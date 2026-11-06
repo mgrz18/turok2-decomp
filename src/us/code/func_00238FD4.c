@@ -42,7 +42,7 @@ struct Filter {
 };
 struct Filter;
 typedef struct Filter Filter;
-extern void func_00246690(void *, s32, Triple, s32);
+extern void Actor_SpawnParticle(void *, s32, Triple, s32);
 struct Triple;
 struct Triple;
 void func_00238FD4(void *arg0, Filter *arg1, s32 arg2, Triple arg3, struct IntPair arg6) {
@@ -59,5 +59,5 @@ void func_00238FD4(void *arg0, Filter *arg1, s32 arg2, Triple arg3, struct IntPa
         }
         break;
     }
-    func_00246690(arg0, arg6.field_0, arg3, 0);
+    Actor_SpawnParticle(arg0, arg6.field_0, arg3, 0);
 }

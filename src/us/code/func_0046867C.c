@@ -1,8 +1,8 @@
-/* Second VM module copy of func_0042F75C (same source, linked 0xE0 lower). */
+/* Second VM module copy of Demo_DecodeStick (same source, linked 0xE0 lower). */
 #include "common.h"
 #include "structs/demo.h"
 
-void func_0042EB50(DemoStream *);
+void Demo_ReadRunLength_2(DemoStream *);
 
 /* Reads count bits, most significant first. */
 static __inline__ s32 readBits(DemoStream *r, s32 count) {
@@ -17,7 +17,7 @@ static __inline__ s32 readBits(DemoStream *r, s32 count) {
     return v;
 }
 
-void func_0046867C(DemoStream *t) {
+void Demo_DecodeStick_2(DemoStream *t) {
     t->value = readBits(t, 8);
-    func_0042EB50(t);
+    Demo_ReadRunLength_2(t);
 }

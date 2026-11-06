@@ -3,7 +3,7 @@
 
 /* Acclaim's intrusive list (CList__*): the head and tail element, and where
  * in an element its links are (the IntrusiveList of the Rage Wars decomp).
- * func_002007D0 and its neighbours are the list functions.
+ * CList__RemoveHead and its neighbours are the list functions.
  * tools/check_structs.py checks every offset below with the game's compiler. */
 
 #include "common.h"

@@ -21,8 +21,8 @@ struct RootRecAt1C {
     struct Middle *middle;
 };
 struct RootRecAt1C;
-extern s32 func_0041C9C4(void *unused, struct RootRecAt1C *root);
-s32 func_0041C9C4(void *unused, struct RootRecAt1C *root) {
+extern s32 StatsMenu_Done(void *unused, struct RootRecAt1C *root);
+s32 StatsMenu_Done(void *unused, struct RootRecAt1C *root) {
     root->middle->leaf->flag = 1;
     return 1;
 }

@@ -1,4 +1,4 @@
-/* WRONG CUT: REAL func_0042CF90 size 0x110 (splat cut it into func_0042CF90 + func_0042CFC0 + func_0042D040). */
+/* WRONG CUT: REAL SceneActorPool_Construct size 0x110 (splat cut it into SceneActorPool_Construct + func_0042CFC0 + func_0042D040). */
 #include "common.h"
 #include "structs/intelligence.h"
 
@@ -23,7 +23,7 @@ extern void func_0027BD10(CIntelligence *def);
 extern void func_00227664(SceneActor *actor);
 
 /* Links the 32 actors of the pool into its free list and sets up the two default definitions. */
-void func_0042CF90(ScenePool *pool) {
+void SceneActorPool_Construct(ScenePool *pool) {
     s32 i;
 
     pool->free = pool->actors;

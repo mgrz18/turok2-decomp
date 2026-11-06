@@ -2,14 +2,14 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 
-extern s32 func_0024E700(CPlayer *player, s32 weapon);
-extern s16 *func_0025398C(CPlayer *player, s32 weapon);
-extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
+extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
+extern s16 *CPlayer__GetFiringAmmo(CPlayer *player, s32 weapon);
+extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 /* Fire check for the first-person weapon: once its cooldown is over and the
  * weapon is usable, fire button 0x2000 starts mode 4 and a tap of 0x10 with
  * weapon 19 starts mode 5. Returns 1 when it fired. */
-s32 func_00257EA0(CGameObjectInstance *obj, CAI *ai) {
+s32 WeaponActor_CheckFire(CGameObjectInstance *obj, CAI *ai) {
     CPlayer *player;
     s32 tapped;
     s32 mode;
@@ -18,7 +18,7 @@ s32 func_00257EA0(CGameObjectInstance *obj, CAI *ai) {
     if (ai->m_Weapon.m_FireDelay > 0.0f) {
         return 0;
     }
-    if (!func_0024E700(player, player->m_Data.m_CurrentWeapon)) {
+    if (!CPlayer__GetWeaponAmmo(player, player->m_Data.m_CurrentWeapon)) {
         return 0;
     }
     if (player->m_pOptions->m_TagMode == 1) {
@@ -35,7 +35,7 @@ s32 func_00257EA0(CGameObjectInstance *obj, CAI *ai) {
     }
     if (player->m_Data.m_CurrentWeapon == 21) {
         CPlayer *owner = (CPlayer *) obj->m_AI.m_pParent;
-        if (*(owner->m_Data.m_AmmoList + *func_0025398C(owner, 21)) == 0) {
+        if (*(owner->m_Data.m_AmmoList + *CPlayer__GetFiringAmmo(owner, 21)) == 0) {
             return 0;
         }
     }
@@ -50,7 +50,7 @@ s32 func_00257EA0(CGameObjectInstance *obj, CAI *ai) {
     } else {
         return 0;
     }
-    func_00243414(obj, ai, mode);
+    CAI__SetMode(obj, ai, mode);
     ai->m_ModeLastFrame = -1;
     return 1;
 }

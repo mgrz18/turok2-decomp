@@ -3,10 +3,10 @@
 
 #include "common.h"
 #include "ultra_types.h"
-extern s32 __osCheckId(OSPfs *pfs);
+extern s32 __osCheckId_2(OSPfs *pfs);
 extern s32 func_00429DE4(OSPfs *pfs);
-extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
-s32 __osCheckId(OSPfs *pfs)
+extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
+s32 __osCheckId_2(OSPfs *pfs)
 {
     int k;
     u8 temp[32];
@@ -17,12 +17,12 @@ s32 __osCheckId(OSPfs *pfs)
         if (ret != 0)
             return ret;
     }
-    ret = func_00299680(pfs->queue, pfs->channel, 1, temp);
+    ret = __osContRamRead(pfs->queue, pfs->channel, 1, temp);
     if (ret != 0) {
         if (ret != 2) {
             return ret;
         }
-        ret = func_00299680(pfs->queue, pfs->channel, 1, temp);
+        ret = __osContRamRead(pfs->queue, pfs->channel, 1, temp);
         if (ret != 0)
             return ret;
     }

@@ -3,6 +3,6 @@
 
 extern s32 D_801309C0;
 
-void func_0045B75C(void) {
+void PakMessage_InitDeleteFailed_2(void) {
     D_801309C0 = 0xE;
 }

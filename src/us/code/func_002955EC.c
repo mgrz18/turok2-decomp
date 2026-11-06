@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002955EC(ALLowPass *lp);
+extern void init_lpfilter(ALLowPass *lp);
 extern const f64 D_800AA528;
 extern const f64 D_800AA530;
-void func_002955EC(ALLowPass *lp)
+void init_lpfilter(ALLowPass *lp)
 {
     s32 i, temp;
     s16 fc;

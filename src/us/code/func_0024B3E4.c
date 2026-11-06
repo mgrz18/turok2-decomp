@@ -6,14 +6,14 @@
 
 extern f32 D_800AE2D8;              /* slot scale */
 
-f32 func_00211774(f32 value, f32 target, f32 rate);
-void func_0020F79C(f32 *m);
-void func_00210790(f32 *m, f32 angle);
-void func_0020F85C(f32 *m, CVector3 *in, CVector3 *out);
-void func_0024AF68(CBarrel *menu, CBarrelIcon *items, s32 count, s32 arg3);
+f32 Math_Approach(f32 value, f32 target, f32 rate);
+void CMtxF__Identity(f32 *m);
+void CMtxF__RotateX(f32 *m, f32 angle);
+void CMtxF__TransformPoint(f32 *m, CVector3 *in, CVector3 *out);
+void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, s32 arg3);
 
 /* Lays out the weapon menu's slots around the wheel and draws them. */
-void func_0024B3E4(CBarrel *menu, s32 arg1, s32 arg2) {
+void CBarrel__DrawRing(CBarrel *menu, s32 arg1, s32 arg2) {
     f32 m[16];
     CVector3 position;
     CVector3 offset;
@@ -35,15 +35,15 @@ void func_0024B3E4(CBarrel *menu, s32 arg1, s32 arg2) {
             target = D_800AE2D8 * 1.3f;
         } else {
             target = D_800AE2D8;
-            slot->m_Lift = func_00211774(slot->m_Lift, 0.0f, 0.35f);
+            slot->m_Lift = Math_Approach(slot->m_Lift, 0.0f, 0.35f);
         }
-        slot->m_Scale = func_00211774(slot->m_Scale, target, D_800AE2D8 * 0.1f);
+        slot->m_Scale = Math_Approach(slot->m_Scale, target, D_800AE2D8 * 0.1f);
         offset.x = 0.0f;
         offset.y = 0.0f;
         offset.z = 0.75f;
-        func_0020F79C(m);
-        func_00210790(m, menu->m_Spin - slot->m_Angle);
-        func_0020F85C(m, &offset, &position);
+        CMtxF__Identity(m);
+        CMtxF__RotateX(m, menu->m_Spin - slot->m_Angle);
+        CMtxF__TransformPoint(m, &offset, &position);
         count++;
         item->m_Item = i;
         item->m_vPos = position;
@@ -52,5 +52,5 @@ void func_0024B3E4(CBarrel *menu, s32 arg1, s32 arg2) {
         item->m_Size = 1.0f;
         item++;
     }
-    func_0024AF68(menu, items, count, arg2);
+    CBarrel__DrawIcons(menu, items, count, arg2);
 }

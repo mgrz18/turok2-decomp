@@ -20,7 +20,7 @@ extern char D_800B4F68[];
 extern char D_800B4F98[];
 extern char D_800B4FD4[];
 extern char D_800B5010[];
-s32 func_0045B7D0(MenuItem *item) {
+s32 PakMessage_UpdateLine1_2(MenuItem *item) {
     switch (D_801309C0) {
     default:
     case 0:

@@ -7,8 +7,8 @@ extern float func_002974C0(float x);
 extern float D_800A7D1C;
 extern float D_800A7D18;
 extern float D_800A7D20;
-extern f32 func_00266F50(f32 arg0);
-f32 func_00266F50(f32 arg0)
+extern f32 SmoothStep(f32 arg0);
+f32 SmoothStep(f32 arg0)
 {
   f32 var_f1;
   f32 var_f0;

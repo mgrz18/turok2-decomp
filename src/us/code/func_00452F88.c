@@ -2,7 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 typedef signed int s32;
-extern void func_002759C4(s32 a);
+extern void Music_SetTrack(s32 a);
 struct ObjRecAtB0;
 struct ObjRecAtB0 {
     char pad0[0xB0];
@@ -17,7 +17,7 @@ struct RecordRecAt20V1 {
     struct ObjRecAtB0 *inner;
 };
 extern s32 D_800C1F78;
-s32 func_00452F88(s32 arg0, struct RecordRecAt20V1 *arg1) {
+s32 SoundMenu_StepMusicTrack_2(s32 arg0, struct RecordRecAt20V1 *arg1) {
     s32 var_a0;
     var_a0 = D_800C1F78;
     if (arg1->inner->unkB0 & 0x20202) {
@@ -37,6 +37,6 @@ s32 func_00452F88(s32 arg0, struct RecordRecAt20V1 *arg1) {
         }
     }
     D_800C1F78 = var_a0;
-    func_002759C4(var_a0);
+    Music_SetTrack(var_a0);
     return 0;
 }

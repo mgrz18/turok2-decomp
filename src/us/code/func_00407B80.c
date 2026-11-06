@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
+s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern u8 D_8012F9D2;
 
-void func_00407B80(CGameObjectInstance *obj, CAI *ai) {
+void Primagen_UpdateMode14(CGameObjectInstance *obj, CAI *ai) {
     s32 var_a2;
 
     if (ai->m_AnimRepeatedCount != 0) {
@@ -13,6 +13,6 @@ void func_00407B80(CGameObjectInstance *obj, CAI *ai) {
         if (D_8012F9D2 == 0) {
             var_a2 = 7;
         }
-        func_00243414(obj, ai, var_a2);
+        CAI__SetMode(obj, ai, var_a2);
     }
 }

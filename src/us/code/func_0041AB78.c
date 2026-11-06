@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_0041AB78(void) {
+s32 EnterCheatMenu_TextFieldSelect(void) {
     return 0;
 }

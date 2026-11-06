@@ -1,8 +1,8 @@
-/* Second-module copy of func_004233E8 (first module). The port comes back through a pointer (a stack slot the ROM stores but never reads). */
+/* Second-module copy of SavePortalMenu_SelectGoBack (first module). The port comes back through a pointer (a stack slot the ROM stores but never reads). */
 #include "common.h"
 #include "structs/menu.h"
 
-void func_00416644(char *dst, char *fmt, void *player, s32 controller, s32 arg4);
+void MenuPool_OpenMenu(char *dst, char *fmt, void *player, s32 controller, s32 arg4);
 
 extern char D_0043BBB0[];
 extern s32 D_800C2028;
@@ -24,7 +24,7 @@ static __inline__ u8 *GetPlayer(Menu *event, s32 *port) {
     return player;
 }
 
-s32 func_0045C308(s32 unused, Menu *event) {
+s32 SavePortalMenu_SelectGoBack_2(s32 unused, Menu *event) {
     u8 *player;
     s32 port;
 
@@ -33,7 +33,7 @@ s32 func_0045C308(s32 unused, Menu *event) {
     D_801198A4[1] = 0;
     D_80130940 = 0;
     player = GetPlayer(event, &port);
-    func_00416644(*(char **)(player + 0x51C) + 0x53C, D_0043BBB0, player, *(s32 *)(player + 0xA50), 0);
+    MenuPool_OpenMenu(*(char **)(player + 0x51C) + 0x53C, D_0043BBB0, player, *(s32 *)(player + 0xA50), 0);
     D_80130998 = 0;
     return 1;
 }

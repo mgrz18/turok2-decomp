@@ -11,16 +11,16 @@ typedef struct SpawnObj {
 
 extern u8 D_800F8928[];
 
-void func_002688C8(SpawnObj *obj, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
-CQuaternion func_0021AE6C(SpawnObj *obj);
+void GameObject_TraceMove(SpawnObj *obj, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
+CQuaternion CGameObjectInstance__GetRotation(SpawnObj *obj);
 CQuaternion func_002156D4(SpawnObj *obj);
 s32 func_0021F1F8(SpawnObj *obj);
-s32 func_0022F350(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
+s32 CParticleSystem__Spawn(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
                   CQuaternion rot, CVector3 pos, s32 region, s32 b, s32 c);
 
 /* Spawns a particle of `kind` from `obj` at `at`, moving with it and
  * oriented like it. */
-void func_00246690(SpawnObj *obj, s32 kind, CVector3 at) {
+void Actor_SpawnParticle(SpawnObj *obj, s32 kind, CVector3 at) {
     CVector3 pos;
     CVector3 vel;
     CQuaternion rot;
@@ -29,7 +29,7 @@ void func_00246690(SpawnObj *obj, s32 kind, CVector3 at) {
     s32 target;
 
     mode = 1;
-    func_002688C8(obj, at, &pos, &region, 0, 1);
+    GameObject_TraceMove(obj, at, &pos, &region, 0, 1);
     target = 0;
     switch (obj->type) {
     case 0:
@@ -40,7 +40,7 @@ void func_00246690(SpawnObj *obj, s32 kind, CVector3 at) {
         break;
     case 1:
         vel = obj->velocity;
-        rot = func_0021AE6C(obj);
+        rot = CGameObjectInstance__GetRotation(obj);
         target = obj->target;
         if (func_0021F1F8(obj) == 5) {
             mode = 3;
@@ -51,5 +51,5 @@ void func_00246690(SpawnObj *obj, s32 kind, CVector3 at) {
         rot = func_002156D4(obj);
         break;
     }
-    func_0022F350(D_800F8928, obj, obj, NULL, target, kind, vel, rot, pos, region, -1, mode);
+    CParticleSystem__Spawn(D_800F8928, obj, obj, NULL, target, kind, vel, rot, pos, region, -1, mode);
 }

@@ -343,11 +343,11 @@ struct Trigger {
     u8 pad13;
 };
 /* NOTE: Turok 2 differs from Rage Wars here: no trigger fields are read; it
- * calls func_002535E4 on the world with 900.0f, then func_00412438(0x136). */
-extern void func_0040333C(struct Trigger *arg0);
-extern void func_002535E4(Shared_World *world, float value);
-extern void func_00412438(s32 id);
-void func_0040333C(Trigger *arg0) {
-    func_002535E4(&D_80119870.m_PlayerList, 900.0f);
-    func_00412438(0x136);
+ * calls CPlayerPool__SetInvincibility on the world with 900.0f, then Cinema_RequestById(0x136). */
+extern void MantidQueen_EnterDeath(struct Trigger *arg0);
+extern void CPlayerPool__SetInvincibility(Shared_World *world, float value);
+extern void Cinema_RequestById(s32 id);
+void MantidQueen_EnterDeath(Trigger *arg0) {
+    CPlayerPool__SetInvincibility(&D_80119870.m_PlayerList, 900.0f);
+    Cinema_RequestById(0x136);
 }

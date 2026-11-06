@@ -9,7 +9,7 @@ typedef struct {
 
 extern s32 D_800B6D1C;          /* current view */
 
-void func_00235FC4(VtxBuffers *arg0) {
+void RibbonVtxPool_Reset(VtxBuffers *arg0) {
     s32 i = D_800B6D1C;
     arg0->count = 0x12C;
     arg0->current = (s8 *)arg0 + i * 0x12C0;

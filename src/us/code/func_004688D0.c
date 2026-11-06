@@ -1,5 +1,5 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_9.CPP, func_8044A170_de, with Turok 2's layouts. */
-/* Second VM module copy of func_0042F9B0 (same source, linked 0xE0 lower). */
+/* Second VM module copy of CCamera__Construct (same source, linked 0xE0 lower). */
 #include "common.h"
 #include "structs/camera.h"
 
@@ -16,16 +16,16 @@ extern s32 D_800C2030;
 extern s32 D_800C2034;
 extern IntPair D_800F5A40;
 
-void func_00280C28(void *);
-void func_0020F79C(void *);
-void func_00281278(CCamera *);
-void func_00280E64(CCamera *, s32);
-void func_00416614(void *);
+void CCameraViewParams__Construct(void *);
+void CMtxF__Identity(void *);
+void CCamera__ResetWarp(CCamera *);
+void CCamera__SetMode(CCamera *, s32);
+void MenuPool_Construct(void *);
 void func_0042FF10(void *);
 void CList__Construct(void *list, s32 prevOffset, s32 nextOffset);
-void func_00281A98(CCamera *);
+void CCamera__ConstructSkySystem(CCamera *);
 
-void func_004688D0(CCamera *view) {
+void CCamera__Construct_2(CCamera *view) {
     f32 one;
     f32 zero;
     s16 size;
@@ -36,9 +36,9 @@ void func_004688D0(CCamera *view) {
     Floats *f4;
     Floats *f5;
 
-    func_00280C28(&view->m_ViewParams);
-    func_0020F79C(view->m_mfViewOrient);
-    func_0020F79C(view->m_mfProjection);
+    CCameraViewParams__Construct(&view->m_ViewParams);
+    CMtxF__Identity(view->m_mfViewOrient);
+    CMtxF__Identity(view->m_mfProjection);
     zero = 0.0f;
     one = 1.0f;
     f1 = (Floats *)&view->m_qViewAlign;
@@ -46,7 +46,7 @@ void func_004688D0(CCamera *view) {
     f1->unk4 = zero;
     view->m_qViewAlign.x = zero;
     view->m_qViewAlign.w = one;
-    func_0020F79C(view->m_mfInverseViewOrient);
+    CMtxF__Identity(view->m_mfInverseViewOrient);
     view->m_Viewport.m_Width = (f32)D_800C2030;
     view->m_Viewport.m_Height = (f32)D_800C2034;
     view->m_nCurrentRegionSet = -1;
@@ -70,7 +70,7 @@ void func_004688D0(CCamera *view) {
     view->m_LastFarClip = 1024.0f;
     view->m_FieldOfView = 47.5f;
     view->m_LastFieldOfView = 47.5f;
-    func_00281278(view);
+    CCamera__ResetWarp(view);
     f2 = (Floats *)&view->m_Shake;
     view->m_TremorAngle = zero;
     view->m_TremorHeight = zero;
@@ -93,7 +93,7 @@ void func_004688D0(CCamera *view) {
     f5->unk8 = zero;
     f5->unkC = zero;
     f5->unk10 = zero;
-    func_00280E64(view, 0);
+    CCamera__SetMode(view, 0);
     size = D_800C2030 * 2;
     for (i = 0; i < 2; i++) {
         view->m_vp[i].vscale[0] = size;
@@ -105,12 +105,12 @@ void func_004688D0(CCamera *view) {
         view->m_vp[i].vtrans[2] = 0;
         view->m_vp[i].vtrans[3] = 0;
     }
-    func_00416614(view->m_MenuPool);
+    MenuPool_Construct(view->m_MenuPool);
     func_0042FF10(view->m_SkySystem);
-    func_0020F79C(view->m_mfFaceScreen);
-    func_0020F79C(view->m_mfFaceScreenYAxisUp);
+    CMtxF__Identity(view->m_mfFaceScreen);
+    CMtxF__Identity(view->m_mfFaceScreenYAxisUp);
     view->m_FlashMode = 0;
     D_800F5A40.field_4 = 0;
     CList__Construct(&view->m_ActiveTextList, 0, 4);
-    func_00281A98(view);
+    CCamera__ConstructSkySystem(view);
 }

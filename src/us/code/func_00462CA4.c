@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern u16 func_00462CA4(u8 *bytes, s32 count);
-u16 func_00462CA4(u8 *bytes, s32 count)
+extern u16 __osSumcalc_2(u8 *bytes, s32 count);
+u16 __osSumcalc_2(u8 *bytes, s32 count)
 {
     s32 i;
     s32 sum;

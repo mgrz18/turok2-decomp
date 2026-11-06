@@ -2,15 +2,15 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 
-s32 func_004160F0(MenuItem *item); /* length of the item's text line */
-s32 func_0029E3E0(char *buf, const char *fmt, ...); /* sprintf */
+s32 MenuItem_TextLength(MenuItem *item); /* length of the item's text line */
+s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 extern char D_800B617C[];
 extern char D_800B6164[];
 
 /* Names setting 0x2E. */
 s32 func_004522CC(MenuItem *item) {
-    switch (D_8011AAD8.teamUnk2E) {
+    switch (D_8011AAD8.teamCrosshairs) {
     case 0:
         item->text = D_800B617C;
         break;

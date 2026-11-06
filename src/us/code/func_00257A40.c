@@ -18,18 +18,18 @@ typedef struct {
 extern s32 D_800AE37C;             /* flip x */
 extern s32 D_800AE380;             /* flip y */
 extern s32 D_800AE384;             /* flip z */
-extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-extern void func_0020FC74(f32 *mtx, f32 x, f32 y, f32 z);
-extern void func_002101A0(void *src, CVector3 *out);
-extern void func_00211114(void *q, f32 *mtx);
-extern void func_00210318(f32 *mtx, f32 x, f32 y, f32 z);
-extern void func_00210C3C(f32 *mtx);
-extern void func_0020C618(f32 *dst, f32 *a, f32 *b);
+extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+extern void CMtxF__SetScale(f32 *mtx, f32 x, f32 y, f32 z);
+extern void CMtxF__GetTranslation(void *src, CVector3 *out);
+extern void CQuaternion__ToMatrix(void *q, f32 *mtx);
+extern void CMtxF__Translate(f32 *mtx, f32 x, f32 y, f32 z);
+extern void CMtxF__SwapYZRows(f32 *mtx);
+extern void CMtxF__MultiplyAffine(f32 *dst, f32 *a, f32 *b);
 
 /* Builds the first-person weapon model's matrix from the owner's camera:
  * its own offset scaled by 0.1, the weapon's view offset (optionally
  * mirrored per axis) scaled by -10.24, the camera rotation and position. */
-void func_00257A40(WeaponModel *model) {
+void WeaponActor_BuildMatrix(WeaponModel *model) {
     CVector3 cameraPos;
     f32 rotation[4][4];
     CVector3 scaled;
@@ -48,13 +48,13 @@ void func_00257A40(WeaponModel *model) {
     if (D_800AE384) {
         viewOffset.z = -viewOffset.z;
     }
-    func_0020EF60(&scaled, &model->offset, 0.1f);
-    func_0020FC74(mtx[0], scaled.x, scaled.y, scaled.z);
-    func_0020EF60(&viewOffset, &viewOffset, -10.24f);
-    func_002101A0(((u8 *)player->m_pCamera) + 0x14C, &cameraPos);
-    func_00211114(((u8 *)player->m_pCamera) + 0x12C, rotation[0]);
-    func_00210318(mtx[0], viewOffset.x, viewOffset.y, viewOffset.z);
-    func_00210C3C(mtx[0]);
-    func_0020C618(model->matrix[0], mtx[0], rotation[0]);
-    func_00210318(model->matrix[0], cameraPos.x, cameraPos.y, cameraPos.z);
+    CVector3__Scale(&scaled, &model->offset, 0.1f);
+    CMtxF__SetScale(mtx[0], scaled.x, scaled.y, scaled.z);
+    CVector3__Scale(&viewOffset, &viewOffset, -10.24f);
+    CMtxF__GetTranslation(((u8 *)player->m_pCamera) + 0x14C, &cameraPos);
+    CQuaternion__ToMatrix(((u8 *)player->m_pCamera) + 0x12C, rotation[0]);
+    CMtxF__Translate(mtx[0], viewOffset.x, viewOffset.y, viewOffset.z);
+    CMtxF__SwapYZRows(mtx[0]);
+    CMtxF__MultiplyAffine(model->matrix[0], mtx[0], rotation[0]);
+    CMtxF__Translate(model->matrix[0], cameraPos.x, cameraPos.y, cameraPos.z);
 }

@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00202AC0(s32 arg0);
-s32 func_00202AC0(s32 arg0) {
+extern s32 RoundToPowerOfTwo(s32 arg0);
+s32 RoundToPowerOfTwo(s32 arg0) {
     s32 var_a1;
     s32 var_a2;
     s32 var_v1;

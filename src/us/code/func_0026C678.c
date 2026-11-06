@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/region.h"
 
-CRegionInfo *func_0022425C(void *, void *);          /* extern */
-void func_0026CEC8(CGameRegion *);                  /* extern */
+CRegionInfo *CScene__GetRegionInfo(void *, void *);          /* extern */
+void CGameRegion__FloodClearWaterAll(CGameRegion *);                  /* extern */
 extern u8 D_800F7078[];
 
-void func_0026C678(CGameRegion *arg0) {
+void CGameRegion__FloodClearWater(CGameRegion *arg0) {
     CGameRegion *temp_a0;
     CGameRegion *temp_a0_2;
     CGameRegion *temp_a0_3;
@@ -18,18 +18,18 @@ void func_0026C678(CGameRegion *arg0) {
             temp_a0 = arg0->m_pNeighbours[0];
             arg0->m_wFlags = (u16) (temp_v1 & 0xFFFE);
             if (temp_a0 != NULL) {
-                func_0026CEC8(temp_a0);
+                CGameRegion__FloodClearWaterAll(temp_a0);
             }
             temp_a0_2 = arg0->m_pNeighbours[1];
             if (temp_a0_2 != NULL) {
-                func_0026CEC8(temp_a0_2);
+                CGameRegion__FloodClearWaterAll(temp_a0_2);
             }
             temp_a0_3 = arg0->m_pNeighbours[2];
             if (temp_a0_3 != NULL) {
-                func_0026CEC8(temp_a0_3);
+                CGameRegion__FloodClearWaterAll(temp_a0_3);
             }
         }
-        temp_v0 = func_0022425C(D_800F7078, arg0);
+        temp_v0 = CScene__GetRegionInfo(D_800F7078, arg0);
         if (temp_v0 != NULL) {
             temp_v0->unk_58 = 0;
             temp_v0->m_MapColour = 0;

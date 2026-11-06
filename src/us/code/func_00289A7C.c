@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_00289A7C(void) {
+void EngineMode13_Game_Retrace(void) {
 
 }

@@ -29,10 +29,10 @@ typedef struct {
 
 extern u8 D_8011AAEF;
 
-extern s32 func_002113A4(void); /* rand */
-extern s32 func_00219F74(CGameObjectInstance *actor, s32 model, s32 arg2);
+extern s32 Random_Next(void); /* rand */
+extern s32 CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, s32 model, s32 arg2);
 
-s32 func_0025B078(CGameObjectInstance *actor, s32 unused, HitInfo *hit) {
+s32 EnemyAI_PickDeathMode(CGameObjectInstance *actor, s32 unused, HitInfo *hit) {
     CEnemyIntelligence *anims;
     Source *src;
     s32 front = 0;
@@ -75,7 +75,7 @@ s32 func_0025B078(CGameObjectInstance *actor, s32 unused, HitInfo *hit) {
     if (blast && anims->m_BlastDeathModel != -1) {
         return 0x37;
     }
-    if (func_002113A4() % 1000 < 500) {
+    if (Random_Next() % 1000 < 500) {
         back = side = front = 0;
     }
     if (hit->point != NULL) {
@@ -104,7 +104,7 @@ s32 func_0025B078(CGameObjectInstance *actor, s32 unused, HitInfo *hit) {
         }
     }
     if (D_8011AAEF != 0 && (hit->flags & 0x800000) && anims->m_ExplodeDeathModel != -1) {
-        if (func_00219F74(actor, anims->m_GibModel + 1, -1) != -1) {
+        if (CGameObjectInstance__PickRandomAnim(actor, anims->m_GibModel + 1, -1) != -1) {
             return 0x35;
         }
         return 0x36;

@@ -5,22 +5,22 @@
 #include "structs/boss.h"
 
 /* Module phase 2 entry: resets the actors' blend values and the fade timer, sets up phase 2 (timers, anim,
- * slot values), resets its active slots unless ai->m_Mode is 0x13, and queues func_0040C7B4. */
+ * slot values), resets its active slots unless ai->m_Mode is 0x13, and queues MotherBoss_OnPhase2CinemaDone. */
 
 
 extern s32 D_801301CC[]; /* D_8012FB70.phase */
 extern s32 D_801301D0[]; /* D_8012FB70.activeMask */
 extern s32 D_801301D4[]; /* D_8012FB70.liveMask */
 extern s32 D_801301EC[]; /* D_8012FB70.counter */
-extern f32 D_800C1900; /* fade timer (func_0040A25C) */
+extern f32 D_800C1900; /* fade timer (MotherBoss_PartEffects) */
 extern s32 D_800C1904;
 extern s32 D_00431DE4[];
 extern s32 D_00431DF0[]; /* active slot mask per phase */
 extern s32 D_00431DFC[];
 extern u8 D_00431E08[];
-extern void func_00236314(void *dst, void *src);
-extern void func_0040C7B4(void);
-extern s32 func_00283FF8(s32 id, void *arg1, void *arg2);
+extern void ScriptAnimator_SetScript(void *dst, void *src);
+extern void MotherBoss_OnPhase2CinemaDone(void);
+extern s32 Cinema_SetNextCallbacks(s32 id, void *arg1, void *arg2);
 
 static __inline__ void resetSlots(s32 mask, void *src) {
     MotherBossState *state = &D_8012FB70;
@@ -28,7 +28,7 @@ static __inline__ void resetSlots(s32 mask, void *src) {
 
     for (i = 0; i < 15; i++) {
         if ((mask >> i) & 1) {
-            func_00236314(&state->slots[i].anim, src);
+            ScriptAnimator_SetScript(&state->slots[i].anim, src);
         }
     }
 }
@@ -52,7 +52,7 @@ static __inline__ void enterPhase2(MotherBossState *s, CAI *ai) {
     }
 }
 
-void func_0040ABB4(void *obj, CAI *ai) {
+void MotherBoss_StartPhase2Cinema(void *obj, CAI *ai) {
     MotherBossState *state = &D_8012FB70;
     CGameObjectInstance *actor;
     s32 i;
@@ -63,5 +63,5 @@ void func_0040ABB4(void *obj, CAI *ai) {
         actor->m_AI.m_Mother.m_PulseScale = 0.0f;
     }
     enterPhase2(&D_8012FB70, ai);
-    func_00283FF8(0xDC, func_0040C7B4, NULL);
+    Cinema_SetNextCallbacks(0xDC, MotherBoss_OnPhase2CinemaDone, NULL);
 }

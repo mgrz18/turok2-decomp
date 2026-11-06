@@ -20,9 +20,9 @@ typedef struct {
 extern f32 D_800B6D28; /* frame time */
 extern f32 D_800C1900; /* fade timer */
 extern s32 D_800C1904; /* second value reached its peak */
-extern void func_0021034C(void *arg0, f32 r, f32 g, f32 b);
+extern void CMtxF__ScaleAxes(void *arg0, f32 r, f32 g, f32 b);
 
-void func_0040A25C(void *arg0, PartInfo *info) {
+void MotherBoss_PartEffects(void *arg0, PartInfo *info) {
     CGameObjectInstance *actor = info->actor;
     ModuleObj *obj;
     f32 v;
@@ -70,7 +70,7 @@ void func_0040A25C(void *arg0, PartInfo *info) {
         case 51:
         case 56:
         case 61:
-            func_0021034C(arg0, actor->m_AI.m_Mother.m_GrowScale, actor->m_AI.m_Mother.m_GrowScale, actor->m_AI.m_Mother.m_GrowScale);
+            CMtxF__ScaleAxes(arg0, actor->m_AI.m_Mother.m_GrowScale, actor->m_AI.m_Mother.m_GrowScale, actor->m_AI.m_Mother.m_GrowScale);
             break;
         case 89:
         case 93:
@@ -78,7 +78,7 @@ void func_0040A25C(void *arg0, PartInfo *info) {
         case 101:
         case 105:
         case 109:
-            func_0021034C(arg0, actor->m_AI.m_Mother.m_PulseScale, actor->m_AI.m_Mother.m_PulseScale, actor->m_AI.m_Mother.m_PulseScale);
+            CMtxF__ScaleAxes(arg0, actor->m_AI.m_Mother.m_PulseScale, actor->m_AI.m_Mother.m_PulseScale, actor->m_AI.m_Mother.m_PulseScale);
             break;
     }
 }

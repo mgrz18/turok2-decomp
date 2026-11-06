@@ -6,11 +6,11 @@
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 extern u32 D_80122A30;
 extern void *D_800B8930;
-extern u32 func_0029DFC0(void);
-extern void func_0029BE0C(u64 tim);
-extern u64 func_0029BE6C(OSTimer *t);
-extern void func_0029E210(u32 compare);
-void func_0029BC70(void)
+extern u32 osGetCount(void);
+extern void __osSetTimerIntr(u64 tim);
+extern u64 __osInsertTimer(OSTimer *t);
+extern void __osSetCompare(u32 compare);
+void __osTimerInterrupt(void)
 {
     OSTimer *t;
     u32 count;
@@ -23,16 +23,16 @@ void func_0029BC70(void)
     for (;;) {
         t = ((OSTimer *)D_800B8930)->next;
         if (t == D_800B8930) {
-            func_0029E210(0);
+            __osSetCompare(0);
             D_80122A30 = 0;
             break;
         }
-        count = func_0029DFC0();
+        count = osGetCount();
         elapsed_cycles = count - *counter;
         *counter = count;
         if (elapsed_cycles < t->value) {
             t->value -= elapsed_cycles;
-            func_0029BE0C(t->value);
+            __osSetTimerIntr(t->value);
             break;
         }
         t->prev->next = t->next;
@@ -44,8 +44,8 @@ void func_0029BC70(void)
         }
         if (t->interval != 0) {
             t->value = t->interval;
-            func_0029BE6C(t);
+            __osInsertTimer(t);
         }
     }
 }
-void func_0029BE0C(u64 interval);
+void __osSetTimerIntr(u64 interval);

@@ -11,8 +11,8 @@ typedef struct B01Pair {
 } B01Pair;
 
 extern u8 D_800F7078[];
-void func_00237EE4(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, B01Pair extra);
-void func_00220260(void *mgr, CGameObjectInstance *actor, s32 flag);
+void ImpactEvent_Call(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, B01Pair extra);
+void CScene__SetInstanceSavedBit(void *mgr, CGameObjectInstance *actor, s32 flag);
 
 static __inline__ s32 r01_check(CGameObjectInstance *actor, CAI *state, f32 scale) {
     if (actor->m_nAnims == 1) return 1;
@@ -25,14 +25,14 @@ static __inline__ s32 r01_check(CGameObjectInstance *actor, CAI *state, f32 scal
     }
 }
 
-void func_002653F8(CGameObjectInstance *actor, CAI *state) {
+void Door_CloseUpdate(CGameObjectInstance *actor, CAI *state) {
     s32 idx = *(s8 *)((u8 *) actor->header.m_pIntelligence + 0x1D);
     B01Pair extra;
     if (idx != -1) {
         if (r01_check(actor, state, (f32)idx * 0.007874016f)) {
             extra.a = 0;
-            func_00237EE4(actor, actor, 7, actor->header.m_vPos, extra);
-            func_00220260(D_800F7078, actor, 0);
+            ImpactEvent_Call(actor, actor, 7, actor->header.m_vPos, extra);
+            CScene__SetInstanceSavedBit(D_800F7078, actor, 0);
         }
     }
 }

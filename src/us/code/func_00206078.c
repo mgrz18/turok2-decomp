@@ -3,6 +3,6 @@
 
 extern s32 D_800D8DEC;
 
-s32 func_00206078(void) {
+s32 CCache__GetFrameDelay(void) {
     return D_800D8DEC;
 }

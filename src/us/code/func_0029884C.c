@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0029884C();
+extern void __osPackReadData();
 extern s8 D_801213DC;
-void func_0029884C(void) {
+void __osPackReadData(void) {
     extern OSPifRam D_801213E0;
     ContReadFormat readformat;
     u8 *ptr;

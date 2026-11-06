@@ -17,7 +17,7 @@ extern char D_800B6044[];
 extern char D_800B605C[];
 extern char D_800B6074[];
 
-s32 func_00419100(MenuItem *a) {
+s32 TeamBloodMenu_LevelLabel(MenuItem *a) {
     switch (D_8011AB04) {
     case 0:
         a->text = D_800B5F3C;

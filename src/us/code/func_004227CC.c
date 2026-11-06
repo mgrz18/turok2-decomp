@@ -4,7 +4,7 @@
 extern s32 D_8013098C;
 extern s32 D_801309C0;
 
-void func_004227CC(void) {
+void PakMessage_InitRumblePakB(void) {
     D_801309C0 = 9;
     D_8013098C = 1;
 }

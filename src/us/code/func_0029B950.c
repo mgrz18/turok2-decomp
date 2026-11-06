@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern struct IntPair D_801229A0[];
-void func_0029B950(s32 arg0, s32 arg1, s32 arg2) {
+void osSetEventMesg(s32 arg0, s32 arg1, s32 arg2) {
     extern void __osRestoreInt(u32);
     extern u32 __osDisableInt(void);
     u32 temp_v0;

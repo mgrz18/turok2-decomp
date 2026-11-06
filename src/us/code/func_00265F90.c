@@ -35,13 +35,13 @@ extern u8 D_801198F0[]; /* game + 0x40: fallback camera */
 extern char *D_800B69D8[]; /* {text, sound} pairs */
 extern s32 D_800B69DC[];  /* D_800B69D8 + 4 */
 
-extern s32 func_00253720(CPlayer *player, s32 item); /* can take it? */
-extern void func_002536E0(CPlayer *player, s32 item);
-extern void func_002817A0(void *game, void *camera, char *text, Pickup *obj, f32 time);
-extern void func_0027580C(s32 sound);
+extern s32 CPlayer__GetPickupCountLow(CPlayer *player, s32 item); /* can take it? */
+extern void CPlayer__UseSpecialPickup(CPlayer *player, s32 item);
+extern void CCameraPool__AddMultiLineText(void *game, void *camera, char *text, Pickup *obj, f32 time);
+extern void Sound__PlaySpeech(s32 sound);
 
 /* A touch on a pickup: give the item, or show why it cannot be taken. */
-s32 func_00265F90(Pickup *obj, PickupState *state, Toucher *toucher) {
+s32 Action_CheckRequiredItem(Pickup *obj, PickupState *state, Toucher *toucher) {
     PickupInfo *info = &obj->def->info;
     CPlayer *player;
     void *camera;
@@ -50,8 +50,8 @@ s32 func_00265F90(Pickup *obj, PickupState *state, Toucher *toucher) {
         return 1;
     }
     player = toucher->owner;
-    if (func_00253720(player, info->item)) {
-        func_002536E0(player, info->item);
+    if (CPlayer__GetPickupCountLow(player, info->item)) {
+        CPlayer__UseSpecialPickup(player, info->item);
         return 1;
     }
     if (info->message == 0) {
@@ -61,10 +61,10 @@ s32 func_00265F90(Pickup *obj, PickupState *state, Toucher *toucher) {
     if (player->m_pCamera != NULL) {
         camera = player->m_pCamera;
     }
-    func_002817A0(D_801198B0, camera,
+    CCameraPool__AddMultiLineText(D_801198B0, camera,
                   D_800B69D8[info->message * 2], obj, 4.0f);
     if (D_800B69DC[info->message * 2] != 0) {
-        func_0027580C(D_800B69DC[info->message * 2]);
+        Sound__PlaySpeech(D_800B69DC[info->message * 2]);
     }
     return 0;
 }

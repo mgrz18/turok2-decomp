@@ -3,41 +3,41 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002A12DC();
+extern void adecClearStopFlag();
 extern QueueRec D_800F55F4[];
-extern void func_002A12CC(void);
-extern s32 func_002A1170(void *, s32, s32 *);
-extern s32 func_00293580(char *);
-extern void func_00293DE0(char *, f32);
-extern void func_00293E70(char *, s32);
-extern void func_00293D90(char *, s32);
-extern void func_00293E30(char *, s32, s32);
-extern void func_00293D40(char *, s32);
-extern void func_00293CE0(char *);
-void func_002768D0(PlayerRecAt24 *player) {
-    extern void func_00293E60(char *, s32);
-    extern void *func_002017D4(void *, s32);
-    extern char *func_002718F4(Bank *);
-    extern void func_00271514(Bank *);
-    extern void func_002714B0(Bank *);
+extern void adecGetStopFlag(void);
+extern s32 adecStreamOpen(void *, s32, s32 *);
+extern s32 alSndpGetState(char *);
+extern void alSndpSetPitch(char *, f32);
+extern void alSndpSetVol(char *, s32);
+extern void alSndpSetPan(char *, s32);
+extern void alSndpSetPriority(char *, s32, s32);
+extern void alSndpSetFXMix(char *, s32);
+extern void alSndpPlay(char *);
+void SpeechPlayer_Update(PlayerRecAt24 *player) {
+    extern void alSndpSetSound(char *, s32);
+    extern void *CISet__GetBlock(void *, s32);
+    extern char *CAudioWorld__GetSndPlayer(Bank *);
+    extern void CAudioWorld__Unlock(Bank *);
+    extern void CAudioWorld__Lock(Bank *);
     extern func_80203E78_S1 *D_800B2AA8;
     s32 rate;
     char *channel;
     s32 index;
     SongHeader *header;
     void *sequence;
-    func_002714B0(player->bank);
-    channel = func_002718F4(player->bank);
+    CAudioWorld__Lock(player->bank);
+    channel = CAudioWorld__GetSndPlayer(player->bank);
     switch (player->state) {
         case 0:
             break;
         case 3:
-            func_002A12CC();
+            adecGetStopFlag();
             break;
         case 2:
-            func_00293E60(channel, player->id);
-            if (func_00293580(channel) == 0) {
-                func_002A12DC();
+            alSndpSetSound(channel, player->id);
+            if (alSndpGetState(channel) == 0) {
+                adecClearStopFlag();
                 if (player->loop >= 0) {
                     player->state = 1;
                 } else {
@@ -50,22 +50,22 @@ void func_002768D0(PlayerRecAt24 *player) {
             ((u8 *)D_800F55F4)[4] = 2;
             ((s32 *)D_800F55F4)[2] = 0;
             index = player->song * 2;
-            header = func_002017D4(player->bank->songs, index);
+            header = CISet__GetBlock(player->bank->songs, index);
             player->tempoScale = header->tempo * 0.01f;
             player->volume = header->volume;
-            sequence = func_002017D4(player->bank->songs, index | 1);
+            sequence = CISet__GetBlock(player->bank->songs, index | 1);
             ((void **)D_800F55F4)[-1] = sequence;
-            D_800B2AA8->unk4 = func_002A1170(sequence, 0x5622, &rate);
+            D_800B2AA8->unk4 = adecStreamOpen(sequence, 0x5622, &rate);
             player->state = 3;
-            func_00293E60(channel, player->id);
-            func_00293DE0(channel, rate * 4.5351473e-05f);
-            func_00293E70(channel, (s16)(player->speed * player->tempoScale));
-            func_00293D90(channel, player->priority);
-            func_00293E30(channel, player->id, 0x7F);
-            func_00293D40(channel, (u8)(u32)player->volume);
-            func_00293CE0(channel);
+            alSndpSetSound(channel, player->id);
+            alSndpSetPitch(channel, rate * 4.5351473e-05f);
+            alSndpSetVol(channel, (s16)(player->speed * player->tempoScale));
+            alSndpSetPan(channel, player->priority);
+            alSndpSetPriority(channel, player->id, 0x7F);
+            alSndpSetFXMix(channel, (u8)(u32)player->volume);
+            alSndpPlay(channel);
             player->loop = -1;
             break;
     }
-    func_00271514(player->bank);
+    CAudioWorld__Unlock(player->bank);
 }

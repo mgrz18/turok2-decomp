@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
+s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
-void func_00446CD4(CGameObjectInstance *obj, CAI *ai) {
+void BlindOne_BossMode5Update_2(CGameObjectInstance *obj, CAI *ai) {
     if (ai->m_AnimRepeatedCount != 0) {
-        func_00243414(obj, ai, 3);
+        CAI__SetMode(obj, ai, 3);
     }
 }

@@ -3,7 +3,7 @@
 
 /* Resets the under-water wobble of the view: still, at its rest scale and
  * speeds (the speeds are angles a frame: pi/2 and 75 degrees). */
-void func_00280EAC(CCamera *cam) {
+void CCamera__ResetWaterWobble(CCamera *cam) {
     cam->m_WaterWobbleXAngle = 0.0f;
     cam->m_WaterWobbleYAngle = 0.0f;
     cam->m_WaterWobbleXScale = 0.2f;

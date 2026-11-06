@@ -3,15 +3,15 @@
 
 typedef unsigned char u8;
 typedef signed int s32;
-s32 func_0029E4C0(u8 *);
+s32 strlen(u8 *);
 extern u8 D_800C1F8C[0x64];
-s32 func_00453C38(u8 *arg0) {
+s32 EnterCheatMenu_MatchesCode_2(u8 *arg0) {
     u8 *input = arg0;
     s32 index = 0;
-    if (func_0029E4C0(input) != func_0029E4C0(D_800C1F8C)) {
+    if (strlen(input) != strlen(D_800C1F8C)) {
         return 0;
     }
-    for (; index < func_0029E4C0(input); index++) {
+    for (; index < strlen(input); index++) {
         if ((input[index] ^ index) != D_800C1F8C[index]) {
             return 0;
         }

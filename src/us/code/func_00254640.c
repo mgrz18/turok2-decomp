@@ -1,10 +1,10 @@
 #include "common.h"
 
-s32 func_002685F0(s32);
+s32 GameObject_IsOnGround(s32);
 
 extern s32 D_8011AAD8;
 
-void func_00254640(void *arg0, void *arg1, void *arg2)
+void CPlayer__UpdateSpeedScale(void *arg0, void *arg1, void *arg2)
 {
   s32 *new_var;
   f32 temp_f1;
@@ -20,7 +20,7 @@ void func_00254640(void *arg0, void *arg1, void *arg2)
   {
     *((f32 *) (((s8 *) arg0) + 0xB28)) = (f32) (temp_f1 * (*((f32 *) (((s8 *) new_var) + 0x1C))));
   }
-  if (((!((*((s32 *) (((s8 *) arg1) + 0x140))) & 0xC0000)) && (arg2 != 0)) && ((func_002685F0((s32) arg1) != 0) || ((*((u16 *) (((s8 *) arg2) + 0x52))) & 0x800)))
+  if (((!((*((s32 *) (((s8 *) arg1) + 0x140))) & 0xC0000)) && (arg2 != 0)) && ((GameObject_IsOnGround((s32) arg1) != 0) || ((*((u16 *) (((s8 *) arg2) + 0x52))) & 0x800)))
   {
     *((f32 *) (((s8 *) arg0) + 0xB28)) = (f32) ((*((f32 *) (((s8 *) arg0) + 0xB28))) * (*((f32 *) (((s8 *) arg2) + 0x30))));
   }

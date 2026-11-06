@@ -9,7 +9,7 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-s32 func_00292774(void *arg0, void *arg1)
+s32 __vsVol(void *arg0, void *arg1)
 {
   int new_var;
   new_var = ((s32) (((*((u8 *) (((s8 *) arg0) + 0x36))) * (*((u8 *) (((s8 *) arg0) + 0x33)))) * (*((u8 *) (((s8 *) arg0) + 0x30))))) >> 6;

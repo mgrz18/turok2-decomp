@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s16 func_00295EC8(f64 vol, f64 tgt, s32 count, u16 *ratel);
-s16 func_00295EC8(f64 vol, f64 tgt, s32 count, u16 *ratel)
+extern s16 _getRate(f64 vol, f64 tgt, s32 count, u16 *ratel);
+s16 _getRate(f64 vol, f64 tgt, s32 count, u16 *ratel)
 {
   s16 s;
   f64 invn = (1.0f) / ((f32) count);

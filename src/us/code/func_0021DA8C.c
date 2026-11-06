@@ -3,18 +3,18 @@
 #include "structs/game_object.h"
 #include "structs/model.h"
 
-/* As func_0021D7BC, for a model drawn from its cached "lit vertices"
- * resource (built by func_00220208, fixed up once by func_00214F68). */
+/* As CGameObjectInstance__DrawModel, for a model drawn from its cached "lit vertices"
+ * resource (built by CGameObjectInstance__ConstructLitVertices, fixed up once by Model_PulseVertexColors). */
 
 extern s32 D_800ACAD8;
 
-void func_0021DC84(CGameObjectInstance *, s32, CDrawArgs *);
-void func_0020B6A0(s32, s32, s32, void *, char *, s32, s32);
-s32 **func_00203CA0(s32, s32, s32, s32, s32, CGameObjectInstance *, void *, char *, s32);
-void func_0020565C(s32, s32 **);
-void func_00214F68(char *, char *);
-void func_002051F4(s32, s32 **);
-void func_00220208();
+void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
+void Render_QueueModelInstance(s32, s32, s32, void *, char *, s32, s32);
+s32 **CCache__RequestDecompression(s32, s32, s32, s32, s32, CGameObjectInstance *, void *, char *, s32);
+void CCache__LockForDisplayList(s32, s32 **);
+void Model_PulseVertexColors(char *, char *);
+void CCache__Unlock(s32, s32 **);
+void CGameObjectInstance__ConstructLitVertices();
 
 static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0, s32 *set1) {
     CIntelligence *intel = actor->header.m_pIntelligence;
@@ -57,7 +57,7 @@ static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0
     }
 }
 
-void func_0021DA8C(CGameObjectInstance *actor, s32 arg1, CDrawArgs *params) {
+void CGameObjectInstance__DrawModelLitVertices(CGameObjectInstance *actor, s32 arg1, CDrawArgs *params) {
     s32 **resource;
     s32 *header;
     char *object;
@@ -66,25 +66,25 @@ void func_0021DA8C(CGameObjectInstance *actor, s32 arg1, CDrawArgs *params) {
     pickSets(actor, params->m_nVariant, &params->m_nModel, &params->m_nShadowModel);
     actor->m_AI.m_VisBits = 1 << params->m_nModel;
     if (params->m_bShadow != 0) {
-        func_0021DC84(actor, arg1, params);
+        CGameObjectInstance__DrawShadow(actor, arg1, params);
     }
     if (params->m_bDraw == 0) {
         return;
     }
-    resource = func_00203CA0(0, actor->m_dwUniqueID | D_800ACAD8, params->m_hModel, 0, 0, actor,
-                             func_00220208, "lit vertices", 1);
+    resource = CCache__RequestDecompression(0, actor->m_dwUniqueID | D_800ACAD8, params->m_hModel, 0, 0, actor,
+                             CGameObjectInstance__ConstructLitVertices, "lit vertices", 1);
     if (resource == NULL) {
         return;
     }
-    func_0020565C(0, resource);
+    CCache__LockForDisplayList(0, resource);
     header = *resource;
     if (header[0] == 1) {
         object = (char *) header + header[1];
-        func_00214F68(object, (char *) header + header[2]);
+        Model_PulseVertexColors(object, (char *) header + header[2]);
         data = object;
     } else {
         data = (char *) (header + 2);
     }
-    func_0020B6A0(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, 0, data, params->m_nModel, actor->m_AI.m_nTexture);
-    func_002051F4(0, resource);
+    Render_QueueModelInstance(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, 0, data, params->m_nModel, actor->m_AI.m_nTexture);
+    CCache__Unlock(0, resource);
 }

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-void func_00210478(CMtxF mf, f32 arg1, f32 arg2, f32 arg3) {
+void CMtxF__ScaleColumns(CMtxF mf, f32 arg1, f32 arg2, f32 arg3) {
     mf[0][0] = (f32) (mf[0][0] * arg1);
     mf[1][0] = (f32) (mf[1][0] * arg1);
     mf[2][0] = (f32) (mf[2][0] * arg1);

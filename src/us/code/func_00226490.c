@@ -20,12 +20,12 @@ typedef struct {
 extern f32 D_800B6D28;          /* the frame time step */
 
 void func_0021F1B4(DrawActor *actor);
-void func_0021A344(DrawActor *actor);
-void func_00251FC4(CPlayerList *list);
-s32 func_00253460(CPlayerList *list);
+void CGameObjectInstance__UpdateAnimation(DrawActor *actor);
+void CPlayerPool__Update(CPlayerList *list);
+s32 CPlayerPool__CheckAllReady(CPlayerList *list);
 void func_00430330(u8 *);
-s32 func_00275F7C(void);
-void func_00275E98(s32);
+s32 LoopSounds_Get(void);
+void LoopSounds_Update(s32);
 
 /* Draws one actor, keeping the frame time step. */
 static __inline__ void drawActor(DrawActor *actor) {
@@ -33,14 +33,14 @@ static __inline__ void drawActor(DrawActor *actor) {
 
     func_0021F1B4(actor);
     if (actor->flags & 0x2000) {
-        func_0021A344(actor);
+        CGameObjectInstance__UpdateAnimation(actor);
     }
     D_800B6D28 = step;
 }
 /* Draws the leading run of type-2 actors, then the mode extras, then the rest.
  * One actor variable for both loops: its pseudo outlives the first loop, so
  * the first loop keeps the kind-test load ($a0) apart from it ($s0). */
-void func_00226490(DrawWorld *world) {
+void CScene__AdvanceInstances(DrawWorld *world) {
     DrawActor *actor;
     s32 i = 0;
     s32 count = world->actorCount;
@@ -54,14 +54,14 @@ void func_00226490(DrawWorld *world) {
         drawActor(actor);
     }
     if (D_80119870.m_Settings.mode == 13) {
-        func_00251FC4(&D_80119870.m_PlayerList);
+        CPlayerPool__Update(&D_80119870.m_PlayerList);
     }
-    if (func_00253460(&D_80119870.m_PlayerList)) {
+    if (CPlayerPool__CheckAllReady(&D_80119870.m_PlayerList)) {
         func_00430330(&D_800F6CB0);
     }
     while (i < count) {
         actor = actors[i++];
         drawActor(actor);
     }
-    func_00275E98(func_00275F7C());
+    LoopSounds_Update(LoopSounds_Get());
 }

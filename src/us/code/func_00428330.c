@@ -3,18 +3,18 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00429EC4(OSPfs *pfs);
-extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
-extern s32 func_00428330(OSPfs *pfs);
-extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
-extern s32 func_00429EC4(OSPfs *pfs);
-extern s32 func_00429DFC(OSPfs *pfs);
+extern s32 __osPfsSelectBank(OSPfs *pfs);
+extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
+extern s32 osPfsChecker(OSPfs *pfs);
+extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
+extern s32 __osPfsSelectBank(OSPfs *pfs);
+extern s32 __osCheckId(OSPfs *pfs);
 extern s32 __osGetId(OSPfs *pfs);
-extern s32 func_00429AA4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-extern s32 func_0042876C(OSPfs *pfs, __OSInodeCache *cache);
+extern s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+extern s32 corrupted_init(OSPfs *pfs, __OSInodeCache *cache);
 extern s32 corrupted(OSPfs *pfs, __OSInodeUnit fpage, __OSInodeCache *cache);
-s32 func_00428330(OSPfs *pfs)
+s32 osPfsChecker(OSPfs *pfs)
 {
     int j;
     s32 ret;
@@ -29,18 +29,18 @@ s32 func_00428330(OSPfs *pfs)
     s32 cc;
     s32 cl;
     int offset;
-    ret = func_00429DFC(pfs);
+    ret = __osCheckId(pfs);
     if (ret == 2) {
         ret = __osGetId(pfs);
     }
     if (ret != 0) {
         return ret;
     }
-    ret = func_0042876C(pfs, &cache);
+    ret = corrupted_init(pfs, &cache);
     if (ret != 0)
         return ret;
     for (j = 0; j < pfs->dir_size; j++) {
-        ret = func_00299680(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir);
+        ret = __osContRamRead(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir);
         if (ret != 0)
             return ret;
         if (tmp_dir.company_code != 0 && tmp_dir.game_code != 0) {
@@ -51,7 +51,7 @@ s32 func_00428330(OSPfs *pfs)
                    (next_page.inode_t.page >= 0x01) && (next_page.inode_t.page < 0x80)) {
                 if (bank != next_page.inode_t.bank) {
                     bank = next_page.inode_t.bank;
-                    ret = func_00429AA4(pfs, &tmp_inode, 0, bank);
+                    ret = __osPfsRWInode(pfs, &tmp_inode, 0, bank);
                     if (ret != 0 && ret != 3) {
                         return ret;
                     }
@@ -72,11 +72,11 @@ corrupted
                 tmp_dir.data_sum = 0;
                 if (pfs->activebank != 0) {
                     pfs->activebank = 0;
-                    ret = func_00429EC4(pfs);
+                    ret = __osPfsSelectBank(pfs);
                     if (ret != 0)
                         return ret;
                 }
-                ret = func_00299A40(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir, 0);
+                ret = __osContRamWrite(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir, 0);
                 if (ret != 0)
                     return ret;
                 fixed++;
@@ -90,11 +90,11 @@ corrupted
                 tmp_dir.data_sum = 0;
                 if (pfs->activebank != 0) {
                     pfs->activebank = 0;
-                    ret = func_00429EC4(pfs);
+                    ret = __osPfsSelectBank(pfs);
                     if (ret != 0)
                         return ret;
                 }
-                ret = func_00299A40(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir, 0);
+                ret = __osContRamWrite(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir, 0);
                 if (ret != 0)
                     return ret;
                 fixed++;
@@ -102,7 +102,7 @@ corrupted
         }
     }
     for (j = 0; j < pfs->dir_size; j++) {
-        ret = func_00299680(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir);
+        ret = __osContRamRead(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir);
         if (ret != 0)
             return ret;
         if (tmp_dir.company_code != 0 && tmp_dir.game_code != 0 &&
@@ -113,7 +113,7 @@ corrupted
         }
     }
     for (bank = 0; bank < pfs->banks; bank++) {
-        ret = func_00429AA4(pfs, &tmp_inode, 0, bank);
+        ret = __osPfsRWInode(pfs, &tmp_inode, 0, bank);
         if (ret != 0 && ret != 3) {
             return ret;
         }
@@ -131,7 +131,7 @@ corrupted
                 file_next_node[j] = checked_inode.inode_page[pp] = tmp_inode.inode_page[pp];
             }
         }
-        ret = func_00429AA4(pfs, &checked_inode, 1, bank);
+        ret = __osPfsRWInode(pfs, &checked_inode, 1, bank);
         if (ret != 0)
             return ret;
     }
@@ -142,5 +142,5 @@ corrupted
     }
     return 0;
 }
-extern s32 func_00429AA4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-s32 func_0042876C(OSPfs *pfs, __OSInodeCache *cache);
+extern s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+s32 corrupted_init(OSPfs *pfs, __OSInodeCache *cache);

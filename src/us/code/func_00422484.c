@@ -17,7 +17,7 @@ extern char D_800B49AC[];
 extern char D_800B49B8[];
 extern u16 D_8013094C; /* score */
 
-s32 func_00422484(MenuItem *item) {
+s32 CharNoteMenu_UpdateRank(MenuItem *item) {
     s32 score = D_8013094C;
     char *src = NULL;
     char *dst;

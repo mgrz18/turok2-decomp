@@ -13,7 +13,7 @@ typedef struct {
     /* 0x24 */ s32 frames;
 } AnimState;
 
-void func_00290D5C(AnimState *s, f32 scale) {
+void __CSPSetUsptFromTempo(AnimState *s, f32 scale) {
     if (s->data != 0) {
         s->frames = scale * s->data->length;
     } else {

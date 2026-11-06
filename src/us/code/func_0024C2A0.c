@@ -13,13 +13,13 @@ extern s32 D_800ADD68[8];
 extern f32 D_800AE2D8;              /* slot scale */
 extern u8 D_8011AAF1;
 
-s32 func_0024E700(CPlayer *player, s32 weapon);
+s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 
 /* Lays out the eight-slot weapon wheel from the layout table for :
  * each weapon becomes its alternate when the player owns that (and is not
  * holding it), the held weapon gets the cursor, and the slots are set
  * 45 degrees apart. */
-void func_0024C2A0(CBarrel *menu, s32 group, CPlayer *player) {
+void CBarrel__LayoutEight(CBarrel *menu, s32 group, CPlayer *player) {
     s32 *layout;
     s32 i;
     s32 w;
@@ -65,7 +65,7 @@ void func_0024C2A0(CBarrel *menu, s32 group, CPlayer *player) {
                 menu->m_nCursor = i;
             }
             menu->m_Items[i].m_pInfo = D_800AF618[w];
-            if (func_0024E700(player, w) == 0 || player->m_Data.m_WeaponList[w] == 0) {
+            if (CPlayer__GetWeaponAmmo(player, w) == 0 || player->m_Data.m_WeaponList[w] == 0) {
                 ok = 0;
             } else {
                 ok = 1;

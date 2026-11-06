@@ -5,12 +5,12 @@ extern s32 D_800C2030;      /* screen width */
 extern s32 D_800C2034;      /* screen height */
 extern u8 D_8011AAF1;
 
-void func_002810EC(CCamera *, f32 *, f32 *, f32 *);
-void func_0027B320(s32, s32, s16, s16, f32, f32, s32);
+void CCamera__WorldToScreen(CCamera *, f32 *, f32 *, f32 *);
+void Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
 
 /* Draws a sprite at a world position projected to the screen (or centred
  * for the HUD sprites 0x2BC, 0x2DA and 0x2E4). */
-void func_0024A678(CCamera *view, f32 *pos, s32 sprite, f32 frame, f32 scale, f32 size) {
+void Hud_DrawWorldSprite(CCamera *view, f32 *pos, s32 sprite, f32 frame, f32 scale, f32 size) {
     f32 x;
     f32 y;
     f32 half;
@@ -23,7 +23,7 @@ void func_0024A678(CCamera *view, f32 *pos, s32 sprite, f32 frame, f32 scale, f3
         if (!(view->m_ViewVolume[5].m_vNormal.x * pos[0] + view->m_ViewVolume[5].m_vNormal.y * pos[1] + view->m_ViewVolume[5].m_vNormal.z * pos[2] <= view->m_ViewVolume[5].m_Dist)) {
             return;
         }
-        func_002810EC(view, pos, &x, &y);
+        CCamera__WorldToScreen(view, pos, &x, &y);
         if (x < -64.0f || (f32) (D_800C2030 + 64) < x || y < -64.0f || (f32) (D_800C2034 + 64) < y) {
             return;
         }
@@ -33,5 +33,5 @@ void func_0024A678(CCamera *view, f32 *pos, s32 sprite, f32 frame, f32 scale, f3
         }
     }
     half = scale * size - 1.0f;
-    func_0027B320(sprite, frame, x - half, y - half, size, size, 1);
+    Hud_DrawSprite(sprite, frame, x - half, y - half, size, size, 1);
 }

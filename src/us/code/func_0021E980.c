@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 /* Restarts the current animation. */
-void func_0021E980(CGameObjectInstance *arg0) {
+void CGameObjectInstance__RestartAnim(CGameObjectInstance *arg0) {
     arg0->m_CurrentAnimation.m_bAnimActive = 1;
     arg0->m_CurrentAnimation.m_AnimationFrame = 0;
     arg0->m_CurrentAnimation.m_bCycleCompleted = 0;

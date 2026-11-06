@@ -7,7 +7,7 @@ typedef unsigned int u32;
 typedef float f32;
 extern float D_800AA7C0;
 extern float D_800AA7C4;
-void func_00297AE0(s32 *arg0) {
+void guMtxIdent(s32 *arg0) {
     f32 matrix[16];
     u8 *diagBase;
     u8 *diag;

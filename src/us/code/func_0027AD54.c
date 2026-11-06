@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 func_0027AD00(void *, s32 *);           /* extern */
+s32 COverlay__StartScript(void *, s32 *);           /* extern */
 extern s32 D_800B2C64;
 
 typedef struct {
@@ -11,9 +11,9 @@ typedef struct {
     /* 0x8C */ s32 unk8C;
 } Unk0027AD54;
 
-void func_0027AD54(Unk0027AD54 *arg0, s32 arg1, s32 arg2) {
+void COnScreen__SetBoss2(Unk0027AD54 *arg0, s32 arg1, s32 arg2) {
     arg0->unk88 = arg1;
     arg0->unk84 = arg2;
     arg0->unk8C = 0x64;
-    func_0027AD00(arg0->sub48, &D_800B2C64);
+    COverlay__StartScript(arg0->sub48, &D_800B2C64);
 }

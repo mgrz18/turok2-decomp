@@ -11,8 +11,8 @@ extern float D_800A5750;
 extern float D_800A5754;
 extern float D_800AC9D4[];
 extern f32 D_800A5764;
-extern void func_0020F040(f32 *);
-s32 func_002123D4(ObjectRecAtBC *arg0, u32 arg1, u32 arg2, u32 arg3,
+extern void CVector3__Normalize(f32 *);
+s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, u32 arg1, u32 arg2, u32 arg3,
                   CVector3 *arg4, f32 *arg5) {
     f32 temp_f0;
     f32 var_f0;
@@ -85,7 +85,7 @@ shared:
         } else {
             *arg4 = *(CVector3 *)&arg1;
         }
-        func_0020F040(arg4);
+        CVector3__Normalize(arg4);
         *arg5 = var_f20;
         return 1;
     } else {

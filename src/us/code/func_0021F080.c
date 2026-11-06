@@ -16,7 +16,7 @@ typedef struct B11Box {
     B11Pt *p8;
     B11Pt *pC;
 } B11Box;
-void func_0026BC54(f32 *out, B11Box *box);
+void CGameRegion__GetNormalRaw(f32 *out, B11Box *box);
 s32 func_0021F080(CGameObjectInstance *a) {
     B11Box *b = (B11Box *)a->header.m_pCurrentRegion;
     f32 t;
@@ -53,6 +53,6 @@ s32 func_0021F080(CGameObjectInstance *a) {
     }
     s = func_002982F0(a->m_RotY);
     c = func_002974C0(a->m_RotY);
-    func_0026BC54(buf, b);
+    CGameRegion__GetNormalRaw(buf, b);
     return buf[0] * -s + buf[2] * -c < 0.0f;
 }

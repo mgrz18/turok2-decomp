@@ -9,7 +9,7 @@ typedef struct {
 
 extern State D_800B8960;
 
-s32 func_002A3060(void)
+s32 osPiGetCmdQueue(void)
 {
   s32 *new_var;
   s32 new_var2;

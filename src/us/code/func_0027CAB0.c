@@ -3,7 +3,7 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 
-/* What a region set gives a camera (the record func_0022425C finds). */
+/* What a region set gives a camera (the record CScene__GetRegionInfo finds). */
 typedef struct {
     /* 0x00 */ u8 m_FogColor[4];
     /* 0x04 */ u8 m_HeldFogColor[4];        /* under water, or as the player's flags ask */
@@ -29,14 +29,14 @@ extern CPlayer *D_80119890; /* the players */
 extern s32 D_80130940;
 extern s32 D_800B6D20;
 extern f32 D_800B6D28;          /* the frame's time step */
-CRegionSetAttributes *func_0022425C(s32 *list, u16 *key);
-s32 func_00284358(void);
-s32 func_00284330(void);
-void func_00275950(u8 track);
-void func_002759C4(u8 track);
-f32 func_00268AB4(CPlayer *player);
+CRegionSetAttributes *CScene__GetRegionInfo(s32 *list, u16 *key);
+s32 Cinema_OverridesMusic1(void);
+s32 Cinema_OverridesMusic2(void);
+void Sound__SetAmbientTrack(u8 track);
+void Music_SetTrack(u8 track);
+f32 GameObject_GetViewWaterHeight(CPlayer *player);
 
-/* func_00281194, inlined: the player whose camera this is, or NULL. */
+/* CCamera__GetPlayer, inlined: the player whose camera this is, or NULL. */
 static __inline__ CPlayer *GetPlayer(CCamera *cam) {
     CPlayer *player;
     CPlayer *node;
@@ -54,7 +54,7 @@ static __inline__ CPlayer *GetPlayer(CCamera *cam) {
  * changes the camera blends from the old values to the new ones over the
  * set's blend time. In game mode 13 the first camera also starts the set's
  * music. */
-void func_0027CAB0(CCamera *cam) {
+void CCamera__AdvanceAttributes(CCamera *cam) {
     u8 target[4];
     CRegionSetAttributes *rec;
     CPlayer *player;
@@ -74,16 +74,16 @@ void func_0027CAB0(CCamera *cam) {
     if (key == NULL) {
         return;
     }
-    rec = func_0022425C(D_800F7078, key);
+    rec = CScene__GetRegionInfo(D_800F7078, key);
     if (rec == NULL) {
         return;
     }
     if (D_8011ACA4 == 0 && cam == D_801198B4 && D_8011AC88 == 13 && D_8011AC8C == D_8011AC88) {
-        if (func_00284358() == 0) {
-            func_00275950(rec->m_Music1);
+        if (Cinema_OverridesMusic1() == 0) {
+            Sound__SetAmbientTrack(rec->m_Music1);
         }
-        if (func_00284330() == 0) {
-            func_002759C4(rec->m_Music2);
+        if (Cinema_OverridesMusic2() == 0) {
+            Music_SetTrack(rec->m_Music2);
         }
     }
     freeze = hold = 0;
@@ -117,7 +117,7 @@ void func_0027CAB0(CCamera *cam) {
             }
             target[3] = 0;
         } else {
-            darkness = (player != NULL) ? func_00268AB4(player) : rec->m_Darkness;
+            darkness = (player != NULL) ? GameObject_GetViewWaterHeight(player) : rec->m_Darkness;
             dark = (s32) darkness / 16;
             for (i = 0; i < 3; i++) {
                 target[i] = (rec->m_HeldFogColor[i] - dark < 0) ? 0 : rec->m_HeldFogColor[i] - dark;

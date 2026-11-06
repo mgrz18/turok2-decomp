@@ -4,10 +4,10 @@
 #include "structs/sound.h"
 #include "rw/junk_types.h" /* SndCore */
 
-void func_00293E60(void *p, s32 id);
-s32 func_00293580(void *p);
-void func_00293EC0(void *p);
-s32 func_00273370(SndVoicePool *p, s32 a, s32 b, s16 pri, s32 c) {
+void alSndpSetSound(void *p, s32 id);
+s32 alSndpGetState(void *p);
+void alSndpStop(void *p);
+s32 SndVoicePool_FindSlot(SndVoicePool *p, s32 a, s32 b, s16 pri, s32 c) {
     SndMgr *m;
     SndCore *core;
     s32 i;
@@ -55,9 +55,9 @@ s32 func_00273370(SndVoicePool *p, s32 a, s32 b, s16 pri, s32 c) {
         s->stopping = 1;
         s->vp.follow = 0;
         if (s->vp.frame != m2->frame) {
-            func_00293E60(&m2->player, m2->handles[s->index]);
-            if (func_00293580(&m2->player) != 0) {
-                func_00293EC0(&m2->player);
+            alSndpSetSound(&m2->player, m2->handles[s->index]);
+            if (alSndpGetState(&m2->player) != 0) {
+                alSndpStop(&m2->player);
             }
             s->sound = -1;
         }

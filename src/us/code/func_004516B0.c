@@ -2,8 +2,8 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 
-s32 func_004160F0(MenuItem *item); /* length of the item's text line */
-s32 func_0029E3E0(char *buf, const char *fmt, ...); /* sprintf */
+s32 MenuItem_TextLength(MenuItem *item); /* length of the item's text line */
+s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 extern char D_800B608C[];
 extern char D_800B60A4[];
@@ -17,7 +17,7 @@ extern char D_800B614C[];
 
 /* Names setting 0x28. */
 s32 func_004516B0(MenuItem *item) {
-    switch (D_8011AAD8.tagSkill) {
+    switch (D_8011AAD8.tagTextureSet) {
     case 0:
         item->text = D_800B608C;
         break;

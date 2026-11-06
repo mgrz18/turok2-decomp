@@ -9,18 +9,18 @@ extern f32 D_800AB8C0[2]; /* fade level, alpha */
 extern s32 D_800B6D1C; /* current view */
 extern u8 D_801100D4[];
 
-extern void func_0021D928(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params);
-extern void func_0021D7BC(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params);
-extern void func_0020B258(s32 model, s32 matrix, s32 segment, void *lights, s32 textures, s32 lod, s32 pass);
+extern void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params);
+extern void CGameObjectInstance__DrawModel(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params);
+extern void Render_DrawModelShared(s32 model, s32 matrix, s32 segment, void *lights, s32 textures, s32 lod, s32 pass);
 extern void func_0020BBE4(void *arg0, s32 renderMode, s32 model, s32 matrix, s32 projected, void *lights,
                           s32 segment, s32 group, s32 arg8);
 
-void func_0025BA80(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params) {
+void EnemyAI_DrawFaded(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params) {
     u8 alpha;
 
     if (ai->m_Mode == 0x20) {
-        func_0021D928(actor, ai, params);
-        func_0020B258(params->m_hModel, actor->m_pmtDrawMtxs, 1, actor->m_Lights[D_800B6D1C], 0, ((s8 *)params)[0x1B], -1);
+        CGameObjectInstance__DrawModelImmediate(actor, ai, params);
+        Render_DrawModelShared(params->m_hModel, actor->m_pmtDrawMtxs, 1, actor->m_Lights[D_800B6D1C], 0, ((s8 *)params)[0x1B], -1);
         return;
     }
     if (ai->m_Enemy.m_Timer > 0.0f) {
@@ -35,7 +35,7 @@ void func_0025BA80(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params) {
         if (alpha != 255) {
             D_800AB8B0 = 1;
             D_800AB8C0[0] = 255 - alpha;
-            func_0021D928(actor, ai, params);
+            CGameObjectInstance__DrawModelImmediate(actor, ai, params);
         }
         if (alpha != 0) {
             D_800AB8C0[0] = alpha;
@@ -45,6 +45,6 @@ void func_0025BA80(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params) {
         }
         D_800AB8B0 = 0;
     } else {
-        func_0021D7BC(actor, ai, params);
+        CGameObjectInstance__DrawModel(actor, ai, params);
     }
 }

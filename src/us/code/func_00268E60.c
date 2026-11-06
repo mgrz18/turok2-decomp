@@ -9,18 +9,18 @@ typedef struct {
     /* 0x58 */ u8 kind;
 } KeyInfo;
 
-void *func_0022425C(void *table, void *key);
+void *CScene__GetRegionInfo(void *table, void *key);
 s32 func_0021F1F8(void *arg);
 extern u8 D_800F7078[];
 
-s32 func_00268E60(u8 *obj) {
+s32 GameObject_GetFloorKind(u8 *obj) {
     void *key = *(void **) (obj + 0x10);
     KeyInfo *info;
     s32 result = 0;
     u32 objFlags;
     u8 *other;
 
-    if (key != NULL && (info = func_0022425C(D_800F7078, key)) != NULL) {
+    if (key != NULL && (info = CScene__GetRegionInfo(D_800F7078, key)) != NULL) {
         if (info->flags & 0x4000) {
             result = -1;
         } else if (info->flags & 0x400000) {

@@ -4,10 +4,10 @@
 extern CGameRegion *D_800B2608;    /* triangle whose normal is cached */
 extern CVector3 D_800F2020;         /* its normal */
 
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);    /* a - b */
-void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);    /* cross product */
-void func_0020F040(CVector3 *v);                        /* normalize */
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);    /* a - b */
+void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);    /* cross product */
+void CVector3__Normalize(CVector3 *v);                        /* normalize */
 
 /* tri's face normal, cached for the last triangle asked about. */
 static __inline__ CVector3 triNormal(CGameRegion *tri) {
@@ -15,16 +15,16 @@ static __inline__ CVector3 triNormal(CGameRegion *tri) {
     CVector3 edge2;
 
     if (tri != D_800B2608) {
-        func_0020EF2C(&edge1, tri->m_pVertices[1], tri->m_pVertices[0]);
-        func_0020EF2C(&edge2, tri->m_pVertices[2], tri->m_pVertices[1]);
-        func_0020EFDC(&D_800F2020, &edge1, &edge2);
+        CVector3__Subtract(&edge1, tri->m_pVertices[1], tri->m_pVertices[0]);
+        CVector3__Subtract(&edge2, tri->m_pVertices[2], tri->m_pVertices[1]);
+        CVector3__Cross(&D_800F2020, &edge1, &edge2);
     }
     D_800B2608 = tri;
     return D_800F2020;
 }
 
 /* The velocity something slides with down the slope of tri. */
-CVector3 func_00269DF0(CGameRegion *tri, f32 speed) {
+CVector3 CGameRegion__GetSlideVelocity(CGameRegion *tri, f32 speed) {
     CVector3 normal;
     CVector3 up;
     CVector3 side;
@@ -40,16 +40,16 @@ CVector3 func_00269DF0(CGameRegion *tri, f32 speed) {
         up.y = 1.0f;
         up.z = 0.0f;
         normal = triNormal(tri);
-        func_0020EFDC(&side, &normal, &up);
-        func_0020EFDC(&downhill, &normal, &side);
-        func_0020F040(&downhill);
+        CVector3__Cross(&side, &normal, &up);
+        CVector3__Cross(&downhill, &normal, &side);
+        CVector3__Normalize(&downhill);
         if (downhill.y > 0.0f) {
-            func_0020EF60(&downhill, &downhill, -1.0f);
+            CVector3__Scale(&downhill, &downhill, -1.0f);
         }
         down.x = 0.0f;    /* set but never used */
         down.z = 0.0f;
         down.y = -1.0f;
-        func_0020EF60(&result, &downhill, -downhill.y * -speed * 10.24f);
+        CVector3__Scale(&result, &downhill, -downhill.y * -speed * 10.24f);
     }
     return result;
 }

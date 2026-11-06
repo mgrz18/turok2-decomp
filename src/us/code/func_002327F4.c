@@ -23,12 +23,12 @@ struct Shared_ParticleView {
     Matrix viewMtx;    /* 0x20C */
 };
 
-extern void func_0020F85C(void *arg0, void *arg1, void *arg2);
+extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
 extern s32 D_801198E0[];
 extern s32 D_800B6D1C;
-extern void func_0022D2FC(void *, s32, s32, f32);
+extern void CParticle__BuildMatrix(void *, s32, s32, f32);
 
-void func_002327F4(void *arg0) {
+void CParticle__BuildCameraMatrix(void *arg0) {
     CVector3 delta;
     void *arg1;
     f32 amount;
@@ -36,16 +36,16 @@ void func_002327F4(void *arg0) {
     state = D_801198E0;
     if (state[0] == 1) {
         arg1 = (void *)state[-4];
-        func_0020F85C(&((struct Shared_ParticleView *)arg1)->viewMtx, &((Shared_Particle *)arg0)->pos, &delta);
+        CMtxF__TransformPoint(&((struct Shared_ParticleView *)arg1)->viewMtx, &((Shared_Particle *)arg0)->pos, &delta);
         amount = delta.z;
         if (amount < 0.0f) {
             amount = -amount;
         }
-        func_0022D2FC(arg0,
+        CParticle__BuildMatrix(arg0,
                       (s32)((char *)arg0 + ((D_800B6D1C << 6) + 0x48)),
                       (s32)arg1, amount);
     } else {
-        func_0022D2FC(arg0,
+        CParticle__BuildMatrix(arg0,
                       (s32)((char *)arg0 + ((D_800B6D1C << 6) + 0x48)),
                       0, 0.0f);
     }

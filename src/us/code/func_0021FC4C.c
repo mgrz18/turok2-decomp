@@ -4,9 +4,9 @@
 #include "rw/abu_types.h"
 
 extern float D_800A5D2C;
-extern char *func_002017D4(s32 *, s32);
-extern void func_0020DAA4(void *arg0, s32 arg1, void *arg2, void *arg3);
-void func_0021FC4C(ObjectLinks24_2 *arg0, s32 arg1, Vector4f *arg2) {
+extern char *CISet__GetBlock(s32 *, s32);
+extern void CQuaternion__Slerp(void *arg0, s32 arg1, void *arg2, void *arg3);
+void Anim_GetBoneRotationSlerp(ObjectLinks24_2 *arg0, s32 arg1, Vector4f *arg2) {
     ObjectLinks24_2 *o = arg0;
     ObjRecAt2V1 *indices;
     s16 idx;
@@ -24,8 +24,8 @@ void func_0021FC4C(ObjectLinks24_2 *arg0, s32 arg1, Vector4f *arg2) {
         arg2->w = (f32)rec->unk_12 * scale;
         return;
     }
-    base = func_002017D4(o->unk_C, (s32)idx);
-    func_0020DAA4(arg2, o->unk_20,
+    base = CISet__GetBlock(o->unk_C, (s32)idx);
+    CQuaternion__Slerp(arg2, o->unk_20,
                     (char *)base + o->unk_10 * 4,
                     (char *)base + o->unk_14 * 4);
 }

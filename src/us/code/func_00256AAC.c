@@ -5,7 +5,7 @@ typedef struct {
     /* 0x52C */ u8 counters[1]; /* two 4-bit counters per byte */
 } CounterOwner;
 
-/* func_00256A8C, inlined. */
+/* PickupCounter_Get, inlined. */
 static __inline__ u8 getCounter(CounterOwner *owner, s32 index, s32 high) {
     if (high != 0) {
         return owner->counters[index] >> 4;
@@ -14,7 +14,7 @@ static __inline__ u8 getCounter(CounterOwner *owner, s32 index, s32 high) {
 }
 
 /* Bumps one nibble of a packed counter byte and returns that nibble. */
-u8 func_00256AAC(CounterOwner *owner, s32 index, s32 high) {
+u8 PickupCounter_Inc(CounterOwner *owner, s32 index, s32 high) {
     if (high != 0) {
         owner->counters[index] += 0x10;
     } else {

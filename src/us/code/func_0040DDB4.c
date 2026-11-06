@@ -9,10 +9,10 @@
 
 extern BlindOneState D_80130200;
 extern u8 D_00432464[];
-extern void func_00236314(void *dst, void *src);
-extern void func_00243414(void *obj, CAI *ai, s32 state);
+extern void ScriptAnimator_SetScript(void *dst, void *src);
+extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 
-void func_0040DDB4(void *obj, CAI *ai, DamageEvent *event) {
+void BlindOne_ActorHurt(void *obj, CAI *ai, DamageEvent *event) {
     BlindOneState *state = &D_80130200;
     s32 health;
 
@@ -24,10 +24,10 @@ void func_0040DDB4(void *obj, CAI *ai, DamageEvent *event) {
         ai->m_Health = health;
         if (ai->m_BlindOne.m_HitTimer == 0.0f) {
             ai->m_BlindOne.m_HitTimer = 2.25f;
-            func_00236314(&state->faders[ai->m_BlindOne.m_nFader], D_00432464);
+            ScriptAnimator_SetScript(&state->faders[ai->m_BlindOne.m_nFader], D_00432464);
         }
         if (ai->m_Health == 0) {
-            func_00243414(obj, ai, 6);
+            CAI__SetMode(obj, ai, 6);
         }
     }
 }

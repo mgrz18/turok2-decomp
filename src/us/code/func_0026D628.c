@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_002113A4(void);
-extern s32 func_002113A4(void);
-s16 func_0026D628(WeightedTable *arg0) {
+extern s32 Random_Next(void);
+extern s32 Random_Next(void);
+s16 WeightedTable_Pick(WeightedTable *arg0) {
     s16 *entry;
     s16 *start;
     s32 random;
@@ -24,7 +24,7 @@ s16 func_0026D628(WeightedTable *arg0) {
             entry += 2;
         } while (*entry != -1);
     }
-    random = func_002113A4();
+    random = Random_Next();
     entry = start;
     value = random % total;
     total = 0;

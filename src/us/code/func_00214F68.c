@@ -17,12 +17,12 @@ typedef struct {
     /* 0x8 */ Vertex vertices[1];
 } VertexGroup;
 
-VertexGroup *func_002017D4(s32 *, s32);
+VertexGroup *CISet__GetBlock(s32 *, s32);
 
 extern s32 D_800B6D18;
 extern s8 D_800ACAF4[];
 
-void func_00214F68(s32 *object, u8 *colors) {
+void Model_PulseVertexColors(s32 *object, u8 *colors) {
     s32 state = D_800B6D18;
     s32 i = 0;
     s32 g, count;
@@ -30,7 +30,7 @@ void func_00214F68(s32 *object, u8 *colors) {
     if (!(state & 1)) {
         count = object[0];
         for (g = 0; g < count; g++) {
-            VertexGroup *group = func_002017D4(object, g);
+            VertexGroup *group = CISet__GetBlock(object, g);
             Vertex *v = group->vertices;
             Vertex *end = v + group->count;
 

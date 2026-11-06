@@ -15,17 +15,17 @@ typedef struct AnimationInfo {
 extern Gfx *D_800D8E24;             /* display list head */
 extern s32 D_800B6D1C;              /* frame buffer index */
 
-extern void *func_0020798C(void *texture);
-extern void func_002079D8(void *resource, AnimationInfo *info);
-extern void func_00206B30(void *texture, void *resource, s32 frame, s32, s32 scaleS, s32 scaleT, s32, s32, s32);
-extern void func_00207A70(s32 mode);
-extern f32 func_0026F400(f32 *plane, CVector3 *from, CVector3 *to);
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
-extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
-extern void func_002051F4(s32, void *resource);
+extern void *Texture_Request(void *texture);
+extern void Texture_GetInfo(void *resource, AnimationInfo *info);
+extern void Texture_Load(void *texture, void *resource, s32 frame, s32, s32 scaleS, s32 scaleT, s32, s32, s32);
+extern void Render_SetCombineMode(s32 mode);
+extern f32 Plane_SegmentFraction(f32 *plane, CVector3 *from, CVector3 *to);
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
+extern void CCache__Unlock(s32, void *resource);
 
 /* Clips and draws an emitter as a textured translucent fan at its depth. */
-void func_00282340(CEmitter *object, CCamera *view) {
+void CEmitter__Draw(CEmitter *object, CCamera *view) {
     AnimationInfo animation;
     CVector3 points[5];
     f32 red[5], green[5], blue[5], alpha[5];
@@ -46,9 +46,9 @@ void func_00282340(CEmitter *object, CCamera *view) {
     f32 maxS, minS, maxT, minT, shiftS, shiftT, factor;
     UnitVtx *vertex;
 
-    resource = func_0020798C(object->m_Texture);
+    resource = Texture_Request(object->m_Texture);
     if (resource != NULL) {
-        func_002079D8(resource, &animation);
+        Texture_GetInfo(resource, &animation);
         if (animation.frameCount != 0) {
             descriptor = object->m_pDef;
             frame = animation.frame;
@@ -62,7 +62,7 @@ void func_00282340(CEmitter *object, CCamera *view) {
                 g->w1 = 0;
             }
             frameIndex = (s32)phase % animation.frameCount;
-            func_00206B30(object->m_Texture, resource, frameIndex, 0, scaleS, scaleT, 0, 0, 15);
+            Texture_Load(object->m_Texture, resource, frameIndex, 0, scaleS, scaleT, 0, 0, 15);
             texturePeriod = 5120.0f;
             wrapPeriod = 10240.0f;
             frame = animation.frame;
@@ -70,7 +70,7 @@ void func_00282340(CEmitter *object, CCamera *view) {
             switch (format) {
             case 2:
             default:
-                func_00207A70(32);
+                Render_SetCombineMode(32);
                 {
                     Gfx *g = D_800D8E24++;
                     g->w0 = 0xFB000000;     /* gDPSetEnvColor */
@@ -85,7 +85,7 @@ void func_00282340(CEmitter *object, CCamera *view) {
                 break;
             case 0:
             case 1:
-                func_00207A70(33);
+                Render_SetCombineMode(33);
                 center[0] = 255;
                 center[1] = 255;
                 center[2] = 255;
@@ -124,7 +124,7 @@ void func_00282340(CEmitter *object, CCamera *view) {
                 alpha[i] = i == 0 ? fade : 0.0f;
             }
             for (i = 1; i < 5; i++) {
-                t = func_0026F400((f32 *)&view->m_ViewVolume[2], &points[0], &points[i]);
+                t = Plane_SegmentFraction((f32 *)&view->m_ViewVolume[2], &points[0], &points[i]);
                 if (t >= 0.0f && t < 1.0f) {
                     points[i].x = points[0].x + t * (points[i].x - points[0].x);
                     points[i].z = points[0].z + t * (points[i].z - points[0].z);
@@ -157,9 +157,9 @@ void func_00282340(CEmitter *object, CCamera *view) {
                 triangle[0] = points[first];
                 triangle[1] = points[second];
                 triangle[2] = points[third];
-                func_0020EF2C(&edge0, &triangle[1], &triangle[0]);
-                func_0020EF2C(&edge1, &triangle[2], &triangle[1]);
-                func_0020EFDC(&normal, &edge0, &edge1);
+                CVector3__Subtract(&edge0, &triangle[1], &triangle[0]);
+                CVector3__Subtract(&edge1, &triangle[2], &triangle[1]);
+                CVector3__Cross(&normal, &edge0, &edge1);
                 if (normal.y <= 0.0f) {
                     if (below != 1) {
                         goto draw_face;
@@ -242,6 +242,6 @@ void func_00282340(CEmitter *object, CCamera *view) {
                 }
             }
         }
-        func_002051F4(0, resource);
+        CCache__Unlock(0, resource);
     }
 }

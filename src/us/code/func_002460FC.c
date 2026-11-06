@@ -6,7 +6,7 @@ typedef struct {
     /* 0x7C */ s32 unk7C;
 } Target;
 
-void func_002460FC(s32 arg0, Target *arg1, s32 arg2, s32 arg3) {
+void AI_SetTargetOverride(s32 arg0, Target *arg1, s32 arg2, s32 arg3) {
     arg1->unk78 = arg2;
     arg1->unk7C = arg3;
 }

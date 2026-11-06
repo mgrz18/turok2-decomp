@@ -27,21 +27,21 @@ typedef struct {
     /* 0xC7 */ s8 count;
 } Item00402FA0;
 
-s32 func_00219F74(Obj00402FA0 *obj, s32 a1, s32 a2);
-void func_0020EF2C(Vec3_00402FA0 *out, Vec3_00402FA0 *from, Vec3_00402FA0 *to);
-void func_00243414(Obj00402FA0 *obj, Item00402FA0 *item, s32 a2);
+s32 CGameObjectInstance__PickRandomAnim(Obj00402FA0 *obj, s32 a1, s32 a2);
+void CVector3__Subtract(Vec3_00402FA0 *out, Vec3_00402FA0 *from, Vec3_00402FA0 *to);
+void CAI__SetMode(Obj00402FA0 *obj, Item00402FA0 *item, s32 a2);
 
-void func_00402FA0(Obj00402FA0 *obj, Item00402FA0 *item) {
+void MantidQueen_UpdatePush(Obj00402FA0 *obj, Item00402FA0 *item) {
     Vec3_00402FA0 dir;
     s32 anim;
     WaveBossState *s = &D_8012F3A0;
 
-    anim = func_00219F74(obj, 0x1004, -1);
+    anim = CGameObjectInstance__PickRandomAnim(obj, 0x1004, -1);
     if (obj->anim == anim) {
         if (s->pushed == 0 && obj->time >= 10.0f) {
             s->pushed = 1;
             if (item->target != NULL) {
-                func_0020EF2C(&dir, &item->target->pos, &obj->pos);
+                CVector3__Subtract(&dir, &item->target->pos, &obj->pos);
                 obj->vel.x += dir.x * 0.75f;
                 obj->vel.z += dir.z * 0.75f;
             }
@@ -52,6 +52,6 @@ void func_00402FA0(Obj00402FA0 *obj, Item00402FA0 *item) {
         }
     }
     if (item->count != 0) {
-        func_00243414(obj, item, 8);
+        CAI__SetMode(obj, item, 8);
     }
 }

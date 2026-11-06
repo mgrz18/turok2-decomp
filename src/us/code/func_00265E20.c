@@ -9,7 +9,7 @@ typedef struct ObjectStateC7 {
     char pad0[0xC7];
     s8 unk_C7;
 } ObjectStateC7;
-void func_00265E20(void *arg0, void *arg1) {
+void Destructible_GoDeathUpdate(void *arg0, void *arg1) {
     CGameObjectInstance *object = arg0;
     CDestructibleIntelligence *nested = &object->header.m_pIntelligence->m_Destructible;
     ObjectStateC7 *state = arg1;

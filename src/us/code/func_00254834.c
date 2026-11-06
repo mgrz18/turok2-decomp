@@ -10,11 +10,11 @@ extern float D_800A7120;
 extern float D_800A7124;
 extern void func_00254834(void *arg0, struct ScreenRectangle *arg1);
 typedef struct ScreenRectangle { char pad0[0x288]; f32 x,y,width,height; } ScreenRectangle;
-extern s32 func_0027B320(s32 arg0, s32 arg1, s16 arg2, s16 arg3, f32 arg4, f32 arg5, s32 arg6);
+extern s32 Hud_DrawSprite(s32 arg0, s32 arg1, s16 arg2, s16 arg3, f32 arg4, f32 arg5, s32 arg6);
 extern u8 D_8011AAEA;
 extern s32 D_800C2030;
 extern s32 D_800C2034;
-void func_00279028(u8 arg0);
+void Hud_SetupTextureMode(u8 arg0);
 void func_00254834(void *arg0, struct ScreenRectangle *arg1)
 {
   f32 x;
@@ -27,7 +27,7 @@ void func_00254834(void *arg0, struct ScreenRectangle *arg1)
   f32 by;
   f32 screenX;
   f32 screenY;
-  func_00279028(D_8011AAEA);
+  Hud_SetupTextureMode(D_8011AAEA);
   x = arg1->x;
   ax = x * D_800A7120;
   y = arg1->y;
@@ -38,5 +38,5 @@ void func_00254834(void *arg0, struct ScreenRectangle *arg1)
   by = sy * D_800A7124;
   screenX = ((arg1->width) + ax) - bx;
   screenY = ((arg1->height) + ay) - by;
-  func_0027B320(0x1FB, 0, (s16) ((s32) (((arg1->width) + ax) - bx)), (s16) ((s32) screenY), sx, sy, 1);
+  Hud_DrawSprite(0x1FB, 0, (s16) ((s32) (((arg1->width) + ax) - bx)), (s16) ((s32) screenY), sx, sy, 1);
 }

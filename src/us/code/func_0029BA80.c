@@ -4,9 +4,9 @@
 #include "rw/abu_types.h"
 
 extern void *D_800B8930;
-extern void func_0029BE0C(u64 tim);
-extern u64 func_0029BE6C(OSTimer *t);
-int func_0029BA80(Node802C07B0 *node, u64 arg1, u64 arg2, void *arg3, void *arg4) {
+extern void __osSetTimerIntr(u64 tim);
+extern u64 __osInsertTimer(OSTimer *t);
+int osSetTimer(Node802C07B0 *node, u64 arg1, u64 arg2, void *arg3, void *arg4) {
     u64 value;
     node->field10 = arg1;
     node->field0 = 0;
@@ -17,9 +17,9 @@ int func_0029BA80(Node802C07B0 *node, u64 arg1, u64 arg2, void *arg3, void *arg4
     }
     node->field18 = arg3;
     node->field1C = arg4;
-    value = func_0029BE6C(node);
+    value = __osInsertTimer(node);
     if (*(void **)D_800B8930 == node) {
-        func_0029BE0C(value);
+        __osSetTimerIntr(value);
     }
     return 0;
 }

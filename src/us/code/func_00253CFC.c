@@ -8,7 +8,7 @@
 extern f32 D_800A70FC;          /* 82.944f: default height */
 extern f32 D_800A7100;          /* 0.9f */
 
-f32 func_00253CFC(CGameObjectInstance *actor) {
+f32 Actor_GetEyeHeight(CGameObjectInstance *actor) {
     CIntelligence *def = actor->header.m_pIntelligence;
 
     if (def != 0) {

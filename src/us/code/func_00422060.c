@@ -2,16 +2,16 @@
 #include "structs/menu.h"
 #include "structs/save.h"
 
-s32 func_004160F0(void *item);
-s32 func_0029E3E0(char *dst, const char *fmt, ...); /* sprintf */
+s32 MenuItem_TextLength(void *item);
+s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 
 extern char D_800C1418[];
 
-s32 func_00422060(MenuItem *item) {
+s32 GameNoteMenu_UpdateTime(MenuItem *item) {
     s32 seconds = D_800C201C->seconds;
     s32 minutes = D_800C201C->minutes;
     s32 hours = D_800C201C->hours;
 
-    func_0029E3E0(item->text + (func_004160F0(item) - 9), D_800C1418, hours, minutes, seconds);
+    sprintf(item->text + (MenuItem_TextLength(item) - 9), D_800C1418, hours, minutes, seconds);
     return 1;
 }

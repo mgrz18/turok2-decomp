@@ -10,7 +10,7 @@ extern s32 D_00431DE4[];
 extern s32 D_00431DF0[]; /* active slot mask per phase */
 extern s32 D_00431DFC[];
 extern u8 D_00431E08[];
-extern void func_00236314(void *dst, void *src);
+extern void ScriptAnimator_SetScript(void *dst, void *src);
 
 static __inline__ void resetSlots(s32 mask, void *src) {
     MotherBossState *state = &D_8012FB70;
@@ -18,12 +18,12 @@ static __inline__ void resetSlots(s32 mask, void *src) {
 
     for (i = 0; i < 15; i++) {
         if ((mask >> i) & 1) {
-            func_00236314(&state->slots[i].anim, src);
+            ScriptAnimator_SetScript(&state->slots[i].anim, src);
         }
     }
 }
 
-void func_0040AE24(void *obj, CAI *ai) {
+void MotherBoss_SetupPhase0(void *obj, CAI *ai) {
     MotherBossState *state = &D_8012FB70;
     s32 mask;
 

@@ -2,10 +2,10 @@
 #include "structs/game.h"
 
 extern u8 D_800F7078[];
-extern void func_002535E4(void *players, f32 value);
-extern void func_00225D0C(void *);
+extern void CPlayerPool__SetInvincibility(void *players, f32 value);
+extern void CScene__UnmarkGeneratorsSaved(void *);
 
-void func_0040EB30(void) {
-    func_002535E4(&D_80119870.m_PlayerList, 900.0f);
-    func_00225D0C(D_800F7078);
+void BlindOne_PhaseVictoryInit(void) {
+    CPlayerPool__SetInvincibility(&D_80119870.m_PlayerList, 900.0f);
+    CScene__UnmarkGeneratorsSaved(D_800F7078);
 }

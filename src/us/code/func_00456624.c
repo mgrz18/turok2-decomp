@@ -18,11 +18,11 @@ struct EntryRecAt1C {
 };
 struct EntryRecAt1C;
 typedef struct EntryRecAt1C EntryRecAt1C;
-extern s32 func_0025340C(void *table, void *player);
-s32 func_00456624(s32 unused, EntryRecAt1C *arg1) {
+extern s32 CPlayerPool__GetIndex(void *table, void *player);
+s32 NameEntryMenu_DeleteChar_2(s32 unused, EntryRecAt1C *arg1) {
     s32 i;
     s32 count;
-    i = func_0025340C(&D_80119870.m_PlayerList, arg1->unk1C);
+    i = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, arg1->unk1C);
     count = D_800C1FB0[i].length;
     D_800C1FB0[i].timer = 0;
     if (count == 0) {

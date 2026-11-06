@@ -11,11 +11,11 @@ typedef struct {
     /* 0x14 */ Triple c;
 } Obj00401B30;
 
-void func_00401B70(Obj00401B30 *obj);
+void Automap_RevealAroundPlayer(Obj00401B30 *obj);
 
-void func_00401B30(Obj00401B30 *obj, s32 a, s32 b, Triple c) {
+void Automap_SetPlayer(Obj00401B30 *obj, s32 a, s32 b, Triple c) {
     obj->a = a;
     obj->b = b;
     obj->c = c;
-    func_00401B70(obj);
+    Automap_RevealAroundPlayer(obj);
 }

@@ -10,9 +10,9 @@ typedef struct Bucket {
     u8 pad4[0x10];
 } Bucket;
 
-extern void func_0022F1C8(u8 *arg0, Node *node);
+extern void CParticleSystem__Free(u8 *arg0, Node *node);
 
-void func_002316F4(u8 *arg0) {
+void CParticleSystem__FreeAll(u8 *arg0) {
     s32 i;
     Node *node;
     Node *cur;
@@ -22,7 +22,7 @@ void func_002316F4(u8 *arg0) {
         while (node != NULL) {
             cur = node;
             node = node->next;
-            func_0022F1C8(arg0, cur);
+            CParticleSystem__Free(arg0, cur);
         }
     }
 }

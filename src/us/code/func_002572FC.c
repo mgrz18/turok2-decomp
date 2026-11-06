@@ -1,6 +1,6 @@
 #include "structs/weapon.h"
 
-s32 func_002572FC(s16 id, s32 mode) {
+s32 Weapon_IsAllowedInMode(s16 id, s32 mode) {
     switch (mode) {
     case 0:
         if (D_800AF618[id]->flags & 1) {

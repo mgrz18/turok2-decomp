@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00211CC4(f32 *arg0, f32 *arg1, f32 *arg2);
-s32 func_00211CC4(f32 *arg0, f32 *arg1, f32 *arg2) {
+extern s32 Edge_IntersectXZ(f32 *arg0, f32 *arg1, f32 *arg2);
+s32 Edge_IntersectXZ(f32 *arg0, f32 *arg1, f32 *arg2) {
     CVector3 delta;
     f32 temp_f3;
     s32 result;

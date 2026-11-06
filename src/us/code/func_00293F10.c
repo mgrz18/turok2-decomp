@@ -15,7 +15,7 @@ typedef struct {
 s32 osSetIntMask(s32);                              /* extern */
 
 /* Pushes arg1 on arg0, stamped with arg0's current stamp, interrupts masked. */
-void func_00293F10(Queue *arg0, QueueNode *arg1) {
+void alSynAddPlayer(Queue *arg0, QueueNode *arg1) {
     s32 temp_v0;
 
     temp_v0 = osSetIntMask(1);

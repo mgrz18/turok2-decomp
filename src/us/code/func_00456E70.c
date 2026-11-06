@@ -28,7 +28,7 @@ s32 func_004264B4(s32 ch);
 s32 func_00426AF8(s32 ch);
 void func_0041D948(Menu *o);
 u32 func_00426D98(u8 *data, s32 len, u32 crc);
-void func_00416644(u8 *a, void *b, void *c, s32 d, void *e);
+void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, void *e);
 extern u8 D_80130974[8];
 extern u8 D_0043ABA0[];
 extern u8 D_0043ABC4[];
@@ -69,7 +69,7 @@ static inline void O01Capture(CPlayer *a) {
         D_80130974[i] = p->m_Name[i];
     }
 }
-void func_00456E70(Menu *own) {
+void PakMenu_InitSaveProfile_2(Menu *own) {
     CPlayer *plr;
     O01Sel sel;
     u8 *msg;
@@ -90,7 +90,7 @@ void func_00456E70(Menu *own) {
     msg = O01Pick(&sel);
     if (D_800C2020 != 0) {
         D_801309BC = 1;
-        func_00416644((u8 *)own->player->m_pCamera + 0x53C, msg, plr, plr->m_ContState.m_pContState, 0);
+        MenuPool_OpenMenu((u8 *)own->player->m_pCamera + 0x53C, msg, plr, plr->m_ContState.m_pContState, 0);
     } else {
         if (D_80130990 != 0) {
             pad = D_800C2028;
@@ -105,11 +105,11 @@ void func_00456E70(Menu *own) {
         } else {
             D_801309BC = 1;
             if (func_004264B4(sel.v) != 0) {
-                func_00416644(D_80119E2C, D_0043BB68, plr, plr->m_ContState.m_pContState, msg);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BB68, plr, plr->m_ContState.m_pContState, msg);
             } else if (func_00426AF8(sel.v) != 0) {
-                func_00416644(D_80119E2C, D_0043BF7C, plr, plr->m_ContState.m_pContState, D_0043B5EC);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BF7C, plr, plr->m_ContState.m_pContState, D_0043B5EC);
             } else {
-                func_00416644(D_80119E2C, D_0043BB20, plr, plr->m_ContState.m_pContState, msg);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BB20, plr, plr->m_ContState.m_pContState, msg);
             }
         }
     }

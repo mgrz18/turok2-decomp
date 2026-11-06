@@ -1,5 +1,5 @@
 /* cc1-flags: -quiet -G0 -mips3 -mgas -meb -mno-fix4300 -mhard-float -funsigned-char -O3 -mcpu=VR4300 -mgp32 -mfp32 -fforce-addr -fno-builtin */
-/* From decompals/ultralib (libultra 2.0I): src/io/pfschecker.c, osPfsChecker. */
+/* From decompals/ultralib (libultra 2.0I): src/io/pfschecker.c, osPfsChecker (module-2 copy osPfsChecker_2). */
 #include "common.h"
 #include "ultra_types.h"
 
@@ -31,12 +31,12 @@ extern s32 func_00429D1C(OSPfs *pfs); /* __osCheckId */
 extern s32 func_004297D8(OSPfs *pfs); /* __osGetId */
 extern s32 func_00429DE4(OSPfs *pfs); /* __osPfsSelectBank */
 extern s32 func_004299C4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank); /* __osPfsRWInode */
-extern s32 func_00299680(OSMesgQueue *mq, int channel, u16 address, u8 *buffer); /* __osContRamRead */
-extern s32 func_00299A40(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force); /* __osContRamWrite */
+extern s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer); /* __osContRamRead */
+extern s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force); /* __osContRamWrite */
 extern s32 func_0042868C(OSPfs *pfs, __OSInodeCache *cache); /* corrupted_init */
 extern s32 func_004287D8(OSPfs *pfs, __OSInodeUnit fpage, __OSInodeCache *cache); /* corrupted */
 
-s32 osPfsChecker(OSPfs *pfs) {
+s32 osPfsChecker_2(OSPfs *pfs) {
     int j;
     s32 ret;
     __OSInodeUnit next_page;
@@ -64,7 +64,7 @@ s32 osPfsChecker(OSPfs *pfs) {
     ERRCK(func_0042868C(pfs, &cache));
 
     for (j = 0; j < pfs->dir_size; j++) {
-        ERRCK(func_00299680(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir));
+        ERRCK(__osContRamRead(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir));
 
         if (tmp_dir.company_code != 0 && tmp_dir.game_code != 0) {
             next_page = tmp_dir.start_page;
@@ -96,7 +96,7 @@ s32 osPfsChecker(OSPfs *pfs) {
                 tmp_dir.data_sum = 0;
 
                 SET_ACTIVEBANK_TO_ZERO();
-                ERRCK(func_00299A40(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir, 0));
+                ERRCK(__osContRamWrite(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir, 0));
                 fixed++;
             }
         } else {
@@ -108,14 +108,14 @@ s32 osPfsChecker(OSPfs *pfs) {
                 tmp_dir.data_sum = 0;
 
                 SET_ACTIVEBANK_TO_ZERO();
-                ERRCK(func_00299A40(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir, 0));
+                ERRCK(__osContRamWrite(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir, 0));
                 fixed++;
             }
         }
     }
 
     for (j = 0; j < pfs->dir_size; j++) {
-        ERRCK(func_00299680(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir));
+        ERRCK(__osContRamRead(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir));
 
         if (tmp_dir.company_code != 0 && tmp_dir.game_code != 0 &&
             tmp_dir.start_page.ipage >= (u16)pfs->inode_start_page) {

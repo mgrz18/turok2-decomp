@@ -3,35 +3,35 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_00290D90(s32 arg0);
+extern f32 alCents2Ratio(s32 arg0);
 extern const float D_800AA400;
 extern const float D_800AA408;
 extern char D_800AA380[];
 extern char D_800AA384[];
-extern void func_00291BF4(ALSeqPlayer *, ALEvent *);
-extern void func_00291034(ALEventQueue *, ALEvent *, ALMicroTime);
-extern void func_0029B020(char *, char *, s32);
+extern void __handleMIDIMsg(ALSeqPlayer *, ALEvent *);
+extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, ALMicroTime);
+extern void __assert(char *, char *, s32);
 extern const float D_800AA400;
 extern const float D_800AA408;
 extern char D_800AA380[];
 extern char D_800AA384[];
-extern ALSound *func_00292640(ALSeqPlayer *, u8, u8, u8);
-extern ALVoiceState *func_0029247C(ALSeqPlayer *, u8, u8, u8);
-extern ALVoiceState *func_002925E0(ALSeqPlayer *, u8, u8);
+extern ALSound *__lookupSoundQuick(ALSeqPlayer *, u8, u8, u8);
+extern ALVoiceState *__mapVoice(ALSeqPlayer *, u8, u8, u8);
+extern ALVoiceState *__lookupVoice(ALSeqPlayer *, u8, u8);
 extern s32 alSynAllocVoice(void *, ALVoice *, ALVoiceConfig *);
-extern u8 func_00292804(ALVoiceState *, ALSeqPlayer *);
-extern s16 func_00292774(ALVoiceState *, ALSeqPlayer *);
-extern ALMicroTime func_002927E8(ALVoiceState *, ALMicroTime);
-extern void func_00294540(void *, ALVoice *, void *, f32, s16, u8, u8, ALMicroTime);
-extern void func_00291034(ALEventQueue *, ALEvent *, ALMicroTime);
-extern void func_00292A74(ALSeqPlayer *, ALVoice *, ALMicroTime);
+extern u8 __vsPan(ALVoiceState *, ALSeqPlayer *);
+extern s16 __vsVol(ALVoiceState *, ALSeqPlayer *);
+extern ALMicroTime __vsDelta(ALVoiceState *, ALMicroTime);
+extern void alSynStartVoiceParams(void *, ALVoice *, void *, f32, s16, u8, u8, ALMicroTime);
+extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, ALMicroTime);
+extern void __seqpReleaseVoice(ALSeqPlayer *, ALVoice *, ALMicroTime);
 extern void alSynSetVol(void *, ALVoice *, s16, ALMicroTime);
-extern void func_002942B0(void *, ALVoice *, u8);
-extern void func_00294200(void *, ALVoice *, u8);
-extern void func_00294340(void *, ALVoice *, f32);
-extern void func_00292A20(ALSeqPlayer *, ALInstrument *, s32);
-extern void func_0029B020(char *, char *, s32);
-void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
+extern void alSynSetPan(void *, ALVoice *, u8);
+extern void alSynSetFXMix(void *, ALVoice *, u8);
+extern void alSynSetPitch(void *, ALVoice *, f32);
+extern void __setInstChanState(ALSeqPlayer *, ALInstrument *, s32);
+extern void __assert(char *, char *, s32);
+void __handleMIDIMsg(ALSeqPlayer *seqp, ALEvent *event)
 {
     ALVoice *voice;
     ALVoiceState *vs;
@@ -48,7 +48,7 @@ void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
     ALVoiceState *vstate;
     u8 pan;
     if (!(event->type == 1 || event->type == 2))
-        func_0029B020(D_800AA380, D_800AA384, 436);
+        __assert(D_800AA380, D_800AA384, 436);
     status = event->msg.midi.status & 0xF0;
     chan = event->msg.midi.status & 0x0F;
     byte1 = key = event->msg.midi.byte1;
@@ -67,13 +67,13 @@ void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
             u8 *tremeloSlot;
             if (seqp->state != 1)
                 break;
-            sound = func_00292640(seqp, key, vel, chan);
+            sound = __lookupSoundQuick(seqp, key, vel, chan);
             if (!sound)
                 return;
             config.priority = seqp->chanState[chan].priority;
             config.fxBus = 0;
             config.unityPitch = 0;
-            vstate = func_0029247C(seqp, key, vel, chan);
+            vstate = __mapVoice(seqp, key, vel, chan);
             if (!vstate)
                 return;
             voice = &vstate->voice;
@@ -85,7 +85,7 @@ void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
             else
                 vstate->phase = 0;
             cents = (key - sound->keyMap->keyBase) * 100 + sound->keyMap->detune;
-            vstate->pitch = func_00290D90(cents);
+            vstate->pitch = alCents2Ratio(cents);
             vstate->envGain = sound->envelope->attackVolume;
             vstate->envEndTime = seqp->curTime + sound->envelope->attackTime;
             vstate->flags = 0;
@@ -99,7 +99,7 @@ void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
                         evt.type = 22;
                         evt.msg.osc.vs = vstate;
                         evt.msg.osc.oscState = oscState;
-                        func_00291034(&seqp->evtq, &evt, deltaTime);
+                        alEvtqPostEvent(&seqp->evtq, &evt, deltaTime);
                         vstate->flags |= 0x01;
                     }
                 }
@@ -122,7 +122,7 @@ void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
                         evt.msg.osc.vs = vstate;
                         evt.msg.osc.oscState = oscState;
                         evt.msg.osc.chan = chan;
-                        func_00291034(&seqp->evtq, &evt, deltaTime);
+                        alEvtqPostEvent(&seqp->evtq, &evt, deltaTime);
                         vstate->flags |= 0x02;
                     }
                 }
@@ -130,43 +130,43 @@ void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
             vstate->vibrato = oscValue;
             pitch = vstate->pitch * seqp->chanState[chan].pitchBend * vstate->vibrato;
             fxmix = seqp->chanState[chan].fxmix;
-            pan = func_00292804(vstate, seqp);
-            vol = func_00292774(vstate, seqp);
+            pan = __vsPan(vstate, seqp);
+            vol = __vsVol(vstate, seqp);
             deltaTime = sound->envelope->attackTime;
-            func_00294540(seqp->drvr, voice, sound->wavetable, pitch, vol, pan, fxmix, deltaTime);
+            alSynStartVoiceParams(seqp->drvr, voice, sound->wavetable, pitch, vol, pan, fxmix, deltaTime);
             evt.type = 6;
             evt.msg.vol.voice = voice;
             evt.msg.vol.vol = sound->envelope->decayVolume;
             evt.msg.vol.delta = sound->envelope->decayTime;
             deltaTime = sound->envelope->attackTime;
-            func_00291034(&seqp->evtq, &evt, deltaTime);
+            alEvtqPostEvent(&seqp->evtq, &evt, deltaTime);
             break;
         }
     case 0x80:
-        vstate = func_002925E0(seqp, key, chan);
+        vstate = __lookupVoice(seqp, key, chan);
         if (!vstate)
             return;
         if (vstate->phase == 2)
             vstate->phase = 4;
         else {
             vstate->phase = 3;
-            func_00292A74(seqp, &vstate->voice, vstate->sound->envelope->releaseTime);
+            __seqpReleaseVoice(seqp, &vstate->voice, vstate->sound->envelope->releaseTime);
         }
         break;
     case 0xA0:
-        vstate = func_002925E0(seqp, key, chan);
+        vstate = __lookupVoice(seqp, key, chan);
         if (!vstate)
             return;
         vstate->velocity = byte2;
-        alSynSetVol(seqp->drvr, &vstate->voice, func_00292774(vstate, seqp),
-                      func_002927E8(vstate, seqp->curTime));
+        alSynSetVol(seqp->drvr, &vstate->voice, __vsVol(vstate, seqp),
+                      __vsDelta(vstate, seqp->curTime));
         break;
     case 0xD0:
         for (vs = seqp->vAllocHead; vs != 0; vs = vs->next) {
             if (vs->channel == chan) {
                 vs->velocity = byte1;
-                alSynSetVol(seqp->drvr, &vs->voice, func_00292774(vs, seqp),
-                              func_002927E8(vs, seqp->curTime));
+                alSynSetVol(seqp->drvr, &vs->voice, __vsVol(vs, seqp),
+                              __vsDelta(vs, seqp->curTime));
             }
         }
         break;
@@ -176,8 +176,8 @@ void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
             seqp->chanState[chan].pan = byte2;
             for (vs = seqp->vAllocHead; vs != 0; vs = vs->next) {
                 if (vs->channel == chan) {
-                    pan = func_00292804(vs, seqp);
-                    func_002942B0(seqp->drvr, &vs->voice, pan);
+                    pan = __vsPan(vs, seqp);
+                    alSynSetPan(seqp->drvr, &vs->voice, pan);
                 }
             }
             break;
@@ -185,8 +185,8 @@ void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
             seqp->chanState[chan].vol = byte2;
             for (vs = seqp->vAllocHead; vs != 0; vs = vs->next) {
                 if ((vs->channel == chan) && (vs->envPhase != 3)) {
-                    vol = func_00292774(vs, seqp);
-                    alSynSetVol(seqp->drvr, &vs->voice, vol, func_002927E8(vs, seqp->curTime));
+                    vol = __vsVol(vs, seqp);
+                    alSynSetVol(seqp->drvr, &vs->voice, vol, __vsDelta(vs, seqp->curTime));
                 }
             }
             break;
@@ -205,7 +205,7 @@ void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
                             vs->phase = 0;
                         else if (vs->phase == 4) {
                             vs->phase = 3;
-                            func_00292A74(seqp, &vs->voice, vs->sound->envelope->releaseTime);
+                            __seqpReleaseVoice(seqp, &vs->voice, vs->sound->envelope->releaseTime);
                         }
                     }
                 }
@@ -215,7 +215,7 @@ void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
             seqp->chanState[chan].fxmix = byte2;
             for (vs = seqp->vAllocHead; vs != 0; vs = vs->next) {
                 if (vs->channel == chan)
-                    func_00294200(seqp->drvr, &vs->voice, byte2);
+                    alSynSetFXMix(seqp->drvr, &vs->voice, byte2);
             }
             break;
         case 0x14:
@@ -233,10 +233,10 @@ void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
         break;
     case 0xC0:
         if (seqp->bank == 0)
-            func_0029B020(D_800AA380, D_800AA384, 714);
+            __assert(D_800AA380, D_800AA384, 714);
         if (key < seqp->bank->instCount) {
             ALInstrument *inst = seqp->bank->instArray[key];
-            func_00292A20(seqp, inst, chan);
+            __setInstChanState(seqp, inst, chan);
         }
         break;
     case 0xE0:
@@ -246,11 +246,11 @@ void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
             s32 cents;
             bendVal = ((byte2 << 7) + byte1) - 8192;
             cents = (seqp->chanState[chan].bendRange * bendVal) / 8192;
-            bendRatio = func_00290D90(cents);
+            bendRatio = alCents2Ratio(cents);
             seqp->chanState[chan].pitchBend = bendRatio;
             for (vs = seqp->vAllocHead; vs != 0; vs = vs->next)
                 if (vs->channel == chan)
-                    func_00294340(seqp->drvr, &vs->voice, vs->pitch * bendRatio * vs->vibrato);
+                    alSynSetPitch(seqp->drvr, &vs->voice, vs->pitch * bendRatio * vs->vibrato);
         }
         break;
     default:

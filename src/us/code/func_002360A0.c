@@ -1,10 +1,10 @@
 #include "common.h"
 
-s32 func_0020F7EC(s32);
-s32 func_002333C0(s32, s32, s32);
+s32 CMtxF__ClampEntries(s32);
+s32 Swoosh_NewNode(s32, s32, s32);
 
-s32 func_0020FF80(s32 *, s32);              /* extern */
-s32 func_0021034C(s32 *, f32, f32, f32);    /* extern */
+s32 CMtxF__Copy(s32 *, s32);              /* extern */
+s32 CMtxF__ScaleAxes(s32 *, f32, f32, f32);    /* extern */
 
 typedef struct {
     /* 0x0 */ u8 pad0[0xC];
@@ -34,10 +34,10 @@ void func_002360A0(World002360A0 *arg0, s32 arg1, s32 arg2) {
     if (var_s0 != NULL) {
         do {
             if ((var_s0->inst == arg1) && (var_s0->strength > 0.0f)) {
-                func_0020FF80(sp10, arg2 + (var_s0->ref->index << 6));
-                func_0021034C(sp10, 0.00000015258789f, 0.00000015258789f, 0.00000015258789f);
-                func_0020F7EC((s32) sp10);
-                func_002333C0((s32) arg0, (s32) var_s0, (s32) sp10);
+                CMtxF__Copy(sp10, arg2 + (var_s0->ref->index << 6));
+                CMtxF__ScaleAxes(sp10, 0.00000015258789f, 0.00000015258789f, 0.00000015258789f);
+                CMtxF__ClampEntries((s32) sp10);
+                Swoosh_NewNode((s32) arg0, (s32) var_s0, (s32) sp10);
             }
             var_s0 = var_s0->next;
         } while (var_s0 != NULL);

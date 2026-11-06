@@ -5,7 +5,7 @@ typedef struct {
     /* 0x04 */ s32 size;
 } Entry;
 
-Entry *func_002017D4(s32 *, s32);                    /* extern */
+Entry *CISet__GetBlock(s32 *, s32);                    /* extern */
 
 s32 func_00214188(s32 *arg0) {
     s32 var_s0;
@@ -16,7 +16,7 @@ s32 func_00214188(s32 *arg0) {
     var_s1 = 0;
     if (*arg0 > 0) {
         do {
-            temp_v0 = func_002017D4(arg0, var_s0);
+            temp_v0 = CISet__GetBlock(arg0, var_s0);
             var_s0 += 1;
             var_s1 += temp_v0->size;
         } while (var_s0 < *arg0);

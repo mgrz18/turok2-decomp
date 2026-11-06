@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/pak.h"
 
-s32 func_0045F8EC(s32 i, s32 j, char **out) {
+s32 Pak_GetNoteExtName_2(s32 i, s32 j, char **out) {
     if (D_80130C60[i] != 3) {
         return -2;
     }

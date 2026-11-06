@@ -5,6 +5,6 @@ typedef struct {
     /* 0x14 */ s32 (*callback)();
 } Arg0;
 
-void func_00468550(Arg0 *arg0) {
+void DemoStream_Decode_2(Arg0 *arg0) {
     arg0->callback();
 }

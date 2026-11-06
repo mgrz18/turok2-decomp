@@ -17,7 +17,7 @@ extern State D_8012FA10;
 
 #define SCRIPT (((s32 **) &D_8012FA10)[-1])
 
-void func_004070B4(s32 arg0) {
+void Primagen_SetSpawnScript(s32 arg0) {
     D_8012FA10.unk0 = -1;
     D_8012FA10.unk8 = 1;
     D_8012FA10.unk4 = -1;

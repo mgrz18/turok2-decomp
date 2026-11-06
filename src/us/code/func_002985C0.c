@@ -5,8 +5,8 @@
 
 extern s32 __osAiDeviceBusy();
 extern u8 D_800B7A20[];
-extern u32 func_0029BF80(void *);
-s32 func_002985C0(void *bufPtr, u32 size) {
+extern u32 osVirtualToPhysical(void *);
+s32 osAiSetNextBuffer(void *bufPtr, u32 size) {
     char *bptr = bufPtr;
     if (D_800B7A20[0] != 0) {
         bptr -= 0x2000;
@@ -19,7 +19,7 @@ s32 func_002985C0(void *bufPtr, u32 size) {
     if (__osAiDeviceBusy() != 0) {
         return -1;
     }
-    *(volatile u32 *)0xA4500000 = func_0029BF80(bptr);
+    *(volatile u32 *)0xA4500000 = osVirtualToPhysical(bptr);
     *(volatile u32 *)0xA4500004 = size;
     return 0;
 }

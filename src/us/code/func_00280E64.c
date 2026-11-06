@@ -10,7 +10,7 @@ typedef struct {
 extern CameraModeEntry D_800B6CB0[];
 
 /* Switches the camera to mode arg1 and runs its enter handler. */
-void func_00280E64(CCamera *arg0, s16 arg1) {
+void CCamera__SetMode(CCamera *arg0, s16 arg1) {
     s32 (*temp_v0)();
 
     arg0->m_Mode = arg1;

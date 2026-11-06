@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 void func_0026E294(Record14 *arg0) {
-    extern void func_0026DFB0(void *);
+    extern void LevelEvent_Fire(void *);
     Record14 copy;
     u8 *bytes = (u8 *)arg0;
     bytes[0xE] |= 0x20;
@@ -12,6 +12,6 @@ void func_0026E294(Record14 *arg0) {
         copy = *arg0;
         ((u8 *)&copy)[0x12] = 2;
         ((u8 *)&copy)[0x10] = 0;
-        func_0026DFB0(&copy);
+        LevelEvent_Fire(&copy);
     }
 }

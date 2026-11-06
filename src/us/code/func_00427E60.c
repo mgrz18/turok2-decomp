@@ -3,8 +3,8 @@
 
 #include "common.h"
 #include "ultra_types.h"
-s32 func_00429DFC(OSPfs *pfs);
-s32 func_00429AA4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+s32 __osCheckId(OSPfs *pfs);
+s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
 s32 osPfsFreeBlocks(OSPfs *pfs, s32 *leo_bytes) {
     __OSInode inode;
     s32 j;
@@ -15,11 +15,11 @@ s32 osPfsFreeBlocks(OSPfs *pfs, s32 *leo_bytes) {
     if ((pfs->status & 0x1) == 0) {
         return 5;
     }
-    if (func_00429DFC(pfs) == 2) {
+    if (__osCheckId(pfs) == 2) {
         return 2;
     }
     for (bank = 0; bank < pfs->banks; bank++) {
-        ret = func_00429AA4(pfs, &inode, 0, bank);
+        ret = __osPfsRWInode(pfs, &inode, 0, bank);
         if (ret != 0) {
             return ret;
         }

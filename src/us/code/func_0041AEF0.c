@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern s32 D_8011AADC;
-s32 func_0041AEF0(s32 index, s32 step, s32 mode) {
+s32 Cheat_FindWarpLevel(s32 index, s32 step, s32 mode) {
     s32 i;
     s32 mask;
     s32 *flags;

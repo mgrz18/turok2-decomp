@@ -65,7 +65,7 @@ static __inline__ void writeQuantized(u32 bitAddress, Func802608ECResult range, 
     }
     write_bits(quantized, bitAddress, range.value);
 }
-void func_002177DC(u32 *stream, Func802608ECResult range, f32 value) {
+void Bits_WriteFloat(u32 *stream, Func802608ECResult range, f32 value) {
     writeQuantized(*stream, range, value);
     *stream += range.value;
 }

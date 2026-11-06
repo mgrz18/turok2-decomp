@@ -3,15 +3,15 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00210EF0(f32 *value);
+extern void Angle_Wrap(f32 *value);
 extern float D_800A5634;
 extern const f32 D_800A562C;
 extern f32 D_800A562C;
-f32 func_00210DB4(f32 fraction, f32 first, f32 second) {
+f32 Angle_Lerp(f32 fraction, f32 first, f32 second) {
     f32 var_f3;
     f32 result;
-    func_00210EF0(&first);
-    func_00210EF0(&second);
+    Angle_Wrap(&first);
+    Angle_Wrap(&second);
     if (first > second) {
         var_f3 = second + *(&D_800A562C + 1);
         if ((var_f3 - first) < (first - second)) {
@@ -24,7 +24,7 @@ f32 func_00210DB4(f32 fraction, f32 first, f32 second) {
         }
     }
     result = first + (fraction * (second - first));
-    func_00210EF0(&result);
+    Angle_Wrap(&result);
     return result;
 }
-void func_00210EF0(f32 *value);
+void Angle_Wrap(f32 *value);

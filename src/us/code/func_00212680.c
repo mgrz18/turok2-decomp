@@ -4,13 +4,13 @@
 #include "rw/abu_types.h"
 
 extern float D_800A5768;
-extern void func_0020F85C(void *, void *, void *);
-extern void func_0020FAFC(void *arg0, void *arg1, void *arg2);
-extern void func_0020F040(f32 *);
-extern s32 func_002123D4(ObjectRecAtBC *arg0, f32 arg1, f32 arg2, f32 arg3,
+extern void CMtxF__TransformPoint(void *, void *, void *);
+extern void CMtxF__RotateVector(void *arg0, void *arg1, void *arg2);
+extern void CVector3__Normalize(f32 *);
+extern s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, f32 arg1, f32 arg2, f32 arg3,
                         f32 *arg4, f32 *arg5);
-extern void func_0020EF60(void *, void *, f32);
-s32 func_00212680(ObjectRecAtBC *arg0, CVector3 arg1, CVector3 arg4, Matrix *arg7,
+extern void CVector3__Scale(void *, void *, f32);
+s32 Actors_EvaluateLightVolume(ObjectRecAtBC *arg0, CVector3 arg1, CVector3 arg4, Matrix *arg7,
                   CVector3 *arg8, f32 *arg9) {
     CVector3 second;
     CVector3 first;
@@ -30,11 +30,11 @@ s32 func_00212680(ObjectRecAtBC *arg0, CVector3 arg1, CVector3 arg4, Matrix *arg
         second.y = arg4.y * arg7->m[5];
         second.z = arg4.z * arg7->m[10];
     } else {
-        func_0020F85C(arg7, &arg1.x, &first);
-        func_0020FAFC(arg7, &arg4.x, &second);
+        CMtxF__TransformPoint(arg7, &arg1.x, &first);
+        CMtxF__RotateVector(arg7, &arg4.x, &second);
     }
-    func_0020F040(&second.x);
-    if (func_002123D4(arg0, first.x, first.y, first.z,
+    CVector3__Normalize(&second.x);
+    if (Actors_GetLightVolumeFalloff(arg0, first.x, first.y, first.z,
                      &normal.x, &amount) == 0) {
         return 0;
     }
@@ -57,7 +57,7 @@ s32 func_00212680(ObjectRecAtBC *arg0, CVector3 arg1, CVector3 arg4, Matrix *arg
         if (arg9 != 0) {
             *arg9 = amount;
         }
-        func_0020EF60(arg8, &arg0->direction, amount);
+        CVector3__Scale(arg8, &arg0->direction, amount);
     }
     return 1;
 }

@@ -1,7 +1,7 @@
 #include "common.h"
 
-s32 func_00275224(s32);                         /* extern */
+s32 SndSeq_Duck(s32);                         /* extern */
 
-void func_00271A70(s32 arg0) {
-    func_00275224(arg0 + 0x1D64);
+void CAudioWorld__DuckMusic(s32 arg0) {
+    SndSeq_Duck(arg0 + 0x1D64);
 }

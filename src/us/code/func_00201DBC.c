@@ -4,21 +4,21 @@
 #include "rw/abu_types.h"
 
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern Chunk *func_0020205C(CartridgeReadWorker *arg0);
+extern Chunk *CLoader__AllocLoaderEntry(CartridgeReadWorker *arg0);
 extern s32 osJamMesg(void *arg0, void *arg1, s32 arg2);
 extern s32 osJamMesg(void *, void *, s32);
-void func_00201DBC(struct CartridgeReadWorker *arg0, u32 arg1, s32 arg2, void *arg3) {
-    extern void func_0029B030(void *arg0, s32 arg1, s32 arg2);
+void CLoader__LoadSync(struct CartridgeReadWorker *arg0, u32 arg1, s32 arg2, void *arg3) {
+    extern void osCreateMesgQueue(void *arg0, s32 arg1, s32 arg2);
     char queue[0x18];
     s32 queue_init;
     s32 completed;
     s32 remaining;
     s32 length;
     Chunk *chunk;
-    func_0029B030(queue, (s32) &queue_init, 1);
+    osCreateMesgQueue(queue, (s32) &queue_init, 1);
     remaining = arg2;
     do {
-        chunk = func_0020205C(arg0);
+        chunk = CLoader__AllocLoaderEntry(arg0);
         length = 0x2000;
         if (chunk == 0) {
             break;

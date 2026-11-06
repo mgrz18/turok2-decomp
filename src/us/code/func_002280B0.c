@@ -7,7 +7,7 @@ s32 CList__Remove(s32 *, void *);           /* extern */
 extern s32 D_8010FEA0;
 extern s32 D_8010FEB4;
 
-void func_002280B0(CListedInstance *arg0) {
+void CListedInstance__Free(CListedInstance *arg0) {
     s32 *temp_v1;
 
     temp_v1 = arg0->m_pOwnerCount;

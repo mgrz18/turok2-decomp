@@ -1,7 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC_6.CPP, func_8040458C_de, with Turok 2's layouts. */
 /* WRONG CUT: the real function is 0x00425E74-0x00426064 (size 0x1F0, 124 words); splat cut its tail (the two text-decoding loops and the
  * epilogue) off as func_00425F84 (0x00425F84, 0xE0, listed in part x4). All 124 words match (checked over the real extent).
- * First-module copy of src/us/code/func_0045ED94.c. */
+ * First-module copy of src/us/code/Pak_FindNote_2.c. */
 #include "common.h"
 #include "structs/pak.h"
 
@@ -22,7 +22,7 @@ static __inline__ void DecodePakText(u8 *dst, u8 *src, s32 n) {
 }
 
 /* Reports note index of the pak on channel ch from the cached directory. */
-s32 func_00425E74(s32 ch, s32 index, s32 *exists, u8 *name, u8 *ext, s32 *size, u8 *company, u8 *code) {
+s32 Pak_FindNote(s32 ch, s32 index, s32 *exists, u8 *name, u8 *ext, s32 *size, u8 *company, u8 *code) {
     if (D_80130C60[ch] != 3) {
         return -2;
     }

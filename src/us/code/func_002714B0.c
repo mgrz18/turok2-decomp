@@ -5,7 +5,7 @@ s32 osRecvMesg(void *, s32, s32);    /* extern */
 s32 __osDisableInt();                                /* extern */
 s32 __osRestoreInt(s32);                         /* extern */
 
-void func_002714B0(s32 arg0) {
+void CAudioWorld__Lock(s32 arg0) {
     s32 temp_a0;
     s32 temp_v1;
     CMutex *temp_s0;

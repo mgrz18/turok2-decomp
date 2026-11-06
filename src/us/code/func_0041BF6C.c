@@ -8,7 +8,7 @@
 extern CPlayerOptions D_8011AB18;
 extern char D_800B3EB8[];
 extern char D_800B3ED0[];
-s32 func_0041BF6C(MenuItem *a, Menu *b) {
+s32 OptionsMenu_ControlTypeText(MenuItem *a, Menu *b) {
 CPlayerOptions *p = &D_8011AB18;
 if (b->player) { CPlayerOptions *q = b->player->m_pOptions; if (q) p = q; }
  switch (p->m_ControlType) { case 0: a->text = D_800B3EB8; break; case 1: a->text = D_800B3ED0; break; }

@@ -7,7 +7,7 @@ typedef struct {
 
 extern Unk0029B150 *D_800B8920;   /* the default when arg0 is NULL */
 
-s32 func_0029B150(Unk0029B150 *arg0) {
+s32 osGetThreadPri(Unk0029B150 *arg0) {
     Unk0029B150 *var_a0;
 
     var_a0 = arg0;

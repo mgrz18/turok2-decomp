@@ -5,11 +5,11 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-extern s32 func_0041648C(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);
+extern s32 Menu_StepValue(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);
 extern CPlayerOptions D_8011AB18;
-s32 func_0041BF08(MenuItem *a, Menu *b) {
+s32 OptionsMenu_StepControlType(MenuItem *a, Menu *b) {
     CPlayerOptions *p = &D_8011AB18;
     if (b->player) { CPlayerOptions *q = b->player->m_pOptions; if (q) p = q; }
-    p->m_ControlType = func_0041648C((s32)b, p->m_ControlType, 1, 0, 1, 1);
+    p->m_ControlType = Menu_StepValue((s32)b, p->m_ControlType, 1, 0, 1, 1);
     return 0;
 }

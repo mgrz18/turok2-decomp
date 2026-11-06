@@ -4,8 +4,8 @@
 #include "rw/junk_types.h"
 
 f32 func_00298470(f32 x);
-f32 func_0021153C(f32 x);
-f32 func_0020EAA0(CVector3 *v) {
+f32 Math_AcosLookup(f32 x);
+f32 CVector3__GetYaw(CVector3 *v) {
     f32 x = v->x;
     f32 z = v->z;
     f32 len, r, res, t;
@@ -19,7 +19,7 @@ f32 func_0020EAA0(CVector3 *v) {
     }
     if (((x) < 0.0f ? -(x) : (x)) < ((z) < 0.0f ? -(z) : (z))) {
         x /= len;
-        r = func_0021153C(((-1.0f) > (((1.0f) < (x) ? (1.0f) : (x))) ? (-1.0f) : (((1.0f) < (x) ? (1.0f) : (x)))));
+        r = Math_AcosLookup(((-1.0f) > (((1.0f) < (x) ? (1.0f) : (x))) ? (-1.0f) : (((1.0f) < (x) ? (1.0f) : (x)))));
         res = -r;
         if (z < 0.0f) {
             res = r;
@@ -28,7 +28,7 @@ f32 func_0020EAA0(CVector3 *v) {
     } else {
         z /= len;
         t = ((-1.0f) > (((1.0f) < (z) ? (1.0f) : (z))) ? (-1.0f) : (((1.0f) < (z) ? (1.0f) : (z))));
-        r = func_0021153C(-t);
+        r = Math_AcosLookup(-t);
         res = -r;
         if (x < 0.0f) {
             res = r;

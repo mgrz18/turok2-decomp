@@ -17,12 +17,12 @@ extern BlindOneState D_80130200;
 extern f32 D_800B6D28; /* frame time */
 extern BlindOnePhase D_0043240C[];
 extern u8 D_801100F0[];
-extern void func_00235510(void *slot);
-extern void func_0040C850(BlindOneMover *mover);
-extern s32 func_0040CB28(BlindOneState *state);
-extern void func_0027AD88(void *hud, s32 value);
+extern void Animator_Update(void *slot);
+extern void BlindOne_UpdateMover(BlindOneMover *mover);
+extern s32 BlindOne_GetHealthPercent(BlindOneState *state);
+extern void COnScreen__SetBossPercent(void *hud, s32 value);
 
-void func_0040DA90(void *obj, CAI *ai) {
+void BlindOne_BossUpdate(void *obj, CAI *ai) {
     BlindOneState *state = &D_80130200;
     s32 i;
 
@@ -34,10 +34,10 @@ void func_0040DA90(void *obj, CAI *ai) {
         D_0043240C[state->phase].update(state);
     }
     for (i = 0; i < state->faderCount; i++) {
-        func_00235510(&state->faders[i]);
+        Animator_Update(&state->faders[i]);
     }
-    func_0040C850(&state->movers[0]);
-    func_0040C850(&state->movers[1]);
-    func_0040C850(&state->movers[2]);
-    func_0027AD88(D_801100F0, func_0040CB28(state));
+    BlindOne_UpdateMover(&state->movers[0]);
+    BlindOne_UpdateMover(&state->movers[1]);
+    BlindOne_UpdateMover(&state->movers[2]);
+    COnScreen__SetBossPercent(D_801100F0, BlindOne_GetHealthPercent(state));
 }

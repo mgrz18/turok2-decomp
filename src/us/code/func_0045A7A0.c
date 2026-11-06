@@ -13,7 +13,7 @@ typedef struct {
 extern s32 D_800C202C;
 extern s32 D_8011B108;
 
-s32 func_0045A7A0(Arg0 *arg0) {
+s32 PakMenu_PollStartPressed_2(Arg0 *arg0) {
     if ((arg0->item->flags & 0x1000) && (D_800C202C == 0)) {
         D_8011B108 = 1;
         D_800C202C = 1;

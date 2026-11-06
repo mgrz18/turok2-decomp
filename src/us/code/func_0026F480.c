@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-s32 func_0026F480(f32 (*planes)[4], f32 *point) {
+s32 Frustum_ContainsPoint(f32 (*planes)[4], f32 *point) {
     s32 i;
     f32 *plane;
     for (i = 0; i < 6; i++) {

@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_0021149C(f32 arg0);
-extern f32 func_00274560(u8 arg0, u8 arg1);
-f32 func_00274560(u8 arg0, u8 arg1) {
+extern f32 Random_Float(f32 arg0);
+extern f32 Sound_RandomVolume(u8 arg0, u8 arg1);
+f32 Sound_RandomVolume(u8 arg0, u8 arg1) {
     extern f32 D_800A818C;
     extern f32 D_800A8184[];
     f32 first;
@@ -18,5 +18,5 @@ f32 func_00274560(u8 arg0, u8 arg1) {
     if (second == first) {
         return first;
     }
-    return first + func_0021149C(second - first);
+    return first + Random_Float(second - first);
 }

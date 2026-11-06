@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/cinema.h"
 
-void func_00410CE8();                               /* extern */
+void Cinema_UpdateCamera();                               /* extern */
 extern Cinema *D_800C1BB0;
 
-void func_00284254(void) {
+void Cinema_UpdateCameraIfActive(void) {
     if (D_800C1BB0->active != 0) {
-        func_00410CE8();
+        Cinema_UpdateCamera();
     }
 }

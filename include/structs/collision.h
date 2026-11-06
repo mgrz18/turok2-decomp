@@ -2,17 +2,17 @@
 #define STRUCTS_COLLISION_H
 
 /* Collision: an object's collision response (CCollisionInfo), the move being
- * tested (Sweep, func_00239F00 builds one on its stack and runs the tests of
+ * tested (Sweep, Collision_MoveInstance builds one on its stack and runs the tests of
  * D_800AD190 on it), and what the last test hit (CCollisionResults,
  * D_800F1CE0; D_800F1ADC points at the one being filled).
  *
  * A test that takes a hit records where to write it back (SweepHit's *Out
- * pointers into the results); func_0023C120 writes the object's position,
+ * pointers into the results); SweepHit_Store writes the object's position,
  * its region, the kind and the data there when the move ends on that hit.
  *
  * CCollisionInfo is Rage Wars' CCollisionInfo2_t (rw_abu
  * include/COMMON/CCOLLISIONINFO2_T.H, filled from a CCollisionSetup_t table
- * by func_002418C0); "CCollisionInfo__Reset" and gCollisionResults /
+ * by CCollisionSetup__Construct); "CCollisionInfo__Reset" and gCollisionResults /
  * gCollisionResultsP are Turok 3's names (references/turok3 colinfo.h).
  * The floor triangles a sweep walks are CGameRegion (structs/region.h).
  * tools/check_structs.py checks every offset below with the game's compiler. */
@@ -21,7 +21,7 @@
 #include "structs/region.h"
 
 /* The behaviours (m_InstanceBehavior, m_WallBehavior, m_GroundBehavior, and
- * the kind func_0023AB18 takes) */
+ * the kind Sweep_HitPlane takes) */
 #define COLLIDE_NONE    0
 #define COLLIDE_STOP    1
 #define COLLIDE_SLIDE   2
@@ -57,14 +57,14 @@ typedef struct HitFrame {
 
 /* What the last collision test hit (D_800F1CE0, 0xF0), one record per kind
  * of thing: each has the region the object was in, where it was, and a kind
- * or the thing hit. func_00241894 clears it (the instance's node to -1). */
+ * or the thing hit. CCollisionResults__Clear clears it (the instance's node to -1). */
 typedef struct CCollisionResults {
     /* 0x00 */ CGameObjectInstance *m_pInstance;   /* the instance hit (or the model) */
     /* 0x04 */ CGameRegion *m_pInstanceRegion;
     /* 0x08 */ CVector3 m_vInstancePos;            /* the collision point */
     /* 0x14 */ s32 m_nInstanceNode;                /* the node (bone) hit, -1 none */
-    /* 0x18 */ HitFrame m_Frame;                    /* what the hit node gave (func_0023F880) */
-    /* 0x88 */ CGameObjectInstance *m_pShape;      /* an instance hit by its collision shape (func_00242604) */
+    /* 0x18 */ HitFrame m_Frame;                    /* what the hit node gave (Sweep_TestBoxFaces) */
+    /* 0x88 */ CGameObjectInstance *m_pShape;      /* an instance hit by its collision shape (Platform_Collide) */
     /* 0x8C */ CGameRegion *m_pShapeRegion;
     /* 0x90 */ CVector3 m_vShapePos;
     /* 0x9C */ CGameRegion *m_pWallRegion;         /* non-NULL: a wall was hit */
@@ -87,7 +87,7 @@ typedef struct SweepHit {
     /* 0x08 */ CVector3 vel;                   /* velocity after the hit */
     /* 0x14 */ CVector3 slideTo;
     /* 0x20 */ CVector3 pos;                   /* where the hit is */
-    /* 0x2C */ CVector3 *posOut;               /* where func_0023C120 writes the object's position */
+    /* 0x2C */ CVector3 *posOut;               /* where SweepHit_Store writes the object's position */
     /* 0x30 */ CGameRegion **regionOut;        /* ... its region */
     /* 0x34 */ s32 *kindOut;                   /* ... kind */
     /* 0x38 */ s32 kind;
@@ -95,7 +95,7 @@ typedef struct SweepHit {
     /* 0x40 */ void *data;
 } SweepHit; /* size 0x44 */
 
-/* A move from obj's position to end, as func_00239F00 tests it. */
+/* A move from obj's position to end, as Collision_MoveInstance tests it. */
 typedef struct Sweep {
     union {
     /* 0x00 */ CGameObjectInstance *obj;
@@ -120,22 +120,22 @@ typedef struct Sweep {
     /* 0xA4 */ u8 padA4[4];
 } Sweep; /* size 0xA8 */
 
-/* A sweep against a model, in the sweep's own space (func_0023D050 builds
- * it, func_0023DBBC and func_0023D7CC walk the model's polygons). */
+/* A sweep against a model, in the sweep's own space (Collision_TestModels builds
+ * it, ModelSweep_TestModel and ModelSweep_TestGroup walk the model's polygons). */
 typedef struct ModelSweep {
     /* 0x00 */ Sweep *sweep;
     /* 0x04 */ f32 view[4][4];                 /* world to sweep space */
     /* 0x44 */ f32 scale;                      /* minus the sweep's length */
     /* 0x48 */ f32 hitDist;                    /* scale * the nearest hit's fraction */
     /* 0x4C */ void *model;                    /* the scene model */
-    /* 0x50 */ s32 kind;                       /* func_00245724(model) */
+    /* 0x50 */ s32 kind;                       /* Actor_GetTypeClass(model) */
     /* 0x54 */ f32 mtx[4][4];                  /* the model's matrix */
     /* 0x94 */ f32 inverse[4][4];
     /* 0xD4 */ void *meshes;
     /* 0xD8 */ s32 special;                    /* kind 9: every polygon counts */
 } ModelSweep; /* size 0xDC */
 
-/* The volume a sweep moves, against instances' cylinders (func_0024032C
+/* The volume a sweep moves, against instances' cylinders (Collision_SweepActors
  * builds it): the mover's radius and height, its top and bottom at the start
  * and the end, and the ground rectangle the move covers. */
 typedef struct SweepBox {
@@ -153,8 +153,8 @@ typedef struct SweepBox {
     /* 0x2C */ s32 flag;                       /* the move goes up or down: test the discs */
 } SweepBox; /* size 0x30 */
 
-/* A sweep's circle against the map's wall edges (func_00240E90 builds it on
- * its stack and D_800F1AB0 points at it while func_00240800 walks the
+/* A sweep's circle against the map's wall edges (Collision_SweepMapWalls builds it on
+ * its stack and D_800F1AB0 points at it while Collision_SweepRegionWalls walks the
  * regions). */
 typedef struct MapSweep {
     /* 0x00 */ Sweep *sweep;
@@ -181,16 +181,16 @@ typedef struct MapSweep {
     /* 0x84 */ u8 pad84[4];
 } MapSweep; /* size 0x88 */
 
-/* A face of an object's collision box (func_00241960 gives the box's eight
- * corners, func_0023C9CC and the D_800AD930 face builders take four of them):
+/* A face of an object's collision box (Platform_GetCollisionBox gives the box's eight
+ * corners, Quad_SetBoxBottom and the D_800AD930 face builders take four of them):
  * its corners in order and its normal. */
 typedef struct CollisionQuad {
     /* 0x00 */ CVector3 corner[4];
     /* 0x30 */ CVector3 normal;
 } CollisionQuad; /* size 0x3C */
 
-/* A hit to deal (Rage Wars' Shared_DamageEvent): func_00245828 fills it,
- * the AI's damage handlers (func_002465C8, func_0025B2D4, func_00247C10
+/* A hit to deal (Rage Wars' Shared_DamageEvent): DamageEvent_Set fills it,
+ * the AI's damage handlers (CAI__CallHurt, EnemyAI_OnDamage, Player_OnMultiplayerKill
  * for the player...) take it. */
 typedef struct DamageEvent {
     /* 0x00 */ void *source;                   /* what deals it (NULL: the world) */
@@ -203,7 +203,7 @@ typedef struct DamageEvent {
 
 /* An axis-aligned box. D_800F5A10 is the box of what the active cameras can
  * see (widened for animation), D_800F5A28 their plain view boxes
- * (func_0027ECF0 builds both); an object is drawn or tested when its box
+ * (CCameraPool__Advance builds both); an object is drawn or tested when its box
  * (CGameObjectInstance m_vMin / m_vMax) meets it. */
 typedef struct CBox {
     /* 0x00 */ CVector3 m_vMin;

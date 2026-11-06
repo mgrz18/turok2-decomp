@@ -18,10 +18,10 @@ typedef struct {
 extern f32 D_800B6D28;          /* frame time scale */
 extern u8 D_800F6CB0[];
 
-void func_002883E0(void *, Color32 *, s32, s32, s32, s32);
+void CEngineApp__DrawFilledRect(void *, Color32 *, s32, s32, s32, s32);
 
 /* Fades out a red flash over the screen area and draws it while it lasts. */
-void func_00280EE8(Screen *scr) {
+void CCamera__DrawHitFlash(Screen *scr) {
     Color32 color;
 
     if (scr->m_FlashAlpha > scr->m_FlashFade) {
@@ -34,7 +34,7 @@ void func_00280EE8(Screen *scr) {
         color.g = 0;
         color.b = 0;
         color.a = scr->m_FlashAlpha;
-        func_002883E0(D_800F6CB0, &color, scr->m_X, scr->m_Y,
+        CEngineApp__DrawFilledRect(D_800F6CB0, &color, scr->m_X, scr->m_Y,
                       scr->m_X + scr->m_Width, scr->m_Y + scr->m_Height);
     }
 }

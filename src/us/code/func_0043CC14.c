@@ -1,8 +1,8 @@
-/* Second VM module twin of func_00403C14 (same source, same link address). */
+/* Second VM module twin of Primagen_SetStage (same source, same link address). */
 #include "common.h"
 #include "structs/boss.h"
 
-void func_0043CC14(s32 mode) {
+void Primagen_SetStage_2(s32 mode) {
     if (mode == 1) {
         D_8012F608.partsDone = 120;
         D_8012F608.values[0][3] = 0x1400;

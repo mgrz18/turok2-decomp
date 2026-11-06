@@ -3,7 +3,7 @@
 
 extern s32 D_8012F9D8;
 
-void func_00407410(CGameObjectInstance *arg0) {
+void Primagen_EnterMode6(CGameObjectInstance *arg0) {
     s32 *flags;
 
     /* through a pointer: a plain struct store gets scheduled after D_8012F9D8's */

@@ -3,7 +3,7 @@
 
 extern u8 D_800F5EA0[];
 
-s32 func_00285A20(void) {
+s32 Controller_AnyPakWatched(void) {
     s32 i;
 
     for (i = 0; i < 4; i++) {

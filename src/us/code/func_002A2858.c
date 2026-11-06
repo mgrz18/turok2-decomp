@@ -20,12 +20,12 @@ typedef struct B01IoReq {
 extern s32 D_800BC304;
 extern OSMesgQueue D_80128370;
 extern OSMesgQueue D_80128540;
-void func_002A24B4(s32 arg);
-s32 func_002A2858(void) {
+void HostIo_StartThread(s32 arg);
+s32 PCinitThreaded(void) {
     B01IoReq req;
     OSMesg reply;
     D_800BC304 = 2;
-    func_002A24B4(0xFF);
+    HostIo_StartThread(0xFF);
     req.w4 = 0;
     req.wC.i = 0x80000101;
     req.w10 = 0;

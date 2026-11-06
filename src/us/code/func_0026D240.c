@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_0026D240(void *arg0, void *arg1) {
+void DList_AddHead(void *arg0, void *arg1) {
     if ((((struct ListHeader *) ((s8 *) arg0))->count) == 0) {
         (((struct ListHeader *) ((s8 *) arg0))->head) = arg1;
         (((struct ListHeader *) ((s8 *) arg0))->tail) = arg1;

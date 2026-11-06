@@ -3,10 +3,10 @@
 
 
 extern Gfx *D_800D8E24;
-void func_00207FEC(s32);
-void func_00207A70(s32);
+void Render_SetRenderMode(s32);
+void Render_SetCombineMode(s32);
 
-void func_0027AF4C(void) {
+void Hud_SetupFillMode(void) {
     Gfx *g;
 
     g = D_800D8E24++;
@@ -15,6 +15,6 @@ void func_0027AF4C(void) {
     g = D_800D8E24++;
     g->w0 = 0xE3000A01;
     g->w1 = 0;
-    func_00207FEC(0x15);
-    func_00207A70(0x19);
+    Render_SetRenderMode(0x15);
+    Render_SetCombineMode(0x19);
 }

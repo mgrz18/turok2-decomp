@@ -10,7 +10,7 @@ typedef struct Entry0026C5C4 {
     /* 0x18 */ struct Entry0026C5C4 *child2;
 } Entry0026C5C4;
 
-void func_0026C934(Entry0026C5C4 *arg0, u16 arg1) {
+void CGameRegion__FloodClearFlag4Same(Entry0026C5C4 *arg0, u16 arg1) {
     u16 temp_s0;
     u16 temp_v1;
     Entry0026C5C4 *temp_a0;
@@ -24,15 +24,15 @@ void func_0026C934(Entry0026C5C4 *arg0, u16 arg1) {
             temp_a0 = arg0->child0;
             arg0->flags = (u16) (temp_v1 & 0xFFFB);
             if (temp_a0 != NULL) {
-                func_0026C934(temp_a0, temp_s0);
+                CGameRegion__FloodClearFlag4Same(temp_a0, temp_s0);
             }
             temp_a0_2 = arg0->child1;
             if (temp_a0_2 != NULL) {
-                func_0026C934(temp_a0_2, temp_s0);
+                CGameRegion__FloodClearFlag4Same(temp_a0_2, temp_s0);
             }
             temp_a0_3 = arg0->child2;
             if (temp_a0_3 != NULL) {
-                func_0026C934(temp_a0_3, temp_s0);
+                CGameRegion__FloodClearFlag4Same(temp_a0_3, temp_s0);
             }
         }
     }

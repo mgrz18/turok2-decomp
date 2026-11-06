@@ -1,10 +1,10 @@
-/* Second-module copy of func_00424978 (first module). The two row tests jump out to their bodies (gotos), which gives the ROM's bnez/bnel + j layout. */
+/* Second-module copy of InventoryMenu_HasItem (first module). The two row tests jump out to their bodies (gotos), which gives the ROM's bnez/bnel + j layout. */
 #include "common.h"
 #include "structs/menu.h"
 
-s32 func_00253748(u8 *player, s32 type);
+s32 CPlayer__GetPickupCountHigh(u8 *player, s32 type);
 
-s32 func_0045D898(MenuItem *item, Menu *event) {
+s32 InventoryMenu_HasItem_2(MenuItem *item, Menu *event) {
     s32 type = item->def->param;
     s32 index = item->def->index;
     u8 *player = event->player;
@@ -12,7 +12,7 @@ s32 func_0045D898(MenuItem *item, Menu *event) {
 
     switch (type) {
         default:
-            result = index < func_00253748(player, type);
+            result = index < CPlayer__GetPickupCountHigh(player, type);
             break;
         case 0x10FE:
             if (index >= 0) {

@@ -35,18 +35,18 @@ typedef struct {
 
 extern s32 D_8011001C;
 
-Location *func_0028479C(s8 *location);
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
-void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a + b */
-void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-void func_0020F040(CVector3 *v);                          /* normalise */
-f32 func_0020EAA0(CVector3 *v);                           /* heading */
-f32 func_002672C8(CGameObjectInstance *a);                           /* radius */
-void func_002688C8(CGameObjectInstance *a, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
-s32 func_00239C28(CGameObjectInstance *a, s32 b, CVector3 pos, s32 region, s32 d, CVector3 *out);
-s32 func_002399F8(CGameObjectInstance *a, CVector3 pos, s32 region, s32 d, CVector3 *hit);
-s32 func_0026BB9C(s32 region, f32 x, f32 z);
-f32 func_00246310(CGameObjectInstance *a, CVector3 point);
+Location *CPathTrack__GetCurrentPoint(s8 *location);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a + b */
+void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+void CVector3__Normalize(CVector3 *v);                          /* normalise */
+f32 CVector3__GetYaw(CVector3 *v);                           /* heading */
+f32 GameObject_GetCollisionRadius(CGameObjectInstance *a);                           /* radius */
+void GameObject_TraceMove(CGameObjectInstance *a, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
+s32 Path_FindFleeRegion(CGameObjectInstance *a, s32 b, CVector3 pos, s32 region, s32 d, CVector3 *out);
+s32 Path_FindRegionPath(CGameObjectInstance *a, CVector3 pos, s32 region, s32 d, CVector3 *hit);
+s32 CGameRegion__ContainsXZ(s32 region, f32 x, f32 z);
+f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);
 
 /* The point beside `target`, on the side away from `from`, where `self`
  * stands touching it. */
@@ -56,21 +56,21 @@ static __inline__ void Approach(CGameObjectInstance *self, CGameObjectInstance *
     f32 dist;
 
     if (from != NULL) {
-        func_0020EF2C(&dir, &target->header.m_vPos, &from->header.m_vPos);
+        CVector3__Subtract(&dir, &target->header.m_vPos, &from->header.m_vPos);
         dir.y = 0.0f;
-        func_0020F040(&dir);
+        CVector3__Normalize(&dir);
     } else {
         dir.x = 0.0f;
         dir.y = 0.0f;
         dir.z = 0.0f;
     }
-    dist = func_002672C8(target) + func_002672C8(self) + 51.199997f;
-    func_0020EF60(&dir, &dir, dist);
-    func_0020EEF8(&to, &target->header.m_vPos, &dir);
-    func_002688C8(target, to, outPos, outRegion, 0, 0);
+    dist = GameObject_GetCollisionRadius(target) + GameObject_GetCollisionRadius(self) + 51.199997f;
+    CVector3__Scale(&dir, &dir, dist);
+    CVector3__Add(&to, &target->header.m_vPos, &dir);
+    GameObject_TraceMove(target, to, outPos, outRegion, 0, 0);
 }
 
-s32 func_002438C0(CGameObjectInstance *self, Plan *plan, CGameObjectInstance *target) {
+s32 AI_UpdatePathHeading(CGameObjectInstance *self, Plan *plan, CGameObjectInstance *target) {
     CVector3 pos;
     CVector3 hit;
     s32 region;
@@ -112,7 +112,7 @@ s32 func_002438C0(CGameObjectInstance *self, Plan *plan, CGameObjectInstance *ta
         region = ((s32)self->header.m_pCurrentRegion);
         break;
     case 4:
-        loc = func_0028479C(&plan->location);
+        loc = CPathTrack__GetCurrentPoint(&plan->location);
         pos = loc->pos;
         region = loc->region;
         break;
@@ -124,7 +124,7 @@ s32 func_002438C0(CGameObjectInstance *self, Plan *plan, CGameObjectInstance *ta
         Approach(self, target, plan->approachFrom, &pos, &region);
         break;
     case 1:
-        region = func_00239C28(self, plan->unk84, target->header.m_vPos, ((s32)target->header.m_pCurrentRegion), plan->info->unkC, &pos);
+        region = Path_FindFleeRegion(self, plan->unk84, target->header.m_vPos, ((s32)target->header.m_pCurrentRegion), plan->info->unkC, &pos);
         if (region == 0) {
             do {
     default:
@@ -134,19 +134,19 @@ s32 func_002438C0(CGameObjectInstance *self, Plan *plan, CGameObjectInstance *ta
         }
         break;
     }
-    if (func_002399F8(self, pos, region, plan->info->unkC, &hit) != 0) {
-        if (func_0026BB9C(((s32)self->header.m_pCurrentRegion), hit.x, hit.z) != 0) {
+    if (Path_FindRegionPath(self, pos, region, plan->info->unkC, &hit) != 0) {
+        if (CGameRegion__ContainsXZ(((s32)self->header.m_pCurrentRegion), hit.x, hit.z) != 0) {
             plan->height = hit.y;
         } else {
             plan->height = hit.y + 51.199997f;
         }
-        func_0020EF2C(&hit, &hit, &self->header.m_vPos);
-        plan->rotY = func_0020EAA0(&hit) + 3.1415927f;
+        CVector3__Subtract(&hit, &hit, &self->header.m_vPos);
+        plan->rotY = CVector3__GetYaw(&hit) + 3.1415927f;
         return 1;
     }
     if (mode == 1) {
         plan->height = pos.y;
-        plan->rotY = self->m_RotY + func_00246310(self, pos);
+        plan->rotY = self->m_RotY + AI_AngleToPoint(self, pos);
         return 1;
     }
     return 0;

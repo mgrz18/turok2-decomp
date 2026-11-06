@@ -6,7 +6,7 @@
 extern __OSViContext *D_800B7AC4; /* __osViNext */
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
-void func_0029A580(s32 arg0) {
+void osViBlack(s32 arg0) {
     u32 temp_a0;
     u16 *ptr;
     u16 v;

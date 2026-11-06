@@ -17,31 +17,31 @@ typedef struct B21World {
 } B21World;
 extern B21World D_80119850;
 extern s32 D_8011ACF4;
-s32 func_00416AF8(void *a);
+s32 MenuPool_CountOpen(void *a);
 s32 Cinema_PathPlaying();
-s32 func_00284408();
-s32 func_00284240();
-void func_00412B14();
+s32 Cinema_GetScriptId();
+s32 Cinema_IsFinished();
+void Cinema_StopAtEnd();
 s32 func_00289F30(CEngineApp *g) {
     B21GameBlk *b;
     s32 r;
-    if (func_00416AF8(D_80119850.sub5DC) == 0) {
+    if (MenuPool_CountOpen(D_80119850.sub5DC) == 0) {
         if (Cinema_PathPlaying()) {
-            if (func_00284408() == 0x78) {
+            if (Cinema_GetScriptId() == 0x78) {
                 b = &D_80119850.blk;
                 if (b->unk44 != 0) {
                     goto check;
                 }
                 if (g->m_Settings.paused == 0) {
                     b->unk44 = 1;
-                    func_00412B14();
+                    Cinema_StopAtEnd();
                 }
             }
         }
     }
     if (D_8011ACF4 != 0) {
 check:
-        r = func_00284240();
+        r = Cinema_IsFinished();
         if (r) return 1;
     }
     return 0;

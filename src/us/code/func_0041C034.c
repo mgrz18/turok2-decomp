@@ -7,7 +7,7 @@ extern s32 D_800B3F18;
 
 extern CPlayerOptions D_8011AB18;
 
-s32 func_0041C034(MenuItem *arg0, Menu *arg1) {
+s32 OptionsMenu_ControlSideText(MenuItem *arg0, Menu *arg1) {
     CPlayerOptions *temp_v0_2;
     CPlayerOptions *var_v1;
     u8 temp_v1;

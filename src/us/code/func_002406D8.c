@@ -7,7 +7,7 @@ typedef struct {
 } Box;
 
 /* The eight corners of the box: bottom face (y = min) then top face. */
-void func_002406D8(Box *arg0, CVector3 *arg1) {
+void Collision_BoxCorners(Box *arg0, CVector3 *arg1) {
     arg1[0].x = (f32) arg0->min.x;
     arg1[0].y = (f32) arg0->min.y;
     arg1[0].z = (f32) arg0->min.z;

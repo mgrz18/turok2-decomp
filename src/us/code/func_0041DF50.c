@@ -26,13 +26,13 @@ extern u8 D_0043AC80[];
 extern u8 D_0043ACA4[];
 extern u8 D_0043ACC8[];
 extern u8 D_0043ACEC[];
-void func_00426480(s32 ch);
-s32 func_0042655C(s32 ch);
-s32 func_00426594(s32 ch);
-s32 func_00426BD8(s32 ch);
-void func_0041DA28(Menu *o);
-u32 func_00426E78(u8 *data, s32 len, u32 crc);
-void func_00416644(u8 *a, void *b, void *c, s32 d, void *e);
+void Pak_ProbeSlot(s32 ch);
+s32 Pak_GetStatus(s32 ch);
+s32 Pak_IsRumblePak(s32 ch);
+s32 Pak_NeedsRepair(s32 ch);
+void PakMenu_UpdateNoteRows(Menu *o);
+u32 Crc32_Compute(u8 *data, s32 len, u32 crc);
+void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, void *e);
 /* O01Pick and O01Capture are separate functions in Rage Wars; inlined here in Turok 2. */
 static inline u8 *O01Pick(O01Sel *sel) {
     u8 *msg;
@@ -68,7 +68,7 @@ static inline void O01Capture(CPlayer *a) {
         D_80130968.name[i] = o->m_Name[i];
     }
 }
-void func_0041DF50(Menu *own) {
+void PakMenu_InitSaveProfile(Menu *own) {
     CPlayer *plr;
     O01Sel sel;
     u8 *msg;
@@ -89,26 +89,26 @@ void func_0041DF50(Menu *own) {
     msg = O01Pick(&sel);
     if (D_800C2020 != 0) {
         D_801309BC = 1;
-        func_00416644((u8 *)own->player->m_pCamera + 0x53C, msg, plr, plr->m_ContState.m_pContState, 0);
+        MenuPool_OpenMenu((u8 *)own->player->m_pCamera + 0x53C, msg, plr, plr->m_ContState.m_pContState, 0);
     } else {
         if (D_80130990 != 0) {
             pad = D_800C2028;
         } else {
             pad = own->controller->port;
         }
-        func_00426480(pad);
-        if (func_0042655C(sel.v) == 0) {
+        Pak_ProbeSlot(pad);
+        if (Pak_GetStatus(sel.v) == 0) {
             O01Capture(plr);
-            D_80130968.checksum = func_00426E78((u8 *)&D_80130968, 0x14, 4);
-            func_0041DA28(own);
+            D_80130968.checksum = Crc32_Compute((u8 *)&D_80130968, 0x14, 4);
+            PakMenu_UpdateNoteRows(own);
         } else {
             D_801309BC = 1;
-            if (func_00426594(sel.v) != 0) {
-                func_00416644(D_80119E2C, D_0043BC48, plr, plr->m_ContState.m_pContState, msg);
-            } else if (func_00426BD8(sel.v) != 0) {
-                func_00416644(D_80119E2C, D_0043C05C, plr, plr->m_ContState.m_pContState, D_0043B6CC);
+            if (Pak_IsRumblePak(sel.v) != 0) {
+                MenuPool_OpenMenu(D_80119E2C, D_0043BC48, plr, plr->m_ContState.m_pContState, msg);
+            } else if (Pak_NeedsRepair(sel.v) != 0) {
+                MenuPool_OpenMenu(D_80119E2C, D_0043C05C, plr, plr->m_ContState.m_pContState, D_0043B6CC);
             } else {
-                func_00416644(D_80119E2C, D_0043BC00, plr, plr->m_ContState.m_pContState, msg);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BC00, plr, plr->m_ContState.m_pContState, msg);
             }
         }
     }

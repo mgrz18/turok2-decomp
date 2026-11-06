@@ -4,11 +4,11 @@
 #include "rw/abu_types.h"
 
 extern s32 D_800B6D1C;
-extern void func_0020FC74(void *, f32, f32, f32);
-extern void func_0020F79C(void *);
-extern void func_00233E18(Node438C *, Node438C *, struct GameplayCamera *, void *);
-extern void func_0020D274(void *, s32);
-void func_00233FCC(void *arg0, void *arg1) {
+extern void CMtxF__SetScale(void *, f32, f32, f32);
+extern void CMtxF__Identity(void *);
+extern void Trail_ComputeNodeFrame(Node438C *, Node438C *, struct GameplayCamera *, void *);
+extern void CMtxF__ToMtxAffine(void *, s32);
+void Trail_ComputeFrames(void *arg0, void *arg1) {
     f32 matrix[16];
     Node438C *first;
     Node438C *next;
@@ -19,9 +19,9 @@ void func_00233FCC(void *arg0, void *arg1) {
     first = state->vertices;
     next = first->next;
     if (first != 0) {
-        func_0020FC74(matrix, first->a, first->b, first->c);
+        CMtxF__SetScale(matrix, first->a, first->b, first->c);
     } else {
-        func_0020F79C(matrix);
+        CMtxF__Identity(matrix);
     }
     while (first != 0) {
         Node438C *a;
@@ -52,7 +52,7 @@ z_test:
         goto z_test;
 boundary:
         if (a != 0 && b != 0) {
-            func_00233E18(a, b, arg1, matrix);
+            Trail_ComputeNodeFrame(a, b, arg1, matrix);
             goto apply;
         }
 no_pair:
@@ -62,12 +62,12 @@ no_pair:
             matrix[14] = first->position.z;
         }
 apply:
-        func_0020D274(matrix, (s32)first->matrices[D_800B6D1C]);
+        CMtxF__ToMtxAffine(matrix, (s32)first->matrices[D_800B6D1C]);
         first = next;
         next = first->next;
     }
     matrix[12] = first->position.x;
     matrix[13] = first->position.y;
     matrix[14] = first->position.z;
-    func_0020D274(matrix, (s32)first->matrices[D_800B6D1C]);
+    CMtxF__ToMtxAffine(matrix, (s32)first->matrices[D_800B6D1C]);
 }

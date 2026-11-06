@@ -7,12 +7,12 @@
 extern u32 D_800B6D20;          /* frame counter */
 f32 func_002974C0(f32 x);       /* cosine */
 f32 func_002982F0(f32 x);       /* sine */
-void func_0020F040(f32 *v);     /* normalise */
+void CVector3__Normalize(f32 *v);     /* normalise */
 
 /* Cycles a light and the camera's fog colour with the frame counter: the
  * light's colours pulse on sine waves, its direction turns, and the fog
  * drifts between dark and light tones (rounded to 5 bits a channel). */
-void func_0027C4E4(CCamera *cam) {
+void CCamera__CycleLightAndFog(CCamera *cam) {
     CVector3 direction;
     f32 phaseScale;
     f32 ambientScale;
@@ -43,7 +43,7 @@ void func_0027C4E4(CCamera *cam) {
     direction.x = func_002982F0((f32) (D_800B6D20 * 6) * 0.01745329424738884f);
     direction.y = func_002982F0((f32) (D_800B6D20 * 8) * 0.01745329424738884f);
     direction.z = func_002974C0((f32) (D_800B6D20 * 10) * 0.01745329424738884f);
-    func_0020F040(&direction.x);
+    CVector3__Normalize(&direction.x);
     direction.x *= 120.0f;
     direction.y *= 120.0f;
     direction.z *= 120.0f;

@@ -16,21 +16,21 @@ typedef struct World {
     /* 0x95A0 */ CList freeSlots;
 } World;
 
-extern void func_0026D330(void *pool, void *items, s32 size, s32 count);
+extern void NodePool_Init(void *pool, void *items, s32 size, s32 count);
 extern void func_0026D230(void *list);
-extern void func_0026D288(void *list, void *node);
+extern void DList_AddTail(void *list, void *node);
 extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
 extern s32 CList__AddTail(CList *list, void *node);
-extern void func_00235F48(World *world);
+extern void SwooshSystem_Update(World *world);
 
 void func_0042D410(World *world) {
     s32 i;
 
-    func_0026D330(world->pool0, world->pool0Items, 0x54, 32);
-    func_0026D330(world->pool1, world->pool1Items, 0x1C, 3);
+    NodePool_Init(world->pool0, world->pool0Items, 0x54, 32);
+    NodePool_Init(world->pool1, world->pool1Items, 0x1C, 3);
     func_0026D230(world->nodeList);
     for (i = 0; i < 96; i++) {
-        func_0026D288(world->nodeList, world->nodes[i]);
+        DList_AddTail(world->nodeList, world->nodes[i]);
     }
     CList__Construct(&world->freeSlots, 0, 4);
     for (i = 0; i < 10; i++) {
@@ -40,5 +40,5 @@ void func_0042D410(World *world) {
         CList__AddTail(&world->freeSlots, world->slots[i]);
     }
     world->unk2580 = 0;
-    func_00235F48(world);
+    SwooshSystem_Update(world);
 }

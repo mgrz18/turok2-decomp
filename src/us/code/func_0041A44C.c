@@ -19,7 +19,7 @@ struct StridedTable {
 };
 struct StridedTable;
 typedef struct StridedTable StridedTable;
-extern s32 func_0041A44C(void);
+extern s32 GameOverMenu_Poll(void);
 extern f32 D_8011ACC0;
 struct OSTask_t;
 struct OSTask_t {
@@ -344,7 +344,7 @@ struct GameSession {
 };
 extern GameSession D_800F6CB0;
 extern void func_00430330(void *);
-s32 func_0041A44C(void) {
+s32 GameOverMenu_Poll(void) {
     if (D_8011ACC0 <= 0.0f) {
         func_00430330(&D_800F6CB0);
         return 1;

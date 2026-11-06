@@ -13,11 +13,11 @@ typedef struct FrameAnimDef {
     /* 0x1E */ u8 mode;
 } FrameAnimDef;
 
-s32 func_002113A4(void);                /* random */
+s32 Random_Next(void);                /* random */
 
 /* The frame index of an animation of `count` frames, by the definition's playback mode:
  * clamp (and remember the end), clamp, loop, ping-pong, random every time, random once. */
-s32 func_00234C88(FrameAnim *anim, FrameAnimDef *def, s32 *count) {
+s32 Trail_GetAnimFrame(FrameAnim *anim, FrameAnimDef *def, s32 *count) {
     s32 frame;
     s32 *f;
     s32 period;
@@ -49,11 +49,11 @@ s32 func_00234C88(FrameAnim *anim, FrameAnimDef *def, s32 *count) {
         }
         break;
     case 4:
-        *f = func_002113A4() % *count;
+        *f = Random_Next() % *count;
         break;
     case 5:
         if (anim->randomFrame == -1) {
-            anim->randomFrame = func_002113A4() % *count;
+            anim->randomFrame = Random_Next() % *count;
         }
         *f = anim->randomFrame;
         break;

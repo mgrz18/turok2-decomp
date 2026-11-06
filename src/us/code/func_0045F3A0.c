@@ -4,21 +4,21 @@
 #include "common.h"
 #include "structs/pak.h"
 
-extern s32 func_00285878(s32 arg0);
+extern s32 Controller_Lock(s32 arg0);
 extern u8 D_800F677B[];
-extern void func_002847E0(void);
+extern void Controller_ReadAll(void);
 extern u8 D_800F6750;
 extern u8 D_800F677B[];
 extern u8 D_800F6798[];
 extern s32 osMotorInit(u8 *a0, OSPfs *a1, s32 a2);
 extern s32 func_00425808(s32 a0);
-extern void func_002858A4(void);
-void func_0045F3A0(s32 kind)
+extern void Controller_Unlock(void);
+void Pak_ProbeSlot_2(s32 kind)
 {
     RumblePak *cur;
     s32 ready;
-    ((void (*)(s32))func_00285878)(1);
-    func_002847E0();
+    ((void (*)(s32))Controller_Lock)(1);
+    Controller_ReadAll();
     D_800F6750 = 2;
     cur = &D_80130AA0[kind];
     if (D_800F677B[kind * 4] != 0) {
@@ -35,5 +35,5 @@ void func_0045F3A0(s32 kind)
     } else {
         D_80130C60[kind] = 1;
     }
-    func_002858A4();
+    Controller_Unlock();
 }

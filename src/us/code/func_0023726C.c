@@ -27,7 +27,7 @@ struct B15Obj {               /* Turok 2 layout (Rage Wars offsets in comments) 
                 u8 padFC[0x10];
                 B15Obj *unk12C;       /* 0x10C (0x12C) */
 };
-s32 func_00267090(B15Obj *a);
+s32 GameObject_IsSolid(B15Obj *a);
 extern s32 D_8011001C;
 extern u8 D_8011AAF1;
 static __inline__ s32 chk(B15Obj *a, B15Obj *t) {
@@ -86,7 +86,7 @@ static __inline__ s32 chk3(B15Obj *a, B15Obj *t) {
 done:
     return res;
 }
-s32 func_0023726C(B15Obj *a, B15Obj *t)
+s32 Blast_CanHit(B15Obj *a, B15Obj *t)
 {
   B15Obj *p;
   B15Obj *u;
@@ -94,7 +94,7 @@ s32 func_0023726C(B15Obj *a, B15Obj *t)
   {
     return 0;
   }
-  if ((a->flags & 0x300000) && (!func_00267090(a)))
+  if ((a->flags & 0x300000) && (!GameObject_IsSolid(a)))
   {
     return 0;
   }

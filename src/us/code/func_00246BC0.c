@@ -44,12 +44,12 @@ typedef struct {
 
 extern f32 D_800B6D28;
 extern ButtonMap D_800ADA70[];
-f32 func_0021170C(f32 value, f32 rate);
+f32 Math_DecayToZero(f32 value, f32 rate);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
 /* The remap table applies to control modes 0 and 1 with remapping on. */
-void func_00246BC0(PlayerInput *in, CPlayer *pl) {
+void CPlayer__ReadInput(PlayerInput *in, CPlayer *pl) {
     register CPlayerOptions *opt asm("$17");
     Controller *ctrl;
     ButtonMap *map;
@@ -139,7 +139,7 @@ void func_00246BC0(PlayerInput *in, CPlayer *pl) {
             if (d < 0.0f) {
                 d = -d;
             }
-            in->look = func_0021170C(in->look, d);
+            in->look = Math_DecayToZero(in->look, d);
         }
         if (in->look > 1.0f) {
             in->look = 1.0f;
@@ -183,7 +183,7 @@ void func_00246BC0(PlayerInput *in, CPlayer *pl) {
             if (d < 0.0f) {
                 d = -d;
             }
-            in->look = func_0021170C(in->look, d);
+            in->look = Math_DecayToZero(in->look, d);
         }
         break;
     }

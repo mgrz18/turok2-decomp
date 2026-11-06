@@ -5,7 +5,7 @@ typedef unsigned char u8;
 typedef signed short s16;
 typedef signed int s32;
 typedef float f32;
-extern void func_00290D5C(void *arg0, f32 arg1);
+extern void __CSPSetUsptFromTempo(void *arg0, f32 arg1);
 struct ListLink;
 struct ListLink {
     struct ListLink *next;
@@ -60,9 +60,9 @@ struct ObjectState4C {
     char unk_48;
 };
 struct ListLink;
-extern void func_002933B0(struct ListLink *arg0);
-extern void func_002933E0(void *arg0, void **arg1);
-extern void func_00290CCC(void *arg0, Node_func_802AFD6C_de *arg1);
+extern void alUnlink(struct ListLink *arg0);
+extern void alLink(void *arg0, void **arg1);
+extern void __CSPRepostEvent(void *arg0, Node_func_802AFD6C_de *arg1);
 void __CSPHandleMetaMsg(void *arg0, ObjectState10_2 *arg1) {
     s32 padding[4];
     s32 total = 0;
@@ -75,7 +75,7 @@ void __CSPHandleMetaMsg(void *arg0, ObjectState10_2 *arg1) {
             return;
         }
         scale = ((ObjectState4C *)(arg0))->unk_24;
-        func_00290D5C(arg0,
+        __CSPSetUsptFromTempo(arg0,
                       (f32)((arg1->unk_B << 16) | (arg1->unk_C << 8) | arg1->unk_D));
         node = ((struct ObjectLinks54_2 *) ((char *) arg0))->link;
         while (node != 0) {
@@ -83,9 +83,9 @@ void __CSPHandleMetaMsg(void *arg0, ObjectState10_2 *arg1) {
             total += node->value;
             if (node->type == 0x15) {
                 s32 node_total;
-                func_002933B0((ListLink *)node);
+                alUnlink((ListLink *)node);
                 if (head != 0) {
-                    func_002933E0(node, head);
+                    alLink(node, head);
                 } else {
                     head = node;
                     node->prev = 0;
@@ -104,10 +104,10 @@ void __CSPHandleMetaMsg(void *arg0, ObjectState10_2 *arg1) {
         while (node != 0) {
             next = node->prev;
             node->value = (node->value / scale) * ((ObjectState4C *)(arg0))->unk_24;
-            func_00290CCC(&((ObjectState4C *)(arg0))->unk_48, node);
+            __CSPRepostEvent(&((ObjectState4C *)(arg0))->unk_48, node);
             node = next;
         }
     }
 }
-void func_00290CCC(void *arg0, Node_func_802AFD6C_de *arg1);
-void func_00290D5C(void *arg0, f32 arg1);
+void __CSPRepostEvent(void *arg0, Node_func_802AFD6C_de *arg1);
+void __CSPSetUsptFromTempo(void *arg0, f32 arg1);

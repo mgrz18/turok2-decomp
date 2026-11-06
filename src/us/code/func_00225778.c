@@ -8,7 +8,7 @@
 /* Turok 2 LevelActor: 0x288 bytes (Rage Wars 0x2E8). */
 
 /* Nearest other actor matching team/kind (-1 = any), optionally alive only. */
-CGameObjectInstance *func_00225778(CWorld *world, CGameObjectInstance *self, s32 team, s32 kind, s32 activeOnly) {
+CGameObjectInstance *CScene__FindNearestActor(CWorld *world, CGameObjectInstance *self, s32 team, s32 kind, s32 activeOnly) {
     s32 i;
     CGameObjectInstance *obj;
     CGameObjectInstance *best;

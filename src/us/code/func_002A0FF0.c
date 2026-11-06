@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002A0FF0(float *arg0, float *arg1);
-void func_002A0FF0(float *arg0, float *arg1) {
+extern void mdctPackSpectrum(float *arg0, float *arg1);
+void mdctPackSpectrum(float *arg0, float *arg1) {
     short i = 0;
     do {
         arg0[i * 2] = arg1[i * 2];

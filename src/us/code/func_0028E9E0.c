@@ -11,7 +11,7 @@ typedef struct {
 } LinkList;
 
 /* Appends arg1 to the list. */
-void func_0028E9E0(LinkList *arg0, Link *arg1) {
+void VM_ListAddTail(LinkList *arg0, Link *arg1) {
     Link *temp_v0;
 
     arg1->next = NULL;

@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-void func_0028F61C(RuntimeState *state, DecodeResult_func_802AE6BC_de *result) {
-    extern u32 func_0028F98C(RuntimeState *state, u32 index);
+void alCSeqNextEvent(RuntimeState *state, DecodeResult_func_802AE6BC_de *result) {
+    extern u32 __readVarLen(RuntimeState *state, u32 index);
     extern s32 __alCSeqGetTrackEvent(RuntimeState *state, u32 index, DecodeResult *result);
     u32 minimum;
     u32 index;
@@ -31,7 +31,7 @@ void func_0028F61C(RuntimeState *state, DecodeResult_func_802AE6BC_de *result) {
     state->total += minimum;
     if (result->type != 0x12) {
         u32 delta;
-        delta = func_0028F98C(state, selected);
+        delta = __readVarLen(state, selected);
         state->results[selected] += delta;
     }
     state->first = 1;

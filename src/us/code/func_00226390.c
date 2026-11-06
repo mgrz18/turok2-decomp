@@ -25,7 +25,7 @@ typedef struct {
     /* 0x14A8 */ s32 unk14A8;
 } Arg0;
 
-void func_00226390(Arg0 *arg0) {
+void CScene__ClearListCounts(Arg0 *arg0) {
     arg0->unk8EC = 0;
     arg0->unkAF0 = 0;
     arg0->unkBF4 = 0;

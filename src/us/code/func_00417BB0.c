@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game.h"
 
-void func_00417BB0(f32 minutes, s32 a1, s32 started, s32 a3) {
+void Mp_SetupMatchRules(f32 minutes, s32 a1, s32 started, s32 a3) {
     GameMatch *m = &D_8011ACB0;
 
     m->tag = started;

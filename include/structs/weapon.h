@@ -47,11 +47,11 @@ typedef struct WeaponInfo {
 } WeaponInfo;
 
 /* The weapon wheel (the "barrel", CPlayer m_Barrel at 0xCD0). Two layouts:
- * a strip of every usable weapon that scrolls by m_Spin (func_0024B5A0,
- * filled by func_0024C0B4 / func_0024BF1C), and, with control style 1, the
- * eight-slot stick wheel (func_0024BAD4, laid out by func_0024C2A0 from a
- * table per button group, another one under water). func_0024BD18 updates
- * it, func_0024B3E4 / func_00254D5C build the icons and func_0024AF68 draws
+ * a strip of every usable weapon that scrolls by m_Spin (CBarrel__RunButtons,
+ * filled by CBarrel__Open / CBarrel__Fill), and, with control style 1, the
+ * eight-slot stick wheel (CBarrel__RunStick, laid out by CBarrel__LayoutEight from a
+ * table per button group, another one under water). CBarrel__Update updates
+ * it, CBarrel__DrawRing / CBarrel__DrawEight build the icons and CBarrel__DrawIcons draws
  * them. LibTEngine names the struct CBarrel (m_nItems, m_nLastItem) but its
  * layout does not fit; the field names here come from the code. */
 
@@ -65,7 +65,7 @@ typedef struct {
     /* 0x14 */ f32 m_Scale;
 } CBarrelItem; /* size 0x18 */
 
-/* One icon to draw (func_0024B3E4 / func_00254D5C build them on the stack). */
+/* One icon to draw (CBarrel__DrawRing / CBarrel__DrawEight build them on the stack). */
 typedef struct {
     /* 0x00 */ s32 m_Item;          /* index into CBarrel.m_Items */
     /* 0x04 */ CVector3 m_vPos;

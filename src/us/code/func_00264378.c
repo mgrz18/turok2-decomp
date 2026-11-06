@@ -7,15 +7,15 @@ typedef struct {
 
 extern u8 D_800F7078[];
 extern f32 D_800B6D28; /* frame delta */
-s32 func_00220408(void *table, void *actor);
-void func_00263A20(void *actor, void *state);
-void func_00263DD8(void *actor, void *state);
+s32 CScene__GetInstanceSavedBit(void *table, void *actor);
+void Platform_UpdateSpecial(void *actor, void *state);
+void Platform_UpdatePosition(void *actor, void *state);
 
-void func_00264378(u8 *actor, u8 *state) {
+void Platform_Step(u8 *actor, u8 *state) {
     u8 *info = *(u8 **) (actor + 0x14) + 0x14;
     StateHooks *hooks;
 
-    if (func_00220408(D_800F7078, actor) == 0) {
+    if (CScene__GetInstanceSavedBit(D_800F7078, actor) == 0) {
         *(s32 *) (actor + 0xD4) &= ~0x10000;
         *(s32 *) (actor + 0xD4) &= ~0x100;
         return;
@@ -26,6 +26,6 @@ void func_00264378(u8 *actor, u8 *state) {
         hooks->onEnter(actor, state);
     }
     *(f32 *) (state + 0x124) += *(f32 *) (info + 0x48) * D_800B6D28;
-    func_00263A20(actor, state);
-    func_00263DD8(actor, state);
+    Platform_UpdateSpecial(actor, state);
+    Platform_UpdatePosition(actor, state);
 }

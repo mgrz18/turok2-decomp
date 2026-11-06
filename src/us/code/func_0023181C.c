@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_0022F1C8(s32 *, void *);           /* extern */
-s32 func_00232B40(void *);                      /* extern */
-s16 *func_0025398C(s32, s32);                   /* extern */
+s32 CParticleSystem__Free(s32 *, void *);           /* extern */
+s32 CParticle__StopLoopSound(void *);                      /* extern */
+s16 *CPlayer__GetFiringAmmo(s32, s32);                   /* extern */
 extern s32 D_800F8928;
 
 /* A drawn instance; 0xF8 points at its render info, 0x1D0 links it in the
@@ -46,15 +46,15 @@ void func_0023181C(CRenderInst *arg0) {
 
     if (arg0->objType == 0x68) {
         temp_s0 = (s32) arg0->actor->m_AI.m_pParent;
-        ((Parent0023181C *)((*func_0025398C(temp_s0, 0x15) * 2) + temp_s0))->flags934[0] = 1;
+        ((Parent0023181C *)((*CPlayer__GetFiringAmmo(temp_s0, 0x15) * 2) + temp_s0))->flags934[0] = 1;
     }
     temp_s0_2 = arg0->link;
     if (temp_s0_2 != NULL) {
         temp_a0 = temp_s0_2->type;
         if ((temp_a0 == 2) && (temp_s0_2->flags & 0x100) && ((temp_v1 = temp_s0_2->objType, (temp_v1 == temp_a0)) || (temp_v1 == 0x111))) {
-            func_0022F1C8(&D_800F8928, temp_s0_2);
-            func_00232B40(temp_s0_2);
+            CParticleSystem__Free(&D_800F8928, temp_s0_2);
+            CParticle__StopLoopSound(temp_s0_2);
         }
     }
-    func_00232B40(arg0);
+    CParticle__StopLoopSound(arg0);
 }

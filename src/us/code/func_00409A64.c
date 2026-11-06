@@ -1,10 +1,10 @@
-/* func_00409A64 and func_00409D4C: one file. func_00409D4C's pool (0x800C061C)
+/* MotherBoss_TeleportTarget and MotherBoss_AnimEvent: one file. MotherBoss_AnimEvent's pool (0x800C061C)
  * starts 4 past an 8-byte boundary and holds a jump table, which its own object
- * would 8-align; the file's .rodata opens with func_00409A64's pool at 0x800C05F8.
- * func_00409A64 is the first-module twin of src/us/code/func_00442A64.c.
- * FAKEMATCH (func_00409D4C): the actor count uses fewerActorsThan, the inline copy
- * of func_0040C4F4 with identical if/else arms in its loop (the same fake as
- * src/us/code/func_0040C4F4.c, func_0040A418.c and func_0040A8FC.c); the plain
+ * would 8-align; the file's .rodata opens with MotherBoss_TeleportTarget's pool at 0x800C05F8.
+ * MotherBoss_TeleportTarget is the first-module twin of src/us/code/MotherBoss_TeleportTarget_2.c.
+ * FAKEMATCH (MotherBoss_AnimEvent): the actor count uses fewerActorsThan, the inline copy
+ * of MotherBoss_FewerActorsThan with identical if/else arms in its loop (the same fake as
+ * src/us/code/MotherBoss_FewerActorsThan.c, MotherBoss_Phase0ChooseAttack.c and MotherBoss_Phase2ChooseAttack.c); the plain
  * loop puts the counter in $v0 instead of $v1. */
 #include "common.h"
 #include "structs/game_object.h"
@@ -24,19 +24,19 @@ typedef struct {
 } __attribute__((aligned(4))) Part;
 
 
-extern void func_00246108(CListedInstance *actor, void *ai, CAITargets *t, s32 f1, s32 f2);
-extern f32 func_002119FC(f32 min, f32 max);
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
+extern void AI_UpdateTargets(CListedInstance *actor, void *ai, CAITargets *t, s32 f1, s32 f2);
+extern f32 Random_Blend(f32 min, f32 max);
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern f32 func_00298470(f32 x); /* sqrt */
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
-extern void func_00246690(CListedInstance *actor, s32 id, CVector3 pos, s32 a5);
+extern void Actor_SpawnParticle(CListedInstance *actor, s32 id, CVector3 pos, s32 a5);
 
 static __inline__ void FindTarget(CListedInstance *obj, CListedInstance **target) {
     CAITargets targets;
 
     *target = NULL;
-    func_00246108(obj, (u8 *)obj + 0x140, &targets, 1, 0);
+    AI_UpdateTargets(obj, (u8 *)obj + 0x140, &targets, 1, 0);
     if (targets.m_Path.m_pTarget != NULL && (targets.m_Path.m_pTarget->m_dwFlags & 0x300000)) {
         *target = (CListedInstance *) targets.m_Path.m_pTarget;
     }
@@ -46,14 +46,14 @@ static __inline__ f32 DistXZ(CVector3 a, CVector3 *b) {
     CVector3 d;
 
     a.y = 0.0f;
-    func_0020EF2C(&d, &a, b);
+    CVector3__Subtract(&d, &a, b);
     return func_00298470(d.x * d.x + d.y * d.y + d.z * d.z);
 }
 
 /* Teleports the current target (when it is a flagged actor) to a random spot: around the spawn point
  * nearest to it (within 460.8) inside that point's angle range, else around itself; retried until the spot
  * is at least 460.8 away from every spawn point. */
-void func_00409A64(CListedInstance *obj, s32 nearSelf) {
+void MotherBoss_TeleportTarget(CListedInstance *obj, s32 nearSelf) {
     CVector3 p;
     CListedInstance *target;
     s32 retry;
@@ -78,7 +78,7 @@ void func_00409A64(CListedInstance *obj, s32 nearSelf) {
         if (idx >= 0) {
             break;
         }
-        func_0020EF2C(&p, &target->m_Instance.header.m_vPos, &D_00431D20[i].pos);
+        CVector3__Subtract(&p, &target->m_Instance.header.m_vPos, &D_00431D20[i].pos);
         if (func_00298470(p.x * p.x + p.y * p.y + p.z * p.z) < 460.8f) {
             idx = i;
         }
@@ -89,8 +89,8 @@ void func_00409A64(CListedInstance *obj, s32 nearSelf) {
             if (idx >= 0) {
                 baseX = D_00431D20[idx].pos.x;
                 baseZ = D_00431D20[idx].pos.z;
-                r = func_002119FC(460.8f, 921.6f);
-                angle = func_002119FC(D_00431D20[idx].minAngle, D_00431D20[idx].maxAngle);
+                r = Random_Blend(460.8f, 921.6f);
+                angle = Random_Blend(D_00431D20[idx].minAngle, D_00431D20[idx].maxAngle);
             } else {
                 baseX = target->m_Instance.header.m_vPos.x;
                 baseZ = target->m_Instance.header.m_vPos.z;
@@ -98,8 +98,8 @@ void func_00409A64(CListedInstance *obj, s32 nearSelf) {
                     r = 0.0f;
                     angle = 0.0f;
                 } else {
-                    r = func_002119FC(204.79999f, 921.6f);
-                    angle = func_002119FC(-3.1415927f, 3.1415927f);
+                    r = Random_Blend(204.79999f, 921.6f);
+                    angle = Random_Blend(-3.1415927f, 3.1415927f);
                 }
             }
             dx = r * func_002982F0(angle);
@@ -117,22 +117,22 @@ void func_00409A64(CListedInstance *obj, s32 nearSelf) {
             }
         } while (retry);
     }
-    func_00246690(target, 0x112, p, 0);
+    Actor_SpawnParticle(target, 0x112, p, 0);
 }
 
 extern CListedInstance *D_8010FEB4;
 extern u8 D_8010ABA0[];
 
-extern void func_002688C8(void *obj, CVector3 in, CVector3 *out, s32 *region, s32 a, s32 b);
-extern void *func_00228108(void *world, s32 model, s32 type, s32 intelligence, s32 region, CVector3 pos, f32 rotY,
+extern void GameObject_TraceMove(void *obj, CVector3 in, CVector3 *out, s32 *region, s32 a, s32 b);
+extern void *CInstancePool__Spawn(void *world, s32 model, s32 type, s32 intelligence, s32 region, CVector3 pos, f32 rotY,
                            CVector3 vel, CVector3 scale, s32 *owner);
-extern void func_00236EA0(void *src, void *dst, s32 kind, s32 id, CVector3 pos, Part part);
-extern void func_00243414(CListedInstance *obj, void *ai, s32 state);
-extern void func_0020F040(CVector3 *v);
-extern void func_0020EF60(CVector3 *out, CVector3 *a, f32 s);
-extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, Part part);
+extern void CAI__SetMode(CListedInstance *obj, void *ai, s32 state);
+extern void CVector3__Normalize(CVector3 *v);
+extern void CVector3__Scale(CVector3 *out, CVector3 *a, f32 s);
+extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
 
-/* func_0040C4F4 */
+/* MotherBoss_FewerActorsThan */
 static __inline__ s32 fewerActorsThan(s32 max) {
     CListedInstance *actor;
     s32 count = 0;
@@ -148,14 +148,14 @@ static __inline__ s32 fewerActorsThan(s32 max) {
     return count < max;
 }
 
-/* func_0040BD60 */
+/* MotherBoss_GetTargetDist */
 static __inline__ f32 getTargetDist(CListedInstance *obj, CListedInstance **found) {
     CAITargets t;
     f32 dist;
 
     dist = -1.0f;
     *found = NULL;
-    func_00246108(obj, &obj->m_Instance.m_AI, &t, 1, 0);
+    AI_UpdateTargets(obj, &obj->m_Instance.m_AI, &t, 1, 0);
     if (t.m_Path.m_pTarget != NULL && (t.m_Path.m_pTarget->m_dwFlags & 0x300000)) {
         dist = t.m_Path.m_FlatDist;
         *found = (CListedInstance *) t.m_Path.m_pTarget;
@@ -167,7 +167,7 @@ static __inline__ f32 getTargetDist(CListedInstance *obj, CListedInstance **foun
  * actors), hits the target's owner with a shock wave when close, throws the
  * live minions around the target, or knocks the target back. 1228.7999f: the
  * ROM's pool word is 0x44999999, one ulp under 1228.8f. */
-void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
+void MotherBoss_AnimEvent(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
     MotherBossState *s = &D_8012FB70;
     CListedInstance *obj = self;
     CListedInstance *found;
@@ -192,11 +192,11 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
     switch (ev.type) {
     case 0:
         if (fewerActorsThan(3) && (s->phase == 2 || 1228.7999f < dist)) {
-            func_002688C8(self, ev.pos, &ev.pos, &region, 0, 0);
+            GameObject_TraceMove(self, ev.pos, &ev.pos, &region, 0, 0);
             scale.x = 0.5f;
             scale.y = 0.5f;
             scale.z = 0.5f;
-            func_00228108(D_8010ABA0, -1, 0x458, (s32)s->intel, region, ev.pos, 0.0f, obj->m_Instance.m_vVelocity, scale, NULL);
+            CInstancePool__Spawn(D_8010ABA0, -1, 0x458, (s32)s->intel, region, ev.pos, 0.0f, obj->m_Instance.m_vVelocity, scale, NULL);
         }
         break;
     case 1:
@@ -206,25 +206,25 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
             part.a = 0xA00;
             part.b = 0x500;
             part.c[0] = part.c[1] = part.c[2] = part.c[3] = 0;
-            func_00236EA0(obj, obj, 3, -1, owner->m_CharacterActor.header.m_vPos, part);
+            ImpactEvent_Send(obj, obj, 3, -1, owner->m_CharacterActor.header.m_vPos, part);
         }
         break;
     case 2:
         if (found != NULL && owner != NULL) {
             for (i = 0; i < s->partsLeft; i++) {
                 actor = (CGameObjectInstance *)s->parts[i];
-                r = func_002119FC(153.59999f, 256.0f);
-                angle = found->m_Instance.m_RotY + 3.1415927f + func_002119FC(-0.5235988f, 0.5235988f);
+                r = Random_Blend(153.59999f, 256.0f);
+                angle = found->m_Instance.m_RotY + 3.1415927f + Random_Blend(-0.5235988f, 0.5235988f);
                 x = owner->m_CharacterActor.header.m_vPos.x;
                 z = owner->m_CharacterActor.header.m_vPos.z;
                 dx = r * func_002982F0(angle);
                 dz = r * func_002974C0(angle);
                 x += dx;
                 z += dz;
-                actor->m_Instance.header.m_vPos.y = func_002119FC(-204.79999f, -51.199997f);
+                actor->m_Instance.header.m_vPos.y = Random_Blend(-204.79999f, -51.199997f);
                 actor->m_Instance.header.m_vPos.x = x;
                 actor->m_Instance.header.m_vPos.z = z;
-                func_00243414(actor, &actor->m_Instance.m_AI, 1);
+                CAI__SetMode(actor, &actor->m_Instance.m_AI, 1);
             }
         }
         break;
@@ -235,7 +235,7 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
             part.a = 0xA00;
             part.b = 0xA00;
             part.c[0] = part.c[1] = part.c[2] = part.c[3] = 0;
-            func_00236EA0(obj, obj, 3, -1, owner->m_CharacterActor.header.m_vPos, part);
+            ImpactEvent_Send(obj, obj, 3, -1, owner->m_CharacterActor.header.m_vPos, part);
         }
         break;
     case 4:
@@ -245,17 +245,17 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
             part.a = 0xA00;
             part.b = 0x500;
             part.c[0] = part.c[1] = part.c[2] = part.c[3] = 0;
-            func_00236EA0(obj, obj, 3, -1, owner->m_CharacterActor.header.m_vPos, part);
+            ImpactEvent_Send(obj, obj, 3, -1, owner->m_CharacterActor.header.m_vPos, part);
         }
         break;
     case 5:
         if (found != NULL) {
             CVector3 push;
 
-            func_0020EF2C(&push, &obj->m_Instance.header.m_vPos, &found->m_Instance.header.m_vPos);
-            func_0020F040(&push);
-            func_0020EF60(&push, &push, dist);
-            func_0020EEF8(&found->m_Instance.m_vVelocity, &found->m_Instance.m_vVelocity, &push);
+            CVector3__Subtract(&push, &obj->m_Instance.header.m_vPos, &found->m_Instance.header.m_vPos);
+            CVector3__Normalize(&push);
+            CVector3__Scale(&push, &push, dist);
+            CVector3__Add(&found->m_Instance.m_vVelocity, &found->m_Instance.m_vVelocity, &push);
         }
         break;
     }

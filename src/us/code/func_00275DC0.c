@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 func_00275864(s32);                         /* extern */
+s32 Sound__Stop(s32);                         /* extern */
 extern s32 D_800B2A88;
 
 typedef struct Node00275DC0 {
@@ -16,14 +16,14 @@ typedef struct {
     /* 0x28 */ s32 done;
 } List00275DC0;
 
-void func_00275DC0(List00275DC0 *arg0) {
+void LoopSounds_Pause(List00275DC0 *arg0) {
     s32 temp_v0;
     Node00275DC0 *var_s0;
 
     var_s0 = arg0->head;
     if (var_s0 != NULL) {
         do {
-            func_00275864(var_s0->id);
+            Sound__Stop(var_s0->id);
             temp_v0 = var_s0->id;
             var_s0 = var_s0->next;
             D_800B2A88 = temp_v0;

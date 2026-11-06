@@ -40,14 +40,14 @@ extern s32 D_8011001C;
 extern s32 D_80110020;
 extern u8 D_800F7078[];
 
-void func_0042EB04(void);
-s32 func_00285BD0(s32, s32);
-s32 func_00424A60(s32);
-s32 func_0042C194(void *, s32, s32, CWarpPoint *, s32);
-f32 func_0020F6BC(CVector3 *, CVector3 *);
-s32 func_002242F8(void *, s32);
-void func_0042DE74(WarpPlayer *);
-void func_0042C700(void *, s32, s32);
+void CPlayer__StopLoopingSounds(void);
+s32 Controller_SetRumbleOption(s32, s32);
+s32 Mission_LevelObjectivesDone(s32);
+s32 CScene__FindWarpDests(void *, s32, s32, CWarpPoint *, s32);
+f32 CVector3__Distance(CVector3 *, CVector3 *);
+s32 CScene__GetRegion(void *, s32);
+void CPlayer__LevelStart(WarpPlayer *);
+void CScene__RequestWarp(void *, s32, s32);
 
 /* Sum of the distances from a warp record to every active player. */
 static __inline__ f32 sumDistance(CWarpPoint *r) {
@@ -57,13 +57,13 @@ static __inline__ f32 sumDistance(CWarpPoint *r) {
     dist = 0.0f;
     for (other = (WarpPlayer *)D_80119870.m_PlayerList.m_ActiveList.m_pHead; other != NULL; other = other->next) {
         if (other->active) {
-            dist += func_0020F6BC(&r->m_vPos, &other->pos);
+            dist += CVector3__Distance(&r->m_vPos, &other->pos);
         }
     }
     return dist;
 }
 
-void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
+void CPlayer__Warp(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
     CWarpPoint rec;
     CWarpPoint recs[32];
     s32 skip;
@@ -74,8 +74,8 @@ void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
     f32 dist;
 
     skip = FALSE;
-    func_0042EB04();
-    func_00285BD0(pl->controller, 0);
+    CPlayer__StopLoopingSounds();
+    Controller_SetRumbleOption(pl->controller, 0);
 
     if (D_8011001C && respawn) {
         skip = TRUE;
@@ -83,37 +83,37 @@ void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
     if (!skip) {
         switch (warp) {
         case 1000:
-            if (!func_00424A60(1)) {
+            if (!Mission_LevelObjectivesDone(1)) {
                 pl->unkC00 = 1;
             }
             break;
         case 2000:
-            if (!func_00424A60(2)) {
+            if (!Mission_LevelObjectivesDone(2)) {
                 pl->unkC00 = 1;
             }
             break;
         case 3000:
-            if (!func_00424A60(3)) {
+            if (!Mission_LevelObjectivesDone(3)) {
                 pl->unkC00 = 1;
             }
             break;
         case 4000:
-            if (!func_00424A60(4)) {
+            if (!Mission_LevelObjectivesDone(4)) {
                 pl->unkC00 = 1;
             }
             break;
         case 5000:
-            if (!func_00424A60(5)) {
+            if (!Mission_LevelObjectivesDone(5)) {
                 pl->unkC00 = 1;
             }
             break;
         case 6000:
-            if (!func_00424A60(6)) {
+            if (!Mission_LevelObjectivesDone(6)) {
                 pl->unkC00 = 1;
             }
             break;
         case 7100:
-            if (func_00424A60(1)) {
+            if (Mission_LevelObjectivesDone(1)) {
                 if (pl->keys[0]) {
                     warp = 1999;
                 }
@@ -123,7 +123,7 @@ void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
             }
             break;
         case 7200:
-            if (func_00424A60(2)) {
+            if (Mission_LevelObjectivesDone(2)) {
                 if (pl->keys[1]) {
                     warp = 2999;
                 }
@@ -133,7 +133,7 @@ void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
             }
             break;
         case 7300:
-            if (func_00424A60(3)) {
+            if (Mission_LevelObjectivesDone(3)) {
                 if (pl->keys[2]) {
                     warp = 3999;
                 }
@@ -143,7 +143,7 @@ void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
             }
             break;
         case 7400:
-            if (func_00424A60(4)) {
+            if (Mission_LevelObjectivesDone(4)) {
                 if (pl->keys[3]) {
                     if (pl->keys[5]) {
                         warp = 4999;
@@ -157,7 +157,7 @@ void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
             }
             break;
         case 7500:
-            if (func_00424A60(5)) {
+            if (Mission_LevelObjectivesDone(5)) {
                 if (pl->keys[4]) {
                     if (pl->keys[6]) {
                         warp = 5999;
@@ -171,7 +171,7 @@ void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
             }
             break;
         case 7601:
-            if (func_00424A60(6)) {
+            if (Mission_LevelObjectivesDone(6)) {
                 if (pl->keys[7]) {
                     warp = 6999;
                 }
@@ -208,7 +208,7 @@ void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
     }
 
     if (D_80119870.m_Settings.multiplayer) {
-        count = func_0042C194(D_800F7078, -1, warp, recs, 32);
+        count = CScene__FindWarpDests(D_800F7078, -1, warp, recs, 32);
         best = -1;
         bestDist = 0.0f;
         for (i = 0; i < count; i++) {
@@ -222,22 +222,22 @@ void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
             pl->spawnPos = recs[best].m_vPos;
             pl->pos = pl->spawnPos;
             pl->angle = pl->spawnAngle = recs[best].m_RotY;
-            pl->room = pl->spawnRoom = func_002242F8(D_800F7078, recs[best].m_nID);
-            func_0042DE74(pl);
+            pl->room = pl->spawnRoom = CScene__GetRegion(D_800F7078, recs[best].m_nID);
+            CPlayer__LevelStart(pl);
             return;
         }
     } else {
         do { /* a block of its own: it decides which of the two addresses gets $s0 */
-            if (func_0042C194(D_800F7078, -1, warp, &rec, 1) && rec.m_nLevel == D_80110020 &&
+            if (CScene__FindWarpDests(D_800F7078, -1, warp, &rec, 1) && rec.m_nLevel == D_80110020 &&
                 (D_80119870.m_Settings.multiplayer || D_8011001C)) {
                 pl->spawnPos = rec.m_vPos;
                 pl->pos = pl->spawnPos;
                 pl->angle = pl->spawnAngle = rec.m_RotY;
-                pl->room = pl->spawnRoom = func_002242F8(D_800F7078, rec.m_nID);
-                func_0042DE74(pl);
+                pl->room = pl->spawnRoom = CScene__GetRegion(D_800F7078, rec.m_nID);
+                CPlayer__LevelStart(pl);
                 return;
             }
         } while (0);
     }
-    func_0042C700(D_800F7078, warp, arg2);
+    CScene__RequestWarp(D_800F7078, warp, arg2);
 }

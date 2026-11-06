@@ -9,18 +9,18 @@ extern u8 D_800F12C0[];
 extern u8 D_800F1360[];
 extern u8 D_800B6D1B;                   /* frame counter */
 
-s32 func_00224180(void *world, s32 id);
-s32 func_00224F84(void *world, s32 index);
-void func_00227B7C(CLevelActorPool *pool, CPooledLevelActor *actor);
-f32 func_002671B4(CPooledLevelActor *actor);
-void func_002254C0(void *world, CVector3 *pos, void *out);
+s32 CScene__FindObjectType(void *world, s32 id);
+s32 CScene__GetObject(void *world, s32 index);
+void CLevelActorPool__Free(CLevelActorPool *pool, CPooledLevelActor *actor);
+f32 GameObject_GetCollisionHeight(CPooledLevelActor *actor);
+void CScene__GetLightsAt(void *world, CVector3 *pos, void *out);
 
 /* Takes a free slot, or releases the oldest actor for one, links it at the head and clears it. */
 static __inline__ CPooledLevelActor *allocActor(CLevelActorPool *pool) {
     CPooledLevelActor *actor;
 
     if (pool->m_pFree == NULL) {
-        func_00227B7C(pool, pool->m_pTail);
+        CLevelActorPool__Free(pool, pool->m_pTail);
     }
     actor = pool->m_pFree;
     pool->m_pFree = actor->m_pNext;
@@ -47,17 +47,17 @@ static __inline__ CPooledLevelActor *allocActor(CLevelActorPool *pool) {
 
 /* Spawns a pool actor of the given level id at pos with velocity vel, taking a free slot (or
  * the oldest one, released first) and linking it at the head; counts it in *refCount. */
-CPooledLevelActor *func_00227240(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 arg9, f32 lifetime) {
+CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 arg9, f32 lifetime) {
     CPooledLevelActor *actor;
     CVector3 p;
     s32 index;
     s32 resource;
 
-    if (D_800B6D54 == 0 || (index = func_00224180(D_800F7078, id)) == -1) {
+    if (D_800B6D54 == 0 || (index = CScene__FindObjectType(D_800F7078, id)) == -1) {
         return NULL;
     }
     actor = allocActor(pool);
-    resource = func_00224F84(D_800F7078, index);
+    resource = CScene__GetObject(D_800F7078, index);
     actor->m_pOwnerCount = refCount;
     if (refCount != NULL) {
         (*refCount)++;
@@ -89,8 +89,8 @@ CPooledLevelActor *func_00227240(CLevelActorPool *pool, s32 *refCount, s32 id, C
     actor->m_Actor.m_vVelocity = vel;
     actor->m_Actor.m_DrawnFrame = actor->m_Actor.m_UpdatedFrame = D_800B6D1B - 1;
     p.x = actor->m_Actor.header.m_vPos.x;
-    p.y = actor->m_Actor.header.m_vPos.y + func_002671B4(actor) * 0.5f;
+    p.y = actor->m_Actor.header.m_vPos.y + GameObject_GetCollisionHeight(actor) * 0.5f;
     p.z = actor->m_Actor.header.m_vPos.z;
-    func_002254C0(D_800F7078, &p, actor->m_Actor.m_Lights);
+    CScene__GetLightsAt(D_800F7078, &p, actor->m_Actor.m_Lights);
     return actor;
 }

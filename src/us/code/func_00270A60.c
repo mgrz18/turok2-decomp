@@ -33,50 +33,50 @@ static inline void SndMgr_Unlock(SndMgr *m) {
     }
 }
 extern u8 D_801198B0[];
-s32 func_00281444(void *p, s32 id);
-s32 func_00273D88(void *pool, s16 a);
-f32 func_002743D0(s32 id, s32 p);
-s32 func_002740E8(void *pool, s16 a, s32 b);
-s32 func_00275FA0(void *q, SoundEffectInfo *info, s32 id, s32 a3, s32 a5);
-void func_00273C5C(void *pool, s16 a, s16 b);
-SndVoice *func_00273504(void *pool, SoundEffectInfo *info, s32 a3, s32 a4);
-void func_00273E98(SndVoice *v, s32 id, s32 a6);
-void func_00273EB8(SndVoice *v, s16 a);
-void func_00273EC0(SndVoice *v, SoundEffectInfo *info, s32 a5);
-s32 func_002706A0(SndMgr *m, s32 id, s32 a2, s32 a3);
-s32 func_00270A60(SndMgr *m, SoundEffectInfo *info, s32 id, s32 a3, s32 a4, s32 a5, s32 a6) {
+s32 CCameraPool__GetNearestCamera(void *p, s32 id);
+s32 SndVoicePool_IsSoundPlaying(void *pool, s16 a);
+f32 Sound_DistanceFalloff(s32 id, s32 p);
+s32 SndVoicePool_FindSoundWithOwner(void *pool, s16 a, s32 b);
+s32 SndQueue_Add(void *q, SoundEffectInfo *info, s32 id, s32 a3, s32 a5);
+void SndVoicePool_StopGroupVoice(void *pool, s16 a, s16 b);
+SndVoice *SndVoicePool_AllocVoice(void *pool, SoundEffectInfo *info, s32 a3, s32 a4);
+void SndVoice_SetPosition(SndVoice *v, s32 id, s32 a6);
+void SndVoice_SetSoundId(SndVoice *v, s16 a);
+void SndVoice_Setup(SndVoice *v, SoundEffectInfo *info, s32 a5);
+s32 CAudioWorld__StartVoice(SndMgr *m, s32 id, s32 a2, s32 a3);
+s32 CAudioWorld__PlayLayer(SndMgr *m, SoundEffectInfo *info, s32 id, s32 a3, s32 a4, s32 a5, s32 a6) {
     SndVoice *v;
-    m->listener = func_00281444(D_801198B0, id);
+    m->listener = CCameraPool__GetNearestCamera(D_801198B0, id);
     if (info->flags & 1) {
-        if (func_00273D88(&m->pool, m->cueId) != 0) {
+        if (SndVoicePool_IsSoundPlaying(&m->pool, m->cueId) != 0) {
             return -1;
         }
-        if (func_002743D0(id, (s32)&m->listener->m_vPos) == 0.0f) {
+        if (Sound_DistanceFalloff(id, (s32)&m->listener->m_vPos) == 0.0f) {
             return -1;
         }
     }
     if (info->flags & 0x1000) {
         if (m->cueArg != -1) {
-            if (func_002740E8(&m->pool, m->cueId, m->cueArg) != -1) {
+            if (SndVoicePool_FindSoundWithOwner(&m->pool, m->cueId, m->cueArg) != -1) {
                 return -1;
             }
         }
     }
     if (info->sample != 0) {
-        return func_00275FA0(&m->queue, info, id, a3, a5);
+        return SndQueue_Add(&m->queue, info, id, a3, a5);
     }
     if (info->flags & 0x40) {
-        func_00273C5C(&m->pool, m->cueId, info->group);
+        SndVoicePool_StopGroupVoice(&m->pool, m->cueId, info->group);
     }
-    v = func_00273504(&m->pool, info, a3, a4);
+    v = SndVoicePool_AllocVoice(&m->pool, info, a3, a4);
     if (v == 0) {
         return -1;
     }
-    func_00273E98(v, id, a6);
-    func_00273EB8(v, m->cueId);
-    func_00273EC0(v, info, a5);
+    SndVoice_SetPosition(v, id, a6);
+    SndVoice_SetSoundId(v, m->cueId);
+    SndVoice_Setup(v, info, a5);
     SndMgr_Lock(m);
-    func_002706A0(m, v->id, 0, id);
+    CAudioWorld__StartVoice(m, v->id, 0, id);
     SndMgr_Unlock(m);
     return 0;
 }

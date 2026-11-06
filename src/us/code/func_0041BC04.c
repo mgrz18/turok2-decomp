@@ -1,9 +1,9 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_0041BC50(s32);
+s32 PlayerOptions_SetDefaultName(s32);
 
-void func_0041BC04(void *arg0, s8 arg1)
+void PlayerOptions_SetDefaults(void *arg0, s8 arg1)
 {
   int new_var;
   new_var = 0x80;
@@ -18,5 +18,5 @@ void func_0041BC04(void *arg0, s8 arg1)
   *((s8 *) (((s8 *) arg0) + 0x30)) = 0;
   *((s8 *) (((s8 *) arg0) + 0x31)) = 1;
   *((s8 *) (((s8 *) arg0) + 0x32)) = 0;
-  func_0041BC50((s32) arg0);
+  PlayerOptions_SetDefaultName((s32) arg0);
 }

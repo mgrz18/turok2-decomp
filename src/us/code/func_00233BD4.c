@@ -54,9 +54,9 @@ typedef struct Owner3F94 {
 extern f32 D_800B6D28;
 extern f32 D_800B6D2C;
 extern f32 D_800B6D30;
-void func_00236040(s32 a, SSlot *s, SEnt *e);
+void SwooshGroup_Remove(s32 a, SSlot *s, SEnt *e);
 void func_002368B0(SSlot *s);
-s32 func_00233BD4(s32 a0, SSlot *s) {
+s32 Swoosh_Update(s32 a0, SSlot *s) {
     f32 saved, k1, k2;
     SEnt *e, *next;
     Owner3F94 *ow;
@@ -93,7 +93,7 @@ s32 func_00233BD4(s32 a0, SSlot *s) {
             if (e->unk8 <= 0.0f) {
                 e->unk8 = e->unk8 - k1;
                 if (e->unk8 < k2) {
-                    func_00236040(a0, s, e);
+                    SwooshGroup_Remove(a0, s, e);
                 }
             } else {
                 e->unk8 = e->unk8 - D_800B6D28;

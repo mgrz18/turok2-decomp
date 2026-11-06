@@ -9,7 +9,7 @@
 extern u8 D_8011AB8B[][0x40];   /* player options +0x33: names */
 extern u8 D_800C1340[];   /* "player" */
 
-extern s32 func_0025340C(void *players, void *player);
+extern s32 CPlayerPool__GetIndex(void *players, void *player);
 
 #define ROW_SELECTED 0x01800000
 
@@ -28,14 +28,14 @@ static __inline__ s32 nameCmp(u8 *a, u8 *b, s32 n) {
     return c1 - c2;
 }
 
-void func_0041D050(Menu *menu) {
+void NameEntryMenu_Init(Menu *menu) {
     s32 index;
     s32 i;
     s32 spaces;
     u8 *name;
     u8 *dst;
 
-    index = func_0025340C(&D_80119870.m_PlayerList, menu->player);
+    index = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, menu->player);
     switch (index) {
     case 0:
     default:

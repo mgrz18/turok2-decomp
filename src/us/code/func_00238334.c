@@ -14,14 +14,14 @@ extern CCollisionResults D_800F1CE0;  /* the last collision test: the node it hi
 extern HitFrame D_800F1970;
 extern u8 D_8011AAF1;
 
-f32 func_0020F6BC(CVector3 *a, CVector3 *b);
-s32 func_0021E374(BlastActor *a, CVector3 pos, HitFrame *out);
-f32 func_002671B4(BlastActor *a);
-f32 func_002672C8(BlastActor *a);
+f32 CVector3__Distance(CVector3 *a, CVector3 *b);
+s32 CGameObjectInstance__GetNearestBox(BlastActor *a, CVector3 pos, HitFrame *out);
+f32 GameObject_GetCollisionHeight(BlastActor *a);
+f32 GameObject_GetCollisionRadius(BlastActor *a);
 
 /* How much of a blast at `p` reaches `a`: its armour, then (with falloff) a linear drop over
  * the distance to the nearest point of its body, out to `reach` plus its own size. */
-f32 func_00238334(BlastActor *a, BlastActor *t, CVector3 p, f32 reach, s32 falloff, u32 flags, HitFrame **psrc) {
+f32 Blast_GetReach(BlastActor *a, BlastActor *t, CVector3 p, f32 reach, s32 falloff, u32 flags, HitFrame **psrc) {
     CVector3 c;
     CCollisionResults *o;
     HitFrame *sv;
@@ -42,7 +42,7 @@ f32 func_00238334(BlastActor *a, BlastActor *t, CVector3 p, f32 reach, s32 fallo
     if (t->kind == 2 && (BlastActor *)(o = &D_800F1CE0)->m_pInstance == a && o->m_nInstanceNode != -1) {
         sv = &o->m_Frame;
         falloff = 0;
-    } else if (func_0021E374(a, p, &D_800F1970) != 0) {
+    } else if (CGameObjectInstance__GetNearestBox(a, p, &D_800F1970) != 0) {
         sv = &D_800F1970;
     } else {
         sv = NULL;
@@ -56,7 +56,7 @@ f32 func_00238334(BlastActor *a, BlastActor *t, CVector3 p, f32 reach, s32 fallo
     }
     c = a->pos;
     lo = a->pos.y + a->footY;
-    hi = lo + func_002671B4(a);
+    hi = lo + GameObject_GetCollisionHeight(a);
     if (hi < p.y) {
         c.y = hi;
     } else if (p.y < lo) {
@@ -64,8 +64,8 @@ f32 func_00238334(BlastActor *a, BlastActor *t, CVector3 p, f32 reach, s32 fallo
     } else {
         c.y = p.y;
     }
-    lim = reach + func_002672C8(a);
-    dist = func_0020F6BC(&p, &c);
+    lim = reach + GameObject_GetCollisionRadius(a);
+    dist = CVector3__Distance(&p, &c);
     if (lim < dist) {
         return 0.0f;
     }

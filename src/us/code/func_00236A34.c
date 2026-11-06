@@ -64,12 +64,12 @@ struct Emit {
 extern f32 D_800A6534;
 extern f32 D_800A6538;
 extern s32 D_800B6D1C;
-void func_0020D274(void *, void *);
-void func_0020D908(void *, void *);
-void func_0020F7EC(void *);
-void func_002101A0(void *, void *);
-void func_002101BC(void *, void *);
-void func_0021034C(void *, f32, f32, f32);
+void CMtxF__ToMtxAffine(void *, void *);
+void CMtxF__FromMtxAffine(void *, void *);
+void CMtxF__ClampEntries(void *);
+void CMtxF__GetTranslation(void *, void *);
+void CMtxF__GetScale(void *, void *);
+void CMtxF__ScaleAxes(void *, f32, f32, f32);
 void func_00236A34(Emit *e, EmitNode *n) {
     u8 m[0x40];
     EmitOwner *o;
@@ -80,18 +80,18 @@ void func_00236A34(Emit *e, EmitNode *n) {
             n->mtx[D_800B6D1C] = n->mtx[D_800B6D1C ^ 1];
             n->unkB0 = ((void *)0);
         } else {
-            func_0020D908(m, (u8 *)o + ((D_800B6D1C << 6) + 0x48));
+            CMtxF__FromMtxAffine(m, (u8 *)o + ((D_800B6D1C << 6) + 0x48));
             s = D_800A6534;
             if (o->info->unk14 != 0) {
                 s = D_800A6538;
             }
-            func_0021034C(m, s, s, s);
-            func_0020F7EC(m);
-            func_002101A0(m, n->v10);
+            CMtxF__ScaleAxes(m, s, s, s);
+            CMtxF__ClampEntries(m);
+            CMtxF__GetTranslation(m, n->v10);
             if (e->flags & 4) {
-                func_002101BC(m, n->v1C);
+                CMtxF__GetScale(m, n->v1C);
             } else {
-                func_0020D274(m, &n->mtx[D_800B6D1C]);
+                CMtxF__ToMtxAffine(m, &n->mtx[D_800B6D1C]);
             }
         }
         n->unk8 = *(f32 *)((u8 *)e->def + 8);

@@ -1,7 +1,7 @@
 /* FAKEMATCH: two register asm pins and a second player pointer stand for what natural C does not give: the ROM
  * loads the player into $v0 and copies it to $s0 (pp, then p as the copy the branches use), and the constant 1 of
  * the error branch gets its own register (natural C shares one $s register for every 1: cse2 follows the jumps
- * into that branch). Twin of func_004579A4 (same C). */
+ * into that branch). Twin of PakMenu_InitSaveGame_2 (same C). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00406F7C.c, func_00406F7C, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/player.h"
@@ -32,16 +32,16 @@ extern u8 D_0043BC48[];
 extern u8 D_0043C05C[];
 extern u8 D_0043B714[];
 extern u8 D_0043BC00[];
-void func_00426480(s32 ch);
-s32 func_0042655C(s32 ch);
-s32 func_00426594(s32 ch);
-s32 func_00426BD8(s32 ch);
-void func_0041D890(CPlayer *p);
-void func_0041DA28(Menu *o);
-u32 func_00426E78(u8 *data, s32 len, u32 crc);
-void func_00416644(u8 *a, void *b, void *c, s32 d, void *e);
+void Pak_ProbeSlot(s32 ch);
+s32 Pak_GetStatus(s32 ch);
+s32 Pak_IsRumblePak(s32 ch);
+s32 Pak_NeedsRepair(s32 ch);
+void SaveGame_Build(CPlayer *p);
+void PakMenu_UpdateNoteRows(Menu *o);
+u32 Crc32_Compute(u8 *data, s32 len, u32 crc);
+void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, void *e);
 
-void func_0041EA84(Menu *own) {
+void PakMenu_InitSaveGame(Menu *own) {
     CPlayer *plr;
     CPlayer *p;
     PadSel sel;
@@ -62,31 +62,31 @@ void func_0041EA84(Menu *own) {
     if (D_800C2020 != 0) {
         p = plr;
         D_801309BC = 1;
-        func_00416644(((u8 *)p->m_pCamera) + 0x53C, D_0043BEF4, p, p->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, D_0043BEF4, p, p->m_ContState.m_pContState, NULL);
         D_80130940 = 0;
     } else {
-        func_00426480(own->controller->port);
+        Pak_ProbeSlot(own->controller->port);
         p = plr;
-        if (func_0042655C(sel.v) == 0) {
-            func_0041D890(plr);
+        if (Pak_GetStatus(sel.v) == 0) {
+            SaveGame_Build(plr);
             {
-                u32 crc = func_00426E78(D_800C2018, D_800F70A8 + 0x684, 0xB);
+                u32 crc = Crc32_Compute(D_800C2018, D_800F70A8 + 0x684, 0xB);
                 s32 buf = (s32)D_800C2018;
                 s32 size = D_800F70A8;
 
                 *(u32 *)(size + buf + 0x684) = crc;
             }
-            func_0041DA28(own);
+            PakMenu_UpdateNoteRows(own);
         } else {
             register s32 one asm("$17") = 1;
 
             D_801309BC = one;
-            if (func_00426594(sel.v) != 0) {
-                func_00416644(((u8 *)p->m_pCamera) + 0x53C, D_0043BC48, p, p->m_ContState.m_pContState, (void *)one);
-            } else if (func_00426BD8(sel.v) != 0) {
-                func_00416644(D_80119E2C, D_0043C05C, p, p->m_ContState.m_pContState, D_0043B714);
+            if (Pak_IsRumblePak(sel.v) != 0) {
+                MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, D_0043BC48, p, p->m_ContState.m_pContState, (void *)one);
+            } else if (Pak_NeedsRepair(sel.v) != 0) {
+                MenuPool_OpenMenu(D_80119E2C, D_0043C05C, p, p->m_ContState.m_pContState, D_0043B714);
             } else {
-                func_00416644(((u8 *)p->m_pCamera) + 0x53C, D_0043BC00, p, p->m_ContState.m_pContState, D_0043BEF4);
+                MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, D_0043BC00, p, p->m_ContState.m_pContState, D_0043BEF4);
             }
         }
     }

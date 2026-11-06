@@ -5,7 +5,7 @@ s32 Cinema_PathPlaying();                                /* extern */
 extern s32 D_800B6D54;
 extern s32 D_8011AC8C;
 
-s32 func_00401C1C(void *arg0)
+s32 Automap_IsShown(void *arg0)
 {
   s32 var_s0;
   s32 var_v0;

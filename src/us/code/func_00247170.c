@@ -24,13 +24,13 @@ extern u8 D_8011AAF1;           /* multiplayer */
 extern f32 D_800B6D28;          /* the frame's time step */
 extern u8 D_800F7078[];         /* the level */
 
-s32 func_00224180(void *level, s32 id);
-void *func_00224F84(void *level, s32 index);
+s32 CScene__FindObjectType(void *level, s32 id);
+void *CScene__GetObject(void *level, s32 index);
 
 /* Places the scope model and animates it up (state 1) or down (state 3)
  * over 3.75 frames: the sniper scope (0xC83) swings in from the side, the
  * others tip up from below. */
-void func_00247170(HudModel *m, CPlayer *owner) {
+void CPlayer__AnimateScope(HudModel *m, CPlayer *owner) {
     s32 index;
 
     if (m->current == 0xC83) {
@@ -50,9 +50,9 @@ void func_00247170(HudModel *m, CPlayer *owner) {
         m->roll = 3.141593f;
     }
     if (m->requested != m->current && m->state == 0) {
-        index = func_00224180(D_800F7078, m->requested);
+        index = CScene__FindObjectType(D_800F7078, m->requested);
         if (index != -1) {
-            m->model = func_00224F84(D_800F7078, index);
+            m->model = CScene__GetObject(D_800F7078, index);
             m->state = 1;
             m->current = m->requested;
         } else {

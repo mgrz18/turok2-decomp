@@ -7,7 +7,7 @@ extern char D_800AB0B0;
 extern char D_11059;
 extern char D_800C18F0;
 extern char D_94F;
-int func_00266FC0(u32 arg0) {
+int IsDataPointer(u32 arg0) {
     if (arg0 >= (u32)&D_800AB0B0 &&
         arg0 < (u32)&D_800AB0B0 + (u32)&D_11059) {
         return 1;

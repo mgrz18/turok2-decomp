@@ -1,7 +1,7 @@
 #include "rw/junk_types.h" /* ALSeq */
 
-s32 func_002932BC();
-s32 func_00293254(ALSeq *seq, s32 *arg1)
+s32 __alSeqReadVarLen();
+s32 __alSeqNextDelta(ALSeq *seq, s32 *arg1)
 {
   u32 temp_s1;
   temp_s1 = (u32) seq->curPtr;
@@ -9,13 +9,13 @@ s32 func_00293254(ALSeq *seq, s32 *arg1)
   {
     if (seq)
     {
-      *arg1 = func_002932BC();
+      *arg1 = __alSeqReadVarLen();
       seq->curPtr = (u8 *) temp_s1;
       return 1;
     }
     else
     {
-      *arg1 = func_002932BC();
+      *arg1 = __alSeqReadVarLen();
       seq->curPtr = (u8 *) temp_s1;
       return 1;
     }

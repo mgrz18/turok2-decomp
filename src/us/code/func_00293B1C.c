@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002936E0(ALSndPlayer * arg0, ALSndpEvent * arg1);
-extern s32 func_00293B1C(void *node);
-extern void func_00291034(ALEventQueue *, ALEvent *, ALMicroTime);
-extern s32 func_00290F9C(ALEventQueue *, ALEvent *);
-s32 func_00293B1C(void *node)
+extern void _handleEvent(ALSndPlayer * arg0, ALSndpEvent * arg1);
+extern s32 _sndpVoiceHandler(void *node);
+extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, ALMicroTime);
+extern s32 alEvtqNextEvent(ALEventQueue *, ALEvent *);
+s32 _sndpVoiceHandler(void *node)
 {
     ALSndPlayer *sndp = (ALSndPlayer *)node;
     ALSndpEvent evt;
@@ -16,13 +16,13 @@ s32 func_00293B1C(void *node)
         switch (sndp->nextEvent.type) {
             case 5:
                 evt.common.type = 5;
-                func_00291034(&sndp->evtq, (ALEvent *)&evt, sndp->frameTime);
+                alEvtqPostEvent(&sndp->evtq, (ALEvent *)&evt, sndp->frameTime);
                 break;
             default:
-                func_002936E0(sndp, next);
+                _handleEvent(sndp, next);
                 break;
         }
-        sndp->nextDelta = func_00290F9C(&sndp->evtq, &sndp->nextEvent);
+        sndp->nextDelta = alEvtqNextEvent(&sndp->evtq, &sndp->nextEvent);
     } while (sndp->nextDelta == 0);
     sndp->curTime += sndp->nextDelta;
     return sndp->nextDelta;

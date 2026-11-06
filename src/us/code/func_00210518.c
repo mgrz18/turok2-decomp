@@ -5,7 +5,7 @@
 
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
-void func_00210518(void *arg0, f32 arg1) {
+void CMtxF__SetRotateX(void *arg0, f32 arg1) {
     extern f32 D_800A561C;
     RW_Mtx *m = arg0;
     f32 sin_v;

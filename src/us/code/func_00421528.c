@@ -9,7 +9,7 @@ extern CWorld D_800F7078;
 extern s32 D_80110060[];
 extern u8 D_800EBAC0[];
 
-void func_00421528(CPlayer *p) {
+void SaveGame_Restore(CPlayer *p) {
     CWorld *level = &D_800F7078;
     u8 keep;
     s32 i;

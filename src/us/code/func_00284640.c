@@ -3,6 +3,6 @@
 
 extern Cinema *D_800C1BB0;
 
-s32 func_00284640(void) {
+s32 Cinema_GetActive(void) {
     return D_800C1BB0->active;
 }

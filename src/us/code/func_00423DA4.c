@@ -6,7 +6,7 @@
 extern u32 D_801309B0;
 extern char D_800B52F8[];
 extern char D_800B5314[];
-s32 func_00423DA4(struct FieldRecAt14 *field) {
+s32 PakConfirmMenu_UpdateNo(struct FieldRecAt14 *field) {
     u32 state = D_801309B0;
     if (state >= 5) {
         goto state_other;

@@ -1,7 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00408E1C.c, func_00408E1C, with Turok 2's layouts. */
-/* WRONG CUT: the real function is 0x0042085C-0x00420C30 (size 0x3D4, 245 words): splat split it into func_0042085C (0x1C),
+/* WRONG CUT: the real function is 0x0042085C-0x00420C30 (size 0x3D4, 245 words): splat split it into PakMessage_SelectOk (0x1C),
  * func_00420878 (0x68) and func_004208E0 (0x350). All 245 words match (checked over the real extent).
- * Twin of src/us/code/func_0045977C.c (first-module callees and data names, +0xE0). */
+ * Twin of src/us/code/PakMessage_SelectOk_2.c (first-module callees and data names, +0xE0). */
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
@@ -27,17 +27,17 @@ extern u8 D_0043B6F0[];
 extern u8 D_00439190[];
 extern u8 D_0043B714[];
 extern u8 D_0043B6CC[];
-void func_00285AE0(ControllerProfile *a);
-void func_00285BD0(ControllerProfile *a, s32 b);
-void func_00285A80(s32 a);
-s32 func_002858CC(s32 a);
-void func_00426480(s32 a);
-s32 func_0042655C(s32 a);
-void func_0042C700(u8 *a, s32 b, s32 c);
+void Controller_ResetRumble(ControllerProfile *a);
+void Controller_SetRumbleOption(ControllerProfile *a, s32 b);
+void Controller_UnwatchPak(s32 a);
+s32 Controller_TakePakChanged(s32 a);
+void Pak_ProbeSlot(s32 a);
+s32 Pak_GetStatus(s32 a);
+void CScene__RequestWarp(u8 *a, s32 b, s32 c);
 void func_004303AC(u8 *a);
-void func_00416644(u8 *a, void *b, CPlayer *c, ControllerProfile *d, s32 e);
+void MenuPool_OpenMenu(u8 *a, void *b, CPlayer *c, ControllerProfile *d, s32 e);
 
-s32 func_0042085C(s32 a0, Menu *o) {
+s32 PakMessage_SelectOk(s32 a0, Menu *o) {
     s32 s0, s1, v;
     u8 *p;
 
@@ -48,8 +48,8 @@ s32 func_0042085C(s32 a0, Menu *o) {
         D_80130940 = 0;
     }
     if (D_801309C0 == 9 || D_801309C0 == 5) {
-        func_00285AE0(o->controller);
-        func_00285BD0(o->controller, 1);
+        Controller_ResetRumble(o->controller);
+        Controller_SetRumbleOption(o->controller, 1);
     }
     if (D_801309C0 == 9) {
         if (D_80130994 != 0 && D_801309B4 == 0 && D_8013098C == 0) {
@@ -58,8 +58,8 @@ s32 func_0042085C(s32 a0, Menu *o) {
             } else {
                 s1 = o->controller->port;
             }
-            func_00285A80(s1);
-            func_0042C700(D_800F7078, o->player->m_Data.m_CheckPointWarpID, 2);
+            Controller_UnwatchPak(s1);
+            CScene__RequestWarp(D_800F7078, o->player->m_Data.m_CheckPointWarpID, 2);
             return 1;
         }
         func_004303AC(D_800F6CB0);
@@ -71,8 +71,8 @@ s32 func_0042085C(s32 a0, Menu *o) {
         s1 = o->controller->port;
     }
     if (D_801309C0 == 5) {
-        func_00285A80(s1);
-        func_0042C700(D_800F7078, D_80110054, 2);
+        Controller_UnwatchPak(s1);
+        CScene__RequestWarp(D_800F7078, D_80110054, 2);
     }
     if (D_80130990 != 0) {
         if (D_801309C0 == 6) {
@@ -80,27 +80,27 @@ s32 func_0042085C(s32 a0, Menu *o) {
         }
     }
     if (D_801309C0 == 4 && D_80130994 != 0 && D_801309B4 == 0) {
-        func_00426480(s1);
-        s0 = func_0042655C(s1);
-        v = func_002858CC(s1);
+        Pak_ProbeSlot(s1);
+        s0 = Pak_GetStatus(s1);
+        v = Controller_TakePakChanged(s1);
         if ((s0 == 0 || v != 0) && s0 != -2 && o->context == (void *)1) {
-            func_00416644(D_80119E2C, D_0043B6F0, o->player, o->controller, 0);
+            MenuPool_OpenMenu(D_80119E2C, D_0043B6F0, o->player, o->controller, 0);
         } else {
-            func_00416644(D_80119E2C, D_00439190, o->player, o->controller, 0);
+            MenuPool_OpenMenu(D_80119E2C, D_00439190, o->player, o->controller, 0);
         }
     } else if (D_801309C0 == 3 && D_80130998 != 0) {
-        func_00426480(s1);
-        s0 = func_0042655C(s1);
-        v = func_002858CC(s1);
+        Pak_ProbeSlot(s1);
+        s0 = Pak_GetStatus(s1);
+        v = Controller_TakePakChanged(s1);
         if ((s0 == 0 || v != 0) && s0 != -2 && o->context == (void *)1) {
-            func_00416644(D_80119E2C, D_0043B714, o->player, o->controller, 0);
+            MenuPool_OpenMenu(D_80119E2C, D_0043B714, o->player, o->controller, 0);
         } else {
             if (o->player != NULL) {
                 p = ((u8 *)o->player->m_pCamera) + 0x53C;
             } else {
                 p = D_80119E2C;
             }
-            func_00416644(p, D_0043BEF4, o->player, o->controller, 0);
+            MenuPool_OpenMenu(p, D_0043BEF4, o->player, o->controller, 0);
             D_80130940 = 0;
         }
     } else {
@@ -113,7 +113,7 @@ s32 func_0042085C(s32 a0, Menu *o) {
             } else {
                 p = D_80119E2C;
             }
-            func_00416644(p, o->context, o->player, o->controller, s1);
+            MenuPool_OpenMenu(p, o->context, o->player, o->controller, s1);
         }
     }
     return 1;

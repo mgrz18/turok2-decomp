@@ -7,7 +7,7 @@ extern char D_00439640; /* death screen */
 
 /* Whether the game is paused (D_8011ACA4) or a menu other than the death
  * screen is open on the player's camera. */
-s32 func_00253FFC(CPlayer *p) {
+s32 CPlayer__IsPausedOrInMenu(CPlayer *p) {
     Menu *menu;
 
     if (D_8011ACA4) {

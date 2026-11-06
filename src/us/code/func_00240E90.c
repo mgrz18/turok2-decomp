@@ -4,11 +4,11 @@
 extern MapSweep *D_800F1AB0;
 
 f32 func_00268460(CGameObjectInstance *inst);
-void func_00240800(void *region);
-void func_0026CC0C(void *region);
+void Collision_SweepRegionWalls(void *region);
+void CGameRegion__ClearVisited(void *region);
 
 /* Sweep an instance against the map, starting from its region. */
-void func_00240E90(Sweep *sweep) {
+void Collision_SweepMapWalls(Sweep *sweep) {
     MapSweep ms;
     CCollisionInfo *def;
     CGameObjectInstance *inst;
@@ -51,6 +51,6 @@ void func_00240E90(Sweep *sweep) {
     }
     D_800F1AB0->minZ = lo - D_800F1AB0->radius;
     D_800F1AB0->maxZ = hi + D_800F1AB0->radius;
-    func_00240800(region);
-    func_0026CC0C(region);
+    Collision_SweepRegionWalls(region);
+    CGameRegion__ClearVisited(region);
 }

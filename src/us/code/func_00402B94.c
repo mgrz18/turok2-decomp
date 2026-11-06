@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00412438(s32);
+s32 Cinema_RequestById(s32);
 
-void func_00402B94(void) {
-    func_00412438(0x12C);
+void MantidQueen_EnterIntro(void) {
+    Cinema_RequestById(0x12C);
 }

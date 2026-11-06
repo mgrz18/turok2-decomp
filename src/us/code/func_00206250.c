@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void *func_00206250(s32 unused0, s32 arg1);
+extern void *CCache__PopFreeMemEntry(s32 unused0, s32 arg1);
 extern s32 CList__AddHead(void *arg0, s32 arg1);
-void *func_00206250(s32 unused0, s32 arg1) {
+void *CCache__PopFreeMemEntry(s32 unused0, s32 arg1) {
     extern Pool D_800D8DAC;
     extern void **D_800D81D4;
     struct ResourceCacheEntry *temp_s0;

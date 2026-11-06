@@ -1,10 +1,10 @@
-/* Cut fixed in versions/cuts.us.txt: func_00253AC0 really is 0x253AC0-0x253B54 (0x94 bytes, with the trailing nop): splat split it at its loop head as func_00253AD4. */
+/* Cut fixed in versions/cuts.us.txt: CPlayer__GetMaxAmmo really is 0x253AC0-0x253B54 (0x94 bytes, with the trailing nop): splat split it at its loop head as func_00253AD4. */
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
 
 /* Most rounds of an ammo type any weapon carries (only held weapons if heldOnly). */
-s32 func_00253AC0(CPlayer *player, s32 type, s32 heldOnly) {
+s32 CPlayer__GetMaxAmmo(CPlayer *player, s32 type, s32 heldOnly) {
     s32 max;
     s32 w;
     s32 i;

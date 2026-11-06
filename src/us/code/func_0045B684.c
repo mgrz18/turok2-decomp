@@ -1,9 +1,9 @@
 #include "common.h"
 
-s32 func_00285CC4(void *, void *);              /* extern */
+s32 Controller_DisableMenuSounds(void *, void *);              /* extern */
 extern s32 D_801309C0;
 
-void func_0045B684(void *arg0)
+void PakMessage_InitNoController_2(void *arg0)
 {
   void *temp_a0;
   void *temp_a1;
@@ -14,5 +14,5 @@ void func_0045B684(void *arg0)
   new_var = (s32) ((*((s32 *) (((s8 *) temp_a0) + 0x120))) | 8);
   D_801309C0 = 8;
   *((s32 *) (((s8 *) temp_a0) + 0x120)) = new_var;
-  func_00285CC4(temp_a0, temp_a1);
+  Controller_DisableMenuSounds(temp_a0, temp_a1);
 }

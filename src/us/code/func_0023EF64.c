@@ -10,7 +10,7 @@ typedef struct Row14 {
     u8 pad6[14];
 } Row14;
 extern Row14 D_800AD498[];
-Row14 *func_0023EF64(s32 id) {
+Row14 *Pickup_FindAmmoEntry(s32 id) {
     s32 i;
     Row14 *p = D_800AD498;
     for (i = 0x23; i != -1; i--) {

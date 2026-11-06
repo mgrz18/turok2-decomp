@@ -1,11 +1,11 @@
-/* WRONG CUT: REAL func_00428058 size 0x8C (splat cut it into func_00428058 + func_00428080). */
+/* WRONG CUT: REAL __osPfsRequestOneChannel size 0x8C (splat cut it into __osPfsRequestOneChannel + func_00428080). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SDK/PFS/80446BD0_10.CPP, func_80446E58_de, with Turok 2's layouts. */
 /* __osPfsRequestOneChannel (libultra pfsgetstatus.c). */
 #include "rw/abu_types.h"
 
 extern u8 D_80121420;
 
-void func_00428058(int channel)
+void __osPfsRequestOneChannel(int channel)
 {
     extern OSPifRam D_80130E20;
     u8 *base;

@@ -11,7 +11,7 @@ typedef float f32;
 typedef double f64;
 extern s32 D_800D81C0;
 extern s32 D_800D81C4;
-void func_00202A08(u32 arg0)
+void CHashTable__Remove(u32 arg0)
 {
   s32 *temp_v0;
   s32 *var_a0;

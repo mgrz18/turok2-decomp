@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_0020D908(s32, s32);
-s32 func_0020F7EC(s32);
-s32 func_002333C0(s32, s32, s32);
+s32 CMtxF__FromMtxAffine(s32, s32);
+s32 CMtxF__ClampEntries(s32);
+s32 Swoosh_NewNode(s32, s32, s32);
 
-s32 func_0021034C(s32 *, f32, f32, f32);    /* extern */
+s32 CMtxF__ScaleAxes(s32 *, f32, f32, f32);    /* extern */
 extern f32 D_800A6514;
 extern f32 D_800A6518;
 
@@ -49,7 +49,7 @@ typedef struct {
     /* 0x7520 */ Node00236170 *head;
 } World00236170;
 
-void func_00236170(World00236170 *arg0, CRenderInst *arg1, s32 arg2) {
+void Swoosh_AddParticleNode(World00236170 *arg0, CRenderInst *arg1, s32 arg2) {
     u8 sp10[0x40];
     f32 temp_f0;
     f32 var_f0;
@@ -62,14 +62,14 @@ void func_00236170(World00236170 *arg0, CRenderInst *arg1, s32 arg2) {
                 temp_f0 = var_s0->strength;
                 if (temp_f0 > 0.0f) {
                     if (temp_f0 > 0.0f) {
-                        func_0020D908((s32) sp10, arg2);
+                        CMtxF__FromMtxAffine((s32) sp10, arg2);
                         var_f0 = D_800A6514;
                         if (arg1->info->unk14 != 0) {
                             var_f0 = D_800A6518;
                         }
-                        func_0021034C(sp10, var_f0, var_f0, var_f0);
-                        func_0020F7EC((s32) sp10);
-                        func_002333C0((s32) arg0, (s32) var_s0, (s32) sp10);
+                        CMtxF__ScaleAxes(sp10, var_f0, var_f0, var_f0);
+                        CMtxF__ClampEntries((s32) sp10);
+                        Swoosh_NewNode((s32) arg0, (s32) var_s0, (s32) sp10);
                     }
                 }
             }

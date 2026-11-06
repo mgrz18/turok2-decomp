@@ -11,12 +11,12 @@ struct Plane {
     char pad24[0x24];
     CVector3 normal;
 };
-extern void func_0020EF2C(CVector3 *, CVector3 *, CVector3 *);
-s32 func_0023C240(void *arg0, CVector3 *arg1) {
+extern void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
+s32 Plane_IsBehind(void *arg0, CVector3 *arg1) {
     Plane *object = arg0;
     CVector3 sp10;
     s32 var_v0;
-    func_0020EF2C(&sp10, arg1, &object->pos);
+    CVector3__Subtract(&sp10, arg1, &object->pos);
     var_v0 = 0;
     if (!((object->normal.x * sp10.x) + (object->normal.y * sp10.y) + (object->normal.z * sp10.z) >= 0.0f)) {
         var_v0 = 1;

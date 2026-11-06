@@ -7,7 +7,7 @@ typedef struct {
 
 s32 osSendMesg(s32, s32, s32);
 
-s32 func_00201BDC(s32 arg0, Request *arg1, s32 arg2) {
+s32 CDecompressor__DecompressAsync(s32 arg0, Request *arg1, s32 arg2) {
     arg1->arg = arg2;
     return ~osSendMesg(arg0 + 0x230, (s32) arg1, 0) != 0;
 }

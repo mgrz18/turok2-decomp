@@ -3,7 +3,7 @@
 #include "structs/weapon.h"
 
 /* Whether the player holds a usable weapon that is not in the list. */
-s32 func_00254F88(CBarrel *list, CPlayer *player) {
+s32 CBarrel__HasUnlistedWeapon(CBarrel *list, CPlayer *player) {
     WeaponInfo *def;
     s32 usable;
     s32 found;

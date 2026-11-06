@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-/* The scope model raised to the view (see func_00247170). */
+/* The scope model raised to the view (see CPlayer__AnimateScope). */
 typedef struct {
     /* 0x00 */ s32 current;
     /* 0x04 */ s32 requested;
@@ -13,8 +13,8 @@ typedef struct {
 
 extern s32 D_8011AAA0;
 
-void func_00247170(HudModel *m, CPlayer *owner);
-void func_002117DC(f32 *value, f32 target, f32 rate);
+void CPlayer__AnimateScope(HudModel *m, CPlayer *owner);
+void Math_EaseToward(f32 *value, f32 target, f32 rate);
 
 /* Starts lowering the scope model if it is up or being raised. */
 static __inline__ void LowerScope(HudModel *m) {
@@ -33,7 +33,7 @@ static __inline__ void RaiseScope(HudModel *m, s32 model) {
 
 /* Sniper zoom: toggled by button 0x100 on a weapon with a scope, then
  * adjusted by 8 (in) and 4 (out) while 0x10 is held. */
-void func_00247660(CPlayer *p) {
+void CPlayer__UpdateZoom(CPlayer *p) {
     f32 target;
     f32 t;
     u16 model;
@@ -83,9 +83,9 @@ void func_00247660(CPlayer *p) {
         }
     }
     p->m_TargetZoomBlend = target;
-    func_00247170(&p->m_Overlay, p);
+    CPlayer__AnimateScope(&p->m_Overlay, p);
     if (p->m_Overlay.m_Mode != 1) {
-        func_002117DC(&p->m_ZoomBlend, target, 0.5f);
+        Math_EaseToward(&p->m_ZoomBlend, target, 0.5f);
         if (target == 0.0f && p->m_ZoomBlend < 0.01f) {
             p->m_ZoomBlend = 0.0f;
         }

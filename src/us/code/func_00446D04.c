@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_00243414(s32, s32, s32);
+s32 CAI__SetMode(s32, s32, s32);
 
-void func_00446D04(s32 arg0, CAI *arg1) {
+void BlindOne_BossFlinchUpdate_2(s32 arg0, CAI *arg1) {
     if (arg1->m_AnimRepeatedCount >= 7) {
-        func_00243414(arg0, (s32) arg1, 7);
+        CAI__SetMode(arg0, (s32) arg1, 7);
     }
 }

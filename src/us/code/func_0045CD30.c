@@ -20,17 +20,17 @@ extern s32 D_800AB898;
 extern s32 D_800AB89C;
 extern s32 D_801198E8;
 
-s32 func_00266B80(void); /* osGetMemSize */
-void func_0029AAD0(u32 features); /* osViSetSpecialFeatures */
+s32 GetMemSize(void); /* osGetMemSize */
+void osViSetSpecialFeatures(u32 features); /* osViSetSpecialFeatures */
 void func_0042456C(s32 width, s32 height, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
 
-void func_0045CD30(void) {
+void Video_ApplyResolution_2(void) {
     s32 *mode = NULL;
     ScreenExtra extra;
 
     D_801198E8 = 2;
     if (D_800C2038 == -1) {
-        if (func_00266B80() != 0x400000) {
+        if (GetMemSize() != 0x400000) {
             D_800C2038 = 1;
         } else {
             D_800C2038 = 0;
@@ -55,8 +55,8 @@ void func_0045CD30(void) {
         D_800C2030 = mode[0];
         D_800C2034 = mode[1];
         func_0042456C(mode[0], mode[1], mode[2], mode[3], mode[4], mode[5]);
-        func_0029AAD0(D_800C2044 ? 0x40 : 0x80);
-        func_0029AAD0(0x20);
-        func_0029AAD0(2);
+        osViSetSpecialFeatures(D_800C2044 ? 0x40 : 0x80);
+        osViSetSpecialFeatures(0x20);
+        osViSetSpecialFeatures(2);
     }
 }

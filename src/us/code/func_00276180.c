@@ -81,21 +81,21 @@ struct Glyphs;
 typedef struct Glyphs Glyphs;
 struct ContextCode802591C0;
 typedef struct ContextCode802591C0 ContextCode802591C0;
-extern s16 func_00273370(char *, s32, s32, s32, s32);
+extern s16 SndVoicePool_FindSlot(char *, s32, s32, s32, s32);
 struct Font;
 typedef struct Font Font;
-extern void func_002714B0(s32 *arg0);
-extern void func_00271514(s32 *arg0);
-extern s16 func_00293470(char *, s32);
+extern void CAudioWorld__Lock(s32 *arg0);
+extern void CAudioWorld__Unlock(s32 *arg0);
+extern s16 alSndpAllocate(char *, s32);
 extern void *func_0029E460(void *destination, const void *source, int count);
-extern void func_002706A0(ContextCode802591C0 *, s32, s32, char *);
+extern void CAudioWorld__StartVoice(ContextCode802591C0 *, s32, s32, char *);
 static __inline__ void append(ListHead *head, Entry_func_80259440_de *entry) {
     entry->prev = head->prev;
     entry->next = (Entry_func_80259440_de *)head;
     head->prev->next = entry;
     head->prev = entry;
 }
-void func_00276180(Cache *cache) {
+void SndQueue_Update(Cache *cache) {
     s16 *slots;
     char *textures;
     Glyphs *glyphs;
@@ -105,7 +105,7 @@ void func_00276180(Cache *cache) {
     s16 *cursor;
     s32 free;
     CellCode802591C0 *cell;
-    func_002714B0(cache->context);
+    CAudioWorld__Lock(cache->context);
     slots = cache->context->slots;
     textures = cache->context->textures;
     glyphs = cache->context->font->glyphs;
@@ -125,7 +125,7 @@ void func_00276180(Cache *cache) {
             append(&cache->done, entry);
             continue;
         }
-        slot = func_00273370(cache->context->cells, entry->style, entry->font, entry->glyph, 0);
+        slot = SndVoicePool_FindSlot(cache->context->cells, entry->style, entry->font, entry->glyph, 0);
         if (slot == -1 || slot == 16) {
             break;
         }
@@ -134,7 +134,7 @@ void func_00276180(Cache *cache) {
         if (free != -1) {
             break;
         }
-        *cursor = func_00293470(textures, glyphs->bitmaps[entry->font]);
+        *cursor = alSndpAllocate(textures, glyphs->bitmaps[entry->font]);
         if (*cursor == free) {
             break;
         }
@@ -144,12 +144,12 @@ void func_00276180(Cache *cache) {
         cell->texture = *cursor;
         cell->frame = cache->context->frame;
         cell->index = slot;
-        func_002706A0(cache->context, cell->sequence, 0, cell->data);
+        CAudioWorld__StartVoice(cache->context, cell->sequence, 0, cell->data);
         entry->sequence = free;
         entry->glyph = free;
         entry->prev->next = entry->next;
         entry->next->prev = entry->prev;
         append(&cache->done, entry);
     }
-    func_00271514(cache->context);
+    CAudioWorld__Unlock(cache->context);
 }

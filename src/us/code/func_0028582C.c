@@ -3,7 +3,7 @@
 
 /* Once a frame: copies what the reads gathered (the input* fields) into
  * the fields the game reads, and clears the gathered presses. */
-void func_0028582C(ControllerProfile *arg0) {
+void Controller_Latch(ControllerProfile *arg0) {
     arg0->stickX = arg0->inputStickX;
     arg0->stickY = arg0->inputStickY;
     arg0->buttons = arg0->inputButtons;

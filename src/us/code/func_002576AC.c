@@ -4,7 +4,7 @@
 extern f32 D_800A723C;
 extern f32 D_800A7240;
 
-void func_002576AC(CPlayer *arg0) {
+void CPlayer__PickLandingAnim(CPlayer *arg0) {
     f32 temp_f1;
     s32 var_a1;
 

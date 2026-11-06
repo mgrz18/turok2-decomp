@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 
-void func_00256450(CPlayer *arg0) {
+void PlayerRideMove_Enter(CPlayer *arg0) {
     CBarrel *temp_v0;
 
     temp_v0 = &arg0->m_Barrel;

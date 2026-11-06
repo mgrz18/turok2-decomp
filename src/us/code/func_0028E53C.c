@@ -9,7 +9,7 @@ extern u32 D_80120FCC;
  * stores below. */
 #define FIELD_AT(ptr, type, T, field) (*(type *)((s8 *)(ptr) + (s32) &((T *)0)->field))
 
-void func_0028E53C(void) {
+void VM_Age(void) {
     PageRegion *var_v1;
     s32 var_a0_2;
     s32 var_a1;

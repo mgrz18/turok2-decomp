@@ -3,6 +3,6 @@
 
 s32 func_0029E460();                                /* extern */
 
-s32 func_0029E438(s32 arg0, s32 arg1, s32 arg2) {
+s32 proutSprintf(s32 arg0, s32 arg1, s32 arg2) {
     return func_0029E460() + arg2;
 }

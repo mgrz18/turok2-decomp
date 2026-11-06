@@ -5,20 +5,20 @@
 /* AI state: turn toward the target; after 100 steps, or when the target is within 460.8 and less than 20
  * degrees off, go to anim state 0x16. */
 
-extern void func_00246108(void *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
-extern void func_00245BAC(void *obj, void *ai, f32 turnRate, f32 angle);
-extern void func_00243414(void *obj, void *ai, s32 state);
+extern void AI_UpdateTargets(void *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
+extern void AI_TurnClamped(void *obj, void *ai, f32 turnRate, f32 angle);
+extern void CAI__SetMode(void *obj, void *ai, s32 state);
 
-void func_0040B80C(void *obj, void *ai) {
+void MotherBoss_Mode23_Approach(void *obj, void *ai) {
     CAITargets t;
     MotherBossState *state;
 
-    func_00246108(obj, ai, &t, 1, 1);
-    func_00245BAC(obj, ai, 0.261799425f, t.m_Path.m_Angle);
+    AI_UpdateTargets(obj, ai, &t, 1, 1);
+    AI_TurnClamped(obj, ai, 0.261799425f, t.m_Path.m_Angle);
     state = &D_8012FB70;
     if (++state->counter > 100 ||
         (t.m_Path.m_pTarget != NULL && t.m_Sight.m_pTarget != NULL && t.m_Path.m_FlatDist < 460.8f &&
          (t.m_Sight.m_Angle < 0.0f ? -t.m_Sight.m_Angle <= 0.34906590f : t.m_Sight.m_Angle <= 0.34906590f))) {
-        func_00243414(obj, ai, 0x16);
+        CAI__SetMode(obj, ai, 0x16);
     }
 }

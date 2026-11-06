@@ -1,12 +1,12 @@
 /* Draw a 16x16 texture as a texture rectangle at (x, y), scaled by (sx, sy): set the image and run the
- * display list D_800B2C90 that loads it (the twin of func_0027854C for the bigger glyphs). */
+ * display list D_800B2C90 that loads it (the twin of Hud_DrawGlyph16x8 for the bigger glyphs). */
 
 #include "common.h"
 #include "gfx.h"
 
 extern Gfx D_800B2C90[];        /* loads the 16x16 texture */
 
-void func_0027B0FC(s32 texture, f32 x, f32 y, f32 sx, f32 sy) {
+void Hud_DrawGlyph16x16(s32 texture, f32 x, f32 y, f32 sx, f32 sy) {
     Gfx *g;
     s32 xh, yh, xl, yl;
     s32 dsdx;

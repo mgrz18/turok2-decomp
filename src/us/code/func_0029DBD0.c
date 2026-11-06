@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern OSPiHandle_s *D_800B8980[];
-s32 func_0029DBD0(OSPiHandle_s *arg0, u32 arg1, u32 arg2) {
+s32 osEPiRawWriteIo(OSPiHandle_s *arg0, u32 arg1, u32 arg2) {
     OSPiHandle_s *previous;
     s32 index;
     while (*(volatile u32 *)0xA4600010 & 3) {

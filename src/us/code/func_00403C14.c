@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/boss.h"
 
-void func_00403C14(s32 mode) {
+void Primagen_SetStage(s32 mode) {
     if (mode == 1) {
         D_8012F608.partsDone = 120;
         D_8012F608.values[0][3] = 0x1400;

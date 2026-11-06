@@ -3,10 +3,10 @@
 
 #include "rw/junk_types.h"
 
-void func_00292DE0(ALSeq *seq, ALEvent *event);
-void func_00293108(ALSeq *seq, ALSeqMarker *m, u32 ticks);
-void func_00292DE0(ALSeq *seq, ALEvent *event);
-void func_00293108(ALSeq *seq, ALSeqMarker *m, u32 ticks) {
+void alSeqNextEvent(ALSeq *seq, ALEvent *event);
+void alSeqNewMarker(ALSeq *seq, ALSeqMarker *m, u32 ticks);
+void alSeqNextEvent(ALSeq *seq, ALEvent *event);
+void alSeqNewMarker(ALSeq *seq, ALSeqMarker *m, u32 ticks) {
     ALEvent evt;
     u8 *ptr;
     u16 status;
@@ -30,7 +30,7 @@ void func_00293108(ALSeq *seq, ALSeqMarker *m, u32 ticks) {
             ptr = seq->curPtr;
             status = seq->lastStatus;
             lastTicks = seq->lastTicks;
-            func_00292DE0(seq, &evt);
+            alSeqNextEvent(seq, &evt);
             if (evt.type == 4) {
                 ptr = seq->curPtr;
                 status = seq->lastStatus;

@@ -190,7 +190,7 @@ typedef struct M04SortTab {
 } M04SortTab;
 /* The sound manager seen from its bank pointer (SndMgr.bank, 0x7C): snd is
  * SndMgr.handles. Kept as a view because addressing the handles through it
- * is what the ROM does (func_00273370, func_00274A98). */
+ * is what the ROM does (SndVoicePool_FindSlot, SndVoicePool_ReleaseVoice). */
 typedef struct SndCore {
                  u8 pad0[0x60];
                  s16 snd[16];

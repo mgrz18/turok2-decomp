@@ -8,23 +8,23 @@
 
 extern float D_800A7FD8;
 extern float D_800A7FD0;
-extern void func_0020F040(f32 *arg0);
+extern void CVector3__Normalize(f32 *arg0);
 extern CGameRegion *D_800B2608;
 extern CGameRegion *D_800B260C;
 extern CVector3 D_800F2020;
 extern f32 D_800F2024;
 extern s32 D_800F2028;
 extern CVector3 D_800F2030;
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 static __inline__ void edge(CVector3 *out, CVector3 *a, CVector3 *b) {
-    func_0020EF2C(out, a, b);
+    CVector3__Subtract(out, a, b);
 }
 static __inline__ void normalize_copy(CVector3 *out, CVector3 *in) {
     *out = *in;
-    func_0020F040(out);
+    CVector3__Normalize(out);
 }
-s32 func_0026AFC0(CGameRegion *polygon) {
+s32 CGameRegion__IsSteep(CGameRegion *polygon) {
     CVector3 up;
     CVector3 normal;
     CVector3 edge0;
@@ -46,7 +46,7 @@ s32 func_0026AFC0(CGameRegion *polygon) {
         } else if (polygon != D_800B2608) {
             edge(&edge0, polygon->m_pVertices[1], polygon->m_pVertices[0]);
             edge(&edge1, polygon->m_pVertices[2], polygon->m_pVertices[1]);
-            func_0020EFDC(&D_800F2020, &edge0, &edge1);
+            CVector3__Cross(&D_800F2020, &edge0, &edge1);
         }
         D_800B2608 = polygon;
         normalize_copy(&D_800F2030, &D_800F2020);

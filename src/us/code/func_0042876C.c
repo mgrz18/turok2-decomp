@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00429AA4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-extern s32 func_0042876C(OSPfs *pfs, __OSInodeCache *cache);
-extern s32 func_00429AA4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-s32 func_0042876C(OSPfs *pfs, __OSInodeCache *cache)
+extern s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+extern s32 corrupted_init(OSPfs *pfs, __OSInodeCache *cache);
+extern s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+s32 corrupted_init(OSPfs *pfs, __OSInodeCache *cache)
 {
     int i;
     int n;
@@ -21,7 +21,7 @@ s32 func_0042876C(OSPfs *pfs, __OSInodeCache *cache)
     cache->bank = -1;
     for (bank = 0; bank < pfs->banks; bank++) {
         offset = bank > 0 ? 1 : pfs->inode_start_page;
-        ret = func_00429AA4(pfs, &tmp_inode, 0, bank);
+        ret = __osPfsRWInode(pfs, &tmp_inode, 0, bank);
         if (ret != 0 && ret != 3) {
             return ret;
         }

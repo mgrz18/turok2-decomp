@@ -3,7 +3,7 @@
 #include "structs/game.h"
 
 /* Ends a demo: puts back the game settings saved when it started. */
-void func_0042F514(void) {
+void Demo_End(void) {
     DemoPlayer *s = &D_800F56B0;
 
     if (s->saved != 0) {

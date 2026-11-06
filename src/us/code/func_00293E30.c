@@ -11,6 +11,6 @@ typedef struct {
     /* 0x40 */ ChanState *chanState;
 } SeqPlayer;
 
-void func_00293E30(SeqPlayer *seqp, s16 chan, u8 value) {
+void alSndpSetPriority(SeqPlayer *seqp, s16 chan, u8 value) {
     seqp->chanState[chan].x20 = value;
 }

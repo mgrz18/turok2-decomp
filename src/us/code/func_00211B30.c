@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00211B30(void *arg0, void *arg1, void *arg2);
-void func_00211B30(void *arg0, void *arg1, void *arg2) {
+extern void Edge_Init(void *arg0, void *arg1, void *arg2);
+void Edge_Init(void *arg0, void *arg1, void *arg2) {
     GeometryEdge *dst = arg0;
     CVector3 *a = arg1;
     CVector3 *b = arg2;

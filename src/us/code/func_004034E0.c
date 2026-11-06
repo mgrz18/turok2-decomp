@@ -14,7 +14,7 @@ typedef struct {
     /* 0x250 */ s32 valid;
 } Reader;
 
-void func_004034E0(Reader *r, Chunk *c) {
+void MantidQueen_SetStep(Reader *r, Chunk *c) {
     r->chunk = c;
     r->total += c->size;
     r->pos = 0;

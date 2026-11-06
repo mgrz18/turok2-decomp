@@ -2,12 +2,12 @@
 #include "m2c_macros.h"
 
 typedef struct { s16 type; s32 val; s32 pad[2]; } Msg;
-extern void func_00291034(void *, Msg *, s32);
+extern void alEvtqPostEvent(void *, Msg *, s32);
 
-void func_00290E10(u8 *arg0, s32 arg1) {
+void alCSPSetBank(u8 *arg0, s32 arg1) {
     Msg m;
 
     m.type = 0xE;
     m.val = arg1;
-    func_00291034(arg0 + 0x48, &m, 0);
+    alEvtqPostEvent(arg0 + 0x48, &m, 0);
 }

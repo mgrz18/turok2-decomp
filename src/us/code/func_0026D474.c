@@ -9,7 +9,7 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-void func_0026D474(void *arg0, void *arg1)
+void NodePool_Free(void *arg0, void *arg1)
 {
   void **temp_v1;
   void *temp_a2;

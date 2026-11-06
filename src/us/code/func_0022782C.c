@@ -34,13 +34,13 @@ extern float D_800A6064;
 extern f32 D_800A6068;
 extern s32 D_800AB8B0;
 extern f32 D_800AB8C0;
-extern void func_0020B5D4();
-extern void func_0020B624();
-extern s32 func_0026F60C(void *arg0, void *arg1);
-extern void func_002152AC(void *arg0);
+extern void Render_ResetBatches();
+extern void Render_FlushBatches();
+extern s32 Frustum_TestBox(void *arg0, void *arg1);
+extern void CLevelActor__Draw(void *arg0);
 
 /* Draw the scene effects whose bounds are inside the camera's clip volume. */
-void func_0022782C(char *arg0, char *arg1) {
+void CLevelActorPool__Draw(char *arg0, char *arg1) {
     WorldRecAt3C08 *world = (void *)arg0;
     GameplayCamera *camera = (void *)arg1;
     SceneEffect *entry;
@@ -48,7 +48,7 @@ void func_0022782C(char *arg0, char *arg1) {
     f32 upper;
     f32 scale;
     f32 zero;
-    func_0020B5D4();
+    Render_ResetBatches();
     entry = world->head;
     if (entry != 0) {
         zero = 0.0f;
@@ -61,18 +61,18 @@ void func_0022782C(char *arg0, char *arg1) {
                 (camera->clipBounds[0].z < entry->maxZ) &&
                 (camera->clipBounds[1].y > entry->minY) &&
                 (camera->clipBounds[0].y < entry->maxY) &&
-                (func_0026F60C(camera->clipPlanes, &entry->minX) != 0)) {
+                (Frustum_TestBox(camera->clipPlanes, &entry->minX) != 0)) {
                 value = entry->lifetime;
                 D_800AB8B0 = 0;
                 if ((value > zero) && (value <= upper)) {
                     D_800AB8B0 = 1;
                     D_800AB8C0 = value * scale;
                 }
-                func_002152AC(entry);
+                CLevelActor__Draw(entry);
                 D_800AB8B0 = 0;
             }
             entry = entry->next;
         } while (entry != 0);
     }
-    func_0020B624();
+    Render_FlushBatches();
 }

@@ -2,14 +2,14 @@
 #define STRUCTS_DEMO_H
 
 /* The attract-mode demo player, D_800F56B0. A demo (DemoHeader, from the
- * zero-terminated list D_004384E8, played in turn by func_0042F590) is a
+ * zero-terminated list D_004384E8, played in turn by Demo_PlayNext) is a
  * bit stream per input: for each player the buttons (decoded by
- * func_0042ECF0), the stick x and y (func_0042F75C), plus one stream for the
- * whole match (func_0042F7C8, copied to D_8011AD10 each frame). Each value
- * lasts a run of frames read after it (func_0042EC30). func_0042EF2C starts
- * a demo (saving the game settings first), func_0042F344 feeds the decoded
+ * Demo_DecodeButtons), the stick x and y (Demo_DecodeStick), plus one stream for the
+ * whole match (Demo_DecodeMatch, copied to D_8011AD10 each frame). Each value
+ * lasts a run of frames read after it (Demo_ReadRunLength). Demo_Start starts
+ * a demo (saving the game settings first), Demo_UpdateStreams feeds the decoded
  * values to the controllers (D_800F5F70) and keeps a checksum
- * (func_0042F868), func_0042F514 puts the saved settings back.
+ * (Demo_UpdateChecksum), Demo_End puts the saved settings back.
  * tools/check_structs.py checks the offsets. */
 
 #include "common.h"
@@ -41,9 +41,9 @@ typedef struct DemoStream {
 } DemoStream; /* size 0x20 */
 
 typedef struct DemoPlayer {
-    /* 0x000 */ s32 active;             /* the attract mode plays demos (func_0042F57C) */
+    /* 0x000 */ s32 active;             /* the attract mode plays demos (Demo_Enable) */
     /* 0x004 */ s32 unk4;
-    /* 0x008 */ s32 playing;            /* a demo is running (func_0042EF2C) */
+    /* 0x008 */ s32 playing;            /* a demo is running (Demo_Start) */
     /* 0x00C */ s32 fastForward;        /* read every stream each frame */
     /* 0x010 */ s32 done;
     /* 0x014 */ DemoStream buttons[4];

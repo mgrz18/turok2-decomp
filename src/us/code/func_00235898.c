@@ -9,7 +9,7 @@ static __inline__ void clamp255(f32 *v) {
     }
 }
 
-void func_00235898(void) {
+void ScreenTint_UpdateMode(void) {
     f32 alpha;
     f32 fade;
 

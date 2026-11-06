@@ -1,15 +1,15 @@
-/* WRONG CUT: the real function is func_004301C8, size 0xD0 (splat split it at func_00430250). */
+/* WRONG CUT: the real function is Cont_ResetSlot, size 0xD0 (splat split it at func_00430250). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0044BC58.c, func_0044BC58, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/controller.h"
 
 
-/* Controller / rumble slot, 0x224 bytes (Controller in func_00285AE0). */
+/* Controller / rumble slot, 0x224 bytes (Controller in Controller_ResetRumble). */
 
-s32 func_0026EB3C(void *dst, void *src, s32 n);
+s32 RumblePool_Init(void *dst, void *src, s32 n);
 
 /* Resets a controller slot; returns whether a controller is plugged into its port. */
-s32 func_004301C8(ControllerProfile *c, s32 port) {
+s32 Cont_ResetSlot(ControllerProfile *c, s32 port) {
     s32 i;
 
     c->port = port;
@@ -39,6 +39,6 @@ s32 func_004301C8(ControllerProfile *c, s32 port) {
     c->connected = ((D_800F6778[port].errno >> 3) ^ 1) & 1;
     c->rumbleLevel = 0;
     c->rumbleTimer = 0;
-    func_0026EB3C(c->rumblePool, c->rumbleNodes, 3);
+    RumblePool_Init(c->rumblePool, c->rumbleNodes, 3);
     return c->connected;
 }

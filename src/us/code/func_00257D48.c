@@ -40,13 +40,13 @@ typedef struct {
 extern PoseInfo D_800ADF68[];
 extern f32 D_800B6D28;             /* frame time scale */
 extern u8 D_800F7078[];
-extern void func_00243414(Object *obj, AI *ai, s32 mode);
-extern void func_002241D8(void *level, Object *obj, s32 model, s32 animType);
+extern void CAI__SetMode(Object *obj, AI *ai, s32 mode);
+extern void CScene__SetInstanceObjectType(void *level, Object *obj, s32 model, s32 animType);
 
 /* First-person weapon AI: counts its timers down, goes to mode 1 when the
  * player's pose asks for it or a weapon change is queued, runs the state's
  * and the weapon's updates, then animates the weapon model. */
-void func_00257D48(Object *obj, AI *ai) {
+void WeaponActor_Update(Object *obj, AI *ai) {
     CPlayer *player;
     s32 mode;
 
@@ -62,11 +62,11 @@ void func_00257D48(Object *obj, AI *ai) {
         ai->timer118 -= D_800B6D28;
     }
     if (mode == 1) {
-        func_00243414(obj, ai, 1);
+        CAI__SetMode(obj, ai, 1);
     }
     if (player->m_RequestedWeapon != player->m_Data.m_CurrentWeapon) {
         player->m_SniperMode = 0;
-        func_00243414(obj, ai, 1);
+        CAI__SetMode(obj, ai, 1);
     }
     if (ai->state != NULL && ai->state->update != NULL) {
         ai->state->update(obj, ai);
@@ -74,5 +74,5 @@ void func_00257D48(Object *obj, AI *ai) {
     if (D_800AF618[player->m_Data.m_CurrentWeapon]->update != NULL) {
         D_800AF618[player->m_Data.m_CurrentWeapon]->update(obj, ai);
     }
-    func_002241D8(D_800F7078, obj, D_800AF618[player->m_Data.m_CurrentWeapon]->model, ai->anim->animType);
+    CScene__SetInstanceObjectType(D_800F7078, obj, D_800AF618[player->m_Data.m_CurrentWeapon]->model, ai->anim->animType);
 }

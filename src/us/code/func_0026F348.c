@@ -3,18 +3,18 @@
 
 #include "rw/abu_types.h"
 
-void func_0026F348(void *arg0, void *arg1, void *arg2, void *arg3) {
-    extern void func_0020F040(void *out);
-    extern void func_0020EFDC(void *out, void *a, void *b);
-    extern void func_0020EF2C(void *out, void *a, void *b);
+void Plane_FromPoints(void *arg0, void *arg1, void *arg2, void *arg3) {
+    extern void CVector3__Normalize(void *out);
+    extern void CVector3__Cross(void *out, void *a, void *b);
+    extern void CVector3__Subtract(void *out, void *a, void *b);
     PlaneEquation *plane = arg0;
     CVector3 *point = arg1;
     u8 sp10[12];
     u8 sp20[12];
-    func_0020EF2C(sp10, arg2, arg1);
-    func_0020EF2C(sp20, arg3, arg2);
-    func_0020EFDC(arg0, sp20, sp10);
-    func_0020F040(arg0);
+    CVector3__Subtract(sp10, arg2, arg1);
+    CVector3__Subtract(sp20, arg3, arg2);
+    CVector3__Cross(arg0, sp20, sp10);
+    CVector3__Normalize(arg0);
     plane->distance = (plane->normal.x * point->x)
                                   + (plane->normal.y * point->y)
                                   + (plane->normal.z * point->z);

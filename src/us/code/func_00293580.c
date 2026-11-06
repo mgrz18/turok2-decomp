@@ -12,6 +12,6 @@ typedef struct {
     /* 0x40 */ Track00293580 *tracks;
 } Unk00293580;
 
-s32 func_00293580(Unk00293580 *arg0) {
+s32 alSndpGetState(Unk00293580 *arg0) {
     return arg0->tracks[arg0->current].unk28;
 }

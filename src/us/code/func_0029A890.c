@@ -54,15 +54,15 @@ struct OSIoMesg {
     u32 size;
     void *piHandle;
 };
-extern void func_0029ACE0();
+extern void __osViSwapContext();
 extern u16 D_801216D0;
-extern struct __OSViContext *func_0029AA10(void);
-extern u32 func_0029DFC0(void);
-extern void func_0029BC70(void);
+extern struct __OSViContext *__osViGetCurrentContext(void);
+extern u32 osGetCount(void);
+extern void __osTimerInterrupt(void);
 static __inline__ u16 *viRetrace(void) {
     return &D_801216D0;
 }
-void func_0029A890(struct OSDevMgr *arg)
+void viMgrMain(struct OSDevMgr *arg)
 {
     struct __OSViContext *vc;
     struct OSDevMgr *dm;
@@ -75,7 +75,7 @@ void func_0029A890(struct OSDevMgr *arg)
     u64 *currentTime;
     mb = 0;
     first = 0;
-    vc = func_0029AA10();
+    vc = __osViGetCurrentContext();
     retraceInit = &D_801216D0;
     *retraceInit = vc->retraceCount;
     if (*retraceInit == 0) {
@@ -86,9 +86,9 @@ void func_0029A890(struct OSDevMgr *arg)
         osRecvMesg(dm->evtQueue, (OSMesg *)&mb, 1);
         switch (mb->hdr.type) {
             case 13:
-                func_0029ACE0();
+                __osViSwapContext();
                 if (--*viRetrace() == 0) {
-                    vc = func_0029AA10();
+                    vc = __osViGetCurrentContext();
                     if (vc->msgq != 0) {
                         osSendMesg(vc->msgq, vc->msg, 0);
                     }
@@ -97,19 +97,19 @@ void func_0029A890(struct OSDevMgr *arg)
                 intrCount = &D_80122A24;
                 (*intrCount)++;
                 if (first) {
-                    count = func_0029DFC0();
+                    count = osGetCount();
                     D_80122A28 = count;
                     first = 0;
                 }
                 baseCounter = &D_80122A20;
                 count = *baseCounter;
-                *baseCounter = func_0029DFC0();
+                *baseCounter = osGetCount();
                 count = *baseCounter - count;
                 currentTime = &D_80122A28;
                 *currentTime = *currentTime + count;
                 break;
             case 14:
-                func_0029BC70();
+                __osTimerInterrupt();
                 break;
             default:
                 break;

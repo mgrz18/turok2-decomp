@@ -3,6 +3,6 @@
 
 extern s32 D_800B6CF8;
 
-void func_00285CD4(void) {
+void Controller_EnableMenuSounds(void) {
     D_800B6CF8 = 1;
 }

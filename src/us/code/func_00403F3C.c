@@ -28,31 +28,31 @@ extern u8 D_00431CF0[];
 extern u8 D_00431D0C[];
 extern u8 D_00431D14[];
 extern u8 D_801100F0[];
-void func_0025AD90(Actor00403F3C *actor, Level00403F3C *level, s32 a2);
-void func_00235510(void *light);
-s16 func_0026D518(void *table);
-void func_00406FE4(s16 type, s32 a1, Vec3_00403F3C offset);
-void func_00404450(Actor00403F3C *actor, Level00403F3C *level);
-void func_0040457C(Actor00403F3C *actor, Level00403F3C *level);
-void func_0027AD88(void *a0, s32 percent);
-void func_00243414(Actor00403F3C *actor, Level00403F3C *level, s32 event);
+void AI_TurnHeadToTarget(Actor00403F3C *actor, Level00403F3C *level, s32 a2);
+void Animator_Update(void *light);
+s16 WeightedTable_PickStatic(void *table);
+void Primagen_SpawnTossedObject(s16 type, s32 a1, Vec3_00403F3C offset);
+void Primagen_UpdateHealth(Actor00403F3C *actor, Level00403F3C *level);
+void Primagen_UpdateSpawner(Actor00403F3C *actor, Level00403F3C *level);
+void COnScreen__SetBossPercent(void *a0, s32 percent);
+void CAI__SetMode(Actor00403F3C *actor, Level00403F3C *level, s32 event);
 
 #define COUNT_DOWN(t)              \
     if ((t) > 0.0f) {              \
         (t) -= D_800B6D28;         \
     }
 
-void func_00403F3C(Actor00403F3C *actor, Level00403F3C *level) {
+void Primagen_Step(Actor00403F3C *actor, Level00403F3C *level) {
     Vec3_00403F3C offset;
     s32 type;
     s32 i;
 
-    func_0025AD90(actor, level, 0);
+    AI_TurnHeadToTarget(actor, level, 0);
     if (level->def != NULL && level->def->onReset != NULL) {
         level->def->onReset(actor, level);
     }
     for (i = 0; i < 8; i++) {
-        func_00235510(&D_8012F608.anims[i]);
+        Animator_Update(&D_8012F608.anims[i]);
     }
     if (D_8012F608.bossState == 1) {
         level->spawn.x = D_8012F608.home.x;
@@ -83,51 +83,51 @@ void func_00403F3C(Actor00403F3C *actor, Level00403F3C *level) {
         offset.y = 0.0f;
         offset.z = 0.0f;
         if (D_8012F608.stage == 3) {
-            type = func_0026D518(D_00431CF0);
+            type = WeightedTable_PickStatic(D_00431CF0);
         } else {
-            type = func_0026D518(D_00431CD4);
+            type = WeightedTable_PickStatic(D_00431CD4);
         }
-        func_00406FE4(type, 0x11D, offset);
+        Primagen_SpawnTossedObject(type, 0x11D, offset);
         offset.x = 0.0f;
         offset.y = 0.0f;
         offset.z = -2324.48f;
         if (D_8012F608.stage == 3) {
-            type = func_0026D518(D_00431CF0);
+            type = WeightedTable_PickStatic(D_00431CF0);
         } else {
-            type = func_0026D518(D_00431CD4);
+            type = WeightedTable_PickStatic(D_00431CD4);
         }
-        func_00406FE4(type, 0x11D, offset);
+        Primagen_SpawnTossedObject(type, 0x11D, offset);
         offset.x = 2314.24f;
         offset.y = 0.0f;
         offset.z = 0.0f;
         if (D_8012F608.stage == 3) {
-            type = func_0026D518(D_00431D14);
+            type = WeightedTable_PickStatic(D_00431D14);
         } else {
-            type = func_0026D518(D_00431D0C);
+            type = WeightedTable_PickStatic(D_00431D0C);
         }
-        func_00406FE4(type, 0x11D, offset);
+        Primagen_SpawnTossedObject(type, 0x11D, offset);
         offset.x = -460.8f;
         offset.y = 0.0f;
         offset.z = -460.8f;
-        func_00406FE4(func_0026D518(D_00431CD4), 0x11D, offset);
+        Primagen_SpawnTossedObject(WeightedTable_PickStatic(D_00431CD4), 0x11D, offset);
         offset.x = 460.8f;
         offset.y = 0.0f;
         offset.z = -460.8f;
-        func_00406FE4(func_0026D518(D_00431CD4), 0x11D, offset);
+        Primagen_SpawnTossedObject(WeightedTable_PickStatic(D_00431CD4), 0x11D, offset);
         offset.x = 0.0f;
         offset.y = 0.0f;
         offset.z = 614.39996f;
-        func_00406FE4(func_0026D518(D_00431CD4), 0x11D, offset);
+        Primagen_SpawnTossedObject(WeightedTable_PickStatic(D_00431CD4), 0x11D, offset);
         D_8012F608.timer3EC = 300.0f;
     }
-    func_00404450(actor, level);
-    func_0040457C(actor, level);
-    func_0027AD88(D_801100F0, D_8012F608.total * 100 / D_8012F608.bonus);
+    Primagen_UpdateHealth(actor, level);
+    Primagen_UpdateSpawner(actor, level);
+    COnScreen__SetBossPercent(D_801100F0, D_8012F608.total * 100 / D_8012F608.bonus);
     if (actor->pos.y < -204.79999f) {
         D_8012F608.bossMode = 11;
         D_8012F608.dest.x = 0.0f;
         D_8012F608.dest.y = 0.0f;
         D_8012F608.dest.z = 0.0f;
-        func_00243414(actor, level, 0x19);
+        CAI__SetMode(actor, level, 0x19);
     }
 }

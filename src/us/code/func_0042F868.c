@@ -4,7 +4,7 @@
 extern s32 D_800B6D20;
 
 /* Folds the timers' values into the state's checksum. */
-void func_0042F868(void) {
+void Demo_UpdateChecksum(void) {
     DemoPlayer *s = &D_800F56B0;
     s32 i;
 

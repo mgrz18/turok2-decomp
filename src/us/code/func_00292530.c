@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00292530(void *arg0, s32 arg1, s32 arg2);
-extern void func_002933B0(void *arg0);
-extern void func_002933E0(void *arg0, void **arg1);
-s32 func_00292530(void *arg0, s32 arg1, s32 arg2) {
+extern s32 __voiceNeedsNoteKill(void *arg0, s32 arg1, s32 arg2);
+extern void alUnlink(void *arg0);
+extern void alLink(void *arg0, void **arg1);
+s32 __voiceNeedsNoteKill(void *arg0, s32 arg1, s32 arg2) {
     s32 amount;
     s32 total;
     s32 result;
@@ -25,8 +25,8 @@ s32 func_00292530(void *arg0, s32 arg1, s32 arg2) {
                     if (next != 0) {
                         ((ALEventListItem *)next)->delta = ((ALEventListItem *)next)->delta + amount;
                     }
-                    func_002933B0(cur);
-                    func_002933E0(cur, &((ALSeqPlayer *)arg0)->evtq.freeList.next);
+                    alUnlink(cur);
+                    alLink(cur, &((ALSeqPlayer *)arg0)->evtq.freeList.next);
                     goto done;
                 }
                 result = 0;

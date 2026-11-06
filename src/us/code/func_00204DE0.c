@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 func_00203330(s32, s32);
+s32 CCache__Compact(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
@@ -16,7 +16,7 @@ extern u8 D_800D8DB0[];
 extern s32 D_800D8DCC;
 extern Counters D_800D8DEC;
 
-void func_00204DE0(void)
+void CCache__Advance(void)
 {
   s32 temp_a0;
   s8 *new_var;
@@ -46,7 +46,7 @@ void func_00204DE0(void)
   }
   do
   {
-    func_00203330(0, 0);
+    CCache__Compact(0, 0);
     var_s0 += 1;
   }
   while (var_s0 < 0xA);

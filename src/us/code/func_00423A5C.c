@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00423A5C(void);
+extern void PakConfirmMenu_InitNoSpace(void);
 extern int D_801309B0;
 extern s32 D_801309A4;
 extern s32 D_801309B0;
-void func_00423A5C(void) {
+void PakConfirmMenu_InitNoSpace(void) {
     D_801309B0 = 1;
     D_801309A4 = 0;
 }

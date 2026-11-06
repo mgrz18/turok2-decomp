@@ -3,12 +3,12 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00291034(ALEventQueue *, void *, s32);
-void func_00293EC0(ObjRecAt40V2 *arg0) {
+extern void alEvtqPostEvent(ALEventQueue *, void *, s32);
+void alSndpStop(ObjRecAt40V2 *arg0) {
     s32 new_var;
     Buf16 sp10;
     new_var = arg0->field40;
     sp10.count = 1;
     sp10.value = new_var + (arg0->field3C * 0x30);
-    func_00291034(&arg0->events, &sp10, 0);
+    alEvtqPostEvent(&arg0->events, &sp10, 0);
 }

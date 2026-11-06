@@ -1,11 +1,11 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00243414(s32, s32, s32);
+s32 CAI__SetMode(s32, s32, s32);
 
-void func_00447A24(s32 *arg0) {
+void BlindOne_PhaseVulnerableInit_2(s32 *arg0) {
     s32 temp_a0;
 
     temp_a0 = *arg0;
-    func_00243414(temp_a0, temp_a0 + 0x140, 0);
+    CAI__SetMode(temp_a0, temp_a0 + 0x140, 0);
 }

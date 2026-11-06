@@ -8,11 +8,11 @@ extern char D_800B4080[];
 extern char D_800B4098[];
 extern char D_800C1318[]; /* "  %2d"-style */
 extern char D_800C1320[];
-extern s32 func_004160F0(MenuItem *a);
-extern void func_0029E3E0(char *dst, char *fmt, ...);
+extern s32 MenuItem_TextLength(MenuItem *a);
+extern void sprintf(char *dst, char *fmt, ...);
 
 /* Label of the player's 0x80-centred setting at options+0x2A. */
-s32 func_0041C650(MenuItem *a, Menu *c) {
+s32 OptionsMenu_StickVertText(MenuItem *a, Menu *c) {
     CPlayerOptions *options = &D_8011AB18;
     s32 v;
 
@@ -24,10 +24,10 @@ s32 func_0041C650(MenuItem *a, Menu *c) {
         a->text = D_800B4080;
     } else if (v > 0) {
         a->text = D_800B4098;
-        func_0029E3E0(a->text + (func_004160F0(a) - 4), D_800C1318, v);
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C1318, v);
     } else {
         a->text = D_800B4098;
-        func_0029E3E0(a->text + (func_004160F0(a) - 4), D_800C1320, v);
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C1320, v);
     }
     return 0;
 }

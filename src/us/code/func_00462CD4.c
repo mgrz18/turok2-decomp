@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-s32 func_00462CD4(u16 *block, u16 *sum, u16 *inverse) {
+s32 __osIdCheckSum_2(u16 *block, u16 *sum, u16 *inverse) {
     u32 offset;
     *inverse = 0;
     *sum = 0;

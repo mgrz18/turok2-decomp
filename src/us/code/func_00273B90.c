@@ -3,14 +3,14 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00273B90(s32 arg0, s16 arg1);
-extern void func_00293E60(void *sound, s16 sample);
-extern s32 func_00293580(void *sound);
-extern void func_00293E60(void *sound, s16 sample);
-extern s32 func_00293580(void *sound);
-extern void func_00293E60(void *arg0, s16 arg1);
-extern s32 func_00293580(void *arg0);
-s32 func_00273B90(s32 arg0, s16 arg1)
+extern s32 SndVoicePool_GetVoiceState(s32 arg0, s16 arg1);
+extern void alSndpSetSound(void *sound, s16 sample);
+extern s32 alSndpGetState(void *sound);
+extern void alSndpSetSound(void *sound, s16 sample);
+extern s32 alSndpGetState(void *sound);
+extern void alSndpSetSound(void *arg0, s16 arg1);
+extern s32 alSndpGetState(void *arg0);
+s32 SndVoicePool_GetVoiceState(s32 arg0, s16 arg1)
 {
   s32 temp_v0;
   s32 temp_v1;
@@ -23,6 +23,6 @@ s32 func_00273B90(s32 arg0, s16 arg1)
   temp_v1 = slot->owner;
   owner = (OwnerCode8025A3EC8025B5F0 *)temp_v1;
   temp_s0 = owner->sound;
-  func_00293E60(temp_s0, owner->samples[slot->index]);
-  func_00293580(temp_s0);
+  alSndpSetSound(temp_s0, owner->samples[slot->index]);
+  alSndpGetState(temp_s0);
 }

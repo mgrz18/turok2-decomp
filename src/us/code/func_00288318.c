@@ -22,7 +22,7 @@ extern s32 D_80130A50;
 extern s32 D_80130A80;
 extern s32 D_80130A84;
 
-void func_00288318(GfxState288318 *gfx) {
+void CEngineApp__AdvanceFrameData(GfxState288318 *gfx) {
     D_800B6D18++;
     D_800B6D20++;
     D_800B6D1C ^= 1;

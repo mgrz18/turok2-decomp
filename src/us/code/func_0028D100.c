@@ -4,11 +4,11 @@
 #include "structs/game.h"
 
 extern u8 D_800F7078[];             /* the world */
-s32 func_002242F8(void *world, s32 region);
+s32 CScene__GetRegion(void *world, s32 region);
 
-/* Restore every player's state saved by func_0028D264, and in state 1 also
+/* Restore every player's state saved by SavedPlayers_Save, and in state 1 also
  * the position, facing and region. */
-void func_0028D100(void) {
+void SavedPlayers_Restore(void) {
     CPlayerList *list;
     CSavedPlayers *save = &D_8011F290;
     s32 i;
@@ -20,7 +20,7 @@ void func_0028D100(void) {
         if (save->m_State == 1) {
             player->m_CharacterActor.header.m_vPos = save->m_vPos[i];
             player->m_CharacterActor.m_RotY = save->m_RotY[i];
-            player->m_CharacterActor.header.m_pCurrentRegion = func_002242F8(D_800F7078, save->m_Region[i]);
+            player->m_CharacterActor.header.m_pCurrentRegion = CScene__GetRegion(D_800F7078, save->m_Region[i]);
         }
     }
 }

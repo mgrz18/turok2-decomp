@@ -5,23 +5,23 @@
 #include "ultra_types.h"
 #include "structs/pak.h"
 
-extern s32 func_00285878(s32 arg0);
+extern s32 Controller_Lock(s32 arg0);
 extern u8 D_800F677B[];
-extern void func_002858A4();
-extern void func_002847E0(void);
+extern void Controller_Unlock();
+extern void Controller_ReadAll(void);
 extern u8 D_800F6750;
 s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);
 extern s32 func_00425808(s32);
-extern void func_002847E0(void);
-extern void func_002858A4(void);
+extern void Controller_ReadAll(void);
+extern void Controller_Unlock(void);
 s32 func_00425808(s32 ch);
-void func_0045E9D8(void) {
+void Pak_ProbeAll_2(void) {
     extern u8 D_800F6798[];
     s32 channel;
     s32 present;
     RumblePak *record;
-    func_00285878(1);
-    func_002847E0();
+    Controller_Lock(1);
+    Controller_ReadAll();
     D_800F6750 = 2;
     for (channel = 0; channel < 4; channel++) {
         record = &D_80130AA0[channel];
@@ -36,5 +36,5 @@ void func_0045E9D8(void) {
         else if (func_00425808(channel) != 0) D_80130C60[channel] = 3;
         else D_80130C60[channel] = 1;
     }
-    func_002858A4();
+    Controller_Unlock();
 }

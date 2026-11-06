@@ -6,7 +6,7 @@
 extern f32 D_800B6D28;                  /* the frame's time step */
 extern CBox D_800F5A10;               /* visible bounds */
 
-void func_00227680(CPooledLevelActor *actor);
+void CPooledLevelActor__Update(CPooledLevelActor *actor);
 
 /* Releases an actor in use: uncounts it, unlinks it and puts it on the free list. */
 static __inline__ void releaseActor(CLevelActorPool *pool, CPooledLevelActor *actor) {
@@ -33,9 +33,9 @@ static __inline__ void releaseActor(CLevelActorPool *pool, CPooledLevelActor *ac
     }
 }
 
-/* Updates the pool actors (func_00227680); releases those whose lifetime ran out this frame
+/* Updates the pool actors (CPooledLevelActor__Update); releases those whose lifetime ran out this frame
  * or that left the visible bounds. */
-void func_002274A4(CLevelActorPool *pool) {
+void CLevelActorPool__Update(CLevelActorPool *pool) {
     CPooledLevelActor *actor;
     CPooledLevelActor *next;
     s32 expired;
@@ -59,7 +59,7 @@ void func_002274A4(CLevelActorPool *pool) {
         if (expired) {
             releaseActor(pool, actor);
         } else {
-            func_00227680(actor);
+            CPooledLevelActor__Update(actor);
         }
     }
 }

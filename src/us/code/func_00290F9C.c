@@ -1,12 +1,12 @@
 #include "common.h"
 
-s32 func_002933E0(s32, s32);
+s32 alLink(s32, s32);
 s32 osSetIntMask(s32);
 
-s32 func_00291270(s32, s16 *, s32);         /* extern */
-s32 func_002933B0(s32);                         /* extern */
+s32 alCopy(s32, s16 *, s32);         /* extern */
+s32 alUnlink(s32);                         /* extern */
 
-s32 func_00290F9C(void *arg0, s16 *arg1)
+s32 alEvtqNextEvent(void *arg0, s16 *arg1)
 {
   s32 temp_s0;
   s32 temp_s2;
@@ -17,9 +17,9 @@ s32 func_00290F9C(void *arg0, s16 *arg1)
   temp_s2 = new_var;
   if (temp_s0 != 0)
   {
-    func_002933B0(temp_s0);
-    func_00291270(temp_s0 + 0xC, arg1, 0x10);
-    func_002933E0(temp_s0, (s32) arg0);
+    alUnlink(temp_s0);
+    alCopy(temp_s0 + 0xC, arg1, 0x10);
+    alLink(temp_s0, (s32) arg0);
     var_s0 = *((s32 *) (((s8 *) temp_s0) + 8));
   }
   else

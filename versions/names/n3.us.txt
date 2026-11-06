@@ -1,0 +1,580 @@
+// N2 naming round, part n3: functions at 0x00240000-0x0025FFFF (532 files).
+// Collision sweeps and platforms, the generic AI core (mode tables, targets,
+// turning, damage), the player (weapons, weapon wheel, movement states,
+// multiplayer bookkeeping), the first-person weapon actor, and the generic
+// enemy AI with its mode/reaction callbacks. Most of these are named by
+// behavior: the function was read, together with its callers/callees and the
+// player-state and AI-mode tables in us/asm/data/os_rodata.data.s.
+
+// Collision (turok3 colinfo.c / unicol.c neighbourhood): sweeps of a moving
+// instance against the actors and the map regions. Sweep/MapSweep are
+// structs/collision.h; D_800F1ADC is turok3's gCollisionResultsP.
+Collision_SweepActors = 0x0024032C; // gathers world movers whose CBox the swept segment touches, sorts them nearest first (func_00226F90 with the two helpers below), sweeps against each
+Collision_BoxCorners = 0x002406D8; // writes the eight corners of a min/max box, bottom face then top
+Collision_SwapInstanceHits = 0x0024079C; // swap callback Collision_SweepActors passes to the sort (RW func_802405FC_de)
+Collision_CompareInstanceHits = 0x002407D8; // compare callback for the same sort: on the f32 hit fraction at 0x4
+Collision_SweepRegionWalls = 0x00240800; // recursive walk of the regions the sweep's box overlaps, testing each wall edge and its corners (func_0023AB18/func_0023B38C)
+Collision_SweepMapWalls = 0x00240E90; // sets up the MapSweep (radius, x/z bounds) and calls Collision_SweepRegionWalls from the instance's region
+Collision_SweepRegions = 0x00241010; // walks a sweep region to region: floor, ceiling, water surface or edge hits, writes m_vFloorPos/m_vWaterPos/m_vWallPos of the results
+CCollisionResults__Clear = 0x00241894; // turok3 colinfo.c order (func_2291D4 sits between CCollisionInfo__Reset and CCollisionSetup__Construct); zeroes m_pInstance, m_pShape, m_pWallRegion, m_pFloorRegion, m_pWaterRegion
+CCollisionSetup__Construct = 0x002418C0; // turok3 colinfo.c: CCollisionInfo__Reset calls it with gCollisionSetupTable (here D_0042D510); copies each table entry into its CCollisionInfo
+
+// Moving platforms (CPlatformIntelligence m_CollisionType 0 ground, 1 cylinder, 2 box).
+Platform_GetCollisionBox = 0x00241960; // the eight corners of a platform's collision box in world space (m_CollisionWidth/Height/Length/Offsets, pitch and m_RotY)
+Platform_LandOnTop = 0x00241CB0; // puts the collider on the platform's top face within reach: sets m_pInstanceBelow, AI flag 0x10000
+Platform_CollideGround = 0x00241E30; // "kind 0" platform collision
+Platform_CollideBox = 0x00241FC8; // "kind 2" platform collision, the box's side faces
+Platform_CollideCylinder = 0x00242284; // "kind 1" platform collision
+Platform_GetTopHeight = 0x002425A4; // height at (x, z) of the quad built from box points 0-3
+Platform_Collide = 0x00242604; // switch on m_CollisionType to the three above; on a hit fills m_vShapePos/m_pShapeRegion/m_pShape of the results
+Platform_HitFace = 0x002426F4; // sweep against one quad face of a platform (func_0023AB18), sets m_pInstanceBelow and AI flags 0x10000/0x20000; used as a callback
+
+// The generic AI core (CAI at CGameObjectInstance+0x140, structs/game_object.h;
+// RW cites it as src/WEAPONS/80213ED4*.CPP and src/game/func_002149C0..).
+AI_InitHealth = 0x002427E0; // health, tranq health and aggression from the CIntelligence, scaled by difficulty D_8011AAE0 (8/16/32) and the multiplayer skill
+CAI__Setup = 0x002429BC; // RW src/AI/NAV/80212C90_18.CPP ACTOR_SETUP: clears the CAI (keeping m_pParent), installs the callbacks, seeds the initial position/scale copies
+AI_RideMovingPlatform = 0x00242C00; // carries an actor standing on a platform (func_00267800) along with its move and turn; AI flags 0x40000/0x80000
+AI_UpdateRegionFlags = 0x00242E34; // AI flags 0x7F80 from the region's CRegionInfo (water, deep water...) and periodic region damage
+CAI__UpdateModeAnim = 0x00243170; // runs the current mode entry (m_pModeCurrent) on a mode change: its scale, flags and animation callback, then the animation repeat count
+CAI__SetMode = 0x00243414; // 278 callers: sets m_Mode, looks the mode up in the m_pModeTable chain, runs its enter hook and takes its flags (4 = stop)
+AI_IsInViewCone = 0x002435AC; // whether target is within range and inside the viewer's horizontal and vertical angles
+AI_UpdatePathHeading = 0x002438C0; // picks the goal by target kind (dead/home/location/leader/player...), path-finds to it and sets m_PathHeight and m_PathRotY
+AI_FindBestTarget = 0x00243C90; // the nearest candidate (sides' leaders, ignored actor, creatures, players) the AI may attack and, optionally, see
+AI_GetPathTargetInfo = 0x00244338; // fills a CAITarget for m_pPathTarget: kind, target, range, goal and offsets (3D and flattened)
+AI_GetSightTargetInfo = 0x002449E0; // same for m_pSightTarget: kind, turn to face it, position, offset, distance
+AI_FindClearHeading = 0x00244E84; // heading toward pos, or the first unblocked one 30..150 degrees to either side
+AI_IsAimedAt = 0x002451AC; // whether target (a player with a ready weapon, a creature in an attack pose) aims at self; returns the side
+Actor_GetTypeClass = 0x00245724; // maps func_00268C04's type id to a class 0-9 (3 by default)
+DamageEvent_Set = 0x00245828; // fills a DamageEvent (source, damage, radius, flags, frame); 14 callers
+CAI__Update = 0x00245848; // per-frame AI: freeze timer, position history, AI_UpdateRegionFlags, AI_RideMovingPlatform, the step callback, CAI__UpdateModeAnim
+AI_ComputeFrameMotion = 0x0024599C; // CAIFrameMotion: delta/dir/dist since m_vPosLastFrame (3D and flat) and the turn since m_RotYLastFrame
+AI_PickAnimFromTable = 0x00245A98; // weighted random pick among the table's animations whose flags match and that the actor has (func_00219F74)
+AI_TurnClamped = 0x00245BAC; // turns by a rate clamped to +-max, scaled by the frame step D_800B6D28, not past the wanted angle
+AI_TurnTowardTarget = 0x00245C5C; // AI_FindClearHeading to the target, then the same clamped turn
+AI_GetTargetKind = 0x00245D50; // 0 enemy, 1 threatening player, 2 parent, 3 none, 4 path track, 5 type-5 intelligence, 6 dead, 7 actor 0x64F (the switch of AI_UpdatePathHeading)
+AI_IsEyeLineBlocked = 0x00245E48; // sweeps between the two actors' eyes (0.8 of the height); 1 if a wall or floor region flagged 2 is hit
+AI_IsLineOfSightBlocked = 0x00245FC8; // sweeps from the top of one actor to the top of the other; blocked unless what it hit is the target
+AI_SetTargetOverride = 0x002460FC; // writes CAI m_pTargetOverride (0x78) and m_TargetOverrideTime (0x7C)
+AI_UpdateTargets = 0x00246108; // counts m_TargetOverrideTime down (clearing the override), then AI_GetPathTargetInfo / AI_GetSightTargetInfo; 63 callers
+AI_AngleToPoint = 0x00246310; // signed angle between the actor's facing (0x50) and the direction to a point
+Actor_TurnBy = 0x00246440; // adds to m_RotY and wraps it
+AI_SpawnParticlesOnce = 0x0024646C; // once per flag bit: spawns the particles of two mask tables (D_800AD950, D_800ADA58) at the actor via func_00268C48
+ValuePair_Set = 0x00246588; // sets a value and its initial copy
+AI_NextInCycle = 0x00246594; // returns the next s16 of a -1-terminated list, wrapping to its start
+CAI__CallHurt = 0x002465C8; // calls m_pfHurt if set; 9 callers
+AI_DistSqToPointAtHeight = 0x002465F0; // squared distance from the actor's position raised by 0x54 to a point
+AI_FlatDistSqToPoint = 0x0024665C; // squared XZ distance from the actor to a point
+Actor_SpawnParticle = 0x00246690; // spawns a particle of a kind from an actor/particle at a point, with its velocity and rotation (func_0022F350)
+AI_StartSound = 0x00246860; // replaces the AI state's sound with sound id at the actor (func_00275C6C)
+AI_StopSound = 0x00246918; // stops and clears the AI's attached sound
+AI_PushAway = 0x0024699C; // moves b away from c by both radii plus a margin (func_002688C8)
+AI_SetTargetPoint = 0x00246A74; // fills a CAITarget of kind 3 with a fixed point (no target, zero offsets)
+AI_SpawnParticlesByMask = 0x00246B24; // spawns the particles of a mask table whose bit is in mask (func_00268C48)
+
+// The player (CPlayer, structs/player.h): input, scope, kills, ammo,
+// damage, death, drawing and the auto-aim.
+CPlayer__ReadInput = 0x00246BC0; // controller buttons through the remap table D_800ADA70 (m_ControlSide 1), then move/strafe/turn/look from m_ControlType, scaled by m_SettingY and the zoom
+CPlayerContState__Init = 0x002470E8; // clears a CPlayerContState (CPlayer.m_ContState at 0xA40: look/move axes, buttons) and sets m_pContState (0x10) to the controller D_800F5EC0[n] (see CPlayer__ResetControlState)
+Player_SwapStrafeTurnBits = 0x00247124; // swaps button bits 8<->0x10000 and 4<->0x80000 of a mask, leaves the rest
+CPlayer__AnimateScope = 0x00247170; // places the scope model and swings it up (state 1) or down (state 3) over 3.75 frames; sniper scope 0xC83 from the side
+CPlayer__DrawScope = 0x00247438; // draws the scope model (render state, its matrix from the view) when it has an object and a state
+CPlayer__UpdateZoom = 0x00247660; // sniper zoom: button 0x100 toggles it on a weapon with a scope, 8 in / 4 out while 0x10 is held
+CPlayer__ShowKillMessages = 0x002478C8; // "killed by"/"tagged by" on the victim's screen, "you killed"/"you tagged"/"head shot!" on the killer's
+Player_OnMultiplayerKill = 0x00247C10; // a player's actor took a lethal hit in multiplayer: works out the killer, updates kills, deaths, tags and team counts
+Player_DrawNodeCallback = 0x00247FB0; // player actor node-draw callback (VM func_0042DA60): team colour or tag fade, shock flash, then the held weapon on its node
+CPlayer__Reset = 0x00248340; // resets the player's movement, camera and crosshair state; 12 callers
+CPlayer__CanGetRefill = 0x00253640; // whether Adon has not yet helped with ammo (kind 0) or health (kind 1) on the hub level func_0026EFB8 maps to (1-6)
+CPlayer__RefillFrom = 0x002484F8; // Adon's refill: kind 0 tops up every owned weapon's ammo, kind 1 health to 100; notes who gave it (see CPlayer__CanGetRefill)
+CPlayer__CollectKeyPiece = 0x00248644; // key piece id-4000; key 4500 counts per level and after the sixth flags the player and gives ammo
+CPlayer__FireWeapon = 0x00248720; // spends ammo, advances the firing animation, picks the projectile (sniper/charge variants), launches it from the camera (func_0022F350)
+CPlayer__GiveStartingWeapons = 0x00248A8C; // strips weapons and ammo, gives the multiplayer character's kit or knife and bow with 20 rounds
+CPlayer__Warp = 0x00248BA8; // puts the player at a warp point: hub warps 1000..6000 (func_00424A60), marks visited hubs, picks the CWarpPoint farthest from the other players
+CPlayer__Kill = 0x00249118; // drops the weapon in multiplayer, plays a death animation picked from the cause unless one is given
+CPlayer__Hurt = 0x00249358; // damage scaled by the reduced-damage state and handicap, then red flash, low-health warning, rumble and hurt sound
+CPlayer__DrawCharacter = 0x0024972C; // picks the player's model (single player, tag mode, character) and sets the render state before func_0021D39C
+CPlayer__DrawWeaponOverlay = 0x00249898; // the weapon's HUD overlay, scissored to its screen box
+CPlayer__CanLockOn = 0x00249A58; // whether the player's weapon may lock on to a target
+Player_FindAutoAimTarget = 0x00249C20; // the target closest to the aim direction inside the weapon's cone, and the rotation that turns the aim to it
+Player_UpdateAim = 0x0024A0DC; // second function of func_00249C20.c: per-frame aim rotation and target lock times per weapon (13, 16, 29...)
+Hud_DrawWorldSprite = 0x0024A678; // a sprite at a world position projected to the screen (or centred for HUD sprites 0x2BC/0x2DA/0x2E4)
+CPlayer__DrawTargetMarkers = 0x0024A86C; // the player's two target markers
+CPlayer__UpdateFlashlight = 0x0024AB0C; // counts m_FlashlightTime, updates m_pDLFlashlight1/2 (flickering under 70) and drops m_pDLDarkCityLight (RW func_0021E5D4)
+
+// The weapon wheel: LibTEngine's CBarrel (structs/weapon.h), CPlayer.m_Barrel.
+CBarrel__DrawIcons = 0x0024AF68; // sorts the listed icons (func_00226F90 with the two helpers at 0x2571D8/0x257124) and places them on the wheel or a fading strip
+CBarrel__DrawRing = 0x0024B3E4; // lays out the slots around the wheel (cursor slot scaled 1.3) and draws them (RW func_80217928_de)
+CBarrel__RunButtons = 0x0024B5A0; // marks usable weapons, steps the cursor with next/previous weapon, turns the wheel to the selection
+CBarrel__GetStickDirection = 0x0024B88C; // 8-way stick direction (0 = up, clockwise), -1 in the dead zone
+CBarrel__RunStick = 0x0024BAD4; // stick-driven wheel: the slot under the stick becomes the hovered and chosen entry
+CBarrel__Update = 0x0024BD18; // runs the wheel by stick or buttons, slides it open (1), keeps it (2) until CBarrel__ShouldClose, slides it shut (3)
+CBarrel__Fill = 0x0024BF1C; // fills the wheel with the weapons flagged in owned, spread evenly around it
+CBarrel__Open = 0x0024C0B4; // flags the pickable weapons, lays them out on one or two rings, steps the cursor
+CBarrel__LayoutEight = 0x0024C2A0; // the eight-slot wheel from its layout table, 45 degrees apart, alternates for owned upgrades
+CBarrel__OpenWheel = 0x0024C47C; // picks the weapons to show and how many times round so slots are at most 20 degrees apart (head of the func_0024C47C.c source file)
+CPlayer__DrawHud = 0x0024C648; // in func_0024C47C.c: HUD items, crosshair, ammo (charge gauge), health, lives, keys, score and frags
+CPlayer__UpdateOrbitCamera = 0x0024CF58; // in func_0024C47C.c: points the camera at a target, mode 1 from offsets, mode 2 orbiting with the buttons
+CPlayer__UpdateWeaponSet = 0x0024D1F8; // in func_0024C47C.c: weapon set 0 on foot, 1 in states 10-11, 2 with flag 0x8000; queues the new set's weapon
+CPlayer__Update = 0x0024D344; // in func_0024C47C.c (RW func_80220ED4_de): input toggles, regeneration, the state machine and collision over the frame time, animation, cheats, weapon sounds
+CBarrel__Reset = 0x00254C44; // clears the wheel and sets the 36 slots' angles and scale (RW func_8021836C_de)
+CBarrel__Draw = 0x00254CC0; // sets bilinear filtering, then CBarrel__DrawEight (eight-slot mode at 0x380) or CBarrel__DrawRing
+CBarrel__DrawEight = 0x00254D5C; // the eight slots dropping in as the wheel opens, drawn
+CBarrel__ShouldClose = 0x00254F24; // eight-slot mode: closes unless 0xC000 is held; otherwise counts the open timer down
+CBarrel__HasUnlistedWeapon = 0x00254F88; // whether the player holds a usable weapon not in the wheel
+CPlayer__GetSelectableWeapons = 0x00255048; // fills 35 flags of selectable weapons and returns the count
+CBarrel__SetEntry = 0x002550E8; // fills one entry with a weapon, selecting it if it is the requested one
+CBarrel__Close = 0x002551A0; // m_State 0, m_Turn 0, cursor -1, m_Open 0
+
+// Player movement states. CPlayer__SetState switches through the state table
+// D_800ADF54 (0x18-byte entries {enter, update, tuning, flags, anim, ...};
+// states 0-1 empty). The state numbers below are table indexes.
+CPlayer__SetState = 0x0024E5F0; // sets m_Mode/m_ModeBefore, runs the table entry's enter hook, takes its flags and anim; 32 callers
+CPlayer__GetWeaponAmmo = 0x0024E700; // rounds of a weapon's ammo, -1 if none; 21 callers
+CPlayer__GetCurrentAmmoInfo = 0x0024E7D0; // the D_800AF6A8 entry of the current weapon's ammo type, -1 if none
+CPlayer__CheckWater = 0x0024E88C; // enters swimming (11) or wading (9) from the actor's water flags
+CPlayer__CheckJumpPad = 0x0024E9D0; // enters state 32 (jump pad) in a region flagged 0x1000 whose key requirements are met
+CPlayer__TryMount = 0x0024EAF8; // mounts creature 0x136 in front within 45 degrees: takes its seat and heading
+CPlayer__RamWithMount = 0x0024ED54; // while riding, button 0x8000 throws the creature in front and shakes the view
+CPlayer__TurnAndLook = 0x0024EF70; // turns the body and tilts the view from the stick at the tuning's rates; 9 callers
+CPlayer__MoveOnFoot = 0x0024F174; // walking movement: forward/strafe toward the stick, dodge impulses, into the velocity (RW func_802233F0_de)
+CPlayer__MoveInWater = 0x0024F658; // swimming movement: speeds, dodges, climb, drag and roll (RW func_802238E0_de)
+CPlayer__BobView = 0x0024FC08; // settles tilt and kicks, bobs the view with the walk
+CPlayer__BobViewStride = 0x0024FE10; // same, bobbing with the stride scaled by the speed
+CPlayer__UpdateFlyCheat = 0x0025005C; // fly mode cheat: turn/pitch with the stick, fly with the buttons, all three 0xE000 buttons leave it
+PlayerStand_Update = 0x00250430; // state 2 update: bob, turn, hand off to a jump or to walking, turning animation
+PlayerWalk_Update = 0x002505F8; // state 3 update: bob, turn and move, jump or stop, wading sound, walking animation
+PlayerWade_Update = 0x002508D0; // states 8-9 update: follow the water surface, dive when looking down, stroke sounds
+PlayerSwim_Update = 0x00250BF0; // states 10-11 update: swim, surface and gasp, leave for falling/wading/walking
+PlayerClimb_Update = 0x00250EC0; // state 14 update: face the wall, look, jump off, climb with the stick, step sounds
+CPlayer__StartDeathCinema = 0x00251698; // death-state enter: decides m_DoDeathCin from the region and mode, starts cinema `kind` (func_00283FF8) with callback 0x257784, scales from the 0xC45 actor
+PlayerJumpPad_Update = 0x00251828; // state 32 update: eases the yaw to m_JumpPadAngleDirection and flies from m_vJumpPadStart to the target over its duration (RW func_00225D10)
+CPlayer__UpdateRiding = 0x00251A2C; // riding: the mount sways the view, charges on button 8, shakes at each step; called by both ride states
+PlayerShock_Update = 0x00251E28; // state 35 update: flash and shake, then back to standing taking the shock's damage
+Player_ZeroVelocity = 0x0025556C; // (unused, arg, CPlayer*) callback shape: zeroes the character actor's velocity; no reference found
+PlayerStand_Enter = 0x0025557C; // state 2 enter: straight to walking (3) when moving
+PlayerWalk_Enter = 0x002555C4; // state 3 enter: empty
+PlayerJump_Enter = 0x002555CC; // state 4 enter: jump speed from the tuning (higher on level 0x1DB1), plus the platform's velocity, jump sound 0x3AC1
+PlayerJump_Update = 0x00255670; // state 4 update: keeps rising while 0x10 is held under 3 time units, then falling (5)
+PlayerFall_Update = 0x00255714; // state 5 update: eases the lean back, moves, landing animation 0x7F8
+PlayerDodge_Enter = 0x00255840; // state 6 enter: side speed left or right from the stick
+PlayerDodge_Update = 0x00255884; // state 6 update: hop sideways until the stick lets go, then state 7
+PlayerDodgeFall_Update = 0x00255940; // state 7 update: turn and move with the standing tunings, back to standing (2) on the ground
+PlayerWade_Enter = 0x002559E0; // states 8-9 enter: stop the fall and ease the height to the surface
+PlayerSwim_Enter = 0x00255A44; // states 10-11 enter: lowest height reached, damp the motion, splash sound 2000
+PlayerState12_Enter = 0x00255B20; // (entered by CPlayer__CheckState12Hit) states 12-13 enter: damps the speeds and the vertical velocity
+PlayerState12_Update = 0x00255B50; // the file calls it a landing state; states 12-13 update: pose 0xC/0xD, animations 0x8A2/0x8A7/0x14, then walking (3)
+PlayerClimb_Enter = 0x00255C5C; // state 14 enter: stops, hand side, clears the actor's motion
+PlayerState15_Enter = 0x00255C80; // state 15 enter: stops and opens a menu screen (per multiplayer slot D_0043AB60.., else D_00439748/D_004396DC) on the camera's menu pool
+PlayerState15_Update = 0x00255D68; // state 15 update: empty
+PlayerState16_Enter = 0x00255D70; // state 16 enter: clears the shock, opens the slot's screen (D_0043ABF0..) in multiplayer
+PlayerState17_Enter = 0x00255E4C; // state 17 enter: opens menu D_800C1E54 for the first active player
+PlayerState17_Update = 0x00255EA8; // state 17 update: empty
+PlayerDeathWait_Enter = 0x00255EB0; // state 18 enter: clears the wait timer, velocity, shock; m_CharAnim 1
+PlayerDeathWait_Update = 0x00255F04; // state 18 update: after 75 time units (or the team match over) goes to 16 or 17
+PlayerCinema50_Enter = 0x00255FC4; // state 31 enter: starts cinema 0x50 (func_00283FF8) with callback 0x2577DC
+CPlayer__UpdateDeath = 0x00255FF4; // the death states' update: fall in state 29, tilt the head, after 37.5 hand over to func_0042E29C
+PlayerDeath0A_Enter = 0x00256084; // state 19 enter: CPlayer__StartDeathCinema(0xA)
+PlayerDeath0A_Update = 0x002560A0; // state 19 update: CPlayer__UpdateDeath
+PlayerDeath32_Enter = 0x002560BC; // state 28 enter: CPlayer__StartDeathCinema(0x32) (saves the fog colour)
+PlayerDeath32_Update = 0x002560D8; // state 28 update: CPlayer__UpdateDeath
+PlayerDeath1E_Enter = 0x002560F4; // state 20 enter: CPlayer__StartDeathCinema(0x1E)
+PlayerDeath1E_Update = 0x00256110; // state 20 update
+PlayerDeath28_Enter = 0x0025612C; // state 24 enter: CPlayer__StartDeathCinema(0x28)
+PlayerDeath28_Update = 0x00256148; // state 24 update
+PlayerDeath0B_Enter = 0x00256164; // state 22 enter: CPlayer__StartDeathCinema(0xB)
+PlayerDeath0B_Update = 0x00256180; // state 22 update
+PlayerDeath0C_Enter = 0x0025619C; // state 25 enter: CPlayer__StartDeathCinema(0xC)
+PlayerDeath0C_Update = 0x002561B8; // state 25 update
+PlayerDeath0D_Enter = 0x002561D4; // state 26 enter: CPlayer__StartDeathCinema(0xD)
+PlayerDeath0D_Update = 0x002561F0; // state 26 update
+PlayerDeath0E_Enter = 0x0025620C; // state 27 enter: CPlayer__StartDeathCinema(0xE)
+PlayerDeath0E_Update = 0x00256228; // state 27 update
+PlayerDeath0F_Enter = 0x00256244; // state 30 enter: CPlayer__StartDeathCinema(0xF)
+PlayerDeath0F_Update = 0x00256260; // state 30 update
+PlayerDeath14_Enter = 0x0025627C; // state 29 enter: CPlayer__StartDeathCinema(0x14)
+PlayerDeath14_Update = 0x00256298; // state 29 update
+PlayerDeath46_Enter = 0x002562B4; // state 21 enter: CPlayer__StartDeathCinema(0x46)
+PlayerDeath46_Update = 0x002562D0; // state 21 update
+PlayerDeath3C_Enter = 0x002562EC; // state 23 enter: CPlayer__StartDeathCinema(0x3C)
+PlayerDeath3C_Update = 0x00256308; // state 23 update
+PlayerJumpPad_Enter = 0x00256324; // state 32 enter: stores the jump pad region and start (m_vJumpPadStart), the heading to it, sound 0x1450
+PlayerRideIdle_Enter = 0x002563DC; // state 33 enter: closes the weapon wheel, head movement on
+PlayerRideIdle_Update = 0x002563FC; // state 33 update: CPlayer__UpdateRiding, to 34 when moving
+PlayerRideMove_Enter = 0x00256450; // state 34 enter: same as 33's
+PlayerRideMove_Update = 0x00256470; // state 34 update: CPlayer__UpdateRiding, to 33 when stopped
+PlayerShock_Enter = 0x002564C4; // state 35 enter: flag 0x800000, shock time; on a mount (14) pushes it
+
+// The player pool: our CPlayerList (structs/player_list.h, D_80119870.m_PlayerList)
+// is Turok 3's CPlayerPool (turok3 include/playerai.h: m_FreeList/m_ActiveList,
+// gEngineApp.playerPool), so its methods are CPlayerPool__.
+CPlayerPool__Update = 0x00251FC4; // moves each player in the game (unless CPlayer__IsPausedOrInMenu), pause/death screen, hub key screen, level-end cinema, joins and leaves, match clock and tag
+CPlayer__BecomeIt = 0x0025247C; // tag: the player becomes "it": sound, weapon wheel and weapon reset, respawn with full health
+CPlayerPool__PickTagIt = 0x002525BC; // tag: picks who is "it" at the start of a round, flashing over the viewports
+CPlayerPool__RespawnAll = 0x00252840; // every player respawned at a spawn point with full health, out of tag mode
+CPlayerPool__IsFragLimitReached = 0x0025295C; // either team's total in team games, else one player's frags
+CPlayerPool__AnimateWeapons = 0x00252ADC; // each living player's weapon model animated on its own, put back on the player; stops weapon sounds otherwise (called from the scene update func_00220530)
+CPlayerPool__ReloadAnimInfo = 0x00252C70; // reloads the animation object info of every player's actor, the weapon for the viewing player
+Hud_DrawMatchClock = 0x00252E08; // the match clock (D_8011AAD8.match.timeLeft, 1/15 s ticks) at the top of the view, blinking in the last 30 seconds
+CPlayerPool__PreUpdate = 0x00253018; // from the scene update (func_00220530) before the actors: resets each player's character and weapon actor (func_0021EBC0) and their animation info (RW func_8022A170_de)
+CPlayerPool__RegisterActors = 0x002530A4; // adds the active players' actors to the scene's actor list (+0xEC, count at 0x8EC, at most 0x200)
+CPlayerPool__DrawCharacters = 0x00253148; // CPlayer__DrawCharacter for each player not seen through its own first-person camera
+CPlayerPool__DrawWeaponOverlays = 0x002531D0; // CPlayer__DrawWeaponOverlay for the player of a first-person camera
+CPlayerPool__DrawHuds = 0x0025322C; // CPlayer__DrawHud for the player of the camera
+CPlayerPool__DrawMatchClock = 0x0025328C; // wrapper of Hud_DrawMatchClock
+CPlayerPool__GetFirstActive = 0x002532A8; // m_ActiveList.m_pHead; 24 callers
+CPlayerPool__FindTagged = 0x002532B4; // the first player whose options tag mode (0x3E) is 1
+CPlayerPool__FindNearest = 0x002532EC; // the active player nearest a point (RW func_0022A470)
+CPlayerPool__FindNearestOther = 0x00253370; // the nearest player with 0x524 set, skipping one (RW func_0022A4F4)
+CPlayerPool__GetIndex = 0x0025340C; // (player - m_Players) / 0x1328; 31 callers
+CPlayerPool__FindByController = 0x0025342C; // the player record driven by controller n (RW func_8022A5C0_de)
+CPlayerPool__CheckAllReady = 0x00253460; // once every player's options byte 0x3D is 1, the match's over flag becomes done
+CPlayerPool__EndMatch = 0x002534E0; // sets the match (or team) over flag and puts every player in state 18
+CPlayerPool__SetInvincibility = 0x002535E4; // sets m_InvincibilityTime of every active player
+ValueTracker_Set = 0x0025360C; // sets a value, flagging when it repeats the old one
+CPlayer__IsSpecialPickup = 0x002536B4; // single player only: whether a pickup id is in 4000..5024 (m_SpecialPickupCount range)
+CPlayer__GetSpecialPickupIndex = 0x002536D8; // id - 4000
+CPlayer__UseSpecialPickup = 0x002536E0; // decrements m_SpecialPickupCount[id - 4000] (except 0x111C..0x1120)
+CPlayer__GetPickupCountLow = 0x00253720; // low nibble of a packed pickup counter byte (0xA74 back from the index), 1 in multiplayer
+CPlayer__GetPickupCountHigh = 0x00253748; // high nibble of the same byte
+CPlayer__OnParticleHit = 0x00253770; // a projectile hit on the player: charge dart 0x128 adds shock time (60..150) and records m_pHitMeWithChargeDart, ...
+CPlayer__RebuildWeaponActor = 0x00253864; // rebuilds the weapon actor (func_0021F1B4/func_0021A344, keeping D_800B6D28) and puts it where the character is
+CPlayer__GetFiringAmmo = 0x0025398C; // the AmmoInfo a weapon fires now (lower ammo when selected and stocked, else the first stocked)
+CPlayer__GetFiringAmmoType = 0x00253A1C; // the ammo type a weapon fires now, -1 if none
+CPlayer__GetMaxAmmo = 0x00253AC0; // most rounds of an ammo type any (held) weapon carries
+CPlayer__AddAmmo = 0x00253B54; // adds rounds up to the maximum; whether there was room
+CPlayer__HasRoomForAmmo = 0x00253C14; // whether a pickup's ammo still fits, held weapons only
+CPlayer__IsBelowFullHealth = 0x00253CF0; // m_Health < 100 (24.8)
+Actor_GetEyeHeight = 0x00253CFC; // the intelligence's m_CollisionHeight * 0.9, a default without one
+Actor_GetHeightOrDefault = 0x00253D30; // func_002671B4 (height) with a definition, else a constant
+CPlayer__SetPosition = 0x00253D68; // puts the character and weapon actors at a point and in its region (func_00220A1C); whether it has one
+CPlayer__StartWeaponBackgroundSound = 0x00253DE0; // restarts m_pLoopingSound_WeaponBackground with a sound id
+CPlayer__StopWeaponBackgroundSound = 0x00253E68; // stops and clears m_pLoopingSound_WeaponBackground
+CPlayer__StartWeaponFiringSound = 0x00253EB8; // restarts the firing looping sound with a sound id
+CPlayer__StopWeaponFiringSound = 0x00253F40; // stops the firing looping sound
+CPlayer__TransformByView = 0x00253F90; // a point through the player camera's view orientation, in place
+PlayerPool_GetNumPlayers = 0x00253FD0; // returns D_80119878, the pool's m_nPlayers (CPlayerList at 0x80119870 + 8); compared >= 2 in CPlayer__StartDeathCinema
+CPlayer__HasMenuOpen = 0x00253FE0; // whether the player's camera has a menu (m_Menus.count)
+CPlayer__IsPausedOrInMenu = 0x00253FFC; // paused (D_8011ACA4) or a menu other than the death screen on the player's camera
+CPlayer__PickSpawnPoint = 0x00254044; // picks a spawn point for the player and copies its position
+CPlayer__Respawn = 0x002540E4; // respawn at a spawn point with full health; 7 callers
+CPlayer__LoadCharacterModel = 0x002541E4; // the character model id (0x66 single player, tag model, or per character D_800ADB30) set on the actor (func_002241D8)
+CPlayer__LoadWeaponModel = 0x0025426C; // the current weapon's model (D_800AF618[weapon]->model) set on the weapon actor
+Actor_ReloadAnimInfo = 0x002542B4; // for actors flagged 0x40000: reloads the animation object info, optionally turned toward the owner's camera
+CPlayer__UpdateWaterRegion = 0x002543A4; // oxygen reset out of water, CPlayer__UpdateSubmerged when entering a 0x2 (flags52) region...
+CPlayer__UpdateOxygen = 0x00254430; // m_Oxygen counts up: warning sound 0x163 at 300, drowning damage after 600
+CPlayer__UpdateSpeedScale = 0x00254640; // 0xB28: 1 in modes 0-1, else the actor's speed scale (times the multiplayer speed setting, times the region's on ground)
+CPlayer__HasScope = 0x00254564; // whether the current weapon has a zoom model
+CPlayer__UpdateSubmerged = 0x00254584; // with the 380th special pickup (or in multiplayer) runs the oxygen while submerged, else 10 damage of type 0x1C
+CPlayer__EaseEyeOffset = 0x002545F0; // eases m_ActualCameraVertEyeOffset toward the region's eye offset
+CPlayer__TickFlashlight = 0x00254704; // m_FlashlightTime counts down to 0
+CPlayer__ResetLives = 0x00254744; // m_Lives 3, 1 in D_8011AAF1's mode
+CPlayer__IsInMatchEndState = 0x002548FC; // m_Mode 16, 17 or 18; 7 callers
+CPlayerPool__UpdateMatchClock = 0x0025492C; // runs the match clock and ends the match on time or (outside tag) the frag limit
+CPlayerPool__IsScoreLimitReached = 0x00254A5C; // some player sums at least D_8011ACB0.scoreLimit
+CPlayerPool__GetViewPlayer = 0x00254B04; // the index-th player with a camera whose 0x54C and options 0x3F are clear
+CPlayerPool__ClearLastTagMode = 0x00254B6C; // m_LastTagMode 1 -> 0 for every active player
+CPlayerPool__CountPlaying = 0x00254B9C; // players with no menu open and m_LastTagMode clear
+CPlayerPool__CountIdleMenus = 0x00254BE4; // active players whose camera's menu pool is idle
+
+// More player helpers (0x255220-0x257A40).
+CPlayer__CheckState12Hit = 0x00255220; // into state 12 when hit by an actor with AI flag 0x800, unless already in 12, 13 or 16-18
+CPlayer__CheckClimb = 0x00255298; // into state 14 (climbing) touching an actor whose intelligence has flag 1 and AI flag 0x1000
+CPlayer__CheckJumpOn = 0x00255340; // into state 4 touching an actor with intelligence flag 2 (and AI 0x6000 clear) when player flag 0x10 is set
+CPlayer__Dismount = 0x002553BC; // leaves the mount (m_pOnEnemy, func_0025EC28), state 5, thrown ahead 102.4 and up 163.84 with velocity 358.4
+CPlayer__CheckTagHit = 0x002554D0; // multiplayer: the last collision (D_800F1CE0) is actor 0x64E changing mode: ends the player's tag mode 1
+Ease_CubicOut = 0x00256584; // c - (c - t)^3 with c = D_800A71D8
+CPlayer__ResetHeadSway = 0x002565A4; // 0xABC = 0, 0xAB4 = 0xAB0, 0xAB8 = 23 degrees
+CPlayer__ResetJumpAngle = 0x002565C0; // m_DesiredJumpAngle 0, m_JumpU 0, m_StartJumpAngle = m_JumpAngle
+CPlayer__IsCrouched = 0x002565DC; // m_DuckOffset > 5.12
+CPlayer__UpdateCrouch = 0x00256604; // button 0x400 toggles the crouch in poses 2 and 3, eases the crouch height toward 40.96
+Actor_PlayRangedSound = 0x00256738; // sound event callback: plays only when the value is inside the event's range (RW func_8022E0B0_de)
+Actor_IsInRegionFlag40 = 0x002567B8; // whether the actor's region info has flags52 bit 0x40 (RW func_0022E120)
+CPlayerPool__AddTeamScore = 0x00256804; // team games: counts a kill event on the player's team's score
+CPlayer__OnParticleHitCallback = 0x0025689C; // actor callback: CPlayer__OnParticleHit on the actor's parent player
+CPlayer__ResetControlState = 0x002568CC; // CPlayerContState__Init with the player's controller, then clears the movement/look fields 0xA78-0xB28 and the eye height
+CPlayer__FillAllAmmo = 0x002569C8; // every held weapon's ammo to its maximum; whether any was added
+CPlayer__TopUpHealth = 0x00256A68; // health (0x524) to 100 if lower; whether it changed
+PickupCounter_Get = 0x00256A8C; // one nibble (low or high) of a packed counter byte
+PickupCounter_Inc = 0x00256AAC; // bumps one nibble of a packed counter byte and returns it
+PickupCounter_Dec = 0x00256AF0; // drops one nibble of a packed counter byte and returns it
+Weapon_FiresProjectile = 0x00256B34; // whether weapon arg1 fires projectile arg2 (its NULL-ended ammo list)
+Actor_ProbeMove = 0x00256B84; // probes a move raised by half the height plus the step height; writes where it ends, 1 if blocked
+CPlayerPool__SumViewWeights = 0x00256CE0; // sum of func_0020F6BC(arg, pos) over the players with a camera
+CPlayer__IsWalkAnim7DF = 0x00256D44; // state 3 with 0xC04 in 0x7DF..0x7E3
+CPlayer__IsClimbing = 0x00256D6C; // m_Mode == 14
+CPlayer__KeepInSphere = 0x00256D7C; // keeps an actor inside a sphere of radius 20000 in regions flagged 0x4000
+Hud_GetSpriteValue = 0x00256E6C; // for HUD sprite 0x2DA in D_8011AAF1's mode, a settings value by sub-mode; else 0
+Particle_AttachToActor = 0x00256ED0; // creates the particle id in a slot if empty (func_00228AEC) and moves it to the actor at an offset (RW func_0022E77C)
+Particle_FreeSlot = 0x00256FD4; // frees a slot's particle (func_00228B4C) and clears it
+Angle_StepToward = 0x00257014; // wraps both angles and steps the first toward the second in the given direction
+CBarrel__SwapIcons = 0x00257124; // swap callback of CBarrel__DrawIcons' sort (0x1C-byte records)
+CBarrel__CompareIcons = 0x002571D8; // compare callback of the same sort, on the depth at 0xC
+CBarrel__MarkUsable = 0x002571FC; // marks each entry enabled when CPlayer__GetWeaponAmmo accepts its id
+CPlayer__CanSelectWeapon = 0x00257280; // owned, allowed underwater or on land (D_800AF618 flags 2/1), and not the lower of an owned pair
+Weapon_IsAllowedInMode = 0x002572FC; // mode 0: flags 1, mode 1: flags 2, mode 2: weapon 0x13 only
+CPlayer__ToggleLowerAmmo = 0x0025739C; // toggles m_UseLowerAmmo on the ammo-switch button
+CPlayer__PreferAlternateWeapon = 0x002573FC; // m_RequestedWeapon becomes its owned alternate
+CPlayer__RegenerateHealth = 0x0025748C; // D_8011AAF1's mode: health regains D_800ADD88[character] per second up to m_StartHealth
+Sound_SetUnderwaterFilter = 0x0025756C; // filter (func_00275B30) by the depth under the water surface of a region flagged 0x40 (RW func_8022EA3C_de)
+CPlayer__CheckLanded = 0x00257644; // falling and on the ground: back to standing (2)
+CPlayer__PickLandingAnim = 0x002576AC; // m_CharAnim 0x8A2/0x8A7/... by speed unless 0x1144 is still running
+PlayerWade_EnterAlt = 0x00257720; // same body as PlayerWade_Enter
+PlayerDeath_CinemaDone = 0x00257784; // callback of the death cinema: last life -> func_0042E29C, else state 31; clears D_800AE340
+PlayerCinema50_Done = 0x002577DC; // callback of cinema 0x50: func_0042E29C(D_800F1FD8)
+CPlayer__ClearShock = 0x00257800; // velocity 0, m_ShockedTimer 0, m_CharAnim 1, actor flag 0x800000 off
+CPlayerPool__AllocPlayers = 0x00257830; // allocates and clears count 0x1328-byte player records (m_pmePlayers/m_Players/m_nPlayers), like turok3's CPlayerPool__NewGame(pool, maxPlayerCount)
+CPlayerPool__FreePlayers = 0x002578AC; // frees m_pmePlayers and clears the three fields
+CPlayer__ShowLevelNotCompleteScreen = 0x002578FC; // m_bLevelNotCompleteExit: opens D_0043CAB4 when the hub level's first-time flag is set
+Cinema_CheckPlayerStart = 0x00257980; // starts a cinema state once no menu is open and cinema 0x190 plays
+String_CountTrailingSpaces = 0x00257A10; // counts the spaces at the end of a string of length n (RW func_8022EF04_de)
+
+// Enemy animation pickers: each is AI_PickAnimFromTable over one anim table
+// (D_800AF6F0..D_800B0600) filtered by one CIntelligence m_Enemy.m_w*AnimFlags
+// word. They are the anim callbacks of the generic enemy mode tables
+// D_800B0A60 / D_800B0E80 / D_800B1200 (three variants of each kind, one per
+// table). Named <kind>_<low bits of the anim table>.
+EnemyAnim_Idle_AF6F0 = 0x00259E60; // AI_PickAnimFromTable(D_800AF6F0, m_Enemy.m_wIdleAnimFlags)
+EnemyAnim_Idle_AF720 = 0x00259E8C; // AI_PickAnimFromTable(D_800AF720, m_Enemy.m_wIdleAnimFlags)
+EnemyAnim_Idle_AF750 = 0x00259EB8; // AI_PickAnimFromTable(D_800AF750, m_Enemy.m_wIdleAnimFlags)
+EnemyAnim_Alert_AF810 = 0x00259EE4; // AI_PickAnimFromTable(D_800AF810, m_Enemy.m_wAlertAnimFlags)
+EnemyAnim_Alert_AF840 = 0x00259F10; // AI_PickAnimFromTable(D_800AF840, m_Enemy.m_wAlertAnimFlags)
+EnemyAnim_Alert_AF870 = 0x00259F3C; // AI_PickAnimFromTable(D_800AF870, m_Enemy.m_wAlertAnimFlags)
+EnemyAnim_TakeCover_AF8A0 = 0x00259F68; // AI_PickAnimFromTable(D_800AF8A0, m_Enemy.m_wTakeCoverAnimFlags)
+EnemyAnim_TakeCover_AF8D0 = 0x00259F94; // AI_PickAnimFromTable(D_800AF8D0, m_Enemy.m_wTakeCoverAnimFlags)
+EnemyAnim_TakeCover_AF900 = 0x00259FC0; // AI_PickAnimFromTable(D_800AF900, m_Enemy.m_wTakeCoverAnimFlags)
+EnemyAnim_LeftArmWound_AF930 = 0x00259FEC; // AI_PickAnimFromTable(D_800AF930, m_Enemy.m_wLeftArmWoundAnimFlags)
+EnemyAnim_LeftArmWound_AF960 = 0x0025A018; // AI_PickAnimFromTable(D_800AF960, m_Enemy.m_wLeftArmWoundAnimFlags)
+EnemyAnim_LeftArmWound_AF990 = 0x0025A044; // AI_PickAnimFromTable(D_800AF990, m_Enemy.m_wLeftArmWoundAnimFlags)
+EnemyAnim_RightArmWound_AF9C0 = 0x0025A070; // AI_PickAnimFromTable(D_800AF9C0, m_Enemy.m_wRightArmWoundAnimFlags)
+EnemyAnim_RightArmWound_AF9F0 = 0x0025A09C; // AI_PickAnimFromTable(D_800AF9F0, m_Enemy.m_wRightArmWoundAnimFlags)
+EnemyAnim_RightArmWound_AFA20 = 0x0025A0C8; // AI_PickAnimFromTable(D_800AFA20, m_Enemy.m_wRightArmWoundAnimFlags)
+EnemyAnim_Patrol_AFA50 = 0x0025A0F4; // AI_PickAnimFromTable(D_800AFA50, m_Enemy.m_wPatrolAnimFlags)
+EnemyAnim_Patrol_AFA80 = 0x0025A120; // AI_PickAnimFromTable(D_800AFA80, m_Enemy.m_wPatrolAnimFlags)
+EnemyAnim_Patrol_AFAB0 = 0x0025A14C; // AI_PickAnimFromTable(D_800AFAB0, m_Enemy.m_wPatrolAnimFlags)
+EnemyAnim_Move_AFAE0 = 0x0025A178; // AI_PickAnimFromTable(D_800AFAE0, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_AFB68 = 0x0025A1A4; // AI_PickAnimFromTable(D_800AFB68, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_AFBF0 = 0x0025A1D0; // AI_PickAnimFromTable(D_800AFBF0, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_AFC78 = 0x0025A1FC; // AI_PickAnimFromTable(D_800AFC78, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_AFCA8 = 0x0025A228; // AI_PickAnimFromTable(D_800AFCA8, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_AFCD8 = 0x0025A254; // AI_PickAnimFromTable(D_800AFCD8, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Flee_AFD08 = 0x0025A280; // AI_PickAnimFromTable(D_800AFD08, m_Enemy.m_wFleeAnimFlags)
+EnemyAnim_Flee_AFD38 = 0x0025A2AC; // AI_PickAnimFromTable(D_800AFD38, m_Enemy.m_wFleeAnimFlags)
+EnemyAnim_Flee_AFD68 = 0x0025A2D8; // AI_PickAnimFromTable(D_800AFD68, m_Enemy.m_wFleeAnimFlags)
+EnemyAnim_ComboEnd_AFD98 = 0x0025A524; // AI_PickAnimFromTable(D_800AFD98, m_Enemy.m_wComboEndAnimFlags)
+EnemyAnim_ComboEnd_AFDC8 = 0x0025A550; // AI_PickAnimFromTable(D_800AFDC8, m_Enemy.m_wComboEndAnimFlags)
+EnemyAnim_ComboEnd_AFDF8 = 0x0025A57C; // AI_PickAnimFromTable(D_800AFDF8, m_Enemy.m_wComboEndAnimFlags)
+EnemyAnim_Combat_AFE28 = 0x0025A5A8; // AI_PickAnimFromTable(D_800AFE28, m_Enemy.m_wCombatAnimFlags)
+EnemyAnim_Combat_AFE58 = 0x0025A5D4; // AI_PickAnimFromTable(D_800AFE58, m_Enemy.m_wCombatAnimFlags)
+EnemyAnim_Combat_AFE88 = 0x0025A600; // AI_PickAnimFromTable(D_800AFE88, m_Enemy.m_wCombatAnimFlags)
+EnemyAnim_Leap_AFEB8 = 0x0025A62C; // AI_PickAnimFromTable(D_800AFEB8, m_Enemy.m_wLeapAnimFlags)
+EnemyAnim_Leap_AFEE8 = 0x0025A658; // AI_PickAnimFromTable(D_800AFEE8, m_Enemy.m_wLeapAnimFlags)
+EnemyAnim_Leap_AFF18 = 0x0025A684; // AI_PickAnimFromTable(D_800AFF18, m_Enemy.m_wLeapAnimFlags)
+EnemyAnim_Dart_AFF48 = 0x0025A6B0; // AI_PickAnimFromTable(D_800AFF48, m_Enemy.m_wDartAnimFlags)
+EnemyAnim_Dart_AFF78 = 0x0025A6DC; // AI_PickAnimFromTable(D_800AFF78, m_Enemy.m_wDartAnimFlags)
+EnemyAnim_DartFallback_AFF18 = 0x0025A708; // third variant of the dart pickers (after 0x25A6B0, 0x25A6DC), uses the leap table: AI_PickAnimFromTable(D_800AFF18, m_Enemy.m_wLeapAnimFlags)
+EnemyAnim_Projectile_AFFD8 = 0x0025A734; // AI_PickAnimFromTable(D_800AFFD8, m_Enemy.m_wProjectileAnimFlags)
+EnemyAnim_Projectile_B0008 = 0x0025A760; // AI_PickAnimFromTable(D_800B0008, m_Enemy.m_wProjectileAnimFlags)
+EnemyAnim_ProjectileFallback_AFF18 = 0x0025A78C; // third variant of the projectile pickers (after 0x25A734, 0x25A760), uses the leap table: AI_PickAnimFromTable(D_800AFF18, m_Enemy.m_wLeapAnimFlags)
+EnemyAnim_Weapon_B0068 = 0x0025A7B8; // AI_PickAnimFromTable(D_800B0068, m_Enemy.m_wWeaponAnimFlags)
+EnemyAnim_Weapon_B00C0 = 0x0025A7E4; // AI_PickAnimFromTable(D_800B00C0, m_Enemy.m_wWeaponAnimFlags)
+EnemyAnim_Weapon_B00F0 = 0x0025A810; // AI_PickAnimFromTable(D_800B00F0, m_Enemy.m_wWeaponAnimFlags)
+EnemyAnim_NormalDeath_B0120 = 0x0025A83C; // AI_PickAnimFromTable(D_800B0120, m_Enemy.m_wNormalDeathAnimFlags)
+EnemyAnim_NormalDeath_B0150 = 0x0025A868; // AI_PickAnimFromTable(D_800B0150, m_Enemy.m_wNormalDeathAnimFlags)
+EnemyAnim_NormalDeath_B0180 = 0x0025A894; // AI_PickAnimFromTable(D_800B0180, m_Enemy.m_wNormalDeathAnimFlags)
+EnemyAnim_MovingDeath_B01B0 = 0x0025A8C0; // AI_PickAnimFromTable(D_800B01B0, m_Enemy.m_wMovingDeathAnimFlags)
+EnemyAnim_MovingDeath_B01E0 = 0x0025A8EC; // AI_PickAnimFromTable(D_800B01E0, m_Enemy.m_wMovingDeathAnimFlags)
+EnemyAnim_MovingDeath_B0210 = 0x0025A918; // AI_PickAnimFromTable(D_800B0210, m_Enemy.m_wMovingDeathAnimFlags)
+EnemyAnim_ViolentDeath_B0240 = 0x0025A944; // AI_PickAnimFromTable(D_800B0240, m_Enemy.m_wViolentDeathAnimFlags)
+EnemyAnim_ViolentDeath_B0270 = 0x0025A970; // AI_PickAnimFromTable(D_800B0270, m_Enemy.m_wViolentDeathAnimFlags)
+EnemyAnim_ViolentDeath_B02A0 = 0x0025A99C; // AI_PickAnimFromTable(D_800B02A0, m_Enemy.m_wViolentDeathAnimFlags)
+EnemyAnim_ExplosiveDeath_B02D0 = 0x0025A9C8; // AI_PickAnimFromTable(D_800B02D0, m_Enemy.m_wExplosiveDeathAnimFlags)
+EnemyAnim_ExplosiveDeath_B0300 = 0x0025A9F4; // AI_PickAnimFromTable(D_800B0300, m_Enemy.m_wExplosiveDeathAnimFlags)
+EnemyAnim_ExplosiveDeath_B0330 = 0x0025AA20; // AI_PickAnimFromTable(D_800B0330, m_Enemy.m_wExplosiveDeathAnimFlags)
+EnemyAnim_NormalDeath_B0360 = 0x0025AA4C; // AI_PickAnimFromTable(D_800B0360, m_Enemy.m_wNormalDeathAnimFlags)
+EnemyAnim_NormalDeath_B0390 = 0x0025AA78; // AI_PickAnimFromTable(D_800B0390, m_Enemy.m_wNormalDeathAnimFlags)
+EnemyAnim_NormalDeath_B03C0 = 0x0025AAA4; // AI_PickAnimFromTable(D_800B03C0, m_Enemy.m_wNormalDeathAnimFlags)
+EnemyAnim_Evade_B03F0 = 0x0025AAD0; // AI_PickAnimFromTable(D_800B03F0, m_Enemy.m_wEvadeAnimFlags)
+EnemyAnim_Evade_B0420 = 0x0025AAFC; // AI_PickAnimFromTable(D_800B0420, m_Enemy.m_wEvadeAnimFlags)
+EnemyAnim_Evade_B0450 = 0x0025AB28; // AI_PickAnimFromTable(D_800B0450, m_Enemy.m_wEvadeAnimFlags)
+EnemyAnim_Evade_B0480 = 0x0025AB54; // AI_PickAnimFromTable(D_800B0480, m_Enemy.m_wEvadeAnimFlags)
+EnemyAnim_Evade_B04B0 = 0x0025AB80; // AI_PickAnimFromTable(D_800B04B0, m_Enemy.m_wEvadeAnimFlags)
+EnemyAnim_Evade_B04E0 = 0x0025ABAC; // AI_PickAnimFromTable(D_800B04E0, m_Enemy.m_wEvadeAnimFlags)
+EnemyAnim_Move_B0510 = 0x0025ABD8; // AI_PickAnimFromTable(D_800B0510, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_B0540 = 0x0025AC04; // AI_PickAnimFromTable(D_800B0540, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_B0570 = 0x0025AC30; // AI_PickAnimFromTable(D_800B0570, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_B05A0 = 0x0025AC5C; // AI_PickAnimFromTable(D_800B05A0, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_B05D0 = 0x0025AD30; // AI_PickAnimFromTable(D_800B05D0, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_B0600 = 0x0025AD5C; // AI_PickAnimFromTable(D_800B0600, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_PickAttack_B0A60 = 0x0025A304; // weighted pick among the combat (0x25A5A8), leap (0x25A62C) and weapon (0x25A7B8) pickers allowed by the intelligence's flags; anim callback in table D_800B0A60
+EnemyAnim_PickAttack_B0E80 = 0x0025A3DC; // same over the D_800B0E80 variants (0x25A5D4, 0x25A658, ...)
+EnemyAnim_PickAttack_B1200 = 0x0025A480; // same over the D_800B1200 variants (0x25A600, 0x25A684, ...)
+EnemyAnim_JoypadTestPlayAnim = 0x0025AC88; // anim of mode 0x32 ENEMY_JOYPAD_TEST_PLAY_ANIM_MODE: the idle pick from three override slots D_800F5C66 (+0, +100, +200) or the plain idle table D_800AF6F0
+
+// The first-person weapon actor (CPlayer.m_WeaponActor, CAI m_Weapon vars):
+// WeaponActor_InitAI installs mode table D_800AE394, m_pfStep and m_pfDraw;
+// per-weapon mode tables D_800AE494..D_800AE934 (0x20-byte entries: id,
+// enter at +4, update at +8, anim callback at +0x10) and per-weapon node
+// callbacks in the WeaponInfo records (+0x4C node matrix, +0x50 update).
+// Mode tables are named by address where the weapon is not pinned down.
+WeaponActor_BuildMatrix = 0x00257A40; // the weapon model's matrix from the owner's camera: offsets scaled 0.1 and -10.24, camera rotation and position
+CPlayer__GetNextUsableWeapon = 0x00257BA0; // the first usable weapon after the current, else the last before it; 0x18 or 0 when none
+WeaponActor_Update = 0x00257D48; // m_pfStep of the weapon actor: timers, mode 1 on a pose or queued change, the mode's and weapon's updates, the model animation
+WeaponActor_CheckFire = 0x00257EA0; // after the cooldown, fire button 0x2000 starts mode 4, a tap of 0x10 with weapon 19 mode 5; 1 when it fired
+WeaponMode_Idle_Update = 0x00258000; // picks another weapon when out of ammo, tag-mode sound 0x27D8, else switches to the queued weapon
+WeaponMode_WindUp_Update = 0x002581C4; // sets the fire-rate scale D_800AE350 from the time held (weapons 2-3, 12), then mode 7 or 5
+WeaponMode_SpinFire_Update = 0x00258370; // spun-up firing while fire is held; on release mode 2 and the stop sounds 0x1B5/0x1A6
+WeaponMode_StreamFire_Update = 0x002584DC; // weapon 0x14: drains ammo every third tick while fire is held, else mode 2
+WeaponActor_SetModeWrapper = 0x0025864C; // tail call to CAI__SetMode
+WeaponActor_SwitchToRequested = 0x00258668; // switches the weapon actor to its owner's requested weapon
+WeaponActor_FireCallback = 0x00258734; // CPlayer__FireWeapon on the owner (m_AI.m_pParent) with the event's projectile type
+WeaponActor_SwitchToRequestedInline = 0x00258754; // inlined copy of WeaponActor_SwitchToRequested
+WeaponActor_Draw = 0x0025883C; // m_pfDraw: the muzzle child (copying the parent's render block), then the model
+WeaponActor_InitAI = 0x00258964; // m_pModeTable = D_800AE394, m_pfStep = WeaponActor_Update, m_pfDraw = WeaponActor_Draw, clears the vars, switches to the requested weapon
+WeaponMode_Switch_Enter = 0x002589CC; // D_800AE394 entry 1 enter: same body as WeaponActor_SwitchToRequested
+WeaponMode_Switch_Update = 0x00258A98; // D_800AE394 entry 1 update: resets the barrel, then fire (4) if still held and allowed, else 2
+WeaponMode_Ready_Update = 0x00258B74; // picks the next weapon when out of ammo; without a shot goes to the mode the player's state table asks for
+WeaponMode_Fire_Enter = 0x00258C20; // m_FireDelay from the weapon's fireDelay
+WeaponMode_Fire_Update = 0x00258C50; // refires (mode 4) while fire is held after the delay, else back; used by most weapon tables
+WeaponMode_Idle_Enter = 0x00258D6C; // D_800AE394 entry 2 enter: func_0042EB04 on the owner
+WeaponAnim_4EF2 = 0x00258D8C; // anim callback: returns animation 0x4EF2 (table D_800AE514)
+WeaponAnim_4E84 = 0x00258D94; // anim callback: returns animation 0x4E84
+WeaponBarrel_NodeMatrix_AEE38 = 0x00258D9C; // node callback of weapon info D_800AEE38: rotates the barrel nodes by m_BarrelAngle per node
+WeaponMode_SpinUp_Enter = 0x00258E38; // condition timer 0, background sound 0x1A5, fire delay
+WeaponBarrel_Spin_AEE38 = 0x00258EA0; // update of weapon info D_800AEE38: spins down unless held, turns the barrel, rumble and spin sound
+WeaponNode_Rotate_AF324 = 0x00258FF8; // node callback of D_800AF324: node 2 rotated by -1.5x the angle
+WeaponMode_AE634_Enter = 0x00259040; // fires projectile 0x12B and starts the background (0x1A5) and firing (0x1A7) sounds
+WeaponMode_SpinUpFire_Update = 0x002590CC; // spins the barrel up while fire is held, else stops it
+WeaponBarrel_Spin_AF324 = 0x002591F4; // update of D_800AF324: spin decay, angle, sound rates 0x1A7/0x1A5
+WeaponActor_PlayChargeAnim = 0x0025934C; // update of D_800AF5C4: holding fire sets the character animation 0x1130
+WeaponNode_Rotate_AF084 = 0x002593A4; // node callback of D_800AF084: node 2 rotated by m_BarrelAngle
+WeaponActor_Sway_AF084 = 0x002593D8; // update of D_800AF084: tilts the weapon with the movement
+WeaponAnim_Alternate4F1A = 0x00259558; // anim callback of D_800AE694: alternates 0x4F1A / 0x4F24
+WeaponMode_AE694_Update = 0x00259584; // out of ammo -> 2, tap 0x10 -> 5, release -> ...
+WeaponMode_AE694_Hold = 0x00259630; // fire held and ammo -> 4, else back to 2 when 0x10 is released
+WeaponActor_EquipRequested = 0x002596B4; // makes m_RequestedWeapon current: its mode table and effects, its name on the HUD (func_0027FC2C)
+WeaponMode_AE714_Enter = 0x00259794; // fire delay and firing sound 0x1A9
+WeaponSound_Update_AF12C = 0x002597E8; // update of D_800AF12C: background sound 0x1A8, sound rate 0x1A9
+WeaponMode_AE794_Enter = 0x00259858; // background sound 0x464
+WeaponMode_AE794_Update = 0x00259878; // spin sound 0x464 while held; on release mode 2 or, spun past 16 degrees, mode 5
+WeaponBarrel_Spin_AF1D4 = 0x00259944; // update of D_800AF1D4: turns the barrel and makes the controller rumble with the spin speed
+WeaponNode_Rotate_AF1D4 = 0x00259A4C; // node callback of D_800AF1D4: nodes 1 and 12
+WeaponNode_Rotate_AF180 = 0x00259A98; // node callback of D_800AF180: node 2
+WeaponBarrel_Spin_AF180 = 0x00259AE0; // update of D_800AF180: spins up toward 10 degrees a frame, frame-7 flag in mode 4
+WeaponMode_AE7F4_Enter = 0x00259BC4; // sound 0x1BB and fire delay
+WeaponMode_Charge_Update = 0x00259C4C; // on release charges by the time held (at most 1), shot count D_800AE9D2, then mode 5
+WeaponMode_Weapon10Fire_Enter = 0x00259D38; // spends one round of weapon 0x10; mode 7 when empty else 4
+WeaponMode_Weapon1FFire_Enter = 0x00259DD0; // weapon 0x1F with one round left -> mode 7, else 4
+WeaponMode_AE934_Enter = 0x00259E30; // m_RefireDelay = D_800A7364, mode 4
+
+// The generic enemy AI (CEnemyAIVars, structs/ai_vars.h). Its mode tables:
+// D_800B0720 (start, wake, deaths 0x34-0x3B, gone 0x3C, misc 0x17-0x19,
+// 0x26-0x2B, 0x31-0x33) and the three locomotion tables D_800B0A80 /
+// D_800B0EA0 / D_800B1220 (idle 0xA, location 0xB, alert 0xC, take cover
+// 0xD, patrol/move/flee 3-6, evade 8-9, attacks 0xE-0x12, recoil 0x13,
+// combo end 0x14, grab 0x15, reactions 0x1C-0x22, arm wounds 0x24-0x25,
+// ridden 0x2C-0x2E). Mode numbers below are those table ids; the mode
+// names are the ROM's own EnemyModes enum (SN64 debug type records at ROM
+// 0x12F2xx, values in order from 0 ENEMY_WAIT_FOR_TRIGGER_MODE: 2 START,
+// 4 MOVE, 0xA IDLE, 0xB INTERACTIVE_IDLE, 0x13 COMBO, 0x15
+// PICKUP_THROW_OBJECT, 0x17 TELEPORT_OUT, 0x1C-0x22 REACTION_EXPLOSION ..
+// REACTION_BORE_CLUNK, 0x26-0x2B the ground/air/underwater transitions,
+// 0x2C PLAYER_RIDE_IDLE, 0x33 FEIGN_DEATH, 0x34 DEATH .. 0x3C DEATH_MELT).
+AI_TurnHeadToTarget = 0x0025AD90; // loads the "anim object info" and turns the head yaw/pitch toward the target (with a pitch offset); 6 callers
+EnemyAI_PickDeathMode = 0x0025B078; // picks the death from what killed the actor (weapon, projectile, hit direction)
+EnemyAI_OnDamage = 0x0025B2D4; // retargets the attacker, takes the health, hurt sound, death/fall/flinch reaction, knock back
+EnemyAI_DrawFaded = 0x0025BA80; // m_pfDraw: draws the actor faded in or out (dying / teleporting); reinstalled by EnemyAI_Dismount
+EnemyAI_Init = 0x0025BC70; // installs the AI callbacks and seeds timers/flags from the definition (types 0x44E..0x456 aside)
+EnemyAI_InitDispatch = 0x0025BE88; // types 0x44E..0x456 go to their own init in the VM code, the rest to EnemyAI_Init
+EnemyAI_CalcOrientationMatrix = 0x0025C018; // m_pfCalculateOrientationMatrix: world matrix from the look angles, yaw, rotation, scale, position
+EnemyAI_IdleSoundCallback = 0x0025C1B0; // counts the idle timer down and plays the ambient animation/sound when idle in mode 4
+EnemyAI_TickTimers = 0x0025C338; // for type flag 0x100000: m_Timer then m_Timer2 count down
+EnemyAI_AttackWait = 0x0025C430; // attack-wait callback: counts the delay down, then plays the attack animation
+EnemyAI_Update = 0x0025C5F8; // the enemy step: age, frame time, current mode handler, timers, idle anims, swim/land switches, behaviour, burning
+EnemyAI_OnHit = 0x0025CAC8; // m_pfHit: a near projectile lengthens the wait and is heard; its type picks a reaction
+EnemyAI_PickAttack = 0x0025D030; // weighted random among the attacks the definition enables for the mode whose range test passes
+EnemyAI_TryDodge = 0x0025D308; // dodges, with a probability growing with the skill, to the side away from the attack
+EnemyMode_Move_Update = 0x0025D474; // update of idle/patrol/move/flee (0xA, 3-6): turn to the target, run or walk, bank in flight, attack in range
+EnemyAnim_InteractiveIdle = 0x0025D9E4; // mode 0xB anim: one candidate from the location's primary and one from its secondary flags
+EnemyMode_Attack_Update = 0x0025DBD8; // modes 0xE-0x12: turn to the target, taunt, the 0x11F4 anims, dodge, type 0x259's melee
+EnemyMode_Combo_Update = 0x0025DDBC; // mode 0x13: turn at double speed, recoil timer, react to hits (0xA/0x14)
+EnemyAnim_PickDeath = 0x0025DF04; // anim of modes 0x33/0x34: the explosive, violent, moving or normal death picker by flags and index (the file's "attack" comment is off: the pickers are the m_w*DeathAnimFlags ones)
+EnemyMode_Death_Update = 0x0025E248; // deaths 0x34-0x3B: in the 7020-7041 band chains to the next anim (landing), else finishes
+EnemyAI_GetBehaviorIndex = 0x0025E428; // CEnemyAIVars.m_BehaviorIndex
+EnemyAI_SetBehaviorIndex = 0x0025E434; // sets m_BehaviorIndex
+EnemyAI_GetBehavior = 0x0025E43C; // m_Behavior[i]
+EnemyAI_GetCurrentBehavior = 0x0025E44C; // m_Behavior[m_BehaviorIndex]
+EnemyAI_SetBehavior = 0x0025E460; // m_Behavior[i] = v
+EnemyAI_GetBehaviorAt = 0x0025E46C; // byte i from m_Behavior (0x24 of the var buffer)
+EnemyAI_GetGrabbed = 0x0025E47C; // CEnemyAIVars.m_pGrabbed
+EnemyAI_SetGrabbed = 0x0025E488; // sets m_pGrabbed and tells it (func_00264C8C)
+EnemyAI_HeadNodeCallback = 0x0025E4B8; // node callback: turns the node by the owner's m_HeadTurn/m_HeadTilt (0x164/0x168) when the value is in range
+AI_HearNoise = 0x0025E52C; // raises the alert level on a noise of a kind within 3072 units and remembers where it came from; 7 callers
+EnemyMode_WaitForTrigger_Enter = 0x0025E650; // mode 0 enter: empty
+EnemyMode_WaitForTrigger_Update = 0x0025E658; // mode 0 update: enemies (type 1 without 0x800) go to mode 2
+EnemyMode_StartDelay_Enter = 0x0025E698; // mode 1 enter: empty
+EnemyMode_StartDelay_Update = 0x0025E6A0; // mode 1 update: m_ConditionTimer down, then mode 2
+EnemyAnim_PickStart = 0x0025E6E0; // anim of modes 1-2: m_StartAnim (+1 for types 0x1F9/0x385 in the 0x2B16 band)
+EnemyMode_Start_Enter = 0x0025E798; // mode 2 enter: plays m_StartSound
+EnemyMode_Start_Update = 0x0025E7E0; // mode 2 update: turns toward the target (pi/3 or pi/12 a step), then mode 4
+EnemyMode_Death_Enter = 0x0025E888; // deaths 0x34-0x3B enter: health 0, flags, death setup from the definition
+EnemyMode_DeathMelt_Enter = 0x0025E94C; // mode 0x3C enter: draw callback func_002605AC, sound off, region event 0x80
+EnemyMode_DeathMelt_Update = 0x0025E9BC; // mode 0x3C update: squash and remove after 30
+EnemyAI_UsesRideTables = 0x0025EAB0; // 0 for mode tables D_800B17C0/1840/18C0 or type 0x259, else 1
+EnemyAI_GetTypeTurnRate = 0x0025EAFC; // a turn rate, another for type 0x259
+EnemyAI_GetModeTurnRate = 0x0025EB24; // pi/3 after modes 1-2, else pi/12 (see EnemyMode_Start_Update)
+AI_LerpByAggression = 0x0025EB50; // a + m_Aggression/255 * (b - a)
+EnemyAI_Mount = 0x0025EB80; // the player mounts the creature: m_pGrabbed = player, keeps its scale, model +1, mode 0x2C
+EnemyAI_Dismount = 0x0025EC28; // back from riding: draw and orientation callbacks, scale and model restored, mode 0xA (called by CPlayer__Dismount)
+EnemyAI_DrawNode = 0x0025ECDC; // node-draw callback: func_0021D928 then func_0020B258 with the actor's lights
+EnemyAI_DrawWithBlend = 0x0025ED4C; // draw override: blend fill mode and colour (D_800AB8B0) around the draw
+EnemyAI_CheckOffscreen = 0x0025EE38; // not in view (func_00220408): flags 0x2100; while a cinema plays sets 0x200
+EnemyAI_SleepIfOffscreen = 0x0025EEA4; // out of view in mode 0: EnemyAI_CheckOffscreen and mode 2
+EnemyAI_CheckGrab = 0x0025EF68; // alive and the last collision hit its path target: grabs it (m_pGrabbed) and goes to mode 0x15
+EnemyAnim_WaitForTrigger = 0x0025EFF8; // mode 0 anim: start anim for types 0x1F9/0x385
+EnemyMode_InteractiveIdle_Update = 0x0025F068; // mode 0xB: turns (15 or 60 degrees) toward the target, then mode 0xA
+EnemyMode_Alert_Update = 0x0025F114; // mode 0xC: turns toward D_800B06A0, then EnemyMode_Move_Update
+EnemyMode_TakeCover_Update = 0x0025F1B4; // mode 0xD: empty
+EnemyMode_Evade_Update = 0x0025F1D0; // modes 8-9: holds the evade anims while aimed at (AI_IsAimedAt), else back to 0xA
+EnemyMode_Attack_Enter = 0x0025F29C; // modes 0xE-0x12 enter: attack delay from the intensity, clears AI flag 0x4000000
+EnemyMode_Combo_Enter = 0x0025F2F8; // mode 0x13 enter: timer from the intensity (15..45)
+EnemyMode_ComboEnd_Update = 0x0025F358; // mode 0x14: back to 0xA when the anim ends
+EnemyMode_PickupThrowObject_Enter = 0x0025F380; // mode 0x15 enter: puts the grabbed actor in mode 1
+EnemyMode_PickupThrowObject_Update = 0x0025F3A4; // mode 0x15: turns toward the target with anim 10000, releases the grabbed actor near its end
+EnemyMode_DropObject_Enter = 0x0025F4AC; // mode 0x16 enter: empty
+EnemyMode_DropObject_Update = 0x0025F4B4; // mode 0x16: back to 0xA when the anim ends
+EnemyMode_TeleportOut_Update = 0x0025F4DC; // mode 0x17: to 0x18 when the anim ends
+EnemyMode_TeleportIn_Enter = 0x0025F504; // mode 0x18 enter: a random point within the leash radius (or 2048)
+EnemyMode_TeleportIn_Update = 0x0025F5FC; // mode 0x18: back to 0xA when the anim ends
+EnemyMode_CloakActivate_Enter = 0x0025F624; // mode 0x19 enter: random m_Timer and m_Timer2
+EnemyMode_CloakActivate_Update = 0x0025F684; // mode 0x19: back to 0xA after four loops
+EnemyMode_GroundToAir_Update = 0x0025F6B0; // mode 0x26: sets var byte 0x27, mode 4 when the anim ends
+EnemyMode_GroundToUnderwater_Update = 0x0025F6DC; // mode 0x27: m_BehaviorIndex 2, then mode 4
+EnemyMode_AirToGround_Update = 0x0025F708; // mode 0x28: behaviour index 0, then mode 4
+EnemyMode_AirToUnderwater_Update = 0x0025F730; // mode 0x29: m_BehaviorIndex 2, then mode 4
+EnemyMode_UnderwaterToGround_Update = 0x0025F75C; // mode 0x2A: var byte 0x27 cleared, then mode 4
+EnemyMode_UnderwaterToAir_Update = 0x0025F784; // mode 0x2B: behaviour index 1, then mode 4
+EnemyAI_BobToTargetHeight = 0x0025F7B0; // bobs toward the target height on a sine wave, then mode 0x3C
+EnemyMode_ReactionExplosion_Enter = 0x0025F8E4; // mode 0x1C enter: m_Aggression += 25
+EnemyMode_ReactionExplosion_Update = 0x0025F900; // mode 0x1C: to 0x1E when the anim ends
+EnemyMode_ReactionFallDown_Enter = 0x0025F928; // mode 0x1D enter: m_Aggression += 10, timer 240..120
+EnemyMode_ReactionFallDown_Update = 0x0025F978; // mode 0x1D: timer (at most 240) down, then 0x1E
+EnemyMode_ReactionGetup_Update = 0x0025F9D4; // mode 0x1E: back to 0xA when the anim ends
+EnemyMode_ReactionBlinded_Enter = 0x0025F9FC; // mode 0x1F enter: intensity +10, reaction delay 105..60
+EnemyMode_ReactionBlinded_Update = 0x0025FA54; // mode 0x1F: timer down, then 0xA
+EnemyMode_ReactionShocked_Enter = 0x0025FAB0; // mode 0x20 enter: m_Aggression += 10, condition timer cleared
+EnemyMode_ReactionShocked_Update = 0x0025FAD0; // mode 0x20: damage over time (34/s, flag 0x100000) through CAI__CallHurt, sound 0x227, then 0xA
+EnemyMode_ReactionBore_Enter = 0x0025FBB8; // mode 0x21 enter: intensity +20, timer 75..60
+EnemyMode_ReactionBore_Update = 0x0025FC08; // mode 0x21: when the timer runs out the actor dies (mode 0x38 or 0x34)
+EnemyMode_ReactionBoreClunk_Enter = 0x0025FCB8; // mode 0x22 enter: intensity +20, delay 75..60
+EnemyMode_ReactionBoreClunk_Update = 0x0025FD08; // mode 0x22: back to 0xA when the anim ends
+EnemyMode_WoundedArm_Update = 0x0025FD30; // modes 0x24-0x25: EnemyMode_Move_Update once the anim ends
+EnemyMode_FeignDeath_Enter = 0x0025FD58; // mode 0x33 enter: empty
+EnemyMode_FeignDeath_Update = 0x0025FD60; // mode 0x33: when the anim ends, 0x3C if dead else 0x1E
+EnemyAnim_ExtremeDeath = 0x0025FD98; // anim of modes 0x35/0x36: a death anim of the definition (+1 in mode 0x35)
+EnemyAnim_PfmDeath = 0x0025FDC8; // anim of mode 0x37: m_DeathAnims[0]
+EnemyAnim_HeadBlownOffDeath = 0x0025FDD8; // anim of mode 0x38: m_DeathAnims[1]
+EnemyAnim_LeftArmBlownOffDeath = 0x0025FDE8; // anim of mode 0x39: m_DeathAnims[2]
+EnemyAnim_RightArmBlownOffDeath = 0x0025FDF8; // anim of mode 0x3A: m_DeathAnims[3]
+EnemyAnim_BodyHoleDeath = 0x0025FE08; // anim of mode 0x3B: m_DeathAnims[4]
+EnemyMode_PlayerRide_Update = 0x0025FE18; // modes 0x2C-0x2E: follows the rider's ride states (33 -> 0x2C, 34 -> 0x2D)
+Projectile_PlaceAtMuzzle = 0x0025FEB0; // inherits the shooter's rotation, yaws by its own angle, pushed 10.24 along it
+EnemyMode_JoypadTestIdle_Update = 0x0025FFF0; // mode 0x31: to 0x32 when an idle override slot (D_800F5C66) is set

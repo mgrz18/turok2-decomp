@@ -8,10 +8,10 @@ extern u32 D_800B6D20;
 extern s32 D_800F7078;
 extern u8 D_801198B0[];
 
-extern void func_0027FC2C(void *arg0, void *camera, s32 model);
+extern void CCameraPool__AddText(void *arg0, void *camera, s32 model);
 
-/* Same body as func_00258668. Switches the weapon actor to its owner's requested weapon. */
-void func_002589CC(CGameObjectInstance *weapon, CAI *state) {
+/* Same body as WeaponActor_SwitchToRequested. Switches the weapon actor to its owner's requested weapon. */
+void WeaponMode_Switch_Enter(CGameObjectInstance *weapon, CAI *state) {
     CPlayer *player = *(CPlayer **)((u8 *)weapon + 0x1A8);
     s16 requested = *(s16 *)((u8 *)player + 0xB14);
 
@@ -20,7 +20,7 @@ void func_002589CC(CGameObjectInstance *weapon, CAI *state) {
         state->m_pModeTable = D_800AF618[requested]->modeTable;
         state->m_pfEffects = D_800AF618[player->m_Data.m_CurrentWeapon]->effects;
         if (D_800B6D20 >= 5) {
-            func_0027FC2C(D_801198B0, player->m_pCamera, D_800AF618[player->m_Data.m_CurrentWeapon]->name);
+            CCameraPool__AddText(D_801198B0, player->m_pCamera, D_800AF618[player->m_Data.m_CurrentWeapon]->name);
         }
         state->m_Weapon.m_BarrelAngle = 0;
         state->m_Weapon.m_BarrelSpeed = 0;

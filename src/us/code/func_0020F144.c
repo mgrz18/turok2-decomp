@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void *func_0020F144(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2, f32 arg3);
-void *func_0020F144(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2, f32 arg3) {
+extern void *CVector3__Bounce(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2, f32 arg3);
+void *CVector3__Bounce(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2, f32 arg3) {
     CVector3 tmp;
     f32 temp_f2;
     f32 temp_f3;

@@ -17,18 +17,18 @@ typedef struct {
 
 typedef void (*TrackDecoder)(u32 *, f32 *, s32);
 
-void func_00218620(u32 *, f32 *, s32);
-void func_00216464(u32 *, f32 *, s32);
-void func_002186D8(u32 *, f32 *, s32);
-u32 func_00217B04(s32);
-u32 func_00217C58(u32 *, u32);
-f32 *func_002017D4(TrackTable *, s32);
-void func_00211074(Quaternion *);
+void Anim_DecodeCurveChannel(u32 *, f32 *, s32);
+void Anim_DecodeQuantizedChannel(u32 *, f32 *, s32);
+void Anim_DecodeRawChannel(u32 *, f32 *, s32);
+u32 BitAddr_FromPointer(s32);
+u32 Bits_Read(u32 *, u32);
+f32 *CISet__GetBlock(TrackTable *, s32);
+void CQuaternion__Normalize(Quaternion *);
 
 extern s32 D_800E67A4;
 extern s32 D_800E67A8;
 
-s32 func_00216604(s32 source, TrackTable *table, s32 tracks, s32 channels, s32 radius, s32 encoding) {
+s32 Anim_DecodeTracks(s32 source, TrackTable *table, s32 tracks, s32 channels, s32 radius, s32 encoding) {
     TrackDecoder decode;
     u32 stream;
     s32 index;
@@ -41,13 +41,13 @@ s32 func_00216604(s32 source, TrackTable *table, s32 tracks, s32 channels, s32 r
     decode = NULL;
     switch (encoding) {
     case 0:
-        decode = func_00218620;
+        decode = Anim_DecodeCurveChannel;
         break;
     case 1:
-        decode = func_00216464;
+        decode = Anim_DecodeQuantizedChannel;
         break;
     case 2:
-        decode = func_002186D8;
+        decode = Anim_DecodeRawChannel;
         break;
     }
     index = 1;
@@ -75,17 +75,17 @@ s32 func_00216604(s32 source, TrackTable *table, s32 tracks, s32 channels, s32 r
         } while (i < tracks);
     }
     i = 0;
-    stream = func_00217B04(source);
+    stream = BitAddr_FromPointer(source);
     if (tracks > 0) {
         do {
-            f32 *track = func_002017D4(table, i);
+            f32 *track = CISet__GetBlock(table, i);
 
             j = 0;
             if (channels > 0) {
                 f32 *out = track;
 
                 do {
-                    func_00217C58(&stream, 31);
+                    Bits_Read(&stream, 31);
                     decode(&stream, out, D_800E67A4);
                     out++;
                     j++;
@@ -97,7 +97,7 @@ s32 func_00216604(s32 source, TrackTable *table, s32 tracks, s32 channels, s32 r
     i = 0;
     if (tracks > 0) {
         do {
-            f32 *keys = func_002017D4(table, i);
+            f32 *keys = CISet__GetBlock(table, i);
 
             if (channels == 4 && radius != 0) {
                 s32 k;
@@ -126,10 +126,10 @@ s32 func_00216604(s32 source, TrackTable *table, s32 tracks, s32 channels, s32 r
         if (tracks > 0) {
             j = 0;
             do {
-                Quaternion *rotations = (Quaternion *) func_002017D4(table, j);
+                Quaternion *rotations = (Quaternion *) CISet__GetBlock(table, j);
 
                 for (i = 0; i < D_800E67A8; i++) {
-                    func_00211074(&rotations[i]);
+                    CQuaternion__Normalize(&rotations[i]);
                 }
                 j++;
             } while (j < tracks);

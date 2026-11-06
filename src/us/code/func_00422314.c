@@ -16,7 +16,7 @@ extern char D_800B53AC[];
 extern s8 D_80130950[];
 extern s32 D_801309A8;
 
-s32 func_00422314(MenuItem *item) {
+s32 CharNoteMenu_UpdateType(MenuItem *item) {
     char *src;
     char *dst;
     s32 i;

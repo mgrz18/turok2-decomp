@@ -9,12 +9,12 @@ typedef struct {
     /* 0x8A */ u8 frame;            /* compared with D_800B6D1B */
 } Drawable;
 
-void func_00205A2C(s32, s32);                       /* extern */
+void CCache__Touch(s32, s32);                       /* extern */
 extern s32 D_800ACAD8;
 extern u8 D_800B6D1B;
 
-void func_00214E88(Drawable *arg0) {
+void CStaticObject__TouchLitVertices(Drawable *arg0) {
     if (!(arg0->flags & 0x40) && (arg0->frame != D_800B6D1B)) {
-        func_00205A2C(0, arg0->unk80 | D_800ACAD8);
+        CCache__Touch(0, arg0->unk80 | D_800ACAD8);
     }
 }

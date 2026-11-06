@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern s16 func_0026D518(s16 *arg0);
-extern s32 func_002113A4(void);
-s16 func_0026D518(s16 *arg0) {
+extern s16 WeightedTable_PickStatic(s16 *arg0);
+extern s32 Random_Next(void);
+s16 WeightedTable_PickStatic(s16 *arg0) {
     s16 *entry;
     s16 *start;
     s32 random;
@@ -20,7 +20,7 @@ s16 func_0026D518(s16 *arg0) {
             entry += 2;
         } while (*entry != -1);
     }
-    random = func_002113A4();
+    random = Random_Next();
     entry = start;
     value = random % total;
     total = 0;
@@ -33,4 +33,4 @@ s16 func_0026D518(s16 *arg0) {
     }
     return *entry;
 }
-extern s32 func_002113A4(void);
+extern s32 Random_Next(void);

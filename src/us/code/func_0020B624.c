@@ -3,24 +3,24 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0020A994();
-extern void func_0020A568();
-extern void func_0020B624();
+extern void Render_DrawBatches();
+extern void Render_FlushModelBatch();
+extern void Render_FlushBatches();
 extern s32 D_800DD170;
-extern void func_002051F4(s32 arg0, s32 arg1);
+extern void CCache__Unlock(s32 arg0, s32 arg1);
 extern s32 D_800DD178[];
-void func_0020B624(void) {
-    extern void func_0020565C(s32 arg0, s32 arg1);
+void Render_FlushBatches(void) {
+    extern void CCache__LockForDisplayList(s32 arg0, s32 arg1);
     s32 temp_s0;
     s32 var_s1;
-    func_0020A568();
+    Render_FlushModelBatch();
     var_s1 = 0;
-    func_0020A994();
+    Render_DrawBatches();
     if (D_800DD170 > 0) {
         do {
             temp_s0 = D_800DD178[var_s1];
-            func_0020565C(0, temp_s0);
-            func_002051F4(0, temp_s0);
+            CCache__LockForDisplayList(0, temp_s0);
+            CCache__Unlock(0, temp_s0);
             var_s1 += 1;
         } while (var_s1 < D_800DD170);
     }

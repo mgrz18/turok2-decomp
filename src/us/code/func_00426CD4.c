@@ -12,7 +12,7 @@ static __inline__ s32 toUpper(s32 c) {
 }
 
 /* Upper-cases n characters of src in place and encodes them as pak font codes at dst (0 when none fits). */
-void func_00426CD4(u8 *src, u8 *dst, s32 n) {
+void Pak_EncodeText(u8 *src, u8 *dst, s32 n) {
     s32 i;
     s32 j;
 

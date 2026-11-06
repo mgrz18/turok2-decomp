@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/pak.h"
 
-s32 func_0045F62C(s32 i, s32 *freeCount) {
+s32 Pak_CountEmptyNotes_2(s32 i, s32 *freeCount) {
     s32 j;
 
     if (D_80130C60[i] != 3) {

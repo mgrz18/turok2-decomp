@@ -4,13 +4,13 @@
 
 extern CCollisionResults *D_800F1ADC;
 
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);           /* out = a - b */
-void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);           /* out = a + b */
-void func_0020EF60(CVector3 *out, CVector3 *v, f32 k);                 /* out = v * k */
-void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);    /* out = a + (b - a) * t */
-void func_0020F144(CVector3 *out, CVector3 *v, CVector3 *n, f32 bounce); /* bounce off n */
-void func_0020F1D8(CVector3 *out, CVector3 *v, CVector3 *n);           /* slide along n */
-void func_0020F3C0(CVector3 *out, CVector3 *v, CVector3 *n);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);           /* out = a - b */
+void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);           /* out = a + b */
+void CVector3__Scale(CVector3 *out, CVector3 *v, f32 k);                 /* out = v * k */
+void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);    /* out = a + (b - a) * t */
+void CVector3__Bounce(CVector3 *out, CVector3 *v, CVector3 *n, f32 bounce); /* bounce off n */
+void CVector3__RemoveComponent(CVector3 *out, CVector3 *v, CVector3 *n);           /* slide along n */
+void CVector3__ProjectKeepLength(CVector3 *out, CVector3 *v, CVector3 *n);
 f32 func_00298470(f32);                                                /* sqrtf */
 
 #define DOT(a, b) ((a)->x * (b)->x + (a)->y * (b)->y + (a)->z * (b)->z)
@@ -19,7 +19,7 @@ f32 func_00298470(f32);                                                /* sqrtf 
  * nearer hit records it and answers it the way kind says (1 stop, 2 slide,
  * 3 bounce, 4 and 5 other slides, 6 slide or bounce, 7 pass through).
  * Returns 1 when the hit was taken. */
-s32 func_0023AB18(Sweep *sweep, CVector3 *normal, CVector3 *point, s32 frontOnly, s32 kind, f32 friction,
+s32 Sweep_HitPlane(Sweep *sweep, CVector3 *normal, CVector3 *point, s32 frontOnly, s32 kind, f32 friction,
                   s32 allowBehind) {
     CVector3 toPoint;
     CVector3 dir;
@@ -50,7 +50,7 @@ s32 func_0023AB18(Sweep *sweep, CVector3 *normal, CVector3 *point, s32 frontOnly
     if (frontOnly && denom > 0.0f) {
         return 0;
     }
-    func_0020EF2C(&toPoint, point, &sweep->inst->m_vPos);
+    CVector3__Subtract(&toPoint, point, &sweep->inst->m_vPos);
     t = DOT(normal, &toPoint) / denom;
     if (sweep->hit.fraction <= t) {
         return 0;
@@ -63,7 +63,7 @@ s32 func_0023AB18(Sweep *sweep, CVector3 *normal, CVector3 *point, s32 frontOnly
     }
     D_800F1ADC->m_vNormal = *normal;
     sweep->hit.fraction = t;
-    func_0020EF8C(&sweep->hit.pos, t, &sweep->inst->m_vPos, &sweep->end);
+    CVector3__Lerp(&sweep->hit.pos, t, &sweep->inst->m_vPos, &sweep->end);
     if (kind == 6) {
         kind = 3;
         if (sweep->onGround) {
@@ -103,19 +103,19 @@ s32 func_0023AB18(Sweep *sweep, CVector3 *normal, CVector3 *point, s32 frontOnly
                 if (len == 0.0f) {
                     return 0;
                 }
-                func_0020EF60(&dir, normal, 1.0f / len);
+                CVector3__Scale(&dir, normal, 1.0f / len);
             }
             if (sweep->physics) {
-                func_0020F144(&vel, &sweep->obj->m_vVelocity, &dir, sweep->def->m_BounceReturnEnergy);
+                CVector3__Bounce(&vel, &sweep->obj->m_vVelocity, &dir, sweep->def->m_BounceReturnEnergy);
                 sweep->hit.vel = vel;
-                func_0020EF60(&sweep->hit.vel, &sweep->hit.vel, 1.0f - friction);
+                CVector3__Scale(&sweep->hit.vel, &sweep->hit.vel, 1.0f - friction);
             }
             if (sweep->more) {
                 sweep->hit.type = 3;
-                func_0020EF60(&rest, &sweep->delta, 1.0f - t);
-                func_0020F144(&bounced, &rest, &dir, sweep->def->m_BounceReturnEnergy);
-                func_0020EF60(&bounced, &bounced, 1.0f - friction);
-                func_0020EEF8(&sweep->hit.slideTo, &sweep->hit.pos, &bounced);
+                CVector3__Scale(&rest, &sweep->delta, 1.0f - t);
+                CVector3__Bounce(&bounced, &rest, &dir, sweep->def->m_BounceReturnEnergy);
+                CVector3__Scale(&bounced, &bounced, 1.0f - friction);
+                CVector3__Add(&sweep->hit.slideTo, &sweep->hit.pos, &bounced);
             } else {
                 sweep->hit.type = 2;
             }
@@ -128,21 +128,21 @@ s32 func_0023AB18(Sweep *sweep, CVector3 *normal, CVector3 *point, s32 frontOnly
                 if (len == 0.0f) {
                     return 0;
                 }
-                func_0020EF60(&dir, normal, 1.0f / len);
+                CVector3__Scale(&dir, normal, 1.0f / len);
             }
             if (sweep->physics) {
-                func_0020F1D8(&vel, &sweep->obj->m_vVelocity, &dir);
+                CVector3__RemoveComponent(&vel, &sweep->obj->m_vVelocity, &dir);
                 sweep->hit.vel = vel;
-                func_0020EF60(&sweep->hit.vel, &sweep->hit.vel, 1.0f - friction);
+                CVector3__Scale(&sweep->hit.vel, &sweep->hit.vel, 1.0f - friction);
             }
             if (sweep->more) {
                 sweep->hit.type = 3;
-                func_0020EF60(&rest, &sweep->delta, 1.0f - t);
-                func_0020F1D8(&move, &rest, &dir);
-                func_0020EF60(&move, &move, 1.0f - friction);
-                func_0020EEF8(&sweep->hit.slideTo, &sweep->hit.pos, &move);
-                func_0020EF60(&push, &dir, 0.2048f);
-                func_0020EEF8(&sweep->hit.slideTo, &sweep->hit.slideTo, &push);
+                CVector3__Scale(&rest, &sweep->delta, 1.0f - t);
+                CVector3__RemoveComponent(&move, &rest, &dir);
+                CVector3__Scale(&move, &move, 1.0f - friction);
+                CVector3__Add(&sweep->hit.slideTo, &sweep->hit.pos, &move);
+                CVector3__Scale(&push, &dir, 0.2048f);
+                CVector3__Add(&sweep->hit.slideTo, &sweep->hit.slideTo, &push);
             } else {
                 sweep->hit.type = 2;
             }
@@ -155,19 +155,19 @@ s32 func_0023AB18(Sweep *sweep, CVector3 *normal, CVector3 *point, s32 frontOnly
                 if (len == 0.0f) {
                     return 0;
                 }
-                func_0020EF60(&dir, normal, 1.0f / len);
+                CVector3__Scale(&dir, normal, 1.0f / len);
             }
             if (sweep->physics) {
-                func_0020F3C0(&vel, &sweep->obj->m_vVelocity, &dir);
+                CVector3__ProjectKeepLength(&vel, &sweep->obj->m_vVelocity, &dir);
                 sweep->hit.vel = vel;
             }
             if (sweep->more) {
                 sweep->hit.type = 3;
-                func_0020EF60(&rest, &sweep->delta, 1.0f - t);
-                func_0020F3C0(&move, &rest, &dir);
-                func_0020EEF8(&sweep->hit.slideTo, &sweep->hit.pos, &move);
-                func_0020EF60(&push, &dir, 0.2048f);
-                func_0020EEF8(&sweep->hit.slideTo, &sweep->hit.slideTo, &push);
+                CVector3__Scale(&rest, &sweep->delta, 1.0f - t);
+                CVector3__ProjectKeepLength(&move, &rest, &dir);
+                CVector3__Add(&sweep->hit.slideTo, &sweep->hit.pos, &move);
+                CVector3__Scale(&push, &dir, 0.2048f);
+                CVector3__Add(&sweep->hit.slideTo, &sweep->hit.slideTo, &push);
             } else {
                 sweep->hit.type = 2;
             }
@@ -180,24 +180,24 @@ s32 func_0023AB18(Sweep *sweep, CVector3 *normal, CVector3 *point, s32 frontOnly
                 if (len == 0.0f) {
                     return 0;
                 }
-                func_0020EF60(&dir, normal, 1.0f / len);
+                CVector3__Scale(&dir, normal, 1.0f / len);
             }
             if (sweep->physics) {
-                func_0020F1D8(&a, &sweep->obj->m_vVelocity, &dir);
-                func_0020F3C0(&b, &sweep->obj->m_vVelocity, &dir);
-                func_0020EF8C(&sweep->hit.vel, 0.25f, &a, &b);
-                func_0020EF60(&sweep->hit.vel, &sweep->hit.vel, 1.0f - friction);
+                CVector3__RemoveComponent(&a, &sweep->obj->m_vVelocity, &dir);
+                CVector3__ProjectKeepLength(&b, &sweep->obj->m_vVelocity, &dir);
+                CVector3__Lerp(&sweep->hit.vel, 0.25f, &a, &b);
+                CVector3__Scale(&sweep->hit.vel, &sweep->hit.vel, 1.0f - friction);
             }
             if (sweep->more) {
                 sweep->hit.type = 3;
-                func_0020EF60(&rest, &sweep->delta, 1.0f - t);
-                func_0020F1D8(&a, &rest, &dir);
-                func_0020F3C0(&b, &rest, &dir);
-                func_0020EF8C(&move, 0.25f, &a, &b);
-                func_0020EF60(&move, &move, 1.0f - friction);
-                func_0020EEF8(&sweep->hit.slideTo, &sweep->hit.pos, &move);
-                func_0020EF60(&push, &dir, 0.2048f);
-                func_0020EEF8(&sweep->hit.slideTo, &sweep->hit.slideTo, &push);
+                CVector3__Scale(&rest, &sweep->delta, 1.0f - t);
+                CVector3__RemoveComponent(&a, &rest, &dir);
+                CVector3__ProjectKeepLength(&b, &rest, &dir);
+                CVector3__Lerp(&move, 0.25f, &a, &b);
+                CVector3__Scale(&move, &move, 1.0f - friction);
+                CVector3__Add(&sweep->hit.slideTo, &sweep->hit.pos, &move);
+                CVector3__Scale(&push, &dir, 0.2048f);
+                CVector3__Add(&sweep->hit.slideTo, &sweep->hit.slideTo, &push);
             } else {
                 sweep->hit.type = 2;
             }

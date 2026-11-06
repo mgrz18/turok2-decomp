@@ -22,7 +22,7 @@ extern s32 D_80130984;
 extern s32 D_801309B4;
 extern s32 D_80130990;
 extern char *D_800C140C[];
-s32 func_0045AC40(struct Field *field, s16 *arg1) {
+s32 PakMenu_UpdateSubtitle_2(struct Field *field, s16 *arg1) {
     s32 option;
     u32 rel;
     option = *arg1;

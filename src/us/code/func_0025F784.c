@@ -1,18 +1,18 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* How this actor uses CAI's m_VarBuffer (as in func_0025C1B0.c). */
+/* How this actor uses CAI's m_VarBuffer (as in EnemyAI_IdleSoundCallback.c). */
 typedef struct {
     /* 0x00 */ u8 pad0[0x24];
     /* 0x24 */ s8 mode[3];
     /* 0x27 */ s8 modeIndex;
 } AIModeVars;
 
-s32 func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
+s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
-void func_0025F784(CGameObjectInstance *obj, CAI *ai) {
+void EnemyMode_UnderwaterToAir_Update(CGameObjectInstance *obj, CAI *ai) {
     ((AIModeVars *) ai->m_VarBuffer)->modeIndex = 1;
     if (ai->m_AnimRepeatedCount != 0) {
-        func_00243414(obj, ai, 4);
+        CAI__SetMode(obj, ai, 4);
     }
 }

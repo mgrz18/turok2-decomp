@@ -9,7 +9,7 @@ typedef struct {
     /* 0x1C */ s32 unk1C;
 } Unk0045E524;
 
-void func_0045E524(Unk0045E524 *arg0) {
+void GfxPool_Clear_2(Unk0045E524 *arg0) {
     s32 var_v1;
     s32 *var_v0;
 

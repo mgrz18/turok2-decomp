@@ -39,8 +39,8 @@ extern u32 __osDisableInt(void);   /* __osDisableInt */
 extern void __osRestoreInt(u32);   /* __osRestoreInt */
 extern s32 osRecvMesg(void *mq, void *msg, s32 flag);
 extern s32 osSendMesg(void *mq, void *msg, s32 flag);
-extern void func_00207A70(s32);
-extern void func_00207FEC(s32);
+extern void Render_SetCombineMode(s32);
+extern void Render_SetRenderMode(s32);
 
 #define _SHIFTL(v, s, w) ((unsigned int) (((unsigned int) (v) & ((0x01 << (w)) - 1)) << (s)))
 #define G_FILLRECT 0xF6
@@ -72,7 +72,7 @@ extern void func_00207FEC(s32);
 /* Debug view of the heap: a grey box with one band per tracked allocation, scaled to the total heap
  * size (yellow = locked, red = bit 8, blue = bits 9/10, else green) with a half-bright edge line; nodes
  * not touched for 5 or more frames get a white overlay with a brighter edge. */
-void func_00204778(s32 unused, s32 left, s32 top, s32 right, s32 bottom) {
+void CCache__DrawDebug(s32 unused, s32 left, s32 top, s32 right, s32 bottom) {
     u32 mask;
     u32 mask2;
     HeapSpan *span;
@@ -91,11 +91,11 @@ void func_00204778(s32 unused, s32 left, s32 top, s32 right, s32 bottom) {
 
     gDPPipeSync(D_800D8E24++);
     gDPSetCycleType1Cycle(D_800D8E24++);
-    func_00207A70(0x19);
-    func_00207FEC(0x15);
+    Render_SetCombineMode(0x19);
+    Render_SetRenderMode(0x15);
     gDPSetPrimColor(D_800D8E24++, 0, 0, 0xA0, 0xA0, 0xA0, 0x00);
     gDPFillRectangle(D_800D8E24++, left - 1, top - 1, right + 1, bottom + 1);
-    func_00207FEC(0x1B);
+    Render_SetRenderMode(0x1B);
     gDPSetPrimColor(D_800D8E24++, 0, 0, 0xA0, 0xA0, 0xA0, 0xFF);
     gDPFillRectangle(D_800D8E24++, left, top, right, bottom);
 

@@ -15,19 +15,19 @@ extern s32 D_8011ACA4;
 extern f32 D_800B6D28;      /* frame time */
 extern GameState D_801198A4;
 
-extern s32 func_00283BC0(void);
-extern s32 func_00284174(void);
-extern s32 func_00284240(void);
-extern void func_002838A4(void);
-extern void func_00283A4C(void);
-extern void func_00412798(void);
-extern void func_00284468(s32);
-extern void func_002844F0(void);
-extern void func_002052D8(void *, void *);
-extern void func_00275904(s32);
-extern void func_00206068(s32);
+extern s32 Cinema_StartPending(void);
+extern s32 Cinema_IsActive(void);
+extern s32 Cinema_IsFinished(void);
+extern void Cinema_Start(void);
+extern void Cinema_RestorePlayer(void);
+extern void Cinema_FireCues(void);
+extern void Cinema_RunEnd(s32);
+extern void Cinema_Close(void);
+extern void CCache__Deallocate(void *, void *);
+extern void Sound__StopAllExcept(s32);
+extern void CCache__SetFrameDelay(s32);
 
-void func_00283CD4(void) {
+void Cinema_Update(void) {
     Cinema *ctx;
     f32 value;
     f32 limit;
@@ -36,16 +36,16 @@ void func_00283CD4(void) {
         return;
     }
     D_800B6CE0 = D_800B6D18;
-    if (func_00283BC0() == 0) {
-        if (func_00284174() != 0) {
-            if (D_8011ACA4 != 0 || func_00284240() != 0) {
+    if (Cinema_StartPending() == 0) {
+        if (Cinema_IsActive() != 0) {
+            if (D_8011ACA4 != 0 || Cinema_IsFinished() != 0) {
                 D_800C1BB0->prevTime = D_800C1BB0->time;
             } else {
                 ctx = D_800C1BB0;
                 ctx->prevTime = *(volatile f32 *)&ctx->time;
                 ctx->time += D_800B6D28 * 0.06666667f;
                 if (ctx->startTime <= ctx->time) {
-                    func_002838A4();
+                    Cinema_Start();
                 }
                 value = D_800C1BB0->time;
                 limit = D_800C1BB0->clipEnd;
@@ -58,17 +58,17 @@ void func_00283CD4(void) {
                 }
             }
         }
-        func_00412798();
+        Cinema_FireCues();
     }
-    func_00283BC0();
+    Cinema_StartPending();
     if (D_800C1BB0->fading != 0 && (D_800C1BB0->fade -= 2.0f * (D_800B6D28 * 0.06666667f)) < -0.5f) {
         D_800C1BB0->fading = 0;
         D_800C1BB0->fade = 0.0f;
-        if (func_00284174() != 0) {
-            func_00284468(1);
-            func_002844F0();
+        if (Cinema_IsActive() != 0) {
+            Cinema_RunEnd(1);
+            Cinema_Close();
             if (D_800C1BB0->owner != 0) {
-                func_002052D8(0, D_800C1BB0->owner);
+                CCache__Deallocate(0, D_800C1BB0->owner);
             }
             D_800C1BB0->owner = 0;
             D_800C1BB0->resource = 0;
@@ -78,14 +78,14 @@ void func_00283CD4(void) {
         }
         return;
     }
-    func_00283BC0();
-    if (func_00284174() != 0 && func_00284240() == 0 && D_801198A4.busy == 0 && D_801198A4.paused == 0) {
+    Cinema_StartPending();
+    if (Cinema_IsActive() != 0 && Cinema_IsFinished() == 0 && D_801198A4.busy == 0 && D_801198A4.paused == 0) {
         if (D_800C1BB0->time >= D_800C1BB0->endTime && D_800C1BB0->ended == 0) {
             CinemaCallback cue;
 
-            func_00275904(-1);
+            Sound__StopAllExcept(-1);
             if (D_800C1BB0->restoreAtEnd != 0) {
-                func_00283A4C();
+                Cinema_RestorePlayer();
             }
             ctx = D_800C1BB0;
             cue = ctx->onEnd;
@@ -97,7 +97,7 @@ void func_00283CD4(void) {
         }
         if (D_800C1BB0->time >= D_800C1BB0->clipEnd && D_800C1BB0->closed == 0) {
             if (D_800C1BB0->owner != 0) {
-                func_002052D8(0, D_800C1BB0->owner);
+                CCache__Deallocate(0, D_800C1BB0->owner);
             }
             {
                 CinemaCallback end = D_800C1BB0->onClose;
@@ -115,8 +115,8 @@ void func_00283CD4(void) {
             D_800C1BB0->closed = 1;
         }
     }
-    func_00283BC0();
+    Cinema_StartPending();
     if (D_800C1BB0->active != 0) {
-        func_00206068(0xA);
+        CCache__SetFrameDelay(0xA);
     }
 }

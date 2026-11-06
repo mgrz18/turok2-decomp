@@ -5,12 +5,12 @@
 
 extern SineTable D_800ACBF8;
 extern s32 D_800B6D18;
-extern void func_0020F040(CVector3 *);
-extern void func_0020FF80(f32 *, f32 *);
-extern void func_0020EF60(CVector3 *, CVector3 *, f32);
-extern void func_00210318(f32 *, f32, f32, f32);
-extern void func_0020FCC4(f32 *, f32, f32, f32, f32);
-extern void func_0020C618(f32 *, f32 *, f32 *);
+extern void CVector3__Normalize(CVector3 *);
+extern void CMtxF__Copy(f32 *, f32 *);
+extern void CVector3__Scale(CVector3 *, CVector3 *, f32);
+extern void CMtxF__Translate(f32 *, f32, f32, f32);
+extern void CMtxF__SetAxisAngle(f32 *, f32, f32, f32, f32);
+extern void CMtxF__MultiplyAffine(f32 *, f32 *, f32 *);
 void func_0021B59C(s32 time, s32 flags, f32 *matrix) {
     f32 rotation[16];
     f32 inverse[16];
@@ -53,16 +53,16 @@ void func_0021B59C(s32 time, s32 flags, f32 *matrix) {
     } else {
         return;
     }
-    func_0020F040(&axis);
+    CVector3__Normalize(&axis);
     origin.x = matrix[12];
     origin.y = matrix[13];
     origin.z = matrix[14];
-    func_0020FF80(inverse, matrix);
+    CMtxF__Copy(inverse, matrix);
     flip = -1.0f;
-    func_0020EF60(&origin, &origin, flip);
-    func_00210318(inverse, origin.x, origin.y, origin.z);
-    func_0020FCC4(rotation, angle, axis.x, axis.y, axis.z);
-    func_0020C618(matrix, inverse, rotation);
-    func_0020EF60(&origin, &origin, flip);
-    func_00210318(matrix, origin.x, origin.y, origin.z);
+    CVector3__Scale(&origin, &origin, flip);
+    CMtxF__Translate(inverse, origin.x, origin.y, origin.z);
+    CMtxF__SetAxisAngle(rotation, angle, axis.x, axis.y, axis.z);
+    CMtxF__MultiplyAffine(matrix, inverse, rotation);
+    CVector3__Scale(&origin, &origin, flip);
+    CMtxF__Translate(matrix, origin.x, origin.y, origin.z);
 }

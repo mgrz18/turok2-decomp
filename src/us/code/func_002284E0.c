@@ -31,21 +31,21 @@ struct UnitLight {
 };
 struct LightNode;
 typedef struct LightNode LightNode;
-extern void func_0020F85C(void *arg0, void *arg1, void *arg2);
+extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
 extern Gfx *D_800D8E24;
 extern s32 D_800F1800;
 extern UnitLight D_800F1400[];
 extern char D_8010FF34;
-extern LightNode *func_00228B8C(void *);
-extern LightNode *func_00228B98(void *, LightNode *);
-void func_002284E0(char *view) {
+extern LightNode *CDLightSet__GetFirst(void *);
+extern LightNode *CDLightSet__GetNext(void *, LightNode *);
+void DLights_Load(char *view) {
     LightNode *node;
     LightData *data;
     f32 position[4];
     f32 out[4];
     s32 i;
     s32 x;
-    node = func_00228B8C(&D_8010FF34);
+    node = CDLightSet__GetFirst(&D_8010FF34);
     if (node == 0) {
         Gfx *g = D_800D8E24++;
         { Gfx *_gbi = (Gfx *)(g); _gbi->w0 = ((((unsigned int)(0xD9) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(~(0x80)) & (0xFFFFFFFFU >> (32 - (24)))) << (0))); _gbi->w1 = ((unsigned int)(0)); };
@@ -59,7 +59,7 @@ void func_002284E0(char *view) {
             position[0] = node->position[0];
             position[1] = node->position[1];
             position[2] = node->position[2];
-            func_0020F85C(view + 0x20C, position, out);
+            CMtxF__TransformPoint(view + 0x20C, position, out);
             x = out[0];
             D_800F1400[i + D_800F1800].dir[0] = -x;
             D_800F1400[i + D_800F1800].dir[1] = out[1];
@@ -75,7 +75,7 @@ void func_002284E0(char *view) {
             D_800F1400[i + D_800F1800].falloff = -0x8000;
         }
         if (node != 0) {
-            node = func_00228B98(&D_8010FF34, node);
+            node = CDLightSet__GetNext(&D_8010FF34, node);
         }
         {
             Gfx *g = D_800D8E24++;

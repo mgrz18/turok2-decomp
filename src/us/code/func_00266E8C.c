@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-s32 func_00266E8C(void *arg0, s32 arg1)
+s32 BitTest(void *arg0, s32 arg1)
 {
   s32 temp_a1;
   s32 temp_v0;

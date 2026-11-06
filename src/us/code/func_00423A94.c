@@ -4,7 +4,7 @@
 extern s32 D_801309A4;
 extern s32 D_801309B0;
 
-void func_00423A94(void) {
+void PakConfirmMenu_InitOverwrite(void) {
     D_801309B0 = 3;
     D_801309A4 = 0;
 }

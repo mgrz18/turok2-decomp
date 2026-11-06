@@ -20,7 +20,7 @@ typedef struct {
 } NodeQueue;
 
 /* Takes a node off the free list and appends it to the used list. */
-PoolNode *func_0029247C(NodeQueue *arg0, s8 arg1, s8 arg2, s8 arg3) {
+PoolNode *__mapVoice(NodeQueue *arg0, s8 arg1, s8 arg2, s8 arg3) {
     PoolNode *temp_v1;
 
     temp_v1 = arg0->freeList;

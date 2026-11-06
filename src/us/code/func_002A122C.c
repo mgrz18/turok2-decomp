@@ -3,12 +3,12 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002A0448(void *arg0);
-extern void func_002A0B6C(void *arg0, void *arg1);
+extern void adecDecodeFrame(void *arg0);
+extern void adecImdctFrame(void *arg0, void *arg1);
 extern unsigned short D_800B8BB2;
 extern DecodeState D_80125C38;
 extern char D_80125EF0;
-void *func_002A122C(void) {
+void *adecNextFrame(void) {
     struct DecodeState *base = &D_80125C38;
     unsigned short *counter;
     char *slots;
@@ -16,7 +16,7 @@ void *func_002A122C(void) {
     if (base->count == 0) {
         return 0;
     }
-    func_002A0448(base);
+    adecDecodeFrame(base);
     counter = &D_800B8BB2;
     temp = *counter + 1;
     *counter = temp;
@@ -24,7 +24,7 @@ void *func_002A122C(void) {
         *counter = 0;
     }
     slots = &D_80125EF0;
-    func_002A0B6C(slots + (*counter << 9), base);
+    adecImdctFrame(slots + (*counter << 9), base);
     base->count = base->count - 1;
     return slots + (*counter << 9);
 }

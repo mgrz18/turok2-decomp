@@ -18,7 +18,7 @@ s32 CList__AddTail(void *, void *);
 s32 CList__Remove(void *, void *);
 
 /* Frees every active node of the swoosh/decal set (D_801102B8, not the particle system) that belongs to arg1. */
-void func_002365F8(SwooshSet *arg0, s32 arg1)
+void SwooshSet_FreeOwner(SwooshSet *arg0, s32 arg1)
 {
   s32 var_s4;
   CList *temp_s2;

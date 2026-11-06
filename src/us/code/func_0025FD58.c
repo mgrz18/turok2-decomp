@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_0025FD58(void) {
+void EnemyMode_FeignDeath_Enter(void) {
 
 }

@@ -1,4 +1,4 @@
-/* Second-module copy of func_00422314 (first module; this one at link address 0x00422234), calling this module's own functions at their link addresses. */
+/* Second-module copy of CharNoteMenu_UpdateType (first module; this one at link address 0x00422234), calling this module's own functions at their link addresses. */
 #include "common.h"
 #include "structs/menu.h"
 
@@ -17,7 +17,7 @@ extern char D_800B53AC[];
 extern s8 D_80130950[];
 extern s32 D_801309A8;
 
-s32 func_0045B234(MenuItem *item) {
+s32 CharNoteMenu_UpdateType_2(MenuItem *item) {
     char *src;
     char *dst;
     s32 i;

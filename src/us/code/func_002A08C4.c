@@ -3,12 +3,12 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_002A08C4(f32 *out, s16 *in);
+extern s32 adecDequantize(f32 *out, s16 *in);
 extern float D_800AAC34;
 extern u16 D_800B8A88[];
 extern s16 D_800B8AA6;
 extern f32 D_800B8AA8[];
-s32 func_002A08C4(f32 *out, s16 *in) {
+s32 adecDequantize(f32 *out, s16 *in) {
     s16 *scale;
     s16 band;
     s16 i;

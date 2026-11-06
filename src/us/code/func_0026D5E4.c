@@ -11,7 +11,7 @@ typedef struct PBuf {
     s16 n;
     Pair16 e[0x18];
 } PBuf;
-s32 func_0026D5E4(PBuf *b, s16 x, s16 y) {
+s32 WeightedTable_Add(PBuf *b, s16 x, s16 y) {
     if (b->n == 0x18) {
         return 0;
     }

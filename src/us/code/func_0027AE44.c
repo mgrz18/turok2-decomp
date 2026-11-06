@@ -15,7 +15,7 @@ typedef struct {
 
 /* Frame `frame` (wrapped to the count) of *ptable: its data in *pdata and its
  * byte in *pbyte; *pdata is NULL with no table. */
-void func_0027AE44(FrameTable **ptable, s32 frame, void **pdata, u8 *pbyte) {
+void Hud_GetImageFrame(FrameTable **ptable, s32 frame, void **pdata, u8 *pbyte) {
     FrameTable *table;
     FrameEntry *entry;
     s32 offset;

@@ -22,12 +22,12 @@ extern u8 D_800ADB10[];
 extern u8 D_800ADB18[];
 extern u8 D_800ADB20[];
 extern u8 D_800ADB28[];
-void func_00228B4C(u8 *, void *);
-s32 func_002113A4();
-B05Fx *func_00228AEC(u8 *, u8 *);
-void func_0021F00C(CVector3 *out, B05P14 *p, CVector3 off);
-void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
-f32 func_002671B4(B05P14 *p);
+void CDLightSet__Free(u8 *, void *);
+s32 Random_Next();
+B05Fx *CDLightSet__Alloc(u8 *, u8 *);
+void CGameObjectInstance__LocalToWorld(CVector3 *out, B05P14 *p, CVector3 off);
+void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
+f32 GameObject_GetCollisionHeight(B05P14 *p);
 
 /* A separate function in Rage Wars; inlined here in Turok 2. */
 static inline void fxupd(B05P14 *p, void **slot, u8 *tab, f32 offz, f32 k1, f32 k2) {
@@ -35,7 +35,7 @@ static inline void fxupd(B05P14 *p, void **slot, u8 *tab, f32 offz, f32 k1, f32 
     CVector3 off;
     CVector3 v;
     if (fx == ((void *)0)) {
-        fx = func_00228AEC(D_8010FF34, tab);
+        fx = CDLightSet__Alloc(D_8010FF34, tab);
         if (fx == ((void *)0)) {
             return;
         }
@@ -44,21 +44,21 @@ static inline void fxupd(B05P14 *p, void **slot, u8 *tab, f32 offz, f32 k1, f32 
     off.x = 0.0f;
     off.y = 0.0f;
     off.z = offz;
-    func_0021F00C(&v, p, off);
-    func_0020EEF8(&v, &v, &p->pos);
+    CGameObjectInstance__LocalToWorld(&v, p, off);
+    CVector3__Add(&v, &v, &p->pos);
     fx->unk16 = 1;
     fx->unk10 = v.x;
-    fx->unk12 = v.y + func_002671B4(p) * k1;
+    fx->unk12 = v.y + GameObject_GetCollisionHeight(p) * k1;
     fx->unk14 = v.z;
     fx->unkC = k2;
 }
-void func_0024AB0C(B05P14 *p) {
+void CPlayer__UpdateFlashlight(B05P14 *p) {
     s32 vis;
     if (D_8011AAD8 & 0x4000) {
         p->timer = 0.0f;
     } else {
         if (p->fx3 != ((void *)0)) {
-            func_00228B4C(D_8010FF34, p->fx3);
+            CDLightSet__Free(D_8010FF34, p->fx3);
             p->fx3 = ((void *)0);
         }
     }
@@ -68,8 +68,8 @@ void func_0024AB0C(B05P14 *p) {
         if (p->timer < 70.0f) {
             vis = 1;
             if (p->timer < 20.0f) {
-                vis = ((func_002113A4() % 100) < 0x32) ^ vis;
-            } else if ((func_002113A4() % 100) < 0xF) {
+                vis = ((Random_Next() % 100) < 0x32) ^ vis;
+            } else if ((Random_Next() % 100) < 0xF) {
                 vis = 0;
             }
             if (p->fx1 != ((void *)0)) {
@@ -81,11 +81,11 @@ void func_0024AB0C(B05P14 *p) {
         }
     } else {
         if (p->fx1 != ((void *)0)) {
-            func_00228B4C(D_8010FF34, p->fx1);
+            CDLightSet__Free(D_8010FF34, p->fx1);
             p->fx1 = ((void *)0);
         }
         if (p->fx2 != ((void *)0)) {
-            func_00228B4C(D_8010FF34, p->fx2);
+            CDLightSet__Free(D_8010FF34, p->fx2);
             p->fx2 = ((void *)0);
         }
     }

@@ -8,8 +8,8 @@ typedef unsigned short u16;
 typedef float Matrix[4][4];
 typedef struct { long m[4][4]; } Mtx;
 
-void func_00297BCC(float mf[4][4]);          /* guMtxIdentF */
-void func_00297C1C(float mf[4][4], Mtx *m);  /* guMtxF2L */
+void guMtxIdentF(float mf[4][4]);          /* guMtxIdentF */
+void guMtxF2L(float mf[4][4], Mtx *m);  /* guMtxF2L */
 float func_002974C0(float x);                /* cosf */
 float func_002982F0(float x);                /* sinf */
 
@@ -18,7 +18,7 @@ static __inline__ void guPerspectiveF(float mf[4][4], u16 *perspNorm, float fovy
     float cot;
     int i, j;
 
-    func_00297BCC(mf);
+    guMtxIdentF(mf);
 
     fovy *= 3.1415926f / 180.0f;
     cot = func_002974C0(fovy / 2.0f) / func_002982F0(fovy / 2.0f);
@@ -48,9 +48,9 @@ static __inline__ void guPerspectiveF(float mf[4][4], u16 *perspNorm, float fovy
     }
 }
 
-void func_00297FB0(Mtx *m, u16 *perspNorm, float fovy, float aspect, float near, float far, float scale) {
+void guPerspective(Mtx *m, u16 *perspNorm, float fovy, float aspect, float near, float far, float scale) {
     Matrix mf;
 
     guPerspectiveF(mf, perspNorm, fovy, aspect, near, far, scale);
-    func_00297C1C(mf, m);
+    guMtxF2L(mf, m);
 }

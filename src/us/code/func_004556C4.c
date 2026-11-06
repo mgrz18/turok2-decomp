@@ -1,10 +1,10 @@
-/* The same code as func_0041C764 (the other module). */
+/* The same code as OptionsMenu_ToggleWeaponSelect (the other module). */
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 
 extern CPlayerOptions D_8011AB18;
-s32 func_004556C4(void *unused, Menu *menu) {
+s32 OptionsMenu_ToggleWeaponSelect_2(void *unused, Menu *menu) {
     CPlayerOptions *settings = &D_8011AB18;
     if (menu->player != 0) {
         settings = menu->player->m_pOptions;

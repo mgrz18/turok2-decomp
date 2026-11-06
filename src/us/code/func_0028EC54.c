@@ -12,7 +12,7 @@ typedef struct {
 s32 osSendMesg(void *mq, void *msg, s32 flag);
 
 
-void func_0028EC54(RegionDesc *desc) {
+void VM_AllocRegion(RegionDesc *desc) {
     PageRegion *p;
     PageRegion *prev;
     PageRegion *r;

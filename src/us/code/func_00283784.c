@@ -6,7 +6,7 @@ typedef struct {
 } Sortable;
 
 /* qsort-style comparator on the float at 0x210 of the pointed-to objects. */
-s32 func_00283784(Sortable **arg0, Sortable **arg1) {
+s32 Emitter_CompareHeightDesc(Sortable **arg0, Sortable **arg1) {
     s32 r = 1;
     if ((*arg0)->key > (*arg1)->key) {
         r = -1;

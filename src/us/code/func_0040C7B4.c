@@ -3,8 +3,8 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-s32 func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
+s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
-void func_0040C7B4(void) {
-    func_00243414(D_8012FB70.obj, &D_8012FB70.obj->m_AI, 0x14);
+void MotherBoss_OnPhase2CinemaDone(void) {
+    CAI__SetMode(D_8012FB70.obj, &D_8012FB70.obj->m_AI, 0x14);
 }

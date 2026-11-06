@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002103C8(float * arg0, float * arg1, float sx, float sy, float sz);
+extern void CMtxF__CopyScaled(float * arg0, float * arg1, float sx, float sy, float sz);
 extern f32 D_800A5618;
-void func_002103C8(f32 *arg0, f32 *arg1, f32 sx, f32 sy, f32 sz) {
+void CMtxF__CopyScaled(f32 *arg0, f32 *arg1, f32 sx, f32 sy, f32 sz) {
     arg0[0] = arg1[0] * sx;
     arg0[1] = arg1[1] * sx;
     arg0[2] = arg1[2] * sx;

@@ -5,12 +5,12 @@
 
 /* Draw an actor's model (params->m_hModel) with the current view's lighting:
  * first pick its two colour sets (params->m_nModel/set1), from its intelligence's
- * death models (by AI mode) for an enemy (type 1), then its shadow (func_0021DC84). */
+ * death models (by AI mode) for an enemy (type 1), then its shadow (CGameObjectInstance__DrawShadow). */
 
 extern s32 D_800B6D1C;      /* current view */
 
-void func_0021DC84(CGameObjectInstance *, s32, CDrawArgs *);
-void func_0020B6A0(s32, s32, s32, void *, s32, s32, s32);
+void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
+void Render_QueueModelInstance(s32, s32, s32, void *, s32, s32, s32);
 
 static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0, s32 *set1) {
     CIntelligence *intel = actor->header.m_pIntelligence;
@@ -53,13 +53,13 @@ static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0
     }
 }
 
-void func_0021D7BC(CGameObjectInstance *actor, s32 arg1, CDrawArgs *params) {
+void CGameObjectInstance__DrawModel(CGameObjectInstance *actor, s32 arg1, CDrawArgs *params) {
     pickSets(actor, params->m_nVariant, &params->m_nModel, &params->m_nShadowModel);
     actor->m_AI.m_VisBits = 1 << params->m_nModel;
     if (params->m_bShadow != 0) {
-        func_0021DC84(actor, arg1, params);
+        CGameObjectInstance__DrawShadow(actor, arg1, params);
     }
     if (params->m_bDraw != 0) {
-        func_0020B6A0(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[D_800B6D1C], 0, params->m_nModel, actor->m_AI.m_nTexture);
+        Render_QueueModelInstance(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[D_800B6D1C], 0, params->m_nModel, actor->m_AI.m_nTexture);
     }
 }

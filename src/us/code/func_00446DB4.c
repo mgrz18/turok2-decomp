@@ -1,4 +1,4 @@
-/* Second-module copy of func_0040DDB4 (src/us/code/func_0040DDB4.c), with its string/data addresses 0xE0 lower. */
+/* Second-module copy of BlindOne_ActorHurt (src/us/code/BlindOne_ActorHurt.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -10,10 +10,10 @@
 
 extern BlindOneState D_80130200;
 extern u8 D_00432384[];
-extern void func_00236314(void *dst, void *src);
-extern void func_00243414(void *obj, CAI *ai, s32 state);
+extern void ScriptAnimator_SetScript(void *dst, void *src);
+extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 
-void func_00446DB4(void *obj, CAI *ai, DamageEvent *event) {
+void BlindOne_ActorHurt_2(void *obj, CAI *ai, DamageEvent *event) {
     BlindOneState *state = &D_80130200;
     s32 health;
 
@@ -25,10 +25,10 @@ void func_00446DB4(void *obj, CAI *ai, DamageEvent *event) {
         ai->m_Health = health;
         if (ai->m_BlindOne.m_HitTimer == 0.0f) {
             ai->m_BlindOne.m_HitTimer = 2.25f;
-            func_00236314(&state->faders[ai->m_BlindOne.m_nFader], D_00432384);
+            ScriptAnimator_SetScript(&state->faders[ai->m_BlindOne.m_nFader], D_00432384);
         }
         if (ai->m_Health == 0) {
-            func_00243414(obj, ai, 6);
+            CAI__SetMode(obj, ai, 6);
         }
     }
 }

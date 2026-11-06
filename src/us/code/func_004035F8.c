@@ -14,7 +14,7 @@ typedef struct {
 
 extern CListedInstance *D_8010FEB4;
 
-s32 func_004035F8(Group004035F8 *group) {
+s32 MantidQueen_CountActiveMinions(Group004035F8 *group) {
     s32 i;
     s32 n = 0;
     CListedInstance *a;

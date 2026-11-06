@@ -26,7 +26,7 @@
 })
 
 /* Extent on the ground plane. */
-s32 func_0026AFC0(CGameRegion *tri);   /* too steep to stand on */
+s32 CGameRegion__IsSteep(CGameRegion *tri);   /* too steep to stand on */
 
 /* tri's extent on the ground plane. */
 static __inline__ void triRect(CRect *r, CGameRegion *tri) {
@@ -37,7 +37,7 @@ static __inline__ void triRect(CRect *r, CGameRegion *tri) {
 }
 
 /* Top of tri, raised to that of any steep neighbour lying within its slightly grown footprint. */
-f32 func_0026B130(CGameRegion *tri) {
+f32 CGameRegion__GetTopWithSteepNeighbours(CGameRegion *tri) {
     CRect box;
     CRect adjBox;
     CGameRegion *adj;
@@ -54,7 +54,7 @@ f32 func_0026B130(CGameRegion *tri) {
     box.maxZ += margin;
     for (i = 0; i < 3; i++) {
         adj = tri->m_pNeighbours[i];
-        if (adj == NULL || !func_0026AFC0(adj)) {
+        if (adj == NULL || !CGameRegion__IsSteep(adj)) {
             continue;
         }
         triRect(&adjBox, adj);

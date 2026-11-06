@@ -1,10 +1,10 @@
 #include "common.h"
 
-s32 func_00416454(s32, s32, s32);
+s32 MenuItem_SelectSubmenu(s32, s32, s32);
 
-s32 func_00275A74();                            /* extern */
+s32 Music_RestoreVolume();                            /* extern */
 
-void func_00424A10(s32 arg0, s32 arg1, s32 arg2) {
-    func_00275A74();
-    func_00416454(arg0, arg1, arg2);
+void InventoryMenu_SelectOk(s32 arg0, s32 arg1, s32 arg2) {
+    Music_RestoreVolume();
+    MenuItem_SelectSubmenu(arg0, arg1, arg2);
 }

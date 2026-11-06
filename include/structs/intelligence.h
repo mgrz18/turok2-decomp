@@ -11,17 +11,17 @@
  * and src/IO/80200568_3.CPP), the same engine. Turok 2's bodies line up with
  * them field for field, except that its CCommonEnemyIntelligence is 0x34
  * bytes, not 0x38, so what follows it (the enemy and turret fields) sits 4
- * bytes lower. Checked against the code: the health setup (func_002427E0)
+ * bytes lower. Checked against the code: the health setup (AI_InitHealth)
  * reads the enemy's and the turret's health as a word at 0x18 and the
  * destructible's as a halfword, and hands 0x40/0x41 to the AI's m_Aggression
- * and m_TranqHealth; the generator's drop (func_00262D74) and delay
- * (func_00263594) read its object, variation, scale, particle and intervals;
- * the destructible's accessors (func_00265B2C...) its animations; the enemy's
- * 19 animation masks (handed to func_00245A98, one bit per animation of an
+ * and m_TranqHealth; the generator's drop (Generator_SpawnEnter) and delay
+ * (Generator_WaitEnter) read its object, variation, scale, particle and intervals;
+ * the destructible's accessors (Destructible_GetIdleAnim...) its animations; the enemy's
+ * 19 animation masks (handed to AI_PickAnimFromTable, one bit per animation of an
  * action table) run from 0x76 to 0x9A in Rage Wars' order (evade, combat
  * and the four attacks paired with the five attack radii, the arm wounds
  * as the hit-region reactions, flee as "can run"); the collision code
- * (func_002233A8) reads the door's two radii and the destructible's and
+ * (CScene__CheckAutoActivation) reads the door's two radii and the destructible's and
  * the action's "go" radius at their places.
  *
  * Offsets in the bodies are from the body (0x14); the comments give the
@@ -48,7 +48,7 @@ enum {
 };
 
 /* Type 0: scenery with collision. Types 0, 5, 8, 10 and 12 keep their
- * collision radius at 0x04 (func_002672C8). */
+ * collision radius at 0x04 (GameObject_GetCollisionRadius). */
 typedef struct CStaticIntelligence {
     /* 0x00 (0x14) */ u32 m_dwFlags;
     /* 0x04 (0x18) */ f32 m_CollisionRadius;
@@ -92,8 +92,8 @@ typedef struct CEnemyIntelligence {
     };
     /* 0x4E (0x62) */ u8 m_UnderwaterBehavior;
     /* 0x4F (0x63) */ union {
-        s8 m_DeathModels[6];                /* by death mode 0x36 + i: func_0021EBE4, func_0021D7BC */
-        struct {                            /* -1: none (func_0025B078 picks the death) */
+        s8 m_DeathModels[6];                /* by death mode 0x36 + i: CGameObjectInstance__GetDeathModels, CGameObjectInstance__DrawModel */
+        struct {                            /* -1: none (EnemyAI_PickDeathMode picks the death) */
             s8 m_ExplodeDeathModel;         /* modes 0x35/0x36 */
             s8 m_BlastDeathModel;           /* 0x37 */
             s8 m_SideDeathModel;            /* 0x38 */
@@ -103,7 +103,7 @@ typedef struct CEnemyIntelligence {
         };
     };
     /* 0x55 (0x69) */ u8 pad55;
-    /* 0x56 (0x6A) */ s16 m_GibModel;        /* the gibs' model is m_GibModel + 1 (func_0025B078) */
+    /* 0x56 (0x6A) */ s16 m_GibModel;        /* the gibs' model is m_GibModel + 1 (EnemyAI_PickDeathMode) */
     /* 0x58 (0x6C) */ s16 m_DeathAnims[5];
     /* 0x62 (0x76) */ u16 m_wIdleAnimFlags;
     /* 0x64 (0x78) */ u16 m_wMoveAnimFlags;
@@ -127,7 +127,7 @@ typedef struct CEnemyIntelligence {
 } CEnemyIntelligence; /* size 0x88 */
 
 /* Type 2: moving platforms (and lifts). Checked: the flags at 0x24 and the
- * move time at 0x38 (func_00264740 counts the timer down by dt / it). */
+ * move time at 0x38 (Platform_BackUpdate counts the timer down by dt / it). */
 typedef struct CPlatformIntelligence {
     /* 0x00 (0x14) */ u32 m_dwFlags;
     /* 0x04 (0x18) */ u16 m_CollisionType;
@@ -266,7 +266,7 @@ typedef struct CPlayerIntelligence {
     /* 0x2C (0x40) */ f32 m_ScaleZ;
 } CPlayerIntelligence;
 
-/* Type 12: an object that plays its animation (func_002156FC). */
+/* Type 12: an object that plays its animation (CLevelActor__Update). */
 typedef struct CMorpherIntelligence {
     /* 0x00 (0x14) */ u32 m_dwFlags;
     /* 0x04 (0x18) */ f32 m_CollisionRadius;

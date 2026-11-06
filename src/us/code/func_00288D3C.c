@@ -6,7 +6,7 @@
 extern s32 D_800F5D2C;
 extern f32 D_800A9DE4;
 
-s32 func_00288D3C(CEngineApp *ctx, f32 value, s32 normalNext, s32 forcedNext) {
+s32 CEngineApp__TimedModeSwitch(CEngineApp *ctx, f32 value, s32 normalNext, s32 forcedNext) {
     s32 *flag = &D_800F5D2C;
 
     if (*flag != 0 && forcedNext != -1) {

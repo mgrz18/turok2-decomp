@@ -17,12 +17,12 @@ typedef struct {
     u8 r, g, b, a;
 } Color4;
 
-void *func_002017D4(s32 *, s32);
+void *CISet__GetBlock(s32 *, s32);
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 /* Copies every vertex color of the model into `colors`, clamped to 30..225. */
-void func_00212F98(s32 *model, Color4 *colors) {
+void Lighting_CopyVertexColors(s32 *model, Color4 *colors) {
     VertexGroup *group;
     ModelVertex *verts;
     Color4 *c;
@@ -34,7 +34,7 @@ void func_00212F98(s32 *model, Color4 *colors) {
 
     k = 0;
     for (i = 0; i < *model; i++) {
-        group = func_002017D4(model, i);
+        group = CISet__GetBlock(model, i);
         verts = group->verts;
         n = group->count;
         for (j = 0; j < n; j++) {

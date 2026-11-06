@@ -7,8 +7,8 @@ extern BlindOnePhase D_0043240C[];
 extern u8 D_004324C8[];
 
 extern u8 D_800F7078[];
-extern void func_00225C84(void *);
-extern s32 func_00243414(CGameObjectInstance *actor, void *ai, s32 state);
+extern void CScene__MarkGeneratorsSaved(void *);
+extern s32 CAI__SetMode(CGameObjectInstance *actor, void *ai, s32 state);
 
 static __inline__ void StartTimer(BlindOneState *m, s32 n, void *proc, f32 seconds) {
     BlindOneMover *t;
@@ -22,12 +22,12 @@ static __inline__ void StartTimer(BlindOneState *m, s32 n, void *proc, f32 secon
     t->interval = seconds * 15.0f;
 }
 
-void func_0040E72C(BlindOneState *m) {
+void BlindOne_PhaseGroup2Init(BlindOneState *m) {
     s32 i;
 
     for (i = 0; i < m->count2; i++) {
-        func_00243414(m->actors2[i], &m->actors2[i]->m_AI, 0);
+        CAI__SetMode(m->actors2[i], &m->actors2[i]->m_AI, 0);
     }
     StartTimer(m, 1, D_004324C8, m->script->seconds);
-    func_00225C84(D_800F7078);
+    CScene__MarkGeneratorsSaved(D_800F7078);
 }

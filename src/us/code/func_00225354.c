@@ -16,11 +16,11 @@ typedef struct {
 
 s32 CList__AddHead(s32, s32);
 s32 CList__Remove(s32, s32);
-s32 func_0026DFB0(s32);
+s32 LevelEvent_Fire(s32);
 
-f32 func_0026D210(u16);                             /* extern */
+f32 HalfToFloat(u16);                             /* extern */
 
-void func_00225354(VoiceOwner *arg0, LevelEvent *arg1) {
+void CScene__QueueDelayedEvent(VoiceOwner *arg0, LevelEvent *arg1) {
     f32 temp_f0;
     Voice *var_s0;
 
@@ -31,10 +31,10 @@ void func_00225354(VoiceOwner *arg0, LevelEvent *arg1) {
         var_s0->def = (s32) arg1;
     } else {
         var_s0 = arg0->activeVoices.m_pTail;
-        func_0026DFB0(var_s0->def);
+        LevelEvent_Fire(var_s0->def);
         var_s0->def = (s32) arg1;
     }
-    temp_f0 = func_0026D210(arg1->delay);
+    temp_f0 = HalfToFloat(arg1->delay);
     var_s0->length = temp_f0;
     if (arg1->flags & 2) {
         var_s0->length = (f32) (temp_f0 * 15.0f);

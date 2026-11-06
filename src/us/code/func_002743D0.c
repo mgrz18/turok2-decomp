@@ -4,7 +4,7 @@ extern s32 D_800A8178;          /* f32 constants; [1] used here */
 extern f32 D_800B2A30;          /* falloff distance squared */
 
 /* Distance falloff: 1 - d^2 / D_800B2A30 inside, 0 outside. */
-f32 func_002743D0(CVector3 *arg0, CVector3 *arg1)
+f32 Sound_DistanceFalloff(CVector3 *arg0, CVector3 *arg1)
 {
   f32 temp_f0;
   f32 temp_f0_2;

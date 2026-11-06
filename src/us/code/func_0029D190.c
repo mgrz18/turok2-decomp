@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 
 extern OSPiHandle_s *D_800B8980[2];
-extern u32 func_0029BF80(void *addr);
-s32 func_0029D190(OSPiHandle_s *pihandle, s32 direction, u32 devAddr, void *dramAddr, u32 size)
+extern u32 osVirtualToPhysical(void *addr);
+s32 osEPiRawStartDma(OSPiHandle_s *pihandle, s32 direction, u32 devAddr, void *dramAddr, u32 size)
 {
     u32 stat;
     u32 domain;
@@ -28,7 +28,7 @@ s32 func_0029D190(OSPiHandle_s *pihandle, s32 direction, u32 devAddr, void *dram
         }
         D_800B8980[domain] = pihandle;
     }
-    (*(volatile u32 *)(0xA4600000) = (func_0029BF80(dramAddr)));
+    (*(volatile u32 *)(0xA4600000) = (osVirtualToPhysical(dramAddr)));
     (*(volatile u32 *)(0xA4600004) = ((pihandle->baseAddress | devAddr) & 0x1FFFFFFF));
     switch (direction) {
         case 0:

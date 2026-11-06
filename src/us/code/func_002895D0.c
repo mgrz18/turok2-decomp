@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00288E58(s32, s32, s32);
+s32 CEngineApp__UpdateCinemaMode(s32, s32, s32);
 
-void func_002895D0(s32 arg0) {
-    func_00288E58(arg0, 7, 7);
+void EngineMode05_Cinema_Retrace(s32 arg0) {
+    CEngineApp__UpdateCinemaMode(arg0, 7, 7);
 }

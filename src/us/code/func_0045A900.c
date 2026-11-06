@@ -8,9 +8,9 @@
 extern void func_004263A0(s32);
 void func_004263A0(s32);
 extern s32 D_800C2028;
-extern void func_0045A900(struct Menu *record);
+extern void PakMenu_ProbeOwnerPort_2(struct Menu *record);
 extern s32 D_80130990;
-void func_0045A900(struct Menu *record) {
+void PakMenu_ProbeOwnerPort_2(struct Menu *record) {
     s32 value;
     if (D_80130990 != 0) {
         value = D_800C2028;

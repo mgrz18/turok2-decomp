@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 
-/* Menu item handler: depending on the menu state, checks the item (func_0041DD90) and prints its text, or (states 1
+/* Menu item handler: depending on the menu state, checks the item (PakMenu_CheckPak) and prints its text, or (states 1
  * and 2) resets the menu flags and opens the item's menu on its owner's camera. */
 
 typedef struct {
@@ -26,9 +26,9 @@ extern s32 D_8011F148;
 extern u8 D_80119E2C[];
 extern u8 D_0043BED0[];
 extern u8 D_0043BEF4[];
-extern s32 func_0041DD90(Item *item, s32 id, s32 a2);
-extern void *func_0041DC5C(Item *item);
-extern void func_00416644(void *dst, void *string, CPlayer *owner, ItemData *data, s32 a4);
+extern s32 PakMenu_CheckPak(Item *item, s32 id, s32 a2);
+extern void *PakMenu_GetReturnMenu(Item *item);
+extern void MenuPool_OpenMenu(void *dst, void *string, CPlayer *owner, ItemData *data, s32 a4);
 
 static __inline__ s32 ItemId(Item *item) {
     s32 id;
@@ -41,32 +41,32 @@ static __inline__ s32 ItemId(Item *item) {
     return id;
 }
 
-s32 func_00420F34(s32 arg0, Item *item) {
+s32 PakConfirmMenu_SelectNo(s32 arg0, Item *item) {
     void *string;
 
     switch (D_801309B0) {
         case 4:
-            if (func_0041DD90(item, ItemId(item), 1)) {
+            if (PakMenu_CheckPak(item, ItemId(item), 1)) {
                 D_801309BC = 1;
-                func_00416644(D_80119E2C, item->string, item->owner, item->data, 0);
+                MenuPool_OpenMenu(D_80119E2C, item->string, item->owner, item->data, 0);
             } else {
-                func_00416644(D_80119E2C, item->string, item->owner, item->data, 0);
+                MenuPool_OpenMenu(D_80119E2C, item->string, item->owner, item->data, 0);
             }
             break;
         case 3:
-            if (func_0041DD90(item, ItemId(item), 1)) {
+            if (PakMenu_CheckPak(item, ItemId(item), 1)) {
                 D_801309BC = 1;
-                func_00416644(D_80119E2C, item->string, item->owner, item->data, 0);
+                MenuPool_OpenMenu(D_80119E2C, item->string, item->owner, item->data, 0);
             } else {
-                func_00416644(D_80119E2C, item->string, item->owner, item->data, 0);
+                MenuPool_OpenMenu(D_80119E2C, item->string, item->owner, item->data, 0);
             }
             break;
         case 0:
-            if (func_0041DD90(item, ItemId(item), 1)) {
+            if (PakMenu_CheckPak(item, ItemId(item), 1)) {
                 D_801309BC = 1;
-                func_00416644(D_80119E2C, item->string, item->owner, item->data, 0);
+                MenuPool_OpenMenu(D_80119E2C, item->string, item->owner, item->data, 0);
             } else {
-                func_00416644(D_80119E2C, item->string, item->owner, item->data, 0);
+                MenuPool_OpenMenu(D_80119E2C, item->string, item->owner, item->data, 0);
             }
             break;
         case 1:
@@ -77,14 +77,14 @@ s32 func_00420F34(s32 arg0, Item *item) {
                 D_8011F148 = 1;
                 return 1;
             }
-            string = func_0041DC5C(item);
+            string = PakMenu_GetReturnMenu(item);
             if (string == NULL) {
                 string = item->string;
             }
             if (item->string == D_0043BEF4 || item->string == D_0043BED0) {
                 D_80130940 = 0;
             }
-            func_00416644(item->owner != NULL ? item->owner->m_pCamera->m_MenuPool : D_80119E2C, string, item->owner,
+            MenuPool_OpenMenu(item->owner != NULL ? item->owner->m_pCamera->m_MenuPool : D_80119E2C, string, item->owner,
                           item->data, 0);
             break;
     }

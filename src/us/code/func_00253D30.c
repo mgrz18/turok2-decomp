@@ -127,10 +127,10 @@ struct LevelActor;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
-extern f32 func_002671B4(void);
-f32 func_00253D30(LevelActor *arg0) {
+extern f32 GameObject_GetCollisionHeight(void);
+f32 Actor_GetHeightOrDefault(LevelActor *arg0) {
     if (arg0->definition != 0) {
-        return func_002671B4();
+        return GameObject_GetCollisionHeight();
     } else {
         return D_800A7104;
     }

@@ -3,18 +3,18 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_0029A080(s32, s32);
+extern s32 __osSiRawStartDma(s32, s32);
 extern int __osSiDeviceBusy();
-extern void func_0029B020(void *arg0, void *arg1, s32 arg2);
+extern void __assert(void *arg0, void *arg1, s32 arg2);
 extern int __osSiDeviceBusy(void);
 extern void osWritebackDCache(s32 arg0, s32 arg1);
-extern s32 func_0029BF80(s32);
+extern s32 osVirtualToPhysical(s32);
 extern void osInvalDCache(s32 arg0, s32 arg1);
 extern s32 D_800AA890;
 extern s32 D_800AA894;
-s32 func_0029A080(s32 arg0, s32 arg1) {
+s32 __osSiRawStartDma(s32 arg0, s32 arg1) {
     if (arg1 & 3) {
-        func_0029B020(&D_800AA890, &D_800AA894, 0x37);
+        __assert(&D_800AA890, &D_800AA894, 0x37);
     }
     if (__osSiDeviceBusy() != 0) {
         return -1;
@@ -22,7 +22,7 @@ s32 func_0029A080(s32 arg0, s32 arg1) {
     if (arg0 == 1) {
         osWritebackDCache(arg1, 0x40);
     }
-    (*(volatile u32 *)(0xA4800000U) = (func_0029BF80(arg1)));
+    (*(volatile u32 *)(0xA4800000U) = (osVirtualToPhysical(arg1)));
     if (arg0 == 0) {
         (*(volatile u32 *)(0xA4800004U) = (0x1FC007C0U));
     } else {

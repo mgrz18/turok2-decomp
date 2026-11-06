@@ -9,7 +9,7 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-volatile unsigned int func_0025FD98(void *arg0, void *arg1)
+volatile unsigned int EnemyAnim_ExtremeDeath(void *arg0, void *arg1)
 {
   if ((*((s8 *) (((s8 *) arg1) + 0x36))) != 0x35)
   {

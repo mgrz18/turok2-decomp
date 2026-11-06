@@ -1,4 +1,4 @@
-/* Second VM module copy of func_0042EF2C (linked 0x39000 lower; here the cut is whole, 0x298). The settings loop is written out in the function (not an inline) so both loops share the counter i ($a2), as in the ROM. */
+/* Second VM module copy of Demo_Start (linked 0x39000 lower; here the cut is whole, 0x298). The settings loop is written out in the function (not an inline) so both loops share the counter i ($a2), as in the ROM. */
 #include "common.h"
 #include "structs/demo.h"
 #include "structs/game.h"
@@ -9,7 +9,7 @@ extern void func_0042EC10();
 extern void func_0042F67C();
 extern void func_0042F6E8();
 extern void func_0041B9B0(GameSettings *setup);
-extern s32 func_002113A4(void);
+extern s32 Random_Next(void);
 static __inline__ void initSetting(DemoStream *t, DemoHeader *config, s32 index, void (*handler)(), s32 value) {
     t->bits = (u8 *)config;
     t->player = index;
@@ -21,7 +21,7 @@ static __inline__ void initSetting(DemoStream *t, DemoHeader *config, s32 index,
 }
 
 /* Starts a match from config: sets up the per-player settings and the game setup. */
-void func_00467E4C(DemoHeader *arg) {
+void Demo_Start_2(DemoHeader *arg) {
     DemoPlayer *s = &D_800F56B0;
     GameSettings *setup;
     s32 i;
@@ -74,8 +74,8 @@ void func_00467E4C(DemoHeader *arg) {
     setup->unk17 = 0;
     setup->playerCount = s->playerCount;
     setup->cheatFlags = 12;
-    r = func_002113A4() % 9;
-    setup->dmSkill = r;
-    setup->tagSkill = r;
-    setup->teamSkill = r;
+    r = Random_Next() % 9;
+    setup->dmTextureSet = r;
+    setup->tagTextureSet = r;
+    setup->teamTextureSet = r;
 }

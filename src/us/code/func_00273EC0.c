@@ -292,7 +292,7 @@ struct Shared_Body;
 struct Shared_Body;
 struct Table_func_804428F8_de;
 typedef struct Table_func_804428F8_de Table_func_804428F8_de;
-extern f32 func_0026D210(s32);
+extern f32 HalfToFloat(s32);
 struct Triple;
 struct GameplayCamera;
 typedef struct Lights Lights;
@@ -432,44 +432,44 @@ struct Shared_func_80234FDC_S8 {
 struct Triple;
 struct Triple;
 struct Triple;
-extern void func_00272278(Voice *voice, ControllerCode802591C0 *control, s32 arg2);
-extern void func_00271F6C(void *arg0, void *arg1, s32 arg2);
-extern void *func_002717A8(ContextRecAt2BC0 *arg0, s32 arg1);
-extern s32 func_002718E0(void *arg0);
-extern s16 func_00271E20(void *arg0, GameplayCamera *arg1);
-void func_00273EC0(void *arg0, void *arg1, s32 arg2) {
+extern void SndVoice_InitVolume(Voice *voice, ControllerCode802591C0 *control, s32 arg2);
+extern void SndVoice_InitPitch(void *arg0, void *arg1, s32 arg2);
+extern void *CAudioWorld__GetPanEnvelope(ContextRecAt2BC0 *arg0, s32 arg1);
+extern s32 CAudioWorld__GetStereo(void *arg0);
+extern s16 Sound_CalcPan(void *arg0, GameplayCamera *arg1);
+void SndVoice_Setup(void *arg0, void *arg1, s32 arg2) {
     f32 first;
     s16 index;
     s16 value;
     void *record;
-    func_00271F6C(arg0, arg1, arg2);
-    func_00272278(arg0, arg1, arg2);
+    SndVoice_InitPitch(arg0, arg1, arg2);
+    SndVoice_InitVolume(arg0, arg1, arg2);
     ((struct View_func_8025AE1C_de *)(arg0))->priority = 0x40;
     index = ((struct Shared_Body *)(arg1))->kind;
     if (index != -1) {
-        record = func_002717A8(((struct View_func_8025AE1C_de *)(arg0))->context, index);
+        record = CAudioWorld__GetPanEnvelope(((struct View_func_8025AE1C_de *)(arg0))->context, index);
         ((struct View_func_8025AE1C_de *)(arg0))->envelope = *(SoundEnvelope *)record;
-        first = func_0026D210(((struct View_func_8025AE1C_de *)(arg0))->envelope.initial);
+        first = HalfToFloat(((struct View_func_8025AE1C_de *)(arg0))->envelope.initial);
         ((struct View_func_8025AE1C_de *)(arg0))->step =
-            (first - func_0026D210(((struct View_func_8025AE1C_de *)(arg0))->envelope.target)) /
+            (first - HalfToFloat(((struct View_func_8025AE1C_de *)(arg0))->envelope.target)) /
             ((struct View_func_8025AE1C_de *)(arg0))->envelope.frames;
         ((struct View_func_8025AE1C_de *)(arg0))->value =
-            func_0026D210(((struct View_func_8025AE1C_de *)(arg0))->envelope.initial);
+            HalfToFloat(((struct View_func_8025AE1C_de *)(arg0))->envelope.initial);
         ((struct View_func_8025AE1C_de *)(arg0))->priority =
-            (s16)(s32)func_0026D210(((struct View_func_8025AE1C_de *)(arg0))->envelope.initial);
+            (s16)(s32)HalfToFloat(((struct View_func_8025AE1C_de *)(arg0))->envelope.initial);
         ((struct View_func_8025AE1C_de *)(arg0))->sweeping = 1;
         return;
     }
     ((struct View_func_8025AE1C_de *)(arg0))->sweeping = 0;
     if (((struct View_func_8025AE1C_de *)(arg0))->trackId < 0x100) {
         if (((struct View_func_8025AE1C_de *)(arg0))->fixed == 0 &&
-            func_002718E0(((struct View_func_8025AE1C_de *)(arg0))->context) != 0) {
+            CAudioWorld__GetStereo(((struct View_func_8025AE1C_de *)(arg0))->context) != 0) {
             value = (s8)((ContextRecAt2BC0 *)((struct View_func_8025AE1C_de *)arg0)->context)->field2B94;
             goto store_value;
         }
     } else if (((struct View_func_8025AE1C_de *)(arg0))->fixed == 0 &&
-               func_002718E0(((struct View_func_8025AE1C_de *)(arg0))->context) != 0) {
-        value = func_00271E20(&((struct View_func_8025AE1C_de *)(arg0))->position,
+               CAudioWorld__GetStereo(((struct View_func_8025AE1C_de *)(arg0))->context) != 0) {
+        value = Sound_CalcPan(&((struct View_func_8025AE1C_de *)(arg0))->position,
             ((struct View_func_8025AE1C_de *)arg0)->context->result);
 store_value:
         ((struct View_func_8025AE1C_de *)(arg0))->priority = value;

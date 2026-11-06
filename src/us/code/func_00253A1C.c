@@ -1,9 +1,9 @@
-/* Cut fixed in versions/cuts.us.txt: func_00253A1C really is 0x253A1C-0x253AC0 (0xA4 bytes): splat split off its tail (return *ammo) as func_00253AB4. */
+/* Cut fixed in versions/cuts.us.txt: CPlayer__GetFiringAmmoType really is 0x253A1C-0x253AC0 (0xA4 bytes): splat split off its tail (return *ammo) as func_00253AB4. */
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-/* func_0025398C, inlined. */
+/* CPlayer__GetFiringAmmo, inlined. */
 static __inline__ AmmoInfo *GetWeaponAmmo(CPlayer *player, s32 weapon) {
     AmmoInfo *ammo;
     AmmoInfo *found;
@@ -29,7 +29,7 @@ static __inline__ AmmoInfo *GetWeaponAmmo(CPlayer *player, s32 weapon) {
 }
 
 /* Ammo type a weapon fires now, -1 if it has none. */
-s32 func_00253A1C(CPlayer *player, s32 weapon) {
+s32 CPlayer__GetFiringAmmoType(CPlayer *player, s32 weapon) {
     AmmoInfo *ammo = GetWeaponAmmo(player, weapon);
 
     if (ammo != NULL) {

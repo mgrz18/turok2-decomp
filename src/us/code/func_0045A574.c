@@ -12,7 +12,7 @@ extern s32 D_0043BE14;
 extern s32 D_80130940;
 
 /* Whether the state handler is one of the two at 0x43BE14 / 0x43BDF0 (and clears D_80130940 then). */
-s32 func_0045A574(StateHolder *arg0) {
+s32 PakMenu_IsSavePortalMenu_2(StateHolder *arg0) {
     s32 temp_v1;
 
     temp_v1 = arg0->stateHandler;

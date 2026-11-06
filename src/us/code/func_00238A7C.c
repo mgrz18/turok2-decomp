@@ -15,16 +15,16 @@ typedef struct EventParams {
 
 extern u8 D_801198B0[];
 extern SoundPair D_800B69D8[];
-extern void func_0027FC2C(void *arg0, void *arg1, s32 arg2);
-extern void func_0027580C(s32 arg0);
+extern void CCameraPool__AddText(void *arg0, void *arg1, s32 arg2);
+extern void Sound__PlaySpeech(s32 arg0);
 
-void func_00238A7C(s32 arg0, CGameObjectInstance *actor, s32 arg2, CVector3 pos, EventParams params) {
+void ImpactEvent_PlaySoundAndEffect(s32 arg0, CGameObjectInstance *actor, s32 arg2, CVector3 pos, EventParams params) {
     if (actor->header.m_Type == 1 && (actor->m_dwFlags & 0x300000)) {
-        func_0027FC2C(D_801198B0, ((CPlayer *)actor->m_AI.m_pParent)->m_pCamera, D_800B69D8[params.index].sound);
+        CCameraPool__AddText(D_801198B0, ((CPlayer *)actor->m_AI.m_pParent)->m_pCamera, D_800B69D8[params.index].sound);
     } else {
-        func_0027FC2C(D_801198B0, D_801198B0 + 0x40, D_800B69D8[params.index].sound);
+        CCameraPool__AddText(D_801198B0, D_801198B0 + 0x40, D_800B69D8[params.index].sound);
     }
     if (D_800B69D8[params.index].effect != 0) {
-        func_0027580C(D_800B69D8[params.index].effect);
+        Sound__PlaySpeech(D_800B69D8[params.index].effect);
     }
 }

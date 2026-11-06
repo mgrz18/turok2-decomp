@@ -1,0 +1,408 @@
+// Names for 0x00260000-0x0026FFFF (round N2, part n4).
+//
+// Most of this range is the engine's per-intelligence-type AI code. Its
+// tables tell what each function is: D_800ACB60[m_Type] (indexed by
+// CIntelligence::m_Type, the INTELLIGENCE_* enum of structs/intelligence.h)
+// gives each type a {setup, advance, then {onActor, onEvent} event-handler
+// pairs} block (D_800B2628[kind] points 8 bytes into it: the handlers
+// func_0026DFB0 runs for a level event); the setup installs a CAIModeInfo
+// table whose rows give each mode's enter/update callbacks. The enemy's
+// block (D_800B1760) has instead D_800B1790[behaviour], one
+// CEnemyBehaviorInfo {m_SetupFunction, m_AdvanceFunction,
+// m_pGroundModeTable, m_pAirModeTable, m_pUnderwaterModeTable} per
+// behaviour value (struct and field names from the ROM's SN64 debug type
+// records at ROM 0x14E443). Mode numbers are named from the same debug
+// records: the EnemyModes, DoorModes, ActionModes, DestructibleModes and
+// ThrowableModes enums (ROM 0x14E592-0x14F21D, each member preceded by its
+// value), e.g. 0x04 ENEMY_MOVE_MODE, 0x0A ENEMY_IDLE_MODE, 0x0E
+// ENEMY_ATTACK_COMBAT_MODE, 0x10 ENEMY_ATTACK_DART_MODE, 0x17
+// ENEMY_TELEPORT_OUT_MODE, 0x1B ENEMY_PUFFUP_MODE, 0x31/0x32
+// ENEMY_JOYPAD_TEST_IDLE/PLAY_ANIM_MODE, 0x3D ENEMY_NUKED_FROZEN_MODE.
+// "Event" handlers below are the {onActor, onEvent} pairs: onActor runs on
+// the actor when it is in the current level, onEvent (the *Remote names)
+// only records the change in the saved-actor bits of the other level
+// (func_002245BC). Handler numbers are the LevelEvent.handler index.
+
+// Enemy (type 1): mode callbacks of the base enemy tables (D_800B0700...).
+EnemyAI_JoypadTestPlayAnimUpdate = 0x00260038; // row {0x32 ENEMY_JOYPAD_TEST_PLAY_ANIM_MODE} at 0x800B09E0: back to 0x31 ENEMY_JOYPAD_TEST_IDLE_MODE once the animation has looped
+EnemyAI_NukedFrozenEnter = 0x00260060; // row {0x3D ENEMY_NUKED_FROZEN_MODE} enter at 0x800B0A24: installs the frozen-fade draw func_0025ED4C, m_OnFireTimer = 75
+EnemyAI_NukedFrozenUpdate = 0x0026007C; // same row's update: stops the looping sound when m_OnFireTimer is out, removes the actor after 150 frames (EnemyAI_NukedFrozenRemove)
+EnemyAI_NukedFrozenRemove = 0x002600E8; // spawns particle 0x17 at the actor, sets its saved-actor bit and fires its 0x1 triggers, stops its sound, frees a pooled instance (func_002280B0)
+EnemyAI_TryTeleportOut = 0x002601CC; // with enemy flag 0x40 counts m_VarBuffer[6] down; when out in a movable mode re-seeds it and goes to 0x17 ENEMY_TELEPORT_OUT_MODE
+EnemyAI_RaiseAggression = 0x002602C4; // m_Aggression += arg, clamped to 0xFF
+EnemyAI_LowerAggression = 0x002602E0; // m_Aggression -= arg, clamped to 0
+EnemyAI_HasComboEndAnim = 0x002602F8; // whether any behaviour slot in m_Enemy.m_Behavior[] has an m_wComboEndAnimFlags bit
+EnemyAI_CurrentHasComboEndAnim = 0x00260360; // the same for the current m_BehaviorIndex, false in modes 0x20/0x3D
+EnemyAI_TurnToTarget = 0x002603F0; // fills the CAITargets and turns toward the sight target, 60 degrees a step after modes 1-2, else 15
+EnemyAI_TurnToPoint = 0x00260464; // turns toward the fixed point D_800B06A0 (func_00246310), same two rates from rodata
+EnemyAI_SaveDeadAndFireTriggers = 0x002604E8; // sets the actor's saved-actor bit (unless type flag 0x20) and fires its 0x1 triggers: the tail of EnemyAI_NukedFrozenRemove
+EnemyAI_StopSoundAndFree = 0x00260554; // clears flags 0x100/0x2000, stops the attached sound, frees a pooled instance: the end of EnemyAI_NukedFrozenRemove
+EnemyAI_DrawFadeOut = 0x002605AC; // draw override: fill mode 1 with alpha 255 - m_ModeTime * scale, then the normal draw func_0021D928; only caller func_0025E94C
+
+// Enemy behaviour 2 (CEnemyBehaviorInfo at 0x800B1940, D_800B1790[2]):
+// turns in place and attacks.
+EnemyStationary_Setup = 0x00260610; // its m_SetupFunction: clears m_vTargetOffset and flag 0x20000
+EnemyStationary_Update = 0x00260634; // IDLE and MOVE rows of its three tables (0x800B17E8...): turns to the sight target, within range picks an attack (func_0025D030), else 0x0A IDLE
+
+// Flying steering shared by the air behaviours (func_0025E428() == 1: air).
+EnemyFly_SteerToPath = 0x00260730; // eases vertical speed toward the path target (clamp 81.92), pitch from the climb and roll from the turn, turns; a chasing flier switches air/ground behaviour with its target
+EnemyFly_SteerToPathScaled = 0x00260D60; // the same with speed and turn-rate factors and faster easing when pitch/roll change sign
+
+// Enemy behaviour 6 (0x800B1AE0): a hovering flier.
+EnemyHover_Setup = 0x00260920; // m_SetupFunction: random m_vTargetOffset within +-40.96
+EnemyHover_Advance = 0x00260990; // m_AdvanceFunction: levels pitch/roll unless moving in the air, counts the action delay down
+EnemyHover_MoveUpdate = 0x00260A34; // MOVE row: flying steering, picks attacks, back to IDLE after 60-120 frames
+EnemyHover_IdleEnter = 0x00260B38; // IDLE row enter: empty
+EnemyHover_IdleUpdate = 0x00260B40; // IDLE row update: faces the target and sidesteps it (else damps velocity), to MOVE after a while
+EnemyAI_Sidestep = 0x00260C7C; // the sidestep of EnemyHover_IdleUpdate on its own (func_002451AC side within 20 degrees): pushes velocity sideways or damps it
+
+// Enemy behaviour 7 (0x800B1C80): a flier that rams (combat-mode contact damage).
+EnemyRam_Setup = 0x00260FF8; // m_SetupFunction: m_pfCollision = EnemyRam_Collision, random m_vTargetOffset
+EnemyRam_Advance = 0x00261074; // m_AdvanceFunction: holds m_vLeashPos.y at the start height, levels pitch/roll, counts the action delay
+EnemyRam_MoveEnter = 0x00261128; // MOVE row enter: m_Action = 0, action delay 30-90 frames
+EnemyRam_MoveUpdate = 0x0026115C; // MOVE row update: scaled flying steering at leash height (x2 once the delay is out), attacks within 90 degrees
+EnemyRam_CombatUpdate = 0x0026129C; // 0x0E ATTACK_COMBAT row: dives at the target, faster when close; back to MOVE when level with it or after 90 frames
+EnemyRam_Collision = 0x002613D8; // in ATTACK_COMBAT, touching its sight/path target deals 0x500 damage (func_00245828/func_002465C8), then MOVE
+
+// Enemy behaviours 3-5 (0x800B1DC0, m_UnderwaterBehavior 3/4/5): swimmers.
+EnemySwim_Advance = 0x00261490; // m_AdvanceFunction: pitch from vertical speed, scale pulses in 0x1B ENEMY_PUFFUP_MODE, re-picks m_vTargetOffset when m_WanderTimer is out
+EnemySwim_MoveUpdate = 0x002616B8; // MOVE_SLOW/MOVE rows: wavy speed and turn, depth between floor and ceiling; close in front -> FLEE, or (behaviour 5) dart radius -> 0x10 ATTACK_DART
+EnemySwim_FleeEnter = 0x00261A18; // FLEE/FLEE_TURN180 rows enter: picks a spot behind the target; behaviour 4 -> PUFFUP, 3 -> IDLE
+EnemySwim_Setup = 0x00261C38; // m_SetupFunction: m_pfCollision = EnemySwim_Collision, random phase, m_BaseScale from the scale
+EnemySwim_FleeUpdate = 0x00261CAC; // FLEE rows update: fast turn and speed toward the flee spot, MOVE when there or after 90 frames
+EnemySwim_IdleEnter = 0x00261E10; // IDLE row enter: random idle time
+EnemySwim_IdleUpdate = 0x00261E44; // IDLE row update: slows down, FLEE when the time is out
+EnemySwim_PuffUpEnter = 0x00261ECC; // 0x1B PUFFUP row enter: clears flag 0x20000, 30-60 frames
+EnemySwim_PuffUpUpdate = 0x00261F18; // PUFFUP row update: slows, then sets 0x20000 and FLEEs
+EnemySwim_DartUpdate = 0x00261FB0; // 0x10 ATTACK_DART row: full speed straight at the path target
+EnemySwim_Collision = 0x00261B78; // hitting a wall resets the leash; in ATTACK_DART touching the path target deals 0x200 damage, then FLEE
+EnemySwim_SteerToPath = 0x002620B4; // the vertical easing and turn of the swim updates on their own (unreferenced)
+
+// Turret (type 4, block 0x800B1EC0, mode table D_800B1DE0: 0, 1, 0x3E aim, 0x3F fire, 0x40 dead).
+Turret_UpdateHinge = 0x00262150; // the turret's hinged part (its open value): swings open/shut (mode 1) or toward the target (mode 2), then rotates its points about the hinge (func_0020EF8C); only caller Turret_Aim
+Turret_Aim = 0x002623EC; // turns toward the sight target within aimRange/aimFov and the turn arc, eases m_Turret.m_Pitch, drives the hinge; returns whether it is in fireRange/fireFov
+Turret_Setup = 0x002626A8; // block slot 0: m_pModeTable = D_800B1DE0, step/hurt/orientation/effects callbacks
+Turret_Advance = 0x002626E8; // block slot 1: starts in mode 0, 1 or 0x40 (saved as destroyed) from the definition flags
+Turret_Step = 0x002627B8; // m_pfStep: runs the current mode's m_pfCallback
+Turret_GetIdleAnim = 0x002627EC; // the mode rows' animation function: m_StartAnim or 0x2F44
+Turret_ActivateUpdate = 0x00262808; // mode 1: when the animation has played, to 0x3E
+Turret_AimUpdate = 0x00262830; // mode 0x3E: aims, to 0x3F when it can fire
+Turret_FireUpdate = 0x00262874; // mode 0x3F: aims, back to 0x3E when it cannot
+Turret_DeathEnter = 0x002628B8; // mode 0x40 enter: death effects (func_0024646C), saved as destroyed, fires its 0x1 triggers
+Turret_EventShow = 0x00262960; // event handler 2: flags |= 0x2100 unless saved
+Turret_EventActivate = 0x002629A4; // event handler 1: shows it and goes to mode 1 when in mode 0
+Turret_CalcOrientation = 0x00262A1C; // m_pfCalculateOrientationMatrix: yaw (base node or whole), ground quaternion, scale and position into m_mfOrient
+Turret_Effects = 0x00262B58; // m_pfEffects: pitches the gun node (m_GunNode) and yaws the rotating node (m_RotNode)
+Turret_Hurt = 0x00262BE0; // m_pfHurt: takes the damage, mode 0x40 at 0 health
+
+// Generator (type 3, block 0x800B2088, mode table D_800B2008: 0 wait, 1 spawn).
+Generator_IsPickupUnlocked = 0x00262C20; // whether the game flag behind a multiplayer pickup id (0x5EB-0x5F3 / 0x842-0x84A) is set; only caller Generator_SpawnEnter
+Generator_SpawnEnter = 0x00262D74; // mode 1 enter: spawns its object, particle or a weighted random pickup (weapon/ammo/item tables at 0x800B1EE0...), counting m_Generator.m_nRemaining down
+Generator_Setup = 0x002633D8; // block slot 0: mode table D_800B2008, m_pfStep = Generator_Step
+Generator_Advance = 0x0026342C; // block slot 1: first delay, counters from the definition, mode 0
+Generator_Step = 0x0026352C; // m_pfStep: runs the mode callback while the generator is switched on (saved-actor bit)
+Generator_WaitEnter = 0x00263594; // mode 0 enter: random delay between m_IntervalTime1/2, 25% shorter per multiplayer player past two
+Generator_WaitUpdate = 0x00263640; // mode 0 update: to mode 1 when the delay is out, unless at its active limit or blocked
+Generator_SpawnUpdate = 0x002636EC; // mode 1 update: back to mode 0 when the animation has played
+Generator_IsOn = 0x00263714; // saved-actor bit == 1 (unreferenced)
+Generator_EventOn = 0x00263744; // event handler 1: sets its saved-actor bit
+Generator_EventOnRemote = 0x0026376C; // handler 1 for another level (func_002245BC ..., 1)
+Generator_EventOff = 0x0026379C; // event handler 2: clears the bit
+Generator_EventOffRemote = 0x002637C4; // handler 2 for another level
+Generator_SpawnPickup = 0x002637F4; // the pickup spawn of Generator_SpawnEnter out of line (unreferenced)
+Generator_SpawnObject = 0x002638A0; // the object spawn (func_00228108) out of line (unreferenced)
+Generator_SpawnEffect = 0x00263954; // the particle spawn (func_0022F350) out of line (unreferenced)
+
+// Platform (type 2, block 0x800B2170, mode table D_800B20B0: 0 at start, 1 forward, 2 at end, 3 back).
+Platform_UpdateSpecial = 0x00263A20; // the special shake-and-sink of structs/ai_vars.h CPlatformAIVars (m_SpecialTimer, m_vSpecialOffset)
+Platform_UpdatePosition = 0x00263DD8; // eases the position between the start and end points (m_ConditionTimer 0..1, smoothed), bobbing and spin, carries the region floor
+Platform_IdleEnter = 0x002640D4; // empty (unreferenced)
+Platform_GetModeAnim = 0x002640DC; // the mode rows' animation function: 0x526C... by m_Action and m_Mode
+Platform_IsOn = 0x00264170; // reads the saved-actor bit and drops it (unreferenced)
+Platform_Setup = 0x00264198; // block slot 0: mode table D_800B20B0, step Platform_Step, orientation Platform_CalcOrientation
+Platform_Advance = 0x0026421C; // block slot 1: mode 0, inactive unless saved on
+Platform_CalcOrientation = 0x0026426C; // tilt (m_Platform.m_Pitch/m_Roll), yaw and ground quaternion into m_mfOrient
+Platform_Step = 0x00264378; // m_pfStep: when on runs the mode callback, Platform_UpdateSpecial and Platform_UpdatePosition
+Platform_AtStartEnter = 0x0026444C; // mode 0 enter: clears the forward request 0x08000000 unless flag 0x40
+Platform_AtStartUpdate = 0x00264478; // mode 0 update: to mode 1 after its delay when the trigger conditions hold
+Platform_ForwardEnter = 0x00264518; // mode 1 enter: fires its 0x10000 triggers, clears the forward request
+Platform_ForwardUpdate = 0x00264574; // mode 1 update: m_ConditionTimer += dt / move time, mode 2 at 1
+Platform_AtEndEnter = 0x00264618; // mode 2 enter: clears the back request 0x10000000 unless flag 0x80
+Platform_AtEndUpdate = 0x00264644; // mode 2 update: to mode 3 after its delay when the conditions hold
+Platform_BackEnter = 0x002646E4; // mode 3 enter: fires its 0x20000 triggers, clears the back request
+Platform_BackUpdate = 0x00264740; // mode 3 update: m_ConditionTimer -= dt / move time, mode 0 at 0
+Platform_EventForward = 0x002647DC; // event handler 1: shows it, requests forward, mode 1
+Platform_EventBack = 0x00264814; // event handler 2: shows it, requests back, mode 3
+Platform_EventOn = 0x0026484C; // event handler 4: saved-actor bit on, flag 0x100
+Platform_EventOnRemote = 0x0026488C; // handler 4 for another level
+Platform_EventOff = 0x002648BC; // event handler 3: saved-actor bit off, clears 0x100
+Platform_EventOffRemote = 0x00264900; // handler 3 for another level
+Platform_EventShow = 0x00264930; // event handler 5: flags |= 0x2100
+Platform_EventRequestForward = 0x00264940; // event handler 6: forward request + show
+Platform_EventRequestBack = 0x00264960; // event handler 7: back request + show
+Platform_EventHide = 0x00264980; // event handler 8: clears 0x2000
+
+// Throwable (type 5, block 0x800B2280, mode table D_800B21E0: ThrowableModes IDLE 0, PICKED_UP 1, FLYING 2).
+Throwable_CalcOrientation = 0x002649A0; // its m_pfCalculateOrientationMatrix (stored as func_00264994 + 0xC by Throwable_Setup): tumble tilt about its middle, yaw, scale, position
+Throwable_GetCarryPoint = 0x00264B0C; // the midpoint of the holder's two hand joints (D_800B21C0/D_800B21D0) lifted by its height
+Throwable_GetModeAnim = 0x00264C80; // returns m_VarBuffer[0]
+Throwable_SetModeAnim = 0x00264C8C; // sets m_VarBuffer[0]
+Throwable_Setup = 0x00264C94; // block slot 0: mode table D_800B21E0, step, collision and orientation callbacks
+Throwable_Advance = 0x00264CC8; // block slot 1: clears its state, THROWABLE_IDLE_MODE
+Throwable_Collision = 0x00264CEC; // in THROWABLE_FLYING_MODE hitting an actor deals 0x500 damage, then IDLE
+Throwable_Step = 0x00264D98; // m_pfStep: runs the mode callback
+Throwable_IdleUpdate = 0x00264DCC; // IDLE row: collision behaviour D_800F1F94 = 2
+Throwable_PickedUpEnter = 0x00264DE0; // PICKED_UP row enter: stops it
+Throwable_PickedUpUpdate = 0x00264DF0; // PICKED_UP row: follows the holder's hands during its 0x15 ENEMY_PICKUP_THROW_OBJECT_MODE animation, FLYING when the holder leaves that mode
+Throwable_FlyingEnter = 0x00264F58; // FLYING row enter: launch velocity away from / at the holder's target
+Throwable_FlyingUpdate = 0x0026508C; // FLYING row: lets the holder go once clear, tumbles with speed, IDLE when stopped
+
+// Door (type 6, block 0x800B2310, mode table D_800B2290: DoorModes OPEN 0, CLOSE 1).
+Door_OpenUpdate = 0x00265200; // DOOR_OPEN row update: at m_OpenDoorEvent of its animation fires callback 6 and sets the saved bit; closes after m_OpenDuration
+Door_CloseUpdate = 0x002653F8; // DOOR_CLOSE row update: at its event frame fires callback 7 and clears the saved bit
+Door_Setup = 0x00265544; // block slot 0: mode table D_800B2290, step Door_Step
+Door_Advance = 0x00265560; // block slot 1: OPEN when saved open, else CLOSE
+Door_Step = 0x002655C4; // m_pfStep: runs the mode callback
+Door_OpenEnter = 0x002655F8; // DOOR_OPEN row enter: saved bit on, fires its 0x4000 triggers, callback 6
+Door_CloseEnter = 0x002656BC; // DOOR_CLOSE row enter: saved bit off, fires its 0x8000 triggers, callback 7
+Door_EventOpen = 0x00265770; // event handler 1: DOOR_OPEN_MODE
+Door_EventOpenRemote = 0x0026578C; // handler 1 for another level
+Door_EventClose = 0x002657BC; // event handler 2: DOOR_CLOSE_MODE
+Door_EventCloseRemote = 0x002657D8; // handler 2 for another level
+Door_IsOpen = 0x00265808; // saved-actor bit == 1 (unreferenced)
+Door_OpenNow = 0x00265838; // callback 6 and saved bit on, without the mode change (unreferenced)
+Door_CloseNow = 0x002658A0; // callback 7 and saved bit off (unreferenced)
+AI_RaiseConditionTimer = 0x00265908; // sets m_ConditionTimer to arg (0 always, else only upward), restarting m_ModeTime from 0 (unreferenced)
+
+// Destructible (type 7, block 0x800B23D0, mode table D_800B2330: DestructibleModes IDLE 0, GO 1, GO_DEATH 2).
+AI_AnimReached = 0x00265954; // has the actor's current animation played up to `scale` of its length (the check the door updates inline)
+Destructible_Setup = 0x00265A30; // block slot 0: mode table D_800B2330, step, hurt Destructible_Hurt
+Destructible_Advance = 0x00265A80; // block slot 1: GO when saved, else IDLE with collision on
+Destructible_Step = 0x00265AF8; // m_pfStep: runs the mode callback
+Destructible_GetIdleAnim = 0x00265B2C; // IDLE row animation: m_IdleAnim or 0x5334
+Destructible_GetGoAnim = 0x00265B48; // GO row animation: m_GoAnim
+Destructible_GoEnter = 0x00265B58; // GO row enter: saved, fires its 0x40000 triggers, sound/particle/death effects
+Destructible_GoUpdate = 0x00265CC8; // GO row update: hides it when the animation has played and flag 4
+Destructible_GetGoDeathAnim = 0x00265D04; // GO_DEATH row animation: m_GoDeathAnim
+Destructible_GoDeathEnter = 0x00265D14; // GO_DEATH row enter: as GoEnter with effect kind 8
+Destructible_GoDeathUpdate = 0x00265E20; // GO_DEATH row update: hides it when played and flag 0x20
+Destructible_EventGo = 0x00265E5C; // event handler 1: GO, saved bit on
+Destructible_EventGoRemote = 0x00265E98; // handler 1 for another level
+Destructible_IsHitExplosive = 0x00265EC8; // a damage event's flag 0x400000 (unreferenced; Destructible_Hurt inlines it)
+Destructible_IsHitNotExplosive = 0x00265ED8; // its flag 0x400000 clear (unreferenced)
+Destructible_Hurt = 0x00265EEC; // takes damage of the kinds its type flags 1/2 allow; at 0, GO (or GO_DEATH with flag 0x40)
+
+Action_CheckRequiredItem = 0x00265F90; // a player using an Action that needs an item (key): consumes it if carried (func_00253720/func_002536E0), else shows the definition's message and sound and refuses; called by LevelEvent_CheckRequiredItem for kind 10 handler 1
+
+// Action (type 10, block 0x800B24B0, mode table D_800B2410: ActionModes IDLE 0, GO 1, CHILD_VANISH 2).
+Action_Step = 0x0026609C; // m_pfStep: runs the mode callback
+Action_Setup = 0x002660D0; // block slot 0: mode table D_800B2410, step, draw Action_Draw
+Action_Advance = 0x0026613C; // block slot 1: GO when saved (hiding some types), else IDLE
+Action_GetIdleAnim = 0x00266200; // IDLE row animation: m_IdleAnim, visible only if it has one
+Action_IdleEnter = 0x00266230; // IDLE row enter: saved bit off, fires its 0x200000 triggers
+Action_GetGoAnim = 0x00266284; // GO row animation: m_GoAnim
+Action_GoEnter = 0x002662BC; // GO row enter: saved bit on, fires its 0x80000 triggers
+Action_GoUpdate = 0x00266380; // GO row update: back to IDLE when done (tag-mode reset for type 0x64E), CHILD_VANISH for type 0x64C
+Action_ChildVanishEnter = 0x00266490; // CHILD_VANISH row enter: draw Action_DrawFade
+Action_ChildVanishUpdate = 0x002664A0; // CHILD_VANISH row update: hidden after 30 frames
+Action_EventGo = 0x002664D8; // event handler 1: GO
+Action_EventGoRemote = 0x002664F4; // handler 1 for another level
+Action_EventIdle = 0x00266524; // event handler 2: IDLE
+Action_EventIdleRemote = 0x00266540; // handler 2 for another level
+Action_Draw = 0x00266570; // m_pfDraw: picks its model/shadow pair by mode and draws it
+Action_DrawFade = 0x00266644; // draw override: fades out with m_ModeTime
+AI_PlayAnim = 0x002666B0; // m_VarBuffer[0] = anim, starts it (func_0021E9A4) and resets (func_0021A7EC); the VM's cinema actors call it
+
+// Interactive animation (type 9, block 0x800B2570, mode table D_800B2510).
+InteractiveAnim_Setup = 0x002666F4; // block slot 0: mode table D_800B2510, step; a multi-model draw for type 0x453 in level 0x6F
+InteractiveAnim_Advance = 0x00266794; // block slot 1: starting animation from the definition, hidden if saved
+InteractiveAnim_Step = 0x00266814; // m_pfStep: runs the mode callback
+InteractiveAnim_GetAnim = 0x00266848; // the row's animation function: m_VarBuffer[0]
+InteractiveAnim_Update = 0x00266854; // mode 0: when an idle animation (0xFA0-0x13A0) has looped, picks the next from D_800AF6F0
+InteractiveAnim_EventPlay = 0x002668D4; // event handler 1: plays the event's animation, shows it, saved bit off
+InteractiveAnim_EventHide = 0x00266924; // event handler 2: hides it, saved bit on
+InteractiveAnim_EventHideRemote = 0x00266964; // handler 2 for another level
+InteractiveAnim_EventShow = 0x00266994; // event handler 3: shows it (flag 0x200 while a cinema path plays), saved bit off
+InteractiveAnim_EventShowRemote = 0x00266A00; // handler 3 for another level
+InteractiveAnim_EventPlayCinema = 0x00266A30; // queues the event's cinema on it (func_00412314), shows it (unreferenced)
+InteractiveAnim_EventPlayCinemaRemote = 0x00266A78; // the cinema with no owner (unreferenced)
+InteractiveAnim_EventSetModel = 0x00266A98; // event handler 8: the definition's m_nModel/m_nShadowModel from the event
+InteractiveAnim_DrawAllModels = 0x00266AB4; // draw override: draws every model of its set
+
+// Turok 3's defs.c in this order (GetMemSize ... BinaryRange): small
+// library helpers.
+GetMemSize = 0x00266B80; // returns osMemSize (D_80000318); turok3 defs.c GetMemSize (which also caps it)
+memmove = 0x00266B90; // overlapping copy, words when all aligned; callers comment it as such
+memset = 0x00266C5C; // fill (dst, byte, size); 43 callers comment it /* memset */; turok3 function_symbols.h memset
+memcmp = 0x00266C80; // compares bytes (words while aligned), -1/0/1
+BinarySearch = 0x00266D24; // index of key in a sorted u32 array, or -1
+BinaryRange = 0x00266D8C; // first/last index of the run equal to key; turok3 defs.c BinaryRange follows its binary search the same way
+BitBytes = 0x00266E78; // (bits + 7) / 8 (unreferenced)
+BitTest = 0x00266E8C; // tests bit n of a byte array
+BitSet = 0x00266EC4; // sets or clears bit n (unreferenced)
+BitToggle = 0x00266F18; // flips bit n (unreferenced)
+SmoothStep = 0x00266F50; // clamps t to 0..1 and returns (1 - cos(t*pi)) / 2: the platform easing
+IsDataPointer = 0x00266FC0; // address inside the data ranges D_800AB0B0.. / D_800C18F0..
+IsCodePointer = 0x00267024; // address inside the engine code (from CList__Construct) or the VM module code (func_00400000)
+
+// Object shape queries by intelligence type.
+GameObject_IsSolid = 0x00267090; // whether the instance collides, by m_Type (visible 0x2000 and collision 0x10000 flags, players, pickups)
+GameObject_GetCollisionHeight = 0x002671B4; // collision height by m_Type, a ducking player's lower
+GameObject_GetCollisionRadius = 0x002672C8; // collision radius by m_Type (comment: "Radius of an object, by the kind of its definition")
+GameObject_GetAimRotation = 0x002673CC; // quaternion turning the object's forward toward its lock-on (or the nearest player's eye) from a point
+GameObject_GetGroundHeight = 0x00267648; // its region floor under it, or the platform it stands on if higher
+GameObject_GetPlatformBelow = 0x00267800; // the instance it stands on, if (for a platform) it is still touching it
+GameObject_GetGroundRotation = 0x00267944; // body lean on the floor normal (players blend in a lean along the heading); func_00219BC0 stores it in m_qGround
+GameObject_CanEnterWater = 0x00267F64; // enemy: dead or m_dwEnemyFlags 4; func_0023B664 refuses a move into deep water (region flag 1, not shallow) without it or definition flag 0x40000
+GameObject_CanLeaveWater = 0x00267FA8; // enemy m_dwEnemyFlags 8; func_0023B664 refuses a move out of deep water without it or flag 0x80000
+GameObject_IsEnemy = 0x002682B8; // m_pIntelligence->m_Type == INTELLIGENCE_ENEMY
+GameObject_GetWallRadius = 0x00268304; // radius against walls by m_Type: player m_CollisionRadius, enemy m_CollisionWallRadius, platform, throwable, pickup
+GameObject_GetDeadCollisionHeight = 0x002683CC; // enemy/turret/player m_CollisionDeadHeight (intelligence 0x34); GameObject_GetCollisionHeight uses it at 0 health
+GameObject_GetAttackCombatRadius = 0x00268508; // enemy m_AttackCombatRadius (intelligence 0x4C) (unreferenced)
+GameObject_GetLeashRadius = 0x00268534; // enemy m_LeashRadius
+GameObject_GetFloorPointAt = 0x00268560; // traces to (x, 0, z) (GameObject_TraceMove) and puts the floor height of the region found in the result (unreferenced)
+GameObject_GetInstanceBelow = 0x002685D4; // m_pInstanceBelow of an instance (header.m_Type 1), else NULL (unreferenced)
+GameObject_IsOnGround = 0x002685F0; // flag 0x1000, a held/carried AI state, or within 0.512 above GameObject_GetGroundHeight
+GameObject_GetFloorHeightAt = 0x00268688; // floor under (x, z) of an actor used as ground: a platform's region or collision box (func_002425A4), else its y
+GameObject_GetRegionFloorHeight = 0x0026872C; // CGameRegion__GetHeight of its region at its position (+ optional offset), its y without a region
+GameObject_GetFrameDelta = 0x00268798; // the CAIFrameMotion m_vDelta (func_0024599C) of an instance, zero otherwise
+GameObject_GetFrameTurn = 0x002687FC; // the CAIFrameMotion m_Turn of an instance, 0 otherwise
+GameObject_IsNearFloor = 0x00268838; // flag 0x1000 or within 0.4 of its region floor (unreferenced)
+GameObject_TraceMove = 0x002688C8; // runs the collision move (func_00239F00) to pos and restores the header: where it would end and in which region (comment in the file); 19 callers
+GameObject_GetRegionInfo = 0x00268A2C; // the CRegionInfo (func_0022425C) of its m_pCurrentRegion
+GameObject_GetWaterHeight = 0x00268A5C; // CRegionInfo.m_WaterHeight of its region when REGION_FLAG_WATER, else 0
+GameObject_GetViewWaterHeight = 0x00268AB4; // the same, made relative to the view for a player (m_pCamera corner y); only caller func_0027CAB0
+GameObject_GetRegionTopAbove = 0x00268B50; // highest vertex of its region minus its y
+GameObject_GetHeightAboveRegionBottom = 0x00268B98; // its y minus the lowest vertex of its region
+GameObject_GetTypeId = 0x00268C04; // m_nTypeFlag of an instance, else the object type of its m_nObjType (func_002241C0)
+GameObject_DropPickupAt = 0x00268C48; // traces to pos and spawns pickup `kind` there thrown upward (func_00227240 on the pickup pool D_80107590)
+GameObject_GetFloorKind = 0x00268E60; // the surface kind under it from its CRegionInfo (-1 none, 7/8 special flags), overridden while carried/in some AI states
+GameObject_GetFloorTilt = 0x00268F3C; // quaternion tilting up onto its region's normal (comment: "Tilt of an actor toward the floor normal under it")
+GameObject_ApplyCurrent = 0x00269050; // a surface current: pushes the position, turns the actor with the flow, vertical part (comment in the file)
+GameObject_SlideTo = 0x002694A8; // moves to (x, z) with collision keeping its height over the floor (comment in the file)
+GameObject_TestMove = 0x0026961C; // trial move to pos with the collision settings for its kind (swimmer, climber...), restored; returns the hit
+GameObject_CanSee = 0x00269780; // clear line from 80% of its height to 80% of the target's
+GameObject_CanMoveTo = 0x002698AC; // trial move hits no instance and no wall
+GameObject_PlayLandSound = 0x002699E4; // sound 0x39D-0x3A1 by GameObject_GetFloorKind at its position, plus a world noise (func_00225C08); only caller func_0024C47C
+
+// The level floor: CGameRegion (structs/region.h) triangles and their ceilings.
+CGameRegion__GetCeilingNormal = 0x00269A90; // unit ceiling normal, cached in D_800F2010/D_800B2604
+CGameRegion__GetCeilingHeight = 0x00269C3C; // the ceiling plane's height at (x, z); func_0023B664 tests it under REGION_FLAG_CEILING
+CGameRegion__GetSlideVelocity = 0x00269DF0; // velocity down the triangle's slope (comment in the file)
+CGameRegion__GetClimbCos = 0x00269F7C; // cosine of the slope climbed from (x1, z1) to (x2, z2) (comment in the file)
+CGameRegion__GetClimbAngle = 0x0026A268; // slope angle climbed between two points, negative going down
+CGameRegion__IntersectSegment = 0x0026A5A0; // where a segment crosses the triangle's plane (fraction, strictly inside)
+CGameRegion__IntersectSegmentCeiling = 0x0026A798; // the same for its ceiling plane (cache D_800B2600)
+CGameRegion__GetTiltRotation = 0x0026A9C0; // quaternion turning up onto the unit normal
+CGameRegion__GetCeilingTiltRotation = 0x0026AC38; // the same for the ceiling normal (CGameRegion__GetCeilingNormal)
+CGameRegion__GetEdgeRotation = 0x0026AD94; // orientation along edge i, tipped a quarter turn (comment in the file)
+CGameRegion__IsSteep = 0x0026AFC0; // flag 8, or with flag 0x2000 the unit normal's dot with up below a rodata limit; 10 callers (players refuse to lean on it)
+CGameRegion__GetTopWithSteepNeighbours = 0x0026B130; // its top, raised to any steep neighbour's inside its grown footprint
+CGameRegion__FindBelow = 0x0026B4A4; // the triangle nearest below pos other than `skip` (comment in the file)
+CGameRegion__GetCentreDistance = 0x0026B858; // distance between two triangles' centres
+BoundingBox_FromPoints = 0x0026B9E0; // min/max box of n points, started at the first
+UnpackScaledVec4 = 0x0026BAE4; // four s32 to f32 times a rodata scale, in place (level loader func_0042B6B0)
+CGameRegion__Unpack = 0x0026BB30; // builds a region from its ROM record: vertex indices to pointers (16 bytes each), neighbour indices to regions (0x20 each, 0xFFFF none)
+CGameRegion__ContainsXZ = 0x0026BB9C; // (x, z) inside the triangle's XZ projection
+CGameRegion__GetNormalRaw = 0x0026BC54; // unnormalised normal, up for none, cached (D_800B2608)
+CGameRegion__GetNormal = 0x0026BD20; // unit normal, up for none, cached
+CGameRegion__GetHeight = 0x0026BE60; // the plane's height at (x, z), -14336 for none; 25 callers
+CGameRegion__GetCeilingNormalRaw = 0x0026BFB4; // unnormalised ceiling normal, down for none
+CGameRegion__IntersectWater = 0x0026C148; // whether a segment crosses the region's water height (CRegionInfo.m_WaterHeight) strictly inside, and where
+CGameRegion__GetEdgeYaw = 0x0026C240; // yaw of edge i in XZ
+CGameRegion__GetEdgeDirection = 0x0026C308; // horizontal unit vector along edge i
+CGameRegion__GetDownhillYaw = 0x0026C434; // downhill yaw of a steep triangle, 0 when level
+CGameRegion__FloodSetFlag4 = 0x0026C55C; // with flag 2, CGameRegion__FloodSetFlag4Same over its group; only caller func_00237FAC
+CGameRegion__FloodClearFlag4 = 0x0026C590; // with flag 2, CGameRegion__FloodClearFlag4Same; only caller func_00237FAC
+CGameRegion__FloodSetWater = 0x0026C5C4; // sets REGION_FLAG_WATER on it and its same-info neighbours (unreferenced)
+CGameRegion__FloodClearWater = 0x0026C678; // clears REGION_FLAG_WATER over its connected regions (unreferenced)
+CGameRegion__SetGroupHeight = 0x0026C888; // CGameRegion__FloodSetHeight from it with its own m_nInfo; Platform_UpdatePosition carries its floor
+CGameRegion__FloodSetFlag4Same = 0x0026C8B0; // sets flag 4 on it and, recursively, the neighbours with the same m_nInfo
+CGameRegion__FloodClearFlag4Same = 0x0026C934; // clears flag 4 the same way
+CGameRegion__FloodSetFlag4000Same = 0x0026C9B8; // sets flag 0x4000 the same way
+CGameRegion__FloodSetHeight = 0x0026CA3C; // sets its three vertices' y and spreads to same-info neighbours
+CGameRegion__GetCentroid = 0x0026CB2C; // centre of its edge midpoints; 3 collision callers
+CGameRegion__ClearVisited = 0x0026CC0C; // clears REGION_FLAG_VISITED (0x8000) over the marked regions it links to
+BoundingBox_AddPoints = 0x0026CCA8; // grows a min/max box by n points (unreferenced)
+BoundingRect_FromPoints = 0x0026CD70; // XZ rect started at the first point, grown by the rest (comment in the file)
+BoundingRect_AddPoints = 0x0026CDAC; // grows an XZ rect by n points
+CGameRegion__FloodSetWaterSame = 0x0026CE44; // sets REGION_FLAG_WATER on same-info neighbours, recursively (CGameRegion__FloodSetWater's walk)
+CGameRegion__FloodClearWaterAll = 0x0026CEC8; // clears REGION_FLAG_WATER recursively (CGameRegion__FloodClearWater's walk)
+CGameRegion__GetRect = 0x0026CF34; // the triangle's XZ bounding rect
+CGameRegion__GetMaxHeight = 0x0026D028; // highest vertex y
+Material_Unpack = 0x0026D070; // copies a material record: flags, prim/env colours, S/T masks...; only caller func_00209AF4
+RandomInPackedRange = 0x0026D128; // base + rand * range, both 16-bit halves of floats (comment in the file)
+FloatToHalf = 0x0026D200; // the top 16 bits of a float (the packed form RandomInPackedRange reads)
+HalfToFloat = 0x0026D210; // a 16-bit packed float back to f32 (LevelEvent.delay etc.); 21 callers
+
+// A small doubly linked list {head, tail, count} and a node pool of two of them (free at 0, used at 0xC).
+DList_AddHead = 0x0026D240; // links a node at the head
+DList_AddTail = 0x0026D288; // links a node at the tail, returns the count
+DList_Remove = 0x0026D2D0; // unlinks a node (comment "Unlinks arg1 from the list")
+NodePool_Init = 0x0026D330; // empties both lists, puts n nodes of `stride` bytes on the free one
+NodePool_Alloc = 0x0026D3BC; // moves the free list's head to the used list and returns it
+NodePool_Free = 0x0026D474; // moves a node from the used list back to the free one
+
+// Weighted random choice (tables of {id, weight} ending in -1).
+WeightedTable_PickStatic = 0x0026D518; // picks from a constant -1-terminated table by weight; Generator_SpawnEnter's weapon/ammo/item tables, the VM
+WeightedTable_Clear = 0x0026D5DC; // count = 0
+WeightedTable_Add = 0x0026D5E4; // appends {id, weight}, at most 0x18
+WeightedTable_Pick = 0x0026D628; // terminates the table and picks by weight, -1 when empty
+
+GameObject_EmitHotPoints = 0x0026D710; // for each attachment point whose event bit is in m_dwHotPointFlags: its bone position, then the effect (particles 0x51/0x5C..., sounds)
+
+// Level events and triggers (structs/event.h).
+LevelEvent_Fire = 0x0026DFB0; // structs/event.h: message, music, then D_800B2628[kind][handler] on the actor or for its level
+GameObject_FireTriggers = 0x0026E110; // the actor's trigger records (func_00225058) through LevelEvent_ProcessTriggers with these enter flags
+CGameRegion__FireTriggers = 0x0026E19C; // the region's trigger records (func_00224FC0, keyed by its m_nInfo) with enter/leave flags; func_0024C47C passes the old and new regions
+LevelEvent_Trigger = 0x0026E210; // marks it fired (0x10), then queues it for its delay (func_00225354) or fires it now
+Event_Hide = 0x0026E2FC; // shared handler (several types): clears flags 0x2000/0x100
+Event_Show = 0x0026E318; // shared handler: resets the animation (func_0021A7EC), flags |= 0x2100
+Event_PlayCinema = 0x0026E348; // shared handler: in play mode queues the event's cinema on the actor (func_00412314)
+Event_PlayCinemaRemote = 0x0026E378; // its onEvent: the cinema with no owner
+Event_PlaySoundOrMusic = 0x0026E3A8; // shared handler: ids >= 0x100 play as a sound (func_0027580C), lower ones go to func_002759C4
+Event_PlaySound = 0x0026E3EC; // shared handler: func_00275624(param)
+Event_SetMusicRemote = 0x0026E40C; // onEvent paired with Event_PlaySoundOrMusic: func_002759C4(value)
+Event_PlaySoundRemote = 0x0026E42C; // onEvent paired with Event_PlaySound
+Event_DisableCollision = 0x0026E48C; // shared handler: clears flag 0x10000 (GameObject_IsSolid tests it)
+Event_EnableCollision = 0x0026E4A4; // shared handler: sets flag 0x10000
+LevelEvent_ProcessTriggers = 0x0026E4B8; // walks trigger records: matching enter/require/group masks fire their event (LevelEvent_Trigger) or count toward an id
+LevelEvent_CheckRequiredItem = 0x0026E6D4; // for an Action (kind 10) handler 1 in this level, Action_CheckRequiredItem; else allowed
+
+// Rumble (force feedback): CWorld.m_pRumbles records played through a pool
+// of 0x3C-byte nodes, each with an amplitude and a lifetime curve;
+// func_002851C0 sums them into its rumbleLevel.
+Rumble_GetLevelAt = 0x0026E760; // summed amplitude of a pool's active rumbles heard from a point, distance falloff, 0 in cinemas/pause; only caller func_002851C0 (rumbleLevel)
+Rumble_Init = 0x0026E928; // fills a node: clip, position, radius/scale, owner link, both curves (RumbleCurve_Init) (unreferenced; Rumble_Start inlines it)
+Rumble_ClearLink = 0x0026E9D8; // clears the owner's pointer to it (unreferenced)
+Rumble_IsFinished = 0x0026E9F4; // either curve has run out (unreferenced; RumblePool_FreeFinished inlines it)
+Rumble_GetLevelOne = 0x0026EA48; // one rumble's amplitude at a point: curve value x (1 - distance / radius) x scale (unreferenced)
+RumblePool_Init = 0x0026EB3C; // two CLists, every 0x3C-byte node on the free one
+Rumble_Start = 0x0026EBDC; // takes a free node and starts a rumble clip at a position; only caller func_00225DB0 (CWorld.m_pRumbles)
+RumblePool_FreeFinished = 0x0026ECF0; // returns the nodes whose curves ended to the free list
+RumblePool_FreeAll = 0x0026EDA8; // returns every active node; 11 callers
+RumbleCurve_Init = 0x0026EE30; // curve pointer, time 0
+RumbleCurve_Advance = 0x0026EE40; // steps a sampled or random curve by the frame time, 1 when past its length
+RumbleCurve_GetValue = 0x0026EF30; // the curve's current sample (or its random value)
+
+// View-volume planes.
+Frustum_FromCorners = 0x0026F080; // the six planes from the eye and the far rectangle's corners (comment in the file); only caller func_0027D160
+Plane_FromPoints = 0x0026F348; // unit normal and distance of the plane through three points (unreferenced)
+Plane_SegmentFraction = 0x0026F400; // where a->b crosses the plane, as a fraction (comment in the file); renamed by C12: n2 has Plane_IntersectSegment (0x0023C478, writes the hit point)
+Frustum_ContainsPoint = 0x0026F480; // the point is inside all six planes
+Frustum_TestPoints = 0x0026F4E0; // every plane has one of the n points inside (unreferenced)
+Frustum_TestPointsNoFar = 0x0026F56C; // the same skipping plane 2, the far plane (unreferenced)
+Frustum_TestBox = 0x0026F60C; // an AABB (min/max) against the six planes, nearest corner per plane; 6 callers
+Plane_TestBox = 0x0026F6C8; // an AABB against one plane (unreferenced)
+
+// The audio manager: the N64 SDK demo's audiomgr.c, in its order
+// (amCreateAudioMgr, __amMain, __amHandleFrameMsg, __clearAudioDMA,
+// __amDmaNew; __amDMA is func_002700D0, in the next range).
+amCreateAudioMgr = 0x0026F760; // fills ALSynConfig (dmaproc = __amDmaNew, outputRate from osAiSetFrequency func_002984A0, frame size), builds the audio tasks; only caller func_00270240
+__amMain = 0x0026FB70; // the audio thread loop: osRecvMesg on its queue, frame messages to __amHandleFrameMsg
+__amDmaNew = 0x0026FD4C; // the ALDMANew: one-time DMA state, returns the DMA callback func_002700D0 (__amDMA)
+__amHandleFrameMsg = 0x0026FD88; // __clearAudioDMA, alAudioFrame (func_002949A4) into the current buffer, sends the task, flips buffers
+__clearAudioDMA = 0x0026FEA0; // waits for the frame's audio DMAs and frees buffers not used lately (comment in the file)
+AudioDMA_CacheBlock = 0x0026FFA0; // looks a sample block up in the DMA cache list D_800F279C (re-copying it if the size changed), else takes a free entry; returns its physical address; only caller func_0029F190
+
+Level_GetHub = 0x0026EFB8; // a level number's hub 1-6 by its thousand (1000-6999), 0 for the x999 ids and 99, -1 otherwise; callers index the per-hub key/Adon tables with it - 1 (func_00253640, func_0023E820)

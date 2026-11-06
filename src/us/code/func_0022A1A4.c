@@ -37,17 +37,17 @@ typedef struct {
 
 extern f32 func_00298470(f32);                              /* sqrtf */
 extern f32 func_0026841C(TargetActor *actor);               /* its height */
-extern f32 func_002671B4(TargetActor *actor);
-extern f32 func_0026D210(s32 value);
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a - b */
-extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
-extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
-extern void func_0020F040(CVector3 *v);                        /* normalize */
-extern Vector4f func_0020E810(CVector3 *dir);                  /* quaternion facing dir */
-extern void func_0020DCC8(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b);
-extern void func_00211114(Vector4f *q, MatrixF *m);
-extern void func_0020F85C(MatrixF *m, CVector3 *in, CVector3 *out);
-extern void func_00229618(Projectile *p, f32 scale);
+extern f32 GameObject_GetCollisionHeight(TargetActor *actor);
+extern f32 HalfToFloat(s32 value);
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a - b */
+extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
+extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
+extern void CVector3__Normalize(CVector3 *v);                        /* normalize */
+extern Vector4f CQuaternion__FromDirection(CVector3 *dir);                  /* quaternion facing dir */
+extern void CQuaternion__SlerpFast(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b);
+extern void CQuaternion__ToMatrix(Vector4f *q, MatrixF *m);
+extern void CMtxF__TransformPoint(MatrixF *m, CVector3 *in, CVector3 *out);
+extern void CParticle__Wobble(Projectile *p, f32 scale);
 
 /* Speeds up along the heading, stopping at the definition's limit. */
 static __inline__ void accelerate(Projectile *p, f32 accel) {
@@ -58,18 +58,18 @@ static __inline__ void accelerate(Projectile *p, f32 accel) {
     f32 limit;
 
     dir = p->dir;
-    func_0020EF60(&step, &dir, accel);
+    CVector3__Scale(&step, &dir, accel);
     vel = &p->vel;
-    func_0020EEF8(vel, vel, &step);
+    CVector3__Add(vel, vel, &step);
     speed = func_00298470(p->vel.x * p->vel.x + p->vel.y * p->vel.y + p->vel.z * p->vel.z);
-    limit = func_0026D210(p->def->motion->limit);
+    limit = HalfToFloat(p->def->motion->limit);
     if (accel > 0.0f) {
         if (limit < speed) {
-            func_0020EF60(vel, &dir, limit);
+            CVector3__Scale(vel, &dir, limit);
         }
     } else {
         if (speed < limit) {
-            func_0020EF60(vel, &dir, limit);
+            CVector3__Scale(vel, &dir, limit);
         }
     }
 }
@@ -77,7 +77,7 @@ static __inline__ void accelerate(Projectile *p, f32 accel) {
 /* Homing projectile: turns toward the middle of its target, harder the
  * closer it is, then accelerates along its heading up to (or down to) the
  * definition's speed limit, then wobbles. */
-void func_0022A1A4(Projectile *p) {
+void CParticle__UpdateHoming(Projectile *p) {
     CVector3 aim;
     CVector3 delta;
     CVector3 forward;
@@ -97,16 +97,16 @@ void func_0022A1A4(Projectile *p) {
 
         aim = target->pos;
         aim.y += height;
-        aim.y += func_002671B4(target) * 0.5f;
-        func_0020EF2C(&delta, &aim, &p->pos);
+        aim.y += GameObject_GetCollisionHeight(target) * 0.5f;
+        CVector3__Subtract(&delta, &aim, &p->pos);
         dist = func_00298470(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
         if (dist <= 51.199997f) {
             p->pos = target->pos;
             return;
         }
-        func_0020F040(&delta);
-        to = func_0020E810(&delta);
-        from = func_0020E810(&p->dir);
+        CVector3__Normalize(&delta);
+        to = CQuaternion__FromDirection(&delta);
+        from = CQuaternion__FromDirection(&p->dir);
         speed = func_00298470(p->vel.x * p->vel.x + p->vel.y * p->vel.y + p->vel.z * p->vel.z);
         if (dist < 1024.0f) {
             amount = dist - 204.79999f;
@@ -119,17 +119,17 @@ void func_0022A1A4(Projectile *p) {
         } else {
             amount = 0.04f;
         }
-        func_0020DCC8(&turn, amount, &from, &to);
-        func_00211114(&turn, &matrix);
+        CQuaternion__SlerpFast(&turn, amount, &from, &to);
+        CQuaternion__ToMatrix(&turn, &matrix);
         forward.x = 0.0f;
         forward.y = 0.0f;
         forward.z = 1.0f;
-        func_0020F85C(&matrix, &forward, &p->dir);
-        func_0020EF60(&p->vel, &p->dir, speed);
+        CMtxF__TransformPoint(&matrix, &forward, &p->dir);
+        CVector3__Scale(&p->vel, &p->dir, speed);
     }
-    accel = func_0026D210(p->def->motion->accel);
+    accel = HalfToFloat(p->def->motion->accel);
     if (accel != 0.0f) {
         accelerate(p, accel);
     }
-    func_00229618(p, 1.0f);
+    CParticle__Wobble(p, 1.0f);
 }

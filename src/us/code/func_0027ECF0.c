@@ -21,11 +21,11 @@ typedef struct {
     /* 0x0 */ u32 m_Bits;
 } CVisBits;
 
-u32 func_0027BD30(CShakeAxis *axis);
+u32 CShakeAxis__Advance(CShakeAxis *axis);
 void CList__Remove(CList *list, void *item);
 void CList__AddHead(CList *list, void *item);
-void func_0027EA88(CCamera *cam, f32 width, f32 height, f32 x, f32 y);
-void func_0027D160(CCamera *cam);
+void CCamera__MoveViewport(CCamera *cam, f32 width, f32 height, f32 x, f32 y);
+void CCamera__Advance(CCamera *cam);
 
 /* A camera's m_pNext, read as a plain word (not as a structure field, which
  * would let GCC move the read above the store to D_800F5A40 before it). */
@@ -36,7 +36,7 @@ void func_0027D160(CCamera *cam);
  * cameras for one to four players, advances the main camera and each active
  * one, gathering their view boxes and visibility bits, and counts down
  * m_bActiveChanged after the number of active cameras changes. */
-void func_0027ECF0(CCameraPool *pool) {
+void CCameraPool__Advance(CCameraPool *pool) {
     f32 halfWidth, halfHeight, width, height;
     f32 top, left, right, bottom;
     f32 splitX, splitY;
@@ -70,9 +70,9 @@ void func_0027ECF0(CCameraPool *pool) {
     if (shake != NULL) {
         do {
             nextShake = shake->m_pNext;
-            xDone = func_0027BD30(&shake->m_XAxis);
-            yDone = func_0027BD30(&shake->m_YAxis);
-            zDone = func_0027BD30(&shake->m_ZAxis);
+            xDone = CShakeAxis__Advance(&shake->m_XAxis);
+            yDone = CShakeAxis__Advance(&shake->m_YAxis);
+            zDone = CShakeAxis__Advance(&shake->m_ZAxis);
             finished = 0;
             if (xDone != 0 && yDone != 0) {
                 finished = zDone > 0U;
@@ -92,36 +92,36 @@ void func_0027ECF0(CCameraPool *pool) {
     view = (CCamera *) pool->m_ActiveList.m_pHead;
     switch ((u32) pool->m_ActiveList.m_nCount) {
     case 1:
-        func_0027EA88(view, width, height, 0.0f, 0.0f);
+        CCamera__MoveViewport(view, width, height, 0.0f, 0.0f);
         break;
     case 2:
         if (D_8011AAF3 == 0) {
-            func_0027EA88(view, width, halfHeight, left, top);
+            CCamera__MoveViewport(view, width, halfHeight, left, top);
             view = view->m_pNext;
-            func_0027EA88(view, width, halfHeight, left, top + halfHeight);
+            CCamera__MoveViewport(view, width, halfHeight, left, top + halfHeight);
         } else {
-            func_0027EA88(view, halfWidth, height, left, top);
+            CCamera__MoveViewport(view, halfWidth, height, left, top);
             view = view->m_pNext;
-            func_0027EA88(view, halfWidth, height, left + halfWidth, top);
+            CCamera__MoveViewport(view, halfWidth, height, left + halfWidth, top);
         }
         break;
     case 3:
-        func_0027EA88(view, halfWidth, halfHeight, left, top);
+        CCamera__MoveViewport(view, halfWidth, halfHeight, left, top);
         view = view->m_pNext;
-        func_0027EA88(view, halfWidth, halfHeight, left + halfWidth, top);
+        CCamera__MoveViewport(view, halfWidth, halfHeight, left + halfWidth, top);
         view = view->m_pNext;
-        func_0027EA88(view, halfWidth, halfHeight, left, top + halfHeight);
+        CCamera__MoveViewport(view, halfWidth, halfHeight, left, top + halfHeight);
         break;
     case 4:
-        func_0027EA88(view, halfWidth, halfHeight, left, top);
+        CCamera__MoveViewport(view, halfWidth, halfHeight, left, top);
         view = view->m_pNext;
         splitX = left + halfWidth;
-        func_0027EA88(view, halfWidth, halfHeight, splitX, top);
+        CCamera__MoveViewport(view, halfWidth, halfHeight, splitX, top);
         view = view->m_pNext;
         splitY = top + halfHeight;
-        func_0027EA88(view, halfWidth, halfHeight, left, splitY);
+        CCamera__MoveViewport(view, halfWidth, halfHeight, left, splitY);
         view = view->m_pNext;
-        func_0027EA88(view, halfWidth, halfHeight, splitX, splitY);
+        CCamera__MoveViewport(view, halfWidth, halfHeight, splitX, splitY);
         break;
     }
     clip = &D_800F5A28;
@@ -129,10 +129,10 @@ void func_0027ECF0(CCameraPool *pool) {
     bounds = &D_800F5A10;
     *bounds = *(CBox *) &pool->m_MainCamera.m_AnimMin;
     D_800F5A40 = D_800B6D00[0];
-    func_0027D160(&pool->m_MainCamera);
+    CCamera__Advance(&pool->m_MainCamera);
     view = (CCamera *) pool->m_ActiveList.m_pHead;
     if (view != NULL) {
-        func_0027D160(view);
+        CCamera__Advance(view);
         *clip = *(CBox *) &view->m_ViewMin;
         *bounds = *(CBox *) &view->m_AnimMin;
         D_800F5A40 = view->m_ViewParams.m_VisBits;
@@ -140,7 +140,7 @@ void func_0027ECF0(CCameraPool *pool) {
         if (view != NULL) {
             flags = (CVisBits *) &D_800F5A40;
             do {
-                func_0027D160(view);
+                CCamera__Advance(view);
                 v = view->m_ViewMin.x;
                 if (!(v <= clip->m_vMin.x)) v = clip->m_vMin.x;
                 clip->m_vMin.x = v;

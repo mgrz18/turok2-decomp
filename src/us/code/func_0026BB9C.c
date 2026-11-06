@@ -1,4 +1,4 @@
-/* WRONG CUT: the loop body continues as .L0026BBC0 (us/asm/6C7C0.s) up to func_0026BC54;
+/* WRONG CUT: the loop body continues as .L0026BBC0 (us/asm/6C7C0.s) up to CGameRegion__GetNormalRaw;
  * the "return 0" exit at 0x8026BBB8 has no symbol. */
 #include "common.h"
 
@@ -12,7 +12,7 @@ typedef struct {
 } Tri;
 
 /* Is (x, z) inside the XZ projection of the triangle? */
-s32 func_0026BB9C(Tri *tri, f32 x, f32 z) {
+s32 CGameRegion__ContainsXZ(Tri *tri, f32 x, f32 z) {
     s32 i, next;
     Vtx3 *a, *b;
 

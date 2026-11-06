@@ -9,7 +9,7 @@ typedef struct {
 
 extern BossFlags D_8012F9E0;
 
-void func_0040734C(CGameObjectInstance *arg0) {
+void Primagen_EnterMode5(CGameObjectInstance *arg0) {
     arg0->m_dwFlags = (s32) (arg0->m_dwFlags | 0x2000);
     D_8012F9E0.unk0 = 0;
     D_8012F9E0.unk1 = 0;

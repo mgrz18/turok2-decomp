@@ -2,13 +2,13 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-/* Clears the two scales (m_Mother) of every actor of the module, resets the module (func_0040A5B4) and queues func_0040C6F4. */
+/* Clears the two scales (m_Mother) of every actor of the module, resets the module (MotherBoss_SetupPhase1) and queues MotherBoss_OnPhase1CinemaDone. */
 
-extern void func_0040A5B4(void *obj, void *ai);
-extern void func_0040C6F4(void);
-extern s32 func_00283FF8(s32 id, void *arg1, void *arg2);
+extern void MotherBoss_SetupPhase1(void *obj, void *ai);
+extern void MotherBoss_OnPhase1CinemaDone(void);
+extern s32 Cinema_SetNextCallbacks(s32 id, void *arg1, void *arg2);
 
-void func_0040B180(void *obj, void *ai) {
+void MotherBoss_StartPhase1Cinema(void *obj, void *ai) {
     MotherBossState *state = &D_8012FB70;
     CGameObjectInstance *actor;
     s32 i;
@@ -18,6 +18,6 @@ void func_0040B180(void *obj, void *ai) {
         actor->m_AI.m_Mother.m_GrowScale = 0;
         actor->m_AI.m_Mother.m_PulseScale = 0;
     }
-    func_0040A5B4(obj, ai);
-    func_00283FF8(0xD2, func_0040C6F4, NULL);
+    MotherBoss_SetupPhase1(obj, ai);
+    Cinema_SetNextCallbacks(0xD2, MotherBoss_OnPhase1CinemaDone, NULL);
 }

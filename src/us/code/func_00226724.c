@@ -17,9 +17,9 @@ typedef struct Cache {
     Entry8 entries[1];    /* 0x14AC */
 } Cache;
 
-extern void func_002051F4(s32 arg0, s32 arg1);
+extern void CCache__Unlock(s32 arg0, s32 arg1);
 
-void func_00226724(Cache *cache) {
+void CScene__ReleaseSectors(Cache *cache) {
     s32 i;
     s32 count;
     Entry8 *entries;
@@ -27,7 +27,7 @@ void func_00226724(Cache *cache) {
     count = cache->count;
     entries = cache->entries;
     for (i = 0; i < count; i++) {
-        func_002051F4(0, entries[i].handle);
+        CCache__Unlock(0, entries[i].handle);
     }
     cache->unk8EC = 0;
     cache->unkBF4 = 0;

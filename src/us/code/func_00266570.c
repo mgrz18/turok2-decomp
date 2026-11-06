@@ -3,10 +3,10 @@
 #include "structs/model.h"
 
 extern s32 D_800B6D1C;
-void func_0021DC84(void *actor, void *state, CDrawArgs *req);
-void func_0020B6A0(s32 anim, s32 model, s32 one, CLights1 *slot, s32 zero, s32 first, s32 second);
+void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
+void Render_QueueModelInstance(s32 anim, s32 model, s32 one, CLights1 *slot, s32 zero, s32 first, s32 second);
 
-void func_00266570(u8 *actor, u8 *state, CDrawArgs *req) {
+void Action_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
     u8 *info = *(u8 **) (actor + 0x14) + 0x14;
     s32 first;
     s32 second;
@@ -23,10 +23,10 @@ void func_00266570(u8 *actor, u8 *state, CDrawArgs *req) {
     *(s8 *) (state + 0x11) = second;
     *(s32 *) (actor + 0x14C) = 1 << req->m_nModel;
     if (req->m_bShadow != 0) {
-        func_0021DC84(actor, state, req);
+        CGameObjectInstance__DrawShadow(actor, state, req);
     }
     if (req->m_bDraw != 0) {
-        func_0020B6A0(req->m_hModel, *(s32 *) (actor + 0x98), 1, &((CLights1 *) (actor + 0x110))[D_800B6D1C], 0,
+        Render_QueueModelInstance(req->m_hModel, *(s32 *) (actor + 0x98), 1, &((CLights1 *) (actor + 0x110))[D_800B6D1C], 0,
                       first, second);
     }
 }

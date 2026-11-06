@@ -23,39 +23,39 @@ extern u8 D_80124D28[];         /* __osPiEventBuf */
 extern u8 D_80124DB8[];         /* __osPiAccessQueue */
 extern u8 D_80123D10[];         /* __osPiThreadStack (its end is __osPiEventQueue) */
 extern s32 osPiRawStartDma();
-extern s32 func_0029D190();     /* osEPiRawStartDma */
-extern void func_0029D690(void *arg); /* __osDevMgrMain */
+extern s32 osEPiRawStartDma();     /* osEPiRawStartDma */
+extern void __osDevMgrMain(void *arg); /* __osDevMgrMain */
 
-extern void func_0029B030(void *mq, void *msg, s32 count);  /* osCreateMesgQueue */
-extern void func_0029DD10(void);                            /* __osPiCreateAccessQueue */
-extern void func_0029B950(s32 event, void *mq, void *msg);  /* osSetEventMesg */
-extern s32 func_0029B150(void *thread);                     /* osGetThreadPri */
-extern void func_0029B9B0(void *thread, s32 pri);           /* osSetThreadPri */
+extern void osCreateMesgQueue(void *mq, void *msg, s32 count);  /* osCreateMesgQueue */
+extern void __osPiCreateAccessQueue(void);                            /* __osPiCreateAccessQueue */
+extern void osSetEventMesg(s32 event, void *mq, void *msg);  /* osSetEventMesg */
+extern s32 osGetThreadPri(void *thread);                     /* osGetThreadPri */
+extern void osSetThreadPri(void *thread, s32 pri);           /* osSetThreadPri */
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
-extern void func_0029B060(void *t, s32 id, void (*entry)(void *), void *arg, void *sp, s32 pri); /* osCreateThread */
-extern void func_0029BB10(void *thread);                    /* osStartThread */
+extern void osCreateThread(void *t, s32 id, void (*entry)(void *), void *arg, void *sp, s32 pri); /* osCreateThread */
+extern void osStartThread(void *thread);                    /* osStartThread */
 
-void func_0029D450(s32 pri, void *cmdQ, void *cmdBuf, s32 cmdMsgCnt) {
+void osCreatePiManager(s32 pri, void *cmdQ, void *cmdBuf, s32 cmdMsgCnt) {
     u32 savedMask;
     s32 oldPri;
     s32 myPri;
 
     if (!D_800B8960.initialized) {
-        func_0029B030(cmdQ, cmdBuf, cmdMsgCnt);
-        func_0029B030(D_80124D10, D_80124D28, 1);
+        osCreateMesgQueue(cmdQ, cmdBuf, cmdMsgCnt);
+        osCreateMesgQueue(D_80124D10, D_80124D28, 1);
 
         if (!D_800B8990) {
-            func_0029DD10();
+            __osPiCreateAccessQueue();
         }
 
-        func_0029B950(8, D_80124D10, (void *)0x22222222);
+        osSetEventMesg(8, D_80124D10, (void *)0x22222222);
 
         oldPri = -1;
-        myPri = func_0029B150(NULL);
+        myPri = osGetThreadPri(NULL);
         if (myPri < pri) {
             oldPri = myPri;
-            func_0029B9B0(NULL, pri);
+            osSetThreadPri(NULL, pri);
         }
 
         savedMask = __osDisableInt();
@@ -63,18 +63,18 @@ void func_0029D450(s32 pri, void *cmdQ, void *cmdBuf, s32 cmdMsgCnt) {
         D_800B8960.initialized = 1;
         D_800B8960.acsQueue = D_80124DB8;
         D_800B8960.dma_func = osPiRawStartDma;
-        D_800B8960.edma_func = func_0029D190;
+        D_800B8960.edma_func = osEPiRawStartDma;
         D_800B8960.evtQueue = D_80124D10;
         D_800B8960.thread = D_80123AE0;
         D_800B8960.cmdQueue = cmdQ;
 
-        func_0029B060(D_80123AE0, 0, func_0029D690, &D_800B8960, &D_80123D10[0x1000], pri);
-        func_0029BB10(D_80123AE0);
+        osCreateThread(D_80123AE0, 0, __osDevMgrMain, &D_800B8960, &D_80123D10[0x1000], pri);
+        osStartThread(D_80123AE0);
 
         __osRestoreInt(savedMask);
 
         if (oldPri != -1) {
-            func_0029B9B0(NULL, oldPri);
+            osSetThreadPri(NULL, oldPri);
         }
     }
 }

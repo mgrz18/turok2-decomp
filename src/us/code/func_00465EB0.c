@@ -21,7 +21,7 @@ extern Emitter D_800F12C0;
 void func_0027BD10(Emitter *emitter);
 void func_00227664(CPooledLevelActor *actor);
 
-void func_00465EB0(CLevelActorPool *pool) {
+void SceneActorPool_Construct_2(CLevelActorPool *pool) {
     s32 i;
 
     pool->m_pFree = pool->m_Actors;

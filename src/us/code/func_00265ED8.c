@@ -7,6 +7,6 @@ typedef struct {
 } FlagsRecord;
 
 /* Whether flag bit 22 is clear. */
-s32 func_00265ED8(FlagsRecord *arg0) {
+s32 Destructible_IsHitNotExplosive(FlagsRecord *arg0) {
     return (((u32) arg0->flags >> 0x16) ^ 1) & 1;
 }

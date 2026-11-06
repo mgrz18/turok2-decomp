@@ -1,15 +1,15 @@
 #include "common.h"
 #include "structs/menu.h"
 
-s32 func_004160F0(void *item);
-s32 func_0029E3E0(char *dst, const char *fmt, ...); /* sprintf */
+s32 MenuItem_TextLength(void *item);
+s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 
 extern char D_800C140C[];
 extern char D_800C1410[];
 extern char D_800B45E0[];
 extern s32 D_80130990;
 
-s32 func_00421CA0(MenuItem *item, Menu *event) {
+s32 PakMenu_UpdateTitle(MenuItem *item, Menu *event) {
     s32 port;
 
     if (D_80130990 != 0) {
@@ -17,7 +17,7 @@ s32 func_00421CA0(MenuItem *item, Menu *event) {
     } else {
         port = event->controller->port;
         item->text = D_800B45E0;
-        func_0029E3E0(item->text + (func_004160F0(item) - 1), D_800C1410, port + 1);
+        sprintf(item->text + (MenuItem_TextLength(item) - 1), D_800C1410, port + 1);
     }
     return 0;
 }

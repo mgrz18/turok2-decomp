@@ -17,9 +17,9 @@ typedef struct StatusStep {
 
 extern StatusStep D_8011AB98[];
 extern CPlayerOptions D_8011AB58[];
-extern s32 func_002855E8(ControllerProfile *slot);
+extern s32 Controller_ConfirmPressed(ControllerProfile *slot);
 
-void func_00417C0C(void) {
+void Mp_JoinPressingController(void) {
     StatusStep *status;
     CPlayerOptions *settings;
     s32 i;
@@ -34,7 +34,7 @@ void func_00417C0C(void) {
     active = 1;
     settings = D_8011AB58;
     for (; i < 4; i++) {
-        if (func_002855E8(&D_800F5EC0[i]) != 0) {
+        if (Controller_ConfirmPressed(&D_800F5EC0[i]) != 0) {
             settings[i].m_bActive = active;
             settings[i].m_nController = i;
             break;

@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-s32 func_00296690(void *arg0, s32 arg1, s32 arg2) {
+s32 alResampleParam(void *arg0, s32 arg1, s32 arg2) {
     void *node = arg0;
     void *target;
     void (*callback)(void *, s32, s32);

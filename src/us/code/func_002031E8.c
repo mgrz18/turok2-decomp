@@ -4,7 +4,7 @@
 #include "common.h"
 #include "structs/cache.h"
 
-extern s32 func_00203068(s32 unused0, s32 unused1, s32 keep_recent);
+extern s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent);
 struct Pool;
 struct Pool {
     s32 count;
@@ -34,12 +34,12 @@ static __inline__ void *pool_alloc(s32 arg1) {
     ((CMemEntry *)(temp_s0))->flags |= (arg1 & 0xC);
     return temp_s0;
 }
-void *func_002031E8(s32 unused0, s32 flags) {
+void *CCache__AllocMemEntry(s32 unused0, s32 flags) {
     void *node;
     node = pool_alloc(flags);
     if (node == 0) {
         s32 keep = flags & 0x10;
-        if (func_00203068(0, 2, keep == 0) != 0) {
+        if (CCache__FreeOldestMemEntry(0, 2, keep == 0) != 0) {
             node = pool_alloc(flags);
         }
     }

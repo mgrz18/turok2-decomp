@@ -4,7 +4,7 @@
 
 f32 func_00298470(f32);
 
-void func_0021F268(CGameObjectInstance *arg0) {
+void CGameObjectInstance__GetAverageScale(CGameObjectInstance *arg0) {
     f32 temp_f0;
     f32 temp_f12;
     f32 temp_f1;

@@ -2,7 +2,7 @@
 
 s32 CList__AddHead(s32, s32);
 s32 CList__Remove(s32, s32);
-s32 func_0026DFB0(s32);
+s32 LevelEvent_Fire(s32);
 
 typedef struct ListNode0046588C {
     /* 0x0 */ u8 pad0[4];
@@ -26,7 +26,7 @@ void func_0046588C(Unk0046588C *arg0) {
     if (var_s1 != NULL) {
         do {
             temp_s0 = var_s1->next;
-            func_0026DFB0(var_s1->handle);
+            LevelEvent_Fire(var_s1->handle);
             CList__Remove((s32) &arg0->activeHead, (s32) var_s1);
             CList__AddHead((s32) arg0->freeList, (s32) var_s1);
             var_s1 = temp_s0;

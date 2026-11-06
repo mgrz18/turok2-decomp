@@ -6,7 +6,7 @@ typedef struct {
 } SortItem;
 
 /* qsort-style comparator on the f32 key at 0x4. */
-s32 func_00226D30(SortItem *arg0, SortItem *arg1) {
+s32 SortRecord_Compare(SortItem *arg0, SortItem *arg1) {
     s32 r = 1;
 
     if (arg0->key > arg1->key) {

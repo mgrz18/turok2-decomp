@@ -13,10 +13,10 @@
 /* Draws the level geometry seen by one view: every static object and level
  * actor of the grid regions inside the view's box that is shown in this view
  * and inside its frustum is drawn, or queued on the world's sorted list
- * (translucent ones, drawn later by func_0022077C). Objects flagged 8 also
+ * (translucent ones, drawn later by CScene__DrawSortedList). Objects flagged 8 also
  * go on a second list, except the type found at 0x33 in the world's id table
- * unless the view's player passes the func_00253720(0x111F) test. With the
- * shared flag set, the cached list of func_00221D3C is used instead. */
+ * unless the view's player passes the CPlayer__GetPickupCountLow(0x111F) test. With the
+ * shared flag set, the cached list of CScene__BuildGeometryDisplayList is used instead. */
 
 typedef struct {
     s32 stride;             /* 0x00 */
@@ -27,19 +27,19 @@ typedef struct {
 extern u8 D_8011AAF1;       /* D_8011AAD8.multiplayer */
 extern s32 D_800B6D20;
 
-void func_00221D3C(CWorld *);
-CPlayer *func_00281194(CCamera *);
-s32 func_00253720(CPlayer *, s32);
-void func_0020B5D4(void);
-void func_0020B624(void);
-void func_0020565C(s32, void **);
-void *func_002017D4(void *, s32);
-s32 func_0026F60C(void *, CBox *);
-void func_00214D04(CStaticObject *, CCamera *);
-void func_00214844(CStaticObject *, CCamera *);
-void func_002152AC(CLevelActor *);
+void CScene__BuildGeometryDisplayList(CWorld *);
+CPlayer *CCamera__GetPlayer(CCamera *);
+s32 CPlayer__GetPickupCountLow(CPlayer *, s32);
+void Render_ResetBatches(void);
+void Render_FlushBatches(void);
+void CCache__LockForDisplayList(s32, void **);
+void *CISet__GetBlock(void *, s32);
+s32 Frustum_TestBox(void *, CBox *);
+void CStaticObject__RequestLitVertices(CStaticObject *, CCamera *);
+void CStaticObject__Draw(CStaticObject *, CCamera *);
+void CLevelActor__Draw(CLevelActor *);
 
-void func_002222E0(CWorld *w, CCamera *v_) {
+void CScene__DrawGeometry(CWorld *w, CCamera *v_) {
     register CCamera *v asm("$18") = v_;
     u8 *base;
     void *grp;
@@ -70,10 +70,10 @@ void func_002222E0(CWorld *w, CCamera *v_) {
     mask = D_8011AAD8.difficulty;
     vmask = v->m_ViewParams.m_VisBits;
     if (D_8011AAD8.multiplayer != 0) {
-        func_00221D3C(w);
+        CScene__BuildGeometryDisplayList(w);
         return;
     }
-    player = func_00281194(v);
+    player = CCamera__GetPlayer(v);
     si = 0;
     tbl = (IdTable *)w->m_pObjectTypes;
     cnt = tbl->count;
@@ -89,7 +89,7 @@ void func_002222E0(CWorld *w, CCamera *v_) {
     }
     idx = -1;
 found:
-    if (player != NULL && idx != -1 && func_00253720(player, 0x111F) != 0 && D_8011AAF1 == 0) {
+    if (player != NULL && idx != -1 && CPlayer__GetPickupCountLow(player, 0x111F) != 0 && D_8011AAF1 == 0) {
         flag = 1;
     } else {
         flag = 0;
@@ -104,7 +104,7 @@ found:
         g->w0 = 0xE3000A01;
         g->w1 = 0x100000;
     }
-    func_0020B5D4();
+    Render_ResetBatches();
     w->m_nDeferred = 0;
     if (player != NULL && (player->m_ModeFlags & 0x100)) {
         {
@@ -160,10 +160,10 @@ found:
             cell = region->m_pBounds;
             if (cell->maxX > v->m_ViewMin.x && cell->minX < v->m_ViewMax.x
                 && cell->maxZ > v->m_ViewMin.z && cell->minZ < v->m_ViewMax.z) {
-                func_0020565C(0, region->m_hData);
+                CCache__LockForDisplayList(0, region->m_hData);
                 k = 0;
                 grp = *region->m_hData;
-                t = func_002017D4(grp, k);
+                t = CISet__GetBlock(grp, k);
                 cnt1 = t->count;
                 base = t->entries;
                 if (cnt1 > 0) {
@@ -173,13 +173,13 @@ found:
                         if (a->header.m_pIntelligence->m_dwFlags & mask) {
                             a->m_pOwner = region->m_hData;
                             if (D_800B6D20 == 0) {
-                                func_00214D04(a, v);
+                                CStaticObject__RequestLitVertices(a, v);
                             }
                             if ((vmask & a->m_ViewMask)
                                 && v->m_ViewMax.x > a->m_Bounds.m_vMin.x && v->m_ViewMin.x < a->m_Bounds.m_vMax.x
                                 && v->m_ViewMax.z > a->m_Bounds.m_vMin.z && v->m_ViewMin.z < a->m_Bounds.m_vMax.z
                                 && v->m_ViewMax.y > a->m_Bounds.m_vMin.y && v->m_ViewMin.y < a->m_Bounds.m_vMax.y
-                                && func_0026F60C(v->m_ViewVolume, &a->m_Bounds) != 0) {
+                                && Frustum_TestBox(v->m_ViewVolume, &a->m_Bounds) != 0) {
                                 if ((a->m_wFlags & 8) && (a->header.m_nObjType != idx || flag != 0)) {
                                     c = w->m_nListed;
                                     if (c != 0x40) {
@@ -194,7 +194,7 @@ found:
                                         w->m_nDeferred = c + 1;
                                     }
                                 } else {
-                                    func_00214844(a, v);
+                                    CStaticObject__Draw(a, v);
                                 }
                             }
                         }
@@ -202,7 +202,7 @@ found:
                         off += sizeof(CStaticObject);
                     } while (k < cnt1);
                 }
-                t = func_002017D4(grp, 1);
+                t = CISet__GetBlock(grp, 1);
                 k = 0;
                 cnt2 = t->count;
                 actors = (CLevelActor *)t->entries;
@@ -216,7 +216,7 @@ found:
                                 && v->m_ViewMax.x > p->m_Bounds.m_vMin.x && v->m_ViewMin.x < p->m_Bounds.m_vMax.x
                                 && v->m_ViewMax.z > p->m_Bounds.m_vMin.z && v->m_ViewMin.z < p->m_Bounds.m_vMax.z
                                 && v->m_ViewMax.y > p->m_Bounds.m_vMin.y && v->m_ViewMin.y < p->m_Bounds.m_vMax.y
-                                && (fl & 2) && func_0026F60C(v->m_ViewVolume, &p->m_Bounds) != 0) {
+                                && (fl & 2) && Frustum_TestBox(v->m_ViewVolume, &p->m_Bounds) != 0) {
                                 if (p->m_wFlags & 0x20) {
                                     c = w->m_nDeferred;
                                     if (c != 0x40) {
@@ -224,7 +224,7 @@ found:
                                         w->m_nDeferred = c + 1;
                                     }
                                 } else {
-                                    func_002152AC(p);
+                                    CLevelActor__Draw(p);
                                 }
                             }
                         }
@@ -235,5 +235,5 @@ found:
             i++;
         } while (i < n);
     }
-    func_0020B624();
+    Render_FlushBatches();
 }

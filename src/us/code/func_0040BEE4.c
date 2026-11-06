@@ -13,13 +13,13 @@ typedef struct {
 } ModuleObj;
 
 extern s32 D_800B6D1C; /* current view */
-extern void func_0021DC84(CGameObjectInstance *actor, void *ai, CDrawArgs *req);
+extern void CGameObjectInstance__DrawShadow(CGameObjectInstance *actor, void *ai, CDrawArgs *req);
 extern s32 Cinema_PathPlaying(void);
-extern void func_00236324(void *slotData);
-extern void func_00235898(void);
-extern void func_0020A33C(s32 hModel, s32 model, s32 one, CLights1 *slot, s32 zero, s32 index, s32 second);
+extern void ScriptAnimator_Apply(void *slotData);
+extern void ScreenTint_UpdateMode(void);
+extern void Render_DrawModel(s32 hModel, s32 model, s32 one, CLights1 *slot, s32 zero, s32 index, s32 second);
 
-void func_0040BEE4(CGameObjectInstance *actor, void *ai, CDrawArgs *req) {
+void MotherBoss_Draw(CGameObjectInstance *actor, void *ai, CDrawArgs *req) {
     MotherBossState *state;
     u8 *data;
     s32 mask;
@@ -35,12 +35,12 @@ void func_0040BEE4(CGameObjectInstance *actor, void *ai, CDrawArgs *req) {
         if (mask & (one << i)) {
             req->m_nModel = i;
             req->m_nShadowModel = i;
-            func_0021DC84(actor, ai, req);
+            CGameObjectInstance__DrawShadow(actor, ai, req);
             if (!Cinema_PathPlaying()) {
-                func_00236324(data);
-                func_00235898();
+                ScriptAnimator_Apply(data);
+                ScreenTint_UpdateMode();
             }
-            func_0020A33C(req->m_hModel, actor->m_pmtDrawMtxs, 1, (CLights1 *) actor->m_Lights[D_800B6D1C], 0, i, actor->m_AI.m_nTexture);
+            Render_DrawModel(req->m_hModel, actor->m_pmtDrawMtxs, 1, (CLights1 *) actor->m_Lights[D_800B6D1C], 0, i, actor->m_AI.m_nTexture);
             D_800AB8B0.m_Mode = 0;
         }
         i++;

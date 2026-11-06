@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* Which thousand-block an id falls in (1..6); 0 for the block-end ids, -1 otherwise. */
-s32 func_0026EFB8(s32 id) {
+s32 Level_GetHub(s32 id) {
     if (id == 1999 || id == 2999 || id == 3999 || id == 4999 || id == 5999 || id == 6999 ||
         id == 99) {
         return 0;

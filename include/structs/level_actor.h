@@ -9,11 +9,11 @@
  *
  * All of them start like an instance (CInstanceHeader: type, id, position,
  * region, intelligence), which is why the collision and drawing code can
- * take any of them. The level geometry's display list (func_00221D3C,
- * func_002222E0) draws both kinds; the level loader (func_00220D00) sets
+ * take any of them. The level geometry's display list (CScene__BuildGeometryDisplayList,
+ * CScene__DrawGeometry) draws both kinds; the level loader (CScene__DecompressGridSection) sets
  * the actors' killed bit and their lights; the pool functions
- * (func_00227240, func_002274A4, func_00227780, func_00227AE0,
- * func_00465EB0) spawn and release the pooled ones. Fields named unk are not
+ * (CLevelActorPool__Spawn, CLevelActorPool__Update, CPooledLevelActor__Release, CLevelActorPool__Alloc,
+ * SceneActorPool_Construct_2) spawn and release the pooled ones. Fields named unk are not
  * known yet. */
 
 #include "common.h"
@@ -24,7 +24,7 @@
 /* CStaticObject.m_wFlags / CLevelActor.m_wFlags */
 #define LEVEL_ACTOR_FLAG_DEAD        0x0001 /* killed (the level's killed bit is set) */
 #define LEVEL_ACTOR_FLAG_SHOWN       0x0002
-#define LEVEL_ACTOR_FLAG_GROWING     0x0010 /* scaling in to 0.35 (func_002157F0) */
+#define LEVEL_ACTOR_FLAG_GROWING     0x0010 /* scaling in to 0.35 (CLevelActor__UpdateGrowIn) */
 
 /* A static scenery object of the level, 0x90 bytes. */
 typedef struct CStaticObject {
@@ -40,13 +40,13 @@ typedef struct CStaticObject {
 } CStaticObject; /* size 0x90 */
 
 /* A level actor, 0x198 bytes: set up from its placement record by
- * func_002150C0, drawn by func_002152AC. The first 0x34 bytes are a
+ * CLevelActor__Construct, drawn by CLevelActor__Draw. The first 0x34 bytes are a
  * CObjectHead. */
 typedef struct CLevelActor {
     /* 0x000 */ CInstanceHeader header;     /* m_Type 3; m_nObjType: the index in the level's id table */
     /* 0x018 */ CVector3 m_vVelocity;
     /* 0x024 */ s32 unk24[4];               /* CObjectHead's water displacement and m_pInstanceBelow, cleared on a spawn */
-    /* 0x034 */ s32 m_Resource;             /* func_00224F84 (the model) */
+    /* 0x034 */ s32 m_Resource;             /* CScene__GetObject (the model) */
     /* 0x038 */ f32 m_Matrices[4][16];      /* its matrix, one per frame slot (D_800B6D1C), rebuilt once per frame */
     /* 0x138 */ s32 unk138;
     /* 0x13C */ f32 m_Scale;
@@ -58,12 +58,12 @@ typedef struct CLevelActor {
     /* 0x168 */ f32 m_Height;
     /* 0x16C */ u16 m_wFlags;               /* LEVEL_ACTOR_FLAG_*: 1 dead, 2 shown, 0x20 translucent */
     /* 0x16E */ u16 m_nKilledIndex;         /* its bit in the level's killed array */
-    /* 0x170 */ f32 m_Timer;                /* the grow-in time (flag 0x10, func_002157F0), the morpher's animation clock (func_002156FC) */
-    /* 0x174 */ f32 m_AnimSpeed;            /* type 12 (morpher): the frame rate times its m_AnimSpeed (func_00215868) */
-    /* 0x178 */ u8 m_Lights[0x18];          /* the lighting at its position (func_002254C0, func_00222A9C; D_800AB0D0 when placed) */
-    /* 0x190 */ s32 m_ViewMask;             /* the views it shows in: the placement record's, then its region's m_VisBits (func_002156FC) */
+    /* 0x170 */ f32 m_Timer;                /* the grow-in time (flag 0x10, CLevelActor__UpdateGrowIn), the morpher's animation clock (CLevelActor__Update) */
+    /* 0x174 */ f32 m_AnimSpeed;            /* type 12 (morpher): the frame rate times its m_AnimSpeed (CLevelActor__UpdateAnimSpeed) */
+    /* 0x178 */ u8 m_Lights[0x18];          /* the lighting at its position (CScene__GetLightsAt, CScene__ComputeLights; D_800AB0D0 when placed) */
+    /* 0x190 */ s32 m_ViewMask;             /* the views it shows in: the placement record's, then its region's m_VisBits (CLevelActor__Update) */
     /* 0x194 */ u8 m_DrawnFrame;            /* the frame (D_800B6D1B) its matrix was last built for */
-    /* 0x195 */ u8 m_UpdatedFrame;          /* the frame its once-per-frame update (func_002156FC) last ran */
+    /* 0x195 */ u8 m_UpdatedFrame;          /* the frame its once-per-frame update (CLevelActor__Update) last ran */
     /* 0x196 */ u8 pad196[0x198 - 0x196];
 } CLevelActor; /* size 0x198 */
 

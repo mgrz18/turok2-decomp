@@ -1,7 +1,7 @@
 #include "common.h"
 
-s32 func_0025D474();                            /* extern */
+s32 EnemyMode_Move_Update();                            /* extern */
 
-void func_0025F1B4(void) {
-    func_0025D474();
+void EnemyMode_TakeCover_Update(void) {
+    EnemyMode_Move_Update();
 }

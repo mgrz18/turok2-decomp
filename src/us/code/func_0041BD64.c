@@ -3,19 +3,19 @@
 
 #include "rw/abu_types.h"
 
-extern int func_00285628(struct ControllerProfile *object);
-extern int func_00285670(struct ControllerProfile *object);
-s32 func_002855E8(char *);
-s32 func_0041BD64(void) {
+extern int Controller_MenuLeft(struct ControllerProfile *object);
+extern int Controller_MenuRight(struct ControllerProfile *object);
+s32 Controller_ConfirmPressed(char *);
+s32 OptionsMenu_CycleDifficulty(void) {
     extern u32 D_8011AAE0[];
- if(((s32 (*)(char *))func_00285628)((char *)&D_800F5C78)) {
+ if(((s32 (*)(char *))Controller_MenuLeft)((char *)&D_800F5C78)) {
  switch(D_8011AAE0[0]) {
  case 8: D_8011AAE0[0]=32; break;
  case 16: D_8011AAE0[0]=8; break;
  case 32: D_8011AAE0[0]=16; break;
  }
  }
- if(((s32 (*)(char *))func_00285670)((char *)&D_800F5C78) || func_002855E8((char *)&D_800F5C78)) {
+ if(((s32 (*)(char *))Controller_MenuRight)((char *)&D_800F5C78) || Controller_ConfirmPressed((char *)&D_800F5C78)) {
  switch(D_8011AAE0[0]) {
  case 8: D_8011AAE0[0]=16; break;
  case 16: D_8011AAE0[0]=32; break;

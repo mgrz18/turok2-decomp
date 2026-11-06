@@ -1,4 +1,4 @@
-/* The two inlined helpers after AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD/8028E6FC.CPP, func_8028E860_de and func_8028E78C_de (func_00226EBC and func_00226DE8 here), with Turok 2's layouts. */
+/* The two inlined helpers after AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD/8028E6FC.CPP, func_8028E860_de and func_8028E78C_de (Blast_GetStrength and Blast_IsLivingEnemyInRange here), with Turok 2's layouts. */
 
 #include "common.h"
 #include "structs/vector.h"
@@ -28,20 +28,20 @@ struct Entity {
 
 extern CListedInstance *D_8010FEB4;
 
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-void func_00245828(DamageEvent *event, s32 source, s32 damage, f32 radius, s32 flags, s32 arg5);
-void func_002465C8(Entity *e, void *ai, DamageEvent *event);
-s32 func_00243414(Entity *e, void *ai, s32 state);
-Entity *func_002532A8(void *list);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+void DamageEvent_Set(DamageEvent *event, s32 source, s32 damage, f32 radius, s32 flags, s32 arg5);
+void CAI__CallHurt(Entity *e, void *ai, DamageEvent *event);
+s32 CAI__SetMode(Entity *e, void *ai, s32 state);
+Entity *CPlayerPool__GetFirstActive(void *list);
 
-/* func_00226EBC inlined: the strength (0 or 0xFF) a blast at `target` hits `e` with. */
+/* Blast_GetStrength inlined: the strength (0 or 0xFF) a blast at `target` hits `e` with. */
 static __inline__ s32 blastStrength(Entity *e, CVector3 *target) {
     CVector3 d;
     f32 dist;
     u32 t;
 
     if (e->kind == 1 && e->def->m_Type == 7) {
-        func_0020EF2C(&d, &e->pos, target);
+        CVector3__Subtract(&d, &e->pos, target);
         dist = d.x * d.x + d.z * d.z;
         d.y = 0;
         if (262144.0f < dist) {
@@ -58,13 +58,13 @@ static __inline__ s32 blastStrength(Entity *e, CVector3 *target) {
     return 0;
 }
 
-/* func_00226DE8 inlined: a living enemy within 2560 units of `target`. */
+/* Blast_IsLivingEnemyInRange inlined: a living enemy within 2560 units of `target`. */
 static __inline__ s32 inBlastRange(Entity *e, CVector3 *target) {
     CVector3 d;
     f32 dist;
     u32 t;
 
-    func_0020EF2C(&d, &e->pos, target);
+    CVector3__Subtract(&d, &e->pos, target);
     dist = d.x * d.x + d.y * d.y + d.z * d.z;
     if (e->def->m_Type == 1) {
         t = e->typeId;
@@ -84,7 +84,7 @@ static __inline__ s32 inBlastRange(Entity *e, CVector3 *target) {
 
 /* A blast at `target`: damages every entity of the world and of the actor list, then damages
  * the current player when within 512 units. */
-void func_00223A94(CWorld *world, CVector3 *target) {
+void CScene__Blast(CWorld *world, CVector3 *target) {
     DamageEvent event;
     CVector3 d;
     Entity *e;
@@ -100,28 +100,28 @@ void func_00223A94(CWorld *world, CVector3 *target) {
         e = (Entity *)world->m_pKind1[i];
         strength = blastStrength(e, target);
         if (strength != 0) {
-            func_00245828(&event, 0, strength << 8, 102.399994f, 0x400000, 0);
-            func_002465C8(e, e->ai, &event);
+            DamageEvent_Set(&event, 0, strength << 8, 102.399994f, 0x400000, 0);
+            CAI__CallHurt(e, e->ai, &event);
         }
         if (inBlastRange(e, target)) {
-            func_00243414(e, e->ai, 0x3D);
+            CAI__SetMode(e, e->ai, 0x3D);
         }
     }
     for (node = D_8010FEB4; node != NULL; node = node->m_pNext) {
         actor = (Entity *)&node->m_Instance;
         strength = blastStrength(actor, target);
         if (strength != 0) {
-            func_00245828(&event, 0, strength << 8, 102.399994f, 0x400000, 0);
-            func_002465C8(actor, actor->ai, &event);
+            DamageEvent_Set(&event, 0, strength << 8, 102.399994f, 0x400000, 0);
+            CAI__CallHurt(actor, actor->ai, &event);
         }
         if (inBlastRange(actor, target)) {
-            func_00243414(actor, actor->ai, 0x3D);
+            CAI__SetMode(actor, actor->ai, 0x3D);
         }
     }
-    player = func_002532A8(&D_80119870.m_PlayerList);
-    func_0020EF2C(&d, &player->pos, target);
+    player = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
+    CVector3__Subtract(&d, &player->pos, target);
     if (d.x * d.x + d.y * d.y + d.z * d.z <= 262144.0f) {
-        func_00245828(&event, 0, 0x1900, 102.399994f, 0x400000, 0);
-        func_002465C8(player, player->ai, &event);
+        DamageEvent_Set(&event, 0, 0x1900, 102.399994f, 0x400000, 0);
+        CAI__CallHurt(player, player->ai, &event);
     }
 }

@@ -1,17 +1,17 @@
 #include "rw/junk_types.h" /* B12Node: a cached resource */
 
-s32 func_002021F0(s32, s32, s32);
-B12Node *func_002031E8(s32, s32);
+s32 CHeap__AllocAt(s32, s32, s32);
+B12Node *CCache__AllocMemEntry(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
-void func_002062F8(s32, B12Node *);
-void func_00206498(s32, B12Node *);
+void CCache__FreeMemEntry(s32, B12Node *);
+void CCache__AddToAddressList(s32, B12Node *);
 extern u8 D_800D1CC0[];
 extern u8 D_800D8DB0[];
 extern s32 D_800D8DCC;
-B12Node *func_00204FD0(s32 arg0, s32 arg1, s32 arg2)
+B12Node *CCache__AllocateAt(s32 arg0, s32 arg1, s32 arg2)
 {
   s32 temp_a0;
   s32 temp_v0;
@@ -31,20 +31,20 @@ B12Node *func_00204FD0(s32 arg0, s32 arg1, s32 arg2)
   {
     __osRestoreInt(temp_a0);
   }
-  var_s0 = func_002031E8(0, 0);
+  var_s0 = CCache__AllocMemEntry(0, 0);
   if (var_s0 != 0)
   {
-    temp_v0 = func_002021F0((s32) (D_800D1CC0), arg1, arg2);
+    temp_v0 = CHeap__AllocAt((s32) (D_800D1CC0), arg1, arg2);
     var_s0->key = temp_v0;
     if (temp_v0 != 0)
     {
       var_s0->unk4 = arg2;
       var_s0->flags = var_s0->flags | 3;
-      func_00206498(0, var_s0);
+      CCache__AddToAddressList(0, var_s0);
     }
     else
     {
-      func_002062F8(0, var_s0);
+      CCache__FreeMemEntry(0, var_s0);
       var_s0 = 0;
     }
   }

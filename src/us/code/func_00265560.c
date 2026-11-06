@@ -5,13 +5,13 @@
 #include "structs/world.h"
 
 extern CWorld D_800F7078;
-extern s32 func_00220408(void *, void *);
-void func_00265560(void *arg0, void *arg1) {
-    extern s32 func_00243414(void *, void *, s32);
-    s32 different = func_00220408(&D_800F7078, arg0) != 1;
+extern s32 CScene__GetInstanceSavedBit(void *, void *);
+void Door_Advance(void *arg0, void *arg1) {
+    extern s32 CAI__SetMode(void *, void *, s32);
+    s32 different = CScene__GetInstanceSavedBit(&D_800F7078, arg0) != 1;
     if (different == 0) {
-        func_00243414(arg0, arg1, 0);
+        CAI__SetMode(arg0, arg1, 0);
     } else {
-        func_00243414(arg0, arg1, 1);
+        CAI__SetMode(arg0, arg1, 1);
     }
 }

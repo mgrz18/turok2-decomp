@@ -12,10 +12,10 @@ typedef struct {
 
 extern f32 D_800B6D28; /* frame delta */
 
-extern void func_00243414(CGameObjectInstance *actor, CAI *ai, s32 anim);
-extern f32 func_002119FC(f32 lo, f32 hi);
+extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
+extern f32 Random_Blend(f32 lo, f32 hi);
 
-void func_0025C1B0(CGameObjectInstance *actor, CAI *ai, Motion *motion) {
+void EnemyAI_IdleSoundCallback(CGameObjectInstance *actor, CAI *ai, Motion *motion) {
     s32 modeIndex = ai->m_Enemy.m_BehaviorIndex;
     f32 speed;
 
@@ -26,7 +26,7 @@ void func_0025C1B0(CGameObjectInstance *actor, CAI *ai, Motion *motion) {
     if (speed < 0.0f ? -speed > 102.399994f : speed > 102.399994f) {
         ai->m_Enemy.m_IdleTimer = 30.0f;
         if (ai->m_Enemy.m_Behavior[1] && modeIndex == 0) {
-            func_00243414(actor, ai, 0x26);
+            CAI__SetMode(actor, ai, 0x26);
         }
         return;
     }
@@ -35,14 +35,14 @@ void func_0025C1B0(CGameObjectInstance *actor, CAI *ai, Motion *motion) {
         ai->m_Enemy.m_IdleTimer = 0.0f;
     }
     if (ai->m_Health && ai->m_Mode == 4 && ai->m_Enemy.m_IdleTimer == 0.0f) {
-        ai->m_Enemy.m_IdleTimer = func_002119FC(30.0f, 75.0f);
+        ai->m_Enemy.m_IdleTimer = Random_Blend(30.0f, 75.0f);
         if (modeIndex == 0) {
             if (ai->m_Enemy.m_Behavior[1]) {
-                func_00243414(actor, ai, 0x26);
+                CAI__SetMode(actor, ai, 0x26);
             }
         } else if (modeIndex == 1) {
             if (ai->m_Enemy.m_Behavior[0]) {
-                func_00243414(actor, ai, 0x28);
+                CAI__SetMode(actor, ai, 0x28);
             }
         }
     }

@@ -16,7 +16,7 @@ typedef struct PlrGroup {
     Plr *head;          /* 0x20 */
 } PlrGroup;
 extern f32 D_800A70D0;
-Plr *func_002532EC(PlrGroup *g, CVector3 p) {
+Plr *CPlayerPool__FindNearest(PlrGroup *g, CVector3 p) {
     Plr *a;
     Plr *best = ((void *)0);
     f32 min = D_800A70D0;

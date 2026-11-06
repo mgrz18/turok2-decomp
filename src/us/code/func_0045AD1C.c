@@ -8,7 +8,7 @@ typedef struct {
 extern s32 D_800B490C;
 extern s32 D_80130990;
 
-s32 func_0045AD1C(Item *arg0) {
+s32 PakMenu_UpdateCancel_2(Item *arg0) {
     if (D_80130990 != 0) {
         arg0->data = &D_800B490C;
     }

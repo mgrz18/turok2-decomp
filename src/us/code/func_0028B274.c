@@ -13,14 +13,14 @@ typedef struct {
     /* 0x2F4 */ Stream *stream;
 } StreamOwner;
 
-void func_0029A4F0(Stream *);                       /* extern */
+void osSpTaskYield(Stream *);                       /* extern */
 
-void func_0028B274(StreamOwner *arg0) {
+void __scYield(StreamOwner *arg0) {
     Stream *temp_a0;
 
     temp_a0 = arg0->stream;
     if (temp_a0->state == 1) {
         temp_a0->flags = (s32) (temp_a0->flags | 0x10);
-        func_0029A4F0(temp_a0);
+        osSpTaskYield(temp_a0);
     }
 }

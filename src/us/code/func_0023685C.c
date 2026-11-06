@@ -1,6 +1,6 @@
 #include "common.h"
 
-/* A swoosh trail (see func_00236BC4). */
+/* A swoosh trail (see Trail_Draw). */
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
     /* 0x14 */ u8 model[0x34 - 0x14];

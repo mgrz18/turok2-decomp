@@ -2,10 +2,10 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-s32 func_0041648C(s32, s32, s32, s32, s32, s32);
+s32 Menu_StepValue(s32, s32, s32, s32, s32, s32);
 extern CPlayerOptions D_8011AB18;     /* the default settings */
 
-s32 func_0041C4C0(s32 arg0, Menu *arg1) {
+s32 OptionsMenu_StepStickHorz(s32 arg0, Menu *arg1) {
     CPlayerOptions *temp_v0_2;
     CPlayerOptions *var_s0;
     CPlayer *temp_v0;
@@ -18,6 +18,6 @@ s32 func_0041C4C0(s32 arg0, Menu *arg1) {
             var_s0 = temp_v0_2;
         }
     }
-    var_s0->m_SettingX = func_0041648C((s32) arg1, (s32) var_s0->m_SettingX, 8, 8, 0xF8, 0);
+    var_s0->m_SettingX = Menu_StepValue((s32) arg1, (s32) var_s0->m_SettingX, 8, 8, 0xF8, 0);
     return 0;
 }

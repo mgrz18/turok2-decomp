@@ -3,17 +3,17 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00285878(s32 arg0);
+extern s32 Controller_Lock(s32 arg0);
 extern int D_80130C60[];
 extern int D_80130C70[];
 extern s8 D_800F6750;
-extern void func_002847E0(void);
-extern void func_002858A4(void);
-void func_002847E0();
-void func_002858A4();
-void func_004258E8(s32);
+extern void Controller_ReadAll(void);
+extern void Controller_Unlock(void);
+void Controller_ReadAll();
+void Controller_Unlock();
+void Pak_Mount(s32);
 s32 osPfsRepairId(void *);
-s32 func_00426814(s32 arg0) {
+s32 Pak_RepairIfDamaged(s32 arg0) {
     extern char D_80130C80[];
     s32 temp_s0;
     s32 var_s0;
@@ -21,8 +21,8 @@ s32 func_00426814(s32 arg0) {
     if (D_80130C60[arg0] != 3) {
         return -2;
     }
-    ((void (*)(s32))func_00285878)(1);
-    func_002847E0();
+    ((void (*)(s32))Controller_Lock)(1);
+    Controller_ReadAll();
     var_s0 = D_80130C70[arg0];
     D_800F6750 = 2;
     if (var_s0 == -4) {
@@ -30,8 +30,8 @@ s32 func_00426814(s32 arg0) {
         if (var_s0 != 0) {
             var_s0 = -1;
         }
-        func_004258E8(arg0);
+        Pak_Mount(arg0);
     }
-    func_002858A4();
+    Controller_Unlock();
     return var_s0;
 }

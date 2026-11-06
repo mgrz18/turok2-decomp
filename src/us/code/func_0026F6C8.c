@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_0026F6C8(f32 *arg0, f32 *arg1);
-s32 func_0026F6C8(f32 *arg0, f32 *arg1) {
+extern s32 Plane_TestBox(f32 *arg0, f32 *arg1);
+s32 Plane_TestBox(f32 *arg0, f32 *arg1) {
     f32 temp_f0;
     f32 temp_f0_2;
     f32 temp_f0_3;

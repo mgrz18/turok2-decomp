@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00460F78(int channel);
+extern void __osPfsRequestOneChannel_2(int channel);
 extern u8 D_80121420;
-void func_00460F78(int channel)
+void __osPfsRequestOneChannel_2(int channel)
 {
     extern OSPifRam D_80130E20;
     u8 *base;

@@ -6,11 +6,11 @@ struct CGameRegion {
     /* 0x00 */ u8 pad0[4];
     /* 0x04 */ CVector3 *m_pCorners[3];
     /* 0x10 */ u8 pad10[0x1C - 0x10];
-    /* 0x1C */ u32 unk1C; /* visibility bits, see func_00281E4C */
+    /* 0x1C */ u32 unk1C; /* visibility bits, see CCamera__UpdateVisBits */
 };
 
 /* How far the highest corner of the current region is above the object. */
-f32 func_00268B50(CGameObjectInstance *arg0) {
+f32 GameObject_GetRegionTopAbove(CGameObjectInstance *arg0) {
     f32 temp_f1;
     f32 var_f0;
     f32 var_f1;

@@ -2,10 +2,10 @@
 #include "structs/boss.h"
 
 extern BossScript D_8012F9F8; /* LevelScriptState.script */
-extern f32 func_002119FC(f32 lo, f32 hi);
+extern f32 Random_Blend(f32 lo, f32 hi);
 
 /* Pick the next attack of the script: steps are skipped by chance, type 5 wraps around. */
-void func_00406E0C(void) {
+void Primagen_NextAttackStep(void) {
     if (D_8012F9F8.cursor != -1) {
         D_8012F9F8.timer = D_8012F9F8.steps[D_8012F9F8.cursor].delay;
     } else {
@@ -17,5 +17,5 @@ void func_00406E0C(void) {
             D_8012F9F8.cursor = 0;
         }
         D_8012F9F8.current = D_8012F9F8.cursor;
-    } while ((f32) D_8012F9F8.steps[D_8012F9F8.cursor].chance <= func_002119FC(0.0f, 100.0f));
+    } while ((f32) D_8012F9F8.steps[D_8012F9F8.cursor].chance <= Random_Blend(0.0f, 100.0f));
 }

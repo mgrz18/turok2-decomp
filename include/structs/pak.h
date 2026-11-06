@@ -4,7 +4,7 @@
 /* The Controller Pak menus: the game keeps one OSPfs per channel
  * (D_80130C80) and a cached copy of each pak's note directory
  * (D_800C2224: free space and the osPfsFileState of its 16 notes),
- * refreshed by func_00425760. The libultra side (OSPfs, OSPfsState,
+ * refreshed by Pak_RefreshNotes. The libultra side (OSPfs, OSPfsState,
  * __OSDir...) is in ultra_types.h. The pak menus are Menu windows
  * (structs/menu.h).
  * tools/check_structs.py checks every offset below with the game's compiler. */
@@ -13,13 +13,13 @@
 #include "ultra_types.h"
 
 /* One pak's cached directory; D_800C2224 points to 4 of them (one per
- * channel, 0x810 bytes allocated by func_0045F2FC). */
+ * channel, 0x810 bytes allocated by Pak_AllocDirectory_2). */
 typedef struct PakDirectory {
     /* 0x000 */ s32 freeBytes;      /* what osPfsFreeBlocks returned */
     /* 0x004 */ OSPfsState notes[16];
 } PakDirectory; /* size 0x204 */
 
-/* A channel's Rumble Pak: what func_00426480 probes into D_80130AA0[4]
+/* A channel's Rumble Pak: what Pak_ProbeSlot probes into D_80130AA0[4]
  * (the pak states D_80130C60 follow it). */
 typedef struct RumblePak {
     /* 0x00 */ u8 present;          /* osMotorInit succeeded */
@@ -39,15 +39,15 @@ typedef struct PakProfile {
     /* 0x08 */ u8 character;
     /* 0x09 */ u8 reserved[3];      /* cleared before a save */
     /* 0x0C */ u8 name[8];
-    /* 0x14 */ u32 checksum;        /* func_00426E78 over the first 0x14 bytes */
+    /* 0x14 */ u32 checksum;        /* Crc32_Compute over the first 0x14 bytes */
 } PakProfile; /* size 0x18 */
 
-/* The free-space query of the pak save menus (func_0041F0C8,
- * func_00457FE8), on the stack. */
+/* The free-space query of the pak save menus (PakMenu_WriteSaveGame,
+ * PakMenu_WriteSaveGame_2), on the stack. */
 typedef struct PakQuery {
     /* 0x00 */ s32 channel;
-    /* 0x04 */ s32 freeBytes;       /* func_004267A0 */
-    /* 0x08 */ s32 freeNotes;       /* func_0042670C */
+    /* 0x04 */ s32 freeBytes;       /* Pak_GetFreePages */
+    /* 0x08 */ s32 freeNotes;       /* Pak_CountEmptyNotes */
 } PakQuery; /* size 0xC */
 
 extern RumblePak D_80130AA0[];      /* per channel: its Rumble Pak */

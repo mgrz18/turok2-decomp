@@ -4,7 +4,7 @@
 
 extern f32 D_800B2848; /* volume step */
 
-void func_00272D3C(SndVoice *s) {
+void SndVoice_UpdateDoppler(SndVoice *s) {
     f32 dx;
     f32 dy;
     f32 dz;

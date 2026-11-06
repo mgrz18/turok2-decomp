@@ -3,20 +3,20 @@
 #include "common.h"
 #include "structs/sound.h"
 
-void func_00290EC0(s32 handle, s16 volume);
-void func_00290EF0(s32 handle);
+void alCSPSetVol(s32 handle, s16 volume);
+void alCSPStop(s32 handle);
 
-void func_00275018(SndSeq *ch) {
+void SndSeq_UpdateFade(SndSeq *ch) {
     f32 current;
     f32 target;
     f32 next;
 
     if (ch->flags & 2) {
-        func_00290EC0(ch->csp, ch->volume.h.lo);
+        alCSPSetVol(ch->csp, ch->volume.h.lo);
         ch->volume.w = (f32) ch->volume.w - ch->fadeStep;
         if (ch->volume.w <= 0) {
             ch->volume.w = 0;
-            func_00290EF0(ch->csp);
+            alCSPStop(ch->csp);
             ch->flags |= 4;
         }
     } else if (ch->sliding) {

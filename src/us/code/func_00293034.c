@@ -16,11 +16,11 @@ typedef struct {
 } Seq;
 
 /* alSeqTicksToSec */
-f32 func_00293034(Seq *seq, s32 ticks, u32 tempo) {
+f32 alSeqTicksToSec(Seq *seq, s32 ticks, u32 tempo) {
     return ((f32) ticks * (f32) tempo) / ((f32) seq->division * 1000000.0f);
 }
 
 /* alSeqSecToTicks */
-u32 func_00293080(Seq *seq, f32 sec, u32 tempo) {
+u32 alSeqSecToTicks(Seq *seq, f32 sec, u32 tempo) {
     return sec * (seq->division * 1000000.0f) / tempo;
 }

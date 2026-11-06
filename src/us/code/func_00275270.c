@@ -3,23 +3,23 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00266D24(void *, s32, s32);
-extern void *func_002017D4(void *, s32);
-extern f32 func_0026D210(s32);
+extern s32 BinarySearch(void *, s32, s32);
+extern void *CISet__GetBlock(void *, s32);
+extern f32 HalfToFloat(s32);
 extern f32 D_800A81EC;
-void *func_00275270(SequenceState *state, s32 index) {
+void *SndSeq_GetSongData(SequenceState *state, s32 index) {
     s32 selection;
     s32 section;
     void *result;
     SequenceCommand *command;
     f32 duration;
-    selection = func_00266D24(state->resource->lookup, state->resource->count, index);
+    selection = BinarySearch(state->resource->lookup, state->resource->count, index);
     if (selection != -1) {
         section = selection * 2;
-        result = func_002017D4(state->resource->sections, section | 1);
-        command = func_002017D4(state->resource->sections, section);
+        result = CISet__GetBlock(state->resource->sections, section | 1);
+        command = CISet__GetBlock(state->resource->sections, section);
         state->command = command->command;
-        duration = func_0026D210(command->duration);
+        duration = HalfToFloat(command->duration);
         state->duration = duration;
         if (duration <= 0.0f) state->duration = D_800A81EC;
         return result;

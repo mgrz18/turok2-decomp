@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_0025E52C(s32, s32, s32, s32);
+s32 AI_HearNoise(s32, s32, s32, s32);
 
 void func_00225C08(void *arg0, s32 arg1, s32 arg2)
 {
@@ -27,7 +27,7 @@ void func_00225C08(void *arg0, s32 arg1, s32 arg2)
       temp_a0 = *((s32 *) (((s8 *) var_s1) + 0xDFC));
       var_s1 += 4;
       var_s0 += 1;
-      func_0025E52C(temp_a0, temp_a0 + 0x140, arg2, arg1);
+      AI_HearNoise(temp_a0, temp_a0 + 0x140, arg2, arg1);
     }
     while (var_s0 < temp_s2);
   }

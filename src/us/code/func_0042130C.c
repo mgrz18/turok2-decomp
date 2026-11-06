@@ -7,6 +7,6 @@ typedef struct {
 
 extern s32 D_800F70A8;          /* base address; arg0 is a byte offset into it */
 
-void func_0042130C(s32 arg0, s32 arg1) {
+void Pak_SetBufferSize(s32 arg0, s32 arg1) {
     ((Entry *) (D_800F70A8 + arg0))->unk684 = arg1;
 }

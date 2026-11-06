@@ -6,11 +6,11 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
-void func_00227240(u8 *base, s32 zero, s32 a, CVector3 z, CVector3 v, s32 b, f32 f);
-void func_00224ED0(CWorld *lv, s32 a1, CVector3 v, s32 x, f32 f) {
+void CLevelActorPool__Spawn(u8 *base, s32 zero, s32 a, CVector3 z, CVector3 v, s32 b, f32 f);
+void CScene__SpawnPoolActor(CWorld *lv, s32 a1, CVector3 v, s32 x, f32 f) {
     CVector3 z;
     z.x = 0;
     z.y = 0;
     z.z = 0;
-    func_00227240((u8 *)lv + 0x10518, 0, x, z, v, a1, f);
+    CLevelActorPool__Spawn((u8 *)lv + 0x10518, 0, x, z, v, a1, f);
 }

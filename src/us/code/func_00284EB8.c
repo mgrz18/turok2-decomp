@@ -4,7 +4,7 @@
 #include "common.h"
 #include "structs/controller.h"
 
-void func_00284EB8(ControllerProfile *c, s8 x, s8 y, s32 btn) {
+void Controller_ProcessInput(ControllerProfile *c, s8 x, s8 y, s32 btn) {
     u32 b;
     f32 fx;
     register f32 fy asm("$f1");

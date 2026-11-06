@@ -9,13 +9,13 @@ typedef struct {
     /* 0x04 */ u8 extra[4];
 } __attribute__((aligned(4))) ActionParams;
 
-extern void func_00236EA0(void *source, void *p, s32 effect, s32 arg3, CVector3 pos, ActionParams params);
+extern void ImpactEvent_Send(void *source, void *p, s32 effect, s32 arg3, CVector3 pos, ActionParams params);
 
-void func_0040C518(CGameObjectInstance *obj, CGameObjectInstance *other, s32 value) {
+void MotherBoss_SendImpactAt(CGameObjectInstance *obj, CGameObjectInstance *other, s32 value) {
     ActionParams params;
 
     params.upper = 0xA00;
     params.lower = value << 8;
     params.extra[0] = params.extra[1] = params.extra[2] = params.extra[3] = 0;
-    func_00236EA0(obj, obj, 3, -1, other->header.m_vPos, params);
+    ImpactEvent_Send(obj, obj, 3, -1, other->header.m_vPos, params);
 }

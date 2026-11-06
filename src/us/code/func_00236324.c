@@ -3,7 +3,7 @@
 #include "structs/light.h"
 #include "structs/boss.h"
 
-void func_00236324(ScriptAnimator *arg0) {
+void ScriptAnimator_Apply(ScriptAnimator *arg0) {
     CVector3 *temp_v0;
     CVector3 *temp_v0_2;
 

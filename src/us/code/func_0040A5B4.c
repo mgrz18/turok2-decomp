@@ -3,15 +3,15 @@
 #include "structs/boss.h"
 
 /* Module phase 1 setup: timers, the anim for the phase, slot values; unless ai->m_Mode is 9, resets the
- * phase's active slots and runs func_00409500 three times. */
+ * phase's active slots and runs MotherBoss_DropPickupsAtSpawnPoints three times. */
 
 extern s32 D_00431DE4[];
 extern s32 D_00431DF0[]; /* active slot mask per phase */
 extern s32 D_00431DFC[];
 extern u8 D_00431E08[];
 extern u8 D_00431DDC[];
-extern void func_00236314(void *dst, void *src);
-extern void func_00409500(s32 arg0, void *arg1);
+extern void ScriptAnimator_SetScript(void *dst, void *src);
+extern void MotherBoss_DropPickupsAtSpawnPoints(s32 arg0, void *arg1);
 
 static __inline__ void resetSlots(s32 mask, void *src) {
     MotherBossState *state = &D_8012FB70;
@@ -19,12 +19,12 @@ static __inline__ void resetSlots(s32 mask, void *src) {
 
     for (i = 0; i < 15; i++) {
         if ((mask >> i) & 1) {
-            func_00236314(&state->slots[i].anim, src);
+            ScriptAnimator_SetScript(&state->slots[i].anim, src);
         }
     }
 }
 
-void func_0040A5B4(CGameObjectInstance *obj, CAI *ai) {
+void MotherBoss_SetupPhase1(CGameObjectInstance *obj, CAI *ai) {
     MotherBossState *state = &D_8012FB70;
     s32 mask;
     s32 i;
@@ -43,7 +43,7 @@ void func_0040A5B4(CGameObjectInstance *obj, CAI *ai) {
     if (ai->m_Mode != 9) {
         resetSlots(state->activeMask, D_00431E08);
         for (i = 0; i < 3; i++) {
-            func_00409500(0, D_00431DDC);
+            MotherBoss_DropPickupsAtSpawnPoints(0, D_00431DDC);
         }
     }
 }

@@ -2,7 +2,7 @@
 #include "m2c_macros.h"
 #include "structs/player.h"
 
-s32 func_002565DC(CPlayer *arg0) {
+s32 CPlayer__IsCrouched(CPlayer *arg0) {
     s32 var_v0;
 
     var_v0 = 1;

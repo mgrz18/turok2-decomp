@@ -3,10 +3,10 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-/* One file: func_0040C850, func_0040CB28, func_0040CCC0 and func_0040CFC4.
- * func_0040CCC0's only literal, the string "Blind", sits at 0x800C08D4, 4 past
- * an 8-byte boundary, after func_0040C850's float; alone its object put the
- * string 4 bytes off. func_0040CFC4 starts at 0x40CFC4, which is not 16-aligned,
+/* One file: BlindOne_UpdateMover, BlindOne_GetHealthPercent, BlindOne_Setup and BlindOne_PhaseWaitPlayerUpdate.
+ * BlindOne_Setup's only literal, the string "Blind", sits at 0x800C08D4, 4 past
+ * an 8-byte boundary, after BlindOne_UpdateMover's float; alone its object put the
+ * string 4 bytes off. BlindOne_PhaseWaitPlayerUpdate starts at 0x40CFC4, which is not 16-aligned,
  * so it is no object start: the file runs on to it (its literal follows the
  * string's padding, at 0x800C08DC). Each part keeps its own types (suffixed
  * by address) from when it was matched alone. */
@@ -19,9 +19,9 @@
 
 extern BlindOneState D_80130200;
 extern f32 D_800B6D28; /* frame time */
-extern void func_00243414(CGameObjectInstance *obj, void *ai, s32 state);
+extern void CAI__SetMode(CGameObjectInstance *obj, void *ai, s32 state);
 
-void func_0040C850(BlindOneMover *mover) {
+void BlindOne_UpdateMover(BlindOneMover *mover) {
     BlindOneState *state;
     CGameObjectInstance *actor;
     s32 bits;
@@ -50,7 +50,7 @@ void func_0040C850(BlindOneMover *mover) {
                         actor = state->actors1[i];
                         if (actor->m_AI.m_Health > 0) {
                             more = 0;
-                            func_00243414(actor, &actor->m_AI, 3);
+                            CAI__SetMode(actor, &actor->m_AI, 3);
                         }
                     }
                 }
@@ -64,9 +64,9 @@ void func_0040C850(BlindOneMover *mover) {
                         if (actor->m_AI.m_Health != 0) {
                             more = 0;
                             if (actor->m_AI.m_BlindOne.m_SightDist >= 1228.7999f) {
-                                func_00243414(actor, &actor->m_AI, 5);
+                                CAI__SetMode(actor, &actor->m_AI, 5);
                             } else {
-                                func_00243414(actor, &actor->m_AI, 4);
+                                CAI__SetMode(actor, &actor->m_AI, 4);
                             }
                         }
                     }
@@ -80,7 +80,7 @@ void func_0040C850(BlindOneMover *mover) {
                         actor = state->actors3[i];
                         if (actor->m_AI.m_Health != 0) {
                             more = 0;
-                            func_00243414(actor, &actor->m_AI, 4);
+                            CAI__SetMode(actor, &actor->m_AI, 4);
                         }
                     }
                 }
@@ -110,7 +110,7 @@ static __inline__ void sumHealth_40CB28(s32 count, CGameObjectInstance **actors,
     }
 }
 
-s32 func_0040CB28(BlindOneState *state) {
+s32 BlindOne_GetHealthPercent(BlindOneState *state) {
     s32 total = 0;
     s32 alive = 0;
 
@@ -133,11 +133,11 @@ s32 func_0040CB28(BlindOneState *state) {
 extern BlindOnePhase D_0043240C[];
 extern u8 D_800F7078[];
 extern u8 D_801100F0[];
-extern s32 func_00225F6C(void *container, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max);
-extern void func_002362E4(void *slot, s32 arg1);
-extern void *func_00225EBC(void *level, s32 arg1, s32 id);
-extern void func_0027AD24(void *hud, CGameObjectInstance *obj, char *name);
-extern void func_00225D0C(void *level);
+extern s32 CScene__FindInstances(void *container, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max);
+extern void ScriptAnimator_Start(void *slot, s32 arg1);
+extern void *CScene__FindIntelligence(void *level, s32 arg1, s32 id);
+extern void COnScreen__SetBoss(void *hud, CGameObjectInstance *obj, char *name);
+extern void CScene__UnmarkGeneratorsSaved(void *level);
 
 /* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase_40CCC0(BlindOneState *state) {
@@ -163,14 +163,14 @@ static __inline__ void nextPhase_40CCC0(BlindOneState *state) {
     }
 }
 
-void func_0040CCC0(BlindOneState *state) {
+void BlindOne_Setup(BlindOneState *state) {
     CGameObjectInstance *obj;
     CGameObjectInstance *actor;
     s32 i;
 
-    state->count1 = func_00225F6C(D_800F7078, 0x454, 1, -1, state->actors1, 4);
-    state->count2 = func_00225F6C(D_800F7078, 0x455, 1, -1, state->actors2, 4);
-    state->count3 = func_00225F6C(D_800F7078, 0x456, 1, -1, state->actors3, 3);
+    state->count1 = CScene__FindInstances(D_800F7078, 0x454, 1, -1, state->actors1, 4);
+    state->count2 = CScene__FindInstances(D_800F7078, 0x455, 1, -1, state->actors2, 4);
+    state->count3 = CScene__FindInstances(D_800F7078, 0x456, 1, -1, state->actors3, 3);
     obj = state->boss;
     state->faderCount = 0;
     obj->m_AI.m_Health = obj->m_AI.m_InitialHealth = 0x3200;
@@ -197,18 +197,18 @@ void func_0040CCC0(BlindOneState *state) {
         actor->m_AI.m_BlindOne.m_nFader = state->faderCount++;
     }
     for (i = 0; i < state->faderCount; i++) {
-        func_002362E4(&state->faders[i], 0);
+        ScriptAnimator_Start(&state->faders[i], 0);
     }
-    state->minionDefA = func_00225EBC(D_800F7078, 1, 0x1CE9);
-    state->minionDefB = func_00225EBC(D_800F7078, 1, 0x1CEA);
+    state->minionDefA = CScene__FindIntelligence(D_800F7078, 1, 0x1CE9);
+    state->minionDefB = CScene__FindIntelligence(D_800F7078, 1, 0x1CEA);
     state->toSpawn = 0;
     state->minionsAlive = 0;
     state->maxMinions = 0;
     state->alive1 = 0;
     state->alive2 = 0;
     state->alive3 = 0;
-    func_0027AD24(D_801100F0, state->boss, "Blind");
-    func_00225D0C(D_800F7078);
+    COnScreen__SetBoss(D_801100F0, state->boss, "Blind");
+    CScene__UnmarkGeneratorsSaved(D_800F7078);
     nextPhase_40CCC0(state);
 }
 
@@ -243,7 +243,7 @@ static __inline__ void nextPhase_40CFC4(BlindOneState *state) {
     }
 }
 
-void func_0040CFC4(BlindOneState *state) {
+void BlindOne_PhaseWaitPlayerUpdate(BlindOneState *state) {
     CPlayer *player = D_80119890;
 
     if (player != NULL &&

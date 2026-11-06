@@ -8,12 +8,12 @@ extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: w
 f32 func_00298470(f32);         /* sqrtf */
 f32 func_002982F0(f32);         /* sinf */
 f32 func_002974C0(f32);         /* cosf */
-f32 func_0021153C(f32);         /* acosf */
-f32 func_002672C8(CGameObjectInstance *a);    /* radius */
-s32 func_0026961C(CGameObjectInstance *self, CVector3 pos, s32 *out); /* blocked at pos */
-void func_00210EF0(f32 *angle); /* wrap */
+f32 Math_AcosLookup(f32);         /* acosf */
+f32 GameObject_GetCollisionRadius(CGameObjectInstance *a);    /* radius */
+s32 GameObject_TestMove(CGameObjectInstance *self, CVector3 pos, s32 *out); /* blocked at pos */
+void Angle_Wrap(f32 *angle); /* wrap */
 
-/* func_00246310: the angle from the actor's heading to a point. */
+/* AI_AngleToPoint: the angle from the actor's heading to a point. */
 static __inline__ f32 angleTo(CGameObjectInstance *actor, CVector3 point) {
     f32 dx;
     f32 dz;
@@ -35,7 +35,7 @@ static __inline__ f32 angleTo(CGameObjectInstance *actor, CVector3 point) {
     c = -func_002974C0(actor->m_RotY);
     dot = (dx * -s + dz * c) / dist;
     dot = ((((dot) > (1.0f) ? (1.0f) : (dot))) < ((-1.0f)) ? ((-1.0f)) : (((dot) > (1.0f) ? (1.0f) : (dot))));
-    angle = func_0021153C(dot);
+    angle = Math_AcosLookup(dot);
     if (!(dx * c + dz * s > 0.0f)) {
         angle = -angle;
     }
@@ -45,7 +45,7 @@ static __inline__ f32 angleTo(CGameObjectInstance *actor, CVector3 point) {
 /* The heading for self toward pos: straight at it, or when pos is blocked,
  * the first free direction 30, 60, ... 150 degrees to either side (the side
  * tried first alternating between actors), turned 15 degrees further. */
-f32 func_00244E84(CGameObjectInstance *self, CVector3 pos, CGameObjectInstance *target, f32 scale) {
+f32 AI_FindClearHeading(CGameObjectInstance *self, CVector3 pos, CGameObjectInstance *target, f32 scale) {
     CVector3 probe;
     s32 out;
     f32 heading;
@@ -57,7 +57,7 @@ f32 func_00244E84(CGameObjectInstance *self, CVector3 pos, CGameObjectInstance *
     s32 first;
 
     angle = angleTo(self, pos);
-    if ((self->m_dwFlags & 0x200) && func_0026961C(self, pos, &out)) {
+    if ((self->m_dwFlags & 0x200) && GameObject_TestMove(self, pos, &out)) {
         if (target != NULL && D_800F1CE0.m_pInstance == target) {
             return angle;
         }
@@ -74,11 +74,11 @@ f32 func_00244E84(CGameObjectInstance *self, CVector3 pos, CGameObjectInstance *
                     heading = angle - step;
                     extra = -0.26179942f;
                 }
-                probe.x = self->header.m_vPos.x + func_002982F0(self->m_RotY + 3.1415927f + heading) * (scale * func_002672C8(self));
-                probe.z = self->header.m_vPos.z + func_002974C0(self->m_RotY + 3.1415927f + heading) * (scale * func_002672C8(self));
-                if (!func_0026961C(self, probe, NULL)) {
+                probe.x = self->header.m_vPos.x + func_002982F0(self->m_RotY + 3.1415927f + heading) * (scale * GameObject_GetCollisionRadius(self));
+                probe.z = self->header.m_vPos.z + func_002974C0(self->m_RotY + 3.1415927f + heading) * (scale * GameObject_GetCollisionRadius(self));
+                if (!GameObject_TestMove(self, probe, NULL)) {
                     heading += extra;
-                    func_00210EF0(&heading);
+                    Angle_Wrap(&heading);
                     return heading;
                 }
             }

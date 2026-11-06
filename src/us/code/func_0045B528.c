@@ -12,7 +12,7 @@ extern char D_800B4B84[];
 extern char D_800B4B8C[];
 extern int D_80130960;
 extern s32 D_801309A8;
-s32 func_0045B528(struct FieldRecAt14 *field) {
+s32 CharNoteMenu_UpdatePrompt_2(struct FieldRecAt14 *field) {
     if (D_80130960 != 0) {
         field->text = D_800B4B84;
     } else if (D_801309A8 != 0) {

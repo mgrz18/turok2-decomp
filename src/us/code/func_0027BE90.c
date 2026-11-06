@@ -3,33 +3,33 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_002119FC(f32 arg0, f32 arg1);
+extern f32 Random_Blend(f32 arg0, f32 arg1);
 extern float func_002982F0(float x);
 extern float D_800A97E0;
-extern void func_0027BE90(Effect33920 *arg0, CVector3 position, CVector3 *out);
+extern void CShake__ApplyOffset(Effect33920 *arg0, CVector3 position, CVector3 *out);
 extern float D_800A97E8;
 extern float D_800A97E4;
 extern float D_800A97EC;
-extern f32 func_00266F50(f32 arg0);
-extern void func_0020EF2C(CVector3 *, CVector3 *, CVector3 *);
+extern f32 SmoothStep(f32 arg0);
+extern void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
 extern f32 func_00298470(f32);
-void func_0027BE90(Effect33920 *arg0, CVector3 position, CVector3 *out) {
+void CShake__ApplyOffset(Effect33920 *arg0, CVector3 position, CVector3 *out) {
     f32 distance;
     f32 value;
     AxisWave *wave;
-    func_0020EF2C(&position, &position, &arg0->origin);
+    CVector3__Subtract(&position, &position, &arg0->origin);
     distance = func_00298470((position.x * position.x) +
                              (position.y * position.y) +
                              (position.z * position.z));
     if (distance < arg0->radius) {
-        distance = func_00266F50(D_800A97E0 - (distance / arg0->radius));
+        distance = SmoothStep(D_800A97E0 - (distance / arg0->radius));
         wave = &arg0->x;
         if (wave->mode == 0) goto x_sine;
         if (wave->mode != 1) goto x_zero;
         value = func_002982F0(wave->accumulator * D_800A97E4) * wave->rate;
         goto x_done;
 x_sine:
-        value = func_002119FC(-wave->rate, wave->rate);
+        value = Random_Blend(-wave->rate, wave->rate);
         goto x_done;
 x_zero:
         value = 0.0f;
@@ -41,7 +41,7 @@ x_done:
         value = func_002982F0(wave->accumulator * D_800A97E8) * wave->rate;
         goto y_done;
 y_sine:
-        value = func_002119FC(-wave->rate, wave->rate);
+        value = Random_Blend(-wave->rate, wave->rate);
         goto y_done;
 y_zero:
         value = 0.0f;
@@ -53,7 +53,7 @@ y_done:
         value = func_002982F0(wave->accumulator * D_800A97EC) * wave->rate;
         goto z_done;
 z_sine:
-        value = func_002119FC(-wave->rate, wave->rate);
+        value = Random_Blend(-wave->rate, wave->rate);
         goto z_done;
 z_zero:
         value = 0.0f;

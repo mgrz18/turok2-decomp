@@ -3,16 +3,16 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_002119FC(f32 arg0, f32 arg1);
+extern f32 Random_Blend(f32 arg0, f32 arg1);
 extern float func_002982F0(float x);
 extern float D_800A9C2C;
-extern f32 func_00281B94(struct Wave *wave);
-f32 func_00281B94(struct Wave *wave) {
+extern f32 CShakeAxis__GetOffset(struct Wave *wave);
+f32 CShakeAxis__GetOffset(struct Wave *wave) {
     switch (wave->kind) {
     case 1:
         return func_002982F0(wave->phase * D_800A9C2C) * wave->amplitude;
     case 0:
-        return func_002119FC(-wave->amplitude, wave->amplitude);
+        return Random_Blend(-wave->amplitude, wave->amplitude);
     }
     return 0.0f;
 }

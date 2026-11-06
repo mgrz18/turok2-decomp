@@ -34,10 +34,10 @@ typedef struct {
     /* 0x7520 */ Swoosh *head;
 } SwooshList;
 
-s32 func_00233BD4(void *, void *);                  /* extern */
-s32 func_0026D474(void *, void *);              /* extern */
+s32 Swoosh_Update(void *, void *);                  /* extern */
+s32 NodePool_Free(void *, void *);              /* extern */
 
-void func_002366C8(SwooshList *arg0) {
+void SwooshSystem_UpdateSwooshes(SwooshList *arg0) {
     f32 temp_f1;
     u8 temp_v0;
     u8 temp_v0_2;
@@ -50,7 +50,7 @@ void func_002366C8(SwooshList *arg0) {
     if (var_s0 != NULL) {
         do {
             temp_s1 = var_s0->next;
-            if (func_00233BD4(arg0, var_s0) == 0) {
+            if (Swoosh_Update(arg0, var_s0) == 0) {
                 temp_v1 = var_s0->owner;
                 if (temp_v1 != NULL) {
                     if (var_s0->flags & 1) {
@@ -72,7 +72,7 @@ void func_002366C8(SwooshList *arg0) {
                 if (var_s0->top < temp_f1) {
                     var_s0->top = temp_f1;
                 }
-                func_0026D474(arg0->list, var_s0);
+                NodePool_Free(arg0->list, var_s0);
             }
             var_s0 = temp_s1;
         } while (var_s0 != NULL);

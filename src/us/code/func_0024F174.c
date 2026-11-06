@@ -18,19 +18,19 @@ typedef struct {
 
 extern f32 D_800B6D28;      /* frame time */
 
-s32 func_00284174(void);
-f32 func_0021170C(f32 value, f32 rate);
-f32 func_0021160C(f32 value, f32 delta, f32 limit);
+s32 Cinema_IsActive(void);
+f32 Math_DecayToZero(f32 value, f32 rate);
+f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-void func_0020F70C(CVector3 *v, f32 max);
-void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
-void func_00275544(s16 sound, CVector3 pos, s32, s32);
+void CVector3__LimitLength(CVector3 *v, f32 max);
+void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
+void Sound__Play(s16 sound, CVector3 pos, s32, s32);
 
 /* Walking movement: forward and strafe speeds towards the stick, the dodge
  * impulses, turned into world space and added to the velocity. */
-void func_0024F174(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
+void CPlayer__MoveOnFoot(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
     CVector3 motion;
     f32 forward;
     f32 strafe;
@@ -39,7 +39,7 @@ void func_0024F174(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
     s32 impulse;
     s32 ready;
 
-    if (func_00284174() == 0) {
+    if (Cinema_IsActive() == 0) {
         impulse = 0;
         time = player->m_BurstTimer;
         ready = 1;
@@ -50,12 +50,12 @@ void func_0024F174(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
         forward = player->m_Speed;
         time = tuning->forwardMax;
         if (forward < 0.0f ? time < -forward : time < forward) {
-            player->m_Speed = func_0021170C(player->m_Speed, tuning->forwardDecel * 0.5f);
+            player->m_Speed = Math_DecayToZero(player->m_Speed, tuning->forwardDecel * 0.5f);
         } else if (player->m_ContState.m_FinalMoveY != 0.0f && player->m_SniperMode != 2) {
-            player->m_Speed = func_0021160C(player->m_Speed, player->m_ContState.m_FinalMoveY * tuning->forwardAccel,
+            player->m_Speed = Math_StepClamped(player->m_Speed, player->m_ContState.m_FinalMoveY * tuning->forwardAccel,
                 (player->m_ContState.m_FinalMoveY < 0.0f ? -player->m_ContState.m_FinalMoveY : player->m_ContState.m_FinalMoveY) * tuning->forwardMax);
         } else {
-            player->m_Speed = func_0021170C(player->m_Speed, tuning->forwardDecel);
+            player->m_Speed = Math_DecayToZero(player->m_Speed, tuning->forwardDecel);
         }
         motion.x = player->m_Speed * func_002982F0(body->m_RotY + 3.1415927f);
         motion.y = 0;
@@ -63,12 +63,12 @@ void func_0024F174(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
         strafe = player->m_SideSpeed;
         max = tuning->strafeMax;
         if (strafe < 0.0f ? max < -strafe : max < strafe) {
-            player->m_SideSpeed = func_0021170C(player->m_SideSpeed, tuning->strafeDecel * 0.5f);
+            player->m_SideSpeed = Math_DecayToZero(player->m_SideSpeed, tuning->strafeDecel * 0.5f);
         } else if (player->m_ContState.m_FinalMoveX != 0.0f) {
-            player->m_SideSpeed = func_0021160C(player->m_SideSpeed, player->m_ContState.m_FinalMoveX * tuning->strafeAccel,
+            player->m_SideSpeed = Math_StepClamped(player->m_SideSpeed, player->m_ContState.m_FinalMoveX * tuning->strafeAccel,
                 (player->m_ContState.m_FinalMoveX < 0.0f ? -player->m_ContState.m_FinalMoveX : player->m_ContState.m_FinalMoveX) * tuning->strafeMax);
         } else {
-            player->m_SideSpeed = func_0021170C(player->m_SideSpeed, tuning->strafeDecel);
+            player->m_SideSpeed = Math_DecayToZero(player->m_SideSpeed, tuning->strafeDecel);
         }
         motion.x += player->m_SideSpeed * func_002982F0(body->m_RotY - 1.5707964f);
         motion.z += player->m_SideSpeed * func_002974C0(body->m_RotY - 1.5707964f);
@@ -78,9 +78,9 @@ void func_0024F174(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
         }
         forward = player->m_Speed;
         if (forward < 0.0f ? -forward < strafe : forward < strafe) {
-            func_0020F70C(&motion, tuning->strafeMax);
+            CVector3__LimitLength(&motion, tuning->strafeMax);
         } else {
-            func_0020F70C(&motion, tuning->forwardMax);
+            CVector3__LimitLength(&motion, tuning->forwardMax);
         }
         if (ready && (player->m_ContState.m_dwButtonsSingle & 8)) {
             player->m_BurstSpeed = tuning->impulse;
@@ -89,7 +89,7 @@ void func_0024F174(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
             player->m_BurstSpeed = -tuning->impulse * 0.5f;
             impulse = 1;
         } else {
-            player->m_BurstSpeed = func_0021170C(player->m_BurstSpeed, tuning->impulseDecel);
+            player->m_BurstSpeed = Math_DecayToZero(player->m_BurstSpeed, tuning->impulseDecel);
         }
         motion.x += player->m_BurstSpeed * func_002982F0(body->m_RotY + 3.1415927f);
         motion.z += player->m_BurstSpeed * func_002974C0(body->m_RotY + 3.1415927f);
@@ -100,15 +100,15 @@ void func_0024F174(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
             player->m_BurstSideSpeed = -tuning->impulse * 0.75f;
             impulse = 1;
         } else {
-            player->m_BurstSideSpeed = func_0021170C(player->m_BurstSideSpeed, tuning->impulseDecel * 0.75f);
+            player->m_BurstSideSpeed = Math_DecayToZero(player->m_BurstSideSpeed, tuning->impulseDecel * 0.75f);
         }
         motion.x += player->m_BurstSideSpeed * func_002982F0(body->m_RotY - 1.5707964f);
         motion.z += player->m_BurstSideSpeed * func_002974C0(body->m_RotY - 1.5707964f);
-        func_0020EF60(&motion, &motion, player->m_FrameIncrementScaled);
-        func_0020EEF8(&player->m_vDesiredPos, &player->m_vDesiredPos, &motion);
+        CVector3__Scale(&motion, &motion, player->m_FrameIncrementScaled);
+        CVector3__Add(&player->m_vDesiredPos, &player->m_vDesiredPos, &motion);
         if (impulse) {
             player->m_BurstTimer += 7.5f;
-            func_00275544(tuning->impulseSound, body->header.m_vPos, 0, -1);
+            Sound__Play(tuning->impulseSound, body->header.m_vPos, 0, -1);
         }
     }
 }

@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00450E7C(void) {
+s32 FinalScoreMenu_PleaseWaitSelect_2(void) {
     return 0;
 }

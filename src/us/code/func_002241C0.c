@@ -8,6 +8,6 @@ typedef struct {
     /* 0x08 */ u16 entries[1];
 } HalfwordTable;
 
-u16 func_002241C0(CWorld *arg0, s32 arg1) {
+u16 CScene__GetObjectTypeID(CWorld *arg0, s32 arg1) {
     return ((HalfwordTable *)arg0->m_pObjectTypes)->entries[arg1];
 }

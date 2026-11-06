@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00251698(s32, s32, s32);
+s32 CPlayer__StartDeathCinema(s32, s32, s32);
 
-void func_00256164(s32 arg0, s32 arg1) {
-    func_00251698(arg0, arg1, 0xB);
+void PlayerDeath0B_Enter(s32 arg0, s32 arg1) {
+    CPlayer__StartDeathCinema(arg0, arg1, 0xB);
 }

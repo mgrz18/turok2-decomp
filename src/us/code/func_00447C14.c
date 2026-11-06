@@ -1,4 +1,4 @@
-/* Second-module copy of func_0040EC14 (src/us/code/func_0040EC14.c), with its string/data addresses 0xE0 lower. */
+/* Second-module copy of BlindOne_EnterPhase (src/us/code/BlindOne_EnterPhase.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -7,7 +7,7 @@ extern BlindOnePhase D_0043232C[];
 
 
 /* Starts script command `cmd`: stops the movers, clears every member's flag and runs the command. */
-void func_00447C14(BlindOneState *m, s32 cmd) {
+void BlindOne_EnterPhase_2(BlindOneState *m, s32 cmd) {
     s32 i;
 
     m->movers[0].seq = NULL;

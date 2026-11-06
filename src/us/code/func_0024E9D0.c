@@ -4,8 +4,8 @@
 
 extern u32 D_8011AAD8;              /* cheat flags */
 
-CRegionInfo *func_00268A2C(void *actor);
-s32 func_0024E5F0(CPlayer *player, void *actor, s32 state);
+CRegionInfo *GameObject_GetRegionInfo(void *actor);
+s32 CPlayer__SetState(CPlayer *player, void *actor, s32 state);
 
 static __inline__ s32 func_0024E9D0_isSpecial(CPlayer *player) {
     if (player->m_Mode == 18 || player->m_Mode == 16 || player->m_Mode == 17) {
@@ -24,7 +24,7 @@ static __inline__ s32 func_0024E9D0_hasKey(CPlayer *player, s32 i) {
 /* Enters state 32 when the actor stands in a region flagged 0x1000 whose
  * key requirements (0x800 on the flags, 0x10 on flags54) the player meets.
  * Returns whether it did. */
-s32 func_0024E9D0(CPlayer *player, void *actor) {
+s32 CPlayer__CheckJumpPad(CPlayer *player, void *actor) {
     CRegionInfo *region;
 
     if (player->m_TimeOffGround > 0.0f) {
@@ -33,7 +33,7 @@ s32 func_0024E9D0(CPlayer *player, void *actor) {
     if (func_0024E9D0_isSpecial(player)) {
         return 0;
     }
-    region = func_00268A2C(actor);
+    region = GameObject_GetRegionInfo(actor);
     if (region != NULL && (region->m_wFlags52 & 0x1000)) {
         if (!(region->m_dwFlags & 0x800)) {
             if (region->m_wFlags54 & 0x10) {
@@ -51,7 +51,7 @@ s32 func_0024E9D0(CPlayer *player, void *actor) {
     second:
         if (func_0024E9D0_hasKey(player, 1)) {
         enter:
-            func_0024E5F0(player, actor, 32);
+            CPlayer__SetState(player, actor, 32);
             return 1;
         }
     }

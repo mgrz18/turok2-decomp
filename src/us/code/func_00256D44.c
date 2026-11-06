@@ -2,7 +2,7 @@
 #include "structs/player.h"
 
 /* Whether the player is in state 3 with 0xC04 in 0x7DF..0x7E3. */
-s32 func_00256D44(CPlayer *arg0) {
+s32 CPlayer__IsWalkAnim7DF(CPlayer *arg0) {
     s32 temp_a0;
     s32 var_a1;
 

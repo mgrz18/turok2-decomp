@@ -3,7 +3,7 @@
 
 #include "structs/player.h"
 
-extern f32 func_002683CC(CGameObjectInstance *a);
+extern f32 GameObject_GetDeadCollisionHeight(CGameObjectInstance *a);
 extern f32 D_800A7D9C;
 extern f32 D_800A7DA0;
 
@@ -11,11 +11,11 @@ extern f32 D_800A7DA0;
  * and falls through to case 1/4) and has no cases 13/14.
  * The object's collision height, by the type of its intelligence (a ducking
  * player's lower). */
-f32 func_002671B4(CGameObjectInstance *a) {
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *a) {
     CIntelligence *d;
     f32 r;
     if (a->header.m_Type == 1 && a->m_AI.m_Health <= 0) {
-        return func_002683CC(a);
+        return GameObject_GetDeadCollisionHeight(a);
     }
     switch (a->header.m_pIntelligence->m_Type) {
     case 11:

@@ -18,16 +18,16 @@ typedef struct SndOwner {
     u8 pad0[0xEC];
     SndHandle *sound;       /* 0xEC (0xFC in Rage Wars) */
 } SndOwner;
-void *func_00275C6C(s32 a, s32 b, CVector3 *c, CVector3 *d, void *e);
-void func_00275D34(s32 a, SndHandle *h);
-s32 func_00275F7C();
-void func_00246860(SndSrc *src, SndOwner *owner, s32 id) {
+void *LoopSounds_Start(s32 a, s32 b, CVector3 *c, CVector3 *d, void *e);
+void LoopSounds_Stop(s32 a, SndHandle *h);
+s32 LoopSounds_Get();
+void AI_StartSound(SndSrc *src, SndOwner *owner, s32 id) {
     void *s0 = (void *)-1;
     if (owner->sound != ((void *)0)) {
         if (owner->sound->unkC == id) {
             return;
         }
-        func_00275D34(func_00275F7C(), owner->sound);
+        LoopSounds_Stop(LoopSounds_Get(), owner->sound);
     }
     switch (src->type) {
     case 1:
@@ -38,5 +38,5 @@ void func_00246860(SndSrc *src, SndOwner *owner, s32 id) {
         s0 = src->unk80;
         break;
     }
-    owner->sound = func_00275C6C(func_00275F7C(), id, &src->pos, &src->pos, s0);
+    owner->sound = LoopSounds_Start(LoopSounds_Get(), id, &src->pos, &src->pos, s0);
 }

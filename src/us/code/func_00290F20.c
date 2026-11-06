@@ -8,10 +8,10 @@ typedef struct {
     /* 0x10 */ s32 unk10;
 } List;
 
-s32 func_002933E0(s32, List *);                 /* extern */
+s32 alLink(s32, List *);                 /* extern */
 
 /* Clears the list and adds arg2 0x1C-byte entries from arg1. */
-void func_00290F20(List *arg0, s32 arg1, s32 arg2) {
+void alEvtqNew(List *arg0, s32 arg1, s32 arg2) {
     s32 var_s0;
     s32 var_s1;
 
@@ -24,7 +24,7 @@ void func_00290F20(List *arg0, s32 arg1, s32 arg2) {
     if (arg2 > 0) {
         var_s0 = arg1;
         do {
-            func_002933E0(var_s0, arg0);
+            alLink(var_s0, arg0);
             var_s1 += 1;
             var_s0 += 0x1C;
         } while (var_s1 < arg2);

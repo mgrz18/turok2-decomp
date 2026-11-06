@@ -26,14 +26,14 @@ extern Viewer *D_801198D0;      /* viewers */
 extern CBox D_800F5A10;       /* visible bounds: min xyz, max xyz */
 extern char D_800A5F6C[];       /* "grid section" */
 
-void *func_002017D4(void *table, s32 index);
-void *func_0020185C(void *file, s32 arg1, s32 index, s32 *size);
-void **func_0020367C(s32 arg0, void *data, s32 size, s32 align, void *owner, s32 (*load)(), char *name, s32 arg7);
-s32 func_00220D00();
-void func_002051F4(s32 arg0, void **handle);
+void *CISet__GetBlock(void *table, s32 index);
+void *CISet__GetROMAddressAndSize(void *file, s32 arg1, s32 index, s32 *size);
+void **CCache__Request(s32 arg0, void *data, s32 size, s32 align, void *owner, s32 (*load)(), char *name, s32 arg7);
+s32 CScene__DecompressGridSection();
+void CCache__Unlock(s32 arg0, void **handle);
 
 /* Loads the grid sections inside the visible bounds that some viewer overlaps. */
-void func_002216DC(CWorld *world) {
+void CScene__LoadVisibleGridSections(CWorld *world) {
     s32 size;
     s32 nx;
     s32 x0;
@@ -64,16 +64,16 @@ void func_002216DC(CWorld *world) {
     }
     x0 = 0;
     count = 0;
-    list = func_002017D4(world->m_pCollision, 0);
+    list = CISet__GetBlock(world->m_pCollision, 0);
     xMax = list->values;
     nx = list->count;
-    xMin = ((FloatList *)func_002017D4(world->m_pCollision, 1))->values;
+    xMin = ((FloatList *)CISet__GetBlock(world->m_pCollision, 1))->values;
     x1 = nx - 1;
-    list = func_002017D4(world->m_pCollision, 2);
+    list = CISet__GetBlock(world->m_pCollision, 2);
     nz = list->count;
     zMax = list->values;
-    zMin = ((FloatList *)func_002017D4(world->m_pCollision, 3))->values;
-    cells = (GridCell *)((u8 *)func_002017D4(world->m_pCollision, 4) + 8);
+    zMin = ((FloatList *)CISet__GetBlock(world->m_pCollision, 3))->values;
+    cells = (GridCell *)((u8 *)CISet__GetBlock(world->m_pCollision, 4) + 8);
     z1 = nz - 1;
     z0 = 0;
     while (x0 < nx && xMin[x0] < D_800F5A10.m_vMin.x) {
@@ -107,8 +107,8 @@ void func_002216DC(CWorld *world) {
             if (!found) {
                 continue;
             }
-            handle = func_0020367C(0, func_0020185C(world->m_pLevelInfo, world->m_LevelInfoKey, idx, &size), size, 8, world,
-                                   func_00220D00, D_800A5F6C, 0);
+            handle = CCache__Request(0, CISet__GetROMAddressAndSize(world->m_pLevelInfo, world->m_LevelInfoKey, idx, &size), size, 8, world,
+                                   CScene__DecompressGridSection, D_800A5F6C, 0);
             if (handle == NULL) {
                 continue;
             }
@@ -120,7 +120,7 @@ void func_002216DC(CWorld *world) {
                     goto done;
                 }
             } else {
-                func_002051F4(0, handle);
+                CCache__Unlock(0, handle);
             }
         }
     }

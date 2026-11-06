@@ -21,10 +21,10 @@ typedef struct SoundEvent {
     s32 value;                 /* 0x90 (Rage Wars 0x04) */
 } SoundEvent;
 
-extern void func_00210790(void *arg0, f32 arg1);
+extern void CMtxF__RotateX(void *arg0, f32 arg1);
 extern float D_800A71FC;
 
-void func_00256738(void *arg0, void *arg1) {
+void Actor_PlayRangedSound(void *arg0, void *arg1) {
     SoundRange *range;
     CPlayer *actor;
     s32 value;
@@ -45,5 +45,5 @@ void func_00256738(void *arg0, void *arg1) {
     if (actor->m_Mode == 0xE) {
         amount += D_800A71FC;
     }
-    func_00210790(arg0, amount / (f32)range->divisor);
+    CMtxF__RotateX(arg0, amount / (f32)range->divisor);
 }

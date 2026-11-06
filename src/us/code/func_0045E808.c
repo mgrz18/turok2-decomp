@@ -1,4 +1,4 @@
-/* Second-module copy of src/us/code/func_004258E8.c (after thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars),
+/* Second-module copy of src/us/code/Pak_Mount.c (after thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars),
  * src/ovl_a/func_00404018.c, func_00404018); callees named by their link addresses. */
 
 #include "rw/junk_types.h"
@@ -9,8 +9,8 @@ extern OSPfs D_80130C80[];
 extern s32 D_80130C70[];
 extern s32 D_80130C60[];
 s32 func_00428080(OSMesgQueue *queue, OSPfs *pfs, int channel); /* osPfsInitPak_2 (link address) */
-s32 func_00425680(s32 pad); /* func_0045E680 (link address) */
-s32 func_0045E808(s32 pad) {
+s32 func_00425680(s32 pad); /* Pak_RefreshNotes_2 (link address) */
+s32 Pak_Mount_2(s32 pad) {
     s32 i;
     s32 r;
     s32 v;

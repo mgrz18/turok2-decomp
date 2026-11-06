@@ -13,14 +13,14 @@ typedef struct {
 extern s32 D_800F7F78;
 extern s32 D_8011001C;
 
-CGameObjectInstance *func_00243C90(CGameObjectInstance *self, CAI *plan, s32 arg2, s32 arg3);
-Location *func_0028479C(s8 *location);
-f32 func_00246310(CGameObjectInstance *a, CVector3 point);              /* angle to a point */
-void func_00210EF0(f32 *angle);                        /* wrap an angle */
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+CGameObjectInstance *AI_FindBestTarget(CGameObjectInstance *self, CAI *plan, s32 arg2, s32 arg3);
+Location *CPathTrack__GetCurrentPoint(s8 *location);
+f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);              /* angle to a point */
+void Angle_Wrap(f32 *angle);                        /* wrap an angle */
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
 f32 func_00298470(f32 x);                              /* sqrt */
 
-/* What the plan aims at (the same classes as func_002438C0). */
+/* What the plan aims at (the same classes as AI_UpdatePathHeading). */
 static __inline__ s32 Kind(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *target) {
     CPlayer *player;
 
@@ -61,7 +61,7 @@ static __inline__ s32 Kind(CGameObjectInstance *self, CAI *plan, CGameObjectInst
 
 /* Picks the plan's target and fills `out` with its kind, the turn to face
  * it, its position, offset and distance, in 3D and flattened. */
-void func_002449E0(CGameObjectInstance *self, CAI *plan, s32 unused, CAITarget *out) {
+void AI_GetSightTargetInfo(CGameObjectInstance *self, CAI *plan, s32 unused, CAITarget *out) {
     CVector3 pos;
     CVector3 delta;
     f32 angle;
@@ -70,7 +70,7 @@ void func_002449E0(CGameObjectInstance *self, CAI *plan, s32 unused, CAITarget *
     Location *loc;
 
     if (plan->m_PathFindCount == D_800F7F78 && (!(plan->m_dwFlags & 0x40000000) || plan->m_pTargetOverride != NULL)) {
-        plan->m_pSightTarget = func_00243C90(self, plan, 1, 0);
+        plan->m_pSightTarget = AI_FindBestTarget(self, plan, 1, 0);
     }
     if (self->header.m_pIntelligence->m_Type == 1 && plan->m_Mode == 0xB && Kind(self, plan, plan->m_pPathTarget) == 4) {
         target = plan->m_pPathTarget;
@@ -81,16 +81,16 @@ void func_002449E0(CGameObjectInstance *self, CAI *plan, s32 unused, CAITarget *
     }
     if (target != NULL) {
         pos = target->header.m_vPos;
-        angle = func_00246310(self, pos);
+        angle = AI_AngleToPoint(self, pos);
     } else {
         switch (kind) {
         case 4:
-            loc = func_0028479C(&plan->m_PathTrack.m_Mode);
+            loc = CPathTrack__GetCurrentPoint(&plan->m_PathTrack.m_Mode);
             pos = loc->pos;
             if (loc->flags & 1) {
                 angle = loc->rotY - self->m_RotY;
             } else {
-                angle = func_00246310(self, pos);
+                angle = AI_AngleToPoint(self, pos);
             }
             break;
         case 3:
@@ -103,8 +103,8 @@ void func_002449E0(CGameObjectInstance *self, CAI *plan, s32 unused, CAITarget *
             break;
         }
     }
-    func_00210EF0(&angle);
-    func_0020EF2C(&delta, &pos, &self->header.m_vPos);
+    Angle_Wrap(&angle);
+    CVector3__Subtract(&delta, &pos, &self->header.m_vPos);
     out->m_Kind = kind;
     out->m_pTarget = target;
     out->m_Angle = angle;

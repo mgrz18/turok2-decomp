@@ -9,8 +9,8 @@ typedef struct {
     /* 0xC7 */ s8 count;
 } Item004030D4;
 
-void func_00243414(s32 a0, Item004030D4 *item, s32 a2);
-void func_004030D4(s32 a0, Item004030D4 *item) {
+void CAI__SetMode(s32 a0, Item004030D4 *item, s32 a2);
+void MantidQueen_UpdateAttackAnim(s32 a0, Item004030D4 *item) {
     s32 needed;
 
     switch (item->id) {
@@ -25,6 +25,6 @@ void func_004030D4(s32 a0, Item004030D4 *item) {
         needed = 1;
     }
     if (item->count >= needed) {
-        func_00243414(a0, item, 8);
+        CAI__SetMode(a0, item, 8);
     }
 }

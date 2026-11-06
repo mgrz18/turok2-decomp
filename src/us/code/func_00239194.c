@@ -8,9 +8,9 @@ typedef struct EventParams {
 } EventParams;
 
 extern u8 D_8010ABA0[];
-extern void func_00227C10(void *arg0, s32 arg1, s32 arg2, CVector3 pos, s32 arg6, CVector3 rot, CVector3 scale, s32 arg13);
+extern void CInstancePool__SpawnAnimInstance(void *arg0, s32 arg1, s32 arg2, CVector3 pos, s32 arg6, CVector3 rot, CVector3 scale, s32 arg13);
 
-void func_00239194(CGameObjectInstance *actor, s32 arg1, s32 arg2, CVector3 arg3, EventParams params) {
+void ImpactEvent_SpawnAnimInstance(CGameObjectInstance *actor, s32 arg1, s32 arg2, CVector3 arg3, EventParams params) {
     CVector3 scale;
     CVector3 rot;
 
@@ -24,5 +24,5 @@ void func_00239194(CGameObjectInstance *actor, s32 arg1, s32 arg2, CVector3 arg3
     scale.x = params.size;
     scale.y = params.size;
     scale.z = params.size;
-    func_00227C10(D_8010ABA0, params.unk0, ((s32)actor->header.m_pCurrentRegion), actor->header.m_vPos, 0, rot, scale, 0);
+    CInstancePool__SpawnAnimInstance(D_8010ABA0, params.unk0, ((s32)actor->header.m_pCurrentRegion), actor->header.m_vPos, 0, rot, scale, 0);
 }

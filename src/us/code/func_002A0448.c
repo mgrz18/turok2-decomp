@@ -29,12 +29,12 @@ extern s16 D_800B8BAE;          /* first frame (raw header) done */
 extern AdecHuffSeg D_800B8C54[]; /* segment table */
 extern u16 D_80125010[16];      /* previous scale indices */
 
-extern s32 func_0029FE70(u16 *dst, u16 nbits, u16 count, s16 sign, AdecStream *st);          /* adecReadBits */
-extern s16 func_002A0044(AdecHuffSeg *segs, s16 *out, s16 n, s16 *cnt, AdecStream *st);    /* adecHuffDecode */
+extern s32 adecReadBits(u16 *dst, u16 nbits, u16 count, s16 sign, AdecStream *st);          /* adecReadBits */
+extern s16 adecHuffDecode(AdecHuffSeg *segs, s16 *out, s16 n, s16 *cnt, AdecStream *st);    /* adecHuffDecode */
 
 /* Decodes one frame into st: the 16 scale indices st->band[] (the very first frame raw 6 bit fields, afterwards Huffman coded
    differences against the previous frame) and the 256 coefficients st->coef[]. Returns 1, or -1 on a stream error. */
-s32 func_002A0448(AdecStream *st) {
+s32 adecDecodeFrame(AdecStream *st) {
     s16 cnt;
     s16 nv;
     s16 i;
@@ -42,7 +42,7 @@ s32 func_002A0448(AdecStream *st) {
     AdecHuffSeg *seg = D_800B8C54;
     if (D_800B8BAE == 0) {
         D_800B8BAE = 1;
-        if ((s16)func_0029FE70((u16 *)st->band, 6, 16, 0, st) <= 0) {
+        if ((s16)adecReadBits((u16 *)st->band, 6, 16, 0, st) <= 0) {
             return -1;
         }
         seg->pos += 0x60;
@@ -53,7 +53,7 @@ s32 func_002A0448(AdecStream *st) {
             seg++;
         }
     } else {
-        rv = func_002A0044(seg, st->band, 16, &cnt, st);
+        rv = adecHuffDecode(seg, st->band, 16, &cnt, st);
         if (rv != 16) {
             goto fail;
         }
@@ -64,7 +64,7 @@ s32 func_002A0448(AdecStream *st) {
             D_80125010[i] = st->band[i];
         }
     }
-    rv = func_002A0044(seg, st->coef, 256, &cnt, st);
+    rv = adecHuffDecode(seg, st->coef, 256, &cnt, st);
     if (rv != 256) {
     fail:
         return -1;

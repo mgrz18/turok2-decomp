@@ -38,13 +38,13 @@ typedef struct Emitter {
 } Emitter;
 
 extern s32 D_800B6D1C;
-void func_0020D274(void *, void *);
-void func_0020D908(void *, void *);
-void func_0020EF2C(CVector3 *, CVector3 *, CVector3 *);
-void func_0020F7EC(void *);
-void func_002101A0(void *, void *);
-void func_002101BC(void *, void *);
-void func_0021034C(void *, f32, f32, f32);
+void CMtxF__ToMtxAffine(void *, void *);
+void CMtxF__FromMtxAffine(void *, void *);
+void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
+void CMtxF__ClampEntries(void *);
+void CMtxF__GetTranslation(void *, void *);
+void CMtxF__GetScale(void *, void *);
+void CMtxF__ScaleAxes(void *, f32, f32, f32);
 f32 func_00298470(f32);                 /* sqrtf */
 
 /* Rage Wars' func_802A6174: places one node on its owner, or freezes it when the owner went away (-1). */
@@ -56,24 +56,24 @@ static __inline__ void placeNode(Emitter *e, EmitNode *n, CParticle *o) {
         n->mtx[D_800B6D1C] = n->mtx[D_800B6D1C ^ 1];
         n->owner = NULL;
     } else {
-        func_0020D908(m, o->m_mtxDraw[D_800B6D1C]);
+        CMtxF__FromMtxAffine(m, o->m_mtxDraw[D_800B6D1C]);
         k = 0.01f;
         if (o->m_pEffect->m_pModel != NULL) {
             k = 0.29257143f;
         }
-        func_0021034C(m, k, k, k);
-        func_0020F7EC(m);
-        func_002101A0(m, &n->pos);
+        CMtxF__ScaleAxes(m, k, k, k);
+        CMtxF__ClampEntries(m);
+        CMtxF__GetTranslation(m, &n->pos);
         if (e->flags & 4) {
-            func_002101BC(m, n->rot);
+            CMtxF__GetScale(m, n->rot);
         } else {
-            func_0020D274(m, &n->mtx[D_800B6D1C]);
+            CMtxF__ToMtxAffine(m, &n->mtx[D_800B6D1C]);
         }
     }
 }
 
 /* Places every node of the emitter on its owner and sums the distances between consecutive nodes. */
-void func_0023417C(Emitter *e) {
+void Trail_PlaceNodes(Emitter *e) {
     CVector3 d;
     EmitNode *n;
     CParticle *o;
@@ -94,7 +94,7 @@ void func_0023417C(Emitter *e) {
             }
             prev = n->prev;
             if (prev != NULL) {
-                func_0020EF2C(&d, &n->pos, &prev->pos);
+                CVector3__Subtract(&d, &n->pos, &prev->pos);
                 len = func_00298470(d.x * d.x + d.y * d.y + d.z * d.z);
                 prev->length = len;
                 e->totalLength += len;

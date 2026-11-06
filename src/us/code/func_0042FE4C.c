@@ -32,12 +32,12 @@ struct func_8044B27C_S1 {
 struct func_8044B27C_S1;
 typedef struct func_8044B27C_S1 func_8044B27C_S1;
 extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
-extern void * func_00266C5C(void *arg0, int arg1, u32 arg2);
-extern void func_0042F9B0(void *);
-extern void func_0027D160(void *);
-void func_0042FE4C(func_8044B27C_S1 *actor) {
+extern void * memset(void *arg0, int arg1, u32 arg2);
+extern void CCamera__Construct(void *);
+extern void CCamera__Advance(void *);
+void CCameraPool__Construct(func_8044B27C_S1 *actor) {
     char *parts;
-    func_00266C5C(actor, 0, 0x11F0);
+    memset(actor, 0, 0x11F0);
     CList__Construct(&actor->unkC, 0, 4);
     CList__Construct(&actor->unk20, 0, 4);
     CList__Construct(&actor->unkF0C, 0, 4);
@@ -50,6 +50,6 @@ void func_0042FE4C(func_8044B27C_S1 *actor) {
     actor->unkF04 = 0;
     actor->unkF08 = 0;
     actor->unk38 = 2;
-    func_0042F9B0(parts);
-    func_0027D160(parts);
+    CCamera__Construct(parts);
+    CCamera__Advance(parts);
 }

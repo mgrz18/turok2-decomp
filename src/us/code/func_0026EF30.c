@@ -20,7 +20,7 @@ typedef struct {
 extern Tuning D_800A8078;
 extern f32 D_800A8080;
 
-f32 func_0026EF30(CurveState *arg0) {
+f32 RumbleCurve_GetValue(CurveState *arg0) {
     s32 temp_a1;
     Curve *temp_v1;
 

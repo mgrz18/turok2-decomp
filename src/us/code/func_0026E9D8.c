@@ -6,7 +6,7 @@ typedef struct {
     /* 0x38 */ s32 *flag;
 } FlagOwner;
 
-void func_0026E9D8(FlagOwner *arg0) {
+void Rumble_ClearLink(FlagOwner *arg0) {
     s32 *temp_v0;
 
     temp_v0 = arg0->flag;

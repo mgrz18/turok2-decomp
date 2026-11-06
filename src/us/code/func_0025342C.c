@@ -17,7 +17,7 @@ typedef struct Round {
 } Round;
 
 /* Find the player record driven by controller arg1. */
-void *func_0025342C(char *object, s32 arg1) {
+void *CPlayerPool__FindByController(char *object, s32 arg1) {
     Round *round = (Round *)object;
     PlayerRecord *record = round->players;
     if (record != 0) {

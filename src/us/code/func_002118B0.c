@@ -2,7 +2,7 @@
 #include "m2c_macros.h"
 
 
-f32 func_002118B0(f32 arg0)
+f32 Angle_WrapValue(f32 arg0)
 {
   f32 var_f12;
   float new_var;

@@ -7,11 +7,11 @@ extern float D_800A551C;
 extern float D_800A5514;
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
-extern s32 func_002113A4(void);
+extern s32 Random_Next(void);
 extern f32 func_00298470(f32);
-extern s32 func_002113A4(void);
+extern s32 Random_Next(void);
 extern f32 func_00298470(f32);
-CVector3 func_0020E240(CVector3 *in, f32 amount) {
+CVector3 CVector3__RandomPerturbX(CVector3 *in, f32 amount) {
     CVector3 random;
     CVector3 result;
     CVector3 *randomPtr;
@@ -19,7 +19,7 @@ CVector3 func_0020E240(CVector3 *in, f32 amount) {
     f32 randomScale;
     f32 inputMagnitude;
     f32 inputScale;
-    random.x = (f32)((func_002113A4() % 20000) - 0x2710) *
+    random.x = (f32)((Random_Next() % 20000) - 0x2710) *
                *(&D_800A5514 + 1);
     random.y = in->y;
     random.z = in->z;
@@ -47,8 +47,8 @@ CVector3 func_0020E240(CVector3 *in, f32 amount) {
     result.z = in->z + amount * (randomPtr->z - in->z);
     return result;
 }
-extern s32 func_002113A4(void);
+extern s32 Random_Next(void);
 extern f32 func_00298470(f32);
-extern s32 func_002113A4(void);
+extern s32 Random_Next(void);
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);

@@ -12,16 +12,25 @@ not a function inside a section.
 So: compute what the assembled objects actually define, and emit filtered
 copies of the symbol files with those removed.
 
+The compiled C objects count too. splat lists in `undefined_funcs_auto` some
+named functions that a C file defines, at their named address; for the second
+VM module (named 0x39000 above where it is linked) that address is wrong, and
+the script definition would move every call to it.
+
 Usage:
     python3 tools/filter_defined_syms.py <out-dir> <sym-file> [<sym-file> ...]
 """
 
+import os
 import pathlib
 import re
+import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ASM_DIRS = (ROOT / "us" / "asm", ROOT / "src" / "us" / "asm")
+C_OBJ_DIR = ROOT / "build" / "src"
+NM = os.environ.get("NM", "mips-linux-gnu-nm")
 
 GLOBL_RE = re.compile(r"^\s*\.globl\s+(\S+)\s*$")
 ASSIGN_RE = re.compile(r"^\s*([A-Za-z_.$][\w.$]*)\s*=")
@@ -39,6 +48,20 @@ def defined_symbols():
                     m = GLOBL_RE.match(line)
                     if m:
                         names.add(m.group(1))
+    return names | c_defined_symbols()
+
+
+def c_defined_symbols():
+    """Every global symbol the compiled C objects define."""
+    objs = sorted(str(p) for p in C_OBJ_DIR.rglob("*.c.o")) if C_OBJ_DIR.exists() else []
+    names = set()
+    for i in range(0, len(objs), 500):
+        out = subprocess.run([NM, "-g", "--defined-only", *objs[i:i + 500]],
+                             check=True, capture_output=True, text=True).stdout
+        for line in out.splitlines():
+            parts = line.split()
+            if len(parts) == 3:
+                names.add(parts[2])
     return names
 
 

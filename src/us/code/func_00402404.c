@@ -2,11 +2,11 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-void func_00243414(void *a0, void *a1, s32 event);
-void func_002666B0(CGameObjectInstance *actor, void *ai, s32 state);
+void CAI__SetMode(void *a0, void *a1, s32 event);
+void AI_PlayAnim(CGameObjectInstance *actor, void *ai, s32 state);
 extern CListedInstance *D_8010FEB4;
 
-/* func_00403520 */
+/* MantidQueen_NextStep */
 static __inline__ void State_NextStep(WaveBossState *s) {
     WaveBossStep *step;
     s32 value;
@@ -25,13 +25,13 @@ static __inline__ void State_NextStep(WaveBossState *s) {
         s->waveActive = 0;
     }
     if (s->stepIndex == 7) {
-        func_00243414(s->actor, ((u8 *)&s->actor->m_AI), 14);
+        CAI__SetMode(s->actor, ((u8 *)&s->actor->m_AI), 14);
     } else if (s->stepIndex == 8) {
-        func_00243414(s->actor, ((u8 *)&s->actor->m_AI), 16);
+        CAI__SetMode(s->actor, ((u8 *)&s->actor->m_AI), 16);
     }
 }
 
-/* func_004035F8 */
+/* MantidQueen_CountActiveMinions */
 static __inline__ s32 State_CountActive(WaveBossState *s) {
     s32 i;
     s32 n = 0;
@@ -50,7 +50,7 @@ static __inline__ s32 State_CountActive(WaveBossState *s) {
     return n;
 }
 
-/* func_00403430 */
+/* MantidQueen_UpdateBossAnim */
 static __inline__ void State_UpdateBoss(WaveBossState *s) {
     CGameObjectInstance *boss = s->boss;
     s32 aiState;
@@ -61,7 +61,7 @@ static __inline__ void State_UpdateBoss(WaveBossState *s) {
     } else if (aiState < 0x5AB5) {
     } else if (aiState == 0x5ABE) {
         if (boss->m_AI.m_AnimRepeatedCount != 0) {
-            func_002666B0(s->boss, ((u8 *)&s->boss->m_AI), 0x5ADC);
+            AI_PlayAnim(s->boss, ((u8 *)&s->boss->m_AI), 0x5ADC);
         }
     }
 }
@@ -91,10 +91,10 @@ typedef struct {
 
 extern u8 D_00430924[];
 extern u8 D_801100F0[];
-void func_00236314(void *slot, void *arg);
-void func_0027AD88(void *a0, s32 percent);
+void ScriptAnimator_SetScript(void *slot, void *arg);
+void COnScreen__SetBossPercent(void *a0, s32 percent);
 
-void func_00402404(void *a0, Obj00402404 *obj, Hit00402404 *hit) {
+void MantidQueen_Hurt(void *a0, Obj00402404 *obj, Hit00402404 *hit) {
     WaveBossState *s;
     WaveBossStep *step;
     s32 index;
@@ -123,15 +123,15 @@ void func_00402404(void *a0, Obj00402404 *obj, Hit00402404 *hit) {
         return;
     }
     if (obj->kind != 15 && (hit->flags & 0xC00000)) {
-        func_00243414(a0, obj, 13);
+        CAI__SetMode(a0, obj, 13);
     }
     s->spots[index].health -= hit->damage;
-    func_00236314(&s->spots[index].anim, D_00430924);
+    ScriptAnimator_SetScript(&s->spots[index].anim, D_00430924);
     if (s->spots[index].health <= 0) {
         s->spots[index].health = 0;
         obj->flags &= ~bit;
         if (obj->kind != 15) {
-            func_00243414(a0, obj, 13);
+            CAI__SetMode(a0, obj, 13);
         }
         State_NextStep(s);
     }
@@ -141,5 +141,5 @@ void func_00402404(void *a0, Obj00402404 *obj, Hit00402404 *hit) {
     }
     percent = (sum >> 8) * 100 / 460;
     percent = MIN(MAX(percent, 0), 100);
-    func_0027AD88(D_801100F0, percent);
+    COnScreen__SetBossPercent(D_801100F0, percent);
 }

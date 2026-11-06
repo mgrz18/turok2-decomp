@@ -4,7 +4,7 @@
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
-extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
+extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern s32 D_800F1C40[];
 extern s32 D_800F1F50[];
@@ -14,7 +14,7 @@ extern BossStep2 D_004314CC[];
 extern BossStep2 D_00431558[];
 extern BossStep2 D_00431590[];
 
-/* func_004070B4: start the second script for a stage. */
+/* Primagen_SetSpawnScript: start the second script for a stage. */
 static __inline__ void StartScript2(s32 stage) {
     D_8012F608.script2.cursor = -1;
     D_8012F608.script2On = 1;
@@ -39,7 +39,7 @@ static __inline__ void StartScript2(s32 stage) {
     }
 }
 
-void func_00406AA8(CGameObjectInstance *obj, CAI *ai) {
+void Primagen_UpdateMode24(CGameObjectInstance *obj, CAI *ai) {
     f32 dy;
 
     if (ai->m_AnimRepeatedCount == 0) {
@@ -71,11 +71,11 @@ void func_00406AA8(CGameObjectInstance *obj, CAI *ai) {
         if (D_8012F608.stage == 3) {
             StartScript2(3);
         }
-        func_00243414(obj, ai, 5);
+        CAI__SetMode(obj, ai, 5);
     } else if (!D_8012F608.partActive) {
         D_8012F608.bossMode = 2;
-        func_00243414(obj, ai, 7);
+        CAI__SetMode(obj, ai, 7);
     } else {
-        func_00243414(obj, ai, 0x10);
+        CAI__SetMode(obj, ai, 0x10);
     }
 }

@@ -1,4 +1,4 @@
-/* Second-module twin of func_0040AE24 (VM module 2 is linked over module 1; same source, its own strings and pool). */
+/* Second-module twin of MotherBoss_SetupPhase0 (VM module 2 is linked over module 1; same source, its own strings and pool). */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -11,7 +11,7 @@ extern s32 D_00431D04[];
 extern s32 D_00431D10[]; /* active slot mask per phase */
 extern s32 D_00431D1C[];
 extern u8 D_00431D28[];
-extern void func_00236314(void *dst, void *src);
+extern void ScriptAnimator_SetScript(void *dst, void *src);
 
 static __inline__ void resetSlots(s32 mask, void *src) {
     MotherBossState *state = &D_8012FB70;
@@ -19,12 +19,12 @@ static __inline__ void resetSlots(s32 mask, void *src) {
 
     for (i = 0; i < 15; i++) {
         if ((mask >> i) & 1) {
-            func_00236314(&state->slots[i].anim, src);
+            ScriptAnimator_SetScript(&state->slots[i].anim, src);
         }
     }
 }
 
-void func_00443E24(void *obj, CAI *ai) {
+void MotherBoss_SetupPhase0_2(void *obj, CAI *ai) {
     MotherBossState *state = &D_8012FB70;
     s32 mask;
 

@@ -6,11 +6,11 @@
 #include "structs/list.h"
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
-void func_0029BB10(OSThread *thread);
+void osStartThread(OSThread *thread);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-void *func_00266C5C(void *s, int c, u32 n);
-void func_0029B060(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
-void func_0029B030(OSMesgQueue *mq, OSMesg *msgBuf, s32 count);
+void *memset(void *s, int c, u32 n);
+void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
+void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msgBuf, s32 count);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 typedef struct B12Node B12Node;
 struct B12Node {
@@ -68,13 +68,13 @@ extern u32 D_800AB0C0;
 extern s32 D_800B6E8C;
 extern u8 D_800D1CC0[];
 void CMutex__Construct(void *lock);
-u32 func_00266B80(void);
-u8 *func_002024E0(void *heap, u32 size);
+u32 GetMemSize(void);
+u8 *CHeap__Alloc(void *heap, u32 size);
 void CList__Construct(CList *l, s32 prevOff, s32 nextOff);
 void CList__AddTail(CList *l, void *n);
 void CHashTable__Construct(u32 n);
 void D_002041E4(void *arg);
-void func_00202BB0(s32 unused, s32 id) {
+void CCache__Construct(s32 unused, s32 id) {
     u32 mask;
     u32 m2;
     u32 i;
@@ -91,13 +91,13 @@ void func_00202BB0(s32 unused, s32 id) {
         __osRestoreInt(mask);
     }
     D_800AB0C0 = 0x400;
-    if (func_00266B80() > 0x400000) {
+    if (GetMemSize() > 0x400000) {
         D_800AB0C0 *= 2;
     }
-    D_800D7BE0.nodes = (B12Node *)func_002024E0(D_800D1CC0, D_800AB0C0 * 0x28);
-    D_800D7BE0.stk = (B12Node **)func_002024E0(D_800D1CC0, D_800AB0C0 * 4);
-    D_800D7BE0.pool2 = func_002024E0(D_800D1CC0, D_800AB0C0 * 0x2C);
-    func_0029B030(&D_800D7BE0.q11F0, &D_800D7BE0.buf11F0, 1);
+    D_800D7BE0.nodes = (B12Node *)CHeap__Alloc(D_800D1CC0, D_800AB0C0 * 0x28);
+    D_800D7BE0.stk = (B12Node **)CHeap__Alloc(D_800D1CC0, D_800AB0C0 * 4);
+    D_800D7BE0.pool2 = CHeap__Alloc(D_800D1CC0, D_800AB0C0 * 0x2C);
+    osCreateMesgQueue(&D_800D7BE0.q11F0, &D_800D7BE0.buf11F0, 1);
     D_800D7BE0.tbl630[1] = 0;
     D_800D7BE0.tbl630[0] = 0;
     CList__Construct(&D_800D7BE0.lists[0], 0x18, 0x1C);
@@ -129,7 +129,7 @@ void func_00202BB0(s32 unused, s32 id) {
         CList__AddTail(&D_800D7BE0.lists3[0], n);
     }
     CHashTable__Construct(D_800AB0C0);
-    func_0029B030(&D_800D7BE0.q870, D_800D7BE0.buf870, 0x40);
+    osCreateMesgQueue(&D_800D7BE0.q870, D_800D7BE0.buf870, 0x40);
     m2 = __osDisableInt();
     if (--D_800D8DCC != 0) {
         __osRestoreInt(m2);
@@ -137,7 +137,7 @@ void func_00202BB0(s32 unused, s32 id) {
     } else {
         __osRestoreInt(m2);
     }
-    func_00266C5C(D_800D7BE0.stack, (u8)id, 0x800);
-    func_0029B060(&D_800D7BE0.thread, id, D_002041E4, 0, D_800D7BE0.stack + 0x800, D_800B6E8C);
-    func_0029BB10(&D_800D7BE0.thread);
+    memset(D_800D7BE0.stack, (u8)id, 0x800);
+    osCreateThread(&D_800D7BE0.thread, id, D_002041E4, 0, D_800D7BE0.stack + 0x800, D_800B6E8C);
+    osStartThread(&D_800D7BE0.thread);
 }

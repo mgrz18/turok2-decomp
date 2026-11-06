@@ -1,4 +1,4 @@
-/* Second-module copy of func_0040CCC0 (in src/us/code/func_0040C850.c), with its data addresses 0xE0 lower. */
+/* Second-module copy of BlindOne_Setup (in src/us/code/BlindOne_UpdateMover.c), with its data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -13,11 +13,11 @@
 extern BlindOnePhase D_0043232C[];
 extern u8 D_800F7078[];
 extern u8 D_801100F0[];
-extern s32 func_00225F6C(void *container, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max);
-extern void func_002362E4(void *slot, s32 arg1);
-extern void *func_00225EBC(void *level, s32 arg1, s32 id);
-extern void func_0027AD24(void *hud, CGameObjectInstance *obj, char *name);
-extern void func_00225D0C(void *level);
+extern s32 CScene__FindInstances(void *container, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max);
+extern void ScriptAnimator_Start(void *slot, s32 arg1);
+extern void *CScene__FindIntelligence(void *level, s32 arg1, s32 id);
+extern void COnScreen__SetBoss(void *hud, CGameObjectInstance *obj, char *name);
+extern void CScene__UnmarkGeneratorsSaved(void *level);
 
 /* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase(BlindOneState *state) {
@@ -43,14 +43,14 @@ static __inline__ void nextPhase(BlindOneState *state) {
     }
 }
 
-void func_00445CC0(BlindOneState *state) {
+void BlindOne_Setup_2(BlindOneState *state) {
     CGameObjectInstance *obj;
     CGameObjectInstance *actor;
     s32 i;
 
-    state->count1 = func_00225F6C(D_800F7078, 0x454, 1, -1, state->actors1, 4);
-    state->count2 = func_00225F6C(D_800F7078, 0x455, 1, -1, state->actors2, 4);
-    state->count3 = func_00225F6C(D_800F7078, 0x456, 1, -1, state->actors3, 3);
+    state->count1 = CScene__FindInstances(D_800F7078, 0x454, 1, -1, state->actors1, 4);
+    state->count2 = CScene__FindInstances(D_800F7078, 0x455, 1, -1, state->actors2, 4);
+    state->count3 = CScene__FindInstances(D_800F7078, 0x456, 1, -1, state->actors3, 3);
     obj = state->boss;
     state->faderCount = 0;
     obj->m_AI.m_Health = obj->m_AI.m_InitialHealth = 0x3200;
@@ -77,18 +77,18 @@ void func_00445CC0(BlindOneState *state) {
         actor->m_AI.m_BlindOne.m_nFader = state->faderCount++;
     }
     for (i = 0; i < state->faderCount; i++) {
-        func_002362E4(&state->faders[i], 0);
+        ScriptAnimator_Start(&state->faders[i], 0);
     }
-    state->minionDefA = func_00225EBC(D_800F7078, 1, 0x1CE9);
-    state->minionDefB = func_00225EBC(D_800F7078, 1, 0x1CEA);
+    state->minionDefA = CScene__FindIntelligence(D_800F7078, 1, 0x1CE9);
+    state->minionDefB = CScene__FindIntelligence(D_800F7078, 1, 0x1CEA);
     state->toSpawn = 0;
     state->minionsAlive = 0;
     state->maxMinions = 0;
     state->alive1 = 0;
     state->alive2 = 0;
     state->alive3 = 0;
-    func_0027AD24(D_801100F0, state->boss, "Blind");
-    func_00225D0C(D_800F7078);
+    COnScreen__SetBoss(D_801100F0, state->boss, "Blind");
+    CScene__UnmarkGeneratorsSaved(D_800F7078);
     nextPhase(state);
 }
 

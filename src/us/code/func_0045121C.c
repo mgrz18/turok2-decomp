@@ -37,27 +37,27 @@ typedef struct S10Pair {
                s16 v;
                s16 w;
 } S10Pair;
-extern s32 func_002855E8(void *p);
-extern s32 func_00416558(S10Menu *a, s32 cur, s32 step, s32 lo, s32 hi, s32 wrap);
+extern s32 Controller_ConfirmPressed(void *p);
+extern s32 Menu_StepValueLR(S10Menu *a, s32 cur, s32 step, s32 lo, s32 hi, s32 wrap);
 extern void func_0042E350(S10Ctx *c, s32 v);
-extern void func_00416214(void *a, s32 b, s32 c);
-extern void func_00275624(s32 a);
-extern void func_00416894(s32 a, s32 b, void *c);
+extern void MenuItem_SetModel(void *a, s32 b, s32 c);
+extern void Sound__Play2D(s32 a);
+extern void MenuPool_OpenChildMenu(s32 a, s32 b, void *c);
 extern u8 D_00438668[];
 extern S10Pair D_800C1E7A[];
-s32 func_0045121C(void *x, S10Menu *m, void *y) {
+s32 CharacterMenu_SelectCharacter_2(void *x, S10Menu *m, void *y) {
     S10Ctx *ctx = m->ctx;
     S10Sub *sub = ctx->sub;
-    if (func_002855E8(m->ctrl)) {
+    if (Controller_ConfirmPressed(m->ctrl)) {
         func_0042E350(ctx, sub->b30);
-        func_00275624(D_800C1E7A[ctx->f520].v);
-        func_00416894((s32)y, (s32)m, D_00438668);
+        Sound__Play2D(D_800C1E7A[ctx->f520].v);
+        MenuPool_OpenChildMenu((s32)y, (s32)m, D_00438668);
         return 1;
     } else {
-        s8 v = func_00416558(m, sub->b30, 1, 0, 0xA, 1);
+        s8 v = Menu_StepValueLR(m, sub->b30, 1, 0, 0xA, 1);
         sub->b30 = v;
         func_0042E350(ctx, v);
-        func_00416214(x, 0xB, sub->b30);
+        MenuItem_SetModel(x, 0xB, sub->b30);
         return 0;
     }
 }

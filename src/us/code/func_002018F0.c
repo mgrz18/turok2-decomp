@@ -2,7 +2,7 @@
 #include "structs/table.h"
 
 /* The table's address and total size in bytes. */
-void func_002018F0(ArrayTable *arg0, void **arg1, s32 *arg2) {
+void CUSet__GetSetAndSize(ArrayTable *arg0, void **arg1, s32 *arg2) {
     *arg1 = arg0;
     *arg2 = (arg0->count * arg0->size) + 8;
 }

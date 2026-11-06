@@ -1,17 +1,17 @@
-/* One source file from func_0022D2FC to func_0022F350: the particle code.
- * func_0022E094's .rodata starts at 0x800A631C and func_0022F350's at
+/* One source file from CParticle__BuildMatrix to CParticleSystem__Spawn: the particle code.
+ * CParticle__DrawSprite's .rodata starts at 0x800A631C and CParticleSystem__Spawn's at
  * 0x800A63A4, both 4 past an 8-byte boundary, and their jump tables are
- * 8-aligned only counted from 0x800A6250, where func_0022D2FC's pool opens
- * (func_0022DCBC's, at 0x800A62F4, continues it too). Alone, each object put
+ * 8-aligned only counted from 0x800A6250, where CParticle__BuildMatrix's pool opens
+ * (CParticle__DrawShadow's, at 0x800A62F4, continues it too). Alone, each object put
  * its table 4 bytes off.
  *
- * FAKEMATCH (func_0022D2FC): four register asm pins ($f2-$f5) in its inlined
+ * FAKEMATCH (CParticle__BuildMatrix): four register asm pins ($f2-$f5) in its inlined
  * depth scale and at its call (see there).
  *
  * The four C parts were written apart: each keeps its own view of the shared
- * globals and structs (func_0022D2FC's types are Mtx-prefixed here, and it
+ * globals and structs (CParticle__BuildMatrix's types are Mtx-prefixed here, and it
  * passes its matrices to the CMtxF * prototypes the later parts declare).
- * func_0022D2FC, func_0022E094 and func_0022F350 are after Rage Wars
+ * CParticle__BuildMatrix, CParticle__DrawSprite and CParticleSystem__Spawn are after Rage Wars
  * (Particle_BuildMatrix, Particle_DrawSprite and func_802800C0_de). */
 #include "common.h"
 #include "gfx.h"
@@ -103,30 +103,30 @@ typedef struct {
     /* 0x1B4 */ u8 opacity;
 } MtxParticle;
 
-/* func_0022D09C under this part's view (the effect code below declares it as (Effect *, s32, s32)). */
-extern void MtxParticle_Place(MtxParticle *p, CVector3 *outPosition, CVector3 *outHeading) asm("func_0022D09C");
-extern CMtxF *func_0022CF40(MtxParticle *p, MtxCamera *camera);
-extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);       /* cross product */
-extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);         /* out = in * s */
-extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a + b */
-extern void func_0020F040(CVector3 *v);                             /* normalize */
+/* CParticle__Attach under this part's view (the effect code below declares it as (Effect *, s32, s32)). */
+extern void MtxParticle_Place(MtxParticle *p, CVector3 *outPosition, CVector3 *outHeading) asm("CParticle__Attach");
+extern CMtxF *CParticle__GetParentTransform(MtxParticle *p, MtxCamera *camera);
+extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);       /* cross product */
+extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);         /* out = in * s */
+extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a + b */
+extern void CVector3__Normalize(CVector3 *v);                             /* normalize */
 extern f32 func_002982F0(f32 angle);                             /* sin */
-extern void func_0020FE00(CMtxF m, f32 x, f32 y, f32 z);         /* rotation */
-extern void func_0020F79C(CMtxF *m);                              /* identity */
-extern void func_0020C618(CMtxF out, CMtxF a, CMtxF b);          /* out = a * b */
-extern void func_00210630(CMtxF m, f32 angle);                   /* roll */
-extern void func_00210284(CMtxF m, f32 x, f32 y, f32 z);
-extern void func_00210318(CMtxF *m, f32 x, f32 y, f32 z);         /* translate */
-extern f32 func_0026BE60(void *region, f32 x, f32 z);            /* ground height */
-extern f32 func_00269C3C(void *region, f32 x, f32 z);            /* ceiling height */
-extern void func_0020F510(CVector3 *v, f32 limit);
-extern void func_0021034C(CMtxF *m, f32 x, f32 y, f32 z);         /* scale */
-extern void func_00210C3C(CMtxF m);
-extern void func_0020FF80(CMtxF dst, CMtxF src);                 /* copy */
-extern void func_0020FC24(CMtxF *m, f32 x, f32 y, f32 z);         /* translation */
-extern void func_00210968(CMtxF m, f32 angle);
-extern void func_00210790(CMtxF m, f32 angle);
-extern void func_0020D274(CMtxF *m, void *out);                   /* pack */
+extern void CMtxF__SetEulerXYZ(CMtxF m, f32 x, f32 y, f32 z);         /* rotation */
+extern void CMtxF__Identity(CMtxF *m);                              /* identity */
+extern void CMtxF__MultiplyAffine(CMtxF out, CMtxF a, CMtxF b);          /* out = a * b */
+extern void CMtxF__SetRotateZ(CMtxF m, f32 angle);                   /* roll */
+extern void CMtxF__TranslateLocal(CMtxF m, f32 x, f32 y, f32 z);
+extern void CMtxF__Translate(CMtxF *m, f32 x, f32 y, f32 z);         /* translate */
+extern f32 CGameRegion__GetHeight(void *region, f32 x, f32 z);            /* ground height */
+extern f32 CGameRegion__GetCeilingHeight(void *region, f32 x, f32 z);            /* ceiling height */
+extern void CVector3__ClampLength(CVector3 *v, f32 limit);
+extern void CMtxF__ScaleAxes(CMtxF *m, f32 x, f32 y, f32 z);         /* scale */
+extern void CMtxF__SwapYZRows(CMtxF m);
+extern void CMtxF__Copy(CMtxF dst, CMtxF src);                 /* copy */
+extern void CMtxF__SetTranslate(CMtxF *m, f32 x, f32 y, f32 z);         /* translation */
+extern void CMtxF__RotateY(CMtxF m, f32 angle);
+extern void CMtxF__RotateX(CMtxF m, f32 angle);
+extern void CMtxF__ToMtxAffine(CMtxF *m, void *out);                   /* pack */
 
 static __inline__ f32 particleDepthScale(MtxParticleDesc *desc, f32 depth) {
     f32 farness;
@@ -162,7 +162,7 @@ static __inline__ f32 rampFade(f32 time, s32 ramp) {
     return 1.0f;
 }
 
-void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 depth) {
+void CParticle__BuildMatrix(MtxParticle *particle, void *out, MtxCamera *camera, f32 depth) {
     CMtxF rotation, basis, local, world, shakeMtx;
     CVector3 position;
     CVector3 up;
@@ -219,39 +219,39 @@ void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 dept
                 up.x = 0;
                 up.z = 0;
                 up.y = 1.0f;
-                func_0020EFDC(&side, &up, &direction);
-                func_0020EF60(&offset, &side, func_002982F0(particle->phaseA) * -particle->amplitudeA * fade);
-                func_0020EEF8(&position, &position, &offset);
+                CVector3__Cross(&side, &up, &direction);
+                CVector3__Scale(&offset, &side, func_002982F0(particle->phaseA) * -particle->amplitudeA * fade);
+                CVector3__Add(&position, &position, &offset);
             }
             if (particle->amplitudeB < 0.0f) {
                 up.x = 0;
                 up.z = 0;
                 up.y = 1.0f;
-                func_0020EFDC(&across, &up, &direction);
-                func_0020EFDC(&side, &across, &direction);
-                func_0020EF60(&offset, &side, func_002982F0(particle->phaseB) * -particle->amplitudeB * fade);
-                func_0020EEF8(&position, &position, &offset);
+                CVector3__Cross(&across, &up, &direction);
+                CVector3__Cross(&side, &across, &direction);
+                CVector3__Scale(&offset, &side, func_002982F0(particle->phaseB) * -particle->amplitudeB * fade);
+                CVector3__Add(&position, &position, &offset);
             }
         }
     }
     if (particle->desc->renderModel != 0) {
         if (particle->space == -7) {
-            func_0020FE00(rotation, particle->rot.x + 3.141593f / 2, particle->rot.y, particle->rot.z);
+            CMtxF__SetEulerXYZ(rotation, particle->rot.x + 3.141593f / 2, particle->rot.y, particle->rot.z);
             if ((heading.x == 0.0f) && (heading.y == 0.0f) && (heading.z == 0.0f)) {
                 axisZ = particle->direction;
             } else {
                 axisZ = heading;
             }
-            func_0020F040(&axisZ);
+            CVector3__Normalize(&axisZ);
             up.x = 0;
             up.z = 0;
             up.y = 1.0f;
-            func_0020EFDC(&axisX, &up, &axisZ);
-            func_0020EFDC(&axisY, &axisX, &axisZ);
-            func_0020F79C((CMtxF *) basis);
-            func_0020F040(&axisX);
-            func_0020F040(&axisY);
-            func_0020F040(&axisZ);
+            CVector3__Cross(&axisX, &up, &axisZ);
+            CVector3__Cross(&axisY, &axisX, &axisZ);
+            CMtxF__Identity((CMtxF *) basis);
+            CVector3__Normalize(&axisX);
+            CVector3__Normalize(&axisY);
+            CVector3__Normalize(&axisZ);
             basis[0][0] = axisX.x;
             basis[0][1] = axisX.y;
             basis[0][2] = axisX.z;
@@ -261,14 +261,14 @@ void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 dept
             basis[2][0] = axisZ.x;
             basis[2][1] = axisZ.y;
             basis[2][2] = axisZ.z;
-            func_0020C618(local, rotation, basis);
+            CMtxF__MultiplyAffine(local, rotation, basis);
         } else {
-            func_0020FE00(local, particle->rot.x, particle->rot.y + 3.141593f, particle->rot.z);
+            CMtxF__SetEulerXYZ(local, particle->rot.x, particle->rot.y + 3.141593f, particle->rot.z);
         }
     } else if ((particle->rot.x == 0.0f) && (particle->rot.y == 0.0f)) {
-        func_00210630(local, particle->rot.z);
+        CMtxF__SetRotateZ(local, particle->rot.z);
     } else {
-        func_00210630(local, particle->rot.z);
+        CMtxF__SetRotateZ(local, particle->rot.z);
         model = particle->desc->renderModel;
         tiltX = 0.0f;
         if (model == 0) {
@@ -279,11 +279,11 @@ void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 dept
         if (model == 0) {
             tiltY = particle->rot.y;
         }
-        func_00210284(local, tiltX, -tiltY, 0.0f);
+        CMtxF__TranslateLocal(local, tiltX, -tiltY, 0.0f);
     }
     if (lift != 0.0f) {
-        func_00210284(local, 0.0f, lift, 0.0f);
-        func_00210318((CMtxF *) local, 0.0f, -lift, 0.0f);
+        CMtxF__TranslateLocal(local, 0.0f, lift, 0.0f);
+        CMtxF__Translate((CMtxF *) local, 0.0f, -lift, 0.0f);
     }
     particle->flags &= ~0x800000;
     switch (particle->space) {
@@ -294,11 +294,11 @@ void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 dept
         break;
     case -5:
         if (desc->clampToGround != 0) {
-            position.y = MAX_GT(position.y, func_0026BE60(particle->region, position.x, position.z) + 5.12f);
+            position.y = MAX_GT(position.y, CGameRegion__GetHeight(particle->region, position.x, position.z) + 5.12f);
         }
         break;
     case -3:
-        ground = func_0026BE60(particle->region, position.x, position.z);
+        ground = CGameRegion__GetHeight(particle->region, position.x, position.z);
         if (desc->flags & 0x400) {
             if (position.y < ground + 1.024f) {
                 position.y = ground;
@@ -311,7 +311,7 @@ void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 dept
         break;
     case -2:
         if (desc->clampToGround != 0) {
-            position.y = MIN_LT(position.y, func_00269C3C(particle->region, position.x, position.z) - 5.12f);
+            position.y = MIN_LT(position.y, CGameRegion__GetCeilingHeight(particle->region, position.x, position.z) - 5.12f);
         }
         break;
     case -6:
@@ -325,41 +325,41 @@ void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 dept
     case 2:
         break;
     }
-    func_0020F510(&position, 20000.0f);
+    CVector3__ClampLength(&position, 20000.0f);
     if ((desc->flags & 0x80000) && (desc->animMode == 1)) {
         scale = scale * (1.0f / 255.0f) * (f32)particle->opacity;
     }
     if (particle->desc->renderModel != 0) {
         extent = scale * particle->size.z * (35.0f / 1024.0f);
-        func_0021034C((CMtxF *) local, particle->size.x * extent, particle->size.y * extent, extent * 10.24f);
-        func_00210C3C(local);
+        CMtxF__ScaleAxes((CMtxF *) local, particle->size.x * extent, particle->size.y * extent, extent * 10.24f);
+        CMtxF__SwapYZRows(local);
     } else {
         extent = scale * particle->size.z;
-        func_0021034C((CMtxF *) local, particle->size.x * extent, particle->size.y * extent, extent * 10.24f);
+        CMtxF__ScaleAxes((CMtxF *) local, particle->size.x * extent, particle->size.y * extent, extent * 10.24f);
     }
     {
-        CMtxF *parent = func_0022CF40(particle, camera);
+        CMtxF *parent = CParticle__GetParentTransform(particle, camera);
         if (parent != 0) {
-            func_0020C618(world, local, *parent);
+            CMtxF__MultiplyAffine(world, local, *parent);
         } else {
-            func_0020FF80(world, local);
+            CMtxF__Copy(world, local);
         }
     }
-    func_00210318((CMtxF *) world, position.x, position.y, position.z);
+    CMtxF__Translate((CMtxF *) world, position.x, position.y, position.z);
     if ((particle->flags & 0x20000) && (shake = particle->shake) != 0) {
         jolt = (f32)shake * (1.0f / 127.0f);
         joltSq = jolt * jolt;
         angle = joltSq * (3.141593f * 5 / 180);
-        func_0020FC24((CMtxF *) shakeMtx, 0.0f, 0.0f, -66.56f);
-        func_00210968(shakeMtx, angle * (func_002982F0(joltSq * (6 * 3.141593f)) * 0.25f));
-        func_00210790(shakeMtx, angle * func_002982F0(joltSq * (14 * 3.141593f)));
-        func_00210318((CMtxF *) shakeMtx, 0.0f, 0.0f, 66.56f);
-        func_0020C618(rotation, shakeMtx, world);
+        CMtxF__SetTranslate((CMtxF *) shakeMtx, 0.0f, 0.0f, -66.56f);
+        CMtxF__RotateY(shakeMtx, angle * (func_002982F0(joltSq * (6 * 3.141593f)) * 0.25f));
+        CMtxF__RotateX(shakeMtx, angle * func_002982F0(joltSq * (14 * 3.141593f)));
+        CMtxF__Translate((CMtxF *) shakeMtx, 0.0f, 0.0f, 66.56f);
+        CMtxF__MultiplyAffine(rotation, shakeMtx, world);
         final = rotation[0];
     } else {
         final = world[0];
     }
-    func_0020D274((CMtxF *) final, out);
+    CMtxF__ToMtxAffine((CMtxF *) final, out);
 }
 
 typedef struct {
@@ -395,24 +395,24 @@ extern CCollisionResults D_800F1CE0;
 extern f32 D_800DD78C;
 extern Gfx *D_800D8E24;
 
-void *func_00206950(void *pool, s32 count);
-void func_0026A9C0(CQuaternion *out, void *region);
-f32 func_00267648(ShadowActor *actor, s32 arg1);    /* ground height */
-s32 func_00239F00(void *obj, CVector3 to, CCollisionInfo *info);
-void func_0020E810(CQuaternion *out, CVector3 *dir);
+void *MtxPool_Alloc(void *pool, s32 count);
+void CGameRegion__GetTiltRotation(CQuaternion *out, void *region);
+f32 GameObject_GetGroundHeight(ShadowActor *actor, s32 arg1);    /* ground height */
+s32 Collision_MoveInstance(void *obj, CVector3 to, CCollisionInfo *info);
+void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);
-void func_0020F510(CVector3 *v, f32 arg1);
-void func_00211114(CQuaternion *rot, CMtxF *m);
-void func_0021034C(CMtxF *m, f32 x, f32 y, f32 z);  /* scale */
-void func_00210318(CMtxF *m, f32 x, f32 y, f32 z);  /* translate */
-void func_0020D274(CMtxF *m, void *dst);
-void func_002086BC(void *mtx, s32 arg1, u32 alpha);
+void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);
+void CVector3__ClampLength(CVector3 *v, f32 arg1);
+void CQuaternion__ToMatrix(CQuaternion *rot, CMtxF *m);
+void CMtxF__ScaleAxes(CMtxF *m, f32 x, f32 y, f32 z);  /* scale */
+void CMtxF__Translate(CMtxF *m, f32 x, f32 y, f32 z);  /* translate */
+void CMtxF__ToMtxAffine(CMtxF *m, void *dst);
+void Render_DrawShadowQuad(void *mtx, s32 arg1, u32 alpha);
 
 /* Draws the blob shadow under an actor: on the ground of its region, or
  * where a ray cast straight down from it lands, tilted to the surface. */
-void func_0022DCBC(ShadowActor *actor) {
+void CParticle__DrawShadow(ShadowActor *actor) {
     CMtxF mtx;
     CVector3 pos;
     CQuaternion rot;
@@ -426,13 +426,13 @@ void func_0022DCBC(ShadowActor *actor) {
     f32 a;
     f32 size;
 
-    gmtx = func_00206950(D_800F7148, 1);
+    gmtx = MtxPool_Alloc(D_800F7148, 1);
     if (gmtx == NULL) {
         return;
     }
     if (actor->region != NULL) {
-        func_0026A9C0(&rot, actor->region);
-        ground = func_00267648(actor, 0);
+        CGameRegion__GetTiltRotation(&rot, actor->region);
+        ground = GameObject_GetGroundHeight(actor, 0);
     } else {
         probe = *(CObjectHead *) actor;
         probe.header.m_vPos.y += 10.24f;
@@ -442,16 +442,16 @@ void func_0022DCBC(ShadowActor *actor) {
         probe.m_vVelocity.x = 0;
         probe.m_vVelocity.y = 0;
         probe.m_vVelocity.z = 0;
-        func_00239F00(&probe, pos, &D_800F1B40);
+        Collision_MoveInstance(&probe, pos, &D_800F1B40);
         if (D_800F1CE0.m_pInstance == NULL) {
             return;
         }
-        func_0020E810(&tilt, &D_800F1CE0.m_vNormal);
+        CQuaternion__FromDirection(&tilt, &D_800F1CE0.m_vNormal);
         spin.x = D_800DD78C = func_002982F0(0.785398245f);
         spin.y = 0.0f;
         spin.z = 0.0f;
         spin.w = func_002974C0(0.785398245f);
-        func_00210F68(&rot, &spin, &tilt);
+        CQuaternion__Multiply(&rot, &spin, &tilt);
         ground = D_800F1CE0.m_vInstancePos.y;
     }
     height = actor->pos.y - ground;
@@ -469,14 +469,14 @@ void func_0022DCBC(ShadowActor *actor) {
     pos.x = actor->pos.x;
     pos.z = actor->pos.z;
     pos.y = ground;
-    func_0020F510(&pos, 20000.0f);
-    func_00211114(&rot, &mtx);
-    func_0021034C(&mtx, size, 1.0f, size);
-    func_00210318(&mtx, pos.x, pos.y, pos.z);
-    func_0020D274(&mtx, gmtx);
+    CVector3__ClampLength(&pos, 20000.0f);
+    CQuaternion__ToMatrix(&rot, &mtx);
+    CMtxF__ScaleAxes(&mtx, size, 1.0f, size);
+    CMtxF__Translate(&mtx, pos.x, pos.y, pos.z);
+    CMtxF__ToMtxAffine(&mtx, gmtx);
     { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = 0xE7000000; _g->w1 = 0; }
     { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = 0xE3000A01; _g->w1 = 0x100000; }
-    func_002086BC(gmtx, 1, (u8) alpha);
+    Render_DrawShadowQuad(gmtx, 1, (u8) alpha);
     { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = 0xE7000000; _g->w1 = 0; }
     { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = 0xE3000A01; _g->w1 = 0; }
 }
@@ -590,34 +590,34 @@ extern CCollisionInfo D_800F1B40;
 extern u8 D_800F1930[];             /* the sprite's four vertices */
 extern u8 D_800F7148[];             /* matrix pool */
 
-extern void *func_0020798C(s32 *ref);
-extern void func_002079D8(void *model, AnimInfo *info);
-extern void func_00206B30(s32 *ref, void *model, s32 frame, s32 a3, s32 shiftS, s32 shiftT, s32 a6, s32 a7, s32 a8);
-extern ParticleHead *func_00281194(ParticleView *view);
-extern s32 func_00239F00(void *obj, CVector3 to, CCollisionInfo *info);
-extern void func_0020F85C(void *m, void *in, void *out);
-extern void *func_00206950(void *pool, s32 count);
-extern void func_00207A70(s32 mode);
-extern void func_00207FEC(s32 mode);
-extern void func_002051F4(s32 arg0, void *model);
-extern s32 func_002113A4(void);
+extern void *Texture_Request(s32 *ref);
+extern void Texture_GetInfo(void *model, AnimInfo *info);
+extern void Texture_Load(s32 *ref, void *model, s32 frame, s32 a3, s32 shiftS, s32 shiftT, s32 a6, s32 a7, s32 a8);
+extern ParticleHead *CCamera__GetPlayer(ParticleView *view);
+extern s32 Collision_MoveInstance(void *obj, CVector3 to, CCollisionInfo *info);
+extern void CMtxF__TransformPoint(void *m, void *in, void *out);
+extern void *MtxPool_Alloc(void *pool, s32 count);
+extern void Render_SetCombineMode(s32 mode);
+extern void Render_SetRenderMode(s32 mode);
+extern void CCache__Unlock(s32 arg0, void *model);
+extern s32 Random_Next(void);
 
 static __inline__ s32 Particle_Occluded(Particle *particle, ParticleView *view) {
     ParticleHead *inst;
     s32 hit;
 
-    inst = func_00281194(view);
+    inst = CCamera__GetPlayer(view);
     if (inst != 0 && view->unk24 == 0) {
         ParticleHead saved;
         saved = *inst;
         inst->pos = view->eye;
-        hit = func_00239F00(inst, particle->inst.pos, &D_800F1B40);
+        hit = Collision_MoveInstance(inst, particle->inst.pos, &D_800F1B40);
         *inst = saved;
     } else {
         ParticleHead probe;
         probe = particle->inst;
         probe.pos = view->eye;
-        hit = func_00239F00(&probe, particle->inst.pos, &D_800F1B40);
+        hit = Collision_MoveInstance(&probe, particle->inst.pos, &D_800F1B40);
     }
     return hit;
 }
@@ -642,7 +642,7 @@ static __inline__ s32 Particle_Scale(f32 value, f32 div) {
 #define CLAMP_U8(v) (u32)(((v) > 255.0f ? 255.0f : (v)) < 0.0f ? 0.0f : ((v) > 255.0f ? 255.0f : (v)))
 #define LERP(to, from, t) (((to) - (from)) * (t) + (from))
 
-void func_0022E094(Particle *particle, ParticleView *view) {
+void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     AnimInfo info;
     u8 env[3];
     u8 prim[3];
@@ -673,7 +673,7 @@ void func_0022E094(Particle *particle, ParticleView *view) {
     if (particle->time < 0.0f) {
         return;
     }
-    model = func_0020798C(&particle->model);
+    model = Texture_Request(&particle->model);
     if (model == 0) {
         return;
     }
@@ -692,7 +692,7 @@ void func_0022E094(Particle *particle, ParticleView *view) {
         }
         particle->opacity = alpha;
         if (alpha == 0.0f) {
-            func_002051F4(0, model);
+            CCache__Unlock(0, model);
             return;
         }
     }
@@ -712,7 +712,7 @@ void func_0022E094(Particle *particle, ParticleView *view) {
     prim[2] = CLAMP_U8(LERP(primTo[2], primFrom[2], ratio));
 
     mode = Particle_ColorMode(particle);
-    func_002079D8(model, &info);
+    Texture_GetInfo(model, &info);
     frame = particle->frame;
     time = particle->time;
     switch (desc->animMode) {
@@ -742,11 +742,11 @@ void func_0022E094(Particle *particle, ParticleView *view) {
             }
             break;
         case 4:
-            frame = func_002113A4() % info.count;
+            frame = Random_Next() % info.count;
             break;
         case 5:
             if (particle->randomFrame == -1) {
-                particle->randomFrame = func_002113A4() % info.count;
+                particle->randomFrame = Random_Next() % info.count;
             }
             frame = particle->randomFrame;
             break;
@@ -757,19 +757,19 @@ void func_0022E094(Particle *particle, ParticleView *view) {
             ParticleView *camera = D_801198D0;
             CVector3 local;
             f32 depth;
-            func_0020F85C(camera->viewMtx, &particle->inst.pos, &local);
+            CMtxF__TransformPoint(camera->viewMtx, &particle->inst.pos, &local);
             depth = local.z;
             if (depth < 0.0f) {
                 depth = -depth;
             }
-            func_0022D2FC(particle, &particle->mtx[D_800B6D1C], camera, depth);
+            CParticle__BuildMatrix(particle, &particle->mtx[D_800B6D1C], camera, depth);
         } else {
-            func_0022D2FC(particle, &particle->mtx[D_800B6D1C], 0, 0.0f);
+            CParticle__BuildMatrix(particle, &particle->mtx[D_800B6D1C], 0, 0.0f);
         }
         particle->builtFrame = frame;
         particle->flags |= 0x100000;
     }
-    func_0020F85C(view->viewMtx, &particle->inst.pos, &viewPos);
+    CMtxF__TransformPoint(view->viewMtx, &particle->inst.pos, &viewPos);
     dist = viewPos.z;
     if (dist < 0.0f) {
         dist = -dist;
@@ -777,37 +777,37 @@ void func_0022E094(Particle *particle, ParticleView *view) {
     if (D_801198E0 == 1) {
         GFX_CMD(0xDA380003, (u32)&particle->mtx[D_800B6D1C])
     } else {
-        mtx = func_00206950(D_800F7148, 1);
+        mtx = MtxPool_Alloc(D_800F7148, 1);
         if (mtx == 0) {
-            func_002051F4(0, model);
+            CCache__Unlock(0, model);
             return;
         }
-        func_0022D2FC(particle, mtx, view, dist);
+        CParticle__BuildMatrix(particle, mtx, view, dist);
         GFX_CMD(0xDA380003, (u32)mtx)
     }
 
     textured = particle->flags & 0x800000;
     shiftS = 1 << (((desc->flags & 0x100) ? 7 : 6) + info.frame->shiftS);
     shiftT = 1 << (((desc->flags & 0x200) ? 7 : 6) + info.frame->shiftT);
-    func_00206B30(&particle->model, model, frame, 0, shiftS, shiftT, 1, 1, 0);
+    Texture_Load(&particle->model, model, frame, 0, shiftS, shiftT, 1, 1, 0);
     switch (info.frame->kind) {
         case 0:
         case 1:
-            func_00207A70(0x18);
+            Render_SetCombineMode(0x18);
             break;
         case 3:
-            func_00207A70(0x1D);
+            Render_SetCombineMode(0x1D);
             break;
     }
     if (textured) {
-        func_00207FEC(0xF);
+        Render_SetRenderMode(0xF);
         GFX_CMD(0xD7FF0002, (shiftS << 16) | (shiftT & 0xFFFF))
     } else if ((desc->flags & 0x400) && desc->fade->unkE != 4) {
-        func_00207FEC(0xF);
+        Render_SetRenderMode(0xF);
     } else if (desc->flags & 0x4000) {
-        func_00207FEC(!(D_8011AAD8 & 0x200) ? 0xD : 0x11);
+        Render_SetRenderMode(!(D_8011AAD8 & 0x200) ? 0xD : 0x11);
     } else {
-        func_00207FEC((D_8011AAD8 & 0x200) ? 0x12 : 0x13);
+        Render_SetRenderMode((D_8011AAD8 & 0x200) ? 0x12 : 0x13);
     }
 
     alpha = 0xFF;
@@ -876,7 +876,7 @@ void func_0022E094(Particle *particle, ParticleView *view) {
             break;
     }
     GFX_CMD(0x06000204, 0x00040600)
-    func_002051F4(0, model);
+    CCache__Unlock(0, model);
 }
 
 /* Engine actor instance (only the fields used here). */
@@ -901,15 +901,15 @@ typedef struct EffectActor {
 extern u8 D_800F8928[];
 extern u8 D_801102B8[];
 extern u8 D_8010FF34[];
-s16 *func_0025398C(u8 *, s32);
-void func_00232B40(EffectActor *);
-void func_002327F4(EffectActor *);
-void func_00234E48(void *, EffectActor *);
-void func_00228B4C(void *, s32);
+s16 *CPlayer__GetFiringAmmo(u8 *, s32);
+void CParticle__StopLoopSound(EffectActor *);
+void CParticle__BuildCameraMatrix(EffectActor *);
+void Trail_DetachOwner(void *, EffectActor *);
+void CDLightSet__Free(void *, s32);
 void CList__Remove(void *list, void *node);
 void CList__AddHead(void *list, void *node);
 
-void func_0022F1C8(u8 *mgr, EffectActor *actor) {
+void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
     EffectActor *child;
     u8 *owner;
     u32 flags;
@@ -922,21 +922,21 @@ void func_0022F1C8(u8 *mgr, EffectActor *actor) {
     if (!(flags & 0x800)) {
         if (actor->typeId == 0x68) {
             owner = *(u8 **) (actor->parent + 0x1A8);
-            *(s16 *) (owner + *func_0025398C(owner, 0x15) * 2 + 0x934) = 1;
+            *(s16 *) (owner + *CPlayer__GetFiringAmmo(owner, 0x15) * 2 + 0x934) = 1;
         }
         child = actor->child;
         if (child != NULL && (kind = child->kind) == 2 && (child->flags & 0x100) &&
             (child->typeId == kind || child->typeId == 0x111)) {
-            func_0022F1C8(D_800F8928, child);
-            func_00232B40(child);
+            CParticleSystem__Free(D_800F8928, child);
+            CParticle__StopLoopSound(child);
         }
-        func_00232B40(actor);
+        CParticle__StopLoopSound(actor);
         if (actor->registered) {
-            func_002327F4(actor);
-            func_00234E48(D_801102B8, actor);
+            CParticle__BuildCameraMatrix(actor);
+            Trail_DetachOwner(D_801102B8, actor);
         }
         if (actor->sound != 0) {
-            func_00228B4C(D_8010FF34, actor->sound);
+            CDLightSet__Free(D_8010FF34, actor->sound);
             actor->sound = 0;
         }
         if (actor->liveCount != NULL) {
@@ -965,7 +965,7 @@ void func_0022F1C8(u8 *mgr, EffectActor *actor) {
  * Returns the number spawned. */
 
 
-/* Two half-floats: base and random range (see func_0026D128). */
+/* Two half-floats: base and random range (see RandomInPackedRange). */
 typedef struct {
     /* 0x0 */ u16 base;
     /* 0x2 */ u16 range;
@@ -1167,43 +1167,43 @@ extern u8 D_801102B8[];
 extern u8 D_8010FF34[];
 extern f32 D_800ACE10[2];
 
-extern void *func_002017D4(s32 resource, s32 index);
-extern s32 func_00266D8C(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
-extern void func_00223A94(void *, CVector3 *);
+extern void *CISet__GetBlock(s32 resource, s32 index);
+extern s32 BinaryRange(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
+extern void CScene__Blast(void *, CVector3 *);
 extern void func_00225C08(void *, s32, CVector3 *);
-extern s32 func_002113A4(void);
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
-extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-extern void func_0020F040(CVector3 *v);
-extern void func_0020FAFC(CMtxF *m, CVector3 *in, CVector3 *out);
-extern void func_0020D908(CMtxF *out, CMtxF *in);
-extern void func_0020C208(CMtxF *out, CMtxF *in);
-extern void func_0021034C(CMtxF *m, f32 x, f32 y, f32 z);
-extern void func_00210318(CMtxF *m, f32 x, f32 y, f32 z);
-extern void func_0020FC74(CMtxF *m, f32 x, f32 y, f32 z);
-extern void func_0020FC24(CMtxF *m, f32 x, f32 y, f32 z);
-extern void func_0020F79C(CMtxF *m);
-extern void func_002673CC(CQuaternion *q, Owner *owner, CVector3 pos);
-extern void func_00211114(CQuaternion *q, CMtxF *m);
+extern s32 Random_Next(void);
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+extern void CVector3__Normalize(CVector3 *v);
+extern void CMtxF__RotateVector(CMtxF *m, CVector3 *in, CVector3 *out);
+extern void CMtxF__FromMtxAffine(CMtxF *out, CMtxF *in);
+extern void CMtxF__InvertAffine(CMtxF *out, CMtxF *in);
+extern void CMtxF__ScaleAxes(CMtxF *m, f32 x, f32 y, f32 z);
+extern void CMtxF__Translate(CMtxF *m, f32 x, f32 y, f32 z);
+extern void CMtxF__SetScale(CMtxF *m, f32 x, f32 y, f32 z);
+extern void CMtxF__SetTranslate(CMtxF *m, f32 x, f32 y, f32 z);
+extern void CMtxF__Identity(CMtxF *m);
+extern void GameObject_GetAimRotation(CQuaternion *q, Owner *owner, CVector3 pos);
+extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *m);
 extern void CList__AddTail(EffectList *list, Effect *effect);
-extern void func_002005D0(EffectList *list, Effect *after, Effect *effect);
+extern void CList__InsertBefore(EffectList *list, Effect *after, Effect *effect);
 extern void func_00207914(u32 *bits, s32 value);
-extern f32 func_0026D128(PackedRange r);
-extern f32 func_0026D210(u16 h);
-extern void func_002688C8(Effect *effect, CVector3 pos, CVector3 *outPos, void **outRegion, s32 a, s32 b);
-extern void func_00228C40(s8, u8, u8, u8, u8 *, u8 *, u8 *);
-extern void func_00228FF8(u8, u8, u8, u8, u8 *, u8 *, u8 *);
-extern void func_002291D4(u8, u8, u8, u8, u8 *, u8 *, u8 *);
-extern void func_0025E52C(Actor *actor, s32 *ai, CVector3 *from, s32 arg3);
-extern void func_0022D09C(Effect *effect, s32, s32);
-extern void func_002350EC(void *, Effect *, s32);
-extern s32 func_00228AB0(void *, s32);
-extern void func_00232AC4(Effect *effect, s32 sound);
-extern void func_00275544(s16 sound, CVector3 pos, s32 a, s32 b);
+extern f32 RandomInPackedRange(PackedRange r);
+extern f32 HalfToFloat(u16 h);
+extern void GameObject_TraceMove(Effect *effect, CVector3 pos, CVector3 *outPos, void **outRegion, s32 a, s32 b);
+extern void Color_ShiftHue(s8, u8, u8, u8, u8 *, u8 *, u8 *);
+extern void Color_Saturate(u8, u8, u8, u8, u8 *, u8 *, u8 *);
+extern void Color_Darken(u8, u8, u8, u8, u8 *, u8 *, u8 *);
+extern void AI_HearNoise(Actor *actor, s32 *ai, CVector3 *from, s32 arg3);
+extern void CParticle__Attach(Effect *effect, s32, s32);
+extern void Trail_AddNode(void *, Effect *, s32);
+extern s32 DLight_Spawn(void *, s32);
+extern void CParticle__StartLoopSound(Effect *effect, s32 sound);
+extern void Sound__Play(s16 sound, CVector3 pos, s32 a, s32 b);
 
 static __inline__ s32 randomCount(s32 range) {
-    return range != 0 ? func_002113A4() % (range + 1) : 0;
+    return range != 0 ? Random_Next() % (range + 1) : 0;
 }
 
 static __inline__ Effect *findOwned(EffectList *list, void *ownerId, Entry *entry) {
@@ -1234,7 +1234,7 @@ static __inline__ Effect *allocateEffect(EffectSystem *sys, u8 index) {
     if (sys->free.head == 0) {
         for (i = 0; i <= index; i++) {
             if ((&sys->lists[i])->tail != 0) {
-                func_0022F1C8(sys, (&sys->lists[i])->tail);
+                CParticleSystem__Free(sys, (&sys->lists[i])->tail);
                 break;
             }
         }
@@ -1265,21 +1265,21 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
         effect->mode = -4;
         targetActor = (Actor *)D_800F1CE0.m_pInstance;
         targetTeam = D_800F1CE0.m_Frame.action;
-        func_0020D908(&targetMtx, &targetActor->bones[D_800F1CE0.m_nInstanceNode]);
-        func_0020C208(&targetInv, &targetMtx);
+        CMtxF__FromMtxAffine(&targetMtx, &targetActor->bones[D_800F1CE0.m_nInstanceNode]);
+        CMtxF__InvertAffine(&targetInv, &targetMtx);
         scene = &D_800F1CE0;
-        func_0020F85C(&targetInv, &scene->m_vInstancePos, &effect->attachPos);
+        CMtxF__TransformPoint(&targetInv, &scene->m_vInstancePos, &effect->attachPos);
         up = D_800F1CE0.m_vVelocity;
-        func_0020F040(&up);
-        func_0020FAFC(&targetInv, &up, vel);
+        CVector3__Normalize(&up);
+        CMtxF__RotateVector(&targetInv, &up, vel);
         effect->target = (s32) targetActor;
         effect->flags |= 0x10000;
         effect->shake = D_800F1CE0.m_nInstanceNode;
         if (targetActor->def->m_Type == 1) {
             if (effect->owner != 0) {
-                func_0025E52C(targetActor, &targetActor->ai, &effect->owner->pos, 3);
+                AI_HearNoise(targetActor, &targetActor->ai, &effect->owner->pos, 3);
             } else {
-                func_0025E52C(targetActor, &targetActor->ai, &scene->m_vInstancePos, 3);
+                AI_HearNoise(targetActor, &targetActor->ai, &scene->m_vInstancePos, 3);
             }
         }
         if (effect->kind == 0x56 && targetTeam == 2) {
@@ -1288,7 +1288,7 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
     }
 }
 
-s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount, s32 arg4, s32 kind,
+s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount, s32 arg4, s32 kind,
                   CVector3 arg6, CQuaternion rotation, CVector3 pos, void *region, s32 arg10, s32 arg11) {
     CMtxF mtx;
     CVector3 dir;
@@ -1344,14 +1344,14 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
     count = 0;
     resource = sys->resource;
     D_800F1ADC = &target;
-    block = func_002017D4(resource, 1);
+    block = CISet__GetBlock(resource, 1);
     numEntries = block->count;
     templates = block->entries;
     if (kind == 0xFC) {
-        func_00223A94(D_800F7078, &pos);
+        CScene__Blast(D_800F7078, &pos);
     }
-    if (func_00266D8C(templates, numEntries, kind, &first, &last) != 0) {
-        entries = ((EntryBlock *) func_002017D4(resource, 2))->entries;
+    if (BinaryRange(templates, numEntries, kind, &first, &last) != 0) {
+        entries = ((EntryBlock *) CISet__GetBlock(resource, 2))->entries;
         anchor = 0;
         /* The current player list, D_80119890, addressed from D_8011ACA4. */
         if (((Actor **) global)[-0x505] != 0) {
@@ -1383,7 +1383,7 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                 }
             }
             if (anchor != 0) {
-                func_0020EF2C(&delta, &pos, &anchor->pos);
+                CVector3__Subtract(&delta, &pos, &anchor->pos);
             } else {
                 delta.x = delta.y = delta.z = 0.0f;
             }
@@ -1445,7 +1445,7 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                 }
             }
             if (entry->params->chance != 100) {
-                if (func_002113A4() % 1000 + 1 > entry->params->chance * 10) {
+                if (Random_Next() % 1000 + 1 > entry->params->chance * 10) {
                     ok = 0;
                 }
             }
@@ -1462,44 +1462,44 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                         if (!(source->flags & 0x100000)) {
                             if (D_801198E0 == 1) {
                                 camera = D_801198D0;
-                                func_0020F85C(&camera->view, &source->pos, &aimDelta);
+                                CMtxF__TransformPoint(&camera->view, &source->pos, &aimDelta);
                                 depth = aimDelta.z;
                                 if (depth < 0.0f) {
                                     depth = -depth;
                                 }
-                                func_0022D2FC(source, &source->matrices[D_800B6D1C], camera, depth);
+                                CParticle__BuildMatrix(source, &source->matrices[D_800B6D1C], camera, depth);
                             } else {
-                                func_0022D2FC(source, &source->matrices[D_800B6D1C], 0, 0.0f);
+                                CParticle__BuildMatrix(source, &source->matrices[D_800B6D1C], 0, 0.0f);
                             }
                             source->flags |= 0x100000;
                         }
-                        func_0020D908(&mtx, &source->matrices[D_800B6D1C]);
+                        CMtxF__FromMtxAffine(&mtx, &source->matrices[D_800B6D1C]);
                         scale = 0.09765625f;
                         if (source->model->large != 0) {
                             scale = 2.857143f;
                         }
-                        func_0021034C(&mtx, scale, scale, scale);
+                        CMtxF__ScaleAxes(&mtx, scale, scale, scale);
                         if (source->model->flags & 8) {
-                            func_00210318(&mtx, 0.0f, -source->unk130 * source->unk134, 0.0f);
+                            CMtxF__Translate(&mtx, 0.0f, -source->unk130 * source->unk134, 0.0f);
                         }
                         break;
                     case 1:
                         extra = 0x400000;
-                        func_0020FC74(&mtx, -1.0f, 1.0f, -1.0f);
+                        CMtxF__SetScale(&mtx, -1.0f, 1.0f, -1.0f);
                         break;
                     default:
-                        func_0020FC24(&mtx, source->pos.x, source->pos.y, source->pos.z);
+                        CMtxF__SetTranslate(&mtx, source->pos.x, source->pos.y, source->pos.z);
                         break;
                 }
             } else if (entry->flags & 0x1000000) {
-                func_0020F79C(&mtx);
+                CMtxF__Identity(&mtx);
             } else {
                 if (entry->flags & 0x40000) {
-                    func_002673CC(&quat, owner, pos);
+                    GameObject_GetAimRotation(&quat, owner, pos);
                 } else {
                     quat = rotation;
                 }
-                func_00211114(&quat, &mtx);
+                CQuaternion__ToMatrix(&quat, &mtx);
             }
             n = entry->params->countBase + randomCount(entry->params->countRange);
             for (j = 0; j < n; j++) {
@@ -1553,12 +1553,12 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                 } else {
                     effect->spread = -(f32) randomCount(spread);
                 }
-                effect->rot[0] = func_0026D128(entry->unk2C[2]) * 6.2831855f;
-                effect->rot[2] = func_0026D128(entry->unk2C[1]) * 0.41887906f;
-                effect->rot[4] = func_0026D128(entry->unk2C[0]);
-                effect->rot[1] = func_0026D128(entry->unk2C[5]) * 6.2831855f;
-                effect->rot[3] = func_0026D128(entry->unk2C[4]) * 0.41887906f;
-                effect->rot[5] = func_0026D128(entry->unk2C[3]);
+                effect->rot[0] = RandomInPackedRange(entry->unk2C[2]) * 6.2831855f;
+                effect->rot[2] = RandomInPackedRange(entry->unk2C[1]) * 0.41887906f;
+                effect->rot[4] = RandomInPackedRange(entry->unk2C[0]);
+                effect->rot[1] = RandomInPackedRange(entry->unk2C[5]) * 6.2831855f;
+                effect->rot[3] = RandomInPackedRange(entry->unk2C[4]) * 0.41887906f;
+                effect->rot[5] = RandomInPackedRange(entry->unk2C[3]);
                 if (entry->flags & 2) {
                     effect->age = randomCount(life);
                 } else {
@@ -1568,43 +1568,43 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                 effect->life = life;
                 effect->unk12A = 0;
                 effect->unk12B = -1;
-                dir.x = func_0026D128(entry->direction[0]);
-                dir.y = func_0026D128(entry->direction[1]);
-                dir.z = func_0026D128(entry->direction[2]);
-                func_0020F040(&dir);
+                dir.x = RandomInPackedRange(entry->direction[0]);
+                dir.y = RandomInPackedRange(entry->direction[1]);
+                dir.z = RandomInPackedRange(entry->direction[2]);
+                CVector3__Normalize(&dir);
                 if (dir.x != 0.0f || dir.y != 0.0f || dir.z != 0.0f) {
-                    func_0020F85C(&mtx, &dir, &dirOut);
+                    CMtxF__TransformPoint(&mtx, &dir, &dirOut);
                 } else {
                     dirOut = dir;
                 }
                 if (mode == -8) {
                     effect->direction = D_800F1CE0.m_vNormal;
-                    func_0020F040(&effect->direction);
+                    CVector3__Normalize(&effect->direction);
                 } else {
                     effect->direction = dirOut;
                 }
-                effect->unk12C[0] = func_0026D128(entry->unk24[0]);
-                effect->unk12C[1] = func_0026D128(entry->unk24[2]);
-                effect->unk12C[2] = func_0026D128(entry->unk24[4]);
-                effect->unk12C[3] = func_0026D128(entry->unk24[1]);
-                effect->unk12C[4] = func_0026D128(entry->unk24[3]);
-                effect->unk12C[5] = func_0026D128(entry->unk24[5]);
+                effect->unk12C[0] = RandomInPackedRange(entry->unk24[0]);
+                effect->unk12C[1] = RandomInPackedRange(entry->unk24[2]);
+                effect->unk12C[2] = RandomInPackedRange(entry->unk24[4]);
+                effect->unk12C[3] = RandomInPackedRange(entry->unk24[1]);
+                effect->unk12C[4] = RandomInPackedRange(entry->unk24[3]);
+                effect->unk12C[5] = RandomInPackedRange(entry->unk24[5]);
                 /* Both branches are the same (as in Rage Wars); GCC merges them after loop
                  * optimisation, whose decisions still see both copies. */
                 if (entry->unk14 != 0) {
-                    effect->unk15C[0] = func_0026D128(entry->unk20[0]);
-                    effect->unk15C[1] = func_0026D128(entry->unk20[2]);
-                    effect->unk15C[2] = func_0026D128(entry->unk20[4]);
-                    effect->unk15C[3] = func_0026D128(entry->unk20[1]);
-                    effect->unk15C[4] = func_0026D128(entry->unk20[3]);
-                    effect->unk15C[5] = func_0026D128(entry->unk20[5]);
+                    effect->unk15C[0] = RandomInPackedRange(entry->unk20[0]);
+                    effect->unk15C[1] = RandomInPackedRange(entry->unk20[2]);
+                    effect->unk15C[2] = RandomInPackedRange(entry->unk20[4]);
+                    effect->unk15C[3] = RandomInPackedRange(entry->unk20[1]);
+                    effect->unk15C[4] = RandomInPackedRange(entry->unk20[3]);
+                    effect->unk15C[5] = RandomInPackedRange(entry->unk20[5]);
                 } else {
-                    effect->unk15C[0] = func_0026D128(entry->unk20[0]);
-                    effect->unk15C[1] = func_0026D128(entry->unk20[2]);
-                    effect->unk15C[2] = func_0026D128(entry->unk20[4]);
-                    effect->unk15C[3] = func_0026D128(entry->unk20[1]);
-                    effect->unk15C[4] = func_0026D128(entry->unk20[3]);
-                    effect->unk15C[5] = func_0026D128(entry->unk20[5]);
+                    effect->unk15C[0] = RandomInPackedRange(entry->unk20[0]);
+                    effect->unk15C[1] = RandomInPackedRange(entry->unk20[2]);
+                    effect->unk15C[2] = RandomInPackedRange(entry->unk20[4]);
+                    effect->unk15C[3] = RandomInPackedRange(entry->unk20[1]);
+                    effect->unk15C[4] = RandomInPackedRange(entry->unk20[3]);
+                    effect->unk15C[5] = RandomInPackedRange(entry->unk20[5]);
                 }
                 if ((entry->flags & 0x80000) && entry->unk8 == 1) {
                     effect->alphaByte = 0;
@@ -1615,16 +1615,16 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                 }
                 effect->region = region;
                 effect->pos = pos;
-                offset.x = func_0026D128(entry->offset[0]);
-                offset.y = func_0026D128(entry->offset[1]);
-                offset.z = func_0026D128(entry->offset[2]);
+                offset.x = RandomInPackedRange(entry->offset[0]);
+                offset.y = RandomInPackedRange(entry->offset[1]);
+                offset.z = RandomInPackedRange(entry->offset[2]);
                 if (offset.x != 0.0f || offset.y != 0.0f || offset.z != 0.0f) {
-                    func_0020F85C(&mtx, &offset, &offsetOut);
+                    CMtxF__TransformPoint(&mtx, &offset, &offsetOut);
                     if (!(entry->flags & 0x8000)) {
-                        func_0020EEF8(&offsetOut, &pos, &offsetOut);
+                        CVector3__Add(&offsetOut, &pos, &offsetOut);
                     }
                     if (effect->region != 0) {
-                        func_002688C8(effect, offsetOut, &effect->pos, &effect->region, (s8) entry->unkB,
+                        GameObject_TraceMove(effect, offsetOut, &effect->pos, &effect->region, (s8) entry->unkB,
                                       (s8) entry->unk9);
                     } else {
                         effect->pos = offsetOut;
@@ -1632,28 +1632,28 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                 }
                 effect->startPos = effect->pos;
                 effect->attachPos = effect->pos;
-                func_0020EF60(&effect->velocity, &dirOut, func_0026D128(entry->motion->speed));
+                CVector3__Scale(&effect->velocity, &dirOut, RandomInPackedRange(entry->motion->speed));
                 if (entry->flags & 0x20) {
-                    func_0020EEF8(&effect->velocity, &effect->velocity, &arg6);
+                    CVector3__Add(&effect->velocity, &effect->velocity, &arg6);
                 }
                 hue = 0;
                 if (entry->color->hueRange != 0) {
-                    hue = func_002113A4() % (entry->color->hueRange * 2) - (u8) entry->color->hueRange;
+                    hue = Random_Next() % (entry->color->hueRange * 2) - (u8) entry->color->hueRange;
                 }
-                sat = entry->color->satRange != 0 ? func_002113A4() % entry->color->satRange : 0;
-                val = entry->color->valRange != 0 ? func_002113A4() % entry->color->valRange : 0;
+                sat = entry->color->satRange != 0 ? Random_Next() % entry->color->satRange : 0;
+                val = entry->color->valRange != 0 ? Random_Next() % entry->color->valRange : 0;
                 r = entry->color->rgb0[0];
                 g = entry->color->rgb0[1];
                 b = entry->color->rgb0[2];
-                func_00228C40(hue, r, g, b, &h, &sv, &v);
-                func_00228FF8(sat, h, sv, v, &r, &g, &b);
-                func_002291D4(val, r, g, b, &r0, &g0, &b0);
+                Color_ShiftHue(hue, r, g, b, &h, &sv, &v);
+                Color_Saturate(sat, h, sv, v, &r, &g, &b);
+                Color_Darken(val, r, g, b, &r0, &g0, &b0);
                 r = entry->color->rgb1[0];
                 g = entry->color->rgb1[1];
                 b = entry->color->rgb1[2];
-                func_00228C40(hue, r, g, b, &h, &sv, &v);
-                func_00228FF8(sat, h, sv, v, &r, &g, &b);
-                func_002291D4(val, r, g, b, &r1, &g1, &b1);
+                Color_ShiftHue(hue, r, g, b, &h, &sv, &v);
+                Color_Saturate(sat, h, sv, v, &r, &g, &b);
+                Color_Darken(val, r, g, b, &r1, &g1, &b1);
                 effect->rgb0[0] = r0;
                 effect->rgb0[1] = g0;
                 effect->rgb0[2] = b0;
@@ -1665,11 +1665,11 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                 render->unk5 = entry->unkA;
                 render->unk4 = entry->unk9;
                 render->unk6 = entry->unkB;
-                render->unk8 = func_0026D128(entry->motion->size);
-                render->unkC = func_0026D210(entry->motion->unk8[0]);
-                render->unk10 = func_0026D210(entry->motion->unk8[1]);
-                render->unk14 = func_0026D210(entry->motion->unk8[2]);
-                render->unk18 = func_0026D210(entry->motion->unk8[3]);
+                render->unk8 = RandomInPackedRange(entry->motion->size);
+                render->unkC = HalfToFloat(entry->motion->unk8[0]);
+                render->unk10 = HalfToFloat(entry->motion->unk8[1]);
+                render->unk14 = HalfToFloat(entry->motion->unk8[2]);
+                render->unk18 = HalfToFloat(entry->motion->unk8[3]);
                 if (kind == 0x101 || kind == 0x128) {
                     render->flags |= 4;
                 }
@@ -1688,7 +1688,7 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                         }
                     }
                     if (other != 0) {
-                        func_002005D0(&sys->groups, other, effect);
+                        CList__InsertBefore(&sys->groups, other, effect);
                     } else if (effect->entry->flags & 0x2000) {
                         CList__AddHead(&sys->groups, effect);
                     } else {
@@ -1700,19 +1700,19 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                     render->flags |= 0x80000000;
                 }
                 vel = &effect->velocity;
-                func_0020EF60(vel, vel, D_800ACE10[0]);
+                CVector3__Scale(vel, vel, D_800ACE10[0]);
                 if ((kind == 0x2D || kind == 0x4F) && source->type == 2) {
                     if (D_800F1CE0.m_pInstance != 0) {
                         aimEffect(effect, vel);
                     }
                 }
                 effect->unk1BC = D_800ACE10[1];
-                func_0022D09C(effect, 0, 0);
+                CParticle__Attach(effect, 0, 0);
                 if (entry->unk6 != -1) {
-                    func_002350EC(D_801102B8, effect, entry->unk6);
+                    Trail_AddNode(D_801102B8, effect, entry->unk6);
                 }
                 if (entry->unk7 != -1) {
-                    effect->sound = func_00228AB0(D_8010FF34, entry->unk7);
+                    effect->sound = DLight_Spawn(D_8010FF34, entry->unk7);
                 } else {
                     effect->sound = 0;
                 }
@@ -1721,10 +1721,10 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                         case 0x22:
                         case 0x5F:
                         case 0x60:
-                            func_00232AC4(effect, sound);
+                            CParticle__StartLoopSound(effect, sound);
                             break;
                         default:
-                            func_00275544(sound, effect->pos, 0, -1);
+                            Sound__Play(sound, effect->pos, 0, -1);
                             break;
                     }
                 }

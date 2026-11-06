@@ -10,12 +10,12 @@ extern s32 D_800ADB5C;
 extern s32 D_800ADB30[];
 extern u8 D_800F7078[];
 
-void func_002241D8(void *world, CPlayer *player, s32 model, s32 arg3);
-void func_0021D39C(CPlayer *player, s32 arg1);
+void CScene__SetInstanceObjectType(void *world, CPlayer *player, s32 model, s32 arg3);
+void CGameObjectInstance__Draw(CPlayer *player, s32 arg1);
 
 /* Draws the player's model: picks it (single player, tag mode or the
-   character), then sets up the render state before func_0021D39C. */
-void func_0024972C(CPlayer *player, s32 arg1) {
+   character), then sets up the render state before CGameObjectInstance__Draw. */
+void CPlayer__DrawCharacter(CPlayer *player, s32 arg1) {
     s32 model;
     Gfx *g;
 
@@ -26,7 +26,7 @@ void func_0024972C(CPlayer *player, s32 arg1) {
     } else {
         model = D_800ADB30[player->m_CharacterActor.header.m_pIntelligence->m_Id];
     }
-    func_002241D8(D_800F7078, player, model, player->m_CharAnim);
+    CScene__SetInstanceObjectType(D_800F7078, player, model, player->m_CharAnim);
     g = D_800D8E24++;
     g->w0 = 0xE7000000;
     g->w1 = 0;
@@ -48,5 +48,5 @@ void func_0024972C(CPlayer *player, s32 arg1) {
     g = D_800D8E24++;
     g->w0 = 0xDB04001C;
     g->w1 = 0xFFFE;
-    func_0021D39C(player, arg1);
+    CGameObjectInstance__Draw(player, arg1);
 }

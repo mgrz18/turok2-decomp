@@ -1,4 +1,4 @@
-/* Module-2 copy of func_0041BA50 (same code; callee at its link address). */
+/* Module-2 copy of GameSettings_SetDefaults (same code; callee at its link address). */
 #include "common.h"
 #include "structs/game.h"
 
@@ -20,7 +20,7 @@ static __inline__ void InitSlot(CPlayerOptions *slot, u8 index) {
 }
 
 /* Default multiplayer setup. */
-void func_004549B0(GameSettings *s) {
+void GameSettings_SetDefaults_2(GameSettings *s) {
     s32 i;
 
     s->unk13 = 1;
@@ -39,18 +39,18 @@ void func_004549B0(GameSettings *s) {
     s->dmTimeLimit = 10;
     s->dmScoreLimit = 0;
     s->dmArena = 0;
-    s->dmSkill = 0;
-    s->dmUnk24 = 1;
+    s->dmTextureSet = 0;
+    s->dmCrosshairs = 1;
     s->tagTimeLimit = 0;
     s->tagScoreLimit = 0;
     s->tagArena = 0;
-    s->tagSkill = 0;
-    s->tagUnk29 = 1;
+    s->tagTextureSet = 0;
+    s->tagCrosshairs = 1;
     s->teamTimeLimit = 10;
     s->teamScoreLimit = 0;
     s->teamArena = 0;
-    s->teamSkill = 0;
-    s->teamUnk2E = 1;
+    s->teamTextureSet = 0;
+    s->teamCrosshairs = 1;
     s->hudAlpha = s->hudAlphaSetting.value;
     s->speed = 1.0f;
     for (i = 0; i < 10; i++) {

@@ -6,7 +6,7 @@ typedef struct {
     /* 0x04 */ f32 key;
 } KeyedRecord;
 
-s32 func_0023DB98(KeyedRecord *arg0, KeyedRecord *arg1) {
+s32 Collision_SortCompare(KeyedRecord *arg0, KeyedRecord *arg1) {
     s32 var_v0;
 
     var_v0 = 1;

@@ -45,8 +45,8 @@ typedef struct ObjRecAt20V2 ObjRecAt20V2;
 extern signed char D_8011AB47;
 struct ObjRecAt20V2;
 /* Turok 2 layouts (Rage Wars: 8 records of 0x96 bytes at 0xD0, local/mode at 0x1D/0x1E). */
-extern void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu);
-extern void func_00275A74();
+extern void TitleMenu_Single(void *arg0, struct ObjRecAt20V2 *menu);
+extern void Music_RestoreVolume();
 extern CPlayerOptions D_8011AB18;
 struct OSTask_t;
 struct OSTask_t {
@@ -340,10 +340,10 @@ typedef struct RenderSettings {
     s32 ready;
 } RenderSettings;
 extern s32 D_801308F8;
-extern s32 func_002855E8(char *);
-extern void func_00275A74(void);
+extern s32 Controller_ConfirmPressed(char *);
+extern void Music_RestoreVolume(void);
 extern void func_00430454(char *, s32);
-void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu) {
+void TitleMenu_Single(void *arg0, struct ObjRecAt20V2 *menu) {
     GameSettings *globals;
     CPlayerOptions *settings;
     ControllerProfile *profile;
@@ -359,7 +359,7 @@ void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu) {
     settings = &D_8011AB18;
     on = 1;
     for (profile = D_800F5EC0; i < 4; i++) {
-        if (func_002855E8(profile) != 0) {
+        if (Controller_ConfirmPressed(profile) != 0) {
             settings->m_bActive = on;
             D_8011AB47 = i;
             menu->unk20 = profile;
@@ -367,7 +367,7 @@ void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu) {
         }
         profile++;
     }
-    func_00275A74();
+    Music_RestoreVolume();
     func_00430454(&D_800F6CB0, -1);
     D_801308F8 = 1;
 }

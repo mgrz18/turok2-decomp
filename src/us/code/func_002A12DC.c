@@ -3,6 +3,6 @@
 
 extern s32 D_80125C48;
 
-void func_002A12DC(void) {
+void adecClearStopFlag(void) {
     D_80125C48 = 0;
 }

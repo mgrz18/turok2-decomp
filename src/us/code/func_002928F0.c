@@ -21,7 +21,7 @@ typedef struct {
 } MidiPlayer;
 
 /* Resets every channel to its defaults. */
-void func_002928F0(MidiPlayer *arg0) {
+void __initChanState(MidiPlayer *arg0) {
     s32 temp_v1;
     s32 var_a1;
 

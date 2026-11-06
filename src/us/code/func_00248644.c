@@ -5,11 +5,11 @@ extern s32 D_8011AAD8;
 extern s32 D_80110048;
 extern WeaponInfo *D_800AF670; /* D_800AF618[22] */
 
-s32 func_0026EFB8(s32 arg0);
+s32 Level_GetHub(s32 arg0);
 
 /* Collects key piece (id - 4000); key 4500 also counts per level and, once the
    sixth piece is found, flags the player and gives two rounds of ammo. */
-void func_00248644(u8 *player, s32 id) {
+void CPlayer__CollectKeyPiece(u8 *player, s32 id) {
     u8 *key;
     u32 level;
     AmmoInfo *info;
@@ -21,7 +21,7 @@ void func_00248644(u8 *player, s32 id) {
         key = player + (id - 4000);
         key[0x52C] += 0x11;
         if (id == 4500) {
-            level = func_0026EFB8(D_80110048) - 1;
+            level = Level_GetHub(D_80110048) - 1;
             if (level < 6) {
                 (player + level)[0x9FC]++;
             }

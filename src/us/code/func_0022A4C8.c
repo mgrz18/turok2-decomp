@@ -53,38 +53,38 @@ typedef struct Projectile {
 
 extern ProjNode *D_80119890;               /* current player */
 
-extern f32 func_0026D210(s32 halfFloat);
+extern f32 HalfToFloat(s32 halfFloat);
 extern f32 func_00298470(f32);             /* sqrtf */
-extern f32 func_002671B4(ProjNode *node);
+extern f32 GameObject_GetCollisionHeight(ProjNode *node);
 extern f32 func_0026841C(ProjNode *node);
-extern f32 func_002119FC(f32 lo, f32 hi);   /* random in range */
-extern f32 func_0021153C(f32);             /* acosf */
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
-extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-extern void func_0020F70C(CVector3 *v, f32 max);
-extern void func_0020F040(CVector3 *v);
-extern void func_0020E810(CQuaternion *out, CVector3 *dir);
-extern void func_0020DCC8(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b);
-extern void func_00211114(CQuaternion *q, CMtxF *out);
-extern void func_0020F85C(CMtxF *m, CVector3 *in, CVector3 *out);
-extern void *func_00275F7C(void);
-extern ProjSound *func_00275C6C(void *pool, s32 id, CVector3 *pos, CVector3 *pos2, s32 arg4);
-extern void func_00232B40(Projectile *p);
-extern void func_00229618(Projectile *p, f32 scale);
-extern void func_002298C4(Projectile *p);
-extern void func_00229D10(Projectile *p);
-extern void func_0022A1A4(Projectile *p);
+extern f32 Random_Blend(f32 lo, f32 hi);   /* random in range */
+extern f32 Math_AcosLookup(f32);             /* acosf */
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+extern void CVector3__LimitLength(CVector3 *v, f32 max);
+extern void CVector3__Normalize(CVector3 *v);
+extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
+extern void CQuaternion__SlerpFast(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b);
+extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *out);
+extern void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
+extern void *LoopSounds_Get(void);
+extern ProjSound *LoopSounds_Start(void *pool, s32 id, CVector3 *pos, CVector3 *pos2, s32 arg4);
+extern void CParticle__StopLoopSound(Projectile *p);
+extern void CParticle__Wobble(Projectile *p, f32 scale);
+extern void CParticle__UpdateHomingMissile(Projectile *p);
+extern void CParticle__UpdateReturning(Projectile *p);
+extern void CParticle__UpdateHoming(Projectile *p);
 
-/* func_00232AC4, inlined: (re)start the projectile's looping sound unless it is already playing. */
+/* CParticle__StartLoopSound, inlined: (re)start the projectile's looping sound unless it is already playing. */
 static __inline__ void PlayLoopingSound(Projectile *o, s32 id) {
     if (o->sound != NULL) {
         if (o->sound->id == id && o->sound->state != -1) {
             return;
         }
-        func_00232B40(o);
+        CParticle__StopLoopSound(o);
     }
-    o->sound = func_00275C6C(func_00275F7C(), id, &o->pos, &o->pos, -1);
+    o->sound = LoopSounds_Start(LoopSounds_Get(), id, &o->pos, &o->pos, -1);
 }
 
 static __inline__ void Steer(Projectile *o, f32 a) {
@@ -94,20 +94,20 @@ static __inline__ void Steer(Projectile *o, f32 a) {
 
     if (a != 0.0f) {
         vel = o->heading;
-        func_0020EF60(&push, &vel, a);
-        func_0020EEF8(&o->velocity, &o->velocity, &push);
+        CVector3__Scale(&push, &vel, a);
+        CVector3__Add(&o->velocity, &o->velocity, &push);
         len = func_00298470(o->velocity.x * o->velocity.x + o->velocity.y * o->velocity.y
                             + o->velocity.z * o->velocity.z);
-        lim = func_0026D210(o->def->limits->maxSpeed);
+        lim = HalfToFloat(o->def->limits->maxSpeed);
         if (a > 0.0f) {
-            if (lim < len) func_0020EF60(&o->velocity, &vel, lim);
+            if (lim < len) CVector3__Scale(&o->velocity, &vel, lim);
         } else {
-            if (len < lim) func_0020EF60(&o->velocity, &vel, lim);
+            if (len < lim) CVector3__Scale(&o->velocity, &vel, lim);
         }
     }
 }
 
-void func_0022A4C8(Projectile *o) {
+void CParticle__Steer(Projectile *o) {
     CVector3 d;
     CVector3 tp;
     CVector3 vv;
@@ -137,15 +137,15 @@ void func_0022A4C8(Projectile *o) {
                     h = p->height;
                     tp = p->pos;
                     tp.y += h;
-                    tp.y += func_002671B4(p2) * fa;
-                    func_0020EF2C(&d, tpp, &o->pos);
+                    tp.y += GameObject_GetCollisionHeight(p2) * fa;
+                    CVector3__Subtract(&d, tpp, &o->pos);
                     k = func_00298470(d.x * d.x + d.y * d.y + d.z * d.z);
                     if (k < 512.0f) {
                         k = 1.0f - k * (1.0f / 512);
-                        d.x *= k * func_002119FC(fa, fb);
-                        d.y *= k * func_002119FC(fa, fb);
-                        d.z *= k * func_002119FC(fa, fb);
-                        func_0020EF2C(velp, velp, &d);
+                        d.x *= k * Random_Blend(fa, fb);
+                        d.y *= k * Random_Blend(fa, fb);
+                        d.z *= k * Random_Blend(fa, fb);
+                        CVector3__Subtract(velp, velp, &d);
                     }
                     p2 = p->next;
                     p = p2;
@@ -155,24 +155,24 @@ void func_0022A4C8(Projectile *o) {
             tt = func_0026841C(t);
             tp = t->pos;
             tp.y += tt;
-            func_0020EF2C(&d, &tp, &o->pos);
+            CVector3__Subtract(&d, &tp, &o->pos);
             fc = 0.3f;
             fd = 0.7f;
-            d.x *= func_002119FC(fc, fd);
-            d.y *= func_002119FC(fc, fd);
-            d.z *= func_002119FC(fc, fd);
-            func_0020EEF8(&o->velocity, &o->velocity, &d);
-            func_0020F70C(&o->velocity, func_0026D210(o->def->limits->maxSpeed));
+            d.x *= Random_Blend(fc, fd);
+            d.y *= Random_Blend(fc, fd);
+            d.z *= Random_Blend(fc, fd);
+            CVector3__Add(&o->velocity, &o->velocity, &d);
+            CVector3__LimitLength(&o->velocity, HalfToFloat(o->def->limits->maxSpeed));
             return;
         case 0xE:
-            func_0022A1A4(o);
+            CParticle__UpdateHoming(o);
             return;
         case 0xB:
         case 0x129:
-            func_002298C4(o);
+            CParticle__UpdateHomingMissile(o);
             return;
         case 0x68:
-            func_00229D10(o);
+            CParticle__UpdateReturning(o);
             return;
         case 0x5F:
         case 0x60:
@@ -188,35 +188,35 @@ void func_0022A4C8(Projectile *o) {
                 tt = func_0026841C(t);
                 tp = t->pos;
                 tp.y += tt;
-                tp.y += func_002671B4(t) * 0.5f;
-                func_0020EF2C(&dir, &tp, &o->pos);
-                func_0020F040(&dir);
-                func_0020E810(&q1, &dir);
-                func_0020E810(&q0, &o->heading);
+                tp.y += GameObject_GetCollisionHeight(t) * 0.5f;
+                CVector3__Subtract(&dir, &tp, &o->pos);
+                CVector3__Normalize(&dir);
+                CQuaternion__FromDirection(&q1, &dir);
+                CQuaternion__FromDirection(&q0, &o->heading);
                 vv = o->heading;
-                func_0020F040(&vv);
+                CVector3__Normalize(&vv);
                 speed = func_00298470(o->velocity.x * o->velocity.x + o->velocity.y * o->velocity.y
                                       + o->velocity.z * o->velocity.z);
-                ang = func_0021153C(vv.x * dir.x + vv.y * dir.y + vv.z * dir.z);
+                ang = Math_AcosLookup(vv.x * dir.x + vv.y * dir.y + vv.z * dir.z);
                 tt = (f32)o->def->turnRate * 0.017453294f;
                 w = 1.0f;
                 if (tt < ang) {
                     w = tt / ang;
                 }
-                func_0020DCC8(&q2, w, &q0, &q1);
-                func_00211114(&q2, &mt);
+                CQuaternion__SlerpFast(&q2, w, &q0, &q1);
+                CQuaternion__ToMatrix(&q2, &mt);
                 *(s32 *)&ax.x = 0;
                 *(s32 *)&ax.y = 0;
                 ax.z = 1.0f;
-                func_0020F85C(&mt, &ax, &o->heading);
-                func_0020EF60(&o->velocity, &o->heading, speed);
+                CMtxF__TransformPoint(&mt, &ax, &o->heading);
+                CVector3__Scale(&o->velocity, &o->heading, speed);
             }
         }
     }
     if (!(o->flags & 0x70000)) {
-        Steer(o, func_0026D210(o->def->limits->thrust));
+        Steer(o, HalfToFloat(o->def->limits->thrust));
     }
     if (!(o->flags & 0x30000)) {
-        func_00229618(o, 1.0f);
+        CParticle__Wobble(o, 1.0f);
     }
 }

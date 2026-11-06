@@ -9,24 +9,24 @@ typedef struct {
 } Actor00402ADC;
 
 extern u8 D_800F7078[];
-s32 func_00225F6C(void *world, s32 a1, s32 a2, s32 a3, Actor00402ADC **out, s32 max);
-void func_00401E30(void *state, s32 a1);
-void func_00243414(s32 a0, s32 a1, s32 a2);
-s32 func_00403660(s32 a0, s32 a1, s32 a2);
-void func_0025E4B8(void);
+s32 CScene__FindInstances(void *world, s32 a1, s32 a2, s32 a3, Actor00402ADC **out, s32 max);
+void MantidQueen_Init(void *state, s32 a1);
+void CAI__SetMode(s32 a0, s32 a1, s32 a2);
+s32 MantidQueen_Draw(s32 a0, s32 a1, s32 a2);
+void EnemyAI_HeadNodeCallback(void);
 
-void func_00402ADC(s32 a0, s32 a1) {
+void MantidQueen_EnterStart(s32 a0, s32 a1) {
     Actor00402ADC *found[2];
     Actor00402ADC *actor;
     s32 count;
     s32 i;
 
-    count = func_00225F6C(D_800F7078, 0x451, 9, -1, found, 2);
+    count = CScene__FindInstances(D_800F7078, 0x451, 9, -1, found, 2);
     for (i = 0; i < count; i++) {
         actor = found[i];
-        actor->onEvent = func_00403660;
-        actor->onUpdate = func_0025E4B8;
+        actor->onEvent = MantidQueen_Draw;
+        actor->onUpdate = EnemyAI_HeadNodeCallback;
     }
-    func_00401E30(&D_8012F3A0, a0);
-    func_00243414(a0, a1, 1);
+    MantidQueen_Init(&D_8012F3A0, a0);
+    CAI__SetMode(a0, a1, 1);
 }

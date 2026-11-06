@@ -3,12 +3,12 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00291270(unsigned char *source, unsigned char *destination, int count);
+extern void alCopy(unsigned char *source, unsigned char *destination, int count);
 extern s32 osSetIntMask(s32);
-void func_00291034(ALEventQueue *evtq, ALEvent *evt, s32 delta)
+void alEvtqPostEvent(ALEventQueue *evtq, ALEvent *evt, s32 delta)
 {
-    extern void func_002933E0(ListLink *, ListLink *);
-    extern void func_002933B0(ListLink *);
+    extern void alLink(ListLink *, ListLink *);
+    extern void alUnlink(ListLink *);
     ALEventListItem *item;
     ALEventListItem *nextItem;
     ListLink *node;
@@ -20,8 +20,8 @@ void func_00291034(ALEventQueue *evtq, ALEvent *evt, s32 delta)
         osSetIntMask(mask);
         return;
     }
-    func_002933B0((ListLink *)item);
-    ((void (*)(void *, void *, s32))func_00291270)(evt, &item->evt, sizeof(*evt));
+    alUnlink((ListLink *)item);
+    ((void (*)(void *, void *, s32))alCopy)(evt, &item->evt, sizeof(*evt));
     if (delta == 0x7FFFFFFF)
         postAtEnd = -1;
     for (node = &evtq->allocList; node != 0; node = node->next) {
@@ -30,14 +30,14 @@ void func_00291034(ALEventQueue *evtq, ALEvent *evt, s32 delta)
                 item->delta = 0;
             else
                 item->delta = delta;
-            func_002933E0((ListLink *)item, node);
+            alLink((ListLink *)item, node);
             break;
         } else {
             nextItem = (ALEventListItem *)node->next;
             if (delta < nextItem->delta) {
                 item->delta = delta;
                 nextItem->delta -= delta;
-                func_002933E0((ListLink *)item, node);
+                alLink((ListLink *)item, node);
                 break;
             }
             delta -= nextItem->delta;

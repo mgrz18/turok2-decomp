@@ -5,6 +5,6 @@ typedef struct {
     /* 0x3C */ s32 unk3C;
 } Arg0;
 
-void func_00293E60(Arg0 *arg0, s16 arg1) {
+void alSndpSetSound(Arg0 *arg0, s16 arg1) {
     arg0->unk3C = (s32) arg1;
 }

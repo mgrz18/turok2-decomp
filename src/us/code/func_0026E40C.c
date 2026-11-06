@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 func_002759C4(u16);
+s32 Music_SetTrack(u16);
 
 /* The mode parameter this AI callback is handed: only the field it reads. */
 typedef struct AIModeParam {
@@ -8,6 +8,6 @@ typedef struct AIModeParam {
     /* 0x6 */ u16 value;
 } AIModeParam;                         /* extern */
 
-void func_0026E40C(AIModeParam *arg0) {
-    func_002759C4(arg0->value);
+void Event_SetMusicRemote(AIModeParam *arg0) {
+    Music_SetTrack(arg0->value);
 }

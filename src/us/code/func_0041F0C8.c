@@ -22,26 +22,26 @@ extern u8 D_0043C1C4[];
 extern u8 D_0043BD68[];
 extern u8 D_0043BDF8[];
 extern u8 D_0043BEF4[];
-u32 func_00426E6C(u32 n);
-s32 func_004267A0(s32 pad, s32 *out);
-s32 func_0042670C(s32 pad, s32 *out);
-s32 func_00426A94(s32 pad, u8 *ext);
-s32 func_00426164(s32 pad, s32 size, s32 buf, char *n1, u8 *ext, char *n2);
-void func_002053A8(s32 a);
-void func_002052D8(s32 a, s32 b);
-void func_00412B14(void);
-void func_00412438(s32 a);
-void func_00416644(u8 *a, void *b, void *c, s32 d, s32 e);
+u32 Pak_BytesToPages(u32 n);
+s32 Pak_GetFreePages(s32 pad, s32 *out);
+s32 Pak_CountEmptyNotes(s32 pad, s32 *out);
+s32 Pak_FindFreeExtLetter(s32 pad, u8 *ext);
+s32 Pak_SaveNoteVerified(s32 pad, s32 size, s32 buf, char *n1, u8 *ext, char *n2);
+void CCache__Flush(s32 a);
+void CCache__Deallocate(s32 a, s32 b);
+void Cinema_StopAtEnd(void);
+void Cinema_RequestById(s32 a);
+void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, s32 e);
 
 static __inline__ void FreeAll(void) {
     if (D_800C2010 != 0 || D_800C2014 != 0) {
-        func_002053A8(0);
+        CCache__Flush(0);
     }
     if (D_800C2010 != 0) {
-        func_002052D8(0, D_800C2010);
+        CCache__Deallocate(0, D_800C2010);
     }
     if (D_800C2014 != 0) {
-        func_002052D8(0, D_800C2014);
+        CCache__Deallocate(0, D_800C2014);
     }
     D_800C2010 = 0;
     D_800C2014 = 0;
@@ -49,7 +49,7 @@ static __inline__ void FreeAll(void) {
     D_800C201C = 0;
 }
 
-s32 func_0041F0C8(s32 unused, Menu *own) {
+s32 PakMenu_WriteSaveGame(s32 unused, Menu *own) {
     u8 ext[8];
     PakQuery pad;
     CPlayer *plr;
@@ -76,23 +76,23 @@ s32 func_0041F0C8(s32 unused, Menu *own) {
     plr = pp;
     size = D_800F70A8 + 0x688;
     if (D_80130984 != 0) {
-        need = func_00426E6C(size);
-        r = func_004267A0(pad.channel, &pad.freeBytes);
+        need = Pak_BytesToPages(size);
+        r = Pak_GetFreePages(pad.channel, &pad.freeBytes);
         if (r == 0) {
             if (pad.freeBytes >= need) {
-                r = func_0042670C(pad.channel, &pad.freeNotes);
+                r = Pak_CountEmptyNotes(pad.channel, &pad.freeNotes);
                 if (r == 0 && pad.freeNotes != 0) {
                     ok = 0;
-                    r = func_00426A94(pad.channel, ext);
+                    r = Pak_FindFreeExtLetter(pad.channel, ext);
                     if (r == 0) {
                         written = 1;
                         padv = pad.channel;
-                        r = func_00426164(padv, size, D_800C2018, D_800B45CC, ext, D_800B45D8);
+                        r = Pak_SaveNoteVerified(padv, size, D_800C2018, D_800B45CC, ext, D_800B45D8);
                     }
                 }
             }
             if (ok != 0) {
-                func_00416644(D_80119E2C, D_0043C1C4, plr, plr->m_ContState.m_pContState, own->desc);
+                MenuPool_OpenMenu(D_80119E2C, D_0043C1C4, plr, plr->m_ContState.m_pContState, own->desc);
                 return 0;
             }
         }
@@ -102,14 +102,14 @@ s32 func_0041F0C8(s32 unused, Menu *own) {
         return 1;
     }
     if (r == 0) {
-        func_00412B14();
-        func_00412438(0x191);
+        Cinema_StopAtEnd();
+        Cinema_RequestById(0x191);
     }
     err = r;
     if (err == 0) {
-        func_00416644(D_80119E2C, D_0043BD68, plr, plr->m_ContState.m_pContState, (s32)D_0043BEF4);
+        MenuPool_OpenMenu(D_80119E2C, D_0043BD68, plr, plr->m_ContState.m_pContState, (s32)D_0043BEF4);
     } else {
-        func_00416644(D_80119E2C, D_0043BDF8, plr, plr->m_ContState.m_pContState, (s32)D_0043BEF4);
+        MenuPool_OpenMenu(D_80119E2C, D_0043BDF8, plr, plr->m_ContState.m_pContState, (s32)D_0043BEF4);
     }
     return 1;
 }

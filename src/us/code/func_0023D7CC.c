@@ -16,9 +16,9 @@ typedef union DLCmd {
     u8 b[8];
 } DLCmd;
 
-char *func_002017D4(s32 *list, s32 index);
-void func_0020F85C(f32 (*mtx)[4], CVector3 *in, ProjVertex *out);
-void func_0023D4D4(ModelSweep *ms, ProjVertex **tri);
+char *CISet__GetBlock(s32 *list, s32 index);
+void CMtxF__TransformPoint(f32 (*mtx)[4], CVector3 *in, ProjVertex *out);
+void ModelSweep_TestTriangle(ModelSweep *ms, ProjVertex **tri);
 
 #define G_VTX 0x01
 #define G_TRI1 0x05
@@ -27,7 +27,7 @@ void func_0023D4D4(ModelSweep *ms, ProjVertex **tri);
 
 /* Walk one polygon group's display list (F3DEX2 G_VTX/G_TRI1/G_TRI2) and
  * sweep against every triangle that is not wholly outside the sweep. */
-void func_0023D7CC(ModelSweep *ms, s32 *group) {
+void ModelSweep_TestGroup(ModelSweep *ms, s32 *group) {
     ProjVertex verts[32];
     ProjVertex *tri[3];
     CVector3 pos;
@@ -43,13 +43,13 @@ void func_0023D7CC(ModelSweep *ms, s32 *group) {
     s32 flags;
     f32 z;
 
-    header = (u32 *)func_002017D4(group, 0);
+    header = (u32 *)CISet__GetBlock(group, 0);
     if (ms->special == 0 && (*header & 0x280)) {
         return;
     }
     doubleSided = *header & 4;
     sweep = ms->sweep;
-    cmd = (DLCmd *)func_002017D4(group, 1);
+    cmd = (DLCmd *)CISet__GetBlock(group, 1);
     do {
         if (sweep->stop != 0) {
             return;
@@ -62,12 +62,12 @@ void func_0023D7CC(ModelSweep *ms, s32 *group) {
                 tri[1] = &verts[(cmd->w0 & 0xFE00) >> 9];
                 tri[2] = &verts[(cmd->w0 & 0xFF) >> 1];
                 if (!(tri[0]->flags & tri[1]->flags & tri[2]->flags)) {
-                    func_0023D4D4(ms, tri);
+                    ModelSweep_TestTriangle(ms, tri);
                     if (doubleSided) {
                         swap = tri[0];
                         tri[0] = tri[2];
                         tri[2] = swap;
-                        func_0023D4D4(ms, tri);
+                        ModelSweep_TestTriangle(ms, tri);
                     }
                 }
                 if (op == G_TRI2) {
@@ -75,12 +75,12 @@ void func_0023D7CC(ModelSweep *ms, s32 *group) {
                     tri[1] = &verts[(cmd->w1 & 0xFE00) >> 9];
                     tri[2] = &verts[(cmd->w1 & 0xFF) >> 1];
                     if (!(tri[0]->flags & tri[1]->flags & tri[2]->flags)) {
-                        func_0023D4D4(ms, tri);
+                        ModelSweep_TestTriangle(ms, tri);
                         if (doubleSided) {
                             swap = tri[0];
                             tri[0] = tri[2];
                             tri[2] = swap;
-                            func_0023D4D4(ms, tri);
+                            ModelSweep_TestTriangle(ms, tri);
                         }
                     }
                 }
@@ -94,7 +94,7 @@ void func_0023D7CC(ModelSweep *ms, s32 *group) {
                     pos.x = src[0];
                     pos.y = src[1];
                     pos.z = src[2];
-                    func_0020F85C(ms->inverse, &pos, v);
+                    CMtxF__TransformPoint(ms->inverse, &pos, v);
                     flags = 2;
                     if (v->x < 0.0f) {
                         flags = 1;

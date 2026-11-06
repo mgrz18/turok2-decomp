@@ -10,17 +10,17 @@ typedef struct Owner {
     StrideTable *table;   /* 0x7C */
 } Owner;
 
-extern s32 func_00266D24(void *entries, s32 count, s32 id);
-extern s32 func_0020185C(s32 arg0, s32 arg1, s32 index, s32 *out);
-extern s32 func_0020367C(s32 arg0, s32 arg1, s32 arg2, s32 flags, s32 arg4, void *arg5, void *arg6, s32 arg7);
-extern u8 func_00200AE0[];
+extern s32 BinarySearch(void *entries, s32 count, s32 id);
+extern s32 CISet__GetROMAddressAndSize(s32 arg0, s32 arg1, s32 index, s32 *out);
+extern s32 CCache__Request(s32 arg0, s32 arg1, s32 arg2, s32 flags, s32 arg4, void *arg5, void *arg6, s32 arg7);
+extern u8 ProPack__Decompress[];
 extern u8 D_800A5F48[];
 
-s32 func_00224DF4(Owner *owner, s32 id, s32 flags, s32 arg3) {
+s32 CScene__LoadGraphicSet(Owner *owner, s32 id, s32 flags, s32 arg3) {
     s32 index;
     s32 out;
 
-    index = func_00266D24(owner->table->entries, owner->table->count, id);
+    index = BinarySearch(owner->table->entries, owner->table->count, id);
     if (index == -1) {
         return 0;
     }
@@ -42,6 +42,6 @@ s32 func_00224DF4(Owner *owner, s32 id, s32 flags, s32 arg3) {
         flags |= 4;
         break;
     }
-    return func_0020367C(0, func_0020185C(owner->unk48, owner->unk1C, index, &out), out, flags, 0,
-                         func_00200AE0, D_800A5F48, arg3);
+    return CCache__Request(0, CISet__GetROMAddressAndSize(owner->unk48, owner->unk1C, index, &out), out, flags, 0,
+                         ProPack__Decompress, D_800A5F48, arg3);
 }

@@ -13,9 +13,9 @@ struct RecordRecAt1C {
     s32 e;
 };
 struct RecordRecAt1C;
-extern void func_002052D8(void *arg0, void *arg1);
-extern void func_00425638(struct RecordRecAt1C *arg0);
-void func_00425638(struct RecordRecAt1C *arg0) {
+extern void CCache__Deallocate(void *arg0, void *arg1);
+extern void GfxPool_Free(struct RecordRecAt1C *arg0);
+void GfxPool_Free(struct RecordRecAt1C *arg0) {
     s32 temp_a1;
     s32 temp_a1_2;
     s32 temp_a1_3;
@@ -25,25 +25,25 @@ void func_00425638(struct RecordRecAt1C *arg0) {
     s32 var_v1;
     temp_a1 = arg0->b;
     if (temp_a1 != 0) {
-        func_002052D8(0, temp_a1);
+        CCache__Deallocate(0, temp_a1);
     }
     temp_a1_2 = arg0->c;
     if (temp_a1_2 != 0) {
-        func_002052D8(0, temp_a1_2);
+        CCache__Deallocate(0, temp_a1_2);
     }
     temp_a1_3 = arg0->d;
     if (temp_a1_3 != 0) {
-        func_002052D8(0, temp_a1_3);
+        CCache__Deallocate(0, temp_a1_3);
     }
     temp_a1_4 = arg0->e;
     if (temp_a1_4 != 0) {
-        func_002052D8(0, temp_a1_4);
+        CCache__Deallocate(0, temp_a1_4);
     }
     var_s1 = 0;
     do {
         temp_a1_5 = arg0->values[var_s1];
         if (temp_a1_5 != 0) {
-            func_002052D8(0, temp_a1_5);
+            CCache__Deallocate(0, temp_a1_5);
         }
         var_s1 += 1;
     } while (var_s1 < 3);

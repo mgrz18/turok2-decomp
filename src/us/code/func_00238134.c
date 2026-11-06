@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00246690(void *, s32, Triple, s32);
+extern void Actor_SpawnParticle(void *, s32, Triple, s32);
 void func_00238134(void *actor,int unused1,int unused2,Triple input,int event) {
- func_00246690(actor,event,input,0);
+ Actor_SpawnParticle(actor,event,input,0);
 }

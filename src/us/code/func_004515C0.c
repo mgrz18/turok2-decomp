@@ -2,8 +2,8 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 
-s32 func_004160F0(MenuItem *item); /* length of the item's text line */
-s32 func_0029E3E0(char *buf, const char *fmt, ...); /* sprintf */
+s32 MenuItem_TextLength(MenuItem *item); /* length of the item's text line */
+s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 extern char D_800B5F3C[];
 extern char D_800B61D8[];
@@ -14,7 +14,7 @@ extern char D_800B6238[];
 extern char D_800B6250[];
 
 /* Names setting 0x27. */
-s32 func_004515C0(MenuItem *item) {
+s32 FragTagMenu_LevelLabel_2(MenuItem *item) {
     switch (D_8011AAD8.tagArena) {
     case 0:
         item->text = D_800B5F3C;

@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern u8 D_80121420;
-void func_00461ABC(u8 cmd) {
+void __osPfsRequestData_2(u8 cmd) {
     extern OSPifRam D_80130E20;
     extern u8 D_801213DC;
     u8 *ptr;

@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/player.h"
 
-extern f32 func_00211774(f32 value, f32 target, f32 rate);
-extern void func_00253DE0(CPlayer *player, s32 sound);
-extern void func_00253E68(CPlayer *player);
+extern f32 Math_Approach(f32 value, f32 target, f32 rate);
+extern void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 sound);
+extern void CPlayer__StopWeaponBackgroundSound(CPlayer *player);
 
-void func_002593D8(void *obj, CAI *state) {
+void WeaponActor_Sway_AF084(void *obj, CAI *state) {
     CPlayer *player = *(CPlayer **)((u8 *)obj + 0x1A8);
     f32 target;
     f32 rate;
@@ -26,7 +26,7 @@ void func_002593D8(void *obj, CAI *state) {
             rate *= 4.0f;
         }
         if (player->m_pLoopingSound_WeaponBackground == 0) {
-            func_00253DE0(player, 0x467);
+            CPlayer__StartWeaponBackgroundSound(player, 0x467);
         }
     } else {
         rate = 0.008726647124f;
@@ -35,10 +35,10 @@ void func_002593D8(void *obj, CAI *state) {
             target = 0.017453294f;
         }
         if (player->m_pLoopingSound_WeaponBackground != 0) {
-            func_00253E68(player);
+            CPlayer__StopWeaponBackgroundSound(player);
         }
     }
-    tilt = func_00211774(state->m_Weapon.m_BarrelSpeed, target, rate);
+    tilt = Math_Approach(state->m_Weapon.m_BarrelSpeed, target, rate);
     state->m_Weapon.m_BarrelSpeed = tilt;
     state->m_Weapon.m_BarrelAngle -= tilt;
 }

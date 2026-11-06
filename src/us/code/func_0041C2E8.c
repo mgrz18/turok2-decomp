@@ -4,9 +4,9 @@
 #include "rw/abu_types.h"
 
 extern u8 D_8011AAF3;
-extern s32 func_0041648C(void *, s32, s32, s32, s32, s32);
-s32 func_0041C2E8(void *first, void *second) {
+extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
+s32 OptionsMenu_StepTwoPlayerLayout(void *first, void *second) {
     u8 *option = &D_8011AAF3;
-    *option = func_0041648C(second, *option, 1, 0, 1, 1);
+    *option = Menu_StepValue(second, *option, 1, 0, 1, 1);
     return 0;
 }

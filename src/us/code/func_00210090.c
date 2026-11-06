@@ -15,10 +15,10 @@ typedef struct {
 
 extern CVector3 D_800A5404; /* {0, 1, 0} */
 
-void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b); /* cross product */
+void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b); /* cross product */
 
 /* Builds an orientation matrix whose forward axis is direction. */
-void func_00210090(DirMtx *m, CVector3 *direction) {
+void CMtxF__SetLookDirection(DirMtx *m, CVector3 *direction) {
     CVector3 up;
 
     up = D_800A5404;
@@ -27,9 +27,9 @@ void func_00210090(DirMtx *m, CVector3 *direction) {
         m->right.z = 0;
         m->right.x = 1.0f;
     } else {
-        func_0020EFDC(&m->right, &up, direction);
+        CVector3__Cross(&m->right, &up, direction);
     }
-    func_0020EFDC(&m->up, &m->right, direction);
+    CVector3__Cross(&m->up, &m->right, direction);
     m->forward = *direction;
     m->m03 = m->m13 = m->m23 = m->m30 = m->m31 = m->m32 = 0.0f;
     m->m33 = 1.0f;

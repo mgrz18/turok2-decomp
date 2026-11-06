@@ -3,7 +3,7 @@
 
 #define TEAM(p) (*(s32 *) ((char *) (p) + 0xBF4))
 
-void func_00256804(char *player, char *other, s32 event) {
+void CPlayerPool__AddTeamScore(char *player, char *other, s32 event) {
     GameMatch *score = &D_8011ACB0;
     s32 *count;
 

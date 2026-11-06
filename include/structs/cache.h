@@ -1,7 +1,7 @@
 #ifndef STRUCTS_CACHE_H
 #define STRUCTS_CACHE_H
 
-/* The resource cache (CHashTable__Construct to func_00206990): a CMemEntry per
+/* The resource cache (CHashTable__Construct to Texture_DecompressCallback): a CMemEntry per
  * block of loaded data and a CCacheEntry per load request. Names from
  * Turok 3's cache.h (references/turok3/include/cache.h), which has the
  * same objects; Turok 2's CMemEntry has a lock count at 0x08 that Turok 3

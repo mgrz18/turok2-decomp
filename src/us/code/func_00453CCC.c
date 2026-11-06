@@ -15,12 +15,12 @@ struct CheatCode {
 extern int D_80110060;
 struct CheatCode;
 typedef struct CheatCode CheatCode;
-s32 func_00275624(s32 arg0);
+s32 Sound__Play2D(s32 arg0);
 extern CheatCode D_00439690[];
 extern u8 D_800C1F8C[];
 extern s32 D_80130920;
-extern s32 func_0029E4C0(u8 *);
-s32 func_00453CCC(void)
+extern s32 strlen(u8 *);
+s32 EnterCheatMenu_Enter_2(void)
 {
     u32 i;
     s32 j;
@@ -32,11 +32,11 @@ s32 func_00453CCC(void)
     for (i = 0; i < 12; i++) {
         code = D_00439690[i].code;
         j = 0;
-        if (func_0029E4C0(code) != func_0029E4C0(D_800C1F8C)) {
+        if (strlen(code) != strlen(D_800C1F8C)) {
             match = 0;
         } else {
             for (;;) {
-                if (j < func_0029E4C0(code)) {
+                if (j < strlen(code)) {
                     if ((code[j] ^ j) != D_800C1F8C[j]) {
                         match = 0;
                         break;
@@ -57,7 +57,7 @@ s32 func_00453CCC(void)
             hasSound = D_00439690[i].sound != 0;
             D_80130920 = i;
             if (hasSound) {
-                func_00275624((s16)D_00439690[i].sound);
+                Sound__Play2D((s16)D_00439690[i].sound);
             }
         }
     }

@@ -6,8 +6,8 @@ typedef struct CKeyEvent {
     /* 0x06 */ u16 param; /* sound id, ... */
 } CKeyEvent;
 
-s32 func_00275624(s32);
+s32 Sound__Play2D(s32);
 
-void func_0026E3EC(s32 arg0, s32 arg1, CKeyEvent *arg2) {
-    func_00275624((s16) arg2->param);
+void Event_PlaySound(s32 arg0, s32 arg1, CKeyEvent *arg2) {
+    Sound__Play2D((s16) arg2->param);
 }

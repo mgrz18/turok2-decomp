@@ -4,12 +4,12 @@
 /* The sound manager and its voices.
  *
  * One SndMgr drives all sound effects (Rage Wars' audio context,
- * ContextRecAt2BC0 at D_8010C080 there). func_00270240 builds it: an audio
+ * ContextRecAt2BC0 at D_8010C080 there). CAudioWorld__Initialize builds it: an audio
  * heap, the libaudio synthesizer and sound player, the sound bank, then the
  * voice queue, the music sequence, the 17-voice pool and the effects block.
  * Its CMutex is taken around every public call. A playing sound is a SndVoice
  * (0xCC bytes): its parameters block is what the sound player is fed
- * (alSndpSetPitch/FXMix/Pan/Vol, func_002706A0), followed by three envelopes
+ * (alSndpSetPitch/FXMix/Pan/Vol, CAudioWorld__StartVoice), followed by three envelopes
  * stepped every frame. Names come from Rage Wars (rw/junk_types.h's M04Emitter
  * / M04VP / M04Ctx, rw_abu's ContextRecAt2BC0 / Voice) and from what the code
  * does. */
@@ -40,7 +40,7 @@ typedef struct {
     /* 0x1A */ u8 pad1A[2];
     /* 0x1C */ f32 scale;      /* volume scale */
     /* 0x20 */ f32 f20;
-    /* 0x24 */ f32 doppler;      /* pitch factor of sounds 0x1B2/0x1B3 (func_00272D3C) */
+    /* 0x24 */ f32 doppler;      /* pitch factor of sounds 0x1B2/0x1B3 (SndVoice_UpdateDoppler) */
     /* 0x28 */ s16 priority;
     /* 0x2A */ s16 channel;
     /* 0x2C */ s16 s2C;
@@ -105,7 +105,7 @@ typedef struct {
     /* 0x8 */ SndVoice body;
 } SndNode; /* size 0xD4 */
 
-/* Requests waiting for a voice (initialised by func_002763F4). */
+/* Requests waiting for a voice (initialised by SndQueue_Construct). */
 typedef struct {
     /* 0x0000 */ SndMgr *owner;
     /* 0x0004 */ SndNode active;
@@ -113,8 +113,8 @@ typedef struct {
     /* 0x01AC */ SndNode nodes[32];
 } SndQueue; /* size 0x1C2C */
 
-/* The music sequence (initialised by func_00274F34; faded and slid by
- * func_00275018). */
+/* The music sequence (initialised by SndSeq_Construct; faded and slid by
+ * SndSeq_UpdateFade). */
 typedef struct {
     /* 0x00 */ SndMgr *owner;
     /* 0x04 */ s32 unk4;
@@ -141,13 +141,13 @@ typedef struct {
     /* 0x40 */ f32 target;
 } SndSeq; /* size 0x44 */
 
-/* The voices (initialised by func_00273A94). */
+/* The voices (initialised by SndVoicePool_Construct). */
 typedef struct {
     /* 0x000 */ SndMgr *owner;
     /* 0x004 */ SndVoice voices[17];
 } SndVoicePool; /* size 0xD90 */
 
-/* Effects block (initialised by func_00276D98). */
+/* Effects block (initialised by SpeechPlayer_Construct). */
 typedef struct {
     /* 0x00 */ SndMgr *owner;
     /* 0x04 */ s32 unk4;
@@ -181,7 +181,7 @@ struct SndMgr {
     /* 0x1D64 */ SndSeq seq;
     /* 0x1DA8 */ ALHeap heap;
     /* 0x1DB8 */ SndVoicePool pool;
-    /* 0x2B48 */ void *soundData;      /* the sound tree file (func_00270550) */
+    /* 0x2B48 */ void *soundData;      /* the sound tree file (CAudioWorld__LoadSfxDataFile) */
     /* 0x2B4C */ u32 *variants;
     /* 0x2B50 */ void *node2B50;
     /* 0x2B54 */ s32 rangeCount;
@@ -216,9 +216,9 @@ struct SndMgr {
 }; /* size 0x2C00 */
 
 /* A sound source in a level's source list (rw_abu's SoundSourceNode): its
- * play handle and sound, restarted at pos by func_00275E1C, dropped when the
- * handle stops playing (func_00275E98). The list is a CList at 0x14 of its
- * owner (func_00275EFC). */
+ * play handle and sound, restarted at pos by LoopSounds_Resume, dropped when the
+ * handle stops playing (LoopSounds_Update). The list is a CList at 0x14 of its
+ * owner (LoopSounds_StopAll). */
 typedef struct SndSource {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ struct SndSource *next;

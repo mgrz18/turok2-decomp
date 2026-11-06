@@ -7,9 +7,9 @@ typedef struct {
     /* 0x0A */ u16 unkA;
 } TriggerData;
 
-s32 func_002245BC(s32 *, u16, u16, s32); /* extern */
+s32 CScene__SetInstanceSavedBitInLevel(s32 *, u16, u16, s32); /* extern */
 extern s32 D_800F7078;
 
-void func_00266A00(TriggerData *arg0) {
-    func_002245BC(&D_800F7078, arg0->unkA, arg0->unk4, 0);
+void InteractiveAnim_EventShowRemote(TriggerData *arg0) {
+    CScene__SetInstanceSavedBitInLevel(&D_800F7078, arg0->unkA, arg0->unk4, 0);
 }

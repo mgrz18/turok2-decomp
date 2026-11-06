@@ -26,17 +26,17 @@ extern u8 D_800B6674[];
 extern u8 D_801100F0[];
 extern CListedInstance *D_8010FEB4[]; /* the actor list head */
 
-CPlayer *func_002532A8(CPlayerList *);
-void func_0027FC2C(void *hud, void *camera, u8 *msg);
-void func_0027580C(s32 sound);
-s8 func_00219F74(CListedInstance *actor, s32 id, s32);
-void func_00225D0C(void *world);
-void func_0027AD98(void *);
-void func_0027ADA0(void *);
+CPlayer *CPlayerPool__GetFirstActive(CPlayerList *);
+void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
+void Sound__PlaySpeech(s32 sound);
+s8 CGameObjectInstance__PickRandomAnim(CListedInstance *actor, s32 id, s32);
+void CScene__UnmarkGeneratorsSaved(void *world);
+void COnScreen__ClearBoss(void *);
+void COnScreen__ClearBoss2(void *);
 
 static __inline__ void setAnim(CListedInstance *actor, s32 id) {
     BossAI *ai;
-    s8 anim = func_00219F74(actor, id, -1);
+    s8 anim = CGameObjectInstance__PickRandomAnim(actor, id, -1);
 
     ai = (BossAI *) &actor->m_Instance.m_AI.m_dwFlags;
     ai->anim = anim;
@@ -48,21 +48,21 @@ static __inline__ void setAnim(CListedInstance *actor, s32 id) {
 /* The fight starts: message, the boss's intro animation, and the helpers
  * (those not dead and, unless the fight is over, targeting the boss) turn on
  * the current player. */
-void func_0040813C(BossFight *fight) {
+void TotemDefense_Fail(BossFight *fight) {
     CGame *game = &D_80119870;
     CPlayer *player;
     CListedInstance *a;
     CPlayer *current;
 
-    player = func_002532A8(&game->m_PlayerList);
-    func_0027FC2C(game->m_CameraPool, player->m_pCamera, D_800B6674);
+    player = CPlayerPool__GetFirstActive(&game->m_PlayerList);
+    CCameraPool__AddText(game->m_CameraPool, player->m_pCamera, D_800B6674);
     player->m_InvincibilityTime = 900.0f;
     fight->state = 2;
     fight->warned = 2;
     setAnim(fight->obj, 0x5336);
-    func_0027AD98(D_801100F0);
-    func_0027ADA0(D_801100F0);
-    func_00225D0C(D_800F7078);
+    COnScreen__ClearBoss(D_801100F0);
+    COnScreen__ClearBoss2(D_801100F0);
+    CScene__UnmarkGeneratorsSaved(D_800F7078);
     if (fight->state != 1) {
         current = D_80119890;
         for (a = D_8010FEB4[0]; a != NULL; a = a->m_pNext) {

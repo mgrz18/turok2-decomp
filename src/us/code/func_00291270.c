@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_00291270(u8 *arg0, u8 *arg1, s32 arg2) {
+void alCopy(u8 *arg0, u8 *arg1, s32 arg2) {
     s32 var_v1;
     u8 *var_a0;
     u8 *var_a1;

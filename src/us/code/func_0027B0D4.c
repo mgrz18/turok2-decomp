@@ -1,9 +1,9 @@
 #include "common.h"
 
-s32 func_0027836C();                            /* extern */
+s32 COnScreen__SelectSmallFont();                            /* extern */
 extern s32 D_800F56A8;
 
-void func_0027B0D4(void) {
-    func_0027836C();
+void COnScreen__SelectFont2(void) {
+    COnScreen__SelectSmallFont();
     D_800F56A8 = 2;
 }

@@ -1,4 +1,4 @@
-/* WRONG CUT: REAL func_0042D220 size 0x1E8 (splat cut it into func_0042D220 + func_0042D330). */
+/* WRONG CUT: REAL CParticleSystem__Construct size 0x1E8 (splat cut it into CParticleSystem__Construct + func_0042D330). */
 #include "common.h"
 #include "structs/particle.h"
 
@@ -20,9 +20,9 @@ extern DirLight D_800F1930[4];
 extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
 extern s32 CList__AddTail(CList *list, void *node);
 extern void func_0027BD10(void *def);
-extern void func_00210518(void *, f32);
+extern void CMtxF__SetRotateX(void *, f32);
 
-void func_0042D220(CParticleSystem *sys, s32 arg1) {
+void CParticleSystem__Construct(CParticleSystem *sys, s32 arg1) {
     s32 i;
     s32 j;
     DirLight *light;
@@ -78,6 +78,6 @@ void func_0042D220(CParticleSystem *sys, s32 arg1) {
         light->color[2] = 0xFF;
         light->color[3] = 0xFF;
     }
-    func_00210518(D_800F18F0, 1.5707964f);
+    CMtxF__SetRotateX(D_800F18F0, 1.5707964f);
     sys->m_pParticleData = (void *)arg1;
 }

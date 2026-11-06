@@ -4,9 +4,9 @@
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
-extern f32 func_00246310(CGameObjectInstance *obj, CVector3 point);       /* angle to a point */
-extern void func_00245BAC(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 angle);
-extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
+extern f32 AI_AngleToPoint(CGameObjectInstance *obj, CVector3 point);       /* angle to a point */
+extern void AI_TurnClamped(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 angle);
+extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 extern f32 func_002982F0(f32 angle);                                      /* sin */
 extern f32 func_002974C0(f32 angle);                                      /* cos */
 
@@ -14,7 +14,7 @@ extern s32 D_800F1C40[];
 extern s32 D_800F1F50[];
 extern f32 D_800B6D28;          /* per-frame scale */
 
-void func_00406598(CGameObjectInstance *obj, CAI *ai) {
+void Primagen_UpdateMode18(CGameObjectInstance *obj, CAI *ai) {
     CVector3 point;
     f32 angle;
 
@@ -26,25 +26,25 @@ void func_00406598(CGameObjectInstance *obj, CAI *ai) {
         if (D_8012F608.bossState == 3) {
             D_800F1C40[0] |= 0x300;
             D_800F1F50[0] |= 0x300;
-            func_00243414(obj, ai, 0x19);
+            CAI__SetMode(obj, ai, 0x19);
         } else {
-            func_00243414(obj, ai, 0x13);
+            CAI__SetMode(obj, ai, 0x13);
         }
         return;
     }
     if (D_8012F608.bossMode == 8) {
         point = D_8012F608.point;
-        angle = func_00246310(obj, point);
+        angle = AI_AngleToPoint(obj, point);
         if (ABS(angle) <= 0.1f) {
             obj->m_vVelocity.y += 0.0102400007f; /* 0x3C27C5AD: one ulp above 0.01024f */
             obj->m_vVelocity.x += func_002982F0(obj->m_RotY) * -24.576f;
             obj->m_vVelocity.z += func_002974C0(obj->m_RotY) * -24.576f;
             if (ai->m_AnimRepeatedCount != 0) {
-                func_00243414(obj, ai, 0x17);
+                CAI__SetMode(obj, ai, 0x17);
                 return;
             }
         }
-        func_00245BAC(obj, ai, 0.261799425f, angle);
+        AI_TurnClamped(obj, ai, 0.261799425f, angle);
     }
     if (D_8012F608.bossMode == 9) {
         if (D_8012F608.swayTimer <= 0.0f) {
@@ -56,7 +56,7 @@ void func_00406598(CGameObjectInstance *obj, CAI *ai) {
         }
         if (ai->m_AnimRepeatedCount != 0) {
             D_8012F608.bossMode = 2;
-            func_00243414(obj, ai, 0x17);
+            CAI__SetMode(obj, ai, 0x17);
         }
     }
 }

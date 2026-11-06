@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 func_0021D928(s32, s32, s32);
+s32 CGameObjectInstance__DrawModelImmediate(s32, s32, s32);
 
 typedef struct {
     /* 0x0 */ s32 unk0;
@@ -15,7 +15,7 @@ typedef struct {
     /* 0x40 */ f32 unk40;
 } Unk002605AC;
 
-void func_002605AC(s32 arg0, Unk002605AC *arg1, s32 arg2) {
+void EnemyAI_DrawFadeOut(s32 arg0, Unk002605AC *arg1, s32 arg2) {
     f32 var_f1;
 
     var_f1 = 255.0f - (arg1->unk40 * D_800A7990.fadeScale);
@@ -24,5 +24,5 @@ void func_002605AC(s32 arg0, Unk002605AC *arg1, s32 arg2) {
         var_f1 = 0.0f;
     }
     D_800AB8C0 = var_f1;
-    func_0021D928(arg0, (s32) arg1, arg2);
+    CGameObjectInstance__DrawModelImmediate(arg0, (s32) arg1, arg2);
 }

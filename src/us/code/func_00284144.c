@@ -3,6 +3,6 @@
 
 extern Cinema *D_800C1BB0;
 
-s32 func_00284144(void) {
+s32 Cinema_IsSkippable(void) {
     return D_800C1BB0->scriptId == 0x50;
 }

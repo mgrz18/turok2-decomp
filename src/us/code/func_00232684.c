@@ -2,7 +2,7 @@
 #include "structs/particle.h"
 
 extern u8 D_800F7078[];
-extern CRegionInfo *func_0022425C(void *arg0, CGameRegion *region);
+extern CRegionInfo *CScene__GetRegionInfo(void *arg0, CGameRegion *region);
 
 /* Whether the particle is at or below the water height of its region's info flagged 0x1000000. */
 s32 func_00232684(CParticle *obj) {
@@ -14,7 +14,7 @@ s32 func_00232684(CParticle *obj) {
     if (!(obj->header.m_pCurrentRegion->m_wFlags & REGION_FLAG_WATER)) {
         return 0;
     }
-    target = func_0022425C(D_800F7078, obj->header.m_pCurrentRegion);
+    target = CScene__GetRegionInfo(D_800F7078, obj->header.m_pCurrentRegion);
     if (target == NULL) {
         return 0;
     }

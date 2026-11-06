@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 #include "gfx.h"
 
-void func_0027AFAC(s32 x0,s32 y0,s32 x1,s32 y1,u8 r,u8 g,u8 b,u8 a) {
+void Hud_FillRect(s32 x0,s32 y0,s32 x1,s32 y1,u8 r,u8 g,u8 b,u8 a) {
     extern Gfx *D_800D8E24;
  { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = (0); };
  { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xFA) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(255) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(255) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((((unsigned int)(r) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(g) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(b) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(a) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); };

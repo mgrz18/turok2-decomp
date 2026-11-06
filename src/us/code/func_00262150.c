@@ -41,13 +41,13 @@ typedef struct SwingTarget {
 extern f32 func_00298470(f32);                          /* sqrtf */
 extern f32 func_002982F0(f32);                          /* sinf */
 extern f32 func_002974C0(f32);                          /* cosf */
-extern f32 func_00211774(f32 cur, f32 target, f32 rate);
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-extern void func_002105A4(f32 mtx[4][4], f32 angle);
-extern void func_0020F85C(f32 mtx[4][4], CVector3 *in, CVector3 *out);
-extern void func_0020EF8C(void *rotation, f32 angle, CVector3 *pivot, CVector3 *point);
+extern f32 Math_Approach(f32 cur, f32 target, f32 rate);
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void CMtxF__SetRotateY(f32 mtx[4][4], f32 angle);
+extern void CMtxF__TransformPoint(f32 mtx[4][4], CVector3 *in, CVector3 *out);
+extern void CVector3__Lerp(void *rotation, f32 angle, CVector3 *pivot, CVector3 *point);
 
-void func_00262150(SwingOwner *owner, SwingActor *actor, s32 mode, SwingTarget *target) {
+void Turret_UpdateHinge(SwingOwner *owner, SwingActor *actor, s32 mode, SwingTarget *target) {
     SwingParams *p;
     CVector3 hinge;
     CVector3 delta;
@@ -75,7 +75,7 @@ void func_00262150(SwingOwner *owner, SwingActor *actor, s32 mode, SwingTarget *
             if (actor->state == mode) {
                 speed = -speed;
             }
-            velocity = func_00211774(actor->velocity, speed, 0.25f);
+            velocity = Math_Approach(actor->velocity, speed, 0.25f);
             open += velocity;
             actor->velocity = velocity;
             if (actor->state == 0) {
@@ -97,9 +97,9 @@ void func_00262150(SwingOwner *owner, SwingActor *actor, s32 mode, SwingTarget *
                 if (p->heading == 0.0f) {
                     desired = 0.0f;
                 } else {
-                    func_0020EF2C(&delta, &target->pos, &actor->pos);
-                    func_002105A4(mtx, -p->heading);
-                    func_0020F85C(mtx, &delta, &local);
+                    CVector3__Subtract(&delta, &target->pos, &actor->pos);
+                    CMtxF__SetRotateY(mtx, -p->heading);
+                    CMtxF__TransformPoint(mtx, &delta, &local);
                     desired = local.z / p->radius;
                 }
                 speed = desired - open;
@@ -108,7 +108,7 @@ void func_00262150(SwingOwner *owner, SwingActor *actor, s32 mode, SwingTarget *
                 } else if (speed < -maxSpeed) {
                     speed = -maxSpeed;
                 }
-                velocity = func_00211774(actor->velocity, speed, 0.25f);
+                velocity = Math_Approach(actor->velocity, speed, 0.25f);
                 open += velocity;
                 actor->velocity = velocity;
             }
@@ -126,5 +126,5 @@ void func_00262150(SwingOwner *owner, SwingActor *actor, s32 mode, SwingTarget *
     hinge.x += p->radius * func_002982F0(p->heading);
     hinge.y += p->height;
     hinge.z += p->radius * func_002974C0(p->heading);
-    func_0020EF8C(actor->rotation, open, &actor->pos, &hinge);
+    CVector3__Lerp(actor->rotation, open, &actor->pos, &hinge);
 }

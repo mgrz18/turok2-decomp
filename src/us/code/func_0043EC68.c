@@ -2,7 +2,7 @@
 #include "m2c_macros.h"
 #include "structs/game_object.h"
 
-M2C_UNK func_00236314(void *, M2C_UNK *);           /* extern */
+M2C_UNK ScriptAnimator_SetScript(void *, M2C_UNK *);           /* extern */
 extern M2C_UNK D_00431A74;
 extern f32 D_800C0488;
 extern f32 D_800C048C;
@@ -10,7 +10,7 @@ extern f32 D_800C0490;
 extern M2C_UNK D_8012F608;
 extern M2C_UNK D_8012F9DC;
 
-void func_0043EC68(CGameObjectInstance *arg0) {
+void Primagen_EnterMode7_2(CGameObjectInstance *arg0) {
     void *temp_s2;
 
     if (M2C_FIELD(&D_8012F9DC, s32 *, 0) == 2) {
@@ -29,19 +29,19 @@ void func_0043EC68(CGameObjectInstance *arg0) {
         arg0->m_AI.m_AnimSpeed = (f32) D_800C0490;
     }
     if ((M2C_FIELD(&D_8012F9DC, s32 *, -0x3D4) == 1) && (M2C_FIELD(temp_s2, s32 *, 0x18) == 0)) {
-        func_00236314(((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x284)), &D_00431A74);
-        func_00236314(((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x220)), &D_00431A74);
-        func_00236314(((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x158)), &D_00431A74);
-        func_00236314(((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x1BC)), &D_00431A74);
+        ScriptAnimator_SetScript(((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x284)), &D_00431A74);
+        ScriptAnimator_SetScript(((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x220)), &D_00431A74);
+        ScriptAnimator_SetScript(((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x158)), &D_00431A74);
+        ScriptAnimator_SetScript(((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x1BC)), &D_00431A74);
         M2C_FIELD(temp_s2, s32 *, 0x18) = (s32) (M2C_FIELD(temp_s2, s32 *, 0x18) + 1);
     }
     if ((M2C_FIELD(&D_8012F608, s32 *, 0) == 2) && (M2C_FIELD(&D_8012F608, s32 *, 0x18) == 1)) {
-        func_00236314(((__typeof__(&D_8012F608))((s8 *)&D_8012F608 + 0x24)), &D_00431A74);
-        func_00236314(((__typeof__(&D_8012F608))((s8 *)&D_8012F608 + 0xEC)), &D_00431A74);
+        ScriptAnimator_SetScript(((__typeof__(&D_8012F608))((s8 *)&D_8012F608 + 0x24)), &D_00431A74);
+        ScriptAnimator_SetScript(((__typeof__(&D_8012F608))((s8 *)&D_8012F608 + 0xEC)), &D_00431A74);
         M2C_FIELD(&D_8012F608, s32 *, 0x18) = (s32) (M2C_FIELD(&D_8012F608, s32 *, 0x18) + 1);
     }
     if ((M2C_FIELD(&D_8012F608, s32 *, 0) == 3) && (M2C_FIELD(&D_8012F608, s32 *, 0x18) == 2)) {
-        func_00236314(((__typeof__(&D_8012F608))((s8 *)&D_8012F608 + 0x88)), &D_00431A74);
+        ScriptAnimator_SetScript(((__typeof__(&D_8012F608))((s8 *)&D_8012F608 + 0x88)), &D_00431A74);
         M2C_FIELD(&D_8012F608, s32 *, 0x18) = (s32) (M2C_FIELD(&D_8012F608, s32 *, 0x18) + 1);
     }
     arg0->m_dwFlags = (s32) (arg0->m_dwFlags | 0x2000);

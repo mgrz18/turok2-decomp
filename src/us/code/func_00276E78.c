@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00276E78(void **arg0, s16 id, s16 avoid);
-extern s32 func_00266D8C(s32, s32, s32, s32 *, s32 *);
-extern s32 func_002113A4(void);
-s32 func_00276E78(void **arg0, s16 id, s16 avoid) {
+extern s32 SpeechPlayer_PickEntry(void **arg0, s16 id, s16 avoid);
+extern s32 BinaryRange(s32, s32, s32, s32 *, s32 *);
+extern s32 Random_Next(void);
+s32 SpeechPlayer_PickEntry(void **arg0, s16 id, s16 avoid) {
     s32 first;
     s32 last;
     s32 total;
@@ -16,7 +16,7 @@ s32 func_00276E78(void **arg0, s16 id, s16 avoid) {
     s32 result;
     total = 0;
     table = *arg0;
-    if (func_00266D8C(table->unk2B60, table->unk2B64, id, &first, &last) == 0) {
+    if (BinaryRange(table->unk2B60, table->unk2B64, id, &first, &last) == 0) {
         return -1;
     }
     result = first;
@@ -24,7 +24,7 @@ s32 func_00276E78(void **arg0, s16 id, s16 avoid) {
         for (entry = first; entry <= last; entry++) {
             total += 100;
         }
-        draw = func_002113A4() % total;
+        draw = Random_Next() % total;
         total = 0;
         for (entry = first; entry < last; entry++) {
             total += 100;

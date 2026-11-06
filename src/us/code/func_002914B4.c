@@ -2,8 +2,8 @@
 #include "common.h"
 #include "structs/libaudio.h"
 
-extern s32 func_00292530(void *arg0, s32 arg1, s32 arg2);
-extern void func_00292B94(void *arg0, void *arg1);
+extern s32 __voiceNeedsNoteKill(void *arg0, s32 arg1, s32 arg2);
+extern void __seqpStopOsc(void *arg0, void *arg1);
 struct Node_func_80239AF4_de;
 typedef struct Node_func_80239AF4_de Node_func_80239AF4_de;
 struct Node_func_80239AF4_de;
@@ -24,27 +24,27 @@ struct List802B663C {
     Node_func_80239AF4_de *tail;
     Node_func_80239AF4_de *free;
 };
-extern void func_002924CC(List802B663C *arg0, void *arg1);
-extern void func_00292C84(void *arg0);
-extern void func_0029B020(const char *arg0, const char *arg1, s32 arg2);
+extern void __unmapVoice(List802B663C *arg0, void *arg1);
+extern void __postNextSeqEvent(void *arg0);
+extern void __assert(const char *arg0, const char *arg1, s32 arg2);
 extern char D_800AA380[];
 extern char D_800AA384[];
-extern void func_002919F0(ALSeqPlayer *);
-extern void func_00291BF4(ALSeqPlayer *, ALEvent *);
-extern void func_00292D4C(ALSeqPlayer *, ALEvent *);
-extern void func_00292DB0(ALSeqPlayer *, f32);
-extern void func_00291034(ALEventQueue *, ALEvent *, ALMicroTime);
-extern ALMicroTime func_00290F9C(ALEventQueue *, ALEvent *);
-extern void func_002911B8(ALEventQueue *, s16);
+extern void __handleNextSeqEvent(ALSeqPlayer *);
+extern void __handleMIDIMsg(ALSeqPlayer *, ALEvent *);
+extern void __handleMetaMsg(ALSeqPlayer *, ALEvent *);
+extern void __setUsptFromTempo(ALSeqPlayer *, f32);
+extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, ALMicroTime);
+extern ALMicroTime alEvtqNextEvent(ALEventQueue *, ALEvent *);
+extern void alEvtqFlushType(ALEventQueue *, s16);
 extern void alSynStopVoice(struct Shape_typemap_71 *, ALVoice *);
-extern void func_00294160(void *, ALVoice *);
+extern void alSynFreeVoice(void *, ALVoice *);
 extern void alSynSetVol(void *, ALVoice *, s16, ALMicroTime);
-extern void func_00294340(void *, ALVoice *, f32);
-extern s16 func_00292774(ALVoiceState *, ALSeqPlayer *);
-extern ALMicroTime func_002927E8(ALVoiceState *, ALMicroTime);
-extern void func_00292A74(ALSeqPlayer *, ALVoice *, ALMicroTime);
-extern void func_00292844(ALSeqPlayer *, void *);
-ALMicroTime func_002914B4(void *node)
+extern void alSynSetPitch(void *, ALVoice *, f32);
+extern s16 __vsVol(ALVoiceState *, ALSeqPlayer *);
+extern ALMicroTime __vsDelta(ALVoiceState *, ALMicroTime);
+extern void __seqpReleaseVoice(ALSeqPlayer *, ALVoice *, ALMicroTime);
+extern void __initFromBank(ALSeqPlayer *, void *);
+ALMicroTime __seqpVoiceHandler(void *node)
 {
     ALSeqPlayer *seqp = node;
     ALEvent evt;
@@ -59,20 +59,20 @@ ALMicroTime func_002914B4(void *node)
     do {
         switch (seqp->nextEvent.type) {
         case 0:
-            func_002919F0(seqp);
+            __handleNextSeqEvent(seqp);
             break;
         case 9:
             evt.type = 9;
-            func_00291034(&seqp->evtq, (ALEvent *)&evt, seqp->frameTime);
+            alEvtqPostEvent(&seqp->evtq, (ALEvent *)&evt, seqp->frameTime);
             break;
         case 5:
             voice = seqp->nextEvent.msg.note.voice;
             alSynStopVoice(seqp->drvr, voice);
-            func_00294160(seqp->drvr, voice);
+            alSynFreeVoice(seqp->drvr, voice);
             vs = (ALVoiceState *)voice->clientPrivate;
             if (vs->flags)
-                func_00292B94(seqp, vs);
-            func_002924CC(seqp, voice);
+                __seqpStopOsc(seqp, vs);
+            __unmapVoice(seqp, voice);
             break;
         case 6:
             voice = seqp->nextEvent.msg.vol.voice;
@@ -82,7 +82,7 @@ ALMicroTime func_002914B4(void *node)
             delta = seqp->nextEvent.msg.vol.delta;
             vs->envGain = seqp->nextEvent.msg.vol.vol;
             vs->envEndTime = seqp->curTime + delta;
-            alSynSetVol(seqp->drvr, voice, func_00292774(vs, seqp), delta);
+            alSynSetVol(seqp->drvr, voice, __vsVol(vs, seqp), delta);
             break;
         case 22:
             vs = seqp->nextEvent.msg.osc.vs;
@@ -91,12 +91,12 @@ ALMicroTime func_002914B4(void *node)
             tremeloSlot = &vs->tremelo;
             tremelo = (u32)oscValue;
             *tremeloSlot = tremelo;
-            alSynSetVol(seqp->drvr, &vs->voice, func_00292774(vs, seqp),
-                          func_002927E8(vs, seqp->curTime));
+            alSynSetVol(seqp->drvr, &vs->voice, __vsVol(vs, seqp),
+                          __vsDelta(vs, seqp->curTime));
             evt.type = 22;
             evt.msg.osc.vs = vs;
             evt.msg.osc.oscState = oscState;
-            func_00291034(&seqp->evtq, &evt, delta);
+            alEvtqPostEvent(&seqp->evtq, &evt, delta);
             break;
         case 23:
             vs = seqp->nextEvent.msg.osc.vs;
@@ -104,34 +104,34 @@ ALMicroTime func_002914B4(void *node)
             chan = seqp->nextEvent.msg.osc.chan;
             delta = (*seqp->updateOsc)(oscState, &oscValue);
             vs->vibrato = oscValue;
-            func_00294340(seqp->drvr, &vs->voice,
+            alSynSetPitch(seqp->drvr, &vs->voice,
                           vs->pitch * vs->vibrato * seqp->chanState[chan].pitchBend);
             evt.type = 23;
             evt.msg.osc.vs = vs;
             evt.msg.osc.oscState = oscState;
             evt.msg.osc.chan = chan;
-            func_00291034(&seqp->evtq, &evt, delta);
+            alEvtqPostEvent(&seqp->evtq, &evt, delta);
             break;
         case 2:
-            func_00291BF4(seqp, &seqp->nextEvent);
+            __handleMIDIMsg(seqp, &seqp->nextEvent);
             break;
         case 7:
-            func_00292D4C(seqp, &seqp->nextEvent);
+            __handleMetaMsg(seqp, &seqp->nextEvent);
             break;
         case 15:
             if (seqp->state != 1) {
                 seqp->state = 1;
-                func_00292C84(seqp);
+                __postNextSeqEvent(seqp);
             }
             break;
         case 16:
             if (seqp->state == 2) {
                 for (vs = seqp->vAllocHead; vs != 0; vs = seqp->vAllocHead) {
                     alSynStopVoice(seqp->drvr, &vs->voice);
-                    func_00294160(seqp->drvr, &vs->voice);
+                    alSynFreeVoice(seqp->drvr, &vs->voice);
                     if (vs->flags)
-                        func_00292B94(seqp, vs);
-                    func_002924CC(seqp, &vs->voice);
+                        __seqpStopOsc(seqp, vs);
+                    __unmapVoice(seqp, &vs->voice);
                 }
                 seqp->curTime = 0;
                 seqp->state = 0;
@@ -139,22 +139,22 @@ ALMicroTime func_002914B4(void *node)
             break;
         case 17:
             if (seqp->state == 1) {
-                func_002911B8(&seqp->evtq, 0);
-                func_002911B8(&seqp->evtq, 2);
+                alEvtqFlushType(&seqp->evtq, 0);
+                alEvtqFlushType(&seqp->evtq, 2);
                 for (vs = seqp->vAllocHead; vs != 0; vs = vs->next) {
-                    if ((u8)func_00292530(seqp, &vs->voice, 50000))
-                        func_00292A74(seqp, &vs->voice, 50000);
+                    if ((u8)__voiceNeedsNoteKill(seqp, &vs->voice, 50000))
+                        __seqpReleaseVoice(seqp, &vs->voice, 50000);
                 }
                 seqp->state = 2;
                 evt.type = 16;
-                func_00291034(&seqp->evtq, &evt, 0x7fffffff);
+                alEvtqPostEvent(&seqp->evtq, &evt, 0x7fffffff);
             }
             break;
         case 10:
             seqp->vol = seqp->nextEvent.msg.spvol.vol;
             for (vs = seqp->vAllocHead; vs != 0; vs = vs->next) {
-                alSynSetVol(seqp->drvr, &vs->voice, func_00292774(vs, seqp),
-                              func_002927E8(vs, seqp->curTime));
+                alSynSetVol(seqp->drvr, &vs->voice, __vsVol(vs, seqp),
+                              __vsDelta(vs, seqp->curTime));
             }
             break;
         case 11:
@@ -168,25 +168,25 @@ ALMicroTime func_002914B4(void *node)
             break;
         case 13:
             if (seqp->state == 1)
-                func_0029B020(D_800AA380, D_800AA384, 296);
+                __assert(D_800AA380, D_800AA384, 296);
             seqp->target = seqp->nextEvent.msg.spseq.seq;
-            func_00292DB0(seqp, 500000.0f);
+            __setUsptFromTempo(seqp, 500000.0f);
             if (seqp->bank)
-                func_00292844(seqp, seqp->bank);
+                __initFromBank(seqp, seqp->bank);
             break;
         case 14:
             if (seqp->state != 0)
-                func_0029B020(D_800AA380, D_800AA384, 305);
+                __assert(D_800AA380, D_800AA384, 305);
             seqp->bank = seqp->nextEvent.msg.spbank.bank;
-            func_00292844(seqp, seqp->bank);
+            __initFromBank(seqp, seqp->bank);
             break;
         case 4:
         case 3:
         case 1:
-            func_0029B020(D_800AA380, D_800AA384, 315);
+            __assert(D_800AA380, D_800AA384, 315);
             break;
         }
-        seqp->nextDelta = func_00290F9C(&seqp->evtq, &seqp->nextEvent);
+        seqp->nextDelta = alEvtqNextEvent(&seqp->evtq, &seqp->nextEvent);
     } while (seqp->nextDelta == 0);
     seqp->curTime += seqp->nextDelta;
     return seqp->nextDelta;

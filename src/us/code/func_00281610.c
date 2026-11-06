@@ -8,15 +8,15 @@ extern s32 D_800C2034;      /* screen height */
 void CList__Remove(CList *list, void *element);
 void CList__AddHead(CList *list, void *element);
 void CList__AddTail(CList *list, void *element);
-void func_00281B58(CCameraText *text);
+void CCameraText__Reset(CCameraText *text);
 
-/* func_00281AB4, inlined: takes a free text from the pool and puts it on the
+/* CCameraPool__TakeText, inlined: takes a free text from the pool and puts it on the
  * camera's active texts. */
 static __inline__ CCameraText *TakeText(CCameraPool *pool, CCamera *cam) {
     CCameraText *text = pool->m_FreeTextList.m_pHead;
 
     if (text != NULL) {
-        func_00281B58(text);
+        CCameraText__Reset(text);
         CList__Remove(&pool->m_FreeTextList, text);
         CList__AddTail(&cam->m_ActiveTextList, text);
     }
@@ -25,7 +25,7 @@ static __inline__ CCameraText *TakeText(CCameraPool *pool, CCamera *cam) {
 
 /* Shows a string over a camera for `secs`, one text per line, centred, 80
  * pixels above the bottom, with no id (-1). Returns the last line's text. */
-CCameraText *func_00281610(CCameraPool *pool, CCamera *cam, u8 *string, f32 secs) {
+CCameraText *CCameraPool__AddTimedText(CCameraPool *pool, CCamera *cam, u8 *string, f32 secs) {
     CCameraText *text;
     u8 *str;
     u8 *line;

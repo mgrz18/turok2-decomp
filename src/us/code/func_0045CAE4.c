@@ -9,7 +9,7 @@ extern char D_800B51B0[];
 extern char D_800B51EC[];
 extern char D_800B5240[];
 extern char D_800B529C[];
-s32 func_0045CAE4(MenuItem *item) {
+s32 PakConfirmMenu_UpdateLine3_2(MenuItem *item) {
     switch (D_801309B0) {
     default:
     case 0:

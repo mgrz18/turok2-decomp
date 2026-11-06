@@ -5,15 +5,15 @@
 
 /* The game/menu context this runs on. */
 
-s32 func_0042C194(s32, s32, s32, s32, s32);
+s32 CScene__FindWarpDests(s32, s32, s32, s32, s32);
 extern s32 D_800F7078;
 
-void func_002886D0(CEngineApp *arg0, s32 arg1) {
+void CEngineApp__StartGameAtWarp(CEngineApp *arg0, s32 arg1) {
     u8 sp18[0x18];
     s32 var_s0;
 
     var_s0 = arg1;
-    if (func_0042C194((s32) &D_800F7078, -1, var_s0, (s32) sp18, 1) == 0) {
+    if (CScene__FindWarpDests((s32) &D_800F7078, -1, var_s0, (s32) sp18, 1) == 0) {
         var_s0 = 0;
     }
     D_8011ACB0.frames = 0;

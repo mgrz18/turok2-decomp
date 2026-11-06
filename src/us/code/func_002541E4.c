@@ -6,9 +6,9 @@
 extern s32 D_800ADB5C;
 extern s32 D_800ADB30[];
 extern u8 D_800F7078[];
-extern void func_002241D8(void *, CPlayer *, s32, s32);
+extern void CScene__SetInstanceObjectType(void *, CPlayer *, s32, s32);
 
-void func_002541E4(CPlayer *player) {
+void CPlayer__LoadCharacterModel(CPlayer *player) {
     GameSettings *state = &D_8011AAD8;
     s32 id;
 
@@ -20,5 +20,5 @@ void func_002541E4(CPlayer *player) {
     } else {
         id = D_800ADB30[player->m_CharacterActor.header.m_pIntelligence->m_Id];
     }
-    func_002241D8(D_800F7078, player, id, player->m_CharAnim);
+    CScene__SetInstanceObjectType(D_800F7078, player, id, player->m_CharAnim);
 }

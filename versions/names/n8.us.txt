@@ -1,0 +1,573 @@
+// n8: names for the first VM module at 0x00420000-0x0043FFFF (its functions end
+// at 0x004307A8; 0x0043CC14-0x0043FFFF is the second module, copies of n7's
+// originals, named by n7), the `_2` lines for their second-module copies
+// (0x00459000-0x00469400), and the second-module functions that are not
+// copies. Copies were paired by code (every word with immediates and jump
+// targets masked, against ref.elf): 822 of the 829 second-module functions
+// equal the first-module function at their link address (named address -
+// 0x39000) or 0xE0 on; for this range always + 0xE0.
+// Controller pak menus (first VM module, 0x0042019C-0x00423DA4). The menus are
+// MenuDesc/MenuItemDesc tables in the module's .rodata (0x0043B390-0x0043C230);
+// each name below says which table slot holds the function and the item's text.
+// Globals: D_80130994 load mode, D_80130984 save mode, D_80130990 "controller pak
+// menu" mode (port D_800C2028), D_801309B4 character (multiplayer) vs game note.
+PakMenu_SelectCancel = 0x0042019C; // select of the 'cancel' item of the note list (MenuDesc 0x0043B6A8, items 0x0043B390); frees the pak buffers, reopens the previous menu
+PakMenu_UpdateCancel = 0x00421DFC; // update of that 'cancel' item: shows "exit" in the controller pak menu mode
+PakMenu_UpdateTitle = 0x00421CA0; // update of the 'controller pak: #x' title item: sprintf "%1d" of the port + 1
+PakMenu_UpdateSubtitle = 0x00421D20; // update of the 'load note' item: "load note"/"save note"/"delete note"/"controller pak menu" by mode
+PakMenu_UpdateModeText = 0x00421BE4; // update of item 21: "save character"/"save game"/"controller pak :x" by mode
+PakMenu_PollPak = 0x004216C0; // poll of the note-list MenuDescs 0x0043B6A8/0x0043B6CC: sets the done flag D_801309BC when func_0041DD90 sees the pak change; Rage Wars FRONTEND func_8040B700_de
+PakMenu_PollPakB = 0x004217A0; // poll of the note-list MenuDescs 0x0043B6F0/0x0043B714: the same code as PakMenu_PollPak
+PakMenu_PollBootPak = 0x004218C4; // poll of the note-list MenuDesc 0x0043B738 (controller pak menu at boot): ends when D_8011B108 is clear or the pak changes
+PakMenu_PollStartPressed = 0x00421880; // menu poll: START (buttons & 0x1000) once sets D_8011B108 (the boot controller pak menu request)
+PakMenu_HasPort = 0x0042123C; // D_800C2028 != -1 (the controller pak menu's port is set); called from the engine's func_00289110
+PakMenu_PickDefaultPort = 0x004211AC; // if D_800C2028 is -1, probes ports 0-3 (Pak_ProbeSlot) and keeps the first with a controller pak; Rage Wars func_80409744_de
+PakMenu_FindNextPakPort = 0x00421B50; // from the port after arg (or 0), the next port whose Pak_GetStatus is not -2, or -1; Rage Wars func_8040A1B0_de
+PakMenu_ProbeOwnerPort = 0x004219E0; // Pak_ProbeSlot on the menu's port (D_800C2028 in the pak menu mode); Rage Wars func_80409F2C_de
+PakMenu_GetPlayerAndPort = 0x004219A8; // returns the menu's player and stores its port (D_800C2028 and no player in the pak menu mode)
+PakMenu_GetPort = 0x00421690; // the menu's port: D_800C2028 in the pak menu mode, else its controller's port
+PakMenu_FindNoteByName = 0x00421A54; // decodes each of the 16 notes' game names (Pak_GetNoteGameName, Pak_DecodeText) and strcmps them with arg1; returns the note in *arg3
+PakMenu_IsSavePortalMenu = 0x00421654; // whether the window's desc is one of the save portal MenuDescs 0x0043BEF4/0x0043BED0 (then clears D_80130940)
+Pak_IsTurok2Note = 0x00421260; // game code strlen 4 == "NT2E" and company code strlen 2 == "51" (Turok 2's N64 ids); Rage Wars func_00409824
+Pak_GetBufferSize = 0x004212EC; // units << 8, or the default size at D_800F70A8 + 0x688; Rage Wars MENU/PAK func_80409884_de
+Pak_SetBufferSize = 0x0042130C; // stores arg1 at D_800F70A8 + arg0 + 0x684 (the field Pak_GetBufferSize's default sits next to)
+Pak_AllocBuffer = 0x00421334; // frees *handle, allocates units << 8 bytes (tag "Single Save Block"), zeroes it, returns handle and data; Rage Wars MENU/PAK func_804098CC_de
+Pak_FreeSaveBuffers = 0x004213CC; // frees the two save buffers D_800C2010/D_800C2014 and clears the save pointers (also inlined at PakMenu_SelectCancel's top)
+PakMenu_SaveCharacter = 0x00421454; // copies the player's CPlayerOptions (character, kills, deaths, suicides, tags, name) to the character note D_80130968; Rage Wars func_00409A18
+PakMenu_RestoreCharacter = 0x004214C4; // the reverse: the character note D_80130968 into the player's CPlayerOptions
+SaveGame_Restore = 0x00421528; // copies the loaded save (D_800C201C: player data, game settings, play time, cheats, level flags) into the game; the same code inlined in GameNoteMenu_SelectYes
+
+// The game note info dialog (MenuDesc 0x0043B8C4/0x0043B8E8, items 0x0043B75C:
+// 'note info', level, 'time', difficulty, 'health', 'lives', 'load?', 'yes', 'no').
+GameNoteMenu_InitLoad = 0x00421E20; // init of MenuDesc 0x0043B8C4: D_801309B8 = 1 (load)
+GameNoteMenu_InitDelete = 0x00421E34; // init of MenuDesc 0x0043B8E8: D_801309B8 = 0 (delete)
+GameNoteMenu_UpdateTitle = 0x00421E44; // "note info" or "delete note" by D_801309B8
+GameNoteMenu_UpdateLevel = 0x00421F88; // the saved checkpoint's level name ("port of adia", ..., "unknown level id")
+GameNoteMenu_UpdateTime = 0x00422060; // fills 'time :000.00.00' with the saved hours, minutes, seconds
+GameNoteMenu_UpdateDifficulty = 0x00421E78; // "difficulty :  easy" etc. by the saved settings.difficulty (0, 16, 32)
+GameNoteMenu_UpdateHealth = 0x00421ED4; // fills 'health     :' with the saved m_Health >> 8
+GameNoteMenu_UpdateLives = 0x00421F30; // fills 'lives      :' with the saved m_Lives
+GameNoteMenu_UpdatePrompt = 0x004220F0; // "load?" or "delete?" by D_801309B8
+GameNoteMenu_SelectYes = 0x00420454; // select of 'yes': restores the save and opens the "game loaded" dialog, or deletes the note (Pak_DeleteNote)
+GameNoteMenu_SelectNo = 0x00422124; // select of 'no': back to the note list (MenuDesc 0x0043B6F0 when loading)
+
+// The character note info dialog (MenuDesc 0x0043BA50/0x0043BA74/0x0043BA98,
+// items 0x0043B90C: 'note info', name, 'type  :', 'frags :', 'rank  :', 'load?', 'yes', 'no').
+CharNoteMenu_InitLoad = 0x00422190; // init of MenuDesc 0x0043BA50: D_80130960 = 1 (load)
+CharNoteMenu_InitDelete = 0x004221AC; // init of MenuDesc 0x0043BA74: D_80130960 = 0, D_801309A8 = 0
+CharNoteMenu_UpdateTitle = 0x00422204; // "note info" / "delete note" by D_80130960/D_801309A8
+CharNoteMenu_UpdateName = 0x00422258; // copies the note's 8-character name (D_80130954, trailing blanks trimmed) into the line
+CharNoteMenu_UpdateType = 0x00422314; // the saved character (D_80130950: one of ten 11-character names, "      Turok" first) into 'type  :'
+CharNoteMenu_UpdateFrags = 0x00422430; // sprintf of the saved frag score D_8013094C into 'frags :'
+CharNoteMenu_UpdateRank = 0x00422484; // the rank title for the frag score (thresholds 50, 150, ..., 9999) into 'rank  :'
+CharNoteMenu_UpdatePrompt = 0x00422608; // "load?"/"delete?" by mode
+CharNoteMenu_SelectYes = 0x004206B8; // select of 'yes': restores the character into the player (inlined PakMenu_RestoreCharacter) or deletes the note; Rage Wars func_00408C78
+CharNoteMenu_SelectNo = 0x0042265C; // select of 'no': back to the note list
+
+// The pak message box (items 0x0043BABC: heading, five lines, 'ok'); each init
+// picks the message D_801309C0 (texts from the line updates' tables).
+PakMessage_InitPakFull = 0x004226C8; // message 0: "controller pak is full! delete a note to free up space."
+PakMessage_InitPakNotFound = 0x004226D8; // message 1: "controller pak not found! please insert a controller pak and try again."
+PakMessage_InitInsertToManage = 0x004226EC; // message 2: "... insert your controller pak now if you wish to manage it."
+PakMessage_InitInsertToSave = 0x00422700; // message 3: "... if you wish to save."
+PakMessage_InitInsertToLoad = 0x00422714; // message 4: "... if you wish to load."
+PakMessage_InitInsertRumblePak = 0x00422728; // message 5: "this game is rumble pak compatible. please insert your rumble pak ..."
+PakMessage_InitCannotSave = 0x0042273C; // message 6: "controller pak not found! you will not be able to save your game."
+PakMessage_InitPakChanged = 0x00422750; // message 7: "controller pak was changed! please try again."
+PakMessage_InitNoController = 0x00422764; // message 8: "no controller" (also hides item 7's 'ok')
+PakMessage_InitRumblePak = 0x004227B0; // message 9 (rumble pak), D_8013098C = 0
+PakMessage_InitRumblePakB = 0x004227CC; // message 9 (rumble pak), D_8013098C = 1
+PakMessage_InitSaveDone = 0x004227EC; // message 10: "save was successful!"
+PakMessage_InitNoteCorrupt = 0x00422800; // message 11: "this note is corrupt and cannot be used. you may delete this note."
+PakMessage_InitDeleteDone = 0x00422814; // message 12: "note was successfully deleted."
+PakMessage_InitSaveFailed = 0x00422828; // message 13: "problem occurred while trying to save a note."
+PakMessage_InitDeleteFailed = 0x0042283C; // message 14: "problem occurred while trying to delete a note."
+PakMessage_InitRepaired = 0x00422850; // message 15: "controller pak was successfully repaired. ..."
+PakMessage_UpdateHeading = 0x00422864; // "error" or "important" by message
+PakMessage_UpdateLine1 = 0x004228B0; // the message's first line; Rage Wars func_8040ACA0_de
+PakMessage_UpdateLine2 = 0x004229DC; // second line (same Rage Wars source)
+PakMessage_UpdateLine3 = 0x00422B08; // third line
+PakMessage_UpdateLine4 = 0x00422C34; // fourth line
+PakMessage_UpdateLine5 = 0x00422D60; // fifth line
+PakMessage_UpdateOk = 0x00422E8C; // the 'ok' item's text by message; Rage Wars func_0040ACD4
+PakMessage_SelectOk = 0x0042085C; // select of 'ok': closes the box and opens the next one for the menu state; Rage Wars func_00408E1C
+
+// The save portal menu (MenuDesc 0x0043BED0/0x0043BEF4, items 0x0043BE40:
+// 'save', 'health', 'ammo', 'go back').
+SavePortalMenu_Init = 0x00422F14; // init of MenuDesc 0x0043BED0: save mode on (D_80130984 = 1), probes the player's pak
+SavePortalMenu_InitB = 0x00422FC0; // init of MenuDesc 0x0043BEF4: the same without clearing the pak menu mode
+SavePortalMenu_Close = 0x00423130; // close of both descs
+SavePortalMenu_Poll = 0x00423040; // poll of both descs: done when the pak changes (func_0041DD90)
+SavePortalMenu_SelectSave = 0x00423178; // select of 'save': opens the note list (MenuDesc 0x0043B714)
+SavePortalMenu_UpdateHealth = 0x00423210; // update of 'health': greys it (flag 0x01000000) by func_00253640(player, 1, ...)
+SavePortalMenu_SelectHealth = 0x00423278; // select of 'health': func_002484F8(player, 1, ...) and sound 0x192
+SavePortalMenu_UpdateAmmo = 0x004232FC; // update of 'ammo': the same test with 0
+SavePortalMenu_SelectAmmo = 0x00423364; // select of 'ammo': func_002484F8(player, 0, ...) and sound 0x193
+SavePortalMenu_SelectGoBack = 0x004233E8; // select of 'go back': closes the menu
+
+// The damaged pak dialog (MenuDesc 0x0043C038/0x0043C05C, items 0x0043BF18:
+// 'problem!', three lines, 'attempt repair', 'retry', 'continue').
+DamagedPakMenu_InitInGame = 0x00423558; // init of MenuDesc 0x0043C038: D_80130964 = 1 ("controller pak is damaged, game cannot be saved.")
+DamagedPakMenu_InitAtBoot = 0x00423574; // init of MenuDesc 0x0043C05C: D_80130964 = 0 ("damaged controller pak found in controller #x.")
+DamagedPakMenu_Poll = 0x00423478; // poll of both; Rage Wars FRONTEND func_8040B700_de with its own flag D_8013099C
+DamagedPakMenu_UpdateLine1 = 0x0042358C; // "controller pak is" / "damaged controller"
+DamagedPakMenu_UpdateLine2 = 0x004235C0; // "damaged, game cannot" / "pak found in"
+DamagedPakMenu_UpdateLine3 = 0x004235F4; // "be saved." / "controller #x." (sprintf of the port)
+DamagedPakMenu_SelectRepair = 0x00423690; // select of 'attempt repair': opens the confirm dialog MenuDesc 0x0043C1A0
+DamagedPakMenu_SelectRetry = 0x00423768; // select of 'retry'
+DamagedPakMenu_UpdateContinue = 0x00423930; // "continue" / "continue without saving"
+DamagedPakMenu_SelectContinue = 0x00423880; // select of 'continue'
+
+// The pak confirm dialog (MenuDescs 0x0043C1A0-0x0043C230, items 0x0043C080:
+// five lines, 'yes', 'no'); D_801309B0 is the question.
+PakConfirmMenu_InitRepair = 0x00423A44; // question 0: "attempt repair ... would you still like to attempt repair?"
+PakConfirmMenu_InitNoSpace = 0x00423A5C; // question 1: "error: not enough notes or pages available to save."
+PakConfirmMenu_InitNoSpaceAll = 0x00423A78; // question 2: "error: not enough notes or pages available to save all note types."
+PakConfirmMenu_InitOverwrite = 0x00423A94; // question 3: "overwrite ... overwrite this note?"
+PakConfirmMenu_InitCorruptNote = 0x00423AB0; // question 4: "error: this note is corrupt ... delete this note?"
+PakConfirmMenu_Poll = 0x00423964; // poll of all five descs (flag D_801309A4)
+PakConfirmMenu_UpdateLine1 = 0x00423ACC; // Rage Wars func_8040B868_de
+PakConfirmMenu_UpdateLine2 = 0x00423B48; // (same Rage Wars source)
+PakConfirmMenu_UpdateLine3 = 0x00423BC4;
+PakConfirmMenu_UpdateLine4 = 0x00423C40;
+PakConfirmMenu_UpdateLine5 = 0x00423CBC; // the question line ("to attempt repair?", "overwrite this note?", "delete this note?")
+PakConfirmMenu_UpdateYes = 0x00423D38; // "yes" or "manage the controller pak"; Rage Wars func_8040BBC0_us
+PakConfirmMenu_UpdateNo = 0x00423DA4; // "no" or its alternative; Rage Wars func_8040BBC0_us
+PakConfirmMenu_SelectYes = 0x00420C30; // select of 'yes': repairs (Pak_RepairIfDamaged), overwrites or deletes by question; Rage Wars func_80409144_de
+PakConfirmMenu_SelectNo = 0x00420F34; // select of 'no'
+
+// Video modes (resolution D_800C2038: 0 lo-rez, 1 hi-rez, 2 hi-rez letterbox,
+// 3 lo-rez letterbox), after Rage Wars FRONTEND/8040B45C_21/22.CPP.
+Video_ApplyResolution = 0x00423E10; // picks the VI mode for the TV type and resolution (hi-rez when osGetMemSize != 4 MB), sets the display globals and starts it; Rage Wars func_8040BBB0_de
+Video_ResizeViMode = 0x00424008; // resizes the selected VI mode around its centres and applies it; Rage Wars func_8040BDB8_de
+Video_NextResolution = 0x004242EC; // steps to the next video mode of the TV region that fits in memory; called from the engine's options code
+Video_SetResolution = 0x00424508; // D_800C2038 = arg; Video_ApplyResolution
+Video_UpdateResolution = 0x0042454C; // reapplies the resolution when it changed (D_800C203C) and the countdown D_800C2040 is under 5
+Video_GetResolutionText = 0x004245E0; // "Resolution   :   lo-rez" / "hi-rez" / "hi-rez-lb" / "lo-rez-lb" by D_800C2038
+Video_SetMode = 0x0042464C; // sets the screen size flags for the width and region, Video_ResizeViMode, then the size of every viewport in the list at D_801198F0; Rage Wars func_8040C484_de
+
+// The inventory screen (MenuDesc 0x0043C944, items 0x0043C260: 'inventory',
+// 45 item icons, 'ok').
+InventoryMenu_DrawItem = 0x00424780; // draw callback of the 45 icon items: the icon in full colour when the player has the item, greyed otherwise
+InventoryMenu_HasItem = 0x00424978; // the availability test inlined in InventoryMenu_DrawItem (rows of item types/indexes)
+InventoryMenu_Init = 0x00424970; // init of MenuDesc 0x0043C944 (empty)
+InventoryMenu_SelectOk = 0x00424A10; // select of 'ok': func_00275A74, then closes the window (func_00416454)
+
+// The mission status screen (MenuDesc 0x0043CA90/0x0043CAB4, items 0x0043C970:
+// title, level name, two objectives with their progress, 'ok').
+Mission_LevelObjectivesDone = 0x00424A60; // level 1-6: whether both of its objective counters (CScene, func_00224C08 ids 2-12) are at 0; called from the engine's func_00248BA8
+MissionMenu_InitStatus = 0x00424F1C; // init of MenuDesc 0x0043CA90: the level of the warp D_80110048, D_80130A34 = 0 ("mission status")
+MissionMenu_InitFailed = 0x00424F50; // init of MenuDesc 0x0043CAB4: the same, D_80130A34 = 1 ("mission failed")
+MissionMenu_UpdateTitle = 0x00424F88; // "mission status" / "mission failed"
+MissionMenu_UpdateLevelName = 0x00424FBC; // "port of adia", "river of souls", ...
+MissionMenu_UpdateObjective1 = 0x0042505C; // the first objective's name ("distress beacons", "soul gates", ...)
+MissionMenu_UpdateObjective1Count = 0x00424B90; // "activated x of 3", "destroyed x of 2", ... with the count from the CScene counter
+MissionMenu_UpdateObjective2 = 0x004250FC; // the second objective's name ("children", "sisters of despair", ...)
+MissionMenu_UpdateObjective2Count = 0x00424D54; // "rescued x of 4", "destroyed x of 3", ...
+MissionMenu_SelectOk = 0x0042519C; // select of 'ok': closes the window, or restarts the level when it failed (func_00285304, func_00285410(1))
+
+// The frame buffer / display list pool (GfxPool at D_80130A58), set up by the engine's func_00286674.
+GfxPool_Alloc = 0x00425220; // frees and reallocates the frame buffers, depth buffer and display-list memory (expansion pak aware); Rage Wars func_004058B0
+GfxPool_Clear = 0x00425604; // zeroes the pool's eight words
+GfxPool_Free = 0x00425638; // frees each block of the pool and zeroes it; Rage Wars OVLGAME func_80405CDC_de
+
+// Controller pak driver (state per port: D_80130C60 kind 1 none/2 rumble/3
+// controller pak, D_80130C70 status, D_800C2224 the cached directory), after
+// Rage Wars MENU/PAK/80403BCC*.CPP.
+Pak_RefreshNotes = 0x00425760; // osPfsFileState of the 16 notes (retried once, an invalid note cleared) and osPfsFreeBlocks into the cache
+Pak_Mount = 0x004258E8; // osPfsInitPak (up to 4 tries), maps its error to the status (-2 none, -3, -4 needs repair, -5 ok) and refreshes the notes; Rage Wars func_00404018
+Pak_ProbeAll = 0x00425AB8; // for the 4 ports: osMotorInit (rumble pak) or Pak_Mount, sets the kind; Rage Wars func_804041F0_de
+Pak_WriteNote = 0x00425BC0; // encodes the name and writes data as a note (osPfsAllocateFile, osPfsReadWriteFile; deletes it on failure); Rage Wars func_804042F0_de
+Pak_FindNote = 0x00425E74; // looks the note up in the cached directory by codes and name; Rage Wars func_8040458C_de
+Pak_DeleteNote = 0x00426064; // osPfsDeleteFile of cached note index, then Pak_Mount; Rage Wars func_80404858_de
+Pak_SaveNoteVerified = 0x00426164; // writes the note and reads it back to compare, up to four times; Rage Wars func_80404958_de
+Pak_AllocDirectory = 0x004263DC; // allocates and zeroes the 0x810-byte directory cache D_800C2224; Rage Wars func_80404D84_de
+Pak_FreeDirectory = 0x00426434; // releases the directory cache; Rage Wars func_80404DDC_de
+Pak_IsDirectoryAllocated = 0x00427164; // returns D_800C2220 (set by Pak_AllocDirectory)
+Pak_ProbeSlot = 0x00426480; // probes the pak in port ch and records its kind; Rage Wars func_80404E28_de
+Pak_GetStatus = 0x0042655C; // -2 unless a controller pak, else its status D_80130C70
+Pak_IsRumblePak = 0x00426594; // kind == 2
+Pak_NeedsRepair = 0x00426BD8; // a controller pak whose status is -4 (osPfsInitPak's PFS_ERR_ID_FATAL)
+Pak_ReadNote = 0x004265B0; // osPfsReadWriteFile(PFS_READ) of note file_no into a buffer; Rage Wars func_80404958_read
+Pak_CountEmptyNotes = 0x0042670C; // counts the unused notes of the cached directory; Rage Wars func_804050CC_de
+Pak_GetFreePages = 0x004267A0; // the cached free bytes / 256; Rage Wars func_80405160_de
+Pak_RepairIfDamaged = 0x00426814; // osPfsRepairId when the status is -4, then Pak_Mount; Rage Wars func_804051D4_de
+Pak_Repair = 0x004268D0; // osPfsRepairId unconditionally, then Pak_Mount; Rage Wars func_80405290_de
+Pak_GetNoteGameName = 0x00426978; // the cached note's game_name pointer
+Pak_GetNoteExtName = 0x004269CC; // the cached note's ext_name pointer
+Pak_GetNotePages = 0x00426A20; // the cached note's size in pages (Pak_BytesToPages); Rage Wars func_804053E0_de
+Pak_FindFreeExtLetter = 0x00426A94; // the first extension letter 'A' + n that no note of the pak uses
+Pak_ProbeRumble = 0x00426C14; // osMotorInit on port ch: whether a Rumble Pak answered
+Pak_DecodeText = 0x00426C88; // pak font codes -> characters ('~' past the table)
+Pak_EncodeText = 0x00426CD4; // upper-cases and encodes characters as pak font codes; Rage Wars func_804042F0_encode
+Pak_TextHasInvalidChar = 0x00426E3C; // whether a decoded name holds '~' (a code with no character)
+Pak_BytesToPages = 0x00426E6C; // (bytes + 255) >> 8
+Crc32_Compute = 0x00426E78; // table-driven CRC-32 (polynomial 0xEDB88320) of a buffer with a seed; Rage Wars RESMGR func_802A08B8_de
+
+// The string helpers of Rage Wars' RESMGR/resmgr_string_memory.CPP (prefixed so
+// they do not clash with libc names).
+Str_Compare = 0x00426D54; // strcmp
+Str_Length = 0x00426D8C; // strlen; Rage Wars func_802A0238_de
+Str_CopyN = 0x00426DB0; // strncpy (pads with NULs); Rage Wars func_802A0294_de
+Str_Copy = 0x00426E04; // strcpy
+Str_Cat = 0x00426F20; // strcat
+Str_CatN = 0x00426F5C; // strncat
+Str_CompareN = 0x00426FB4; // strncmp
+Str_CompareNoCase = 0x00426FFC; // case-insensitive strcmp (recursive); Rage Wars func_802A03F4_de
+Str_FindLastChar = 0x0042704C; // strrchr; Rage Wars func_802A0444_de
+Str_ToUpper = 0x0042709C; // upper-cases a string in place
+Str_ToLower = 0x004270E8; // lower-cases a string in place
+Char_ToUpper = 0x00427134; // toupper
+Char_ToLower = 0x0042714C; // tolower
+
+// libultra 2.0I's Controller Pak file system (first VM module copy; Turok 2
+// carries it in both VM modules, the engine only has __osContRamRead/Write).
+// By the ultralib code (references/ultralib src/io) these follow line for line;
+// the ones names.us.txt already had (osPfsDeleteFile ...) are not repeated.
+// The plain names moved here from the module-2 copies, which become _2.
+osPfsAllocateFile = 0x00427180; // ultralib pfsallocatefile.c: calls osPfsFindFile, osPfsFreeBlocks, __osPfsDeclearPage, __osPfsRWInode, __osCheckId; Rage Wars func_80445F80_de
+__osPfsDeclearPage = 0x00427524; // ultralib pfsallocatefile.c (the file's own comment says so); module-2 copy 0x00460444
+__osClearPage = 0x004276F0; // ultralib pfsallocatefile.c (static there): selects the bank, writes 8 blocks of the page with __osContRamWrite
+__osPfsReleasePages = 0x004279AC; // ultralib pfsdeletefile.c (the file's comment); module-2 copy 0x004608CC
+__osBlockSum = 0x00427B4C; // ultralib pfsdeletefile.c: sums __osSumcalc over the page's 8 blocks; module-2 copy 0x00460A6C
+osPfsFileState = 0x00427C20; // ultralib pfsfilestate.c: __osCheckId, dir entry read, inode walk for file_size; called by Pak_RefreshNotes
+__osPfsGetStatus = 0x00427F80; // ultralib pfsgetstatus.c (file comment); called from osPfsInitPak and the engine's __osContRamRead/Write
+__osPfsRequestOneChannel = 0x00428058; // ultralib pfsgetstatus.c (file comment)
+__osPfsGetOneChannelData = 0x004280E4; // ultralib pfsgetstatus.c: copies the status/type bytes of the PIF reply; only caller __osPfsGetStatus
+osPfsChecker = 0x00428330; // ultralib pfschecker.c: __osGetId, corrupted_init/corrupted, the inode and dir repair; module-2 copy 0x00461250
+corrupted_init = 0x0042876C; // ultralib pfschecker.c: builds the page map from every inode bank; only caller osPfsChecker
+osPfsIsPlug = 0x00428A20; // ultralib pfsisplug.c (file comment): __osSiGetAccess, __osPfsRequestData, __osPfsGetInitData, retry on CONT_NO_RESPONSE_ERROR
+__osPfsRequestData = 0x00428B9C; // ultralib pfsisplug.c: fills __osPfsPifRam with CONT_CMD_REQUEST_STATUS per channel
+__osPfsGetInitData = 0x00428C38; // ultralib pfsisplug.c: builds the plugged-pak bit pattern from the replies
+osPfsFindFile = 0x004292E0; // ultralib pfssearchfile.c: scans the dir entries for company/game code and names; module-2 copy 0x00462200
+__osPfsRWInode = 0x00429AA4; // ultralib contpfs.c, with __osSumcalc inlined (file comment); module-2 copy 0x004629C4
+__osSumcalc = 0x00429D84; // ultralib contpfs.c: the byte sum of a block; caller __osBlockSum
+__osCheckId = 0x00429DFC; // ultralib contpfs.c: rereads the id block and compares it with pfs->id; module-2 copy 0x00462D1C
+__osPfsSelectBank = 0x00429EC4; // ultralib contpfs.c (one-argument 2.0I form): writes 32 bytes of pfs->activebank at address 0x8000/32
+
+// CScene (Turok 3's name for the object at D_800F7078, our CWorld): level
+// start and load, after Turok 3's src/us/virtual/scene.c (CScene__Construct
+// in C there, the rest named in its asm/headers).
+CScene__Construct = 0x00429FA0; // turok3 virtual/scene.c CScene__Construct: same sequence (ClearListCounts, ConstructWarp, CPlayerPool__LevelStart, the "cartridge index", levels, texture sets, ..., link group types tables, the maps 3500-3504, then CScene__LoadLevel(thisx, 0, 0))
+CScene__ConstructWarp = 0x0042C4F4; // turok3: called right after the mode reset in CScene__Construct; clears the warp fields (m_WarpFade = 2, m_WarpState, m_WarpTime, m_WarpID...)
+CScene__LoadLevel = 0x0042AC0C; // turok3 CScene__LoadLevel(thisx, levelIndex, a2): the last call of CScene__Construct; frees the old level, opens "level index", "collision", "links", "level paths", "level info", "sky layers", "animated instances"
+CScene__ConstructMap = 0x0042CE10; // turok3 CScene__ConstructMap(thisx, section, objectIndex): looks the object up ("object index", "geometry") and copies its header (the same code inlined five times in CScene__Construct)
+CScene__DecompressIntelligence = 0x0042CBE4; // turok3: the decompress callback CScene__Construct passes for the "intelligence" block
+CScene__DecompressParticles = 0x0042CAB4; // turok3: the decompress callback CScene__Construct passes for the "particle effects" block; Rage Wars func_8044D804_de
+CScene__DecompressCollision = 0x0042B6B0; // the decompress callback CScene__LoadLevel passes for the "collision" block (builds the collision triangles)
+CScene__DecompressLinks = 0x0042B3E4; // the decompress callback for the "links" block (link groups into CLists); Rage Wars func_8044C108_de
+CScene__DecompressPaths = 0x0042CD04; // the decompress callback for the "level paths" block (indexes made pointers)
+CScene__DecompressAnimatedInstances = 0x0042BA40; // the decompress callback for the "animated instances" block: spawns the level's actors (players through CPlayer__SetupActors)
+CScene__UnloadLevel = 0x0042C9DC; // frees the level's block handles and stops its sounds (the same release CScene__LoadLevel does first)
+CScene__StreamAllSections = 0x0042BF48; // streams every grid section not loaded yet and spawns its objects; called at the end of CScene__LoadLevel
+CScene__RequestWarp = 0x0042C700; // m_WarpState = 1, m_WarpFade = fade, m_WarpID = id; warp sound 0xBE0 unless id 999
+CScene__WarpToLevel = 0x0042C4B8; // when the level differs from m_nLevel: CScene__RequestWarp(~level, fade 0)
+CScene__FindWarpDests = 0x0042C194; // copies up to max "warp dests" of a kind whose key matches; returns the count; Rage Wars func_8044D220_de
+CScene__FindNearestWarpDest = 0x0042C560; // the "warp dests" point of a type nearest a position; Rage Wars func_8044D3E8_de
+CScene__SetupLighting = 0x0042C758; // CScene__LoadLightSettings, then D_800AB8A0 from the level lights' flag bit 2
+CScene__LoadLightSettings = 0x0042AA80; // the level's light colours, ambient and direction from its light record
+CScene__LoadBitSections = 0x0042C418; // reads the level flag bits block (m_pBitSections D_800EBAC0) from ROM unless a demo plays
+CScene__LoadBitSections2 = 0x0042C46C; // the same for the second block (D_800E6AC0)
+CScene__InitPersistentData = 0x0042C3BC; // both bit sections, then the fields at 0x18FE0 (0, 34, the cheat word); turok3's func_44AE08 at the same place in CScene__Construct
+MatrixHeap_Construct = 0x00429F20; // the "Matrices" heap of CScene__LoadLevel: count matrices of 0x40 bytes each set to identity (func_00297AE0)
+CParticleSystem__Construct = 0x0042D220; // CScene__LoadLevel's first reset (w->m_ParticleSystem): 128 particle vars on the free list, draw and 3 active lists, the four default light directions
+CInstancePool__Construct = 0x0042D0A0; // w->m_InstancePool: two CLists and 32 instances (0x298 bytes) on the free one
+SceneActorPool_Construct = 0x0042CF90; // w->m_ActorPool: links its 32 actors (0x1B0 bytes) into the free list, sets up the default definitions
+Light_SetDefaultDirection = 0x0042D1C0; // a light's default direction (-0.667, 0.953, -0.572) normalised, enabled; Rage Wars func_0044E8B0
+
+// The player pool and the players (turok3's CPlayerPool names).
+CPlayerPool__Construct = 0x0042E834; // turok3 CPlayerPool__Construct: zeroes the pool and constructs its idle and active lists
+CPlayerPool__NewGame = 0x0042E5AC; // turok3 CPlayerPool__NewGame(thisx, maxPlayerCount): allocates count players, constructs each (inlined CPlayer__Construct), sets their options
+CPlayerPool__LevelStart = 0x0042E894; // turok3 CPlayerPool__LevelStart, called the same way from CScene__Construct (&playerPool): CPlayer__LevelStart for every active player
+CPlayer__Construct = 0x0042E91C; // controller state, index, options, looping sounds and warp ids of one player (inlined in CPlayerPool__NewGame)
+CPlayer__NewGame = 0x0042DC18; // activates the player: camera, special pickups, life force, nuke/key flags, lives (3, or 1), kill/tag stats cleared
+CPlayer__LevelStart = 0x0042DE74; // per level: the overlay, rumble, flashlight and the HUD overlays (ammo, health, lives, tokens...)
+CPlayer__SetupActors = 0x0042DA60; // sets up the character and weapon actors (parents, flags, callbacks, scales) from the spawn record
+CPlayer__StartGame = 0x0042E14C; // lives 3 (or 1 in multiplayer), full health, invincibility, then spawns at the checkpoint warp
+CPlayer__LoseLife = 0x0042E29C; // one life fewer (unless the infinite-lives cheat), game over at 0, else respawn at the checkpoint with full health
+CPlayer__ResetHealth = 0x0042EA00; // full health (0x6400) or the multiplayer start health, invincibility, clears the hit state
+CPlayer__SetCharacter = 0x0042E430; // m_nDeathmatchCharacter and the character's intelligence, scale, start health and voice sound
+CPlayer__Activate = 0x0042E9A4; // options' m_bActive = 1, CPlayer__NewGame, weapon actor reset, warp to D_8011ACA8
+CPlayer__StopLoopingSounds = 0x0042EB04; // stops m_pLoopingSound_WeaponBackground and m_pLoopingSound_WeaponFiring
+
+// The camera pool (turok3's CCameraPool names).
+CCameraPool__Construct = 0x0042FE4C; // turok3 CCameraPool__Construct: zeroes the 0x11F0-byte CCameraPool and its lists; called from the engine's init
+CCameraPool__NewGame = 0x0042FBA4; // turok3 CCameraPool__NewGame(thisx, maxCameraCount): main camera, shakes, allocates count cameras; called where CPlayerPool__NewGame is
+CCameraPool__AllocCamera = 0x0042FF58; // takes the first free camera, CCamera__Construct, moves it to the active list; called by CPlayer__NewGame
+CCameraPool__FreeCamera = 0x0042FFB0; // moves a camera from the active list (0x20) back to the free list (0xC)
+CCameraPool__ResetEmitterPools = 0x0042FEEC; // CEmitterPool__Construct on each camera's pool (0x558) and the main one's
+CCamera__Construct = 0x0042F9B0; // resets a CCamera: view params, identity matrices, view quaternion, viewport from the screen size, its emitter pool
+CEmitterPool__Construct = 0x0042FFF0; // active and free lists, its 4 CEmitters on the free one, m_ActiveMask = 0
+
+// Demo (attract mode) playback: D_800F56B0, input streams decoded from bit
+// streams with a run length.
+COnScreen__Construct = 0x0042EB50; // n5's suggestion, checked by C12: zeroes 0x90-0x9C, func_0042EBB4, COnScreen__LoadFontTexture, then COnScreen__BuildCharacterLookUp for both lookups (m_CharacterSmallLookUpPos); func_00286674 calls it on the engine's COnScreen
+Demo_ReadRunLength = 0x0042EC30; // 3 bits n, then n bits + 1: how many frames the value holds
+Demo_DecodeButtons = 0x0042ECF0; // the buttons stream's decoder (nine scrambled bits), set by Demo_Start
+Demo_DecodeStick = 0x0042F75C; // the stick X/Y streams' decoder (8 bits), set by Demo_Start
+Demo_DecodeMatch = 0x0042F7C8; // the match stream's decoder (2 bits + 2), set by Demo_Start
+Demo_Start = 0x0042EF2C; // starts a demo from its header: saves the settings, sets up the per-player streams and the game setup
+Demo_Update = 0x0042F1C4; // per frame: time, countdown to the end, checksum of the streams
+Demo_UpdateStreams = 0x0042F344; // decodes or ticks each player's buttons/stick streams
+Demo_UpdateMatchStream = 0x0042F958; // the match stream, into D_8011AD10
+Demo_UpdateChecksum = 0x0042F868; // folds the streams' values into the checksum (inlined in Demo_Update)
+Demo_Reset = 0x0042F4F0; // clears the demo state
+Demo_End = 0x0042F514; // puts back the settings saved by Demo_Start, stops
+Demo_Enable = 0x0042F57C; // active = 1
+Demo_PlayNext = 0x0042F590; // starts the next demo of the table D_004384E8 (wrapping)
+DemoStream_Init = 0x0042F600; // sets a stream's fields (count 1, decoder...)
+DemoStream_Decode = 0x0042F630; // calls the stream's decoder (0x14)
+DemoStream_ReadBit = 0x0042F6C8; // the next bit of the stream
+DemoStream_ReadBits = 0x0042F700; // count bits of the stream, most significant first
+Bits_Test = 0x0042F6A4; // bit n of a big-endian bit array
+
+// Controllers.
+Cont_InitAll = 0x00430070; // initialises the controllers; returns the lowest port with one plugged in, or -1; Rage Wars func_0044BAC0
+Cont_ResetSlot = 0x004301C8; // resets a controller/rumble slot (0x224 bytes); returns whether its port has a controller; Rage Wars func_0044BC58
+
+// Second-module copies of the functions above (named + _2).
+PakMenu_SelectCancel_2 = 0x004590BC; // module-2 copy of 0x0042019C (twin map: same code at link address + 0xE0)
+GameNoteMenu_SelectYes_2 = 0x00459374; // module-2 copy of 0x00420454 (twin map: same code at link address + 0xE0)
+CharNoteMenu_SelectYes_2 = 0x004595D8; // module-2 copy of 0x004206B8 (twin map: same code at link address + 0xE0)
+PakMessage_SelectOk_2 = 0x0045977C; // module-2 copy of 0x0042085C (twin map: same code at link address + 0xE0)
+PakConfirmMenu_SelectYes_2 = 0x00459B50; // module-2 copy of 0x00420C30 (twin map: same code at link address + 0xE0)
+PakConfirmMenu_SelectNo_2 = 0x00459E54; // module-2 copy of 0x00420F34 (twin map: same code at link address + 0xE0)
+PakMenu_PickDefaultPort_2 = 0x0045A0CC; // module-2 copy of 0x004211AC (twin map: same code at link address + 0xE0)
+PakMenu_HasPort_2 = 0x0045A15C; // module-2 copy of 0x0042123C (twin map: same code at link address + 0xE0)
+Pak_IsTurok2Note_2 = 0x0045A180; // module-2 copy of 0x00421260 (twin map: same code at link address + 0xE0)
+Pak_GetBufferSize_2 = 0x0045A20C; // module-2 copy of 0x004212EC (twin map: same code at link address + 0xE0)
+Pak_SetBufferSize_2 = 0x0045A22C; // module-2 copy of 0x0042130C (twin map: same code at link address + 0xE0)
+Pak_AllocBuffer_2 = 0x0045A254; // module-2 copy of 0x00421334 (twin map: same code at link address + 0xE0)
+Pak_FreeSaveBuffers_2 = 0x0045A2EC; // module-2 copy of 0x004213CC (twin map: same code at link address + 0xE0)
+PakMenu_SaveCharacter_2 = 0x0045A374; // module-2 copy of 0x00421454 (twin map: same code at link address + 0xE0)
+PakMenu_RestoreCharacter_2 = 0x0045A3E4; // module-2 copy of 0x004214C4 (twin map: same code at link address + 0xE0)
+SaveGame_Restore_2 = 0x0045A448; // module-2 copy of 0x00421528 (twin map: same code at link address + 0xE0)
+PakMenu_IsSavePortalMenu_2 = 0x0045A574; // module-2 copy of 0x00421654 (twin map: same code at link address + 0xE0)
+PakMenu_GetPort_2 = 0x0045A5B0; // module-2 copy of 0x00421690 (twin map: same code at link address + 0xE0)
+PakMenu_PollPak_2 = 0x0045A5E0; // module-2 copy of 0x004216C0 (twin map: same code at link address + 0xE0)
+PakMenu_PollPakB_2 = 0x0045A6C0; // module-2 copy of 0x004217A0 (twin map: same code at link address + 0xE0)
+PakMenu_PollStartPressed_2 = 0x0045A7A0; // module-2 copy of 0x00421880 (twin map: same code at link address + 0xE0)
+PakMenu_PollBootPak_2 = 0x0045A7E4; // module-2 copy of 0x004218C4 (twin map: same code at link address + 0xE0)
+PakMenu_GetPlayerAndPort_2 = 0x0045A8C8; // module-2 copy of 0x004219A8 (twin map: same code at link address + 0xE0)
+PakMenu_ProbeOwnerPort_2 = 0x0045A900; // module-2 copy of 0x004219E0 (twin map: same code at link address + 0xE0)
+PakMenu_FindNoteByName_2 = 0x0045A974; // module-2 copy of 0x00421A54 (twin map: same code at link address + 0xE0)
+PakMenu_FindNextPakPort_2 = 0x0045AA70; // module-2 copy of 0x00421B50 (twin map: same code at link address + 0xE0)
+PakMenu_UpdateModeText_2 = 0x0045AB04; // module-2 copy of 0x00421BE4 (twin map: same code at link address + 0xE0)
+PakMenu_UpdateTitle_2 = 0x0045ABC0; // module-2 copy of 0x00421CA0 (twin map: same code at link address + 0xE0)
+PakMenu_UpdateSubtitle_2 = 0x0045AC40; // module-2 copy of 0x00421D20 (twin map: same code at link address + 0xE0)
+PakMenu_UpdateCancel_2 = 0x0045AD1C; // module-2 copy of 0x00421DFC (twin map: same code at link address + 0xE0)
+GameNoteMenu_InitLoad_2 = 0x0045AD40; // module-2 copy of 0x00421E20 (twin map: same code at link address + 0xE0)
+GameNoteMenu_InitDelete_2 = 0x0045AD54; // module-2 copy of 0x00421E34 (twin map: same code at link address + 0xE0)
+GameNoteMenu_UpdateTitle_2 = 0x0045AD64; // module-2 copy of 0x00421E44 (twin map: same code at link address + 0xE0)
+GameNoteMenu_UpdateDifficulty_2 = 0x0045AD98; // module-2 copy of 0x00421E78 (twin map: same code at link address + 0xE0)
+GameNoteMenu_UpdateLevel_2 = 0x0045AEA8; // module-2 copy of 0x00421F88 (twin map: same code at link address + 0xE0)
+GameNoteMenu_UpdatePrompt_2 = 0x0045B010; // module-2 copy of 0x004220F0 (twin map: same code at link address + 0xE0)
+GameNoteMenu_SelectNo_2 = 0x0045B044; // module-2 copy of 0x00422124 (twin map: same code at link address + 0xE0)
+CharNoteMenu_InitLoad_2 = 0x0045B0B0; // module-2 copy of 0x00422190 (twin map: same code at link address + 0xE0)
+CharNoteMenu_InitDelete_2 = 0x0045B0CC; // module-2 copy of 0x004221AC (twin map: same code at link address + 0xE0)
+CharNoteMenu_UpdateTitle_2 = 0x0045B124; // module-2 copy of 0x00422204 (twin map: same code at link address + 0xE0)
+CharNoteMenu_UpdateName_2 = 0x0045B178; // module-2 copy of 0x00422258 (twin map: same code at link address + 0xE0)
+CharNoteMenu_UpdateType_2 = 0x0045B234; // module-2 copy of 0x00422314 (twin map: same code at link address + 0xE0)
+CharNoteMenu_UpdateRank_2 = 0x0045B3A4; // module-2 copy of 0x00422484 (twin map: same code at link address + 0xE0)
+CharNoteMenu_UpdatePrompt_2 = 0x0045B528; // module-2 copy of 0x00422608 (twin map: same code at link address + 0xE0)
+CharNoteMenu_SelectNo_2 = 0x0045B57C; // module-2 copy of 0x0042265C (twin map: same code at link address + 0xE0)
+PakMessage_InitPakFull_2 = 0x0045B5E8; // module-2 copy of 0x004226C8 (twin map: same code at link address + 0xE0)
+PakMessage_InitPakNotFound_2 = 0x0045B5F8; // module-2 copy of 0x004226D8 (twin map: same code at link address + 0xE0)
+PakMessage_InitInsertToManage_2 = 0x0045B60C; // module-2 copy of 0x004226EC (twin map: same code at link address + 0xE0)
+PakMessage_InitInsertToSave_2 = 0x0045B620; // module-2 copy of 0x00422700 (twin map: same code at link address + 0xE0)
+PakMessage_InitInsertToLoad_2 = 0x0045B634; // module-2 copy of 0x00422714 (twin map: same code at link address + 0xE0)
+PakMessage_InitInsertRumblePak_2 = 0x0045B648; // module-2 copy of 0x00422728 (twin map: same code at link address + 0xE0)
+PakMessage_InitCannotSave_2 = 0x0045B65C; // module-2 copy of 0x0042273C (twin map: same code at link address + 0xE0)
+PakMessage_InitPakChanged_2 = 0x0045B670; // module-2 copy of 0x00422750 (twin map: same code at link address + 0xE0)
+PakMessage_InitNoController_2 = 0x0045B684; // module-2 copy of 0x00422764 (twin map: same code at link address + 0xE0)
+PakMessage_InitRumblePak_2 = 0x0045B6D0; // module-2 copy of 0x004227B0 (twin map: same code at link address + 0xE0)
+PakMessage_InitRumblePakB_2 = 0x0045B6EC; // module-2 copy of 0x004227CC (twin map: same code at link address + 0xE0)
+PakMessage_InitSaveDone_2 = 0x0045B70C; // module-2 copy of 0x004227EC (twin map: same code at link address + 0xE0)
+PakMessage_InitNoteCorrupt_2 = 0x0045B720; // module-2 copy of 0x00422800 (twin map: same code at link address + 0xE0)
+PakMessage_InitDeleteDone_2 = 0x0045B734; // module-2 copy of 0x00422814 (twin map: same code at link address + 0xE0)
+PakMessage_InitSaveFailed_2 = 0x0045B748; // module-2 copy of 0x00422828 (twin map: same code at link address + 0xE0)
+PakMessage_InitDeleteFailed_2 = 0x0045B75C; // module-2 copy of 0x0042283C (twin map: same code at link address + 0xE0)
+PakMessage_InitRepaired_2 = 0x0045B770; // module-2 copy of 0x00422850 (twin map: same code at link address + 0xE0)
+PakMessage_UpdateHeading_2 = 0x0045B784; // module-2 copy of 0x00422864 (twin map: same code at link address + 0xE0)
+PakMessage_UpdateLine1_2 = 0x0045B7D0; // module-2 copy of 0x004228B0 (twin map: same code at link address + 0xE0)
+PakMessage_UpdateLine2_2 = 0x0045B8FC; // module-2 copy of 0x004229DC (twin map: same code at link address + 0xE0)
+PakMessage_UpdateLine3_2 = 0x0045BA28; // module-2 copy of 0x00422B08 (twin map: same code at link address + 0xE0)
+PakMessage_UpdateLine4_2 = 0x0045BB54; // module-2 copy of 0x00422C34 (twin map: same code at link address + 0xE0)
+PakMessage_UpdateLine5_2 = 0x0045BC80; // module-2 copy of 0x00422D60 (twin map: same code at link address + 0xE0)
+PakMessage_UpdateOk_2 = 0x0045BDAC; // module-2 copy of 0x00422E8C (twin map: same code at link address + 0xE0)
+SavePortalMenu_Init_2 = 0x0045BE34; // module-2 copy of 0x00422F14 (twin map: same code at link address + 0xE0)
+SavePortalMenu_InitB_2 = 0x0045BEE0; // module-2 copy of 0x00422FC0 (twin map: same code at link address + 0xE0)
+SavePortalMenu_Poll_2 = 0x0045BF60; // module-2 copy of 0x00423040 (twin map: same code at link address + 0xE0)
+SavePortalMenu_Close_2 = 0x0045C050; // module-2 copy of 0x00423130 (twin map: same code at link address + 0xE0)
+SavePortalMenu_SelectSave_2 = 0x0045C098; // module-2 copy of 0x00423178 (twin map: same code at link address + 0xE0)
+SavePortalMenu_UpdateHealth_2 = 0x0045C130; // module-2 copy of 0x00423210 (twin map: same code at link address + 0xE0)
+SavePortalMenu_UpdateAmmo_2 = 0x0045C21C; // module-2 copy of 0x004232FC (twin map: same code at link address + 0xE0)
+SavePortalMenu_SelectGoBack_2 = 0x0045C308; // module-2 copy of 0x004233E8 (twin map: same code at link address + 0xE0)
+DamagedPakMenu_Poll_2 = 0x0045C398; // module-2 copy of 0x00423478 (twin map: same code at link address + 0xE0)
+DamagedPakMenu_InitInGame_2 = 0x0045C478; // module-2 copy of 0x00423558 (twin map: same code at link address + 0xE0)
+DamagedPakMenu_InitAtBoot_2 = 0x0045C494; // module-2 copy of 0x00423574 (twin map: same code at link address + 0xE0)
+DamagedPakMenu_UpdateLine1_2 = 0x0045C4AC; // module-2 copy of 0x0042358C (twin map: same code at link address + 0xE0)
+DamagedPakMenu_UpdateLine2_2 = 0x0045C4E0; // module-2 copy of 0x004235C0 (twin map: same code at link address + 0xE0)
+DamagedPakMenu_UpdateLine3_2 = 0x0045C514; // module-2 copy of 0x004235F4 (twin map: same code at link address + 0xE0)
+DamagedPakMenu_SelectRepair_2 = 0x0045C5B0; // module-2 copy of 0x00423690 (twin map: same code at link address + 0xE0)
+DamagedPakMenu_SelectRetry_2 = 0x0045C688; // module-2 copy of 0x00423768 (twin map: same code at link address + 0xE0)
+DamagedPakMenu_SelectContinue_2 = 0x0045C7A0; // module-2 copy of 0x00423880 (twin map: same code at link address + 0xE0)
+DamagedPakMenu_UpdateContinue_2 = 0x0045C850; // module-2 copy of 0x00423930 (twin map: same code at link address + 0xE0)
+PakConfirmMenu_Poll_2 = 0x0045C884; // module-2 copy of 0x00423964 (twin map: same code at link address + 0xE0)
+PakConfirmMenu_InitRepair_2 = 0x0045C964; // module-2 copy of 0x00423A44 (twin map: same code at link address + 0xE0)
+PakConfirmMenu_InitNoSpace_2 = 0x0045C97C; // module-2 copy of 0x00423A5C (twin map: same code at link address + 0xE0)
+PakConfirmMenu_InitNoSpaceAll_2 = 0x0045C998; // module-2 copy of 0x00423A78 (twin map: same code at link address + 0xE0)
+PakConfirmMenu_InitOverwrite_2 = 0x0045C9B4; // module-2 copy of 0x00423A94 (twin map: same code at link address + 0xE0)
+PakConfirmMenu_InitCorruptNote_2 = 0x0045C9D0; // module-2 copy of 0x00423AB0 (twin map: same code at link address + 0xE0)
+PakConfirmMenu_UpdateLine1_2 = 0x0045C9EC; // module-2 copy of 0x00423ACC (twin map: same code at link address + 0xE0)
+PakConfirmMenu_UpdateLine2_2 = 0x0045CA68; // module-2 copy of 0x00423B48 (twin map: same code at link address + 0xE0)
+PakConfirmMenu_UpdateLine3_2 = 0x0045CAE4; // module-2 copy of 0x00423BC4 (twin map: same code at link address + 0xE0)
+PakConfirmMenu_UpdateLine4_2 = 0x0045CB60; // module-2 copy of 0x00423C40 (twin map: same code at link address + 0xE0)
+PakConfirmMenu_UpdateLine5_2 = 0x0045CBDC; // module-2 copy of 0x00423CBC (twin map: same code at link address + 0xE0)
+PakConfirmMenu_UpdateYes_2 = 0x0045CC58; // module-2 copy of 0x00423D38 (twin map: same code at link address + 0xE0)
+PakConfirmMenu_UpdateNo_2 = 0x0045CCC4; // module-2 copy of 0x00423DA4 (twin map: same code at link address + 0xE0)
+Video_ApplyResolution_2 = 0x0045CD30; // module-2 copy of 0x00423E10 (twin map: same code at link address + 0xE0)
+Video_NextResolution_2 = 0x0045D20C; // module-2 copy of 0x004242EC (twin map: same code at link address + 0xE0)
+Video_SetResolution_2 = 0x0045D428; // module-2 copy of 0x00424508 (twin map: same code at link address + 0xE0)
+Video_UpdateResolution_2 = 0x0045D46C; // module-2 copy of 0x0042454C (twin map: same code at link address + 0xE0)
+Video_GetResolutionText_2 = 0x0045D500; // module-2 copy of 0x004245E0 (twin map: same code at link address + 0xE0)
+Video_SetMode_2 = 0x0045D56C; // module-2 copy of 0x0042464C (twin map: same code at link address + 0xE0)
+InventoryMenu_DrawItem_2 = 0x0045D6A0; // module-2 copy of 0x00424780 (twin map: same code at link address + 0xE0)
+InventoryMenu_Init_2 = 0x0045D890; // module-2 copy of 0x00424970 (twin map: same code at link address + 0xE0)
+InventoryMenu_HasItem_2 = 0x0045D898; // module-2 copy of 0x00424978 (twin map: same code at link address + 0xE0)
+InventoryMenu_SelectOk_2 = 0x0045D930; // module-2 copy of 0x00424A10 (twin map: same code at link address + 0xE0)
+Mission_LevelObjectivesDone_2 = 0x0045D980; // module-2 copy of 0x00424A60 (twin map: same code at link address + 0xE0)
+MissionMenu_UpdateObjective1Count_2 = 0x0045DAB0; // module-2 copy of 0x00424B90 (twin map: same code at link address + 0xE0)
+MissionMenu_UpdateObjective2Count_2 = 0x0045DC74; // module-2 copy of 0x00424D54 (twin map: same code at link address + 0xE0)
+MissionMenu_InitStatus_2 = 0x0045DE3C; // module-2 copy of 0x00424F1C (twin map: same code at link address + 0xE0)
+MissionMenu_InitFailed_2 = 0x0045DE70; // module-2 copy of 0x00424F50 (twin map: same code at link address + 0xE0)
+MissionMenu_UpdateTitle_2 = 0x0045DEA8; // module-2 copy of 0x00424F88 (twin map: same code at link address + 0xE0)
+MissionMenu_UpdateLevelName_2 = 0x0045DEDC; // module-2 copy of 0x00424FBC (twin map: same code at link address + 0xE0)
+MissionMenu_UpdateObjective1_2 = 0x0045DF7C; // module-2 copy of 0x0042505C (twin map: same code at link address + 0xE0)
+MissionMenu_UpdateObjective2_2 = 0x0045E01C; // module-2 copy of 0x004250FC (twin map: same code at link address + 0xE0)
+MissionMenu_SelectOk_2 = 0x0045E0BC; // module-2 copy of 0x0042519C (twin map: same code at link address + 0xE0)
+GfxPool_Alloc_2 = 0x0045E140; // module-2 copy of 0x00425220 (twin map: same code at link address + 0xE0)
+GfxPool_Clear_2 = 0x0045E524; // module-2 copy of 0x00425604 (twin map: same code at link address + 0xE0)
+GfxPool_Free_2 = 0x0045E558; // module-2 copy of 0x00425638 (twin map: same code at link address + 0xE0)
+Pak_RefreshNotes_2 = 0x0045E680; // module-2 copy of 0x00425760 (twin map: same code at link address + 0xE0)
+Pak_Mount_2 = 0x0045E808; // module-2 copy of 0x004258E8 (twin map: same code at link address + 0xE0)
+Pak_ProbeAll_2 = 0x0045E9D8; // module-2 copy of 0x00425AB8 (twin map: same code at link address + 0xE0)
+Pak_WriteNote_2 = 0x0045EAE0; // module-2 copy of 0x00425BC0 (twin map: same code at link address + 0xE0)
+Pak_FindNote_2 = 0x0045ED94; // module-2 copy of 0x00425E74 (twin map: same code at link address + 0xE0)
+Pak_DeleteNote_2 = 0x0045EF84; // module-2 copy of 0x00426064 (twin map: same code at link address + 0xE0)
+Pak_SaveNoteVerified_2 = 0x0045F084; // module-2 copy of 0x00426164 (twin map: same code at link address + 0xE0)
+Pak_AllocDirectory_2 = 0x0045F2FC; // module-2 copy of 0x004263DC (twin map: same code at link address + 0xE0)
+Pak_FreeDirectory_2 = 0x0045F354; // module-2 copy of 0x00426434 (twin map: same code at link address + 0xE0)
+Pak_ProbeSlot_2 = 0x0045F3A0; // module-2 copy of 0x00426480 (twin map: same code at link address + 0xE0)
+Pak_GetStatus_2 = 0x0045F47C; // module-2 copy of 0x0042655C (twin map: same code at link address + 0xE0)
+Pak_IsRumblePak_2 = 0x0045F4B4; // module-2 copy of 0x00426594 (twin map: same code at link address + 0xE0)
+Pak_ReadNote_2 = 0x0045F4D0; // module-2 copy of 0x004265B0 (twin map: same code at link address + 0xE0)
+Pak_CountEmptyNotes_2 = 0x0045F62C; // module-2 copy of 0x0042670C (twin map: same code at link address + 0xE0)
+Pak_GetFreePages_2 = 0x0045F6C0; // module-2 copy of 0x004267A0 (twin map: same code at link address + 0xE0)
+Pak_RepairIfDamaged_2 = 0x0045F734; // module-2 copy of 0x00426814 (twin map: same code at link address + 0xE0)
+Pak_Repair_2 = 0x0045F7F0; // module-2 copy of 0x004268D0 (twin map: same code at link address + 0xE0)
+Pak_GetNoteGameName_2 = 0x0045F898; // module-2 copy of 0x00426978 (twin map: same code at link address + 0xE0)
+Pak_GetNoteExtName_2 = 0x0045F8EC; // module-2 copy of 0x004269CC (twin map: same code at link address + 0xE0)
+Pak_GetNotePages_2 = 0x0045F940; // module-2 copy of 0x00426A20 (twin map: same code at link address + 0xE0)
+Pak_FindFreeExtLetter_2 = 0x0045F9B4; // module-2 copy of 0x00426A94 (twin map: same code at link address + 0xE0)
+Pak_NeedsRepair_2 = 0x0045FAF8; // module-2 copy of 0x00426BD8 (twin map: same code at link address + 0xE0)
+Pak_ProbeRumble_2 = 0x0045FB34; // module-2 copy of 0x00426C14 (twin map: same code at link address + 0xE0)
+Pak_EncodeText_2 = 0x0045FBF4; // module-2 copy of 0x00426CD4 (twin map: same code at link address + 0xE0)
+Str_Compare_2 = 0x0045FC74; // module-2 copy of 0x00426D54 (twin map: same code at link address + 0xE0)
+Str_Length_2 = 0x0045FCAC; // module-2 copy of 0x00426D8C (twin map: same code at link address + 0xE0)
+Str_CopyN_2 = 0x0045FCD0; // module-2 copy of 0x00426DB0 (twin map: same code at link address + 0xE0)
+Str_Copy_2 = 0x0045FD24; // module-2 copy of 0x00426E04 (twin map: same code at link address + 0xE0)
+Pak_TextHasInvalidChar_2 = 0x0045FD5C; // module-2 copy of 0x00426E3C (twin map: same code at link address + 0xE0)
+Pak_BytesToPages_2 = 0x0045FD8C; // module-2 copy of 0x00426E6C (twin map: same code at link address + 0xE0)
+Crc32_Compute_2 = 0x0045FD98; // module-2 copy of 0x00426E78 (twin map: same code at link address + 0xE0)
+Str_Cat_2 = 0x0045FE40; // module-2 copy of 0x00426F20 (twin map: same code at link address + 0xE0)
+Str_CatN_2 = 0x0045FE7C; // module-2 copy of 0x00426F5C (twin map: same code at link address + 0xE0)
+Str_CompareN_2 = 0x0045FED4; // module-2 copy of 0x00426FB4 (twin map: same code at link address + 0xE0)
+Str_CompareNoCase_2 = 0x0045FF1C; // module-2 copy of 0x00426FFC (twin map: same code at link address + 0xE0)
+Str_FindLastChar_2 = 0x0045FF6C; // module-2 copy of 0x0042704C (twin map: same code at link address + 0xE0)
+Str_ToUpper_2 = 0x0045FFBC; // module-2 copy of 0x0042709C (twin map: same code at link address + 0xE0)
+Str_ToLower_2 = 0x00460008; // module-2 copy of 0x004270E8 (twin map: same code at link address + 0xE0)
+Char_ToUpper_2 = 0x00460054; // module-2 copy of 0x00427134 (twin map: same code at link address + 0xE0)
+Char_ToLower_2 = 0x0046006C; // module-2 copy of 0x0042714C (twin map: same code at link address + 0xE0)
+Pak_IsDirectoryAllocated_2 = 0x00460084; // module-2 copy of 0x00427164 (twin map: same code at link address + 0xE0)
+osPfsAllocateFile_2 = 0x004600A0; // module-2 copy of 0x00427180 (twin map: same code at link address + 0xE0)
+__osClearPage_2 = 0x00460610; // module-2 copy of 0x004276F0 (twin map: same code at link address + 0xE0)
+osPfsFileState_2 = 0x00460B40; // module-2 copy of 0x00427C20 (twin map: same code at link address + 0xE0)
+osPfsFreeBlocks_2 = 0x00460D80; // module-2 copy of osPfsFreeBlocks 0x00427E60 (twin map, link address + 0xE0)
+__osPfsGetStatus_2 = 0x00460EA0; // module-2 copy of 0x00427F80 (twin map: same code at link address + 0xE0)
+__osPfsRequestOneChannel_2 = 0x00460F78; // module-2 copy of 0x00428058 (twin map: same code at link address + 0xE0)
+__osPfsGetOneChannelData_2 = 0x00461004; // module-2 copy of 0x004280E4 (twin map: same code at link address + 0xE0)
+corrupted_init_2 = 0x0046168C; // module-2 copy of 0x0042876C (twin map: same code at link address + 0xE0)
+osPfsIsPlug_2 = 0x00461940; // module-2 copy of 0x00428A20 (twin map: same code at link address + 0xE0)
+__osPfsRequestData_2 = 0x00461ABC; // module-2 copy of 0x00428B9C (twin map: same code at link address + 0xE0)
+__osPfsGetInitData_2 = 0x00461B58; // module-2 copy of 0x00428C38 (twin map: same code at link address + 0xE0)
+osPfsReadWriteFile_2 = 0x00461C10; // module-2 copy of osPfsReadWriteFile 0x00428CF0 (twin map)
+osPfsRepairId_2 = 0x00462050; // module-2 copy of osPfsRepairId 0x00429130 (twin map)
+__osRepairPackId_2 = 0x00462380; // module-2 copy of __osRepairPackId 0x00429460 (twin map)
+__osSumcalc_2 = 0x00462CA4; // module-2 copy of 0x00429D84 (twin map: same code at link address + 0xE0)
+__osIdCheckSum_2 = 0x00462CD4; // module-2 copy of __osIdCheckSum 0x00429DB4 (twin map)
+__osPfsSelectBank_2 = 0x00462DE4; // module-2 copy of 0x00429EC4 (twin map: same code at link address + 0xE0)
+CScene__Construct_2 = 0x00462EC0; // module-2 copy of 0x00429FA0 (twin map: same code at link address + 0xE0)
+CScene__LoadLightSettings_2 = 0x004639A0; // module-2 copy of 0x0042AA80 (twin map: same code at link address + 0xE0)
+CScene__LoadLevel_2 = 0x00463B2C; // module-2 copy of 0x0042AC0C (twin map: same code at link address + 0xE0)
+CScene__DecompressLinks_2 = 0x00464304; // module-2 copy of 0x0042B3E4 (twin map: same code at link address + 0xE0)
+CScene__DecompressAnimatedInstances_2 = 0x00464960; // module-2 copy of 0x0042BA40 (twin map: same code at link address + 0xE0)
+CScene__InitPersistentData_2 = 0x004652DC; // module-2 copy of 0x0042C3BC (twin map: same code at link address + 0xE0)
+CScene__LoadBitSections_2 = 0x00465338; // module-2 copy of 0x0042C418 (twin map: same code at link address + 0xE0)
+CScene__LoadBitSections2_2 = 0x0046538C; // module-2 copy of 0x0042C46C (twin map: same code at link address + 0xE0)
+CScene__WarpToLevel_2 = 0x004653D8; // module-2 copy of 0x0042C4B8 (twin map: same code at link address + 0xE0)
+CScene__ConstructWarp_2 = 0x00465414; // module-2 copy of 0x0042C4F4 (twin map: same code at link address + 0xE0)
+CScene__RequestWarp_2 = 0x00465620; // module-2 copy of 0x0042C700 (twin map: same code at link address + 0xE0)
+CScene__SetupLighting_2 = 0x00465678; // module-2 copy of 0x0042C758 (twin map: same code at link address + 0xE0)
+CScene__UnloadLevel_2 = 0x004658FC; // module-2 copy of 0x0042C9DC (twin map: same code at link address + 0xE0)
+CScene__DecompressParticles_2 = 0x004659D4; // module-2 copy of 0x0042CAB4 (twin map: same code at link address + 0xE0)
+CScene__DecompressIntelligence_2 = 0x00465B04; // module-2 copy of 0x0042CBE4 (twin map: same code at link address + 0xE0)
+CScene__ConstructMap_2 = 0x00465D30; // module-2 copy of 0x0042CE10 (twin map: same code at link address + 0xE0)
+SceneActorPool_Construct_2 = 0x00465EB0; // module-2 copy of 0x0042CF90 (twin map: same code at link address + 0xE0)
+CInstancePool__Construct_2 = 0x00465FC0; // module-2 copy of 0x0042D0A0 (twin map: same code at link address + 0xE0)
+CParticleSystem__Construct_2 = 0x00466140; // module-2 copy of 0x0042D220 (twin map: same code at link address + 0xE0)
+CPlayer__SetupActors_2 = 0x00466980; // module-2 copy of 0x0042DA60 (twin map: same code at link address + 0xE0)
+CPlayer__NewGame_2 = 0x00466B38; // module-2 copy of 0x0042DC18 (twin map: same code at link address + 0xE0)
+CPlayer__LevelStart_2 = 0x00466D94; // module-2 copy of 0x0042DE74 (twin map: same code at link address + 0xE0)
+CPlayer__StartGame_2 = 0x0046706C; // module-2 copy of 0x0042E14C (twin map: same code at link address + 0xE0)
+CPlayer__LoseLife_2 = 0x004671BC; // module-2 copy of 0x0042E29C (twin map: same code at link address + 0xE0)
+CPlayer__SetCharacter_2 = 0x00467350; // module-2 copy of 0x0042E430 (twin map: same code at link address + 0xE0)
+CPlayerPool__NewGame_2 = 0x004674CC; // module-2 copy of 0x0042E5AC (twin map: same code at link address + 0xE0)
+CPlayerPool__Construct_2 = 0x00467754; // module-2 copy of 0x0042E834 (twin map: same code at link address + 0xE0)
+CPlayerPool__LevelStart_2 = 0x004677B4; // module-2 copy of 0x0042E894 (twin map: same code at link address + 0xE0)
+CPlayer__Construct_2 = 0x0046783C; // module-2 copy of 0x0042E91C (twin map: same code at link address + 0xE0)
+CPlayer__Activate_2 = 0x004678C4; // module-2 copy of 0x0042E9A4 (twin map: same code at link address + 0xE0)
+CPlayer__ResetHealth_2 = 0x00467920; // module-2 copy of 0x0042EA00 (twin map: same code at link address + 0xE0)
+CPlayer__StopLoopingSounds_2 = 0x00467A24; // module-2 copy of 0x0042EB04 (twin map: same code at link address + 0xE0)
+COnScreen__Construct_2 = 0x00467A70; // module-2 copy of 0x0042EB50 (func_00467A70.c says so; linked 0x0042EA70)
+Demo_ReadRunLength_2 = 0x00467B50; // module-2 copy of 0x0042EC30 (twin map: same code at link address + 0xE0)
+Demo_DecodeButtons_2 = 0x00467C10; // module-2 copy of 0x0042ECF0 (twin map: same code at link address + 0xE0)
+Demo_Start_2 = 0x00467E4C; // module-2 copy of 0x0042EF2C (twin map: same code at link address + 0xE0)
+Demo_Update_2 = 0x004680E4; // module-2 copy of 0x0042F1C4 (twin map: same code at link address + 0xE0)
+Demo_UpdateStreams_2 = 0x00468264; // module-2 copy of 0x0042F344 (twin map: same code at link address + 0xE0)
+Demo_Reset_2 = 0x00468410; // module-2 copy of 0x0042F4F0 (twin map: same code at link address + 0xE0)
+Demo_Enable_2 = 0x0046849C; // module-2 copy of 0x0042F57C (twin map: same code at link address + 0xE0)
+Demo_PlayNext_2 = 0x004684B0; // module-2 copy of 0x0042F590 (twin map: same code at link address + 0xE0)
+DemoStream_Decode_2 = 0x00468550; // module-2 copy of 0x0042F630 (twin map: same code at link address + 0xE0)
+Demo_DecodeStick_2 = 0x0046867C; // module-2 copy of 0x0042F75C (twin map: same code at link address + 0xE0)
+Demo_DecodeMatch_2 = 0x004686E8; // module-2 copy of 0x0042F7C8 (twin map: same code at link address + 0xE0)
+CCamera__Construct_2 = 0x004688D0; // module-2 copy of 0x0042F9B0 (twin map: same code at link address + 0xE0)
+CCameraPool__NewGame_2 = 0x00468AC4; // module-2 copy of 0x0042FBA4 (twin map: same code at link address + 0xE0)
+CCameraPool__Construct_2 = 0x00468D6C; // module-2 copy of 0x0042FE4C (twin map: same code at link address + 0xE0)
+CCameraPool__ResetEmitterPools_2 = 0x00468E0C; // module-2 copy of 0x0042FEEC (twin map: same code at link address + 0xE0)
+CCameraPool__AllocCamera_2 = 0x00468E78; // module-2 copy of 0x0042FF58 (twin map: same code at link address + 0xE0)
+CCameraPool__FreeCamera_2 = 0x00468ED0; // module-2 copy of 0x0042FFB0 (twin map: same code at link address + 0xE0)
+CEmitterPool__Construct_2 = 0x00468F10; // module-2 copy of 0x0042FFF0 (twin map: same code at link address + 0xE0)
+Cont_InitAll_2 = 0x00468F90; // module-2 copy of 0x00430070 (twin map: same code at link address + 0xE0)
+Cont_ResetSlot_2 = 0x004690E8; // module-2 copy of 0x004301C8 (twin map: same code at link address + 0xE0)
+
+// Second-module functions that are not copies: the variant build of the
+// menu block (docs/VMASM.md) compiles five "closes once the match is over"
+// polls to a bare return of D_8011ACCC (GameMatch D_8011ACB0 + 0x1C, over).
+// Each sits where the copy of its first-module original would (n7's names,
+// paired by the neighbouring copies' offsets), so it takes that name + _2.
+RumbleMenu_Poll_2 = 0x00450E84; // variant of RumbleMenu_Poll 0x00417E84 (next copy RumbleMenu_Play_2 0x00450E94 = 0x00417EBC)
+PlayerSetupMenu_Poll_2 = 0x00450EF0; // variant of PlayerSetupMenu_Poll 0x00417F18 (link 0x417EF0, the copies here 0x28 below)
+CharacterMenu_Poll_2 = 0x004511A4; // variant of CharacterMenu_Poll 0x004181F4 (next copy CharacterMenu_LoadSelect_2 0x004511B4 = 0x0041822C)
+TeamMenu_Poll_2 = 0x00451310; // variant of TeamMenu_Poll 0x00418388 (next copy TeamMenu_ChooseBlue_2 0x00451320 = 0x004183C0)
+NameEntryMenu_IsMatchOver_2 = 0x0045679C; // variant of NameEntryMenu_IsMatchOver 0x0041D84C (link 0x41D79C, the copies here 0xB0 below)

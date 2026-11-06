@@ -10,7 +10,7 @@ typedef struct PathNode {
     /* 0x0C */ f32 cost;
 } PathNode;
 
-/* The path search state (see func_002399F8). */
+/* The path search state (see Path_FindRegionPath). */
 typedef struct PathSearch {
     /* 0x000 */ CGameObjectInstance *obj;
     /* 0x004 */ CGameRegion *startRegion;
@@ -22,7 +22,7 @@ typedef struct PathSearch {
     /* 0x994 */ PathNode *poolNext;
     /* 0x998 */ s32 nodeCount;
     /* 0x99C */ PathNode *path;
-    /* 0x9A0 */ u8 mover[0xA8];         /* who moves, for func_0023B664 */
+    /* 0x9A0 */ u8 mover[0xA8];         /* who moves, for Sweep_CrossRegionEdge */
 } PathSearch;
 
 /* A neighbour worth exploring: its edge index and squared distance. */
@@ -49,10 +49,10 @@ extern f32 D_800F1A3C;                  /* cost */
 extern s32 D_800F1A40;                  /* found */
 extern s32 D_800F1A44;                  /* passable */
 
-f32 func_0026B858(CGameRegion *from, CGameRegion *to);
-void func_0026CB2C(CGameRegion *region, CVector3 *centre);
-s32 func_0023B664(void *mover, CGameRegion *region, s32 edge, CVector3 *centre);
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
+f32 CGameRegion__GetCentreDistance(CGameRegion *from, CGameRegion *to);
+void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
+s32 Sweep_CrossRegionEdge(void *mover, CGameRegion *region, s32 edge, CVector3 *centre);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 
 #define IN_BOUNDS(p) ((p)->x >= D_800F1A48->bounds[0] && (p)->x <= D_800F1A48->bounds[2] \
                       && (p)->z >= D_800F1A48->bounds[1] && (p)->z <= D_800F1A48->bounds[3])
@@ -60,7 +60,7 @@ void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 /* Walks the region graph from region, depth first and nearest neighbour
  * first, appending a node for each step and keeping in path the cheapest
  * node that reached the start region. */
-void func_002393D0(PathNode *parent, CGameRegion *region) {
+void Path_ExpandNode(PathNode *parent, CGameRegion *region) {
     s8 next[3];
     PathNode *node;
 
@@ -74,7 +74,7 @@ void func_002393D0(PathNode *parent, CGameRegion *region) {
         return;
     }
     if (parent != NULL) {
-        D_800F1A3C = parent->cost + func_0026B858(parent->region, region);
+        D_800F1A3C = parent->cost + CGameRegion__GetCentreDistance(parent->region, region);
         D_800F1A28 = parent->count + 1;
         if (D_800F1A48->path != NULL && D_800F1A48->path->cost <= D_800F1A3C) {
             return;
@@ -110,10 +110,10 @@ void func_002393D0(PathNode *parent, CGameRegion *region) {
                 }
             }
             if (D_800F1A40) {
-                func_0026CB2C(D_800F19E0, &D_800F1A30);
-                D_800F1A44 = func_0023B664(D_800F1A48->mover, D_800F19E0, D_800F1A2C, &D_800F1A30);
+                CGameRegion__GetCentroid(D_800F19E0, &D_800F1A30);
+                D_800F1A44 = Sweep_CrossRegionEdge(D_800F1A48->mover, D_800F19E0, D_800F1A2C, &D_800F1A30);
                 if (D_800F1A44) {
-                    func_0020EF2C(&D_800F1A30, &D_800F1A30, &D_800F1A48->startPos);
+                    CVector3__Subtract(&D_800F1A30, &D_800F1A30, &D_800F1A48->startPos);
                     D_800F1A3C = D_800F1A30.x * D_800F1A30.x + D_800F1A30.y * D_800F1A30.y
                                + D_800F1A30.z * D_800F1A30.z;
                     D_800F19F0[D_800F1A20].edge = D_800F1A24;
@@ -167,12 +167,12 @@ void func_002393D0(PathNode *parent, CGameRegion *region) {
             break;
     }
     if (next[0] != -1) {
-        func_002393D0(node, region->m_pNeighbours[next[0]]);
+        Path_ExpandNode(node, region->m_pNeighbours[next[0]]);
     }
     if (next[1] != -1) {
-        func_002393D0(node, region->m_pNeighbours[next[1]]);
+        Path_ExpandNode(node, region->m_pNeighbours[next[1]]);
     }
     if (next[2] != -1) {
-        func_002393D0(node, region->m_pNeighbours[next[2]]);
+        Path_ExpandNode(node, region->m_pNeighbours[next[2]]);
     }
 }

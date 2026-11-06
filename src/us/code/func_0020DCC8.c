@@ -3,13 +3,13 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_0021153C(f32 arg0);
+extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002982F0(float x);
 extern float D_800A5504;
 extern float D_800A550C;
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
-void func_0020DCC8(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b) {
+void CQuaternion__SlerpFast(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b) {
     Vector4f negative;
     Vector4f *other;
     f32 dot;
@@ -49,7 +49,7 @@ void func_0020DCC8(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b) {
             out->w *= scale;
         }
     } else {
-        angle = func_0021153C(dot);
+        angle = Math_AcosLookup(dot);
         sine = func_002982F0(angle);
         if (sine == 0.0f) {
             *out = *a;

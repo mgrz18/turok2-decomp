@@ -3,13 +3,13 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_0021170C(f32 arg0, f32 arg1);
+extern f32 Math_DecayToZero(f32 arg0, f32 arg1);
 extern float D_800A97D0;
 extern float D_800A97D4;
 extern float D_800A97D8;
 extern float D_800A97DC;
 extern f32 D_800B6D28;
-u32 func_0027BD30(StateRecAt10 *state) {
+u32 CShakeAxis__Advance(StateRecAt10 *state) {
     f32 scale;
     f32 step;
     if (state->value > state->limit) {
@@ -23,18 +23,18 @@ u32 func_0027BD30(StateRecAt10 *state) {
     }
     step = D_800B6D28;
     scale = D_800A97D4;
-    state->value = func_0021170C(state->value, step * scale);
-    state->limit = func_0021170C(state->limit, D_800B6D28 * scale);
+    state->value = Math_DecayToZero(state->value, step * scale);
+    state->limit = Math_DecayToZero(state->limit, D_800B6D28 * scale);
     switch (state->mode) {
     case 1:
         if (state->rate > 0.0f) {
             state->accumulator += (state->rate + state->rate) * (D_800B6D28 * scale);
-            state->rate = func_0021170C(state->rate, D_800A97D8);
+            state->rate = Math_DecayToZero(state->rate, D_800A97D8);
         }
         break;
     case 0:
         if (state->rate > 0.0f) {
-            state->rate = func_0021170C(state->rate, D_800A97DC);
+            state->rate = Math_DecayToZero(state->rate, D_800A97DC);
         }
         break;
     }

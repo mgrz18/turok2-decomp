@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_002113A4(void);
-void *func_002009F0(void *arg0) {
+extern s32 Random_Next(void);
+void *CList__GetRandom(void *arg0) {
     s32 index;
     s32 offset;
     void *node;
@@ -12,7 +12,7 @@ void *func_002009F0(void *arg0) {
     if (node == 0) {
         return 0;
     }
-    index = func_002113A4() % (u32)((CList *)arg0)->m_nCount;
+    index = Random_Next() % (u32)((CList *)arg0)->m_nCount;
     index--;
     if (index != -1) {
         offset = ((CList *)arg0)->m_NextOffset;

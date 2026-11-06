@@ -3,6 +3,6 @@
 
 extern u8 D_800F5EA0[];
 
-u8 func_00285A54(s32 arg0) {
+u8 Controller_IsPakWatched(s32 arg0) {
     return *(((u8 *)(D_800F5EA0 + arg0)));
 }

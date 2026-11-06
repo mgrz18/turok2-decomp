@@ -2,7 +2,7 @@
  * function starts at 0x291330. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/libultra/csplayer.c, alCSPNew, with Turok 2's layouts.
  * It is libultra 2.0I's alSeqpNew (seqplayer.c): it clears the ALSeqPlayer's
- * loopStart/loopEnd/loopCount and installs __seqpVoiceHandler (func_002914B4). */
+ * loopStart/loopEnd/loopCount and installs __seqpVoiceHandler (__seqpVoiceHandler). */
 #include "common.h"
 #include "structs/libaudio.h"
 
@@ -11,15 +11,15 @@
 #define AL_SEQP_API_EVT 9
 
 extern ALGlobals *D_800B7760; /* alGlobals */
-void *func_002912A0(char *file, s32 line, void *hp, s32 num, s32 size); /* alHeapDBAlloc */
-void func_002928F0(ALSeqPlayer *seqp);                                   /* __initChanState */
-void func_00290F20(ALEventQueue *evtq, void *items, s32 itemCount);     /* alEvtqNew */
-void func_00293F10(void *drvr, ALPlayer *client);                       /* alSynAddPlayer */
-s32 func_002914B4(void *node);                                          /* __seqpVoiceHandler */
+void *alHeapDBAlloc(char *file, s32 line, void *hp, s32 num, s32 size); /* alHeapDBAlloc */
+void __initChanState(ALSeqPlayer *seqp);                                   /* __initChanState */
+void alEvtqNew(ALEventQueue *evtq, void *items, s32 itemCount);     /* alEvtqNew */
+void alSynAddPlayer(void *drvr, ALPlayer *client);                       /* alSynAddPlayer */
+s32 __seqpVoiceHandler(void *node);                                          /* __seqpVoiceHandler */
 
-#define alHeapAlloc(hp, num, size) func_002912A0(0, 0, hp, num, size)
+#define alHeapAlloc(hp, num, size) alHeapDBAlloc(0, 0, hp, num, size)
 
-void func_00291330(ALSeqPlayer *seqp, ALSeqpConfig *c) {
+void alSeqpNew(ALSeqPlayer *seqp, ALSeqpConfig *c) {
     s32 i;
     void *items;
     ALVoiceState *vs;
@@ -49,7 +49,7 @@ void func_00291330(ALSeqPlayer *seqp, ALSeqpConfig *c) {
 
     seqp->maxChannels = c->maxChannels;
     seqp->chanState = alHeapAlloc(hp, c->maxChannels, 0x10);
-    func_002928F0(seqp);
+    __initChanState(seqp);
 
     voices = alHeapAlloc(hp, c->maxVoices, sizeof(ALVoiceState));
     seqp->vFreeList = 0;
@@ -63,10 +63,10 @@ void func_00291330(ALSeqPlayer *seqp, ALSeqpConfig *c) {
     seqp->vAllocTail = 0;
 
     items = alHeapAlloc(hp, c->maxEvents, 0x1C);
-    func_00290F20(&seqp->evtq, items, c->maxEvents);
+    alEvtqNew(&seqp->evtq, items, c->maxEvents);
 
     seqp->node.next = 0;
-    seqp->node.handler = func_002914B4;
+    seqp->node.handler = __seqpVoiceHandler;
     seqp->node.clientData = seqp;
-    func_00293F10(D_800B7760, &seqp->node);
+    alSynAddPlayer(D_800B7760, &seqp->node);
 }

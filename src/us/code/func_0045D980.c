@@ -1,15 +1,15 @@
-/* Second-module copy of func_00424A60 (first module). The flag test is an inline helper, so &D_800F7078 is re-addressed by symbol at each call. */
+/* Second-module copy of Mission_LevelObjectivesDone (first module). The flag test is an inline helper, so &D_800F7078 is re-addressed by symbol at each call. */
 #include "common.h"
 
-s32 func_00224C08(void *arg0, s32 arg1);
+s32 CScene__GetLinkGroupCount(void *arg0, s32 arg1);
 
 extern s32 D_800F7078;
 
 static __inline__ s32 IsSet(s32 flag) {
-    return func_00224C08(&D_800F7078, flag);
+    return CScene__GetLinkGroupCount(&D_800F7078, flag);
 }
 
-s32 func_0045D980(s32 level) {
+s32 Mission_LevelObjectivesDone_2(s32 level) {
     s32 open = 0;
 
     switch (level) {

@@ -3,15 +3,15 @@
 
 #include "rw/abu_types.h"
 
-extern u32 func_002700D0(s32 offset, s32 length);
+extern u32 __amDMA(s32 offset, s32 length);
 extern int D_800F2040;
 extern Window *D_800F2798;
 extern char D_800D1CD8;
-extern void func_00201E94(void *, u32, s32, s32, void *, s32, s32);
-u32 func_002700D0(s32 offset, s32 length) {
-    extern u32 func_0029BF80(s32);
-    extern void func_002933E0(Window *, Window *);
-    extern void func_002933B0(Window *);
+extern void CLoader__LoadAsync(void *, u32, s32, s32, void *, s32, s32);
+u32 __amDMA(s32 offset, s32 length) {
+    extern u32 osVirtualToPhysical(s32);
+    extern void alLink(Window *, Window *);
+    extern void alUnlink(Window *);
     extern Window *D_800F2794;
     extern char D_800F2778;
     extern s32 D_800B2664;
@@ -36,15 +36,15 @@ u32 func_002700D0(s32 offset, s32 length) {
         after = window;
         if (top >= end) {
             window->frame = D_800B2660;
-            return func_0029BF80(window->buffer + address - window->base);
+            return osVirtualToPhysical(window->buffer + address - window->base);
         }
     }
     pool = &D_800F2798;
     window = *pool;
     *pool = window->next;
-    func_002933B0(window);
+    alUnlink(window);
     if (after != 0) {
-        func_002933E0(window, after);
+        alLink(window, after);
     } else if (pool[-1] != 0) {
         after = pool[-1];
         pool[-1] = window;
@@ -62,6 +62,6 @@ u32 func_002700D0(s32 offset, s32 length) {
     window->frame = D_800B2660;
     word = window->buffer;
     D_800B2664++;
-    func_00201E94(&D_800D1CD8, address, 0x300, word, &D_800F2778, 0, 1);
-    return func_0029BF80(word) + odd;
+    CLoader__LoadAsync(&D_800D1CD8, address, 0x300, word, &D_800F2778, 0, 1);
+    return osVirtualToPhysical(word) + odd;
 }

@@ -6,7 +6,7 @@ extern s32 D_80119890; /* current player */
 
 /* Step callback of the Blind One's actors: while alive they target the
  * current player, run their mode's callback and count the hit flash down. */
-void func_0040DF70(void *obj, CAI *ai) {
+void BlindOne_ActorUpdate(void *obj, CAI *ai) {
     if (ai->m_Health != 0 && D_80119890 != 0) {
         ai->m_pSightTarget = (struct CGameObjectInstance *) D_80119890;
         ai->m_pPathTarget = (struct CGameObjectInstance *) D_80119890;

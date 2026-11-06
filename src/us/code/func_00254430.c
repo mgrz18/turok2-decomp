@@ -1,13 +1,13 @@
 #include "common.h"
 #include "structs/player.h"
 
-s32 func_00249358(s32, s32, s32, s32, s32);
+s32 CPlayer__Hurt(s32, s32, s32, s32, s32);
 
-s32 func_0027580C(s32);                     /* extern */
+s32 Sound__PlaySpeech(s32);                     /* extern */
 extern f32 D_800B6D28;
 extern u8 D_8011AAF1;
 
-void func_00254430(CPlayer *arg0, s32 arg1) {
+void CPlayer__UpdateOxygen(CPlayer *arg0, s32 arg1) {
     f32 temp_f0;
     f32 temp_f1;
     s32 temp_v0;
@@ -18,7 +18,7 @@ void func_00254430(CPlayer *arg0, s32 arg1) {
     temp_f0 = temp_f1 + D_800B6D28;
     arg0->m_Oxygen = temp_f0;
     if ((temp_f1 < 300.0f) && (temp_f0 > 300.0f) && (D_8011AAF1 == 0)) {
-        func_0027580C(0x163);
+        Sound__PlaySpeech(0x163);
     }
     if (arg0->m_Oxygen > 600.0f) {
         temp_v0 = (s32) arg0->m_Data.m_Health >> 8;
@@ -31,11 +31,11 @@ void func_00254430(CPlayer *arg0, s32 arg1) {
         }
         if (arg0->m_bOxygenOut == 0) {
             if (D_8011AAF1 == 0) {
-                func_0027580C(0x164);
+                Sound__PlaySpeech(0x164);
             }
         }
         arg0->m_bOxygenOut = 1;
-        func_00249358((s32) arg0, arg1, var_s1 << 8, 0, 0x1C);
+        CPlayer__Hurt((s32) arg0, arg1, var_s1 << 8, 0, 0x1C);
         arg0->m_Oxygen = (f32) (arg0->m_Oxygen - 37.5f);
     }
 }

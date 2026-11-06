@@ -5,8 +5,8 @@
 
 /* Boss fight tick: updates the 15 attack slots, then (outside cinematics)
  * counts up the two timers: by phase, drops a random pickup somewhere in the
- * arena (inlined func_0040C2C4) and, later, a pickup at every spawn point
- * (func_00409500). */
+ * arena (inlined MotherBoss_SpawnPickup) and, later, a pickup at every spawn point
+ * (MotherBoss_DropPickupsAtSpawnPoints). */
 
 extern s32 D_801301F8;      /* arena radius range */
 extern s32 D_801301FC;
@@ -16,34 +16,34 @@ extern u8 D_00431DD0[];
 extern u8 D_800F7078[];
 extern u8 D_80107590[];
 
-extern void func_00235510(void *slot);
+extern void Animator_Update(void *slot);
 extern s32 Cinema_PathPlaying(void);
-extern s32 func_0026D518(void *table);
-extern f32 func_002119FC(f32 lo, f32 hi);
+extern s32 WeightedTable_PickStatic(void *table);
+extern f32 Random_Blend(f32 lo, f32 hi);
 extern f32 func_002982F0(f32);
 extern f32 func_002974C0(f32);
-extern s32 func_00220A1C(void *level, CVector3 *pos);
-extern CPooledLevelActor *func_00227240(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
-extern void func_00246690(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
-extern void func_00409500(s32 lifetime, void *table);
+extern s32 CScene__FindRegionAt(void *level, CVector3 *pos);
+extern CPooledLevelActor *CLevelActorPool__Spawn(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
+extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
+extern void MotherBoss_DropPickupsAtSpawnPoints(s32 lifetime, void *table);
 
-/* func_0040C2C4 */
+/* MotherBoss_SpawnPickup */
 static __inline__ void spawnPickup(s32 id, s32 lifetime, CVector3 pos) {
     CVector3 vel;
     s32 region;
     CPooledLevelActor *pickup;
 
-    region = func_00220A1C(D_800F7078, &pos);
+    region = CScene__FindRegionAt(D_800F7078, &pos);
     vel.x = 0.0f;
     vel.y = 512.0f;
     vel.z = 0.0f;
-    pickup = func_00227240(D_80107590, NULL, id, vel, pos, region, lifetime);
+    pickup = CLevelActorPool__Spawn(D_80107590, NULL, id, vel, pos, region, lifetime);
     if (pickup != NULL) {
-        func_00246690(pickup, 0x11D, pos, 0);
+        Actor_SpawnParticle(pickup, 0x11D, pos, 0);
     }
 }
 
-void func_00409784(MotherBossState *s) {
+void MotherBoss_UpdateSpotsAndPickups(MotherBossState *s) {
     CVector3 pos;
     s32 i;
     s32 spawn;
@@ -61,7 +61,7 @@ void func_00409784(MotherBossState *s) {
     dropLifetime = 0;
     table = NULL;
     for (i = 0; i < 15; i++) {
-        func_00235510(&s->slots[i].anim);
+        Animator_Update(&s->slots[i].anim);
     }
     if (Cinema_PathPlaying()) {
         return;
@@ -103,9 +103,9 @@ void func_00409784(MotherBossState *s) {
     }
     if (spawn) {
         s->pickupTimer = 0;
-        id = (s16) func_0026D518(D_00431D94);
-        dist = func_002119FC(D_801301F8, D_801301FC);
-        angle = func_002119FC(-3.1415927f, 3.1415927f);
+        id = (s16) WeightedTable_PickStatic(D_00431D94);
+        dist = Random_Blend(D_801301F8, D_801301FC);
+        angle = Random_Blend(-3.1415927f, 3.1415927f);
         pos.x = dist * func_002982F0(angle);
         pos.z = dist * func_002974C0(angle);
         pos.y = 0.0f;
@@ -113,6 +113,6 @@ void func_00409784(MotherBossState *s) {
     }
     if (table != NULL && drop) {
         s->dropTimer = 0;
-        func_00409500(dropLifetime, table);
+        MotherBoss_DropPickupsAtSpawnPoints(dropLifetime, table);
     }
 }

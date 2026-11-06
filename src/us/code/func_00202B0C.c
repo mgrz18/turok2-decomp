@@ -5,7 +5,7 @@
 
 extern s32 D_800AB0B8;
 extern s32 D_800AB0B0;
-void func_00202B0C(void) {
+void CHashTable__GetLongestChain(void) {
     extern s32 D_800D81C4;
     s32 var_a1;
     s32 var_v1;

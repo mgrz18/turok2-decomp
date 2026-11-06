@@ -4,7 +4,7 @@
 extern f32 D_800A77F4;
 extern f32 D_800A77F8;
 
-f32 func_0025EB24(s32 arg0, CAI *arg1) {
+f32 EnemyAI_GetModeTurnRate(s32 arg0, CAI *arg1) {
     f32 var_f0;
 
     var_f0 = D_800A77F4;

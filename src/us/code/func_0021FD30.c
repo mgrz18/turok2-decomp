@@ -6,11 +6,11 @@
 extern float D_800A5D58;
 extern float D_800A5D50;
 extern float D_800A5D30;
-extern void func_0021FD30(f32 *src, PackedMatrixWords *dst);
+extern void CMtxF__ToMtxAffineUnscaled(f32 *src, PackedMatrixWords *dst);
 extern float D_800A5D48;
 extern float D_800A5D40;
 extern float D_800A5D38;
-void func_0021FD30(f32 *src, PackedMatrixWords *dst) {
+void CMtxF__ToMtxAffineUnscaled(f32 *src, PackedMatrixWords *dst) {
     u32 *upper = dst->upper;
     u32 *lower = dst->lower;
     s32 a;

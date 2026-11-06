@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_0045FF1C(u8 *arg0, u8 *arg1);
-s32 func_0045FF1C(u8 *arg0, u8 *arg1)
+extern s32 Str_CompareNoCase_2(u8 *arg0, u8 *arg1);
+s32 Str_CompareNoCase_2(u8 *arg0, u8 *arg1)
 {
   s32 c2;
   int new_var;
@@ -32,7 +32,7 @@ s32 func_0045FF1C(u8 *arg0, u8 *arg1)
   {
     if (c2 == c1)
     {
-      return func_0045FF1C(arg0, arg1);
+      return Str_CompareNoCase_2(arg0, arg1);
     }
   }
   return c1 - c2;

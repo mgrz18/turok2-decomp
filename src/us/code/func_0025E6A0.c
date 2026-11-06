@@ -1,16 +1,16 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_00243414(s32, s32, s32);
+s32 CAI__SetMode(s32, s32, s32);
 
 extern f32 D_800B6D28;
 
-void func_0025E6A0(s32 arg0, CAI *arg1) {
+void EnemyMode_StartDelay_Update(s32 arg0, CAI *arg1) {
     f32 temp_f0;
 
     temp_f0 = arg1->m_ConditionTimer - D_800B6D28;
     arg1->m_ConditionTimer = temp_f0;
     if (temp_f0 <= 0.0f) {
-        func_00243414(arg0, (s32) arg1, 2);
+        CAI__SetMode(arg0, (s32) arg1, 2);
     }
 }

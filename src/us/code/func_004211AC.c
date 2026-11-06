@@ -4,10 +4,10 @@
 #include "rw/abu_types.h"
 
 extern s32 D_800C2028;
-extern void func_004211AC(void);
-void func_00426480(s32);
-s32 func_0042655C(s32);
-void func_004211AC(void) {
+extern void PakMenu_PickDefaultPort(void);
+void Pak_ProbeSlot(s32);
+s32 Pak_GetStatus(s32);
+void PakMenu_PickDefaultPort(void) {
     s32 var_s0;
     s32 var_s1;
     s32 unavailable;
@@ -16,8 +16,8 @@ void func_004211AC(void) {
         var_s1 = 0;
     unavailable = -2;
 loop_2:
-        func_00426480(var_s0);
-        if (func_0042655C(var_s0) == unavailable) {
+        Pak_ProbeSlot(var_s0);
+        if (Pak_GetStatus(var_s0) == unavailable) {
             var_s0 += 1;
             if (var_s0 >= 4) {
                 var_s0 = 0;

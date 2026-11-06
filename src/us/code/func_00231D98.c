@@ -81,26 +81,26 @@ struct B19Obj {
 };
 extern u8 D_801102B8[];
 extern u8 D_8010FF34[];
-void func_0022D09C(B19Obj *, s32, s32);
-void func_002350EC(void *, B19Obj *, s32);
-s32 func_00228AB0(void *, s32);
-void func_00232AC4(B19Obj *, s32);
-void func_00275544(s16, f32, f32, f32, s32, s32);
-void func_00231D98(B19Obj *o, B19Def *def) {
+void CParticle__Attach(B19Obj *, s32, s32);
+void Trail_AddNode(void *, B19Obj *, s32);
+s32 DLight_Spawn(void *, s32);
+void CParticle__StartLoopSound(B19Obj *, s32);
+void Sound__Play(s16, f32, f32, f32, s32, s32);
+void CParticle__StartEffects(B19Obj *o, B19Def *def) {
     s32 t;
-    func_0022D09C(o, 0, 0);
-    if (def->b6 != -1) func_002350EC(D_801102B8, o, def->b6);
-    if (def->b7 != -1) o->unk118 = func_00228AB0(D_8010FF34, def->b7);
+    CParticle__Attach(o, 0, 0);
+    if (def->b6 != -1) Trail_AddNode(D_801102B8, o, def->b6);
+    if (def->b7 != -1) o->unk118 = DLight_Spawn(D_8010FF34, def->b7);
     else o->unk118 = 0;
     if (!(o->flags & 0x200000) && (t = def->sC) != 0) {
         switch (o->id) {
         case 0x22:
         case 0x5F:
         case 0x60:
-            func_00232AC4(o, t);
+            CParticle__StartLoopSound(o, t);
             break;
         default:
-            func_00275544(t, o->pos.x, o->pos.y, o->pos.z, 0, -1);
+            Sound__Play(t, o->pos.x, o->pos.y, o->pos.z, 0, -1);
             break;
         }
     }

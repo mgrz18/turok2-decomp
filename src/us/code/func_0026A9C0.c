@@ -5,7 +5,7 @@
 
 #include "common.h"
 #include "structs/region.h"
-extern f32 func_0021153C(f32 arg0);
+extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 struct CQuatern_t;
@@ -17,7 +17,7 @@ struct CQuatern_t {
     float z;
     float w;
 };
-extern void func_0020F040(f32 *arg0);
+extern void CVector3__Normalize(f32 *arg0);
 extern CGameRegion *D_800B2608;
 extern CGameRegion *D_800B260C;
 extern CVector3 D_800F2020;
@@ -27,21 +27,21 @@ extern CVector3 D_800F2030;
 extern f32 D_800F2034;
 extern s32 D_800F2038;
 extern f32 D_800DD78C;
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);
-extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern f32 func_00298470(f32);
 static __inline__ void edge(CVector3 *out, CVector3 *a, CVector3 *b) {
-    func_0020EF2C(out, a, b);
+    CVector3__Subtract(out, a, b);
 }
 static __inline__ void normalize_copy(CVector3 *out, CVector3 *in) {
     *out = *in;
-    func_0020F040(out);
+    CVector3__Normalize(out);
 }
 extern float D_800DD78C;
-extern void func_0020EFDC(CVector3 *, CVector3 *, CVector3 *);
-extern void func_0020EF60(CVector3 *, CVector3 *, float);
-CQuatern *func_0026A9C0(CQuatern *out, CGameRegion *polygon) {
+extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
+extern void CVector3__Scale(CVector3 *, CVector3 *, float);
+CQuatern *CGameRegion__GetTiltRotation(CQuatern *out, CGameRegion *polygon) {
     CVector3 normal;
     CVector3 up;
     CVector3 axis;
@@ -64,7 +64,7 @@ CQuatern *func_0026A9C0(CQuatern *out, CGameRegion *polygon) {
         } else if (polygon != D_800B2608) {
             edge(&edge0, polygon->m_pVertices[1], polygon->m_pVertices[0]);
             edge(&edge1, polygon->m_pVertices[2], polygon->m_pVertices[1]);
-            func_0020EFDC(&D_800F2020, &edge0, &edge1);
+            CVector3__Cross(&D_800F2020, &edge0, &edge1);
         }
         D_800B2608 = polygon;
         normalize_copy(&D_800F2030, &D_800F2020);
@@ -75,7 +75,7 @@ CQuatern *func_0026A9C0(CQuatern *out, CGameRegion *polygon) {
     up.x = 0.0f;
     up.y = one;
     up.z = 0.0f;
-    func_0020EFDC(&axis, &up, &normal);
+    CVector3__Cross(&axis, &up, &normal);
     len = func_00298470(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
     if (len == 0.0f) {
         result.z = 0.0f;
@@ -83,8 +83,8 @@ CQuatern *func_0026A9C0(CQuatern *out, CGameRegion *polygon) {
         result.x = 0.0f;
         result.w = one;
     } else {
-        func_0020EF60(&axis, &axis, one / len);
-        angle = func_0021153C(up.x * normal.x + up.y * normal.y + up.z * normal.z);
+        CVector3__Scale(&axis, &axis, one / len);
+        angle = Math_AcosLookup(up.x * normal.x + up.y * normal.y + up.z * normal.z);
         angle *= 0.5f;
         scale = func_002982F0(angle);
         result.x = axis.x * scale;

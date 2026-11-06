@@ -1,4 +1,4 @@
-/* WRONG CUT: REAL func_0042C560 size 0x1A0 (splat cut it into func_0042C560 + func_0042C620 + func_0042C6BC). */
+/* WRONG CUT: REAL CScene__FindNearestWarpDest size 0x1A0 (splat cut it into CScene__FindNearestWarpDest + func_0042C620 + func_0042C6BC). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_29.CPP, func_8044D3E8_de, with Turok 2's layouts. */
 #include "common.h"
 
@@ -25,14 +25,14 @@ extern s32 D_800F7074;
 extern char D_800A5D8C[];
 extern char D_800A5FC4[];
 
-extern void func_00205B94(s32, s32 *, s32, char *);
-extern void **func_00205D0C(s32, s32, s32, s32, void *, s32, char *);
-extern void *func_002017D4(void *table, s32 index);
-extern f32 func_0020F6BC(void *a, void *b);
-extern void func_002052D8(s32, void *);
+extern void CCache__LoadPersistantIndex(s32, s32 *, s32, char *);
+extern void **CCache__LoadPersistantSubBlock(s32, s32, s32, s32, void *, s32, char *);
+extern void *CISet__GetBlock(void *table, s32 index);
+extern f32 CVector3__Distance(void *a, void *b);
+extern void CCache__Deallocate(s32, void *);
 
 /* Finds the point of the given type nearest to position; copies it to out and returns its value (0 when none). */
-s32 func_0042C560(void *world, void *position, s32 type, SearchPoint *out) {
+s32 CScene__FindNearestWarpDest(void *world, void *position, s32 type, SearchPoint *out) {
     s32 i;
     s32 best;
     SearchValues *values;
@@ -48,20 +48,20 @@ s32 func_0042C560(void *world, void *position, s32 type, SearchPoint *out) {
     void *table;
 
     pool = D_800F7074;
-    func_00205B94(0, &resource, pool, D_800A5D8C);
+    CCache__LoadPersistantIndex(0, &resource, pool, D_800A5D8C);
     i = 0;
     best = 0;
-    handle = func_00205D0C(0, resource, 8, pool, world, 0, D_800A5FC4);
+    handle = CCache__LoadPersistantSubBlock(0, resource, 8, pool, world, 0, D_800A5FC4);
     table = *handle;
-    values = func_002017D4(table, 0);
+    values = CISet__GetBlock(table, 0);
     count = values->count;
     vals = values->values;
-    points = func_002017D4(table, 1);
+    points = CISet__GetBlock(table, 1);
     minimum = 3.4028235e38f;
     pts = points->points;
     for (; i < count; i++) {
         if (pts[i].type == type) {
-            distance = func_0020F6BC(&pts[i], position);
+            distance = CVector3__Distance(&pts[i], position);
             if (distance < minimum) {
                 minimum = distance;
                 best = i;
@@ -71,7 +71,7 @@ s32 func_0042C560(void *world, void *position, s32 type, SearchPoint *out) {
     if (best != 0) {
         *out = pts[best];
     }
-    func_002052D8(0, handle);
+    CCache__Deallocate(0, handle);
     if (best != 0) {
         return vals[best];
     }

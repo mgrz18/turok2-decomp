@@ -1,4 +1,4 @@
-/* WRONG CUT: REAL func_0042AA80 size 0x18C (splat cut it into func_0042AA80 + func_0042AB2C). */
+/* WRONG CUT: REAL CScene__LoadLightSettings size 0x18C (splat cut it into CScene__LoadLightSettings + func_0042AB2C). */
 #include "common.h"
 #include "structs/light.h"
 
@@ -18,10 +18,10 @@ typedef struct MenuState {
 } MenuState;
 
 extern f32 func_00298470(f32);
-extern void func_0020EF60(f32 *out, f32 *in, f32 scale);
+extern void CVector3__Scale(f32 *out, f32 *in, f32 scale);
 
 /* Loads the level's light colours into the scene light and its direction, normalised to 127, into the menu. */
-void func_0042AA80(MenuState *menu) {
+void CScene__LoadLightSettings(MenuState *menu) {
     s32 i;
     f32 dir[3];
     f32 len;
@@ -36,7 +36,7 @@ void func_0042AA80(MenuState *menu) {
     dir[2] = menu->lights->dir[2];
     len = func_00298470(dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2]);
     if (len != 0.0f) {
-        func_0020EF60(dir, dir, 127.0f / len);
+        CVector3__Scale(dir, dir, 127.0f / len);
         menu->dir[0] = dir[0];
         menu->dir[1] = dir[1];
         menu->dir[2] = dir[2];

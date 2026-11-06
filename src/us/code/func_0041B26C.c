@@ -7,7 +7,7 @@ extern s32 D_8011AAD8;
 extern s32 D_8011AADC;
 extern s32 D_800B57E4;
 extern s32 D_800B5800;
-s32 func_0041B26C(struct Func8043D458Arg *arg0) {
+s32 CheatMenu_InfiniteLivesText(struct Func8043D458Arg *arg0) {
     if (D_8011AADC & 2) {
         arg0->flags |= 0x01000000;
     } else {

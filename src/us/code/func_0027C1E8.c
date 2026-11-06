@@ -10,17 +10,17 @@ extern u32 D_800B6CC0;          /* and the one before that */
 extern s32 D_800AE340;          /* a tint forced over the view */
 extern u8 D_800F1FE4[4];        /* its colour */
 extern f32 D_800B6D28;          /* the frame's time step */
-void func_002883E0(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
-void func_0027C074(CCamera *cam);
+void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
+void CCamera__UpdateFlash(CCamera *cam);
 s32 Cinema_PathPlaying(void);
-void func_0025322C(CPlayerList *list, CCamera *cam);
-s32 func_00284284(CCamera *cam);
+void CPlayerPool__DrawHuds(CPlayerList *list, CCamera *cam);
+s32 Cinema_DrawOverlay(CCamera *cam);
 
 /* The tints over a camera's view (LibTEngine's CCamera DrawTints): the fog
  * colour while its player is under water (AI flags 0x880) or a forced
  * tint is up, then the screen flash, then the red flash of a hit fading at
  * m_FlashDec a frame. */
-s32 func_0027C1E8(CCamera *cam) {
+s32 CCamera__DrawTints(CCamera *cam) {
     CPlayer *player;
     u32 flags;
     u8 tint[4];
@@ -28,7 +28,7 @@ s32 func_0027C1E8(CCamera *cam) {
     u8 *rgba;
     s32 i;
 
-    /* func_00281194, inlined */
+    /* CCamera__GetPlayer, inlined */
     for (player = D_80119890; player != NULL; player = player->m_pNext) {
         if (player->m_pCamera == (void *) cam) {
             goto found;
@@ -56,13 +56,13 @@ found:
                 tint[1] >>= 3;
                 tint[2] >>= 3;
             }
-            func_002883E0(&D_800F6CB0, tint, (s32) cam->m_Viewport.m_ScreenPosX, (s32) cam->m_Viewport.m_ScreenPosY,
+            CEngineApp__DrawFilledRect(&D_800F6CB0, tint, (s32) cam->m_Viewport.m_ScreenPosX, (s32) cam->m_Viewport.m_ScreenPosY,
                           (s32) (cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width),
                           (s32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height));
         }
-        func_0027C074(cam);
+        CCamera__UpdateFlash(cam);
         if (cam->m_FlashMode != 0) {
-            func_002883E0(&D_800F6CB0, cam->m_FlashColor, (s32) cam->m_Viewport.m_ScreenPosX,
+            CEngineApp__DrawFilledRect(&D_800F6CB0, cam->m_FlashColor, (s32) cam->m_Viewport.m_ScreenPosX,
                           (s32) cam->m_Viewport.m_ScreenPosY,
                           (s32) (cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width),
                           (s32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height));
@@ -78,13 +78,13 @@ found:
             hurt[1] = 0;
             hurt[2] = 0;
             hurt[3] = cam->m_Flash;
-            func_002883E0(&D_800F6CB0, hurt, (s32) cam->m_Viewport.m_ScreenPosX, (s32) cam->m_Viewport.m_ScreenPosY,
+            CEngineApp__DrawFilledRect(&D_800F6CB0, hurt, (s32) cam->m_Viewport.m_ScreenPosX, (s32) cam->m_Viewport.m_ScreenPosY,
                           (s32) (cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width),
                           (s32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height));
         }
         if (Cinema_PathPlaying() == 0 && D_80119870.m_Settings.mode == 13) {
-            func_0025322C(&D_80119870.m_PlayerList, cam);
+            CPlayerPool__DrawHuds(&D_80119870.m_PlayerList, cam);
         }
-        return func_00284284(cam);
+        return Cinema_DrawOverlay(cam);
     }
 }

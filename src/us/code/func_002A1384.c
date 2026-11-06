@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_002A1384(s32 arg0);
-s32 func_002A1384(s32 arg0) {
+extern s32 HostIo_ReadWord(s32 arg0);
+s32 HostIo_ReadWord(s32 arg0) {
     if ((*(volatile u32 *)(0xA4600010U)) & 3U) {
         do {
         } while ((*(volatile u32 *)(0xA4600010U)) & 3U);

@@ -5,7 +5,7 @@ s32 __osDisableInt();                                /* extern */
 s32 __osRestoreInt(s32);                         extern __OSViContext *D_800B7AC4; /* __osViNext */
 
 /* libultra's osViSwapBuffer. */
-void func_0029AC90(void *frameBufPtr) {
+void osViSwapBuffer(void *frameBufPtr) {
     s32 temp_v0;
 
     temp_v0 = __osDisableInt();

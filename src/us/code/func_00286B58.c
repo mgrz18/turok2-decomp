@@ -70,10 +70,10 @@ extern s32 D_80130A80;
 extern s32 D_80130A84;
 
 extern void osWritebackDCacheAll(void);
-extern void func_0028B3E8(void *, ScTask *);
+extern void Sched_SubmitTask(void *, ScTask *);
 
 /* Builds the RSP task(s) for a frame, hands them to the scheduler, moves to the next frame. */
-void func_00286B58(GfxState *gfx, GfxTask *task) {
+void CEngineApp__SubmitGfxTask(GfxState *gfx, GfxTask *task) {
     u32 dataSize;
     u32 dataSize2;
     ScTask *t;
@@ -133,9 +133,9 @@ void func_00286B58(GfxState *gfx, GfxTask *task) {
         t->framebuffer = task->framebuffer;
     }
     osWritebackDCacheAll();
-    func_0028B3E8(D_8011AD90, &task->sc[0]);
+    Sched_SubmitTask(D_8011AD90, &task->sc[0]);
     if (task->twoTasks) {
-        func_0028B3E8(D_8011AD90, &task->sc[1]);
+        Sched_SubmitTask(D_8011AD90, &task->sc[1]);
     }
     D_800B6D18++;
     idx = D_800B6D18 % D_800C2210;

@@ -11,7 +11,7 @@ typedef struct {
     /* 0x16 */ u16 maskT;
 } MaterialRec;
 
-/* The runtime material (see func_00207FEC). */
+/* The runtime material (see Render_SetRenderMode). */
 typedef struct {
     /* 0x00 */ u32 flags;
     /* 0x04 */ s32 unk4;
@@ -25,7 +25,7 @@ typedef struct {
 
 s32 func_00207914(void *, s32);                 /* extern */
 
-void func_0026D070(Material *arg0, MaterialRec *arg1) {
+void Material_Unpack(Material *arg0, MaterialRec *arg1) {
     s32 temp_a1;
     s32 var_v0;
 

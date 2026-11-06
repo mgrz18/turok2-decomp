@@ -10,7 +10,7 @@ extern f32 D_800A7188;
 extern f32 D_800A718C;
 extern f32 D_800A7190;
 
-void func_00255840(CPlayer *arg0, Arg1 *arg1) {
+void PlayerDodge_Enter(CPlayer *arg0, Arg1 *arg1) {
     if (arg0->m_ContState.m_FinalMoveX < 0.0f) {
         arg0->m_SideSpeed = (f32) D_800A7188;
     } else {

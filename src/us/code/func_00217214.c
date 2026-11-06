@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-s32 func_00217C58(s32 *, s32);
-void func_00217214(Curve *arg0)
+s32 Bits_Read(s32 *, s32);
+void AnimCurve_LoadSegment(Curve *arg0)
 {
   s32 sp10;
   int new_var;
@@ -29,11 +29,11 @@ void func_00217214(Curve *arg0)
   temp_s3 = arg0->unk0;
   temp_lo = arg0->unk28 * ((temp_s3 * 4) + 6);
   sp10 = arg0->unkC + temp_lo;
-  temp_s5 = func_00217C58(&sp10, 6);
-  temp_s1 = func_00217C58(&sp10, temp_s3);
-  temp_s0 = func_00217C58(&sp10, temp_s3);
-  temp_s2 = func_00217C58(&sp10, temp_s3);
-  temp_v0 = func_00217C58(&sp10, temp_s3);
+  temp_s5 = Bits_Read(&sp10, 6);
+  temp_s1 = Bits_Read(&sp10, temp_s3);
+  temp_s0 = Bits_Read(&sp10, temp_s3);
+  temp_s2 = Bits_Read(&sp10, temp_s3);
+  temp_v0 = Bits_Read(&sp10, temp_s3);
   temp_f6 = (f32) temp_s1;
   new_var=temp_s1*0x15;
   temp_a2 = temp_s0 << 5;

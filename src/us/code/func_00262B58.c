@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_00210790(s32, s32);                    /* extern */
-s32 func_00210B38(s32, f32);                    /* extern */
+s32 CMtxF__RotateX(s32, s32);                    /* extern */
+s32 CMtxF__RotateZ(s32, f32);                    /* extern */
 
 /* Effect callback context: the actor it runs for and the current value. */
 typedef struct {
@@ -11,7 +11,7 @@ typedef struct {
     /* 0x90 */ s32 value;
 } Effect00262B58;
 
-void func_00262B58(s32 arg0, Effect00262B58 *arg1) {
+void Turret_Effects(s32 arg0, Effect00262B58 *arg1) {
     CGameObjectInstance *temp_a0;
     CTurretIntelligence *temp_s1;
     CGameObjectInstance *temp_v0;
@@ -19,10 +19,10 @@ void func_00262B58(s32 arg0, Effect00262B58 *arg1) {
     temp_a0 = arg1->owner;
     temp_s1 = &temp_a0->header.m_pIntelligence->m_Turret;
     if (arg1->value == temp_s1->m_GunNode) {
-        func_00210790(arg0, temp_a0->m_AI.m_VarBuffer[0]);
+        CMtxF__RotateX(arg0, temp_a0->m_AI.m_VarBuffer[0]);
     }
     if (arg1->value == temp_s1->m_RotNode) {
         temp_v0 = arg1->owner;
-        func_00210B38(arg0, temp_v0->m_AI.m_InitialRotY - temp_v0->m_RotY);
+        CMtxF__RotateZ(arg0, temp_v0->m_AI.m_InitialRotY - temp_v0->m_RotY);
     }
 }

@@ -2,18 +2,18 @@
 #include "structs/cache.h"
 
 s32 CList__AddTail(s32, s32);
-s32 func_002005D0(s32, s32, s32);
+s32 CList__InsertBefore(s32, s32, s32);
 
 extern CMemEntry *D_800D81F4;
 
-void func_00206498(s32 arg0, CMemEntry *arg1) {
+void CCache__AddToAddressList(s32 arg0, CMemEntry *arg1) {
     CMemEntry *var_s0;
 
     var_s0 = D_800D81F4;
     if (var_s0 != NULL) {
 loop_1:
         if (var_s0->data > arg1->data) {
-            func_002005D0((s32) &D_800D81F4, (s32) var_s0, (s32) arg1);
+            CList__InsertBefore((s32) &D_800D81F4, (s32) var_s0, (s32) arg1);
         } else {
             var_s0 = var_s0->lockedNext;
             if (var_s0 != NULL) {

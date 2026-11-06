@@ -5,7 +5,7 @@
  * of alGlobals->drvr. */
 extern ALGlobals *D_800B7760; /* alGlobals */
 
-ALParam *func_00294B58(void) {
+ALParam *__allocParam(void) {
     ALParam *head;
     ALParam *update;
 

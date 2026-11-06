@@ -34,15 +34,15 @@ typedef struct PathSearch {
 extern u32 D_800B6D20;
 extern PathSearch *D_800F1A48;
 
-void func_0026CB2C(CGameRegion *region, CVector3 *centre);
-void func_0026CDAC(f32 *bounds, s32 count, CVector3 *points);
-void func_0026CC0C(CGameRegion *region);
-s32 func_002393D0(s32, CGameRegion *);
+void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
+void BoundingRect_AddPoints(f32 *bounds, s32 count, CVector3 *points);
+void CGameRegion__ClearVisited(CGameRegion *region);
+s32 Path_ExpandNode(s32, CGameRegion *);
 
-/* Searches a path of regions from obj to goalRegion (func_002393D0,
- * func_0026CC0C) and puts in *out the centre of the region to head for.
+/* Searches a path of regions from obj to goalRegion (Path_ExpandNode,
+ * CGameRegion__ClearVisited) and puts in *out the centre of the region to head for.
  * Returns 0 if no path was found. */
-s32 func_002399F8(CGameObjectInstance *obj, CVector3 goal, CGameRegion *goalRegion, s32 arg, CVector3 *out) {
+s32 Path_FindRegionPath(CGameObjectInstance *obj, CVector3 goal, CGameRegion *goalRegion, s32 arg, CVector3 *out) {
     PathSearch search;
     CGameRegion *region;
     PathNode *node;
@@ -77,7 +77,7 @@ s32 func_002399F8(CGameObjectInstance *obj, CVector3 goal, CGameRegion *goalRegi
     D_800F1A48->bounds[1] = obj->header.m_vPos.z - 5120.0f;
     D_800F1A48->bounds[3] = obj->header.m_vPos.z + 5120.0f;
     do {
-        func_0026CDAC(D_800F1A48->bounds, 1, region->m_pVertices[i]);
+        BoundingRect_AddPoints(D_800F1A48->bounds, 1, region->m_pVertices[i]);
         i++;
     } while (i < 3);
     D_800F1A48->obj2 = obj;
@@ -85,8 +85,8 @@ s32 func_002399F8(CGameObjectInstance *obj, CVector3 goal, CGameRegion *goalRegi
     D_800F1A48->goalPos2 = goal;
     D_800F1A48->unkA3C = 0;
     D_800F1A48->unkA40 = 1;
-    func_002393D0(0, D_800F1A48->goalRegion);
-    func_0026CC0C(D_800F1A48->goalRegion);
+    Path_ExpandNode(0, D_800F1A48->goalRegion);
+    CGameRegion__ClearVisited(D_800F1A48->goalRegion);
     node = D_800F1A48->path;
     if (node == NULL) {
         return 0;
@@ -98,7 +98,7 @@ s32 func_002399F8(CGameObjectInstance *obj, CVector3 goal, CGameRegion *goalRegi
                 node = node->next;
             }
         }
-        func_0026CB2C(node->region, out);
+        CGameRegion__GetCentroid(node->region, out);
     }
     return 1;
 }

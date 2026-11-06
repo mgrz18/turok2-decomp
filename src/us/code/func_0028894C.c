@@ -4,7 +4,7 @@
 
 extern f32 D_800B6D28; /* frame delta */
 
-void func_0028894C(CEngineApp *g) {
+void CEngineApp__UpdateFade(CEngineApp *g) {
     f32 speed;
     f32 kk;
 

@@ -72,20 +72,20 @@ extern f32 D_800B6D28;          /* frame time */
 extern f32 D_800B6D2C;          /* time scale */
 extern ModeHandler *D_800B1790[];
 
-void *func_002532EC(CPlayerList *players, CVector3 pos);
-f32 func_002119FC(f32 lo, f32 hi);
-void func_00243414(Object *obj, AI *ai, s32 state);
-void func_0025C338(Object *obj, AI *ai);
-void func_0025AD90(Object *obj, AI *ai, f32);
-void func_00275544(s16 sound, CVector3 pos, s32, s32);
-void func_00246860(Object *obj, AI *ai, s32 sound);
-void func_00246918(Object *obj, AI *ai);
+void *CPlayerPool__FindNearest(CPlayerList *players, CVector3 pos);
+f32 Random_Blend(f32 lo, f32 hi);
+void CAI__SetMode(Object *obj, AI *ai, s32 state);
+void EnemyAI_TickTimers(Object *obj, AI *ai);
+void AI_TurnHeadToTarget(Object *obj, AI *ai, f32);
+void Sound__Play(s16 sound, CVector3 pos, s32, s32);
+void AI_StartSound(Object *obj, AI *ai, s32 sound);
+void AI_StopSound(Object *obj, AI *ai);
 
 /* AI update: age, scale the frame time, run the current mode handler (its
  * enter callback when the animation changes), count down the timers, start
  * idle animations and the swim/land switches, run the behaviour, and keep
  * the burning effect and its sound going while burnTime lasts. */
-void func_0025C5F8(Object *obj, AI *ai) {
+void EnemyAI_Update(Object *obj, AI *ai) {
     Object *target;
     ModeHandler *handler;
     s32 index;
@@ -107,7 +107,7 @@ void func_0025C5F8(Object *obj, AI *ai) {
         ai->age++;
     }
     D_800B6D28 *= D_800B6D2C;
-    func_002532EC(&D_80119870.m_PlayerList, obj->pos);
+    CPlayerPool__FindNearest(&D_80119870.m_PlayerList, obj->pos);
     mode = ai->mode[ai->modeIndex];
     index = ai->modeIndex;
     handler = D_800B1790[mode];
@@ -153,23 +153,23 @@ void func_0025C5F8(Object *obj, AI *ai) {
             state = ai->state;
             if (state == 4 || state == 0xE || state == 0xF || state == 0x10 || state == 0x11 || state == 0x12
                 || state == 0xA) {
-                ai->idleTime = func_002119FC(75.0f, 150.0f);
-                func_00243414(obj, ai, 0x17);
+                ai->idleTime = Random_Blend(75.0f, 150.0f);
+                CAI__SetMode(obj, ai, 0x17);
             }
         }
     }
-    func_0025C338(obj, ai);
+    EnemyAI_TickTimers(obj, ai);
     if (ai->active) {
         if (index != 2 && (ai->flags & 0x80) && ai->state != 0x27 && ai->state != 0x29 && ai->mode2 != 0) {
             if (index == 0) {
-                func_00243414(obj, ai, 0x27);
+                CAI__SetMode(obj, ai, 0x27);
             } else if (index == 1) {
-                func_00243414(obj, ai, 0x29);
+                CAI__SetMode(obj, ai, 0x29);
             }
         }
         if (ai->active && index == 2 && !(ai->flags & 0x80) && ai->state != 0x2A && ai->state != 0x2B
             && ai->mode[0] != 0) {
-            func_00243414(obj, ai, 0x2A);
+            CAI__SetMode(obj, ai, 0x2A);
         }
     }
     if (ai->behaviour != NULL && ai->behaviour->update != NULL) {
@@ -180,15 +180,15 @@ void func_0025C5F8(Object *obj, AI *ai) {
         ai->homeZ = ai->posZ;
         obj->flags &= ~0x20000;
     }
-    func_0025AD90(obj, ai, 0.0f);
+    AI_TurnHeadToTarget(obj, ai, 0.0f);
     if (ai->burnTime > 0.0f) {
         ai->burnTime -= D_800B6D28;
         obj->fxFlags |= 2;
-        func_00275544(0x3D1, obj->pos, 0, -1);
+        Sound__Play(0x3D1, obj->pos, 0, -1);
         if (ai->active) {
-            func_00246860(obj, ai, 0x3D2);
+            AI_StartSound(obj, ai, 0x3D2);
         } else if (ai->sound != NULL && ai->sound->id != 0x3D2) {
-            func_00246918(obj, ai);
+            AI_StopSound(obj, ai);
         }
     } else {
         obj->fxFlags &= ~2;

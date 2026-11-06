@@ -31,7 +31,7 @@ static __inline__ void NextCommand(BlindOneState *m) {
     }
 }
 
-void func_0040EA48(BlindOneState *m) {
+void BlindOne_PhaseVulnerableUpdate(BlindOneState *m) {
     if (m->boss->m_AI.m_Health == 0) {
         NextCommand(m);
     }

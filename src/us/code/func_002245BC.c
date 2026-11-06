@@ -7,10 +7,10 @@
 
 /* Turok 2 level actor: 0x288 bytes (0x2E8 in Rage Wars). */
 
-void *func_002017D4(void *table, s32 index);
-extern void func_00201818(s32 arg0, s32 arg1);
+void *CISet__GetBlock(void *table, s32 index);
+extern void CISet__GetBlockSize(s32 arg0, s32 arg1);
 
-void func_002245BC(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
+void CScene__SetInstanceSavedBitInLevel(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
     void *entry;
     CIntelligence *cond;
     void *field80;
@@ -33,10 +33,10 @@ void func_002245BC(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
         }
     }
     field80 = ((CWorld *)arg0)->m_pBitSections;
-    temp_v0 = func_002017D4(func_002017D4(func_002017D4(field80, 0), (s32) arg1), 0);
-    func_002017D4(temp_v0, 0);
-    func_00201818((s32) temp_v0, 1);
-    base1 = (u8 *) func_002017D4(temp_v0, 1);
+    temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(field80, 0), (s32) arg1), 0);
+    CISet__GetBlock(temp_v0, 0);
+    CISet__GetBlockSize((s32) temp_v0, 1);
+    base1 = (u8 *) CISet__GetBlock(temp_v0, 1);
     base2 = base1;
     mask = 1 << (arg2 & 7);
     if (arg3 != 0) {

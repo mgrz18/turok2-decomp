@@ -20,11 +20,11 @@ typedef struct B01IoReq {
 extern s32 D_800BC304;
 extern OSMesgQueue D_80128370; /* request queue */
 extern OSMesgQueue D_80128540; /* reply queue (Turok 2) */
-s32 func_002A12F0(void);
-void func_002A1324(s32 mask);
-void func_002A1A3C(u32 dst, u8 *src, u32 n);
-s32 func_002A259C(u32 a0, u32 a1, u32 a2, u32 a3);
-s32 func_002A2D64(s32 arg, u8 *buf, u32 n) {
+s32 HostIo_DisableInt(void);
+void HostIo_RestoreInt(s32 mask);
+void HostIo_WriteBlock(u32 dst, u8 *src, u32 n);
+s32 HostIo_Call(u32 a0, u32 a1, u32 a2, u32 a3);
+s32 PCwrite(s32 arg, u8 *buf, u32 n) {
     B01IoReq req;
     s32 reply;
     s32 done = 0;
@@ -54,14 +54,14 @@ s32 func_002A2D64(s32 arg, u8 *buf, u32 n) {
             done += reply;
         }
     } else {
-        mask = func_002A12F0();
+        mask = HostIo_DisableInt();
         while (n != 0) {
             chunk = n;
             if (chunk > 0x8000) {
                 chunk = 0x8000;
             }
-            func_002A1A3C(0xB1FF0000, buf, chunk);
-            reply = func_002A259C(0x606, arg, chunk, 0);
+            HostIo_WriteBlock(0xB1FF0000, buf, chunk);
+            reply = HostIo_Call(0x606, arg, chunk, 0);
             if (reply == 0) {
                 break;
             }
@@ -69,7 +69,7 @@ s32 func_002A2D64(s32 arg, u8 *buf, u32 n) {
             n -= reply;
             done += reply;
         }
-        func_002A1324(mask);
+        HostIo_RestoreInt(mask);
     }
     return done;
 }

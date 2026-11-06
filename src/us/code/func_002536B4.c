@@ -10,7 +10,7 @@ typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
 extern s32 D_8011AAD8;
-s32 func_002536B4(s32 arg0, s32 arg1)
+s32 CPlayer__IsSpecialPickup(s32 arg0, s32 arg1)
 {
   int new_var;
   if (!(D_8011AAD8 & 0x10))

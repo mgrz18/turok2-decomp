@@ -6,14 +6,14 @@
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 extern float D_80125430[];
-extern void func_002A05D4();
+extern void mdctInitTwiddles();
 extern float D_800AAC20;
 extern float D_80125230[];
 extern float D_80125030[];
 extern float D_80125630[];
 extern float D_800AAC28;
 extern s32 D_80125830[];
-void func_002A05D4(void) {
+void mdctInitTwiddles(void) {
     s16 i;
     f32 angle;
     f32 s;

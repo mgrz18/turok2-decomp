@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00421B50(s32 arg0);
-extern void func_00426480(s32);
-void func_00426480(s32);
-s32 func_0042655C(s32);
-s32 func_00421B50(s32 arg0) {
+extern s32 PakMenu_FindNextPakPort(s32 arg0);
+extern void Pak_ProbeSlot(s32);
+void Pak_ProbeSlot(s32);
+s32 Pak_GetStatus(s32);
+s32 PakMenu_FindNextPakPort(s32 arg0) {
     s32 var_s0;
     s32 var_s1;
     s32 unavailable;
@@ -21,8 +21,8 @@ s32 func_00421B50(s32 arg0) {
     var_s1 = 0;
     unavailable = -2;
 loop_4:
-    func_00426480(var_s0);
-    if (func_0042655C(var_s0) == unavailable) {
+    Pak_ProbeSlot(var_s0);
+    if (Pak_GetStatus(var_s0) == unavailable) {
         var_s0 += 1;
         if (var_s0 >= 4) {
             var_s0 = 0;

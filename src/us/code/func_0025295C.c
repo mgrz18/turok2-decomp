@@ -2,11 +2,11 @@
 #include "structs/player.h"
 #include "structs/game.h"
 
-extern s32 func_0025340C(CPlayerList *list, CPlayer *player);
+extern s32 CPlayerPool__GetIndex(CPlayerList *list, CPlayer *player);
 
 /* Whether the frag limit is reached: by either team's total in team games,
- * otherwise by one player's frags (the slot func_0025340C names left out). */
-s32 func_0025295C(CPlayerList *list) {
+ * otherwise by one player's frags (the slot CPlayerPool__GetIndex names left out). */
+s32 CPlayerPool__IsFragLimitReached(CPlayerList *list) {
     GameMatch *state = &D_8011ACB0;
     CPlayer *p;
     s32 i;
@@ -17,7 +17,7 @@ s32 func_0025295C(CPlayerList *list) {
         s32 skip;
 
         for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
-            skip = func_0025340C(list, p);
+            skip = CPlayerPool__GetIndex(list, p);
             for (i = 0; i < 4; i++) {
                 if (i != skip) {
                     switch (p->m_nDeathmatchTeamSelected) {
@@ -44,7 +44,7 @@ s32 func_0025295C(CPlayerList *list) {
             s32 skip;
             s32 sum;
 
-            skip = func_0025340C(list, p);
+            skip = CPlayerPool__GetIndex(list, p);
             sum = 0;
             for (i = 0; i < 4; i++) {
                 if (i != skip) {

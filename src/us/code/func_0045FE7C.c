@@ -3,8 +3,8 @@
 
 typedef unsigned char u8;
 typedef signed int s32;
-extern u8 *func_0045FE7C(u8 *destination, u8 *source, s32 count);
-u8 *func_0045FE7C(u8 *destination, u8 *source, s32 count) {
+extern u8 *Str_CatN_2(u8 *destination, u8 *source, s32 count);
+u8 *Str_CatN_2(u8 *destination, u8 *source, s32 count) {
     u8 *end = destination + 1;
     u8 byte;
     if (*destination != 0) {

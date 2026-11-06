@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 /* Copies a matrix element by element. */
-void func_0020FF80(CMtxF dst, CMtxF src) {
+void CMtxF__Copy(CMtxF dst, CMtxF src) {
     dst[0][0] = (f32) src[0][0];
     dst[0][1] = (f32) src[0][1];
     dst[0][2] = (f32) src[0][2];

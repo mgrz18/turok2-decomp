@@ -10,7 +10,7 @@ typedef struct {
 } Unk00268B98;
 
 /* Height of arg0 above the lowest vertex of its triangle. */
-f32 func_00268B98(Unk00268B98 *arg0) {
+f32 GameObject_GetHeightAboveRegionBottom(Unk00268B98 *arg0) {
     f32 temp_f1;
     f32 var_f0;
     f32 var_f1;

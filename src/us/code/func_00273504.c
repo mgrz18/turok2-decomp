@@ -9,18 +9,18 @@ extern f32 D_800A8164;
 extern f32 D_800A8168;
 extern s32 D_800B2A34[];
 extern s32 D_800B2A44[];
-s16 func_00293470(void *p, s32 a, void *owner);
-void func_00293E30(void *p, s16 id, s32 pri);
-void func_002714B0(SndMgr *m);
-void func_00271514(SndMgr *m);
-s16 func_00273370(SndVoicePool *p, s16 a, s16 b, s16 c, s32 d);
-s16 func_00276820(SoundEffectInfo *i);
-s8 func_00276838(SoundEffectInfo *i);
-s8 func_00276844(SoundEffectInfo *i);
-s8 func_00276868(SoundEffectInfo *i);
-s16 func_00276898(SoundEffectInfo *i);
-s32 func_00211420();
-SndVoice *func_00273504(SndVoicePool *p, SoundEffectInfo *info, int tag, s32 a3)
+s16 alSndpAllocate(void *p, s32 a, void *owner);
+void alSndpSetPriority(void *p, s16 id, s32 pri);
+void CAudioWorld__Lock(SndMgr *m);
+void CAudioWorld__Unlock(SndMgr *m);
+s16 SndVoicePool_FindSlot(SndVoicePool *p, s16 a, s16 b, s16 c, s32 d);
+s16 SoundEffectInfo_GetGroup(SoundEffectInfo *i);
+s8 SoundEffectInfo_GetPriority(SoundEffectInfo *i);
+s8 SoundEffectInfo_GetChance(SoundEffectInfo *i);
+s8 SoundEffectInfo_GetPan(SoundEffectInfo *i);
+s16 SoundEffectInfo_GetFlags(SoundEffectInfo *i);
+s32 Random_NextB();
+SndVoice *SndVoicePool_AllocVoice(SndVoicePool *p, SoundEffectInfo *info, int tag, s32 a3)
 {
   s16 *snd;
   SndMgr *m3;
@@ -39,19 +39,19 @@ SndVoice *func_00273504(SndVoicePool *p, SoundEffectInfo *info, int tag, s32 a3)
   s16 *new_var;
   s32 r;
   SndVoice *v;
-  pri = func_00276820(info);
-  flag = func_00276838(info);
+  pri = SoundEffectInfo_GetGroup(info);
+  flag = SoundEffectInfo_GetPriority(info);
   m = p->owner;
   snd = m->handles;
   if (((M04Bank2 *) m->bank)->tab->n < pri)
   {
     return 0;
   }
-  func_002714B0(m);
+  CAudioWorld__Lock(m);
   new_var = &(*((s16 *) (((u8 *) info) + 2)));
-  if ((func_00276844(info) == 0x64) || ((func_00211420() % 100) < func_00276844(info)))
+  if ((SoundEffectInfo_GetChance(info) == 0x64) || ((Random_NextB() % 100) < SoundEffectInfo_GetChance(info)))
   {
-    idx = func_00273370(p, (s16) tag, pri, (s16) flag, func_00276898(info));
+    idx = SndVoicePool_FindSlot(p, (s16) tag, pri, (s16) flag, SoundEffectInfo_GetFlags(info));
     if (idx != (-1))
     {
       v = (SndVoice *) (&p->voices[idx]);
@@ -66,7 +66,7 @@ SndVoice *func_00273504(SndVoicePool *p, SoundEffectInfo *info, int tag, s32 a3)
       m2 = p->owner;
       new_var2 = &m2->player;
       core = ((u8 *) m2) + 0x7C;
-      snd[idx] = func_00293470(new_var2, ((M04Bank2 *) m2->bank)->tab->v[pri], m2);
+      snd[idx] = alSndpAllocate(new_var2, ((M04Bank2 *) m2->bank)->tab->v[pri], m2);
       sv = snd[idx];
       if (sv == (-1))
       {
@@ -75,7 +75,7 @@ SndVoice *func_00273504(SndVoicePool *p, SoundEffectInfo *info, int tag, s32 a3)
         v->vp.priority = 0;
         p->owner->pendingCue = sv;
         fail:
-        func_00271514(p->owner);
+        CAudioWorld__Unlock(p->owner);
         return 0;
       }
       f = ((f32) ((s16) flag)) * D_800A8160;
@@ -94,7 +94,7 @@ SndVoice *func_00273504(SndVoicePool *p, SoundEffectInfo *info, int tag, s32 a3)
         pr = (s32) (f - D_800A8164);
         pr = pr | 0x80000000;
       }
-      func_00293E30(new_var2, snd[idx], pr & 0xFF);
+      alSndpSetPriority(new_var2, snd[idx], pr & 0xFF);
       blk16:
       v->soundId = p->owner->cueId;
       v->reset = p->owner->unk2BAC;
@@ -115,10 +115,10 @@ SndVoice *func_00273504(SndVoicePool *p, SoundEffectInfo *info, int tag, s32 a3)
       vp->s2C = tag;
       vp->frame = p->owner->frame;
       vp->doppler = D_800A8168;
-      vp->distanceMode = func_00276868(info);
-      v->flags = func_00276898(info);
+      vp->distanceMode = SoundEffectInfo_GetPan(info);
+      v->flags = SoundEffectInfo_GetFlags(info);
       vp->follow = 0;
-      func_00271514(p->owner);
+      CAudioWorld__Unlock(p->owner);
       return v;
     }
   }

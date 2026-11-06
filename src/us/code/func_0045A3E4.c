@@ -4,8 +4,8 @@
 extern s32 D_80130970;          /* the character of the pak profile D_80130968 (structs/pak.h), after its 4 counts */
 extern u8 D_80130974[];
 
-/* Copies the loaded pak profile into the options of the player (second-module copy of func_004214C4). */
-void func_0045A3E4(CPlayer *arg0)
+/* Copies the loaded pak profile into the options of the player (second-module copy of PakMenu_RestoreCharacter). */
+void PakMenu_RestoreCharacter_2(CPlayer *arg0)
 {
   s32 var_a0;
   u8 temp_v0;

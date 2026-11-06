@@ -10,9 +10,9 @@ typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
 s32 osSetIntMask(s32);
-s32 func_002933B0(void *);
-s32 func_002933E0(void *, void *);
-void func_00293BA8(void *arg0, s32 arg1)
+s32 alUnlink(void *);
+s32 alLink(void *, void *);
+void _removeEvents(void *arg0, s32 arg1)
 {
   long long new_var;
   s32 temp_s3;
@@ -32,8 +32,8 @@ void func_00293BA8(void *arg0, s32 arg1)
         {
           *((s32 *) (((s8 *) temp_s1) + 8)) = (s32) ((*((s32 *) (((s8 *) temp_s1) + 8))) + (*((s32 *) (((s8 *) var_s0) + 8))));
         }
-        func_002933B0(var_s0);
-        func_002933E0(var_s0, arg0);
+        alUnlink(var_s0);
+        alLink(var_s0, arg0);
       }
       var_s0 = temp_s1;
     }

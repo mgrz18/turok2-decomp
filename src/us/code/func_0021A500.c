@@ -100,11 +100,11 @@ extern f32 D_800A5AF0;
 extern f32 D_800A5AF4;
 extern f32 D_800A5AF8;
 extern f32 D_800B6D28;
-s32 func_002685F0();
-void func_00267944(f32 *loc, B10Obj *o);
+s32 GameObject_IsOnGround();
+void GameObject_GetGroundRotation(f32 *loc, B10Obj *o);
 s32 func_002682A4(B10Obj *o);
-void func_00211250(f32 *a, f32 *loc);
-void func_0020DCC8(f32 *a, f32 t, f32 *b, f32 *loc);
+void CQuaternion__TurnToward(f32 *a, f32 *loc);
+void CQuaternion__SlerpFast(f32 *a, f32 t, f32 *b, f32 *loc);
 void func_0021A500(B10Obj *o) {
     f32 loc[4];
     u32 fl;
@@ -118,11 +118,11 @@ void func_0021A500(B10Obj *o) {
     if (fl & 1) {
         return;
     }
-    r = func_002685F0();
+    r = GameObject_IsOnGround();
     if (o->p14 == 0) {
         return;
     }
-    func_00267944(loc, o);
+    GameObject_GetGroundRotation(loc, o);
     s = o->p14->h2 & 1;
     if (func_002682A4(o) == 0) {
         return;
@@ -133,7 +133,7 @@ void func_0021A500(B10Obj *o) {
     }
     if (mask) {
         if ((!(o->flags100 & 0x1000) && r) || s) {
-            func_00211250(&o->f5C, loc);
+            CQuaternion__TurnToward(&o->f5C, loc);
         }
     } else {
         if (r && !(o->flags100 & 0x1000)) {
@@ -143,6 +143,6 @@ void func_0021A500(B10Obj *o) {
             t = D_800B6D28;
             t *= D_800A5AF4;
         }
-        func_0020DCC8(&o->f5C, (D_800A5AF8 < t) ? D_800A5AF8 : t, &o->f5C, loc);
+        CQuaternion__SlerpFast(&o->f5C, (D_800A5AF8 < t) ? D_800A5AF8 : t, &o->f5C, loc);
     }
 }

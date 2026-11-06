@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00266F18(s32 arg0, s32 arg1);
-void func_00266F18(s32 arg0, s32 arg1)
+extern void BitToggle(s32 arg0, s32 arg1);
+void BitToggle(s32 arg0, s32 arg1)
 {
   s32 temp_a1;
   s32 temp_v0;

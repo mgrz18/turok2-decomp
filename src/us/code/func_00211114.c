@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern float D_800A5654;
-void func_00211114(f32 *q, f32 *m)
+void CQuaternion__ToMatrix(f32 *q, f32 *m)
 {
   f32 x = q[0];
   f32 xx = x * x;

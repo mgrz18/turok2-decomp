@@ -5,7 +5,7 @@ extern u8 D_8011AB06; /* D_8011AAD8 + 0x2E */
 extern char D_800B6164[];
 extern char D_800B617C[];
 
-s32 func_0041936C(MenuItem *a) {
+s32 TeamBloodMenu_CrosshairsLabel(MenuItem *a) {
     switch (D_8011AB06) {
     case 0:
         a->text = D_800B617C;

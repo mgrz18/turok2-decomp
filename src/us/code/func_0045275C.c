@@ -4,9 +4,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 extern char D_00438FB4[];
-extern void func_00416894(void *, void *, void *);
+extern void MenuPool_OpenChildMenu(void *, void *, void *);
 
-s32 func_0045275C(void *first, void *second, void *third) {
+s32 TitleMenu_Multi_2(void *first, void *second, void *third) {
     GameSettings *options = &D_8011AAD8;
     s32 i;
     options->multiplayer = 1;
@@ -14,6 +14,6 @@ s32 func_0045275C(void *first, void *second, void *third) {
     for (i = 0; i < 4; i++) {
         options->slots[i].m_bActive = 0;
     }
-    func_00416894(third, second, D_00438FB4);
+    MenuPool_OpenChildMenu(third, second, D_00438FB4);
     return 1;
 }

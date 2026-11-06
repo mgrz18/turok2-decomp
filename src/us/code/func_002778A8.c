@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "gfx.h"
-extern void func_002778A8(s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+extern void Hud_DrawBevelBox(s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 extern Gfx *D_800D8E24;
 static __inline__ void rectangle(s32 x0,s32 y0,s32 x1,s32 y1,s32 r,s32 g,s32 b,s32 a) {
     { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = (0); };
@@ -11,7 +11,7 @@ static __inline__ void rectangle(s32 x0,s32 y0,s32 x1,s32 y1,s32 r,s32 g,s32 b,s
     { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(x1>0?x1:0) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(y1>0?y1:0) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(x0>0?x0:0) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(y0>0?y0:0) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
 }
 extern Gfx *D_800D8E24;
-void func_002778A8(s32 x0,s32 y0,s32 x1,s32 y1,s32 border,s32 invert,s32 red,s32 green,s32 blue,s32 alpha) {
+void Hud_DrawBevelBox(s32 x0,s32 y0,s32 x1,s32 y1,s32 border,s32 invert,s32 red,s32 green,s32 blue,s32 alpha) {
     u8 r=red,g=green,b=blue,a=alpha;
     s32 lightR,lightG,lightB,darkR,darkG,darkB;
     lightR=invert ? r>>1 : r<<1;

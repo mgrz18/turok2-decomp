@@ -2,17 +2,17 @@
 #include "structs/particle.h"
 
 extern u8 D_800F7078[];
-extern CRegionInfo *func_0022425C(void *arg0, CGameRegion *region);
+extern CRegionInfo *CScene__GetRegionInfo(void *arg0, CGameRegion *region);
 
 /* Whether the particle is under water: below its region's water height (flag 4 when it has no region). */
-s32 func_002325F0(CParticle *obj) {
+s32 CParticle__IsUnderWater(CParticle *obj) {
     CRegionInfo *target;
 
     if (obj->header.m_pCurrentRegion != NULL) {
         if (!(obj->header.m_pCurrentRegion->m_wFlags & REGION_FLAG_WATER)) {
             return 0;
         }
-        target = func_0022425C(D_800F7078, obj->header.m_pCurrentRegion);
+        target = CScene__GetRegionInfo(D_800F7078, obj->header.m_pCurrentRegion);
         if (target != NULL) {
             goto found;
         }

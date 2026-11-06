@@ -11,7 +11,7 @@ typedef struct {
 extern s32 D_8011AAD8;
 
 /* Number of active players, or 0 if any of them is not ready. */
-s32 func_00450D10(void) {
+s32 Mp_CountJoinedControllers_2(void) {
     PlayerOptionsView *var_a0;
     s32 var_a1;
     s32 var_a2;

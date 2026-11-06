@@ -14,7 +14,7 @@ extern u8 D_800B5E8C[];
 extern u8 D_800B5E98[];
 extern u8 D_800B5EA4[];
 
-void func_00454BB0(NamedThing *t) {
+void PlayerOptions_SetDefaultName_2(NamedThing *t) {
     s32 i;
 
     switch (t->kind) {

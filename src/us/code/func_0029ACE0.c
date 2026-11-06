@@ -5,11 +5,11 @@
 
 extern float D_800AA8D8;
 extern double D_800AA8D0;
-extern void func_0029ACE0();
+extern void __osViSwapContext();
 extern __OSViContext *D_800B7AC0;
 extern __OSViContext *D_800B7AC4;
-extern u32 func_0029BF80(void *addr);
-void func_0029ACE0(void)
+extern u32 osVirtualToPhysical(void *addr);
+void __osViSwapContext(void)
 {
     register OSViMode *vm;
     register __OSViContext *vc;
@@ -26,7 +26,7 @@ void func_0029ACE0(void)
     vc = D_800B7AC4;
     vm = vc->modep;
     field = (*(volatile u32 *)(0xA4400010)) & 1;
-    origin = func_0029BF80(vc->framep) + (vm->fldRegs[field].origin);
+    origin = osVirtualToPhysical(vc->framep) + (vm->fldRegs[field].origin);
     if (vc->state & 2) {
         vc->x.scale |= (vm->comRegs.xScale & ~0xFFF);
     } else {
@@ -59,11 +59,11 @@ void func_0029ACE0(void)
     }
     if (vc->state & 0x40) {
         vc->y.scale = 0;
-        origin = func_0029BF80(vc->framep);
+        origin = osVirtualToPhysical(vc->framep);
     }
     if (vc->state & 0x80) {
         vc->y.scale = (vc->y.offset << 16) & (0x3FF << 16);
-        origin = func_0029BF80(vc->framep);
+        origin = osVirtualToPhysical(vc->framep);
     }
     (*(volatile u32 *)(0xA4400004) = (origin));
     (*(volatile u32 *)(0xA4400008) = (vm->comRegs.width));

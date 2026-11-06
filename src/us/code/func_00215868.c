@@ -4,6 +4,6 @@
 
 extern f32 D_800B6D28;
 
-void func_00215868(CLevelActor *arg0) {
+void CLevelActor__UpdateAnimSpeed(CLevelActor *arg0) {
     arg0->m_AnimSpeed = (f32) (D_800B6D28 * arg0->header.m_pIntelligence->m_Morpher.m_AnimSpeed);
 }

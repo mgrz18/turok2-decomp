@@ -24,29 +24,29 @@ typedef struct {
 
 extern s32 D_800F7078[];
 
-void func_00246690(Actor *self, s32 type, CVector3 pos, s32 arg4);
-void func_004089C8(void);
-void func_00220260(void *mgr, Actor *actor, s32 flag);
-void func_0026E110(Actor *actor, s32 flags, Actor *actor2);
-void func_00246918(Actor *self, void *ai);
-void func_002280B0(Actor *self);
+void Actor_SpawnParticle(Actor *self, s32 type, CVector3 pos, s32 arg4);
+void TotemDefense_AddKill(void);
+void CScene__SetInstanceSavedBit(void *mgr, Actor *actor, s32 flag);
+void GameObject_FireTriggers(Actor *actor, s32 flags, Actor *actor2);
+void AI_StopSound(Actor *self, void *ai);
+void CListedInstance__Free(Actor *self);
 
-void func_002600E8(Actor *self, void *ai) {
+void EnemyAI_NukedFrozenRemove(Actor *self, void *ai) {
     CIntelligence *def;
 
-    func_00246690(self, 0x17, self->pos, 0);
-    func_004089C8();
+    Actor_SpawnParticle(self, 0x17, self->pos, 0);
+    TotemDefense_AddKill();
     def = self->def;
     if (!(self->flags.word & 0x80000)) {
         if (!(def->m_dwTypeFlags & 0x20)) {
-            func_00220260(D_800F7078, self, 1);
+            CScene__SetInstanceSavedBit(D_800F7078, self, 1);
         }
-        func_0026E110(self, 1, self);
+        GameObject_FireTriggers(self, 1, self);
     }
     self->flags.bits.b100 = 0;
     self->flags.bits.b2000 = 0;
-    func_00246918(self, ai);
+    AI_StopSound(self, ai);
     if (self->flags.word & 0x80000) {
-        func_002280B0(self);
+        CListedInstance__Free(self);
     }
 }

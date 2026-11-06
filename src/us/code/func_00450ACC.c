@@ -19,7 +19,7 @@ struct SharedRecAt148;
 typedef struct SharedRecAt148 SharedRecAt148;
 struct Shared_func_8043DEDC_S3;
 typedef struct Shared_func_8043DEDC_S3 Shared_func_8043DEDC_S3;
-extern void func_00450ACC(func_80250BD4_S1 *arg0);
+extern void Menu_ClaimPressingController_2(func_80250BD4_S1 *arg0);
 struct SharedRecAt224;
 typedef struct SharedRecAt224 SharedRecAt224;
 struct SharedRecAt148;
@@ -34,11 +34,11 @@ struct Shared_func_8043DEDC_S3 {
     char pad29[0x6];
     s8 unk2F;
 };
-void func_00275A74(void);
-unsigned int func_002855E8(void *);
+void Music_RestoreVolume(void);
+unsigned int Controller_ConfirmPressed(void *);
 extern s32 D_8011AB18;
 extern struct SharedRecAt148 D_8011AB98[];
-void func_00450ACC(func_80250BD4_S1 *arg0) {
+void Menu_ClaimPressingController_2(func_80250BD4_S1 *arg0) {
     Shared_func_8043DEDC_S3 *settings;
     s8 *status;
     ControllerProfile *profile;
@@ -54,12 +54,12 @@ void func_00450ACC(func_80250BD4_S1 *arg0) {
     settings = (Shared_func_8043DEDC_S3 *)&D_8011AB18;
     on = 1;
     for (profile = D_800F5EC0; i < 4; i++, profile++) {
-        if (func_002855E8(profile) != 0) {
+        if (Controller_ConfirmPressed(profile) != 0) {
             settings->unk28 = on;
             settings->unk2F = i;
             arg0->unk20 = profile;
             break;
         }
     }
-    func_00275A74();
+    Music_RestoreVolume();
 }

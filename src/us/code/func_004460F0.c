@@ -1,4 +1,4 @@
-/* Second-module copy of func_0040D0F0 (nonmatching/vm/func_0040D0F0.c), with its data addresses 0xE0 lower. */
+/* Second-module copy of BlindOne_PhaseMinionsUpdate (nonmatching/vm/BlindOne_PhaseMinionsUpdate.c), with its data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -13,11 +13,11 @@
 
 extern BlindOnePhase D_0043232C[];
 extern u8 D_8010ABA0[];
-extern f32 func_002119FC(f32 min, f32 max);
+extern f32 Random_Blend(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
-extern void func_002688C8(CGameObjectInstance *obj, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
-extern void *func_00228108(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
+extern void GameObject_TraceMove(CGameObjectInstance *obj, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
+extern void *CInstancePool__Spawn(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
                            CVector3 vel, CVector3 scale, s32 *owner);
 
 /* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
@@ -63,15 +63,15 @@ static __inline__ void spawnMinion(BlindOneState *state, s32 *toSpawn, s32 *aliv
     pos.x = obj->header.m_vPos.x + dist * func_002982F0(angle);
     pos.y = 0.0f;
     pos.z = obj->header.m_vPos.z + dist * func_002974C0(angle);
-    func_002688C8(state->boss, pos, &pos, &region, 0, 0);
-    if (func_00228108(D_8010ABA0, -1, 0x1FF, intelligence, region, pos, angle, vel, scale, alive) && toSpawn != NULL) {
+    GameObject_TraceMove(state->boss, pos, &pos, &region, 0, 0);
+    if (CInstancePool__Spawn(D_8010ABA0, -1, 0x1FF, intelligence, region, pos, angle, vel, scale, alive) && toSpawn != NULL) {
         (*toSpawn)--;
     }
 }
 
-void func_004460F0(BlindOneState *state) {
-    spawnMinion(state, &state->toSpawn, &state->minionsAlive, func_002119FC(1228.7999f, 1536.0f), state->maxMinions,
-                state->minionDefA, state->boss, func_002119FC(-3.141593f, 3.141593f));
+void BlindOne_PhaseMinionsUpdate_2(BlindOneState *state) {
+    spawnMinion(state, &state->toSpawn, &state->minionsAlive, Random_Blend(1228.7999f, 1536.0f), state->maxMinions,
+                state->minionDefA, state->boss, Random_Blend(-3.141593f, 3.141593f));
     if (state->toSpawn == 0 && state->minionsAlive < 5) {
         nextPhase(state);
     }

@@ -24,7 +24,7 @@ extern int D_801198A0;
 extern GameSession D_800F6CB0;
 extern void func_00430250(GameSession *);
 
-int func_00455960(int unused, Menu *menu) {
+int StatsMenu_ContinueNo_2(int unused, Menu *menu) {
     RenderCounters *sync = &D_8011A6D8.counters;
     int team;
     if (sync->option34 != 0) {

@@ -11,15 +11,15 @@ typedef struct {
     /* 0x508 */ s32 z;
 } PosCopy;
 
-s32 func_00225C84(s32);
+s32 CScene__MarkGeneratorsSaved(s32);
 
 extern s32 D_800F7078;
 
-void func_0044755C(PosCopy *arg0) {
+void BlindOne_PhaseMinionsInit_2(PosCopy *arg0) {
     CVector3 *temp_v0;
 
     temp_v0 = arg0->pos;
     arg0->y = temp_v0->y;
     arg0->z = temp_v0->z;
-    func_00225C84((s32) &D_800F7078);
+    CScene__MarkGeneratorsSaved((s32) &D_800F7078);
 }

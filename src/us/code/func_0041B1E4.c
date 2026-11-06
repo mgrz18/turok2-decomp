@@ -7,7 +7,7 @@ extern s32 D_8011AAD8;
 extern s32 D_8011AADC;
 extern s32 D_800B57AC;
 extern s32 D_800B57C8;
-s32 func_0041B1E4(struct Func8043D458Arg *arg0) {
+s32 CheatMenu_InvincibilityText(struct Func8043D458Arg *arg0) {
     if (D_8011AADC & 1) {
         arg0->flags |= 0x01000000;
     } else {

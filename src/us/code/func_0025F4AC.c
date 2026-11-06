@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_0025F4AC(void) {
+void EnemyMode_DropObject_Enter(void) {
 
 }

@@ -9,8 +9,8 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-s32 func_00220260(s32, s32, s32);
-void func_00225C84(void *arg0)
+s32 CScene__SetInstanceSavedBit(s32, s32, s32);
+void CScene__MarkGeneratorsSaved(void *arg0)
 {
   s32 temp_s2;
   int new_var;
@@ -29,7 +29,7 @@ void func_00225C84(void *arg0)
       temp_a1 = (*((s32 *) (((s8 *) arg0) + 0xE0))) + var_s1;
       if ((*(*((s32 **) (((s8 *) temp_a1) + 0x14)))) == new_var)
       {
-        func_00220260((s32) arg0, (s32) temp_a1, 1);
+        CScene__SetInstanceSavedBit((s32) arg0, (s32) temp_a1, 1);
       }
       var_s0 += 1;
       var_s1 += 0x288;

@@ -7,45 +7,45 @@
 
 extern u8 D_801102B8[];
 void func_002847D0(void);
-void func_002222E0(u8 *world, CCamera *cam);
+void CScene__DrawGeometry(u8 *world, CCamera *cam);
 s32 Cinema_PathPlaying(void);
-void func_00252C70(CPlayerList *list, CCamera *cam);
-void func_00253148(CPlayerList *list, CCamera *cam);
-void func_00223F8C(u8 *world, CCamera *cam);
+void CPlayerPool__ReloadAnimInfo(CPlayerList *list, CCamera *cam);
+void CPlayerPool__DrawCharacters(CPlayerList *list, CCamera *cam);
+void CScene__DrawRegisteredInstances(u8 *world, CCamera *cam);
 void func_00235C30(void *arg0, CCamera *cam);
-void func_0022782C(u8 *arg0, CCamera *cam);
-void func_0022077C(u8 *world, CCamera *cam);
-void func_00283238(u8 *sky, CCamera *cam);
-void func_002240C4(u8 *world, CCamera *cam);
-void func_002352F8(void *arg0, CCamera *cam);
-void func_00280AA0(CCamera *cam);
-void func_002531D0(CPlayerList *list, CCamera *cam);
-void func_00207FEC(s32 arg0);
+void CLevelActorPool__Draw(u8 *arg0, CCamera *cam);
+void CScene__DrawSortedList(u8 *world, CCamera *cam);
+void CEmitterPool__Draw(u8 *sky, CCamera *cam);
+void CScene__DrawParticles(u8 *world, CCamera *cam);
+void Trail_DrawAll(void *arg0, CCamera *cam);
+void CCamera__DrawGlares(CCamera *cam);
+void CPlayerPool__DrawWeaponOverlays(CPlayerList *list, CCamera *cam);
+void Render_SetRenderMode(s32 arg0);
 
 /* Draws the scene through a camera, layer by layer (LibTEngine's CCamera
  * DrawScene), and with game flag 0x200 up clears its viewport after: a
  * fill rectangle in fill mode, blend colour and prim depth all ones. */
-void func_0027E770(CCamera *cam, u8 *world) {
+void CCamera__DrawScene(CCamera *cam, u8 *world) {
     func_002847D0();
-    func_002222E0(world, cam);
+    CScene__DrawGeometry(world, cam);
     if (Cinema_PathPlaying() == 0) {
-        func_00252C70(&D_80119870.m_PlayerList, cam);
+        CPlayerPool__ReloadAnimInfo(&D_80119870.m_PlayerList, cam);
     }
     if (D_80119870.m_Settings.mode == 13) {
-        func_00253148(&D_80119870.m_PlayerList, cam);
+        CPlayerPool__DrawCharacters(&D_80119870.m_PlayerList, cam);
     }
-    func_00223F8C(world, cam);
+    CScene__DrawRegisteredInstances(world, cam);
     func_00235C30(D_801102B8, cam);
     if (Cinema_PathPlaying() == 0) {
-        func_0022782C(world + 0x10518, cam);
+        CLevelActorPool__Draw(world + 0x10518, cam);
     }
-    func_0022077C(world, cam);
-    func_00283238(cam->m_SkySystem, cam);
-    func_002240C4(world, cam);
-    func_002352F8(D_801102B8, cam);
-    func_00280AA0(cam);
+    CScene__DrawSortedList(world, cam);
+    CEmitterPool__Draw(cam->m_SkySystem, cam);
+    CScene__DrawParticles(world, cam);
+    Trail_DrawAll(D_801102B8, cam);
+    CCamera__DrawGlares(cam);
     if (Cinema_PathPlaying() == 0 && D_80119870.m_Settings.mode == 13) {
-        func_002531D0(&D_80119870.m_PlayerList, cam);
+        CPlayerPool__DrawWeaponOverlays(&D_80119870.m_PlayerList, cam);
     }
     if (D_8011AAD8.cheatFlags & 0x200) {
         GFX_WORDS(0xE7000000, 0);                   /* gDPPipeSync */
@@ -53,7 +53,7 @@ void func_0027E770(CCamera *cam, u8 *world) {
         GFX_WORDS(0xF9000000, 0xFFFFFFFF);          /* gDPSetBlendColor */
         GFX_WORDS(0xEE000000, 0xFFFFFFFF);          /* gDPSetPrimDepth */
         GFX_WORDS(0xE2001D00, 4);                   /* gDPSetRenderMode, z compare */
-        func_00207FEC(0x16);
+        Render_SetRenderMode(0x16);
         {                                           /* gDPFillRectangle over the viewport */
         Gfx *g = D_800D8E24++;
         g->w0 = 0xF6000000

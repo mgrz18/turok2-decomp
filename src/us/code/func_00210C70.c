@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00210C70(f32 *dst, f32 *src);
-void func_00210C70(f32 *dst, f32 *src) {
+extern void CMtxF__CopySwapYZRows(f32 *dst, f32 *src);
+void CMtxF__CopySwapYZRows(f32 *dst, f32 *src) {
     extern const f32 D_800A5624[];
     dst[0] = src[0];
     dst[1] = src[1];

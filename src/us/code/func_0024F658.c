@@ -29,20 +29,20 @@ typedef struct {
 extern f32 D_800B6D28;      /* frame time */
 extern Mode D_800ADF5C[];
 
-f32 func_0021170C(f32 value, f32 rate);
-f32 func_0021160C(f32 value, f32 delta, f32 limit);
+f32 Math_DecayToZero(f32 value, f32 rate);
+f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
 f32 func_00298470(f32 x);
-void func_002117DC(f32 *value, f32 target, f32 rate);
-CQuaternion func_0021AE6C(CGameObjectInstance *body);
-void func_00211114(CQuaternion *q, f32 *mtx);
-void func_0020F85C(f32 *mtx, CVector3 *in, CVector3 *out);
-void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
-void func_00275544(s16 sound, CVector3 pos, s32, s32);
+void Math_EaseToward(f32 *value, f32 target, f32 rate);
+CQuaternion CGameObjectInstance__GetRotation(CGameObjectInstance *body);
+void CQuaternion__ToMatrix(CQuaternion *q, f32 *mtx);
+void CMtxF__TransformPoint(f32 *mtx, CVector3 *in, CVector3 *out);
+void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
+void Sound__Play(s16 sound, CVector3 pos, s32, s32);
 
 /* Swimming movement: forward and strafe speeds, the dodge impulses and the
  * climb, turned by the body's facing and added to the velocity, with drag
  * on the way down and a roll from the strafe. */
-void func_0024F658(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
+void CPlayer__MoveInWater(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
     CVector3 forward;
     CVector3 strafe;
     CVector3 forwardOut;
@@ -69,28 +69,28 @@ void func_0024F658(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
     if (player->m_Data.m_CurrentWeapon == 0x12 || player->m_Data.m_CurrentWeapon == 0x21) {
         ready = 0;
         if (player->m_ContState.m_dwButtons & 8) {
-            player->m_Speed = func_0021160C(player->m_Speed, tuning->max * 0.75f, tuning->max * 3.0f);
+            player->m_Speed = Math_StepClamped(player->m_Speed, tuning->max * 0.75f, tuning->max * 3.0f);
         }
     }
     value = player->m_Speed;
     max = tuning->max;
     if (value < 0.0f ? max < -value : max < value) {
-        player->m_Speed = func_0021170C(player->m_Speed, tuning->decel * 0.5f);
+        player->m_Speed = Math_DecayToZero(player->m_Speed, tuning->decel * 0.5f);
     } else if (player->m_ContState.m_FinalMoveY != 0.0f) {
-        player->m_Speed = func_0021160C(player->m_Speed, player->m_ContState.m_FinalMoveY * tuning->accel,
+        player->m_Speed = Math_StepClamped(player->m_Speed, player->m_ContState.m_FinalMoveY * tuning->accel,
             (player->m_ContState.m_FinalMoveY < 0.0f ? -player->m_ContState.m_FinalMoveY : player->m_ContState.m_FinalMoveY) * tuning->max);
     } else {
-        player->m_Speed = func_0021170C(player->m_Speed, tuning->decel);
+        player->m_Speed = Math_DecayToZero(player->m_Speed, tuning->decel);
     }
     value = player->m_SideSpeed;
     max = tuning->max;
     if (value < 0.0f ? max < -value : max < value) {
-        player->m_SideSpeed = func_0021170C(player->m_SideSpeed, tuning->decel * 0.5f);
+        player->m_SideSpeed = Math_DecayToZero(player->m_SideSpeed, tuning->decel * 0.5f);
     } else if (player->m_ContState.m_FinalMoveX != 0.0f) {
-        player->m_SideSpeed = func_0021160C(player->m_SideSpeed, player->m_ContState.m_FinalMoveX * tuning->accel,
+        player->m_SideSpeed = Math_StepClamped(player->m_SideSpeed, player->m_ContState.m_FinalMoveX * tuning->accel,
             (player->m_ContState.m_FinalMoveX < 0.0f ? -player->m_ContState.m_FinalMoveX : player->m_ContState.m_FinalMoveX) * tuning->max * 0.75f);
     } else {
-        player->m_SideSpeed = func_0021170C(player->m_SideSpeed, tuning->decel);
+        player->m_SideSpeed = Math_DecayToZero(player->m_SideSpeed, tuning->decel);
     }
     if (ready) {
         pressed = player->m_ContState.m_dwButtonsSingle;
@@ -105,7 +105,7 @@ void func_0024F658(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
         }
     } else {
     decay:
-        speed = func_0021170C(player->m_BurstSpeed, tuning->impulseDecel);
+        speed = Math_DecayToZero(player->m_BurstSpeed, tuning->impulseDecel);
     }
     player->m_BurstSpeed = speed;
     if (ready && (player->m_ContState.m_dwButtonsDouble & 1)) {
@@ -115,7 +115,7 @@ void func_0024F658(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
         player->m_BurstSideSpeed = -tuning->impulse * 0.75f;
         impulse = 1;
     } else {
-        player->m_BurstSideSpeed = func_0021170C(player->m_BurstSideSpeed, tuning->impulseDecel * 0.75f);
+        player->m_BurstSideSpeed = Math_DecayToZero(player->m_BurstSideSpeed, tuning->impulseDecel * 0.75f);
     }
     if (ready && (player->m_ContState.m_dwButtonsSingle & 0x10)) {
         impulse = 1;
@@ -125,7 +125,7 @@ void func_0024F658(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
         climb = body->m_vVelocity.y;
         climbMax = tuning->climbMax;
         if (climb < climbMax) {
-            body->m_vVelocity.y = func_0021160C(climb, tuning->climbAccel, climbMax);
+            body->m_vVelocity.y = Math_StepClamped(climb, tuning->climbAccel, climbMax);
         }
     }
     forward.x = 0.0f;
@@ -134,22 +134,22 @@ void func_0024F658(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
     strafe.x = player->m_SideSpeed + player->m_BurstSideSpeed;
     strafe.y = 0;
     strafe.z = 0;
-    rot = func_0021AE6C(body);
-    func_00211114(&rot, mtx);
-    func_0020F85C(mtx, &forward, &forwardOut);
-    func_0020F85C(mtx, &strafe, &strafeOut);
+    rot = CGameObjectInstance__GetRotation(body);
+    CQuaternion__ToMatrix(&rot, mtx);
+    CMtxF__TransformPoint(mtx, &forward, &forwardOut);
+    CMtxF__TransformPoint(mtx, &strafe, &strafeOut);
     player->m_vDesiredPos.x += (forwardOut.x + strafeOut.x) * player->m_FrameIncrementScaled;
     player->m_vDesiredPos.y += (forwardOut.y + strafeOut.y) * player->m_FrameIncrementScaled;
     player->m_vDesiredPos.z += (forwardOut.z + strafeOut.z) * player->m_FrameIncrementScaled;
     if (body->m_vVelocity.y < 0.0f) {
-        func_0020EEF8(&sum, &forwardOut, &strafeOut);
+        CVector3__Add(&sum, &forwardOut, &strafeOut);
         body->m_vVelocity.y -= D_800ADF5C[player->m_Mode].physics->drag
             * (func_00298470(sum.x * sum.x + sum.y * sum.y + sum.z * sum.z) / (tuning->max * 4.0f))
             * player->m_FrameIncrementScaled;
     }
-    func_002117DC(&player->m_vHeadRotOffset.z, (player->m_SideSpeed * 1.8f + player->m_ContState.m_FinalLookX * 16.0f) * 0.017453294f, 0.04f);
+    Math_EaseToward(&player->m_vHeadRotOffset.z, (player->m_SideSpeed * 1.8f + player->m_ContState.m_FinalLookX * 16.0f) * 0.017453294f, 0.04f);
     if (impulse) {
         player->m_BurstTimer += 7.5f;
-        func_00275544(tuning->impulseSound, body->header.m_vPos, 0, -1);
+        Sound__Play(tuning->impulseSound, body->header.m_vPos, 0, -1);
     }
 }

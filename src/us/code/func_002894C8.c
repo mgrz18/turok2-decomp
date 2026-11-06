@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_002894C8(void) {
+void EngineMode02_DemoWarning_Init(void) {
 
 }

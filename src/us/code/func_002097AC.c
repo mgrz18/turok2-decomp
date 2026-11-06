@@ -19,11 +19,11 @@ typedef struct MorphFrame {
 extern s32 D_800B6D18;
 extern s32 D_800B6D1C;
 
-void *func_002017D4(void *resource, s32 index);
+void *CISet__GetBlock(void *resource, s32 index);
 
 /* Blends the morph frames around time t into the output frame: t wraps into [0, frames - 2), and
  * the two frames either side of it are mixed, positions in 16.16 and normals in 8.8 fixed point. */
-void func_002097AC(void *resource, f32 t) {
+void Model_BlendMorphFrames(void *resource, f32 t) {
     MorphFrame *frames[2];
     s32 counts[2];
     MorphVtx *verts[2];
@@ -41,14 +41,14 @@ void func_002097AC(void *resource, f32 t) {
     s32 p1;
     s32 p0;
 
-    state = func_002017D4(resource, 3);
+    state = CISet__GetBlock(resource, 3);
     state[0] = D_800B6D18;
-    anim = func_002017D4(resource, 0);
+    anim = CISet__GetBlock(resource, 0);
     numFrames = *(s32 *)anim;
     if (numFrames < 3) {
         return;
     }
-    outFrame = func_002017D4(anim, D_800B6D1C);
+    outFrame = CISet__GetBlock(anim, D_800B6D1C);
     out = outFrame->verts;
     outCount = outFrame->count;
     while (t < 0.0f) {
@@ -64,7 +64,7 @@ void func_002097AC(void *resource, f32 t) {
     p1 = frac * 65536.0f;
     p0 = 0x10000 - p1;
     for (i = 0; i < 2; i++) {
-        frames[i] = func_002017D4(anim, ((s32)t + i) % (numFrames - 2) + 2);
+        frames[i] = CISet__GetBlock(anim, ((s32)t + i) % (numFrames - 2) + 2);
         counts[i] = frames[i]->count;
         verts[i] = frames[i]->verts;
     }

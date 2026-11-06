@@ -10,9 +10,9 @@ typedef struct {
 
 s32 CList__AddTail(void *, void *);              /* extern */
 s32 CList__Remove(void *, void *);              /* extern */
-s32 func_00275864(s32);                         /* extern */
+s32 Sound__Stop(s32);                         /* extern */
 
-void func_00275EFC(SoundSlotPool *arg0) {
+void LoopSounds_StopAll(SoundSlotPool *arg0) {
     SndSource *temp_s0;
     SndSource *var_s1;
 
@@ -20,7 +20,7 @@ void func_00275EFC(SoundSlotPool *arg0) {
     if (var_s1 != NULL) {
         do {
             temp_s0 = var_s1->next;
-            func_00275864(var_s1->handle);
+            Sound__Stop(var_s1->handle);
             var_s1->sound.w = -1;
             var_s1->handle = -1;
             CList__Remove(&arg0->m_Used, var_s1);

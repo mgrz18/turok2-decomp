@@ -5,7 +5,7 @@
 extern Gfx *D_800D8E24;         /* display list head */
 extern s32 D_800F56A8;
 
-void *func_0027B4EC(void);
+void *COnScreen__GetFontTexture(void);
 
 #define GFX(a, b)                   \
     {                               \
@@ -15,9 +15,9 @@ void *func_0027B4EC(void);
     }
 
 /* Loads a 16-bit I texture (gDPLoadTextureBlock-style) for the image returned
- * by func_0027B4EC. */
-void func_00278278(void) {
-    void *image = func_0027B4EC();
+ * by COnScreen__GetFontTexture. */
+void COnScreen__SelectFont3(void) {
+    void *image = COnScreen__GetFontTexture();
 
     if (image != NULL) {
         D_800F56A8 = 3;

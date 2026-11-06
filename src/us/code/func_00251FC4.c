@@ -54,30 +54,30 @@ extern char D_00439640;         /* death screen */
 extern char D_0043BED0;
 extern char D_0043CAB4;         /* key screen */
 
-void func_0024D344(CPlayer *p);
-void func_0024CF58(CPlayer *p, CPlayer *other);
-void func_00401B30(void *, s32 region, f32 yaw, CVector3 pos);
-void func_00246BC0(void *input, CPlayer *p);
-s32 func_00285558(ControllerProfile *c);
-s32 func_00284174(void);
-void func_002840EC(void);
-s32 func_00416AF8(Globals *g);
-void func_00275A50(void);
-void func_00275904(s32);
-void func_00275A98(void);
-void func_00416644(void *pool, void *screen, CPlayer *p, ControllerProfile *c, s32);
-s32 func_0026EFB8(s32 level);
+void CPlayer__Update(CPlayer *p);
+void CPlayer__UpdateOrbitCamera(CPlayer *p, CPlayer *other);
+void Automap_SetPlayer(void *, s32 region, f32 yaw, CVector3 pos);
+void CPlayer__ReadInput(void *input, CPlayer *p);
+s32 Controller_StartPressedNoCinema(ControllerProfile *c);
+s32 Cinema_IsActive(void);
+void Cinema_TrySkip(void);
+s32 MenuPool_CountOpen(Globals *g);
+void Music_DuckVolume(void);
+void Sound__StopAllExcept(s32);
+void Sound__DisableAmbientTrack(void);
+void MenuPool_OpenMenu(void *pool, void *screen, CPlayer *p, ControllerProfile *c, s32);
+s32 Level_GetHub(s32 level);
 s32 Cinema_PathPlaying(void);
-s32 func_00284408(void);
-s32 func_00284240(void);
-void func_0042DC18(CPlayer *p, s32 character, s32);
-void func_00243414(void *actor, void *ai, s32 mode);
-void func_00248BA8(CPlayer *p, s32, s32, s32);
+s32 Cinema_GetScriptId(void);
+s32 Cinema_IsFinished(void);
+void CPlayer__NewGame(CPlayer *p, s32 character, s32);
+void CAI__SetMode(void *actor, void *ai, s32 mode);
+void CPlayer__Warp(CPlayer *p, s32, s32, s32);
 void CList__Remove(void *list, void *node);
 void CList__AddHead(void *list, void *node);
-void func_0042FFB0(void *pool, CCamera *cam);
-void func_0025492C(PlayerList *list);
-void func_002525BC(PlayerList *list);
+void CCameraPool__FreeCamera(void *pool, CCamera *cam);
+void CPlayerPool__UpdateMatchClock(PlayerList *list);
+void CPlayerPool__PickTagIt(PlayerList *list);
 
 static __inline__ void reset_strokes(CBarrel *s) {
     s->m_State = 0;
@@ -86,7 +86,7 @@ static __inline__ void reset_strokes(CBarrel *s) {
     s->m_Open = 0.0f;
 }
 
-/* func_00253FFC: paused, or a menu other than the death screen open on the
+/* CPlayer__IsPausedOrInMenu: paused, or a menu other than the death screen open on the
  * player's camera. */
 static __inline__ s32 in_menu(CPlayer *p) {
     s32 result;
@@ -102,10 +102,10 @@ static __inline__ s32 in_menu(CPlayer *p) {
 }
 
 /* Update the players: move each one in the game (unless paused or in a menu:
- * func_00253FFC), handle pause (the death screen), the hub key screen and the level-end
+ * CPlayer__IsPausedOrInMenu), handle pause (the death screen), the hub key screen and the level-end
  * cinema; let idle players join while the match allows it and send players
  * who left back to the idle list; then run the match clock and tag. */
-void func_00251FC4(PlayerList *list) {
+void CPlayerPool__Update(PlayerList *list) {
     CPlayer *p;
     CPlayer *next;
     f32 frameTime;
@@ -118,52 +118,52 @@ void func_00251FC4(PlayerList *list) {
     frameTime = D_800B6D28;
     for (p = list->active.head; p != NULL; p = p->m_pNext) {
         if (!in_menu(p)) {
-            func_0024D344(p);
+            CPlayer__Update(p);
         }
-        func_0024CF58(p, p);
-        func_00401B30(&D_8011AAA0, p->m_CharacterActor.header.m_pCurrentRegion, p->m_CharacterActor.m_RotY, p->m_CharacterActor.header.m_vPos);
+        CPlayer__UpdateOrbitCamera(p, p);
+        Automap_SetPlayer(&D_8011AAA0, p->m_CharacterActor.header.m_pCurrentRegion, p->m_CharacterActor.m_RotY, p->m_CharacterActor.header.m_vPos);
     }
     for (p = list->active.head; p != NULL; p = p->m_pNext) {
-        func_00246BC0(&p->m_ContState, p);
-        if (func_00285558(p->m_ContState.m_pContState)) {
-            if (func_00284174()) {
-                func_002840EC();
-            } else if (!func_00416AF8(&D_80119E2C) && p->m_Data.m_Health != 0 && p->m_pCamera != NULL
+        CPlayer__ReadInput(&p->m_ContState, p);
+        if (Controller_StartPressedNoCinema(p->m_ContState.m_pContState)) {
+            if (Cinema_IsActive()) {
+                Cinema_TrySkip();
+            } else if (!MenuPool_CountOpen(&D_80119E2C) && p->m_Data.m_Health != 0 && p->m_pCamera != NULL
                        && p->m_pCamera->m_Menus.count == 0 && (D_80119E2C.match.over == 0 || D_80119E2C.timed == 0)) {
                 D_80119E2C.paused = 1;
-                func_00275A50();
-                func_00275904(300);
-                func_00275A98();
+                Music_DuckVolume();
+                Sound__StopAllExcept(300);
+                Sound__DisableAmbientTrack();
                 reset_strokes(&p->m_Barrel);
                 p->m_LivesOverlay.m_Value = -1;
                 p->m_TokensOverlay.m_Value = -1;
-                func_00416644(&D_80119E2C, &D_00439640, p, (p->m_ContState.m_pContState), 0);
+                MenuPool_OpenMenu(&D_80119E2C, &D_00439640, p, (p->m_ContState.m_pContState), 0);
             }
         }
         if (p->m_bLevelNotCompleteExit) {
-            hub = func_0026EFB8(D_80110048) - 1;
+            hub = Level_GetHub(D_80110048) - 1;
             if (hub < 6 && (p->m_Data.m_dwLevelFirstTimeFlags & (1 << hub))) {
-                func_00416644(&D_80119E2C, &D_0043CAB4, p, (p->m_ContState.m_pContState), 0);
+                MenuPool_OpenMenu(&D_80119E2C, &D_0043CAB4, p, (p->m_ContState.m_pContState), 0);
             }
             p->m_bLevelNotCompleteExit = 0;
         }
-        if (!func_00416AF8(&D_80119E2C) && Cinema_PathPlaying() && func_00284408() == 400 && !list->cinema) {
+        if (!MenuPool_CountOpen(&D_80119E2C) && Cinema_PathPlaying() && Cinema_GetScriptId() == 400 && !list->cinema) {
             if (p->m_pCamera != NULL && p->m_pCamera->m_Menus.count == 0) {
                 list->cinema = 1;
                 list->cinemaStarted = 0;
             }
         }
         if (list->cinema) {
-            if (func_00284240() && !list->cinemaStarted) {
+            if (Cinema_IsFinished() && !list->cinemaStarted) {
                 list->cinemaStarted = 1;
-                func_00416644(p->m_pCamera->m_MenuPool, &D_0043BED0, p, (p->m_ContState.m_pContState), 0);
+                MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, &D_0043BED0, p, (p->m_ContState.m_pContState), 0);
             }
         }
     }
     for (p = list->idle.head; p != NULL; p = next) {
         MatchState *match;
 
-        func_00246BC0(&p->m_ContState, p);
+        CPlayer__ReadInput(&p->m_ContState, p);
         next = p->m_pNext;
         match = &D_80119E2C.match;
         if (p != NULL && !match->over && (match->timeLeft >= 900.0f || match->timeLeft < 0.0f || !D_80119E2C.timed)
@@ -171,9 +171,9 @@ void func_00251FC4(PlayerList *list) {
             p->m_bActive = 1;
             character = D_8011AB88[p->m_nController].character;
             p->m_pOptions->m_bActive = 1;
-            func_0042DC18(p, character, 1);
-            func_00243414(&p->m_WeaponActor, &p->m_WeaponActor.m_AI, 2);
-            func_00248BA8(p, D_8011ACA8, 0, 1);
+            CPlayer__NewGame(p, character, 1);
+            CAI__SetMode(&p->m_WeaponActor, &p->m_WeaponActor.m_AI, 2);
+            CPlayer__Warp(p, D_8011ACA8, 0, 1);
             CList__Remove(&list->idle, p);
             CList__AddHead(&list->active, p);
         }
@@ -182,14 +182,14 @@ void func_00251FC4(PlayerList *list) {
         next = p->m_pNext;
         if (p != NULL && !p->m_bActive && list->active.count >= 2) {
             if (p->m_pCamera != NULL) {
-                func_0042FFB0(&D_801198B0, p->m_pCamera);
+                CCameraPool__FreeCamera(&D_801198B0, p->m_pCamera);
                 p->m_pCamera = NULL;
             }
             CList__Remove(&list->active, p);
             CList__AddHead(&list->idle, p);
         }
     }
-    func_0025492C(list);
-    func_002525BC(list);
+    CPlayerPool__UpdateMatchClock(list);
+    CPlayerPool__PickTagIt(list);
     D_800B6D28 = frameTime;
 }

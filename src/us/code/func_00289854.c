@@ -1,9 +1,9 @@
 #include "common.h"
 
-s32 func_00288E58(s32, s32, s32);       /* extern */
-s32 func_0042F57C();                            /* extern */
+s32 CEngineApp__UpdateCinemaMode(s32, s32, s32);       /* extern */
+s32 Demo_Enable();                            /* extern */
 
-void func_00289854(s32 arg0) {
-    func_0042F57C();
-    func_00288E58(arg0, 0xD, 8);
+void EngineMode10_Cinema_Retrace(s32 arg0) {
+    Demo_Enable();
+    CEngineApp__UpdateCinemaMode(arg0, 0xD, 8);
 }

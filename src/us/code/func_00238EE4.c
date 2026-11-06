@@ -34,7 +34,7 @@ struct ObjectRecAt17C {
     u8 pad84[0x14C - 0x84];
     u32 mask;
 };
-extern s32 func_002755B0(s32 arg0, CVector3 arg1, s32 arg4, s32 arg5,
+extern s32 Sound__PlayPitched(s32 arg0, CVector3 arg1, s32 arg4, s32 arg5,
                          f32 arg6);
 extern f32 D_800A65D8;
 extern s32 D_8011ACA4;
@@ -68,5 +68,5 @@ void func_00238EE4(ObjectRecAt17C *arg0, ObjectRecAt17C *arg1, s32 arg2, CVector
         }
         break;
     }
-    func_002755B0(arg6.value, arg3, 0, selected, scale);
+    Sound__PlayPitched(arg6.value, arg3, 0, selected, scale);
 }

@@ -28,15 +28,15 @@ extern void __osRestoreInt(s32 mask);    /* restore interrupts */
 extern s32 osRecvMesg(void *mq, void *msg, s32 flag);
 extern s32 osSendMesg(void *mq, void *msg, s32 flag);
 extern void CMutex__Construct(CMutex *lock);
-extern void func_002912F0(void *heap, s32 base, s32 len);    /* alHeapInit */
-extern void func_0026F760(ALSynConfig *cfg, s32 a, AiCfg *ai);
-extern BankRes *func_0028E60C(s32 a, s32 b, s32 c);
-extern void func_00270550(SndMgr *m);
-extern void func_00274F34(void *seq, SndMgr *m);
-extern void func_002935B0(void *player, void *cfg);           /* alSndpNew */
-extern void func_002763F4(void *q, SndMgr *m);
-extern void func_00273A94(void *pool, SndMgr *m);
-extern void func_00276D98(void *fx, SndMgr *m);
+extern void alHeapInit(void *heap, s32 base, s32 len);    /* alHeapInit */
+extern void amCreateAudioMgr(ALSynConfig *cfg, s32 a, AiCfg *ai);
+extern BankRes *VM_Alloc(s32 a, s32 b, s32 c);
+extern void CAudioWorld__LoadSfxDataFile(SndMgr *m);
+extern void SndSeq_Construct(void *seq, SndMgr *m);
+extern void alSndpNew(void *player, void *cfg);           /* alSndpNew */
+extern void SndQueue_Construct(void *q, SndMgr *m);
+extern void SndVoicePool_Construct(void *pool, SndMgr *m);
+extern void SpeechPlayer_Construct(void *fx, SndMgr *m);
 
 static __inline__ void SndMgr_Lock(SndMgr *m) {
     CMutex *l = &m->lock;
@@ -63,7 +63,7 @@ static __inline__ void SndMgr_Unlock(SndMgr *m) {
 }
 
 /* Sound manager start-up: heap, synthesizer, banks, player and state. */
-void func_00270240(SndMgr *m) {
+void CAudioWorld__Initialize(SndMgr *m) {
     ALSynConfig cfg;
     AiCfg ai;
     BankRes *r;
@@ -79,7 +79,7 @@ void func_00270240(SndMgr *m) {
     CMutex__Construct(&m->lock);
     SndMgr_Lock(m);
     m->soundState = 0;
-    func_002912F0(&m->heap, D_80130A40, D_80130A7C);
+    alHeapInit(&m->heap, D_80130A40, D_80130A7C);
     cfg.maxVVoices = 0x25;
     cfg.maxPVoices = 0x25;
     cfg.maxUpdates = 0x100;
@@ -90,15 +90,15 @@ void func_00270240(SndMgr *m) {
     cfg.dmaproc = 0;
     cfg.heap = &m->heap;
     ai.size = 0x800;
-    func_0026F760(&cfg, D_800B6E90, &ai);
+    amCreateAudioMgr(&cfg, D_800B6E90, &ai);
     D_800F2040 = 0x20F194;
-    r = func_0028E60C(0x2F194, 0, 0x1E0000);
+    r = VM_Alloc(0x2F194, 0, 0x1E0000);
     m->seq.data = (s32 *)r->f4;
     bk = r->bankFile;
     m->bankFile = bk;
     m->bank = bk->bankArray[0];
-    func_00270550(m);
-    func_00274F34(&m->seq, m);
+    CAudioWorld__LoadSfxDataFile(m);
+    SndSeq_Construct(&m->seq, m);
     t = m->bank->instArray[0];
     for (i = 0; i < t->soundCount; i++) {
         for (j = i + 1; j < t->soundCount; j++) {
@@ -115,7 +115,7 @@ void func_00270240(SndMgr *m) {
     m->playerConfig.maxSounds = 0x11;
     m->playerConfig.maxEvents = 0xC0;
     m->playerConfig.heap = &m->heap;
-    func_002935B0(&m->player, &m->playerConfig);
+    alSndpNew(&m->player, &m->playerConfig);
     for (n = 0; n < 16; n++) {
         m->handles[n] = -1;
     }
@@ -128,8 +128,8 @@ void func_00270240(SndMgr *m) {
     m->listener = 0;
     m->muted = 0;
     m->fxMix = 0;
-    func_002763F4(&m->queue, m);
-    func_00273A94(&m->pool, m);
+    SndQueue_Construct(&m->queue, m);
+    SndVoicePool_Construct(&m->pool, m);
     e = D_8011AAED;
     m->sfxVolume = (f32)e[0] * (1.0f / 255);
     m->volume2BA4 = (f32)e[-1] * (1.0f / 255);
@@ -138,7 +138,7 @@ void func_00270240(SndMgr *m) {
     m->unk2BB0 = e[-2];
     m->unk2BB4 = 1;
     m->unk2BBC = 1.0f;
-    func_00276D98(&m->fx, m);
+    SpeechPlayer_Construct(&m->fx, m);
     D_800B2680 = 1;
     SndMgr_Unlock(m);
 }

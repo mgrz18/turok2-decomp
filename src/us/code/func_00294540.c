@@ -3,14 +3,14 @@
 
 #include "rw/abu_types.h"
 
-extern Node_func_80239AF4_de *func_00294B58(void);
-extern s32 func_00294C30(ALSynth *, s32);
-void func_00294540(ALSynth *s, ALVoice *v, void *w, f32 pitch, s16 vol, u8 pan, s8 fxmix, s32 t)
+extern Node_func_80239AF4_de *__allocParam(void);
+extern s32 _timeToSamplesNoRound(ALSynth *, s32);
+void alSynStartVoiceParams(ALSynth *s, ALVoice *v, void *w, f32 pitch, s16 vol, u8 pan, s8 fxmix, s32 t)
 {
     ALStartParamAlt *update;
     ALFilter *f;
     if (v->pvoice) {
-        update = (ALStartParamAlt *)func_00294B58();
+        update = (ALStartParamAlt *)__allocParam();
         if (update == 0) { return; };
         if (fxmix < 0) {
             fxmix = -fxmix;
@@ -23,7 +23,7 @@ void func_00294540(ALSynth *s, ALVoice *v, void *w, f32 pitch, s16 vol, u8 pan, 
         update->volume = vol;
         update->fxMix = fxmix;
         update->pitch = pitch;
-        update->samples = func_00294C30(s, t);
+        update->samples = _timeToSamplesNoRound(s, t);
         update->wave = w;
         f = v->pvoice->channelKnob;
         (*f->setParam)(f, 3, update);

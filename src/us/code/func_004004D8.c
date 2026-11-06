@@ -74,17 +74,17 @@ extern MapVtx D_8012F340[2][3];
 extern u8 D_800AB100[];
 extern u8 D_800AB130[];
 
-extern char *func_002017D4(s32 *data, s32 index);
-extern void func_0020C208(f32 *out, f32 *m);
-extern void func_0020D274(f32 *m, Mtx *out);
-extern void func_0020F85C(f32 *m, CVector3 *in, CVector3 *out);
-extern void func_0020FC24(f32 *m, f32 x, f32 y, f32 z);
-extern void func_0020FC74(f32 *m, f32 x, f32 y, f32 z);
-extern void func_00210318(f32 *m, f32 x, f32 y, f32 z);
-extern void func_00210478(f32 *m, f32 x, f32 y, f32 z);
-extern void func_00210B38(f32 *m, f32 angle);
+extern char *CISet__GetBlock(s32 *data, s32 index);
+extern void CMtxF__InvertAffine(f32 *out, f32 *m);
+extern void CMtxF__ToMtxAffine(f32 *m, Mtx *out);
+extern void CMtxF__TransformPoint(f32 *m, CVector3 *in, CVector3 *out);
+extern void CMtxF__SetTranslate(f32 *m, f32 x, f32 y, f32 z);
+extern void CMtxF__SetScale(f32 *m, f32 x, f32 y, f32 z);
+extern void CMtxF__Translate(f32 *m, f32 x, f32 y, f32 z);
+extern void CMtxF__ScaleColumns(f32 *m, f32 x, f32 y, f32 z);
+extern void CMtxF__RotateZ(f32 *m, f32 angle);
 extern f32 func_002974C0(f32 x); /* cos */
-extern void func_00297D50(Mtx *m, f32 l, f32 r, f32 b, f32 t, f32 n, f32 f, f32 scale);
+extern void guOrtho(Mtx *m, f32 l, f32 r, f32 b, f32 t, f32 n, f32 f, f32 scale);
 extern f32 func_002982F0(f32 x); /* sin */
 
 #define MIN(a, b) ((b) < (a) ? (b) : (a))
@@ -114,7 +114,7 @@ static __inline__ s32 EdgeVisible(CVector3 *corners, CVector3 *p0, CVector3 *p1)
     return 1;
 }
 
-void func_004004D8(MapView *view) {
+void Automap_Draw(MapView *view) {
     s32 codes[3];
     f32 world[16];
     f32 inverse[16];
@@ -171,7 +171,7 @@ void func_004004D8(MapView *view) {
     if (D_8011AC8C == 1) {
         return;
     }
-    func_00297D50(&D_80129A00, 0.0f, D_800C2030 - 1, 0.0f, D_800C2034 - 1, -200.0f, 200.0f, 32.0f);
+    guOrtho(&D_80129A00, 0.0f, D_800C2030 - 1, 0.0f, D_800C2034 - 1, -200.0f, 200.0f, 32.0f);
     if (view->visible == 0 || D_800B6D54 == 0) {
         return;
     }
@@ -204,16 +204,16 @@ void func_004004D8(MapView *view) {
     scaleX = scaleZ = 0.1f;
     cx = MAX(MIN(cx, 32000.0f), -32000.0f);
     cz = MAX(MIN(cz, 32000.0f), -32000.0f);
-    func_0020FC24(world, -cx, -cz, 0.0f);
-    func_00210478(world, scaleX, scaleZ, 1.0f);
-    func_00210B38(world, view->angle + 3.1415929f);
+    CMtxF__SetTranslate(world, -cx, -cz, 0.0f);
+    CMtxF__ScaleColumns(world, scaleX, scaleZ, 1.0f);
+    CMtxF__RotateZ(world, view->angle + 3.1415929f);
     {
         f32 centreY = D_800C2034 / 2;
 
         centreY -= 16.0f;
-        func_00210318(world, D_800C2030 / 2, centreY, 0.0f);
+        CMtxF__Translate(world, D_800C2030 / 2, centreY, 0.0f);
     }
-    func_0020C208(inverse, world);
+    CMtxF__InvertAffine(inverse, world);
 
     corners[0].x = 0.0f;
     corners[0].y = 0.0f;
@@ -228,7 +228,7 @@ void func_004004D8(MapView *view) {
     corners[3].y = D_800C2034;
     corners[3].z = 0.0f;
     for (i = 0; i < 4; i++) {
-        func_0020F85C(inverse, &corners[i], &viewCorners[i]);
+        CMtxF__TransformPoint(inverse, &corners[i], &viewCorners[i]);
     }
     box.minX = box.maxX = viewCorners[0].x;
     box.minZ = box.maxZ = viewCorners[0].y;
@@ -240,16 +240,16 @@ void func_004004D8(MapView *view) {
         box.maxZ = !(box.maxZ <= a->y) ? box.maxZ : a->y;
     }
 
-    func_0020D274(world, &D_80129100[D_800B6D1C]);
+    CMtxF__ToMtxAffine(world, &D_80129100[D_800B6D1C]);
     GFX(0xDA380003, (u32) &D_80129100[D_800B6D1C]);    /* gSPMatrix(modelview, load) */
 
     vtx = D_80129A40[D_800B6D1C];
     w = &D_800F7078;
-    regions = (CGameRegion *) (func_002017D4(w->m_pRegionData, 2) + 8);
-    data = func_002017D4(w->m_pRegionData, 3);
+    regions = (CGameRegion *) (CISet__GetBlock(w->m_pRegionData, 2) + 8);
+    data = CISet__GetBlock(w->m_pRegionData, 3);
     areas = (Area *) (data + 8);
     areaCount = *(s32 *) (data + 4);
-    infos = (CRegionInfo *) (func_002017D4(w->m_pRegionData, 0) + 8);
+    infos = (CRegionInfo *) (CISet__GetBlock(w->m_pRegionData, 0) + 8);
     nIdx = 0;
     base = 0;
     nVtx = 0;
@@ -529,9 +529,9 @@ draw:
 
     /* The compass. */
     vtx = D_8012DA40[D_800B6D1C];
-    func_0020FC74(screen, 0.5f, 0.5f, 1.0f);
-    func_00210318(screen, D_800C2030 / 2, 32.0f, 0.0f);
-    func_0020D274(screen, &D_80129180[D_800B6D1C]);
+    CMtxF__SetScale(screen, 0.5f, 0.5f, 1.0f);
+    CMtxF__Translate(screen, D_800C2030 / 2, 32.0f, 0.0f);
+    CMtxF__ToMtxAffine(screen, &D_80129180[D_800B6D1C]);
     GFX(0xDA380003, (u32) &D_80129180[D_800B6D1C]);
     alpha = view->fade * 255.0f;
     radius = 15.0f;

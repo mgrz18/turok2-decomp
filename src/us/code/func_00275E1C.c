@@ -9,18 +9,18 @@ typedef struct {
     /* 0x28 */ s32 playing;
 } SoundOwner;
 
-s32 func_00275544(s16, CVector3, s32, s32);    /* extern */
+s32 Sound__Play(s16, CVector3, s32, s32);    /* extern */
 extern s32 D_800B2A8C;
 
 /* Restarts every looping sound of the owner. */
-void func_00275E1C(SoundOwner *arg0) {
+void LoopSounds_Resume(SoundOwner *arg0) {
     s32 temp_v0;
     SndSource *var_s0;
 
     var_s0 = arg0->sounds;
     if (var_s0 != NULL) {
         do {
-            temp_v0 = func_00275544(var_s0->sound.h.lo, var_s0->pos, var_s0->flags, -1);
+            temp_v0 = Sound__Play(var_s0->sound.h.lo, var_s0->pos, var_s0->flags, -1);
             var_s0->handle = temp_v0;
             var_s0 = var_s0->next;
             D_800B2A8C = temp_v0;

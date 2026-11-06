@@ -1,11 +1,11 @@
-/* Module-2 copy of func_00427524 (0x00460444 named, linked 0x00427444). */
+/* Module-2 copy of __osPfsDeclearPage (0x00460444 named, linked 0x00427444). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SDK/PFS/80446BD0_4.CPP, func_80446324_de, with Turok 2's layouts. */
-/* __osPfsDeclearPage (libultra pfsallocatefile.c). */
+/* __osPfsDeclearPage_2 (libultra pfsallocatefile.c). */
 #include "rw/abu_types.h"
 
 extern s32 func_00427610(OSPfs *pfs, int page_no, u8 *data, u8 bank);
 
-s32 __osPfsDeclearPage(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank,
+s32 __osPfsDeclearPage_2(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank,
                   int *decleared, int *last_page)
 {
     int j;

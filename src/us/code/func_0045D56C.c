@@ -21,7 +21,7 @@ extern unsigned short D_800C21AA[],D_801309D0;
 extern NodeRecAt294 D_801198F0;
 extern int D_800C2030,D_800C2034;
 extern void func_00423F28(unsigned,int,int,int,int,int);
-void func_0045D56C(unsigned width,int a1,int a2,int a3,int a4,int a5) {
+void Video_SetMode_2(unsigned width,int a1,int a2,int a3,int a4,int a5) {
  int flags=0,region=0; NodeRecAt294 *node; float h;
  switch(D_80000300) {case 0:region=1;break;case 1:break;case 2:region=2;break;}
  if(width>320) flags|=4;

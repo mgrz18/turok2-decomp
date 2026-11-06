@@ -9,7 +9,7 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-s32 *func_0026D3BC(void *arg0)
+s32 *NodePool_Alloc(void *arg0)
 {
   s32 *temp_a1;
   s32 *temp_a1_2;

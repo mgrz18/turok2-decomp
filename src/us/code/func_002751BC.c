@@ -6,7 +6,7 @@
 extern f32 D_800A81DC;
 extern f32 D_800A81E0;
 extern f32 D_800A81E4;
-void func_002751BC(SndSeq *s) {
+void SndSeq_FadeOut(SndSeq *s) {
     f32 f;
     s->flags = 2;
     s->unk18 = 0x20;

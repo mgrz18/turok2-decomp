@@ -1,6 +1,6 @@
 #include "structs/game_object.h"
 
-f32 func_00268534(CGameObjectInstance *actor)
+f32 GameObject_GetLeashRadius(CGameObjectInstance *actor)
 {
   CIntelligence *def;
   f32 new_var;

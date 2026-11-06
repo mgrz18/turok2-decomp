@@ -143,7 +143,7 @@ typedef struct {
 } Awords;
 
 /* An RSP audio command: the synthesizer pulls commands from its main bus,
- * which pulls them from each of its sources (alMainBusPull, func_00296360). */
+ * which pulls them from each of its sources (alMainBusPull, alMainBusPull). */
 typedef union {
     Awords words;
     Aadpcm adpcm;

@@ -6,16 +6,16 @@
 
 extern f32 D_800B6D28;      /* frame step */
 
-s32 func_0024E700(CPlayer *player, s32 weapon);
-s32 func_002548FC(CPlayer *player);
-s32 func_00254F88(CBarrel *menu, CPlayer *player);
-void func_0024C47C(CBarrel *menu, CPlayer *player);
-void func_00210EF0(f32 *angle);
+s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
+s32 CPlayer__IsInMatchEndState(CPlayer *player);
+s32 CBarrel__HasUnlistedWeapon(CBarrel *menu, CPlayer *player);
+void CBarrel__OpenWheel(CBarrel *menu, CPlayer *player);
+void Angle_Wrap(f32 *angle);
 
 /* Runs the weapon menu: marks the weapons the player can use, steps the
  * cursor with the next/previous weapon buttons and turns the wheel towards
  * the selected slot. */
-void func_0024B5A0(CBarrel *menu, CPlayer *player) {
+void CBarrel__RunButtons(CBarrel *menu, CPlayer *player) {
     s32 step;
     s32 i;
     s32 dir;
@@ -27,14 +27,14 @@ void func_0024B5A0(CBarrel *menu, CPlayer *player) {
     dir = 0;
     if (menu->m_State == 1 || menu->m_State == 2) {
         for (i = 0; i < menu->m_nCount; i++) {
-            if (func_0024E700(player, menu->m_Items[i].m_Weapon) != 0) {
+            if (CPlayer__GetWeaponAmmo(player, menu->m_Items[i].m_Weapon) != 0) {
                 menu->m_Items[i].m_bAvailable = 1;
             } else {
                 menu->m_Items[i].m_bAvailable = 0;
             }
         }
     }
-    if (func_002548FC(player) != 0) {
+    if (CPlayer__IsInMatchEndState(player) != 0) {
         dir = 0;
     } else if (player->m_ContState.m_dwButtonsSingle & 0x4000) {
         dir = 1;
@@ -42,9 +42,9 @@ void func_0024B5A0(CBarrel *menu, CPlayer *player) {
         dir = -1;
     }
     if ((menu->m_State == 0 && dir != 0)
-        || (func_00254F88(menu, player) != 0 && menu->m_State != 0)
+        || (CBarrel__HasUnlistedWeapon(menu, player) != 0 && menu->m_State != 0)
         || (menu->m_nCursor != -1 && menu->m_Items[menu->m_nCursor].m_Weapon != player->m_RequestedWeapon)) {
-        func_0024C47C(menu, player);
+        CBarrel__OpenWheel(menu, player);
     }
     if (dir != 0) {
         do {
@@ -66,8 +66,8 @@ void func_0024B5A0(CBarrel *menu, CPlayer *player) {
         from = menu->m_Spin;
         to = menu->m_Items[menu->m_nCursor].m_Angle;
         step = menu->m_Step;
-        func_00210EF0(&from);
-        func_00210EF0(&to);
+        Angle_Wrap(&from);
+        Angle_Wrap(&to);
         if (step > 0) {
             if (to < from) {
                 to += 6.283186f;

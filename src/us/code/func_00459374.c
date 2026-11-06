@@ -26,11 +26,11 @@ extern u8 D_0043BC40[];
 extern u8 D_0043BCD0[];
 extern u8 D_0043BD3C[];
 s32 func_0041DCB0(Menu *o, s32 pad, s32 z);
-CPlayer *func_0025342C(CPlayerList *list, ControllerProfile *s);
+CPlayer *CPlayerPool__FindByController(CPlayerList *list, ControllerProfile *s);
 s32 func_00425F84(s32 pad, s32 idx);
-void func_00416644(u8 *a, void *b, void *c, s32 d, s32 e);
+void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, s32 e);
 
-s32 func_00459374(s32 unused, Menu *own) {
+s32 GameNoteMenu_SelectYes_2(s32 unused, Menu *own) {
     f32 *new_var;
     s32 pad;
     CPlayer *plr;
@@ -51,7 +51,7 @@ s32 func_00459374(s32 unused, Menu *own) {
         return 1;
     }
     if (D_801309B8 != 0) {
-        plr = func_0025342C(&D_80119870.m_PlayerList, own->controller);
+        plr = CPlayerPool__FindByController(&D_80119870.m_PlayerList, own->controller);
         g = D_800F7078;
         save = D_8011AC58;
         plr->m_Data = D_800C201C->player;
@@ -73,13 +73,13 @@ s32 func_00459374(s32 unused, Menu *own) {
         }
         D_80119870.m_PlayerList.m_bCinema = 0;
         D_80119870.m_PlayerList.m_bCinemaStarted = 0;
-        func_00416644(D_80119870.m_MenuPool, D_0043BC40, plr, plr->m_ContState.m_pContState, 0);
+        MenuPool_OpenMenu(D_80119870.m_MenuPool, D_0043BC40, plr, plr->m_ContState.m_pContState, 0);
         return 1;
     }
     if (func_00425F84(pad, D_801309C4) == 0) {
-        func_00416644(D_80119E2C, D_0043BCD0, own->player, own->controller, own->context);
+        MenuPool_OpenMenu(D_80119E2C, D_0043BCD0, own->player, own->controller, own->context);
     } else {
-        func_00416644(D_80119E2C, D_0043BD3C, own->player, own->controller, own->context);
+        MenuPool_OpenMenu(D_80119E2C, D_0043BD3C, own->player, own->controller, own->context);
     }
     return 1;
 }

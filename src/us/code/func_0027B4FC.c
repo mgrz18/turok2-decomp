@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0027B4FC(u16 *grid, s16 x0, s32 y);
-extern void func_00279158(s32 *pixels, char *mask, s32 x, s16 y, s32 w, s32 h);
-void func_0027B4FC(u16 *grid, s16 x0, s32 y) {
+extern void Hud_DrawMaskedImage(u16 *grid, s16 x0, s32 y);
+extern void Hud_DrawMaskedBlock(s32 *pixels, char *mask, s32 x, s16 y, s32 w, s32 h);
+void Hud_DrawMaskedImage(u16 *grid, s16 x0, s32 y) {
     s32 *tile;
     s32 rows;
     s32 cols;
@@ -23,7 +23,7 @@ void func_0027B4FC(u16 *grid, s16 x0, s32 y) {
             w = tile[0];
             h = tile[1];
             area = w * h;
-            func_00279158(tile + 2, (char *)tile + (area * 2 + 8), x, y, w, h);
+            Hud_DrawMaskedBlock(tile + 2, (char *)tile + (area * 2 + 8), x, y, w, h);
             x += w;
             tile = (s32 *)((char *)tile + (area * 2 + (area >> 1)));
             tile += 2;

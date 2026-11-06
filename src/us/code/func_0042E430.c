@@ -1,4 +1,4 @@
-/* CPlayer code: func_0042E430, 0x0042E430-0x0042E5AC (splat had it inside the data D_0042D50C). */
+/* CPlayer code: CPlayer__SetCharacter, 0x0042E430-0x0042E5AC (splat had it inside the data D_0042D50C). */
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
@@ -9,16 +9,16 @@ extern s32 D_8011ACE4;
 extern s32 D_800ADB5C;
 extern s32 D_800ADB30[];
 
-extern CIntelligence *func_00225EBC(void *world, s32 kind, s32 character);
-extern s32 func_002113A4(void);
-extern void func_00248A8C(CPlayer *p);
-extern void func_002241D8(void *world, CPlayer *p, s32, s32);
+extern CIntelligence *CScene__FindIntelligence(void *world, s32 kind, s32 character);
+extern s32 Random_Next(void);
+extern void CPlayer__GiveStartingWeapons(CPlayer *p);
+extern void CScene__SetInstanceObjectType(void *world, CPlayer *p, s32, s32);
 
 static __inline__ CIntelligence *findDef(s32 kind, s32 character) {
-    return func_00225EBC(D_800F7078, kind, character);
+    return CScene__FindIntelligence(D_800F7078, kind, character);
 }
 
-void func_0042E430(CPlayer *p, s32 character) {
+void CPlayer__SetCharacter(CPlayer *p, s32 character) {
     CIntelligence *def;
     s32 sound;
 
@@ -40,11 +40,11 @@ void func_0042E430(CPlayer *p, s32 character) {
     p->m_Data.m_Health = def->m_Player.m_StartHealth << 8;
     p->m_CharacterActor.m_AI.m_Health = p->m_CharacterActor.header.m_pIntelligence->m_Player.m_StartHealth << 8;
     if (p->m_Data.m_nDeathmatchCharacter == 7) {
-        p->m_CharacterActor.m_AI.m_nTexture = func_002113A4() % 18;
+        p->m_CharacterActor.m_AI.m_nTexture = Random_Next() % 18;
     } else {
         p->m_CharacterActor.m_AI.m_nTexture = -1;
     }
-    func_00248A8C(p);
+    CPlayer__GiveStartingWeapons(p);
     sound = 0x66;
     if (D_8011AAF1) {
         if (D_8011ACE4 != 0 && p->m_pOptions->m_TagMode != 0) {
@@ -53,5 +53,5 @@ void func_0042E430(CPlayer *p, s32 character) {
             sound = D_800ADB30[p->m_CharacterActor.header.m_pIntelligence->m_Id];
         }
     }
-    func_002241D8(D_800F7078, p, sound, p->m_CharAnim);
+    CScene__SetInstanceObjectType(D_800F7078, p, sound, p->m_CharAnim);
 }

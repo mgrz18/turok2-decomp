@@ -77,17 +77,17 @@ typedef struct SetupCallbacks {
     void (*first)(SetupSource *, SetupActor *);
 } SetupCallbacks;
 
-void func_00266C5C(void *dst, s32 value, s32 size); /* memset */
-void func_002427E0(SetupActor *ai, SetupDesc *desc, SetupVec pos, SetupSource *source);
-f32 func_0026BE60(void *region, f32 x, f32 z);  /* floor height at */
-s32 func_0021D7BC();
-void func_0021E840();
+void memset(void *dst, s32 value, s32 size); /* memset */
+void AI_InitHealth(SetupActor *ai, SetupDesc *desc, SetupVec pos, SetupSource *source);
+f32 CGameRegion__GetHeight(void *region, f32 x, f32 z);  /* floor height at */
+s32 CGameObjectInstance__DrawModel();
+void CGameObjectInstance__CalculateOrientationMatrix();
 
 /* Builds an object's AI: clears it (keeping the field at 0x68), runs the
  * shared initialiser, installs the two callbacks, seeds the position and
  * scale copies, the sentinel indices and the default factors, runs the
  * optional first callback, and flags it when the object asks (bit 27). */
-void func_002429BC(SetupSource *source, SetupActor *actor, SetupCallbacks *callbacks) {
+void CAI__Setup(SetupSource *source, SetupActor *actor, SetupCallbacks *callbacks) {
     s32 saved;
     f32 default_;
     void *region;
@@ -97,12 +97,12 @@ void func_002429BC(SetupSource *source, SetupActor *actor, SetupCallbacks *callb
     register s16 none asm("$3");
 
     saved = actor->field68;
-    func_00266C5C(actor, 0, 0x13C);
+    memset(actor, 0, 0x13C);
     actor->flags = 0x40;
     actor->field68 = saved;
-    func_002427E0(actor, source->desc, source->pos, source);
-    actor->callback104 = func_0021E840;
-    actor->callbackF4 = func_0021D7BC;
+    AI_InitHealth(actor, source->desc, source->pos, source);
+    actor->callback104 = CGameObjectInstance__CalculateOrientationMatrix;
+    actor->callbackF4 = CGameObjectInstance__DrawModel;
     actor->field34 = -1;
     actor->field35 = -1;
     actor->field30 = 0;
@@ -127,7 +127,7 @@ void func_002429BC(SetupSource *source, SetupActor *actor, SetupCallbacks *callb
     region = source->region;
     actor->regionB8 = region;
     if ((source->desc->flags & 4) && region != NULL) {
-        actor->posAC.y = func_0026BE60(region, actor->posAC.x, actor->posAC.z);
+        actor->posAC.y = CGameRegion__GetHeight(region, actor->posAC.x, actor->posAC.z);
     }
     default_ = 1.0f;
     actor->fieldC6 = -1;

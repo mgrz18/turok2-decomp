@@ -3,7 +3,7 @@
 #include "common.h"
 #include "structs/game.h"
 
-extern void func_0041BC50(CPlayerOptions *slot);
+extern void PlayerOptions_SetDefaultName(CPlayerOptions *slot);
 
 static __inline__ void InitSlot(CPlayerOptions *slot, u8 index) {
     slot->m_bActive = 0;
@@ -17,11 +17,11 @@ static __inline__ void InitSlot(CPlayerOptions *slot, u8 index) {
     slot->m_nCharacter = 0;
     slot->m_WeaponSelect = 1;
     slot->m_Handicap = 0;
-    func_0041BC50(slot);
+    PlayerOptions_SetDefaultName(slot);
 }
 
 /* Default multiplayer setup. */
-void func_0041BA50(GameSettings *s) {
+void GameSettings_SetDefaults(GameSettings *s) {
     s32 i;
 
     s->unk13 = 1;
@@ -40,18 +40,18 @@ void func_0041BA50(GameSettings *s) {
     s->dmTimeLimit = 10;
     s->dmScoreLimit = 0;
     s->dmArena = 0;
-    s->dmSkill = 0;
-    s->dmUnk24 = 1;
+    s->dmTextureSet = 0;
+    s->dmCrosshairs = 1;
     s->tagTimeLimit = 0;
     s->tagScoreLimit = 0;
     s->tagArena = 0;
-    s->tagSkill = 0;
-    s->tagUnk29 = 1;
+    s->tagTextureSet = 0;
+    s->tagCrosshairs = 1;
     s->teamTimeLimit = 10;
     s->teamScoreLimit = 0;
     s->teamArena = 0;
-    s->teamSkill = 0;
-    s->teamUnk2E = 1;
+    s->teamTextureSet = 0;
+    s->teamCrosshairs = 1;
     s->hudAlpha = s->hudAlphaSetting.value;
     s->speed = 1.0f;
     for (i = 0; i < 10; i++) {

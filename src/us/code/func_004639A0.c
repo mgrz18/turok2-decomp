@@ -28,8 +28,8 @@ extern u8 D_800AB0D4[];
 extern u8 D_800AB0DC[];
 extern u8 D_800AB0E0[];
 extern f32 func_00298470(f32);
-extern void func_0020EF60(f32 *, f32 *, f32);
-void func_004639A0(SceneRecAt1B2B4 *scene) {
+extern void CVector3__Scale(f32 *, f32 *, f32);
+void CScene__LoadLightSettings_2(SceneRecAt1B2B4 *scene) {
     s32 i;
     u8 c;
     f32 v[3];
@@ -50,7 +50,7 @@ void func_004639A0(SceneRecAt1B2B4 *scene) {
     v[2] = scene->light->dir[2];
     length = func_00298470(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     if (length != 0.0f) {
-        func_0020EF60(v, v, D_800A5EB0 / length);
+        CVector3__Scale(v, v, D_800A5EB0 / length);
         scene->dir[0] = v[0];
         scene->dir[1] = v[1];
         scene->dir[2] = v[2];

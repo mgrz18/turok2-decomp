@@ -1,9 +1,9 @@
 /* the real function is 0x004242EC-0x00424508 (size 0x21C, 135 words); splat cut its last two words (jr ra; addiu sp) off as func_00424500.
- * All 135 words match (checked over the real extent). First-module copy of src/us/code/func_0045D20C.c. */
+ * All 135 words match (checked over the real extent). First-module copy of src/us/code/Video_NextResolution_2.c. */
 #include "common.h"
 #include "structs/frame.h"
 
-s32 func_00266B80(void); /* osGetMemSize */
+s32 GetMemSize(void); /* osGetMemSize */
 
 #define MAX(a, b) ((a) >= (b) ? (a) : (b))
 
@@ -15,7 +15,7 @@ extern s32 D_800C203C; /* previous mode */
 extern s32 D_800C204C[2]; /* mode count per TV region */
 
 /* Steps to the next video mode of the TV region that fits in memory. */
-void func_004242EC(void) {
+void Video_NextResolution(void) {
     s32 region = 0;
     s32 *mode;
     s32 limit;
@@ -29,7 +29,7 @@ void func_004242EC(void) {
             break;
     }
     mode = (s32 *)&D_800C2054[region][D_800C2038];
-    if (func_00266B80() != 0x400000) {
+    if (GetMemSize() != 0x400000) {
         limit = 0x2A300;
     } else {
         limit = 0xF660;

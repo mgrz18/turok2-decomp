@@ -13,7 +13,7 @@ typedef struct {
 extern s32 D_8011AADC; /* owned weapons */
 extern s32 D_80130924; /* selected weapon */
 
-void func_0041A4D0(Menu41A4D4 *menu) {
+void CheatsMenu_Init(Menu41A4D4 *menu) {
     s32 weapon = 0;
     s32 tries;
     s32 mask;

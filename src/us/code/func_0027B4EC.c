@@ -3,6 +3,6 @@
 
 extern s32 D_800B2AC0;
 
-s32 func_0027B4EC(void) {
+s32 COnScreen__GetFontTexture(void) {
     return D_800B2AC0;
 }

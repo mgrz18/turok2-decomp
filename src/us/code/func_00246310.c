@@ -3,7 +3,7 @@
 
 #include "structs/vector.h"
 
-extern f32 func_0021153C(f32 arg0);
+extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 struct func_80216F44_S1;
@@ -18,7 +18,7 @@ struct func_80216F44_S1 {
     f32 unk50;  /* yaw */
 };
 extern f32 func_00298470(f32);
-f32 func_00246310(void *actor, CVector3 point) {
+f32 AI_AngleToPoint(void *actor, CVector3 point) {
     f32 dx;
     f32 dz;
     f32 dist;
@@ -38,7 +38,7 @@ f32 func_00246310(void *actor, CVector3 point) {
     c = -func_002974C0(((func_80216F44_S1 *)(actor))->unk50);
     dot = (dx * -s + dz * c) / dist;
     dot = ((((dot) > (1.0f) ? (1.0f) : (dot)))<((-1.0f))?((-1.0f)):(((dot) > (1.0f) ? (1.0f) : (dot))));
-    angle = func_0021153C(dot);
+    angle = Math_AcosLookup(dot);
     if (dx * c + dz * s > 0.0f) {
         return angle;
     }

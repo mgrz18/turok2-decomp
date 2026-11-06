@@ -3,7 +3,7 @@
 /* Builds a 128-entry lookup table: every entry 0xFF (none), then each
  * (index, value) pair of the list, which ends at a negative index. The
  * counter is the first argument, which callers pass for nothing. */
-void func_0027BA8C(u8 i, s8 *pairs, u8 *table) {
+void COnScreen__BuildCharacterLookUp(u8 i, s8 *pairs, u8 *table) {
     s8 *p;
     u8 slot;
     s8 index;

@@ -14,17 +14,17 @@ typedef struct {
     /* 0x20 */ s32 now;
 } TimedList;
 
-s32 func_0029B020(s32 *, s32 *, s32); /* extern */
+s32 __assert(s32 *, s32 *, s32); /* extern */
 extern s32 D_800AA4B0;
 extern s32 D_800AA4B4;
 
-s32 func_00294C70(TimedList *arg0, TimedNode **arg1) {
+s32 __nextSampleTime(TimedList *arg0, TimedNode **arg1) {
     s32 var_s0;
     TimedNode *var_a0;
 
     var_s0 = 0x7FFFFFFF;
     if (arg0->head == NULL) {
-        func_0029B020(&D_800AA4B0, &D_800AA4B4, 0x133);
+        __assert(&D_800AA4B0, &D_800AA4B4, 0x133);
     }
     *arg1 = NULL;
     var_a0 = arg0->head;

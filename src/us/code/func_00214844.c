@@ -46,14 +46,14 @@ extern s8 D_800ACAF4[];         /* the colour pulse, 64 steps */
 extern s32 D_800B6D18;          /* frame count */
 extern u8 D_800B6D1B;           /* its low byte */
 
-s32 func_00245724(void);
-void **func_00214DBC(PlacedProp *prop);
-void func_00214F14(void);
-s32 **func_00203CA0(s32, s32, void **, s32, s32, void *, void *, void *, s32);
-void func_0020565C(s32, s32 **);
-VtxChunk *func_002017D4(void *file, s32 index);
-void func_0020B6A0(void **resource, void *matrix, s32 segment, void *lights, void *textures, s32 lod, s32 pass);
-void func_002051F4(s32, void *);
+s32 Actor_GetTypeClass(void);
+void **CStaticObject__LoadGeometry(PlacedProp *prop);
+void CStaticObject__BuildLitVerticesCallback(void);
+s32 **CCache__RequestDecompression(s32, s32, void **, s32, s32, void *, void *, void *, s32);
+void CCache__LockForDisplayList(s32, s32 **);
+VtxChunk *CISet__GetBlock(void *file, s32 index);
+void Render_QueueModelInstance(void **resource, void *matrix, s32 segment, void *lights, void *textures, s32 lod, s32 pass);
+void CCache__Unlock(s32, void *);
 
 /* The colour pulse (Rage Wars' func_8027892C_de): every vertex flagged 0x70
  * gets its base colour from colors plus a step of the pulse table. */
@@ -71,7 +71,7 @@ static __inline__ void pulseColors(s32 *object, u8 *colors) {
     if (!(state & 1)) {
         count = *object;
         for (j = 0; j < count; j++) {
-            chunk = func_002017D4(object, j);
+            chunk = CISet__GetBlock(object, j);
             record = chunk->v;
             end = record + chunk->count;
             if (record != end) {
@@ -112,7 +112,7 @@ static __inline__ void pulseColors(s32 *object, u8 *colors) {
 /* Queues a placed prop's model: the level of detail from its descriptor (in
  * multiplayer, from the game setup for some modes), and its vertex colours
  * pulsed once a frame. */
-void func_00214844(PlacedProp *prop) {
+void CStaticObject__Draw(PlacedProp *prop) {
     s32 argument;
     s32 mode;
     void **instance;
@@ -130,7 +130,7 @@ void func_00214844(PlacedProp *prop) {
     } while (0);
     argument = prop->descriptor->argument;
     if (D_8011AAF1) {
-        mode = func_00245724();
+        mode = Actor_GetTypeClass();
         switch (mode) {
             case 1:
             case 4:
@@ -154,13 +154,13 @@ void func_00214844(PlacedProp *prop) {
     } else {
         lod = prop->descriptor->lod;
     }
-    instance = func_00214DBC(prop);
+    instance = CStaticObject__LoadGeometry(prop);
     if (instance == NULL) {
         return;
     }
-    resource = func_00203CA0(0, prop->colorKey | D_800ACAD8, instance, prop->cache, 8, prop, func_00214F14, D_800A57F8, 0);
+    resource = CCache__RequestDecompression(0, prop->colorKey | D_800ACAD8, instance, prop->cache, 8, prop, CStaticObject__BuildLitVerticesCallback, D_800A57F8, 0);
     if (resource != NULL) {
-        func_0020565C(0, resource);
+        CCache__LockForDisplayList(0, resource);
         header = *resource;
         if (header[0] == 1) {
             data = (u8 *) header + header[1];
@@ -169,12 +169,12 @@ void func_00214844(PlacedProp *prop) {
             if (prop->colorFrame != D_800B6D1B) {
                 pulseColors(object, colors);
             }
-            func_0020B6A0(instance, prop->matrix, 0, 0, data, argument, lod);
+            Render_QueueModelInstance(instance, prop->matrix, 0, 0, data, argument, lod);
         } else {
-            func_0020B6A0(instance, prop->matrix, 0, 0, header + 2, argument, lod);
+            Render_QueueModelInstance(instance, prop->matrix, 0, 0, header + 2, argument, lod);
         }
-        func_002051F4(0, resource);
+        CCache__Unlock(0, resource);
     }
-    func_002051F4(0, instance);
+    CCache__Unlock(0, instance);
     prop->colorFrame = D_800B6D1B;
 }

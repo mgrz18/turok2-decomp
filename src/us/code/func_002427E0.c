@@ -17,7 +17,7 @@ typedef struct Dest {
 extern s32 D_8011AAE0;  /* difficulty: 8, 16 or 32 */
 
 /* Initial health and level of an actor from its definition, scaled by difficulty. */
-void func_002427E0(Dest *dst, CIntelligence *def, CVector3 pos, void *actor) {
+void AI_InitHealth(Dest *dst, CIntelligence *def, CVector3 pos, void *actor) {
     GameSettings *settings;
     s32 level;
     f32 health;
@@ -35,9 +35,9 @@ void func_002427E0(Dest *dst, CIntelligence *def, CVector3 pos, void *actor) {
         level = def->m_nTexture;
         if (settings->multiplayer != 0 && def->m_Type != 1 && def->m_Type != 11) {
             if (settings->match.tag != 0) {
-                level = settings->tagSkill;
+                level = settings->tagTextureSet;
             } else {
-                level = settings->dmSkill;
+                level = settings->dmTextureSet;
             }
         }
         switch (def->m_Type) {

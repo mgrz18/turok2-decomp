@@ -28,11 +28,11 @@ extern OSPiHandle D_80123A60;   /* LeoDiskHandle */
 extern OSPiHandle *D_80123AD4;  /* __osDiskHandle */
 extern OSPiHandle *D_800B897C;  /* __osPiTable */
 
-extern void func_00266C5C(void *p, s32 c, u32 n); /* memset */
+extern void memset(void *p, s32 c, u32 n); /* memset */
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
 
-OSPiHandle *func_0029D370(void) {
+OSPiHandle *osLeoDiskInit(void) {
     u32 saveMask;
 
     D_80123A60.type = DEVICE_TYPE_64DD;
@@ -47,7 +47,7 @@ OSPiHandle *func_0029D370(void) {
     IO_WRITE(PI_BSD_DOM2_PGS_REG, D_80123A60.pageSize);
     IO_WRITE(PI_BSD_DOM2_RLS_REG, D_80123A60.relDuration);
     D_80123A60.speed = 0;
-    func_00266C5C(&D_80123A60.transferInfo, 0, sizeof(D_80123A60.transferInfo));
+    memset(&D_80123A60.transferInfo, 0, sizeof(D_80123A60.transferInfo));
     saveMask = __osDisableInt();
     D_80123A60.next = D_800B897C;
     D_800B897C = &D_80123A60;

@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0027B8E0(u16 *grid, f32 x0, f32 y, f32 sx, f32 sy);
-extern void func_0027A4DC(u32 *data, f32 x, f32 y, u32 w, u32 h, f32 sx, f32 sy);
-void func_0027B8E0(u16 *grid, f32 x0, f32 y, f32 sx, f32 sy) {
+extern void Hud_DrawI4ImageScaled(u16 *grid, f32 x0, f32 y, f32 sx, f32 sy);
+extern void Hud_DrawI4BlockScaled(u32 *data, f32 x, f32 y, u32 w, u32 h, f32 sx, f32 sy);
+void Hud_DrawI4ImageScaled(u16 *grid, f32 x0, f32 y, f32 sx, f32 sy) {
     u32 *tile;
     f32 rows;
     f32 cols;
@@ -21,7 +21,7 @@ void func_0027B8E0(u16 *grid, f32 x0, f32 y, f32 sx, f32 sy) {
         while (cols-- != 0.0f) {
             w = tile[0];
             h = tile[1];
-            func_0027A4DC(tile + 2, x, y, w, h, sx, sy);
+            Hud_DrawI4BlockScaled(tile + 2, x, y, w, h, sx, sy);
             x += w * sx;
             tile = (u32 *)((char *)tile + ((w * h) >> 1));
             tile += 2;

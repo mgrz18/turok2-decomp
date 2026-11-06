@@ -3,6 +3,6 @@
 
 extern s32 D_80119878;
 
-s32 func_00253FD0(void) {
+s32 PlayerPool_GetNumPlayers(void) {
     return D_80119878;
 }

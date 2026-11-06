@@ -11,7 +11,7 @@ extern s32 D_800D8E34;
 extern s32 D_800D8E38;
 extern s32 D_800DD170;
 
-void func_0020B5D4(void) {
+void Render_ResetBatches(void) {
     D_800D8E28 = 0;
     D_800D8E34 = 0;
     D_800D8E2C = 0;

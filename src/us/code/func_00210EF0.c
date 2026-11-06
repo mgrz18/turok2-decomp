@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00210EF0(f32 *value);
+extern void Angle_Wrap(f32 *value);
 extern float D_800A5644;
 extern f32 D_800A564C;
-void func_00210EF0(f32 *value)
+void Angle_Wrap(f32 *value)
 {
     extern f32 D_800A563C;
     {

@@ -3,7 +3,7 @@
 #include "common.h"
 #include "structs/vector.h"
 
-/* A light volume (built by func_00211F64). */
+/* A light volume (built by LightVolume_Construct). */
 typedef struct LightVolume {
     /* 0x00 */ u8 pad0[0x20];
     /* 0x20 */ f32 inverse[16];
@@ -35,18 +35,18 @@ typedef struct VertexList {
     /* 0x08 */ PackedVertex vertices[1];
 } VertexList;
 
-void *func_002017D4(void *table, s32 index);
-void func_0020D908(f32 *out, void *packed);
-void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
-void func_0020F85C(f32 *mtx, CVector3 *in, CVector3 *out);
-void func_0020FAFC(f32 *mtx, CVector3 *in, CVector3 *out);
-s32 func_00212680(LightVolume *light, CVector3 pos, CVector3 normal, f32 *inverse, CVector3 *out, f32 *amount);
+void *CISet__GetBlock(void *table, s32 index);
+void CMtxF__FromMtxAffine(f32 *out, void *packed);
+void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
+void CMtxF__TransformPoint(f32 *mtx, CVector3 *in, CVector3 *out);
+void CMtxF__RotateVector(f32 *mtx, CVector3 *in, CVector3 *out);
+s32 Actors_EvaluateLightVolume(LightVolume *light, CVector3 pos, CVector3 normal, f32 *inverse, CVector3 *out, f32 *amount);
 
 /* Adds the light of the volumes to each drawn vertex of the vertex lists: the vertex (moved by its
  * own packed matrix when multiple) is lit by each volume holding it. The last animated volume
  * found sets the vertex's animation bits: pattern 4..6 from the volume's seed (mode 1) or from
  * the vertex position (mode 2), and a level from the volume's strength there. */
-void func_0021285C(LightVolume **lights, s32 lightCount, s32 *lists, void *matrices, CVector3 *output, s32 multiple) {
+void Actors_AccumulateVertexLighting(LightVolume **lights, s32 lightCount, s32 *lists, void *matrices, CVector3 *output, s32 multiple) {
     f32 matrix[16];
     CVector3 sum;
     CVector3 position;
@@ -70,10 +70,10 @@ void func_0021285C(LightVolume **lights, s32 lightCount, s32 *lists, void *matri
     VertexList *list;
     LightVolume *light;
 
-    func_0020D908(matrix, matrices);
+    CMtxF__FromMtxAffine(matrix, matrices);
     drawn = 0;
     for (n = 0; n < *lists; n++) {
-        list = func_002017D4(lists, n);
+        list = CISet__GetBlock(lists, n);
         base = list->vertices;
         for (i = 0; i < list->count; i++) {
             vertex = &base[i];
@@ -85,16 +85,16 @@ void func_0021285C(LightVolume **lights, s32 lightCount, s32 *lists, void *matri
                 continue;
             }
             if (multiple) {
-                func_0020D908(matrix, (u8 *)matrices + ((vertex->flags >> 8) << 6));
+                CMtxF__FromMtxAffine(matrix, (u8 *)matrices + ((vertex->flags >> 8) << 6));
             }
             position.x = vertex->px;
             position.y = vertex->py;
             position.z = vertex->pz;
-            func_0020F85C(matrix, &position, &worldPosition);
+            CMtxF__TransformPoint(matrix, &position, &worldPosition);
             normal.x = vertex->nx;
             normal.y = vertex->ny;
             normal.z = vertex->nz;
-            func_0020FAFC(matrix, &normal, &worldNormal);
+            CMtxF__RotateVector(matrix, &normal, &worldNormal);
             sum.x = 0.0f;
             sum.y = 0.0f;
             sum.z = 0.0f;
@@ -109,13 +109,13 @@ void func_0021285C(LightVolume **lights, s32 lightCount, s32 *lists, void *matri
                     light->min.x <= worldPosition.x &&
                     light->min.y <= worldPosition.y &&
                     light->min.z <= worldPosition.z &&
-                    func_00212680(light, worldPosition, worldNormal, light->inverse, &contribution, &amount)) {
+                    Actors_EvaluateLightVolume(light, worldPosition, worldNormal, light->inverse, &contribution, &amount)) {
                     if (light->animatedLight) {
                         mode = light->animatedLight;
                         colour = light->animationSeed;
                         selectedAmount = amount;
                     }
-                    func_0020EEF8(&sum, &sum, &contribution);
+                    CVector3__Add(&sum, &sum, &contribution);
                 }
             }
             if (mode) {

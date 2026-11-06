@@ -4,7 +4,7 @@
 extern s32 D_8011AAD8;          /* settings; per-player 0x40-byte blocks, flag at +0xA8 */
 
 /* Counts the connected controllers; 0 if one of their players is not ready. */
-s32 func_00417D10(void) {
+s32 Mp_CountJoinedControllers(void) {
     u8 *var_a0;
     s32 var_a1;
     s32 var_a2;

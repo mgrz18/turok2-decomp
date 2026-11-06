@@ -111,12 +111,12 @@ extern f32 D_800A8124;
 extern f32 D_800B2A30;
 extern M04Tab D_800B2750[];
 extern u8 D_800F2940[];
-f32 func_0026D210(u16 x);
-u16 func_0026D200(f32 x);
+f32 HalfToFloat(u16 x);
+u16 FloatToHalf(f32 x);
 s32 Cinema_PathPlaying();
-M04Rec12 *func_00271778(M04Ctx *c, s16 id);
-f32 func_0021149C(f32 x);
-void func_00272278(M04Emitter *o, M04Info *rec) {
+M04Rec12 *CAudioWorld__GetVolumeEnvelope(M04Ctx *c, s16 id);
+f32 Random_Float(f32 x);
+void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
     M04VP *vp = &o->vp;
     M04Rec12 *env;
     u8 *pp;
@@ -146,9 +146,9 @@ void func_00272278(M04Emitter *o, M04Info *rec) {
     }
     env = &o->env2;
     if (rec->envId != -1) {
-        *env = *func_00271778(o->ctx, rec->envId);
+        *env = *CAudioWorld__GetVolumeEnvelope(o->ctx, rec->envId);
     } else {
-        env->w0 = func_0026D200((f32)rec->b0F);
+        env->w0 = FloatToHalf((f32)rec->b0F);
     }
     if (!(rec->bits6 & 0x800) && o->resetFlag != 1 && o->ctx->tgt != 0) {
         a = (f32)pp[0] * D_800A8118;
@@ -158,7 +158,7 @@ void func_00272278(M04Emitter *o, M04Info *rec) {
         } else if (b == a) {
             vf = a;
         } else {
-            vf = a + func_0021149C(b - a);
+            vf = a + Random_Float(b - a);
         }
         p = &vp->pos;
         q = (CVector3 *)&o->ctx->tgt->x;
@@ -193,16 +193,16 @@ void func_00272278(M04Emitter *o, M04Info *rec) {
         vp->f20 = vf;
     }
     if (rec->bits6 & 4) {
-        vp->vol = (s32)func_0026D210(env->w0);
-        fs = func_0026D210(env->w1);
-        fs -= func_0026D210(env->w2);
+        vp->vol = (s32)HalfToFloat(env->w0);
+        fs = HalfToFloat(env->w1);
+        fs -= HalfToFloat(env->w2);
         if (env->w3 == 0) {
             o->env2Slope = 0.0f;
         } else {
             o->env2Slope = fs / (f32)env->w3;
         }
-        o->env2A = func_0026D210(env->w1);
-        n = (s32)func_0026D210(env->w0);
+        o->env2A = HalfToFloat(env->w1);
+        n = (s32)HalfToFloat(env->w0);
         if ((f32)n < 0.0f) {
             t = -n * 2;
         } else {
@@ -214,11 +214,11 @@ void func_00272278(M04Emitter *o, M04Info *rec) {
         } else {
             t = n * 2;
         }
-        env->w0 = func_0026D200((f32)*(s16 *)(D_800F2940 + t) * vf);
-        vp->wC = (s32)func_0026D210(env->w0 & 0xFFFF);
+        env->w0 = FloatToHalf((f32)*(s16 *)(D_800F2940 + t) * vf);
+        vp->wC = (s32)HalfToFloat(env->w0 & 0xFFFF);
         return;
     }
-    n = (s32)func_0026D210(env->w0);
+    n = (s32)HalfToFloat(env->w0);
     if ((f32)n < 0.0f) {
         t = -n * 2;
     } else {

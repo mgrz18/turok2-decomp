@@ -12,8 +12,8 @@ typedef struct B01Info {
     s16 unk14;
     s16 unk16;
 } B01Info;
-void func_00243414(CGameObjectInstance *actor, CAI *state, s32 event);
-void func_00263640(CGameObjectInstance *actor, CAI *state) {
+void CAI__SetMode(CGameObjectInstance *actor, CAI *state, s32 event);
+void Generator_WaitUpdate(CGameObjectInstance *actor, CAI *state) {
     B01Info *info = ((B01Info *)((u8 *)(actor->header.m_pIntelligence) + 0x14));
     if (info->unk4 == 0) {
         if (info->unk14 == -1) {
@@ -35,7 +35,7 @@ void func_00263640(CGameObjectInstance *actor, CAI *state) {
             return;
         }
         if (state->m_ModeTime >= state->m_ConditionTimer) {
-            func_00243414(actor, state, 1);
+            CAI__SetMode(actor, state, 1);
         }
     }
 }

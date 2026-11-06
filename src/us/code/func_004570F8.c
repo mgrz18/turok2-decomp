@@ -24,8 +24,8 @@ extern void func_004263A0(s32 ch);
 extern s32 func_0042647C(s32 ch);
 extern s32 func_004264B4(s32 ch);
 extern s32 func_00426AF8(s32 ch);
-extern void func_00416644(char *, char *, CPlayer *, ControllerProfile *, char *);
-void func_004570F8(Menu *menu) {
+extern void MenuPool_OpenMenu(char *, char *, CPlayer *, ControllerProfile *, char *);
+void PakMenu_InitLoadProfile_2(Menu *menu) {
     s32 ch;
     D_80130984 = 0;
     D_801309A0 = 0;
@@ -38,7 +38,7 @@ void func_004570F8(Menu *menu) {
     ch = menu->controller->port;
     if (D_800C2020 != 0) {
         D_801309BC = 1;
-        func_00416644(((char *)menu->player->m_pCamera) + 0x53C, D_0043874C, menu->player, menu->controller, 0);
+        MenuPool_OpenMenu(((char *)menu->player->m_pCamera) + 0x53C, D_0043874C, menu->player, menu->controller, 0);
         return;
     }
     func_004263A0(ch);
@@ -48,10 +48,10 @@ void func_004570F8(Menu *menu) {
     }
     D_801309BC = 1;
     if (func_004264B4(ch) != 0) {
-        func_00416644(D_80119E2C, D_0043BB8C, menu->player, menu->controller, D_0043874C);
+        MenuPool_OpenMenu(D_80119E2C, D_0043BB8C, menu->player, menu->controller, D_0043874C);
     } else if (func_00426AF8(ch) != 0) {
-        func_00416644(D_80119E2C, D_0043BF7C, menu->player, menu->controller, D_0043B5C8);
+        MenuPool_OpenMenu(D_80119E2C, D_0043BF7C, menu->player, menu->controller, D_0043B5C8);
     } else {
-        func_00416644(D_80119E2C, D_0043BB20, menu->player, menu->controller, D_0043874C);
+        MenuPool_OpenMenu(D_80119E2C, D_0043BB20, menu->player, menu->controller, D_0043874C);
     }
 }

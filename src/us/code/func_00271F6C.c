@@ -3,19 +3,19 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_002119FC(f32 arg0, f32 arg1);
-extern f32 func_0026D210(s32);
+extern f32 Random_Blend(f32 arg0, f32 arg1);
+extern f32 HalfToFloat(s32);
 extern float D_800A80FC;
 extern float D_800A8100;
 extern float D_800A8104;
 extern float D_800A8108;
 extern float D_800A810C;
 extern float D_800B284C[];
-extern struct Bytes12 *func_00271790(ContextRecAt2BC0 *, s32);
-extern s16 func_0026D200(f32);
-extern s32 func_002768A4(ControllerCode802591C0 *);
-extern s32 func_002768B0(ControllerCode802591C0 *);
-void func_00271F6C(ViewRecAtB0 *view, ControllerCode802591C0 *controller, s32 flags) {
+extern struct Bytes12 *CAudioWorld__GetPitchEnvelope(ContextRecAt2BC0 *, s32);
+extern s16 FloatToHalf(f32);
+extern s32 SoundEffectInfo_GetRandomRange0(ControllerCode802591C0 *);
+extern s32 SoundEffectInfo_GetRandomRange1(ControllerCode802591C0 *);
+void SndVoice_InitPitch(ViewRecAtB0 *view, ControllerCode802591C0 *controller, s32 flags) {
     s16 x;
     s16 y;
     f32 fx;
@@ -33,37 +33,37 @@ void func_00271F6C(ViewRecAtB0 *view, ControllerCode802591C0 *controller, s32 fl
     angles = &view->angles;
     motion->rate1 = motion->rate2 = 0.0f;
     if (controller->preset != -1) {
-        *(struct Bytes12 *)angles = *func_00271790(view->presets, controller->preset);
+        *(struct Bytes12 *)angles = *CAudioWorld__GetPitchEnvelope(view->presets, controller->preset);
     } else {
-        angles->heading = func_0026D200(controller->yaw);
+        angles->heading = FloatToHalf(controller->yaw);
     }
-    x = func_002768A4(controller);
-    y = func_002768B0(controller);
+    x = SoundEffectInfo_GetRandomRange0(controller);
+    y = SoundEffectInfo_GetRandomRange1(controller);
     fy = y;
     fx = x;
-    turn = (s16)(s32)(fx + ((func_002119FC(fy, fx)) < 0.0f ? -(func_002119FC(fy, fx)) : (func_002119FC(fy, fx))));
-    angles->heading = func_0026D200(func_0026D210(angles->heading) + turn);
+    turn = (s16)(s32)(fx + ((Random_Blend(fy, fx)) < 0.0f ? -(Random_Blend(fy, fx)) : (Random_Blend(fy, fx))));
+    angles->heading = FloatToHalf(HalfToFloat(angles->heading) + turn);
     if (flags & 0x40) {
-        angles->heading = func_0026D200(func_0026D210(angles->heading) + D_800A80FC);
+        angles->heading = FloatToHalf(HalfToFloat(angles->heading) + D_800A80FC);
     }
     if (flags & 0x80) {
-        angles->heading = func_0026D200(func_0026D210(angles->heading) - D_800A8100);
+        angles->heading = FloatToHalf(HalfToFloat(angles->heading) - D_800A8100);
     }
-    if (func_0026D210(angles->heading) >= D_800A8104) {
-        angles->heading = func_0026D200(D_800A8104);
+    if (HalfToFloat(angles->heading) >= D_800A8104) {
+        angles->heading = FloatToHalf(D_800A8104);
     }
     if (controller->flags & 2) {
-        motion->heading = func_0026D210(angles->heading);
-        diff = func_0026D210(angles->pitch);
-        diff -= func_0026D210(angles->target);
+        motion->heading = HalfToFloat(angles->heading);
+        diff = HalfToFloat(angles->pitch);
+        diff -= HalfToFloat(angles->target);
         if (angles->steps == 0) {
             view->pitchStep = 0.0f;
         } else {
             view->pitchStep = diff / angles->steps;
         }
-        view->pitch = func_0026D210(angles->pitch);
+        view->pitch = HalfToFloat(angles->pitch);
     }
-    position = (func_0026D210(angles->heading) + D_800A8108) * D_800A810C;
+    position = (HalfToFloat(angles->heading) + D_800A8108) * D_800A810C;
     index = position;
     if (index != position) {
         next = index + 1;
@@ -73,5 +73,5 @@ void func_00271F6C(ViewRecAtB0 *view, ControllerCode802591C0 *controller, s32 fl
         result = D_800B284C[index];
     }
     motion->heading = result;
-    angles->heading = func_0026D200(result);
+    angles->heading = FloatToHalf(result);
 }

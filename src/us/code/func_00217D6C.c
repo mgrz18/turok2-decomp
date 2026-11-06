@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern Func802608ECResult func_00217D6C(f32 arg0, f32 arg1, f32 arg2);
-Func802608ECResult func_00217D6C(f32 arg0, f32 arg1, f32 arg2) {
+extern Func802608ECResult Bits_QuantizeRange(f32 arg0, f32 arg1, f32 arg2);
+Func802608ECResult Bits_QuantizeRange(f32 arg0, f32 arg1, f32 arg2) {
     Func802608ECResult result;
     f32 ratio;
     s32 truncated;

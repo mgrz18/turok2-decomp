@@ -1,4 +1,4 @@
-/* Second-module copy of func_0040E930 (src/us/code/func_0040E930.c), with its string/data addresses 0xE0 lower. */
+/* Second-module copy of BlindOne_PhaseBossMode0Init (src/us/code/BlindOne_PhaseBossMode0Init.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -6,8 +6,8 @@
 extern BlindOnePhase D_0043232C[];
 
 extern u8 D_800F7078[];
-extern void func_00225C84(void *);
-extern s32 func_00243414(CGameObjectInstance *actor, void *ai, s32 state);
+extern void CScene__MarkGeneratorsSaved(void *);
+extern s32 CAI__SetMode(CGameObjectInstance *actor, void *ai, s32 state);
 
 static __inline__ void StartTimer(BlindOneState *m, s32 n, void *proc, f32 seconds) {
     BlindOneMover *t;
@@ -48,7 +48,7 @@ static __inline__ void NextCommand(BlindOneState *m) {
     }
 }
 
-void func_00447930(BlindOneState *m) {
-    func_00243414(m->boss, &m->boss->m_AI, 0);
+void BlindOne_PhaseBossMode0Init_2(BlindOneState *m) {
+    CAI__SetMode(m->boss, &m->boss->m_AI, 0);
     NextCommand(m);
 }

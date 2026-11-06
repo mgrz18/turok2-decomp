@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_002119FC(f32 arg0, f32 arg1);
+extern f32 Random_Blend(f32 arg0, f32 arg1);
 extern f32 D_800B6D28;
-void func_00235510(Animator *a) {
+void Animator_Update(Animator *a) {
     s32 next;
     f32 op0;
     f32 op1;
@@ -66,7 +66,7 @@ void func_00235510(Animator *a) {
             op0 = *a->script++;
             op1 = *a->script++;
             a->mode = 1;
-            a->time = func_002119FC(op0, op1);
+            a->time = Random_Blend(op0, op1);
             break;
         case 3:
             next = 1;

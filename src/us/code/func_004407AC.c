@@ -18,7 +18,7 @@ typedef struct {
 extern f32 D_800C0540;
 extern State D_8012F9D8;
 
-void func_004407AC(char *actor) {
+void Primagen_EnterMode24_2(char *actor) {
     f32 v = D_800C0540;
     SubState *sub = &D_8012F9D8.sub;
 

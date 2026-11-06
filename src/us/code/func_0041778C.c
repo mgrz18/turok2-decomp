@@ -4,11 +4,11 @@
 
 extern CPlayerOptions D_8011AB58[4]; /* D_8011AAD8.slots */
 
-extern s32 func_002855E8(ControllerProfile *ctl);
-extern s32 func_002113A4(void);
+extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
+extern s32 Random_Next(void);
 extern void func_00430454(void *a, s32 level);
 
-/* func_00417BB0, inlined. */
+/* Mp_SetupMatchRules, inlined. */
 static __inline__ void StartMatch(f32 minutes, s32 a1, s32 started, s32 a3) {
     GameMatch *m = &D_8011AAD8.match;
 
@@ -26,7 +26,7 @@ static __inline__ void StartMatch(f32 minutes, s32 a1, s32 started, s32 a3) {
     }
 }
 
-s32 func_0041778C(void) {
+s32 MpMenu_StartTeamBlood(void) {
     GameSettings *setup = &D_8011AAD8;
     s32 level;
     s32 arg;
@@ -39,7 +39,7 @@ s32 func_0041778C(void) {
         setup->slots[i].m_nCharacter = 0;
     }
     for (i = 0, ctl = D_800F5EC0; i < 4; i++, ctl++) {
-        if (func_002855E8(ctl)) {
+        if (Controller_ConfirmPressed(ctl)) {
             CPlayerOptions *slot = &D_8011AB58[i];
 
             slot->m_bActive = 1;
@@ -51,10 +51,10 @@ s32 func_0041778C(void) {
         if ((u32) (level - 1) < 13) {
             arg = level + 0x2328;
         } else {
-            arg = func_002113A4() % 13 + 0x2329;
+            arg = Random_Next() % 13 + 0x2329;
         }
     } else {
-        arg = func_002113A4() % 13 + 0x2329;
+        arg = Random_Next() % 13 + 0x2329;
     }
     func_00430454(&D_800F6CB0, arg);
     return 1;

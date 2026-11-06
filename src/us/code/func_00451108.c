@@ -37,7 +37,7 @@ typedef struct S10Item {
 } S10Item;
 extern u8 D_800B4210[];
 extern u8 D_800B4220[];
-s32 func_00451108(S10Item *a, S10Menu *m) {
+s32 PlayerSetupMenu_ControlTypeLabel_2(S10Item *a, S10Menu *m) {
     switch (m->ctx->sub->b2B) {
     case 0:
         a->f14 = D_800B4210;

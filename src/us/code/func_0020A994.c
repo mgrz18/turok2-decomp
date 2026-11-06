@@ -13,7 +13,7 @@ typedef struct Material {
     /* 0x17 */ u8 alpha;
 } Material;
 
-/* One draw of a part with one instance's state (built by func_0020A568). */
+/* One draw of a part with one instance's state (built by Render_FlushModelBatch). */
 typedef struct DrawItem {
     /* 0x00 */ void *list;
     /* 0x04 */ void *matrix;
@@ -40,14 +40,14 @@ extern SortNode *D_800D8E1C;        /* first opaque node */
 extern Gfx *D_800D8E24;             /* display list head */
 extern SortNode *D_800D8E38;        /* first translucent node */
 
-s32 func_00208810(Material *material, s32 pass);
+s32 Render_SetupMaterial(Material *material, s32 pass);
 void func_00209658(void);
 
 /* Emits the batched draws: the opaque nodes in key order (those whose material is flagged 0x4000
  * set aside and drawn afterwards with their alpha as primitive colour, after func_00209658), then
  * the translucent ones. Each item loads its lights, its matrix (or segment 1) and its textures as
  * segment 2, sets the texture scale when it changes, and calls the part's display list. */
-void func_0020A994(void) {
+void Render_DrawBatches(void) {
     SortNode *node;
     SortNode *deferred;
     SortNode *next;
@@ -60,7 +60,7 @@ void func_0020A994(void) {
     if (node != NULL) {
         do {
             item = node->head;
-            if (item != NULL && func_00208810(node->material, node->pass)) {
+            if (item != NULL && Render_SetupMaterial(node->material, node->pass)) {
                 scaleT = 0;
                 scaleS = 0;
                 do {
@@ -135,7 +135,7 @@ void func_0020A994(void) {
     if (node != NULL) {
         do {
             item = node->head;
-            if (item != NULL && func_00208810(node->material, node->pass)) {
+            if (item != NULL && Render_SetupMaterial(node->material, node->pass)) {
                 scaleT = 0;
                 scaleS = 0;
                 do {

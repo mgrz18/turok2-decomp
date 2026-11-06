@@ -5,7 +5,7 @@
 
 f32 func_00298470(f32);
 extern float D_800A55D4;
-extern CVector3 *func_0020F260(CVector3 *out, CVector3 *value, CVector3 *a, CVector3 *b);
+extern CVector3 *CVector3__ProjectOntoPlaneNormal(CVector3 *out, CVector3 *value, CVector3 *a, CVector3 *b);
 static __inline__ void normalizeProjectionNormal(CVector3 *normal) {
     f32 length;
     f32 inverse;
@@ -27,7 +27,7 @@ static __inline__ void projectionScale(CVector3 *out, CVector3 *normal, f32 proj
     out->y = normal->y * projection;
     out->z = normal->z * projection;
 }
-CVector3 *func_0020F260(CVector3 *out, CVector3 *value, CVector3 *a, CVector3 *b) {
+CVector3 *CVector3__ProjectOntoPlaneNormal(CVector3 *out, CVector3 *value, CVector3 *a, CVector3 *b) {
     CVector3 normal;
     CVector3 projected;
     f32 length;

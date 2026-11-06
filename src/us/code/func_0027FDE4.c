@@ -3,9 +3,9 @@
 
 extern s32 D_800C2034;          /* screen height */
 extern f32 D_800B6D28;          /* the frame's time step */
-void func_00277F6C(void);
-void func_0027845C(void);
-void func_00278CDC(char *string, s32 x, s32 y, s32 alpha, s32 arg4, s32 arg5, f32 scaleX, f32 scaleY);
+void COnScreen__BeginText(void);
+void COnScreen__SelectTinyFont(void);
+void COnScreen__DrawString(char *string, s32 x, s32 y, s32 alpha, s32 arg4, s32 arg5, f32 scaleX, f32 scaleY);
 f32 func_002982F0(f32 x);       /* sine */
 f32 func_002974C0(f32 x);       /* cosine */
 void CList__Remove(CList *list, void *element);
@@ -16,7 +16,7 @@ void CList__AddHead(CList *list, void *element);
  * last to first, faded in (mode 2) and out (mode 4) over a fifteenth of a
  * second per unit of time with a quarter sine wave; when one has faded out
  * the waiting ones (mode 1) start in. Finished texts go back to the pool. */
-void func_0027FDE4(CCameraPool *pool, CCamera *cam) {
+void CCameraPool__AdvanceCinemaText(CCameraPool *pool, CCamera *cam) {
     CCameraText *text;
     CCameraText *cur;
     CCameraText *prev;
@@ -24,8 +24,8 @@ void func_0027FDE4(CCameraPool *pool, CCamera *cam) {
     f32 f;                      /* the gap between lines, then the time step */
     f32 wave;
 
-    func_00277F6C();
-    func_0027845C();
+    COnScreen__BeginText();
+    COnScreen__SelectTinyFont();
     f = 9.0f;
     prev = cam->m_ActiveTextList.m_pHead;
     if (prev != NULL) {
@@ -36,7 +36,7 @@ void func_0027FDE4(CCameraPool *pool, CCamera *cam) {
         }
     }
     for (text = cam->m_ActiveTextList.m_pTail; text != NULL; text = text->m_pLast) {
-        func_00278CDC(text->m_pString, text->m_PositionX, text->m_PositionY, text->m_nAlpha, 1, 1, 1.0f, 1.0f);
+        COnScreen__DrawString(text->m_pString, text->m_PositionX, text->m_PositionY, text->m_nAlpha, 1, 1, 1.0f, 1.0f);
     }
     for (text = cam->m_ActiveTextList.m_pTail; text != NULL; text = text->m_pLast) {
         f = D_800B6D28 * (1.0f / 15.0f);

@@ -1,0 +1,590 @@
+// N2 naming round, part n5: functions at 0x00270000-0x0028FFFF (545 files).
+// Sound engine (CAudioWorld = Turok 3's audioworld.c object at D_800F2A00,
+// our SndMgr), the sound.c API, the HUD (COnScreen / COverlay and the
+// sprite/text primitives), the demo player hooks, the camera (CCamera,
+// CCameraPool, CShake, CCameraText, the region emitters), cinema state,
+// controllers and rumble, CEngineApp (turok3 tengine.c) and its mode table,
+// the scheduler (libultra sched.c, Acclaim-modified), the crash screen,
+// the VM pager (turok3 vhandler.c) and the start of libaudio (cseq.c,
+// csplayer.c). Evidence per line.
+
+// audiomgr.c (SDK), the rest is in n4
+__amDMA = 0x002700D0; // SDK audiomgr.c __amDMA (n4 named the rest of audiomgr: __amDmaNew 0x0026FD4C returns this callback): caches 0x300-byte ROM windows, PI read on a miss
+
+// CAudioWorld (D_800F2A00, our SndMgr): Turok 3 audioworld.c has the same object (CMutex at 0x110, music node/table/count at 0x2B50/0x2B60/0x2B64), functions in the same order and sizes
+CAudioWorld__Initialize = 0x00270240; // turok3 audioworld.c first function: CMutex__Construct, alHeapInit, synth/bank/alSndpNew, queue/seq/pool init; called by Sound__Initialize
+CAudioWorld__LoadSfxDataFile = 0x00270550; // turok3 audioworld.c second function: loads the sound data file (func_0028E60C 0x3EA7A0), sets the variant/envelope/music tables
+CAudioWorld__StartVoice = 0x002706A0; // turok3 order: voice by id; slot 16 goes to the request queue, else alSndpSetPitch/FXMix/Pan/Vol and plays
+CAudioWorld__StopHandle = 0x002708C0; // same size as turok3's slot (0x1A0): locked, drops queued requests and stops every voice whose play handle == id; wrapper Sound__Stop
+CAudioWorld__PlayLayer = 0x00270A60; // starts one layer of a cue: listener distance / duplicate-owner checks, queues sampled ones (SndQueue_Add), else AllocVoice + Setup + StartVoice
+CAudioWorld__PlaySound = 0x00270C80; // file comment: plays a sound/music cue at pos, weighted random variant, returns the new handle; called by Sound__Play*
+CAudioWorld__PlaySoundIndex = 0x00271128; // PlaySound with a direct variant index (< rangeCount), cue 0x100; wrappers Sound__PlayIndex/PlayIndex2D
+CAudioWorld__Update = 0x002712E8; // per frame (Sound__Update): option volumes, voices, queue, speech, music sequence, ambient track
+CAudioWorld__Lock = 0x002714B0; // turok3 CAudioWorld__Lock: takes the CMutex at 0x110
+CAudioWorld__Unlock = 0x00271514; // turok3 CAudioWorld__Unlock: releases it
+CAudioWorld__StopSound = 0x00271570; // pool stop by sound id + queue cancel by id; wrapper Sound__StopSoundId
+CAudioWorld__StopSoundsByOwner = 0x002715B0; // pool stop by voice +0xB4 (the owner the caller passes, func_00246918 passes the actor) + queue cancel; wrapper Sound__StopOwner
+CAudioWorld__StopSoundsByFlags = 0x002715F0; // pool stop by flags mask + queue cancel by flags; wrapper Sound__StopFlags
+CAudioWorld__PlaySoundPitched = 0x00271630; // sets unk2BBC (copied to the voice pitchScale) around PlaySound, then back to 1.0
+CAudioWorld__UpdateAmbientTrack = 0x00271694; // the tail of Update on its own: replays mgr->track at the listener every 4 frames in game mode 13
+CAudioWorld__SetSfxVolume = 0x00271740; // writes sfxVolume (0x2BA0)
+CAudioWorld__SetSequenceVolume = 0x00271748; // writes 0x2BA4, the MIDI sequence volume SndSeq_UpdateVolume reads
+CAudioWorld__SetMusicVolume = 0x00271770; // writes musicVolume (0x2BA8)
+CAudioWorld__GetVolumeEnvelope = 0x00271778; // &table2B70[i] (0xC-byte SndEnv); SndVoice_InitVolume's env2
+CAudioWorld__GetPitchEnvelope = 0x00271790; // &table2B74[i]; SndVoice_InitPitch
+CAudioWorld__GetPanEnvelope = 0x002717A8; // &table2B78[i]; SndVoice_Setup / SndVoice_InitPan (env3)
+CAudioWorld__StopAllSounds = 0x002717C0; // locked: pool StopAllExcept(arg), queue flush, fxMix 0, stops the speech; wrapper Sound__StopAllExcept
+CAudioWorld__FadeOutMusic = 0x002718A0; // SndSeq_FadeOut(&seq); wrapper Music_FadeOut
+CAudioWorld__SetForce2D = 0x002718BC; // writes 0x2BAC (copied to voice.reset: no distance volume/pan); Sound__Play2D sets it around the call
+CAudioWorld__GetForce2D = 0x002718C4; // reads 0x2BAC
+CAudioWorld__SetAmbientTrackEnabled = 0x002718D0; // writes 0x2BB4, the gate of the ambient track in UpdateAmbientTrack; wrappers Sound__Enable/DisableAmbientTrack
+CAudioWorld__SetListener = 0x002718D8; // writes listener (0x2B98, a CCamera)
+CAudioWorld__GetStereo = 0x002718E0; // reads 0x2BB0 (option byte D_8011AAEB); 0 forces the pan to 0x40
+CAudioWorld__SetStereo = 0x002718EC; // writes 0x2BB0
+CAudioWorld__GetSndPlayer = 0x002718F4; // turok3 CAudioWorld__GetSndPlayer, same slot of the accessor run: &player (0x84)
+CAudioWorld__SetMuted = 0x002718FC; // writes muted (0x2BB8, structs/sound.h); wrapper Sound__SetMuted
+CAudioWorld__CountHandleVoices = 0x00271904; // locked count of voices whose play handle == arg; wrapper Sound__IsPlaying
+CAudioWorld__StopMusic = 0x002719F4; // SndSeq_Stop(&seq); wrapper Music_Stop
+CAudioWorld__SetFxMix = 0x00271A10; // clamps a float to [0,max] and scales it into fxMix (0x2B9C); wrapper Sound__SetReverb
+CAudioWorld__DuckMusic = 0x00271A70; // SndSeq_Duck(&seq); wrapper Music_DuckVolume
+CAudioWorld__UnduckMusic = 0x00271A8C; // SndSeq_Unduck(&seq); wrapper Music_RestoreVolume
+CAudioWorld__DetachAllVoices = 0x00271AA8; // SndVoicePool_ClearFollow(&pool); wrapper Sound__DetachAll
+CAudioWorld__PlaySpeech = 0x00271AC4; // SpeechPlayer_Play on the 0x2BC0 player at min(1, musicVolume); wrapper Sound__PlaySpeech
+CAudioWorld__StopSpeech = 0x00271B04; // SpeechPlayer_Stop on 0x2BC0; wrapper Sound__StopSpeech
+CAudioWorld__SortInstrumentSounds = 0x00271B20; // the bubble sort of instArray[0]->soundArray inlined in CAudioWorld__Initialize
+CAudioWorld__FindVoice = 0x00271BA8; // file comment: index of the voice with the id, -1
+CAudioWorld__PickVariant = 0x00271BEC; // weighted random variant avoiding the last one: the code inlined in PlaySound
+CAudioWorld__GetVariantCue = 0x00271D54; // variants[i][0] (m->cue in PlaySound)
+CAudioWorld__GetVariantLayers = 0x00271D84; // variants[i][1] (the layer list in PlaySound)
+CAudioWorld__IsSoundBusy = 0x00271DB4; // PlaySound's refuse test: muted + 0x44C, pending cue, 6 voices of the id
+
+// SndVoice (a playing sound, 0xCC bytes; structs/sound.h)
+Sound_CalcPan = 0x00271E20; // pan 0..0x7F (0x40 centre) from the source position against the camera's m_vPos / m_mfViewOrient
+SndVoice_InitPitch = 0x00271F6C; // from SndVoice_Setup: pitch envelope (table2B74), random range, flags 0x40/0x80, cents table D_800B284C
+SndVoice_InitVolume = 0x00272278; // from SndVoice_Setup: per-sound scale table D_800B2750, env2, distance falloff, vp.vol
+SndVoice_UpdateVolume = 0x002726DC; // per frame: hearing range from the listener's m_FarClip, distance curve, env2 slide, alSndpSetVol
+SndVoice_UpdatePan = 0x00272B54; // per frame: pan envelope slide or Sound_CalcPan, alSndpSetPan; mono gives 0x40
+SndVoice_UpdateDoppler = 0x00272D3C; // file header: doppler factor of sounds 0x1B2/0x1B3 clamped 0.6..1.4
+SndVoice_UpdatePitch = 0x00272EC4; // file comment: slides the pitch offset toward the target, alSndpSetPitch
+SndVoice_Update = 0x0027314C; // file comment: update one sound, release it when stopped; calls the three above
+SndVoice_Construct = 0x00273A34; // resets one voice's fields; called by SndQueue_Construct / SndQueue_InitNode
+SndVoice_SetPosition = 0x00273E98; // vp.pos = *pos, vp.follow = ptr
+SndVoice_SetSoundId = 0x00273EB8; // writes soundId (0xA8); callers PlayLayer, SndQueue_Add
+SndVoice_Setup = 0x00273EC0; // InitPitch + InitVolume + pan; callers PlayLayer, SndQueue_Add
+SndVoice_SetVolume = 0x002746AC; // alSndpSetSound + alSndpSetVol(vol * volumeScale)
+SndVoice_SetPitch = 0x00274728; // alSndpSetPitch(p * doppler * pitchScale)
+SndVoice_SetPan = 0x00274798; // alSndpSetSound + alSndpSetPan
+SndVoice_GetState = 0x002747EC; // alSndpSetSound + alSndpGetState
+SndVoice_Play = 0x00274830; // alSndpPlay on mgr->player
+SndVoice_Stop = 0x00274850; // stopping = 1, follow = 0, alSndpStop unless started this frame
+SndVoice_Release = 0x002748D0; // file comment: alSndpDeallocate and reset
+SndVoice_InitPan = 0x00274948; // rw_abu Sound_InitVoiceVolume (US 0x8025C674), same code; what it sets is vp.pan / env3
+
+// SndVoicePool (17 voices at SndMgr 0x1DB8)
+SndVoicePool_Update = 0x0027403C; // SndVoice_Update on each live voice but the pending one, counts them (D_800B2A5C, max D_800B2A60)
+SndVoicePool_FindSlot = 0x00273370; // a free alSndp slot or steals the lowest-priority voice (16 = queue)
+SndVoicePool_AllocVoice = 0x00273504; // chance roll, FindSlot, alSndpAllocate, fills the voice from the SoundEffectInfo
+SndVoicePool_StopAllExcept = 0x0027392C; // stops every live voice but key (-1: all); from CAudioWorld__StopAllSounds
+SndVoicePool_Construct = 0x00273A94; // builds the volume curve D_800F2940, inits 17 voices; from CAudioWorld__Initialize
+SndVoicePool_GetVoiceState = 0x00273B90; // alSndpSetSound + alSndpGetState of voice idx; from StartVoice
+SndVoicePool_PlayVoice = 0x00273BF8; // alSndpPlay, flags |= 8; from StartVoice
+SndVoicePool_StopGroupVoice = 0x00273C5C; // stops the voice of the same cue/group (flag 0x40 exclusive); from PlayLayer
+SndVoicePool_IsSoundPlaying = 0x00273D88; // any live voice with soundId == id; from PlayLayer
+SndVoicePool_StopVoice = 0x00273DD8; // stops voice idx; from StopHandle
+SndVoicePool_ClearFollow = 0x00273E78; // file comment: clears every voice's follow pointer
+SndVoicePool_FindSoundWithOwner = 0x002740E8; // voice with soundId == a and owner (+0xB4) == b; PlayLayer's flag-0x1000 dedup
+SndVoicePool_StopSound = 0x00274144; // stops voices with soundId == key
+SndVoicePool_StopByOwner = 0x0027421C; // stops voices whose owner (+0xB4) == key
+SndVoicePool_StopByFlags = 0x002742F4; // stops voices with flags & mask
+SndVoicePool_ReleaseVoice = 0x00274A98; // alSndpDeallocate + reset of voice idx
+
+// sound math
+Sound_DistanceFalloff = 0x002743D0; // file comment: 1 - d^2 / D_800B2A30 inside, 0 outside
+Sound_CentsToPitch = 0x00274440; // file comment: table every 60 cents from -6000 (inlined in SndVoice_UpdatePitch)
+Sound_RandomVolume = 0x00274560; // random between two bytes / 255 (InitVolume's computation)
+Sound_DistanceAttenuation = 0x002745DC; // file comment: the distance curve by vp.distanceMode
+
+// SndSeq (the MIDI music sequence at SndMgr 0x1D64, an ALCSPlayer)
+SndSeq_Update = 0x00274B40; // per-frame state machine: looks the song up, alCSPSetSeq/Bank/Play, fades; from CAudioWorld__Update
+SndSeq_Construct = 0x00274F34; // alCSPNew (20 voices, 192 events); from CAudioWorld__Initialize
+SndSeq_UpdateFade = 0x00275018; // file header: fade out (flags 2 -> 4, alCSPStop) and volume slide
+SndSeq_SelectSong = 0x00275100; // looks key up in table2B60, sets the sequence/volume/fade time; returns found
+SndSeq_FadeOut = 0x002751BC; // flags = 2, state 0x20, fadeStep
+SndSeq_Duck = 0x00275224; // sliding = 1, target 0
+SndSeq_Unduck = 0x00275234; // sliding = 0, target 1.0
+SndSeq_Stop = 0x00275248; // index = -1, stops the csp (func_00290EF0)
+SndSeq_GetSongData = 0x00275270; // SelectSong's lookup, returns the sequence data
+SndSeq_SetVolume = 0x00275324; // alCSPSetVol(f * 32767) and keeps it
+SndSeq_UpdateVolume = 0x00275378; // volume from the 0x2BA4 option, duck/mute, alCSPSetVol on change
+SndSeq_Load = 0x00275450; // alCSeqNew + alCSPSetSeq + SetBank + channel FX 0 + vol (SndSeq_Update's 0x80 case without the play)
+
+// the sound API (turok3 sound.c; each passes &D_800F2A00 to a CAudioWorld method)
+Sound__Initialize = 0x00275520; // turok3 sound.c Sound__Initialize: CAudioWorld__Initialize(&D_800F2A00); last call of CEngineApp__Construct as in turok3
+Sound__Play = 0x00275544; // CAudioWorld__PlaySound(id, pos, ...) unless sound is off (D_8011ACA0); 49 callers
+Sound__PlayPitched = 0x002755B0; // CAudioWorld__PlaySoundPitched
+Sound__Play2D = 0x00275624; // zero position, CAudioWorld__SetForce2D(1) around PlaySound; 30 callers
+Sound__PlayIndex = 0x002756D8; // CAudioWorld__PlaySoundIndex
+Sound__PlayIndex2D = 0x0027573C; // CAudioWorld__PlaySoundIndex with Force2D
+Sound__IsPlaying = 0x002757E4; // CAudioWorld__CountHandleVoices != 0; LoopSounds_Update drops a handle when it is 0
+Sound__PlaySpeech = 0x0027580C; // CAudioWorld__PlaySpeech unless sound is off; callers pass the voice of an on-screen message (text/voice tables D_800B69D8/DC)
+Sound__StopSpeech = 0x00275840; // CAudioWorld__StopSpeech
+Sound__Stop = 0x00275864; // CAudioWorld__StopHandle(handle): LoopSounds_Stop/Pause pass a node's play handle
+Sound__StopSoundId = 0x0027588C; // CAudioWorld__StopSound; callers pass effect ids 0x1A5/0x1A7/0x1A9
+Sound__StopOwner = 0x002758B4; // CAudioWorld__StopSoundsByOwner; func_00246918 passes the owning actor
+Sound__StopFlags = 0x002758DC; // CAudioWorld__StopSoundsByFlags; callers pass 0x1000 on leaving a level
+Sound__StopAllExcept = 0x00275904; // CAudioWorld__StopAllSounds; callers pass -1 (all) or 300
+Sound__Update = 0x0027592C; // CAudioWorld__Update; called by the audio frame task func_0026FD88
+Sound__SetAmbientTrack = 0x00275950; // writes mgr->track (D_800F2B34) and the gate; CCamera__AdvanceAttributes passes the region's m_Music1
+Sound__SetForce2D = 0x0027598C; // writes mgr->unk2BAC (CAudioWorld__SetForce2D's field); menus set 1, the game 0
+Music_GetTrack = 0x002759B4; // returns D_800F478C; callers keep it in D_800C1F70 and restore it with Music_SetTrack
+Music_SetTrack = 0x002759C4; // unless sound is off: on change D_800F478C = track, 0 fades out; CCamera__AdvanceAttributes passes the region's m_Music2
+Music_FadeOut = 0x00275A08; // CAudioWorld__FadeOutMusic
+Music_Stop = 0x00275A2C; // CAudioWorld__StopMusic
+Music_DuckVolume = 0x00275A50; // CAudioWorld__DuckMusic: sliding = 1, target 0
+Music_RestoreVolume = 0x00275A74; // CAudioWorld__UnduckMusic; called when menus/pause close
+Sound__DisableAmbientTrack = 0x00275A98; // CAudioWorld__SetAmbientTrackEnabled(mgr, 0)
+Sound__EnableAmbientTrack = 0x00275ABC; // CAudioWorld__SetAmbientTrackEnabled(mgr, 1); with LoopSounds_Resume when the pause ends
+Sound__SetListener = 0x00275AE0; // CAudioWorld__SetListener; callers pass &m_MainCamera / a camera
+Sound__SetMuted = 0x00275B08; // CAudioWorld__SetMuted; func_0024C47C each frame
+Sound__SetReverb = 0x00275B30; // CAudioWorld__SetFxMix; callers pass 1 - ceiling height / 1024 in regions flagged 0x40, else 0
+Sound__DetachAll = 0x00275B58; // CAudioWorld__DetachAllVoices; with Sound__StopFlags(0x1000) on leaving a level
+Sound__Lock = 0x00275B7C; // CAudioWorld__Lock; func_0026FD88 takes it around building the audio list
+Sound__Unlock = 0x00275BA0; // CAudioWorld__Unlock
+
+// looping sounds (D_800E6A90: free CList at 0, used at 0x14, paused flag at 0x28; CPlayer.m_pLoopingSound_* point at its nodes)
+LoopSounds_Construct = 0x00275BE8; // CList__Construct of both lists, N nodes on the free one; (D_800E6A90, D_800E68B0, 15) at level load
+LoopSounds_Start = 0x00275C6C; // a free node to the used list, Sound__Play, keeps handle/sound/pos/owner; returns the node (CPlayer m_pLoopingSound_*)
+LoopSounds_Stop = 0x00275D34; // finds the node, Sound__Stop(handle), back to the free list; callers pass m_pLoopingSound_WeaponBackground/Firing
+LoopSounds_Pause = 0x00275DC0; // Sound__Stop of every used node, keeps them, paused = 1; pause/menu entry handlers
+LoopSounds_Resume = 0x00275E1C; // replays every used node, paused = 0; pause exit handlers
+LoopSounds_Update = 0x00275E98; // unless paused, clears the nodes whose handle stopped (Sound__IsPlaying == 0); func_00226490 each frame
+LoopSounds_StopAll = 0x00275EFC; // Sound__Stop of every used node, all back to the free list; level/game reset
+LoopSounds_Get = 0x00275F7C; // returns &D_800E6A90, which every LoopSounds_* caller passes
+
+// SndQueue (the sound request queue at SndMgr 0x138)
+SndQueue_Add = 0x00275FA0; // a free node: handle = mgr->handle++, group/priority/sample/pan/flags/pitch from the SoundEffectInfo, inserted by priority; from CAudioWorld__PlayLayer
+SndQueue_Update = 0x00276180; // per frame: delays, drops requests 16 frames old, finds a voice (SndVoicePool_FindSlot) + alSndpAllocate, copies the 0xCC body and starts it
+SndQueue_InitNode = 0x002763AC; // node linked to itself + SndVoice_Construct: the per-node init SndQueue_Construct inlines
+SndQueue_Unlink = 0x002763D4; // unhooks a node from its doubly linked list and returns it
+SndQueue_Construct = 0x002763F4; // owner, two sentinels, 32 linked nodes; CAudioWorld__Initialize passes (&m->queue, m)
+SndQueue_RequeueVoice = 0x002764C4; // copies the mgr's 0xCC voice to a free node, inserted by priority; StartVoice with index 16
+SndQueue_CancelHandle = 0x002765F4; // moves the requests with handle == arg out; from CAudioWorld__StopHandle
+SndQueue_CancelAllExcept = 0x00276658; // moves all (or all but key) out; from CAudioWorld__StopAllSounds
+SndQueue_CancelSoundId = 0x002766C8; // by key; from CAudioWorld__StopSound
+SndQueue_CancelOwner = 0x0027672C; // by owner (+0xBC = voice +0xB4); from CAudioWorld__StopSoundsByOwner
+SndQueue_CancelFlags = 0x00276790; // by flags & mask; from CAudioWorld__StopSoundsByFlags
+
+// SoundEffectInfo getters (structs/sound.h: "read through the accessors at 0x276820..0x2768BC")
+SoundEffectInfo_GetGroup = 0x00276820; // return info->group
+SoundEffectInfo_GetSample = 0x0027682C; // return info->sample
+SoundEffectInfo_GetPriority = 0x00276838; // return info->priority
+SoundEffectInfo_GetChance = 0x00276844; // return info->chance; SndVoicePool_AllocVoice rolls % 100 against it
+SoundEffectInfo_GetPan = 0x00276868; // flags >> 14
+SoundEffectInfo_GetPitch = 0x00276874; // return info->pitch
+SoundEffectInfo_GetFlags = 0x00276898; // flags & 0x3FFF
+SoundEffectInfo_GetRandomRange0 = 0x002768A4; // return info->randomRange0
+SoundEffectInfo_GetRandomRange1 = 0x002768B0; // return info->randomRange1
+SoundEffectInfo_GetPanEnvelope = 0x002768BC; // info->unkC, which SndVoice_InitPan uses as the pan envelope id
+
+// the speech player (SndMgr 0x2BC0; Rage Wars' field is dialog[0]; streamed samples from table 0x2B50)
+SpeechPlayer_Update = 0x002768D0; // per-frame state machine (idle, start: header tempo/volume + sample, alSndp pitch/vol/pri/pan/play; stopped; playing); from CAudioWorld__Update
+SpeechPlayer_Play = 0x00276B10; // a random entry of a group, request++, restarts if playing; from CAudioWorld__PlaySpeech (callers pass message text/voice pairs)
+SpeechPlayer_Construct = 0x00276D98; // owner = mgr, state 0, volume 0x40, alSndpAllocate; from CAudioWorld__Initialize
+SpeechPlayer_Stop = 0x00276DFC; // locked: unless state 0/2, state = 2, alSndpSetSound + alSndpStop; from CAudioWorld__StopSpeech / StopAllSounds
+SpeechPlayer_PickEntry = 0x00276E78; // a random entry of the group avoiding `avoid`: the pick SpeechPlayer_Play inlines
+SpeechPlayer_ReadHeader = 0x00276F90; // reads entry 2*n's header in table 0x2B50: tempo * 0.01 and volume, as SpeechPlayer_Update does
+SpeechPlayer_StopUnlocked = 0x00277024; // SpeechPlayer_Stop's body without the lock: unless state 0/2, state = 2, alSndpSetSound(0x3C) + alSndpStop (func_00293EC0)
+
+// COnScreen boss bars (g_OnScreen = D_801100F0; fields of structs/player.h)
+COnScreen__DrawBossBar = 0x00277090; // (os, 1/2): eases m_BossOverlay(2).m_Value toward m_BossPercent(2), fill rect + frame sprite 0x191; only caller COnScreen__DrawBossBars
+COnScreen__DrawBossBars = 0x0027ADA8; // sprite mode with HUD alpha D_8011AAEA, then DrawBossBar(os,1) if m_pBoss, (os,2) if m_pBoss2
+COnScreen__SetBoss = 0x0027AD24; // m_pBoss, m_pBossName, m_BossPercent = 100, boss script D_800B2C50 on m_BossOverlay (docs/HUD.md)
+COnScreen__SetBoss2 = 0x0027AD54; // the same on m_pBoss2/m_pBossName2/m_BossPercent2, script D_800B2C64 on m_BossOverlay2
+COnScreen__SetBossPercent = 0x0027AD88; // m_BossPercent = arg; boss code passes 0..100
+COnScreen__SetBossPercent2 = 0x0027AD90; // m_BossPercent2 = arg
+COnScreen__ClearBoss = 0x0027AD98; // m_pBoss = 0 (hides bar 1) when the fight ends
+COnScreen__ClearBoss2 = 0x0027ADA0; // m_pBoss2 = 0
+
+// COverlay (HUD element scripts, docs/HUD.md)
+COverlay__Update = 0x00277328; // docs/HUD.md: the overlay script interpreter, one step of m_pScript (ops 0-6) a frame
+COverlay__Construct = 0x0027ACC4; // (ov, x, y): m_bOnScreen 0, m_Mode 0, m_PositionX/Y, m_Value -1; the player HUD init func_0042DE74 does every CPlayer overlay
+COverlay__StartScript = 0x0027AD00; // docs/HUD.md: m_pScript = script, m_Mode = 2, then COverlay__Update
+
+// COnScreen fonts and text
+COnScreen__BeginText = 0x00277F6C; // 2-cycle text render state, loads the font texture as font 0 (D_800F56A8), resets colour (SetFontColor), scale, spacing D_801101B0
+COnScreen__SelectNormalFont = 0x00278188; // loads the font texture with a 16x16 tile, D_800F56A8 = 0 (the 24-pixel font) without the render state
+COnScreen__SelectSmallFont = 0x0027836C; // D_800F56A8 = 1 (12-pixel advance); menu font switch 1 is BeginText + this
+COnScreen__SelectFont2 = 0x0027B0D4; // SelectSmallFont then D_800F56A8 = 2
+COnScreen__SelectFont3 = 0x00278278; // D_800F56A8 = 3 (16-pixel advance)
+COnScreen__SelectTinyFont = 0x0027845C; // D_800F56A8 = 4 (8-pixel advance); menu font switch 2 is BeginText + this
+COnScreen__GetFontAdvance = 0x0027BAEC; // the advance of the font D_800F56A8 selects: 24, 12, 16, 8, 6 pixels as the Select* functions set
+COnScreen__LoadFontTexture = 0x0027B40C; // copies 0x90 bytes of resource 2 frame 42 to D_800F5618, points D_800B2AC0 at it; called from func_0042EB50 (COnScreen construction)
+COnScreen__GetFontTexture = 0x0027B4EC; // returns D_800B2AC0, the texture the font selects load
+COnScreen__BuildCharacterLookUp = 0x0027BA8C; // 128-entry table from (index, value) pairs; func_0042EB50 builds COnScreen.m_CharacterSmallLookUpPos with it
+COnScreen__DrawString = 0x00278CDC; // (text,x,y,alpha,centred,shadow,sx,sy): centres and fits the screen width, env/prim colour from the style, then COnScreen__DrawText (shadow first)
+COnScreen__DrawTextShadowed = 0x0027B274; // COnScreen__DrawText's shadow pass when asked, then the normal pass (RW func_802AAB7C_de)
+
+// HUD draw primitives (display list D_800D8E24)
+Hud_SetupFillMode = 0x0027AF4C; // pipe sync, 1-cycle, combine/render mode for flat fills; before Hud_FillRect / Hud_DrawBevelBox
+Hud_SetupTextureMode = 0x00279028; // (alpha): 2-cycle, env colour white + alpha, texture on, filter from D_800C2038; before HUD sprites (15 callers)
+Hud_FillRect = 0x0027AFAC; // (x0,y0,x1,y1,r,g,b,a): prim colour + fill rectangle; the boss bar's fill
+Hud_DrawBoxOutline = 0x00277668; // file comment: a box outline `border` pixels thick as four fill rectangles
+Hud_DrawBevelBox = 0x002778A8; // filled box, light top/right and dark bottom/left edges (invert swaps them); menus
+Hud_DrawNumber = 0x00277CF0; // docs/HUD.md "Draw a number": up to 4 digits with the font sprites, minDigits, right-aligned
+Hud_DrawGlyph16x8 = 0x0027854C; // file comment: a 16x8 I4 texture as a scaled texture rectangle
+Hud_DrawGlyph16x16 = 0x0027B0FC; // file comment: the 16x16 twin of Hud_DrawGlyph16x8 (D_800B2C90 loads it)
+
+// HUD images and sprites
+Hud_DrawSprite = 0x0027B320; // docs/HUD.md "Draw a HUD sprite": (id, frame, x, y, sx, sy, scaled), requests the image from the cache, Hud_DrawImageFrame
+Hud_GetSpriteSize = 0x0027AEA8; // (id, frame, &w, &h) from the frame's grid header; the boss bar sizes sprite 0x191 with it
+Hud_GetImageFrame = 0x0027AE44; // file comment: frame table lookup, frame % count -> data + opaque byte
+Hud_DrawImageFrame = 0x0027A7A0; // one frame of a tiled image block by block, opaque I4 or RGBA16 through an I4 mask, scaled or not (DrawText, DrawNumber, DrawSprite use it)
+Hud_DrawI4Block = 0x0027A2C4; // one I4 block as an unscaled texture rectangle (RW func_802A9CD0_de)
+Hud_DrawI4BlockScaled = 0x0027A4DC; // the same scaled by (sx, sy)
+Hud_DrawMaskedBlock = 0x00279158; // an RGBA16 block through an I4 mask (TMEM 0x100), unscaled (RW func_802A9364_de)
+Hud_DrawMaskedBlockScaled = 0x00279528; // file comment: the same scaled, clipped at the top left
+Hud_DrawMaskedBlockAt = 0x00279AC4; // file comment: masked block, 32x32 wrap, starting at texel (s, t)
+Hud_DrawMaskedBlockSized = 0x00279EEC; // file comment: masked block drawn width x height at one texel a pixel
+Hud_DrawI4Image = 0x0027B7E0; // Hud_DrawImageFrame's grid loop on its own: I4 blocks, unscaled
+Hud_DrawI4ImageScaled = 0x0027B8E0; // the grid loop, I4 blocks scaled
+Hud_DrawMaskedImage = 0x0027B4FC; // the grid loop, masked blocks unscaled
+Hud_DrawMaskedImageScaled = 0x0027B614; // the grid loop, masked blocks scaled
+
+// the attract-mode demo player D_800F56B0 (structs/demo.h)
+Demo_UpdateInput = 0x0027BB80; // while a demo plays: func_0042F344 feeds the decoded values to the controllers, then buttonsSingle from previous/now; from CEngineApp__UpdateControllers
+Demo_GetPlayerCount = 0x0027BC34; // DemoPlayer.playerCount while unk4 or playing is set, else 0 (15 callers test "a demo is running")
+Demo_AdvanceMatchStream = 0x0027BC68; // decodes the match stream (DemoPlayer.match, every frame in fastForward) into D_8011AD10, as demo.h describes; from CEngineApp__Update
+
+// CShake (camera shake sources, structs/camera.h; Rage Wars' Effect33920 / AxisWave)
+CShakeAxis__Advance = 0x0027BD30; // one CShakeAxis a frame (RW func_802337D0_de, called per axis by CCameraPool__Advance and CCamera__Advance), returns done
+CShake__ApplyOffset = 0x0027BE90; // adds a shake source's offset, falling off over m_Radius, to a camera position; per source in CCamera__Advance (docs/CAMERA.md)
+CShakeAxis__Construct = 0x00281B64; // zeroes m_Shake, m_LastShake, m_Amp, m_Angle
+CShakeAxis__Set = 0x00281B78; // (axis, amp, type): m_Type = type, m_Shake = amp * 0.1 (docs/CAMERA.md "a tenth of each amplitude")
+CShakeAxis__GetOffset = 0x00281B94; // sine of the phase * amplitude (type 1) or random +-amplitude (type 0), as CShake__ApplyOffset inlines
+CShake__Construct = 0x00281C08; // m_vPos 0, m_Radius 1.0, the three axes cleared
+CShake__Set = 0x00281C60; // position, radius, wave type and a tenth of each amplitude on the three axes (what CCameraPool__StartShake does)
+CShake__Advance = 0x00281CC0; // CShakeAxis__Advance on m_XAxis/m_YAxis/m_ZAxis, done when all three are
+
+// CCamera (structs/camera.h, docs/CAMERA.md; LibTEngine names from the doc's italics)
+CCamera__DrawTints = 0x0027C1E8; // docs/CAMERA.md: LibTEngine's CCamera DrawTints
+CCamera__UpdateFlash = 0x0027C074; // docs/CAMERA.md screen flash: runs the rise/hold/fade state machine on m_FlashMode
+CCamera__CycleLightAndFog = 0x0027C4E4; // docs/CAMERA.md: cycles a display list light (D_800AB0D0) and the fog colour with the frame counter
+CCamera__AdvanceAttributes = 0x0027CAB0; // docs/CAMERA.md: LibTEngine's AdvanceAttributes (the region set's fog, far clip, FOV, music)
+CCamera__Advance = 0x0027D160; // file comment / docs/CAMERA.md: LibTEngine's CCamera Advance
+CCamera__DisplayListSetup = 0x0027E000; // file comment / docs/CAMERA.md: LibTEngine's DisplayListSetup
+CCamera__DrawScene = 0x0027E770; // docs/CAMERA.md: LibTEngine's DrawScene
+CCamera__MoveViewport = 0x0027EA88; // docs/CAMERA.md: moves the viewport toward a size and a place, 16 pixels a frame
+CCamera__DrawBorder = 0x0027F64C; // file comment: a one-pixel frame around the viewport (split-screen borders)
+CCamera__DrawGlare = 0x002803E8; // docs/CAMERA.md: a glare from a screen point, fading toward the edges (the sun's lens flare)
+CCamera__DrawGlares = 0x00280AA0; // docs/CAMERA.md: the glares of the objects the camera sees (flag 0x80000), each through CCamera__DrawGlare
+CCameraViewParams__Construct = 0x00280C28; // fills a CCameraViewParams (0x44): m_nType 1, rotation/offsets 0, m_qGround w = 1.0, no region, m_VisBits = D_800B6D00[0]; callers the camera init func_0042F9B0 / func_004688D0
+CCamera__SetViewParams = 0x00280C94; // stores its 13 args to m_ViewParams (0x24..0x60), then the region and m_VisBits (as CCamera__UpdateVisBits); caller the player update func_0024C47C
+CCamera__GetViewOrigin = 0x00280E40; // returns m_vTCorners[0] (the apex of the five view-volume points); CEmitterPool__Advance compares its y with the water height
+CCamera__SetMode = 0x00280E64; // m_Mode = mode, m_Time/m_Stage/m_StageTime 0, runs the mode table D_800B6CB0's enter handler (docs/CAMERA.md: mode table)
+CCamera__ResetWaterWobble = 0x00280EAC; // docs/CAMERA.md: resets the under-water wobble
+CCamera__DrawHitFlash = 0x00280EE8; // fades m_Flash by m_FlashDec and draws it red over the viewport: DrawTints' red hit flash on its own
+CCamera__DrawFlash = 0x00280FD8; // docs/CAMERA.md: draws the flash over the viewport
+CCamera__SetHitFlash = 0x00281054; // docs/CAMERA.md: m_Flash and m_FlashDec, the red hit flash
+CCamera__StartFlash = 0x00281060; // docs/CAMERA.md: starts the screen flash (opacity, colour, attack/sustain/decay frames)
+CCamera__GetFogColor = 0x002810A0; // docs/CAMERA.md: the fog colour to 5 bits a channel, black under flag 0x4000
+CCamera__WorldToScreen = 0x002810EC; // docs/CAMERA.md: where a world point falls on the screen
+CCamera__GetPlayer = 0x00281194; // docs/CAMERA.md: the CPlayer whose m_pCamera this is
+CCamera__SetShake = 0x002811CC; // docs/CAMERA.md: sets the camera's own shake (m_Shake)
+CCamera__IsPointVisible = 0x0028124C; // docs/CAMERA.md: tests a point against m_ViewVolume's six planes
+CCamera__ResetWarp = 0x00281278; // docs/CAMERA.md warp: reset
+CCamera__StartWarp1 = 0x002812AC; // docs/CAMERA.md warp: starts mode 1
+CCamera__StartWarp2 = 0x002812BC; // docs/CAMERA.md warp: starts mode 2
+CCamera__LoadOnScreenProjection = 0x002812CC; // docs/CAMERA.md: gSPMatrix of m_mOnScreenProjection[frame]
+CCamera__DistanceTo = 0x0028130C; // docs/CAMERA.md: distance from m_vPos to a point
+CCamera__ConstructSkySystem = 0x00281A98; // func_0042FFF0(&m_SkySystem), the CEmitterPool constructor (structs/emitter.h); callers the camera init func_0042F9B0 / func_004688D0
+CCamera__UpdateTremor = 0x00281D1C; // docs/CAMERA.md: the tremor of a region flagged 0x10000
+CCamera__UpdateVisBits = 0x00281E4C; // file comment: the camera's visibility bits from its region when 5 to 11 units above its floor, else D_800B6D00
+
+// CCameraPool
+CCameraPool__Advance = 0x0027ECF0; // docs/CAMERA.md "The pool": lays out the viewports, advances the shake sources and the cameras; from CEngineApp__Draw
+CCameraPool__Draw = 0x0027F2C4; // per camera DisplayListSetup, DrawScene, DrawTints, texts, border, then the main camera; from func_00220530
+CCameraPool__AddText = 0x0027FC2C; // file comment: a string over a camera for a second, one text per line, no id; 20 callers (level names, messages)
+CCameraPool__AdvanceCinemaText = 0x0027FDE4; // docs/CAMERA.md AdvanceText: the texts while a cinema path plays (CCameraPool__AdvanceText hands over to it then)
+CCameraPool__AdvanceText = 0x002800A0; // file comment: a camera's texts each frame outside a cinema path: stacked, grow/stay/shrink, finished ones back to the pool
+CCameraPool__StartShake = 0x0028135C; // docs/CAMERA.md: starts one of the pool's shake sources (or reuses the newest)
+CCameraPool__GetNearestCamera = 0x00281444; // docs/CAMERA.md: the active camera nearest a point, for sound; the audio code (CAudioWorld__Update, PlayLayer) calls it
+CCameraPool__GetAverageDistance = 0x00281518; // docs/CAMERA.md: average distance from the active cameras
+CCameraPool__AddSmallText = 0x002815E0; // CCameraPool__AddText, then the text's m_bSmall = 1
+CCameraPool__AddTimedText = 0x00281610; // file comment: AddText with a display time `secs`
+CCameraPool__AddMultiLineText = 0x002817A0; // docs/CAMERA.md: LibTEngine's AddMultiLineText (with an id, same-id texts go first)
+CCameraPool__ReleaseCameraTexts = 0x00281974; // every text of a camera's m_ActiveTextList back to the pool's m_FreeTextList (0xF0C)
+CCameraPool__ReleaseAllTexts = 0x002819E0; // the same for the main camera and every active camera; from Cinema_Start
+CCameraPool__TakeText = 0x00281AB4; // docs/CAMERA.md: takes a free text for a camera
+CCameraPool__ReleaseText = 0x00281B14; // file comment: a camera's text back to the pool's free list
+CCameraText__Reset = 0x00281B58; // m_nMode = 0, m_nId = 0 (file comment: resets a camera text)
+CCameraPool__AllocCameras = 0x00281F84; // file comment: allocates the pool's cameras and clears them
+CCameraPool__AllocTexts = 0x00281FF8; // docs/CAMERA.md: allocates the pool's texts
+CCameraPool__FreeCameras = 0x0028205C; // docs/CAMERA.md: frees the cameras
+CCameraPool__FreeTexts = 0x002820B4; // docs/CAMERA.md: frees the pool's texts
+CCameraPool__StepToward = 0x002820FC; // file comment: value toward target by step (straight there while SavedPlayers_IsActive), sets D_800F5A40[1] while it moves
+CCameraPool__AddTextEx = 0x002821AC; // file comment: AddText with a start mode, display time and id
+
+// the region emitters (CEmitterPool = CCamera.m_SkySystem, structs/emitter.h)
+CEmitter__Draw = 0x00282340; // emitter.h: "func_00282340 draws one" (a translucent fan at its depth)
+CEmitterPool__Advance = 0x00282E4C; // emitter.h: "func_00282E4C updates them" (starts those the region asks for); from CCamera__Advance
+CEmitterPool__Draw = 0x00283238; // emitter.h: "func_00283238 sorts them around the camera's height" and draws them; from CCamera__DrawScene
+CEmitter__Start = 0x002834CC; // def, mask, texture (func_00207914), scale, offsets: the start CEmitterPool__Advance inlines (its comment says so)
+CEmitter__Advance = 0x00283550; // throttle/phase/height step, 1 once wound down: inlined in CEmitterPool__Advance (its comment says so)
+CEmitterPool__TakeEmitter = 0x002836E4; // file comment: first free emitter to the active list
+CEmitterPool__ReleaseEmitter = 0x00283730; // m_ActiveList (0x8B4) to m_FreeList (0x8A0)
+Emitter_SwapPointers = 0x00283770; // swaps two pointers; CEmitterPool__Draw's sort
+Emitter_CompareHeightDesc = 0x00283784; // comparator on CEmitter.m_Height (0x210), descending; CEmitterPool__Draw
+Emitter_CompareHeightAsc = 0x002837B0; // the same ascending
+
+// cinema state (*D_800C1BB0, structs/cinema.h; turok3 cinema.c)
+Cinema__Initialize = 0x002837E0; // turok3 cinema.c Cinema__Initialize: clears the cinema state; called from CEngineApp__Construct where turok3's calls it
+Cinema_Start = 0x002838A4; // file comment: once, resets the player (remembering its start), warps to the pending warp id, marks it started; from Cinema_Update / Cinema_AdvanceClock
+Cinema_RestorePlayer = 0x00283A4C; // file comment: puts the player back where Cinema_Start saw it start; from Cinema_RunEnd / Cinema_Update
+Cinema_StartPending = 0x00283BC0; // when entryIndex != -1: starts that entry (func_0040FD6C) and clears it (RW CAMERA/80243A80_6.CPP)
+Cinema_Update = 0x00283CD4; // once a frame (D_800B6D18 change): pending entry, clock, start, end/close callbacks, fade; from CEngineApp__Draw
+Cinema_SetNextCallbacks = 0x00283FF8; // if the playing cinema is script arg0, keeps arg1/arg2 as nextOnClose/nextOnEnd, else runs them now; level/AI scripts (7 callers)
+Cinema_Stop = 0x00284080; // on a mode switch (only caller EngineMode17_Switch_Retrace): runs the end and close, frees the track, clears the state
+Cinema_TrySkip = 0x002840EC; // START during a skippable cinema (func_00251FC4): fading = 1, fade = 1.0
+Cinema_IsSkippable = 0x00284144; // scriptId == 0x50; only caller Cinema_TrySkip
+Cinema_IsPending = 0x0028415C; // entryIndex != -1
+Cinema_IsActive = 0x00284174; // returns Cinema.active; 26 callers
+Cinema_PathDone = 0x002841D0; // !active || time > endTime (RW func_802457E0_de)
+Cinema_IsIdle = 0x00284204; // !active && !Cinema_IsPending
+Cinema_IsFinished = 0x00284240; // returns Cinema.finished
+Cinema_UpdateCameraIfActive = 0x00284254; // if active, Cinema_UpdateCamera (func_00410CE8, n7)(cam) drives the camera along the cinema paths; from CCamera__Advance
+Cinema_DrawOverlay = 0x00284284; // if active, func_00411EF8(rect) fills the cinema's screen rectangle; from CCamera__DrawTints
+Cinema_Enable = 0x002842B4; // D_800C1BB8 = 1, the flag every cinema-table lookup checks
+Cinema_Disable = 0x002842C8; // D_800C1BB8 = 0
+Cinema_IsEnabled = 0x002842D8; // returns D_800C1BB8
+Cinema_ClearFinished = 0x002842E8; // finished = 0
+Cinema_FollowsPlayer = 0x002842F8; // Cinema_PathPlaying && spec.flags & 2; the player draw func_00253148
+Cinema_OverridesMusic2 = 0x00284330; // active ? spec.unk44 : 0; CCamera__AdvanceAttributes starts the region's m_Music2 only when 0
+Cinema_OverridesMusic1 = 0x00284358; // active ? spec.unk40 : 0; the same for m_Music1
+Cinema_GetCameraFov = 0x00284390; // active ? Cinema_GetFOV (func_00410BB4, n7)(time) : 47.5; the projection FOV in CCamera__Advance
+Cinema_GetFarClip = 0x002843D4; // spec.scale * 10.24; CCamera__Advance sets m_FarClip from it
+Cinema_GetFogColor = 0x002843F4; // spec.unk48; CCamera__Advance's cinematic fog colour
+Cinema_GetScriptId = 0x00284408; // returns scriptId
+Cinema_Reset = 0x0028441C; // frees the track, clears owner/resource/active/finished/fading, no callbacks
+Cinema_RunEnd = 0x00284468; // once: stops music, Cinema_RestorePlayer if asked, runs onEnd
+Cinema_Close = 0x002844F0; // once: frees the track, clears the state, runs onClose
+Cinema_AdvanceClock = 0x00284568; // time += frame time / 15, Cinema_Start at startTime, finished at clipEnd (cinema.h)
+Cinema_GetActive = 0x00284640; // returns active (a second copy of Cinema_IsActive)
+
+// CPathTrack (structs/game_object.h; the file's "sprite/texture anim" comment is wrong)
+CPathTrack__Advance = 0x00284660; // steps m_nCurrentPointIndex along path m_nCurrentPathIndex (ping-pong or loop); callers pass &ai->m_PathTrack
+CPathTrack__StartAtNearestPoint = 0x00284760; // mode 2, path = arg1, point = the nearest one (func_002261A8)
+CPathTrack__GetCurrentPoint = 0x0028479C; // func_00226160(scene, path, point): the point record
+
+// controllers, rumble and the controller pak (ControllerProfile D_800F5EC0[4], structs/controller.h)
+Controller_ReadAll = 0x002847E0; // SI state machine D_800F6750: osContGetReadData + Controller_ProcessInput per port, osContGetQuery, osContStartQuery (RW func_00263760)
+Controller_Service = 0x00284B94; // file comment: once a frame under the pak lock: reads, rumble per port, starts the next read/query
+Controller_UpdatePakInsertion = 0x00284CE0; // per watched port: CONT_CARD_ON in/out, raises D_800F6788 on re-insertion; each frame from CEngineApp__Draw
+Controller_UpdateConnection = 0x00284DAC; // from the query's CONT_NO_RESPONSE: on a new connection resets the profile, sets connected
+Controller_ProcessInput = 0x00284EB8; // stick dead zone 3 (rw_junk port docs: "the game subtracts its own dead zone of 3 (func_00263E1C)"), single/double/repeat presses
+Controller_UpdateRumble = 0x002851C0; // rumble level from the effect pools, osMotorStart/Stop
+Controller_ResetAllRumble = 0x00285304; // every connected port: motor off, rumble cleared, osMotorInit; CEngineApp__Main's pre-NMI path (turok3: "Stop rumbles")
+Controller_SetRumbleOptionAll = 0x00285410; // rumbleOn = arg on the 4 ports; 0 resets the motors and the pool D_800F5A50
+Controller_StartPressedNoCinema = 0x00285558; // buttonsSingle & START, menu sound 300 unless a cinema is active; func_00251FC4
+Controller_StartPressed = 0x002855A8; // buttonsSingle & START, menu sound 300
+Controller_ConfirmPressed = 0x002855E8; // buttonsSingle & (A|B|START), menu sound 300; 24 callers
+Controller_MenuLeft = 0x00285628; // buttonsRepeat & 0x20202 (stick/d-pad/C left), sound 0x12D
+Controller_MenuRight = 0x00285670; // buttonsRepeat & 0x40101
+Controller_MenuUp = 0x002856B8; // buttonsRepeat & 0x10808
+Controller_MenuDown = 0x00285700; // buttonsRepeat & 0x80404
+Controller_MenuBack = 0x00285748; // buttonsSingle & B, sound 0x12C
+Controller_MenuSelect = 0x00285788; // buttonsSingle & A, sound 0x12C
+Controller_LatchAll = 0x002857C8; // Controller_Latch on the 4 ports and D_800F5C78
+Controller_Latch = 0x0028582C; // file comment: copies the gathered input to the fields the game reads
+Controller_Lock = 0x00285878; // osRecvMesg on the SI/pak lock queue D_800F6758; 20 callers around pak operations
+Controller_Unlock = 0x002858A4; // osSendMesg on D_800F6758
+Controller_TakePakChanged = 0x002858CC; // reads and clears D_800F6788[port] if watched
+Controller_PakChanged = 0x0028591C; // D_800F6788[port]
+Controller_IsConnected = 0x00285960; // !(status.errno & CONT_NO_RESPONSE)
+Controller_PakInserted = 0x00285980; // status & CONT_CARD_ON
+Controller_AnyConnected = 0x00285998; // any port answers (RW func_8026464C_de)
+Controller_CountConnected = 0x002859DC; // ports that answer
+Controller_AnyPakWatched = 0x00285A20; // any D_800F5EA0[i]
+Controller_IsPakWatched = 0x00285A54; // D_800F5EA0[port]
+Controller_WatchPak = 0x00285A68; // D_800F5EA0[port] = 1
+Controller_UnwatchPak = 0x00285A80; // D_800F5EA0[port] = 0
+Controller_WatchAllPaks = 0x00285A94; // all 4 = 1; at boot from CEngineApp__Main
+Controller_UnwatchAllPaks = 0x00285ABC; // all 4 = 0
+Controller_ResetRumble = 0x00285AE0; // one port's version of Controller_ResetAllRumble's motor reset
+Controller_SetRumbleOption = 0x00285BD0; // rumbleOn = state, 0 resets the motor
+Controller_DisableMenuSounds = 0x00285CC4; // D_800B6CF8 = 0, the flag the Controller_Menu* tests use for their sound
+Controller_EnableMenuSounds = 0x00285CD4; // D_800B6CF8 = 1
+
+// CEngineApp (turok3 tengine.c, same order: Construct, Main, ..., Draw, Update, boot, Boot, Idle, AdvanceFrameData, ..., idle, mainproc, InitFade, ..., Retrace)
+CEngineApp__Construct = 0x00286440; // turok3 CEngineApp__Construct: osCreateMesgQueue 0x1000, osCreateScheduler, osScAddClient, InitFade, Cinema__Initialize, frame data loop with CSunFrameData__Construct, AdvanceFrameData, Sound__Initialize
+CEngineApp__Main = 0x00286674; // turok3 CEngineApp__Main: osCreateViManager, osViBlack, Construct, clears the frame buffers, CCollisionInfo__Reset, the retrace/done/pre-NMI message loop
+CEngineApp__BeginDisplayList = 0x00286A04; // the frame's first display list: segment 6, init lists, z image, viewport, scissor; first call of CEngineApp__Draw
+CEngineApp__SubmitGfxTask = 0x00286B58; // fills the OSScTask(s) (rspboot, gfx ucode, yield buffer), Sched_SubmitTask, advances the frame data
+Render_DrawTextLines = 0x00286E14; // file header: after rw_abu src/RENDER/render_screen_overlay.CPP Render_DrawTextLines (a NULL-terminated list of strings)
+CEngineApp__Draw = 0x00287248; // turok3's CEngineApp__Draw (called by Update): begins the list, cameras, the mode's draw handler, fade, sync, submits the task
+CEngineApp__Update = 0x00287ABC; // turok3 CEngineApp__Update: osGetTime delta, 4 retraces a frame while Cinema_PathPlaying, the frame time D_800B6D28, Draw, modeTime
+Engine_Boot = 0x002881E8; // turok3 tengine.c boot(): CEngineApp__Boot(&D_800F6CB0), called from main; `boot` is already a word in src (asm label), so prefixed
+CEngineApp__Idle = 0x00288284; // turok3 CEngineApp__Idle: memset stack, osCreateThread(mainproc), osStartThread, osSetThreadPri, spins
+CEngineApp__AdvanceFrameData = 0x00288318; // turok3 CEngineApp__AdvanceFrameData: frame count++, even/odd, current frame data, double-buffered lists
+CEngineApp__DrawFilledRect = 0x002883E0; // (app, rgba, l, t, r, b): a fill rectangle in the prim colour unless alpha is 0; fade and flashes use it
+CEngineApp__ClearDepthRect = 0x0028852C; // file comment: fills a rectangle of the z buffer with max depth, restores the colour image
+CEngineApp__UpdateControllers = 0x002886AC; // Controller_LatchAll then Demo_UpdateInput; from Draw and the pak menus
+CEngineApp__StartGameAtWarp = 0x002886D0; // validates the warp, resets the match clock D_8011ACB0, matchMode = warp, next mode 13 (game), fades out
+Util_StrCmp = 0x00288780; // byte compare -1/0/1, -1 for a NULL; checks the boot marker in main (0x0028D380)
+Util_StrCpy = 0x00288800; // file comment: strcpy (named apart from GCC's builtin)
+Engine_Idle = 0x00288838; // turok3 tengine.c idle(): CEngineApp__Idle(&D_800F6CB0, arg), the idle thread CEngineApp__Boot creates; `idle` is a local/field name in src, so prefixed
+CEngineApp__InitFade = 0x0028891C; // turok3 CEngineApp__InitFade: fadeMode 1, fade 0, fastFade 0; from CEngineApp__Construct
+CEngineApp__UpdateFade = 0x0028894C; // fades m_Settings.fade in (mode 1, faster with fastFade) or out (mode 2), below -4 switches to mode 17 (rw_junk func_002935A4)
+CEngineApp__DrawFade = 0x00288B1C; // a black rectangle over the screen at the fade's alpha (CEngineApp__DrawFilledRect); from CEngineApp__Draw
+CEngineApp__SetMode = 0x00288BC8; // mode 17 (switching), nextMode = arg, prevMode = old, fade in; Main calls it at boot where turok3 calls func_285FC4(app, 2)
+CEngineApp__SetupFadeTo = 0x00288C5C; // fadeMode 2, nextMode = arg; Main's pre-NMI does fastFade = 1 + this(e, 17), turok3's comment there: "CEngineApp__SetupFadeTo ?"
+CEngineApp__Retrace = 0x00288C80; // turok3 CEngineApp__Retrace: on Main's retrace message, the mode table's retrace handler
+CEngineApp__TimedModeSwitch = 0x00288D3C; // fades to forcedNext on a press (D_800F5D2C), else to normalNext once modeTime passes the time; the attract modes use it
+CEngineApp__StartWarp = 0x00288DD0; // resets the menu blocks at +0x22C00/+0x22BC0, warps the scene (func_0042C700) to a warp id; the cinema modes pass 100/90/111/141/130
+CEngineApp__UpdateCinemaMode = 0x00288E58; // START fades to the target (not in modes 11/12); when the cinema ends (Cinema_IsIdle) SetMode(arg1)
+CEngineApp__DrawWorld = 0x00288F60; // draws the blocks at +0x23DF0, +0x3C8, +0x22C00, +0x19440, then CEngineApp__DrawFade; draw handler of the cinema modes
+CEngineApp__UpdatePlayTime = 0x00288FDC; // file comment: the play clock in D_8011ACB0 (frames, seconds, minutes, hours) unless paused; from CEngineApp__Update
+
+// the engine mode table D_800B6D78 (turok3 gEngineModeTable; 18 rows {Init, Retrace, Draw}: Init on a switch from EngineMode17_Switch_Retrace, Retrace from CEngineApp__Retrace, Draw from CEngineApp__Draw)
+EngineMode00_PakCheck_Init = 0x00289110; // row 0 (boot): pak init func_004211AC
+EngineMode00_PakCheck_Retrace = 0x0028917C; // row 0: opens menu D_0043B738, fades to 1 once D_8011F148 is set
+EngineMode00_PakCheck_Draw = 0x00289258; // row 0: draws D_800B3634, "accessing the" / "controller pak"
+EngineMode01_Legal_Init = 0x002892D8; // row 1: one player, not multiplayer, func_0042AC0C(scene)
+EngineMode01_Legal_Retrace = 0x0028932C; // row 1: after 12 s to mode 4, or to 3 (expansion pak) when memory > 4 MB
+EngineMode01_Legal_Draw = 0x002893D8; // row 1: draws D_800B3644, the legal lines ("TUROK 2 $ SEEDS OF EVIL TM", "LICENSED BY...")
+EngineMode02_DemoWarning_Init = 0x002894C8; // row 2: empty
+EngineMode02_DemoWarning_Retrace = 0x002894D0; // row 2: CEngineApp__TimedModeSwitch(14 s, 5, 5)
+EngineMode02_DemoWarning_Draw = 0x002894F4; // row 2: draws D_800B369C, "THIS IN-STORE DEMONSTRATION / HAS BEEN EDITED TO REDUCE / VIOLENCE AND GORE"
+EngineMode03_ExpansionPak_Init = 0x00289474; // row 3
+EngineMode03_ExpansionPak_Retrace = 0x00289494; // row 3: after 4 s to mode 4, shown once (clears D_800B6D68)
+EngineMode03_ExpansionPak_Draw = 0x00285CF0; // row 3: spinning model 0xE10 + Render_DrawTextLines(D_800B36F4: "EXPANSION PAK FOUND!", "PRESS ANY BUTTON")
+EngineMode04_Cinema_Init = 0x00289554; // row 4: CEngineApp__StartWarp(100)
+EngineMode04_Cinema_Retrace = 0x00289570; // row 4: CEngineApp__UpdateCinemaMode(5, 5)
+EngineMode04_Cinema_Draw = 0x00289590; // row 4: D_800AB8A0 = 0, CEngineApp__DrawWorld
+EngineMode05_Cinema_Init = 0x002895B4; // row 5: StartWarp(90)
+EngineMode05_Cinema_Retrace = 0x002895D0; // row 5: UpdateCinemaMode(7, 7), to the title
+EngineMode05_Cinema_Draw = 0x002895F0; // row 5: DrawWorld
+EngineMode06_Init = 0x0028961C; // row 6: empty
+EngineMode06_Retrace = 0x00289624; // row 6: empty
+EngineMode06_Draw = 0x0028962C; // row 6: empty
+EngineMode07_Title_Init = 0x00289634; // row 7: Music_SetTrack(0x10)
+EngineMode07_Title_Retrace = 0x00289650; // row 7: TimedModeSwitch(20 s, 13, 8): START to the main menu (8), idle to the demo
+EngineMode07_Title_Draw = 0x00285E60; // row 7: clears the screen, draws the full-screen picture 0x386
+EngineMode08_MainMenu_Init = 0x00289688; // row 8: opens menu D_004392B0 in the menu pool
+EngineMode08_MainMenu_Retrace = 0x00289700; // row 8: input resets modeTime, idle timeout fades to 7 (title)
+EngineMode08_MainMenu_Draw = 0x00289758; // row 8: EngineMode13_Game_Draw
+EngineMode09_Cinema_Init = 0x00289774; // row 9: D_800B6D60++, StartWarp(111)
+EngineMode09_Cinema_Retrace = 0x002897A4; // row 9: UpdateCinemaMode(7, 8)
+EngineMode09_Cinema_Draw = 0x002897C4; // row 9: DrawWorld
+EngineMode10_Cinema_Init = 0x00289838; // row 10: StartWarp(111)
+EngineMode10_Cinema_Retrace = 0x00289854; // row 10: UpdateCinemaMode(13, 8)
+EngineMode10_Cinema_Draw = 0x00289888; // row 10: DrawWorld
+EngineMode11_Cinema_Init = 0x002897E0; // row 11: StartWarp(111)
+EngineMode11_Cinema_Retrace = 0x002897FC; // row 11: UpdateCinemaMode(12, 12)
+EngineMode11_Cinema_Draw = 0x0028981C; // row 11: DrawWorld
+EngineMode12_Cinema_Init = 0x002898A4; // row 12: StartWarp(141)
+EngineMode12_Cinema_Retrace = 0x002898D4; // row 12: UpdateCinemaMode(13, 13), to the game
+EngineMode12_Cinema_Draw = 0x002898F4; // row 12: DrawWorld
+EngineMode13_Game_Init = 0x00289910; // row 13 (gameplay, SavedPlayers_Arm tests mode 13): the match mode, SavedPlayers_Restore, CCollisionInfo__Reset
+EngineMode13_Game_Retrace = 0x00289A7C; // row 13: empty
+EngineMode13_Game_Draw = 0x0028908C; // row 13 (also rows 0 and 8): the same code as CEngineApp__DrawWorld
+EngineMode14_Init = 0x00289A84; // row 14: empty
+EngineMode14_Retrace = 0x00289A8C; // row 14: empty
+EngineMode14_Draw = 0x00289A94; // row 14: empty
+EngineMode15_Ending_Init = 0x00289A9C; // row 15: warp 130; skips the reset when the player's m_bPrimagenBossComplete is set
+EngineMode15_Ending_Retrace = 0x00289B60; // row 15: to mode 1 once D_800B6D70 is set; START arms a skip
+EngineMode15_Ending_Draw = 0x00289BD8; // row 15: DrawWorld + Credits_Draw + Credits_Update
+EngineMode16_Ending_Init = 0x00289C0C; // row 16: as row 15, multiplayer off, D_800B6D70 = 1
+EngineMode16_Ending_Retrace = 0x00289CE8; // row 16: as row 15
+EngineMode16_Ending_Draw = 0x00289D60; // row 16: as row 15
+EngineMode17_Switch_Init = 0x00289D94; // row 17 (game.h "17: switching"): audio fade
+EngineMode17_Switch_Retrace = 0x00289DFC; // row 17: once D_8011B110 == 2, mode = nextMode, music/sound reset, Cinema_Stop, the new row's Init
+EngineMode17_Switch_Draw = 0x00289F28; // row 17: empty
+Credits_Draw = 0x002860A4; // the scrolling credit lines D_800B66DC with fade-in; from the ending modes' draw (rows 15/16)
+Credits_Update = 0x002862A4; // scrolls the credits; after the last line waits and leaves (CEngineApp__StartGameAtWarp(0x1B57) or a mode switch)
+
+// the scheduler (libultra's sched.c as in the N64 demos, Acclaim-modified; message ids 0x29A..0x29D are VIDEO/RSP_DONE/RDP_DONE/PRE_NMI)
+__scMain = 0x0028A020; // sched.c __scMain: the loop on interruptQ (retrace, RSP, RDP, pre-NMI, and Acclaim's message 6)
+__scHandleRetrace = 0x0028A17C; // sched.c __scHandleRetrace: drains cmdQ, swaps the frame buffer, starts tasks, wakes the clients (rw_junk func_0028EAAC)
+__scHandleRSP = 0x0028A43C; // sched.c __scHandleRSP: curRSPTask done or yielded, __scTaskComplete, __scSchedule/__scExec
+__scHandleRDP = 0x0028A914; // sched.c __scHandleRDP: curRDPTask done
+__scSchedule = 0x0028ABE0; // sched.c __scSchedule: next RSP/RDP tasks from the audio/gfx lists
+osCreateScheduler = 0x0028ADF0; // sched.c: two queues, osSetEventMesg 0x29B/0x29C/0x29D, osViSetEvent 0x29A, thread __scMain; CEngineApp__Construct calls it first, as turok3's does
+osScAddClient = 0x0028AF00; // rw_abu symbol at the same place (de 0x8028F864); CEngineApp__Construct calls it after osCreateScheduler, as turok3's does
+osScRemoveClient = 0x0028AF58; // sched.c: unlinks a client with interrupts off (rw_abu func_8028F8BC_de, right after osScAddClient)
+osScGetCmdQ = 0x0028AFE8; // sched.c: returns &sc->cmdQ (0x78)
+__scAppendList = 0x0028AFF0; // rw_abu symbol at the same place (de 0x8028F954): audio tasks to the audio list, else gfx
+__scTaskReady = 0x0028B048; // sched.c __scTaskReady: NULL while the task's frame buffer is on screen or next
+__scTaskComplete = 0x0028B0A8; // sched.c __scTaskComplete: 0 while (state & 3); swaps buffers for SWAPBUFFER|LAST_TASK
+__scExec = 0x0028B0FC; // sched.c __scExec: osWritebackDCacheAll for audio, osSpTaskLoad/StartGo
+__scYield = 0x0028B274; // rw_abu symbol at the same place (de 0x8028FBD8): gfx task flags |= 0x10, osSpTaskYield
+Sched_HandleCmdMsg = 0x0028B2AC; // Acclaim's message 6: drains cmdQ into __scAppendList, raises the priority for a gfx task, yields or schedules
+Sched_GetInterruptQ = 0x0028B3E0; // returns &sc->interruptQ (0x40)
+Sched_SubmitTask = 0x0028B3E8; // osSendMesg(cmdQ, task) then osSendMesg(interruptQ, 6); from CEngineApp__SubmitGfxTask and the audio frame task
+
+// the crash screen (frame buffer text, 8x16 font D_800B6EA0)
+Crash_PutChar = 0x0028B430; // one glyph at the cursor D_800B7490/7494, handles \r \t \f \n
+Crash_PrintFlags = 0x0028B614; // "name: XXXXXXXX<flag,...>" from a {mask, value, name} table; the cause register
+Crash_PrintRegPair = 0x0028B7C0; // "name1: XXXXXXXX   name2: XXXXXXXX\n"
+Crash_PrintRegPairHighlight = 0x0028B954; // the same, second value in colour 0xF7A9
+Crash_PrintRegs4 = 0x0028BB00; // four labelled hex words on a line
+Crash_PrintStack = 0x0028BDFC; // "Call stack (top: bot: low:)" and five words from the thread's sp
+Crash_ShowScreen = 0x0028C0B0; // "TUROK2 BUILD ", warp id, player XYZ, "ASSERTION FAILED!!" / "Fault in thread", __OSThreadContext registers
+Crash_PrintHex32 = 0x0028CCB8; // 4 x Crash_PrintHex8
+Crash_PrintHex16 = 0x0028CD10; // 2 x Crash_PrintHex8
+Crash_PrintHex8 = 0x0028CD68; // two hex digits through Crash_PutChar
+Crash_PrintInt = 0x0028CDC4; // file comment: a signed decimal
+Crash_SetTextColor = 0x0028CE4C; // r, g, b to RGBA5551 in D_8011F184
+Crash_SetBackgroundColor = 0x0028CE84; // r, g, b to RGBA5551 in D_800B7498
+Crash_ResetFrameBuffer = 0x0028CEBC; // D_8011F180 = D_80130A88
+Crash_ClearScreen = 0x0028CED4; // fills the screen with the background colour (inlined in Crash_ShowScreen)
+Crash_PrintString = 0x0028CF38; // Crash_PutChar over a C string
+
+// the players kept for a restart (CSavedPlayers D_8011F290, structs/player.h)
+SavedPlayers_Arm = 0x0028CF80; // player.h: "func_0028CF80 arms it (and steps m_State)"; from VM_HandleTLBMiss before a restart
+SavedPlayers_Clear = 0x0028D0B8; // m_bActive = m_State = m_Timer = 0
+SavedPlayers_GetWarpID = 0x0028D0D0; // returns m_WarpID
+SavedPlayers_IsActive = 0x0028D0E0; // returns m_bActive (CEngineApp__Main, SetMode, EngineMode13_Game_Init)
+SavedPlayers_Deactivate = 0x0028D0F0; // m_bActive = 0
+SavedPlayers_Restore = 0x0028D100; // copies m_Data back (and pos/rotY/region in state 1); EngineMode13_Game_Init
+SavedPlayers_UpdateTimer = 0x0028D23C; // m_Timer--, m_State = 0 at zero; from CEngineApp__Retrace
+SavedPlayers_Save = 0x0028D264; // copies every player's m_Data, position, rotY, region in
+
+// boot
+Boot_CanOverwrite = 0x0028D714; // whether a word may be cleared on reset (marker, saved players, settings): main's inline copy (rw_junk func_802A7554_de)
+
+// the VM pager (turok3 vhandler.c VM_*, same order: Initialize, AcquireNextTLB, MapTLBEntry, ..., Age, osMapTLBRdb, Alloc; structs/pager.h)
+VM_Initialize = 0x0028D820; // turok3 vhandler.c VM_Initialize (first in the file): clears the pager, __osUnmapTLBAll, regions, the manager thread
+VM_AcquireNextTLB = 0x0028DAEC; // turok3 vhandler.c VM_AcquireNextTLB: the same code
+VM_MapTLBEntry = 0x0028DBAC; // turok3 VM_MapTLBEntry(s16 faultpage, t_VM_Page *, u8 faultthread, u8 *pLogicalTrans): same signature and place
+VM_UnmapTLBEntry = 0x0028DEFC; // turok3 func_225B14's place (after MapTLBEntry): drops a page's half of its TLB pair, unmaps when both are free
+VM_HandleTLBMiss = 0x0028E068; // pager.h: the TLB miss (cause 4/8) maps a resident page or queues a read; other faults arm SavedPlayers and restart
+VM_Age = 0x0028E53C; // turok3 vhandler.c VM_Age: the same code
+VM_Alloc = 0x0028E60C; // turok3 vhandler.c VM_Alloc: the same code (request 3 to the manager, waits)
+VM_Free = 0x0028E6DC; // request 2 (VM_FreeRegion) to the manager, then frees the region's block
+VM_GetStats = 0x0028E754; // copies the pager's first 0x20 bytes (requests, misses, VM_Age's figures)
+VM_ManagerThread = 0x0028E7A4; // pager.h: "the manager thread (func_0028E7A4)"
+VM_ReaderThread = 0x0028E8A4; // pager.h: "the reader thread (func_0028E8A4)": reads pages from the cart
+VM_ListRemove = 0x0028E98C; // unlinks a PageMapping from a PageChain
+VM_ListAddTail = 0x0028E9E0; // appends to a {head, tail} list (VM_Initialize builds the LRU chain with it)
+VM_ListAddHead = 0x0028EA10; // pushes at the head
+VM_FindRegion = 0x0028EA40; // file comment: the region containing a page (inlined in VM_HandleTLBMiss)
+VM_ReclaimLRUPage = 0x0028EA88; // the LRU head (D_80121290): unmaps it, clears its region's entry
+VM_FreeRegion = 0x0028EB54; // manager request 2: unlinks the region, unmaps its pages, replies
+VM_AllocRegion = 0x0028EC54; // manager request 3: appends a region, replies with its address
+VM_FinishPageJob = 0x0028ED10; // rw_abu Sched_FinishPageJob (SCHED/CODE_8023CBF8.CPP), the same code: maps the page read, resumes the thread
+
+// libultra audio: cseq.c, cspgetstate.c, csplayer.c (ultralib src/audio, in link order after __alCSeqGetTrackEvent)
+alCSeqNewMarker = 0x0028F1F0; // ultralib cseq.c alCSeqNewMarker (the file says so)
+__getTrackByte = 0x0028F460; // ultralib cseq.c __getTrackByte
+alCSeqNew = 0x0028F518; // ultralib cseq.c alCSeqNew
+alCSeqNextEvent = 0x0028F61C; // ultralib cseq.c alCSeqNextEvent
+alCSeqGetTicks = 0x0028F710; // ultralib cseq.c: returns seq->lastTicks
+alCSeqTicksToSec = 0x0028F71C; // ultralib cseq.c alCSeqTicksToSec
+alCSeqSecToTicks = 0x0028F784; // ultralib cseq.c alCSeqSecToTicks
+alCSeqSetLoc = 0x0028F828; // ultralib cseq.c alCSeqSetLoc
+alCSeqGetLoc = 0x0028F89C; // ultralib cseq.c alCSeqGetLoc
+__alCSeqNextDelta = 0x0028F910; // ultralib cseq.c __alCSeqNextDelta
+__readVarLen = 0x0028F98C; // ultralib cseq.c __readVarLen; rw_abu has the name
+alCSPGetState = 0x0028FA00; // ultralib cspgetstate.c: returns seqp->state
+alCSPNew = 0x0028FA10; // ultralib csplayer.c alCSPNew: installs __CSPVoiceHandler
+__CSPVoiceHandler = 0x0028FB80; // ultralib csplayer.c __CSPVoiceHandler (the file says so)

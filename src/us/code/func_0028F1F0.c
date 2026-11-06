@@ -8,7 +8,7 @@
 #define AL_SEQ_END_EVT 4
 #define AL_TRACK_END 0x12
 
-u32 func_0028F98C(ALCSeq *seq, u32 track);     /* __alCSeqNextDelta */
+u32 __readVarLen(ALCSeq *seq, u32 track);     /* ultralib cseq.c */
 u32 __alCSeqGetTrackEvent(ALCSeq *seq, u32 track, ALEvent *event);
 
 static __inline__ void alCSeqNew(ALCSeq *seq, u8 *ptr) {
@@ -32,7 +32,7 @@ static __inline__ void alCSeqNew(ALCSeq *seq, u8 *ptr) {
             flagTmp = 1 << i;
             seq->validTracks |= flagTmp;
             seq->curLoc[i] = (u8 *)((u32)ptr + tmpOff);
-            seq->evtDeltaTicks[i] = func_0028F98C(seq, i);
+            seq->evtDeltaTicks[i] = __readVarLen(seq, i);
         } else {
             seq->curLoc[i] = 0;
         }
@@ -68,14 +68,14 @@ static __inline__ void alCSeqNextEvent(ALCSeq *seq, ALEvent *evt) {
     seq->lastTicks += firstTime;
     seq->lastDeltaTicks = firstTime;
     if (evt->type != AL_TRACK_END) {
-        seq->evtDeltaTicks[firstTrack] += func_0028F98C(seq, firstTrack);
+        seq->evtDeltaTicks[firstTrack] += __readVarLen(seq, firstTrack);
     }
     deltaFlag = &seq->deltaFlag;
     *deltaFlag = 1;
 }
 
 /* alCSeqNewMarker: plays a copy of the sequence up to ticks and records its state in m. */
-void func_0028F1F0(ALCSeq *seq, ALCSeqMarker *m, u32 ticks) {
+void alCSeqNewMarker(ALCSeq *seq, ALCSeqMarker *m, u32 ticks) {
     ALEvent evt;
     ALCSeq tempSeq;
     s32 i;

@@ -34,15 +34,15 @@ typedef struct {
     /* 0x8A */ u8 colorFrame;
 } PlacedProp;
 
-void *func_00225E88(void *, s32);
-void func_00211074(f32 *);
-void func_00211114(f32 *, void *);
-void func_0021034C(void *, f32, f32, f32);
-void func_00210318(void *, f32, f32, f32);
-void func_00210C3C(void *);
-void func_0020FF80(f32 *, void *);
-void func_0020D274(void *, f32 *);
-f32 func_0026D210(s32);
+void *CScene__GetIntelligence(void *, s32);
+void CQuaternion__Normalize(f32 *);
+void CQuaternion__ToMatrix(f32 *, void *);
+void CMtxF__ScaleAxes(void *, f32, f32, f32);
+void CMtxF__Translate(void *, f32, f32, f32);
+void CMtxF__SwapYZRows(void *);
+void CMtxF__Copy(f32 *, void *);
+void CMtxF__ToMtxAffine(void *, f32 *);
+f32 HalfToFloat(s32);
 
 extern u8 D_800F7078[];
 extern s32 D_800ACAF0;
@@ -60,7 +60,7 @@ static __inline__ s32 next_key(void) {
     return D_800ACAF0;
 }
 
-void func_00214564(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *segments) {
+void CStaticObject__Construct(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *segments) {
     f32 rotation[4];
     u8 matrix[0x40];
 
@@ -68,17 +68,17 @@ void func_00214564(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *se
     prop->id = record->id;
     prop->owner = owner;
     prop->field1C = 0;
-    prop->model = func_00225E88(D_800F7078, record->model);
+    prop->model = CScene__GetIntelligence(D_800F7078, record->model);
     prop->flags = record->flags;
     rotation[0] = record->rotation[0] * 0.007874016f;
     rotation[1] = record->rotation[1] * 0.007874016f;
     rotation[2] = record->rotation[2] * 0.007874016f;
     rotation[3] = record->rotation[3] * 0.007874016f;
-    func_00211074(rotation);
-    func_00211114(rotation, matrix);
-    func_0021034C(matrix, record->scale[0], record->scale[1], record->scale[2]);
-    func_00210318(matrix, record->position.x, record->position.y, record->position.z);
-    func_00210C3C(matrix);
+    CQuaternion__Normalize(rotation);
+    CQuaternion__ToMatrix(rotation, matrix);
+    CMtxF__ScaleAxes(matrix, record->scale[0], record->scale[1], record->scale[2]);
+    CMtxF__Translate(matrix, record->position.x, record->position.y, record->position.z);
+    CMtxF__SwapYZRows(matrix);
     if (prop->flags & 0x40) {
         prop->min[0] = record->position.x - 102.399994f;
         prop->min[1] = record->position.y - 102.399994f;
@@ -86,16 +86,16 @@ void func_00214564(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *se
         prop->max[0] = record->position.x + 102.399994f;
         prop->max[1] = record->position.y + 102.399994f;
         prop->max[2] = record->position.z + 102.399994f;
-        func_0020FF80(prop->matrix, matrix);
+        CMtxF__Copy(prop->matrix, matrix);
         prop->value = D_800B6D00;
     } else {
-        prop->min[0] = func_0026D210(record->extents[0]) + record->position.x - 0.5f;
-        prop->min[1] = func_0026D210(record->extents[1]) + record->position.y - 0.5f;
-        prop->min[2] = func_0026D210(record->extents[2]) + record->position.z - 0.5f;
-        prop->max[0] = func_0026D210(record->extents[3]) + record->position.x + 0.5f;
-        prop->max[1] = func_0026D210(record->extents[4]) + record->position.y + 0.5f;
-        prop->max[2] = func_0026D210(record->extents[5]) + record->position.z + 0.5f;
-        func_0020D274(matrix, prop->matrix);
+        prop->min[0] = HalfToFloat(record->extents[0]) + record->position.x - 0.5f;
+        prop->min[1] = HalfToFloat(record->extents[1]) + record->position.y - 0.5f;
+        prop->min[2] = HalfToFloat(record->extents[2]) + record->position.z - 0.5f;
+        prop->max[0] = HalfToFloat(record->extents[3]) + record->position.x + 0.5f;
+        prop->max[1] = HalfToFloat(record->extents[4]) + record->position.y + 0.5f;
+        prop->max[2] = HalfToFloat(record->extents[5]) + record->position.z + 0.5f;
+        CMtxF__ToMtxAffine(matrix, prop->matrix);
         prop->value = record->value;
     }
     prop->position = record->position;

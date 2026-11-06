@@ -82,11 +82,11 @@ struct StridedTable {
 struct StridedTable;
 typedef struct StridedTable StridedTable;
 struct LevelActor;
-extern void func_0026E110(struct Shared_Actor *arg0, s32 arg1, void *arg2);
-extern void func_00246690(void *, s32, Triple, s32);
-extern s32 func_00275544(s16, CVector3, s32, s32);
+extern void GameObject_FireTriggers(struct Shared_Actor *arg0, s32 arg1, void *arg2);
+extern void Actor_SpawnParticle(void *, s32, Triple, s32);
+extern s32 Sound__Play(s16, CVector3, s32, s32);
 struct Player;
-extern void func_0024646C(struct Player *, s32 *, s32, s32, s32);
+extern void AI_SpawnParticlesOnce(struct Player *, s32 *, s32, s32, s32);
 typedef struct {
     s16 hi;
     s16 id;
@@ -478,22 +478,22 @@ extern CWorld D_800F7078;
 struct LevelActor;
 struct LevelActor;
 struct Shared_Actor;
-void func_00265D14(Obj54E0 *arg0, void *arg1) {
+void Destructible_GoDeathEnter(Obj54E0 *arg0, void *arg1) {
     Rec54E0 *rec;
     rec = &arg0->holder->r;
     arg0->flags = arg0->flags & 0xFFFEFFFF;
-    func_0026E110(arg0, 0x40000, arg0);
+    GameObject_FireTriggers(arg0, 0x40000, arg0);
     if (rec->unk2C == 0) {
         arg0->flags &= ~0x2000;
         arg0->flags &= ~0x100;
     }
     if (D_800F7078.m_Mode == 4) {
         if (rec->unk34.whole != -1) {
-            func_00275544(rec->unk34.half.id, arg0->pos.v, 0, -1);
+            Sound__Play(rec->unk34.half.id, arg0->pos.v, 0, -1);
         }
         if (rec->unk30 != -1) {
-            func_00246690(arg0, rec->unk30, arg0->pos.t, 0);
+            Actor_SpawnParticle(arg0, rec->unk30, arg0->pos.t, 0);
         }
-        func_0024646C(arg0, arg1, 8, rec->unk38, rec->unk3C);
+        AI_SpawnParticlesOnce(arg0, arg1, 8, rec->unk38, rec->unk3C);
     }
 }

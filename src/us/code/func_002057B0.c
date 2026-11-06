@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/cache.h"
 
-s32 func_002026EC(s32, s32);
-s32 func_002062F8(s32, s32);
-s32 func_002065F8(s32, s32);
+s32 CHeap__Free(s32, s32);
+s32 CCache__FreeMemEntry(s32, s32);
+s32 CCache__DetachCacheEntry(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
@@ -13,7 +13,7 @@ extern s32 D_800D1CC0;
 extern s32 D_800D8DB0;
 extern s32 D_800D8DCC;
 
-void func_002057B0(s32 arg0, CMemEntry **arg1, CMemEntry *arg2) {
+void CCache__DeallocAndReplaceCompressedData(s32 arg0, CMemEntry **arg1, CMemEntry *arg2) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v0_2;
@@ -44,9 +44,9 @@ loop_4:
         } while (temp_s0->lockCount != 0);
     }
     if (!(temp_s0->flags & 0x702)) {
-        func_002065F8(0, (s32) temp_s0);
-        func_002026EC((s32) &D_800D1CC0, temp_s0->data);
-        func_002062F8(0, (s32) temp_s0);
+        CCache__DetachCacheEntry(0, (s32) temp_s0);
+        CHeap__Free((s32) &D_800D1CC0, temp_s0->data);
+        CCache__FreeMemEntry(0, (s32) temp_s0);
     }
     *arg1 = arg2;
     temp_v0_2 = __osDisableInt();

@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 func_0026D474(void *, void *);              /* extern */
+s32 NodePool_Free(void *, void *);              /* extern */
 extern f32 D_800B6D28;
 
 /* A repeating timer: counts down by the frame time, fires its callback,
@@ -21,7 +21,7 @@ typedef struct {
     /* 0x758C */ Timer002367A0 *timerHead;
 } World002367A0;
 
-void func_002367A0(World002367A0 *arg0) {
+void SwooshSystem_UpdateTimers(World002367A0 *arg0) {
     f32 temp_f0;
     f32 temp_f1;
     s32 temp_v0;
@@ -44,7 +44,7 @@ void func_002367A0(World002367A0 *arg0) {
                 temp_v0 = var_s0->repeats - 1;
                 var_s0->repeats = temp_v0;
                 if (temp_v0 <= 0) {
-                    func_0026D474(arg0->timerList, var_s0);
+                    NodePool_Free(arg0->timerList, var_s0);
                 }
             }
             var_s0 = temp_s1;

@@ -5,24 +5,24 @@
 #include "structs/memory.h"
 
 extern u8 D_8F128560[];
-extern u32 func_002A1384(u32 address);
-extern void func_002A13F0(void);
-extern void func_002A1CB4(u32 address, s32 value, u32 count);
-extern void func_002A1D7C(u32 dst, u32 src, u32 count);
-extern void func_002A1A3C(u32 address, u32 source, u32 count);
-extern void func_002A1844(u32 port, u32 address, u32 count);
-extern void func_002A15B8(u32 port, u32 address, u32 count);
+extern u32 HostIo_ReadWord(u32 address);
+extern void HostIo_ScanTlb(void);
+extern void HostIo_FillBlock(u32 address, s32 value, u32 count);
+extern void HostIo_CopyCartBytes(u32 dst, u32 src, u32 count);
+extern void HostIo_WriteBlock(u32 address, u32 source, u32 count);
+extern void HostIo_ReadBlockRmw(u32 port, u32 address, u32 count);
+extern void HostIo_ReadBlock(u32 port, u32 address, u32 count);
 
 /* Split the debugger's memory transfer at permission boundaries. */
-void func_002A1DEC(u32 mode) {
+void HostIo_MemoryTransfer(u32 mode) {
     u32 address, remaining, chunk, flags;
     u32 port = 0xB1FE0000;
     u32 i;
 
-    address = func_002A1384(0xB1FFFFF4);
-    remaining = func_002A1384(0xB1FFFFF8);
+    address = HostIo_ReadWord(0xB1FFFFF4);
+    remaining = HostIo_ReadWord(0xB1FFFFF8);
     if (address - 0x80000000 > 0x3FFFFFFF) {
-        func_002A13F0();
+        HostIo_ScanTlb();
     }
     if (address > 0xEFFFFFFF) {
         address += (u32) D_8F128560;
@@ -44,20 +44,20 @@ void func_002A1DEC(u32 mode) {
         }
         if ((flags & mode) == 0) {
             if (mode == 1) {
-                func_002A1CB4(port, 0, chunk);
+                HostIo_FillBlock(port, 0, chunk);
             }
         } else if (flags & 4) {
             if (mode == 1) {
-                func_002A1D7C(port, address, chunk);
+                HostIo_CopyCartBytes(port, address, chunk);
             } else {
-                func_002A1D7C(address, port, chunk);
+                HostIo_CopyCartBytes(address, port, chunk);
             }
         } else if (mode == 1) {
-            func_002A1A3C(port, address, chunk);
+            HostIo_WriteBlock(port, address, chunk);
         } else if (flags & 8) {
-            func_002A1844(port, address, chunk);
+            HostIo_ReadBlockRmw(port, address, chunk);
         } else {
-            func_002A15B8(port, address, chunk);
+            HostIo_ReadBlock(port, address, chunk);
         }
         port += chunk;
         remaining -= chunk;

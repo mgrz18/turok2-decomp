@@ -30,8 +30,8 @@ extern u8 D_800AB580[];
 extern u8 D_800ACFC8[];
 extern u8 D_8011AD48[];
 extern f32 D_800F5A10[6];
-void func_0020B5B8(void);
-void func_00207A54(void);
+void Render_InvalidateModeCache(void);
+void Texture_InvalidateCache(void);
 void CList__Remove(VList *, VNode *);
 void CList__AddTail(void *, VNode *);
 void func_00235C30(VCtx *c) {
@@ -72,6 +72,6 @@ void func_00235C30(VCtx *c) {
             }
         }
     }
-    func_0020B5B8();
-    func_00207A54();
+    Render_InvalidateModeCache();
+    Texture_InvalidateCache();
 }

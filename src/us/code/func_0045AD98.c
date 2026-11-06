@@ -7,7 +7,7 @@
 extern char D_800B49DC[];
 extern char D_800B49F0[];
 extern char D_800B4A04[];
-s32 func_0045AD98(MenuItem *item) {
+s32 GameNoteMenu_UpdateDifficulty_2(MenuItem *item) {
     switch (D_800C201C->settings.difficulty) {
     default:
     case 0:

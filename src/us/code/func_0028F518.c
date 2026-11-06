@@ -5,8 +5,8 @@
 
 extern double D_800AA240;
 extern float D_800AA248;
-void func_0028F518(RuntimeStateRecAtB8 *state, u32 base) {
-    extern u32 func_0028F98C(RuntimeStateRecAtB8 *state, u32 index);
+void alCSeqNew(RuntimeStateRecAtB8 *state, u32 base) {
+    extern u32 __readVarLen(RuntimeStateRecAtB8 *state, u32 index);
     f64 converted;
     s32 count;
     u32 entry;
@@ -25,7 +25,7 @@ void func_0028F518(RuntimeStateRecAtB8 *state, u32 base) {
         if (entry != 0) {
             state->active |= 1U << i;
             state->objects[i] = (void *)(base + entry);
-            state->results[i] = func_0028F98C(state, i);
+            state->results[i] = __readVarLen(state, i);
         } else {
             state->objects[i] = 0;
         }

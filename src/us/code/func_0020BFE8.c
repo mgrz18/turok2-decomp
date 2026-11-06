@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void *func_0020BFE8(Node8026E4F8 **arg0, u32 arg1);
-void *func_0020BFE8(Node8026E4F8 **arg0, u32 arg1)
+extern void *Render_SortTreeFind(Node8026E4F8 **arg0, u32 arg1);
+void *Render_SortTreeFind(Node8026E4F8 **arg0, u32 arg1)
 {
   u32 temp_v1;
   Node8026E4F8 *var_a0;

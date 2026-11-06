@@ -4,9 +4,9 @@
 #include "rw/junk_types.h"
 
 extern const f32 D_800A58F4;
-void *func_002017D4(void *t, s32 i);
-void func_0020DAA4(f32 *out, f32 t, void *a, void *b);
-void func_00215F4C(R05Anim *a, s32 idx, f32 time, f32 *out)
+void *CISet__GetBlock(void *t, s32 i);
+void CQuaternion__Slerp(f32 *out, f32 t, void *a, void *b);
+void CAnimationState__GetBoneRotation(R05Anim *a, s32 idx, f32 time, f32 *out)
 {
     void *root;
     void *blk;
@@ -25,15 +25,15 @@ void func_00215F4C(R05Anim *a, s32 idx, f32 time, f32 *out)
     s32 off;
     u32 ub;
     root = *a->data;
-    blk = func_002017D4(root, 5);
-    cfg = func_002017D4(blk, 0);
-    tab = func_002017D4(root, 1);
+    blk = CISet__GetBlock(root, 5);
+    cfg = CISet__GetBlock(blk, 0);
+    tab = CISet__GetBlock(root, 1);
     scale = cfg->scale;
     sel = *(s16 *)(tab + (idx << 2) + 0xA);
     n = cfg->n;
     time = time * scale;
     if (sel == -1) {
-        v2 = func_002017D4(root, 2);
+        v2 = CISet__GetBlock(root, 2);
         off = idx * *v2 + 8;
         p = (u8 *)v2 + off;
         out[0] = (f32)*(s16 *)(p + 0xC) * D_800A58F4;
@@ -42,7 +42,7 @@ void func_00215F4C(R05Anim *a, s32 idx, f32 time, f32 *out)
         out[3] = (f32)*(s16 *)(p + 0x12) * D_800A58F4;
         return;
     }
-    keys = func_002017D4(func_002017D4(blk, 2), sel);
+    keys = CISet__GetBlock(CISet__GetBlock(blk, 2), sel);
     if (a->loopStart == 0xFFFF) {
         i0 = (((time) >= 0.0f) ? (s32)(time) : (((f32)(s32)(time) == (time)) ? (s32)(time) : (s32)(time) - 1));
         if (n <= (f32)i0) {
@@ -65,5 +65,5 @@ void func_00215F4C(R05Anim *a, s32 idx, f32 time, f32 *out)
         }
     }
     frac = time - (f32)(((time) >= 0.0f) ? (s32)(time) : (((f32)(s32)(time) == (time)) ? (s32)(time) : (s32)(time) - 1));
-    func_0020DAA4(out, frac, (u8 *)keys + i0 * 16, (u8 *)keys + i1 * 16);
+    CQuaternion__Slerp(out, frac, (u8 *)keys + i0 * 16, (u8 *)keys + i1 * 16);
 }

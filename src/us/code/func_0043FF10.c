@@ -7,7 +7,7 @@ extern s32 D_00431004;
 extern s32 D_004310B8;
 extern s32 D_00431158;
 extern s32 D_00431220;
-void func_0043FF10(s32 arg0) {
+void Primagen_SetAttackScript_2(s32 arg0) {
     if (arg0 == 2) {
         if (D_8012F608.stage == 1) {
             D_8012F608.script.steps = &D_00430FB4;

@@ -4,12 +4,12 @@
 #include "rw/abu_types.h"
 
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern void func_002765F4(struct ChannelSet *arg0, s32 arg1);
+extern void SndQueue_CancelHandle(struct ChannelSet *arg0, s32 arg1);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 extern void osSendMesg(void *, s32, s32);
-extern void func_00273DD8(void *, s16);
-s32 func_002708C0(void *arg0, s32 id) {
+extern void SndVoicePool_StopVoice(void *, s16);
+s32 CAudioWorld__StopHandle(void *arg0, s32 id) {
     void *temp_s0;
     void *var_a0;
     s32 temp_v1;
@@ -34,7 +34,7 @@ s32 func_002708C0(void *arg0, s32 id) {
         __osRestoreInt(temp_a0);
         var_a0 = &((ContextRecAt2BC0 *)(arg0))->view[0];
     }
-    func_002765F4(var_a0, id);
+    SndQueue_CancelHandle(var_a0, id);
     for (i = 0; i < 17; i++) {
         if (((ContextRecAt2BC0 *)arg0)->voices[i].sound == id) {
             found++;
@@ -51,7 +51,7 @@ s32 func_002708C0(void *arg0, s32 id) {
                     voice->flags &= ~0x10;
                 }
                 if ((&((ContextCode8025A3EC *)arg0)->slots)[0].ids[i] != -1) {
-                    func_00273DD8(&((ContextRecAt2BC0 *)(arg0))->menu[0], i);
+                    SndVoicePool_StopVoice(&((ContextRecAt2BC0 *)(arg0))->menu[0], i);
                 }
             }
         }

@@ -5,14 +5,14 @@
 
 
 extern u8 D_800F7078[];
-void *func_0022425C(void *tbl, s32 id);
+void *CScene__GetRegionInfo(void *tbl, s32 id);
 
 
-s32 func_002567B8(CGameObjectInstance *actor)
+s32 Actor_IsInRegionFlag40(CGameObjectInstance *actor)
 {
     s32 id = ((s32)actor->header.m_pCurrentRegion);
     if (id != 0) {
-        void *p = func_0022425C(D_800F7078, id);
+        void *p = CScene__GetRegionInfo(D_800F7078, id);
         if (p != ((void *)0)) {
             if (*(u16 *)((u8 *)p + 0x52) & 0x40) {
                 return 1;

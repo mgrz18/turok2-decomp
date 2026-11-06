@@ -1,5 +1,5 @@
 /* Boundary fixed in versions/cuts.us.txt: the function starts at 0x00267090. splat cut its first word,
- * `lw $2, 0x14($4)`, into a one-word func_00267090 (the name its callers
+ * `lw $2, 0x14($4)`, into a one-word GameObject_IsSolid (the name its callers
  * jal), and the rest into func_00267094. Written whole under its real name.
  * Its switch reads jtbl_800A7D30, which still lives in the asm .rodata. */
 #include "common.h"
@@ -16,7 +16,7 @@ typedef struct {
 
 extern u8 D_8011AAF1;
 
-s32 func_00267090(CGameObjectInstance *actor) {
+s32 GameObject_IsSolid(CGameObjectInstance *actor) {
     CPlayer *owner;
     Attachment *attachment;
     u32 flags;

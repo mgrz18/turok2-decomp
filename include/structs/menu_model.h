@@ -3,8 +3,8 @@
 
 /* A menu's 3D model item (MenuItem type 3, structs/menu.h): its data says
  * which definition to show and where, and its 0x330-byte extra (allocated
- * after the window's items, func_00414EA8) holds a copy of that definition
- * and the instance drawn from it (func_00414938, func_00416214). Kept apart
+ * after the window's items, Menu_Construct) holds a copy of that definition
+ * and the instance drawn from it (MenuItem_DrawModel, MenuItem_SetModel). Kept apart
  * from menu.h, which does not need the instance's headers.
  * tools/check_structs.py checks every offset below with the game's compiler. */
 
@@ -13,12 +13,12 @@
 
 /* A type-3 item's data (MenuItem part). */
 typedef struct MenuModelPart {
-    /* 0x00 */ s32 objType;         /* handed to func_00219BC0 with the definition */
-    /* 0x04 */ s32 intelType;       /* which definition: func_00225EBC(world, intelType, intelId) */
+    /* 0x00 */ s32 objType;         /* handed to CGameObjectInstance__Construct with the definition */
+    /* 0x04 */ s32 intelType;       /* which definition: CScene__FindIntelligence(world, intelType, intelId) */
     /* 0x08 */ s32 intelId;
     /* 0x0C */ CVector3 pos;        /* in the window's camera view */
     /* 0x18 */ CVector3 scale;      /* in 284x222 screen units */
-    /* 0x24 */ s32 width;           /* the model's box, in 284x222 screen units (func_0041363C) */
+    /* 0x24 */ s32 width;           /* the model's box, in 284x222 screen units (MenuItem_Layout) */
     /* 0x28 */ s32 height;
     /* 0x2C */ f32 spin;            /* turned by spin * frame time each frame */
 } MenuModelPart; /* size 0x30 */

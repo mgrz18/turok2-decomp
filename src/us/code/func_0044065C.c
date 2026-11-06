@@ -5,7 +5,7 @@ extern f32 D_800C052C;
 extern f32 D_800C0530;
 extern s32 D_8012F9E8;          /* f32, with another f32 just before it */
 
-void func_0044065C(CGameObjectInstance *arg0)
+void Primagen_EnterMode20_2(CGameObjectInstance *arg0)
 {
   unsigned int new_var3;
   f32 new_var4;

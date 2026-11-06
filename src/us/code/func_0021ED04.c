@@ -24,30 +24,30 @@ typedef struct ModelRef {
 extern s32 D_800B6D1C;          /* frame buffer index */
 extern u8 D_800F7148[];
 
-Mtx *func_00206950(void *pool, s32 count);
-void func_0020C890(f32 (*mf)[4], void *arg1, void *arg2);
-void func_0020F7EC(f32 (*mf)[4]);
-void func_0020CC94(f32 (*mf)[4], Mtx *m);
-void func_0020AF08(s32, s32, s32, s32, Slot24 *, s32, s32, s32);
+Mtx *MtxPool_Alloc(void *pool, s32 count);
+void CMtxF__Multiply(f32 (*mf)[4], void *arg1, void *arg2);
+void CMtxF__ClampEntries(f32 (*mf)[4]);
+void CMtxF__ToMtx(f32 (*mf)[4], Mtx *m);
+void Render_DrawModelFlat(s32, s32, s32, s32, Slot24 *, s32, s32, s32);
 
-void func_0021ED04(CGameObjectInstance *owner, ModelRef *ref, void *arg2, s32 arg3) {
+void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *owner, ModelRef *ref, void *arg2, s32 arg3) {
     f32 mf[4][4];
     Model *model;
     Mtx *m;
 
     if (owner->m_pmtDrawMtxs != NULL) {
-        m = func_00206950(D_800F7148, 1);
+        m = MtxPool_Alloc(D_800F7148, 1);
         if (m != NULL) {
             model = ref->model;
-            func_0020C890(mf, arg2, model->unk1CC);
-            func_0020F7EC(mf);
-            func_0020CC94(mf, m);
+            CMtxF__Multiply(mf, arg2, model->unk1CC);
+            CMtxF__ClampEntries(mf);
+            CMtxF__ToMtx(mf, m);
             {
                 Gfx *g = D_800D8E24++;
                 g->w0 = 0xDA380007;
                 g->w1 = (u32)m;
             }
-            func_0020AF08((u8)arg3, ref->unkC, (s32) owner->m_pmtDrawMtxs, 1, (Slot24 *) owner->m_Lights[D_800B6D1C], 0, ref->unk1C,
+            Render_DrawModelFlat((u8)arg3, ref->unkC, (s32) owner->m_pmtDrawMtxs, 1, (Slot24 *) owner->m_Lights[D_800B6D1C], 0, ref->unk1C,
                           owner->m_AI.m_nTexture);
             {
                 Gfx *g = D_800D8E24++;

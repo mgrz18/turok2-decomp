@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_0020F908(f32 *m, f32 *in, f32 *out, u32 count) {
+void CMtxF__TransformPoints(f32 *m, f32 *in, f32 *out, u32 count) {
     f32 vx, vy, vz;
     while (count-- != 0) {
         vx = in[0];

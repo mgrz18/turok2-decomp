@@ -4,10 +4,10 @@
 #include "rw/abu_types.h"
 
 extern double D_800AA258;
-extern f32 func_0028F71C(void **arg0, s32 arg1, s32 arg2);
+extern f32 alCSeqTicksToSec(void **arg0, s32 arg1, s32 arg2);
 extern double D_800AA250;
 extern float D_800AA260;
-f32 func_0028F71C(void **arg0, s32 arg1, s32 arg2) {
+f32 alCSeqTicksToSec(void **arg0, s32 arg1, s32 arg2) {
     f64 angle;
     f32 arg1f;
     f32 scaled;

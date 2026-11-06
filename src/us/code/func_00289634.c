@@ -1,7 +1,7 @@
 #include "common.h"
 
-void func_002759C4(s32);                     /* extern */
+void Music_SetTrack(s32);                     /* extern */
 
-void func_00289634(void) {
-    func_002759C4(0x10);
+void EngineMode07_Title_Init(void) {
+    Music_SetTrack(0x10);
 }

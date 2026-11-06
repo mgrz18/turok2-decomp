@@ -14,15 +14,15 @@ extern s32 D_800AB884;
 extern u32 D_800AB8A4;              /* extra geometry mode bits */
 extern u32 D_800AB8AC;              /* extra render mode bits */
 
-void *func_002017D4(void *resource, s32 index);
-void func_0020565C(s32 unused, void **resource);
+void *CISet__GetBlock(void *resource, s32 index);
+void CCache__LockForDisplayList(s32 unused, void **resource);
 
 /* Draws one level of detail of a model resource flat-shaded in the primitive colour with the given
  * alpha, when the frame's command buffer still has 3000 commands free: loads the matrix (or sets it
  * as segment 1), loads an optional two-light block, sets segment 2 to the given texture base or the
  * model's own, sets up the combiner and render state, then emits every part's display list. The
  * cached render state D_800AB880/D_800AB884 is invalidated before and after. */
-void func_0020AF08(u8 alpha, void **resource, void *matrix, s32 segment, char *lights, void *textures, s32 lod) {
+void Render_DrawModelFlat(u8 alpha, void **resource, void *matrix, s32 segment, char *lights, void *textures, s32 lod) {
     void *header;
     void **parts;
     void **lodParts;
@@ -38,11 +38,11 @@ void func_0020AF08(u8 alpha, void **resource, void *matrix, s32 segment, char *l
         return;
     }
     header = *resource;
-    parts = func_002017D4(header, 2);
+    parts = CISet__GetBlock(header, 2);
     if (lod < 0 || lod >= *(s32 *)parts) {
         return;
     }
-    func_0020565C(0, resource);
+    CCache__LockForDisplayList(0, resource);
     if (segment != 0) {
         GFX_W(D_800D8E24++, 0xDB060004, (u32)matrix);   /* gSPSegment(1, matrix) */
     } else {
@@ -55,10 +55,10 @@ void func_0020AF08(u8 alpha, void **resource, void *matrix, s32 segment, char *l
     }
     base = textures;
     if (base == 0) {
-        base = func_002017D4(header, 0);
+        base = CISet__GetBlock(header, 0);
     }
     GFX_W(D_800D8E24++, 0xDB060008, (u32)base);     /* gSPSegment(2, base) */
-    lodParts = func_002017D4(parts, lod);
+    lodParts = CISet__GetBlock(parts, lod);
     sync = D_800D8E24++;
     D_800AB880 = -1;
     D_800AB884 = -1;
@@ -75,9 +75,9 @@ void func_0020AF08(u8 alpha, void **resource, void *matrix, s32 segment, char *l
     geom |= 0x400;                                  /* G_CULL_BACK */
     GFX_W(D_800D8E24++, 0xD9FFFFFF, geom); /* gSPSetGeometryMode */
     for (i = 0; i < count; i++) {
-        part = func_002017D4(lodParts, i);
-        func_002017D4(part, 0);
-        list = func_002017D4(part, 1);
+        part = CISet__GetBlock(lodParts, i);
+        CISet__GetBlock(part, 0);
+        list = CISet__GetBlock(part, 1);
         GFX_W(D_800D8E24++, 0xDE000000, (u32)list);     /* gSPDisplayList */
     }
     D_800AB884 = -1;

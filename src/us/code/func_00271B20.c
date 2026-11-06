@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00271B20(SortTable *table);
-void func_00271B20(SortTable *table) {
+extern void CAudioWorld__SortInstrumentSounds(SortTable *table);
+void CAudioWorld__SortInstrumentSounds(SortTable *table) {
     int i;
     int j;
     u32 right;

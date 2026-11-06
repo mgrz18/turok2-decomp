@@ -8,14 +8,14 @@
 
 
 
-extern void func_002470E8(void *arg0, ControllerProfile *profile);
-extern f32 func_00253CFC(CPlayer *player);
+extern void CPlayerContState__Init(void *arg0, ControllerProfile *profile);
+extern f32 Actor_GetEyeHeight(CPlayer *player);
 
-void func_002568CC(CPlayer *player) {
+void CPlayer__ResetControlState(CPlayer *player) {
     CVector3 *v;
     f32 zero;
 
-    func_002470E8((u8 *)player + 0xA40, &D_800F5EC0[player->m_nController]);
+    CPlayerContState__Init((u8 *)player + 0xA40, &D_800F5EC0[player->m_nController]);
     P_S32(player, 0xA78) = 0;
     P_S32(player, 0xA7C) = 0;
     P_S32(player, 0xA80) = 0;
@@ -39,7 +39,7 @@ void func_002568CC(CPlayer *player) {
     P_S32(player, 0xAD8) = 0;
     P_S32(player, 0xADC) = 0;
     P_S32(player, 0xAE0) = 0;
-    P_F32(player, 0xAE4) = func_00253CFC(player);
+    P_F32(player, 0xAE4) = Actor_GetEyeHeight(player);
     P_F32(player, 0xAE8) = 0.0f;
     v = &P_VEC(player, 0xAEC);
     zero = P_F32(player, 0xAE8);

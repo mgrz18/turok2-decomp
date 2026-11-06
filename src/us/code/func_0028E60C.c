@@ -6,12 +6,12 @@
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern s32 D_801206C4;
 extern s32 D_800AA210;
-void func_0029B030(void *arg0, s32 arg1, s32 arg2);
-void **func_00204EDC(s32 arg0, s32 arg1, s32 arg2, void *arg3);
+void osCreateMesgQueue(void *arg0, s32 arg1, s32 arg2);
+void **CCache__Allocate(s32 arg0, s32 arg1, s32 arg2, void *arg3);
 void osSendMesg(void *arg0, void *arg1, s32 arg2);
-extern void func_0029B030(void *arg0, s32 arg1, s32 arg2);
+extern void osCreateMesgQueue(void *arg0, s32 arg1, s32 arg2);
 extern void osSendMesg(void *arg0, void *arg1, s32 arg2);
-s32 func_0028E60C(s32 arg0, s32 arg1_unused, s32 arg2)
+s32 VM_Alloc(s32 arg0, s32 arg1_unused, s32 arg2)
 {
   char sp10[0x18];
   int new_var2;
@@ -27,13 +27,13 @@ s32 func_0028E60C(s32 arg0, s32 arg1_unused, s32 arg2)
   new_var = (temp_s1 + 1) & (~1);
   if (1)
   {
-    func_0029B030(sp10, (s32) (&sp38), 1);
+    osCreateMesgQueue(sp10, (s32) (&sp38), 1);
     blk.f28 = 3;
     blk.f2C = arg0;
     blk.f34 = (void **) sp10;
     new_var2 = temp_s1 * 4;
     rounded = new_var + 0x18;
-    temp_v0 = func_00204EDC(0, new_var2 + rounded, 3, &D_800AA210);
+    temp_v0 = CCache__Allocate(0, new_var2 + rounded, 3, &D_800AA210);
     temp_v1 = *temp_v0;
     blk.f30 = temp_v1;
     temp_v1->model = temp_v0;

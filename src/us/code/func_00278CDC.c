@@ -23,10 +23,10 @@ extern FontStyle D_801100F0;
 extern s32 D_800F56A8;          /* the loaded font */
 extern s32 D_800C2030;          /* screen width */
 
-extern f32 func_004163C0(u8 *text, f32 size, f32 spacing);   /* the string's width */
+extern f32 Menu_TextWidth(u8 *text, f32 size, f32 spacing);   /* the string's width */
 extern void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shadow, s32 alpha, s32 language);
 
-void func_00278CDC(u8 *text, s32 x, s32 y, s32 alpha, s32 centred, s32 shadow, f32 scaleX, f32 scaleY) {
+void COnScreen__DrawString(u8 *text, s32 x, s32 y, s32 alpha, s32 centred, s32 shadow, f32 scaleX, f32 scaleY) {
     FontStyle *style;
     f32 sizeFactor;
     f32 spacing;
@@ -83,7 +83,7 @@ void func_00278CDC(u8 *text, s32 x, s32 y, s32 alpha, s32 centred, s32 shadow, f
             spacing = 1.0f;
             break;
         }
-        width = func_004163C0(text, size, spacing);
+        width = Menu_TextWidth(text, size, spacing);
         limit = D_800C2030 - 0x2C;
         if (limit < width) {
             ratio = limit / width;

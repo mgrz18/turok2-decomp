@@ -4,7 +4,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 /* Menu callback: toggle the option selected by arg0[0]. */
-s32 func_004193B4(s32 *arg0) {
+s32 WeaponsMenu_Toggle(s32 *arg0) {
     GameSettings *base;
     switch (arg0[0]) {
         case 2:

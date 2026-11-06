@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern void *func_0029E460(void *destination, const void *source, int count);
-void func_002764C4(ManagerRecAtD8V2 *manager, s32 index, s32 owner, CVector3 *position) {
+void SndQueue_RequeueVoice(ManagerRecAtD8V2 *manager, s32 index, s32 owner, CVector3 *position) {
     Entry_func_80259784_de *entry;
     NodeRecAt4C *node;
     NodeRecAt4C *at;

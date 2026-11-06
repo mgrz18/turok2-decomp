@@ -17,33 +17,33 @@ typedef struct LevelState {
 } LevelState;
 
 
-extern void *func_002532A8(void *);
-extern void func_0042EB04(void *);
-extern s32 func_00275F7C(void);
-extern void func_00275EFC(s32);
-extern void func_00275B58(void);
-extern void func_002758DC(s32);
-extern void func_002052D8(s32, void *);
+extern void *CPlayerPool__GetFirstActive(void *);
+extern void CPlayer__StopLoopingSounds(void *);
+extern s32 LoopSounds_Get(void);
+extern void LoopSounds_StopAll(s32);
+extern void Sound__DetachAll(void);
+extern void Sound__StopFlags(s32);
+extern void CCache__Deallocate(s32, void *);
 
 /* Tears the level down: releases its resources' handles. */
-void func_0042C9DC(LevelState *level) {
+void CScene__UnloadLevel(LevelState *level) {
     void *p;
 
-    p = func_002532A8(&D_80119870.m_PlayerList);
+    p = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
     if (p != NULL) {
-        func_0042EB04(p);
+        CPlayer__StopLoopingSounds(p);
     }
-    func_00275EFC(func_00275F7C());
-    func_00275B58();
-    func_002758DC(0x1000);
-    func_002052D8(0, level->handle98);
-    func_002052D8(0, level->handle9C);
-    func_002052D8(0, level->handleA0);
-    func_002052D8(0, level->handleA4);
-    func_002052D8(0, level->handleA8);
-    func_002052D8(0, level->handleB0);
-    func_002052D8(0, level->handleB4);
-    func_002052D8(0, level->handleCC);
-    func_002052D8(0, level->handleAC);
-    func_002052D8(0, level->handleC8);
+    LoopSounds_StopAll(LoopSounds_Get());
+    Sound__DetachAll();
+    Sound__StopFlags(0x1000);
+    CCache__Deallocate(0, level->handle98);
+    CCache__Deallocate(0, level->handle9C);
+    CCache__Deallocate(0, level->handleA0);
+    CCache__Deallocate(0, level->handleA4);
+    CCache__Deallocate(0, level->handleA8);
+    CCache__Deallocate(0, level->handleB0);
+    CCache__Deallocate(0, level->handleB4);
+    CCache__Deallocate(0, level->handleCC);
+    CCache__Deallocate(0, level->handleAC);
+    CCache__Deallocate(0, level->handleC8);
 }

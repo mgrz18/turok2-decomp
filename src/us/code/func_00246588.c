@@ -6,7 +6,7 @@ typedef struct {
     /* 0x04 */ s32 initial;
 } ValuePair;
 
-void func_00246588(ValuePair *arg0, s32 arg1) {
+void ValuePair_Set(ValuePair *arg0, s32 arg1) {
     arg0->value = arg1;
     arg0->initial = arg1;
 }

@@ -16,21 +16,21 @@ typedef struct TravelTarget {
 
 extern f32 D_800B6D28;      /* frame time */
 extern char D_800ADE70;
-extern void func_0024EF70(void *, void *, void *);
-extern s32 func_0024E5F0(void *, void *, s32);
-extern void func_00210EF0(f32 *value);
+extern void CPlayer__TurnAndLook(void *, void *, void *);
+extern s32 CPlayer__SetState(void *, void *, s32);
+extern void Angle_Wrap(f32 *value);
 
-void func_00251828(CPlayer *player, void *body) {
+void PlayerJumpPad_Update(CPlayer *player, void *body) {
     f32 yaw, targetYaw, alternate, duration, t;
     Position pos;
 
-    func_0024EF70(player, body, &D_800ADE70);
+    CPlayer__TurnAndLook(player, body, &D_800ADE70);
     player->m_JumpPadCurrentTime += D_800B6D28;
     yaw = player->m_CharacterActor.m_RotY;
     targetYaw = player->m_JumpPadAngleDirection;
     if (targetYaw != yaw) {
-        func_00210EF0(&yaw);
-        func_00210EF0(&targetYaw);
+        Angle_Wrap(&yaw);
+        Angle_Wrap(&targetYaw);
         if (yaw > targetYaw) {
             alternate = targetYaw + 6.2831855f;
             if (alternate - yaw < yaw - targetYaw) {
@@ -53,7 +53,7 @@ void func_00251828(CPlayer *player, void *body) {
                 yaw = targetYaw;
             }
         }
-        func_00210EF0(&yaw);
+        Angle_Wrap(&yaw);
     }
     player->m_WeaponActor.m_RotY = yaw;
     player->m_CharacterActor.m_RotY = yaw;
@@ -67,5 +67,5 @@ void func_00251828(CPlayer *player, void *body) {
         player->m_vDesiredPos = pos;
         return;
     }
-    func_0024E5F0(player, body, 2);
+    CPlayer__SetState(player, body, 2);
 }

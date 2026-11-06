@@ -5,7 +5,7 @@
 extern s32 D_80110058;
 extern s32 D_8011005C;
 
-void func_0024BF1C(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
+void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
 /* Opens the weapon menu: flags the weapons the player can pick (an owned
  * weapon usable in the current mode, unless it is the lower of a pair the
@@ -14,7 +14,7 @@ void func_0024BF1C(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *pla
 Dockerfile	   README.md	   include	src	 us
 Dockerfile.native  baserom.us.z64  nonmatching	test	 versions
 LICENSE		   build	   references	tools until it rests on the queued weapon. */
-void func_0024C0B4(CBarrel *menu, s32 dir, CPlayer *player) {
+void CBarrel__Open(CBarrel *menu, s32 dir, CPlayer *player) {
     s32 owned[35];
     s32 count;
     s32 i;
@@ -51,7 +51,7 @@ void func_0024C0B4(CBarrel *menu, s32 dir, CPlayer *player) {
             rows = 2;
         }
     }
-    func_0024BF1C(menu, rows, owned, count, player);
+    CBarrel__Fill(menu, rows, owned, count, player);
     menu->m_Turn = 45.0f;
     if (menu->m_State == 0 || menu->m_State == 3) {
         menu->m_State = 1;

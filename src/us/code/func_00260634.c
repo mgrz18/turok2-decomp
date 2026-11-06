@@ -1,31 +1,31 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-void func_00246108(void *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
-void func_0024599C(void *self, CAI *ai, CAIFrameMotion *out);
-f32 func_0025EB24(void *self, CAI *ai);
-void func_00245BAC(void *self, CAI *ai, f32 angle, f32 arg3);
-f32 func_0025EAFC(void *self, CAI *ai);
-s32 func_0025D030(void *self, CAI *ai, CAITargets *t);
-void func_00243414(void *self, CAI *ai, s32 mode);
+void AI_UpdateTargets(void *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
+void AI_ComputeFrameMotion(void *self, CAI *ai, CAIFrameMotion *out);
+f32 EnemyAI_GetModeTurnRate(void *self, CAI *ai);
+void AI_TurnClamped(void *self, CAI *ai, f32 angle, f32 arg3);
+f32 EnemyAI_GetTypeTurnRate(void *self, CAI *ai);
+s32 EnemyAI_PickAttack(void *self, CAI *ai, CAITargets *t);
+void CAI__SetMode(void *self, CAI *ai, s32 mode);
 
-void func_00260634(void *self, CAI *ai) {
+void EnemyStationary_Update(void *self, CAI *ai) {
     CAITargets t;
     CAIFrameMotion steer;
     f32 range;
     s32 mode;
 
-    func_00246108(self, ai, &t, 1, 1);
-    func_0024599C(self, ai, &steer);
-    func_00245BAC(self, ai, func_0025EB24(self, ai), t.m_Sight.m_Angle);
-    range = func_0025EAFC(self, ai);
+    AI_UpdateTargets(self, ai, &t, 1, 1);
+    AI_ComputeFrameMotion(self, ai, &steer);
+    AI_TurnClamped(self, ai, EnemyAI_GetModeTurnRate(self, ai), t.m_Sight.m_Angle);
+    range = EnemyAI_GetTypeTurnRate(self, ai);
     if ((t.m_Sight.m_Angle < 0.0f ? -t.m_Sight.m_Angle : t.m_Sight.m_Angle) <= range) {
-        mode = func_0025D030(self, ai, &t);
+        mode = EnemyAI_PickAttack(self, ai, &t);
         if (mode != 0) {
             ai->m_ModeLastFrame = -1;
-            func_00243414(self, ai, mode);
+            CAI__SetMode(self, ai, mode);
         } else {
-            func_00243414(self, ai, 10);
+            CAI__SetMode(self, ai, 10);
         }
     }
 }

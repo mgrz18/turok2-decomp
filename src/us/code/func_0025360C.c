@@ -9,7 +9,7 @@ typedef struct {
 } Tracker;
 
 /* Sets the value, noting when it is the same as before. */
-void func_0025360C(Tracker *arg0, s32 arg1) {
+void ValueTracker_Set(Tracker *arg0, s32 arg1) {
     if (arg0->value == arg1) {
         arg0->repeated = 1;
     }

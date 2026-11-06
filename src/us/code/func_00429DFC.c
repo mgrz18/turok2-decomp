@@ -3,25 +3,25 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
-extern s32 func_00429EC4(OSPfs *pfs);
-s32 func_00429DFC(OSPfs *pfs)
+extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
+extern s32 __osPfsSelectBank(OSPfs *pfs);
+s32 __osCheckId(OSPfs *pfs)
 {
     int k;
     u8 temp[32];
     s32 ret;
     if (pfs->activebank != 0) {
         pfs->activebank = 0;
-        ret = func_00429EC4(pfs);
+        ret = __osPfsSelectBank(pfs);
         if (ret != 0)
             return ret;
     }
-    ret = func_00299680(pfs->queue, pfs->channel, 1, temp);
+    ret = __osContRamRead(pfs->queue, pfs->channel, 1, temp);
     if (ret != 0) {
         if (ret != 2) {
             return ret;
         }
-        ret = func_00299680(pfs->queue, pfs->channel, 1, temp);
+        ret = __osContRamRead(pfs->queue, pfs->channel, 1, temp);
         if (ret != 0)
             return ret;
     }

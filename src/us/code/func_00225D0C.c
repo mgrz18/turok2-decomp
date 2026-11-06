@@ -228,8 +228,8 @@ typedef struct Def Def;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
-extern void func_00220260(CWorld *, void *, s32);
-void func_00225D0C(void *arg0) {
+extern void CScene__SetInstanceSavedBit(CWorld *, void *, s32);
+void CScene__UnmarkGeneratorsSaved(void *arg0) {
     CWorld *object;
     s32 count;
     s32 i;
@@ -250,7 +250,7 @@ void func_00225D0C(void *arg0) {
             if (field != three) {
                 i += 1;
             } else {
-                func_00220260(arg0, entry, 0);
+                CScene__SetInstanceSavedBit(arg0, entry, 0);
                 i += 1;
             }
             offset += 0x288; /* sizeof(LevelActor) in Turok 2 */

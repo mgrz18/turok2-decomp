@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0028E754(struct Shape_typemap_110 *arg0);
+extern void VM_GetStats(struct Shape_typemap_110 *arg0);
 extern struct Shape_typemap_110 D_801206A0;
-void func_0028E754(struct Shape_typemap_110 *arg0) {
+void VM_GetStats(struct Shape_typemap_110 *arg0) {
     *arg0 = D_801206A0;
 }

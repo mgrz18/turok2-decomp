@@ -25,13 +25,13 @@
         _a->words.w1 = (u32)(d); \
     }
 
-Acmd *func_0029FCF4(Acmd *ptr, ALLoadFilter *f, s32 tsam, s32 nbytes, s16 outp, s16 inp, u32 flags); /* _decodeChunk */
-u32 func_0026FFA0(void *addr, s32 len); /* game DMA cache: returns the physical address of a cached copy */
+Acmd *_decodeChunk(Acmd *ptr, ALLoadFilter *f, s32 tsam, s32 nbytes, s16 outp, s16 inp, u32 flags); /* _decodeChunk */
+u32 AudioDMA_CacheBlock(void *addr, s32 len); /* game DMA cache: returns the physical address of a cached copy */
 
 /* alAdpcmPull (libaudio load.c): pull handler of the loader filter for ADPCM wave tables: load the codebook, decode
-   whole 16 sample frames (9 bytes each) through func_0029FCF4, restarting from the loop start (and merging the
+   whole 16 sample frames (9 bytes each) through _decodeChunk, restarting from the loop start (and merging the
    sections in DMEM) when the request crosses the loop end, and clear what runs past the end of the table. */
-Acmd *func_0029F190(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
+Acmd *alAdpcmPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
 {
     Acmd *ptr = p;
     ALLoadFilter *f = (ALLoadFilter *)filter;
@@ -53,7 +53,7 @@ Acmd *func_0029F190(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acm
         return ptr;
 
     /* the codebook of the wave table goes through the game's DMA cache */
-    aLoadADPCM(ptr++, f->bookSize, func_0026FFA0((void *)((u32)f->table->waveInfo.adpcmWave.book + 8), f->bookSize));
+    aLoadADPCM(ptr++, f->bookSize, AudioDMA_CacheBlock((void *)((u32)f->table->waveInfo.adpcmWave.book + 8), f->bookSize));
 
     looped = 0;
     inp = 0;
@@ -74,7 +74,7 @@ Acmd *func_0029F190(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acm
     nbytes = nframes * 9;
 
     if (looped) {
-        ptr = func_0029FCF4(ptr, f, tsam, nbytes, *outp, inp, f->first);
+        ptr = _decodeChunk(ptr, f, tsam, nbytes, *outp, inp, f->first);
         if (f->lastsam)
             *outp += f->lastsam << 1;
         else
@@ -95,7 +95,7 @@ Acmd *func_0029F190(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acm
             if (tsam < 0)
                 tsam = 0;
             nframes = (tsam + 15) >> 4;
-            ptr = func_0029FCF4(ptr, f, tsam, nframes * 9, dmemAlign, inp, f->first | 2);
+            ptr = _decodeChunk(ptr, f, tsam, nframes * 9, dmemAlign, inp, f->first | 2);
             aDMEMMove(ptr++, dmemAlign + (f->lastsam << 1), dmemOut, nSam << 1);
         }
         f->lastsam = (outCount + f->lastsam) & 0xF;
@@ -113,7 +113,7 @@ Acmd *func_0029F190(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acm
         nbytes -= overBytes;
         if (overFlow - (overFlow & 0xF) < outCount) {
             decoded = 1;
-            ptr = func_0029FCF4(ptr, f, nSam - overFlow, nbytes, *outp, inp, f->first);
+            ptr = _decodeChunk(ptr, f, nSam - overFlow, nbytes, *outp, inp, f->first);
             if (f->lastsam)
                 *outp += f->lastsam << 1;
             else

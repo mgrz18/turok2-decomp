@@ -1,18 +1,18 @@
-/* Second-module copy of func_0040E46C (src/us/code/func_0040E46C.c), with its string/data addresses 0xE0 lower. */
+/* Second-module copy of BlindOne_PhaseWaitCinemaUpdate (src/us/code/BlindOne_PhaseWaitCinemaUpdate.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
 extern BlindOnePhase D_0043232C[];
 
-extern s32 func_00284204(BlindOneState *m);
+extern s32 Cinema_IsIdle(BlindOneState *m);
 
-void func_0044746C(BlindOneState *m) {
+void BlindOne_PhaseWaitCinemaUpdate_2(BlindOneState *m) {
     BlindOneStep *script;
     s32 cmd;
     s32 i;
 
-    if (func_00284204(m)) {
+    if (Cinema_IsIdle(m)) {
         script = m->script;
         m->script = script + 1;
         cmd = script[1].id;

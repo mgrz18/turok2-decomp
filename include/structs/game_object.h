@@ -192,8 +192,8 @@ typedef struct CGameObjectInstance {
 /* The first 0x34 bytes of an instance (and of a CParticle, which starts the
  * same way): the header, the velocity, the water displacement and what it
  * stands on. The collision probes save and restore them as one struct
- * around a trial move (func_00233000, func_00245E48, func_00245FC8,
- * func_00256B84, func_002698AC). */
+ * around a trial move (CCamera__CanSeeTarget, AI_IsEyeLineBlocked, AI_IsLineOfSightBlocked,
+ * Actor_ProbeMove, GameObject_CanMoveTo). */
 typedef struct CObjectHead {
     /* 0x00 */ CInstanceHeader header;
     /* 0x18 */ CVector3 m_vVelocity;
@@ -209,23 +209,23 @@ typedef struct CListedInstance {
     /* 0x000 */ CGameObjectInstance m_Instance;
     /* 0x288 */ struct CListedInstance *m_pPrev;
     /* 0x28C */ struct CListedInstance *m_pNext;
-    /* 0x290 */ s32 *m_pOwnerCount;   /* counted up when it is taken (func_002283FC), down when it goes (func_002280B0) */
+    /* 0x290 */ s32 *m_pOwnerCount;   /* counted up when it is taken (CInstancePool__Alloc), down when it goes (CListedInstance__Free) */
     /* 0x294 */ s32 _pad294;
 } CListedInstance; /* size 0x298 */
 
 /* The pool of dynamic objects, D_8010ABA0: 32 of them, the free ones on
  * m_FreeList (D_8010FEA0) and the live ones on m_ActiveList (D_8010FEB4).
- * func_002283FC takes one (only while fewer than 3 are live, unless
- * D_8011001C), func_002280B0 / func_00228484 give it back; func_00227C10,
- * func_00227EE8 and func_00228108 spawn into it. */
+ * CInstancePool__Alloc takes one (only while fewer than 3 are live, unless
+ * D_8011001C), CListedInstance__Free / CInstancePool__Free give it back; CInstancePool__SpawnAnimInstance,
+ * CInstancePool__SpawnCopy and CInstancePool__Spawn spawn into it. */
 typedef struct CInstancePool {
     /* 0x0000 */ CListedInstance m_Instances[32];
     /* 0x5300 */ CList m_FreeList;     /* D_8010FEA0 */
     /* 0x5314 */ CList m_ActiveList;   /* D_8010FEB4 */
 } CInstancePool; /* size 0x5328 */
 
-/* What an AI aims at this frame: func_002449E0 fills one from CAI's
- * m_pSightTarget, func_00244338 one from m_pPathTarget (or the home point, a
+/* What an AI aims at this frame: AI_GetSightTargetInfo fills one from CAI's
+ * m_pSightTarget, AI_GetPathTargetInfo one from m_pPathTarget (or the home point, a
  * location, the actor itself when there is none; m_Kind says which). The
  * position, the offset from the actor and its length, in 3D and flattened. */
 typedef struct {
@@ -240,18 +240,18 @@ typedef struct {
     /* 0x40 */ f32 m_FlatDist;
 } CAITarget; /* size 0x44 */
 
-/* The pair the AI callbacks hand each other (func_00246108 fills both). */
+/* The pair the AI callbacks hand each other (AI_UpdateTargets fills both). */
 typedef struct {
     /* 0x00 */ CAITarget m_Sight;
     /* 0x44 */ CAITarget m_Path;
 } CAITargets; /* size 0x88 */
 
-/* How far an AI's actor moved since the last frame (func_0024599C: the
+/* How far an AI's actor moved since the last frame (AI_ComputeFrameMotion: the
  * position against CAI's m_vPosLastFrame, the facing against
  * m_RotYLastFrame): the offset, its direction and length, in 3D and
- * flattened, and the turn. The steering callbacks (func_00260634...
- * func_00261FB0) fill one on the stack and hand it to func_00260730 /
- * func_00260D60 with the CAITargets. */
+ * flattened, and the turn. The steering callbacks (EnemyStationary_Update...
+ * EnemySwim_DartUpdate) fill one on the stack and hand it to EnemyFly_SteerToPath /
+ * EnemyFly_SteerToPathScaled with the CAITargets. */
 typedef struct {
     /* 0x00 */ CVector3 m_vDelta;
     /* 0x0C */ CVector3 m_vDir;

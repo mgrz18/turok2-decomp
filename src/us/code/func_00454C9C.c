@@ -5,7 +5,7 @@
 extern CPlayerOptions D_8011AB18;
 
 /* The player's options, or the defaults at D_8011AB18. */
-CPlayerOptions *func_00454C9C(Menu *arg0) {
+CPlayerOptions *OptionsMenu_GetPlayerOptions_2(Menu *arg0) {
     CPlayerOptions *temp_v1_2;
     CPlayerOptions *var_v0;
     CPlayer *temp_v1;

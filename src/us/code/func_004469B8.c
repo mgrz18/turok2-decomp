@@ -1,4 +1,4 @@
-/* Second-module copy of func_0040D9B8 (src/us/code/func_0040D9B8.c), with its string/data addresses 0xE0 lower. */
+/* Second-module copy of BlindOne_BossHurt (src/us/code/BlindOne_BossHurt.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -10,11 +10,11 @@
 
 extern BlindOneState D_80130200;
 extern u8 D_00432384[];
-extern void func_00236314(void *dst, void *src);
-extern void func_00243414(void *obj, CAI *ai, s32 state);
-extern void func_00206068(s32 arg0);
+extern void ScriptAnimator_SetScript(void *dst, void *src);
+extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
+extern void CCache__SetFrameDelay(s32 arg0);
 
-void func_004469B8(void *obj, CAI *ai, DamageEvent *event) {
+void BlindOne_BossHurt_2(void *obj, CAI *ai, DamageEvent *event) {
     BlindOneState *state;
     s32 health;
 
@@ -22,7 +22,7 @@ void func_004469B8(void *obj, CAI *ai, DamageEvent *event) {
         state = &D_80130200;
         if (state->phase != 9) {
             ai->m_AnimRepeatedCount = 0;
-            func_00243414(obj, ai, 6);
+            CAI__SetMode(obj, ai, 6);
         } else {
             health = ai->m_Health - event->damage;
             if (health < 0) {
@@ -31,11 +31,11 @@ void func_004469B8(void *obj, CAI *ai, DamageEvent *event) {
             ai->m_Health = health;
             if (ai->m_BlindOne.m_HitTimer == 0.0f) {
                 ai->m_BlindOne.m_HitTimer = 2.25f;
-                func_00236314(&state->faders[0], D_00432384);
+                ScriptAnimator_SetScript(&state->faders[0], D_00432384);
             }
             if (ai->m_Health == 0) {
-                func_00243414(obj, ai, 9);
-                func_00206068(8);
+                CAI__SetMode(obj, ai, 9);
+                CCache__SetFrameDelay(8);
             }
         }
     }

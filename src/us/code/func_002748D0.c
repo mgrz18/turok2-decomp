@@ -1,16 +1,16 @@
 #include "common.h"
 #include "structs/sound.h"
 
-s32 func_00293530(void *, s32);
+s32 alSndpDeallocate(void *, s32);
 
 /* Releases the voice slot and resets the voice. */
-void func_002748D0(SndVoice *arg0) {
+void SndVoice_Release(SndVoice *arg0) {
     s32 temp_a0;
     u8 *var_s1;
 
     temp_a0 = (s32) arg0->mgr;
     var_s1 = (u8 *) (temp_a0 + 0x7C);       /* slots - 0x60 */
-    func_00293530((void *) (temp_a0 + 0x84), *(s16 *) (var_s1 + (arg0->index << 1) + 0x60));
+    alSndpDeallocate((void *) (temp_a0 + 0x84), *(s16 *) (var_s1 + (arg0->index << 1) + 0x60));
     var_s1 += arg0->index * 2;
     *(s16 *) (var_s1 + 0x60) = -1;          /* owner->slots[index] */
     arg0->vp.priority = 0;

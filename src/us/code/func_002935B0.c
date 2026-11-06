@@ -3,15 +3,15 @@
 
 #include "rw/abu_types.h"
 
-extern int func_00293B1C(void * arg0);
+extern int _sndpVoiceHandler(void * arg0);
 extern ALGlobals *D_800B7760;
-extern void *func_002912A0(u8 *, s32, ALHeap *, s32, s32);
-extern void func_00290F20(ALEventQueue *, ALEventListItem *, s32);
-extern void func_00293F10(ALSynth *, ALPlayer *);
-extern void func_00291034(ALEventQueue *, ALEvent *, s32);
-extern s32 func_00290F9C(ALEventQueue *, ALEvent *);
-extern s32 func_00293B1C(void *);
-void func_002935B0(ALSndPlayer *sndp, ALSndpConfig *c)
+extern void *alHeapDBAlloc(u8 *, s32, ALHeap *, s32, s32);
+extern void alEvtqNew(ALEventQueue *, ALEventListItem *, s32);
+extern void alSynAddPlayer(ALSynth *, ALPlayer *);
+extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, s32);
+extern s32 alEvtqNextEvent(ALEventQueue *, ALEvent *);
+extern s32 _sndpVoiceHandler(void *);
+void alSndpNew(ALSndPlayer *sndp, ALSndpConfig *c)
 {
     u8 *ptr;
     ALEvent evt;
@@ -20,18 +20,18 @@ void func_002935B0(ALSndPlayer *sndp, ALSndpConfig *c)
     sndp->maxSounds = c->maxSounds;
     sndp->target = -1;
     sndp->frameTime = 16000;
-    sState = (ALSoundState *)func_002912A0(0, 0, c->heap, 1, c->maxSounds * sizeof(ALSoundState));
+    sState = (ALSoundState *)alHeapDBAlloc(0, 0, c->heap, 1, c->maxSounds * sizeof(ALSoundState));
     sndp->sndState = sState;
     for (i = 0; i < c->maxSounds; i++)
         sState[i].sound = 0;
-    ptr = func_002912A0(0, 0, c->heap, 1, c->maxEvents * sizeof(ALEventListItem));
-    func_00290F20(&sndp->evtq, (ALEventListItem *)ptr, c->maxEvents);
+    ptr = alHeapDBAlloc(0, 0, c->heap, 1, c->maxEvents * sizeof(ALEventListItem));
+    alEvtqNew(&sndp->evtq, (ALEventListItem *)ptr, c->maxEvents);
     sndp->drvr = &D_800B7760->drvr;
     sndp->node.next = 0;
-    sndp->node.handler = func_00293B1C;
+    sndp->node.handler = _sndpVoiceHandler;
     sndp->node.clientData = sndp;
-    func_00293F10(sndp->drvr, &sndp->node);
+    alSynAddPlayer(sndp->drvr, &sndp->node);
     evt.type = 5;
-    func_00291034(&sndp->evtq, (ALEvent *)&evt, sndp->frameTime);
-    sndp->nextDelta = func_00290F9C(&sndp->evtq, &sndp->nextEvent);
+    alEvtqPostEvent(&sndp->evtq, (ALEvent *)&evt, sndp->frameTime);
+    sndp->nextDelta = alEvtqNextEvent(&sndp->evtq, &sndp->nextEvent);
 }

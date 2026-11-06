@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00284DAC(ControllerProfile *arg0);
+extern void Controller_UpdateConnection(ControllerProfile *arg0);
 extern u8 D_800F677B[];
-extern s32 func_0026EB3C(void *arg0, void *arg1, s32 arg2);
-void func_00284DAC(ControllerProfile *arg0) {
+extern s32 RumblePool_Init(void *arg0, void *arg1, s32 arg2);
+void Controller_UpdateConnection(ControllerProfile *arg0) {
     ControllerProfile *c = arg0;
     s32 type;
     s32 bit;
@@ -45,7 +45,7 @@ void func_00284DAC(ControllerProfile *arg0) {
         c->rumbleLevel = 0;
         c->rumbleTimer = 0;
         c->connected = bit2;
-        func_0026EB3C(c->rumblePool, c->rumbleNodes, 3);
+        RumblePool_Init(c->rumblePool, c->rumbleNodes, 3);
     }
     c->connected = bit;
 }

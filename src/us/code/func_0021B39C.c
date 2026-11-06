@@ -29,13 +29,13 @@ typedef struct {
     u8 b65;             /* 0x65 */
 } B10Ent2;
 
-s32 **func_0021F358(void);
-void func_002051F4(s32, s32 **);
-void *func_002017D4(void *, s32);
-void func_0020EF2C(CVector3 *o, CVector3 *a, CVector3 *b);
-void func_0020EFDC(CVector3 *o, CVector3 *a, CVector3 *b);
-void func_0020EF60(CVector3 *o, CVector3 *a, f32 s);
-void func_0020F040(CVector3 *v);
+s32 **CGameObjectInstance__LoadGeometry(void);
+void CCache__Unlock(s32, s32 **);
+void *CISet__GetBlock(void *, s32);
+void CVector3__Subtract(CVector3 *o, CVector3 *a, CVector3 *b);
+void CVector3__Cross(CVector3 *o, CVector3 *a, CVector3 *b);
+void CVector3__Scale(CVector3 *o, CVector3 *a, f32 s);
+void CVector3__Normalize(CVector3 *v);
 
 void func_0021B39C(s32 a, B10Pb *b, B10Pc *c, CVector3 v1, CVector3 v2, s32 idx) {
     CVector3 r;
@@ -47,34 +47,34 @@ void func_0021B39C(s32 a, B10Pb *b, B10Pc *c, CVector3 v1, CVector3 v2, s32 idx)
     s32 i;
     s32 cur;
 
-    if (b->b34 != 0x3C && b->b12 < 0x17 && (n = func_0021F358()) != 0) {
-        node = func_002017D4(*n, 3);
-        e = func_002017D4(func_002017D4(node, idx), 1);
+    if (b->b34 != 0x3C && b->b12 < 0x17 && (n = CGameObjectInstance__LoadGeometry()) != 0) {
+        node = CISet__GetBlock(*n, 3);
+        e = CISet__GetBlock(CISet__GetBlock(node, idx), 1);
         cur = idx;
         if ((e->b65 & 3) == 3) {
-            func_002051F4(0, n);
+            CCache__Unlock(0, n);
             return;
         }
         for (i = 0; i < 4; i++) {
             b->b14[i] = cur;
             cur = e->b64;
             if (cur != -1) {
-                e = func_002017D4(func_002017D4(node, cur), 1);
+                e = CISet__GetBlock(CISet__GetBlock(node, cur), 1);
             }
         }
-        func_002051F4(0, n);
+        CCache__Unlock(0, n);
         b->b12 = 0x19;
         t.x = c->f30;
         t.y = c->f34;
         t.z = c->f38;
-        func_0020EF2C(&v1, &v1, &t);
-        func_0020EFDC(&r, &v1, &v2);
-        func_0020F040(&r);
-        func_0020F040(&v1);
-        func_0020F040(&v2);
-        func_0020EFDC(&x, &r, &v1);
-        func_0020EF60(&r, &r, x.x * v2.x + x.y * v2.y + x.z * v2.z);
-        func_0020F040(&r);
+        CVector3__Subtract(&v1, &v1, &t);
+        CVector3__Cross(&r, &v1, &v2);
+        CVector3__Normalize(&r);
+        CVector3__Normalize(&v1);
+        CVector3__Normalize(&v2);
+        CVector3__Cross(&x, &r, &v1);
+        CVector3__Scale(&r, &r, x.x * v2.x + x.y * v2.y + x.z * v2.z);
+        CVector3__Normalize(&r);
         b->v18 = r;
     }
 }

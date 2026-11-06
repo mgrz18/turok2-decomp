@@ -12,12 +12,12 @@ struct Triple {
 };
 struct Triple;
 typedef struct Triple Triple;
-extern void func_0024599C(void *arg0, void *arg1, void *arg2);
-void func_00268798(u8 *arg0, void *arg1) {
+extern void AI_ComputeFrameMotion(void *arg0, void *arg1, void *arg2);
+void GameObject_GetFrameDelta(u8 *arg0, void *arg1) {
     Triple buf;
     char pad[0x30];
     if (*arg0 == 1) {
-        func_0024599C(arg0, arg0 + 0x140, &buf);
+        AI_ComputeFrameMotion(arg0, arg0 + 0x140, &buf);
         *(Triple *)arg1 = buf;
         return;
     }

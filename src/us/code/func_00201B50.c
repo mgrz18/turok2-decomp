@@ -11,11 +11,11 @@ typedef float f32;
 typedef double f64;
 s32 osJamMesg(s32, s32, s32);
 s32 osRecvMesg(s32, s32, s32);
-s32 func_0029B9B0(s32, s32);
-s32 func_0029B030(s32 *, s32 *, s32);
+s32 osSetThreadPri(s32, s32);
+s32 osCreateMesgQueue(s32 *, s32 *, s32);
 extern s32 D_800B6E54;
 extern s32 D_800B6E88;
-s32 func_00201B50(s32 arg0, void *arg1)
+s32 CDecompressor__DecompressSync(s32 arg0, void *arg1)
 {
   s32 new_var3;
   u8 sp10[0x18];
@@ -25,11 +25,11 @@ s32 func_00201B50(s32 arg0, void *arg1)
   s32 *new_var;
   new_var2 = 1;
   new_var = &sp28;
-  func_0029B030(sp10, new_var, new_var2);
+  osCreateMesgQueue(sp10, new_var, new_var2);
   new_var3 = D_800B6E88;
   *((s32 **) (((s8 *) arg1) + 0x20)) = sp10;
   D_800B6E54 = 2;
-  func_0029B9B0(arg0, new_var3);
+  osSetThreadPri(arg0, new_var3);
   osJamMesg(arg0 + 0x230, (s32) arg1, 1);
   osRecvMesg((s32) sp10, (s32) (&sp2C), new_var2);
   return 1;

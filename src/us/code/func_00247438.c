@@ -38,27 +38,27 @@ extern s32 D_800C2038;
 extern f32 D_800ADDB8;
 extern u8 D_800F6CB0[];
 
-void func_0020B5B8(void);
-void func_0020B5D4(void);
-void func_0020B624(void);
-void func_0028852C(void *vp, s32 left, s32 right, s32 top, s32 bottom);
-void func_0020FC74(f32 *mtx, f32 x, f32 y, f32 z);
-void func_00210968(f32 *mtx, f32 angle);
-void func_00210790(f32 *mtx, f32 angle);
-void func_00210318(f32 *mtx, f32 x, f32 y, f32 z);
-void func_00210C3C(f32 *mtx);
-void func_0020FF80(f32 *dst, f32 *src);
-void func_00210478(f32 *mtx, f32 x, f32 y, f32 z);
-void func_0020D274(f32 *src, Mtx64 *dst);
-void func_0020F85C(f32 *mtx, CVector3 *in, CVector3 *out);
-void func_0020B7F8(s32 key, void *matrix, void *lights, s32 lod, s32 pass);
+void Render_InvalidateModeCache(void);
+void Render_ResetBatches(void);
+void Render_FlushBatches(void);
+void CEngineApp__ClearDepthRect(void *vp, s32 left, s32 right, s32 top, s32 bottom);
+void CMtxF__SetScale(f32 *mtx, f32 x, f32 y, f32 z);
+void CMtxF__RotateY(f32 *mtx, f32 angle);
+void CMtxF__RotateX(f32 *mtx, f32 angle);
+void CMtxF__Translate(f32 *mtx, f32 x, f32 y, f32 z);
+void CMtxF__SwapYZRows(f32 *mtx);
+void CMtxF__Copy(f32 *dst, f32 *src);
+void CMtxF__ScaleColumns(f32 *mtx, f32 x, f32 y, f32 z);
+void CMtxF__ToMtxAffine(f32 *src, Mtx64 *dst);
+void CMtxF__TransformPoint(f32 *mtx, CVector3 *in, CVector3 *out);
+void Render_QueueModelByKey(s32 key, void *matrix, void *lights, s32 lod, s32 pass);
 
-void func_00247438(HudModel *m, HudView *view) {
+void CPlayer__DrawScope(HudModel *m, HudView *view) {
     f32 mf[4][4];
     f32 mfDraw[4][4];
     CVector3 out;
 
-    func_0020B5B8();
+    Render_InvalidateModeCache();
     if (m->object == 0 || m->state == 0) {
         return;
     }
@@ -79,21 +79,21 @@ void func_00247438(HudModel *m, HudView *view) {
         g->w0 = 0xE3001201;
         g->w1 = 0x2000;
     }
-    func_0020B5D4();
-    func_0028852C(D_800F6CB0, view->left, view->width + view->left, view->top, view->height + view->top);
-    func_0020FC74(&mf[0][0], m->scaleX, m->scaleY, m->scaleZ);
-    func_00210968(&mf[0][0], m->rotY);
-    func_00210790(&mf[0][0], m->rotX);
-    func_00210318(&mf[0][0], m->pos.x, m->pos.y, m->pos.z);
-    func_00210C3C(&mf[0][0]);
-    func_0020FF80(&mfDraw[0][0], &mf[0][0]);
+    Render_ResetBatches();
+    CEngineApp__ClearDepthRect(D_800F6CB0, view->left, view->width + view->left, view->top, view->height + view->top);
+    CMtxF__SetScale(&mf[0][0], m->scaleX, m->scaleY, m->scaleZ);
+    CMtxF__RotateY(&mf[0][0], m->rotY);
+    CMtxF__RotateX(&mf[0][0], m->rotX);
+    CMtxF__Translate(&mf[0][0], m->pos.x, m->pos.y, m->pos.z);
+    CMtxF__SwapYZRows(&mf[0][0]);
+    CMtxF__Copy(&mfDraw[0][0], &mf[0][0]);
     if (D_800C2038 == 2) {
-        func_00210478(&mfDraw[0][0], D_800ADDB8, 1.0f, 1.0f);
+        CMtxF__ScaleColumns(&mfDraw[0][0], D_800ADDB8, 1.0f, 1.0f);
     }
-    func_0020D274(&mfDraw[0][0], &m->mtx[D_800B6D1C]);
-    func_0020F85C(&mf[0][0], &m->pos, &out);
-    func_0020B7F8(m->object, &m->mtx[D_800B6D1C], D_800AB0D0, 0, -1);
-    func_0020B624();
+    CMtxF__ToMtxAffine(&mfDraw[0][0], &m->mtx[D_800B6D1C]);
+    CMtxF__TransformPoint(&mf[0][0], &m->pos, &out);
+    Render_QueueModelByKey(m->object, &m->mtx[D_800B6D1C], D_800AB0D0, 0, -1);
+    Render_FlushBatches();
     D_800AB8CC = 0;
     {
         Gfx *g = D_800D8E24++;

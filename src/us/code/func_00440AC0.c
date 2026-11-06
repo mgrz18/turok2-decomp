@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_00440AC0(void) {
+void Primagen_EnterMode11_2(void) {
 
 }

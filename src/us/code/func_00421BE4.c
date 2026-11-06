@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/menu.h"
 
-s32 func_004160F0(void *item);
-s32 func_0029E3E0(char *dst, const char *fmt, ...); /* sprintf */
+s32 MenuItem_TextLength(void *item);
+s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 
 extern char D_800C1410[];
 extern s32 D_800C2028;
@@ -13,7 +13,7 @@ extern s32 D_80130984;
 extern s32 D_80130990;
 extern s32 D_801309B4;
 
-s32 func_00421BE4(MenuItem *item) {
+s32 PakMenu_UpdateModeText(MenuItem *item) {
     s32 player;
 
     if (D_801309B4 != 0 && D_80130984 != 0) {
@@ -23,7 +23,7 @@ s32 func_00421BE4(MenuItem *item) {
     } else if (D_80130990 != 0) {
         player = D_800C2028;
         item->text = D_800B48F8;
-        func_0029E3E0(item->text + (func_004160F0(item) - 1), D_800C1410, player + 1);
+        sprintf(item->text + (MenuItem_TextLength(item) - 1), D_800C1410, player + 1);
     }
     return 0;
 }

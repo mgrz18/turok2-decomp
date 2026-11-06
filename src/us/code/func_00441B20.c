@@ -11,16 +11,16 @@ typedef struct {
     /* 0x14 */ s32 unk14;
 } ObjState;
 
-s32 func_00219F74(s32, s32, s32);
-s32 func_0027AD24(s32, s32, s32);
-s32 func_004089E0(s32, s32, s32);
+s32 CGameObjectInstance__PickRandomAnim(s32, s32, s32);
+s32 COnScreen__SetBoss(s32, s32, s32);
+s32 TotemDefense_DrawTotem(s32, s32, s32);
 
-void func_0027AD54(void *, void *, void *);         /* extern */
+void COnScreen__SetBoss2(void *, void *, void *);         /* extern */
 extern u8 D_800C0560[];
 extern u8 D_800C0568[];
 extern u8 D_801100F0[];
 
-void func_00441B20(ObjState *arg0, CGameObjectInstance *arg1)
+void TotemDefense_InitFight_2(ObjState *arg0, CGameObjectInstance *arg1)
 {
   CAI *temp_a3;
   CGameObjectInstance *temp_s0;
@@ -31,14 +31,14 @@ void func_00441B20(ObjState *arg0, CGameObjectInstance *arg1)
   arg0->unk8 = 0;
   arg0->unk10 = 0;
   arg0->unkC = (f32) new_var;
-  arg1->m_AI.m_pfDraw = func_004089E0;
+  arg1->m_AI.m_pfDraw = TotemDefense_DrawTotem;
   temp_s0 = arg0->obj;
   arg0->unk14 = 0;
   temp_a3 = &temp_s0->m_AI;
-  temp_a3->m_AnimIndex = func_00219F74((s32) temp_s0, 0x5334, -1);
+  temp_a3->m_AnimIndex = CGameObjectInstance__PickRandomAnim((s32) temp_s0, 0x5334, -1);
   temp_a3->m_AnimType = 0x5334;
   temp_s0->m_AI.m_dwFlags = temp_s0->m_AI.m_dwFlags & (~1);
   temp_a3->m_AnimRepeatedCount = 0;
-  func_0027AD24((s32) D_801100F0, (s32) arg1, (s32) D_800C0560);
-  func_0027AD54(D_801100F0, arg1, D_800C0568);
+  COnScreen__SetBoss((s32) D_801100F0, (s32) arg1, (s32) D_800C0560);
+  COnScreen__SetBoss2(D_801100F0, arg1, D_800C0568);
 }

@@ -5,7 +5,7 @@
 
 typedef unsigned int u32;
 
-u32 func_0029DFC0(void) {
+u32 osGetCount(void) {
     u32 count;
     __asm__ __volatile__("mfc0 %0, $9" : "=r"(count)); /* CP0 $9 = Count */
     return count;

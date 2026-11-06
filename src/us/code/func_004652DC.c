@@ -9,7 +9,7 @@ extern Shape_8011AADC D_8011AADC;
 extern void func_0042C338(char *);
 extern void func_0042C38C(char *);
 
-void func_004652DC(CWorld *world, s32 level) {
+void CScene__InitPersistentData_2(CWorld *world, s32 level) {
     func_0042C338((char *)world);
     func_0042C38C((char *)world);
     world->m_PreviewState = 0;

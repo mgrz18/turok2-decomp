@@ -3,17 +3,17 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00429DFC(OSPfs *pfs);
-extern s32 func_004292E0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 *file_no);
+extern s32 __osCheckId(OSPfs *pfs);
+extern s32 osPfsFindFile(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 *file_no);
 extern s32 osPfsFreeBlocks(OSPfs *pfs, s32 *bytes_not_used);
-extern s32 func_00429AA4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-extern s32 func_00427524(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank,
+extern s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+extern s32 __osPfsDeclearPage(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank,
                          int *decleared, int *last_page);
-extern s32 func_00429DFC(OSPfs *pfs);
-extern s32 func_004292E0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 *file_no);
-extern s32 func_00429AA4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
-s32 func_00427180(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name,
+extern s32 __osCheckId(OSPfs *pfs);
+extern s32 osPfsFindFile(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 *file_no);
+extern s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
+s32 osPfsAllocateFile(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name,
                   int file_size_in_bytes, s32 *file_no)
 {
     int start_page;
@@ -38,9 +38,9 @@ s32 func_00427180(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8
     if ((pfs->status & 1) == 0) {
         return 5;
     }
-    if (func_00429DFC(pfs) == 2)
+    if (__osCheckId(pfs) == 2)
         return 2;
-    if (((ret = func_004292E0(pfs, company_code, game_code, game_name, ext_name, file_no)) != 0) &&
+    if (((ret = osPfsFindFile(pfs, company_code, game_code, game_name, ext_name, file_no)) != 0) &&
         ret != 5) {
         return ret;
     }
@@ -52,17 +52,17 @@ s32 func_00427180(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8
         return 7;
     }
     if (file_size_in_pages != 0) {
-        if (((ret = func_004292E0(pfs, 0, 0, 0, 0, file_no)) != 0) && ret != 5) {
+        if (((ret = osPfsFindFile(pfs, 0, 0, 0, 0, file_no)) != 0) && ret != 5) {
             return ret;
         }
         if (*file_no == -1) {
             return 8;
         }
         for (bank = 0; bank < pfs->banks; bank++) {
-            ret = func_00429AA4(pfs, &inode, 0, bank);
+            ret = __osPfsRWInode(pfs, &inode, 0, bank);
             if (ret != 0)
                 return ret;
-            ret = func_00427524(pfs, &inode, file_size_in_pages, &start_page, bank, &decleared, &last_page);
+            ret = __osPfsDeclearPage(pfs, &inode, file_size_in_pages, &start_page, bank, &decleared, &last_page);
             if (ret != 0)
                 return ret;
             if (start_page != -1) {
@@ -72,7 +72,7 @@ s32 func_00427180(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8
                 } else {
                     backup_inode.inode_page[old_last_page].inode_t.bank = bank;
                     backup_inode.inode_page[old_last_page].inode_t.page = start_page;
-                    ret = func_00429AA4(pfs, &backup_inode, 1, old_bank);
+                    ret = __osPfsRWInode(pfs, &backup_inode, 1, old_bank);
                     if (ret != 0)
                         return ret;
                 }
@@ -95,7 +95,7 @@ s32 func_00427180(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8
         }
         backup_inode.inode_page[old_last_page].inode_t.bank = bank;
         backup_inode.inode_page[old_last_page].inode_t.page = start_page;
-        ret = func_00429AA4(pfs, &backup_inode, 1, old_bank);
+        ret = __osPfsRWInode(pfs, &backup_inode, 1, old_bank);
         if (ret != 0)
             return ret;
         dir.start_page = fpage;
@@ -106,7 +106,7 @@ s32 func_00427180(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8
             dir.game_name[j] = *game_name++;
         for (j = 0; j < 4; j++)
             dir.ext_name[j] = *ext_name++;
-        ret = func_00299A40(pfs->queue, pfs->channel, pfs->dir_table + *file_no, (u8 *)&dir, 0);
+        ret = __osContRamWrite(pfs->queue, pfs->channel, pfs->dir_table + *file_no, (u8 *)&dir, 0);
         if (ret != 0)
             return ret;
         return ret;
@@ -114,7 +114,7 @@ s32 func_00427180(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8
         return 5;
     }
 }
-s32 func_00427524(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank,
+s32 __osPfsDeclearPage(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank,
                   int *decleared, int *last_page);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);

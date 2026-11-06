@@ -7,6 +7,6 @@ typedef struct {
 
 extern s32 D_800F70A8;
 
-void func_0045A22C(s32 arg0, s32 arg1) {
+void Pak_SetBufferSize_2(s32 arg0, s32 arg1) {
     ((Slot *) (D_800F70A8 + arg0))->value = arg1;
 }

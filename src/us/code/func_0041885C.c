@@ -5,7 +5,7 @@ extern u8 D_8011AB01; /* D_8011AAD8 + 0x29 */
 extern char D_800B6164[];
 extern char D_800B617C[];
 
-s32 func_0041885C(MenuItem *a) {
+s32 FragTagMenu_CrosshairsLabel(MenuItem *a) {
     switch (D_8011AB01) {
     case 0:
         a->text = D_800B617C;

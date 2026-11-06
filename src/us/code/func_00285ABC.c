@@ -3,7 +3,7 @@
 
 extern s8 D_800F5EA3;
 
-void func_00285ABC(void) {
+void Controller_UnwatchAllPaks(void) {
     s32 var_v1;
     s8 *var_v0;
 

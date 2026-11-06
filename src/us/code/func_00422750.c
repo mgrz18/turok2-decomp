@@ -3,6 +3,6 @@
 
 extern s32 D_801309C0;
 
-void func_00422750(void) {
+void PakMessage_InitPakChanged(void) {
     D_801309C0 = 7;
 }

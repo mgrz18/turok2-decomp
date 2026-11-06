@@ -24,7 +24,7 @@ struct RibbonVertexPool {
     s32 remaining;
     Vtx *next;
 };
-s32 func_00235F8C(void *arg0, s32 arg1)
+s32 RibbonVtxPool_Alloc(void *arg0, s32 arg1)
 {
     struct RibbonVertexPool *pool = arg0;
     s32 avail;

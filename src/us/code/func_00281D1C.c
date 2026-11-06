@@ -8,16 +8,16 @@ typedef struct {
 } RegionTremor;
 
 extern u8 D_800F7078[];
-RegionTremor *func_0022425C(void *regions, struct CGameRegion *region);
-f32 func_002119FC(f32 min, f32 max);          /* a random float between the two */
+RegionTremor *CScene__GetRegionInfo(void *regions, struct CGameRegion *region);
+f32 Random_Blend(f32 min, f32 max);          /* a random float between the two */
 
 /* The tremor of the ground in a region that shakes: eases the camera's
  * tremor toward 0.5 degrees and 0.25 high there (toward nothing elsewhere)
  * and gives this frame's random offset of the view. */
-void func_00281D1C(CCamera *cam, CVector3 *offset) {
+void CCamera__UpdateTremor(CCamera *cam, CVector3 *offset) {
     f32 height = 0.0f;
     f32 angle = height;
-    RegionTremor *region = func_0022425C(D_800F7078, cam->m_ViewParams.m_pCurrentRegion);
+    RegionTremor *region = CScene__GetRegionInfo(D_800F7078, cam->m_ViewParams.m_pCurrentRegion);
 
     if (region == NULL) {
         offset->x = height;
@@ -31,7 +31,7 @@ void func_00281D1C(CCamera *cam, CVector3 *offset) {
     }
     cam->m_TremorAngle += (angle - cam->m_TremorAngle) * 0.2f;
     cam->m_TremorHeight += (height - cam->m_TremorHeight) * 0.1f;
-    offset->x = func_002119FC(-cam->m_TremorAngle * 0.017453294f, cam->m_TremorAngle * 0.017453294f);
-    offset->y = func_002119FC(0.0f, cam->m_TremorHeight * 10.24f);
-    offset->z = func_002119FC(-cam->m_TremorAngle * 0.017453294f, cam->m_TremorAngle * 0.017453294f);
+    offset->x = Random_Blend(-cam->m_TremorAngle * 0.017453294f, cam->m_TremorAngle * 0.017453294f);
+    offset->y = Random_Blend(0.0f, cam->m_TremorHeight * 10.24f);
+    offset->z = Random_Blend(-cam->m_TremorAngle * 0.017453294f, cam->m_TremorAngle * 0.017453294f);
 }

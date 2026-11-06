@@ -3,7 +3,7 @@
 
 extern s32 D_8011F290[];
 
-void func_0028D23C(void) {
+void SavedPlayers_UpdateTimer(void) {
     s32 *p = D_8011F290;
 
     if (p[2] != 0) {

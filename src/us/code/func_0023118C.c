@@ -26,16 +26,16 @@ extern CCamera *D_801198D0;
 extern u8 D_800F7078[];
 extern u8 D_801102B8[];
 
-extern s32 func_0026F60C(void *planes, Box *box);
-extern void func_0020F85C(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
-extern void func_0022D2FC(CParticle *particle, void *mtx, CCamera *camera, f32 depth);
-extern void func_002254C0(void *list, CVector3 *pos, void *out);
+extern s32 Frustum_TestBox(void *planes, Box *box);
+extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
+extern void CParticle__BuildMatrix(CParticle *particle, void *mtx, CCamera *camera, f32 depth);
+extern void CScene__GetLightsAt(void *list, CVector3 *pos, void *out);
 extern void func_0020B9F4(void *model, void *mtx, void *mtx2, s32 a, s32 b);
-extern void func_0022E094(CParticle *particle, CCamera *view);
-extern void func_0022DCBC(CParticle *particle, CCamera *view);
-extern void func_00236170(void *list, CParticle *particle, void *mtx);
+extern void CParticle__DrawSprite(CParticle *particle, CCamera *view);
+extern void CParticle__DrawShadow(CParticle *particle, CCamera *view);
+extern void Swoosh_AddParticleNode(void *list, CParticle *particle, void *mtx);
 
-void func_0023118C(CParticleSystem *world, CCamera *view) {
+void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
     Box box;
     CVector3 transformed;
     CParticle *node;
@@ -85,7 +85,7 @@ void func_0023118C(CParticleSystem *world, CCamera *view) {
                     if (minX < view->m_ViewMax.x && view->m_ViewMin.x < maxX &&
                         minZ < view->m_ViewMax.z && view->m_ViewMin.z < maxZ &&
                         minY < view->m_ViewMax.y && view->m_ViewMin.y < maxY &&
-                        func_0026F60C(view->m_ViewVolume, &box)) {
+                        Frustum_TestBox(view->m_ViewVolume, &box)) {
                         visible = 1;
                     }
                 } else visible = 1;
@@ -95,42 +95,42 @@ void func_0023118C(CParticleSystem *world, CCamera *view) {
                     if (!built) {
                         if (D_801198E0 == 1) {
                             camera = D_801198D0;
-                            func_0020F85C(camera->m_mfView, &node->header.m_vPos, &transformed);
+                            CMtxF__TransformPoint(camera->m_mfView, &node->header.m_vPos, &transformed);
                             depth = transformed.z;
                             if (depth < 0.0f) depth = -depth;
-                            func_0022D2FC(node, node->m_mtxDraw[D_800B6D1C], camera, depth);
+                            CParticle__BuildMatrix(node, node->m_mtxDraw[D_800B6D1C], camera, depth);
                         } else {
-                            func_0022D2FC(node, node->m_mtxDraw[D_800B6D1C], 0, 0.0f);
+                            CParticle__BuildMatrix(node, node->m_mtxDraw[D_800B6D1C], 0, 0.0f);
                         }
                         node->m_dwFlags |= builtFlag;
                     }
                     if (node->m_pEffect->m_pModel != 0) {
-                        func_002254C0(D_800F7078, &node->header.m_vPos, node->m_Lights[D_800B6D1C]);
+                        CScene__GetLightsAt(D_800F7078, &node->header.m_vPos, node->m_Lights[D_800B6D1C]);
                         func_0020B9F4(node->m_pEffect->m_pModel, node->m_mtxDraw[D_800B6D1C], node->m_Lights[D_800B6D1C], 0, -1);
                     } else {
-                        func_0022E094(node, view);
+                        CParticle__DrawSprite(node, view);
                     }
                     if (node->m_pEffect->m_dwFlags & builtFlag) {
-                        func_0022DCBC(node, view);
+                        CParticle__DrawShadow(node, view);
                     }
                     if (!node->m_ActiveSwooshes || built) break;
                     if (!(node->m_pEffect->m_dwFlags & 0x10000)) {
-                        func_00236170(D_801102B8, node, node->m_mtxDraw[D_800B6D1C]);
+                        Swoosh_AddParticleNode(D_801102B8, node, node->m_mtxDraw[D_800B6D1C]);
                     }
                 } else {
                     if (!node->m_ActiveSwooshes || built) break;
                     if (D_801198E0 == 1) {
                         camera = D_801198D0;
-                        func_0020F85C(camera->m_mfView, &node->header.m_vPos, &transformed);
+                        CMtxF__TransformPoint(camera->m_mfView, &node->header.m_vPos, &transformed);
                         depth = transformed.z;
                         if (depth < 0.0f) depth = -depth;
-                        func_0022D2FC(node, node->m_mtxDraw[D_800B6D1C], camera, depth);
+                        CParticle__BuildMatrix(node, node->m_mtxDraw[D_800B6D1C], camera, depth);
                     } else {
-                        func_0022D2FC(node, node->m_mtxDraw[D_800B6D1C], 0, 0.0f);
+                        CParticle__BuildMatrix(node, node->m_mtxDraw[D_800B6D1C], 0, 0.0f);
                     }
                     node->m_dwFlags |= builtFlag;
                     if (!(node->m_pEffect->m_dwFlags & 0x10000)) {
-                        func_00236170(D_801102B8, node, node->m_mtxDraw[D_800B6D1C]);
+                        Swoosh_AddParticleNode(D_801102B8, node, node->m_mtxDraw[D_800B6D1C]);
                     }
                 }
             } while (0);

@@ -30,20 +30,20 @@ extern CWorld D_800F7078;
 extern CCollisionResults *D_800F1ADC;
 extern u8 D_8011AAF1;
 
-s32 func_0023A640(Sweep *sweep, CBox *box, f32 *t);
-void func_00226F90(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
-s32 func_002407D8();
-s32 func_0024079C();
-void func_0023E6D8(Sweep *sweep, SweepBox *box);
-void func_0023DF70(Sweep *sweep, SweepBox *box, HitInst *other);
-void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, CBox *box);
+s32 Sweep_HitBox(Sweep *sweep, CBox *box, f32 *t);
+void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
+s32 Collision_CompareInstanceHits();
+s32 Collision_SwapInstanceHits();
+void Sweep_GetVolumeBounds(Sweep *sweep, SweepBox *box);
+void Sweep_TestInstance(Sweep *sweep, SweepBox *box, HitInst *other);
+void Sweep_TestBox(Sweep *sweep, HitInst *other, CVector3 *start, CBox *box);
 
 #define MIN(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
 
 /* Sweep against the actors whose bounds the swept segment's box touches,
  * nearest first, until the sweep's range runs out. */
-void func_0024032C(Sweep *sweep) {
+void Collision_SweepActors(Sweep *sweep) {
     CBox box;
     SweepBox volume;
     InstanceHit hits[0x80];
@@ -106,7 +106,7 @@ void func_0024032C(Sweep *sweep) {
             !(box.m_vMax.y > other->bounds.m_vMin.y) || !(box.m_vMin.y < other->bounds.m_vMax.y)) {
             continue;
         }
-        if (func_0023A640(sweep, &other->bounds, &t)) {
+        if (Sweep_HitBox(sweep, &other->bounds, &t)) {
             hit->inst = other;
             hit->t = t;
             hit++;
@@ -114,7 +114,7 @@ void func_0024032C(Sweep *sweep) {
         }
     }
     if (nHits != 0) {
-        func_00226F90(hits, nHits, sizeof(InstanceHit), func_002407D8, func_0024079C);
+        Sort_Quick(hits, nHits, sizeof(InstanceHit), Collision_CompareInstanceHits, Collision_SwapInstanceHits);
         hit = hits;
         for (j = 0; j < nHits; j++, hit++) {
             if (!(hit->t < sweep->hit.fraction)) {
@@ -122,10 +122,10 @@ void func_0024032C(Sweep *sweep) {
             }
             other = hit->inst;
             if ((other->flags & 0x300000) && !(multi = &D_8011AAD8)->multiplayer) {
-                func_0023E6D8(sweep, &volume);
-                func_0023DF70(sweep, &volume, other);
+                Sweep_GetVolumeBounds(sweep, &volume);
+                Sweep_TestInstance(sweep, &volume, other);
             } else {
-                func_0023FDF0(sweep, other, start, &box);
+                Sweep_TestBox(sweep, other, start, &box);
             }
         }
     }

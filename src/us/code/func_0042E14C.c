@@ -1,4 +1,4 @@
-/* CPlayer code: func_0042E14C, 0x0042E14C-0x0042E29C (splat had it inside the data D_0042D50C). */
+/* CPlayer code: CPlayer__StartGame, 0x0042E14C-0x0042E29C (splat had it inside the data D_0042D50C). */
 #include "common.h"
 #include "structs/game.h"
 #include "structs/player.h"
@@ -9,14 +9,14 @@ extern u32 D_800B6D20;
 extern s16 D_800AE2B4[];
 extern f32 D_800A6AC4; /* 60.0f, in the engine's .rodata */
 
-extern void func_00285BD0(s32 controller, s32 state);
-extern void func_002540E4(CPlayer *p);
-extern void func_00248340(CPlayer *p);
-extern void func_0027580C(s32 sound);
-extern void func_00248A8C(CPlayer *p);
-extern void func_00248BA8(CPlayer *p, s32 warp, s32 arg2, s32 respawn);
+extern void Controller_SetRumbleOption(s32 controller, s32 state);
+extern void CPlayer__Respawn(CPlayer *p);
+extern void CPlayer__Reset(CPlayer *p);
+extern void Sound__PlaySpeech(s32 sound);
+extern void CPlayer__GiveStartingWeapons(CPlayer *p);
+extern void CPlayer__Warp(CPlayer *p, s32 warp, s32 arg2, s32 respawn);
 
-void func_0042E14C(CPlayer *p) {
+void CPlayer__StartGame(CPlayer *p) {
     s32 mode = (D_80119878 >= 2) * 2;
 
     if (D_8011AAF1) {
@@ -24,14 +24,14 @@ void func_0042E14C(CPlayer *p) {
     } else {
         p->m_Data.m_Lives = 3;
     }
-    if (D_8011AAF1 != 0 || (func_00285BD0(p->m_ContState.m_pContState, 1), D_8011AAF1 != 0)) {
-        func_002540E4(p);
+    if (D_8011AAF1 != 0 || (Controller_SetRumbleOption(p->m_ContState.m_pContState, 1), D_8011AAF1 != 0)) {
+        CPlayer__Respawn(p);
     } else {
         p->m_Data.m_Health = 0x6400;
         p->m_CharacterActor.m_AI.m_Health = 0x6400;
     }
     p->m_InvincibilityTime = D_800A6AC4;
-    func_00248340(p);
+    CPlayer__Reset(p);
     p->m_ShockedTimer = 0;
     p->m_pHitMeWithCBore = 0;
     p->m_pHitMeWithChargeDart = 0;
@@ -39,12 +39,12 @@ void func_0042E14C(CPlayer *p) {
     p->m_UseLowerAmmo = 0;
     if (D_8011AAD8.mode == 13 && D_8011AAF1 == 0 && D_800B6D20 >= 11) {
         if (p->m_Data.m_Lives < 11) {
-            func_0027580C(D_800AE2B4[p->m_Data.m_Lives]);
+            Sound__PlaySpeech(D_800AE2B4[p->m_Data.m_Lives]);
         }
     }
     if (D_8011AAF1 != 0) {
-        func_00248A8C(p);
+        CPlayer__GiveStartingWeapons(p);
     }
     p->m_bEnteringDeathmatch = 0;
-    func_00248BA8(p, p->m_Data.m_CheckPointWarpID, mode, 1);
+    CPlayer__Warp(p, p->m_Data.m_CheckPointWarpID, mode, 1);
 }

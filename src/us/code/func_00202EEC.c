@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0020656C(s32, s32);
+extern void CCache__ClearDisplayListLocks(s32, s32);
 extern int D_800D8218;
 extern int D_800D8DCC;
 extern int D_800D8208[];
@@ -15,7 +15,7 @@ extern s32 D_800D8DA4[];
 extern s32 D_800D8DD0;
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
-void func_00202EEC(void) {
+void CCache__WaitForDisplayLists(void) {
     extern s32 osSendMesg(void *, s32, s32);
     extern s32 D_800D8DB0;
     s32 temp_v1;
@@ -35,7 +35,7 @@ void func_00202EEC(void) {
                 goto block_7;
             }
             D_800D8208[var_s0] = 0;
-            func_0020656C(0, var_s0);
+            CCache__ClearDisplayListLocks(0, var_s0);
             var_s0 += 1;
         } else {
 block_7:

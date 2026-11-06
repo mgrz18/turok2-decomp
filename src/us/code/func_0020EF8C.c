@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0020EF8C(void *arg0, f32 t, void *a, void *b);
-void func_0020EF8C(void *arg0, f32 t, void *a, void *b) {
+extern void CVector3__Lerp(void *arg0, f32 t, void *a, void *b);
+void CVector3__Lerp(void *arg0, f32 t, void *a, void *b) {
     CVector3 *out = arg0;
     CVector3 *start = a;
     CVector3 *end = b;

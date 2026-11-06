@@ -3,17 +3,17 @@
 
 #include "rw/abu_types.h"
 
-extern Chunk *func_0020205C(CartridgeReadWorker *arg0);
+extern Chunk *CLoader__AllocLoaderEntry(CartridgeReadWorker *arg0);
 extern s32 osJamMesg(void *arg0, void *arg1, s32 arg2);
 extern s32 osJamMesg(void *, void *, s32);
 extern s32 osSendMesg(void *, s32, s32);
-void func_00201E94(struct CartridgeReadWorker *arg0, u32 source, s32 length, void *destination,
+void CLoader__LoadAsync(struct CartridgeReadWorker *arg0, u32 source, s32 length, void *destination,
                    Queue *queue, s32 value, s32 direct) {
     s32 remaining;
     s32 chunk_length;
     Chunk *chunk;
     if (direct != 0) {
-        chunk = func_0020205C(arg0);
+        chunk = CLoader__AllocLoaderEntry(arg0);
         if (chunk != 0) {
             chunk->source = source;
             chunk->destination = destination;
@@ -25,7 +25,7 @@ void func_00201E94(struct CartridgeReadWorker *arg0, u32 source, s32 length, voi
     } else {
         remaining = length;
         do {
-            chunk = func_0020205C(arg0);
+            chunk = CLoader__AllocLoaderEntry(arg0);
             chunk_length = 0x2000;
             if (chunk == 0) {
                 break;

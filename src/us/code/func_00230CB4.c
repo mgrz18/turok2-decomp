@@ -15,16 +15,16 @@ extern s32 D_8011ACA4;
 extern s32 D_80110028;
 extern CBox D_800F5A10;       /* visible bounds */
 
-extern void func_0022AFB4(CParticle *p);
-extern s32 func_002325F0(CParticle *p);
-extern void func_00236EA0(CParticle *p, CParticle *source, s32 type, s32 id, CVector3 pos, CEventValue value);
-extern void func_00229340(CParticle *p, s32 type, s32 alignment, s32 count);
-extern void func_00275544(s16 sound, CVector3 pos, s32 a, s32 b);
-extern void func_0022F1C8(CParticleSystem *world, CParticle *p);
-extern void func_00230AB0(CParticleSystem *world, CParticle *p, CParticle **others, s32 count);
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);    /* out = a - b */
+extern void CParticle__Update(CParticle *p);
+extern s32 CParticle__IsUnderWater(CParticle *p);
+extern void ImpactEvent_Send(CParticle *p, CParticle *source, s32 type, s32 id, CVector3 pos, CEventValue value);
+extern void CParticle__SpawnChild(CParticle *p, s32 type, s32 alignment, s32 count);
+extern void Sound__Play(s16 sound, CVector3 pos, s32 a, s32 b);
+extern void CParticleSystem__Free(CParticleSystem *world, CParticle *p);
+extern void CParticle__CheckProximity(CParticleSystem *world, CParticle *p, CParticle **others, s32 count);
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);    /* out = a - b */
 
-void func_00230CB4(CParticleSystem *world) {
+void CParticleSystem__Update(CParticleSystem *world) {
     CParticle *colliders[128];
     CParticle *stepped[128];
     CEventValue value;
@@ -71,7 +71,7 @@ void func_00230CB4(CParticleSystem *world) {
         if (p->m_cFrame < (f32)p->m_nFrames && p->m_nFrames != 1 && !(p->m_dwFlags & 0x1000)) {
             if (D_800F5A10.m_vMax.x > p->header.m_vPos.x && D_800F5A10.m_vMax.y > p->header.m_vPos.y && D_800F5A10.m_vMax.z > p->header.m_vPos.z &&
                 D_800F5A10.m_vMin.x <= p->header.m_vPos.x && D_800F5A10.m_vMin.y <= p->header.m_vPos.y && D_800F5A10.m_vMin.z <= p->header.m_vPos.z) {
-                func_0022AFB4(p);
+                CParticle__Update(p);
                 light = p->m_pDLight;
                 if (light) {
                     light->m_bEnabled = 1;
@@ -82,28 +82,28 @@ void func_00230CB4(CParticleSystem *world) {
                 }
                 p->m_cFrame += D_800B6D28;
             } else {
-                func_0022F1C8(world, p);
+                CParticleSystem__Free(world, p);
             }
         } else {
             effect = p->m_pEffect;
-            event = func_002325F0(p) ? 12 : 10;
+            event = CParticle__IsUnderWater(p) ? 12 : 10;
             particleType = effect->m_pImpact->m_ImpactParticleType[event];
             eventType = effect->m_pImpact->m_ImpactEventType[event];
             value = effect->m_pImpact->m_ImpactEventValue[event];
             soundType = effect->m_pImpact->m_ImpactSoundType[event];
             if (eventType != 0xFFFF) {
-                func_00236EA0(p, p, eventType, -1, p->header.m_vPos, value);
+                ImpactEvent_Send(p, p, eventType, -1, p->header.m_vPos, value);
             }
             if (particleType != 0xFFFF) {
-                func_00229340(p, particleType, p->m_Alignment, 1);
+                CParticle__SpawnChild(p, particleType, p->m_Alignment, 1);
             }
             if (soundType != 0xFFFF) {
-                func_00275544(soundType, p->header.m_vPos, 0, -1);
+                Sound__Play(soundType, p->header.m_vPos, 0, -1);
             }
             if (!(p->m_dwFlags & 0x100)) {
                 continue;
             }
-            func_0022F1C8(world, p);
+            CParticleSystem__Free(world, p);
         }
         if (p->m_dwFlags & 0x100) {
             switch (p->header.m_nObjType) {
@@ -121,13 +121,13 @@ void func_00230CB4(CParticleSystem *world) {
             focus = begin[i];
             switch (focus->header.m_nObjType) {
             case 34:
-                func_00230AB0(world, focus, begin, pairCount);
+                CParticle__CheckProximity(world, focus, begin, pairCount);
                 break;
             case 87:
                 for (j = 0; j < pairCount; j++) {
                     p = begin[j];
                     if (p->header.m_nObjType != 87) {
-                        func_0020EF2C(&delta, &p->header.m_vPos, &focus->header.m_vPos);
+                        CVector3__Subtract(&delta, &p->header.m_vPos, &focus->header.m_vPos);
                         if (delta.x * delta.x + delta.y * delta.y + delta.z * delta.z <= 65536.0f) {
                             p->m_nFrames = 1;
                         }

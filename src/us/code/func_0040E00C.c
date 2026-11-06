@@ -23,7 +23,7 @@ typedef struct {
 
 extern BlindOneState D_80130200;
 
-void func_0040E00C(Actor40E00C *actor, Spawn40E00C *spawn) {
+void BlindOne_ActorAppearEnter(Actor40E00C *actor, Spawn40E00C *spawn) {
     BlindOneState *stats;
 
     spawn->unk28 = 0;

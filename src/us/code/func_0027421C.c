@@ -3,12 +3,12 @@
 #include "structs/sound.h"
 
  
-void func_00293E60(void *sound, s16 sample);
-s32 func_00293580(void *sound);
-void func_00293EC0(void *sound);
+void alSndpSetSound(void *sound, s16 sample);
+s32 alSndpGetState(void *sound);
+void alSndpStop(void *sound);
 
 /* Stop every voice whose second key matches. */
-void func_0027421C(SndVoicePool *set, s32 key) {
+void SndVoicePool_StopByOwner(SndVoicePool *set, s32 key) {
     s32 i;
     SndVoice *voice = set->voices;
 
@@ -21,9 +21,9 @@ void func_0027421C(SndVoicePool *set, s32 key) {
             voice->vp.follow = 0;
             if (voice->vp.frame != owner->frame) {
                 sound = &owner->player;
-                func_00293E60(sound, owner->handles[voice->index]);
-                if (func_00293580(sound)) {
-                    func_00293EC0(sound);
+                alSndpSetSound(sound, owner->handles[voice->index]);
+                if (alSndpGetState(sound)) {
+                    alSndpStop(sound);
                 }
                 voice->sound = -1;
             }

@@ -12,16 +12,16 @@ extern OSMesgQueue D_800D8DB0;
 extern s32 D_800D8DCC;
 extern u8 D_800D6D68[];
 extern u8 D_800D1CC0[];
-void func_002067C4(s32 a, u32 b);
-s32 func_00201BDC(void *port, B12Msg *n, void *q);
+void CCache__ReleaseDisplayList(s32 a, u32 b);
+s32 CDecompressor__DecompressAsync(void *port, B12Msg *n, void *q);
 void CList__Remove(void *l, B12Msg *n);
 void CList__AddHead(void *l, B12Msg *n);
-void func_002065F8(s32 a, B12Node *n);
-void func_002026EC(void *heap, s32 key);
-void func_002062F8(s32 a, B12Node *n);
-void func_002066B0(s32 a, B12Msg *n);
-void func_002044A8(s32 a, B12Msg *n, s32 b);
-void func_002041E4(void) {
+void CCache__DetachCacheEntry(s32 a, B12Node *n);
+void CHeap__Free(void *heap, s32 key);
+void CCache__FreeMemEntry(s32 a, B12Node *n);
+void CCache__FreeCacheEntry(s32 a, B12Msg *n);
+void CCache__CompleteRequest(s32 a, B12Msg *n, s32 b);
+void CCache__Main(void) {
     B12Msg *msg;
     B12Node *p;
     u32 mask;
@@ -36,7 +36,7 @@ void func_002041E4(void) {
             } else {
                 __osRestoreInt(mask);
             }
-            func_002067C4(0, (u32)msg);
+            CCache__ReleaseDisplayList(0, (u32)msg);
             m2 = __osDisableInt();
             if (--D_800D8DCC != 0) {
                 __osRestoreInt(m2);
@@ -48,7 +48,7 @@ void func_002041E4(void) {
             msg->flags &= ~2;
             if (msg->flags & 8) {
                 msg->flags &= ~8;
-                if (func_00201BDC(D_800D6D68, msg, &D_800D7BE0.q870) != 0) {
+                if (CDecompressor__DecompressAsync(D_800D6D68, msg, &D_800D7BE0.q870) != 0) {
                     continue;
                 }
                 mask = __osDisableInt();
@@ -69,11 +69,11 @@ void func_002041E4(void) {
                     }
                 }
                 if (!(p->flags & 0x702)) {
-                    func_002065F8(0, p);
-                    func_002026EC(D_800D1CC0, p->key);
-                    func_002062F8(0, p);
+                    CCache__DetachCacheEntry(0, p);
+                    CHeap__Free(D_800D1CC0, p->key);
+                    CCache__FreeMemEntry(0, p);
                 }
-                func_002066B0(0, msg);
+                CCache__FreeCacheEntry(0, msg);
                 m2 = __osDisableInt();
                 if (--D_800D8DCC != 0) {
                     __osRestoreInt(m2);
@@ -90,7 +90,7 @@ void func_002041E4(void) {
                 } else {
                     __osRestoreInt(mask);
                 }
-                func_002044A8(0, msg, 1);
+                CCache__CompleteRequest(0, msg, 1);
                 m2 = __osDisableInt();
                 if (--D_800D8DCC != 0) {
                     __osRestoreInt(m2);

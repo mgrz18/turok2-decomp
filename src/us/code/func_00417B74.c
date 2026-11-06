@@ -4,15 +4,15 @@
 #include "rw/abu_types.h"
 
 extern void func_00417B74(void *arg0, s32 arg1);
-extern void func_00285A68(s32 arg);
-extern void func_00285A80(s32 arg);
+extern void Controller_WatchPak(s32 arg);
+extern void Controller_UnwatchPak(s32 arg);
 void func_00417B74(void *arg0, s32 arg1) {
     s32 val;
     MenuRecAt20V2 *menu = arg0;
     val = menu->widget->unk4;
     if (arg1 != 0) {
-        func_00285A68(val);
+        Controller_WatchPak(val);
     } else {
-        func_00285A80(val);
+        Controller_UnwatchPak(val);
     }
 }

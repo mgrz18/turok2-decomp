@@ -20,9 +20,9 @@ extern s32 D_800AB894;
 extern s32 D_800AB898;
 extern s32 D_800AB89C;
 extern VideoFlags D_800C216C[];
-extern s32 func_00266B80(void); /* osGetMemSize */
-extern void func_0042464C(s32 width, s32 height, s32 a2, s32 a3, s32 a4, s32 a5);
-extern void func_0029AAD0(s32 flags);
+extern s32 GetMemSize(void); /* osGetMemSize */
+extern void Video_SetMode(s32 width, s32 height, s32 a2, s32 a3, s32 a4, s32 a5);
+extern void osViSetSpecialFeatures(s32 flags);
 
 static __inline__ void SetConfig(s32 a, s32 b, s32 c, s32 d, s32 e) {
     D_800C2044 = a;
@@ -35,16 +35,16 @@ static __inline__ void SetConfig(s32 a, s32 b, s32 c, s32 d, s32 e) {
 static __inline__ void SetMode(s32 *mode) {
     D_800C2030 = mode[0];
     D_800C2034 = mode[1];
-    func_0042464C(mode[0], mode[1], mode[2], mode[3], mode[4], mode[5]);
+    Video_SetMode(mode[0], mode[1], mode[2], mode[3], mode[4], mode[5]);
 }
 
-void func_00423E10(void) {
+void Video_ApplyResolution(void) {
     VideoMode *mode = NULL;
     s32 flag;
 
     D_801198E8 = 2;
     if (D_800C2038 == -1) {
-        if (func_00266B80() != 0x400000) {
+        if (GetMemSize() != 0x400000) {
             D_800C2038 = 1;
         } else {
             D_800C2038 = 0;
@@ -68,8 +68,8 @@ void func_00423E10(void) {
         if (D_800C2044 != 0) {
             flag = 0x40;
         }
-        func_0029AAD0(flag);
-        func_0029AAD0(0x20);
-        func_0029AAD0(2);
+        osViSetSpecialFeatures(flag);
+        osViSetSpecialFeatures(0x20);
+        osViSetSpecialFeatures(2);
     }
 }

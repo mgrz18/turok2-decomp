@@ -7,8 +7,8 @@ extern f32 D_800A81F4;
 extern f32 D_800A81F8;
 extern f32 D_800A81FC;
 extern f32 D_800A8200;
-void func_00290EC0(void *csp, s16 vol);
-void func_00275378(SndSeq *s) {
+void alCSPSetVol(void *csp, s16 vol);
+void SndSeq_UpdateVolume(SndSeq *s) {
     f32 f;
     if (s->sliding != 0) {
         f = (f32)s->unk24;
@@ -23,6 +23,6 @@ void func_00275378(SndSeq *s) {
             return;
         }
     }
-    func_00290EC0((void *)s->csp, f * D_800A8200);
+    alCSPSetVol((void *)s->csp, f * D_800A8200);
     s->vol = f;
 }

@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_00243414(s32, s32, s32);
+s32 CAI__SetMode(s32, s32, s32);
 extern f32 D_800B6D28;
 
-void func_00264740(CGameObjectInstance *arg0, CAI *arg1) {
+void Platform_BackUpdate(CGameObjectInstance *arg0, CAI *arg1) {
     s32 temp_a3;
     s32 var_v1;
     CPlatformIntelligence *temp_t0;
@@ -22,6 +22,6 @@ void func_00264740(CGameObjectInstance *arg0, CAI *arg1) {
         arg1->m_ConditionTimer = arg1->m_ConditionTimer - (D_800B6D28 / temp_t0->m_MoveTime);
     }
     if (arg1->m_ConditionTimer <= 0.0f) {
-        func_00243414((s32) arg0, (s32) arg1, 0);
+        CAI__SetMode((s32) arg0, (s32) arg1, 0);
     }
 }

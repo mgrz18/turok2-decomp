@@ -7,8 +7,8 @@
 typedef float Matrix[4][4];
 typedef struct { long m[4][4]; } Mtx;
 
-void func_00297BCC(float mf[4][4]);          /* guMtxIdentF */
-void func_00297C1C(float mf[4][4], Mtx *m);  /* guMtxF2L */
+void guMtxIdentF(float mf[4][4]);          /* guMtxIdentF */
+void guMtxF2L(float mf[4][4], Mtx *m);  /* guMtxF2L */
 float func_00298470(float x);                /* sqrtf */
 
 static __inline__ void guLookAtF(Matrix mf, float xEye, float yEye, float zEye,
@@ -16,7 +16,7 @@ static __inline__ void guLookAtF(Matrix mf, float xEye, float yEye, float zEye,
                    float xUp, float yUp, float zUp) {
     float len, xLook, yLook, zLook, xRight, yRight, zRight;
 
-    func_00297BCC(mf);
+    guMtxIdentF(mf);
 
     xLook = xAt - xEye;
     yLook = yAt - yEye;
@@ -67,12 +67,12 @@ static __inline__ void guLookAtF(Matrix mf, float xEye, float yEye, float zEye,
     mf[3][3] = 1;
 }
 
-void func_002975D0(Mtx *m, float xEye, float yEye, float zEye,
+void guLookAt(Mtx *m, float xEye, float yEye, float zEye,
                    float xAt, float yAt, float zAt,
                    float xUp, float yUp, float zUp) {
     Matrix mf;
 
     guLookAtF(mf, xEye, yEye, zEye, xAt, yAt, zAt, xUp, yUp, zUp);
 
-    func_00297C1C(mf, m);
+    guMtxF2L(mf, m);
 }

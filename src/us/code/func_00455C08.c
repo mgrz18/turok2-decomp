@@ -9,10 +9,10 @@ extern s32 D_8011ACE4;
 extern char D_8011AB8B[];
 extern char D_800C1338[];
 
-s32 func_004160F0(MenuItem *item);
-void func_0029E3E0(char *dst, char *fmt, s32 value);
+s32 MenuItem_TextLength(MenuItem *item);
+void sprintf(char *dst, char *fmt, s32 value);
 
-s32 func_00455C08(MenuItem *item, Menu *event) {
+s32 StatsMenu_PlayerRowText_2(MenuItem *item, Menu *event) {
     s32 other = item->index - 2;
     u8 *player = (u8 *) event->player;
     s32 value;
@@ -30,6 +30,6 @@ s32 func_00455C08(MenuItem *item, Menu *event) {
     for (i = 0; i < 8; i++) {
         *dst++ = *src++;
     }
-    func_0029E3E0(item->text + (func_004160F0(item) - 2), D_800C1338, value);
+    sprintf(item->text + (MenuItem_TextLength(item) - 2), D_800C1338, value);
     return 0;
 }

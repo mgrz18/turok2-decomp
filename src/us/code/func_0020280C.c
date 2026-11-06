@@ -13,7 +13,7 @@ typedef struct {
 } Heap0020280C;
 
 /* Sums the block sizes into *arg1 and keeps the largest in *arg2. */
-void func_0020280C(Heap0020280C *arg0, s32 *arg1, u32 *arg2) {
+void CHeap__GetFreeStats(Heap0020280C *arg0, s32 *arg1, u32 *arg2) {
     u32 temp_a0;
     u32 var_v1;
     Block0020280C *var_a3;

@@ -3,17 +3,17 @@
 
 #include "common.h"
 #include "ultra_types.h"
-s32 func_00299680(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
-s32 func_00299A40(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
-s32 func_00429DFC(OSPfs *pfs);
-s32 func_00429EC4(OSPfs *pfs);
-s32 func_00429AA4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
+s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
+s32 __osCheckId(OSPfs *pfs);
+s32 __osPfsSelectBank(OSPfs *pfs);
+s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
 static __inline__ s32 next_page(OSPfs *pfs, u8 *cbank, __OSInode *inode, __OSInodeUnit *curr) {
     s32 ret;
     u8 b;
     if (curr->inode_t.bank != *cbank) {
         *cbank = curr->inode_t.bank;
-        ret = func_00429AA4(pfs, inode, 0, *cbank);
+        ret = __osPfsRWInode(pfs, inode, 0, *cbank);
         if (ret != 0) {
             return ret;
         }
@@ -49,17 +49,17 @@ s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, int offset, int size_in
     if ((pfs->status & 0x1) == 0) {
         return 5;
     }
-    if (func_00429DFC(pfs) == 2) {
+    if (__osCheckId(pfs) == 2) {
         return 2;
     }
     if (pfs->activebank != 0) {
         pfs->activebank = 0;
-        ret = func_00429EC4(pfs);
+        ret = __osPfsSelectBank(pfs);
         if (ret != 0) {
             return ret;
         }
     }
-    ret = func_00299680(pfs->queue, pfs->channel, (u16)(pfs->dir_table + file_no), (u8 *)&dir);
+    ret = __osContRamRead(pfs->queue, pfs->channel, (u16)(pfs->dir_table + file_no), (u8 *)&dir);
     if (ret != 0) {
         return ret;
     }
@@ -97,16 +97,16 @@ s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, int offset, int size_in
         }
         if (pfs->activebank != curr_page.inode_t.bank) {
             pfs->activebank = curr_page.inode_t.bank;
-            ret = func_00429EC4(pfs);
+            ret = __osPfsSelectBank(pfs);
             if (ret != 0) {
                 return ret;
             }
         }
         addr = curr_page.inode_t.page * 8 + offset_in_blocks;
         if (flag == 0) {
-            ret = func_00299680(pfs->queue, pfs->channel, (u16)addr, buf);
+            ret = __osContRamRead(pfs->queue, pfs->channel, (u16)addr, buf);
         } else {
-            ret = func_00299A40(pfs->queue, pfs->channel, (u16)addr, buf, 0);
+            ret = __osContRamWrite(pfs->queue, pfs->channel, (u16)addr, buf, 0);
         }
         if (ret != 0) {
             return ret;
@@ -118,11 +118,11 @@ s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, int offset, int size_in
     if (flag == 1 && (dir.status & 2) == 0) {
         dir.status |= 2;
         pfs->activebank = 0;
-        ret = func_00429EC4(pfs);
+        ret = __osPfsSelectBank(pfs);
         if (ret != 0) {
             return ret;
         }
-        ret = func_00299A40(pfs->queue, pfs->channel, (u16)(pfs->dir_table + file_no), (u8 *)&dir, 0);
+        ret = __osContRamWrite(pfs->queue, pfs->channel, (u16)(pfs->dir_table + file_no), (u8 *)&dir, 0);
         if (ret != 0) {
             return ret;
         }

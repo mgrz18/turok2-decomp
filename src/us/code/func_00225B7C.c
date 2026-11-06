@@ -348,17 +348,17 @@ struct Shared_ReactionPlayerRecord {
     s32 unk324;
     Shared_ReactionPlayer *unk328;
 };
-extern void func_00245828(Shared_DamageEvent *event, s32 arg1, s32 damage, f32 radius, s32 flags, s32 arg5);
-extern void func_002465C8(LevelActor *actor, s32 *behavior, Shared_DamageEvent *event);
-void func_00225B7C(CWorld *world, s32 damage, s32 flags) {
+extern void DamageEvent_Set(Shared_DamageEvent *event, s32 arg1, s32 damage, f32 radius, s32 flags, s32 arg5);
+extern void CAI__CallHurt(LevelActor *actor, s32 *behavior, Shared_DamageEvent *event);
+void CScene__DamageAllEnemies(CWorld *world, s32 damage, s32 flags) {
     Shared_DamageEvent event;
     LevelActor **actors;
     s32 count;
     s32 i;
-    func_00245828(&event, 0, damage, 102.399994f, flags, 0);
+    DamageEvent_Set(&event, 0, damage, 102.399994f, flags, 0);
     count = world->m_nKind1;
     actors = (LevelActor **)world->m_pKind1;
     for (i = 0; i < count; i++) {
-        func_002465C8(actors[i], &actors[i]->behaviorFlags, &event);
+        CAI__CallHurt(actors[i], &actors[i]->behaviorFlags, &event);
     }
 }

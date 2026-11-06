@@ -8,8 +8,8 @@
  * (CPlayer + 0xA50) points to the player's, and a menu window reads one
  * (Menu::controller, structs/menu.h).
  *
- * func_00284EB8 reads a port into the input* fields (the stick at 0xC4,
- * the buttons from 0x14); once a frame func_0028582C copies them into the
+ * Controller_ProcessInput reads a port into the input* fields (the stick at 0xC4,
+ * the buttons from 0x14); once a frame Controller_Latch copies them into the
  * fields from 0xB0 and 0xC6, which is what the game reads. The button
  * groups are the ones CPlayerContState (structs/player.h) has: held,
  * just pressed ("single"), let go quickly ("single, no hold"), pressed
@@ -22,7 +22,7 @@
 #include "ultra_types.h"
 #endif
 
-/* One button's counters (func_00284EB8). */
+/* One button's counters (Controller_ProcessInput). */
 typedef struct ControllerButtonHistory {
     /* 0x0 */ s8 taps;              /* presses less than 30 frames apart */
     /* 0x1 */ s8 age;               /* frames since the last press, up to 30 */
@@ -59,7 +59,7 @@ typedef struct ControllerProfile {
     /* 0x0D0 */ f32 rumbleLevel;
     /* 0x0D4 */ f32 rumbleTimer;
     /* 0x0D8 */ u8 rumblePfs[0x68]; /* the OSPfs osMotorInit fills */
-    /* 0x140 */ u8 rumblePool[0x28]; /* the rumble effects' free and active lists (func_0026EB3C) */
+    /* 0x140 */ u8 rumblePool[0x28]; /* the rumble effects' free and active lists (RumblePool_Init) */
     /* 0x168 */ f32 rumbleBase;     /* the level the effects add to (the weapon spin...) */
     /* 0x16C */ u8 rumbleNodes[3][0x3C]; /* the pool's 3 effects */
     /* 0x220 */ s32 reset;

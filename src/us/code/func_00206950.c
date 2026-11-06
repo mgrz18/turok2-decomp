@@ -8,7 +8,7 @@ typedef struct {
 } BlockPool;
 
 /* Takes arg1 blocks off the pool; 0 if there are not enough. */
-s32 func_00206950(BlockPool *arg0, s32 arg1) {
+s32 MtxPool_Alloc(BlockPool *arg0, s32 arg1) {
     s32 var_a2;
 
     var_a2 = 0;

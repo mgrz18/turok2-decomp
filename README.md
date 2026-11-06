@@ -125,7 +125,7 @@ one possible.
 What a source port needs: code a person can read and change without breaking it.
 - [x] Shared struct headers in `include/structs/` (offsets checked with `tools/check_structs.py`)
 - [ ] Hoist the remaining repeated local structs (291 names; [docs/STRUCTS_TODO.md](docs/STRUCTS_TODO.md))
-- [ ] Name the functions: almost every file is still `func_XXXXXXXX`
+- [ ] Name the functions: 3,823 of the 4,146 C functions named (92%; 3,932 names with the asm ones), from Turok 3's and Rage Wars' decomps, libultra, the ROM's strings and SN64 debug records (`versions/names.us.txt`, `versions/names/`, `tools/apply_names.py`; [docs/NAMES.md](docs/NAMES.md))
 - [ ] Name the globals (about 2,000 `D_80XXXXXX`)
 - [ ] De-fake the 16 FAKEMATCH functions ([docs/MATCHING.md](docs/MATCHING.md))
 - [ ] Recover the original source-file boundaries and group functions into real modules

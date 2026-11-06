@@ -2,9 +2,9 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern s32 func_0041648C(void *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap);
-extern s32 func_00285670(s32);
-extern s32 func_002855E8(s32);
+extern s32 Menu_StepValue(void *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap);
+extern s32 Controller_MenuRight(s32);
+extern s32 Controller_ConfirmPressed(s32);
 
 extern s32 D_800C1EA8;      /* selected entry, 0..15 */
 typedef struct {
@@ -17,12 +17,12 @@ extern f32 D_8011AAF4;      /* resulting scale */
 
 /* Steps the selection (twice when the controller reports busy) and sets the scale
  * from the table plus one, clamped to [0.5, 2.0]. */
-s32 func_004188A4(void *arg0, Menu *item) {
+s32 MpMenu_StepPlayerSpeed(void *arg0, Menu *item) {
     f32 scale;
 
-    D_800C1EA8 = func_0041648C(item, D_800C1EA8, 1, 0, 15, 0);
-    if (func_00285670(item->controller) != 0 || func_002855E8(item->controller) != 0) {
-        func_0041648C(item, D_800C1EA8, 1, 0, 15, 0);
+    D_800C1EA8 = Menu_StepValue(item, D_800C1EA8, 1, 0, 15, 0);
+    if (Controller_MenuRight(item->controller) != 0 || Controller_ConfirmPressed(item->controller) != 0) {
+        Menu_StepValue(item, D_800C1EA8, 1, 0, 15, 0);
     }
     scale = D_00438900.scale[D_800C1EA8] + 1.0f;
     if (!(scale < 0.5f)) {

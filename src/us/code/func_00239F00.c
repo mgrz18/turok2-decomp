@@ -14,19 +14,19 @@ extern CCollisionInfo D_800F1CC0;
 extern CCollisionInfo D_800F1AE0;
 extern CCollisionInfo D_800F1C60;
 
-CRegionInfo *func_0022425C(s32 *list, CGameRegion *region);
-void func_00241894(CCollisionInfo *def);
-void func_0023BE24(Sweep *sweep);
-void func_0020EF60(CVector3 *out, CVector3 *v, f32 k);
-void func_0023C0FC(SweepHit *hit);
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-void func_0023C120(SweepHit *hit, CGameObjectInstance *obj);
-f32 func_0026872C(CGameObjectInstance *obj, s32 arg1);
-s32 func_0023C188(Sweep *sweep, CGameRegion *region);
+CRegionInfo *CScene__GetRegionInfo(s32 *list, CGameRegion *region);
+void CCollisionResults__Clear(CCollisionInfo *def);
+void Sweep_FollowGround(Sweep *sweep);
+void CVector3__Scale(CVector3 *out, CVector3 *v, f32 k);
+void SweepHit_Clear(SweepHit *hit);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+void SweepHit_Store(SweepHit *hit, CGameObjectInstance *obj);
+f32 GameObject_GetRegionFloorHeight(CGameObjectInstance *obj, s32 arg1);
+s32 Sweep_GetGroundBehavior(Sweep *sweep, CGameRegion *region);
 
 /* Moves obj to pos through the collision tests, in up to 100 slides, and
  * returns the number of hits. */
-s32 func_00239F00(CGameObjectInstance *obj, CVector3 pos, CCollisionInfo *def) {
+s32 Collision_MoveInstance(CGameObjectInstance *obj, CVector3 pos, CCollisionInfo *def) {
     Sweep sweep;
     CVector3 accel;
     CRegionInfo *info;
@@ -45,14 +45,14 @@ s32 func_00239F00(CGameObjectInstance *obj, CVector3 pos, CCollisionInfo *def) {
     f32 ground;
     f32 dy;
 
-    info = func_0022425C(D_800F7078, obj->header.m_pCurrentRegion);
+    info = CScene__GetRegionInfo(D_800F7078, obj->header.m_pCurrentRegion);
     if (def != &D_800F1E10 && def != &D_800F1CC0 && def != &D_800F1AE0 && def != &D_800F1C60) {
         obj->m_pInstanceBelow = 0;
         if (obj->header.m_Type == 1) {
             obj->m_AI.m_dwFlags &= ~0x30000;
         }
     }
-    func_00241894(def);
+    CCollisionResults__Clear(def);
     iter = 0;
     remaining = 1.0f;
     hits = 0;
@@ -114,13 +114,13 @@ s32 func_00239F00(CGameObjectInstance *obj, CVector3 pos, CCollisionInfo *def) {
         sweep.checkRegionInfo = 0;
     }
     sweep.more = hits + 1 < passes;
-    func_0023BE24(&sweep);
+    Sweep_FollowGround(&sweep);
     if (sweep.onGround && sweep.physics) {
-        func_0020EF60(&obj->m_vVelocity, &obj->m_vVelocity, (def->m_GroundFriction > 1.0f) ? 0.0f : 1.0f - def->m_GroundFriction);
+        CVector3__Scale(&obj->m_vVelocity, &obj->m_vVelocity, (def->m_GroundFriction > 1.0f) ? 0.0f : 1.0f - def->m_GroundFriction);
     }
     do {
-        func_0023C0FC(&sweep.hit);
-        func_0020EF2C(&sweep.delta, &sweep.end, &obj->header.m_vPos);
+        SweepHit_Clear(&sweep.hit);
+        CVector3__Subtract(&sweep.delta, &sweep.end, &obj->header.m_vPos);
         if (sweep.physics) {
             sweep.hit.vel = obj->m_vVelocity;
         }
@@ -137,7 +137,7 @@ s32 func_00239F00(CGameObjectInstance *obj, CVector3 pos, CCollisionInfo *def) {
                 hits++;
             case 1:
                 obj->header.m_vPos = sweep.hit.pos;
-                func_0023C120(&sweep.hit, obj);
+                SweepHit_Store(&sweep.hit, obj);
                 if (sweep.physics) {
                     obj->m_vVelocity = sweep.hit.vel;
                 }
@@ -154,7 +154,7 @@ s32 func_00239F00(CGameObjectInstance *obj, CVector3 pos, CCollisionInfo *def) {
         }
         remaining -= sweep.hit.fraction * remaining;
         if (sweep.onGround) {
-            ground = func_0026872C(obj, 0);
+            ground = GameObject_GetRegionFloorHeight(obj, 0);
             obj->header.m_vPos.y = (obj->header.m_vPos.y <= ground) ? ground : obj->header.m_vPos.y;
         }
         more = 0;
@@ -164,12 +164,12 @@ s32 func_00239F00(CGameObjectInstance *obj, CVector3 pos, CCollisionInfo *def) {
         if (more) {
             sweep.end = sweep.hit.slideTo;
             sweep.more = hits + 1 < passes;
-            func_0023BE24(&sweep);
+            Sweep_FollowGround(&sweep);
         }
         iter++;
     } while (more && iter < 100 && hits < passes);
 
-    if (def->m_WallBehavior != 0 && !(def->m_dwFlags & 0x01000000) && func_0023C188(&sweep, obj->header.m_pCurrentRegion)) {
+    if (def->m_WallBehavior != 0 && !(def->m_dwFlags & 0x01000000) && Sweep_GetGroundBehavior(&sweep, obj->header.m_pCurrentRegion)) {
         if (remaining > 0.01f) {
             if (sweep.hit.posOut == &D_800F1ADC->m_vInstancePos) {
                 more = def->m_InstanceBehavior != 1;
@@ -181,7 +181,7 @@ s32 func_00239F00(CGameObjectInstance *obj, CVector3 pos, CCollisionInfo *def) {
         } else {
             more = 0;
         }
-        ground = func_0026872C(obj, 0);
+        ground = GameObject_GetRegionFloorHeight(obj, 0);
         obj->header.m_vPos.y = MAX(ground, more ? sweep.end.y : obj->header.m_vPos.y);
     }
     if (sweep.onGround && sweep.physics && dt != 0.0f && def->m_GravityAcceleration != 0.0f) {

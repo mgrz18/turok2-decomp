@@ -31,14 +31,14 @@ extern u8 D_800B6684[];
 extern u8 D_801100F0[];
 extern CListedInstance *D_8010FEB4;
 
-void *func_002532A8(void *);
-void func_00281610(void *, s32, void *, f32);
-void func_0027580C(s32);
-void func_0027AD88(void *, s32);
-void func_0027AD90(void *, s32);
-s8 func_00219F74(void *, s32, s32);
-void func_0040813C(BossFight *);
-void func_00407F20(BossFight *);
+void *CPlayerPool__GetFirstActive(void *);
+void CCameraPool__AddTimedText(void *, s32, void *, f32);
+void Sound__PlaySpeech(s32);
+void COnScreen__SetBossPercent(void *, s32);
+void COnScreen__SetBossPercent2(void *, s32);
+s8 CGameObjectInstance__PickRandomAnim(void *, s32, s32);
+void TotemDefense_Fail(BossFight *);
+void TotemDefense_Complete(BossFight *);
 
 static __inline__ s32 toInt(f32 f) {
     s32 value;
@@ -50,7 +50,7 @@ static __inline__ s32 toInt(f32 f) {
     return value;
 }
 
-void func_004082A0(BossFight *fight) {
+void TotemDefense_UpdateFight(BossFight *fight) {
     f32 timer;
     u8 *bar;
     void *player;
@@ -65,17 +65,17 @@ void func_004082A0(BossFight *fight) {
         return;
     }
     if ((f32) (*(s32 *) (fight->obj->def + 0x54) * 15) <= fight->timer) {
-        func_00281610(D_80119870.m_CameraPool, *(s32 *) ((u8 *) func_002532A8(&D_80119870.m_PlayerList) + 0x51C), D_800B6684, 4.0f);
-        func_0027580C(0x182);
+        CCameraPool__AddTimedText(D_80119870.m_CameraPool, *(s32 *) ((u8 *) CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList) + 0x51C), D_800B6684, 4.0f);
+        Sound__PlaySpeech(0x182);
     }
     bar = D_801100F0;
-    func_0027AD88(bar, toInt(fight->timer * (1.0f / 15) / (f32) fight->def->time * 100.0f));
-    func_0027AD90(bar, toInt((f32) (fight->def->kills - fight->count) / (f32) fight->def->kills * 100.0f));
+    COnScreen__SetBossPercent(bar, toInt(fight->timer * (1.0f / 15) / (f32) fight->def->time * 100.0f));
+    COnScreen__SetBossPercent2(bar, toInt((f32) (fight->def->kills - fight->count) / (f32) fight->def->kills * 100.0f));
     if (fight->state == 0) {
         if (fight->timer < 450.0f && fight->warned != 1) {
             obj = (u8 *) fight->obj;
             ai = obj + 0x140;
-            ai[0xC6] = func_00219F74(obj, 0x5335, -1);
+            ai[0xC6] = CGameObjectInstance__PickRandomAnim(obj, 0x5335, -1);
             *(s16 *) (ai + 0xC4) = 0x5335;
             *(s32 *) (obj + 0x140) &= ~1;
             ai[0xC7] = 0;
@@ -87,12 +87,12 @@ void func_004082A0(BossFight *fight) {
         fight->timer = timer;
         if (timer <= 0.0f) {
             if (left > 0) {
-                func_0040813C(fight);
+                TotemDefense_Fail(fight);
             } else {
-                func_00407F20(fight);
+                TotemDefense_Complete(fight);
             }
         } else if (left2 <= 0) {
-            func_00407F20(fight);
+            TotemDefense_Complete(fight);
         } else {
             fight->state = 0;
         }

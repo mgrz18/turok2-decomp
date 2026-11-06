@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_0021153C(f32 arg0);
+extern f32 Math_AcosLookup(f32 arg0);
 extern f32 func_00298470(f32);
-f32 func_0026C240(void *arg0, s32 arg1) {
+f32 CGameRegion__GetEdgeYaw(void *arg0, s32 arg1) {
     Triangle *polygon = arg0;
     CVector3 *v0;
     CVector3 *v1;
@@ -20,7 +20,7 @@ f32 func_0026C240(void *arg0, s32 arg1) {
     if (mag == 0.0f) {
         return 0.0f;
     }
-    result = func_0021153C(dx / mag);
+    result = Math_AcosLookup(dx / mag);
     if (!(dz < 0.0f)) {
         result = -result;
     }

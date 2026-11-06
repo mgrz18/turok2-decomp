@@ -18,7 +18,7 @@
         }                                                                    \
     }
 
-void func_00467B50(DemoStream *br) {
+void Demo_ReadRunLength_2(DemoStream *br) {
     s32 n;
     s32 bits;
 

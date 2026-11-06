@@ -5,10 +5,10 @@
 
 extern float D_800A56A8;
 extern float D_800A56A0;
-extern f32 func_00211920(f32 arg0, f32 arg1);
+extern f32 Angle_Delta(f32 arg0, f32 arg1);
 extern float D_800A56B8;
 extern float D_800A56B0;
-f32 func_00211920(f32 arg0, f32 arg1) {
+f32 Angle_Delta(f32 arg0, f32 arg1) {
     f32 var_f0;
     f32 var_f14;
     var_f14 = arg1;

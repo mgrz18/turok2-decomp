@@ -7,7 +7,7 @@ extern s32 D_8011AADC;
 extern s32 D_8011AAD8;
 extern char D_800B59DC[];
 extern char D_800B59F8[];
-s32 func_0045469C(MenuItem *a) {
+s32 CheatMenu_GouraudModeText_2(MenuItem *a) {
     if (D_8011AADC & 0x400) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
     if (D_8011AAD8 & 0x400) a->text = D_800B59DC; else a->text = D_800B59F8;
     return 0;

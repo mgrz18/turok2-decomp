@@ -6,17 +6,17 @@
 extern u8 D_800F7078[];             /* the world */
 extern s32 D_80110048;              /* world +0x18FD0 */
 
-s32 func_0027BC34(void);
-void func_0028D264(void);
-CPlayer *func_002532A8(void *list);
+s32 Demo_GetPlayerCount(void);
+void SavedPlayers_Save(void);
+CPlayer *CPlayerPool__GetFirstActive(void *list);
 
-void func_0028CF80(void) {
+void SavedPlayers_Arm(void) {
     CSavedPlayers *save = &D_8011F290;
     s32 ok;
     CPlayer *player;
     GameSettings *settings;
 
-    ok = !func_0027BC34();
+    ok = !Demo_GetPlayerCount();
     if (D_80119870.m_Settings.mode != 13) {
         ok = 0;
     }
@@ -39,11 +39,11 @@ void func_0028CF80(void) {
                 save->m_State = 0;
                 break;
         }
-        func_0028D264();
+        SavedPlayers_Save();
         settings = &D_80119870.m_Settings;
         save->m_WarpID = D_80110048;
         if (settings->multiplayer == 0) {
-            player = func_002532A8(&D_80119870.m_PlayerList);
+            player = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
             if (player != NULL) {
                 if (save->m_State == 1) {
                     if (D_80110048 != player->m_Data.m_CheckPointWarpID || (player->m_Mode >= 19 && player->m_Mode < 31)) {

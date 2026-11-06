@@ -14,22 +14,22 @@ typedef struct MemoryBoundaryInit {
 extern MemoryBoundaryInit D_800B7600[];
 extern u8 D_80128880;
 extern u8 D_80128882;
-extern s32 func_002A12F0(void);
+extern s32 HostIo_DisableInt(void);
 extern void func_002A3100(void);
-extern void func_002A1350(u32 address, u32 value);
-extern void func_002A1324(s32 saved);
+extern void HostIo_WriteWord(u32 address, u32 value);
+extern void HostIo_RestoreInt(s32 saved);
 
 /* Reset the debugger mailbox and build the memory permission map for the installed RAM i. */
-void func_002A2104(void) {
+void HostIo_Init(void) {
     s32 saved;
     u32 i; /* also holds the RAM size first: a separate variable changes the registers */
     u32 *src;
     u32 first;
 
-    saved = func_002A12F0();
+    saved = HostIo_DisableInt();
     func_002A3100();
-    func_002A1350(0xB1FFFFF0, 0);
-    func_002A1350(0xB1FFFFFC, 0);
+    HostIo_WriteWord(0xB1FFFFF0, 0);
+    HostIo_WriteWord(0xB1FFFFFC, 0);
     D_80128880 = 1;
     i = osMemSize;
     D_80128882 = 0xFF;
@@ -56,5 +56,5 @@ void func_002A2104(void) {
         D_80128130[i].m_First = -1;
         D_80128130[i].m_Flags = 0;
     }
-    func_002A1324(saved);
+    HostIo_RestoreInt(saved);
 }

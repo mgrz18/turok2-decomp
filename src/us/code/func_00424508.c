@@ -1,11 +1,11 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00423E10(void);
+s32 Video_ApplyResolution(void);
 
 extern s32 D_800C2038;
 
-void func_00424508(s32 arg0) {
+void Video_SetResolution(s32 arg0) {
     D_800C2038 = arg0;
-    func_00423E10();
+    Video_ApplyResolution();
 }

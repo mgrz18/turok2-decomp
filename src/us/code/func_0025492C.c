@@ -25,35 +25,35 @@ typedef struct PlayerList PlayerList;
 extern Globals D_80119E2C;
 extern f32 D_800B6D28;          /* frame time scale */
 
-extern s32 func_00416AF8(void *menuPool);
-extern s32 func_00254BE4(PlayerList *list);
-extern s32 func_0025295C(PlayerList *list);
-extern void func_002534E0(PlayerList *list);
+extern s32 MenuPool_CountOpen(void *menuPool);
+extern s32 CPlayerPool__CountIdleMenus(PlayerList *list);
+extern s32 CPlayerPool__IsFragLimitReached(PlayerList *list);
+extern void CPlayerPool__EndMatch(PlayerList *list);
 
 /* Run the match clock and end the match when the time is up or, outside tag
  * mode, when the frag limit is reached. Not while a menu is open. */
-void func_0025492C(PlayerList *list) {
+void CPlayerPool__UpdateMatchClock(PlayerList *list) {
     MatchState *match = &D_80119E2C.match;
     Globals *g;
 
     if (match->over || !D_80119E2C.timed) {
         return;
     }
-    if (!func_00416AF8(&D_80119E2C) && match->timeLeft > 0.0f && !D_80119E2C.paused) {
-        if (func_00254BE4(list)) {
+    if (!MenuPool_CountOpen(&D_80119E2C) && match->timeLeft > 0.0f && !D_80119E2C.paused) {
+        if (CPlayerPool__CountIdleMenus(list)) {
             match->timeLeft -= D_800B6D28;
         }
         if (match->timeLeft <= 0.0f && !match->over) {
             match->timeLeft = 0.0f;
-            func_002534E0(list);
+            CPlayerPool__EndMatch(list);
         }
     }
     g = &D_80119E2C;
-    if (!func_00416AF8(g) && func_0025295C(list)) {
+    if (!MenuPool_CountOpen(g) && CPlayerPool__IsFragLimitReached(list)) {
         MatchState *m = &g->match;
 
         if (!m->over && !g->paused && m->fragLimit > 0 && !m->tagMode) {
-            func_002534E0(list);
+            CPlayerPool__EndMatch(list);
         }
     }
 }

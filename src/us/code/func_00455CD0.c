@@ -9,7 +9,7 @@ typedef struct {
 
 extern s32 D_8011ACE4;
 
-void func_00455CD0(Menu *arg0) {
+void StatsMenu_ShowTagsRow_2(Menu *arg0) {
     Target *temp_a0;
     Target *temp_v0;
 

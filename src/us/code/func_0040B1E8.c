@@ -6,10 +6,10 @@
 
 extern s32 D_801301D0; /* active slot mask */
 extern u8 D_00431EE4[];
-extern void func_00236314(void *dst, void *src);
-extern void func_00243414(void *obj, CAI *ai, s32 state);
+extern void ScriptAnimator_SetScript(void *dst, void *src);
+extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 
-void func_0040B1E8(void *obj, CAI *ai) {
+void MotherBoss_Mode10_FlashSpotsThenIdle(void *obj, CAI *ai) {
     MotherBossState *state;
     s32 mask;
     s32 i;
@@ -19,9 +19,9 @@ void func_0040B1E8(void *obj, CAI *ai) {
         state = &D_8012FB70;
         for (i = 0; i < 15; i++) {
             if ((mask >> i) & 1) {
-                func_00236314(&state->slots[i].anim, D_00431EE4);
+                ScriptAnimator_SetScript(&state->slots[i].anim, D_00431EE4);
             }
         }
-        func_00243414(obj, ai, 0xC);
+        CAI__SetMode(obj, ai, 0xC);
     }
 }

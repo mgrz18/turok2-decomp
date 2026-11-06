@@ -3,6 +3,6 @@
 
 extern s8 D_800F1F94;
 
-void func_00264DCC(void) {
+void Throwable_IdleUpdate(void) {
     D_800F1F94 = 2;
 }

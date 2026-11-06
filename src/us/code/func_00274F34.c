@@ -5,8 +5,8 @@
 
 extern float D_800A81C8;
 extern float D_800A81CC;
-s32 func_002912A0(s32 a, s32 b, void *c, s32 d, s32 e);
-void func_00274F34(struct AudioStateD844 *state, struct AudioRootD844 *root) {
+s32 alHeapDBAlloc(s32 a, s32 b, void *c, s32 d, s32 e);
+void SndSeq_Construct(struct AudioStateD844 *state, struct AudioRootD844 *root) {
     ALSeqpConfig params;
     void *player;
     state->root = root;
@@ -20,10 +20,10 @@ void func_00274F34(struct AudioStateD844 *state, struct AudioRootD844 *root) {
     params.initOsc = 0;
     params.updateOsc = 0;
     params.stopOsc = 0;
-    player = func_002912A0(0, 0, &state->root->heap, 1, 0x7C);
+    player = alHeapDBAlloc(0, 0, &state->root->heap, 1, 0x7C);
     state->player = player;
-    func_0028FA10(player, &params);
-    state->allocation = func_002912A0(0, 0, &state->root->heap, 1, 0xF8);
+    alCSPNew(player, &params);
+    state->allocation = alHeapDBAlloc(0, 0, &state->root->heap, 1, 0xF8);
     state->timer = 50;
     state->counter = 0;
     state->first = D_800A81C8;

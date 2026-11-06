@@ -13,7 +13,7 @@ typedef struct {
     /* 0x24 */ s32 value;
 } Obj292DB0;
 
-void func_00292DB0(Obj292DB0 *obj, f32 f) {
+void __setUsptFromTempo(Obj292DB0 *obj, f32 f) {
     if (obj->def != 0) {
         obj->value = f * obj->def->scale;
     } else {

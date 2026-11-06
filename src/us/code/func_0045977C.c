@@ -24,17 +24,17 @@ extern u8 D_0043B610[];
 extern u8 D_004390B0[];
 extern u8 D_0043B634[];
 extern u8 D_0043B5EC[];
-void func_00285AE0(ControllerProfile *a);
-void func_00285BD0(ControllerProfile *a, s32 b);
-void func_00285A80(s32 a);
-s32 func_002858CC(s32 a);
+void Controller_ResetRumble(ControllerProfile *a);
+void Controller_SetRumbleOption(ControllerProfile *a, s32 b);
+void Controller_UnwatchPak(s32 a);
+s32 Controller_TakePakChanged(s32 a);
 void func_004263A0(s32 a);
 s32 func_0042647C(s32 a);
 void func_0042C620(u8 *a, s32 b, s32 c);
 void func_004302CC(u8 *a);
-void func_00416644(u8 *a, void *b, CPlayer *c, ControllerProfile *d, s32 e);
+void MenuPool_OpenMenu(u8 *a, void *b, CPlayer *c, ControllerProfile *d, s32 e);
 
-s32 func_0045977C(s32 a0, Menu *o) {
+s32 PakMessage_SelectOk_2(s32 a0, Menu *o) {
     s32 s0, s1, v;
     u8 *p;
 
@@ -45,8 +45,8 @@ s32 func_0045977C(s32 a0, Menu *o) {
         D_80130940 = 0;
     }
     if (D_801309C0 == 9 || D_801309C0 == 5) {
-        func_00285AE0(o->controller);
-        func_00285BD0(o->controller, 1);
+        Controller_ResetRumble(o->controller);
+        Controller_SetRumbleOption(o->controller, 1);
     }
     if (D_801309C0 == 9) {
         if (D_80130994 != 0 && D_801309B4 == 0 && D_8013098C == 0) {
@@ -55,7 +55,7 @@ s32 func_0045977C(s32 a0, Menu *o) {
             } else {
                 s1 = o->controller->port;
             }
-            func_00285A80(s1);
+            Controller_UnwatchPak(s1);
             func_0042C620(D_800F7078, o->player->m_Data.m_CheckPointWarpID, 2);
             return 1;
         }
@@ -68,7 +68,7 @@ s32 func_0045977C(s32 a0, Menu *o) {
         s1 = o->controller->port;
     }
     if (D_801309C0 == 5) {
-        func_00285A80(s1);
+        Controller_UnwatchPak(s1);
         func_0042C620(D_800F7078, D_80110054, 2);
     }
     if (D_80130990 != 0) {
@@ -79,25 +79,25 @@ s32 func_0045977C(s32 a0, Menu *o) {
     if (D_801309C0 == 4 && D_80130994 != 0 && D_801309B4 == 0) {
         func_004263A0(s1);
         s0 = func_0042647C(s1);
-        v = func_002858CC(s1);
+        v = Controller_TakePakChanged(s1);
         if ((s0 == 0 || v != 0) && s0 != -2 && o->context == (void *)1) {
-            func_00416644(D_80119E2C, D_0043B610, o->player, o->controller, 0);
+            MenuPool_OpenMenu(D_80119E2C, D_0043B610, o->player, o->controller, 0);
         } else {
-            func_00416644(D_80119E2C, D_004390B0, o->player, o->controller, 0);
+            MenuPool_OpenMenu(D_80119E2C, D_004390B0, o->player, o->controller, 0);
         }
     } else if (D_801309C0 == 3 && D_80130998 != 0) {
         func_004263A0(s1);
         s0 = func_0042647C(s1);
-        v = func_002858CC(s1);
+        v = Controller_TakePakChanged(s1);
         if ((s0 == 0 || v != 0) && s0 != -2 && o->context == (void *)1) {
-            func_00416644(D_80119E2C, D_0043B634, o->player, o->controller, 0);
+            MenuPool_OpenMenu(D_80119E2C, D_0043B634, o->player, o->controller, 0);
         } else {
             if (o->player != NULL) {
                 p = ((u8 *)o->player->m_pCamera) + 0x53C;
             } else {
                 p = D_80119E2C;
             }
-            func_00416644(p, D_0043BE14, o->player, o->controller, 0);
+            MenuPool_OpenMenu(p, D_0043BE14, o->player, o->controller, 0);
             D_80130940 = 0;
         }
     } else {
@@ -110,7 +110,7 @@ s32 func_0045977C(s32 a0, Menu *o) {
             } else {
                 p = D_80119E2C;
             }
-            func_00416644(p, o->context, o->player, o->controller, s1);
+            MenuPool_OpenMenu(p, o->context, o->player, o->controller, s1);
         }
     }
     return 1;

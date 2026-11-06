@@ -22,42 +22,42 @@ typedef struct TrailMgr {
     /* 0x7520 */ Trail *trails;
 } TrailMgr;
 
-void func_0020B5B8(void);
-void func_00207FEC(s32);
-void func_00207A70(s32);
-void func_00207A54(void);
-void func_0023417C(Trail *);
-void func_00233FCC(Trail *, s32);
-void func_00234348(TrailMgr *, Trail *, s32);
-void func_00234928(TrailMgr *, Trail *, s32);
+void Render_InvalidateModeCache(void);
+void Render_SetRenderMode(s32);
+void Render_SetCombineMode(s32);
+void Texture_InvalidateCache(void);
+void Trail_PlaceNodes(Trail *);
+void Trail_ComputeFrames(Trail *, s32);
+void Trail_DrawTextured(TrailMgr *, Trail *, s32);
+void Trail_DrawUntextured(TrailMgr *, Trail *, s32);
 
 /* Draws the trails: the negative layers first, then the positive ones. */
-void func_002352F8(TrailMgr *mgr, s32 arg) {
+void Trail_DrawAll(TrailMgr *mgr, s32 arg) {
     Trail *e;
 
     GFX_CMD(0xE7000000, 0)
-    func_0020B5B8();
-    func_00207FEC(0xE);
-    func_00207A70(0x1C);
+    Render_InvalidateModeCache();
+    Render_SetRenderMode(0xE);
+    Render_SetCombineMode(0x1C);
     GFX_CMD(0xD9F8FB7F, 0)
     GFX_CMD(0xD9FFFFFF, 0x200004)
     GFX_CMD(0xE3000A01, 0)
     GFX_CMD(0xE3000C00, 0x80000)
     GFX_CMD(0xD7000000, 0)
-    func_00207A54();
+    Texture_InvalidateCache();
     for (e = mgr->trails; e != NULL; e = e->next) {
         if (e->layer < 0) {
             if (e->flags & 8) {
-                func_0023417C(e);
+                Trail_PlaceNodes(e);
             }
             if (e->flags & 4) {
-                func_00233FCC(e, arg);
+                Trail_ComputeFrames(e, arg);
             }
             if (e->nodeCount >= 2) {
                 if (e->layer >= 0) {
-                    func_00234348(mgr, e, arg);
+                    Trail_DrawTextured(mgr, e, arg);
                 } else {
-                    func_00234928(mgr, e, arg);
+                    Trail_DrawUntextured(mgr, e, arg);
                 }
             }
         }
@@ -65,16 +65,16 @@ void func_002352F8(TrailMgr *mgr, s32 arg) {
     for (e = mgr->trails; e != NULL; e = e->next) {
         if (e->layer > 0) {
             if (e->flags & 8) {
-                func_0023417C(e);
+                Trail_PlaceNodes(e);
             }
             if (e->flags & 4) {
-                func_00233FCC(e, arg);
+                Trail_ComputeFrames(e, arg);
             }
             if (e->nodeCount >= 2) {
                 if (e->layer >= 0) {
-                    func_00234348(mgr, e, arg);
+                    Trail_DrawTextured(mgr, e, arg);
                 } else {
-                    func_00234928(mgr, e, arg);
+                    Trail_DrawUntextured(mgr, e, arg);
                 }
             }
         }

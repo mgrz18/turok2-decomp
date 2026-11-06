@@ -6,7 +6,7 @@ extern u8 D_8011AAF3; /* D_8011AAD8 + 0x1B */
 extern char D_800B3FD8[];
 extern char D_800B3FF0[];
 
-s32 func_0041C338(MenuItem *a) {
+s32 OptionsMenu_TwoPlayerLayoutText(MenuItem *a) {
     if (D_8011AAD8.mode == 13 && D_8011AAD8.multiplayer == 0) {
         a->flags &= ~0x1000000;
     } else {

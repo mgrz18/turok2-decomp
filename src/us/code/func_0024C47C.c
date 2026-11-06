@@ -1,14 +1,14 @@
-/* One source file from func_0024C47C to func_0024D344 (at least: the file
+/* One source file from CBarrel__OpenWheel to CPlayer__Update (at least: the file
  * starts earlier, on a 16-byte boundary in .text, but this is the shortest
- * run whose .rodata starts 8-aligned). func_0024D344's pool
+ * run whose .rodata starts 8-aligned). CPlayer__Update's pool
  * starts at 0x800A6CFC, 4 past an 8-byte boundary, and its 2^32 double is
- * 8-aligned only counted from 0x800A6C70, where func_0024C47C's pool opens;
- * func_0024C648's (0x800A6C74) and func_0024CF58's (0x800A6CDC) are 4 past a
+ * 8-aligned only counted from 0x800A6C70, where CBarrel__OpenWheel's pool opens;
+ * CPlayer__DrawHud's (0x800A6C74) and CPlayer__UpdateOrbitCamera's (0x800A6CDC) are 4 past a
  * boundary too, so neither can open the file.
  *
  * The parts were written apart; the first three use structs/player.h's
- * CPlayer, func_0024D344 keeps its own Player view (see there), and they
- * share one WeaponInfo. func_0024D344 is after Rage Wars (func_80220ED4_de). */
+ * CPlayer, CPlayer__Update keeps its own Player view (see there), and they
+ * share one WeaponInfo. CPlayer__Update is after Rage Wars (func_80220ED4_de). */
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
@@ -19,12 +19,12 @@
 extern s32 D_80110058;
 extern s32 D_8011005C;
 
-void func_0024BF1C(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
+void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
 /* Opens the weapon wheel: picks the weapons to show (owned, allowed here,
  * not superseded by an owned upgrade) and how many times round to repeat
  * them so that the slots are at most 20 degrees apart. */
-void func_0024C47C(CBarrel *menu, CPlayer *player) {
+void CBarrel__OpenWheel(CBarrel *menu, CPlayer *player) {
     s32 shown[0x23];
     s32 count = 0;
     s32 range = D_8011005C - D_80110058 + 1;
@@ -65,7 +65,7 @@ void func_0024C47C(CBarrel *menu, CPlayer *player) {
         slots += count;
         rows++;
     }
-    func_0024BF1C(menu, rows, shown, count, player);
+    CBarrel__Fill(menu, rows, shown, count, player);
 }
 
 #include "gfx.h"
@@ -73,7 +73,7 @@ void func_0024C47C(CBarrel *menu, CPlayer *player) {
 #include "structs/collision.h"
 #include "structs/camera.h"
 
-/* An animated HUD item (func_00277328 ticks it, func_0027AD00 restarts it). */
+/* An animated HUD item (COverlay__Update ticks it, COverlay__StartScript restarts it). */
 extern s32 D_8011AC8C;          /* game state */
 extern u8 D_8011AAEA;           /* HUD alpha */
 extern s32 D_800C2030;          /* screen width */
@@ -85,17 +85,17 @@ extern u8 D_800ADC00[];
 extern u8 D_800ADC40[];
 extern u8 D_800ADC80[];
 
-void func_00277328(COverlay *item);
-void func_0027AD00(COverlay *item, u8 *anim);
-void func_0024A86C(CPlayer *player, CCamera *view);
-void func_00247438(void *crosshair, CCamera *view);
-void func_00279028(s32 alpha);
-void func_00254D5C(CBarrel *strokes, CCamera *view, CPlayer *player);
-void func_0024B3E4(CBarrel *strokes, CCamera *view, CPlayer *player);
-s32 func_0024E700(CPlayer *player, s32 weapon);
-s32 func_0024E7D0(CPlayer *player);
-void func_0027B320(s32 sprite, s32 frame, s16 x, s16 y, f32 sx, f32 sy, s32);
-void func_00277CF0(s32 value, f32 x, f32 y, f32 sx, f32 sy, s32, s32 rightAlign, s32 minDigits);
+void COverlay__Update(COverlay *item);
+void COverlay__StartScript(COverlay *item, u8 *anim);
+void CPlayer__DrawTargetMarkers(CPlayer *player, CCamera *view);
+void CPlayer__DrawScope(void *crosshair, CCamera *view);
+void Hud_SetupTextureMode(s32 alpha);
+void CBarrel__DrawEight(CBarrel *strokes, CCamera *view, CPlayer *player);
+void CBarrel__DrawRing(CBarrel *strokes, CCamera *view, CPlayer *player);
+s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
+s32 CPlayer__GetCurrentAmmoInfo(CPlayer *player);
+void Hud_DrawSprite(s32 sprite, s32 frame, s16 x, s16 y, f32 sx, f32 sy, s32);
+void Hud_DrawNumber(s32 value, f32 x, f32 y, f32 sx, f32 sy, s32, s32 rightAlign, s32 minDigits);
 void func_00254768(CPlayer *player, CCamera *view);
 
 /* The next display list command. Through this helper, as in the ROM, the
@@ -108,7 +108,7 @@ static __inline__ Gfx *dl_next(void) {
 /* Draw a player's HUD: tick the item animations, the crosshair and strokes,
  * then the ammo (with the charge gauge of weapon 0xDD), the health, the
  * lives, the keys in single player, and the score and frags in multiplayer. */
-void func_0024C648(CPlayer *player, CCamera *view) {
+void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
     f32 sx;
     f32 sy;
     f32 shift;
@@ -126,18 +126,18 @@ void func_0024C648(CPlayer *player, CCamera *view) {
     if (D_8011AC8C == 0xB || D_8011AC8C == 8) {
         return;
     }
-    func_00277328(&player->m_AmmoOverlay);
-    func_00277328(&player->m_HealthOverlay);
-    func_00277328(&player->m_LivesOverlay);
-    func_00277328(&player->m_TokensOverlay);
-    func_00277328(&player->m_TotalKillsOverlay);
-    func_00277328(&player->m_TotalTagsOverlay);
-    func_0024A86C(player, view);
+    COverlay__Update(&player->m_AmmoOverlay);
+    COverlay__Update(&player->m_HealthOverlay);
+    COverlay__Update(&player->m_LivesOverlay);
+    COverlay__Update(&player->m_TokensOverlay);
+    COverlay__Update(&player->m_TotalKillsOverlay);
+    COverlay__Update(&player->m_TotalTagsOverlay);
+    CPlayer__DrawTargetMarkers(player, view);
     if (view->m_ViewParams.m_nType == 0) {
-        func_00247438(&player->m_Overlay, view);
+        CPlayer__DrawScope(&player->m_Overlay, view);
     }
     strokes = &player->m_Barrel;
-    func_00279028(0xFF);
+    Hud_SetupTextureMode(0xFF);
     {   /* gDPSetTextureFilter(G_TF_BILERP) */
         Gfx *g = dl_next();
 
@@ -145,25 +145,25 @@ void func_0024C648(CPlayer *player, CCamera *view) {
         g->w1 = 0x2000;
     }
     if (strokes->m_bStickWheel) {
-        func_00254D5C(strokes, view, player);
+        CBarrel__DrawEight(strokes, view, player);
     } else {
-        func_0024B3E4(strokes, view, player);
+        CBarrel__DrawRing(strokes, view, player);
     }
-    func_00279028(D_8011AAEA);
+    Hud_SetupTextureMode(D_8011AAEA);
     sx = view->m_Viewport.m_Width / (f32)D_800C2030;
     shift = sx * 32.0f;
     sy = view->m_Viewport.m_Height / (f32)D_800C2034;
 
-    ammo = func_0024E700(player, player->m_Data.m_CurrentWeapon);
+    ammo = CPlayer__GetWeaponAmmo(player, player->m_Data.m_CurrentWeapon);
     if (player->m_AmmoOverlay.m_Value != ammo) {
-        func_0027AD00(&player->m_AmmoOverlay, D_800ADB84);
+        COverlay__StartScript(&player->m_AmmoOverlay, D_800ADB84);
         player->m_AmmoOverlay.m_Value = ammo;
     }
-    icon = func_0024E7D0(player);
+    icon = CPlayer__GetCurrentAmmoInfo(player);
     if (player->m_AmmoOverlay.m_bOnScreen && player->m_AmmoOverlay.m_Mode && icon != -1) {
         x = player->m_AmmoOverlay.m_PositionX * sx + view->m_Viewport.m_ScreenPosX;
         y = player->m_AmmoOverlay.m_PositionY * sy + view->m_Viewport.m_ScreenPosY + view->m_Viewport.m_Height;
-        func_0027B320(0x12C, 0, x - shift + sx * 18.0f, y + sy, sx, sy, 1);
+        Hud_DrawSprite(0x12C, 0, x - shift + sx * 18.0f, y + sy, sx, sy, 1);
         frame = 0;
         if (icon == 0xDD) {
             frame = 8;
@@ -174,68 +174,68 @@ void func_0024C648(CPlayer *player, CCamera *view) {
         } else if (player->m_Data.m_CurrentWeapon == 0x15) {
             showAmmo = 0;
         }
-        func_0027B320(icon, frame, x - shift, y - sy * 8.0f, sx, sy, 1);
+        Hud_DrawSprite(icon, frame, x - shift, y - sy * 8.0f, sx, sy, 1);
         if (showAmmo) {
-            func_00277CF0(player->m_AmmoOverlay.m_Value, x - sx * 6.0f, y - sy * 4.0f, sx, sy, 1, 0, 0);
+            Hud_DrawNumber(player->m_AmmoOverlay.m_Value, x - sx * 6.0f, y - sy * 4.0f, sx, sy, 1, 0, 0);
         }
     }
 
     x = player->m_HealthOverlay.m_PositionX * sx + view->m_Viewport.m_ScreenPosX;
     y = player->m_HealthOverlay.m_PositionY * sy + view->m_Viewport.m_ScreenPosY + view->m_Viewport.m_Height;
-    func_0027B320(0x12C, 0, x - shift + sx * 21.0f, y + sy, sx, sy, 1);
-    func_0027B320(0x1F7, 0, x - shift + sx, y - sy * 9.0f, sx, sy, 1);
-    func_00277CF0((player->m_Data.m_Health + 0xFF) >> 8, x - sx * 3.0f, y - sy * 4.0f, sx, sy, 1, 0, 0);
+    Hud_DrawSprite(0x12C, 0, x - shift + sx * 21.0f, y + sy, sx, sy, 1);
+    Hud_DrawSprite(0x1F7, 0, x - shift + sx, y - sy * 9.0f, sx, sy, 1);
+    Hud_DrawNumber((player->m_Data.m_Health + 0xFF) >> 8, x - sx * 3.0f, y - sy * 4.0f, sx, sy, 1, 0, 0);
 
     lives = player->m_Data.m_LifeForce;
     if (player->m_TokensOverlay.m_Value != lives) {
-        func_0027AD00(&player->m_TokensOverlay, D_800ADC00);
+        COverlay__StartScript(&player->m_TokensOverlay, D_800ADC00);
         player->m_TokensOverlay.m_Value = lives;
     }
     if (player->m_TokensOverlay.m_bOnScreen && player->m_TokensOverlay.m_Mode) {
         x = player->m_TokensOverlay.m_PositionX * sx + view->m_Viewport.m_ScreenPosX + view->m_Viewport.m_Width;
         y = player->m_TokensOverlay.m_PositionY * sy + view->m_Viewport.m_ScreenPosY;
-        func_0027B320(0x12C, 1, x + sx * -42.0f, y + sy * 24.0f, sx, sy, 1);
-        func_0027B320(0x1F5, 0, x, y + sy * 8.0f, sx, sy, 1);
-        func_00277CF0(player->m_Data.m_LifeForce, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
+        Hud_DrawSprite(0x12C, 1, x + sx * -42.0f, y + sy * 24.0f, sx, sy, 1);
+        Hud_DrawSprite(0x1F5, 0, x, y + sy * 8.0f, sx, sy, 1);
+        Hud_DrawNumber(player->m_Data.m_LifeForce, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
     }
 
     if (!D_8011AAD8.multiplayer) {
         value = player->m_Data.m_Lives;
         if (player->m_LivesOverlay.m_Value != value) {
-            func_0027AD00(&player->m_LivesOverlay, D_800ADBC0);
+            COverlay__StartScript(&player->m_LivesOverlay, D_800ADBC0);
             player->m_LivesOverlay.m_Value = value;
         }
         if (player->m_LivesOverlay.m_bOnScreen && player->m_LivesOverlay.m_Mode) {
             x = player->m_LivesOverlay.m_PositionX * sx + view->m_Viewport.m_ScreenPosX;
             y = player->m_LivesOverlay.m_PositionY * sy + view->m_Viewport.m_ScreenPosY;
-            func_0027B320(0x12C, 0, x + sx * 18.0f, y + sy * 28.0f, sx, sy, 1);
-            func_0027B320(0x1F6, 0, x, y, sx, sy, 1);
-            func_00277CF0(player->m_Data.m_Lives, x + sx * 30.0f, y + sy * 24.0f, sx, sy, 1, 0, 0);
+            Hud_DrawSprite(0x12C, 0, x + sx * 18.0f, y + sy * 28.0f, sx, sy, 1);
+            Hud_DrawSprite(0x1F6, 0, x, y, sx, sy, 1);
+            Hud_DrawNumber(player->m_Data.m_Lives, x + sx * 30.0f, y + sy * 24.0f, sx, sy, 1, 0, 0);
         }
     }
     if (D_8011AAD8.multiplayer) {
         value = player->m_pOptions->m_Kills;
         if (player->m_TotalKillsOverlay.m_Value != value) {
-            func_0027AD00(&player->m_TotalKillsOverlay, D_800ADC40);
+            COverlay__StartScript(&player->m_TotalKillsOverlay, D_800ADC40);
             player->m_TotalKillsOverlay.m_Value = value;
         }
         if (player->m_TotalKillsOverlay.m_bOnScreen && player->m_TotalKillsOverlay.m_Mode) {
             x = player->m_TotalKillsOverlay.m_PositionX * sx + view->m_Viewport.m_ScreenPosX + view->m_Viewport.m_Width;
             y = player->m_TotalKillsOverlay.m_PositionY * sy + view->m_Viewport.m_ScreenPosY;
-            func_0027B320(0x1FA, 0, x, y + sy * 8.0f, sx, sy, 1);
-            func_00277CF0(player->m_pOptions->m_Kills, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
+            Hud_DrawSprite(0x1FA, 0, x, y + sy * 8.0f, sx, sy, 1);
+            Hud_DrawNumber(player->m_pOptions->m_Kills, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
         }
         if (D_8011ACE4) {
             value = player->m_pOptions->m_Tags;
             if (player->m_TotalTagsOverlay.m_Value != value) {
-                func_0027AD00(&player->m_TotalTagsOverlay, D_800ADC80);
+                COverlay__StartScript(&player->m_TotalTagsOverlay, D_800ADC80);
                 player->m_TotalTagsOverlay.m_Value = value;
             }
             if (player->m_TotalTagsOverlay.m_bOnScreen && player->m_TotalTagsOverlay.m_Mode) {
                 x = player->m_TotalTagsOverlay.m_PositionX * sx + view->m_Viewport.m_ScreenPosX + view->m_Viewport.m_Width;
                 y = player->m_TotalTagsOverlay.m_PositionY * sy + view->m_Viewport.m_ScreenPosY;
-                func_0027B320(0x1FD, 0, x, y + sy * 8.0f, sx, sy, 1);
-                func_00277CF0(player->m_pOptions->m_Tags, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
+                Hud_DrawSprite(0x1FD, 0, x, y + sy * 8.0f, sx, sy, 1);
+                Hud_DrawNumber(player->m_pOptions->m_Tags, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
             }
         }
     }
@@ -260,12 +260,12 @@ extern f32 D_800AE30C;
 
 f32 func_002982F0(f32);             /* sin */
 f32 func_002974C0(f32);             /* cos */
-void func_00280C94(void *camera, s32 type, f32 a, f32 b, f32 x0, f32 y0, f32 x1, f32 y1, f32 z1,
+void CCamera__SetViewParams(void *camera, s32 type, f32 a, f32 b, f32 x0, f32 y0, f32 x1, f32 y1, f32 z1,
                    f32 h, CQuaternion quad, struct CGameRegion *region, f32 c, f32 d);
 
 /* Points the camera at : in mode 1 from the view's offsets, in
  * mode 2 orbiting it, the buttons turning the orbit and moving it in or out. */
-void func_0024CF58(CPlayer *player, CGameObjectInstance *target) {
+void CPlayer__UpdateOrbitCamera(CPlayer *player, CGameObjectInstance *target) {
     void *camera;
     f32 angle;
     f32 x;
@@ -275,7 +275,7 @@ void func_0024CF58(CPlayer *player, CGameObjectInstance *target) {
         return;
     }
     if (player->m_bActive == 1) {
-        func_00280C94(camera, 0, target->m_RotY, player->m_vHeadRotOffset.x + player->m_vHeadWobbleRotOffset.x - player->m_JumpAngle,
+        CCamera__SetViewParams(camera, 0, target->m_RotY, player->m_vHeadRotOffset.x + player->m_vHeadWobbleRotOffset.x - player->m_JumpAngle,
                       player->m_vHeadRotOffset.y + player->m_vHeadWobbleRotOffset.y, player->m_vHeadRotOffset.z + player->m_vHeadWobbleRotOffset.z,
                       target->header.m_vPos.x + player->m_vEyeOffset.x, target->header.m_vPos.y, target->header.m_vPos.z + player->m_vEyeOffset.z,
                       MAX(player->m_vEyeOffset.y + player->m_ActualCameraVertEyeOffset - player->m_DuckOffset, 40.96f), target->m_qGround, target->header.m_pCurrentRegion, player->m_ZoomBlend, 3.0f);
@@ -291,18 +291,18 @@ void func_0024CF58(CPlayer *player, CGameObjectInstance *target) {
         }
         angle = target->m_RotY + D_800AE308;
         x = target->header.m_vPos.x + D_800AE30C * func_002982F0(angle);
-        func_00280C94(camera, 1, angle, 0.0f, 0.0f, 0.0f, x, target->header.m_vPos.y + 81.92f,
+        CCamera__SetViewParams(camera, 1, angle, 0.0f, 0.0f, 0.0f, x, target->header.m_vPos.y + 81.92f,
                       target->header.m_vPos.z + D_800AE30C * func_002974C0(angle), 0.0f, target->m_qGround, target->header.m_pCurrentRegion, 0.0f, 3.0f);
     }
 }
 
 
-void func_00258668(void *a, void *b);
+void WeaponActor_SwitchToRequested(void *a, void *b);
 
 /* Picks the player's weapon set (0 on foot, 1 in states 10-11, 2 with
  * flag 0x8000); when it changes, remembers the weapon held in the old set
  * if it belongs there and queues the new set's weapon. */
-void func_0024D1F8(CPlayer *player) {
+void CPlayer__UpdateWeaponSet(CPlayer *player) {
     s32 keep;
     s16 weapon;
 
@@ -347,7 +347,7 @@ void func_0024D1F8(CPlayer *player) {
     }
     player->m_RequestedWeapon = player->m_Data.m_LastWeapon[player->m_CurrentAllowedWeaponType];
     if (player->m_RequestedWeapon == 19) {
-        func_00258668(&player->m_WeaponActor, &player->m_WeaponActor.m_AI);
+        WeaponActor_SwitchToRequested(&player->m_WeaponActor, &player->m_WeaponActor.m_AI);
     }
 }
 
@@ -358,7 +358,7 @@ typedef struct Model {
     /* 0x02 */ u16 flags;
 } Model;
 
-/* What the actor stands in (func_00268A2C). */
+/* What the actor stands in (GameObject_GetRegionInfo). */
 typedef struct Surface {
     /* 0x00 */ u8 pad0[0x44];
     /* 0x44 */ u32 flags;
@@ -390,7 +390,7 @@ typedef struct Voice {
     /* 0x10 */ s32 bank;
 } Voice;
 
-/* CPlayer (structs/player.h) as func_0024D344 reads it, kept local: it uses
+/* CPlayer (structs/player.h) as CPlayer__Update reads it, kept local: it uses
  * the player both as itself and as its m_CharacterActor (actor = p), and
  * several words are typed against the header (0x10 the region as a Model,
  * the controller's 0x08 as a position, the weapon actor's 0x3F4 as a voice,
@@ -523,52 +523,52 @@ extern s32 D_800ADB30[];
 extern s32 D_800ADB5C;
 
 s32 Cinema_PathPlaying(void);
-void func_00206068(s32);
-void func_00275B08(s32 enable);
-void func_00242E34(Player *, u32 *ai);
-void func_0021A344(Player *);
-void func_00242C00(Player *, u32 *ai);
-Surface *func_00268A2C(Player *);
-void func_00254640(Player *, Player *, Surface *);
-f32 func_00269C3C(Model *, f32 x, f32 z);
-f32 func_0026BE60(Model *, f32 x, f32 z);
-void func_00275B30(f32);
-void func_002545F0(Player *, Player *);
+void CCache__SetFrameDelay(s32);
+void Sound__SetMuted(s32 enable);
+void AI_UpdateRegionFlags(Player *, u32 *ai);
+void CGameObjectInstance__UpdateAnimation(Player *);
+void AI_RideMovingPlatform(Player *, u32 *ai);
+Surface *GameObject_GetRegionInfo(Player *);
+void CPlayer__UpdateSpeedScale(Player *, Player *, Surface *);
+f32 CGameRegion__GetCeilingHeight(Model *, f32 x, f32 z);
+f32 CGameRegion__GetHeight(Model *, f32 x, f32 z);
+void Sound__SetReverb(f32);
+void CPlayer__EaseEyeOffset(Player *, Player *);
 f32 func_00298470(f32);
-s32 func_002548FC(Player *);
-f32 func_0021149C(f32);
-void func_00245828(DamageEvent *, s32, s32, f32, s32, s32);
-void func_00247C10(Player *, u32 *ai, DamageEvent *);
-void func_00275544(s32 sound, CVector3 pos, s32, s32);
-s32 func_002685F0(Player *);
-void func_002699E4(Player *);
-void func_0024E9D0(Player *, Player *);
-void func_0024E88C(Player *, Player *);
-void func_00255220(Player *, Player *);
-void func_00255298(Player *, Player *);
-void func_00247660(Player *);
-void func_00269050(Player *, Surface *, CVector3 *, s32);
-void func_00249358(Player *, Player *, s32, s32, s32);
-void func_002543A4(Player *, Player *, Surface *);
-void func_0024AB0C(Player *, Player *);
-s32 func_00239F00(Player *, CVector3, u32 *);
-void func_0026E19C(Model *, s32, Player *);
-void func_002233A8(void *, Player *, CVector3 *, CVector3 *);
-void func_0026E110(u8 *, s32, Player *);
-void func_0024ED54(Player *, Player *, u32 *);
-s32 func_0024EAF8(Player *, Player *, u32 *);
-void func_0023F05C(Player *, u8 *);
-void func_002553BC(Player *, Player *);
-void func_00248BA8(Player *, s32, s32, s32);
-f32 func_0026872C(Player *, s32);
-void func_002241D8(void *, void *, s32, s32);
-s32 func_0021E9A4(Player *, s32, s32);
-s32 func_00219F74(Player *, s32, s32);
-void func_0021E9F8(Player *, s32, s32);
+s32 CPlayer__IsInMatchEndState(Player *);
+f32 Random_Float(f32);
+void DamageEvent_Set(DamageEvent *, s32, s32, f32, s32, s32);
+void Player_OnMultiplayerKill(Player *, u32 *ai, DamageEvent *);
+void Sound__Play(s32 sound, CVector3 pos, s32, s32);
+s32 GameObject_IsOnGround(Player *);
+void GameObject_PlayLandSound(Player *);
+void CPlayer__CheckJumpPad(Player *, Player *);
+void CPlayer__CheckWater(Player *, Player *);
+void CPlayer__CheckState12Hit(Player *, Player *);
+void CPlayer__CheckClimb(Player *, Player *);
+void CPlayer__UpdateZoom(Player *);
+void GameObject_ApplyCurrent(Player *, Surface *, CVector3 *, s32);
+void CPlayer__Hurt(Player *, Player *, s32, s32, s32);
+void CPlayer__UpdateWaterRegion(Player *, Player *, Surface *);
+void CPlayer__UpdateFlashlight(Player *, Player *);
+s32 Collision_MoveInstance(Player *, CVector3, u32 *);
+void CGameRegion__FireTriggers(Model *, s32, Player *);
+void CScene__CheckAutoActivation(void *, Player *, CVector3 *, CVector3 *);
+void GameObject_FireTriggers(u8 *, s32, Player *);
+void CPlayer__RamWithMount(Player *, Player *, u32 *);
+s32 CPlayer__TryMount(Player *, Player *, u32 *);
+void CPlayer__TouchPickup(Player *, u8 *);
+void CPlayer__Dismount(Player *, Player *);
+void CPlayer__Warp(Player *, s32, s32, s32);
+f32 GameObject_GetRegionFloorHeight(Player *, s32);
+void CScene__SetInstanceObjectType(void *, void *, s32, s32);
+s32 CGameObjectInstance__SetAnimByAction(Player *, s32, s32);
+s32 CGameObjectInstance__PickRandomAnim(Player *, s32, s32);
+void CGameObjectInstance__SetAnim(Player *, s32, s32);
 void func_0021A500(Player *);
-s16 *func_0025398C(Player *, s32);
-void func_0024BD18(s32 *, Player *, u8 *);
-void func_0024A0DC(Player *);
+s16 *CPlayer__GetFiringAmmo(Player *, s32);
+void CBarrel__Update(s32 *, Player *, u8 *);
+void Player_UpdateAim(Player *);
 
 static __inline__ s32 link_enabled(u8 *bits) {
     if (D_8011AAD8.cheatFlags & 0x10) {
@@ -595,13 +595,13 @@ static __inline__ void enter_surface(Player *p, Player *actor, Surface *before, 
     }
     if (after->flags & 0x200000) {
         ok = not_flagged(before->flags, 0x40000);
-    } else if (func_0026BE60(model, actor->pos.x, actor->pos.z) < actor->pos.y) {
+    } else if (CGameRegion__GetHeight(model, actor->pos.x, actor->pos.z) < actor->pos.y) {
         ok = 0;
     } else {
         ok = 1;
     }
     if (ok) {
-        func_00248BA8(p, after->unk48, (after->unk54 & 1) ? 1 : 2, 0);
+        CPlayer__Warp(p, after->unk48, (after->unk54 & 1) ? 1 : 2, 0);
     }
 }
 
@@ -609,7 +609,7 @@ static __inline__ void enter_surface(Player *p, Player *actor, Surface *before, 
  * multiplayer, then the state machine and collision in a loop over the frame
  * time, the landscape ceiling, the animation for the current action, the
  * cheats (all weapons / ammo) and the weapon sounds. */
-void func_0024D344(Player *p) {
+void CPlayer__Update(Player *p) {
     CVector3 prev;
     Input saved;
     DamageEvent damage;
@@ -651,7 +651,7 @@ void func_0024D344(Player *p) {
     game = &D_8011AAD8;
     if (game->multiplayer) {
         human = 1;
-        func_00206068(8);
+        CCache__SetFrameDelay(8);
     }
     enable = 0;
     p->owner = p;
@@ -659,7 +659,7 @@ void func_0024D344(Player *p) {
     if ((p->aiFlags & 0x80) && game->multiplayer == 0) {
         enable = *(u32 *) ((u8 *) game - 0xCAC) == 0; /* D_80119E2C, the block before */
     }
-    func_00275B08(enable);
+    Sound__SetMuted(enable);
     if (D_8011AAD8.multiplayer == 0) {
         if (!(D_8011AAA0 != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x800)) {
             if (p->unk12A4 != 0) {
@@ -694,12 +694,12 @@ void func_0024D344(Player *p) {
         }
     }
     actor->flags &= ~0x20000;
-    func_00242E34(actor, &actor->aiFlags);
+    AI_UpdateRegionFlags(actor, &actor->aiFlags);
     if (human) {
-        func_0021A344(actor);
+        CGameObjectInstance__UpdateAnimation(actor);
     }
     D_800B6D28 = scale;
-    func_00242C00(actor, &actor->aiFlags);
+    AI_RideMovingPlatform(actor, &actor->aiFlags);
     if (link_enabled(&p->unk6A9)) {
         linkFlags |= 0x800;
     }
@@ -731,25 +731,25 @@ void func_0024D344(Player *p) {
     saved = p->input;
     for (remaining = D_800B6D28; remaining > 0.0f;) {
         remaining = 0.0f;
-        func_00242E34(actor, &actor->aiFlags);
+        AI_UpdateRegionFlags(actor, &actor->aiFlags);
         p->prevState = (u16) p->state;
         p->prevStateFlags = p->stateFlags;
         model = actor->model;
-        material = func_00268A2C(actor);
-        func_00254640(p, actor, material);
+        material = GameObject_GetRegionInfo(actor);
+        CPlayer__UpdateSpeedScale(p, actor, material);
         if (D_8011AAD8.multiplayer == 0) {
             CVector3 *pos = &p->pos;
 
             if (model != NULL && pos != NULL && (model->flags & 0x40)) {
-                f32 amount = (s32) (func_00269C3C(model, p->pos.x, pos->z) - func_0026BE60(model, p->pos.x, pos->z));
+                f32 amount = (s32) (CGameRegion__GetCeilingHeight(model, p->pos.x, pos->z) - CGameRegion__GetHeight(model, p->pos.x, pos->z));
 
                 if (amount < 1024.0f) {
-                    func_00275B30(1.0f - amount * 0.0009765625f);
+                    Sound__SetReverb(1.0f - amount * 0.0009765625f);
                 } else {
-                    func_00275B30(0.0f);
+                    Sound__SetReverb(0.0f);
                 }
             } else {
-                func_00275B30(0.0f);
+                Sound__SetReverb(0.0f);
             }
         }
         if (material != NULL) {
@@ -757,29 +757,29 @@ void func_0024D344(Player *p) {
         } else {
             p->step = D_800B6D28;
         }
-        func_002545F0(p, actor);
+        CPlayer__EaseEyeOffset(p, actor);
         p->speed = func_00298470(p->velX * p->velX + p->velZ * p->velZ);
         p->unkB00 += p->speed * 0.021000002f;
         p->unkAFC += p->speed * 1.00000005e-4f;
         p->goal = actor->pos;
-        if (p->shake > 0.0f && p->health != 0 && !func_002548FC(p)) {
-            p->goal.x += (func_0021149C(5.0f) - 2.5f) * 10.24f;
-            p->goal.z += (func_0021149C(5.0f) - 2.5f) * 10.24f;
-            p->goal.y += func_0021149C(1.0f) * 10.24f;
-            p->yaw += (func_0021149C(20.0f) - 10.0f) * 0.017453294f;
-            p->unkAC8 += func_0021149C(0.5f) - 0.25f;
+        if (p->shake > 0.0f && p->health != 0 && !CPlayer__IsInMatchEndState(p)) {
+            p->goal.x += (Random_Float(5.0f) - 2.5f) * 10.24f;
+            p->goal.z += (Random_Float(5.0f) - 2.5f) * 10.24f;
+            p->goal.y += Random_Float(1.0f) * 10.24f;
+            p->yaw += (Random_Float(20.0f) - 10.0f) * 0.017453294f;
+            p->unkAC8 += Random_Float(0.5f) - 0.25f;
             if (D_800B6D1C != 0) {
-                func_00245828(&damage, p->unk12AC, 0x19, 25.599998f, 0x100000, 0);
-                func_00247C10(p, &p->aiFlags, &damage);
+                DamageEvent_Set(&damage, p->unk12AC, 0x19, 25.599998f, 0x100000, 0);
+                Player_OnMultiplayerKill(p, &p->aiFlags, &damage);
             }
-            func_00275544(0x227, p->pos, 0, -1);
+            Sound__Play(0x227, p->pos, 0, -1);
         }
         p->stateTime += D_800B6D28;
         {
-            s32 ground = func_002685F0(actor);
+            s32 ground = GameObject_IsOnGround(actor);
 
             if (ground != 0 && p->onGround == 0 && p->lastVelY < -51.199997f) {
-                func_002699E4(actor);
+                GameObject_PlayLandSound(actor);
             }
             p->onGround = ground;
             p->lastVelY = actor->velY;
@@ -790,11 +790,11 @@ void func_0024D344(Player *p) {
             }
         }
         if ((u16) p->state >= 2 && p->health != 0) {
-            func_0024E9D0(p, actor);
-            func_0024E88C(p, actor);
-            func_00255220(p, actor);
-            func_00255298(p, actor);
-            func_00247660(p);
+            CPlayer__CheckJumpPad(p, actor);
+            CPlayer__CheckWater(p, actor);
+            CPlayer__CheckState12Hit(p, actor);
+            CPlayer__CheckClimb(p, actor);
+            CPlayer__UpdateZoom(p);
         }
         if (!Cinema_PathPlaying() || (u32) ((u16) p->state - 19) < 12) {
             void (*update)(Player *, Player *) = D_800ADF54[p->state].update;
@@ -803,11 +803,11 @@ void func_0024D344(Player *p) {
                 update(p, actor);
             }
         }
-        material = func_00268A2C(actor);
+        material = GameObject_GetRegionInfo(actor);
         if (material != NULL) {
-            func_00269050(actor, material, &p->goal, 1);
-            if ((material->flags & 0x4000) && actor->pos.y <= func_0026BE60(actor->model, actor->pos.x, actor->pos.z)) {
-                func_00249358(p, actor, 0x3E700, 0, 0x1D);
+            GameObject_ApplyCurrent(actor, material, &p->goal, 1);
+            if ((material->flags & 0x4000) && actor->pos.y <= CGameRegion__GetHeight(actor->model, actor->pos.x, actor->pos.z)) {
+                CPlayer__Hurt(p, actor, 0x3E700, 0, 0x1D);
             }
         }
         stateFlags = D_800ADF54[p->state].flags;
@@ -846,41 +846,41 @@ void func_0024D344(Player *p) {
                 *stateFlags &= ~0x80;
             }
         }
-        func_002543A4(p, actor, material);
+        CPlayer__UpdateWaterRegion(p, actor, material);
         if (p->unkA30 > 0.0f) {
             p->unkA30 -= D_800B6D28;
             if (p->unkA30 < 0.0f) {
                 p->unkA30 = 0.0f;
             }
         }
-        func_0024AB0C(p, actor);
+        CPlayer__UpdateFlashlight(p, actor);
         oldModel = actor->model;
         prev = actor->pos;
-        before = func_00268A2C(actor);
+        before = GameObject_GetRegionInfo(actor);
         if (p->collide != 0) {
             actor->flags |= 0x10000;
-            hit = func_00239F00(actor, p->goal, stateFlags);
+            hit = Collision_MoveInstance(actor, p->goal, stateFlags);
             actor->flags &= ~0x10000;
         } else {
             hit = 0;
         }
         model = actor->model;
-        material = func_00268A2C(actor);
+        material = GameObject_GetRegionInfo(actor);
         if (before != material) {
-            func_0026E19C(oldModel, linkFlags | 2, actor);
-            func_0026E19C(model, linkFlags | 1, actor);
+            CGameRegion__FireTriggers(oldModel, linkFlags | 2, actor);
+            CGameRegion__FireTriggers(model, linkFlags | 1, actor);
         }
-        func_002233A8(&D_800F7078, actor, &prev, &actor->pos);
+        CScene__CheckAutoActivation(&D_800F7078, actor, &prev, &actor->pos);
         landed = 0;
         if (hit) {
             if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 1) {
-                func_0026E110((u8 *)D_800F1CE0.m_pInstance, soundFlags | 2, actor);
+                GameObject_FireTriggers((u8 *)D_800F1CE0.m_pInstance, soundFlags | 2, actor);
             }
             if (D_800F1CE0.m_pWallRegion != NULL) {
-                func_0026E19C((Model *)D_800F1CE0.m_pWallRegion, linkFlags | 4, actor);
+                CGameRegion__FireTriggers((Model *)D_800F1CE0.m_pWallRegion, linkFlags | 4, actor);
             }
-            func_0024ED54(p, actor, stateFlags);
-            landed = func_0024EAF8(p, actor, stateFlags);
+            CPlayer__RamWithMount(p, actor, stateFlags);
+            landed = CPlayer__TryMount(p, actor, stateFlags);
             if (D_800F1D90 == 2 && (u32) ((u16) p->state - 4) < 2) {
                 if (actor->velY > 0.0f) {
                     actor->velY = 0.0f;
@@ -891,11 +891,11 @@ void func_0024D344(Player *p) {
             }
         }
         if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 3) {
-            func_0023F05C(p, (u8 *)D_800F1CE0.m_pInstance);
+            CPlayer__TouchPickup(p, (u8 *)D_800F1CE0.m_pInstance);
         }
         if (before != NULL && material != NULL) {
             if ((p->stateFlags & 0x8000) && !landed && !(before->unk54 & 8) && (material->unk54 & 8)) {
-                func_002553BC(p, actor);
+                CPlayer__Dismount(p, actor);
             }
             if (material->flags & 0x4000000) {
                 if (material->item != p->item) {
@@ -916,7 +916,7 @@ void func_0024D344(Player *p) {
     }
     p->input = saved;
     D_800B6D28 = scale;
-    under = func_00268A2C(actor);
+    under = GameObject_GetRegionInfo(actor);
     if (under != NULL && (under->flags & 0x4000)) {
         f32 x2 = actor->pos.x * actor->pos.x;
         f32 z2 = actor->pos.z * actor->pos.z;
@@ -933,7 +933,7 @@ void func_0024D344(Player *p) {
             }
             actor->pos.y = y;
             if (under->flags & 0x4000) {
-                actor->pos.y = func_0026872C(actor, 0) - 1.0f;
+                actor->pos.y = GameObject_GetRegionFloorHeight(actor, 0) - 1.0f;
             }
         }
     }
@@ -946,14 +946,14 @@ void func_0024D344(Player *p) {
                 sound = D_800ADB30[p->def->m_Id];
             }
         }
-        func_002241D8(&D_800F7078, p, sound, p->action);
+        CScene__SetInstanceObjectType(&D_800F7078, p, sound, p->action);
         if (p->lastAction != p->action) {
-            if (!func_0021E9A4(actor, p->action, 0) && Cinema_PathPlaying()) {
-                func_0021E9A4(actor, 7000, 0);
+            if (!CGameObjectInstance__SetAnimByAction(actor, p->action, 0) && Cinema_PathPlaying()) {
+                CGameObjectInstance__SetAnimByAction(actor, 7000, 0);
             }
         }
-        first = func_00219F74(actor, p->action, -1);
-        second = func_00219F74(actor, p->action, first);
+        first = CGameObjectInstance__PickRandomAnim(actor, p->action, -1);
+        second = CGameObjectInstance__PickRandomAnim(actor, p->action, first);
         low = second;
         if (second > first) {
             low = first;
@@ -964,12 +964,12 @@ void func_0024D344(Player *p) {
         }
         if (actor->animPending) {
             if (actor->anim == low) {
-                if (func_0021149C(100.0f) < 0.4f) {
-                    func_0021E9F8(actor, high, 0);
+                if (Random_Float(100.0f) < 0.4f) {
+                    CGameObjectInstance__SetAnim(actor, high, 0);
                     actor->animPending = 0;
                 }
             } else {
-                func_0021E9F8(actor, low, 0);
+                CGameObjectInstance__SetAnim(actor, low, 0);
                 actor->animPending = 0;
             }
         }
@@ -1009,7 +1009,7 @@ void func_0024D344(Player *p) {
     }
     if (D_8011AAD8.cheatFlags & 4) {
         if (D_8011AAD8.multiplayer == 0 && p->owned[21] == 0) {
-            *(p->ammo + *func_0025398C(p, 21)) = 1;
+            *(p->ammo + *CPlayer__GetFiringAmmo(p, 21)) = 1;
         }
         for (i = 0; i < 35; i++) {
             if ((i >= 24) ^ !D_8011AAD8.multiplayer) {
@@ -1017,8 +1017,8 @@ void func_0024D344(Player *p) {
             }
         }
     }
-    func_0024D1F8((CPlayer *) p);
-    func_0024BD18(&p->unkCD0, p, p->unk3C8);
+    CPlayer__UpdateWeaponSet((CPlayer *) p);
+    CBarrel__Update(&p->unkCD0, p, p->unk3C8);
     if (p->shake > 0.0f) {
         p->shake -= D_800B6D28;
         if (p->shake > 0.0f) {
@@ -1027,8 +1027,8 @@ void func_0024D344(Player *p) {
             p->flags &= ~0x800000;
         }
     }
-    func_0024A0DC(p);
+    Player_UpdateAim(p);
     p->input.controller->pos = p->pos;
-    func_002241D8(&D_800F7078, p->emitter, D_800AF618[p->weapon]->model, p->voice->bank);
+    CScene__SetInstanceObjectType(&D_800F7078, p->emitter, D_800AF618[p->weapon]->model, p->voice->bank);
     p->lastAction = p->action;
 }

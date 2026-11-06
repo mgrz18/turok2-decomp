@@ -9,14 +9,14 @@ extern const float D_800AA818;
 extern const float D_800AA81C;
 extern const float D_800AA820;
 extern const float D_800AA828;
-extern void func_00297BCC(float mf[4][4]);
-void func_0029815C(float mf[4][4], u16 *perspNorm, float fovy, float aspect, float near, float far, float scale)
+extern void guMtxIdentF(float mf[4][4]);
+void guPerspectiveF(float mf[4][4], u16 *perspNorm, float fovy, float aspect, float near, float far, float scale)
 {
     float cot;
     int i, j;
     float norm;
     unsigned int value;
-    func_00297BCC(mf);
+    guMtxIdentF(mf);
     fovy *= D_800AA818;
     fovy *= D_800AA81C;
     cot = func_002974C0(fovy) / func_002982F0(fovy);

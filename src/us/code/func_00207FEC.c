@@ -1,12 +1,12 @@
-/* func_00207FEC, func_002086BC and func_00208810, one source file: the
- * file's .rodata opens at 0x800A52B8 with func_00207FEC's jump table, and
- * func_00208810's pool (2^31 floats for float-to-unsigned and three jump
+/* Render_SetRenderMode, Render_DrawShadowQuad and Render_SetupMaterial, one source file: the
+ * file's .rodata opens at 0x800A52B8 with Render_SetRenderMode's jump table, and
+ * Render_SetupMaterial's pool (2^31 floats for float-to-unsigned and three jump
  * tables) follows at 0x800A5334, 4 past an 8-byte boundary, which it only
- * reaches as a continuation of that pool. func_002086BC sits between the two
- * in .text, so it is in the file too. func_002086BC and func_00208810 are the
+ * reaches as a continuation of that pool. Render_DrawShadowQuad sits between the two
+ * in .text, so it is in the file too. Render_DrawShadowQuad and Render_SetupMaterial are the
  * Rage Wars imports. */
-/* func_002086BC: from AbuN64/ragewars-decomp (Turok: Rage Wars), src/func_80268CE0_de.c, func_8026992C_de. */
-/* func_00208810: after AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_3/80268160_12.CPP, func_80269A80_de, with Turok 2's layouts. */
+/* Render_DrawShadowQuad: from AbuN64/ragewars-decomp (Turok: Rage Wars), src/func_80268CE0_de.c, func_8026992C_de. */
+/* Render_SetupMaterial: after AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_3/80268160_12.CPP, func_80269A80_de, with Turok 2's layouts. */
 #include "common.h"
 #include "gfx.h"
 
@@ -37,7 +37,7 @@
 typedef struct Material {
     /* 0x00 */ u32 flags;
     /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 texture; /* resource handle, func_0020798C resolves it */
+    /* 0x08 */ s32 texture; /* resource handle, Texture_Request resolves it */
     /* 0x0C */ s32 unkC;
     /* 0x10 */ u8 prim[4];
     /* 0x14 */ u8 env[4];
@@ -86,7 +86,7 @@ typedef struct TextureInfo {
 #define G_TX_NOMASK 0
 #define G_TX_NOLOD 0
 
-extern u32 D_800AB884;          /* current render mode index (func_00207FEC) */
+extern u32 D_800AB884;          /* current render mode index (Render_SetRenderMode) */
 extern s32 D_800AB890;          /* anti-aliasing enabled */
 extern u32 D_800AB8A8;          /* extra blender flags */
 extern u32 D_800AB8AC;          /* extra blender flags (z-buffered modes) */
@@ -94,10 +94,10 @@ extern u32 D_800AB880;
 extern u8 D_800AB580[];         /* 16x16 I8 texture */
 extern Gfx D_800AB458[], D_800AB4E0[];
 
-void func_00207A54(void);
+void Texture_InvalidateCache(void);
 
 /* Switches the RDP render mode; returns 0 when it was already active. */
-s32 func_00207FEC(u32 mode) {
+s32 Render_SetRenderMode(u32 mode) {
     if (D_800AB884 == mode) {
         return 0;
     }
@@ -251,7 +251,7 @@ s32 func_00207FEC(u32 mode) {
 /* Draws a 16x16 intensity texture (D_800AB580) with `matrix` and the display
  * list for `pass`, white at `alpha`; then forces the next render and combine
  * modes to be set again. */
-void func_002086BC(void *matrix, s32 pass, u32 alpha) {
+void Render_DrawShadowQuad(void *matrix, s32 pass, u32 alpha) {
     Gfx *list;
 
     /* gDPLoadTextureBlock(D_800AB580, G_IM_FMT_I, G_IM_SIZ_8b, 16, 16, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, ...) */
@@ -270,7 +270,7 @@ void func_002086BC(void *matrix, s32 pass, u32 alpha) {
     gSPDisplayList(D_800D8E24++, ({ if (pass != 0) list = D_800AB4E0; list; }));
     D_800AB884 = -1;
     D_800AB880 = -1;
-    func_00207A54();
+    Texture_InvalidateCache();
 }
 
 extern s32 D_8011AAD8;
@@ -288,16 +288,16 @@ extern u8 D_800AB8CB;
 extern u8 D_800AB8CC;
 extern u8 D_800AB8CD;
 
-extern void *func_0020798C(s32 *texture);
-extern void func_002079D8(void *node, TextureInfo *info);
-extern void func_00206B30(s32 *, void *, s32, s32, s32, s32, s32, s32, s32);
-extern void func_00207A70(s32 combine);
-extern void func_002051F4(s32 unused, void *node);
+extern void *Texture_Request(s32 *texture);
+extern void Texture_GetInfo(void *node, TextureInfo *info);
+extern void Texture_Load(s32 *, void *, s32, s32, s32, s32, s32, s32, s32);
+extern void Render_SetCombineMode(s32 combine);
+extern void CCache__Unlock(s32 unused, void *node);
 
 /* Sets up the RDP for drawing with `mat`: its texture frame `pass` (or the
  * animated one when negative), colours, combiner, render and geometry modes.
  * Returns 0 when the material is invisible or its texture is not loaded. */
-s32 func_00208810(Material *mat, s32 pass) {
+s32 Render_SetupMaterial(Material *mat, s32 pass) {
     TextureInfo info;
     void *node;
     s32 tailEnum;
@@ -314,11 +314,11 @@ s32 func_00208810(Material *mat, s32 pass) {
     }
     tailEnum = -1;
     if (mat->texture != 0 && !(D_8011AAD8 & 0x400)) {
-        node = func_0020798C(&mat->texture);
+        node = Texture_Request(&mat->texture);
         if (node == 0) {
             return 0;
         }
-        func_002079D8(node, &info);
+        Texture_GetInfo(node, &info);
         if (pass < 0) {
             pass = D_800B6D20 / info.frame->speed;
         }
@@ -346,7 +346,7 @@ s32 func_00208810(Material *mat, s32 pass) {
             extra |= G_TX_MIRROR;
             extra2 |= G_TX_MIRROR;
         }
-        func_00206B30(&mat->texture, node, a, b, maskS, maskT, extra, extra2, 0);
+        Texture_Load(&mat->texture, node, a, b, maskS, maskT, extra, extra2, 0);
         if (mat->flags & 0x2000) {
             gDPSetTextureLOD(D_800D8E24++, G_TL_LOD);
         }
@@ -356,103 +356,103 @@ s32 func_00208810(Material *mat, s32 pass) {
                            D_800AB8B0 == 0 ? mat->prim[3] : D_800AB8B4[3]);
             if (mat->flags & 2) {
                 if (!(mat->flags & 0x1000)) {
-                    func_00207A70(2);
+                    Render_SetCombineMode(2);
                 } else if (D_800AB8B0 == 0) {
-                    func_00207A70(0);
+                    Render_SetCombineMode(0);
                 } else {
-                    func_00207A70(1);
+                    Render_SetCombineMode(1);
                 }
             } else if (!(mat->flags & 0x1000)) {
-                func_00207A70(4);
+                Render_SetCombineMode(4);
             } else {
-                func_00207A70(3);
+                Render_SetCombineMode(3);
             }
-            func_002051F4(0, node);
+            CCache__Unlock(0, node);
         } else if (mat->flags & 2) {
             if (mat->flags & 0x2000) {
                 switch (info.frame->kind) {
                 case 4:
                 case 5:
                     gDPSetEnvColor(D_800D8E24++, mat->env[0], mat->env[1], mat->env[2], mat->env[3]);
-                    func_00207A70(0x23);
+                    Render_SetCombineMode(0x23);
                     break;
                 default:
-                    func_00207A70(5);
+                    Render_SetCombineMode(5);
                     break;
                 }
             } else if (D_800AB8B0 == 0) {
-                func_00207A70(6);
+                Render_SetCombineMode(6);
             } else {
                 gDPSetEnvColor(D_800D8E24++, D_800AB8B4[0], D_800AB8B4[1], D_800AB8B4[2],
                                D_800AB8B4[3]);
                 switch (D_800AB8B0) {
                 case 1:
                 case 2:
-                    func_00207A70(7);
+                    Render_SetCombineMode(7);
                     break;
                 case 3:
-                    func_00207A70(8);
+                    Render_SetCombineMode(8);
                     break;
                 case 7:
-                    func_00207A70(9);
+                    Render_SetCombineMode(9);
                     break;
                 case 4:
                 case 5:
-                    func_00207A70(10);
+                    Render_SetCombineMode(10);
                     break;
                 case 6:
                     gDPSetPrimColor(D_800D8E24++, 0, 0, mat->prim[0], mat->prim[1], mat->prim[2], D_800AB8B4[4]);
-                    func_00207A70(0xB);
+                    Render_SetCombineMode(0xB);
                     break;
                 default:
                     break;
                 }
             }
-            func_002051F4(0, node);
+            CCache__Unlock(0, node);
         } else {
             if (mat->flags & 0x2000) {
                 switch (info.frame->kind) {
                 case 4:
                     gDPSetEnvColor(D_800D8E24++, mat->env[0], mat->env[1], mat->env[2], mat->env[3]);
-                    func_00207A70(0x25);
+                    Render_SetCombineMode(0x25);
                     break;
                 case 5:
                     gDPSetEnvColor(D_800D8E24++, mat->env[0], mat->env[1], mat->env[2], mat->env[3]);
-                    func_00207A70(0x24);
+                    Render_SetCombineMode(0x24);
                     break;
                 default:
-                    func_00207A70(0xC);
+                    Render_SetCombineMode(0xC);
                     break;
                 }
             } else if (D_800AB8B0 == 0) {
-                func_00207A70(0xD);
+                Render_SetCombineMode(0xD);
             } else {
                 gDPSetEnvColor(D_800D8E24++, D_800AB8B4[0], D_800AB8B4[1], D_800AB8B4[2],
                                D_800AB8B4[3]);
                 switch (D_800AB8B0) {
                 case 1:
                 case 2:
-                    func_00207A70(0xE);
+                    Render_SetCombineMode(0xE);
                     break;
                 case 3:
-                    func_00207A70(0xF);
+                    Render_SetCombineMode(0xF);
                     break;
                 case 7:
-                    func_00207A70(9);
+                    Render_SetCombineMode(9);
                     break;
                 case 4:
                 case 5:
-                    func_00207A70(0x10);
+                    Render_SetCombineMode(0x10);
                     break;
                 case 6:
                     gDPSetPrimColor(D_800D8E24++, 0, 0, mat->prim[0], mat->prim[1], mat->prim[2], D_800AB8B4[4]);
-                    func_00207A70(0x11);
+                    Render_SetCombineMode(0x11);
                     break;
                 default:
                     break;
                 }
             }
-            func_002051F4(0, node);
+            CCache__Unlock(0, node);
         }
     } else {
         gDPPipeSync(D_800D8E24++);
@@ -469,30 +469,30 @@ s32 func_00208810(Material *mat, s32 pass) {
         }
         gSPTexture(D_800D8E24++, 0, 0, 0, 0, 0);
         if (mat->flags & 2) {
-            func_00207A70(0x12);
+            Render_SetCombineMode(0x12);
         } else if (D_800AB8B0 == 0) {
-            func_00207A70(0x13);
+            Render_SetCombineMode(0x13);
         } else {
             gDPSetEnvColor(D_800D8E24++, D_800AB8B4[0], D_800AB8B4[1], D_800AB8B4[2],
                            D_800AB8B4[3]);
             switch (D_800AB8B0) {
             case 1:
             case 2:
-                func_00207A70(0x14);
+                Render_SetCombineMode(0x14);
                 break;
             case 3:
-                func_00207A70(0x15);
+                Render_SetCombineMode(0x15);
                 break;
             case 7:
-                func_00207A70(0x16);
+                Render_SetCombineMode(0x16);
                 break;
             case 4:
             case 5:
-                func_00207A70(0x17);
+                Render_SetCombineMode(0x17);
                 break;
             case 6:
                 gDPSetPrimColor(D_800D8E24++, 0, 0, mat->prim[0], mat->prim[1], mat->prim[2], D_800AB8B4[4]);
-                func_00207A70(0x11);
+                Render_SetCombineMode(0x11);
                 break;
             default:
                 break;
@@ -515,7 +515,7 @@ s32 func_00208810(Material *mat, s32 pass) {
             }
         }
     } else if (mat->flags & 0x80) {
-        func_00207FEC(6);
+        Render_SetRenderMode(6);
     } else {
         tailEnum = 7;
         if (!(mat->flags & 0x200)) {
@@ -533,7 +533,7 @@ s32 func_00208810(Material *mat, s32 pass) {
         }
     }
     if (tailEnum != -1) {
-        func_00207FEC(tailEnum);
+        Render_SetRenderMode(tailEnum);
     }
     mode = 0x260404;
     if (mat->flags & 0x1000) {

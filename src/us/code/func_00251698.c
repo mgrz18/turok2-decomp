@@ -2,14 +2,14 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 
-/* A 0x64-byte record of the world model sections (func_0022425C finds it from an id). */
+/* A 0x64-byte record of the world model sections (CScene__GetRegionInfo finds it from an id). */
 typedef struct {
     /* 0x00 */ u8 pad0[0x44];
     /* 0x44 */ s32 flags;
     /* 0x48 */ u8 pad48[0x64 - 0x48];
 } ModelRecord; /* size 0x64 */
 
-/* What func_00225EBC finds (id 0xC45): three floats at 0x38. */
+/* What CScene__FindIntelligence finds (id 0xC45): three floats at 0x38. */
 typedef struct {
     /* 0x00 */ u8 pad0[0x38];
     /* 0x38 */ f32 unk38;
@@ -17,10 +17,10 @@ typedef struct {
     /* 0x40 */ f32 unk40;
 } Found0xC45;
 
-ModelRecord *func_0022425C(s32, s32);
-Found0xC45 *func_00225EBC(s32, s32, s32);
+ModelRecord *CScene__GetRegionInfo(s32, s32);
+Found0xC45 *CScene__FindIntelligence(s32, s32, s32);
 
-s32 func_00283FF8(s32, s32, s32 *);     /* extern */
+s32 Cinema_SetNextCallbacks(s32, s32, s32 *);     /* extern */
 extern s32 D_800ACDE4;
 extern s32 D_800AE340;
 extern void *D_800F1FD0;
@@ -28,9 +28,9 @@ extern u8 D_800F1FE4[];
 extern s32 D_800F7078;
 extern s32 D_8011001C;
 extern s32 D_80119878;
-extern s32 func_00257784;
+extern s32 PlayerDeath_CinemaDone;
 
-void func_00251698(CPlayer *arg0, s32 arg1, s32 arg2) {
+void CPlayer__StartDeathCinema(CPlayer *arg0, s32 arg1, s32 arg2) {
     s32 temp_a0;
     s32 temp_a1;
     ModelRecord *temp_v0;
@@ -43,7 +43,7 @@ void func_00251698(CPlayer *arg0, s32 arg1, s32 arg2) {
     temp_a1 = arg0->m_CharacterActor.header.m_pCurrentRegion;
     var_s1 = 0;
     if (temp_a1 != 0) {
-        temp_v0 = func_0022425C((s32) &D_800F7078, temp_a1);
+        temp_v0 = CScene__GetRegionInfo((s32) &D_800F7078, temp_a1);
         if (temp_v0 != 0) {
             var_s1 = temp_v0->flags;
         }
@@ -85,9 +85,9 @@ void func_00251698(CPlayer *arg0, s32 arg1, s32 arg2) {
         }
         D_800ACDE4 = 0;
         D_800F1FD0 = arg0;
-        func_00283FF8(arg2, 0, &func_00257784);
+        Cinema_SetNextCallbacks(arg2, 0, &PlayerDeath_CinemaDone);
     }
-    temp_v0_2 = func_00225EBC((s32) &D_800F7078, -1, 0xC45);
+    temp_v0_2 = CScene__FindIntelligence((s32) &D_800F7078, -1, 0xC45);
     if (temp_v0_2 != 0) {
         arg0->m_CharacterActor.m_vScale.x = temp_v0_2->unk38;
         arg0->m_CharacterActor.m_vScale.y = temp_v0_2->unk3C;

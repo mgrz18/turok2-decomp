@@ -3,6 +3,6 @@
 
 extern s32 D_8012FB58;
 
-s32 func_004089B8(void) {
+s32 TotemDefense_GetState(void) {
     return D_8012FB58;
 }

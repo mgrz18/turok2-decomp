@@ -4,12 +4,12 @@
 extern char D_800B42D8[];
 extern char D_800C0E70[]; /* "%d"-style format */
 extern s32 D_8011ACDC;
-extern s32 func_004160F0(MenuItem *a);
-extern void func_0029E3E0(char *dst, char *fmt, s32 value);
+extern s32 MenuItem_TextLength(MenuItem *a);
+extern void sprintf(char *dst, char *fmt, s32 value);
 
 /* Prints D_8011ACDC over the last four characters of the label. */
-s32 func_00417DD4(MenuItem *a) {
+s32 FinalScoreMenu_BlueScoreLabel(MenuItem *a) {
     a->text = D_800B42D8;
-    func_0029E3E0(a->text + (func_004160F0(a) - 4), D_800C0E70, D_8011ACDC);
+    sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C0E70, D_8011ACDC);
     return 0;
 }

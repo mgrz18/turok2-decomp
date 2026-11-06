@@ -18,11 +18,11 @@ extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern s32 osSendMesg(void *queue, void *msg, s32 flag);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
-extern s32 func_002113A4(void);
-extern f32 func_0021149C(f32 range);
-extern s32 func_00266D8C(void *ranges, s32 count, s16 id, s32 *lo, s32 *hi);
-extern void *func_002017D4(void *list, s32 index);
-extern void func_00270A60(SndMgr *m, void *layer, CVector3 *pos, s32 variant, s32 handle, s32 a5, s32 a6);
+extern s32 Random_Next(void);
+extern f32 Random_Float(f32 range);
+extern s32 BinaryRange(void *ranges, s32 count, s16 id, s32 *lo, s32 *hi);
+extern void *CISet__GetBlock(void *list, s32 index);
+extern void CAudioWorld__PlayLayer(SndMgr *m, void *layer, CVector3 *pos, s32 variant, s32 handle, s32 a5, s32 a6);
 
 static __inline__ void SndMgr_Lock(SndMgr *m) {
     CMutex *l = &m->lock;
@@ -48,7 +48,7 @@ static __inline__ void SndMgr_Unlock(SndMgr *m) {
     }
 }
 
-s32 func_00270C80(SndMgr *m, s32 id, CVector3 pos, s32 a5, s32 a6) {
+s32 CAudioWorld__PlaySound(SndMgr *m, s32 id, CVector3 pos, s32 a5, s32 a6) {
     s32 i;
     s32 j;
     s32 busy;
@@ -98,13 +98,13 @@ chk:
         last = *(u16 *)((u8 *)m + 0x132);
         sum = 0;
         if (m->rangeCount != 0) {
-            if (func_00266D8C(m->ranges, m->rangeCount, id, &lo, &hi) != 0) {
+            if (BinaryRange(m->ranges, m->rangeCount, id, &lo, &hi) != 0) {
                 i = lo;
                 if (i != hi) {
                     for (count = lo; count <= hi; count++) {
                         sum += m->weights[count] * 10;
                     }
-                    r = func_002113A4() % sum;
+                    r = Random_Next() % sum;
                     thresh = r;
                     sum = 0;
                     for (i = lo; i < hi; i++) {
@@ -128,17 +128,17 @@ chk:
         } else {
             idx = -1;
         }
-        m->cueVolume = func_0021149C(127.0f);
+        m->cueVolume = Random_Float(127.0f);
     } else {
         sum = 0;
         if (m->rangeCount != 0) {
-            if (func_00266D8C(m->ranges, m->rangeCount, id, &lo2, &hi2) != 0) {
+            if (BinaryRange(m->ranges, m->rangeCount, id, &lo2, &hi2) != 0) {
                 i = lo2;
                 if (i != hi2) {
                     for (r = lo2; r <= hi2; r++) {
                         sum += m->weights[r] * 10;
                     }
-                    r = func_002113A4() % sum;
+                    r = Random_Next() % sum;
                     thresh = r;
                     sum = 0;
                     for (i = lo2; i < hi2; i++) {
@@ -160,10 +160,10 @@ chk:
         return -1;
     }
     sh = (s16)idx;
-    m->cue = func_002017D4(func_002017D4(m->variants, sh), 0);
+    m->cue = CISet__GetBlock(CISet__GetBlock(m->variants, sh), 0);
     m->cueId = id;
     m->cueArg = a6;
-    nd = (SndLayers *)func_002017D4(func_002017D4(m->variants, sh), 1);
+    nd = (SndLayers *)CISet__GetBlock(CISet__GetBlock(m->variants, sh), 1);
     layers = nd->count;
     if (layers != 0) {
         SndMgr_Lock(m);
@@ -178,7 +178,7 @@ chk:
     n = 0;
     if (layers != 0) {
         do {
-            func_00270A60(m, (u8 *)nd + (n * nd->stride + 8), &pos, idx, ret, 0, a5);
+            CAudioWorld__PlayLayer(m, (u8 *)nd + (n * nd->stride + 8), &pos, idx, ret, 0, a5);
             n++;
         } while ((u32)n < layers);
     }

@@ -30,11 +30,11 @@
 
 extern char D_800AA730[]; /* "EX" (expression text) */
 extern char D_800AA734[]; /* "audio/save.c" */
-void func_0029B020(char *, char *, s32); /* __assert */
+void __assert(char *, char *, s32); /* __assert */
 
-#define assert(e, line) ((e) ? (void)0 : func_0029B020(D_800AA730, D_800AA734, line))
+#define assert(e, line) ((e) ? (void)0 : __assert(D_800AA730, D_800AA734, line))
 
-Acmd *func_002972E0(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p) {
+Acmd *alSavePull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p) {
     Acmd *ptr = p;
     ALSave *f = (ALSave *)filter;
     ALFilter *source = f->filter.source;

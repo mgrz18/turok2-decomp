@@ -10,17 +10,17 @@ extern struct { u8 value; } D_8011AAF1;
 extern u8 D_800B0A60[];
 extern u8 D_800F7078[];
 
-extern void func_0025C5F8();
-extern void func_0025C018();
-extern void func_0025BA80();
-extern void func_0025CAC8();
-extern void func_0025EF68();
-extern void func_0025B2D4();
-extern void func_0025E4B8();
-extern void func_00220260(void *mgr, CGameObjectInstance *actor, s32 flag);
-extern f32 func_002119FC(f32 lo, f32 hi);
+extern void EnemyAI_Update();
+extern void EnemyAI_CalcOrientationMatrix();
+extern void EnemyAI_DrawFaded();
+extern void EnemyAI_OnHit();
+extern void EnemyAI_CheckGrab();
+extern void EnemyAI_OnDamage();
+extern void EnemyAI_HeadNodeCallback();
+extern void CScene__SetInstanceSavedBit(void *mgr, CGameObjectInstance *actor, s32 flag);
+extern f32 Random_Blend(f32 lo, f32 hi);
 
-void func_0025BC70(CGameObjectInstance *actor, CAI *ai) {
+void EnemyAI_Init(CGameObjectInstance *actor, CAI *ai) {
     CEnemyIntelligence *info;
     s32 mode2;
     s32 one; /* the mode indices live in variables: constants do not match */
@@ -43,18 +43,18 @@ void func_0025BC70(CGameObjectInstance *actor, CAI *ai) {
         return;
     }
     ai->m_pModeTable = D_800B0A60;
-    ai->m_pfStep = func_0025C5F8;
-    ai->m_pfCalculateOrientationMatrix = func_0025C018;
-    ai->m_pfDraw = func_0025BA80;
+    ai->m_pfStep = EnemyAI_Update;
+    ai->m_pfCalculateOrientationMatrix = EnemyAI_CalcOrientationMatrix;
+    ai->m_pfDraw = EnemyAI_DrawFaded;
     if (actor->m_nTypeFlag == 0x136) {
         ai->m_pfHit = NULL;
         ai->m_pfCollision = NULL;
         ai->m_pfHurt = NULL;
-        func_00220260(D_800F7078, actor, 0);
+        CScene__SetInstanceSavedBit(D_800F7078, actor, 0);
     } else {
-        ai->m_pfHit = func_0025CAC8;
-        ai->m_pfCollision = func_0025EF68;
-        ai->m_pfHurt = func_0025B2D4;
+        ai->m_pfHit = EnemyAI_OnHit;
+        ai->m_pfCollision = EnemyAI_CheckGrab;
+        ai->m_pfHurt = EnemyAI_OnDamage;
     }
     ai->m_Enemy.m_Pitch = 0;
     ai->m_Enemy.m_Roll = 0;
@@ -64,7 +64,7 @@ void func_0025BC70(CGameObjectInstance *actor, CAI *ai) {
     ai->m_Enemy.unk18 = 0;
     ai->m_Enemy.m_WanderTimer = 0;
     ai->m_Enemy.m_BaseScale = 1.0f;
-    ai->m_Enemy.m_IdleTimer = func_002119FC(60.0f, 120.0f);
+    ai->m_Enemy.m_IdleTimer = Random_Blend(60.0f, 120.0f);
     ai->m_Enemy.m_Timer = 0;
     ai->m_Enemy.m_Timer2 = 150.0f;
     ai->m_Enemy.m_Behavior[0] = info->m_Behaviors[0];
@@ -83,7 +83,7 @@ void func_0025BC70(CGameObjectInstance *actor, CAI *ai) {
             ai->m_Enemy.m_BehaviorIndex = 0;
         }
     }
-    ai->m_pfEffects = func_0025E4B8;
+    ai->m_pfEffects = EnemyAI_HeadNodeCallback;
     if (!(actor->m_dwFlags & 0x80000) && (info->m_dwFlags & 0x1000)) {
         actor->m_dwFlags &= ~0x2000;
         actor->m_dwFlags &= ~0x100;

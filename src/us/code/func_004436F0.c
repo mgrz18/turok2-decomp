@@ -1,4 +1,4 @@
-/* Second-module twin of func_0040A6F0 (src/us/code); here the cut is whole (0x004436F0, 0x20C). Both flag masks are computed before the tests (found with the permuter). */
+/* Second-module twin of MotherBoss_Phase1ChooseAttack (src/us/code); here the cut is whole (0x004436F0, 0x20C). Both flag masks are computed before the tests (found with the permuter). */
 #include "common.h"
 #include "structs/pick.h"
 #include "structs/game_object.h"
@@ -7,18 +7,18 @@
 /* Picks the next attack anim from a weighted table: close to the target only 0x10/0xD, otherwise 0xF
  * (when flagged and not just used), 0x10 and 0x12 weighted by the module's timer ratio. */
 
-extern void func_00246108(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern s16 func_0026D518(Pick *table);
-extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 state);
+extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+extern s16 WeightedTable_PickStatic(Pick *table);
+extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 state);
 
-/* func_0040BD60 */
+/* MotherBoss_GetTargetDist */
 static __inline__ f32 getTargetDist(CGameObjectInstance *obj, CGameObjectInstance **found) {
     CAITargets t;
     f32 dist;
 
     dist = -1.0f;
     *found = NULL;
-    func_00246108(obj, &obj->m_AI, &t, 1, 0);
+    AI_UpdateTargets(obj, &obj->m_AI, &t, 1, 0);
     if (t.m_Path.m_pTarget != NULL && (t.m_Path.m_pTarget->m_dwFlags & 0x300000)) {
         dist = t.m_Path.m_FlatDist;
         *found = t.m_Path.m_pTarget;
@@ -26,7 +26,7 @@ static __inline__ f32 getTargetDist(CGameObjectInstance *obj, CGameObjectInstanc
     return dist;
 }
 
-void func_004436F0(CGameObjectInstance *obj, CAI *ai) {
+void MotherBoss_Phase1ChooseAttack_2(CGameObjectInstance *obj, CAI *ai) {
     Pick picks[8];
     CGameObjectInstance *found;
     MotherBossState *state = &D_8012FB70;
@@ -78,8 +78,8 @@ void func_004436F0(CGameObjectInstance *obj, CAI *ai) {
             n++;
         }
         picks[n].id = -1;
-        state->lastAnim = func_0026D518(picks);
+        state->lastAnim = WeightedTable_PickStatic(picks);
         state->counter = 0;
-        func_00243414(obj, ai, state->lastAnim);
+        CAI__SetMode(obj, ai, state->lastAnim);
     }
 }

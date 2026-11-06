@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00247124(s32 arg0)
+s32 Player_SwapStrafeTurnBits(s32 arg0)
 {
   int new_var;
   s32 var_v1;

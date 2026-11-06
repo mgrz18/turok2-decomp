@@ -77,8 +77,8 @@
         gDPPipeSync(D_800D8E24++);                                                   \
     }
 
-extern void func_0020565C(s32 unused, void **resource);
-extern s32 *func_002017D4(void *table, s32 index);
+extern void CCache__LockForDisplayList(s32 unused, void **resource);
+extern s32 *CISet__GetBlock(void *table, s32 index);
 extern s32 D_800AB570;
 extern s32 D_800D8E00;
 extern s32 D_800D8E04;
@@ -88,7 +88,7 @@ extern Gfx D_800AB190[], D_800AB210[], D_800AB290[], D_800AB328[], D_800AB3C0[];
 
 /* Loads frame `frame` of the texture `resource` (and its palette `secondary`)
  * into TMEM, skipping what the last call already loaded, then turns texturing on. */
-void func_00206B30(s32 *output, void **resource, s32 frame, s32 secondary, s32 scaleS, s32 scaleT, s32 wrapS, s32 wrapT,
+void Texture_Load(s32 *output, void **resource, s32 frame, s32 secondary, s32 scaleS, s32 scaleT, s32 wrapS, s32 wrapT,
                    s32 mode) {
     s32 *texture;
     s32 *palette;
@@ -103,13 +103,13 @@ void func_00206B30(s32 *output, void **resource, s32 frame, s32 secondary, s32 s
     s32 tile;
     Gfx *list;
 
-    func_0020565C(0, resource);
+    CCache__LockForDisplayList(0, resource);
     header = *resource;
-    info = (u8 *) func_002017D4(header, 0);
-    texture = func_002017D4(func_002017D4(header, 1), frame);
-    entries = func_002017D4(header, 2);
+    info = (u8 *) CISet__GetBlock(header, 0);
+    texture = CISet__GetBlock(CISet__GetBlock(header, 1), frame);
+    entries = CISet__GetBlock(header, 2);
     if (*(s32 *) entries != 0) {
-        palette = func_002017D4(entries, secondary);
+        palette = CISet__GetBlock(entries, secondary);
         paletteChanged = 0;
         if (D_800AB570 != *output || D_800D8E04 != secondary) paletteChanged = 1;
     } else {

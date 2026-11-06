@@ -4,22 +4,22 @@
 
 extern CCollisionInfo D_800F1AE0;
 extern CCollisionResults D_800F1CE0;
-f32 func_002671B4(CGameObjectInstance *obj); /* the object's height */
-s32 func_00239F00(void *obj, CVector3 to, CCollisionInfo *info);
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *obj); /* the object's height */
+s32 Collision_MoveInstance(void *obj, CVector3 to, CCollisionInfo *info);
 
 /* Whether the line between the two objects' eyes (0.8 of their height up)
  * hits a wall or floor region flagged 2. */
-s32 func_00245E48(CGameObjectInstance *from, s32 unused, CGameObjectInstance *to) {
+s32 AI_IsEyeLineBlocked(CGameObjectInstance *from, s32 unused, CGameObjectInstance *to) {
     CObjectHead saved;
     CVector3 target;
 
     saved = *(CObjectHead *) from;
-    from->header.m_vPos.y += func_002671B4(from) * 0.8f;
+    from->header.m_vPos.y += GameObject_GetCollisionHeight(from) * 0.8f;
     from->header.m_vPos.y += from->m_CollisionYOffset;
     target = to->header.m_vPos;
-    target.y += func_002671B4(to) * 0.8f;
+    target.y += GameObject_GetCollisionHeight(to) * 0.8f;
     target.y += to->m_CollisionYOffset;
-    func_00239F00(from, target, &D_800F1AE0);
+    Collision_MoveInstance(from, target, &D_800F1AE0);
     do {
         *(CObjectHead *) from = saved;
     } while (0);

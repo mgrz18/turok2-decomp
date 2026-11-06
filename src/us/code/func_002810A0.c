@@ -5,7 +5,7 @@ extern s32 D_8011AAD8;          /* game flags */
 
 /* The camera's fog colour, each channel to 5 bits, or black while flag
  * 0x4000 is up. */
-void func_002810A0(CCamera *cam, u8 *red, u8 *green, u8 *blue) {
+void CCamera__GetFogColor(CCamera *cam, u8 *red, u8 *green, u8 *blue) {
     if (D_8011AAD8 & 0x4000) {
         *red = 0;
         *green = 0;

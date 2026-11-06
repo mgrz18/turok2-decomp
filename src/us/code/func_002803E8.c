@@ -6,14 +6,14 @@
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
 f32 func_00298470(f32 x);       /* square root */
-void func_0027B320(s32 sprite, s32 frame, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 arg6);
+void Hud_DrawSprite(s32 sprite, s32 frame, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 arg6);
 
 /* A lens flare from the screen point (x, y): seven glares strung from it
  * through the centre of the screen, fading as the point leaves the centre.
  * With `sun` set the first glare is the sun itself (sprite 0x258), faded in
  * 35.2 pixels from the screen edges, and the flare does not fade with
  * distance. */
-void func_002803E8(CCamera *cam, f32 x, f32 y, f32 alpha, s32 sun, s32 unused) {
+void CCamera__DrawGlare(CCamera *cam, f32 x, f32 y, f32 alpha, s32 sun, s32 unused) {
     f32 sizes[7] = { 16.0f, 16.0f, 24.0f, 32.0f, 16.0f, 32.0f, 48.0f };
     s32 opacities[7] = { 24, 24, 24, 24, 24, 24, 24 };
     s32 colours[21] = {
@@ -108,13 +108,13 @@ void func_002803E8(CCamera *cam, f32 x, f32 y, f32 alpha, s32 sun, s32 unused) {
                 g = D_800D8E24++;
                 g->w0 = 0xFB000000;                     /* gDPSetEnvColor */
                 g->w1 = (u32) (alpha * 255.0f) | 0xFFFFFF00;
-                func_0027B320(0x258, 0, (s32) (x - radius), (s32) (y - radius), t, t, 1);
+                Hud_DrawSprite(0x258, 0, (s32) (x - radius), (s32) (y - radius), t, t, 1);
             } else {
                 g = D_800D8E24++;
                 g->w0 = 0xFB000000;
                 g->w1 = (u8) colours[i * 3] << 24 | (u8) colours[i * 3 + 1] << 16 | (u8) colours[i * 3 + 2] << 8
                       | ((u32) (opacities[i] * alpha) & 0xFF);
-                func_0027B320(0x259, 0, (s32) (x - radius), (s32) (y - radius), t, t, 1);
+                Hud_DrawSprite(0x259, 0, (s32) (x - radius), (s32) (y - radius), t, t, 1);
             }
             i++;
         } while (i < 7);

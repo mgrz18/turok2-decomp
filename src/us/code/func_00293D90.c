@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00291034(void *, s16 *, s32);
-s32 func_00293D90(struct ObjRecAt40V2 *arg0, s8 arg1) {
+extern s32 alEvtqPostEvent(void *, s16 *, s32);
+s32 alSndpSetPan(struct ObjRecAt40V2 *arg0, s8 arg1) {
     ParamsRecAt8V2 p;
     s32 acc;
     acc = arg0->field40;
@@ -12,5 +12,5 @@ s32 func_00293D90(struct ObjRecAt40V2 *arg0, s8 arg1) {
     p.f8 = arg1;
     acc += arg0->field3C * 0x30;
     p.f4 = acc;
-    func_00291034(&arg0->events, (s16 *)&p, 0);
+    alEvtqPostEvent(&arg0->events, (s16 *)&p, 0);
 }

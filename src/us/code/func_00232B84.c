@@ -25,8 +25,8 @@ typedef struct PoolNode84478 {
     s32 counter;
     s32 flags;
 } PoolNode84478;
-extern void func_0022F1C8(PoolOwner84478 *, PoolNode84478 *);
-PoolNode84478 *func_00232B84(PoolOwner84478 *owner, s32 index) {
+extern void CParticleSystem__Free(PoolOwner84478 *, PoolNode84478 *);
+PoolNode84478 *CParticleSystem__AllocNode(PoolOwner84478 *owner, s32 index) {
     PoolNode84478 *node;
     PoolBucket84478 *slot;
     s32 i;
@@ -35,7 +35,7 @@ PoolNode84478 *func_00232B84(PoolOwner84478 *owner, s32 index) {
         for (i = 0; i <= (index & 0xFF); i++) {
             tail = (&owner->slots[i])->tail;
             if (tail != 0) {
-                func_0022F1C8(owner, tail);
+                CParticleSystem__Free(owner, tail);
                 break;
             }
         }

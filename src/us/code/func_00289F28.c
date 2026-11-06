@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_00289F28(void) {
+void EngineMode17_Switch_Draw(void) {
 
 }

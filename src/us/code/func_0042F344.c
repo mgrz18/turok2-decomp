@@ -1,4 +1,4 @@
-/* First VM module copy of func_00468264 (same source); the per-timer calls are inline helpers, which keeps GCC from strength-reducing &s->buttons[i]. */
+/* First VM module copy of Demo_UpdateStreams_2 (same source); the per-timer calls are inline helpers, which keeps GCC from strength-reducing &s->buttons[i]. */
 #include "common.h"
 #include "structs/demo.h"
 
@@ -12,11 +12,11 @@ typedef struct Slot {
     /* 0x18 */ u8 pad18[0x224 - 0x18];
 } Slot;
 
-void func_0042F1C4(void);
+void Demo_Update(void);
 extern Slot D_800F5F70[];
 static __inline__ void fire(DemoStream *t) { t->decode(t); }
 static __inline__ void tick(DemoStream *t) { if (--t->frames <= 0) t->decode(t); }
-void func_0042F344(void) {
+void Demo_UpdateStreams(void) {
     DemoPlayer *s = &D_800F56B0;
     s32 i;
 
@@ -44,5 +44,5 @@ void func_0042F344(void) {
             D_800F5F70[i].c = s->stickY[i].value;
         }
     }
-    func_0042F1C4();
+    Demo_Update();
 }

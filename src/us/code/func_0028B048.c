@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern void *func_0028B048(struct OSScTask_s *arg0);
-extern void *func_0029A6E0();
+extern void *__scTaskReady(struct OSScTask_s *arg0);
+extern void *osViGetCurrentFramebuffer();
 extern s32 D_8011B098;
 extern s32 D_8011B0A0;
-void *func_0028B048(struct OSScTask_s *arg0) {
+void *__scTaskReady(struct OSScTask_s *arg0) {
     s32 f1a;
     s32 f1b;
     void *v2;
@@ -18,7 +18,7 @@ void *func_0028B048(struct OSScTask_s *arg0) {
     if (f1a == D_8011B0A0) {
         return 0;
     }
-    v2 = func_0029A6E0();
+    v2 = osViGetCurrentFramebuffer();
     f1b = (s32)arg0->framebuffer;
     if (f1b == (s32)v2) {
         return 0;

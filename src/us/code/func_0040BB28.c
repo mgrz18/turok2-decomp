@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_0040BB28(void) {
+void MotherBoss_Mode28_Enter(void) {
 
 }

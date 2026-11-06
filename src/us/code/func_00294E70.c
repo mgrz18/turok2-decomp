@@ -6,11 +6,11 @@
 extern double D_800AA508;
 extern float D_800AA514;
 extern double D_800AA518;
-extern void func_00296340(void *f, int h, int s, int type);
-extern s32 func_002912A0(s32 file, s32 line, void *hp, s32 num, s32 size);
-extern char func_00297038;
-extern char func_00296750;
-extern char func_00296AF4;
+extern void alFilterNew(void *f, int h, int s, int type);
+extern s32 alHeapDBAlloc(s32 file, s32 line, void *hp, s32 num, s32 size);
+extern char alFxParam;
+extern char alFxPull;
+extern char alFxParamHdl;
 extern s32 D_800B7770[];
 extern s32 D_800B77D8[];
 extern s32 D_800B7860[];
@@ -19,15 +19,15 @@ extern s32 D_800B78B0[];
 extern s32 D_800B78D8[];
 extern const f32 D_800AA500;
 extern const f32 D_800AA510;
-void func_00294E70(ALFx *r, ALSynConfig *c, ALHeap *hp)
+void alFxNew(ALFx *r, ALSynConfig *c, ALHeap *hp)
 {
     u16 i, j, k;
     s32 *param = 0;
     ALFilter *f = &r->filter;
     ALDelay *d;
-    func_00296340(f, 0, (s32)&func_00297038, 5);
-    f->handler = &func_00296750;
-    r->paramHdl = &func_00296AF4;
+    alFilterNew(f, 0, (s32)&alFxParam, 5);
+    f->handler = &alFxPull;
+    r->paramHdl = &alFxParamHdl;
     switch (c->fxType) {
       case 1: param = D_800B7770; break;
       case 2: param = D_800B77D8; break;
@@ -40,8 +40,8 @@ void func_00294E70(ALFx *r, ALSynConfig *c, ALHeap *hp)
     j = 0;
     r->section_count = param[j++];
     r->length = param[j++];
-    r->delay = (void *)func_002912A0(0, 0, hp, r->section_count, sizeof(ALDelay));
-    r->base = (void *)func_002912A0(0, 0, hp, r->length, sizeof(s16));
+    r->delay = (void *)alHeapDBAlloc(0, 0, hp, r->section_count, sizeof(ALDelay));
+    r->base = (void *)alHeapDBAlloc(0, 0, hp, r->length, sizeof(s16));
     r->input = r->base;
     for (k = 0; k < r->length; k++)
         r->base[k] = 0;
@@ -67,8 +67,8 @@ void func_00294E70(ALFx *r, ALSynConfig *c, ALHeap *hp)
             d->rsgain = depth * ((f32)flength * D_800AA510);
             d->rsval = D_800AA514;
             d->rsdelta = 0;
-            d->rs = (void *)func_002912A0(0, 0, hp, 1, sizeof(ALResampler));
-            ((ALResampler *)d->rs)->state = (void *)func_002912A0(0, 0, hp, 1, 32);
+            d->rs = (void *)alHeapDBAlloc(0, 0, hp, 1, sizeof(ALResampler));
+            ((ALResampler *)d->rs)->state = (void *)alHeapDBAlloc(0, 0, hp, 1, 32);
             ((ALResampler *)d->rs)->delta = 0;
             ((ALResampler *)d->rs)->first = 1;
         } else {
@@ -77,8 +77,8 @@ void func_00294E70(ALFx *r, ALSynConfig *c, ALHeap *hp)
             j++;
         }
         if (param[j]) {
-            d->lp = (void *)func_002912A0(0, 0, hp, 1, sizeof(ALLowPass));
-            ((ALLowPass *)d->lp)->fstate = (void *)func_002912A0(0, 0, hp, 1, sizeof(POLEF_STATE));
+            d->lp = (void *)alHeapDBAlloc(0, 0, hp, 1, sizeof(ALLowPass));
+            ((ALLowPass *)d->lp)->fstate = (void *)alHeapDBAlloc(0, 0, hp, 1, sizeof(POLEF_STATE));
             ((ALLowPass *)d->lp)->fc = param[j++];
             {
                 ALLowPass *lp = d->lp;

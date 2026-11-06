@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_00446BC0(void) {
+void BlindOne_BossMode1Enter_2(void) {
 
 }

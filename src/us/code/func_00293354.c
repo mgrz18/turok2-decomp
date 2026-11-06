@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-int func_00293354(void *arg0) {
+int __alSeqReadWord(void *arg0) {
     ALSeq *stream = arg0;
     unsigned char *p;
     unsigned int b0, b1, b2, b3;

@@ -19,10 +19,10 @@ typedef struct B01IoReq {
 extern s32 D_800BC304;
 extern OSMesgQueue D_80128370;
 extern OSMesgQueue D_80128540;
-s32 func_002A12F0(void);
-void func_002A1324(s32 mask);
-s32 func_002A259C(u32 a0, u32 a1, u32 a2, u32 a3);
-s32 func_002A2B08(s32 arg) {
+s32 HostIo_DisableInt(void);
+void HostIo_RestoreInt(s32 mask);
+s32 HostIo_Call(u32 a0, u32 a1, u32 a2, u32 a3);
+s32 PCclose(s32 arg) {
     B01IoReq req;
     s32 reply;
     s32 mask;
@@ -39,12 +39,12 @@ s32 func_002A2B08(s32 arg) {
             reply |= 0xFFFF0000;
         }
     } else {
-        mask = func_002A12F0();
-        reply = func_002A259C(0x404, arg, 0, 0);
+        mask = HostIo_DisableInt();
+        reply = HostIo_Call(0x404, arg, 0, 0);
         if (reply & 0x8000) {
             reply |= 0xFFFF0000;
         }
-        func_002A1324(mask);
+        HostIo_RestoreInt(mask);
     }
     return reply;
 }

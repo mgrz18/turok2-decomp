@@ -24,7 +24,7 @@ struct PlrGroup {
                  s32 unk40;
 };
 extern f32 D_800A70D4;
-Plr *func_00253370(PlrGroup *g, CVector3 p, Plr *skip) {
+Plr *CPlayerPool__FindNearestOther(PlrGroup *g, CVector3 p, Plr *skip) {
     Plr *a;
     Plr *best = ((void *)0);
     f32 min = D_800A70D4;

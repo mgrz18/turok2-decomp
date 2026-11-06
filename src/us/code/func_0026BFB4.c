@@ -15,13 +15,13 @@ typedef struct {
 /* A region's vertex seen with its ceiling height. */
 #define CEILING_VERTEX(tri, i) ((CeilingVertex *)(tri)->m_pVertices[i])
 
-extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
+extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 
 extern CGameRegion *D_800B2600;    /* triangle of the cached ceiling normal */
 extern CVector3 D_800F2000;        /* cached raw ceiling normal */
 
 /* Raw normal of a triangle's ceiling plane (straight down for none), cached for the last triangle. */
-CVector3 *func_0026BFB4(CVector3 *out, CGameRegion *tri) {
+CVector3 *CGameRegion__GetCeilingNormalRaw(CVector3 *out, CGameRegion *tri) {
     CVector3 a;
     CVector3 b;
 
@@ -36,7 +36,7 @@ CVector3 *func_0026BFB4(CVector3 *out, CGameRegion *tri) {
         b.x = CEILING_VERTEX(tri, 2)->x - CEILING_VERTEX(tri, 1)->x;
         b.y = CEILING_VERTEX(tri, 2)->ceiling - CEILING_VERTEX(tri, 1)->ceiling;
         b.z = CEILING_VERTEX(tri, 2)->z - CEILING_VERTEX(tri, 1)->z;
-        func_0020EFDC(&D_800F2000, &b, &a);
+        CVector3__Cross(&D_800F2000, &b, &a);
     }
     *out = D_800F2000;
     D_800B2600 = tri;

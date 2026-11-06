@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_0020F7EC(f32 *arg0) {
+void CMtxF__ClampEntries(f32 *arg0) {
     extern f32 D_800A55E4[2];
     extern f32 D_800A55EC;
     f32 *var_a0;

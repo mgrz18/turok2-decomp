@@ -20,14 +20,14 @@ extern CListedInstance *D_8010FEB4;
 extern f32 D_800B6D28;
 extern s32 D_80110048;
 
-extern void func_004089E0();
-extern void func_004082A0(BossFight *fight);
-extern f32 func_0021149C(f32 range);
-extern void func_00246690(CListedInstance *actor, s32 sound, CVector3 pos, s32 arg);
-extern void func_00245828(void *out, s32 a, s32 b, f32 c, s32 d, s32 e);
-extern void func_0025B2D4(CListedInstance *actor, void *ai, void *anim);
-extern CPlayer *func_002532A8(void *players);
-extern void func_00248BA8(CPlayer *player, s32 track, s32 a, s32 b);
+extern void TotemDefense_DrawTotem();
+extern void TotemDefense_UpdateFight(BossFight *fight);
+extern f32 Random_Float(f32 range);
+extern void Actor_SpawnParticle(CListedInstance *actor, s32 sound, CVector3 pos, s32 arg);
+extern void DamageEvent_Set(void *out, s32 a, s32 b, f32 c, s32 d, s32 e);
+extern void EnemyAI_OnDamage(CListedInstance *actor, void *ai, void *anim);
+extern CPlayer *CPlayerPool__GetFirstActive(void *players);
+extern void CPlayer__Warp(CPlayer *player, s32 track, s32 a, s32 b);
 
 static __inline__ s32 helperAlive(void) {
     CListedInstance *actor;
@@ -46,29 +46,29 @@ static __inline__ void stunHelper(void) {
 
     if (D_8012FB50.timer > 0.0f) {
         D_8012FB50.timer -= D_800B6D28;
-    } else if (!(func_0021149C(100.0f) > 25.0f)) {
+    } else if (!(Random_Float(100.0f) > 25.0f)) {
         for (actor = D_8010FEB4; actor != NULL; actor = actor->m_pNext) {
             if (actor->m_Instance.header.m_pIntelligence->m_Type == 1 && actor->m_Instance.m_AI.m_Health != 0) {
-                func_00246690(actor, 0x17C, actor->m_Instance.header.m_vPos, 0);
-                func_00245828(anim, 0, 0xFF00, 51.199997f, 0x100000, 0);
-                func_0025B2D4(actor, &actor->m_Instance.m_AI, anim);
+                Actor_SpawnParticle(actor, 0x17C, actor->m_Instance.header.m_vPos, 0);
+                DamageEvent_Set(anim, 0, 0xFF00, 51.199997f, 0x100000, 0);
+                EnemyAI_OnDamage(actor, &actor->m_Instance.m_AI, anim);
                 break;
             }
         }
     }
 }
 
-void func_004085A0(void *obj, CAI *ai) {
+void TotemDefense_Update(void *obj, CAI *ai) {
     BossFight *fight = &D_8012FB50;
     CPlayer *player;
     s32 track;
 
-    if (ai->m_pfDraw != func_004089E0) {
-        ai->m_pfDraw = func_004089E0;
+    if (ai->m_pfDraw != TotemDefense_DrawTotem) {
+        ai->m_pfDraw = TotemDefense_DrawTotem;
     }
     switch (fight->state) {
     case 0:
-        func_004082A0(fight);
+        TotemDefense_UpdateFight(fight);
         break;
     case 1:
         stunHelper();
@@ -92,7 +92,7 @@ void func_004085A0(void *obj, CAI *ai) {
     } else if (ai->m_ModeTime < 75.0f) {
         return;
     }
-    player = func_002532A8(&D_80119870.m_PlayerList);
+    player = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
     if (player == NULL) {
         return;
     }
@@ -123,5 +123,5 @@ void func_004085A0(void *obj, CAI *ai) {
         break;
     }
     player->m_InvincibilityTime = 0.0f;
-    func_00248BA8(player, track, 2, 0);
+    CPlayer__Warp(player, track, 2, 0);
 }

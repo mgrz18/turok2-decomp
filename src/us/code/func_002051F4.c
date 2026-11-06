@@ -10,7 +10,7 @@ extern u8 D_800D8DB0[];                             /* the cache lock (OSMesgQue
 extern s32 D_800D8DCC;
 
 /* Releases one use of a resource; the last one clears its 0x100 flag. */
-void func_002051F4(s32 arg0, CMemEntry *arg1) {
+void CCache__Unlock(s32 arg0, CMemEntry *arg1) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v0_2;

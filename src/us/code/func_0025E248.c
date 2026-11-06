@@ -32,16 +32,16 @@ typedef struct {
     /* 0x133 */ s8 index;
 } AttackState;
 
-s32 func_00219F74(void *, s32, s32);
-s32 func_0025AA78(void *, void *);
-s32 func_0025AAA4(void *, void *);
-s32 func_002685F0(void *);
-void func_0024646C(void *, void *, s32, s32, s32);
-void func_00243414(void *, void *, s32);
-void func_00246918(void *, void *);
-void func_002280B0(void *);
+s32 CGameObjectInstance__PickRandomAnim(void *, s32, s32);
+s32 EnemyAnim_NormalDeath_B0390(void *, void *);
+s32 EnemyAnim_NormalDeath_B03C0(void *, void *);
+s32 GameObject_IsOnGround(void *);
+void AI_SpawnParticlesOnce(void *, void *, s32, s32, s32);
+void CAI__SetMode(void *, void *, s32);
+void AI_StopSound(void *, void *);
+void CListedInstance__Free(void *);
 
-void func_0025E248(AttackActor *actor, AttackState *state) {
+void EnemyMode_Death_Update(AttackActor *actor, AttackState *state) {
     AttackInfo *info = (AttackInfo *)(actor->def + 0x14);
     s32 anim;
 
@@ -55,22 +55,22 @@ void func_0025E248(AttackActor *actor, AttackState *state) {
             if (state->queued == 0) {
                 return;
             }
-            anim = func_0025AA78(actor, state);
+            anim = EnemyAnim_NormalDeath_B0390(actor, state);
             break;
         case 7021:
         case 7026:
         case 7031:
         case 7036:
         case 7041:
-            if (!func_002685F0(actor)) {
+            if (!GameObject_IsOnGround(actor)) {
                 return;
             }
-            anim = func_0025AAA4(actor, state);
+            anim = EnemyAnim_NormalDeath_B03C0(actor, state);
             break;
         default:
             goto finish;
         }
-        state->animSlot = func_00219F74(actor, anim, -1);
+        state->animSlot = CGameObjectInstance__PickRandomAnim(actor, anim, -1);
         state->anim = anim;
         state->queued = 0;
         state->flags &= ~1;
@@ -79,22 +79,22 @@ void func_0025E248(AttackActor *actor, AttackState *state) {
 finish:
     if (state->queued != 0) {
         if (state->move == 0x35) {
-            func_00243414(actor, state, 0x36);
+            CAI__SetMode(actor, state, 0x36);
         } else {
             state->flags |= 0x20;
             actor->flags &= ~0x01000000;
-            func_0024646C(actor, state, 4, info->unk0C, info->unk10);
+            AI_SpawnParticlesOnce(actor, state, 4, info->unk0C, info->unk10);
             actor->flags &= ~0x20000;
             if (state->time > 90.0f) {
-                func_00243414(actor, state, 0x3C);
+                CAI__SetMode(actor, state, 0x3C);
             }
         }
         if (info->flags & 0x10000) {
             actor->flags &= ~0x100;
             actor->flags &= ~0x2000;
-            func_00246918(actor, state);
+            AI_StopSound(actor, state);
             if (actor->flags & 0x80000) {
-                func_002280B0(actor);
+                CListedInstance__Free(actor);
             }
         }
     } else {

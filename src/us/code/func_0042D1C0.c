@@ -3,11 +3,11 @@
 
 #include "rw/junk_types.h"
 
-void func_0020F040(CVector3 *v);
-void func_0042D1C0(S7Light *l) {
+void CVector3__Normalize(CVector3 *v);
+void Light_SetDefaultDirection(S7Light *l) {
     l->dir.x = -0.667424f;
     l->dir.y = 0.953462f;
     l->dir.z = -0.572078f;
-    func_0020F040(&l->dir);
+    CVector3__Normalize(&l->dir);
     l->enabled = 1;
 }

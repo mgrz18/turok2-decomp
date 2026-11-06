@@ -36,10 +36,10 @@ extern s32 __osDisableInt(void);
 extern void __osRestoreInt(s32 mask);
 extern void CList__Remove(Pool_func_80285B64_de *pool, Node_func_80285B64_de *node);
 extern void CList__AddTail(Node_func_80285B64_de **list, Node_func_80285B64_de *node);
-extern s32 func_00225D94(void *table, s32 id);
-extern void func_0026EE30(void *slot, s32 handle);
+extern s32 CScene__GetCurve(void *table, s32 id);
+extern void RumbleCurve_Init(void *slot, s32 handle);
 static __inline__ void bind(Node_func_80285B64_de *node, s32 offset, s32 id) {
-    func_0026EE30((char *)node + offset, func_00225D94(&D_800F7078, id));
+    RumbleCurve_Init((char *)node + offset, CScene__GetCurve(&D_800F7078, id));
 }
 static __inline__ void init(Node_func_80285B64_de *node, Clip *key, CVector3 position, f32 value0, f32 value1, Node_func_80285B64_de **owner) {
     node->key = key;
@@ -53,7 +53,7 @@ static __inline__ void init(Node_func_80285B64_de *node, Clip *key, CVector3 pos
     bind(node, 0x20, key->mode);
     bind(node, 0x2C, key->frames);
 }
-Node_func_80285B64_de *func_0026EBDC(Pool_func_80285B64_de *pool, Clip *key, CVector3 position, f32 value0, f32 value1, Node_func_80285B64_de **owner) {
+Node_func_80285B64_de *Rumble_Start(Pool_func_80285B64_de *pool, Clip *key, CVector3 position, f32 value0, f32 value1, Node_func_80285B64_de **owner) {
     s32 mask;
     Node_func_80285B64_de *node;
     mask = __osDisableInt();

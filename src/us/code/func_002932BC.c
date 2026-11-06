@@ -7,7 +7,7 @@ typedef struct {
 
 /* Reads a MIDI-style variable-length quantity: 7 bits per byte, high bit set
  * on every byte but the last. */
-u32 func_002932BC(Reader *r) {
+u32 __alSeqReadVarLen(Reader *r) {
     u32 v;
     u32 c;
     c = *r->p++;

@@ -3,23 +3,23 @@
 
 #include "rw/abu_types.h"
 
-extern u32 func_00298E10(struct Triple *);
+extern u32 osMotorStop(struct Triple *);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern void *D_800B7A40[];
 extern u8 D_80130E20[];
-extern void func_00299FE4(void);
-extern s32 func_0029A080(s32, s32);
+extern void __osSiGetAccess(void);
+extern s32 __osSiRawStartDma(s32, s32);
 extern s32 osRecvMesg(OSMesgQueue *, void **, s32);
-extern u32 func_00299E48(void *arg0);
-extern void func_0029A050(void);
+extern u32 __osContDataCrc(void *arg0);
+extern void __osSiRelAccess(void);
 extern void *D_800B7A40[];
 extern u8 D_80121420;
 extern u8 D_80121550[];
 extern u8 D_80121650;
 extern u8 D_80130E20[];
-extern s32 func_0029A080(s32, s32);
-extern u32 func_00299E48(void *arg0);
-u32 func_00298E10(Triple *arg0) {
+extern s32 __osSiRawStartDma(s32, s32);
+extern u32 __osContDataCrc(void *arg0);
+u32 osMotorStop(Triple *arg0) {
     Block40 saved;
     u8 *source;
     s32 i;
@@ -29,11 +29,11 @@ u32 func_00298E10(Triple *arg0) {
     } else {
         u32 result;
         s32 count;
-        func_00299FE4();
+        __osSiGetAccess();
         D_80121420 = 3;
-        func_0029A080(1, &D_80121550[arg0->z << 6]);
+        __osSiRawStartDma(1, &D_80121550[arg0->z << 6]);
         osRecvMesg(arg0->y, 0, 1);
-        func_0029A080(0, D_80130E20);
+        __osSiRawStartDma(0, D_80130E20);
         osRecvMesg(arg0->y, 0, 1);
         count = arg0->z;
         if (count != 0) {
@@ -47,10 +47,10 @@ u32 func_00298E10(Triple *arg0) {
         }
         saved = *(Block40 *)source;
         result = (saved.bytes[2] & 0xC0) >> 4;
-        if ((result == 0) && ((func_00299E48(&D_80121650) & 0xFF) != saved.bytes[0x26])) {
+        if ((result == 0) && ((__osContDataCrc(&D_80121650) & 0xFF) != saved.bytes[0x26])) {
             result = 4;
         }
-        func_0029A050();
+        __osSiRelAccess();
         return result;
     }
 }

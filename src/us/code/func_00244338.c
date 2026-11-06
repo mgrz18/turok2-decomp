@@ -11,22 +11,22 @@ typedef struct {
 extern s32 D_800F7F78;
 extern s32 D_8011001C;
 
-s32 func_0025E428(CGameObjectInstance *self, CAI *plan);
-s32 func_002438C0(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *target);
-CGameObjectInstance *func_00243C90(CGameObjectInstance *self, CAI *plan, s32 arg2, s32 arg3);
-f32 func_00244E84(CGameObjectInstance *self, CVector3 pos, CGameObjectInstance *target, f32 scale);
-f32 func_00246310(CGameObjectInstance *a, CVector3 point);              /* angle to a point */
-Location *func_0028479C(s8 *location);
-f32 func_002671B4(CGameObjectInstance *a);                           /* height */
-f32 func_002672C8(CGameObjectInstance *a);                           /* radius */
+s32 EnemyAI_GetBehaviorIndex(CGameObjectInstance *self, CAI *plan);
+s32 AI_UpdatePathHeading(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *target);
+CGameObjectInstance *AI_FindBestTarget(CGameObjectInstance *self, CAI *plan, s32 arg2, s32 arg3);
+f32 AI_FindClearHeading(CGameObjectInstance *self, CVector3 pos, CGameObjectInstance *target, f32 scale);
+f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);              /* angle to a point */
+Location *CPathTrack__GetCurrentPoint(s8 *location);
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);                           /* height */
+f32 GameObject_GetCollisionRadius(CGameObjectInstance *a);                           /* radius */
 f32 func_00268460(CGameObjectInstance *a);                           /* reach */
-f32 func_00268A5C(CGameObjectInstance *a);                           /* ceiling */
-void func_002688C8(CGameObjectInstance *a, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
-void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a + b */
-void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-void func_0020F040(CVector3 *v);                          /* normalise */
-f32 func_0020EAA0(CVector3 *v);                           /* heading */
+f32 GameObject_GetWaterHeight(CGameObjectInstance *a);                           /* ceiling */
+void GameObject_TraceMove(CGameObjectInstance *a, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a + b */
+void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+void CVector3__Normalize(CVector3 *v);                          /* normalise */
+f32 CVector3__GetYaw(CVector3 *v);                           /* heading */
 f32 func_002982F0(f32 x);                              /* sin */
 f32 func_002974C0(f32 x);                              /* cos */
 f32 func_00298470(f32 x);                              /* sqrt */
@@ -39,28 +39,28 @@ static __inline__ void Approach(CGameObjectInstance *self, CGameObjectInstance *
     f32 dist;
 
     if (from != NULL) {
-        func_0020EF2C(&dir, &target->header.m_vPos, &from->header.m_vPos);
+        CVector3__Subtract(&dir, &target->header.m_vPos, &from->header.m_vPos);
         dir.y = 0.0f;
-        func_0020F040(&dir);
+        CVector3__Normalize(&dir);
     } else {
         dir.x = 0.0f;
         dir.y = 0.0f;
         dir.z = 0.0f;
     }
-    dist = func_002672C8(target) + func_002672C8(self) + 51.199997f;
-    func_0020EF60(&dir, &dir, dist);
-    func_0020EEF8(&to, &target->header.m_vPos, &dir);
-    func_002688C8(target, to, outPos, outRegion, 0, 0);
+    dist = GameObject_GetCollisionRadius(target) + GameObject_GetCollisionRadius(self) + 51.199997f;
+    CVector3__Scale(&dir, &dir, dist);
+    CVector3__Add(&to, &target->header.m_vPos, &dir);
+    GameObject_TraceMove(target, to, outPos, outRegion, 0, 0);
 }
 
 /* Picks what the plan aims at (its target, itself, a location or home
  * point, or the actor) and fills `out` with the kind, target, range, goal
  * position and its offset from the actor, in 3D and flattened. The caller
- * (func_00246108) passes the plan's m_pPathTarget as `target`; the path
+ * (AI_UpdateTargets) passes the plan's m_pPathTarget as `target`; the path
  * update below may change it, so it is read again from the plan into the
  * parameter. With the parameter reused that way and boost a local of its
  * own, the $s registers come out as in the ROM. */
-void func_00244338(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *target, CAITarget *out) {
+void AI_GetPathTargetInfo(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *target, CAITarget *out) {
     CVector3 pos;
     CVector3 probe;
     CVector3 away;
@@ -78,17 +78,17 @@ void func_00244338(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *ta
 
     boost = 0;
     if (self->header.m_pIntelligence->m_Type == 1) {
-        mode = func_0025E428(self, plan);
+        mode = EnemyAI_GetBehaviorIndex(self, plan);
     } else {
         mode = -1;
     }
     if (plan->m_PathFindCount == D_800F7F78) {
         if ((plan->m_dwFlags & 0x20000000) && plan->m_pTargetOverride == NULL) {
-            if (func_002438C0(self, plan, plan->m_pPathTarget) == 0) {
+            if (AI_UpdatePathHeading(self, plan, plan->m_pPathTarget) == 0) {
                 plan->m_dwFlags &= ~0x20000000;
             }
         } else {
-            plan->m_pPathTarget = func_00243C90(self, plan, 0, 1);
+            plan->m_pPathTarget = AI_FindBestTarget(self, plan, 0, 1);
         }
     }
     target = plan->m_pPathTarget;
@@ -127,10 +127,10 @@ void func_00244338(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *ta
             pos = target->header.m_vPos;
             region = ((s32)target->header.m_pCurrentRegion);
             if (mode == 1) {
-                pos.y += target->m_CollisionYOffset + func_002671B4(target) * 0.9f;
+                pos.y += target->m_CollisionYOffset + GameObject_GetCollisionHeight(target) * 0.9f;
             }
         }
-        gap = func_002672C8(target) + func_002672C8(self);
+        gap = GameObject_GetCollisionRadius(target) + GameObject_GetCollisionRadius(self);
         switch (kind) {
         case 2:
             gap += 102.399994f;
@@ -147,10 +147,10 @@ void func_00244338(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *ta
             plan->m_PathTrack.m_Mode = 4;
         }
     } else {
-        gap = func_002672C8(self);
+        gap = GameObject_GetCollisionRadius(self);
         switch (kind) {
         case 4:
-            loc = func_0028479C(&plan->m_PathTrack.m_Mode);
+            loc = CPathTrack__GetCurrentPoint(&plan->m_PathTrack.m_Mode);
             pos = loc->pos;
             gap = 0.0f;
             region = loc->region;
@@ -167,32 +167,32 @@ void func_00244338(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *ta
             pos = self->header.m_vPos;
             region = ((s32)self->header.m_pCurrentRegion);
             if (mode == 2) {
-                pos.y = func_00268A5C(self);
+                pos.y = GameObject_GetWaterHeight(self);
             }
             break;
         }
     }
-    func_0020EEF8(&pos, &pos, &plan->m_vTargetOffset);
+    CVector3__Add(&pos, &pos, &plan->m_vTargetOffset);
     if (gap > 0.0f) {
-        func_0020EF2C(&away, &self->header.m_vPos, &pos);
-        angle = func_0020EAA0(&away);
+        CVector3__Subtract(&away, &self->header.m_vPos, &pos);
+        angle = CVector3__GetYaw(&away);
         pos.x -= gap * func_002982F0(angle);
         pos.z -= gap * func_002974C0(angle);
     }
     if (mode == 2) {
-        pos.y = (pos.y < func_00268A5C(self)) ? pos.y : func_00268A5C(self);
+        pos.y = (pos.y < GameObject_GetWaterHeight(self)) ? pos.y : GameObject_GetWaterHeight(self);
     }
     if (boost) {
         reach = func_00268460(self);
         probe.x = self->header.m_vPos.x + reach * func_002982F0(plan->m_PathRotY);
         probe.y = plan->m_PathHeight;
         probe.z = self->header.m_vPos.z + reach * func_002974C0(plan->m_PathRotY);
-        range = func_00244E84(self, probe, target, 1.5f);
+        range = AI_FindClearHeading(self, probe, target, 1.5f);
         pos.y = plan->m_PathHeight;
     } else {
-        range = func_00246310(self, pos);
+        range = AI_AngleToPoint(self, pos);
     }
-    func_0020EF2C(&delta, &pos, &self->header.m_vPos);
+    CVector3__Subtract(&delta, &pos, &self->header.m_vPos);
     out->m_Kind = kind;
     out->m_pTarget = target;
     out->m_Angle = range;

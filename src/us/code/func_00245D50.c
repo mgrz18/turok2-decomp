@@ -7,9 +7,9 @@ extern s32 D_8011001C;
 
 /* WRONG CUT: the ROM splits this function at 0x245E20 (func_00245E20 = its last 10 words,
    reached by branches from here). Compiled whole it is 0xF8 bytes; the first 0xD0 match
-   func_00245D50 and the tail matches func_00245E20 word for word. */
+   AI_GetTargetKind and the tail matches func_00245E20 word for word. */
 
-s32 func_00245D50(CGameObjectInstance *self, CAI *target, CGameObjectInstance *actor) {
+s32 AI_GetTargetKind(CGameObjectInstance *self, CAI *target, CGameObjectInstance *actor) {
     CPlayer *owner;
 
     if (target->m_Health == 0) {

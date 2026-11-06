@@ -3,16 +3,16 @@
 
 #include "rw/abu_types.h"
 
-extern int func_0042265C(int unused, ItemRecAt24 *item);
+extern int CharNoteMenu_SelectNo(int unused, ItemRecAt24 *item);
 extern int D_80130960;
 extern char D_80119E2C[];
 extern char D_0043B6A8[];
-extern void func_00416644(char *, char *, int, int, int);
-int func_0042265C(int unused, ItemRecAt24 *item) {
+extern void MenuPool_OpenMenu(char *, char *, int, int, int);
+int CharNoteMenu_SelectNo(int unused, ItemRecAt24 *item) {
     if (D_80130960 != 0) {
-        func_00416644(D_80119E2C, D_0043B6A8, item->x, item->y, 0);
+        MenuPool_OpenMenu(D_80119E2C, D_0043B6A8, item->x, item->y, 0);
     } else {
-        func_00416644(D_80119E2C, item->label, item->x, item->y, 0);
+        MenuPool_OpenMenu(D_80119E2C, item->label, item->x, item->y, 0);
     }
     return 1;
 }

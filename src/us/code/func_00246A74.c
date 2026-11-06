@@ -8,7 +8,7 @@ typedef struct VecSrc {
     u8 pad0[4]; /* pos at 0x4 */
     CVector3 v;
 } VecSrc;
-void func_00246A74(VecSrc *src, s32 unused, CAITarget *dst) {
+void AI_SetTargetPoint(VecSrc *src, s32 unused, CAITarget *dst) {
     CVector3 a;
     CVector3 b;
     a = src->v;

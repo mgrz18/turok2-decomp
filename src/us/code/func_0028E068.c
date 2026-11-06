@@ -17,17 +17,17 @@ typedef struct FaultedThread {
 extern OSMesgQueue D_80121178;
 extern s32 D_800B7658;
 
-extern FaultedThread *func_0029B140(void);     /* __osGetCurrFaultedThread */
-extern u64 func_0029B170(void);                /* osGetTime */
-extern void func_0028DBAC(s16 page, PageMapping *mapping, s32 slot, u8 *map);
-extern void func_0028DEFC(PageMapping *mapping);   /* releases its TLB slot */
-extern PageRegion *func_0028EA40(u16 page);
+extern FaultedThread *__osGetCurrFaultedThread(void);     /* __osGetCurrFaultedThread */
+extern u64 osGetTime(void);                /* osGetTime */
+extern void VM_MapTLBEntry(s16 page, PageMapping *mapping, s32 slot, u8 *map);
+extern void VM_UnmapTLBEntry(PageMapping *mapping);   /* releases its TLB slot */
+extern PageRegion *VM_FindRegion(u16 page);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **msg, s32 block);
 extern s32 osSendMesg(OSMesgQueue *queue, void *msg, s32 block);
 extern void osWritebackDCacheAll(void);
 extern void osSetIntMask(s32);
-extern void func_0028CF80(void);
-extern void func_0029BB10(void *thread);
+extern void SavedPlayers_Arm(void);
+extern void osStartThread(void *thread);
 
 static __inline__ void writeLink(PageMapping **where, PageMapping *value) {
     *where = value;
@@ -49,7 +49,7 @@ static __inline__ void detachPage(PageMapping *mapping) {
     }
 }
 
-/* func_0028EA40, inlined here. */
+/* VM_FindRegion, inlined here. */
 static __inline__ PageRegion *findRegion(u32 page) {
     PageRegion *region;
 
@@ -62,7 +62,7 @@ static __inline__ PageRegion *findRegion(u32 page) {
 }
 
 /* TLB miss handler: maps the faulting page if it is resident, else queues a read of it; any other fault restarts the game. */
-void func_0028E068(void) {
+void VM_HandleTLBMiss(void) {
     FaultedThread *thread;
     PageRegion *region;
     PageRegion *owner;
@@ -73,7 +73,7 @@ void func_0028E068(void) {
     u32 kind;
     u64 start;
 
-    thread = func_0029B140();
+    thread = __osGetCurrFaultedThread();
     kind = thread->cause & 0x7C;
     if (kind == 4 || kind == 8) {
         D_801206A0.requests++;
@@ -86,7 +86,7 @@ void func_0028E068(void) {
                 mapping = &D_801206A0.slots[*slot];
                 if (mapping->slot == 0xFF) {
                     detachPage(mapping);
-                    func_0028DBAC(page, mapping, thread->slot, slot);
+                    VM_MapTLBEntry(page, mapping, thread->slot, slot);
                     writeLink(&mapping->next, NULL);
                     writeLink(&mapping->prev, D_801206A0.chain.tail);
                     if (D_801206A0.chain.tail != NULL) {
@@ -98,7 +98,7 @@ void func_0028E068(void) {
                     }
                 }
                 thread->state = 2;
-                func_0029BB10(thread);
+                osStartThread(thread);
                 return;
             }
             osRecvMesg(&D_801206A0.jobs, (void **)&job, 1);
@@ -107,9 +107,9 @@ void func_0028E068(void) {
             job->size = 0x1000;
             mapping = ((PageChain *)&D_80121290)->head;
             detachPage(mapping);
-            func_0028DEFC(mapping);
+            VM_UnmapTLBEntry(mapping);
             if (mapping->id != 0xFFFF) {
-                owner = func_0028EA40(mapping->id);
+                owner = VM_FindRegion(mapping->id);
                 owner->map[mapping->id - owner->start] = 0xFF;
                 mapping->id = 0xFFFF;
             }
@@ -122,19 +122,19 @@ void func_0028E068(void) {
             return;
         }
         /* fault outside the paged regions: wait two seconds, then restart */
-        start = func_0029B170();
+        start = osGetTime();
         do {
-        } while ((f32)(((func_0029B170() - start) * 64) / 3000) * 0.000001f < 2.0f);
+        } while ((f32)(((osGetTime() - start) * 64) / 3000) * 0.000001f < 2.0f);
     } else {
-        start = func_0029B170();
+        start = osGetTime();
         do {
-        } while ((f32)(((func_0029B170() - start) * 64) / 3000) * 0.000001f < 2.0f);
+        } while ((f32)(((osGetTime() - start) * 64) / 3000) * 0.000001f < 2.0f);
     }
     osWritebackDCacheAll();
     osSetIntMask(1);
-    func_0028CF80();
+    SavedPlayers_Arm();
     ((void (*)(void))0x80000400)();
     D_800B7658 = -1;
     thread->state = 2;
-    func_0029BB10(thread);
+    osStartThread(thread);
 }

@@ -3,7 +3,7 @@
 
 extern u8 D_800F677B[];
 
-s32 func_002859DC(void)
+s32 Controller_CountConnected(void)
 {
   s32 var_a0;
   s32 var_v0;

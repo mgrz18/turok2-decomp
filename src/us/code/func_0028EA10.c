@@ -11,7 +11,7 @@ typedef struct {
 } LinkList;
 
 /* Pushes the node at the head of the list. */
-void func_0028EA10(LinkList *arg0, Link *arg1) {
+void VM_ListAddHead(LinkList *arg0, Link *arg1) {
     Link *temp_v0;
 
     arg1->prev = 0;

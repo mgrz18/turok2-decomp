@@ -3,16 +3,16 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00218620(char **stream, f32 *out, s32 frames);
-extern void func_00217450(Track_func_80261180_de *track, char **cursor);
+extern void Anim_DecodeCurveChannel(char **stream, f32 *out, s32 frames);
+extern void AnimCurve_Init(Track_func_80261180_de *track, char **cursor);
 extern f32 func_0021852C(Track_func_80261180_de *track, f32 time, s32 arg2, s32 arg3);
-void func_00218620(char **stream, f32 *out, s32 frames)
+void Anim_DecodeCurveChannel(char **stream, f32 *out, s32 frames)
 {
     Track_func_80261180_de track;
     char *cursor;
     s32 i;
     cursor = *stream;
-    func_00217450(&track, &cursor);
+    AnimCurve_Init(&track, &cursor);
     for (i = 0; i < frames; i++) {
         *out = func_0021852C(&track, i, 0, 0);
         out += 4;

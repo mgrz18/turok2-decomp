@@ -22,7 +22,7 @@ extern int D_801198A0;
 extern char D_800F6CB0[];
 extern void func_00430330(char *);
 
-int func_0041CA00(int unused, Menu *menu) {
+int StatsMenu_ContinueNo(int unused, Menu *menu) {
     RenderCounters *sync = &D_8011A6D8.counters;
     int team;
     if (sync->option34 != 0) {

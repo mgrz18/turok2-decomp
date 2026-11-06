@@ -1,7 +1,7 @@
 /* FAKEMATCH: two register asm pins and a second player pointer stand for what natural C does not give: the ROM
  * loads the player into $v0 and copies it to $s0 (pp, then p as the copy the branches use), and the constant 1 of
  * the error branch gets its own register (natural C shares one $s register for every 1: cse2 follows the jumps
- * into that branch). Twin of func_004579A4 (same C). */
+ * into that branch). Twin of PakMenu_InitSaveGame_2 (same C). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00406F7C.c, func_00406F7C, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/player.h"
@@ -39,9 +39,9 @@ s32 func_00426AF8(s32 ch);
 void func_0041D7B0(CPlayer *p);
 void func_0041D948(Menu *o);
 u32 func_00426D98(u8 *data, s32 len, u32 crc);
-void func_00416644(u8 *a, void *b, void *c, s32 d, void *e);
+void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, void *e);
 
-void func_004579A4(Menu *own) {
+void PakMenu_InitSaveGame_2(Menu *own) {
     CPlayer *plr;
     CPlayer *p;
     PadSel sel;
@@ -62,7 +62,7 @@ void func_004579A4(Menu *own) {
     if (D_800C2020 != 0) {
         p = plr;
         D_801309BC = 1;
-        func_00416644(((u8 *)p->m_pCamera) + 0x53C, D_0043BE14, p, p->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, D_0043BE14, p, p->m_ContState.m_pContState, NULL);
         D_80130940 = 0;
     } else {
         func_004263A0(own->controller->port);
@@ -82,11 +82,11 @@ void func_004579A4(Menu *own) {
 
             D_801309BC = one;
             if (func_004264B4(sel.v) != 0) {
-                func_00416644(((u8 *)p->m_pCamera) + 0x53C, D_0043BB68, p, p->m_ContState.m_pContState, (void *)one);
+                MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, D_0043BB68, p, p->m_ContState.m_pContState, (void *)one);
             } else if (func_00426AF8(sel.v) != 0) {
-                func_00416644(D_80119E2C, D_0043BF7C, p, p->m_ContState.m_pContState, D_0043B634);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BF7C, p, p->m_ContState.m_pContState, D_0043B634);
             } else {
-                func_00416644(((u8 *)p->m_pCamera) + 0x53C, D_0043BB20, p, p->m_ContState.m_pContState, D_0043BE14);
+                MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, D_0043BB20, p, p->m_ContState.m_pContState, D_0043BE14);
             }
         }
     }

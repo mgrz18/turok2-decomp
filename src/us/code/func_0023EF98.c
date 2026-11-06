@@ -10,7 +10,7 @@ typedef struct Row18 {
     u8 pad6[18];
 } Row18;
 extern Row18 D_800AD768[];
-Row18 *func_0023EF98(s32 id) {
+Row18 *Pickup_FindHealthEntry(s32 id) {
     s32 i;
     Row18 *p = D_800AD768;
     for (i = 6; i != -1; i--) {

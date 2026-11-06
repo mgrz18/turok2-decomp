@@ -2,7 +2,7 @@
 
 s32 CList__AddHead(s32, s32);
 s32 CList__Remove(s32, s32);
-s32 func_0026DFB0(s32);
+s32 LevelEvent_Fire(s32);
 
 extern f32 D_800B6D28;
 
@@ -21,7 +21,7 @@ typedef struct {
     /* 0x1194 */ TimedNode *freeHead;    /* CList at 0x1194 */
 } TimedPool;
 
-void func_002253F8(TimedPool *arg0) {
+void CScene__UpdateDelayedEvents(TimedPool *arg0) {
     f32 temp_f1;
     s32 var_s1;
     s32 var_v1;
@@ -45,7 +45,7 @@ void func_002253F8(TimedPool *arg0) {
                 }
             }
             if (var_v1 != 0) {
-                func_0026DFB0((s32) temp_a0);
+                LevelEvent_Fire((s32) temp_a0);
             }
             if (var_s1 != 0) {
                 CList__Remove((s32) &arg0->activeHead, (s32) var_s0);

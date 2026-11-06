@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/player.h"
 
-s32 func_0024E5F0(void *, s32, s32);    /* extern */
-s32 func_00251A2C();                            /* extern */
+s32 CPlayer__SetState(void *, s32, s32);    /* extern */
+s32 CPlayer__UpdateRiding();                            /* extern */
 
-void func_002563FC(CPlayer *arg0, s32 arg1) {
-    func_00251A2C();
+void PlayerRideIdle_Update(CPlayer *arg0, s32 arg1) {
+    CPlayer__UpdateRiding();
     if (arg0->m_Speed != 0.0f) {
-        func_0024E5F0(arg0, arg1, 0x22);
+        CPlayer__SetState(arg0, arg1, 0x22);
     }
 }

@@ -6,7 +6,7 @@
 extern __OSViContext *D_800B7AC4;
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
-void func_0029AA80(OSViMode *modep) {
+void osViSetMode(OSViMode *modep) {
     register u32 saveMask = __osDisableInt();
     D_800B7AC4->modep = modep;
     D_800B7AC4->state = 1;

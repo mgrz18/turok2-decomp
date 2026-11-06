@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 /* out = b * a (quaternions, x y z w). */
-void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b) {
+void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b) {
     out->x = (((b->w * a->x) - (b->z * a->y)) + (b->y * a->z) + (b->x * a->w));
     out->y = ((((b->z * a->x) + (b->w * a->y)) - (b->x * a->z)) + (b->y * a->w));
     out->z = ((-b->y * a->x) + (b->x * a->y) + (b->w * a->z) + (b->z * a->w));

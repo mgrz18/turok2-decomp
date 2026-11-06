@@ -3,7 +3,7 @@
 
 typedef unsigned char u8;
 typedef signed int s32;
-s32 func_00288780(u8 *a, u8 *b) {
+s32 Util_StrCmp(u8 *a, u8 *b) {
     if (a == ((void *)0) || b == ((void *)0)) {
         return -1;
     }

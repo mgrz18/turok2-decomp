@@ -4,17 +4,17 @@
 #include "structs/player.h"
 
 
-s32 func_0024E700(CPlayer *player, s32 weapon);   /* ammo for a weapon */
-f32 func_002671B4(CGameObjectInstance *a);                     /* height */
-f32 func_0021153C(f32 x);                        /* acos */
+s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);   /* ammo for a weapon */
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);                     /* height */
+f32 Math_AcosLookup(f32 x);                        /* acos */
 f32 func_002982F0(f32 x);                        /* sin */
 f32 func_002974C0(f32 x);                        /* cos */
 f32 func_00298470(f32 x);                        /* sqrt */
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
-void func_0020F040(CVector3 *v);                          /* normalise */
-void func_0021F00C(CVector3 *out, CGameObjectInstance *a, CVector3 v);    /* v in a's frame */
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+void CVector3__Normalize(CVector3 *v);                          /* normalise */
+void CGameObjectInstance__LocalToWorld(CVector3 *out, CGameObjectInstance *a, CVector3 v);    /* v in a's frame */
 
-/* func_00246310: the signed angle from the actor's heading to a point. */
+/* AI_AngleToPoint: the signed angle from the actor's heading to a point. */
 static __inline__ f32 AngleTo(CGameObjectInstance *actor, CVector3 point) {
     f32 dx;
     f32 dz;
@@ -36,7 +36,7 @@ static __inline__ f32 AngleTo(CGameObjectInstance *actor, CVector3 point) {
     c = -func_002974C0(actor->m_RotY);
     dot = (dx * -s + dz * c) / dist;
     dot = ((((dot) > (1.0f) ? (1.0f) : (dot))) < ((-1.0f)) ? ((-1.0f)) : (((dot) > (1.0f) ? (1.0f) : (dot))));
-    angle = func_0021153C(dot);
+    angle = Math_AcosLookup(dot);
     if (!(dx * c + dz * s > 0.0f)) {
         angle = -angle;
     }
@@ -45,7 +45,7 @@ static __inline__ f32 AngleTo(CGameObjectInstance *actor, CVector3 point) {
 
 /* Whether `self` sees `target` (a player holding a ready weapon, or a
  * creature in an attack pose) aiming at it: 0 if not, else the side (-1/1). */
-s32 func_002451AC(CGameObjectInstance *self, s32 unused, CGameObjectInstance *target, f32 cone) {
+s32 AI_IsAimedAt(CGameObjectInstance *self, s32 unused, CGameObjectInstance *target, f32 cone) {
     CVector3 dir;
     CVector3 facing;
     CVector3 fwd;
@@ -62,7 +62,7 @@ s32 func_002451AC(CGameObjectInstance *self, s32 unused, CGameObjectInstance *ta
     }
     if (target->m_dwFlags & 0x300000) {
         player = ((CPlayer *)target->m_AI.m_pParent);
-        if (func_0024E700(player, player->m_Data.m_CurrentWeapon) <= 0) {
+        if (CPlayer__GetWeaponAmmo(player, player->m_Data.m_CurrentWeapon) <= 0) {
             return 0;
         }
         if (!(player->m_ContState.m_dwButtons & 0x2000)) {
@@ -86,9 +86,9 @@ s32 func_002451AC(CGameObjectInstance *self, s32 unused, CGameObjectInstance *ta
     }
 body:
     lo = self->header.m_vPos.y + self->m_CollisionYOffset;
-    hi = lo + func_002671B4(self);
+    hi = lo + GameObject_GetCollisionHeight(self);
     to.x = target->header.m_vPos.x;
-    y = target->header.m_vPos.y + target->m_CollisionYOffset + func_002671B4(target) * 0.9f;
+    y = target->header.m_vPos.y + target->m_CollisionYOffset + GameObject_GetCollisionHeight(target) * 0.9f;
     to.y = y;
     to.z = target->header.m_vPos.z;
     from.x = self->header.m_vPos.x;
@@ -104,13 +104,13 @@ body:
     if (1.2217306f < angle && angle < 1.9198624f) {
         return 0;
     }
-    func_0020EF2C(&dir, &from, &to);
-    func_0020F040(&dir);
+    CVector3__Subtract(&dir, &from, &to);
+    CVector3__Normalize(&dir);
     fwd.x = 0;
     fwd.y = 0;
     fwd.z = 1.0f;
-    func_0021F00C(&facing, target, fwd);
-    if (func_0021153C(dir.x * facing.x + dir.y * facing.y + dir.z * facing.z) < cone * 0.5f) {
+    CGameObjectInstance__LocalToWorld(&facing, target, fwd);
+    if (Math_AcosLookup(dir.x * facing.x + dir.y * facing.y + dir.z * facing.z) < cone * 0.5f) {
         if (dir.x * -facing.z + dir.z * facing.x < 0.0f) {
             return -1;
         }

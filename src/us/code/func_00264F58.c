@@ -2,8 +2,8 @@
 #include "structs/vector.h"
 #include "structs/game_object.h"
 
-extern f32 func_002119FC(f32 min, f32 max); /* random float in [min, max] */
-extern f32 func_002465F0(void *obj, CVector3 v);
+extern f32 Random_Blend(f32 min, f32 max); /* random float in [min, max] */
+extern f32 AI_DistSqToPointAtHeight(void *obj, CVector3 v);
 extern f32 func_00298470(f32 x); /* sqrtf */
 extern f32 func_002982F0(f32 x); /* sinf */
 extern f32 func_002974C0(f32 x); /* cosf */
@@ -16,7 +16,7 @@ typedef struct {
 } OwnedState;
 
 /* Launch velocity: thrown away from the owner, aimed at its target. */
-void func_00264F58(CGameObjectInstance *obj, OwnedState *state) {
+void Throwable_FlyingEnter(CGameObjectInstance *obj, OwnedState *state) {
     CGameObjectInstance *owner = state->owner;
     CGameObjectInstance *target;
     f32 speed;
@@ -28,14 +28,14 @@ void func_00264F58(CGameObjectInstance *obj, OwnedState *state) {
         speed = 51.199997f;
         lift = 204.79999f;
     } else if ((target = owner->m_AI.m_pSightTarget) != NULL) {
-        r = func_002119FC(1.5f, 2.5f);
-        speed = r * func_00298470(func_002465F0(obj, target->header.m_vPos));
+        r = Random_Blend(1.5f, 2.5f);
+        speed = r * func_00298470(AI_DistSqToPointAtHeight(obj, target->header.m_vPos));
         lift = -D_800F1F98 / (r * 3.8f);
     } else {
         speed = 512.0f;
         lift = 358.4f;
     }
-    lift += func_002119FC(0.0f, 2.56f);
+    lift += Random_Blend(0.0f, 2.56f);
     x = speed * func_002982F0(owner->m_RotY + 3.1415927f);
     obj->m_vVelocity.y = lift;
     obj->m_vVelocity.x = x;

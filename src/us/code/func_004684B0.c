@@ -4,7 +4,7 @@
 extern void *D_00438408[]; /* NULL-terminated list */
 extern void func_0042EE4C(void *entry);
 
-void func_004684B0(void) {
+void Demo_PlayNext_2(void) {
     DemoPlayer *s = &D_800F56B0;
 
     if (s->active) {

@@ -4,7 +4,7 @@
 void CList__Construct(s32, s32, s32);
 s32 CList__AddTail(s32, s32);
 
-void func_00468F10(CEmitterPool *arg0) {
+void CEmitterPool__Construct_2(CEmitterPool *arg0) {
     s32 var_s0;
     s32 var_s1;
 

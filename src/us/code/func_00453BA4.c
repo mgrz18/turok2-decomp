@@ -5,7 +5,7 @@
 #include "structs/menu.h"
 
 extern s32 D_80130920;
-s32 func_00453BA4(void) {
+s32 EnterCheatMenu_Backspace_2(void) {
     s32 index;
     s32 next;
     D_80130920 = -1;

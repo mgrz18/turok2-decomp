@@ -7,7 +7,7 @@
 #include "structs/intelligence.h"
 #include "structs/game.h"
 struct LevelActor;
-extern f32 func_0021153C(f32 arg0);
+extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 struct Box;
@@ -137,18 +137,18 @@ struct LevelActor;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
-extern void func_0020F040(f32 *arg0);
-extern void func_0020F85C(void *arg0, void *arg1, void *arg2);
+extern void CVector3__Normalize(f32 *arg0);
+extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
 extern f32 D_800DD78C;
-extern CQuatern func_0021AE6C(char *);
-extern void func_00211114(CQuatern *, f32 *);
-extern char *func_002532EC(void *, CVector3);
-extern f32 func_002671B4(char *);
-extern void func_0020EF2C(CVector3 *, CVector3 *, CVector3 *);
-extern void func_0020EFDC(CVector3 *, CVector3 *, CVector3 *);
-extern void func_00210F68(CQuatern *, CQuatern *, CQuatern *);
-extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);
-CQuatern func_002673CC(char *actor, CVector3 point) {
+extern CQuatern CGameObjectInstance__GetRotation(char *);
+extern void CQuaternion__ToMatrix(CQuatern *, f32 *);
+extern char *CPlayerPool__FindNearest(void *, CVector3);
+extern f32 GameObject_GetCollisionHeight(char *);
+extern void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
+extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
+extern void CQuaternion__Multiply(CQuatern *, CQuatern *, CQuatern *);
+extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
+CQuatern GameObject_GetAimRotation(char *actor, CVector3 point) {
     CVector3 origin;
     CVector3 dir;
     CVector3 forward;
@@ -165,19 +165,19 @@ CQuatern func_002673CC(char *actor, CVector3 point) {
     target = 0;
     if (actor != 0 && *(u8 *)actor == 1) {
         target = ((LevelActor *)(actor))->lockOn;
-        aim = func_0021AE6C(actor);
-        func_00211114(&aim, matrix);
+        aim = CGameObjectInstance__GetRotation(actor);
+        CQuaternion__ToMatrix(&aim, matrix);
         local.x = 0.0f;
         local.y = 0.0f;
         local.z = 1.0f;
-        func_0020F85C(matrix, &local, &forward);
+        CMtxF__TransformPoint(matrix, &local, &forward);
     } else {
         forward.x = 0.0f;
         forward.y = 0.0f;
         forward.z = 1.0f;
     }
     if (target == 0) {
-        found = func_002532EC(&D_80119870.m_PlayerList, point);
+        found = CPlayerPool__FindNearest(&D_80119870.m_PlayerList, point);
         if (found != 0) {
             target = found;
         }
@@ -189,12 +189,12 @@ CQuatern func_002673CC(char *actor, CVector3 point) {
     }
     origin = ((Actor_func_80214310_de *)(target))->position;
     origin.y += ((Actor_func_80214310_de *)(target))->eye;
-    origin.y += func_002671B4(target) * 0.75f;
-    func_0020EF2C(&dir, &origin, &point);
-    func_0020F040(&dir);
-    func_0020EFDC(&axis, &forward, &dir);
-    func_0020F040(&axis);
-    angle = func_0021153C(forward.x * dir.x + forward.y * dir.y + forward.z * dir.z) * 0.5f;
+    origin.y += GameObject_GetCollisionHeight(target) * 0.75f;
+    CVector3__Subtract(&dir, &origin, &point);
+    CVector3__Normalize(&dir);
+    CVector3__Cross(&axis, &forward, &dir);
+    CVector3__Normalize(&axis);
+    angle = Math_AcosLookup(forward.x * dir.x + forward.y * dir.y + forward.z * dir.z) * 0.5f;
     scale = func_002982F0(angle);
     turn.x = axis.x * scale;
     turn.y = axis.y * scale;
@@ -202,7 +202,7 @@ CQuatern func_002673CC(char *actor, CVector3 point) {
     D_800DD78C = scale;
     turn.w = func_002974C0(angle);
     if (actor != 0 && *(u8 *)actor == 1) {
-        func_00210F68(&result, &aim, &turn);
+        CQuaternion__Multiply(&result, &aim, &turn);
     } else {
         result = turn;
     }

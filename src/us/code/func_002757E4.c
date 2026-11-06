@@ -1,8 +1,8 @@
 #include "common.h"
 
-s32 func_00271904(s32 *, s32);              /* extern */
+s32 CAudioWorld__CountHandleVoices(s32 *, s32);              /* extern */
 extern s32 D_800F2A00;
 
-void func_002757E4(s32 arg0) {
-    func_00271904(&D_800F2A00, arg0);
+void Sound__IsPlaying(s32 arg0) {
+    CAudioWorld__CountHandleVoices(&D_800F2A00, arg0);
 }

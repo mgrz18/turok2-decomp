@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 
 extern float D_800A9C34;
-extern void func_00281C60(struct RecordRecAt18 *record, f32 first, f32 second, f32 third, f32 value, s32 mode, Triple triple);
-void func_00281C60(struct RecordRecAt18 *record, f32 first, f32 second, f32 third, f32 value, s32 mode,
+extern void CShake__Set(struct RecordRecAt18 *record, f32 first, f32 second, f32 third, f32 value, s32 mode, Triple triple);
+void CShake__Set(struct RecordRecAt18 *record, f32 first, f32 second, f32 third, f32 value, s32 mode,
                    Triple triple) {
     record->triple = triple;
     record->value = value;

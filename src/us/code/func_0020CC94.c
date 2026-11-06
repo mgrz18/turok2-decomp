@@ -19,7 +19,7 @@ extern float D_800A541C;
 extern float D_800A5414;
 extern float D_800A5484;
 extern float D_800A546C;
-void func_0020CC94(f32 *src, PackedMatrixWords *dst) {
+void CMtxF__ToMtx(f32 *src, PackedMatrixWords *dst) {
     u32 *upper = dst->upper;
     u32 *lower = dst->lower;
     f32 value;

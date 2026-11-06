@@ -5,7 +5,7 @@ extern char D_800B5AF4[];
 extern char D_800B5B10[];
 extern s32 D_8011AAD8;
 extern s32 D_8011AADC;
-s32 func_0041B9DC(MenuItem *item)
+s32 CheatMenu_FrootyStripesText(MenuItem *item)
 {
   s32 var_v0;
   int new_var;

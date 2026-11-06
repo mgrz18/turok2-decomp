@@ -5,9 +5,9 @@
 /* Picks the module object's idle anim for the current phase (0, 1; none in phase 2) from the AI's flags. */
 
 extern s32 D_801301CC; /* module state +0x65C: phase */
-extern s16 func_0026D518(Pick *table);
+extern s16 WeightedTable_PickStatic(Pick *table);
 
-s16 func_0040A170(void *obj, CAI *ai) {
+s16 MotherBoss_PickPhaseAnim(void *obj, CAI *ai) {
     Pick picks[8];
     s32 n = 0;
 
@@ -36,5 +36,5 @@ s16 func_0040A170(void *obj, CAI *ai) {
             break;
     }
     picks[n].id = -1;
-    return func_0026D518(picks);
+    return WeightedTable_PickStatic(picks);
 }

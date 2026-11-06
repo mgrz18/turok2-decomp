@@ -4,7 +4,7 @@
 f32 func_00298470(f32);         /* sqrtf */
 
 /* Clamps the vector length to arg1. */
-void func_0020F70C(CVector3 *arg0, f32 arg1) {
+void CVector3__LimitLength(CVector3 *arg0, f32 arg1) {
     f32 temp_f0;
     f32 temp_f0_2;
     f32 temp_f12;

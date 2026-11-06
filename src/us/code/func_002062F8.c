@@ -21,7 +21,7 @@ extern s32 D_800D8DAC;
 #define LAST_RESOURCE (((CMemEntry **) &D_800D81E0)[-2])
 
 /* Drops a resource from the lists and returns its slot to the free stack. */
-void func_002062F8(s32 arg0, CMemEntry *arg1) {
+void CCache__FreeMemEntry(s32 arg0, CMemEntry *arg1) {
     s32 *flags = &arg1->flags;
 
     CList__Remove((s32) &D_800D81E0.resident, (s32) arg1);

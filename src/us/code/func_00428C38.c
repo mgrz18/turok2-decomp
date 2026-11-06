@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_00428C38(u8 *valid, EntryRecAt3 *data) {
+void __osPfsGetInitData(u8 *valid, EntryRecAt3 *data) {
     extern char D_80130E20;
     extern u8 D_801213DC[];
     u8 *ptr;

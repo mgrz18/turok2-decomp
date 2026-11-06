@@ -6,21 +6,21 @@ typedef f32 Mtx4[4][4];
 
 extern f32 D_800DD78C;
 
-f32 func_0026BE60(void *region, f32 x, f32 z);
-f32 func_002672C8(CGameObjectInstance *collider);
-f32 func_002671B4(CGameObjectInstance *collider);
-f32 func_0026872C(CGameObjectInstance *mover, s32 arg1);
+f32 CGameRegion__GetHeight(void *region, f32 x, f32 z);
+f32 GameObject_GetCollisionRadius(CGameObjectInstance *collider);
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *collider);
+f32 GameObject_GetRegionFloorHeight(CGameObjectInstance *mover, s32 arg1);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-void func_00210518(Mtx4 *mtx, f32 angle);
-void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);
-void func_00211114(CQuaternion *q, Mtx4 *mtx);
-void func_0020C618(Mtx4 *out, Mtx4 *a, Mtx4 *b);
-void func_00210318(Mtx4 *mtx, f32 x, f32 y, f32 z);
-void func_0020F908(Mtx4 *mtx, CVector3 *in, CVector3 *out, s32 count);
+void CMtxF__SetRotateX(Mtx4 *mtx, f32 angle);
+void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);
+void CQuaternion__ToMatrix(CQuaternion *q, Mtx4 *mtx);
+void CMtxF__MultiplyAffine(Mtx4 *out, Mtx4 *a, Mtx4 *b);
+void CMtxF__Translate(Mtx4 *mtx, f32 x, f32 y, f32 z);
+void CMtxF__TransformPoints(Mtx4 *mtx, CVector3 *in, CVector3 *out, s32 count);
 
 /* The eight corners of the mover's collision box (top face first), in world space. */
-void func_00241960(CGameObjectInstance *mover, CVector3 *points, CGameObjectInstance *collider) {
+void Platform_GetCollisionBox(CGameObjectInstance *mover, CVector3 *points, CGameObjectInstance *collider) {
     Mtx4 mtx;
     Mtx4 rot;
     Mtx4 spinMtx;
@@ -44,7 +44,7 @@ void func_00241960(CGameObjectInstance *mover, CVector3 *points, CGameObjectInst
         x = mover->header.m_vPos.x;
         minX = x + -10240.0f;
         maxX = x + 10240.0f;
-        top = func_0026BE60(mover->header.m_pCurrentRegion, x, mover->header.m_vPos.z) + 0.001f;
+        top = CGameRegion__GetHeight(mover->header.m_pCurrentRegion, x, mover->header.m_vPos.z) + 0.001f;
         z = mover->header.m_vPos.z;
         minZ = z + -10240.0f;
         maxZ = z + 10240.0f;
@@ -78,19 +78,19 @@ void func_00241960(CGameObjectInstance *mover, CVector3 *points, CGameObjectInst
             halfZ = info->m_CollisionLength * 0.5f;
             if (collider != NULL) {
                 if (collider->m_dwFlags & 0x300000) {
-                    halfX += func_002672C8(collider) * 0.5f;
-                    bottomOff = -func_002671B4(collider);
-                    halfZ += func_002672C8(collider) * 0.5f;
+                    halfX += GameObject_GetCollisionRadius(collider) * 0.5f;
+                    bottomOff = -GameObject_GetCollisionHeight(collider);
+                    halfZ += GameObject_GetCollisionRadius(collider) * 0.5f;
                 } else {
-                    halfX += func_002672C8(collider);
-                    bottomOff = -func_002671B4(collider);
-                    halfZ += func_002672C8(collider);
+                    halfX += GameObject_GetCollisionRadius(collider);
+                    bottomOff = -GameObject_GetCollisionHeight(collider);
+                    halfZ += GameObject_GetCollisionRadius(collider);
                 }
             }
             break;
         case 1:
             if (collider != NULL) {
-                halfZ = info->m_CollisionRadius + func_002672C8(collider);
+                halfZ = info->m_CollisionRadius + GameObject_GetCollisionRadius(collider);
             } else {
                 halfZ = info->m_CollisionRadius;
             }
@@ -131,22 +131,22 @@ void func_00241960(CGameObjectInstance *mover, CVector3 *points, CGameObjectInst
         points[6].z = minZ;
         points[7].z = minZ;
 
-        func_00210518(&rot, ai->m_Platform.m_Pitch);
+        CMtxF__SetRotateX(&rot, ai->m_Platform.m_Pitch);
         sinHalf = func_002982F0(mover->m_RotY * 0.5f);
         q.x = 0.0f;
         q.y = sinHalf;
         q.z = 0.0f;
         D_800DD78C = sinHalf;
         q.w = func_002974C0(mover->m_RotY * 0.5f);
-        func_00210F68(&spin, &q, &mover->m_qGround);
-        func_00211114(&spin, &spinMtx);
-        func_0020C618(&mtx, &rot, &spinMtx);
-        func_00210318(&mtx, mover->header.m_vPos.x, mover->header.m_vPos.y, mover->header.m_vPos.z);
-        func_0020F908(&mtx, points, points, 8);
+        CQuaternion__Multiply(&spin, &q, &mover->m_qGround);
+        CQuaternion__ToMatrix(&spin, &spinMtx);
+        CMtxF__MultiplyAffine(&mtx, &rot, &spinMtx);
+        CMtxF__Translate(&mtx, mover->header.m_vPos.x, mover->header.m_vPos.y, mover->header.m_vPos.z);
+        CMtxF__TransformPoints(&mtx, points, points, 8);
         if (!(info->m_dwFlags & 1)) {
             return;
         }
-        bottom = func_0026872C(mover, 0);
+        bottom = GameObject_GetRegionFloorHeight(mover, 0);
     }
     points[4].y = bottom;
     points[5].y = bottom;

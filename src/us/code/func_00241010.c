@@ -26,17 +26,17 @@ typedef struct {
 extern CCollisionResults *D_800F1ADC;
 extern u8 D_800F7078[];
 
-void func_00266C5C(void *p, s32 c, s32 n);                 /* memset */
-s32 func_0023C188(Sweep *sweep, CGameRegion *region);
-void func_0026BC54(CVector3 *normal, CGameRegion *region);        /* floor plane */
-void func_0026BFB4(CVector3 *normal, CGameRegion *region);        /* ceiling plane */
-s32 func_0026AFC0(CGameRegion *region);
-Water *func_0022425C(u8 *scene, CGameRegion *region);
-f32 func_002671B4(CGameObjectInstance *inst);                       /* height */
-void func_0020EF2C(CVector3 *out, void *a, CVector3 *b);        /* out = a - b */
-void func_0020EF8C(CVector3 *out, f32 t, CVector3 *base, CVector3 *dir);   /* out = base + t * dir */
-CGameRegion *func_0023B664(Sweep *sweep, CGameRegion *region, s32 edge, CVector3 *point);
-s32 func_0023AB18(Sweep *sweep, CVector3 *normal, void *point, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
+void memset(void *p, s32 c, s32 n);                 /* memset */
+s32 Sweep_GetGroundBehavior(Sweep *sweep, CGameRegion *region);
+void CGameRegion__GetNormalRaw(CVector3 *normal, CGameRegion *region);        /* floor plane */
+void CGameRegion__GetCeilingNormalRaw(CVector3 *normal, CGameRegion *region);        /* ceiling plane */
+s32 CGameRegion__IsSteep(CGameRegion *region);
+Water *CScene__GetRegionInfo(u8 *scene, CGameRegion *region);
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *inst);                       /* height */
+void CVector3__Subtract(CVector3 *out, void *a, CVector3 *b);        /* out = a - b */
+void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *base, CVector3 *dir);   /* out = base + t * dir */
+CGameRegion *Sweep_CrossRegionEdge(Sweep *sweep, CGameRegion *region, s32 edge, CVector3 *point);
+s32 Sweep_HitPlane(Sweep *sweep, CVector3 *normal, void *point, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
 
 static __inline__ f32 Dot(CVector3 *a, CVector3 *b) {
     return a->x * b->x + a->y * b->y + a->z * b->z;
@@ -45,7 +45,7 @@ static __inline__ f32 Dot(CVector3 *a, CVector3 *b) {
 /* Walk a sweep through the map's regions: in each, find where it leaves
  * through the floor, the ceiling, the water surface or an edge, record the
  * nearest hit, or cross the edge into the next region (100 at most). */
-void func_00241010(Sweep *sweep) {
+void Collision_SweepRegions(Sweep *sweep) {
     CVector3 edgeN;
     CVector3 floorN;
     CVector3 ceilN;
@@ -78,7 +78,7 @@ void func_00241010(Sweep *sweep) {
     s32 kind;
     s32 v;
 
-    func_00266C5C(&surface, 0, sizeof(surface));
+    memset(&surface, 0, sizeof(surface));
     if ((sweep->def->m_dwFlags & 0x1000000) || sweep->inst->m_pCurrentRegion == NULL || sweep->def->m_WallBehavior == 0) {
         return;
     }
@@ -90,15 +90,15 @@ void func_00241010(Sweep *sweep) {
     do {
         floorT = 1.0f;
         if (sweep->checkRegionInfo != 0) {
-            v = func_0023C188(sweep, sweep->inst->m_pCurrentRegion);
+            v = Sweep_GetGroundBehavior(sweep, sweep->inst->m_pCurrentRegion);
         } else {
             v = sweep->def->m_GroundBehavior;
         }
         if (sweep->onGround == 0 && v != 0) {
-            func_0026BC54(&floorN, *regionp);
+            CGameRegion__GetNormalRaw(&floorN, *regionp);
             d = floorN.x * sweep->delta.x + floorN.y * sweep->delta.y + floorN.z * sweep->delta.z;
             if (d < 0.0f) {
-                func_0020EF2C(&rel, (*regionp)->m_pVertices[0], pos);
+                CVector3__Subtract(&rel, (*regionp)->m_pVertices[0], pos);
                 num = Dot(&floorN, &rel);
                 floorT = num / d;
                 if (floorT < best) {
@@ -108,19 +108,19 @@ void func_00241010(Sweep *sweep) {
         }
         ceilT = 1.0f;
         if (sweep->def->m_GroundBehavior != 0 && ((*regionp)->m_wFlags & 0x40)) {
-            func_0026BFB4(&ceilN, *regionp);
+            CGameRegion__GetCeilingNormalRaw(&ceilN, *regionp);
             d = ceilN.x * sweep->delta.x + ceilN.y * sweep->delta.y + ceilN.z * sweep->delta.z;
             if (d < 0.0f) {
                 ceilPt.x = (*regionp)->m_pVertices[0]->x;
                 ceilPt.y = REGION_CORNER(*regionp, 0)->ceiling;
                 if (sweep->def->m_dwFlags & 0x400000) {
-                    ceilPt.y -= func_002671B4(sweep->obj);
+                    ceilPt.y -= GameObject_GetCollisionHeight(sweep->obj);
                     if (sweep->def->m_dwFlags & 0x80) {
                         ceilPt.y += 44.032f;
                     }
                 }
                 ceilPt.z = (*regionp)->m_pVertices[0]->z;
-                func_0020EF2C(&rel, &ceilPt, pos);
+                CVector3__Subtract(&rel, &ceilPt, pos);
                 num = Dot(&ceilN, &rel);
                 ceilT = num / d;
                 if (ceilT < best) {
@@ -129,7 +129,7 @@ void func_00241010(Sweep *sweep) {
             }
         }
         waterT = 1.0f;
-        water = func_0022425C(D_800F7078, *regionp);
+        water = CScene__GetRegionInfo(D_800F7078, *regionp);
         if (((*regionp)->m_wFlags & 1) && (sweep->def->m_dwFlags & 8) && D_800F1ADC->m_pWaterRegion == 0 && water != NULL
             && sweep->delta.y != 0.0f) {
             waterT = (water->level - pos->y) / sweep->delta.y;
@@ -161,7 +161,7 @@ void func_00241010(Sweep *sweep) {
         } while (i < 3);
         if (waterT <= best && waterT < sweep->hit.fraction) {
             surface.y = water->level;
-            if (func_0023AB18(sweep, (pos->y >= water->level) ? &up : &down, &surface, 1, 7, 0.0f, 1)) {
+            if (Sweep_HitPlane(sweep, (pos->y >= water->level) ? &up : &down, &surface, 1, 7, 0.0f, 1)) {
                 if (water->flags & 0x400000) {
                     kind = 7;
                 } else if (water->flags52 & 0x80) {
@@ -178,12 +178,12 @@ void func_00241010(Sweep *sweep) {
             }
         }
         if (floorT <= best && floorT < sweep->hit.fraction) {
-            if (func_0026AFC0(*regionp) == 0) {
+            if (CGameRegion__IsSteep(*regionp) == 0) {
                 arg = sweep->def->m_GroundFriction;
             } else {
                 arg = 0.0f;
             }
-            if (func_0023AB18(sweep, &floorN, (*regionp)->m_pVertices[0], 0, sweep->def->m_GroundBehavior, arg, 1)) {
+            if (Sweep_HitPlane(sweep, &floorN, (*regionp)->m_pVertices[0], 0, sweep->def->m_GroundBehavior, arg, 1)) {
                 sweep->hit.kind = 1;
                 sweep->hit.dataOut = 0;
                 sweep->hit.data = 0;
@@ -196,7 +196,7 @@ void func_00241010(Sweep *sweep) {
             }
         }
         if (ceilT <= best && ceilT < sweep->hit.fraction) {
-            if (func_0023AB18(sweep, &ceilN, &ceilPt, 0, sweep->def->m_WallBehavior, 0.0f, 1)) {
+            if (Sweep_HitPlane(sweep, &ceilN, &ceilPt, 0, sweep->def->m_WallBehavior, 0.0f, 1)) {
                 sweep->hit.kind = 2;
                 sweep->hit.dataOut = 0;
                 sweep->hit.data = 0;
@@ -211,11 +211,11 @@ void func_00241010(Sweep *sweep) {
         if (!(best < sweep->hit.fraction)) {
             return;
         }
-        func_0020EF8C(&at, best, pos, &sweep->end);
-        next = func_0023B664(sweep, *regionp, edge, &at);
+        CVector3__Lerp(&at, best, pos, &sweep->end);
+        next = Sweep_CrossRegionEdge(sweep, *regionp, edge, &at);
         if (next == NULL || sweep->onGround != 0 || ((sweep->def->m_dwFlags & 0x8000) && (next->m_wFlags & 8))) {
             edgeN.y = 0.0f;
-            if (func_0023AB18(sweep, &edgeN, (*regionp)->m_pVertices[edge], 0, (next != NULL) ? 7 : sweep->def->m_WallBehavior, 0.0f, 1)) {
+            if (Sweep_HitPlane(sweep, &edgeN, (*regionp)->m_pVertices[edge], 0, (next != NULL) ? 7 : sweep->def->m_WallBehavior, 0.0f, 1)) {
                 if (next != NULL) {
                     *regionp = next;
                     sweep->hit.posOut = NULL;

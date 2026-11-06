@@ -4,12 +4,12 @@
 
 extern s32 D_800C1BD0;       /* current draw mode */
 
-s32 func_00253748(u8 *player, s32 type);
-void func_00279028(s32 alpha);
-void func_0027B320(s32 image, s32 frame, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 arg6);
+s32 CPlayer__GetPickupCountHigh(u8 *player, s32 type);
+void Hud_SetupTextureMode(s32 alpha);
+void Hud_DrawSprite(s32 image, s32 frame, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 arg6);
 
 /* Draws an inventory item's icon, full colour when the player has it, greyed out otherwise. */
-void func_00424780(MenuItem *item, MenuItemLayout *box, s32 unused, Menu *window) {
+void InventoryMenu_DrawItem(MenuItem *item, MenuItemLayout *box, s32 unused, Menu *window) {
     s32 type = item->def->param;
     s32 index = item->def->index;
     u8 *player = window->player;
@@ -17,7 +17,7 @@ void func_00424780(MenuItem *item, MenuItemLayout *box, s32 unused, Menu *window
 
     switch (type) {
         default:
-            owned = index < func_00253748(player, type);
+            owned = index < CPlayer__GetPickupCountHigh(player, type);
             break;
         case 0x10FE:
             if (index >= 0) {
@@ -41,7 +41,7 @@ void func_00424780(MenuItem *item, MenuItemLayout *box, s32 unused, Menu *window
     }
     if (D_800C1BD0 != 0x14) {
         D_800C1BD0 = 0x14;
-        func_00279028((s32) (window->fade * (window->alpha * 255.0f)));
+        Hud_SetupTextureMode((s32) (window->fade * (window->alpha * 255.0f)));
     }
     {
         Gfx *g = D_800D8E24++;
@@ -62,5 +62,5 @@ void func_00424780(MenuItem *item, MenuItemLayout *box, s32 unused, Menu *window
         g->w0 = 0xFB000000;
         g->w1 = ((s32) (window->fade * (window->alpha * 255.0f)) & 0xFF) | 0x32323200;
     }
-    func_0027B320(item->image, 0, (s16) box->left, (s16) box->top, box->scaleX, box->scaleY, 1);
+    Hud_DrawSprite(item->image, 0, (s16) box->left, (s16) box->top, box->scaleX, box->scaleY, 1);
 }

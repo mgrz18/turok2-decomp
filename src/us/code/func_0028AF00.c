@@ -14,7 +14,7 @@ typedef struct {
 s32 osSetIntMask(s32);                              /* extern */
 
 /* Pushes arg1 (holding arg2) on arg0's list with interrupts masked. */
-void func_0028AF00(PendingOwner *arg0, PendingNode *arg1, s32 arg2) {
+void osScAddClient(PendingOwner *arg0, PendingNode *arg1, s32 arg2) {
     s32 temp_v0;
 
     temp_v0 = osSetIntMask(1);

@@ -10,17 +10,17 @@
 extern Gfx *D_800D8E24;             /* display list head */
 extern u8 D_8011B0C8[];             /* the matrix loaded for them */
 
-void func_00207FEC(s32 mode);
-void func_00226F90(void *items, s32 count, s32 size, void *compare, void *swap);
-s32 func_00283784(void *a, void *b);
-s32 func_002837B0(void *a, void *b);
-void func_00283770(void *a, void *b);
-void func_00282340(CEmitter *e, CCamera *view);
+void Render_SetRenderMode(s32 mode);
+void Sort_Quick(void *items, s32 count, s32 size, void *compare, void *swap);
+s32 Emitter_CompareHeightDesc(void *a, void *b);
+s32 Emitter_CompareHeightAsc(void *a, void *b);
+void Emitter_SwapPointers(void *a, void *b);
+void CEmitter__Draw(CEmitter *e, CCamera *view);
 
 /* Draws the running emitters: sets up the display list, splits them into
  * those deeper than the view and the others (four of each at most), sorts
  * each group and draws the deeper group first. */
-void func_00283238(CEmitterPool *owner, CCamera *view) {
+void CEmitterPool__Draw(CEmitterPool *owner, CCamera *view) {
     CEmitter *near[4];
     CEmitter *far[4];
     CEmitter *e;
@@ -39,7 +39,7 @@ void func_00283238(CEmitterPool *owner, CCamera *view) {
     GFX_CMD(0xDB04001C, 0xFFFE)
     GFX_CMD(0xD9FEFFFF, 0)
     GFX_CMD(0xE3000A01, 0)
-    func_00207FEC(0xD);
+    Render_SetRenderMode(0xD);
     GFX_CMD(0xD9F9FBFF, 0)
     GFX_CMD(0xD9FFFFFF, 0x200004)
     GFX_CMD(0xE3000C00, 0x80000)
@@ -53,12 +53,12 @@ void func_00283238(CEmitterPool *owner, CCamera *view) {
             far[farCount++] = e;
         }
     }
-    func_00226F90(near, nearCount, 4, func_00283784, func_00283770);
-    func_00226F90(far, farCount, 4, func_002837B0, func_00283770);
+    Sort_Quick(near, nearCount, 4, Emitter_CompareHeightDesc, Emitter_SwapPointers);
+    Sort_Quick(far, farCount, 4, Emitter_CompareHeightAsc, Emitter_SwapPointers);
     for (i = 0; i < nearCount; i++) {
-        func_00282340(near[i], view);
+        CEmitter__Draw(near[i], view);
     }
     for (i = 0; i < farCount; i++) {
-        func_00282340(far[i], view);
+        CEmitter__Draw(far[i], view);
     }
 }

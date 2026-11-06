@@ -4,7 +4,7 @@
 f32 func_00298470(f32);         /* sqrtf */
 
 /* Normalises the vector (left alone if zero). */
-void func_0020F040(CVector3 *arg0) {
+void CVector3__Normalize(CVector3 *arg0) {
     f32 temp_f0;
     f32 temp_f0_2;
     f32 temp_f12;

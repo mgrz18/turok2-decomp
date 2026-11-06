@@ -10,7 +10,7 @@ extern void __osRestoreInt(u32 mask);
 extern void __osDequeueThread(OSThread **queue, OSThread *t);
 extern void __osEnqueueThread(OSThread **queue, OSThread *t);
 extern void __osEnqueueAndYield(OSThread **queue);
-void func_0029B9B0(OSThread *t, s32 pri)
+void osSetThreadPri(OSThread *t, s32 pri)
 {
     register u32 saveMask;
     OSThread **runQueue;

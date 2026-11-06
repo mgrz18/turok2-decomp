@@ -17,7 +17,7 @@ typedef struct {
     /* 0x10 */ HeapBlock *first;
 } Heap;
 
-void func_00202474(Heap *heap, u8 *start, s32 size) {
+void CHeap__Construct(Heap *heap, u8 *start, s32 size) {
     u8 *end = start + size;
     HeapBlock *block = (HeapBlock *)(((u32)start + 15) & ~15);
 

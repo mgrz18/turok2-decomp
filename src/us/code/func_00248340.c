@@ -4,9 +4,9 @@
 #include "structs/controller.h"
 
 
-void func_002470E8(void *controls, void *settings);
-f32 func_00253CFC(CPlayer *player);
-void func_0024E5F0(CPlayer *player, CPlayer *arg1, s32 arg2);
+void CPlayerContState__Init(void *controls, void *settings);
+f32 Actor_GetEyeHeight(CPlayer *player);
+void CPlayer__SetState(CPlayer *player, CPlayer *arg1, s32 arg2);
 
 /* The ROM clears the float fields with integer stores (sw $zero): a 0.0f
  * store keeps the constant in a register instead. */
@@ -19,10 +19,10 @@ static __inline__ void setVec3(CVector3 *v, f32 x, f32 y, f32 z) {
 }
 
 /* Resets a player's movement, camera and crosshair state. */
-void func_00248340(CPlayer *p) {
+void CPlayer__Reset(CPlayer *p) {
     f32 zero;
 
-    func_002470E8(&p->m_ContState, &D_800F5EC0[p->m_nController]);
+    CPlayerContState__Init(&p->m_ContState, &D_800F5EC0[p->m_nController]);
     CLEAR_WORD(p->m_Speed);
     CLEAR_WORD(p->m_SideSpeed);
     CLEAR_WORD(p->m_TotalSpeed);
@@ -46,7 +46,7 @@ void func_00248340(CPlayer *p) {
     CLEAR_WORD(p->m_vHeadWobbleRotOffset.y);
     CLEAR_WORD(p->m_vHeadWobbleRotOffset.z);
     CLEAR_WORD(p->m_vEyeOffset.x);
-    p->m_vEyeOffset.y = func_00253CFC(p);
+    p->m_vEyeOffset.y = Actor_GetEyeHeight(p);
     CLEAR_WORD(p->m_vEyeOffset.z);
     setVec3((CVector3 *) &p->m_qGround, 0.0f, 0.0f, 0.0f);
     CLEAR_WORD(p->m_ActualCameraVertEyeOffset);
@@ -83,7 +83,7 @@ void func_00248340(CPlayer *p) {
     p->m_vSightVel.x = zero;
     p->m_vSightVel.y = zero;
     p->m_vSightVel.z = zero;
-    func_0024E5F0(p, p, 2);
+    CPlayer__SetState(p, p, 2);
     p->m_pOnEnemy = NULL;
     p->m_RideEnemyTime = zero;
     p->m_OnEnemyStompTime = zero;

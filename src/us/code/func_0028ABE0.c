@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_0028ABE0(struct Ctx_func_8028F544_de *, struct Node_func_8028F544_de **, struct Node_func_8028F544_de **, s32);
-extern void *func_0029A6E0();
+extern s32 __scSchedule(struct Ctx_func_8028F544_de *, struct Node_func_8028F544_de **, struct Node_func_8028F544_de **, s32);
+extern void *osViGetCurrentFramebuffer();
 extern s32 D_8011B098;
 extern s32 D_8011B0A0;
-s32 func_0028ABE0(Ctx_func_8028F544_de *arg0, Node_func_8028F544_de **arg1, Node_func_8028F544_de **arg2, s32 arg3) {
+s32 __scSchedule(Ctx_func_8028F544_de *arg0, Node_func_8028F544_de **arg1, Node_func_8028F544_de **arg2, s32 arg3) {
     Node_func_8028F544_de *temp_s0;
     Node_func_8028F544_de *temp_v1_0;
     Node_func_8028F544_de *temp_v0;
@@ -39,7 +39,7 @@ s32 func_0028ABE0(Ctx_func_8028F544_de *arg0, Node_func_8028F544_de **arg1, Node
             var_v1 = 0;
         } else if (temp_s0->unkC == D_8011B0A0) {
             var_v1 = 0;
-        } else if (temp_s0->unkC == func_0029A6E0()) {
+        } else if (temp_s0->unkC == osViGetCurrentFramebuffer()) {
             var_v1 = 0;
         } else if (temp_s0->unkC == D_8011B098) {
             var_v1 = 0;
@@ -99,7 +99,7 @@ s32 func_0028ABE0(Ctx_func_8028F544_de *arg0, Node_func_8028F544_de **arg1, Node
         }
     }
     if (var_s1 != temp_s5) {
-        var_s1 = func_0028ABE0(arg0, arg1, arg2, var_s1);
+        var_s1 = __scSchedule(arg0, arg1, arg2, var_s1);
     }
     return var_s1;
 }

@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-s32 func_002026EC(Pool80255ACC *arg0, char *arg1) {
+s32 CHeap__Free(Pool80255ACC *arg0, char *arg1) {
     Block80255720 *block;
     Block80255720 *header;
     Block80255720 *other;

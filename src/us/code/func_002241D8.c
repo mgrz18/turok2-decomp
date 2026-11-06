@@ -37,17 +37,17 @@ struct Object_func_8028B274_de;
 typedef struct Object_func_8028B274_de Object_func_8028B274_de;
 struct BankRecAt94;
 struct Object_func_8028B274_de;
-extern void func_002241D8(struct BankRecAt94 *, struct Object_func_8028B274_de *, s32, s32);
-extern void func_0021A150(Object_func_8028B274_de *,s32,s32,s32);
+extern void CScene__SetInstanceObjectType(struct BankRecAt94 *, struct Object_func_8028B274_de *, s32, s32);
+extern void CGameObjectInstance__SetupAnimation(Object_func_8028B274_de *,s32,s32,s32);
 static __inline__ s32 find(TableRecAt8 *table,u16 id) {
  s32 index=0,count; u16 *entry;entry=table->entries;count=table->count;
  if(count>0) { do {if(*entry==id) return index; index++;entry++;} while(index<count); }
  return -1;
 }
-void func_002241D8(BankRecAt94 *arg0,Object_func_8028B274_de *arg1,s32 arg2,s32 arg3) {
+void CScene__SetInstanceObjectType(BankRecAt94 *arg0,Object_func_8028B274_de *arg1,s32 arg2,s32 arg3) {
  s32 index=0;
  if(arg1->id!=arg2) {
  index=find(arg0->table,arg2);
- if(index!=-1){arg1->index=index;arg1->id=arg2;func_0021A150(arg1,arg0->field40,arg0->field14,arg3);}
+ if(index!=-1){arg1->index=index;arg1->id=arg2;CGameObjectInstance__SetupAnimation(arg1,arg0->field40,arg0->field14,arg3);}
  }
 }

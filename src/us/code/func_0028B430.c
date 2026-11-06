@@ -21,7 +21,7 @@ static __inline__ void newline(void) {
 }
 
 /* Debug console: draws one character at the cursor and advances it. */
-void func_0028B430(s32 c) {
+void Crash_PutChar(s32 c) {
     s32 row;
     s32 col;
     s32 width;

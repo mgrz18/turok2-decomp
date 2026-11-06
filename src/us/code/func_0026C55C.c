@@ -5,10 +5,10 @@ typedef struct {
     /* 0x2 */ u16 flags;
 } Entry;
 
-extern s32 func_0026C8B0(void *, u16);
+extern s32 CGameRegion__FloodSetFlag4Same(void *, u16);
 
-void func_0026C55C(Entry *arg0) {
+void CGameRegion__FloodSetFlag4(Entry *arg0) {
     if ((arg0 != NULL) && (arg0->flags & 2)) {
-        func_0026C8B0(arg0, arg0->id);
+        CGameRegion__FloodSetFlag4Same(arg0, arg0->id);
     }
 }

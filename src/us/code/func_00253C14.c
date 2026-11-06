@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-/* func_00253AC0, inlined. */
+/* CPlayer__GetMaxAmmo, inlined. */
 static __inline__ s32 GetMaxAmmo(CPlayer *player, s32 type, s32 heldOnly) {
     s32 max;
     s32 w;
@@ -42,12 +42,12 @@ typedef struct {
     /* 0x0C */ s16 ammoType;
 } PickupInfo;
 
-extern PickupInfo *func_0023EF64(s32);
+extern PickupInfo *Pickup_FindAmmoEntry(s32);
 
 /* Whether the player has room for more of a pickup ammo, counting only the
  * weapons held. */
-s32 func_00253C14(CPlayer *player, s32 pickup) {
-    PickupInfo *info = func_0023EF64(pickup);
+s32 CPlayer__HasRoomForAmmo(CPlayer *player, s32 pickup) {
+    PickupInfo *info = Pickup_FindAmmoEntry(pickup);
     s32 type;
     s16 *ammo;
 

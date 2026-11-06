@@ -4,7 +4,7 @@
 f32 func_00298470(f32);
 
 /* Normalises a quaternion. */
-void func_00211074(CQuaternion *arg0) {
+void CQuaternion__Normalize(CQuaternion *arg0) {
     f32 temp_f0;
     f32 temp_f0_2;
     f32 temp_f12;

@@ -8,13 +8,13 @@ extern s32 D_800C2034;      /* screen height */
 extern s32 D_80130A78;      /* z-buffer */
 extern s32 D_801101B0[2];
 
-extern void func_00207FEC(s32 mode);
-extern void func_00277F6C(void);
-extern void func_0027836C();
+extern void Render_SetRenderMode(s32 mode);
+extern void COnScreen__BeginText(void);
+extern void COnScreen__SelectSmallFont();
 extern void COnScreen__SetFontScale(f32 x, f32 y);
-extern s32 func_00278CDC(char *text, s32 x, s32 y, s32 alpha, s32, s32, f32, f32);
+extern s32 COnScreen__DrawString(char *text, s32 x, s32 y, s32 alpha, s32, s32, f32, f32);
 
-/* func_0028852C: fills a rectangle of the z-buffer, then points the color image back at the frame. */
+/* CEngineApp__ClearDepthRect: fills a rectangle of the z-buffer, then points the color image back at the frame. */
 static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) {
     s32 colorImage;
 
@@ -23,7 +23,7 @@ static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) 
         g->w0 = 0xE7000000;     /* gDPPipeSync */
         g->w1 = 0;
     }
-    func_00207FEC(0x14);
+    Render_SetRenderMode(0x14);
     colorImage = 0xFF100000 | ((D_800C2030 - 1) & 0xFFF);
     {
         Gfx *g = D_800D8E24++;
@@ -68,7 +68,7 @@ static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) 
 }
 
 /* Draws a NULL-terminated list of scaled strings, over a cleared screen if asked. */
-void func_00286E14(void *state, s32 drawBackdrop, char **lines, s32 x, s32 y, s32 lineStep, f32 scaleX, f32 scaleY) {
+void Render_DrawTextLines(void *state, s32 drawBackdrop, char **lines, s32 x, s32 y, s32 lineStep, f32 scaleX, f32 scaleY) {
     CFrameData *task = D_800F6CB0.m_pCurrentFrameData;
     char *text;
     s32 i;
@@ -112,8 +112,8 @@ void func_00286E14(void *state, s32 drawBackdrop, char **lines, s32 x, s32 y, s3
             g->w1 = 0;
         }
     }
-    func_00277F6C();
-    func_0027836C();
+    COnScreen__BeginText();
+    COnScreen__SelectSmallFont();
     scaleX = scaleX * D_800C2030 * (1.0f / 284.0f);
     scaleY = scaleY * D_800C2034 * (1.0f / 222.0f);
     scaleX *= (D_800C2034 >= 0xDF) ? 0.8f : 0.85f;
@@ -123,7 +123,7 @@ void func_00286E14(void *state, s32 drawBackdrop, char **lines, s32 x, s32 y, s3
     D_801101B0[1] = 1;
     for (i = 0; lines[i] != NULL; i++) {
         text = lines[i];
-        func_00278CDC(text, x, y, 0xFF, 1, 1, 1.0f, 1.0f);
+        COnScreen__DrawString(text, x, y, 0xFF, 1, 1, 1.0f, 1.0f);
         y = y + lineStep * scaleY;
     }
 }

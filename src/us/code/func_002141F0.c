@@ -41,13 +41,13 @@ extern s32 D_800ACAF0;
 extern s32 D_800B6D00;
 extern u8 D_800B6D1B;
 
-void *func_00225E88(void *, s32);
-void func_002105A4(f32 *mtx, f32 angle);
-void func_0021034C(f32 *mtx, f32 x, f32 y, f32 z);
-void func_00210318(f32 *mtx, f32 x, f32 y, f32 z);
-void func_00210C3C(f32 *mtx);
-void func_0020FF80(f32 *dst, f32 *src);
-void func_0020D274(f32 *src, f32 *dst);
+void *CScene__GetIntelligence(void *, s32);
+void CMtxF__SetRotateY(f32 *mtx, f32 angle);
+void CMtxF__ScaleAxes(f32 *mtx, f32 x, f32 y, f32 z);
+void CMtxF__Translate(f32 *mtx, f32 x, f32 y, f32 z);
+void CMtxF__SwapYZRows(f32 *mtx);
+void CMtxF__Copy(f32 *dst, f32 *src);
+void CMtxF__ToMtxAffine(f32 *src, f32 *dst);
 
 #define PI 3.141593f
 
@@ -62,7 +62,7 @@ static __inline__ s32 nextColorKey(void) {
     return D_800ACAF0;
 }
 
-void func_002141F0(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *segments, f32 scale) {
+void CStaticObject__ConstructCompact(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *segments, f32 scale) {
     f32 matrix[16];
     CVector3 pos;
     f32 angle;
@@ -72,7 +72,7 @@ void func_002141F0(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *se
     prop->id = record->id;
     prop->owner = owner;
     prop->unk1C = 0;
-    prop->model = func_00225E88(D_800F7078, record->model);
+    prop->model = CScene__GetIntelligence(D_800F7078, record->model);
     pos.x = record->x * scale;
     if (record->bits & 0x10) {
         pos.x = -pos.x;
@@ -96,10 +96,10 @@ void func_002141F0(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *se
             break;
     }
     prop->flags = record->flags;
-    func_002105A4(matrix, angle);
-    func_0021034C(matrix, record->scale, record->scale, record->scale);
-    func_00210318(matrix, pos.x, pos.y, pos.z);
-    func_00210C3C(matrix);
+    CMtxF__SetRotateY(matrix, angle);
+    CMtxF__ScaleAxes(matrix, record->scale, record->scale, record->scale);
+    CMtxF__Translate(matrix, pos.x, pos.y, pos.z);
+    CMtxF__SwapYZRows(matrix);
     if (prop->flags & 0x40) {
         prop->min.x = pos.x - 102.399994f;
         prop->min.y = pos.y - 102.399994f;
@@ -107,7 +107,7 @@ void func_002141F0(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *se
         prop->max.x = pos.x + 102.399994f;
         prop->max.y = pos.y + 102.399994f;
         prop->max.z = pos.z + 102.399994f;
-        func_0020FF80(prop->matrix, matrix);
+        CMtxF__Copy(prop->matrix, matrix);
         prop->value = D_800B6D00;
     } else {
         prop->min.x = pos.x + record->extents[0] * 10.24f - 0.5f;
@@ -116,7 +116,7 @@ void func_002141F0(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *se
         prop->max.x = pos.x + record->extents[1] * 10.24f + 0.5f;
         prop->max.y = pos.y + record->extents[3] * 10.24f + 0.5f;
         prop->max.z = pos.z + record->extents[5] * 10.24f + 0.5f;
-        func_0020D274(matrix, prop->matrix);
+        CMtxF__ToMtxAffine(matrix, prop->matrix);
         prop->value = record->value;
     }
     prop->pos = pos;

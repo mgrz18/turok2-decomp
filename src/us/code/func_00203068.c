@@ -4,7 +4,7 @@
 #include "common.h"
 #include "structs/cache.h"
 
-extern s32 func_00203068(s32 unused0, s32 unused1, s32 keep_recent);
+extern s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent);
 extern CMemEntry *D_800D81E4;
 extern CMemEntry *D_800D81D8;
 extern CMemEntry **D_800D81D4;
@@ -13,8 +13,8 @@ extern s32 D_800D8DF0;
 extern char D_800D1CC0;
 extern char D_800D81E0;
 extern char D_800D81F4;
-extern void func_002065F8(void *, CMemEntry *);
-extern s32 func_002026EC(void *, s32);
+extern void CCache__DetachCacheEntry(void *, CMemEntry *);
+extern s32 CHeap__Free(void *, s32);
 extern void CList__Remove(void *, CMemEntry *);
 static __inline__ CMemEntry *find_stale(CMemEntry **recent) {
     CMemEntry *node;
@@ -34,7 +34,7 @@ static __inline__ CMemEntry *find_stale(CMemEntry **recent) {
     }
     return 0;
 }
-s32 func_00203068(s32 unused0, s32 unused1, s32 keep_recent) {
+s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent) {
     CMemEntry *recent;
     CMemEntry *node;
     s32 result;
@@ -46,8 +46,8 @@ s32 func_00203068(s32 unused0, s32 unused1, s32 keep_recent) {
         }
     }
     if (node != 0) {
-        func_002065F8(0, node);
-        result = func_002026EC(&D_800D1CC0, node->data);
+        CCache__DetachCacheEntry(0, node);
+        result = CHeap__Free(&D_800D1CC0, node->data);
         CList__Remove(&D_800D81E0, node);
         if (node->flags & 0x1000) {
             CList__Remove(&D_800D81F4, node);

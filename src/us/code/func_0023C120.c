@@ -3,7 +3,7 @@
 
 /* Writes a sweep's hit back where the test that took it asked: the object's
  * position and region, the kind and the data (see SweepHit). */
-void func_0023C120(SweepHit *out, CInstanceHeader *src) {
+void SweepHit_Store(SweepHit *out, CInstanceHeader *src) {
     if (out->posOut != NULL) {
         *out->posOut = src->m_vPos;
     }

@@ -7,9 +7,9 @@ typedef struct {
     /* 0x1C */ s32 owner;
 } CMutex;
 
-extern void func_0029B030(void *, void *, s32);     /* osCreateMesgQueue */
+extern void osCreateMesgQueue(void *, void *, s32);     /* osCreateMesgQueue */
 
 void CMutex__Construct(CMutex *arg0) {
     arg0->owner = 0;
-    func_0029B030(arg0, &arg0->msg, 1);
+    osCreateMesgQueue(arg0, &arg0->msg, 1);
 }

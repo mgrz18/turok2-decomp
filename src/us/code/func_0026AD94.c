@@ -5,10 +5,10 @@
 extern f32 D_800DD78C;
 
 f32 func_00298470(f32 x);   /* sqrtf */
-f32 func_0021153C(f32 x);   /* acosf */
+f32 Math_AcosLookup(f32 x);   /* acosf */
 f32 func_002982F0(f32 x);   /* sinf */
 f32 func_002974C0(f32 x);   /* cosf */
-void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);    /* quaternion product */
+void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);    /* quaternion product */
 
 /* Heading of tri's edge from vertex i to the next one, seen from above. */
 static __inline__ f32 edgeHeading(CGameRegion *tri, s32 i) {
@@ -22,7 +22,7 @@ static __inline__ f32 edgeHeading(CGameRegion *tri, s32 i) {
     if (len == 0.0f) {
         return 0.0f;
     }
-    angle = func_0021153C(dx / len);
+    angle = Math_AcosLookup(dx / len);
     if (!(dz < 0.0f)) {
         angle = -angle;
     }
@@ -30,7 +30,7 @@ static __inline__ f32 edgeHeading(CGameRegion *tri, s32 i) {
 }
 
 /* Orientation lying along tri's edge i: turned to its heading, then tipped a quarter turn. */
-CQuaternion func_0026AD94(CGameRegion *tri, s32 i) {
+CQuaternion CGameRegion__GetEdgeRotation(CGameRegion *tri, s32 i) {
     CQuaternion heading;
     CQuaternion tilt;
     CQuaternion result;
@@ -52,6 +52,6 @@ CQuaternion func_0026AD94(CGameRegion *tri, s32 i) {
     tilt.y = 0.0f;
     tilt.z = 0.0f;
     tilt.w = func_002974C0(half);
-    func_00210F68(&result, &tilt, &heading);
+    CQuaternion__Multiply(&result, &tilt, &heading);
     return result;
 }

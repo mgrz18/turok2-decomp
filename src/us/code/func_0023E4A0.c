@@ -6,16 +6,16 @@ extern CWorld D_800F7078;
 extern s32 D_800F7964;
 extern CCollisionInfo D_800F1C60;
 
-f32 func_002671B4(CGameObjectInstance *inst);
-f32 func_002672C8(CGameObjectInstance *inst);
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *inst);
+f32 GameObject_GetCollisionRadius(CGameObjectInstance *inst);
 f32 func_0026841C(CGameObjectInstance *inst);
-void func_0023DF70(Sweep *sweep, SweepBox *box, CGameObjectInstance *other);
+void Sweep_TestInstance(Sweep *sweep, SweepBox *box, CGameObjectInstance *other);
 
 #define MIN(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
 
 /* Sweep an instance's volume against every drawn instance it may hit. */
-void func_0023E4A0(Sweep *sweep) {
+void Collision_TestInstances(Sweep *sweep) {
     SweepBox box;
     SweepBox *b;
     CGameObjectInstance *inst;
@@ -34,10 +34,10 @@ void func_0023E4A0(Sweep *sweep) {
     inst = sweep->obj;
     count = D_800F7964; /* D_800F7078.drawCount */
     b = &box;
-    box.radius = func_002672C8(inst);
+    box.radius = GameObject_GetCollisionRadius(inst);
     b->flag = def->m_dwFlags & 0x100000;
     b->bottom = func_0026841C(inst);
-    b->top = b->bottom + func_002671B4(inst);
+    b->top = b->bottom + GameObject_GetCollisionHeight(inst);
     b->startBottom = inst->header.m_vPos.y + b->bottom;
     b->startTop = inst->header.m_vPos.y + b->top;
     b->endBottom = sweep->end.y + b->bottom;
@@ -68,6 +68,6 @@ void func_0023E4A0(Sweep *sweep) {
                 }
                 break;
         }
-        func_0023DF70(sweep, &box, other);
+        Sweep_TestInstance(sweep, &box, other);
     }
 }

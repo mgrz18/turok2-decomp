@@ -3,13 +3,13 @@
 #include "structs/collision.h"
 #include "structs/region.h"
 
-void func_00241960(CGameObjectInstance *mover, CVector3 *points, CGameObjectInstance *collider);
-void func_0023C9CC(CollisionQuad *quad, CVector3 *points);
-s32 func_0023C730(CollisionQuad *quad, f32 x, f32 z);
-f32 func_0023C8A0(CollisionQuad *quad, f32 x, f32 z);
+void Platform_GetCollisionBox(CGameObjectInstance *mover, CVector3 *points, CGameObjectInstance *collider);
+void Quad_SetBoxBottom(CollisionQuad *quad, CVector3 *points);
+s32 Quad_ContainsPointXZ(CollisionQuad *quad, f32 x, f32 z);
+f32 Quad_GetHeightAt(CollisionQuad *quad, f32 x, f32 z);
 
 /* Lands the collider on top of the box face of a mover when it is within reach. */
-void func_00241CB0(Sweep *ctrl, CGameObjectInstance *collider) {
+void Platform_LandOnTop(Sweep *ctrl, CGameObjectInstance *collider) {
     CGameObjectInstance *mover;
     CPlatformIntelligence *info;
     CVector3 points[8];
@@ -23,15 +23,15 @@ void func_00241CB0(Sweep *ctrl, CGameObjectInstance *collider) {
     if (info->m_CollisionType == 0 && collider->header.m_pCurrentRegion != NULL && mover->header.m_pCurrentRegion->m_nInfo != collider->header.m_pCurrentRegion->m_nInfo) {
         return;
     }
-    func_00241960(mover, points, collider);
+    Platform_GetCollisionBox(mover, points, collider);
     if (!(ctrl->delta.y > 0.0f)) {
         return;
     }
-    func_0023C9CC(&quad, points);
-    if (info->m_CollisionType != 0 && !func_0023C730(&quad, collider->header.m_vPos.x, collider->header.m_vPos.z)) {
+    Quad_SetBoxBottom(&quad, points);
+    if (info->m_CollisionType != 0 && !Quad_ContainsPointXZ(&quad, collider->header.m_vPos.x, collider->header.m_vPos.z)) {
         return;
     }
-    top = func_0023C8A0(&quad, collider->header.m_vPos.x, collider->header.m_vPos.z);
+    top = Quad_GetHeightAt(&quad, collider->header.m_vPos.x, collider->header.m_vPos.z);
     y = collider->header.m_vPos.y;
     reach = top + ctrl->delta.y;
     if (!(top <= y) && info->m_CollisionType != 0) {

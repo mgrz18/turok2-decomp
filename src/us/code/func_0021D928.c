@@ -3,14 +3,14 @@
 #include "structs/game_object.h"
 #include "structs/model.h"
 
-/* As func_0021D7BC, drawing through func_0020A33C and without setting the
+/* As CGameObjectInstance__DrawModel, drawing through Render_DrawModel and without setting the
  * actor's mask; clears D_800AB8B0 afterwards. */
 
 extern s32 D_800B6D1C;      /* current view */
 extern s32 D_800AB8B0;
 
-void func_0021DC84(CGameObjectInstance *, s32, CDrawArgs *);
-void func_0020A33C(s32, s32, s32, void *, s32, s32, s32);
+void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
+void Render_DrawModel(s32, s32, s32, void *, s32, s32, s32);
 
 static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0, s32 *set1) {
     CIntelligence *intel = actor->header.m_pIntelligence;
@@ -53,13 +53,13 @@ static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0
     }
 }
 
-void func_0021D928(CGameObjectInstance *actor, s32 arg1, CDrawArgs *params) {
+void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, s32 arg1, CDrawArgs *params) {
     pickSets(actor, params->m_nVariant, &params->m_nModel, &params->m_nShadowModel);
     if (params->m_bShadow != 0) {
-        func_0021DC84(actor, arg1, params);
+        CGameObjectInstance__DrawShadow(actor, arg1, params);
     }
     if (params->m_bDraw != 0) {
-        func_0020A33C(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[D_800B6D1C], 0, params->m_nModel, actor->m_AI.m_nTexture);
+        Render_DrawModel(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[D_800B6D1C], 0, params->m_nModel, actor->m_AI.m_nTexture);
     }
     D_800AB8B0 = 0;
 }

@@ -4,9 +4,9 @@
 #include "gfx.h"
 
 extern s32 D_800F56A8;
-void *func_0027B4EC(void);
-void func_0027845C(void) {
-    void *tex = func_0027B4EC();
+void *COnScreen__GetFontTexture(void);
+void COnScreen__SelectTinyFont(void) {
+    void *tex = COnScreen__GetFontTexture();
     if (tex != ((void *)0)) {
         D_800F56A8 = 4;
         { Gfx *_g = D_800D8E24++; _g->w0 = (0xFD900000); _g->w1 = ((u32)tex); };

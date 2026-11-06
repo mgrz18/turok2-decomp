@@ -29,12 +29,12 @@ typedef struct S10Game {
 extern S10Game D_8011ACB0[];
 extern f32 D_801308FC;
 extern f32 D_800B6D28;
-extern void func_002534E0(void *p);
-s32 func_00450D78(void) {
+extern void CPlayerPool__EndMatch(void *p);
+s32 FinalScoreMenu_Poll_2(void) {
     D_801308FC += D_800B6D28;
     if (D_801308FC >= 120.0f) {
         D_8011ACB0->unk24 = 0;
-        func_002534E0((u8 *)D_8011ACB0 - 0x1440);
+        CPlayerPool__EndMatch((u8 *)D_8011ACB0 - 0x1440);
         return 1;
     }
     return 0;

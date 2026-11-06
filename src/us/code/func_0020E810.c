@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_0021153C(f32 arg0);
+extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 extern float D_800A554C;
@@ -20,7 +20,7 @@ extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
 extern f32 D_800DD78C;
 extern f32 func_00298470(f32);
-Vector4f func_0020E810(CVector3 *input) {
+Vector4f CQuaternion__FromDirection(CVector3 *input) {
     Vector4f result;
     CVector3 normalized;
     CVector3 basis;
@@ -69,7 +69,7 @@ general:
         {
             f32 halfAngle;
             f32 scale;
-            angle = func_0021153C((normalized.x * basis.x) +
+            angle = Math_AcosLookup((normalized.x * basis.x) +
                                   (normalized.y * basis.y) +
                                   (normalized.z * basis.z));
             axis.x = (basis.y * normalized.z) - (basis.z * normalized.y);

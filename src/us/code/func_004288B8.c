@@ -4,7 +4,7 @@
 
 #include "rw/ultralib_types.h"
 
-s32 func_00429AA4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
 s32 corrupted(OSPfs* pfs, __OSInodeUnit fpage, __OSInodeCache* cache);
 s32 corrupted(OSPfs* pfs, __OSInodeUnit fpage, __OSInodeCache* cache) {
     int j;
@@ -20,7 +20,7 @@ s32 corrupted(OSPfs* pfs, __OSInodeUnit fpage, __OSInodeCache* cache) {
         offset = bank > 0 ? 1 : pfs->inode_start_page;
         if (bank == fpage.inode_t.bank || cache->map[n] & (1 << (bank % 8))) {
             if (bank != cache->bank) {
-                ret = func_00429AA4(pfs, &cache->inode, 0, bank);
+                ret = __osPfsRWInode(pfs, &cache->inode, 0, bank);
                 if (ret != 0 && ret != 3) {
                     return ret;
                 }

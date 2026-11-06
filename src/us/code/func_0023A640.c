@@ -4,7 +4,7 @@
 
 /* Where the segment from sweep->inst's position to sweep->end first enters
  * box, as a fraction of dir (slab test): 1 and *t if it does before maxT. */
-s32 func_0023A640(Sweep *sweep, CBox *box, f32 *t) {
+s32 Sweep_HitBox(Sweep *sweep, CBox *box, f32 *t) {
     CVector3 hit;
     CVector3 *start;
     CVector3 *end;

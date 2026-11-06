@@ -23,59 +23,59 @@
 # normally, so the code exists in the output; what is missing is the entry
 # point at the second address. Revisit once the VM loader is understood well
 # enough to say which copy actually runs. See #40.
-func_0043DC44
-func_0043E0E0
-func_0043E3C4
+Primagen_RunAttackStep_2
+Primagen_RunSpawnStep_2
+Primagen_RunSoundStep_2
 func_00441FF8
-func_00442D4C
-func_0044325C
+MotherBoss_AnimEvent_2
+MotherBoss_PartEffects_2
 func_0044C22C
-func_0044C3A4
-func_0044C63C
-func_0044F2FC
-func_0044FF8C
-func_0045007C
-func_00450910
-func_004515C0
+MenuItem_UpdateBinding_2
+MenuItem_Layout_2
+Menu_CharWidth_2
+MenuItem_GetBindingValue_2
+MenuItem_SetBindingValue_2
+WeaponsMenu_ToggleLabel_2
+FragTagMenu_LevelLabel_2
 func_004516B0
 func_00451BA0
 func_00451D00
 func_00452060
 func_004521C0
-func_00452314
-func_00452960
-func_0045353C
-func_00453FC4
-func_004540B0
-func_00459B50
-func_00459E54
-func_0045AEA8
-func_0045B234
-func_0045B784
-func_0045B7D0
-func_0045B8FC
-func_0045BA28
-func_0045BB54
-func_0045BC80
-func_0045BDAC
-func_0045C9EC
-func_0045CA68
-func_0045CAE4
-func_0045CB60
-func_0045CBDC
-func_0045CC58
-func_0045CCC4
+WeaponsMenu_Toggle_2
+Menu_DebugModeLabel_2
+CheatsMenu_WarpSelect_2
+CheatMenu_WarpText_2
+CheatMenu_GetWarpLevel_2
+PakConfirmMenu_SelectYes_2
+PakConfirmMenu_SelectNo_2
+GameNoteMenu_UpdateLevel_2
+CharNoteMenu_UpdateType_2
+PakMessage_UpdateHeading_2
+PakMessage_UpdateLine1_2
+PakMessage_UpdateLine2_2
+PakMessage_UpdateLine3_2
+PakMessage_UpdateLine4_2
+PakMessage_UpdateLine5_2
+PakMessage_UpdateOk_2
+PakConfirmMenu_UpdateLine1_2
+PakConfirmMenu_UpdateLine2_2
+PakConfirmMenu_UpdateLine3_2
+PakConfirmMenu_UpdateLine4_2
+PakConfirmMenu_UpdateLine5_2
+PakConfirmMenu_UpdateYes_2
+PakConfirmMenu_UpdateNo_2
 func_0045D97C
-func_0045DAB0
-func_0045DC74
-func_0045DEDC
-func_0045DF7C
-func_0045E01C
+MissionMenu_UpdateObjective1Count_2
+MissionMenu_UpdateObjective2Count_2
+MissionMenu_UpdateLevelName_2
+MissionMenu_UpdateObjective1_2
+MissionMenu_UpdateObjective2_2
 
 # Cross-module caller of an address a branch crosses: 0x00420B38 is named by
 # its `jal` and crossed by a branch inside the function that contains it, so no
 # symbol can satisfy both. Same class as the 48 above.
-func_0045977C
+PakMessage_SelectOk_2
 
 # The 207 entries that followed were a different problem and are gone: they
 # called a second entry point into another function in another section, and
@@ -86,9 +86,9 @@ func_0045977C
 # rather than only the `at` form. Their tables' entries name the
 # `virtual` copy's case bodies, so nothing in them falls inside these.
 func_0045342C
-func_00453E58
-func_0045E808
-func_00465B04
+Cheat_FindWarpLevel_2
+Pak_Mount_2
+CScene__DecompressIntelligence_2
 
 # The SN64 boot stub. It sets the stack, then writes Index, EntryHi, EntryLo0
 # and EntryLo1 and issues `tlbwi` to map the engine into useg -- TLB setup and
@@ -104,7 +104,7 @@ boot_main
 # Branches to an address no section covers, so no symbol can be
 # placed there. Rejecting the boundary only moves the stray word
 # to the next enclosing function.
-func_00293D40
+alSndpSetFXMix
 
 # Branches to an address no section covers, so no symbol can be
 # placed there. Rejecting the boundary only moves the stray word
@@ -121,16 +121,16 @@ STVM_MapTLB
 # Branches to an address no section covers, so no symbol can be
 # placed there. Rejecting the boundary only moves the stray word
 # to the next enclosing function.
-func_00457294
+PakMenu_CheckSlotForSave_2
 
 # Branches to an address no section covers, so no symbol can be
 # placed there. Rejecting the boundary only moves the stray word
 # to the next enclosing function.
-func_00460444
+__osPfsDeclearPage_2
 
 # Calls a declared entry the recompiler refused (versions/bad_entries.us.txt),
 # so the jal has nothing to bind to.
-func_004671BC
+CPlayer__LoseLife_2
 
 # Calls a declared entry the recompiler refused (versions/bad_entries.us.txt),
 # so the jal has nothing to bind to.

@@ -7,10 +7,10 @@ extern s32 D_8011ACA4;
 extern f32 D_800B6D28;          /* frame time scale */
 
 extern s32 Cinema_PathPlaying(void);
-extern void *func_00275F7C(void);
-extern void func_00275D34(void *mgr, void *sound);
+extern void *LoopSounds_Get(void);
+extern void LoopSounds_Stop(void *mgr, void *sound);
 extern void func_0021F1B4(CGameObjectInstance *obj);
-extern void func_0021A344(CGameObjectInstance *obj);
+extern void CGameObjectInstance__UpdateAnimation(CGameObjectInstance *obj);
 
 /* Whether the player's camera has a menu open. */
 static __inline__ s32 menu_open(CPlayer *p) {
@@ -25,7 +25,7 @@ static __inline__ s32 menu_open(CPlayer *p) {
 
 /* Animate each living player's weapon model on its own (frame time kept),
  * then put it back on the player; stop the weapon sounds otherwise. */
-void func_00252ADC(CPlayerList *list) {
+void CPlayerPool__AnimateWeapons(CPlayerList *list) {
     CPlayer *p;
 
     if (D_8011AC8C == 11 || D_8011AC8C == 8) {
@@ -33,9 +33,9 @@ void func_00252ADC(CPlayerList *list) {
     }
     for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
         if (Cinema_PathPlaying() || p->m_Data.m_Lives == 0) {
-            func_00275D34(func_00275F7C(), p->m_pLoopingSound_WeaponBackground);
+            LoopSounds_Stop(LoopSounds_Get(), p->m_pLoopingSound_WeaponBackground);
             p->m_pLoopingSound_WeaponBackground = NULL;
-            func_00275D34(func_00275F7C(), p->m_pLoopingSound_WeaponFiring);
+            LoopSounds_Stop(LoopSounds_Get(), p->m_pLoopingSound_WeaponFiring);
             p->m_pLoopingSound_WeaponFiring = NULL;
         } else if (D_8011ACA4 == 0) {
             if (!menu_open(p)) {
@@ -47,7 +47,7 @@ void func_00252ADC(CPlayerList *list) {
                 weapon->m_dwHotPointFlags = 16;
                 weapon->m_dwFlags &= ~0x20000;
                 func_0021F1B4(weapon);
-                func_0021A344(weapon);
+                CGameObjectInstance__UpdateAnimation(weapon);
                 D_800B6D28 = frameTime;
                 if (old != p->m_CharAnim) {
                     p->m_CharacterActor.m_CurrentAnimation.m_bCycleCompleted = 0;

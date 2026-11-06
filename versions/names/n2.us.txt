@@ -1,0 +1,334 @@
+// Names for the functions at 0x00220000-0x0023FFFF (part n2).
+// The world object D_800F7078 (structs/world.h's CWorld) is Turok 3's CScene
+// (turok3 include/scene.h: the same m_nLevel, the same resource tables and
+// strings), so its methods are CScene__ (coordinator's call). Rage Wars'
+// decomps name almost nothing here: most evidence is behaviour (the function
+// and its callers read), the resource names in .rodata (0x800A5D70..), and
+// the comments and struct fields already in the C.
+
+// Math helper.
+Quaternion_ToMatrix = 0x00220128; // fills a 4x4 float matrix from quaternion q (x,y,z,w) plus translation t; no callers (RW func_8024D028_de)
+
+// CScene: the per-frame update and the scene's actor lists.
+CScene__Update = 0x00220530; // the world's frame: input edge flags, warp fade, list counts, actor lists, particles, pool actors, sky rotation (m_SkyAngle/m_qSky), timed events; called by the engine's frame (func_00288F60)
+CScene__AdvanceInstances = 0x00226490; // advances every m_pRegistered instance (func_0021F1B4, then func_0021A344 when flagged 0x2000, which runs CScene__CheckAutoActivation), the leading type-2 (player) ones first, keeping the frame time step; called by CScene__Update
+CScene__AdvanceListedInstances = 0x002263C0; // accumulates the frame time at 0x18EB8 and calls func_00214B58 on every m_pListed instance with the whole-tick flag; called by CScene__Update
+CScene__FindInstances = 0x00225F6C; // collects up to max m_pActors instances matching a type id (0xB8), an intelligence type and a third key (-1 = any) (RW func_8028D050_de); 11 VM callers
+CScene__ClearListCounts = 0x00226390; // zeroes m_nDrawActors, m_nMovers, m_nListed, m_nRegistered, m_nKind1, m_nFlagged, m_nKind5, m_nList6, m_nList7, m_nDeferred, m_nSectors: turok3 scene.h has CScene__ClearListCounts
+CScene__BuildActorLists = 0x00221210; // files every live, visible level actor (m_pActors) into the draw/mover/registered/kind lists (RW func_00287EE8); only caller CScene__Update
+CScene__LoadVisibleGridSections = 0x002216DC; // requests the "grid section" (D_800A5F6C) blocks inside the views' bounds into m_Sectors, with CScene__DecompressGridSection as the cache callback
+CScene__CollectSectorObjects = 0x00221A24; // walks m_Sectors: the static objects and level actors inside the visible bounds go on the draw lists, plus the pool actors (CLevelActorPool__CollectVisible)
+CScene__DecompressGridSection = 0x00220D00; // the cache callback passed with "grid section" (func_002216DC, func_0042BF48): builds the section's static objects / level actors from the file (RW func_0028795C), Turok 3's CScene__Decompress* callback shape (notifyId, cache entry)
+CScene__FileInstance = 0x002255CC; // "files a new actor into every actor list": m_pDrawActors, m_pMovers, m_pRegistered, m_pKind1... ; only caller CInstancePool__UpdateVisibility
+CScene__DetachChildren = 0x00225B44; // clears m_AI.m_pParent of every instance in m_pRegistered (0xBF8/0xDF8) whose parent is arg1
+CScene__FindNearestActor = 0x00225778; // nearest instance of m_pActors other than self, filtered by m_nTypeFlag / intelligence type / alive (RW func_8028CAE0_de)
+CScene__DamageAllEnemies = 0x00225B7C; // builds a damage event (func_00245828) and applies it (func_002465C8) to every instance of m_pKind1 (definition kind 1, INTELLIGENCE_ENEMY)
+CScene__DrawRegisteredInstances = 0x00223F8C; // draws m_pRegistered (func_0021D39C), deferring the flag-4 ones to m_pDeferred; called from the view's draw func_0027E770
+CScene__DrawParticles = 0x002240C4; // sets the clip ratio and draws m_ParticleSystem (world+0x18B0) through CParticleSystem__Draw; called from func_0027E770
+CScene__BuildGeometryDisplayList = 0x00221D3C; // "builds (once per frame) the display list of the level geometry" (comment; RW func_00289054); only caller CScene__DrawGeometry
+CScene__DrawGeometry = 0x002222E0; // draws the static objects and level actors seen by one view, translucent ones to the sorted list (comment); called from func_0027E770
+CScene__DrawSortedList = 0x0022077C; // sorts the queued translucent objects by camera distance (Sort_Quick with SortRecord_Compare/SortRecord_Swap) and draws them; called from func_0027E770
+SortRecord_Swap = 0x00226CD0; // swaps two 8-byte sort records; the swap routine CScene__DrawSortedList hands to Sort_Quick (RW func_802405FC_de)
+SortRecord_CompareDescending = 0x00226D0C; // comparator: -1 when arg0's key is the lower, else 1
+SortRecord_Compare = 0x00226D30; // qsort-style comparator on the f32 key at 4; used by CScene__DrawSortedList
+Sort_Quick = 0x00226F90; // iterative quicksort (base, num, width, compare, swap), 30-entry stack, small ranges to Sort_Insertion (RW func_802852C0_de); 6 callers
+Sort_Insertion = 0x00227184; // the small-range sort Sort_Quick hands ranges of eight or fewer elements to
+CScene__FindRegionAt = 0x00220A1C; // the region (m_pRegionData section 2, 0x20 each) under pos whose floor height is closest (func_0026BB9C/func_0026BE60), or NULL; 16 callers
+CScene__GetRegionInfo = 0x0022425C; // m_pRegionData section 0 + 8 + m_nInfo * 0x64 (CRegionInfo) for a region; 34 callers
+CScene__GetRegionIndex = 0x002242B4; // (region - section 2 base) >> 5: a region's index, -1 for NULL
+CScene__GetRegion = 0x002242F8; // m_pRegionData section 2 + 8 + i * 0x20: region i
+CScene__CheckAutoActivation = 0x002233A8; // a mover going p0->p1 against m_pFlagged doors / actions / destructibles: crossing their m_AutoOpenRadius/m_AutoCloseRadius/m_AutoGoRadius activates them (func_00243414)
+CScene__Blast = 0x00223A94; // "a blast at target: damages every entity of the world and of the actor list, then the current player within 512" (comment); caller the particle code
+Blast_IsLivingEnemyInRange = 0x00226DE8; // a living enemy (type 1, not the 0x44E.. set, not mode 0x3D) within 2560 of the target: the helper CScene__Blast inlines (RW func_0028E768)
+Blast_GetStrength = 0x00226EBC; // 0 or 0xFF: what a blast does to a destructible within 512 / the special enemy set; inlined in CScene__Blast (RW func_0028E83C)
+CScene__GetLightsAt = 0x002254C0; // the CLights1 for a position: the default lights, or the dynamic lights of its sector (CScene__FindLightsAt) combined by CScene__ComputeLights; 5 callers (RW func_0028C6B0)
+CScene__FindLightsAt = 0x002228E4; // collects up to 10 light items of the sector containing pos whose bounds hold it; only caller CScene__GetLightsAt
+CScene__ComputeLights = 0x00222A9C; // weights the given lights by distance to pos and writes a light set; called by CScene__GetLightsAt and for every actor by CScene__DecompressGridSection (m_Lights)
+CScene__GetLight = 0x00223F70; // element i of m_pLights ("dynamic lights"), element size first, data at +8
+CScene__GetSwoosh = 0x00223F50; // func_002017D4 on m_pSwooshes ("particle swooshes"); caller Swoosh_AddNode
+CScene__GetCurve = 0x00225D94; // element i of m_pCurves ("curves"), element size first, data at +8
+CScene__GetRumble = 0x00226DCC; // element i of m_pRumbles ("rumbles"), element size first, data at +8
+CScene__StartRumbles = 0x00225DB0; // every m_pRumbles entry of the m_pRumbleTypes run for id is started (func_0026EBDC); the camera shake of a hit (func_002376F8)
+CScene__FindObjectType = 0x00224180; // index of an id in m_pObjectTypes ("object types"), -1 if absent; 11 callers (RW func_0028B1F8)
+CScene__GetObjectTypeID = 0x002241C0; // m_pObjectTypes entry i (u16)
+CScene__SetInstanceObjectType = 0x002241D8; // when an instance's type id changes: finds it in the object types, stores id and index, reloads the model (func_0021A150) (RW func_8028B274_de)
+CScene__GetObject = 0x00224F84; // m_pObjects / m_ObjectsKey entry i ("objects index"), 0 past the count; 9 callers
+CScene__GetTextureSet = 0x00224F48; // m_pTextureSets / m_TextureSetsKey entry ("texture sets index")
+CScene__LoadBinaryBlock = 0x00224D54; // requests binary id through the cache with the name "binary block" (D_800A5F38), m_pBinaries
+CScene__LoadGraphicSet = 0x00224DF4; // requests graphic set id through the cache with the name "graphicset" (D_800A5F48); callers the HUD text code (COnScreen__DrawText...)
+CScene__GetIntelligence = 0x00225E88; // m_pIntelligence entry i ("intelligence"), NULL for -1; 8 callers
+CScene__FindIntelligence = 0x00225EBC; // first m_pIntelligence entry matching two keys (-1 = any); 20 callers
+CScene__GetLevelName = 0x0022629C; // copies the "level name" (D_800A5FD0) of a level's "level index" (D_800A5EC0) block into a buffer
+CScene__ReleaseSectors = 0x00226724; // frees every m_Sectors handle (func_002051F4) and zeroes m_nSectors and three list counts
+
+// CScene: warps.
+CScene__UpdateWarp = 0x002237C4; // runs m_WarpState: fades to the warp and warps (func_0042C194), then fades back (RW Scene_UpdateSelectionTransition, same role)
+CScene__DrawWarpFade = 0x00226024; // draws the fade colour D_800ACDE8[m_WarpFade] at alpha m_WarpTime*255/length while m_WarpState is 1 or 2
+
+// CScene: the level's event records (m_pRecords / m_pAltRecords, 0x14 each).
+CScene__GetEventRecords = 0x00226660; // the run of records (main or alt table) for an id through m_pRecordIndex/m_pAltRecordIndex (func_00266D8C)
+CScene__GetRegionEventRecords = 0x00224FC0; // the alt-table run for a region's id; only caller func_0026E19C (region events) (RW func_0028C1B0)
+CScene__GetInstanceEventRecords = 0x00225058; // the run of records of an instance (its index in m_pActors); only caller func_0026E110 (RW func_8028C26C_de)
+CScene__GetInstanceIndex = 0x002265E8; // index of an instance in m_pActors (0x288 each), or -1 (RW func_8028D74C_de)
+CScene__FireEventsByKey = 0x0022515C; // fires (func_0026E210) every record of both tables whose key byte (0xF) is arg1
+CScene__FireEventsByKeyOnce = 0x002252A0; // the same walk with func_0026E294 (marks 0x20 and fires a copy)
+CScene__AreEventsDone = 0x00225210; // 1 when every record with the given key is flagged 0x40 (RW func_8028C424_de)
+CScene__RestoreFiredEvent = 0x00220BF0; // at level start: re-fires (func_0026DFB0) a record whose bit is set in the level's fired-event bitmap, unless its link group is done (RW func_8028787C_de); the VM calls it for every record
+CScene__QueueDelayedEvent = 0x00225354; // puts an event on the delayed list (free list -> active, oldest fired early when full), its delay from func_0026D210 (x15 with flag 2)
+CScene__UpdateDelayedEvents = 0x002253F8; // counts the delayed events down by the frame time and fires them (func_0026DFB0) at zero; called by CScene__Update
+
+// CScene: the saved bitmaps of m_pBitSections (per level: [0] instances,
+// [1] level actors by m_nKilledIndex, [2] fired event records) and
+// m_pBitSections2, and the link-group bytes of m_pBitSections[1].
+CScene__SetInstanceSavedBit = 0x00220260; // sets/clears an instance's bit (its m_pActors index) in the current level's section-0 bitmap; skips mode 2 and flagged interactive anims/actions; 25 callers (RW func_80285DB0_de)
+CScene__GetInstanceSavedBit = 0x00220408; // tests that bit (RW func_80285F58_de)
+CScene__SetInstanceSavedBitInLevel = 0x002245BC; // the same for a given level and index (RW func_8028B670_de)
+CScene__GetInstanceSavedBitInLevel = 0x00226A90; // tests bit i of level n's section-0 bitmap
+CScene__MarkGeneratorsSaved = 0x00225C84; // CScene__SetInstanceSavedBit(1) on every m_pActors instance whose intelligence is INTELLIGENCE_GENERATOR (3)
+CScene__UnmarkGeneratorsSaved = 0x00225D0C; // the same with 0 (RW func_8028CDF0_de)
+CScene__SetLevelActorKilled = 0x002247E4; // sets/clears CLevelActor.m_nKilledIndex's bit in the current level's section-1 bitmap; caller the pickup taker func_0023F05C (RW func_0028B874)
+CScene__IsLevelActorKilled = 0x002248D4; // tests it (RW func_0028B964)
+CScene__SetLevelActorKilledInLevel = 0x00224700; // section-1 bit for a given level
+CScene__IsLevelActorKilledInLevel = 0x00226B34; // tests section-1 bit of a given level
+CScene__SetEventFired = 0x00224A68; // sets/clears a record's bit (byte 0x13) in the current level's section-2 bitmap; callers func_0026E210 (fire event) and func_0026E4B8 (RW func_0028BAF8)
+CScene__IsEventFired = 0x00224B58; // tests it; func_0026E4B8 calls the record usable when 0 (RW func_0028BBE8)
+CScene__SetEventFiredInLevel = 0x00224984; // section-2 bit for a given level
+CScene__IsEventFiredInLevel = 0x00226BD8; // "tests a bit of the given level's saved-actor bitmap" (section 2)
+CScene__SetLevelBit = 0x0022441C; // sets/clears bit i of the current level's m_pBitSections2 section 0; the VM's only caller
+CScene__GetLevelBit = 0x0022450C; // tests it
+CScene__SetLevelBitInLevel = 0x00224330; // the same for a given level
+CScene__GetLevelBitInLevel = 0x002269EC; // tests it for a given level
+CScene__SetSavedBit = 0x00226828; // the general form: (table 0x6C or 0x70, section, level, bit, set)
+CScene__GetSavedBit = 0x00226928; // its test
+CScene__GetLinkGroupCount = 0x00224C08; // the byte of m_pBitSections[1] at the index of a key in m_pLinkGroupTypes ("link group types"), -1 if absent; 8 VM callers (RW func_0028BC98)
+CScene__DecLinkGroupCount = 0x00224C98; // decrements byte i of m_pBitSections[1]
+CScene__IsLinkGroupDone = 0x00224CF8; // byte i of m_pBitSections[1] == 0 (RW func_8028BDAC_de)
+CScene__GetLinkGroupCountPtr = 0x00226C7C; // &byte i of m_pBitSections[1]
+
+// The level actor pool (CWorld.m_ActorPool, structs/level_actor.h: the
+// pickups and other pooled CLevelActors).
+CLevelActorPool__Spawn = 0x00227240; // "spawns a pool actor of the given level id at pos with velocity vel, taking a free slot (or the oldest one)" (comment); 11 callers
+CScene__SpawnPoolActor = 0x00224ED0; // CLevelActorPool__Spawn on world+0x10518 (m_ActorPool) with zero velocity (RW func_0028BFB4)
+CLevelActorPool__Update = 0x002274A4; // updates the pool actors and releases the expired / out-of-bounds ones; called by CScene__Update
+CPooledLevelActor__Update = 0x00227680; // counts its timer down, moves it (func_002156FC), collides (func_00239F00), refreshes its bounds; only caller CLevelActorPool__Update
+CPooledLevelActor__Release = 0x00227780; // unlinks an active node and pushes it on the free list; caller the pickup taker
+CLevelActorPool__CollectVisible = 0x002279A4; // adds the pool actors flagged 0x20000 inside the visible bounds to the world's draw list; caller CScene__CollectSectorObjects
+CLevelActorPool__Draw = 0x0022782C; // draws the pool's effects inside the camera's clip volume; called by func_0027E770 on world+0x10518 (RW func_802905F4_de)
+CLevelActorPool__Alloc = 0x00227AE0; // takes the free head (releasing the tail first when none), links it at the head, clears velocity and lifetime, flags 1
+CLevelActorPool__Free = 0x00227B7C; // "releases arg1 back to the pool's free list"; callers CLevelActorPool__Spawn / __Alloc
+
+// The dynamic object pool (CInstancePool D_8010ABA0, structs/game_object.h).
+CInstancePool__SpawnAnimInstance = 0x00227C10; // spawns an "anim object index" model variant at a position with scale, direction and colour into the pool (RW func_80262CE0_de); caller func_00239194
+CInstancePool__SpawnCopy = 0x00227EE8; // "spawns a copy of an actor: takes a free instance off the world's free list and initialises it from src"
+CInstancePool__Spawn = 0x00228108; // "spawns an actor from loose parameters" (model, type, intelligence, region, pos, rotY, velocity, scale, owner counter); 9 callers
+CInstancePool__Alloc = 0x002283FC; // takes a free CListedInstance (fewer than three live, or D_8011001C), activates it, counts it in *owner
+CInstancePool__Free = 0x00228484; // drops the owner count and moves it back to m_FreeList
+CListedInstance__Free = 0x002280B0; // health 0, owner count down, D_8010FEB4 -> D_8010FEA0 (m_ActiveList -> m_FreeList); 4 callers
+CInstancePool__UpdateVisibility = 0x0022828C; // the live pool objects inside the visible bounds are filed (CScene__FileInstance), the others freed (RW func_80262E88_de); caller CScene__BuildActorLists
+
+// Dynamic lights (CDLight, the set at D_8010FF34, structs/particle.h).
+DLight_Spawn = 0x00228AB0; // CDLightSet__Alloc(set, CScene__GetLight(D_800F7078, ...)): takes a dynamic light for a particle; callers the particle code
+CDLightSet__Alloc = 0x00228AEC; // free list (0x14) -> used list (0x0), sets m_pROMLight, clears m_bEnabled
+CDLightSet__Free = 0x00228B4C; // clears m_bEnabled and puts the light back on the list at 0x14; 6 callers
+CDLightSet__GetFirst = 0x00228B8C; // the used list's head; caller DLights_Load
+CDLightSet__GetNext = 0x00228B98; // a node's m_pNext (read through a mistyped struct); caller DLights_Load
+DLights_Load = 0x002284E0; // writes up to 8 point lights (gSPLight / G_MOVEWORD 0xDC, colour * m_ColorFade) from D_8010FF34 into the double-buffered D_800F1400 for a view (RW func_802659E0_de)
+DLights_SwapBuffers = 0x002288D0; // flips the D_800F1400 half (D_800ACE00 0 / 0x20) DLights_Load writes; caller func_00287248
+DLights_GetAtPoint = 0x00228910; // sums the D_8010FF34 lights in range of a point into a direction and strength; caller the lit-vertices draw func_0021DC84 (RW func_80268A40_de)
+CGameObjectInstance__ConstructLitVertices = 0x00220208; // the cache callback func_0021DA8C passes with "lit vertices": builds the instance's lit vertex copy (func_00213A70)
+
+// The sun (turok3 sun.c, same order).
+CSun__SetSunDir = 0x00228BC4; // stores dir at 0x14 and normalises it (func_0020F040): turok3 sun.c CSun__SetSunDir
+
+// Particle impact events: the handler table D_800AD080 (structs/particle_event.h,
+// {handler, flags} per event kind; slot numbers below) and the blast code
+// its damage handlers share (RW SYSTEM_2/802661FC_2.CPP).
+ImpactEvent_Send = 0x00236EA0; // dispatches an event kind through D_800AD080[kind] to the target, or to every actor / player by the kind's flags; 18 callers
+ImpactEvent_Call = 0x00237EE4; // calls D_800AD080[kind].handler if set (RW func_80267198_de); 6 callers
+ImpactEvent_Call2 = 0x00237F48; // the same code again, a second copy (RW func_80267198_de)
+ImpactEvent_ApplyBlast = 0x00237AFC; // a blast at pos on a victim: armour/falloff (static inline after RW), push (func_002374AC), damage event (func_00245828 / func_002465C8), hit reaction (func_002376F8); every damage slot below calls it
+Blast_CanHit = 0x0023726C; // whether a blast from source may hurt target (team, player ids, intelligence kinds); only caller ImpactEvent_ApplyBlast (RW func_002661FC)
+Blast_GetPush = 0x002374AC; // "the blast's push from src turned into a world vector, in the frame of target" (comment)
+Blast_ApplyHit = 0x002376F8; // "applies a hit: marks the attacker, shakes the target player's camera, sprays blood, pushes the target" (comment; RW func_80267958_de inlined)
+Blast_GetReach = 0x00238334; // "how much of a blast at p reaches a: its armour, then a linear drop over the distance" (comment)
+Blast_GetSourcePos = 0x0023816C; // moves the blast origin 3/4 of the way to the player when the source is the player's melee weapon actor (weapon < 2 or 0x22), same test as in ImpactEvent_ApplyBlast
+Blast_GetSourceScale = 0x002382F8; // func_0021F268(source) for an instance of type 1, else a rodata 1.0
+ImpactEvent_DirectDamage = 0x0023870C; // slot 2: ImpactEvent_ApplyBlast(no falloff, no push, 0x100000) on a type-1 target
+ImpactEvent_AreaDamage = 0x0023876C; // slot 3: ImpactEvent_ApplyBlast(falloff, 0x100000)
+ImpactEvent_AreaDamagePush = 0x002387C4; // slot 4: falloff and push, 0x100000
+ImpactEvent_AreaDamage200000 = 0x00238B2C; // slot 15: falloff, damage flag 0x200000
+ImpactEvent_AreaDamagePush200000 = 0x00238B84; // slot 16: falloff and push, 0x200000
+ImpactEvent_ExplosionDamage = 0x00238BDC; // slot 17: falloff, 0x400000 (DamageEvent flags: "an explosion", structs/collision.h)
+ImpactEvent_ExplosionDamagePush = 0x00238C34; // slot 18: falloff and push, 0x400000
+ImpactEvent_AreaDamage800000 = 0x00238C8C; // slot 19: falloff, 0x800000
+ImpactEvent_AreaDamagePush800000 = 0x00238CE4; // slot 20: falloff and push, 0x800000
+ImpactEvent_FlashScreens = 0x00238888; // slot 9: every camera of D_801198D0 that sees pos gets a screen flash (func_00281060, the pickup flash) of the event's colour (RW func_80267CE4_de)
+ImpactEvent_SetWeaponFirePos = 0x00238914; // slot 11: stores pos as the owner player's m_vWeaponFirePos and fires (func_00258734)
+ImpactEvent_PlaySoundAndEffect = 0x00238A7C; // slot 14: plays D_800B69D8[index]'s sound (func_0027FC2C, at the player's camera) and effect (func_0027580C)
+ImpactEvent_Rumble = 0x00238D3C; // slot 21: CScene__StartRumbles at the hit (RW func_802681A8_de)
+ImpactEvent_LevelSpecial = 0x00238DF8; // slot 22: by the level id D_80110048 (0x1D4D, 0x1DB2, 0x1DB1) calls that level's VM handler
+ImpactEvent_SetHotPoint = 0x00239130; // slot 26: sets bit n of m_dwHotPointFlags on a type-1 instance
+ImpactEvent_ClearHotPoint = 0x00239160; // slot 27: clears it
+ImpactEvent_SpawnAnimInstance = 0x00239194; // slot 28: CInstancePool__SpawnAnimInstance at the actor with the event's size
+ImpactEvent_PlaySound = 0x00238114; // slot 30: func_0027580C(the event's sound)
+
+// Pickups (RW MENU/802ABDBC_11.CPP, the pickup feedback).
+CPlayer__TouchPickup = 0x0023F05C; // a pooled pickup touched: CPlayer__CollectPickup, then flags it taken, frees it or marks it killed (CScene__SetLevelActorKilled) and fires its region's events; caller func_0024C47C
+CPlayer__CollectPickup = 0x0023E820; // "pick up an item of type id: the tables' handler takes it if one has it; otherwise a generic pickup with its message, sound and effect" (comment)
+Pickup_FindWeaponEntry = 0x0023EF30; // the 0x18-byte row of D_800AD1B0 (31 rows, handler Pickup_GiveWeapon) for an id (RW func_802AD0B0_de)
+Pickup_FindAmmoEntry = 0x0023EF64; // the 0x14-byte row of D_800AD498 (36 rows, handler Pickup_GiveAmmo) (RW func_002AD940)
+Pickup_FindHealthEntry = 0x0023EF98; // the 0x18-byte row of D_800AD768 (7 rows, handler Pickup_GiveHealth) (RW func_002AD90C)
+Pickup_FindItemEntry = 0x0023F000; // the 0x10-byte row of D_800AD838 (15 rows, handler Pickup_GiveItem) (RW func_002AD9DC)
+Pickup_GiveWeapon = 0x0023ECF8; // "weapon pickup: gives the weapon, selects it when better, plays the feedback" (comment); the handler of the weapon rows
+Pickup_GiveAmmo = 0x0023F120; // gives m_Ammo.m_Amount of m_Ammo.m_Type (func_00253B54), then the feedback; the handler of the ammo rows
+Pickup_GiveHealth = 0x0023F3E4; // "health pickup: add the entry's amount, up to its cap" (comment)
+Pickup_GiveLifeForce = 0x0023F524; // "life force pickup: every 100 gives an extra life, up to 9" (comment)
+Pickup_GiveItem = 0x0023F634; // "item pickups selected by the entry's id" (comment); the handler of the item rows
+Pickup_Feedback = 0x0023F7B8; // "flashes the player's screen and plays a pickup's optional resource, sound and callback" (comment)
+
+// Collision: sweeps (Sweep / SweepHit / ModelSweep, structs/collision.h).
+Collision_MoveInstance = 0x00239F00; // "moves obj to pos through the collision tests, in up to 100 slides, and returns the number of hits" (comment); 20 callers
+Collision_TestInstances = 0x0023E4A0; // "sweep an instance's volume against every drawn instance it may hit"; slot 0 of the test list D_800AD190
+Collision_TestModels = 0x0023D050; // sweeps against the scene models whose bounds the move enters, nearest first (Sort_Quick); slot 1 of D_800AD190
+Collision_SortSwap = 0x0023DB5C; // the swap routine Collision_TestModels hands to Sort_Quick (RW func_802405FC_de, a second copy of SortRecord_Swap)
+Collision_SortCompare = 0x0023DB98; // "qsort comparator over records with a float key at 4"; Collision_TestModels
+Collision_LookAtF = 0x0023DCBC; // a static copy of guLookAtF (eye, at, up -> mf, identity first); only caller Collision_TestModels (RW func_80274DFC_de)
+Sweep_GetVolumeBounds = 0x0023E6D8; // "fill the bounds of the volume a sweep's instance moves through"
+Sweep_TestInstance = 0x0023DF70; // "sweep an instance's volume (box) against another instance's cylinder" (comment)
+Sweep_TestBox = 0x0023FDF0; // sweeps against a model node's hit box (its eight corners); caller func_0024032C
+Sweep_TestBoxFaces = 0x0023F880; // "sweep against the six faces of a box given by its eight corners" (comment)
+Sweep_IsSpecialObject = 0x0023F034; // "nonzero for an object (kind 1) with flags 0x300000 set" (the player's actors)
+ModelSweep_TestModel = 0x0023DBBC; // "sweep against every polygon group of the model's current variant, until a hit"
+ModelSweep_TestGroup = 0x0023D7CC; // "walk one polygon group's display list (G_VTX/G_TRI1/G_TRI2) and sweep against every triangle"
+ModelSweep_TestTriangle = 0x0023D4D4; // "sweep against one triangle of a model" (comment)
+Sweep_HitBox = 0x0023A640; // "where the segment first enters box (slab test)" (comment); 5 callers
+Sweep_HitRect = 0x0023A968; // "Sweep_HitBox on the ground plane" (comment)
+Sweep_HitPlane = 0x0023AB18; // "tests the sweep against the plane through point; on a nearer hit records it and answers it the way kind says (stop, slide, bounce...)"; 11 callers
+Sweep_HitCylinder = 0x0023B38C; // "sweep against a vertical cylinder of the given radius round centre" (comment)
+Sweep_CrossRegionEdge = 0x0023B664; // "whether the sweep's instance may go from region from across its edge: returns that region, or NULL" (comment)
+Sweep_FollowGround = 0x0023BE24; // "whether the sweep stays on the ground of its region; if so, end is put on the region's surface" (comment)
+SweepHit_Clear = 0x0023C0FC; // "clears a sweep's hit: no hit yet, the whole move to go"
+SweepHit_Store = 0x0023C120; // "writes a sweep's hit back where the test that took it asked" (comment)
+Sweep_GetGroundBehavior = 0x0023C188; // the definition's m_GroundBehavior, 0 when the region info has flag 0x4000
+Quad_ComputeNormal = 0x0023C1D8; // (c1 - c0) x (c2 - c1) into the normal at 0x30 of a four-corner quad
+Plane_IsBehind = 0x0023C240; // 1 when a point is behind a plane (dot with its normal < 0) (RW func_80241260_de)
+Plane_SegmentCrosses = 0x0023C2B0; // 1 when a and b are on different sides of the plane
+Plane_IntersectSegmentT = 0x0023C390; // the fraction where start->end crosses the plane from its front
+Plane_IntersectSegment = 0x0023C478; // "where the segment from start to end crosses plane (from its front), in *hit"
+Quad_ContainsPoint = 0x0023C594; // "1 when point lies on the inner side of all four edges of the quad"
+Quad_ContainsPointYZ = 0x0023C678; // point-in-quad in the YZ projection (winding by normal.x)
+Quad_ContainsPointXZ = 0x0023C730; // point-in-quad in the XZ projection (winding by normal.y)
+Quad_ContainsPointXY = 0x0023C7E8; // point-in-quad in the XY projection (winding by normal.z)
+Quad_GetHeightAt = 0x0023C8A0; // "height of the quad's plane at (x, z)"
+Quad_Translate = 0x0023C960; // adds a vector to the four corners
+Quad_SetBoxBottom = 0x0023C9CC; // "sets a box face from points 0, 1, 2 and 3 of the box" (RW func_80240D20_de)
+Quad_SetBoxSide0374 = 0x0023CA98; // box face from points 0, 3, 7, 4
+Quad_SetBoxSide2156 = 0x0023CB64; // box face from points 2, 1, 5, 6
+Quad_SetBoxSide3267 = 0x0023CC30; // box face from points 3, 2, 6, 7
+Quad_SetBoxSide4510 = 0x0023CCFC; // box face from points 4, 5, 1, 0
+Quad_SetBoxTop = 0x0023CDC8; // box face from points 7, 6, 5, 4 (the top, the corners are bottom face first)
+Sphere_Set = 0x0023CE94; // stores a centre and a radius
+Cylinder_ContainsPoint = 0x0023CEC0; // "a vertical cylinder: its centre and its squared radius": point inside on x/z
+Circle_SegmentIntersects = 0x0023CF04; // "whether the segment from a to b crosses the circle of sphere on the ground plane"
+
+// Path finding over the region graph.
+Path_ExpandNode = 0x002393D0; // one step of the region path search (pool nodes, Sweep_CrossRegionEdge); callers Path_FindRegionPath
+Path_FindRegionPath = 0x002399F8; // "searches a path of regions from obj to goalRegion and puts in *out the centre of the region to head for" (comment)
+Path_FindFleeRegion = 0x00239C28; // "picks the neighbouring region whose centre is farthest from pos and still passes func_002698AC" (comment)
+Path_FitsInRegion = 0x00239DB0; // "whether a mover at pos fits in region" (comment)
+
+// Particles (CParticle / CParticleSystem, structs/particle.h; one source
+// file func_0022D2FC..func_0022F350, after Rage Wars' particle/8027A0F4_*.CPP
+// and CODE_80281A70.CPP, whose few names AbuN64 gives are taken).
+CParticleSystem__Update = 0x00230CB4; // "steps the particle system once" (comment; RW func_80281CA0_de); called by CScene__Update on world+0x18B0
+CParticleSystem__Draw = 0x0023118C; // RW Particle_DrawRenderList: "draws the particle render list"; caller CScene__DrawParticles
+CParticleSystem__Spawn = 0x0022F350; // spawns the particles a template block lists for a kind (owner, ref count, position, rotation, region); RW func_802800C0_de; 18 files call it
+CParticleSystem__Free = 0x0022F1C8; // retires a live particle (flag 0x100): its children, loop sound, swooshes, dynamic light, owner count, back to the free list at 0xEC00; 15 files call it
+CParticleSystem__FreeAll = 0x002316F4; // frees every particle of the three active lists at 0xEC28
+CParticleSystem__AllocNode = 0x00232B84; // RW Particle_AllocPoolNode: a free node, freeing the oldest of a lower list first when none
+CParticleSystem__FreeOldest = 0x00232C7C; // frees the tail of the first non-empty active list up to count (RW func_8028466C_de)
+CParticleSystem__FindOwned = 0x00232CD8; // "finds the particle of owner arg1 (and of template arg2) in the template's active list" (RW func_802846C8_de)
+CParticleSystem__ResolveInteractions = 0x00233268; // type 0x22 particles check their surroundings (CParticle__CheckProximity), type 0x57 ones expire the others in range (RW func_00284E70)
+CParticle__Update = 0x0022AFB4; // "updates a particle for one frame" (comment; RW func_8027B720_de); caller CParticleSystem__Update
+CParticle__BuildMatrix = 0x0022D2FC; // RW Particle_BuildMatrix: the particle's draw matrix (camera-facing, depth-scaled, coloured)
+CParticle__BuildCameraMatrix = 0x002327F4; // CParticle__BuildMatrix for the current camera with |view z| as depth (RW func_80284178_de)
+CParticle__DrawSprite = 0x0022E094; // RW Particle_DrawSprite (the file's header says so): draws a sprite particle; caller CParticleSystem__Draw
+CParticle__DrawShadow = 0x0022DCBC; // "draws the blob shadow under an actor, tilted to the surface" (comment)
+CParticle__DrawModel = 0x002328A8; // lights (CScene__GetLightsAt) and draws the particle's model (func_0020B9F4), what CParticleSystem__Draw does inline for model particles
+CParticle__GetParentTransform = 0x0022CF40; // RW Particle_ParentTransform: "the transform a particle's position is relative to, picked by its attachment mode"
+CParticle__Attach = 0x0022D09C; // RW Particle_Attach: "moves a particle attached to an actor along with it"
+CParticle__HitTarget = 0x0022C488; // RW Particle_HitTarget: "a particle hit the current collision target: attaches, plays the impact's model, effects and sound"
+CParticle__HitInstanceBody = 0x0022CA90; // the other target hit (type-0 instance with hit flag 0x1000000): "puts the particle at the hit point and pulls it back" (RW func_8027D4A8_de)
+CParticle__HitWall = 0x0022BA88; // the wall-region impact (D_800F1CE0.m_pWallRegion), events by the region's surface (RW func_8027C274_de)
+CParticle__HitWater = 0x0022BD10; // the water-region impact (m_pWaterRegion) (RW func_8027C4F0_de)
+CParticle__HitFloor = 0x0022BFA0; // the floor impact (m_nFloorKind 1) (RW func_8027C758_de)
+CParticle__HitCeiling = 0x0022C228; // the other floor kind (m_nFloorKind 2: "ceiling", structs/collision.h) (RW func_8027C9CC_de)
+CParticle__ReportCollision = 0x0022AAE0; // "reports a particle to the two collision states by the type group it belongs to" (comment; RW func_8027B428_de)
+CParticle__SpawnChild = 0x00229340; // spawns impact particle type `model` from this one through CParticleSystem__Spawn with its parent transform (RW func_80279B40_de); 6 callers
+CParticle__Steer = 0x0022A4C8; // "a projectile's per-frame steering: by type, then homing, thrust and movement" (comment; RW func_0027ADBC)
+CParticle__Wobble = 0x00229618; // "projectile wobble: swings the velocity sideways along sine waves" (comment)
+CParticle__UpdateHomingMissile = 0x002298C4; // "a homing missile: keeps its flight sound 0x1B2 playing, turns toward its target, accelerates" (comment)
+CParticle__UpdateReturning = 0x00229D10; // "a projectile that flies back to a point beside its owner's player and is caught there" (comment)
+CParticle__UpdateHoming = 0x0022A1A4; // "homing projectile: turns toward the middle of its target, harder the closer it is" (comment)
+CParticle__Accelerate = 0x00231EF8; // "accelerates m_vVelocity along m_vDirection, clamping the speed to the parent limit"
+CParticle__CheckProximity = 0x00230AB0; // sets 0x128 when a living enemy (m_pKind1) or a player is within 256 (RW func_00281A70); type 0x22 particles
+CParticle__ExpireNearby = 0x00233190; // sets m_nFrames = 1 on the non-0x57 particles within range (RW func_00284D98)
+CParticle__StartEffects = 0x00231D98; // attaches it, starts its swoosh (Trail_AddNode), dynamic light (DLight_Spawn) and sound (RW func_002838F4)
+CParticle__StopEffects = 0x00231E94; // detaches its swooshes (Trail_DetachOwner) and gives back its CDLight
+CParticle__Kill = 0x002317E4; // CParticleSystem__Free on D_800F8928 and CParticle__StopLoopSound
+CParticle__StartLoopSound = 0x00232AC4; // "starts (or restarts) the looping sound on the object"
+CParticle__StopLoopSound = 0x00232B40; // stops the looping sound handle (func_00275D34) and clears it; 14 callers
+CParticle__IsUnderWater = 0x002325F0; // "whether the particle is under water: below its region's water height"
+CParticle__GetDistanceScale = 0x0023270C; // the size scale by distance (CROMParticleDistance m_NearScale/m_FarScale, structs/particle.h names this function) (RW func_00284064)
+CParticle__FireUpdateEvent = 0x002323E0; // fires impact event 13/11 (under water or not) every update; caller CParticle__Update
+CParticle__FireExpireEvent = 0x002324E8; // fires impact event 12/10, the one CParticleSystem__Update fires for expired particles; caller CParticle__Update when a size goes negative
+CParticle__SpawnAtWallHit = 0x002318D4; // spawns `kind` at D_800F1CE0's wall hit (m_vWallPos, m_pWallRegion, m_nWallEdge)
+CParticle__SpawnAtFloorHit = 0x00231A00; // spawns `kind` at the floor hit, alignment -3 (the floor value CParticle__Update uses)
+CParticle__SpawnAtCeilingHit = 0x00231B2C; // the same at the floor-kind hit with alignment -2
+CParticle__SpawnAtWaterHit = 0x00231C58; // spawns `kind` at the water hit
+CParticle__SpawnAlongPath = 0x00232934; // "spawns count copies along the segment the actor covered this frame"
+CParticle__PlaceAtInstanceHit = 0x00232044; // puts it at D_800F1CE0.m_vInstancePos flying along the hit velocity, backed off 49.92
+CParticle__AttachToHitNode = 0x00232168; // attaches it to the node of the instance it hit (m_vAttachPos in the node's frame, m_pTarget)
+
+// Colour helpers of the particle code (callers CParticle__BuildMatrix).
+Color_ShiftHue = 0x00228C40; // mixes an RGB colour by a signed hue phase over three 85-wide sectors (1/85 weights) (RW func_802765B0_de)
+Color_Saturate = 0x00228FF8; // "blend a colour toward its brightest channel by percent"
+Color_Darken = 0x002291D4; // "darkens an RGB colour by percent"
+
+// Trails and swooshes (the swoosh system at D_801102B8; RW func_802A25D0_de.. files).
+SwooshSystem_Update = 0x00235F48; // updates the swooshes (SwooshSystem_UpdateSwooshes) and the timers (SwooshSystem_UpdateTimers) outside a pause; called by CScene__Update
+SwooshSystem_UpdateSwooshes = 0x002366C8; // walks the swoosh list at 0x7514 updating each (Swoosh_Update)
+SwooshSystem_UpdateTimers = 0x002367A0; // "a repeating timer: counts down by the frame time, fires its callback, removed after its last repeat"
+Swoosh_Update = 0x00233BD4; // ages one swoosh slot (time scale flags, owner timeout, fade) (RW func_002A3F94)
+Swoosh_TakeNode = 0x00235FF4; // takes the pending node off a swoosh and puts it on its group (func_0026D2D0/func_0026D288)
+SwooshGroup_Remove = 0x00236040; // "takes arg2 out of group arg1 (and its amount out of the group's total)"
+Swoosh_NewNode = 0x002333C0; // a new node for a swoosh: Swoosh_TakeNode, then its matrices from mtx (RW func_802A25D0_de); 5 callers
+Swoosh_AddParticleNode = 0x00236170; // adds a node at a drawn particle's matrix; caller CParticleSystem__Draw
+Swoosh_DetachOwner = 0x0023624C; // "detaches every swoosh of owner arg1, letting each fade out"
+SwooshSet_FreeOwner = 0x002365F8; // "frees every active node of the swoosh/decal set (D_801102B8) that belongs to arg1"
+Trail_AddNode = 0x002350EC; // "adds a node to the actor's trail, starting the trail first when the actor has none" (RW func_002A5588)
+Trail_DetachOwner = 0x00234E48; // for every trail part of `who`: freezes it (-1) or moves it with the owner's matrices (RW func_002A52E4); called when a particle goes
+Trail_DrawAll = 0x002352F8; // "draws the trails: the negative layers first, then the positive ones" (RW func_002A577C); called from func_0027E770
+Trail_Draw = 0x00236BC4; // one trail: Trail_ComputeFrames, Trail_PlaceNodes, then textured or (< 0) untextured drawing
+Trail_PlaceNodes = 0x0023417C; // "places every node of the emitter on its owner and sums the distances between consecutive nodes" (RW func_002A7164)
+Trail_ComputeFrames = 0x00233FCC; // builds each node's frame along the trail (Trail_ComputeNodeFrame) (RW func_802A339C_de)
+Trail_ComputeNodeFrame = 0x00233E18; // the frame of a node from the direction to the next one and the camera matrix (RW func_002A41D8)
+Trail_DrawTextured = 0x00234348; // "draws a textured trail" (comment; RW func_802A3718_de)
+Trail_DrawUntextured = 0x00234928; // the untextured trail (comment of func_00236BC4: "< 0: drawn untextured") (RW func_802A3DD4_de)
+Trail_GetAnimFrame = 0x00234C88; // "the frame index of an animation of count frames, by the definition's playback mode"
+Morph_BlendVertices = 0x0023353C; // "blends a vertex buffer between two point sets with a cosine ease"
+Morph_BlendVerticesTex = 0x00233868; // "Morph_BlendVertices with texture coordinates"
+RibbonVtxPool_Alloc = 0x00235F8C; // takes n vertices off the per-view pool, 0 when short (RW func_802A56C4_de)
+RibbonVtxPool_Reset = 0x00235FC4; // "per-view vertex buffers: 0x12C0 bytes each": resets the count and picks this frame's (D_800B6D1C)
+Path_StoreSegmentFractions = 0x00236B7C; // "stores where each segment starts, as a fraction of the whole path"
+
+// Script animators (ScriptAnimator, STRUCTS_TODO: "func_002362E4 starts it, func_00236314 fires it, func_00236324 applies").
+ScriptAnimator_Start = 0x002362E4; // binds an animator to its owner; 7 VM callers
+ScriptAnimator_SetScript = 0x00236314; // points it at a float script; 28 VM callers
+ScreenTint_UpdateMode = 0x00235898; // clamps the screen tint D_800AB8B0's colour and D_800AB8C0's two alphas to 255 and picks its m_Mode (0, 1, 3, 6); the same VM callers as ScriptAnimator_Apply
+ScriptAnimator_Apply = 0x00236324; // writes the animator's colour and alphas into the screen tint D_800AB8B0 / D_800AB8C0; 5 VM callers
+Animator_Update = 0x00235510; // steps an animator's mode machine (wait, loop, timed...) by the frame time (RW func_802A4A60_de); 9 VM callers
+
+// Misc.
+Quat_AlignYTo = 0x00235AD0; // the rotation taking the Y axis to a direction (cross product with (0,1,0), sqrt, half-angle sin/cos) as a 4-vector (RW func_802A5020_de)
+CCamera__CanSeeTarget = 0x00233000; // "whether the line from the camera to target is clear" (comment)

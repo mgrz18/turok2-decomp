@@ -1,5 +1,5 @@
 /* 0x00409000-0x00409340. splat started it at 0x00408FF8, two junk words before
- * it (src/us/asm/stray_00408FF8.s); func_00409340 installs func_00408FF8 + 8,
+ * it (src/us/asm/stray_00408FF8.s); MotherBoss_Init installs func_00408FF8 + 8,
  * this function, as the AI hit callback. */
 #include "common.h"
 #include "structs/game_object.h"
@@ -13,10 +13,10 @@
 
 extern u8 D_00431E54[];
 
-extern void func_0040BDD0(void *obj, void *sounds, s32 flags);
-extern void func_00243414(void *obj, CAI *ai, s32 state);
+extern void MotherBoss_StartSpotAnims(void *obj, void *sounds, s32 flags);
+extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 
-void func_00409000(void *obj, CAI *ai, DamageEvent *hit) {
+void MotherBoss_Hurt(void *obj, CAI *ai, DamageEvent *hit) {
     MotherBossState *s;
     s32 mask;
     s32 spot;
@@ -107,7 +107,7 @@ void func_00409000(void *obj, CAI *ai, DamageEvent *hit) {
     damage = s->slots[target].health < hit->damage ? (s->slots + target)->health : hit->damage;
     s->slots[target].health -= damage;
     s->health -= damage;
-    func_0040BDD0(obj, D_00431E54, fx);
+    MotherBoss_StartSpotAnims(obj, D_00431E54, fx);
     if (s->slots[target].health > 0) {
         return;
     }
@@ -115,10 +115,10 @@ void func_00409000(void *obj, CAI *ai, DamageEvent *hit) {
         s->partsLeft--;
         switch (kind) {
         case 0:
-            func_00243414(obj, ai, 7);
+            CAI__SetMode(obj, ai, 7);
             break;
         case 1:
-            func_00243414(obj, ai, 8);
+            CAI__SetMode(obj, ai, 8);
             break;
         }
     }
@@ -132,13 +132,13 @@ void func_00409000(void *obj, CAI *ai, DamageEvent *hit) {
     }
     switch (s->phase) {
     case 0:
-        func_00243414(obj, ai, 9);
+        CAI__SetMode(obj, ai, 9);
         break;
     case 1:
-        func_00243414(obj, ai, 0x13);
+        CAI__SetMode(obj, ai, 0x13);
         break;
     case 2:
-        func_00243414(obj, ai, 0x1E);
+        CAI__SetMode(obj, ai, 0x1E);
         break;
     }
 }

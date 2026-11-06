@@ -1,10 +1,10 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU_2/80408AC4_8.CPP, func_8043CF84_de, with Turok 2's layouts.
- * Second-module twin of func_0041AEF0. */
+ * Second-module twin of Cheat_FindWarpLevel. */
 
 #include "rw/abu_types.h"
 
 extern s32 D_8011AADC;
-s32 func_00453E58(s32 index, s32 step, s32 mode) {
+s32 Cheat_FindWarpLevel_2(s32 index, s32 step, s32 mode) {
     s32 i;
     s32 mask;
     s32 *flags;

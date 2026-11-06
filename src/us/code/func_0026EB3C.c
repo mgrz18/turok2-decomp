@@ -13,7 +13,7 @@ s32 CList__AddTail(void *, s32);                 /* extern */
 s32 __osDisableInt();                                /* extern */
 s32 __osRestoreInt(s32);                         /* extern */
 
-void func_0026EB3C(CPool *arg0, s32 arg1, s32 arg2) {
+void RumblePool_Init(CPool *arg0, s32 arg1, s32 arg2) {
     s32 temp_s4;
     s32 var_s0;
     s32 var_s1;

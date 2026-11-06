@@ -3,10 +3,10 @@
 
 #include "common.h"
 #include "ultra_types.h"
-extern s32 __osPfsReleasePages(OSPfs *pfs, __OSInode *inode, u8 start_page, u16 *sum, u8 bank,
+extern s32 __osPfsReleasePages_2(OSPfs *pfs, __OSInode *inode, u8 start_page, u16 *sum, u8 bank,
                          __OSInodeUnit *last_page, int flag);
 extern s32 func_00427A6C(OSPfs *pfs, u8 page_no, u16 *sum, u8 bank);
-s32 __osPfsReleasePages(OSPfs *pfs, __OSInode *inode, u8 start_page, u16 *sum, u8 bank,
+s32 __osPfsReleasePages_2(OSPfs *pfs, __OSInode *inode, u8 start_page, u16 *sum, u8 bank,
                   __OSInodeUnit *last_page, int flag)
 {
     __OSInodeUnit next_page;

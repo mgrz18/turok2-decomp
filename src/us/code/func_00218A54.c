@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_00218A54(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f32 arg5);
-f32 func_00218A54(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f32 arg5) {
+extern f32 Curve_EvaluateCubic(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f32 arg5);
+f32 Curve_EvaluateCubic(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f32 arg5) {
     f32 bits = *(f32 *)&arg0;
     f32 v1 = *(f32 *)&arg1;
     f32 v2 = *(f32 *)&arg2;

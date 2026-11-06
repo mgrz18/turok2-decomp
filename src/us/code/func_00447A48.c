@@ -1,4 +1,4 @@
-/* Second-module copy of func_0040EA48 (src/us/code/func_0040EA48.c), with its string/data addresses 0xE0 lower. */
+/* Second-module copy of BlindOne_PhaseVulnerableUpdate (src/us/code/BlindOne_PhaseVulnerableUpdate.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -32,7 +32,7 @@ static __inline__ void NextCommand(BlindOneState *m) {
     }
 }
 
-void func_00447A48(BlindOneState *m) {
+void BlindOne_PhaseVulnerableUpdate_2(BlindOneState *m) {
     if (m->boss->m_AI.m_Health == 0) {
         NextCommand(m);
     }

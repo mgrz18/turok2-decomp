@@ -13,7 +13,7 @@ typedef struct {
 extern s32 D_00431700;
 extern LevelScriptF9D0 D_8012F9D0;
 
-void func_00407BBC(void) {
+void Primagen_EnterMode16(void) {
     D_8012F9D0.restart = 1;
     D_8012F9D0.scriptPrev = -1;
     D_8012F9D0.scriptIndex = -1;

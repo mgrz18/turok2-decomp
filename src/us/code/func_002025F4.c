@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void *func_002025F4(HeapRecAtC *heap, s32 request)
+void *CHeap__AllocTop(HeapRecAtC *heap, s32 request)
 {
     BlockRecAt20 *block;
     BlockRecAt20 *split;

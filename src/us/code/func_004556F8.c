@@ -12,14 +12,14 @@ struct RecordRecAt14 {
 };
 extern f32 D_80130930;
 extern f32 D_800B6D28;
-extern s32 func_00266B80(void);
+extern s32 GetMemSize(void);
 extern s32 func_00424500();
-s32 func_004556F8(struct RecordRecAt14 *record) {
+s32 OptionsMenu_ResolutionText_2(struct RecordRecAt14 *record) {
     D_80130930 -= D_800B6D28;
     if (D_80130930 <= 0.0f) {
         D_80130930 = 0.0f;
     }
-    if (func_00266B80() != 0x400000) {
+    if (GetMemSize() != 0x400000) {
         record->flags |= 0x1000000;
     } else {
         record->flags &= ~0x1000000;

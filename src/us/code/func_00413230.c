@@ -1,18 +1,18 @@
 /* One file, 0x413230-0x417484, .rodata 0x800C0AF0-0x800C0E64: the menu
- * code from func_00413230 to func_00417418. Objects start 16-aligned in
+ * code from MenuItem_FormatBinding to MenuPool_CloseMenu. Objects start 16-aligned in
  * .text and in .rodata, with junk words before: stray_00413228 opens it,
  * stray_00417484 closes it, and its pool opens after junk at 0x800C0AE8 and
  * ends with junk at 0x800C0E64, before the next object's at 0x800C0E70.
- * The pools run on from one function to the next (func_004156FC's double at
+ * The pools run on from one function to the next (Menu_Draw's double at
  * 0x800C0C28 is 8-aligned only counted from 0x800C0AF0), and the string
- * "menu" (0x800C0C54) is one constant for func_00415FB8, func_00416644,
- * func_00416760, func_00416894 and func_004172F8.
+ * "menu" (0x800C0C54) is one constant for MenuPool_OpenSubmenu, MenuPool_OpenMenu,
+ * MenuPool_OpenMenuFrom, MenuPool_OpenChildMenu and MenuPool_OpenMenuParam.
  *
  * Each part was matched alone first; the types are the shared ones now
  * (structs/menu.h, structs/menu_model.h, structs/camera.h), and the extern
  * aliases the parts declared still carry the part's address as a suffix.
  * The second module holds this file byte for byte at the same link address
- * (func_0044C230.c). */
+ * (MenuItem_FormatBinding_2.c). */
 #include "common.h"
 #include "structs/game.h"
 #include "structs/menu.h"
@@ -20,12 +20,12 @@
 #include "structs/camera.h"
 #include "gfx.h"
 
-/* ---------------- func_00413230 ---------------- */
-/* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of func_004131B0 (3 words), a padding nop,
+/* ---------------- MenuItem_FormatBinding ---------------- */
+/* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
  * one junk word (0x41322C) and this function, which really starts at 0x413230 (0x174 bytes). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043F290.c, func_0043F290, with Turok 2's layouts. */
 
-extern s32 func_0029E3E0(char *buf, const char *fmt, ...); /* sprintf */
+extern s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 extern char D_801308A0[];
 extern char D_80130860[];
 
@@ -57,26 +57,26 @@ static __inline__ f32 MenuItem_GetValue(MenuItem *item) {
 }
 
 /* Formats the item's value (scaled) after its name. */
-char *func_00413230(MenuItem *item) {
+char *MenuItem_FormatBinding(MenuItem *item) {
     MenuBinding *binding = item->binding;
     f32 value = MenuItem_GetValue(item);
 
     value = value / binding->scale;
-    func_0029E3E0(D_801308A0, "%3.2f", (f64) value);
+    sprintf(D_801308A0, "%3.2f", (f64) value);
     if (binding->name) {
-        func_0029E3E0(D_80130860, "%s %s", binding->name, D_801308A0);
+        sprintf(D_80130860, "%s %s", binding->name, D_801308A0);
     } else {
-        func_0029E3E0(D_80130860, "%s", D_801308A0);
+        sprintf(D_80130860, "%s", D_801308A0);
     }
     return D_80130860;
 }
 
-/* ---------------- func_004133A4 ---------------- */
+/* ---------------- MenuItem_UpdateBinding ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043F404.c, func_0043F404, with Turok 2's layouts. */
 /* A menu slider: step its bound variable (any numeric type) with left/right. */
 
-extern s32 func_00285628(ControllerProfile *controller);   /* left pressed */
-extern s32 func_00285670(ControllerProfile *controller);   /* right pressed */
+extern s32 Controller_MenuLeft(ControllerProfile *controller);   /* left pressed */
+extern s32 Controller_MenuRight(ControllerProfile *controller);   /* right pressed */
 
 static __inline__ f32 bindingGet(MenuItem *item) {
     MenuBinding *b = item->binding;
@@ -109,17 +109,17 @@ static __inline__ void bindingSet(MenuItem *item, f32 value) {
     }
 }
 
-s32 func_004133A4(MenuItem *item, Menu *menu) {
+s32 MenuItem_UpdateBinding(MenuItem *item, Menu *menu) {
     MenuBinding *b = item->binding;
     f32 value;
 
     value = bindingGet(item);
-    if (func_00285628(menu->controller)) {
+    if (Controller_MenuLeft(menu->controller)) {
         value -= b->step;
         if (value < b->min) {
             value = b->min;
         }
-    } else if (func_00285670(menu->controller)) {
+    } else if (Controller_MenuRight(menu->controller)) {
         value += b->step;
         if (b->max < value) {
             value = b->max;
@@ -129,17 +129,17 @@ s32 func_004133A4(MenuItem *item, Menu *menu) {
     return 0;
 }
 
-/* ---------------- func_0041363C ---------------- */
+/* ---------------- MenuItem_Layout ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043F69C.c, func_0043F69C, with Turok 2's layouts. */
 
 extern s32 D_800C2030; /* screen width */
 extern s32 D_800C2034; /* screen height */
 
-extern s32 func_00266B80(void);
-extern CCamera *func_00416B28_41363C(void *pool) __asm__("func_00416B28");
-extern u8 *func_00413230_41363C(MenuItem *item) __asm__("func_00413230");
-extern f32 func_004163C0_41363C(u8 *text, f32 a, f32 b) __asm__("func_004163C0");
-extern void func_0027AEA8(s32 image, s32 b, s32 *width, s32 *height);
+extern s32 GetMemSize(void);
+extern CCamera *func_00416B28_41363C(void *pool) __asm__("MenuPool_GetCamera");
+extern u8 *func_00413230_41363C(MenuItem *item) __asm__("MenuItem_FormatBinding");
+extern f32 func_004163C0_41363C(u8 *text, f32 a, f32 b) __asm__("Menu_TextWidth");
+extern void Hud_GetSpriteSize(s32 image, s32 b, s32 *width, s32 *height);
 
 static __inline__ MenuTextStyle *MenuItem_Style_41363C(MenuItem *it) {
     s32 i;
@@ -181,7 +181,7 @@ static __inline__ MenuTextStyle *MenuItem_Style_41363C(MenuItem *it) {
 }
 
 /* Measures a menu item and places it on screen. */
-void func_0041363C(MenuItem *it, MenuItemLayout *o) {
+void MenuItem_Layout(MenuItem *it, MenuItemLayout *o) {
     CCamera *cam;
     MenuTextStyle *E;
     MenuItem cp;
@@ -231,11 +231,11 @@ void func_0041363C(MenuItem *it, MenuItemLayout *o) {
             break;
         case 1:
             if ((D_8011AAD8.mode == 13 && (it->flags & 0x40000000)) ||
-                (D_8011AAD8.multiplayer != 0 && (s32) it->flags < 0 && func_00266B80() == 0x400000)) {
+                (D_8011AAD8.multiplayer != 0 && (s32) it->flags < 0 && GetMemSize() == 0x400000)) {
                 o->width = 0x11C;
                 o->height = 0xDE;
             } else {
-                func_0027AEA8(it->data, 0, &o->width, &o->height);
+                Hud_GetSpriteSize(it->data, 0, &o->width, &o->height);
             }
             if ((it->flags & 0x10000000) && (f32) o->width != 0.0f && (f32) o->height != 0.0f) {
                 fa = cam->m_Viewport.m_Width / (f32) o->width;
@@ -251,17 +251,17 @@ void func_0041363C(MenuItem *it, MenuItemLayout *o) {
             a = *o;
             cp = *it;
             cp.type = 0;
-            func_0041363C(&cp, &a);
+            MenuItem_Layout(&cp, &a);
             b = *o;
             cp = *it;
             cp.type = 1;
             cp.data = 0;
-            func_0041363C(&cp, &b);
+            MenuItem_Layout(&cp, &b);
             c = *o;
             cp = *it;
             cp.type = 1;
             cp.data = 0;
-            func_0041363C(&cp, &c);
+            MenuItem_Layout(&cp, &c);
             n2 = b.width + c.width;
             if (n2 < a.width) {
                 n2 = a.width;
@@ -299,7 +299,7 @@ void func_0041363C(MenuItem *it, MenuItemLayout *o) {
     o->bottom = (f32) o->top + (f32) o->height * o->scaleY;
 }
 
-/* ---------------- func_00413F74 ---------------- */
+/* ---------------- MenuItem_DrawString ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043FFAC.c, func_0043FFAC, with Turok 2's layouts. */
 
 extern s32 D_800C1BD0; /* current draw mode */
@@ -307,14 +307,14 @@ extern s32 D_801101B0[];
 extern s32 D_800C2030; /* screen width */
 extern s32 D_800C2034; /* screen height */
 
-extern s32 func_00266B80(void);
-extern void func_00415CE8_413F74(Menu *w, MenuItem *it, s32 c) __asm__("func_00415CE8");
-extern void func_00277F6C(void);
-extern void func_0027836C(void);
-extern void func_0027845C(void);
+extern s32 GetMemSize(void);
+extern void func_00415CE8_413F74(Menu *w, MenuItem *it, s32 c) __asm__("Menu_DrawBar");
+extern void COnScreen__BeginText(void);
+extern void COnScreen__SelectSmallFont(void);
+extern void COnScreen__SelectTinyFont(void);
 extern void COnScreen__SetFontColor(s32 r0, s32 g0, s32 b0, s32 r1, s32 g1, s32 b1);
 extern void COnScreen__SetFontScale(f32 x, f32 y);
-extern void func_00278CDC(char *text, s32 x, s32 y, s32 alpha, s32 centred, s32 shadow, f32 scaleX, f32 scaleY);
+extern void COnScreen__DrawString(char *text, s32 x, s32 y, s32 alpha, s32 centred, s32 shadow, f32 scaleX, f32 scaleY);
 
 static __inline__ MenuTextStyle *MenuItem_Style_413F74(MenuItem *it) {
     s32 i;
@@ -356,7 +356,7 @@ static __inline__ MenuTextStyle *MenuItem_Style_413F74(MenuItem *it) {
 }
 
 /* Draws a menu item's text in its class's style, brighter when it is the selected one. */
-void func_00413F74(MenuItem *it, MenuItemLayout *b, MenuItemLayout *c, Menu *w, char *text) {
+void MenuItem_DrawString(MenuItem *it, MenuItemLayout *b, MenuItemLayout *c, Menu *w, char *text) {
     u8 en;
     MenuTextStyle *E;
     f32 k;
@@ -364,7 +364,7 @@ void func_00413F74(MenuItem *it, MenuItemLayout *b, MenuItemLayout *c, Menu *w, 
 
     en = 1;
     if ((D_8011AAD8.mode == 13 && (it->flags & 0x40000000)) ||
-        (D_8011AAD8.multiplayer != 0 && (s32) it->flags < 0 && func_00266B80() == 0x400000)) {
+        (D_8011AAD8.multiplayer != 0 && (s32) it->flags < 0 && GetMemSize() == 0x400000)) {
         w->visible = 0;
     }
     if (it->flags & 0x08000000) {
@@ -382,15 +382,15 @@ void func_00413F74(MenuItem *it, MenuItemLayout *b, MenuItemLayout *c, Menu *w, 
     if (D_800C1BD0 != E->font) {
         switch (E->font) {
             case 0:
-                func_00277F6C();
+                COnScreen__BeginText();
                 break;
             case 1:
-                func_00277F6C();
-                func_0027836C();
+                COnScreen__BeginText();
+                COnScreen__SelectSmallFont();
                 break;
             case 2:
-                func_00277F6C();
-                func_0027845C();
+                COnScreen__BeginText();
+                COnScreen__SelectTinyFont();
                 break;
         }
         D_800C1BD0 = E->font;
@@ -428,25 +428,25 @@ void func_00413F74(MenuItem *it, MenuItemLayout *b, MenuItemLayout *c, Menu *w, 
     if (en != 0) {
         en = E->shadow;
     }
-    func_00278CDC(text, b->left, b->top, (s32) (w->fade * (w->alpha * 255.0f)), 0, en, 1.0f, 1.0f);
+    COnScreen__DrawString(text, b->left, b->top, (s32) (w->fade * (w->alpha * 255.0f)), 0, en, 1.0f, 1.0f);
 }
 
-/* ---------------- func_004143DC ---------------- */
-/* func_004143DC to func_004156FC were matched first as one file of their
+/* ---------------- MenuItem_DrawImage ---------------- */
+/* MenuItem_DrawImage to Menu_Draw were matched first as one file of their
  * own (0x4143DC-0x415CE8, .rodata from 0x800C0BE8); their types carry the
  * address of the part that matched them. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0044044C.c, func_0044044C, with Turok 2's layouts. */
 
 extern s32 D_800C1BD0_4143DC __asm__("D_800C1BD0"); /* current draw mode */
 
-extern s32 func_00266B80(void);
-extern void func_0027AF4C(); /* called with and without an argument */
-extern void func_002778A8(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);
-extern void func_00279028(s32 alpha);
-extern void func_0027B320(s32 image, s32 b, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 g);
+extern s32 GetMemSize(void);
+extern void Hud_SetupFillMode(); /* called with and without an argument */
+extern void Hud_DrawBevelBox(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);
+extern void Hud_SetupTextureMode(s32 alpha);
+extern void Hud_DrawSprite(s32 image, s32 b, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 g);
 
 /* Draws a menu image: a filled box when it is the focused item, the image otherwise. */
-void func_004143DC(MenuItem *item, MenuItemLayout *box, MenuItemLayout *area, Menu *window) {
+void MenuItem_DrawImage(MenuItem *item, MenuItemLayout *box, MenuItemLayout *area, Menu *window) {
     s32 alpha;
     f32 fx;
     f32 fy;
@@ -454,12 +454,12 @@ void func_004143DC(MenuItem *item, MenuItemLayout *box, MenuItemLayout *area, Me
     f32 t2;
 
     if ((D_8011AAD8.mode == 13 && (item->flags & 0x40000000)) ||
-        (D_8011AAD8.multiplayer != 0 && (s32) item->flags < 0 && func_00266B80() == 0x400000)) {
+        (D_8011AAD8.multiplayer != 0 && (s32) item->flags < 0 && GetMemSize() == 0x400000)) {
         window->highlighted = 1;
         if (D_800C1BD0_4143DC != 3) {
             D_800C1BD0_4143DC = 3;
         }
-        func_0027AF4C();
+        Hud_SetupFillMode();
         t1 = (f32) box->width * box->scaleX;
         t2 = (f32) box->height * box->scaleY;
         fy = (f32) box->top;
@@ -479,28 +479,28 @@ void func_004143DC(MenuItem *item, MenuItemLayout *box, MenuItemLayout *area, Me
         } else {
             alpha = 0x80;
         }
-        func_002778A8(box->left, box->top, (s32) fx, (s32) fy, 1, 0, 0, 0, 0, alpha);
+        Hud_DrawBevelBox(box->left, box->top, (s32) fx, (s32) fy, 1, 0, 0, 0, 0, alpha);
     } else {
         if (D_800C1BD0_4143DC != 3) {
             D_800C1BD0_4143DC = 3;
-            func_00279028((s32) (window->fade * (window->alpha * 255.0f)));
+            Hud_SetupTextureMode((s32) (window->fade * (window->alpha * 255.0f)));
         }
-        func_0027B320(item->image, 0, (s16) box->left, (s16) box->top, box->scaleX, box->scaleY, 1);
+        Hud_DrawSprite(item->image, 0, (s16) box->left, (s16) box->top, box->scaleX, box->scaleY, 1);
     }
 }
 
 
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00440618.c, func_00440618, with Turok 2's layouts. */
 
-extern void func_0041363C_4143DC(MenuItem *item, MenuItemLayout *info) __asm__("func_0041363C");
-extern void func_00413F74_4143DC(MenuItem *item, MenuItemLayout *box, MenuItemLayout *column, Menu *window, s32 data) __asm__("func_00413F74");
+extern void func_0041363C_4143DC(MenuItem *item, MenuItemLayout *info) __asm__("MenuItem_Layout");
+extern void func_00413F74_4143DC(MenuItem *item, MenuItemLayout *box, MenuItemLayout *column, Menu *window, s32 data) __asm__("MenuItem_DrawString");
 
 static __inline__ void fin_4145B0(MenuItem *item, MenuItemLayout *box, MenuItemLayout *column, Menu *window) {
     func_00413F74_4143DC(item, box, column, window, item->data);
 }
 
 /* Draws a slider: its label, its bar and its knob at the item's value. */
-void func_004145B0(MenuItem *it, MenuItemLayout *box, MenuItemLayout *column, Menu *window) {
+void MenuItem_DrawSlider(MenuItem *it, MenuItemLayout *box, MenuItemLayout *column, Menu *window) {
     MenuItem cp;
     MenuItemLayout o1;
     MenuItemLayout o2;
@@ -527,13 +527,13 @@ void func_004145B0(MenuItem *it, MenuItemLayout *box, MenuItemLayout *column, Me
         box->left = mid - ((o2.width + o3.width) / 2);
     }
     box->left = box->left + o3.width / 2;
-    func_004143DC(&cp, box, column, window);
+    MenuItem_DrawImage(&cp, box, column, window);
     cp = *it;
     cp.data = 0;
     t = it->value * o2.width;
     box->left = box->left + (t / 256 - o3.width / 2);
     box->top = box->top + (o2.height / 2 - o3.height / 2);
-    func_004143DC(&cp, box, column, window);
+    MenuItem_DrawImage(&cp, box, column, window);
     cp = *it;
     if (it->flags & 1) {
         box->left = mid - o1.width / 2;
@@ -555,26 +555,26 @@ extern s32 D_801308E0;
 extern u8 D_800F7078[];
 extern s32 D_800ADB30[];
 
-extern void func_00266C5C(void *p, s32 c, s32 n); /* memset */
+extern void memset(void *p, s32 c, s32 n); /* memset */
 extern f32 func_002982F0(f32 angle);             /* sin */
-extern CIntelligence *func_00225EBC(void *world, s32 type, s32 id);
-extern void func_0020F85C(void *m, CVector3 *in, CVector3 *out);
-extern void func_00219BC0(CGameObjectInstance *fx, s32 a, s32 b, s32 c, void *d, s32 e, s32 f, f32 g, CVector3 h, s32 i, CVector3 j,
+extern CIntelligence *CScene__FindIntelligence(void *world, s32 type, s32 id);
+extern void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
+extern void CGameObjectInstance__Construct(CGameObjectInstance *fx, s32 a, s32 b, s32 c, void *d, s32 e, s32 f, f32 g, CVector3 h, s32 i, CVector3 j,
                           CVector3 k, s32 l);
 extern void func_0021E5D4(CGameObjectInstance *fx);
-extern void func_0021EBC0(CGameObjectInstance *fx);
-extern void func_0021A344(CGameObjectInstance *fx);
-extern s32 func_00206078(void);
-extern void func_00206068(s32 a);
-extern void func_002241D8(void *world, CGameObjectInstance *fx, s32 c, s32 d);
-extern void func_0020B5D4(void);
-extern void func_0020B624(void);
-extern void func_0021D39C(CGameObjectInstance *fx, CCamera *cam);
-extern void func_004171D0_4143DC(void) __asm__("func_004171D0");
-extern void func_004171F4_4143DC(void) __asm__("func_004171F4");
+extern void CGameObjectInstance__ClearDrawMatrices(CGameObjectInstance *fx);
+extern void CGameObjectInstance__UpdateAnimation(CGameObjectInstance *fx);
+extern s32 CCache__GetFrameDelay(void);
+extern void CCache__SetFrameDelay(s32 a);
+extern void CScene__SetInstanceObjectType(void *world, CGameObjectInstance *fx, s32 c, s32 d);
+extern void Render_ResetBatches(void);
+extern void Render_FlushBatches(void);
+extern void CGameObjectInstance__Draw(CGameObjectInstance *fx, CCamera *cam);
+extern void func_004171D0_4143DC(void) __asm__("MenuModel_DrawUnselected");
+extern void func_004171F4_4143DC(void) __asm__("MenuModel_DrawSelected");
 
 /* Draws a menu item's 3D model, loading it the first time. */
-void func_00414938(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused, Menu *w) {
+void MenuItem_DrawModel(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused, Menu *w) {
     CVector3 v50;
     CVector3 v60;
     CVector3 v70;
@@ -593,7 +593,7 @@ void func_00414938(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused, Men
     f32 tt;
     f32 ta, tb;
 
-    func_00266C5C(&v50, 0, 12);
+    memset(&v50, 0, 12);
     if (o->model != NULL) {
         x = o->model;
         p = o->part;
@@ -616,7 +616,7 @@ void func_00414938(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused, Men
             if (!(o->flags & 0x2000000)) {
                 s2 = p->intelType;
                 x2 = o->model;
-                src = func_00225EBC(D_800F7078, s2, p->intelId);
+                src = CScene__FindIntelligence(D_800F7078, s2, p->intelId);
                 if (src == NULL) {
                     x2->loaded = 0;
                 } else {
@@ -635,9 +635,9 @@ void func_00414938(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused, Men
             }
             v60 = p->pos;
             v60.y = v60.y - x->height * v80.y * 0.8f;
-            func_0020F85C(&w->camera->m_mfViewOrient, &v60, &v70);
+            CMtxF__TransformPoint(&w->camera->m_mfViewOrient, &v60, &v70);
             if (s3 != NULL && !(o->flags & 0x2000000)) {
-                func_00219BC0(fx, -1, p->objType, D_800B6D00, s3, -1, 0, w->camera->m_ViewParams.m_RotY + 3.141593f, v70, 0, p->scale, v50,
+                CGameObjectInstance__Construct(fx, -1, p->objType, D_800B6D00, s3, -1, 0, w->camera->m_ViewParams.m_RotY + 3.141593f, v70, 0, p->scale, v50,
                               0);
                 func_0021E5D4(fx);
                 o->flags = o->flags | 0x2000000;
@@ -651,11 +651,11 @@ void func_00414938(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused, Men
             } else {
                 fx->m_AI.m_pfDraw = (void *) func_004171D0_4143DC;
             }
-            if (func_00206078() == 0) {
-                func_00206068(1);
+            if (CCache__GetFrameDelay() == 0) {
+                CCache__SetFrameDelay(1);
             }
             if (x->intelType == INTELLIGENCE_PLAYER) {
-                func_002241D8(D_800F7078, fx, D_800ADB30[fx->header.m_pIntelligence->m_Id], 1);
+                CScene__SetInstanceObjectType(D_800F7078, fx, D_800ADB30[fx->header.m_pIntelligence->m_Id], 1);
             }
             if (D_800C1BD0_4143DC != 4) {
                 D_800C1BD0_4143DC = 4;
@@ -687,28 +687,28 @@ void func_00414938(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused, Men
             fx->m_vScale = v80;
             fx->header.m_vPos = v70;
             fx->m_AI.m_vDesiredPos = v70;
-            func_0021EBC0(fx);
+            CGameObjectInstance__ClearDrawMatrices(fx);
             fx->header.m_vPos = v70;
             fx->m_AI.m_vDesiredPos = v70;
-            func_0021A344(fx);
+            CGameObjectInstance__UpdateAnimation(fx);
             fx->m_RotY = fx->m_RotY + p->spin * D_800B6D28;
             fx->header.m_vPos = v70;
             fx->m_AI.m_vDesiredPos = v70;
-            func_0020B5D4();
-            func_0021D39C(fx, w->camera);
-            func_0020B624();
+            Render_ResetBatches();
+            CGameObjectInstance__Draw(fx, w->camera);
+            Render_FlushBatches();
         }
     }
 }
 
 
-/* ---- func_00414EA8 ---- */
+/* ---- Menu_Construct ---- */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00440F10.c, func_00440F10.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern void *func_00416B28_4143DC() __asm__("func_00416B28");
-extern void func_00416C00_4143DC() __asm__("func_00416C00");
-extern void func_00416C0C_4143DC(void *p) __asm__("func_00416C0C");
+extern void *func_00416B28_4143DC() __asm__("MenuPool_GetCamera");
+extern void func_00416C00_4143DC() __asm__("Menu_ResetFlash");
+extern void func_00416C0C_4143DC(void *p) __asm__("Menu_StartFlash");
 /* The colour records a window starts with (Menu colors): 8 records of
  * 0x18 bytes, read as halfwords at 0, 4, 8 and bytes at 0xD, 0x11, 0x15 (the
  * low parts of six words: the symbol sits 2 bytes into the table). */
@@ -717,7 +717,7 @@ extern MenuColorInit D_800C1CD2[];
 /* Builds a window in its block: the items from the desc's table, the
  * extras after them, the colours, then the desc's init and the items' select
  * callbacks flagged 0x04000000. */
-void func_00414EA8(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, ControllerProfile *a5, void *a6, MenuPool *a7)
+void Menu_Construct(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, ControllerProfile *a5, void *a6, MenuPool *a7)
 {
   s32 i;
   s32 j;
@@ -849,7 +849,7 @@ void func_00414EA8(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, C
 }
 
 
-/* ---- func_004151B4 ---- */
+/* ---- Menu_MoveCursor ---- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8043F52C_de_4.c, func_804410AC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
@@ -857,7 +857,7 @@ void func_00414EA8(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, C
 /* Moves the window's cursor by the selected item's link for dir (0x10 +
  * MENU_LINK_*: the byte at that offset), on until an item that is shown,
  * enabled (0x1800000) and selectable; the item reached links back. */
-void func_004151B4(Menu *menu, u8 dir) {
+void Menu_MoveCursor(Menu *menu, u8 dir) {
     MenuItem *entry;
     s32 old;
     entry = &menu->items[menu->cursor];
@@ -897,21 +897,21 @@ void func_004151B4(Menu *menu, u8 dir) {
 }
 
 
-/* ---- func_0041531C ---- */
+/* ---- Menu_Update ---- */
 /* WRONG CUT: real function 0x0041531C, size 0x3E0 (through 0x004156FC): splat cut it into
- * func_0041531C, func_004154C4, func_00415500, func_00415508, func_004155AC,
+ * Menu_Update, func_004154C4, func_00415500, func_00415508, func_004155AC,
  * func_0041560C and func_004156D8 at branch targets. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00441384.c, func_00441384, with Turok 2's layouts. */
 
 extern f32 D_800B6D28; /* frame delta */
-extern s32 func_002855E8(ControllerProfile *ctl);
-extern s32 func_00285628_4143DC(ControllerProfile *ctl) __asm__("func_00285628");
-extern s32 func_00285670_4143DC(ControllerProfile *ctl) __asm__("func_00285670");
-extern s32 func_002856B8(ControllerProfile *ctl);
-extern s32 func_00285700(ControllerProfile *ctl);
-extern void func_00416C28_4143DC(Menu *menu) __asm__("func_00416C28");
+extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
+extern s32 func_00285628_4143DC(ControllerProfile *ctl) __asm__("Controller_MenuLeft");
+extern s32 func_00285670_4143DC(ControllerProfile *ctl) __asm__("Controller_MenuRight");
+extern s32 Controller_MenuUp(ControllerProfile *ctl);
+extern s32 Controller_MenuDown(ControllerProfile *ctl);
+extern void func_00416C28_4143DC(Menu *menu) __asm__("Menu_UpdateFlash");
 
-s32 func_0041531C(Menu *menu, void *arg) {
+s32 Menu_Update(Menu *menu, void *arg) {
     MenuItem *item;
     s32 quit;
     s32 i;
@@ -994,23 +994,23 @@ s32 func_0041531C(Menu *menu, void *arg) {
             }
             if (horizontal == 0) {
                 if (func_00285628_4143DC(menu->controller) != 0) {
-                    func_004151B4(menu, 0x10);
+                    Menu_MoveCursor(menu, 0x10);
                 }
                 if (func_00285670_4143DC(menu->controller) != 0) {
-                    func_004151B4(menu, 0x11);
+                    Menu_MoveCursor(menu, 0x11);
                 }
             } else if (menu->controller->buttons & 0x60303) {
                 moveV = 0;
             }
             if (moveV != 0) {
-                if (func_002856B8(menu->controller) != 0) {
-                    func_004151B4(menu, 0x12);
+                if (Controller_MenuUp(menu->controller) != 0) {
+                    Menu_MoveCursor(menu, 0x12);
                 }
-                if (func_00285700(menu->controller) != 0) {
-                    func_004151B4(menu, 0x13);
+                if (Controller_MenuDown(menu->controller) != 0) {
+                    Menu_MoveCursor(menu, 0x13);
                 }
             }
-            if (menu->state == 2 && (func_002855E8(menu->controller) != 0 || (func_00285628_4143DC(menu->controller) != 0 && horizontal != 0)
+            if (menu->state == 2 && (Controller_ConfirmPressed(menu->controller) != 0 || (func_00285628_4143DC(menu->controller) != 0 && horizontal != 0)
                                      || (func_00285670_4143DC(menu->controller) != 0 && horizontal != 0))) {
                 if (item->def->select == NULL || item->def->select(item, menu, arg) != 0) {
                     menu->state = 3;
@@ -1022,18 +1022,18 @@ s32 func_0041531C(Menu *menu, void *arg) {
 }
 
 
-/* ---- func_004156FC ---- */
+/* ---- Menu_Draw ---- */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00441764.c, func_00441764.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 f32 func_002982F0(f32 x);
-extern void func_002778A8(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);
+extern void Hud_DrawBevelBox(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);
 extern f32 func_002982F0(f32 x);
 extern s32 D_800C1BD0_4143DC __asm__("D_800C1BD0");
 /* Draws a window's items: lays them all out, centres the box around them
  * (the area) on the camera's viewport and the window's offset, highlights
  * the cursor's and calls each item's draw callback. */
-void func_004156FC(Menu *p, void *a1) {
+void Menu_Draw(Menu *p, void *a1) {
     MenuItemLayout area;
     MenuItemLayout info;
     MenuItemLayout cp;
@@ -1114,13 +1114,13 @@ void func_004156FC(Menu *p, void *a1) {
                             fb = (f32)cp.top;
                             fa = (f32)cp.bottom;
                             fa = fb + (fa - fb);
-                            func_0027AF4C(it);
+                            Hud_SetupFillMode(it);
                             tt = func_002982F0((f32)((u32) D_800B6D20 * 10) * 0.017453294f);
                             sv = p->fade * p->alpha * ((tt + 1.0f) * 50.0f + 50.0f);
                             if (it->flags & 0x10) {
-                                func_002778A8(cp.left - 4, (s32)fb, cp.right + 4, (s32)fa, 0, 0, 0xFF, 0, 10, (u32)sv & 0xFF);
+                                Hud_DrawBevelBox(cp.left - 4, (s32)fb, cp.right + 4, (s32)fa, 0, 0, 0xFF, 0, 10, (u32)sv & 0xFF);
                             } else {
-                                func_002778A8(cp.left - 4, (s32)fb, cp.right + 4, (s32)fa, 0, 0, 0xFF, 0, 10, (u32)sv & 0xFF);
+                                Hud_DrawBevelBox(cp.left - 4, (s32)fb, cp.right + 4, (s32)fa, 0, 0, 0xFF, 0, 10, (u32)sv & 0xFF);
                             }
                             D_800C1BD0_4143DC = -1;
                         }
@@ -1132,7 +1132,7 @@ void func_004156FC(Menu *p, void *a1) {
     }
 }
 
-/* ---------------- func_00415CE8 ---------------- */
+/* ---------------- Menu_DrawBar ---------------- */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00441D50.c, func_00441D50.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
@@ -1141,14 +1141,14 @@ void func_004156FC(Menu *p, void *a1) {
 
 
 
-extern void func_0041363C_415CE8(MenuItem *it, void *info) __asm__("func_0041363C");
-extern void func_0027AF4C_415CE8(void) __asm__("func_0027AF4C");
-extern void func_002778A8_415CE8(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j) __asm__("func_002778A8");
+extern void func_0041363C_415CE8(MenuItem *it, void *info) __asm__("MenuItem_Layout");
+extern void func_0027AF4C_415CE8(void) __asm__("Hud_SetupFillMode");
+extern void func_002778A8_415CE8(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j) __asm__("Hud_DrawBevelBox");
 extern s32 D_800C2030;
 extern s32 D_800C2034;
 /* Draws the bar behind a window's line of items (flag 0x08000000 text):
  * the screen's width, at the window's offset (c: from the bottom). */
-void func_00415CE8(Menu *a, MenuItem *b, s32 c) {
+void Menu_DrawBar(Menu *a, MenuItem *b, s32 c) {
     MenuItemLayout area;
     MenuItemLayout info;
     CCamera *cam;
@@ -1191,7 +1191,7 @@ void func_00415CE8(Menu *a, MenuItem *b, s32 c) {
     }
 }
 
-/* ---------------- func_00415FB8 ---------------- */
+/* ---------------- MenuPool_OpenSubmenu ---------------- */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00442020.c, func_00442020.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
@@ -1199,12 +1199,12 @@ void func_00415CE8(Menu *a, MenuItem *b, s32 c) {
 
 /* Static inline in the Rage Wars source file (dropped by the importer); 0x330 in Turok 2, 0x480 in Rage Wars. */
 static inline s32 O06_ItemSize_415FB8(s16 *a) { if (*a == 3) return 0x330; return 0; }
-extern s32 *func_00204EDC();
-extern void func_00414EA8_415FB8() __asm__("func_00414EA8");
+extern s32 *CCache__Allocate();
+extern void func_00414EA8_415FB8() __asm__("Menu_Construct");
 extern void CList__AddHead(MenuPool *a, s32 b);
 /* Opens the window c's submenu in the pool a (an item's select callback,
- * func_00416454): the window, its items and their extras in one block. */
-s32 func_00415FB8(MenuPool *a, Menu *c) {
+ * MenuItem_SelectSubmenu): the window, its items and their extras in one block. */
+s32 MenuPool_OpenSubmenu(MenuPool *a, Menu *c) {
     s32 size, i;
     s32 *r;
     s32 s;
@@ -1214,7 +1214,7 @@ s32 func_00415FB8(MenuPool *a, Menu *c) {
         p1 = b->param; p2 = (s32) c->player; p3 = (s32) c->controller; p4 = (s32) c->context;
         size = b->count * 40 + 0x1D8;
         for (i = 0; i < b->count; i++) size += O06_ItemSize_415FB8(&b->items[i].type);
-        r = func_00204EDC(0, size, 0x3B, "menu");
+        r = CCache__Allocate(0, size, 0x3B, "menu");
         if (r != 0) {
             s = *r;
             if (s != 0) {
@@ -1228,13 +1228,13 @@ s32 func_00415FB8(MenuPool *a, Menu *c) {
     return 0;
 }
 
-/* ---------------- func_004160F0 ---------------- */
+/* ---------------- MenuItem_TextLength ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00442158.c, func_00442158, with Turok 2's layouts. */
 
-extern u8 *func_00413230_4160F0(void) __asm__("func_00413230");
+extern u8 *func_00413230_4160F0(void) __asm__("MenuItem_FormatBinding");
 
 /* Length of the item's text up to the end or the first newline. */
-s32 func_004160F0(MenuItem *a) {
+s32 MenuItem_TextLength(MenuItem *a) {
     s32 n = 0;
     u8 *s;
 
@@ -1251,20 +1251,20 @@ s32 func_004160F0(MenuItem *a) {
 
 /* ---- The window functions below use Menu, MenuDesc, ControllerProfile and MenuPool (structs/menu.h) ---- */
 
-/* ---------------- func_00416168 ---------------- */
-s32 func_00413F74_416168(s32, s32, s32, s32, s32) __asm__("func_00413F74");
+/* ---------------- MenuItem_DrawText ---------------- */
+s32 func_00413F74_416168(s32, s32, s32, s32, s32) __asm__("MenuItem_DrawString");
 
-void func_00416168(Menu *arg0, s32 arg1, s32 arg2, s32 arg3) {
+void MenuItem_DrawText(Menu *arg0, s32 arg1, s32 arg2, s32 arg3) {
     func_00413F74_416168((s32) arg0, arg1, arg2, arg3, (s32) arg0->desc);
 }
 
-/* ---------------- func_00416188 ---------------- */
+/* ---------------- MenuItem_DrawChar ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00442224.c, func_00442224, with Turok 2's layouts. */
 
-extern void func_00413F74_416188(MenuItem *a, s32 b, s32 c, s32 d, u8 *text) __asm__("func_00413F74");
+extern void func_00413F74_416188(MenuItem *a, s32 b, s32 c, s32 d, u8 *text) __asm__("MenuItem_DrawString");
 
 /* Draws the item's single character (the low byte of its data). */
-void func_00416188(MenuItem *a, s32 b, s32 c, s32 d) {
+void MenuItem_DrawChar(MenuItem *a, s32 b, s32 c, s32 d) {
     u8 buf[2];
 
     buf[0] = ((u8 *) &a->data)[3];
@@ -1272,23 +1272,23 @@ void func_00416188(MenuItem *a, s32 b, s32 c, s32 d) {
     func_00413F74_416188(a, b, c, d, buf);
 }
 
-/* ---------------- func_004161B4 ---------------- */
-s32 func_00413230_4161B4(s32) __asm__("func_00413230");
-s32 func_00413F74_4161B4(s32, s32, s32, s32, s32) __asm__("func_00413F74");
+/* ---------------- MenuItem_DrawBinding ---------------- */
+s32 func_00413230_4161B4(s32) __asm__("MenuItem_FormatBinding");
+s32 func_00413F74_4161B4(s32, s32, s32, s32, s32) __asm__("MenuItem_DrawString");
 
-void func_004161B4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+void MenuItem_DrawBinding(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     func_00413F74_4161B4(arg0, arg1, arg2, arg3, func_00413230_4161B4(arg0));
 }
 
-/* ---------------- func_00416214 ---------------- */
+/* ---------------- MenuItem_SetModel ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004422BC.c, func_004422BC, with Turok 2's layouts. */
 
 extern u8 D_800F7078[];
-extern CIntelligence *func_00225EBC_416214(void *world, s32 type, s32 id) __asm__("func_00225EBC");
+extern CIntelligence *func_00225EBC_416214(void *world, s32 type, s32 id) __asm__("CScene__FindIntelligence");
 
 /* Finds a model item's definition and copies it into the item's extra (as
- * func_00414938 does). */
-CIntelligence *func_00416214(MenuItem *a, s32 id, s32 arg) {
+ * MenuItem_DrawModel does). */
+CIntelligence *MenuItem_SetModel(MenuItem *a, s32 id, s32 arg) {
     MenuModel *p = a->model;
     CIntelligence *v = func_00225EBC_416214(D_800F7078, id, arg);
 
@@ -1322,12 +1322,12 @@ s32 func_004162E4(Menu *arg0) {
     return var_v0;
 }
 
-/* ---------------- func_004162FC ---------------- */
+/* ---------------- Menu_CharWidth ---------------- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8043F52C_de_6.c, func_8044222C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern float func_004162FC(int c, unsigned char next, float sx, float sy);
-f32 func_004162FC(s32 arg0, u8 arg1, f32 arg2, f32 arg3) {
+extern float Menu_CharWidth(int c, unsigned char next, float sx, float sy);
+f32 Menu_CharWidth(s32 arg0, u8 arg1, f32 arg2, f32 arg3) {
     f32 var_f0;
     s32 temp_a0;
     s32 temp_a1;
@@ -1370,13 +1370,13 @@ f32 func_004162FC(s32 arg0, u8 arg1, f32 arg2, f32 arg3) {
     return var_f0 * arg2;
 }
 
-/* ---------------- func_004163C0 ---------------- */
+/* ---------------- Menu_TextWidth ---------------- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8043F52C_de_6.c, func_804422F0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern float func_004162FC_4163C0(int c, unsigned char next, float sx, float sy) __asm__("func_004162FC");
-f32 func_004162FC_4163C0(s32 arg0, u8 arg1, f32 arg2, f32 arg3) __asm__("func_004162FC");
-f32 func_004163C0(u8 *p, f32 sx, f32 sy) {
+extern float func_004162FC_4163C0(int c, unsigned char next, float sx, float sy) __asm__("Menu_CharWidth");
+f32 func_004162FC_4163C0(s32 arg0, u8 arg1, f32 arg2, f32 arg3) __asm__("Menu_CharWidth");
+f32 Menu_TextWidth(u8 *p, f32 sx, f32 sy) {
     f32 total;
     u8 c;
     total = 0.0f;
@@ -1387,10 +1387,10 @@ f32 func_004163C0(u8 *p, f32 sx, f32 sy) {
     return total;
 }
 
-/* ---------------- func_00416454 ---------------- */
-s32 func_00415FB8_416454(s32, s32) __asm__("func_00415FB8");
+/* ---------------- MenuItem_SelectSubmenu ---------------- */
+s32 func_00415FB8_416454(s32, s32) __asm__("MenuPool_OpenSubmenu");
 
-s32 func_00416454(s32 arg0, s32 arg1, s32 arg2) {
+s32 MenuItem_SelectSubmenu(s32 arg0, s32 arg1, s32 arg2) {
     return func_00415FB8_416454(arg2, arg1) != 0;
 }
 
@@ -1399,19 +1399,19 @@ s32 func_00416474(void) {
     return 0;
 }
 
-/* ---------------- func_0041647C ---------------- */
-s32 func_0041647C(Menu *arg0) {
+/* ---------------- Menu_GetDescValue ---------------- */
+s32 Menu_GetDescValue(Menu *arg0) {
     return arg0->desc->value;
 }
 
-/* ---------------- func_0041648C ---------------- */
+/* ---------------- Menu_StepValue ---------------- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8043F52C_de_6.c, func_804423BC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern int func_00285628_41648C(struct ControllerProfile *object) __asm__("func_00285628");
-extern int func_00285670_41648C(struct ControllerProfile *object) __asm__("func_00285670");
-s32 func_002855E8_41648C(ControllerProfile *) __asm__("func_002855E8");
-s32 func_0041648C(Menu *menu,s32 value,s32 step,s32 minimum,s32 maximum,s32 wrap) {
+extern int func_00285628_41648C(struct ControllerProfile *object) __asm__("Controller_MenuLeft");
+extern int func_00285670_41648C(struct ControllerProfile *object) __asm__("Controller_MenuRight");
+s32 func_002855E8_41648C(ControllerProfile *) __asm__("Controller_ConfirmPressed");
+s32 Menu_StepValue(Menu *menu,s32 value,s32 step,s32 minimum,s32 maximum,s32 wrap) {
  if(func_00285628_41648C(menu->controller))value-=step;
  if(func_00285670_41648C(menu->controller)||func_002855E8_41648C(menu->controller))value+=step;
  if(value<minimum) {
@@ -1422,11 +1422,11 @@ s32 func_0041648C(Menu *menu,s32 value,s32 step,s32 minimum,s32 maximum,s32 wrap
  return value;
 }
 
-/* ---------------- func_00416558 ---------------- */
-s32 func_00285628_416558(s32) __asm__("func_00285628");
-s32 func_00285670_416558(s32) __asm__("func_00285670");
-/* func_0041648C with its own left/right reading (Menu controller). */
-s32 func_00416558(Menu *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+/* ---------------- Menu_StepValueLR ---------------- */
+s32 func_00285628_416558(s32) __asm__("Controller_MenuLeft");
+s32 func_00285670_416558(s32) __asm__("Controller_MenuRight");
+/* Menu_StepValue with its own left/right reading (Menu controller). */
+s32 Menu_StepValueLR(Menu *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
   s32 var_s0;
   s32 var_s1;
@@ -1477,15 +1477,15 @@ s32 func_00416558(Menu *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
   return var_v0;
 }
 
-/* ---------------- func_00416614 ---------------- */
+/* ---------------- MenuPool_Construct ---------------- */
 void CList__Construct(s32, s32, s32);
 
-void func_00416614(s32 arg0) {
+void MenuPool_Construct(s32 arg0) {
     CList__Construct(arg0, 0x1D0, 0x1D4);
     ((MenuPool *) arg0)->opened = 0;
 }
 
-/* ---------------- func_00416644 ---------------- */
+/* ---------------- MenuPool_OpenMenu ---------------- */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_004426E4.c, func_004426E4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
@@ -1497,11 +1497,11 @@ static __inline__ s32 O06_ItemSize_416644(s16 *a) {
     if (*a == 3) n = 0x330;
     return n;
 }
-extern s32 *func_00204EDC_416644() __asm__("func_00204EDC");
-extern void func_00414EA8_416644() __asm__("func_00414EA8");
+extern s32 *func_00204EDC_416644() __asm__("CCache__Allocate");
+extern void func_00414EA8_416644() __asm__("Menu_Construct");
 extern void CList__AddHead_416644(MenuPool *a, s32 b) __asm__("CList__AddHead");
 /* Opens the window described by b in the pool a. */
-s32 func_00416644(MenuPool *a, MenuDesc *b, s32 c, s32 d, s32 e) {
+s32 MenuPool_OpenMenu(MenuPool *a, MenuDesc *b, s32 c, s32 d, s32 e) {
     s32 size, i;
     s32 *r;
     s32 s;
@@ -1517,7 +1517,7 @@ s32 func_00416644(MenuPool *a, MenuDesc *b, s32 c, s32 d, s32 e) {
     return s;
 }
 
-/* ---------------- func_00416760 ---------------- */
+/* ---------------- MenuPool_OpenMenuFrom ---------------- */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00442800.c, func_00442800.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
@@ -1529,12 +1529,12 @@ static inline s32 O06_ItemSize_416760(s16 *a) {
     if (*a == 3) n = 0x330; else n = 0;
     return n;
 }
-extern s32 *func_00204EDC_416760() __asm__("func_00204EDC");
-extern void func_00414EA8_416760() __asm__("func_00414EA8");
+extern s32 *func_00204EDC_416760() __asm__("CCache__Allocate");
+extern void func_00414EA8_416760() __asm__("Menu_Construct");
 extern void CList__AddHead_416760(MenuPool *a, s32 b) __asm__("CList__AddHead");
 /* Opens the window described by b in the pool a, with the window c's
  * param, player, controller and context. */
-s32 func_00416760(MenuPool *a, Menu *c, MenuDesc *b) {
+s32 MenuPool_OpenMenuFrom(MenuPool *a, Menu *c, MenuDesc *b) {
     s32 size, i;
     s32 *r;
     s32 s;
@@ -1551,7 +1551,7 @@ s32 func_00416760(MenuPool *a, Menu *c, MenuDesc *b) {
     return s;
 }
 
-/* ---------------- func_00416894 ---------------- */
+/* ---------------- MenuPool_OpenChildMenu ---------------- */
 /* WRONG CUT: real function 0x00416894, size 0x134 (through 0x004169C8): splat cut its
  * epilogue off as func_004169A0. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00442020.c, func_00442020, with Turok 2's layouts
@@ -1565,11 +1565,11 @@ static __inline__ s32 ItemExtSize(s16 *type) {
     return 0;
 }
 
-extern s32 *func_00204EDC_416894(s32, s32, s32, void *) __asm__("func_00204EDC");
-extern void func_00414EA8_416894(s32 menu, s32 *mem, MenuDesc *t, s32, s32, s32, s32, MenuPool *pool) __asm__("func_00414EA8");
+extern s32 *func_00204EDC_416894(s32, s32, s32, void *) __asm__("CCache__Allocate");
+extern void func_00414EA8_416894(s32 menu, s32 *mem, MenuDesc *t, s32, s32, s32, s32, MenuPool *pool) __asm__("Menu_Construct");
 extern void CList__AddHead_416894(MenuPool *a, s32 b) __asm__("CList__AddHead");
 
-s32 func_00416894(MenuPool *pool, Menu *c, MenuDesc *t) {
+s32 MenuPool_OpenChildMenu(MenuPool *pool, Menu *c, MenuDesc *t) {
     s32 size, i;
     s32 *r;
     s32 s;
@@ -1603,14 +1603,14 @@ s32 func_00416894(MenuPool *pool, Menu *c, MenuDesc *t) {
     return s;
 }
 
-/* ---------------- func_004169C8 ---------------- */
+/* ---------------- MenuPool_Update ---------------- */
 s32 CList__Remove(s32, s32);
-s32 func_002052D8(s32, s32);
-s32 func_0041531C_4169C8(s32, s32) __asm__("func_0041531C");
+s32 CCache__Deallocate(s32, s32);
+s32 func_0041531C_4169C8(s32, s32) __asm__("Menu_Update");
 
 extern MenuPool D_80119E2C;
 
-void func_004169C8(MenuPool *arg0) {
+void MenuPool_Update(MenuPool *arg0) {
     s32 (*temp_v0)(Menu *, MenuPool *);
     Menu *temp_s2;
     ControllerProfile *temp_v0_2;
@@ -1636,7 +1636,7 @@ block_6:
                     temp_v0_2->buttonsSingle = 0;
                     temp_v0_2->buttonsDouble = 0;
                     CList__Remove((s32) arg0, (s32) var_s0);
-                    func_002052D8(0, var_s0->block);
+                    CCache__Deallocate(0, var_s0->block);
                 }
             }
             var_s0 = temp_s2;
@@ -1644,8 +1644,8 @@ block_6:
     }
 }
 
-/* ---------------- func_00416AA4 ---------------- */
-void func_00416AA4(MenuPool *arg0) {
+/* ---------------- MenuPool_Draw ---------------- */
+void MenuPool_Draw(MenuPool *arg0) {
     Menu *var_s0;
 
     var_s0 = arg0->tail;
@@ -1657,8 +1657,8 @@ void func_00416AA4(MenuPool *arg0) {
     }
 }
 
-/* ---------------- func_00416AF8 ---------------- */
-s32 func_00416AF8(MenuPool *arg0) {
+/* ---------------- MenuPool_CountOpen ---------------- */
+s32 MenuPool_CountOpen(MenuPool *arg0) {
     s32 var_v1;
     Menu *var_a0;
 
@@ -1675,20 +1675,20 @@ s32 func_00416AF8(MenuPool *arg0) {
     return var_v1;
 }
 
-/* ---------------- func_00416B28 ---------------- */
-s32 func_00416B28(s32 arg0) {
+/* ---------------- MenuPool_GetCamera ---------------- */
+s32 MenuPool_GetCamera(s32 arg0) {
     return arg0 - 0x53C;
 }
 
-/* ---------------- func_00416B30 ---------------- */
+/* ---------------- MenuPool_CloseAll ---------------- */
 /* WRONG CUT: real function 0x00416B30, size 0x7C (through 0x00416BAC): splat cut the loop
  * off as func_00416B44. */
 
 extern void CList__Remove_416B30(MenuPool *list, Menu *item) __asm__("CList__Remove");
-extern void func_002052D8_416B30(s32, void *mem) __asm__("func_002052D8");
+extern void func_002052D8_416B30(s32, void *mem) __asm__("CCache__Deallocate");
 
 /* Closes and frees every open menu. */
-void func_00416B30(MenuPool *pool) {
+void MenuPool_CloseAll(MenuPool *pool) {
     Menu *menu;
     ControllerProfile *ctl;
 
@@ -1708,12 +1708,12 @@ next:
     }
 }
 
-/* ---------------- func_00416BAC ---------------- */
-extern u8 *func_00413230_416BAC(void) __asm__("func_00413230");
-extern f32 func_004163C0_416BAC(u8 *text, f32 sx, f32 sy) __asm__("func_004163C0");
+/* ---------------- MenuItem_TextWidth ---------------- */
+extern u8 *func_00413230_416BAC(void) __asm__("MenuItem_FormatBinding");
+extern f32 func_004163C0_416BAC(u8 *text, f32 sx, f32 sy) __asm__("Menu_TextWidth");
 
 /* Width of the item's text at the given scale. */
-f32 func_00416BAC(MenuItem *a, f32 scale) {
+f32 MenuItem_TextWidth(MenuItem *a, f32 scale) {
     u8 *s;
 
     if (a->type == 5) {
@@ -1724,22 +1724,22 @@ f32 func_00416BAC(MenuItem *a, f32 scale) {
     return func_004163C0_416BAC(s, scale, scale);
 }
 
-/* ---------------- func_00416C00 ---------------- */
-void func_00416C00(Menu *arg0) {
+/* ---------------- Menu_ResetFlash ---------------- */
+void Menu_ResetFlash(Menu *arg0) {
     arg0->flashStep = 0;
     arg0->flash = 0;
 }
 
-/* ---------------- func_00416C0C ---------------- */
-void func_00416C0C(Menu *arg0) {
+/* ---------------- Menu_StartFlash ---------------- */
+void Menu_StartFlash(Menu *arg0) {
     if (arg0->flashStep == 0) {
         arg0->flashStep = 1;
         arg0->flash = 0;
     }
 }
 
-/* ---------------- func_00416C28 ---------------- */
-void func_00416C28(Menu *arg0) {
+/* ---------------- Menu_UpdateFlash ---------------- */
+void Menu_UpdateFlash(Menu *arg0) {
     s32 temp_v0;
 
     temp_v0 = arg0->flash + arg0->flashStep;
@@ -1750,9 +1750,9 @@ void func_00416C28(Menu *arg0) {
     }
 }
 
-/* ---------------- func_00416C54 ---------------- */
+/* ---------------- Menu_GetFlashLevel ---------------- */
 /* The window's flash, up 0..0x17 then down again. */
-s32 func_00416C54(Menu *obj) {
+s32 Menu_GetFlashLevel(Menu *obj) {
     s32 v = obj->flash;
     if (v < 0x18) {
         return v;
@@ -1760,7 +1760,7 @@ s32 func_00416C54(Menu *obj) {
     return 0x2F - v;
 }
 
-/* ---------------- func_00416C74 ---------------- */
+/* ---------------- Menu_DrawFlash ---------------- */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00442D18.c, func_00442D18.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
@@ -1768,21 +1768,21 @@ s32 func_00416C54(Menu *obj) {
 
 
 
-extern void func_00277F6C(void);
-extern void func_00207FEC(s32 a);
-extern void func_0027B320_416C74(s32 a, s32 b, s16 c, s16 d, f32 e, f32 f, s32 g) __asm__("func_0027B320");
+extern void COnScreen__BeginText(void);
+extern void Render_SetRenderMode(s32 a);
+extern void func_0027B320_416C74(s32 a, s32 b, s16 c, s16 d, f32 e, f32 f, s32 g) __asm__("Hud_DrawSprite");
 extern s32 D_800C2030;
 extern s32 D_800C2034;
 /* Draws a window's flash (image 0x67, frame by the flash) over its camera's viewport. */
-void func_00416C74(Menu *a) {
+void Menu_DrawFlash(Menu *a) {
     s32 v, t;
     f32 x, y;
     Gfx *g;
     if (a->flashStep == 0) return;
     t = a->flash;
     v = (t < 0x18) ? t : 0x2F - t;
-    func_00277F6C();
-    func_00207FEC(0x15);
+    COnScreen__BeginText();
+    Render_SetRenderMode(0x15);
     x = a->camera->m_Viewport.m_Width;
     y = a->camera->m_Viewport.m_Height;
     g = D_800D8E24++;
@@ -1794,33 +1794,33 @@ void func_00416C74(Menu *a) {
                   y / (f32)D_800C2034 * 4.0f, 1);
 }
 
-/* ---------------- func_00416DA4 ---------------- */
+/* ---------------- MenuItemDesc_ExtraSize ---------------- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/ITEMS/80442BC8.CPP, func_80442CD8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 
-extern s32 func_00416DA4(s16 *record);
-s32 func_00416DA4(s16 *record) {
+extern s32 MenuItemDesc_ExtraSize(s16 *record);
+s32 MenuItemDesc_ExtraSize(s16 *record) {
     if (*record == 3) {
         return 0x330;
     }
     return 0;
 }
 
-/* ---------------- func_00416DC0 ---------------- */
-void func_00416DC0(s16 *arg0, MenuModel *arg1) {
+/* ---------------- MenuItemDesc_InitExtra ---------------- */
+void MenuItemDesc_InitExtra(s16 *arg0, MenuModel *arg1) {
     if (*arg0 == 3) {
         arg1->loaded = 1;
     }
 }
 
-/* ---------------- func_00416DDC ---------------- */
+/* ---------------- MenuItem_Construct ---------------- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/ITEMS/80442BC8.CPP, func_80442D10_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-/* Makes item id of a window from its desc entry (what func_00414EA8 does inline). */
-extern void func_00416DDC(MenuItem *w, MenuItemDesc *d, char **arena, int id, int arg);
-void func_00416DDC(MenuItem *w, MenuItemDesc *d, char **arena, int id, int arg) {
+/* Makes item id of a window from its desc entry (what Menu_Construct does inline). */
+extern void MenuItem_Construct(MenuItem *w, MenuItemDesc *d, char **arena, int id, int arg);
+void MenuItem_Construct(MenuItem *w, MenuItemDesc *d, char **arena, int id, int arg) {
  int size; char *extra;
  w->index=id; w->type=d->type; w->flags=d->flags|0x1800000;
  w->x=d->x; w->y=d->y; w->link[0]=d->link[0]; w->link[1]=d->link[1]; w->link[2]=d->link[2]; w->link[3]=d->link[3];
@@ -1834,12 +1834,12 @@ void func_00416DDC(MenuItem *w, MenuItemDesc *d, char **arena, int id, int arg) 
  }
 }
 
-/* ---------------- func_00416EA8 ---------------- */
+/* ---------------- MenuItem_GetTextStyle ---------------- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80442A58_de.c, func_80442DDC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 /* The item's text style (MenuTextStyle). */
-void *func_00416EA8(MenuItem *arg0) {
+void *MenuItem_GetTextStyle(MenuItem *arg0) {
  s32 index=0;
  switch(arg0->flags & 0x3fe0) {
  case 0x20: break;
@@ -1856,12 +1856,12 @@ void *func_00416EA8(MenuItem *arg0) {
  return &D_800C1BD4[index];
 }
 
-/* ---------------- func_00416F8C ---------------- */
+/* ---------------- MenuItem_GetBindingValue ---------------- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80442EC0_de.c, func_80442EC0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 /* A type-5 item's value, as a float (MenuItem_GetValue). */
-f32 func_00416F8C(MenuItem *arg0) {
+f32 MenuItem_GetBindingValue(MenuItem *arg0) {
  MenuBinding *v = arg0->binding;
  void *p = v->storage();
  switch(v->type) {
@@ -1876,12 +1876,12 @@ f32 func_00416F8C(MenuItem *arg0) {
  }
 }
 
-/* ---------------- func_0041707C ---------------- */
+/* ---------------- MenuItem_SetBindingValue ---------------- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80442FB0_de.c, func_80442FB0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-/* Sets a type-5 item's value (func_004133A4's bindingSet). */
-void func_0041707C(MenuItem *item,float value) {
+/* Sets a type-5 item's value (MenuItem_UpdateBinding's bindingSet). */
+void MenuItem_SetBindingValue(MenuItem *item,float value) {
  float *storage;
  MenuBinding *binding;
  unsigned int *word;
@@ -1898,16 +1898,16 @@ void func_0041707C(MenuItem *item,float value) {
  }
 }
 
-/* ---------------- func_004171D0 ---------------- */
-s32 func_0021ECA0(s32, s32, s32, s32);
+/* ---------------- MenuModel_DrawUnselected ---------------- */
+s32 CGameObjectInstance__DrawModelWithLights(s32, s32, s32, s32);
 
 extern s32 D_800AB0E8;
 
-void func_004171D0(s32 arg0, s32 arg1, s32 arg2) {
-    func_0021ECA0(arg0, arg1, arg2, (s32) &D_800AB0E8);
+void MenuModel_DrawUnselected(s32 arg0, s32 arg1, s32 arg2) {
+    CGameObjectInstance__DrawModelWithLights(arg0, arg1, arg2, (s32) &D_800AB0E8);
 }
 
-/* ---------------- func_004171F4 ---------------- */
+/* ---------------- MenuModel_DrawSelected ---------------- */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00443298.c, func_00443298.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
@@ -1926,10 +1926,10 @@ extern O06Cam D_800AB8B4[];
 extern O06Seg D_800AB0E8_4171F4 __asm__("D_800AB0E8");
 extern s32 D_800B6D1C;
 extern s32 D_801308E0;
-extern void func_0021D928(void *a, s32 b, s32 c);
-/* The selected model item's draw callback (func_00414938): drawn with the
+extern void CGameObjectInstance__DrawModelImmediate(void *a, s32 b, s32 c);
+/* The selected model item's draw callback (MenuItem_DrawModel): drawn with the
  * lights of D_800AB0E8 and a fade by D_801308E0. */
-void func_004171F4(CGameObjectInstance *a, s32 b, s32 c) {
+void MenuModel_DrawSelected(CGameObjectInstance *a, s32 b, s32 c) {
  D_800AB8B0 = 3;
  ((O06A_4171F4 *) a)->seg[D_800B6D1C] = D_800AB0E8_4171F4;
  D_800AB8B4->f0 = 255.0f;
@@ -1937,12 +1937,12 @@ void func_004171F4(CGameObjectInstance *a, s32 b, s32 c) {
  D_800AB8B4->unk8 = 0;
  D_800AB8B4->unk10 = 0;
  D_800AB8B4->fC = (f32)(D_801308E0 / 2);
- func_0021D928(a, b, c);
+ CGameObjectInstance__DrawModelImmediate(a, b, c);
  D_800AB8B0 = 0;
 }
 
-/* ---------------- func_004172B0 ---------------- */
-void func_004172B0(Menu *arg0) {
+/* ---------------- Menu_Close ---------------- */
+void Menu_Close(Menu *arg0) {
     s32 (*temp_v0)();
     ControllerProfile *temp_v0_2;
 
@@ -1956,16 +1956,16 @@ void func_004172B0(Menu *arg0) {
     temp_v0_2->buttonsDouble = 0;
 }
 
-/* ---------------- func_004172F8 ---------------- */
+/* ---------------- MenuPool_OpenMenuParam ---------------- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/ITEMS/80442BC8_11.CPP, func_8044322C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 
-extern void func_00414EA8_4172F8(void *, void **, MenuDesc *, s32, s32, s32, s32, MenuPool *) __asm__("func_00414EA8");
+extern void func_00414EA8_4172F8(void *, void **, MenuDesc *, s32, s32, s32, s32, MenuPool *) __asm__("Menu_Construct");
 void CList__AddHead_4172F8(void *list, void *node) __asm__("CList__AddHead");
-extern void **func_00204EDC_4172F8(s32, s32, s32, char *) __asm__("func_00204EDC");
+extern void **func_00204EDC_4172F8(s32, s32, s32, char *) __asm__("CCache__Allocate");
 /* Opens the window described by list in the pool owner. */
-void *func_004172F8(MenuPool *owner, MenuDesc *list, s32 a, s32 b, s32 c, s32 d) {
+void *MenuPool_OpenMenuParam(MenuPool *owner, MenuDesc *list, s32 a, s32 b, s32 c, s32 d) {
     s32 size = list->count * 40 + 0x1D8;
     s32 i;
     void **block;
@@ -1993,11 +1993,11 @@ void *func_004172F8(MenuPool *owner, MenuDesc *list, s32 a, s32 b, s32 c, s32 d)
     return first;
 }
 
-/* ---------------- func_00417418 ---------------- */
+/* ---------------- MenuPool_CloseMenu ---------------- */
 s32 CList__Remove_417418(s32, s32) __asm__("CList__Remove");
-s32 func_002052D8_417418(s32, s32) __asm__("func_002052D8");
+s32 func_002052D8_417418(s32, s32) __asm__("CCache__Deallocate");
 
-void func_00417418(s32 arg0, Menu *arg1) {
+void MenuPool_CloseMenu(s32 arg0, Menu *arg1) {
     s32 (*temp_v0)(Menu *, s32);
     ControllerProfile *temp_v0_2;
 

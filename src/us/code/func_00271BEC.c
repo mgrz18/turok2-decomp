@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00271BEC(SceneRecAt2B5C *scene, s16 id, s16 avoid);
-extern s32 func_00266D8C(s32, s32, s32, s32 *, s32 *);
-extern s32 func_002113A4(void);
-s32 func_00271BEC(SceneRecAt2B5C *scene, s16 id, s16 avoid) {
+extern s32 CAudioWorld__PickVariant(SceneRecAt2B5C *scene, s16 id, s16 avoid);
+extern s32 BinaryRange(s32, s32, s32, s32 *, s32 *);
+extern s32 Random_Next(void);
+s32 CAudioWorld__PickVariant(SceneRecAt2B5C *scene, s16 id, s16 avoid) {
     s32 first;
     s32 last;
     s32 total;
@@ -15,7 +15,7 @@ s32 func_00271BEC(SceneRecAt2B5C *scene, s16 id, s16 avoid) {
     s32 i;
     total = 0;
     if (scene->count != 0) {
-        if (func_00266D8C(scene->ids, scene->count, id, &first, &last) == 0) {
+        if (BinaryRange(scene->ids, scene->count, id, &first, &last) == 0) {
             return -1;
         }
         entry = first;
@@ -23,7 +23,7 @@ s32 func_00271BEC(SceneRecAt2B5C *scene, s16 id, s16 avoid) {
             for (i = first; i <= last; i++) {
                 total += scene->weights[i] * 10;
             }
-            draw = func_002113A4() % total;
+            draw = Random_Next() % total;
             total = 0;
             for (entry = first; entry < last; entry++) {
                 total += scene->weights[entry] * 10;

@@ -5,8 +5,8 @@
 
 extern int D_800B2A84;
 extern s32 CList__AddTail(CList *list, void *node);
-extern void func_00275864(s32 arg0);
-s32 func_00275D34(void *arg0, void *arg1) {
+extern void Sound__Stop(s32 arg0);
+s32 LoopSounds_Stop(void *arg0, void *arg1) {
     extern void CList__Remove(void *, s32);
     void *var_s0;
     if (arg1 == 0) {
@@ -16,7 +16,7 @@ s32 func_00275D34(void *arg0, void *arg1) {
     if (var_s0 != 0) {
         do {
             if (var_s0 == arg1) {
-                func_00275864(((SoundSourceNode *)var_s0)->value);
+                Sound__Stop(((SoundSourceNode *)var_s0)->value);
                 D_800B2A84 = ((SoundSourceNode *)var_s0)->value;
                 CList__Remove(&((SoundVoicePool *)arg0)->playing, (s32)var_s0);
                 CList__AddTail(arg0, var_s0);

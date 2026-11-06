@@ -11,17 +11,17 @@ typedef struct Box {
 
 extern u8 D_8011AAF1;
 
-void **func_0021F358(CGameObjectInstance *actor);
-void *func_002017D4(void *table, s32 index);
-void func_0020EEF8(CVector3 *dst, CVector3 *a, CVector3 *b);    /* add */
-void func_0020EF60(CVector3 *dst, CVector3 *src, f32 scale);
-void func_0020D908(CMtxF *dst, CMtxF *src);
-void func_0020F85C(CMtxF *m, CVector3 *in, CVector3 *out);
-void func_0020EF2C(CVector3 *dst, CVector3 *a, CVector3 *b);    /* subtract */
-void func_002051F4(s32 arg0, void **handle);
+void **CGameObjectInstance__LoadGeometry(CGameObjectInstance *actor);
+void *CISet__GetBlock(void *table, s32 index);
+void CVector3__Add(CVector3 *dst, CVector3 *a, CVector3 *b);    /* add */
+void CVector3__Scale(CVector3 *dst, CVector3 *src, f32 scale);
+void CMtxF__FromMtxAffine(CMtxF *dst, CMtxF *src);
+void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
+void CVector3__Subtract(CVector3 *dst, CVector3 *a, CVector3 *b);    /* subtract */
+void CCache__Unlock(s32 arg0, void **handle);
 
 /* Copies the actor's bounding box whose center is nearest to pos into out. */
-s32 func_0021E374(CGameObjectInstance *actor, CVector3 pos, Box *out) {
+s32 CGameObjectInstance__GetNearestBox(CGameObjectInstance *actor, CVector3 pos, Box *out) {
     CVector3 center;
     CVector3 d;
     CMtxF mtx;
@@ -43,27 +43,27 @@ s32 func_0021E374(CGameObjectInstance *actor, CVector3 pos, Box *out) {
             return 0;
         }
     }
-    handle = func_0021F358(actor);
+    handle = CGameObjectInstance__LoadGeometry(actor);
     if (handle == NULL) {
         return 0;
     }
-    boxes = func_002017D4(*handle, 3);
+    boxes = CISet__GetBlock(*handle, 3);
     best = NULL;
     count = *(s32 *)boxes;
     bestDist = 3.4028235e38f;
     for (i = 0; i < count; i++) {
-        box = func_002017D4(func_002017D4(boxes, i), 1);
+        box = CISet__GetBlock(CISet__GetBlock(boxes, i), 1);
         if (!(box->mask & actor->m_AI.m_VisBits)) {
             continue;
         }
         center = box->corners[0];
         for (j = 1; j < 8; j++) {
-            func_0020EEF8(&center, &center, &box->corners[j]);
+            CVector3__Add(&center, &center, &box->corners[j]);
         }
-        func_0020EF60(&center, &center, 0.125f);
-        func_0020D908(&mtx, &matrices[i]);
-        func_0020F85C(&mtx, &center, &d);
-        func_0020EF2C(&d, &d, &pos);
+        CVector3__Scale(&center, &center, 0.125f);
+        CMtxF__FromMtxAffine(&mtx, &matrices[i]);
+        CMtxF__TransformPoint(&mtx, &center, &d);
+        CVector3__Subtract(&d, &d, &pos);
         dist = d.x * d.x + d.y * d.y + d.z * d.z;
         if (dist < bestDist) {
             best = box;
@@ -76,6 +76,6 @@ s32 func_0021E374(CGameObjectInstance *actor, CVector3 pos, Box *out) {
             out->unk68 = 1.0f;
         }
     }
-    func_002051F4(0, handle);
+    CCache__Unlock(0, handle);
     return best != NULL;
 }

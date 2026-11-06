@@ -1,8 +1,8 @@
-/* Second-module copy of func_004242EC (first module). The mode record is read as an s32 array so the loop reloads its width (alias ordering). */
+/* Second-module copy of Video_NextResolution (first module). The mode record is read as an s32 array so the loop reloads its width (alias ordering). */
 #include "common.h"
 #include "structs/frame.h"
 
-s32 func_00266B80(void); /* osGetMemSize */
+s32 GetMemSize(void); /* osGetMemSize */
 
 #define MAX(a, b) ((a) >= (b) ? (a) : (b))
 
@@ -14,7 +14,7 @@ extern s32 D_800C203C; /* previous mode */
 extern s32 D_800C204C[2]; /* mode count per TV region */
 
 /* Steps to the next video mode of the TV region that fits in memory. */
-void func_0045D20C(void) {
+void Video_NextResolution_2(void) {
     s32 region = 0;
     s32 *mode;
     s32 limit;
@@ -28,7 +28,7 @@ void func_0045D20C(void) {
             break;
     }
     mode = (s32 *)&D_800C2054[region][D_800C2038];
-    if (func_00266B80() != 0x400000) {
+    if (GetMemSize() != 0x400000) {
         limit = 0x2A300;
     } else {
         limit = 0xF660;

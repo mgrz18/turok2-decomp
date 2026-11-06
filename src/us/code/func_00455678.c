@@ -8,7 +8,7 @@
 extern CPlayerOptions D_8011AB18;
 extern char D_800B40B0[];
 extern char D_800B40C8[];
-s32 func_00455678(MenuItem *a, Menu *b) {
+s32 OptionsMenu_WeaponSelectText_2(MenuItem *a, Menu *b) {
  CPlayer *q = b->player;
  CPlayerOptions *p;
  if (q) p = q->m_pOptions; else p = &D_8011AB18;

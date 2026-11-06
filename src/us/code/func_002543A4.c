@@ -3,10 +3,10 @@
 #include "structs/game_object.h"
 #include "structs/region.h"
 
-void func_00254430(void *, void *);                 /* extern */
-void func_00254584(void *, void *);                 /* extern */
+void CPlayer__UpdateOxygen(void *, void *);                 /* extern */
+void CPlayer__UpdateSubmerged(void *, void *);                 /* extern */
 
-void func_002543A4(CPlayer *arg0, CGameObjectInstance *arg1, CRegionInfo *arg2)
+void CPlayer__UpdateWaterRegion(CPlayer *arg0, CGameObjectInstance *arg1, CRegionInfo *arg2)
 {
   int new_var;
   s32 temp_s0;
@@ -24,11 +24,11 @@ void func_002543A4(CPlayer *arg0, CGameObjectInstance *arg1, CRegionInfo *arg2)
     }
     if ((!new_var) && (temp_s2 != 0))
     {
-      func_00254584(arg0, arg1);
+      CPlayer__UpdateSubmerged(arg0, arg1);
     }
     if ((temp_s0 != 0) && (temp_s2 == 0))
     {
-      func_00254430(arg0, arg1);
+      CPlayer__UpdateOxygen(arg0, arg1);
     }
   }
 }

@@ -3,15 +3,15 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 
-s32 func_004160F0(MenuItem *item); /* length of the item's text line */
-s32 func_0029E3E0(char *buf, const char *fmt, ...); /* sprintf */
+s32 MenuItem_TextLength(MenuItem *item); /* length of the item's text line */
+s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 extern char D_800B4050[];
 extern char D_800B4068[];
 
 /* Shows the player's option unk29 (0-255, centred on 0x80) in steps of 8, falling back to the
  * default options when there is no player. */
-s32 func_00455484(MenuItem *item, Menu *menu) {
+s32 OptionsMenu_StickHorzText_2(MenuItem *item, Menu *menu) {
     CPlayerOptions *options = &D_8011AAD8.defaultSlot;
     s32 value;
 
@@ -23,10 +23,10 @@ s32 func_00455484(MenuItem *item, Menu *menu) {
         item->text = D_800B4050;
     } else if (value > 0) {
         item->text = D_800B4068;
-        func_0029E3E0(&item->text[func_004160F0(item) - 4], "  %02d", value);
+        sprintf(&item->text[MenuItem_TextLength(item) - 4], "  %02d", value);
     } else {
         item->text = D_800B4068;
-        func_0029E3E0(&item->text[func_004160F0(item) - 4], " %03d", value);
+        sprintf(&item->text[MenuItem_TextLength(item) - 4], " %03d", value);
     }
     return 0;
 }

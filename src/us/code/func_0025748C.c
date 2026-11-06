@@ -8,7 +8,7 @@ extern u8 D_8011AAF1;
 extern f32 D_800ADD88[];
 extern f32 D_800B6D28; /* the frame's time step */
 
-void func_0025748C(CPlayer *player) {
+void CPlayer__RegenerateHealth(CPlayer *player) {
     f32 rate;
     f32 cur;
     f32 next = 0.0f; /* doubles as the zero for the tests below */

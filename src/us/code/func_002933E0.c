@@ -7,7 +7,7 @@ typedef struct ListNode {
 } ListNode;
 
 /* Insert at the head of a doubly linked list: next at 0, prev at 4. */
-void func_002933E0(ListNode *arg0, ListNode **arg1) {
+void alLink(ListNode *arg0, ListNode **arg1) {
     arg0->next = *arg1;
     arg0->prev = arg1;
     if (*arg1 != NULL) {

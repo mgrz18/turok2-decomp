@@ -10,7 +10,7 @@ typedef struct {
     /* 0x176 */ s8 prevMode;
 } Func0021EBE4Obj;
 
-void func_0021EBE4(Func0021EBE4Obj *obj, s32 offset, s32 *outA, s32 *outB) {
+void CGameObjectInstance__GetDeathModels(Func0021EBE4Obj *obj, s32 offset, s32 *outA, s32 *outB) {
     CIntelligence *def;
     s32 mode;
 

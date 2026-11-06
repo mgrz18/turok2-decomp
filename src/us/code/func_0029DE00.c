@@ -9,7 +9,7 @@ extern void *D_800B8920;
 extern u32 __osDisableInt(void);
 extern void __osDequeueThread(void *arg0, Func802C1F10Node *arg1);
 extern void __osRestoreInt(u32);
-void func_0029DE00(Func802C1F10Node *arg0) {
+void osDestroyThread(Func802C1F10Node *arg0) {
     Func802C1F10Node *node;
     Func802C1F10Node *cur;
     Func802C1F10Node **head;

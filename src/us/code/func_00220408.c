@@ -6,10 +6,10 @@
 #include "structs/world.h"
 
 
-void *func_002017D4(void *table, s32 index);
-extern void func_00201818(s32 arg0, s32 arg1);
+void *CISet__GetBlock(void *table, s32 index);
+extern void CISet__GetBlockSize(s32 arg0, s32 arg1);
 
-s32 func_00220408(void *arg0, void *arg1) {
+s32 CScene__GetInstanceSavedBit(void *arg0, void *arg1) {
     CWorld *world = arg0;
     CGameObjectInstance *actor = arg1;
     void *field80;
@@ -39,10 +39,10 @@ s32 func_00220408(void *arg0, void *arg1) {
     }
     field80 = world->m_pBitSections;
     field1B40C = world->m_nLevel;
-    temp_v0 = func_002017D4(func_002017D4(func_002017D4(field80, 0), field1B40C), 0);
-    func_002017D4(temp_v0, 0);
-    func_00201818((s32) temp_v0, 1);
-    base = (u8 *) func_002017D4(temp_v0, 1);
+    temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(field80, 0), field1B40C), 0);
+    CISet__GetBlock(temp_v0, 0);
+    CISet__GetBlockSize((s32) temp_v0, 1);
+    base = (u8 *) CISet__GetBlock(temp_v0, 1);
     mask = 1 << (index & 7);
     i = index;
     if (i < 0) {

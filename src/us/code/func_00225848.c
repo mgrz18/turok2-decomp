@@ -4,10 +4,10 @@
 #include "structs/world.h"
 
 
-s32 func_00264C80(CGameObjectInstance *actor, void *ai);
+s32 Throwable_GetModeAnim(CGameObjectInstance *actor, void *ai);
 
 /* The actor of kind 5 in the world list nearest to target (squared distance) for which
- * func_00264C80 returns 0, or NULL. */
+ * Throwable_GetModeAnim returns 0, or NULL. */
 CGameObjectInstance *func_00225848(CWorld *world, CGameObjectInstance *target) {
     CGameObjectInstance **actors;
     CGameObjectInstance *actor;
@@ -27,7 +27,7 @@ CGameObjectInstance *func_00225848(CWorld *world, CGameObjectInstance *target) {
         if (actor->header.m_pIntelligence->m_Type != 5) {
             continue;
         }
-        if (func_00264C80(actor, ((u8 *)&actor->m_AI)) != 0) {
+        if (Throwable_GetModeAnim(actor, ((u8 *)&actor->m_AI)) != 0) {
             continue;
         }
         dx = target->header.m_vPos.x - actor->header.m_vPos.x;

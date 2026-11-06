@@ -25,8 +25,8 @@ typedef struct WTab {
 } WTab;
 typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
 extern CWorld D_800F7078;
-void *func_002017D4();
-s32 func_002132B8(Box3 *q, WRec **out, s32 *cnt)
+void *CISet__GetBlock();
+s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
 {
   s32 hashes[64];
   CWorldSector *list[64];
@@ -71,7 +71,7 @@ s32 func_002132B8(Box3 *q, WRec **out, s32 *cnt)
   }
   if (ncell == 1)
   {
-    tab = func_002017D4(*list[0]->m_hData, 2);
+    tab = CISet__GetBlock(*list[0]->m_hData, 2);
     j = tab->count;
     j--;
     rec = tab->r;
@@ -102,7 +102,7 @@ s32 func_002132B8(Box3 *q, WRec **out, s32 *cnt)
   {
     for (i = 0; i < ncell; i++)
     {
-      tab = func_002017D4(*list[i]->m_hData, 2);
+      tab = CISet__GetBlock(*list[i]->m_hData, 2);
       j = tab->count;
       j--;
       rec = tab->r;

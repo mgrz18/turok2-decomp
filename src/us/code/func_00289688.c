@@ -2,18 +2,18 @@
 #include "structs/controller.h"
 #include "structs/game.h"
 
-s32 func_002759C4(s32);                     /* extern */
+s32 Music_SetTrack(s32);                     /* extern */
 s32 func_002888BC(CEngineApp *, s32, s32);       /* extern */
-s32 func_00416644(void *, s32 *, s32, ControllerProfile *, s32); /* extern */
-s32 func_0042AC0C(s32 *, s32, s32); /* extern */
-s32 func_0042F514();                            /* extern */
+s32 MenuPool_OpenMenu(void *, s32 *, s32, ControllerProfile *, s32); /* extern */
+s32 CScene__LoadLevel(s32 *, s32, s32); /* extern */
+s32 Demo_End();                            /* extern */
 extern s32 D_004392B0;
 extern s32 D_800F7078;
 
-void func_00289688(CEngineApp *app) {
-    func_0042F514();
+void EngineMode08_MainMenu_Init(CEngineApp *app) {
+    Demo_End();
     func_002888BC(app, 0, 0);
-    func_002759C4(0x10);
-    func_0042AC0C(&D_800F7078, 0, 0);
-    func_00416644(app->m_Game.m_MenuPool, &D_004392B0, 0, &D_800F5C78, 0);
+    Music_SetTrack(0x10);
+    CScene__LoadLevel(&D_800F7078, 0, 0);
+    MenuPool_OpenMenu(app->m_Game.m_MenuPool, &D_004392B0, 0, &D_800F5C78, 0);
 }

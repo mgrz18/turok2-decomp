@@ -8,9 +8,9 @@ extern s32 D_800F56BC;                              /* D_800F56B0.fastForward */
 extern void (*D_800F5858)(DemoStream *);         /* D_800F56B0.match.decode */
 extern s32 D_8011AD10;
 
-void func_00206068(s32);
+void CCache__SetFrameDelay(s32);
 
-static __inline__ s32 func_0027BC34(void) {
+static __inline__ s32 Demo_GetPlayerCount(void) {
     DemoPlayer *state = &D_800F56B0;
 
     if (state->unk4 != 0 || state->playing != 0) {
@@ -19,13 +19,13 @@ static __inline__ s32 func_0027BC34(void) {
     return 0;
 }
 
-void func_0027BC68(void) {
+void Demo_AdvanceMatchStream(void) {
     DemoPlayer *state;
     DemoStream *timer;
     s32 flag;
 
-    if (func_0027BC34()) {
-        func_00206068(8);
+    if (Demo_GetPlayerCount()) {
+        CCache__SetFrameDelay(8);
         flag = D_800F56BC;
         state = &D_800F56B0;
         timer = &state->match;

@@ -4,20 +4,20 @@
 
 extern CCollisionResults D_800F1CE0;
 
-void func_00245828(DamageEvent *event, CGameObjectInstance *source, s32 damage, f32 radius, s32 flags, void *shield);
-void func_002465C8(CGameObjectInstance *actor, void *ai, DamageEvent *event);
-void func_00243414(CGameObjectInstance *self, CAI *ai, s32 mode);
+void DamageEvent_Set(DamageEvent *event, CGameObjectInstance *source, s32 damage, f32 radius, s32 flags, void *shield);
+void CAI__CallHurt(CGameObjectInstance *actor, void *ai, DamageEvent *event);
+void CAI__SetMode(CGameObjectInstance *self, CAI *ai, s32 mode);
 
-void func_002613D8(CGameObjectInstance *self, CAI *ai) {
+void EnemyRam_Collision(CGameObjectInstance *self, CAI *ai) {
     DamageEvent event;
     CCollisionResults *ps;
 
     if (ai->m_Health != 0 && ai->m_Mode == 0xE) {
         ps = &D_800F1CE0;
         if (ps->m_pInstance != NULL && (ps->m_pInstance == ai->m_pSightTarget || ps->m_pInstance == ai->m_pPathTarget)) {
-            func_00245828(&event, self, 0x500, 25.599998f, 0x100000, NULL);
-            func_002465C8(ps->m_pInstance, ((u8 *)&ps->m_pInstance->m_AI), &event);
-            func_00243414(self, ai, 4);
+            DamageEvent_Set(&event, self, 0x500, 25.599998f, 0x100000, NULL);
+            CAI__CallHurt(ps->m_pInstance, ((u8 *)&ps->m_pInstance->m_AI), &event);
+            CAI__SetMode(self, ai, 4);
         }
     }
 }

@@ -13,7 +13,7 @@ typedef struct {
     Slot slots[17];             /* 0x1E64 */
 } Player;
 
-s32 func_00271DB4(Player *player, s32 id) {
+s32 CAudioWorld__IsSoundBusy(Player *player, s32 id) {
     s32 count;
     s32 i;
 

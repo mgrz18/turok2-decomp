@@ -21,7 +21,7 @@ typedef struct ObjectStateCC {
     s8 unk_C7;                  /* 0xC7 (Rage Wars 0xCB) */
 } ObjectStateCC;
 
-void func_00265CC8(BreakableHitContext *arg0, ObjectStateCC *arg1) {
+void Destructible_GoUpdate(BreakableHitContext *arg0, ObjectStateCC *arg1) {
     Descriptor *def = arg0->def;
     if (arg1->unk_C7 != 0 && (def->damageFlags & 0x4) != 0) {
         unsigned int flags = arg0->flags;

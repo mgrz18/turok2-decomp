@@ -34,7 +34,7 @@ struct ChannelSet {
 };
 struct ChannelSet;
 typedef struct ChannelSet ChannelSet;
-extern void func_00273A34(Header *header, s32 owner, s32 arg2);
+extern void SndVoice_Construct(Header *header, s32 owner, s32 arg2);
 static __inline__ void func_802596D4_linkInit(ListLink *link) {
     link->prev = link;
     link->next = link;
@@ -47,15 +47,15 @@ static __inline__ void func_802596D4_insertAfter(ListLink *at, ListLink *link) {
 }
 static __inline__ void func_802596D4_voiceInit(VoiceRecAt8 *voice, s32 owner) {
     func_802596D4_linkInit(&voice->link);
-    func_00273A34(&voice->header, owner, -1);
+    SndVoice_Construct(&voice->header, owner, -1);
 }
-void func_002763F4(ChannelSet *set, s32 owner) {
+void SndQueue_Construct(ChannelSet *set, s32 owner) {
     s32 i;
     set->owner = owner;
     func_802596D4_linkInit(&set->free);
-    func_00273A34(&set->freeHeader, owner, -1);
+    SndVoice_Construct(&set->freeHeader, owner, -1);
     func_802596D4_linkInit(&set->active);
-    func_00273A34(&set->activeHeader, owner, -1);
+    SndVoice_Construct(&set->activeHeader, owner, -1);
     for (i = 0; i < 32; i++) {
         func_802596D4_voiceInit(&set->voices[i], owner);
         func_802596D4_insertAfter(set->active.prev, &set->voices[i].link);

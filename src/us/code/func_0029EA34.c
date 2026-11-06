@@ -4,9 +4,9 @@
 
 #include "rw/ultralib_types.h"
 
-size_t func_0029E4C0(const char *);
-void func_0029EEA0(_Pft *px, char code);
-void func_0029F180(_Pft* px, char code);
+size_t strlen(const char *);
+void _Litob(_Pft *px, char code);
+void _Ldtob(_Pft* px, char code);
 void _Putfld(_Pft *px, va_list *pap, char code, char *ac);
 void _Putfld(_Pft *px, va_list *pap, char code, char *ac) {
     px->n0 = px->nz0 = px->n1 = px->nz1 = px->n2 =
@@ -35,7 +35,7 @@ void _Putfld(_Pft *px, va_list *pap, char code, char *ac) {
                 ac[px->n0++] = ' ';
             }
             px->s = (char *)&ac[px->n0];
-            func_0029EEA0(px, code);
+            _Litob(px, code);
             break;
         case 'x':
         case 'X':
@@ -60,7 +60,7 @@ void _Putfld(_Pft *px, va_list *pap, char code, char *ac) {
                 }
             }
             px->s = (char *)&ac[px->n0];
-            func_0029EEA0(px, code);
+            _Litob(px, code);
             break;
         case 'e':
         case 'f':
@@ -75,7 +75,7 @@ void _Putfld(_Pft *px, va_list *pap, char code, char *ac) {
             else if (px->flags & 1)
                 ac[px->n0++] = ' ';
             px->s = (char *)&ac[px->n0];
-            func_0029F180(px, code);
+            _Ldtob(px, code);
             break;
         case 'n':
             if (px->qual == 'h') {
@@ -91,11 +91,11 @@ void _Putfld(_Pft *px, va_list *pap, char code, char *ac) {
         case 'p':
             px->v.ll = (long)((void * *) (void *) (*pap = (char *) ((__alignof__(void *) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (void *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
             px->s = (char *)&ac[px->n0];
-            func_0029EEA0(px, 'x');
+            _Litob(px, 'x');
             break;
         case 's':
             px->s = ((char * *) (void *) (*pap = (char *) ((__alignof__(char *) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (char *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
-            px->n1 = func_0029E4C0(px->s);
+            px->n1 = strlen(px->s);
             if (px->prec >= 0 && px->prec < px->n1) {
                 px->n1 = px->prec;
             }

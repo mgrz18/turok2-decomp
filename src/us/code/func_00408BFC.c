@@ -12,6 +12,6 @@ typedef struct {
     /* 0x10 */ s32 unk10;
 } Unk00408BFC;
 
-s32 func_00408BFC(Unk00408BFC *arg0) {
+s32 TotemDefense_KillsLeft(Unk00408BFC *arg0) {
     return arg0->ref->unk46 - arg0->unk10;
 }

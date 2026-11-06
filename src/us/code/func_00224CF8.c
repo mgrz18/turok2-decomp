@@ -11,12 +11,12 @@ struct Field_void_6C {
 };
 struct Field_void_6C;
 typedef struct Field_void_6C Field_void_6C;
-void *func_002017D4(void *table, s32 index);
-s32 func_00224CF8(void *arg0, s32 arg1) {
+void *CISet__GetBlock(void *table, s32 index);
+s32 CScene__IsLinkGroupDone(void *arg0, s32 arg1) {
     void *temp_v0;
     u8 *result;
-    temp_v0 = func_002017D4((((struct Field_void_6C *) ((s8 *) arg0))->value), 1);
-    func_002017D4(temp_v0, 0);
-    result = (u8 *)((char *)func_002017D4(temp_v0, 1)) + arg1;
+    temp_v0 = CISet__GetBlock((((struct Field_void_6C *) ((s8 *) arg0))->value), 1);
+    CISet__GetBlock(temp_v0, 0);
+    result = (u8 *)((char *)CISet__GetBlock(temp_v0, 1)) + arg1;
     return *result == 0;
 }

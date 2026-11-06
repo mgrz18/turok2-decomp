@@ -1,10 +1,10 @@
-/* One source file from func_0027D160 to func_0027E000: the camera advance
- * and its display list setup. func_0027E000's .rodata starts at 0x800A99E4,
- * 4 past an 8-byte boundary, right after func_0027D160's pool (its last
+/* One source file from CCamera__Advance to CCamera__DisplayListSetup: the camera advance
+ * and its display list setup. CCamera__DisplayListSetup's .rodata starts at 0x800A99E4,
+ * 4 past an 8-byte boundary, right after CCamera__Advance's pool (its last
  * word, a 5.0f, at 0x800A99E0); an object of its own would 8-align it.
  *
- * func_0027D160: after AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/80233920_6.CPP, func_80234FEC_de, with Turok 2's layouts.
- * func_0027E000: after the same file's Camera_SetupViewportAndFog. */
+ * CCamera__Advance: after AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/80233920_6.CPP, func_80234FEC_de, with Turok 2's layouts.
+ * CCamera__DisplayListSetup: after the same file's Camera_SetupViewportAndFog. */
 #include "common.h"
 #include "structs/player.h"
 #include "gfx.h"
@@ -36,49 +36,49 @@ extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
 extern s32 D_800F7078[];
 extern s32 D_800B6D00;
-void func_0027CAB0(CCamera *cam);
+void CCamera__AdvanceAttributes(CCamera *cam);
 s32 Cinema_PathPlaying(void);
-void func_00297860(CMtxF m, f32 eyeX, f32 eyeY, f32 eyeZ, f32 atX, f32 atY, f32 atZ, f32 upX, f32 upY, f32 upZ);
-void func_00284254(CCamera *cam);
-void func_00281D1C(CCamera *cam, CVector3 *offset);
+void guLookAtF(CMtxF m, f32 eyeX, f32 eyeY, f32 eyeZ, f32 atX, f32 atY, f32 atZ, f32 upX, f32 upY, f32 upZ);
+void Cinema_UpdateCameraIfActive(CCamera *cam);
+void CCamera__UpdateTremor(CCamera *cam, CVector3 *offset);
 f32 func_002982F0(f32 x);       /* sinf */
 f32 func_002974C0(f32 x);       /* cosf */
-void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);
-void func_00211114(CQuaternion *q, CMtxF m);
-void func_0020FC24(CMtxF m, f32 x, f32 y, f32 z);
-void func_0027BE90(CShake *shake, CVector3 pos, CVector3 *out);
-u32 func_0027BD30(CShakeAxis *axis);
-void func_0020C618(CMtxF out, CMtxF a, CMtxF b);
-void func_0020F85C(CMtxF m, CVector3 *in, CVector3 *out);
-void func_002101A0(CMtxF m, CVector3 *pos);
-void func_0020C208(CMtxF out, CMtxF m);
-void func_002105A4(CMtxF m, f32 angle);
-void func_0020FF80(CMtxF out, CMtxF m);
-void func_002117DC(f32 *value, f32 target, f32 rate);
-f32 func_00284390(CCamera *cam);
+void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);
+void CQuaternion__ToMatrix(CQuaternion *q, CMtxF m);
+void CMtxF__SetTranslate(CMtxF m, f32 x, f32 y, f32 z);
+void CShake__ApplyOffset(CShake *shake, CVector3 pos, CVector3 *out);
+u32 CShakeAxis__Advance(CShakeAxis *axis);
+void CMtxF__MultiplyAffine(CMtxF out, CMtxF a, CMtxF b);
+void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);
+void CMtxF__GetTranslation(CMtxF m, CVector3 *pos);
+void CMtxF__InvertAffine(CMtxF out, CMtxF m);
+void CMtxF__SetRotateY(CMtxF m, f32 angle);
+void CMtxF__Copy(CMtxF out, CMtxF m);
+void Math_EaseToward(f32 *value, f32 target, f32 rate);
+f32 Cinema_GetCameraFov(CCamera *cam);
 f32 func_00298470(f32 x);       /* sqrtf */
-f32 func_0021153C(f32 x);
-f32 func_002843D4(void);
-void func_0029815C(CMtxF m, u16 *perspNorm, f32 fovy, f32 aspect, f32 near, f32 far, f32 scale);
-void func_0020FC74(CMtxF m, f32 x, f32 y, f32 z);
-void func_0020C890(CMtxF out, CMtxF a, CMtxF b);
-void func_0020F7EC(CMtxF m);
-void func_0020CC94(CMtxF m, Mtx *out);
-void func_00210790(CMtxF m, f32 angle);
-void func_00210968(CMtxF m, f32 angle);
-void func_0020F908(CMtxF m, CVector3 *in, CVector3 *out, u32 count);
-void func_0026F080(CPlane *planes, CVector3 *eye, CVector3 *c0, CVector3 *c1, CVector3 *c2, CVector3 *c3);
-void func_0026B9E0(CVector3 *box, s32 count, CVector3 *points);
-void func_0020F79C(CMtxF m);
-void func_00282E4C(void *sky, CCamera *cam);
-void func_004169C8(void *menus);
-CFloor *func_00220A1C(s32 *world, CVector3 *pos);
-f32 func_0026BE60(CFloor *floor, f32 x, f32 z);
+f32 Math_AcosLookup(f32 x);
+f32 Cinema_GetFarClip(void);
+void guPerspectiveF(CMtxF m, u16 *perspNorm, f32 fovy, f32 aspect, f32 near, f32 far, f32 scale);
+void CMtxF__SetScale(CMtxF m, f32 x, f32 y, f32 z);
+void CMtxF__Multiply(CMtxF out, CMtxF a, CMtxF b);
+void CMtxF__ClampEntries(CMtxF m);
+void CMtxF__ToMtx(CMtxF m, Mtx *out);
+void CMtxF__RotateX(CMtxF m, f32 angle);
+void CMtxF__RotateY(CMtxF m, f32 angle);
+void CMtxF__TransformPoints(CMtxF m, CVector3 *in, CVector3 *out, u32 count);
+void Frustum_FromCorners(CPlane *planes, CVector3 *eye, CVector3 *c0, CVector3 *c1, CVector3 *c2, CVector3 *c3);
+void BoundingBox_FromPoints(CVector3 *box, s32 count, CVector3 *points);
+void CMtxF__Identity(CMtxF m);
+void CEmitterPool__Advance(void *sky, CCamera *cam);
+void MenuPool_Update(void *menus);
+CFloor *CScene__FindRegionAt(s32 *world, CVector3 *pos);
+f32 CGameRegion__GetHeight(CFloor *floor, f32 x, f32 z);
 
 #define MIN1(x) (((x) > 1.0f) ? 1.0f : (x))
 
 /* Advances a camera (LibTEngine's CCamera Advance): see docs/CAMERA.md. */
-void func_0027D160(CCamera *cam) {
+void CCamera__Advance(CCamera *cam) {
     CMtxF mLookAt, mRot, mYOffset, mGround, mTrans, mPi, mInv, mView, m, mOrient;
     CMtxF mProj, mFlip, mLight, mOnScreen;
     CQuaternion qX, qY, qZ, qXY, q;
@@ -109,7 +109,7 @@ void func_0027D160(CCamera *cam) {
     player = NULL;
 found:
     cam->m_Time += D_800B6D28;
-    func_0027CAB0(cam);
+    CCamera__AdvanceAttributes(cam);
     if (Cinema_PathPlaying() == 0) {
         update = D_800B6CB4[cam->m_Mode].m_Update;
         if (update != NULL) {
@@ -117,8 +117,8 @@ found:
         }
     }
     lookAt = &cam->m_LookAt[D_800B6D1C];
-    func_00297860(mLookAt, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f);
-    func_00284254(cam);
+    guLookAtF(mLookAt, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f);
+    Cinema_UpdateCameraIfActive(cam);
     rotX = cam->m_ViewParams.m_vRotOffset.x;
     rotZ = cam->m_ViewParams.m_vRotOffset.z;
     posX = cam->m_ViewParams.m_vPos.x;
@@ -131,7 +131,7 @@ found:
     zoomBlend = cam->m_ViewParams.m_ZoomBlend;
     zoomFov = cam->m_ViewParams.m_ZoomFov;
     if (Cinema_PathPlaying() == 0) {
-        func_00281D1C(cam, &tremor);
+        CCamera__UpdateTremor(cam, &tremor);
         rotZ += tremor.z;
         rotX += tremor.x;
         posY += tremor.y;
@@ -157,34 +157,34 @@ found:
         qY.y = sn;
         qY.z = 0.0f;
         qY.w = func_002974C0(yawCam);
-        func_00210F68(&qXY, &qX, &qY);
-        func_00210F68(&cam->m_qViewAlignNoZ, &qXY, &qGround);
-        func_00210F68(&cam->m_qViewAlign, &qZ, &cam->m_qViewAlignNoZ);
-        func_00210F68(&q, &qZ, &qXY);
-        func_00211114(&q, mRot);
-        func_0020FC24(mYOffset, 0.0f, yOffset, 0.0f);
-        func_00211114(&qGround, mGround);
+        CQuaternion__Multiply(&qXY, &qX, &qY);
+        CQuaternion__Multiply(&cam->m_qViewAlignNoZ, &qXY, &qGround);
+        CQuaternion__Multiply(&cam->m_qViewAlign, &qZ, &cam->m_qViewAlignNoZ);
+        CQuaternion__Multiply(&q, &qZ, &qXY);
+        CQuaternion__ToMatrix(&q, mRot);
+        CMtxF__SetTranslate(mYOffset, 0.0f, yOffset, 0.0f);
+        CQuaternion__ToMatrix(&qGround, mGround);
         shake.x = 0.0f;
         shake.y = 0.0f;
         shake.z = 0.0f;
-        func_0027BE90(&cam->m_Shake, cam->m_Shake.m_vPos, &shake);
-        func_0027BD30(&cam->m_Shake.m_XAxis);
-        func_0027BD30(&cam->m_Shake.m_YAxis);
-        func_0027BD30(&cam->m_Shake.m_ZAxis);
+        CShake__ApplyOffset(&cam->m_Shake, cam->m_Shake.m_vPos, &shake);
+        CShakeAxis__Advance(&cam->m_Shake.m_XAxis);
+        CShakeAxis__Advance(&cam->m_Shake.m_YAxis);
+        CShakeAxis__Advance(&cam->m_Shake.m_ZAxis);
         if (cam != &D_801198B0.m_MainCamera) {
             for (s = (CShake *) D_801198B0.m_ShakeActiveList.m_pHead; s != NULL; s = s->m_pNext) {
-                func_0027BE90(s, cam->m_ViewParams.m_vPos, &shake);
+                CShake__ApplyOffset(s, cam->m_ViewParams.m_vPos, &shake);
             }
         }
-        func_0020C618(m, mRot, mGround);
-        func_0020F85C(m, &shake, &shakeOffset);
+        CMtxF__MultiplyAffine(m, mRot, mGround);
+        CMtxF__TransformPoint(m, &shake, &shakeOffset);
         posX += shakeOffset.x;
         posY += shakeOffset.y;
         posZ += shakeOffset.z;
-        func_0020C618(m, mRot, mYOffset);
-        func_0020C618(mOrient, m, mGround);
-        func_0020FC24(mTrans, posX, posY, posZ);
-        func_0020C618(cam->m_mfViewOrient, mOrient, mTrans);
+        CMtxF__MultiplyAffine(m, mRot, mYOffset);
+        CMtxF__MultiplyAffine(mOrient, m, mGround);
+        CMtxF__SetTranslate(mTrans, posX, posY, posZ);
+        CMtxF__MultiplyAffine(cam->m_mfViewOrient, mOrient, mTrans);
     } else {
         half = 0.5f;
         a = rotZ * half;
@@ -208,23 +208,23 @@ found:
         qY.y = sn;
         qY.z = 0.0f;
         qY.w = func_002974C0(yawPath);
-        func_00210F68(&qXY, &qX, &qY);
+        CQuaternion__Multiply(&qXY, &qX, &qY);
         cam->m_qViewAlignNoZ = qXY;
-        func_00210F68(&cam->m_qViewAlign, &qZ, &cam->m_qViewAlignNoZ);
-        func_00211114(&qXY, mRot);
-        func_0020FC24(mTrans, posX, posY, posZ);
-        func_0020C618(cam->m_mfViewOrient, mRot, mTrans);
+        CQuaternion__Multiply(&cam->m_qViewAlign, &qZ, &cam->m_qViewAlignNoZ);
+        CQuaternion__ToMatrix(&qXY, mRot);
+        CMtxF__SetTranslate(mTrans, posX, posY, posZ);
+        CMtxF__MultiplyAffine(cam->m_mfViewOrient, mRot, mTrans);
     }
-    func_002101A0(cam->m_mfViewOrient, &cam->m_vPos);
+    CMtxF__GetTranslation(cam->m_mfViewOrient, &cam->m_vPos);
     cam->m_vRotation.x = rotX;
     cam->m_vRotation.y = rotY;
     cam->m_vRotation.z = rotZ;
-    func_0020C208(cam->m_mfInverseViewOrient, cam->m_mfViewOrient);
-    func_002105A4(mPi, 3.1415927f);
-    func_0020C618(m, mPi, cam->m_mfViewOrient);
-    func_0020C208(mInv, m);
-    func_0020C618(mView, mInv, mLookAt);
-    func_0020FF80(cam->m_mfView, mView);
+    CMtxF__InvertAffine(cam->m_mfInverseViewOrient, cam->m_mfViewOrient);
+    CMtxF__SetRotateY(mPi, 3.1415927f);
+    CMtxF__MultiplyAffine(m, mPi, cam->m_mfViewOrient);
+    CMtxF__InvertAffine(mInv, m);
+    CMtxF__MultiplyAffine(mView, mInv, mLookAt);
+    CMtxF__Copy(cam->m_mfView, mView);
     if (player != NULL && (player->m_ModeFlags & 0x40) && cam->m_ViewParams.m_nType == 0 && Cinema_PathPlaying() == 0) {
         cam->m_XScale = MIN1(cam->m_WaterWobbleXScale * 0.5f * (func_002982F0(cam->m_WaterWobbleXAngle) + 1.0f) + 0.8f);
         cam->m_YScale = MIN1(cam->m_WaterWobbleYScale * 0.5f * (func_002982F0(cam->m_WaterWobbleYAngle) + 1.0f) + 0.9f);
@@ -236,17 +236,17 @@ found:
         } else if (1.0f < swim) {
             swim = 1.0f;
         }
-        func_002117DC(&cam->m_WaterWobbleXScale, 0.1f, 0.5f);
-        func_002117DC(&cam->m_WaterWobbleYScale, 0.05f, 0.5f);
+        Math_EaseToward(&cam->m_WaterWobbleXScale, 0.1f, 0.5f);
+        Math_EaseToward(&cam->m_WaterWobbleYScale, 0.05f, 0.5f);
         inv = 1.0f - swim;
-        func_002117DC(&cam->m_WaterWobbleXSpeed, swim * 0.104719765f + inv * 0.06981318f, 0.16666667f);
-        func_002117DC(&cam->m_WaterWobbleYSpeed, swim * 0.087266475f + inv * 0.03490659f, 0.16666667f);
+        Math_EaseToward(&cam->m_WaterWobbleXSpeed, swim * 0.104719765f + inv * 0.06981318f, 0.16666667f);
+        Math_EaseToward(&cam->m_WaterWobbleYSpeed, swim * 0.087266475f + inv * 0.03490659f, 0.16666667f);
     } else {
         cam->m_YScale = 1.0f;
         cam->m_XScale = 1.0f;
     }
     if (Cinema_PathPlaying() != 0) {
-        fov = func_00284390(cam);
+        fov = Cinema_GetCameraFov(cam);
     } else {
         fov = cam->m_FieldOfView + zoomBlend * (zoomFov - cam->m_FieldOfView);
     }
@@ -257,7 +257,7 @@ found:
     ty = t / aspect;
     ty = ty / cam->m_YScale;
     t = t / cam->m_XScale;
-    fov = func_0021153C(func_00298470(1.0f / (ty * ty + 1.0f)));
+    fov = Math_AcosLookup(func_00298470(1.0f / (ty * ty + 1.0f)));
     fov = fov * 57.295776f;
     far = cam->m_FarClip;
     aspect = t / ty;
@@ -266,23 +266,23 @@ found:
     halfX = far * t;
     halfY = far * ty;
     if (Cinema_PathPlaying() != 0) {
-        n = func_002843D4();
+        n = Cinema_GetFarClip();
         if (n > 0) {
             cam->m_FarClip = n;
         }
     }
-    func_0029815C(mProj, &cam->m_PerspNorm, fov, aspect, 16.0f, cam->m_FarClip, 1.0f - zoomBlend * 0.95f);
-    func_0020FC74(mFlip, -1.0f, 1.0f, 1.0f);
-    func_0020C890(m, mView, mProj);
-    func_0020C890(cam->m_mfProjection, m, mFlip);
-    func_0020F7EC(cam->m_mfProjection);
-    func_0020CC94(cam->m_mfProjection, &cam->m_mProjection[D_800B6D1C]);
-    func_0020FF80(mLight, mView);
+    guPerspectiveF(mProj, &cam->m_PerspNorm, fov, aspect, 16.0f, cam->m_FarClip, 1.0f - zoomBlend * 0.95f);
+    CMtxF__SetScale(mFlip, -1.0f, 1.0f, 1.0f);
+    CMtxF__Multiply(m, mView, mProj);
+    CMtxF__Multiply(cam->m_mfProjection, m, mFlip);
+    CMtxF__ClampEntries(cam->m_mfProjection);
+    CMtxF__ToMtx(cam->m_mfProjection, &cam->m_mProjection[D_800B6D1C]);
+    CMtxF__Copy(mLight, mView);
     if (D_80119870.m_Settings.mode == 4) {
-        func_00210790(mLight, cam->m_Time * 0.010908309f);
-        func_00210968(mLight, cam->m_Time * 0.008726647f);
+        CMtxF__RotateX(mLight, cam->m_Time * 0.010908309f);
+        CMtxF__RotateY(mLight, cam->m_Time * 0.008726647f);
     }
-    func_0020F7EC(mLight);
+    CMtxF__ClampEntries(mLight);
     v = mLight[0][0] * 128.0f;
     if (!(v <= 127.0f)) v = 127.0f;
     lookAt->l[0x08] = (s32) v;
@@ -359,10 +359,10 @@ found:
         corners[4].z = boxZ;
         radius = func_00298470(boxX * boxX + boxY * boxY + boxZ * boxZ);
     }
-    func_0020F908(cam->m_mfViewOrient, corners, cam->m_vTCorners, 5);
-    func_0026F080(cam->m_ViewVolume, &cam->m_vTCorners[0], &cam->m_vTCorners[1], &cam->m_vTCorners[2],
+    CMtxF__TransformPoints(cam->m_mfViewOrient, corners, cam->m_vTCorners, 5);
+    Frustum_FromCorners(cam->m_ViewVolume, &cam->m_vTCorners[0], &cam->m_vTCorners[1], &cam->m_vTCorners[2],
                   &cam->m_vTCorners[3], &cam->m_vTCorners[4]);
-    func_0026B9E0(&cam->m_ViewMin, 5, cam->m_vTCorners);
+    BoundingBox_FromPoints(&cam->m_ViewMin, 5, cam->m_vTCorners);
     r15 = radius * 1.5f;
     cam->m_AnimMin.x = cam->m_vTCorners[0].x - radius;
     cam->m_AnimMax.x = cam->m_vTCorners[0].x + radius;
@@ -370,21 +370,21 @@ found:
     cam->m_AnimMax.y = cam->m_vTCorners[0].y + r15;
     cam->m_AnimMin.z = cam->m_vTCorners[0].z - radius;
     cam->m_AnimMax.z = cam->m_vTCorners[0].z + radius;
-    func_00211114(&cam->m_qViewAlignNoZ, cam->m_mfFaceScreen);
-    func_002105A4(cam->m_mfFaceScreenYAxisUp, cam->m_vRotation.y);
+    CQuaternion__ToMatrix(&cam->m_qViewAlignNoZ, cam->m_mfFaceScreen);
+    CMtxF__SetRotateY(cam->m_mfFaceScreenYAxisUp, cam->m_vRotation.y);
     if (D_801198E8 != 0) {
-        func_0029815C(mProj, &cam->m_OnScreenPerspNorm, 47.5f, D_800C2030 / D_800C2034, 16.0f, 7168.0f, 1.0f);
-        func_0020F79C(mView);
-        func_0020C890(m, mView, mProj);
-        func_0020FC74(mFlip, -1.0f, 1.0f, 1.0f);
-        func_0020C890(mOnScreen, m, mFlip);
-        func_0020F7EC(mOnScreen);
-        func_0020CC94(mOnScreen, &cam->m_mOnScreenProjection[D_800B6D1C]);
+        guPerspectiveF(mProj, &cam->m_OnScreenPerspNorm, 47.5f, D_800C2030 / D_800C2034, 16.0f, 7168.0f, 1.0f);
+        CMtxF__Identity(mView);
+        CMtxF__Multiply(m, mView, mProj);
+        CMtxF__SetScale(mFlip, -1.0f, 1.0f, 1.0f);
+        CMtxF__Multiply(mOnScreen, m, mFlip);
+        CMtxF__ClampEntries(mOnScreen);
+        CMtxF__ToMtx(mOnScreen, &cam->m_mOnScreenProjection[D_800B6D1C]);
     }
-    func_00282E4C(cam->m_SkySystem, cam);
-    func_004169C8(cam->m_MenuPool);
+    CEmitterPool__Advance(cam->m_SkySystem, cam);
+    MenuPool_Update(cam->m_MenuPool);
     if (Cinema_PathPlaying() != 0) {
-        cam->m_ViewParams.m_pCurrentRegion = (struct CGameRegion *) func_00220A1C(D_800F7078, &cam->m_ViewParams.m_vPos);
+        cam->m_ViewParams.m_pCurrentRegion = (struct CGameRegion *) CScene__FindRegionAt(D_800F7078, &cam->m_ViewParams.m_vPos);
     }
     floor = (CFloor *) cam->m_ViewParams.m_pCurrentRegion;
     x = cam->m_ViewParams.m_vPos.x;
@@ -393,7 +393,7 @@ found:
     height = cam->m_ViewParams.m_YPosOffset;
     cam->m_ViewParams.m_VisBits = D_800B6D00;
     if (floor != NULL && Cinema_PathPlaying() == 0) {
-        above = ((y + height) - func_0026BE60(floor, x, z)) * 0.09765625f;
+        above = ((y + height) - CGameRegion__GetHeight(floor, x, z)) * 0.09765625f;
         if (above < 11.0f && above > 5.0f) {
             cam->m_ViewParams.m_VisBits = floor->m_VisBits;
         }
@@ -414,11 +414,11 @@ extern Gfx D_800AB130[];
 extern CCamera D_801198F0;      /* the main camera (camera pool + 0x40) */
 extern s32 D_801198E0;          /* the pool's active camera count */
 extern void *D_80130A78;        /* the z buffer */
-void func_00207A54(void);
-void func_00207FEC(s32 arg0);
+void Texture_InvalidateCache(void);
+void Render_SetRenderMode(s32 arg0);
 s32 Cinema_PathPlaying(void);
-u32 func_002843F4(void);        /* a cinematic's fog colour, 0xFF00 for none */
-void func_002284E0(CCamera *cam);
+u32 Cinema_GetFogColor(void);        /* a cinematic's fog colour, 0xFF00 for none */
+void DLights_Load(CCamera *cam);
 
 #define GFX(dl, a, b) { Gfx *_g = (dl)++; _g->w0 = (a); _g->w1 = (b); }
 
@@ -439,7 +439,7 @@ static __inline__ void SetPixelScale(CCamera *cam, f32 xs, f32 ys) {
  * DisplayListSetup): its projection, viewport, scissor and look-at; then,
  * unless it is the main camera with others active, clears the z buffer and
  * the view to the fog colour, with the fog from m_FogStart to 1000. */
-void func_0027E000(CCamera *cam) {
+void CCamera__DisplayListSetup(CCamera *cam) {
     struct { u8 red, green, blue; } rgb;
     s16 ulx, uly, lrx, lry;
     s32 near, far, denom;
@@ -491,13 +491,13 @@ void func_0027E000(CCamera *cam) {
             ((s32) (lrx * 4.0f) & 0xFFF) << 12 | ((s32) (lry * 4.0f) & 0xFFF));   /* gDPSetScissor */
         GFX(*setup, 0xDC08000A, (u32) &cam->m_LookAt[frame]);                        /* gSPLookAtX */
         GFX(*setup, 0xDC08030A, (u32) &cam->m_LookAt[frame] + 0x10);                 /* gSPLookAtY */
-        func_00207A54();
+        Texture_InvalidateCache();
     }
     GFX(D_800D8E24, 0xE3001201, 0x2000);                    /* gDPSetTextureFilter(bilerp) */
     if (cam != &D_801198F0 || D_801198E0 == 0) {
         Gfx **clearDl = &D_800D8E24;
 
-        func_00207FEC(0x14);
+        Render_SetRenderMode(0x14);
         GFX(*clearDl, 0xE7000000, 0);
         GFX(*clearDl, 0xE3000A01, 0x300000);                /* gDPSetCycleType(G_CYC_FILL) */
         GFX(*clearDl, 0xFF100000 | ((D_800C2030 - 1) & 0xFFF), (u32) D_80130A78);   /* colour image: z buffer */
@@ -521,7 +521,7 @@ void func_0027E000(CCamera *cam) {
             rgb.blue = cam->m_FogColor[2] & 0xF8;
         }
         if (Cinema_PathPlaying() != 0) {
-            color = func_002843F4();
+            color = Cinema_GetFogColor();
             if (color != 0xFF00) {
                 rgb.blue = color >> 16;
                 rgb.green = color >> 8;
@@ -556,7 +556,7 @@ void func_0027E000(CCamera *cam) {
     GFX(D_800D8E24, 0xE3001A01, 0x10);
     GFX(D_800D8E24, 0xE3000A01, 0x100000);                  /* gDPSetCycleType(G_CYC_2CYCLE) */
     if (cam != &D_801198F0) {
-        func_002284E0(cam);
+        DLights_Load(cam);
     }
     GFX(D_800D8E24, 0xE7000000, 0);
 }

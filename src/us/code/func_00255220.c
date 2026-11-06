@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 
-extern void func_0024E5F0(CPlayer *player, CGameObjectInstance *other, s32 mode);
+extern void CPlayer__SetState(CPlayer *player, CGameObjectInstance *other, s32 mode);
 
 /* s16 player mode at 0xA08 (LibTEngine's CPlayer has m_Mode at 0xA0C). */
 #define PLAYER_MODE(p) (*(s16 *)((u8 *)(p) + 0xA08))
@@ -17,7 +17,7 @@ static __inline__ s32 InMode10To12(CPlayer *player) {
 
 /* Puts the player in mode 0xC when hit by an actor with AI flag 0x800,
  * unless already in modes 0xC, 0xD or 0x10-0x12. */
-s32 func_00255220(CPlayer *player, CGameObjectInstance *actor) {
+s32 CPlayer__CheckState12Hit(CPlayer *player, CGameObjectInstance *actor) {
     if (InMode10To12(player)) {
         return 0;
     }
@@ -28,7 +28,7 @@ s32 func_00255220(CPlayer *player, CGameObjectInstance *actor) {
         if (PLAYER_MODE(player) == 0xD) {
             return 0;
         }
-        func_0024E5F0(player, actor, 0xC);
+        CPlayer__SetState(player, actor, 0xC);
         return 1;
     }
     return 0;

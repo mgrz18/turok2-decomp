@@ -11,7 +11,7 @@
 extern u8 D_8011AB8B[];
 extern u8 D_800C1340[];
 
-s32 func_0025340C(void *state, void *player);
+s32 CPlayerPool__GetIndex(void *state, void *player);
 
 static __inline__ s32 nameEquals(u8 *a, u8 *b, s32 count) {
     u8 c;
@@ -24,8 +24,8 @@ static __inline__ s32 nameEquals(u8 *a, u8 *b, s32 count) {
     return c == d;
 }
 
-void func_00455FA0(Menu *event) {
-    s32 i = func_0025340C(&D_80119870.m_PlayerList, event->player);
+void NameEntryMenu_Init_2(Menu *event) {
+    s32 i = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, event->player);
     s32 trailing;
     char *dst;
     u8 *src;

@@ -22,18 +22,18 @@ typedef struct DrawList {
     Drawable *items[1];         /* 0x1068 */
 } DrawList;
 
-CVector3 func_00280E40(void *cam);  /* camera position */
-void func_00226F90(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
-s32 func_00226D30();
-s32 func_00226CD0();
-void func_0020B5D4(void);
-void func_0020B624(void);
-void func_00214844(Drawable *item, void *cam);
-void func_0021D39C(Drawable *item, void *cam);
-void func_002152AC(Drawable *item);
+CVector3 CCamera__GetViewOrigin(void *cam);  /* camera position */
+void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
+s32 SortRecord_Compare();
+s32 SortRecord_Swap();
+void Render_ResetBatches(void);
+void Render_FlushBatches(void);
+void CStaticObject__Draw(Drawable *item, void *cam);
+void CGameObjectInstance__Draw(Drawable *item, void *cam);
+void CLevelActor__Draw(Drawable *item);
 
 /* Sorts the list by distance from the camera, then draws it. */
-void func_0022077C(DrawList *list, void *cam) {
+void CScene__DrawSortedList(DrawList *list, void *cam) {
     SortEntry entries[0x800];
     s32 count;
     s32 i;
@@ -65,9 +65,9 @@ void func_0022077C(DrawList *list, void *cam) {
         g->w0 = 0xDB04001C;
         g->w1 = 0xFFFF;
     }
-    cx = func_00280E40(cam).x * -2.0f;
-    cy = func_00280E40(cam).y * -2.0f;
-    cz = func_00280E40(cam).z * -2.0f;
+    cx = CCamera__GetViewOrigin(cam).x * -2.0f;
+    cy = CCamera__GetViewOrigin(cam).y * -2.0f;
+    cz = CCamera__GetViewOrigin(cam).z * -2.0f;
     for (i = 0; i < count; i++) {
         item = list->items[i];
         switch (item->type) {
@@ -91,21 +91,21 @@ void func_0022077C(DrawList *list, void *cam) {
         entries[i].item = item;
         entries[i].dist = dx * dx + dy * dy + dz * dz;
     }
-    func_00226F90(entries, count, sizeof(SortEntry), func_00226D30, func_00226CD0);
-    func_0020B5D4();
+    Sort_Quick(entries, count, sizeof(SortEntry), SortRecord_Compare, SortRecord_Swap);
+    Render_ResetBatches();
     for (i = 0; i < count; i++) {
         item = entries[i].item;
         switch (item->type) {
         case 0:
-            func_00214844(item, cam);
+            CStaticObject__Draw(item, cam);
             break;
         case 3:
-            func_002152AC(item);
+            CLevelActor__Draw(item);
             break;
         case 1:
-            func_0021D39C(item, cam);
+            CGameObjectInstance__Draw(item, cam);
             break;
         }
     }
-    func_0020B624();
+    Render_FlushBatches();
 }

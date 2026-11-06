@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern Reusable *D_800F1ADC;
-void func_002418C0(EntryRecAt24 *arg0)
+void CCollisionSetup__Construct(EntryRecAt24 *arg0)
 {
     EntryRecAt24 *e = arg0;
     s32 counter = -1;

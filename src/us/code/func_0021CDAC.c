@@ -3,7 +3,7 @@
 /* Builds an animated object's bone matrices: binds its animation index,
  * loads the current (and, when blending, the next) animation into the two
  * channels, finds their keyframes, fills a draw context and has
- * func_0021B95C pose the skeleton from the object's matrix (scaled to the
+ * CGameObjectInstance__PoseBone pose the skeleton from the object's matrix (scaled to the
  * fixed-point 65536 units), timing that call in a profile slot. Then draws
  * the object's attachments. Returns whether the matrices were built. */
 
@@ -54,7 +54,7 @@ typedef struct AnimObject {
     /* 0x27C */ s32 hasAttachments;
 } AnimObject;
 
-/* What func_0021B95C reads to pose the skeleton. */
+/* What CGameObjectInstance__PoseBone reads to pose the skeleton. */
 typedef struct PoseContext {
     /* 0x00 */ AnimObject *obj;
     /* 0x04 */ s32 animIndex;
@@ -100,18 +100,18 @@ extern u8 D_801102B8[];
 extern u32 D_8011AAD8;
 
 s32 Cinema_PathPlaying(void);
-void *func_002017D4(void *file, s32 index);
-void func_002051F4(s32, s32 handle);
-s32 func_0020367C(s32, s32 file, s32 size, s32, s32, s32, char *name, s32);
-s32 func_00206950(void *table, s32 id);
-void func_00218B10(AnimChannel *channel, s32 anims, s32 file, s32, s32, s32);
-void func_00219328(AnimChannel *channel, KeyLookup *keys);
-void func_00219938(AnimChannel *channel);
-s32 func_00219968(AnimChannel *channel);
-void func_0021B95C(AnimObject *obj, PoseContext *ctx, s32, f32 mtx[4][4]);
+void *CISet__GetBlock(void *file, s32 index);
+void CCache__Unlock(s32, s32 handle);
+s32 CCache__Request(s32, s32 file, s32 size, s32, s32, s32, char *name, s32);
+s32 MtxPool_Alloc(void *table, s32 id);
+void CAnimationState__SwitchToQueued(AnimChannel *channel, s32 anims, s32 file, s32, s32, s32);
+void CAnimationState__FindKeys(AnimChannel *channel, KeyLookup *keys);
+void CAnimationState__Release(AnimChannel *channel);
+s32 CAnimationState__IsLoaded(AnimChannel *channel);
+void CGameObjectInstance__PoseBone(AnimObject *obj, PoseContext *ctx, s32, f32 mtx[4][4]);
 void func_002360A0(void *effects, AnimObject *obj, void *bones);
-void func_0026D710(void *list, s32 count, void *bones, AnimObject *obj, void *anims);
-u32 func_0029DFC0(void);
+void GameObject_EmitHotPoints(void *list, s32 count, void *bones, AnimObject *obj, void *anims);
+u32 osGetCount(void);
 
 /* OS_CYCLES_TO_USEC */
 static __inline__ void addMicroseconds(f32 *usec, u32 cycles) {
@@ -119,7 +119,7 @@ static __inline__ void addMicroseconds(f32 *usec, u32 cycles) {
     *dst = *usec + (f32) ((u64) cycles * 64 / 3000);
 }
 
-s32 func_0021CDAC(AnimObject *obj, s32 *file, s32 arg2) {
+s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, s32 arg2) {
     PoseContext ctx;
     u8 bones[0x2000];
     f32 mtx[4][4];
@@ -142,8 +142,8 @@ s32 func_0021CDAC(AnimObject *obj, s32 *file, s32 arg2) {
     s32 len;
     s32 *data;
 
-    anims = func_002017D4(file, 3);
-    obj->animIndex = func_00206950(D_800F7148, *anims);
+    anims = CISet__GetBlock(file, 3);
+    obj->animIndex = MtxPool_Alloc(D_800F7148, *anims);
     if (obj->animIndex == 0) {
         return 0;
     }
@@ -151,14 +151,14 @@ s32 func_0021CDAC(AnimObject *obj, s32 *file, s32 arg2) {
     hidden = obj->flags & 1;
     isType9 = *obj->def == 9;
     inCinema = 0;
-    handle = (s32 *) func_0020367C(0, obj->animFile, ((obj->animCount * 4) + 0xF) & ~7, 4, 0, 0, D_800A5AF8 + 4, 0);
+    handle = (s32 *) CCache__Request(0, obj->animFile, ((obj->animCount * 4) + 0xF) & ~7, 4, 0, 0, D_800A5AF8 + 4, 0);
     if (handle != NULL) {
         channel = &obj->channel;
         blendChannel = &obj->blendChannel;
-        func_00218B10(channel, *handle, obj->animFile, 0, 0, 0);
-        if (func_00219968(channel)) {
+        CAnimationState__SwitchToQueued(channel, *handle, obj->animFile, 0, 0, 0);
+        if (CAnimationState__IsLoaded(channel)) {
             if ((obj->flags & 0x400)
-                && (func_00218B10(blendChannel, *handle, obj->animFile, 0, 0, 0), func_00219968(blendChannel))) {
+                && (CAnimationState__SwitchToQueued(blendChannel, *handle, obj->animFile, 0, 0, 0), CAnimationState__IsLoaded(blendChannel))) {
                 ctx.blend = 1;
             } else {
                 ctx.blend = 0;
@@ -171,8 +171,8 @@ s32 func_0021CDAC(AnimObject *obj, s32 *file, s32 arg2) {
             ctx.channel = channel;
             ctx.blendChannel = blendChannel;
             ctx.file = file;
-            func_00219328(&obj->channel, &ctx.keys);
-            func_00219328(&obj->blendChannel, &ctx.blendKeys);
+            CAnimationState__FindKeys(&obj->channel, &ctx.keys);
+            CAnimationState__FindKeys(&obj->blendChannel, &ctx.blendKeys);
             ctx.visible = (!hidden || isType9) && !inCinema;
             type = *obj->def;
             if (obj->flags & 0x300000) {
@@ -240,9 +240,9 @@ s32 func_0021CDAC(AnimObject *obj, s32 *file, s32 arg2) {
             mtx[3][3] = 65536.0f;
 
             prof = &D_800E6880;
-            prof->start = func_0029DFC0();
-            func_0021B95C(obj, &ctx, 0, mtx);
-            elapsed = func_0029DFC0() - (u32) prof->start;
+            prof->start = osGetCount();
+            CGameObjectInstance__PoseBone(obj, &ctx, 0, mtx);
+            elapsed = osGetCount() - (u32) prof->start;
             if (D_800B6D18 != prof->frame) {
                 prof->frame = D_800B6D18;
                 prof->average = prof->average * 0.97f + prof->usec * 0.03f;
@@ -257,16 +257,16 @@ s32 func_0021CDAC(AnimObject *obj, s32 *file, s32 arg2) {
             } while (0);
 
             if (obj->hasAttachments) {
-                count = func_002017D4(file, 2);
-                lists = func_002017D4(file, 4);
+                count = CISet__GetBlock(file, 2);
+                lists = CISet__GetBlock(file, 4);
                 n = *count;
                 for (i = 0; i < n; i++) {
                     if (obj->attachMask & (1 << i)) {
-                        entry = func_002017D4(lists, i);
+                        entry = CISet__GetBlock(lists, i);
                         len = entry[1];
                         if (len != 0) {
                             data = entry + 2;
-                            func_0026D710(data, len, bones, obj, func_002017D4(file, 3));
+                            GameObject_EmitHotPoints(data, len, bones, obj, CISet__GetBlock(file, 3));
                         }
                     }
                 }
@@ -275,12 +275,12 @@ s32 func_0021CDAC(AnimObject *obj, s32 *file, s32 arg2) {
                 func_002360A0(D_801102B8, obj, bones);
             }
             if (ctx.blend) {
-                func_00219938(blendChannel);
+                CAnimationState__Release(blendChannel);
             }
-            func_00219938(channel);
+            CAnimationState__Release(channel);
             ok = 1;
         }
-        func_002051F4(0, (s32) handle);
+        CCache__Unlock(0, (s32) handle);
     }
     if (!ok) {
         obj->animIndex = 0;

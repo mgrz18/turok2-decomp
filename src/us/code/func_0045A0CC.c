@@ -4,10 +4,10 @@
 #include "rw/abu_types.h"
 
 extern s32 D_800C2028;
-extern void func_0045A0CC(void);
+extern void PakMenu_PickDefaultPort_2(void);
 void func_004263A0(s32);
 s32 func_0042647C(s32);
-void func_0045A0CC(void) {
+void PakMenu_PickDefaultPort_2(void) {
     s32 var_s0;
     s32 var_s1;
     s32 unavailable;

@@ -6,28 +6,28 @@
 extern u8 D_800F7078[];
 extern s16 D_800AE312[];        /* per character: climbing step sound (stride 4) */
 
-s32 func_0026AFC0(void *region);
-s32 func_0024E5F0(CPlayer *player, CGameObjectInstance *body, s32 mode);
-void *func_0022425C(u8 *list, void *region);
-f32 func_0026C434(void *region);
-f32 func_00210E64(f32 from, f32 to);
-void func_002117DC(f32 *value, f32 target, f32 rate);
-f32 func_00268B50(CGameObjectInstance *body);
-f32 func_00268B98(CGameObjectInstance *body);
+s32 CGameRegion__IsSteep(void *region);
+s32 CPlayer__SetState(CPlayer *player, CGameObjectInstance *body, s32 mode);
+void *CScene__GetRegionInfo(u8 *list, void *region);
+f32 CGameRegion__GetDownhillYaw(void *region);
+f32 Angle_Difference(f32 from, f32 to);
+void Math_EaseToward(f32 *value, f32 target, f32 rate);
+f32 GameObject_GetRegionTopAbove(CGameObjectInstance *body);
+f32 GameObject_GetHeightAboveRegionBottom(CGameObjectInstance *body);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-f32 func_0021170C(f32 value, f32 rate);
-f32 func_0021160C(f32 value, f32 delta, f32 limit);
-void func_0024FC08(CPlayer *player, CGameObjectInstance *body);
-void func_00275624(s32 sound);
-void func_00275544(s16 sound, CVector3 pos, s32, s32);
+f32 Math_DecayToZero(f32 value, f32 rate);
+f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
+void CPlayer__BobView(CPlayer *player, CGameObjectInstance *body);
+void Sound__Play2D(s32 sound);
+void Sound__Play(s16 sound, CVector3 pos, s32, s32);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
 static __inline__ s32 try_jump(CPlayer *player, CGameObjectInstance *body) {
     if (player->m_SniperMode == 0 && !(11.25f < player->m_TimeOffGround) && !(body->m_AI.m_dwFlags & 0x6000)
         && (body->header.m_pIntelligence->m_dwTypeFlags & 2) && (player->m_ContState.m_dwButtonsSingle & 0x10)) {
-        func_0024E5F0(player, body, 4);
+        CPlayer__SetState(player, body, 4);
         return 1;
     }
     return 0;
@@ -36,7 +36,7 @@ static __inline__ s32 try_jump(CPlayer *player, CGameObjectInstance *body) {
 /* Climbing: face the wall, look up or down with the stick (tilting the view
  * back near the top and the bottom of the climb), jump off, climb with the
  * stick and play a step sound every 11.25 time units. */
-void func_00250EC0(CPlayer *player, CGameObjectInstance *body) {
+void PlayerClimb_Update(CPlayer *player, CGameObjectInstance *body) {
     f32 angle;
     f32 side;
     f32 sideRaw;
@@ -54,14 +54,14 @@ void func_00250EC0(CPlayer *player, CGameObjectInstance *body) {
     s32 down;
     s32 anim;
 
-    if (!func_0026AFC0(body->header.m_pCurrentRegion) || !(body->m_AI.m_dwFlags & 0x1000)) {
+    if (!CGameRegion__IsSteep(body->header.m_pCurrentRegion) || !(body->m_AI.m_dwFlags & 0x1000)) {
         player->m_vHeadRotOffset.x = 0.0f;
-        func_0024E5F0(player, body, 2);
+        CPlayer__SetState(player, body, 2);
         return;
     }
-    func_0022425C(D_800F7078, body->header.m_pCurrentRegion);
-    func_002117DC(&body->m_RotY, body->m_RotY - func_00210E64(body->m_RotY, func_0026C434(body->header.m_pCurrentRegion)), 0.9f);
-    func_002117DC(&player->m_vHeadRotOffset.y, player->m_ContState.m_FinalLookX * 3.4906588f, 0.25f);
+    CScene__GetRegionInfo(D_800F7078, body->header.m_pCurrentRegion);
+    Math_EaseToward(&body->m_RotY, body->m_RotY - Angle_Difference(body->m_RotY, CGameRegion__GetDownhillYaw(body->header.m_pCurrentRegion)), 0.9f);
+    Math_EaseToward(&player->m_vHeadRotOffset.y, player->m_ContState.m_FinalLookX * 3.4906588f, 0.25f);
     angle = -player->m_ContState.m_FinalLookY * 80.0f;
     if (angle > 0.0f) {
         angle *= 0.1875f;
@@ -79,7 +79,7 @@ void func_00250EC0(CPlayer *player, CGameObjectInstance *body) {
     }
     angle -= side * scale;
     angle += 90.0f;
-    toTop = func_00268B50(body);
+    toTop = GameObject_GetRegionTopAbove(body);
     if (toTop < 0.0f) {
         toTop = 0.0f;
     }
@@ -87,7 +87,7 @@ void func_00250EC0(CPlayer *player, CGameObjectInstance *body) {
     if (!(toTop <= 184.31999f)) {
         nearTop = 0;
     }
-    toBottom = func_00268B98(body);
+    toBottom = GameObject_GetHeightAboveRegionBottom(body);
     if (toBottom < 0.0f) {
         toBottom = 0.0f;
     }
@@ -111,7 +111,7 @@ void func_00250EC0(CPlayer *player, CGameObjectInstance *body) {
     if (angle < -90.0f) {
         angle = -90.0f;
     }
-    func_002117DC(&player->m_vHeadRotOffset.x, angle * 0.017453294f, 0.5f);
+    Math_EaseToward(&player->m_vHeadRotOffset.x, angle * 0.017453294f, 0.5f);
     if (try_jump(player, body)) {
         s = func_002982F0(body->m_RotY + 6.2831855f);
         c = func_002974C0(body->m_RotY + 6.2831855f);
@@ -123,9 +123,9 @@ void func_00250EC0(CPlayer *player, CGameObjectInstance *body) {
     }
     bob = player->m_HandSide * player->m_Speed * func_002982F0(player->m_ModeTime * 0.13962635f);
     if (player->m_ContState.m_FinalMoveY > 0.0f || player->m_ContState.m_FinalMoveY < 0.0f) {
-        func_002117DC(&player->m_vHeadRotOffset.z, bob, 0.25f);
+        Math_EaseToward(&player->m_vHeadRotOffset.z, bob, 0.25f);
     } else {
-        func_002117DC(&player->m_vHeadRotOffset.z, 0.0f, 0.9f);
+        Math_EaseToward(&player->m_vHeadRotOffset.z, 0.0f, 0.9f);
     }
     up = 1;
     if (!(player->m_ContState.m_FinalMoveY > 0.0f)) {
@@ -137,23 +137,23 @@ void func_00250EC0(CPlayer *player, CGameObjectInstance *body) {
     }
     lastForward = player->m_Speed;
     if (up || down) {
-        player->m_Speed = func_0021160C(player->m_Speed, player->m_ContState.m_FinalMoveY * 2.048f,
+        player->m_Speed = Math_StepClamped(player->m_Speed, player->m_ContState.m_FinalMoveY * 2.048f,
                                         ABS(player->m_ContState.m_FinalMoveY) * 14.3359995f);
     } else {
-        player->m_Speed = func_0021170C(lastForward, 4.096f);
+        player->m_Speed = Math_DecayToZero(lastForward, 4.096f);
     }
     if (player->m_ContState.m_FinalMoveX != 0.0f) {
-        player->m_SideSpeed = func_0021160C(player->m_SideSpeed, player->m_ContState.m_FinalMoveX * 2.048f,
+        player->m_SideSpeed = Math_StepClamped(player->m_SideSpeed, player->m_ContState.m_FinalMoveX * 2.048f,
                                        ABS(player->m_ContState.m_FinalMoveX) * 14.3359995f);
     } else {
-        player->m_SideSpeed = func_0021170C(player->m_SideSpeed, 4.096f);
+        player->m_SideSpeed = Math_DecayToZero(player->m_SideSpeed, 4.096f);
     }
     if (player->m_Speed == 0.0f && player->m_SideSpeed == 0.0f) {
         player->m_ModeTime = 0.0f;
         if (lastForward != 0.0f) {
             player->m_HandSide = -player->m_HandSide;
         }
-        func_0024FC08(player, body);
+        CPlayer__BobView(player, body);
     } else if ((time = player->m_ModeTime) > 11.25f) {
         player->m_HandSide = -player->m_HandSide;
         player->m_ModeTime = time - 11.25f;
@@ -161,12 +161,12 @@ void func_00250EC0(CPlayer *player, CGameObjectInstance *body) {
         player->m_SideSpeed *= 0.1f;
         if (D_8011AAD8.multiplayer) {
             if (player->m_pOptions->m_TagMode == 1) {
-                func_00275624(0x27DB);
+                Sound__Play2D(0x27DB);
             } else {
-                func_00275544(D_800AE312[player->m_Data.m_nDeathmatchCharacter * 2], body->header.m_vPos, 0, -1);
+                Sound__Play(D_800AE312[player->m_Data.m_nDeathmatchCharacter * 2], body->header.m_vPos, 0, -1);
             }
         } else {
-            func_00275544(0x3AB7, body->header.m_vPos, 0, -1);
+            Sound__Play(0x3AB7, body->header.m_vPos, 0, -1);
         }
     }
     s = func_002982F0(body->m_RotY - 1.5707964f);

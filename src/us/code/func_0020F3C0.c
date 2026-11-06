@@ -14,7 +14,7 @@ static __inline__ CVector3 project(CVector3 *arg0, CVector3 *arg1) {
     return projected;
 }
 extern f32 func_00298470(f32 arg0);
-CVector3 func_0020F3C0(CVector3 *arg0, CVector3 *arg1) {
+CVector3 CVector3__ProjectKeepLength(CVector3 *arg0, CVector3 *arg1) {
     CVector3 projected;
     f32 projectedMagnitude;
     f32 magnitudeRatio;

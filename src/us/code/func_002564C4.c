@@ -34,8 +34,8 @@ struct Object126 {
     u8 pad24[0x2C];
     f32 angle;            /* 0x50 (0x6C): yaw */
 };
-extern void func_002564C4(Actor126 *actor, Object126 *arg1);
-void func_002564C4(Actor126 *actor, Object126 *arg1) {
+extern void PlayerShock_Enter(Actor126 *actor, Object126 *arg1);
+void PlayerShock_Enter(Actor126 *actor, Object126 *arg1) {
     Object126 *object;
     f32 angle;
     f32 object_angle;

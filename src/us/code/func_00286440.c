@@ -24,44 +24,44 @@ extern Unk8011ACB0 D_8011ACB0_arr[] __asm__("D_8011ACB0");
 extern s32 D_80130940;
 extern s32 D_80130A88[];
 
-extern void func_0029B030(void *, void *, s32);
-extern void func_00266C5C(void *, s32, s32);
-extern void func_0028ADF0(void *, void *, s32, s32, s32);
-extern void func_0028AF00(void *, void *, void *);
-extern void func_0028891C(CEngineApp *);
-extern void func_00297AE0(void *);
-extern void func_0028D0B8(void);
-extern void func_0041BA50(void *);
+extern void osCreateMesgQueue(void *, void *, s32);
+extern void memset(void *, s32, s32);
+extern void osCreateScheduler(void *, void *, s32, s32, s32);
+extern void osScAddClient(void *, void *, void *);
+extern void CEngineApp__InitFade(CEngineApp *);
+extern void guMtxIdent(void *);
+extern void SavedPlayers_Clear(void);
+extern void GameSettings_SetDefaults(void *);
 extern void func_00430500(void *);
-extern void func_002837E0(void);
+extern void Cinema__Initialize(void);
 extern void func_004302A0(void);
-extern void func_0042D1C0(void *);
+extern void Light_SetDefaultDirection(void *);
 extern void CSunFrameData__Construct(CFrameData *);
-extern void func_00288318(CEngineApp *);
-extern void func_00275520(void);
+extern void CEngineApp__AdvanceFrameData(CEngineApp *);
+extern void Sound__Initialize(void);
 
-void func_00286440(CEngineApp *state) {
+void CEngineApp__Construct(CEngineApp *state) {
     u32 i;
     u32 prev;
     u32 next;
 
-    func_0029B030(D_8011AD28, D_8011B120, 0x1000);
-    func_00266C5C(D_800CFC80, 7, 0x2000);
-    func_0028ADF0(D_8011AD90, D_800CFC80 + 0x2000, D_800B6E98, 0, 1);
-    func_0028AF00(D_8011AD90, D_8011F128, D_8011AD28);
+    osCreateMesgQueue(D_8011AD28, D_8011B120, 0x1000);
+    memset(D_800CFC80, 7, 0x2000);
+    osCreateScheduler(D_8011AD90, D_800CFC80 + 0x2000, D_800B6E98, 0, 1);
+    osScAddClient(D_8011AD90, D_8011F128, D_8011AD28);
     state->m_Settings.prevMode = -1;
-    func_0028891C(state);
+    CEngineApp__InitFade(state);
     D_800D8E24 = 0;
-    func_00297AE0(D_8011B0C8);
+    guMtxIdent(D_8011B0C8);
     if (D_80120690 != 0) {
-        func_0028D0B8();
-        func_0041BA50(&D_8011AAD8);
+        SavedPlayers_Clear();
+        GameSettings_SetDefaults(&D_8011AAD8);
     }
     func_00430500(&state->m_Game.m_DebugLines);
     i = 0;
-    func_002837E0();
+    Cinema__Initialize();
     func_004302A0();
-    func_0042D1C0(&state->m_Settings.m_Sun);
+    Light_SetDefaultDirection(&state->m_Settings.m_Sun);
     state->m_Settings.unk1C8 = 0;
     state->m_Settings.ready = 1;
     state->m_Settings.unk1C4 = 0;
@@ -78,6 +78,6 @@ void func_00286440(CEngineApp *state) {
         state->m_FrameData[i].m_pNext = &state->m_FrameData[next];
         CSunFrameData__Construct(&state->m_FrameData[i]);
     }
-    func_00288318(state);
-    func_00275520();
+    CEngineApp__AdvanceFrameData(state);
+    Sound__Initialize();
 }

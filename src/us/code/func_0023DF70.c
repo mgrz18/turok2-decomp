@@ -22,21 +22,21 @@ typedef struct HitInst {
 
 extern CCollisionResults *D_800F1ADC;
 
-f32 func_002671B4(HitInst *inst);
-f32 func_002672C8(HitInst *inst);
+f32 GameObject_GetCollisionHeight(HitInst *inst);
+f32 GameObject_GetCollisionRadius(HitInst *inst);
 f32 func_0026841C(HitInst *inst);
-void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
-s32 func_0023AB18(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
-s32 func_0023B38C(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f32 maxY, f32 minY,
+void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
+s32 Sweep_HitPlane(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
+s32 Sweep_HitCylinder(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f32 maxY, f32 minY,
                   s32 frontOnly, s32 arg7, f32 arg8, s32 fromInside);
-s32 func_0023F034(HitInst *other, HitInst *inst);
-void func_0023C0FC(f32 *hit);
-void func_00241CB0(Sweep *sweep, HitInst *other);
-void func_00242604(Sweep *sweep, HitInst *other);
+s32 Sweep_IsSpecialObject(HitInst *other, HitInst *inst);
+void SweepHit_Clear(f32 *hit);
+void Platform_LandOnTop(Sweep *sweep, HitInst *other);
+void Platform_Collide(Sweep *sweep, HitInst *other);
 
 /* Sweep an instance's volume (box) against another instance's cylinder:
  * its top and bottom discs when the box asks for it, then its side. */
-void func_0023DF70(Sweep *sweep, SweepBox *box, HitInst *other) {
+void Sweep_TestInstance(Sweep *sweep, SweepBox *box, HitInst *other) {
     CRect rect;
     CVector3 hit;
     CVector3 normal;
@@ -57,7 +57,7 @@ void func_0023DF70(Sweep *sweep, SweepBox *box, HitInst *other) {
 
     x = other->pos.x;
     z = other->pos.z;
-    radius = func_002672C8(other);
+    radius = GameObject_GetCollisionRadius(other);
     rect.minX = x - radius;
     rect.maxX = x + radius;
     rect.minZ = z - radius;
@@ -71,24 +71,24 @@ void func_0023DF70(Sweep *sweep, SweepBox *box, HitInst *other) {
     special = 0;
     if (inst->type == 1 && inst->def->kind == 2) {
         if (other->type == inst->type) {
-            func_00241CB0(sweep, other);
+            Platform_LandOnTop(sweep, other);
         }
         return;
     }
     if (other->type == 1 && other->def->kind == 2) {
         if (inst->type == other->type) {
-            func_00242604(sweep, other);
+            Platform_Collide(sweep, other);
         }
         return;
     }
     if (other->type == 3) {
-        if (!func_0023F034(other, inst)) {
+        if (!Sweep_IsSpecialObject(other, inst)) {
             return;
         }
         special = 1;
     }
     bottom = other->pos.y + func_0026841C(other);
-    top = func_002671B4(other) + bottom;
+    top = GameObject_GetCollisionHeight(other) + bottom;
     if (box->flag) {
         normal.x = normal.z = 0.0f;
     }
@@ -102,25 +102,25 @@ void func_0023DF70(Sweep *sweep, SweepBox *box, HitInst *other) {
         if (box->startTop <= bottom && bottom < box->endTop) {
             t = (bottom - box->startTop) / sweep->delta.y;
             if (t < sweep->hit.fraction) {
-                func_0020EF8C(&hit, t, &inst->pos, &sweep->end);
+                CVector3__Lerp(&hit, t, &inst->pos, &sweep->end);
                 dx = x - hit.x;
                 dz = z - hit.z;
                 if (dx * dx + dz * dz < reach * reach) {
                     normal.y = -1.0f;
-                    result |= func_0023AB18(sweep, &normal, &hit, 0, 7, 0.0f, 1);
+                    result |= Sweep_HitPlane(sweep, &normal, &hit, 0, 7, 0.0f, 1);
                 }
             }
         }
         if (top <= box->startBottom && box->endBottom < top) {
             t = (top - box->startBottom) / sweep->delta.y;
             if (t < sweep->hit.fraction) {
-                func_0020EF8C(&hit, t, &inst->pos, &sweep->end);
+                CVector3__Lerp(&hit, t, &inst->pos, &sweep->end);
                 dx = x - hit.x;
                 dz = z - hit.z;
                 if (dx * dx + dz * dz < reach * reach) {
                     normal.y = 1.0f;
                     if (other->def->flags & 0x80) {
-                        if (func_0023AB18(sweep, &normal, &hit, 0, 2, 0.0f, 1)) {
+                        if (Sweep_HitPlane(sweep, &normal, &hit, 0, 2, 0.0f, 1)) {
                             result |= 1;
                             if (inst->fallSpeed < 0.0f) {
                                 inst->fallSpeed = 0.0f;
@@ -128,18 +128,18 @@ void func_0023DF70(Sweep *sweep, SweepBox *box, HitInst *other) {
                             }
                         }
                     } else {
-                        result |= func_0023AB18(sweep, &normal, &hit, 0, 7, 0.0f, 1);
+                        result |= Sweep_HitPlane(sweep, &normal, &hit, 0, 7, 0.0f, 1);
                     }
                 }
             }
         }
     }
-    result |= func_0023B38C(sweep, &other->pos, reach, 1, top - box->bottom, bottom - box->top, 1,
+    result |= Sweep_HitCylinder(sweep, &other->pos, reach, 1, top - box->bottom, bottom - box->top, 1,
                             special ? 7 : def->m_InstanceBehavior, 0.0f, 1);
     if (result) {
         target = D_800F1ADC;
         if (target->m_pInstance) {
-            func_0023C0FC(&sweep->hit.fraction);
+            SweepHit_Clear(&sweep->hit.fraction);
         } else {
             sweep->hit.posOut = &target->m_vInstancePos;
             sweep->hit.regionOut = &target->m_pInstanceRegion;

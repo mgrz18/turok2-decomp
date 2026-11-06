@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00291034(void *, s16 *, s32);
-void func_00293E70(ALSndPlayer *arg0, s16 arg1) {
+extern s32 alEvtqPostEvent(void *, s16 *, s32);
+void alSndpSetVol(ALSndPlayer *arg0, s16 arg1) {
     ParamsRecAt8V1 p;
     s32 acc;
     acc = (s32)arg0->sndState;
@@ -12,5 +12,5 @@ void func_00293E70(ALSndPlayer *arg0, s16 arg1) {
     acc += arg0->target * 0x30;
     p.f8 = arg1;
     p.f4 = acc;
-    func_00291034(&arg0->evtq, (s16 *)&p, 0);
+    alEvtqPostEvent(&arg0->evtq, (s16 *)&p, 0);
 }

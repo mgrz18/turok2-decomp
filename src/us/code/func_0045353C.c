@@ -1,4 +1,4 @@
-/* Module-2 version of func_0041A5DC (the warp menu); here both exits also clear the multiplayer flag. */
+/* Module-2 version of CheatsMenu_WarpSelect (the warp menu); here both exits also clear the multiplayer flag. */
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/game.h"
@@ -13,12 +13,12 @@
 extern s32 D_80130924;
 extern u8 D_800F7078[];
 
-extern s32 func_002855E8(s32 pad);
-extern s32 func_00285628(s32 pad);
-extern s32 func_00285670(s32 pad);
-extern void func_00417ACC(Menu *c);
-extern void func_00288C5C(void *game, s32 mode);
-extern void func_002886D0(void *game, s32 level);
+extern s32 Controller_ConfirmPressed(s32 pad);
+extern s32 Controller_MenuLeft(s32 pad);
+extern s32 Controller_MenuRight(s32 pad);
+extern void Menu_ClaimPressingController(Menu *c);
+extern void CEngineApp__SetupFadeTo(void *game, s32 mode);
+extern void CEngineApp__StartGameAtWarp(void *game, s32 level);
 extern void func_0042C620(void *level, s32 id, s32 how);
 
 static __inline__ u32 levelKey(s32 level) {
@@ -85,7 +85,7 @@ static __inline__ s32 findLevel(s32 step) {
     return -1;
 }
 
-s32 func_0045353C(void *menu, Menu *c) {
+s32 CheatsMenu_WarpSelect_2(void *menu, Menu *c) {
     s32 id;
 
     switch (D_80130924) {
@@ -124,12 +124,12 @@ s32 func_0045353C(void *menu, Menu *c) {
         id = 8000;
         break;
     }
-    if (func_002855E8(c->controller) != 0) {
+    if (Controller_ConfirmPressed(c->controller) != 0) {
         if (id == 8000) {
             PROGRESS->multiplayer = 0;
             PROGRESS->playerCount = 1;
-            func_00417ACC(c);
-            func_00288C5C(&D_800F6CB0, 16);
+            Menu_ClaimPressingController(c);
+            CEngineApp__SetupFadeTo(&D_800F6CB0, 16);
             return 1;
         }
         if (D_80119870.m_Settings.mode == 13) {
@@ -138,13 +138,13 @@ s32 func_0045353C(void *menu, Menu *c) {
         }
         PROGRESS->multiplayer = 0;
         PROGRESS->playerCount = 1;
-        func_00417ACC(c);
-        func_002886D0(&D_800F6CB0, id);
+        Menu_ClaimPressingController(c);
+        CEngineApp__StartGameAtWarp(&D_800F6CB0, id);
         return 1;
     }
-    if (func_00285628(c->controller) != 0) {
+    if (Controller_MenuLeft(c->controller) != 0) {
         D_80130924 = findLevel(-1);
-    } else if (func_00285670(c->controller) != 0) {
+    } else if (Controller_MenuRight(c->controller) != 0) {
         D_80130924 = findLevel(1);
     } else {
         return 0;

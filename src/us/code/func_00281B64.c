@@ -8,7 +8,7 @@ typedef struct {
     /* 0x10 */ s32 unk10;
 } Arg0;
 
-void func_00281B64(Arg0 *arg0) {
+void CShakeAxis__Construct(Arg0 *arg0) {
     arg0->unk4 = 0;
     arg0->unk8 = 0;
     arg0->unkC = 0;

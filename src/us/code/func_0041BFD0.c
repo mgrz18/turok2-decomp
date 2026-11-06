@@ -6,12 +6,12 @@
 #include "structs/menu.h"
 
 extern CPlayerOptions D_8011AB18;
-extern s32 func_0041648C(void *, s32, s32, s32, s32, s32);
-s32 func_0041BFD0(void *first, Menu *menu) {
+extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
+s32 OptionsMenu_StepControlSide(void *first, Menu *menu) {
     CPlayerOptions *settings = &D_8011AB18;
     if (menu->player != 0 && menu->player->m_pOptions != 0) {
         settings = menu->player->m_pOptions;
     }
-    settings->m_ControlSide = func_0041648C(menu, settings->m_ControlSide, 1, 0, 1, 1);
+    settings->m_ControlSide = Menu_StepValue(menu, settings->m_ControlSide, 1, 0, 1, 1);
     return 0;
 }

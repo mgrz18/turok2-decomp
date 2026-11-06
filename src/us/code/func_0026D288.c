@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-s32 func_0026D288(void *arg0, void *arg1) {
+s32 DList_AddTail(void *arg0, void *arg1) {
     s32 count;
     if ((((struct ListHeader *) ((s8 *) arg0))->count) == 0) {
         (((struct ListHeader *) ((s8 *) arg0))->head) = arg1;

@@ -3,7 +3,7 @@
 
 extern s32 D_8011AD10;
 
-void func_0042F958(void) {
+void Demo_UpdateMatchStream(void) {
     DemoPlayer *s = &D_800F56B0;
     DemoStream *t = &s->match;
 

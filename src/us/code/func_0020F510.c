@@ -5,7 +5,7 @@
 
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32 arg0);
-s32 func_0020F510(f32 *arg0, f32 arg1) {
+s32 CVector3__ClampLength(f32 *arg0, f32 arg1) {
     f32 magSq;
     f32 mag;
     f32 scale;

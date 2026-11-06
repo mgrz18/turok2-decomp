@@ -6,7 +6,7 @@ void __osRestoreInt(s32);
 
 extern s32 D_800B8908[];
 
-void func_0029DEE0(s32 arg0) {
+void __osResetGlobalIntMask(s32 arg0) {
     s32 temp_v0;
 
     temp_v0 = __osDisableInt();

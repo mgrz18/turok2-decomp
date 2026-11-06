@@ -26,7 +26,7 @@ static __inline__ s32 findSorted(u32 *array, u32 count, u32 key) {
 }
 
 /* Finds the run of entries equal to key; returns 0 when there is none. */
-s32 func_00266D8C(u32 *array, s32 count, u32 key, s32 *first, s32 *last) {
+s32 BinaryRange(u32 *array, s32 count, u32 key, s32 *first, s32 *last) {
     s32 index = findSorted(array, count, key);
     s32 i;
 

@@ -15,42 +15,42 @@ extern u8 D_800F7078[];
 extern u32 D_800F1F10[];
 extern u8 D_00431F00[];
 
-s32 func_00225F6C(void *, s32, s32, s32, CGameObjectInstance **, s32);
-s32 func_00225EBC(void *, s32, s32);
-void func_00243414(Obj *, CAI *, s32);
-void func_002362E4(void *, Obj *);
-void func_0040BC64();
-void func_0040BEE4();
-void func_0040BFF0();
-void func_0025E4B8();
+s32 CScene__FindInstances(void *, s32, s32, s32, CGameObjectInstance **, s32);
+s32 CScene__FindIntelligence(void *, s32, s32);
+void CAI__SetMode(Obj *, CAI *, s32);
+void ScriptAnimator_Start(void *, Obj *);
+void MotherBoss_Step();
+void MotherBoss_Draw();
+void MotherBoss_Collision();
+void EnemyAI_HeadNodeCallback();
 extern u8 func_00408FF8[];
 
-void func_00409340(Obj *obj, CAI *ai) {
+void MotherBoss_Init(Obj *obj, CAI *ai) {
     MotherBossState *s = &D_8012FB70;
     s32 i;
 
     D_80110048 = 0x1DB1;
     s->pickupTimer = 0;
     s->dropTimer = 0;
-    s->partCount = func_00225F6C(D_800F7078, 0x650, 10, 0x1DB1, (CGameObjectInstance **)s->parts, 6);
+    s->partCount = CScene__FindInstances(D_800F7078, 0x650, 10, 0x1DB1, (CGameObjectInstance **)s->parts, 6);
     for (i = 0; i < s->partCount; i++) {
         ((CGameObjectInstance *)s->parts[i])->m_AI.m_Mother.m_bActive = 1;
     }
     s->partsLeft = s->partCount;
-    func_00225F6C(D_800F7078, 0x650, 10, 0x1DB2, (CGameObjectInstance **)&s->controller, 1);
+    CScene__FindInstances(D_800F7078, 0x650, 10, 0x1DB2, (CGameObjectInstance **)&s->controller, 1);
     ((CGameObjectInstance *)s->controller)->m_AI.m_Mother.m_bActive = 1;
-    s->intel = (void *)func_00225EBC(D_800F7078, 1, 0x1DB1);
+    s->intel = (void *)CScene__FindIntelligence(D_800F7078, 1, 0x1DB1);
     ai->m_pModeTable = D_00431F00;
-    ai->m_pfStep = func_0040BC64;
+    ai->m_pfStep = MotherBoss_Step;
     ai->m_pfHurt = func_00408FF8 + 8;
-    ai->m_pfEffects = func_0025E4B8;
-    ai->m_pfCollision = func_0040BFF0;
-    ai->m_pfDraw = func_0040BEE4;
-    func_00243414(obj, ai, 0);
+    ai->m_pfEffects = EnemyAI_HeadNodeCallback;
+    ai->m_pfCollision = MotherBoss_Collision;
+    ai->m_pfDraw = MotherBoss_Draw;
+    CAI__SetMode(obj, ai, 0);
     D_8012FB70.obj = obj;
     D_800F1F10[0] &= ~0x300;
     obj->flags |= 0x04000000;
     for (i = 0; i < 15; i++) {
-        func_002362E4(&D_8012FB70.slots[i].anim, obj);
+        ScriptAnimator_Start(&D_8012FB70.slots[i].anim, obj);
     }
 }

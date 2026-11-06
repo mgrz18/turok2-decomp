@@ -9,19 +9,19 @@ typedef struct {
     /* 0x1E */ s16 unk1E;
 } Sound;
 
-s32 func_002718F4(s32);                             /* extern */
-s32 func_00293E60(s32, s16);                    /* extern */
-s32 func_00293EC0(s32);                         /* extern */
+s32 CAudioWorld__GetSndPlayer(s32);                             /* extern */
+s32 alSndpSetSound(s32, s16);                    /* extern */
+s32 alSndpStop(s32);                         /* extern */
 
-void func_00277024(Sound *arg0) {
+void SpeechPlayer_StopUnlocked(Sound *arg0) {
     s32 temp_v0;
     s32 temp_v0_2;
 
     temp_v0 = arg0->state;
     if ((temp_v0 != 2) && (temp_v0 != 0)) {
         arg0->state = 2;
-        temp_v0_2 = func_002718F4(arg0->handle);
-        func_00293E60(temp_v0_2, arg0->unk1E);
-        func_00293EC0(temp_v0_2);
+        temp_v0_2 = CAudioWorld__GetSndPlayer(arg0->handle);
+        alSndpSetSound(temp_v0_2, arg0->unk1E);
+        alSndpStop(temp_v0_2);
     }
 }

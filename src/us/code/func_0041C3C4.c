@@ -7,10 +7,10 @@ extern char D_800B4008[];
 extern char D_800B4020[];
 extern char D_800B4038[];
 extern char D_800C1310[]; /* number format */
-extern s32 func_004160F0(MenuItem *a);
-extern void func_0029E3E0(char *dst, char *fmt, ...);
+extern s32 MenuItem_TextLength(MenuItem *a);
+extern void sprintf(char *dst, char *fmt, ...);
 
-s32 func_0041C3C4(MenuItem *a) {
+s32 OptionsMenu_OpacityText(MenuItem *a) {
     u32 h = D_8011AAD8.hudAlphaSetting.value >> 4;
 
     if (h == 0) {
@@ -19,7 +19,7 @@ s32 func_0041C3C4(MenuItem *a) {
         a->text = D_800B4020;
     } else {
         a->text = D_800B4038;
-        func_0029E3E0(a->text + (func_004160F0(a) - 2), D_800C1310, h);
+        sprintf(a->text + (MenuItem_TextLength(a) - 2), D_800C1310, h);
     }
     return 0;
 }

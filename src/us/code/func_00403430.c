@@ -15,9 +15,9 @@ typedef struct {
     /* 0x220 */ Actor00403430 *actor;
 } Owner00403430;
 
-void func_002666B0(Actor00403430 *actor, void *ai, s32 state);
+void AI_PlayAnim(Actor00403430 *actor, void *ai, s32 state);
 
-void func_00403430(Owner00403430 *owner) {
+void MantidQueen_UpdateBossAnim(Owner00403430 *owner) {
     Actor00403430 *actor = owner->actor;
     s32 state;
 
@@ -27,7 +27,7 @@ void func_00403430(Owner00403430 *owner) {
     } else if (state < 0x5AB5) {
     } else if (state == 0x5ABE) {
         if (actor->active != 0) {
-            func_002666B0(owner->actor, owner->actor->ai, 0x5ADC);
+            AI_PlayAnim(owner->actor, owner->actor->ai, 0x5ADC);
         }
     }
 }

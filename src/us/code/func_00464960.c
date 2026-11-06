@@ -1,5 +1,5 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_13.CPP, func_8044C7B8_de, with Turok 2's layouts. */
-/* Second VM module copy of func_0042BA40 (same source); its calls go to the module's own copies, named by link address. */
+/* Second VM module copy of CScene__DecompressAnimatedInstances (same source); its calls go to the module's own copies, named by link address. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
@@ -38,28 +38,28 @@ extern s32 D_80119948;
 extern CPlayer *D_80119874;
 extern s32 D_80119878;
 
-extern s32 func_00200B00(Handle **handle, s32);
-extern s32 func_002242F8(CWorld *world, s32);
-extern Handle *func_00205D7C(s32, Handle **handle, s32 size);
-extern void func_0020192C(LevelNode *node, void *data, s32);
+extern s32 ProPackDecompress(Handle **handle, s32);
+extern s32 CScene__GetRegion(CWorld *world, s32);
+extern Handle *CCache__AllocateMemoryForDecompression(s32, Handle **handle, s32 size);
+extern void CUSet__Transpose(LevelNode *node, void *data, s32);
 extern s32 func_0042C480(CWorld *world, CVector3 *pos, s32 group, void *info);
 extern s32 func_0042C0B4(CWorld *world, s32 group, s32 key, CWarpPoint *out, s32 max);
-extern s32 *func_00225E88(CWorld *world, u16 id);
-extern void func_0021E6AC(CGameObjectInstance *obj, LevelRecord *rec, s32 mode, s32 index);
-extern s32 func_00220A1C(CWorld *world, CVector3 *pos);
-extern void func_00210EF0(f32 *angle);
+extern s32 *CScene__GetIntelligence(CWorld *world, u16 id);
+extern void CGameObjectInstance__ConstructFromRecord(CGameObjectInstance *obj, LevelRecord *rec, s32 mode, s32 index);
+extern s32 CScene__FindRegionAt(CWorld *world, CVector3 *pos);
+extern void Angle_Wrap(f32 *angle);
 extern void func_0042D980(CPlayer *player, LevelRecord *rec, s32 mode, s32 index);
 extern s32 func_00267DBC(CGameObjectInstance *obj);
 extern s32 func_00267D94(CGameObjectInstance *obj);
-extern f32 func_002465F0(CGameObjectInstance *obj, CVector3 pos);
-extern void func_002057B0(s32, Handle **handle, Handle *block);
+extern f32 AI_DistSqToPointAtHeight(CGameObjectInstance *obj, CVector3 pos);
+extern void CCache__DeallocAndReplaceCompressedData(s32, Handle **handle, Handle *block);
 
 /* Builds the level's actor block from its records: places every player on the spawn points found for
    the level (one record per player start), then links each remaining actor to the nearest actor with
    the same definition. The spawn point is indexed afresh on each use and the position copied with
    memcpy (as in Rage Wars): both set loop.c's insn count and giv benefits, which decide the ROM's
    hoisting of the spawns base and of the angle constants. */
-void func_00464960(CWorld *world, Handle **handle) {
+void CScene__DecompressAnimatedInstances_2(CWorld *world, Handle **handle) {
     CWarpPoint spawns[4];
     CGameObjectInstance *objects;
     s32 mode;
@@ -84,13 +84,13 @@ void func_00464960(CWorld *world, Handle **handle) {
     f32 dist;
     s16 value;
 
-    if (func_00200B00(handle, 1) != 0) {
-        mode = func_002242F8(world, 0);
+    if (ProPackDecompress(handle, 1) != 0) {
+        mode = CScene__GetRegion(world, 0);
         node = (*handle)->data;
         n = node->count;
-        block = func_00205D7C(0, handle, n * sizeof(CGameObjectInstance) + 8);
+        block = CCache__AllocateMemoryForDecompression(0, handle, n * sizeof(CGameObjectInstance) + 8);
         if (block != NULL) {
-            func_0020192C(node, block->data, 1);
+            CUSet__Transpose(node, block->data, 1);
             hdr = block->data;
             hdr->size = sizeof(CGameObjectInstance);
             hdr->count = n;
@@ -117,7 +117,7 @@ void func_00464960(CWorld *world, Handle **handle) {
                     rec = recWalk;
                     obj = objWalk;
                     i++;
-                    obj->header.m_pIntelligence = func_00225E88(world, rec->defId);
+                    obj->header.m_pIntelligence = CScene__GetIntelligence(world, rec->defId);
                     objWalk = obj + 1;
                     recWalk = rec + 1;
                 }
@@ -126,19 +126,19 @@ void func_00464960(CWorld *world, Handle **handle) {
             for (i = 0; i < n; i++) {
                 rec = &records[i];
                 obj = &objects[i];
-                func_0021E6AC(obj, rec, mode, i);
-                if (*func_00225E88(world, rec->defId) != 0xB && i != 0) {
+                CGameObjectInstance__ConstructFromRecord(obj, rec, mode, i);
+                if (*CScene__GetIntelligence(world, rec->defId) != 0xB && i != 0) {
                     continue;
                 }
                 world->m_nFirstActor++;
                 memcpy(&D_80119928, &rec->pos, sizeof(CVector3));
                 D_80119928.y += 204.79999f;
-                D_80119948 = func_00220A1C(world, &rec->pos);
+                D_80119948 = CScene__FindRegionAt(world, &rec->pos);
                 for (playerIndex = 0; playerIndex < D_80119878; playerIndex++) {
                     player = &D_80119874[playerIndex];
                     if (nspawns != 0) {
                         rec->spawnId = spawns[spawnIndex].m_nID;
-                        func_00210EF0(&spawns[spawnIndex].m_RotY);
+                        Angle_Wrap(&spawns[spawnIndex].m_RotY);
                         angle = spawns[spawnIndex].m_RotY;
                         if (!(angle > 3.1415927f)) {
                             if (!(angle < -3.1415927f)) {
@@ -174,20 +174,20 @@ void func_00464960(CWorld *world, Handle **handle) {
                     other = &objects[j];
                     if (obj->header.m_pIntelligence->m_Type == other->header.m_pIntelligence->m_Type && func_00267D94(other) != 0 && obj != other) {
                         if (obj->m_AI.m_pParent != NULL) {
-                            dist = func_002465F0(obj, other->header.m_vPos);
+                            dist = AI_DistSqToPointAtHeight(obj, other->header.m_vPos);
                             if (dist < best) {
                                 obj->m_AI.m_pParent = other;
                                 best = dist;
                             }
                         } else {
                             obj->m_AI.m_pParent = other;
-                            best = func_002465F0(obj, other->header.m_vPos);
+                            best = AI_DistSqToPointAtHeight(obj, other->header.m_vPos);
                         }
                     }
                 }
             }
         }
-        func_002057B0(0, handle, block);
+        CCache__DeallocAndReplaceCompressedData(0, handle, block);
         world->m_Kind1Cursor = 0;
     }
 }

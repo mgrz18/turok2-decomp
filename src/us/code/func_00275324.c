@@ -8,10 +8,10 @@ typedef struct {
     /* 0x2C */ f32 volume;
 } SoundChannel;
 
-void func_00290EC0(s32, s16);                       /* extern */
+void alCSPSetVol(s32, s16);                       /* extern */
 
 /* Sets the volume (0..1, sent as 0..32767). */
-void func_00275324(SoundChannel *arg0, f32 arg1) {
-    func_00290EC0(arg0->voice, (s16) (s32) (arg1 * 32767.0f));
+void SndSeq_SetVolume(SoundChannel *arg0, f32 arg1) {
+    alCSPSetVol(arg0->voice, (s16) (s32) (arg1 * 32767.0f));
     arg0->volume = arg1;
 }

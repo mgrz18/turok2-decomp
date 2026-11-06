@@ -3,6 +3,6 @@
 #include "m2c_macros.h"
 
 
-void func_0042F57C(void) {
+void Demo_Enable(void) {
     D_800F56B0.active = 1;
 }

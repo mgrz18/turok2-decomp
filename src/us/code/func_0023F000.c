@@ -10,7 +10,7 @@ typedef struct Row10 {
     u8 pad6[10];
 } Row10;
 extern Row10 D_800AD838[];
-Row10 *func_0023F000(s32 id) {
+Row10 *Pickup_FindItemEntry(s32 id) {
     s32 i;
     Row10 *p = D_800AD838;
     for (i = 14; i != -1; i--) {

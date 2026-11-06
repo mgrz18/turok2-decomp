@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 /* Stops the object. */
-void func_0044083C(CGameObjectInstance *arg0) {
+void Primagen_EnterMode22_2(CGameObjectInstance *arg0) {
     arg0->m_vVelocity.x = 0;
     arg0->m_vVelocity.y = 0;
     arg0->m_vVelocity.z = 0;

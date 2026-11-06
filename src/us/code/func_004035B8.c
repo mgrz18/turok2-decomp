@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_004035B8(s32 *arg0, s32 *arg1) {
+void MantidQueen_SortSwap(s32 *arg0, s32 *arg1) {
     s32 temp_v1;
 
     temp_v1 = *arg0;

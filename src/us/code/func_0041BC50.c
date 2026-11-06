@@ -14,7 +14,7 @@ extern u8 D_800B5E8C[12];
 extern u8 D_800B5E98[12];
 extern u8 D_800B5EA4[12];
 
-void func_0041BC50(Widget *w) {
+void PlayerOptions_SetDefaultName(Widget *w) {
     s32 i;
 
     switch (w->style) {

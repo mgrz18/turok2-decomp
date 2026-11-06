@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002A1350(s32 address, s32 value);
-void func_002A1350(s32 address, s32 value) {
+extern void HostIo_WriteWord(s32 address, s32 value);
+void HostIo_WriteWord(s32 address, s32 value) {
     if ((*(volatile u32 *)(0xA4600010U)) & 3U) {
         do {
         } while ((*(volatile u32 *)(0xA4600010U)) & 3U);

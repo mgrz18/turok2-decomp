@@ -2,7 +2,7 @@
 #include "gfx.h"
 #include "structs/camera.h"
 
-void func_0020B5B8(void);
+void Render_InvalidateModeCache(void);
 
 #define GFX(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
 /* gDPFillRectangle with float corners, each converted to an unsigned int. */
@@ -15,10 +15,10 @@ void func_0020B5B8(void);
 
 /* Draws a one-pixel frame around a camera's viewport (the borders of a
  * split screen): four fill rectangles in fill mode, colour 0x10001. */
-void func_0027F64C(CCamera *cam) {
+void CCamera__DrawBorder(CCamera *cam) {
     f32 x, y, width, height;
 
-    func_0020B5B8();
+    Render_InvalidateModeCache();
     x = cam->m_Viewport.m_ScreenPosX;
     y = cam->m_Viewport.m_ScreenPosY;
     width = cam->m_Viewport.m_Width;

@@ -4,14 +4,14 @@
 
 extern BlindOnePhase D_0043240C[];
 
-extern s32 func_00284204(BlindOneState *m);
+extern s32 Cinema_IsIdle(BlindOneState *m);
 
-void func_0040E46C(BlindOneState *m) {
+void BlindOne_PhaseWaitCinemaUpdate(BlindOneState *m) {
     BlindOneStep *script;
     s32 cmd;
     s32 i;
 
-    if (func_00284204(m)) {
+    if (Cinema_IsIdle(m)) {
         script = m->script;
         m->script = script + 1;
         cmd = script[1].id;

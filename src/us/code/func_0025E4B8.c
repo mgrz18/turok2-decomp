@@ -1,7 +1,7 @@
 #include "common.h"
 
-s32 func_00210790(s32, s32);                    /* extern */
-s32 func_00210B38(s32, s32);                    /* extern */
+s32 CMtxF__RotateX(s32, s32);                    /* extern */
+s32 CMtxF__RotateZ(s32, s32);                    /* extern */
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x164];
@@ -23,14 +23,14 @@ typedef struct {
     /* 0x90 */ s32 value;
 } Effect0025E4B8;
 
-void func_0025E4B8(s32 arg0, Effect0025E4B8 *arg1) {
+void EnemyAI_HeadNodeCallback(s32 arg0, Effect0025E4B8 *arg1) {
     s32 temp_v1;
     Range0025E4B8 *temp_a0;
 
     temp_a0 = arg1->range;
     temp_v1 = arg1->value;
     if ((temp_v1 >= temp_a0->min) && (temp_a0->max >= temp_v1)) {
-        func_00210B38(arg0, arg1->owner->unk164);
-        func_00210790(arg0, arg1->owner->unk168);
+        CMtxF__RotateZ(arg0, arg1->owner->unk164);
+        CMtxF__RotateX(arg0, arg1->owner->unk168);
     }
 }

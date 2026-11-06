@@ -4,7 +4,7 @@
 extern CListedInstance *D_8010FEB4;
 
 /* Is any actor whose definition kind is 1 still alive? */
-s32 func_00408E64(void) {
+s32 TotemDefense_AnyEnemyAlive(void) {
     CListedInstance *actor;
 
     for (actor = D_8010FEB4; actor != NULL; actor = actor->m_pNext) {

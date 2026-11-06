@@ -1,7 +1,7 @@
 #include "common.h"
 
-s32 func_0028908C();                            /* extern */
+s32 EngineMode13_Game_Draw();                            /* extern */
 
-void func_00289758(void) {
-    func_0028908C();
+void EngineMode08_MainMenu_Draw(void) {
+    EngineMode13_Game_Draw();
 }

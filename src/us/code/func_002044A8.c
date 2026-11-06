@@ -20,10 +20,10 @@ extern CMemEntry **D_800D81D4; /* free node stack */
 
 void CList__Remove(void *list, void *item);
 void CList__AddHead(void *list, void *item);
-void func_00202A08(u32 key);
-void func_002026EC(void *heap, s32 data);
-void func_002066B0(s32 unused, CCacheEntry *request);
-void func_00202934(u32 key, CCacheEntry *value);
+void CHashTable__Remove(u32 key);
+void CHeap__Free(void *heap, s32 data);
+void CCache__FreeCacheEntry(s32 unused, CCacheEntry *request);
+void CHashTable__Insert(u32 key, CCacheEntry *value);
 
 static __inline__ void find(u32 key, CCacheEntry **out) {
     HashEntry *node = D_800D81C4 + (((key << 5) ^ (key >> 1) ^ (key >> 9) ^ (key >> 17)) & D_800D81C0);
@@ -55,7 +55,7 @@ static __inline__ void release(CMemEntry *node) {
     *(&D_800D81E0 + 0x2F3) += 1;
 }
 
-CCacheEntry *func_002044A8(s32 unused, CCacheEntry *request, s32 dropReference) {
+CCacheEntry *CCache__CompleteRequest(s32 unused, CCacheEntry *request, s32 dropReference) {
     CCacheEntry *existing;
     CMemEntry *node;
 
@@ -65,21 +65,21 @@ CCacheEntry *func_002044A8(s32 unused, CCacheEntry *request, s32 dropReference) 
         find(request->requestId, &existing);
         if (existing != 0) {
             if ((s32) existing->requestLength < (s32) request->requestLength) {
-                func_00202A08(existing->requestId);
+                CHashTable__Remove(existing->requestId);
                 existing->memEntry->cacheEntry = 0;
                 if (!(existing->memEntry->flags & 0x702)) {
-                    func_002026EC(D_800D1CC0, existing->memEntry->data);
+                    CHeap__Free(D_800D1CC0, existing->memEntry->data);
                     release(existing->memEntry);
                 }
-                func_002066B0(0, existing);
+                CCache__FreeCacheEntry(0, existing);
             } else {
-                func_002026EC(D_800D1CC0, request->memEntry->data);
+                CHeap__Free(D_800D1CC0, request->memEntry->data);
                 release(request->memEntry);
-                func_002066B0(0, request);
+                CCache__FreeCacheEntry(0, request);
                 return existing;
             }
         }
-        func_00202934(request->requestId, request);
+        CHashTable__Insert(request->requestId, request);
         request->memEntry->cacheEntry = request;
         if (dropReference != 0) {
             node = request->memEntry;
@@ -89,6 +89,6 @@ CCacheEntry *func_002044A8(s32 unused, CCacheEntry *request, s32 dropReference) 
         }
         return request;
     }
-    func_002066B0(0, request);
+    CCache__FreeCacheEntry(0, request);
     return 0;
 }

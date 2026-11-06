@@ -3,16 +3,16 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00293E60(void *sound, s16 sample);
-extern s32 func_00293580(void *sound);
-extern void func_00293EC0(void *sound);
-extern void func_00293E60(void *sound, s16 sample);
-extern s32 func_00293580(void *sound);
-extern void func_00293EC0(void *sound);
-extern void func_00293E60(void *arg0, s16 arg1);
-extern s32 func_00293580(void *arg0);
-extern void func_00293EC0(void *arg0);
-void func_0027392C(RecordRecAt4V6 *record, s32 value)
+extern void alSndpSetSound(void *sound, s16 sample);
+extern s32 alSndpGetState(void *sound);
+extern void alSndpStop(void *sound);
+extern void alSndpSetSound(void *sound, s16 sample);
+extern s32 alSndpGetState(void *sound);
+extern void alSndpStop(void *sound);
+extern void alSndpSetSound(void *arg0, s16 arg1);
+extern s32 alSndpGetState(void *arg0);
+extern void alSndpStop(void *arg0);
+void SndVoicePool_StopAllExcept(RecordRecAt4V6 *record, s32 value)
 {
   s32 i;
   s32 active;
@@ -32,16 +32,16 @@ void func_0027392C(RecordRecAt4V6 *record, s32 value)
       if (slot->key != owner->key)
       {
         sound = owner->sound;
-        func_00293E60(sound, owner->samples[slot->index]);
-        if (func_00293580(sound) != 0)
+        alSndpSetSound(sound, owner->samples[slot->index]);
+        if (alSndpGetState(sound) != 0)
         {
           if (active)
           {
-            func_00293EC0(sound);
+            alSndpStop(sound);
           }
           else
           {
-            func_00293EC0(sound);
+            alSndpStop(sound);
           }
         }
         slot->state = absent;

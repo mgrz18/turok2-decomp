@@ -124,10 +124,10 @@ struct Shared_Game {
 };
 extern Shared_Game D_8011A6D8;
 extern f32 D_801308FC;
-extern s32 func_00417D78(void);
+extern s32 FinalScoreMenu_Poll(void);
 extern f32 D_800B6D28;
-void func_002534E0(void *arg0);
-s32 func_00417D78(void) {
+void CPlayerPool__EndMatch(void *arg0);
+s32 FinalScoreMenu_Poll(void) {
     f32 time;
     RenderCounters *base;
     time = D_801308FC + D_800B6D28;
@@ -135,7 +135,7 @@ s32 func_00417D78(void) {
     if ((120.0f) <= time) {
         base = &D_8011A6D8.counters;
         base->teams = 0;
-        func_002534E0((void *) ((char *) base - 0x1440));
+        CPlayerPool__EndMatch((void *) ((char *) base - 0x1440));
         return 1;
     }
     return 0;

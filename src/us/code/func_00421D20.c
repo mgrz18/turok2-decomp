@@ -15,7 +15,7 @@ extern s32 D_80130990;
 extern s32 D_80130994;
 extern s32 D_801309B4;
 
-s32 func_00421D20(MenuItem *item, s16 *id) {
+s32 PakMenu_UpdateSubtitle(MenuItem *item, s16 *id) {
     s32 n = *id;
     u32 k = n - 3;
 

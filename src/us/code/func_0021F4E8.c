@@ -14,13 +14,13 @@ typedef struct B11Rec {
     CVector3 pos;
     B11Pair unk14;
 } B11Rec;
-B11Rec *func_002199C8(s32 a);
-s32 func_002199F4(s32 a);
-void func_0020F85C(void *m, void *v, CVector3 *out);
-void func_00236EA0(CGameObjectInstance *a, CGameObjectInstance *b, u16 c, s32 d, CVector3 e, B11Pair f);
+B11Rec *CAnimationState__GetEvents(s32 a);
+s32 CAnimationState__GetEventCount(s32 a);
+void CMtxF__TransformPoint(void *m, void *v, CVector3 *out);
+void ImpactEvent_Send(CGameObjectInstance *a, CGameObjectInstance *b, u16 c, s32 d, CVector3 e, B11Pair f);
 void func_0021F4E8(CGameObjectInstance *a, s32 b) {
-    B11Rec *list = func_002199C8(b);
-    s32 n = func_002199F4(b);
+    B11Rec *list = CAnimationState__GetEvents(b);
+    s32 n = CAnimationState__GetEventCount(b);
     s32 i;
     s32 t;
     CVector3 v;
@@ -28,8 +28,8 @@ void func_0021F4E8(CGameObjectInstance *a, s32 b) {
         t = list[i].type;
         if (t < 8) {
             if (t >= 6) {
-                func_0020F85C(a->m_mfOrient, &list[i].pos, &v);
-                func_00236EA0(a, a, list[i].type, -1, v, list[i].unk14);
+                CMtxF__TransformPoint(a->m_mfOrient, &list[i].pos, &v);
+                ImpactEvent_Send(a, a, list[i].type, -1, v, list[i].unk14);
             }
         }
     }

@@ -3,9 +3,9 @@
 
 typedef unsigned int u32;
 typedef signed int s32;
-s32 func_0029A4A0(u32 pc);
-s32 func_0029A4A0(u32 pc);
-s32 func_0029A4A0(u32 pc) {
+s32 __osSpSetPc(u32 pc);
+s32 __osSpSetPc(u32 pc);
+s32 __osSpSetPc(u32 pc) {
     if (!((*(volatile u32 *)((u32)(0x04040010) | 0xA0000000)) & 0x0001)) {
         return -1;
     }

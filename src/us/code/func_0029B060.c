@@ -7,7 +7,7 @@ extern OSThread *D_800B891C;
 extern void __osCleanupThread(void);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
-void func_0029B060(OSThread *t, s32 id, void (*entry)(void *), void *arg, void *sp, s32 p)
+void osCreateThread(OSThread *t, s32 id, void (*entry)(void *), void *arg, void *sp, s32 p)
 {
     register u32 saveMask;
     u32 mask;

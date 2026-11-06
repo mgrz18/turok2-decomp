@@ -7,7 +7,7 @@ s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 /* How many of the manager's voices play the given sound (CMutex taken
  * around the scan). */
-s32 func_00271904(SndMgr *mgr, s32 sound)
+s32 CAudioWorld__CountHandleVoices(SndMgr *mgr, s32 sound)
 {
   s32 mask;
   s32 mask2;

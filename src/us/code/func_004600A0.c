@@ -1,4 +1,4 @@
-/* Second-module copy of func_00427180 (first module; this one at link address 0x004270A0), calling this module's own functions at their link addresses. */
+/* Second-module copy of osPfsAllocateFile (first module; this one at link address 0x004270A0), calling this module's own functions at their link addresses. */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80446C5C_de_2.c, func_80445F80_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
@@ -13,8 +13,8 @@ extern s32 func_00427444(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, i
 extern s32 func_00429D1C(OSPfs *pfs);
 extern s32 func_00429200(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 *file_no);
 extern s32 func_004299C4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
-s32 func_004600A0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name,
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
+s32 osPfsAllocateFile_2(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name,
                   int file_size_in_bytes, s32 *file_no)
 {
     int start_page;
@@ -107,7 +107,7 @@ s32 func_004600A0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8
             dir.game_name[j] = *game_name++;
         for (j = 0; j < 4; j++)
             dir.ext_name[j] = *ext_name++;
-        ret = func_00299A40(pfs->queue, pfs->channel, pfs->dir_table + *file_no, (u8 *)&dir, 0);
+        ret = __osContRamWrite(pfs->queue, pfs->channel, pfs->dir_table + *file_no, (u8 *)&dir, 0);
         if (ret != 0)
             return ret;
         return ret;
@@ -117,5 +117,5 @@ s32 func_004600A0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8
 }
 s32 func_00427444(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank,
                   int *decleared, int *last_page);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);

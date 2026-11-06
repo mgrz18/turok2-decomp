@@ -4,9 +4,9 @@
 #include "rw/abu_types.h"
 
 extern u8 D_8011AAF0;
-extern s32 func_0041648C(void *, s32, s32, s32, s32, s32);
-s32 func_004199AC(void *first, void *second) {
+extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
+s32 Menu_StepDebugMode(void *first, void *second) {
     u8 *option = &D_8011AAF0;
-    *option = func_0041648C(second, *option, 1, 0, 2, 1);
+    *option = Menu_StepValue(second, *option, 1, 0, 2, 1);
     return 0;
 }

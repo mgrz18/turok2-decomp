@@ -16,20 +16,20 @@ typedef struct {
 
 extern u8 D_80130E20[];
 
-void func_00460F78(s32 channel);
-s32 func_0029A080(s32 enable, void *timer);
+void __osPfsRequestOneChannel_2(s32 channel);
+s32 __osSiRawStartDma(s32 enable, void *timer);
 s32 osRecvMesg(void *mq, void *msg, s32 flag);
 void func_00428004(s32 channel, PakStatus *status);
 
-s32 func_00460EA0(void *mq, s32 channel) {
+s32 __osPfsGetStatus_2(void *mq, s32 channel) {
     PakStatus status;
     void *msg;
     s32 ret;
 
-    func_00460F78(channel);
-    func_0029A080(1, D_80130E20);
+    __osPfsRequestOneChannel_2(channel);
+    __osSiRawStartDma(1, D_80130E20);
     osRecvMesg(mq, &msg, 1);
-    ret = func_0029A080(0, D_80130E20);
+    ret = __osSiRawStartDma(0, D_80130E20);
     osRecvMesg(mq, &msg, 1);
     func_00428004(channel, &status);
     if ((status.s.b.status & 1) && (status.s.b.status & 2)) {

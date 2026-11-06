@@ -21,12 +21,12 @@
 extern char D_800AA290[];
 extern char D_800AA294[];
 
-void func_0028F61C(void *seq, ALEvent *evt);            /* alCSeqNextEvent */
-s32 func_0028F910(void *seq, s32 *deltaTicks);          /* __alCSeqNextDelta */
-void func_00290240(ALCSPlayer *seqp, ALEvent *evt);     /* __CSPHandleMIDIMsg */
+void alCSeqNextEvent(void *seq, ALEvent *evt);            /* alCSeqNextEvent */
+s32 __alCSeqNextDelta(void *seq, s32 *deltaTicks);          /* __alCSeqNextDelta */
+void __CSPHandleMIDIMsg(ALCSPlayer *seqp, ALEvent *evt);     /* __CSPHandleMIDIMsg */
 void __CSPHandleMetaMsg(ALCSPlayer *seqp, ALEvent *evt);
-void func_00291034(ALEventQueue *evtq, ALEvent *evt, s32 delta);   /* alEvtqPostEvent */
-void func_0029B020(char *file, char *text, s32 line);   /* assertion failure */
+void alEvtqPostEvent(ALEventQueue *evtq, ALEvent *evt, s32 delta);   /* alEvtqPostEvent */
+void __assert(char *file, char *text, s32 line);   /* assertion failure */
 
 static __inline__ void postNextSeqEvent(ALCSPlayer *seqp) {
     ALEvent evt;
@@ -35,23 +35,23 @@ static __inline__ void postNextSeqEvent(ALCSPlayer *seqp) {
     if (seqp->state != AL_PLAYING || seqp->target == NULL) {
         return;
     }
-    if (!(u8)func_0028F910(seqp->target, &deltaTicks)) {
+    if (!(u8)__alCSeqNextDelta(seqp->target, &deltaTicks)) {
         return;
     }
     evt.type = AL_SEQ_REF_EVT;
-    func_00291034(&seqp->evtq, &evt, deltaTicks * seqp->uspt);
+    alEvtqPostEvent(&seqp->evtq, &evt, deltaTicks * seqp->uspt);
 }
 
-void func_002900B0(ALCSPlayer *seqp) {
+void __CSPHandleNextSeqEvent(ALCSPlayer *seqp) {
     ALEvent evt;
 
     if (seqp->target == NULL) {
         return;
     }
-    func_0028F61C(seqp->target, &evt);
+    alCSeqNextEvent(seqp->target, &evt);
     switch (evt.type) {
         case AL_SEQ_MIDI_EVT:
-            func_00290240(seqp, &evt);
+            __CSPHandleMIDIMsg(seqp, &evt);
             postNextSeqEvent(seqp);
             break;
         case AL_TEMPO_EVT:
@@ -61,7 +61,7 @@ void func_002900B0(ALCSPlayer *seqp) {
         case AL_SEQ_END_EVT:
             seqp->state = AL_STOPPED;
             evt.type = AL_SEQP_STOP_EVT;
-            func_00291034(&seqp->evtq, &evt, 0x7FFFFFFF);
+            alEvtqPostEvent(&seqp->evtq, &evt, 0x7FFFFFFF);
             break;
         case AL_TRACK_END:
         case AL_CSP_LOOPSTART:
@@ -69,7 +69,7 @@ void func_002900B0(ALCSPlayer *seqp) {
             postNextSeqEvent(seqp);
             break;
         default:
-            func_0029B020(D_800AA290, D_800AA294, 400);
+            __assert(D_800AA290, D_800AA294, 400);
             break;
     }
 }

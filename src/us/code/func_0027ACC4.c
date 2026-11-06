@@ -11,7 +11,7 @@ typedef struct {
     /* 0x38 */ s32 index;
 } Cursor;
 
-void func_0027ACC4(Cursor *arg0, s16 arg1, s16 arg2) {
+void COverlay__Construct(Cursor *arg0, s16 arg1, s16 arg2) {
     arg0->index = -1;
     arg0->x = arg1;
     arg0->unk0 = 0;

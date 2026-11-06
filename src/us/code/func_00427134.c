@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00427134(s32 arg0) {
+s32 Char_ToUpper(s32 arg0) {
     s32 var_a0;
 
     var_a0 = arg0;

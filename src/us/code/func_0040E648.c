@@ -4,7 +4,7 @@
 
 extern BlindOnePhase D_0043240C[];
 
-void func_0040E648(BlindOneState *m) {
+void BlindOne_PhaseGroup1Update(BlindOneState *m) {
     BlindOneStep *script;
     s32 cmd;
     s32 i;

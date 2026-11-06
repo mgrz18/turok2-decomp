@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game.h"
 
-/* The play-time clock (see func_00288FDC.c) and a word at 0x44. */
+/* The play-time clock (see CEngineApp__UpdatePlayTime.c) and a word at 0x44. */
 
 /* The fields this sets, far into this (large) state. */
 

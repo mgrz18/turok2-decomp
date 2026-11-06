@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 func_0026EDA8(s32);                         /* extern */
+s32 RumblePool_FreeAll(s32);                         /* extern */
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xD0];
@@ -9,7 +9,7 @@ typedef struct {
     /* 0x140 */ u8 sub140[1];
 } Attached002534E0;
 
-/* 0x1328-byte list entries (see func_0025340C) linked through 0x1320. */
+/* 0x1328-byte list entries (see CPlayerPool__GetIndex) linked through 0x1320. */
 typedef struct Node002534E0 {
     /* 0x0000 */ u8 pad0[0xA50];
     /* 0x0A50 */ Attached002534E0 *attached;
@@ -28,7 +28,7 @@ void func_0025359C(List002534E0 *arg0) {
     var_s0 = arg0->head;
     if (var_s0 != NULL) {
         do {
-            func_0026EDA8((s32) var_s0->attached->sub140);
+            RumblePool_FreeAll((s32) var_s0->attached->sub140);
             var_s0->attached->unkD0 = 0;
             var_s0 = var_s0->next;
         } while (var_s0 != NULL);

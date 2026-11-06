@@ -7,14 +7,14 @@
  * away from the point (0, 0, 512) (and upward) and deals it 0x500 damage. */
 
 extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
-extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a + b */
-extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-extern void func_0020F040(CVector3 *v); /* normalise */
-extern void func_00245828(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, void *shield);
-extern void func_002465C8(CGameObjectInstance *target, CAI *ai, DamageEvent *event);
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
+extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a + b */
+extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+extern void CVector3__Normalize(CVector3 *v); /* normalise */
+extern void DamageEvent_Set(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, void *shield);
+extern void CAI__CallHurt(CGameObjectInstance *target, CAI *ai, DamageEvent *event);
 
-void func_0040BFF0(CGameObjectInstance *obj, CAI *ai) {
+void MotherBoss_Collision(CGameObjectInstance *obj, CAI *ai) {
     DamageEvent event;
     CVector3 dir;
     CGameObjectInstance *player = (CGameObjectInstance *) D_800F1CE0.m_pInstance;
@@ -24,12 +24,12 @@ void func_0040BFF0(CGameObjectInstance *obj, CAI *ai) {
         dir.x = 0.0f;
         dir.y = 0.0f;
         dir.z = 512.0f;
-        func_0020EF2C(&dir, &obj->header.m_vPos, &dir);
-        func_0020F040(&dir);
-        func_0020EF60(&dir, &dir, 1536.0f);
+        CVector3__Subtract(&dir, &obj->header.m_vPos, &dir);
+        CVector3__Normalize(&dir);
+        CVector3__Scale(&dir, &dir, 1536.0f);
         dir.y = 409.59998f;
-        func_0020EEF8(&player->m_vVelocity, &player->m_vVelocity, &dir);
-        func_00245828(&event, obj, 0x500, 102.399994f, 0x100000, NULL);
-        func_002465C8(player, &player->m_AI, &event);
+        CVector3__Add(&player->m_vVelocity, &player->m_vVelocity, &dir);
+        DamageEvent_Set(&event, obj, 0x500, 102.399994f, 0x100000, NULL);
+        CAI__CallHurt(player, &player->m_AI, &event);
     }
 }

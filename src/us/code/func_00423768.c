@@ -4,8 +4,8 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-s32 func_0041DD90(void *event, s32 port, s32 arg2);
-void func_00416644(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
+s32 PakMenu_CheckPak(void *event, s32 port, s32 arg2);
+void MenuPool_OpenMenu(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
 
 extern char D_0043BED0[];
 extern char D_0043BEF4[];
@@ -23,12 +23,12 @@ static __inline__ s32 GetPort(Menu *event) {
     return event->controller->port;
 }
 
-s32 func_00423768(s32 unused, Menu *event) {
+s32 DamagedPakMenu_SelectRetry(s32 unused, Menu *event) {
     s32 port = GetPort(event);
     char *dst;
 
     D_801309BC = 1;
-    if (func_0041DD90(event, port, 1) != 0) {
+    if (PakMenu_CheckPak(event, port, 1) != 0) {
         if (event->player != NULL) {
             dst = (char *)event->player->m_pCamera + 0x53C;
         } else {
@@ -37,13 +37,13 @@ s32 func_00423768(s32 unused, Menu *event) {
         if (event->context == D_0043BEF4 || event->context == D_0043BED0) {
             D_80130940 = 0;
         }
-        func_00416644(dst, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu(dst, event->context, event->player, (s32) event->controller, NULL);
         return 1;
     } else {
         if (event->context == D_0043BEF4 || event->context == D_0043BED0) {
             D_80130940 = 0;
         }
-        func_00416644(D_80119E2C, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu(D_80119E2C, event->context, event->player, (s32) event->controller, NULL);
         return 1;
     }
 }

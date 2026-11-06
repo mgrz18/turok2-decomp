@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern void func_00207914(s32 *arg0, s32 arg1);
-void func_002834CC(Effect *effect, s16 *definition, s16 mask, f32 scale,
+void CEmitter__Start(Effect *effect, s16 *definition, s16 mask, f32 scale,
                    f32 offset0, f32 offset1, f32 offset2) {
     effect->definition = definition;
     effect->mask = mask;

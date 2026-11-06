@@ -1,9 +1,9 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_0026E210(s32);
+s32 LevelEvent_Trigger(s32);
 
-void func_0022515C(void *arg0, s32 arg1)
+void CScene__FireEventsByKey(void *arg0, s32 arg1)
 {
   s32 var_s0;
   s32 var_s3;
@@ -22,7 +22,7 @@ void func_0022515C(void *arg0, s32 arg1)
     {
       if ((*((u8 *) (((s8 *) var_s1) + 0xF))) == var_s3)
       {
-        func_0026E210((s32) var_s1);
+        LevelEvent_Trigger((s32) var_s1);
       }
       var_s0 -= 1;
       var_s1 += 0x14;
@@ -39,7 +39,7 @@ void func_0022515C(void *arg0, s32 arg1)
     {
       if ((*((u8 *) (((s8 *) var_s1) + 0xF))) == var_s3)
       {
-        func_0026E210((s32) var_s1);
+        LevelEvent_Trigger((s32) var_s1);
       }
       var_s0 -= 1;
       var_s1 += 0x14;

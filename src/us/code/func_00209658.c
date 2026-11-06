@@ -4,14 +4,14 @@
 #include "rw/abu_types.h"
 #include "gfx.h"
 
-extern void func_00207A54();
+extern void Texture_InvalidateCache();
 extern Gfx *D_800D8E24;
 extern char D_800AB680;
 extern u32 D_800AB8A4;
-extern s32 func_00207FEC(s32);
+extern s32 Render_SetRenderMode(s32);
 void func_00209658(void) {
     Gfx *cmd;
-    func_00207A54();
+    Texture_InvalidateCache();
     cmd = D_800D8E24++;
     { Gfx *_gbi = (Gfx *)(cmd); _gbi->w0 = ((((unsigned int)(0xFD) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (21)) | (((unsigned int)(2) & (0xFFFFFFFFU >> (32 - (2)))) << (19)) | (((unsigned int)((1) - 1) & (0xFFFFFFFFU >> (32 - (12)))) << (0))); _gbi->w1 = ((unsigned int)(&D_800AB680)); };
     cmd = D_800D8E24++;
@@ -32,5 +32,5 @@ void func_00209658(void) {
     { Gfx *_gbi = (Gfx *)(cmd); _gbi->w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (14) - (2)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((2) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((((unsigned int)(0x0)) << 14))); };
     cmd = D_800D8E24++;
     { Gfx *_gbi = (Gfx *)(cmd); _gbi->w0 = ((((unsigned int)(0xD9) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(~(0)) & (0xFFFFFFFFU >> (32 - (24)))) << (0))); _gbi->w1 = ((unsigned int)(D_800AB8A4 | 0x00260404)); };
-    func_00207FEC(0x1D);
+    Render_SetRenderMode(0x1D);
 }

@@ -6,11 +6,11 @@ extern f32 D_800B06A0;
 extern f32 D_800B06A4;
 extern f32 D_800B06A8;
 
-f32 func_00246310(CGameObjectInstance *self, f32 x, f32 y, f32 z); /* angle to a point (a CVector3 by value) */
-void func_00245BAC(CGameObjectInstance *self, CAI *ai, f32 rate, f32 angle);
-void func_0025D474(CGameObjectInstance *self, CAI *ai);
+f32 AI_AngleToPoint(CGameObjectInstance *self, f32 x, f32 y, f32 z); /* angle to a point (a CVector3 by value) */
+void AI_TurnClamped(CGameObjectInstance *self, CAI *ai, f32 rate, f32 angle);
+void EnemyMode_Move_Update(CGameObjectInstance *self, CAI *ai);
 
-/* Like func_0025EB24: the turn rate, pi/3 in modes 1-2, else pi/12. */
+/* Like EnemyAI_GetModeTurnRate: the turn rate, pi/3 in modes 1-2, else pi/12. */
 static __inline__ f32 TurnRate(CGameObjectInstance *self, CAI *ai) {
     f32 rate = 0.261799425f;
 
@@ -20,18 +20,18 @@ static __inline__ f32 TurnRate(CGameObjectInstance *self, CAI *ai) {
     return rate;
 }
 
-/* AI callback: turns toward the point D_800B06A0, then calls func_0025D474
+/* AI callback: turns toward the point D_800B06A0, then calls EnemyMode_Move_Update
  * once 0xC7 reaches 5. */
-void func_0025F114(CGameObjectInstance *self, CAI *ai) {
-    func_00245BAC(self, ai, TurnRate(self, ai), func_00246310(self, D_800B06A0, D_800B06A4, D_800B06A8));
+void EnemyMode_Alert_Update(CGameObjectInstance *self, CAI *ai) {
+    AI_TurnClamped(self, ai, TurnRate(self, ai), AI_AngleToPoint(self, D_800B06A0, D_800B06A4, D_800B06A8));
     if (ai->m_AnimRepeatedCount >= 5) {
         /* FAKEMATCH: the identical branches are merged by cross-jumping; the
          * extra use of self only gives it the register priority it has in the
          * ROM ($s0 for self, $s1 for ai). */
         if (self->header.m_pIntelligence != NULL) {
-            func_0025D474(self, ai);
+            EnemyMode_Move_Update(self, ai);
         } else {
-            func_0025D474(self, ai);
+            EnemyMode_Move_Update(self, ai);
         }
     }
 }

@@ -4,16 +4,16 @@
 #include "rw/abu_types.h"
 #include "structs/controller.h"
 
-extern ControllerProfile *func_00417CA0(s32 *out);
-extern s32 func_002855E8(ControllerProfile *);
-extern s32 func_002855E8(ControllerProfile *slot);
-ControllerProfile *func_00417CA0(s32 *out) {
+extern ControllerProfile *Menu_FindPressingController(s32 *out);
+extern s32 Controller_ConfirmPressed(ControllerProfile *);
+extern s32 Controller_ConfirmPressed(ControllerProfile *slot);
+ControllerProfile *Menu_FindPressingController(s32 *out) {
     s32 i;
     ControllerProfile *s;
     i = 0;
     s = D_800F5EC0;
     while (i < 4) {
-        if (func_002855E8(s) != 0) {
+        if (Controller_ConfirmPressed(s) != 0) {
             *out = i;
             return s;
         }

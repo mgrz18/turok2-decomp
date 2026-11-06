@@ -11,7 +11,7 @@ extern char D_800B6238[];
 extern char D_800B6250[];
 
 /* Label of the level item. */
-s32 func_00418660(MenuItem *a) {
+s32 FragTagMenu_LevelLabel(MenuItem *a) {
     switch (D_8011AAFF) {
     case 0:
         a->text = D_800B5F3C;

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/boss.h"
 
-void func_002362E4(ScriptAnimator *arg0, void *owner) {
+void ScriptAnimator_Start(ScriptAnimator *arg0, void *owner) {
     arg0->owner = owner;
     arg0->mode = 0;
     arg0->loop = 0;

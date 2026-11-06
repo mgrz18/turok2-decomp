@@ -23,10 +23,10 @@ typedef struct B2State {
     u32 flags;
 } B2State;
 
-void func_0026E110(B2Actor *a, s32 mask, B2Actor *b);
-void func_002646E4(B2Actor *actor, B2State *state) {
+void GameObject_FireTriggers(B2Actor *a, s32 mask, B2Actor *b);
+void Platform_BackEnter(B2Actor *actor, B2State *state) {
     B2Info *info = &actor->def->info;
-    func_0026E110(actor, 0x20000, actor);
+    GameObject_FireTriggers(actor, 0x20000, actor);
     if ((info->flags24 & 0x80) == 0) {
         state->flags &= ~0x10000000; /* Rage Wars clears 0x20000 */
     }

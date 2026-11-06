@@ -13,7 +13,7 @@ extern CVector3 D_800B06A0;
 extern CVector3 D_800B06AC;
 extern u8 D_800F7078[];
 
-extern void func_00243414(CGameObjectInstance *actor, CAI *ai, s32 anim);
+extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
 extern s16 func_002261A8(void *level, s32 id, CVector3 *pos);
 
 static __inline__ s32 canAttack(CAI *ai, CEnemyIntelligence *info, s32 state) {
@@ -31,7 +31,7 @@ static __inline__ s32 canAttack(CAI *ai, CEnemyIntelligence *info, s32 state) {
     return 0;
 }
 
-void func_0025C430(CGameObjectInstance *actor, CAI *ai) {
+void EnemyAI_AttackWait(CGameObjectInstance *actor, CAI *ai) {
     s32 state;
 
     if (ai->m_Health == 0) {
@@ -45,7 +45,7 @@ void func_0025C430(CGameObjectInstance *actor, CAI *ai) {
     case 0:
         if (ai->m_ActionTime > 30.0f) {
             if (canAttack(ai, &actor->header.m_pIntelligence->m_Enemy, state)) {
-                func_00243414(actor, ai, 0xC);
+                CAI__SetMode(actor, ai, 0xC);
             }
             D_800B06A0 = D_800B06AC;
             ai->m_Action = 1;

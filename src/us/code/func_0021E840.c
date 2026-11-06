@@ -57,15 +57,15 @@ struct LevelActor;
 struct LevelActor;
 struct LevelActor;
 extern s32 Cinema_PathPlaying(void);
-extern void func_00268F3C(CQuatern *arg0, void *arg1);
-extern void func_00210F68(CQuatern *arg0, CQuatern *arg1, CQuatern *arg2);
-extern void func_00211114(void *, void *);
-extern void func_0021034C(void *arg0, f32 sx, f32 sy, f32 sz);
-extern s32 func_0020F510(f32 *arg0, f32 arg1);
-extern void func_00210318(char *, f32, f32, f32);
-extern void func_00210C3C(void *);
+extern void GameObject_GetFloorTilt(CQuatern *arg0, void *arg1);
+extern void CQuaternion__Multiply(CQuatern *arg0, CQuatern *arg1, CQuatern *arg2);
+extern void CQuaternion__ToMatrix(void *, void *);
+extern void CMtxF__ScaleAxes(void *arg0, f32 sx, f32 sy, f32 sz);
+extern s32 CVector3__ClampLength(f32 *arg0, f32 arg1);
+extern void CMtxF__Translate(char *, f32, f32, f32);
+extern void CMtxF__SwapYZRows(void *);
 extern f32 D_800DD78C;
-void func_0021E840(void *arg0) {
+void CGameObjectInstance__CalculateOrientationMatrix(void *arg0) {
     CQuatern trig;
     CQuatern product;
     CQuatern copy;
@@ -78,7 +78,7 @@ void func_0021E840(void *arg0) {
     copy = ((struct LevelActor *)(arg0))->rotation;
     copy_ptr = &copy;
     if (Cinema_PathPlaying() != 0) {
-        func_00268F3C(copy_ptr, arg0);
+        GameObject_GetFloorTilt(copy_ptr, arg0);
     }
     angle = ((struct LevelActor *)(arg0))->yaw;
     scale = (0.5f);
@@ -90,15 +90,15 @@ void func_0021E840(void *arg0) {
     D_800DD78C = sine;
     trig.w = func_002974C0(angle);
     product_ptr = &product;
-    func_00210F68(product_ptr, &trig, copy_ptr);
+    CQuaternion__Multiply(product_ptr, &trig, copy_ptr);
     transform = &((struct LevelActor *)(arg0))->transform[0];
-    func_00211114(product_ptr, transform);
-    func_0021034C(transform, ((struct LevelActor *)(arg0))->scale.x,
+    CQuaternion__ToMatrix(product_ptr, transform);
+    CMtxF__ScaleAxes(transform, ((struct LevelActor *)(arg0))->scale.x,
                     ((struct LevelActor *)(arg0))->scale.y,
                     ((struct LevelActor *)(arg0))->scale.z);
-    func_0020F510(&((struct LevelActor *)(arg0))->position0.x, 20000.0f);
-    func_00210318(transform, ((struct LevelActor *)(arg0))->position0.x,
+    CVector3__ClampLength(&((struct LevelActor *)(arg0))->position0.x, 20000.0f);
+    CMtxF__Translate(transform, ((struct LevelActor *)(arg0))->position0.x,
                    ((struct LevelActor *)(arg0))->position0.y,
                    ((struct LevelActor *)(arg0))->position0.z);
-    func_00210C3C(transform);
+    CMtxF__SwapYZRows(transform);
 }

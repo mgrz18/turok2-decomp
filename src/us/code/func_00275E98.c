@@ -8,16 +8,16 @@ typedef struct {
     /* 0x28 */ s32 paused;
 } SoundList;
 
-s32 func_002757E4(s32);                             /* extern */
+s32 Sound__IsPlaying(s32);                             /* extern */
 
-void func_00275E98(SoundList *arg0) {
+void LoopSounds_Update(SoundList *arg0) {
     SndSource *var_s0;
 
     if (arg0->paused == 0) {
         var_s0 = arg0->head;
         if (var_s0 != NULL) {
             do {
-                if (func_002757E4(var_s0->handle) == 0) {
+                if (Sound__IsPlaying(var_s0->handle) == 0) {
                     var_s0->sound.w = -1;
                     var_s0->handle = -1;
                 }

@@ -5,7 +5,7 @@
 
 extern int D_80130C60[];
 extern int D_80130C70[];
-int func_004267A0(int slot, int *score) {
+int Pak_GetFreePages(int slot, int *score) {
     extern int *D_800C2224;
     if (D_80130C60[slot] != 3) {
         return -2;

@@ -14,7 +14,7 @@ static __inline__ s32 readBits(DemoStream *r, s32 count) {
     return v;
 }
 
-void func_0042EC30(DemoStream *r) {
+void Demo_ReadRunLength(DemoStream *r) {
     s32 n = readBits(r, 3);
 
     if (n != 0) {

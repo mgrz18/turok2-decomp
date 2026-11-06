@@ -1,4 +1,4 @@
-/* Second-module copy of func_0040E7D8 (src/us/code/func_0040E7D8.c), with its string/data addresses 0xE0 lower. */
+/* Second-module copy of BlindOne_PhaseGroup2Update (src/us/code/BlindOne_PhaseGroup2Update.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -32,7 +32,7 @@ static __inline__ void NextCommand(BlindOneState *m) {
     }
 }
 
-void func_004477D8(BlindOneState *m) {
+void BlindOne_PhaseGroup2Update_2(BlindOneState *m) {
     if (m->alive2 == 0) {
         NextCommand(m);
     }

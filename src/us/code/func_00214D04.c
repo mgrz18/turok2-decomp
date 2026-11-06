@@ -10,27 +10,27 @@ typedef struct {
     /* 0x88 */ u16 flags;
 } SpawnSource;
 
-s32 func_00203CA0(s32, s32, s32, s32, s32, void *, s32 *, s32 *, s32); /* extern */
-s32 func_002051F4(s32, s32);                /* extern */
-s32 func_0020BE08(s32);                         /* extern */
-s32 func_00214DBC();                                /* extern */
+s32 CCache__RequestDecompression(s32, s32, s32, s32, s32, void *, s32 *, s32 *, s32); /* extern */
+s32 CCache__Unlock(s32, s32);                /* extern */
+s32 Model_RequestTextures(s32);                         /* extern */
+s32 CStaticObject__LoadGeometry();                                /* extern */
 extern s32 D_800A57F8;
 extern s32 D_800ACAD8;
-extern s32 func_00214F14;
+extern s32 CStaticObject__BuildLitVerticesCallback;
 
-void func_00214D04(SpawnSource *arg0) {
+void CStaticObject__RequestLitVertices(SpawnSource *arg0) {
     s32 temp_v0;
     s32 temp_v0_2;
 
     if (!(arg0->flags & 0x40)) {
-        temp_v0 = func_00214DBC();
+        temp_v0 = CStaticObject__LoadGeometry();
         if (temp_v0 != 0) {
-            func_0020BE08(temp_v0);
-            temp_v0_2 = func_00203CA0(0, arg0->spawnFlags | D_800ACAD8, temp_v0, arg0->id, 8, arg0, &func_00214F14, &D_800A57F8, 0);
+            Model_RequestTextures(temp_v0);
+            temp_v0_2 = CCache__RequestDecompression(0, arg0->spawnFlags | D_800ACAD8, temp_v0, arg0->id, 8, arg0, &CStaticObject__BuildLitVerticesCallback, &D_800A57F8, 0);
             if (temp_v0_2 != 0) {
-                func_002051F4(0, temp_v0_2);
+                CCache__Unlock(0, temp_v0_2);
             }
-            func_002051F4(0, temp_v0);
+            CCache__Unlock(0, temp_v0);
         }
     }
 }

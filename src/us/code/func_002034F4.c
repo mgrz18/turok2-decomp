@@ -5,14 +5,14 @@
 #include "structs/cache.h"
 
 extern int D_800D8DCC;
-extern void *func_002034F4(s32 arg0, s32 arg1);
+extern void *CCache__LookupAndLock(s32 arg0, s32 arg1);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 extern struct Shape_func_8021A2D4_de_2 D_800D81C0;
 extern struct Shape_func_8021A2D4_de_2 D_800D81C4;
-extern void func_00200818(void *, s32);
-void *func_002034F4(s32 arg0, s32 arg1) {
+extern void CList__MoveToHead(void *, s32);
+void *CCache__LookupAndLock(s32 arg0, s32 arg1) {
     extern s32 osSendMesg(OSMesgQueue *, s32, s32);
     extern struct Shape_func_8021A2D4_de_2 D_800D8DF0;
     extern OSMesgQueue D_800D8DB0;
@@ -66,7 +66,7 @@ found:
         object->lockCount += 1;
         object->flags |= MEMENTRY_FLAG_LOCKED;
         object->age = D_800D8DF0.field_0;
-        func_00200818(&D_800D81E0, object);
+        CList__MoveToHead(&D_800D81E0, object);
     }
     temp_v0 = __osDisableInt();
     temp_v1_2 = D_800D8DCC - 1;

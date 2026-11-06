@@ -1,11 +1,11 @@
 #include "common.h"
 
-s32 func_00243414(s32, s32, s32);
-s32 func_00409A64(s32, s32);
+s32 CAI__SetMode(s32, s32, s32);
+s32 MotherBoss_TeleportTarget(s32, s32);
 
 extern s32 D_8012FB70;
 
-void func_0040B488(s32 arg0, void *arg1)
+void MotherBoss_Mode16_TeleportTarget(s32 arg0, void *arg1)
 {
   s32 temp_v0;
   s32 *new_var;
@@ -14,13 +14,13 @@ void func_0040B488(s32 arg0, void *arg1)
     new_var = &D_8012FB70;
     if ((*((s32 *) (((s8 *) (&D_8012FB70)) + 0x67C))) == (((*((s32 *) (((s8 *) new_var) + 0x67C))) / 3) * 3))
     {
-      func_00409A64(arg0, (*((s32 *) (((s8 *) (&D_8012FB70)) + 0x67C))) == 0);
+      MotherBoss_TeleportTarget(arg0, (*((s32 *) (((s8 *) (&D_8012FB70)) + 0x67C))) == 0);
     }
     temp_v0 = (*((s32 *) (((s8 *) (&D_8012FB70)) + 0x67C))) + 1;
     *((s32 *) (((s8 *) new_var) + 0x67C)) = temp_v0;
     if (temp_v0 >= 0x1F)
     {
-      func_00243414(arg0, (s32) arg1, 0x11);
+      CAI__SetMode(arg0, (s32) arg1, 0x11);
     }
   }
 }

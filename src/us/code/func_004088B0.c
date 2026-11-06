@@ -27,12 +27,12 @@ typedef struct {
     /* 0xF8 */ void *onEvent;
 } BossEvents;
 
-extern s8 func_00219F74(BossActor *actor, s32 anim, s32 arg2);
-extern void func_0027AD24(void *hud, BossActor *actor, char *name, void *ai);
-extern void func_0027AD54(void *hud, BossActor *actor, char *name);
-extern void func_004085A0();
-extern void func_00408FF0();
-extern void func_004089E0();
+extern s8 CGameObjectInstance__PickRandomAnim(BossActor *actor, s32 anim, s32 arg2);
+extern void COnScreen__SetBoss(void *hud, BossActor *actor, char *name, void *ai);
+extern void COnScreen__SetBoss2(void *hud, BossActor *actor, char *name);
+extern void TotemDefense_Update();
+extern void TotemDefense_OnEvent();
+extern void TotemDefense_DrawTotem();
 
 extern u8 D_801100F0[];
 /* Boss fight state (0x8012FB50 on). */
@@ -48,22 +48,22 @@ static __inline__ void startBossAnim(BossActor *obj) {
     BossAI *ai = &boss->ai;
 
     D_8012FB64[0] = 0;
-    ai->animIndex = func_00219F74(boss, 0x5334, -1);
+    ai->animIndex = CGameObjectInstance__PickRandomAnim(boss, 0x5334, -1);
     ai->animType = 0x5334;
     ai->flags &= ~1;
     ai->animRepeats = 0;
-    func_0027AD24(D_801100F0, obj, "Enemies", ai);
+    COnScreen__SetBoss(D_801100F0, obj, "Enemies", ai);
 }
 
-void func_004088B0(BossActor *obj, BossEvents *events) {
-    events->onUpdate = func_004085A0;
-    events->onEvent = func_00408FF0;
+void TotemDefense_Init(BossActor *obj, BossEvents *events) {
+    events->onUpdate = TotemDefense_Update;
+    events->onEvent = TotemDefense_OnEvent;
     D_8012FB50[0] = obj;
     D_8012FB54[0] = (u8 *) obj->def + 0x14;
     D_8012FB5C[0] = obj->def->m_Destructible.m_TotemMissionDuration * 15;
     D_8012FB58[0] = 0;
     D_8012FB60[0] = 0;
-    obj->onDraw = func_004089E0;
+    obj->onDraw = TotemDefense_DrawTotem;
     startBossAnim(obj);
-    func_0027AD54(D_801100F0, obj, "Time");
+    COnScreen__SetBoss2(D_801100F0, obj, "Time");
 }

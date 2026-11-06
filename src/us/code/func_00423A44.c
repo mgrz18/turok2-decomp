@@ -4,7 +4,7 @@
 extern s32 D_801309A4;
 extern s32 D_801309B0;
 
-void func_00423A44(void) {
+void PakConfirmMenu_InitRepair(void) {
     D_801309B0 = 0;
     D_801309A4 = 0;
 }

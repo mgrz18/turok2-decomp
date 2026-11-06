@@ -1,8 +1,8 @@
-/* WRONG CUT: REAL func_0042ECF0 size 0x23C (splat cut it into func_0042ECF0 + func_0042EE4C). */
+/* WRONG CUT: REAL Demo_DecodeButtons size 0x23C (splat cut it into Demo_DecodeButtons + func_0042EE4C). */
 #include "common.h"
 #include "structs/demo.h"
 
-extern void func_0042EC30(DemoStream *r);
+extern void Demo_ReadRunLength(DemoStream *r);
 
 static __inline__ s32 readBit(DemoStream *r) {
     u32 pos = r->pos++;
@@ -11,7 +11,7 @@ static __inline__ s32 readBit(DemoStream *r) {
 }
 
 /* Reads a nine-bit code, its bits stored in a scrambled order, then decodes it. */
-void func_0042ECF0(DemoStream *r) {
+void Demo_DecodeButtons(DemoStream *r) {
     r->value = readBit(r) << 15;
     r->value |= readBit(r) << 14;
     r->value |= readBit(r) << 4;
@@ -21,5 +21,5 @@ void func_0042ECF0(DemoStream *r) {
     r->value |= readBit(r);
     r->value |= readBit(r) << 2;
     r->value |= readBit(r) << 8;
-    func_0042EC30(r);
+    Demo_ReadRunLength(r);
 }
