@@ -1,0 +1,205 @@
+{
+ "doc": [
+  "Byte-order spec of every load unit type (docs/assets/BYTEORDER.md). Checked by tools/assets/swapcheck.py.",
+  "A unit is what T2Asset_Read returns: the ROM bytes of one CCache/VM_Alloc load, RNC-unpacked, big-endian.",
+  "Types are the romfs node types (= the CCache__Request description strings, ROMFS.md).",
+  "Rule ops: struct (FIELDS), cstruct (a C struct from c_headers, by name), array, iset (entries/each/cycle),",
+  "index (ISet header only), uset (elem, transposed), seq, switch, byte, rdp, opaque, pad, unk, graph, graphicset.",
+  "FIELDS: 'type[count]:name ...'; type: u8 s8 char u16 s16 u32 s32 f32 u64 f64 ptr | pad unk rdp16 opaque byte;",
+  "a trailing ? (u16?) = width guessed from the data; count may use earlier fields ('@order*@npredictors*8').",
+  "Classes: swap (2/4/8-byte fields: reverse on a little-endian host), byte, rdp (16-bit texels/TLUTs Fast3D reads as",
+  "big-endian bytes: keep), opaque (byte/bit streams decoded byte-wise: keep), pad, unk (width not known yet)."
+ ],
+ "version": 1,
+ "c_headers": [
+  "include/structs/vector.h", "include/structs/region.h", "include/structs/emitter.h",
+  "include/structs/event.h", "include/structs/cinema.h", "include/structs/intelligence.h",
+  "include/structs/world.h", "include/structs/sound.h", "include/structs/particle.h"
+ ],
+ "rules": {
+  "index": {"op": "index"},
+  "s32set": {"op": "uset", "elem": "s32"},
+  "f32set": {"op": "uset", "elem": "f32"},
+  "empty_set": {"op": "iset", "count": 0},
+
+  "Vtx": {"op": "struct", "fields": "s16[3]:ob u16:flag s16[2]:tc u8[4]:cn"},
+  "Material": {"op": "struct", "fields": "s32:texture s32:unk4 u32:flags u8[4]:prim u8[4]:env u16:scaleS u16:scaleT"},
+  "Bone": {"op": "struct", "fields": "f32[24]:corners f32:radius u8:parent u8:partFlags u8:unk66 u8:zero67 f32:unk68 u32:hitMask"},
+  "HotPoint": {"op": "struct", "fields": "f32[3]:offset u32:event u16:bone pad[2]"},
+  "geometry": {"op": "iset", "entries": [
+     {"op": "iset", "each": {"op": "uset", "transposed": true, "elem": "@Vtx"}},
+     {"op": "iset", "each": {"op": "unk", "note": "geometry block 1 (copied as is by Model_Decompress; reader unknown; 8 zero bytes)"}},
+     {"op": "iset", "each": {"op": "iset", "each": {"op": "iset", "entries": ["@Material",
+          {"op": "byte", "note": "packed command stream, read byte by byte by Model_Decompress"}]}}},
+     {"op": "iset", "each": {"op": "iset", "entries": ["@s32set", "@Bone"]}},
+     {"op": "iset", "each": {"op": "uset", "elem": "@HotPoint"}},
+     {"op": "iset", "each": {"op": "uset", "elem": {"op": "unk", "note": "geometry block 5 records (8 bytes, unknown; almost always empty)"}, "elem_tail": {"op": "unk"}}}
+  ]},
+
+  "AnimObjInfo": {"op": "struct", "fields": "f32[3]:bboxMin f32[3]:bboxMax s8:neckBone s8:headBone s8:headTurnBones u8:zero1B u16:intelligence u16:halfScale"},
+  "anim object info": {"op": "iset", "entries": [
+     {"op": "switch", "on": "size", "cases": {"0x20": "@AnimObjInfo", "8": "u32[2]:empty"}},
+     {"op": "switch", "on": "size", "cases": {"8": "u32[2]:emptyUSet"}, "default": "@s32set"}
+  ]},
+
+  "AnimEvent": {"op": "struct", "fields": "u16:frame u16:effect s16:bone s16:zero6 f32[3]:local s32[2]:params"},
+  "TrackHeader": {"op": "struct", "fields": "s32:radius s32:frames s32:encoding f32:tolerance s32:rotTracks s32:posTracks f32:frameCount f32:frameStep"},
+  "animation": {"op": "iset", "entries": [
+     {"op": "uset", "elem": "s16"},
+     {"op": "uset", "elem": "s16:posTrack s16:rotTrack"},
+     {"op": "uset", "elem": "f32[3]:pos s16[4]:rot"},
+     {"op": "iset", "entries": ["u16:blendFrames u16:loopStart u8:zero4 u8:blendStart u8:zero6 u8:blendEnd f32:rate pad[4]",
+                                {"op": "unk", "note": "chunk 3 block 1 (8 bytes, zero except in 2 clips)"}]},
+     {"op": "uset", "elem": "@AnimEvent"},
+     {"op": "iset", "entries": ["@TrackHeader",
+        {"op": "array", "type": "u32", "name": "posStream", "note": "Bits_Read fetches u32 words (LSB-first inside each word)"},
+        {"op": "array", "type": "u32", "name": "rotStream"}]}
+  ]},
+
+  "Attachment": {"op": "struct", "fields": "u16:field0 u16:type s32:field4 f32[3]:offset s32[2]:params"},
+
+  "IntelHeader": {"op": "cstruct", "name": "CIntelligence", "from": 0, "to": 20},
+  "intel_body": {"op": "switch", "on": {"at": 0, "type": "s32"}, "cases": {
+     "0": {"op": "seq", "parts": [{"size": 20, "rule": "@IntelHeader"}, {"rule": {"op": "cstruct", "name": "CStaticIntelligence", "tail": {"op": "unk", "note": "after the type-0 body"}}}]},
+     "1": {"op": "seq", "parts": [{"size": 20, "rule": "@IntelHeader"}, {"rule": {"op": "cstruct", "name": "CEnemyIntelligence", "tail": {"op": "unk", "note": "after the enemy body"}}}]},
+     "2": {"op": "seq", "parts": [{"size": 20, "rule": "@IntelHeader"}, {"rule": {"op": "cstruct", "name": "CPlatformIntelligence", "tail": {"op": "unk", "note": "after the platform body"}}}]},
+     "3": {"op": "seq", "parts": [{"size": 20, "rule": "@IntelHeader"}, {"rule": {"op": "cstruct", "name": "CGeneratorIntelligence", "tail": {"op": "unk", "note": "after the generator body"}}}]},
+     "4": {"op": "seq", "parts": [{"size": 20, "rule": "@IntelHeader"}, {"size": 52, "rule": {"op": "cstruct", "name": "CEnemyIntelligence", "from": 0, "to": 52}},
+                                    {"rule": {"op": "cstruct", "name": "CTurretIntelligence", "from": 52, "to": 68, "tail": {"op": "unk", "note": "after the turret body"}}}]},
+     "5": {"op": "seq", "parts": [{"size": 20, "rule": "@IntelHeader"}, {"rule": {"op": "cstruct", "name": "CThrowableIntelligence", "tail": {"op": "unk", "note": "after the throwable body"}}}]},
+     "6": {"op": "seq", "parts": [{"size": 20, "rule": "@IntelHeader"}, {"rule": {"op": "cstruct", "name": "CDoorIntelligence", "tail": {"op": "unk", "note": "after the door body"}}}]},
+     "7": {"op": "seq", "parts": [{"size": 20, "rule": "@IntelHeader"}, {"rule": {"op": "cstruct", "name": "CDestructibleIntelligence", "tail": {"op": "unk", "note": "after the destructible body"}}}]},
+     "8": {"op": "seq", "parts": [{"size": 20, "rule": "@IntelHeader"}, {"rule": {"op": "cstruct", "name": "CPickupIntelligence", "tail": {"op": "unk", "note": "after the pickup body"}}}]},
+     "9": {"op": "seq", "parts": [{"size": 20, "rule": "@IntelHeader"}, {"rule": {"op": "unk", "note": "type 9 (interactive anim) body: no struct yet"}}]},
+     "10": {"op": "seq", "parts": [{"size": 20, "rule": "@IntelHeader"}, {"rule": {"op": "cstruct", "name": "CActionIntelligence", "tail": {"op": "unk", "note": "after the action body"}}}]},
+     "11": {"op": "seq", "parts": [{"size": 20, "rule": "@IntelHeader"}, {"rule": {"op": "cstruct", "name": "CPlayerIntelligence", "tail": {"op": "unk", "note": "after the player body"}}}]},
+     "12": {"op": "seq", "parts": [{"size": 20, "rule": "@IntelHeader"}, {"rule": {"op": "cstruct", "name": "CMorpherIntelligence", "tail": {"op": "unk", "note": "after the morpher body"}}}]}
+  }},
+
+  "Piece": {"op": "struct", "fields": "unk[20] s32:tag s32[9]:offsets"},
+
+  "RegionVertex": {"op": "struct", "fields": "s32[4]:xyzw"},
+  "PackedRegion": {"op": "struct", "fields": "u16:info u16:flags u16[3]:vertex u16[3]:neighbour s32:visBits"},
+  "PathItem": {"op": "struct", "fields": "f32[3]:pos s32:region f32[3]:data"},
+  "AnimInstance": {"op": "struct", "fields": "s32:unused f32[3]:pos f32[3]:scale u16:object u16:type u16:region u16:intelligence s16:rotY u8:flags u8:sound"},
+  "CompactStatic": {"op": "struct", "fields": "s32:vis f32:scale u16:object u16:region u16:flags u16:intelligence s16:y s8[6]:extents u8:bits u8:x u8:z pad[1]"},
+  "StaticObject": {"op": "struct", "fields": "s32:vis f32[3]:pos f32[3]:scale u16[6]:halfExtents u16:object u16:region u16:intelligence u8:flags s8[4]:quat pad[1]"},
+  "LevelActor": {"op": "struct", "fields": "s32:vis f32[3]:pos f32:radius u16:object u16:region u16:flags u16:killed u16:intelligence s8:angle pad[1]"},
+  "VolumeRec": {"op": "struct", "fields": "s32[3]:pos s32[3]:rot s32[3]:scale s32:width s32:height pad[3] u8:mode pad[7] u8:unk37 pad[3] u8:unk3B u32[3]:unk3C"},
+  "BitSection": {"op": "iset", "entries": ["u32:bitCount pad[4]", {"op": "byte", "note": "flag bits, read as u8 (CScene__IsEventFired)"}]},
+  "LevelBits": {"op": "iset", "each": "@BitSection"},
+  "Clip": {"op": "iset", "entries": [{"op": "uset", "elem": "f32[3]:eye"}, "@f32set", {"op": "uset", "elem": "f32[3]:target"}, "@f32set",
+                                      {"op": "unk", "note": "cinema clip block 4 (8 bytes)"}]},
+  "SongData": {"op": "switch", "on": {"at": 0, "type": "u32"}, "cases": {
+     "0x44": {"op": "seq", "parts": [{"size": 68, "rule": "s32[16]:trackOffset s32:division"},
+                                      {"rule": {"op": "byte", "note": "alCSeq track bytes (__getTrackByte: byte loads)"}}]}},
+     "default": {"op": "seq", "parts": [{"size": 12, "rule": "u32:sampleRate u32:frameCount u32:bitstreamBytes"},
+                                         {"rule": {"op": "array", "type": "u16", "name": "adecBitstream", "note": "adecReadBits fetches u16 words, MSB first"}}]}}
+ },
+
+ "types": {
+  "cartridge index": "@index",
+  "objects index": "@index",
+  "object index": "@index",
+  "texture sets index": "@index",
+  "levels index": "@index",
+  "level index": "@index",
+  "grid sections index": "@index",
+  "graphicset index": "@index",
+  "Cinemas index": "@index",
+  "animations index": "@index",
+  "binaries index": "@index",
+
+  "audio control block": {"op": "graph", "vaddr": 4718592, "root": "CtlHeader",
+     "structs": {
+       "CtlHeader": "s32:count ptr:musicBank>ALBankFile s32:musicTbl ptr:sfxBank>ALBankFile s32:sfxTbl",
+       "ALBankFile": "s16:revision s16:bankCount ptr[@bankCount]:bankArray>ALBank",
+       "ALBank": "s16:instCount u8:flags pad[1] s32:sampleRate ptr:percussion>ALInstrument ptr[@instCount]:instArray>ALInstrument",
+       "ALInstrument": "u8:volume u8:pan u8:priority u8:flags u8[8]:tremVib s16:bendRange s16:soundCount ptr[@soundCount]:soundArray>ALSound",
+       "ALSound": "ptr:envelope>ALEnvelope ptr:keyMap>ALKeyMap ptr:wavetable>ALWaveTable u8:samplePan u8:sampleVolume u8:flags pad[1]",
+       "ALEnvelope": "s32[3]:times u8:attackVolume u8:decayVolume pad[2]",
+       "ALKeyMap": "u8[5]:velKey s8:detune",
+       "ALWaveTable": "u32:base s32:len u8:type u8:flags pad[2] ptr:loop>ALADPCMloop ptr:book>ALADPCMBook",
+       "ALADPCMloop": "u32:start u32:end u32:count s16[16]:state",
+       "ALADPCMBook": "s32:order s32:npredictors s16[@order*@npredictors*8]:book"
+     },
+     "rest": {"op": "pad", "note": "alignment between bank structures (not reached from the bank graph)"}},
+  "audio wave table": {"op": "opaque", "note": "VADPCM frames (9 bytes: header byte + 8 nibble bytes), decoded byte-wise"},
+  "sound data file": {"op": "iset", "entries": [
+     {"op": "iset", "entries": ["@s32set", "@s32set",
+        {"op": "iset", "each": {"op": "iset", "entries": ["u8?[8]:cue",
+            {"op": "uset", "elem": "s16:group s16:sample s8:priority s8:chance u16:flags s16:unk8 s16:unkA s16:unkC s8:pitch s8:unkF s16:unk10 s16:randomRange0 s16:randomRange1 pad[2]"}]}},
+        {"op": "uset", "elem": {"op": "cstruct", "name": "SndEnv"}},
+        {"op": "uset", "elem": {"op": "cstruct", "name": "SndEnv"}},
+        {"op": "uset", "elem": {"op": "cstruct", "name": "SndEnv"}}]},
+     {"op": "iset", "entries": ["@s32set", {"op": "iset", "cycle": ["s32:volume u16:scale u16:h6", "@SongData"]}]}
+  ]},
+
+  "anim object info": "@anim object info",
+  "geometry": "@geometry",
+  "animation": "@animation",
+  "static events": {"op": "uset", "elem": "@Attachment"},
+  "intelligence": {"op": "iset", "each": "@intel_body"},
+  "object types": {"op": "uset", "elem": "u16"},
+  "object types 2": "u32[2]:empty",
+  "texture": {"op": "iset", "entries": [
+     "u8:format u8:speed u8:log2Width u8:log2Height u8:lod u8:kind pad[2]",
+     {"op": "iset", "each": {"op": "opaque", "note": "CI4/CI8 texels: Fast3D reads bytes"}},
+     {"op": "iset", "each": {"op": "rdp", "note": "RGBA5551/IA16 TLUT: Fast3D reads big-endian u16 from bytes; keep. Texture_DecompressCallback's recolour must use BE accessors in the port"}}
+  ]},
+  "particle effects": {"op": "particles", "template": {"op": "cstruct", "name": "CROMParticleEffect"},
+     "note": "block 0 = pool of sub-records at the offsets of the templates' 9 pointer fields (relocated by CScene__DecompressParticles); records several templates share are typed once",
+     "slots": [
+       [24, {"op": "cstruct", "name": "CROMParticleImpact"}],
+       [28, "f32?[3]:offset"],
+       [32, "f32?[6]:unk20"],
+       [36, {"op": "cstruct", "name": "CROMParticleDistance"}],
+       [40, "f32?[3]:direction"],
+       [44, "unk[28]:oscillation"],
+       [48, {"op": "cstruct", "name": "CROMParticleMotion"}],
+       [52, "u8?[16]:colors"],
+       [56, {"op": "cstruct", "name": "CROMParticleParams"}]]},
+  "level info": {"op": "seq", "parts": [{"size": 20, "rule": {"op": "cstruct", "name": "CLevelHeader"}}, {"rule": {"op": "unk", "note": "level info bytes 0x14..0x17"}}]},
+  "collision": {"op": "iset", "entries": [
+     {"op": "uset", "transposed": true, "elem": {"op": "cstruct", "name": "CRegionInfo"}},
+     {"op": "uset", "transposed": true, "elem": "@RegionVertex"},
+     {"op": "uset", "transposed": true, "elem": "@PackedRegion"},
+     {"op": "uset", "transposed": true, "elem": "unk[20]:table3"}
+  ]},
+  "level paths": {"op": "iset", "each": {"op": "iset", "entries": [{"op": "unk", "note": "path group block 0 (8 bytes)"}, {"op": "uset", "elem": "@PathItem"}]}},
+  "animated instances": {"op": "uset", "transposed": true, "elem": "@AnimInstance"},
+  "grid bounds": {"op": "iset", "entries": ["@f32set", "@f32set", "@f32set", "@f32set", {"op": "uset", "elem": "f32[4]:rect s32:empty"}]},
+  "grid section": {"op": "switch", "on": "size", "cases": {"<=8": {"op": "array", "type": "u32", "name": "emptyCell"}},
+     "default": {"op": "iset", "entries": [
+        {"op": "uset", "transposed": true, "elem": "@CompactStatic"},
+        {"op": "uset", "transposed": true, "elem": "@StaticObject"},
+        {"op": "uset", "transposed": true, "elem": "@LevelActor"},
+        {"op": "uset", "transposed": true, "elem": "@VolumeRec"}]}},
+  "sky layers": {"op": "uset", "elem": {"op": "cstruct", "name": "CEmitterDef"}},
+  "links": {"op": "iset", "entries": ["@s32set", {"op": "uset", "elem": {"op": "cstruct", "name": "LevelEvent"}},
+                                      "@s32set", {"op": "uset", "elem": {"op": "cstruct", "name": "LevelEvent"}}]},
+  "level name": {"op": "byte", "note": "C string"},
+  "load/save persistent bit sections": {"op": "iset", "entries": [{"op": "iset", "each": "@LevelBits"}, "@BitSection"]},
+  "game persistent bit sections": {"op": "iset", "entries": [{"op": "iset", "each": "@LevelBits"}]},
+  "warp dests": {"op": "iset", "entries": ["@s32set", {"op": "uset", "elem": "f32[3]:pos f32:rotY s16:level s16:spawn"}]},
+  "particle swooshes": {"op": "iset", "each": {"op": "struct", "fields": "f32:unk0 unk[12] s16:sound unk[13] u8:tex0 u8:tex1",
+                                                "tail": {"op": "unk", "note": "TrailInfo beyond 0x21"}}},
+  "dynamic lights": {"op": "uset", "elem": "u16?:mask u16?:step u8[4]:color"},
+  "curves": {"op": "uset", "elem": {"op": "switch", "on": {"at": 0, "type": "s32"}, "cases": {
+       "0": "s32:type u8[16]:samples f32:length",
+       "1": "s32:type f32:period u8:minimum u8:maximum unk[10] f32:length"}}},
+  "rumbles": {"op": "uset", "elem": "s16:mode s16:frames"},
+  "rumble types": "@s32set",
+  "graphicset": {"op": "graphicset"},
+  "graphicset type": "@s32set",
+  "cinema table": {"op": "uset", "elem": {"op": "cstruct", "name": "CinemaEntry"}},
+  "Cinema": {"op": "iset", "entries": [
+     {"op": "iset", "each": "@Clip"},
+     {"op": "uset", "elem": "f32[4]:rgba f32:time"},
+     {"op": "uset", "elem": "f32:time s32:list s32:event"},
+     {"op": "uset", "elem": "f32:fov f32:time"}
+  ]},
+  "link group types": "@s32set",
+  "end marker": {"op": "pad", "note": "never read"}
+ }
+}

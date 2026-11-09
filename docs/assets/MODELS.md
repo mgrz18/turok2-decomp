@@ -19,7 +19,8 @@ Locating and decompressing go through `tools/assets/romfs.py` and `propack.py`
 `rnc_min.py` of the first pass is gone (it matched `propack.decompress` on every geometry block).
 Texture previews use `textures.py`'s decoder. `--pose` places the vertices of animated models at
 frame 0 of their animation 0 (`anim.parse_skeleton` / `parse_animation` / `pose` ->
-`apply_pose`); `extract_all.py` exports them that way. The parser (`parse_geometry`) only sees
+`apply_pose`); `extract_all.py` exports them that way. Posed models are Z-up (ANIMATION.md), so `--render`
+draws them with `up="z"` (upright); unposed scenery stays Y-up. The parser (`parse_geometry`) only sees
 the decompressed bytes.
 
 ## Where the models are

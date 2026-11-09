@@ -14,6 +14,7 @@ tools read the player's own ROM (SHA1 `fb0400f21e3f043939ab56500c7b12a3231006f1`
 | [LEVELS.md](LEVELS.md) | Levels (header, collision regions, paths, instances, grid bounds and sections, sky layers, links, events), warp destinations, cinemas. Tools: `levels.py`, `cinemas.py`. |
 | [AUDIO.md](AUDIO.md) | The two libaudio banks (VADPCM), the sound tree file (effects, envelopes, songs: alCSeq MIDI and Acclaim `adec` MDCT streams). Tool: `audio.py`. |
 | [PORT.md](PORT.md) | How the native port gets these assets without shipping them: archive format, engine hooks, extractor plan. Tool: `romid.py`. |
+| [ARCHIVE.md](ARCHIVE.md) | The game archive `turok2.o2r` as built: entries, unit layout (libultraship Blob), manifest and flags, decisions (RNC unpacked, no containers with RNC children, partial reads), determinism, verification. Tools: `mkarchive.py`, `archive_check.py`, `romfs.py --manifest`. |
 
 ## The four regions
 
@@ -135,5 +136,6 @@ table and writes it to `summary.json`):
   endian kept; byte swapping per type in one `T2Asset_Read`.
 - Engine change: `CLoader__LoadSync`, `CLoader__LoadAsync` / `CLoader__Main`, `VM_Alloc` and
   the size in `CCache__Request` read from the archive instead of the cartridge.
-- Next steps: `romfs.py --manifest`, per-type field-width tables, `mkarchive.py` (Python
-  reference builder), the Torch `T2` module for distribution, `port/t2asset.cpp`.
+- Done: `romfs.py --manifest`, `mkarchive.py` + `archive_check.py` ([ARCHIVE.md](ARCHIVE.md)).
+- Next steps: per-type field-width tables (BYTEORDER.md), the port-side reader
+  (`port/assets/t2asset.c`), the Torch `T2` module for distribution.

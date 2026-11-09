@@ -138,7 +138,8 @@ What a source port needs: code a person can read and change without breaking it.
 
 ### Phase 6 — Assets
 - [x] Map every asset in the ROM: models, textures, levels, animations, sounds, music, text. 100% of the asset region (0x1E0000-0x1FF7AEC, 31.5 MB) classified, 99.7% exported to files: 2705 models, 1839 textures + 114 graphic sets, 490 skeletons / 1857 animations, 165 levels, 197 cinemas, 2 sound banks (866 waves), 1319 effects, 19 sequences, 140 streams. See [docs/assets/README.md](docs/assets/README.md)
-- [ ] Extractor that builds a resource archive from the user's ROM (the port ships no game data). Partially: `tools/assets/extract_all.py` extracts everything to ordinary files and the archive format is chosen ([docs/assets/PORT.md](docs/assets/PORT.md): libultraship `.o2r`, one entry per load unit); the `.o2r` builder is next
+- [x] Extractor that builds a resource archive from the user's ROM (the port ships no game data): `tools/assets/mkarchive.py baserom.us.z64 -o turok2.o2r` checks the ROM (z64/v64/n64, SHA1) and writes a libultraship `.o2r`: 26,124 load units as standard Blob resources keyed by ROM address (`t2/u/XXXXXXXX`), RNC pre-decompressed, 33.9 MB, deterministic, ~8 s; `tools/assets/archive_check.py` verifies every entry against the ROM ([docs/assets/ARCHIVE.md](docs/assets/ARCHIVE.md)). Byte order for little-endian hosts: `tools/assets/swap_spec.json`, 99.5% of unit bytes typed ([docs/assets/BYTEORDER.md](docs/assets/BYTEORDER.md)). Torch module for distribution: next
+- [ ] Code loads assets through the archive instead of fixed ROM offsets. Started: the C reader `port/assets/t2asset.c` (`T2Asset_Read(romKey)`, archive and ROM backends, 0 mismatches over all 26,124 units) and the exact loader replacements in [docs/assets/PORT.md](docs/assets/PORT.md) §10; wiring it into the engine is part of the native build
 - [ ] Code loads assets through the archive instead of fixed ROM offsets
 
 ### Phase 7 — Native build

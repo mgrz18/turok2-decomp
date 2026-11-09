@@ -299,7 +299,8 @@ changing the scheme (section 7).
 | `turok2.o2r` | generated from the user's ROM at first run | **never** |
 | `mods/*.o2r` | user mods; mounted after `turok2.o2r`, so entries with the same path win | user's |
 
-`turok2.o2r` entries:
+`turok2.o2r` entries (sketch; the format as built, with 8-digit names and units stored as
+libultraship Blob resources rather than a custom `T2LU` type, is in [ARCHIVE.md](ARCHIVE.md)):
 
 | path | content |
 |---|---|
@@ -364,16 +365,16 @@ u32). It must handle reads of a prefix (the probes) by swapping only whole
 fields inside `[offset, offset+len)`. Rules learned so far:
 
 - CISet / CUSet headers and offset tables: u32.
-- 8-bit pixels and CI indices, bit streams (`Bits_Read`, animation channels),
-  ADPCM and Acclaim audio frames: no swap. Check whether `Bits_Read` fetches
-  bytes or words: if it reads words, the swap of those blocks is u32
-  (ANIMATION.md).
+- 8-bit pixels and CI indices, VADPCM frames: no swap. Bit streams: `Bits_Read` (animation) reads
+  u32 words and `adecReadBits` (adec audio) u16 words, so those streams are swapped as u32 / u16.
+- 16-bit texels and TLUTs stay big-endian: Fast3D decodes them from bytes (`(addr[2i] << 8) | addr[2i+1]`).
+  The full table and its coverage check: BYTEORDER.md (`tools/assets/swap_spec.json`, `swapcheck.py`).
 - Model vertex frames are stored byte-transposed (`CUSet__Transpose` in
   `Model_Decompress`), so swapping them is "un-transpose, swap the `Vtx` s16
   fields, re-transpose". That is still a pure byte permutation, so it can
   happen at read time or at extraction time.
-- RGBA16 textures: u16 per texel. `Texture_DecompressCallback` recolours them
-  as u16.
+- RGBA16 textures: kept big-endian for Fast3D (above); `Texture_DecompressCallback`'s palette
+  recolour must use big-endian accessors in the port.
 
 Why swap at read time rather than extraction time: the archive stays a
 faithful (unpacked) copy of the ROM, the extractor needs no format knowledge,
@@ -459,8 +460,9 @@ Dependencies: a1 = ROMFS, a2 TEXTURES, a3 MODELS, a4 LEVELS, a5 ANIMATION, a6 AU
    4,885 empty, 334 raw, 41 USet, plus the 3 audio regions (audio window and sound
    data as `VM_Alloc` units, the sample data read piecemeal). `fs.readers(node)`
    gives `[(description, callback, callers)]` (column "readers" in romfs_tree.tsv;
-   ROMFS.md "Load units and their readers"). Still to add for the archive: a
-   `--manifest` writer with (address, ROM size, unpacked size, type, flags).
+   ROMFS.md "Load units and their readers"). The manifest writer is done:
+   `romfs.py --manifest units.tsv|json` (key, ROM size, host size, kind, type, flags,
+   readers; ARCHIVE.md).
 2. **Unpack rule check** (a1, done): every RNC unit has a reader with a callback,
    and every such callback calls `ProPackDecompress` (`Model_Decompress*`,
    `Anim_Decompress`, `Texture_DecompressCallback`, `CScene__Decompress*`,
@@ -471,7 +473,9 @@ Dependencies: a1 = ROMFS, a2 TEXTURES, a3 MODELS, a4 LEVELS, a5 ANIMATION, a6 AU
    type, e.g. `grid section: CISet; child 0: CUSet stride 0x1C {f32 x3, u16, u16, ...}`.
    `tools/assets/swapgen.py` turns them into `port/t2swap.c`. Until a type has
    a table it is `unknown` and logged.
-4. **`mkarchive.py`** (Python, stdlib): writes `turok2.o2r` / the folder
+4. **`mkarchive.py`** (Python, stdlib; done, see [ARCHIVE.md](ARCHIVE.md) for the
+   format as built: units are libultraship Blob resources named `t2/u/XXXXXXXX`, checked by
+   `archive_check.py`): writes `turok2.o2r` / the folder
    tree, `version`, `t2/units`, `t2/types`. Unit tests: unit bytes equal the ROM
    range or its RNC unpack; manifest sizes; no unit outside the asset region
    except the audio window.
@@ -528,8 +532,8 @@ Dependencies: a1 = ROMFS, a2 TEXTURES, a3 MODELS, a4 LEVELS, a5 ANIMATION, a6 AU
   `KEEP_PACKED` or an offset-table rewrite (5.2).
 - Units read at more than one size where the larger read crosses into what
   another call site treats as a separate unit: does the tree walker see any?
-- `Bits_Read`: byte or word fetches? (Decides the swap rule for animation
-  streams.)
+- `Bits_Read`: byte or word fetches? **Answered (BYTEORDER.md):** 32-bit words (`word[0]`, `word[1]`
+  native loads, bits LSB first inside the word), so the animation streams are swapped as u32 arrays.
 - The audio window 0x1E0000-0x20F194 (now its own splat segment, `audio_ctl`)
   holds the 913-entry sfx soundArray at 0x20E334 (AUDIO.md / ROMFS.md).
   The libaudio bank structures it contains are pointer-fixed in place by
@@ -539,3 +543,187 @@ Dependencies: a1 = ROMFS, a2 TEXTURES, a3 MODELS, a4 LEVELS, a5 ANIMATION, a6 AU
 - Other releases (EU, JP) are not supported by the decomp. Adding one means
   another SHA1, another set of root constants, and checking whether the
   layout differs.
+
+## 10. Reader (`port/assets`, prototype)
+
+The port-side half of option C, written in plain C so it can be built and tested on
+the box before libultraship is in the tree. Nothing in `src/` changes yet: the
+replacement code below is what Phase 7 drops into the port build, while the matching
+build stays untouched.
+
+### 10.1 Files
+
+| file | what |
+|---|---|
+| `port/assets/t2asset.h/.c` | the reader: front end (unit lookup, prefix rule, inner-address reads, buffers) + two backends |
+| `port/third_party/miniz/` | miniz 3.0.2 (`miniz.c/.h`, MIT, `LICENSE` included): zip reading and inflate |
+| `port/third_party/rnc/rnc.c` | RNC ProPack methods 1 and 2, copied unchanged from `references/rw_junk/docs/hand_asm_c/rnc.c` (functionally equivalent C of the hand-written unpacker, differentially tested there; README in the folder) |
+| `port/tests/t2asset_test.c` | host test: both backends, every unit, byte-compare |
+| `port/Makefile` | `make -C port` (cc -O2), `make -C port test ROM=.. UNITS=.. ARCHIVES=..` |
+
+### 10.2 Interface
+
+```c
+int  T2Asset_OpenArchive(const char *o2rPath);              /* turok2.o2r (miniz) */
+int  T2Asset_OpenRom(const char *romPath, const char *unitsTsv); /* bring-up: the ROM itself */
+void T2Asset_SetBackend(const T2AssetBackend *be, void *ctx);    /* LUS ArchiveManager later */
+void T2Asset_Close(void);
+
+const void *T2Asset_Read(u32 romKey, u32 *size);  /* in: requested size (0 = whole), out: host size */
+void        T2Asset_Release(const void *data);
+u32         T2Asset_HostSize(u32 key, u32 size);  /* what CCache__Request must allocate */
+int         T2Asset_ReadInto(u32 address, u32 offset, void *dst, u32 len); /* loader form */
+```
+
+Rules, the same for every backend:
+
+- **Whole unit:** a request whose size is `>=` the unit's ROM size (or 0) returns the
+  whole unit. For an RNC unit that is the unpacked bytes, which are larger than the
+  ROM slot the engine asked for (`*size` reports it).
+- **Prefix probe:** a request smaller than the unit's ROM size returns that prefix (the
+  4-byte count probe of `CCache__LoadPersistantIndex`, the 0x18-byte object-index
+  probes). This needs the unit's ROM size, which comes from the archive manifest
+  `t2/units`. Without a manifest (e.g. a mod entry with a new size), every request
+  returns the whole unit, which is a superset and safe for the cache.
+- **Inner addresses:** units flagged `RAW_RANGE` (the audio wave table) or `VM_WINDOW`
+  (audio control block, sound data) are also served at any address inside them. The
+  archive backend keeps them resident after the first touch (up to 4); the ROM backend
+  copies from the image.
+- Buffers are `malloc`ed (16-byte aligned on the 64-bit hosts) and followed by 16 zero
+  bytes, like libultraship's Blob padding for code that over-reads.
+- Bytes are returned as stored: ROM byte order. The byte swap (`T2Asset_Swap`, from
+  b2's `swap_spec.json` / BYTEORDER.md) hooks in at the end of `T2Asset_Read` /
+  `T2Asset_ReadInto`, keyed by the manifest's type id; not done in this prototype.
+
+Backends:
+
+- **archive:** opens the zip with miniz, indexes every `t2/u/XXXXXXXX` entry (sorted,
+  binary search), reads `t2/units` (`'T2UT'` + 16-byte LE records: key, ROM size,
+  host size, type, flags) for ROM sizes and flags. Entry format detected once: the
+  `mkarchive.py` format (64-byte LUS header, type Blob `OBLB` v0, T2 block `'T2LU'` at
+  0x14, u32 size, data; the reader checks the size field and the T2 block against the
+  entry) or a bare data entry (hand-made mod / FolderArchive file).
+- **rom:** loads the image, normalizes `.v64`/`.n64`, requires SHA1
+  `fb0400f2...06f1`, takes the unit list from a TSV (`romfs.py --manifest` or the
+  archive's `t2/units.tsv`: key, size, ..., flags), unpacks RNC units with `rnc.c` and
+  checks the header CRC16 (the game does not). Without a list it still serves RNC
+  streams by key and raw bytes at any address.
+- **LUS (later):** a third `T2AssetBackend` whose `load` is
+  `ResourceGetDataByName("t2/u/%08X")` / `ArchiveManager::LoadFile` (skipping the
+  68-byte Blob prefix, or taking `Blob::Data` as is), and whose `lookup` reads the same
+  `t2/units`. The front end and the engine changes below stay as they are.
+
+### 10.3 Test results (box, gcc 14.2 -O2)
+
+`port/build/t2asset_test baserom.us.z64 units.tsv A.o2r [B.o2r ...]` reads every unit
+through the ROM backend, then every unit of each archive, and compares bytes and sizes;
+it also checks `T2Asset_HostSize`, the 4-byte probe of every raw unit, and 20,000
+random 0x300-byte reads inside the three audio units (the audio DMA pattern) against
+the ROM image.
+
+| run | units | result | time |
+|---|---|---|---|
+| ROM backend (SHA1 + 14,426 RNC unpacks in C, CRC-checked) | 26,124 (45,890,836 bytes) | all unpack, sizes = manifest | 1.16 s |
+| `mkarchive.py` archive, deflate (33.9 MB) | 26,124 | 0 mismatches, 0 HostSize errors, 11,695/11,695 probes served as prefix, 20,000 audio reads OK | open 0.10 s, read all 0.86 s |
+| `mkarchive.py --store` (53.8 MB) | 26,124 | same | open 0.10 s, read all 0.37 s |
+| bare-data entries, no `t2/units` | 26,124 | same bytes; probes return the whole unit (by design) | read all 0.83 s |
+
+Also checked: a `.v64` copy of the ROM is accepted and gives the same bytes; a ROM
+with one flipped bit is refused with its SHA1.
+
+### 10.4 Engine changes (Phase 7; exact replacement code, not applied)
+
+`CLoader__LoadSync` (`func_00201DBC.c`): no chunking, no thread hop. Its callers (the
+`direct` path of `CCache__Request`, the VM pager, persistent defaults) all expect the
+bytes on return.
+
+```c
+void CLoader__LoadSync(CLoader *thisx, u32 address, s32 length, void *dest) {
+    if (T2Asset_ReadInto(address, 0, dest, (u32)length) < 0)
+        T2Port_Fatal("asset %08X+%X: %s", address, length, T2Asset_Error());
+}
+```
+
+`CLoader__LoadAsync` (`func_00201E94.c`): one entry per request. Chunk entries at
+`address + k*0x2000` would name addresses that are not unit keys (and, for an unpacked
+unit, not even the same bytes). The queue, the reply message and the `direct` jam stay,
+so the cache's async protocol (`CCache__CompleteRequest` on the reply) is unchanged.
+
+```c
+void CLoader__LoadAsync(CLoader *thisx, u32 address, s32 length, void *dest,
+                        OSMesgQueue *replyQueue, OSMesg replyMessage, s32 direct) {
+    CLoaderEntry *entry = CLoader__AllocLoaderEntry(thisx);
+    if (entry == NULL)
+        return;
+    entry->address = address;
+    entry->dest = dest;
+    entry->length = length;
+    entry->replyQueue = replyQueue;
+    entry->replyMessage = replyMessage;
+    if (direct != 0)
+        osJamMesg(&thisx->queue, entry, OS_MESG_BLOCK);
+    else
+        osSendMesg(&thisx->queue, entry, OS_MESG_BLOCK);
+}
+```
+
+`CLoader__Main` (`func_00201FBC.c`): the PI DMA and the cache maintenance go.
+
+```c
+void CLoader__Main(CLoader *thisx) {
+    CLoaderEntry *entry;
+    for (;;) {
+        osRecvMesg(&thisx->queue, (OSMesg *)&entry, OS_MESG_BLOCK);
+        if (T2Asset_ReadInto(entry->address, 0, entry->dest, (u32)entry->length) < 0)
+            T2Port_Fatal("asset %08X+%X: %s", entry->address, entry->length, T2Asset_Error());
+        if (entry->replyQueue != NULL)
+            osSendMesg(entry->replyQueue, entry->replyMessage, OS_MESG_BLOCK);
+        CLoader__DeallocLoaderEntry(thisx, entry);
+    }
+}
+```
+
+`VM_Alloc` (`func_0028E60C.c`): the window becomes the resident unit; the pager
+(`VM_HandleTLBMiss`, `VM_Age`, `VM_MapTLBEntry`, the pager thread) is not built. The
+return value is used as a pointer, so on a 64-bit host the signature must return
+`void *` (its two callers in `CAudioWorld__Initialize` / `CAudioWorld__LoadSfxDataFile`
+change with it).
+
+```c
+void *VM_Alloc(s32 size, s32 unused, s32 romAddr) {
+    u32 n = (u32)size;                       /* 0x2F194 / 0x3EA7A0: the whole VM_WINDOW unit */
+    const void *p = T2Asset_Read((u32)romAddr, &n);
+    if (p == NULL)
+        T2Port_Fatal("VM window %08X: %s", romAddr, T2Asset_Error());
+    return (void *)p;                        /* resident for the whole run, never released */
+}
+```
+
+`CCache__Request` (`func_0020367C.c`): one line at the top, before `find()`, so the
+lookup, the pending-list check, `allocate()` and `requestLength` all work in host sizes:
+
+```c
+    size = T2Asset_HostSize(key, size);      /* unpacked size of an RNC unit; probes unchanged */
+```
+
+The `direct` path then calls `CLoader__LoadSync(&gLoader, key, size, data)` and the
+async path `CLoader__LoadAsync(..., key, size, data, ...)`, both with the host size, and
+`T2Asset_ReadInto` fills the whole block. The audio DMA callback (`func_002700D0.c`)
+is unchanged: its `CLoader__LoadAsync(direct = 1)` addresses lie inside the
+`RAW_RANGE` unit.
+
+### 10.5 Open points
+
+- **Locking.** `T2Asset_*` is not thread safe. On N64 `CLoader__LoadSync` runs on the
+  caller's thread while the loader thread runs `CLoader__Main`; the port needs one mutex
+  around `T2Asset_ReadInto` / `T2Asset_Read` (or all reads funnelled through the loader
+  thread).
+- **Cache hit test.** As decompiled, `CCache__Request` returns a cached entry when
+  `request->requestLength <= size`, i.e. also a *smaller* cached block (a 4-byte probe)
+  for a later full request. Section 1.2 describes it as "holds at least `size`". Worth
+  re-reading the assembly before the port relies on either reading.
+- **Byte swap hook:** needs b2's spec and the manifest type id per unit; a prefix read
+  must swap only whole fields inside the prefix (5.3).
+- **Resident VM windows and mods:** a mod that shadows `t2/u/001E0000` changes the
+  audio bank the engine pointer-fixes in place; the 64-bit audio rebuild (section 9)
+  owns that.
