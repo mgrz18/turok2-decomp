@@ -682,6 +682,22 @@ def apply_plan(data, plan, planes):
     return bytes(out)
 
 
+def unit_plan(spec, data, key, typ):
+    """The swap plan of one unit's bytes (ROM order, RNC unpacked): (runs, planes, errors).
+    runs: merged (offset, width, count), sorted; planes: (offset, records, [(plane, width)...])
+    transposed tables, in the order the spec found them. mkarchive.py stores these in t2/swap
+    (docs/assets/ARCHIVE.md) and port/assets/t2asset.c applies them on a little-endian host."""
+    u = Unit(data, key, typ)
+    rule = spec.types.get(typ)
+    if rule is None:
+        return [], [], ["no rule for type %s" % typ]
+    try:
+        spec.apply(rule, u, 0, len(data), typ)
+    except (struct.error, IndexError) as e:
+        u.err("parse error: %s" % e)
+    return merge_runs(u.plan), list(u.planes), u.errors
+
+
 def unit_data(fs, n):
     return fs.blob(n) if n.compressed else fs.read(n)
 

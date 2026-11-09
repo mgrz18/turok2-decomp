@@ -21,12 +21,12 @@ folders are game data: write them outside the repository (`*.o2r` is in `.gitign
 
 | | |
 |---|---|
-| entries | 26,129 = 26,124 units + 5 metadata files |
+| entries | 26,130 = 26,124 units + 6 metadata files (format 2.0) |
 | units | 14,426 RNC streams stored unpacked (14,261 method 1, 165 method 2), 11,698 stored as in the ROM |
 | unit bytes | 45,890,836 (ROM side: 31,554,284 bytes read from the ROM) |
-| archive | 33,875,898 bytes (deflate level 6); 33,805,951 at `--level 9`; 53,795,943 with `--store` |
-| build time | 7.5-9.5 s with `-j 8` (22-23 s with `-j 1`); RNC unpacking is the only real work |
-| check time | 32 s (`archive_check.py` unpacks every RNC stream again) |
+| archive | 34,316,542 bytes (format 2.0, deflate level 6; `t2/swap` is 3,063,476 bytes, 453,548 deflated); format 1.0 was 33,875,898 |
+| build time | 12 s with `-j 4` (RNC unpacking, then the swap plans of every unit) |
+| check time | 35 s with `-j 4` (`archive_check.py` unpacks every RNC stream again and recomputes the plans) |
 
 Units by kind: 14,261 `rnc1`, 165 `rnc2`, 6,437 `iset`, 4,885 `empty`, 332 `raw`, 41 `uset`,
 3 `audio-region`. Flags: 14,426 `RNC_UNPACKED`, 5,747 `INDEX_HEADER`, 2,906 `CONTAINER`
@@ -42,6 +42,7 @@ Units by kind: 14,261 `rnc1`, 165 `rnc2`, 6,437 `iset`, 4,885 `empty`, 332 `raw`
 | `t2/units` | binary table of contents, little-endian: `'T2UT'`, `u16 major`, `u16 minor`, `u32 count`, `u32 typeCount`, then `count` records `{u32 key, u32 romSize, u32 hostSize, u16 type, u16 flags}` sorted by key (16 bytes each). |
 | `t2/units.tsv` | the same as text (`romfs.manifest_tsv`): key, size, host size, kind, type, flags, flag names, CCache descriptions, decompress callbacks, romfs path. |
 | `t2/types` | `id \t type \t descriptions` per line; type ids are the index in the sorted list of type names. |
+| `t2/swap` | (format 2) byte-swap plans, little-endian: `'T2SW'`, `u16 major`, `u16 minor`, `u32 count`, `u32 0`, then `count` records `{u32 key, u32 hostSize, u32 offset, u32 runs, u32 tables}` sorted by key (20 bytes each; only units whose plan is not empty: 25,957), then the plans. A plan at `offset` (from the entry start): `runs` x `{u32 offset, u32 count << 2 \| width code}` (code 1, 2, 3 = 2, 4, 8-byte fields), then `tables` x `{u32 offset, u32 records, u32 swaps}` + `swaps` x `{u16 plane, u16 width}` (a transposed table: reverse planes `plane..plane+width-1`, each `records` bytes). Built from `tools/assets/swap_spec.json` by `swapcheck.unit_plan` (228,911 runs, 11,920 tables). |
 | `t2/u/XXXXXXXX` | one load unit; `XXXXXXXX` = ROM key, 8 uppercase hex digits (`t2/u/00FCEA9C` = object 0's geometry). |
 
 Unit entry layout (all header fields little-endian; the unit bytes after them are not):
@@ -175,8 +176,12 @@ PORT.md step 7 (log every request against `t2/units`) answers it.
 
 ### Byte order
 
-Unit bytes stay in ROM (big-endian) order; swapping per type happens in the port's
-`T2Asset_Read` (PORT.md 5.3, BYTEORDER.md). The libultraship header and the T2 metadata are
+Unit bytes stay in ROM (big-endian) order. Since format 2 the archive carries each unit's
+swap plan (`t2/swap`, above); the port's reader applies it once per load on a little-endian
+host, to the whole unit before a prefix is cut (`T2Asset_SwapUnit`, PORT.md 10.6,
+BYTEORDER.md), so the engine gets host-order fields. Keeping the bytes in ROM order keeps the
+unit entries checkable against the ROM and the spec fixable without touching the port: fix
+`swap_spec.json`, rebuild the archive. The port refuses format 1 archives (no plans). The libultraship header and the T2 metadata are
 little-endian because their own byte-order byte says so; that byte governs the header and
 the Blob's `u32` size only, not the unit bytes.
 
@@ -188,10 +193,11 @@ the Blob's `u32` size only, not the unit bytes.
 ### Determinism
 
 Entries are written in a fixed order (`version`, `t2/info.json`, `t2/units`, `t2/units.tsv`,
-`t2/types`, then units by key) with fixed zip metadata (date 1980-01-01 00:00:00, unix
+`t2/types`, `t2/swap`, then units by key) with fixed zip metadata (date 1980-01-01 00:00:00, unix
 attributes 0100644 (regular file, rw-r--r--), `create_system` = unix, no extra fields). Checked: builds with `-j 8` and
 `-j 1` and from `.z64`, `.v64` and `.n64` images are byte-identical
-(sha1 `bb77f744594dd036be4d6738eecbb6f1ef25d8fc` with Python 3.13 / zlib 1.3.1). Deflate
+(format 1.0: sha1 `bb77f744594dd036be4d6738eecbb6f1ef25d8fc`; format 2.0:
+`99cbe76733bfab1d7235e4894cec2b91be3965f7`, same with `-j 2` and `-j 4`; Python 3.13 / zlib 1.3.1). Deflate
 output depends on the zlib version, which `t2/info.json` records; `--store` gives an archive
 that depends on nothing but the ROM. The port should compare `version` (format + ROM SHA1),
 not the archive's hash.
@@ -203,7 +209,9 @@ walks the ROM afresh with `romfs`, and checks: `version` (byte order, CRC1, form
 `t2/units` equal to `RomFS.manifest()` record by record and sorted; every unit entry's
 libultraship header, T2 block and size; the bytes against `ROM[key:key+size]` for stored
 units and against a fresh unpack of the RNC stream (length = header size, CRC16 = header CRC)
-for RNC units; no missing or extra entries; the `--folder` tree byte for byte. A tampered
+for RNC units; `t2/swap` equal to the plans recomputed from `swap_spec.json` on the checked
+bytes, and every plan applied twice (`swapcheck.apply_plan`) giving the unit back; the format
+major (2); no missing or extra entries; the `--folder` tree byte for byte. A tampered
 archive (one flipped byte in a unit, one unit removed) fails with both errors reported.
 
 ## Mods and the Torch module
@@ -211,6 +219,10 @@ archive (one flipped byte in a unit, one unit removed) fails with both errors re
 - A mod O2R that contains `t2/u/XXXXXXXX` in the same layout shadows the unit (libultraship
   mounts it later). Its size may differ: the port should take the size from the entry it
   actually loads (the Blob `u32` at 0x40) rather than from the base archive's `t2/units`.
+  Byte order: a plan only applies when its `hostSize` equals the unit's; a resized mod unit is
+  served in ROM order and counted as "refused" (`T2Asset_SwapStats`). A mod that changes a
+  unit's layout should ship its own `t2/swap` (the last mounted one wins) built with
+  `mkarchive.swap_table`.
 - The shipping extractor (a Torch `T2` module, PORT.md 5.5) must produce byte-identical
   entries; `archive_check.py` (and a straight comparison with `mkarchive.py --store` output)
   is the oracle.
