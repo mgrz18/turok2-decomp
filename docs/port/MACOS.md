@@ -122,6 +122,36 @@ The CList offsets there are already host values (0, 8).
 After those fixes the Mac reaches `CCameraPool__Construct`, the same region where Linux stops. The
 remaining work is the same on both, so nothing below this point is macOS-specific.
 
+### r1 + r3 + r5 together on the Mac (local branch `r5-test-all`, not for merge)
+
+This test merges `names-R3_r3` @ 15b57137 and `names-R3_r1` @ ef12cb66 (which includes r2's
+loader) into this branch and runs with r2's format-2 archive (`mkarchive.py`: t2/swap, sha1
+`8c1a4211…` with zlib 1.2.12). On Linux, r1's tree reaches mode 0 and draws frames. On the Mac:
+
+- **Merge**: 13 `src/` files conflict between r1 and r3. Both sides make the same fixes
+  (CList offsets, MenuPool, CCamera). Three semantic conflicts break the build until resolved:
+  - r1's port body of `CCache__AllocateAt` keeps `s32 addr` and `(u32)CHeap__AllocAt`, while
+    r3's protos use `sptr`;
+  - `CCache__AllocateMemoryForDecompression(Top)`: r1 returns `s32`, r3 `sptr`;
+  - `-X theirs` keeps r1's `MenuPool_Construct(s32)`.
+- **Further 64-bit truncations on the boot path**, found one crash at a time on the Mac. Each
+  row is fixed on the test branch and works on Linux only because of low memory:
+
+| # | where | cause |
+|---|---|---|
+| a | `CCache__DeallocateInternal` (func_002061B8) from `CCache__LoadPersistantIndex` from `CScene__Construct` | the CMemEntry is typed as `CAI` (`m_dwFlags` = data as s32, `m_VisBits` = flags at N64 0xC), and the local decls of `CHeap__Free`/`FreeMemEntry`/`DetachCacheEntry` take `s32` |
+| b | `CDecompressor__Main` calls `0x2F9CC0` | `CCache__LoadPersistantSubBlock(..., s32 arg5, ...)` truncates the callback (`CScene__DecompressIntelligence`); it is also declared `void`, but every caller reads its return value (v0 of `CCache__Request`) |
+| c | `CScene__GetObject` from `CScene__DecompressParticles(s32 arg0, ...)` | a decompression callback whose `notifyId` (the scene) is `s32`; the same for `CScene__DecompressIntelligence` |
+| d | `CLoader__LoadSync` memmove from `CScene__LoadBitSections` (func_0042C418) | local decl with `s32 dest` |
+| e | `ProPackDecompress` from `Model_DecompressCallback(s32, s32)` (func_0020B490) | callback arguments are `s32` |
+| f | `CISet__GetROMAddressAndSize` from `func_00207914(s32 arg0, ...)` from `Material_Unpack` | **stopped**: `Material.texture` is an `s32` in the decompressed model block, and the texture handle is written at `texture` and `texture + 4`. This is asset/model layout with in-place pointers, not a prototype fix |
+
+With fixes a-e the Mac runs `CScene__Construct` through the index loads, intelligence,
+particles and bit sections, into the first model decompression. Every decompression callback
+(`decompressCallback(sptr notifyId, CCacheEntry *)`) still needs the host signature. The
+particle `Piece` relocation (`base + piece[i].unkNN` in s32 slots) and `Material` are the next
+asset-layout items.
+
 ## 5. Not checked / open
 
 - **Windowed mode was not run beyond one first test.** The user asked for headless only on the
