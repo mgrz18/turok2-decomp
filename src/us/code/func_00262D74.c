@@ -11,6 +11,13 @@
 #include "protos/player.h"
 #include "protos/game.h"
 
+#ifdef TARGET_PORT /* host layout: CGame.m_Settings (structs/game.h) */
+#include "structs/game.h"
+#define GAME_SETTINGS_OFF T2_OFFSETOF(CGame, m_Settings)
+#else
+#define GAME_SETTINGS_OFF 0x1268
+#endif
+
 /* Drops an actor's loot at its feet (raised to the ground height): kind 0
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup
  * if it is unlocked), kind 1 a particle effect, kind 2 a pickup picked at
@@ -132,7 +139,7 @@ void Generator_SpawnEnter(CGameObjectInstance *actor, CAI *ai) {
                 item = WeightedTable_Pick(&unlocked);
             }
         } else {
-            player = CPlayerPool__GetFirstActive((u8 *)flags - 0x1268); /* the player list, gEngineApp_m_Game */
+            player = CPlayerPool__GetFirstActive((u8 *)flags - GAME_SETTINGS_OFF); /* the player list, gEngineApp_m_Game */
             if (player == NULL) {
                 break;
             }

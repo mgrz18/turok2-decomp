@@ -9,7 +9,11 @@ extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: global
 /* The game the settings belong to, recovered from the settings pointer. Its address is
    gEngineApp_m_Settings - 0x1228 for the compiler, not gEngineApp_m_Game_m_CameraPool: that is what keeps the tagged and
    head-shot messages from being cross-jumped into the "you killed" one. */
+#ifdef TARGET_PORT
+#define GAME_OF(settings) ((CGameFromCameraPool *)((u8 *)(settings) - T2_OFFSETOF(CGameFromCameraPool, m_Settings)))
+#else
 #define GAME_OF(settings) ((CGameFromCameraPool *)((u8 *)(settings) - 0x1228))
+#endif
 
 /* The messages live in the data after .rodata ("head shot!" in the hit-region names), not in this file's pool. */
 extern char D_800B53D0[]; /* "head shot!" */
