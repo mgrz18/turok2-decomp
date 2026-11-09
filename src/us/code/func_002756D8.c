@@ -7,7 +7,15 @@
 
 extern s32 CAudioWorld__PlaySoundIndex(void *, s32, CVector3, s32);
 extern int CAudioWorld__PlaySoundIndex(void *arg0, int arg1, CVector3 arg2, int arg3);
+#ifdef TARGET_PORT
+int T2Port_AudioReady(void);
+#endif
 s32 Sound__PlayIndex(s32 arg0, CVector3 arg1, s32 arg2) {
+#ifdef TARGET_PORT /* no sound bank on the host yet: audio off (port/game/t2audio.c) */
+    if (!T2Port_AudioReady()) {
+        return 0;
+    }
+#endif
     if (gEngineApp_m_Settings.unk1C8 != 0) {
         return -1;
     }

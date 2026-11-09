@@ -18,7 +18,11 @@ void osScAddClient(void *a, void *b, void *c);
 void __amHandleFrameMsg(s32 buf, s32 z);
 void alClose(void *g);
 void __amMain(void) {
+#ifdef TARGET_PORT /* two host pointers (OSScClient) */
+    void *sp10[2];
+#else
     s32 sp10[2];
+#endif
     u32 msg;
     u32 cnt;
     s32 arg;

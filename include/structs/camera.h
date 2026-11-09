@@ -16,6 +16,9 @@
 #include "structs/gbi.h"
 #include "structs/list.h"
 #include "structs/menu.h"
+#ifdef TARGET_PORT
+#include "structs/emitter.h"
+#endif
 
 typedef struct {
     /* 0x00 */ CVector3 m_vNormal;
@@ -170,7 +173,11 @@ typedef struct CCamera {
         MenuPool m_Menus;                      /* the same, as structs/menu.h lays it out */
     };
     /* 0x554 */ s32 _pad4;
+#ifdef TARGET_PORT /* the emitter pool at its host size (its lists hold pointers) */
+    CEmitterPool m_SkySystem[1];
+#else
     /* 0x558 */ u8 m_SkySystem[0x8D0];           /* CSkySystem */
+#endif
     /* 0xE28 */ CList m_ActiveTextList;
     /* 0xE3C */ CMtxF m_mfFaceScreen;
     /* 0xE7C */ CMtxF m_mfFaceScreenYAxisUp;

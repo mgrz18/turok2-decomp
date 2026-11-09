@@ -5,6 +5,10 @@
 #include "structs/world.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
+#ifdef TARGET_PORT
+#include "structs/game.h"
+extern CGame gEngineApp_m_Game;
+#endif
 
 /* Builds the frame's actor lists: every live level actor (flag 0x100) whose
  * type is shown in the current view is tested against the view's bounding
@@ -49,10 +53,18 @@ void CScene__BuildActorLists(CScene *w) {
     w->m_nRegistered = 0;
     w->m_nKind1 = 0;
     w->m_nFlagged = 0;
+#ifdef TARGET_PORT /* the CGame / CCamera fields by name (host layout) */
+    CPlayerPool__RegisterActors(&gEngineApp_m_Game.m_PlayerList, w);
+#else
     CPlayerPool__RegisterActors((u8 *)&gEngineApp_m_Settings_difficulty - 0x1270, w);
+#endif
     view = NULL;
     if (gEngineApp_m_Settings_difficulty.unk11 == 0) {
+#ifdef TARGET_PORT /* the CGame / CCamera fields by name (host layout) */
+        view = gEngineApp_m_Game.m_CameraPool->m_ActiveList.m_pHead;
+#else
         view = *(u8 **)((u8 *)&gEngineApp_m_Settings_difficulty - 0x1210);
+#endif
     }
     sflag = 0;
     if (Cinema_PathPlaying() == 0) {
@@ -76,7 +88,11 @@ void CScene__BuildActorLists(CScene *w) {
                         if (bB[0] > o->m_vMin.x && bB[-3] < o->m_vMax.x && bB[2] > o->m_vMin.z
                             && bB[-1] < o->m_vMax.z && bB[1] > o->m_vMin.y && bB[-2] < o->m_vMax.y) {
                             if (view != NULL) {
+#ifdef TARGET_PORT /* the CGame / CCamera fields by name (host layout) */
+                                s2 = Frustum_TestBox(((CCamera *)view)->m_ViewVolume, &o->m_vMin.x);
+#else
                                 s2 = Frustum_TestBox(view + 0x2D8, &o->m_vMin.x);
+#endif
                             } else {
                                 goto set1;
                             }

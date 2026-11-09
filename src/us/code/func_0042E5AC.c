@@ -6,13 +6,26 @@
 #include "globals/game.h"
 #include "protos/list.h"
 
+#ifdef TARGET_PORT /* the CPlayer links at their host offsets */
+#define PLAYER_LAST T2_OFFSETOF(CPlayer, m_pLast)
+#define PLAYER_NEXT T2_OFFSETOF(CPlayer, m_pNext)
+#else
+#define PLAYER_LAST 0x131C
+#define PLAYER_NEXT 0x1320
+#endif
+
 
 typedef struct PlayerList {
     /* 0x00 */ CPlayer **handle;
     /* 0x04 */ CPlayer *players;
     /* 0x08 */ s32 count;
+#ifdef TARGET_PORT /* CPlayerPool's host layout (the lists are 8-aligned there) */
+    CPlayerCList list0[1];
+    CPlayerCList list1[1];
+#else
     /* 0x0C */ u8 list0[0x14];
     /* 0x20 */ u8 list1[0x14];
+#endif
 } PlayerList;
 
 extern CPlayer **CCache__Allocate(s32 heap, s32 size, s32 tag, char *name);
@@ -44,8 +57,8 @@ void CPlayerPool__NewGame(PlayerList *list, s32 count, s32 arg2) {
     CPlayer *p;
     s32 i;
 
-    CList__Construct(list->list0, 0x131C, 0x1320);
-    CList__Construct(list->list1, 0x131C, 0x1320);
+    CList__Construct(list->list0, PLAYER_LAST, PLAYER_NEXT);
+    CList__Construct(list->list1, PLAYER_LAST, PLAYER_NEXT);
     Controller_SetRumbleOptionAll(0);
     CCache__Flush(0);
     flags = &gEngineApp_m_Settings;

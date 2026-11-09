@@ -109,6 +109,10 @@ void CCamera__Construct(CCamera *view) {
     CMtxF__Identity(view->m_mfFaceScreenYAxisUp);
     view->m_FlashMode = 0;
     gCameraVisBits.field_4 = 0;
+#ifdef TARGET_PORT /* the text links at their host offsets */
+    CList__Construct(&view->m_ActiveTextList, T2_OFFSETOF(CCameraText, m_pLast), T2_OFFSETOF(CCameraText, m_pNext));
+#else
     CList__Construct(&view->m_ActiveTextList, 0, 4);
+#endif
     CCamera__ConstructSkySystem(view);
 }

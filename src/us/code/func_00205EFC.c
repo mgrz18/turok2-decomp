@@ -7,6 +7,14 @@ s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
 
+#ifdef TARGET_PORT
+/* The port: the typed allocation of func_00205D7C.c with memFlags 0x22 (the m2c body below writes
+ * CMemEntry fields at N64 offsets). */
+struct CMemEntry *CCache__AllocDecompressFlags(u32 flags, u32 size);
+s32 CCache__AllocateMemoryForDecompressionTop(s32 arg0, s32 arg1, s32 arg2) {
+    return (s32)(sptr)CCache__AllocDecompressFlags(0x22, (u32)arg2);
+}
+#else
 s32 CCache__AllocateMemoryForDecompressionTop(s32 arg0, s32 arg1, s32 arg2)
 {
   s32 temp_a0;
@@ -74,3 +82,4 @@ s32 CCache__AllocateMemoryForDecompressionTop(s32 arg0, s32 arg1, s32 arg2)
   __osRestoreInt(temp_v0_3);
   return var_s0;
 }
+#endif

@@ -33,6 +33,27 @@
 #include "protos/scene.h"
 #include "protos/menu.h"
 
+#ifdef TARGET_PORT /* the windows, items, descs and model blocks at their host sizes (structs/menu.h) */
+#include "structs/menu_model.h"
+#define MENU_SIZE sizeof(Menu)
+#define MENUITEM_SIZE sizeof(MenuItem)
+#define MENUITEMDESC_SIZE sizeof(MenuItemDesc)
+#define MENUMODEL_SIZE sizeof(MenuModel)
+#define MENU_PTR sptr
+#define MENU_COLOR_BASE(p, j, i) ((u8 *)&(p)->colors[j][i] - 0x48)
+#define MENU_LINKS T2_OFFSETOF(Menu, prev), T2_OFFSETOF(Menu, next)
+void *t2_n64_to_host(u32 addr);
+#else
+#define MENU_SIZE 0x1D8
+#define MENUITEM_SIZE 0x28
+#define MENUITEMDESC_SIZE 0x24
+#define MENUMODEL_SIZE 0x330
+#define MENU_PTR s32
+#define MENU_COLOR_BASE(p, j, i) (((u8 *)p) + ((j << 7) + i * 16))
+#define MENU_LINKS 0x1D0, 0x1D4
+#endif
+
+
 /* ---------------- MenuItem_FormatBinding ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
  * one junk word (0x41322C) and this function, which really starts at 0x413230 (0x174 bytes). */
@@ -723,15 +744,15 @@ void Menu_Construct(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, 
   p->offsetX = t->offsetX;
   p->offsetY = t->offsetY;
   p->block = a1;
-  ib = (MenuItem *) (((u8 *) p) + 0x1D8);
+  ib = (MenuItem *) (((u8 *) p) + MENU_SIZE);
   p->items = ib;
   p->count = t->count;
   ext = (u8 *) ib;
-  ext = ((u8 *) ib) + (t->count * 0x28);
+  ext = ((u8 *) ib) + (t->count * MENUITEM_SIZE);
   for (i = 0; i < t->count; i++)
   {
-    MenuItem *it = (MenuItem *) ((i * 0x28) + ((s32) p->items));
-    MenuItemDesc *tp = (MenuItemDesc *) ((i * 0x24) + ((s32) t->items));
+    MenuItem *it = (MenuItem *) ((i * MENUITEM_SIZE) + ((MENU_PTR) p->items));
+    MenuItemDesc *tp = (MenuItemDesc *) ((i * MENUITEMDESC_SIZE) + ((MENU_PTR) t->items));
     it->index = i;
     pc = &ext;
     {
@@ -748,11 +769,21 @@ void Menu_Construct(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, 
     it->def = tp;
     it->value = -1;
     it->menu = p;
+#ifdef TARGET_PORT
+    /* the desc keeps a text or table address as its N64 word (s32 data, gendata keeps
+     * integers): the item gets the host pointer (port/gen/relocs.c) */
+    if ((u32)new_var2 >= 0x80000000u && (u32)new_var2 < 0x80800000u) {
+        it->text = (char *)t2_n64_to_host((u32)new_var2);
+    } else {
+        it->data = new_var2;
+    }
+#else
     it->data = new_var2;
+#endif
     k = 0;
     if (tp->type == 3)
     {
-      k = 0x330;
+      k = MENUMODEL_SIZE;
     }
     if (k != 0)
     {
@@ -765,7 +796,7 @@ void Menu_Construct(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, 
       k2 = 0;
       if (tp->type == 3)
       {
-        k2 = 0x330;
+        k2 = MENUMODEL_SIZE;
       }
       *pc += k2;
     }
@@ -790,7 +821,7 @@ void Menu_Construct(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, 
     {
       /* rb + 0x48 is p->colors[j][i] (MenuColor w0..bF); written through
        * the byte offsets, as the struct's fields schedule differently */
-      u8 *rb = ((u8 *)p) + ((j << 7) + i * 16);
+      u8 *rb = MENU_COLOR_BASE(p, j, i);
       *((u16 *) (rb + 0x48)) = D_800C1CD2[i].a;
       *((u16 *) (rb + 0x4A)) = D_800C1CD2[i].b;
       *((u16 *) (rb + 0x4C)) = D_800C1CD2[i].c;
@@ -919,7 +950,7 @@ s32 Menu_Update(Menu *menu, void *arg) {
             item++;
         } while (i != -1);
     }
-    item = (MenuItem *) ((u8 *) menu->items + menu->cursor * 0x28);
+    item = (MenuItem *) ((u8 *) menu->items + menu->cursor * MENUITEM_SIZE);
     menu->time = menu->time + gFrameIncrement;
     horizontal = item->flags & 0x400000;
     func_00416C28_4143DC(menu);
@@ -1173,7 +1204,7 @@ void Menu_DrawBar(Menu *a, MenuItem *b, s32 c) {
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 /* Static inline in the Rage Wars source file (dropped by the importer); 0x330 in Turok 2, 0x480 in Rage Wars. */
-static inline s32 O06_ItemSize_415FB8(s16 *a) { if (*a == 3) return 0x330; return 0; }
+static inline s32 O06_ItemSize_415FB8(s16 *a) { if (*a == 3) return MENUMODEL_SIZE; return 0; }
 extern void func_00414EA8_415FB8() __asm__("Menu_Construct");
 /* Opens the window c's submenu in the pool a (an item's select callback,
  * MenuItem_SelectSubmenu): the window, its items and their extras in one block. */
@@ -1185,7 +1216,7 @@ s32 MenuPool_OpenSubmenu(MenuPool *a, Menu *c) {
     s32 p1, p2, p3, p4;
     if (b != 0) {
         p1 = b->param; p2 = (s32) c->player; p3 = (s32) c->controller; p4 = (s32) c->context;
-        size = b->count * 40 + 0x1D8;
+        size = b->count * MENUITEM_SIZE + MENU_SIZE;
         for (i = 0; i < b->count; i++) size += O06_ItemSize_415FB8(&b->items[i].type);
         r = CCache__Allocate(0, size, 0x3B, "menu");
         if (r != 0) {
@@ -1452,7 +1483,7 @@ s32 Menu_StepValueLR(Menu *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg
 /* ---------------- MenuPool_Construct ---------------- */
 
 void MenuPool_Construct(s32 arg0) {
-    CList__Construct(arg0, 0x1D0, 0x1D4);
+    CList__Construct(arg0, MENU_LINKS);
     ((MenuPool *) arg0)->opened = 0;
 }
 
@@ -1463,7 +1494,7 @@ void MenuPool_Construct(s32 arg0) {
 /* Extra allocation per item: kind 3 items carry a 0x330-byte block (0x480 in Rage Wars). */
 static __inline__ s32 O06_ItemSize_416644(s16 *a) {
     s32 n = 0;
-    if (*a == 3) n = 0x330;
+    if (*a == 3) n = MENUMODEL_SIZE;
     return n;
 }
 extern s32 *func_00204EDC_416644() __asm__("CCache__Allocate");
@@ -1474,7 +1505,7 @@ s32 MenuPool_OpenMenu(MenuPool *a, MenuDesc *b, s32 c, s32 d, s32 e) {
     s32 size, i;
     s32 *r;
     s32 s;
-    size = b->count * 40 + 0x1D8;
+    size = b->count * MENUITEM_SIZE + MENU_SIZE;
     for (i = 0; i < b->count; i++) size += O06_ItemSize_416644(&b->items[i].type);
     r = func_00204EDC_416644(0, size, 0x3B, "menu");
     if (r == 0) return 0;
@@ -1493,7 +1524,7 @@ s32 MenuPool_OpenMenu(MenuPool *a, MenuDesc *b, s32 c, s32 d, s32 e) {
 /* Turok 2 inlines the per-item size (Rage Wars calls it): kind 3 adds 0x330 */
 static inline s32 O06_ItemSize_416760(s16 *a) {
     s32 n;
-    if (*a == 3) n = 0x330; else n = 0;
+    if (*a == 3) n = MENUMODEL_SIZE; else n = 0;
     return n;
 }
 extern s32 *func_00204EDC_416760() __asm__("CCache__Allocate");
@@ -1506,7 +1537,7 @@ s32 MenuPool_OpenMenuFrom(MenuPool *a, Menu *c, MenuDesc *b) {
     s32 *r;
     s32 s;
     s32 p1 = c->param, p2 = (s32) c->player, p3 = (s32) c->controller, p4 = (s32) c->context;
-    size = b->count * 40 + 0x1D8;
+    size = b->count * MENUITEM_SIZE + MENU_SIZE;
     for (i = 0; i < b->count; i++) size += O06_ItemSize_416760(&b->items[i].type);
     r = func_00204EDC_416760(0, size, 0x3B, "menu");
     if (r == 0) return 0;
@@ -1527,7 +1558,7 @@ s32 MenuPool_OpenMenuFrom(MenuPool *a, Menu *c, MenuDesc *b) {
 /* Each item of type 3 gets a 0x330-byte extension after the item array. */
 static __inline__ s32 ItemExtSize(s16 *type) {
     if (*type == 3) {
-        return 0x330;
+        return MENUMODEL_SIZE;
     }
     return 0;
 }
@@ -1546,7 +1577,7 @@ s32 MenuPool_OpenChildMenu(MenuPool *pool, Menu *c, MenuDesc *t) {
     p2 = c->player;
     p3 = c->controller;
     p4 = c->context;
-    size = t->count * 40 + 0x1D8;
+    size = t->count * MENUITEM_SIZE + MENU_SIZE;
     for (i = 0; i < t->count; i++) {
         size += ItemExtSize(&t->items[i].type);
     }
@@ -1758,7 +1789,7 @@ void Menu_DrawFlash(Menu *a) {
 extern s32 MenuItemDesc_ExtraSize(s16 *record);
 s32 MenuItemDesc_ExtraSize(s16 *record) {
     if (*record == 3) {
-        return 0x330;
+        return MENUMODEL_SIZE;
     }
     return 0;
 }
@@ -1781,11 +1812,11 @@ void MenuItem_Construct(MenuItem *w, MenuItemDesc *d, char **arena, int id, int 
  w->index=id; w->type=d->type; w->flags=d->flags|0x1800000;
  w->x=d->x; w->y=d->y; w->link[0]=d->link[0]; w->link[1]=d->link[1]; w->link[2]=d->link[2]; w->link[3]=d->link[3];
  w->data=d->data; w->def=d; w->value=-1; w->menu=(Menu *)arg;
- size=0; if(d->type==3) size=0x330;
+ size=0; if(d->type==3) size=MENUMODEL_SIZE;
  if(size) {
  w->extra=*arena;
  extra=*arena; if(d->type==3) ((MenuModel *)(extra))->loaded=1;
- { int step=0; if(d->type==3) step=0x330;
+ { int step=0; if(d->type==3) step=MENUMODEL_SIZE;
  *arena+=step; }
  }
 }
@@ -1904,14 +1935,14 @@ void CList__AddHead_4172F8(void *list, void *node) __asm__("CList__AddHead");
 extern void **func_00204EDC_4172F8(s32, s32, s32, char *) __asm__("CCache__Allocate");
 /* Opens the window described by list in the pool owner. */
 void *MenuPool_OpenMenuParam(MenuPool *owner, MenuDesc *list, s32 a, s32 b, s32 c, s32 d) {
-    s32 size = list->count * 40 + 0x1D8;
+    s32 size = list->count * MENUITEM_SIZE + MENU_SIZE;
     s32 i;
     void **block;
     void *first;
     for (i = 0; i < list->count; i++) {
         s32 extra = 0;
         if (list->items[i].type == 3) {
-            extra = 0x330; /* 0x480 in Rage Wars */
+            extra = MENUMODEL_SIZE; /* 0x480 in Rage Wars */
         }
         size += extra;
     }

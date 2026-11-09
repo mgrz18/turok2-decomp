@@ -4,6 +4,7 @@
 
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
+#ifndef TARGET_PORT
 s32 CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
 {
   s32 temp_a0;
@@ -73,6 +74,7 @@ s32 CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
   __osRestoreInt(temp_v0_3);
   return var_s0;
 }
+#endif
 
 #ifdef TARGET_PORT
 #include "structs/cache.h"
@@ -81,8 +83,7 @@ s32 CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
  * offsets and returns the entry as s32). ProPackDecompress (func_00200B00.c) calls it for the
  * block a load unit is copied into: a fresh entry with the request's memFlags, locked, `size`
  * bytes from the heap (from the top when memFlags has 0x20), on the address list. */
-CMemEntry *CCache__AllocDecompressBlock(CCacheEntry *request, u32 size) {
-    u32 flags = request->memFlags;
+CMemEntry *CCache__AllocDecompressFlags(u32 flags, u32 size) {
     CMemEntry *node;
     s32 token = __osDisableInt();
     if (++gCache_mutex_count != 1) {
@@ -116,5 +117,14 @@ CMemEntry *CCache__AllocDecompressBlock(CCacheEntry *request, u32 size) {
         __osRestoreInt(token);
     }
     return node;
+}
+
+CMemEntry *CCache__AllocDecompressBlock(CCacheEntry *request, u32 size) {
+    return CCache__AllocDecompressFlags(request->memFlags, size);
+}
+
+/* The game's entry point (protos/cache.h still returns the entry as s32: 64BIT.md part 2). */
+s32 CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2) {
+    return (s32)(sptr)CCache__AllocDecompressBlock((CCacheEntry *)arg1, (u32)arg2);
 }
 #endif

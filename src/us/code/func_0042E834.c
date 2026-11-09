@@ -3,12 +3,20 @@
 #include "structs/player.h"
 #include "protos/list.h"
 
+#ifdef TARGET_PORT /* the CPlayer links at their host offsets */
+#define PLAYER_LAST T2_OFFSETOF(CPlayer, m_pLast)
+#define PLAYER_NEXT T2_OFFSETOF(CPlayer, m_pNext)
+#else
+#define PLAYER_LAST 0x131C
+#define PLAYER_NEXT 0x1320
+#endif
+
 extern void memset(void *p, s32 c, s32 n); /* memset */
 
 void CPlayerPool__Construct(CPlayerPool *pl) {
     memset(pl, 0, sizeof(CPlayerPool));
-    CList__Construct(&pl->m_IdleList, 0x131C, 0x1320);
-    CList__Construct(&pl->m_ActiveList, 0x131C, 0x1320);
+    CList__Construct(&pl->m_IdleList, PLAYER_LAST, PLAYER_NEXT);
+    CList__Construct(&pl->m_ActiveList, PLAYER_LAST, PLAYER_NEXT);
     pl->m_pmePlayers = 0;
     pl->m_Players = 0;
     pl->m_nPlayers = 0;

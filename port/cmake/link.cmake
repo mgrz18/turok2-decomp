@@ -87,6 +87,24 @@ set(T2_LINK_REPLACED
     func_0028E6DC.c   # VM_Free
     # audio (t2boot.c): off until the sound bank is converted for the host (STATUS.md)
     func_00275520.c   # Sound__Initialize
+    # the scheduler, typed for the host (port/game/t2sched.c: its views overran on LP64)
+    func_0028A020.c   # __scMain
+    func_0028A17C.c   # __scHandleRetrace
+    func_0028A43C.c   # __scHandleRSP
+    func_0028A914.c   # __scHandleRDP
+    func_0028ABE0.c   # __scSchedule
+    func_0028ADF0.c   # osCreateScheduler
+    func_0028AF00.c   # osScAddClient
+    func_0028AF58.c   # osScRemoveClient
+    func_0028AFE8.c   # osScGetCmdQ
+    func_0028AFF0.c   # __scAppendList
+    func_0028B048.c   # __scTaskReady
+    func_0028B0A8.c   # __scTaskComplete
+    func_0028B0FC.c   # __scExec
+    func_0028B274.c   # __scYield
+    func_0028B2AC.c   # Sched_HandleCmdMsg
+    func_0028B3E0.c   # Sched_GetInterruptQ
+    func_0028B3E8.c   # Sched_SubmitTask
 )
 
 # True if NAME (a src/us/code file name) is module 2 (.virtual_1).

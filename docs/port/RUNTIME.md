@@ -522,3 +522,26 @@ Steps 1-3 of §9 are in: the executable links the game (engine + module 1), t2os
 device shims run under the t2_ names (§2.4, done with `port/include/t2_rename.h`), and
 `turok2 --game` boots `mainproc` as in §3. The first crash is the heap's 64-bit layout
 (`CHashTable__Construct` on a NULL `CHeap__Alloc`). See docs/port/LINK.md.
+
+## 13. Round 3 (r1): the scheduler typed for the host, the frame loop running
+
+The game's scheduler (Acclaim's PR/sched.c: `osCreateScheduler`, `__scMain`, `__scHandleRetrace`,
+`__scHandleRSP/RDP`, `__scSchedule`, `__scExec`, `__scYield`, `__scAppendList`,
+`__scTaskReady/Complete`, `osScAdd/RemoveClient`, `osScGetCmdQ`, `Sched_GetInterruptQ`,
+`Sched_SubmitTask`, `Sched_HandleCmdMsg`; func_0028A020 .. func_0028B3E8) reached OSSched and
+OSScTask through a dozen local views at N64 offsets. On LP64 the message queues, the thread and the
+task pointers are larger, so the views overran each other (the scheduler thread started with its
+argument overwritten). `port/game/t2sched.c` is the same code over `T2Sched` / `T2ScTask`
+(`include/structs/sched.h`, TARGET_PORT), function by function; `port/cmake/link.cmake` leaves the
+17 originals out of the link and `port/cmake/game.cmake` links `port/game/*.c` (game-side host
+replacements, compiled with the game's flags and headers). `CFrameData.m_Task` / `m_LineTask` are
+`T2ScTask` on the host, and `CEngineApp__SubmitGfxTask` / `CEngineApp__AdvanceFrameData` fill
+them through `CFrameData`. The device side is unchanged (t2ultra.c: SP/DP completions at the next
+frame, `osViSwapBuffer`).
+
+With that, §1.3's loop runs as on hardware: 300 host frames = 151 gfx tasks, each started by the
+scheduler and drawn by Fast3D with `--draw` (STATUS.md, round 3 r1).
+
+Audio stays off: `Sound__Initialize` is the host stub, and the game's `Sound__*` entry points
+return early while `T2Port_AudioReady()` (port/game/t2audio.c: the audio world has a bank) is
+false.

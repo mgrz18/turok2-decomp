@@ -3,6 +3,34 @@
 #include "globals/render.h"
 #include "globals/libultra.h"
 
+#ifdef TARGET_PORT
+/* The port: the same through CCameraPool / CCamera (structs/camera.h): the main camera and the
+ * active ones get the full-screen viewport. */
+#include "globals/camera.h"
+extern unsigned short D_800C21AA[];
+extern void Video_ResizeViMode(unsigned,int,int,int,int,int);
+void Video_SetMode(unsigned width,int a1,int a2,int a3,int a4,int a5) {
+    int flags = 0, region = 0;
+    CCamera *cam;
+    switch (osTvType) {case 0: region = 1; break; case 1: break; case 2: region = 2; break;}
+    if (width > 320) flags |= 4;
+    if (gViAntiAlias) flags |= 2;
+    if (width > 320) flags |= 1;
+    sViModeIndex = *(unsigned short *)((char *)D_800C21AA + flags * 4 + region * 32);
+    Video_ResizeViMode(width, a1, a2, a3, a4, a5);
+    cam = &gEngineApp_m_Game_m_CameraPool.m_MainCamera;
+    cam->m_Viewport.m_Width = gScreenWidth;
+    cam->m_Viewport.m_Height = gScreenHeight;
+    cam->m_Viewport.m_ScreenPosX = 0;
+    cam->m_Viewport.m_ScreenPosY = 0;
+    for (cam = gEngineApp_m_Game_m_CameraPool.m_ActiveList.m_pHead; cam != NULL; cam = cam->m_pNext) {
+        cam->m_Viewport.m_ScreenPosX = 0;
+        cam->m_Viewport.m_ScreenPosY = 0;
+        cam->m_Viewport.m_Width = gScreenWidth;
+        cam->m_Viewport.m_Height = gScreenHeight;
+    }
+}
+#else
 struct NodeRecAt294;
 typedef struct NodeRecAt294 NodeRecAt294;
 struct NodeRecAt294;
@@ -31,3 +59,4 @@ void Video_SetMode(unsigned width,int a1,int a2,int a3,int a4,int a5) {
  node=*(NodeRecAt294 **)((char *)node-32);
  while(node) {node->x=0;node->y=0;node->width=gScreenWidth;node->height=gScreenHeight;node=node->next;}
 }
+#endif

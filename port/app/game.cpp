@@ -13,6 +13,11 @@
 #include <memory>
 
 #include "fast/Fast3dWindow.h"
+#include "fast/interpreter.h"
+#include "fast/backends/gfx_rendering_api.h"
+
+#include <cstdlib>
+#include <vector>
 
 extern "C" {
 #include "t2port.h"
@@ -21,6 +26,28 @@ extern "C" {
 #include "game.h"
 
 namespace {
+
+// T2_DLDUMP=1: print the commands of the last frame's display list (following G_DL), for
+// bring-up. Words are host-sized (gfx.h GfxWord).
+void DumpDL(const uintptr_t* dl, int depth, int* budget) {
+    for (; *budget > 0; dl += 2) {
+        (*budget)--;
+        uint32_t w0 = (uint32_t)dl[0];
+        uint8_t op = w0 >> 24;
+        printf("%*s%02X %08X %016llX\n", depth * 2, "", op, w0, (unsigned long long)dl[1]);
+        if (op == 0xDE) {
+            if (dl[1] & 1) {
+                continue; // segmented: not followed
+            }
+            DumpDL((const uintptr_t*)dl[1], depth + 1, budget);
+            if ((w0 >> 16 & 0xFF) == 1) {
+                return; // branch
+            }
+        } else if (op == 0xDF) {
+            return;
+        }
+    }
+}
 
 OSMesgQueue sContQueue;
 OSMesg sContMsg[1];
@@ -67,6 +94,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     fflush(stdout);
 
     int drawn = 0;
+    const void* lastDL = nullptr;
     auto t0 = std::chrono::steady_clock::now();
     for (int f = 0; f < args.frames && (!window || window->IsRunning()); f++) {
         if (window) {
@@ -77,6 +105,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         if (T2Port_TakeGfxTask(&task) && args.draw && window && task.dataPtr != nullptr) {
             // Only with --draw: the game's display lists are not host-correct yet (GBI words
             // hold 32-bit addresses; docs/port/BUILD.md "GBI").
+            lastDL = task.dataPtr;
             if (window->DrawAndRunGraphicsCommands((Gfx*)task.dataPtr, {})) {
                 drawn++;
             }
@@ -90,6 +119,32 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
                    (unsigned long long)s.audioTasks, (unsigned long long)s.piDmas, (unsigned long long)s.piBytes,
                    (unsigned long long)s.viSwaps, (unsigned long long)s.missingCalls);
             fflush(stdout);
+        }
+    }
+    if (getenv("T2_DLDUMP") != nullptr && lastDL != nullptr) {
+        int budget = 4000;
+        DumpDL((const uintptr_t*)lastDL, 0, &budget);
+    }
+    // T2_SHOT=<file.ppm>: the last frame Fast3D drew, read back (bring-up screenshots).
+    if (const char* shot = getenv("T2_SHOT"); shot != nullptr && window && drawn > 0) {
+        auto interp = window->GetInterpreterWeak().lock();
+        if (interp && interp->mRapi) {
+            const uint32_t w = interp->mCurDimensions.width, h = interp->mCurDimensions.height;
+            std::vector<uint16_t> fb((size_t)w * h);
+            interp->mRapi->ReadFramebufferToCPU(0, w, h, fb.data());
+            if (FILE* fp = fopen(shot, "wb")) {
+                fprintf(fp, "P6\n%u %u\n255\n", w, h);
+                for (uint32_t y = 0; y < h; y++) {
+                    for (uint32_t x = 0; x < w; x++) {
+                        uint16_t c = fb[(size_t)(h - 1 - y) * w + x];
+                        uint8_t px[3] = { (uint8_t)((c >> 11 & 31) << 3), (uint8_t)((c >> 6 & 31) << 3),
+                                          (uint8_t)((c >> 1 & 31) << 3) };
+                        fwrite(px, 1, 3, fp);
+                    }
+                }
+                fclose(fp);
+                printf("game: wrote %s (%ux%u)\n", shot, w, h);
+            }
         }
     }
     double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();

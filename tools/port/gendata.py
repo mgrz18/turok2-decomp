@@ -332,8 +332,11 @@ def leaves(d, noff, hoff, out):
             leaves(d[2], noff + i * n, hoff + i * h, out)
     elif t == 'r':
         fields = d[6]
-        if d[5]:  # union: the first member decides
-            fields = fields[:1]
+        if d[5]:  # union: the first member decides, except that a scalar member as large as
+            # the union wins (libultra's du is { struct { u32 hi, lo; } w; f64 d; }: written by
+            # its words, a little-endian double comes out with its halves swapped)
+            whole = [f for f in fields if f[2] < 0 and f[3][0] == 's' and f[3][1] == d[1]]
+            fields = whole[:1] if whole else fields[:1]
         for nb, hb, bw, fd in fields:
             if bw >= 0:
                 out.append((noff * 8 + nb, hoff * 8 + hb, 'b', bw, dsize(fd)[1], None))
@@ -344,24 +347,64 @@ def leaves(d, noff, hoff, out):
 
 
 def dtranslate(d, noff):
+    return _dtranslate(d, noff)[0]
+
+
+def _dtranslate(d, noff):
+    """(host offset, typed): typed is False when the offset only lands in a byte array (a
+    `u8 pad[N]` view), so that a union prefers the member that types the offset: CGame's
+    camera pool is `union { CCameraPool m_CameraPool[1]; struct { u8 pad[..]; u8 m_MenuPool[..]; }; }`
+    and CEngineApp's game `union { CGame m_Game; struct { u8 pad[..]; GameSettings m_Settings; }; }`
+    (structs/game.h). Ties go to the first member, as in leaves()."""
     t = d[0]
     if t == 'a':
         n, h = dsize(d[2])
         if n <= 0:
-            return noff
+            return noff, False
         i = noff // n
-        return i * h + dtranslate(d[2], noff - i * n)
+        sub, typed = _dtranslate(d[2], noff - i * n)
+        if d[2][0] == 's' and d[2][1] == 1 and d[1] > 4:
+            typed = False
+        return i * h + sub, typed
     if t == 'r':
-        best = None
-        for nb, hb, bw, fd in d[6]:
-            if bw < 0 and nb // 8 <= noff:
-                best = (nb // 8, hb // 8, fd)
-        if best is None:
-            return noff
-        return best[1] + dtranslate(best[2], noff - best[0])
+        cands = [(nb // 8, hb // 8, fd) for nb, hb, bw, fd in d[6] if bw < 0 and nb // 8 <= noff]
+        if not cands:
+            return noff, True
+        if d[5]:  # union: every member starts at 0
+            best = None
+            for c in cands:
+                if noff - c[0] >= dsize(c[2])[0]:
+                    continue
+                sub, typed = _dtranslate(c[2], noff - c[0])
+                if best is None or (typed and not best[1]):
+                    best = (c[1] + sub, typed)
+            if best is not None:
+                return best
+        c = cands[-1]
+        sub, typed = _dtranslate(c[2], noff - c[0])
+        return c[1] + sub, typed
     if t == 'p':
-        return min(noff, 4)
-    return noff
+        return min(noff, 4), True
+    return noff, True
+
+
+# F3DEX2 commands whose w1 is an address: G_VTX, G_MTX, G_MOVEMEM, G_DL, G_RDPHALF_1 (branch),
+# G_SETTIMG, G_SETZIMG, G_SETCIMG (and G_MOVEWORD G_MW_SEGMENT, tested apart).
+GFX_ADDR_OPS = {0x01, 0xDA, 0xDC, 0xDE, 0xE1, 0xFD, 0xFE, 0xFF}
+
+
+def is_gfx(d):
+    """A Gfx (or an array of them): two words that are 4 bytes on the N64 and 8 on the host
+    (gfx.h GfxWord). Static display lists in the ROM hold N64 addresses in w1."""
+    if d is None:
+        return False
+    if d[0] == 'a':
+        d = d[2]
+    if d[0] == 'r' and d[5]:  # a union: its first member
+        d = d[6][0][3] if d[6] else d
+    if d[0] != 'r' or len(d[6]) != 2:
+        return False
+    return all(f[3][0] == 's' and f[3][1] == 4 and f[3][2] == 8 for f in d[6])
 
 
 def shape(d):
@@ -517,6 +560,11 @@ class Generator:
         self.func_refs = set()
         self.ext_funcs = set()
         self.int_addr = collections.Counter()  # integer leaves that hold an address
+        self.bss_slack = []   # .bss byte views given twice their N64 size
+        self.gfx_syms = []    # display lists (Gfx data)
+        self.ptr_tables = 0   # pointer targets typed as arrays of their pointee
+        self.count_hint = {}  # key -> element count stored next to a pointer to it
+        self.gfx_relocs = 0   # their w1 addresses made host pointers
 
     # -- choosing a type --------------------------------------------------
     def pick(self, name, ds):
@@ -546,6 +594,7 @@ class Generator:
 
     def run(self, data_names, decls):
         self.queue = []
+        self.declared = set(data_names)
         for n in data_names:
             ds = decls.get(n)
             self.add(n, self.pick(n, ds) if ds else None, 'C')
@@ -583,6 +632,28 @@ class Generator:
             n, _ = dsize(d)
             if ext > n and ext % n == 0 and ext // n <= 4096 and not self.is_bss(s):
                 d = ['a', ext // n, d]  # m2c `extern s32 D_x;` indexed as an array
+        elif d[0] == 'r' and s.why == 'pointer target' and not self.is_bss(s):
+            # a table reached through a pointer to its first element (MenuDesc.items ->
+            # MenuItemDesc[count]): the count stored next to the pointer when there is one
+            # (symbols inside it become aliases), else as many whole elements as fit before
+            # the next symbol
+            n, _ = dsize(d)
+            cnt = self.count_hint.get(s.key, 0)
+            if n > 0 and cnt <= 1:
+                cnt = ext // n if ext // n <= 4096 else 0
+            if n > 0 and cnt * n > ext:
+                # never over a symbol the C declares (it keeps its own type)
+                i = bisect.bisect_right(self.elf.keys, s.key)
+                while i < len(self.elf.keys) and self.elf.keys[i] < s.key + cnt * n:
+                    k = self.elf.keys[i]
+                    if any(nm in self.declared for nm in self.elf.at[k]):
+                        cnt = (k - s.key) // n
+                        break
+                    i += 1
+            if n > 0 and cnt > 1:
+                d = ['a', cnt, d]
+                ext = max(ext, cnt * n)
+                self.ptr_tables += 1
         elif d[0] in ('x', 'F'):
             return None, ext
         return d, ext
@@ -605,6 +676,12 @@ class Generator:
         raw = None if self.is_bss(s) else self.elf.read(s.key, n)
         if raw is None:
             s.bss = True
+            if d is None or (d[0] == 'a' and d[2][0] == 's' and d[2][1] == 1):
+                # a runtime struct the C only declares as bytes (`extern u8 gPoolBuffers[]`, a
+                # GfxPool of pointers): host pointers can make it up to twice the N64 size
+                s.hsize = 2 * n
+                s.align = 8
+                self.bss_slack.append(s.name)
             return
         raw = raw.ljust(n, b'\0')
         if d is None:
@@ -614,7 +691,19 @@ class Generator:
         leaves(d, 0, 0, lv)
         img = bytearray(h)
         ptrs = []
+        gfx = is_gfx(d)
+        int_after = {lf[0]: lf[3] for lf in lv if lf[2] == 's' and lf[3] in (2, 4) and lf[5] != 'f'}
+        if gfx:
+            self.gfx_syms.append(s.name)
         for noff, hoff, kind, ns, hs, extra in lv:
+            if kind == 's' and gfx and noff % 8 == 4 and ns == 4:
+                # the w1 of a display-list command that carries an address: a host pointer
+                op = raw[noff - 4]
+                v = int.from_bytes(raw[noff:noff + 4], 'big')
+                if (op in GFX_ADDR_OPS or (op == 0xDB and raw[noff - 3] == 0x06)) and 0x80000000 <= v < 0x80800000:
+                    ptrs.append((hoff, v, None))
+                    self.gfx_relocs += 1
+                    continue
             if kind == 's':
                 v = raw[noff:noff + ns]
                 if len(v) < ns:
@@ -649,6 +738,13 @@ class Generator:
             elif kind == 'p':
                 v = int.from_bytes(raw[noff:noff + 4], 'big')
                 ptrs.append((hoff, v, extra))
+                # { T *items; s16/s32 count; } (MenuDesc): the count sizes the table
+                cnt = int_after.get(noff + 4)
+                if cnt is not None and isinstance(extra, str) and extra != 'F' and v != 0:
+                    c = int.from_bytes(raw[noff + 4:noff + 4 + cnt], 'big', signed=True)
+                    if 1 < c <= 256:
+                        k = phys(v)
+                        self.count_hint[k] = max(self.count_hint.get(k, 0), c)
         items = []
         last = 0
         for hoff, v, pointee in ptrs:
@@ -934,6 +1030,9 @@ class Generator:
         P('  bytes (no usable declaration): %d' % sum(1 for s in from_c if s.layout_desc is None))
         P('pointer targets generated in addition: %d' % (len(ss) - len(from_c)))
         P('bss (zero) symbols: %d' % sum(1 for s in ss if s.bss))
+        P("bss byte views given twice their N64 size (host pointers): %d" % len(self.bss_slack))
+        P("display lists: %d, w1 addresses relocated: %d" % (len(self.gfx_syms), self.gfx_relocs))
+        P("pointer targets typed as tables of their pointee: %d" % self.ptr_tables)
         P('aliases inside another symbol: %d' % sum(1 for s in ss if s.alias_of))
         np = sum(1 for s in ss for it in s.items if it[1] == 'P')
         P('pointer slots: %d (relocated %d, null %d, unresolved %d)' % (

@@ -4,6 +4,15 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 
+#ifdef TARGET_PORT /* the CScene fields this view reaches at N64 offsets (structs/world.h) */
+#include "structs/world.h"
+#define WORLD_TREE(w) (((CScene *)(w))->m_pBitSections2)
+#define WORLD_GROUP(w) (((CScene *)(w))->m_nLevel)
+#else
+#define WORLD_TREE(w) ((w)->tree)
+#define WORLD_GROUP(w) ((w)->group)
+#endif
+
 typedef struct CollisionBuildVertex {
     f32 x;
     f32 y;
@@ -110,7 +119,11 @@ void CScene__DecompressCollision(CollisionBuildWorld *world, CollisionBuildMeshH
         flist = CISet__GetBlock(node, 2);
         ntris = flist->count;
         chunk = CISet__GetBlockAndSize(node, 3, &size3);
+#ifdef TARGET_PORT /* host triangles (CGameRegion) are larger than 0x20 */
+        tableSize = ntris * sizeof(CollisionBuildTriangle) + 8;
+#else
         tableSize = (ntris << 5) | 8;
+#endif
         block = CCache__AllocateMemoryForDecompression(0, handle, size0 + 0x18 + size1 + tableSize + size3);
         if (block != 0) {
             offset = 0x18;
@@ -144,8 +157,8 @@ void CScene__DecompressCollision(CollisionBuildWorld *world, CollisionBuildMeshH
             for (j = 0; j < ntris; j++) {
                 tri = &tris[j];
                 CGameRegion__Unpack(tri, &face[j], verts, nverts, tris, ntris);
-                index = world->group;
-                group = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(world->tree, 0), index), 0);
+                index = WORLD_GROUP(world);
+                group = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(WORLD_TREE(world), 0), index), 0);
                 CISet__GetBlock(group, 0);
                 CISet__GetBlockSize(group, 1);
                 bits = CISet__GetBlock(group, 1);

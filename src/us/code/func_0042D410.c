@@ -22,6 +22,16 @@ extern void func_0026D230(void *list);
 extern void DList_AddTail(void *list, void *node);
 extern void SwooshSystem_Update(World *world);
 
+#ifdef TARGET_PORT
+/* The port, for now: the swoosh/effect system (gEngineApp_m_SwooshSystem, world below) is N64
+ * bytes whose pools and lists link their items through 4-byte words at N64 strides; it is not
+ * typed yet, so on the host it stays empty (no pools, empty lists, no swooshes or effect slots:
+ * spawning finds nothing free). docs/port/STATUS.md, crash table. */
+extern void *memset(void *, int, unsigned long);
+void func_0042D410(World *world) {
+    memset(world, 0, sizeof(World));
+}
+#else
 void func_0042D410(World *world) {
     s32 i;
 
@@ -41,3 +51,4 @@ void func_0042D410(World *world) {
     world->unk2580 = 0;
     SwooshSystem_Update(world);
 }
+#endif

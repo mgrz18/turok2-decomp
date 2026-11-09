@@ -163,3 +163,15 @@ That is exactly the "function-side remainder" (docs/port/BUILD.md). No data symb
 - q3: type the `*ModeTable` declarations (function pointers stored as `s32`), then rerun the
   generator.
 - Replace the ELF `.set` aliases with something Mach-O accepts before the macOS build.
+
+## Round 3 (r1): generator changes found by running the game
+
+| change | why | count on this tree |
+|---|---|---|
+| offset translation through a **union** prefers the member that types the offset (not the last one) | `CGame`'s `union { CCameraPool m_CameraPool[1]; struct { pad; u8 m_MenuPool[]; }; }` and `CEngineApp`'s `m_Game` / `m_Settings` union: aliases inside the camera pool landed in the pad | aliases now on the fields (`gEngineApp_m_Game_m_CameraPool` = `&gEngineApp.m_Game.m_CameraPool`) |
+| a union's data is laid out by a **scalar member as large as the union** when there is one (else the first member) | libultra's `du` (`{ struct { u32 hi, lo; } w; f64 d; }`): written by its words, a little-endian double had its halves swapped (`sinf`/`cosf` constants -> NaN) | all `du` constants |
+| a **.bss symbol declared only as bytes** gets twice its N64 size, 8-aligned | `extern u8 gPoolBuffers[]` is a GfxPool of pointers (0x20 N64, 0x40 host): `GfxPool_Alloc` overwrote the next symbol | 409 |
+| **static display lists**: in data typed `Gfx` (two `GfxWord`s), the w1 of G_VTX, G_MTX, G_MOVEMEM, G_DL, G_RDPHALF_1, G_SETTIMG/ZIMG/CIMG and G_MOVEWORD G_MW_SEGMENT with an RDRAM address becomes a host pointer | `gRspInitDL` loads the lights at 0x800AB0D8 | 10 lists, 4 addresses |
+| a **pointer target** of a record type is typed as a **table**: as many elements as the integer stored right after the pointer says (`{ T *items; s16 count; }`, MenuDesc), else as many as fit before the next symbol; never over a symbol the C declares (it keeps its type) | menu item tables were one typed `MenuItemDesc` followed by N64 bytes | 88 tables; pointer slots 2,621 -> 4,074 (relocated 2,487) |
+
+The report (`data_report.txt`) prints the three new counts.
