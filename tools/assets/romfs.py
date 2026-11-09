@@ -10,7 +10,7 @@ func_0020188C.c):
             entry i = bytes [offset[i], offset[i+1]) relative to the set start
             (offset[0] = 8 + 4*count rounded up to 8; offset[count] = set size)
     USet  = u32 elemSize; u32 count; count * elemSize bytes   (CUSet__*)
-    RNC   = 'RNC' + method ... (ProPack, see propack.py); a block whose callback
+    RNC   = 'RNC' + method ... (ProPack, see rnc.py); a block whose callback
             is ProPack__Decompress / Model_Decompress* / Texture_Decompress* etc.
             is stored compressed and expanded after the DMA.
 
@@ -55,7 +55,7 @@ import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import propack  # noqa: E402
+import rnc  # noqa: E402
 
 ASSET_START = 0x1E0000
 ASSET_END = 0x1FF7AEC
@@ -326,8 +326,8 @@ class RomFS:
         p = n._base
         if how == "raw" or size == 0:
             n.kind = "raw"
-        elif propack.is_rnc(buf, p) and size >= propack.HEADER_LEN:
-            h = propack.header(buf, p)
+        elif rnc.is_rnc(buf, p) and size >= rnc.HEADER_LEN:
+            h = rnc.header(buf, p)
             n.kind, n.compressed, n.method, n.unpacked_size = "rnc", True, h["method"], h["unpacked"]
         else:
             offs = parse_iset(buf, p, size, strict=(how != "iset"))
@@ -409,7 +409,7 @@ class RomFS:
         key = n.path
         b = self._blobs.get(key)
         if b is None:
-            b = propack.decompress(n._buf, n._base, verify)
+            b = rnc.decompress(n._buf, n._base, verify)
             self._blobs[key] = b
         return b
 

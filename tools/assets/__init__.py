@@ -2,7 +2,7 @@
 
     romid.py      identify the ROM (.z64/.v64/.n64 -> z64, SHA1 gate), asset roots
     romfs.py      the ROM filesystem: regions, cartridge index tree, load units, coverage
-    propack.py    RNC ProPack methods 1 and 2 (ProPackDecompress)
+    rnc.py        RNC ProPack methods 1 and 2 (ProPackDecompress), original code
     cache_calls.py  the CCache__Request call sites in the C (descriptions, callbacks)
     textures.py   texture banks + graphic sets (HUD, fonts, screens) -> PNG
     models.py     object geometry -> OBJ / glTF / PNG (posed through anim.py with --pose)

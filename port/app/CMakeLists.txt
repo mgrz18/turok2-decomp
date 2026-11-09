@@ -1,13 +1,12 @@
 # turok2: the host executable (skeleton). See docs/port/LIBULTRASHIP.md.
 add_library(t2asset STATIC
     ${T2_PORT_DIR}/assets/t2asset.c
-    ${T2_PORT_DIR}/third_party/rnc/rnc.c
+    ${T2_PORT_DIR}/assets/rnc.c
     ${T2_PORT_DIR}/third_party/miniz/miniz.c)
 target_include_directories(t2asset PUBLIC ${T2_PORT_DIR}/assets)
 # miniz must not export zlib names: LUS links libzip, which links the system zlib.
 target_compile_definitions(t2asset PRIVATE MINIZ_NO_ZLIB_COMPATIBLE_NAMES _LARGEFILE64_SOURCE)
-set_source_files_properties(${T2_PORT_DIR}/third_party/rnc/rnc.c ${T2_PORT_DIR}/third_party/miniz/miniz.c
-    PROPERTIES COMPILE_OPTIONS "-w")
+set_source_files_properties(${T2_PORT_DIR}/third_party/miniz/miniz.c PROPERTIES COMPILE_OPTIONS "-w")
 
 add_executable(turok2 main.cpp t2asset_lus.cpp testdl.c)
 set_target_properties(turok2 PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON C_STANDARD 11)

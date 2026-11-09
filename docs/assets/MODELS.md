@@ -14,9 +14,9 @@ material record). `--render` writes a 256x256 PNG from a small z-buffered softwa
 (`--textured` uses a preview texture decode, `--uvcheck` a checker per texture repeat).
 The whole set (2705 objects, glTF + OBJ) exports in about 15 s.
 
-Locating and decompressing go through `tools/assets/romfs.py` and `propack.py`
+Locating and decompressing go through `tools/assets/romfs.py` and `rnc.py`
 (`fs.children(fs.object(i))[1]` + `fs.blob`; `Rom` is a thin wrapper over them). The stand-in
-`rnc_min.py` of the first pass is gone (it matched `propack.decompress` on every geometry block).
+`rnc_min.py` of the first pass is gone (it matched the decompressor on every geometry block).
 Texture previews use `textures.py`'s decoder. `--pose` places the vertices of animated models at
 frame 0 of their animation 0 (`anim.parse_skeleton` / `parse_animation` / `pose` ->
 `apply_pose`); `extract_all.py` exports them that way. Posed models are Z-up (ANIMATION.md), so `--render`
@@ -161,7 +161,7 @@ ids used (9..1837).
 
 ## Verification
 
-* Decoding: every one of the 2705 geometry blocks decompresses (CRC-checked by a1's propack) and parses; every
+* Decoding: every one of the 2705 geometry blocks decompresses (CRC-checked by `rnc.py`) and parses; every
   LOD's vertex loads use up exactly its vertex list; every exported glTF's indices are in range.
 * Rendered (textured with a preview decode of the CI4/CI8 textures, frame 0): object 1 is an egg-shaped orb with
   a glowing vein texture; 13 is a dark metallic piece; 19 is a yellow object with a black/white

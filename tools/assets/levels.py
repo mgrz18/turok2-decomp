@@ -14,7 +14,7 @@ CScene__DecompressGridSection, CScene__DecompressAnimatedInstances, CScene__Deco
 CScene__DecompressLinks, CScene__FindWarpDests.  docs/assets/LEVELS.md describes the formats.
 
 Locating goes through tools/assets/romfs.py (fs.level(i), fs.cinema(i)) and RNC unpacking through
-propack.py; the parsers only see bytes.
+rnc.py; the parsers only see bytes.
 """
 import argparse
 import json
@@ -26,7 +26,7 @@ import sys
 import zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import propack  # noqa: E402
+import rnc  # noqa: E402
 import romfs  # noqa: E402
 
 # ---------------------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ def rom_set(rom, key):
 
 def unpack(blob):
     """ProPackDecompress semantics: RNC chunks are unpacked, raw blocks pass through."""
-    return propack.maybe_decompress(blob)
+    return rnc.maybe_decompress(blob)
 
 
 def _fs(rom):

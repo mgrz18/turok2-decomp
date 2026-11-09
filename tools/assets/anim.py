@@ -31,7 +31,7 @@ import sys
 import zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import propack  # noqa: E402  (tools/assets/propack.py, part a1)
+import rnc  # noqa: E402  (tools/assets/rnc.py)
 
 # ----------------------------------------------------------------------------------------------
 # Locating: tools/assets/romfs.py (cartridge index -> objects index -> object), kept apart from
@@ -80,7 +80,7 @@ def is_animated(rom, obj_off):
 
 def unpack(rom, off, size):
     """ProPackDecompress: RNC -> unpacked bytes, otherwise the raw bytes."""
-    return propack.maybe_decompress(rom, off, size)
+    return rnc.maybe_decompress(rom, off, size)
 
 
 # Action ids (anim object info block 1) as the enemy AI picks them: the m_Anim column of the
