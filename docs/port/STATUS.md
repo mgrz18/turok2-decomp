@@ -117,3 +117,28 @@ so `--draw` (q4's GBI is in) has nothing to show yet.
    the `*ModeTable` integers that hold function addresses (type them, rerun gendata).
 5. Remaining 64-bit work (64BIT.md part 2): 1,064 mismatched declarations, ~3,000
    pointer-width warnings; each fix above was found by running, the audit lists the rest.
+
+## Round 3, part r4: audio on the host
+
+Details: [AUDIO.md](AUDIO.md). Behind `--audio` (off by default: runs without it are unchanged).
+
+- Sound bank (ROM 0x1E0000) rebuilt as host libaudio structs (2 bank files, 34 instruments,
+  1,115 sounds, 866 wave tables), sound data file swapped to host order (or left alone when it
+  already is: r2's archive path), host audio manager (one 368-sample frame per retrace), an ABI1
+  interpreter for all 16 commands, AI queue -> LUS `AudioPlayerPlayFrame` (game.cpp).
+- `t2audio_test --direct K` + `tools/port/audio_compare.py`: a sound effect through
+  LOADADPCM/LOADBUFF/ADPCM/RESAMPLE/ENVMIXER/INTERLEAVE/SAVEBUFF equals audio.py's VADPCM decode
+  with **0** difference (sfx 0: 6,704 samples, sfx 40: 1,088).
+- Game path: `Sound__Initialize` (`CAudioWorld__Initialize`) completes on the host; the first
+  audio frame spins in `_sndpVoiceHandler` because `gAudioWorld.player.evtq` is corrupted
+  (open, AUDIO.md §4). `turok2 --game --audio` stops at the same `CCameraPool__Construct` crash
+  as without `--audio`.
+
+| # | where | cause | fix |
+|---|---|---|---|
+| A1 | `alCSPNew` from `SndSeq_Construct` | `AudioStateD844`/`AudioRootD844` views: heap at N64 offset 0x1DA8 | `SndSeq_Construct` typed with `SndSeq`/`CAudioWorld` (`TARGET_PORT`), `SndSeq.csp` as `sptr`, `alCSPNew` sizes by `sizeof` |
+| A2 | (heap) | `alHeapInit`/`alHeapDBAlloc` 32-bit views of `ALHeap` | host layout, `uptr` (`TARGET_PORT`) |
+| A3 | `alSndpAllocate` | `PoolRecAt44`/`SlotRecAt2F` views | the 10 sound player API calls typed in port/audio/t2audio_sndp.c (files out of the link) |
+| A4 | `alEvtqPostEvent` | `alEvtqNew`/`alEvtqNextEvent` 0x1C strides, s32 links | typed (`TARGET_PORT`) |
+| A5 | `osRecvMesg` from `CAudioWorld__Lock` | lock at `arg0 + 0x110` | `&arg0->lock` (matches) |
+| A6 | `_sndpVoiceHandler` spins | `gAudioWorld.player.evtq` overwritten with stack-like data | **open** (AUDIO.md §4) |

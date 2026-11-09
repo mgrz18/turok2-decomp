@@ -131,6 +131,7 @@ struct Args {
     bool window = true;
     bool game = false;
     bool draw = false;
+    bool audio = false;
     bool verbose = false;
 #ifdef T2_LOW_MEMORY_DEFAULT
     bool lowMemory = true;
@@ -157,13 +158,15 @@ Args ParseArgs(int argc, char** argv) {
             a.game = true;
         } else if (s == "--draw") {
             a.draw = true;
+        } else if (s == "--audio") {
+            a.audio = true;
         } else if (s == "--verbose") {
             a.verbose = true;
         } else if (s == "--high-memory") {
             a.lowMemory = false;
         } else {
             fprintf(stderr, "usage: %s [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]\n"
-                            "          [--game [--draw] [--verbose] [--high-memory]]\n",
+                            "          [--game [--draw] [--audio] [--verbose] [--high-memory]]\n",
                     argv[0]);
             exit(2);
         }
@@ -388,6 +391,7 @@ int main(int argc, char** argv) {
         g.rom = args.rom;
         g.frames = args.frames;
         g.draw = args.draw;
+        g.audio = args.audio;
         g.lowMemory = args.lowMemory;
         g.verbose = args.verbose;
         CHECK(T2Game_Run(window, g) == 0, "game run");

@@ -2,8 +2,10 @@
  *
  *   t2audio_bank.c  the sound bank (ROM 0x1E0000, two libaudio "B1" bank files whose pointers
  *                   are relative to the VM address 0x480000) as host structs with host
- *                   pointers in host byte order, and the sound data file (ROM 0xBE1814)
- *                   byte-swapped in place for the host;
+ *                   pointers in host byte order (read from the ROM image itself, so it does
+ *                   not matter whether VM_Alloc/T2Asset return the ctl unit swapped or not),
+ *                   and the sound data file (ROM 0xBE1814) byte-swapped in place unless it
+ *                   already arrives in host order;
  *   t2audio_mgr.c   the audio manager (the SDK audiomgr.c pattern: amCreateAudioMgr, __amMain,
  *                   __amHandleFrameMsg, __amDmaNew, __amDMA) for the host: one synthesizer
  *                   frame per retrace, run through the ABI1 interpreter, handed to the AI;
@@ -35,7 +37,11 @@ const T2AudioCtl *T2Audio_LoadCtl(void);
  * Returns the number of 16/32-bit words swapped, -1 if the layout is not recognized. */
 long T2Audio_SwapSoundData(uint8_t *p, size_t size);
 
-/* VM_Alloc's host hook: fixes up a resident copy of a ROM region that the audio code reads. */
+/* 1 if the sound data file at p is already in host order (r2's archive path swaps it) */
+int T2Audio_SoundDataIsHostOrder(const uint8_t *p, size_t size);
+
+/* VM_Alloc's host hook: fixes up a resident copy of a ROM region the audio code reads (a no-op
+ * for a copy that already arrives in host order). */
 void T2Audio_FixRegion(uint32_t romAddr, uint8_t *p, size_t size);
 
 /* The wave table data: ROM offset (gAudioRomBase + wave base) -> host bytes. */

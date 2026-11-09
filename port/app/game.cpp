@@ -16,6 +16,7 @@
 
 extern "C" {
 #include "t2port.h"
+#include "t2audio.h"
 }
 
 #include "game.h"
@@ -60,6 +61,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     cfg.romPath = args.rom.empty() ? nullptr : args.rom.c_str();
     cfg.lowMemory = args.lowMemory;
     cfg.verbose = args.verbose;
+    cfg.audio = args.audio;
     if (T2Port_Boot(&cfg) != 0) {
         return 1;
     }
@@ -73,6 +75,15 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             window->HandleEvents();
         }
         T2Port_Frame();
+        if (args.audio) {
+            // the frames the audio manager produced this retrace (22050 Hz stereo s16) to LUS's
+            // AudioPlayer (a no-op when it has no audio backend, e.g. headless)
+            static int16_t pcm[4096 * 2];
+            size_t n = T2Audio_TakeSamples(pcm, 4096);
+            if (n > 0) {
+                AudioPlayerPlayFrame(reinterpret_cast<const uint8_t*>(pcm), n * 4);
+            }
+        }
         T2PortTask task;
         if (T2Port_TakeGfxTask(&task) && args.draw && window && task.dataPtr != nullptr) {
             // Only with --draw: the game's display lists are not host-correct yet (GBI words

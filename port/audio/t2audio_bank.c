@@ -499,7 +499,22 @@ long T2Audio_SwapSoundData(uint8_t *p, size_t size) {
     return sSwapped;
 }
 
+/* The sound data file's first word is its top ISet's count, 2: read natively it tells whether
+ * the copy is still big-endian (VM_Alloc's ROM copy) or already in host order (the archive
+ * path, whose swap plan, tools/assets/swap_spec.json "sound data file", did the same job). */
+int T2Audio_SoundDataIsHostOrder(const uint8_t *p, size_t size) {
+    u32 w;
+    if (size < 4)
+        return 0;
+    memcpy(&w, p, 4);
+    return w == 2 && !(p[0] == 0 && p[3] == 2);
+}
+
 void T2Audio_FixRegion(uint32_t romAddr, uint8_t *p, size_t size) {
+    if (romAddr == SOUND_DATA_ROM && T2Audio_Enabled() && T2Audio_SoundDataIsHostOrder(p, size)) {
+        fprintf(stderr, "t2audio: sound data file already in host order\n");
+        return;
+    }
     if (romAddr == SOUND_DATA_ROM && T2Audio_Enabled()) {
         long n = T2Audio_SwapSoundData(p, size);
         fprintf(stderr, "t2audio: sound data file (ROM %X, %zu bytes): %ld words swapped to host order\n", romAddr,
