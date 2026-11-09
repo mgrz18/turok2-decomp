@@ -9,6 +9,7 @@
 # Pieces live in port/cmake/*.cmake so they merge independently:
 #   game.cmake          turok2_game (docs/port/BUILD.md)
 #   libultraship.cmake  libultraship pin + app/ (docs/port/LIBULTRASHIP.md)
+#   data.cmake          turok2_data, the generated game data (docs/port/DATA.md)
 cmake_minimum_required(VERSION 3.24)  # libultraship needs 3.24
 project(turok2_port LANGUAGES C CXX)
 
@@ -18,6 +19,7 @@ set(T2_REPO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 option(T2_BUILD_GAME_LIB "Build turok2_game (the game C, host static library)" ON)
 if(T2_BUILD_GAME_LIB)
     include(cmake/game.cmake)
+    include(cmake/data.cmake)
 endif()
 
 option(T2_BUILD_EXE "Build the turok2 executable (links libultraship)" ON)
