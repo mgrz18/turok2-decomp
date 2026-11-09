@@ -1,14 +1,19 @@
-# Port status after Phase 7 round 2 (merged state)
+# Port status after Phase 7 round 3 (merged state)
 
-Round 2 merged five parts and then integrated them: q1 (clean-room RNC), q4 (host-sized GBI),
-q3 (`sptr`/`uptr`, canonical prototypes), q2 (the game data generated as C) and q5 (the game
-linked into `turok2`, t2_ names, runtime, placeholders). This page says how to build and run
-the result, how far `turok2 --game` gets and what stops it. Details per part:
-[DATA.md](DATA.md) (q2), [LINK.md](LINK.md) (q5), [64BIT.md](64BIT.md) (q3), [GBI.md](GBI.md)
-(q4), [../assets/ARCHIVE.md](../assets/ARCHIVE.md) (q1's RNC).
+Round 3 merged five branches, in this order: r2 (archive format 2.0, the loader through the
+archive in host byte order), r1 (the boot runner to mode 0), r3 (the 64-bit typing sweep), r5
+(macOS arm64) and r4 (audio behind `--audio`). Then it fixed what the merge broke and followed
+the black frame to the text and the menu. This page says how to build and run the result, how
+far `turok2 --game` gets, what stopped it on the way (one table for the whole round) and what
+comes next. The part sections further down keep each branch's own notes. Details:
+[DATA.md](DATA.md) (gendata), [64BIT.md](64BIT.md) (part 2: retype.py), [AUDIO.md](AUDIO.md),
+[MACOS.md](MACOS.md), [RUNTIME.md](RUNTIME.md) (13: the typed scheduler),
+[../assets/PORT.md](../assets/PORT.md) 10.4/10.6 and [../assets/ARCHIVE.md](../assets/ARCHIVE.md)
+(`t2/swap`).
 
-The matching build is unchanged: `tools/asm_diff.py --base 55932a88` reports 0 differences over
-all 3,938 files, and a clean `make build` + `make verify` gives the identical ROM.
+The matching build is unchanged. `tools/asm_diff.py --base 3798e01e -j 8` reports 0 differences
+over all 3,938 files after every merge and fix. A clean `make clean && make build && make verify`
+gives the identical ROM (CRCs good, 123 shared .rodata objects agree).
 
 ## 1. Build and run (Linux x86_64, the box)
 
@@ -16,50 +21,142 @@ all 3,938 files, and a clean `make build` + `make verify` gives the identical RO
 # 0. the matching build first: gendata reads its ELF (build/turok2.us.elf)
 make setup && make -j8 build && make verify
 
-# 1. the archive (sha1 bb77f744594dd036be4d6738eecbb6f1ef25d8fc with Python 3.13 / zlib 1.3.1)
+# 1. the archive, format 2.0 (t2/swap byte-swap plans); the port refuses 1.x archives
+#    (sha1 99cbe76733bfab1d7235e4894cec2b91be3965f7 with zlib 1.3.1, any -j)
 python tools/assets/mkarchive.py baserom.us.z64 -o OUT/turok2.o2r -j 4
+python tools/assets/archive_check.py OUT/turok2.o2r baserom.us.z64     # OK, format 2.0
 
-# 2. configure; build the game library (gendata needs its compile_commands.json and objects)
+# 2. configure; build the game library AND the runtime/audio libraries: gendata reads the
+#    undefined symbols of all three (t2audio_mgr.c reads gAudioFrameSize, gAudioGlobals, ...)
 cmake -S port -B OUT/build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
       -DCMAKE_BUILD_TYPE=Debug
-ninja -C OUT/build -j8 turok2_game
+ninja -C OUT/build -j8 turok2_game t2runtime t2audio
 
-# 3. the game data as C, into port/gen/ (gitignored: ROM content); libclang 19 python bindings
-pip install clang==19.1.7                 # in .venv; libclang from /usr/lib/llvm-19
+# 3. the game data as C, into port/gen/ (gitignored: ROM content); libclang 19 python bindings.
+#    Drop the cache whenever a header changes (it holds the types): sizes and aliases follow them.
+rm -f OUT/decls.json
 python3 tools/port/gendata.py --build OUT/build --cache OUT/decls.json -j 4
-#    (about 40 s with 4 workers; drop the cache file whenever a header changes: it holds types)
 
 # 4. re-run cmake so data.cmake sees port/gen/*.c, then the executable
 cmake OUT/build && ninja -C OUT/build -j8 turok2
 
-# 5. run headless (T2_LOW_MEMORY is the Linux default: non-PIE + game memory below 2 GB)
-SDL_VIDEODRIVER=offscreen gdb -batch -ex run -ex "bt 30" -ex "thread apply all bt 8" \
+# 5. run headless and draw (SDL's offscreen driver: no window; --no-window would skip Fast3D)
+SDL_VIDEODRIVER=offscreen T2_SHOT=OUT/frame.ppm gdb -batch -ex run -ex "bt 30" \
     --args OUT/build/app/turok2 --archive OUT/turok2.o2r --rom baserom.us.z64 \
-    --game --no-window --frames 120
+    --game --draw --frames 300            # add --audio for the sound world (section 2)
 ```
 
-`turok2` links `t2runtime` + `turok2_game` + `turok2_data` as one rescanned group, then
-`t2placeholders`. With the generated data the placeholders shrink from 597 to **1**
-(`osResetType`, which only `T2Port_Boot` writes); regenerate them with the procedure in
-`tools/port/genplaceholders.py` after the data changes. The 32 asm-only functions q2 listed are
-all covered: `RNC_UnpackMethod1/2` call `Rnc_Unpack` (port/assets/rnc.c, header-driven: the
-size arguments are big-endian ROM words read natively), the rest are t2os / t2ultra under the
-t2_ names, `sqrtf` and `sprintf` are in t2boot.c, `memcpy` is libc.
+`T2_SHOT=<file.ppm>` writes the last frame Fast3D drew (640x480). `T2_DLDUMP=1` prints the last
+display list; it is read after the run, when the game may already be filling that buffer again,
+so trust a breakpoint over it for single commands.
 
-Generated data on this tree (`gendata.py` report): 1,562 data symbols that module-1 C needs
-(1,555 typed from a C declaration, 7 as bytes), 277 extra pointer targets, 782 .bss symbols,
-226 aliases, 2,624 pointer slots (1,479 relocated, 742 null in the ROM, 403 unresolved and set
-to NULL), 388 functions referenced from data (all defined by the game C), 1.22 MB.
-
-Two integration fixes were needed for that:
-- `CMAKE_EXPORT_COMPILE_COMMANDS` moved to `port/CMakeLists.txt`, before `turok2_game` exists.
-  In `data.cmake` (included after `game.cmake`) it missed every game target, so gendata found
-  no compile command and typed nothing (0 of 1,562, all as bytes).
-- `__osCurrentTime` is defined by libultraship's `os.cpp` too (multiple definition): the game
-  names it `t2___osCurrentTime` (`port/include/t2_rename.h`, new data block) and gendata
-  generates `t2_X` data from the N64 symbol `X` (`#define X t2_X` at the top of each file).
+gendata on this tree: 1,545 data symbols that module-1 C and the runtime need (1,539 typed from
+a C declaration), 393 zero .bss symbols (29 byte views doubled for host pointers), 3,794
+pointer slots (2,770 relocated, 994 null in the ROM, 30 unresolved).
 
 ## 2. How far `turok2 --game` gets
+
+```
+t2: boot: arena 32 MB at 0x40200000 (low memory), ROM baserom.us.z64, mainproc started (pri 13)
+game: booted, 300 frames
+t2: Sound__Initialize: audio off (run with --audio)
+t2: __osSiRawStartDma: PIF not modelled (no Controller Pak yet)
+game: 300 frames in 2.78 s, 1414 thread switches, 151 gfx tasks (151 drawn), 0 audio tasks,
+      0 PI DMAs, 0 missing-function calls
+OK (0 failed checks)
+```
+
+Boot -> `CEngineApp__Main` -> the engine, camera pool, player pool, `CScene__Construct` and
+`CScene__LoadLevel(0)` -> mode 17 -> **mode 0 (pak check)**, which draws every retrace through the
+game's scheduler into Fast3D: 300 frames, 151 display lists drawn, no crash.
+
+What the frames show now (they were black with a 4-pixel red bar at the end of r1):
+- frames up to ~120: **"ACCESSING THE / CONTROLLER PAK"** in the game's small font, beige,
+  centred at the right place on the 480x360 screen;
+- from frame ~120, the timer opens the pak menu (`gPakSaveGameAnyPakMenuDesc`, then
+  `gDamagedPakAtBootMenuDesc`, because no Controller Pak is modelled): the menu's **background
+  image** (the reptile-scale texture, full screen, darker bands at top and bottom) and the
+  **red highlight bar** of the selected line, centred. The menu lines themselves draw no
+  glyphs yet (below).
+
+With `--audio`: the sound bank is converted (2 bank files, 34 instruments, 1,115 sounds, 866
+wave tables), the sound data file arrives in host order through the archive (the audio hook
+sees that and leaves it alone), the audio manager starts. Mode 17's `Sound__StopAllExcept` now
+works (the voice pool and request queue typed, rows I5/I6). It then stops in
+`SndQueue_CancelHandle` from `CAudioWorld__StopHandle` <- `Sound__Stop` <- `LoopSounds_StopAll`
+<- `CScene__LoadLevel` (mode 0's init): `CAudioWorld__StopHandle` reaches the queue through the
+Rage Wars `ContextRecAt2BC0` view of `CAudioWorld` at N64 offsets.
+
+macOS arm64 (r5, [MACOS.md](MACOS.md)): the whole port builds and the tests pass. The game runs
+headless with full 64-bit pointers (a low-memory mode is impossible there). With r1+r3+r5 it gets
+past the camera pool and stops in `Model_Decompress` -> `Material_Unpack` (section 4).
+
+## 3. Crash and fix table (round 3, all parts)
+
+Rows r1-* and r4-* were found on the branches; I-* during the merge (C18). Every fix is under
+`TARGET_PORT` or in a port-only file, asm_diff 0.
+
+| # | where | cause | fix |
+|---|---|---|---|
+| r1-1 | `CScene__GetRegionInfo` via `CCamera__AdvanceAttributes` | `CEngineApp`/`CGame` held the scene, camera pool, onscreen as N64-sized bytes | `structs/game.h` under TARGET_PORT: typed one-element-array members; literal CEngineApp/CGame offsets by `T2_OFFSETOF` |
+| r1-2 | same | gendata translated offsets inside a union through its last member | a union prefers the member that types the offset |
+| r1-3 | `CCamera__AdvanceAttributes` | `CCameraViewParams__Construct` wrote through a 4-byte-pointer view | host body |
+| r1-4 | `Math_AcosLookup(NaN)` | libultra's `du` doubles generated by their words | gendata: a union's whole-size scalar member lays out the data |
+| r1-5 | `CHeap__Free(NULL)` | `gPoolBuffers` generated at its N64 0x20 bytes | gendata doubles byte-only .bss; `CCache__AllocateAt` through `CMemEntry` |
+| r1-6/7 | player / loader lists | link offsets 0x131C/0x1320, 0x18/0x1C | `T2_OFFSETOF`; host `PlayerList` |
+| r1-8 | `CCache__DetachCacheEntry`, `__FreeCacheEntry` | m2c offsets | typed bodies |
+| r1-9 | `CCache__LoadPersistantIndex` | `s32 cart` received a pointer | `sptr cart` |
+| r1-10 | `Model_Decompress` | decompression blocks written at N64 offsets | r2's typed `CCache__AllocDecompressFlags` |
+| r1-11 | `SwooshSystem_UpdateSwooshes` | swoosh/effect system as N64 bytes | **stub** (left empty on the host) |
+| r1-12/13 | CScene views, `CGameObjectInstance__SetupAnimation` | N64 offsets, region stride | by field / typed |
+| r1-14 | `__scMain(sc=NULL)` | scheduler views overran on LP64 | `port/game/t2sched.c` (17 functions typed, originals out of the link) |
+| r1-15 | `SndVoicePool_*` from `Sound__StopAllExcept` | no sound bank | `Sound__*` return early while `gAudioWorld.bank` is NULL (they stay: they only fire without `--audio`) |
+| r1-16/17 | delayed level events, actor lists | bytes / m2c offsets | typed |
+| r1-18 | `CCameraPool__AdvanceText` | camera text/shake/emitter lists, sky system | links by `T2_OFFSETOF`, `CEmitterPool m_SkySystem[1]` |
+| r1-19/20 | Fast3D `G_MOVEMEM` | `DlCmd` 32-bit words; static display lists with N64 addresses | `DlCmd` host words; gendata relocates w1 in static lists |
+| r1-21 | `Menu_Construct` & co. | menu sizes, links, desc tables, desc text addresses | `MENU_SIZE`...; pointer-target tables; `t2_n64_to_host` |
+| r4-A1..A5 | `alCSPNew`, heap, `alSndpAllocate`, `alEvtqPostEvent`, `CAudioWorld__Lock` | views at N64 offsets | typed (AUDIO.md) |
+| r4-A6 | `_sndpVoiceHandler` spins | `player.evtq` overwritten | open on r4; not reached now (I6 stops first) |
+| I1 | link: `gAudioFrameSize`, `gAudioGlobals`, `gAudioMaxRSPCmds` undefined | r4's audio manager files left the game library, so gendata no longer saw these names | gendata also reads `libt2runtime.a`/`libt2audio.a`'s undefined data names (build them before gendata) |
+| I2 | merge r1+r3 does not compile | r3's `sptr` prototypes vs r1's `s32` port bodies | r3's prototypes kept, r1's bodies adapted (`CCache__AllocateAt`, `..ForDecompression[Top]`, `Sound__Play`/`SetListener` with the guard, `MenuPool_Construct`) |
+| I3 | `VM_Alloc` (r2 vs r4) | r2 reads the unit through the archive in host order; r4 copied ROM bytes and swapped | r2's `T2Port_AssetWindow` + r4's `T2Audio_FixRegion` (detects host order) |
+| I4 | pak menu lines measured 0 wide | the menu strings (`D_800B50C0` "damaged controller pak found in" ...) are address-only labels (SHN_ABS) in `.code_rodata`; gendata made every SHN_ABS symbol zero .bss | gendata reads SHN_ABS labels inside `.code_rodata`/`.code_rodata_tail` as data (`ABS_DATA_SECTIONS`) |
+| I5 | `--audio`: `SndVoicePool_StopAllExcept` (mode 17) | Rage Wars views of the voice pool (0xCC-byte slots, 4-byte owner) | `SndVoicePool_Construct`, `SndVoicePool_StopAllExcept` typed on `SndVoicePool`/`SndVoice` |
+| I6 | `--audio`: `SndQueue_CancelHandle` | the same for the request queue | `SndQueue_Construct` and `SndQueue_Cancel{AllExcept,Handle,SoundId,Owner,Flags}` typed on `SndQueue`; now stops in `CAudioWorld__StopHandle` (open) |
+| I7 | no text, no font texture | `CScene__LoadGraphicSet` read the scene through an N64-offset view (0x1C, 0x48, 0x7C): the font graphic set was never found, `sOnScreenFontTexture` stayed NULL | typed on `CScene` (`m_GraphicSetsKey`, `m_pGraphicSets`, `m_pGraphicSetTypes`) |
+| I8 | texture rectangles of size 0, black text | `COnScreen__DrawString`/`DrawText` read colours, scale and spacing through `FontStyle { u8 pad0[0xA0]; ... }` | pad by `T2_OFFSETOF(COnScreen, m_TopR)` |
+| I9 | wrong glyphs ("!## 33)" for "access") | `COnScreen__Construct` built the character tables through a `Hud` view at N64 offsets (0xC8/0x148) | typed on `COnScreen` (`m_CharacterSmallLookUpPos`, +0x80) |
+| I10 | everything drawn 1.5x too large, off to the right | Fast3D's native size is 320x240; the game draws at 480x360 | `game.cpp` sets the interpreter's native size from `gScreenWidth`/`gScreenHeight` before each frame |
+| I11 | menu at the left edge, no background | `MenuPool_GetCamera` = pool - 0x53C (N64 `offsetof(CCamera, m_MenuPool)`): the menu's camera and viewport were 44 bytes into the camera | `pool - T2_OFFSETOF(CCamera, m_MenuPool)` (`sptr`) |
+
+## 4. Next
+
+1. **The pak menu's lines.** They are laid out and highlighted but draw no glyphs: the items of
+   `gDamagedPakAtBootMenuDesc` reach `MenuItem_DrawString` with `text` pointing into the desc
+   table itself (`D_0043BF18 + 0x38`, an empty string), while the first menu's items map their
+   N64 text addresses correctly (`t2_n64_to_host`). Follow the item text of this desc (its update
+   callbacks `DamagedPakMenu_UpdateLine1/2` and the `data` words of the .virtual desc table).
+2. **Controller Pak / input**: `__osSiRawStartDma` is not modelled, so the game always sees a
+   damaged pak and never gets past mode 0. Model the PIF (controllers, then a pak file) to reach
+   the title screen.
+3. **Audio**: `CAudioWorld__StopHandle` and the rest of the `CAudioWorld` API (about 40 functions:
+   `SndVoicePool_*`, `SndVoice_*`, `SndQueue_RequeueVoice`) go through Rage Wars views of
+   `CAudioWorld` at N64 offsets (`ContextRecAt2BC0`, `RecordCode8025A3EC`, ...). Type them on
+   `CAudioWorld`/`SndVoicePool`/`SndQueue` as I5/I6 did; then r4's open `evtq` corruption.
+4. **macOS** (full 64-bit, r5 found on r1+r3+r5): `Material_Unpack` (func_00207914) writes the
+   texture handle into `Material.texture` (an `s32` inside the model block) and `texture + 4`:
+   needs a host-typed `Material` or a side table. Then five more truncations listed in
+   [MACOS.md](MACOS.md) (decompress callbacks with `s32` arguments, the
+   `LoadPersistantSubBlock` callback argument, the CAI view in `DeallocateInternal`,
+   `LoadBitSections` with an `s32` destination; r3's e9b1dfcc covers part of these: re-check).
+5. The swoosh/effect system (CEngineApp 0x19608-0x22BA0, r1-11) typed instead of left empty.
+6. 64-bit: 1,727 pointer-width warnings, **1,019 truncating** (`retype.py --dry --rules ""` on
+   this tree; 2,828 before r3), 999 disagreeing declarations. Each crash above was one of them.
+
+## Round 2 (history)
+
+
+### How far `turok2 --game` got after round 2
 
 ```
 t2: boot: arena 32 MB at 0x40200000 (low memory), ROM baserom.us.z64, mainproc started (pri 13)
@@ -85,7 +182,7 @@ sound bank is skipped) -> `CCameraPool__Construct` -> the main camera's first `A
 it stops. Mode: none yet (`CEngineApp__SetMode(0)` comes after the pools); 0 frames drawn,
 so `--draw` (q4's GBI is in) has nothing to show yet.
 
-## 3. Crash log (this round)
+### Crash log (round 2)
 
 | # | where | cause | fix |
 |---|---|---|---|
@@ -99,7 +196,7 @@ so `--draw` (q4's GBI is in) has nothing to show yet.
 | 8 | `CCameraPool__Construct` (func_0042FE4C) | local m2c struct with pads at N64 offsets, `memset(0x11F0)` | typed with `CCameraPool` (structs/camera.h), list links at 0 and `sizeof(void *)` (matches) |
 | 9 | `CScene__GetRegionInfo` via `CCamera__AdvanceAttributes` | `cam->m_ViewParams.m_pCurrentRegion` is garbage: `CEngineApp`/`CGame` keep the camera pool, the scene and other parts as **byte arrays of N64 size** (structs/game.h), so on the host the typed `CCameraPool` (larger) overruns its slot, and the alias symbols (`gEngineApp_m_Game_m_CameraPool`, ...) disagree with `e->m_Game.m_CameraPool` (pool at `...m_ActiveList_m_pHead+4`, not even 8-aligned) | **open**, next round (below) |
 
-## 4. What the next round needs
+### What round 3 was given to do
 
 1. **`gEngineApp` host layout.** `CEngineApp` and `CGame` (structs/game.h) hold `CScene`,
    `CCameraPool`, the menu pool and more as `u8[N64 size]`, and `CGameFromCameraPool` views the
@@ -168,7 +265,7 @@ Branch `names-R3_r1` (merges r2's `names-R3_r2` at 691aad0a for the loader). Eve
 `tools/asm_diff.py --base 3798e01e -j 8` = **3938 files, 0 differ**; `check_structs.py` on
 game.h, camera.h, world.h, frame.h, sched.h: 0 wrong.
 
-### Where it is now
+### Where it was at the end of r1
 
 ```
 SDL_VIDEODRIVER=offscreen T2_SHOT=out.ppm build/app/turok2 --archive <r2's format-2 turok2.o2r> \

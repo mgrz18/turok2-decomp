@@ -175,3 +175,10 @@ That is exactly the "function-side remainder" (docs/port/BUILD.md). No data symb
 | a **pointer target** of a record type is typed as a **table**: as many elements as the integer stored right after the pointer says (`{ T *items; s16 count; }`, MenuDesc), else as many as fit before the next symbol; never over a symbol the C declares (it keeps its type) | menu item tables were one typed `MenuItemDesc` followed by N64 bytes | 88 tables; pointer slots 2,621 -> 4,074 (relocated 2,487) |
 
 The report (`data_report.txt`) prints the three new counts.
+
+## Round 3 merge: two more generator changes
+
+| change | why | effect on this tree |
+|---|---|---|
+| the **undefined data names of `libt2runtime.a` and `libt2audio.a`** are needed too (build `t2runtime t2audio` before the generator; it says so when they are missing) | r4 moved the SDK audio manager to `port/audio/t2audio_mgr.c`, out of the game library; its `gAudioFrameSize`, `gAudioGlobals`, `gAudioMaxRSPCmds` were no longer generated and the link failed | 1,545 needed symbols |
+| an **address-only label (SHN_ABS) inside `.code_rodata` / `.code_rodata_tail`** is read as data (`ABS_DATA_SECTIONS`); elsewhere SHN_ABS stays .bss as before | the pak menu strings (`D_800B50C0` "damaged controller pak found in", ...) come from `undefined_syms_auto` with no section: they were zero .bss, so every menu line measured 0 wide | 393 zero .bss symbols left |
