@@ -141,8 +141,13 @@ That is exactly the "function-side remainder" (docs/port/BUILD.md). No data symb
   declared size runs past the zero words into the next labels' bytes (strings, code). They are
   runtime state, probably .bss in Acclaim's layout. They are written as NULL. The right fix is
   to mark such symbols bss: they are zero at boot, or the game initializes them.
-- **Int slots that carry addresses** are not counted yet. A next step is to report every s32/u32
-  leaf whose value resolves to a symbol: that list is a worklist for q3's typing.
+- **Integer slots that carry addresses**: the report lists 331 in 85 symbols whose value looks
+  like an address (KSEG0 RAM, the engine window or module 1) and falls on a known symbol. These
+  are kept as the N64 handle. The list is q3's worklist: `osViModeTable` (56: VI register words
+  and framebuffer addresses; those are not real pointers), `gEnemyGroundModeTable` (37),
+  `sWeaponActorModeTable` (31), `sPrimagenModeTable` (21), the other boss and platform
+  `*ModeTable`s (function pointers declared as `s32`), `sCheatCodes` (12) and `gAudioWorld` (11).
+  Typing them in `src/` and rerunning turns them into real pointers.
 - **Aliases on Mach-O/COFF**: see point 7 above.
 - **Module 2** is skipped entirely, as the task asked: no `.virtual_1` data and no objects.
 - The `void *` slots are host pointers, so the data cannot be written back as N64 bytes. Nothing
@@ -155,5 +160,6 @@ That is exactly the "function-side remainder" (docs/port/BUILD.md). No data symb
 - q5: link `turok2_data` into `turok2`, together with the host stubs for the 32 functions above
   (`RNC_*` from q1). Run to the first crash.
 - Mark the runtime structs above as bss: an option in the generator, or a list in the tool.
-- Emit the "int leaf holds an address" list for q3, and rerun after each q3 typing batch.
+- q3: type the `*ModeTable` declarations (function pointers stored as `s32`), then rerun the
+  generator.
 - Replace the ELF `.set` aliases with something Mach-O accepts before the macOS build.

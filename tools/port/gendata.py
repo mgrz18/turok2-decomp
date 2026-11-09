@@ -505,6 +505,7 @@ class Generator:
         self.unresolved_ex = {}
         self.func_refs = set()
         self.ext_funcs = set()
+        self.int_addr = collections.Counter()  # integer leaves that hold an address
 
     # -- choosing a type --------------------------------------------------
     def pick(self, name, ds):
@@ -607,6 +608,11 @@ class Generator:
                 v = raw[noff:noff + ns]
                 if len(v) < ns:
                     continue
+                if ns == 4 and extra != 'f':
+                    iv = int.from_bytes(v, 'big')
+                    if (0x80000400 <= iv < 0x80400000 or 0x00200500 <= iv < 0x002C3000
+                            or 0x00400000 <= iv < 0x0043CC14) and self.elf.containing(phys(iv)) is not None:
+                        self.int_addr[s.name] += 1
                 if extra == 'f' or ns == hs:
                     img[hoff:hoff + hs] = v[::-1] if ns > 1 else v
                 else:  # int widened (long): sign/zero extend
@@ -932,9 +938,14 @@ class Generator:
         for n, c in self.unresolved.most_common():
             P('  %s: %d (e.g. %s)' % (n, c, self.unresolved_ex[n]))
         P('== aliases (ELF .set; a separate copy elsewhere): %d' % len(self.alias_nonelf))
+        P('== integer slots whose value looks like an address (kept as the N64 handle;'
+          ' candidates for pointer typing in src/): %d in %d symbols' % (
+              sum(self.int_addr.values()), len(self.int_addr)))
+        for n, c in self.int_addr.most_common():
+            P('  %s: %d' % (n, c))
         with open(os.path.join(out, 'data_report.txt'), 'w') as f:
             f.write('\n'.join(lines) + '\n')
-        print('\n'.join(lines[:14]))
+        print('\n'.join(lines[:12]))
 
 
 if __name__ == '__main__':
