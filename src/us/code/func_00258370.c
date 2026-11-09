@@ -17,7 +17,7 @@ extern s32 CPlayer__FireWeapon(void *player, s32 arg1);
 extern void Math_EaseToward(f32 *value, f32 target, f32 rate);
 
 void WeaponMode_SpinFire_Update(void *obj, CAI *state) {
-    CPlayer *player = *(CPlayer **)((u8 *)obj + 0x1A8);
+    CPlayer *player = (*(CPlayer **)&((CGameObjectInstance *)obj)->m_AI.m_pParent);
     CVector3 *pos = (CVector3 *)(((u8 *)player->m_pCamera) + 0x114);
 
     if (!(player->m_ContState.m_dwButtons & 0x2000) || player->m_bHeadMovementDisabled != 0
@@ -41,6 +41,6 @@ void WeaponMode_SpinFire_Update(void *obj, CAI *state) {
     state->m_ConditionTimer -= gFrameIncrement;
     if (state->m_ConditionTimer <= 0.0f) {
         state->m_ConditionTimer += 1.875f;
-        CPlayer__FireWeapon(*(void **)((u8 *)obj + 0x1A8), 0x1A);
+        CPlayer__FireWeapon((*(void **)&((CGameObjectInstance *)obj)->m_AI.m_pParent), 0x1A);
     }
 }

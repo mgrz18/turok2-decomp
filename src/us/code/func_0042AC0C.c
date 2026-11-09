@@ -213,7 +213,7 @@ loaded:
     i = w->m_nFirstActor;
     w->m_Mode = 3;
     for (; i < count; i++) {
-        func_0021E5D4((u8 *)w->m_pActors + i * (s32)sizeof(CGameObjectInstance));
+        func_0021E5D4((u8 *)w->m_pActors + i * sizeof(CGameObjectInstance));
     }
     player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
     actor = player;
@@ -228,7 +228,7 @@ loaded:
     count = w->m_nActors;
     for (i = w->m_nFirstActor; i < count; i++) {
         ptr = (u8 *)w->m_pActors;
-        p = ptr + i * 0x288;
+        p = ptr + i * sizeof(CGameObjectInstance);
         func_0021F1B4(p);
         CGameObjectInstance__UpdateAnimation(p);
     }
