@@ -24,6 +24,7 @@
 #ifndef T2OS_H
 #define T2OS_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #ifndef T2OS_HAVE_ULTRA_TYPES
@@ -33,6 +34,8 @@ typedef int32_t s32;
 typedef uint32_t u32;
 typedef uint16_t u16;
 typedef int16_t s16;
+typedef uint8_t u8;
+typedef int8_t s8;
 typedef uint64_t u64;
 typedef void *OSMesg;
 typedef s32 OSPri;
@@ -115,6 +118,9 @@ s32 t2os_post(OSMesgQueue *mq, OSMesg msg);
 /* Run the game threads until every one of them is blocked or stopped. Returns the number of
  * thread switches made. Must be called from the platform thread. */
 int t2os_run_until_idle(void);
+/* Where game thread stacks come from (default: pthread's own). The port's low-memory bring-up
+ * mode puts them below 2 GB (docs/port/LINK.md). Call before the first osCreateThread. */
+void t2os_set_stack_allocator(void *(*alloc)(size_t size));
 /* Diagnostics */
 typedef void (*t2os_trace_fn)(int event, OSId from, OSId to);
 void t2os_set_trace(t2os_trace_fn fn);

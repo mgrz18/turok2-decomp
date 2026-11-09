@@ -43,6 +43,13 @@ static void fatal(const char *what) {
     abort();
 }
 
+#define T2OS_STACK_SIZE (8u << 20)
+static void *(*sStackAlloc)(size_t size);
+
+void t2os_set_stack_allocator(void *(*alloc)(size_t size)) {
+    sStackAlloc = alloc;
+}
+
 void t2os_init(void) {
     /* static initialisers do the work; kept as the documented entry point */
 }
@@ -184,7 +191,13 @@ void osCreateThread(OSThread *t, OSId id, void (*entry)(void *), void *arg, void
         t->queue = NULL;
     }
     pthread_attr_init(&attr);
-    pthread_attr_setstacksize(&attr, 8u << 20); /* macOS gives secondary threads 512 KB by default */
+    if (sStackAlloc != NULL) {
+        void *stack = sStackAlloc(T2OS_STACK_SIZE);
+        if (stack == NULL || pthread_attr_setstack(&attr, stack, T2OS_STACK_SIZE) != 0)
+            fatal("cannot set the thread stack");
+    } else {
+        pthread_attr_setstacksize(&attr, T2OS_STACK_SIZE); /* macOS gives secondary threads 512 KB by default */
+    }
     if (pthread_create(&h->pt, &attr, trampoline, h) != 0)
         fatal("pthread_create failed");
     pthread_attr_destroy(&attr);
