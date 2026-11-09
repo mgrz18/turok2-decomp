@@ -5,6 +5,62 @@
 #include "globals/ucode.h"
 #include "protos/ultra.h"
 
+#ifdef TARGET_PORT
+/* The port: the same through CFrameData (structs/frame.h) and the host scheduler's T2ScTask
+ * (structs/sched.h, port/game/t2sched.c); the views below have the N64 layout. */
+#include "structs/game.h"
+
+extern u8 gScheduler[];
+extern void Sched_SubmitTask(void *, T2ScTask *);
+
+static void fillTask(T2ScTask *t, CFrameData *task, void *dl, u32 size, u64 *text, u64 *data) {
+    t->list.t.data_ptr = dl;
+    t->list.t.type = 1;
+    t->list.t.ucode_boot = rspbootTextStart;
+    t->list.t.ucode_boot_size = (u8 *)rspbootTextEnd - (u8 *)rspbootTextStart;
+    t->list.t.ucode_size = 0x1000;
+    t->list.t.ucode_data_size = 0x800;
+    t->list.t.yield_data_ptr = gGfxYieldBuffer;
+    t->list.t.yield_data_size = 0xC00;
+    t->list.t.ucode = text;
+    t->list.t.ucode_data = data;
+    t->list.t.flags = 0;
+    t->list.t.dram_stack = NULL;
+    t->list.t.dram_stack_size = 0;
+    t->list.t.output_buff = gRspFifoBuffer;
+    t->list.t.output_buff_size = (u64 *)((u8 *)gRspFifoBuffer + gRspFifoSize);
+    t->list.t.data_size = size;
+    t->next = NULL;
+    t->msgQ = &gGfxFrameMessageQueue;
+    t->msg = &task->m_Msg;
+    t->framebuffer = (void *)(uptr)task->m_pFrameBuffer;
+}
+
+void CEngineApp__SubmitGfxTask(CEngineApp *gfx, CFrameData *task) {
+    u32 idx;
+
+    fillTask(&task->m_Task, task, task->m_pDisplayList, task->m_DisplayListSize,
+             (u64 *)gspF3DEX_NoN_fifoTextStart, (u64 *)gspF3DEX_NoN_fifoDataStart);
+    task->m_Task.flags = task->m_bLines ? 3 : 0x23;
+    if (task->m_bLines) {
+        fillTask(&task->m_LineTask, task, task->m_pLineList, task->m_LineListSize,
+                 (u64 *)gspL3DEX_fifoTextStart, (u64 *)gspL3DEX_fifoDataStart);
+        task->m_LineTask.flags = 0x23;
+    }
+    osWritebackDCacheAll();
+    Sched_SubmitTask(gScheduler, &task->m_Task);
+    if (task->m_bLines) {
+        Sched_SubmitTask(gScheduler, &task->m_LineTask);
+    }
+    gFrameCount++;
+    idx = gFrameCount % gTotalFramebuffers;
+    gFrameCountGameplay++;
+    gEvenOdd ^= 1;
+    gfx->m_pCurrentFrameData = &gfx->m_FrameData[idx];
+    gfx->m_FrameData[idx].m_pDisplayList = gEvenOdd == 0 ? gDisplayList1 : gDisplayList0;
+    gfx->m_pCurrentFrameData->m_pLineList = gEvenOdd == 0 ? gLineList1 : gLineList0;
+}
+#else
 typedef struct {
     /* 0x00 */ u32 type;
     /* 0x04 */ u32 flags;
@@ -132,3 +188,4 @@ void CEngineApp__SubmitGfxTask(GfxState *gfx, GfxTask *task) {
     cur = gfx->cur;
     cur->dl[1] = gEvenOdd == 0 ? gLineList1 : gLineList0;
 }
+#endif

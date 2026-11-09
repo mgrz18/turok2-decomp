@@ -15,6 +15,9 @@
  * includes this one). tools/check_structs.py checks the offsets. */
 
 #include "common.h"
+#ifdef TARGET_PORT
+#include "structs/sched.h"
+#endif
 
 /* The message the scheduler gets when the frame is done (an OSScMsg,
  * Turok 3's GFXMsg). */
@@ -25,8 +28,13 @@ typedef struct CFrameMsg {
 
 typedef struct CFrameData {
     /* 0x000 */ u8 m_SunFrame[0x20];     /* CSunFrameData (CSunFrameData__Construct) */
+#ifdef TARGET_PORT
+    T2ScTask m_Task;                     /* structs/sched.h: the host scheduler's task */
+    T2ScTask m_LineTask;
+#else
     /* 0x020 */ u8 m_Task[0x68];         /* OSScTask */
     /* 0x088 */ u8 m_LineTask[0x68];     /* OSScTask */
+#endif
     /* 0x0F0 */ CFrameMsg m_Msg;         /* sent to gGfxFrameMessageQueue when the frame is done */
     /* 0x110 */ u32 m_pFrameBuffer;      /* its colour image (gCFB[i], gDPSetColorImage) */
     /* 0x114 */ void *m_pDisplayList;    /* Gfx *: the start of the frame's list */
