@@ -148,6 +148,12 @@ struct ActorStateTable {
 extern void AI_StopSound(void *, void *);
 #ifdef TARGET_PORT
 #include "structs/game_object.h"
+#include "globals/ai.h"
+/* gendata types a data symbol by the declarations of the C that uses it. The shared base mode
+ * table is reached only through the header rows' m_Mode words (integers), so nothing used it:
+ * it came out as N64 bytes and the scan below read 0x20-byte rows as host ones. This reference
+ * makes gendata lay it out as host CAIModeInfo rows. */
+CAIModeInfo *const gAIBaseModeTable_port = D_800B0700;
 /* The port: the same on CGameObjectInstance/CAI/CAIModeInfo (the Rage Wars Source110/Dest views
  * are the N64 layout): switches the AI to mode arg2, found in its chain of mode tables (each
  * table's header row links the next one in m_Mode, its rows end with m_Mode -1). */
