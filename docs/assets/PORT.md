@@ -567,6 +567,8 @@ build stays untouched.
 | `port/third_party/miniz/` | miniz 3.0.2 (`miniz.c/.h`, MIT, `LICENSE` included): zip reading and inflate |
 | `port/assets/rnc.h/.c` | RNC ProPack methods 1 and 2, bounds-checked; original code of this repository (CC0, like the rest), written from Turok 2's own routines (`ProPackDecompress`, `RNC_UnpackMethod1` 0x200C40, `RNC_UnpackMethod2` 0x2010C0) and the public RNC header layout |
 | `port/tests/t2asset_test.c` | host test: both backends, every unit, byte-compare |
+| `port/tests/t2asset_typed_test.c`, `t2asset_typed.py` | typed units through the load path: level headers, model geometry (incl. transposed vertices), texture banks against the area tools' big-endian parsers (10.6) |
+| `port/runtime/t2loader.c`, `port/include/t2asset_game.h` | the engine side: `T2Port_ReadAsset` (CLoader), `T2Port_AssetHostSize` (CCache__Request), `T2Port_AssetWindow` (VM_Alloc) |
 | `port/tests/rnc_test.c` | scans a ROM for RNC headers (packed CRC must match) and unpacks each with both CRCs checked: 14,426 streams |
 | `port/Makefile` | `make -C port` (cc -O2), `make -C port test ROM=.. UNITS=.. ARCHIVES=..` |
 
@@ -582,6 +584,12 @@ const void *T2Asset_Read(u32 romKey, u32 *size);  /* in: requested size (0 = who
 void        T2Asset_Release(const void *data);
 u32         T2Asset_HostSize(u32 key, u32 size);  /* what CCache__Request must allocate */
 int         T2Asset_ReadInto(u32 address, u32 offset, void *dst, u32 len); /* loader form */
+
+int  T2Asset_SetSwapTable(const void *t2swap, size_t len); /* the archive's t2/swap (copied) */
+int  T2Asset_LoadSwapFile(const char *o2rOrT2sw);          /* for the ROM backend */
+int  T2Asset_SwapActive(void);                              /* table loaded, little-endian host */
+int  T2Asset_SwapUnit(u32 key, void *data, u32 size);       /* ROM order -> host order, in place */
+void T2Asset_SwapStats(u32 *applied, u32 *noPlan, u32 *refused);
 ```
 
 Rules, the same for every backend:
@@ -600,9 +608,11 @@ Rules, the same for every backend:
   copies from the image.
 - Buffers are `malloc`ed (16-byte aligned on the 64-bit hosts) and followed by 16 zero
   bytes, like libultraship's Blob padding for code that over-reads.
-- Bytes are returned as stored: ROM byte order. The byte swap (`T2Asset_Swap`, from
-  b2's `swap_spec.json` / BYTEORDER.md) hooks in at the end of `T2Asset_Read` /
-  `T2Asset_ReadInto`, keyed by the manifest's type id; not done in this prototype.
+- **Byte order** (Phase 7 round 3): every unit the backend loads goes through
+  `T2Asset_SwapUnit` before the front end hands it out (whole unit, then the prefix is cut),
+  so `T2Asset_Read` / `T2Asset_ReadInto` return HOST-order fields when a swap table is loaded
+  and the host is little-endian (10.6). Resident copies of the VM windows are swapped once.
+  Without a table (format 1 archive, ROM backend without `T2Asset_LoadSwapFile`): ROM order.
 
 Backends:
 
@@ -640,7 +650,31 @@ the ROM image.
 Also checked: a `.v64` copy of the ROM is accepted and gives the same bytes; a ROM
 with one flipped bit is refused with its SHA1.
 
-### 10.4 Engine changes (Phase 7; exact replacement code, not applied)
+### 10.4 Engine changes (applied in Phase 7 round 3, under `#ifdef TARGET_PORT`)
+
+Applied as below, with two differences: the game files call `T2Port_ReadAsset` /
+`T2Port_AssetHostSize` (port/runtime/t2loader.c, declared in port/include/t2asset_game.h with
+the game's own types; they abort with the address when nothing serves a read), and `VM_Alloc`
+stays in port/runtime/t2boot.c, where it returns `T2Port_AssetWindow`'s copy of the whole unit
+in low memory (the game keeps the address as `s32`). Also needed to get a request through the
+cache on the host (all `TARGET_PORT`, asm_diff 0):
+
+- `ProPackDecompress` (func_00200B00.c): the 'RNC' test is gone on the host (units are
+  unpacked, and a host-order first word could only misfire); only the plain-data branch is
+  left, typed: `arg1 == 0` copies the unit into a block from `CCache__AllocDecompressBlock`
+  (func_00205D7C.c, the typed form of `CCache__AllocateMemoryForDecompression`, whose m2c body
+  writes `CMemEntry` at N64 offsets), `arg1 != 0` leaves it in place (the N64 unpacks RNC units
+  at the heap top there; on the host they stay where they were loaded).
+- `CCache__Construct` (func_00202BB0.c) on the typed `gCache`: its `B12Mgr` view hangs off
+  `D_800D7BE0`, which gendata places inside `gDecompressor`, so the free stack stayed NULL.
+- The free stack by index in `CCache__FreeMemEntry`-style code (func_00203068.c) and
+  `CCache__CompleteRequest`'s `release` (func_002044A8.c), which used N64 strides/offsets.
+
+Checked in the game (gdb, at `GfxPool_Alloc`, i.e. after the cache is constructed and before
+round 3's next crash): `CCache__Request` direct of a level header (0x18 bytes, scale reads 1.024
+natively), of an RNC geometry unit (asked 0x2E8, gets 0x520 bytes, ISet header in host order),
+with the `ProPack__Decompress` callback (0x5B8 bytes, copied block), and a 4-byte probe
+(prefix of the swapped unit). The original replacement code: 
 
 `CLoader__LoadSync` (`func_00201DBC.c`): no chunking, no thread hop. Its callers (the
 `direct` path of `CCache__Request`, the VM pager, persistent defaults) all expect the
@@ -723,16 +757,47 @@ is unchanged: its `CLoader__LoadAsync(direct = 1)` addresses lie inside the
 
 ### 10.5 Open points
 
-- **Locking.** `T2Asset_*` is not thread safe. On N64 `CLoader__LoadSync` runs on the
-  caller's thread while the loader thread runs `CLoader__Main`; the port needs one mutex
-  around `T2Asset_ReadInto` / `T2Asset_Read` (or all reads funnelled through the loader
-  thread).
+- **Locking.** `T2Asset_*` is not thread safe; on the port all game threads run one at a time
+  under t2os's baton (RUNTIME.md), so no lock was added. Revisit if the loader thread ever runs
+  in parallel with the game (`CLoader__LoadSync` reads on the caller's thread while the loader
+  thread runs `CLoader__Main`: one mutex around `T2Asset_Read` / `T2Asset_ReadInto` then).
 - **Cache hit test.** As decompiled, `CCache__Request` returns a cached entry when
   `request->requestLength <= size`, i.e. also a *smaller* cached block (a 4-byte probe)
   for a later full request. Section 1.2 describes it as "holds at least `size`". Worth
   re-reading the assembly before the port relies on either reading.
-- **Byte swap hook:** needs b2's spec and the manifest type id per unit; a prefix read
-  must swap only whole fields inside the prefix (5.3).
+- **Byte swap hook:** done (10.6): precomputed plans per unit key rather than per type id,
+  applied to the whole unit before a prefix is cut, so no partial fields.
 - **Resident VM windows and mods:** a mod that shadows `t2/u/001E0000` changes the
   audio bank the engine pointer-fixes in place; the 64-bit audio rebuild (section 9)
   owns that.
+
+### 10.6 Byte order through the reader (Phase 7 round 3)
+
+`tools/assets/mkarchive.py` (format 2.0) runs `swap_spec.json` over every unit
+(`swapcheck.unit_plan`, the same interpreter `swapcheck.py --apply` checks) and stores the plans
+in `t2/swap` (ARCHIVE.md has the layout: runs of `(offset, width, count)` and transposed-table
+plane reversals, 3.06 MB, 0.45 MB deflated, 25,957 units with a plan). The reader loads the table
+when the archive is opened (miniz backend: `T2Asset_OpenArchive`; LUS backend:
+`T2Asset_OpenLus`, which also refuses format 1 archives; ROM backend: `T2Asset_LoadSwapFile`),
+and `load_unit()` applies the unit's plan after every backend load, before a prefix is cut.
+Plans are validated against the table size on install and against the unit size on use (a
+mod entry of another size keeps ROM order and is counted as refused). Raw reads at inner
+addresses are served from swapped resident copies when the containing unit has a plan (the two
+VM windows), from ROM bytes otherwise (the wave table: VADPCM, no plan). On a big-endian host
+nothing is swapped.
+
+Results (box, gcc -O2 / clang -O0 for the game):
+
+| test | result |
+|---|---|
+| `t2asset_test ROM units.tsv turok2.o2r` | 26,124 units equal to the ROM backend's bytes put through the plans; 23,288 units change byte order; swapping twice gives the ROM bytes for all; 11,695/11,695 probes served from the swapped unit; 20,000 audio reads (VM windows swapped, wave table raw) OK; ROM backend + the archive's `t2/swap` gives the same 26,124 units; 0 refused |
+| `t2asset_typed_test` (`port/tests/t2asset_typed.py` from the ROM) | 1,585 checks over 165 level headers, 40 model geometries, 40 texture banks: native loads (f32 scale, u32 ISet headers, s32 Vtx table sizes, material s32/u32/u16 fields) equal the parsers' big-endian values; byte fields, the packed command streams, texels and TLUTs still in ROM order; transposed vertices untransposed on the host equal the parser's (s16 x y z, u16 flag, s16 s t). 0 errors through the archive, through the ROM backend + `t2/swap`; and with the table dropped the same fields read big-endian |
+| `archive_check.py` | OK: `t2/swap` equals the recomputed plans, every plan is an involution |
+| `turok2` self test (no `--game`) | LUS, miniz and ROM(+plans) backends give the same 26,124 units (fnv1a64 `e9b9d3e7c226d5aa`); the Blob route equals T2Asset after the plan |
+
+`make -C port test ROM=.. UNITS=.. ARCHIVES=..` runs all of them (the typed test needs Python
+and the repository's tools).
+
+Not covered by plans (BYTEORDER.md "Not known yet", 0.5 %): those bytes arrive in ROM order.
+The texture recolour (`Texture_DecompressCallback`, RGBA5551 palettes with native u16 loads)
+must use big-endian accessors on the host, since texels/TLUTs stay big-endian for Fast3D.
