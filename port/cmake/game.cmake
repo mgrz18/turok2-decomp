@@ -58,13 +58,42 @@ list(LENGTH T2_GAME_SOURCES n_src)
 list(LENGTH T2_HOSTIFIED n_host)
 message(STATUS "turok2_game: ${n_src} C files (${n_host} hostified)")
 
-add_library(turok2_game STATIC ${T2_GAME_SOURCES})
-target_include_directories(turok2_game BEFORE PUBLIC
+# Split off what the executable must not link (port/cmake/link.cmake, docs/port/LINK.md):
+# module 2 and the libultra/boot files port/runtime replaces. They still compile, as
+# turok2_game_unlinked, so "every C file builds for the host" stays checked.
+include(${CMAKE_CURRENT_LIST_DIR}/link.cmake)
+set(T2_GAME_LINKED)
+set(T2_GAME_UNLINKED)
+foreach(f ${T2_GAME_SOURCES})
+    get_filename_component(name ${f} NAME)
+    t2_is_module2(${name} mod2)
+    list(FIND T2_LINK_REPLACED ${name} repl)
+    if(mod2 OR NOT repl EQUAL -1)
+        list(APPEND T2_GAME_UNLINKED ${f})
+    else()
+        list(APPEND T2_GAME_LINKED ${f})
+    endif()
+endforeach()
+list(LENGTH T2_GAME_LINKED n_linked)
+list(LENGTH T2_GAME_UNLINKED n_unlinked)
+message(STATUS "turok2_game: ${n_linked} files linked, ${n_unlinked} compile-only (module 2 + replaced libultra)")
+
+# Flags shared by both libraries (an interface target).
+add_library(t2_game_flags INTERFACE)
+target_include_directories(t2_game_flags BEFORE INTERFACE
     ${T2_PORT}/include
     ${T2_ROOT}/include)
-target_compile_definitions(turok2_game PUBLIC
+target_compile_definitions(t2_game_flags INTERFACE
     TARGET_PORT=1 _LANGUAGE_C F3DEX_GBI_2 GAME_VERSION="us")
-target_compile_options(turok2_game PRIVATE
+
+add_library(turok2_game STATIC ${T2_GAME_LINKED})
+target_link_libraries(turok2_game PRIVATE t2_game_flags)
+option(T2_BUILD_UNLINKED "Also compile the game files the executable does not link" ON)
+if(T2_BUILD_UNLINKED)
+    add_library(turok2_game_unlinked STATIC ${T2_GAME_UNLINKED})
+    target_link_libraries(turok2_game_unlinked PRIVATE t2_game_flags)
+endif()
+target_compile_options(t2_game_flags INTERFACE
     -std=gnu89
     "SHELL:-include ${T2_PORT}/include/port_shim.h"
     # MIPS GCC: plain char is signed (arm64 hosts default to unsigned).
@@ -84,7 +113,7 @@ target_compile_options(turok2_game PRIVATE
 if(T2_WARN_ALL)
     # everything clang reports by default
 elseif(T2_WARN_64BIT)
-    target_compile_options(turok2_game PRIVATE
+    target_compile_options(t2_game_flags INTERFACE
         -Wno-everything
         -Wint-conversion -Wint-to-pointer-cast -Wpointer-to-int-cast
         -Wshorten-64-to-32 -Wvoid-pointer-to-int-cast
@@ -93,5 +122,5 @@ elseif(T2_WARN_64BIT)
         # a host libc function redeclared with the N64 types (size_t = u32)
         -Wincompatible-library-redeclaration)
 else()
-    target_compile_options(turok2_game PRIVATE -w)
+    target_compile_options(t2_game_flags INTERFACE -w)
 endif()
