@@ -4,15 +4,15 @@
 #include "globals/render.h"
 #include "globals/engine.h"
 
-extern s32 Render_DrawTextLines(s32, s32, void *, s32, s32, s32, f32, f32);
-extern void EngineMode13_Game_Draw(void);
+extern s32 Render_DrawTextLines(sptr, s32, void *, s32, s32, s32, f32, f32);
+extern void EngineMode13_Game_Draw(sptr);
 
-void EngineMode00_PakCheck_Draw(s32 arg0) {
+void EngineMode00_PakCheck_Draw(sptr arg0) {
     if (gPakCheckStarted != 0) {
         if (gPakCheckHasPak != 0) {
             Render_DrawTextLines(arg0, 1, sPakCheckText, gScreenWidth / 2, 0x5A, 0xA, 1.0f, 1.0f);
             return;
         }
-        EngineMode13_Game_Draw();
+        EngineMode13_Game_Draw(arg0);
     }
 }

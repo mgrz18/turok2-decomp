@@ -4,12 +4,12 @@
 #include "globals/render.h"
 
 
-extern void CEngineApp__ClearDepthRect(s32, s32, s32, s32, s32);
+extern void CEngineApp__ClearDepthRect(sptr, s32, s32, s32, s32);
 extern void Hud_GetSpriteSize(s32, s32, s32 *, s32 *);
 extern void Hud_SetupTextureMode(s32);
 extern void Hud_DrawSprite(s32, s32, s32, s32, f32, f32, s32);
 
-void EngineMode07_Title_Draw(s32 arg0) {
+void EngineMode07_Title_Draw(sptr arg0) {
     CFrameData *fb;
     s32 width;
     s32 height;

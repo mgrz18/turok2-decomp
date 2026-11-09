@@ -2,9 +2,9 @@
 #include "globals/render.h"
 #include "globals/engine.h"
 
-extern s32 Render_DrawTextLines(s32, s32, void *, s32, s32, s32, f32, f32);
+extern s32 Render_DrawTextLines(sptr, s32, void *, s32, s32, s32, f32, f32);
 
-void EngineMode01_Legal_Draw(s32 arg0) {
+void EngineMode01_Legal_Draw(sptr arg0) {
     f32 x;
 
     if (gScreenWidth >= 0x11D) {

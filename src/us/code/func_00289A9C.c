@@ -15,9 +15,9 @@ typedef struct {
     /* 0x9F0 */ s32 unk9F0;
 } Unk002532A8;
 
-s32 CEngineApp__StartWarp(s32, s32);                /* extern */
+s32 CEngineApp__StartWarp(sptr, s32);                /* extern */
 
-void EngineMode15_Ending_Init(s32 arg0) {
+void EngineMode15_Ending_Init(sptr arg0) {
     void *temp_v0;
 
     gFinalEnding = 0;

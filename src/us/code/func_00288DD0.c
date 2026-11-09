@@ -18,10 +18,10 @@
 #endif
 
 s32 Cinema_RequestById(s32);                         /* extern */
-s32 CPlayerPool__NewGame(s32, s32, s32);       /* extern */
-s32 CCameraPool__NewGame(s32, s32);                /* extern */
+s32 CPlayerPool__NewGame(sptr, s32, s32);       /* extern */
+s32 CCameraPool__NewGame(sptr, s32);                /* extern */
 
-void CEngineApp__StartWarp(s32 arg0, s32 arg1) {
+void CEngineApp__StartWarp(sptr arg0, s32 arg1) {
     CCameraPool__NewGame(arg0 + APP_CAMERAPOOL, 1);
     CPlayerPool__NewGame(arg0 + APP_GAME, 1, 0);
     CScene__RequestWarp(&gScene, ~Cinema_RequestById(arg1), 0);

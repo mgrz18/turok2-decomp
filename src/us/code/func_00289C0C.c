@@ -18,9 +18,9 @@
 
 s32 Cinema_RequestById(s32);
 
-void CEngineApp__StartWarp(s32, s32);                       /* extern */
+void CEngineApp__StartWarp(sptr, s32);                       /* extern */
 
-void EngineMode16_Ending_Init(s32 arg0)
+void EngineMode16_Ending_Init(sptr arg0)
 {
   CPlayer *temp_v0;
   s8 *new_var;
