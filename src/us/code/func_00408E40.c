@@ -5,5 +5,5 @@
 
 
 void TotemDefense_StopGenerators(void) {
-    CScene__UnmarkGeneratorsSaved((s32) &gScene);
+    CScene__UnmarkGeneratorsSaved(&gScene);
 }

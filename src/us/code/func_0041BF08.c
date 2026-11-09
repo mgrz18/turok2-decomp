@@ -10,6 +10,6 @@
 s32 OptionsMenu_StepControlType(MenuItem *a, Menu *b) {
     CPlayerOptions *p = &gEngineApp_m_Settings.defaultSlot;
     if (b->player) { CPlayerOptions *q = b->player->m_pOptions; if (q) p = q; }
-    p->m_ControlType = Menu_StepValue((s32)b, p->m_ControlType, 1, 0, 1, 1);
+    p->m_ControlType = Menu_StepValue(b, p->m_ControlType, 1, 0, 1, 1);
     return 0;
 }

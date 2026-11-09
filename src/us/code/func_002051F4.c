@@ -21,7 +21,7 @@ void CCache__Unlock(s32 arg0, CMemEntry *arg1) {
     gCache_mutex_count = temp_v1;
     if (temp_v1 != 1) {
         __osRestoreInt(temp_a0);
-        osRecvMesg((s32) &gCache_mutex, 0, 1);
+        osRecvMesg(&gCache_mutex, 0, 1);
     } else {
         __osRestoreInt(temp_a0);
     }
@@ -35,7 +35,7 @@ void CCache__Unlock(s32 arg0, CMemEntry *arg1) {
     gCache_mutex_count = temp_v1_2;
     if (temp_v1_2 != 0) {
         __osRestoreInt(temp_v0_2);
-        osSendMesg((s32) &gCache_mutex, 0, 1);
+        osSendMesg(&gCache_mutex, 0, 1);
         return;
     }
     __osRestoreInt(temp_v0_2);

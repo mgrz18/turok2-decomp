@@ -20,7 +20,7 @@ void _collectPVoices(ListOwner294 *arg0) {
     if (var_s0 != 0) {
         do {
             alUnlink(var_s0);
-            alLink(var_s0, (s32) var_s1->list);
+            alLink(var_s0, (sptr) var_s1->list);
             var_s0 = var_s1->head;
         } while (var_s0 != 0);
     }

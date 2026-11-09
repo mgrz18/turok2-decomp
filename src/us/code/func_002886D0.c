@@ -14,7 +14,7 @@ void CEngineApp__StartGameAtWarp(CEngineApp *arg0, s32 arg1) {
     s32 var_s0;
 
     var_s0 = arg1;
-    if (CScene__FindWarpDests((s32) &gScene, -1, var_s0, (s32) sp18, 1) == 0) {
+    if (CScene__FindWarpDests(&gScene, -1, var_s0, sp18, 1) == 0) {
         var_s0 = 0;
     }
     gEngineApp_m_Settings.match.frames = 0;

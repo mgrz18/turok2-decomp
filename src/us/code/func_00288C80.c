@@ -22,7 +22,7 @@ void CEngineApp__Retrace(CEngineApp *arg0) {
     }
     if ((arg0->m_Settings.mode != 0x11) && (gDisplayListCount != 0)) {
         gDisplayListCount -= 1;
-        CEngineApp__Update((s32) arg0);
+        CEngineApp__Update((sptr) arg0);
     }
     gRetraceCount += 1;
 }

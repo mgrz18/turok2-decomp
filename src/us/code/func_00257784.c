@@ -8,9 +8,9 @@ s32 CPlayer__LoseLife(s32);
 
 void PlayerDeath_CinemaDone(void) {
     if (sDeathCinemaPlayer->m_Data.m_Lives == 1) {
-        CPlayer__LoseLife((s32) sDeathCinemaPlayer);
+        CPlayer__LoseLife((sptr) sDeathCinemaPlayer);
     } else {
-        CPlayer__SetState((s32) sDeathCinemaPlayer, (s32) sDeathCinemaPlayer, 0x1F);
+        CPlayer__SetState(sDeathCinemaPlayer, sDeathCinemaPlayer, 0x1F);
     }
     gCinemaHidesActors = 1;
     gDeathTint = 0;

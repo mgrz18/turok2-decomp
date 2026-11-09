@@ -2,13 +2,13 @@
 #include "structs/camera.h"
 #include "protos/cache.h"
 
-void memset(s32, s32, s32);                  /* extern */
+void memset(s32, s32, sptr);                  /* extern */
 extern u8 D_800A9A00[];
 
 /* Allocates the pool's arg1 cameras and clears them. */
 void CCameraPool__AllocCameras(CCameraPool *arg0, s32 arg1) {
     s32 *temp_v0;
-    s32 temp_a0;
+    sptr temp_a0;
     s32 temp_s0;
 
     temp_s0 = arg1 * sizeof(CCamera);

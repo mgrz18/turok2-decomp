@@ -6,9 +6,9 @@ s32 CPlayer__StartWeaponBackgroundSound(s32, s32);
 
 
 void WeaponMode_SpinUp_Enter(CGameObjectInstance *obj, CAI *ai) {
-    s32 player;
+    sptr player;
 
-    player = (s32) obj->m_AI.m_pParent;
+    player = (sptr) obj->m_AI.m_pParent;
     ai->m_ConditionTimer = 0.0f;
     CPlayer__StartWeaponBackgroundSound(player, 0x1A5);
     *(f32 *) &ai->m_VarBuffer[3] = gWeaponInfoTable[((CPlayer *) obj->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * 15.0f;

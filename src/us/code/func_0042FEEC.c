@@ -12,7 +12,7 @@ void CEmitterPool__Construct(char *);
 
 /* Updates each camera's message block (at 0x558), then the owner's own at 0x598. */
 void CCameraPool__ResetEmitterPools(Cameras *owner) {
-    s32 i;
+    sptr i;
 
     for (i = 0; i < owner->count; i++) {
         CEmitterPool__Construct((char *)(i * 0xEC0 + owner->cameras + 0x558));

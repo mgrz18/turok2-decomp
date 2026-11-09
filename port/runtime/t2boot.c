@@ -11,7 +11,7 @@
  * Also here: the game functions whose N64 version cannot work on the host and that are
  * replaced as a whole (their files are left out of the link, port/cmake/link.cmake):
  *   InitializeSystemResources  heap on a host allocation instead of [end of image, top of RDRAM)
- *   VM_Initialize/Alloc/Free   no pager: module 1 is linked, VM regions are plain allocations
+ *   VM_Initialize/Alloc/Free   no pager: module 1 is linked, a VM region is its unit (t2loader.c)
  *   RNC_UnpackMethod1/2        asm on the N64 (func_00200C40/func_002010C0): port/assets/rnc.c
  *   sprintf                    SN64 varargs on the N64 (func_0029E3E0): host vsprintf
  *   func_00298470              sqrtf (sqrt.s): host libm */
@@ -26,6 +26,7 @@
 #include "t2os.h"
 #include "t2port.h"
 #include "rnc.h"
+#include "t2audio.h"
 
 void t2ultra_configure(const T2PortConfig *cfg);
 int t2ultra_load_rom(const char *path);
@@ -73,12 +74,19 @@ uintptr_t T2Port_RdramTop(void) {
     return (uintptr_t)sArena + sArenaSize + 0x80000;
 }
 
-/* func_00275520: audio is off on the host for now (docs/port/STATUS.md). The synthesizer itself
- * initializes (alInit, amCreateAudioMgr), but CAudioWorld__Initialize then reads the sound bank
- * from a VM_Alloc copy of the ROM (0x1E0000): big-endian, N64 layout, pointers that are VM
- * addresses. It needs the bank converted (T2Asset / swap_spec.json) first. */
+/* func_00275520: CAudioWorld__Initialize only with --audio (docs/port/AUDIO.md): the sound bank
+ * comes converted from port/audio/t2audio_bank.c (T2Audio_LoadCtl), the sound data file is
+ * swapped by VM_Alloc's hook, the audio manager is port/audio/t2audio_mgr.c. Without --audio
+ * the game runs with no sound world (as before: gAudioWorldReady stays 0). */
+typedef struct CAudioWorld CAudioWorld;
+extern CAudioWorld gAudioWorld;
+void CAudioWorld__Initialize(CAudioWorld *m);
 void Sound__Initialize(void) {
-    t2_log_once("Sound__Initialize: audio off on the host (sound bank not converted yet)");
+    if (!T2Audio_Enabled()) {
+        t2_log_once("Sound__Initialize: audio off (run with --audio)");
+        return;
+    }
+    CAudioWorld__Initialize(&gAudioWorld);
 }
 
 /* func_0028D820: no pager, no TLB, no VM threads; module 1 is linked into the executable
@@ -87,17 +95,16 @@ void VM_Initialize(s32 a, s32 b) {
     (void)a, (void)b;
 }
 
-/* func_0028E60C: a VM region backed by ROM (the audio data, CAudioWorld__Initialize) becomes a
- * resident copy. The N64 returns the region's virtual address as s32. */
+/* func_0028E60C: a VM region backed by ROM (the audio control block, the sound data file:
+ * CAudioWorld__Initialize / __LoadSfxDataFile) becomes the resident unit, read through the asset
+ * reader in host byte order (t2loader.c, docs/assets/PORT.md 10.4). The N64 returns the region's
+ * virtual address as s32. */
+void *T2Port_AssetWindow(uint32_t romAddr, uint32_t size);
 intptr_t VM_Alloc(s32 size, s32 unused, u32 romAddr) {
-    size_t rs = 0;
-    const u8 *rom = t2_rom(&rs);
-    u8 *p = t2_lowmem_alloc((size_t)size);
     (void)unused;
-    if (rom != NULL && romAddr < rs)
-        memcpy(p, rom + romAddr, (size_t)size <= rs - romAddr ? (size_t)size : rs - romAddr);
-    else
-        t2_log_once("VM_Alloc: no ROM image, region left zeroed");
+    void *p = T2Port_AssetWindow(romAddr, (uint32_t)size);
+    if (p != NULL)
+        T2Audio_FixRegion(romAddr, (u8 *)p, (size_t)size); /* the sound data file: no-op when the unit is already host order */
     return (intptr_t)p;
 }
 
@@ -189,9 +196,11 @@ int T2Port_Boot(const T2PortConfig *cfg) {
     set_if_zero(&gThreadPriorityLoader, 17);
     set_if_zero(&gThreadPriorityScheduler, 18);
 
+    T2Audio_Enable(sCfg.audio);
+
     t2os_init();
     /* CEngineApp__Idle's work, minus the spin */
-    osCreateThread(&gThreadMain, 1, mainproc, NULL, NULL, gThreadPriorityMain);
+    osCreateThread(&gThreadMain, 1, sCfg.mainEntry ? sCfg.mainEntry : mainproc, NULL, NULL, gThreadPriorityMain);
     osStartThread(&gThreadMain);
     fprintf(stderr, "t2: boot: arena %u MB at %p%s, ROM %s, mainproc started (pri %d)\n", sArenaSize >> 20,
             (void *)sArena, sCfg.lowMemory ? " (low memory)" : "", sCfg.romPath ? sCfg.romPath : "none",

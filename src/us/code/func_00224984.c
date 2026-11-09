@@ -7,9 +7,9 @@
 void CScene__SetEventFiredInLevel(void *arg0, s32 arg1, s32 arg2, s32 arg3)
 {
   s32 temp_a0;
-  s32 temp_a1;
-  s32 temp_v0;
-  s32 new_var;
+  sptr temp_a1;
+  sptr temp_v0;
+  sptr new_var;
   s32 var_a2;
   s32 var_v1;
   u8 *temp_v0_2;

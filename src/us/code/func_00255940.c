@@ -16,7 +16,7 @@ struct Box {
     CVector3 max;
 };
 extern void Math_EaseToward(f32 *value, f32 target, f32 rate);
-extern void PlayerDodgeFall_Update(s32 arg0, s32 arg1);
+extern void PlayerDodgeFall_Update(sptr arg0, sptr arg1);
 struct CQuatern_t;
 typedef struct CQuatern_t CQuatern;
 struct CQuatern_t;
@@ -133,7 +133,7 @@ struct LevelActor;
 extern void CPlayer__MoveOnFoot(void *, void *, void *);
 extern void CPlayer__TurnAndLook(void *, void *, void *);
 extern s32 GameObject_IsOnGround(void *arg0);
-void PlayerDodgeFall_Update(s32 arg0, s32 arg1) {
+void PlayerDodgeFall_Update(sptr arg0, sptr arg1) {
     Math_EaseToward(arg0 + 0xAD0, 0.0f, 0.25f);
     CPlayer__TurnAndLook((void *)arg0, (void *)arg1, &gStandLookTuning);
     CPlayer__MoveOnFoot((void *)arg0, (void *)arg1, &gDodgeMoveTuning);

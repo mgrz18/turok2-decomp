@@ -11,7 +11,7 @@
  * menu when there is a player). */
 
 s32 PakMenu_CheckPak_2(Menu *event, s32 mode, s32 arg2);
-void MenuPool_OpenMenu_2(void *menu, void *page, void *player, void *args, s32 flags);
+void MenuPool_OpenMenu_2(void *menu, void *page, void *player, void *args, sptr flags);
 
 static __inline__ s32 currentMode(Menu *event) {
     s32 mode;

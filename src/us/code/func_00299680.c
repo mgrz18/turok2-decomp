@@ -6,11 +6,11 @@
 #include "protos/ultra.h"
 
 extern void __osSiGetAccess(void);
-extern s32 __osSiRawStartDma(s32, s32);
+extern s32 __osSiRawStartDma(s32, sptr);
 extern u32 __osContDataCrc(void *arg0);
 extern void __osSiRelAccess(void);
 extern void __osPackRamReadData(s32 arg0, s32 arg1);
-extern s32 __osSiRawStartDma(s32, s32);
+extern s32 __osSiRawStartDma(s32, sptr);
 extern u32 __osContDataCrc(void *arg0);
 extern u32 __osPfsGetStatus(s32 arg0, s32 arg1);
 u32 __osContRamRead(s32 arg0, s32 arg1, u16 arg2, u8 *arg3) {

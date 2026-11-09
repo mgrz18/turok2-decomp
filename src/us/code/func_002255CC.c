@@ -22,15 +22,15 @@ void CScene__FileInstance(CScene *arg0, CGameObjectInstance *arg1) {
     s32 temp_v1_4;
     s32 temp_v1_5;
 
-    CGameObjectInstance__ClearDrawMatrices((s32) arg1);
-    if (GameObject_IsSolid((s32) arg1) != 0) {
+    CGameObjectInstance__ClearDrawMatrices((sptr) arg1);
+    if (GameObject_IsSolid((sptr) arg1) != 0) {
         temp_v1 = arg0->m_nDrawActors;
         if (temp_v1 != 0x200) {
             arg0->m_pDrawActors[temp_v1] = (CGameObjectInstance *)arg1;
             arg0->m_nDrawActors = (s32) (temp_v1 + 1);
         }
     }
-    if (func_002681BC((s32) arg1) != 0) {
+    if (func_002681BC((sptr) arg1) != 0) {
         temp_v1_2 = arg0->m_nMovers;
         if (temp_v1_2 != 0x80) {
             arg0->m_pMovers[temp_v1_2] = (CGameObjectInstance *)arg1;

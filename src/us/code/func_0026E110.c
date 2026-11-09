@@ -4,9 +4,9 @@
 #include "protos/scene.h"
 #include "protos/game.h"
 
-s32 LevelEvent_ProcessTriggers(s32, s32, s32, s32, s32, s32, s32); /* extern */
+s32 LevelEvent_ProcessTriggers(s32, s32, s32, s32, s32, s32, sptr); /* extern */
 
-void GameObject_FireTriggers(CGameObjectInstance *arg0, s32 arg1, s32 arg2) {
+void GameObject_FireTriggers(CGameObjectInstance *arg0, s32 arg1, sptr arg2) {
     s32 sp20;
     s32 sp24;
 

@@ -69,7 +69,7 @@ void *CPlayerPool__FindNearest(CPlayerPool *players, CVector3 pos);
 f32 Random_Blend(f32 lo, f32 hi);
 void EnemyAI_TickTimers(Object *obj, AI *ai);
 void AI_TurnHeadToTarget(Object *obj, AI *ai, f32);
-void Sound__Play(s16 sound, CVector3 pos, s32, s32);
+void Sound__Play(s16 sound, CVector3 pos, sptr, s32);
 void AI_StartSound(Object *obj, AI *ai, s32 sound);
 void AI_StopSound(Object *obj, AI *ai);
 
@@ -82,7 +82,7 @@ void EnemyAI_Update(Object *obj, AI *ai) {
     CEnemyBehaviorInfo *handler;
     s32 index;
     s32 mode;
-    s32 anim;
+    sptr anim;
     s32 state;
     s32 swimming;
 
@@ -107,13 +107,13 @@ void EnemyAI_Update(Object *obj, AI *ai) {
     if (handler != NULL) {
         switch (index) {
             case 0:
-                anim = (s32) handler->m_pGroundModeTable;
+                anim = (sptr) handler->m_pGroundModeTable;
                 break;
             case 1:
-                anim = (s32) handler->m_pAirModeTable;
+                anim = (sptr) handler->m_pAirModeTable;
                 break;
             case 2:
-                anim = (s32) handler->m_pUnderwaterModeTable;
+                anim = (sptr) handler->m_pUnderwaterModeTable;
                 break;
             default:
                 anim = 0;

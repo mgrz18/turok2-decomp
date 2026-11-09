@@ -4,7 +4,7 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80213ED4.CPP, func_80213ED4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern s32 CGameObjectInstance__SetAnim(void *arg0, s32 arg1, s32 arg2);
+extern s32 CGameObjectInstance__SetAnim(void *arg0, sptr arg1, s32 arg2);
 struct SoundSourceNode;
 struct SoundSourceNode {
     s32 unk0;
@@ -121,9 +121,9 @@ struct StateEntry {
     u32 flags;
 };
 extern s32 IsCodePointer(StateCallback);
-extern s32 IsDataPointer(u32);
+extern s32 IsDataPointer(uptr);
 extern void *CGameObjectInstance__PickAvailableAction(void *, void *, s32);
-extern s32 CGameObjectInstance__PickRandomAnim(void *, s32, s32);
+extern sptr CGameObjectInstance__PickRandomAnim(void *, sptr, sptr);
 void CAI__UpdateModeAnim(Source110 *src, Dest *dst) {
     StateEntry *entry;
     StateCallback callback;
@@ -141,12 +141,12 @@ void CAI__UpdateModeAnim(Source110 *src, Dest *dst) {
             if (callback != 0) {
                 if (IsCodePointer(callback) != 0) {
                     callback = callback(src, dst);
-                } else if (IsDataPointer((u32)callback) != 0) {
+                } else if (IsDataPointer((uptr)callback) != 0) {
                     callback = (StateCallback)CGameObjectInstance__PickAvailableAction(src, callback, dst->state_result);
                 }
                 if (callback != 0) {
                     if (callback != (StateCallback)-1) {
-                        dst->state_result = CGameObjectInstance__PickRandomAnim(src, (s32)callback, dst->state_result);
+                        dst->state_result = CGameObjectInstance__PickRandomAnim(src, (sptr)callback, dst->state_result);
                         dst->result = (s16)callback;
                         if (src->current_state == dst->state_result) {
                             src->limit = 0.0f;

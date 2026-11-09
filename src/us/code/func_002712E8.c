@@ -207,7 +207,7 @@ struct ContextRecAt2BC0;
 struct ContextRecAt2BC0;
 struct Table_func_804428F8_de;
 typedef struct Table_func_804428F8_de Table_func_804428F8_de;
-extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
+extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, sptr, s32);
 struct ContextRecAt2BC0;
 extern s32 CAudioWorld__Update(void *arg0);
 struct GameplayCamera;
@@ -366,7 +366,7 @@ extern void SndQueue_Update(void *arg0);
 extern void SpeechPlayer_Update(void *arg0);
 extern void SndSeq_Update(void *arg0);
 extern void *CCameraPool__GetNearestCamera(MenuMatchGlobals *arg0, CVector3 *arg1);
-extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
+extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, sptr, s32);
 s32 CAudioWorld__Update(void *arg0) {
     char *object = arg0;
     u8 *bytes = &gEngineApp_m_Settings.unk15;

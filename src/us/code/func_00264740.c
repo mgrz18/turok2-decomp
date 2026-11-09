@@ -22,6 +22,6 @@ void Platform_BackUpdate(CGameObjectInstance *arg0, CAI *arg1) {
         arg1->m_ConditionTimer = arg1->m_ConditionTimer - (gFrameIncrement / temp_t0->m_MoveTime);
     }
     if (arg1->m_ConditionTimer <= 0.0f) {
-        CAI__SetMode((s32) arg0, (s32) arg1, 0);
+        CAI__SetMode(arg0, arg1, 0);
     }
 }

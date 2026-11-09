@@ -17,6 +17,11 @@ void CAudioWorld__StopAllSounds(CAudioWorld *arg0, s32 arg1) {
     CMutex *temp_s0;
     CMutex *temp_s0_2;
 
+#ifdef TARGET_PORT
+    if (arg0->bank == NULL) {
+        return; /* no sound bank: audio off on the host (Sound__Initialize, t2boot.c) */
+    }
+#endif
     temp_s0 = &arg0->lock;
     temp_a0 = __osDisableInt();
     temp_v1 = temp_s0->count + 1;

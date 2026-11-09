@@ -21,7 +21,7 @@ f32 AnimCurve_Evaluate(B14Trk *t, f32 x) {
     start = t->start;
     rec = t->bits * 4 + 6;
     if (frame < start || frame >= start + t->span) {
-        s32 idx;
+        sptr idx;
         u32 s4, s0, addr, data;
         u32 *p;
         u32 *tb;
@@ -38,7 +38,7 @@ f32 AnimCurve_Evaluate(B14Trk *t, f32 x) {
             s0 = Bits_Peek(addr, 6);
         }
         tb = tbl;
-        p = (u32 *)(idx * 4 + (u32)tb);
+        p = (u32 *)(idx * 4 + (uptr)tb);
         for (;;) {
             if (!(frame < s4 || frame >= s0)) {
                 if (idx != t->cur) {

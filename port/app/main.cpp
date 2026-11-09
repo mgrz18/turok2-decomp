@@ -131,6 +131,7 @@ struct Args {
     bool window = true;
     bool game = false;
     bool draw = false;
+    bool audio = false;
     bool verbose = false;
 #ifdef T2_LOW_MEMORY_DEFAULT
     bool lowMemory = true;
@@ -157,13 +158,15 @@ Args ParseArgs(int argc, char** argv) {
             a.game = true;
         } else if (s == "--draw") {
             a.draw = true;
+        } else if (s == "--audio") {
+            a.audio = true;
         } else if (s == "--verbose") {
             a.verbose = true;
         } else if (s == "--high-memory") {
             a.lowMemory = false;
         } else {
             fprintf(stderr, "usage: %s [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]\n"
-                            "          [--game [--draw] [--verbose] [--high-memory]]\n",
+                            "          [--game [--draw] [--audio] [--verbose] [--high-memory]]\n",
                     argv[0]);
             exit(2);
         }
@@ -288,7 +291,8 @@ int main(int argc, char** argv) {
         fprintf(stderr, "FAIL: T2Asset_OpenLus: %s\n", err.c_str());
         return 1;
     }
-    printf("T2Asset over ArchiveManager: %u units in t2/units\n", T2Asset_UnitCount());
+    printf("T2Asset over ArchiveManager: %u units in t2/units, byte swap %s\n", T2Asset_UnitCount(),
+           T2Asset_SwapActive() ? "on (t2/swap plans, little-endian host)" : "off");
 #ifndef T2_HAVE_GAME
     if (args.game) {
         fprintf(stderr, "--game: this build does not link the game (T2_LINK_GAME=OFF)\n");
@@ -314,7 +318,14 @@ int main(int argc, char** argv) {
         snprintf(path, sizeof(path), "t2/u/%08X", key);
         auto blob = std::dynamic_pointer_cast<Ship::Blob>(ResourceLoad(path));
         size_t blobSize = ResourceGetSizeByName(path);
-        bool same = blob && data && blob->Data.size() == (size_t)hs + 16 && memcmp(blob->Data.data(), data, hs) == 0;
+        // the Blob holds the stored (ROM-order) bytes: through the unit's swap plan they must
+        // equal what T2Asset hands the engine
+        std::vector<uint8_t> host;
+        if (blob && blob->Data.size() >= hs) {
+            host.assign(blob->Data.begin(), blob->Data.begin() + hs);
+            T2Asset_SwapUnit(key, host.data(), hs);
+        }
+        bool same = blob && data && blob->Data.size() == (size_t)hs + 16 && memcmp(host.data(), data, hs) == 0;
         CHECK(same, "Blob route differs for %s", path);
         CHECK(blobSize == (size_t)hs + 16, "ResourceGetSizeByName(%s) = %zu, want %u + 16", path, blobSize, hs);
         printf("  %s rom %6X host %6X flags %03X first bytes %02X%02X%02X%02X  blob: %s (size %zu)\n", path, rs, hs,
@@ -354,7 +365,8 @@ int main(int argc, char** argv) {
         if (tsv && tsv->IsLoaded) {
             std::ofstream(tsvPath, std::ios::binary).write(tsv->Buffer->data(), tsv->Buffer->size());
         }
-        if (T2Asset_OpenRom(args.rom.c_str(), tsvPath.c_str()) == 0) {
+        if (T2Asset_OpenRom(args.rom.c_str(), tsvPath.c_str()) == 0 &&
+            T2Asset_LoadSwapFile(archivePath.c_str()) == 0) { // the same host-order bytes
             Pass rom = ReadAllUnits();
             PrintPass("rom", rom);
             CHECK(rom.hash == lus.hash && rom.bytes == lus.bytes, "ROM and LUS backends disagree");
@@ -388,6 +400,7 @@ int main(int argc, char** argv) {
         g.rom = args.rom;
         g.frames = args.frames;
         g.draw = args.draw;
+        g.audio = args.audio;
         g.lowMemory = args.lowMemory;
         g.verbose = args.verbose;
         CHECK(T2Game_Run(window, g) == 0, "game run");

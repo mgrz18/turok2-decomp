@@ -17,6 +17,6 @@ s32 TitleMenu_SoundOptions(s32 arg0, s32 arg1, s32 arg2) {
     Sound__SetForce2D(1);
     sSoundMenuActive = 0;
     Controller_DisableMenuSounds();
-    MenuPool_OpenChildMenu(arg2, arg1, (s32) &gSoundOptionsMenuDesc);
+    MenuPool_OpenChildMenu(arg2, arg1, &gSoundOptionsMenuDesc);
     return 1;
 }

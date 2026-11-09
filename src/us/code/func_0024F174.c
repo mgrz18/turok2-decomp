@@ -26,7 +26,7 @@ f32 func_002974C0(f32 x);
 void CVector3__LimitLength(CVector3 *v, f32 max);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
-void Sound__Play(s16 sound, CVector3 pos, s32, s32);
+void Sound__Play(s16 sound, CVector3 pos, sptr, s32);
 
 /* Walking movement: forward and strafe speeds towards the stick, the dodge
  * impulses, turned into world space and added to the velocity. */

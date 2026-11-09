@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void memset(s8 *arg0, s8 arg1, s32 arg2) {
-    s32 var_v0;
+void memset(s8 *arg0, s8 arg1, sptr arg2) {
+    sptr var_v0;
     s8 *var_a0;
 
     var_a0 = arg0;

@@ -55,7 +55,7 @@ void Crash_PutChar(s32 c) {
         row = 0;
     nextRow:
         for (col = 0; col < 8; col++) {
-            pixel = (u16 *)(((y + row) * width + (x + col)) * 2 + (u32)fb);
+            pixel = (u16 *)(((y + row) * width + (x + col)) * 2 + (uptr)fb);
             if (!((gCrashFont[c][row] >> (7 - col)) & 1)) {
                 *pixel = sCrashBgColor;
             } else {

@@ -3,7 +3,7 @@
 #include "globals/menu.h"
 
 
-s32 COnScreen__GetFontTexture(void);
+sptr COnScreen__GetFontTexture(void);
 
 /* Loads the texture COnScreen__GetFontTexture returns into TMEM, as gDPLoadTextureBlock
  * would: set the image, the load tile, sync, load the block, then the render

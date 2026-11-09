@@ -18,7 +18,7 @@ extern s32 Cinema_IsActive(void);
 extern s16 *CPlayer__GetFiringAmmo(CPlayer *p, s32);
 extern void Cinema_Disable(void);
 extern void Cinema_Enable(void);
-extern void CGameRegion__FireTriggers(s32, s32, CPlayer *p);
+extern void CGameRegion__FireTriggers(sptr, s32, CPlayer *p);
 
 void CPlayer__LevelStart_2(CPlayer *p) {
     GameSettings *flags = &gEngineApp_m_Settings;
@@ -46,7 +46,7 @@ void CPlayer__LevelStart_2(CPlayer *p) {
     c->m_vRot.y = 1.5707965f;
     p->m_pRumble = NULL;
     if (!flags->multiplayer) {
-        Controller_SetRumbleOption((s32) p->m_ContState.m_pContState, 1);
+        Controller_SetRumbleOption(p->m_ContState.m_pContState, 1);
     }
     p->m_FlashlightTime = 0.0f;
     p->m_pDLFlashlight1 = NULL;
@@ -86,7 +86,7 @@ void CPlayer__LevelStart_2(CPlayer *p) {
     }
     Cinema_Disable();
     if (p->m_CharacterActor.header.m_pCurrentRegion) {
-        CGameRegion__FireTriggers((s32) p->m_CharacterActor.header.m_pCurrentRegion, 1, p);
+        CGameRegion__FireTriggers((sptr) p->m_CharacterActor.header.m_pCurrentRegion, 1, p);
     }
     Cinema_Enable();
 }

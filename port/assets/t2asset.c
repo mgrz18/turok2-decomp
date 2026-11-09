@@ -144,6 +144,212 @@ u32 T2Rnc_Unpack(const u8 *src, size_t avail, u8 *dst, u32 dstCap)
 static const T2AssetBackend *sBe;
 static void *sCtx;
 
+/* ===================================================================================== */
+/* byte order: swap plans (t2/swap, docs/assets/ARCHIVE.md)                              */
+/* ===================================================================================== */
+/* Table layout (little-endian): 'T2SW' u16 major u16 minor u32 count u32 reserved, then count
+ * x {u32 key, u32 hostSize, u32 offset, u32 runs, u32 tables} sorted by key; each plan at
+ * `offset` (from the table start): runs x {u32 offset, u32 count << 2 | width code (1: 2 bytes,
+ * 2: 4, 3: 8)}, then tables x {u32 offset, u32 records, u32 swaps, swaps x {u16 plane, u16 width}}
+ * (a transposed table, CUSet__Transpose: a w-byte field at record offset p is planes p..p+w-1,
+ * each `records` bytes long; swapping it reverses those planes). Runs first, then tables, the
+ * order of tools/assets/swapcheck.py apply_plan(). */
+#define SWAP_HDR 16
+#define SWAP_REC 20
+#define SWAP_MAJOR 2
+static u8 *sSwap;
+static size_t sSwapLen;
+static u32 sSwapN;
+static u32 sSwapApplied, sSwapNoPlan, sSwapRefused;
+
+static int host_little(void)
+{
+    const u16 one = 1;
+    return *(const u8 *)&one == 1;
+}
+
+static void swap_drop(void)
+{
+    free(sSwap);
+    sSwap = NULL, sSwapLen = 0, sSwapN = 0;
+    sSwapApplied = sSwapNoPlan = sSwapRefused = 0;
+}
+
+int T2Asset_SetSwapTable(const void *data, size_t len)
+{
+    const u8 *p = (const u8 *)data;
+    u32 n, i, prev = 0;
+    swap_drop();
+    if (len < SWAP_HDR || memcmp(p, "T2SW", 4) != 0)
+        return fail("t2/swap: bad magic");
+    if ((u32)(p[4] | p[5] << 8) != SWAP_MAJOR)
+        return fail("t2/swap: format %u, this reader needs %u (rebuild the archive)", (u32)(p[4] | p[5] << 8), SWAP_MAJOR);
+    n = le32(p + 8);
+    if ((u64)n * SWAP_REC + SWAP_HDR > len)
+        return fail("t2/swap: truncated index");
+    for (i = 0; i < n; i++) {
+        const u8 *r = p + SWAP_HDR + (size_t)i * SWAP_REC;
+        u64 need = (u64)le32(r + 12) * 8 + (u64)le32(r + 16) * 12;
+        if ((i && le32(r) <= prev) || le32(r + 8) < SWAP_HDR + (u64)n * SWAP_REC || le32(r + 8) + need > len)
+            return fail("t2/swap: bad record %u (key %08X)", i, le32(r));
+        prev = le32(r);
+    }
+    sSwap = (u8 *)malloc(len);
+    if (!sSwap)
+        return fail("out of memory");
+    memcpy(sSwap, data, len);
+    sSwapLen = len, sSwapN = n;
+    return 0;
+}
+
+int T2Asset_SwapActive(void) { return sSwap != NULL && host_little(); }
+
+void T2Asset_SwapStats(u32 *applied, u32 *noPlan, u32 *refused)
+{
+    if (applied) *applied = sSwapApplied;
+    if (noPlan) *noPlan = sSwapNoPlan;
+    if (refused) *refused = sSwapRefused;
+}
+
+static const u8 *swap_find(u32 key)
+{
+    u32 lo = 0, hi = sSwapN;
+    while (lo < hi) {
+        u32 mid = (lo + hi) / 2;
+        const u8 *r = sSwap + SWAP_HDR + (size_t)mid * SWAP_REC;
+        if (le32(r) == key) return r;
+        if (le32(r) < key) lo = mid + 1; else hi = mid;
+    }
+    return NULL;
+}
+
+static void rev_bytes(u8 *p, u32 w)
+{
+    u32 i;
+    for (i = 0; i < w / 2; i++) {
+        u8 t = p[i];
+        p[i] = p[w - 1 - i];
+        p[w - 1 - i] = t;
+    }
+}
+
+int T2Asset_SwapUnit(u32 key, void *data, u32 size)
+{
+    u8 *buf = (u8 *)data;
+    const u8 *rec, *q, *end;
+    u32 runs, tables, i;
+    if (!T2Asset_SwapActive())
+        return 0;
+    rec = swap_find(key);
+    if (!rec) {
+        sSwapNoPlan++;
+        return 0;
+    }
+    if (le32(rec + 4) != size) { /* a mod entry with another size: no plan fits it */
+        sSwapRefused++;
+        return fail("0x%08X: swap plan is for 0x%X bytes, unit has 0x%X", key, le32(rec + 4), size);
+    }
+    q = sSwap + le32(rec + 8);
+    end = sSwap + sSwapLen;
+    runs = le32(rec + 12), tables = le32(rec + 16);
+    /* check the whole plan before touching the buffer: a unit is swapped completely or not at all */
+    {
+        const u8 *c = q + (size_t)runs * 8;
+        for (i = 0; i < runs; i++) {
+            u32 o = le32(q + 8 * i), cw = le32(q + 8 * i + 4), w = 1u << (cw & 3), n = cw >> 2;
+            if ((cw & 3) == 0 || (u64)o + (u64)w * n > size)
+                return fail("0x%08X: swap run %u outside the unit", key, i);
+        }
+        for (i = 0; i < tables; i++) {
+            u32 d, n, k, ns;
+            if (c + 12 > end) return fail("0x%08X: swap plan truncated", key);
+            d = le32(c), n = le32(c + 4), ns = le32(c + 8);
+            c += 12;
+            if (c + (size_t)ns * 4 > end) return fail("0x%08X: swap plan truncated", key);
+            for (k = 0; k < ns; k++) {
+                u32 pl = (u32)(c[4 * k] | c[4 * k + 1] << 8), w = (u32)(c[4 * k + 2] | c[4 * k + 3] << 8);
+                if ((u64)d + (u64)(pl + w) * n > size)
+                    return fail("0x%08X: swap table %u outside the unit", key, i);
+            }
+            c += (size_t)ns * 4;
+        }
+    }
+    for (i = 0; i < runs; i++, q += 8) {
+        u32 o = le32(q), cw = le32(q + 4), w = 1u << (cw & 3), n = cw >> 2, k;
+        u8 *p = buf + o;
+        switch (w) {
+        case 2:
+            for (k = 0; k < n; k++, p += 2) { u8 t = p[0]; p[0] = p[1]; p[1] = t; }
+            break;
+        case 4:
+            for (k = 0; k < n; k++, p += 4) {
+                u8 t0 = p[0], t1 = p[1];
+                p[0] = p[3], p[1] = p[2], p[2] = t1, p[3] = t0;
+            }
+            break;
+        default:
+            for (k = 0; k < n; k++, p += w) rev_bytes(p, w);
+            break;
+        }
+    }
+    for (i = 0; i < tables; i++) {
+        u32 d = le32(q), n = le32(q + 4), ns = le32(q + 8), k;
+        q += 12;
+        for (k = 0; k < ns; k++, q += 4) {
+            u32 pl = (u32)(q[0] | q[1] << 8), w = (u32)(q[2] | q[3] << 8), j;
+            for (j = 0; j < w / 2; j++) { /* swap planes pl+j and pl+w-1-j, n bytes each */
+                u8 *a = buf + d + (size_t)(pl + j) * n, *b = buf + d + (size_t)(pl + w - 1 - j) * n;
+                u32 x;
+                for (x = 0; x < n; x++) { u8 t = a[x]; a[x] = b[x]; b[x] = t; }
+            }
+        }
+    }
+    sSwapApplied++;
+    return 1;
+}
+
+int T2Asset_LoadSwapFile(const char *path)
+{
+    FILE *f;
+    long n;
+    u8 *buf;
+    int rc;
+    mz_zip_archive zip;
+    memset(&zip, 0, sizeof zip);
+    if (mz_zip_reader_init_file(&zip, path, 0)) {
+        size_t len = 0;
+        void *p = mz_zip_reader_extract_file_to_heap(&zip, "t2/swap", &len, 0);
+        mz_zip_reader_end(&zip);
+        if (!p) return fail("%s: no t2/swap entry", path);
+        rc = T2Asset_SetSwapTable(p, len);
+        mz_free(p);
+        return rc;
+    }
+    f = fopen(path, "rb");
+    if (!f) return fail("%s: cannot open", path);
+    fseek(f, 0, SEEK_END);
+    n = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    buf = n > 0 ? (u8 *)malloc((size_t)n) : NULL;
+    if (!buf || fread(buf, 1, (size_t)n, f) != (size_t)n) {
+        fclose(f);
+        free(buf);
+        return fail("%s: read error", path);
+    }
+    fclose(f);
+    rc = T2Asset_SetSwapTable(buf, (size_t)n);
+    free(buf);
+    return rc;
+}
+
+/* backend load + byte order: every unit the front end hands out goes through here */
+static int load_unit(u32 key, void *dst, u32 hostSize)
+{
+    if (sBe->load(sCtx, key, dst, hostSize) < 0)
+        return -1;
+    return T2Asset_SwapUnit(key, dst, hostSize) < 0 ? -1 : 0;
+}
+
 /* resident copies of RAW_RANGE units, for reads at inner addresses (archive backend) */
 typedef struct { u32 key, size; u8 *data; } Resident;
 static Resident sRes[4];
@@ -167,6 +373,7 @@ void T2Asset_SetBackend(const T2AssetBackend *backend, void *ctx)
 void T2Asset_Close(void)
 {
     drop_residents();
+    swap_drop();
     if (sBe && sBe->close)
         sBe->close(sCtx);
     sBe = NULL;
@@ -213,7 +420,8 @@ static int read_raw(u32 addr, u8 *dst, u32 len)
 {
     u32 i, n = T2Asset_UnitCount();
     int slot = -1;
-    if (sBe->read_raw)
+    /* the backend's raw reader gives ROM order: only for bytes no swap plan covers */
+    if (sBe->read_raw && (!T2Asset_SwapActive() || n == 0))
         return sBe->read_raw(sCtx, addr, dst, len);
     for (i = 0; i < 4; i++)
         if (sRes[i].data && addr >= sRes[i].key && addr - sRes[i].key < sRes[i].size)
@@ -226,15 +434,20 @@ static int read_raw(u32 addr, u8 *dst, u32 len)
             if (T2Asset_UnitKey(mid) <= addr) lo = mid + 1; else hi = mid;
         }
         if (lo == 0)
-            return fail("0x%08X: no unit", addr);
+            return sBe->read_raw ? sBe->read_raw(sCtx, addr, dst, len) : fail("0x%08X: no unit", addr);
         key = T2Asset_UnitKey(lo - 1);
-        if (!sBe->lookup(sCtx, key, &r, &h, &f) || !(f & T2U_INNER) || addr - key >= h)
+        if (!sBe->lookup(sCtx, key, &r, &h, &f) || !(f & T2U_INNER) || addr - key >= h) {
+            if (sBe->read_raw) /* outside every unit (a raw ROM read): ROM bytes */
+                return sBe->read_raw(sCtx, addr, dst, len);
             return fail("0x%08X: not inside a RAW_RANGE unit", addr);
+        }
+        if (sBe->read_raw && !swap_find(key)) /* nothing to swap in it: no resident copy needed */
+            return sBe->read_raw(sCtx, addr, dst, len);
         for (i = 0; i < 4 && sRes[i].data; i++)
             ;
         if (i == 4) { free(sRes[3].data); i = 3; }
         sRes[i].data = alloc_buf(h);
-        if (!sRes[i].data || sBe->load(sCtx, key, sRes[i].data, h) < 0) {
+        if (!sRes[i].data || load_unit(key, sRes[i].data, h) < 0) {
             free(sRes[i].data);
             sRes[i].data = NULL;
             return fail("0x%08X: cannot load RAW_RANGE unit", key);
@@ -262,7 +475,7 @@ const void *T2Asset_Read(u32 romKey, u32 *size)
     }
     if (sBe->lookup(sCtx, romKey, &r, &h, &f) && !((f & T2U_INNER) && want != 0 && want < h)) {
         buf = alloc_buf(h);
-        if (!buf || sBe->load(sCtx, romKey, buf, h) < 0) {
+        if (!buf || load_unit(romKey, buf, h) < 0) {
             free(buf);
             if (!sErr[0]) fail("0x%08X: load failed", romKey);
             return NULL;
@@ -296,14 +509,14 @@ int T2Asset_ReadInto(u32 address, u32 offset, void *dst, u32 len)
     /* RAW_RANGE units (audio) are read piecemeal at any inner address: raw path */
     if (sBe->lookup(sCtx, address, &r, &h, &f) && !(f & T2U_INNER)) {
         if (offset == 0 && len >= h) {
-            if (sBe->load(sCtx, address, dst, h) < 0)
+            if (load_unit(address, dst, h) < 0)
                 return -1;
             memset((u8 *)dst + h, 0, len - h);
             return 0;
         }
         {
             u8 *tmp = alloc_buf(h);
-            if (!tmp || sBe->load(sCtx, address, tmp, h) < 0) {
+            if (!tmp || load_unit(address, tmp, h) < 0) {
                 free(tmp);
                 return -1;
             }
@@ -567,6 +780,18 @@ int T2Asset_OpenArchive(const char *path)
         }
     arc_manifest(c);
     T2Asset_SetBackend(&kArchiveBackend, c);
+    {   /* byte-swap plans (format 2); a 1.x archive has none and is served in ROM order */
+        size_t len = 0;
+        void *p = mz_zip_reader_extract_file_to_heap(&c->zip, "t2/swap", &len, 0);
+        if (p) {
+            int rc = T2Asset_SetSwapTable(p, len);
+            mz_free(p);
+            if (rc < 0) {
+                T2Asset_Close();
+                return -1;
+            }
+        }
+    }
     return 0;
 }
 

@@ -5,9 +5,13 @@
  *
  * 1. ROM backend (ROM + units list): reads every load unit (RNC unpacked by port/assets/rnc.c, CRC16
  *    checked) and keeps the bytes.
- * 2. Each archive: same unit set (count and keys), every unit byte-identical to (1),
- *    T2Asset_HostSize, prefix probes, and RAW_RANGE reads at inner addresses (the audio
- *    DMA pattern) against the ROM image.
+ * 2. Each archive: same unit set (count and keys), every unit byte-identical to (1) after
+ *    (1)'s bytes go through the archive's swap plans (T2Asset_SwapUnit; ROM order when the
+ *    archive has no t2/swap), swapping twice gives (1) back, T2Asset_HostSize, prefix probes
+ *    (served from the swapped unit), and reads at inner addresses of the three audio units
+ *    (the audio DMA pattern) against the ROM image / the swapped VM windows.
+ * 3. With a format 2 archive: the ROM backend with T2Asset_LoadSwapFile(archive) gives the
+ *    same host-order bytes as the archive.
  * Prints counts and times; exit status 0 only if everything matched.
  */
 #include "../assets/t2asset.h"
@@ -24,7 +28,7 @@ static double now(void)
     return ts.tv_sec + ts.tv_nsec * 1e-9;
 }
 
-typedef struct { u32 key, romSize, hostSize, flags; const u8 *data; } Ref;
+typedef struct { u32 key, romSize, hostSize, flags; const u8 *data; u8 *host; } Ref;
 
 static u32 sSeed = 12345;
 static u32 rnd(void) { sSeed = sSeed * 1103515245u + 12345u; return sSeed >> 8; }
@@ -96,6 +100,36 @@ int main(int argc, char **argv)
         }
         tOpen = now() - t0;
         m = T2Asset_UnitCount();
+        {   /* expected host-order bytes: (1) through this archive's plans */
+            u32 dbl = 0, planned = 0;
+            for (i = 0; i < n; i++) {
+                Ref *r = &ref[i];
+                free(r->host);
+                r->host = NULL;
+                if (!r->data) continue;
+                r->host = (u8 *)malloc(r->hostSize + 1);
+                memcpy(r->host, r->data, r->hostSize);
+                if (T2Asset_SwapUnit(r->key, r->host, r->hostSize) < 0) {
+                    fprintf(stderr, "%s: swap %08X: %s\n", argv[a], r->key, T2Asset_Error());
+                    bad++;
+                    continue;
+                }
+                if (memcmp(r->host, r->data, r->hostSize) != 0) {
+                    u8 *twice = (u8 *)malloc(r->hostSize + 1);
+                    planned++;
+                    memcpy(twice, r->host, r->hostSize);
+                    T2Asset_SwapUnit(r->key, twice, r->hostSize);
+                    if (memcmp(twice, r->data, r->hostSize) != 0) {
+                        if (dbl < 5) fprintf(stderr, "%s: %08X: swapping twice does not give the ROM bytes\n", argv[a], r->key);
+                        dbl++;
+                    }
+                    free(twice);
+                }
+            }
+            printf("%s: swap %s, %u units change byte order, %u double-swap errors\n", argv[a],
+                   T2Asset_SwapActive() ? "active" : "off (no t2/swap or big-endian host)", planned, dbl);
+            bad += dbl;
+        }
         if (m != n) {
             fprintf(stderr, "%s: %u units, ROM backend has %u\n", argv[a], m, n);
             bad++;
@@ -111,7 +145,7 @@ int main(int argc, char **argv)
                 break;
             }
             d = (const u8 *)T2Asset_Read(key, &sz);
-            if (!d || !r->data || sz != r->hostSize || memcmp(d, r->data, sz) != 0) {
+            if (!d || !r->host || sz != r->hostSize || memcmp(d, r->host, sz) != 0) {
                 if (mism < 10)
                     fprintf(stderr, "%s: %08X differs (size %X vs %X)%s\n", argv[a], key, sz, r->hostSize, d ? "" : T2Asset_Error());
                 mism++;
@@ -135,20 +169,25 @@ int main(int argc, char **argv)
             probed++;
             prefix += sz == 4;
             /* with a manifest the probe returns 4 bytes; without one the whole unit */
-            if (!d || (sz != 4 && sz != r->hostSize) || memcmp(d, r->data, 4) != 0) {
+            if (!d || (sz != 4 && sz != r->hostSize) || memcmp(d, r->host, 4) != 0) {
                 if (probes < 5) fprintf(stderr, "%s: probe %08X -> %X\n", argv[a], r->key, sz);
                 probes++;
             }
             T2Asset_Release(d);
         }
-        /* RAW_RANGE: 20000 reads of 0x300 bytes at random inner addresses of the three audio units */
+        /* RAW_RANGE / VM_WINDOW: 20000 reads of 0x300 bytes at random inner addresses of the three
+         * audio units (the wave table has no plan: ROM bytes; the two VM windows: swapped) */
         t0 = now();
         for (i = 0; i < 20000; i++) {
             static const u32 lo[3] = { T2_ROOT_AUDIO_CTL, T2_ROOT_AUDIO_DATA, T2_ROOT_SOUND_DATA };
             static const u32 hi[3] = { T2_ROOT_AUDIO_DATA, T2_ROOT_SOUND_DATA, T2_ROOT_CARTRIDGE };
             u8 buf[0x300];
-            u32 k = i % 3, addr = lo[k] + rnd() % (hi[k] - lo[k] - 0x300);
-            if (T2Asset_ReadInto(addr, 0, buf, sizeof buf) < 0 || memcmp(buf, rom + addr, sizeof buf) != 0) {
+            u32 k = i % 3, addr = lo[k] + rnd() % (hi[k] - lo[k] - 0x300), j;
+            const u8 *want = rom + addr;
+            for (j = 0; j < n; j++)
+                if (ref[j].key == lo[k] && ref[j].host && addr - lo[k] + sizeof buf <= ref[j].hostSize)
+                    want = ref[j].host + (addr - lo[k]);
+            if (T2Asset_ReadInto(addr, 0, buf, sizeof buf) < 0 || memcmp(buf, want, sizeof buf) != 0) {
                 if (raw < 5) fprintf(stderr, "%s: raw read %08X: %s\n", argv[a], addr, T2Asset_Error());
                 raw++;
             }
@@ -158,11 +197,39 @@ int main(int argc, char **argv)
                "%u/%u 4-byte probes served as prefix (%u errors), 20000 audio reads %.3f s (%u errors)\n",
                argv[a], m, tOpen, tRead, mism, hs, prefix, probed, probes, tRaw, raw);
         bad += mism + probes + raw + hs;
+        {
+            u32 ap, np, rf;
+            T2Asset_SwapStats(&ap, &np, &rf);
+            printf("%s: swap counters (this check + the reads): %u plans applied, %u loads without a plan, %u refused\n", argv[a], ap, np, rf);
+            bad += rf;
+        }
         T2Asset_Close();
+        /* 3. the ROM backend with this archive's plans: same host-order bytes */
+        if (T2Asset_OpenRom(argv[1], argv[2]) == 0 && T2Asset_LoadSwapFile(argv[a]) == 0) {
+            u32 rm = 0;
+            t0 = now();
+            for (i = 0; i < n; i++) {
+                u32 sz = 0;
+                const u8 *d = (const u8 *)T2Asset_Read(ref[i].key, &sz);
+                if (!d || !ref[i].host || sz != ref[i].hostSize || memcmp(d, ref[i].host, sz) != 0) {
+                    if (rm < 5) fprintf(stderr, "rom + %s plans: %08X differs\n", argv[a], ref[i].key);
+                    rm++;
+                }
+                T2Asset_Release(d);
+            }
+            printf("rom backend + %s's t2/swap: %u units, %u mismatches, %.3f s\n", argv[a], n, rm, now() - t0);
+            bad += rm;
+            T2Asset_Close();
+        } else {
+            printf("rom backend + %s's t2/swap: skipped (%s)\n", argv[a], T2Asset_Error());
+            T2Asset_Close();
+        }
     }
 
-    for (i = 0; i < n; i++)
+    for (i = 0; i < n; i++) {
         T2Asset_Release(ref[i].data);
+        free(ref[i].host);
+    }
     free(ref);
     free(rom);
     printf("%s\n", bad ? "FAIL" : "OK");

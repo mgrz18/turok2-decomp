@@ -178,7 +178,7 @@ void CEngineApp__Draw(CEngineApp *level) {
         g->w0 = 0xDF000000;         /* gSPEndDisplayList */
         g->w1 = 0;
     }
-    gFrameData->m_DisplayListSize = (u32)gDList - (u32)gFrameData->m_pDisplayList;
+    gFrameData->m_DisplayListSize = (uptr)gDList - (uptr)gFrameData->m_pDisplayList;
     if (level->m_Settings.mode == 0xD) {
         gFrameData->m_bLines = Automap_IsShown(&level->m_Game.m_Automap);
     } else {
@@ -198,7 +198,7 @@ void CEngineApp__Draw(CEngineApp *level) {
             g->w0 = 0xDF000000;     /* gSPEndDisplayList */
             g->w1 = 0;
         }
-        gFrameData->m_LineListSize = (u32)gDList - (u32)gFrameData->m_pLineList;
+        gFrameData->m_LineListSize = (uptr)gDList - (uptr)gFrameData->m_pLineList;
     }
     gFrameData->m_nPredictTicks = gNextTicks;
     gRenderTime = (f32)(((osGetTime() - start) * 64) / 3) * 0.000001f;   /* OS_CYCLES_TO_USEC */

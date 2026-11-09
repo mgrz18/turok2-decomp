@@ -45,8 +45,8 @@ void Player_OnMultiplayerKill(CGameObjectInstance *actor, s32 arg1, DamageEvent 
     CGameObjectInstance *source;
     CGameObjectInstance *owner;
     CPlayerOptions *options;
-    s32 killerIndex;
-    s32 victimIndex;
+    sptr killerIndex;
+    sptr victimIndex;
     s32 *score;
     s32 *teamScore;
 

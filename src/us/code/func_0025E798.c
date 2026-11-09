@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-extern void Sound__Play(s16 sound, CVector3 pos, s32, s32);
+extern void Sound__Play(s16 sound, CVector3 pos, sptr, s32);
 
 void EnemyMode_Start_Enter(CGameObjectInstance *obj) {
     u16 temp_a0;

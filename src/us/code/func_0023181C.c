@@ -14,13 +14,13 @@ typedef struct {
 } Parent0023181C;
 
 void func_0023181C(CParticle *arg0) {
-    s32 temp_s0;
+    sptr temp_s0;
     u16 temp_v1;
     u8 temp_a0;
     CParticle *temp_s0_2;
 
     if (arg0->header.m_nObjType == 0x68) {
-        temp_s0 = (s32) arg0->m_pOwner->m_AI.m_pParent;
+        temp_s0 = (sptr) arg0->m_pOwner->m_AI.m_pParent;
         ((Parent0023181C *)((*CPlayer__GetFiringAmmo(temp_s0, 0x15) * 2) + temp_s0))->flags934[0] = 1;
     }
     temp_s0_2 = arg0->m_pSource;

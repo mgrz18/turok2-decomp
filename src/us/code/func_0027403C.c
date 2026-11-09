@@ -25,7 +25,7 @@ void SndVoicePool_Update(void **arg0) {
     var_s0 = 0;
     do {
         if ((((Slot0027403C *)var_s1)->id != -1) && (((Owner0027403C *)*arg0)->skipIndex != var_s0)) {
-            SndVoice_Update((s32) var_s1);
+            SndVoice_Update((sptr) var_s1);
             var_s2 += 1;
         }
         var_s0 += 1;

@@ -5,8 +5,8 @@
 #include "protos/scene.h"
 
 
-s32 func_0027AE00(s32 arg0) {
-    s32 r;
+sptr func_0027AE00(s32 arg0) {
+    sptr r;
 
     if (gPersistentDataLoaded != 0) {
         r = CScene__LoadGraphicSet(&gScene, arg0, 3, 1);

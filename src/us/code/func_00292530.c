@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern s32 __voiceNeedsNoteKill(void *arg0, s32 arg1, s32 arg2);
+extern s32 __voiceNeedsNoteKill(void *arg0, sptr arg1, s32 arg2);
 extern void alUnlink(void *arg0);
 extern void alLink(void *arg0, void **arg1);
-s32 __voiceNeedsNoteKill(void *arg0, s32 arg1, s32 arg2) {
+s32 __voiceNeedsNoteKill(void *arg0, sptr arg1, s32 arg2) {
     s32 amount;
     s32 total;
     s32 result;
@@ -20,7 +20,7 @@ s32 __voiceNeedsNoteKill(void *arg0, s32 arg1, s32 arg2) {
             amount = ((ALEventListItem *)cur)->delta;
             next = ((ALEventListItem *)cur)->node.next;
             total += amount;
-            if (((ALEventListItem *)cur)->evt.type == 5 && (s32)((ALEvent *)&((ALEventListItem *)cur)->evt)->msg.note.voice == arg1) {
+            if (((ALEventListItem *)cur)->evt.type == 5 && (sptr)((ALEvent *)&((ALEventListItem *)cur)->evt)->msg.note.voice == arg1) {
                 if (arg2 < total) {
                     if (next != 0) {
                         ((ALEventListItem *)next)->delta = ((ALEventListItem *)next)->delta + amount;

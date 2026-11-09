@@ -16,7 +16,7 @@ extern void *PakMenu_GetReturnMenu_2(Menu *c);
 extern s32 Controller_TakePakChanged(s32 slot);
 extern s32 Pak_IsRumblePak_2(s32 slot);
 extern s32 Pak_NeedsRepair_2(s32 slot);
-extern void MenuPool_OpenMenu_2(void *menus, void *tmpl, s32 a, s32 b, void *parent);
+extern void MenuPool_OpenMenu_2(void *menus, void *tmpl, sptr a, sptr b, void *parent);
 
 s32 PakMenu_CheckPak_2(Menu *c, s32 slot, s32 quiet) {
     s32 status;

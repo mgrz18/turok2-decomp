@@ -27,7 +27,7 @@ typedef struct MenuMatchGlobals {
 } MenuMatchGlobals;
 
 extern MenuMatchGlobals gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
+extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, sptr, s32);
 extern void *CCameraPool__GetNearestCamera(MenuMatchGlobals *arg0, CVector3 *arg1);
 
 void CAudioWorld__UpdateAmbientTrack(ContextRecAt2BC0 *arg0) {

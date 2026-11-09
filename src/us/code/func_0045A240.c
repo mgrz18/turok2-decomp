@@ -5,5 +5,5 @@
 
 extern s32 func_0045A240(s32 *block);
 s32 func_0045A240(s32 *block) {
-    return ((struct Shape_typemap_3 *) (block[0] + (s32) block))[-1].field_0;
+    return ((struct Shape_typemap_3 *) (block[0] + (sptr) block))[-1].field_0;
 }

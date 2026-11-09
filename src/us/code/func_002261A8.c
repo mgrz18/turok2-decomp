@@ -59,9 +59,9 @@ typedef struct {
     /* 0x54 */ f32 z2;
 } Element;
 
-void CScene__DecompressIntelligence(s32 unused, void ***resource) __attribute__((section(".text_vm")));
+void CScene__DecompressIntelligence(sptr unused, void ***resource) __attribute__((section(".text_vm")));
 
-void CScene__DecompressIntelligence(s32 unused, void ***resource) {
+void CScene__DecompressIntelligence(sptr unused, void ***resource) {
     f32 scale = 1.0f;
     s32 *table;
     s32 count;

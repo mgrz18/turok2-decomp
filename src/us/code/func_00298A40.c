@@ -5,10 +5,10 @@
 #include "globals/libultra.h"
 
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern s32 __osSiRawStartDma(s32, s32);
+extern s32 __osSiRawStartDma(s32, sptr);
 extern s32 osRecvMesg(OSMesgQueue *, void **, s32);
 extern void __osSiCreateAccessQueue();
-extern void osCreateMesgQueue(void *, s32, s32);
+extern void osCreateMesgQueue(void *, sptr, s32);
 extern u64 osGetTime(void);
 extern void __osPackRequestData(s32 arg0);
 extern void __osContGetInitData(s32 *arg0, s32 arg1);
@@ -26,19 +26,19 @@ s32 osContInit(s32 arg0, s32 *arg1, s32 arg2) {
     *initialized = 1;
     value = osGetTime();
     if (value <= 0x0165A0BBULL) {
-        osCreateMesgQueue(sp40, (s32)sp58, 1);
+        osCreateMesgQueue(sp40, (sptr)sp58, 1);
         osSetTimer(sp20, 0x0165A0BCULL - value, 0, sp40, sp58);
-        osRecvMesg(sp40, (s32)sp58, 1);
+        osRecvMesg(sp40, sp58, 1);
     }
     __osContNumControllers = 4;
     __osPackRequestData(0);
     __osSiRawStartDma(1, &__osContBuffer);
-    osRecvMesg(arg0, (s32)sp58, 1);
+    osRecvMesg(arg0, sp58, 1);
     result = __osSiRawStartDma(0, &__osContBuffer);
-    osRecvMesg(arg0, (s32)sp58, 1);
+    osRecvMesg(arg0, sp58, 1);
     __osContGetInitData(arg1, arg2);
     __osContLastCmd = 0;
     __osSiCreateAccessQueue();
-    osCreateMesgQueue(&__osContMesgQueue, (s32)&__osContMesgBuff, 1);
+    osCreateMesgQueue(&__osContMesgQueue, (sptr)&__osContMesgBuff, 1);
     return result;
 }

@@ -13,7 +13,7 @@ void __osRestoreInt(u32 mask);
 
 /* Loads a four-byte probe to read a count, frees it under the resource lock, then loads count*4+15
  * rounded to eight bytes and stores its first word through arg1, returning the allocation. */
-void **CCache__LoadPersistantIndex(s32 arg0, void **arg1, s32 arg2, void *arg3) {
+void **CCache__LoadPersistantIndex(s32 arg0, void **arg1, sptr arg2, void *arg3) {
     void **resource;
     s32 size;
     s32 counter;

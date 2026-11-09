@@ -18,7 +18,7 @@ void alEvtqFlush(void *arg0)
     {
       temp_s0 = *var_s1;
       alUnlink(var_s1);
-      alLink((s32) var_s1, (s32) arg0);
+      alLink((sptr) var_s1, (sptr) arg0);
       var_s1 = temp_s0;
     }
     while (var_s1 != 0);

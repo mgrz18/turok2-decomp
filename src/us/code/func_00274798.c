@@ -10,7 +10,7 @@ s32 alSndpSetPan(s32, s32);
 s32 alSndpSetSound(s32, s16);                    /* extern */
 
 void SndVoice_SetPan(Model *arg0, s32 arg1) {
-    s32 var_s0;
+    sptr var_s0;
     s32 var_s1;
     s16 *temp_v0;
 

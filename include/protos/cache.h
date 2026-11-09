@@ -19,11 +19,11 @@ void CCache__AddToAddressList(s32, struct CMemEntry *);
 void CCache__Advance(void);
 void *CCache__AllocCacheEntry(s32, s32);
 struct CMemEntry *CCache__AllocMemEntry(s32, s32);
-struct B12Node *CCache__Allocate(s32, s32, u32, s32);
-struct B12Node *CCache__AllocateAt(s32, s32, s32);
+struct B12Node *CCache__Allocate(s32, s32, u32, sptr);
+struct B12Node *CCache__AllocateAt(s32, sptr, s32);
 struct CMemEntry *CCache__AllocateInternal(s32, s32, s32);
-s32 CCache__AllocateMemoryForDecompression(s32, void *, s32);
-s32 CCache__AllocateMemoryForDecompressionTop(s32, s32, s32);
+sptr CCache__AllocateMemoryForDecompression(s32, void *, s32);
+sptr CCache__AllocateMemoryForDecompressionTop(s32, sptr, s32);
 void CCache__BeginDisplayList(s32, s32);
 void CCache__ClearCurrentDisplayList(void);
 void CCache__ClearDisplayListLocks(s32, s32);
@@ -47,16 +47,20 @@ s32 CCache__GetFreeCacheEntryCount(void);
 s32 CCache__GetFreeMemEntryCount(void);
 s32 CCache__GetMemEntryCount(void);
 void *CCache__HeapAlloc(s32, u32, s32, u32);
-void **CCache__LoadPersistantIndex(s32, void **, s32, void *);
-void CCache__LoadPersistantSubBlock(s32, s32, s32, s32, s32, s32, s32);
+void **CCache__LoadPersistantIndex(s32, void **, sptr, void *);
+#ifdef TARGET_PORT
+void *CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, sptr, sptr, sptr); /* callers read the request it leaves in v0 */
+#else
+void CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, sptr, s32, sptr);
+#endif
 void CCache__LockForDisplayList(s32, struct B12Node *);
 void *CCache__LookupAndLock(s32, s32);
 void CCache__Main(void);
 struct CMemEntry *CCache__PopFreeMemEntry(s32, s32);
 void CCache__PostDisplayListDone(s32, s32);
 void CCache__ReleaseAndReplaceData(s32, void *, struct CMemEntry *);
-void CCache__ReleaseDisplayList(s32, s32);
-struct CMemEntry *CCache__Request(s32, u32, u32, u32, sptr, void *, char *, u32);
+void CCache__ReleaseDisplayList(s32, sptr);
+struct CMemEntry *CCache__Request(s32, uptr, u32, u32, sptr, void *, char *, u32);
 struct CMemEntry *CCache__RequestDecompression(s32, s32, struct CMemEntry *, struct CMemEntry *, s32, void *, void *, void *, s32);
 void CCache__SetFrameDelay(s32);
 void *CCache__TakeFreeCacheEntry(void);

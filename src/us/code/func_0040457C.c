@@ -85,7 +85,7 @@ void Primagen_NextSoundStep(void);
 void Primagen_RunSoundStep(Entity0040457C *actor, void *level, s32 a2);
 
 static __inline__ Wave0040457C *CurrentWave(void) {
-    return (Wave0040457C *)(gLevelScript.wave * sizeof(Wave0040457C) + (s32)gLevelScript.waves);
+    return (Wave0040457C *)(gLevelScript.wave * sizeof(Wave0040457C) + (sptr)gLevelScript.waves);
 }
 
 void Primagen_UpdateSpawner(Entity0040457C *actor, void *level) {

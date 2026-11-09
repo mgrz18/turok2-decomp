@@ -13,7 +13,7 @@ s32 CPlayerPool__CountIdleMenus(CPlayerPool *arg0) {
     var_s1 = 0;
     if (var_s0 != NULL) {
         do {
-            if ((var_s0->m_bActive != 0) && (MenuPool_CountOpen((s32) var_s0->m_pCamera->m_MenuPool) == 0)) {
+            if ((var_s0->m_bActive != 0) && (MenuPool_CountOpen((sptr) var_s0->m_pCamera->m_MenuPool) == 0)) {
                 var_s1 += 1;
             }
             var_s0 = var_s0->m_pNext;

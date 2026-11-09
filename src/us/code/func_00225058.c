@@ -19,7 +19,7 @@ static __inline__ s32 World_ActorIndex(CScene *world, CGameObjectInstance *actor
     base = (CGameObjectInstance *)world->m_pActors;
     if (actor >= base &&
         (char *)actor <= (char *)base + ((u32)world->m_nActors * sizeof(CGameObjectInstance) - sizeof(CGameObjectInstance))) {
-        return ((u32)actor - (u32)base) / sizeof(CGameObjectInstance);
+        return ((uptr)actor - (uptr)base) / sizeof(CGameObjectInstance);
     }
     return -1;
 }

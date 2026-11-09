@@ -7,13 +7,13 @@
 
 extern char D_11059;
 extern char D_94F;
-int IsDataPointer(u32 arg0) {
-    if (arg0 >= (u32)&gHashSize &&
-        arg0 < (u32)&gHashSize + (u32)&D_11059) {
+int IsDataPointer(uptr arg0) {
+    if (arg0 >= (uptr)&gHashSize &&
+        arg0 < (uptr)&gHashSize + (uptr)&D_11059) {
         return 1;
     }
-    if (arg0 >= (u32)&gPrimagenPaths &&
-        arg0 < (u32)&gPrimagenPaths + (u32)&D_94F) {
+    if (arg0 >= (uptr)&gPrimagenPaths &&
+        arg0 < (uptr)&gPrimagenPaths + (uptr)&D_94F) {
         return 1;
     }
     return 0;

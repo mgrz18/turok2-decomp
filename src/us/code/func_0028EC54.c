@@ -17,7 +17,7 @@ void VM_AllocRegion(RegionDesc *desc) {
     PageRegion *p;
     PageRegion *prev;
     PageRegion *r;
-    u32 start;
+    uptr start;
     s32 pages;
     s32 count;
     u8 *map;

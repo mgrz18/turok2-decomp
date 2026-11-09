@@ -24,15 +24,15 @@ void alSeqNew(MidiReader *arg0, s32 arg1, s32 arg2) {
     arg0->unk1A = 0;
     arg0->unkC = 0;
     arg0->cursor = arg1;
-    if (__alSeqReadWord((s32) arg0) == 0x4D546864) {
-        __alSeqReadWord((s32) arg0);
+    if (__alSeqReadWord((sptr) arg0) == 0x4D546864) {
+        __alSeqReadWord((sptr) arg0);
         if (((__alSeqReadShort(arg0) << 0x10) == 0) && (__alSeqReadShort(arg0) == 1)) {
             temp_v0 = __alSeqReadShort(arg0);
             arg0->division = temp_v0;
             if (!(temp_v0 & 0x8000)) {
                 arg0->tickScale = (f32) (1.0f / (f32) temp_v0);
-                if (__alSeqReadWord((s32) arg0) == 0x4D54726B) {
-                    __alSeqReadWord((s32) arg0);
+                if (__alSeqReadWord((sptr) arg0) == 0x4D54726B) {
+                    __alSeqReadWord((sptr) arg0);
                     arg0->trackStart = arg0->cursor;
                 }
             }

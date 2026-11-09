@@ -102,7 +102,7 @@ struct M1Ref {
                 s32 unkC;
 };
 extern u8 gEngineApp_m_SwooshSystem[];
-void Sound__Play(s16 id, CVector3 pos, s32 a, s32 b);
+void Sound__Play(s16 id, CVector3 pos, sptr a, s32 b);
 void Actor_SpawnParticle(M1Actor *a, s32 id, CVector3 pos, s32 n);
 void AI_DropPickupsOnce(M1Actor *a, M1State *s, s32 n, s32 x, s32 y);
 void SwooshSet_FreeOwner(u8 *p, M1Actor *a);

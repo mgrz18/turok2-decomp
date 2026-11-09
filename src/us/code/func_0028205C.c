@@ -3,7 +3,7 @@
 
 s32 CCache__Deallocate(s32, s32);                /* extern */
 s32 CCache__Flush(s32);                     /* extern */
-s32 Sound__SetListener(s32);                         /* extern */
+s32 Sound__SetListener(sptr);                         /* extern */
 
 /* Frees the pool's cameras, the main one first. */
 void CCameraPool__FreeCameras(CCameraPool *pool) {

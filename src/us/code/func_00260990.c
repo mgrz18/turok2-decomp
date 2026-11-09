@@ -10,7 +10,7 @@ void EnemyHover_Advance(s32 arg0, CAI *ai) {
     f32 temp_f0;
     f32 temp_f20;
 
-    if ((EnemyAI_GetBehaviorIndex(arg0, (s32) ai) != 1) || (ai->m_Mode != 4)) {
+    if ((EnemyAI_GetBehaviorIndex(arg0, (sptr) ai) != 1) || (ai->m_Mode != 4)) {
         temp_f20 = 0.17453295f;
         *(f32 *) &ai->m_VarBuffer[1] = Math_DecayToZero(*(f32 *) &ai->m_VarBuffer[1], temp_f20);
         *(f32 *) &ai->m_VarBuffer[0] = Math_DecayToZero(*(f32 *) &ai->m_VarBuffer[0], temp_f20);

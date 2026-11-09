@@ -13,6 +13,6 @@ void Turret_Hurt(s32 arg0, CAI *arg1, DamageEvent *arg2) {
     }
     arg1->m_Health = var_v1;
     if (var_v1 == 0) {
-        CAI__SetMode(arg0, (s32) arg1, 0x40);
+        CAI__SetMode(arg0, arg1, 0x40);
     }
 }

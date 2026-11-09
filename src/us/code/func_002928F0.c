@@ -22,7 +22,7 @@ typedef struct {
 
 /* Resets every channel to its defaults. */
 void __initChanState(MidiPlayer *arg0) {
-    s32 temp_v1;
+    sptr temp_v1;
     s32 var_a1;
 
     var_a1 = 0;

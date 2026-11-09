@@ -29,7 +29,7 @@ s32 PakConfirmMenu_Poll(Menu *arg0) {
                 } else {
                     var_a1 = (s32) arg0->controller->port;
                 }
-                if (PakMenu_CheckPak((s32) arg0, var_a1, 0) != 0) {
+                if (PakMenu_CheckPak((sptr) arg0, var_a1, 0) != 0) {
                     sPakConfirmDone = 1;
                 }
             }

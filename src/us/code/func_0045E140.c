@@ -10,7 +10,7 @@
  * block address. */
 
 typedef struct {
-    s32 addr; /* 0x0 */
+    uptr addr; /* 0x0 */
 } MemHandle;
 
 typedef struct {
@@ -23,10 +23,10 @@ typedef struct {
 } GfxPool;
 
 extern MemHandle *CCache__Allocate(s32 heap, s32 size, s32 flags, char *name); /* allocate */
-extern MemHandle *CCache__AllocateAt(s32 heap, s32 addr, s32 size, char *name);  /* claim a fixed block */
+extern MemHandle *CCache__AllocateAt(s32 heap, sptr addr, s32 size, char *name);  /* claim a fixed block */
 extern void CCache__Deallocate(s32 heap, MemHandle *handle);                     /* free */
 extern u32 GetMemSize(void);                                             /* osGetMemSize */
-extern void memset(void *dst, s32 value, u32 size);                  /* memset */
+extern void memset(void *dst, s32 value, uptr size);                  /* memset */
 
 extern char D_800C1864[]; /* "audio heap": the byte after it is the linker's fill (0x0B), not a zero the C could give */
 

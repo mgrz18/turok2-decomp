@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/heap.h"
 
-void CHeap__Construct(CHeap *heap, u8 *start, s32 size) {
+void CHeap__Construct(CHeap *heap, u8 *start, sptr size) {
     u8 *end = start + size;
     CHeapBlock *block = (CHeapBlock *)(((uptr)start + 15) & ~15);
 

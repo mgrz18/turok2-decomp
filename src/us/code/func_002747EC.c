@@ -10,8 +10,8 @@ s32 alSndpGetState(s32);                         /* extern */
 s32 alSndpSetSound(s32, s16);                    /* extern */
 
 void SndVoice_GetState(Model *arg0) {
-    s32 temp_s0;
-    s32 temp_v1;
+    sptr temp_s0;
+    sptr temp_v1;
 
     temp_v1 = arg0->header;
     temp_s0 = temp_v1 + 0x84;

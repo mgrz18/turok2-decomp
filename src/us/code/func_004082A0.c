@@ -26,7 +26,7 @@ void CCameraPool__AddTimedText(void *, s32, void *, f32);
 void Sound__PlaySpeech(s32);
 void COnScreen__SetBossPercent(void *, s32);
 void COnScreen__SetBossPercent2(void *, s32);
-s8 CGameObjectInstance__PickRandomAnim(void *, s32, s32);
+s8 CGameObjectInstance__PickRandomAnim(void *, sptr, sptr);
 void TotemDefense_Fail(TotemDefenseState *);
 void TotemDefense_Complete(TotemDefenseState *);
 

@@ -14,7 +14,7 @@ s32 PakMenu_IsSavePortalMenu_2(StateHolder *arg0) {
     s32 temp_v1;
 
     temp_v1 = arg0->stateHandler;
-    if ((temp_v1 == (s32) &gSavePortalMenuDescB_2) || (temp_v1 == (s32) &gSavePortalMenuDesc_2)) {
+    if ((temp_v1 == (sptr) &gSavePortalMenuDescB_2) || (temp_v1 == (sptr) &gSavePortalMenuDesc_2)) {
         gCameraPoolHideViews = 0;
         return 1;
     }

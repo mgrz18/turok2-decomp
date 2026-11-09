@@ -37,7 +37,7 @@ void CMtxF__MultiplyAffine(void *, void *, void *);
 void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *, ShadowParams *, void *, u8);
 void Shadow_DrawBlob(CGameObjectInstance *, s32, s32);
 
-void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, s32 unused, ShadowParams *s) {
+void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, sptr unused, ShadowParams *s) {
     CVector3 dir;
     f32 r;
     u8 m[0x40];

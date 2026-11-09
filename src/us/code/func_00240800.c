@@ -18,7 +18,7 @@ void Collision_SweepRegionWalls(CGameRegion *region) {
     u8 cornerDone[3];
     s32 i;
 
-    if ((u32) &region < (u32) &D_800C894C) {
+    if ((uptr) &region < (uptr) &D_800C894C) {
         return;
     }
     i = 0;

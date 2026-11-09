@@ -10,7 +10,12 @@ extern char D_8011AB8B[];
 extern char D_800C1338[];
 
 s32 MenuItem_TextLength_2(MenuItem *item);
+#ifdef TARGET_PORT
+/* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
+void sprintf(char *dst, const char *fmt, ...);
+#else
 void sprintf(char *dst, char *fmt, s32 value);
+#endif
 
 s32 StatsMenu_PlayerRowText_2(MenuItem *item, Menu *event) {
     s32 other = item->index - 2;

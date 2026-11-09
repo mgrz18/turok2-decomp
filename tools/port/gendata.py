@@ -63,6 +63,14 @@ import sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
+# host layout = the machine the port is built on (docs/port/MACOS.md for macOS arm64)
+if sys.platform == 'darwin':
+    DEFAULT_LIBCLANG = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
+    DEFAULT_HOST_TARGET = 'arm64-apple-macos13'
+else:
+    DEFAULT_LIBCLANG = '/usr/lib/llvm-19/lib/libclang-19.so.1'
+    DEFAULT_HOST_TARGET = 'x86_64-linux-gnu'
+
 # ---------------------------------------------------------------------------
 # libclang worker: declared types, in both layouts
 # ---------------------------------------------------------------------------
@@ -72,9 +80,10 @@ _index = None
 _targets = None
 
 
-def _init_worker(libclang, targets):
-    global _ci, _index, _targets
+def _init_worker(libclang, targets, host_target='x86_64-linux-gnu'):
+    global _ci, _index, _targets, _host_target
     import clang.cindex as ci
+    _host_target = host_target
     if libclang:
         ci.Config.set_library_file(libclang)
     _ci = ci
@@ -160,7 +169,7 @@ def _parse_args(cmd):
         if skip:
             skip -= 1
             continue
-        if a in ('-o', '-c'):
+        if a in ('-o', '-c', '-arch'):  # -arch: the target is given explicitly (_worker)
             skip = 1
             continue
         if a.startswith('-W'):
@@ -177,7 +186,7 @@ def _worker(job):
     res = {}
     try:
         tus = []
-        for tgt in ('x86_64-linux-gnu', 'mips-linux-gnu'):
+        for tgt in (_host_target, 'mips-linux-gnu'):
             tus.append(_index.parse(path, args=args + ['-target', tgt]))
         decls = []
         for tu in tus:
@@ -288,6 +297,22 @@ class Elf:
 # layout: leaves of a described type
 # ---------------------------------------------------------------------------
 
+# Sections whose address-only (SHN_ABS) labels are read as data, not left as .bss.
+ABS_DATA_SECTIONS = ('.code_rodata', '.code_rodata_tail')
+
+# Runtime state that sits, by address, inside the loaded .libultra section
+# (0x800C2474..0x800F632C): what the ELF has there is other bytes (code, tables,
+# strings), the game writes these before it reads them. Their pointer slots were
+# the "not a known address" list of data_report.txt (docs/port/DATA.md).
+RUNTIME_BSS = frozenset("""
+    gDemoPlayer_match_decode gAudioWorld gRumbleEntries gDemoPlayer sPathSearch
+    gAudioFrameMsgBuf gAudioReplyMsgBuf gLoopSoundEntries gAudioThread gLoopSounds
+    gRumblePool sMapSweep sPathNeighbour D_800F1FF4 gAudioDmaBuffers sCinema50Player
+    sPathSorted sPoseChildren D_800F55F0 D_800F55F4 gAudioReplyMsgQ sDeathCinemaPlayer
+    gAudioGlobals gCollisionResultsP gPakMesgBuf sPathSwap sPoseRegion
+""".split())
+
+
 def dsize(d):
     """(n64 size, host size) of a description."""
     t = d[0]
@@ -332,8 +357,11 @@ def leaves(d, noff, hoff, out):
             leaves(d[2], noff + i * n, hoff + i * h, out)
     elif t == 'r':
         fields = d[6]
-        if d[5]:  # union: the first member decides
-            fields = fields[:1]
+        if d[5]:  # union: the first member decides, except that a scalar member as large as
+            # the union wins (libultra's du is { struct { u32 hi, lo; } w; f64 d; }: written by
+            # its words, a little-endian double comes out with its halves swapped)
+            whole = [f for f in fields if f[2] < 0 and f[3][0] == 's' and f[3][1] == d[1]]
+            fields = whole[:1] if whole else fields[:1]
         for nb, hb, bw, fd in fields:
             if bw >= 0:
                 out.append((noff * 8 + nb, hoff * 8 + hb, 'b', bw, dsize(fd)[1], None))
@@ -344,24 +372,64 @@ def leaves(d, noff, hoff, out):
 
 
 def dtranslate(d, noff):
+    return _dtranslate(d, noff)[0]
+
+
+def _dtranslate(d, noff):
+    """(host offset, typed): typed is False when the offset only lands in a byte array (a
+    `u8 pad[N]` view), so that a union prefers the member that types the offset: CGame's
+    camera pool is `union { CCameraPool m_CameraPool[1]; struct { u8 pad[..]; u8 m_MenuPool[..]; }; }`
+    and CEngineApp's game `union { CGame m_Game; struct { u8 pad[..]; GameSettings m_Settings; }; }`
+    (structs/game.h). Ties go to the first member, as in leaves()."""
     t = d[0]
     if t == 'a':
         n, h = dsize(d[2])
         if n <= 0:
-            return noff
+            return noff, False
         i = noff // n
-        return i * h + dtranslate(d[2], noff - i * n)
+        sub, typed = _dtranslate(d[2], noff - i * n)
+        if d[2][0] == 's' and d[2][1] == 1 and d[1] > 4:
+            typed = False
+        return i * h + sub, typed
     if t == 'r':
-        best = None
-        for nb, hb, bw, fd in d[6]:
-            if bw < 0 and nb // 8 <= noff:
-                best = (nb // 8, hb // 8, fd)
-        if best is None:
-            return noff
-        return best[1] + dtranslate(best[2], noff - best[0])
+        cands = [(nb // 8, hb // 8, fd) for nb, hb, bw, fd in d[6] if bw < 0 and nb // 8 <= noff]
+        if not cands:
+            return noff, True
+        if d[5]:  # union: every member starts at 0
+            best = None
+            for c in cands:
+                if noff - c[0] >= dsize(c[2])[0]:
+                    continue
+                sub, typed = _dtranslate(c[2], noff - c[0])
+                if best is None or (typed and not best[1]):
+                    best = (c[1] + sub, typed)
+            if best is not None:
+                return best
+        c = cands[-1]
+        sub, typed = _dtranslate(c[2], noff - c[0])
+        return c[1] + sub, typed
     if t == 'p':
-        return min(noff, 4)
-    return noff
+        return min(noff, 4), True
+    return noff, True
+
+
+# F3DEX2 commands whose w1 is an address: G_VTX, G_MTX, G_MOVEMEM, G_DL, G_RDPHALF_1 (branch),
+# G_SETTIMG, G_SETZIMG, G_SETCIMG (and G_MOVEWORD G_MW_SEGMENT, tested apart).
+GFX_ADDR_OPS = {0x01, 0xDA, 0xDC, 0xDE, 0xE1, 0xFD, 0xFE, 0xFF}
+
+
+def is_gfx(d):
+    """A Gfx (or an array of them): two words that are 4 bytes on the N64 and 8 on the host
+    (gfx.h GfxWord). Static display lists in the ROM hold N64 addresses in w1."""
+    if d is None:
+        return False
+    if d[0] == 'a':
+        d = d[2]
+    if d[0] == 'r' and d[5]:  # a union: its first member
+        d = d[6][0][3] if d[6] else d
+    if d[0] != 'r' or len(d[6]) != 2:
+        return False
+    return all(f[3][0] == 's' and f[3][1] == 4 and f[3][2] == 8 for f in d[6])
 
 
 def shape(d):
@@ -405,7 +473,9 @@ def main():
     ap.add_argument('--build', required=True, help='port build dir (compile_commands.json, libturok2_game.a)')
     ap.add_argument('--elf', default=os.path.join(ROOT, 'build/turok2.us.elf'))
     ap.add_argument('--out', default=os.path.join(ROOT, 'port/gen'))
-    ap.add_argument('--libclang', default=os.environ.get('LIBCLANG', '/usr/lib/llvm-19/lib/libclang-19.so.1'))
+    ap.add_argument('--libclang', default=os.environ.get('LIBCLANG', DEFAULT_LIBCLANG))
+    ap.add_argument('--host-target', default=DEFAULT_HOST_TARGET,
+                    help='clang triple of the host layout (default: this machine: %s)' % DEFAULT_HOST_TARGET)
     ap.add_argument('-j', type=int, default=4)
     ap.add_argument('--cache', help='json cache of the declared types (skip libclang)')
     a = ap.parse_args()
@@ -421,6 +491,8 @@ def main():
     for line in nm.splitlines():
         p = line.split()
         obj = p[0].split(':')[1]
+        if sys.platform == 'darwin' and p[-1].startswith('_'):
+            p[-1] = p[-1][1:]  # Mach-O C names carry the '_' user label prefix
         if p[-2] == 'U':
             undef_by[obj].add(p[-1])
         elif p[-2] in 'TDBRC':
@@ -442,6 +514,24 @@ def main():
     for obj, us in undef_by.items():
         if obj not in mod2:
             needed |= us - defined
+
+    # data the host runtime and audio libraries read by their N64 names (t2audio_mgr.c replaces
+    # the SDK audio manager and reads gAudioFrameSize, gAudioGlobals, ...): needed too, when the
+    # ELF has them as data. Build those libraries before running the generator.
+    for extra in ('app/libt2runtime.a', 'app/libt2audio.a'):
+        path = os.path.join(a.build, extra)
+        if not os.path.exists(path):
+            print('note: %s not built: its data references are not generated' % extra)
+            continue
+        out = subprocess.run(['nm', '-A', path], capture_output=True, text=True, check=True).stdout
+        for line in out.splitlines():
+            p = line.split()
+            if len(p) < 2 or p[-2] != 'U':
+                continue
+            n = p[-1][1:] if sys.platform == 'darwin' and p[-1].startswith('_') else p[-1]
+            s = elf.syms.get(n)
+            if s and s[3] != 'STT_FUNC' and n not in defined:
+                needed.add(n)
 
     # data the game names through port/include/t2_rename.h (t2_X: libultraship also defines X):
     # generated from X's N64 data, emitted under the t2_ name (#define X t2_X in every file)
@@ -486,7 +576,7 @@ def main():
         decls = collections.defaultdict(list)
         types = {}
         decls['__types__'] = types
-        with multiprocessing.Pool(a.j, _init_worker, (a.libclang, want)) as pool:
+        with multiprocessing.Pool(a.j, _init_worker, (a.libclang, want, a.host_target)) as pool:
             for res in pool.imap_unordered(_worker, jobs, chunksize=4):
                 if '__error__' in res:
                     print('warning:', res.pop('__error__'), file=sys.stderr)
@@ -517,6 +607,11 @@ class Generator:
         self.func_refs = set()
         self.ext_funcs = set()
         self.int_addr = collections.Counter()  # integer leaves that hold an address
+        self.bss_slack = []   # .bss byte views given twice their N64 size
+        self.gfx_syms = []    # display lists (Gfx data)
+        self.ptr_tables = 0   # pointer targets typed as arrays of their pointee
+        self.count_hint = {}  # key -> element count stored next to a pointer to it
+        self.gfx_relocs = 0   # their w1 addresses made host pointers
 
     # -- choosing a type --------------------------------------------------
     def pick(self, name, ds):
@@ -546,6 +641,7 @@ class Generator:
 
     def run(self, data_names, decls):
         self.queue = []
+        self.declared = set(data_names)
         for n in data_names:
             ds = decls.get(n)
             self.add(n, self.pick(n, ds) if ds else None, 'C')
@@ -560,9 +656,17 @@ class Generator:
     def is_bss(self, s):
         """Linker-script symbols (SHN_ABS: placed by address, no .s data
         behind them) are .bss: the ELF bytes at their address belong to
-        whatever splat put there (libultra code, strings), not to them."""
+        whatever splat put there (libultra code, strings), not to them.
+        RUNTIME_BSS: the same for runtime structs that splat's labels put
+        inside the .libultra section (their pointer slots read code bytes)."""
         info = self.elf.syms[s.name]
-        return info[2] == 'SHN_ABS' or self.elf.section_of(s.key) is None
+        r = self.elf.section_of(s.key)
+        if r is None or s.name in RUNTIME_BSS:
+            return True
+        # an address-only label inside the game's rodata is ROM data all the same (the menu
+        # strings D_800B50C0 "damaged controller pak found in" ...: with no bytes the pak
+        # menu measured every line as 0 wide and drew no text)
+        return info[2] == 'SHN_ABS' and r[3] not in ABS_DATA_SECTIONS
 
     def size_of(self, s):
         ext = self.elf.extent(s.key)
@@ -583,6 +687,28 @@ class Generator:
             n, _ = dsize(d)
             if ext > n and ext % n == 0 and ext // n <= 4096 and not self.is_bss(s):
                 d = ['a', ext // n, d]  # m2c `extern s32 D_x;` indexed as an array
+        elif d[0] == 'r' and s.why == 'pointer target' and not self.is_bss(s):
+            # a table reached through a pointer to its first element (MenuDesc.items ->
+            # MenuItemDesc[count]): the count stored next to the pointer when there is one
+            # (symbols inside it become aliases), else as many whole elements as fit before
+            # the next symbol
+            n, _ = dsize(d)
+            cnt = self.count_hint.get(s.key, 0)
+            if n > 0 and cnt <= 1:
+                cnt = ext // n if ext // n <= 4096 else 0
+            if n > 0 and cnt * n > ext:
+                # never over a symbol the C declares (it keeps its own type)
+                i = bisect.bisect_right(self.elf.keys, s.key)
+                while i < len(self.elf.keys) and self.elf.keys[i] < s.key + cnt * n:
+                    k = self.elf.keys[i]
+                    if any(nm in self.declared for nm in self.elf.at[k]):
+                        cnt = (k - s.key) // n
+                        break
+                    i += 1
+            if n > 0 and cnt > 1:
+                d = ['a', cnt, d]
+                ext = max(ext, cnt * n)
+                self.ptr_tables += 1
         elif d[0] in ('x', 'F'):
             return None, ext
         return d, ext
@@ -605,6 +731,12 @@ class Generator:
         raw = None if self.is_bss(s) else self.elf.read(s.key, n)
         if raw is None:
             s.bss = True
+            if d is None or (d[0] == 'a' and d[2][0] == 's' and d[2][1] == 1):
+                # a runtime struct the C only declares as bytes (`extern u8 gPoolBuffers[]`, a
+                # GfxPool of pointers): host pointers can make it up to twice the N64 size
+                s.hsize = 2 * n
+                s.align = 8
+                self.bss_slack.append(s.name)
             return
         raw = raw.ljust(n, b'\0')
         if d is None:
@@ -614,7 +746,19 @@ class Generator:
         leaves(d, 0, 0, lv)
         img = bytearray(h)
         ptrs = []
+        gfx = is_gfx(d)
+        int_after = {lf[0]: lf[3] for lf in lv if lf[2] == 's' and lf[3] in (2, 4) and lf[5] != 'f'}
+        if gfx:
+            self.gfx_syms.append(s.name)
         for noff, hoff, kind, ns, hs, extra in lv:
+            if kind == 's' and gfx and noff % 8 == 4 and ns == 4:
+                # the w1 of a display-list command that carries an address: a host pointer
+                op = raw[noff - 4]
+                v = int.from_bytes(raw[noff:noff + 4], 'big')
+                if (op in GFX_ADDR_OPS or (op == 0xDB and raw[noff - 3] == 0x06)) and 0x80000000 <= v < 0x80800000:
+                    ptrs.append((hoff, v, None))
+                    self.gfx_relocs += 1
+                    continue
             if kind == 's':
                 v = raw[noff:noff + ns]
                 if len(v) < ns:
@@ -623,6 +767,11 @@ class Generator:
                     iv = int.from_bytes(v, 'big')
                     if (0x80000400 <= iv < 0x80400000 or 0x00200500 <= iv < 0x002C3000
                             or 0x00400000 <= iv < 0x0043CC14) and self.elf.containing(phys(iv)) is not None:
+                        if hs == 8:
+                            # a pointer-wide integer (sptr/uptr in src/: "an integer or an
+                            # address") that holds an address: relocated like a void *
+                            ptrs.append((hoff, iv, None))
+                            continue
                         self.int_addr[s.name] += 1
                 if extra == 'f' or ns == hs:
                     img[hoff:hoff + hs] = v[::-1] if ns > 1 else v
@@ -649,6 +798,13 @@ class Generator:
             elif kind == 'p':
                 v = int.from_bytes(raw[noff:noff + 4], 'big')
                 ptrs.append((hoff, v, extra))
+                # { T *items; s16/s32 count; } (MenuDesc): the count sizes the table
+                cnt = int_after.get(noff + 4)
+                if cnt is not None and isinstance(extra, str) and extra != 'F' and v != 0:
+                    c = int.from_bytes(raw[noff + 4:noff + 4 + cnt], 'big', signed=True)
+                    if 1 < c <= 256:
+                        k = phys(v)
+                        self.count_hint[k] = max(self.count_hint.get(k, 0), c)
         items = []
         last = 0
         for hoff, v, pointee in ptrs:
@@ -813,7 +969,12 @@ class Generator:
             f.write('/* %s = %s + 0x%X (N64 0x%08X) */\n' % (s.name, base.name, hoff, s.addr))
             f.write('#if defined(__ELF__)\n__asm__(".globl " T2_SYM(%s) "\\n.set " T2_SYM(%s) ", " T2_SYM(%s) " + %d");\n'
                     % (s.name, s.name, base.name, hoff))
-            f.write('#else\nchar %s[1]; /* FIXME: alias not supported here */\n#endif\n' % s.name)
+            # Mach-O: .set to base+offset gives an N_SECT symbol in the base's section;
+            # .alt_entry keeps it inside the base's atom (subsections_via_symbols, dead_strip)
+            f.write('#elif defined(__APPLE__)\n__asm__(".globl " T2_SYM(%s) "\\n.alt_entry " T2_SYM(%s) '
+                    '"\\n.set " T2_SYM(%s) ", " T2_SYM(%s) " + %d");\n'
+                    % (s.name, s.name, s.name, base.name, hoff))
+            f.write('#else\nchar %s[1]; /* FIXME: alias not supported here (COFF) */\n#endif\n' % s.name)
             self.alias_nonelf.append(s.name)
             return
         al = min(max(s.align, 4), 16)
@@ -934,6 +1095,9 @@ class Generator:
         P('  bytes (no usable declaration): %d' % sum(1 for s in from_c if s.layout_desc is None))
         P('pointer targets generated in addition: %d' % (len(ss) - len(from_c)))
         P('bss (zero) symbols: %d' % sum(1 for s in ss if s.bss))
+        P("bss byte views given twice their N64 size (host pointers): %d" % len(self.bss_slack))
+        P("display lists: %d, w1 addresses relocated: %d" % (len(self.gfx_syms), self.gfx_relocs))
+        P("pointer targets typed as tables of their pointee: %d" % self.ptr_tables)
         P('aliases inside another symbol: %d' % sum(1 for s in ss if s.alias_of))
         np = sum(1 for s in ss for it in s.items if it[1] == 'P')
         P('pointer slots: %d (relocated %d, null %d, unresolved %d)' % (
@@ -959,7 +1123,7 @@ class Generator:
             sum(self.unresolved.values()), len(self.unresolved)))
         for n, c in self.unresolved.most_common():
             P('  %s: %d (e.g. %s)' % (n, c, self.unresolved_ex[n]))
-        P('== aliases (ELF .set; a separate copy elsewhere): %d' % len(self.alias_nonelf))
+        P('== aliases (ELF .set, Mach-O .set + .alt_entry; a 1-byte FIXME copy on COFF): %d' % len(self.alias_nonelf))
         P('== integer slots whose value looks like an address (kept as the N64 handle;'
           ' candidates for pointer typing in src/): %d in %d symbols' % (
               sum(self.int_addr.values()), len(self.int_addr)))

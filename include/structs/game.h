@@ -161,12 +161,33 @@ typedef struct CAutomap {
  * bytes here so that this header does not pull in the cameras and the game
  * objects; the menus' pool is the one of its main camera
  * (m_MainCamera.m_MenuPool), so it is written out. */
+#ifdef TARGET_PORT
+/* The port: the parts CGame and CEngineApp embed are their real types, so that each is laid out
+ * at its host size and gendata's aliases (gEngineApp_m_Game_m_CameraPool, gScene_*, ...) land on
+ * the fields (docs/port/RUNTIME.md). The N64 offsets are the same as the byte views below
+ * (asserted for the mips layout at the end of this file). A one-element array keeps each
+ * `x.m_CameraPool` / `x.m_Scene` expression a pointer, as the byte arrays are. */
+#include "structs/camera.h"
+#include "structs/world.h"
+#include "structs/player.h"
+#endif
+
 typedef struct CGame {
     /* 0x0000 */ CPlayerPool m_PlayerList;
     /* 0x003C */ s32 _pad3C;
+#ifdef TARGET_PORT
+    union {
+        CCameraPool m_CameraPool[1];        /* gEngineApp_m_Game_m_CameraPool */
+        struct {
+            u8 _padMenuPool[__builtin_offsetof(CCameraPool, m_MainCamera.m_MenuPool)];
+            u8 m_MenuPool[0x18];            /* gEngineApp_m_Game_m_MenuPool */
+        };
+    };
+#else
     /* 0x0040 */ u8 m_CameraPool[0x57C];   /* CCameraPool, gEngineApp_m_Game_m_CameraPool (0x11F0 bytes) */
     /* 0x05BC */ u8 m_MenuPool[0x18];      /* its m_MainCamera.m_MenuPool (MenuPool, structs/menu.h), gEngineApp_m_Game_m_MenuPool */
     /* 0x05D4 */ u8 m_CameraPoolEnd[0x1230 - 0x5D4];
+#endif
     /* 0x1230 */ CAutomap m_Automap;   /* the automap (gEngineApp_m_Game_m_DebugLines); reset by func_00430500 */
     /* 0x1268 */ GameSettings m_Settings;  /* gEngineApp_m_Settings */
 } CGame; /* size 0x1490 */
@@ -176,7 +197,11 @@ typedef struct CGame {
  * gEngineApp_m_Settings their code no longer matches); they declare gEngineApp_m_Game_m_CameraPool so. The
  * camera pool files declare it CCameraPool (structs/camera.h). */
 typedef struct CGameFromCameraPool {
+#ifdef TARGET_PORT
+    CCameraPool m_CameraPool[1];
+#else
     /* 0x0000 */ u8 m_CameraPool[0x11F0];   /* CCameraPool: m_MainCamera at 0x40 */
+#endif
     /* 0x11F0 */ CAutomap m_Automap;
     /* 0x1228 */ GameSettings m_Settings;   /* gEngineApp_m_Settings */
 } CGameFromCameraPool; /* size 0x1450 */
@@ -196,6 +221,19 @@ typedef struct CEngineApp {
     /* 0x00000 */ CFrameData m_FrameData[3];
     /* 0x003C0 */ CFrameData *m_pCurrentFrameData;   /* gEngineApp_m_pCurrentFrameData */
     /* 0x003C4 */ s32 m_CartridgeIndex;              /* the ROM address of the cartridge index (0xFCBFB4: CEngineApp__Main, CScene__Construct) */
+#ifdef TARGET_PORT
+    CScene m_Scene[1];                               /* gScene */
+    COnScreen unk19440[1];                           /* gEngineApp_m_OnScreen */
+    u8 m_SwooshSystem[0x22BA0 - 0x19608];            /* gEngineApp_m_SwooshSystem (bytes: the game indexes it so) */
+    u8 unk22BA0[0x22BC0 - 0x22BA0];                  /* D_80119850 */
+    union {
+        CGame m_Game;                                /* gEngineApp_m_Game */
+        struct {
+            u8 _pad22BC0[__builtin_offsetof(CGame, m_Settings)];
+            GameSettings m_Settings;                 /* gEngineApp_m_Settings */
+        };
+    };
+#else
     /* 0x003C8 */ u8 m_Scene[0x19440 - 0x3C8];       /* CScene gScene (0x19078 bytes) */
     /* 0x19440 */ u8 unk19440[0x22BC0 - 0x19440];
     union {
@@ -205,7 +243,23 @@ typedef struct CEngineApp {
             /* 0x23E28 */ GameSettings m_Settings;   /* gEngineApp_m_Settings, m_Game.m_Settings */
         };
     };
+#endif
 } CEngineApp; /* size 0x24050 */
+
+#if defined(TARGET_PORT) && defined(__mips__)
+/* gendata parses the port's headers for mips too: the typed members keep the N64 offsets. */
+_Static_assert(__builtin_offsetof(CGame, m_CameraPool) == 0x40, "CGame.m_CameraPool");
+_Static_assert(__builtin_offsetof(CGame, m_MenuPool) == 0x5BC, "CGame.m_MenuPool");
+_Static_assert(__builtin_offsetof(CGame, m_Automap) == 0x1230, "CGame.m_Automap");
+_Static_assert(sizeof(CGame) == 0x1490, "CGame");
+_Static_assert(__builtin_offsetof(CGameFromCameraPool, m_Settings) == 0x1228, "CGameFromCameraPool");
+_Static_assert(__builtin_offsetof(CEngineApp, m_Scene) == 0x3C8, "CEngineApp.m_Scene");
+_Static_assert(__builtin_offsetof(CEngineApp, unk19440) == 0x19440, "CEngineApp.m_OnScreen");
+_Static_assert(__builtin_offsetof(CEngineApp, m_SwooshSystem) == 0x19608, "CEngineApp.m_SwooshSystem");
+_Static_assert(__builtin_offsetof(CEngineApp, m_Game) == 0x22BC0, "CEngineApp.m_Game");
+_Static_assert(__builtin_offsetof(CEngineApp, m_Settings) == 0x23E28, "CEngineApp.m_Settings");
+_Static_assert(sizeof(CEngineApp) == 0x24050, "CEngineApp");
+#endif
 
 extern CEngineApp gEngineApp;
 

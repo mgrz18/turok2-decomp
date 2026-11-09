@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-Acmd *_decodeChunk(Acmd *ptr, ALLoadFilter *f, s32 tsam, s32 nbytes, s16 outp, s16 inp, u32 flags)
+Acmd *_decodeChunk(Acmd *ptr, ALLoadFilter *f, sptr tsam, s32 nbytes, s16 outp, s16 inp, u32 flags)
 {
     s32 dramAlign, dramLoc;
     if (nbytes > 0) {
@@ -15,10 +15,10 @@ Acmd *_decodeChunk(Acmd *ptr, ALLoadFilter *f, s32 tsam, s32 nbytes, s16 outp, s
     } else
         dramAlign = 0;
     if (flags & 0x02) {
-        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(15) & (0xFFFFFFFFU >> (32 - (8)))) << (24)); _a->words.w1 = (unsigned int)(((u32)(f->lstate) & 0x1FFFFFFF)); };
+        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(15) & (0xFFFFFFFFU >> (32 - (8)))) << (24)); _a->words.w1 = (unsigned int)(((uptr)(f->lstate) & 0x1FFFFFFF)); };
     }
     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(8) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(inp + dramAlign) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(outp) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(tsam << 1) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
-    { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(1) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(flags) & (0xFFFFFFFFU >> (32 - (8)))) << (16)); _a->words.w1 = (unsigned int)(((u32)(f->state) & 0x1FFFFFFF)); };
+    { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(1) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(flags) & (0xFFFFFFFFU >> (32 - (8)))) << (16)); _a->words.w1 = (unsigned int)(((uptr)(f->state) & 0x1FFFFFFF)); };
     f->first = 0;
     return ptr;
 }

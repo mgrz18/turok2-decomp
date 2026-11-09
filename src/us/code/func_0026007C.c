@@ -6,9 +6,9 @@ s32 EnemyAI_NukedFrozenRemove(s32, s32);
 
 void EnemyAI_NukedFrozenUpdate(s32 arg0, CAI *arg1) {
     if (arg1->m_OnFireTimer <= 0.0f) {
-        AI_StopSound(arg0, (s32) arg1);
+        AI_StopSound(arg0, (sptr) arg1);
     }
     if (arg1->m_ModeTime >= 150.0f) {
-        EnemyAI_NukedFrozenRemove(arg0, (s32) arg1);
+        EnemyAI_NukedFrozenRemove(arg0, (sptr) arg1);
     }
 }

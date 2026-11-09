@@ -6,7 +6,7 @@
 #include "globals/menu_desc.h"
 
 s32 PakMenu_CheckPak_2(void *event, s32 port, s32 arg2);
-void MenuPool_OpenMenu_2(char *dst, char *fmt, u8 *player, s32 arg3, char *arg4);
+void MenuPool_OpenMenu_2(char *dst, char *fmt, u8 *player, sptr arg3, char *arg4);
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {
@@ -21,10 +21,10 @@ s32 DamagedPakMenu_SelectRepair_2(s32 unused, Menu *event) {
         if (event->context == (char *)&gSavePortalMenuDescB_2 || event->context == (char *)&gSavePortalMenuDesc_2) {
             gCameraPoolHideViews = 0;
         }
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (sptr) event->controller, NULL);
         return 1;
     } else {
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (char *)&gPakConfirmRepairDesc_2, event->player, (s32) event->controller, event->context);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (char *)&gPakConfirmRepairDesc_2, event->player, (sptr) event->controller, event->context);
         return 1;
     }
 }

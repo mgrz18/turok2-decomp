@@ -7,7 +7,15 @@
 
 extern s32 CAudioWorld__PlaySoundPitched(struct ContextRecAt2BC0 *arg0, s32 arg1, CVector3 arg2,
                          s32 arg3, s32 arg4, f32 arg5);
+#ifdef TARGET_PORT
+int T2Port_AudioReady(void);
+#endif
 s32 Sound__PlayPitched(s32 arg0, CVector3 arg1, s32 arg4, s32 arg5, f32 arg6) {
+#ifdef TARGET_PORT /* no sound bank on the host yet: audio off (port/game/t2audio.c) */
+    if (!T2Port_AudioReady()) {
+        return 0;
+    }
+#endif
     if (gEngineApp_m_Settings.unk1C8 != 0) {
         return -1;
     }

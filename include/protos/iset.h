@@ -12,12 +12,12 @@
 struct ArrayTable;
 
 void *CISet__GetBlock(void *, s32);
-s32 CISet__GetBlockAndSize(s32 *, s32, s32 *);
+sptr CISet__GetBlockAndSize(s32 *, s32, s32 *);
 s32 CISet__GetBlockSize(s32 *, s32);
 s32 CISet__GetDataSize(s32 *);
 s32 CISet__GetOffsetAndSize(s32 *, s32, s32 *);
-s32 CISet__GetROMAddress(s32, s32, s32);
-s32 CISet__GetROMAddressAndSize(s32 *, s32, s32, s32 *);
+s32 CISet__GetROMAddress(sptr, s32, s32);
+sptr CISet__GetROMAddressAndSize(s32 *, sptr, sptr, s32 *);
 void CISet__GetSetAndSize(s32 *, s32 **, s32 *);
 void *CUSet__GetArrayAndSize(struct ArrayTable *, s32 *);
 void CUSet__GetSetAndSize(struct ArrayTable *, void **, s32 *);

@@ -17,6 +17,6 @@ s32 osPiRawReadIo(s32 arg0, s32 *arg1) {
     while (status & 3) {
         status = *(volatile u32 *)0xA4600010;
     }
-    *arg1 = *(s32 *)((u32) osRomBase | arg0 | 0xA0000000);
+    *arg1 = *(s32 *)((uptr) osRomBase | arg0 | 0xA0000000);
     return 0;
 }

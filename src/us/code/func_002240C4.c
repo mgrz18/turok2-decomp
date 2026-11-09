@@ -6,7 +6,7 @@ void Render_ResetBatches(void);
 void CParticleSystem__Draw(void *, s32);
 void Render_FlushBatches(void);
 
-void CScene__DrawParticles(u8 *arg0, s32 arg1) {
+void CScene__DrawParticles(u8 *arg0, sptr arg1) {
     Gfx *g;
 
     /* gSPClipRatio(FRUSTRATIO_1) */

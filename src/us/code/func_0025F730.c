@@ -6,6 +6,6 @@
 void EnemyMode_AirToUnderwater_Update(s32 arg0, CAI *ai) {
     ((s8 *)&ai->m_VarBuffer[9])[3] = 2;
     if (ai->m_AnimRepeatedCount != 0) {
-        CAI__SetMode(arg0, (s32) ai, 4);
+        CAI__SetMode(arg0, ai, 4);
     }
 }

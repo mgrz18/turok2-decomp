@@ -1,6 +1,27 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00238EA8.c, func_00238EA8.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#ifdef TARGET_PORT
+/* The port: the same stores through CCameraViewParams (structs/camera.h); the 4-byte slot
+ * ObjInit has at 0x34 is the m_pCurrentRegion pointer, 8 bytes on the host. */
+#include "common.h"
+#include "structs/camera.h"
+
+extern u32 gDefaultVisBits[];
+void CCameraViewParams__Construct(CCameraViewParams *o) {
+    o->m_YPosOffset = 0.0f;
+    o->m_nType = 1;
+    o->m_RotY = 0.0f;
+    o->m_vRotOffset.x = o->m_vRotOffset.y = o->m_vRotOffset.z = 0.0f;
+    o->m_vPos.x = o->m_vPos.y = o->m_vPos.z = 0.0f;
+    o->m_qGround.x = o->m_qGround.y = o->m_qGround.z = 0.0f;
+    o->m_qGround.w = 1.0f;
+    o->m_pCurrentRegion = NULL;
+    o->m_ZoomBlend = 0.0f;
+    o->m_ZoomFov = 0.17453295f;
+    o->m_VisBits = gDefaultVisBits[0];
+}
+#else
 #include "rw/junk_types.h"
 
 extern s32 gDefaultVisBits[]; /* local type: the u32 of globals/camera.h loads it first (GCC 2 alias order) */
@@ -25,3 +46,4 @@ void CCameraViewParams__Construct(ObjInit *o) {
     o->unk3C = 0.17453295f;
     o->unk40 = gDefaultVisBits[0];
 }
+#endif

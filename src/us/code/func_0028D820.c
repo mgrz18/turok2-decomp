@@ -17,7 +17,7 @@ void __osUnmapTLBAll(void);           /* osUnmapTLBAll */
 void VM_ListAddTail(PageChain *chain, PageMapping *slot);
 void CLoader__LoadSync(CLoader *reader, u8 *source, void *size, u32 dest);
 void func_0028EE40(s32 arg0, s32 arg1, s32 arg2, u32 addr, u32 arg4, s32 arg5);
-void memset(void *dst, s32 value, s32 size);
+void memset(void *dst, s32 value, sptr size);
 void VM_ManagerThread(void);
 
 static __inline__ void fill(void *dst, u8 value, s32 n) {
@@ -62,7 +62,7 @@ void VM_Initialize(void) {
     gPager.regions.pages = 0x80;
     gPager.regions.map = gPager.lookup;
     gPager.regions.next = NULL;
-    gPager.regions.source = (u8 *)((u32)D_14A000 | 0xB0000000);
+    gPager.regions.source = (u8 *)((uptr)D_14A000 | 0xB0000000);
     gPager.mapped = 0;
     if (GetMemSize() > 0x4FFFFF) {
         CLoader__LoadSync(&gLoader, D_14A000, D_3CAE0, extra);

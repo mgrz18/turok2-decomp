@@ -19,6 +19,6 @@ s32 OptionsMenu_StepLookSpring_2(s32 arg0, Menu *arg1) {
             var_s0 = temp_v0_2;
         }
     }
-    var_s0->m_bLookSpring = Menu_StepValue_2((s32) arg1, var_s0->m_bLookSpring, 1, 0, 1, 1);
+    var_s0->m_bLookSpring = Menu_StepValue_2((sptr) arg1, var_s0->m_bLookSpring, 1, 0, 1, 1);
     return 0;
 }

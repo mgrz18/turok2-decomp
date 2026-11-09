@@ -16,7 +16,7 @@ s32 Pak_IsRumblePak_2(s32 ch);
 s32 Pak_NeedsRepair_2(s32 ch);
 void PakMenu_UpdateNoteRows_2(Menu *o);
 u32 Crc32_Compute_2(u8 *data, s32 len, u32 crc);
-void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, s32 d, void *e);
+void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, sptr d, void *e);
 /* Static inlines in the Rage Wars source file (dropped by the importer). */
 static inline u8 *O01Pick(O01Sel *sel) {
     u8 *p;

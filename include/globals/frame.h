@@ -54,13 +54,13 @@ extern s32 gRspFifoSize;                 /* 0x8000 */
 extern u64 *gRspFifoBuffer;
 
 /* The pool buffers (addresses, set at boot). */
-extern s32 gAudioHeapBase;
+extern sptr gAudioHeapBase;
 extern s32 gAudioHeapSize;
-extern s32 gLineList0;
-extern s32 gLineList1;
-extern s32 gDisplayList0;
-extern s32 gDisplayList1;
-extern s32 gDepthBuffer;
+extern sptr gLineList0;
+extern sptr gLineList1;
+extern sptr gDisplayList0;
+extern sptr gDisplayList1;
+extern sptr gDepthBuffer;
 
 /* The crash screen. */
 extern u16 sCrashTextColor;

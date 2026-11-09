@@ -33,7 +33,7 @@ typedef struct {
     /* 0x133 */ s8 index;
 } AttackState;
 
-s32 CGameObjectInstance__PickRandomAnim(void *, s32, s32);
+sptr CGameObjectInstance__PickRandomAnim(void *, sptr, sptr);
 s32 EnemyAnim_NormalDeath_B0390(void *, void *);
 s32 EnemyAnim_NormalDeath_B03C0(void *, void *);
 s32 GameObject_IsOnGround(void *);

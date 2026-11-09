@@ -2,6 +2,7 @@
 # build in the top-level Makefile does not use this directory).
 #   make -C port            build build/t2asset_test, build/rnc_test
 #   make -C port test ROM=../baserom.us.z64 UNITS=units.tsv ARCHIVES="turok2.o2r"
+#   (the first archive also runs the typed-unit test, port/tests/t2asset_typed.py + _test.c)
 CC      ?= cc
 CFLAGS  ?= -O2 -g -Wall -Wextra -Wno-unused-parameter
 BUILD   ?= build
@@ -9,8 +10,9 @@ BUILD   ?= build
 LIB_SRC := assets/t2asset.c assets/rnc.c third_party/miniz/miniz.c
 TEST    := $(BUILD)/t2asset_test
 RNCTEST := $(BUILD)/rnc_test
+TYPED   := $(BUILD)/t2asset_typed_test
 
-all: $(TEST) $(RNCTEST)
+all: $(TEST) $(RNCTEST) $(TYPED)
 
 $(BUILD)/%.o: %.c
 	@mkdir -p $(dir $@)
@@ -21,12 +23,17 @@ $(BUILD)/third_party/%.o: CFLAGS += -w -D_LARGEFILE64_SOURCE
 $(TEST): $(patsubst %.c,$(BUILD)/%.o,$(LIB_SRC) tests/t2asset_test.c)
 	$(CC) $(CFLAGS) $^ -o $@
 
+$(TYPED): $(patsubst %.c,$(BUILD)/%.o,$(LIB_SRC) tests/t2asset_typed_test.c)
+	$(CC) $(CFLAGS) $^ -o $@
+
 $(RNCTEST): $(BUILD)/assets/rnc.o $(BUILD)/tests/rnc_test.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 test: $(TEST) $(RNCTEST)
 	$(RNCTEST) $(ROM)
 	$(TEST) $(ROM) $(UNITS) $(ARCHIVES)
+	python3 tests/t2asset_typed.py $(ROM) -o $(BUILD)/typed.txt
+	$(TYPED) $(firstword $(ARCHIVES)) $(BUILD)/typed.txt $(ROM) $(UNITS)
 
 clean:
 	rm -rf $(BUILD)

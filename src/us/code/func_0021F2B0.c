@@ -19,7 +19,7 @@ f32 func_0021F2B0(CGameObjectInstance *arg0) {
 
     var_f20 = 1.0f;
     if (arg0->m_dwFlags & 0x40000) {
-        temp_v0 = CCache__Request(0, (s32) arg0->m_rpObject, arg0->m_rpObjectHeader, 4, 0, 0, &D_800A5AC4, 1);
+        temp_v0 = CCache__Request(0, (sptr) arg0->m_rpObject, arg0->m_rpObjectHeader, 4, 0, 0, &D_800A5AC4, 1);
         var_f0 = var_f20;
         if (temp_v0 != NULL) {
             var_f20 = HalfToFloat(((ModelSection *) CISet__GetBlock(*temp_v0, 0))->angle);

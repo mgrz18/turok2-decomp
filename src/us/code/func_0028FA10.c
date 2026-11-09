@@ -14,7 +14,7 @@ void alCSPNew(ALCSPlayer *arg0, ALSeqpConfig *arg1) {
     ALSeqpConfig *params = arg1;
     ALHeap *heap = params->heap;
     ALSynth *drvr = &alGlobals->drvr;
-    s32 allocation;
+    sptr allocation;
     s32 i;
     obj->chanMask = 0xFF;
     obj->uspt = 0x1E8;
@@ -31,9 +31,9 @@ void alCSPNew(ALCSPlayer *arg0, ALSeqpConfig *arg1) {
     obj->stopOsc = params->stopOsc;
     obj->nextEvent.type = 9;
     obj->maxChannels = params->maxChannels;
-    obj->chanState = alHeapDBAlloc(0, 0, heap, params->maxChannels, 0x10);
+    obj->chanState = alHeapDBAlloc(0, 0, heap, params->maxChannels, sizeof(ALChanState));
     __initChanState(obj);
-    allocation = alHeapDBAlloc(0, 0, heap, params->maxVoices, 0x38);
+    allocation = alHeapDBAlloc(0, 0, heap, params->maxVoices, sizeof(ALVoiceState));
     obj->vFreeList = 0;
     i = 0;
     if (params->maxVoices > 0) {
@@ -49,7 +49,7 @@ void alCSPNew(ALCSPlayer *arg0, ALSeqpConfig *arg1) {
     }
     obj->vAllocHead = 0;
     obj->vAllocTail = 0;
-    allocation = alHeapDBAlloc(0, 0, heap, params->maxEvents, 0x1C);
+    allocation = alHeapDBAlloc(0, 0, heap, params->maxEvents, sizeof(ALEventListItem));
     alEvtqNew(&obj->evtq, (void *)allocation, params->maxEvents);
     {
         ALPlayer *node = &obj->node;

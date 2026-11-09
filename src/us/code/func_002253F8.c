@@ -2,6 +2,36 @@
 #include "globals/engine.h"
 #include "protos/list.h"
 
+#ifdef TARGET_PORT
+/* The port: the scene's delayed events typed (structs/world.h). */
+#include "structs/world.h"
+#include "structs/event.h"
+
+s32 LevelEvent_Fire(s32);
+void CScene__UpdateDelayedEvents(CScene *scene) {
+    CDelayedEvent *d = scene->m_DelayedEvents.m_pHead;
+    CDelayedEvent *next;
+    s32 fire;
+
+    while (d != NULL) {
+        LevelEvent *event = d->m_pEvent;
+        next = d->m_pNext;
+        fire = 0;
+        if (event->flags & 2) {
+            d->m_Time -= gFrameIncrement;
+            if (d->m_Time <= 0.0f) {
+                fire = 1;
+            }
+        }
+        if (fire) {
+            LevelEvent_Fire((s32)(sptr)event);
+            CList__Remove(&scene->m_DelayedEvents, d);
+            CList__AddHead(&scene->m_FreeDelayedEvents, d);
+        }
+        d = next;
+    }
+}
+#else
 s32 LevelEvent_Fire(s32);
 
 
@@ -44,14 +74,15 @@ void CScene__UpdateDelayedEvents(TimedPool *arg0) {
                 }
             }
             if (var_v1 != 0) {
-                LevelEvent_Fire((s32) temp_a0);
+                LevelEvent_Fire((sptr) temp_a0);
             }
             if (var_s1 != 0) {
-                CList__Remove((s32) &arg0->activeHead, (s32) var_s0);
-                CList__AddHead((s32) &arg0->freeHead, (s32) var_s0);
+                CList__Remove(&arg0->activeHead, var_s0);
+                CList__AddHead(&arg0->freeHead, var_s0);
             }
             var_s0 = temp_s2;
             var_s1 = 0;
         } while (var_s0 != NULL);
     }
 }
+#endif

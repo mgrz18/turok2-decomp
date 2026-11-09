@@ -5,6 +5,6 @@
 
 
 s32 DeathmatchMenu_OpenBloodLust(s32 arg0, s32 arg1, s32 arg2) {
-    MenuPool_OpenChildMenu(arg2, arg1, (s32) &gBloodLustMenuDesc);
+    MenuPool_OpenChildMenu(arg2, arg1, &gBloodLustMenuDesc);
     return 1;
 }

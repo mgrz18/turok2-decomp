@@ -12,8 +12,8 @@ extern void alSndpSetSound(void *arg0, s16 arg1);
 extern s32 alSndpGetState(void *arg0);
 s32 SndVoicePool_GetVoiceState(s32 arg0, s16 arg1)
 {
-  s32 temp_v0;
-  s32 temp_v1;
+  sptr temp_v0;
+  sptr temp_v1;
   void *temp_s0;
   RecordCode8025A3EC *slot;
   OwnerCode8025A3EC8025B5F0 *owner;

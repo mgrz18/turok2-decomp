@@ -10,7 +10,7 @@ typedef struct {
     /* 0x28 */ s32 playing;
 } SoundOwner;
 
-s32 Sound__Play(s16, CVector3, s32, s32);    /* extern */
+s32 Sound__Play(s16, CVector3, sptr, s32);    /* extern */
 
 /* Restarts every looping sound of the owner. */
 void LoopSounds_Resume(SoundOwner *arg0) {

@@ -44,7 +44,7 @@ void CPlayer__FireWeapon(CPlayer *p, s32 type) {
     CCamera *camera = p->m_pCamera;
     AmmoInfo *info;
     s16 *ammo;
-    s32 target;
+    sptr target;
     f32 f;
     s32 found;
 
@@ -89,7 +89,7 @@ void CPlayer__FireWeapon(CPlayer *p, s32 type) {
     }
     vel = p->m_CharacterActor.m_vVelocity;
     if (p->m_CrossHairMode == 2) {
-        target = (s32) p->m_pCrossHairTarget;
+        target = (sptr) p->m_pCrossHairTarget;
     }
     gProjectilePower = p->weapon_particle_damage_scaler;
     if (p->m_SniperMode) {

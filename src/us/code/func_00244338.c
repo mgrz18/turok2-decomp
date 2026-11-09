@@ -64,7 +64,7 @@ void AI_GetPathTargetInfo(CGameObjectInstance *self, CAI *plan, CGameObjectInsta
     CVector3 probe;
     CVector3 away;
     CVector3 delta;
-    s32 region;
+    sptr region;
     s32 boost;
     s32 kind;
     s32 mode;
@@ -124,7 +124,7 @@ void AI_GetPathTargetInfo(CGameObjectInstance *self, CAI *plan, CGameObjectInsta
             Approach(self, target, plan->m_pSightTarget, &pos, &region);
         } else {
             pos = target->header.m_vPos;
-            region = ((s32)target->header.m_pCurrentRegion);
+            region = ((sptr)target->header.m_pCurrentRegion);
             if (mode == 1) {
                 pos.y += target->m_CollisionYOffset + GameObject_GetCollisionHeight(target) * 0.9f;
             }
@@ -164,7 +164,7 @@ void AI_GetPathTargetInfo(CGameObjectInstance *self, CAI *plan, CGameObjectInsta
             break;
         case 6:
             pos = self->header.m_vPos;
-            region = ((s32)self->header.m_pCurrentRegion);
+            region = ((sptr)self->header.m_pCurrentRegion);
             if (mode == 2) {
                 pos.y = GameObject_GetWaterHeight(self);
             }

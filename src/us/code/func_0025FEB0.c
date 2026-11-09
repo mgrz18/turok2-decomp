@@ -40,7 +40,7 @@ void Projectile_PlaceAtMuzzle(Projectile *self, CAI *ai) {
     self->yaw = shooter->m_RotY;
     self->rot = shooter->m_qGround;
     self->pos = owner->m_pCamera->m_vPos;
-    self->unk10 = (s32) shooter->header.m_pCurrentRegion;
+    self->unk10 = (sptr) shooter->header.m_pCurrentRegion;
     s = func_002982F0(self->yaw * 0.5f);
     yaw.x = 0.0f;
     yaw.y = s;

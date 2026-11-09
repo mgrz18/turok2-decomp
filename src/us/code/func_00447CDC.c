@@ -23,7 +23,7 @@ void BlindOne_UpdateFight_2(void *arg0)
     var_s1 = 0x3C;
     do
     {
-      Animator_Update((s32) (arg0 + var_s1));
+      Animator_Update((sptr) (arg0 + var_s1));
       var_s0 += 1;
       var_s1 += 0x64;
       var_s0++;
@@ -31,8 +31,8 @@ void BlindOne_UpdateFight_2(void *arg0)
     }
     while (var_s0 < (*((s32 *) (((s8 *) arg0) + 0x4EC))));
   }
-  BlindOne_UpdateMover_2((s32) (arg0 + 0x518));
-  BlindOne_UpdateMover_2((s32) (arg0 + 0x530));
-  BlindOne_UpdateMover_2((s32) (arg0 + 0x548));
-  COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, BlindOne_GetHealthPercent_2((s32) arg0));
+  BlindOne_UpdateMover_2((sptr) (arg0 + 0x518));
+  BlindOne_UpdateMover_2((sptr) (arg0 + 0x530));
+  BlindOne_UpdateMover_2((sptr) (arg0 + 0x548));
+  COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, BlindOne_GetHealthPercent_2((sptr) arg0));
 }

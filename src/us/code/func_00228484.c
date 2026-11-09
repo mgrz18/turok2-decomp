@@ -13,6 +13,6 @@ void CInstancePool__Free(CInstancePool *world, CListedInstance *arg1) {
     if (temp_v1 != NULL) {
         *temp_v1 -= 1;
     }
-    CList__Remove((s32) &world->m_ActiveList, arg1);
-    CList__AddTail((s32) &world->m_FreeList, arg1);
+    CList__Remove(&world->m_ActiveList, arg1);
+    CList__AddTail(&world->m_FreeList, arg1);
 }

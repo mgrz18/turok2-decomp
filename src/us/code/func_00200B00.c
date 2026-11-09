@@ -7,6 +7,34 @@
 extern void *func_0029E460(void *destination, const void *source, int count);
 s32 RNC_UnpackMethod1();
 s32 RNC_UnpackMethod2();
+#ifdef TARGET_PORT
+#include "structs/cache.h"
+CMemEntry *CCache__AllocDecompressBlock(CCacheEntry *request, u32 size);
+
+/* The host never sees an RNC stream here: the archive stores every RNC unit unpacked
+ * (tools/assets/mkarchive.py refuses units with RNC children) and the loader already put it
+ * in host byte order, so only the N64's plain-data branch is left: with arg1 == 0 the unit
+ * is copied into a block of its own (CCache__DeallocAndReplaceCompressedData swaps it in),
+ * with arg1 != 0 it stays where it was loaded (the N64 decompresses an RNC unit into a block
+ * at the heap top there; plain data is left in place, as here). arg0 is the request
+ * (CCacheEntry, whose first field is the CMemEntry). */
+s32 ProPackDecompress(void **arg0, s32 arg1) {
+    CCacheEntry *request = (CCacheEntry *)arg0;
+    CMemEntry *src = request->memEntry;
+    CMemEntry *dst;
+
+    if (arg1 != 0) {
+        return 1;
+    }
+    dst = CCache__AllocDecompressBlock(request, (u32)src->size);
+    if (dst == NULL) {
+        return 0;
+    }
+    func_0029E460(dst->data, src->data, src->size);
+    CCache__DeallocAndReplaceCompressedData(0, &request->memEntry, dst);
+    return 1;
+}
+#else
 s32 ProPackDecompress(void **arg0, s32 arg1) {
     s32 var_s0;
     u8 temp_v1;
@@ -18,7 +46,7 @@ s32 ProPackDecompress(void **arg0, s32 arg1) {
     temp_s0 = temp_a2->unk0;
     if ((temp_s0->unk0 & ~0xFF) == 0x524E4300) {
         if (arg1 != 0) {
-            var_s1 = CCache__AllocateMemoryForDecompressionTop(0, (s32) arg0, temp_s0->unk4);
+            var_s1 = CCache__AllocateMemoryForDecompressionTop(0, (sptr) arg0, temp_s0->unk4);
         } else {
             var_s1 = CCache__AllocateMemoryForDecompression(0, arg0, temp_s0->unk4);
         }
@@ -55,3 +83,4 @@ s32 ProPackDecompress(void **arg0, s32 arg1) {
 done:
     return var_s0;
 }
+#endif

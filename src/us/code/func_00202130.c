@@ -9,8 +9,8 @@
 #include "protos/cache.h"
 
 s32 GetMemSize(void);                                  /* osGetMemSize */
-void *memset(void *dst, s32 value, u32 size);      /* memset */
-void CHeap__Construct(CHeap *heap, void *base, u32 size);
+void *memset(void *dst, s32 value, uptr size);      /* memset */
+void CHeap__Construct(CHeap *heap, void *base, uptr size);
 void CDecompressor__Construct(CDecompressor *p, s32 n);
 void CLoader__Construct(CLoader *p, s32 n);
 void VM_Initialize(s32 a, s32 b);
@@ -20,14 +20,14 @@ extern u8 D_8014A000[];   /* end of the loaded image */
 void InitializeSystemResources(void) {
     u8 *base;
     u32 top;
-    u32 size;
+    uptr size;
 
     top = 0x80400000;
     base = D_8014A000;
     if (GetMemSize() != 0x400000) {
         top = (GetMemSize() | 0x80000000) - 0x80000;
     }
-    size = top - (u32) base;
+    size = top - (uptr) base;
     memset(base, 0, size);
     CHeap__Construct(&gHeap, base, size);
     CDecompressor__Construct(&gDecompressor, 3);

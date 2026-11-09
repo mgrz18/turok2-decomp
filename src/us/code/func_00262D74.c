@@ -11,6 +11,13 @@
 #include "protos/player.h"
 #include "protos/game.h"
 
+#ifdef TARGET_PORT /* host layout: CGame.m_Settings (structs/game.h) */
+#include "structs/game.h"
+#define GAME_SETTINGS_OFF T2_OFFSETOF(CGame, m_Settings)
+#else
+#define GAME_SETTINGS_OFF 0x1268
+#endif
+
 /* Drops an actor's loot at its feet (raised to the ground height): kind 0
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup
  * if it is unlocked), kind 1 a particle effect, kind 2 a pickup picked at
@@ -41,14 +48,14 @@ static __inline__ void spawnPickup(CGameObjectInstance *actor, CAI *ai, CVector3
 }
 
 /* Spawns the object model (an intelligence entry) at pos. */
-static __inline__ void spawnObject(CGameObjectInstance *actor, CAI *ai, CVector3 pos, CVector3 scale, s32 region, s32 type, s32 *model) {
+static __inline__ void spawnObject(CGameObjectInstance *actor, CAI *ai, CVector3 pos, CVector3 scale, sptr region, s32 type, s32 *model) {
     if (CInstancePool__Spawn(&gScene.m_InstancePool, type, 0, model, region, pos, actor->m_RotY, actor->m_vVelocity, scale, &ai->m_Generator.m_nActive)) {
         ai->m_Generator.m_nRemaining--;
     }
 }
 
 /* Spawns the effect at pos. */
-static __inline__ void spawnEffect(CGameObjectInstance *actor, CAI *ai, CVector3 pos, s32 region, s32 type) {
+static __inline__ void spawnEffect(CGameObjectInstance *actor, CAI *ai, CVector3 pos, sptr region, s32 type) {
     ai->m_Generator.m_nRemaining -= CParticleSystem__Spawn(&gScene.m_ParticleSystem, actor, actor, &ai->m_Generator.m_nActive, 0, type, actor->m_vVelocity, actor->m_qGround, pos, region,
                                -1, 0);
 }
@@ -59,7 +66,7 @@ void Generator_SpawnEnter(CGameObjectInstance *actor, CAI *ai) {
     PickTable picks;
     PickTable unlocked;
     CGeneratorIntelligence *info;
-    s32 region;
+    sptr region;
     s32 *model;
     s32 id;
     f32 ground;
@@ -132,7 +139,7 @@ void Generator_SpawnEnter(CGameObjectInstance *actor, CAI *ai) {
                 item = WeightedTable_Pick(&unlocked);
             }
         } else {
-            player = CPlayerPool__GetFirstActive((u8 *)flags - 0x1268); /* the player list, gEngineApp_m_Game */
+            player = CPlayerPool__GetFirstActive((u8 *)flags - GAME_SETTINGS_OFF); /* the player list, gEngineApp_m_Game */
             if (player == NULL) {
                 break;
             }

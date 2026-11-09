@@ -6,7 +6,7 @@
 extern char D_800A5AC4[];
 
 void **CGameObjectInstance__LoadGeometry(void *obj);
-s32 CGameObjectInstance__BuildBoneMatrices(void *, void *, s32);
+s32 CGameObjectInstance__BuildBoneMatrices(void *, void *, sptr);
 
 s32 CGameObjectInstance__LoadBoneMatrices(CGameObjectInstance *obj, s32 arg1) {
     s32 result;
@@ -18,7 +18,7 @@ s32 CGameObjectInstance__LoadBoneMatrices(CGameObjectInstance *obj, s32 arg1) {
     if (!(obj->m_dwFlags & 0x40000)) {
         return result;
     }
-    res = CCache__Request(0, (s32)obj->m_rpObject, obj->m_rpObjectHeader, 0, 0, 0, D_800A5AC4, arg1);
+    res = CCache__Request(0, (sptr)obj->m_rpObject, obj->m_rpObjectHeader, 0, 0, 0, D_800A5AC4, arg1);
     if (res != NULL) {
         sub = CGameObjectInstance__LoadGeometry(obj);
         if (sub != NULL) {

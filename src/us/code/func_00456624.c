@@ -21,7 +21,7 @@ struct EntryRecAt1C {
 struct EntryRecAt1C;
 typedef struct EntryRecAt1C EntryRecAt1C;
 s32 NameEntryMenu_DeleteChar_2(s32 unused, EntryRecAt1C *arg1) {
-    s32 i;
+    sptr i;
     s32 count;
     i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, arg1->unk1C);
     count = gNameEntries[i].length;

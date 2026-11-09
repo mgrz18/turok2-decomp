@@ -85,8 +85,44 @@ set(T2_LINK_REPLACED
     func_0028D820.c   # VM_Initialize (no pager)
     func_0028E60C.c   # VM_Alloc (resident copy)
     func_0028E6DC.c   # VM_Free
-    # audio (t2boot.c): off until the sound bank is converted for the host (STATUS.md)
+    # audio (docs/port/AUDIO.md): Sound__Initialize in t2boot.c (only with --audio); the SDK
+    # audio manager in port/audio/t2audio_mgr.c (frames through the ABI1 interpreter, resident
+    # wave data instead of the loader's DMA windows)
     func_00275520.c   # Sound__Initialize
+    func_0026F760.c   # amCreateAudioMgr
+    func_0026FB70.c   # __amMain
+    func_0026FD4C.c   # __amDmaNew
+    func_0026FD88.c   # __amHandleFrameMsg
+    func_002700D0.c   # __amDMA
+    # the sound player API (m2c views with N64 offsets): port/audio/t2audio_sndp.c
+    func_00293470.c   # alSndpAllocate
+    func_00293530.c   # alSndpDeallocate
+    func_00293580.c   # alSndpGetState
+    func_00293CE0.c   # alSndpPlay
+    func_00293D40.c   # alSndpSetFXMix
+    func_00293D90.c   # alSndpSetPan
+    func_00293DE0.c   # alSndpSetPitch
+    func_00293E60.c   # alSndpSetSound
+    func_00293E70.c   # alSndpSetVol
+    func_00293EC0.c   # alSndpStop
+    # the scheduler, typed for the host (port/game/t2sched.c: its views overran on LP64)
+    func_0028A020.c   # __scMain
+    func_0028A17C.c   # __scHandleRetrace
+    func_0028A43C.c   # __scHandleRSP
+    func_0028A914.c   # __scHandleRDP
+    func_0028ABE0.c   # __scSchedule
+    func_0028ADF0.c   # osCreateScheduler
+    func_0028AF00.c   # osScAddClient
+    func_0028AF58.c   # osScRemoveClient
+    func_0028AFE8.c   # osScGetCmdQ
+    func_0028AFF0.c   # __scAppendList
+    func_0028B048.c   # __scTaskReady
+    func_0028B0A8.c   # __scTaskComplete
+    func_0028B0FC.c   # __scExec
+    func_0028B274.c   # __scYield
+    func_0028B2AC.c   # Sched_HandleCmdMsg
+    func_0028B3E0.c   # Sched_GetInterruptQ
+    func_0028B3E8.c   # Sched_SubmitTask
 )
 
 # True if NAME (a src/us/code file name) is module 2 (.virtual_1).

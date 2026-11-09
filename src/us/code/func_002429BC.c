@@ -12,7 +12,7 @@ typedef struct CAISetupCallbacks {
     void (*first)(CGameObjectInstance *, CAI *);
 } CAISetupCallbacks;
 
-void memset(void *dst, s32 value, s32 size); /* memset */
+void memset(void *dst, s32 value, sptr size); /* memset */
 void AI_InitHealth(CAI *ai, CIntelligence *def, CVector3 pos, CGameObjectInstance *obj);
 f32 CGameRegion__GetHeight(struct CGameRegion *region, f32 x, f32 z);  /* floor height at */
 s32 CGameObjectInstance__DrawModel();

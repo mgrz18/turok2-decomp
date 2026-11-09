@@ -9,7 +9,7 @@
  * resource (built by CGameObjectInstance__ConstructLitVertices, fixed up once by Model_PulseVertexColors). */
 
 
-void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
+void CGameObjectInstance__DrawShadow(CGameObjectInstance *, sptr, CDrawArgs *);
 void Render_QueueModelInstance(s32, s32, s32, void *, char *, s32, s32);
 void Model_PulseVertexColors(char *, char *);
 void CGameObjectInstance__ConstructLitVertices();
@@ -83,6 +83,6 @@ void CGameObjectInstance__DrawModelLitVertices(CGameObjectInstance *actor, s32 a
     } else {
         data = (char *) (header + 2);
     }
-    Render_QueueModelInstance(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, 0, data, params->m_nModel, actor->m_AI.m_nTexture);
+    Render_QueueModelInstance(params->m_hModel, ((sptr)actor->m_pmtDrawMtxs), 1, 0, data, params->m_nModel, actor->m_AI.m_nTexture);
     CCache__Unlock(0, resource);
 }

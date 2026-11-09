@@ -6,5 +6,5 @@
 
 
 void EnemyAnim_Flee_AFD38(CGameObjectInstance *arg0, s32 arg1) {
-    AI_PickAnimFromTable((s32) arg0, arg1, (s32) sEnemyAnimFlee_AFD38, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wFleeAnimFlags);
+    AI_PickAnimFromTable((sptr) arg0, arg1, sEnemyAnimFlee_AFD38, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wFleeAnimFlags);
 }

@@ -172,7 +172,7 @@ void MotherBoss_AnimEvent(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
     CListedInstance *actor;
     f32 dist;
     s32 i;
-    s32 region;
+    sptr region;
     CVector3 scale;
     f32 r;
     f32 angle;
@@ -193,7 +193,7 @@ void MotherBoss_AnimEvent(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
             scale.x = 0.5f;
             scale.y = 0.5f;
             scale.z = 0.5f;
-            CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x458, (s32)s->intel, region, ev.pos, 0.0f, obj->m_Instance.m_vVelocity, scale, NULL);
+            CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x458, s->intel, region, ev.pos, 0.0f, obj->m_Instance.m_vVelocity, scale, NULL);
         }
         break;
     case 1:

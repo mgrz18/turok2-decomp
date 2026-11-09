@@ -2,6 +2,68 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 
+#ifdef TARGET_PORT
+/* The port: the same through CGameObjectInstance (structs/game_object.h); the Actor view below
+ * has the N64 offsets (the pointers before 0xA4 and in CAI make the host ones larger). */
+#include "structs/game_object.h"
+
+extern u8 D_800A5AC4[];     /* "anim object info" */
+
+void CMtxF__TransformBox(void *, void *, void *);
+void CAnimationState__Reset(void *);
+s32 CGameObjectInstance__PickRandomAnim(CGameObjectInstance *, s32, s32);
+
+void CGameObjectInstance__SetupAnimation(CGameObjectInstance *actor, s32 a1, s32 a2, s32 anim) {
+    s32 *model;
+    s32 *set;
+    s32 id;
+    s32 tree;
+    s32 setTree;
+    s32 size;
+    void *data;
+
+    actor->m_dwFlags &= ~0x40000;
+    id = CISet__GetROMAddress(a1, a2, actor->header.m_nObjType);
+    model = (s32 *)(sptr)CCache__Request(0, id, 0x18, 0, 0, 0, (s32) "anim object index", 1);
+    if (model != NULL) {
+        tree = *model;
+        actor->m_rpGeometryHeader = (void *)(sptr)CISet__GetROMAddressAndSize(tree, id, 1, &size);
+        actor->m_rpGeometryHeaderSize = size;
+        actor->m_rpObject = (void *)(sptr)CISet__GetROMAddressAndSize(tree, id, 0, &size);
+        actor->m_rpObjectHeader = size;
+        actor->m_rpAnims = (void *)(sptr)CISet__GetROMAddress(tree, id, 2);
+        set = (s32 *)(sptr)CCache__Request(0, (s32)(sptr)actor->m_rpObject, actor->m_rpObjectHeader, 0, 0, 0, (s32) D_800A5AC4, 1);
+        if (set != NULL) {
+            setTree = *set;
+            data = CISet__GetBlock((void *)(sptr)setTree, 0);
+            ((void (*)(CGameObjectInstance *, void *))actor->m_AI.m_pfCalculateOrientationMatrix)(actor, &actor->m_AI);
+            CMtxF__TransformBox(&actor->m_mfOrient, data, &actor->m_vMin);
+            CAnimationState__Reset(&actor->m_CurrentAnimation);
+            CAnimationState__Reset(&actor->m_BlendAnimation);
+            actor->m_nAnims = ((u16 *) CISet__GetBlock((void *)(sptr)setTree, 1))[3];
+            actor->m_dwFlags |= 0x40000;
+            if (anim > 0) {
+                anim = CGameObjectInstance__PickRandomAnim(actor, anim, -1);
+            } else {
+                anim = -anim;
+            }
+            if (anim == -1) {
+                anim = 0;
+            }
+            actor->m_CurrentAnimation.m_nRequestedAnimIndex = anim;
+            actor->m_CurrentAnimation.m_bCycleCompleted = 0;
+            if (actor->m_CurrentAnimation.m_nAnimIndex != anim) {
+                actor->m_CurrentAnimation.m_bAnimActive = 1;
+            }
+            actor->m_AI.m_ModeLastFrame = -1;
+            actor->m_AI.m_AnimIndex = anim;
+            CCache__Unlock(0, set);
+        }
+        CCache__Unlock(0, model);
+    }
+}
+#else
+
 /* Bind an actor to its model and animation set, then choose its first
  * animation: `anim` > 0 is an action to pick at random (CGameObjectInstance__PickRandomAnim),
  * otherwise -anim is the entry itself. */
@@ -42,25 +104,25 @@ extern u8 D_800A5AC4[];     /* "anim object info" */
 
 void CMtxF__TransformBox(void *, void *, void *);
 void CAnimationState__Reset(void *);
-s32 CGameObjectInstance__PickRandomAnim(Actor *, s32, s32);
+sptr CGameObjectInstance__PickRandomAnim(Actor *, sptr, sptr);
 
-void CGameObjectInstance__SetupAnimation(Actor *actor, s32 a1, s32 a2, s32 anim) {
+void CGameObjectInstance__SetupAnimation(Actor *actor, s32 a1, s32 a2, sptr anim) {
     s32 *model;
     s32 *set;
     s32 id;
-    s32 tree;
-    s32 setTree;
+    sptr tree;
+    sptr setTree;
     void *data;
 
     actor->flags &= ~0x40000;
     id = CISet__GetROMAddress(a1, a2, actor->unk2);
-    model = CCache__Request(0, id, 0x18, 0, 0, 0, (s32) "anim object index", 1);
+    model = CCache__Request(0, id, 0x18, 0, 0, 0, (sptr) "anim object index", 1);
     if (model != NULL) {
         tree = *model;
         actor->unkAC = CISet__GetROMAddressAndSize(tree, id, 1, &actor->unkB4);
         actor->unkA4 = CISet__GetROMAddressAndSize(tree, id, 0, &actor->unkB0);
         actor->unkA8 = CISet__GetROMAddress(tree, id, 2);
-        set = CCache__Request(0, actor->unkA4, actor->unkB0, 0, 0, 0, (s32) D_800A5AC4, 1);
+        set = CCache__Request(0, actor->unkA4, actor->unkB0, 0, 0, 0, D_800A5AC4, 1);
         if (set != NULL) {
             setTree = *set;
             data = CISet__GetBlock(setTree, 0);
@@ -90,3 +152,4 @@ void CGameObjectInstance__SetupAnimation(Actor *actor, s32 a1, s32 a2, s32 anim)
         CCache__Unlock(0, model);
     }
 }
+#endif

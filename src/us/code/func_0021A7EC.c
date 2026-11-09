@@ -54,7 +54,7 @@ typedef struct {
     /* 0x10D */ u8 blendEnd;
 } AnimActor;
 
-void CAnimationState__SwitchToQueued(AnimTrack *track, s32 data, s32 key, s32 primary, s32 *active, AnimTrack *other);
+void CAnimationState__SwitchToQueued(AnimTrack *track, sptr data, s32 key, s32 primary, s32 *active, AnimTrack *other);
 s32 CAnimationState__IsLoaded(AnimTrack *track);
 AnimBlendEntry *CAnimationState__GetKeyHeader(AnimTrack *track);
 void CAnimationState__Release(AnimTrack *track);
@@ -105,7 +105,7 @@ void CGameObjectInstance__AdvanceAnimation(AnimActor *actor) {
 
     track0 = &actor->currentTrack;
     track1 = &actor->previousTrack;
-    CAnimationState__SwitchToQueued(track0, (s32) *resource, actor->animationKey, 1, &active, track1);
+    CAnimationState__SwitchToQueued(track0, (sptr) *resource, actor->animationKey, 1, &active, track1);
     if (CAnimationState__IsLoaded(track0) != 0) {
         AnimBlendEntry *entry;
 
@@ -128,7 +128,7 @@ void CGameObjectInstance__AdvanceAnimation(AnimActor *actor) {
             }
         }
         if (actor->flags & 0x400) {
-            CAnimationState__SwitchToQueued(track1, (s32) *resource, actor->animationKey, 0, 0, 0);
+            CAnimationState__SwitchToQueued(track1, (sptr) *resource, actor->animationKey, 0, 0, 0);
             if (CAnimationState__IsLoaded(track1) != 0) {
                 f32 time;
                 f32 end;

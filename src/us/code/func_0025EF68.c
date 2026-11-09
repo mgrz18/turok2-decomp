@@ -13,8 +13,8 @@ void EnemyAI_CheckGrab(s32 arg0, CAI *arg1) {
     void *owner;
 
     if ((arg1->m_Health != 0) && (gCollisionResults != NULL) && (owner = arg1->m_pPathTarget, !(arg1->m_ModeFlags & 0x1000)) && (gCollisionResults == owner) && (gCollisionResults->header.m_pIntelligence->m_Type == 5)) {
-        arg1->m_VarBuffer[2] = (u32) gCollisionResults;
+        arg1->m_VarBuffer[2] = (uptr) gCollisionResults;
         Throwable_SetModeAnim(gCollisionResults, &gCollisionResults->m_AI, arg0);
-        CAI__SetMode(arg0, (s32) arg1, 0x15);
+        CAI__SetMode(arg0, arg1, 0x15);
     }
 }

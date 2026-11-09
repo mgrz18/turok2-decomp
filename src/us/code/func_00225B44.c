@@ -19,7 +19,7 @@ void CScene__DetachChildren(ActorTable *arg0, s32 arg1) {
     p = arg0->actors;
     if (n > 0) {
         do {
-            if ((s32) (*p)->m_AI.m_pParent == arg1) {
+            if ((sptr) (*p)->m_AI.m_pParent == arg1) {
                 (*p)->m_AI.m_pParent = NULL;
             }
             i++;

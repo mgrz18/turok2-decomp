@@ -12,7 +12,7 @@
 #define DEVICE_TYPE_64DD 2
 #define PI_DOMAIN2 1
 
-extern void memset(void *p, s32 c, u32 n); /* memset */
+extern void memset(void *p, s32 c, uptr n); /* memset */
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
 

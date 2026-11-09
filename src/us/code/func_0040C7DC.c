@@ -21,6 +21,6 @@ void MotherBoss_OnDefeatCinemaDone(void) {
         temp_v1 = &gEngineApp_m_Game.m_Settings;
         temp_v0->m_Data.m_bMotherBossComplete = 1;
         temp_v1->unlockedCheats = (s32) (temp_v1->unlockedCheats | 4);
-        CPlayer__Warp((s32) temp_v0, 0x1B57, 2, 0);
+        CPlayer__Warp((sptr) temp_v0, 0x1B57, 2, 0);
     }
 }

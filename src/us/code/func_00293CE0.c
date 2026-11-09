@@ -5,7 +5,7 @@
 
 extern s32 alEvtqPostEvent(void *, s16 *, s32);
 void alSndpPlay(ALSndPlayer *arg0) {
-    s32 base = (s32)arg0->sndState;
+    s32 base = (sptr)arg0->sndState;
     if (((ALSoundState *) (base + (arg0->target * 0x30)))->state == 0) {
         ParamsRecAt8V1 p;
         p.f0 = 0;

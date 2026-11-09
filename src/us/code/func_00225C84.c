@@ -19,7 +19,7 @@ void CScene__MarkGeneratorsSaved(void *arg0)
       temp_a1 = (*((s32 *) (((s8 *) arg0) + 0xE0))) + var_s1;
       if ((*(*((s32 **) (((s8 *) temp_a1) + 0x14)))) == new_var)
       {
-        CScene__SetInstanceSavedBit((s32) arg0, (s32) temp_a1, 1);
+        CScene__SetInstanceSavedBit(arg0, temp_a1, 1);
       }
       var_s0 += 1;
       var_s1 += 0x288;

@@ -6,20 +6,33 @@
 #include "globals/game.h"
 #include "protos/list.h"
 
+#ifdef TARGET_PORT /* the CPlayer links at their host offsets */
+#define PLAYER_LAST T2_OFFSETOF(CPlayer, m_pLast)
+#define PLAYER_NEXT T2_OFFSETOF(CPlayer, m_pNext)
+#else
+#define PLAYER_LAST 0x131C
+#define PLAYER_NEXT 0x1320
+#endif
+
 
 typedef struct PlayerList {
     /* 0x00 */ CPlayer **handle;
     /* 0x04 */ CPlayer *players;
     /* 0x08 */ s32 count;
+#ifdef TARGET_PORT /* CPlayerPool's host layout (the lists are 8-aligned there) */
+    CPlayerCList list0[1];
+    CPlayerCList list1[1];
+#else
     /* 0x0C */ u8 list0[0x14];
     /* 0x20 */ u8 list1[0x14];
+#endif
 } PlayerList;
 
 extern CPlayer **CCache__Allocate(s32 heap, s32 size, s32 tag, char *name);
 extern void CCache__Deallocate(s32 heap, CPlayer **handle);
 extern void CCache__Flush(s32);
 extern void Controller_SetRumbleOptionAll(s32);
-extern void memset(void *p, s32 c, s32 n); /* memset */
+extern void memset(void *p, s32 c, sptr n); /* memset */
 extern void CPlayerContState__Init(void *, ControllerProfile *);
 extern void CPlayer__Reset(CPlayer *p);
 extern void CPlayer__NewGame(CPlayer *p, s32 character, s32 arg2);
@@ -44,8 +57,8 @@ void CPlayerPool__NewGame(PlayerList *list, s32 count, s32 arg2) {
     CPlayer *p;
     s32 i;
 
-    CList__Construct(list->list0, 0x131C, 0x1320);
-    CList__Construct(list->list1, 0x131C, 0x1320);
+    CList__Construct(list->list0, PLAYER_LAST, PLAYER_NEXT);
+    CList__Construct(list->list1, PLAYER_LAST, PLAYER_NEXT);
     Controller_SetRumbleOptionAll(0);
     CCache__Flush(0);
     flags = &gEngineApp_m_Settings;

@@ -13,7 +13,7 @@ s16 alSndpAllocate(PoolRecAt44 *pool, void *owner) {
         u8 flags = 0x40;
         do {
         s16 index = i;
-        SlotRecAt2F *slot = (SlotRecAt2F *)(index * sizeof(*slots) + (u32)slots);
+        SlotRecAt2F *slot = (SlotRecAt2F *)(index * sizeof(*slots) + (uptr)slots);
         if (slot->owner == 0) {
             slot->owner = owner;
             slot->state = state;

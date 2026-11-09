@@ -6,5 +6,5 @@
 
 
 void EnemyAnim_ComboEnd_AFD98(CGameObjectInstance *obj, s32 arg1) {
-    AI_PickAnimFromTable((s32) obj, arg1, (s32) sEnemyAnimComboEnd_AFD98, obj->header.m_pIntelligence->m_Enemy.m_wComboEndAnimFlags);
+    AI_PickAnimFromTable((sptr) obj, arg1, sEnemyAnimComboEnd_AFD98, obj->header.m_pIntelligence->m_Enemy.m_wComboEndAnimFlags);
 }

@@ -62,7 +62,7 @@ f32 AI_FindClearHeading(CGameObjectInstance *self, CVector3 pos, CGameObjectInst
             return angle;
         }
         probe.y = self->header.m_vPos.y;
-        first = ((u32) self % 0x288) & 1;
+        first = ((uptr) self % 0x288) & 1;
         for (i = 1; i < 6; i++) {
             step = i * 0.52359885f;
             for (side = 0; side < 2; side++) {

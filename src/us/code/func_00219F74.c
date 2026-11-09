@@ -15,22 +15,22 @@ typedef struct {
 
 extern u8 D_800A5AC4[];     /* "anim object info" */
 
-s32 BinarySearch(s32 *, s32, s32);
+s32 BinarySearch(s32 *, s32, sptr);
 void WeightedTable_Clear(RandList *);
 void WeightedTable_Add(RandList *, s16, s32);
 s32 WeightedTable_Pick(RandList *);
 
-s32 CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, s32 action, s32 skip) {
+sptr CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, sptr action, sptr skip) {
     RandList list;
     s32 *res;
     s32 *data;
     s32 *entries;
     s32 count;
-    s32 i;
-    s32 found;
+    sptr i;
+    sptr found;
 
     if (actor->m_dwFlags & 0x40000) {
-        res = CCache__Request(0, ((s32)actor->m_rpObject), actor->m_rpObjectHeader, 0, 0, 0, (s32) D_800A5AC4, 1);
+        res = CCache__Request(0, ((sptr)actor->m_rpObject), actor->m_rpObjectHeader, 0, 0, 0, D_800A5AC4, 1);
         if (res != NULL) {
             data = CISet__GetBlock(*res, 1);
             entries = data + 2;

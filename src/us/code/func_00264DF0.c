@@ -5,7 +5,7 @@
 #include "protos/ai.h"
 
 extern void Throwable_GetCarryPoint(void *obj, void *state, f32 *out);
-extern s32 CGameObjectInstance__PickRandomAnim(void *actor, s32 action, s32 skip);
+extern sptr CGameObjectInstance__PickRandomAnim(void *actor, sptr action, sptr skip);
 extern void CVector3__Lerp(f32 *out, f32 t, f32 *from, f32 *to);
 
 typedef struct {
@@ -21,7 +21,7 @@ typedef struct {
 
 void Throwable_PickedUpUpdate(CGameObjectInstance *obj, OwnedState *state) {
     f32 target[3];
-    s32 anim;
+    sptr anim;
     CGameObjectInstance *owner = state->owner;
 
     gThrowableCollisionInfo_m_InstanceBehavior = 0;

@@ -17,7 +17,7 @@ void PakMenu_UpdateNoteRows_2(Menu *o);
 s32 PakMenu_CheckPak_2(Menu *o, s32 a, s32 b);
 void PakMenu_WriteProfile_2(s32 a, Menu *o, s32 c);
 void PakMenu_WriteSaveGame_2(s32 a, Menu *o, s32 c);
-void MenuPool_OpenMenu_2(void *a, void *b, s32 c, ControllerProfile *d, void *e);
+void MenuPool_OpenMenu_2(void *a, void *b, sptr c, ControllerProfile *d, void *e);
 
 s32 PakMenu_SelectPak_2(s32 a0, Menu *o, s32 a2) {
     u8 buf[16];

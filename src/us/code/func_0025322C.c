@@ -11,7 +11,7 @@ void CPlayerPool__DrawHuds(CPlayerPool *arg0, s32 arg1) {
     var_s0 = arg0->m_ActiveList.m_pHead;
     if (var_s0 != NULL) {
         do {
-            if ((s32) var_s0->m_pCamera == arg1) {
+            if ((sptr) var_s0->m_pCamera == arg1) {
                 CPlayer__DrawHud(var_s0, arg1);
             }
             var_s0 = var_s0->m_pNext;

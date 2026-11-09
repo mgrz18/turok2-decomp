@@ -3,7 +3,7 @@
 #include "structs/camera.h"
 
 s32 Render_FlushBatches(void);
-s32 CPlayer__DrawCharacter(s32, s32);
+s32 CPlayer__DrawCharacter(s32, sptr);
 s32 Cinema_FollowsPlayer(void);
 
 void Render_ResetBatches();                               /* extern */
@@ -16,7 +16,7 @@ void CPlayerPool__DrawCharacters(CPlayerPool *arg0, CCamera *arg1) {
     if (var_s0 != NULL) {
         do {
             if ((var_s0->m_pCamera != arg1) || (arg1->m_ViewParams.m_nType == 1) || (Cinema_FollowsPlayer() != 0)) {
-                CPlayer__DrawCharacter((s32) var_s0, (s32) arg1);
+                CPlayer__DrawCharacter((sptr) var_s0, (sptr) arg1);
             }
             var_s0 = var_s0->m_pNext;
         } while (var_s0 != NULL);

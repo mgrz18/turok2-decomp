@@ -26,7 +26,7 @@ void alEvtqFlushType(void *arg0, s16 arg1)
           *((s32 *) (((s8 *) temp_s1) + 8)) = (s32) ((*((s32 *) (((s8 *) temp_s1) + 8))) + (*((s32 *) (((s8 *) var_s0) + 8))));
         }
         alUnlink(var_s0);
-        alLink((s32) var_s0, (s32) arg0);
+        alLink((sptr) var_s0, (sptr) arg0);
       }
       var_s0 = temp_s1;
     }

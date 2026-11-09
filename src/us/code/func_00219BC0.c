@@ -16,7 +16,7 @@ void CGameObjectInstance__RequestAnim(CGameObjectInstance *, s32);
 void CMtxF__Identity(CMtxF *);
 void CAI__Setup(CGameObjectInstance *, CAI *, void *);
 void CPathTrack__StartAtNearestPoint(void *, s32, CVector3 *);
-void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, s32);
+void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, sptr);
 s32 Instance_NextUniqueId(void);
 void CGameObjectInstance__DrawModelLitVertices(void);
 

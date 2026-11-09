@@ -2,7 +2,7 @@
 
 /* Walks a chain of offsets relative to the base at 0xC until a zero link. */
 void func_00200A74(s32 *arg0) {
-    s32 next;
+    sptr next;
     s32 base;
 
     next = arg0[0];

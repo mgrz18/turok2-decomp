@@ -12,7 +12,7 @@ void CScene__GetRegionEventRecords(CScene *lv, u16 *idp, CSceneRecord **outRecs,
     s32 hi;
     s32 lo;
     s32 r; s32 a; s32 b; s32 id;
-    id = *idp; a = (s32) lv->m_pAltRecordIndex; b = lv->m_nAltRecords;
+    id = *idp; a = (sptr) lv->m_pAltRecordIndex; b = lv->m_nAltRecords;
     r = BinaryRange(a, b, id, &lo, &hi);
     if (r != 0) {
         *outRecs = lv->m_pAltRecords + lo;

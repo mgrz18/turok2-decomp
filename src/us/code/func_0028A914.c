@@ -15,8 +15,8 @@ extern void func_00228BBC();
 extern u32 D_800F6CA8;
 void __scHandleRDP(OSSched *sc)
 {
-    s32 value1 = 0;
-    s32 value2 = 0;
+    sptr value1 = 0;
+    sptr value2 = 0;
     OSScTask_s *task = sc->curRDPTask;
     void *framebuffer;
     CFrameData *schedule;

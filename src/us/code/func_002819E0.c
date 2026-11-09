@@ -22,8 +22,8 @@ void CCameraPool__ReleaseAllTexts(s32 arg0)
     do
     {
       temp_s0 = *var_s1;
-      CList__Remove((s32) (temp_s2 + 0xE28), (s32) var_s1);
-      CList__AddHead(arg0 + 0xF0C, (s32) var_s1);
+      CList__Remove((sptr) (temp_s2 + 0xE28), var_s1);
+      CList__AddHead(arg0 + 0xF0C, var_s1);
       var_s1 = temp_s0;
       var_a0 = temp_s2 + 0xE28;
     }
@@ -41,8 +41,8 @@ void CCameraPool__ReleaseAllTexts(s32 arg0)
         do
         {
           temp_s0_2 = *var_s1_2;
-          CList__Remove((s32) var_a0_2, (s32) var_s1_2);
-          CList__AddHead(arg0 + 0xF0C, (s32) var_s1_2);
+          CList__Remove(var_a0_2, var_s1_2);
+          CList__AddHead(arg0 + 0xF0C, var_s1_2);
           var_s1_2 = temp_s0_2;
           var_a0_2 = var_s2 + 0xE28;
         }

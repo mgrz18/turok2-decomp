@@ -24,8 +24,9 @@ if(T2_LINK_GAME AND TARGET turok2_game)
     add_library(t2runtime STATIC
         ${T2_PORT_DIR}/runtime/t2os.c
         ${T2_PORT_DIR}/runtime/t2ultra.c
-        ${T2_PORT_DIR}/runtime/t2boot.c)
-    target_include_directories(t2runtime PUBLIC ${T2_PORT_DIR}/runtime PRIVATE ${T2_PORT_DIR}/include)
+        ${T2_PORT_DIR}/runtime/t2boot.c
+        ${T2_PORT_DIR}/runtime/t2loader.c)
+    target_include_directories(t2runtime PUBLIC ${T2_PORT_DIR}/runtime ${T2_PORT_DIR}/audio PRIVATE ${T2_PORT_DIR}/include)
     target_compile_definitions(t2runtime PRIVATE T2_RENAME_NO_LIBC)
     set_target_properties(t2runtime PROPERTIES C_STANDARD 11)
     # t2os.c defines the libultra names: compile it under the game's t2_ names
@@ -34,6 +35,18 @@ if(T2_LINK_GAME AND TARGET turok2_game)
     find_package(Threads REQUIRED)
     # RNC_UnpackMethod1/2 (t2boot.c) use the clean-room decompressor in t2asset (port/assets/rnc.c)
     target_link_libraries(t2runtime PUBLIC Threads::Threads m t2asset)
+
+    # The game's audio on the host (docs/port/AUDIO.md): sound bank conversion, the audio
+    # manager, the ABI1 interpreter. Compiled with the game's flags (it uses the game's
+    # libaudio structs, include/structs/libaudio.h).
+    add_library(t2audio STATIC
+        ${T2_PORT_DIR}/audio/t2audio_bank.c
+        ${T2_PORT_DIR}/audio/t2audio_mgr.c
+        ${T2_PORT_DIR}/audio/t2audio_sndp.c
+        ${T2_PORT_DIR}/audio/t2asp.c)
+    target_link_libraries(t2audio PRIVATE t2_game_flags)
+    target_include_directories(t2audio PUBLIC ${T2_PORT_DIR}/audio PRIVATE ${T2_PORT_DIR}/runtime)
+    target_compile_definitions(t2audio PRIVATE T2_RENAME_NO_LIBC)
 
     add_library(t2placeholders STATIC ${T2_PORT_DIR}/runtime/t2_placeholders.c)
     target_compile_options(t2placeholders PRIVATE -w)
@@ -54,10 +67,23 @@ if(T2_LINK_GAME AND TARGET turok2_game)
     target_compile_definitions(turok2 PRIVATE T2_HAVE_GAME=1)
     if(APPLE)
         # ld64 resolves archive members in any order
-        target_link_libraries(turok2 PRIVATE t2runtime turok2_game ${_t2_data} t2placeholders)
+        target_link_libraries(turok2 PRIVATE t2runtime t2audio turok2_game ${_t2_data} t2placeholders)
     else()
         # t2runtime <-> turok2_game reference each other: one rescanned group
-        target_link_libraries(turok2 PRIVATE "$<LINK_GROUP:RESCAN,t2runtime,turok2_game${_t2_data_group}>" t2placeholders)
+        target_link_libraries(turok2 PRIVATE "$<LINK_GROUP:RESCAN,t2runtime,t2audio,turok2_game${_t2_data_group}>" t2placeholders)
+    endif()
+
+    # t2audio_test: the game's synthesizer on the host without the engine (docs/port/AUDIO.md §6):
+    # boots t2os with a test main thread, Sound__Initialize, plays a sound effect and a song,
+    # checks the samples, writes a WAV.
+    add_executable(t2audio_test ${T2_PORT_DIR}/tests/t2audio_test.c)
+    target_link_libraries(t2audio_test PRIVATE t2_game_flags)
+    target_compile_definitions(t2audio_test PRIVATE T2_RENAME_NO_LIBC)
+    target_include_directories(t2audio_test PRIVATE ${T2_PORT_DIR}/runtime ${T2_PORT_DIR}/audio)
+    if(APPLE)
+        target_link_libraries(t2audio_test PRIVATE t2runtime t2audio turok2_game ${_t2_data} t2placeholders)
+    else()
+        target_link_libraries(t2audio_test PRIVATE "$<LINK_GROUP:RESCAN,t2runtime,t2audio,turok2_game${_t2_data_group}>" t2placeholders)
     endif()
 
     # Bring-up aid (Linux x86-64): a non-PIE executable keeps the game's statics below 2 GB,
@@ -67,6 +93,8 @@ if(T2_LINK_GAME AND TARGET turok2_game)
     option(T2_LOW_MEMORY "Non-PIE executable + game memory below 2 GB (Linux bring-up aid)" ON)
     if(T2_LOW_MEMORY AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
         target_link_options(turok2 PRIVATE -no-pie)
+        target_link_options(t2audio_test PRIVATE -no-pie)
+        target_compile_definitions(t2audio_test PRIVATE T2_LOW_MEMORY_DEFAULT=1)
         target_compile_definitions(turok2 PRIVATE T2_LOW_MEMORY_DEFAULT=1)
     endif()
 endif()

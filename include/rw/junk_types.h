@@ -19,15 +19,19 @@
 #include "structs/list.h" /* CList (Rage Wars' B12List) */
 
 typedef struct B12Node B12Node;
-struct B12Node {
-               u32 key;
+struct B12Node {          /* Rage Wars name of CMemEntry (structs/cache.h) */
+               uptr key;      /* data */
                s32 unk4;
                s32 refs;
                u32 flags;
                u32 unk10;
                B12Node *link;
                B12Node *link18;
+#ifdef TARGET_PORT
+               void *pad1C;   /* CMemEntry.next: a pointer, so the host layout matches */
+#else
                u8 pad1C[4];
+#endif
                B12Node *prev;
                B12Node *next;
 };
@@ -215,8 +219,13 @@ typedef struct ObjInit {
     s32 unk40;
 } ObjInit;
 typedef struct DlCmd {
+#ifdef TARGET_PORT /* a display-list command is two host words (gfx.h GfxWord, docs/port/GBI.md) */
+    __UINTPTR_TYPE__ w0;
+    __UINTPTR_TYPE__ w1;
+#else
     u32 w0;
     u32 w1;
+#endif
 } DlCmd;
 typedef struct B21Vp {
     s16 vscale[4];

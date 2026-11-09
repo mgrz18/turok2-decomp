@@ -19,6 +19,6 @@ void MantidQueen_FlashWeakSpot(State00403494 *s, void *arg) {
 
     if (index != -1) {
         /* &s->slots[index].body, computed as an address */
-        ScriptAnimator_SetScript((void *)(index * sizeof(Slot00403494) + (s32)s + 0xC), arg);
+        ScriptAnimator_SetScript((void *)(index * sizeof(Slot00403494) + (sptr)s + 0xC), arg);
     }
 }

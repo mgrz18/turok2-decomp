@@ -18,7 +18,7 @@ extern void Model_DecompressCallbackTerminated();
 s32 *CLevelActor__LoadGeometry(void *obj) {
     s32 *index;
     s32 *geometry;
-    s32 src;
+    sptr src;
     s32 size;
 
     index = CCache__Request(0, *(s32 *) ((u8 *) obj + 0x34), 0x18, 4, 0, NULL, "simp object index", 0);
@@ -36,7 +36,7 @@ void CLevelActor__TouchGeometry(ResourceOwner *arg0) {
     s32 sp20;
     s32 *temp_v0;
     s32 *var_s0;
-    s32 temp_s0;
+    sptr temp_s0;
 
     temp_v0 = CCache__Request(0, arg0->key, 0x18, 4, 0, NULL, "simp object index", 0);
     if (temp_v0 != NULL) {

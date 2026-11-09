@@ -27,14 +27,14 @@ s32 __amHandleFrameMsg(FrameTask *arg0) {
     s32 sp10;
     s32 sp14;
     s32 temp_s0;
-    s32 temp_s0_2;
+    sptr temp_s0_2;
     s32 temp_v0;
 
     __clearAudioDMA();
     temp_s0 = osVirtualToPhysical(arg0->buffer);
     arg0->size = D_800F283A;
     Sound__Lock();
-    temp_s0_2 = alAudioFrame(*(((__typeof__(&gAudioCmdLists))((s8 *)&gAudioCmdLists + (curAcmdList * 4)))), (s32) &sp10, temp_s0, (s32) (s16) arg0->size);
+    temp_s0_2 = alAudioFrame(*(((__typeof__(&gAudioCmdLists))((s8 *)&gAudioCmdLists + (curAcmdList * 4)))), (sptr) &sp10, temp_s0, (s32) (s16) arg0->size);
     Sound__Unlock();
     if (sp10 == 0) {
         return 0;
@@ -46,7 +46,7 @@ s32 __amHandleFrameMsg(FrameTask *arg0) {
     Sched_SubmitTask(&gScheduler, arg0->msg);
     curAcmdList ^= 1;
     Sound__Update();
-    osRecvMesg((s32) &gAudioReplyMsgQ, (s32) &sp14, 1);
+    osRecvMesg(&gAudioReplyMsgQ, &sp14, 1);
     osAiSetNextBuffer(arg0->buffer, (s16) arg0->size * 4);
     return 1;
 }

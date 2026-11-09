@@ -18,5 +18,5 @@ void MantidQueen_InitAI(s32 arg0, CAI *arg1) {
     arg1->m_pfEffects = &EnemyAI_HeadNodeCallback;
     arg1->m_pfDraw = MantidQueen_Draw;
     arg1->m_VisBits = -1;
-    CAI__SetMode(arg0, (s32) arg1, 0);
+    CAI__SetMode(arg0, arg1, 0);
 }

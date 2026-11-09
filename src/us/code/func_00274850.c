@@ -16,7 +16,7 @@ void SndVoice_Stop(SndVoice *arg0) {
     if (arg0->vp.frame != temp_a0->frame) {
         alSndpSetSound(temp_s0, temp_a0->handles[arg0->index]);
         if (alSndpGetState(temp_s0) != 0) {
-            alSndpStop((s32) temp_s0);
+            alSndpStop((sptr) temp_s0);
         }
         arg0->sound = -1;
     }

@@ -2,7 +2,7 @@
 #include "common.h"
 #include "structs/libaudio.h"
 
-extern s32 __voiceNeedsNoteKill(void *arg0, s32 arg1, s32 arg2);
+extern s32 __voiceNeedsNoteKill(void *arg0, sptr arg1, s32 arg2);
 extern void __seqpStopOsc(void *arg0, void *arg1);
 struct Node_func_80239AF4_de;
 typedef struct Node_func_80239AF4_de Node_func_80239AF4_de;

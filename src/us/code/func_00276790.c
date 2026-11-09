@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 
+#ifndef TARGET_PORT
 void SndQueue_CancelFlags(Lists *arg0, s32 arg1) {
     NodeRecAtAC *var_a2;
     NodeRecAtAC *temp_a3;
@@ -30,3 +31,23 @@ void SndQueue_CancelFlags(Lists *arg0, s32 arg1) {
         } while (var_a2 != temp_t0);
     }
 }
+#else
+#include "structs/sound.h"
+/* The port: the same on the typed queue (the view above has N64 offsets; the node's flags (+0xAC)
+ * is body.flags). Matching active requests move to the free list's tail. */
+void SndQueue_CancelFlags(SndQueue *q, s32 arg1) {
+    SndLink *node = q->active.link.next;
+    while (node != &q->active.link) {
+        SndLink *next = node->next;
+        if ((((SndNode *)node)->body.flags & arg1) != 0) {
+            node->prev->next = next;
+            node->next->prev = node->prev;
+            node->next = &q->free.link;
+            node->prev = q->free.link.prev;
+            q->free.link.prev->next = node;
+            q->free.link.prev = node;
+        }
+        node = next;
+    }
+}
+#endif

@@ -25,7 +25,7 @@ s32 osPiStartDma(OSIoMesg *entry, s32 subtype, s32 arg2, s32 arg3,
     entry->size = arg5;
     entry->piHandle = 0;
     if (subtype != 1) {
-        return osSendMesg(osPiGetCmdQueue(), (s32)entry, 0);
+        return osSendMesg(osPiGetCmdQueue(), (sptr)entry, 0);
     }
     return osJamMesg(osPiGetCmdQueue(), entry, 0);
 }

@@ -11,7 +11,7 @@
 extern s32 D_8012FB64;
 
 void CGameObjectInstance__GetDeathModels(CGameObjectInstance *, s32, s32 *, s32 *);
-void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
+void CGameObjectInstance__DrawShadow(CGameObjectInstance *, sptr, CDrawArgs *);
 void Render_QueueModelInstance(s32, s32, s32, s32, char *, s32, s32);
 void Model_PulseVertexColors(char *, char *);
 void CGameObjectInstance__ConstructLitVertices();
@@ -44,6 +44,6 @@ void TotemDefense_DrawTotem(CGameObjectInstance *actor, s32 arg1, CDrawArgs *par
     } else {
         data = (char *) (header + 2);
     }
-    Render_QueueModelInstance(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, 0, data, D_8012FB64, -1);
+    Render_QueueModelInstance(params->m_hModel, ((sptr)actor->m_pmtDrawMtxs), 1, 0, data, D_8012FB64, -1);
     CCache__Unlock(0, resource);
 }

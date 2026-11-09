@@ -110,6 +110,6 @@ void CCamera__Construct_2(CCamera *view) {
     CMtxF__Identity(view->m_mfFaceScreenYAxisUp);
     view->m_FlashMode = 0;
     gCameraVisBits.field_4 = 0;
-    CList__Construct(&view->m_ActiveTextList, 0, 4);
+    CList__Construct(&view->m_ActiveTextList, 0, sizeof(void *));
     CCamera__ConstructSkySystem(view);
 }

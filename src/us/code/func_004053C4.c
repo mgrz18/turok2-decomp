@@ -5,7 +5,7 @@
 
 extern f32 Random_Blend(f32 lo, f32 hi);
 extern s32 WeightedTable_PickStatic(s32 id);
-extern void Sound__Play(s16 sound, CVector3 pos, s32 arg2, CGameObjectInstance *source);
+extern void Sound__Play(s16 sound, CVector3 pos, sptr arg2, CGameObjectInstance *source);
 
 
 /* Run the current step of the third script (sounds, jumps, waits). */

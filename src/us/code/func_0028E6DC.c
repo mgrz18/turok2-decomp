@@ -12,7 +12,7 @@ void VM_Free(s32 arg0) {
     Block_func_8023C85C_de block;
     s32 sp38;
     void *sp3C;
-    osCreateMesgQueue(sp10, (s32)&sp38, 1);
+    osCreateMesgQueue(sp10, &sp38, 1);
     block.type = 2;
     block.value = arg0;
     block.data = sp10;

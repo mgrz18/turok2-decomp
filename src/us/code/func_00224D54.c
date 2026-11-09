@@ -2,7 +2,7 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-s32 BinarySearch(s32, s32, s32);
+s32 BinarySearch(s32, s32, sptr);
 
 extern s32 ProPack__Decompress;
 
@@ -21,15 +21,15 @@ typedef struct {
     /* 0x78 */ Table00224D54 *table;
 } Unk00224D54;
 
-s32 CScene__LoadBinaryBlock(Unk00224D54 *arg0, s32 arg1, s32 arg2, s32 arg3) {
+sptr CScene__LoadBinaryBlock(Unk00224D54 *arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 sp20;
-    s32 temp_v0;
+    sptr temp_v0;
     Table00224D54 *temp_a0;
 
     temp_a0 = arg0->table;
-    temp_v0 = BinarySearch((s32) temp_a0->entries, temp_a0->count, arg1);
+    temp_v0 = BinarySearch((sptr) temp_a0->entries, temp_a0->count, arg1);
     if (temp_v0 != -1) {
-        return CCache__Request(0, CISet__GetROMAddressAndSize(arg0->unk44, arg0->unk18, temp_v0, (s32) &sp20), sp20, arg2, 0, (s32) &ProPack__Decompress, (s32) "binary block", arg3);
+        return CCache__Request(0, CISet__GetROMAddressAndSize(arg0->unk44, arg0->unk18, temp_v0, &sp20), sp20, arg2, 0, &ProPack__Decompress, (sptr) "binary block", arg3);
     }
     return 0;
 }

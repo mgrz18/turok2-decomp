@@ -6,5 +6,5 @@
 
 
 void EnemyAnim_Dart_AFF48(CGameObjectInstance *arg0, s32 arg1) {
-    AI_PickAnimFromTable((s32) arg0, arg1, (s32) sEnemyAnimDart_AFF48, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wDartAnimFlags);
+    AI_PickAnimFromTable((sptr) arg0, arg1, sEnemyAnimDart_AFF48, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wDartAnimFlags);
 }

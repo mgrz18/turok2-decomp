@@ -20,5 +20,5 @@ void BlindOne_PhaseMinionsInit(Tracker *arg0) {
     temp_v0 = arg0->target;
     arg0->targetY = (s32) temp_v0->y;
     arg0->targetZ = (s32) temp_v0->z;
-    CScene__MarkGeneratorsSaved((s32) &gScene);
+    CScene__MarkGeneratorsSaved(&gScene);
 }

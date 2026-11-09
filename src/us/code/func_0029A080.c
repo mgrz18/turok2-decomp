@@ -4,13 +4,13 @@
 #include "rw/abu_types.h"
 #include "protos/ultra.h"
 
-extern s32 __osSiRawStartDma(s32, s32);
+extern s32 __osSiRawStartDma(s32, sptr);
 extern int __osSiDeviceBusy();
 extern void __assert(void *arg0, void *arg1, s32 arg2);
 extern int __osSiDeviceBusy(void);
 extern s32 D_800AA890;
 extern s32 D_800AA894;
-s32 __osSiRawStartDma(s32 arg0, s32 arg1) {
+s32 __osSiRawStartDma(s32 arg0, sptr arg1) {
     if (arg1 & 3) {
         __assert(&D_800AA890, &D_800AA894, 0x37);
     }

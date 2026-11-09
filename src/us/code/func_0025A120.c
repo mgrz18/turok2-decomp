@@ -6,5 +6,5 @@
 
 
 void EnemyAnim_Patrol_AFA80(CGameObjectInstance *arg0, s32 arg1) {
-    AI_PickAnimFromTable((s32) arg0, arg1, (s32) sEnemyAnimPatrol_AFA80, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wPatrolAnimFlags);
+    AI_PickAnimFromTable((sptr) arg0, arg1, sEnemyAnimPatrol_AFA80, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wPatrolAnimFlags);
 }

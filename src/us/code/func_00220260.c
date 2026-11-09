@@ -20,19 +20,19 @@ void CScene__SetInstanceSavedBit(CScene *arg0, void *arg1, s32 arg2) {
     u8 *base2;
     s32 level;
     s32 mask;
-    s32 index;
-    s32 idx;
-    s32 idx2;
+    sptr index;
+    sptr idx;
+    sptr idx2;
     s32 lastOffset;
-    u32 first;
+    uptr first;
     if (!(((CGameObjectInstance *)arg1)->m_dwFlags & 0x80000)) {
-        first = (u32)arg0->m_pActors;
+        first = (uptr)arg0->m_pActors;
         index = -1;
-        if ((u32) arg1 >= first) {
+        if ((uptr) arg1 >= first) {
             lastOffset = arg0->m_nActors * 0x288;
             lastOffset -= 0x288;
-            if (first + lastOffset >= (u32) arg1) {
-                index = ((u32) arg1 - first) / 0x288;
+            if (first + lastOffset >= (uptr) arg1) {
+                index = ((uptr) arg1 - first) / 0x288;
             }
         }
     } else {
@@ -55,7 +55,7 @@ void CScene__SetInstanceSavedBit(CScene *arg0, void *arg1, s32 arg2) {
     field80 = arg0->m_pBitSections;
     temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(field80, 0), level), 0);
     CISet__GetBlock(temp_v0, 0);
-    CISet__GetBlockSize((s32) temp_v0, 1);
+    CISet__GetBlockSize(temp_v0, 1);
     base1 = (u8 *) CISet__GetBlock(temp_v0, 1);
     base2 = base1;
     mask = 1 << (index & 7);

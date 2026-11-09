@@ -46,13 +46,15 @@ typedef struct {
 
 /* One row of an AI's mode table (CAI::m_pModeTable, e.g. gEnemyGroundModeTable: a
  * 0x20-byte header row, then one row per mode; m_pModeCurrent points at the
- * current one). The AI step calls m_pfCallback while the mode runs. */
+ * current one). The AI step calls m_pfCallback while the mode runs.
+ * The words that hold an integer or an address are sptr: pointer-wide on the host, and
+ * tools/port/gendata.py relocates such a word when its value is a known address. */
 typedef struct CAIModeInfo {
-    /* 0x00 */ s32 m_Mode;
-    /* 0x04 */ s32 unk_04;
+    /* 0x00 */ sptr m_Mode;     /* the header row (the first) holds the next table here */
+    /* 0x04 */ sptr unk_04;     /* the enter function (WeaponMode_Switch_Enter, Door_OpenEnter...) or 0 */
     /* 0x08 */ s32 (*m_pfCallback)();
     /* 0x0C */ void *m_pData;   /* D_800F1C20 in the enemy table */
-    /* 0x10 */ s32 unk_10;   /* a function in the mode rows */
+    /* 0x10 */ sptr unk_10;     /* the animation: an id, or a function that picks it (Platform_GetModeAnim) */
     /* 0x14 */ f32 m_AnimSpeed;   /* copied to CAI::m_AnimModeSpeed */
     /* 0x18 */ s32 unk_18;
     /* 0x1C */ u32 unk_1C;

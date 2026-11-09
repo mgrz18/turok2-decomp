@@ -13,10 +13,10 @@ typedef struct {
 s32 CCamera__Construct(s32);
 
 /* Takes the first free element, resets it and moves it to the active list. */
-s32 CCameraPool__AllocCamera(CElementPool *arg0) {
-    s32 temp_s0;
+sptr CCameraPool__AllocCamera(CElementPool *arg0) {
+    sptr temp_s0;
 
-    temp_s0 = (s32) arg0->m_FreeList.m_pHead;
+    temp_s0 = (sptr) arg0->m_FreeList.m_pHead;
     if (temp_s0 != 0) {
         CCamera__Construct(temp_s0);
         CList__Remove(&arg0->m_FreeList, temp_s0);

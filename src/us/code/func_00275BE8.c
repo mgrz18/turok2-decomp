@@ -6,8 +6,8 @@
 
 void LoopSounds_Construct(void *arg0, SoundSourceNode *arg1, s32 arg2) {
     s32 i;
-    CList__Construct(arg0, 0, 4);
-    CList__Construct(&((SoundVoicePool *)arg0)->playing, 0, 4);
+    CList__Construct(arg0, 0, sizeof(void *));
+    CList__Construct(&((SoundVoicePool *)arg0)->playing, 0, sizeof(void *));
     i = 0;
     if (arg2 > 0) {
         do {

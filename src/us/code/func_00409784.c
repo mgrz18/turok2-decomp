@@ -24,7 +24,7 @@ extern void MotherBoss_DropPickupsAtSpawnPoints(s32 lifetime, void *table);
 /* MotherBoss_SpawnPickup */
 static __inline__ void spawnPickup(s32 id, s32 lifetime, CVector3 pos) {
     CVector3 vel;
-    s32 region;
+    sptr region;
     CPooledLevelActor *pickup;
 
     region = CScene__FindRegionAt(&gScene, &pos);

@@ -26,8 +26,8 @@ typedef struct SearchPoints {
 extern char D_800A5D8C[];
 extern char D_800A5FC4[];
 
-extern void CCache__LoadPersistantIndex(s32, s32 *, s32, char *);
-extern void **CCache__LoadPersistantSubBlock(s32, s32, s32, s32, void *, s32, char *);
+extern void CCache__LoadPersistantIndex(s32, s32 *, sptr, char *);
+extern void **CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, void *, sptr, char *);
 extern f32 CVector3__Distance(void *a, void *b);
 extern void CCache__Deallocate(s32, void *);
 

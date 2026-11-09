@@ -4,5 +4,5 @@
 s32 CPlayer__StopLoopingSounds(s32);                         /* extern */
 
 void WeaponMode_Idle_Enter(CGameObjectInstance *arg0) {
-    CPlayer__StopLoopingSounds((s32) arg0->m_AI.m_pParent);
+    CPlayer__StopLoopingSounds((sptr) arg0->m_AI.m_pParent);
 }

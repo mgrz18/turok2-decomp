@@ -77,7 +77,7 @@ CListedInstance *CInstancePool__SpawnAnimInstance(CInstancePool *scene, s32 vari
     s32 id;
     s32 model;
     s32 src;
-    s32 count;
+    sptr count;
     s32 size;
 
     effect = NULL;

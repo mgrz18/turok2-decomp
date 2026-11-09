@@ -9,7 +9,7 @@
 /* As CGameObjectInstance__DrawModel, drawing through Render_DrawModel and without setting the
  * actor's mask; clears gBlendState afterwards. */
 
-void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
+void CGameObjectInstance__DrawShadow(CGameObjectInstance *, sptr, CDrawArgs *);
 
 static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0, s32 *set1) {
     CIntelligence *intel = actor->header.m_pIntelligence;
@@ -52,13 +52,13 @@ static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0
     }
 }
 
-void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, s32 arg1, CDrawArgs *params) {
+void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, sptr arg1, CDrawArgs *params) {
     pickSets(actor, params->m_nVariant, &params->m_nModel, &params->m_nShadowModel);
     if (params->m_bShadow != 0) {
         CGameObjectInstance__DrawShadow(actor, arg1, params);
     }
     if (params->m_bDraw != 0) {
-        Render_DrawModel(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, params->m_nModel, actor->m_AI.m_nTexture);
+        Render_DrawModel(params->m_hModel, ((sptr)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, params->m_nModel, actor->m_AI.m_nTexture);
     }
     gBlendState = 0;
 }

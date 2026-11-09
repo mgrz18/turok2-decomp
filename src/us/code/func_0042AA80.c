@@ -11,8 +11,14 @@ typedef struct LevelLights {
     /* 0x11 */ s8 dir[3];
 } LevelLights;
 
+#ifdef TARGET_PORT /* the scene (CScene, structs/world.h) at its host layout */
+#include "structs/world.h"
+typedef struct MenuState {
+    u8 pad0[__builtin_offsetof(CScene, m_pLevelHeader)];
+#else
 typedef struct MenuState {
     /* 0x00000 */ u8 pad0[0x18E50];
+#endif
     /* 0x18E50 */ LevelLights *lights;
     /* 0x18E54 */ s16 dir[3];
 } MenuState;

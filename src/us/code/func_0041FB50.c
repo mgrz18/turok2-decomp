@@ -11,7 +11,12 @@ extern char D_800B48E0[];
 extern s32 Pak_FindNote(s32 slot, s32 note, s32 *used, char *name, char *ext, s32 *size, void *a6, void *a7);
 extern s32 Pak_TextHasInvalidChar(char *s, s32 n);
 extern void Str_Copy(char *dst, char *src);
+#ifdef TARGET_PORT
+/* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
+extern void sprintf(char *dst, const char *fmt, ...);
+#else
 extern void sprintf(char *dst, char *fmt, s32 value);
+#endif
 
 s32 PakMenu_NoteText(MenuItem *item, Menu *c) {
     char name[16];

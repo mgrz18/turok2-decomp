@@ -499,7 +499,9 @@ void CParticle__DrawShadow(ShadowActor *actor) {
  * emits the colour and draw commands. */
 
 
+#ifndef STRUCTS_GBI_H /* the port includes structs/gbi.h through structs/game.h */
 typedef struct { u8 pad0[0x40]; } Mtx;
+#endif
 
 /* The leading 0x34 bytes of a game object, as the collision test reads them. */
 typedef struct {
@@ -664,7 +666,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     u8 *envFrom;
     u8 *primFrom;
 
-    if (gDisplayListSize - ((u32)gDList - (u32)gEngineApp_m_pCurrentFrameData->m_pDisplayList) / sizeof(Gfx) < 3000) {
+    if (gDisplayListSize - ((uptr)gDList - (uptr)gEngineApp_m_pCurrentFrameData->m_pDisplayList) / sizeof(Gfx) < 3000) {
         return;
     }
     if (particle->time < 0.0f) {
@@ -1181,7 +1183,7 @@ extern void CParticle__Attach(Effect *effect, s32, s32);
 extern void Trail_AddNode(void *, Effect *, s32);
 extern s32 DLight_Spawn(void *, s32);
 extern void CParticle__StartLoopSound(Effect *effect, s32 sound);
-extern void Sound__Play(s16 sound, CVector3 pos, s32 a, s32 b);
+extern void Sound__Play(s16 sound, CVector3 pos, sptr a, s32 b);
 
 static __inline__ s32 randomCount(s32 range) {
     return range != 0 ? Random_Next() % (range + 1) : 0;
@@ -1253,7 +1255,7 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
         up = gCollisionResults.m_vVelocity;
         CVector3__Normalize(&up);
         CMtxF__RotateVector(&targetInv, &up, vel);
-        effect->target = (s32) targetActor;
+        effect->target = (sptr) targetActor;
         effect->flags |= 0x10000;
         effect->shake = gCollisionResults.m_nInstanceNode;
         if (targetActor->def->m_Type == 1) {
@@ -1303,7 +1305,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
     s32 spread;
     u32 *bits;
     u8 mask;
-    s32 resource;
+    sptr resource;
     EntryBlock *block;
     s32 numEntries;
     Entry *templates;
