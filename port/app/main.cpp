@@ -132,6 +132,7 @@ struct Args {
     bool game = false;
     bool draw = false;
     bool audio = false;
+    std::string wav;      // --wav <file>: the game's mixed audio output as a WAV (implies --audio)
     bool verbose = false;
 #ifdef T2_LOW_MEMORY_DEFAULT
     bool lowMemory = true;
@@ -160,13 +161,16 @@ Args ParseArgs(int argc, char** argv) {
             a.draw = true;
         } else if (s == "--audio") {
             a.audio = true;
+        } else if (s == "--wav" && i + 1 < argc) {
+            a.wav = argv[++i];
+            a.audio = true;
         } else if (s == "--verbose") {
             a.verbose = true;
         } else if (s == "--high-memory") {
             a.lowMemory = false;
         } else {
             fprintf(stderr, "usage: %s [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]\n"
-                            "          [--game [--draw] [--audio] [--verbose] [--high-memory]]\n",
+                            "          [--game [--draw] [--audio] [--wav out.wav] [--verbose] [--high-memory]]\n",
                     argv[0]);
             exit(2);
         }
@@ -401,6 +405,7 @@ int main(int argc, char** argv) {
         g.frames = args.frames;
         g.draw = args.draw;
         g.audio = args.audio;
+        g.wav = args.wav;
         g.lowMemory = args.lowMemory;
         g.verbose = args.verbose;
         CHECK(T2Game_Run(window, g) == 0, "game run");

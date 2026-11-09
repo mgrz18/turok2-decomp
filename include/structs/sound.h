@@ -122,8 +122,8 @@ typedef struct {
     /* 0x00 */ CAudioWorld *owner;
     /* 0x04 */ s32 unk4;
     /* 0x08 */ s32 *data;
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ void *unk10;
+    /* 0x0C */ sptr unkC;     /* the song's sequence data (SndSeq_SelectSong) */
+    /* 0x10 */ void *unk10;    /* its ALCSeq */
     /* 0x14 */ sptr csp;       /* compressed sequence player (alCSPSetVol) */
     /* 0x18 */ s32 unk18;
     /* 0x1C */ u32 flags;      /* 0x2 fading out, 0x4 faded out */
@@ -234,7 +234,7 @@ typedef struct SndSource {
         } h;
     } sound;
     /* 0x10 */ CVector3 pos;
-    /* 0x1C */ s32 flags;
+    /* 0x1C */ sptr flags;      /* the position it follows (CVector3 *): Sound__Play's follow argument */
 } SndSource; /* size 0x20 */
 
 /* The level's looping sounds (LoopSounds_*): the free sources and the
@@ -242,7 +242,8 @@ typedef struct SndSource {
 typedef struct LoopSounds {
     /* 0x00 */ CList m_FreeList;
     /* 0x14 */ CList m_UsedList;
-} LoopSounds;
+    /* 0x28 */ s32 m_Paused;       /* LoopSounds_Pause / LoopSounds_Resume */
+} LoopSounds; /* size 0x2C */
 
 /* A sound effect descriptor (SndInfo in rw/junk_types.h), read through the
  * accessors at 0x276820..0x2768BC. */

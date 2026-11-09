@@ -37,6 +37,8 @@ extern s32 gAudioMaxRSPCmds;
 extern s32 gAudioRomBase;
 extern u32 audFrameCt;
 void alInit(ALGlobals *g, ALSynConfig *c);
+void T2Audio_DmaCacheAge(void); /* t2audio_lib.c */
+extern ALHeap *gAudioHeap;  /* amCreateAudioMgr sets it (the codebook cache allocates from it) */
 void *alHeapDBAlloc(u8 *file, s32 line, ALHeap *hp, s32 num, s32 size);
 Acmd *alAudioFrame(Acmd *cmdList, s32 *cmdLen, s16 *outBuf, s32 outLen);
 void Sound__Lock(void);
@@ -192,6 +194,8 @@ static void am_frame(void) {
         T2Asp_Run((const uint32_t *)sCmd[sCur], (size_t)cmdLen);
     aiq_push(out, (size_t)n);
     sStats.frames++;
+    if (sStats.frames % 21 == 0)
+        T2Audio_DmaCacheAge(); /* __amMain: the codebook cache ages every 21 retraces */
     audFrameCt++;
     sCur ^= 1;
     Sound__Update();
@@ -222,6 +226,7 @@ void amCreateAudioMgr(ALSynConfig *cfg, s32 pri, AmConfig *ac) {
         n = (n & ~0xF) + 0x10;
     gAudioFrameSize = n;
     alInit(&gAudioGlobals, cfg);
+    gAudioHeap = cfg->heap; /* the codebook cache's heap (amCreateAudioMgr) */
     sMaxCmds = ac->maxACMDSize;
     gAudioMaxRSPCmds = ac->maxACMDSize;
     for (i = 0; i < 2; i++) {

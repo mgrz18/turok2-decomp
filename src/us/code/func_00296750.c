@@ -31,8 +31,13 @@ Acmd *alFxPull(ALFx *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(output) & (0xFFFFFFFFU >> (32 - (24)))) << (0)); _a->words.w1 = (unsigned int)(outCount << 1); };
     for (i = 0; i < r->section_count; i++) {
         d = &r->delay[i];
+#ifdef TARGET_PORT /* the delays are u32: negated they wrap only with 32-bit pointers */
+        in_ptr = &r->input[-(s32)d->input];
+        out_ptr = &r->input[-(s32)d->output];
+#else
         in_ptr = &r->input[-d->input];
         out_ptr = &r->input[-d->output];
+#endif
         if (in_ptr == prev_out_ptr) {
             { s16 t = buff2; buff2 = buff1; buff1 = t; };
         } else {

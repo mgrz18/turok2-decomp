@@ -103,3 +103,8 @@ void alSndpSetFXMix(ALSndPlayer *sndp, u8 mix) {
     e.fx.mix = mix;
     post(sndp, 8, &e);
 }
+
+/* func_00293E30 (SeqPlayer view: the state array at 0x40, 0x30-byte states, priority at 0x20) */
+void alSndpSetPriority(ALSndPlayer *sndp, ALSndId id, u8 priority) {
+    ((ALSoundState *)sndp->sndState)[id].priority = priority;
+}

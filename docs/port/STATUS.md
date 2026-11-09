@@ -413,3 +413,50 @@ Details: [AUDIO.md](AUDIO.md). Behind `--audio` (off by default: runs without it
 | A4 | `alEvtqPostEvent` | `alEvtqNew`/`alEvtqNextEvent` 0x1C strides, s32 links | typed (`TARGET_PORT`) |
 | A5 | `osRecvMesg` from `CAudioWorld__Lock` | lock at `arg0 + 0x110` | `&arg0->lock` (matches) |
 | A6 | `_sndpVoiceHandler` spins | `gAudioWorld.player.evtq` overwritten with stack-like data | **open** (AUDIO.md §4) |
+
+## Round 4, part s4: audio part 2 (the sound world typed, --audio through mode 0, --wav)
+
+`turok2 --game --audio --frames 300` now runs mode 0 to the end (300 frames, no crash; it used
+to stop in `SndQueue_CancelHandle`). The synthesizer mixes a frame every retrace; mode 0 plays
+nothing itself (the volume options are still 0 until the settings are loaded), so its output is
+silent. Through the game's own API a sound effect plays: with `T2_TEST_SFX=300` (debug only,
+`Sound__Play2D(300)` at frame 30, volume options forced to 0xC0) the WAV has the sound
+(peak 1037, rms 88 over 5 s, 197,534 non-zero samples) under gdb. Details: AUDIO.md section 8.
+
+```sh
+# the mixed output as a WAV (implies --audio) and its summary line
+SDL_VIDEODRIVER=offscreen OUT/build/app/turok2 --archive OUT/turok2.o2r --rom baserom.us.z64 \
+    --game --wav OUT/m0.wav --frames 300
+# game: wav OUT/m0.wav: 109664 stereo frames at 22050 Hz (4.97 s), peak 0, rms 0.0, 0 non-zero samples
+T2_TEST_SFX=300 ... --wav OUT/sfx.wav     # one sound effect through Sound__Play2D (debug hook)
+T2_TEST_SONG=0x10 ...                     # music through Music_SetTrack: stops in the CSP (below)
+```
+
+| # | where | cause | fix |
+|---|---|---|---|
+| s4-1 | `SndQueue_CancelHandle` from `CAudioWorld__StopHandle` | the sound world's C is Rage Wars' (ContextRecAt2BC0, Voice, M04Emitter, NodeRecAtC8, ... views at N64 offsets, 0xCC voices) | 81 functions (CAudioWorld, SndVoice, SndVoicePool, SndQueue, SndSeq, the speech player, LoopSounds, Sound__IsPlaying) typed in `port/audio/t2audio_world.c`, originals out of the link |
+| s4-2 | r4's `_sndpVoiceHandler` evtq corruption | `SpeechPlayer_Construct` allocated its sound on `CAudioWorld__GetSndPlayer(m)` = m + 0x84 (the N64 offset of the sound player: the bank pointers on the host) | typed (s4-1) |
+| s4-3 | `alAudioFrame` spins | `__nextSampleTime` read the client's time at 0x10 (`ALPlayer.handler` on the host); `alSynAddPlayer`, `_timeToSamples` the same | `port/audio/t2audio_lib.c`: the synthesizer driver, voice calls (`alSynAllocVoice` helpers, `alSynSet*`, `alSynStart/StopVoice`, `alSynFreeVoice`), `alEvtqFlush*`, `_removeEvents`, `alCSPGetState`, then (s4-4..s4-7) the filter constructors, `alResampleParam`, the CSP API posts and the codebook cache (30 functions) |
+| s4-4 | `alAudioFrame`: `output->setParam` = 3 | `alFilterNew` stored handler/setParam as s32 at N64 offsets; `alSaveNew`/`alSaveParam` the same | typed in t2audio_lib.c; `ALSave.dramout` is `sptr` |
+| s4-5 | SAVEBUFF of 11,168 bytes over the save filter | `alFxPull`/`_doModFunc`: `&r->input[-d->input]` with a u32 delay wraps only with 32-bit pointers | `-(s32)` under `TARGET_PORT` (func_00296750.c, func_00296CD0.c) |
+| s4-6 | `alAdpcmPull` -> `alResampleParam` calls a handler as setParam | `alResampleParam` (IntegerState34 view) | typed |
+| s4-7 | `AudioDMA_CacheBlock`: heap NULL, entries 0x90 bytes | `gAudioHeap` set by the replaced `amCreateAudioMgr`; CacheEntry holds pointers | t2audio_mgr.c sets `gAudioHeap`; typed host cache + ageing (`T2Audio_DmaCacheAge`) |
+| s4-8 | `ALParam` too small for `ALStartParamAlt` | the update casts carry a pointer at 0x20 on the host | `ALParam` gets a host pad (`TARGET_PORT`) |
+| s4-9 | (silent) pitch/env halves | `FloatToHalf` took the first u16 of the float: the low half on a little-endian host | `TARGET_PORT`: the top 16 bits |
+| s4-10 | (silent) `LoopSounds` paused flag past the struct | `LoopSounds` had no field at 0x28 | `m_Paused` added (structs/sound.h); `SndSource.flags` and `SndSeq.unkC` are `sptr` (pointers) |
+
+Open (next): (1) without gdb, a playing sound effect crashes in `t2asp.c` `cmd_adpcm`
+(`memcpy(ram(w1), ...)`: the ADPCM state address in the command; under gdb, no ASLR, it plays:
+an address above 4 GB or a stale state pointer, look at `alAdpcmPull`/`_decodeChunk`'s
+`osVirtualToPhysical` arguments first); (2) music: `Music_SetTrack` -> `SndSeq_Update` (typed)
+-> `__CSPVoiceHandler` -> `__CSPSetUsptFromTempo` (func_00290D5C) crashes: the compressed
+sequence player (`__CSP*`, `alCSeq*`, func_0028F1F0..func_00290D5C) is still m2c views;
+(3) speech (`SpeechPlayer_Update` state 1, the adec stream) is stubbed: it ends the request and
+says so once.
+
+For the merge: new files `port/audio/t2audio_world.c`, `port/audio/t2audio_lib.c`; edits in
+`port/cmake/link.cmake` (112 files added to `T2_LINK_REPLACED`), `port/app/CMakeLists.txt`
+(t2audio sources), `port/app/main.cpp` / `game.h` / `game.cpp` (`--wav`, the T2_TEST_* hooks:
+s2 also adds a flag in main.cpp), `port/audio/t2audio_mgr.c`, `port/audio/t2audio_sndp.c`
+(`alSndpSetPriority`), `include/structs/sound.h`, `include/structs/libaudio.h`, three src files.
+Drop OUT/decls.json (header changes). asm_diff 0 (see the commit).

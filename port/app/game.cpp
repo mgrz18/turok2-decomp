@@ -22,6 +22,7 @@
 extern "C" {
 #include "t2port.h"
 #include "t2audio.h"
+#include <cmath>
 }
 
 #include "game.h"
@@ -82,7 +83,19 @@ void ContRead(void* pads) {
 
 } // namespace
 
+extern "C" {
+int Sound__Play2D(int id);
+void Music_SetTrack(int track);
+void T2Audio_TestVolumes(void);
+}
+
 int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameArgs& args) {
+    // Debug only (audio bring-up, docs/port/AUDIO.md section 9): T2_TEST_SFX=<id> plays the
+    // game's sound <id> through Sound__Play2D at frame 30, T2_TEST_SONG=<n> starts music
+    // track <n> through Music_SetTrack at frame 60 (both between frames, when every game thread
+    // is idle). Needs --audio.
+    const char* testSfx = getenv("T2_TEST_SFX");
+    const char* testSong = getenv("T2_TEST_SONG");
     if (window) {
         static const T2PortContHooks hooks = { ContInit, ContRead };
         T2Port_SetContHooks(&hooks);
@@ -98,12 +111,39 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     printf("game: booted, %d frames\n", args.frames);
     fflush(stdout);
 
+    // --wav: the mixed output as a 16-bit stereo WAV (header patched at the end), with a summary
+    // (peak, RMS, non-silent frames) so headless runs can check the sound is there and sane
+    FILE* wav = nullptr;
+    uint64_t wavFrames = 0, wavNonZero = 0;
+    double wavSumSq = 0.0;
+    int wavPeak = 0;
+    if (!args.wav.empty()) {
+        wav = fopen(args.wav.c_str(), "wb");
+        if (wav == nullptr) {
+            fprintf(stderr, "game: cannot write %s\n", args.wav.c_str());
+        } else {
+            static const uint8_t zero[44] = {};
+            fwrite(zero, 1, sizeof zero, wav);
+        }
+    }
+
     int drawn = 0;
     const void* lastDL = nullptr;
     auto t0 = std::chrono::steady_clock::now();
     for (int f = 0; f < args.frames && (!window || window->IsRunning()); f++) {
         if (window) {
             window->HandleEvents();
+        }
+        if (args.audio && (testSfx != nullptr || testSong != nullptr) && f == 29) {
+            T2Audio_TestVolumes();
+        }
+        if (args.audio && testSfx != nullptr && f == 30) {
+            int h = Sound__Play2D((int)strtol(testSfx, nullptr, 0));
+            printf("game: T2_TEST_SFX: Sound__Play2D(%s) -> handle %d\n", testSfx, h);
+        }
+        if (args.audio && testSong != nullptr && f == 60) {
+            Music_SetTrack((int)strtol(testSong, nullptr, 0));
+            printf("game: T2_TEST_SONG: Music_SetTrack(%s)\n", testSong);
         }
         T2Port_Frame();
         if (args.audio) {
@@ -113,6 +153,16 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             size_t n = T2Audio_TakeSamples(pcm, 4096);
             if (n > 0) {
                 AudioPlayerPlayFrame(reinterpret_cast<const uint8_t*>(pcm), n * 4);
+            }
+            if (wav != nullptr && n > 0) {
+                fwrite(pcm, 4, n, wav);
+                for (size_t k = 0; k < n * 2; k++) {
+                    int v = pcm[k] < 0 ? -pcm[k] : pcm[k];
+                    wavPeak = v > wavPeak ? v : wavPeak;
+                    wavSumSq += (double)pcm[k] * pcm[k];
+                    wavNonZero += pcm[k] != 0;
+                }
+                wavFrames += n;
             }
         }
         T2PortTask task;
@@ -171,6 +221,23 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         }
     }
     double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+    if (wav != nullptr) {
+        uint32_t rate = T2Audio_Rate() != 0 ? T2Audio_Rate() : 22050;
+        uint32_t data = (uint32_t)(wavFrames * 4);
+        uint8_t h[44];
+        auto put32 = [&](int o, uint32_t v) { h[o] = v; h[o + 1] = v >> 8; h[o + 2] = v >> 16; h[o + 3] = v >> 24; };
+        auto put16 = [&](int o, uint32_t v) { h[o] = v; h[o + 1] = v >> 8; };
+        memcpy(h, "RIFF", 4); put32(4, 36 + data); memcpy(h + 8, "WAVEfmt ", 8); put32(16, 16); put16(20, 1);
+        put16(22, 2); put32(24, rate); put32(28, rate * 4); put16(32, 4); put16(34, 16); memcpy(h + 36, "data", 4);
+        put32(40, data);
+        fseek(wav, 0, SEEK_SET);
+        fwrite(h, 1, sizeof h, wav);
+        fclose(wav);
+        double rms = wavFrames ? sqrt(wavSumSq / (double)(wavFrames * 2)) : 0.0;
+        printf("game: wav %s: %llu stereo frames at %u Hz (%.2f s), peak %d, rms %.1f, %llu non-zero samples\n",
+               args.wav.c_str(), (unsigned long long)wavFrames, rate, wavFrames / (double)rate, wavPeak, rms,
+               (unsigned long long)wavNonZero);
+    }
     T2PortStats s;
     T2Port_GetStats(&s);
     printf("game: %llu frames in %.2f s, %llu thread switches, %llu gfx tasks (%d drawn), %llu audio tasks, "
