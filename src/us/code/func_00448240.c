@@ -234,9 +234,9 @@ typedef struct SplineSource { s32 stride,count; union { char data[0]; CVector3 p
 typedef struct SplineTable { s32 count; } SplineTable;
 typedef union SplineSourceCursor { SplineSource *header; CVector3 *points; f32 *weights; } SplineSourceCursor;
 extern void Pack_Init(void *,s32);
-extern char *Pack_Add(Pack *,s32,s32);
+extern char *Pack_Add(Pack *,sptr,s32);
 extern s32 ProPackDecompress(void **, s32);
-static __inline__ char *packAppend(Pack *pack,void *prepare,s32 size) { return Pack_Add(pack,(s32)prepare,size); }
+static __inline__ char *packAppend(Pack *pack,void *prepare,s32 size) { return Pack_Add(pack,(sptr)prepare,size); }
 static __inline__ s32 splineRecordSize(s32 left,s32 right) { s32 a=left*9,b=right*9; return (b+a)*4+48; }
 void Cinema_PrepareResource_2(s32 unused, struct Shape_typemap_165 **handle) {
     struct Shape_typemap_165 *output;
