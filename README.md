@@ -137,8 +137,8 @@ What a source port needs: code a person can read and change without breaking it.
 - [ ] libultra from [decompals/ultralib](https://github.com/decompals/ultralib) (`libgultra`)
 
 ### Phase 6 — Assets
-- [ ] Map every asset in the ROM: models, textures, levels, animations, sounds, music, text
-- [ ] Extractor that builds a resource archive from the user's ROM (the port ships no game data)
+- [x] Map every asset in the ROM: models, textures, levels, animations, sounds, music, text. 100% of the asset region (0x1E0000-0x1FF7AEC, 31.5 MB) classified, 99.7% exported to files: 2705 models, 1839 textures + 114 graphic sets, 490 skeletons / 1857 animations, 165 levels, 197 cinemas, 2 sound banks (866 waves), 1319 effects, 19 sequences, 140 streams. See [docs/assets/README.md](docs/assets/README.md)
+- [ ] Extractor that builds a resource archive from the user's ROM (the port ships no game data). Partially: `tools/assets/extract_all.py` extracts everything to ordinary files and the archive format is chosen ([docs/assets/PORT.md](docs/assets/PORT.md): libultraship `.o2r`, one entry per load unit); the `.o2r` builder is next
 - [ ] Code loads assets through the archive instead of fixed ROM offsets
 
 ### Phase 7 — Native build

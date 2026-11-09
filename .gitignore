@@ -80,3 +80,8 @@ include/functions.h
 # qemu core dumps from cc1 crashes, and the permuter debug output
 *.core
 debug_source.c
+
+# Phase 6 asset output: game data extracted from the user ROM, never commit
+assets_out/
+*.o2r
+*.otr

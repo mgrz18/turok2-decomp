@@ -46,7 +46,7 @@ ROUND5_MODULES = [
     ("virtual_text_1",   0x186000, 0x1B3400, 0x80210000),
     ("virtual_rodata_1", 0x1B3400, 0x1BFA00, None),
     ("virtual_text_2",   0x1BFA00, 0x1DEE00, 0x80280000),
-    ("virtual_rodata_2", 0x1DEE00, 0x20E334, None),
+    ("virtual_rodata_2", 0x1DEE00, 0x1E0000, None),
 ]
 
 

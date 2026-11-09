@@ -17,8 +17,14 @@ VRAM mapping (main + code): ROM 0x1000 = VRAM 0x80000400, delta `0x7FFFF400`.
 | 0x00001000 | code    | main      | SN64 SNMAIN stub (0x100 bytes ending at `jr ra; nop`). |
 | 0x00001100 | code    | code      | Engine + libultra/libaudio + .rodata, plus the SN64 LNK debug block. |
 | 0x0013B5F0 | code    | virtual   | VM/virtual code segment (T3 calls this "virtual"). |
-| 0x0020F000 | bin     | assets    | Compressed asset / texture / audio / level / model data. |
-| 0x01FF7AE4 | bin     | trailer   | 0xFF ROM padding to 0x2000000. |
+| 0x001E0000 | bin     | audio_ctl | Audio control block (libaudio bank files). Asset region starts here. |
+| 0x0020F194 | bin     | audio_wavetable | VADPCM sample data (`gAudioRomBase`). |
+| 0x00BE1814 | bin     | sound_data | Sound tree file (effects, envelopes, songs). |
+| 0x00FCBFB4 | bin     | cartridge | Cartridge index: every other asset. |
+| 0x01FF7AEC | bin     | trailer   | 0xFF ROM padding to 0x2000000. |
+
+The asset rows are resolved: see "Asset region structure" below and
+[docs/assets/README.md](assets/README.md).
 
 ## Sub-segment boundaries inside `code` (high confidence)
 
@@ -41,7 +47,28 @@ VRAM mapping (main + code): ROM 0x1000 = VRAM 0x80000400, delta `0x7FFFF400`.
 | 0x0013B5F0 | asm     | Function-prologue density resumes after the LNK debug block. The VM dispatch trampolines live here. |
 | 0x001E0000 | data    | Opcode density holds 100% until 0x1DFC00 then drops to ~80% with sustained low-zero stretches → end of `.text`, .rodata begins. |
 
-## Asset region structure (low confidence — needs decoding)
+## Asset region structure (resolved, Phase 6)
+
+The asset region is fully decoded: [docs/assets/README.md](assets/README.md)
+and [docs/assets/ROMFS.md](assets/ROMFS.md). It starts at **0x1E0000** (not
+0x20F000 / 0x20F178) and is four regions the C hard-codes:
+
+| ROM | Segment | What | C |
+|-----|---------|------|---|
+| 0x1E0000-0x20F194 | `audio_ctl` | libaudio bank files, pointers relocated to 0x480000 | `CAudioWorld__Initialize`: `VM_Alloc(0x2F194, 0, 0x1E0000)` |
+| 0x20F194-0xBE1814 | `audio_wavetable` | VADPCM samples | `gAudioRomBase = 0x20F194` |
+| 0xBE1814-0xFCBFB4 | `sound_data` | sound tree file (ISet) | `CAudioWorld__LoadSfxDataFile`: `VM_Alloc(0x3EA7A0, 0, 0xBE1814)` |
+| 0xFCBFB4-0x1FF7AEC | `cartridge` | cartridge index (ISet of 21) | `m_CartridgeIndex = 0xFCBFB4` -> `CScene__Construct` |
+
+The "monotonic offset table" of the notes below (0x20E334..0x20F178, 913
+entries, values 0x48AD2C..0x4AE26C) is the sfx instrument's `soundArray`
+inside the audio control block: pointers to the 913 sfx `ALSound`s, relocated
+to the block's VM address 0x480000. It is not an asset directory. The
+"high-entropy data" after it is the VADPCM wave table and the RNC-packed
+(ProPack) cartridge blocks. `virtual_rodata_2` ends at 0x1E0000. The notes
+below are kept as the history of how the layout was found.
+
+Earlier notes (superseded):
 
 - 0x0020F000 begins with what looks like a **monotonic 32-bit offset table** (`00 4a 9c 0c, 00 4a 9c d4, 00 4a 9d 9c ...`). The values point well past their own location, deep into the asset data. Likely the cartridge / asset directory.
 - 8 distinct `0xFFFFFE00` markers scattered through 0x5BA104 … 0x1F71CA0 — probably compression terminators or section separators.
@@ -256,6 +283,10 @@ checksum table or refcount array).
 `0x1FF7AEC`. The 8 bytes preceding belong to the `assets` segment.
 
 ### 4.3 Asset directory at 0x20F000 — actually starts at 0x20E334
+
+> **Resolved (Phase 6):** this table is the sfx `soundArray` inside the audio
+> control block (0x1E0000-0x20F194), not an asset directory; the asset region
+> starts at 0x1E0000. See "Asset region structure" above and docs/assets/.
 
 **Evidence**:
 
