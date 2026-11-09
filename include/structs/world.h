@@ -24,6 +24,15 @@
 #include "structs/level_actor.h"
 #include "structs/particle.h"
 
+/* The scene's matrix heap, gScene_m_Heap (MatrixHeap_Construct, MtxPool_Reset, MtxPool_Alloc):
+ * 0x40-byte Mtx blocks in two halves, one per frame buffer (gEvenOdd). */
+typedef struct MtxPool {
+    /* 0x0 */ u8 *base;          /* the first block */
+    /* 0x4 */ s32 n;             /* blocks per half */
+    /* 0x8 */ s32 remaining;     /* blocks left this frame */
+    /* 0xC */ u8 *next;          /* the next free block */
+} MtxPool; /* size 0x10 */
+
 /* Where a warp puts the player: a spawn point of a level. */
 typedef struct CWarpPoint {
     /* 0x00 */ CVector3 m_vPos;
@@ -122,7 +131,11 @@ typedef struct CScene {
     /* 0x000B8 */ u8 unk_B8[0x10];
     /* 0x000C8 */ void **m_hHeap;
     /* 0x000CC */ void **m_hPaths;
-    /* 0x000D0 */ u8 m_Heap[0x10];                  /* gScene_m_Heap */
+#ifdef TARGET_PORT /* pointers: 24 bytes on the host */
+    MtxPool m_Heap[1];
+#else
+    /* 0x000D0 */ u8 m_Heap[0x10];                  /* gScene_m_Heap: a MtxPool */
+#endif
     /* 0x000E0 */ struct CGameObjectInstance *m_pActors; /* gScene_m_pActors: the level's actors */
     /* 0x000E4 */ s32 m_nFirstActor;
     /* 0x000E8 */ s32 m_nActors;
