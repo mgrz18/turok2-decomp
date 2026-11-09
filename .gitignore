@@ -88,3 +88,6 @@ assets_out/
 
 # Local previews of extracted assets (game data)
 /.preview/
+
+# generated game data (ROM content): tools/port/gendata.py, docs/port/DATA.md
+port/gen/
