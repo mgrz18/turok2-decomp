@@ -1256,10 +1256,12 @@ s32 MenuItem_TextLength(MenuItem *a) {
 /* ---- The window functions below use Menu, MenuDesc, ControllerProfile and MenuPool (structs/menu.h) ---- */
 
 /* ---------------- MenuItem_DrawText ---------------- */
-s32 func_00413F74_416168(s32, s32, s32, s32, s32) __asm__("MenuItem_DrawString");
+s32 func_00413F74_416168(MenuItem *, s32, s32, s32, char *) __asm__("MenuItem_DrawString");
 
-void MenuItem_DrawText(Menu *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    func_00413F74_416168((sptr) arg0, arg1, arg2, arg3, (sptr) arg0->desc);
+/* Draws the item's text line (MenuItem.text, 0x14). m2c read the item as a Menu
+ * (Menu.desc is also at 0x14 on the N64; on the host that view read MenuItem.def). */
+void MenuItem_DrawText(MenuItem *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    func_00413F74_416168(arg0, arg1, arg2, arg3, arg0->text);
 }
 
 /* ---------------- MenuItem_DrawChar ---------------- */
