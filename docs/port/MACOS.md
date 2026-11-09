@@ -146,7 +146,8 @@ loader) into this branch and runs with r2's format-2 archive (`mkarchive.py`: t2
 | e | `ProPackDecompress` from `Model_DecompressCallback(s32, s32)` (func_0020B490) | callback arguments are `s32` |
 | f | `CISet__GetROMAddressAndSize` from `func_00207914(s32 arg0, ...)` from `Material_Unpack` | **stopped**: `Material.texture` is an `s32` in the decompressed model block, and the texture handle is written at `texture` and `texture + 4`. This is asset/model layout with in-place pointers, not a prototype fix |
 
-With fixes a-e the Mac runs `CScene__Construct` through the index loads, intelligence,
+r3 @ e9b1dfcc has a-e. Rechecked on the Mac (local `r5-test-all2`: r5 + r3 @ e9b1dfcc + r1 @ ef12cb66,
+with only the three semantic merge fixes): it stops at f, the same place. With fixes a-e the Mac runs `CScene__Construct` through the index loads, intelligence,
 particles and bit sections, into the first model decompression. Every decompression callback
 (`decompressCallback(sptr notifyId, CCacheEntry *)`) still needs the host signature. The
 particle `Piece` relocation (`base + piece[i].unkNN` in s32 slots) and `Material` are the next
