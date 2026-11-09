@@ -85,3 +85,6 @@ debug_source.c
 assets_out/
 *.o2r
 *.otr
+
+# Local previews of extracted assets (game data)
+/.preview/
