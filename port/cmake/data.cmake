@@ -17,7 +17,9 @@ file(GLOB T2_DATA_SOURCES CONFIGURE_DEPENDS ${T2_GEN_DIR}/*.c)
 if(T2_DATA_SOURCES)
     add_library(turok2_data STATIC ${T2_DATA_SOURCES})
     # -w: the initializers are byte lists and (void *) relocations, nothing to warn about
-    target_compile_options(turok2_data PRIVATE -w)
+    # -fno-common: zero arrays as real definitions; a Mach-O alias (.set base + off, gendata.py)
+    # needs its base in a section, and Apple clang still puts tentative definitions in common
+    target_compile_options(turok2_data PRIVATE -w -fno-common)
     list(LENGTH T2_DATA_SOURCES n_data)
     message(STATUS "turok2_data: ${n_data} generated files from ${T2_GEN_DIR}")
 else()

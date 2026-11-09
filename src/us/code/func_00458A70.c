@@ -12,7 +12,12 @@ extern u8 D_800C1404[];
 s32 Pak_FindNote_2(s32 pad, s32 idx, s32 *valid, u8 *name, u8 *ext, s32 *blocks, u8 *company, u8 *game);
 s32 Pak_TextHasInvalidChar_2(u8 *p, s32 n);
 char *Str_Copy_2(char *dst, char *src);
+#ifdef TARGET_PORT
+/* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
+void sprintf(char *dst, const char *fmt, ...);
+#else
 void sprintf(char *dst, u8 *fmt, s32 a);
+#endif
 
 s32 PakMenu_NoteText_2(MenuItem *item, Menu *own) {
     u8 name[16];

@@ -63,6 +63,14 @@ import sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
+# host layout = the machine the port is built on (docs/port/MACOS.md for macOS arm64)
+if sys.platform == 'darwin':
+    DEFAULT_LIBCLANG = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
+    DEFAULT_HOST_TARGET = 'arm64-apple-macos13'
+else:
+    DEFAULT_LIBCLANG = '/usr/lib/llvm-19/lib/libclang-19.so.1'
+    DEFAULT_HOST_TARGET = 'x86_64-linux-gnu'
+
 # ---------------------------------------------------------------------------
 # libclang worker: declared types, in both layouts
 # ---------------------------------------------------------------------------
@@ -72,9 +80,10 @@ _index = None
 _targets = None
 
 
-def _init_worker(libclang, targets):
-    global _ci, _index, _targets
+def _init_worker(libclang, targets, host_target='x86_64-linux-gnu'):
+    global _ci, _index, _targets, _host_target
     import clang.cindex as ci
+    _host_target = host_target
     if libclang:
         ci.Config.set_library_file(libclang)
     _ci = ci
@@ -160,7 +169,7 @@ def _parse_args(cmd):
         if skip:
             skip -= 1
             continue
-        if a in ('-o', '-c'):
+        if a in ('-o', '-c', '-arch'):  # -arch: the target is given explicitly (_worker)
             skip = 1
             continue
         if a.startswith('-W'):
@@ -177,7 +186,7 @@ def _worker(job):
     res = {}
     try:
         tus = []
-        for tgt in ('x86_64-linux-gnu', 'mips-linux-gnu'):
+        for tgt in (_host_target, 'mips-linux-gnu'):
             tus.append(_index.parse(path, args=args + ['-target', tgt]))
         decls = []
         for tu in tus:
@@ -461,7 +470,9 @@ def main():
     ap.add_argument('--build', required=True, help='port build dir (compile_commands.json, libturok2_game.a)')
     ap.add_argument('--elf', default=os.path.join(ROOT, 'build/turok2.us.elf'))
     ap.add_argument('--out', default=os.path.join(ROOT, 'port/gen'))
-    ap.add_argument('--libclang', default=os.environ.get('LIBCLANG', '/usr/lib/llvm-19/lib/libclang-19.so.1'))
+    ap.add_argument('--libclang', default=os.environ.get('LIBCLANG', DEFAULT_LIBCLANG))
+    ap.add_argument('--host-target', default=DEFAULT_HOST_TARGET,
+                    help='clang triple of the host layout (default: this machine: %s)' % DEFAULT_HOST_TARGET)
     ap.add_argument('-j', type=int, default=4)
     ap.add_argument('--cache', help='json cache of the declared types (skip libclang)')
     a = ap.parse_args()
@@ -477,6 +488,8 @@ def main():
     for line in nm.splitlines():
         p = line.split()
         obj = p[0].split(':')[1]
+        if sys.platform == 'darwin' and p[-1].startswith('_'):
+            p[-1] = p[-1][1:]  # Mach-O C names carry the '_' user label prefix
         if p[-2] == 'U':
             undef_by[obj].add(p[-1])
         elif p[-2] in 'TDBRC':
@@ -542,7 +555,7 @@ def main():
         decls = collections.defaultdict(list)
         types = {}
         decls['__types__'] = types
-        with multiprocessing.Pool(a.j, _init_worker, (a.libclang, want)) as pool:
+        with multiprocessing.Pool(a.j, _init_worker, (a.libclang, want, a.host_target)) as pool:
             for res in pool.imap_unordered(_worker, jobs, chunksize=4):
                 if '__error__' in res:
                     print('warning:', res.pop('__error__'), file=sys.stderr)
@@ -930,7 +943,12 @@ class Generator:
             f.write('/* %s = %s + 0x%X (N64 0x%08X) */\n' % (s.name, base.name, hoff, s.addr))
             f.write('#if defined(__ELF__)\n__asm__(".globl " T2_SYM(%s) "\\n.set " T2_SYM(%s) ", " T2_SYM(%s) " + %d");\n'
                     % (s.name, s.name, base.name, hoff))
-            f.write('#else\nchar %s[1]; /* FIXME: alias not supported here */\n#endif\n' % s.name)
+            # Mach-O: .set to base+offset gives an N_SECT symbol in the base's section;
+            # .alt_entry keeps it inside the base's atom (subsections_via_symbols, dead_strip)
+            f.write('#elif defined(__APPLE__)\n__asm__(".globl " T2_SYM(%s) "\\n.alt_entry " T2_SYM(%s) '
+                    '"\\n.set " T2_SYM(%s) ", " T2_SYM(%s) " + %d");\n'
+                    % (s.name, s.name, s.name, base.name, hoff))
+            f.write('#else\nchar %s[1]; /* FIXME: alias not supported here (COFF) */\n#endif\n' % s.name)
             self.alias_nonelf.append(s.name)
             return
         al = min(max(s.align, 4), 16)
@@ -1079,7 +1097,7 @@ class Generator:
             sum(self.unresolved.values()), len(self.unresolved)))
         for n, c in self.unresolved.most_common():
             P('  %s: %d (e.g. %s)' % (n, c, self.unresolved_ex[n]))
-        P('== aliases (ELF .set; a separate copy elsewhere): %d' % len(self.alias_nonelf))
+        P('== aliases (ELF .set, Mach-O .set + .alt_entry; a 1-byte FIXME copy on COFF): %d' % len(self.alias_nonelf))
         P('== integer slots whose value looks like an address (kept as the N64 handle;'
           ' candidates for pointer typing in src/): %d in %d symbols' % (
               sum(self.int_addr.values()), len(self.int_addr)))
