@@ -769,7 +769,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
         dist = -dist;
     }
     if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
-        GFX_CMD(0xDA380003, (u32)&particle->mtx[gEvenOdd])
+        GFX_CMD(0xDA380003, GBI_ADDR(&particle->mtx[gEvenOdd]))
     } else {
         mtx = MtxPool_Alloc(gScene.m_Heap, 1);
         if (mtx == 0) {
@@ -777,7 +777,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
             return;
         }
         CParticle__BuildMatrix(particle, mtx, view, dist);
-        GFX_CMD(0xDA380003, (u32)mtx)
+        GFX_CMD(0xDA380003, GBI_ADDR(mtx))
     }
 
     textured = particle->flags & 0x800000;
@@ -852,7 +852,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
         }
     }
     alpha = (alpha > 255 ? 255 : alpha) < 0 ? 0 : (alpha > 255 ? 255 : alpha);
-    GFX_CMD(0x01004008, (u32)gParticleSpriteVtx)
+    GFX_CMD(0x01004008, GBI_ADDR(gParticleSpriteVtx))
     if (textured) {
         GFX_CMD(0xD7FF0002, (shiftS << 16) | (shiftT & 0xFFFF))
     }

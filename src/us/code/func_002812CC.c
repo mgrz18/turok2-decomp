@@ -1,5 +1,6 @@
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/camera.h"
 #include "globals/engine.h"
 
@@ -10,5 +11,5 @@ void CCamera__LoadOnScreenProjection(CCamera *cam) {
     Gfx *g = gDList++;
 
     g->w0 = 0xDA380007;
-    g->w1 = (u32)&cam->m_mOnScreenProjection[gEvenOdd];
+    g->w1 = GBI_ADDR(&cam->m_mOnScreenProjection[gEvenOdd]);
 }

@@ -30,7 +30,7 @@ void CEmitterPool__Draw(CEmitterPool *owner, CCamera *view) {
         return;
     }
     GFX_CMD(0xE7000000, 0)
-    GFX_CMD(0xDA380003, (u32)&gIdentityMtx)
+    GFX_CMD(0xDA380003, GBI_ADDR(&gIdentityMtx))
     GFX_CMD(0xDB040004, 2)
     GFX_CMD(0xDB04000C, 2)
     GFX_CMD(0xDB040014, 0xFFFE)

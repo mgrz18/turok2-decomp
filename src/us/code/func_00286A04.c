@@ -5,6 +5,7 @@
 #include "structs/frame.h"
 #include "globals/frame.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "globals/render.h"
 #include "globals/engine.h"
 
@@ -27,10 +28,10 @@ void CEngineApp__BeginDisplayList(void)
   d1->w1 = 0;
   d2 = gDList++;
   d2->w0 = 0xDE000000;
-  d2->w1 = (u32) gRspInitDL;
+  d2->w1 = GBI_ADDR(gRspInitDL);
   d3 = gDList++;
   d3->w0 = 0xDE000000;
-  d3->w1 = (u32) gRdpInitDL;
+  d3->w1 = GBI_ADDR(gRdpInitDL);
   d4 = gDList++;
   d4->w0 = 0xFE000000;
   vp = &gScreenViewport[gEvenOdd];
@@ -47,7 +48,7 @@ void CEngineApp__BeginDisplayList(void)
   new_var = (f32) (gScreenWidth - 1);
   d5 = gDList++;
   d5->w0 = 0xDC080008;
-  d5->w1 = (u32) vp;
+  d5->w1 = GBI_ADDR(vp);
   d6 = gDList++;
   d6->w0 = 0xED000000;
   d6->w1 = ((((s32) (new_var * 4.0f)) & 0xFFF) << 12) | (((s32) (((f32) (gScreenHeight - 1)) * 4.0f)) & 0xFFF);

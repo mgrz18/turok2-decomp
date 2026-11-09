@@ -438,8 +438,8 @@ void CCamera__DisplayListSetup(CCamera *cam) {
         Gfx **setup = &gDList;
 
         GFX(*setup, 0xE7000000, 0);                         /* gDPPipeSync */
-        GFX(*setup, 0xDE000000, (u32) gRspInitDL);          /* gSPDisplayList */
-        GFX(*setup, 0xDE000000, (u32) gRdpInitDL);
+        GFX(*setup, 0xDE000000, GBI_ADDR(gRspInitDL));          /* gSPDisplayList */
+        GFX(*setup, 0xDE000000, GBI_ADDR(gRdpInitDL));
         ResetPixelScale(cam);
         SetPixelScale(cam, cam->m_WarpXScale, cam->m_WarpYScale);
         sx = cam->m_PixelXScale;
@@ -462,17 +462,17 @@ void CCamera__DisplayListSetup(CCamera *cam) {
         if (lry > gScreenHeight - 1) lry = maxy;
         buffer = gEngineApp.m_pCurrentFrameData;
         frame = gEvenOdd;
-        GFX(*setup, 0xDA380007, (u32) &cam->m_mProjection[frame]);   /* gSPMatrix */
+        GFX(*setup, 0xDA380007, GBI_ADDR(&cam->m_mProjection[frame]));   /* gSPMatrix */
         GFX(*setup, 0xDB0E0000, cam->m_PerspNorm);                    /* gSPPerspNormalize */
         cam->m_vp[frame].vscale[0] = vx;
         cam->m_vp[frame].vscale[1] = vy;
         cam->m_vp[frame].vtrans[0] = (s32) ((vx * 0.25f + cam->m_Viewport.m_ScreenPosX) * 4.0f);
         cam->m_vp[frame].vtrans[1] = (s32) ((vy * 0.25f + cam->m_Viewport.m_ScreenPosY) * 4.0f);
-        GFX(*setup, 0xDC080008, (u32) &cam->m_vp[frame]);             /* gSPViewport */
+        GFX(*setup, 0xDC080008, GBI_ADDR(&cam->m_vp[frame]));             /* gSPViewport */
         GFX(*setup, 0xED000000 | ((s32) (ulx * 4.0f) & 0xFFF) << 12 | ((s32) (uly * 4.0f) & 0xFFF),
             ((s32) (lrx * 4.0f) & 0xFFF) << 12 | ((s32) (lry * 4.0f) & 0xFFF));   /* gDPSetScissor */
-        GFX(*setup, 0xDC08000A, (u32) &cam->m_LookAt[frame]);                        /* gSPLookAtX */
-        GFX(*setup, 0xDC08030A, (u32) &cam->m_LookAt[frame] + 0x10);                 /* gSPLookAtY */
+        GFX(*setup, 0xDC08000A, GBI_ADDR(&cam->m_LookAt[frame]));                        /* gSPLookAtX */
+        GFX(*setup, 0xDC08030A, GBI_ADDR(&cam->m_LookAt[frame]) + 0x10);                 /* gSPLookAtY */
         Texture_InvalidateCache();
     }
     GFX(gDList, 0xE3001201, 0x2000);                    /* gDPSetTextureFilter(bilerp) */

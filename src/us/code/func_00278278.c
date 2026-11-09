@@ -15,7 +15,7 @@ void COnScreen__SelectFont3(void) {
 
     if (image != NULL) {
         gLoadedFont = 3;
-        GFX_CMD(0xFD900000, (u32)image);            /* gDPSetTextureImage */
+        GFX_CMD(0xFD900000, GBI_ADDR(image));            /* gDPSetTextureImage */
         GFX_CMD(0xF5900100, 0x07010040);            /* gDPSetTile */
         GFX_CMD(0xE6000000, 0);                     /* gDPLoadSync */
         GFX_CMD(0xF3000000, 0x0703F800);            /* gDPLoadBlock */

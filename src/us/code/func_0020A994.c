@@ -33,15 +33,15 @@ void Render_DrawBatches(void) {
                 do {
                     if (item->lights != NULL) {
                         GFX_W(gDList++, 0xDB020000, 0x18);                  /* gSPNumLights(1) */
-                        GFX_W(gDList++, 0xDC08060A, (u32)(item->lights + 8)); /* gSPLight(lights + 8, 1) */
-                        GFX_W(gDList++, 0xDC08090A, (u32)item->lights);       /* gSPLight(lights, 2) */
+                        GFX_W(gDList++, 0xDC08060A, GBI_ADDR(item->lights + 8)); /* gSPLight(lights + 8, 1) */
+                        GFX_W(gDList++, 0xDC08090A, GBI_ADDR(item->lights));       /* gSPLight(lights, 2) */
                     }
                     if (item->segment != 0) {
-                        GFX_W(gDList++, 0xDB060004, (u32)item->matrix);       /* gSPSegment(1, matrix) */
+                        GFX_W(gDList++, 0xDB060004, GBI_ADDR(item->matrix));       /* gSPSegment(1, matrix) */
                     } else {
-                        GFX_W(gDList++, 0xDA380003, (u32)item->matrix);       /* gSPMatrix(matrix, G_MTX_LOAD) */
+                        GFX_W(gDList++, 0xDA380003, GBI_ADDR(item->matrix));       /* gSPMatrix(matrix, G_MTX_LOAD) */
                     }
-                    GFX_W(gDList++, 0xDB060008, (u32)item->textures);         /* gSPSegment(2, textures) */
+                    GFX_W(gDList++, 0xDB060008, GBI_ADDR(item->textures));         /* gSPSegment(2, textures) */
                     if (item->scaleS != 0) {
                         if (scaleS != item->scaleS || scaleT != item->scaleT) {
                             if (node->material->flags & 0x2000) {
@@ -53,7 +53,7 @@ void Render_DrawBatches(void) {
                         scaleS = item->scaleS;
                         scaleT = item->scaleT;
                     }
-                    GFX_W(gDList++, 0xDE000000, (u32)item->list);             /* gSPDisplayList */
+                    GFX_W(gDList++, 0xDE000000, GBI_ADDR(item->list));             /* gSPDisplayList */
                     item = item->next;
                 } while (item != NULL);
                 if (node->material->flags & 0x2000) {
@@ -82,16 +82,16 @@ void Render_DrawBatches(void) {
                 do {
                     if (item->lights != NULL) {
                         GFX_W(gDList++, 0xDB020000, 0x18);
-                        GFX_W(gDList++, 0xDC08060A, (u32)(item->lights + 8));
-                        GFX_W(gDList++, 0xDC08090A, (u32)item->lights);
+                        GFX_W(gDList++, 0xDC08060A, GBI_ADDR(item->lights + 8));
+                        GFX_W(gDList++, 0xDC08090A, GBI_ADDR(item->lights));
                     }
                     if (item->segment != 0) {
-                        GFX_W(gDList++, 0xDB060004, (u32)item->matrix);
+                        GFX_W(gDList++, 0xDB060004, GBI_ADDR(item->matrix));
                     } else {
-                        GFX_W(gDList++, 0xDA380003, (u32)item->matrix);
+                        GFX_W(gDList++, 0xDA380003, GBI_ADDR(item->matrix));
                     }
-                    GFX_W(gDList++, 0xDB060008, (u32)item->textures);
-                    GFX_W(gDList++, 0xDE000000, (u32)item->list);
+                    GFX_W(gDList++, 0xDB060008, GBI_ADDR(item->textures));
+                    GFX_W(gDList++, 0xDE000000, GBI_ADDR(item->list));
                     item = item->next;
                 } while (item != NULL);
             }
@@ -108,15 +108,15 @@ void Render_DrawBatches(void) {
                 do {
                     if (item->lights != NULL) {
                         GFX_W(gDList++, 0xDB020000, 0x18);
-                        GFX_W(gDList++, 0xDC08060A, (u32)(item->lights + 8));
-                        GFX_W(gDList++, 0xDC08090A, (u32)item->lights);
+                        GFX_W(gDList++, 0xDC08060A, GBI_ADDR(item->lights + 8));
+                        GFX_W(gDList++, 0xDC08090A, GBI_ADDR(item->lights));
                     }
                     if (item->segment != 0) {
-                        GFX_W(gDList++, 0xDB060004, (u32)item->matrix);
+                        GFX_W(gDList++, 0xDB060004, GBI_ADDR(item->matrix));
                     } else {
-                        GFX_W(gDList++, 0xDA380003, (u32)item->matrix);
+                        GFX_W(gDList++, 0xDA380003, GBI_ADDR(item->matrix));
                     }
-                    GFX_W(gDList++, 0xDB060008, (u32)item->textures);
+                    GFX_W(gDList++, 0xDB060008, GBI_ADDR(item->textures));
                     if (item->scaleS != 0) {
                         if (scaleS != item->scaleS || scaleT != item->scaleT) {
                             if (node->material->flags & 0x2000) {
@@ -128,7 +128,7 @@ void Render_DrawBatches(void) {
                         scaleS = item->scaleS;
                         scaleT = item->scaleT;
                     }
-                    GFX_W(gDList++, 0xDE000000, (u32)item->list);
+                    GFX_W(gDList++, 0xDE000000, GBI_ADDR(item->list));
                     item = item->next;
                 } while (item != NULL);
                 if (node->material->flags & 0x2000) {

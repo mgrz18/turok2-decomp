@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "globals/render.h"
 struct LightData;
 struct LightData {
@@ -78,7 +79,7 @@ void DLights_Load(char *view) {
         }
         {
             Gfx *g = gDList++;
-            { Gfx *_gbi = (Gfx *)(g); _gbi->w0 = ((((unsigned int)(0xDC) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((16) - 1) / 8) & (0xFFFFFFFFU >> (32 - (5)))) << (19)) | (((unsigned int)((((i + 1) * 2 + 10) * 8) / 8) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(10) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)(&gDLightBuffer[i + gDLightBufferIndex])); };
+            { Gfx *_gbi = (Gfx *)(g); _gbi->w0 = ((((unsigned int)(0xDC) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((16) - 1) / 8) & (0xFFFFFFFFU >> (32 - (5)))) << (19)) | (((unsigned int)((((i + 1) * 2 + 10) * 8) / 8) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(10) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = (GBI_ADDR(&gDLightBuffer[i + gDLightBufferIndex])); };
         }
     }
     gDLightBufferIndex += 8;

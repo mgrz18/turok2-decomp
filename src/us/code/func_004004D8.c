@@ -148,12 +148,12 @@ void Automap_Draw(MapView *view) {
         return;
     }
     GFX_CMD(0xDB060000, 0);                                 /* gSPSegment(0, 0) */
-    GFX_CMD(0xDE000000, (u32) gRspInitDL);                  /* gSPDisplayList */
-    GFX_CMD(0xDE000000, (u32) gRdpInitDL);
+    GFX_CMD(0xDE000000, GBI_ADDR(gRspInitDL));                  /* gSPDisplayList */
+    GFX_CMD(0xDE000000, GBI_ADDR(gRdpInitDL));
     GFX_CMD(0xED000000, ((((s32) ((f32) (gScreenWidth - 1) * 4.0f)) & 0xFFF) << 12) |
                         (((s32) ((f32) (gScreenHeight - 1) * 4.0f)) & 0xFFF)); /* gDPSetScissor */
-    GFX_CMD(0xFF100000 | ((gScreenWidth - 1) & 0xFFF), (u32) gEngineApp_m_pCurrentFrameData[0]->colorImage); /* gDPSetColorImage */
-    GFX_CMD(0xDC080008, (u32) vp);                          /* gSPViewport */
+    GFX_CMD(0xFF100000 | ((gScreenWidth - 1) & 0xFFF), GBI_ADDR(gEngineApp_m_pCurrentFrameData[0]->colorImage)); /* gDPSetColorImage */
+    GFX_CMD(0xDC080008, GBI_ADDR(vp));                          /* gSPViewport */
     GFX_CMD(0xE7000000, 0);                                 /* gDPPipeSync */
     GFX_CMD(0xE3000A01, 0);                                 /* gDPSetCycleType(G_CYC_1CYCLE) */
     GFX_CMD(0xE200001C, 0x507048);                          /* gDPSetRenderMode */
@@ -165,7 +165,7 @@ void Automap_Draw(MapView *view) {
     GFX_CMD(0xDB04000C, 6);
     GFX_CMD(0xDB040014, 0xFFFA);
     GFX_CMD(0xDB04001C, 0xFFFA);
-    GFX_CMD(0xDA380007, (u32) &sAutomapOrthoMtx);                 /* gSPMatrix(projection, load) */
+    GFX_CMD(0xDA380007, GBI_ADDR(&sAutomapOrthoMtx));                 /* gSPMatrix(projection, load) */
 
     cx = view->pos.x;
     cz = view->pos.z;
@@ -213,7 +213,7 @@ void Automap_Draw(MapView *view) {
     }
 
     CMtxF__ToMtxAffine(world, &sAutomapWorldMtx[gEvenOdd]);
-    GFX_CMD(0xDA380003, (u32) &sAutomapWorldMtx[gEvenOdd]);    /* gSPMatrix(modelview, load) */
+    GFX_CMD(0xDA380003, GBI_ADDR(&sAutomapWorldMtx[gEvenOdd]));    /* gSPMatrix(modelview, load) */
 
     vtx = sAutomapLineVtx[gEvenOdd];
     w = &gScene;
@@ -469,7 +469,7 @@ draw:
     i = 0;
     while (remaining >= 2) {
         count = MIN(remaining, 32);
-        GFX_CMD(VTX_W0(count), (u32) &vtx[nVtx]);
+        GFX_CMD(VTX_W0(count), GBI_ADDR(&vtx[nVtx]));
         while (sAutomapLineIndices[i + 1] - nVtx < count && i < nIdx - 1) {
             GFX_CMD(LINE_W0(sAutomapLineIndices[i] - nVtx, sAutomapLineIndices[i + 1] - nVtx), 0);
             i += 2;
@@ -495,7 +495,7 @@ draw:
     vtx[0].cn[3] = alpha;
     vtx[1].cn[3] = alpha;
     vtx[2].cn[3] = alpha;
-    GFX_CMD(VTX_W0(3), (u32) vtx);
+    GFX_CMD(VTX_W0(3), GBI_ADDR(vtx));
     GFX_CMD(LINE_W0(0, 1), 0);
     GFX_CMD(LINE_W0(0, 2), 0);
 
@@ -504,7 +504,7 @@ draw:
     CMtxF__SetScale(screen, 0.5f, 0.5f, 1.0f);
     CMtxF__Translate(screen, gScreenWidth / 2, 32.0f, 0.0f);
     CMtxF__ToMtxAffine(screen, &sAutomapScreenMtx[gEvenOdd]);
-    GFX_CMD(0xDA380003, (u32) &sAutomapScreenMtx[gEvenOdd]);
+    GFX_CMD(0xDA380003, GBI_ADDR(&sAutomapScreenMtx[gEvenOdd]));
     alpha = view->fade * 255.0f;
     radius = 15.0f;
     vtx[0].ob[0] = func_002982F0(view->angle) * radius;
@@ -533,7 +533,7 @@ draw:
     vtx[5].cn[3] = alpha;
     vtx[6].cn[3] = alpha;
     vtx[7].cn[3] = alpha;
-    GFX_CMD(VTX_W0(8), (u32) vtx);
+    GFX_CMD(VTX_W0(8), GBI_ADDR(vtx));
     GFX_CMD(LINE_W0(0, 1), 0);
     GFX_CMD(LINE_W0(1, 2), 0);
     GFX_CMD(LINE_W0(1, 3), 0);
