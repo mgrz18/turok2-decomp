@@ -28,6 +28,8 @@ extern "C" {
 
 // the game's screen size (render.h; Video_SetMode writes it)
 extern "C" int32_t gScreenWidth, gScreenHeight;
+extern "C" int T2Game_EngineMode(void); // port/game/t2modelog.c
+extern "C" const void* T2Game_TopMenu(int* cursor);
 
 namespace {
 
@@ -167,6 +169,20 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         }
         sFrame = f;
         T2Port_Frame();
+        static int lastMode = -1;
+        if (int mode = T2Game_EngineMode(); mode != lastMode) {
+            printf("game: frame %d: engine mode %d\n", f, mode);
+            lastMode = mode;
+        }
+        static const bool menuLog = getenv("T2_MENU_LOG") != nullptr;
+        static const void* lastMenu = nullptr;
+        static int lastCursor = -1;
+        int cursor;
+        if (const void* menu = T2Game_TopMenu(&cursor); menuLog && (menu != lastMenu || cursor != lastCursor)) {
+            printf("game: frame %d: menu desc %p cursor %d\n", f, menu, cursor);
+            lastMenu = menu;
+            lastCursor = cursor;
+        }
         if (args.audio) {
             // the frames the audio manager produced this retrace (22050 Hz stereo s16) to LUS's
             // AudioPlayer (a no-op when it has no audio backend, e.g. headless)
