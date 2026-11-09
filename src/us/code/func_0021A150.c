@@ -6,6 +6,7 @@
 /* The port: the same through CGameObjectInstance (structs/game_object.h); the Actor view below
  * has the N64 offsets (the pointers before 0xA4 and in CAI make the host ones larger). */
 #include "structs/game_object.h"
+#include "structs/cache.h"
 
 extern u8 D_800A5AC4[];     /* "anim object info" */
 
@@ -13,29 +14,29 @@ void CMtxF__TransformBox(void *, void *, void *);
 void CAnimationState__Reset(void *);
 s32 CGameObjectInstance__PickRandomAnim(CGameObjectInstance *, s32, s32);
 
-void CGameObjectInstance__SetupAnimation(CGameObjectInstance *actor, s32 a1, s32 a2, s32 anim) {
-    s32 *model;
-    s32 *set;
+void CGameObjectInstance__SetupAnimation(CGameObjectInstance *actor, s32 *a1, s32 a2, s32 anim) {
+    CMemEntry *model;
+    CMemEntry *set;
     s32 id;
-    s32 tree;
-    s32 setTree;
+    void *tree;
+    void *setTree;
     s32 size;
     void *data;
 
     actor->m_dwFlags &= ~0x40000;
-    id = CISet__GetROMAddress(a1, a2, actor->header.m_nObjType);
-    model = (s32 *)(sptr)CCache__Request(0, id, 0x18, 0, 0, 0, (s32) "anim object index", 1);
+    id = CISet__GetROMAddress((sptr)a1, a2, actor->header.m_nObjType);
+    model = CCache__Request(0, id, 0x18, 0, 0, 0, "anim object index", 1);
     if (model != NULL) {
-        tree = *model;
+        tree = model->data;
         actor->m_rpGeometryHeader = (void *)(sptr)CISet__GetROMAddressAndSize(tree, id, 1, &size);
         actor->m_rpGeometryHeaderSize = size;
         actor->m_rpObject = (void *)(sptr)CISet__GetROMAddressAndSize(tree, id, 0, &size);
         actor->m_rpObjectHeader = size;
-        actor->m_rpAnims = (void *)(sptr)CISet__GetROMAddress(tree, id, 2);
-        set = (s32 *)(sptr)CCache__Request(0, (s32)(sptr)actor->m_rpObject, actor->m_rpObjectHeader, 0, 0, 0, (s32) D_800A5AC4, 1);
+        actor->m_rpAnims = (void *)(sptr)CISet__GetROMAddress((sptr)tree, id, 2);
+        set = CCache__Request(0, (s32)(sptr)actor->m_rpObject, actor->m_rpObjectHeader, 0, 0, 0, (char *)D_800A5AC4, 1);
         if (set != NULL) {
-            setTree = *set;
-            data = CISet__GetBlock((void *)(sptr)setTree, 0);
+            setTree = set->data;
+            data = CISet__GetBlock(setTree, 0);
             ((void (*)(CGameObjectInstance *, void *))actor->m_AI.m_pfCalculateOrientationMatrix)(actor, &actor->m_AI);
             CMtxF__TransformBox(&actor->m_mfOrient, data, &actor->m_vMin);
             CAnimationState__Reset(&actor->m_CurrentAnimation);
