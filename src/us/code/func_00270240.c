@@ -33,6 +33,15 @@ extern void alSndpNew(void *player, void *cfg);           /* alSndpNew */
 extern void SndQueue_Construct(void *q, CAudioWorld *m);
 extern void SndVoicePool_Construct(void *pool, CAudioWorld *m);
 extern void SpeechPlayer_Construct(void *fx, CAudioWorld *m);
+#ifdef TARGET_PORT
+/* port/audio/t2audio.h's T2AudioCtl (its first two fields): the ctl region's bank files
+ * converted to host structs (docs/port/AUDIO.md) instead of the VM_Alloc copy of the ROM */
+typedef struct {
+    ALBankFile *musicBank;
+    ALBankFile *sfxBank;
+} T2AudioCtlView;
+extern const T2AudioCtlView *T2Audio_LoadCtl(void);
+#endif
 
 static __inline__ void CAudioWorld_Lock(CAudioWorld *m) {
     CMutex *l = &m->lock;
@@ -68,8 +77,13 @@ void CAudioWorld__Initialize(CAudioWorld *m) {
     s32 i;
     s32 j;
     s32 n;
+#ifdef TARGET_PORT
+    uptr a; /* soundArray holds pointers: the host compares them whole */
+    uptr b;
+#else
     u32 a;
     u32 b;
+#endif
     u8 *e;
 
     CMutex__Construct(&m->lock);
@@ -88,9 +102,17 @@ void CAudioWorld__Initialize(CAudioWorld *m) {
     ai.size = 0x800;
     amCreateAudioMgr(&cfg, gThreadPriorityAudio, &ai);
     gAudioRomBase = 0x20F194;
+#ifdef TARGET_PORT
+    {
+        const T2AudioCtlView *c = T2Audio_LoadCtl();
+        m->seq.data = (s32 *)c->musicBank;
+        bk = c->sfxBank;
+    }
+#else
     r = VM_Alloc(0x2F194, 0, 0x1E0000);
     m->seq.data = (s32 *)r->f4;
     bk = r->bankFile;
+#endif
     m->bankFile = bk;
     m->bank = bk->bankArray[0];
     CAudioWorld__LoadSfxDataFile(m);

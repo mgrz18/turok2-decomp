@@ -85,8 +85,15 @@ set(T2_LINK_REPLACED
     func_0028D820.c   # VM_Initialize (no pager)
     func_0028E60C.c   # VM_Alloc (resident copy)
     func_0028E6DC.c   # VM_Free
-    # audio (t2boot.c): off until the sound bank is converted for the host (STATUS.md)
+    # audio (docs/port/AUDIO.md): Sound__Initialize in t2boot.c (only with --audio); the SDK
+    # audio manager in port/audio/t2audio_mgr.c (frames through the ABI1 interpreter, resident
+    # wave data instead of the loader's DMA windows)
     func_00275520.c   # Sound__Initialize
+    func_0026F760.c   # amCreateAudioMgr
+    func_0026FB70.c   # __amMain
+    func_0026FD4C.c   # __amDmaNew
+    func_0026FD88.c   # __amHandleFrameMsg
+    func_002700D0.c   # __amDMA
 )
 
 # True if NAME (a src/us/code file name) is module 2 (.virtual_1).
