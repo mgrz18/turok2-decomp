@@ -165,7 +165,7 @@ Branch `names-R4_s2` (from 474e40af). Every commit has `tools/asm_diff.py --base
 SDL_VIDEODRIVER=offscreen T2_SHOT=out.ppm T2_SHOT_EVERY=300 build/app/turok2 --archive turok2.o2r \
     --rom baserom.us.z64 --game --draw --frames 5000 --skip-pak-check
 game: frame 2: engine mode 17 -> 0          pak check: "ACCESSING THE CONTROLLER PAK"
-game: frame 16: engine mode 17 -> 1         legal screen, all 22 lines of text
+game: frame 16: engine mode 17 -> 1         legal screen, the full text
 game: frame 788: engine mode 17 -> 3        "EXPANSION PAK FOUND!" with the 3D pak model
 game: frame 1080: engine mode 17 -> 4       intro cinema 100 ("acclaimlogo", level 162): runs 486 frames, draws black
 game: frame 1570: engine mode 17 -> 5       intro cinema 90 (level 44): runs to its end, draws black
