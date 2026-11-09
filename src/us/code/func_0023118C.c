@@ -3,6 +3,7 @@
 #include "structs/region.h"
 #include "structs/particle.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/camera.h"
 #include "globals/camera.h"
 #include "globals/scene.h"
@@ -15,7 +16,6 @@
  * The list walk is a goto loop and the built flag a local, as in the ROM: the
  * flag stays in a saved register and nothing else is hoisted out of the walk. */
 
-#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 typedef struct {
     /* 0x00 */ CVector3 min;

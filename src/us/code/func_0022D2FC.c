@@ -15,6 +15,7 @@
  * (Particle_BuildMatrix, Particle_DrawSprite and func_802800C0_de). */
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
 #include "structs/frame.h"
@@ -493,7 +494,6 @@ void CParticle__DrawShadow(ShadowActor *actor) {
  * its alpha from life, fade-in, fade-out and distance from the view, and
  * emits the colour and draw commands. */
 
-#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 typedef struct { u8 pad0[0x40]; } Mtx;
 

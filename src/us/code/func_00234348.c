@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_3/CODE_802A35C0.CPP, func_802A3718_de, with Turok 2's layouts. */
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "globals/engine.h"
 
 /* Draws a textured trail: spaces the texture along the tail by length, picks
@@ -74,7 +75,6 @@ typedef struct {
     /* 0x20 */ f32 texStepT;
 } Morph;
 
-#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 extern void *Texture_Request(void *model);
 extern void Texture_GetInfo(void *model, AnimInfo *info);

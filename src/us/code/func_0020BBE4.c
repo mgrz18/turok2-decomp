@@ -1,10 +1,10 @@
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/frame.h"
 #include "globals/render.h"
 
 /* One two-word display list command at the list head. */
-#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 
 s32 Render_SetupMaterial(s32, s32);

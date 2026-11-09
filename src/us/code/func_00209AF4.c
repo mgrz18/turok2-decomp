@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/table.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 
 /* An F3DEX2 vertex (libultra's Vtx), 16 bytes. */
 typedef struct Vtx {
@@ -14,7 +15,6 @@ typedef struct Vtx {
 /* F3DEX2 triangle word: three vertex indices, each times 2 (libultra's __gsSP1Triangle_w1). */
 #define TRI_WORD(a, b, c) (((((a) * 2) & 0xFF) << 16) | ((((b) * 2) & 0xFF) << 8) | (((c) * 2) & 0xFF))
 
-#define GFX_W(pkt, a, b) { Gfx *_g = (Gfx *)(pkt); _g->w0 = (a); _g->w1 = (b); }
 
 /* Bytes of an offset table of n entries: the count, n offsets and the next free offset, 8-aligned. */
 #define TABLE_SIZE(n) (((n) * 4 + 0xF) & ~7)

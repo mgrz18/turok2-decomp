@@ -2,11 +2,11 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/camera.h"
 #include "structs/emitter.h"
 #include "globals/frame.h"
 
-#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 void Render_SetRenderMode(s32 mode);
 void Sort_Quick(void *items, s32 count, s32 size, void *compare, void *swap);

@@ -8,6 +8,7 @@
  * allocation order and the dead else replaces the asms). */
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 
 /* A tracked allocation (list at gCache_memLockedList). */
 typedef struct HeapNode HeapNode;
@@ -42,30 +43,15 @@ extern s32 osSendMesg(void *mq, void *msg, s32 flag);
 extern void Render_SetCombineMode(s32);
 extern void Render_SetRenderMode(s32);
 
-#define _SHIFTL(v, s, w) ((unsigned int) (((unsigned int) (v) & ((0x01 << (w)) - 1)) << (s)))
-#define G_FILLRECT 0xF6
-#define G_SETPRIMCOLOR 0xFA
 
-#define gDPPipeSync(pkt) { Gfx *_g = (Gfx *) (pkt); _g->w0 = _SHIFTL(0xE7, 24, 8); _g->w1 = 0; }
-#define gDPSetCycleType1Cycle(pkt) \
-    { Gfx *_g = (Gfx *) (pkt); _g->w0 = _SHIFTL(0xE3, 24, 8) | _SHIFTL(10, 8, 8) | _SHIFTL(1, 0, 8); _g->w1 = 0; }
-#define gDPSetPrimColor(pkt, m, l, r, g, b, a) \
-    { Gfx *_g = (Gfx *) (pkt); \
-      _g->w0 = (_SHIFTL(G_SETPRIMCOLOR, 24, 8) | _SHIFTL(m, 8, 8) | _SHIFTL(l, 0, 8)); \
-      _g->w1 = (_SHIFTL(r, 24, 8) | _SHIFTL(g, 16, 8) | _SHIFTL(b, 8, 8) | _SHIFTL(a, 0, 8)); }
-#define gDPFillRectangle(pkt, ulx, uly, lrx, lry) \
-    { Gfx *_g = (Gfx *) (pkt); \
-      _g->w0 = (_SHIFTL(G_FILLRECT, 24, 8) | _SHIFTL((lrx), 14, 10) | _SHIFTL((lry), 2, 10)); \
-      _g->w1 = (_SHIFTL((ulx), 14, 10) | _SHIFTL((uly), 2, 10)); }
 /* gDPFillRectangle with ulx masked as a shift pair ((x << 22) >> 22): combine folds it back to the
  * `andi 0x3FF`, but at loop.c time it is two movables, which keeps left's (x & 0x3FF) << 14 inside the
  * pass loop as in the ROM (Rage Wars FINDINGS s703 no. 11). */
 #define RECTA(pkt, ulx, uly, lrx, lry) \
-    { Gfx *_g = (Gfx *) (pkt); \
-      _g->w0 = _SHIFTL(G_FILLRECT, 24, 8) | _SHIFTL(lrx, 14, 10) | _SHIFTL(lry, 2, 10); \
-      _g->w1 = ((((unsigned int) (ulx) << 22) >> 22) << 14) | _SHIFTL(uly, 2, 10); }
+    GFX_W(pkt, _SHIFTL(G_FILLRECT, 24, 8) | _SHIFTL(lrx, 14, 10) | _SHIFTL(lry, 2, 10), \
+          ((((unsigned int) (ulx) << 22) >> 22) << 14) | _SHIFTL(uly, 2, 10))
 /* gDPSetPrimColor with the colour word given as one expression. */
-#define PRIMC(pkt, wd) { Gfx *_g = (Gfx *) (pkt); _g->w0 = _SHIFTL(G_SETPRIMCOLOR, 24, 8); _g->w1 = (wd); }
+#define PRIMC(pkt, wd) GFX_W(pkt, _SHIFTL(G_SETPRIMCOLOR, 24, 8), wd)
 /* Half of a colour component, clamped to 0xFF. */
 #define HALF(c) ((((s32) ((c) >> 1)) < 0x100) ? ((s32) ((c) >> 1)) : 0xFF)
 

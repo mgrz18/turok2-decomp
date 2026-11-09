@@ -2,10 +2,10 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "globals/batch.h"
 
 
-#define GFX_W(pkt, a, b) { Gfx *_g = (Gfx *)(pkt); _g->w0 = (a); _g->w1 = (b); }
 
 s32 Render_SetupMaterial(Material *material, s32 pass);
 void func_00209658(void);

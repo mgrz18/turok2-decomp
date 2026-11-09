@@ -8,6 +8,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/camera.h"
 #include "structs/game.h"
 #include "globals/game.h"
@@ -401,7 +402,7 @@ s32 Cinema_PathPlaying(void);
 u32 Cinema_GetFogColor(void);        /* a cinematic's fog colour, 0xFF00 for none */
 void DLights_Load(CCamera *cam);
 
-#define GFX(dl, a, b) { Gfx *_g = (dl)++; _g->w0 = (a); _g->w1 = (b); }
+#define GFX(dl, a, b) GFX_W((dl)++, a, b)
 
 static __inline__ void ResetPixelScale(CCamera *cam) {
     cam->m_PixelXScale = 1.0f;

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/camera.h"
 #include "structs/game.h"
 #include "structs/frame.h"
@@ -9,7 +10,6 @@
 #include "globals/camera.h"
 #include "globals/engine.h"
 
-#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 void CCache__LockForDisplayList(s32 unused, void *resource);
 void Render_InvalidateModeCache(void);
