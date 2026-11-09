@@ -9,6 +9,7 @@
  * (its loop-end note stops cse1, but cse2 runs after loop and ignores it). Twin of PakMenu_InitSaveGame (same C). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00406F7C.c, func_00406F7C, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/save.h"

@@ -3,6 +3,7 @@
  * func_00420878 (0x68) and func_004208E0 (0x350). All 245 words match (checked over the real extent).
  * Twin of src/us/code/PakMessage_SelectOk_2.c (first-module callees and data names, +0xE0). */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"

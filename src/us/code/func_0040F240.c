@@ -49,7 +49,11 @@ static __inline__ f32 *TempAlloc(s32 size) {
     handle = CCache__Allocate(0, size + 0x10, 0x13, "Cinema temp alloc");
     if (handle != NULL) {
         block = *handle;
+#ifdef TARGET_PORT /* the whole handle pointer in the 0x10-byte header */
+        *(s32 ***) block = handle;
+#else
         *block = (sptr) handle;
+#endif
         return (f32 *) (block + 4);
     }
     return NULL;
@@ -57,7 +61,11 @@ static __inline__ f32 *TempAlloc(s32 size) {
 
 static __inline__ void TempFree(f32 *data) {
     if (data != NULL) {
+#ifdef TARGET_PORT /* the handle TempAlloc keeps 0x10 bytes before the array */
+        CCache__Deallocate(0, *(s32 ***) ((u8 *) data - 0x10));
+#else
         CCache__Deallocate(0, ((s32 **) data)[-4]);
+#endif
     }
 }
 
@@ -220,9 +228,9 @@ typedef struct SplineSource { s32 stride,count; union { char data[0]; CVector3 p
 typedef struct SplineTable { s32 count; } SplineTable;
 typedef union SplineSourceCursor { SplineSource *header; CVector3 *points; f32 *weights; } SplineSourceCursor;
 extern void Pack_Init(void *,s32);
-extern char *Pack_Add(Pack *,s32,s32);
+extern char *Pack_Add(Pack *,sptr,s32);
 extern s32 ProPackDecompress(void **, s32);
-static __inline__ char *packAppend(Pack *pack,void *prepare,s32 size) { return Pack_Add(pack,(s32)prepare,size); }
+static __inline__ char *packAppend(Pack *pack,void *prepare,s32 size) { return Pack_Add(pack,(sptr)prepare,size); }
 static __inline__ s32 splineRecordSize(s32 left,s32 right) { s32 a=left*9,b=right*9; return (b+a)*4+48; }
 void Cinema_PrepareResource(s32 unused, struct Shape_typemap_165 **handle) {
     struct Shape_typemap_165 *output;

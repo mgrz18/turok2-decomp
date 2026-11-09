@@ -1,5 +1,6 @@
 #include "common.h"
 #include "protos/iset.h"
+#include "structs/world.h"
 
 typedef struct ListItem {
     /* 0x00 */ u8 pad0[0xC];
@@ -17,18 +18,15 @@ typedef struct Entry {
     u8 data[0x20];
 } Entry;
 
-typedef struct LevelState {
-    /* 0x00 */ u8 pad0[0x58];
-    /* 0x58 */ void *table;
-    /* 0x5C */ u8 pad5C[0xC];
-    /* 0x68 */ s32 *groups;
-} LevelState;
 
 extern s32 ProPackDecompress(s32 ***handle, s32);
 extern void Angle_Wrap(void *);
 
-/* Resolves the references of every item of every group of the loaded resource and keeps it in the level. */
-void CScene__DecompressPaths(LevelState *level, s32 ***handle) {
+/* Resolves the references of every item of every group of the loaded resource and keeps it in the
+ * level (CScene.unk_68; the references point into block 2 of m_pRegionData). Typed on CScene: the
+ * m2c view put them at their N64 offsets 0x58/0x68, which on the host overwrote m_pCollision.
+ * The item's ref stays an s32 (the ROM record): a pointer only in low-memory mode. */
+void CScene__DecompressPaths(CScene *level, s32 ***handle) {
     s32 *groups;
     s32 ngroups;
     s32 i;
@@ -49,7 +47,7 @@ void CScene__DecompressPaths(LevelState *level, s32 ***handle) {
             for (j = 0; j < count; j++) {
                 ref = item->ref;
                 if (ref != -1) {
-                    entries = (Entry *)((u8 *)CISet__GetBlock(level->table, 2) + 8);
+                    entries = (Entry *)((u8 *)CISet__GetBlock(level->m_pRegionData, 2) + 8);
                     item->ref = (sptr)&entries[ref];
                 } else {
                     item->ref = 0;
@@ -58,6 +56,6 @@ void CScene__DecompressPaths(LevelState *level, s32 ***handle) {
                 item++;
             }
         }
-        level->groups = groups;
+        level->unk_68 = groups;
     }
 }

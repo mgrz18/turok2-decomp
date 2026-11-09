@@ -1643,9 +1643,16 @@ s32 MenuPool_CountOpen_2(MenuPool *arg0) {
 }
 
 /* ---------------- MenuPool_GetCamera_2 ---------------- */
+#ifdef TARGET_PORT
+/* as MenuPool_GetCamera: the pool's camera at the host offset of CCamera.m_MenuPool */
+sptr MenuPool_GetCamera_2(sptr arg0) {
+    return arg0 - T2_OFFSETOF(CCamera, m_MenuPool);
+}
+#else
 s32 MenuPool_GetCamera_2(s32 arg0) {
     return arg0 - 0x53C;
 }
+#endif
 
 /* ---------------- MenuPool_CloseAll_2 ---------------- */
 /* WRONG CUT: real function 0x00416B30, size 0x7C (through 0x00416BAC): splat cut the loop

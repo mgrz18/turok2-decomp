@@ -1,6 +1,7 @@
 /* WRONG CUT: real function 0x0041E1D8, size 0x19C (through 0x0041E374): splat cut it in two
  * (PakMenu_InitLoadProfile, func_0041E294) at a jal's delay slot. */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"

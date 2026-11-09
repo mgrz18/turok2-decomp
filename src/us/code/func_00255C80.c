@@ -1,11 +1,11 @@
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
 #include "protos/player.h"
-#include "structs/camera.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 #define P_S16(p, off) (*(s16 *)((u8 *)(p) + (off)))
@@ -37,12 +37,12 @@ void PlayerState15_Enter(CPlayer *player, CGameObjectInstance *actor) {
             text = (char *)&gStatsContinueMenuDesc4;
             break;
         }
-        MenuPool_OpenMenu((u8 *)((CPlayer *)player)->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), text, player, (sptr)((CPlayer *)player)->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu((u8 *)player->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), text, player, (sptr) player->m_ContState.m_pContState, NULL);
     } else {
         text = (char *)&gGameOverMenuDesc;
         if (P_S16(player, 0x52A) != 0) {
             text = (char *)&gContinueMenuDesc;
         }
-        MenuPool_OpenMenu((u8 *)((CPlayer *)player)->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), text, player, (sptr)((CPlayer *)player)->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu((u8 *)player->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), text, player, (sptr) player->m_ContState.m_pContState, NULL);
     }
 }

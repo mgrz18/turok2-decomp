@@ -13,6 +13,96 @@ void __osRestoreInt(u32 mask);
 extern B12Mgr D_800D7BE0;
 s32 CDecompressor__DecompressAsync(CDecompressor *port, B12Msg *n, void *q);
 void CHeap__Free(CHeap *heap, s32 key);
+#ifdef TARGET_PORT
+#include "structs/cache.h"
+#include "globals/cache.h"
+/* The port: typed on gCache (structs/cache.h) and CMemEntry/CCacheEntry. The ROM reaches the
+ * cache through D_800D7BE0 (gCache - 0x5F0) and B12Node/B12Msg views at N64 offsets: on the host
+ * they missed the cache's own fields (the display-list locks landed in CMemEntry.lockCount, so
+ * a model still in the frame's display list could be freed; the cache thread waited on a queue
+ * that was never created, so async loads and display-list releases never completed). */
+void CCache__Main(void) {
+    CCacheEntry *msg;
+    CMemEntry *p;
+    u32 mask;
+    u32 m2;
+    while (1) {
+        osRecvMesg(&gCache.queue, (OSMesg *)&msg, 1);
+        if ((uptr)msg < 2) {
+            mask = __osDisableInt();
+            if (++gCache_mutex_count != 1) {
+                __osRestoreInt(mask);
+                osRecvMesg(&gCache.mutex.queue, 0, 1);
+            } else {
+                __osRestoreInt(mask);
+            }
+            CCache__ReleaseDisplayList(0, (uptr)msg);
+            m2 = __osDisableInt();
+            if (--gCache_mutex_count != 0) {
+                __osRestoreInt(m2);
+                osSendMesg(&gCache.mutex.queue, 0, 1);
+            } else {
+                __osRestoreInt(m2);
+            }
+        } else {
+            msg->flags &= ~2;
+            if (msg->flags & 8) {
+                msg->flags &= ~8;
+                if (CDecompressor__DecompressAsync(&gDecompressor, (B12Msg *)msg, &gCache.queue) != 0) {
+                    continue;
+                }
+                mask = __osDisableInt();
+                if (++gCache_mutex_count != 1) {
+                    __osRestoreInt(mask);
+                    osRecvMesg(&gCache.mutex.queue, 0, 1);
+                } else {
+                    __osRestoreInt(mask);
+                }
+                CList__Remove(&gCache.cachePendingList, msg);
+                CList__AddHead(&gCache.cacheUsedList, msg);
+                p = msg->memEntry;
+                p->flags &= ~2;
+                while (p->lockCount != 0) {
+                    p->lockCount--;
+                    if (p->lockCount == 0) {
+                        p->flags &= ~0x100;
+                    }
+                }
+                if (!(p->flags & 0x702)) {
+                    CCache__DetachCacheEntry(0, p);
+                    CHeap__Free(&gHeap, (sptr)p->data);
+                    CCache__FreeMemEntry(0, p);
+                }
+                CCache__FreeCacheEntry(0, msg);
+                m2 = __osDisableInt();
+                if (--gCache_mutex_count != 0) {
+                    __osRestoreInt(m2);
+                    osSendMesg(&gCache.mutex.queue, 0, 1);
+                } else {
+                    __osRestoreInt(m2);
+                }
+            } else {
+                msg->flags &= ~4;
+                mask = __osDisableInt();
+                if (++gCache_mutex_count != 1) {
+                    __osRestoreInt(mask);
+                    osRecvMesg(&gCache.mutex.queue, 0, 1);
+                } else {
+                    __osRestoreInt(mask);
+                }
+                CCache__CompleteRequest(0, msg, 1);
+                m2 = __osDisableInt();
+                if (--gCache_mutex_count != 0) {
+                    __osRestoreInt(m2);
+                    osSendMesg(&gCache.mutex.queue, 0, 1);
+                } else {
+                    __osRestoreInt(m2);
+                }
+            }
+        }
+    }
+}
+#else
 void CCache__Main(void) {
     B12Msg *msg;
     B12Node *p;
@@ -94,3 +184,4 @@ void CCache__Main(void) {
         }
     }
 }
+#endif

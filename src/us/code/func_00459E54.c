@@ -1,5 +1,6 @@
 /* Second-module copy of PakConfirmMenu_SelectNo (first module). NOTE: the ROM code reads jtbl_800C1450, whose entries are the first module copy's case addresses (link base 0x420F34, 0xE0 above this copy's 0x420E54): the switch here builds its own table, which will not equal the ROM's. */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"

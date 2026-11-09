@@ -3,6 +3,7 @@
 
 #include "structs/game_object.h"
 #include "common.h"
+#include "structs/player.h"
 #include "structs/world.h"
 #include "protos/iset.h"
 #include "protos/scene.h"
@@ -24,7 +25,7 @@ void CScene__SetInstanceSavedBitInLevel(void *arg0, s32 arg1, s32 arg2, s32 arg3
         return;
     }
     if (((CScene *)arg0)->m_nLevel == arg1) {
-        entry = (char *)((CScene *)arg0)->m_pActors + (s32) arg2 * 0x288;
+        entry = (char *)((CScene *)arg0)->m_pActors + (s32) arg2 * (s32)sizeof(CGameObjectInstance);
         cond = ((CGameObjectInstance *)entry)->header.m_pIntelligence;
         if ((u32) (cond->m_Type - 9) < 2) {
             if (cond->m_dwFlags & 0x200) {

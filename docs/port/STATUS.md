@@ -285,6 +285,103 @@ new `port/game/t2modelog.c`. Header changes: drop `decls.json` before gendata.
 Next: the mode 4 camera crash; a swap plan for the save records so notes move between the
 port and emulators (the pak filesystem already does); a Rumble Pak mode; macOS: the same code
 is LP64-clean (the queue truncation is fixed) but untested there.
+## Round 4, part s2: boot runner part 2 (mode 0 to the title screen)
+
+Branch `names-R4_s2` (from 474e40af). Every commit has `tools/asm_diff.py --base 474e40af -j 8` at
+0 differ or fail over the files it touches; the one include change (`structs/world.h`, under
+`TARGET_PORT`) was checked over the whole tree (3,938 files, 0 differ).
+
+### How far it gets
+
+```
+SDL_VIDEODRIVER=offscreen T2_SHOT=out.ppm T2_SHOT_EVERY=300 build/app/turok2 --archive turok2.o2r \
+    --rom baserom.us.z64 --game --draw --frames 5000 --skip-pak-check
+game: frame 2: engine mode 17 -> 0          pak check: "ACCESSING THE CONTROLLER PAK"
+game: frame 16: engine mode 17 -> 1         legal screen, the full text
+game: frame 788: engine mode 17 -> 3        "EXPANSION PAK FOUND!" with the 3D pak model
+game: frame 1080: engine mode 17 -> 4       intro cinema 100 ("acclaimlogo", level 162): runs 486 frames, draws black
+game: frame 1570: engine mode 17 -> 5       intro cinema 90 (level 44): runs to its end, draws black
+game: frame 3932: engine mode 17 -> 7       TITLE SCREEN (logo, "SEEDS OF EVIL", the scale background)
+game: 5000 frames in 32.31 s, 1911 gfx tasks (1911 drawn), 0 missing-function calls
+```
+
+The whole boot sequence of the N64 game now runs on its own, timers and cinemas included, from
+the pak check to the title. `--start-mode 7` reaches the title at frame 3 for quick checks.
+With s1's PIF/pak the debug switch is not needed for mode 0 (s1 reported mode 0 -> 1 -> 3 -> 4
+and the crash in mode 4's `CCameraPool__AllocCamera`, fixed here: row s2-3).
+
+After the title's timeout (frame 5183) the game starts the attract demo (mode 13, level 81) and
+stops in an enemy's mode setup:
+```
+#0 CAI__SetMode (arg2=0)  func_00243414.c:203   entry->unk_04 (the mode's enter function) is garbage
+#1 EnemyAI_InitDispatch                          func_0025BE88.c:52   the enemy's mode table, set through N64 views
+#2 func_0021E5D4 <- CScene__LoadLevel(81) <- CScene__UpdateWarp <- EngineMode13_Game_Draw
+```
+That is the start of "levels run" (the enemy AI, s5's sweep: ~400 offset sites).
+
+Screenshots (`T2_SHOT_EVERY`): the damaged-pak menu with its lines ("PROBLEM!", "DAMAGED
+CONTROLLER PAK FOUND IN CONTROLLER #1.", "ATTEMPT REPAIR" highlighted, "RETRY", "CONTINUE WITHOUT
+SAVING"), the legal text, the Expansion Pak screen with the rotating pak model, the title. The two
+cinemas draw black frames: their scene draws no geometry yet (no `G_VTX` in the frame's list).
+
+### Debug switches (DEBUG ONLY, port/game/t2debug.c)
+
+| switch | effect |
+|---|---|
+| `--skip-pak-check` | once mode 0 has started, sets `gPakCheckDone` ("continue without saving"): `EngineMode00_PakCheck_Retrace` takes its own exit to mode 1 |
+| `--start-mode N` | once mode 0 has started, `CEngineApp__SetMode(&gEngineApp, N)` (7: title) |
+| `T2_SHOT_EVERY=n` | with `T2_SHOT=<f.ppm>`: also `<f.ppm>.<frame>.ppm`, the first drawn frame of every n |
+
+Every run logs the engine mode changes (`game: frame F: engine mode A -> B`). The two switches go
+away once s1's pak model is merged (keep them until the demo path runs, they save 1000 frames).
+
+### Crash and fix table (round 4, s2)
+
+| # | where | cause | fix |
+|---|---|---|---|
+| s2-1 | pak menu lines draw nothing | `MenuItem_DrawText` read the item as a `Menu` and passed `->desc` (N64 0x14 = `MenuItem.text`; host: `MenuItem.def`, the desc row, an empty string) | typed on `MenuItem`, passes `text` |
+| s2-2 | mode 0 never ends | no PIF/pak (s1) | debug switches above |
+| s2-3 | `CCameraViewParams__Construct(0x31)` from `CCameraPool__AllocCamera` (mode 4 `CPlayer__NewGame`) | pool view with the free/active lists at N64 0xC/0x20 | `CCameraPool__AllocCamera(_2)` typed on `CCameraPool` |
+| s2-4 | `MenuPool_CountOpen` from `Automap_Update` | camera menu pool as `m_pCamera + 0x53C` (23 files; three through raw player offsets 0x51C/0xA50) | `T2_OFFSETOF(CCamera, m_MenuPool)`, `player->m_pCamera`, `m_ContState.m_pContState`; `MenuPool_GetCamera_2` as I11 |
+| s2-5 | `func_00267DBC`, `func_0021E5D4` (actor init), `func_0021F1B4`, `CScene__LoadLevel` | N64 views: intelligence at 0x14, AI at 0x140, flags 0xD4, 0x288/0x1328 strides, player link 0x1320 | typed / host body / `sizeof`, `T2_OFFSETOF` |
+| s2-6 | `InteractiveAnim_Advance` | AI vars at 0x10C | typed on `CAI.m_VarS32/F32` |
+| s2-7 | `CScene__BuildActorLists`: `m_pActors` = 0x190_402B4900 | `CScene.m_Heap` is `u8[0x10]` but holds a pool of pointers (24 host bytes): `MtxPool_Reset` wrote over `m_pActors` | `MtxPool` (structs/world.h), `CScene.m_Heap` typed under TARGET_PORT; `MatrixHeap_Construct`, `MtxPool_Reset`, `MtxPool_Alloc` typed |
+| s2-8 | `CCache__Deallocate(0x50)` from the cinema spline | `TempAlloc` kept the handle as an s32, `TempFree` read `((s32 **)data)[-4]` (32 bytes back on the host) | the whole pointer, 0x10 bytes back (TARGET_PORT; both cinema copies) |
+| s2-9 | archive abort: grid section `0x01F748E4` not a unit | `CScene__DecompressPaths` wrote the paths through a view at 0x58/0x68 (N64 `m_pRegionData`/`unk_68`): on the host that was `m_pCollision` | typed on `CScene` |
+| s2-10 | Fast3D `G_VTX` with w1 `0x00800080020000D7` | the swoosh display list `D_800ACFC8` declared `u8[]`: gendata emitted ROM bytes | declared `Gfx[]` (gendata relocates it) |
+| s2-11 | Fast3D runs matrices as commands (`G_DL` to a freed model) | `CCache__LockForDisplayList`, `Begin/EndDisplayList` and the cache thread `CCache__Main` used `D_800D7BE0` (gCache - 0x5F0) through `B12Mgr`/`B12Node`/`B12Msg` N64 views: the lock bit went into `CMemEntry.lockCount`; `CCache__Main` waited on a queue never created on the host (async loads and display-list releases never completed) | the four typed on `gCache`/`CMemEntry`/`CCacheEntry` (TARGET_PORT bodies) |
+| s2-12 | Fast3D runs stale commands (the frame's list 8 bytes off) | `CCamera__DrawGlares` wrote one command as two u32 and stepped 8 bytes | one host `Gfx` (TARGET_PORT) |
+| s2-13 | intro cinema never ends (`clipStart` -4761, 9007 cues) | `Pack_Add` called the memcpy `func_0029E460(data)`: m2c dropped the source and size (still in a1/a2 on the N64): every cinema resource block was left uninitialised on the host | `func_0029E460(data, prepare, size)` (matches); `proutSprintf` the same; `prepare` is `sptr` |
+| s2-14 | `CAI__Update` callback | Rage Wars Source/Dest views | typed on `CGameObjectInstance`/`CAI` (matches) |
+| s2-15 | `CAI__SetMode` | the same, plus the mode-table chain | host body on `CAI`/`CAIModeInfo` |
+| s2-16 | `LevelEvent_Fire` and 11 other files | camera pool at `&multiplayer - 0x1201/0x1221`, actor stride 0x288, AI at +0x140, weapon actor +0x288/+0x3C8 | by name / `sizeof` / `T2_OFFSETOF` |
+
+### For the merge
+
+- Files others may touch: `port/app/{game.cpp,main.cpp,game.h}` (s1 adds flags there too: keep
+  both sets of options; the mode log and `WriteShot` are mine), `include/structs/world.h`
+  (`MtxPool`, `m_Heap`), `src/us/code/func_00413230.c` (menus: `MenuItem_DrawText` only),
+  `func_0044C230.c` (`MenuPool_GetCamera_2`), the cache files `func_002041E4.c`,
+  `func_0020548C.c`, `func_00205574.c`, `func_0020565C.c`, cinema `func_0040F240.c`/
+  `func_00448240.c`, `func_00218590.c` (`Pack_Add`), the AI files `func_00243414.c`,
+  `func_00245848.c`, `func_00266794.c`, and the 23 menu-pool files of s2-4 (s5's offset sweep may
+  touch the same lines: they compute the same offsets).
+- Rerun gendata with a fresh cache (`rm decls.json`): `world.h` and `D_800ACFC8`'s type changed.
+- A fresh `turok2.cfg.json` makes LUS open 1024x768 and the game then draws into the lower-left
+  640x480 of it (seen once with a new output directory): copy a 640x480 config or fix the
+  default; screenshots assume 640x480.
+- macOS (s3): s2-7, s2-8 and s2-11 are host-layout fixes that matter there too; several s32
+  pointer arguments remain on this path (`CEngineApp__StartWarp(s32 app)`, `Action_EventGo`,
+  `CHeap__Free(s32)` in `CCache__Main`, the cinema path items' `ref`).
+
+### Next
+
+1. The attract demo (mode 13): `EnemyAI_InitDispatch` and the enemy mode tables (N64 views of
+   `CAI`), then the level renderer for the demo and the cinemas (they draw no geometry: follow
+   `CScene__Draw`/the actor draw on level 162, whose acclaim-logo actor should show).
+2. Merge s1 (PIF/pak) and drop `--skip-pak-check` from the default runs.
+3. The rest of the Rage Wars views on the AI path (`AI_UpdateRegionFlags`, `CAI__UpdateModeAnim`,
+   `EnemyAI_*`): s5's sweep, by the crash order above.
 
 ## Round 2 (history)
 

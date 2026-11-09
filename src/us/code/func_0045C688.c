@@ -1,6 +1,7 @@
 /* WRONG CUT: the real function starts at 0x0045C688 (size 0x118 = 280): splat
  * cut its first two words (lui/lw gPakMenuAnyPak) as DamagedPakMenu_SelectRetry_2. */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"

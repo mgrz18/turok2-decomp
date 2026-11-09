@@ -146,6 +146,72 @@ struct ActorStateTable {
     StateEntry entries[1];
 };
 extern void AI_StopSound(void *, void *);
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+/* The port: the same on CGameObjectInstance/CAI/CAIModeInfo (the Rage Wars Source110/Dest views
+ * are the N64 layout): switches the AI to mode arg2, found in its chain of mode tables (each
+ * table's header row links the next one in m_Mode, its rows end with m_Mode -1). */
+s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2) {
+    CGameObjectInstance *obj = (CGameObjectInstance *) arg0;
+    CAI *ai = (CAI *) arg1;
+    CAIModeInfo *node;
+    CAIModeInfo *entry;
+    CAIModeInfo *scan;
+    u32 flags;
+
+    if (gScene.m_Mode == 2) {
+        return 1;
+    }
+    if (gScene.m_Mode == 4) {
+        obj->m_dwFlags |= 0x100;
+    }
+    ai->m_ModeBefore = ai->m_Mode;
+    obj->m_CurrentAnimation.m_bAnimActive = 1;
+    obj->m_BlendAnimation.m_bAnimActive = 1;
+    if (ai->m_pModeCurrent != NULL && ai->m_Mode == arg2) {
+        return 1;
+    }
+    node = ai->m_pModeTable;
+    entry = NULL;
+    ai->m_Mode = arg2;
+    *(s32 *) &ai->m_ModeTime = 0;
+    while (node != NULL) {
+        for (scan = node + 1; scan->m_Mode != -1; scan++) {
+            if (scan->m_Mode == arg2) {
+                entry = scan;
+                break;
+            }
+        }
+        if (entry != NULL) {
+            break;
+        }
+        node = (CAIModeInfo *) node->m_Mode;
+    }
+    if (entry == NULL) {
+        return 0;
+    }
+    ai->m_pModeCurrent = entry;
+    obj->m_dwHotPointFlags &= 0x1F80007F;
+    if ((obj->m_dwFlags & 0x08000000) == 0) {
+        ai->m_AnimRepeatedCount = 0;
+        ai->m_dwFlags &= ~1U;
+    }
+    if (ai->m_pAttachedLoopingSound != NULL) {
+        AI_StopSound(arg0, arg1);
+    }
+    if (entry->unk_04 != 0) {
+        ((void (*)(CGameObjectInstance *, CAI *)) entry->unk_04)(obj, ai);
+    }
+    flags = entry->unk_1C;
+    ai->m_ModeFlags = flags;
+    if (flags & 4) {
+        obj->m_vVelocity.x = 0;
+        obj->m_vVelocity.y = 0;
+        obj->m_vVelocity.z = 0;
+    }
+    return ai->m_Mode == arg2;
+}
+#else
 s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2) {
     struct ActorStateTable *node;
     StateEntry *entry;
@@ -207,3 +273,4 @@ s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2) {
     }
     return ((Dest *)arg1)->state == arg2;
 }
+#endif

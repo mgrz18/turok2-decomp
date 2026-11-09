@@ -1,6 +1,7 @@
 /* WRONG CUT: one function 0x00423768-0x00423880 (size 0x118); splat cut its second half into
  * func_004237FC (which starts in the delay slot of a bnel). */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"

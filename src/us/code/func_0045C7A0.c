@@ -1,5 +1,6 @@
 /* Second-module copy of DamagedPakMenu_SelectContinue (first module; this one at link address 0x004237A0), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"

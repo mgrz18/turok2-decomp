@@ -2,6 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "structs/player.h"
+#include "structs/game_object.h"
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/player.h"
@@ -37,11 +39,11 @@ void *CGameObjectInstance__GetBodySetup(char *arg0)
                 if (object == arg0) {
                     return 0;
                 }
-                if (object + 0x288 == arg0) {
+                if (object + T2_OFFSETOF(CPlayer, m_WeaponActor) == arg0) {
                     return &gWeaponActorTypeInfo;
                 }
                 i++;
-                object += 0x1328;
+                object += (s32)sizeof(CPlayer);
             } while (i < limit);
         }
     }

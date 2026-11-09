@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/menu.h"
 #include "structs/player.h"
 #include "globals/menu_desc.h"

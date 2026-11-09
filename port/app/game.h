@@ -18,6 +18,9 @@ struct T2GameArgs {
     int pakMode = 0;        // T2_PAK_FILE / T2_PAK_BLANK / T2_PAK_NONE (t2port.h, docs/port/INPUT.md)
     std::string pakDir;     // --pak-dir (empty: the user data dir)
     std::string input;      // --input: scripted button presses for headless runs (debug aid)
+    // DEBUG-ONLY bring-up switches (port/game/t2debug.c) until the Controller Pak is modelled:
+    int skipPakCheck = 0; // --skip-pak-check: mode 0 ends as "continue without saving"
+    int startMode = -1;   // --start-mode N: switch to engine mode N once mode 0 has started
 };
 
 // Boots the game and runs args.frames frames; window may be null (--no-window).
