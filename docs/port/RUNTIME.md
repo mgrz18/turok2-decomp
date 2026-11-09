@@ -545,3 +545,26 @@ scheduler and drawn by Fast3D with `--draw` (STATUS.md, round 3 r1).
 Audio stays off: `Sound__Initialize` is the host stub, and the game's `Sound__*` entry points
 return early while `T2Port_AudioReady()` (port/game/t2audio.c: the audio world has a bank) is
 false.
+
+## 14. Round 4 (s2): the boot sequence to the title
+
+With s2's fixes the engine runs its own mode sequence on the host: 0 (pak check) -> 1 (legal) ->
+3 (Expansion Pak) -> 4 and 5 (the two intro cinemas, levels 162 and 44) -> 7 (title, frame
+3932), then the attract demo (13). Details and the crash table: STATUS.md "Round 4, part s2".
+
+Runtime points found on the way:
+
+- **The cache thread.** `CCache__Main` (func_002041E4) is the thread that completes async loads
+  (`CLoader__LoadAsync` replies), async decompression and the display-list releases the
+  scheduler posts (`msg < 2`) on `gCache.queue`. Its ROM code reaches the cache through
+  `D_800D7BE0` (= `gCache - 0x5F0`) with Rage Wars' `B12Mgr` view; on the host that symbol is
+  separate memory, so the thread waited on a queue nobody created. It is now typed on `gCache`
+  (TARGET_PORT), as are `CCache__LockForDisplayList`, `CCache__BeginDisplayList` and
+  `CCache__EndDisplayList`: a model used in the frame's display list is locked (flags 0x200/0x400
+  of `CMemEntry`) until the scheduler's DP-done release, as on the N64.
+- **Display lists are host `Gfx` (16 bytes) everywhere**: any code that writes commands through
+  `u32 *` and steps 8 bytes (`CCamera__DrawGlares` was one) leaves the rest of the frame
+  misaligned; Fast3D then runs whatever an older frame left in the buffer. Static display lists
+  in .data must be declared `Gfx[]` for gendata to emit host commands (`D_800ACFC8`).
+- **Debug switches** (port/game/t2debug.c, debug only): `--skip-pak-check`, `--start-mode N`,
+  called from game.cpp between retraces while every game thread is blocked.
