@@ -196,6 +196,9 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     const char* shotEnv = getenv("T2_SHOT_EVERY");
     const int shotEvery = shotEnv != nullptr ? atoi(shotEnv) : 0;
     int nextShot = shotEvery;
+    const char* dumpAtEnv = getenv("T2_DLDUMP_AT");
+    const int dumpAt = dumpAtEnv != nullptr ? atoi(dumpAtEnv) : 0;
+    bool dumped = false;
     auto t0 = std::chrono::steady_clock::now();
     for (int f = 0; f < args.frames && (!window || window->IsRunning()); f++) {
         if (window) {
@@ -230,10 +233,21 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             }
         }
         T2PortTask task;
-        if (T2Port_TakeGfxTask(&task) && args.draw && window && task.dataPtr != nullptr) {
+        const bool got = T2Port_TakeGfxTask(&task) && args.draw && task.dataPtr != nullptr;
+        if (got) {
+            lastDL = task.dataPtr;
+            // T2_DLDUMP_AT=<frame>: dump the first display list from that frame on, now, before
+            // the game runs again (no window needed: macOS has no headless GL, MACOS.md)
+            if (dumpAt > 0 && f + 1 >= dumpAt && !dumped) {
+                dumped = true;
+                int budget = 4000;
+                printf("dl: frame %d\n", f + 1);
+                DumpDL((const uintptr_t*)lastDL, 0, &budget);
+            }
+        }
+        if (got && window) {
             // Only with --draw: the game's display lists are not host-correct yet (GBI words
             // hold 32-bit addresses; docs/port/BUILD.md "GBI").
-            lastDL = task.dataPtr;
             // Fast3D maps RDP coordinates from its native size (320x240 by default) to the
             // window: the game draws at the size Video_SetMode chose (gScreenWidth x
             // gScreenHeight, 480x360 in mode 0), so tell it before every frame.

@@ -619,6 +619,36 @@ address. Linux `--high-memory` stops at the same line, and macOS cannot have a l
 work. It also found a host-layout bug that affects Linux too: `CCache__AllocateAt` writes a
 `CMemEntry` through junk_types' `B12Node` view, so `flags |= 3` lands in `lockCount`.
 
+## Round 4, part s3: macOS parity (mode 0, then legal and the first cinema)
+
+Details and the crash table (s3-1 to s3-19): [MACOS.md](MACOS.md) section 6. Branch
+`names-R4_s3` in the Mac clone, 21 commits on 474e40af. asm_diff 0 over all 3,938 files,
+checked on the box after every change.
+
+- **macOS now runs mode 0 headless for 300 frames**: 1,414 thread switches and 151 gfx tasks,
+  as on Linux. The display lists of frames 101 and 301 are command-for-command identical to
+  Linux's (headless on both; only host addresses differ).
+- With a local end-the-pak-check probe (not committed), the Mac goes through mode 1 (legal),
+  mode 3 (expansion pak) and into mode 4 (intro cinema, level 162). It stops in the AI action
+  callbacks that take the actor as `s32` (`Action_IdleEnter` -> `CScene__SetInstanceSavedBit`),
+  and in `CAI__SetMode`'s N64-offset views.
+- **Fixes that matter on Linux too:**
+  - s3-13: the damaged-pak menu lines now draw (this is section 4 item 1).
+    `MenuItem_DrawText` read `Menu.desc`, which on the host is the item's desc pointer.
+  - s3-19: `CFrameData.m_pFrameBuffer` is `uptr`. Every `G_SETCIMG` used to carry a truncated
+    address, and `t2sched.c`'s `frameOf` compared 32 bits.
+  - s3-16: `cam + 0x53C` -> `cam->m_MenuPool` (29 sites).
+  - s3-18: `CScene__LoadLevel` steps over actors by `sizeof(CGameObjectInstance)`.
+- New: `T2_DLDUMP_AT=<frame>` (game.cpp) dumps a frame's display list without a window. macOS
+  has no headless Metal/GL, so the Mac compares display lists, not pixels.
+
+For the merge (files others may touch): `src/us/code/func_00413230.c` (menus: MenuPool_Open*,
+MenuItem_DrawText/Layout; s2), `func_0044C230.c`, `protos/menu.h`, the 19 `+ 0x53C` files
+(s5's offset sweep), `func_002718A0.c`/`func_00275A08.c` (audio, s4), `func_004263DC.c`
+(pak directory, s1), `structs/world.h` (MtxPool), `structs/frame.h`, `port/game/t2sched.c`,
+`port/app/game.cpp`, the 28 `EngineModeNN_*` files (s2's mode runner). `include/` changed, so
+the whole tree must be rerun through asm_diff after the merge.
+
 ## Round 3, part r4: audio on the host
 
 Details: [AUDIO.md](AUDIO.md). Behind `--audio` (off by default: runs without it are unchanged).

@@ -7,11 +7,11 @@
 #include "protos/scene.h"
 
 extern void CGameObjectInstance__ConstructFromRecord(void *obj, InputRecAt27 *rec, s32 mode, s32 index);
-extern void CGameObjectInstance__Construct(void *, u16, u16, s32, void *, s32, s32, f32,
+extern void CGameObjectInstance__Construct(void *, u16, u16, s32, void *, s32, sptr, f32,
                           CVector3, u8, CVector3, CVector3, s32);
 void CGameObjectInstance__ConstructFromRecord(void *arg0, InputRecAt27 *arg1, s32 mode, s32 index) {
     void *resource0;
-    s32 resource1;
+    sptr resource1;
     s32 lookup;
     s32 amountRaw;
     f32 fzero;

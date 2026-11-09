@@ -13,7 +13,7 @@
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 static __inline__ void ShowPlayerMessage(u8 *player, char *fmt) {
-    MenuPool_OpenMenu((char *)((CPlayer *)player)->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), fmt, player, (sptr)((CPlayer *)player)->m_ContState.m_pContState, 0);
+    MenuPool_OpenMenu((char *)((CPlayer *)player)->m_pCamera->m_MenuPool, fmt, player, (sptr)((CPlayer *)player)->m_ContState.m_pContState, 0);
 }
 
 s32 SavePortalMenu_SelectGoBack(s32 unused, Menu *event) {

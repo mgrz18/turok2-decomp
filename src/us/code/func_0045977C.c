@@ -81,7 +81,7 @@ s32 PakMessage_SelectOk_2(s32 a0, Menu *o) {
             MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakSaveGameMenuDesc_2, o->player, o->controller, 0);
         } else {
             if (o->player != NULL) {
-                p = ((u8 *)o->player->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool);
+                p = (u8 *)o->player->m_pCamera->m_MenuPool;
             } else {
                 p = &gEngineApp_m_Game_m_MenuPool;
             }
@@ -94,7 +94,7 @@ s32 PakMessage_SelectOk_2(s32 a0, Menu *o) {
         }
         if (o->context != NULL) {
             if (o->context != &gPakSaveProfileMenuDesc_2 && o->player != NULL) {
-                p = ((u8 *)o->player->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool);
+                p = (u8 *)o->player->m_pCamera->m_MenuPool;
             } else {
                 p = &gEngineApp_m_Game_m_MenuPool;
             }

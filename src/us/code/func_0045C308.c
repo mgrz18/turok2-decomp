@@ -32,7 +32,7 @@ s32 SavePortalMenu_SelectGoBack_2(s32 unused, Menu *event) {
     gEngineApp_m_Game_m_PlayerList_m_bCinema[1] = 0;
     gCameraPoolHideViews = 0;
     player = GetPlayer(event, &port);
-    MenuPool_OpenMenu_2((char *)((CPlayer *)player)->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), (char *)&gPakMsgInsertRumblePakDesc_2, player, (sptr)((CPlayer *)player)->m_ContState.m_pContState, 0);
+    MenuPool_OpenMenu_2((char *)((CPlayer *)player)->m_pCamera->m_MenuPool, (char *)&gPakMsgInsertRumblePakDesc_2, player, (sptr)((CPlayer *)player)->m_ContState.m_pContState, 0);
     gSavePortalActive = 0;
     return 1;
 }

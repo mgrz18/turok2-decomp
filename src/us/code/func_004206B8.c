@@ -49,7 +49,7 @@ s32 CharNoteMenu_SelectYes(s32 unused, Menu *own) {
         own->player = plr;
         O01Restore(plr);
         CPlayer__SetCharacter(plr, gPakProfileRead_character[0]);
-        MenuPool_OpenChildMenu((u8 *)plr->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), own, (u8 *)&gPlayerSetupMenuDesc);
+        MenuPool_OpenChildMenu((u8 *)plr->m_pCamera->m_MenuPool, own, (u8 *)&gPlayerSetupMenuDesc);
         return 1;
     }
     if (Pak_DeleteNote(pad, gPakNoteIndex) == 0) {

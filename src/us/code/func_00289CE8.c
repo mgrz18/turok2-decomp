@@ -4,10 +4,10 @@
 #include "globals/controller.h"
 #include "globals/engine.h"
 
-s32 CEngineApp__UpdateCinemaMode(s32, s32, s32);
+s32 CEngineApp__UpdateCinemaMode(sptr, s32, s32);
 
 
-void EngineMode16_Ending_Retrace(s32 arg0) {
+void EngineMode16_Ending_Retrace(sptr arg0) {
     if (gFinalEnding != 0) {
         CEngineApp__UpdateCinemaMode(arg0, 1, 1);
         return;

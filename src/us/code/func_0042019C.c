@@ -62,7 +62,7 @@ s32 PakMenu_SelectCancel(s32 a0, Menu *arg) {
         if (gPakMenuIsLoad != 0) {
             gPakMenuLeaving = 1;
             plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, arg->controller);
-            MenuPool_OpenMenu(((u8 *)plr->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool), (u8 *)&gCharacterMenuDesc, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
+            MenuPool_OpenMenu((u8 *)plr->m_pCamera->m_MenuPool, (u8 *)&gCharacterMenuDesc, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
         if (gPakMenuIsSave != 0) {
@@ -86,7 +86,7 @@ s32 PakMenu_SelectCancel(s32 a0, Menu *arg) {
                 tbl = (u8 *)&gStatsAfterPakMenuDesc4;
                 break;
             }
-            MenuPool_OpenMenu(((u8 *)plr->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool), tbl, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
+            MenuPool_OpenMenu((u8 *)plr->m_pCamera->m_MenuPool, tbl, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
         return 0;
@@ -101,7 +101,7 @@ s32 PakMenu_SelectCancel(s32 a0, Menu *arg) {
         return 0;
     } else {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu(((u8 *)plr->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool), (u8 *)&gSavePortalMenuDescB, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
+        MenuPool_OpenMenu((u8 *)plr->m_pCamera->m_MenuPool, (u8 *)&gSavePortalMenuDescB, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
         gCameraPoolHideViews = 0;
         return 1;
     }

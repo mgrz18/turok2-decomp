@@ -37,12 +37,12 @@ void PlayerState15_Enter(CPlayer *player, CGameObjectInstance *actor) {
             text = (char *)&gStatsContinueMenuDesc4;
             break;
         }
-        MenuPool_OpenMenu((u8 *)player->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), text, player, (sptr) player->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu((u8 *)player->m_pCamera->m_MenuPool, text, player, (sptr) player->m_ContState.m_pContState, NULL);
     } else {
         text = (char *)&gGameOverMenuDesc;
         if (P_S16(player, 0x52A) != 0) {
             text = (char *)&gContinueMenuDesc;
         }
-        MenuPool_OpenMenu((u8 *)player->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), text, player, (sptr) player->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu((u8 *)player->m_pCamera->m_MenuPool, text, player, (sptr) player->m_ContState.m_pContState, NULL);
     }
 }

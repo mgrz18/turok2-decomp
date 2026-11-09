@@ -1,5 +1,4 @@
 #include "common.h"
-#include "structs/game_object.h"
 #include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/model.h"
@@ -37,7 +36,7 @@ void WeaponActor_Draw(WeaponActor *obj, CAI *state, CDrawArgs *args) {
     WeaponActor *muzzle;
     s32 arg6 = -1;
 
-    if (gEngineApp_m_Settings.multiplayer != 0 && MenuPool_CountOpen(((u8 *)player->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool)) != 0) {
+    if (gEngineApp_m_Settings.multiplayer != 0 && MenuPool_CountOpen((u8 *)player->m_pCamera->m_MenuPool) != 0) {
         return;
     }
     muzzle = ((WeaponActor *)player->m_pOnEnemy);

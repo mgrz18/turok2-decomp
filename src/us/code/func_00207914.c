@@ -4,6 +4,7 @@
 #include "protos/scene.h"
 
 
-void func_00207914(s32 arg0, s32 arg1) {
-    CScene__GetTextureSet(&gScene, arg1, arg0, arg0 + 4);
+/* arg0: &Material.texture (the ROM address, then its size at +4): an address, sptr on the host. */
+void func_00207914(sptr arg0, s32 arg1) {
+    CScene__GetTextureSet(&gScene, arg1, (s32 *)arg0, arg0 + 4);
 }

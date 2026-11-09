@@ -5,11 +5,11 @@
 #include "protos/scene.h"
 
 
-void func_002888BC(s32, s32, s32);
+void func_002888BC(sptr, s32, s32);
 
 /* The ROM bases every store on gEngineApp_m_Settings_match (the match), the settings at
  * -0x1D8 from it. */
-void EngineMode01_Legal_Init(s32 arg0) {
+void EngineMode01_Legal_Init(sptr arg0) {
     GameMatch *match = &gEngineApp_m_Settings.match;
     GameSettings *settings;
 

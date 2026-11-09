@@ -36,7 +36,7 @@ typedef struct CFrameData {
     /* 0x088 */ u8 m_LineTask[0x68];     /* OSScTask */
 #endif
     /* 0x0F0 */ CFrameMsg m_Msg;         /* sent to gGfxFrameMessageQueue when the frame is done */
-    /* 0x110 */ u32 m_pFrameBuffer;      /* its colour image (gCFB[i], gDPSetColorImage) */
+    /* 0x110 */ uptr m_pFrameBuffer;     /* its colour image (gCFB[i], gDPSetColorImage); an address */
     /* 0x114 */ void *m_pDisplayList;    /* Gfx *: the start of the frame's list */
     /* 0x118 */ void *m_pLineList;       /* Gfx *: the line / overlay list */
     /* 0x11C */ s32 m_DisplayListSize;   /* in bytes */

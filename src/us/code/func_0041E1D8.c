@@ -30,7 +30,7 @@ void PakMenu_InitLoadProfile(Menu *m) {
     kind = m->controller->port;
     if (gDamagedPakContinued) {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu(((u8 *)m->player->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool), &gCharacterMenuAfterPakDesc, m->player, m->controller, NULL);
+        MenuPool_OpenMenu((u8 *)m->player->m_pCamera->m_MenuPool, &gCharacterMenuAfterPakDesc, m->player, m->controller, NULL);
         return;
     }
     Pak_ProbeSlot(kind);

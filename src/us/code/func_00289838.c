@@ -1,7 +1,7 @@
 #include "common.h"
 
-extern void CEngineApp__StartWarp(s32, s32);
+extern void CEngineApp__StartWarp(sptr, s32);
 
-void EngineMode10_Cinema_Init(s32 arg0) {
+void EngineMode10_Cinema_Init(sptr arg0) {
     CEngineApp__StartWarp(arg0, 0x6F);
 }

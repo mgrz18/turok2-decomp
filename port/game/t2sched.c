@@ -256,13 +256,13 @@ void __scHandleRetrace(T2Sched *sc) {
 /* The frame whose colour image is fb (the first one if none). */
 static CFrameData *frameOf(void *fb) {
     CFrameData *frames = gEngineApp.m_FrameData;
-    if ((u32)(uptr)fb == frames[0].m_pFrameBuffer) {
+    if ((uptr)fb == frames[0].m_pFrameBuffer) {
         return &frames[0];
     }
-    if ((u32)(uptr)fb == frames[1].m_pFrameBuffer) {
+    if ((uptr)fb == frames[1].m_pFrameBuffer) {
         return &frames[1];
     }
-    if ((u32)(uptr)fb == frames[2].m_pFrameBuffer) {
+    if ((uptr)fb == frames[2].m_pFrameBuffer) {
         return &frames[2];
     }
     return &frames[0];

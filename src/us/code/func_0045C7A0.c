@@ -19,7 +19,7 @@ s32 DamagedPakMenu_SelectContinue_2(s32 unused, Menu *event) {
         gPakCheckDone = 1;
     } else {
         if (event->player != NULL) {
-            dst = (char *)event->player->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool);
+            dst = (char *)event->player->m_pCamera->m_MenuPool;
         } else {
             dst = &gEngineApp_m_Game_m_MenuPool;
         }

@@ -75,7 +75,7 @@ void PakMenu_InitSaveProfile(Menu *own) {
     msg = O01Pick(&sel);
     if (gDamagedPakContinued != 0) {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu((u8 *)own->player->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), msg, plr, plr->m_ContState.m_pContState, 0);
+        MenuPool_OpenMenu((u8 *)own->player->m_pCamera->m_MenuPool, msg, plr, plr->m_ContState.m_pContState, 0);
     } else {
         if (gPakMenuAnyPak != 0) {
             pad = gPakMenuPort;

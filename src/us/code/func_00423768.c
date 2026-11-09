@@ -26,7 +26,7 @@ s32 DamagedPakMenu_SelectRetry(s32 unused, Menu *event) {
     gPakMenuLeaving = 1;
     if (PakMenu_CheckPak(event, port, 1) != 0) {
         if (event->player != NULL) {
-            dst = (char *)event->player->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool);
+            dst = (char *)event->player->m_pCamera->m_MenuPool;
         } else {
             dst = &gEngineApp_m_Game_m_MenuPool;
         }

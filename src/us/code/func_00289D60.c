@@ -1,10 +1,10 @@
 #include "common.h"
 
-void Credits_Draw(s32);                         /* extern */
-void Credits_Update(s32);                         /* extern */
+void Credits_Draw(sptr);                         /* extern */
+void Credits_Update(sptr);                         /* extern */
 void CEngineApp__DrawWorld();                            /* extern */
 
-void EngineMode16_Ending_Draw(s32 arg0) {
+void EngineMode16_Ending_Draw(sptr arg0) {
     CEngineApp__DrawWorld();
     Credits_Draw(arg0);
     Credits_Update(arg0);
