@@ -22,7 +22,7 @@ void func_0020BBE4(s32 arg0, s32 renderMode, s32 **model, s32 matrix, s32 projec
     s32 i;
     s32 *seg;
 
-    if ((u32) (gDisplayListSize - ((u32) ((u8 *) gDList - (u8 *) gEngineApp_m_pCurrentFrameData->m_pDisplayList) >> 3)) < 3000) {
+    if ((u32) (gDisplayListSize - ((u32) ((u8 *) gDList - (u8 *) gEngineApp_m_pCurrentFrameData->m_pDisplayList) / GFX_SIZE)) < 3000) {
         return;
     }
     if (Render_SetupMaterial(arg0, arg8) == 0) {
