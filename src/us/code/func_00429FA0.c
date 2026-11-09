@@ -55,7 +55,11 @@ static __inline__ void loadGeomHeader(CScene *w, CGeomHeader *out, s32 id) {
 }
 
 void CScene__Construct(CScene *w, s32 file) {
+#ifdef TARGET_PORT
+    sptr cart; /* CCache__LoadPersistantIndex stores a pointer through it */
+#else
     s32 cart;
+#endif
     s32 res;
     f32 *vec;
 
