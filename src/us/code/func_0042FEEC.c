@@ -2,6 +2,22 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_19.CPP, func_8044A6CC_de, with Turok 2's layouts. */
 #include "common.h"
 
+#ifdef TARGET_PORT
+#include "structs/camera.h"
+
+void CEmitterPool__Construct(char *);
+
+/* Host body: the pool and its cameras through CCameraPool/CCamera (the view below has the camera
+ * table and count at their N64 offsets 4/8 and the 0xEC0 camera stride). */
+void CCameraPool__ResetEmitterPools(CCameraPool *owner) {
+    s32 i;
+
+    for (i = 0; i < owner->m_nCameras; i++) {
+        CEmitterPool__Construct((char *)owner->m_Cameras[i].m_SkySystem);
+    }
+    CEmitterPool__Construct((char *)owner->m_MainCamera.m_SkySystem);
+}
+#else
 typedef struct Cameras {
     /* 0x0 */ s32 handle;
     /* 0x4 */ s32 cameras; /* address of count 0xEC0-byte records */
@@ -19,3 +35,4 @@ void CCameraPool__ResetEmitterPools(Cameras *owner) {
     }
     CEmitterPool__Construct((char *)owner + 0x598);
 }
+#endif

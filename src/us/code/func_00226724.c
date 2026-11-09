@@ -1,6 +1,23 @@
 #include "common.h"
 #include "protos/cache.h"
 
+#ifdef TARGET_PORT
+#include "structs/world.h"
+
+/* Host body on CScene (the view below has the N64 offsets and a 4-byte sector handle). */
+void CScene__ReleaseSectors(CScene *scene) {
+    s32 i;
+    s32 count = scene->m_nSectors;
+
+    for (i = 0; i < count; i++) {
+        CCache__Unlock(0, (struct CMemEntry *)scene->m_Sectors[i].m_hData);
+    }
+    scene->m_nDrawActors = 0;
+    scene->m_nListed = 0;
+    scene->m_nDeferred = 0;
+    scene->m_nSectors = 0;
+}
+#else
 typedef struct Entry8 {
     s32 handle;
     s32 unk4;
@@ -34,3 +51,4 @@ void CScene__ReleaseSectors(Cache *cache) {
     cache->unk1064 = 0;
     cache->count = 0;
 }
+#endif
