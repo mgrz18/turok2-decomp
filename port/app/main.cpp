@@ -218,6 +218,30 @@ int main(int argc, char** argv) {
 
     auto config = std::make_shared<Ship::Config>(Ship::Context::GetPathRelativeToAppDirectory("turok2.cfg.json"));
     context->GetChildren().Add(config);
+    // The window size: a fresh config gets the game's own output size, windowed, 640x480 (2x the
+    // N64's 320x240, what the screenshots and the interpreter's scaling assume). SDL's offscreen
+    // driver (headless runs) reports its window as fullscreen, so LUS saved
+    // Window.Fullscreen.Enabled = true at exit and the next run opened a fullscreen window at
+    // the driver's size, the game drawn into its lower-left 640x480: headless runs always start
+    // windowed.
+    {
+        bool changed = false;
+        if (!config->Contains("Window.Width") || !config->Contains("Window.Height")) {
+            config->SetInt("Window.Width", 640);
+            config->SetInt("Window.Height", 480);
+            changed = true;
+        }
+        const char* driver = getenv("SDL_VIDEODRIVER");
+        const bool headless = driver != nullptr && strcmp(driver, "offscreen") == 0;
+        if (!config->Contains("Window.Fullscreen.Enabled") ||
+            (headless && config->GetBool("Window.Fullscreen.Enabled", false))) {
+            config->SetBool("Window.Fullscreen.Enabled", false);
+            changed = true;
+        }
+        if (changed) {
+            config->Save();
+        }
+    }
     auto cvars = std::make_shared<Ship::ConsoleVariable>(config);
     context->GetChildren().Add(cvars);
     CVarSetConsoleVariable(cvars);
