@@ -541,6 +541,7 @@ class Generator:
         self.func_refs = set()
         self.ext_funcs = set()
         self.int_addr = collections.Counter()  # integer leaves that hold an address
+        self.bss_slack = []   # .bss byte views given twice their N64 size
 
     # -- choosing a type --------------------------------------------------
     def pick(self, name, ds):
@@ -629,6 +630,12 @@ class Generator:
         raw = None if self.is_bss(s) else self.elf.read(s.key, n)
         if raw is None:
             s.bss = True
+            if d is None or (d[0] == 'a' and d[2][0] == 's' and d[2][1] == 1):
+                # a runtime struct the C only declares as bytes (`extern u8 gPoolBuffers[]`, a
+                # GfxPool of pointers): host pointers can make it up to twice the N64 size
+                s.hsize = 2 * n
+                s.align = 8
+                self.bss_slack.append(s.name)
             return
         raw = raw.ljust(n, b'\0')
         if d is None:
@@ -958,6 +965,7 @@ class Generator:
         P('  bytes (no usable declaration): %d' % sum(1 for s in from_c if s.layout_desc is None))
         P('pointer targets generated in addition: %d' % (len(ss) - len(from_c)))
         P('bss (zero) symbols: %d' % sum(1 for s in ss if s.bss))
+        P("bss byte views given twice their N64 size (host pointers): %d" % len(self.bss_slack))
         P('aliases inside another symbol: %d' % sum(1 for s in ss if s.alias_of))
         np = sum(1 for s in ss for it in s.items if it[1] == 'P')
         P('pointer slots: %d (relocated %d, null %d, unresolved %d)' % (

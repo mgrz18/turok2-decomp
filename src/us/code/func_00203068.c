@@ -51,7 +51,11 @@ s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent) {
         } else {
             node->flags = 0;
         }
+#ifdef TARGET_PORT /* the free stack holds host pointers */
+        gCache_memEntriesFree[gCache_freeEntryCount] = node;
+#else
         *(CMemEntry **)(gCache_freeEntryCount * 4 + (char *)gCache_memEntriesFree) = node;
+#endif
         gCache_freeEntryCount++;
         return result;
     }
