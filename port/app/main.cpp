@@ -16,6 +16,11 @@
 //   4. exits with 0 when every check passed.
 //
 //   turok2 [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]
+//
+// With --game (when the game is linked, T2_HAVE_GAME; docs/port/LINK.md) step 2 only mounts
+// the archive and installs the T2Asset backend, and step 3 runs the game (game.cpp) instead of
+// the test display list: [--draw] hands its display lists to Fast3D, [--verbose] logs every
+// frame and task, [--high-memory] turns off the low-memory bring-up aid.
 #include <libultraship/libultraship.h>
 
 #include <chrono>
@@ -53,6 +58,9 @@
 #include "ship/window/FileDrop.h"
 
 #include "t2asset_lus.h"
+#ifdef T2_HAVE_GAME
+#include "game.h"
+#endif
 extern "C" {
 #include "t2asset.h"
 extern Gfx gT2TestDL[];
@@ -121,6 +129,14 @@ struct Args {
     std::string rom;
     int frames = 3;
     bool window = true;
+    bool game = false;
+    bool draw = false;
+    bool verbose = false;
+#ifdef T2_LOW_MEMORY_DEFAULT
+    bool lowMemory = true;
+#else
+    bool lowMemory = false;
+#endif
 };
 
 Args ParseArgs(int argc, char** argv) {
@@ -137,8 +153,17 @@ Args ParseArgs(int argc, char** argv) {
             a.frames = atoi(argv[++i]);
         } else if (s == "--no-window") {
             a.window = false;
+        } else if (s == "--game") {
+            a.game = true;
+        } else if (s == "--draw") {
+            a.draw = true;
+        } else if (s == "--verbose") {
+            a.verbose = true;
+        } else if (s == "--high-memory") {
+            a.lowMemory = false;
         } else {
-            fprintf(stderr, "usage: %s [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]\n",
+            fprintf(stderr, "usage: %s [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]\n"
+                            "          [--game [--draw] [--verbose] [--high-memory]]\n",
                     argv[0]);
             exit(2);
         }
@@ -264,6 +289,13 @@ int main(int argc, char** argv) {
         return 1;
     }
     printf("T2Asset over ArchiveManager: %u units in t2/units\n", T2Asset_UnitCount());
+#ifndef T2_HAVE_GAME
+    if (args.game) {
+        fprintf(stderr, "--game: this build does not link the game (T2_LINK_GAME=OFF)\n");
+        return 2;
+    }
+#endif
+    if (!args.game) {
 
     // A few named units, the two routes of ARCHIVE.md: raw LoadFile + skip 0x44 (what
     // T2Asset uses) and the ResourceManager's Blob resource (+16 bytes of padding).
@@ -332,6 +364,7 @@ int main(int argc, char** argv) {
         }
         std::filesystem::remove(tsvPath);
     }
+    } // !args.game: the backend stays open for the game
 
     // ---- 3. Window, controller, Fast3D ----
     if (args.window) {
@@ -348,6 +381,19 @@ int main(int argc, char** argv) {
         printf("window: backend %s, video driver %s, %ux%u\n", window->GetWindowBackendName().c_str(),
                SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "?", window->GetWidth(),
                window->GetHeight());
+    }
+#ifdef T2_HAVE_GAME
+    if (args.game) {
+        T2GameArgs g;
+        g.rom = args.rom;
+        g.frames = args.frames;
+        g.draw = args.draw;
+        g.lowMemory = args.lowMemory;
+        g.verbose = args.verbose;
+        CHECK(T2Game_Run(window, g) == 0, "game run");
+    }
+#endif
+    if (args.window && !args.game) {
 
         // Controllers through LUS's libultra replacements, as the game's own code will call
         // them: osContInit initializes SDL gamepads and the ControlDeck,
