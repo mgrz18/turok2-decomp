@@ -255,6 +255,11 @@ stay integers and Fast3D resolves them through `gSPSegment` as on N64.
 5. **Build with clang everywhere** (clang-cl on Windows), `-fsigned-char`
    mandatory.
 
+## Link (round 2)
+
+Since Phase 7 round 2 the executable links `turok2_game`: module 2 and the 62 replaced
+libultra/boot files moved to `turok2_game_unlinked` (still compiled), see docs/port/LINK.md.
+
 ## What the next round needs
 
 - Exclude the libultra/hardware files and the module-2 copies from
