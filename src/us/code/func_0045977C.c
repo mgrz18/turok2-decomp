@@ -8,6 +8,7 @@
 #include "structs/game.h"
 #include "globals/menu_desc.h"
 #include "protos/game.h"
+#include "structs/camera.h"
 
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
@@ -79,7 +80,7 @@ s32 PakMessage_SelectOk_2(s32 a0, Menu *o) {
             MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakSaveGameMenuDesc_2, o->player, o->controller, 0);
         } else {
             if (o->player != NULL) {
-                p = ((u8 *)o->player->m_pCamera) + 0x53C;
+                p = ((u8 *)o->player->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool);
             } else {
                 p = &gEngineApp_m_Game_m_MenuPool;
             }
@@ -92,7 +93,7 @@ s32 PakMessage_SelectOk_2(s32 a0, Menu *o) {
         }
         if (o->context != NULL) {
             if (o->context != &gPakSaveProfileMenuDesc_2 && o->player != NULL) {
-                p = ((u8 *)o->player->m_pCamera) + 0x53C;
+                p = ((u8 *)o->player->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool);
             } else {
                 p = &gEngineApp_m_Game_m_MenuPool;
             }

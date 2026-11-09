@@ -16,6 +16,7 @@
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
+#include "structs/camera.h"
 
 /* Controller pak menu, "save" entry: when the pak is ready, builds the save note (with its checksum) and
  * opens the save menu; otherwise shows why the pak cannot be used. */
@@ -55,7 +56,7 @@ void PakMenu_InitSaveGame(Menu *own) {
     if (gDamagedPakContinued != 0) {
         p = plr;
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, &gSavePortalMenuDescB, p, p->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu(((u8 *)p->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool), &gSavePortalMenuDescB, p, p->m_ContState.m_pContState, NULL);
         gCameraPoolHideViews = 0;
     } else {
         Pak_ProbeSlot(own->controller->port);
@@ -75,11 +76,11 @@ void PakMenu_InitSaveGame(Menu *own) {
 
             gPakMenuLeaving = one;
             if (Pak_IsRumblePak(sel.v) != 0) {
-                MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, &gPakMsgInsertToSaveDesc, p, p->m_ContState.m_pContState, (void *)one);
+                MenuPool_OpenMenu(((u8 *)p->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool), &gPakMsgInsertToSaveDesc, p, p->m_ContState.m_pContState, (void *)one);
             } else if (Pak_NeedsRepair(sel.v) != 0) {
                 MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gDamagedPakAtBootMenuDesc, p, p->m_ContState.m_pContState, &gPakSaveGameMenuDesc);
             } else {
-                MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, &gPakMsgPakNotFoundDesc, p, p->m_ContState.m_pContState, &gSavePortalMenuDescB);
+                MenuPool_OpenMenu(((u8 *)p->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool), &gPakMsgPakNotFoundDesc, p, p->m_ContState.m_pContState, &gSavePortalMenuDescB);
             }
         }
     }

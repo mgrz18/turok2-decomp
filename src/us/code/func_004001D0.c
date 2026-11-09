@@ -4,6 +4,7 @@
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "protos/player.h"
+#include "structs/camera.h"
 
 /* Free-look camera driven by the C buttons. */
 typedef struct {
@@ -35,7 +36,7 @@ void Automap_Update(Look004001D0 *look) {
         return;
     }
     if (look->mode == 0) {
-        if (!MenuPool_CountOpen(((u8 *)player->m_pCamera) + 0x53C) && (player->m_ContState.m_dwButtonsSingle & 0x20) && player->m_SniperMode == 0) {
+        if (!MenuPool_CountOpen(((u8 *)player->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool)) && (player->m_ContState.m_dwButtonsSingle & 0x20) && player->m_SniperMode == 0) {
             look->mode = 1;
         }
     } else if (player->m_SniperMode != 0) {

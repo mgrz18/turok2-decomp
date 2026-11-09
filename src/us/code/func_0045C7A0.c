@@ -5,6 +5,7 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "structs/camera.h"
 
 void MenuPool_OpenMenu_2(char *dst, char *fmt, void *arg2, sptr arg3, sptr arg4);
 
@@ -17,7 +18,7 @@ s32 DamagedPakMenu_SelectContinue_2(s32 unused, Menu *event) {
         gPakCheckDone = 1;
     } else {
         if (event->player != NULL) {
-            dst = (char *)event->player->m_pCamera + 0x53C;
+            dst = (char *)event->player->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool);
         } else {
             dst = &gEngineApp_m_Game_m_MenuPool;
         }
