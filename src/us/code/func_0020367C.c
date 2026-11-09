@@ -13,6 +13,9 @@ extern void __osRestoreInt(u32);
 extern void CDecompressor__DecompressSync(CDecompressor *, CCacheEntry *);
 extern void CLoader__LoadSync(CLoader *, u32, u32, void *);
 extern void CLoader__LoadAsync(CLoader *, u32, u32, void *, void *, CCacheEntry *, s32);
+#ifdef TARGET_PORT
+#include "t2asset_game.h"
+#endif
 
 static __inline__ void acquire(void) {
     u32 token = __osDisableInt();
@@ -97,6 +100,12 @@ CMemEntry *CCache__Request(s32 unused, u32 key, u32 size, u32 mode, sptr owner, 
     s32 busy;
     CCacheEntry *allocated;
 
+#ifdef TARGET_PORT
+    /* Host sizes from here on (lookup, pending check, allocate, requestLength, the loader): the
+     * archive serves RNC units unpacked, so a whole-unit request needs the unpacked size;
+     * prefix probes keep theirs (docs/assets/PORT.md 10.4). */
+    size = T2Port_AssetHostSize(key, size);
+#endif
     acquire();
     find(key, &request);
     if (request != 0 && request->requestLength <= size) {
