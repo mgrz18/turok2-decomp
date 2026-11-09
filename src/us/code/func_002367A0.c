@@ -1,34 +1,19 @@
 #include "common.h"
 #include "globals/engine.h"
+#include "structs/swoosh.h"
 
 s32 NodePool_Free(void *, void *);              /* extern */
 
-/* A repeating timer: counts down by the frame time, fires its callback,
- * and is removed after its last repeat. */
-typedef struct Timer002367A0 {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ struct Timer002367A0 *next;
-    /* 0x08 */ f32 time;
-    /* 0x0C */ f32 period;
-    /* 0x10 */ s32 repeats;
-    /* 0x14 */ u8 pad14[4];
-    /* 0x18 */ s32 (*callback)(void *);
-} Timer002367A0;
-
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x7580];
-    /* 0x7580 */ u8 timerList[0x758C - 0x7580];
-    /* 0x758C */ Timer002367A0 *timerHead;
-} World002367A0;
-
-void SwooshSystem_UpdateTimers(World002367A0 *arg0) {
+/* Runs the repeating timers: each counts down by the frame time, fires its callback,
+ * and is freed after its last repeat. */
+void SwooshSystem_UpdateTimers(CSwooshSystem *arg0) {
     f32 temp_f0;
     f32 temp_f1;
     s32 temp_v0;
-    Timer002367A0 *temp_s1;
-    Timer002367A0 *var_s0;
+    SwooshTimer *temp_s1;
+    SwooshTimer *var_s0;
 
-    var_s0 = arg0->timerHead;
+    var_s0 = arg0->m_TimerPool.used.head;
     if (var_s0 != NULL) {
         do {
             temp_f1 = var_s0->time - gFrameIncrement;
@@ -44,7 +29,7 @@ void SwooshSystem_UpdateTimers(World002367A0 *arg0) {
                 temp_v0 = var_s0->repeats - 1;
                 var_s0->repeats = temp_v0;
                 if (temp_v0 <= 0) {
-                    NodePool_Free(arg0->timerList, var_s0);
+                    NodePool_Free(&arg0->m_TimerPool, var_s0);
                 }
             }
             var_s0 = temp_s1;

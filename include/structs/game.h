@@ -170,6 +170,9 @@ typedef struct CAutomap {
 #include "structs/camera.h"
 #include "structs/world.h"
 #include "structs/player.h"
+#ifdef TARGET_PORT
+#include "structs/swoosh.h"
+#endif
 #endif
 
 typedef struct CGame {
@@ -224,8 +227,10 @@ typedef struct CEngineApp {
 #ifdef TARGET_PORT
     CScene m_Scene[1];                               /* gScene */
     COnScreen unk19440[1];                           /* gEngineApp_m_OnScreen */
-    u8 m_SwooshSystem[0x22BA0 - 0x19608];            /* gEngineApp_m_SwooshSystem (bytes: the game indexes it so) */
-    u8 unk22BA0[0x22BC0 - 0x22BA0];                  /* D_80119850 */
+    union {
+        CSwooshSystem m_SwooshSystem[1];             /* gEngineApp_m_SwooshSystem (structs/swoosh.h) */
+        u8 _SwooshBytes[0x22BC0 - 0x19608];          /* the N64's 0x9598 bytes and unk22BA0 (D_80119850) */
+    };
     union {
         CGame m_Game;                                /* gEngineApp_m_Game */
         struct {

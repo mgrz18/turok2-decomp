@@ -1,54 +1,31 @@
 #include "common.h"
 #include "structs/list.h"
+#include "structs/swoosh.h"
 #include "protos/list.h"
-
-typedef struct World {
-    /* 0x0000 */ u8 pad0[0x2580];
-    /* 0x2580 */ s32 unk2580;
-    /* 0x2584 */ u8 pad2584[4];
-    /* 0x2588 */ u8 nodes[96][0xB8];
-    /* 0x6A88 */ u8 nodeList[0xC];
-    /* 0x6A94 */ u8 pool0Items[32][0x54];
-    /* 0x7514 */ u8 pool0[0x18];
-    /* 0x752C */ u8 pool1Items[3][0x1C];
-    /* 0x7580 */ u8 pool1[0x18];
-    /* 0x7598 */ u8 slots[100][0x50];
-    /* 0x94D8 */ CList lists[10];
-    /* 0x95A0 */ CList freeSlots;
-} World;
 
 extern void NodePool_Init(void *pool, void *items, s32 size, s32 count);
 extern void func_0026D230(void *list);
 extern void DList_AddTail(void *list, void *node);
-extern void SwooshSystem_Update(World *world);
+extern void SwooshSystem_Update(CSwooshSystem *world);
 
-#ifdef TARGET_PORT
-/* The port, for now: the swoosh/effect system (gEngineApp_m_SwooshSystem, world below) is N64
- * bytes whose pools and lists link their items through 4-byte words at N64 strides; it is not
- * typed yet, so on the host it stays empty (no pools, empty lists, no swooshes or effect slots:
- * spawning finds nothing free). docs/port/STATUS.md, crash table. */
-extern void *memset(void *, int, unsigned long);
-void func_0042D410(World *world) {
-    memset(world, 0, sizeof(World));
-}
-#else
-void func_0042D410(World *world) {
+/* Builds the swoosh/effect system (structs/swoosh.h): the swoosh and timer pools, the free
+ * swoosh points, the decal lists, an empty ribbon vertex pool. */
+void func_0042D410(CSwooshSystem *world) {
     s32 i;
 
-    NodePool_Init(world->pool0, world->pool0Items, 0x54, 32);
-    NodePool_Init(world->pool1, world->pool1Items, 0x1C, 3);
-    func_0026D230(world->nodeList);
+    NodePool_Init(&world->m_SwooshPool, world->m_Swooshes, sizeof(Swoosh), 32);
+    NodePool_Init(&world->m_TimerPool, world->m_Timers, sizeof(SwooshTimer), 3);
+    func_0026D230(&world->m_FreeNodes);
     for (i = 0; i < 96; i++) {
-        DList_AddTail(world->nodeList, world->nodes[i]);
+        DList_AddTail(&world->m_FreeNodes, &world->m_Nodes[i]);
     }
-    CList__Construct(&world->freeSlots, 0, sizeof(void *));
+    CList__Construct(&world->m_FreeDecals, 0, sizeof(void *));
     for (i = 0; i < 10; i++) {
-        CList__Construct(&world->lists[i], 0, sizeof(void *));
+        CList__Construct(&world->m_DecalLists[i], 0, sizeof(void *));
     }
     for (i = 0; i < 100; i++) {
-        CList__AddTail(&world->freeSlots, world->slots[i]);
+        CList__AddTail(&world->m_FreeDecals, &world->m_Decals[i]);
     }
-    world->unk2580 = 0;
+    world->m_RibbonVtxLeft = 0;
     SwooshSystem_Update(world);
 }
-#endif

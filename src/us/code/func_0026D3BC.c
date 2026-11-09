@@ -1,4 +1,42 @@
 
+#ifdef TARGET_PORT
+#include "common.h"
+#include "structs/swoosh.h"
+
+/* The port: the list words at their host size (structs/swoosh.h: an element links to its
+ * previous element in its first word, to its next in its second). */
+typedef struct T2ListNode {
+    struct T2ListNode *prev;
+    struct T2ListNode *next;
+} T2ListNode;
+
+/* Takes the free list's head into the used list's tail. */
+s32 *NodePool_Alloc(void *arg0) {
+    SwooshPool *p = arg0;
+    T2ListNode *n = p->free.head;
+
+    if (n != NULL) {
+        if (n->next != NULL) n->next->prev = n->prev;
+        if (n->prev != NULL) n->prev->next = n->next;
+        if (p->free.head == n) p->free.head = n->next;
+        if (p->free.tail == n) p->free.tail = n->prev;
+        p->free.count--;
+        if (p->used.count == 0) {
+            p->used.head = n;
+            p->used.tail = n;
+            n->prev = NULL;
+            n->next = NULL;
+        } else {
+            n->prev = p->used.tail;
+            n->next = NULL;
+            ((T2ListNode *)p->used.tail)->next = n;
+            p->used.tail = n;
+        }
+        p->used.count++;
+    }
+    return (s32 *)n;
+}
+#else
 typedef signed char s8;
 typedef unsigned char u8;
 typedef signed short s16;
@@ -58,3 +96,4 @@ s32 *NodePool_Alloc(void *arg0)
   }
   return temp_v1;
 }
+#endif

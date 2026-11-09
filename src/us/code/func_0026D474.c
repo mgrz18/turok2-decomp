@@ -1,4 +1,39 @@
 
+#ifdef TARGET_PORT
+#include "common.h"
+#include "structs/swoosh.h"
+
+/* The port: the list words at their host size (structs/swoosh.h: an element links to its
+ * previous element in its first word, to its next in its second). */
+typedef struct T2ListNode {
+    struct T2ListNode *prev;
+    struct T2ListNode *next;
+} T2ListNode;
+
+/* Unlinks arg1 from the used list, appends it to the free list. */
+void NodePool_Free(void *arg0, void *arg1) {
+    SwooshPool *p = arg0;
+    T2ListNode *n = arg1;
+
+    if (n->prev != NULL) n->prev->next = n->next;
+    if (n->next != NULL) n->next->prev = n->prev;
+    if (p->used.head == n) p->used.head = n->next;
+    if (p->used.tail == n) p->used.tail = n->prev;
+    p->used.count--;
+    if (p->free.count == 0) {
+        p->free.head = n;
+        p->free.tail = n;
+        n->prev = NULL;
+        n->next = NULL;
+    } else {
+        n->prev = p->free.tail;
+        n->next = NULL;
+        ((T2ListNode *)p->free.tail)->next = n;
+        p->free.tail = n;
+    }
+    p->free.count++;
+}
+#else
 typedef signed char s8;
 typedef unsigned char u8;
 typedef signed short s16;
@@ -54,3 +89,4 @@ void NodePool_Free(void *arg0, void *arg1)
   }
   *((s32 *) (((s8 *) arg0) + 8)) = (s32) ((*((s32 *) (((s8 *) arg0) + 8))) + 1);
 }
+#endif
