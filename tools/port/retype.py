@@ -18,8 +18,14 @@ that should not (a cast dropped where the callee's prototype already takes the p
 
 and repeats until nothing changes (C feeds on the warnings D creates). Then every edited
 file goes through tools/asm_diff.py; a file whose N64 code changes or that no longer
-compiles is retried with rule D alone and, failing that, put back. Files with a `_2`
-suffix (module 2, not linked on the host) are skipped unless named.
+compiles is retried with rule D alone and, failing that, put back (with --params the
+whole tree is checked and a failing file is put back as it was). Files with their own
+scalar typedefs (no common.h, so no sptr) are left alone.
+
+  P  (--params N) a call that passes a pointer or an sptr to an `s32`/`u32` parameter,
+     or a function that returns one through an `s32` return type: the parameter / return
+     type becomes sptr / uptr in the definition and in every declaration (src/ and
+     include/), then the file rules run again on the callers
 """
 import argparse, collections, glob, os, re, shutil, subprocess, sys, tempfile
 from concurrent.futures import ThreadPoolExecutor
@@ -135,7 +141,14 @@ def retype_decl(lines, i, name):
     return True
 
 
+def self_contained(text):
+    """a file with its own scalar typedefs (no common.h): it has no sptr/uptr"""
+    return re.search(r'^typedef\s+(?:signed\s+)?int\s+s32\s*;', text, re.M) is not None
+
+
 def one_pass(path, inc, rules):
+    if self_contained(open(path, errors='replace').read()):
+        return False, []
     ds, rc = diags(path, inc)
     if rc != 0 and not ds:
         return False, ds
@@ -306,6 +319,8 @@ def params_pass(rows, srcs):
         if len(defs.get(name, [])) != 1:
             continue
         f, i = defs[name][0]
+        if self_contained(open(f, errors='replace').read()):
+            continue
         line = open(f, errors='replace').read().split('\n')[i]
         m = re.match(PROTO % re.escape(name), line)
         if not m:
@@ -326,6 +341,8 @@ def params_pass(rows, srcs):
     touched = []
     for f in srcs:
         t = open(f, errors='replace').read()
+        if self_contained(t):
+            continue
         lines = t.split('\n')
         ch = False
         for i, line in enumerate(lines):

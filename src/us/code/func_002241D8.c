@@ -6,7 +6,7 @@
 #include "structs/game_object.h"
 #include "protos/scene.h"
 
-extern void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, s32);
+extern void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, sptr);
 
 /* CScene__FindObjectType, inlined: the index of id in the level's object type table. */
 static __inline__ s32 find(IdTable *table, u16 id) {
@@ -24,7 +24,7 @@ static __inline__ s32 find(IdTable *table, u16 id) {
     return -1;
 }
 
-void CScene__SetInstanceObjectType(CScene *scene, CGameObjectInstance *obj, s32 type, s32 anim) {
+void CScene__SetInstanceObjectType(CScene *scene, CGameObjectInstance *obj, s32 type, sptr anim) {
     s32 index = 0;
     if (obj->m_nTypeFlag != type) {
         index = find(scene->m_pObjectTypes, type);

@@ -44,7 +44,7 @@ void CMtxF__TransformBox(void *, void *, void *);
 void CAnimationState__Reset(void *);
 sptr CGameObjectInstance__PickRandomAnim(Actor *, sptr, sptr);
 
-void CGameObjectInstance__SetupAnimation(Actor *actor, s32 a1, s32 a2, s32 anim) {
+void CGameObjectInstance__SetupAnimation(Actor *actor, s32 a1, s32 a2, sptr anim) {
     s32 *model;
     s32 *set;
     s32 id;

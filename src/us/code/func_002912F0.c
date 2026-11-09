@@ -8,7 +8,7 @@ typedef struct {
     /* 0xC */ s32 count;
 } Arena;
 
-void alHeapInit(Arena *arg0, s32 arg1, s32 arg2) {
+void alHeapInit(Arena *arg0, sptr arg1, s32 arg2) {
     s32 temp_v1;
 
     temp_v1 = 0x10 - (arg1 & 0xF);

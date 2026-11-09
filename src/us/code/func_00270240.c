@@ -24,7 +24,7 @@ extern u8 gEngineApp_m_Settings_unk15[]; /* local type: the field's real type (o
 extern s32 __osDisableInt(void);         /* disable interrupts */
 extern void __osRestoreInt(s32 mask);    /* restore interrupts */
 extern void CMutex__Construct(CMutex *lock);
-extern void alHeapInit(void *heap, s32 base, s32 len);    /* alHeapInit */
+extern void alHeapInit(void *heap, sptr base, s32 len);    /* alHeapInit */
 extern void amCreateAudioMgr(ALSynConfig *cfg, s32 a, AiCfg *ai);
 extern BankRes *VM_Alloc(s32 a, s32 b, s32 c);
 extern void CAudioWorld__LoadSfxDataFile(CAudioWorld *m);

@@ -99,7 +99,7 @@ void CScene__RequestWarp(struct CScene *, s32, s32);
 void CScene__RestoreFiredEvent(void *, void *);
 void CScene__SetEventFired(struct CScene *, void *, s32);
 void CScene__SetEventFiredInLevel(void *, s32, s32, s32);
-void CScene__SetInstanceObjectType(struct CScene *, struct CGameObjectInstance *, s32, s32);
+void CScene__SetInstanceObjectType(struct CScene *, struct CGameObjectInstance *, s32, sptr);
 void CScene__SetInstanceSavedBit(struct CScene *, void *, s32);
 void CScene__SetInstanceSavedBitInLevel(void *, s32, s32, s32);
 void CScene__SetLevelActorKilled(void *, void *, s32);
