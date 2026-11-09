@@ -12,7 +12,15 @@ extern s32 CAudioWorld__PlaySoundIndex(void *, s32, CVector3, s32);
 extern int CAudioWorld__GetForce2D(struct ContextRecAt2BC0 *arg0);
 extern void CAudioWorld__SetForce2D(struct ContextRecAt2BC0 *arg0, int arg1);
 extern int CAudioWorld__PlaySoundIndex(void *arg0, int arg1, CVector3 arg2, int arg3);
+#ifdef TARGET_PORT
+int T2Port_AudioReady(void);
+#endif
 int Sound__PlayIndex2D(int arg0) {
+#ifdef TARGET_PORT /* no sound bank on the host yet: audio off (port/game/t2audio.c) */
+    if (!T2Port_AudioReady()) {
+        return 0;
+    }
+#endif
     int temp_s0;
     int temp_s1;
     if (gEngineApp_m_Settings.unk1C8 != 0) {

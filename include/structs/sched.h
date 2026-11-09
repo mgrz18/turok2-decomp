@@ -57,7 +57,7 @@ typedef struct T2Sched {
     /* 0x2F8 */ T2ScTask *curRDPTask;
     /* 0x2FC */ u32 frameCount;
     /* 0x300 */ s32 doAudio;
-} T2Sched; /* size 0x304 */
+} T2Sched;
 #endif
 
 #endif

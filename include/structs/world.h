@@ -60,6 +60,16 @@ typedef struct CGeomHeader {
     /* 0x00 */ s32 m_Data[7];
 } CGeomHeader; /* size 0x1C */
 
+#ifdef TARGET_PORT
+/* A delayed level event (CScene.m_DelayedEvents): the event record and the time left. */
+typedef struct CDelayedEvent {
+    /* 0x00 */ struct CDelayedEvent *m_pLast;
+    /* 0x04 */ struct CDelayedEvent *m_pNext;
+    /* 0x08 */ struct LevelEvent *m_pEvent;
+    /* 0x0C */ f32 m_Time;
+} CDelayedEvent; /* size 0x10 */
+#endif
+
 /* Turok 3's CScene, the level (gScene). Called CWorld here until round N3;
  * CSceneSector and CSceneRecord were CWorldSector and CWorldRecord. */
 typedef struct CScene {
@@ -143,7 +153,15 @@ typedef struct CScene {
     /* 0x01174 */ s32 *m_pAltRecordIndex;
     /* 0x01178 */ CSceneRecord *m_pRecords;
     /* 0x0117C */ CSceneRecord *m_pAltRecords;
+#ifdef TARGET_PORT
+    /* the delayed level events (CScene__QueueDelayedEvent, CScene__UpdateDelayedEvents;
+     * CScene__DecompressLinks builds the free list): typed on the host */
+    CList m_DelayedEvents;                        /* 0x01180 */
+    CList m_FreeDelayedEvents;                    /* 0x01194 */
+    CDelayedEvent m_DelayedEventPool[0x30];       /* 0x011A8 */
+#else
     /* 0x01180 */ u8 unk_1180[0x14A8 - 0x1180];
+#endif
     /* 0x014A8 */ s32 m_nSectors;
     /* 0x014AC */ CSceneSector m_Sectors[128];
     /* 0x018AC */ u8 unk_18AC[0x4];

@@ -32,6 +32,30 @@ struct Face {
 struct Face;
 typedef struct Face Face;
 struct Face;
+#ifdef TARGET_PORT /* the same fields at the host offsets of CScene (structs/world.h) */
+#include "structs/world.h"
+struct WorldRecAt1B40C {
+    char pad0[__builtin_offsetof(CScene, m_pBitSections)];
+    void *tree;
+    char pad70[__builtin_offsetof(CScene, m_nRecords) - __builtin_offsetof(CScene, m_pBitSections) - sizeof(void *)];
+    s32 nfaces;
+    s32 nedges;
+    void *verts;
+    void *edgeData;
+    struct Face *faces;
+    struct Face *edges;
+    CList listA;
+    CList listB;
+    CDelayedEvent buckets[0x30];
+    char pad14A8[__builtin_offsetof(CScene, m_nLevel) - __builtin_offsetof(CScene, m_nSectors)];
+    s32 group;
+};
+_Static_assert(__builtin_offsetof(struct WorldRecAt1B40C, listA) == __builtin_offsetof(CScene, m_DelayedEvents), "listA");
+_Static_assert(__builtin_offsetof(struct WorldRecAt1B40C, faces) == __builtin_offsetof(CScene, m_pRecords), "faces");
+_Static_assert(__builtin_offsetof(struct WorldRecAt1B40C, group) == __builtin_offsetof(CScene, m_nLevel), "group");
+#define BUCKET_LINKS T2_OFFSETOF(CDelayedEvent, m_pLast), T2_OFFSETOF(CDelayedEvent, m_pNext)
+#else
+#define BUCKET_LINKS 0, 4
 struct WorldRecAt1B40C;
 struct WorldRecAt1B40C {
     char pad0[0x6C];
@@ -49,6 +73,7 @@ struct WorldRecAt1B40C {
     char pad14A8[0x18FA8 - 0x14A8];
     s32 group;               /* 0x18FA8 (0x1B40C) */
 };
+#endif
 struct WorldRecAt1B40C;
 typedef struct WorldRecAt1B40C WorldRecAt1B40C;
 typedef struct ResidentDataChunk {
@@ -95,8 +120,8 @@ void CScene__DecompressLinks(WorldRecAt1B40C *world, void ***handle) {
         world->edgeData = &((ResidentDataChunk *)(l2))->data[0];
         world->edges = (Face *)&((ResidentDataChunk *)(l3))->data[0];
         world->nedges = count;
-        CList__Construct(&world->listA, 0, 4);
-        CList__Construct(&world->listB, 0, 4);
+        CList__Construct(&world->listA, BUCKET_LINKS);
+        CList__Construct(&world->listB, BUCKET_LINKS);
         for (k = 0; k < 0x30; k++) {
             CList__AddTail(&world->listB, &world->buckets[k]);
         }

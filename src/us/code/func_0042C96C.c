@@ -2,6 +2,25 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "protos/list.h"
+#ifdef TARGET_PORT
+/* The port: the scene's delayed events typed (structs/world.h): fire them all and free them. */
+#include "common.h"
+#include "structs/world.h"
+
+extern void LevelEvent_Fire(s32);
+void func_0042C96C(CScene *scene) {
+    CDelayedEvent *d = scene->m_DelayedEvents.m_pHead;
+    CDelayedEvent *next;
+
+    while (d != NULL) {
+        next = d->m_pNext;
+        LevelEvent_Fire((s32)(sptr)d->m_pEvent);
+        CList__Remove(&scene->m_DelayedEvents, d);
+        CList__AddHead(&scene->m_FreeDelayedEvents, d);
+        d = next;
+    }
+}
+#else
 struct Entry_func_8044D794_de;
 typedef struct Entry_func_8044D794_de Entry_func_8044D794_de;
 struct Owner_func_8044D794_de;
@@ -37,3 +56,4 @@ void func_0042C96C(Owner_func_8044D794_de *arg0) {
         entry = next;
     }
 }
+#endif

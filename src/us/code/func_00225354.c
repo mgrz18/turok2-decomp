@@ -3,6 +3,33 @@
 #include "structs/event.h"
 #include "protos/list.h"
 
+#ifdef TARGET_PORT
+/* The port: the scene's delayed events typed (structs/world.h); the views below have the N64
+ * offsets. */
+#include "structs/world.h"
+
+s32 LevelEvent_Fire(s32);
+f32 HalfToFloat(u16);
+void CScene__QueueDelayedEvent(CScene *scene, LevelEvent *event) {
+    CDelayedEvent *d = scene->m_FreeDelayedEvents.m_pHead;
+    f32 t;
+
+    if (d != NULL) {
+        CList__Remove(&scene->m_FreeDelayedEvents, d);
+        CList__AddHead(&scene->m_DelayedEvents, d);
+        d->m_pEvent = event;
+    } else {
+        d = scene->m_DelayedEvents.m_pTail;
+        LevelEvent_Fire((s32)(sptr)d->m_pEvent);
+        d->m_pEvent = event;
+    }
+    t = HalfToFloat(event->delay);
+    d->m_Time = t;
+    if (event->flags & 2) {
+        d->m_Time = t * 15.0f;
+    }
+}
+#else
 typedef struct {
     /* 0x00 */ u8 links[8];
     /* 0x08 */ s32 def;
@@ -39,3 +66,4 @@ void CScene__QueueDelayedEvent(VoiceOwner *arg0, LevelEvent *arg1) {
         var_s0->length = (f32) (temp_f0 * 15.0f);
     }
 }
+#endif
