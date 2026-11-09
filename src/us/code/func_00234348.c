@@ -35,12 +35,17 @@ typedef struct {
     /* 0x24 */ u8 blends[1];
 } TrailTrack;
 
+/* structs/swoosh.h Swoosh */
 typedef struct {
-    /* 0x00 */ u8 pad0[0x8];
+    /* 0x00 */ void *prev;
+    /* 0x04 */ void *next;
     /* 0x08 */ TrailTrack *track;
     /* 0x0C */ void *first;
     /* 0x10 */ void *second;
-    /* 0x14 */ u8 model[0x28 - 0x14];
+    /* 0x14 */ s32 model[2];
+    /* 0x1C */ void *owner;
+    /* 0x20 */ s32 id;
+    /* 0x24 */ f32 time;
     /* 0x28 */ f32 phase;
     /* 0x2C */ u8 pad2C[0x3C - 0x2C];
     /* 0x3C */ u32 flags;

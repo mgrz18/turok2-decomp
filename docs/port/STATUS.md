@@ -153,6 +153,86 @@ Rows r1-* and r4-* were found on the branches; I-* during the merge (C18). Every
 6. 64-bit: 1,727 pointer-width warnings, **1,019 truncating** (`retype.py --dry --rules ""` on
    this tree; 2,828 before r3), 999 disagreeing declarations. Each crash above was one of them.
 
+## Round 4, part s5: the swoosh/effect system typed, N64-offset sweep (menus, cameras, level load)
+
+Branch `names-R4_s5` (from 474e40af). Every commit: `tools/asm_diff.py --base 474e40af -j 8` = 0
+differences (over the whole tree, 3,938 files, for the commits that touch `include/`).
+
+**The swoosh/effect system is typed and runs on the host (r1-11's stub is gone).**
+`include/structs/swoosh.h` lays out `CSwooshSystem` (`gEngineApp_m_SwooshSystem`, CEngineApp +
+0x19608, N64 size 0x95B4: it runs 0x1C bytes into `unk22BA0`): the ribbon vertex pool (2 x 300
+`SwooshVtx`, the count at 0x2580, the cursor at 0x2584), 96 `SwooshNode` points (0xB8) and their
+free list at 0x6A88, 32 `Swoosh` trails (0x54) with their NodePool at 0x7514 (live swooshes =
+`m_SwooshPool.used`, head 0x7520), 3 `SwooshTimer`s (0x1C) with their pool at 0x7580, 100
+`SwooshDecal`s (0x50, ground shadows/scorches) in 10 kind `CList`s at 0x94D8 and the free list at
+0x95A0. mips `_Static_assert`s keep the N64 offsets. `structs/game.h` (TARGET_PORT) embeds it as
+`union { CSwooshSystem m_SwooshSystem[1]; u8 _SwooshBytes[0x22BC0 - 0x19608]; }`, so gendata's
+alias `gEngineApp_m_SwooshSystem` and everything after it follow the host size.
+
+The owner of a swoosh is a `CGameObjectInstance` when `flags & 1` (count `m_ActiveSwooshes` at
+0x10F) and a `CParticle` when `flags & 2` (0x1B5); `Trail_AddNode` takes a `CParticle` (effect
+flags, `m_pOwner` as the key with `flags & 8`, `header.m_nObjType` as the id).
+
+| what | files |
+|---|---|
+| on the shared types (same C for N64 and host) | `func_0042D410` (init: the host stub is gone), `SwooshSystem_Update`, `_UpdateSwooshes`, `_UpdateTimers`, `RibbonVtxPool_Reset`, `Swoosh_TakeNode`, `SwooshGroup_Remove`, `Swoosh_NewNode`, `Swoosh_DetachOwner`, `func_002368B0`, `func_002360A0`, `Swoosh_AddParticleNode`, `func_002364A4` (decal), `SwooshSet_FreeOwner`, `func_00236444` (timer), `func_00235C30` (decal draw), `Trail_AddNode`, `Trail_DrawAll`, `Trail_Draw` |
+| views with their pointer members (host-correct, N64 identical) | `Swoosh_Update`, `Trail_DetachOwner` (CParticle, owner counts by type; its `register asm` hack is N64-only), `Trail_PlaceNodes`, `Trail_ComputeNodeFrame`, `Trail_ComputeFrames`, `Trail_DrawTextured`, `Morph_BlendVertices(Tex)`, `func_00236D10`, `func_00236D50`; `rw/abu_types.h`: `Actor_func_802A274C_de`, `ObjRecAt28V1`, `State802A6DF8`, `Node438C`, `Morph` (its pointer/float unions are floats on the host) |
+| host bodies (`#ifdef TARGET_PORT`) | the generic lists `DList_AddHead`, `DList_AddTail`, `NodePool_Alloc`, `NodePool_Free`, `func_0026D230` (they wrote 4-byte words at N64 offsets); `RibbonVtxPool_Alloc` returns the vertex pointer at host width; the decal draw reads the matrix translation as host words |
+
+Check: `port/game/t2swoosh.c` (`T2Swoosh_SelfTest`, run by `turok2 --game` after the frames; one
+line in `port/app/main.cpp`) builds a private `CSwooshSystem` with the game's code and checks the
+pools (96/32/3/100, links both ways), a timer firing twice and freed, a swoosh of three points
+(lengths 5 + 12, fractions, removing a point), a decal placed and freed by its owner, the ribbon
+pool (host pointers, the 300 limit): `t2: swoosh self test: OK (0 failed)`. In the game the
+system is built twice (mode 17 and mode 0's `CScene__LoadLevel`) and updated every frame; mode 0
+spawns no swoosh, so the draw functions have only run on empty lists so far.
+
+```
+game: 300 frames in 2.78 s, 1414 thread switches, 151 gfx tasks (151 drawn), 0 audio tasks, 0 PI DMAs, 0 missing-function calls
+t2: swoosh self test: OK (0 failed)
+OK (0 failed checks)
+```
+
+**N64-offset sweep** (boot/menu/camera path). `tools/port/n64_offsets.py` counts the sites
+(`M2C_FIELD`, `((s8 *)x) + 0xNN`, `*(T *)(x + 0xNN)`, `P_S32(p, 0xNN)` macros):
+474e40af **378 sites in 135 files** -> **345 in 118** (m2c 62 -> 62, casts 161 -> 139, derefs
+87 -> 80, macros 68 -> 64). Not in that count: the 34 swoosh files above, whose local pad views
+were the larger part. Fixed here:
+- the camera's menu pool, `(u8 *)player->m_pCamera + 0x53C` (I11's offset, used by every
+  `MenuPool_OpenMenu`/`CountOpen` caller: pak menus, save portal, character/player setup,
+  rumble, messages): `+ T2_OFFSETOF(CCamera, m_MenuPool)` in 21 files, the module-2 copies (func_0045xxxx)
+  included;
+- `CPlayer` views: `m_pCamera` (0x51C), `m_ContState.m_pContState` (0xA50),
+  `m_Data.m_CheckPointWarpID` (0x92C) in `ShowPlayerMessage` (func_004233E8), func_00255C80,
+  `SavePortalMenu_*` (func_00423210/278/364);
+- `CScene__LoadLevel` (mode 0's init): the actor stride 0x288, `m_WeaponActor` (+0x288) and the
+  player link 0x1320;
+- `CCamera__GetViewOrigin` (0x24C, `m_vTCorners`), `CCameraPool__ReleaseAllTexts` (main camera
+  0x40, `m_ActiveTextList` 0xE28/0xE2C, `m_FreeTextList` 0xF0C).
+
+For the merge:
+- `include/structs/game.h` (the CEngineApp swoosh member, TARGET_PORT only), new
+  `include/structs/swoosh.h`, `include/rw/abu_types.h` (5 structs: pads -> the same-size
+  pointer members), `port/app/main.cpp` (one CHECK line + one extern), new
+  `port/game/t2swoosh.c`, new `tools/port/n64_offsets.py`.
+- s2 territory touched by one-token edits only: the `+ 0x53C` lines of the pak/menu files
+  (func_0041DF50, func_0041E1D8, func_0041EA84, func_0042019C, func_004206B8, func_0042085C,
+  func_00423768, func_00423880, func_004183C0 and the `_2` copies); `func_00413230.c` itself is
+  untouched.
+- Rerun gendata with a fresh cache (CEngineApp's host layout changed after +0x19608).
+
+Next (s5's area):
+1. Exercise the trail draw path in the game (a level with swooshes: `Trail_DrawTextured` /
+   `Morph_BlendVertices` write vertices and GBI through views that are now host-sized, but the
+   textured path also reads `Texture_Request(trail->model)` handles (`s32 texture[2]` at 0x14,
+   func_00207914's handle: s3's `Material` work on macOS changes it, keep the two in step).
+2. `D_80119850` (`B21World`, func_00289F30) is a view from CEngineApp + 0x22BA0 into CGame at N64
+   offsets (`sub5DC` = the menu pool): retype on `gEngineApp_m_Game`.
+3. The 345 counted sites (top: func_002568CC 31 (player), func_0043EC68 19, func_00258964 12,
+   func_00255F04, func_00275450 (`alCSeqNew`) 8), and the local pad views that the counter does not
+   see (the swoosh files were 34 of them): the same recipe, `T2_OFFSETOF`/typed members, asm_diff
+   per batch.
+
 ## Round 2 (history)
 
 

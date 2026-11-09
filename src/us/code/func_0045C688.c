@@ -6,6 +6,7 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "structs/camera.h"
 
 /* Start the selected level, then open the next menu page (on the player's own
  * menu when there is a player). */
@@ -31,7 +32,7 @@ s32 DamagedPakMenu_SelectRetry_2(void *arg0, Menu *event) {
     gPakMenuLeaving = 1;
     if (PakMenu_CheckPak_2(event, mode, 1) != 0) {
         if (event->player != NULL) {
-            menu = (u8 *)event->player->m_pCamera + 0x53C;
+            menu = (u8 *)event->player->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool);
         } else {
             menu = &gEngineApp_m_Game_m_MenuPool;
         }

@@ -7,7 +7,7 @@
 extern void CMtxF__SetScale(void *, f32, f32, f32);
 extern void CMtxF__Identity(void *);
 extern void Trail_ComputeNodeFrame(Node438C *, Node438C *, struct GameplayCamera *, void *);
-extern void CMtxF__ToMtxAffine(void *, s32);
+extern void CMtxF__ToMtxAffine(void *, sptr);
 void Trail_ComputeFrames(void *arg0, void *arg1) {
     f32 matrix[16];
     Node438C *first;

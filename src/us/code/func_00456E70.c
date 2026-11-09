@@ -8,6 +8,7 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "structs/camera.h"
 
 typedef struct O01Sel { s32 v; s32 w; } O01Sel;
 void Pak_ProbeSlot_2(s32 ch);
@@ -73,7 +74,7 @@ void PakMenu_InitSaveProfile_2(Menu *own) {
     msg = O01Pick(&sel);
     if (gDamagedPakContinued != 0) {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu_2((u8 *)own->player->m_pCamera + 0x53C, msg, plr, plr->m_ContState.m_pContState, 0);
+        MenuPool_OpenMenu_2((u8 *)own->player->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), msg, plr, plr->m_ContState.m_pContState, 0);
     } else {
         if (gPakMenuAnyPak != 0) {
             pad = gPakMenuPort;

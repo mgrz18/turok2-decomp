@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
+#include "structs/camera.h"
 
 
 
@@ -12,6 +13,6 @@ s32 TeamMenu_ChooseBlue(s32 arg0, Menu *arg1) {
     temp_a2 = arg1->player;
     temp_a2->m_nDeathmatchTeamSelected = 0;
     temp_a2->m_pOptions->m_nCharacter = 0;
-    MenuPool_OpenMenu((sptr) temp_a2->m_pCamera + 0x53C, &gCharacterMenuDesc, (sptr) temp_a2, (sptr) temp_a2->m_ContState.m_pContState, temp_a2->m_nController);
+    MenuPool_OpenMenu((sptr) temp_a2->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), &gCharacterMenuDesc, (sptr) temp_a2, (sptr) temp_a2->m_ContState.m_pContState, temp_a2->m_nController);
     return 1;
 }

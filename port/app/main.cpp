@@ -70,6 +70,9 @@ namespace {
 
 constexpr uint32_t kGameVersionUS = 0x49088A11; // ROM header CRC1, the archive's `version`
 
+#ifdef T2_HAVE_GAME
+extern "C" int T2Swoosh_SelfTest(void);
+#endif
 int gFailures = 0;
 #define CHECK(cond, ...)                                                                                     \
     do {                                                                                                     \
@@ -404,6 +407,7 @@ int main(int argc, char** argv) {
         g.lowMemory = args.lowMemory;
         g.verbose = args.verbose;
         CHECK(T2Game_Run(window, g) == 0, "game run");
+        CHECK(T2Swoosh_SelfTest() == 0, "swoosh system self test");   // port/game/t2swoosh.c
     }
 #endif
     if (args.window && !args.game) {
