@@ -14,9 +14,12 @@ engine already uses as its cache key:
     t2/units         binary table of contents (little-endian; layout in ARCHIVE.md)
     t2/units.tsv     the same, readable (romfs.manifest_tsv)
     t2/types         type id -> type name / CCache descriptions (TSV)
+    t2/swap          per-unit byte-swap plans (swap_spec.json run through swapcheck.py):
+                     what a little-endian host reverses to get each unit in host order
     t2/u/XXXXXXXX    one load unit: 64-byte libultraship resource header (type Blob
                      'OBLB', v0) + u32 data size + the bytes. RNC streams are stored
-                     unpacked; everything stays in ROM (big-endian) byte order.
+                     unpacked; everything stays in ROM (big-endian) byte order: the
+                     reader applies t2/swap once per load on a little-endian host.
 
 Same ROM -> byte-identical archive (fixed entry order, timestamps and attributes;
 deflate output depends only on the zlib version, recorded in t2/info.json; use
@@ -40,10 +43,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import rnc  # noqa: E402
 import romfs  # noqa: E402
 import romid  # noqa: E402
+import swapcheck  # noqa: E402
 
 TOOL = "mkarchive.py"
-FORMAT_MAJOR = 1          # bump when an entry's layout or naming changes (the port re-extracts)
-FORMAT_MINOR = 0
+FORMAT_MAJOR = 2          # bump when an entry's layout or naming changes (the port re-extracts)
+FORMAT_MINOR = 0          # 2.0: t2/swap (byte-swap plans) added; the port refuses 1.x archives
 
 LUS_HEADER_SIZE = 0x40
 LUS_ENDIAN_LITTLE = 0     # Ship::Endianness::Little
@@ -52,6 +56,9 @@ LUS_BLOB_VERSION = 0      # ResourceFactoryBinaryBlobV0
 T2_UNIT_MAGIC = b"T2LU"   # T2 block inside the header's reserved bytes (0x14..0x40)
 T2_UNITS_MAGIC = b"T2UT"
 T2_VERSION_MAGIC = b"T2AV"
+T2_SWAP_MAGIC = b"T2SW"
+SWAP_WIDTH_CODE = {2: 1, 4: 2, 8: 3}
+SWAP_INDEX_SIZE = 20
 UNIT_PREFIX = "t2/u/"
 ZIP_DATE = (1980, 1, 1, 0, 0, 0)
 
@@ -95,8 +102,39 @@ def version_file(rom, sha1):
             struct.pack("<HH", FORMAT_MAJOR, FORMAT_MINOR) + bytes.fromhex(sha1))
 
 
+def swap_plan_bytes(runs, planes):
+    """One unit's plan (ARCHIVE.md "t2/swap"): runs {u32 offset, u32 count << 2 | width code},
+    then tables {u32 offset, u32 records, u32 swaps, swaps x {u16 plane, u16 width}}."""
+    out = bytearray()
+    for o, w, n in runs:
+        if n >= 1 << 30:
+            raise ValueError("swap run too long")
+        out += struct.pack("<II", o, (n << 2) | SWAP_WIDTH_CODE[w])
+    for d, n, swaps in planes:
+        out += struct.pack("<III", d, n, len(swaps))
+        for p, w in swaps:
+            out += struct.pack("<HH", p, w)
+    return bytes(out)
+
+
+def swap_table(rows, plans):
+    """t2/swap: 'T2SW' u16 major u16 minor u32 count u32 0, then count x {u32 key, u32 hostSize,
+    u32 offset (from the start of the entry), u32 runs, u32 tables}, sorted by key, then the plans.
+    Units whose plan is empty (byte streams, texels, VADPCM) have no record."""
+    recs = [(r, plans[r["key"]]) for r in rows if plans[r["key"]][0] or plans[r["key"]][1]]
+    off = 16 + SWAP_INDEX_SIZE * len(recs)
+    head = bytearray(T2_SWAP_MAGIC + struct.pack("<HHII", FORMAT_MAJOR, FORMAT_MINOR, len(recs), 0))
+    body = bytearray()
+    for r, (runs, planes, blob) in recs:
+        head += struct.pack("<IIIII", r["key"], r["host_size"], off + len(body), len(runs), len(planes))
+        body += blob
+    return bytes(head + body)
+
+
 # ---------------------------------------------------------------- unit bytes
 _ROM = None
+_DATA = None
+_SPEC = None
 
 
 def _init(rom):
@@ -124,6 +162,32 @@ def unit_data(rom, rows, jobs=1):
         if r["key"] not in data:
             data[r["key"]] = rom[r["key"]:r["key"] + r["size"]]
     return data
+
+
+def _plan(job):
+    key, typ = job
+    runs, planes, errors = swapcheck.unit_plan(_SPEC, _DATA[key], key, typ)
+    return key, runs, planes, swap_plan_bytes(runs, planes), errors
+
+
+def swap_plans(rows, data, jobs=1):
+    """{key: (runs, planes, plan bytes)} for every unit, from tools/assets/swap_spec.json."""
+    global _DATA, _SPEC
+    _DATA = data
+    _SPEC = swapcheck.Spec(os.path.join(os.path.dirname(os.path.abspath(__file__)), "swap_spec.json"),
+                           os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+    work = [(r["key"], r["type"]) for r in rows]
+    if jobs > 1:
+        ctx = multiprocessing.get_context("fork")
+        with ctx.Pool(jobs) as pool:
+            res = pool.map(_plan, work, chunksize=64)
+    else:
+        res = [_plan(j) for j in work]
+    _DATA = None
+    bad = [(k, e) for k, _, _, _, e in res if e]
+    if bad:
+        raise SystemExit("swap spec errors in %d units, first %08X: %s" % (len(bad), bad[0][0], bad[0][1][:3]))
+    return {k: (runs, planes, blob) for k, runs, planes, blob, _ in res}
 
 
 # ---------------------------------------------------------------- build
@@ -160,6 +224,9 @@ def build(rom_bytes, jobs=1, log=print):
     log("%d load units, %d types (%.1fs)" % (len(rows), len(types), time.time() - t0))
     data = unit_data(rom, rows, jobs)
     log("unit bytes ready (%.1fs)" % (time.time() - t0))
+    plans = swap_plans(rows, data, jobs)
+    swap = swap_table(rows, plans)
+    log("swap plans ready: %d bytes (%.1fs)" % (len(swap), time.time() - t0))
 
     info = {
         "rom": known["name"], "sha1": sha1, "tool": TOOL,
@@ -169,6 +236,10 @@ def build(rom_bytes, jobs=1, log=print):
         "host_bytes": sum(r["host_size"] for r in rows),
         "rnc_unpacked": sum(1 for r in rows if r["flags"] & romfs.UF_RNC_UNPACKED),
         "zlib": zlib.ZLIB_VERSION,
+        "swap_units": sum(1 for p in plans.values() if p[0] or p[1]),
+        "swap_runs": sum(len(p[0]) for p in plans.values()),
+        "swap_tables": sum(len(p[1]) for p in plans.values()),
+        "swap_bytes": len(swap),
     }
     entries = [
         ("version", version_file(rom, sha1)),
@@ -176,6 +247,7 @@ def build(rom_bytes, jobs=1, log=print):
         ("t2/units", units_table(rows, type_ids)),
         ("t2/units.tsv", romfs.manifest_tsv(rows).encode()),
         ("t2/types", "".join("%d\t%s\t%s\n" % (i, t, descs[t]) for i, t in enumerate(types)).encode()),
+        ("t2/swap", swap),
     ]
     for r in rows:
         entries.append((unit_name(r["key"]), unit_entry(r, type_ids[r["type"]], data[r["key"]])))
@@ -214,7 +286,7 @@ def main(argv=None):
     ap.add_argument("--store", action="store_true", help="no compression (zlib-independent bytes)")
     ap.add_argument("--level", type=int, default=6, help="deflate level (default 6)")
     ap.add_argument("-j", "--jobs", type=int, default=min(8, os.cpu_count() or 1),
-                    help="processes for RNC unpacking (default min(8, cpus))")
+                    help="processes for RNC unpacking and swap plans (default min(8, cpus))")
     a = ap.parse_args(argv)
     t0 = time.time()
     with open(a.rom, "rb") as f:

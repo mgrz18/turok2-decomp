@@ -7,6 +7,16 @@
 
 CLoaderEntry *CLoader__AllocLoaderEntry(CLoader *thisx);
 
+#ifdef TARGET_PORT
+#include "t2asset_game.h"
+
+/* The host reads the whole request at once, on the caller's thread: the unit out of the
+ * archive, RNC unpacked and in host byte order (docs/assets/PORT.md 10.4). */
+void CLoader__LoadSync(CLoader *thisx, u32 address, s32 length, void *dest) {
+    (void)thisx;
+    T2Port_ReadAsset(address, dest, (u32)length);
+}
+#else
 /* Reads length bytes of ROM at address into dest, LOADER_CHUNK_SIZE at a
  * time, waiting for each. */
 void CLoader__LoadSync(CLoader *thisx, u32 address, s32 length, void *dest) {
@@ -37,3 +47,4 @@ void CLoader__LoadSync(CLoader *thisx, u32 address, s32 length, void *dest) {
         remaining -= chunkLength;
     } while (remaining != 0);
 }
+#endif

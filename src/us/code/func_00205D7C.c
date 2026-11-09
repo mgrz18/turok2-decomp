@@ -73,3 +73,48 @@ s32 CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
   __osRestoreInt(temp_v0_3);
   return var_s0;
 }
+
+#ifdef TARGET_PORT
+#include "structs/cache.h"
+
+/* The host form of the function above, typed (its m2c body writes CMemEntry fields at N64
+ * offsets and returns the entry as s32). ProPackDecompress (func_00200B00.c) calls it for the
+ * block a load unit is copied into: a fresh entry with the request's memFlags, locked, `size`
+ * bytes from the heap (from the top when memFlags has 0x20), on the address list. */
+CMemEntry *CCache__AllocDecompressBlock(CCacheEntry *request, u32 size) {
+    u32 flags = request->memFlags;
+    CMemEntry *node;
+    s32 token = __osDisableInt();
+    if (++gCache_mutex_count != 1) {
+        __osRestoreInt(token);
+        osRecvMesg(&gCache_mutex.queue, 0, 1);
+    } else {
+        __osRestoreInt(token);
+    }
+    node = CCache__AllocMemEntry(0, flags);
+    if (node != NULL) {
+        node->lockCount++;
+        node->flags |= 0x100;
+        node->data = (void *)CCache__HeapAlloc(0, size, (flags >> 5) & 1, flags);
+        if (node->data != NULL) {
+            node->size = size;
+            node->flags |= flags;
+            CCache__AddToAddressList(0, node);
+        } else {
+            if (--node->lockCount == 0) {
+                node->flags &= ~0x100;
+            }
+            CCache__FreeMemEntry(0, node);
+            node = NULL;
+        }
+    }
+    token = __osDisableInt();
+    if (--gCache_mutex_count != 0) {
+        __osRestoreInt(token);
+        osSendMesg(&gCache_mutex.queue, 0, 1);
+    } else {
+        __osRestoreInt(token);
+    }
+    return node;
+}
+#endif
