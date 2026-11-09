@@ -38,15 +38,17 @@ typedef struct MorphTiming {
     /* 0x08 */ f32 duration;
 } MorphTiming;
 
-typedef struct MorphOwner {
-    /* 0x00 */ u8 pad0[0x8];
+typedef struct MorphOwner {     /* structs/swoosh.h Swoosh */
+    /* 0x00 */ void *prev;
+    /* 0x04 */ void *next;
     /* 0x08 */ MorphTiming *timing;
     /* 0x0C */ u8 padC[0x24 - 0xC];
     /* 0x24 */ f32 remaining;
 } MorphOwner;
 
-typedef struct MorphClock {
-    /* 0x00 */ u8 pad0[0x8];
+typedef struct MorphClock {     /* structs/swoosh.h SwooshNode */
+    /* 0x00 */ void *prev;
+    /* 0x04 */ void *next;
     /* 0x08 */ f32 time;
 } MorphClock;
 

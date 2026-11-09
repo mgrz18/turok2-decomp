@@ -5,6 +5,9 @@ typedef unsigned char u8;
 typedef unsigned int u32;
 typedef signed int s32;
 typedef float f32;
+#ifdef TARGET_PORT
+#include "structs/swoosh.h"
+#endif
 typedef struct Emit Emit;
 typedef struct EmitDef {
                u8 pad0[2];
@@ -35,7 +38,7 @@ typedef struct Mtx64 {
 } Mtx64;
 typedef struct EmitNode EmitNode;
 struct EmitNode {
-               u8 pad0[4];
+               EmitNode *prev;
                EmitNode *next;
                f32 unk8;
                u8 padC[4];
@@ -46,22 +49,24 @@ struct EmitNode {
                f32 unkAC;
                EmitOwner *unkB0;
 };
-struct Emit {
-               u8 pad0[4];
+struct Emit {   /* structs/swoosh.h Swoosh */
+               Emit *prev;
                Emit *next;
                EmitDef *def;
-               s32 unkC;
-               s32 unk10;
-               u8 pad14[8];
+               void *unkC;
+               void *unk10;
+               s32 texture[2];
                EmitOwner *owner;
-               u8 pad20[4];
+               s32 id;
                f32 unk24;
-               u8 pad28[0xC];
+               f32 unk28;
+               f32 unk2C;
+               f32 unk30;
                s32 unk34;
                u8 pad38[4];
                u32 flags;
                EmitNode *list;
-               u8 pad44[4];
+               EmitNode *tail;
                s32 unk48;
                f32 unk4C;
 };
@@ -91,12 +96,20 @@ static inline void upd(EmitMgr *m, Emit *e, s32 c) {
 }
 void func_00236D50(EmitMgr *m, s32 c) {
     Emit *e;
+#ifdef TARGET_PORT
+    for (e = ((CSwooshSystem *)m)->m_SwooshPool.used.head; e != ((void *)0); e = e->next) {
+#else
     for (e = m->head; e != ((void *)0); e = e->next) {
+#endif
         if (e->unk34 < 0) {
             upd(m, e, c);
         }
     }
+#ifdef TARGET_PORT
+    for (e = ((CSwooshSystem *)m)->m_SwooshPool.used.head; e != ((void *)0); e = e->next) {
+#else
     for (e = m->head; e != ((void *)0); e = e->next) {
+#endif
         if (e->unk34 > 0) {
             upd(m, e, c);
         }

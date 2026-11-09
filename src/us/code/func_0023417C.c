@@ -26,15 +26,22 @@ struct EmitNode {
     /* 0xB0 */ CParticle *owner;
 };
 
+/* structs/swoosh.h Swoosh */
 typedef struct Emitter {
-    /* 0x00 */ u8 pad0[0x8];
+    /* 0x00 */ void *prev;
+    /* 0x04 */ void *next;
     /* 0x08 */ EmitInfo *info;
-    /* 0x0C */ u8 padC[0x24 - 0xC];
+    /* 0x0C */ void *tex0;
+    /* 0x10 */ void *tex1;
+    /* 0x14 */ s32 texture[2];
+    /* 0x1C */ void *owner;
+    /* 0x20 */ s32 id;
     /* 0x24 */ f32 unk24;
     /* 0x28 */ u8 pad28[0x3C - 0x28];
     /* 0x3C */ u32 flags;
     /* 0x40 */ EmitNode *nodes;
-    /* 0x44 */ u8 pad44[0x4C - 0x44];
+    /* 0x44 */ EmitNode *tail;
+    /* 0x48 */ s32 count;
     /* 0x4C */ f32 totalLength;
 } Emitter;
 

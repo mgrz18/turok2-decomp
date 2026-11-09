@@ -2,6 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
 #include "globals/engine.h"
+#include "structs/particle.h"
+#include "structs/swoosh.h"
 
 typedef struct R8Mtx { s32 w[16]; } R8Mtx;
 typedef struct R8Info {
@@ -9,40 +11,40 @@ typedef struct R8Info {
                f32 unk4;
                f32 unk8;
 } R8Info;
-typedef struct R8Pawn {
-                u8 pad0[0x10F];
-                u8 unk10F;      /* 0x10F (Rage Wars 0x13B) */
-                u8 pad110[0xA5];
-                u8 unk1B5;      /* 0x1B5 (Rage Wars 0x1D9) */
-} R8Pawn;
 typedef struct R8Part R8Part;
+/* structs/swoosh.h SwooshNode, Swoosh: the same layouts. */
 struct R8Part {
-               u8 pad0[4];
+               R8Part *prev;
                R8Part *next;
                f32 unk8;
                u8 padC[4];
                u8 unk10[0x18];
                R8Mtx mtx[2];
                u8 padA8[8];
-               s32 owner;
+               sptr owner;
 };
 typedef struct R8Emit R8Emit;
 struct R8Emit {
-               u8 pad0[4];
+               R8Emit *prev;
                R8Emit *next;
                R8Info *info;
-               u8 padC[0x10];
-               R8Pawn *owner;
-               u8 pad20[4];
+               void *tex0;
+               void *tex1;
+               s32 texture[2];
+               void *owner;     /* flags & 1: a CGameObjectInstance, & 2: a CParticle */
+               s32 id;
                f32 unk24;
-               u8 pad28[0x14];
+               f32 unk28;
+               f32 unk2C;
+               f32 unk30;
+               s32 layer;
+               s32 unk38;
                u32 flags;
                R8Part *parts;
 };
-typedef struct R8Cfg { u8 pad0[0x14]; s32 unk14; } R8Cfg;
-/* Turok 2 actor: matrices at 0x48, cfg at 0xF8 (Rage Wars 0x60 / 0x118). */
-typedef struct R8Actor { u8 pad0[0x48]; R8Mtx mtx[2]; u8 padC8[0x30]; R8Cfg *cfg; } R8Actor;
-typedef struct R8Mgr { u8 pad0[0x7520]; R8Emit *list; } R8Mgr;
+/* The particle a swoosh follows: m_mtxDraw at 0x48, m_pEffect at 0xF8 (Rage Wars 0x60 / 0x118). */
+typedef CParticle R8Actor;
+typedef CSwooshSystem R8Mgr;
 extern u8 gEngineApp_m_SwooshSystem[];
 void CMtxF__ToMtxAffine(void *, void *);
 void CMtxF__FromMtxAffine(void *, void *);
@@ -58,7 +60,7 @@ void Trail_DetachOwner(R8Mgr *mgr, R8Actor *who) {
     f32 k;
     s32 i;
     u8 *dst, *src;
-    e = mgr->list;
+    e = mgr->m_SwooshPool.used.head;
     if (e == ((void *)0)) {
         return;
     }
@@ -73,16 +75,16 @@ void Trail_DetachOwner(R8Mgr *mgr, R8Actor *who) {
                                 p->mtx[gEvenOdd] = p->mtx[gEvenOdd ^ 1];
                                 p->owner = 0;
                             } else {
-                                CMtxF__FromMtxAffine(sp10, &who->mtx[gEvenOdd]);
+                                CMtxF__FromMtxAffine(sp10, who->m_mtxDraw[gEvenOdd]);
                                 k = 0.01f;
-                                if (who->cfg->unk14 != 0) {
+                                if (who->m_pEffect->m_pModel != 0) {
                                     k = 0.29257143f;
                                 }
                                 CMtxF__ScaleAxes(sp10, k, k, k);
                                 CMtxF__ClampEntries(sp10);
                                 CMtxF__GetTranslation(sp10, p->unk10);
                                 if (e->flags & 4) {
-                                    CMtxF__GetScale(sp10, (u8 *)p + 0x1C);
+                                    CMtxF__GetScale(sp10, p->unk10 + 0xC);
                                 } else {
                                     CMtxF__ToMtxAffine(sp10, &p->mtx[gEvenOdd]);
                                 }
@@ -96,14 +98,19 @@ void Trail_DetachOwner(R8Mgr *mgr, R8Actor *who) {
             }
         } else if ((R8Actor *)e->owner == who) {
             if (e->flags & 2) {
+#ifdef TARGET_PORT
+              u8 *wm = who->m_mtxDraw[gEvenOdd];
+              if (e->unk24 > 0.0f) {
+#else
               register s32 t asm("$2") = gEvenOdd;
               register u8 *wm asm("$5") = (u8 *)((t << 6) + (sptr)who);
               __asm__("" : "+r"(wm));
               if (e->unk24 > 0.0f) {
                 wm += 0x48;
+#endif
                 CMtxF__FromMtxAffine(sp10, wm);
                 k = 0.01f;
-                if (who->cfg->unk14 != 0) {
+                if (who->m_pEffect->m_pModel != 0) {
                     k = 0.29257143f;
                 }
                 CMtxF__ScaleAxes(sp10, k, k, k);
@@ -113,13 +120,13 @@ void Trail_DetachOwner(R8Mgr *mgr, R8Actor *who) {
             }
             if (e->owner != ((void *)0)) {
                 if (e->flags & 1) {
-                    if (e->owner->unk10F != 0) {
-                        e->owner->unk10F = e->owner->unk10F - 1;
+                    if (((CGameObjectInstance *)e->owner)->m_ActiveSwooshes != 0) {
+                        ((CGameObjectInstance *)e->owner)->m_ActiveSwooshes = ((CGameObjectInstance *)e->owner)->m_ActiveSwooshes - 1;
                     }
                 }
                 if (e->flags & 2) {
-                    if (e->owner->unk1B5 != 0) {
-                        e->owner->unk1B5 = e->owner->unk1B5 - 1;
+                    if (((CParticle *)e->owner)->m_ActiveSwooshes != 0) {
+                        ((CParticle *)e->owner)->m_ActiveSwooshes = ((CParticle *)e->owner)->m_ActiveSwooshes - 1;
                     }
                 }
             }
