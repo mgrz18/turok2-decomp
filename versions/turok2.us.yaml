@@ -62,9 +62,11 @@ options:
 #   0x186C14 - 0x1B341C : virtual_text_1 (VM module 2 .text, linked at 0x403C14)
 #   0x1B341C - 0x1BFA00 : virtual_rodata_1
 #   0x1BFA00 - 0x1DEE00 : virtual_text_2 (VM module 3 .text)
-#   0x1DEE00 - 0x20E334 : virtual_rodata_2 / .sdata
-#   0x20E334 - 0x20F178 : assets_index (913 x uint32 offset table)
-#   0x20F178 - 0x1FF7AEC: compressed assets (textures, audio, levels)
+#   0x1DEE00 - 0x1E0000 : virtual_rodata_2 / .sdata
+#   0x1E0000 - 0x20F194 : audio_ctl (libaudio bank files, pointers relocated to 0x480000)
+#   0x20F194 - 0xBE1814 : audio_wavetable (VADPCM samples, gAudioRomBase)
+#   0xBE1814 - 0xFCBFB4 : sound_data (sound tree file: sfx, sequences, adec streams)
+#   0xFCBFB4 - 0x1FF7AEC: cartridge (cartridge index: every other asset; docs/assets/)
 #   0x1FF7AEC- 0x2000000: 0xFF trailer (ROM padding)
 segments:
   - name: header
@@ -5659,18 +5661,30 @@ segments:
     subsegments:
       - [0x1DEE00, data, virtual_rodata_2]
 
-  # 913-entry uint32 BE monotonic offset table (assets directory).
-  # Discovered in pass 4: it actually starts 0xCCC bytes earlier than
-  # 0x20F000 was claiming. Ends at 0x20F178.
-  - name: assets_index
+  # The asset region (docs/assets/README.md, ROMFS.md). It starts at 0x1E0000,
+  # where CAudioWorld__Initialize maps the audio control block
+  # (VM_Alloc(0x2F194, 0, 0x1E0000)). The "913-entry monotonic offset table" at
+  # 0x20E334 that the old layout called assets_index is the sfx instrument's
+  # soundArray inside that block, not a directory. All bin: tools/assets/ reads
+  # these from the ROM; splat extracts nothing here.
+  - name: audio_ctl
     type: bin
-    start: 0x20E334
+    start: 0x1E0000
 
-  # Compressed asset/level/audio/texture data. Treated as binary until
-  # the cartridge index is decoded.
-  - name: assets
+  # gAudioRomBase = 0x20F194: ALWaveTable.base is relative to it.
+  - name: audio_wavetable
     type: bin
-    start: 0x20F178
+    start: 0x20F194
+
+  # CAudioWorld__LoadSfxDataFile: VM_Alloc(0x3EA7A0, 0, 0xBE1814).
+  - name: sound_data
+    type: bin
+    start: 0xBE1814
+
+  # m_CartridgeIndex = 0xFCBFB4 (CEngineApp__Main -> CScene__Construct): ISet of 21.
+  - name: cartridge
+    type: bin
+    start: 0xFCBFB4
 
   # Final 0xFF trailer (ROM padding). Last non-FF byte at 0x1FF7AEB.
   - name: trailer
