@@ -1,8 +1,9 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-s32 CAI__Update(s32, s32);
+s32 CAI__Update(CGameObjectInstance *, CAI *);
 
-void func_0021F1B4(s32 arg0) {
-    CAI__Update(arg0, arg0 + 0x140);
+/* Updates the actor's AI (CGameObjectInstance.m_AI, 0x140). */
+void func_0021F1B4(CGameObjectInstance *arg0) {
+    CAI__Update(arg0, &arg0->m_AI);
 }
