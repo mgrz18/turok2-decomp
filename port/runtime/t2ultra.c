@@ -15,7 +15,8 @@
  *   PI   raw DMA copies from the ROM image (if one was given) and posts OS_EVENT_PI.
  *   SI   controllers through the app's hooks (LUS ControlDeck); every StartReadData /
  *        StartQuery posts OS_EVENT_SI (the scheduler blocks in Controller_ReadAll otherwise);
- *        no Controller Pak, no rumble pak.
+ *        the Controller Pak through the virtual PIF behind __osSiRawStartDma (t2pif.c); no
+ *        rumble pak (osMotorInit answers PFS_ERR_NOPACK).
  *   time a virtual clock: 46.875 MHz counted per retrace (deterministic runs).
  *   caches, TLB, interrupts, FPU control: no-ops.
  *
@@ -31,6 +32,11 @@
 #include "t2_rename.h"
 #include "t2os.h"
 #include "t2port.h"
+
+/* t2pif.c */
+void t2pif_configure(const T2PortConfig *cfg, u8 (*contBits)(void));
+int t2pif_pak_present(int ch);
+void t2pif_get_stats(T2PifStats *out);
 
 /* ---- logging ---- */
 
@@ -506,7 +512,7 @@ static void fill_status(T2ContStatus *st) {
     for (int i = 0; i < 4; i++) {
         if (sContBits & (1 << i)) {
             st[i].type = 0x0005; /* CONT_TYPE_NORMAL */
-            st[i].status = 0;    /* no pak in the slot */
+            st[i].status = t2pif_pak_present(i) ? 1 : 0; /* CONT_CARD_ON */
             st[i].err = 0;
         } else {
             st[i].type = 0;
@@ -555,14 +561,7 @@ void osContGetReadData(void *pads) {
         if (!(sContBits & (1 << i)))
             ((u8 *)pads)[i * 6 + 4] = 0x8; /* errno: no response */
 }
-s32 __osSiRawStartDma(s32 direction, void *dramAddr) {
-    /* reached only from the game's Controller Pak / rumble code (__osContRamRead/Write): no pak
-     * is reported, so leave the buffer and complete the transfer */
-    (void)direction, (void)dramAddr;
-    t2_log_once("__osSiRawStartDma: PIF not modelled (no Controller Pak yet)");
-    t2os_post_event(OS_EVENT_SI);
-    return 0;
-}
+/* __osSiRawStartDma: the virtual PIF (t2pif.c) */
 s32 __osSiDeviceBusy(void) {
     return 0;
 }
@@ -581,8 +580,17 @@ s32 osMotorStop(void *pfs) {
 
 /* ---- the frame (platform thread) ---- */
 
+static u8 cont_bits(void) {
+    return sContBits;
+}
+
 void t2ultra_configure(const T2PortConfig *cfg) {
     sCfg = *cfg;
+    t2pif_configure(cfg, cont_bits);
+}
+
+void T2Port_GetPifStats(T2PifStats *out) {
+    t2pif_get_stats(out);
 }
 
 int t2ultra_load_rom(const char *path) {

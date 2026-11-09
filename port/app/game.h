@@ -15,6 +15,9 @@ struct T2GameArgs {
     int audio = 0;      // --audio: the game's sound (docs/port/AUDIO.md) through LUS's AudioPlayer
     int lowMemory = 0;  // game memory below 2 GB (Linux bring-up aid)
     int verbose = 0;
+    int pakMode = 0;        // T2_PAK_FILE / T2_PAK_BLANK / T2_PAK_NONE (t2port.h, docs/port/INPUT.md)
+    std::string pakDir;     // --pak-dir (empty: the user data dir)
+    std::string input;      // --input: scripted button presses for headless runs (debug aid)
 };
 
 // Boots the game and runs args.frames frames; window may be null (--no-window).

@@ -31,7 +31,24 @@ typedef struct T2PortConfig {
     int audio;              /* --audio: Sound__Initialize runs, the audio manager makes one frame per
                                retrace through the ABI1 interpreter (port/audio, docs/port/AUDIO.md) */
     void (*mainEntry)(void *); /* tests: run this instead of mainproc on the main game thread */
+    int pakMode;            /* Controller Pak (port/runtime/t2pif.c, docs/port/INPUT.md): T2_PAK_FILE,
+                               T2_PAK_BLANK or T2_PAK_NONE */
+    const char *pakDir;     /* T2_PAK_FILE: directory of turok2_pak<N>.mpk; NULL: the user data dir */
+    int pakPorts;           /* bit per port that has a pak in its slot (0: port 1 only) */
 } T2PortConfig;
+
+enum {
+    T2_PAK_FILE = 0,        /* a 32 KB .mpk per port (blank formatted when missing, saved on write) */
+    T2_PAK_BLANK = 1,       /* a blank formatted pak in memory, never saved (tests) */
+    T2_PAK_NONE = 2,        /* no pak in any slot */
+};
+
+/* The virtual PIF's counters (t2pif.c). */
+typedef struct T2PifStats {
+    uint64_t dmas;          /* __osSiRawStartDma calls */
+    uint64_t status, reads, writes; /* joybus status/reset, pak block reads, pak block writes */
+} T2PifStats;
+void T2Port_GetPifStats(T2PifStats *out);
 
 /* Controller hooks (LUS's ControlDeck, set by the app; NULL: no controller). bits gets one bit
  * per connected pad; pads points at 4 OSContPad (6 bytes each, N64 layout). */

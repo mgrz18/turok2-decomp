@@ -133,6 +133,9 @@ struct Args {
     bool draw = false;
     bool audio = false;
     bool verbose = false;
+    int pakMode = 0;
+    std::string pakDir;
+    std::string input;
 #ifdef T2_LOW_MEMORY_DEFAULT
     bool lowMemory = true;
 #else
@@ -164,9 +167,18 @@ Args ParseArgs(int argc, char** argv) {
             a.verbose = true;
         } else if (s == "--high-memory") {
             a.lowMemory = false;
+        } else if (s == "--no-pak") {
+            a.pakMode = 2; // T2_PAK_NONE
+        } else if (s == "--pak-blank") {
+            a.pakMode = 1; // T2_PAK_BLANK
+        } else if (s == "--pak-dir" && i + 1 < argc) {
+            a.pakDir = argv[++i];
+        } else if (s == "--input" && i + 1 < argc) {
+            a.input = argv[++i];
         } else {
             fprintf(stderr, "usage: %s [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]\n"
-                            "          [--game [--draw] [--audio] [--verbose] [--high-memory]]\n",
+                            "          [--game [--draw] [--audio] [--verbose] [--high-memory]\n"
+                            "                  [--no-pak | --pak-blank | --pak-dir DIR] [--input BUTTON@FRAME,...]]\n",
                     argv[0]);
             exit(2);
         }
@@ -403,6 +415,9 @@ int main(int argc, char** argv) {
         g.audio = args.audio;
         g.lowMemory = args.lowMemory;
         g.verbose = args.verbose;
+        g.pakMode = args.pakMode;
+        g.pakDir = args.pakDir;
+        g.input = args.input;
         CHECK(T2Game_Run(window, g) == 0, "game run");
     }
 #endif
