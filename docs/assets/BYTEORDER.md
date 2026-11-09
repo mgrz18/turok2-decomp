@@ -157,7 +157,14 @@ above to decide.
   have to clip runs at the read boundary.
 - **Texture recolour** and any CPU access to texels: big-endian accessors (above).
 
-## For the port (next step)
+## For the port
+
+Done in Phase 7 round 3 with option 2 below: `mkarchive.py` stores every unit's plan in
+`t2/swap` (archive format 2.0, ARCHIVE.md) and `port/assets/t2asset.c` applies it once per load
+(`T2Asset_SwapUnit`, PORT.md 10.6). The generic applier is ~60 lines; checked against the area
+tools' parsers on level headers, model geometry (transposed vertices) and texture banks.
+
+Original notes:
 
 Two ways to run this table in C:
 

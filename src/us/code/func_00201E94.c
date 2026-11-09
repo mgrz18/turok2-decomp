@@ -12,6 +12,25 @@ CLoaderEntry *CLoader__AllocLoaderEntry(CLoader *thisx);
  * jammed at the front of the queue. */
 void CLoader__LoadAsync(CLoader *thisx, u32 address, s32 length, void *dest,
                         OSMesgQueue *replyQueue, OSMesg replyMessage, s32 direct) {
+#ifdef TARGET_PORT
+    /* One entry per request on the host: chunks at address + k * 0x2000 would name addresses
+     * that are not unit keys (and, for an unpacked RNC unit, not even the same bytes). The
+     * queue, the reply and the direct jam stay (docs/assets/PORT.md 10.4). */
+    CLoaderEntry *entry = CLoader__AllocLoaderEntry(thisx);
+    if (entry == NULL) {
+        return;
+    }
+    entry->address = address;
+    entry->dest = dest;
+    entry->length = length;
+    entry->replyQueue = replyQueue;
+    entry->replyMessage = replyMessage;
+    if (direct != 0) {
+        osJamMesg(&thisx->queue, entry, 1);
+    } else {
+        osSendMesg(&thisx->queue, entry, 1);
+    }
+#else
     s32 remaining;
     s32 chunkLength;
     CLoaderEntry *entry;
@@ -51,4 +70,5 @@ void CLoader__LoadAsync(CLoader *thisx, u32 address, s32 length, void *dest,
             osSendMesg(&thisx->queue, entry, 1);
         } while (entry != NULL && remaining != 0);
     }
+#endif
 }

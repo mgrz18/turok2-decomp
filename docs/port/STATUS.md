@@ -117,3 +117,47 @@ so `--draw` (q4's GBI is in) has nothing to show yet.
    the `*ModeTable` integers that hold function addresses (type them, rerun gendata).
 5. Remaining 64-bit work (64BIT.md part 2): 1,064 mismatched declarations, ~3,000
    pointer-width warnings; each fix above was found by running, the audit lists the rest.
+
+## Round 3, part r2: the loader through the archive, assets in host byte order
+
+Details: [../assets/PORT.md](../assets/PORT.md) 10.4 and 10.6, [../assets/ARCHIVE.md](../assets/ARCHIVE.md)
+(`t2/swap`, format 2.0), [../assets/BYTEORDER.md](../assets/BYTEORDER.md).
+
+- **Archive format 2.0** (`tools/assets/mkarchive.py`): new entry `t2/swap`, one byte-swap plan per
+  unit, computed from `swap_spec.json` (`swapcheck.unit_plan`). Rebuild the archive: the port
+  (`T2Asset_OpenLus`) refuses 1.x. Deterministic (sha1 `99cbe767...` with zlib 1.3.1, any `-j`).
+  `archive_check.py` recomputes and checks the plans.
+- **Reader** (`port/assets/t2asset.c`): `T2Asset_SwapUnit` applies the plan after every backend
+  load (whole unit, then the prefix), so `T2Asset_Read` / `T2Asset_ReadInto` return host-order
+  fields on a little-endian host; VM-window residents are swapped once; the wave table stays raw.
+- **Engine** (`#ifdef TARGET_PORT`, asm_diff 0 over the 9 changed files): `CLoader__LoadSync`,
+  `CLoader__LoadAsync` (one entry per request), `CLoader__Main` (no PI DMA) read through
+  `T2Port_ReadAsset` (port/runtime/t2loader.c); `CCache__Request` sizes with
+  `T2Port_AssetHostSize`; `VM_Alloc` returns the whole unit in host order; `ProPackDecompress`
+  keeps only the plain-data branch (no 'RNC' path can be taken on the host).
+- **Cache on the host** (found while checking the path in the game): `CCache__Construct` wrote
+  through `D_800D7BE0`, which gendata places inside `gDecompressor`, so `gCache`'s free stack
+  stayed NULL and the first `CCache__AllocMemEntry` crashed; now typed on `gCache`. Also the free
+  stack by index (func_00203068, func_002044A8) and a typed `CCache__AllocDecompressBlock`
+  (func_00205D7C) for `ProPackDecompress`.
+
+Tests: `t2asset_test` (26,124 units = ROM bytes through the plans, double swap, probes, 20,000
+audio reads, ROM backend + plans: 0 errors), `t2asset_typed_test` (1,585 field checks on level
+headers, geometry incl. transposed vertices, texture banks against the area tools' big-endian
+parsers: 0 errors), `turok2` self test (LUS = miniz = ROM+plans), `archive_check.py` OK.
+
+How far `turok2 --game` gets: unchanged (`CCameraPool__Construct` -> ... -> `CISet__GetBlock(NULL)`,
+r1's crash); no asset read happens before it. In gdb at `GfxPool_Alloc`, `CCache__Request` (direct,
+RNC unit, `ProPack__Decompress` callback, 4-byte probe) returns correct host-order bytes.
+
+Open, found on the way (not fixed here):
+- `gPoolBuffers` is 0x20 bytes of .bss in port/gen (untyped), the host `GfxPool` is 64:
+  `GfxPool_Alloc` writes `pool->gfx`/`vtx` over `gCFB[1]` (becomes a heap pointer), and
+  `CEngineApp__Main` then memsets 150 KB there, over the cache tables. Needs a typed
+  declaration so gendata sizes it.
+- Other m2c views at N64 offsets on the cache path (`CCache__AllocateMemoryForDecompressionTop`,
+  B12Mgr users) remain; `CHeap__Free`/`CCache__HeapAlloc` callers that pass pointers as `s32` work
+  only in low-memory mode (not on macOS).
+- `Texture_DecompressCallback` recolours RGBA5551 palettes with native u16 loads: needs
+  big-endian accessors now that units arrive host-order but texels/TLUTs stay big-endian.
+- The 0.5 % `unk` bytes of BYTEORDER.md arrive in ROM order (collision regions, particles, swooshes).

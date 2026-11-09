@@ -11,7 +11,7 @@
  * Also here: the game functions whose N64 version cannot work on the host and that are
  * replaced as a whole (their files are left out of the link, port/cmake/link.cmake):
  *   InitializeSystemResources  heap on a host allocation instead of [end of image, top of RDRAM)
- *   VM_Initialize/Alloc/Free   no pager: module 1 is linked, VM regions are plain allocations
+ *   VM_Initialize/Alloc/Free   no pager: module 1 is linked, a VM region is its unit (t2loader.c)
  *   RNC_UnpackMethod1/2        asm on the N64 (func_00200C40/func_002010C0): port/assets/rnc.c
  *   sprintf                    SN64 varargs on the N64 (func_0029E3E0): host vsprintf
  *   func_00298470              sqrtf (sqrt.s): host libm */
@@ -87,18 +87,14 @@ void VM_Initialize(s32 a, s32 b) {
     (void)a, (void)b;
 }
 
-/* func_0028E60C: a VM region backed by ROM (the audio data, CAudioWorld__Initialize) becomes a
- * resident copy. The N64 returns the region's virtual address as s32. */
+/* func_0028E60C: a VM region backed by ROM (the audio control block, the sound data file:
+ * CAudioWorld__Initialize / __LoadSfxDataFile) becomes the resident unit, read through the asset
+ * reader in host byte order (t2loader.c, docs/assets/PORT.md 10.4). The N64 returns the region's
+ * virtual address as s32. */
+void *T2Port_AssetWindow(uint32_t romAddr, uint32_t size);
 intptr_t VM_Alloc(s32 size, s32 unused, u32 romAddr) {
-    size_t rs = 0;
-    const u8 *rom = t2_rom(&rs);
-    u8 *p = t2_lowmem_alloc((size_t)size);
     (void)unused;
-    if (rom != NULL && romAddr < rs)
-        memcpy(p, rom + romAddr, (size_t)size <= rs - romAddr ? (size_t)size : rs - romAddr);
-    else
-        t2_log_once("VM_Alloc: no ROM image, region left zeroed");
-    return (intptr_t)p;
+    return (intptr_t)T2Port_AssetWindow(romAddr, (uint32_t)size);
 }
 
 /* func_0028E6DC */

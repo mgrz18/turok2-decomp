@@ -24,7 +24,8 @@ if(T2_LINK_GAME AND TARGET turok2_game)
     add_library(t2runtime STATIC
         ${T2_PORT_DIR}/runtime/t2os.c
         ${T2_PORT_DIR}/runtime/t2ultra.c
-        ${T2_PORT_DIR}/runtime/t2boot.c)
+        ${T2_PORT_DIR}/runtime/t2boot.c
+        ${T2_PORT_DIR}/runtime/t2loader.c)
     target_include_directories(t2runtime PUBLIC ${T2_PORT_DIR}/runtime PRIVATE ${T2_PORT_DIR}/include)
     target_compile_definitions(t2runtime PRIVATE T2_RENAME_NO_LIBC)
     set_target_properties(t2runtime PROPERTIES C_STANDARD 11)

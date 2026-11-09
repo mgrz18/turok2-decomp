@@ -5,12 +5,14 @@
 // and any mod .o2r mounted after it, which shadow units by path). It reads raw files with
 // ArchiveManager::LoadFile (no ResourceManager cache: the engine's CCache is the cache) and
 // skips the 0x44-byte header (64-byte LUS resource header + the Blob's u32 size), the
-// "Blob + skip header" route of docs/assets/ARCHIVE.md.
+// "Blob + skip header" route of docs/assets/ARCHIVE.md. The archive's t2/swap (format 2) is handed
+// to the front end, which swaps every unit to host order after LusLoad (T2Asset_SwapUnit).
 #include "t2asset_lus.h"
 
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
+#include <string>
 #include <vector>
 
 #include "ship/resource/File.h"
@@ -129,8 +131,12 @@ int T2Asset_OpenLus(std::shared_ptr<Ship::ArchiveManager> am, std::string* error
     }
     const uint16_t major = Le16(p + 4);
     const uint32_t count = Le32(p + 8);
-    if (major != 1 || n < 16 + (size_t)count * 16) {
-        return fail("t2/units: unsupported version or truncated");
+    if (major != 2) {
+        return fail("t2/units: archive format " + std::to_string(major) +
+                    ".x, this build needs 2.x (byte-swap plans): rebuild it with tools/assets/mkarchive.py");
+    }
+    if (n < 16 + (size_t)count * 16) {
+        return fail("t2/units: truncated");
     }
     auto* c = new LusCtx;
     c->am = std::move(am);
@@ -146,6 +152,17 @@ int T2Asset_OpenLus(std::shared_ptr<Ship::ArchiveManager> am, std::string* error
     }
     gCtx = c;
     T2Asset_SetBackend(&kLusBackend, c);
+    // Byte order: the plans of every unit (the last mounted t2/swap wins, like any file).
+    auto swap = c->am->LoadFile("t2/swap");
+    if (swap == nullptr || !swap->IsLoaded || swap->Buffer == nullptr) {
+        T2Asset_Close();
+        return fail("t2/swap missing (archive built by an older mkarchive.py?)");
+    }
+    if (T2Asset_SetSwapTable(swap->Buffer->data() + swap->BufferOffset, swap->Buffer->size() - swap->BufferOffset) != 0) {
+        std::string why = T2Asset_Error();
+        T2Asset_Close();
+        return fail(why);
+    }
     return 0;
 }
 

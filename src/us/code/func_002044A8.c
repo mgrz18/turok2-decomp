@@ -33,6 +33,15 @@ static __inline__ void release(CMemEntry *node) {
     if (node->flags & 0x1000) {
         CList__Remove(&gCache_memLockedList, node);
     }
+#ifdef TARGET_PORT
+    /* the same fields by name: the N64 word offsets from gCache_memAgeList are not the host's */
+    if (gCache_currentCompressPos == node) {
+        gCache_currentCompressPos = 0;
+    }
+    node->flags = 0;
+    gCache_memEntriesFree[gCache_freeEntryCount] = node;
+    gCache_freeEntryCount += 1;
+#else
     if (((CMemEntry **)&gCache_memAgeList)[-2] == node) {    /* gCache_currentCompressPos */
         ((CMemEntry **)&gCache_memAgeList)[-2] = 0;
     }
@@ -40,6 +49,7 @@ static __inline__ void release(CMemEntry *node) {
     /* gCache_freeEntryCount, reached from gCache_memAgeList */
     gCache_memEntriesFree[((s32 *)&gCache_memAgeList)[0x2F3]] = node;
     ((s32 *)&gCache_memAgeList)[0x2F3] += 1;
+#endif
 }
 
 CCacheEntry *CCache__CompleteRequest(s32 unused, CCacheEntry *request, s32 dropReference) {
