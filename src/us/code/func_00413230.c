@@ -1208,12 +1208,13 @@ static inline s32 O06_ItemSize_415FB8(s16 *a) { if (*a == 3) return MENUMODEL_SI
 extern void func_00414EA8_415FB8() __asm__("Menu_Construct");
 /* Opens the window c's submenu in the pool a (an item's select callback,
  * MenuItem_SelectSubmenu): the window, its items and their extras in one block. */
-s32 MenuPool_OpenSubmenu(MenuPool *a, Menu *c) {
+sptr MenuPool_OpenSubmenu(MenuPool *a, Menu *c) {
     s32 size, i;
-    s32 *r;
-    s32 s;
+    sptr *r;            /* the block's handle: its data pointer first */
+    sptr s;
     MenuDesc *b = c->submenu;
-    s32 p1, p2, p3, p4;
+    s32 p1;
+    sptr p2, p3, p4;
     if (b != 0) {
         p1 = b->param; p2 = (sptr) c->player; p3 = (sptr) c->controller; p4 = (sptr) c->context;
         size = b->count * MENUITEM_SIZE + MENU_SIZE;
@@ -1497,14 +1498,14 @@ static __inline__ s32 O06_ItemSize_416644(s16 *a) {
     if (*a == 3) n = MENUMODEL_SIZE;
     return n;
 }
-extern s32 *func_00204EDC_416644() __asm__("CCache__Allocate");
+extern sptr *func_00204EDC_416644() __asm__("CCache__Allocate");
 extern void func_00414EA8_416644() __asm__("Menu_Construct");
-extern void CList__AddHead_416644(MenuPool *a, s32 b) __asm__("CList__AddHead");
+extern void CList__AddHead_416644(MenuPool *a, sptr b) __asm__("CList__AddHead");
 /* Opens the window described by b in the pool a. */
-s32 MenuPool_OpenMenu(MenuPool *a, MenuDesc *b, sptr c, sptr d, sptr e) {
+sptr MenuPool_OpenMenu(MenuPool *a, MenuDesc *b, sptr c, sptr d, sptr e) {
     s32 size, i;
-    s32 *r;
-    s32 s;
+    sptr *r;            /* the block's handle: its data pointer first */
+    sptr s;
     size = b->count * MENUITEM_SIZE + MENU_SIZE;
     for (i = 0; i < b->count; i++) size += O06_ItemSize_416644(&b->items[i].type);
     r = func_00204EDC_416644(0, size, 0x3B, "menu");
@@ -1527,16 +1528,17 @@ static inline s32 O06_ItemSize_416760(s16 *a) {
     if (*a == 3) n = MENUMODEL_SIZE; else n = 0;
     return n;
 }
-extern s32 *func_00204EDC_416760() __asm__("CCache__Allocate");
+extern sptr *func_00204EDC_416760() __asm__("CCache__Allocate");
 extern void func_00414EA8_416760() __asm__("Menu_Construct");
-extern void CList__AddHead_416760(MenuPool *a, s32 b) __asm__("CList__AddHead");
+extern void CList__AddHead_416760(MenuPool *a, sptr b) __asm__("CList__AddHead");
 /* Opens the window described by b in the pool a, with the window c's
  * param, player, controller and context. */
-s32 MenuPool_OpenMenuFrom(MenuPool *a, Menu *c, MenuDesc *b) {
+sptr MenuPool_OpenMenuFrom(MenuPool *a, Menu *c, MenuDesc *b) {
     s32 size, i;
-    s32 *r;
-    s32 s;
-    s32 p1 = c->param, p2 = (sptr) c->player, p3 = (sptr) c->controller, p4 = (sptr) c->context;
+    sptr *r;            /* the block's handle: its data pointer first */
+    sptr s;
+    s32 p1 = c->param;
+    sptr p2 = (sptr) c->player, p3 = (sptr) c->controller, p4 = (sptr) c->context;
     size = b->count * MENUITEM_SIZE + MENU_SIZE;
     for (i = 0; i < b->count; i++) size += O06_ItemSize_416760(&b->items[i].type);
     r = func_00204EDC_416760(0, size, 0x3B, "menu");
@@ -1563,15 +1565,15 @@ static __inline__ s32 ItemExtSize(s16 *type) {
     return 0;
 }
 
-extern s32 *func_00204EDC_416894(s32, s32, s32, void *) __asm__("CCache__Allocate");
-extern void func_00414EA8_416894(s32 menu, s32 *mem, MenuDesc *t, s32, s32, s32, s32, MenuPool *pool) __asm__("Menu_Construct");
-extern void CList__AddHead_416894(MenuPool *a, s32 b) __asm__("CList__AddHead");
+extern sptr *func_00204EDC_416894(s32, s32, s32, void *) __asm__("CCache__Allocate");
+extern void func_00414EA8_416894(sptr menu, sptr *mem, MenuDesc *t, sptr, sptr, sptr, sptr, MenuPool *pool) __asm__("Menu_Construct");
+extern void CList__AddHead_416894(MenuPool *a, sptr b) __asm__("CList__AddHead");
 
-s32 MenuPool_OpenChildMenu(MenuPool *pool, Menu *c, MenuDesc *t) {
+sptr MenuPool_OpenChildMenu(MenuPool *pool, Menu *c, MenuDesc *t) {
     s32 size, i;
-    s32 *r;
-    s32 s;
-    s32 p1, p2, p3, p4;
+    sptr *r;            /* the block's handle: its data pointer first */
+    sptr s;
+    sptr p1, p2, p3, p4;
 
     p1 = c->desc;
     p2 = c->player;

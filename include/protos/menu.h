@@ -13,8 +13,8 @@ struct Menu;
 struct MenuDesc;
 struct MenuPool;
 
-s32 MenuPool_OpenChildMenu(struct MenuPool *, struct Menu *, struct MenuDesc *);
-s32 MenuPool_OpenMenu(struct MenuPool *, struct MenuDesc *, sptr, sptr, sptr);
+sptr MenuPool_OpenChildMenu(struct MenuPool *, struct Menu *, struct MenuDesc *);
+sptr MenuPool_OpenMenu(struct MenuPool *, struct MenuDesc *, sptr, sptr, sptr);
 s32 Menu_StepValue(struct Menu *, s32, s32, s32, s32, s32);
 
 #endif
