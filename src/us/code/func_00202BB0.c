@@ -88,19 +88,19 @@ void CCache__Construct(s32 unused, s32 id) {
     if (GetMemSize() > 0x400000) {
         gCacheEntryCount *= 2;
     }
-    D_800D7BE0.nodes = (B12Node *)CHeap__Alloc(&gHeap, gCacheEntryCount * 0x28);
-    D_800D7BE0.stk = (B12Node **)CHeap__Alloc(&gHeap, gCacheEntryCount * 4);
-    D_800D7BE0.pool2 = CHeap__Alloc(&gHeap, gCacheEntryCount * 0x2C);
+    D_800D7BE0.nodes = (B12Node *)CHeap__Alloc(&gHeap, gCacheEntryCount * sizeof(CMemEntry));
+    D_800D7BE0.stk = (B12Node **)CHeap__Alloc(&gHeap, gCacheEntryCount * sizeof(CMemEntry *));
+    D_800D7BE0.pool2 = CHeap__Alloc(&gHeap, gCacheEntryCount * sizeof(CCacheEntry));
     osCreateMesgQueue(&D_800D7BE0.q11F0, &D_800D7BE0.buf11F0, 1);
     D_800D7BE0.tbl630[1] = 0;
     D_800D7BE0.tbl630[0] = 0;
-    CList__Construct(&D_800D7BE0.lists[0], 0x18, 0x1C);
-    CList__Construct(&D_800D7BE0.lists[1], 0x20, 0x24);
+    CList__Construct(&D_800D7BE0.lists[0], T2_OFFSETOF(CMemEntry, last), T2_OFFSETOF(CMemEntry, next));
+    CList__Construct(&D_800D7BE0.lists[1], T2_OFFSETOF(CMemEntry, lockedLast), T2_OFFSETOF(CMemEntry, lockedNext));
     D_800D7BE0.cnt = 0;
     for (i = 0; i < gCacheEntryCount; i++) {
         n1 = D_800D7BE0.nodes;
-        n1 = (B12Node *)((u8 *)n1 + i * 0x28);
-        n1->flags = 0;
+        n1 = (B12Node *)((u8 *)n1 + i * sizeof(CMemEntry));
+        ((CMemEntry *)n1)->flags = 0;
         D_800D7BE0.stk[i] = n1;
         D_800D7BE0.cnt++;
     }
@@ -113,13 +113,13 @@ void CCache__Construct(s32 unused, s32 id) {
     D_800D7BE0.cur = 0;
     D_800D7BE0.f120C = 0; /* 1 in Rage Wars */
     D_800D7BE0.stamp = 0;
-    CList__Construct(&D_800D7BE0.lists3[0], 0x28, 0x24);
-    CList__Construct(&D_800D7BE0.lists3[1], 0x28, 0x24);
-    CList__Construct(&D_800D7BE0.lists3[2], 0x28, 0x24);
+    CList__Construct(&D_800D7BE0.lists3[0], T2_OFFSETOF(CCacheEntry, last), T2_OFFSETOF(CCacheEntry, next));
+    CList__Construct(&D_800D7BE0.lists3[1], T2_OFFSETOF(CCacheEntry, last), T2_OFFSETOF(CCacheEntry, next));
+    CList__Construct(&D_800D7BE0.lists3[2], T2_OFFSETOF(CCacheEntry, last), T2_OFFSETOF(CCacheEntry, next));
     for (i = 0; i < gCacheEntryCount; i++) {
         n = (B12Node *)D_800D7BE0.pool2;
-        n = (B12Node *)((u8 *)n + i * 0x2C);
-        n->unk10 = 0;
+        n = (B12Node *)((u8 *)n + i * sizeof(CCacheEntry));
+        ((CCacheEntry *)n)->flags = 0;
         CList__AddTail(&D_800D7BE0.lists3[0], n);
     }
     CHashTable__Construct(gCacheEntryCount);

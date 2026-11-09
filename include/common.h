@@ -28,4 +28,12 @@ typedef u32 uptr;
 
 #define NULL 0
 
+/* A member's offset (the matching build has no <stddef.h>); a constant on both builds, and the
+ * N64 value equals the old literal (CList link offsets, docs/port/64BIT.md). */
+#ifdef TARGET_PORT
+#define T2_OFFSETOF(type, member) ((s32)__builtin_offsetof(type, member))
+#else
+#define T2_OFFSETOF(type, member) ((s32)&((type *)0)->member)
+#endif
+
 #endif

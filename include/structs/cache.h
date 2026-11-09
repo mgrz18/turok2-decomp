@@ -49,7 +49,8 @@ typedef struct CCacheEntry {
     /* 0x1C */ u32 memFlags;
     /* 0x20 */ void *decompressReplyQueue; /* OSMesgQueue * */
     /* 0x24 */ struct CCacheEntry *next;
-} CCacheEntry;
+    /* 0x28 */ struct CCacheEntry *last;  /* the request lists' previous link (CCache__Construct) */
+} CCacheEntry; /* size 0x2C */
 
 /* Turok 3's mutex.h CBlocker: a one-message queue a thread waits on. */
 typedef struct CBlocker {

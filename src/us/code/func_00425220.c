@@ -28,6 +28,12 @@ extern void CCache__Deallocate(s32 heap, MemHandle *handle);                    
 extern u32 GetMemSize(void);                                             /* osGetMemSize */
 extern void memset(void *dst, s32 value, u32 size);                  /* memset */
 
+#ifdef TARGET_PORT
+/* The host heap is an arena (port/runtime/t2boot.c), not [end of image, top of RDRAM - 512 KB):
+ * the "top of RDRAM" the frame buffers are placed under is the arena's end + 512 KB. */
+extern uptr T2Port_RdramTop(void);
+#endif
+
 extern char D_800C1864[]; /* "audio heap": the byte after it is the linker's fill (0x0B), not a zero the C could give */
 
 void GfxPool_Alloc(GfxPool *pool) {
@@ -39,7 +45,7 @@ void GfxPool_Alloc(GfxPool *pool) {
     MemHandle *fb;
     MemHandle *block;
     u32 size;
-    u32 base;
+    uptr base;
 
     if (pool->gfx != 0) {
         CCache__Deallocate(0, pool->gfx);
@@ -70,7 +76,11 @@ void GfxPool_Alloc(GfxPool *pool) {
 
     if (GetMemSize() >= mb * 6) {
         size = 0x54600;
+#ifdef TARGET_PORT
+        base = T2Port_RdramTop();
+#else
         base = GetMemSize() | 0x80000000;
+#endif
         depth = CCache__AllocateAt(0, base - mb, size, "Z-Buffer");
         fb = CCache__AllocateAt(0, base - mb * 2, 0xFD200, "Display Buffer");
         memset((void *) fb->addr, 0, 0xFD200);

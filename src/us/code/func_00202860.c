@@ -30,7 +30,7 @@ void CHashTable__Construct(s32 capacity)
     gHashSize = half;
     gHashMask = gHashTableSize - 2;
     gHashTableMask = gHashTableSize - 1;
-    gHashTable = CHeap__Alloc(&gHeap, half << 5);
+    gHashTable = CHeap__Alloc(&gHeap, (half << 1) * sizeof(HashEntry));
     for (n = 0; n < gHashTableSize; n++) {
         gHashTable[n].value = 0;
         gHashTable[n].key = 0;

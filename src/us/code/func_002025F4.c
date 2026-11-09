@@ -9,7 +9,7 @@ void *CHeap__AllocTop(CHeap *heap, s32 request)
     CHeapBlock *block;
     CHeapBlock *split;
     u32 size;
-    size = (request + 0x2F) & ~0xF;
+    size = (request + (sizeof(CHeapBlock) + 0xF)) & ~0xF;
     for (block = heap->freeTail; block != 0; block = block->freeLast) {
         if (block->free >= size) {
             { u8 *cursor = (u8 *)block; cursor += block->used; cursor += block->free; cursor -= size; split = (CHeapBlock *)cursor; }

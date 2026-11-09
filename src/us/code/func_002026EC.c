@@ -9,7 +9,7 @@ s32 CHeap__Free(CHeap *heap, u8 *data) {
     CHeapBlock *header;
     CHeapBlock *other;
     CHeapBlock *scan;
-    u32 next;
+    uptr next;
     header = (CHeapBlock *)(data - sizeof(CHeapBlock));
     block = header->usedLast;
     if (block->free == 0) {
@@ -31,7 +31,7 @@ s32 CHeap__Free(CHeap *heap, u8 *data) {
             }
             other = scan;
         }
-        next = (u32)other->freeNext;
+        next = (uptr)other->freeNext;
         block->freeNext = (CHeapBlock *)next;
         if (other->freeNext != 0) {
             *(CHeapBlock **)next = block;

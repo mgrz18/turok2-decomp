@@ -3,7 +3,7 @@
 
 void CHeap__Construct(CHeap *heap, u8 *start, s32 size) {
     u8 *end = start + size;
-    CHeapBlock *block = (CHeapBlock *)(((u32)start + 15) & ~15);
+    CHeapBlock *block = (CHeapBlock *)(((uptr)start + 15) & ~15);
 
     size -= (u8 *)block - start;
     size &= ~15;
@@ -13,8 +13,8 @@ void CHeap__Construct(CHeap *heap, u8 *start, s32 size) {
     block->freeLast = 0;
     block->usedNext = 0;
     block->usedLast = 0;
-    block->used = 0x20;
-    block->free = size - 0x20;
+    block->used = sizeof(CHeapBlock);
+    block->free = size - sizeof(CHeapBlock);
     heap->usedHead = block;
     if (block->free != 0) {
         heap->freeTail = block;

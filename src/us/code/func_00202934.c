@@ -19,6 +19,6 @@ void CHashTable__Insert(u32 key, CCacheEntry *value) {
  }
  index=tail->index|1;
  while (gHashTable[index].value != 0) {index+=2; index &= gHashTableMask;}
- slot=(HashEntry *)((index << 4) + (u32)gHashTable);
+ slot=(HashEntry *)((index * sizeof(HashEntry)) + (uptr)gHashTable);
  slot->key=key;slot->value=value;tail->next=slot;
 }

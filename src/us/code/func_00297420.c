@@ -1,25 +1,15 @@
 #include "common.h"
+#include "structs/libaudio.h"
 
-/* records: base of an array of 0x4C-byte voice records, each with its
- * filter at 0x20. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ s32 bus;
-    /* 0x34 */ s32 records;
-} Synth;
+/* alSynAllocFX (libultra synallocfx.c): the effect of aux bus `bus` (s->auxBus[bus].fx[0],
+ * 0x20 into each 0x4C-byte ALAuxBus) is created, fed from the bus and added to the main bus. */
+void alFxNew(ALFx *r, ALSynConfig *c, ALHeap *hp);
+s32 alFxParam(void *filter, s32 paramID, void *param);
+s32 alMainBusParam(void *filter, s32 paramID, void *param);
 
-s32 alFxNew(s32, s32, s32);           /* extern */
-s32 alMainBusParam(s32, s32, s32);           /* extern */
-s32 alFxParam(s32, s32, s32);           /* extern */
-
-s32 alSynAllocFX(Synth *arg0, s16 arg1, s32 arg2, s32 arg3) {
-    s32 temp_a2;
-    s32 temp_s0;
-
-    temp_s0 = arg1 * 0x4C;
-    alFxNew(arg0->records + temp_s0 + 0x20, arg2, arg3);
-    temp_a2 = arg0->records + temp_s0;
-    alFxParam(temp_a2 + 0x20, 1, temp_a2);
-    alMainBusParam(arg0->bus, 2, arg0->records + temp_s0 + 0x20);
-    return arg0->records + temp_s0 + 0x20;
+ALFxRef alSynAllocFX(ALSynth *s, s16 bus, ALSynConfig *c, ALHeap *hp) {
+    alFxNew(&s->auxBus[bus].fx[0], c, hp);
+    alFxParam(&s->auxBus[bus].fx[0], AL_FILTER_SET_SOURCE, &s->auxBus[bus]);
+    alMainBusParam(s->mainBus, AL_FILTER_ADD_SOURCE, &s->auxBus[bus].fx[0]);
+    return (ALFxRef)&s->auxBus[bus].fx[0];
 }
