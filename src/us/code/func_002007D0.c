@@ -7,7 +7,7 @@ extern void CList__RemoveHead(CList *arg0);
 void CList__RemoveHead(CList *arg0) {
     char *cursor = arg0->m_pHead;
     int stride = arg0->m_NextOffset;
-    int value = *(int *)(cursor + stride);
+    void *value = *(void **)(cursor + stride);
     int count = arg0->m_nCount - 1;
     arg0->m_nCount = count;
     arg0->m_pHead = value;
