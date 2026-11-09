@@ -1,7 +1,8 @@
 #include "common.h"
+#include "structs/sound.h"
 
-s32 SndSeq_FadeOut(s32);                         /* extern */
+void SndSeq_FadeOut(SndSeq *);                   /* extern */
 
-void CAudioWorld__FadeOutMusic(s32 arg0) {
-    SndSeq_FadeOut(arg0 + 0x1D64);
+void CAudioWorld__FadeOutMusic(CAudioWorld *arg0) {
+    SndSeq_FadeOut(&arg0->seq);
 }
