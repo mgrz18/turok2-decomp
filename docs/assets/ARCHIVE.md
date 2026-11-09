@@ -135,6 +135,10 @@ is `hostSize` long. That is the one engine change this needs: `CCache__Request` 
 not stored. The port therefore never needs the RNC unpacker except in the bring-up ROM
 backend.
 
+The unpacker (builder: `tools/assets/rnc.py`; ROM backend: `port/assets/rnc.c`) is original code of this repository (CC0, like the rest), written from Turok 2's own routines (`ProPackDecompress`, `RNC_UnpackMethod1` 0x200C40, `RNC_UnpackMethod2` 0x2010C0) and the public RNC header layout.
+It replaced the unlicensed Rage Wars-derived `propack.py` / `port/third_party/rnc` (docs/port/RAGEWARS_PORT.md
+section 0) without changing a byte: same archive sha1, all 14,426 outputs identical to the old tool's.
+
 ### Containers with RNC children: there are none (no KEEP_PACKED, no table rewrite)
 
 PORT.md 5.2 left open what to do with a raw container whose entries are RNC streams that the

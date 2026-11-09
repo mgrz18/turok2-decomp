@@ -123,7 +123,7 @@ window).
 
 RNC ProPack (`"RNC"` + method byte, u32 unpacked size, u32 packed size, 18-byte
 header). The cartridge holds **14,426 RNC streams** (ROMFS.md; all unpack
-with the header CRC16 checked by `tools/assets/propack.py`): 14,261 of method 1,
+with the header CRC16 checked by `tools/assets/rnc.py`): 14,261 of method 1,
 16.4 MB packed -> 30.8 MB unpacked, so 96.8% of the cartridge's bytes are inside
 RNC streams; and 165 of method 2, one "level paths" block per level. The audio
 and sound roots have none (audio has its own codec; see AUDIO.md).
@@ -346,7 +346,7 @@ through. A raw container whose children are RNC streams that the engine unpacks
 from memory stays `KEEP_PACKED`, unless the walker also rewrites the container's
 offset table, which is legitimate because the engine reads those offsets from
 the loaded block. Either way the port must then carry a C version of the RNC
-unpacker (`tools/assets/propack.py` is the reference; Rage Wars has `rncUnpack` / `tools/rnc.py`).
+unpacker (`port/assets/rnc.c`, the twin of `tools/assets/rnc.py`; both original code).
 
 ### 5.3 Byte order: one swap point
 
@@ -422,7 +422,7 @@ Shipping extractor: **Torch with a `T2` module**, embedded in the port.
   0x20F194-0xBE1814 and 0xBE1814+0x3EA7A0. The factory, like
   `BK64:ASSET_TABLE`, emits all units itself.
 - `Decompressor`: add `CompressionType::RNC` (ProPack methods 1 and 2), ported from
-  `tools/assets/propack.py`, which is itself verified against the game's unpacker.
+  `port/assets/rnc.c` / `tools/assets/rnc.py` (original code written from the game's unpacker).
 - Exporters: `binary` only (the `T2LU` entries + `t2/units`, `t2/types`,
   `version`). No `code` mode: the decomp keeps no asset C.
 - In the port: a `GameExtractor` like Ghostship's. Search order: `TUROK2_ROM`
@@ -523,10 +523,13 @@ Dependencies: a1 = ROMFS, a2 TEXTURES, a3 MODELS, a4 LEVELS, a5 ANIMATION, a6 AU
   (references/rw_junk) has **no licence** (no LICENSE file, GitHub reports
   none; the CC0 in its README covers only files taken from
   melalawi/ragewars-decomp), so none of its code may be reused until the
-  author grants one; this includes the already copied
-  `port/third_party/rnc/rnc.c` and its Python port `tools/assets/propack.py`
-  (docs/port/RAGEWARS_PORT.md section 0). Turok 3's decomp is referenced,
-  not copied.
+  author grants one (docs/port/RAGEWARS_PORT.md section 0). The RNC
+  decompressor that was copied from it (`port/third_party/rnc/rnc.c`, Python
+  port `tools/assets/propack.py`) has been **replaced** (Phase 7 round 2, q1)
+  by `port/assets/rnc.c` and `tools/assets/rnc.py`: original code of this repository (CC0, like the rest), written from Turok 2's own routines (`ProPackDecompress`, `RNC_UnpackMethod1` 0x200C40, `RNC_UnpackMethod2` 0x2010C0) and the public RNC header layout, clean-room
+  (the old files were not read while writing them) and checked black-box
+  against the old tools on all 14,426 streams. The old files remain in git
+  history only. Turok 3's decomp is referenced, not copied.
 
 ## 9. Open questions
 
@@ -562,8 +565,9 @@ build stays untouched.
 |---|---|
 | `port/assets/t2asset.h/.c` | the reader: front end (unit lookup, prefix rule, inner-address reads, buffers) + two backends |
 | `port/third_party/miniz/` | miniz 3.0.2 (`miniz.c/.h`, MIT, `LICENSE` included): zip reading and inflate |
-| `port/third_party/rnc/rnc.c` | RNC ProPack methods 1 and 2, copied unchanged from `references/rw_junk/docs/hand_asm_c/rnc.c` (functionally equivalent C of the hand-written unpacker, differentially tested there; README in the folder) |
+| `port/assets/rnc.h/.c` | RNC ProPack methods 1 and 2, bounds-checked; original code of this repository (CC0, like the rest), written from Turok 2's own routines (`ProPackDecompress`, `RNC_UnpackMethod1` 0x200C40, `RNC_UnpackMethod2` 0x2010C0) and the public RNC header layout |
 | `port/tests/t2asset_test.c` | host test: both backends, every unit, byte-compare |
+| `port/tests/rnc_test.c` | scans a ROM for RNC headers (packed CRC must match) and unpacks each with both CRCs checked: 14,426 streams |
 | `port/Makefile` | `make -C port` (cc -O2), `make -C port test ROM=.. UNITS=.. ARCHIVES=..` |
 
 ### 10.2 Interface
@@ -610,7 +614,7 @@ Backends:
   entry) or a bare data entry (hand-made mod / FolderArchive file).
 - **rom:** loads the image, normalizes `.v64`/`.n64`, requires SHA1
   `fb0400f2...06f1`, takes the unit list from a TSV (`romfs.py --manifest` or the
-  archive's `t2/units.tsv`: key, size, ..., flags), unpacks RNC units with `rnc.c` and
+  archive's `t2/units.tsv`: key, size, ..., flags), unpacks RNC units with `port/assets/rnc.c` and
   checks the header CRC16 (the game does not). Without a list it still serves RNC
   streams by key and raw bytes at any address.
 - **LUS (later):** a third `T2AssetBackend` whose `load` is

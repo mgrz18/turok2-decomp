@@ -1,13 +1,13 @@
 # ROM filesystem (asset region)
 
-Tools: `tools/assets/romfs.py` (tree walker / extractor), `tools/assets/propack.py`
-(RNC ProPack methods 1 and 2), `tools/assets/cache_calls.py` (lists every CCache
+Tools: `tools/assets/romfs.py` (tree walker / extractor), `tools/assets/rnc.py`
+(RNC ProPack methods 1 and 2, original code), `tools/assets/cache_calls.py` (lists every CCache
 request call site with its description string).
 
 ```
 python tools/assets/romfs.py baserom.us.z64 --out OUT --coverage   # OUT/romfs_tree.tsv/.json, romfs_types.tsv
 python tools/assets/romfs.py baserom.us.z64 --out OUT --extract    # + OUT/blobs/<path>.bin / .unp.bin
-python tools/assets/propack.py FILE --offset 0x17618BC --out x.bin
+python tools/assets/rnc.py FILE --offset 0x17618BC --out x.bin
 python tools/assets/cache_calls.py baserom.us.z64 --markdown
 python tools/assets/romfs.py baserom.us.z64 --manifest units.tsv   # one row per load unit (ARCHIVE.md)
 ```
@@ -76,9 +76,10 @@ with RNC_UnpackMethod1 (`hdr+0x12, dst, packed, unpacked`) or RNC_UnpackMethod2
 (`hdr, ...`) (hand asm at 0x2010C0..0x2017A8); otherwise the bytes are copied raw.
 Header: `'RNC' method, u32 unpacked, u32 packed, u16 crc(unpacked), u16 crc(packed),
 u8 leeway, u8 chunks`, stream at +0x12; CRC16 poly 0xA001 (the game does not check it,
-propack.py does). propack.py is a port of the differential-tested C of the same
-decoders in references/rw_junk/docs/hand_asm_c/rnc.c; verification here = CRC16 of
-the output equals the header CRC for all 14,426 blocks. Model/Texture/Anim/Scene
+rnc.py does). rnc.py (and its C twin port/assets/rnc.c) is original code written from
+these two routines and the public header layout (the earlier propack.py, a port of
+rw_junk's unlicensed rnc.c, is gone); verification = both header CRC16s match for all
+14,426 blocks, and the output is byte-identical to the old tool's. Model/Texture/Anim/Scene
 callbacks (Model_DecompressCallback*, Texture_DecompressCallback, Anim_Decompress,
 CScene__Decompress*) all start with this RNC step and then post-process (see the
 area docs: TEXTURES.md, MODELS.md, LEVELS.md, ANIMATION.md, AUDIO.md).
@@ -318,7 +319,7 @@ fs.load_units()                 # all (key, size, node) ROM load units (for a po
 fs.readers(n)                   # [(description, callback, callers)] that request the unit
 fs.manifest()                   # one dict per load unit (key, size, host_size, kind, type, flags, ...)
 fs.audio_ptr(vaddr)             # 0x48xxxx pointer of the audio control block -> ROM
-propack.decompress(buf, off) / propack.maybe_decompress(buf, off, size) / propack.is_rnc
+rnc.decompress(buf, off) / rnc.maybe_decompress(buf, off, size) / rnc.is_rnc / rnc.header
 ```
 
 Paths are positional (`cart/0/12/1` = object 12's geometry); types come from the

@@ -7,7 +7,7 @@ tools read the player's own ROM (SHA1 `fb0400f21e3f043939ab56500c7b12a3231006f1`
 
 | Document | Covers |
 |----------|--------|
-| [ROMFS.md](ROMFS.md) | The region map, the container formats (ISet / USet / RNC), the cartridge index tree, every `CCache__Request` call site, load units and their readers. Tools: `romfs.py`, `propack.py`, `cache_calls.py`. |
+| [ROMFS.md](ROMFS.md) | The region map, the container formats (ISet / USet / RNC), the cartridge index tree, every `CCache__Request` call site, load units and their readers. Tools: `romfs.py`, `rnc.py`, `cache_calls.py`. |
 | [TEXTURES.md](TEXTURES.md) | Texture banks (CI8/CI4 with RGBA16/IA16 palettes, RGBA32, mip chains; animated frames and palettes) and graphic sets (HUD, fonts, screens: I4 and RGBA5551 + I4 mask). Tool: `textures.py`. |
 | [MODELS.md](MODELS.md) | Object geometry (`Model_Decompress`): LODs, vertex lists, packed command streams, materials, UVs, skeleton block. Tool: `models.py`. |
 | [ANIMATION.md](ANIMATION.md) | Anim object info, skeletons, the three track encodings of the animations. Tool: `anim.py`. |
