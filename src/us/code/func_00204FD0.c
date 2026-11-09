@@ -7,10 +7,10 @@
 s32 CHeap__AllocAt(CHeap *, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
-B12Node *CCache__AllocateAt(s32 arg0, s32 arg1, s32 arg2)
+B12Node *CCache__AllocateAt(s32 arg0, sptr arg1, s32 arg2)
 {
   s32 temp_a0;
-  s32 temp_v0;
+  sptr temp_v0;
   s32 temp_v0_2;
   s32 temp_v1;
   s32 temp_v1_2;

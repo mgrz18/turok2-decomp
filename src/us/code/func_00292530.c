@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern s32 __voiceNeedsNoteKill(void *arg0, s32 arg1, s32 arg2);
+extern s32 __voiceNeedsNoteKill(void *arg0, sptr arg1, s32 arg2);
 extern void alUnlink(void *arg0);
 extern void alLink(void *arg0, void **arg1);
-s32 __voiceNeedsNoteKill(void *arg0, s32 arg1, s32 arg2) {
+s32 __voiceNeedsNoteKill(void *arg0, sptr arg1, s32 arg2) {
     s32 amount;
     s32 total;
     s32 result;

@@ -21,7 +21,7 @@ typedef struct {
 extern u8 gScheduler[];
 extern Unk8011ACB0 D_8011ACB0_arr[] __asm__("gEngineApp_m_Settings_match");
 
-extern void memset(void *, s32, s32);
+extern void memset(void *, s32, sptr);
 extern void osCreateScheduler(void *, void *, s32, s32, s32);
 extern void osScAddClient(void *, void *, void *);
 extern void CEngineApp__InitFade(CEngineApp *);

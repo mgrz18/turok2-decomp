@@ -43,7 +43,7 @@ void SndVoice_SetPosition(SndVoice *v, s32 id, s32 a6);
 void SndVoice_SetSoundId(SndVoice *v, s16 a);
 void SndVoice_Setup(SndVoice *v, SoundEffectInfo *info, s32 a5);
 s32 CAudioWorld__StartVoice(CAudioWorld *m, s32 id, s32 a2, s32 a3);
-s32 CAudioWorld__PlayLayer(CAudioWorld *m, SoundEffectInfo *info, s32 id, s32 a3, s32 a4, s32 a5, s32 a6) {
+s32 CAudioWorld__PlayLayer(CAudioWorld *m, SoundEffectInfo *info, s32 id, s32 a3, s32 a4, s32 a5, sptr a6) {
     SndVoice *v;
     m->listener = CCameraPool__GetNearestCamera(&gEngineApp_m_Game_m_CameraPool, id);
     if (info->flags & 1) {

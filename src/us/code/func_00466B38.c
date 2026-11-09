@@ -13,7 +13,7 @@ extern u8 *CCameraPool__AllocCamera_2(void *);
 extern void CBarrel__Reset(void *strokes);
 extern void CPlayer__GiveStartingWeapons(CPlayer *p);
 extern void CPlayer__ResetHealth_2(CPlayer *p);
-extern void MenuPool_OpenMenu_2(void *, void *callback, CPlayer *p, s32 controller, s32 index);
+extern void MenuPool_OpenMenu_2(void *, void *callback, CPlayer *p, sptr controller, sptr index);
 extern void func_00438800();
 extern void func_00438728();
 extern void func_0043908C();

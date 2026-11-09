@@ -7,7 +7,7 @@ s32 CPlayer__Hurt(s32, s32, s32, s32, s32);
 
 s32 Sound__PlaySpeech(s32);                     /* extern */
 
-void CPlayer__UpdateOxygen(CPlayer *arg0, s32 arg1) {
+void CPlayer__UpdateOxygen(CPlayer *arg0, sptr arg1) {
     f32 temp_f0;
     f32 temp_f1;
     s32 temp_v0;

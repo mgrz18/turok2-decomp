@@ -7,7 +7,7 @@ extern f32 _doModFunc(ALDelay *d, s32 count);
 extern Acmd *_loadBuffer(ALFx *, s16 *, s32, s32, Acmd *);
 Acmd *_loadOutputBuffer(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
 {
-    extern s32 osVirtualToPhysical(s32);
+    extern s32 osVirtualToPhysical(sptr);
     Acmd *ptr = p;
     s32 ratio, count, rbuff = 640;
     s16 *out_ptr;

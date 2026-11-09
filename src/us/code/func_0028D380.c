@@ -18,14 +18,14 @@ extern Marker sBootMarker;           /* the boot marker string */
 extern char gSavedPlayers[]; /* local type: globals/save.h declares it; this view (its type here) is what keeps the ROM's code */           /* the saved players (0x1400) */
 extern s32 D_8014A000[];            /* BSS end */
 
-void memset(void *dst, s32 value, s32 size);
+void memset(void *dst, s32 value, sptr size);
 s32 Util_StrCmp(char *marker, char *name);
 void Util_StrCpy(char *marker, char *name);
 void osInitialize(void);
 void Engine_Boot(void);
 
 /* Whether a word may be overwritten on reset (Boot_CanOverwrite inlined). */
-static __inline__ s32 isRestorable(u32 address) {
+static __inline__ s32 isRestorable(uptr address) {
     if (address >= (uptr)gBootSignature && address < (uptr)gBootSignature + 0x10) {
         return 0;
     }

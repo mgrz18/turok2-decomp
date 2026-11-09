@@ -8,7 +8,7 @@ typedef struct {
 } Link;
 
 
-s32 GameObject_GetRegionInfo(Link *arg0) {
+sptr GameObject_GetRegionInfo(Link *arg0) {
     sptr temp_a1;
     sptr var_v0;
 

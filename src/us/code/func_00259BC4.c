@@ -3,7 +3,7 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-s32 Sound__Play(s16, CVector3, s32, s32);
+s32 Sound__Play(s16, CVector3, sptr, s32);
 
 void WeaponMode_AE7F4_Enter(CGameObjectInstance *obj, CAI *ai) {
     CVector3 *temp_v0;

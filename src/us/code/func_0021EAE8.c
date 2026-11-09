@@ -6,7 +6,7 @@
 extern char D_800A5AC4[];
 
 void **CGameObjectInstance__LoadGeometry(void *obj);
-s32 CGameObjectInstance__BuildBoneMatrices(void *, void *, s32);
+s32 CGameObjectInstance__BuildBoneMatrices(void *, void *, sptr);
 
 s32 CGameObjectInstance__LoadBoneMatrices(CGameObjectInstance *obj, s32 arg1) {
     s32 result;

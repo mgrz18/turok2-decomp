@@ -3,7 +3,7 @@
 #include "structs/player.h"
 #include "protos/list.h"
 
-extern void memset(void *p, s32 c, s32 n); /* memset */
+extern void memset(void *p, s32 c, sptr n); /* memset */
 
 void CPlayerPool__Construct_2(CPlayerPool *pl) {
     memset(pl, 0, sizeof(CPlayerPool));

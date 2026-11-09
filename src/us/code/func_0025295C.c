@@ -15,7 +15,7 @@ s32 CPlayerPool__IsFragLimitReached(CPlayerPool *list) {
     if (state->teams) {
         s32 team1 = 0;
         s32 team0 = 0;
-        s32 skip;
+        sptr skip;
 
         for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
             skip = CPlayerPool__GetIndex(list, p);
@@ -42,7 +42,7 @@ s32 CPlayerPool__IsFragLimitReached(CPlayerPool *list) {
         GameMatch *gs = state;
 
         for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
-            s32 skip;
+            sptr skip;
             s32 sum;
 
             skip = CPlayerPool__GetIndex(list, p);

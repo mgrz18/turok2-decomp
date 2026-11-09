@@ -20,7 +20,7 @@ void Render_QueueModelByKey(s32 key, void *matrix, void *lights, s32 lod, s32 pa
     void **resource;
     s32 *parts;
     s32 size;
-    s32 dataKey;
+    sptr dataKey;
     CModelInstance *inst;
     s32 n;
 

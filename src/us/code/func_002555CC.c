@@ -5,7 +5,7 @@
 
 s32 GameObject_GetPlatformBelow(s32);
 s32 GameObject_GetFrameDelta(s32, s32);
-s32 Sound__Play(s32, s32, s32, s32, s32, s32);
+s32 Sound__Play(s32, s32, sptr, s32, s32, s32);
 
 M2C_UNK CVector3__Add(void *, void *, M2C_UNK *);   /* extern */
 

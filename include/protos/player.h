@@ -11,8 +11,8 @@
 
 struct CPlayer;
 
-s32 CPlayerPool__GetFirstActive(void *);
-u32 CPlayerPool__GetIndex(void *, u32);
+sptr CPlayerPool__GetFirstActive(void *);
+uptr CPlayerPool__GetIndex(void *, uptr);
 s32 CPlayer__SetState(struct CPlayer *, void *, s32);
 void CPlayer__StartDeathCinema(struct CPlayer *, s32, s32);
 

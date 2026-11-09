@@ -6,7 +6,7 @@
 #include "globals/menu_desc.h"
 
 s32 PakMenu_CheckPak_2(void *event, s32 port, s32 arg2);
-void MenuPool_OpenMenu_2(char *dst, char *fmt, u8 *player, s32 arg3, char *arg4);
+void MenuPool_OpenMenu_2(char *dst, char *fmt, u8 *player, sptr arg3, char *arg4);
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {

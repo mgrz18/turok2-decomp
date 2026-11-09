@@ -11,7 +11,7 @@ typedef struct {
     /* 0x14 */ s32 base;
 } Unk0029B030;
 
-void osCreateMesgQueue(Unk0029B030 *arg0, s32 arg1, s32 arg2) {
+void osCreateMesgQueue(Unk0029B030 *arg0, sptr arg1, s32 arg2) {
     arg0->head = &__osThreadTail;
     arg0->tail = &__osThreadTail;
     arg0->unk8 = 0;

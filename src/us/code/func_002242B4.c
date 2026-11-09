@@ -17,7 +17,7 @@ struct Shared_ParticleLighting {
     s8 direction[3];
     u8 reserved13[5];
 } __attribute__((aligned(4)));
-u32 CScene__GetRegionIndex(CScene *arg0, s32 arg1) {
+u32 CScene__GetRegionIndex(CScene *arg0, sptr arg1) {
     sptr offset;
     sptr result;
     if (arg1 == 0) {

@@ -2,7 +2,7 @@
 #include "globals/scene.h"
 
 s32 GameObject_GetFloorKind(CGameObjectInstance *obj);
-void Sound__Play(s32 sound, CVector3 pos, s32 arg4, s32 arg5);
+void Sound__Play(s32 sound, CVector3 pos, sptr arg4, s32 arg5);
 void func_00225C08(void *table, s32 arg1, CVector3 *pos);
 
 void GameObject_PlayLandSound(CGameObjectInstance *obj) {

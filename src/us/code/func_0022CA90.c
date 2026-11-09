@@ -18,7 +18,7 @@ s32 Actor_GetTypeClass(Target *target);
 s32 CParticle__IsUnderWater(CParticle *p);
 void ImpactEvent_Send(void *source, CParticle *p, s32 effect, s32 arg3, CVector3 pos, CEventValue params);
 void CParticle__SpawnChild(CParticle *p, s32 model, s32 arg2, s32 enabled);
-void Sound__Play(s16 sound, CVector3 pos, s32 arg2, s32 arg3);
+void Sound__Play(s16 sound, CVector3 pos, sptr arg2, s32 arg3);
 void func_002364A4(void *list, CVector3 pos, CVector3 normal, s32 kind, s32 arg4);
 void CVector3__Normalize(CVector3 *v);
 f32 Random_Blend(f32 lo, f32 hi);

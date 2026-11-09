@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern s32 __osProbeTLB(void);
-s32 osVirtualToPhysical(s32 arg0) {
+s32 osVirtualToPhysical(sptr arg0) {
     if (arg0 < 0 && (u32)arg0 <= 0x9FFFFFFFU) {
         return arg0 & 0x1FFFFFFF;
     }

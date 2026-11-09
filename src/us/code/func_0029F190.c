@@ -25,7 +25,7 @@
         _a->words.w1 = (u32)(d); \
     }
 
-Acmd *_decodeChunk(Acmd *ptr, ALLoadFilter *f, s32 tsam, s32 nbytes, s16 outp, s16 inp, u32 flags); /* _decodeChunk */
+Acmd *_decodeChunk(Acmd *ptr, ALLoadFilter *f, sptr tsam, s32 nbytes, s16 outp, s16 inp, u32 flags); /* _decodeChunk */
 u32 AudioDMA_CacheBlock(void *addr, s32 len); /* game DMA cache: returns the physical address of a cached copy */
 
 /* alAdpcmPull (libaudio load.c): pull handler of the loader filter for ADPCM wave tables: load the codebook, decode

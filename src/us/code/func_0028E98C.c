@@ -12,7 +12,7 @@
 #include "protos/ultra.h"
 
 
-void memset(void *dst, s32 value, s32 size);
+void memset(void *dst, s32 value, sptr size);
 void CLoader__LoadSync(CLoader *reader, u8 *source, s32 size, void *dest);
 void VM_HandleTLBMiss(void);
 void VM_FinishPageJob(PageJob *job);

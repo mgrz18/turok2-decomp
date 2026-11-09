@@ -7,7 +7,7 @@
 #include "protos/cache.h"
 
 void Pak_AllocDirectory(void);
-void *memset(void *, s32, u32);
+void *memset(void *, s32, uptr);
 void Pak_AllocDirectory(void) {
     struct Shape_typemap_165 *temp_v0;
     sptr temp_a0;

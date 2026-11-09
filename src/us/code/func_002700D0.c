@@ -9,7 +9,7 @@ extern u32 __amDMA(s32 offset, s32 length);
 extern Window *gAudioDmaState_firstFree;
 extern void CLoader__LoadAsync(CLoader *reader, u32, s32, s32, void *, s32, s32);
 u32 __amDMA(s32 offset, s32 length) {
-    extern u32 osVirtualToPhysical(s32);
+    extern u32 osVirtualToPhysical(sptr);
     extern void alLink(Window *, Window *);
     extern void alUnlink(Window *);
     extern Window *gAudioDmaState_firstUsed;

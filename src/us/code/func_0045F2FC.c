@@ -4,7 +4,7 @@
 #include "protos/cache.h"
 
 
-s32 memset(s32, s32, s32);       /* extern */
+s32 memset(s32, s32, sptr);       /* extern */
 
 void Pak_AllocDirectory_2(void) {
     s32 *temp_v0;

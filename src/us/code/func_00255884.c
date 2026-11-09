@@ -3,7 +3,7 @@
 #include "structs/game_object.h"
 #include "protos/player.h"
 
-f32 PlayerDodgeFall_Update(s32, s32);
+f32 PlayerDodgeFall_Update(sptr, sptr);
 
 void PlayerDodge_Update(CPlayer *arg0, CGameObjectInstance *arg1) {
     f32 temp_f2;

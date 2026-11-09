@@ -7,7 +7,7 @@
 
 extern char D_11059;
 extern char D_94F;
-int IsDataPointer(u32 arg0) {
+int IsDataPointer(uptr arg0) {
     if (arg0 >= (uptr)&gHashSize &&
         arg0 < (uptr)&gHashSize + (uptr)&D_11059) {
         return 1;

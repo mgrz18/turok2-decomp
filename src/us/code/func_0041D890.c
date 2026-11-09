@@ -14,7 +14,7 @@ extern SaveSize D_800F70A8;
 extern void CCache__Flush(s32);
 extern void CCache__Deallocate(s32, void *);
 extern s32 *CCache__Allocate(s32, s32, s32, void *);
-extern void memset(void *dst, s32 value, s32 size);
+extern void memset(void *dst, s32 value, sptr size);
 extern void func_0029E460(char *dst, char *src, s32 n);
 
 static __inline__ s32 SaveFileSize(void) {

@@ -8,7 +8,7 @@
 
 s32 PakMenu_CheckPak_2(void *event, s32 port, s32 arg2);
 char *PakMenu_GetReturnMenu_2(void *event);
-void MenuPool_OpenMenu_2(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
+void MenuPool_OpenMenu_2(char *dst, char *fmt, CPlayer *player, sptr arg3, char *arg4);
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {

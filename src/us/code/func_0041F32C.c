@@ -9,7 +9,7 @@
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
 
-void *memset(void *s, int c, u32 n);
+void *memset(void *s, int c, uptr n);
 typedef struct K7Sub { u8 pad0[4]; s8 b4; } K7Sub;
 typedef struct K7Obj {
     s16 state;

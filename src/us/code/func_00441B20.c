@@ -12,7 +12,7 @@ typedef struct {
     /* 0x14 */ s32 unk14;
 } ObjState;
 
-s32 CGameObjectInstance__PickRandomAnim(s32, s32, s32);
+sptr CGameObjectInstance__PickRandomAnim(s32, sptr, sptr);
 s32 COnScreen__SetBoss(s32, s32, s32);
 s32 TotemDefense_DrawTotem_2(s32, s32, s32);
 

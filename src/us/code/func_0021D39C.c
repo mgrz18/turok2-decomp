@@ -51,7 +51,7 @@ extern char D_800A5AC4[];   /* "anim object info" */
 void CMtxF__TransformBox(void *, s32, f32 *);
 s32 Frustum_TestBox(void *, f32 *);
 void **CGameObjectInstance__LoadGeometry(Actor *);
-s32 CGameObjectInstance__BuildBoneMatrices(Actor *, void *, s32);
+s32 CGameObjectInstance__BuildBoneMatrices(Actor *, void *, sptr);
 f32 GameObject_GetCollisionHeight(Actor *);
 
 void CGameObjectInstance__Draw(Actor *actor, CCamera *view) {

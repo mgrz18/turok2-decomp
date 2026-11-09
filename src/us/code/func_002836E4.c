@@ -4,7 +4,7 @@
 
 
 /* Takes the first free emitter and moves it to the active list. */
-s32 CEmitterPool__TakeEmitter(CEmitterPool *arg0) {
+sptr CEmitterPool__TakeEmitter(CEmitterPool *arg0) {
     sptr temp_s0;
 
     temp_s0 = (sptr) arg0->m_FreeList.m_pHead;

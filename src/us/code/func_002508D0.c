@@ -12,7 +12,7 @@ void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuni
 void CPlayer__MoveOnFoot(CPlayer *player, CGameObjectInstance *body, void *tuning);
 f32 GameObject_GetWaterHeight(CGameObjectInstance *body);
 f32 func_002982F0(f32 x);
-void Sound__Play(s16 sound, CVector3 pos, s32, s32);
+void Sound__Play(s16 sound, CVector3 pos, sptr, s32);
 
 static __inline__ void reset_strokes(CBarrel *s) {
     s->m_State = 0;

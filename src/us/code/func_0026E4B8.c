@@ -7,9 +7,9 @@
 #include "protos/scene.h"
 
 extern void func_0026E294(Trigger *trigger);
-extern s32 LevelEvent_CheckRequiredItem(Trigger *trigger, s32 arg);
+extern s32 LevelEvent_CheckRequiredItem(Trigger *trigger, sptr arg);
 extern void LevelEvent_Trigger(Trigger *trigger);
-void LevelEvent_ProcessTriggers(Trigger *triggers, s32 count, s32 require, s32 enter, s32 exclude, s32 group, s32 arg) {
+void LevelEvent_ProcessTriggers(Trigger *triggers, s32 count, s32 require, s32 enter, s32 exclude, s32 group, sptr arg) {
     s32 i;
     s32 active;
     s32 usable;

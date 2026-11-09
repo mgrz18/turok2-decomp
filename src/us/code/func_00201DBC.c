@@ -9,7 +9,7 @@ CLoaderEntry *CLoader__AllocLoaderEntry(CLoader *thisx);
 
 /* Reads length bytes of ROM at address into dest, LOADER_CHUNK_SIZE at a
  * time, waiting for each. */
-void CLoader__LoadSync(CLoader *thisx, u32 address, s32 length, void *dest) {
+void CLoader__LoadSync(CLoader *thisx, uptr address, s32 length, void *dest) {
     OSMesgQueue replyQueue;
     OSMesg replyMessage;
     OSMesg reply;

@@ -29,12 +29,12 @@ typedef struct {
     /* 0xC7 */ s8 count;
 } Item00402FA0;
 
-s32 CGameObjectInstance__PickRandomAnim(Obj00402FA0 *obj, s32 a1, s32 a2);
+sptr CGameObjectInstance__PickRandomAnim(Obj00402FA0 *obj, sptr a1, sptr a2);
 void CVector3__Subtract(Vec3_00402FA0 *out, Vec3_00402FA0 *from, Vec3_00402FA0 *to);
 
 void MantidQueen_UpdatePush(Obj00402FA0 *obj, Item00402FA0 *item) {
     Vec3_00402FA0 dir;
-    s32 anim;
+    sptr anim;
     WaveBossState *s = &gMantidQueen;
 
     anim = CGameObjectInstance__PickRandomAnim(obj, 0x1004, -1);

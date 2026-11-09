@@ -9,8 +9,8 @@
 #include "protos/cache.h"
 
 s32 GetMemSize(void);                                  /* osGetMemSize */
-void *memset(void *dst, s32 value, u32 size);      /* memset */
-void CHeap__Construct(CHeap *heap, void *base, u32 size);
+void *memset(void *dst, s32 value, uptr size);      /* memset */
+void CHeap__Construct(CHeap *heap, void *base, uptr size);
 void CDecompressor__Construct(CDecompressor *p, s32 n);
 void CLoader__Construct(CLoader *p, s32 n);
 void VM_Initialize(s32 a, s32 b);

@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern void *Swoosh_TakeNode(void *arg0, s32 arg1);
+extern void *Swoosh_TakeNode(void *arg0, sptr arg1);
 extern void CMtxF__GetTranslation(char *object, f32 *output);
 extern void CMtxF__GetScale(void *arg0, f32 *arg1);
 extern void CMtxF__ToMtxAffine(void *arg0, f32 *arg1);

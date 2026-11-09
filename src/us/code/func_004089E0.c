@@ -11,7 +11,7 @@
 extern s32 D_8012FB64;
 
 void CGameObjectInstance__GetDeathModels(CGameObjectInstance *, s32, s32 *, s32 *);
-void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
+void CGameObjectInstance__DrawShadow(CGameObjectInstance *, sptr, CDrawArgs *);
 void Render_QueueModelInstance(s32, s32, s32, s32, char *, s32, s32);
 void Model_PulseVertexColors(char *, char *);
 void CGameObjectInstance__ConstructLitVertices();

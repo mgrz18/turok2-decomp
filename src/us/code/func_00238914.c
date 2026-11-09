@@ -6,7 +6,7 @@
 
 
 
-extern void WeaponActor_FireCallback(void *actor, s32 flagsAddr, s32 arg2);
+extern void WeaponActor_FireCallback(void *actor, sptr flagsAddr, s32 arg2);
 
 void ImpactEvent_SetWeaponFirePos(s32 arg0, void *arg1, s32 arg2, CVector3 arg3, s32 arg6)
 {

@@ -25,7 +25,7 @@ typedef struct {
 
 extern s32 MenuPool_CountOpen(void *arg0);
 extern void EnemyAI_CalcOrientationMatrix(WeaponActor *actor, void *ai);
-extern s32 CGameObjectInstance__DrawModel(s32, s32, s32);
+extern s32 CGameObjectInstance__DrawModel(s32, sptr, s32);
 extern void CGameObjectInstance__Draw(WeaponActor *actor, struct CCamera *camera);
 extern void Render_QueueModelInstance(s32 arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
 

@@ -9,7 +9,7 @@
  * resource (built by CGameObjectInstance__ConstructLitVertices, fixed up once by Model_PulseVertexColors). */
 
 
-void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
+void CGameObjectInstance__DrawShadow(CGameObjectInstance *, sptr, CDrawArgs *);
 void Render_QueueModelInstance(s32, s32, s32, void *, char *, s32, s32);
 void Model_PulseVertexColors(char *, char *);
 void CGameObjectInstance__ConstructLitVertices();

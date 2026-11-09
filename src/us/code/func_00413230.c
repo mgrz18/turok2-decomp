@@ -1470,7 +1470,7 @@ extern s32 *func_00204EDC_416644() __asm__("CCache__Allocate");
 extern void func_00414EA8_416644() __asm__("Menu_Construct");
 extern void CList__AddHead_416644(MenuPool *a, s32 b) __asm__("CList__AddHead");
 /* Opens the window described by b in the pool a. */
-s32 MenuPool_OpenMenu(MenuPool *a, MenuDesc *b, s32 c, s32 d, s32 e) {
+s32 MenuPool_OpenMenu(MenuPool *a, MenuDesc *b, sptr c, sptr d, sptr e) {
     s32 size, i;
     s32 *r;
     s32 s;

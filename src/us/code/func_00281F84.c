@@ -2,7 +2,7 @@
 #include "structs/camera.h"
 #include "protos/cache.h"
 
-void memset(s32, s32, s32);                  /* extern */
+void memset(s32, s32, sptr);                  /* extern */
 extern u8 D_800A9A00[];
 
 /* Allocates the pool's arg1 cameras and clears them. */

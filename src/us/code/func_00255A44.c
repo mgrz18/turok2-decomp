@@ -5,7 +5,7 @@
 
 extern f32 GameObject_GetWaterHeight(CGameObjectInstance *actor);
 extern void CCamera__ResetWaterWobble(void *camera);
-extern void Sound__Play(s16 sound, CVector3 pos, s32, s32);
+extern void Sound__Play(s16 sound, CVector3 pos, sptr, s32);
 
 /* Tracks the lowest height reached, damps the player's motion and the actor's
  * vertical speed (clamped at -51.2), resets state and plays sound 2000 there. */

@@ -11,7 +11,7 @@
 extern int Controller_MenuLeft(struct ControllerProfile *object);
 extern int Controller_MenuRight(struct ControllerProfile *object);
 s32 NameEntryMenu_UpdateName(void *unused, MenuRecAt20V1 *menu) {
-    s32 i;
+    sptr i;
     f32 t;
     i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, menu->id);
     t = gNameEntries[i].timer + gFrameIncrement;

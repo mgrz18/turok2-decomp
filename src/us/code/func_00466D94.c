@@ -18,7 +18,7 @@ extern s32 Cinema_IsActive(void);
 extern s16 *CPlayer__GetFiringAmmo(CPlayer *p, s32);
 extern void Cinema_Disable(void);
 extern void Cinema_Enable(void);
-extern void CGameRegion__FireTriggers(s32, s32, CPlayer *p);
+extern void CGameRegion__FireTriggers(sptr, s32, CPlayer *p);
 
 void CPlayer__LevelStart_2(CPlayer *p) {
     GameSettings *flags = &gEngineApp_m_Settings;

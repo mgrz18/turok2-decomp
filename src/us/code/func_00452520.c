@@ -3,7 +3,7 @@
 #include "globals/menu.h"
 #include "globals/menu_desc.h"
 
-s32 MenuPool_OpenMenu_2(s32, s32, s32, s32, s32);
+s32 MenuPool_OpenMenu_2(s32, s32, sptr, sptr, sptr);
 
 s32 Controller_WatchPak(s8);                          /* extern */
 

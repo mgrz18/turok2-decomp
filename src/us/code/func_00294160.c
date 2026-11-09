@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern void *__allocParam(void);
-extern void _freePVoice(s32 arg0, void *arg1);
+extern void _freePVoice(sptr arg0, void *arg1);
 void alSynFreeVoice(void *arg0, void *arg1) {
     void *Shared_func_802B3200_de_v0;
     void *temp_a0;

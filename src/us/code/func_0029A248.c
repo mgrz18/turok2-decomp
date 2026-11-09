@@ -6,7 +6,7 @@
 
 extern int __osSpDeviceBusy();
 extern void __osSpSetStatus(unsigned int arg0);
-extern s32 __osSpRawStartDma(s32 direction, s32 spAddress, s32 dramAddress, s32 size);
+extern s32 __osSpRawStartDma(s32 direction, s32 spAddress, sptr dramAddress, s32 size);
 extern OSTask *_VirtualToPhysicalTask(OSTask *arg0);
 extern void __osSpSetStatus(u32 arg0);
 extern s32 __osSpSetPc(u32 arg0);

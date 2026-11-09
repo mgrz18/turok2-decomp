@@ -11,7 +11,7 @@ void CGameObjectInstance__Draw(CPlayer *player, s32 arg1);
 
 /* Draws the player's model: picks it (single player, tag mode or the
    character), then sets up the render state before CGameObjectInstance__Draw. */
-void CPlayer__DrawCharacter(CPlayer *player, s32 arg1) {
+void CPlayer__DrawCharacter(CPlayer *player, sptr arg1) {
     s32 model;
     Gfx *g;
 

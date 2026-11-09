@@ -2,7 +2,7 @@
 #include "structs/camera.h"
 #include "protos/cache.h"
 
-void memset(s32, s32, s32);           /* extern */
+void memset(s32, s32, sptr);           /* extern */
 extern u8 D_800A9A08[];
 
 /* Allocates the pool's on-screen texts (0x40 bytes each) and clears them. */

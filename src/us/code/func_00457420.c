@@ -25,7 +25,7 @@ void func_0045FBA8(s32 a, u8 *b, s32 c);
 s32 Pak_BytesToPages_2(s32 a);
 void PakMenu_UpdateNoteRows_2(Menu *o);
 s32 PakMenu_CheckSlotForSave_2(Menu *o, s32 a, s32 *b, s32 *c);
-void MenuPool_OpenMenu_2(u8 *a, u8 *b, s32 c, ControllerProfile *d, void *e);
+void MenuPool_OpenMenu_2(u8 *a, u8 *b, sptr c, ControllerProfile *d, void *e);
 
 #define PAK_ERROR()                                                        \
     gPakMenuLeaving = 1;                                                        \

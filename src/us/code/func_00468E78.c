@@ -12,7 +12,7 @@ typedef struct {
 
 s32 CCamera__Construct_2(s32);                         /* extern */
 
-s32 CCameraPool__AllocCamera_2(Pool *arg0) {
+sptr CCameraPool__AllocCamera_2(Pool *arg0) {
     sptr temp_s0;
 
     temp_s0 = (sptr) arg0->freeList.m_pHead;

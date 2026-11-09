@@ -6,7 +6,7 @@
 
 void DamageEvent_Set(DamageEvent *event, void *target, s32 damage, f32 radius, s32 flags, void *shield);
 void CAI__CallHurt(CGameObjectInstance *self, CAI *ai, DamageEvent *event);
-void Sound__Play(s16 sound, CVector3 pos, s32 arg4, s32 arg5);
+void Sound__Play(s16 sound, CVector3 pos, sptr arg4, s32 arg5);
 void CAI__SetMode(CGameObjectInstance *self, CAI *ai, s32 mode);
 
 void EnemyMode_ReactionShocked_Update(CGameObjectInstance *self, CAI *ai) {

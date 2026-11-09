@@ -7,7 +7,7 @@
 #include "globals/frame.h"
 #include "protos/ultra.h"
 
-void *memset(void *s, int c, u32 n);
+void *memset(void *s, int c, uptr n);
 extern s8 gAudioDmaState[];
 extern s32 gAudioDmaCache;
 extern B12DbEnt2 gAudioDmaBuffers[];

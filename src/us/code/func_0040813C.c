@@ -21,7 +21,7 @@ extern u8 D_800B6674[];
 
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
 void Sound__PlaySpeech(s32 sound);
-s8 CGameObjectInstance__PickRandomAnim(CListedInstance *actor, s32 id, s32);
+s8 CGameObjectInstance__PickRandomAnim(CListedInstance *actor, sptr id, sptr);
 void COnScreen__ClearBoss(void *);
 void COnScreen__ClearBoss2(void *);
 

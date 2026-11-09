@@ -4,8 +4,8 @@
 #include "protos/scene.h"
 
 s32 CCache__Deallocate(s32, s32);
-s32 CCache__LoadPersistantIndex(s32, s32, s32, s32);
-s32 CCache__LoadPersistantSubBlock(s32, s32, s32, s32, s32, s32, s32);
+s32 CCache__LoadPersistantIndex(s32, s32, sptr, s32);
+s32 CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, sptr, s32, sptr);
 
 M2C_UNK func_0029E460(M2C_UNK, s32, s32);           /* extern */
 extern M2C_UNK D_800A5EC0;

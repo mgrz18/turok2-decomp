@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 CGameObjectInstance__SetAnim(void *arg0, s32 arg1, s32 arg2);
-extern s32 CGameObjectInstance__PickRandomAnim(void *, s32, s32);
+extern s32 CGameObjectInstance__SetAnim(void *arg0, sptr arg1, s32 arg2);
+extern sptr CGameObjectInstance__PickRandomAnim(void *, sptr, sptr);
 s32 CGameObjectInstance__SetAnimByAction(void *a, s32 c, s32 flag) {
     s32 temp_v0 = CGameObjectInstance__PickRandomAnim(a, c, -1);
     if (temp_v0 != -1) {
@@ -12,5 +12,5 @@ s32 CGameObjectInstance__SetAnimByAction(void *a, s32 c, s32 flag) {
     }
     return 0;
 }
-s32 CGameObjectInstance__SetAnim(void *arg0, s32 arg1, s32 arg2);
-extern s32 CGameObjectInstance__PickRandomAnim(void *arg0, s32 arg1, s32 arg2);
+s32 CGameObjectInstance__SetAnim(void *arg0, sptr arg1, s32 arg2);
+extern sptr CGameObjectInstance__PickRandomAnim(void *arg0, sptr arg1, sptr arg2);

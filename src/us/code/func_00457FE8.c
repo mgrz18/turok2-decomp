@@ -23,7 +23,7 @@ void CCache__Flush(s32 a);
 void CCache__Deallocate(s32 a, s32 b);
 void Cinema_StopAtEnd_2(void);
 void Cinema_RequestById_2(s32 a);
-void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, s32 d, s32 e);
+void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, sptr d, sptr e);
 
 static __inline__ void FreeAll(void) {
     if (gSaveBufferHandle != 0 || gLoadBufferHandle != 0) {

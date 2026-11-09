@@ -330,7 +330,7 @@ s32 Cinema_Load_2(s32 index) {
     s32 count;
     s32 previous;
     s32 pending;
-    s32 loaded;
+    sptr loaded;
     CGameObjectInstance *captured;
     CScene *resources;
     s32 **owner;
@@ -968,7 +968,7 @@ void Cinema_DrawFade_2(ScreenRectangle *rectangle) {
 void Cinema_RequestForObject_2(void *owner, LevelEvent *obj) {
     s32 size;
     s32 **table;
-    s32 key;
+    sptr key;
     s32 found;
     s32 i;
     s32 n;
@@ -1007,7 +1007,7 @@ void Cinema_RequestForObject_2(void *owner, LevelEvent *obj) {
 s32 Cinema_RequestById_2(s32 key) {
     s32 size;
     s32 **table;
-    s32 loaded;
+    sptr loaded;
     s32 i;
     s32 n;
     CinemaEntry *entries;
@@ -1044,7 +1044,7 @@ extern s32 Util_StrCmp(const char *a, const char *b); /* strcmp */
 void Cinema_RequestByName_2(const char *name) {
     s32 size;
     s32 **table;
-    s32 loaded;
+    sptr loaded;
     s32 i;
     s32 id;
     s32 n;
@@ -1351,7 +1351,7 @@ s32 Cinema_GetEntryCount_2(void) {
 /* Loads the cinema table. */
 s32 **Cinema_LoadTable_2(void) {
     s32 size;
-    s32 loaded;
+    sptr loaded;
     CScene *resources = &gScene;
 
     loaded = CISet__GetROMAddressAndSize(resources->m_pCinemas, resources->m_CinemasKey, 0, &size);

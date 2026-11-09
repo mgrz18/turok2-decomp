@@ -7,7 +7,7 @@ typedef struct {
     /* 0x08 */ s32 count;
 } PlayerPool;
 
-s32 memset(s32, s32, s32);           /* extern */
+s32 memset(s32, s32, sptr);           /* extern */
 extern s32 D_800A7080;
 
 /* Allocates and clears count player records (0x1328 bytes each). */

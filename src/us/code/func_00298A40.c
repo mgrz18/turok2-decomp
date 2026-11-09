@@ -5,10 +5,10 @@
 #include "globals/libultra.h"
 
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern s32 __osSiRawStartDma(s32, s32);
+extern s32 __osSiRawStartDma(s32, sptr);
 extern s32 osRecvMesg(OSMesgQueue *, void **, s32);
 extern void __osSiCreateAccessQueue();
-extern void osCreateMesgQueue(void *, s32, s32);
+extern void osCreateMesgQueue(void *, sptr, s32);
 extern u64 osGetTime(void);
 extern void __osPackRequestData(s32 arg0);
 extern void __osContGetInitData(s32 *arg0, s32 arg1);

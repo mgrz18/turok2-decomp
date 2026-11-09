@@ -4,7 +4,7 @@
 #include "protos/scene.h"
 
 
-s32 CScene__GetLinkGroupCountPtr(CScene *arg0, s32 arg1) {
+sptr CScene__GetLinkGroupCountPtr(CScene *arg0, s32 arg1) {
     sptr temp_v0;
 
     temp_v0 = CISet__GetBlock(arg0->m_pBitSections, 1);

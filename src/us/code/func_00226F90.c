@@ -2,7 +2,7 @@
 
 #include "common.h"
 
-void Sort_Insertion(u32 lo, u32 hi, u32 width, s32 (*compare)(u32, u32), void (*swap)(u32, u32));
+void Sort_Insertion(uptr lo, uptr hi, u32 width, s32 (*compare)(u32, u32), void (*swap)(u32, u32));
 
 /* Sorts num elements of the given width with a comparator and a swap routine using an iterative quicksort: partitions around the middle element, pushes the larger side onto a 30-entry stack and continues with the smaller, and hands ranges of eight or fewer elements to Sort_Insertion. */
 

@@ -19,7 +19,7 @@ extern u8 gEngineApp_m_Game_m_MenuPool[]; /* local type: globals/menu.h declares
 s32 PakMenu_CheckPak_2(Menu *o, s32 pad, s32 z);
 CPlayer *CPlayerPool__FindByController(CPlayerPool *list, ControllerProfile *s);
 s32 Pak_DeleteNote_2(s32 pad, s32 idx);
-void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, s32 d, s32 e);
+void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, sptr d, sptr e);
 
 s32 GameNoteMenu_SelectYes_2(s32 unused, Menu *own) {
     f32 *new_var;

@@ -54,7 +54,7 @@ typedef struct {
     /* 0x10D */ u8 blendEnd;
 } AnimActor;
 
-void CAnimationState__SwitchToQueued(AnimTrack *track, s32 data, s32 key, s32 primary, s32 *active, AnimTrack *other);
+void CAnimationState__SwitchToQueued(AnimTrack *track, sptr data, s32 key, s32 primary, s32 *active, AnimTrack *other);
 s32 CAnimationState__IsLoaded(AnimTrack *track);
 AnimBlendEntry *CAnimationState__GetKeyHeader(AnimTrack *track);
 void CAnimationState__Release(AnimTrack *track);

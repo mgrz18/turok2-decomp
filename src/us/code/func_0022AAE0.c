@@ -7,7 +7,7 @@
 #include "protos/game.h"
 
 
-void CGameRegion__FireTriggers(s32 state, s32 bits, CParticle *p);
+void CGameRegion__FireTriggers(sptr state, s32 bits, CParticle *p);
 
 static __inline__ s32 isGroupA(CParticle *p) {
     switch (p->header.m_nObjType) {

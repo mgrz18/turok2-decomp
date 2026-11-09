@@ -30,7 +30,7 @@ typedef struct {
     /* 0x52 */ u16 flags2;
 } TargetInfo;
 
-s32 CGameObjectInstance__PickRandomAnim(void *, s32, s32);
+sptr CGameObjectInstance__PickRandomAnim(void *, sptr, sptr);
 s32 EnemyAnim_NormalDeath_B0120(void *, void *);
 s32 EnemyAnim_NormalDeath_B0150(void *, void *);
 s32 EnemyAnim_NormalDeath_B0180(void *, void *);

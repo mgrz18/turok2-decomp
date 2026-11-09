@@ -1181,7 +1181,7 @@ extern void CParticle__Attach(Effect *effect, s32, s32);
 extern void Trail_AddNode(void *, Effect *, s32);
 extern s32 DLight_Spawn(void *, s32);
 extern void CParticle__StartLoopSound(Effect *effect, s32 sound);
-extern void Sound__Play(s16 sound, CVector3 pos, s32 a, s32 b);
+extern void Sound__Play(s16 sound, CVector3 pos, sptr a, s32 b);
 
 static __inline__ s32 randomCount(s32 range) {
     return range != 0 ? Random_Next() % (range + 1) : 0;

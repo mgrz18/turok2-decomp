@@ -3,7 +3,7 @@
 #include "globals/pak.h"
 
 
-s32 PakMenu_GetPlayerAndPort(Menu *arg0, s32 *arg1) {
+sptr PakMenu_GetPlayerAndPort(Menu *arg0, s32 *arg1) {
     sptr var_a0;
     s32 var_v0;
 

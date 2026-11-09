@@ -2,9 +2,9 @@
 #include "globals/scene.h"
 #include "protos/scene.h"
 
-void LevelEvent_ProcessTriggers(s32, s32, s32, s32, s32, s32, s32); /* extern */
+void LevelEvent_ProcessTriggers(s32, s32, s32, s32, s32, s32, sptr); /* extern */
 
-void CGameRegion__FireTriggers(s32 arg0, s32 arg1, s32 arg2) {
+void CGameRegion__FireTriggers(sptr arg0, s32 arg1, s32 arg2) {
     s32 sp20;
     s32 sp24;
 

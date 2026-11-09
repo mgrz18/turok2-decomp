@@ -48,7 +48,7 @@ void CScene__StreamAllSections(CScene *level) {
     s32 col;
     s32 firstCol;
     s32 firstRow;
-    s32 key;
+    sptr key;
     void **block;
     void *node;
     Counted *list;

@@ -4,7 +4,7 @@
 
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
-s32 CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
+sptr CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
 {
   s32 temp_a0;
   s32 temp_s1;

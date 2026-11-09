@@ -8,7 +8,7 @@ typedef struct {
     /* 0x6A88 */ s32 pending;
 } Unk00235FF4;
 
-s32 Swoosh_TakeNode(Unk00235FF4 *arg0, s32 arg1) {
+s32 Swoosh_TakeNode(Unk00235FF4 *arg0, sptr arg1) {
     s32 temp_s0;
 
     temp_s0 = arg0->pending;

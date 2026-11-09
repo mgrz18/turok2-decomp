@@ -11,7 +11,7 @@
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 extern void CDecompressor__DecompressSync(CDecompressor *, CCacheEntry *);
-extern void CLoader__LoadSync(CLoader *, u32, u32, void *);
+extern void CLoader__LoadSync(CLoader *, uptr, u32, void *);
 extern void CLoader__LoadAsync(CLoader *, u32, u32, void *, void *, CCacheEntry *, s32);
 
 static __inline__ void acquire(void) {
@@ -87,7 +87,7 @@ static __inline__ CMemEntry *allocate(u32 size, u32 flags) {
 /* Returns the cached resource for `key` (loading `size` bytes from ROM offset
  * `key` when absent): synchronously when `direct` (or the manager mask) is set,
  * otherwise queues the read and returns 0. */
-CMemEntry *CCache__Request(s32 unused, u32 key, u32 size, u32 mode, sptr owner, void *tag, char *name, u32 direct) {
+CMemEntry *CCache__Request(s32 unused, uptr key, u32 size, u32 mode, sptr owner, void *tag, char *name, u32 direct) {
     CCacheEntry *request;
     CCacheEntry *scan;
     CCacheEntry *resolved;

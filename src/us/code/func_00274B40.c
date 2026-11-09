@@ -61,7 +61,7 @@ extern void alCSPPlay(s32);
 extern int alCSPGetState(void *object);
 struct Track;
 extern void alCSPSetChlFXMix(s32 arg0, s32 arg1, s8 arg2);
-extern s32 BinarySearch(s32,s32,s32);
+extern s32 BinarySearch(s32,s32,sptr);
 extern f32 HalfToFloat(u16);
 extern void alCSeqNew(s32, void *);
 static __inline__ f32 fade_rate(Track *track,f32 time,f32 rate) {track->unk30=time;return (f32)track->unk20/(time*rate);}

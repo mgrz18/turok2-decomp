@@ -68,7 +68,7 @@ __inline__ f32 CAnimationState__GetRootYaw(AnimPlayer *anim, f32 time) {
     return Angle_Lerp(time - (f32) first, (f32) keys[first] * 9.587673e-05f, (f32) keys[last] * 9.587673e-05f);
 }
 
-__inline__ s32 CAnimationState__Load(AnimPlayer *player, s32 file, s32 base, s32 index) {
+__inline__ s32 CAnimationState__Load(AnimPlayer *player, sptr file, s32 base, s32 index) {
     s32 size;
     void *tree;
 
@@ -87,7 +87,7 @@ __inline__ s32 CAnimationState__Load(AnimPlayer *player, s32 file, s32 base, s32
     return 1;
 }
 
-void CAnimationState__SwitchToQueued(AnimPlayer *player, s32 file, s32 base, s32 blend, s32 *changed, AnimPlayer *previous) {
+void CAnimationState__SwitchToQueued(AnimPlayer *player, sptr file, s32 base, s32 blend, s32 *changed, AnimPlayer *previous) {
     s32 current = player->current;
     s32 next = player->next;
     AnimPlayer saved;

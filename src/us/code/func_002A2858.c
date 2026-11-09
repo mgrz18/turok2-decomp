@@ -9,7 +9,7 @@
 #include "structs/hostio.h"
 #include "protos/ultra.h"
 void HostIo_StartThread(s32 arg);
-s32 PCinitThreaded(void) {
+sptr PCinitThreaded(void) {
     HostIoRequest req;
     OSMesg reply;
     sHostIoState = 2;

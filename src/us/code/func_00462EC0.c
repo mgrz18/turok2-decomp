@@ -16,11 +16,11 @@ extern s32 Model_DecompressCallback();
 extern s32 CScene__DecompressIntelligence_2();
 extern s32 CScene__DecompressParticles_2();
 
-extern void **CCache__Request(s32, s32, s32, s32, s32, s32 (*)(), char *, s32);
+extern void **CCache__Request(s32, sptr, s32, s32, s32, s32 (*)(), char *, s32);
 extern void CCache__Deallocate(s32, void **);
 extern void CCache__Flush(s32);
-extern void CCache__LoadPersistantIndex(s32, s32 *, s32, char *);
-extern void **CCache__LoadPersistantSubBlock(s32, s32, s32, s32, CScene *, s32 (*)(), char *);
+extern void CCache__LoadPersistantIndex(s32, s32 *, sptr, char *);
+extern void **CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, CScene *, s32 (*)(), char *);
 extern s32 CScene__FindObjectType(CScene *w, s32 id);
 extern s32 CScene__GetObject(CScene *w, s32 index);
 extern void CScene__ClearListCounts(void);

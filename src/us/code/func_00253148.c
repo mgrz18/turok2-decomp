@@ -3,7 +3,7 @@
 #include "structs/camera.h"
 
 s32 Render_FlushBatches(void);
-s32 CPlayer__DrawCharacter(s32, s32);
+s32 CPlayer__DrawCharacter(s32, sptr);
 s32 Cinema_FollowsPlayer(void);
 
 void Render_ResetBatches();                               /* extern */

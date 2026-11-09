@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 #include "protos/iset.h"
 
-extern s32 BinarySearch(void *, s32, s32);
+extern s32 BinarySearch(void *, s32, sptr);
 extern f32 HalfToFloat(s32);
 void *SndSeq_GetSongData(SequenceState *state, s32 index) {
     s32 selection;

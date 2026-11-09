@@ -104,7 +104,7 @@ extern u8 gEngineApp_m_SwooshSystem[];
 
 s32 Cinema_PathPlaying(void);
 s32 MtxPool_Alloc(void *table, s32 id);
-void CAnimationState__SwitchToQueued(AnimChannel *channel, s32 anims, s32 file, s32, s32, s32);
+void CAnimationState__SwitchToQueued(AnimChannel *channel, sptr anims, s32 file, s32, s32, s32);
 void CAnimationState__FindKeys(AnimChannel *channel, KeyLookup *keys);
 void CAnimationState__Release(AnimChannel *channel);
 s32 CAnimationState__IsLoaded(AnimChannel *channel);
@@ -118,7 +118,7 @@ static __inline__ void addMicroseconds(f32 *usec, u32 cycles) {
     *dst = *usec + (f32) ((u64) cycles * 64 / 3000);
 }
 
-s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, s32 arg2) {
+s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2) {
     PoseContext ctx;
     u8 bones[0x2000];
     f32 mtx[4][4];

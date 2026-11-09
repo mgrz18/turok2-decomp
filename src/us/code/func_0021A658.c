@@ -57,7 +57,7 @@ extern void CGameObjectInstance__MoveWithCollision(char *, CVector3 *);
 typedef struct CollisionInfo CollisionInfo;
 extern CollisionInfo D_800F1EB0;
 extern s32 Collision_MoveInstance(void *arg0, CVector3 arg1, CollisionInfo *arg2);
-extern void CGameRegion__FireTriggers(s32 arg0, s32 arg1, void *arg2);
+extern void CGameRegion__FireTriggers(sptr arg0, s32 arg1, void *arg2);
 void CGameObjectInstance__MoveWithCollision(char *arg0, CVector3 *arg1) {
     CollisionInfo *collision;
     u16 *old_contact;

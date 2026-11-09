@@ -7,7 +7,7 @@
 #include "globals/pak.h"
 #include "globals/controller.h"
 #include "protos/ultra.h"
-s32 osContReset(OSMesgQueue *mq, OSContStatus *data);
+sptr osContReset(OSMesgQueue *mq, OSContStatus *data);
 void osContGetQuery(OSContStatus *data);
 void Controller_UpdateConnection(ControllerProfile *c);
 void Controller_ProcessInput(ControllerProfile *c, s8 x, s8 y, u16 b);
