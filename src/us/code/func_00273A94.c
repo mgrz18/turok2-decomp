@@ -4,6 +4,7 @@
 #include "rw/abu_types.h"
 #include "globals/audio.h"
 
+#ifndef TARGET_PORT
 void SndVoicePool_Construct(s32 *arg0, s32 arg1) {
     s32 i;
     s32 idx;
@@ -58,3 +59,38 @@ void SndVoicePool_Construct(s32 *arg0, s32 arg1) {
         off += 0xCC;
     } while (i < 0x11);
 }
+#else
+#include "structs/sound.h"
+/* The port: the same on the typed pool (the Rage Wars view above writes the 17 voices at N64
+ * offsets, 0xCC apart): the volume curve, then every voice reset. */
+void SndVoicePool_Construct(SndVoicePool *pool, CAudioWorld *m) {
+    s32 i;
+    pool->owner = m;
+    for (i = 0; i < 0x5B; i++) {
+        f32 t = (f32)i * 0.011111111f;
+        gSndVolumeCurve[0x5A - i] = (s16)(s32)(t * t * t * t * t * 3.2e4f);
+    }
+    for (i = 0; i < 0x11; i++) {
+        SndVoice *v = &pool->voices[i];
+        v->index = i;
+        v->mgr = m;
+        v->id = -1;
+        v->unk8 = -1;
+        v->vp.channel = -1;
+        v->vp.priority = 0;
+        v->vp.unk30 = -1;
+        v->vp.w4 = 0;
+        v->vp.scale = 1.0f;
+        v->vp.distSq = 0.0f;
+        v->vp.prevDistSq = 0.0f;
+        v->vp.doppler = 1.0f;
+        v->flags = 0;
+        v->stopping = 0;
+        v->unkB4 = -1;
+        v->pitchScale = 1.0f;
+        v->hasTrack = 0;
+        v->reset = 0;
+        v->unkC4 = 1;
+    }
+}
+#endif

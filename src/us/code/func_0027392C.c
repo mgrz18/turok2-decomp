@@ -12,6 +12,7 @@ extern void alSndpStop(void *sound);
 extern void alSndpSetSound(void *arg0, s16 arg1);
 extern s32 alSndpGetState(void *arg0);
 extern void alSndpStop(void *arg0);
+#ifndef TARGET_PORT
 void SndVoicePool_StopAllExcept(RecordRecAt4V6 *record, s32 value)
 {
   s32 i;
@@ -49,3 +50,27 @@ void SndVoicePool_StopAllExcept(RecordRecAt4V6 *record, s32 value)
     }
   }
 }
+#else
+#include "structs/sound.h"
+/* The port: the same on the typed pool (the Rage Wars view above has N64 offsets: slot.used =
+ * unk8, key = vp.frame, flag = vp.follow, value = soundId, active = stopping, owner = mgr;
+ * header->local = pendingCue, owner->sound = player, samples = handles, owner->key = frame). */
+void SndVoicePool_StopAllExcept(SndVoicePool *pool, s32 value) {
+    s32 i;
+    SndVoice *v = pool->voices;
+    for (i = 0; i < 16; v++, i++) {
+        if (v->unk8 != -1 && pool->owner->pendingCue != i && (value == -1 || v->soundId != value)) {
+            CAudioWorld *m = v->mgr;
+            v->stopping = 1;
+            v->vp.follow = NULL;
+            if (v->vp.frame != m->frame) {
+                alSndpSetSound(&m->player, m->handles[v->index]);
+                if (alSndpGetState(&m->player) != 0) {
+                    alSndpStop(&m->player);
+                }
+                v->sound = -1;
+            }
+        }
+    }
+}
+#endif

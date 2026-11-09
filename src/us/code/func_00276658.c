@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 
+#ifndef TARGET_PORT
 void SndQueue_CancelAllExcept(OwnerRecAtD8 *arg0, s32 arg1) {
     Node_func_80259918_de *node;
     Node_func_80259918_de *next;
@@ -17,3 +18,22 @@ void SndQueue_CancelAllExcept(OwnerRecAtD8 *arg0, s32 arg1) {
         node = next;
     }
 }
+#else
+#include "structs/sound.h"
+/* The port: the same on the typed queue (node key = body.soundId; moved to the free list tail). */
+void SndQueue_CancelAllExcept(SndQueue *q, s32 arg1) {
+    SndLink *node = q->active.link.next;
+    while (node != &q->active.link) {
+        SndLink *next = node->next;
+        if (arg1 == -1 || ((SndNode *)node)->body.soundId != arg1) {
+            node->prev->next = next;
+            node->next->prev = node->prev;
+            node->next = &q->free.link;
+            node->prev = q->free.link.prev;
+            q->free.link.prev->next = node;
+            q->free.link.prev = node;
+        }
+        node = next;
+    }
+}
+#endif
