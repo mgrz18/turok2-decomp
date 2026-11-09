@@ -332,8 +332,11 @@ def leaves(d, noff, hoff, out):
             leaves(d[2], noff + i * n, hoff + i * h, out)
     elif t == 'r':
         fields = d[6]
-        if d[5]:  # union: the first member decides
-            fields = fields[:1]
+        if d[5]:  # union: the first member decides, except that a scalar member as large as
+            # the union wins (libultra's du is { struct { u32 hi, lo; } w; f64 d; }: written by
+            # its words, a little-endian double comes out with its halves swapped)
+            whole = [f for f in fields if f[2] < 0 and f[3][0] == 's' and f[3][1] == d[1]]
+            fields = whole[:1] if whole else fields[:1]
         for nb, hb, bw, fd in fields:
             if bw >= 0:
                 out.append((noff * 8 + nb, hoff * 8 + hb, 'b', bw, dsize(fd)[1], None))
@@ -344,24 +347,45 @@ def leaves(d, noff, hoff, out):
 
 
 def dtranslate(d, noff):
+    return _dtranslate(d, noff)[0]
+
+
+def _dtranslate(d, noff):
+    """(host offset, typed): typed is False when the offset only lands in a byte array (a
+    `u8 pad[N]` view), so that a union prefers the member that types the offset: CGame's
+    camera pool is `union { CCameraPool m_CameraPool[1]; struct { u8 pad[..]; u8 m_MenuPool[..]; }; }`
+    and CEngineApp's game `union { CGame m_Game; struct { u8 pad[..]; GameSettings m_Settings; }; }`
+    (structs/game.h). Ties go to the first member, as in leaves()."""
     t = d[0]
     if t == 'a':
         n, h = dsize(d[2])
         if n <= 0:
-            return noff
+            return noff, False
         i = noff // n
-        return i * h + dtranslate(d[2], noff - i * n)
+        sub, typed = _dtranslate(d[2], noff - i * n)
+        if d[2][0] == 's' and d[2][1] == 1 and d[1] > 4:
+            typed = False
+        return i * h + sub, typed
     if t == 'r':
-        best = None
-        for nb, hb, bw, fd in d[6]:
-            if bw < 0 and nb // 8 <= noff:
-                best = (nb // 8, hb // 8, fd)
-        if best is None:
-            return noff
-        return best[1] + dtranslate(best[2], noff - best[0])
+        cands = [(nb // 8, hb // 8, fd) for nb, hb, bw, fd in d[6] if bw < 0 and nb // 8 <= noff]
+        if not cands:
+            return noff, True
+        if d[5]:  # union: every member starts at 0
+            best = None
+            for c in cands:
+                if noff - c[0] >= dsize(c[2])[0]:
+                    continue
+                sub, typed = _dtranslate(c[2], noff - c[0])
+                if best is None or (typed and not best[1]):
+                    best = (c[1] + sub, typed)
+            if best is not None:
+                return best
+        c = cands[-1]
+        sub, typed = _dtranslate(c[2], noff - c[0])
+        return c[1] + sub, typed
     if t == 'p':
-        return min(noff, 4)
-    return noff
+        return min(noff, 4), True
+    return noff, True
 
 
 def shape(d):
