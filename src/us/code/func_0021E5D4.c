@@ -42,6 +42,44 @@ struct LevelActor;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
+#ifdef TARGET_PORT
+/* The host: the same on CGameObjectInstance/CPlayer (the LevelActor view and the player
+ * stride 0x1328, weapon actor +0x288, AI +0x140 are N64 layouts). */
+#include "structs/game_object.h"
+#include "structs/player.h"
+#include "structs/ai_type.h"
+void func_0021E5D4(char *arg0) {
+    CGameObjectInstance *obj = (CGameObjectInstance *)arg0;
+    CIntelligenceTypeInfo *entry;
+    s32 type;
+    s32 i;
+
+    type = obj->header.m_pIntelligence->m_Type;
+    entry = NULL;
+    if ((u32)type < 13) {
+        entry = gIntelligenceTypeInfo[type];
+        if (type == 11) {
+            for (i = 0; i < gEngineApp_m_Game_m_PlayerList_m_nPlayers; i++) {
+                CPlayer *player = &((CPlayer *)gEngineApp_m_Game_m_PlayerList_m_Players)[i];
+                if (obj == &player->m_CharacterActor) {
+                    entry = NULL;
+                    break;
+                }
+                if (obj == &player->m_WeaponActor) {
+                    entry = &gWeaponActorTypeInfo;
+                    break;
+                }
+            }
+        }
+    }
+    if (entry != NULL && entry->init != NULL) {
+        entry->init(obj, &obj->m_AI);
+    }
+    if (obj->m_dwFlags & 0x08000000) {
+        obj->m_AI.m_AnimRepeatedCount++;
+    }
+}
+#else
 void func_0021E5D4(char *arg0)
 {
     s32 type;
@@ -88,3 +126,4 @@ selected:
         (((struct LevelActor *)(arg0))->updateCount)++;
     }
 }
+#endif
