@@ -78,7 +78,7 @@ void *CScene__GetRegionInfo(struct CScene *, u16 *);
 void *CScene__GetRumble(struct CScene *, s32);
 s32 CScene__GetSavedBit(struct CScene *, s32, s32, s32, s32);
 void CScene__GetSwoosh(struct CScene *);
-void CScene__GetTextureSet(struct CScene *, s32, s32 *, s32);
+void CScene__GetTextureSet(struct CScene *, s32, s32 *, sptr);
 void CScene__InitPersistentData(void *);
 s32 CScene__IsEventFired(struct CScene *, void *);
 s32 CScene__IsEventFiredInLevel(struct CScene *, s32, s32);
