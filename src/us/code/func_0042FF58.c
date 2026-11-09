@@ -2,22 +2,17 @@
 #include "structs/camera.h"
 #include "protos/list.h"
 
-/* A pool of elements on a free list and an active list (CList__*), laid out
- * like the head of CCameraPool. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ CList m_FreeList;
-    /* 0x20 */ CList m_ActiveList;
-} CElementPool;
+/* Typed on CCameraPool (structs/camera.h): m2c's pool view put the free and active lists at
+ * their N64 offsets 0xC/0x20, wrong on the host (the pool starts with two pointers). */
 
-s32 CCamera__Construct(s32);
+void CCamera__Construct(CCamera *);
 
-/* Takes the first free element, resets it and moves it to the active list. */
-sptr CCameraPool__AllocCamera(CElementPool *arg0) {
-    sptr temp_s0;
+/* Takes the first free camera, resets it and moves it to the active list. */
+CCamera *CCameraPool__AllocCamera(CCameraPool *arg0) {
+    CCamera *temp_s0;
 
-    temp_s0 = (sptr) arg0->m_FreeList.m_pHead;
-    if (temp_s0 != 0) {
+    temp_s0 = (CCamera *) arg0->m_FreeList.m_pHead;
+    if (temp_s0 != NULL) {
         CCamera__Construct(temp_s0);
         CList__Remove(&arg0->m_FreeList, temp_s0);
         CList__AddTail(&arg0->m_ActiveList, temp_s0);

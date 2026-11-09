@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/pak.h"
@@ -73,7 +74,7 @@ void PakMenu_InitSaveProfile_2(Menu *own) {
     msg = O01Pick(&sel);
     if (gDamagedPakContinued != 0) {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu_2((u8 *)own->player->m_pCamera + 0x53C, msg, plr, plr->m_ContState.m_pContState, 0);
+        MenuPool_OpenMenu_2((u8 *)own->player->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), msg, plr, plr->m_ContState.m_pContState, 0);
     } else {
         if (gPakMenuAnyPak != 0) {
             pad = gPakMenuPort;

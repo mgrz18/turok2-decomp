@@ -1,6 +1,7 @@
 /* First-module twin of src/us/code/PakMenu_SelectCancel_2.c. WRONG CUT: REAL PakMenu_SelectCancel size 0x2B8 (0x0042019C-0x00420454); splat cut its tail into func_004203B0. Matches whole (checked with the size overridden). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004085E0.c, func_004085E0, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/game.h"
@@ -60,7 +61,7 @@ s32 PakMenu_SelectCancel(s32 a0, Menu *arg) {
         if (gPakMenuIsLoad != 0) {
             gPakMenuLeaving = 1;
             plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, arg->controller);
-            MenuPool_OpenMenu(((u8 *)plr->m_pCamera) + 0x53C, (u8 *)&gCharacterMenuDesc, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
+            MenuPool_OpenMenu(((u8 *)plr->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool), (u8 *)&gCharacterMenuDesc, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
         if (gPakMenuIsSave != 0) {
@@ -84,7 +85,7 @@ s32 PakMenu_SelectCancel(s32 a0, Menu *arg) {
                 tbl = (u8 *)&gStatsAfterPakMenuDesc4;
                 break;
             }
-            MenuPool_OpenMenu(((u8 *)plr->m_pCamera) + 0x53C, tbl, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
+            MenuPool_OpenMenu(((u8 *)plr->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool), tbl, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
         return 0;
@@ -99,7 +100,7 @@ s32 PakMenu_SelectCancel(s32 a0, Menu *arg) {
         return 0;
     } else {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu(((u8 *)plr->m_pCamera) + 0x53C, (u8 *)&gSavePortalMenuDescB, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
+        MenuPool_OpenMenu(((u8 *)plr->m_pCamera) + T2_OFFSETOF(CCamera, m_MenuPool), (u8 *)&gSavePortalMenuDescB, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
         gCameraPoolHideViews = 0;
         return 1;
     }

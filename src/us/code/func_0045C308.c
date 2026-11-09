@@ -1,5 +1,7 @@
 /* Second-module copy of SavePortalMenu_SelectGoBack (first module). The port comes back through a pointer (a stack slot the ROM stores but never reads). */
 #include "common.h"
+#include "structs/player.h"
+#include "structs/camera.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 #include "globals/menu.h"
@@ -30,7 +32,7 @@ s32 SavePortalMenu_SelectGoBack_2(s32 unused, Menu *event) {
     gEngineApp_m_Game_m_PlayerList_m_bCinema[1] = 0;
     gCameraPoolHideViews = 0;
     player = GetPlayer(event, &port);
-    MenuPool_OpenMenu_2(*(char **)(player + 0x51C) + 0x53C, (char *)&gPakMsgInsertRumblePakDesc_2, player, *(s32 *)(player + 0xA50), 0);
+    MenuPool_OpenMenu_2((char *)((CPlayer *)player)->m_pCamera + T2_OFFSETOF(CCamera, m_MenuPool), (char *)&gPakMsgInsertRumblePakDesc_2, player, (sptr)((CPlayer *)player)->m_ContState.m_pContState, 0);
     gSavePortalActive = 0;
     return 1;
 }
