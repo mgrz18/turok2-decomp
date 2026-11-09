@@ -392,7 +392,7 @@ work. It also found a host-layout bug that affects Linux too: `CCache__AllocateA
 ## Round 4, part s3: macOS parity (mode 0, then legal and the first cinema)
 
 Details and the crash table (s3-1 to s3-19): [MACOS.md](MACOS.md) section 6. Branch
-`names-R4_s3` in the Mac clone, 23 commits on 474e40af. asm_diff 0 over all 3,938 files,
+`names-R4_s3` in the Mac clone, 21 commits on 474e40af. asm_diff 0 over all 3,938 files,
 checked on the box after every change.
 
 - **macOS now runs mode 0 headless for 300 frames**: 1,414 thread switches and 151 gfx tasks,

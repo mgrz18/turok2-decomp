@@ -255,7 +255,7 @@ images). Since s3-19 the colour image carries the full 64-bit address (`FF ... 0
 `gPakCheckHasPak` is 0, and mode 0 draws the scene and then the pak menu, not the "ACCESSING THE
 CONTROLLER PAK" text. The Linux windowed run (keyboard controller on port 0) draws the text, and
 since s3-13 also the menu lines:
-`scratchpad/assets_preview/R4_s3_linux_s3branch_f300.png` shows "PROBLEM!", "DAMAGED
+the round-4 screenshot `R4_s3_linux_s3branch_f300.png` (not in the repo) shows "PROBLEM!", "DAMAGED
 CONTROLLER PAK FOUND IN CONTROLLER #1.", "ATTEMPT REPAIR" (highlighted), "RETRY", "CONTINUE
 WITHOUT SAVING". On the Mac that path needs a controller without a window: s1's PIF/controller
 work, or a port flag that connects a virtual pad headless.
