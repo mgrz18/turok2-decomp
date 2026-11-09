@@ -8,7 +8,13 @@
 #include "common.h"
 #include "ultra_types.h" /* OSThread, OSMesgQueue, OSPfs, __OSInode, __OSInodeCache */
 
+#ifdef TARGET_PORT
+/* The host's own size_t (64-bit; Windows predeclares it and rejects another
+ * type). These printf internals are replaced by the host libc in the port. */
+typedef __SIZE_TYPE__ size_t;
+#else
 typedef unsigned size_t;
+#endif
 typedef char * __gnuc_va_list;
 typedef __gnuc_va_list va_list;
 typedef long double ldouble;
