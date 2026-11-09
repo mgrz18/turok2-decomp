@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 void AI_UpdateTargets(void *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
 void AI_ComputeFrameMotion(void *self, CAI *ai, CAIFrameMotion *out);
 void EnemyFly_SteerToPathScaled(void *self, CAI *ai, CAITargets *t, CAIFrameMotion *steer, f32 speed, f32 arg5);
-void CAI__SetMode(void *self, CAI *ai, s32 mode);
 
 void EnemyRam_CombatUpdate(void *self, CAI *ai) {
     CAITargets t;

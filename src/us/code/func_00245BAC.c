@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
 extern void Actor_TurnBy(void *arg0, f32 arg1);
 void AI_TurnClamped(void *arg0, s32 arg1, f32 arg2, f32 arg3) {

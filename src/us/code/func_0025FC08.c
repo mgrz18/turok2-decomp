@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
 
 void TotemDefense_AddKill(void);
-void CAI__SetMode(CGameObjectInstance *self, CAI *ai, s32 mode);
 
 void EnemyMode_ReactionBore_Update(CGameObjectInstance *self, CAI *ai) {
     CEnemyIntelligence *data = &self->header.m_pIntelligence->m_Enemy;

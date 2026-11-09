@@ -2,13 +2,13 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
 /* Weapon state: spins the barrel up while fire is held, else stops it. */
 
 
 
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
-extern s32 CAI__SetMode(void *obj, CAI *state, s32 mode);
 extern s32 Sound__Play(s32 sound, CVector3 position, CVector3 *source, s32 arg5);
 extern void CPlayer__StopWeaponFiringSound(CPlayer *player);
 extern void CPlayer__StopWeaponBackgroundSound(CPlayer *player);

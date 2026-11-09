@@ -1,9 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/TEAM/80217388.CPP, func_80217388_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
 
+#include "protos/game.h"
 typedef struct SoundSourceNode SoundSourceNode;
 
 /* Turok 2 layouts (Rage Wars offsets in comments). */
@@ -19,7 +18,6 @@ typedef struct Dest {
 } Dest;
 
 extern void Sound__StopOwner(void *);
-extern void *LoopSounds_Get(void);
 extern s32 LoopSounds_Stop(void *, void *);
 
 void AI_StopSound(void *arg0, Dest *arg1) {

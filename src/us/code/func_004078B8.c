@@ -2,10 +2,9 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern void AI_TurnClamped(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 angle);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern s32 D_800F1F50[];
 

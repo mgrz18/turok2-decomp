@@ -3,9 +3,8 @@
 #include "structs/boss.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
-void CAI__SetMode(void *a0, void *a1, s32 event);
-void AI_PlayAnim(CGameObjectInstance *actor, void *ai, s32 state);
 
 /* MantidQueen_NextStep */
 static __inline__ void State_NextStep(WaveBossState *s) {

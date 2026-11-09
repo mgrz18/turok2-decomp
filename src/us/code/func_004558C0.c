@@ -3,10 +3,10 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/menu_desc.h"
+#include "protos/player.h"
 
 /* Reset the current player state and open a menu page on the player's controller. */
 
-void CPlayerPool__GetIndex(void *state, void *player);
 void func_0045A170(void);
 void MenuPool_OpenMenu_2(void *menu, void *page, void *player, void *controller, s32 flags);
 

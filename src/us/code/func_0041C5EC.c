@@ -2,8 +2,8 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/game.h"
+#include "protos/menu.h"
 
-s32 Menu_StepValue(s32, s32, s32, s32, s32, s32);
 
 s32 OptionsMenu_StepStickVert(s32 arg0, Menu *arg1) {
     CPlayerOptions *temp_v0_2;

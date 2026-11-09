@@ -2,6 +2,7 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
 /* Name entry: highlight the current player's column and load the player's
  * name (trailing spaces trimmed; the default name "player" counts as empty)
@@ -11,7 +12,6 @@
 
 extern u8 D_8011AB8B[];
 
-s32 CPlayerPool__GetIndex(void *state, void *player);
 
 static __inline__ s32 nameEquals(u8 *a, u8 *b, s32 count) {
     u8 c;

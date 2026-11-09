@@ -4,6 +4,7 @@
 #include "structs/collision.h"
 #include "globals/scene.h"
 #include "globals/collision.h"
+#include "protos/scene.h"
 
 
 /* A region corner: its floor point and the ceiling height above it. */
@@ -31,7 +32,6 @@ s32 Sweep_GetGroundBehavior(Sweep *sweep, CGameRegion *region);
 void CGameRegion__GetNormalRaw(CVector3 *normal, CGameRegion *region);        /* floor plane */
 void CGameRegion__GetCeilingNormalRaw(CVector3 *normal, CGameRegion *region);        /* ceiling plane */
 s32 CGameRegion__IsSteep(CGameRegion *region);
-Water *CScene__GetRegionInfo(u8 *scene, CGameRegion *region);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *inst);                       /* height */
 void CVector3__Subtract(CVector3 *out, void *a, CVector3 *b);        /* out = a - b */
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *base, CVector3 *dir);   /* out = base + t * dir */

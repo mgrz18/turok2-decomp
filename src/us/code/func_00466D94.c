@@ -7,10 +7,10 @@
 #include "globals/scene.h"
 #include "globals/render.h"
 #include "globals/player.h"
+#include "protos/game.h"
 
 extern void CPlayer__PickSpawnPoint(void);
 extern void CPlayer__LoadCharacterModel(CPlayer *p);
-extern void Controller_SetRumbleOption(s32 controller, s32 state);
 extern void COverlay__Construct(COverlay *item, s32 x, s32 y);
 extern void COverlay__StartScript(COverlay *item, s32 *script);
 extern void CPlayer__Reset(CPlayer *p);

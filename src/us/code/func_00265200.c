@@ -7,6 +7,8 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
 typedef struct {
     s32 a;
@@ -24,8 +26,6 @@ typedef struct {
 } ActionState;
 
 extern void ImpactEvent_Call(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, EventArg extra);
-extern void CScene__SetInstanceSavedBit(void *mgr, CGameObjectInstance *actor, s32 flag);
-extern void CAI__SetMode(CGameObjectInstance *actor, ActionState *state, s32 mode);
 
 static __inline__ s32 animReached(CGameObjectInstance *actor, ActionState *state, f32 scale) {
     if (actor->m_nAnims == 1) return 1;

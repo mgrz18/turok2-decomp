@@ -2,6 +2,7 @@
 #include "common.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
+#include "protos/scene.h"
 
 typedef struct Record {
     /* 0x00 */ s32 data[2];
@@ -13,8 +14,6 @@ extern char D_800A5D70[];
 extern char D_800A5D80[];
 extern void Model_DecompressCallback(void);
 
-extern s32 CScene__FindObjectType(void *level, s32 key);
-extern s32 CScene__GetObject(void *level, s32 id);
 
 /* Looks key up in the level and loads its record into out (out->valid = 0 when there is none). */
 void CScene__ConstructMap_2(void *level, Record *out, s32 key) {

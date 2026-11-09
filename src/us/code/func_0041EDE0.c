@@ -6,6 +6,7 @@
 #include "structs/save.h"
 #include "globals/menu.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 typedef struct O01Pad { s32 v; s32 freeb; s32 cnt; } O01Pad;
 extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
@@ -19,7 +20,6 @@ s32 Pak_GetFreePages(s32 pad, s32 *out);
 s32 Pak_CountEmptyNotes(s32 pad, s32 *out);
 s32 Pak_FindFreeExtLetter(s32 pad, u8 *ext);
 s32 Pak_SaveNoteVerified(s32 pad, s32 size, u8 *buf, char *n1, u8 *ext, char *n2);
-void MenuPool_OpenMenu(u8 *a, void *b, void *c, void *d, void *e);
 extern s32 gSaveBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
 extern s32 gLoadBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
 void CCache__Flush(s32 a);

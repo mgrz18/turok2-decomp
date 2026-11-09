@@ -4,6 +4,7 @@
 #include "globals/scene.h"
 #include "globals/camera.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
 
 /* A placed prop's record in the level data. */
 typedef struct {
@@ -39,7 +40,6 @@ typedef struct {
     /* 0x8A */ u8 colorFrame;
 } PlacedProp;
 
-void *CScene__GetIntelligence(void *, s32);
 void CMtxF__SetRotateY(f32 *mtx, f32 angle);
 void CMtxF__ScaleAxes(f32 *mtx, f32 x, f32 y, f32 z);
 void CMtxF__Translate(f32 *mtx, f32 x, f32 y, f32 z);

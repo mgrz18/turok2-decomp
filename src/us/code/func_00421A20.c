@@ -1,8 +1,8 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 void Controller_UnwatchPak(s32);
-s32 CScene__RequestWarp(s32, s32, s32);
 
 
 void func_00421A20(s32 arg0, s32 arg1) {

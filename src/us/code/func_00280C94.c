@@ -5,8 +5,8 @@
 #include "structs/world.h"
 #include "globals/scene.h"
 #include "globals/camera.h"
+#include "protos/scene.h"
 
-extern s32 CScene__FindRegionAt(void *, void *);
 extern s32 Cinema_PathPlaying(void);
 extern f32 CGameRegion__GetHeight(s32 arg0, f32 arg1, f32 arg2);
 void CCamera__SetViewParams(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6,

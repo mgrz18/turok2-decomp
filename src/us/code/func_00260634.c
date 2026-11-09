@@ -1,13 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 void AI_UpdateTargets(void *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
 void AI_ComputeFrameMotion(void *self, CAI *ai, CAIFrameMotion *out);
 f32 EnemyAI_GetModeTurnRate(void *self, CAI *ai);
-void AI_TurnClamped(void *self, CAI *ai, f32 angle, f32 arg3);
 f32 EnemyAI_GetTypeTurnRate(void *self, CAI *ai);
 s32 EnemyAI_PickAttack(void *self, CAI *ai, CAITargets *t);
-void CAI__SetMode(void *self, CAI *ai, s32 mode);
 
 void EnemyStationary_Update(void *self, CAI *ai) {
     CAITargets t;

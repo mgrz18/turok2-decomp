@@ -4,6 +4,7 @@
 #define BOSS_STAGE_AS_WORD
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 /* LevelScriptState (structs/boss.h) seen from 0x8012F604, one word before it
  * (offsets below are from 0x8012F608): the ROM addresses it through D_8012F604. */
@@ -30,9 +31,7 @@ typedef struct {
 } LevelScriptF604;
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 extern f32 AI_AngleToPoint(CGameObjectInstance *obj, CVector3 point);       /* angle to a point */
-extern void AI_TurnClamped(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 angle);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a - b */
 extern f32 CVector3__GetYaw(CVector3 *v);                                    /* heading */
 extern f32 Math_StepClamped(f32 value, f32 target, f32 rate);

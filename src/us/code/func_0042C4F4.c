@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/world.h"
+#include "protos/scene.h"
 
 void CScene__ConstructWarp(CScene *arg0) {
     arg0->m_WarpFade = 2;

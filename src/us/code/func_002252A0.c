@@ -1,5 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "protos/scene.h"
 
 s32 func_0026E294(s32);
 

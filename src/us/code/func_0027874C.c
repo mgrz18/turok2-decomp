@@ -12,6 +12,7 @@
 #include "globals/render.h"
 #include "globals/menu.h"
 #include "protos/cache.h"
+#include "protos/scene.h"
 
 typedef struct FontStyle {
     /* 0x00 */ u8 pad0[0xA0];
@@ -29,7 +30,6 @@ typedef struct FontStyle {
 
 extern u8 D_80110238[];         /* glyph lookup, language 0 */
 
-extern void *CScene__LoadGraphicSet(void *cache, s32 id, s32 kind, s32 flag);
 extern f32 Menu_CharWidth(s32 ch, s32 next, f32 a, f32 b);    /* kerned advance */
 extern void Hud_DrawImageFrame(void *font, s32 glyph, s16 x, s16 y, f32 sx, f32 sy, s32 flag);
 

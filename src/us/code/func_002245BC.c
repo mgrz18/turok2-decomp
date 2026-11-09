@@ -5,6 +5,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "protos/iset.h"
+#include "protos/scene.h"
 
 /* Turok 2 level actor: 0x288 bytes (0x2E8 in Rage Wars). */
 

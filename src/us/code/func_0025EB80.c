@@ -2,10 +2,10 @@
 #include "structs/player.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
 void Throwable_SetModeAnim(CPlayer *player, CAI *ai, CGameObjectInstance *obj);
-void CScene__SetInstanceObjectType(void *level, CGameObjectInstance *obj, s32 a, s32 animType);
-void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 void EnemyAI_Mount(CGameObjectInstance *obj, CAI *ai, CPlayer *player) {
     ai->m_VarBuffer[2] = (u32) player;

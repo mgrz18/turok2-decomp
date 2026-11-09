@@ -4,8 +4,8 @@
 #include "globals/game.h"
 #include "globals/menu.h"
 #include "globals/menu_data.h"
+#include "protos/menu.h"
 
-extern s32 Menu_StepValue(void *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap);
 extern s32 Controller_MenuRight(s32);
 extern s32 Controller_ConfirmPressed(s32);
 

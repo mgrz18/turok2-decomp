@@ -22,6 +22,8 @@
 #include "globals/engine.h"
 #include "globals/player.h"
 #include "protos/cache.h"
+#include "protos/scene.h"
+#include "protos/game.h"
 
 void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
@@ -517,15 +519,11 @@ void CPlayer__UpdateWaterRegion(Player *, Player *, Surface *);
 void CPlayer__UpdateFlashlight(Player *, Player *);
 s32 Collision_MoveInstance(Player *, CVector3, u32 *);
 void CGameRegion__FireTriggers(Model *, s32, Player *);
-void CScene__CheckAutoActivation(void *, Player *, CVector3 *, CVector3 *);
-void GameObject_FireTriggers(u8 *, s32, Player *);
 void CPlayer__RamWithMount(Player *, Player *, u32 *);
 s32 CPlayer__TryMount(Player *, Player *, u32 *);
 void CPlayer__TouchPickup(Player *, u8 *);
 void CPlayer__Dismount(Player *, Player *);
 void CPlayer__Warp(Player *, s32, s32, s32);
-f32 GameObject_GetRegionFloorHeight(Player *, s32);
-void CScene__SetInstanceObjectType(void *, void *, s32, s32);
 s32 CGameObjectInstance__SetAnimByAction(Player *, s32, s32);
 s32 CGameObjectInstance__PickRandomAnim(Player *, s32, s32);
 void CGameObjectInstance__SetAnim(Player *, s32, s32);

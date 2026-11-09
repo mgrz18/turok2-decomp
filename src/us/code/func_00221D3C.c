@@ -11,6 +11,7 @@
 #include "globals/scene.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
+#include "protos/scene.h"
 
 /* Builds (once per frame) the display list of the level geometry: for every
  * grid region seen by one of the views, every static object and every level

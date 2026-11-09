@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
+#include "protos/player.h"
 struct LevelActor;
 struct Box;
 typedef struct Box Box;
@@ -129,7 +130,6 @@ struct LevelActor;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
-extern s32 CPlayer__SetState(void *, void *, s32);
 extern void CPlayer__MoveOnFoot(void *, void *, void *);
 extern void CPlayer__TurnAndLook(void *, void *, void *);
 extern s32 GameObject_IsOnGround(void *arg0);

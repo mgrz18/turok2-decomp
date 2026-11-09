@@ -2,12 +2,12 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
 /* Name entry accepted: copy the edited name (blank-padded to 8 characters)
  * into the current player's record; an empty name restores the default one. */
 
 
-s32 CPlayerPool__GetIndex(void *state, void *player);
 void PlayerOptions_SetDefaultName_2(void *options);
 void MenuItem_SelectSubmenu_2(void *menu, Menu *event, void *arg2);
 

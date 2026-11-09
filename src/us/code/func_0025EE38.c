@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-s32 CScene__GetInstanceSavedBit(void *, void *);               /* extern */
 s32 Cinema_PathPlaying();                                /* extern */
 
 void EnemyAI_CheckOffscreen(CGameObjectInstance *arg0, s32 *arg1) {

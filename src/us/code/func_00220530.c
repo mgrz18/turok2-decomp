@@ -5,6 +5,7 @@
 #include "globals/math.h"
 #include "globals/engine.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* The input state the controller reader fills (gEngineApp_m_Settings, 0x184 bytes). */
 
@@ -12,27 +13,17 @@ extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 gEngineApp_m_Game_m_CameraPool[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 
 void CCache__SetFrameDelay(s32, s32);
-void CScene__UpdateWarp(CScene *);
-void CScene__ClearListCounts(CScene *);
 void MtxPool_Reset(void *);
 void CCache__LockForDisplayList(s32, void **);
 void RibbonVtxPool_Reset(void *);
 void CPlayerPool__PreUpdate(void *);
-void CScene__BuildActorLists(CScene *);
-void CScene__LoadVisibleGridSections(CScene *);
-void CScene__CollectSectorObjects(CScene *);
 void CPlayerPool__AnimateWeapons(void *);
 void CCameraPool__Draw(void *, CScene *);
 void CParticleSystem__Update(CParticleSystem *);
 void SwooshSystem_Update(void *);
-void CScene__AdvanceInstances(CScene *);
-void CScene__AdvanceListedInstances(CScene *);
 void CLevelActorPool__Update(CLevelActorPool *);
 f32 func_002982F0(f32);     /* sinf */
 f32 func_002974C0(f32);     /* cosf */
-void CScene__UpdateDelayedEvents(CScene *);
-void CScene__ReleaseSectors(CScene *);
-void CScene__DrawWarpFade(CScene *);
 
 void CScene__Update(CScene *world) {
     GameSettings *input;

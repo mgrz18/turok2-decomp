@@ -8,6 +8,8 @@
 #include "globals/engine.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
+#include "protos/scene.h"
+#include "protos/game.h"
 
 /* Draw pass for one actor in one view: if the actor is drawable (flags
  * 0x40000 and a draw callback) and active (0x2000), load its "anim object
@@ -48,11 +50,9 @@ extern char D_800A5AC4[];   /* "anim object info" */
 
 void CMtxF__TransformBox(void *, s32, f32 *);
 s32 Frustum_TestBox(void *, f32 *);
-f32 GameObject_GetRegionFloorHeight(Actor *, s32);
 void **CGameObjectInstance__LoadGeometry(Actor *);
 s32 CGameObjectInstance__BuildBoneMatrices(Actor *, void *, s32);
 f32 GameObject_GetCollisionHeight(Actor *);
-void CScene__GetLightsAt(void *, CVector3 *, void *);
 
 void CGameObjectInstance__Draw(Actor *actor, CCamera *view) {
     f32 offset[3];

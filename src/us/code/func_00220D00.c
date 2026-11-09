@@ -5,6 +5,7 @@
 #include "structs/level_actor.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
+#include "protos/scene.h"
 
 /* Instantiates a level's actor data: from the level file's four tables
  * (two kinds of placed objects, the level actors, and a fourth kind of
@@ -35,7 +36,6 @@ void CStaticObject__Construct(ItemA *, SrcB *, s32, void *);
 void CLevelActor__Construct(CLevelActor *, SrcC *, s32, void *);
 void LightVolume_Construct(ItemD *, SrcD *);
 f32 GameObject_GetCollisionHeight(CLevelActor *);
-void CScene__ComputeLights(void **, s32, f32 *, void *);
 
 void CScene__DecompressGridSection(CScene *world, s32 ***file) {
     StrideTable *tE;

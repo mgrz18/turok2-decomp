@@ -5,6 +5,7 @@
 #include "globals/camera.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
+#include "protos/scene.h"
 
 typedef struct GridCell {
     CRect rect;                  /* 0x00 */
@@ -27,7 +28,6 @@ typedef struct Viewer {
 
 extern char D_800A5F6C[];       /* "grid section" */
 
-s32 CScene__DecompressGridSection();
 
 /* Loads the grid sections inside the visible bounds that some viewer overlaps. */
 void CScene__LoadVisibleGridSections(CScene *world) {

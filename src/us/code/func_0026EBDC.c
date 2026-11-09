@@ -4,6 +4,7 @@
 #include "structs/vector.h"
 #include "globals/scene.h"
 #include "protos/list.h"
+#include "protos/scene.h"
 
 struct Clip;
 struct Clip {
@@ -35,7 +36,6 @@ struct Pool_func_80285B64_de;
 typedef struct Pool_func_80285B64_de Pool_func_80285B64_de;
 extern s32 __osDisableInt(void);
 extern void __osRestoreInt(s32 mask);
-extern s32 CScene__GetCurve(void *table, s32 id);
 extern void RumbleCurve_Init(void *slot, s32 handle);
 static __inline__ void bind(Node_func_80285B64_de *node, s32 offset, s32 id) {
     RumbleCurve_Init((char *)node + offset, CScene__GetCurve(&gScene, id));

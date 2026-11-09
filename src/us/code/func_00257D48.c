@@ -4,6 +4,8 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "globals/player.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
 typedef struct Object Object;
 typedef struct AI AI;
@@ -35,8 +37,6 @@ struct Object {
     /* 0x1A8 */ CPlayer *owner;
 };
 
-extern void CAI__SetMode(Object *obj, AI *ai, s32 mode);
-extern void CScene__SetInstanceObjectType(void *level, Object *obj, s32 model, s32 animType);
 
 /* First-person weapon AI: counts its timers down, goes to mode 1 when the
  * player's pose asks for it or a weapon change is queued, runs the state's

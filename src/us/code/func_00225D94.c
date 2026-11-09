@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/world.h"
+#include "protos/scene.h"
 
 /* Curve i: the table starts with the element size, the data at +8. */
 void *CScene__GetCurve(CScene *arg0, s32 arg1) {

@@ -6,6 +6,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
+#include "protos/scene.h"
 struct LevelActor;
 struct Box;
 typedef struct Box Box;

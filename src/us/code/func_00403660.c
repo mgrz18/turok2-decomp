@@ -4,6 +4,7 @@
 #include "structs/model.h"
 #include "globals/boss.h"
 #include "globals/engine.h"
+#include "protos/game.h"
 
 /* A weak spot seen from its animator: walking BossWeakSpot pointers and
  * taking &slot->anim moves the +4 into the loop and breaks the match. */
@@ -23,7 +24,6 @@ typedef struct {
 void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
 void ScriptAnimator_Apply(Slot00403660 *slot);
 void ScreenTint_UpdateMode(void);
-void Render_DrawModel(s32 hModel, s32 model, s32 one, CLights1 *slot, s32 zero, s32 index, s32 second);
 
 static __inline__ s32 hasBit(s32 mask, s32 bit) {
     return mask & bit;

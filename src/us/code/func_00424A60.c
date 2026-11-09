@@ -1,8 +1,8 @@
 /* First-module twin of src/us/code/Mission_LevelObjectivesDone_2.c. The flag test is an inline helper, so &gScene is re-addressed by symbol at each call. */
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-s32 CScene__GetLinkGroupCount(void *arg0, s32 arg1);
 
 
 static __inline__ s32 IsSet(s32 flag) {

@@ -7,6 +7,7 @@
 #include "globals/camera.h"
 #include "globals/scene.h"
 #include "protos/iset.h"
+#include "protos/scene.h"
 
 typedef struct List {
     s32 pad0;
@@ -17,7 +18,6 @@ typedef struct List {
 void CStaticObject__TouchLitVertices(CStaticObject *inst);
 s32 GameObject_IsSolid(CStaticObject *inst);
 f32 GameObject_GetCollisionHeight(CLevelActor *actor);
-void CScene__GetLightsAt(CScene *world, CVector3 *pos, void *out);
 void CLevelActor__Update(CLevelActor *actor);
 void CLevelActorPool__CollectVisible(CLevelActorPool *arg0, CScene *world);
 

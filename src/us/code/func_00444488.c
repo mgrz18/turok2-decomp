@@ -2,8 +2,8 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 s32 MotherBoss_TeleportTarget_2(s32, s32);
 
 void MotherBoss_Mode16_TeleportTarget_2(s32 arg0, CAI *ai)

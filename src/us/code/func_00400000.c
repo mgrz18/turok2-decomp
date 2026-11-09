@@ -1,11 +1,10 @@
 #include "common.h"
 #include "structs/region.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 extern u8 D_800C894C; /* bottom of the stack */
 extern CVector3 D_8011AAB4;
-s32 CScene__GetRegionIndex(void *world, CGameRegion *region);
-void CScene__SetLevelBit(void *world, s32 index, s32 a2);
 
 #define NEAR(p) (((p)->x - D_8011AAB4.x) * ((p)->x - D_8011AAB4.x) + ((p)->z - D_8011AAB4.z) * ((p)->z - D_8011AAB4.z) < 167772.14f)
 

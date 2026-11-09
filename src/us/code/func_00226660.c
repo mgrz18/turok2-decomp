@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/world.h"
+#include "protos/scene.h"
 
 s32 BinaryRange(s32 a, s32 b, s32 c, s32 *lo, s32 *hi);
 void CScene__GetEventRecords(CScene *lv, s32 which, s32 id, CSceneRecord **outRecs, s32 *outCount) {

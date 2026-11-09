@@ -9,6 +9,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
+#include "protos/scene.h"
 void CEngineApp__DrawFilledRect(u8 *a, u8 *col, s32 c, s32 d, s32 e, s32 f);
 void CScene__DrawWarpFade(CScene *lv) {
     u8 col[4];

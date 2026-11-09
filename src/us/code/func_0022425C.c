@@ -7,6 +7,7 @@
 #include "structs/intelligence.h"
 #include "structs/world.h"
 #include "protos/iset.h"
+#include "protos/scene.h"
 typedef struct Shared_ParticleLighting Shared_ParticleLighting;
 struct Shared_ParticleLighting {
     u8 ambient[3], reserved3;

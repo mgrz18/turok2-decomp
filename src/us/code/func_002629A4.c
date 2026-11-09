@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
-s32 CScene__GetInstanceSavedBit(s32 *, s32);                  /* extern */
-s32 CAI__SetMode(s32, void *, s32);        /* extern */
 s32 Turret_EventShow(s32, void *, s32);        /* extern */
 
 void Turret_EventActivate(s32 arg0, CAI *ai, s32 arg2) {

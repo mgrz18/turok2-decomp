@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "protos/ai.h"
 
 
 typedef struct {
@@ -13,7 +14,6 @@ typedef struct {
 
 void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 id);
 void CPlayer__StopWeaponBackgroundSound(CPlayer *player);
-void CAI__SetMode(CGameObjectInstance *actor, State *state, s32 mode);
 
 void WeaponMode_AE794_Update(CGameObjectInstance *actor, State *state) {
     CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);

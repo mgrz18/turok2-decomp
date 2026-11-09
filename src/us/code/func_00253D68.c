@@ -1,5 +1,6 @@
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80225D10_10.CPP, func_8022AE28_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -11,7 +12,6 @@ typedef struct Shared_ActorView {
     CGameObjectInstance weapon;
 } Shared_ActorView;
 typedef struct Shared_World Shared_World;
-extern s32 CScene__FindRegionAt(Shared_World *, CVector3 *);
 int CPlayer__SetPosition(void *arg0, void *arg1) {
     int region;
     CVector3 *src = arg1;

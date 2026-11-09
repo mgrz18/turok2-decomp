@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "protos/cache.h"
+#include "protos/player.h"
 
 /* Releases the object the player is carrying (0xBB0) and throws it ahead of
  * the player: it is moved 102.4 units along the facing (angle 0x50 + pi),
@@ -16,7 +17,6 @@ typedef struct {
 } Thrown;
 
 extern void EnemyAI_Dismount(void *obj, void *ai, CPlayer *player);
-extern void CPlayer__SetState(CPlayer *player, Thrown *other, s32 mode);
 extern f32 func_002982F0(f32 x);   /* sinf */
 extern f32 func_002974C0(f32 x);   /* cosf */
 

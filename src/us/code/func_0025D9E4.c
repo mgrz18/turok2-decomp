@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/enemy.h"
+#include "protos/ai.h"
 
 /* Picks the animation for the AI's current location: one candidate from the
  * location's primary flags and one from its secondary flags, each from the
@@ -14,7 +15,6 @@ typedef struct {
 
 
 extern Location *CPathTrack__GetCurrentPoint(s8 *location);
-extern s32 AI_PickAnimFromTable(void *actor, CAI *ai, CEnemyAnimPick *table, s32 flags);
 extern s32 Random_Next(void);
 
 s32 EnemyAnim_InteractiveIdle(void *actor, CAI *ai) {

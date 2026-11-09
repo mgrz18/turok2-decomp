@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "protos/ai.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 
 extern s32 WeaponActor_CheckFire(CGameObjectInstance *weapon, CAI *state);
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
-extern void CAI__SetMode(CGameObjectInstance *weapon, CAI *state, s32 arg2);
 
 void WeaponMode_Switch_Update(CGameObjectInstance *weapon, CAI *state) {
     CPlayer *player = *(CPlayer **)((u8 *)weapon + 0x1A8);

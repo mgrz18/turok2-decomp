@@ -7,6 +7,7 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/scene.h"
+#include "protos/ai.h"
 
 /* Picks the next attack anim from a weighted table: close to the target (or while anim 0x17 runs its first
  * 100 steps) 0x1A/0x1B; otherwise 0x18 after a long 0x17, and from afar 0x19 (when fewer than 2 actors are
@@ -14,7 +15,6 @@
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern s16 WeightedTable_PickStatic(Pick *table);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 state);
 
 /* MotherBoss_GetTargetDist */
 static __inline__ f32 getTargetDist(CGameObjectInstance *obj, CListedInstance **found) {

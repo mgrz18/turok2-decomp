@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/ai.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x3C];
@@ -9,7 +10,6 @@ typedef struct {
     /* 0xC7 */ s8 count;
 } Item004030D4;
 
-void CAI__SetMode(s32 a0, Item004030D4 *item, s32 a2);
 void MantidQueen_UpdateAttackAnim(s32 a0, Item004030D4 *item) {
     s32 needed;
 

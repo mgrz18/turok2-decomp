@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
+#include "protos/player.h"
 
-extern void CPlayer__SetState(CPlayer *player, CGameObjectInstance *other, s32 mode);
 
 /* s16 player mode at 0xA08 (LibTEngine's CPlayer has m_Mode at 0xA0C). */
 #define PLAYER_MODE(p) (*(s16 *)((u8 *)(p) + 0xA08))

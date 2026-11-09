@@ -3,11 +3,11 @@
 #include "structs/player.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
 extern void CPlayer__SetPosition(CPlayer *player, void *arg1);
 extern void CPlayer__UpdateOrbitCamera(CPlayer *player, CPlayer *other);
-extern void CAI__SetMode(CGameObjectInstance *obj, void *ai, s32 state);
 
 /* MotherBoss_GetTargetDist */
 static __inline__ f32 getTargetDist(CGameObjectInstance *obj, CGameObjectInstance **found) {

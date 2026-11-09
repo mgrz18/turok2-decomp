@@ -5,6 +5,7 @@
 #include "globals/boss.h"
 #include "globals/onscreen.h"
 #include "globals/boss_ai.h"
+#include "protos/ai.h"
 
 /* AI init of the second boss: sets the level's warp id, the anim table and callbacks, starts the phase script
  * and shows its health bar ("EyeBall"). */
@@ -14,7 +15,6 @@ extern void BlindOne_BossUpdate(void);
 extern void BlindOne_BossHurt(void);
 extern void BlindOne_Draw(void);
 extern void BlindOne_EnterPhase(BlindOneState *state, s32 id);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 state);
 extern void COnScreen__SetBoss(void *hud, CGameObjectInstance *obj, char *name);
 
 /* Starts the boss script: its first step runs at once. */

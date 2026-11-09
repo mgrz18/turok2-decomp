@@ -1,6 +1,8 @@
-/* AI helpers called from every enemy: canonical prototypes, generated from the definitions by
- * tools/port/genprotos.py (do not edit; re-run it). Types the header cannot
- * name without a struct header are struct tags or void *. */
+/* AI helpers called from every enemy.
+ *
+ * Canonical prototypes, generated from the definitions by tools/port/genprotos.py
+ * (do not edit; re-run it). Types the header cannot name without a struct header
+ * are struct tags or void *. */
 
 #ifndef PROTOS_AI_H
 #define PROTOS_AI_H

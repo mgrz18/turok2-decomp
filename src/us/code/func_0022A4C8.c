@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "globals/game.h"
+#include "protos/game.h"
 
 typedef struct ProjNode {
     /* 0x0000 */ u8 pad0[4];
@@ -68,7 +69,6 @@ extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 extern void CQuaternion__SlerpFast(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b);
 extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *out);
 extern void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
-extern void *LoopSounds_Get(void);
 extern ProjSound *LoopSounds_Start(void *pool, s32 id, CVector3 *pos, CVector3 *pos2, s32 arg4);
 extern void CParticle__StopLoopSound(Projectile *p);
 extern void CParticle__Wobble(Projectile *p, f32 scale);

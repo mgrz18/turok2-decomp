@@ -11,6 +11,9 @@
 #include "globals/sysrc.h"
 #include "globals/audio.h"
 #include "protos/iset.h"
+#include "protos/scene.h"
+#include "protos/player.h"
+#include "protos/game.h"
 
 
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
@@ -31,28 +34,18 @@ extern void CGameObjectInstance__UpdateAnimation(u8 *actor);
 extern void func_0021E5D4(u8 *actor);
 extern void func_0021F1B4(u8 *actor);
 extern void CScene__GetLevelName(CScene *w, s32 level, void *out, s32 mask);
-extern void CScene__ClearListCounts(CScene *w);
-extern void CScene__ReleaseSectors(CScene *w);
-extern void *CPlayerPool__GetFirstActive(void *players);
 extern void Sound__StopFlags(s32);
 extern void Sound__DetachAll(void);
 extern void LoopSounds_Construct(void *, void *, s32);
 extern void LoopSounds_StopAll(s32);
-extern s32 LoopSounds_Get(void);
 extern s32 Demo_GetPlayerCount(void);
 extern void CCameraPool__Advance(void *);
 extern s32 Cinema_IsActive(void);
 extern void Cinema_RequestOnce(s32 sound);
 extern void MatrixHeap_Construct(void *heap, void *data, s32 size);
-extern void CScene__LoadLightSettings(CScene *w);
-extern s32 CScene__DecompressLinks(s32, s32);
-extern s32 CScene__DecompressCollision(s32, s32);
-extern s32 CScene__DecompressAnimatedInstances(s32, s32);
-extern void CScene__StreamAllSections(CScene *w);
 extern void func_0042C79C(CScene *w);
 extern void func_0042C840(CScene *w);
 extern void func_0042C96C(void);
-extern s32 CScene__DecompressPaths(s32, s32);
 extern void SceneActorPool_Construct(CLevelActorPool *);
 extern void CInstancePool__Construct(void *);
 extern void func_0042D120(void *);

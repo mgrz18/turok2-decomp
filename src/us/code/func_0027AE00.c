@@ -2,8 +2,8 @@
 #include "m2c_macros.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
 
-extern s32 CScene__LoadGraphicSet(void *, s32, s32, s32);
 
 s32 func_0027AE00(s32 arg0) {
     s32 r;

@@ -12,6 +12,7 @@
 #include "globals/controller.h"
 #include "globals/libultra.h"
 #include "globals/framebuffer.h"
+#include "protos/scene.h"
 
 extern u8 gPoolBuffers[];
 extern s32 D_800F6CA8;
@@ -32,7 +33,6 @@ extern void CPlayerPool__Construct(void *p);
 extern void CCollisionInfo__Reset(void);
 extern void CCameraPool__NewGame(void *p, s32 a);
 extern void CPlayerPool__NewGame(void *p, s32 a, s32 b);
-extern void CScene__Construct(void *p, s32 seed);
 extern void Cont_InitAll(void);
 extern void COnScreen__Construct(void *p);
 extern void Pak_AllocDirectory(void);

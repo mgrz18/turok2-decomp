@@ -7,6 +7,7 @@
 #include "globals/camera.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
 
 /* Draws the particle render list: culls each sprite particle by its bounds
  * against the view, builds its matrix once per frame, draws it as a model or
@@ -27,7 +28,6 @@ extern u8 gEngineApp_m_SwooshSystem[];
 extern s32 Frustum_TestBox(void *planes, Box *box);
 extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
 extern void CParticle__BuildMatrix(CParticle *particle, void *mtx, CCamera *camera, f32 depth);
-extern void CScene__GetLightsAt(void *list, CVector3 *pos, void *out);
 extern void func_0020B9F4(void *model, void *mtx, void *mtx2, s32 a, s32 b);
 extern void CParticle__DrawSprite(CParticle *particle, CCamera *view);
 extern void CParticle__DrawShadow(CParticle *particle, CCamera *view);

@@ -8,6 +8,7 @@
 #include "globals/scene.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 /* local: globals/game.h declares these, but its gEngineApp_m_Settings_unk180 (u8) clashes with the array view below, which the ROM needs here */
 extern GameSettings gEngineApp_m_Settings;
@@ -29,7 +30,6 @@ extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2]; /* local type: the field
 extern s32 PakMenu_CheckPak(Menu *c, s32 slot, s32 quiet);
 extern CPlayer *CPlayerPool__FindByController(void *players, ControllerProfile *ctl);
 extern s32 Pak_DeleteNote(s32 slot, s32 note);
-extern void MenuPool_OpenMenu(void *menus, void *tmpl, s32 a, void *b, void *parent);
 
 s32 GameNoteMenu_SelectYes(void *menu, Menu *c) {
     s32 slot;

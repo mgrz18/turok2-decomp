@@ -4,12 +4,12 @@
 #include "structs/player.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/player.h"
 
 extern s16 D_800AE312[];        /* per character: climbing step sound (stride 4) */
 
 s32 CGameRegion__IsSteep(void *region);
-s32 CPlayer__SetState(CPlayer *player, CGameObjectInstance *body, s32 mode);
-void *CScene__GetRegionInfo(u8 *list, void *region);
 f32 CGameRegion__GetDownhillYaw(void *region);
 f32 Angle_Difference(f32 from, f32 to);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);

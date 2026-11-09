@@ -3,8 +3,8 @@
 #include "structs/camera.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "protos/game.h"
 
-extern void *LoopSounds_Get(void);
 extern void LoopSounds_Stop(void *pool, struct CLoopingSoundData *sound);
 extern struct CLoopingSoundData *LoopSounds_Start(void *pool, s32 id, CVector3 *pos,
                                                CVector3 *pos2, s32 arg4);

@@ -5,11 +5,10 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/player.h"
+#include "protos/scene.h"
 
-extern CIntelligence *CScene__FindIntelligence(void *world, s32 kind, s32 character);
 extern s32 Random_Next(void);
 extern void CPlayer__GiveStartingWeapons(CPlayer *p);
-extern void CScene__SetInstanceObjectType(void *world, CPlayer *p, s32, s32);
 
 static __inline__ CIntelligence *findDef(s32 kind, s32 character) {
     return CScene__FindIntelligence(&gScene, kind, character);

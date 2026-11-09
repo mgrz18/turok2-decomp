@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 
 /* LevelScriptState (structs/boss.h) from found[1] on, D_8012F978 (+0x370):
  * the word before it is found[0], the other actor; mode is bossMode. */

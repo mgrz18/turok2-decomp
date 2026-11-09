@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/game.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x1B8];
@@ -6,7 +7,6 @@ typedef struct {
 } SoundObject;
 
 s32 LoopSounds_Stop(s32, s32);                    /* extern */
-s32 LoopSounds_Get();                                /* extern */
 
 void CParticle__StopLoopSound(SoundObject *arg0) {
     if (arg0->loop != 0) {

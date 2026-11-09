@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/ai.h"
+#include "protos/ai.h"
 
-s32 AI_TurnClamped(s32, void *, f32, f32);       /* extern */
 f32 AI_AngleToPoint(s32, CVector3);               /* angle from the actor heading to a point */
 
 

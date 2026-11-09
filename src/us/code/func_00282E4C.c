@@ -5,10 +5,10 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "protos/list.h"
+#include "protos/scene.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
-CRegionInfo *CScene__GetRegionInfo(void *world, s32 region);
 f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);
 CVector3 CCamera__GetViewOrigin(CCamera *camera);
 void func_00207914(s32 *resource, s32 id);

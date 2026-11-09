@@ -1,10 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00207D34.c, func_00207D34.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-typedef unsigned int u32;
 
+#include "protos/game.h"
 typedef struct B2Info {
     u32 flags;
     u8 pad4[0x20];
@@ -23,7 +21,6 @@ typedef struct B2State {
     u32 flags;
 } B2State;
 
-void GameObject_FireTriggers(B2Actor *a, s32 mask, B2Actor *b);
 void Platform_BackEnter(B2Actor *actor, B2State *state) {
     B2Info *info = &actor->def->info;
     GameObject_FireTriggers(actor, 0x20000, actor);

@@ -4,12 +4,12 @@
 #include "structs/model.h"
 #include "globals/engine.h"
 #include "structs/light.h"
+#include "protos/game.h"
 
 /* As CGameObjectInstance__DrawModel, drawing through Render_DrawModel and without setting the
  * actor's mask; clears gBlendState afterwards. */
 
 void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
-void Render_DrawModel(s32, s32, s32, void *, s32, s32, s32);
 
 static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0, s32 *set1) {
     CIntelligence *intel = actor->header.m_pIntelligence;

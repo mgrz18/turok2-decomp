@@ -6,8 +6,8 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
-extern void MenuPool_OpenMenu(void *pool, void *tmpl, CPlayer *player, ControllerProfile *ctl, void *back);
 extern void Pak_ProbeSlot(s32 kind);
 extern s32 Pak_GetStatus(s32 kind);
 extern s32 Pak_IsRumblePak(s32 kind);

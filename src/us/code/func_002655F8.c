@@ -1,6 +1,8 @@
 #include "structs/vector.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/game.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00204C68.c, func_00204C68.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -11,8 +13,6 @@ typedef struct B01Pair {
 } B01Pair;
 extern u8 gEngineApp_m_SwooshSystem[];
 void ImpactEvent_Call(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, B01Pair extra);
-void CScene__SetInstanceSavedBit(void *mgr, CGameObjectInstance *actor, s32 flag);
-void GameObject_FireTriggers(CGameObjectInstance *actor, s32 flags, CGameObjectInstance *actor2);
 void SwooshSet_FreeOwner(void *p, CGameObjectInstance *actor);
 void Door_OpenEnter(CGameObjectInstance *actor, CAI *state) {
     B01Pair extra;

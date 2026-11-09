@@ -5,6 +5,7 @@
 #include "structs/intelligence.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/ai.h"
 
 
 
@@ -21,7 +22,6 @@ typedef struct {
 } ActionState;
 
 extern CPlayer *CPlayerPool__FindTagged(CPlayerPool *list);
-extern void CAI__SetMode(CGameObjectInstance *actor, ActionState *state, s32 mode);
 
 void Action_GoUpdate(CGameObjectInstance *actor, ActionState *state) {
     CDoorIntelligence *info = &actor->header.m_pIntelligence->m_Door;

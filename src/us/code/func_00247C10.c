@@ -6,6 +6,8 @@
 #include "structs/particle.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/player.h"
 
 typedef struct TeamGame {
     /* 0x00 */ s32 active;
@@ -15,9 +17,7 @@ extern s32 D_8011ACE0;      /* team 1 score */
 
 s32 Cinema_PathPlaying(void);
 s32 Cinema_IsActive(void);
-CRegionInfo *CScene__GetRegionInfo(void *world, void *region);
 void CPlayer__Hurt(CPlayer *player, CGameObjectInstance *actor, s32 damage, s32 arg3, s32 arg4);
-s32 CPlayerPool__GetIndex(void *players, CPlayer *player);
 void CPlayer__ShowKillMessages(CPlayer *victim, CPlayer *killer, DamageEvent *hit);
 
 static __inline__ s32 inSpecialRegion(CPlayer *player) {

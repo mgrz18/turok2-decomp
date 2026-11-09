@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "protos/iset.h"
+#include "protos/scene.h"
 struct GroupCode8044E2B8;
 typedef struct GroupCode8044E2B8 GroupCode8044E2B8;
 struct Piece;
@@ -27,7 +28,6 @@ struct GroupCode8044E2B8 {
     Piece pieces[1];
 };
 extern s32 ProPackDecompress(void ***, s32);
-extern s32 CScene__GetObject(s32, s32);
 void CScene__DecompressParticles_2(s32 arg0, void ***arg1) {
     void *obj;
     GroupCode8044E2B8 *group;

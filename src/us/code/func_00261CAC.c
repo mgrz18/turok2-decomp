@@ -1,12 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 void AI_UpdateTargets(CGameObjectInstance *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
 void AI_ComputeFrameMotion(CGameObjectInstance *self, CAI *ai, CAIFrameMotion *out);
 f32 Math_Approach(f32 cur, f32 target, f32 rate);
 f32 Math_StepClamped(f32 value, f32 target, f32 rate);
-void AI_TurnClamped(CGameObjectInstance *self, CAI *ai, f32 turnRate, f32 angle);
-void CAI__SetMode(CGameObjectInstance *self, CAI *ai, s32 mode);
 
 void EnemySwim_FleeUpdate(CGameObjectInstance *self, CAI *ai) {
     CAITargets t;

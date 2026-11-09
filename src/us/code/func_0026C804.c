@@ -1,12 +1,12 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x44];
     /* 0x44 */ s32 flags;
 } Entry;
 
-Entry *CScene__GetRegionInfo(s32 *, s32);                /* extern */
 
 void func_0026C804(s32 arg0) {
     Entry *temp_v0;

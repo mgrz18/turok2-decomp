@@ -4,6 +4,7 @@
 #include "structs/player.h"
 #include "globals/engine.h"
 #include "globals/player.h"
+#include "protos/ai.h"
 
 /* The ridden creature (an AI actor). */
 typedef struct {
@@ -19,7 +20,6 @@ f32 func_002974C0(f32 x);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuning);
 void CPlayer__MoveOnFoot(CPlayer *player, CGameObjectInstance *body, void *tuning);
-void CAI__SetMode(Mount *actor, void *ai, s32 state);
 void CCamera__SetShake(void *ui, f32 a, f32 b, f32 c, f32 d, s32 e, CVector3 pos);
 void CMtxF__SetRotateY(CMtxF *m, f32 angle);
 void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);

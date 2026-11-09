@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 extern f32 AI_FlatDistSqToPoint(void *actor, CVector3 point); /* squared XZ distance */
 extern f32 GameObject_GetCollisionRadius(void *actor);              /* collision radius */
 extern void EnemyAI_SetGrabbed(void *actor, void *ai, s32 arg2);
-extern void CAI__SetMode(void *obj, void *state, s32 mode);
 extern f32 func_00298470(f32 x); /* sqrtf */
 
 extern s8 gThrowableCollisionInfo_m_InstanceBehavior[]; /* local type: globals/collision.h declares it; this view (its type here) is what keeps the ROM's code */

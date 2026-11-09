@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 
 
 void MantidQueen_UpdateMode2(s32 arg0, s32 arg1) {

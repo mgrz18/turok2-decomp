@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern void AI_TurnClamped(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 angle);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern s32 D_800F1F50[];
 extern s32 gLevelScript_script_current[]; /* local type: the field's real type (or the member path) changes the ROM's code here */        /* boss script index; an array so the store stays after the obj store */

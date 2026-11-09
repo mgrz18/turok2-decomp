@@ -6,6 +6,7 @@
 #include "globals/render.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
+#include "protos/game.h"
 
 
 #define GFX_W(pkt, a, b) { Gfx *_g = (Gfx *)(pkt); _g->w0 = (a); _g->w1 = (b); }

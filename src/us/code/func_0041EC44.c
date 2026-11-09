@@ -5,13 +5,13 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 void PakMenu_UpdateNoteRows(Shared_PakMenu *menu);
 extern void Pak_ProbeSlot(s32 ch);
 extern s32 Pak_GetStatus(s32 ch);
 extern s32 Pak_IsRumblePak(s32 ch);
 extern s32 Pak_NeedsRepair(s32 ch);
-extern void MenuPool_OpenMenu(char *, char *, ObjRecAt5DC *, PakMenuSlot *, char *);
 void PakMenu_InitLoadGame(Shared_PakMenu *menu)
 {
   Shared_PakMenu *new_var3;

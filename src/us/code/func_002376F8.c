@@ -4,6 +4,7 @@
 #include "structs/intelligence.h"
 #include "structs/player.h"
 #include "globals/scene.h"
+#include "protos/game.h"
 
 /* Applies a hit from an attacker to a target: marks the attacker, shakes the
  * target player's camera for heavy and medium hits, sprays blood from a
@@ -29,7 +30,6 @@ extern void GameObject_TraceMove(CGameObjectInstance *actor, CVector3 pos, CVect
 extern s32 CParticleSystem__Spawn(CParticleSystem *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
                          CQuaternion rot, CVector3 pos, s32 arg, s32 b, s32 c);
 extern void CScene__StartRumbles(void *table, void *owner, s32 id, CVector3 pos, f32 a, f32 b);
-extern void GameObject_FireTriggers(CGameObjectInstance *actor, s32 mask, CGameObjectInstance *other);
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a + b */
 extern f32 AI_AngleToPoint(CGameObjectInstance *actor, CVector3 point);
 

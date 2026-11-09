@@ -15,6 +15,7 @@
 #include "globals/collision.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
+#include "protos/scene.h"
 
 /* The cinema system: one file from Cinema_SplineSecondDerivs to Cinema_IsWaitCue (0x40F240-0x413228).
  * Its strings ("Cinema temp alloc", "Cinema") are shared by functions all over
@@ -729,9 +730,7 @@ extern CVector3 Cinema_GetTargetPos(f32 t); /* target path */
 extern void CMtxF__Identity(CMtxF *m);                         /* identity */
 extern void CMtxF__SetEulerXYZ(CMtxF *m, f32 x, f32 y, f32 z);    /* rotation */
 extern void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);    /* transform */
-extern void CScene__LoadVisibleGridSections(void *world);
 extern s32 Collision_MoveInstance(CGameObjectInstance *actor, CVector3 to, void *info);
-extern void CScene__ReleaseSectors(void *world);
 
 /* Places the cinema relative to its target (flag 1) or to the player (flag 2). */
 static __inline__ void Cinema_Anchor(CGameObjectInstance *player) {
@@ -1095,7 +1094,6 @@ s32 Cinema_NoWaitCues(void) {
 
 s32 Cinema_IsActive(void);
 void LevelEvent_Trigger(LevelEvent *k);
-void CScene__SetEventFired(CScene *g, LevelEvent *k, s32 z);
 
 void Cinema_FireCues(void) {
     f32 now = gCinemaPlayerP->time;

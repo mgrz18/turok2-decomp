@@ -2,8 +2,8 @@
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-s32 CScene__GetLinkGroupCount(void *arg0, s32 arg1);
 s32 MenuItem_TextLength(void *item);
 
 extern char D_800C1768[];

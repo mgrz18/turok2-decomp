@@ -29,6 +29,7 @@
 #include "protos/list.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
+#include "protos/scene.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -1152,7 +1153,6 @@ extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 
 extern s32 BinaryRange(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
-extern void CScene__Blast(void *, CVector3 *);
 extern void func_00225C08(void *, s32, CVector3 *);
 extern s32 Random_Next(void);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);

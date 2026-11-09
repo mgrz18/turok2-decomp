@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/scene.h"
+#include "protos/player.h"
 
-s32 CPlayer__SetState(s32, s32, s32);
 s32 PlayerFall_Update(s32, s32);
 
 typedef struct {

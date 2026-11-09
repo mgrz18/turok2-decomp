@@ -3,16 +3,15 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 #include "globals/game.h"
+#include "protos/player.h"
+#include "protos/game.h"
 
 
 
-void Controller_SetRumbleOption(s32 arg0, s32 arg1);
 void CPlayer__Dismount(CPlayer *player, s32 arg1);
-void GameObject_FireTriggers(s32 arg0, s32 arg1, s32 arg2);
 void CPlayer__StopLoopingSounds(CPlayer *player);
 void GameObject_DropPickupAt(CPlayer *player, CVector3 pos, s32 id, f32 arg);
 void Sound__Play2D(s32 sound);
-void CPlayer__SetState(CPlayer *player, s32 arg1, s32 anim);
 
 static __inline__ s32 fallingFast(CPlayer *player) {
     return player->m_DuckOffset > 5.12f;

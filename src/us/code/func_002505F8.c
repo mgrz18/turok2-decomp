@@ -4,12 +4,12 @@
 #include "structs/player.h"
 #include "globals/engine.h"
 #include "globals/player.h"
+#include "protos/player.h"
 
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 void CPlayer__BobViewStride(CPlayer *player, CGameObjectInstance *body);
 void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuning);
 void CPlayer__MoveOnFoot(CPlayer *player, CGameObjectInstance *body, void *tuning);
-s32 CPlayer__SetState(CPlayer *player, CGameObjectInstance *body, s32 mode);
 void Sound__Play(s16 sound, CVector3 pos, s32, s32);
 
 static __inline__ s32 try_jump(CPlayer *player, CGameObjectInstance *body) {

@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void AI_TurnHeadToTarget(CGameObjectInstance *actor, CAI *ai, f32 angle);
 extern void Angle_Wrap(f32 *angle); /* wraps an angle */
-extern void AI_TurnClamped(CGameObjectInstance *actor, CAI *ai, f32 turnRate, f32 angle);
 
 void BlindOne_ActorAimUpdate(CGameObjectInstance *actor, CAI *ai) {
     CAITargets t;

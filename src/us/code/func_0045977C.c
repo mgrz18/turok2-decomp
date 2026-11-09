@@ -7,11 +7,11 @@
 #include "globals/scene.h"
 #include "structs/game.h"
 #include "globals/menu_desc.h"
+#include "protos/game.h"
 
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
 void Controller_ResetRumble(ControllerProfile *a);
-void Controller_SetRumbleOption(ControllerProfile *a, s32 b);
 void Controller_UnwatchPak(s32 a);
 s32 Controller_TakePakChanged(s32 a);
 void Pak_ProbeSlot_2(s32 a);

@@ -4,10 +4,10 @@
 #include "structs/camera.h"
 #include "globals/game.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
+#include "protos/player.h"
 
 void CPlayer__StopLoopingSounds(CPlayer *);
-s32 CPlayerPool__GetIndex(CPlayerPool *players, CPlayer *player);
-void MenuPool_OpenMenu(void *pool, void *screen, CPlayer *p, void *controller, s32);
 
 /* CPlayer__StopLoopingSounds takes the player (as in CPlayer__Kill): the call keeps it in $a0,
  * which is what lets sched2 keep the mask's lui/ori together. */

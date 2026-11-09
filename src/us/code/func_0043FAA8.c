@@ -3,10 +3,10 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern s32 D_800F1C40[];
 extern s32 D_800F1F50[];

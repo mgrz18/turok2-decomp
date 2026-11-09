@@ -3,6 +3,7 @@
 #include "structs/boss.h"
 #include "structs/collision.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 /* Module hit callback (the level's onHit, func_00408FF8 + 8 at the link address): finds the first active part the
  * hit touched; parts 10-14 are three groups, each draining the health of one still-alive slot of the current phase.
@@ -10,7 +11,6 @@
  * state starts. */
 
 extern void MotherBoss_StartSpotAnims_2(void *obj, void *sound, s32 a2);
-extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 
 void MotherBoss_Hurt_2(void *obj, CAI *ai, DamageEvent *hit) {
     MotherBossState *state;

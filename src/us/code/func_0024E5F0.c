@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "globals/game.h"
 #include "globals/player.h"
+#include "protos/player.h"
 
 s32 CPlayer__IsInMatchEndState(CPlayer *player);
 

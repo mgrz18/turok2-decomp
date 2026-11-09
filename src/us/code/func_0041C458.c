@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/menu.h"
 
-s32 Menu_StepValue(s32, s32, s32, s32, s32, s32);
 
 s32 OptionsMenu_StepOpacity(s32 arg0, s32 arg1) {
     u16 temp_v0;

@@ -2,10 +2,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/game.h"
+#include "protos/ai.h"
 
 
 extern void CPlayer__NewGame(CPlayer *p, s32 arg1, s32 arg2);
-extern void CAI__SetMode(void *, void *, s32);
 extern void CPlayer__Warp(CPlayer *p, s32 warp, s32 arg2, s32 respawn);
 
 void CPlayer__Activate(CPlayer *p, s32 arg1) {

@@ -4,6 +4,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/game.h"
 typedef union B01FH { f32 f; s32 i; s16 h; } B01FH;
 typedef union B01W4 { s32 i; f32 f; s16 h[2]; u8 b[4]; } B01W4;
 typedef struct B01Info {
@@ -34,8 +36,6 @@ typedef struct B01Info {
                 f32 unk6C;
 } B01Info;
 void AI_DropPickupsOnce(CGameObjectInstance *actor, CAI *state, s32 kind, s32 a, s32 b);
-void CScene__SetInstanceSavedBit(void *mgr, CGameObjectInstance *actor, s32 flag);
-void GameObject_FireTriggers(CGameObjectInstance *actor, s32 flags, CGameObjectInstance *actor2);
 void Turret_DeathEnter(CGameObjectInstance *actor, CAI *state) {
     B01Info *info = ((B01Info *)((u8 *)(actor->header.m_pIntelligence) + 0x14));
     AI_DropPickupsOnce(actor, state, 4, info->unkC.i, info->unk10.i);

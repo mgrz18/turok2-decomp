@@ -1,5 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "protos/scene.h"
 
 s32 LevelEvent_Trigger(s32);
 

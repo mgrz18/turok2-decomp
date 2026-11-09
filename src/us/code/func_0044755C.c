@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* The record whose position at 0x4F8 gets copied, as integers, to 0x500 / 0x508. */
 typedef struct {
@@ -12,7 +13,6 @@ typedef struct {
     /* 0x508 */ s32 z;
 } PosCopy;
 
-s32 CScene__MarkGeneratorsSaved(s32);
 
 
 void BlindOne_PhaseMinionsInit_2(PosCopy *arg0) {

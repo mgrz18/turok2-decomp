@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 
 void Platform_EventForward(CGameObjectInstance *arg0, s32 *arg1) {
     arg0->m_dwFlags = (s32) (arg0->m_dwFlags | 0x2100);

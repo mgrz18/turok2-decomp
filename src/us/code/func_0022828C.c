@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/list.h"
 #include "protos/list.h"
+#include "protos/scene.h"
 
 struct SceneEffectPool;
 /* Turok 2 effect record: 0x298 bytes (Rage Wars 0x2F8), most fields 0x2C-0x60 earlier. */
@@ -26,7 +27,6 @@ struct SceneEffectPool {
     CList activeEffects; /* 0x5314 */
 };
 extern f32 D_800F5A18;
-extern void CScene__FileInstance(s32, Effect_func_80262E88_de *);
 static __inline__ s32 overlaps(Effect_func_80262E88_de *effect, f32 *max) {
     if (max[0] > effect->min[0] && max[-3] < effect->max[0] && max[2] > effect->min[2] &&
         max[-1] < effect->max[2] && max[1] > effect->min[1] && max[-2] < effect->max[1]) {

@@ -4,6 +4,8 @@
 #include "globals/boss.h"
 #include "globals/scene.h"
 #include "globals/boss_ai.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
 typedef struct {
     f32 x, y, z;
@@ -29,13 +31,10 @@ typedef struct {
     /* 0x108 */ void *onDraw;
 } Level00403CF8;
 
-s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void **out, s32 max);
-void *CScene__FindIntelligence(void *world, s32 a1, s32 id);
 void ScriptAnimator_Start(void *light, void *actor);
 void Primagen_SetStage_2(s32 mode);
 void Primagen_SetSpawnScript_2(s32 a0);
 void Primagen_SetAttackScript_2(s32 a0);
-void CAI__SetMode(void *actor, void *level, s32 event);
 void Primagen_Step_2();
 void Primagen_Hurt();
 void Primagen_Effects();

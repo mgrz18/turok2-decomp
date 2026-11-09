@@ -5,6 +5,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "protos/iset.h"
+#include "protos/scene.h"
 
 
 

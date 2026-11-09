@@ -4,6 +4,7 @@
 #include "structs/world.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
+#include "protos/scene.h"
 
 typedef struct Counted {
     /* 0x00 */ s32 unk0;
@@ -25,7 +26,6 @@ typedef struct ObjB {
     /* 0x000 */ u8 pad0[0x198];
 } ObjB; /* 0x198 */
 
-extern void CScene__DecompressGridSection(void);
 
 extern void CStaticObject__RequestLitVertices(ObjA *a, s32);
 extern void *CStaticObject__LoadGeometry(ObjA *a);

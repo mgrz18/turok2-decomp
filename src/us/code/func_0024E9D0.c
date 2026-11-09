@@ -2,10 +2,10 @@
 #include "structs/region.h"
 #include "structs/player.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
 
 CRegionInfo *GameObject_GetRegionInfo(void *actor);
-s32 CPlayer__SetState(CPlayer *player, void *actor, s32 state);
 
 static __inline__ s32 func_0024E9D0_isSpecial(CPlayer *player) {
     if (player->m_Mode == 18 || player->m_Mode == 16 || player->m_Mode == 17) {

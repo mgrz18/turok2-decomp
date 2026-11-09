@@ -5,8 +5,8 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-extern CRegionInfo *CScene__GetRegionInfo(void *table, CGameRegion *region);
 
 /* Height of the actor's region (0 if it has none), relative to the owner's
  * height for a kind-1 actor flagged 0x300000. */

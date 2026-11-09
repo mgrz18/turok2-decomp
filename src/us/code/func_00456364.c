@@ -2,11 +2,11 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
 /* Name entry: append the selected character to the current player's name. */
 
 
-s32 CPlayerPool__GetIndex(void *state, void *player);
 
 s32 NameEntryMenu_AddChar_2(MenuItem *item, Menu *event) {
     s32 i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, event->player);

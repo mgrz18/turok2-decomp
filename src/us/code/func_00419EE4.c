@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "protos/menu.h"
 
 s32 Sound__Play2D(s32);
-s32 Menu_StepValue(s32, s32, s32, s32, s32, s32);
 
 extern u8 gEngineApp_m_Settings_unk15[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 

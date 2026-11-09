@@ -3,6 +3,7 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/engine.h"
+#include "protos/game.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -24,7 +25,6 @@ void CGameObjectInstance__UpdateAnimation(DrawActor *actor);
 void CPlayerPool__Update(CPlayerPool *list);
 s32 CPlayerPool__CheckAllReady(CPlayerPool *list);
 void func_00430330(u8 *);
-s32 LoopSounds_Get(void);
 void LoopSounds_Update(s32);
 
 /* Draws one actor, keeping the frame time step. */

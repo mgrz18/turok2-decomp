@@ -6,6 +6,8 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/onscreen.h"
+#include "protos/scene.h"
+#include "protos/player.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC4];
@@ -17,12 +19,10 @@ typedef struct {
 
 extern u8 D_800B6660[];
 
-CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
 void Sound__PlaySpeech(s32 sound);
 void CPlayerPool__SetInvincibility(CPlayerPool *list, f32 value);
 s8 CGameObjectInstance__PickRandomAnim(CListedInstance *actor, s32 id, s32);
-void CScene__UnmarkGeneratorsSaved(void *world);
 void COnScreen__ClearBoss(void *);
 void COnScreen__ClearBoss2(void *);
 

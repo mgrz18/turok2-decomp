@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "protos/iset.h"
+#include "protos/scene.h"
 struct Field_void_6C;
 struct Field_void_6C {
     char pad[0x6C];

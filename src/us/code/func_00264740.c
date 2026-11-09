@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 
 void Platform_BackUpdate(CGameObjectInstance *arg0, CAI *arg1) {
     s32 temp_a3;

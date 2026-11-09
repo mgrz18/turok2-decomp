@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 s32 MotherBoss_TeleportTarget(s32, s32);
 
 

@@ -3,6 +3,7 @@
 #include "structs/controller.h"
 #include "globals/pak.h"
 #include "globals/controller.h"
+#include "protos/game.h"
 
 /* ControllerProfile profile, stride 0x224. */
 

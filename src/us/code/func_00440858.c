@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 
 void Primagen_UpdateMode22_2(CGameObjectInstance *arg0, CAI *arg1) {
     f32 *speed = &arg0->m_AI.m_AnimSpeed;

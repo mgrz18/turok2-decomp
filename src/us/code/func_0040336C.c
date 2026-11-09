@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
 
 
@@ -17,7 +18,6 @@ typedef struct {
 
 void CPlayerPool__SetInvincibility(CPlayerPool *list, f32 value);
 s32 Cinema_IsIdle(void);
-CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *list);
 void CPlayer__Warp(CPlayer *player, s32 a1, s32 a2, s32 a3);
 
 void MantidQueen_UpdateDeath(Obj0040336C *obj, Item0040336C *item) {

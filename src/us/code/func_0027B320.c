@@ -5,8 +5,8 @@
 #include "globals/render.h"
 #include "globals/engine.h"
 #include "protos/cache.h"
+#include "protos/scene.h"
 
-s32 CScene__LoadGraphicSet(s32 *, s32, s32, s32); /* extern */
 s32 Hud_DrawImageFrame(s32, s32, s16, s16, f32, f32, s32); /* extern */
 
 s32 Hud_DrawSprite(s32 arg0, s32 arg1, s16 arg2, s16 arg3, f32 arg4, f32 arg5, s32 arg6) {

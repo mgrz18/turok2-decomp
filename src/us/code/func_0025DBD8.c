@@ -1,13 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
+#include "protos/ai.h"
 
 /* AI combat update: turns toward the target, then picks a reaction (taunt,
  * the 0x11F4-range anims, a dodge or a special melee for type 0x259). */
 
 extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern void AI_TurnClamped(CGameObjectInstance *actor, CAI *ai, f32 angle, f32 dist);
-extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
 extern void EnemyMode_Move_Update(CGameObjectInstance *actor, CAI *ai);
 extern s32 EnemyAI_PickAttack(CGameObjectInstance *actor, CAI *ai, CAITargets *t);
 extern void EnemyAI_TryDodge(CGameObjectInstance *actor, CAI *ai);

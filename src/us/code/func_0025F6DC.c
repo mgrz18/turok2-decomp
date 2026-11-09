@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 
 void EnemyMode_GroundToUnderwater_Update(s32 arg0, CAI *arg1) {
     arg1->m_Enemy.m_BehaviorIndex = 2;

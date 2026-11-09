@@ -5,6 +5,7 @@
 #include "structs/collision.h"
 #include "globals/collision.h"
 #include "globals/ai.h"
+#include "protos/ai.h"
 
 /* AI hit callback: a projectile (or its owner) close enough lengthens the
  * wait and becomes the last-heard position; then the projectile type picks a
@@ -23,7 +24,6 @@ typedef struct Projectile {
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 extern f32 CVector3__Distance(CVector3 *a, CVector3 *b);
-extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
 extern void Sound__Play(s16 sound, CVector3 pos, s32, s32);
 
 /* A noise at pos within 3072 units lengthens the wait and is remembered. */

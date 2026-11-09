@@ -4,6 +4,7 @@
 #include "globals/game.h"
 #include "globals/menu.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* Level select (warp) menu input: A warps to the selected level (or, on the
  * last entry, starts the credits/next mode), up and down move the selection
@@ -18,7 +19,6 @@ extern s32 Controller_MenuRight(s32 pad);
 extern void Menu_ClaimPressingController(Menu *c);
 extern void CEngineApp__SetupFadeTo(void *game, s32 mode);
 extern void CEngineApp__StartGameAtWarp(void *game, s32 level);
-extern void CScene__RequestWarp(void *level, s32 id, s32 how);
 
 static __inline__ u32 levelKey(s32 level) {
     u32 bit;

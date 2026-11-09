@@ -6,16 +6,15 @@
 #include "globals/scene.h"
 #include "globals/render.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
 
 extern u8 gEngineApp_m_Game_m_CameraPool_m_MainCamera[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 
-extern s32 CScene__FindObjectType(void *, s32);
 extern void CCamera__DisplayListSetup(void *);
 extern void CMtxF__SetTranslate(f32 *matrix, f32 x, f32 y, f32 z);
 extern void CMtxF__PreRotateY(f32 *matrix, f32 angle);
 extern void CMtxF__SwapYZRows(f32 *matrix);
 extern void CMtxF__ToMtxAffine(f32 *src, f32 *dst);
-extern s32 CScene__GetObject(void *, s32);
 extern void Render_ResetBatches(void);
 extern void Render_QueueModelByKey(s32 key, void *matrix, void *lights, s32 lod, s32 pass);
 extern void Render_FlushBatches(void);

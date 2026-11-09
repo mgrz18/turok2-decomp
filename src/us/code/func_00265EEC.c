@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 
 void Destructible_Hurt(CGameObjectInstance *arg0, CAI *arg1, DamageEvent *arg2) {
     s32 temp_v1;

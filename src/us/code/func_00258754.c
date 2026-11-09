@@ -4,11 +4,11 @@
 #include "globals/camera.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 
 extern void CCameraPool__AddText(void *arg0, void *camera, s32 model);
-extern void CAI__SetMode(CGameObjectInstance *weapon, CAI *state, s32 arg2);
 
 /* WeaponActor_SwitchToRequested, inlined: switches the weapon actor to its owner's
  * requested weapon. */

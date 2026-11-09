@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/game_object.h"
+#include "protos/scene.h"
 
 extern void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, s32);
 

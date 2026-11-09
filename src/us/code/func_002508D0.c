@@ -5,11 +5,11 @@
 #include "structs/intelligence.h"
 #include "globals/engine.h"
 #include "globals/player.h"
+#include "protos/player.h"
 
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuning);
 void CPlayer__MoveOnFoot(CPlayer *player, CGameObjectInstance *body, void *tuning);
-s32 CPlayer__SetState(CPlayer *player, CGameObjectInstance *body, s32 mode);
 f32 GameObject_GetWaterHeight(CGameObjectInstance *body);
 f32 func_002982F0(f32 x);
 void Sound__Play(s16 sound, CVector3 pos, s32, s32);

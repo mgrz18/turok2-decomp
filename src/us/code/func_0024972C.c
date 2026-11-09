@@ -5,8 +5,8 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/player.h"
+#include "protos/scene.h"
 
-void CScene__SetInstanceObjectType(void *world, CPlayer *player, s32 model, s32 arg3);
 void CGameObjectInstance__Draw(CPlayer *player, s32 arg1);
 
 /* Draws the player's model: picks it (single player, tag mode or the

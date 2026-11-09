@@ -3,6 +3,7 @@
 #include "structs/model.h"
 #include "globals/boss.h"
 #include "globals/engine.h"
+#include "protos/game.h"
 
 typedef struct {
     u8 data[0x64];
@@ -19,7 +20,6 @@ s32 Cinema_PathPlaying(void);
 void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
 void ScriptAnimator_Apply(Slot00407DC0 *slot);
 void ScreenTint_UpdateMode(void);
-void Render_DrawModel(s32 hModel, s32 model, s32 one, CLights1 *slot, s32 zero, s32 index, s32 second);
 
 static __inline__ s32 hasBit(s32 mask, s32 bit) {
     return mask & bit;

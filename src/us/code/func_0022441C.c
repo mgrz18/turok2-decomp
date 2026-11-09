@@ -1,6 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "protos/iset.h"
+#include "protos/scene.h"
 
 
 void CScene__SetLevelBit(void *arg0, s32 arg1, s32 arg2)

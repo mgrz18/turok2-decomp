@@ -2,6 +2,7 @@
 #include "globals/scene.h"
 #include "globals/hud.h"
 #include "protos/cache.h"
+#include "protos/scene.h"
 
 typedef struct {
     /* 0x00 */ s32 offset;
@@ -26,7 +27,6 @@ typedef struct {
 
 extern u8 D_800F5618[0x90];
 
-Resource *CScene__LoadGraphicSet(void *cache, s32 id, s32, s32);
 void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */
 
 /* Loads the 0x90-byte block of chunk 42 of resource 2 into D_800F5618 and

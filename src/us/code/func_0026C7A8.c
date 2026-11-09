@@ -1,5 +1,6 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* A 0x64-byte record of the world model sections (CScene__GetRegionInfo finds it from an id). */
 typedef struct {
@@ -8,7 +9,6 @@ typedef struct {
     /* 0x48 */ u8 pad48[0x64 - 0x48];
 } ModelRecord; /* size 0x64 */
 
-ModelRecord *CScene__GetRegionInfo(s32 *, u16 *);              /* extern */
 s32 CGameRegion__FloodSetFlag4000Same(u16 *, u16);                  /* extern */
 
 void func_0026C7A8(u16 *arg0) {

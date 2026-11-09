@@ -2,11 +2,11 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/player.h"
+#include "protos/player.h"
 
 
 void CPlayer__BobView(CPlayer *player, CGameObjectInstance *body);
 void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuning);
-s32 CPlayer__SetState(CPlayer *player, CGameObjectInstance *body, s32 mode);
 
 static __inline__ s32 try_jump(CPlayer *player, CGameObjectInstance *body) {
     if (player->m_SniperMode == 0 && !(11.25f < player->m_TimeOffGround) && !(body->m_AI.m_dwFlags & 0x6000)

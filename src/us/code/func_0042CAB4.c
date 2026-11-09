@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 #include "protos/iset.h"
+#include "protos/scene.h"
 
 extern s32 ProPackDecompress(void ***, s32);
-extern s32 CScene__GetObject(s32, s32);
 void CScene__DecompressParticles(s32 arg0, void ***arg1) {
     void *obj;
     GroupCode8044E2B8 *group;

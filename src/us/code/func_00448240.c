@@ -15,6 +15,7 @@
 #include "globals/collision.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
+#include "protos/scene.h"
 
 /* The second VM module's copy of src/us/code/Cinema_SplineSecondDerivs.c, byte for byte,
  * at the same link address (named 0x448240-0x44C228, linked 0x40F240-0x413228):
@@ -735,9 +736,7 @@ extern CVector3 Cinema_GetTargetPos_2(f32 t); /* target path */
 extern void CMtxF__Identity(CMtxF *m);                         /* identity */
 extern void CMtxF__SetEulerXYZ(CMtxF *m, f32 x, f32 y, f32 z);    /* rotation */
 extern void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);    /* transform */
-extern void CScene__LoadVisibleGridSections(void *world);
 extern s32 Collision_MoveInstance(CGameObjectInstance *actor, CVector3 to, void *info);
-extern void CScene__ReleaseSectors(void *world);
 
 /* Places the cinema relative to its target (flag 1) or to the player (flag 2). */
 static __inline__ void Cinema_Anchor(CGameObjectInstance *player) {
@@ -1101,7 +1100,6 @@ s32 Cinema_NoWaitCues_2(void) {
 
 s32 Cinema_IsActive(void);
 void LevelEvent_Trigger(LevelEvent *k);
-void CScene__SetEventFired(CScene *g, LevelEvent *k, s32 z);
 
 void Cinema_FireCues_2(void) {
     f32 now = gCinemaPlayerP->time;

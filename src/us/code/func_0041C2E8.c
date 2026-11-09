@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "globals/game.h"
+#include "protos/menu.h"
 
-extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
 s32 OptionsMenu_StepTwoPlayerLayout(void *first, void *second) {
     u8 *option = &gEngineApp_m_Settings.unk1B;
     *option = Menu_StepValue(second, *option, 1, 0, 1, 1);

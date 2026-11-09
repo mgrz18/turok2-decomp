@@ -1,10 +1,10 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "globals/game.h"
+#include "protos/game.h"
 
 void Controller_UnwatchPak(s32);
 s32 Controller_ResetRumble(s32);
-s32 Controller_SetRumbleOption(s32, s32);
 
 
 s32 RumbleMenu_Play(s32 arg0, void *arg1)

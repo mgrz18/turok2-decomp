@@ -1,6 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "protos/iset.h"
+#include "protos/scene.h"
 
 
 void CScene__SetSavedBit(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
