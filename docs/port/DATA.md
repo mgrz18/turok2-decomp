@@ -1,0 +1,159 @@
+# The game's data as C (Phase 7, round 2, q2)
+
+The game C files reference ~1,600 data symbols that the matching build defines in assembly
+(`us/asm/data/*.s`, splat output) or by address in the linker script. Before this step,
+`turok2_game` had **1,788 undefined symbols**. `tools/port/gendata.py` now defines all the data
+ones in C. With module 2 dropped and a stub `main`, the link has **33 unresolved symbols**, and
+all of them are on the function side (below).
+
+```sh
+# after `ninja -C <out> turok2_game` (data.cmake turns on compile_commands.json, which gendata reads)
+pip install clang==19.1.7        # python bindings for the system libclang 19
+python3 tools/port/gendata.py --build <out> [--cache <out>/decls.json] [-j 4]
+cmake <out> && ninja -C <out> turok2_data          # port/cmake/data.cmake
+python3 tools/port/linkcheck.py --build <out>      # link check + unresolved list
+```
+
+The generator takes about 1 min with 4 workers (libclang parses each of 1,5xx files twice). With
+`--cache`, a rerun takes about 10 s. Output goes to `port/gen/`, which is **gitignored**: it is ROM
+content (strings, tables, microcode data), like the asset archive. Every port build generates it
+from its own matching ELF, `build/turok2.us.elf`.
+
+| file | content |
+|---|---|
+| `port/gen/data_rodata.c` | `.code_rodata` and `.code_rodata_tail` (engine rodata and data) |
+| `port/gen/data_libultra.c` | `.libultra`, `.libultra_tail`, `.ucode_copy2` data |
+| `port/gen/data_virtual.c` | module-1 VM data (`.virtual`): menu descriptors, mode tables |
+| `port/gen/data_misc.c` | the rest (`.code` data, `.lnk_debug`, `.pre_virtual`, microcode sections) |
+| `port/gen/data_bss.c` | .bss: zero arrays, plus the aliases into them |
+| `port/gen/data_abs.c` | 6 ROM offsets that the C takes the address of (`(u32)&D_14A000`), as absolute symbols |
+| `port/gen/relocs.c` | `t2_data_syms[]` and `t2_n64_to_host(u32)`: N64 address to host address |
+| `port/gen/data_report.txt` | counts, declaration conflicts, unresolved pointer slots |
+
+## The approach: typed from the C declarations, host layout, real pointers
+
+The task offered two options: (1) N64-shaped byte images with a 32-bit handle in each pointer
+slot plus a handle table, or (2) typed definitions where the C type is known. I implemented (2)
+for everything that has a declaration and kept part of (1) for the rest:
+
+1. **The type comes from the game's own declarations.** libclang parses every module-1 file that
+   references a missing symbol, once for `x86_64-linux-gnu` and once for `mips-linux-gnu`, with
+   the same flags as the port build. The same declared type therefore has both layouts: the N64
+   offsets (where to read in the ELF) and the host offsets (where to write). If declarations
+   disagree, the most common one wins, and every conflict is listed in the report.
+2. **Each leaf is converted.** A scalar is read big-endian and written little-endian at its host
+   offset. A `long` is widened to 8 bytes with sign or zero extension. A `char` is copied as is,
+   so strings stay strings. Bitfields are re-packed from MSB-first (MIPS BE) to LSB-first (host).
+   Unions take their first member.
+3. **A pointer leaf becomes a host pointer.** The N64 value is looked up in the ELF symbols:
+   KSEG0 and the engine's `0x002xxxxx` window are folded to one physical address, and VM modules
+   are separate. The slot is emitted as `(void *)((char *)&target + host_offset)`. The offset
+   inside the target goes through the target's layout, so it stays correct past widened pointers.
+   - A function target is emitted as `(void *)Func`: 388 functions, all defined by the game C.
+   - A data target is generated too, even if the C never names it: 276 extra symbols. It is typed
+     by the pointee type when the pointer points at its start.
+4. **An integer leaf keeps its N64 value**, even when it holds an address (m2c `s32`/`u32`
+   pointers, `0xFF01` descriptor words followed by `0x800Bxxxx`). That value is the **handle**.
+   `relocs.c` maps it back: `t2_n64_to_host(0x800C2030) == gScreenWidth`. Code that q3 retypes
+   from `s32` to a pointer gets a real pointer the next time the generator runs. Code that keeps
+   the integer can call `t2_n64_to_host`.
+5. **Symbols without a usable declaration** are copied as bytes in ROM order: 6 of the 1,602.
+   Pointer targets reached through `void *` or `char *` are copied the same way.
+6. **.bss**: a linker-script symbol (`SHN_ABS`, placed by address, no `.s` data behind it), or any
+   symbol outside a loaded section, becomes a zero array. Its size is the declared size, or the
+   distance to the next symbol for `[]`. That distance is capped at 1 MB inside RAM and 4 KB
+   outside RAM: `D_8F128560` is not a RAM address.
+   The bytes the ELF holds at those addresses belong to whatever splat put there (libultra code,
+   strings), not to the variable. The first version read them and produced 11,800 garbage
+   pointers.
+7. **Symbols inside another symbol become aliases.** splat puts labels inside structs that the C
+   declares whole: `gScene_m_nDrawActors` is `gScene + 0x8EC`, which is `gEngineApp + 0xD00` on
+   the host, and the `gEngineApp_m_Settings_*` fields work the same way. Each becomes
+   `.set alias, base + host_offset` in the base's file. The aliases are exact on ELF. On Mach-O
+   and COFF the generator emits a 1-byte placeholder (marked FIXME) for now. **For macOS this
+   needs a different mechanism**: either a `#define alias (base.field)` shim for the game C, or
+   an `.alt_entry` symbol.
+
+The generated files include no game header. Each typed symbol is a packed anonymous-layout struct
+of `unsigned char bN[]` runs and `void *pN` members at the exact host offsets, aligned to the
+type's host alignment. The linker does not see C types, so the game's `extern MenuDesc
+gPauseMenuDesc;` binds to it. Each struct is declared before any definition, so a definition can
+point anywhere in its file.
+
+Checked on the box: a test program linked against `libturok2_data.a` reads `gScreenWidth == 320`.
+`t2_n64_to_host(0x800C2030)` returns `gScreenWidth`. `gPauseMenuDesc.items` points at
+`D_004394D8`, `count == 10`, and init/close/update point at `PauseMenu_Init/Close/Update`.
+`&gScene_m_nDrawActors - &gScene == 0x8EC`.
+
+### Trade-off against handles everywhere
+
+Keeping every symbol N64-shaped, with 4-byte handles in pointer slots, would keep the bytes
+identical to the N64. It would also work without libclang. But every pointer read in the game
+would then need a `t2_n64_to_host()`, including the hundreds of `desc->init(...)` and
+`table[i]->field` reads that the typed C already does correctly. The typed route gives those
+reads real pointers today. It gives integer slots the handle, which is the N64 address, so
+nothing is lost. The costs:
+
+- **The data follows the C types.** A wrong m2c declaration produces wrong data:
+  - `extern s32 D_x;` on what is really a string swaps it as words.
+  - A struct declared bigger than its data runs into the next labels.
+
+  There are 187 symbols with conflicting declarations, but only 10 differ only in signedness.
+  Most of the rest are m2c `char[]` vs `s32` vs `f32` views of the same literal pool, and the
+  most common declaration wins. Each typing fix in `src/` (q3) improves the data on the next run.
+- The generator depends on libclang (python `clang` 19) and on a port build with
+  `compile_commands.json`.
+- An asset struct that the game reads in place must **not** go through this tool (64BIT.md:
+  "never widen a struct that swap_spec.json describes"). That is not an issue here: these are
+  statics, never asset bytes.
+
+## Numbers (tree 55932a88 plus this commit, box x86_64)
+
+| | count |
+|---|---:|
+| undefined symbols in `libturok2_game.a` (all objects) | 1,788 |
+| module-2 objects left out (a `.virtual_1` function) | 629 of 3,917 |
+| data symbols that module-1 C needs | 1,602 (1,596 typed, 6 as bytes) |
+| extra symbols generated as pointer targets | 276 |
+| .bss symbols (zero) | 807 |
+| aliases inside another symbol | 216 |
+| pointer slots | 2,638: 1,480 relocated, 756 null in the ROM, 402 unresolved (set to NULL) |
+| functions referenced from data | 388, all defined by the game C |
+| generated size | 1.23 MB host (1.16 MB N64), 7 C files, ~2 MB of source |
+| **unresolved after linking module 1 + data + stub main** | **33** |
+
+`linkcheck.py` extracts the library and drops the module-2 objects. It links with
+`-no-pie -nostdlib --unresolved-symbols=ignore-all`, so the real linker still checks duplicate
+definitions and relocations: **link OK**. It then classifies what remains:
+
+| category | n | symbols | owner |
+|---|---:|---|---|
+| asm-only / excluded functions (`.code`) | 32 | `RNC_UnpackMethod1/2` (q1's rnc.c), `__osException __osDispatchThread __osEnqueueAndYield __osEnqueueThread __osPopThread __osCleanupThread` (t2os), `__osDisableInt __osRestoreInt osSetIntMask __osGetSR __osSetSR __osGetFpcCsr __osSetFpcCsr osGetCount __osSetCompare` (host no-ops or clock), `osInvalDCache osInvalICache osWritebackDCache osWritebackDCacheAll` (no-ops), `__osProbeTLB __osUnmapTLBAll func_0028EE40 func_0028EEC0` (TLB: no-ops), `func_002A3100 func_002A31E4 func_002A31F0 func_002A31FC` (crash handler, SR), `HostIo_Call sprintf func_00298470` (stub, libc, sqrtf) | q5 (host stubs), q1 |
+| host libc | 1 | `memcpy` | libc |
+
+That is exactly the "function-side remainder" (docs/port/BUILD.md). No data symbol is left.
+
+## Known gaps (data_report.txt has the lists)
+
+- **402 pointer slots hold values that are not addresses**, in 38 symbols. Most are in large
+  runtime structs that splat placed inside loaded sections: `gDemoPlayer_match_decode` (108),
+  `gAudioWorld` (97), `gRumbleEntries` (48), `gDemoPlayer` (26), `sPathSearch` (24). Their
+  declared size runs past the zero words into the next labels' bytes (strings, code). They are
+  runtime state, probably .bss in Acclaim's layout. They are written as NULL. The right fix is
+  to mark such symbols bss: they are zero at boot, or the game initializes them.
+- **Int slots that carry addresses** are not counted yet. A next step is to report every s32/u32
+  leaf whose value resolves to a symbol: that list is a worklist for q3's typing.
+- **Aliases on Mach-O/COFF**: see point 7 above.
+- **Module 2** is skipped entirely, as the task asked: no `.virtual_1` data and no objects.
+- The `void *` slots are host pointers, so the data cannot be written back as N64 bytes. Nothing
+  needs to (saves go through their own code).
+- `data_abs.c` (`D_14A000` and 5 others) uses absolute symbols. These need `-no-pie` on ELF, or
+  the code using them should switch to archive keys (docs/assets/PORT.md).
+
+## What the next round needs
+
+- q5: link `turok2_data` into `turok2`, together with the host stubs for the 32 functions above
+  (`RNC_*` from q1). Run to the first crash.
+- Mark the runtime structs above as bss: an option in the generator, or a list in the tool.
+- Emit the "int leaf holds an address" list for q3, and rerun after each q3 typing batch.
+- Replace the ELF `.set` aliases with something Mach-O accepts before the macOS build.

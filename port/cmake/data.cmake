@@ -8,6 +8,9 @@
 # The files hold no game types: plain byte arrays and packed structs whose
 # pointer members are relocations, so they compile without the game headers.
 
+# gendata.py reads the exact compile flags of each game file from here.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(T2_GEN_DIR ${T2_REPO_DIR}/port/gen CACHE PATH "gendata.py output (data_*.c, relocs.c)")
 file(GLOB T2_DATA_SOURCES CONFIGURE_DEPENDS ${T2_GEN_DIR}/*.c)
 if(T2_DATA_SOURCES)

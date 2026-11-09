@@ -257,6 +257,9 @@ stay integers and Fast3D resolves them through `gSPSegment` as on N64.
 
 ## What the next round needs
 
+(Round 2: the data generator exists: docs/port/DATA.md. Module 1 + generated data + a stub
+main link with 33 unresolved symbols, all function side.)
+
 - Exclude the libultra/hardware files and the module-2 copies from
   `turok2_game` (lists derivable from the ELF sections), and add a
   `port/src/host_ultra.c` with the replacements above, then attempt a link
