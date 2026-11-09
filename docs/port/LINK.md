@@ -177,7 +177,8 @@ arithmetic over structs that change layout"), not link or runtime problems.
 4. Audio stays off (`osAiGetStatus` = full) until the ABI1 HLE; Controller Pak not modelled
    (`__osSiRawStartDma` completes without data).
 5. `t2_sprintf` relies on SysV x86-64 passing variadic arguments like fixed ones; arm64 macOS
-   needs real prototypes at the `sprintf` call sites (genprotos, q3).
+   needs real prototypes at the `sprintf` call sites. Done in round 3 (r5, MACOS.md §2): the 13
+   fixed-parameter declarations are variadic under `TARGET_PORT`.
 6. `--draw` once q4's GBI lands; `T2Port_TakeGfxTask` already hands over `data_ptr`.
 
 ## 8. Files

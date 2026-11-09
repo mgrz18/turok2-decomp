@@ -69,10 +69,9 @@ for everything that has a declaration and kept part of (1) for the rest:
 7. **Symbols inside another symbol become aliases.** splat puts labels inside structs that the C
    declares whole: `gScene_m_nDrawActors` is `gScene + 0x8EC`, which is `gEngineApp + 0xD00` on
    the host, and the `gEngineApp_m_Settings_*` fields work the same way. Each becomes
-   `.set alias, base + host_offset` in the base's file. The aliases are exact on ELF. On Mach-O
-   and COFF the generator emits a 1-byte placeholder (marked FIXME) for now. **For macOS this
-   needs a different mechanism**: either a `#define alias (base.field)` shim for the game C, or
-   an `.alt_entry` symbol.
+   `.set alias, base + host_offset` in the base's file. The aliases are exact on ELF and on
+   Mach-O (`.globl` + `.alt_entry` + `.set`, round 3: MACOS.md; `turok2_data` is built with
+   `-fno-common` so the base is in a section). Only COFF still gets a 1-byte FIXME placeholder.
 
 The generated files include no game header. Each typed symbol is a packed anonymous-layout struct
 of `unsigned char bN[]` runs and `void *pN` members at the exact host offsets, aligned to the
@@ -148,7 +147,7 @@ That is exactly the "function-side remainder" (docs/port/BUILD.md). No data symb
   `sWeaponActorModeTable` (31), `sPrimagenModeTable` (21), the other boss and platform
   `*ModeTable`s (function pointers declared as `s32`), `sCheatCodes` (12) and `gAudioWorld` (11).
   Typing them in `src/` and rerunning turns them into real pointers.
-- **Aliases on Mach-O/COFF**: see point 7 above.
+- **Aliases on COFF**: see point 7 above (Mach-O done in round 3).
 - **Module 2** is skipped entirely, as the task asked: no `.virtual_1` data and no objects.
 - The `void *` slots are host pointers, so the data cannot be written back as N64 bytes. Nothing
   needs to (saves go through their own code).
@@ -162,4 +161,4 @@ That is exactly the "function-side remainder" (docs/port/BUILD.md). No data symb
 - Mark the runtime structs above as bss: an option in the generator, or a list in the tool.
 - q3: type the `*ModeTable` declarations (function pointers stored as `s32`), then rerun the
   generator.
-- Replace the ELF `.set` aliases with something Mach-O accepts before the macOS build.
+- Replace the `.set` aliases with something COFF accepts before a Windows build (Mach-O: done, MACOS.md).

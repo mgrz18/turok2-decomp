@@ -117,3 +117,15 @@ so `--draw` (q4's GBI is in) has nothing to show yet.
    the `*ModeTable` integers that hold function addresses (type them, rerun gendata).
 5. Remaining 64-bit work (64BIT.md part 2): 1,064 mismatched declarations, ~3,000
    pointer-width warnings; each fix above was found by running, the audit lists the rest.
+
+## r5 (round 3): macOS arm64
+
+Details: [MACOS.md](MACOS.md). On the Mac (M5, Apple clang 21, Homebrew; no new packages) the
+whole port builds natively: `turok2_game` (3,917 files, 0 errors), gendata (identical output
+to the box), `turok2` on LUS 2.0. Runtime and asset tests give the same hashes as Linux.
+`turok2 --game` (headless) stops in `GfxPool_Alloc` (func_00425220.c:86) on a truncated `s32`
+address. Linux `--high-memory` stops at the same line, and macOS cannot have a low-memory mode
+(checked). A probe branch (`r5-probe`, not for merge) fixes five truncations and reaches
+`CCameraPool__Construct` → `CCamera__ConstructSkySystem` (`arg0 + 0x558`), the CCamera layout
+work. It also found a host-layout bug that affects Linux too: `CCache__AllocateAt` writes a
+`CMemEntry` through junk_types' `B12Node` view, so `flags |= 3` lands in `lockCount`.
