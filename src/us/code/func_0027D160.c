@@ -482,7 +482,7 @@ void CCamera__DisplayListSetup(CCamera *cam) {
         Render_SetRenderMode(0x14);
         GFX(*clearDl, 0xE7000000, 0);
         GFX(*clearDl, 0xE3000A01, 0x300000);                /* gDPSetCycleType(G_CYC_FILL) */
-        GFX(*clearDl, 0xFF100000 | ((gScreenWidth - 1) & 0xFFF), (u32) gDepthBuffer);   /* colour image: z buffer */
+        GFX(*clearDl, 0xFF100000 | ((gScreenWidth - 1) & 0xFFF), (uptr) gDepthBuffer);   /* colour image: z buffer */
         GFX(*clearDl, 0xE7000000, 0);
         GFX(*clearDl, 0xE3000A01, 0x300000);
         GFX(*clearDl, 0xF7000000, 0xFFFCFFFC);              /* gDPSetFillColor(max z) */
