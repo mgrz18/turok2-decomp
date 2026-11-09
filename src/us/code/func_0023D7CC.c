@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
+#include "protos/iset.h"
 
 /* A vertex of the display list, put in the sweep's space and classified. */
 typedef struct ProjVertex {
@@ -16,7 +17,6 @@ typedef union DLCmd {
     u8 b[8];
 } DLCmd;
 
-char *CISet__GetBlock(s32 *list, s32 index);
 void CMtxF__TransformPoint(f32 (*mtx)[4], CVector3 *in, ProjVertex *out);
 void ModelSweep_TestTriangle(ModelSweep *ms, ProjVertex **tri);
 

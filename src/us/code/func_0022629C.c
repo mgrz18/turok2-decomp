@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "protos/iset.h"
 
-s32 CISet__GetROMAddress(s32, s32, s32);
 s32 CCache__Deallocate(s32, s32);
 s32 CCache__LoadPersistantIndex(s32, s32, s32, s32);
 s32 CCache__LoadPersistantSubBlock(s32, s32, s32, s32, s32, s32, s32);

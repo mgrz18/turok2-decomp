@@ -2,8 +2,8 @@
 #include "structs/camera.h"
 #include "structs/cache.h"
 #include "globals/cache.h"
+#include "protos/list.h"
 
-void CList__Remove(CList *list, void *element);
 
 /* Takes a CMemEntry off the age and address lists and returns it to the free stack. */
 void CCache__FreeMemEntry(s32 unused, CMemEntry *entry) {

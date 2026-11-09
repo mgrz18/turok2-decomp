@@ -1,9 +1,7 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RENDER_4/CODE_8028BD88.CPP, func_8028BDAC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed int s32;
+#include "protos/iset.h"
 struct Field_void_6C;
 struct Field_void_6C {
     char pad[0x6C];
@@ -11,7 +9,6 @@ struct Field_void_6C {
 };
 struct Field_void_6C;
 typedef struct Field_void_6C Field_void_6C;
-void *CISet__GetBlock(void *table, s32 index);
 s32 CScene__IsLinkGroupDone(void *arg0, s32 arg1) {
     void *temp_v0;
     u8 *result;

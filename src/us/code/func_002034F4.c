@@ -4,12 +4,12 @@
 #include "rw/abu_types.h"
 #include "structs/cache.h"
 #include "globals/cache.h"
+#include "protos/list.h"
 
 extern void *CCache__LookupAndLock(s32 arg0, s32 arg1);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
-extern void CList__MoveToHead(void *, s32);
 void *CCache__LookupAndLock(s32 arg0, s32 arg1) {
     extern s32 osSendMesg(OSMesgQueue *, s32, s32);
     s32 temp_v1;

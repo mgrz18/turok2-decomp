@@ -3,6 +3,7 @@
 #include "structs/collision.h"
 #include "structs/rect.h"
 #include "globals/scene.h"
+#include "protos/iset.h"
 
 #define MIN(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
@@ -46,7 +47,6 @@ void Collision_LookAtF(f32 mf[4][4], f32 xEye, f32 yEye, f32 zEye, f32 xAt, f32 
 f32 func_00298470(f32);                 /* sqrtf */
 s32 Sweep_HitRect(Sweep *sweep, CRect *rect, f32 *t);
 s32 Sweep_HitBox(Sweep *sweep, CBox *box, f32 *t);
-SceneModels *CISet__GetBlock(s32 *list, s32 index);
 void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), void (*swap)());
 s32 Collision_SortCompare();
 void Collision_SortSwap();

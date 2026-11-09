@@ -1,9 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "globals/cache.h"
+#include "protos/list.h"
 
-s32 CList__AddHead(s32, s32);
-s32 CList__Remove(s32, s32);
 s32 CHashTable__Remove(s32);
 
 

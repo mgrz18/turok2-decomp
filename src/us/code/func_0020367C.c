@@ -4,12 +4,12 @@
 #include "structs/cache.h"
 #include "globals/cache.h"
 #include "globals/sysrc.h"
+#include "protos/list.h"
 
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 extern s32 osRecvMesg(void *mq, void **msg, s32 flag);
 extern s32 osSendMesg(void *mq, void *msg, s32 flag);
-extern void CList__MoveToHead(void *, CMemEntry *);
 extern CCacheEntry *CCache__AllocCacheEntry(s32, u32);
 extern CMemEntry *CCache__AllocMemEntry(s32, u32);
 extern void CCache__FreeMemEntry(s32, CMemEntry *);
@@ -20,8 +20,6 @@ extern CCacheEntry *CCache__CompleteRequest(s32, CCacheEntry *, s32);
 extern void CLoader__LoadSync(CLoader *, u32, u32, void *);
 extern void CLoader__LoadAsync(CLoader *, u32, u32, void *, void *, CCacheEntry *, s32);
 extern void CCache__FreeCacheEntry(s32, CCacheEntry *);
-extern void CList__Remove(void *list, void *node);
-extern s32 CList__AddTail(void *list, void *node);
 
 static __inline__ void acquire(void) {
     u32 token = __osDisableInt();

@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/iset.h"
 
 extern char D_800A5AC4[];
 
 void **CCache__Request(s32, s32, s32, s32, s32, s32, void *, s32); /* resource load */
 void CCache__Unlock(s32, void **);                                 /* resource free */
 void **CGameObjectInstance__LoadGeometry(void *obj);
-s32 CISet__GetBlock(void *, s32);
 s32 CGameObjectInstance__BuildBoneMatrices(void *, void *, s32);
 
 s32 CGameObjectInstance__LoadBoneMatrices(CGameObjectInstance *obj, s32 arg1) {

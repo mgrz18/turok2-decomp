@@ -3,9 +3,8 @@
 
 #include "common.h"
 #include "structs/world.h"
+#include "protos/iset.h"
 
-s32 *CISet__GetBlock(s32 *tbl, s32 idx);
-void CISet__GetBlockSize(s32 *tbl, s32 idx);
 s32 CScene__GetSavedBit(CScene *lv, s32 sel, s32 c, s32 b, s32 bit) {
     s32 *t;
     s32 *base;

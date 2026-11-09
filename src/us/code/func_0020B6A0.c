@@ -3,8 +3,8 @@
 #include "common.h"
 #include "structs/model.h"
 #include "globals/batch.h"
+#include "protos/iset.h"
 
-void *CISet__GetBlock(void *resource, s32 index);
 void Render_FlushModelBatch(void);
 void CCache__TouchAndLock(s32 unused, void **resource);
 

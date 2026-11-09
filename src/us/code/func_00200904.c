@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "protos/list.h"
 
 /* CList: unlinks element arg1 and appends it at the tail. */
 void CList__MoveToTail(CList *arg0, void *arg1) {

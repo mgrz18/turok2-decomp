@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/table.h"
 #include "gfx.h"
+#include "protos/iset.h"
 
 /* An F3DEX2 vertex (libultra's Vtx), 16 bytes. */
 typedef struct Vtx {
@@ -20,9 +21,6 @@ typedef struct Vtx {
 #define TABLE_SIZE(n) (((n) * 4 + 0xF) & ~7)
 
 s32 ProPackDecompress(void ***handle, s32 arg1);
-void *CISet__GetBlock(void *table, s32 index);
-void *CISet__GetBlockAndSize(void *table, s32 index, s32 *size);
-s32 CUSet__Transpose(void *src, void *dst, s32 arg2);
 void **CCache__AllocateMemoryForDecompression(s32 heap, void ***handle, s32 size);
 void CCache__DeallocAndReplaceCompressedData(s32 heap, void ***handle, void **block);
 void Material_Unpack(void *dst, void *material);

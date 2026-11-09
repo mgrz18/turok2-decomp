@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "protos/iset.h"
 
 extern u8 D_800A7094[];
 extern s32 *CCache__Request(s32, void *, u32, s32, s32, s32, void *, s32);
-extern void *CISet__GetBlock(s32 table, s32 index);
 extern void CGameObjectInstance__UpdateBounds(CGameObjectInstance *, void *);
 extern void Shadow_DrawBlob(CGameObjectInstance *, CVector3 *, s32);
 extern void CCache__Unlock(s32, void *);

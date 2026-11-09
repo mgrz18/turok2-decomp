@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "protos/list.h"
 
 /* Links element arg1 in front of the list head; the links live at the list offsets inside it. */
 void CList__AddHead(CList *arg0, void *arg1) {

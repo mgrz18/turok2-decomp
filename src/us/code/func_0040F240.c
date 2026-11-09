@@ -13,6 +13,7 @@
 #include "globals/render.h"
 #include "globals/cinema.h"
 #include "globals/collision.h"
+#include "protos/iset.h"
 
 /* The cinema system: one file from Cinema_SplineSecondDerivs to Cinema_IsWaitCue (0x40F240-0x413228).
  * Its strings ("Cinema temp alloc", "Cinema") are shared by functions all over
@@ -25,8 +26,6 @@ extern f32 D_800C1BC8;
 extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */ /* current player */
 /* gScene: a function that reads two of its fields does it through a local CScene * (one register). */
 
-extern void *CISet__GetBlock(void *node, s32 index); /* child `index` of a resource node */
-extern s32 CISet__GetROMAddressAndSize(s32 *bundle, s32 lookup, s32 index, s32 *size);
 extern s32 **CCache__Request(s32 a, s32 data, s32 size, s32 tag, s32 e, void *prepare, const char *name, s32 h);
 extern s32 **CCache__Allocate(s32 heap, s32 size, s32 tag, const char *name);
 extern void CCache__Unlock(s32 unused, s32 **handle);
@@ -222,7 +221,6 @@ void Cinema_SplineBuild(s32 count, CVector3 *points, f32 *weights, Spline *splin
 typedef struct SplineSource { s32 stride,count; union { char data[0]; CVector3 points[0]; f32 weights[0]; }; } SplineSource;
 typedef struct SplineTable { s32 count; } SplineTable;
 typedef union SplineSourceCursor { SplineSource *header; CVector3 *points; f32 *weights; } SplineSourceCursor;
-extern int CUSet__GetTotalSize(int *);
 extern void Pack_Init(void *,s32);
 extern char *Pack_Add(Pack *,s32,s32);
 extern s32 ProPackDecompress(void **, s32);

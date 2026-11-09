@@ -1,6 +1,6 @@
 #include "common.h"
+#include "protos/iset.h"
 
-s32 CISet__GetBlock(s32, s32);
 s32 CCache__Touch(s32, s32);
 
 void Model_TouchTextures(s32 *arg0) {

@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "protos/list.h"
 
-void CList__Remove(CList *list, void *element);
-void CList__AddHead(CList *list, void *element);
 
 /* Starts a camera shake: a free shake source if there is one, else the
  * newest active one is reused. It shakes cameras within `radius` of `pos`,

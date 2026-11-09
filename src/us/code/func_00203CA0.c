@@ -7,18 +7,15 @@
 #include "structs/cache.h"
 #include "globals/cache.h"
 #include "globals/sysrc.h"
+#include "protos/list.h"
 
-extern s32 CList__AddTail(CList *list, void *node);
 extern void __osRestoreInt(OSIntMask mask);
 extern OSIntMask __osDisableInt(void);
 extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 extern void CCache__FreeCacheEntry(s32 arg0, void *arg1);
-void CList__AddHead(void *list, void *node);
-extern void CList__Remove(void *list, void *node);
 extern CCacheEntry *CCache__AllocCacheEntry(s32, s32);
 extern void CDecompressor__DecompressSync(CDecompressor *, CCacheEntry *);
-extern void CList__MoveToHead(void *, CMemEntry *);
 extern CCacheEntry *CCache__CompleteRequest(s32 unused, CCacheEntry *request, s32 dropReference);
 static __inline__ void addref(CMemEntry *node) {
     node->lockCount += 1;

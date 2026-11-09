@@ -3,6 +3,7 @@
 #include "structs/vector.h"
 #include "structs/sound.h"
 #include "structs/table.h"
+#include "protos/iset.h"
 
 /* Plays a sound or a music cue at pos: refuses while another cue is pending,
  * when 6 of the 17 voices already play this sound id (or for cue 0x44C while
@@ -17,7 +18,6 @@ extern void __osRestoreInt(u32 mask);
 extern s32 Random_Next(void);
 extern f32 Random_Float(f32 range);
 extern s32 BinaryRange(void *ranges, s32 count, s16 id, s32 *lo, s32 *hi);
-extern void *CISet__GetBlock(void *list, s32 index);
 extern void CAudioWorld__PlayLayer(CAudioWorld *m, void *layer, CVector3 *pos, s32 variant, s32 handle, s32 a5, s32 a6);
 
 static __inline__ void CAudioWorld_Lock(CAudioWorld *m) {

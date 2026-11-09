@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/engine.h"
+#include "protos/iset.h"
 
-void *CISet__GetBlock(s32, s32);                  /* extern */
 s32 Model_BlendMorphFrames(s32, f32, void *);            /* extern */
 
 typedef struct {

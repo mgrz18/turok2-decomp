@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/emitter.h"
+#include "protos/list.h"
 
-void CList__Construct(CList *, s32, s32);
-s32 CList__AddTail(CList *, CEmitter *);
 
 void CEmitterPool__Construct(CEmitterPool *arg0) {
     CEmitter *var_s0;

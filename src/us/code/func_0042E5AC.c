@@ -4,6 +4,7 @@
 #include "structs/game.h"
 #include "structs/controller.h"
 #include "globals/game.h"
+#include "protos/list.h"
 
 
 typedef struct PlayerList {
@@ -14,10 +15,6 @@ typedef struct PlayerList {
     /* 0x20 */ u8 list1[0x14];
 } PlayerList;
 
-extern void CList__Construct(void *list, s32 prevOffset, s32 nextOffset);
-extern void CList__AddHead(void *list, CPlayer *p);
-extern void CList__AddTail(void *list, CPlayer *p);
-extern void CList__Remove(void *list, CPlayer *p);
 extern CPlayer **CCache__Allocate(s32 heap, s32 size, s32 tag, char *name);
 extern void CCache__Deallocate(s32 heap, CPlayer **handle);
 extern void CCache__Flush(s32);

@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/junk_types.h"
+#include "protos/iset.h"
 
-void *CISet__GetBlock(void *t, s32 i);
 void CAnimationState__GetBonePosition(R05Anim *a, s32 idx, f32 time, f32 *out)
 {
     void *root;

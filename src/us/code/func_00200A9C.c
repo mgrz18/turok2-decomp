@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/list.h"
 
 int CList__Contains(CList *arg0, void *arg1) {
     void *node = arg0->m_pHead;

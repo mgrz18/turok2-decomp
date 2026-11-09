@@ -1,7 +1,7 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/OVLGAME/8044E2B8.CPP, func_8044D804_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
+#include "protos/iset.h"
 struct GroupCode8044E2B8;
 typedef struct GroupCode8044E2B8 GroupCode8044E2B8;
 struct Piece;
@@ -27,7 +27,6 @@ struct GroupCode8044E2B8 {
     Piece pieces[1];
 };
 extern s32 ProPackDecompress(void ***, s32);
-void *CISet__GetBlock(void *table, s32 index);
 extern s32 CScene__GetObject(s32, s32);
 void CScene__DecompressParticles_2(s32 arg0, void ***arg1) {
     void *obj;

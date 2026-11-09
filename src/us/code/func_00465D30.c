@@ -1,5 +1,6 @@
 /* Second VM module copy of CScene__ConstructMap (same source, linked 0xE0 lower). */
 #include "common.h"
+#include "protos/iset.h"
 
 typedef struct Record {
     /* 0x00 */ s32 data[2];
@@ -14,8 +15,6 @@ extern void Model_DecompressCallback(void);
 extern s32 CScene__FindObjectType(void *level, s32 key);
 extern s32 CScene__GetObject(void *level, s32 id);
 extern s32 **CCache__Request(s32 unused, s32 key, s32 size, s32 mode, s32 owner, void *tag, char *name, s32 direct);
-extern s32 CISet__GetROMAddressAndSize(s32 *block, s32 key, s32 index, s32 *size);
-extern void *CISet__GetBlock(void *table, s32 index);
 extern void CCache__Deallocate(s32, void *);
 
 /* Looks key up in the level and loads its record into out (out->valid = 0 when there is none). */

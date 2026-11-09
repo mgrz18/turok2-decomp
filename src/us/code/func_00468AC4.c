@@ -2,10 +2,9 @@
 /* Second VM module copy of CCameraPool__NewGame (same source, linked 0xE0 lower). */
 #include "common.h"
 #include "structs/camera.h"
+#include "protos/list.h"
 
 void CCamera__Construct_2(void *);
-void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
-s32 CList__AddTail(CList *list, void *node);
 void Sound__SetListener(void *);
 void CCache__Flush(s32);
 void CCache__Deallocate(s32, void *);

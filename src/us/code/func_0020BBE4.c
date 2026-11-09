@@ -2,13 +2,13 @@
 #include "gfx.h"
 #include "structs/frame.h"
 #include "globals/render.h"
+#include "protos/iset.h"
 
 /* One two-word display list command at the list head. */
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 
 s32 Render_SetupMaterial(s32, s32);
-s32 *CISet__GetBlock(s32 *, s32);
 void CCache__LockForDisplayList(s32, s32 **);
 void Render_SetRenderMode(s32);
 

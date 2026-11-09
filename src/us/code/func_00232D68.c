@@ -1,10 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/particle.h"
+#include "protos/list.h"
 
-extern s32 CList__AddHead(s32, s32);
-extern s32 CList__AddTail(s32, s32);
-extern s32 CList__InsertBefore(s32, s32, s32);
 
 /* Insert arg1 into the list at 0xEC14: after the node with the same key at
  * 0xF8 if there is one, else at the end or the front by a flag. */

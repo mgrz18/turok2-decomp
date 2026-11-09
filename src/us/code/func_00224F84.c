@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/world.h"
+#include "protos/iset.h"
 
-extern s32 CISet__GetROMAddress(s32, s32, s32);
 
 s32 CScene__GetObject(CScene *arg0, s32 arg1) {
     s32 *table;

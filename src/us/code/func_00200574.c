@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "protos/list.h"
 
 /* Appends arg1 to the list; m_LastOffset and m_NextOffset say where in an
  * element its links are. */

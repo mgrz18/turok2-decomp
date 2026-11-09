@@ -2,6 +2,7 @@
  * name the same two literals (GCC shares a string only within a file), the
  * file's whole .rodata. */
 #include "common.h"
+#include "protos/iset.h"
 
 /* Only the field read here: the key of the resource this loads. */
 typedef struct {
@@ -10,7 +11,6 @@ typedef struct {
 } ResourceOwner;
 
 s32 *CCache__Request(s32 heap, s32 src, s32 size, s32 type, s32 arg4, void *callback, void *name, s32 arg7);
-s32 CISet__GetROMAddressAndSize(s32 table, s32 base, s32 index, s32 *size);
 void CCache__Unlock(s32 heap, s32 *block);
 void Model_TouchTextures(s32 *);
 extern void Model_DecompressCallbackTerminated();

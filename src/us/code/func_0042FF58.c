@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "protos/list.h"
 
 /* A pool of elements on a free list and an active list (CList__*), laid out
  * like the head of CCameraPool. */
@@ -9,8 +10,6 @@ typedef struct {
     /* 0x20 */ CList m_ActiveList;
 } CElementPool;
 
-s32 CList__AddTail(CList *, s32);
-s32 CList__Remove(CList *, s32);
 s32 CCamera__Construct(s32);
 
 /* Takes the first free element, resets it and moves it to the active list. */

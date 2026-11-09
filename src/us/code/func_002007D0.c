@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/list.h"
 
-extern void CList__RemoveHead(CList *arg0);
 void CList__RemoveHead(CList *arg0) {
     char *cursor = arg0->m_pHead;
     int stride = arg0->m_NextOffset;

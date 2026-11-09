@@ -3,12 +3,11 @@
 
 #include "common.h"
 #include "structs/rumble.h"
+#include "protos/list.h"
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 s32 RumbleCurve_Advance(RumbleCurve *curve);
-void CList__Remove(CList *list, void *element);
-void CList__AddTail(CList *list, void *element);
 
 /* Returns the effects whose amplitude or lifetime curve has run out to the
  * free list (Rumble_IsFinished, inlined). */

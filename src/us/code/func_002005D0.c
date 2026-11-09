@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "protos/list.h"
 
 /* CList: inserts element arg2 before element arg1 (at the head when arg1 has no previous). */
 void CList__InsertBefore(CList *arg0, void *arg1, void *arg2) {

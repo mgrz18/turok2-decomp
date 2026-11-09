@@ -1,6 +1,6 @@
 #include "common.h"
+#include "protos/iset.h"
 
-s32 CISet__GetROMAddressAndSize(s32, s32, s32, s32);
 s32 CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
 s32 BinarySearch(s32, s32, s32);
 

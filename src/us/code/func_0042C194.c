@@ -2,6 +2,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_29.CPP, func_8044D220_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game.h"
+#include "protos/list.h"
+#include "protos/iset.h"
 
 typedef struct ListRec {
     /* 0x00 */ u8 pad0[0x10];
@@ -25,12 +27,7 @@ extern char D_800A5D8C[];
 
 extern void CCache__LoadPersistantIndex(s32, s32 *, s32, char *);
 extern void **CCache__LoadPersistantSubBlock(s32, s32, s32, s32, void *, s32, char *);
-extern void *CISet__GetBlock(void *table, s32 index);
 extern s32 BinaryRange(s32 *keys, s32 count, s32 key, s32 *first, s32 *last);
-extern void CList__Construct(ListRec *list, s32 prevOffset, s32 nextOffset);
-extern s32 CList__AddHead(ListRec *list, Node *node);
-extern Node *CList__GetRandom(ListRec *list);
-extern void CList__Remove(ListRec *list, Node *node);
 extern void CCache__Deallocate(s32, void *);
 
 /* Copies up to max placed objects of the given kind (-1: any) whose key matches into out; returns how many. */

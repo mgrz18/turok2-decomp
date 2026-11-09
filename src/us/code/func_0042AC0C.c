@@ -10,6 +10,7 @@
 #include "globals/render.h"
 #include "globals/sysrc.h"
 #include "globals/audio.h"
+#include "protos/iset.h"
 
 
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
@@ -19,7 +20,6 @@ extern u8 gEngineApp_m_SwooshSystem[];
 
 extern s32 ProPack__Decompress(s32, s32);
 extern void CCollisionInfo__Reset(void);
-extern s32 CISet__GetROMAddress(s32 *levelCount, s32 file, s32 index);
 extern void CDecompressor__Flush(CDecompressor *thisx);
 extern void **CCache__Allocate(s32 unused, s32 size, s32 mode, char *name);
 extern void CCache__Deallocate(s32 unused, void **block);

@@ -6,6 +6,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
+#include "protos/iset.h"
 typedef struct Shared_ParticleLighting Shared_ParticleLighting;
 struct Shared_ParticleLighting {
     u8 ambient[3], reserved3;
@@ -15,7 +16,6 @@ struct Shared_ParticleLighting {
     s8 direction[3];
     u8 reserved13[5];
 } __attribute__((aligned(4)));
-void *CISet__GetBlock(void *table, s32 index);
 void *CScene__GetRegionInfo(CScene *arg0, u16 *arg1) {
     s32 base;
     s32 idx;

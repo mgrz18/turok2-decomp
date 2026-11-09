@@ -1,5 +1,6 @@
 #include "common.h"
 #include "globals/engine.h"
+#include "protos/iset.h"
 
 /* A vertex as the morph frames store it. */
 typedef struct MorphVtx {
@@ -18,7 +19,6 @@ typedef struct MorphFrame {
 } MorphFrame;
 
 
-void *CISet__GetBlock(void *resource, s32 index);
 
 /* Blends the morph frames around time t into the output frame: t wraps into [0, frames - 2), and
  * the two frames either side of it are mixed, positions in 16.16 and normals in 8.8 fixed point. */

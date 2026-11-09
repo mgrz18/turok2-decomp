@@ -4,8 +4,8 @@
  * 0x2017A8-0x2017B0 is the ASCII padding "meSkyLay"; the only C here is the
  * object that starts at 0x2017B0 (size 0x24), written below as CISet__GetDataSize. */
 #include "common.h"
+#include "protos/iset.h"
 
-void CISet__GetSetAndSize(s32 *arg0, s32 **arg1, s32 *arg2);
 
 /* Returns the word that follows the table at `data` (count at data[0]). */
 s32 CISet__GetDataSize(s32 *data) {

@@ -6,6 +6,7 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/iset.h"
 
 /* Draw pass for one actor in one view: if the actor is drawable (flags
  * 0x40000 and a draw callback) and active (0x2000), load its "anim object
@@ -45,7 +46,6 @@ struct Actor {
 extern char D_800A5AC4[];   /* "anim object info" */
 
 void **CCache__Request(s32, s32, s32, s32, s32, s32, void *, s32);
-s32 CISet__GetBlock(void *, s32);
 void CCache__Unlock(s32, void **);
 void CMtxF__TransformBox(void *, s32, f32 *);
 s32 Frustum_TestBox(void *, f32 *);

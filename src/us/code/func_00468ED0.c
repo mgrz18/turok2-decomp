@@ -1,8 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "protos/list.h"
 
-s32 CList__AddHead(s32, s32);
-s32 CList__Remove(s32, s32);
 
 void CCameraPool__FreeCamera_2(s32 arg0, s32 arg1) {
     CList__Remove(arg0 + 0x20, arg1);

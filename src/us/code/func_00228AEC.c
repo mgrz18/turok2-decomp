@@ -1,7 +1,6 @@
 #include "common.h"
+#include "protos/list.h"
 
-s32 CList__AddHead(void *, void *);              /* extern */
-s32 CList__Remove(void *, void *);              /* extern */
 
 typedef struct {
     /* 0x00 */ u8 pad0[8];

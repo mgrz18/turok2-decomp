@@ -1,8 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "protos/iset.h"
 
-s32 CISet__GetBlock(s32, s32);
-s32 CISet__GetBlockSize(s32, s32);
 
 void CScene__SetSavedBit(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {

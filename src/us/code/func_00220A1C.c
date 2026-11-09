@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "globals/engine.h"
+#include "protos/iset.h"
 
 typedef struct Floor {
     u8 data[0x20];
@@ -19,7 +20,6 @@ typedef struct FloorGrid {
 } FloorGrid;
 
 
-void *CISet__GetBlock(void *table, s32 index);
 s32 CGameRegion__ContainsXZ(Floor *floor, f32 x, f32 z);      /* point over floor */
 f32 CGameRegion__GetHeight(Floor *floor, f32 x, f32 z);      /* floor height at */
 

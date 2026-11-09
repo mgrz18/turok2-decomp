@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "protos/list.h"
 
 void CList__Remove(CList *arg0, void *arg1) {
     void *temp_a2;

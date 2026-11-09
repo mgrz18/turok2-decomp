@@ -32,6 +32,7 @@
 #include "globals/camera.h"
 #include "structs/light.h"
 #include "globals/player.h"
+#include "protos/list.h"
 
 /* ---------------- MenuItem_FormatBinding_2 ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -1180,7 +1181,6 @@ void Menu_DrawBar_2(Menu *a, MenuItem *b, s32 c) {
 static inline s32 O06_ItemSize_415FB8(s16 *a) { if (*a == 3) return 0x330; return 0; }
 extern s32 *CCache__Allocate();
 extern void func_00414EA8_415FB8() __asm__("Menu_Construct_2");
-extern void CList__AddHead(MenuPool *a, s32 b);
 /* Opens the window c's submenu in the pool a (an item's select callback,
  * MenuItem_SelectSubmenu_2): the window, its items and their extras in one block. */
 s32 MenuPool_OpenSubmenu_2(MenuPool *a, Menu *c) {
@@ -1456,7 +1456,6 @@ s32 Menu_StepValueLR_2(Menu *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 a
 }
 
 /* ---------------- MenuPool_Construct_2 ---------------- */
-void CList__Construct(s32, s32, s32);
 
 void MenuPool_Construct_2(s32 arg0) {
     CList__Construct(arg0, 0x1D0, 0x1D4);
@@ -1578,7 +1577,6 @@ s32 MenuPool_OpenChildMenu_2(MenuPool *pool, Menu *c, MenuDesc *t) {
 }
 
 /* ---------------- MenuPool_Update_2 ---------------- */
-s32 CList__Remove(s32, s32);
 s32 CCache__Deallocate(s32, s32);
 s32 func_0041531C_4169C8(s32, s32) __asm__("Menu_Update_2");
 

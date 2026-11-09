@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/junk_types.h"
+#include "protos/iset.h"
 
 extern const f32 D_800A58F4;
-void *CISet__GetBlock(void *t, s32 i);
 void CQuaternion__Slerp(f32 *out, f32 t, void *a, void *b);
 void CAnimationState__GetBoneRotation(R05Anim *a, s32 idx, f32 time, f32 *out)
 {

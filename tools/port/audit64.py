@@ -19,7 +19,7 @@ import argparse, collections, glob, json, os, re, shutil, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CODE = os.path.join(ROOT, 'src/us/code')
-WFLAGS = ['-Wno-everything', '-Wno-error=int-conversion', '-Wint-conversion', '-Wpointer-to-int-cast',
+WFLAGS = ['-DTARGET_PORT=1', '-Wno-everything', '-Wno-error=int-conversion', '-Wint-conversion', '-Wpointer-to-int-cast',
           '-Wint-to-pointer-cast', '-Wvoid-pointer-to-int-cast', '-Wint-to-void-pointer-cast',
           '-Wshorten-64-to-32', '-fno-caret-diagnostics', '-ferror-limit=0']
 
@@ -103,6 +103,8 @@ def classify(w, t, name):
     return 'other (locals, returns, misc casts)'
 
 
+# pointer-sized integers (include/common.h): as wide as a pointer on the host
+WIDE = {'sptr', 'uptr', 'intptr_t', 'uintptr_t'}
 INT = {'s32', 'u32', 'int', 'unsigned', 'long', 's16', 'u16', 's8', 'u8', 'OSPri', 'OSId'}
 
 
@@ -115,6 +117,8 @@ def kind(t):
     toks = [x for x in t.split() if x not in ('const', 'volatile', 'register', 'extern', 'static', 'struct', 'signed')]
     if not toks:
         return '?'
+    if toks[0] in WIDE:
+        return 'W'
     if toks[0] in INT:
         return 'I'
     if toks[0] in ('f32', 'f64', 'float', 'double'):
@@ -129,7 +133,7 @@ def ptype(p):
     if '(' in p:
         return 'P'
     toks = p.replace('*', ' * ').split()
-    if len(toks) >= 2 and re.match(r'^\w+$', toks[-1]) and toks[-1] not in INT | {'f32', 'f64', 'float', 'double'}:
+    if len(toks) >= 2 and re.match(r'^\w+$', toks[-1]) and toks[-1] not in INT | WIDE | {'f32', 'f64', 'float', 'double'}:
         toks = toks[:-1]
     return kind(' '.join(toks) + ('*' if '[' in p else ''))
 
@@ -140,6 +144,8 @@ SIG = re.compile(r'(?:^|[;}\n])\s*((?:extern\s+|static\s+)?[A-Za-z_][\w\s\*]*?)\
 def prototypes():
     files = sorted(glob.glob(CODE + '/*.c') + glob.glob(ROOT + '/src/us/libultra/*.c'))
     files += glob.glob(ROOT + '/include/**/*.h', recursive=True)
+    # include/functions.h is generated (gitignored) and included by no C file
+    files = [f for f in files if not f.endswith('include/functions.h')]
     defs, decls = {}, collections.defaultdict(list)
     for f in files:
         s = open(f, errors='replace').read()
@@ -158,6 +164,10 @@ def prototypes():
             else:
                 decls[name].append(rec)
     return defs, decls
+
+
+# a 32-bit integer on one side, a pointer (or a pointer-sized integer) on the other
+NARROW = ({'P', 'I'}, {'W', 'I'})
 
 
 def main():
@@ -196,10 +206,10 @@ def main():
     ret = set()
     for n, (r, ps, f) in defs.items():
         for (r2, ps2, f2) in decls.get(n, []):
-            bad = {r, r2} == {'P', 'I'}
+            bad = {r, r2} in NARROW
             if bad:
                 ret.add(n)
-            if bad or any({x, y} == {'P', 'I'} for x, y in zip(ps, ps2)):
+            if bad or any({x, y} in NARROW for x, y in zip(ps, ps2)):
                 mism[n] += 1
     print('\nprototype census: %d definitions; %d functions have a declaration elsewhere that puts an integer '
           'where the definition has a pointer (or the reverse): %d declarations, %d of them on the return type'

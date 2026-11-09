@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "protos/iset.h"
 
-s32 CISet__GetBlock(s32, s32);
 s32 CCache__Unlock(s32, s32);
 
 s32 Texture_RequestSync(void *);                          /* extern */

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/iset.h"
 
 /* Pick, at random, one entry of the actor's animation set (0xBA) whose action
  * is `action`: among the run of equal entries around the one found, leaving
@@ -14,7 +15,6 @@ typedef struct {
 extern u8 D_800A5AC4[];     /* "anim object info" */
 
 s32 *CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
-s32 *CISet__GetBlock(s32, s32);
 void CCache__Unlock(s32, s32 *);
 s32 BinarySearch(s32 *, s32, s32);
 void WeightedTable_Clear(RandList *);

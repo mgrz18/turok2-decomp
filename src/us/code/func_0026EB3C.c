@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/rumble.h"
+#include "protos/list.h"
 
-void CList__Construct(CList *list, s32 lastOffset, s32 nextOffset);
-void CList__AddTail(CList *list, void *element);
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 

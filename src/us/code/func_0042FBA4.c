@@ -1,10 +1,9 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_9.CPP, func_8044A370_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/camera.h"
+#include "protos/list.h"
 
 void CCamera__Construct(void *);
-void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
-s32 CList__AddTail(CList *list, void *node);
 void Sound__SetListener(void *);
 void CCache__Flush(s32);
 void CCache__Deallocate(s32, void *);

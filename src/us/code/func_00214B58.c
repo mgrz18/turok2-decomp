@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD_2/8024E914_14.CPP, func_80250624_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
+#include "protos/iset.h"
 
 typedef struct {
     s32 words[2];
@@ -34,7 +35,6 @@ typedef struct {
 } PlacedProp;
 
 void *CCache__Request(s32, s32, s32, s32, s32, void *, void *, s32);
-s32 CISet__GetROMAddressAndSize(s32, s32, s32, s32 *);
 void CCache__Unlock(s32, void *);
 void CMtxF__FromMtxAffine(f32 *, f32 *);
 void CMtxF__TransformPoint(f32 *, CVector3 *, CVector3 *);

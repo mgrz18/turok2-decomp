@@ -4,6 +4,7 @@
 #include "rw/junk_types.h"
 #include "globals/cache.h"
 #include "globals/sysrc.h"
+#include "protos/list.h"
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
@@ -12,8 +13,6 @@ s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern B12Mgr D_800D7BE0;
 void CCache__ReleaseDisplayList(s32 a, u32 b);
 s32 CDecompressor__DecompressAsync(CDecompressor *port, B12Msg *n, void *q);
-void CList__Remove(void *l, B12Msg *n);
-void CList__AddHead(void *l, B12Msg *n);
 void CCache__DetachCacheEntry(s32 a, B12Node *n);
 void CHeap__Free(CHeap *heap, s32 key);
 void CCache__FreeMemEntry(s32 a, B12Node *n);

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/list.h"
+#include "protos/list.h"
 
 typedef struct SwooshNode {
     /* 0x00 */ u8 pad0[4];
@@ -14,8 +15,6 @@ typedef struct {
     /* 0x95A0 */ CList freeList;
 } SwooshSet;
 
-s32 CList__AddTail(void *, void *);
-s32 CList__Remove(void *, void *);
 
 /* Frees every active node of the swoosh/decal set (gEngineApp_m_SwooshSystem, not the particle system) that belongs to arg1. */
 void SwooshSet_FreeOwner(SwooshSet *arg0, s32 arg1)

@@ -1,6 +1,6 @@
 #include "common.h"
+#include "protos/iset.h"
 
-s32 CISet__GetBlock(s32, s16);                        /* extern */
 
 typedef struct {
     /* 0x0000 */ u8 pad0[0x2B4C];

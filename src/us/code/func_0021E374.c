@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/game.h"
+#include "protos/iset.h"
 
 typedef struct Box {
     CVector3 corners[8];            /* 0x00 */
@@ -12,7 +13,6 @@ typedef struct Box {
 
 
 void **CGameObjectInstance__LoadGeometry(CGameObjectInstance *actor);
-void *CISet__GetBlock(void *table, s32 index);
 void CVector3__Add(CVector3 *dst, CVector3 *a, CVector3 *b);    /* add */
 void CVector3__Scale(CVector3 *dst, CVector3 *src, f32 scale);
 void CMtxF__FromMtxAffine(CMtxF *dst, CMtxF *src);

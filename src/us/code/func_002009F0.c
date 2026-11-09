@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/list.h"
 
 extern s32 Random_Next(void);
 void *CList__GetRandom(void *arg0) {

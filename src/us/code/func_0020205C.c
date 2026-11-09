@@ -3,11 +3,10 @@
 
 #include "common.h"
 #include "structs/loader.h"
+#include "protos/list.h"
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
-void CList__Remove(CList *list, void *element);
-void CList__AddHead(CList *list, void *element);
 
 CLoaderEntry *CLoader__AllocLoaderEntry(CLoader *thisx) {
     u32 mask;

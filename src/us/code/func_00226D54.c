@@ -1,15 +1,5 @@
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
-typedef float f32;
-typedef double f64;
-void *CISet__GetBlock(s32, s32);
+#include "protos/iset.h"
 s32 func_00226D54(void *arg0)
 {
   s32 var_s0;

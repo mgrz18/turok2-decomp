@@ -3,6 +3,7 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "globals/camera.h"
+#include "protos/list.h"
 
 /* Spawns an actor from loose parameters: takes a free instance off the
  * world's free list (counted in *owner) and initialises it. */
@@ -12,8 +13,6 @@ extern void CGameObjectInstance__Construct(CGameObjectInstance *obj, s32 model, 
                           CVector3 velocity, s32 extra);
 extern s32 CScene__FindObjectType(void *level, s32 type);
 extern void func_0021E5D4(CGameObjectInstance *obj);
-extern void CList__AddHead(void *list, void *node);
-extern void CList__Remove(void *list, void *node);
 
 /* CInstancePool__Alloc */
 static __inline__ CGameObjectInstance *take_free_instance(CInstancePool *world, s32 *owner) {

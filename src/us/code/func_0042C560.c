@@ -2,6 +2,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_29.CPP, func_8044D3E8_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game.h"
+#include "protos/iset.h"
 
 typedef struct SearchPoint {
     /* 0x00 */ f32 position[3];
@@ -27,7 +28,6 @@ extern char D_800A5FC4[];
 
 extern void CCache__LoadPersistantIndex(s32, s32 *, s32, char *);
 extern void **CCache__LoadPersistantSubBlock(s32, s32, s32, s32, void *, s32, char *);
-extern void *CISet__GetBlock(void *table, s32 index);
 extern f32 CVector3__Distance(void *a, void *b);
 extern void CCache__Deallocate(s32, void *);
 

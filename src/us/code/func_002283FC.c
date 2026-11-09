@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/list.h"
 
-extern s32 CList__AddHead(CList *, CListedInstance *);
-extern s32 CList__Remove(CList *, CListedInstance *);
 
 /* Takes a free object (when fewer than three are active, or always while
  * gScene_m_bStreamAll is set), makes it active and counts it in *arg1. */

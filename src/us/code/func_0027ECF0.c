@@ -4,6 +4,7 @@
 #include "structs/collision.h"
 #include "globals/game.h"
 #include "globals/render.h"
+#include "protos/list.h"
 
 /* local types: this file cannot include globals/camera.h (gDefaultVisBits below) */
 extern f32 gSplitScreenMarginBottom;          /* split screen margins: bottom, */
@@ -22,8 +23,6 @@ typedef struct {
 } CVisBits;
 
 u32 CShakeAxis__Advance(CShakeAxis *axis);
-void CList__Remove(CList *list, void *item);
-void CList__AddHead(CList *list, void *item);
 void CCamera__MoveViewport(CCamera *cam, f32 width, f32 height, f32 x, f32 y);
 void CCamera__Advance(CCamera *cam);
 

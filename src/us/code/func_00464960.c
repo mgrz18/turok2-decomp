@@ -7,6 +7,7 @@
 #include "structs/player.h"
 #include "globals/game.h"
 #include "globals/camera.h"
+#include "protos/iset.h"
 
 typedef struct LevelRecord {
     /* 0x00 */ s32 unk0;
@@ -39,7 +40,6 @@ typedef struct Handle {
 extern s32 ProPackDecompress(Handle **handle, s32);
 extern s32 CScene__GetRegion(CScene *world, s32);
 extern Handle *CCache__AllocateMemoryForDecompression(s32, Handle **handle, s32 size);
-extern void CUSet__Transpose(LevelNode *node, void *data, s32);
 extern s32 func_00465480(CScene *world, CVector3 *pos, s32 group, void *info);
 extern s32 func_004650B4(CScene *world, s32 group, s32 key, CWarpPoint *out, s32 max);
 extern s32 *CScene__GetIntelligence(CScene *world, u16 id);

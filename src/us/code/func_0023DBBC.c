@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/collision.h"
+#include "protos/iset.h"
 
 typedef struct SweepModel {
     /* 0x00 */ u8 pad0[0x14];
@@ -8,7 +9,6 @@ typedef struct SweepModel {
     /* 0x28 */ u8 matrix[0x40];
 } SweepModel;
 
-char *CISet__GetBlock(s32 *list, s32 index);
 void CCache__Unlock(s32 arg0, s32 *arg1);
 void CMtxF__MultiplyAffine(f32 (*dst)[4], f32 (*a)[4], f32 (*b)[4]);
 void CMtxF__FromMtxAffine(f32 (*mtx)[4], void *packed);

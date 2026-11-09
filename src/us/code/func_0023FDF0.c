@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "protos/iset.h"
 
 /* A joint of an animated model: its box at 0x18 in model units. */
 typedef struct Joint {
@@ -40,7 +41,6 @@ typedef struct HitInst {
     /* 0x14C */ s32 hitMask;
 } HitInst;
 
-void *CISet__GetBlock(void *table, s32 index);
 void *CGameObjectInstance__LoadGeometry(HitInst *inst);
 void CCache__Unlock(s32 arg0, void *res);
 void **CCache__Request(s32 unused, s32 key, s32 size, s32 mode, s32 owner, s32 tag, char *name, s32 direct);

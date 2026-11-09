@@ -1,5 +1,6 @@
 #include "common.h"
 #include "globals/object.h"
+#include "protos/iset.h"
 
 /* Expands a packed animation resource in place: rebuilds the six-chunk file
  * with chunks 0-4 copied unchanged and chunk 5 (the compressed animation)
@@ -33,8 +34,6 @@ extern s32 D_800E6794;
 extern s32 D_800E6798;
 
 s32 ProPackDecompress(Resource **res, s32 arg1);
-void *CISet__GetBlock(void *file, s32 index);
-void *CISet__GetBlockAndSize(void *file, s32 index, s32 *size);
 void CCache__Deallocate(s32, Pack **blk);
 void CCache__DeallocAndReplaceCompressedData(s32, Resource **res, Pack **blk);
 Pack **CCache__AllocateMemoryForDecompression(s32, Resource **res, s32 size);

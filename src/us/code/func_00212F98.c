@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/iset.h"
 
 typedef struct {
     /* 0x0 */ s16 x, y, z;
@@ -17,7 +18,6 @@ typedef struct {
     u8 r, g, b, a;
 } Color4;
 
-void *CISet__GetBlock(s32 *, s32);
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 

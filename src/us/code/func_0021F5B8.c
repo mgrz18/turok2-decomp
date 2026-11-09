@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/iset.h"
 
-s32 CISet__GetBlock(s32, s32);
 s32 CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
 s32 CCache__Unlock(s32, s32);
 

@@ -3,6 +3,7 @@
 #include "common.h"
 #include "gfx.h"
 #include "globals/render.h"
+#include "protos/list.h"
 
 typedef struct VInfo {
     u8 pad0[0x18];
@@ -32,8 +33,6 @@ extern u8 D_8011AD48[];
 extern f32 gCameraVisibleBox[6]; /* local type: the CBox read as six floats by index */
 void Render_InvalidateModeCache(void);
 void Texture_InvalidateCache(void);
-void CList__Remove(VList *, VNode *);
-void CList__AddTail(void *, VNode *);
 void func_00235C30(VCtx *c) {
     s32 i;
     VList *l;

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "protos/list.h"
 
 /* CList: insert arg2 after arg1, or at the tail when arg1 has no next. */
 void CList__InsertAfter(CList *arg0, void *arg1, void *arg2) {

@@ -26,6 +26,8 @@
 #include "globals/math.h"
 #include "globals/engine.h"
 #include "globals/particle.h"
+#include "protos/list.h"
+#include "protos/iset.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -899,8 +901,6 @@ void CParticle__StopLoopSound(EffectActor *);
 void CParticle__BuildCameraMatrix(EffectActor *);
 void Trail_DetachOwner(void *, EffectActor *);
 void CDLightSet__Free(void *, s32);
-void CList__Remove(void *list, void *node);
-void CList__AddHead(void *list, void *node);
 
 void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
     EffectActor *child;
@@ -1151,7 +1151,6 @@ extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: 
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 
-extern void *CISet__GetBlock(s32 resource, s32 index);
 extern s32 BinaryRange(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
 extern void CScene__Blast(void *, CVector3 *);
 extern void func_00225C08(void *, s32, CVector3 *);
@@ -1170,8 +1169,6 @@ extern void CMtxF__SetTranslate(CMtxF *m, f32 x, f32 y, f32 z);
 extern void CMtxF__Identity(CMtxF *m);
 extern void GameObject_GetAimRotation(CQuaternion *q, Owner *owner, CVector3 pos);
 extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *m);
-extern void CList__AddTail(EffectList *list, Effect *effect);
-extern void CList__InsertBefore(EffectList *list, Effect *after, Effect *effect);
 extern void func_00207914(u32 *bits, s32 value);
 extern f32 RandomInPackedRange(PackedRange r);
 extern f32 HalfToFloat(u16 h);

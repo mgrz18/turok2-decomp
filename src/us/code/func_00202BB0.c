@@ -7,6 +7,7 @@
 #include "globals/cache.h"
 #include "globals/engine.h"
 #include "globals/sysrc.h"
+#include "protos/list.h"
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 void osStartThread(OSThread *thread);
@@ -69,8 +70,6 @@ extern B12Mgr D_800D7BE0;
 void CMutex__Construct(void *lock);
 u32 GetMemSize(void);
 u8 *CHeap__Alloc(CHeap *heap, u32 size);
-void CList__Construct(CList *l, s32 prevOff, s32 nextOff);
-void CList__AddTail(CList *l, void *n);
 void CHashTable__Construct(u32 n);
 void CCache__Main(void *arg);
 void CCache__Construct(s32 unused, s32 id) {

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/world.h"
+#include "protos/iset.h"
 
-extern s32 CISet__GetBlock(s32, s32);
 
 /* Entry arg2 of table arg1: a word giving the entry size, then the entries
  * from +8. */

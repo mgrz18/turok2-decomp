@@ -5,6 +5,7 @@
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "globals/scene.h"
+#include "protos/iset.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xE];
@@ -49,7 +50,6 @@ void **CStaticObject__LoadGeometry(PlacedProp *prop);
 void CStaticObject__BuildLitVerticesCallback(void);
 s32 **CCache__RequestDecompression(s32, s32, void **, s32, s32, void *, void *, void *, s32);
 void CCache__LockForDisplayList(s32, s32 **);
-VtxChunk *CISet__GetBlock(void *file, s32 index);
 void Render_QueueModelInstance(void **resource, void *matrix, s32 segment, void *lights, void *textures, s32 lod, s32 pass);
 void CCache__Unlock(s32, void *);
 
