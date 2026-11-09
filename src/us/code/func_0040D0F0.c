@@ -3,6 +3,7 @@
 #include "structs/boss.h"
 #include "globals/scene.h"
 #include "globals/boss.h"
+#include "protos/game.h"
 
 /* Second boss phase update: spawns a minion at a random point 1228.8-1536 around the boss while the phase has
  * some left (and fewer than its maximum are alive); once none are left and fewer than 5 are alive, steps the
@@ -15,8 +16,6 @@ extern f32 Random_Blend(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
 extern void GameObject_TraceMove(CGameObjectInstance *obj, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
-extern void *CInstancePool__Spawn(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
-                           CVector3 vel, CVector3 scale, s32 *owner);
 
 /* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase(BlindOneState *state) {

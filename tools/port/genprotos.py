@@ -51,7 +51,8 @@ SCALAR = {'s8', 'u8', 's16', 'u16', 's32', 'u32', 's64', 'u64', 'f32', 'f64', 's
           'char', 'short', 'int', 'long', 'float', 'double', 'unsigned', 'signed'}
 # scalar typedefs of ultra_types.h, by their underlying common.h type
 ALIAS = {'OSPri': 's32', 'OSId': 's32', 'OSTime': 'u64', 'OSMesg': 'void *', 'OSIntMask': 'u32',
-         'OSEvent': 's32', 'size_t': 'u32', 'uintptr_t': 'uptr', 'intptr_t': 'sptr'}
+         'OSEvent': 's32', 'size_t': 'u32', 'uintptr_t': 'uptr', 'intptr_t': 'sptr',
+         'M2C_UNK': 's32', 'M2C_UNK8': 's8', 'M2C_UNK16': 's16'}
 QUAL = {'const', 'volatile', 'register', 'struct', 'union', 'enum'}
 
 
@@ -61,8 +62,9 @@ def strip_comments(s):
 
 
 def struct_tags():
-    """typedef name -> (kind, tag) for every typedef'd struct/union with a tag in include/."""
-    tags = {}
+    """typedef name -> (kind, tag) for every typedef'd struct/union with a tag in include/;
+    an anonymous one -> ('#include', header), for by-value parameters (CVector3)."""
+    tags, anon = {}, {}
     for f in glob.glob(os.path.join(ROOT, 'include/**/*.h'), recursive=True):
         if f.endswith('include/functions.h') or '/protos/' in f:
             continue
@@ -79,6 +81,19 @@ def struct_tags():
             n = re.match(r'\s*(\w+)\s*;', s[i + 1:])
             if n:
                 tags.setdefault(n.group(1), (m.group(1), m.group(2)))
+        if '/structs/' in f:
+            for m in re.finditer(r'typedef\s+(?:struct|union)\s*\{', s):
+                depth, i = 0, m.end() - 1
+                while i < len(s):
+                    depth += {'{': 1, '}': -1}.get(s[i], 0)
+                    if depth == 0:
+                        break
+                    i += 1
+                n = re.match(r'\s*(\w+)\s*;', s[i + 1:])
+                if n:
+                    anon.setdefault(n.group(1), ('#include', os.path.relpath(f, os.path.join(ROOT, 'include'))))
+    for k, v in anon.items():
+        tags.setdefault(k, v)
     return tags
 
 
@@ -135,6 +150,11 @@ def canon_type(t, tags, fwd):
     if len(toks) == 1 and toks[0] in ALIAS:
         base = ALIAS[toks[0]]
         return base + (' ' + '*' * stars if stars else '') if '*' not in base or not stars else 'void *'
+    if len(toks) == 1 and toks[0] in tags and tags[toks[0]][0] == '#include':
+        if stars:
+            return 'void *'
+        fwd.add('#include "%s"' % tags[toks[0]][1])
+        return toks[0]
     if len(toks) == 1 and toks[0] in tags:
         k, tag = tags[toks[0]]
         fwd.add('%s %s' % (k, tag))
@@ -193,7 +213,8 @@ def gen(groups, verbose=True):
                ' * (do not edit; re-run it). Types the header cannot name without a struct header',
                ' * are struct tags or void *. */', '',
                '#ifndef %s' % guard, '#define %s' % guard, '', '#include "common.h"', '']
-        txt += ['%s;' % x for x in sorted(fwd)] + ([''] if fwd else [])
+        txt += sorted(x for x in fwd if x.startswith('#')) + ['%s;' % x for x in sorted(fwd) if not x.startswith('#')]
+        txt += [''] if fwd else []
         txt += lines + ['', '#endif', '']
         open(os.path.join(OUT, g + '.h'), 'w').write('\n'.join(txt))
         result[g] = [n for n in names if not any(s.startswith(n + ' ') for s in skipped)]
@@ -250,7 +271,7 @@ def apply(groups, base):
         if not orig:
             print('%-7s no file to edit' % g)
             continue
-        r = subprocess.run([sys.executable, os.path.join(ROOT, 'tools/asm_diff.py'), '--base', base, '-j', '24']
+        r = subprocess.run([sys.executable, os.path.join(ROOT, 'tools/asm_diff.py'), '--base', base, '-j', '8']
                            + sorted(orig), capture_output=True, text=True, cwd=ROOT)
         bad = set()
         for l in r.stdout.splitlines():

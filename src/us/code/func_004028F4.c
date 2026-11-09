@@ -2,6 +2,7 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/scene.h"
+#include "protos/game.h"
 
 typedef CVector3 Vec3_004028F4;
 
@@ -12,8 +13,6 @@ typedef struct {
 
 s16 WeightedTable_PickStatic(struct Pick *table);
 void GameObject_TraceMove(Obj004028F4 *obj, Vec3_004028F4 pos, Vec3_004028F4 *posp, s32 *out, s32 a5, s32 a6);
-void CInstancePool__Spawn(void *a0, s32 a1, s32 model, void *intel, s32 region, Vec3_004028F4 pos, s32 a8,
-                   Vec3_004028F4 rot, Vec3_004028F4 offset, s32 a9);
 
 void MantidQueen_SpawnMinion(s32 a0, Obj004028F4 *obj, s32 a2, Vec3_004028F4 pos) {
     WaveBossState *s = &gMantidQueen;

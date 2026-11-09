@@ -5,6 +5,7 @@
 #include "globals/camera.h"
 #include "protos/list.h"
 #include "protos/scene.h"
+#include "protos/game.h"
 
 /* Spawns an actor from loose parameters: takes a free instance off the
  * world's free list (counted in *owner) and initialises it. */

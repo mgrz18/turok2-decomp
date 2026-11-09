@@ -1,6 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "protos/iset.h"
+#include "protos/scene.h"
 
 s32 CCache__Deallocate(s32, s32);
 s32 CCache__LoadPersistantIndex(s32, s32, s32, s32);

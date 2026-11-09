@@ -14,6 +14,7 @@
 #include "globals/boss.h"
 #include "globals/scene.h"
 #include "protos/ai.h"
+#include "protos/game.h"
 
 typedef struct {
     /* 0x00 */ CVector3 pos;
@@ -123,8 +124,6 @@ void MotherBoss_TeleportTarget(CListedInstance *obj, s32 nearSelf) {
 }
 
 extern void GameObject_TraceMove(void *obj, CVector3 in, CVector3 *out, s32 *region, s32 a, s32 b);
-extern void *CInstancePool__Spawn(void *world, s32 model, s32 type, s32 intelligence, s32 region, CVector3 pos, f32 rotY,
-                           CVector3 vel, CVector3 scale, s32 *owner);
 extern void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, Part part);
 extern void CVector3__Normalize(CVector3 *v);
 extern void CVector3__Scale(CVector3 *out, CVector3 *a, f32 s);

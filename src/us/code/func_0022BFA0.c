@@ -3,6 +3,7 @@
 #include "structs/particle.h"
 #include "globals/scene.h"
 #include "globals/collision.h"
+#include "protos/game.h"
 
 extern s32 CGameRegion__IsSteep(void *region);
 extern s32 func_0026C114(void *region);
@@ -12,8 +13,6 @@ extern s32 func_0026C0E0(void *region);
  * through gCollisionResults does not give this code. */
 extern void ImpactEvent_Send(CParticle *, CParticle *, s32 effect, s32, CVector3 pos, CEventValue params);
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
-extern void CParticleSystem__Spawn(CParticleSystem *sys, CParticle *p, void *owner, s32 *ownerCount, void *target, s32 type, CVector3 dir,
-                          CQuaternion rot, CVector3 pos, s32 region, s32 arg10, s32 flags);
 extern void Sound__Play(s16 sound, CVector3 pos, s32, s32);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
 extern void CParticleSystem__Free(CParticleSystem *sys, CParticle *p);

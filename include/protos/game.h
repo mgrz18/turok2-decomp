@@ -9,10 +9,13 @@
 
 #include "common.h"
 
+#include "structs/vector.h"
 struct CGameObjectInstance;
 struct ControllerProfile;
 struct LoopSounds;
 
+struct CGameObjectInstance *CInstancePool__Spawn(void *, s32, s32, void *, void *, CVector3, f32, CVector3, CVector3, s32 *);
+s32 CParticleSystem__Spawn(void *, void *, void *, s32 *, s32, s32, CVector3, CQuaternion, CVector3, void *, s32, s32);
 void Controller_SetRumbleOption(struct ControllerProfile *, s32);
 void GameObject_FireTriggers(struct CGameObjectInstance *, s32, s32);
 f32 GameObject_GetRegionFloorHeight(void *, void *);

@@ -9,6 +9,7 @@
 
 #include "common.h"
 
+#include "structs/vector.h"
 struct CCamera;
 struct CGameObjectInstance;
 struct CScene;
@@ -63,6 +64,7 @@ s32 CScene__GetInstanceSavedBitInLevel(struct CScene *, s32, s32);
 s32 CScene__GetIntelligence(void *, s32);
 s32 CScene__GetLevelBit(struct CScene *, s32);
 s32 CScene__GetLevelBitInLevel(void *, s32, s32);
+void CScene__GetLevelName(void *, s32, s32, s32);
 void *CScene__GetLight(struct CScene *, s32);
 void CScene__GetLightsAt(struct CScene *, void *, void *);
 s32 CScene__GetLinkGroupCount(struct CScene *, s32);
@@ -106,6 +108,8 @@ void CScene__SetLevelBit(void *, s32, s32);
 void CScene__SetLevelBitInLevel(void *, s32, s32, s32);
 void CScene__SetSavedBit(void *, s32, s32, s32, s32, s32);
 void CScene__SetupLighting(void *);
+void CScene__SpawnPoolActor(struct CScene *, s32, CVector3, s32, f32);
+void CScene__StartRumbles(struct CScene *, s32, s32, CVector3, f32, f32);
 void CScene__StreamAllSections(struct CScene *);
 void CScene__UnloadLevel(void *);
 void CScene__UnmarkGeneratorsSaved(void *);

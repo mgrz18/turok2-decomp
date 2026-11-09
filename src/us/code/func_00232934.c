@@ -1,13 +1,12 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "globals/scene.h"
+#include "protos/game.h"
 
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
-s32 CParticleSystem__Spawn(CParticleSystem *table, void *actor, void *owner, s32 *ownerCount, void *target, s32 kind, CVector3 origin,
-                  CQuaternion rot, CVector3 pos, void *region, s32 b, s32 c);
 
 /* Spawns `count` copies along the segment the actor covered this frame. */
 void CParticle__SpawnAlongPath(CParticle *actor) {

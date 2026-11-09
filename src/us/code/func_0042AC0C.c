@@ -33,7 +33,6 @@ extern void CCache__SetFrameDelay(s32);
 extern void CGameObjectInstance__UpdateAnimation(u8 *actor);
 extern void func_0021E5D4(u8 *actor);
 extern void func_0021F1B4(u8 *actor);
-extern void CScene__GetLevelName(CScene *w, s32 level, void *out, s32 mask);
 extern void Sound__StopFlags(s32);
 extern void Sound__DetachAll(void);
 extern void LoopSounds_Construct(void *, void *, s32);
