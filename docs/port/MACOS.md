@@ -115,7 +115,9 @@ was not run, and r3 owns this code. Each row is the crash that the previous fix 
 **r3's branch on the Mac.** `names-R3_r3` @ ce849002 merges cleanly with this branch (local
 `r5-test-r3`, gendata rerun). It fixes rows 1-2 properly and stops at row 3:
 `MenuPool_Construct(s32)` from `CCamera__Construct`, past GfxPool, `CEngineApp__Construct`
-and `Sound__Initialize`.
+and `Sound__Initialize`. With r3 @ 15b57137 (MenuPool + every CList__Construct offset), it
+stops at row 4: `CCamera__ConstructSkySystem(s32)` `arg0 + 0x558`, which is CCamera layout (r1).
+The CList offsets there are already host values (0, 8).
 
 After those fixes the Mac reaches `CCameraPool__Construct`, the same region where Linux stops. The
 remaining work is the same on both, so nothing below this point is macOS-specific.
