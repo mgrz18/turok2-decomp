@@ -4,7 +4,7 @@
 #include "protos/cache.h"
 #include "protos/ultra.h"
 
-s32 CHeap__AllocAt(CHeap *, s32, s32);
+sptr CHeap__AllocAt(CHeap *, sptr, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 B12Node *CCache__AllocateAt(s32 arg0, sptr arg1, s32 arg2)

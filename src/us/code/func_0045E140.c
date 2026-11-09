@@ -10,7 +10,7 @@
  * block address. */
 
 typedef struct {
-    s32 addr; /* 0x0 */
+    uptr addr; /* 0x0 */
 } MemHandle;
 
 typedef struct {
