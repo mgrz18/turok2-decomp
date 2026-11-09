@@ -72,6 +72,16 @@ typedef struct CDelayedEvent {
 
 /* Turok 3's CScene, the level (gScene). Called CWorld here until round N3;
  * CSceneSector and CSceneRecord were CWorldSector and CWorldRecord. */
+/* The matrix pool (gScene.m_Heap): 0x40-byte blocks in two halves of n, the half in use
+ * chosen by gEvenOdd (MatrixHeap_Construct, MtxPool_Reset, MtxPool_Alloc). */
+typedef struct MtxBlock { u8 b[0x40]; } MtxBlock;
+typedef struct MtxPool {
+    /* 0x0 */ MtxBlock *base;
+    /* 0x4 */ s32 n;              /* blocks per half */
+    /* 0x8 */ s32 remaining;
+    /* 0xC */ MtxBlock *next;
+} MtxPool; /* size 0x10 */
+
 typedef struct CScene {
     /* 0x00000 */ s32 m_Mode;                       /* 2, 4: multiplayer modes */
     /* 0x00004 */ s32 unk_04;
@@ -122,7 +132,7 @@ typedef struct CScene {
     /* 0x000B8 */ u8 unk_B8[0x10];
     /* 0x000C8 */ void **m_hHeap;
     /* 0x000CC */ void **m_hPaths;
-    /* 0x000D0 */ u8 m_Heap[0x10];                  /* gScene_m_Heap */
+    /* 0x000D0 */ MtxPool m_Heap[1];                /* gScene_m_Heap */
     /* 0x000E0 */ struct CGameObjectInstance *m_pActors; /* gScene_m_pActors: the level's actors */
     /* 0x000E4 */ s32 m_nFirstActor;
     /* 0x000E8 */ s32 m_nActors;
