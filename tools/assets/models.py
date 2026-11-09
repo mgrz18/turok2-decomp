@@ -404,14 +404,19 @@ def png(path, w, h, rgb):
                 + chunk(b"IDAT", zlib.compress(raw, 6)) + chunk(b"IEND", b""))
 
 
-def render(path, verts, parts, size=256, yaw=0.6, pitch=0.35, uvcheck=False, textures=None):
-    """Tiny z-buffered software rasterizer: flat Lambert shading times vertex/prim colour."""
+def render(path, verts, parts, size=256, yaw=0.6, pitch=0.35, uvcheck=False, textures=None, up="y"):
+    """Tiny z-buffered software rasterizer: flat Lambert shading times vertex/prim colour.
+    up: the model's up axis. Scenery and bone-local pieces are drawn Y-up; posed animated models
+    are Z-up (ANIMATION.md: PoseBone works in Z-up object space), so up="z" maps (x, y, z) to
+    (x, z, -y) before the view rotation, which stands them upright."""
     if not verts:
         return False
     cy, sy, cp, sp = math.cos(yaw), math.sin(yaw), math.cos(pitch), math.sin(pitch)
     P = []
     for v in verts:
         x, y, z = v[0], v[1], v[2]
+        if up == "z":
+            y, z = z, -y
         x, z = x * cy - z * sy, x * sy + z * cy
         y, z = y * cp - z * sp, y * sp + z * cp
         P.append((x, y, z))
@@ -583,7 +588,8 @@ def main(argv=None):
                                 texs[mat["texture"]] = preview_texture(rom, mat["texture"])
                             except Exception:  # noqa: BLE001
                                 texs[mat["texture"]] = None
-                render(os.path.join(a.out, name + ".png"), verts, parts, uvcheck=a.uvcheck, textures=texs)
+                render(os.path.join(a.out, name + ".png"), verts, parts, uvcheck=a.uvcheck, textures=texs,
+                       up="z" if index[-1].get("posed") else "y")
     if a.json:
         with open(os.path.join(a.out, "index.json"), "w") as f:
             json.dump(index, f, indent=1)

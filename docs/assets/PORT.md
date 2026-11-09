@@ -365,16 +365,16 @@ u32). It must handle reads of a prefix (the probes) by swapping only whole
 fields inside `[offset, offset+len)`. Rules learned so far:
 
 - CISet / CUSet headers and offset tables: u32.
-- 8-bit pixels and CI indices, bit streams (`Bits_Read`, animation channels),
-  ADPCM and Acclaim audio frames: no swap. Check whether `Bits_Read` fetches
-  bytes or words: if it reads words, the swap of those blocks is u32
-  (ANIMATION.md).
+- 8-bit pixels and CI indices, VADPCM frames: no swap. Bit streams: `Bits_Read` (animation) reads
+  u32 words and `adecReadBits` (adec audio) u16 words, so those streams are swapped as u32 / u16.
+- 16-bit texels and TLUTs stay big-endian: Fast3D decodes them from bytes (`(addr[2i] << 8) | addr[2i+1]`).
+  The full table and its coverage check: BYTEORDER.md (`tools/assets/swap_spec.json`, `swapcheck.py`).
 - Model vertex frames are stored byte-transposed (`CUSet__Transpose` in
   `Model_Decompress`), so swapping them is "un-transpose, swap the `Vtx` s16
   fields, re-transpose". That is still a pure byte permutation, so it can
   happen at read time or at extraction time.
-- RGBA16 textures: u16 per texel. `Texture_DecompressCallback` recolours them
-  as u16.
+- RGBA16 textures: kept big-endian for Fast3D (above); `Texture_DecompressCallback`'s palette
+  recolour must use big-endian accessors in the port.
 
 Why swap at read time rather than extraction time: the archive stays a
 faithful (unpacked) copy of the ROM, the extractor needs no format knowledge,
@@ -532,8 +532,8 @@ Dependencies: a1 = ROMFS, a2 TEXTURES, a3 MODELS, a4 LEVELS, a5 ANIMATION, a6 AU
   `KEEP_PACKED` or an offset-table rewrite (5.2).
 - Units read at more than one size where the larger read crosses into what
   another call site treats as a separate unit: does the tree walker see any?
-- `Bits_Read`: byte or word fetches? (Decides the swap rule for animation
-  streams.)
+- `Bits_Read`: byte or word fetches? **Answered (BYTEORDER.md):** 32-bit words (`word[0]`, `word[1]`
+  native loads, bits LSB first inside the word), so the animation streams are swapped as u32 arrays.
 - The audio window 0x1E0000-0x20F194 (now its own splat segment, `audio_ctl`)
   holds the 913-entry sfx soundArray at 0x20E334 (AUDIO.md / ROMFS.md).
   The libaudio bank structures it contains are pointer-fixed in place by
