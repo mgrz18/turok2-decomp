@@ -91,3 +91,6 @@ assets_out/
 
 # generated game data (ROM content): tools/port/gendata.py, docs/port/DATA.md
 port/gen/
+
+# Local port build dirs
+/OUT/
