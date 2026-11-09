@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/game.h"
 #include "globals/game.h"
@@ -36,12 +37,12 @@ void PlayerState15_Enter(CPlayer *player, CGameObjectInstance *actor) {
             text = (char *)&gStatsContinueMenuDesc4;
             break;
         }
-        MenuPool_OpenMenu((u8 *)P_S32(player, 0x51C) + 0x53C, text, player, P_S32(player, 0xA50), NULL);
+        MenuPool_OpenMenu((u8 *)player->m_pCamera->m_MenuPool, text, player, (sptr) player->m_ContState.m_pContState, NULL);
     } else {
         text = (char *)&gGameOverMenuDesc;
         if (P_S16(player, 0x52A) != 0) {
             text = (char *)&gContinueMenuDesc;
         }
-        MenuPool_OpenMenu((u8 *)P_S32(player, 0x51C) + 0x53C, text, player, P_S32(player, 0xA50), NULL);
+        MenuPool_OpenMenu((u8 *)player->m_pCamera->m_MenuPool, text, player, (sptr) player->m_ContState.m_pContState, NULL);
     }
 }

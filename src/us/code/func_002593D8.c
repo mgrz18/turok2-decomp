@@ -6,7 +6,7 @@ extern void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 sound);
 extern void CPlayer__StopWeaponBackgroundSound(CPlayer *player);
 
 void WeaponActor_Sway_AF084(void *obj, CAI *state) {
-    CPlayer *player = *(CPlayer **)((u8 *)obj + 0x1A8);
+    CPlayer *player = (*(CPlayer **)&((CGameObjectInstance *)obj)->m_AI.m_pParent);
     f32 target;
     f32 rate;
     f32 dir;

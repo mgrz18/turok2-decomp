@@ -1,23 +1,12 @@
 #include "common.h"
+#include "structs/swoosh.h"
 
-/* Only what this reads and writes of its two arguments. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x40];
-    /* 0x40 */ u8 list[0xC];        /* handed to DList_Remove */
-    /* 0x4C */ f32 total;
-} Group;
+void DList_AddTail(void *, SwooshNode *);           /* extern */
+void DList_Remove(void *, SwooshNode *);            /* extern */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0xAC];
-    /* 0xAC */ f32 amount;
-} Member;
-
-void DList_AddTail(s32, Member *);                  /* extern */
-void DList_Remove(void *, Member *);               /* extern */
-
-/* Takes arg2 out of group arg1 (and its amount out of the group's total). */
-void SwooshGroup_Remove(s32 arg0, Group *arg1, Member *arg2) {
-    arg1->total = (f32) (arg1->total - arg2->amount);
-    DList_Remove(arg1->list, arg2);
-    DList_AddTail(arg0 + 0x6A88, arg2);
+/* Takes point arg2 out of swoosh arg1 (and its length out of the swoosh's), back to the free points. */
+void SwooshGroup_Remove(CSwooshSystem *arg0, Swoosh *arg1, SwooshNode *arg2) {
+    arg1->length = (f32) (arg1->length - arg2->length);
+    DList_Remove(&arg1->nodes, arg2);
+    DList_AddTail(&arg0->m_FreeNodes, arg2);
 }

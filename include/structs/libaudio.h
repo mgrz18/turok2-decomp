@@ -717,6 +717,10 @@ typedef struct ALParam_s {
         f32 f;
         s32 i;
     } yetstillmoredata;
+#ifdef TARGET_PORT
+    /* the updates cast from these (ALStartParamAlt: its wave pointer) are larger on the host */
+    void *hostPad;
+#endif
 } ALParam; /* size 0x1C */
 
 typedef struct {
@@ -842,7 +846,7 @@ typedef struct ALAuxBus_s {
 
 typedef struct ALSave_s {
     /* 0x00 */ ALFilter filter;
-    /* 0x14 */ s32 dramout;
+    /* 0x14 */ sptr dramout;  /* the output buffer (AL_FILTER_SET_DRAM) */
     /* 0x18 */ s32 first;
 } ALSave; /* size 0x1C */
 

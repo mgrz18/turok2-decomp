@@ -25,7 +25,11 @@ Acmd *_loadOutputBuffer(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
         fincount = d->rs->delta + (fratio * (f32)incount);
         count = (s32)fincount;
         d->rs->delta = fincount - (f32)count;
+#ifdef TARGET_PORT /* u32 delays: see alFxPull */
+        out_ptr = &r->input[-(s32)(d->output - d->rsdelta)];
+#else
         out_ptr = &r->input[-(d->output - d->rsdelta)];
+#endif
         ramalign = ((sptr)out_ptr & 0x7) >> 1;
         ptr = _loadBuffer(r, out_ptr - ramalign, rbuff, count + ramalign, ptr);
         ratio = (s32)(fratio * unity);
@@ -34,7 +38,11 @@ Acmd *_loadOutputBuffer(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
         d->rs->first = 0;
         d->rsdelta += count - incount;
     } else {
+#ifdef TARGET_PORT
+        out_ptr = &r->input[-(s32)d->output];
+#else
         out_ptr = &r->input[-d->output];
+#endif
         ptr = _loadBuffer(r, out_ptr, buff, incount, ptr);
     }
     return ptr;

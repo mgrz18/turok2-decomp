@@ -1,5 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "structs/player.h"
+#include "structs/camera.h"
 
 s32 Cinema_IsActive(void);
 s32 Cinema_IsFinished(void);
@@ -21,7 +23,7 @@ s32 SavePortalMenu_SelectHealth(s32 unused, Menu *event) {
     if (func_00422EE0_inline()) {
         return 0;
     }
-    ok = CPlayer__RefillFrom(player, 1, *(s32 *)(player + 0x92C));
+    ok = CPlayer__RefillFrom(player, 1, ((CPlayer *)player)->m_Data.m_CheckPointWarpID);
     event->cursor = 0;
     if (ok) {
         Cinema_StopAtEnd();

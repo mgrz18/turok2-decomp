@@ -6,8 +6,11 @@
 typedef struct V16 {
     f32 x, y, z, w;
 } V16;
-typedef struct Ent41D8 {
-    u8 pad0[0x10];
+typedef struct Ent41D8 {   /* structs/swoosh.h SwooshNode */
+    void *prev;
+    void *next;
+    f32 life;
+    s32 unkC;
     CVector3 pos;
     f32 unk1C;
     f32 unk20;

@@ -429,3 +429,20 @@ struct field, a by-hand prototype or an unnamed raw offset.
 - Other mode-table readers with local views (EnemyAI_/Platform_ AI steps that read the row by offset).
 - The 24 remaining unresolved slots are extent overruns of small `.code_rodata` symbols
   (`sBoxSideFaceBuilders`, `sCollisionTests`, `__osTimerList`...): give them exact sizes.
+
+## Part 3 (Phase 7 round 4, s5): the swoosh system and N64 field offsets
+
+- `include/structs/swoosh.h`: `CSwooshSystem` and its elements (`SwooshNode`, `Swoosh`,
+  `SwooshTimer`, `SwooshDecal`, the DList/NodePool `SwooshLinks`/`SwooshPool`), embedded in
+  `CEngineApp` under TARGET_PORT. 34 swoosh files moved to them or got their pointer members
+  (STATUS.md, round 4 s5). The recipe that keeps the N64 code identical: a view is host-correct
+  when every pointer it covers is declared as a pointer and its pads cover only scalars (pads
+  are relative, so the next member lands right on both targets); replacing `u8 pad[8]` with
+  two pointers, `s32 owner` with `sptr`/`void *`, `x + 0xNN` with `x + T2_OFFSETOF(T, m)` gave 0
+  differences in every file tried.
+- The generic list helpers of the Rage Wars code (`DList_AddHead/AddTail`, `NodePool_Alloc/Free`,
+  `func_0026D230`) wrote 4-byte words at N64 offsets: host bodies.
+- `tools/port/n64_offsets.py [--git REV] [--top N]` counts the hard-coded offsets left
+  (`M2C_FIELD`, byte-pointer casts, derefs, `P_xx(p, 0xNN)`): 378 sites in 135 files at
+  474e40af, 345 in 118 after this part (the camera menu pool `+ 0x53C` in 21 files, CPlayer
+  views, `CScene__LoadLevel`, two camera functions).

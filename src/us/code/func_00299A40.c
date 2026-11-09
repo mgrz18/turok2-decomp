@@ -12,8 +12,13 @@ extern void __osSiRelAccess(void);
 extern void __osPackRamWriteData(s32 arg0, s32 arg1, u8 *arg2);
 extern s32 __osSiRawStartDma(s32, sptr);
 extern u32 __osContDataCrc(void *arg0);
+#ifdef TARGET_PORT /* the queue is a pointer (s32 truncates it on LP64) */
+extern u32 __osPfsGetStatus(OSMesgQueue *arg0, s32 arg1);
+u32 __osContRamWrite(OSMesgQueue * arg0, s32 arg1, u16 arg2, u8 *arg3, s32 arg4) {
+#else
 extern u32 __osPfsGetStatus(s32 arg0, s32 arg1);
 u32 __osContRamWrite(s32 arg0, s32 arg1, u16 arg2, u8 *arg3, s32 arg4) {
+#endif
     Block40 saved;
     u8 *source;
     s32 i;

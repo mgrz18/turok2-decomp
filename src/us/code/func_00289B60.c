@@ -2,13 +2,13 @@
 #include "m2c_macros.h"
 #include "globals/engine.h"
 
-s32 CEngineApp__UpdateCinemaMode(s32, s32, s32);
+s32 CEngineApp__UpdateCinemaMode(sptr, s32, s32);
 
 extern s32 gMergedController_buttonsSingle[]; /* local type: indexed by a zero variable for the match (gMergedController.buttonsSingle) */
 extern s32 gCreditsDone[]; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 extern f32 gCreditsTimeLeft[]; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 
-void EngineMode15_Ending_Retrace(s32 arg0)
+void EngineMode15_Ending_Retrace(sptr arg0)
 {
   int new_var;
   new_var = 0;

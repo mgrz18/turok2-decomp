@@ -16,14 +16,14 @@
 #define APP_AUTOMAP 0x23DF0
 #endif
 
-s32 COnScreen__DrawBossBars(s32);                         /* extern */
-s32 func_00281354(s32);                         /* extern */
-s32 CEngineApp__DrawFade(s32);                         /* extern */
-s32 Automap_Update(s32);                         /* extern */
-s32 Automap_IsShown(s32);                             /* extern */
+s32 COnScreen__DrawBossBars(sptr);                         /* extern */
+s32 func_00281354(sptr);                         /* extern */
+s32 CEngineApp__DrawFade(sptr);                         /* extern */
+s32 Automap_Update(sptr);                         /* extern */
+s32 Automap_IsShown(sptr);                             /* extern */
 
-void EngineMode13_Game_Draw(s32 arg0) {
-    s32 temp_s0;
+void EngineMode13_Game_Draw(sptr arg0) {
+    sptr temp_s0;
 
     temp_s0 = arg0 + APP_AUTOMAP;
     Automap_Update(temp_s0);

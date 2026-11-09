@@ -1,4 +1,148 @@
-# Port status after Phase 7 round 3 (merged state)
+# Port status after Phase 7 round 4 (merged state)
+
+Round 4 merged five branches, in this order: s5 (the swoosh/effect system typed, the N64-offset
+sweep), s1 (the virtual PIF and Controller Pak), s2 (the boot runner to the title screen), s3
+(macOS parity to mode 0) and s4 (audio part 2). Then it fixed what only the merged tree reaches
+and followed the attract demo a few steps. This page says how to build and run the result, how
+far `turok2 --game` gets, what stopped it on the way and what comes next. The part sections
+further down keep each branch's own notes and crash tables (s2-1..16 here, s3-1..19 in
+[MACOS.md](MACOS.md) section 6, s4-1..10 below); the round 3 state follows as history. Details:
+[INPUT.md](INPUT.md) (PIF and pak), [AUDIO.md](AUDIO.md), [MACOS.md](MACOS.md),
+[DATA.md](DATA.md), [64BIT.md](64BIT.md), [RUNTIME.md](RUNTIME.md).
+
+The matching build is unchanged. `tools/asm_diff.py --base 474e40af -j 8` reports 0 differences
+over all 3,938 files after every merge and fix. A clean `make clean && make setup && make build &&
+make verify` gives the identical ROM (CRCs good, 123 shared .rodata objects agree).
+
+## 1. Build and run (Linux x86_64, the box)
+
+```sh
+# 0. the matching build first: gendata and asm_diff read its ELF; keep a copy as build/ref.elf
+#    (the asm_diff/gendata tools expect it, and `make clean` deletes it)
+make setup && make -j8 build && make verify && cp build/turok2.us.elf build/ref.elf
+
+# 1. the archive, format 2.0 (t2/swap byte-swap plans); the port refuses 1.x archives.
+#    Round 4 changed no asset tool: an archive from round 3 still checks OK.
+python tools/assets/mkarchive.py baserom.us.z64 -o OUT/turok2.o2r -j 4
+python tools/assets/archive_check.py OUT/turok2.o2r baserom.us.z64     # OK, format 2.0
+
+# 2. configure; the game library AND the runtime/audio libraries (gendata reads all three)
+cmake -S port -B OUT/build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_BUILD_TYPE=Debug
+ninja -C OUT/build -j8 turok2_game t2runtime t2audio
+
+# 3. the game data as C into port/gen/ (gitignored). Drop the cache after ANY header change.
+rm -f OUT/decls.json
+python3 tools/port/gendata.py --build OUT/build --cache OUT/decls.json -j 4
+
+# 4. re-run cmake so data.cmake sees port/gen/*.c, then the executable
+cmake OUT/build && ninja -C OUT/build -j8 turok2
+
+# 5. run headless (SDL's offscreen driver: no window). --pak-blank: a blank formatted
+#    Controller Pak in memory (--pak-dir DIR: turok2_pak<N>.mpk files; --no-pak: none).
+cd OUT && SDL_VIDEODRIVER=offscreen T2_SHOT=shot.ppm T2_SHOT_EVERY=300 \
+    build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
+    --game --draw --pak-blank --frames 5400
+#    --audio / --wav out.wav: the sound world (section 2); gdb -batch -ex run -ex bt --args ...
+#    for a backtrace. Debug only: --skip-pak-check, --start-mode N (7: title at frame 3),
+#    --input START@300,A@400, T2_MENU_LOG=1, T2_DLDUMP_AT=<frame>, T2_TEST_SFX/T2_TEST_SONG.
+```
+
+A fresh `turok2.cfg.json` is fine now: `main.cpp` writes a 640x480 windowed default into a config
+that lacks the window keys, and headless runs always start windowed (SDL's offscreen driver
+reports its window as fullscreen, so LUS saved `Window.Fullscreen.Enabled = true` at exit and
+the next run opened a fullscreen window at the driver's size with the game in its lower-left
+640x480).
+
+gendata on this tree: 1,543 data symbols the C needs (1,535 typed from a C declaration), 279
+pointer targets, 391 zero .bss symbols, 3,881 pointer slots (2,852 relocated, 997 null, 32
+unresolved).
+
+## 2. How far `turok2 --game` gets
+
+With the virtual pak and no debug switch, the N64 boot runs on its own to the title screen and
+into the attract demo:
+
+```
+--game --draw --pak-blank --frames 9000          (Linux, headless)
+game: frame 2:    engine mode 17 -> 0     pak check: "ACCESSING THE CONTROLLER PAK", the pak passes
+game: frame 298:  engine mode 17 -> 1     legal screen, the full text
+game: frame 1070: engine mode 17 -> 3     "EXPANSION PAK FOUND!" with the 3D pak model
+game: frame 1362: engine mode 17 -> 4     intro cinema 100 (level 162): runs, draws black
+game: frame 1852: engine mode 17 -> 5     intro cinema 90 (level 44): runs to its end, draws black
+game: frame 4214: engine mode 17 -> 7     TITLE SCREEN
+game: frame 5465: engine mode 7 -> 17     the title's timeout: attract demo, mode 13, level 81
+SIGSEGV in EnemyAI_Update (func_0025C5F8.c) <- CAI__Update <- func_0021F1B4 <- CScene__LoadLevel(81)
+game: PIF 812 SI DMAs, 1 status, 236 pak reads, 169 pak writes   (the first 300 frames)
+```
+
+Screenshots (`T2_SHOT_EVERY=300`, 640x480, checked by eye): frame 601 the legal text (beige game
+font, centred, every line); frame 1201 the Expansion Pak screen (the rotating pak model, red top,
+grille, "EXPANSION PAK FOUND!"); frames 1501 and 2401 (the cinemas) are uniformly black; frame
+4500 the title (the TUROK logo with the eye in the O, "SEEDS OF EVIL", the red "2" splash on the
+scale background).
+
+With `--audio --wav`: the same sequence up to mode 5. The first cinema's music (`SndSeq_Update`
+-> `__CSPVoiceHandler`) stops in `__CSPSetUsptFromTempo` (func_00290D5C) at the start of the
+second cinema: s4's open music item (the compressed sequence player is still m2c views). The
+mixer runs every retrace before that.
+
+The port tests pass on this tree: `rnc_test` (14,426 streams, 0 failed), `t2asset_test`
+(26,124 units, 0 mismatches), `t2asset_typed_test` (1,585 checks x3, 0 errors), `gbi_test`
+(0 mismatches), `t2os_test` (trace hash `2b2775877e0d226b`), `t2audio_test --direct 0` (19
+frames, peak 32,433), the swoosh self test (`turok2 --game`: OK, 0 failed), `turok2` without
+`--game` (26,124 units on 3 backends, fnv1a64 `e9b9d3e7c226d5aa`).
+
+macOS: s3 ran mode 0 headless with display lists identical to Linux (s3 alone; the merged tree
+was not rerun on the Mac in this round). The merge fixes below are host-layout fixes that apply
+there too.
+
+## 3. Crash and fix table (round 4 merge)
+
+Paths no single branch reached. Every fix is under `TARGET_PORT` or port-only, asm_diff 0.
+
+| # | where | cause | fix |
+|---|---|---|---|
+| M1 | `WeaponActor_SwitchToRequestedInline` (mode 3 -> 4, `CPlayer__SetupActors`) | the weapon actor's owner read at +0x1A8 (N64 `m_AI.m_pParent`) and the player's requested weapon at +0xB14 | `m_AI.m_pParent` / `m_RequestedWeapon` in 10 weapon files; `WeaponActor_InitAI` host body (CAI members, the actor pointer-wide) |
+| M2 | `CGameRegion__GetHeight(region = a stack address)` from `CCamera__SetViewParams` | **ABI**: the definition takes a `Shared_Quad` (union of s32/f32: integer registers on x86-64), the caller a `CQuaternion` (floats: SSE registers), so every later argument arrived in the wrong register; the GameplayCamera view at N64 offsets | host body on `CCamera.m_ViewParams` (`CCameraViewParams`) |
+| M3 | `CScene__GetRegionInfo(0xffffffff402bfb18)` | `ConstructFromRecord` passed the region as `s32` to a pointer parameter (upper half garbage) | s3's 0d572c47 (merged) |
+| M4 | `CList__Construct(0xe58)` from `CCameraPool__ResetEmitterPools` | camera table/count at N64 offsets 4/8, stride 0xEC0 | host body on `CCameraPool`/`CCamera.m_SkySystem` |
+| M5 | `CMtxF__GetTranslation(0x14c)` from `WeaponActor_BuildMatrix` | the weapon model view and the camera's 0x12C/0x14C | the actor's members and `m_mfViewOrient`/`m_qViewAlign` |
+| M6 | `CGameRegion__GetNormal(0x8006ff5df)` from `CalculateOrientationMatrix` | **ABI**: `GameObject_GetFloorTilt` returns a `CQuaternion` by value (MIPS: a hidden result pointer, which the caller's prototype passed; x86-64: registers); the LevelActor view has the N64 header size | host body on `CGameObjectInstance`, the quaternion by value |
+| M7 | `CCache__Unlock(NULL)` from `CScene__ReleaseSectors` | the scene's sector table at N64 offsets | host body on `CScene` (`m_nSectors`, `m_Sectors[].m_hData`, counters) |
+| M8 | `CAI__SetMode` calls garbage (attract demo, enemies) | the base mode table `D_800B0700`, which every AI table chains to through its header row's integer `m_Mode`, was used by no C, so gendata copied it as N64 bytes | declared `CAIModeInfo D_800B0700[27]` (globals/ai.h) and named from the host `CAI__SetMode`: gendata lays it out (3,798 -> 3,881 pointer slots) |
+| M9 | `GameObject_TraceMove(outPos NULL, outRegion 7)` from impact event 7 (`Door_CloseEnter`) | **ABI**: the Rage Wars `Triple` (three s32) by value vs the callers' `CVector3` | `func_00237FAC` takes a `CVector3`, `func_00238858` the actors pointer-wide |
+| M10 | `CScene__LoadLevel` | the s5/s2 conflict resolution kept s5's whole file and lost s2's `sizeof` stride of the second actor loop | restored |
+| open | `EnemyAI_Update` (func_0025C5F8.c:110) | the enemy AI read through an `AI`/`Object` view at N64 offsets (`modeIndex` at 0x133, `age` 0xCB): the behaviour index is garbage | next |
+
+Three of these (M2, M6, M9) are one class of bug the offset sweep does not see: a struct passed
+or returned **by value** whose declarations disagree between an integer-class struct (`Triple`,
+`Shared_Quad`) and a float struct (`CVector3`, `CQuaternion`), or a by-value return
+that a Rage Wars prototype turned into a hidden pointer. MIPS passes all of them the same way,
+x86-64 and arm64 do not. 31 files use `Triple`; the impact-event handlers
+(`ImpactEvent_*`, func_0023870C..func_00238FD4) take one and are called with a `CVector3`.
+
+## 4. Next
+
+1. **The attract demo / levels run**: `EnemyAI_Update` and the rest of the enemy AI on `CAI`
+   (s5's counter: func_002568CC 31 sites, func_0043EC68 19, func_00258964 12, ...).
+2. **By-value struct ABI audit**: a checker (libclang over all declarations of each function:
+   parameter/return classes on x86-64 and arm64) and then the `Triple` handlers; cheaper than
+   finding them one crash at a time.
+3. **Black cinemas**: both intro cinemas run their timing to the end but draw no geometry (no
+   `G_VTX` in their display lists, s2): the cinema scene's draw path.
+4. **Audio**: a sound effect without gdb crashes in `t2asp.c` `cmd_adpcm` (the ADPCM state
+   address, `osVirtualToPhysical`); music stops in `__CSPSetUsptFromTempo` (the `__CSP*`/`alCSeq*`
+   player is still m2c views); speech is stubbed (s4).
+5. **macOS beyond mode 0**: rerun the merged tree on the Mac (the merge fixed several of the
+   paths s3 listed); then the AI action callbacks that take the actor as `s32`
+   (`Action_IdleEnter` -> `CScene__SetInstanceSavedBit`), and `MtxPool_Alloc` declared `s32` in
+   func_0021CDAC.c.
+6. **Pixel screenshots on macOS**: no headless Metal/GL there; the Mac compares display lists
+   (`T2_DLDUMP_AT`). A Metal offscreen target (or a window run by a person) for pixels.
+7. Input: drive the title menu into a level (`--input` scripted presses, s1) once the AI runs.
+
+# Round 3, merged state (history)
 
 Round 3 merged five branches, in this order: r2 (archive format 2.0, the loader through the
 archive in host byte order), r1 (the boot runner to mode 0), r3 (the 64-bit typing sweep), r5
@@ -15,7 +159,7 @@ The matching build is unchanged. `tools/asm_diff.py --base 3798e01e -j 8` report
 over all 3,938 files after every merge and fix. A clean `make clean && make build && make verify`
 gives the identical ROM (CRCs good, 123 shared .rodata objects agree).
 
-## 1. Build and run (Linux x86_64, the box)
+## Round 3: build and run (Linux x86_64, the box)
 
 ```sh
 # 0. the matching build first: gendata reads its ELF (build/turok2.us.elf)
@@ -54,7 +198,7 @@ gendata on this tree: 1,545 data symbols that module-1 C and the runtime need (1
 a C declaration), 393 zero .bss symbols (29 byte views doubled for host pointers), 3,794
 pointer slots (2,770 relocated, 994 null in the ROM, 30 unresolved).
 
-## 2. How far `turok2 --game` gets
+## Round 3: how far `turok2 --game` got
 
 ```
 t2: boot: arena 32 MB at 0x40200000 (low memory), ROM baserom.us.z64, mainproc started (pri 13)
@@ -91,7 +235,7 @@ macOS arm64 (r5, [MACOS.md](MACOS.md)): the whole port builds and the tests pass
 headless with full 64-bit pointers (a low-memory mode is impossible there). With r1+r3+r5 it gets
 past the camera pool and stops in `Model_Decompress` -> `Material_Unpack` (section 4).
 
-## 3. Crash and fix table (round 3, all parts)
+## Round 3: crash and fix table (all parts)
 
 Rows r1-* and r4-* were found on the branches; I-* during the merge (C18). Every fix is under
 `TARGET_PORT` or in a port-only file, asm_diff 0.
@@ -129,14 +273,14 @@ Rows r1-* and r4-* were found on the branches; I-* during the merge (C18). Every
 | I10 | everything drawn 1.5x too large, off to the right | Fast3D's native size is 320x240; the game draws at 480x360 | `game.cpp` sets the interpreter's native size from `gScreenWidth`/`gScreenHeight` before each frame |
 | I11 | menu at the left edge, no background | `MenuPool_GetCamera` = pool - 0x53C (N64 `offsetof(CCamera, m_MenuPool)`): the menu's camera and viewport were 44 bytes into the camera | `pool - T2_OFFSETOF(CCamera, m_MenuPool)` (`sptr`) |
 
-## 4. Next
+## Round 3: next (as it stood)
 
 1. **The pak menu's lines.** They are laid out and highlighted but draw no glyphs: the items of
    `gDamagedPakAtBootMenuDesc` reach `MenuItem_DrawString` with `text` pointing into the desc
    table itself (`D_0043BF18 + 0x38`, an empty string), while the first menu's items map their
    N64 text addresses correctly (`t2_n64_to_host`). Follow the item text of this desc (its update
    callbacks `DamagedPakMenu_UpdateLine1/2` and the `data` words of the .virtual desc table).
-2. **Controller Pak / input**: `__osSiRawStartDma` is not modelled, so the game always sees a
+2. **Controller Pak / input** (done in round 4 s1, below): `__osSiRawStartDma` was not modelled, so the game always sees a
    damaged pak and never gets past mode 0. Model the PIF (controllers, then a pak file) to reach
    the title screen.
 3. **Audio**: `CAudioWorld__StopHandle` and the rest of the `CAudioWorld` API (about 40 functions:
@@ -152,6 +296,236 @@ Rows r1-* and r4-* were found on the branches; I-* during the merge (C18). Every
 5. The swoosh/effect system (CEngineApp 0x19608-0x22BA0, r1-11) typed instead of left empty.
 6. 64-bit: 1,727 pointer-width warnings, **1,019 truncating** (`retype.py --dry --rules ""` on
    this tree; 2,828 before r3), 999 disagreeing declarations. Each crash above was one of them.
+
+## Round 4, part s5: the swoosh/effect system typed, N64-offset sweep (menus, cameras, level load)
+
+Branch `names-R4_s5` (from 474e40af). Every commit: `tools/asm_diff.py --base 474e40af -j 8` = 0
+differences (over the whole tree, 3,938 files, for the commits that touch `include/`).
+
+**The swoosh/effect system is typed and runs on the host (r1-11's stub is gone).**
+`include/structs/swoosh.h` lays out `CSwooshSystem` (`gEngineApp_m_SwooshSystem`, CEngineApp +
+0x19608, N64 size 0x95B4: it runs 0x1C bytes into `unk22BA0`): the ribbon vertex pool (2 x 300
+`SwooshVtx`, the count at 0x2580, the cursor at 0x2584), 96 `SwooshNode` points (0xB8) and their
+free list at 0x6A88, 32 `Swoosh` trails (0x54) with their NodePool at 0x7514 (live swooshes =
+`m_SwooshPool.used`, head 0x7520), 3 `SwooshTimer`s (0x1C) with their pool at 0x7580, 100
+`SwooshDecal`s (0x50, ground shadows/scorches) in 10 kind `CList`s at 0x94D8 and the free list at
+0x95A0. mips `_Static_assert`s keep the N64 offsets. `structs/game.h` (TARGET_PORT) embeds it as
+`union { CSwooshSystem m_SwooshSystem[1]; u8 _SwooshBytes[0x22BC0 - 0x19608]; }`, so gendata's
+alias `gEngineApp_m_SwooshSystem` and everything after it follow the host size.
+
+The owner of a swoosh is a `CGameObjectInstance` when `flags & 1` (count `m_ActiveSwooshes` at
+0x10F) and a `CParticle` when `flags & 2` (0x1B5); `Trail_AddNode` takes a `CParticle` (effect
+flags, `m_pOwner` as the key with `flags & 8`, `header.m_nObjType` as the id).
+
+| what | files |
+|---|---|
+| on the shared types (same C for N64 and host) | `func_0042D410` (init: the host stub is gone), `SwooshSystem_Update`, `_UpdateSwooshes`, `_UpdateTimers`, `RibbonVtxPool_Reset`, `Swoosh_TakeNode`, `SwooshGroup_Remove`, `Swoosh_NewNode`, `Swoosh_DetachOwner`, `func_002368B0`, `func_002360A0`, `Swoosh_AddParticleNode`, `func_002364A4` (decal), `SwooshSet_FreeOwner`, `func_00236444` (timer), `func_00235C30` (decal draw), `Trail_AddNode`, `Trail_DrawAll`, `Trail_Draw` |
+| views with their pointer members (host-correct, N64 identical) | `Swoosh_Update`, `Trail_DetachOwner` (CParticle, owner counts by type; its `register asm` hack is N64-only), `Trail_PlaceNodes`, `Trail_ComputeNodeFrame`, `Trail_ComputeFrames`, `Trail_DrawTextured`, `Morph_BlendVertices(Tex)`, `func_00236D10`, `func_00236D50`; `rw/abu_types.h`: `Actor_func_802A274C_de`, `ObjRecAt28V1`, `State802A6DF8`, `Node438C`, `Morph` (its pointer/float unions are floats on the host) |
+| host bodies (`#ifdef TARGET_PORT`) | the generic lists `DList_AddHead`, `DList_AddTail`, `NodePool_Alloc`, `NodePool_Free`, `func_0026D230` (they wrote 4-byte words at N64 offsets); `RibbonVtxPool_Alloc` returns the vertex pointer at host width; the decal draw reads the matrix translation as host words |
+
+Check: `port/game/t2swoosh.c` (`T2Swoosh_SelfTest`, run by `turok2 --game` after the frames; one
+line in `port/app/main.cpp`) builds a private `CSwooshSystem` with the game's code and checks the
+pools (96/32/3/100, links both ways), a timer firing twice and freed, a swoosh of three points
+(lengths 5 + 12, fractions, removing a point), a decal placed and freed by its owner, the ribbon
+pool (host pointers, the 300 limit): `t2: swoosh self test: OK (0 failed)`. In the game the
+system is built twice (mode 17 and mode 0's `CScene__LoadLevel`) and updated every frame; mode 0
+spawns no swoosh, so the draw functions have only run on empty lists so far.
+
+```
+game: 300 frames in 2.78 s, 1414 thread switches, 151 gfx tasks (151 drawn), 0 audio tasks, 0 PI DMAs, 0 missing-function calls
+t2: swoosh self test: OK (0 failed)
+OK (0 failed checks)
+```
+
+**N64-offset sweep** (boot/menu/camera path). `tools/port/n64_offsets.py` counts the sites
+(`M2C_FIELD`, `((s8 *)x) + 0xNN`, `*(T *)(x + 0xNN)`, `P_S32(p, 0xNN)` macros):
+474e40af **378 sites in 135 files** -> **345 in 118** (m2c 62 -> 62, casts 161 -> 139, derefs
+87 -> 80, macros 68 -> 64). Not in that count: the 34 swoosh files above, whose local pad views
+were the larger part. Fixed here:
+- the camera's menu pool, `(u8 *)player->m_pCamera + 0x53C` (I11's offset, used by every
+  `MenuPool_OpenMenu`/`CountOpen` caller: pak menus, save portal, character/player setup,
+  rumble, messages): `+ T2_OFFSETOF(CCamera, m_MenuPool)` in 21 files, the module-2 copies (func_0045xxxx)
+  included;
+- `CPlayer` views: `m_pCamera` (0x51C), `m_ContState.m_pContState` (0xA50),
+  `m_Data.m_CheckPointWarpID` (0x92C) in `ShowPlayerMessage` (func_004233E8), func_00255C80,
+  `SavePortalMenu_*` (func_00423210/278/364);
+- `CScene__LoadLevel` (mode 0's init): the actor stride 0x288, `m_WeaponActor` (+0x288) and the
+  player link 0x1320;
+- `CCamera__GetViewOrigin` (0x24C, `m_vTCorners`), `CCameraPool__ReleaseAllTexts` (main camera
+  0x40, `m_ActiveTextList` 0xE28/0xE2C, `m_FreeTextList` 0xF0C).
+
+For the merge:
+- `include/structs/game.h` (the CEngineApp swoosh member, TARGET_PORT only), new
+  `include/structs/swoosh.h`, `include/rw/abu_types.h` (5 structs: pads -> the same-size
+  pointer members), `port/app/main.cpp` (one CHECK line + one extern), new
+  `port/game/t2swoosh.c`, new `tools/port/n64_offsets.py`.
+- s2 territory touched by one-token edits only: the `+ 0x53C` lines of the pak/menu files
+  (func_0041DF50, func_0041E1D8, func_0041EA84, func_0042019C, func_004206B8, func_0042085C,
+  func_00423768, func_00423880, func_004183C0 and the `_2` copies); `func_00413230.c` itself is
+  untouched.
+- Rerun gendata with a fresh cache (CEngineApp's host layout changed after +0x19608).
+
+Next (s5's area):
+1. Exercise the trail draw path in the game (a level with swooshes: `Trail_DrawTextured` /
+   `Morph_BlendVertices` write vertices and GBI through views that are now host-sized, but the
+   textured path also reads `Texture_Request(trail->model)` handles (`s32 texture[2]` at 0x14,
+   func_00207914's handle: s3's `Material` work on macOS changes it, keep the two in step).
+2. `D_80119850` (`B21World`, func_00289F30) is a view from CEngineApp + 0x22BA0 into CGame at N64
+   offsets (`sub5DC` = the menu pool): retype on `gEngineApp_m_Game`.
+3. The 345 counted sites (top: func_002568CC 31 (player), func_0043EC68 19, func_00258964 12,
+   func_00255F04, func_00275450 (`alCSeqNew`) 8), and the local pad views that the counter does not
+   see (the swoosh files were 34 of them): the same recipe, `T2_OFFSETOF`/typed members, asm_diff
+   per batch.
+
+## Round 4, part s1: controllers and the Controller Pak (mode 0 passes)
+
+Details: [INPUT.md](INPUT.md). Branch `names-R4_s1`, 4 commits on 474e40af.
+
+- **Virtual PIF** (`port/runtime/t2pif.c`) behind `__osSiRawStartDma`: joybus status/reset,
+  pak block read/write with address and data CRCs, over an emulator-standard 32 KB `.mpk` per
+  port (`turok2_pak<N>.mpk` in the user data dir; blank formatted when missing; written block by
+  block). The game's own libultra pfs C runs unchanged: the PIF converts the pack ID, inode and
+  directory blocks between the file's big-endian layout and host order. Flags: `--pak-dir DIR`,
+  `--pak-blank` (in memory, tests), `--no-pak`; debug: `--input START@300,A@400` (scripted
+  presses), `T2_PIF_LOG=1`, `T2_MENU_LOG=1`. The run logs engine mode changes and PIF counters.
+  Rumble Pak: "not present" (unchanged).
+- **Game-side fixes** (TARGET_PORT only; asm_diff 0 over 3,938 files): pak address high byte
+  first in `__osPackRam{Read,Write}Data`; queue as `OSMesgQueue *` in `__osContRam{Read,Write}`;
+  typed `__osPfsSelectBank(_2)`; `__OSInodeUnit` `{page, bank}` on little-endian hosts
+  (`include/ultra_types.h`); `MenuRecAt24` (`include/rw/abu_types.h`) and
+  `PakConfirmMenu_SelectNo`'s `Item` lead with the host `Menu` fields (both crashed in the
+  repair/continue confirm menus).
+
+How far it gets now (Linux, headless, `--game --draw`):
+
+```
+--pak-blank : mode 0 -> f297 mode 1 (legal screen, full text) -> f1069 mode 3 ("EXPANSION PAK
+              FOUND!", 3D model) -> f1357 mode 4 (cinema) -> SIGSEGV
+--no-pak    : pak menu, any button -> mode 1
+zeroed .mpk : damaged-pak menu -> attempt repair -> yes -> repaired (the file is a valid
+              big-endian formatted pak) -> continue without saving -> mode 1
+```
+
+Where it stops (mode 4, not in s1's scope):
+
+```
+CCameraViewParams__Construct (o=0x31)        func_00280C28.c:12
+CCamera__Construct (view=0x1)                func_0042F9B0.c:37
+CCameraPool__AllocCamera (gEngineApp_m_Game_m_CameraPool) func_0042FF58.c:21
+CPlayer__NewGame (character=0)               func_0042DC18.c:33
+CPlayerPool__NewGame (count=1)               func_0042E5AC.c:96
+CEngineApp__StartWarp (.., 100)              func_00288DD0.c:26
+EngineMode04_Cinema_Init                     func_00289554.c:6
+EngineMode17_Switch_Retrace                  func_00289DFC.c:42
+```
+
+For the merge: files others may touch: `include/ultra_types.h` (inode union),
+`include/rw/abu_types.h` (`MenuRecAt24` only), `src/us/code/func_00420F34.c`,
+`port/app/game.cpp` / `main.cpp` / `game.h` (flags, mode log, scripted input),
+`port/runtime/t2ultra.c` (`__osSiRawStartDma` moved to t2pif.c), `port/runtime/t2port.h`
+(`T2PortConfig.pakMode/pakDir/pakPorts`), `port/app/CMakeLists.txt` (+t2pif.c),
+new `port/game/t2modelog.c`. Header changes: drop `decls.json` before gendata.
+
+Next: the mode 4 camera crash; a swap plan for the save records so notes move between the
+port and emulators (the pak filesystem already does); a Rumble Pak mode; macOS: the same code
+is LP64-clean (the queue truncation is fixed) but untested there.
+## Round 4, part s2: boot runner part 2 (mode 0 to the title screen)
+
+Branch `names-R4_s2` (from 474e40af). Every commit has `tools/asm_diff.py --base 474e40af -j 8` at
+0 differ or fail over the files it touches; the one include change (`structs/world.h`, under
+`TARGET_PORT`) was checked over the whole tree (3,938 files, 0 differ).
+
+### How far it gets
+
+```
+SDL_VIDEODRIVER=offscreen T2_SHOT=out.ppm T2_SHOT_EVERY=300 build/app/turok2 --archive turok2.o2r \
+    --rom baserom.us.z64 --game --draw --frames 5000 --skip-pak-check
+game: frame 2: engine mode 17 -> 0          pak check: "ACCESSING THE CONTROLLER PAK"
+game: frame 16: engine mode 17 -> 1         legal screen, the full text
+game: frame 788: engine mode 17 -> 3        "EXPANSION PAK FOUND!" with the 3D pak model
+game: frame 1080: engine mode 17 -> 4       intro cinema 100 ("acclaimlogo", level 162): runs 486 frames, draws black
+game: frame 1570: engine mode 17 -> 5       intro cinema 90 (level 44): runs to its end, draws black
+game: frame 3932: engine mode 17 -> 7       TITLE SCREEN (logo, "SEEDS OF EVIL", the scale background)
+game: 5000 frames in 32.31 s, 1911 gfx tasks (1911 drawn), 0 missing-function calls
+```
+
+The whole boot sequence of the N64 game now runs on its own, timers and cinemas included, from
+the pak check to the title. `--start-mode 7` reaches the title at frame 3 for quick checks.
+With s1's PIF/pak the debug switch is not needed for mode 0 (s1 reported mode 0 -> 1 -> 3 -> 4
+and the crash in mode 4's `CCameraPool__AllocCamera`, fixed here: row s2-3).
+
+After the title's timeout (frame 5183) the game starts the attract demo (mode 13, level 81) and
+stops in an enemy's mode setup:
+```
+#0 CAI__SetMode (arg2=0)  func_00243414.c:203   entry->unk_04 (the mode's enter function) is garbage
+#1 EnemyAI_InitDispatch                          func_0025BE88.c:52   the enemy's mode table, set through N64 views
+#2 func_0021E5D4 <- CScene__LoadLevel(81) <- CScene__UpdateWarp <- EngineMode13_Game_Draw
+```
+That is the start of "levels run" (the enemy AI, s5's sweep: ~400 offset sites).
+
+Screenshots (`T2_SHOT_EVERY`): the damaged-pak menu with its lines ("PROBLEM!", "DAMAGED
+CONTROLLER PAK FOUND IN CONTROLLER #1.", "ATTEMPT REPAIR" highlighted, "RETRY", "CONTINUE WITHOUT
+SAVING"), the legal text, the Expansion Pak screen with the rotating pak model, the title. The two
+cinemas draw black frames: their scene draws no geometry yet (no `G_VTX` in the frame's list).
+
+### Debug switches (DEBUG ONLY, port/game/t2debug.c)
+
+| switch | effect |
+|---|---|
+| `--skip-pak-check` | once mode 0 has started, sets `gPakCheckDone` ("continue without saving"): `EngineMode00_PakCheck_Retrace` takes its own exit to mode 1 |
+| `--start-mode N` | once mode 0 has started, `CEngineApp__SetMode(&gEngineApp, N)` (7: title) |
+| `T2_SHOT_EVERY=n` | with `T2_SHOT=<f.ppm>`: also `<f.ppm>.<frame>.ppm`, the first drawn frame of every n |
+
+Every run logs the engine mode changes (`game: frame F: engine mode A -> B`). The two switches go
+away once s1's pak model is merged (keep them until the demo path runs, they save 1000 frames).
+
+### Crash and fix table (round 4, s2)
+
+| # | where | cause | fix |
+|---|---|---|---|
+| s2-1 | pak menu lines draw nothing | `MenuItem_DrawText` read the item as a `Menu` and passed `->desc` (N64 0x14 = `MenuItem.text`; host: `MenuItem.def`, the desc row, an empty string) | typed on `MenuItem`, passes `text` |
+| s2-2 | mode 0 never ends | no PIF/pak (s1) | debug switches above |
+| s2-3 | `CCameraViewParams__Construct(0x31)` from `CCameraPool__AllocCamera` (mode 4 `CPlayer__NewGame`) | pool view with the free/active lists at N64 0xC/0x20 | `CCameraPool__AllocCamera(_2)` typed on `CCameraPool` |
+| s2-4 | `MenuPool_CountOpen` from `Automap_Update` | camera menu pool as `m_pCamera + 0x53C` (23 files; three through raw player offsets 0x51C/0xA50) | `T2_OFFSETOF(CCamera, m_MenuPool)`, `player->m_pCamera`, `m_ContState.m_pContState`; `MenuPool_GetCamera_2` as I11 |
+| s2-5 | `func_00267DBC`, `func_0021E5D4` (actor init), `func_0021F1B4`, `CScene__LoadLevel` | N64 views: intelligence at 0x14, AI at 0x140, flags 0xD4, 0x288/0x1328 strides, player link 0x1320 | typed / host body / `sizeof`, `T2_OFFSETOF` |
+| s2-6 | `InteractiveAnim_Advance` | AI vars at 0x10C | typed on `CAI.m_VarS32/F32` |
+| s2-7 | `CScene__BuildActorLists`: `m_pActors` = 0x190_402B4900 | `CScene.m_Heap` is `u8[0x10]` but holds a pool of pointers (24 host bytes): `MtxPool_Reset` wrote over `m_pActors` | `MtxPool` (structs/world.h), `CScene.m_Heap` typed under TARGET_PORT; `MatrixHeap_Construct`, `MtxPool_Reset`, `MtxPool_Alloc` typed |
+| s2-8 | `CCache__Deallocate(0x50)` from the cinema spline | `TempAlloc` kept the handle as an s32, `TempFree` read `((s32 **)data)[-4]` (32 bytes back on the host) | the whole pointer, 0x10 bytes back (TARGET_PORT; both cinema copies) |
+| s2-9 | archive abort: grid section `0x01F748E4` not a unit | `CScene__DecompressPaths` wrote the paths through a view at 0x58/0x68 (N64 `m_pRegionData`/`unk_68`): on the host that was `m_pCollision` | typed on `CScene` |
+| s2-10 | Fast3D `G_VTX` with w1 `0x00800080020000D7` | the swoosh display list `D_800ACFC8` declared `u8[]`: gendata emitted ROM bytes | declared `Gfx[]` (gendata relocates it) |
+| s2-11 | Fast3D runs matrices as commands (`G_DL` to a freed model) | `CCache__LockForDisplayList`, `Begin/EndDisplayList` and the cache thread `CCache__Main` used `D_800D7BE0` (gCache - 0x5F0) through `B12Mgr`/`B12Node`/`B12Msg` N64 views: the lock bit went into `CMemEntry.lockCount`; `CCache__Main` waited on a queue never created on the host (async loads and display-list releases never completed) | the four typed on `gCache`/`CMemEntry`/`CCacheEntry` (TARGET_PORT bodies) |
+| s2-12 | Fast3D runs stale commands (the frame's list 8 bytes off) | `CCamera__DrawGlares` wrote one command as two u32 and stepped 8 bytes | one host `Gfx` (TARGET_PORT) |
+| s2-13 | intro cinema never ends (`clipStart` -4761, 9007 cues) | `Pack_Add` called the memcpy `func_0029E460(data)`: m2c dropped the source and size (still in a1/a2 on the N64): every cinema resource block was left uninitialised on the host | `func_0029E460(data, prepare, size)` (matches); `proutSprintf` the same; `prepare` is `sptr` |
+| s2-14 | `CAI__Update` callback | Rage Wars Source/Dest views | typed on `CGameObjectInstance`/`CAI` (matches) |
+| s2-15 | `CAI__SetMode` | the same, plus the mode-table chain | host body on `CAI`/`CAIModeInfo` |
+| s2-16 | `LevelEvent_Fire` and 11 other files | camera pool at `&multiplayer - 0x1201/0x1221`, actor stride 0x288, AI at +0x140, weapon actor +0x288/+0x3C8 | by name / `sizeof` / `T2_OFFSETOF` |
+
+### For the merge
+
+- Files others may touch: `port/app/{game.cpp,main.cpp,game.h}` (s1 adds flags there too: keep
+  both sets of options; the mode log and `WriteShot` are mine), `include/structs/world.h`
+  (`MtxPool`, `m_Heap`), `src/us/code/func_00413230.c` (menus: `MenuItem_DrawText` only),
+  `func_0044C230.c` (`MenuPool_GetCamera_2`), the cache files `func_002041E4.c`,
+  `func_0020548C.c`, `func_00205574.c`, `func_0020565C.c`, cinema `func_0040F240.c`/
+  `func_00448240.c`, `func_00218590.c` (`Pack_Add`), the AI files `func_00243414.c`,
+  `func_00245848.c`, `func_00266794.c`, and the 23 menu-pool files of s2-4 (s5's offset sweep may
+  touch the same lines: they compute the same offsets).
+- Rerun gendata with a fresh cache (`rm decls.json`): `world.h` and `D_800ACFC8`'s type changed.
+- A fresh `turok2.cfg.json` makes LUS open 1024x768 and the game then draws into the lower-left
+  640x480 of it (seen once with a new output directory): copy a 640x480 config or fix the
+  default; screenshots assume 640x480.
+- macOS (s3): s2-7, s2-8 and s2-11 are host-layout fixes that matter there too; several s32
+  pointer arguments remain on this path (`CEngineApp__StartWarp(s32 app)`, `Action_EventGo`,
+  `CHeap__Free(s32)` in `CCache__Main`, the cinema path items' `ref`).
+
+### Next
+
+1. The attract demo (mode 13): `EnemyAI_InitDispatch` and the enemy mode tables (N64 views of
+   `CAI`), then the level renderer for the demo and the cinemas (they draw no geometry: follow
+   `CScene__Draw`/the actor draw on level 162, whose acclaim-logo actor should show).
+2. Merge s1 (PIF/pak) and drop `--skip-pak-check` from the default runs.
+3. The rest of the Rage Wars views on the AI path (`AI_UpdateRegionFlags`, `CAI__UpdateModeAnim`,
+   `EnemyAI_*`): s5's sweep, by the crash order above.
 
 ## Round 2 (history)
 
@@ -389,6 +763,36 @@ address. Linux `--high-memory` stops at the same line, and macOS cannot have a l
 work. It also found a host-layout bug that affects Linux too: `CCache__AllocateAt` writes a
 `CMemEntry` through junk_types' `B12Node` view, so `flags |= 3` lands in `lockCount`.
 
+## Round 4, part s3: macOS parity (mode 0, then legal and the first cinema)
+
+Details and the crash table (s3-1 to s3-19): [MACOS.md](MACOS.md) section 6. Branch
+`names-R4_s3` in the Mac clone, 21 commits on 474e40af. asm_diff 0 over all 3,938 files,
+checked on the box after every change.
+
+- **macOS now runs mode 0 headless for 300 frames**: 1,414 thread switches and 151 gfx tasks,
+  as on Linux. The display lists of frames 101 and 301 are command-for-command identical to
+  Linux's (headless on both; only host addresses differ).
+- With a local end-the-pak-check probe (not committed), the Mac goes through mode 1 (legal),
+  mode 3 (expansion pak) and into mode 4 (intro cinema, level 162). It stops in the AI action
+  callbacks that take the actor as `s32` (`Action_IdleEnter` -> `CScene__SetInstanceSavedBit`),
+  and in `CAI__SetMode`'s N64-offset views.
+- **Fixes that matter on Linux too:**
+  - s3-13: the damaged-pak menu lines now draw (this is section 4 item 1).
+    `MenuItem_DrawText` read `Menu.desc`, which on the host is the item's desc pointer.
+  - s3-19: `CFrameData.m_pFrameBuffer` is `uptr`. Every `G_SETCIMG` used to carry a truncated
+    address, and `t2sched.c`'s `frameOf` compared 32 bits.
+  - s3-16: `cam + 0x53C` -> `cam->m_MenuPool` (29 sites).
+  - s3-18: `CScene__LoadLevel` steps over actors by `sizeof(CGameObjectInstance)`.
+- New: `T2_DLDUMP_AT=<frame>` (game.cpp) dumps a frame's display list without a window. macOS
+  has no headless Metal/GL, so the Mac compares display lists, not pixels.
+
+For the merge (files others may touch): `src/us/code/func_00413230.c` (menus: MenuPool_Open*,
+MenuItem_DrawText/Layout; s2), `func_0044C230.c`, `protos/menu.h`, the 19 `+ 0x53C` files
+(s5's offset sweep), `func_002718A0.c`/`func_00275A08.c` (audio, s4), `func_004263DC.c`
+(pak directory, s1), `structs/world.h` (MtxPool), `structs/frame.h`, `port/game/t2sched.c`,
+`port/app/game.cpp`, the 28 `EngineModeNN_*` files (s2's mode runner). `include/` changed, so
+the whole tree must be rerun through asm_diff after the merge.
+
 ## Round 3, part r4: audio on the host
 
 Details: [AUDIO.md](AUDIO.md). Behind `--audio` (off by default: runs without it are unchanged).
@@ -413,3 +817,50 @@ Details: [AUDIO.md](AUDIO.md). Behind `--audio` (off by default: runs without it
 | A4 | `alEvtqPostEvent` | `alEvtqNew`/`alEvtqNextEvent` 0x1C strides, s32 links | typed (`TARGET_PORT`) |
 | A5 | `osRecvMesg` from `CAudioWorld__Lock` | lock at `arg0 + 0x110` | `&arg0->lock` (matches) |
 | A6 | `_sndpVoiceHandler` spins | `gAudioWorld.player.evtq` overwritten with stack-like data | **open** (AUDIO.md §4) |
+
+## Round 4, part s4: audio part 2 (the sound world typed, --audio through mode 0, --wav)
+
+`turok2 --game --audio --frames 300` now runs mode 0 to the end (300 frames, no crash; it used
+to stop in `SndQueue_CancelHandle`). The synthesizer mixes a frame every retrace; mode 0 plays
+nothing itself (the volume options are still 0 until the settings are loaded), so its output is
+silent. Through the game's own API a sound effect plays: with `T2_TEST_SFX=300` (debug only,
+`Sound__Play2D(300)` at frame 30, volume options forced to 0xC0) the WAV has the sound
+(peak 1037, rms 88 over 5 s, 197,534 non-zero samples) under gdb. Details: AUDIO.md section 8.
+
+```sh
+# the mixed output as a WAV (implies --audio) and its summary line
+SDL_VIDEODRIVER=offscreen OUT/build/app/turok2 --archive OUT/turok2.o2r --rom baserom.us.z64 \
+    --game --wav OUT/m0.wav --frames 300
+# game: wav OUT/m0.wav: 109664 stereo frames at 22050 Hz (4.97 s), peak 0, rms 0.0, 0 non-zero samples
+T2_TEST_SFX=300 ... --wav OUT/sfx.wav     # one sound effect through Sound__Play2D (debug hook)
+T2_TEST_SONG=0x10 ...                     # music through Music_SetTrack: stops in the CSP (below)
+```
+
+| # | where | cause | fix |
+|---|---|---|---|
+| s4-1 | `SndQueue_CancelHandle` from `CAudioWorld__StopHandle` | the sound world's C is Rage Wars' (ContextRecAt2BC0, Voice, M04Emitter, NodeRecAtC8, ... views at N64 offsets, 0xCC voices) | 81 functions (CAudioWorld, SndVoice, SndVoicePool, SndQueue, SndSeq, the speech player, LoopSounds, Sound__IsPlaying) typed in `port/audio/t2audio_world.c`, originals out of the link |
+| s4-2 | r4's `_sndpVoiceHandler` evtq corruption | `SpeechPlayer_Construct` allocated its sound on `CAudioWorld__GetSndPlayer(m)` = m + 0x84 (the N64 offset of the sound player: the bank pointers on the host) | typed (s4-1) |
+| s4-3 | `alAudioFrame` spins | `__nextSampleTime` read the client's time at 0x10 (`ALPlayer.handler` on the host); `alSynAddPlayer`, `_timeToSamples` the same | `port/audio/t2audio_lib.c`: the synthesizer driver, voice calls (`alSynAllocVoice` helpers, `alSynSet*`, `alSynStart/StopVoice`, `alSynFreeVoice`), `alEvtqFlush*`, `_removeEvents`, `alCSPGetState`, then (s4-4..s4-7) the filter constructors, `alResampleParam`, the CSP API posts and the codebook cache (30 functions) |
+| s4-4 | `alAudioFrame`: `output->setParam` = 3 | `alFilterNew` stored handler/setParam as s32 at N64 offsets; `alSaveNew`/`alSaveParam` the same | typed in t2audio_lib.c; `ALSave.dramout` is `sptr` |
+| s4-5 | SAVEBUFF of 11,168 bytes over the save filter | `alFxPull`/`_doModFunc`: `&r->input[-d->input]` with a u32 delay wraps only with 32-bit pointers | `-(s32)` under `TARGET_PORT` (func_00296750.c, func_00296CD0.c) |
+| s4-6 | `alAdpcmPull` -> `alResampleParam` calls a handler as setParam | `alResampleParam` (IntegerState34 view) | typed |
+| s4-7 | `AudioDMA_CacheBlock`: heap NULL, entries 0x90 bytes | `gAudioHeap` set by the replaced `amCreateAudioMgr`; CacheEntry holds pointers | t2audio_mgr.c sets `gAudioHeap`; typed host cache + ageing (`T2Audio_DmaCacheAge`) |
+| s4-8 | `ALParam` too small for `ALStartParamAlt` | the update casts carry a pointer at 0x20 on the host | `ALParam` gets a host pad (`TARGET_PORT`) |
+| s4-9 | (silent) pitch/env halves | `FloatToHalf` took the first u16 of the float: the low half on a little-endian host | `TARGET_PORT`: the top 16 bits |
+| s4-10 | (silent) `LoopSounds` paused flag past the struct | `LoopSounds` had no field at 0x28 | `m_Paused` added (structs/sound.h); `SndSource.flags` and `SndSeq.unkC` are `sptr` (pointers) |
+
+Open (next): (1) without gdb, a playing sound effect crashes in `t2asp.c` `cmd_adpcm`
+(`memcpy(ram(w1), ...)`: the ADPCM state address in the command; under gdb, no ASLR, it plays:
+an address above 4 GB or a stale state pointer, look at `alAdpcmPull`/`_decodeChunk`'s
+`osVirtualToPhysical` arguments first); (2) music: `Music_SetTrack` -> `SndSeq_Update` (typed)
+-> `__CSPVoiceHandler` -> `__CSPSetUsptFromTempo` (func_00290D5C) crashes: the compressed
+sequence player (`__CSP*`, `alCSeq*`, func_0028F1F0..func_00290D5C) is still m2c views;
+(3) speech (`SpeechPlayer_Update` state 1, the adec stream) is stubbed: it ends the request and
+says so once.
+
+For the merge: new files `port/audio/t2audio_world.c`, `port/audio/t2audio_lib.c`; edits in
+`port/cmake/link.cmake` (112 files added to `T2_LINK_REPLACED`), `port/app/CMakeLists.txt`
+(t2audio sources), `port/app/main.cpp` / `game.h` / `game.cpp` (`--wav`, the T2_TEST_* hooks:
+s2 also adds a flag in main.cpp), `port/audio/t2audio_mgr.c`, `port/audio/t2audio_sndp.c`
+(`alSndpSetPriority`), `include/structs/sound.h`, `include/structs/libaudio.h`, three src files.
+Drop OUT/decls.json (header changes). asm_diff 0 (see the commit).

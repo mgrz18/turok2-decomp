@@ -6,7 +6,7 @@
 #include "protos/cache.h"
 
 /* The weapon actor's owner, at 0x1A8 (inside m_AI). */
-#define OWNER(obj) (*(CPlayer **)((u8 *)(obj) + 0x1A8))
+#define OWNER(obj) ((*(CPlayer **)&((CGameObjectInstance *)(obj))->m_AI.m_pParent))
 
 extern char D_800A7094[];       /* "player anim object info" */
 

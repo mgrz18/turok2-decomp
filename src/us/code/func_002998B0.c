@@ -21,7 +21,13 @@ void __osPackRamReadData(s32 arg0, s32 arg1) {
     packet.bytes[3] = 2;
     checksum = __osContAddressCrc(arg1 & 0xFFFF);
     shifted = arg1 << 5;
+#ifdef TARGET_PORT
+    /* the address goes to the PIF high byte first (a u16 store is little-endian on the host) */
+    packet.bytes[4] = (u8)(((checksum & 0xFF) | shifted) >> 8);
+    packet.bytes[5] = (u8)((checksum & 0xFF) | shifted);
+#else
     *(u16 *)&packet.bytes[4] = (checksum & 0xFF) | shifted;
+#endif
     packet.bytes[0x26] = tail;
     for (i = 0; i < 32; i++) {
         ((Block40 *)((u8 *)&packet + i))->bytes[6] = 0xFF;

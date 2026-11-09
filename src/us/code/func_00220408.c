@@ -3,6 +3,7 @@
 
 #include "structs/game_object.h"
 #include "common.h"
+#include "structs/player.h"
 #include "structs/world.h"
 #include "protos/iset.h"
 #include "protos/scene.h"
@@ -25,10 +26,10 @@ s32 CScene__GetInstanceSavedBit(void *arg0, void *arg1) {
         first = ((uptr)world->m_pActors);
         index = -1;
         if ((uptr) arg1 >= first) {
-            lastOffset = world->m_nActors * 0x288;
-            lastOffset -= 0x288;
+            lastOffset = world->m_nActors * (s32)sizeof(CGameObjectInstance);
+            lastOffset -= (s32)sizeof(CGameObjectInstance);
             if (first + lastOffset >= (uptr) arg1) {
-                index = ((uptr) arg1 - first) / 0x288;
+                index = ((uptr) arg1 - first) / (s32)sizeof(CGameObjectInstance);
             }
         }
     } else {

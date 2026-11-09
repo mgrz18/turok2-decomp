@@ -2,12 +2,14 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/pak.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "structs/camera.h"
 
 typedef struct O01Sel { s32 v; s32 w; } O01Sel;
 void Pak_ProbeSlot_2(s32 ch);
@@ -73,7 +75,7 @@ void PakMenu_InitSaveProfile_2(Menu *own) {
     msg = O01Pick(&sel);
     if (gDamagedPakContinued != 0) {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu_2((u8 *)own->player->m_pCamera + 0x53C, msg, plr, plr->m_ContState.m_pContState, 0);
+        MenuPool_OpenMenu_2((u8 *)own->player->m_pCamera->m_MenuPool, msg, plr, plr->m_ContState.m_pContState, 0);
     } else {
         if (gPakMenuAnyPak != 0) {
             pad = gPakMenuPort;

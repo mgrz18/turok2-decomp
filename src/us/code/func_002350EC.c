@@ -3,21 +3,12 @@
 #include "common.h"
 #include "globals/scene.h"
 #include "globals/particle.h"
+#include "structs/particle.h"
+#include "structs/swoosh.h"
 
-typedef struct TrailActorDef {
-    /* 0x00 */ s32 flags;           /* bit 31: ..., 0x10000: keyed trail */
-} TrailActorDef;
-
-typedef struct TrailActor {
-    /* 0x000 */ u8 pad0[0x2];
-    /* 0x002 */ u16 id;
-    /* 0x004 */ u8 pad4[0xF8 - 0x4];
-    /* 0x0F8 */ TrailActorDef *def;
-    /* 0x0FC */ u8 padFC[0x10C - 0xFC];
-    /* 0x10C */ s32 key;
-    /* 0x110 */ u8 pad110[0x1B5 - 0x110];
-    /* 0x1B5 */ u8 trailCount;
-} TrailActor;
+/* The particle a trail follows (CParticle): its effect's flags (bit 31: ..., 0x10000: a trail
+ * keyed by the particle's owner and type), its type, owner and trail count. */
+typedef CParticle TrailActor;
 
 typedef struct TrailInfo {
     /* 0x00 */ f32 unk0;
@@ -28,45 +19,16 @@ typedef struct TrailInfo {
     /* 0x20 */ u8 tex1;
 } TrailInfo;
 
-typedef struct Trail Trail;
-struct Trail {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Trail *next;
-    /* 0x08 */ TrailInfo *info;
-    /* 0x0C */ s32 tex0;
-    /* 0x10 */ s32 tex1;
-    /* 0x14 */ u8 sound[8];
-    /* 0x1C */ s32 owner;
-    /* 0x20 */ s32 id;
-    /* 0x24 */ f32 unk24;
-    /* 0x28 */ s32 unk28;
-    /* 0x2C */ s32 unk2C;
-    /* 0x30 */ s32 unk30;
-    /* 0x34 */ s32 soundId;
-    /* 0x38 */ s32 unk38;
-    /* 0x3C */ s32 flags;
-    /* 0x40 */ u8 nodes[0xC];
-    /* 0x4C */ s32 unk4C;
-    /* 0x50 */ s32 unk50;
-};
-
-typedef struct TrailNode {
-    /* 0x00 */ u8 pad0[0xB0];
-    /* 0xB0 */ TrailActor *owner;
-} TrailNode;
-
-typedef struct TrailMgr {
-    /* 0x0000 */ u8 pad0[0x7514];
-    /* 0x7514 */ u8 freeList[0xC];
-    /* 0x7520 */ Trail *trails;
-} TrailMgr;
+typedef Swoosh Trail;
+typedef SwooshNode TrailNode;
+typedef CSwooshSystem TrailMgr;
 
 void CMtxF__Identity(void *m);
 void func_0026D230(void *p);
-Trail *NodePool_Alloc(void *list);
+Trail *NodePool_Alloc(SwooshPool *list);
 void func_002316A0(void *a, void *b);
 TrailInfo *CScene__GetSwoosh(void *tbl, s32 arg);
-void func_00207914(void *p, s32 v);
+void func_00207914(s32 *p, s32 v);
 TrailNode *Swoosh_NewNode(void *o, Trail *s, void *m);
 
 /* Adds a node to the actor's trail, starting the trail first when the actor has none. */
@@ -78,16 +40,16 @@ void Trail_AddNode(TrailMgr *mgr, TrailActor *a, s32 type) {
     f32 start;
     TrailInfo *t;
     TrailNode *node;
-    sptr tex0;
-    sptr tex1;
-    s32 key;
+    void *tex0;
+    void *tex1;
+    void *key;
     s32 id;
 
-    if (a->def->flags & 0x10000) {
-        key = a->key;
-        id = a->id;
+    if (a->m_pEffect->m_dwFlags & 0x10000) {
+        key = a->m_pOwner;
+        id = a->header.m_nObjType;
         s = NULL;
-        q = mgr->trails;
+        q = mgr->m_SwooshPool.used.head;
         while (q != NULL) {
             if (q->owner == key) {
                 qid = q->id;
@@ -103,50 +65,50 @@ void Trail_AddNode(TrailMgr *mgr, TrailActor *a, s32 type) {
         s = NULL;
     }
     if (s == NULL) {
-        s = NodePool_Alloc(mgr->freeList);
+        s = NodePool_Alloc(&mgr->m_SwooshPool);
         if (s == NULL) {
             return;
         }
         t = CScene__GetSwoosh(&gScene, type);
-        tex0 = (sptr) sTrailTextures[t->tex0];
-        tex1 = (sptr) sTrailTextures[t->tex1];
-        func_0026D230(s->nodes);
+        tex0 = sTrailTextures[t->tex0];
+        tex1 = sTrailTextures[t->tex1];
+        func_0026D230(&s->nodes);
         s->flags = 2;
-        if (a->def->flags < 0) {
+        if ((s32) a->m_pEffect->m_dwFlags < 0) {
             s->flags = 6;
         }
-        if (a->def->flags & 0x10000) {
+        if (a->m_pEffect->m_dwFlags & 0x10000) {
             s->flags |= 8;
-            s->owner = a->key;
-            s->id = a->id;
+            s->owner = a->m_pOwner;
+            s->id = a->header.m_nObjType;
         } else {
-            s->owner = (sptr)a;
+            s->owner = a;
             s->id = -1;
         }
         s->info = t;
         s->tex0 = tex0;
         s->tex1 = tex1;
         start = t->unk0;
-        s->unk28 = 0;
-        s->unk24 = start;
-        s->soundId = t->sound;
-        s->unk4C = 0;
+        *(s32 *) &s->unk28 = 0;
+        s->time = start;
+        s->layer = t->sound;
+        *(s32 *) &s->length = 0;
         s->unk50 = 0;
-        s->unk2C = 0;
-        s->unk30 = 0;
+        *(s32 *) &s->unk2C = 0;
+        *(s32 *) &s->unk30 = 0;
         s->unk38 = -1;
-        if (s->soundId != -1) {
-            func_00207914(s->sound, s->soundId);
+        if (s->layer != -1) {
+            func_00207914(s->texture, s->layer);
             if (a != NULL) {
-                func_002316A0(a, s->sound);
+                func_002316A0(a, s->texture);
             }
         }
         if (s == NULL) {
             return;
         }
     }
-    a->trailCount++;
-    if (a->def->flags & 0x10000) {
+    a->m_ActiveSwooshes++;
+    if (a->m_pEffect->m_dwFlags & 0x10000) {
         CMtxF__Identity(m);
         node = Swoosh_NewNode(mgr, s, m);
         if (node != NULL) {

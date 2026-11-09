@@ -3,6 +3,7 @@
  * func_00420878 (0x68) and func_004208E0 (0x350). All 245 words match (checked over the real extent).
  * Twin of src/us/code/PakMessage_SelectOk_2.c (first-module callees and data names, +0xE0). */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
@@ -13,6 +14,7 @@
 #include "protos/scene.h"
 #include "protos/menu.h"
 #include "protos/game.h"
+#include "structs/camera.h"
 
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
@@ -82,7 +84,7 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
             MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakSaveGameMenuDesc, o->player, o->controller, 0);
         } else {
             if (o->player != NULL) {
-                p = ((u8 *)o->player->m_pCamera) + 0x53C;
+                p = (u8 *)o->player->m_pCamera->m_MenuPool;
             } else {
                 p = &gEngineApp_m_Game_m_MenuPool;
             }
@@ -95,7 +97,7 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
         }
         if (o->context != NULL) {
             if (o->context != &gPakSaveProfileMenuDesc && o->player != NULL) {
-                p = ((u8 *)o->player->m_pCamera) + 0x53C;
+                p = (u8 *)o->player->m_pCamera->m_MenuPool;
             } else {
                 p = &gEngineApp_m_Game_m_MenuPool;
             }

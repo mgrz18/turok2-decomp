@@ -1,4 +1,15 @@
 #include "common.h"
+#ifdef TARGET_PORT
+#include "structs/player.h"
+#include <string.h>
+
+/* The host: through CPlayerContState (m_pContState is a pointer at 0x10 of a 0x38-byte
+ * N64 record, so the word view below would truncate it and miss the host layout). */
+void CPlayerContState__Init(CPlayerContState *arg0, struct ControllerProfile *arg1) {
+    memset(arg0, 0, sizeof(*arg0));
+    arg0->m_pContState = arg1;
+}
+#else
 
 /* A record of fourteen words: all cleared but the one at 0x10, set to arg1. */
 typedef struct {
@@ -23,3 +34,4 @@ void CPlayerContState__Init(Record14 *arg0, s32 arg1) {
     arg0->unk14[7] = 0;
     arg0->unk14[8] = 0;
 }
+#endif

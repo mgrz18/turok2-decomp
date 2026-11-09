@@ -3,24 +3,11 @@
 #include "common.h"
 #include "gfx.h"
 #include "gbi_t2.h"
+#include "structs/swoosh.h"
 
 
-typedef struct Trail Trail;
-struct Trail {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Trail *next;
-    /* 0x08 */ u8 pad8[0x2C];
-    /* 0x34 */ s32 layer;
-    /* 0x38 */ u8 pad38[4];
-    /* 0x3C */ u32 flags;
-    /* 0x40 */ u8 pad40[8];
-    /* 0x48 */ s32 nodeCount;
-};
-
-typedef struct TrailMgr {
-    /* 0x0000 */ u8 pad0[0x7520];
-    /* 0x7520 */ Trail *trails;
-} TrailMgr;
+typedef Swoosh Trail;
+typedef CSwooshSystem TrailMgr;
 
 void Render_InvalidateModeCache(void);
 void Render_SetRenderMode(s32);
@@ -45,7 +32,7 @@ void Trail_DrawAll(TrailMgr *mgr, s32 arg) {
     GFX_CMD(0xE3000C00, 0x80000)
     GFX_CMD(0xD7000000, 0)
     Texture_InvalidateCache();
-    for (e = mgr->trails; e != NULL; e = e->next) {
+    for (e = mgr->m_SwooshPool.used.head; e != NULL; e = e->next) {
         if (e->layer < 0) {
             if (e->flags & 8) {
                 Trail_PlaceNodes(e);
@@ -53,7 +40,7 @@ void Trail_DrawAll(TrailMgr *mgr, s32 arg) {
             if (e->flags & 4) {
                 Trail_ComputeFrames(e, arg);
             }
-            if (e->nodeCount >= 2) {
+            if (e->nodes.count >= 2) {
                 if (e->layer >= 0) {
                     Trail_DrawTextured(mgr, e, arg);
                 } else {
@@ -62,7 +49,7 @@ void Trail_DrawAll(TrailMgr *mgr, s32 arg) {
             }
         }
     }
-    for (e = mgr->trails; e != NULL; e = e->next) {
+    for (e = mgr->m_SwooshPool.used.head; e != NULL; e = e->next) {
         if (e->layer > 0) {
             if (e->flags & 8) {
                 Trail_PlaceNodes(e);
@@ -70,7 +57,7 @@ void Trail_DrawAll(TrailMgr *mgr, s32 arg) {
             if (e->flags & 4) {
                 Trail_ComputeFrames(e, arg);
             }
-            if (e->nodeCount >= 2) {
+            if (e->nodes.count >= 2) {
                 if (e->layer >= 0) {
                     Trail_DrawTextured(mgr, e, arg);
                 } else {

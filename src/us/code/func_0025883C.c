@@ -1,8 +1,10 @@
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/model.h"
 #include "globals/game.h"
 #include "globals/engine.h"
+#include "structs/camera.h"
 
 /* Draws a weapon actor: its muzzle child (copying the parent's render block), then the model. */
 
@@ -34,12 +36,12 @@ void WeaponActor_Draw(WeaponActor *obj, CAI *state, CDrawArgs *args) {
     WeaponActor *muzzle;
     s32 arg6 = -1;
 
-    if (gEngineApp_m_Settings.multiplayer != 0 && MenuPool_CountOpen(((u8 *)player->m_pCamera) + 0x53C) != 0) {
+    if (gEngineApp_m_Settings.multiplayer != 0 && MenuPool_CountOpen((u8 *)player->m_pCamera->m_MenuPool) != 0) {
         return;
     }
     muzzle = ((WeaponActor *)player->m_pOnEnemy);
     if (muzzle != NULL) {
-        EnemyAI_CalcOrientationMatrix(muzzle, (u8 *)muzzle + 0x140);
+        EnemyAI_CalcOrientationMatrix(muzzle, (u8 *)muzzle + T2_OFFSETOF(CGameObjectInstance, m_AI));
         muzzle->render = obj->render;
         muzzle->drawHook = CGameObjectInstance__DrawModel;
         CGameObjectInstance__Draw(muzzle, args->m_pCamera);

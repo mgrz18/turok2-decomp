@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/player.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
@@ -41,7 +42,7 @@ void CPlayer__BecomeIt(CPlayer *p) {
     barrel->m_nCursor = -1;
     barrel->m_Open = 0;
     p->m_bHeadMovementDisabled = 0;
-    CAI__SetMode((u8 *)p + 0x288, (u8 *)p + 0x3C8, 1);
+    CAI__SetMode((u8 *)p + T2_OFFSETOF(CPlayer, m_WeaponActor), (u8 *)p + T2_OFFSETOF(CPlayer, m_WeaponActor.m_AI), 1);
     place_at_spawn(p);
     p->m_Data.m_Health = p->m_CharacterActor.header.m_pIntelligence->m_Player.m_StartHealth << 8;
     p->m_CharacterActor.m_AI.m_Health = p->m_CharacterActor.header.m_pIntelligence->m_Player.m_StartHealth << 8;

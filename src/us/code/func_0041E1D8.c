@@ -1,12 +1,14 @@
 /* WRONG CUT: real function 0x0041E1D8, size 0x19C (through 0x0041E374): splat cut it in two
  * (PakMenu_InitLoadProfile, func_0041E294) at a jal's delay slot. */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
+#include "structs/camera.h"
 
 extern void Pak_ProbeSlot(s32 kind);
 extern s32 Pak_GetStatus(s32 kind);
@@ -28,7 +30,7 @@ void PakMenu_InitLoadProfile(Menu *m) {
     kind = m->controller->port;
     if (gDamagedPakContinued) {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu(((u8 *)m->player->m_pCamera) + 0x53C, &gCharacterMenuAfterPakDesc, m->player, m->controller, NULL);
+        MenuPool_OpenMenu((u8 *)m->player->m_pCamera->m_MenuPool, &gCharacterMenuAfterPakDesc, m->player, m->controller, NULL);
         return;
     }
     Pak_ProbeSlot(kind);

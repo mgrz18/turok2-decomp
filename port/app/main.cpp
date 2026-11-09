@@ -70,6 +70,9 @@ namespace {
 
 constexpr uint32_t kGameVersionUS = 0x49088A11; // ROM header CRC1, the archive's `version`
 
+#ifdef T2_HAVE_GAME
+extern "C" int T2Swoosh_SelfTest(void);
+#endif
 int gFailures = 0;
 #define CHECK(cond, ...)                                                                                     \
     do {                                                                                                     \
@@ -132,7 +135,13 @@ struct Args {
     bool game = false;
     bool draw = false;
     bool audio = false;
+    std::string wav;      // --wav <file>: the game's mixed audio output as a WAV (implies --audio)
     bool verbose = false;
+    int pakMode = 0;
+    std::string pakDir;
+    std::string input;
+    bool skipPakCheck = false; // DEBUG-ONLY (t2debug.c)
+    int startMode = -1;        // DEBUG-ONLY (t2debug.c)
 #ifdef T2_LOW_MEMORY_DEFAULT
     bool lowMemory = true;
 #else
@@ -160,13 +169,30 @@ Args ParseArgs(int argc, char** argv) {
             a.draw = true;
         } else if (s == "--audio") {
             a.audio = true;
+        } else if (s == "--wav" && i + 1 < argc) {
+            a.wav = argv[++i];
+            a.audio = true;
         } else if (s == "--verbose") {
             a.verbose = true;
+        } else if (s == "--skip-pak-check") {
+            a.skipPakCheck = true;
+        } else if (s == "--start-mode" && i + 1 < argc) {
+            a.startMode = atoi(argv[++i]);
         } else if (s == "--high-memory") {
             a.lowMemory = false;
+        } else if (s == "--no-pak") {
+            a.pakMode = 2; // T2_PAK_NONE
+        } else if (s == "--pak-blank") {
+            a.pakMode = 1; // T2_PAK_BLANK
+        } else if (s == "--pak-dir" && i + 1 < argc) {
+            a.pakDir = argv[++i];
+        } else if (s == "--input" && i + 1 < argc) {
+            a.input = argv[++i];
         } else {
             fprintf(stderr, "usage: %s [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]\n"
-                            "          [--game [--draw] [--audio] [--verbose] [--high-memory]]\n",
+                            "          [--game [--draw] [--audio] [--wav out.wav] [--verbose] [--high-memory]\n"
+                            "                  [--no-pak | --pak-blank | --pak-dir DIR]\n"
+                            "                  [--input BUTTON@FRAME,...] [--skip-pak-check] [--start-mode N]]   (the last three: debug only)\n",
                     argv[0]);
             exit(2);
         }
@@ -192,6 +218,30 @@ int main(int argc, char** argv) {
 
     auto config = std::make_shared<Ship::Config>(Ship::Context::GetPathRelativeToAppDirectory("turok2.cfg.json"));
     context->GetChildren().Add(config);
+    // The window size: a fresh config gets the game's own output size, windowed, 640x480 (2x the
+    // N64's 320x240, what the screenshots and the interpreter's scaling assume). SDL's offscreen
+    // driver (headless runs) reports its window as fullscreen, so LUS saved
+    // Window.Fullscreen.Enabled = true at exit and the next run opened a fullscreen window at
+    // the driver's size, the game drawn into its lower-left 640x480: headless runs always start
+    // windowed.
+    {
+        bool changed = false;
+        if (!config->Contains("Window.Width") || !config->Contains("Window.Height")) {
+            config->SetInt("Window.Width", 640);
+            config->SetInt("Window.Height", 480);
+            changed = true;
+        }
+        const char* driver = getenv("SDL_VIDEODRIVER");
+        const bool headless = driver != nullptr && strcmp(driver, "offscreen") == 0;
+        if (!config->Contains("Window.Fullscreen.Enabled") ||
+            (headless && config->GetBool("Window.Fullscreen.Enabled", false))) {
+            config->SetBool("Window.Fullscreen.Enabled", false);
+            changed = true;
+        }
+        if (changed) {
+            config->Save();
+        }
+    }
     auto cvars = std::make_shared<Ship::ConsoleVariable>(config);
     context->GetChildren().Add(cvars);
     CVarSetConsoleVariable(cvars);
@@ -401,9 +451,16 @@ int main(int argc, char** argv) {
         g.frames = args.frames;
         g.draw = args.draw;
         g.audio = args.audio;
+        g.wav = args.wav;
         g.lowMemory = args.lowMemory;
         g.verbose = args.verbose;
+        g.pakMode = args.pakMode;
+        g.pakDir = args.pakDir;
+        g.input = args.input;
+        g.skipPakCheck = args.skipPakCheck;
+        g.startMode = args.startMode;
         CHECK(T2Game_Run(window, g) == 0, "game run");
+        CHECK(T2Swoosh_SelfTest() == 0, "swoosh system self test");   // port/game/t2swoosh.c
     }
 #endif
     if (args.window && !args.game) {

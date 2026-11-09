@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/80243A80_16.CPP, func_802466A0_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/player.h"
 #include "structs/game_object.h"
 #include "structs/world.h"
 #include "globals/game.h"
@@ -33,11 +34,11 @@ static __inline__ void *body_setup(CGameObjectInstance *obj) {
     }
     if (type == 11) {
         for (i = 0; i < gEngineApp_m_Game.m_PlayerList.m_nPlayers; i++) {
-            player = (u8 *)gEngineApp_m_Game_m_PlayerList_m_Players + i * 0x1328;
+            player = (u8 *)gEngineApp_m_Game_m_PlayerList_m_Players + i * (s32)sizeof(CPlayer);
             if (player == (u8 *) obj) {
                 return 0;
             }
-            if (player + 0x288 == (u8 *) obj) {
+            if (player + T2_OFFSETOF(CPlayer, m_WeaponActor) == (u8 *) obj) {
                 return &gWeaponActorTypeInfo;
             }
         }

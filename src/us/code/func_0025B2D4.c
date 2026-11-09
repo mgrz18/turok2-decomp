@@ -44,7 +44,7 @@ f32 func_00298470(f32 x);
 f32 CVector3__GetYaw(CVector3 *v);
 
 /* An object's owner (0x1A8) lies inside its AI block. */
-#define OWNER(o) (*(Object **)((u8 *)(o) + 0x1A8))
+#define OWNER(o) ((*(Object **)&((CGameObjectInstance *)(o))->m_AI.m_pParent))
 
 /* AI damage: retarget the attacker, take the health, play the hurt sound and
  * pick the death, fall or flinch reaction; a knock back turns the actor to

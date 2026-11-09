@@ -9,12 +9,14 @@
  * (its loop-end note stops cse1, but cse2 runs after loop and ignores it). Twin of PakMenu_InitSaveGame (same C). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00406F7C.c, func_00406F7C, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/save.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "structs/camera.h"
 
 /* Controller pak menu, "save" entry: when the pak is ready, builds the save note (with its checksum) and
  * opens the save menu; otherwise shows why the pak cannot be used. */
@@ -55,7 +57,7 @@ void PakMenu_InitSaveGame_2(Menu *own) {
     if (gDamagedPakContinued != 0) {
         p = plr;
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, &gSavePortalMenuDescB_2, p, p->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu_2((u8 *)p->m_pCamera->m_MenuPool, &gSavePortalMenuDescB_2, p, p->m_ContState.m_pContState, NULL);
         gCameraPoolHideViews = 0;
     } else {
         Pak_ProbeSlot_2(own->controller->port);
@@ -75,11 +77,11 @@ void PakMenu_InitSaveGame_2(Menu *own) {
 
             gPakMenuLeaving = one;
             if (Pak_IsRumblePak_2(sel.v) != 0) {
-                MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, &gPakMsgInsertToSaveDesc_2, p, p->m_ContState.m_pContState, (void *)one);
+                MenuPool_OpenMenu_2((u8 *)p->m_pCamera->m_MenuPool, &gPakMsgInsertToSaveDesc_2, p, p->m_ContState.m_pContState, (void *)one);
             } else if (Pak_NeedsRepair_2(sel.v) != 0) {
                 MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gDamagedPakAtBootMenuDesc_2, p, p->m_ContState.m_pContState, &gPakSaveGameMenuDesc_2);
             } else {
-                MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, &gPakMsgPakNotFoundDesc_2, p, p->m_ContState.m_pContState, &gSavePortalMenuDescB_2);
+                MenuPool_OpenMenu_2((u8 *)p->m_pCamera->m_MenuPool, &gPakMsgPakNotFoundDesc_2, p, p->m_ContState.m_pContState, &gSavePortalMenuDescB_2);
             }
         }
     }

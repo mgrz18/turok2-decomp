@@ -13,11 +13,11 @@ extern void CCameraPool__AddText(void *arg0, void *camera, s32 model);
 /* WeaponActor_SwitchToRequested, inlined: switches the weapon actor to its owner's
  * requested weapon. */
 static __inline__ void SwitchWeapon(CGameObjectInstance *weapon, CAI *state) {
-    CPlayer *player = *(CPlayer **)((u8 *)weapon + 0x1A8);
-    s16 requested = *(s16 *)((u8 *)player + 0xB14);
+    CPlayer *player = (*(CPlayer **)&((CGameObjectInstance *)weapon)->m_AI.m_pParent);
+    s16 requested = player->m_RequestedWeapon;
 
     if (player->m_Data.m_CurrentWeapon != requested || gScene.m_Mode != 4) {
-        player->m_Data.m_CurrentWeapon = *(s16 *)((u8 *)player + 0xB14);
+        player->m_Data.m_CurrentWeapon = player->m_RequestedWeapon;
         state->m_pModeTable = gWeaponInfoTable[requested]->modeTable;
         state->m_pfEffects = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->effects;
         if (gFrameCountGameplay >= 5) {

@@ -1,38 +1,25 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/particle.h"
+#include "structs/swoosh.h"
 
-s32 CMtxF__FromMtxAffine(s32, s32);
-s32 CMtxF__ClampEntries(s32);
-s32 Swoosh_NewNode(s32, s32, s32);
+s32 CMtxF__FromMtxAffine(sptr, sptr);
+s32 CMtxF__ClampEntries(sptr);
+s32 Swoosh_NewNode(sptr, sptr, sptr);
 
 s32 CMtxF__ScaleAxes(s32 *, f32, f32, f32);    /* extern */
 
-typedef struct Node00236170 {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ struct Node00236170 *next;
-    /* 0x08 */ u8 pad8[0x1C - 0x8];
-    /* 0x1C */ CParticle *inst;
-    /* 0x20 */ u8 pad20[0x24 - 0x20];
-    /* 0x24 */ f32 strength;
-} Node00236170;
-
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x7520];
-    /* 0x7520 */ Node00236170 *head;
-} World00236170;
-
-void Swoosh_AddParticleNode(World00236170 *arg0, CParticle *arg1, s32 arg2) {
+void Swoosh_AddParticleNode(CSwooshSystem *arg0, CParticle *arg1, sptr arg2) {
     u8 sp10[0x40];
     f32 temp_f0;
     f32 var_f0;
-    Node00236170 *var_s0;
+    Swoosh *var_s0;
 
-    var_s0 = arg0->head;
+    var_s0 = arg0->m_SwooshPool.used.head;
     if (var_s0 != NULL) {
         do {
-            if (var_s0->inst == arg1) {
-                temp_f0 = var_s0->strength;
+            if (var_s0->owner == arg1) {
+                temp_f0 = var_s0->time;
                 if (temp_f0 > 0.0f) {
                     if (temp_f0 > 0.0f) {
                         CMtxF__FromMtxAffine((sptr) sp10, arg2);

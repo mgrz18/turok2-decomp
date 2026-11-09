@@ -9,7 +9,7 @@ extern s32 WeaponActor_CheckFire(CGameObjectInstance *weapon, CAI *state);
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 
 void WeaponMode_Switch_Update(CGameObjectInstance *weapon, CAI *state) {
-    CPlayer *player = *(CPlayer **)((u8 *)weapon + 0x1A8);
+    CPlayer *player = (*(CPlayer **)&((CGameObjectInstance *)weapon)->m_AI.m_pParent);
 
     P_S32(player, 0xB2C) = 1;
     P_S32(player, 0xB38) = 0;

@@ -1,12 +1,14 @@
 /* WRONG CUT: one function 0x00423768-0x00423880 (size 0x118); splat cut its second half into
  * func_004237FC (which starts in the delay slot of a bnel). */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
+#include "structs/camera.h"
 
 s32 PakMenu_CheckPak(void *event, s32 port, s32 arg2);
 
@@ -24,7 +26,7 @@ s32 DamagedPakMenu_SelectRetry(s32 unused, Menu *event) {
     gPakMenuLeaving = 1;
     if (PakMenu_CheckPak(event, port, 1) != 0) {
         if (event->player != NULL) {
-            dst = (char *)event->player->m_pCamera + 0x53C;
+            dst = (char *)event->player->m_pCamera->m_MenuPool;
         } else {
             dst = &gEngineApp_m_Game_m_MenuPool;
         }

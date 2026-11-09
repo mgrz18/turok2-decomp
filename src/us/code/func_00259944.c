@@ -12,7 +12,7 @@ extern void Math_EaseToward(f32 *value, f32 target, f32 rate);
 extern f32 func_002982F0(f32 x); /* sin */
 
 void WeaponBarrel_Spin_AF1D4(void *obj, CAI *state) {
-    CPlayer *player = *(CPlayer **)((u8 *)obj + 0x1A8);
+    CPlayer *player = (*(CPlayer **)&((CGameObjectInstance *)obj)->m_AI.m_pParent);
     f32 t;
 
     state->m_Weapon.m_BarrelAngle += state->m_Weapon.m_BarrelSpeed * gFrameIncrement;

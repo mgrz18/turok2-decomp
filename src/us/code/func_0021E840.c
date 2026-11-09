@@ -51,13 +51,50 @@ struct LevelActor;
 struct LevelActor;
 struct LevelActor;
 extern s32 Cinema_PathPlaying(void);
+#ifndef TARGET_PORT
 extern void GameObject_GetFloorTilt(CQuatern *arg0, void *arg1);
+#endif
 extern void CQuaternion__Multiply(CQuatern *arg0, CQuatern *arg1, CQuatern *arg2);
 extern void CQuaternion__ToMatrix(void *, void *);
 extern void CMtxF__ScaleAxes(void *arg0, f32 sx, f32 sy, f32 sz);
 extern s32 CVector3__ClampLength(f32 *arg0, f32 arg1);
 extern void CMtxF__Translate(char *, f32, f32, f32);
 extern void CMtxF__SwapYZRows(void *);
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+CQuaternion GameObject_GetFloorTilt(CGameObjectInstance *obj);
+
+/* Host body on CGameObjectInstance: the LevelActor view has the N64 header size (a 4-byte
+ * intelligence pointer), and GameObject_GetFloorTilt returns its quaternion by value (MIPS
+ * passes a hidden result pointer, x86-64 returns it in registers). */
+void CGameObjectInstance__CalculateOrientationMatrix(void *arg0) {
+    CGameObjectInstance *obj = (CGameObjectInstance *)arg0;
+    CQuatern trig;
+    CQuatern product;
+    CQuatern copy;
+    f32 *transform;
+    f32 sine;
+
+    copy = *(CQuatern *)&obj->m_qGround;
+    if (Cinema_PathPlaying() != 0) {
+        CQuaternion tilt = GameObject_GetFloorTilt(obj);
+        copy = *(CQuatern *)&tilt;
+    }
+    sine = func_002982F0(obj->m_RotY * 0.5f);
+    trig.x = 0.0f;
+    trig.y = sine;
+    trig.z = 0.0f;
+    gQuaternionSin = sine;
+    trig.w = func_002974C0(obj->m_RotY * 0.5f);
+    CQuaternion__Multiply(&product, &trig, &copy);
+    transform = obj->m_mfOrient[0];
+    CQuaternion__ToMatrix(&product, transform);
+    CMtxF__ScaleAxes(transform, obj->m_vScale.x, obj->m_vScale.y, obj->m_vScale.z);
+    CVector3__ClampLength(&obj->header.m_vPos.x, 20000.0f);
+    CMtxF__Translate((char *)transform, obj->header.m_vPos.x, obj->header.m_vPos.y, obj->header.m_vPos.z);
+    CMtxF__SwapYZRows(transform);
+}
+#else
 void CGameObjectInstance__CalculateOrientationMatrix(void *arg0) {
     CQuatern trig;
     CQuatern product;
@@ -95,3 +132,4 @@ void CGameObjectInstance__CalculateOrientationMatrix(void *arg0) {
                    ((struct LevelActor *)(arg0))->position0.z);
     CMtxF__SwapYZRows(transform);
 }
+#endif

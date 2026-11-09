@@ -5,42 +5,29 @@
 #include "gbi_t2.h"
 #include "globals/render.h"
 #include "protos/list.h"
+#include "structs/swoosh.h"
 
+/* A decal's matrix: the integer part of its translation at 0x18 (structs/swoosh.h SwooshMtx). */
 typedef struct VInfo {
     u8 pad0[0x18];
     s16 x;
     s16 y;
     s16 z;
 } VInfo;
-typedef struct VNode VNode;
-struct VNode {
-               u8 pad0[4];
-               VNode *next;
-               VInfo info;
-};
-typedef struct VList {
-    VNode *head;
-    u8 pad4[0x10];
-} VList;
-typedef struct VCtx {
-                 u8 pad0[0x94D8];
-                 VList lists[10];
-                 u8 pad95A0[0x10];
-                 s32 mode;
-} VCtx;
 typedef struct Vec3fv { f32 x, y, z; } Vec3fv;
-extern u8 D_800ACFC8[];
+extern Gfx D_800ACFC8[]; /* a static display list (gendata emits host Gfx) */
 extern u8 D_8011AD48[];
 extern f32 gCameraVisibleBox[6]; /* local type: the CBox read as six floats by index */
 void Render_InvalidateModeCache(void);
 void Texture_InvalidateCache(void);
-void func_00235C30(VCtx *c) {
+/* Draws the ground decals inside the camera's box; frees those outside it. */
+void func_00235C30(CSwooshSystem *c) {
     s32 i;
-    VList *l;
-    VNode *n, *next;
+    CList *l;
+    SwooshDecal *n, *next;
     Vec3fv v;
     VInfo *p;
-    if (c->mode == 100) {
+    if (c->m_FreeDecals.m_nCount == 100) {
         return;
     }
     { Gfx *_g = gDList++; _g->w0 = (0xE7000000); _g->w1 = (0); }
@@ -55,16 +42,23 @@ void func_00235C30(VCtx *c) {
     { Gfx *_g = gDList++; _g->w0 = (0xFA000000); _g->w1 = (-0x38); }
     { Gfx *_g = gDList++; _g->w0 = (0xDE000000); _g->w1 = (GBI_ADDR(D_800ACFC8)); }
     for (i = 0; i < 10; i++) {
-        l = &c->lists[i];
-        for (n = l->head; n != ((void *)0); n = next) {
+        l = &c->m_DecalLists[i];
+        for (n = l->m_pHead; n != ((void *)0); n = next) {
             next = n->next;
-            p = &n->info;
+            p = (VInfo *) &n->mtx;
+#ifdef TARGET_PORT
+            /* the matrix holds host words (hi << 16 | lo), not big-endian halves */
+            v.x = (s16) (n->mtx.w[6] >> 16);
+            v.y = (s16) n->mtx.w[6];
+            v.z = (s16) (n->mtx.w[7] >> 16);
+#else
             v.x = p->x;
             v.y = p->y;
             v.z = p->z;
+#endif
             if (!(v.x < gCameraVisibleBox[3] && v.y < gCameraVisibleBox[4] && v.z < gCameraVisibleBox[5] && gCameraVisibleBox[0] <= v.x && gCameraVisibleBox[1] <= v.y && gCameraVisibleBox[2] <= v.z)) {
                 CList__Remove(l, n);
-                CList__AddTail((u8 *)c + 0x95A0, n);
+                CList__AddTail(&c->m_FreeDecals, n);
             } else {
                 { Gfx *_g = gDList++; _g->w0 = (0xDA380003); _g->w1 = (GBI_ADDR(p)); }
                 { Gfx *_g = gDList++; _g->w0 = (0x01004008); _g->w1 = (GBI_ADDR(D_8011AD48)); }

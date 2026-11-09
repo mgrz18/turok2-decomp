@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 #include "structs/game_object.h"
 #include "protos/ai.h"
 
@@ -42,7 +43,7 @@ void EnemyFly_SteerToPath(CGameObjectInstance *self, CAI *ai, CAITargets *steer,
     }
     AI_TurnClamped(self, ai, 0.13962635f, steer->m_Path.m_Angle);
     if (steer->m_Path.m_Kind == 2 && target != NULL && ai->m_Enemy.m_IdleTimer > 15.0f) {
-        if (EnemyAI_GetBehaviorIndex(self, ai) != EnemyAI_GetBehaviorIndex(target, (u8 *)target + 0x140)) {
+        if (EnemyAI_GetBehaviorIndex(self, ai) != EnemyAI_GetBehaviorIndex(target, (u8 *)target + T2_OFFSETOF(CGameObjectInstance, m_AI))) {
             ai->m_Enemy.m_IdleTimer = Random_Blend(0.0f, 15.0f);
         }
     }

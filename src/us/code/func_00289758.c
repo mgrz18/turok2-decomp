@@ -1,7 +1,8 @@
 #include "common.h"
 
-s32 EngineMode13_Game_Draw();                            /* extern */
+void EngineMode13_Game_Draw(sptr);                       /* extern */
 
-void EngineMode08_MainMenu_Draw(void) {
-    EngineMode13_Game_Draw();
+/* The app arrives in a0 and goes straight on (the host needs it passed). */
+void EngineMode08_MainMenu_Draw(sptr arg0) {
+    EngineMode13_Game_Draw(arg0);
 }

@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/game.h"
+#include "structs/player.h"
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "globals/render.h"
@@ -217,22 +218,22 @@ loaded:
     i = w->m_nFirstActor;
     w->m_Mode = 3;
     for (; i < count; i++) {
-        func_0021E5D4((u8 *)w->m_pActors + i * 0x288);
+        func_0021E5D4((u8 *)w->m_pActors + i * (s32) sizeof(CGameObjectInstance));
     }
     player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
     actor = player;
     while (player != NULL) {
         func_0021E5D4(actor);
-        actor += 0x288;
+        actor += T2_OFFSETOF(CPlayer, m_WeaponActor);
         func_0021E5D4(actor);
-        player = *(u8 **)(player + 0x1320);
+        player = *(u8 **)(player + T2_OFFSETOF(CPlayer, m_pNext));
         actor = player;
     }
     func_00465760(w);
     count = w->m_nActors;
     for (i = w->m_nFirstActor; i < count; i++) {
         ptr = (u8 *)w->m_pActors;
-        p = ptr + i * 0x288;
+        p = ptr + i * (s32) sizeof(CGameObjectInstance);
         func_0021F1B4(p);
         CGameObjectInstance__UpdateAnimation(p);
     }

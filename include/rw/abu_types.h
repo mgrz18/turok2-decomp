@@ -620,7 +620,9 @@ struct State802A6DF8 {
     struct State802A6DF8 *prev;
     struct State802A6DF8 *next;
     Node802A697C *node;
-    u8 padC[0x10];
+    void *tex0;     /* structs/swoosh.h Swoosh */
+    void *tex1;
+    s32 texture[2];
     void *object;
     s32 contextId;
     f32 value;
@@ -629,16 +631,17 @@ struct State802A6DF8 {
     u8 pad38[4];
     u32 flags;
     struct Node438C *vertices;
-    u8 pad44[4];
+    struct Node438C *tail;
     s32 vertexCount;
 };
 typedef struct State802A6DF8 State802A6DF8;
 struct Node438C;
 typedef struct Node438C Node438C;
-struct Node438C {
-    u8 pad0[4];
+struct Node438C {   /* structs/swoosh.h SwooshNode */
+    struct Node438C *prev;
     struct Node438C *next;
-    u8 pad8[8];
+    f32 unk8;
+    s32 unkC;
     CVector3 position;
     f32 a;
     f32 b;
@@ -648,9 +651,9 @@ struct Node438C {
 struct GameplayCamera;
 struct ObjRecAt28V1;
 typedef struct ObjRecAt28V1 ObjRecAt28V1;
-struct ObjRecAt28V1 {
+struct ObjRecAt28V1 {   /* structs/swoosh.h SwooshNode */
     struct ObjRecAt28V1 *next;
-    s32 field4;
+    void *field4;
     f32 unk8;
     char padC[0x28 - 0xC];
     s32 matrix[2][16];
@@ -690,16 +693,19 @@ struct Track_func_802A274C_de {
     u8 scaleS, scaleT, count;
     struct Blend blends[1];
 };
-struct Actor_func_802A274C_de {
-    char pad0[8];
+struct Actor_func_802A274C_de {   /* structs/swoosh.h Swoosh */
+    void *prev;
+    void *next;
     struct Track_func_802A274C_de *track;
     struct Key *first;
     struct Key *second;
-    char pad14[0x24 - 0x14];
+    s32 texture[2];
+    void *owner;
+    s32 id;
     f32 time;
     char pad28[0x3C - 0x28];
     u32 flags;
-    s32 field40;
+    void *field40;
     ObjRecAt28V1 *clock;
 };
 typedef struct Blend Blend;
@@ -710,8 +716,13 @@ struct Morph {
     struct Blend *blends;
     struct Key *first;
     struct Key *second;
+#ifdef TARGET_PORT
+    f32 scaleS;     /* 4 bytes, as Morph_BlendVertices reads it */
+    f32 scaleT;
+#else
     union { void *firstFrame; f32 scaleS; };
     union { void *secondFrame; f32 scaleT; };
+#endif
     f32 textureScaleS;
     f32 textureScaleT;
     f32 step;
@@ -2959,7 +2970,16 @@ typedef struct Shared_PakMenu {
 struct MenuRecAt24;
 typedef struct MenuRecAt24 MenuRecAt24;
 struct MenuRecAt24 {
+#ifdef TARGET_PORT
+    /* the host Menu's leading fields (structs/menu.h: cursor .. param), pointers 8 bytes wide */
+    s16 cursor, offsetX, offsetY;
+    u8 _pad6[2];
+    void *block, *items;
+    s32 count;
+    void *desc, *param;
+#else
     char pad0[0x1C];
+#endif
     struct CPlayer *player;   /* structs/player.h */
     PakMenuSlot *slot;
     char *prompt;
