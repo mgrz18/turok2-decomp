@@ -388,6 +388,25 @@ def _dtranslate(d, noff):
     return noff, True
 
 
+# F3DEX2 commands whose w1 is an address: G_VTX, G_MTX, G_MOVEMEM, G_DL, G_RDPHALF_1 (branch),
+# G_SETTIMG, G_SETZIMG, G_SETCIMG (and G_MOVEWORD G_MW_SEGMENT, tested apart).
+GFX_ADDR_OPS = {0x01, 0xDA, 0xDC, 0xDE, 0xE1, 0xFD, 0xFE, 0xFF}
+
+
+def is_gfx(d):
+    """A Gfx (or an array of them): two words that are 4 bytes on the N64 and 8 on the host
+    (gfx.h GfxWord). Static display lists in the ROM hold N64 addresses in w1."""
+    if d is None:
+        return False
+    if d[0] == 'a':
+        d = d[2]
+    if d[0] == 'r' and d[5]:  # a union: its first member
+        d = d[6][0][3] if d[6] else d
+    if d[0] != 'r' or len(d[6]) != 2:
+        return False
+    return all(f[3][0] == 's' and f[3][1] == 4 and f[3][2] == 8 for f in d[6])
+
+
 def shape(d):
     """A description without pointee details (to compare declarations)."""
     t = d[0]
@@ -542,6 +561,8 @@ class Generator:
         self.ext_funcs = set()
         self.int_addr = collections.Counter()  # integer leaves that hold an address
         self.bss_slack = []   # .bss byte views given twice their N64 size
+        self.gfx_syms = []    # display lists (Gfx data)
+        self.gfx_relocs = 0   # their w1 addresses made host pointers
 
     # -- choosing a type --------------------------------------------------
     def pick(self, name, ds):
@@ -645,7 +666,18 @@ class Generator:
         leaves(d, 0, 0, lv)
         img = bytearray(h)
         ptrs = []
+        gfx = is_gfx(d)
+        if gfx:
+            self.gfx_syms.append(s.name)
         for noff, hoff, kind, ns, hs, extra in lv:
+            if kind == 's' and gfx and noff % 8 == 4 and ns == 4:
+                # the w1 of a display-list command that carries an address: a host pointer
+                op = raw[noff - 4]
+                v = int.from_bytes(raw[noff:noff + 4], 'big')
+                if (op in GFX_ADDR_OPS or (op == 0xDB and raw[noff - 3] == 0x06)) and 0x80000000 <= v < 0x80800000:
+                    ptrs.append((hoff, v, None))
+                    self.gfx_relocs += 1
+                    continue
             if kind == 's':
                 v = raw[noff:noff + ns]
                 if len(v) < ns:
@@ -966,6 +998,7 @@ class Generator:
         P('pointer targets generated in addition: %d' % (len(ss) - len(from_c)))
         P('bss (zero) symbols: %d' % sum(1 for s in ss if s.bss))
         P("bss byte views given twice their N64 size (host pointers): %d" % len(self.bss_slack))
+        P("display lists: %d, w1 addresses relocated: %d" % (len(self.gfx_syms), self.gfx_relocs))
         P('aliases inside another symbol: %d' % sum(1 for s in ss if s.alias_of))
         np = sum(1 for s in ss for it in s.items if it[1] == 'P')
         P('pointer slots: %d (relocated %d, null %d, unresolved %d)' % (

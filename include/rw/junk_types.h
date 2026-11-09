@@ -215,8 +215,13 @@ typedef struct ObjInit {
     s32 unk40;
 } ObjInit;
 typedef struct DlCmd {
+#ifdef TARGET_PORT /* a display-list command is two host words (gfx.h GfxWord, docs/port/GBI.md) */
+    __UINTPTR_TYPE__ w0;
+    __UINTPTR_TYPE__ w1;
+#else
     u32 w0;
     u32 w1;
+#endif
 } DlCmd;
 typedef struct B21Vp {
     s16 vscale[4];
