@@ -299,7 +299,8 @@ changing the scheme (section 7).
 | `turok2.o2r` | generated from the user's ROM at first run | **never** |
 | `mods/*.o2r` | user mods; mounted after `turok2.o2r`, so entries with the same path win | user's |
 
-`turok2.o2r` entries:
+`turok2.o2r` entries (sketch; the format as built, with 8-digit names and units stored as
+libultraship Blob resources rather than a custom `T2LU` type, is in [ARCHIVE.md](ARCHIVE.md)):
 
 | path | content |
 |---|---|
@@ -459,8 +460,9 @@ Dependencies: a1 = ROMFS, a2 TEXTURES, a3 MODELS, a4 LEVELS, a5 ANIMATION, a6 AU
    4,885 empty, 334 raw, 41 USet, plus the 3 audio regions (audio window and sound
    data as `VM_Alloc` units, the sample data read piecemeal). `fs.readers(node)`
    gives `[(description, callback, callers)]` (column "readers" in romfs_tree.tsv;
-   ROMFS.md "Load units and their readers"). Still to add for the archive: a
-   `--manifest` writer with (address, ROM size, unpacked size, type, flags).
+   ROMFS.md "Load units and their readers"). The manifest writer is done:
+   `romfs.py --manifest units.tsv|json` (key, ROM size, host size, kind, type, flags,
+   readers; ARCHIVE.md).
 2. **Unpack rule check** (a1, done): every RNC unit has a reader with a callback,
    and every such callback calls `ProPackDecompress` (`Model_Decompress*`,
    `Anim_Decompress`, `Texture_DecompressCallback`, `CScene__Decompress*`,
@@ -471,7 +473,9 @@ Dependencies: a1 = ROMFS, a2 TEXTURES, a3 MODELS, a4 LEVELS, a5 ANIMATION, a6 AU
    type, e.g. `grid section: CISet; child 0: CUSet stride 0x1C {f32 x3, u16, u16, ...}`.
    `tools/assets/swapgen.py` turns them into `port/t2swap.c`. Until a type has
    a table it is `unknown` and logged.
-4. **`mkarchive.py`** (Python, stdlib): writes `turok2.o2r` / the folder
+4. **`mkarchive.py`** (Python, stdlib; done, see [ARCHIVE.md](ARCHIVE.md) for the
+   format as built: units are libultraship Blob resources named `t2/u/XXXXXXXX`, checked by
+   `archive_check.py`): writes `turok2.o2r` / the folder
    tree, `version`, `t2/units`, `t2/types`. Unit tests: unit bytes equal the ROM
    range or its RNC unpack; manifest sizes; no unit outside the asset region
    except the audio window.

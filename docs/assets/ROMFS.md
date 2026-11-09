@@ -9,6 +9,7 @@ python tools/assets/romfs.py baserom.us.z64 --out OUT --coverage   # OUT/romfs_t
 python tools/assets/romfs.py baserom.us.z64 --out OUT --extract    # + OUT/blobs/<path>.bin / .unp.bin
 python tools/assets/propack.py FILE --offset 0x17618BC --out x.bin
 python tools/assets/cache_calls.py baserom.us.z64 --markdown
+python tools/assets/romfs.py baserom.us.z64 --manifest units.tsv   # one row per load unit (ARCHIVE.md)
 ```
 
 ## Summary
@@ -315,6 +316,7 @@ fs.find_rom(addr)               # deepest ROM node containing a ROM address
 fs.load_unit(n) -> (key, size)  # the exact CCache key/size (ISet: header only)
 fs.load_units()                 # all (key, size, node) ROM load units (for a port archive)
 fs.readers(n)                   # [(description, callback, callers)] that request the unit
+fs.manifest()                   # one dict per load unit (key, size, host_size, kind, type, flags, ...)
 fs.audio_ptr(vaddr)             # 0x48xxxx pointer of the audio control block -> ROM
 propack.decompress(buf, off) / propack.maybe_decompress(buf, off, size) / propack.is_rnc
 ```

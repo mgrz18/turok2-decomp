@@ -44,6 +44,9 @@ CLI:
         [--extract] [--coverage]
     writes DIR/romfs_tree.tsv (+ .json), DIR/romfs_types.tsv; --extract writes
     DIR/blobs/<path>.bin (stored) and .unp.bin (decompressed) for ROM leaves.
+    python tools/assets/romfs.py baserom.us.z64 --manifest units.json|units.tsv
+    writes one row per load unit (fs.manifest(); the port archive's table of contents,
+    docs/assets/ARCHIVE.md).
 """
 import fnmatch
 import json
@@ -187,6 +190,42 @@ READERS = {
     "audio wave table": [(None, None, "CLoader__LoadAsync of ALWaveTable ranges (gAudioRomBase)")],
     "sound data file": [(None, None, "VM_Alloc(0x3EA7A0, 0, 0xBE1814) in CAudioWorld__LoadSfxDataFile")],
 }
+
+# Load-unit flags (manifest, archive header; docs/assets/ARCHIVE.md)
+UF_RNC_UNPACKED = 0x001   # stored in the ROM as one RNC stream; archive holds it unpacked
+UF_INDEX_HEADER = 0x002   # header of an index set (count*4+15 & ~7); entries are units of their own
+UF_CONTAINER = 0x004      # raw ISet read whole; its entries are parsed from RAM
+UF_RAW_RANGE = 0x008      # read piecemeal at inner addresses (audio DMA into the wave table)
+UF_VM_WINDOW = 0x010      # VM_Alloc window (TLB-paged in 4 KB pages at inner addresses)
+UF_LOADSYNC = 0x020       # read by CLoader__LoadSync (persistent defaults), not through CCache
+UF_NO_READER = 0x040      # no code reads it (cartridge entry 20, the end marker)
+UF_RNC_CHILDREN = 0x080   # container whose entries are RNC streams (none in the US ROM)
+UNIT_FLAGS = [(UF_RNC_UNPACKED, "RNC_UNPACKED"), (UF_INDEX_HEADER, "INDEX_HEADER"),
+              (UF_CONTAINER, "CONTAINER"), (UF_RAW_RANGE, "RAW_RANGE"), (UF_VM_WINDOW, "VM_WINDOW"),
+              (UF_LOADSYNC, "LOADSYNC"), (UF_NO_READER, "NO_READER"), (UF_RNC_CHILDREN, "RNC_CHILDREN")]
+MANIFEST_FIELDS = ["key", "size", "host_size", "kind", "type", "flags", "flag_names",
+                   "description", "callbacks", "path"]
+
+
+def manifest_tsv(rows):
+    """Manifest rows as TSV text (one line per unit, hex numbers)."""
+    out = ["\t".join(MANIFEST_FIELDS) + "\n"]
+    for r in rows:
+        out.append("\t".join(["%08X" % r["key"], "0x%X" % r["size"], "0x%X" % r["host_size"], r["kind"],
+                              r["type"], "0x%03X" % r["flags"], ",".join(r["flag_names"]),
+                              r["description"], r["callbacks"], r["path"]]) + "\n")
+    return "".join(out)
+
+
+def write_manifest(rows, path):
+    """rows -> path (.json: list of objects; anything else: TSV)."""
+    with open(path, "w") as f:
+        if path.endswith(".json"):
+            json.dump(rows, f, indent=0)
+            f.write("\n")
+        else:
+            f.write(manifest_tsv(rows))
+
 
 for _k, _v in CART_NAMES.items():
     if not any(p == "cart/%d" % _k for p, _, _ in SCHEMA):
@@ -444,6 +483,47 @@ class RomFS:
         (empty for nodes not read on their own: sub-entries of a loaded block)."""
         return READERS.get(n.type, [])
 
+    # -------- manifest (one row per load unit; what the port archive is built from)
+    def unit_info(self, key, size, n):
+        """Manifest row of one load unit (see docs/assets/ARCHIVE.md for the fields)."""
+        flags = 0
+        if n.rom != key:
+            raise ValueError("unit key 0x%X is not its node's ROM address" % key)
+        if n.path in ("audioctl", "audiotbl", "sound"):
+            kind = "audio-region"
+            flags |= UF_RAW_RANGE if n.path == "audiotbl" else UF_VM_WINDOW
+        elif n.kind == "rnc":
+            kind = "rnc%d" % n.method
+            flags |= UF_RNC_UNPACKED
+        else:
+            kind = n.kind
+        if kind == "audio-region":
+            pass
+        elif self._is_index(n):
+            flags |= UF_INDEX_HEADER
+        elif n.kind == "iset" and kind != "audio-region":
+            flags |= UF_CONTAINER
+            if any(c.kind == "rnc" for c in self.walk(n) if c is not n):
+                flags |= UF_RNC_CHILDREN
+        rd = self.readers(n)
+        if not rd:
+            flags |= UF_NO_READER
+        if n.type in ("load/save persistent bit sections", "game persistent bit sections"):
+            flags |= UF_LOADSYNC
+        descs = sorted({d for d, _, _ in rd if d}) or sorted({c for _, _, c in rd if c})
+        cbs = sorted({c for _, c, _ in rd if c})
+        return {
+            "key": key, "size": size,
+            "host_size": n.unpacked_size if n.compressed else size,
+            "kind": kind, "type": n.type, "flags": flags,
+            "flag_names": [nm for bit, nm in UNIT_FLAGS if flags & bit],
+            "description": "; ".join(descs), "callbacks": "; ".join(cbs), "path": n.path,
+        }
+
+    def manifest(self):
+        """Manifest rows of every load unit, sorted by ROM key."""
+        return sorted((self.unit_info(k, s, n) for k, s, n in self.load_units()), key=lambda r: r["key"])
+
     # -------- convenience
     _COLL = {"objects": "cart/0", "texture_sets": "cart/3", "levels": "cart/5",
              "graphicsets": "cart/16", "cinemas": "cart/18", "sound": "sound"}
@@ -511,13 +591,23 @@ def main(argv=None):
     import argparse
     ap = argparse.ArgumentParser(description="Turok 2 ROM filesystem walker")
     ap.add_argument("rom")
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--out", help="directory for romfs_tree.tsv/.json (and --extract / --coverage output)")
+    ap.add_argument("--manifest", metavar="OUT.json|OUT.tsv",
+                    help="write one row per load unit (key, size, host size, kind, type, flags, readers)")
     ap.add_argument("--depth", type=int, default=None)
     ap.add_argument("--decompress", action="store_true", help="also walk inside RNC blobs (slow)")
     ap.add_argument("--extract", action="store_true", help="write stored + decompressed ROM leaves")
     ap.add_argument("--coverage", action="store_true")
     a = ap.parse_args(argv)
+    if not a.out and not a.manifest:
+        ap.error("give --out and/or --manifest")
     fs = RomFS(a.rom)
+    if a.manifest:
+        rows = fs.manifest()
+        write_manifest(rows, a.manifest)
+        print("%d load units -> %s" % (len(rows), a.manifest))
+        if not a.out:
+            return
     os.makedirs(a.out, exist_ok=True)
     rows = []
     with open(os.path.join(a.out, "romfs_tree.tsv"), "w") as f:
