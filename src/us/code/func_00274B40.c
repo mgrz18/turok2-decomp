@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "globals/audio.h"
+#include "protos/iset.h"
 extern void alCSPSetBank(s32 arg0, s32 arg1);
 extern void alCSPSetSeq(s32 arg0, s32 arg1);
 extern void alCSPSetVol(s32 arg0, s16 arg1);
@@ -60,7 +61,6 @@ extern void alCSPPlay(s32);
 extern int alCSPGetState(void *object);
 struct Track;
 extern void alCSPSetChlFXMix(s32 arg0, s32 arg1, s8 arg2);
-void *CISet__GetBlock(void *table, s32 index);
 extern s32 BinarySearch(s32,s32,s32);
 extern f32 HalfToFloat(u16);
 extern void alCSeqNew(s32, void *);

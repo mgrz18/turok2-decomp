@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/pager.h"
 #include "globals/pager.h"
+#include "protos/ultra.h"
 
 typedef struct {
     u8 pad0[0x4];
@@ -10,7 +11,6 @@ typedef struct {
     void *mq;            /* 0x0C reply queue */
 } RegionDesc;
 
-s32 osSendMesg(void *mq, void *msg, s32 flag);
 
 
 void VM_AllocRegion(RegionDesc *desc) {

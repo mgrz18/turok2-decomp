@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 f32 Random_Blend(f32 lo, f32 hi);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-void CAI__SetMode(CGameObjectInstance *self, CAI *ai, s32 mode);
 
 void EnemySwim_FleeEnter(CGameObjectInstance *self, CAI *ai) {
     CEnemyIntelligence *params;

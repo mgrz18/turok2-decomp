@@ -5,10 +5,9 @@
 #include "globals/frame.h"
 #include "globals/render.h"
 #include "globals/engine.h"
+#include "protos/ultra.h"
 
-extern s32 osSendMesg(void *queue, void *msg, s32 flags);
 
-extern u64 osGetTime(void);     /* osGetTime */
 extern void CCache__BeginDisplayList(s32, s32, CFrameData *);
 extern void Texture_InvalidateCache(void);
 extern void func_0020B554(void);

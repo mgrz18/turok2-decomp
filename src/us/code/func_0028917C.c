@@ -4,10 +4,10 @@
 #include "globals/pak.h"
 #include "globals/engine.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 s32 Controller_UnwatchAllPaks();                            /* extern */
 s32 CEngineApp__SetupFadeTo(CEngineApp *, s32);                /* extern */
-s32 MenuPool_OpenMenu(void *, struct MenuDesc *, s32, ControllerProfile *, s32); /* extern */
 
 void EngineMode00_PakCheck_Retrace(CEngineApp *app) {
     if (gPakCheckStarted != 0) {

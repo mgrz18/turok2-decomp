@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 typedef struct B01Info {
     u32 flags;
     s32 unk4;
@@ -12,7 +13,6 @@ typedef struct B01Info {
     s16 unk14;
     s16 unk16;
 } B01Info;
-void CAI__SetMode(CGameObjectInstance *actor, CAI *state, s32 event);
 void Generator_WaitUpdate(CGameObjectInstance *actor, CAI *state) {
     B01Info *info = ((B01Info *)((u8 *)(actor->header.m_pIntelligence) + 0x14));
     if (info->unk4 == 0) {

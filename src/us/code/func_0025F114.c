@@ -1,13 +1,13 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/ai.h"
+#include "protos/ai.h"
 
 /* The point turned to is passed as its three floats; .y and .z go through the
  * interior symbols gEnemyAlertPoint_y/_z (the member path shares one base register
  * and does not match). */
 
 f32 AI_AngleToPoint(CGameObjectInstance *self, f32 x, f32 y, f32 z); /* angle to a point (a CVector3 by value) */
-void AI_TurnClamped(CGameObjectInstance *self, CAI *ai, f32 rate, f32 angle);
 void EnemyMode_Move_Update(CGameObjectInstance *self, CAI *ai);
 
 /* Like EnemyAI_GetModeTurnRate: the turn rate, pi/3 in modes 1-2, else pi/12. */

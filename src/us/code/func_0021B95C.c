@@ -6,6 +6,7 @@
 #include "structs/vector.h"
 #include "structs/region.h"
 #include "globals/object.h"
+#include "protos/iset.h"
 
 /* A bone's track references: -1 means "use the default frame". */
 typedef struct JointRef {
@@ -90,7 +91,6 @@ struct PoseContext {
     /* 0x90 */ s32 bone;
 };
 
-void *CISet__GetBlock(void *file, s32 index);
 void CMtxF__MultiplyAffine(f32 (*out)[4], f32 (*a)[4], f32 (*b)[4]);
 void CQuaternion__Slerp(CQuaternion *out, f32 amount, CQuaternion *a, CQuaternion *b);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);

@@ -5,6 +5,7 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/cache.h"
 
 /* Draws a simple object: rebuilds its matrix for this frame's slot once per
  * frame (from a fixed rotation for type 8, else its yaw), then draws its
@@ -22,7 +23,6 @@ void CMtxF__SwapYZRows(f32 *);
 void CMtxF__ToMtxAffine(f32 *, f32 *);
 void Model_AdvanceMorph(s32 *, f32);
 void Render_QueueModelInstance(s32 *, f32 *, s32, void *, s32, s32, s32);
-void CCache__Unlock(s32, void *);
 s32 CScene__GetObjectTypeID(void *, s32);
 s32 *CISet__GetBlock(s32, s32);
 

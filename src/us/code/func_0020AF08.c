@@ -5,10 +5,10 @@
 #include "gbi_t2.h"
 #include "structs/frame.h"
 #include "globals/render.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
 
-void *CISet__GetBlock(void *resource, s32 index);
-void CCache__LockForDisplayList(s32 unused, void **resource);
 
 /* Draws one level of detail of a model resource flat-shaded in the primitive colour with the given
  * alpha, when the frame's command buffer still has 3000 commands free: loads the matrix (or sets it

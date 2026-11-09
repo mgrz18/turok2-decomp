@@ -7,6 +7,7 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "globals/boss.h"
+#include "protos/player.h"
 
 /* Boss fight AI tick: runs the fight phase (timer and helpers, then the
  * random stun of a live helper), and once the boss has waited long enough
@@ -18,7 +19,6 @@ extern f32 Random_Float(f32 range);
 extern void Actor_SpawnParticle(CListedInstance *actor, s32 sound, CVector3 pos, s32 arg);
 extern void DamageEvent_Set(void *out, s32 a, s32 b, f32 c, s32 d, s32 e);
 extern void EnemyAI_OnDamage(CListedInstance *actor, void *ai, void *anim);
-extern CPlayer *CPlayerPool__GetFirstActive(void *players);
 extern void CPlayer__Warp(CPlayer *player, s32 track, s32 a, s32 b);
 
 static __inline__ s32 helperAlive(void) {

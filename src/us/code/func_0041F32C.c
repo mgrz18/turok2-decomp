@@ -7,6 +7,7 @@
 #include "globals/pak.h"
 #include "structs/save.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 void *memset(void *s, int c, u32 n);
 typedef struct K7Sub { u8 pad0[4]; s8 b4; } K7Sub;
@@ -36,7 +37,6 @@ void CCache__Flush();
 void CCache__Deallocate();
 K7Mem *CCache__Allocate();
 void *memset();
-void MenuPool_OpenMenu();
 /* Game code / company code check on the controller-pak note (inlined). */
 static __inline__ s32 k7_chk(u8 *gc, u8 *cc) {
     if (Str_Length(gc) == 4 && Str_Length(cc) == 2 &&

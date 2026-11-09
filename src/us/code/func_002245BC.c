@@ -4,11 +4,11 @@
 #include "structs/game_object.h"
 #include "common.h"
 #include "structs/world.h"
+#include "protos/iset.h"
+#include "protos/scene.h"
 
 /* Turok 2 level actor: 0x288 bytes (0x2E8 in Rage Wars). */
 
-void *CISet__GetBlock(void *table, s32 index);
-extern void CISet__GetBlockSize(s32 arg0, s32 arg1);
 
 void CScene__SetInstanceSavedBitInLevel(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
     void *entry;

@@ -3,8 +3,9 @@
 
 #include "common.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
+#include "protos/ultra.h"
 
-extern void osSendMesg(OSMesgQueue *queue, OSMesg msg, s32 flags);
 
 /* Display list dlist is done: wakes CCache__WaitForDisplayLists if it waits
  * for it and clears the list's lock bit on every CMemEntry. */

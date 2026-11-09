@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "protos/player.h"
 
 
-s32 CPlayer__SetState(CPlayer *player, CGameObjectInstance *actor, s32 state);
 
 static __inline__ s32 func_0024E88C_isSpecial(CPlayer *player) {
     if (player->m_Mode == 18 || player->m_Mode == 16 || player->m_Mode == 17) {

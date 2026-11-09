@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/ultra.h"
 
-extern unsigned int osVirtualToPhysical(void *);
 Acmd *alResamplePull(ALResampler *filter, s16 *outp, s32 outCnt, s32 sampleOffset, Acmd *p)
 {
     ALResampler *f = filter;

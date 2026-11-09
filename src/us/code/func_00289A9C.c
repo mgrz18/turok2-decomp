@@ -5,16 +5,16 @@
 #include "globals/scene.h"
 #include "globals/render.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
+#include "protos/player.h"
 
 s32 Cinema_RequestById(s32);
-s32 CScene__RequestWarp(s32, s32, s32);
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x9F0];
     /* 0x9F0 */ s32 unk9F0;
 } Unk002532A8;
 
-void *CPlayerPool__GetFirstActive(CPlayerPool *);                     /* extern */
 s32 CEngineApp__StartWarp(s32, s32);                /* extern */
 
 void EngineMode15_Ending_Init(s32 arg0) {

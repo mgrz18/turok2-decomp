@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4C];
@@ -14,7 +15,6 @@ typedef struct {
 } Arg3;
 
 f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
-void AI_TurnClamped(CGameObjectInstance *self, CAI *ai, f32 angle, f32 arg3);
 
 void EnemySwim_SteerToPath(CGameObjectInstance *self, CAI *ai, Arg2 *a2, Arg3 *a3) {
     self->m_vVelocity.y = Math_StepClamped(self->m_vVelocity.y, a2->unk60, a3->unk18 * 2.0f);

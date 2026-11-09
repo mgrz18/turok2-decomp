@@ -5,12 +5,13 @@
 #include "gbi_t2.h"
 #include "structs/frame.h"
 #include "globals/render.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
+#include "protos/game.h"
 
 
 
 
-void *CISet__GetBlock(void *resource, s32 index);
-void CCache__LockForDisplayList(s32 unused, void **resource);
 s32 Render_SetupMaterial(void *material, s32 pass);
 
 /* Draws one level of detail of a model resource when the frame's command buffer still has 3000

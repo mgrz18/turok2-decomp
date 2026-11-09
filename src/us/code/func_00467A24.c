@@ -1,8 +1,8 @@
 /* Second VM module copy of CPlayer__StopLoopingSounds (same source, linked 0x0042EA24). */
 #include "common.h"
 #include "structs/player.h"
+#include "protos/game.h"
 
-extern void *LoopSounds_Get(void);
 extern void LoopSounds_Stop(void *pool, s32 sound);
 
 /* Stops the player's two looping sounds. */

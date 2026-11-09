@@ -1,6 +1,7 @@
 #include "common.h"
 #include "globals/scene.h"
 #include "structs/region.h"
+#include "protos/scene.h"
 
 /* Resource entry: a key, its flags and three child entries. */
 typedef struct Entry0026C5C4 {
@@ -12,7 +13,6 @@ typedef struct Entry0026C5C4 {
     /* 0x18 */ struct Entry0026C5C4 *child2;
 } Entry0026C5C4;
 
-CRegionInfo *CScene__GetRegionInfo(CScene *, s32);
 
 s32 CGameRegion__FloodSetWaterSame(s32, s32);                    /* extern */
 

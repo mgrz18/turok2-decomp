@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
 /* AI state: bob towards the target height on a sine wave, the vertical speed
  * eased and clamped; once level with it, switch to state 0x3C. */
@@ -9,7 +10,6 @@ void EnemyMode_DeathMelt_Update(CGameObjectInstance *self, CAI *ai);
 void AI_UpdateTargets(CGameObjectInstance *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
 f32 func_002982F0(f32 x); /* sinf */
 f32 Math_Approach(f32 cur, f32 target, f32 rate);
-void CAI__SetMode(CGameObjectInstance *self, CAI *ai, s32 mode);
 
 void EnemyAI_BobToTargetHeight(CGameObjectInstance *self, CAI *ai) {
     CAITargets t;

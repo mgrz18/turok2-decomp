@@ -3,8 +3,8 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 void MotherBoss_OnIntroCinemaDone_2(void) {
     CAI__SetMode(gMotherBoss.obj, &gMotherBoss.obj->m_AI, 1);

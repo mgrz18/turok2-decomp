@@ -2,12 +2,12 @@
 #include "structs/demo.h"
 #include "globals/frame.h"
 #include "globals/demo.h"
+#include "protos/cache.h"
 
 
 /* At gDemoPlayer + 0x194. */
 /* The ROM reaches these two through their own symbols, not gDemoPlayer. */
 
-void CCache__SetFrameDelay(s32);
 
 static __inline__ s32 Demo_GetPlayerCount(void) {
     DemoPlayer *state = &gDemoPlayer;

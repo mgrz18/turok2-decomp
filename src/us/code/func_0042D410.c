@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/list.h"
+#include "protos/list.h"
 
 typedef struct World {
     /* 0x0000 */ u8 pad0[0x2580];
@@ -19,8 +20,6 @@ typedef struct World {
 extern void NodePool_Init(void *pool, void *items, s32 size, s32 count);
 extern void func_0026D230(void *list);
 extern void DList_AddTail(void *list, void *node);
-extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
-extern s32 CList__AddTail(CList *list, void *node);
 extern void SwooshSystem_Update(World *world);
 
 void func_0042D410(World *world) {

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
+#include "protos/player.h"
 
-s32 CPlayer__SetState(void *, s32, s32);    /* extern */
 s32 CPlayer__UpdateRiding();                            /* extern */
 
 void PlayerRideIdle_Update(CPlayer *arg0, s32 arg1) {

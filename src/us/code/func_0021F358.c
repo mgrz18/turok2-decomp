@@ -3,9 +3,8 @@
  * shares a string only within a file), the file's whole .rodata. */
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/cache.h"
 
-s32 CCache__Request(s32, s32, s32, s32, s32, void *, void *, s32); /* resource load */
-void CCache__Unlock(s32, s32);
 void Model_TouchTextures(s32);
 extern void Model_DecompressCallbackExtra(void);
 

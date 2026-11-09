@@ -2,12 +2,12 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/list.h"
 
-extern void CList__RemoveTail(CList *arg0);
 void CList__RemoveTail(CList *arg0) {
     char *cursor = arg0->m_pTail;
     int stride = arg0->m_LastOffset;
-    int value = *(int *)(cursor + stride);
+    void *value = *(void **)(cursor + stride);
     int count = arg0->m_nCount - 1;
     arg0->m_nCount = count;
     arg0->m_pTail = value;

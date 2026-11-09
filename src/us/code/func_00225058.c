@@ -4,6 +4,7 @@
 #include "structs/game_object.h"
 #include "common.h"
 #include "structs/world.h"
+#include "protos/scene.h"
 
 /* Turok 2 layouts (Rage Wars offsets in comments). */
 

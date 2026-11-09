@@ -2,14 +2,12 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/ultra.h"
 
 extern s32 __osSiRawStartDma(s32, s32);
 extern int __osSiDeviceBusy();
 extern void __assert(void *arg0, void *arg1, s32 arg2);
 extern int __osSiDeviceBusy(void);
-extern void osWritebackDCache(s32 arg0, s32 arg1);
-extern s32 osVirtualToPhysical(s32);
-extern void osInvalDCache(s32 arg0, s32 arg1);
 extern s32 D_800AA890;
 extern s32 D_800AA894;
 s32 __osSiRawStartDma(s32 arg0, s32 arg1) {

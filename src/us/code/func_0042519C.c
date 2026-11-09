@@ -1,9 +1,9 @@
 #include "common.h"
 #include "globals/menu.h"
+#include "protos/game.h"
 
 void Music_RestoreVolume(void);
 void LoopSounds_Resume(s32);
-s32 LoopSounds_Get(void);
 void Controller_ResetAllRumble(void);
 void Controller_SetRumbleOptionAll(s32);
 void MenuItem_SelectSubmenu(s32, s32, s32);

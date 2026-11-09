@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
 #include "structs/sound.h"
+#include "protos/list.h"
 
 /* The free list at 0, the used list at 0x14. */
 typedef struct {
@@ -8,8 +9,6 @@ typedef struct {
     /* 0x14 */ CList m_Used;
 } SoundSlotPool;
 
-s32 CList__AddTail(void *, void *);              /* extern */
-s32 CList__Remove(void *, void *);              /* extern */
 s32 Sound__Stop(s32);                         /* extern */
 
 void LoopSounds_StopAll(SoundSlotPool *arg0) {

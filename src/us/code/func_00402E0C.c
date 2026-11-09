@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
-s32 AI_PlayAnim(s32, s32, s32);           /* extern */
 extern s32 gMantidQueen_boss; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void MantidQueen_EnterMode5(CGameObjectInstance *arg0) {

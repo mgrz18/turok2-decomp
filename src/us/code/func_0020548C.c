@@ -3,11 +3,11 @@
 
 #include "rw/junk_types.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
+#include "protos/ultra.h"
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern B12Mgr D_800D7BE0;
 void CCache__BeginDisplayList(s32 unused, s32 idx) {
     u32 mask;

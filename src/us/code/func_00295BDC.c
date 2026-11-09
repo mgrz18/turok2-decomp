@@ -3,12 +3,12 @@
 
 #include "rw/abu_types.h"
 #include "globals/libaudio.h"
+#include "protos/ultra.h"
 
 extern s16 _getRate(f64 vol, f64 tgt, s32 count, u16 *ratel);
 extern char D_800AA540[];
 extern char D_800AA544[];
 extern void __assert(const char *, const char *, s32);
-extern unsigned int osVirtualToPhysical(void *);
 Acmd *_pullSubFrame(void *filter, s16 *inp, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
 {
     Acmd *ptr = p;

@@ -2,10 +2,10 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MULTI/8043E9A8_4.CPP, func_8043EBE4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern void MenuPool_OpenChildMenu(void *, void *, void *);
 
 s32 TitleMenu_Multi(void *first, void *second, void *third) {
     GameSettings *options = &gEngineApp_m_Settings;

@@ -1,7 +1,7 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/OVLGAME/80405454_4.CPP, func_80405CDC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
+#include "protos/cache.h"
 struct RecordRecAt1C;
 struct RecordRecAt1C;
 struct RecordRecAt1C {
@@ -13,7 +13,6 @@ struct RecordRecAt1C {
     s32 e;
 };
 struct RecordRecAt1C;
-extern void CCache__Deallocate(void *arg0, void *arg1);
 extern void GfxPool_Free(struct RecordRecAt1C *arg0);
 void GfxPool_Free(struct RecordRecAt1C *arg0) {
     s32 temp_a1;

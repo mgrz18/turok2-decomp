@@ -2,9 +2,9 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 extern f32 Random_Blend(f32 lo, f32 hi);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 void Primagen_UpdateMode5(CGameObjectInstance *obj, CAI *ai) {
     if (ai->m_AnimRepeatedCount != 0) {

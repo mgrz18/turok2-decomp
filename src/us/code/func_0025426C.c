@@ -2,8 +2,8 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-s32 CScene__SetInstanceObjectType(s32 *, void *, u16, s32); /* extern */
 
 
 void CPlayer__LoadWeaponModel(CPlayer *arg0) {

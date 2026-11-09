@@ -4,8 +4,8 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
-extern s32 CPlayerPool__GetIndex(void *players, void *player);
 
 /* Name entry: delete the last character. */
 s32 NameEntryMenu_DeleteChar(s32 menu, Menu *c) {

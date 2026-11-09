@@ -6,12 +6,12 @@
 #include "structs/frame.h"
 #include "globals/scene.h"
 #include "globals/render.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
 
 
 
-void *CISet__GetBlock(void *resource, s32 index);
-void CCache__LockForDisplayList(s32 unused, void **resource);
 s32 Render_SetupMaterial(void *material, s32 pass);
 void Render_SetCombineMode(s32 blend);
 

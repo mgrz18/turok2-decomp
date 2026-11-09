@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
-extern void osYieldThread();
 s32 __osEnqueueAndYield(s32 *, s32);
 void osYieldThread(void)
 {

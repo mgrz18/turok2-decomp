@@ -1,5 +1,6 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* Picks the death animation for an AI actor (modes 0x33/0x34): a special one
  * when the region under it is flagged, then the explosive, violent, moving or
@@ -29,7 +30,6 @@ typedef struct {
     /* 0x52 */ u16 flags2;
 } TargetInfo;
 
-TargetInfo *CScene__GetRegionInfo(void *, s32);
 s32 CGameObjectInstance__PickRandomAnim(void *, s32, s32);
 s32 EnemyAnim_NormalDeath_B0120(void *, void *);
 s32 EnemyAnim_NormalDeath_B0150(void *, void *);

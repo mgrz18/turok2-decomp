@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 /* Flying AI steering, scaled by speed: like EnemyFly_SteerToPath, but the pitch and
  * roll ease faster when they have to swing to the other side. */
@@ -7,7 +8,6 @@
 s32 EnemyAI_GetBehaviorIndex(CGameObjectInstance *self, void *ai);
 f32 Math_StepClamped(f32 value, f32 target, f32 step);
 f32 Math_Approach(f32 cur, f32 target, f32 rate);
-void AI_TurnClamped(CGameObjectInstance *self, CAI *ai, f32 angle, f32 turn);
 
 void EnemyFly_SteerToPathScaled(CGameObjectInstance *self, CAI *ai, CAITargets *steer, CAIFrameMotion *limits, f32 speed, f32 turnRate) {
     f32 v;

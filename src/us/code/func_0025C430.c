@@ -5,13 +5,13 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "globals/ai.h"
+#include "protos/ai.h"
 
 /* AI attack-wait callback: state 0 counts the delay down; once it has run out
  * (more than 30 frames left means an attack is due) it plays the attack
  * animation for the current mode if the definition allows it. State 1 counts
  * the cool-down and re-picks a region. */
 
-extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
 extern s16 func_002261A8(void *level, s32 id, CVector3 *pos);
 
 static __inline__ s32 canAttack(CAI *ai, CEnemyIntelligence *info, s32 state) {

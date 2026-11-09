@@ -10,18 +10,18 @@
 #include "globals/scene.h"
 #include "structs/game.h"
 #include "globals/menu_desc.h"
+#include "protos/scene.h"
+#include "protos/menu.h"
+#include "protos/game.h"
 
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
 void Controller_ResetRumble(ControllerProfile *a);
-void Controller_SetRumbleOption(ControllerProfile *a, s32 b);
 void Controller_UnwatchPak(s32 a);
 s32 Controller_TakePakChanged(s32 a);
 void Pak_ProbeSlot(s32 a);
 s32 Pak_GetStatus(s32 a);
-void CScene__RequestWarp(u8 *a, s32 b, s32 c);
 void func_004303AC(u8 *a);
-void MenuPool_OpenMenu(u8 *a, void *b, CPlayer *c, ControllerProfile *d, s32 e);
 
 s32 PakMessage_SelectOk(s32 a0, Menu *o) {
     s32 s0, s1, v;

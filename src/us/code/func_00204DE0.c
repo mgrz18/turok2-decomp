@@ -1,9 +1,8 @@
 #include "common.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
+#include "protos/ultra.h"
 
-void CCache__Compact(s32 unused, s32 all);
-s32 osRecvMesg(OSMesgQueue *queue, OSMesg *msg, s32 flags);
-s32 osSendMesg(OSMesgQueue *queue, OSMesg msg, s32 flags);
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 

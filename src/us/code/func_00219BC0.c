@@ -7,13 +7,13 @@
 #include "globals/render.h"
 #include "globals/player.h"
 #include "globals/object.h"
+#include "protos/scene.h"
+#include "protos/game.h"
 
-s32 CScene__FindObjectType(CScene *, s32);
 CQuaternion GameObject_GetGroundRotation(CGameObjectInstance *);
 void CAnimationState__Reset(CAnimationState *);
 void CGameObjectInstance__RequestAnim(CGameObjectInstance *, s32);
 void CMtxF__Identity(CMtxF *);
-f32 GameObject_GetRegionFloorHeight(CGameObjectInstance *, s32);
 void CAI__Setup(CGameObjectInstance *, CAI *, void *);
 void CPathTrack__StartAtNearestPoint(void *, s32, CVector3 *);
 void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, s32);

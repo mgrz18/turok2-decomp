@@ -8,6 +8,9 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "globals/menu_desc.h"
+#include "protos/list.h"
+#include "protos/ai.h"
+#include "protos/menu.h"
 
 typedef struct {
     /* 0x00 */ CPlayer *head;
@@ -60,16 +63,12 @@ s32 MenuPool_CountOpen(Globals *g);
 void Music_DuckVolume(void);
 void Sound__StopAllExcept(s32);
 void Sound__DisableAmbientTrack(void);
-void MenuPool_OpenMenu(void *pool, void *screen, CPlayer *p, ControllerProfile *c, s32);
 s32 Level_GetHub(s32 level);
 s32 Cinema_PathPlaying(void);
 s32 Cinema_GetScriptId(void);
 s32 Cinema_IsFinished(void);
 void CPlayer__NewGame(CPlayer *p, s32 character, s32);
-void CAI__SetMode(void *actor, void *ai, s32 mode);
 void CPlayer__Warp(CPlayer *p, s32, s32, s32);
-void CList__Remove(void *list, void *node);
-void CList__AddHead(void *list, void *node);
 void CCameraPool__FreeCamera(void *pool, CCamera *cam);
 void CPlayerPool__UpdateMatchClock(PlayerList *list);
 void CPlayerPool__PickTagIt(PlayerList *list);

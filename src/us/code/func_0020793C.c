@@ -1,6 +1,6 @@
 #include "common.h"
+#include "protos/cache.h"
 
-s32 CCache__Request(s32, s32, s32, s32, s32, s32 *, s32 *, s32); /* extern */
 extern s32 Texture_DecompressCallback;
 extern s32 D_800A51F0;
 

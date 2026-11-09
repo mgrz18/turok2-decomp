@@ -2,11 +2,11 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/player.h"
+#include "protos/player.h"
 
 extern void Math_EaseToward(f32 *value, f32 target, f32 rate);
 extern void CPlayer__TurnAndLook(void *, void *, void *);
 extern void CPlayer__MoveOnFoot(void *, void *, void *);
-extern s32 CPlayer__SetState(void *, void *, s32);
 extern s32 GameObject_IsOnGround(void *body);
 extern f32 GameObject_GetGroundHeight(void *body, s32 arg);
 

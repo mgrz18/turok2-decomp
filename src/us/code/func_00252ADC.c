@@ -3,9 +3,9 @@
 #include "structs/game_object.h"
 #include "globals/game.h"
 #include "globals/engine.h"
+#include "protos/game.h"
 
 extern s32 Cinema_PathPlaying(void);
-extern void *LoopSounds_Get(void);
 extern void LoopSounds_Stop(void *mgr, void *sound);
 extern void func_0021F1B4(CGameObjectInstance *obj);
 extern void CGameObjectInstance__UpdateAnimation(CGameObjectInstance *obj);

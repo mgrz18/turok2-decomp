@@ -2,6 +2,7 @@
 #include "structs/camera.h"
 #include "globals/render.h"
 #include "globals/engine.h"
+#include "protos/list.h"
 
 s32 Cinema_PathPlaying(void);
 void CCameraPool__AdvanceCinemaText(CCameraPool *pool, CCamera *cam);
@@ -9,8 +10,6 @@ void COnScreen__BeginText(void);
 void COnScreen__SelectSmallFont(void);
 void COnScreen__DrawString(char *string, s32 x, s32 y, s32 alpha, s32 arg4, s32 arg5, f32 scaleX, f32 scaleY);
 f32 func_002982F0(f32 x);       /* sine */
-void CList__Remove(CList *list, void *element);
-void CList__AddHead(CList *list, void *element);
 
 /* A camera's on-screen texts, each frame (outside a cinema path; there
  * CCameraPool__AdvanceCinemaText does it): stacked upwards from 80% down the camera's

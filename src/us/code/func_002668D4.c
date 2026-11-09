@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
 s32 CGameObjectInstance__AdvanceAnimation(s32);
-s32 CScene__SetInstanceSavedBit(s32, s32, s32);
-s32 AI_PlayAnim(s32, s32, s32);
 
 /* The mode parameter this AI callback is handed: only the field it reads. */
 typedef struct AIModeParam {

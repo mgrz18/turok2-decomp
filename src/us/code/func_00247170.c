@@ -3,6 +3,7 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
 
 /* The scope model raised to the view. */
 typedef struct {
@@ -23,8 +24,6 @@ typedef struct {
     /* 0xB8 */ f32 time;
 } HudModel; /* size 0xBC */
 
-s32 CScene__FindObjectType(void *level, s32 id);
-void *CScene__GetObject(void *level, s32 index);
 
 /* Places the scope model and animates it up (state 1) or down (state 3)
  * over 3.75 frames: the sniper scope (0xC83) swings in from the side, the

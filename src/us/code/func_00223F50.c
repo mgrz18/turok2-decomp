@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/world.h"
+#include "protos/scene.h"
 
 void CISet__GetBlock(s32);                            /* extern */
 

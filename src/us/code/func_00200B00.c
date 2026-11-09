@@ -2,10 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/cache.h"
 
-void CCache__DeallocAndReplaceCompressedData(s32, void **, void *);
-void * CCache__AllocateMemoryForDecompression(s32, void *, s32);
-void * CCache__AllocateMemoryForDecompressionTop(s32, s32, s32);
 extern void *func_0029E460(void *destination, const void *source, int count);
 s32 RNC_UnpackMethod1();
 s32 RNC_UnpackMethod2();

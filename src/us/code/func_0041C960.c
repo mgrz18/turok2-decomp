@@ -2,6 +2,8 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
+#include "protos/player.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0xA50];
@@ -13,8 +15,6 @@ typedef struct {
     /* 0x1C */ C960Player *player;
 } C960Arg;
 
-extern s32 CPlayerPool__GetIndex(void *players, C960Player *player);
-extern void MenuPool_OpenMenu(void *pool, void *screen, C960Player *p, void *controller, s32);
 extern void func_00421250(void);
 
 s32 StatsMenu_SaveProfile(s32 arg0, C960Arg *arg1) {

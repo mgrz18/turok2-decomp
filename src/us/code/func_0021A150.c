@@ -1,4 +1,6 @@
 #include "common.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
 /* Bind an actor to its model and animation set, then choose its first
  * animation: `anim` > 0 is an action to pick at random (CGameObjectInstance__PickRandomAnim),
@@ -38,11 +40,6 @@ struct Actor {
 
 extern u8 D_800A5AC4[];     /* "anim object info" */
 
-s32 *CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
-s32 CISet__GetROMAddress(s32, s32, u16);
-s32 CISet__GetROMAddressAndSize(s32, s32, s32, s32 *);
-void *CISet__GetBlock(s32, s32);
-void CCache__Unlock(s32, s32 *);
 void CMtxF__TransformBox(void *, void *, void *);
 void CAnimationState__Reset(void *);
 s32 CGameObjectInstance__PickRandomAnim(Actor *, s32, s32);

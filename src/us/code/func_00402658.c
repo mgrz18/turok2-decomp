@@ -3,6 +3,7 @@
 #include "structs/vector.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x40];
@@ -10,9 +11,7 @@ typedef struct {
 
 extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void AI_ComputeFrameMotion(CGameObjectInstance *actor, CAI *ai, Path *path);
-extern void AI_TurnClamped(CGameObjectInstance *actor, CAI *ai, f32 angle, f32 dist);
 extern s32 AI_IsAimedAt(CGameObjectInstance *actor, CAI *ai, s32 visible, f32 angle);
-extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
 extern f32 func_00298470(f32); /* sqrtf */
 
 void MantidQueen_ChooseAttack(CGameObjectInstance *actor, CAI *ai) {

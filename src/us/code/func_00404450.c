@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
-void CAI__SetMode(s32 a0, s32 a1, s32 a2);
 void Primagen_SetStage(s32 mode);
 
 void Primagen_UpdateHealth(s32 a0, s32 a1) {

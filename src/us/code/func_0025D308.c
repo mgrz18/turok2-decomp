@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
+#include "protos/ai.h"
 
 /* AI dodge check: if the definition enables dodging for the current mode,
  * dodges with a probability that grows with the AI's skill (0..255), to the
@@ -8,7 +9,6 @@
 
 extern s32 Random_Next(void);
 extern s32 AI_IsAimedAt(CGameObjectInstance *actor, CAI *ai, s32 threat, f32 angle);
-extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
 
 void EnemyAI_TryDodge(CGameObjectInstance *actor, CAI *ai) {
     f32 skill;

@@ -5,6 +5,8 @@
 #include "globals/scene.h"
 #include "globals/collision.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
+#include "protos/game.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
@@ -12,14 +14,12 @@ extern CCollisionInfo D_800F1E10;
 extern CCollisionInfo D_800F1CC0;
 extern CCollisionInfo D_800F1C60;
 
-CRegionInfo *CScene__GetRegionInfo(s32 *list, CGameRegion *region);
 void CCollisionResults__Clear(CCollisionInfo *def);
 void Sweep_FollowGround(Sweep *sweep);
 void CVector3__Scale(CVector3 *out, CVector3 *v, f32 k);
 void SweepHit_Clear(SweepHit *hit);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void SweepHit_Store(SweepHit *hit, CGameObjectInstance *obj);
-f32 GameObject_GetRegionFloorHeight(CGameObjectInstance *obj, s32 arg1);
 s32 Sweep_GetGroundBehavior(Sweep *sweep, CGameRegion *region);
 
 /* Moves obj to pos through the collision tests, in up to 100 slides, and

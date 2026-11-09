@@ -4,10 +4,10 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "globals/collision.h"
+#include "protos/game.h"
 
 
 void CGameRegion__FireTriggers(s32 state, s32 bits, CParticle *p);
-void GameObject_FireTriggers(CGameObjectInstance *inst, s32 bits, CParticle *p);
 
 static __inline__ s32 isGroupA(CParticle *p) {
     switch (p->header.m_nObjType) {

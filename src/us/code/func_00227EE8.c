@@ -4,6 +4,8 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "globals/camera.h"
+#include "protos/list.h"
+#include "protos/scene.h"
 
 /* Spawns a copy of an actor: takes a free instance off the world's free list
  * and initialises it from src. */
@@ -11,10 +13,7 @@
 extern void CGameObjectInstance__Construct(CGameObjectInstance *obj, s32 model, s32 type, s32 unused, void *intelligence,
                           s32 sound, void *region, f32 rotY, CVector3 pos, s32 flags, CVector3 scale,
                           CVector3 velocity, s32 extra);
-extern s32 CScene__FindObjectType(void *level, s32 type);
 extern void func_0021E5D4(CGameObjectInstance *obj);
-extern void CList__AddHead(void *list, void *node);
-extern void CList__Remove(void *list, void *node);
 
 /* CInstancePool__Alloc without the owner counter. */
 static __inline__ CGameObjectInstance *take_free_instance(CInstancePool *world) {

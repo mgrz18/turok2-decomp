@@ -2,8 +2,8 @@
 #include "structs/menu.h"
 #include "structs/player.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
-s32 MenuPool_OpenMenu(s32, s32, s32, s32, s32);
 
 
 s32 TeamMenu_ChooseBlue(s32 arg0, Menu *arg1) {

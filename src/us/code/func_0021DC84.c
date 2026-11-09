@@ -5,6 +5,7 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "structs/light.h"
+#include "protos/game.h"
 
 /* Draw an actor's shadow. Without flag 0x10000000 it gets the blob shadow
  * (Shadow_DrawBlob). Otherwise its projected shadow model is built once, while
@@ -24,7 +25,6 @@ typedef struct {
 extern u8 D_8010FF34[];
 
 s32 func_00268160(void);
-f32 GameObject_GetRegionFloorHeight(CGameObjectInstance *, s32);
 void *MtxPool_Alloc(void *, s32);
 f32 func_00298470(f32);     /* sqrtf */
 void DLights_GetAtPoint(void *, f32, f32, f32, CVector3 *, f32 *);

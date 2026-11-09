@@ -2,6 +2,7 @@
  * After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SDK/PFS/80447BB0_11.CPP, func_80448470_eu_x, with Turok 2's layouts. */
 #include "common.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 typedef struct {
     /* 0x0 */ u16 type;
@@ -12,7 +13,6 @@ typedef struct {
 extern void __osSiGetAccess(void);                         /* __osSiGetAccess */
 extern void __osSiRelAccess(void);                         /* __osSiRelAccess */
 extern s32 __osSiRawStartDma(s32 direction, void *dramAddr); /* __osSiRawStartDma */
-extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern void __osPfsRequestData_2(u8 cmd);                       /* __osPfsRequestData (this module, link address) */
 extern void __osPfsGetInitData_2(u8 *pattern, ContStatus *data); /* __osPfsGetInitData (this module, link address) */
 

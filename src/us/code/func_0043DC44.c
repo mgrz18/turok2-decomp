@@ -4,10 +4,10 @@
 #define BOSS_STAGE_AS_WORD
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 extern s32 gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */           /* stage */
 extern f32 Random_Blend(f32 lo, f32 hi);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 typedef struct {
     /* 0x0 */ f32 waitMin;       /* 0x8012F618 */

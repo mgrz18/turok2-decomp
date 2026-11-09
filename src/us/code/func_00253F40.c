@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "protos/game.h"
 
 /* A looping sound: only its sound handle here. */
 struct CLoopingSoundData {
@@ -9,7 +10,6 @@ struct CLoopingSoundData {
 
 void Sound__StopSoundId(s32);                            /* extern */
 void LoopSounds_Stop(s32, struct CLoopingSoundData *); /* extern */
-s32 LoopSounds_Get();                                /* extern */
 
 /* Stops the player's weapon firing looping sound. */
 void CPlayer__StopWeaponFiringSound(CPlayer *arg0) {

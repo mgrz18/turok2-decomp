@@ -5,6 +5,7 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/iset.h"
 
 /* Level start: resets the world, opens the cartridge index and the level resource tables (levels, texture
  * sets, object types, objects, intelligence, particle effects, binaries, swooshes, lights, curves, rumbles,
@@ -15,9 +16,6 @@ extern s32 Model_DecompressCallback();
 extern s32 CScene__DecompressIntelligence_2();
 extern s32 CScene__DecompressParticles_2();
 
-extern void *CISet__GetBlock(void *table, s32 index);
-extern s32 CISet__GetROMAddress(s32 res, s32 file, s32 index);
-extern s32 CISet__GetROMAddressAndSize(s32 res, s32 file, s32 index, s32 *size);
 extern void **CCache__Request(s32, s32, s32, s32, s32, s32 (*)(), char *, s32);
 extern void CCache__Deallocate(s32, void **);
 extern void CCache__Flush(s32);

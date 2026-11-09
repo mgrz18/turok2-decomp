@@ -5,6 +5,7 @@
 #include "structs/intelligence.h"
 #include "structs/player.h"
 #include "globals/game.h"
+#include "protos/ai.h"
 
 extern void CGameObjectInstance__ConstructFromRecord(void *obj, void *rec, s32 mode, s32 index);
 extern void CGameObjectInstance__CalculateOrientationMatrix();
@@ -13,7 +14,6 @@ extern void Player_OnMultiplayerKill();
 extern void CPlayer__OnParticleHitCallback();
 extern void Player_DrawNodeCallback();
 extern void WeaponActor_BuildMatrix();
-extern void CAI__SetMode(void *, void *, s32);
 extern void WeaponActor_SwitchToRequested(void *, void *);
 extern void CPlayer__UpdateOrbitCamera(CPlayer *p, CPlayer *q);
 extern void Cinema_UpdateCameraIfActive(s32);

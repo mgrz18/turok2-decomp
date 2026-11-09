@@ -5,9 +5,9 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 extern s32 GameNoteMenu_SelectNo(void *unused, struct RecordRecAt24 *record);
-extern void MenuPool_OpenMenu(void *, void *, s32, s32, s32);
 s32 GameNoteMenu_SelectNo(void *unused, struct RecordRecAt24 *record) {
     do {
         if (sGameNoteLoad != 0) {

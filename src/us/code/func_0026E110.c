@@ -1,8 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/game.h"
 
-s32 CScene__GetInstanceEventRecords(s32 *, void *, s32 *, s32 *); /* extern */
 s32 LevelEvent_ProcessTriggers(s32, s32, s32, s32, s32, s32, s32); /* extern */
 
 void GameObject_FireTriggers(CGameObjectInstance *arg0, s32 arg1, s32 arg2) {

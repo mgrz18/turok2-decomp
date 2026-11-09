@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
-extern u32 osVirtualToPhysical(void *addr);
 s32 osEPiRawStartDma(OSPiHandle_s *pihandle, s32 direction, u32 devAddr, void *dramAddr, u32 size)
 {
     u32 stat;

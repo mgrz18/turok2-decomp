@@ -4,8 +4,9 @@
 #include "common.h"
 #include "structs/cache.h"
 #include "globals/cache.h"
+#include "protos/list.h"
+#include "protos/cache.h"
 
-extern void CList__AddHead(CList *list, void *element);
 
 /* Takes a CMemEntry off the free stack and puts it at the head of the age list. */
 CMemEntry *CCache__PopFreeMemEntry(s32 unused0, s32 flags) {

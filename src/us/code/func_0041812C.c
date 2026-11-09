@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
-extern void MenuPool_OpenChildMenu(void *, void *, void *);
 s32 PlayerSetupMenu_Play(void *first, void *second, void *third) {
     MenuPool_OpenChildMenu(third, second, &gRumbleNoticeMenuDesc);
     return 1;

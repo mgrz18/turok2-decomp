@@ -1,6 +1,7 @@
 #include "common.h"
 #include "globals/menu.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 extern void Sound__StopAllExcept(s32 volume);
 extern void Sound__DisableAmbientTrack(void);
@@ -9,7 +10,6 @@ extern void Music_SetTrack(s32 track);
 extern void Music_RestoreVolume(void);
 extern void Sound__SetForce2D(s32 on);
 extern void Controller_DisableMenuSounds(void);
-extern s32 MenuPool_OpenChildMenu(s32, s32, s32);
 
 /* Opens the menu gSoundOptionsMenuDesc, switching the music (restored by SoundMenu_GoBack). */
 s32 PauseMenu_SoundOptions(s32 arg0, s32 arg1, s32 arg2) {

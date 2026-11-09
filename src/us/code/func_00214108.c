@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "structs/world.h"
+#include "protos/iset.h"
 struct Shape_typemap_13;
 struct Shape_typemap_13 {
     int field_0;
@@ -26,7 +27,6 @@ struct ObjectLinks150C {
     s32 *unk_14AC;
 };
 extern s32 func_00214108(void);
-void *CISet__GetBlock(void *table, s32 index);
 s32 func_00214108(void) {
     s32 total = 0;
     s32 i;

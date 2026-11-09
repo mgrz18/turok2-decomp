@@ -3,6 +3,8 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
+#include "protos/player.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 #define P_S16(p, off) (*(s16 *)((u8 *)(p) + (off)))
@@ -10,8 +12,6 @@
 /* Multiplayer/menu state: byte 0x1281 (gEngineApp_m_Settings_multiplayer) is the "enabled" flag. */
 
 extern void CPlayer__StopLoopingSounds(void);
-extern s32 CPlayerPool__GetIndex(void *state, CPlayer *player);
-extern void MenuPool_OpenMenu(void *a, char *text, CPlayer *player, s32 d, void *e);
 
 void PlayerState15_Enter(CPlayer *player, CGameObjectInstance *actor) {
     char *text;

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "globals/scene.h"
+#include "protos/game.h"
 
 typedef struct SpawnObj {
     /* 0x000 */ u8 type;            /* 0 = level actor, 1 = game object, 2 = ..., 3 = particle */
@@ -15,8 +16,6 @@ void GameObject_TraceMove(SpawnObj *obj, CVector3 pos, CVector3 *outPos, s32 *ou
 CQuaternion CGameObjectInstance__GetRotation(SpawnObj *obj);
 CQuaternion func_002156D4(SpawnObj *obj);
 s32 func_0021F1F8(SpawnObj *obj);
-s32 CParticleSystem__Spawn(CParticleSystem *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
-                  CQuaternion rot, CVector3 pos, s32 region, s32 b, s32 c);
 
 /* Spawns a particle of `kind` from `obj` at `at`, moving with it and
  * oriented like it. */

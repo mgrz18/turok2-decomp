@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 typedef struct {
     f32 x, y, z;
@@ -30,7 +31,6 @@ typedef struct {
 
 s32 CGameObjectInstance__PickRandomAnim(Obj00402FA0 *obj, s32 a1, s32 a2);
 void CVector3__Subtract(Vec3_00402FA0 *out, Vec3_00402FA0 *from, Vec3_00402FA0 *to);
-void CAI__SetMode(Obj00402FA0 *obj, Item00402FA0 *item, s32 a2);
 
 void MantidQueen_UpdatePush(Obj00402FA0 *obj, Item00402FA0 *item) {
     Vec3_00402FA0 dir;

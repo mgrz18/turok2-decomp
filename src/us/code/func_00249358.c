@@ -4,6 +4,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -18,11 +19,9 @@ extern char D_800B66D0[];
 
 s32 Cinema_IsActive(void);
 s32 CPlayer__IsInMatchEndState(CPlayer *p);
-CRegionInfo *CScene__GetRegionInfo(void *level, void *region);
 void CPlayer__Kill(CPlayer *p, HitSource *src, s32 arg3, s32 type);
 void CCameraPool__AddText(CGameFromCameraPool *game, void *camera, char *text);
 void Sound__PlaySpeech(s32 sound);
-void CScene__StartRumbles(void *level, u8 *rumble, s32 id, CVector3 v, f32 f6, f32 f7);
 void CCamera__SetHitFlash(void *camera, s32 alpha, s32 time);
 void Sound__Play2D(s32 sound);
 void Sound__Play(s16 sound, CVector3 pos, s32, s32);

@@ -9,6 +9,8 @@
 #include "common.h"
 #include "gfx.h"
 #include "gbi_t2.h"
+#include "protos/cache.h"
+#include "protos/ultra.h"
 
 /* A tracked allocation (list at gCache_memLockedList). */
 typedef struct HeapNode HeapNode;
@@ -38,8 +40,6 @@ extern HeapSpan *gHeap_usedHead[];
 extern HeapNode *gCache_memLockedList[];
 extern u32 __osDisableInt(void);   /* __osDisableInt */
 extern void __osRestoreInt(u32);   /* __osRestoreInt */
-extern s32 osRecvMesg(void *mq, void *msg, s32 flag);
-extern s32 osSendMesg(void *mq, void *msg, s32 flag);
 extern void Render_SetCombineMode(s32);
 extern void Render_SetRenderMode(s32);
 

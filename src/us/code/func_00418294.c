@@ -5,13 +5,13 @@
 #include "structs/menu.h"
 #include "globals/menu_desc.h"
 #include "globals/menu.h"
+#include "protos/menu.h"
 
 extern s32 Controller_ConfirmPressed(void *controller);
 extern s32 Menu_StepValueLR(Menu *c, s32 value, s32 step, s32 min, s32 max, s32 wrap);
 extern void CPlayer__SetCharacter(CPlayer *player, s32 team);
 extern void MenuItem_SetModel(s32 menu, s32 id, s32 arg);
 extern void Sound__Play2D(s32 sound);
-extern void MenuPool_OpenChildMenu(s32 pool, Menu *c, void *tmpl);
 
 /* Team selection item: left/right cycles the team, A confirms. */
 s32 CharacterMenu_SelectCharacter(s32 menu, Menu *c, s32 pool) {

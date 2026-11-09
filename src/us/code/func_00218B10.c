@@ -14,6 +14,8 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "globals/engine.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
 /* Switches an animation player to its queued animation. With `blend` set and a
  * different animation queued, it loads that one and, if `previous` is given,
@@ -38,11 +40,8 @@ typedef struct {
     u16 frames;
 } AnimHeader;
 
-void *CCache__Request(s32, s32, s32, s32, void *, void *, void *, s32);
-s32 CISet__GetROMAddressAndSize(s32, s32, s32, s32 *);
 s32 CAnimationState__IsLoaded(AnimPlayer *);
 void *CAnimationState__GetData(AnimPlayer *anim);
-void *CISet__GetBlock(void *file, s32 index);
 void Anim_Decompress(void);
 
 typedef struct AngleKeys {
@@ -249,7 +248,6 @@ typedef struct KeyLookup {
     /* 0x20 */ f32 frac;
 } KeyLookup;
 
-void *CISet__GetBlock(void *file, s32 index);
 s32 CMemEntry__IsLocked(s32 **resource);
 
 #define FLOOR(x) ((x) >= 0.0f ? (s32) (x) : (s32) (x) - ((f32) (s32) (x) == (x) ? 0 : 1))
@@ -329,7 +327,6 @@ void CAnimationState__FindKeys(AnimChannel *anim, KeyLookup *out) {
     out->rootOffset1 = k1 * 4;
 }
 
-void CCache__Unlock(s32 heap, void *block);
 
 void CAnimationState__Reset(AnimPlayer *player) {
     player->current = -1;

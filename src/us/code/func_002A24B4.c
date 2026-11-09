@@ -5,11 +5,8 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/hostio.h"
+#include "protos/ultra.h"
 typedef u32 OSEvent;
-void osSetEventMesg(OSEvent e, OSMesgQueue *mq, OSMesg msg);
-void osStartThread(OSThread *thread);
-void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
-void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msgBuf, s32 count);
 extern u8 D_801280DC[];
 void HostIo_ThreadMain(void *arg);
 void HostIo_StartThread(s32 pri) {

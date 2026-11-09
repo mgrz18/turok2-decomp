@@ -2,6 +2,8 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/game.h"
 
 typedef struct ViewInfo {
     /* 0x000 */ u8 pad0[0x114];
@@ -15,9 +17,6 @@ typedef struct ShotActor {
 
 
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
-s32 CParticleSystem__Spawn(CParticleSystem *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
-                  CQuaternion rot, CVector3 pos, s32 arg, s32 b, s32 c);
-void CScene__StartRumbles(void *table, void *owner, s32 id, CVector3 pos, f32 a, f32 b);
 void CPlayer__TransformByView(CPlayer *pl, CVector3 *v);
 void GameObject_TraceMove(ShotActor *a, CVector3 pos, CVector3 *outPos, s32 *outArg, s32 x, s32 y);
 

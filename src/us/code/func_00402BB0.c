@@ -1,6 +1,8 @@
 #include "common.h"
 #include "globals/onscreen.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
 typedef struct {
     f32 x, y, z;
@@ -23,9 +25,6 @@ typedef struct {
 } Item00402BB0;
 
 s32 Cinema_IsIdle(void);
-s32 CScene__FindInstances(void *world, s32 a1, s32 a2, s32 a3, Marker00402BB0 **out, s32 max);
-s32 CScene__FindRegionAt(void *world, Vec3_00402BB0 *pos);
-void CAI__SetMode(Obj00402BB0 *obj, Item00402BB0 *item, s32 a2);
 void COnScreen__SetBoss(void *a0, Obj00402BB0 *obj, void *a2);
 
 void MantidQueen_UpdateIntro(Obj00402BB0 *obj, Item00402BB0 *item) {

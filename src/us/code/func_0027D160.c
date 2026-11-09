@@ -18,6 +18,7 @@
 #include "globals/render.h"
 #include "globals/math.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 _pad0[0x1C];
@@ -62,7 +63,6 @@ void BoundingBox_FromPoints(CVector3 *box, s32 count, CVector3 *points);
 void CMtxF__Identity(CMtxF m);
 void CEmitterPool__Advance(void *sky, CCamera *cam);
 void MenuPool_Update(void *menus);
-CFloor *CScene__FindRegionAt(s32 *world, CVector3 *pos);
 f32 CGameRegion__GetHeight(CFloor *floor, f32 x, f32 z);
 
 #define MIN1(x) (((x) > 1.0f) ? 1.0f : (x))

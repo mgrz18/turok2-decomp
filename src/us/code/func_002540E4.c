@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-extern CIntelligence *CScene__FindIntelligence(void *spawns, s32 kind, s32 character);
 extern s32 Random_Next(void);
 
 /* Same as CPlayer__PickSpawnPoint. */

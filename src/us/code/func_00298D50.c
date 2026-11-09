@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/ultra.h"
 
 extern int __osDpDeviceBusy();
-extern u32 osVirtualToPhysical(void *arg0);
 s32 osDpSetNextBuffer(void *bufPtr, u64 size) {
     if (__osDpDeviceBusy()) {
         return -1;

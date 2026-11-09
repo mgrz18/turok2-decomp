@@ -1,8 +1,8 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
-s32 CScene__GetInstanceSavedBit(void *table, void *actor);
-s32 CAI__SetMode(void *actor, void *anim, s32 mode);
 
 void Turret_Advance(u8 *actor, u8 *anim) {
     u8 *def;

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* What this reads of a region: its flags. 0x10000 makes the ground tremble. */
 typedef struct {
@@ -8,7 +9,6 @@ typedef struct {
     /* 0x44 */ s32 m_Flags;
 } RegionTremor;
 
-RegionTremor *CScene__GetRegionInfo(void *regions, struct CGameRegion *region);
 f32 Random_Blend(f32 min, f32 max);          /* a random float between the two */
 
 /* The tremor of the ground in a region that shakes: eases the camera's

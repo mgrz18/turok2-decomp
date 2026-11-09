@@ -1,9 +1,9 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/game.h"
 
 extern u8 gEngineApp_m_SwooshSystem[];
-void CScene__SetInstanceSavedBit(void *table, void *actor, s32 arg);
-void GameObject_FireTriggers(void *actor, s32 flags, void *other);
 void SwooshSet_FreeOwner(void *list, void *actor);
 
 void Action_GoEnter(u8 *actor) {

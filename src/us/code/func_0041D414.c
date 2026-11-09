@@ -2,8 +2,8 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
-extern s32 CPlayerPool__GetIndex(void *players, void *player);
 
 /* Name entry: append the item's character, up to 8. */
 s32 NameEntryMenu_AddChar(MenuItem *a, Menu *c) {

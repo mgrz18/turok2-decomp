@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/iset.h"
 
 typedef struct {
     /* 0x0 */ s32 count;

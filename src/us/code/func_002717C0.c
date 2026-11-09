@@ -1,11 +1,10 @@
 #include "common.h"
 #include "structs/sound.h"
+#include "protos/ultra.h"
 
 s32 SndVoicePool_StopAllExcept(void *, s32);                /* extern */
 s32 SndQueue_CancelAllExcept(void *, s32);                /* extern */
 s32 SpeechPlayer_Stop(void *);                      /* extern */
-s32 osRecvMesg(void *, s32, s32);    /* extern */
-s32 osSendMesg(void *, s32, s32);    /* extern */
 s32 __osDisableInt();                                /* extern */
 s32 __osRestoreInt(s32);                         /* extern */
 

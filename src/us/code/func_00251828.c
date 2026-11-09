@@ -5,6 +5,7 @@
 #include "structs/player.h"
 #include "globals/engine.h"
 #include "globals/player.h"
+#include "protos/player.h"
 
 typedef CVector3 Position;
 
@@ -17,7 +18,6 @@ typedef struct TravelTarget {
 } TravelTarget;
 
 extern void CPlayer__TurnAndLook(void *, void *, void *);
-extern s32 CPlayer__SetState(void *, void *, s32);
 extern void Angle_Wrap(f32 *value);
 
 void PlayerJumpPad_Update(CPlayer *player, void *body) {

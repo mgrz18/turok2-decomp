@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/cache.h"
 #include "globals/cache.h"
+#include "protos/list.h"
+#include "protos/cache.h"
 
-void CList__AddTail(CList *list, void *element);
-void CList__InsertBefore(CList *list, void *before, void *element);
 
 /* Files a CMemEntry in the locked list, which is sorted by address. */
 void CCache__AddToAddressList(s32 unused, CMemEntry *entry) {

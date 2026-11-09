@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "protos/ai.h"
 
-void CAI__SetMode(CGameObjectInstance *self, CAI *ai, s32 mode);
 
 void EnemyMode_PlayerRide_Update(CGameObjectInstance *self, CAI *ai) {
     CPlayer *player = (CPlayer *)ai->m_Enemy.m_pGrabbed->m_AI.m_pParent;

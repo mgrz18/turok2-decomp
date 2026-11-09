@@ -2,12 +2,12 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/ultra.h"
 
 extern int __osSpDeviceBusy();
 extern void __osSpSetStatus(unsigned int arg0);
 extern s32 __osSpRawStartDma(s32 direction, s32 spAddress, s32 dramAddress, s32 size);
 extern OSTask *_VirtualToPhysicalTask(OSTask *arg0);
-extern void osWritebackDCache(OSTask *, s32);
 extern void __osSpSetStatus(u32 arg0);
 extern s32 __osSpSetPc(u32 arg0);
 extern s32 __osSpDeviceBusy(void);

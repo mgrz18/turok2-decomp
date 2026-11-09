@@ -6,10 +6,10 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/sound.h"
+#include "protos/iset.h"
+#include "protos/ultra.h"
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 static __inline__ void CAudioWorld_Lock(CAudioWorld *m) {
     CMutex *l = &m->lock;
     u32 mask = __osDisableInt();
@@ -30,7 +30,6 @@ static __inline__ void CAudioWorld_Unlock(CAudioWorld *m) {
         __osRestoreInt(mask);
     }
 }
-void *CISet__GetBlock(void *node, s32 idx);
 void CAudioWorld__PlayLayer(CAudioWorld *m, void *rec, CVector3 *pos, s32 id, s32 token, s32 a, s32 flags);
 s32 CAudioWorld__PlaySoundIndex(CAudioWorld *m, s32 id, CVector3 pos, s32 flags) {
     u32 *rec;

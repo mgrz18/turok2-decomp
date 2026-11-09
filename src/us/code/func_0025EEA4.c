@@ -1,9 +1,9 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
-s32 CScene__GetInstanceSavedBit(M2C_UNK *, s32);                  /* extern */
-M2C_UNK CAI__SetMode(s32, void *, M2C_UNK);        /* extern */
 M2C_UNK EnemyAI_CheckOffscreen(s32, void *, M2C_UNK);        /* extern */
 
 void EnemyAI_SleepIfOffscreen(s32 arg0, void *arg1, M2C_UNK arg2) {

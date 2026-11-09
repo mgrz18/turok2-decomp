@@ -1,5 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
 /* The first section of an object model (CISet__GetBlock(*model, 0)): only its angle at 0x1E is read. */
 typedef struct {
@@ -7,9 +9,6 @@ typedef struct {
     /* 0x1E */ u16 angle;
 } ModelSection;
 
-void *CISet__GetBlock(s32, s32);                  /* extern */
-s32 *CCache__Request(s32, s32, s32, s32, s32, s32, s32 *, s32); /* extern */
-s32 CCache__Unlock(s32, s32 *);              /* extern */
 f32 HalfToFloat(u16);                             /* extern */
 extern s32 D_800A5AC4;
 

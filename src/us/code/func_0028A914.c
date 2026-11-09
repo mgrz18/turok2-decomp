@@ -6,13 +6,12 @@
 #include "structs/game.h"
 #include "globals/render.h"
 #include "globals/engine.h"
+#include "protos/ultra.h"
 
-extern void osViSwapBuffer(s32 arg0);
 extern s32 __scSchedule(struct Ctx_func_8028F544_de *, struct Node_func_8028F544_de **, struct Node_func_8028F544_de **, s32);
 extern void __scExec(struct View_func_8028FA60_de *, struct Scene_func_8028FA60_de *, struct Scene_func_8028FA60_de *);
 extern s32 __scTaskComplete(void *,void *);
 extern void func_00228BBC();
-extern u64 osGetTime(void);
 extern u32 D_800F6CA8;
 void __scHandleRDP(OSSched *sc)
 {

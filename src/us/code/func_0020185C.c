@@ -1,5 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "protos/iset.h"
 
 /* Offset table: returns base + the i-th offset and stores the i-th entry's size. */
 s32 CISet__GetROMAddressAndSize(s32 *t, s32 base, s32 i, s32 *size) {

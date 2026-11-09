@@ -5,8 +5,8 @@
 #include "globals/game.h"
 #include "globals/save.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-s32 CScene__GetRegionIndex(void *world, s32 region);
 
 /* Save every player's state, position, facing and region. */
 void SavedPlayers_Save(void) {

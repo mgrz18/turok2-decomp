@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/cache.h"
 
 typedef struct Entry8 {
     s32 handle;
@@ -17,7 +18,6 @@ typedef struct Cache {
     Entry8 entries[1];    /* 0x14AC */
 } Cache;
 
-extern void CCache__Unlock(s32 arg0, s32 arg1);
 
 void CScene__ReleaseSectors(Cache *cache) {
     s32 i;

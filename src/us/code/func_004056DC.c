@@ -3,9 +3,9 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 extern f32 Random_Blend(f32 lo, f32 hi);
 extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
 

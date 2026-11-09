@@ -1,5 +1,7 @@
 #include "common.h"
 #include "structs/table.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
 typedef struct Owner {
     u8 pad0[0x1C];
@@ -11,8 +13,6 @@ typedef struct Owner {
 } Owner;
 
 extern s32 BinarySearch(void *entries, s32 count, s32 id);
-extern s32 CISet__GetROMAddressAndSize(s32 arg0, s32 arg1, s32 index, s32 *out);
-extern s32 CCache__Request(s32 arg0, s32 arg1, s32 arg2, s32 flags, s32 arg4, void *arg5, void *arg6, s32 arg7);
 extern u8 ProPack__Decompress[];
 
 s32 CScene__LoadGraphicSet(Owner *owner, s32 id, s32 flags, s32 arg3) {

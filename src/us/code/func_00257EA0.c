@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "protos/ai.h"
 
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 extern s16 *CPlayer__GetFiringAmmo(CPlayer *player, s32 weapon);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 /* Fire check for the first-person weapon: once its cooldown is over and the
  * weapon is usable, fire button 0x2000 starts mode 4 and a tap of 0x10 with

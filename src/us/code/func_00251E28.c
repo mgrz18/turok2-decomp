@@ -5,11 +5,11 @@
 #include "structs/camera.h"
 #include "globals/camera.h"
 #include "globals/engine.h"
+#include "protos/player.h"
 
 f32 Random_Float(f32 scale);
 void CCamera__StartFlash(CCamera *cam, s32 maxOpacity, s32 red, s32 green, s32 blue, s32 attack, s32 sustain, s32 decay);
 void CCameraPool__StartShake(void *pool, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, CVector3 pos);
-s32 CPlayer__SetState(CPlayer *player, CPlayer *body, s32 mode);
 void DamageEvent_Set(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, void *shield);
 void Player_OnMultiplayerKill(CPlayer *actor, void *ai, DamageEvent *hit);
 

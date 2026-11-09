@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "protos/iset.h"
 
 /* A light volume (built by LightVolume_Construct). */
 typedef struct LightVolume {
@@ -35,7 +36,6 @@ typedef struct VertexList {
     /* 0x08 */ PackedVertex vertices[1];
 } VertexList;
 
-void *CISet__GetBlock(void *table, s32 index);
 void CMtxF__FromMtxAffine(f32 *out, void *packed);
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
 void CMtxF__TransformPoint(f32 *mtx, CVector3 *in, CVector3 *out);

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 
 void MotherBoss_KillMinions_2(void) {

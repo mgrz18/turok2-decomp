@@ -3,6 +3,7 @@
 #include "gfx.h"
 #include "gbi_t2.h"
 #include "globals/engine.h"
+#include "protos/cache.h"
 
 /* Draws a textured trail: spaces the texture along the tail by length, picks
  * the animation frame, sets the combiner and colours, then emits two vertex
@@ -84,7 +85,6 @@ extern s32 Trail_GetAnimFrame(Trail *trail, TrailTrack *track, AnimInfo *info);
 extern void Texture_Load(void *slot, void *model, s32 frame, s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);
 extern Gfx *RibbonVtxPool_Alloc(void *pool, s32 count);
 extern void Morph_BlendVerticesTex(Trail *trail, TrailNode *node, Gfx *vertices, f32 texS, Morph *morph);
-extern void CCache__Unlock(s32 a, void *model);
 
 void Trail_DrawTextured(void *pool, Trail *trail, s32 unused) {
     AnimInfo info;

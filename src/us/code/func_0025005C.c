@@ -6,6 +6,8 @@
 #include "globals/camera.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
+#include "protos/player.h"
 
 
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
@@ -15,8 +17,6 @@ f32 func_002982F0(f32 x); /* sin */
 f32 func_002974C0(f32 x); /* cos */
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
-CGameRegion *CScene__FindRegionAt(void *world, CVector3 *pos);
-s32 CPlayer__SetState(CPlayer *player, CGameObjectInstance *body, s32 mode);
 void CCameraPool__AddText(u8 *game, void *hud, char *msg);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))

@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/loader.h"
+#include "protos/list.h"
 
-void CList__AddHead(CList *list, void *element);
-void CList__Remove(CList *list, void *element);
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 

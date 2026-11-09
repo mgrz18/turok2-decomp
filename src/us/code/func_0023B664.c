@@ -3,9 +3,9 @@
 #include "structs/region.h"
 #include "structs/collision.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 
-CRegionInfo *CScene__GetRegionInfo(s32 *list, CGameRegion *region);
 s32 func_00267EA8(CGameObjectInstance *obj);
 s32 func_00267EE8(CGameObjectInstance *obj);
 s32 func_00267F10(CGameObjectInstance *obj);

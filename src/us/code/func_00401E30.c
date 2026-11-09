@@ -3,9 +3,9 @@
 #include "structs/boss.h"
 #include "globals/scene.h"
 #include "globals/boss.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
-void CAI__SetMode(void *a0, void *a1, s32 event);
-void AI_PlayAnim(CGameObjectInstance *actor, void *ai, s32 state);
 
 /* MantidQueen_NextStep */
 static __inline__ void State_NextStep(WaveBossState *s) {
@@ -68,8 +68,6 @@ static __inline__ void State_UpdateBoss(WaveBossState *s) {
 }
 
 void ScriptAnimator_Start(void *slot, void *actor);
-s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void *out, s32 max);
-void *CScene__FindIntelligence(void *world, s32 a1, s32 id);
 
 static __inline__ void State_SetStep(WaveBossState *s, WaveBossStep *step, s32 index) {
     s->step = step;

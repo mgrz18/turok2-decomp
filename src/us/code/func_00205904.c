@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/cache.h"
 #include "globals/cache.h"
+#include "protos/ultra.h"
 
 /* Two cache references. */
 typedef struct {
@@ -8,8 +9,6 @@ typedef struct {
     /* 0x04 */ CMemEntry *second;
 } CacheRefs;
 
-s32 osRecvMesg(s32, s32, s32);
-s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 

@@ -1,9 +1,7 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/CODE_8028414C.CPP, Particle_AllocPoolNode.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-void CList__AddHead(void *list, void *node);
-extern void CList__Remove(void *list, void *node);
+#include "protos/list.h"
 struct PoolNode84478;
 typedef struct PoolBucket84478 {
     struct PoolNode84478 *head;

@@ -4,11 +4,11 @@
 #include "structs/world.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* Turok 2: the mode block sits at 0x23FD0 (see CEngineApp__UpdateCinemaMode). */
 
 
-s32 CScene__FindWarpDests(void *world, s32 arg1, s32 id, CWarpPoint *out, s32 max);
 
 /* Resets the match state and asks the session for mode 13 at warp `warp` (0 if the
  * world has no such warp point). */

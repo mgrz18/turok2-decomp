@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/rect.h"
+#include "protos/iset.h"
 
 typedef struct Bounds {
     f32 min[3];             /* 0x00 */
@@ -19,7 +20,6 @@ typedef struct ItemList {
     Item items[1];          /* 0x08 */
 } ItemList;
 
-void *CISet__GetBlock(void *table, s32 index);
 
 /* Collects up to 10 items of the region containing pos whose bounds hold it. */
 void CScene__FindLightsAt(CScene *world, f32 *pos, Item **out, s32 *outCount) {

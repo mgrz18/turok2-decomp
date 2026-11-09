@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/sound.h"
 #include "structs/particle.h"
+#include "protos/game.h"
 
 s32 LoopSounds_Start(s32, s32, s32, s32, s32);
 s32 CParticle__StopLoopSound(CParticle *);                      /* extern */
-s32 LoopSounds_Get();                                /* extern */
 
 /* Starts (or restarts) the looping sound on the object. */
 void CParticle__StartLoopSound(CParticle *arg0, s32 arg1) {

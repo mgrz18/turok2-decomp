@@ -2,6 +2,9 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
+#include "protos/ultra.h"
 
 /* Builds an animated object's bone matrices: binds its animation index,
  * loads the current (and, when blending, the next) animation into the two
@@ -100,9 +103,6 @@ extern s32 sBoneMatrixCount[]; /* &sBoneMatrixProfile.calls */
 extern u8 gEngineApp_m_SwooshSystem[];
 
 s32 Cinema_PathPlaying(void);
-void *CISet__GetBlock(void *file, s32 index);
-void CCache__Unlock(s32, s32 handle);
-s32 CCache__Request(s32, s32 file, s32 size, s32, s32, s32, char *name, s32);
 s32 MtxPool_Alloc(void *table, s32 id);
 void CAnimationState__SwitchToQueued(AnimChannel *channel, s32 anims, s32 file, s32, s32, s32);
 void CAnimationState__FindKeys(AnimChannel *channel, KeyLookup *keys);
@@ -111,7 +111,6 @@ s32 CAnimationState__IsLoaded(AnimChannel *channel);
 void CGameObjectInstance__PoseBone(AnimObject *obj, PoseContext *ctx, s32, f32 mtx[4][4]);
 void func_002360A0(void *effects, AnimObject *obj, void *bones);
 void GameObject_EmitHotPoints(void *list, s32 count, void *bones, AnimObject *obj, void *anims);
-u32 osGetCount(void);
 
 /* OS_CYCLES_TO_USEC */
 static __inline__ void addMicroseconds(f32 *usec, u32 cycles) {

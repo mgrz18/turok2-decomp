@@ -3,6 +3,7 @@
 #include "globals/game.h"
 #include "globals/rumble.h"
 #include "globals/menu.h"
+#include "protos/game.h"
 
 
 /* Controller / rumble slot, 0x224 bytes (see Cont_ResetSlot). */
@@ -23,7 +24,6 @@ typedef struct Screen {
 
 void RumblePool_FreeAll(RumblePool *pool);
 void Controller_ResetAllRumble(void);
-void *LoopSounds_Get(void);
 void LoopSounds_Pause(void *);
 
 void PauseMenu_Init_2(Screen *screen) {

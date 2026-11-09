@@ -1,6 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
 /* Just the AI callbacks this sets. */
 typedef struct {
@@ -10,8 +12,6 @@ typedef struct {
     /* 0x248 */ void *onUpdate;
 } Callbacks;
 
-extern s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, Callbacks **out, s32 max);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 extern void Primagen_Draw();
 extern void Primagen_Effects();
 

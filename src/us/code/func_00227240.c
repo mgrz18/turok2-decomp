@@ -4,12 +4,10 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
 
-s32 CScene__FindObjectType(void *world, s32 id);
-s32 CScene__GetObject(void *world, s32 index);
 void CLevelActorPool__Free(CLevelActorPool *pool, CPooledLevelActor *actor);
 f32 GameObject_GetCollisionHeight(CPooledLevelActor *actor);
-void CScene__GetLightsAt(void *world, CVector3 *pos, void *out);
 
 /* Takes a free slot, or releases the oldest actor for one, links it at the head and clears it. */
 static __inline__ CPooledLevelActor *allocActor(CLevelActorPool *pool) {

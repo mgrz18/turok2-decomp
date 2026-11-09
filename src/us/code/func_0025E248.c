@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/ai.h"
 
 /* Index-2 attack follow-up: in the 7020-7041 animation band it chains to the
  * next move; otherwise it finishes the current one. */
@@ -37,7 +38,6 @@ s32 EnemyAnim_NormalDeath_B0390(void *, void *);
 s32 EnemyAnim_NormalDeath_B03C0(void *, void *);
 s32 GameObject_IsOnGround(void *);
 void AI_DropPickupsOnce(void *, void *, s32, s32, s32);
-void CAI__SetMode(void *, void *, s32);
 void AI_StopSound(void *, void *);
 void CListedInstance__Free(void *);
 

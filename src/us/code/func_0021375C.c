@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "globals/game.h"
+#include "protos/iset.h"
 
 /* A vertex (0x10 bytes). */
 typedef struct {
@@ -20,7 +21,6 @@ typedef struct {
 } VtxBlk;
 
 
-VtxBlk *CISet__GetBlock(s32 *file, s32 index); /* returns chunk `index` of a chunked file */
 
 #define MN(a, b) ((a) < (b) ? (a) : (b))
 

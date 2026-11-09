@@ -2,8 +2,8 @@
 #include "structs/vector.h"
 #include "structs/particle.h"
 #include "structs/sound.h"
+#include "protos/game.h"
 
-extern s32 LoopSounds_Get(void);
 extern void *LoopSounds_Start(s32 bank, s32 sound, CVector3 *pos, CVector3 *pos2, s32 loops);  /* starts a sound */
 extern void LoopSounds_Stop(s32 bank, void *handle);                                  /* stops a sound */
 extern void CParticle__StopLoopSound(void *obj);

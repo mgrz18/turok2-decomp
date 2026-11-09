@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/iset.h"
 
-extern char *CISet__GetBlock(s32 *, s32);
 extern void CQuaternion__Slerp(void *arg0, s32 arg1, void *arg2, void *arg3);
 void Anim_GetBoneRotationSlerp(ObjectLinks24_2 *arg0, s32 arg1, Vector4f *arg2) {
     ObjectLinks24_2 *o = arg0;

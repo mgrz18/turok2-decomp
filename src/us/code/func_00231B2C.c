@@ -3,10 +3,9 @@
 #include "structs/collision.h"
 #include "globals/scene.h"
 #include "globals/collision.h"
+#include "protos/game.h"
 
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
-s32 CParticleSystem__Spawn(CParticleSystem *table, void *actor, void *owner, s32 *ownerCount, void *target, s32 kind, CVector3 origin,
-                  CQuaternion rot, CVector3 pos, s32 arg, s32 b, s32 c);
 
 void CParticle__SpawnAtCeilingHit(CParticle *actor, s32 kind) {
     CQuaternion rot;

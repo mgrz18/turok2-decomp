@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
+#include "protos/scene.h"
 
 
 s32 GameObject_IsSolid(s32);

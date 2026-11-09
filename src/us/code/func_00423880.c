@@ -4,8 +4,8 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
-void MenuPool_OpenMenu(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
 
 s32 DamagedPakMenu_SelectContinue(s32 unused, Menu *event) {
     char *dst;

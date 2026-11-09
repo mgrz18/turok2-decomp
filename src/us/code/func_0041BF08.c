@@ -5,8 +5,8 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/game.h"
+#include "protos/menu.h"
 
-extern s32 Menu_StepValue(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);
 s32 OptionsMenu_StepControlType(MenuItem *a, Menu *b) {
     CPlayerOptions *p = &gEngineApp_m_Settings.defaultSlot;
     if (b->player) { CPlayerOptions *q = b->player->m_pOptions; if (q) p = q; }

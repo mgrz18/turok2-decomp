@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 void EnemyMode_AirToGround_Update(CGameObjectInstance *obj, CAI *ai) {
     ai->m_Enemy.m_BehaviorIndex = 0;

@@ -7,6 +7,7 @@
 #include "structs/camera.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
 
 typedef struct Dest {
     u32 flags;         /* 0x00 */
@@ -14,7 +15,6 @@ typedef struct Dest {
     f32 timer;         /* 0xCC */
 } Dest;
 
-CRegionInfo *CScene__GetRegionInfo(void *world, CGameRegion *region);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);
 f32 GameObject_GetWaterHeight(CGameObjectInstance *actor);
 s32 CGameRegion__IsSteep(CGameRegion *region);

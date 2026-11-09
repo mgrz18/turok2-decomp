@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 /* The boss state at D_8012F978: an object, and a word at 0x64; the word
  * before it (gLevelScript_found) is a second object. */
@@ -9,7 +10,6 @@ typedef struct {
     /* 0x64 */ s32 unk64;
 } BossObjects;
 
-s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 extern s32 D_800F1C40[];
 extern s32 D_800F1F50[];
 extern BossObjects D_8012F978;

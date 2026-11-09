@@ -9,9 +9,9 @@
 #include "globals/render.h"
 #include "globals/camera.h"
 #include "globals/engine.h"
+#include "protos/cache.h"
 
 
-void CCache__LockForDisplayList(s32 unused, void *resource);
 void Render_InvalidateModeCache(void);
 void CCamera__DisplayListSetup(CCamera *cam);
 void CCamera__DrawScene(CCamera *cam, void *world);

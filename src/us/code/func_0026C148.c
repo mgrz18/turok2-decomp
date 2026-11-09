@@ -3,8 +3,8 @@
 #include "structs/region.h"
 #include "globals/scene.h"
 #include "globals/region.h"
+#include "protos/scene.h"
 
-extern CRegionInfo *CScene__GetRegionInfo(void *table, CGameRegion *region);
 
 /* Whether the segment from a to b crosses the height of the region's surface,
  * strictly between its ends; *t gets the crossing fraction.

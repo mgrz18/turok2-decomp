@@ -1,6 +1,6 @@
 #include "common.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);       /* extern */
 s32 Turret_Aim();                                /* extern */
 
 void Turret_FireUpdate(s32 arg0, s32 arg1) {

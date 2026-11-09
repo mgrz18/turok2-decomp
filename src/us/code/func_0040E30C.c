@@ -2,9 +2,9 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 
-extern s32 CAI__SetMode(CGameObjectInstance *actor, void *ai, s32 state);
 
 void BlindOne_ActorDeathEnter(CGameObjectInstance *actor, CAI *ai) {
     BlindOneState *counters = &gBlindOne;

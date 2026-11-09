@@ -7,6 +7,7 @@
 #include "common.h"
 #include "gfx.h"
 #include "gbi_t2.h"
+#include "protos/cache.h"
 
 /* One block of a tiled image: its size, then its 16-bit texels (and, for an
  * image with an opacity mask, the 4-bit mask after them). */
@@ -29,7 +30,6 @@ void Hud_DrawI4BlockScaled(void *pTexture, f32 XPos, f32 YPos, int TextureWidth,
 void Hud_DrawI4Block(void *pTexture, int XPos, int YPos, int TextureWidth, int TextureHeight);
 void Hud_DrawMaskedBlockScaled(void *pTexture, void *pOpacity, f32 XPos, f32 YPos, int TextureWidth, int TextureHeight, f32 ScaleX, f32 ScaleY);
 void Hud_DrawMaskedBlock(void *pTexture, void *pOpacity, int XPos, int YPos, int TextureWidth, int TextureHeight);
-void CCache__LockForDisplayList(s32, void *);
 
 /* The next block: past the data of this one (`size` bytes), then its header. */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802A7AA4_de_5.c, func_802A9EE8_de.

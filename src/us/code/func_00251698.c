@@ -4,6 +4,8 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/player.h"
+#include "protos/scene.h"
+#include "protos/player.h"
 
 /* A 0x64-byte record of the world model sections (CScene__GetRegionInfo finds it from an id). */
 typedef struct {
@@ -20,8 +22,6 @@ typedef struct {
     /* 0x40 */ f32 unk40;
 } Found0xC45;
 
-ModelRecord *CScene__GetRegionInfo(s32, s32);
-Found0xC45 *CScene__FindIntelligence(s32, s32, s32);
 
 s32 Cinema_SetNextCallbacks(s32, s32, s32 *);     /* extern */
 extern s32 PlayerDeath_CinemaDone;

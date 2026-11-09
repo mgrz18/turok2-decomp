@@ -2,10 +2,10 @@
 #include "structs/light.h"
 #include "structs/model.h"
 #include "globals/engine.h"
+#include "protos/game.h"
 
 s32 *CISet__GetBlock(s32 base, s32 index);
 void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
-void Render_DrawModel(s32 hModel, s32 model, s32 one, CLights1 *slot, s32 zero, s32 index, s32 second);
 
 void InteractiveAnim_DrawAllModels(u8 *actor, u8 *state, CDrawArgs *req) {
     s32 i;

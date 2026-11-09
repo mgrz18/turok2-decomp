@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "protos/game.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC];
@@ -8,7 +9,6 @@ typedef struct {
 
 s32 Sound__StopSoundId(s32);                         /* extern */
 s32 LoopSounds_Stop(s32, void *);                 /* extern */
-s32 LoopSounds_Get();                                /* extern */
 
 void CPlayer__StopWeaponBackgroundSound(CPlayer *arg0) {
     LoopSound *temp_v0;

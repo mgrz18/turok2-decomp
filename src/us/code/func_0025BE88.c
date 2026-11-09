@@ -2,6 +2,8 @@
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
 /* AI init dispatcher: the 0x44E..0x456 types have their own init in the paged
  * VM code; everything else gets the generic init. */
@@ -14,9 +16,7 @@ extern void BlindOne_BossInit(CGameObjectInstance *actor, CAI *ai);
 extern void BlindOne_Group1Init(CGameObjectInstance *actor, CAI *ai);
 extern void BlindOne_Group2Init(CGameObjectInstance *actor, CAI *ai);
 extern void BlindOne_Group3Init(CGameObjectInstance *actor, CAI *ai);
-extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
 extern void AI_HearNoise(CGameObjectInstance *actor, CAI *ai, f32 *pos, s32 arg3);
-extern s32 CScene__GetInstanceSavedBit(void *mgr, CGameObjectInstance *actor);
 
 void EnemyAI_InitDispatch(CGameObjectInstance *actor, CAI *ai) {
     u32 *defFlags = &actor->header.m_pIntelligence->m_dwTypeFlags;

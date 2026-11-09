@@ -1,6 +1,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 s32 __osDisableInt();                                /* extern */
 s32 __osRestoreInt(s32);

@@ -1,10 +1,8 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 s32 Cinema_RequestById(s32);                         /* extern */
-s32 CScene__LoadBitSections(s32 *);                   /* extern */
-s32 CScene__LoadBitSections2(s32 *);                   /* extern */
-s32 CScene__RequestWarp(s32 *, s32, s32);     /* extern */
 s32 CPlayerPool__NewGame(s32, s32, s32);       /* extern */
 s32 CCameraPool__NewGame(s32, s32);                /* extern */
 

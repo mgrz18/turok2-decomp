@@ -15,6 +15,7 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 /* Controller pak menu, "save" entry: when the pak is ready, builds the save note (with its checksum) and
  * opens the save menu; otherwise shows why the pak cannot be used. */
@@ -32,7 +33,6 @@ s32 Pak_NeedsRepair(s32 ch);
 void SaveGame_Build(CPlayer *p);
 void PakMenu_UpdateNoteRows(Menu *o);
 u32 Crc32_Compute(u8 *data, s32 len, u32 crc);
-void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, void *e);
 
 void PakMenu_InitSaveGame(Menu *own) {
     CPlayer *plr;

@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/vector.h"
 #include "globals/math.h"
+#include "protos/game.h"
 
 typedef f32 Mtx4[4][4];
 
@@ -9,7 +10,6 @@ typedef f32 Mtx4[4][4];
 f32 CGameRegion__GetHeight(void *region, f32 x, f32 z);
 f32 GameObject_GetCollisionRadius(CGameObjectInstance *collider);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *collider);
-f32 GameObject_GetRegionFloorHeight(CGameObjectInstance *mover, s32 arg1);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 void CMtxF__SetRotateX(Mtx4 *mtx, f32 angle);

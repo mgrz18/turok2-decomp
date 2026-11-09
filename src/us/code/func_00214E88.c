@@ -1,6 +1,7 @@
 #include "common.h"
 #include "globals/engine.h"
 #include "globals/scene.h"
+#include "protos/cache.h"
 
 /* What this reads. */
 typedef struct {
@@ -11,7 +12,6 @@ typedef struct {
     /* 0x8A */ u8 frame;            /* compared with (u8)gFrameCount */
 } Drawable;
 
-void CCache__Touch(s32, s32);                       /* extern */
 
 void CStaticObject__TouchLitVertices(Drawable *arg0) {
     if (!(arg0->flags & 0x40) && (arg0->frame != (u8)gFrameCount)) {

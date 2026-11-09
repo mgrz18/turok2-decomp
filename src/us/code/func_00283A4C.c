@@ -5,11 +5,10 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/cinema.h"
+#include "protos/scene.h"
 
 
 
-void CScene__LoadLevel(void *world, s32 id, s32 flags);
-s32 CScene__GetRegion(void *world, s32 region);
 void CPlayer__UpdateOrbitCamera(CPlayer *player, CPlayer *other);
 
 /* Puts the current player back where Cinema_Start saw it start (once,

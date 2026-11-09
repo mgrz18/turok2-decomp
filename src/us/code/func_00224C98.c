@@ -1,7 +1,8 @@
 #include "common.h"
 #include "structs/world.h"
+#include "protos/iset.h"
+#include "protos/scene.h"
 
-s32 CISet__GetBlock(s32, s32);                    /* extern */
 
 void CScene__DecLinkGroupCount(CScene *arg0, s32 arg1) {
     s32 temp_v0;

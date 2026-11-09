@@ -5,8 +5,8 @@
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "globals/player.h"
+#include "protos/game.h"
 
-extern void Controller_SetRumbleOption(s32 controller, s32 state);
 extern void CPlayer__Respawn(CPlayer *p);
 extern void CPlayer__Reset(CPlayer *p);
 extern void Sound__PlaySpeech(s32 sound);

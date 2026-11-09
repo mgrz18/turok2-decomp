@@ -9,6 +9,7 @@
 #include "structs/collision.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "protos/player.h"
 
 typedef struct Entity Entity;
 struct Entity {
@@ -33,7 +34,6 @@ void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void DamageEvent_Set(DamageEvent *event, s32 source, s32 damage, f32 radius, s32 flags, s32 arg5);
 void CAI__CallHurt(Entity *e, void *ai, DamageEvent *event);
 s32 CAI__SetMode(Entity *e, void *ai, s32 state);
-Entity *CPlayerPool__GetFirstActive(void *list);
 
 /* Blast_GetStrength inlined: the strength (0 or 0xFF) a blast at `target` hits `e` with. */
 static __inline__ s32 blastStrength(Entity *e, CVector3 *target) {

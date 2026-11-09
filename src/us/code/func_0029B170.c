@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 extern u32 __osDisableInt(void);
-extern u32 osGetCount(void);
 extern void __osRestoreInt(u32);
 u64 osGetTime(void) {
     u32 saved;

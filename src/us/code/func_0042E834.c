@@ -1,9 +1,9 @@
 /* Player code: CPlayerPool__Construct, 0x0042E834-0x0042E894 (splat had it inside the data D_0042D50C). */
 #include "common.h"
 #include "structs/player.h"
+#include "protos/list.h"
 
 extern void memset(void *p, s32 c, s32 n); /* memset */
-extern void CList__Construct(void *list, s32 prevOffset, s32 nextOffset);
 
 void CPlayerPool__Construct(CPlayerPool *pl) {
     memset(pl, 0, sizeof(CPlayerPool));

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/menu.h"
 
-s32 Menu_StepValue(s32, s32, s32, s32, s32, s32);
 
 s32 FragTagMenu_StepCrosshairs(s32 arg0, s32 arg1) {
     GameSettings *var_s0;

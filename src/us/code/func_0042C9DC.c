@@ -1,6 +1,9 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/cache.h"
+#include "protos/player.h"
+#include "protos/game.h"
 
 typedef struct LevelState {
     /* 0x00 */ u8 pad0[0x98];
@@ -18,13 +21,10 @@ typedef struct LevelState {
 } LevelState;
 
 
-extern void *CPlayerPool__GetFirstActive(void *);
 extern void CPlayer__StopLoopingSounds(void *);
-extern s32 LoopSounds_Get(void);
 extern void LoopSounds_StopAll(s32);
 extern void Sound__DetachAll(void);
 extern void Sound__StopFlags(s32);
-extern void CCache__Deallocate(s32, void *);
 
 /* Tears the level down: releases its resources' handles. */
 void CScene__UnloadLevel(LevelState *level) {

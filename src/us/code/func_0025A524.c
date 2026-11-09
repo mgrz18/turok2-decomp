@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/enemy.h"
+#include "protos/ai.h"
 
-s32 AI_PickAnimFromTable(s32, s32, s32, s32);
 
 
 void EnemyAnim_ComboEnd_AFD98(CGameObjectInstance *obj, s32 arg1) {

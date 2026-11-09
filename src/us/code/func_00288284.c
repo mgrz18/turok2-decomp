@@ -2,10 +2,8 @@
 #include "structs/game.h"
 #include "globals/engine.h"
 #include "globals/frame.h"
+#include "protos/ultra.h"
 
-extern void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
-extern void osSetThreadPri(OSThread *thread, OSPri pri);
-extern void osStartThread(OSThread *thread);
 extern void *memset(void *dst, s32 value, u32 size);
 extern void mainproc(void *arg);
 

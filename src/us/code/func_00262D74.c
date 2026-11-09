@@ -8,6 +8,8 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/ai.h"
+#include "protos/player.h"
+#include "protos/game.h"
 
 /* Drops an actor's loot at its feet (raised to the ground height): kind 0
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup
@@ -19,12 +21,7 @@ extern s32 *CScene__GetIntelligence(void *level, s32 model);
 extern s32 CScene__GetObjectTypeID(void *level, s32 id);
 extern s32 Generator_IsPickupUnlocked(s32 id);
 extern CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
-extern void *CInstancePool__Spawn(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
-                           CVector3 vel, CVector3 scale, s32 *owner);
-extern s32 CParticleSystem__Spawn(CParticleSystem *sys, CGameObjectInstance *p, CGameObjectInstance *owner, s32 *ownerId, s32 target, s32 type, CVector3 dir,
-                         CQuaternion rot, CVector3 pos, s32 region, s32 arg10, s32 flags);
 extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
-extern void *CPlayerPool__GetFirstActive(void *players);
 extern s32 CPlayer__HasRoomForAmmo(void *player, s32 id);
 extern s32 CPlayer__IsBelowFullHealth(void *player, s32 id);
 extern s16 WeightedTable_PickStatic(Pick *table);

@@ -6,6 +6,7 @@
 #include "globals/camera.h"
 #include "globals/cinema.h"
 #include "globals/rumble.h"
+#include "protos/scene.h"
 
 
 /* The world and fields of it (see CScene__UpdateWarp's World). gScene_m_nLevel and
@@ -18,11 +19,8 @@ extern u8 gScene_m_WarpSpawn[]; /* local type: globals/scene.h declares it; this
 extern s32 gScene_m_LevelID[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */            /* world +0x18FD0: selectionValues */
 
 void CPlayer__ResetControlState(CPlayer *player);
-s32 CScene__GetRegionIndex(void *world, s32 region);
 void CCameraPool__ReleaseAllTexts(void *game);
 void RumblePool_FreeAll(RumblePool *pool);
-s32 CScene__FindNearestWarpDest(void *world, s32 *out, s32 id, void *spawn);
-void CScene__LoadLevel(void *world, s32 id, s32 flags);
 s32 Cinema_NoWaitCues(void);
 
 /* Runs once (until the state is cleared): resets the current player when

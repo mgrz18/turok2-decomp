@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/ai.h"
 
 typedef struct {
     /* 0x00 */ s32 active;
@@ -17,7 +18,6 @@ typedef struct {
     /* 0x250 */ s32 enabled;
 } State00403520;
 
-void CAI__SetMode(u8 *actor, u8 *ai, s32 a2);
 
 /* Moves the encounter to its next step: accumulates the step's value, sets
  * whether it is enabled, and fires the actor's events for steps 7 and 8. */

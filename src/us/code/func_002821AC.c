@@ -2,13 +2,11 @@
 #include "structs/camera.h"
 #include "globals/render.h"
 #include "globals/hud.h"
+#include "protos/list.h"
 /* sCinemaTextFadeOut is the marker string itself, but the ROM compares the text
  * pointer with its first word (lw), as if it were a char *: kept as is. */
 
 extern u8 *D_800B2CD0;
-void CList__Remove(CList *list, void *element);
-void CList__AddHead(CList *list, void *element);
-void CList__AddTail(CList *list, void *element);
 void CCameraText__Reset(CCameraText *text);
 
 /* CCameraPool__TakeText, inlined: takes a free text from the pool and puts it on the

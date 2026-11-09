@@ -5,9 +5,9 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 #include "globals/engine.h"
+#include "protos/player.h"
 
 typedef struct { s16 unk0; u8 pad[0x1E]; void *unk20; } O06A2;
-extern s32 CPlayerPool__GetIndex(void *a, s32 b);
 extern s32 Controller_MenuLeft(void *a);
 extern s32 Controller_MenuRight(void *a);
 extern f32 D_800C1348;

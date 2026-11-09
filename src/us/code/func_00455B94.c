@@ -3,13 +3,13 @@
 #include "structs/game.h"
 #include "structs/player_options.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
 /* Menu text item: print the current player's suicide count (his
  * CPlayerOptions in gEngineApp_m_Settings_slots) at the end of the item's text. */
 
 extern char D_800C1330[];
 
-s32 CPlayerPool__GetIndex(void *state, void *player);
 s32 MenuItem_TextLength_2(MenuItem *item);
 void sprintf(char *dst, char *fmt, s32 value);
 

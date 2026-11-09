@@ -5,6 +5,7 @@
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "globals/player.h"
+#include "protos/player.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x114];
@@ -13,7 +14,6 @@ typedef struct {
 
 void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuning);
 void CPlayer__MoveInWater(CPlayer *player, CGameObjectInstance *body, void *tuning);
-s32 CPlayer__SetState(CPlayer *player, CGameObjectInstance *body, s32 mode);
 f32 func_002982F0(f32 x);
 f32 Random_Float(f32 scale);
 void Sound__Play(s16 sound, CVector3 pos, void *source, s32);

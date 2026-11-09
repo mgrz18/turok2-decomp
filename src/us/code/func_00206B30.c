@@ -3,6 +3,8 @@
 #include "gfx.h"
 #include "gbi_t2.h"
 #include "globals/render.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
 /* gDPLoadTextureBlock's expressions, for a 2^info[2] x 2^info[3] texture. */
 #define WIDTH (1 << info[2])
@@ -32,8 +34,6 @@
         gDPPipeSync(gDList++);                                                   \
     }
 
-extern void CCache__LockForDisplayList(s32 unused, void **resource);
-extern s32 *CISet__GetBlock(void *table, s32 index);
 
 /* Loads frame `frame` of the texture `resource` (and its palette `secondary`)
  * into TMEM, skipping what the last call already loaded, then turns texturing on. */

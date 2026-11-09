@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/list.h"
+#include "protos/list.h"
 
 struct func_8044B27C_S1;
 struct func_8044B27C_S1 {
@@ -31,7 +32,6 @@ struct func_8044B27C_S1 {
 };
 struct func_8044B27C_S1;
 typedef struct func_8044B27C_S1 func_8044B27C_S1;
-extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
 extern void * memset(void *arg0, int arg1, u32 arg2);
 extern void CCamera__Construct(void *);
 extern void CCamera__Advance(void *);

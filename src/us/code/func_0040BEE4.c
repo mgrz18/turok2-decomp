@@ -5,6 +5,7 @@
 #include "structs/model.h"
 #include "globals/boss.h"
 #include "globals/engine.h"
+#include "protos/game.h"
 
 /* Draw callback of the module's actors: draws each body part (anim group) whose slot is active in the
  * module object's mask, refreshing the slot's state first unless a cinema path is playing. */
@@ -18,7 +19,6 @@ extern void CGameObjectInstance__DrawShadow(CGameObjectInstance *actor, void *ai
 extern s32 Cinema_PathPlaying(void);
 extern void ScriptAnimator_Apply(void *slotData);
 extern void ScreenTint_UpdateMode(void);
-extern void Render_DrawModel(s32 hModel, s32 model, s32 one, CLights1 *slot, s32 zero, s32 index, s32 second);
 
 void MotherBoss_Draw(CGameObjectInstance *actor, void *ai, CDrawArgs *req) {
     MotherBossState *state;

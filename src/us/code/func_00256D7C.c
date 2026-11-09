@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/region.h"
+#include "protos/game.h"
 
 extern CRegionInfo *GameObject_GetRegionInfo(CGameObjectInstance *actor);
 extern f32 func_00298470(f32 x); /* square root */
-extern f32 GameObject_GetRegionFloorHeight(CGameObjectInstance *actor, s32 arg1);
 
 /* Keeps an actor inside a sphere of radius 20000 in regions with flag 0x4000. */
 void CPlayer__KeepInSphere(CPlayer *player, CGameObjectInstance *actor) {

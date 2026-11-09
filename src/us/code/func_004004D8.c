@@ -9,6 +9,7 @@
 #include "globals/render.h"
 #include "globals/engine.h"
 #include "globals/automap.h"
+#include "protos/iset.h"
 
 /* The automap: the level's navigation regions are drawn as lines in a 2D
  * orthographic view around the player, with an arrow for the player and a
@@ -46,7 +47,6 @@ extern s32 gEngineApp_m_Settings_nextMode; /* local type: globals/game.h declare
 extern FrameBuffers *gEngineApp_m_pCurrentFrameData[]; /* local type: CFrameData * (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently (gEngineApp.m_pCurrentFrameData would need game.h, whose gEngineApp_m_Settings is not this file's s32) */
 extern Vp gScreenViewport[];
 
-extern char *CISet__GetBlock(s32 *data, s32 index);
 extern void CMtxF__InvertAffine(f32 *out, f32 *m);
 extern void CMtxF__ToMtxAffine(f32 *m, Mtx *out);
 extern void CMtxF__TransformPoint(f32 *m, CVector3 *in, CVector3 *out);

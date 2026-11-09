@@ -4,6 +4,7 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 /* Menu item handler: depending on the menu state, checks the item (PakMenu_CheckPak) and prints its text, or (states 1
  * and 2) resets the menu flags and opens the item's menu on its owner's camera. */
@@ -22,7 +23,6 @@ typedef struct {
 
 extern s32 PakMenu_CheckPak(Item *item, s32 id, s32 a2);
 extern void *PakMenu_GetReturnMenu(Item *item);
-extern void MenuPool_OpenMenu(void *dst, void *string, CPlayer *owner, ItemData *data, s32 a4);
 
 static __inline__ s32 ItemId(Item *item) {
     s32 id;

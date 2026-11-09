@@ -3,13 +3,13 @@
 #include "gbi_t2.h"
 #include "structs/frame.h"
 #include "globals/render.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
 /* One two-word display list command at the list head. */
 
 
 s32 Render_SetupMaterial(s32, s32);
-s32 *CISet__GetBlock(s32 *, s32);
-void CCache__LockForDisplayList(s32, s32 **);
 void Render_SetRenderMode(s32);
 
 void func_0020BBE4(s32 arg0, s32 renderMode, s32 **model, s32 matrix, s32 projected,

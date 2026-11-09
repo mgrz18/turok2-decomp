@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "globals/game.h"
 #include "globals/boss_ai.h"
+#include "protos/ai.h"
 
 /* AI init for the module's minions (types 0x456 and others): sets the anim table and callbacks, targets the
  * current player and starts anim state 1. */
@@ -11,7 +12,6 @@ extern void BlindOne_ActorHurt(void);
 extern void EnemyAI_HeadNodeCallback(void);
 extern void BlindOne_Group3Draw(void);
 extern void BlindOne_Draw(void);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 state);
 
 void BlindOne_Group3Init(CGameObjectInstance *obj, CAI *ai) {
     void *player;

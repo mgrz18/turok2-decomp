@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
 
-extern void CCache__ClearDisplayListLocks(s32, s32);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);

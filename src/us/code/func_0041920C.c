@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/game.h"
+#include "protos/menu.h"
 
-s32 Menu_StepValue(s32, s32, s32, s32, s32, s32);
 
 
 s32 TeamBloodMenu_StepTextureSet(s32 arg0, s32 arg1)

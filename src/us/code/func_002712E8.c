@@ -10,6 +10,7 @@
 #include "structs/list.h"
 #include "structs/libaudio.h"
 #include "globals/audio.h"
+#include "protos/ultra.h"
 
 struct Shared_Quad;
 struct Shared_Quad {
@@ -101,8 +102,6 @@ struct Voice {
 };
 extern void __osRestoreInt(OSIntMask mask);
 extern OSIntMask __osDisableInt(void);
-extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 struct GameplayCamera;
 typedef struct ContextRecAt2BC0 ContextRecAt2BC0;
 struct ContextRecAt2BC0 {

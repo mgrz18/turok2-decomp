@@ -1,14 +1,13 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 /* Flying AI state: keep facing the target; when something is in the way,
  * side-step away from it, otherwise damp the velocity. Fires state 4 when
  * the timer runs out. */
 
 void AI_UpdateTargets(CGameObjectInstance *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
-void AI_TurnClamped(CGameObjectInstance *self, CAI *ai, f32 angle, f32 arg3);
 f32 AI_LerpByAggression(CGameObjectInstance *self, CAI *ai, f32 lo, f32 hi);
-void CAI__SetMode(CGameObjectInstance *self, CAI *ai, s32 mode);
 s32 AI_IsAimedAt(CGameObjectInstance *self, CAI *ai, CGameObjectInstance *target, f32 angle);
 void CMtxF__SetRotateY(f32 m[4][4], f32 angle);
 void CMtxF__TransformPoint(f32 m[4][4], CVector3 *in, CVector3 *out);

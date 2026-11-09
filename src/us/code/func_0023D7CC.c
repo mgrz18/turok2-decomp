@@ -3,6 +3,7 @@
 #include "gbi_t2.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
+#include "protos/iset.h"
 
 /* A vertex of the display list, put in the sweep's space and classified. */
 typedef struct ProjVertex {
@@ -29,7 +30,6 @@ typedef union DLCmd {
 #define DLCMD_SEGOFF(c) ((c)->w1 & 0xFFFFFF)
 #endif
 
-char *CISet__GetBlock(s32 *list, s32 index);
 void CMtxF__TransformPoint(f32 (*mtx)[4], CVector3 *in, ProjVertex *out);
 void ModelSweep_TestTriangle(ModelSweep *ms, ProjVertex **tri);
 

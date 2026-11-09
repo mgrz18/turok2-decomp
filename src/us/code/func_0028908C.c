@@ -1,6 +1,6 @@
 #include "common.h"
+#include "protos/scene.h"
 
-s32 CScene__Update(s32);                         /* extern */
 s32 COnScreen__DrawBossBars(s32);                         /* extern */
 s32 func_00281354(s32);                         /* extern */
 s32 CEngineApp__DrawFade(s32);                         /* extern */

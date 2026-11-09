@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 #include "globals/audio.h"
+#include "protos/iset.h"
 
 extern void adecClearStopFlag();
 extern QueueRec D_800F55F4[];

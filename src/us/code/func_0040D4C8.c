@@ -2,13 +2,13 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 /* Second boss module: plays sound 0x284F, sends the module object to anim state 1 and steps the script to
  * the next phase. */
 
 
 extern void Sound__Play2D(s32 sound);
-extern void CAI__SetMode(CGameObjectInstance *obj, void *ai, s32 state);
 
 /* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase(BlindOneState *state) {

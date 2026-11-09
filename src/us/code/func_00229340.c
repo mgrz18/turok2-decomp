@@ -4,6 +4,7 @@
 #include "structs/collision.h"
 #include "globals/scene.h"
 #include "globals/collision.h"
+#include "protos/game.h"
 
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
 extern void CMtxF__SetRotateZ(CMtxF m, s32 angle);              /* rotation about Y */
@@ -11,8 +12,6 @@ extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);  /* tra
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
 extern CMtxF *CParticle__GetParentTransform(CParticle *p, s32 arg1);         /* parent transform */
 extern void GameObject_TraceMove(CParticle *p, CVector3 to, CVector3 *outPos, void **outRegion, s32, s32);
-extern void CParticleSystem__Spawn(CParticleSystem *sys, CParticle *p, void *owner, s32 *ownerCount, void *target, s32 model, CVector3 dir,
-                          CQuaternion rot, CVector3 pos, void *region, s32 arg2, s32 flags);
 
 static __inline__ f32 offset_x(CParticle *p) {
     if (p->m_pEffect->m_pModel != NULL) {

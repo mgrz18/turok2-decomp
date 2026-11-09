@@ -2,13 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/ultra.h"
 
 extern void __scMain(void *sc);
-extern void osCreateMesgQueue(char *row, char *slots, s32 count);
-extern void osSetEventMesg(s32 slot, char *row, s32 text);
-extern void osViSetEvent(char *row, s32 text, s32 style);
-extern void osCreateThread(char *list, s32 count, void *template, Panel *owner, s32 arg4, s32 arg5);
-extern void osStartThread(char *list);
 void osCreateScheduler(Panel *panel, s32 arg1, s32 arg2, s32 arg3, unsigned char style) {
     panel->active = 1;
     panel->field2F4 = 0;

@@ -9,6 +9,7 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 /* Controller pak menu: stops the pak sounds and shows the message for the pak's state. */
 
@@ -17,7 +18,6 @@ extern s32 D_8011B114;
 void CCache__Flush(s32 a);
 void CCache__Deallocate(s32 a, s32 b);
 CPlayer *CPlayerPool__FindByController(void *a, void *b);
-void MenuPool_OpenMenu(void *a, void *b, s32 c, s32 d, s32 e);
 
 s32 PakMenu_SelectCancel(s32 a0, Menu *arg) {
     struct {

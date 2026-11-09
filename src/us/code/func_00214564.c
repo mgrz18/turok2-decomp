@@ -4,6 +4,7 @@
 #include "globals/scene.h"
 #include "globals/camera.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
 
 /* A placed prop as the level file stores it. */
 typedef struct {
@@ -37,7 +38,6 @@ typedef struct {
     /* 0x8A */ u8 colorFrame;
 } PlacedProp;
 
-void *CScene__GetIntelligence(void *, s32);
 void CQuaternion__Normalize(f32 *);
 void CQuaternion__ToMatrix(f32 *, void *);
 void CMtxF__ScaleAxes(void *, f32, f32, f32);
