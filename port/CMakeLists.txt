@@ -6,7 +6,7 @@
 #
 # Pieces live in port/cmake/*.cmake so they merge independently:
 #   game.cmake  turok2_game, the game C as a host static library (docs/port/BUILD.md)
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.24)  # libultraship needs 3.24
 project(turok2_port C CXX)
 
 option(T2_BUILD_GAME_LIB "Build turok2_game (the game C, host static library)" ON)
