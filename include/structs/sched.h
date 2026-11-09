@@ -37,7 +37,7 @@ typedef struct T2ScTask {
     /* 0x54 */ OSMesg msg;
     /* 0x58 */ u64 startTime;
     /* 0x60 */ u64 totalTime;
-} T2ScTask; /* size 0x68 */
+} T2ScTask;
 
 typedef struct T2Sched {
     /* 0x000 */ OSScMsg retraceMsg;     /* type 1 */

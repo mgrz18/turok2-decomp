@@ -67,7 +67,7 @@ typedef struct CDelayedEvent {
     /* 0x04 */ struct CDelayedEvent *m_pNext;
     /* 0x08 */ struct LevelEvent *m_pEvent;
     /* 0x0C */ f32 m_Time;
-} CDelayedEvent; /* size 0x10 */
+} CDelayedEvent;
 #endif
 
 /* Turok 3's CScene, the level (gScene). Called CWorld here until round N3;
