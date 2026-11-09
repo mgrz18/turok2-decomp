@@ -113,8 +113,15 @@ typedef struct {
 /* Controller Pak internals (PRinternal/controller.h). */
 typedef union {
     struct {
+#if defined(TARGET_PORT) && defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+        /* little-endian host: ipage must still read bank << 8 | page (libultra mixes both views);
+         * the virtual PIF swaps each unit as a u16 (port/runtime/t2pif.c) */
+        u8 page;
+        u8 bank;
+#else
         /* 0x0 */ u8 bank;
         /* 0x1 */ u8 page;
+#endif
     } inode_t;
     /* 0x0 */ u16 ipage;
 } __OSInodeUnit;

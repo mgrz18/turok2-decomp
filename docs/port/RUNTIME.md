@@ -180,7 +180,7 @@ LOADBUFF, SAVEBUFF, SETBUFF, SETVOL, SEGMENT), written as expanded macros in 13 
 - Saves: Controller Pak only (no `osEeprom*` caller). `Pak_*` (module 1) over libultra's pfs C
   (`osPfsInitPak`, `osPfsFindFile`, `osPfsReadWriteFile`, `osPfsAllocateFile`, ...; module 1
   0x427180-0x429xxx), which goes down to `__osContRamRead/Write` and `__osSiRawStartDma`
-  (PIF RAM). Engine mode 0 is the pak check: it probes every port before the legal screen.
+  (PIF RAM; on the host the virtual PIF of port/runtime/t2pif.c, [INPUT.md](INPUT.md)). Engine mode 0 is the pak check: it probes every port before the legal screen.
 
 ## 2. Threads and message queues
 

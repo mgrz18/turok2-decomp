@@ -28,6 +28,8 @@ extern "C" {
 
 // the game's screen size (render.h; Video_SetMode writes it)
 extern "C" int32_t gScreenWidth, gScreenHeight;
+extern "C" int T2Game_EngineMode(void); // port/game/t2modelog.c
+extern "C" const void* T2Game_TopMenu(int* cursor);
 
 namespace {
 
@@ -63,6 +65,57 @@ int ContInit(uint8_t* bits) {
     return osContInit(&sContQueue, bits, status);
 }
 
+// --input "START@200,A@320,DD@400": scripted presses on port 1 for headless runs (debug aid,
+// docs/port/INPUT.md). Each press holds the button for kInputHold host frames from FRAME on.
+struct ScriptedPress {
+    int frame;
+    uint16_t button;
+};
+std::vector<ScriptedPress> sScript;
+int sFrame;
+constexpr int kInputHold = 4;
+
+bool ParseInputScript(const std::string& spec) {
+    static const struct {
+        const char* name;
+        uint16_t bit;
+    } kButtons[] = { { "A", 0x8000 },  { "B", 0x4000 },  { "Z", 0x2000 },  { "START", 0x1000 }, { "DU", 0x0800 },
+                     { "DD", 0x0400 }, { "DL", 0x0200 }, { "DR", 0x0100 }, { "L", 0x0020 },     { "R", 0x0010 },
+                     { "CU", 0x0008 }, { "CD", 0x0004 }, { "CL", 0x0002 }, { "CR", 0x0001 } };
+    size_t pos = 0;
+    while (pos < spec.size()) {
+        size_t end = spec.find(',', pos);
+        std::string item = spec.substr(pos, end == std::string::npos ? std::string::npos : end - pos);
+        pos = end == std::string::npos ? spec.size() : end + 1;
+        size_t at = item.find('@');
+        if (at == std::string::npos) {
+            return false;
+        }
+        std::string name = item.substr(0, at);
+        uint16_t bit = 0;
+        for (auto& b : kButtons) {
+            if (name == b.name) {
+                bit = b.bit;
+            }
+        }
+        if (bit == 0) {
+            return false;
+        }
+        sScript.push_back({ atoi(item.c_str() + at + 1), bit });
+    }
+    return true;
+}
+
+uint16_t ScriptedButtons() {
+    uint16_t b = 0;
+    for (auto& p : sScript) {
+        if (sFrame >= p.frame && sFrame < p.frame + kInputHold) {
+            b |= p.button;
+        }
+    }
+    return b;
+}
+
 // LUS's OSContPad carries gyro and right-stick fields (0x24 bytes); the game's is the N64's
 // 6-byte record.
 void ContRead(void* pads) {
@@ -72,6 +125,9 @@ void ContRead(void* pads) {
     auto* out = static_cast<uint8_t*>(pads);
     for (int i = 0; i < 4 && i < MAXCONTROLLERS; i++) {
         uint16_t b = (uint16_t)lus[i].button;
+        if (i == 0) {
+            b |= ScriptedButtons();
+        }
         // N64 byte order is not an issue here: OSContPad.button is read as a u16 by the game
         memcpy(out + i * 6, &b, 2);
         out[i * 6 + 2] = (uint8_t)lus[i].stick_x;
@@ -92,6 +148,12 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     cfg.lowMemory = args.lowMemory;
     cfg.verbose = args.verbose;
     cfg.audio = args.audio;
+    cfg.pakMode = args.pakMode;
+    cfg.pakDir = args.pakDir.empty() ? nullptr : args.pakDir.c_str();
+    if (!args.input.empty() && !ParseInputScript(args.input)) {
+        fprintf(stderr, "--input: expected BUTTON@FRAME[,...] (A B Z START DU DD DL DR L R CU CD CL CR)\n");
+        return 1;
+    }
     if (T2Port_Boot(&cfg) != 0) {
         return 1;
     }
@@ -105,7 +167,22 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         if (window) {
             window->HandleEvents();
         }
+        sFrame = f;
         T2Port_Frame();
+        static int lastMode = -1;
+        if (int mode = T2Game_EngineMode(); mode != lastMode) {
+            printf("game: frame %d: engine mode %d\n", f, mode);
+            lastMode = mode;
+        }
+        static const bool menuLog = getenv("T2_MENU_LOG") != nullptr;
+        static const void* lastMenu = nullptr;
+        static int lastCursor = -1;
+        int cursor;
+        if (const void* menu = T2Game_TopMenu(&cursor); menuLog && (menu != lastMenu || cursor != lastCursor)) {
+            printf("game: frame %d: menu desc %p cursor %d\n", f, menu, cursor);
+            lastMenu = menu;
+            lastCursor = cursor;
+        }
         if (args.audio) {
             // the frames the audio manager produced this retrace (22050 Hz stereo s16) to LUS's
             // AudioPlayer (a no-op when it has no audio backend, e.g. headless)
@@ -177,6 +254,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
            "%llu PI DMAs, %llu missing-function calls\n",
            (unsigned long long)s.frames, secs, (unsigned long long)s.switches, (unsigned long long)s.gfxTasks, drawn,
            (unsigned long long)s.audioTasks, (unsigned long long)s.piDmas, (unsigned long long)s.missingCalls);
+    T2PifStats pif;
+    T2Port_GetPifStats(&pif);
+    printf("game: PIF %llu SI DMAs, %llu status, %llu pak reads, %llu pak writes\n", (unsigned long long)pif.dmas,
+           (unsigned long long)pif.status, (unsigned long long)pif.reads, (unsigned long long)pif.writes);
     fflush(stdout);
     return 0;
 }

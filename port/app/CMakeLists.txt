@@ -24,6 +24,7 @@ if(T2_LINK_GAME AND TARGET turok2_game)
     add_library(t2runtime STATIC
         ${T2_PORT_DIR}/runtime/t2os.c
         ${T2_PORT_DIR}/runtime/t2ultra.c
+        ${T2_PORT_DIR}/runtime/t2pif.c
         ${T2_PORT_DIR}/runtime/t2boot.c
         ${T2_PORT_DIR}/runtime/t2loader.c)
     target_include_directories(t2runtime PUBLIC ${T2_PORT_DIR}/runtime ${T2_PORT_DIR}/audio PRIVATE ${T2_PORT_DIR}/include)

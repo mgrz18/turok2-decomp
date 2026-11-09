@@ -136,7 +136,7 @@ Rows r1-* and r4-* were found on the branches; I-* during the merge (C18). Every
    table itself (`D_0043BF18 + 0x38`, an empty string), while the first menu's items map their
    N64 text addresses correctly (`t2_n64_to_host`). Follow the item text of this desc (its update
    callbacks `DamagedPakMenu_UpdateLine1/2` and the `data` words of the .virtual desc table).
-2. **Controller Pak / input**: `__osSiRawStartDma` is not modelled, so the game always sees a
+2. **Controller Pak / input** (done in round 4 s1, below): `__osSiRawStartDma` was not modelled, so the game always sees a
    damaged pak and never gets past mode 0. Model the PIF (controllers, then a pak file) to reach
    the title screen.
 3. **Audio**: `CAudioWorld__StopHandle` and the rest of the `CAudioWorld` API (about 40 functions:
@@ -232,6 +232,59 @@ Next (s5's area):
    func_00255F04, func_00275450 (`alCSeqNew`) 8), and the local pad views that the counter does not
    see (the swoosh files were 34 of them): the same recipe, `T2_OFFSETOF`/typed members, asm_diff
    per batch.
+
+## Round 4, part s1: controllers and the Controller Pak (mode 0 passes)
+
+Details: [INPUT.md](INPUT.md). Branch `names-R4_s1`, 4 commits on 474e40af.
+
+- **Virtual PIF** (`port/runtime/t2pif.c`) behind `__osSiRawStartDma`: joybus status/reset,
+  pak block read/write with address and data CRCs, over an emulator-standard 32 KB `.mpk` per
+  port (`turok2_pak<N>.mpk` in the user data dir; blank formatted when missing; written block by
+  block). The game's own libultra pfs C runs unchanged: the PIF converts the pack ID, inode and
+  directory blocks between the file's big-endian layout and host order. Flags: `--pak-dir DIR`,
+  `--pak-blank` (in memory, tests), `--no-pak`; debug: `--input START@300,A@400` (scripted
+  presses), `T2_PIF_LOG=1`, `T2_MENU_LOG=1`. The run logs engine mode changes and PIF counters.
+  Rumble Pak: "not present" (unchanged).
+- **Game-side fixes** (TARGET_PORT only; asm_diff 0 over 3,938 files): pak address high byte
+  first in `__osPackRam{Read,Write}Data`; queue as `OSMesgQueue *` in `__osContRam{Read,Write}`;
+  typed `__osPfsSelectBank(_2)`; `__OSInodeUnit` `{page, bank}` on little-endian hosts
+  (`include/ultra_types.h`); `MenuRecAt24` (`include/rw/abu_types.h`) and
+  `PakConfirmMenu_SelectNo`'s `Item` lead with the host `Menu` fields (both crashed in the
+  repair/continue confirm menus).
+
+How far it gets now (Linux, headless, `--game --draw`):
+
+```
+--pak-blank : mode 0 -> f297 mode 1 (legal screen, full text) -> f1069 mode 3 ("EXPANSION PAK
+              FOUND!", 3D model) -> f1357 mode 4 (cinema) -> SIGSEGV
+--no-pak    : pak menu, any button -> mode 1
+zeroed .mpk : damaged-pak menu -> attempt repair -> yes -> repaired (the file is a valid
+              big-endian formatted pak) -> continue without saving -> mode 1
+```
+
+Where it stops (mode 4, not in s1's scope):
+
+```
+CCameraViewParams__Construct (o=0x31)        func_00280C28.c:12
+CCamera__Construct (view=0x1)                func_0042F9B0.c:37
+CCameraPool__AllocCamera (gEngineApp_m_Game_m_CameraPool) func_0042FF58.c:21
+CPlayer__NewGame (character=0)               func_0042DC18.c:33
+CPlayerPool__NewGame (count=1)               func_0042E5AC.c:96
+CEngineApp__StartWarp (.., 100)              func_00288DD0.c:26
+EngineMode04_Cinema_Init                     func_00289554.c:6
+EngineMode17_Switch_Retrace                  func_00289DFC.c:42
+```
+
+For the merge: files others may touch: `include/ultra_types.h` (inode union),
+`include/rw/abu_types.h` (`MenuRecAt24` only), `src/us/code/func_00420F34.c`,
+`port/app/game.cpp` / `main.cpp` / `game.h` (flags, mode log, scripted input),
+`port/runtime/t2ultra.c` (`__osSiRawStartDma` moved to t2pif.c), `port/runtime/t2port.h`
+(`T2PortConfig.pakMode/pakDir/pakPorts`), `port/app/CMakeLists.txt` (+t2pif.c),
+new `port/game/t2modelog.c`. Header changes: drop `decls.json` before gendata.
+
+Next: the mode 4 camera crash; a swap plan for the save records so notes move between the
+port and emulators (the pak filesystem already does); a Rumble Pak mode; macOS: the same code
+is LP64-clean (the queue truncation is fixed) but untested there.
 
 ## Round 2 (history)
 

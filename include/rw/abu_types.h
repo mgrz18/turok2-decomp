@@ -2970,7 +2970,16 @@ typedef struct Shared_PakMenu {
 struct MenuRecAt24;
 typedef struct MenuRecAt24 MenuRecAt24;
 struct MenuRecAt24 {
+#ifdef TARGET_PORT
+    /* the host Menu's leading fields (structs/menu.h: cursor .. param), pointers 8 bytes wide */
+    s16 cursor, offsetX, offsetY;
+    u8 _pad6[2];
+    void *block, *items;
+    s32 count;
+    void *desc, *param;
+#else
     char pad0[0x1C];
+#endif
     struct CPlayer *player;   /* structs/player.h */
     PakMenuSlot *slot;
     char *prompt;
