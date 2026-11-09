@@ -232,13 +232,13 @@ void MenuItem_Layout(MenuItem *it, MenuItemLayout *o) {
                 if (it->type == 5) {
                     p = func_00413230_41363C(it);
                 } else {
-                    p = (u8 *) it->data;
+                    p = (u8 *) it->text;
                 }
                 v = func_004163C0_41363C(p, fs, fs);
                 o->width = v;
             } else {
                 n = 0;
-                p = (it->type == 5 ? func_00413230_41363C(it) : (u8 *) it->data);
+                p = (it->type == 5 ? func_00413230_41363C(it) : (u8 *) it->text);
                 for (; p != NULL && *p != 0 && *p != 10; p++) {
                     n++;
                 }
@@ -518,10 +518,10 @@ void MenuItem_DrawImage(MenuItem *item, MenuItemLayout *box, MenuItemLayout *are
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00440618.c, func_00440618, with Turok 2's layouts. */
 
 extern void func_0041363C_4143DC(MenuItem *item, MenuItemLayout *info) __asm__("MenuItem_Layout");
-extern void func_00413F74_4143DC(MenuItem *item, MenuItemLayout *box, MenuItemLayout *column, Menu *window, s32 data) __asm__("MenuItem_DrawString");
+extern void func_00413F74_4143DC(MenuItem *item, MenuItemLayout *box, MenuItemLayout *column, Menu *window, char *text) __asm__("MenuItem_DrawString");
 
 static __inline__ void fin_4145B0(MenuItem *item, MenuItemLayout *box, MenuItemLayout *column, Menu *window) {
-    func_00413F74_4143DC(item, box, column, window, item->data);
+    func_00413F74_4143DC(item, box, column, window, item->text);
 }
 
 /* Draws a slider: its label, its bar and its knob at the item's value. */
@@ -1257,19 +1257,21 @@ s32 MenuItem_TextLength(MenuItem *a) {
 /* ---- The window functions below use Menu, MenuDesc, ControllerProfile and MenuPool (structs/menu.h) ---- */
 
 /* ---------------- MenuItem_DrawText ---------------- */
-s32 func_00413F74_416168(s32, s32, s32, s32, s32) __asm__("MenuItem_DrawString");
+void func_00413F74_416168(MenuItem *, MenuItemLayout *, MenuItemLayout *, Menu *, char *) __asm__("MenuItem_DrawString");
 
-void MenuItem_DrawText(Menu *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    func_00413F74_416168((sptr) arg0, arg1, arg2, arg3, (sptr) arg0->desc);
+/* A text item's draw callback: its line (MenuItem.text; a Menu view read Menu.desc, which
+ * is the same word on the N64 but the item's desc pointer on the host). */
+void MenuItem_DrawText(MenuItem *arg0, MenuItemLayout *arg1, MenuItemLayout *arg2, Menu *arg3) {
+    func_00413F74_416168(arg0, arg1, arg2, arg3, arg0->text);
 }
 
 /* ---------------- MenuItem_DrawChar ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00442224.c, func_00442224, with Turok 2's layouts. */
 
-extern void func_00413F74_416188(MenuItem *a, s32 b, s32 c, s32 d, u8 *text) __asm__("MenuItem_DrawString");
+extern void func_00413F74_416188(MenuItem *a, sptr b, sptr c, sptr d, u8 *text) __asm__("MenuItem_DrawString");
 
 /* Draws the item's single character (the low byte of its data). */
-void MenuItem_DrawChar(MenuItem *a, s32 b, s32 c, s32 d) {
+void MenuItem_DrawChar(MenuItem *a, sptr b, sptr c, sptr d) {
     u8 buf[2];
 
     buf[0] = ((u8 *) &a->data)[3];
@@ -1278,10 +1280,10 @@ void MenuItem_DrawChar(MenuItem *a, s32 b, s32 c, s32 d) {
 }
 
 /* ---------------- MenuItem_DrawBinding ---------------- */
-s32 func_00413230_4161B4(s32) __asm__("MenuItem_FormatBinding");
-s32 func_00413F74_4161B4(s32, s32, s32, s32, s32) __asm__("MenuItem_DrawString");
+sptr func_00413230_4161B4(sptr) __asm__("MenuItem_FormatBinding");
+s32 func_00413F74_4161B4(sptr, sptr, sptr, sptr, sptr) __asm__("MenuItem_DrawString");
 
-void MenuItem_DrawBinding(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+void MenuItem_DrawBinding(sptr arg0, sptr arg1, sptr arg2, sptr arg3) {
     func_00413F74_4161B4(arg0, arg1, arg2, arg3, func_00413230_4161B4(arg0));
 }
 

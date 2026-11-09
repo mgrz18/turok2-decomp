@@ -1229,10 +1229,11 @@ s32 MenuItem_TextLength_2(MenuItem *a) {
 /* ---- The window functions below use Menu, MenuDesc, ControllerProfile and MenuPool (structs/menu.h) ---- */
 
 /* ---------------- MenuItem_DrawText_2 ---------------- */
-s32 func_00413F74_416168(s32, s32, s32, s32, s32) __asm__("MenuItem_DrawString_2");
+void func_00413F74_416168(MenuItem *, MenuItemLayout *, MenuItemLayout *, Menu *, char *) __asm__("MenuItem_DrawString_2");
 
-void MenuItem_DrawText_2(Menu *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    func_00413F74_416168((sptr) arg0, arg1, arg2, arg3, (sptr) arg0->desc);
+/* A text item's draw callback: its line (MenuItem.text; see MenuItem_DrawText). */
+void MenuItem_DrawText_2(MenuItem *arg0, MenuItemLayout *arg1, MenuItemLayout *arg2, Menu *arg3) {
+    func_00413F74_416168(arg0, arg1, arg2, arg3, arg0->text);
 }
 
 /* ---------------- MenuItem_DrawChar_2 ---------------- */
