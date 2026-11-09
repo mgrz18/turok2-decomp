@@ -27,6 +27,28 @@ extern "C" {
 
 namespace {
 
+// T2_DLDUMP=1: print the commands of the last frame's display list (following G_DL), for
+// bring-up. Words are host-sized (gfx.h GfxWord).
+void DumpDL(const uintptr_t* dl, int depth, int* budget) {
+    for (; *budget > 0; dl += 2) {
+        (*budget)--;
+        uint32_t w0 = (uint32_t)dl[0];
+        uint8_t op = w0 >> 24;
+        printf("%*s%02X %08X %016llX\n", depth * 2, "", op, w0, (unsigned long long)dl[1]);
+        if (op == 0xDE) {
+            if (dl[1] & 1) {
+                continue; // segmented: not followed
+            }
+            DumpDL((const uintptr_t*)dl[1], depth + 1, budget);
+            if ((w0 >> 16 & 0xFF) == 1) {
+                return; // branch
+            }
+        } else if (op == 0xDF) {
+            return;
+        }
+    }
+}
+
 OSMesgQueue sContQueue;
 OSMesg sContMsg[1];
 
@@ -72,6 +94,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     fflush(stdout);
 
     int drawn = 0;
+    const void* lastDL = nullptr;
     auto t0 = std::chrono::steady_clock::now();
     for (int f = 0; f < args.frames && (!window || window->IsRunning()); f++) {
         if (window) {
@@ -82,6 +105,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         if (T2Port_TakeGfxTask(&task) && args.draw && window && task.dataPtr != nullptr) {
             // Only with --draw: the game's display lists are not host-correct yet (GBI words
             // hold 32-bit addresses; docs/port/BUILD.md "GBI").
+            lastDL = task.dataPtr;
             if (window->DrawAndRunGraphicsCommands((Gfx*)task.dataPtr, {})) {
                 drawn++;
             }
@@ -96,6 +120,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
                    (unsigned long long)s.viSwaps, (unsigned long long)s.missingCalls);
             fflush(stdout);
         }
+    }
+    if (getenv("T2_DLDUMP") != nullptr && lastDL != nullptr) {
+        int budget = 4000;
+        DumpDL((const uintptr_t*)lastDL, 0, &budget);
     }
     // T2_SHOT=<file.ppm>: the last frame Fast3D drew, read back (bring-up screenshots).
     if (const char* shot = getenv("T2_SHOT"); shot != nullptr && window && drawn > 0) {
