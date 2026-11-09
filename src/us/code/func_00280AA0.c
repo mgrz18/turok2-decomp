@@ -48,6 +48,13 @@ void CCamera__DrawGlares(CCamera *cam) {
     mask = 8 << cam->m_Index;
     Hud_SetupTextureMode(0x64);
     Render_SetRenderMode(0x1A);
+#ifdef TARGET_PORT /* one host Gfx (the N64 code writes two u32 words and steps 8 bytes) */
+    {
+        Gfx *g = gDList++;
+        g->w0 = 0xE3001201; /* gDPSetTextureFilter(G_TF_BILERP) */
+        g->w1 = 0x2000;
+    }
+#else
     pp = (u32 **) &gDList;
     q0 = *pp;
     dl = q0;
@@ -56,6 +63,7 @@ void CCamera__DrawGlares(CCamera *cam) {
     dl[1] = 0x2000;
     __asm__("" : : : "memory");
     *pp = q0 + 2;
+#endif
     for (e = D_8010753C; e != NULL; e = e->m_pNext) {
         if ((e->m_CameraMask & mask) && (*e->m_pFlags & 0x80000)) {
             ScreenPos(cam, &e->m_vPos, &sx, &sy);

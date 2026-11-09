@@ -29,7 +29,7 @@ typedef struct VCtx {
                  s32 mode;
 } VCtx;
 typedef struct Vec3fv { f32 x, y, z; } Vec3fv;
-extern u8 D_800ACFC8[];
+extern Gfx D_800ACFC8[]; /* a static display list (gendata emits host Gfx) */
 extern u8 D_8011AD48[];
 extern f32 gCameraVisibleBox[6]; /* local type: the CBox read as six floats by index */
 void Render_InvalidateModeCache(void);
