@@ -14,7 +14,7 @@ $(TEST): t2os.c t2os.h ../tests/t2os_test.c
 
 test: $(TEST)
 	@for i in 1 2 3; do $(TEST) | tee $(BUILD)/run$$i.txt | tail -2; done
-	@grep -h "trace hash" $(BUILD)/run*.txt | sort -u | wc -l | grep -qx 1 && echo "deterministic: same hash on 3 runs" || (echo "NOT deterministic"; exit 1)
+	@grep -h "trace hash" $(BUILD)/run*.txt | sort -u | wc -l | tr -d " " | grep -qx 1 && echo "deterministic: same hash on 3 runs" || (echo "NOT deterministic"; exit 1)
 
 clean:
 	rm -rf $(BUILD)
