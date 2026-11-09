@@ -512,6 +512,24 @@ def main():
         if obj not in mod2:
             needed |= us - defined
 
+    # data the host runtime and audio libraries read by their N64 names (t2audio_mgr.c replaces
+    # the SDK audio manager and reads gAudioFrameSize, gAudioGlobals, ...): needed too, when the
+    # ELF has them as data. Build those libraries before running the generator.
+    for extra in ('app/libt2runtime.a', 'app/libt2audio.a'):
+        path = os.path.join(a.build, extra)
+        if not os.path.exists(path):
+            print('note: %s not built: its data references are not generated' % extra)
+            continue
+        out = subprocess.run(['nm', '-A', path], capture_output=True, text=True, check=True).stdout
+        for line in out.splitlines():
+            p = line.split()
+            if len(p) < 2 or p[-2] != 'U':
+                continue
+            n = p[-1][1:] if sys.platform == 'darwin' and p[-1].startswith('_') else p[-1]
+            s = elf.syms.get(n)
+            if s and s[3] != 'STT_FUNC' and n not in defined:
+                needed.add(n)
+
     # data the game names through port/include/t2_rename.h (t2_X: libultraship also defines X):
     # generated from X's N64 data, emitted under the t2_ name (#define X t2_X in every file)
     renamed = set()

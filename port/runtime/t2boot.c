@@ -26,6 +26,7 @@
 #include "t2os.h"
 #include "t2port.h"
 #include "rnc.h"
+#include "t2audio.h"
 
 void t2ultra_configure(const T2PortConfig *cfg);
 int t2ultra_load_rom(const char *path);
@@ -73,12 +74,19 @@ uintptr_t T2Port_RdramTop(void) {
     return (uintptr_t)sArena + sArenaSize + 0x80000;
 }
 
-/* func_00275520: audio is off on the host for now (docs/port/STATUS.md). The synthesizer itself
- * initializes (alInit, amCreateAudioMgr), but CAudioWorld__Initialize then reads the sound bank
- * from a VM_Alloc copy of the ROM (0x1E0000): big-endian, N64 layout, pointers that are VM
- * addresses. It needs the bank converted (T2Asset / swap_spec.json) first. */
+/* func_00275520: CAudioWorld__Initialize only with --audio (docs/port/AUDIO.md): the sound bank
+ * comes converted from port/audio/t2audio_bank.c (T2Audio_LoadCtl), the sound data file is
+ * swapped by VM_Alloc's hook, the audio manager is port/audio/t2audio_mgr.c. Without --audio
+ * the game runs with no sound world (as before: gAudioWorldReady stays 0). */
+typedef struct CAudioWorld CAudioWorld;
+extern CAudioWorld gAudioWorld;
+void CAudioWorld__Initialize(CAudioWorld *m);
 void Sound__Initialize(void) {
-    t2_log_once("Sound__Initialize: audio off on the host (sound bank not converted yet)");
+    if (!T2Audio_Enabled()) {
+        t2_log_once("Sound__Initialize: audio off (run with --audio)");
+        return;
+    }
+    CAudioWorld__Initialize(&gAudioWorld);
 }
 
 /* func_0028D820: no pager, no TLB, no VM threads; module 1 is linked into the executable
@@ -94,7 +102,10 @@ void VM_Initialize(s32 a, s32 b) {
 void *T2Port_AssetWindow(uint32_t romAddr, uint32_t size);
 intptr_t VM_Alloc(s32 size, s32 unused, u32 romAddr) {
     (void)unused;
-    return (intptr_t)T2Port_AssetWindow(romAddr, (uint32_t)size);
+    void *p = T2Port_AssetWindow(romAddr, (uint32_t)size);
+    if (p != NULL)
+        T2Audio_FixRegion(romAddr, (u8 *)p, (size_t)size); /* the sound data file: no-op when the unit is already host order */
+    return (intptr_t)p;
 }
 
 /* func_0028E6DC */
@@ -185,9 +196,11 @@ int T2Port_Boot(const T2PortConfig *cfg) {
     set_if_zero(&gThreadPriorityLoader, 17);
     set_if_zero(&gThreadPriorityScheduler, 18);
 
+    T2Audio_Enable(sCfg.audio);
+
     t2os_init();
     /* CEngineApp__Idle's work, minus the spin */
-    osCreateThread(&gThreadMain, 1, mainproc, NULL, NULL, gThreadPriorityMain);
+    osCreateThread(&gThreadMain, 1, sCfg.mainEntry ? sCfg.mainEntry : mainproc, NULL, NULL, gThreadPriorityMain);
     osStartThread(&gThreadMain);
     fprintf(stderr, "t2: boot: arena %u MB at %p%s, ROM %s, mainproc started (pri %d)\n", sArenaSize >> 20,
             (void *)sArena, sCfg.lowMemory ? " (low memory)" : "", sCfg.romPath ? sCfg.romPath : "none",

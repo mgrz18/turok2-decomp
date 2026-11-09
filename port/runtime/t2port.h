@@ -28,6 +28,9 @@ typedef struct T2PortConfig {
     uint32_t arenaSize;     /* the game heap ("RDRAM arena"); 0: 32 MB */
     int lowMemory;          /* Linux bring-up aid: arena and game thread stacks below 2 GB (see LINK.md) */
     int verbose;            /* log every device call once / every task */
+    int audio;              /* --audio: Sound__Initialize runs, the audio manager makes one frame per
+                               retrace through the ABI1 interpreter (port/audio, docs/port/AUDIO.md) */
+    void (*mainEntry)(void *); /* tests: run this instead of mainproc on the main game thread */
 } T2PortConfig;
 
 /* Controller hooks (LUS's ControlDeck, set by the app; NULL: no controller). bits gets one bit

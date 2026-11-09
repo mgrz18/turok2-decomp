@@ -11,12 +11,29 @@ typedef struct Filter {
     /* 0x04 */ AcmdW *(*handler)(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, AcmdW *p);
 } Filter;
 
+#ifdef TARGET_PORT
+/* the host layout: ALFilter is larger than 0x14 bytes (structs/libaudio.h ALAuxBus) */
+typedef struct {
+    /* 0x00 */ struct {
+        void *source;
+        void *handler;
+        void *setParam;
+        s16 inp;
+        s16 outp;
+        s32 type;
+    } filter;
+    /* 0x14 */ s32 sourceCount;
+    /* 0x18 */ s32 maxSources;
+    /* 0x1C */ Filter **sources;
+} AuxBus;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
     /* 0x14 */ s32 sourceCount;
     /* 0x18 */ s32 maxSources;
     /* 0x1C */ Filter **sources;
 } AuxBus;
+#endif
 
 #define aClearBuffer(pkt, d, c) {          \
         AcmdW *_a = (AcmdW *)pkt;          \
