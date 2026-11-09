@@ -17,6 +17,7 @@ extern void func_0042EBB4(void);
 extern void COnScreen__LoadFontTexture(void);
 extern void COnScreen__BuildCharacterLookUp(Hud *hud, u8 *anim, void *item);
 
+#ifndef TARGET_PORT
 void COnScreen__Construct(Hud *hud) {
     hud->unk90 = 0;
     hud->unk94 = 0;
@@ -27,3 +28,19 @@ void COnScreen__Construct(Hud *hud) {
     COnScreen__BuildCharacterLookUp(hud, sCharacterSmallLookUpPairs, hud->unkC8);
     COnScreen__BuildCharacterLookUp(hud, sCharacterLookUpPairs, hud->unk148);
 }
+#else
+#include "structs/player.h"
+/* The port: the same on the typed COnScreen (the Hud view above has N64 offsets: 0x90..0x9C are
+ * the four font entries, 0xC8 the small and 0x148 the normal character table, which COnScreen
+ * keeps as one 256-byte array). With the view the tables stayed empty and every glyph was off. */
+void COnScreen__Construct(COnScreen *hud) {
+    hud->m_pmeTinyFont = 0;
+    hud->m_pmeSmallFont = 0;
+    hud->m_pmeNormalFont = 0;
+    hud->m_pmeKanjiFont = 0;
+    func_0042EBB4();
+    COnScreen__LoadFontTexture();
+    COnScreen__BuildCharacterLookUp((Hud *)hud, sCharacterSmallLookUpPairs, hud->m_CharacterSmallLookUpPos);
+    COnScreen__BuildCharacterLookUp((Hud *)hud, sCharacterLookUpPairs, hud->m_CharacterSmallLookUpPos + 0x80);
+}
+#endif

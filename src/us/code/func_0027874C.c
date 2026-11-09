@@ -15,7 +15,11 @@
 #include "protos/scene.h"
 
 typedef struct FontStyle {
+#ifdef TARGET_PORT /* COnScreen's colours, scale and spacing at their host offset (pointers come before them) */
+    u8 pad0[T2_OFFSETOF(COnScreen, m_TopR)];
+#else
     /* 0x00 */ u8 pad0[0xA0];
+#endif
     /* 0xA0 */ s32 envR;
     /* 0xA4 */ s32 envG;
     /* 0xA8 */ s32 envB;

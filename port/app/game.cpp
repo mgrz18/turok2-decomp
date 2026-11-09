@@ -26,6 +26,9 @@ extern "C" {
 
 #include "game.h"
 
+// the game's screen size (render.h; Video_SetMode writes it)
+extern "C" int32_t gScreenWidth, gScreenHeight;
+
 namespace {
 
 // T2_DLDUMP=1: print the commands of the last frame's display list (following G_DL), for
@@ -117,6 +120,15 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             // Only with --draw: the game's display lists are not host-correct yet (GBI words
             // hold 32-bit addresses; docs/port/BUILD.md "GBI").
             lastDL = task.dataPtr;
+            // Fast3D maps RDP coordinates from its native size (320x240 by default) to the
+            // window: the game draws at the size Video_SetMode chose (gScreenWidth x
+            // gScreenHeight, 480x360 in mode 0), so tell it before every frame.
+            if (auto interp = window->GetInterpreterWeak().lock();
+                interp && gScreenWidth > 0 && gScreenHeight > 0 &&
+                (interp->mNativeDimensions.width != (uint32_t)gScreenWidth ||
+                 interp->mNativeDimensions.height != (uint32_t)gScreenHeight)) {
+                interp->SetNativeDimensions((float)gScreenWidth, (float)gScreenHeight);
+            }
             if (window->DrawAndRunGraphicsCommands((Gfx*)task.dataPtr, {})) {
                 drawn++;
             }
