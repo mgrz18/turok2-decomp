@@ -64,7 +64,7 @@ s32 CScene__GetInstanceSavedBitInLevel(struct CScene *, s32, s32);
 sptr CScene__GetIntelligence(void *, s32);
 s32 CScene__GetLevelBit(struct CScene *, s32);
 s32 CScene__GetLevelBitInLevel(void *, s32, s32);
-void CScene__GetLevelName(void *, s32, s32, s32);
+void CScene__GetLevelName(struct CScene *, s32, void *, s32);
 void *CScene__GetLight(struct CScene *, s32);
 void CScene__GetLightsAt(struct CScene *, void *, void *);
 s32 CScene__GetLinkGroupCount(struct CScene *, s32);
