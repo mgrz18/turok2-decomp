@@ -14,11 +14,12 @@ material record). `--render` writes a 256x256 PNG from a small z-buffered softwa
 (`--textured` uses a preview texture decode, `--uvcheck` a checker per texture repeat).
 The whole set (2705 objects, glTF + OBJ) exports in about 15 s.
 
-Locating and decompressing: when part a1's `tools/assets/romfs.py` and `propack.py` are present,
-`models.py` uses them (`fs.children(fs.object(i))[1]` + `fs.blob`). Without them it falls back to
-its own locator (`Rom.object_blocks`) and `tools/assets/rnc_min.py`, a stand-in RNC method-1
-unpacker. Both paths give identical `index.json` for all 2705 objects, and `rnc_min` matches a1's
-CRC-checked `propack.decompress` on every geometry block. The parser (`parse_geometry`) only sees
+Locating and decompressing go through `tools/assets/romfs.py` and `propack.py`
+(`fs.children(fs.object(i))[1]` + `fs.blob`; `Rom` is a thin wrapper over them). The stand-in
+`rnc_min.py` of the first pass is gone (it matched `propack.decompress` on every geometry block).
+Texture previews use `textures.py`'s decoder. `--pose` places the vertices of animated models at
+frame 0 of their animation 0 (`anim.parse_skeleton` / `parse_animation` / `pose` ->
+`apply_pose`); `extract_all.py` exports them that way. The parser (`parse_geometry`) only sees
 the decompressed bytes.
 
 ## Where the models are

@@ -1,7 +1,6 @@
 # Animation and skeletons
 
-Tool: `tools/assets/anim.py` (needs `tools/assets/propack.py` and, if present, `romfs.py` from the
-ROM-filesystem part). `python tools/assets/anim.py baserom.us.z64 --out DIR [--objects 83,105]
+Tool: `tools/assets/anim.py` (locates through `tools/assets/romfs.py`, unpacks through `propack.py`). `python tools/assets/anim.py baserom.us.z64 --out DIR [--objects 83,105]
 [--gltf] [--png --anim N] [--no-keys]` writes per animated object `objNNNN.json` (anim object info,
 skeleton, every animation with decoded per-frame keys), optionally `objNNNN.gltf/.bin` (bone node
 tree + one glTF animation per clip) and a stick-figure PNG of one clip (front and side view).

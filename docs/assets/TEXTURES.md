@@ -21,9 +21,8 @@ Every one of the 1839 texture entries and the 114 graphic sets is an RNC ProPack
 all CRCs verified). Blocks in a set are 8-aligned (gaps of 0..7 bytes). Together these cover 4,344,200 bytes,
 **13.9 %** of the asset region 0x20F178..0x1FF7AEC.
 
-Until part a1's `romfs.py`/`propack.py` are wired in, `textures.py` carries a minimal locator (`cartridge()`,
-`iset_entries()`, `load_block()`) and an RNC1 unpacker (`_rnc1_unpack`; it imports `propack.unpack` instead when
-that module is present). The parsers (`parse_texture_bank`, `decode_texture_frame`, `parse_graphic_set`,
+`textures.py` locates through `romfs.py` (`cart/3`, `cart/16`, `cart/17`) and unpacks through `propack.py`
+(the first pass's private locator and RNC1 port are gone). The parsers (`parse_texture_bank`, `decode_texture_frame`, `parse_graphic_set`,
 `decode_graphic_frame`) only take decompressed bytes.
 
 ## Texture banks ("texture" requests)

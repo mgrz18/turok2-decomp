@@ -56,10 +56,10 @@ names refer to `include/structs/*.h`.
   0x20F178 to 0xFCBFB4 (part a1 / audio).
 * **Compression.** `ProPackDecompress` (func_00200B00.c) unpacks a block that starts with `RNC`
   and copies any other block unchanged. Method 1 data begins at header + 0x12; method 2 is given
-  the whole header. The Python port follows `references/rw_junk/docs/hand_asm_c/rnc.c`, the same
-  hand-written decoder. All 990 RNC blocks of the level set unpack with a matching CRC-16 (header
-  +0xC). Both the decoder and the set reader are a temporary copy inside `levels.py`. Once part a1's
-  `propack.py` exists, `levels.unpack()` uses it.
+  the whole header. All 990 RNC blocks of the level set unpack with a matching CRC-16 (header
+  +0xC). `levels.py` locates through `romfs.py` (`fs.level(i)`, `cart/8`) and unpacks through
+  `propack.py`; the first pass's private RNC port (from `references/rw_junk/docs/hand_asm_c/rnc.c`)
+  is gone.
 * **Transposed tables.** Many tables are `{s32 width, s32 count}` followed by `count*width` bytes
   stored one byte plane at a time: byte 0 of every record, then byte 1 of every record, and so on.
   This layout compresses better. `CUSet__Transpose` (func_0020192C.c) restores record order, and

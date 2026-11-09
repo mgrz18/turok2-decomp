@@ -332,5 +332,6 @@ block that merely *look* like ISets/USets are flagged `heuristic`.
   CScene__InitPersistentData / CLoader__LoadSync, not requested through CCache.
 - Entry 10 ("object types" 2nd copy) and the binaries index are empty in the US ROM.
 - Sound data file [1] (318 blocks, ~4 MB): speech/streamed audio; check in AUDIO.md.
-- yaml: `virtual_rodata_2` should end at 0x1E0000 (0x1DEE00-0x1E0000 is code) and
-  `assets_index` is the sfx soundArray; `assets` starts at 0x1E0000.
+- yaml (done): `virtual_rodata_2` ends at 0x1E0000 and the asset region is four `bin`
+  segments, `audio_ctl` / `audio_wavetable` / `sound_data` / `cartridge`; the old
+  `assets_index` (the sfx soundArray) and `assets` segments are gone.

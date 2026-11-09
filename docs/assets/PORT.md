@@ -530,8 +530,8 @@ Dependencies: a1 = ROMFS, a2 TEXTURES, a3 MODELS, a4 LEVELS, a5 ANIMATION, a6 AU
   another call site treats as a separate unit: does the tree walker see any?
 - `Bits_Read`: byte or word fetches? (Decides the swap rule for animation
   streams.)
-- The audio window 0x1E0000-0x20F194 starts inside what splat calls
-  `virtual_rodata` and holds the 913-entry table at 0x20E334 (AUDIO.md / ROMFS.md).
+- The audio window 0x1E0000-0x20F194 (now its own splat segment, `audio_ctl`)
+  holds the 913-entry sfx soundArray at 0x20E334 (AUDIO.md / ROMFS.md).
   The libaudio bank structures it contains are pointer-fixed in place by
   `alBnkfNew`-style code with 32-bit fields. That is a 64-bit problem the
   audio port (Phase 7) must solve by rebuilding the bank in host structures,
