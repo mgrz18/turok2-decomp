@@ -6,8 +6,8 @@
 #include "globals/frame.h"
 #include "structs/game.h"
 #include "globals/engine.h"
-OSTime osGetTime(void);
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
+#include "protos/cache.h"
+#include "protos/ultra.h"
 s32 osSpTaskYielded(OSTask *task);
 typedef struct Qn Qn;
 struct Qn { Qn *next; OSMesgQueue *q; };
@@ -48,8 +48,6 @@ typedef struct {
     u32 unk114;
     u8 pad118[0x28];
 } View;
-OSTime osGetTime(void);
-void CCache__PostDisplayListDone(s32 a, s32 b);
 void __scTaskComplete(Vid *o, Job *j);
 s32 __scSchedule(Vid *o, Job **a, Job **b, s32 mode);
 void __scExec(Vid *o, Job *a, Job *b);

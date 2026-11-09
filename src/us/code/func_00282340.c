@@ -2,9 +2,11 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/camera.h"
 #include "structs/emitter.h"
 #include "globals/engine.h"
+#include "protos/cache.h"
 
 typedef struct AnimationInfo {
     /* 0x0 */ s32 frameCount;
@@ -20,7 +22,6 @@ extern void Render_SetCombineMode(s32 mode);
 extern f32 Plane_SegmentFraction(f32 *plane, CVector3 *from, CVector3 *to);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
-extern void CCache__Unlock(s32, void *resource);
 
 /* Clips and draws an emitter as a textured translucent fan at its depth. */
 void CEmitter__Draw(CEmitter *object, CCamera *view) {
@@ -229,7 +230,7 @@ void CEmitter__Draw(CEmitter *object, CCamera *view) {
                         {
                             Gfx *g = gDList++;
                             g->w0 = 0x01003006;     /* gSPVertex(v, 3, 0) */
-                            g->w1 = (u32)&object->m_Vertices[gEvenOdd][face * 3];
+                            g->w1 = GBI_ADDR(&object->m_Vertices[gEvenOdd][face * 3]);
                         }
                         {
                             Gfx *g = gDList++;

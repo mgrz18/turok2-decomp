@@ -3,10 +3,10 @@
 #include "common.h"
 #include "structs/model.h"
 #include "globals/batch.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
-void *CISet__GetBlock(void *resource, s32 index);
 void Render_FlushModelBatch(void);
-void CCache__TouchAndLock(s32 unused, void **resource);
 
 /* Queues an instance of one level of detail of a model resource. A different model, level or
  * pass, or a full queue, first flushes the batch (Render_FlushModelBatch) and registers the model, unless

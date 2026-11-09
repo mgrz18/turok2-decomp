@@ -8,7 +8,7 @@ void *CHeap__Alloc(CHeap *heap, s32 request) {
     CHeapBlock *block;
     CHeapBlock *split;
     u32 size;
-    size = (request + 0x2F) & ~0xF;
+    size = (request + (sizeof(CHeapBlock) + 0xF)) & ~0xF;
     for (block = heap->freeHead; block != 0; block = block->freeNext) {
         if (block->free >= size) {
             { u8 *cursor = (u8 *)block; cursor += block->used; split = (CHeapBlock *)cursor; }

@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "structs/world.h"
+#include "protos/iset.h"
 typedef struct Box3 {
                 CVector3 mn;
                 CVector3 mx;
@@ -25,7 +26,6 @@ typedef struct WTab {
                 WRec r[1];
 } WTab;
 typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
-void *CISet__GetBlock();
 s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
 {
   s32 hashes[64];

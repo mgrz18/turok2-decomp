@@ -4,6 +4,8 @@
 #include "structs/world.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/game.h"
 
 #define FALSE 0
 #define TRUE 1
@@ -40,13 +42,9 @@ struct WarpPlayer {
 
 
 void CPlayer__StopLoopingSounds(void);
-s32 Controller_SetRumbleOption(s32, s32);
 s32 Mission_LevelObjectivesDone(s32);
-s32 CScene__FindWarpDests(void *, s32, s32, CWarpPoint *, s32);
 f32 CVector3__Distance(CVector3 *, CVector3 *);
-s32 CScene__GetRegion(void *, s32);
 void CPlayer__LevelStart(WarpPlayer *);
-void CScene__RequestWarp(void *, s32, s32);
 
 /* Sum of the distances from a warp record to every active player. */
 static __inline__ f32 sumDistance(CWarpPoint *r) {

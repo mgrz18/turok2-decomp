@@ -4,6 +4,7 @@
 #include "structs/player.h"
 #include "structs/collision.h"
 #include "globals/collision.h"
+#include "protos/ai.h"
 
 
 
@@ -11,7 +12,6 @@ f32 func_002982F0(f32);         /* sinf */
 f32 func_002974C0(f32);         /* cosf */
 void CCamera__SetShake(void *camera, f32 a, f32 b, f32 c, f32 d, s32 e, CVector3 pos);
 void Sound__Play(s16 sound, CVector3 pos, s32, s32);
-void CAI__SetMode(CGameObjectInstance *actor, void *ai, s32 state);
 
 /* While riding, button 0x8000 rams the creature in front: a live one is
  * thrown along the heading (knocked out of a state 0x2E with flag 0x400000)

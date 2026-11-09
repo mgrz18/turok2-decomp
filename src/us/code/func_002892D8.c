@@ -2,10 +2,10 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 
 void func_002888BC(s32, s32, s32);
-s32 CScene__LoadLevel(void *, s32, s32);
 
 /* The ROM bases every store on gEngineApp_m_Settings_match (the match), the settings at
  * -0x1D8 from it. */

@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/list.h"
 
-s32 CList__AddTail(s32 *, void *);           /* extern */
-s32 CList__Remove(s32 *, void *);           /* extern */
 
 
 void CListedInstance__Free(CListedInstance *arg0) {

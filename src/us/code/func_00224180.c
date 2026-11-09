@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/world.h"
+#include "protos/scene.h"
 
 s32 CScene__FindObjectType(CScene *lv, s32 id) {
     IdTable *t = lv->m_pObjectTypes;

@@ -4,6 +4,7 @@
 #include "globals/boss.h"
 #include "globals/engine.h"
 #include "structs/light.h"
+#include "protos/game.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
@@ -18,7 +19,6 @@ typedef struct {
 
 extern void ScriptAnimator_Apply(ScriptAnimator *light);
 extern void ScreenTint_UpdateMode(void);
-extern void Render_DrawModel(s32 a, s32 model, s32 c, Matrix18 *mtx, s32 e, s32 f, s32 g);
 
 void BlindOne_Draw(CGameObjectInstance *actor, CAI *ai, DrawInfo *info) {
     ScriptAnimator_Apply(&gBlindOne.faders[ai->m_BlindOne.m_nFader]);

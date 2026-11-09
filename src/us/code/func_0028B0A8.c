@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/ultra.h"
 
-extern void osViSwapBuffer(s32 arg0);
 extern s32 __scTaskComplete(void *,void *);
 s32 __scTaskComplete(void *arg0, void *arg1) {
     if ((((s32)((struct OSScTask_s *)arg1)->state)) & 3) {

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 f32 Math_Approach(f32 cur, f32 target, f32 rate);
-void CAI__SetMode(CGameObjectInstance *self, CAI *ai, s32 mode);
 
 void EnemySwim_IdleUpdate(CGameObjectInstance *self, CAI *ai) {
     ai->m_AnimSpeed = Math_Approach(ai->m_AnimSpeed, 1.0f, 0.2f);

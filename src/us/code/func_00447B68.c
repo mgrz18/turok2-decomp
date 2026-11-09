@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
 s32 CPlayer__Warp(s32, s32, s32, s32);
 
-void *CPlayerPool__GetFirstActive(s32 *);                     /* extern */
 
 void BlindOne_PhaseVictoryUpdate_2(void **arg0)
 {

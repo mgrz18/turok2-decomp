@@ -2,10 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/iset.h"
+#include "protos/scene.h"
 
 extern s32 ProPackDecompress(void ***, s32);
-extern void *CISet__GetBlock(void *, s32);
-extern s32 CScene__GetObject(s32, s32);
 void CScene__DecompressParticles(s32 arg0, void ***arg1) {
     void *obj;
     GroupCode8044E2B8 *group;

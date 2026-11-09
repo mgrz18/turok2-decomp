@@ -1,9 +1,9 @@
 #include "common.h"
+#include "protos/ultra.h"
 
 s32 __osPackRequestData(s32);
 s32 __osSiGetAccess(void);
 s32 __osSiRawStartDma(s32, s32);
-s32 osRecvMesg(s32, s32, s32);
 
 s32 __osSiRelAccess();                            /* extern */
 extern s32 __osContBuffer; /* local type: globals/libultra.h declares it (OSPifRam); this file keeps its own view with the __osContLastCmd array */

@@ -1,6 +1,6 @@
 #include "common.h"
+#include "protos/iset.h"
 
-extern s32 *CISet__GetBlock(s32 *base, s32 index);
 extern void GameObject_EmitHotPoints(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 *arg4);
 
 void func_0021EE44(u8 *actor, s32 *data, s32 arg2) {

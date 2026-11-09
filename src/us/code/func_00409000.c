@@ -6,6 +6,7 @@
 #include "structs/boss.h"
 #include "structs/collision.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 /* Boss hit callback: finds which weak spot the hit part covers, takes the
  * damage off the matching live spot for the current phase, and when a spot
@@ -14,7 +15,6 @@
 
 
 extern void MotherBoss_StartSpotAnims(void *obj, void *sounds, s32 flags);
-extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 
 void MotherBoss_Hurt(void *obj, CAI *ai, DamageEvent *hit) {
     MotherBossState *s;

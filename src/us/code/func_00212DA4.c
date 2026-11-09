@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "protos/iset.h"
 
 typedef struct {
     f32 r, g, b;
@@ -17,7 +18,6 @@ typedef struct {
     /* 0x8 */ ModelVertex verts[1];
 } VertexGroup;
 
-void *CISet__GetBlock(s32 *, s32);
 void CMtxF__FromMtxAffine(f32 *mtx, void *packed);
 void CVector3__Normalize(CVector3 *v);
 void CMtxF__TransformPoint(f32 *mtx, CVector3 *in, CVector3 *out);

@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 #include "globals/adec.h"
+#include "protos/ultra.h"
 
 extern Acmd *alAdecPull(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p);
 extern s32 adecNextFrame();
-extern void osWritebackDCache(s32 buffer, s32 size);
 Acmd *alAdecPull(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p)
 {
     Acmd *ptr = p;

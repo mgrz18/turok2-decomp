@@ -4,12 +4,10 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/hostio.h"
+#include "protos/ultra.h"
 
 extern void HostIo_WriteByteDma(s32 address, u8 value);
 extern void HostIo_WriteWord(s32 address, s32 value);
-extern s32 osPiStartDma(void *entry, s32 pri, s32 direction, u32 devAddr, void *dramAddr, u32 size,
-                         OSMesgQueue *queue);
-extern s32 osRecvMesg(OSMesgQueue *mq, void *msg, s32 flag);
 
 /* Write an arbitrary byte stream to the device, using DMA when aligned
  * and falling back to byte/word writes if the DMA request is unavailable. */

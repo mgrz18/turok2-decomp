@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-s32 CScene__GetInstanceSavedBit(s32 *, s32);                  /* extern */
 
 void Generator_Step(s32 arg0, CAI *ai) {
     s32 (*temp_v0_2)(s32, void *);

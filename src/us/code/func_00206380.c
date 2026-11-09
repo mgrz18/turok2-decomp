@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "protos/cache.h"
 
-s32 CCache__FreeOldestMemEntry(s32, s32, s32);
 
 void CCache__FreeOldestMemEntryWithFlags(s32 arg0, s32 arg1, s32 arg2) {
     s32 var_v0;

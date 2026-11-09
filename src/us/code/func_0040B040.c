@@ -1,11 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 /* AI state: turn toward the target (15 degrees per step), then go to anim state 2. */
 
 extern void AI_UpdateTargets(void *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern void AI_TurnClamped(void *obj, CAI *ai, f32 angle, f32 dist);
-extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 
 void MotherBoss_Mode05_TrackTarget(void *obj, CAI *ai) {
     CAITargets t;

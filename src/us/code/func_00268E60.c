@@ -1,5 +1,6 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x44];
@@ -10,7 +11,6 @@ typedef struct {
     /* 0x58 */ u8 kind;
 } KeyInfo;
 
-void *CScene__GetRegionInfo(void *table, void *key);
 s32 func_0021F1F8(void *arg);
 
 s32 GameObject_GetFloorKind(u8 *obj) {

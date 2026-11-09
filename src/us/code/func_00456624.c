@@ -4,6 +4,7 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
 struct ObjRecAt5D8;
 typedef struct ObjRecAt5D8 ObjRecAt5D8;
@@ -19,7 +20,6 @@ struct EntryRecAt1C {
 };
 struct EntryRecAt1C;
 typedef struct EntryRecAt1C EntryRecAt1C;
-extern s32 CPlayerPool__GetIndex(void *table, void *player);
 s32 NameEntryMenu_DeleteChar_2(s32 unused, EntryRecAt1C *arg1) {
     s32 i;
     s32 count;

@@ -3,12 +3,16 @@
 #include "common.h"
 #include "structs/table.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/world.h"
 #include "structs/level_actor.h"
 #include "structs/camera.h"
 #include "structs/rect.h"
 #include "globals/camera.h"
 #include "globals/scene.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
+#include "protos/scene.h"
 
 /* Builds (once per frame) the display list of the level geometry: for every
  * grid region seen by one of the views, every static object and every level
@@ -28,8 +32,6 @@ extern ViewState gEngineApp_m_Settings_difficulty; /* local type: the field's re
 
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
-void CCache__LockForDisplayList(s32, void **);
-void *CISet__GetBlock(void *, s32);
 s32 Frustum_TestBox(void *, CBox *);
 void CStaticObject__Draw(CStaticObject *, CCamera *);
 void CLevelActor__Draw(CLevelActor *);
@@ -224,12 +226,12 @@ void CScene__BuildGeometryDisplayList(CScene *w) {
         {
             Gfx *g = gSceneGeometryDL++;
             g->w0 = 0xDE010000;
-            g->w1 = (u32)gDList;
+            g->w1 = GBI_ADDR(gDList);
         }
     }
     {
         Gfx *g = gDList++;
         g->w0 = 0xDE000000;
-        g->w1 = (u32)gSceneGeometryDL;
+        g->w1 = GBI_ADDR(gSceneGeometryDL);
     }
 }

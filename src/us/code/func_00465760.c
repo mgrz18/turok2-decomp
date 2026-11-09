@@ -1,8 +1,7 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/OVLGAME/8044E2B8.CPP, func_8044D668_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
+#include "protos/scene.h"
 struct Item_func_8044D668_de;
 typedef struct Item_func_8044D668_de Item_func_8044D668_de;
 struct Item_func_8044D668_de;
@@ -24,7 +23,6 @@ extern void Cinema_Disable();
 extern void Cinema_Enable();
 extern void Cinema_Disable(void);
 extern void Cinema_Enable(void);
-extern void CScene__RestoreFiredEvent(Level *, Item_func_8044D668_de *);
 void func_00465760(Level *level) {
     s32 i;
     s32 n;

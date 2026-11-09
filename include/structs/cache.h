@@ -44,12 +44,13 @@ typedef struct CCacheEntry {
     /* 0x08 */ u32 requestId;       /* the ROM address it loads from */
     /* 0x0C */ u32 requestLength;
     /* 0x10 */ s32 flags;
-    /* 0x14 */ void (*decompressCallback)(s32 notifyId, struct CCacheEntry *entry);
-    /* 0x18 */ s32 notifyId;
+    /* 0x14 */ void (*decompressCallback)(sptr notifyId, struct CCacheEntry *entry);
+    /* 0x18 */ sptr notifyId;
     /* 0x1C */ u32 memFlags;
     /* 0x20 */ void *decompressReplyQueue; /* OSMesgQueue * */
     /* 0x24 */ struct CCacheEntry *next;
-} CCacheEntry;
+    /* 0x28 */ struct CCacheEntry *last;  /* the request lists' previous link (CCache__Construct) */
+} CCacheEntry; /* size 0x2C */
 
 /* Turok 3's mutex.h CBlocker: a one-message queue a thread waits on. */
 typedef struct CBlocker {

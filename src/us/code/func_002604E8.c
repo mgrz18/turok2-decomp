@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/game.h"
 
-extern s32 CScene__SetInstanceSavedBit(s32, s32, s32);
-extern void GameObject_FireTriggers(void *, s32, void *);
 
 void EnemyAI_SaveDeadAndFireTriggers(CGameObjectInstance *arg0) {
     CIntelligence *sub = arg0->header.m_pIntelligence;

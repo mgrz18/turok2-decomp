@@ -3,10 +3,9 @@
 
 #include "common.h"
 #include "structs/world.h"
+#include "protos/iset.h"
 
 typedef struct { u8 pad0[0x16E]; u16 unk16E; } Src;
-s32 *CISet__GetBlock(s32 *tbl, s32 idx);
-void CISet__GetBlockSize(s32 *tbl, s32 idx);
 s32 CScene__IsLevelActorKilled(CScene *lv, Src *s) {
     s32 bit = s->unk16E;
     s32 idx = lv->m_nLevel;

@@ -5,11 +5,10 @@
 #include "structs/cache.h"
 #include "globals/cache.h"
 #include "globals/sysrc.h"
+#include "protos/list.h"
+#include "protos/cache.h"
 
-extern s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent);
-extern void CCache__DetachCacheEntry(void *, CMemEntry *);
 extern s32 CHeap__Free(CHeap *, s32);
-extern void CList__Remove(void *, CMemEntry *);
 static __inline__ CMemEntry *find_stale(CMemEntry **recent) {
     CMemEntry *node;
     for (node = gCache.memAgeList.m_pTail; node != 0; node = node->last) {

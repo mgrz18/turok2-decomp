@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004058B0.c, func_004058B0, with Turok 2's layouts. */
 #include "common.h"
+#include "gfx.h"
 #include "globals/frame.h"
 #include "globals/render.h"
 #include "globals/framebuffer.h"
@@ -27,6 +28,12 @@ extern void CCache__Deallocate(s32 heap, MemHandle *handle);                    
 extern u32 GetMemSize(void);                                             /* osGetMemSize */
 extern void memset(void *dst, s32 value, u32 size);                  /* memset */
 
+#ifdef TARGET_PORT
+/* The host heap is an arena (port/runtime/t2boot.c), not [end of image, top of RDRAM - 512 KB):
+ * the "top of RDRAM" the frame buffers are placed under is the arena's end + 512 KB. */
+extern uptr T2Port_RdramTop(void);
+#endif
+
 extern char D_800C1864[]; /* "audio heap": the byte after it is the linker's fill (0x0B), not a zero the C could give */
 
 void GfxPool_Alloc(GfxPool *pool) {
@@ -38,7 +45,7 @@ void GfxPool_Alloc(GfxPool *pool) {
     MemHandle *fb;
     MemHandle *block;
     u32 size;
-    u32 base;
+    uptr base;
 
     if (pool->gfx != 0) {
         CCache__Deallocate(0, pool->gfx);
@@ -69,7 +76,11 @@ void GfxPool_Alloc(GfxPool *pool) {
 
     if (GetMemSize() >= mb * 6) {
         size = 0x54600;
+#ifdef TARGET_PORT
+        base = T2Port_RdramTop();
+#else
         base = GetMemSize() | 0x80000000;
+#endif
         depth = CCache__AllocateAt(0, base - mb, size, "Z-Buffer");
         fb = CCache__AllocateAt(0, base - mb * 2, 0xFD200, "Display Buffer");
         memset((void *) fb->addr, 0, 0xFD200);
@@ -94,13 +105,13 @@ void GfxPool_Alloc(GfxPool *pool) {
         memset((void *) gCFB[i], 0, size);
     }
     memset((void *) gDepthBuffer, 0, size);
-    pool->gfx = CCache__Allocate(0, (gDisplayListSize + gLineListSize) * 16, 0x23, "display lists");
+    pool->gfx = CCache__Allocate(0, (gDisplayListSize + gLineListSize) * (2 * GFX_SIZE), 0x23, "display lists");
     pool->dynamic = CCache__Allocate(0, 0x8000, 0x23, "fifo");
     pool->vtx = CCache__Allocate(0, 0x22000, 0x23, D_800C1864);
     gDisplayList1 = pool->gfx->addr;
-    gLineList0 = gDisplayList1 + gDisplayListSize * 8;
-    gDisplayList0 = gLineList0 + gLineListSize * 8;
-    gLineList1 = gDisplayList0 + gDisplayListSize * 8;
+    gLineList0 = gDisplayList1 + gDisplayListSize * GFX_SIZE;
+    gDisplayList0 = gLineList0 + gLineListSize * GFX_SIZE;
+    gLineList1 = gDisplayList0 + gDisplayListSize * GFX_SIZE;
     gRspFifoSize = 0x8000;
     gAudioHeapSize = 0x22000;
     gRspFifoBuffer = (u64 *) pool->dynamic->addr;

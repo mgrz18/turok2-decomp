@@ -1,8 +1,8 @@
 #include "structs/region.h"
 #include "structs/particle.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-extern CRegionInfo *CScene__GetRegionInfo(void *arg0, CGameRegion *region);
 
 /* Whether the particle is under water: below its region's water height (flag 4 when it has no region). */
 s32 CParticle__IsUnderWater(CParticle *obj) {

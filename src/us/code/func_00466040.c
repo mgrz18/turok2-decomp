@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/list.h"
 
 /* Initialise a pool of 8 nodes: an empty used list and a free list holding them all. */
 
@@ -23,8 +24,6 @@ typedef struct {
     PoolNode nodes[8];  /* 0x28 */
 } Pool;
 
-void CList__Construct(List *list, s32 prevOffset, s32 nextOffset);
-s32 CList__AddTail(List *list, void *node);
 
 void func_00466040(Pool *pool) {
     s32 i;

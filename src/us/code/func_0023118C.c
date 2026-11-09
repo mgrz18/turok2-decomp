@@ -3,10 +3,12 @@
 #include "structs/region.h"
 #include "structs/particle.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/camera.h"
 #include "globals/camera.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
 
 /* Draws the particle render list: culls each sprite particle by its bounds
  * against the view, builds its matrix once per frame, draws it as a model or
@@ -15,7 +17,6 @@
  * The list walk is a goto loop and the built flag a local, as in the ROM: the
  * flag stays in a saved register and nothing else is hoisted out of the walk. */
 
-#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 typedef struct {
     /* 0x00 */ CVector3 min;
@@ -27,7 +28,6 @@ extern u8 gEngineApp_m_SwooshSystem[];
 extern s32 Frustum_TestBox(void *planes, Box *box);
 extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
 extern void CParticle__BuildMatrix(CParticle *particle, void *mtx, CCamera *camera, f32 depth);
-extern void CScene__GetLightsAt(void *list, CVector3 *pos, void *out);
 extern void func_0020B9F4(void *model, void *mtx, void *mtx2, s32 a, s32 b);
 extern void CParticle__DrawSprite(CParticle *particle, CCamera *view);
 extern void CParticle__DrawShadow(CParticle *particle, CCamera *view);

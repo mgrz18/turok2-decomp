@@ -5,6 +5,7 @@
 #include "structs/game.h"
 #include "structs/player.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
 /* The object this callback gets (only +0xF8 is used). */
 typedef struct {
@@ -13,7 +14,6 @@ typedef struct {
 } Holder;
 
 extern void CPlayerPool__SetInvincibility(CPlayerPool *list, f32 arg1);
-extern CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *list);
 extern void Cinema_RequestById(s32 id);
 
 

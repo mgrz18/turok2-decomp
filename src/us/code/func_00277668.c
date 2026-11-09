@@ -3,28 +3,15 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 
-
-
-#define _SHIFTL(v, s, w) (((u32) (v) & ((1U << (w)) - 1)) << (s))
 #define CLAMP0(v) ((v) > 0 ? (v) : 0)
 
-#define gDPPipeSync()                                                                      \
-    { Gfx *_g = (Gfx *) (gDList++); _g->w0 = _SHIFTL(0xE7, 24, 8); _g->w1 = 0; }
-#define gDPSetPrimColor(m, l, r, g, b, a)                                                  \
-    { Gfx *_g = (Gfx *) (gDList++);                                                    \
-      _g->w0 = _SHIFTL(0xFA, 24, 8) | _SHIFTL(m, 8, 8) | _SHIFTL(l, 0, 8);           \
-      _g->w1 = _SHIFTL(r, 24, 8) | _SHIFTL(g, 16, 8) | _SHIFTL(b, 8, 8) | _SHIFTL(a, 0, 8); }
-#define gDPFillRectangle(ulx, uly, lrx, lry)                                               \
-    { Gfx *_g = (Gfx *) (gDList++);                                                    \
-      _g->w0 = _SHIFTL(0xF6, 24, 8) | _SHIFTL(lrx, 14, 10) | _SHIFTL(lry, 2, 10);    \
-      _g->w1 = _SHIFTL(ulx, 14, 10) | _SHIFTL(uly, 2, 10); }
-
 void Hud_DrawBoxOutline(s32 x0, s32 y0, s32 x1, s32 y1, s32 border, u8 r, u8 g, u8 b, u8 a) {
-    gDPPipeSync();
-    gDPSetPrimColor(255, 255, r, g, b, a);
-    gDPFillRectangle(CLAMP0(x0), CLAMP0(y0), CLAMP0(x1), CLAMP0(y0 + border));
-    gDPFillRectangle(CLAMP0(x0), CLAMP0(y1 - border), CLAMP0(x1), CLAMP0(y1));
-    gDPFillRectangle(CLAMP0(x0), CLAMP0(y0 + border), CLAMP0(x0 + border), CLAMP0(y1 - border));
-    gDPFillRectangle(CLAMP0(x1 - border), CLAMP0(y0 + border), CLAMP0(x1), CLAMP0(y1 - border));
+    gDPPipeSync(gDList++);
+    gDPSetPrimColor(gDList++, 255, 255, r, g, b, a);
+    gDPFillRectangle(gDList++, CLAMP0(x0), CLAMP0(y0), CLAMP0(x1), CLAMP0(y0 + border));
+    gDPFillRectangle(gDList++, CLAMP0(x0), CLAMP0(y1 - border), CLAMP0(x1), CLAMP0(y1));
+    gDPFillRectangle(gDList++, CLAMP0(x0), CLAMP0(y0 + border), CLAMP0(x0 + border), CLAMP0(y1 - border));
+    gDPFillRectangle(gDList++, CLAMP0(x1 - border), CLAMP0(y0 + border), CLAMP0(x1), CLAMP0(y1 - border));
 }

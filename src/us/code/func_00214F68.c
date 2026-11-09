@@ -2,6 +2,7 @@
 #include "common.h"
 #include "globals/engine.h"
 #include "globals/scene.h"
+#include "protos/iset.h"
 
 /* Pulses the vertex colours of a model whose vertices carry a pulse phase
  * (flag bits 0x70) and amplitude shift (bits 0xC), from their saved base colours. */
@@ -19,7 +20,6 @@ typedef struct {
     /* 0x8 */ Vertex vertices[1];
 } VertexGroup;
 
-VertexGroup *CISet__GetBlock(s32 *, s32);
 
 void Model_PulseVertexColors(s32 *object, u8 *colors) {
     s32 state = gFrameCount;

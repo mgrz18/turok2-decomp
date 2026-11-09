@@ -6,6 +6,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
+#include "protos/scene.h"
 struct LevelActor;
 struct Box;
 typedef struct Box Box;
@@ -139,7 +140,6 @@ typedef struct Def Def;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
-extern void CScene__SetInstanceSavedBit(CScene *, void *, s32);
 void CScene__UnmarkGeneratorsSaved(void *arg0) {
     CScene *object;
     s32 count;

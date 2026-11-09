@@ -8,13 +8,13 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "globals/player.h"
+#include "protos/ai.h"
 
 extern struct {
     s32 enabled;
 } gEngineApp_m_Settings_match_tag;
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 extern s32 CPlayer__GetNextUsableWeapon(CPlayer *player);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 extern void Sound__Play(s32 sound, CVector3 pos, CVector3 *source, s32 arg);
 extern void CCameraPool__AddText(void *buf, s32 camera, s32 model);
 

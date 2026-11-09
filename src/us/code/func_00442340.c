@@ -4,15 +4,14 @@
 #include "globals/boss.h"
 #include "globals/scene.h"
 #include "globals/boss_ai.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
 /* Module init: find the module actors (0x1DB1) and the controller (0x1DB2), set up the AI (mode table and callbacks),
  * then attach every slot to the object. */
 
 extern s32 D_800F1F10[];
-extern s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void *out, s32 max);
-extern void *CScene__FindIntelligence(void *world, s32 a1, s32 id);
 extern void ScriptAnimator_Start(void *slot, void *obj);
-extern void CAI__SetMode(void *obj, CAI *ai, s32 event);
 extern void EnemyAI_HeadNodeCallback();
 extern void func_00441FF8();
 extern void MotherBoss_Step_2();

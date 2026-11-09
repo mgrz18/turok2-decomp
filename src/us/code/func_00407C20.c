@@ -1,8 +1,8 @@
 #include "common.h"
 #include "globals/boss.h"
 #include "globals/onscreen.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 s32 COnScreen__SetBoss(s32, s32, s32);
 
 void Primagen_UpdateMode28(s32 arg0, int arg1)

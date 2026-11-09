@@ -2,14 +2,13 @@
 #include "structs/camera.h"
 #include "globals/render.h"
 #include "globals/engine.h"
+#include "protos/list.h"
 
 void COnScreen__BeginText(void);
 void COnScreen__SelectTinyFont(void);
 void COnScreen__DrawString(char *string, s32 x, s32 y, s32 alpha, s32 arg4, s32 arg5, f32 scaleX, f32 scaleY);
 f32 func_002982F0(f32 x);       /* sine */
 f32 func_002974C0(f32 x);       /* cosine */
-void CList__Remove(CList *list, void *element);
-void CList__AddHead(CList *list, void *element);
 
 /* A camera's on-screen texts, each frame (LibTEngine's CCameraPool
  * AdvanceText): stacked 9 pixels apart from 81% down the screen, drawn

@@ -3,6 +3,7 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/cache.h"
 
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
@@ -10,8 +11,6 @@ s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 extern char D_800B4158[];
 extern char D_800B4170[];
 
-s32 CCache__GetFrameDelay(void);
-void CCache__SetFrameDelay(s32);
 
 /* Shows setting 0x0C in sixteenths: a fixed line for 0, otherwise the number. */
 s32 OptionsMenu_BrightnessText_2(MenuItem *item) {

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game_object.h"
+#include "protos/player.h"
 
-s32 CPlayer__SetState(s32, s32, s32);
 f32 PlayerDodgeFall_Update(s32, s32);
 
 void PlayerDodge_Update(CPlayer *arg0, CGameObjectInstance *arg1) {

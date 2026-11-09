@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
-s32 MenuPool_OpenChildMenu(s32, s32, s32);
 
 
 s32 DeathmatchMenu_OpenWeapons(s32 arg0, s32 arg1, s32 arg2) {

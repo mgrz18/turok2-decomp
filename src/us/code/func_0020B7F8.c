@@ -3,16 +3,13 @@
 #include "common.h"
 #include "structs/model.h"
 #include "globals/batch.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
 extern char D_800A53D8[];
 extern char D_800A53EC[];
 
-void *CISet__GetBlock(void *resource, s32 index);
-void **CCache__Request(s32, s32 key, s32 size, s32 tag, s32, void *callback, void *name, s32 flag);
-s32 CISet__GetROMAddressAndSize(void *header, s32 key, s32 index, s32 *size);
-void CCache__Unlock(s32 unused, void **resource);
 void Render_FlushModelBatch(void);
-void CCache__TouchAndLock(s32 unused, void **resource);
 void Model_DecompressCallbackTerminated();
 
 /* Loads the model resource for key through its 0x18-byte header, then queues an instance of one

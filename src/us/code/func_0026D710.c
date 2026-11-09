@@ -3,6 +3,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "globals/scene.h"
+#include "protos/game.h"
 
 /* Animation attachment events: for each attachment whose event bit is enabled
  * on the object, moves its offset through the bone matrix to world space and
@@ -32,8 +33,6 @@ extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 extern void Actor_SpawnParticle(CGameObjectInstance *obj, s32 sound, CVector3 pos, s32 flags);
 extern void GameObject_TraceMove(CGameObjectInstance *obj, CVector3 pos, CVector3 *out, s32 *region, s32 a, s32 b);
-extern void CParticleSystem__Spawn(CParticleSystem *sys, CGameObjectInstance *p, CGameObjectInstance *owner, s32 ownerId, s32 target, s32 type, CVector3 dir,
-                          CQuaternion rot, CVector3 pos, s32 region, s32 arg10, s32 flags);
 extern f32 func_0021F2B0(CGameObjectInstance *obj);
 extern void ImpactEvent_Send(CGameObjectInstance *obj, CGameObjectInstance *owner, s32 type, s32 id, CVector3 pos, PuffArgs args);
 

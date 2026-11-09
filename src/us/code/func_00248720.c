@@ -6,11 +6,10 @@
 #include "globals/scene.h"
 #include "globals/player.h"
 #include "globals/particle.h"
+#include "protos/game.h"
 
 CQuaternion CGameObjectInstance__GetRotation(CPlayer *p);
 AmmoInfo *CPlayer__GetFiringAmmo(CPlayer *p, s32 weapon);
-void CParticleSystem__Spawn(CParticleSystem *list, CPlayer *src, CPlayer *owner, s32 a3, s32 target, s32 type,
-                   CVector3 vel, CQuaternion aim, CVector3 pos, s32 a40, s32 a44, s32 a48);
 
 /* A debug print compiled out of the release build. Its empty loop notes stop
  * loop.c (find_and_verify_loops) from moving the found block out of the

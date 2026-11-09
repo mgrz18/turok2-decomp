@@ -16,9 +16,7 @@
 
 #include "../third_party/miniz/miniz.h"
 
-/* rnc.c (references/rw_junk/docs/hand_asm_c, vendored in port/third_party/rnc) */
-u32 rnc_unpack_method1(const u8 *in, u8 *out, int32_t in_len, int32_t out_len, int *status);
-int32_t rncUnpackMethod2(const u8 *rnc, u8 *dst, int32_t packed, int32_t unpacked);
+#include "rnc.h" /* RNC methods 1 and 2: original code, written from Turok 2's routines */
 
 #define RNC_HEADER 0x12
 #define RNC_SLACK 16
@@ -41,7 +39,6 @@ static int fail(const char *fmt, ...)
 const char *T2Asset_Error(void) { return sErr; }
 
 static u32 be32(const u8 *p) { return ((u32)p[0] << 24) | ((u32)p[1] << 16) | ((u32)p[2] << 8) | p[3]; }
-static u32 be16(const u8 *p) { return ((u32)p[0] << 8) | p[1]; }
 static u32 le32(const u8 *p) { return ((u32)p[3] << 24) | ((u32)p[2] << 16) | ((u32)p[1] << 8) | p[0]; }
 
 /* ===================================================================================== */
@@ -119,45 +116,26 @@ int T2Rom_Normalize(u8 *rom, size_t len)
 /* ===================================================================================== */
 /* RNC                                                                                   */
 /* ===================================================================================== */
-static u32 crc16(const u8 *p, u32 n)
-{
-    u32 c = 0, i, k;
-    for (i = 0; i < n; i++) {
-        c ^= p[i];
-        for (k = 0; k < 8; k++)
-            c = (c & 1) ? (c >> 1) ^ 0xA001 : c >> 1;
-    }
-    return c & 0xFFFF;
-}
-
 static int is_rnc(const u8 *p, u32 avail)
 {
-    return avail >= RNC_HEADER && p[0] == 'R' && p[1] == 'N' && p[2] == 'C' && (p[3] == 1 || p[3] == 2);
+    return Rnc_IsStream(p, avail);
 }
 
 u32 T2Rnc_Unpack(const u8 *src, size_t avail, u8 *dst, u32 dstCap)
 {
-    u32 unpacked, packed;
-    int st = 0;
-    if (!is_rnc(src, (u32)(avail > 0xFFFFFFFFu ? 0xFFFFFFFFu : avail)))
-        return 0;
-    unpacked = be32(src + 4);
-    packed = be32(src + 8);
-    if (RNC_HEADER + (size_t)packed + RNC_SLACK > avail)
+    RncHeader h;
+    int64_t n;
+    if (Rnc_ReadHeader(src, avail, &h) != RNC_OK || (size_t)h.packed > avail - RNC_HEADER)
         return 0;
     if (!dst)
-        return unpacked;
-    if (dstCap < unpacked)
+        return h.unpacked;
+    if (dstCap < h.unpacked)
         return 0;
-    if (src[3] == 1)
-        rnc_unpack_method1(src + RNC_HEADER, dst, (int32_t)packed, (int32_t)unpacked, &st);
-    else
-        st = rncUnpackMethod2(src, dst, (int32_t)packed, (int32_t)unpacked);
-    if (st != 0)
+    /* the packed CRC is checked once per ROM by tools; the unpacked one on every read */
+    n = Rnc_Unpack(src, avail, dst, dstCap, 0);
+    if (n < 0 || Rnc_Crc16(dst, h.unpacked) != h.crcUnpacked)
         return 0;
-    if (crc16(dst, unpacked) != be16(src + 0xC))
-        return 0;
-    return unpacked;
+    return (u32)n;
 }
 
 /* ===================================================================================== */

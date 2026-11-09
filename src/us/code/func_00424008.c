@@ -3,6 +3,7 @@
 #include "common.h"
 #include "globals/libultra.h"
 #include "globals/render.h"
+#include "protos/ultra.h"
 
 /* Resizes the selected VI mode around its original horizontal and field centres, keeping the original lower
  * screen limits, then applies it. */
@@ -45,7 +46,6 @@ typedef struct {
 
 extern ViMode sResizedViMode;
 extern void *func_0029E460(void *dst, const void *src, s32 count);
-extern void osViSetMode(ViMode *mode); /* osViSetMode */
 
 void Video_ResizeViMode(s32 width, s32 height, s32 x, s32 y, s32 borderX, s32 borderY) {
     ViMode *mode = &sResizedViMode;

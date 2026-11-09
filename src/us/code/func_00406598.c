@@ -3,12 +3,11 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
 extern f32 AI_AngleToPoint(CGameObjectInstance *obj, CVector3 point);       /* angle to a point */
-extern void AI_TurnClamped(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 angle);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 extern f32 func_002982F0(f32 angle);                                      /* sin */
 extern f32 func_002974C0(f32 angle);                                      /* cos */
 

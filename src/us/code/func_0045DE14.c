@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-s32 CScene__GetLinkGroupCount(s32, s32);
 
 
 void func_0045DE14(s32 arg0) {

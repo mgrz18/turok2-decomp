@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
 
 /* Clears display list dlist's lock bit on every CMemEntry. */
 void CCache__ClearDisplayListLocks(s32 unused, s32 dlist) {

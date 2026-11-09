@@ -3,11 +3,11 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* Module init: collects up to 4 actors of type (0x44E, 9) into the module state, hooks their callbacks,
  * sets up the first phase (MotherBoss_SetupPhase0) and queues MotherBoss_OnIntroCinemaDone. */
 
-extern s32 CScene__FindInstances(void *container, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max);
 extern void MotherBoss_Draw(void);
 extern void MotherBoss_PartEffects(void);
 extern void MotherBoss_SetupPhase0(void *obj, void *ai);

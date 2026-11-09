@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/iset.h"
 
 extern void Anim_GetBoneTranslationLerp(void *arg0, s32 arg1, void *arg2);
-extern char *CISet__GetBlock(s32 *, s32);
 void Anim_GetBoneTranslationLerp(void *arg0, s32 arg1, void *arg2) {
     ObjectLinks24 *o = arg0;
     CVector3 *out = arg2;

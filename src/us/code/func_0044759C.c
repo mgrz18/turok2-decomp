@@ -4,9 +4,9 @@
 #include "structs/boss.h"
 #include "globals/scene.h"
 #include "globals/boss.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
-extern void CScene__MarkGeneratorsSaved(void *);
-extern s32 CAI__SetMode(CGameObjectInstance *actor, void *ai, s32 state);
 
 static __inline__ void StartTimer(BlindOneState *m, void *proc, f32 seconds) {
     BlindOneMover *t;

@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/iset.h"
 
 extern void Anim_GetBoneRotationLerp(void *arg0, s32 arg1, Vector4f *arg2);
-extern char *CISet__GetBlock(s32 *, s32);
 void Anim_GetBoneRotationLerp(void *arg0, s32 arg1, Vector4f *arg2) {
     char *o = (char *)arg0;
     s16 idx;

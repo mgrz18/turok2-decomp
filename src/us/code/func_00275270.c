@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/iset.h"
 
 extern s32 BinarySearch(void *, s32, s32);
-extern void *CISet__GetBlock(void *, s32);
 extern f32 HalfToFloat(s32);
 void *SndSeq_GetSongData(SequenceState *state, s32 index) {
     s32 selection;

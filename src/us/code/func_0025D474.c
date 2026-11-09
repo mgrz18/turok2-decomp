@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
+#include "protos/ai.h"
 
 /* AI chase update: turns toward the target and runs or walks at it; flying
  * modes (1, 2) also climb toward its height and bank into the turn. In range,
@@ -27,8 +28,6 @@ typedef struct {
 
 extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void AI_ComputeFrameMotion(CGameObjectInstance *actor, CAI *ai, Dir *dir);
-extern void AI_TurnClamped(CGameObjectInstance *actor, CAI *ai, f32 angle, f32 dist);
-extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
 extern f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
 extern f32 Math_Approach(f32 value, f32 target, f32 rate);
 extern s32 EnemyAI_PickAttack(CGameObjectInstance *actor, CAI *ai, CAITargets *t);

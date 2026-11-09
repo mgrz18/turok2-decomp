@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/emitter.h"
+#include "protos/list.h"
 
-s32 CList__AddTail(void *, s32);                 /* extern */
-s32 CList__Remove(void *, s32);                 /* extern */
 
 /* Takes the first free emitter and moves it to the active list. */
 s32 CEmitterPool__TakeEmitter(CEmitterPool *arg0) {

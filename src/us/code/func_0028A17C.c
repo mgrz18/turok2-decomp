@@ -6,6 +6,7 @@
 #include "globals/engine.h"
 #include "globals/sysrc.h"
 #include "globals/framebuffer.h"
+#include "protos/ultra.h"
 
 typedef struct Client {
     /* 0x0 */ struct Client *next;
@@ -35,10 +36,6 @@ typedef struct {
 } Sched;
 
 
-extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
-extern s32 osSendMesg(void *queue, void *msg, s32 flag);
-extern void osSetThreadPri(void *thread, s32 pri);   /* osSetThreadPri */
-extern void osViSwapBuffer(s32 framebuffer);         /* osViSwapBuffer */
 extern void __scAppendList(Sched *sc, ScTask *task);
 extern void __scHandleRSP(Sched *sc);
 extern void __scYield(Sched *sc);

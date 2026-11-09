@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/iset.h"
 
 extern void CVector3__Lerp(CVector3 *arg0, s32 arg1, void *arg2, void *arg3);
 void func_0021794C(void *arg0, s32 arg1, void *arg2) {

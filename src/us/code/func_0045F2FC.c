@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/pak.h"
 #include "globals/pak.h"
+#include "protos/cache.h"
 
-s32 CCache__Allocate(s32, s32, s32, s32);
 
 s32 memset(s32, s32, s32);       /* extern */
 

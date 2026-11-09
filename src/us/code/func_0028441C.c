@@ -2,8 +2,8 @@
 #include "m2c_macros.h"
 #include "structs/cinema.h"
 #include "globals/cinema.h"
+#include "protos/cache.h"
 
-s32 CCache__Deallocate(s32, s32);
 
 
 void Cinema_Reset(void)

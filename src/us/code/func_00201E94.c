@@ -3,9 +3,8 @@
 
 #include "common.h"
 #include "structs/loader.h"
+#include "protos/ultra.h"
 
-s32 osJamMesg(OSMesgQueue *queue, OSMesg msg, s32 flags);
-s32 osSendMesg(OSMesgQueue *queue, OSMesg msg, s32 flags);
 CLoaderEntry *CLoader__AllocLoaderEntry(CLoader *thisx);
 
 /* Queues a read of length bytes of ROM at address into dest; the last

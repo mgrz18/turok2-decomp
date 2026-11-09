@@ -1,8 +1,8 @@
 #include "common.h"
 #include "globals/menu.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
-s32 MenuPool_OpenMenu(s32, s32, s32, s32, s32);
 
 s32 func_00421250();                            /* extern */
 

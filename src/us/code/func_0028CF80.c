@@ -4,12 +4,12 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/save.h"
+#include "protos/player.h"
 
 
 
 s32 Demo_GetPlayerCount(void);
 void SavedPlayers_Save(void);
-CPlayer *CPlayerPool__GetFirstActive(void *list);
 
 void SavedPlayers_Arm(void) {
     CSavedPlayers *save = &gSavedPlayers;

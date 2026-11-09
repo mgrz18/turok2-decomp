@@ -3,7 +3,8 @@
 
 #include "common.h"
 #include "structs/world.h"
-s32 *CISet__GetBlock(s32 *tbl, s32 idx);
+#include "protos/iset.h"
+#include "protos/scene.h"
 s32 CScene__GetLinkGroupCount(CScene *lv, s32 key) {
     s32 *t = lv->m_pLinkGroupTypes;
     s32 n = t[1];

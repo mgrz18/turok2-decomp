@@ -4,6 +4,7 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "globals/region.h"
+#include "protos/iset.h"
 
 typedef struct {
     /* 0x00 */ f32 minX;
@@ -19,7 +20,6 @@ typedef struct {
     /* 0x08 */ TriGroup groups[1];
 } TriGroupList;
 
-extern void *CISet__GetBlock(void *file, s32 index); /* a block of a file */
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 

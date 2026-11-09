@@ -5,6 +5,7 @@
 #include "structs/camera.h"
 #include "globals/game.h"
 #include "globals/camera.h"
+#include "protos/menu.h"
 
 
 extern s32 Demo_GetPlayerCount(void);
@@ -13,7 +14,6 @@ extern u8 *CCameraPool__AllocCamera(void *);
 extern void CBarrel__Reset(void *strokes);
 extern void CPlayer__GiveStartingWeapons(CPlayer *p);
 extern void CPlayer__ResetHealth(CPlayer *p);
-extern void MenuPool_OpenMenu(void *, void *callback, CPlayer *p, s32 controller, s32 index);
 extern void func_004388E0();
 extern void func_00438808();
 extern void func_0043916C();

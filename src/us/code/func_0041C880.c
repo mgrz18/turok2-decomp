@@ -3,8 +3,8 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/menu.h"
 
-extern s32 Menu_StepValue(void *c, s32 value, s32 step, s32 min, s32 max, s32 wrap);
 
 s32 OptionsMenu_StepBrightness(s32 menu, void *c) {
     GameSettings *s = &gEngineApp_m_Settings;

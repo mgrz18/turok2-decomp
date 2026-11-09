@@ -24,6 +24,7 @@
 #include "structs/menu_model.h"
 #include "structs/camera.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "globals/game.h"
 #include "globals/menu.h"
 #include "globals/scene.h"
@@ -32,6 +33,9 @@
 #include "globals/camera.h"
 #include "structs/light.h"
 #include "globals/player.h"
+#include "protos/list.h"
+#include "protos/cache.h"
+#include "protos/scene.h"
 
 /* ---------------- MenuItem_FormatBinding_2 ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -551,16 +555,12 @@ extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode *
 
 extern void memset(void *p, s32 c, s32 n); /* memset */
 extern f32 func_002982F0(f32 angle);             /* sin */
-extern CIntelligence *CScene__FindIntelligence(void *world, s32 type, s32 id);
 extern void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
 extern void CGameObjectInstance__Construct(CGameObjectInstance *fx, s32 a, s32 b, s32 c, void *d, s32 e, s32 f, f32 g, CVector3 h, s32 i, CVector3 j,
                           CVector3 k, s32 l);
 extern void func_0021E5D4(CGameObjectInstance *fx);
 extern void CGameObjectInstance__ClearDrawMatrices(CGameObjectInstance *fx);
 extern void CGameObjectInstance__UpdateAnimation(CGameObjectInstance *fx);
-extern s32 CCache__GetFrameDelay(void);
-extern void CCache__SetFrameDelay(s32 a);
-extern void CScene__SetInstanceObjectType(void *world, CGameObjectInstance *fx, s32 c, s32 d);
 extern void Render_ResetBatches(void);
 extern void Render_FlushBatches(void);
 extern void CGameObjectInstance__Draw(CGameObjectInstance *fx, CCamera *cam);
@@ -597,7 +597,7 @@ void MenuItem_DrawModel_2(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unus
                 Gfx **pp = &gDList;
                 d = (*pp)++;
                 d->w0 = 0xDA380007;
-                d->w1 = (u32) &w->camera->m_mProjection[gEvenOdd];
+                d->w1 = GBI_ADDR(&w->camera->m_mProjection[gEvenOdd]);
             }
             c = w->camera;
             k = c->m_Viewport.m_Width / (f32) gScreenWidth;
@@ -1178,9 +1178,7 @@ void Menu_DrawBar_2(Menu *a, MenuItem *b, s32 c) {
 
 /* Static inline in the Rage Wars source file (dropped by the importer); 0x330 in Turok 2, 0x480 in Rage Wars. */
 static inline s32 O06_ItemSize_415FB8(s16 *a) { if (*a == 3) return 0x330; return 0; }
-extern s32 *CCache__Allocate();
 extern void func_00414EA8_415FB8() __asm__("Menu_Construct_2");
-extern void CList__AddHead(MenuPool *a, s32 b);
 /* Opens the window c's submenu in the pool a (an item's select callback,
  * MenuItem_SelectSubmenu_2): the window, its items and their extras in one block. */
 s32 MenuPool_OpenSubmenu_2(MenuPool *a, Menu *c) {
@@ -1456,7 +1454,6 @@ s32 Menu_StepValueLR_2(Menu *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 a
 }
 
 /* ---------------- MenuPool_Construct_2 ---------------- */
-void CList__Construct(s32, s32, s32);
 
 void MenuPool_Construct_2(s32 arg0) {
     CList__Construct(arg0, 0x1D0, 0x1D4);
@@ -1578,8 +1575,6 @@ s32 MenuPool_OpenChildMenu_2(MenuPool *pool, Menu *c, MenuDesc *t) {
 }
 
 /* ---------------- MenuPool_Update_2 ---------------- */
-s32 CList__Remove(s32, s32);
-s32 CCache__Deallocate(s32, s32);
 s32 func_0041531C_4169C8(s32, s32) __asm__("Menu_Update_2");
 
 void MenuPool_Update_2(MenuPool *arg0) {

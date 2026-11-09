@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
-s32 CPlayer__SetState(s32, s32, s32);
 s32 Controller_SetRumbleOptionAll(s32);
 
 typedef struct {

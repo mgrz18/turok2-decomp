@@ -4,10 +4,8 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 extern void __osSiGetAccess(void);
-extern void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msg, s32 msgCount);
-extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 static __inline__ void create_access_queue(void) {
     ((s32 *) &__osSiAccessQueueEnabled)[0] = 1;
     osCreateMesgQueue(&__osSiAccessQueue, __osSiAccessBuf, 1);

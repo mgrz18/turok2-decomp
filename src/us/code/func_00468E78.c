@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/list.h"
+#include "protos/list.h"
 
 /* A pool with a free list and a used list. */
 typedef struct {
@@ -8,8 +9,6 @@ typedef struct {
     /* 0x20 */ CList usedList;
 } Pool;
 
-s32 CList__AddTail(s32, s32);
-s32 CList__Remove(s32, s32);
 
 s32 CCamera__Construct_2(s32);                         /* extern */
 

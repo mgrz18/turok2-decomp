@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
+#include "protos/ai.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x40];
@@ -40,7 +41,6 @@ f32 GameObject_GetCollisionHeight(void *actor);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 CVector3__GetPitch(CVector3 *v);
 void Turret_UpdateHinge(Turret *self, CAI *ai, s32 mode, TargetActor *target);
-void AI_TurnClamped(Turret *self, CAI *ai, f32 turnRate, f32 angle);
 f32 Math_Approach(f32 cur, f32 target, f32 rate);
 
 s32 Turret_Aim(Turret *self, CAI *ai) {

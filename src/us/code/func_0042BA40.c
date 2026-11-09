@@ -6,6 +6,8 @@
 #include "structs/player.h"
 #include "globals/game.h"
 #include "globals/camera.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
 typedef struct LevelRecord {
     /* 0x00 */ s32 unk0;
@@ -37,8 +39,6 @@ typedef struct Handle {
 
 extern s32 ProPackDecompress(Handle **handle, s32);
 extern s32 CScene__GetRegion(CScene *world, s32);
-extern Handle *CCache__AllocateMemoryForDecompression(s32, Handle **handle, s32 size);
-extern void CUSet__Transpose(LevelNode *node, void *data, s32);
 extern s32 CScene__FindNearestWarpDest(CScene *world, CVector3 *pos, s32 group, void *info);
 extern s32 CScene__FindWarpDests(CScene *world, s32 group, s32 key, CWarpPoint *out, s32 max);
 extern s32 *CScene__GetIntelligence(CScene *world, u16 id);
@@ -49,7 +49,6 @@ extern void CPlayer__SetupActors(CPlayer *player, LevelRecord *rec, s32 mode, s3
 extern s32 func_00267DBC(CGameObjectInstance *obj);
 extern s32 func_00267D94(CGameObjectInstance *obj);
 extern f32 AI_DistSqToPointAtHeight(CGameObjectInstance *obj, CVector3 pos);
-extern void CCache__DeallocAndReplaceCompressedData(s32, Handle **handle, Handle *block);
 
 /* Builds the level's actor block from its records: places every player on the spawn points found for
    the level (one record per player start), then links each remaining actor to the nearest actor with

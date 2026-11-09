@@ -4,13 +4,12 @@
 #include "rw/abu_types.h"
 #include "globals/engine.h"
 #include "globals/sysrc.h"
+#include "protos/ultra.h"
 
 extern void __scAppendList(struct OSSched *arg0, void *arg1);
 extern void __scYield(void *arg0);
-extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern s32 __scSchedule(struct Ctx_func_8028F544_de *, struct Node_func_8028F544_de **, struct Node_func_8028F544_de **, s32);
 extern void __scExec(struct View_func_8028FA60_de *, struct Scene_func_8028FA60_de *, struct Scene_func_8028FA60_de *);
-extern void osSetThreadPri(void *arg0, s32 arg1);
 s32 __scSchedule(Ctx_func_8028F544_de *arg0, Node_func_8028F544_de **arg1, Node_func_8028F544_de **arg2, s32 arg3);
 void __scAppendList(OSSched *arg0, void *arg1);
 void __scExec(View_func_8028FA60_de *view, Scene_func_8028FA60_de *current, Scene_func_8028FA60_de *next);

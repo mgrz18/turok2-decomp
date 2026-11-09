@@ -1,10 +1,7 @@
 #include "common.h"
 #include "structs/cache.h"
+#include "protos/cache.h"
 
-CMemEntry *CCache__AllocMemEntry(s32, s32);
-s32 CCache__FreeMemEntry(s32, CMemEntry *);
-s32 CCache__HeapAlloc(s32, s32, s32, s32);
-s32 CCache__AddToAddressList(s32, CMemEntry *);
 
 CMemEntry *CCache__AllocateInternal(s32 arg0, s32 arg1, s32 arg2) {
     s32 temp_v0;

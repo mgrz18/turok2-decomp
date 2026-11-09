@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "globals/scene.h"
+#include "protos/iset.h"
 
 typedef struct {
     /* 0x0 */ s16 x, y, z;
@@ -22,7 +23,6 @@ typedef struct {
 } LightInfo;
 
 
-void *CISet__GetBlock(s32 *, s32);
 void CMtxF__FromMtxAffine(f32 *mtx, void *packed);
 void CVector3__Normalize(CVector3 *v);
 void CMtxF__RotateVector(f32 *mtx, CVector3 *in, CVector3 *out);

@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "structs/world.h"
+#include "protos/game.h"
 
 struct Shared_Actor;
 #include "common.h"
@@ -66,7 +67,6 @@ struct Shared_Actor {
     u8 pad5[8];
     struct Shared_Entity * entity;
 };
-extern void GameObject_FireTriggers(struct Shared_Actor *arg0, s32 arg1, void *arg2);
 extern void Actor_SpawnParticle(void *, s32, Triple, s32);
 extern s32 Sound__Play(s16, CVector3, s32, s32);
 struct Player;

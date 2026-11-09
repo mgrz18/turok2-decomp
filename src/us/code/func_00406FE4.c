@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-extern void *CScene__FindRegionAt(void *world, CVector3 *pos);                  /* region at a point */
 extern void *CLevelActorPool__Spawn(CLevelActorPool *table, void *slot, s32 kind, CVector3 velocity, CVector3 pos,
                            void *region, f32 arg);
 extern void Actor_SpawnParticle(void *actor, s32 event, CVector3 pos, s32 arg);

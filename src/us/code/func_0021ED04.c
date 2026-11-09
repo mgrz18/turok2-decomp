@@ -1,5 +1,6 @@
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/gbi.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
@@ -44,14 +45,14 @@ void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *owner, ModelRef
             {
                 Gfx *g = gDList++;
                 g->w0 = 0xDA380007;
-                g->w1 = (u32)m;
+                g->w1 = GBI_ADDR(m);
             }
             Render_DrawModelFlat((u8)arg3, ref->unkC, (s32) owner->m_pmtDrawMtxs, 1, &owner->m_Lights[gEvenOdd], 0, ref->unk1C,
                           owner->m_AI.m_nTexture);
             {
                 Gfx *g = gDList++;
                 g->w0 = 0xDA380007;
-                g->w1 = (u32)&model->mtx[gEvenOdd];
+                g->w1 = GBI_ADDR(&model->mtx[gEvenOdd]);
             }
         }
     }

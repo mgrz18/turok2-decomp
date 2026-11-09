@@ -4,6 +4,7 @@
 #include "structs/boss.h"
 #include "globals/game.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -27,7 +28,6 @@ typedef struct {
 Entity00401FCC *CPlayerPool__FindNearest(void *game, CVector3 pos);
 f32 AI_DistSqToPointAtHeight(Member00401FCC *member, CVector3 pos);
 f32 Random_Blend(f32 lo, f32 hi);
-s32 CAI__SetMode(Member00401FCC *member, void *ai, s32 event);
 void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), void (*swap)());
 s32 MantidQueen_SortCompare();
 void MantidQueen_SortSwap();

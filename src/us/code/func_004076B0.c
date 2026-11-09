@@ -2,8 +2,8 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 extern f32 func_00298470(f32 x);                                          /* sqrt */
 
 extern s32 D_800F1C40[];

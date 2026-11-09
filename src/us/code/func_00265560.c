@@ -4,8 +4,9 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
-extern s32 CScene__GetInstanceSavedBit(void *, void *);
 void Door_Advance(void *arg0, void *arg1) {
     extern s32 CAI__SetMode(void *, void *, s32);
     s32 different = CScene__GetInstanceSavedBit(&gScene, arg0) != 1;

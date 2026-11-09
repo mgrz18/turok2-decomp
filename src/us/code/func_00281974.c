@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "protos/list.h"
 
 /* The block at arg0 + 0x40 of CCameraPool__ReleaseAllTexts: a list at 0xE28 whose elements go back to the list at arg0 + 0xF0C. */
 typedef struct {
@@ -7,8 +8,6 @@ typedef struct {
     /* 0xE28 */ CList m_List;
 } ListOwner;
 
-s32 CList__AddHead(s32, s32 *);              /* extern */
-s32 CList__Remove(void *, s32 *);           /* extern */
 
 void CCameraPool__ReleaseCameraTexts(s32 arg0, ListOwner *arg1) {
     s32 *temp_s0;

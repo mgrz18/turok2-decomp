@@ -4,6 +4,7 @@
 #include "structs/vector.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/cache.h"
 
 typedef struct {
     f32 m[16];
@@ -53,8 +54,6 @@ typedef struct {
     /* 0x10D */ u8 blendEnd;
 } AnimActor;
 
-void **CCache__Request(s32, s32, s32, s32, s32, s32, char *, s32);
-void CCache__Unlock(s32, void **);
 void CAnimationState__SwitchToQueued(AnimTrack *track, s32 data, s32 key, s32 primary, s32 *active, AnimTrack *other);
 s32 CAnimationState__IsLoaded(AnimTrack *track);
 AnimBlendEntry *CAnimationState__GetKeyHeader(AnimTrack *track);

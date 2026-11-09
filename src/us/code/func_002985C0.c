@@ -2,10 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/ultra.h"
 
 extern s32 __osAiDeviceBusy();
 extern u8 hdwrBugFlag[]; /* local type: an array, not the u8 of globals/libultra.h; as a scalar GCC 2 orders the code differently */
-extern u32 osVirtualToPhysical(void *);
 s32 osAiSetNextBuffer(void *bufPtr, u32 size) {
     char *bptr = bufPtr;
     if (hdwrBugFlag[0] != 0) {

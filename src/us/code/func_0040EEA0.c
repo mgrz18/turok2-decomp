@@ -5,8 +5,8 @@
 #include "globals/boss.h"
 #include "globals/engine.h"
 #include "structs/light.h"
+#include "protos/game.h"
 
-s32 Render_DrawModel(s32, s32, s32, s32, s32, s32, s32);
 s32 CGameObjectInstance__DrawModel(s32, s32, s32);
 s32 ScreenTint_UpdateMode(void);
 s32 ScriptAnimator_Apply(void *);

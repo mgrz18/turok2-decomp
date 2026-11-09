@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
-extern void *osViGetCurrentFramebuffer();
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 void *osViGetCurrentFramebuffer(void) {

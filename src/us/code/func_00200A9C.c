@@ -2,15 +2,16 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/list.h"
 
-int CList__Contains(CList *arg0, int arg1) {
-    int node = arg0->m_pHead;
+int CList__Contains(CList *arg0, void *arg1) {
+    void *node = arg0->m_pHead;
     if (node != 0) {
         do {
             if (node == arg1) {
                 return 1;
             }
-            node = *(int *)(node + arg0->m_NextOffset);
+            node = *(void **)((u8 *)node + arg0->m_NextOffset);
         } while (node != 0);
     }
     return 0;

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/ai.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0xD4];
@@ -15,7 +16,6 @@ typedef struct {
     /* 0x220 */ Actor00403430 *actor;
 } Owner00403430;
 
-void AI_PlayAnim(Actor00403430 *actor, void *ai, s32 state);
 
 void MantidQueen_UpdateBossAnim(Owner00403430 *owner) {
     Actor00403430 *actor = owner->actor;

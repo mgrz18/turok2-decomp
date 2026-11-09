@@ -10,14 +10,13 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 extern s8 gPakProfileRead_character[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 s32 PakMenu_CheckPak(Menu *o, s32 pad, s32 z);
 CPlayer *CPlayerPool__FindByController(CPlayerPool *world, ControllerProfile *s);
 void CPlayer__SetCharacter(CPlayer *a, s32 b);
-void MenuPool_OpenChildMenu(u8 *a, Menu *o, u8 *c);
 s32 Pak_DeleteNote(s32 pad, s32 idx);
-void MenuPool_OpenMenu(u8 *a, void *b, void *c, void *d, void *e);
 /* Turok 2 inlines this (Rage Wars calls it) */
 static inline void O01Restore(CPlayer *a) {
     CPlayerOptions *s = a->m_pOptions;

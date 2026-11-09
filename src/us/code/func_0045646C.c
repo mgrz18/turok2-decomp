@@ -4,12 +4,12 @@
 #include "globals/game.h"
 #include "globals/render.h"
 #include "globals/menu.h"
+#include "protos/player.h"
 
 /* Name entry: draw the item, with a blinking cursor box under the character
  * being edited. */
 
 
-s32 CPlayerPool__GetIndex(void *state, void *player);
 void Hud_SetupFillMode(void);
 void Hud_DrawBevelBox(s32 x0, s32 y0, s32 x1, s32 y1, s32 border, s32 invert, s32 red, s32 green, s32 blue, s32 alpha);
 void MenuItem_DrawText_2(void *menu, MenuItemLayout *item, void *arg2, Menu *event);

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/world.h"
+#include "protos/scene.h"
 
 /* Rumble i: the table starts with the element size, the data at +8. */
 void *CScene__GetRumble(CScene *arg0, s32 arg1) {

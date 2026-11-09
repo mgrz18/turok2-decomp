@@ -4,9 +4,9 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
+#include "protos/player.h"
 
 /* Turok 2 layout: the field Rage Wars keeps at 0x58 is at 0x1E8 here. */
-extern s32 CPlayerPool__GetIndex(void *a, void *b);
 extern void Controller_WatchPak(s32 a);
 extern s32 gEngineApp_m_Settings_match_tag[]; /* local type: GameMatch.tag read as an array (the ROM bases the load on a register); so globals/game.h is not included here */
 extern CGame gEngineApp_m_Game; /* local: see above (globals/game.h) */

@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "structs/game_object.h"
+#include "protos/scene.h"
 
 
 /* Turok 2 layouts (Rage Wars offsets in comments). */

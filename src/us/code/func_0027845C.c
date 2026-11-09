@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "globals/menu.h"
 
 void *COnScreen__GetFontTexture(void);
@@ -9,7 +10,7 @@ void COnScreen__SelectTinyFont(void) {
     void *tex = COnScreen__GetFontTexture();
     if (tex != ((void *)0)) {
         gLoadedFont = 4;
-        { Gfx *_g = gDList++; _g->w0 = (0xFD900000); _g->w1 = ((u32)tex); };
+        { Gfx *_g = gDList++; _g->w0 = (0xFD900000); _g->w1 = (GBI_ADDR(tex)); };
         { Gfx *_g = gDList++; _g->w0 = (0xF5900100); _g->w1 = (0x0700C040); };
         { Gfx *_g = gDList++; _g->w0 = (0xE6000000); _g->w1 = (0); };
         { Gfx *_g = gDList++; _g->w0 = (0xF3000000); _g->w1 = (0x0701F800); };

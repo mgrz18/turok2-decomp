@@ -1,8 +1,7 @@
 #include "common.h"
 #include "ultra_types.h"
+#include "protos/ultra.h"
 
-s32 osRecvMesg(void *, s32, s32);    /* extern */
-s32 osSendMesg(void *, s32, s32);    /* extern */
 s32 __osDisableInt();                                /* extern */
 s32 __osRestoreInt(s32);                         /* extern */
 

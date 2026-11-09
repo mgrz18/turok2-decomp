@@ -1,6 +1,6 @@
 #include "common.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 
 /* Three override slots, 6 bytes apart (see EnemyAnim_JoypadTestPlayAnim). */
 extern u16 D_800F5C66[];

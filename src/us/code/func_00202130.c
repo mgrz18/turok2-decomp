@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "globals/sysrc.h"
+#include "protos/cache.h"
 
 s32 GetMemSize(void);                                  /* osGetMemSize */
 void *memset(void *dst, s32 value, u32 size);      /* memset */
@@ -13,7 +14,6 @@ void CHeap__Construct(CHeap *heap, void *base, u32 size);
 void CDecompressor__Construct(CDecompressor *p, s32 n);
 void CLoader__Construct(CLoader *p, s32 n);
 void VM_Initialize(s32 a, s32 b);
-void CCache__Construct(s32 a, s32 b);
 
 extern u8 D_8014A000[];   /* end of the loaded image */
 

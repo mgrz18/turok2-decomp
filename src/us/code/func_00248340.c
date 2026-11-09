@@ -2,11 +2,11 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/controller.h"
+#include "protos/player.h"
 
 
 void CPlayerContState__Init(void *controls, void *settings);
 f32 Actor_GetEyeHeight(CPlayer *player);
-void CPlayer__SetState(CPlayer *player, CPlayer *arg1, s32 arg2);
 
 /* The ROM clears the float fields with integer stores (sw $zero): a 0.0f
  * store keeps the constant in a register instead. */

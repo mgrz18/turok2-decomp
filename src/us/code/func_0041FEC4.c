@@ -3,6 +3,7 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 /* Save/load menu "select pak" handler: checks the pak in the chosen slot;
  * when saving over an existing game file asks for confirmation, when there
@@ -17,7 +18,6 @@ extern s32 Pak_GetStatus(s32 slot);
 extern void Pak_GetNoteGameName(s32 slot, s32 index, char **out);
 extern void Pak_DecodeText(char *src, char *dst, s32 n);
 extern s32 Str_Compare(char *a, char *b);
-extern void MenuPool_OpenMenu(void *menus, void *tmpl, s32 a, ControllerProfile *b, void *parent);
 
 /* PakMenu_FindNoteByName, inlined (the found path sets the result before storing the index) */
 static __inline__ s32 findFile(void *unused, char *file, s32 slot, s32 *index) {

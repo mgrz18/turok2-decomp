@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 extern void osInitialize();
 extern int __osSiRawReadIo(unsigned int devAddr, unsigned int * data);
@@ -12,8 +13,6 @@ extern void osMapTLBRdb();
 extern void __osSetSR(unsigned int sr);
 extern unsigned int __osSetFpcCsr(unsigned int csr);
 extern unsigned int __osGetSR();
-extern void osWritebackDCache(void *addr, s32 size);
-extern void osInvalICache(void *addr, s32 size);
 extern void *memset(void *dst, s32 value, u32 size);
 void osInitialize(void)
 {

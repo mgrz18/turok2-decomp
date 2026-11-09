@@ -4,9 +4,8 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-extern s32 CScene__QueueDelayedEvent(struct WorldRecAt1B40C *arg0, Record14 *arg1);
-extern s32 CScene__SetEventFired(void *arg0, void *arg1, s32 arg2);
 void LevelEvent_Trigger(void *arg0) {
     extern s32 LevelEvent_Fire(void *arg0);
     func_80278EEC_S1 *object = arg0;

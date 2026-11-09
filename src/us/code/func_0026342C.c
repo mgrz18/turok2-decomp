@@ -1,6 +1,7 @@
 #include "structs/vector.h"
 #include "structs/game_object.h"
 #include "globals/game.h"
+#include "protos/ai.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00205F18.c, func_00205F18.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -35,7 +36,6 @@ typedef struct B01Info {
                 f32 unk6C;
 } B01Info;
 f32 Random_Blend(f32 a, f32 b);
-void CAI__SetMode(CGameObjectInstance *actor, CAI *state, s32 event);
 void Generator_Advance(CGameObjectInstance *actor, CAI *state) {
     CGameObjectInstance *a2;
     B01Info *new_var;

@@ -3,11 +3,10 @@
 #include "globals/pak.h"
 #include "globals/controller.h"
 #include "globals/rumble.h"
+#include "protos/ultra.h"
 
 /* Per-controller rumble pak state. */
 
-extern s32 osRecvMesg(void *queue, void *msg, s32 flags);
-extern s32 osSendMesg(void *queue, void *msg, s32 flags);
 extern s32 osMotorInit(void *queue, void *pfs, s32 channel);
 extern void Controller_ReadAll(void);
 extern void RumblePool_Init(void *, void *, s32);

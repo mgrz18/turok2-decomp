@@ -6,6 +6,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
+#include "protos/scene.h"
 CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 a, CVector3 z, CVector3 v, s32 b, f32 f);
 void CScene__SpawnPoolActor(CScene *lv, s32 a1, CVector3 v, s32 x, f32 f) {
     CVector3 z;

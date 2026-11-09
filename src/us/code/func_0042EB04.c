@@ -1,8 +1,8 @@
 /* CPlayer code: CPlayer__StopLoopingSounds, 0x0042EB04-0x0042EB4C (splat had it inside the data D_0042D50C). */
 #include "common.h"
 #include "structs/player.h"
+#include "protos/game.h"
 
-extern void *LoopSounds_Get(void);
 extern void LoopSounds_Stop(void *pool, s32 sound);
 
 /* Stops the player's two looping sounds. */

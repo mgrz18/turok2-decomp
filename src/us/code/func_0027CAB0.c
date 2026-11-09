@@ -7,6 +7,7 @@
 #include "globals/menu.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
 
 /* What a region set gives a camera (the record CScene__GetRegionInfo finds). */
 typedef struct {
@@ -25,7 +26,6 @@ typedef struct {
     /* 0x5B */ u8 m_Music1;
 } CRegionSetAttributes;
 
-CRegionSetAttributes *CScene__GetRegionInfo(s32 *list, u16 *key);
 s32 Cinema_OverridesMusic1(void);
 s32 Cinema_OverridesMusic2(void);
 void Sound__SetAmbientTrack(u8 track);

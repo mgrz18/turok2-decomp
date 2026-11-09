@@ -3,10 +3,10 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void AI_StopSound(CGameObjectInstance *obj, CAI *ai);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern s32 D_800F1F50[];
 extern s32 gLevelScript_values[]; /* local type: the field's real type (or the member path) changes the ROM's code here */

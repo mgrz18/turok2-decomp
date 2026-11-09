@@ -1,5 +1,6 @@
 #include "structs/vector.h"
 #include "globals/collision.h"
+#include "protos/game.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80246E34.CPP, func_8024715C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -57,7 +58,6 @@ typedef struct CollisionInfo CollisionInfo;
 extern CollisionInfo D_800F1EB0;
 extern s32 Collision_MoveInstance(void *arg0, CVector3 arg1, CollisionInfo *arg2);
 extern void CGameRegion__FireTriggers(s32 arg0, s32 arg1, void *arg2);
-extern void GameObject_FireTriggers(void *arg0, s32 arg1, void *arg2);
 void CGameObjectInstance__MoveWithCollision(char *arg0, CVector3 *arg1) {
     CollisionInfo *collision;
     u16 *old_contact;

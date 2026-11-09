@@ -4,16 +4,14 @@
 #include "structs/emitter.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/list.h"
+#include "protos/scene.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
-CRegionInfo *CScene__GetRegionInfo(void *world, s32 region);
 f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);
 CVector3 CCamera__GetViewOrigin(CCamera *camera);
 void func_00207914(s32 *resource, s32 id);
-void CList__Remove(CList *list, void *element);
-void CList__AddHead(CList *list, void *element);
-void CList__AddTail(CList *list, void *element);
 
 /* CEmitterPool__TakeEmitter, inlined: takes a free emitter. */
 static __inline__ CEmitter *TakeEmitter(CEmitterPool *owner) {

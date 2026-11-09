@@ -8,6 +8,7 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 /* Controller pak save: when the pak has room and an existing note can be replaced, writes the save note;
  * stops the pak sounds and shows the result (or the "not enough space" message). */
@@ -22,7 +23,6 @@ void CCache__Flush(s32 a);
 void CCache__Deallocate(s32 a, s32 b);
 void Cinema_StopAtEnd(void);
 void Cinema_RequestById(s32 a);
-void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, s32 e);
 
 static __inline__ void FreeAll(void) {
     if (gSaveBufferHandle != 0 || gLoadBufferHandle != 0) {

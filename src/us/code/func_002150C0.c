@@ -10,6 +10,7 @@
 #include "structs/light.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
 
 /* A placed actor's record in the level data. */
 typedef struct {
@@ -24,7 +25,6 @@ typedef struct {
     /* 0x1E */ s8 angle;
 } PlacedActorRecord;
 
-void *CScene__GetIntelligence(void *cache, s32 model);
 f32 GameObject_GetCollisionHeight(CLevelActor *actor);
 
 void CLevelActor__Construct(CLevelActor *actor, PlacedActorRecord *record, s32 owner, u8 *segments) {

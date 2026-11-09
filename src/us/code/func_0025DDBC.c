@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
 /* AI recoil update: turns toward the target at double speed, counts the
  * recoil timer down, and on being hit either reacts (anim 0xA / 0x14) or
@@ -8,8 +9,6 @@
 
 
 extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern void AI_TurnClamped(CGameObjectInstance *actor, CAI *ai, f32 angle, f32 dist);
-extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
 extern void EnemyAI_TryDodge(CGameObjectInstance *actor, CAI *ai);
 
 void EnemyMode_Combo_Update(CGameObjectInstance *actor, CAI *ai) {

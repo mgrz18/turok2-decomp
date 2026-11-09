@@ -6,6 +6,7 @@
 #include "globals/pak.h"
 #include "structs/game.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 /* Controller pak menu, load: finds a pad with a controller pak (trying each pad in turn), checks it for the
  * game's notes and free space and opens the load menu, or shows why the pak cannot be used. */
@@ -26,7 +27,6 @@ void Pak_DecodeText(s32 a, u8 *b, s32 c);
 s32 Pak_BytesToPages(s32 a);
 void PakMenu_UpdateNoteRows(Menu *o);
 s32 PakMenu_CheckSlotForSave(Menu *o, s32 a, s32 *b, s32 *c);
-void MenuPool_OpenMenu(u8 *a, u8 *b, s32 c, ControllerProfile *d, void *e);
 
 #define PAK_ERROR()                                                        \
     gPakMenuLeaving = 1;                                                        \

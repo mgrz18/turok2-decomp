@@ -5,12 +5,9 @@
 #include "structs/cache.h"
 #include "globals/cache.h"
 #include "globals/sysrc.h"
+#include "protos/list.h"
+#include "protos/cache.h"
 
-extern void CList__RemoveHead(CList *list);
-extern void CList__Construct(CList *list, s32 lastOffset, s32 nextOffset);
-extern void CList__AddTail(CList *list, void *element);
-extern void CList__InsertBefore(CList *list, void *before, void *element);
-extern void CList__Remove(CList *list, void *element);
 extern u8 *CHeap__Alloc(CHeap *heap, s32 size);
 extern void CHeap__Free(CHeap *heap, u8 *data);
 extern void memmove(void *dst, void *src, s32 size);

@@ -3,6 +3,7 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* Module update: ticks every slot, then (outside cinematics) counts the two phase timers: the first spawns
  * one actor at a random spot around the origin, the second starts a burst of spawns at the phase points. */
@@ -13,7 +14,6 @@ extern s32 WeightedTable_PickStatic(void *a);
 extern f32 Random_Blend(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
-extern s32 CScene__FindRegionAt(void *world, CVector3 *pos);
 extern void *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 a1, s16 type, CVector3 vel, CVector3 pos, s32 region, f32 arg);
 extern void Actor_SpawnParticle(void *actor, s32 id, CVector3 pos, s32 a5);
 extern void MotherBoss_DropPickupsAtSpawnPoints_2(s32 delay, void *points);

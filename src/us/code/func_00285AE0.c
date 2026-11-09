@@ -3,11 +3,10 @@
 #include "structs/controller.h"
 #include "globals/pak.h"
 #include "globals/controller.h"
+#include "protos/ultra.h"
 
 /* ControllerProfile profile, stride 0x224. */
 
-s32 osRecvMesg(void *mq, void *msg, s32 flag);
-s32 osSendMesg(void *mq, void *msg, s32 flag);
 s32 osMotorInit(void *mq, void *pfs, s32 channel);
 void Controller_ReadAll(void);
 s32 RumblePool_Init(void *dst, void *src, s32 n);

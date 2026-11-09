@@ -14,7 +14,7 @@ Formats are those the engine's loaders parse (see docs/assets/TEXTURES.md):
   CScene__LoadGraphicSet / Hud_GetImageFrame / Hud_DrawImageFrame  (graphic sets: tiled 2D images, fonts)
 
 Locating goes through tools/assets/romfs.py (cartridge index at ROM 0xFCBFB4: entry 3 = texture sets, 16 = graphic
-sets, 17 = graphic-set type ids) and RNC through propack.py; the parsing functions below only take decompressed bytes.
+sets, 17 = graphic-set type ids) and RNC through rnc.py; the parsing functions below only take decompressed bytes.
 The export functions accept ROM bytes or a romfs.RomFS.
 """
 import argparse
@@ -26,7 +26,7 @@ import sys
 import zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import romfs  # noqa: E402  (locating + ProPack: tools/assets/romfs.py, propack.py)
+import romfs  # noqa: E402  (locating + ProPack: tools/assets/romfs.py, rnc.py)
 
 CART_TEXTURE_SETS = 3        # cart/3  "texture sets index"
 CART_GRAPHIC_SETS = 16       # cart/16 "graphicset index"

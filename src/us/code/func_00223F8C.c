@@ -6,6 +6,7 @@
 #include "structs/intelligence.h"
 #include "structs/world.h"
 #include "structs/game_object.h"
+#include "protos/scene.h"
 void Render_ResetBatches();
 void Render_FlushBatches(void);
 void CGameObjectInstance__Draw(CGameObjectInstance *e, s32 a);

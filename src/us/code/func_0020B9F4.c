@@ -1,13 +1,10 @@
 #include "common.h"
 #include "structs/model.h"
 #include "globals/batch.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
-s32 CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
-s32 CISet__GetROMAddressAndSize(s32, s32, s32, s32 *);
-s32 *CISet__GetBlock(s32, s32);
 void Render_FlushModelBatch(void);
-void CCache__TouchAndLock(s32, s32);
-void CCache__Unlock(s32, s32);
 extern u8 D_800A53D8[];
 extern u8 D_800A53EC[];
 extern void Model_DecompressCallbackTerminated();

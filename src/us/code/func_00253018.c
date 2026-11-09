@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/list.h"
 #include "globals/game.h"
+#include "protos/cache.h"
 
 struct ObjectPool {
     void *allocation;
@@ -23,7 +24,6 @@ struct Shared_ActorView {
 
 extern void Actor_ReloadAnimInfo(void *arg0, s32 arg1);
 extern s32 CGameObjectInstance__LoadBoneMatrices(void *arg0, s32 arg1);
-extern void CCache__LockForDisplayList(s32 arg0, void *arg1);
 extern void CGameObjectInstance__ClearDrawMatrices(void *arg0);
 
 void CPlayerPool__PreUpdate(struct ObjectPool *arg0) {

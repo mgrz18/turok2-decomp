@@ -7,6 +7,7 @@
 #include "globals/engine.h"
 #include "structs/light.h"
 #include "globals/player.h"
+#include "protos/game.h"
 
 typedef struct Hit {
     /* 0x00 */ u8 pad0[0xC];
@@ -20,7 +21,6 @@ s32 CPlayer__IsInMatchEndState(CPlayer *player);
 void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, s32 arg1, void *hit);
 void CGameObjectInstance__DrawModel(CGameObjectInstance *actor, s32 arg1, void *hit);
 void Render_DrawModelShared(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
-void Render_DrawModel(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
 void Render_QueueModelInstance(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
 
 #define HIT_LIMIT(hit) (*CISet__GetBlock(*(hit)->unkC, 2))

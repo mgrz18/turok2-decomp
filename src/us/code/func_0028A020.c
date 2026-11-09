@@ -5,6 +5,8 @@
 
 #include "common.h"
 #include "globals/engine.h"
+#include "protos/game.h"
+#include "protos/ultra.h"
 
 typedef struct Client {
     /* 0x0 */ struct Client *next;
@@ -21,8 +23,6 @@ typedef struct {
 } Sched;
 
 
-extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
-extern s32 osSendMesg(void *queue, void *msg, s32 flag);
 extern void osViBlack(s32 black);   /* osViBlack */
 extern void __scHandleRetrace(Sched *sc);
 extern void Video_UpdateResolution(void);
@@ -30,7 +30,6 @@ extern void __scHandleRSP(Sched *sc);
 extern void __scHandleRDP(Sched *sc);
 extern void Music_FadeOut(void);
 extern void Sound__StopAllExcept(s32);
-extern s32 LoopSounds_Get(void);
 extern void LoopSounds_StopAll(s32);
 extern void Sched_HandleCmdMsg(Sched *sc);
 

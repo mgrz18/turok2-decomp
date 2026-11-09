@@ -1,5 +1,6 @@
 #include "common.h"
 #include "gfx.h"
+#include "protos/scene.h"
 
 void Render_ResetBatches(void);
 void CParticleSystem__Draw(void *, s32);

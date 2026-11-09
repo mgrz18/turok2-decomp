@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/player.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 s32 CPlayer__GetWeaponAmmo(s32, s32);
 s32 CPlayer__GetNextUsableWeapon(s32);
 s32 WeaponActor_CheckFire(s32, s32);

@@ -8,10 +8,9 @@
 #include "ultra_types.h"
 #include "structs/sound.h"
 #include "structs/camera.h"
+#include "protos/ultra.h"
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
-s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 /* Static inlines from the Rage Wars header b13_types.h (dropped by the importer). */
 static inline void CAudioWorld_Lock(CAudioWorld *m) {
     CMutex *l = &m->lock;

@@ -4,6 +4,8 @@
 #include "globals/boss.h"
 #include "globals/scene.h"
 #include "globals/boss_ai.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
 /* Boss fight setup: finds the six level actors with id 0x1DB1 and the one
  * with 0x1DB2, installs the AI callbacks and resets the 15 attack slots. */
@@ -15,9 +17,6 @@ typedef struct {
 
 extern u32 D_800F1F10[];
 
-s32 CScene__FindInstances(void *, s32, s32, s32, CGameObjectInstance **, s32);
-s32 CScene__FindIntelligence(void *, s32, s32);
-void CAI__SetMode(Obj *, CAI *, s32);
 void ScriptAnimator_Start(void *, Obj *);
 void MotherBoss_Step();
 void MotherBoss_Draw();

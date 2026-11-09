@@ -3,9 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "globals/sysrc.h"
+#include "protos/cache.h"
 
-extern s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent);
-extern void *CCache__HeapAlloc(s32 arg0, u32 arg1, s32 arg2, u32 arg3);
 extern void *CHeap__AllocTop(CHeap *arg0, s32 arg1);
 extern void *CHeap__Alloc(CHeap *, s32);
 void *CCache__HeapAlloc(s32 arg0, u32 arg1, s32 arg2, u32 arg3)

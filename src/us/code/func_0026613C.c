@@ -1,8 +1,8 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
-s32 CScene__GetInstanceSavedBit(void *table, void *actor);
-s32 CAI__SetMode(void *actor, void *state, s32 mode);
 
 void Action_Advance(u8 *actor, u8 *state) {
     if (CScene__GetInstanceSavedBit(&gScene, actor) == 1) {

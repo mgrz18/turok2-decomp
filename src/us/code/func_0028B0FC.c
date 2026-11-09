@@ -3,16 +3,12 @@
 
 #include "rw/abu_types.h"
 #include "globals/frame.h"
+#include "protos/ultra.h"
 
 extern int D_800B6E60;
 extern void __scExec(struct View_func_8028FA60_de *, struct Scene_func_8028FA60_de *, struct Scene_func_8028FA60_de *);
 extern s32 D_800B6E64;
-extern void osWritebackDCacheAll();
 extern s32 D_800B6E64;
-extern s64 osGetTime(void);
-extern void osSpTaskLoad(s32 *mode);
-extern void osSpTaskStartGo(s32 *mode);
-extern void osDpSetNextBuffer(s32 music, s64 time);
 void __scExec(View_func_8028FA60_de *view, Scene_func_8028FA60_de *current, Scene_func_8028FA60_de *next) {
     s64 now;
     if (next != 0 && (next->options & 0x20) && !(next->flags & 0x10)) {

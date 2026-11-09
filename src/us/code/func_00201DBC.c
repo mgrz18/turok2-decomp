@@ -3,10 +3,8 @@
 
 #include "common.h"
 #include "structs/loader.h"
+#include "protos/ultra.h"
 
-s32 osRecvMesg(OSMesgQueue *queue, OSMesg *msg, s32 flags);
-s32 osJamMesg(OSMesgQueue *queue, OSMesg msg, s32 flags);
-void osCreateMesgQueue(OSMesgQueue *queue, OSMesg *messages, s32 count);
 CLoaderEntry *CLoader__AllocLoaderEntry(CLoader *thisx);
 
 /* Reads length bytes of ROM at address into dest, LOADER_CHUNK_SIZE at a

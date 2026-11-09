@@ -2,10 +2,10 @@
 #include "structs/vector.h"
 #include "structs/level_actor.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* Spawns pool pickup id at pos, thrown upward, lasting the given time, and plays its spawn sound. */
 
-extern s32 CScene__FindRegionAt(void *level, CVector3 *pos);
 extern CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
 extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
 

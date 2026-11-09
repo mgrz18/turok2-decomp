@@ -2,8 +2,8 @@
 #include "structs/game_object.h"
 #include "globals/scene.h"
 #include "globals/boss_ai.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 s32 MantidQueen_Hurt(s32, s32, s32);
 s32 MantidQueen_Step(s32, s32);
 s32 MantidQueen_Draw(s32, s32, s32);

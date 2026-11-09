@@ -2,8 +2,8 @@
 #include "structs/player.h"
 #include "globals/player.h"
 #include "globals/scene.h"
+#include "protos/player.h"
 
-s32 CPlayer__SetState(s32, s32, s32);
 s32 CPlayer__LoseLife(s32);
 
 void PlayerDeath_CinemaDone(void) {

@@ -5,8 +5,8 @@
 #include "globals/render.h"
 #include "globals/engine.h"
 #include "globals/text.h"
+#include "protos/player.h"
 
-extern void CPlayerPool__GetFirstActive(void *);
 extern void CEngineApp__StartGameAtWarp(s32, s32);
 extern void CEngineApp__SetupFadeTo(s32, s32);
 extern void Sound__PlaySpeech(s32);

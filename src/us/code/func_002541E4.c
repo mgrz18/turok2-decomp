@@ -4,8 +4,8 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/player.h"
+#include "protos/scene.h"
 
-extern void CScene__SetInstanceObjectType(void *, CPlayer *, s32, s32);
 
 void CPlayer__LoadCharacterModel(CPlayer *player) {
     GameSettings *state = &gEngineApp_m_Settings;

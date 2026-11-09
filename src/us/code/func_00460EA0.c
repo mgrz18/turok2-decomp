@@ -1,5 +1,6 @@
 #include "common.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 /* Probe the controller pak in a port: 2 = no pak/error, 1 = not a usable pak,
  * 4 = pak changed, otherwise the timer result. */
@@ -17,7 +18,6 @@ typedef struct {
 
 void __osPfsRequestOneChannel_2(s32 channel);
 s32 __osSiRawStartDma(s32 enable, void *timer);
-s32 osRecvMesg(void *mq, void *msg, s32 flag);
 void __osPfsGetOneChannelData_2(s32 channel, PakStatus *status);
 
 s32 __osPfsGetStatus_2(void *mq, s32 channel) {

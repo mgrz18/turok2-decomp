@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/controller.h"
+#include "protos/ai.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
@@ -8,7 +9,6 @@
 extern s16 D_800AE9D2;
 
 extern f32 Random_Blend(f32 lo, f32 hi); /* random in range */
-extern s32 CAI__SetMode(void *obj, CAI *state, s32 mode);
 
 /* Weapon state: on release, charges by the time held (0.1 + t/45, at most 1)
  * and sets the shot count D_800AE9D2 (charge * 3, at least 1), then goes to

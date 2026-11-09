@@ -7,6 +7,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
+#include "protos/scene.h"
 struct LevelActor;
 struct Box;
 typedef struct Box Box;
@@ -42,7 +43,6 @@ struct ResourceManagerState {
 struct ResourceManagerState;
 typedef struct ResourceManagerState ResourceManagerState;
 struct LevelActor;
-extern void CScene__SetInstanceSavedBit(CScene *, void *, s32);
 typedef struct LevelActor LevelActor;
 struct LevelActor {
     u8 kind;

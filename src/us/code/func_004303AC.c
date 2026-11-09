@@ -2,8 +2,8 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-s32 CScene__FindWarpDests(s32, s32, s32, s32, s32);
 
 void func_004303AC(CEngineApp *arg0) {
     u8 sp18[0x18];

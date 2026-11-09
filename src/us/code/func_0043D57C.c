@@ -5,6 +5,7 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "protos/ai.h"
 
 typedef struct {
     f32 x, y, z;
@@ -75,7 +76,6 @@ typedef struct {
 extern ModeState0040457C gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 D_800F1F50;
 Entity0040457C *CPlayerPool__FindNearest(void *game, Vec3_0040457C pos);
-void CAI__SetMode(void *actor, void *ai, s32 event);
 f32 Random_Blend(f32 lo, f32 hi);
 s32 CInstancePool__Spawn(void *a0, s32 a1, s32 model, s32 handle, s32 region, Vec3_0040457C pos, f32 a6,
                   Vec3_0040457C rot, Vec3_0040457C scale, s32 a9);

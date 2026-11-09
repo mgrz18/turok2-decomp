@@ -3,7 +3,7 @@
 
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
-void GameObject_FireTriggers(CGameObjectInstance *actor, s32 flags, CGameObjectInstance *actor2);
+#include "protos/game.h"
 void Platform_ForwardEnter(CGameObjectInstance *actor, u32 *flags) {
     CPlatformIntelligence *info = &actor->header.m_pIntelligence->m_Platform;
     GameObject_FireTriggers(actor, 0x10000, actor);

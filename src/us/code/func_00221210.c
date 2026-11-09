@@ -4,6 +4,7 @@
 #include "structs/intelligence.h"
 #include "structs/world.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* Builds the frame's actor lists: every live level actor (flag 0x100) whose
  * type is shown in the current view is tested against the view's bounding

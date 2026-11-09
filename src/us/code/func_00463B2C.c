@@ -9,6 +9,10 @@
 #include "globals/render.h"
 #include "globals/sysrc.h"
 #include "globals/audio.h"
+#include "protos/iset.h"
+#include "protos/scene.h"
+#include "protos/player.h"
+#include "protos/game.h"
 
 
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
@@ -18,7 +22,6 @@ extern u8 gEngineApp_m_SwooshSystem[];
 
 extern s32 ProPack__Decompress(s32, s32);
 extern void CCollisionInfo__Reset(void);
-extern s32 CISet__GetROMAddress(s32 *levelCount, s32 file, s32 index);
 extern void CDecompressor__Flush(CDecompressor *thisx);
 extern void **CCache__Allocate(s32 unused, s32 size, s32 mode, char *name);
 extern void CCache__Deallocate(s32 unused, void **block);
@@ -29,15 +32,10 @@ extern void CCache__SetFrameDelay(s32);
 extern void CGameObjectInstance__UpdateAnimation(u8 *actor);
 extern void func_0021E5D4(u8 *actor);
 extern void func_0021F1B4(u8 *actor);
-extern void CScene__GetLevelName(CScene *w, s32 level, void *out, s32 mask);
-extern void CScene__ClearListCounts(CScene *w);
-extern void CScene__ReleaseSectors(CScene *w);
-extern void *CPlayerPool__GetFirstActive(void *players);
 extern void Sound__StopFlags(s32);
 extern void Sound__DetachAll(void);
 extern void LoopSounds_Construct(void *, void *, s32);
 extern void LoopSounds_StopAll(s32);
-extern s32 LoopSounds_Get(void);
 extern s32 Demo_GetPlayerCount(void);
 extern void CCameraPool__Advance(void *);
 extern s32 Cinema_IsActive(void);

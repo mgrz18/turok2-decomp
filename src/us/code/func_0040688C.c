@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
 /* Boss module state from 0x8012F9E4. */
 typedef struct {
@@ -11,8 +12,6 @@ typedef struct {
 } BossTimers;
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern void AI_TurnClamped(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 angle);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a - b */
 extern f32 CVector3__GetYaw(CVector3 *v);                                    /* heading */
 extern s32 GameObject_IsOnGround(CGameObjectInstance *obj);

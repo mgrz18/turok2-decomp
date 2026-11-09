@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/iset.h"
 
 /* The block the instance's first word points at; 0x2B50 is a table
  * handle read through CISet__GetBlock. */
@@ -13,7 +14,6 @@ typedef struct {
     /* 0x4 */ u16 unk4;
 } Entry00276F90;
 
-s32 CISet__GetBlock(s32, s32);
 
 void SpeechPlayer_ReadHeader(CGameObjectInstance *arg0, s32 arg1) {
     f64 var_f2;

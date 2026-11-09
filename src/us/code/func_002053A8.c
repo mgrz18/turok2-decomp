@@ -1,11 +1,10 @@
 #include "common.h"
 #include "globals/cache.h"
+#include "protos/ultra.h"
 
 s32 CCache__WaitForDisplayLists(s32);                     /* extern */
 s32 CCache__Compact(s32, s32);            /* extern */
 s32 CCache__FreeOldestMemEntryWithFlags(s32, s32, s32);       /* extern */
-s32 osRecvMesg(s32 *, s32, s32); /* extern */
-s32 osSendMesg(s32 *, s32, s32); /* extern */
 s32 __osDisableInt();                                /* extern */
 s32 __osRestoreInt(s32);                         /* extern */
 

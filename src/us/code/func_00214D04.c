@@ -1,5 +1,6 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/cache.h"
 
 /* The record this spawns from: an id at 0x24, extra spawn flags at 0x80 and its own flags at 0x88 (0x40: disabled). */
 typedef struct {
@@ -11,8 +12,6 @@ typedef struct {
     /* 0x88 */ u16 flags;
 } SpawnSource;
 
-s32 CCache__RequestDecompression(s32, s32, s32, s32, s32, void *, s32 *, s32 *, s32); /* extern */
-s32 CCache__Unlock(s32, s32);                /* extern */
 s32 Model_RequestTextures(s32);                         /* extern */
 s32 CStaticObject__LoadGeometry();                                /* extern */
 extern s32 D_800A57F8;

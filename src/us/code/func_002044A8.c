@@ -4,12 +4,11 @@
 #include "structs/cache.h"
 #include "globals/sysrc.h"
 #include "globals/cache.h"
+#include "protos/list.h"
+#include "protos/cache.h"
 
-void CList__Remove(void *list, void *item);
-void CList__AddHead(void *list, void *item);
 void CHashTable__Remove(u32 key);
 void CHeap__Free(CHeap *heap, s32 data);
-void CCache__FreeCacheEntry(s32 unused, CCacheEntry *request);
 void CHashTable__Insert(u32 key, CCacheEntry *value);
 
 static __inline__ void find(u32 key, CCacheEntry **out) {

@@ -15,6 +15,7 @@
  * (Particle_BuildMatrix, Particle_DrawSprite and func_802800C0_de). */
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
 #include "structs/frame.h"
@@ -26,6 +27,10 @@
 #include "globals/math.h"
 #include "globals/engine.h"
 #include "globals/particle.h"
+#include "protos/list.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
+#include "protos/scene.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -493,7 +498,6 @@ void CParticle__DrawShadow(ShadowActor *actor) {
  * its alpha from life, fade-in, fade-out and distance from the view, and
  * emits the colour and draw commands. */
 
-#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 typedef struct { u8 pad0[0x40]; } Mtx;
 
@@ -593,7 +597,6 @@ extern void CMtxF__TransformPoint(void *m, void *in, void *out);
 extern void *MtxPool_Alloc(void *pool, s32 count);
 extern void Render_SetCombineMode(s32 mode);
 extern void Render_SetRenderMode(s32 mode);
-extern void CCache__Unlock(s32 arg0, void *model);
 extern s32 Random_Next(void);
 
 static __inline__ s32 Particle_Occluded(Particle *particle, ParticleView *view) {
@@ -769,7 +772,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
         dist = -dist;
     }
     if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
-        GFX_CMD(0xDA380003, (u32)&particle->mtx[gEvenOdd])
+        GFX_CMD(0xDA380003, GBI_ADDR(&particle->mtx[gEvenOdd]))
     } else {
         mtx = MtxPool_Alloc(gScene.m_Heap, 1);
         if (mtx == 0) {
@@ -777,7 +780,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
             return;
         }
         CParticle__BuildMatrix(particle, mtx, view, dist);
-        GFX_CMD(0xDA380003, (u32)mtx)
+        GFX_CMD(0xDA380003, GBI_ADDR(mtx))
     }
 
     textured = particle->flags & 0x800000;
@@ -852,7 +855,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
         }
     }
     alpha = (alpha > 255 ? 255 : alpha) < 0 ? 0 : (alpha > 255 ? 255 : alpha);
-    GFX_CMD(0x01004008, (u32)gParticleSpriteVtx)
+    GFX_CMD(0x01004008, GBI_ADDR(gParticleSpriteVtx))
     if (textured) {
         GFX_CMD(0xD7FF0002, (shiftS << 16) | (shiftT & 0xFFFF))
     }
@@ -899,8 +902,6 @@ void CParticle__StopLoopSound(EffectActor *);
 void CParticle__BuildCameraMatrix(EffectActor *);
 void Trail_DetachOwner(void *, EffectActor *);
 void CDLightSet__Free(void *, s32);
-void CList__Remove(void *list, void *node);
-void CList__AddHead(void *list, void *node);
 
 void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
     EffectActor *child;
@@ -1151,9 +1152,7 @@ extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: 
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 
-extern void *CISet__GetBlock(s32 resource, s32 index);
 extern s32 BinaryRange(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
-extern void CScene__Blast(void *, CVector3 *);
 extern void func_00225C08(void *, s32, CVector3 *);
 extern s32 Random_Next(void);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -1170,8 +1169,6 @@ extern void CMtxF__SetTranslate(CMtxF *m, f32 x, f32 y, f32 z);
 extern void CMtxF__Identity(CMtxF *m);
 extern void GameObject_GetAimRotation(CQuaternion *q, Owner *owner, CVector3 pos);
 extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *m);
-extern void CList__AddTail(EffectList *list, Effect *effect);
-extern void CList__InsertBefore(EffectList *list, Effect *after, Effect *effect);
 extern void func_00207914(u32 *bits, s32 value);
 extern f32 RandomInPackedRange(PackedRange r);
 extern f32 HalfToFloat(u16 h);

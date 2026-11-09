@@ -1,9 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
-s32 CISet__GetROMAddressAndSize(s32, s32, M2C_UNK, void *);       /* extern */
-s32 *CCache__Request(M2C_UNK, s32, s32, M2C_UNK, s32, M2C_UNK *, M2C_UNK *, s32); /* extern */
-M2C_UNK CCache__Unlock(M2C_UNK, s32 *);              /* extern */
 extern M2C_UNK D_800A5808;
 extern M2C_UNK D_800A582C;
 extern M2C_UNK Model_DecompressCallback;

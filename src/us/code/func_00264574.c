@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
-s32 CAI__SetMode(s32, s32, s32);
 void Platform_ForwardUpdate(void *arg0, void *arg1)
 {
   s32 temp_a3;

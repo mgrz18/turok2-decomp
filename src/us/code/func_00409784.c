@@ -4,6 +4,7 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* Boss fight tick: updates the 15 attack slots, then (outside cinematics)
  * counts up the two timers: by phase, drops a random pickup somewhere in the
@@ -16,7 +17,6 @@ extern s32 WeightedTable_PickStatic(void *table);
 extern f32 Random_Blend(f32 lo, f32 hi);
 extern f32 func_002982F0(f32);
 extern f32 func_002974C0(f32);
-extern s32 CScene__FindRegionAt(void *level, CVector3 *pos);
 extern CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
 extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
 extern void MotherBoss_DropPickupsAtSpawnPoints(s32 lifetime, void *table);

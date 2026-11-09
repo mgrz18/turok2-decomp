@@ -6,11 +6,11 @@
 #include "globals/scene.h"
 #include "globals/render.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
+#include "protos/player.h"
 
 s32 Cinema_RequestById(s32);
-s32 CScene__RequestWarp(s32, s32, s32);
 
-CPlayer *CPlayerPool__GetFirstActive(void *);                     /* extern */
 void CEngineApp__StartWarp(s32, s32);                       /* extern */
 
 void EngineMode16_Ending_Init(s32 arg0)

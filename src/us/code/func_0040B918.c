@@ -1,13 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 /* AI state: turn toward the point (0, 0, 512) and go to anim state 0x1C once within 51.2 of it. */
 
 extern f32 AI_AngleToPoint(CGameObjectInstance *obj, CVector3 target);
-extern void AI_TurnClamped(CGameObjectInstance *obj, void *ai, f32 angle, f32 turn);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern f32 func_00298470(f32 x); /* sqrt */
-extern void CAI__SetMode(CGameObjectInstance *obj, void *ai, s32 state);
 
 void MotherBoss_Mode24_GoToCenter(CGameObjectInstance *obj, void *ai) {
     CVector3 d;

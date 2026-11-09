@@ -1,7 +1,7 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RENDER_4/8028FD2C_6.CPP, func_8028FDF8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
+#include "protos/iset.h"
 s32 CISet__GetBlockSize(s32 *table, s32 index) {
     s32 nextIndex = index + 1;
     s32 *next = &table[nextIndex];

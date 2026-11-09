@@ -5,10 +5,10 @@
 
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/cache.h"
+#include "protos/scene.h"
 
 
-extern s32 CScene__LoadGraphicSet(void *set, s32 a, s32 b, s32 c);  /* Render_StartWorldEffect */
-extern void CCache__Unlock(s32 arg0, s32 sprites);         /* release the sprite set */
 extern void Hud_DrawImageFrame(s32 sprites, s32 digit, s16 x, s16 y, f32 size, f32 arg4, s32 arg5);
 
 void Hud_DrawNumber(s32 value, f32 x, f32 y, f32 size, f32 arg4, s32 arg5, s32 rightAlign, s32 minDigits) {

@@ -7,11 +7,11 @@
 /* osPfsIsPlug (libultra pfsisplug.c), with Turok 2's symbols. */
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 extern void __osSiGetAccess(void); /* __osSiGetAccess */
 extern void __osSiRelAccess(void); /* __osSiRelAccess */
 extern s32 __osSiRawStartDma(s32 direction, void *dramAddr); /* __osSiRawStartDma */
-extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern void __osPfsRequestData(u8 cmd); /* __osPfsRequestData */
 extern void __osPfsGetInitData(u8 *pattern, EntryRecAt3 *data); /* __osPfsGetInitData */
 

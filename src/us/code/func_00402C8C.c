@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-s32 CScene__MarkGeneratorsSaved(s32);
 
 
 void MantidQueen_EnterMode2(CGameObjectInstance *arg0) {

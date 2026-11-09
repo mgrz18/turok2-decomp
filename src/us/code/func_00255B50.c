@@ -2,10 +2,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/player.h"
+#include "protos/player.h"
 
 extern void CPlayer__TurnAndLook(void *, void *, void *);
 extern void CPlayer__MoveInWater(void *, void *, void *);
-extern s32 CPlayer__SetState(void *, void *, s32);
 
 /* Landing state: pose 0xC or 0xD, movement tables, animation 0x8A2, 0x8A7
  * or 0x14 by the stick (unless animation 0x1144 is still running), then

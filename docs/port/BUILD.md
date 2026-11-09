@@ -176,7 +176,7 @@ no-op. From docs/ASM_ORIGIN.md (47 entries) and the 9 excluded C files:
 | group | functions | host replacement |
 |---|---|---|
 | SN64 boot / TLB | `boot_main`, `STVM_MapTLB` (boot.s), func_0028EE40/func_0028EE44 (engine STVM_MapTLB), func_0028EEC0 (unmap), func_0028EEFC (TLB dump), `__osUnmapTLBAll`, `__osProbeTLB` | no TLB on the host: `main()` replaces romMain; map/unmap become no-ops once one VM module copy is linked at its real address (p4) |
-| RNC unpacker | func_00200C40 (`RNC_UnpackMethod1`), func_00200CB0, func_00200E1C, func_00200EC0, func_00200EE8, func_00200F20, func_002010C0 (`RNC_UnpackMethod2`) | `port/third_party/rnc/rnc.c` (already used by t2asset) |
+| RNC unpacker | func_00200C40 (`RNC_UnpackMethod1`), func_00200CB0, func_00200E1C, func_00200EC0, func_00200EE8, func_00200F20, func_002010C0 (`RNC_UnpackMethod2`) | `port/assets/rnc.c` (original code written from these routines; already used by t2asset) |
 | libultra thread/exception core (exceptasm.s) | `__osException`, `send_mesg`, `__osEnqueueAndYield`, `__osEnqueueThread`, `__osPopThread`, func_0029C8E0 (`__osDispatchThread`), func_0029CADC (`__osCleanupThread`) | the whole OS thread/message layer is replaced by host threads or a cooperative scheduler (p4); these go with it |
 | CP0 / FPU / interrupts | func_0029DFD0 `__osGetFpcCsr`, func_0029E220 `__osSetFpcCsr`, func_0029DFE0 `__osGetSR`, func_0029E2E0 `__osSetSR`, func_0029DFF0 `__osDisableInt`, `__osRestoreInt`, `osSetIntMask`, func_002A31E4/func_002A31F0 (SR get/set) | no-ops (or a host mutex for DisableInt/RestoreInt if host threads are used) |
 | caches | func_0029E030 `osInvalDCache`, func_0029E0D0 `osInvalICache`, func_0029E340 `osWritebackDCache`, func_0029E3B0 `osWritebackDCacheAll`, func_002A31AC, func_002A31C8 | no-ops |
@@ -255,7 +255,15 @@ stay integers and Fast3D resolves them through `gSPSegment` as on N64.
 5. **Build with clang everywhere** (clang-cl on Windows), `-fsigned-char`
    mandatory.
 
+## Link (round 2)
+
+Since Phase 7 round 2 the executable links `turok2_game`: module 2 and the 62 replaced
+libultra/boot files moved to `turok2_game_unlinked` (still compiled), see docs/port/LINK.md.
+
 ## What the next round needs
+
+(Round 2: the data generator exists: docs/port/DATA.md. Module 1 + generated data + a stub
+main link with 33 unresolved symbols, all function side.)
 
 - Exclude the libultra/hardware files and the module-2 copies from
   `turok2_game` (lists derivable from the ELF sections), and add a

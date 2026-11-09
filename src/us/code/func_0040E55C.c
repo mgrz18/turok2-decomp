@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* Only what this reads and writes. */
 typedef struct {
@@ -12,7 +13,6 @@ typedef struct {
     /* 0x508 */ s32 targetZ;
 } Tracker;
 
-s32 CScene__MarkGeneratorsSaved(s32);
 
 void BlindOne_PhaseMinionsInit(Tracker *arg0) {
     CVector3 *temp_v0;

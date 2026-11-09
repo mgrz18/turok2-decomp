@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/iset.h"
 
 typedef struct ListItem {
     /* 0x00 */ u8 pad0[0xC];
@@ -24,7 +25,6 @@ typedef struct LevelState {
 } LevelState;
 
 extern s32 ProPackDecompress(s32 ***handle, s32);
-extern void *CISet__GetBlock(void *table, s32 index);
 extern void Angle_Wrap(void *);
 
 /* Resolves the references of every item of every group of the loaded resource and keeps it in the level. */

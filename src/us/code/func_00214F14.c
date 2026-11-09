@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "protos/cache.h"
 
-s32 CCache__ReleaseAndReplaceData(s32, s32, s32);
 s32 Lighting_BuildLitVertices(s32, s32, s32, s32, s32);
 
 void CStaticObject__BuildLitVerticesCallback(void *arg0, s32 **arg1)

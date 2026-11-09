@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
+#include "protos/player.h"
 
-extern void CPlayer__SetState(CPlayer *player, CGameObjectInstance *other, s32 mode);
 
 #define PLAYER_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 #define PLAYER_F32(p, off) (*(f32 *)((u8 *)(p) + (off)))

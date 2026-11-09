@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "protos/list.h"
 
-s32 CList__AddTail(s32, s32);                    /* extern */
-s32 CList__Remove(void *, s32);                 /* extern */
 s32 CCameraText__Reset(s32);                         /* extern */
 
 /* Takes a free text from the pool and puts it on the camera's active texts. */

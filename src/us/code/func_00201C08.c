@@ -1,8 +1,8 @@
 #include "common.h"
 #include "globals/engine.h"
 #include "structs/decompressor.h"
+#include "protos/ultra.h"
 
-void osSetThreadPri(OSThread *thread, OSPri pri);
 
 void CDecompressor__Flush(CDecompressor *thisx) {
     if (thisx->queue.validCount != 0) {

@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/camera.h"
 #include "globals/render.h"
+#include "protos/list.h"
 
 typedef struct Floats {
     f32 unk0, unk4, unk8, unkC, unk10, unk14;
@@ -21,7 +22,6 @@ void CCamera__ResetWarp(CCamera *);
 void CCamera__SetMode(CCamera *, s32);
 void MenuPool_Construct_2(void *);
 void CEmitterPool__Construct_2(void *);
-void CList__Construct(void *list, s32 prevOffset, s32 nextOffset);
 void CCamera__ConstructSkySystem(CCamera *);
 
 void CCamera__Construct_2(CCamera *view) {

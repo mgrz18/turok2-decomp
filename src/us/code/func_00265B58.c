@@ -1,5 +1,7 @@
 #include "structs/vector.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/game.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00205324.c, func_00205324.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -100,8 +102,6 @@ struct M1Ref {
                 s32 unkC;
 };
 extern u8 gEngineApp_m_SwooshSystem[];
-void CScene__SetInstanceSavedBit(s32 *p, M1Actor *a, s32 n);
-void GameObject_FireTriggers(M1Actor *a, s32 b, M1Actor *c);
 void Sound__Play(s16 id, CVector3 pos, s32 a, s32 b);
 void Actor_SpawnParticle(M1Actor *a, s32 id, CVector3 pos, s32 n);
 void AI_DropPickupsOnce(M1Actor *a, M1State *s, s32 n, s32 x, s32 y);

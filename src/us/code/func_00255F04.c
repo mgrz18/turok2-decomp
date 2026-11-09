@@ -3,11 +3,11 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/engine.h"
+#include "protos/player.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 #define P_F32(p, off) (*(f32 *)((u8 *)(p) + (off)))
 
-extern void CPlayer__SetState(void *player, void *other, s32 mode);
 
 void PlayerDeathWait_Update(CPlayer *player) {
     GameMatch *state;

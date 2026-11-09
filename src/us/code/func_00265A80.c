@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
-s32 CScene__GetInstanceSavedBit(void *, void *);                  /* extern */
-void CAI__SetMode(void *, CAI *, s32);             /* extern */
 
 void Destructible_Advance(CGameObjectInstance *arg0, CAI *arg1) {
     if (CScene__GetInstanceSavedBit(&gScene, arg0) == 1) {

@@ -5,9 +5,9 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
 
-extern s32 CPlayerPool__GetIndex(void *players, void *player);
 extern void PlayerOptions_SetDefaultName(void *options);
 extern void MenuItem_SelectSubmenu(s32 menu, Menu *c, s32 pool);
 

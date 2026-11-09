@@ -1,11 +1,11 @@
 #include "common.h"
+#include "protos/iset.h"
 
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 size;
 } Entry;
 
-Entry *CISet__GetBlock(s32 *, s32);                    /* extern */
 
 s32 func_00214188(s32 *arg0) {
     s32 var_s0;

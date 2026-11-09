@@ -1,6 +1,7 @@
 #include "structs/vector.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00204A68.c, func_00204A68.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -12,7 +13,6 @@ typedef struct B01Pair {
 } B01Pair;
 
 void ImpactEvent_Call(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, B01Pair extra);
-void CScene__SetInstanceSavedBit(void *mgr, CGameObjectInstance *actor, s32 flag);
 
 static __inline__ s32 r01_check(CGameObjectInstance *actor, CAI *state, f32 scale) {
     if (actor->m_nAnims == 1) return 1;

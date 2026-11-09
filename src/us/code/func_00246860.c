@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "protos/game.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002172D0.c, func_002172D0.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -20,7 +21,6 @@ typedef struct SndOwner {
 } SndOwner;
 void *LoopSounds_Start(s32 a, s32 b, CVector3 *c, CVector3 *d, void *e);
 void LoopSounds_Stop(s32 a, SndHandle *h);
-s32 LoopSounds_Get();
 void AI_StartSound(SndSrc *src, SndOwner *owner, s32 id) {
     void *s0 = (void *)-1;
     if (owner->sound != ((void *)0)) {

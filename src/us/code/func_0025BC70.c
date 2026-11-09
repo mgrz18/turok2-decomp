@@ -3,6 +3,7 @@
 #include "structs/intelligence.h"
 #include "globals/scene.h"
 #include "globals/ai.h"
+#include "protos/scene.h"
 
 /* AI init for a family of actors: installs the AI callbacks and seeds the
  * timers/flags from the actor definition. Types 0x44E..0x456 (except 0x44F and
@@ -17,7 +18,6 @@ extern void EnemyAI_OnHit();
 extern void EnemyAI_CheckGrab();
 extern void EnemyAI_OnDamage();
 extern void EnemyAI_HeadNodeCallback();
-extern void CScene__SetInstanceSavedBit(void *mgr, CGameObjectInstance *actor, s32 flag);
 extern f32 Random_Blend(f32 lo, f32 hi);
 
 void EnemyAI_Init(CGameObjectInstance *actor, CAI *ai) {

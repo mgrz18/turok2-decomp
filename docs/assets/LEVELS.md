@@ -58,8 +58,7 @@ names refer to `include/structs/*.h`.
   and copies any other block unchanged. Method 1 data begins at header + 0x12; method 2 is given
   the whole header. All 990 RNC blocks of the level set unpack with a matching CRC-16 (header
   +0xC). `levels.py` locates through `romfs.py` (`fs.level(i)`, `cart/8`) and unpacks through
-  `propack.py`; the first pass's private RNC port (from `references/rw_junk/docs/hand_asm_c/rnc.c`)
-  is gone.
+  `rnc.py` (original code); the first pass's private RNC port is gone.
 * **Transposed tables.** Many tables are `{s32 width, s32 count}` followed by `count*width` bytes
   stored one byte plane at a time: byte 0 of every record, then byte 1 of every record, and so on.
   This layout compresses better. `CUSet__Transpose` (func_0020192C.c) restores record order, and

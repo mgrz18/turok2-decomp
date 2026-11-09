@@ -1,6 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
 
 s32 CStaticObject__SpawnEvents(s32, s32);
 

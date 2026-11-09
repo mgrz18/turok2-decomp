@@ -3,7 +3,7 @@
  *
  *   t2asset_test ROM UNITS_TSV ARCHIVE.o2r [ARCHIVE2.o2r ...]
  *
- * 1. ROM backend (ROM + units list): reads every load unit (RNC unpacked by rnc.c, CRC16
+ * 1. ROM backend (ROM + units list): reads every load unit (RNC unpacked by port/assets/rnc.c, CRC16
  *    checked) and keeps the bytes.
  * 2. Each archive: same unit set (count and keys), every unit byte-identical to (1),
  *    T2Asset_HostSize, prefix probes, and RAW_RANGE reads at inner addresses (the audio

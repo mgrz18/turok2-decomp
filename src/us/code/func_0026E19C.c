@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-void CScene__GetRegionEventRecords(void *, s32, s32 *, s32 *); /* extern */
 void LevelEvent_ProcessTriggers(s32, s32, s32, s32, s32, s32, s32); /* extern */
 
 void CGameRegion__FireTriggers(s32 arg0, s32 arg1, s32 arg2) {

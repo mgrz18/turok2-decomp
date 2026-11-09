@@ -10,21 +10,21 @@ u8 *CHeap__AllocAt(CHeap *h, u8 *ptr, u32 size) {
     CHeapBlock *p;
     CHeapBlock *nx;
     CHeapBlock *q;
-    u32 need = (size + 0x2F) & ~0xF;
-    u32 lo;
-    u32 end;
-    u32 bend;
+    uptr need = (size + (sizeof(CHeapBlock) + 0xF)) & ~0xF;
+    uptr lo;
+    uptr end;
+    uptr bend;
     q = h->freeHead;
     if (q) {
         f = q;
         while (f->freeNext && f->freeNext < (CHeapBlock *)ptr) {
             f = f->freeNext;
         }
-        lo = (u32)f + f->used;
+        lo = (uptr)f + f->used;
         end = lo + f->free;
         b = (CHeapBlock *)(ptr - sizeof(CHeapBlock));
-        if (!((u32)b < lo)) {
-            bend = (u32)b + need;
+        if (!((uptr)b < lo)) {
+            bend = (uptr)b + need;
             if (!(end < bend)) {
                 b->used = need;
                 b->free = end - bend;
@@ -43,7 +43,7 @@ u8 *CHeap__AllocAt(CHeap *h, u8 *ptr, u32 size) {
                     b->freeLast = 0;
                     b->freeNext = 0;
                 }
-                f->free = (u32)b - ((u32)f + f->used);
+                f->free = (uptr)b - ((uptr)f + f->used);
                 if (f->free == 0) {
                     if (f->freeLast) {
                         f->freeLast->freeNext = f->freeNext;

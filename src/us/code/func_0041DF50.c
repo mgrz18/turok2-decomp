@@ -8,6 +8,7 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 typedef struct O01Sel { s32 v; s32 w; } O01Sel;
 void Pak_ProbeSlot(s32 ch);
@@ -16,7 +17,6 @@ s32 Pak_IsRumblePak(s32 ch);
 s32 Pak_NeedsRepair(s32 ch);
 void PakMenu_UpdateNoteRows(Menu *o);
 u32 Crc32_Compute(u8 *data, s32 len, u32 crc);
-void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, void *e);
 /* O01Pick and O01Capture are separate functions in Rage Wars; inlined here in Turok 2. */
 static inline u8 *O01Pick(O01Sel *sel) {
     u8 *msg;

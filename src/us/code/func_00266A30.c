@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-s32 CScene__SetInstanceSavedBit(s32, s32, s32);
 s32 Cinema_RequestForObject(s32, s32);
 
 

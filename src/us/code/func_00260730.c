@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 /* Flying AI steering: for index 1, ease the vertical speed towards the wanted
  * one and pitch/roll with it; then turn. Chasing a target in the other
@@ -8,7 +9,6 @@
 s32 EnemyAI_GetBehaviorIndex(CGameObjectInstance *self, void *ai);
 f32 Math_StepClamped(f32 value, f32 target, f32 step);
 f32 Math_Approach(f32 cur, f32 target, f32 rate);
-void AI_TurnClamped(CGameObjectInstance *self, CAI *ai, f32 angle, f32 turn);
 f32 Random_Blend(f32 lo, f32 hi);
 
 void EnemyFly_SteerToPath(CGameObjectInstance *self, CAI *ai, CAITargets *steer, CAIFrameMotion *limits) {

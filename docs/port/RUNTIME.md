@@ -408,7 +408,7 @@ TLB code (`STVM_MapTLB`, `func_0028EE40`...), cache ops, `osSetIntMask`, the wat
 code, the crash screen (`Crash_ShowScreen` is never called), SN host I/O (`HostIo_*`, `PC*`),
 64DD (`osLeo*`), libgcc's 64-bit helpers (`__divdi3`, `__moddi3`, `__udivdi3`, `__umoddi3`,
 `__cmpdi2`, `__floatdisf`: the host compiler has 64-bit arithmetic), the RNC asm (replaced by
-`port/third_party/rnc`), all of module 2.
+`port/assets/rnc.c`), all of module 2.
 
 Of the 359 libultra/libaudio/libc C functions in the tree (0x28EF90-0x2A5200 and module 1's
 pfs), the port **compiles as is**: libaudio (cseq, csplayer, seqplayer, sndplayer, synthesizer,
@@ -515,3 +515,10 @@ from module 1's data at 0x43588C, not code).
 - Pre-NMI (reset button): map to a "soft reset" hotkey later; until then never posted.
 - L3DEX lines in Fast3D (automap).
 - Windows: t2os needs pthreads (MinGW) or a Win32 port of its 20 lines of locking.
+
+## 12. Status (Phase 7 round 2, q5)
+
+Steps 1-3 of §9 are in: the executable links the game (engine + module 1), t2os and the
+device shims run under the t2_ names (§2.4, done with `port/include/t2_rename.h`), and
+`turok2 --game` boots `mainproc` as in §3. The first crash is the heap's 64-bit layout
+(`CHashTable__Construct` on a NULL `CHeap__Alloc`). See docs/port/LINK.md.

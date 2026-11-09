@@ -9,34 +9,12 @@
 /* Render_SetupMaterial: after AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_3/80268160_12.CPP, func_80269A80_de, with Turok 2's layouts. */
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "structs/light.h"
 #include "globals/render.h"
-
-/* The libultra GBI (F3DEX2) commands this function writes, as in PR/gbi.h. */
-#define _SHIFTL(v, s, w) (((unsigned int) (v) & (0xFFFFFFFFU >> (32 - (w)))) << (s))
-#define _GBI_CMD(pkt, a, b) { Gfx *_gbi = (Gfx *) (pkt); _gbi->w0 = (a); _gbi->w1 = (b); }
-
-#define G_TX_WRAP 0
-#define G_TX_MIRROR 1
-#define G_TX_CLAMP 2
-#define G_SETOTHERMODE_H 0xE3
-#define G_MDSFT_TEXTLOD 16
-#define G_TL_LOD (1 << G_MDSFT_TEXTLOD)
-
-#define gSPSetOtherMode(pkt, cmd, sft, len, data) \
-    _GBI_CMD(pkt, _SHIFTL(cmd, 24, 8) | _SHIFTL(32 - (sft) - (len), 8, 8) | _SHIFTL((len) - 1, 0, 8), (unsigned int) (data))
-#define gDPSetTextureLOD(pkt, data) gSPSetOtherMode(pkt, G_SETOTHERMODE_H, G_MDSFT_TEXTLOD, 1, data)
-#define gDPPipeSync(pkt) _GBI_CMD(pkt, _SHIFTL(0xE7, 24, 8), 0)
-#define gDPSetPrimColor(pkt, m, l, r, g, b, a)                                         \
-    _GBI_CMD(pkt, _SHIFTL(0xFA, 24, 8) | _SHIFTL(m, 8, 8) | _SHIFTL(l, 0, 8),          \
-             _SHIFTL(r, 24, 8) | _SHIFTL(g, 16, 8) | _SHIFTL(b, 8, 8) | _SHIFTL(a, 0, 8))
-#define gDPSetEnvColor(pkt, r, g, b, a) \
-    _GBI_CMD(pkt, _SHIFTL(0xFB, 24, 8), _SHIFTL(r, 24, 8) | _SHIFTL(g, 16, 8) | _SHIFTL(b, 8, 8) | _SHIFTL(a, 0, 8))
-#define gSPTexture(pkt, s, t, level, tile, on) \
-    _GBI_CMD(pkt, _SHIFTL(0xD7, 24, 8) | _SHIFTL(level, 11, 3) | _SHIFTL(tile, 8, 3) | _SHIFTL(on, 1, 7), _SHIFTL(s, 16, 16) | _SHIFTL(t, 0, 16))
-#define gSPGeometryMode(pkt, clear, set) _GBI_CMD(pkt, _SHIFTL(0xD9, 24, 8) | _SHIFTL(~(clear), 0, 24), (unsigned int) (set))
+#include "protos/cache.h"
 
 typedef struct Material {
     /* 0x00 */ u32 flags;
@@ -64,30 +42,6 @@ typedef struct TextureInfo {
     /* 0x8 */ TextureFrame *frame;
 } TextureInfo;
 
-#define gDPSetRenderMode(pkt, mode) _GBI_CMD(pkt, 0xE200001C, mode) /* G_SETOTHERMODE_L, G_MDSFT_RENDERMODE */
-#define gDPLoadSync(pkt) _GBI_CMD(pkt, _SHIFTL(0xE6, 24, 8), 0)
-#define gDPSetTextureImage(pkt, fmt, siz, width, img) \
-    _GBI_CMD(pkt, _SHIFTL(0xFD, 24, 8) | _SHIFTL(fmt, 21, 3) | _SHIFTL(siz, 19, 2) | _SHIFTL((width) - 1, 0, 12), (unsigned int) (img))
-#define gDPSetTile(pkt, fmt, siz, line, tmem, tile, palette, cmt, maskt, shiftt, cms, masks, shifts)                     \
-    _GBI_CMD(pkt, _SHIFTL(0xF5, 24, 8) | _SHIFTL(fmt, 21, 3) | _SHIFTL(siz, 19, 2) | _SHIFTL(line, 9, 9) | _SHIFTL(tmem, 0, 9), \
-             _SHIFTL(tile, 24, 3) | _SHIFTL(palette, 20, 4) | _SHIFTL(cmt, 18, 2) | _SHIFTL(maskt, 14, 4) |                 \
-             _SHIFTL(shiftt, 10, 4) | _SHIFTL(cms, 8, 2) | _SHIFTL(masks, 4, 4) | _SHIFTL(shifts, 0, 4))
-#define gDPLoadBlock(pkt, tile, uls, ult, lrs, dxt) \
-    _GBI_CMD(pkt, _SHIFTL(0xF3, 24, 8) | _SHIFTL(uls, 12, 12) | _SHIFTL(ult, 0, 12), \
-             _SHIFTL(tile, 24, 3) | _SHIFTL(lrs, 12, 12) | _SHIFTL(dxt, 0, 12))
-#define gDPSetTileSize(pkt, t, uls, ult, lrs, lrt) \
-    _GBI_CMD(pkt, _SHIFTL(0xF2, 24, 8) | _SHIFTL(uls, 12, 12) | _SHIFTL(ult, 0, 12), \
-             _SHIFTL(t, 24, 3) | _SHIFTL(lrs, 12, 12) | _SHIFTL(lrt, 0, 12))
-/* G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH */
-#define gSPMatrixLoad(pkt, m) _GBI_CMD(pkt, _SHIFTL(0xDA, 24, 8) | _SHIFTL(7, 19, 5) | _SHIFTL(2 ^ 1, 0, 8), (unsigned int) (m))
-#define gSPDisplayList(pkt, dl) _GBI_CMD(pkt, _SHIFTL(0xDE, 24, 8), (unsigned int) (dl))
-#define G_IM_FMT_I 4
-#define G_IM_SIZ_8b 1
-#define G_IM_SIZ_16b 2
-#define G_TX_LOADTILE 7
-#define G_TX_RENDERTILE 0
-#define G_TX_NOMASK 0
-#define G_TX_NOLOD 0
 
 void Texture_InvalidateCache(void);
 
@@ -254,7 +208,7 @@ void Render_DrawShadowQuad(void *matrix, s32 pass, u32 alpha) {
     gDPSetTile(gDList++, G_IM_FMT_I, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD,
                G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD);
     gDPLoadSync(gDList++);
-    gDPLoadBlock(gDList++, G_TX_LOADTILE, 0, 0, 127, 1024);
+    gDPLoadBlockN(gDList++, G_TX_LOADTILE, 0, 0, 127, 1024);
     gDPPipeSync(gDList++);
     gDPSetTile(gDList++, G_IM_FMT_I, G_IM_SIZ_8b, 2, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD,
                G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD);
@@ -274,7 +228,6 @@ extern void *Texture_Request(s32 *texture);
 extern void Texture_GetInfo(void *node, TextureInfo *info);
 extern void Texture_Load(s32 *, void *, s32, s32, s32, s32, s32, s32, s32);
 extern void Render_SetCombineMode(s32 combine);
-extern void CCache__Unlock(s32 unused, void *node);
 
 /* Sets up the RDP for drawing with `mat`: its texture frame `pass` (or the
  * animated one when negative), colours, combiner, render and geometry modes.

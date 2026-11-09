@@ -3,9 +3,9 @@
 #include "globals/menu.h"
 #include "globals/scene.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 s32 Level_GetHub(s32);
-s32 MenuPool_OpenMenu(s32, s32, s32, s32, s32);
 
 void CPlayer__ShowLevelNotCompleteScreen(s32 arg0, CPlayer *arg1)
 {

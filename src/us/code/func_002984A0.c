@@ -1,5 +1,6 @@
 #include "common.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 #define IO_WRITE(addr, data) (*(volatile u32 *)(0xA0000000 | (addr)) = (u32)(data))
 #define AI_DACRATE_REG 0x04500010

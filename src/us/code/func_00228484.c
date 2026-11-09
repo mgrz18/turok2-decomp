@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/camera.h"
 #include "structs/game_object.h"
+#include "protos/list.h"
 
-s32 CList__AddTail(s32, void *);                 /* extern */
-s32 CList__Remove(s32, void *);                 /* extern */
 
 /* Retires an effect: drops the owner count and moves it back to the free list. */
 void CInstancePool__Free(CInstancePool *world, CListedInstance *arg1) {

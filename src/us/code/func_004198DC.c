@@ -1,9 +1,9 @@
 #include "common.h"
 #include "globals/menu.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 s32 Music_SetTrack(s32);
-s32 MenuPool_OpenChildMenu(s32, s32, s32);
 
 s32 Sound__StopAllExcept(s32);                     /* extern */
 s32 Sound__SetForce2D(s32);                     /* extern */

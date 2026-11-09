@@ -5,20 +5,15 @@
 
 #include "common.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 extern s32 osPiRawStartDma();
 extern s32 osEPiRawStartDma();     /* osEPiRawStartDma */
 extern void __osDevMgrMain(void *arg); /* __osDevMgrMain */
 
-extern void osCreateMesgQueue(void *mq, void *msg, s32 count);  /* osCreateMesgQueue */
 extern void __osPiCreateAccessQueue(void);                            /* __osPiCreateAccessQueue */
-extern void osSetEventMesg(s32 event, void *mq, void *msg);  /* osSetEventMesg */
-extern s32 osGetThreadPri(void *thread);                     /* osGetThreadPri */
-extern void osSetThreadPri(void *thread, s32 pri);           /* osSetThreadPri */
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
-extern void osCreateThread(void *t, s32 id, void (*entry)(void *), void *arg, void *sp, s32 pri); /* osCreateThread */
-extern void osStartThread(void *thread);                    /* osStartThread */
 
 void osCreatePiManager(s32 pri, void *cmdQ, void *cmdBuf, s32 cmdMsgCnt) {
     u32 savedMask;

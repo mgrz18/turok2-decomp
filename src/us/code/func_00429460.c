@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
-u32 osGetCount(void);
+#include "protos/ultra.h"
 s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
 s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
 s32 __osPfsSelectBank(OSPfs *pfs);

@@ -2,8 +2,8 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
-extern s32 CPlayerPool__GetIndex(CPlayerPool *list, CPlayer *player);
 
 /* Whether the frag limit is reached: by either team's total in team games,
  * otherwise by one player's frags (the slot CPlayerPool__GetIndex names left out). */

@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 s32 CGameObjectInstance__AdvanceAnimation(void *);                      /* extern */
-s32 CScene__SetInstanceSavedBit(s32 *, void *, s32);  /* extern */
 s32 Cinema_PathPlaying();                                /* extern */
 
 void InteractiveAnim_EventShow(CGameObjectInstance *arg0, s32 *arg1) {

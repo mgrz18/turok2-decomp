@@ -1,23 +1,20 @@
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/camera.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/scene.h"
 
-#define GFX_WORDS(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 extern u8 gEngineApp_m_SwooshSystem[];
 void func_002847D0(void);
-void CScene__DrawGeometry(u8 *world, CCamera *cam);
 s32 Cinema_PathPlaying(void);
 void CPlayerPool__ReloadAnimInfo(CPlayerPool *list, CCamera *cam);
 void CPlayerPool__DrawCharacters(CPlayerPool *list, CCamera *cam);
-void CScene__DrawRegisteredInstances(u8 *world, CCamera *cam);
 void func_00235C30(void *arg0, CCamera *cam);
 void CLevelActorPool__Draw(u8 *arg0, CCamera *cam);
-void CScene__DrawSortedList(u8 *world, CCamera *cam);
 void CEmitterPool__Draw(u8 *sky, CCamera *cam);
-void CScene__DrawParticles(u8 *world, CCamera *cam);
 void Trail_DrawAll(void *arg0, CCamera *cam);
 void CCamera__DrawGlares(CCamera *cam);
 void CPlayerPool__DrawWeaponOverlays(CPlayerPool *list, CCamera *cam);
@@ -49,11 +46,11 @@ void CCamera__DrawScene(CCamera *cam, u8 *world) {
         CPlayerPool__DrawWeaponOverlays(&gEngineApp_m_Game.m_PlayerList, cam);
     }
     if (gEngineApp_m_Settings.cheatFlags & 0x200) {
-        GFX_WORDS(0xE7000000, 0);                   /* gDPPipeSync */
-        GFX_WORDS(0xE3000A01, 0);                   /* gDPSetCycleType(G_CYC_FILL) */
-        GFX_WORDS(0xF9000000, 0xFFFFFFFF);          /* gDPSetBlendColor */
-        GFX_WORDS(0xEE000000, 0xFFFFFFFF);          /* gDPSetPrimDepth */
-        GFX_WORDS(0xE2001D00, 4);                   /* gDPSetRenderMode, z compare */
+        GFX_CMD(0xE7000000, 0);                   /* gDPPipeSync */
+        GFX_CMD(0xE3000A01, 0);                   /* gDPSetCycleType(G_CYC_FILL) */
+        GFX_CMD(0xF9000000, 0xFFFFFFFF);          /* gDPSetBlendColor */
+        GFX_CMD(0xEE000000, 0xFFFFFFFF);          /* gDPSetPrimDepth */
+        GFX_CMD(0xE2001D00, 4);                   /* gDPSetRenderMode, z compare */
         Render_SetRenderMode(0x16);
         {                                           /* gDPFillRectangle over the viewport */
         Gfx *g = gDList++;

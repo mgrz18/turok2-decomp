@@ -4,13 +4,13 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
 
 /* Picks the next attack anim from a weighted table: close to the target only 0x10/0xD, otherwise 0xF
  * (when flagged and not just used), 0x10 and 0x12 weighted by the module's timer ratio. */
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern s16 WeightedTable_PickStatic(Pick *table);
-extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 state);
 
 /* MotherBoss_GetTargetDist */
 static __inline__ f32 getTargetDist(CGameObjectInstance *obj, CGameObjectInstance **found) {

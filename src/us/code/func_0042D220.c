@@ -3,6 +3,7 @@
 #include "structs/particle.h"
 #include "globals/scene.h"
 #include "globals/particle.h"
+#include "protos/list.h"
 
 /* One of the four default light directions. */
 typedef struct DirLight {
@@ -17,8 +18,6 @@ typedef struct DirLight {
 
 extern DirLight gParticleSpriteVtx[4];
 
-extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
-extern s32 CList__AddTail(CList *list, void *node);
 extern void func_0027BD10(void *def);
 extern void CMtxF__SetRotateX(void *, f32);
 

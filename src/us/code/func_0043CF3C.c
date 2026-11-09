@@ -3,6 +3,7 @@
 #include "globals/boss.h"
 #include "globals/onscreen.h"
 #include "globals/engine.h"
+#include "protos/ai.h"
 
 typedef struct {
     f32 x, y, z;
@@ -32,7 +33,6 @@ void Primagen_SpawnTossedObject_2(s16 type, s32 a1, Vec3_0043CF3C offset);
 void Primagen_UpdateHealth_2(Actor0043CF3C *actor, Level0043CF3C *level);
 void Primagen_UpdateSpawner_2(Actor0043CF3C *actor, Level0043CF3C *level);
 void COnScreen__SetBossPercent(void *a0, s32 percent);
-void CAI__SetMode(Actor0043CF3C *actor, Level0043CF3C *level, s32 event);
 
 #define COUNT_DOWN(t)              \
     if ((t) > 0.0f) {              \

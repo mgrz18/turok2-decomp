@@ -2,6 +2,7 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/player.h"
 
 /* Player-name menu: highlights the row of the player the menu belongs to
  * and copies that player's name (trailing spaces trimmed, nothing when it is
@@ -9,7 +10,6 @@
 
 extern u8 D_8011AB8B[][0x40];   /* player options +0x33: names */
 
-extern s32 CPlayerPool__GetIndex(void *players, void *player);
 
 #define ROW_SELECTED 0x01800000
 

@@ -1,6 +1,9 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "globals/scene.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
+#include "protos/scene.h"
 
 /* Advance an actor's animation (CGameObjectInstance__AdvanceAnimation) and move it by the root motion
  * that produced: the new position is taken back out, turned by the actor's
@@ -29,16 +32,12 @@ struct Actor {
 
 extern u8 D_800A5AC4[];     /* "anim object info" */
 
-s32 *CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
-void *CISet__GetBlock(s32, s32);
-void CCache__Unlock(s32, s32 *);
 void CMtxF__TransformBox(void *, void *, void *);
 void CVector3__Add(CVector3 *, CVector3 *, void *);
 void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
 void func_0021A500(Actor *);
 void CGameObjectInstance__MoveWithCollision(Actor *, CVector3 *);
 void CGameObjectInstance__AdvanceAnimation(Actor *);
-void CScene__CheckAutoActivation(s32 *, Actor *, CVector3 *, CVector3 *);
 
 void CGameObjectInstance__UpdateAnimation(Actor *actor) {
     CVector3 oldPos;

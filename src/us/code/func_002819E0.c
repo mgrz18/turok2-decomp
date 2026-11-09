@@ -1,8 +1,7 @@
 #include "common.h"
 #include "globals/camera.h"
+#include "protos/list.h"
 
-s32 CList__AddHead(s32, s32);
-s32 CList__Remove(s32, s32);
 
 
 void CCameraPool__ReleaseAllTexts(s32 arg0)

@@ -5,9 +5,9 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 extern int CharNoteMenu_SelectNo(int unused, ItemRecAt24 *item);
-extern void MenuPool_OpenMenu(char *, char *, int, int, int);
 int CharNoteMenu_SelectNo(int unused, ItemRecAt24 *item) {
     if (sCharNoteLoad != 0) {
         MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (char *)&gPakLoadProfileMenuDesc, item->x, item->y, 0);

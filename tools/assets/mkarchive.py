@@ -37,7 +37,7 @@ import zipfile
 import zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import propack  # noqa: E402
+import rnc  # noqa: E402
 import romfs  # noqa: E402
 import romid  # noqa: E402
 
@@ -106,20 +106,20 @@ def _init(rom):
 
 def _unpack(job):
     key, method = job
-    return propack.decompress(_ROM, key, verify=True)
+    return rnc.decompress(_ROM, key, verify=True)
 
 
 def unit_data(rom, rows, jobs=1):
     """{key: bytes} for every unit: RNC units unpacked (CRC16 checked), the rest as stored."""
-    rnc = [(r["key"], r["kind"]) for r in rows if r["flags"] & romfs.UF_RNC_UNPACKED]
+    packed = [(r["key"], r["kind"]) for r in rows if r["flags"] & romfs.UF_RNC_UNPACKED]
     if jobs > 1:
         ctx = multiprocessing.get_context("fork")
         with ctx.Pool(jobs, _init, (rom,)) as pool:
-            unp = pool.map(_unpack, rnc, chunksize=64)
+            unp = pool.map(_unpack, packed, chunksize=64)
     else:
         _init(rom)
-        unp = [_unpack(j) for j in rnc]
-    data = dict(zip((k for k, _ in rnc), unp))
+        unp = [_unpack(j) for j in packed]
+    data = dict(zip((k for k, _ in packed), unp))
     for r in rows:
         if r["key"] not in data:
             data[r["key"]] = rom[r["key"]:r["key"] + r["size"]]

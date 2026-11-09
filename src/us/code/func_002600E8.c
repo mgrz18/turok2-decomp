@@ -2,6 +2,8 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/game.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
@@ -26,8 +28,6 @@ typedef struct {
 
 void Actor_SpawnParticle(Actor *self, s32 type, CVector3 pos, s32 arg4);
 void TotemDefense_AddKill(void);
-void CScene__SetInstanceSavedBit(void *mgr, Actor *actor, s32 flag);
-void GameObject_FireTriggers(Actor *actor, s32 flags, Actor *actor2);
 void AI_StopSound(Actor *self, void *ai);
 void CListedInstance__Free(Actor *self);
 

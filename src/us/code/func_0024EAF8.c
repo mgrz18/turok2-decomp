@@ -5,6 +5,8 @@
 #include "structs/collision.h"
 #include "globals/collision.h"
 #include "globals/player.h"
+#include "protos/cache.h"
+#include "protos/player.h"
 
 /* The creature to mount (an AI actor). */
 typedef struct {
@@ -23,9 +25,7 @@ f32 AI_AngleToPoint(CGameObjectInstance *body, CVector3 point);   /* angle to a 
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);
 void CPlayerContState__Init(void *controls, void *settings);
 f32 Actor_GetEyeHeight(CPlayer *player);
-void CCache__SetFrameDelay(s32);
 void EnemyAI_Mount(Mount *mount, void *ai, CPlayer *player);
-s32 CPlayer__SetState(CPlayer *player, CGameObjectInstance *body, s32 arg2);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 

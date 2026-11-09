@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/region.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-CRegionInfo *CScene__GetRegionInfo(void *, s32);             /* extern */
 
 void func_0026C844(s32 arg0) {
     CRegionInfo *temp_v0;

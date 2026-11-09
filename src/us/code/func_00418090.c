@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/player.h"
+#include "protos/menu.h"
 
-s32 Menu_StepValue(s32, s32, s32, s32, s32, s32);
 
 s32 PlayerSetupMenu_StepControlType(s32 arg0, Menu *arg1) {
     CPlayerOptions *temp_s0;

@@ -9,17 +9,11 @@
 #include "structs/pager.h"
 #include "globals/sysrc.h"
 #include "globals/pager.h"
+#include "protos/ultra.h"
 
 
 void memset(void *dst, s32 value, s32 size);
-void osCreateThread(void *thread, s32 id, void (*entry)(void *), void *arg, void *sp, s32 pri);
-void osStartThread(void *thread);
-void osCreateMesgQueue(OSMesgQueue *queue, void **msg, s32 count);
-s32 osRecvMesg(OSMesgQueue *queue, void **msg, s32 block);
-s32 osSendMesg(OSMesgQueue *queue, void *msg, s32 block);
 void CLoader__LoadSync(CLoader *reader, u8 *source, s32 size, void *dest);
-void osInvalDCache(void *addr, s32 size);
-void osInvalICache(void *addr, s32 size);
 void VM_HandleTLBMiss(void);
 void VM_FinishPageJob(PageJob *job);
 void VM_FreeRegion(PageJob *job);

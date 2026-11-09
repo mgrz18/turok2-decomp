@@ -1,8 +1,7 @@
 #include "common.h"
 #include "globals/engine.h"
+#include "protos/list.h"
 
-s32 CList__AddHead(s32, s32);
-s32 CList__Remove(s32, s32);
 s32 LevelEvent_Fire(s32);
 
 

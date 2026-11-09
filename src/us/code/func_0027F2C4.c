@@ -1,5 +1,6 @@
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/camera.h"
 #include "structs/game.h"
 #include "structs/frame.h"
@@ -8,10 +9,9 @@
 #include "globals/render.h"
 #include "globals/camera.h"
 #include "globals/engine.h"
+#include "protos/cache.h"
 
-#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-void CCache__LockForDisplayList(s32 unused, void *resource);
 void Render_InvalidateModeCache(void);
 void CCamera__DisplayListSetup(CCamera *cam);
 void CCamera__DrawScene(CCamera *cam, void *world);
@@ -48,13 +48,13 @@ void CCameraPool__Draw(CCameraPool *pool, void *world) {
         cam = pool->m_ActiveList.m_pHead;
         if (cam != NULL) {
             GFX_CMD(0xE7000000, 0)
-            GFX_CMD(0xDE000000, (u32)gRspInitDL)
-            GFX_CMD(0xDE000000, (u32)gRdpInitDL)
+            GFX_CMD(0xDE000000, GBI_ADDR(gRspInitDL))
+            GFX_CMD(0xDE000000, GBI_ADDR(gRdpInitDL))
             cam->m_vp[gEvenOdd].vscale[0] = gScreenWidth;
             cam->m_vp[gEvenOdd].vscale[1] = gScreenHeight;
             cam->m_vp[gEvenOdd].vtrans[0] = gScreenWidth;
             cam->m_vp[gEvenOdd].vtrans[1] = gScreenHeight;
-            GFX_CMD(0xDC080008, (u32)&cam->m_vp[gEvenOdd])
+            GFX_CMD(0xDC080008, GBI_ADDR(&cam->m_vp[gEvenOdd]))
             w = gScreenWidth;
             h = gScreenHeight;
             GFX_CMD(0xED000000, ((((s32)((f32)(w - 1) * 4.0f)) & 0xFFF) << 12) | (((s32)((f32)(h - 1) * 4.0f)) & 0xFFF))

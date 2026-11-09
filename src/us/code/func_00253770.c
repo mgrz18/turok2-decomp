@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/particle.h"
+#include "protos/player.h"
 
-s32 CPlayer__SetState(s32, s32, s32);
 s32 CPlayer__IsInMatchEndState(s32);
 
 void CPlayer__OnParticleHit(CPlayer *arg0, s32 arg1, s32 arg2, CParticle *arg3) {

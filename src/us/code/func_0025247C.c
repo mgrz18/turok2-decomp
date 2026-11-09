@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
-extern CIntelligence *CScene__FindIntelligence(void *spawns, s32 kind, s32 character);
 extern s32 Random_Next(void);
 extern void Sound__Play2D(s32 sound);
-extern void CAI__SetMode(void *weapon, void *weaponAI, s32 arg2);
 
 /* Same as CPlayer__PickSpawnPoint. */
 static __inline__ void place_at_spawn(CPlayer *p) {

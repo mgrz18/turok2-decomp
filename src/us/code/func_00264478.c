@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00207ABC.c, func_00207ABC, with Turok 2's layouts. */
 #include "common.h"
+#include "protos/ai.h"
 
 typedef struct {
     u8 pad0[0x24];
@@ -14,7 +15,6 @@ typedef struct {
     f32 timer; /* 0x40 */
 } MotionState;
 
-s32 CAI__SetMode(void *actor, void *state, s32 mode);
 
 void Platform_AtStartUpdate(u8 *actor, MotionState *state) {
     StateInfo *info = (StateInfo *) (*(u8 **) (actor + 0x14) + 0x14);

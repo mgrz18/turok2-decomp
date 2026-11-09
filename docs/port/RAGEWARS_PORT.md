@@ -14,9 +14,22 @@ F3DEX2-family GBI, RNC ProPack, SN64 TLB-mapped code, Controller Pak saves).
 |---|---|
 | rw_junk repo | **No licence at all.** No `LICENSE`/`COPYING`/`UNLICENSE` file in the clone or on GitHub (raw URLs 404), GitHub API `license: null`, README has no licence section. Default copyright applies: *all rights reserved*. |
 | Where "CC0" came from | rw_junk's README says the **other** decomp, melalawi/ragewars-decomp (now `AbuN64/RageWarsDecomp`), is CC0, and that rw_junk's `include/their/` + `their_syms.ld` (copied from it) are CC0. That statement does not cover rw_junk's own code. (Even AbuN64's README says "License: CC0 1.0 (LICENSE)" while the repo has no LICENSE file and API `license: null`; the README statement is the only grant.) |
-| `docs/hand_asm_c/rnc.c` (-> our `port/third_party/rnc/rnc.c`) | Written by the rw_junk author ("readable C reconstruction ... verified by differential testing"), no licence header. **Not CC0; no licence.** Also derived from it: `tools/assets/propack.py` (Python port of the same decoder). |
+| `docs/hand_asm_c/rnc.c` (was copied to `port/third_party/rnc/rnc.c`) | Written by the rw_junk author ("readable C reconstruction ... verified by differential testing"), no licence header. **Not CC0; no licence.** Also derived from it: the old `tools/assets/propack.py`. **Resolved (Phase 7 round 2, q1): both replaced by our own code, see below.** |
 | `port/m2c_macros.h` | Copied from m2c (`matt-kempster/m2c`, **GPL-3.0**) with edits. Do not copy it; write our own macro header (p1). |
 | `RESAMPLE_LUT` in `audio_hle.c` | The aspMain microcode's resampler table (Nintendo data, also in GPL mupen64plus-rsp-hle and in sm64-port). Facts/tables, but note the provenance. |
+
+**Resolution of the RNC item (Phase 7 round 2, part q1).** `port/third_party/rnc/` and
+`tools/assets/propack.py` are deleted. Their replacements, `port/assets/rnc.c/.h` and
+`tools/assets/rnc.py`, are original code under the repo's licence (CC0), written clean-room:
+the sources were Turok 2's own `ProPackDecompress` (`src/us/code/func_00200B00.c`), the asm of
+`RNC_UnpackMethod1` (0x200C40, with func_00200CB0/E1C/EC0/EE8/F20) and `RNC_UnpackMethod2`
+(0x2010C0) in `us/asm/1840.s`, Turok 3's `ppdecom.c` stubs, and the public RNC header layout and
+CRC-16; neither the old files, rw_junk's RNC code nor any other RNC implementation was read.
+Verification was black-box: all 14,426 RNC streams of the ROM (from `romfs.load_units`) unpack
+with both header CRCs matching, and every output is byte-identical to the old tool's (run as a
+subprocess); `mkarchive.py` still gives sha1 `bb77f744...25d8fc`, `archive_check` and
+`t2asset_test` pass; `port/tests/rnc_test.c` (ROM scan, 14,426 streams) covers the C. The old
+files are still in git history (not rewritten).
 
 Consequences / recommendation (decide before the port is published):
 1. `docs/assets/PORT.md` §8 and `port/third_party/rnc/README.md` claimed CC0; both now say
@@ -235,7 +248,7 @@ the 32-bit guest-memory/recompiler design or replaced by LUS. Licence status of 
 
 | File | What it does | Turok 2 |
 |---|---|---|
-| `docs/hand_asm_c/rnc.c` (+ `port/native/rnc*.c`) | RNC ProPack method 1/2 decoders, bounds-checked | **already copied** to `port/third_party/rnc/`; licence must be fixed or rewritten (§0) |
+| `docs/hand_asm_c/rnc.c` (+ `port/native/rnc*.c`) | RNC ProPack method 1/2 decoders, bounds-checked | **not used any more**: replaced by our own `port/assets/rnc.c` / `tools/assets/rnc.py` (§0) |
 | `port/audio_hle.c/.h` | ABI1 aspMain HLE (ADPCM, RESAMPLE, ENVMIXER, POLEF, MIXER, INTERLEAVE, ...) | **adapt**: 64-bit command words / host-order DMEM conventions, or use as the reference for a mixer.c (§5) |
 | `port/tests/audio_hle_test.c` | self-test | **stale** (9/16 fail vs current code); rewrite against verified semantics |
 | `port/audio_out.c` | waveOut ring buffer, prime/hysteresis | n/a (LUS audio backend); copy the tuning numbers |
@@ -263,8 +276,8 @@ the 32-bit guest-memory/recompiler design or replaced by LUS. Licence status of 
 
 ## 9. Decisions recommended for Turok 2
 
-1. Resolve the rnc.c/propack.py licence now (ask the author or rewrite; §0). Record
-   provenance of every third-party file in `port/third_party/*/README.md`.
+1. ~~Resolve the rnc.c/propack.py licence~~ done: rewritten (§0). Record provenance of every
+   third-party file in `port/third_party/*/README.md` (only miniz is left there).
 2. Do not try the RW memory model (guest==host, BE in memory) on 64-bit: it needs a 32-bit
    address space. Keep the current plan (host-order data, 64-bit pointers).
 3. Before the first native run, run the §3 scans on the C (unprototyped calls: 370
@@ -278,7 +291,7 @@ the 32-bit guest-memory/recompiler design or replaced by LUS. Licence status of 
 
 ## 10. What the next round needs
 
-- A decision/answer on the licence (§0).
+- ~~A decision/answer on the licence (§0)~~: done, RNC rewritten (q1).
 - p1's compile log to feed the §3.1-3.4 scanners (a clang warning pass is the cheapest form).
 - An inventory of what the Turok 2 boot asm (`boot_main`, `STVM_MapTLB`) and the C boot path
   write before `main` runs (§3.5).

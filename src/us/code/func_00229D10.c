@@ -3,11 +3,11 @@
 #include "structs/player.h"
 #include "structs/particle.h"
 #include "structs/sound.h"
+#include "protos/game.h"
 
 /* Same family as CParticle__UpdateHomingMissile (homing missile): here a projectile that flies
  * back to a point beside its owner's player and is caught there. */
 
-extern s32 LoopSounds_Get(void);
 extern void *LoopSounds_Start(s32 bank, s32 sound, CVector3 *pos, CVector3 *pos2, s32 loops);  /* starts a sound */
 extern void CParticle__StopLoopSound(void *obj);
 

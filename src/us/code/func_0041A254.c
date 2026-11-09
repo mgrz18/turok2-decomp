@@ -3,6 +3,7 @@
 #include "globals/game.h"
 #include "globals/rumble.h"
 #include "globals/menu.h"
+#include "protos/game.h"
 
 
 typedef struct {
@@ -21,7 +22,6 @@ typedef struct {
 
 extern void Controller_ResetAllRumble(void);
 extern void RumblePool_FreeAll(RumblePool *pool);
-extern s32 LoopSounds_Get(void);
 extern void LoopSounds_Pause(s32);
 
 void PauseMenu_Init(A254Menu *menu) {

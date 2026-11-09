@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
 #include "structs/event.h"
+#include "protos/list.h"
 
 typedef struct {
     /* 0x00 */ u8 links[8];
@@ -14,8 +15,6 @@ typedef struct {
     /* 0x1194 */ CList freeVoices;
 } VoiceOwner;
 
-s32 CList__AddHead(s32, s32);
-s32 CList__Remove(s32, s32);
 s32 LevelEvent_Fire(s32);
 
 f32 HalfToFloat(u16);                             /* extern */

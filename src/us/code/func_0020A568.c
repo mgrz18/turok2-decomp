@@ -3,10 +3,10 @@
 #include "common.h"
 #include "structs/model.h"
 #include "globals/batch.h"
+#include "protos/iset.h"
 
 extern u8 D_800D8E13;               /* low byte of the pass */
 
-void *CISet__GetBlock(void *resource, s32 index);
 
 /* Returns the node keyed key in the tree under n, or the node a new key would hang from. */
 static __inline__ SortNode *find_node(SortNode *n, u32 key) {

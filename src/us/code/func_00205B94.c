@@ -3,15 +3,13 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
+#include "protos/ultra.h"
 
 extern char D_800A51E0[];
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-void **CCache__Request(s32, s32, s32, s32, s32, s32, void *, s32);
-void CCache__DeallocateInternal(s32, void **);
 
 /* Loads a four-byte probe to read a count, frees it under the resource lock, then loads count*4+15
  * rounded to eight bytes and stores its first word through arg1, returning the allocation. */

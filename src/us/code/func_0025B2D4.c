@@ -6,6 +6,7 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/ai.h"
+#include "protos/ai.h"
 
 typedef struct Object Object;
 
@@ -31,7 +32,6 @@ struct Object {
 void EnemyAI_NukedFrozenRemove(Object *obj, CAI *ai);
 void AI_SetTargetOverride(Object *obj, CAI *ai, Object *owner, f32 time);
 void AI_HearNoise(Object *obj, CAI *ai, CVector3 *from, s32);
-void CAI__SetMode(Object *obj, CAI *ai, s32 state);
 void Sound__PlayPitched(s16 sound, CVector3 pos, s32, s32, f32 volume);
 s32 Random_Next(void);
 void AI_StopSound(Object *obj, CAI *ai);

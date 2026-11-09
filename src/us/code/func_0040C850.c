@@ -7,6 +7,8 @@
 #include "globals/onscreen.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/scene.h"
+#include "protos/ai.h"
 
 /* One file: BlindOne_UpdateMover, BlindOne_GetHealthPercent, BlindOne_Setup and BlindOne_PhaseWaitPlayerUpdate.
  * BlindOne_Setup's only literal, the string "Blind", sits at 0x800C08D4, 4 past
@@ -22,7 +24,6 @@
 /* Plays a sequence of bit masks: every interval seconds, each set bit sends the matching actor (bits 0-3:
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
-extern void CAI__SetMode(CGameObjectInstance *obj, void *ai, s32 state);
 
 void BlindOne_UpdateMover(BlindOneMover *mover) {
     BlindOneState *state;
@@ -131,11 +132,8 @@ s32 BlindOne_GetHealthPercent(BlindOneState *state) {
 /* Plays a sequence of bit masks: every interval seconds, each set bit sends the matching actor (bits 0-3:
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
-extern s32 CScene__FindInstances(void *container, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max);
 extern void ScriptAnimator_Start(void *slot, s32 arg1);
-extern void *CScene__FindIntelligence(void *level, s32 arg1, s32 id);
 extern void COnScreen__SetBoss(void *hud, CGameObjectInstance *obj, char *name);
-extern void CScene__UnmarkGeneratorsSaved(void *level);
 
 /* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase_40CCC0(BlindOneState *state) {

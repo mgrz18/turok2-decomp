@@ -5,6 +5,7 @@
 #include "structs/game.h"
 #include "globals/engine.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern u8 D_800B54E0[];
@@ -12,8 +13,6 @@ extern u8 D_800B54E0[];
 void Cinema_Reset(CWarpFadeColor *entry);
 void Cinema_StopAtEnd(void);
 void Cinema_RequestById(s32 arg0);
-s32 CScene__FindWarpDests(CScene *world, s32 arg1, s32 id, CWarpPoint *spawn, s32 arg4);
-void CScene__LoadLevel(CScene *world, s32 id, s32 flags);
 s32 Demo_GetPlayerCount(void);
 void CCameraPool__AddTimedText(CGameFromCameraPool *game, void *camera, u8 *text, f32 time);
 

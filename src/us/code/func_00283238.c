@@ -2,11 +2,11 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/camera.h"
 #include "structs/emitter.h"
 #include "globals/frame.h"
 
-#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 void Render_SetRenderMode(s32 mode);
 void Sort_Quick(void *items, s32 count, s32 size, void *compare, void *swap);
@@ -30,7 +30,7 @@ void CEmitterPool__Draw(CEmitterPool *owner, CCamera *view) {
         return;
     }
     GFX_CMD(0xE7000000, 0)
-    GFX_CMD(0xDA380003, (u32)&gIdentityMtx)
+    GFX_CMD(0xDA380003, GBI_ADDR(&gIdentityMtx))
     GFX_CMD(0xDB040004, 2)
     GFX_CMD(0xDB04000C, 2)
     GFX_CMD(0xDB040014, 0xFFFE)

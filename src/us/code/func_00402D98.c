@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/ai.h"
 
 f32 Math_DecayToZero(f32, f32);
-s32 CAI__SetMode(s32, s32, s32);
 
 void MantidQueen_UpdateMode4(s32 arg0, CAI *arg1) {
     f32 temp_f20;

@@ -2,11 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -msplit-addresses */
 
-typedef unsigned long u32;
-typedef long s32;
+#include "protos/ultra.h"
 typedef volatile unsigned long vu32;
 extern void *osRomBase; /* local type: preprocessed ultralib file with its own u32/s32 typedefs (long), cannot include common.h */
-extern u32 osVirtualToPhysical(void *);
 s32 osPiRawStartDma(s32, u32 , void *, u32 );
 #ident "$Revision: 1.17 $"
 s32 osPiRawStartDma(s32 direction, u32 devAddr, void* dramAddr, u32 size) {

@@ -1,6 +1,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_27.CPP, func_8044C3D4_de, with Turok 2's layouts. */
 #include "common.h"
 #include "globals/camera.h"
+#include "protos/iset.h"
+#include "protos/cache.h"
 
 typedef struct CollisionBuildVertex {
     f32 x;
@@ -55,12 +57,6 @@ typedef struct CollisionBuildWorld {
 
 
 extern s32 ProPackDecompress(CollisionBuildMeshHandle **handle, s32);
-extern void *CISet__GetBlockAndSize(void *node, s32 index, s32 *size);
-extern void *CISet__GetBlock(void *node, s32 index);
-extern void CISet__GetBlockSize(void *node, s32 index);
-extern CollisionBuildMeshHandle *CCache__AllocateMemoryForDecompression(s32, CollisionBuildMeshHandle **handle, s32 size);
-extern void CCache__DeallocAndReplaceCompressedData(s32, CollisionBuildMeshHandle **handle, CollisionBuildMeshHandle *block);
-extern void CUSet__Transpose(void *src, void *dst, s32 arg2);
 extern void UnpackScaledVec4(CollisionBuildVertex *v);
 extern void CGameRegion__Unpack(CollisionBuildTriangle *tri, CollisionBuildFace *face, CollisionBuildVertex *verts,
                           s32 nverts, CollisionBuildTriangle *tris, s32 ntris);

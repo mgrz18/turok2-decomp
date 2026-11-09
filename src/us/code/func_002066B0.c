@@ -1,5 +1,6 @@
 #include "common.h"
 #include "globals/cache.h"
+#include "protos/list.h"
 
 /* An element of the lists at gCache_cacheUsedList - 0x14 and gCache_cacheUsedList. */
 typedef struct {
@@ -7,8 +8,6 @@ typedef struct {
     /* 0x10 */ s32 unk10;
 } ListElem;
 
-s32 CList__AddHead(s32, s32);
-s32 CList__Remove(s32, s32);
 
 
 void CCache__FreeCacheEntry(s32 arg0, ListElem *arg1) {

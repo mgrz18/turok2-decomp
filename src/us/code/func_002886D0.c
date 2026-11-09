@@ -2,12 +2,12 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 /* The multiplayer match state at gEngineApp_m_Settings_match: the fields this resets. */
 
 /* The game/menu context this runs on. */
 
-s32 CScene__FindWarpDests(s32, s32, s32, s32, s32);
 
 void CEngineApp__StartGameAtWarp(CEngineApp *arg0, s32 arg1) {
     u8 sp18[0x18];

@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 extern void __osCleanupThread(void);
 extern u32 __osDisableInt(void);

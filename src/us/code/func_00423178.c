@@ -3,10 +3,10 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 s32 Cinema_IsActive(void);
 s32 Cinema_IsFinished(void);
-void MenuPool_OpenMenu(char *dst, char *fmt, s32 arg2, s32 arg3, s32 arg4);
 
 static __inline__ s32 func_00422EE0_inline(void) {
     if (Cinema_IsActive() != 0 && Cinema_IsFinished() == 0) {

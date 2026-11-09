@@ -3,6 +3,7 @@
 #include "structs/game_object.h"
 #include "structs/model.h"
 #include "globals/scene.h"
+#include "protos/cache.h"
 
 /* As CGameObjectInstance__DrawModel, for a model drawn from its cached "lit vertices"
  * resource (built by CGameObjectInstance__ConstructLitVertices, fixed up once by Model_PulseVertexColors). */
@@ -10,10 +11,7 @@
 
 void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
 void Render_QueueModelInstance(s32, s32, s32, void *, char *, s32, s32);
-s32 **CCache__RequestDecompression(s32, s32, s32, s32, s32, CGameObjectInstance *, void *, char *, s32);
-void CCache__LockForDisplayList(s32, s32 **);
 void Model_PulseVertexColors(char *, char *);
-void CCache__Unlock(s32, s32 **);
 void CGameObjectInstance__ConstructLitVertices();
 
 static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0, s32 *set1) {

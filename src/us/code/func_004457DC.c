@@ -4,12 +4,12 @@
 #include "structs/boss.h"
 #include "globals/game.h"
 #include "globals/boss.h"
+#include "protos/ai.h"
+#include "protos/player.h"
 
 
-s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 s32 CPlayer__Warp(s32, s32, s32, s32);
 
-void *CPlayerPool__GetFirstActive(s32 *);                     /* extern */
 
 void MotherBoss_OnDefeatCinemaDone_2(void) {
     CPlayer *temp_v0;

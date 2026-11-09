@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "protos/iset.h"
 
 typedef struct {
     /* 0x0 */ CVector3 mn;
@@ -20,7 +21,6 @@ typedef struct {
     /* 0x8 */ WRec r[1];
 } WTab;
 
-void *CISet__GetBlock(s32, s32);
 s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt);
 
 /* Collects up to 64 records of `model` (or of the world grid when there is

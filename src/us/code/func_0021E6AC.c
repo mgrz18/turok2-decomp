@@ -4,11 +4,9 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-extern s32 CScene__GetRegion(void *arg0, s32 arg1);
 extern void CGameObjectInstance__ConstructFromRecord(void *obj, InputRecAt27 *rec, s32 mode, s32 index);
-extern void *CScene__GetIntelligence(void *, s32);
-extern s32 CScene__GetInstanceSavedBit(void *, void *);
 extern void CGameObjectInstance__Construct(void *, u16, u16, s32, void *, s32, s32, f32,
                           CVector3, u8, CVector3, CVector3, s32);
 void CGameObjectInstance__ConstructFromRecord(void *arg0, InputRecAt27 *arg1, s32 mode, s32 index) {

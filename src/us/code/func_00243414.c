@@ -7,6 +7,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
+#include "protos/ai.h"
 typedef struct Shared_ParticleLighting Shared_ParticleLighting;
 struct Shared_ParticleLighting {
     u8 ambient[3], reserved3;
@@ -136,7 +137,6 @@ struct ActorStateTable {
     u8 pad4[0x1C];
     StateEntry entries[1];
 };
-s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2);
 extern void AI_StopSound(void *, void *);
 s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2) {
     struct ActorStateTable *node;

@@ -3,9 +3,9 @@
 
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
 
-void *CScene__GetRegionInfo(void *tbl, s32 id);
 
 
 s32 Actor_IsInRegionFlag40(CGameObjectInstance *actor)

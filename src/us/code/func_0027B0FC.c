@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "globals/hud.h"
 
 void Hud_DrawGlyph16x16(s32 texture, f32 x, f32 y, f32 sx, f32 sy) {
@@ -28,7 +29,7 @@ void Hud_DrawGlyph16x16(s32 texture, f32 x, f32 y, f32 sx, f32 sy) {
     g->w1 = texture;
     g = gDList++;
     g->w0 = 0xDE000000;         /* gSPDisplayList */
-    g->w1 = (u32) sHudGlyph16x16LoadDL;
+    g->w1 = GBI_ADDR(sHudGlyph16x16LoadDL);
     g = gDList++;           /* gSPTextureRectangle */
     g->w0 = 0xE4000000 | ((xh & 0xFFF) << 12) | (yh & 0xFFF);
     g->w1 = ((xl & 0xFFF) << 12) | (yl & 0xFFF);

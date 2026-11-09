@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
 
-s32 CScene__SetInstanceSavedBit(s32 *, s32, s32);     /* extern */
 
 void Generator_EventOn(s32 arg0) {
     CScene__SetInstanceSavedBit(&gScene, arg0, 1);
