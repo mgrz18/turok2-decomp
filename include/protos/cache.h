@@ -48,7 +48,11 @@ s32 CCache__GetFreeMemEntryCount(void);
 s32 CCache__GetMemEntryCount(void);
 void *CCache__HeapAlloc(s32, u32, s32, u32);
 void **CCache__LoadPersistantIndex(s32, void **, sptr, void *);
+#ifdef TARGET_PORT
+void *CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, sptr, sptr, sptr); /* callers read the request it leaves in v0 */
+#else
 void CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, sptr, s32, sptr);
+#endif
 void CCache__LockForDisplayList(s32, struct B12Node *);
 void *CCache__LookupAndLock(s32, s32);
 void CCache__Main(void);

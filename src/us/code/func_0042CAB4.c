@@ -6,7 +6,7 @@
 #include "protos/scene.h"
 
 extern s32 ProPackDecompress(void ***, s32);
-void CScene__DecompressParticles(s32 arg0, void ***arg1) {
+void CScene__DecompressParticles(sptr arg0, void ***arg1) {
     void *obj;
     GroupCode8044E2B8 *group;
     Piece *piece;
