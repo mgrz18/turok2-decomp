@@ -143,10 +143,10 @@ What a source port needs: code a person can read and change without breaking it.
 - [ ] Code loads assets through the archive instead of fixed ROM offsets
 
 ### Phase 7 — Native build
-- [ ] Builds with a modern compiler (Clang/GCC) alongside the matching build
-- [ ] 64-bit clean: pointer-size assumptions in structs, fixed `0x80…` addresses, the TLB-paged VM modules linked as ordinary code
-- [ ] Platform layer: renderer for the F3DEX display lists, audio mixer in place of the N64 synthesizer, input, saves (libultraship is the leading candidate)
-- [ ] First window opens; title screen; first level playable
+- [x] Builds with a modern compiler alongside the matching build: `port/` (CMake + Ninja, clang) compiles all 3,917 game C files for 64-bit hosts with 0 errors (Linux x86_64; macOS arm64 and Windows x86_64 cross-checked), through shim headers and a source filter, without changing the matching build (`tools/asm_diff.py`: 0 differences) ([docs/port/BUILD.md](docs/port/BUILD.md)). Not linked yet: ~1,800 data symbols still live in asm
+- [ ] 64-bit clean. Audited ([docs/port/64BIT.md](docs/port/64BIT.md), `tools/port/audit64.py`): ~1,900 pointer-through-32-bit-int sites, 1,100 functions with mismatched prototypes (s32 vs pointer), hand-built 8-byte Gfx words; plan: `sptr`/`uptr` typedefs and canonical prototypes, each change proven with `asm_diff`. The second VM module is never called, so the port links the engine + module 1 only and needs no pager
+- [ ] Platform layer on libultraship 2.0 ([docs/port/LIBULTRASHIP.md](docs/port/LIBULTRASHIP.md)): the `turok2` executable builds, opens a window (headless too), mounts `turok2.o2r` through LUS's ArchiveManager (all 26,124 units identical to the ROM) and draws with Fast3D. Runtime model ([docs/port/RUNTIME.md](docs/port/RUNTIME.md)): the engine keeps its 8 threads on `port/runtime/t2os` (libultra scheduling rules on host threads, deterministic). Audio, Controller Pak and the game link: next
+- [ ] First window opens with the game; title screen; first level playable
 
 ### Phase 8 — Enhancements
 - [ ] Widescreen, high frame rate, mouse-look and keyboard
