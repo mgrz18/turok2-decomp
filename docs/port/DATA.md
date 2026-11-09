@@ -135,6 +135,7 @@ That is exactly the "function-side remainder" (docs/port/BUILD.md). No data symb
 
 ## Known gaps (data_report.txt has the lists)
 
+- **Round 3 (r3):** `RUNTIME_BSS` in gendata.py makes 27 of those runtime structs bss, and a pointer-wide integer leaf (`sptr`/`uptr`) holding a known address is now relocated, so the `*ModeTable`s come out as real pointers. Unresolved pointer slots went from 403 to 24 (extent overruns of small `.code_rodata` symbols) and address-holding integers from 334 to 125 (mostly `osViModeTable`, which holds no real pointers). The rest of this list describes the state before round 3.
 - **402 pointer slots hold values that are not addresses**, in 38 symbols. Most are in large
   runtime structs that splat placed inside loaded sections: `gDemoPlayer_match_decode` (108),
   `gAudioWorld` (97), `gRumbleEntries` (48), `gDemoPlayer` (26), `sPathSearch` (24). Their
@@ -159,7 +160,7 @@ That is exactly the "function-side remainder" (docs/port/BUILD.md). No data symb
 
 - q5: link `turok2_data` into `turok2`, together with the host stubs for the 32 functions above
   (`RNC_*` from q1). Run to the first crash.
-- Mark the runtime structs above as bss: an option in the generator, or a list in the tool.
+- (done in round 3: `RUNTIME_BSS`) Mark the runtime structs above as bss.
 - q3: type the `*ModeTable` declarations (function pointers stored as `s32`), then rerun the
   generator.
 - Replace the ELF `.set` aliases with something Mach-O accepts before the macOS build.

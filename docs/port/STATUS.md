@@ -117,3 +117,34 @@ so `--draw` (q4's GBI is in) has nothing to show yet.
    the `*ModeTable` integers that hold function addresses (type them, rerun gendata).
 5. Remaining 64-bit work (64BIT.md part 2): 1,064 mismatched declarations, ~3,000
    pointer-width warnings; each fix above was found by running, the audit lists the rest.
+
+## Round 3, r3: 64-bit part 2 (the typing sweep)
+
+Branch `names-R3_r3`. Every commit has `tools/asm_diff.py --base 3798e01e` at
+`3938 files: 0 differ or fail`, `check_structs.py structs/game_object.h` at 0 wrong, and
+`turok2_game` / `turok2_data` building with 0 errors. Details and numbers are in 64BIT.md, "Part 2".
+
+- `tools/port/retype.py` (new) does the mechanical work at the columns clang reports.
+  It turns `(s32)ptr` into `(sptr)`, retypes locals that carry pointers, drops casts in
+  front of pointer parameters, and retypes the `s32` parameters and returns of functions
+  that callers fill with pointers (rule P, every declaration). 880 files changed.
+- Truncating pointer-width warnings went from 2,828 to 1,048 (clang, x86_64). The
+  disagreeing declarations went from 1,059 to 999.
+- The GfxPool path is pointer-wide: `CCache__AllocateAt`, `B12Node.key`, `MemHandle.addr`,
+  and `gDepthBuffer`/`gDisplayList*`/`gLineList*`/`gAudioHeapBase` are now `sptr`. r5 saw the
+  macOS run pass `GfxPool_Alloc`.
+- All `CList__Construct` link offsets are now `T2_OFFSETOF`/`sizeof(void *)`.
+  `MenuPool_Construct` is typed, and `CInstancePool__Construct` has a typed host body. r5
+  saw the macOS run pass `MenuPool_Construct`. It next stops in
+  `CCamera__ConstructSkySystem(+0x558)`, which is r1's area.
+- `CAIModeInfo`: `m_Mode` (the header row's next-table link), `unk_04` (enter) and `unk_10`
+  (anim id or function) are now `sptr`. gendata relocates a pointer-wide integer whose value
+  is a known address. 27 runtime structs inside `.libultra` are now `RUNTIME_BSS`.
+  Unresolved pointer slots went from 403 to 24, and address-holding integers from 334 to 125.
+  All `*ModeTable`s are now relocated.
+
+Merging: `include/globals/frame.h`, `include/rw/junk_types.h`,
+`include/structs/game_object.h` (CAIModeInfo only, not CEngineApp/CGame), several
+`include/protos/*.h` and about 880 files in `src/us/code` changed in one-token edits.
+Conflicts with r1/r5 should be small and local. Rerun gendata with a fresh `--cache`,
+because global and struct sizes changed.

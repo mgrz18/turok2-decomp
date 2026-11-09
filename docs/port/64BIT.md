@@ -357,3 +357,75 @@ an `s32`). Those warnings are the work list for part 2 (retype the callers' vari
   types (their own files are put back: the header says `void *`);
 - the put-back files above, by hand (mostly a cast at a dereference);
 - more groups: extend `GROUPS` in genprotos.py (subsystem regex) and run `apply`.
+
+---
+
+## Part 2 done (Phase 7 round 3, r3): callers, CList offsets, mode tables
+
+All commits keep `python tools/asm_diff.py --base 3798e01e` at **0 differ or fail** (3,938 files).
+
+### `tools/port/retype.py`
+
+```
+python3 tools/port/retype.py [--base REV] [-j 4] [--params N] [--dry] [FILE ...]
+```
+
+It compiles each file with clang for x86_64 using audit64's flags, reads the pointer-width
+warnings with their columns and edits those exact sites:
+
+| rule | site | edit | N64 code |
+|---|---|---|---|
+| D | `(s32) ptr`, `(u32) ptr`, `(int) ptr` (truncating cast) | `(sptr)` / `(uptr)` | identical by construction (sptr is s32) |
+| C | a local `s32`/`u32` that receives a pointer or an sptr, is cast to a pointer, or is passed to a pointer parameter | the declaration becomes `sptr`/`uptr` (a shared declaration is split) | identical unless the split moves a register (asm_diff puts it back) |
+| A | `f(.., (s32) &x, ..)` where f's parameter is a pointer | the cast is dropped | identical in practice (checked) |
+| P | `--params N`: a pointer or sptr passed to an `s32` parameter, or returned through an `s32` return type | the parameter / return becomes `sptr` in the definition and in every declaration (src/, include/protos) | identical by construction |
+
+The rules repeat until nothing changes, because C feeds on the warnings D and P create.
+Without `--params`, a file whose N64 code changes is retried with rule D alone and then put back.
+With `--params`, run asm_diff on the whole tree afterwards and put back what differs.
+Files with their own `typedef int s32;` (no common.h, so no sptr) are skipped.
+
+### Numbers (3798e01e -> now)
+
+| | before | after |
+|---|---:|---:|
+| pointer-width warnings (all) | 2,876 | 1,776 |
+| truncating ones (a pointer meets a 32-bit int, or an sptr is narrowed) | 2,828 | **1,048** |
+| declarations that disagree pointer vs 32-bit int | 1,059 (482 functions) | 999 (460) |
+| boot-path warnings: CCache / CCameraPool / GfxPool_ / MenuPool_ / CScene | 117 / 48 / 25 / 44 / 194 | 29 / 32 / 14 / 36 / 179 |
+| gendata: pointer slots that are not a known address | 403 | 24 |
+| gendata: integer slots that hold an address | 334 | 125 |
+
+The remaining warnings are mostly *non-truncating* `-Wint-conversion` (an sptr passed to a
+pointer parameter: 64 bits, fine) and the `-Wshorten-64-to-32` ones where an sptr meets an `s32`
+struct field, a by-hand prototype or an unnamed raw offset.
+
+### By hand
+
+- **GfxPool / CCache__AllocateAt** (the first real-64-bit crash on macOS): `CCache__AllocateAt(s32, sptr, s32)`,
+  `CHeap__AllocAt` local declaration `sptr (CHeap *, sptr, s32)`, `B12Node.key` `uptr` and its
+  `pad1C` a `void *` under `TARGET_PORT` (B12Node is CMemEntry under its Rage Wars name), `MemHandle.addr`
+  `uptr`, `gAudioHeapBase gLineList0/1 gDisplayList0/1 gDepthBuffer` `sptr` (globals/frame.h).
+- **CList link offsets**: every `CList__Construct` literal is now `T2_OFFSETOF(T, prev/next)`
+  (CLoaderEntry, CMemEntry locked links, Menu, CParticle and its draw links, CPlayer, the warp `Node`)
+  or `0, sizeof(void *)` for the 0/4 lists. `MenuPool_Construct(_2)` takes `MenuPool *`.
+  `CInstancePool__Construct(_2)` has a typed `TARGET_PORT` body: the N64 one walks 0x5300/0x298.
+  The warp search's local `ListRec` (a CList read as `count`) has a host layout.
+- **Mode tables**: a CAIModeInfo row is `{mode, enter, update, data, anim, speed, ...}`. The
+  header row's first word is the next table. `m_Mode`, `unk_04` (enter) and `unk_10` (an anim id
+  *or* a getter such as `Platform_GetModeAnim`) are now `sptr`. CAI__SetMode's local `StateEntry` /
+  `ActorStateTable` view has a host layout under `TARGET_PORT`.
+- **gendata**: a pointer-wide integer leaf (`sptr`/`uptr`) whose value is a known address is
+  relocated like a `void *`. Other values keep the integer. That is what makes "integer or
+  function" words work. `RUNTIME_BSS` lists the 27 runtime structs that sit inside the loaded
+  `.libultra` range (the ELF bytes there are code and tables): they are zero now, not garbage.
+
+### Next (part 3)
+
+- About 400 typed dereferences at constant N64 offsets (`*(s32 *)((s8 *)x + 0x98)`,
+  `M2C_FIELD(x, s32 *, 0x14)`), for example in CCache__AllocateMemoryForDecompression(Top). They need the real
+  struct type. A tool can propose `T2_OFFSETOF` when the base's type is known.
+- `s32` struct fields that hold pointers in file-local structs (the 102 "int field" warnings).
+- Other mode-table readers with local views (EnemyAI_/Platform_ AI steps that read the row by offset).
+- The 24 remaining unresolved slots are extent overruns of small `.code_rodata` symbols
+  (`sBoxSideFaceBuilders`, `sCollisionTests`, `__osTimerList`...): give them exact sizes.
