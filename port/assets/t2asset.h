@@ -31,7 +31,9 @@ extern "C" {
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
-typedef uint64_t u64;
+/* u64 as in ultra64.h / libultraship (unsigned long long): uint64_t is unsigned long on LP64
+ * Linux/macOS, and a different typedef for the same name is an error when both headers meet. */
+typedef unsigned long long u64;
 
 /* The four ROM roots the engine hard-codes (docs/assets/PORT.md 1.4). The first three
  * are read at inner addresses too (VM windows, audio DMA). */
