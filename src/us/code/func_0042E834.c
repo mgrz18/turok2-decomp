@@ -7,8 +7,8 @@ extern void memset(void *p, s32 c, sptr n); /* memset */
 
 void CPlayerPool__Construct(CPlayerPool *pl) {
     memset(pl, 0, sizeof(CPlayerPool));
-    CList__Construct(&pl->m_IdleList, 0x131C, 0x1320);
-    CList__Construct(&pl->m_ActiveList, 0x131C, 0x1320);
+    CList__Construct(&pl->m_IdleList, T2_OFFSETOF(CPlayer, m_pLast), T2_OFFSETOF(CPlayer, m_pNext));
+    CList__Construct(&pl->m_ActiveList, T2_OFFSETOF(CPlayer, m_pLast), T2_OFFSETOF(CPlayer, m_pNext));
     pl->m_pmePlayers = 0;
     pl->m_Players = 0;
     pl->m_nPlayers = 0;

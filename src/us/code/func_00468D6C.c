@@ -30,9 +30,9 @@ void CCameraPool__Construct_2(Unk00468D6C *arg0) {
     void *temp_s1;
 
     memset(arg0, 0, 0x11F0U);
-    CList__Construct(arg0->list0C, 0, 4);
-    CList__Construct(arg0->list20, 0, 4);
-    CList__Construct(arg0->listF0C, 0, 4);
+    CList__Construct(arg0->list0C, 0, sizeof(void *));
+    CList__Construct(arg0->list20, 0, sizeof(void *));
+    CList__Construct(arg0->listF0C, 0, sizeof(void *));
     temp_s1 = arg0->sub40;
     arg0->unk11E8 = 1;
     arg0->unk0 = 0;

@@ -22,8 +22,8 @@ void func_0042D120(SlotLists *lists) {
     s32 i;
     Slot *slot;
 
-    CList__Construct(&lists->used, 0, 4);
-    CList__Construct(&lists->free, 0, 4);
+    CList__Construct(&lists->used, 0, sizeof(void *));
+    CList__Construct(&lists->free, 0, sizeof(void *));
     for (i = 0; i < 8; i++) {
         slot = &lists->slots[i];
         CList__AddTail(&lists->free, slot);

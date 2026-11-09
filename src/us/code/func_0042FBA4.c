@@ -36,16 +36,16 @@ void CCameraPool__NewGame(CCameraPool *owner, s32 count) {
     owner->m_MainCamera.m_Index = 0;
     CCamera__Construct(&owner->m_MainCamera);
     owner->m_bActiveChanged = 2;
-    CList__Construct(&owner->m_ShakeFreeList, 0, 4);
-    CList__Construct(&owner->m_ShakeActiveList, 0, 4);
+    CList__Construct(&owner->m_ShakeFreeList, 0, sizeof(void *));
+    CList__Construct(&owner->m_ShakeActiveList, 0, sizeof(void *));
     value = 1.0f;
     for (i = 0; i < 8; i++) {
         initShake(&owner->m_ShakeVars[i], value);
         CList__AddTail(&owner->m_ShakeFreeList, &owner->m_ShakeVars[i]);
     }
-    CList__Construct(&owner->m_FreeList, 0, 4);
-    CList__Construct(&owner->m_ActiveList, 0, 4);
-    CList__Construct(&owner->m_FreeTextList, 0, 4);
+    CList__Construct(&owner->m_FreeList, 0, sizeof(void *));
+    CList__Construct(&owner->m_ActiveList, 0, sizeof(void *));
+    CList__Construct(&owner->m_FreeTextList, 0, sizeof(void *));
     owner->m_bOnlyUseMainCameraForSound = 1;
     Sound__SetListener(&owner->m_MainCamera);
     CCache__Flush(0);

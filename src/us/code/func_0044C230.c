@@ -1455,9 +1455,9 @@ s32 Menu_StepValueLR_2(Menu *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 a
 
 /* ---------------- MenuPool_Construct_2 ---------------- */
 
-void MenuPool_Construct_2(s32 arg0) {
-    CList__Construct(arg0, 0x1D0, 0x1D4);
-    ((MenuPool *) arg0)->opened = 0;
+void MenuPool_Construct_2(MenuPool *arg0) {
+    CList__Construct((CList *)arg0, T2_OFFSETOF(Menu, prev), T2_OFFSETOF(Menu, next));
+    arg0->opened = 0;
 }
 
 /* ---------------- MenuPool_OpenMenu_2 ---------------- */

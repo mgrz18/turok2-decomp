@@ -11,8 +11,8 @@ void RumblePool_Init(RumblePool *pool, RumbleEffect *effects, s32 count) {
     s32 i;
 
     mask = __osDisableInt();
-    CList__Construct(&pool->free, 0, 4);
-    CList__Construct(&pool->active, 0, 4);
+    CList__Construct(&pool->free, 0, sizeof(void *));
+    CList__Construct(&pool->active, 0, sizeof(void *));
     i = 0;
     if (count > 0) {
         do {

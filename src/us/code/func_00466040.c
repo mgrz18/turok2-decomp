@@ -29,8 +29,8 @@ void func_00466040(Pool *pool) {
     s32 i;
     PoolNode *node;
 
-    CList__Construct(&pool->used, 0, 4);
-    CList__Construct(&pool->free, 0, 4);
+    CList__Construct(&pool->used, 0, sizeof(void *));
+    CList__Construct(&pool->free, 0, sizeof(void *));
     for (i = 0; i < 8; i++) {
         node = &pool->nodes[i];
         CList__AddTail(&pool->free, node);

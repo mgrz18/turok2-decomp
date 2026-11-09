@@ -22,7 +22,7 @@ void CCache__Compact(s32 unused, s32 all) {
     CMemEntry *scan;
     u8 *newData;
 
-    CList__Construct(&moved, 0x20, 0x24);
+    CList__Construct(&moved, T2_OFFSETOF(CMemEntry, lockedLast), T2_OFFSETOF(CMemEntry, lockedNext));
     if (all != 0 || gCache.currentCompressPos == NULL) {
         gCache.currentCompressPos = gCache.memLockedList.m_pHead;
         if (gCache.memLockedList.m_pHead == NULL) {

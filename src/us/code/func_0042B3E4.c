@@ -95,8 +95,8 @@ void CScene__DecompressLinks(WorldRecAt1B40C *world, void ***handle) {
         world->edgeData = &((ResidentDataChunk *)(l2))->data[0];
         world->edges = (Face *)&((ResidentDataChunk *)(l3))->data[0];
         world->nedges = count;
-        CList__Construct(&world->listA, 0, 4);
-        CList__Construct(&world->listB, 0, 4);
+        CList__Construct(&world->listA, 0, sizeof(void *));
+        CList__Construct(&world->listB, 0, sizeof(void *));
         for (k = 0; k < 0x30; k++) {
             CList__AddTail(&world->listB, &world->buckets[k]);
         }

@@ -7,8 +7,8 @@ void CEmitterPool__Construct_2(CEmitterPool *arg0) {
     sptr var_s0;
     s32 var_s1;
 
-    CList__Construct(&arg0->m_ActiveList, 0, 4);
-    CList__Construct(&arg0->m_FreeList, 0, 4);
+    CList__Construct(&arg0->m_ActiveList, 0, sizeof(void *));
+    CList__Construct(&arg0->m_FreeList, 0, sizeof(void *));
     var_s1 = 0;
     var_s0 = (sptr) arg0;
     do {
