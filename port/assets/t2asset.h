@@ -12,11 +12,16 @@
  *            straight from the image and RNC streams are unpacked on read (port/assets/rnc.c).
  *
  * Both return the same bytes for every load unit: the ROM bytes, RNC-unpacked where
- * the unit is one RNC stream, still big-endian. Byte swapping for little-endian hosts
- * (T2Asset_Swap, per type) is a separate step and not done here yet (see
- * docs/assets/BYTEORDER.md).
+ * the unit is one RNC stream. Byte order: the archive stores units big-endian (ROM order)
+ * together with a swap plan per unit (t2/swap, tools/assets/mkarchive.py from
+ * swap_spec.json; docs/assets/ARCHIVE.md, BYTEORDER.md). When a plan table is loaded and the
+ * host is little-endian, every unit is swapped to host order right after the backend loads it
+ * (whole, before a prefix is cut), so T2Asset_Read / T2Asset_ReadInto return HOST-order
+ * fields. The archive backends load t2/swap themselves; the ROM backend takes it from
+ * T2Asset_LoadSwapFile (an archive or a bare t2/swap file). Without a table: ROM order.
  *
- * Not thread safe: callers serialize (the engine's loader thread is the only reader).
+ * Not thread safe: callers serialize (on the port all game threads run one at a time under
+ * t2os's baton, docs/port/RUNTIME.md).
  */
 #ifndef T2ASSET_H
 #define T2ASSET_H
@@ -116,6 +121,24 @@ int T2Asset_ReadInto(u32 address, u32 offset, void *dst, u32 len);
 u32 T2Asset_UnitCount(void);
 u32 T2Asset_UnitKey(u32 i);
 int T2Asset_UnitInfo(u32 key, u32 *romSize, u32 *hostSize, u32 *flags);
+
+/* ---- byte order ------------------------------------------------------------------------ */
+/* Install a swap-plan table (the bytes of an archive's t2/swap entry; copied). Validated
+ * (magic, format major 2, sorted keys, offsets inside the table). Returns 0 or <0. Closing
+ * or replacing the backend drops it, so call it after opening. */
+int T2Asset_SetSwapTable(const void *data, size_t len);
+/* t2/swap out of an .o2r (zip) or a bare 'T2SW' file, for the ROM backend. */
+int T2Asset_LoadSwapFile(const char *path);
+/* 1 when units are being swapped to host order (table loaded and the host is little-endian). */
+int T2Asset_SwapActive(void);
+/* Swap one unit in place from ROM order to host order with its plan (a no-op on a big-endian
+ * host or without a table). The reader calls it on every load; tests and tools may call it
+ * on bytes they read themselves. Returns 1 if a plan was applied, 0 if the unit has none,
+ * <0 if the plan does not fit the buffer (size must be the unit's host size). */
+int T2Asset_SwapUnit(u32 key, void *data, u32 size);
+/* Counters: plans applied, units loaded without a plan, plans refused (size mismatch: a mod
+ * entry of a different size keeps ROM order). */
+void T2Asset_SwapStats(u32 *applied, u32 *noPlan, u32 *refused);
 
 /* ---- helpers shared with tools ------------------------------------------------------- */
 /* Normalize a ROM image to .z64 order in place; returns 0 if it looks like an N64 image. */
