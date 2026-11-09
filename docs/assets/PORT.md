@@ -520,8 +520,13 @@ Dependencies: a1 = ROMFS, a2 TEXTURES, a3 MODELS, a4 LEVELS, a5 ANIMATION, a6 AU
   SHA1 it was built from, and the port re-extracts when it differs or when the
   extractor format version changes.
 - Third-party code: libultraship and Torch are MIT. The Rage Wars port
-  (references/rw_junk) is CC0, so its `rom_find.c` and `audio_hle.c` may be
-  reused. Turok 3's decomp is referenced, not copied.
+  (references/rw_junk) has **no licence** (no LICENSE file, GitHub reports
+  none; the CC0 in its README covers only files taken from
+  melalawi/ragewars-decomp), so none of its code may be reused until the
+  author grants one; this includes the already copied
+  `port/third_party/rnc/rnc.c` and its Python port `tools/assets/propack.py`
+  (docs/port/RAGEWARS_PORT.md section 0). Turok 3's decomp is referenced,
+  not copied.
 
 ## 9. Open questions
 

@@ -20,6 +20,15 @@
 #include "structs/adec.h" /* DecodeState, FftTables */
 #include "structs/table.h" /* StrideTable (Rage Wars' StridedTable) */
 
+/* Pads written as `next - offset - sizeof(T *)` assume 4-byte pointers. The
+ * port build (64-bit host, TARGET_PORT) keeps the N64 pad size: its layout is
+ * not offset-exact anyway, and the N64 expression goes negative there. */
+#ifdef TARGET_PORT
+#define RW_PTR_SIZE 4
+#else
+#define RW_PTR_SIZE sizeof(void *)
+#endif
+
 struct Access_u8_3;
 struct Access_u8_3 {
     char pad[0x3];
@@ -387,11 +396,11 @@ struct ObjRecAt2V1 {
 };
 struct ObjectLinks24_2 {
     char * unk_0;
-    char pad0[0x4 - 0x0 - sizeof(char*)];
+    char pad0[0x4 - 0x0 - RW_PTR_SIZE];
     char * unk_4;
     void * unk_8;
     void * unk_C;
-    char padC[0x10 - 0xC - sizeof(void*)];
+    char padC[0x10 - 0xC - RW_PTR_SIZE];
     s32 unk_10;
     char pad10[0x14 - 0x10 - sizeof(s32)];
     s32 unk_14;
@@ -504,11 +513,11 @@ struct ObjectLinks24;
 typedef struct ObjectLinks24 ObjectLinks24;
 struct ObjectLinks24 {
     char * unk_0;
-    char pad0[0x4 - 0x0 - sizeof(char*)];
+    char pad0[0x4 - 0x0 - RW_PTR_SIZE];
     char * unk_4;
     void *translationFrames;
     void * unk_C;
-    char padC[0x10 - 0xC - sizeof(void*)];
+    char padC[0x10 - 0xC - RW_PTR_SIZE];
     s32 unk_10;
     char pad10[0x14 - 0x10 - sizeof(s32)];
     s32 unk_14;
@@ -548,13 +557,13 @@ struct ObjectLinks54;
 struct ObjectLinks54 {
     char pad0[0x8];
     char * unk_8;
-    char pad8[0x28 - 0x8 - sizeof(char*)];
+    char pad8[0x28 - 0x8 - RW_PTR_SIZE];
     f32 unk_28;
     char pad28[0x3C - 0x28 - sizeof(f32)];
     s32 unk_3C;
     char pad3C[0x40 - 0x3C - sizeof(s32)];
     char * unk_40;
-    char pad40[0x4C - 0x40 - sizeof(char*)];
+    char pad40[0x4C - 0x40 - RW_PTR_SIZE];
     f32 unk_4C;
     char pad4C[0x50 - 0x4C - sizeof(f32)];
     s32 unk_50;
@@ -571,7 +580,7 @@ struct ObjectLinksB4;
 struct ObjectLinksB4 {
     char pad0[0x4];
     char * unk_4;
-    char pad4[0x8 - 0x4 - sizeof(char*)];
+    char pad4[0x8 - 0x4 - RW_PTR_SIZE];
     f32 unk_8;
     char pad8[0x10 - 0x8 - sizeof(f32)];
     func_8020E674_S1_U8 unk_10;
@@ -2385,7 +2394,7 @@ typedef struct ObjectLinks88 ObjectLinks88;
 struct ObjectLinks88 {
     char pad0[0x18];
     void * unk_18;
-    char pad18[0x24 - 0x18 - sizeof(void*)];
+    char pad18[0x24 - 0x18 - RW_PTR_SIZE];
     s32 unk_24;
     char pad24[0x2C - 0x24 - sizeof(s32)];
     s32 unk_2C;
@@ -2393,9 +2402,9 @@ struct ObjectLinks88 {
     char unk_48;
     char pad48[0x7C - 0x48 - sizeof(char)];
     void * unk_7C;
-    char pad7C[0x80 - 0x7C - sizeof(void*)];
+    char pad7C[0x80 - 0x7C - RW_PTR_SIZE];
     char * unk_80;
-    char pad80[0x84 - 0x80 - sizeof(char*)];
+    char pad80[0x84 - 0x80 - RW_PTR_SIZE];
     s32 unk_84;
 };
 struct ObjRecAt18V1;
