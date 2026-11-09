@@ -107,3 +107,66 @@ short; fix in gendata or after r1's struct work).
   copy; it swaps only when `T2Audio_SoundDataIsHostOrder` says the copy is still big-endian
   (top ISet count read natively != 2), so r2's pre-swapped unit passes through untouched.
 - The wave table stays raw bytes in both (VADPCM is byte data).
+
+## 8. Round 4 (s4): the sound world and the synthesizer typed
+
+The game path now runs: `turok2 --game --audio` mixes a frame per retrace through mode 0 and a
+sound effect played through the game's API comes out of the mixer (STATUS.md, part s4).
+
+What was wrong was not the converted bank or the interpreter but the game's C between them:
+the sound world (Rage Wars' audio code) and most of libaudio's synthesizer were imported with
+N64-offset views. Two port files hold the typed versions; the originals are listed in
+`port/cmake/link.cmake` and stay out of the link:
+
+- `port/audio/t2audio_world.c` (81 functions): CAudioWorld (StartVoice, StopHandle, PlayLayer,
+  PlaySound, PlaySoundIndex, Update, the one-liners with N64 offsets), SndVoice (InitPitch,
+  InitVolume, InitPan, Setup, Update, UpdatePan, Set*/Get*/Play/Stop/Release), SndVoicePool
+  (FindSlot, AllocVoice, ...), SndQueue (Add, Update, RequeueVoice, InitNode), SndSeq (Update,
+  UpdateFade, SelectSong, Duck/Unduck/Stop/Load/...), the speech player (on `SndFx`, named
+  through `T2SpeechPlayer`), LoopSounds (on `LoopSounds`, now with its paused word),
+  `Sound__IsPlaying` (declared void in the game: its result is CountHandleVoices' v0).
+  Each function's comment names the N64 offsets it replaces. Things the views hid:
+  big-endian halves (`((u8 *)&pan)[1]`, `*(u16 *)(m + 0x132)`, `volume.h.lo`), floats passed
+  as int bits (`alSndpSetPitch`), arguments m2c dropped (StartVoice passes PlayLayer's
+  position to RequeueVoice in a3), functions declared void that return a value.
+- `port/audio/t2audio_lib.c`: libaudio's synthesizer driver (`alSynAddPlayer`,
+  `__nextSampleTime`, `_timeToSamples*`, `_collectPVoices`, `_allocatePVoice`, `_freePVoice`),
+  the voice calls (`alSynSet*`, `alSynStartVoice`, `alSynStopVoice`, `alSynFreeVoice`), the
+  event helpers (`alEvtqFlush`, `alEvtqFlushType`, `_removeEvents`), the filter constructors
+  that stored function pointers as s32 (`alFilterNew`, `alSaveNew`, `alSaveParam`),
+  `alResampleParam`, the CSP API posts (`alCSPSetSeq/Bank/Vol/ChlFXMix/Play/Stop`,
+  `alCSPGetState`) and the codebook cache (`AudioDMA_CacheBlock`, aged by
+  `T2Audio_DmaCacheAge` from t2audio_mgr.c as `__amMain` did).
+
+In the game's own files, under `TARGET_PORT`: `FloatToHalf` (the float's top half),
+`alFxPull`/`_doModFunc` (u32 delays negated as s32). Headers: `ALParam` gets a host pad (the
+start-voice update casts from it carry a pointer), `ALSave.dramout`, `SndSeq.unkC` and
+`SndSource.flags` are `sptr`, `LoopSounds.m_Paused` (0x28).
+
+### Verifying
+
+```sh
+# mode 0 with sound, its output as a WAV and a one-line summary (peak, rms, non-zero samples)
+turok2 --archive ... --rom baserom.us.z64 --game --wav m0.wav --frames 300
+# debug hooks (game.cpp): T2_TEST_SFX=<id> -> Sound__Play2D(id) at frame 30,
+# T2_TEST_SONG=<n> -> Music_SetTrack(n) at frame 60; both set the volume options to 0xC0
+# when they are still 0 (they are, before the settings load)
+T2_TEST_SFX=300 turok2 ... --wav sfx.wav --frames 300
+```
+
+Mode 0 alone is silent (volume options 0, nothing played). With `T2_TEST_SFX=300` (under gdb)
+the sound is there: per 10-frame window peaks 0, 0, 1021, 1029, 1037, ...; peak 1037, rms 88.
+
+### Open
+
+1. Without gdb (ASLR on) the playing sound crashes in `t2asp.c` `cmd_adpcm` writing the ADPCM
+   state to `ram(w1)`: check the addresses `alAdpcmPull`/`_decodeChunk` hand
+   `osVirtualToPhysical` (a pointer above 4 GB, or the loop state).
+2. Music: the compressed sequence player is still m2c (`__CSPVoiceHandler`,
+   `__CSPSetUsptFromTempo` crashes first, `__CSPHandleNextSeqEvent`, `__CSPHandleMIDIMsg`,
+   `__CSPRepostEvent`, `alCSeq*`): type them from libultra's csplayer.c/cseq.c like
+   t2audio_lib.c does.
+3. Speech (adec streams: `SpeechPlayer_Update` state 1, `adecStreamOpen`, `D_800F55F4`) is
+   stubbed.
+4. macOS: `osVirtualToPhysical` addresses (section 2) and the s32 pointer arguments still in
+   the game's libaudio files that are typed but take `s32` (e.g. `alLoadNew`'s heap).

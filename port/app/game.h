@@ -13,6 +13,7 @@ struct T2GameArgs {
     int frames = 60;    // host frames (VI retraces) to run
     bool draw = false;  // hand the game's display lists to Fast3D
     int audio = 0;      // --audio: the game's sound (docs/port/AUDIO.md) through LUS's AudioPlayer
+    std::string wav;    // --wav <file>: also write the mixed output (stereo s16, the synthesizer's rate) as a WAV
     int lowMemory = 0;  // game memory below 2 GB (Linux bring-up aid)
     int verbose = 0;
     int pakMode = 0;        // T2_PAK_FILE / T2_PAK_BLANK / T2_PAK_NONE (t2port.h, docs/port/INPUT.md)

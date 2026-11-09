@@ -135,6 +135,7 @@ struct Args {
     bool game = false;
     bool draw = false;
     bool audio = false;
+    std::string wav;      // --wav <file>: the game's mixed audio output as a WAV (implies --audio)
     bool verbose = false;
     int pakMode = 0;
     std::string pakDir;
@@ -168,6 +169,9 @@ Args ParseArgs(int argc, char** argv) {
             a.draw = true;
         } else if (s == "--audio") {
             a.audio = true;
+        } else if (s == "--wav" && i + 1 < argc) {
+            a.wav = argv[++i];
+            a.audio = true;
         } else if (s == "--verbose") {
             a.verbose = true;
         } else if (s == "--skip-pak-check") {
@@ -186,7 +190,7 @@ Args ParseArgs(int argc, char** argv) {
             a.input = argv[++i];
         } else {
             fprintf(stderr, "usage: %s [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]\n"
-                            "          [--game [--draw] [--audio] [--verbose] [--high-memory]\n"
+                            "          [--game [--draw] [--audio] [--wav out.wav] [--verbose] [--high-memory]\n"
                             "                  [--no-pak | --pak-blank | --pak-dir DIR]\n"
                             "                  [--input BUTTON@FRAME,...] [--skip-pak-check] [--start-mode N]]   (the last three: debug only)\n",
                     argv[0]);
@@ -423,6 +427,7 @@ int main(int argc, char** argv) {
         g.frames = args.frames;
         g.draw = args.draw;
         g.audio = args.audio;
+        g.wav = args.wav;
         g.lowMemory = args.lowMemory;
         g.verbose = args.verbose;
         g.pakMode = args.pakMode;
