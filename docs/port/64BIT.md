@@ -278,3 +278,82 @@ Size: about 20 code sites + 2 unions; none in the hot render/asset paths except 
 - Name the `unk` bytes of `swap_spec.json` that sit in code-read structs (collision regions,
   particle distance/motion) before trusting them on little-endian; check for `(u32 *)` reads of
   u16 pairs there.
+
+---
+
+## Part 1 done (Phase 7 round 2, q3): `sptr`/`uptr`, canonical prototypes
+
+Everything below is byte-identical on N64: `python tools/asm_diff.py --base 55932a88` reports
+`3938 files against 55932a88: 0 differ or fail` after every commit, and the port's
+`turok2_game` still builds with 0 errors.
+
+**Types.** `include/common.h` now has `sptr` / `uptr`: `s32` / `u32` on N64, `__INTPTR_TYPE__` /
+`__UINTPTR_TYPE__` under `TARGET_PORT`. Used so far in `CCache__Request(..., sptr owner, ...)` and
+`CCacheEntry.notifyId` (a message that is a small integer or a pointer). Real pointer types where the
+value is always an address: the CList functions (func_00200518..00200A9C) take and walk `void *`
+nodes (`*(void **)((u8 *)node + off)`), `CISet__GetBlock` is `void *(void *, s32)`,
+`CCache__Deallocate(s32, void *handle)`, `CCache__Request`'s name argument is `char *`.
+
+**Canonical prototypes.** `tools/port/genprotos.py` writes `include/protos/<group>.h` from the
+DEFINITIONS and moves the callers onto it:
+
+```
+python3 tools/port/genprotos.py gen   [GROUP ...]    # rewrite the headers
+python3 tools/port/genprotos.py apply [GROUP ...] --base 55932a88
+```
+
+`apply` drops each file's file-scope declarations of the group's functions, includes the header
+(and drops a file's own copies of the common.h scalar typedefs), runs `tools/asm_diff.py` on the
+edited files and puts back every file whose N64 code changes or that stops compiling. The header
+names struct types by tag with a forward declaration (`struct CMemEntry *`), so it pulls in no
+struct header and cannot clash with a file's local structs; a pointer to a type it cannot name is
+`void *`; a by-value struct (`CVector3`) brings its `structs/` header. `_2` copies are left out
+(module 2 is not linked on the host). `ultra.h` is written by hand with the SDK's types
+(`OSMesgQueue *`, `OSMesg`, `u32 osVirtualToPhysical(void *)`): the libultra definitions in
+`src/us/code` are partly m2c-typed and the port replaces them anyway.
+
+| header | functions | files that include it | put back (N64 code would change / no longer compiles) |
+|---|---:|---:|---:|
+| list.h (CList) | 12 | 98 | 6 |
+| iset.h (CISet, CUSet) | 12 | 143 | 19 |
+| cache.h (CCache) | 50 | 151 | 45 |
+| scene.h (CScene) | 101 | 262 | 55 |
+| ai.h (CAI__SetMode, AI_PickAnimFromTable, AI_TurnClamped, AI_PlayAnim, CAI__CallHurt) | 5 | 365 | 15 |
+| menu.h (MenuPool_OpenMenu/OpenChildMenu, Menu_StepValue) | 3 | 88 | 1 |
+| player.h (CPlayerPool__GetIndex/GetFirstActive, CPlayer__StartDeathCinema/SetState) | 4 | 101 | 2 |
+| game.h (LoopSounds_Get, CParticleSystem__Spawn, GameObject_FireTriggers, ...) | 7 | 97 | 5 |
+| ultra.h (hand-written, 37 libultra entry points) | 37 | 152 | 20 |
+
+1,217 distinct C files include at least one header. The put-back files are listed by `apply`;
+the usual causes: the file dereferences the result through its own typed declaration
+(`*CISet__GetBlock(...)` with a local `s32 *` prototype: "void value not ignored"), a declaration
+inside a function or spread oddly (conflicting types), an `s16`/`u8` parameter or a float argument
+that changes the call's code, a local typedef of a struct the header names differently.
+
+**Measured with `tools/port/audit64.py`** (now compiled with `-DTARGET_PORT=1` so `sptr` is
+pointer-sized, `sptr`/`uptr` counted as pointer-sized, and the gitignored, unused
+`include/functions.h` left out of the census: it was what made the first census say 1,100
+functions / 2,681 declarations):
+
+| | 55932a88 | now |
+|---|---:|---:|
+| functions with a declaration that disagrees pointer vs 32-bit integer | 540 | 484 |
+| such declarations (silent truncation at a call on 64-bit) | 2,073 | **1,064** |
+| ... of them for the 25 worst functions of 55932a88 | 938 | 197 (of which 140 are the libultra `__osContRam*` and module-2 `_2` copies) |
+| pointer-width warnings (clang, x86_64) | 1,939 | 2,996 |
+
+The warning count goes **up** on purpose: a caller that held a pointer in `s32` and called through
+its own `s32` prototype truncated silently; with the real prototype the same truncation is now a
+`-Wint-conversion` warning at the call (`CAI__SetMode(s32var, ...)`, `x = CISet__GetBlock(...)` into
+an `s32`). Those warnings are the work list for part 2 (retype the callers' variables).
+
+**Not done yet (part 2):**
+- the callers' `s32` variables and casts (`warnings.json` lists them; each is an `sptr` or a real
+  pointer type, asm_diff per file);
+- the 39 `CList__Construct(list, 0x18, 0x1C)` sites with literal link offsets
+  (`offsetof` under `TARGET_PORT`);
+- `CCache__Allocate`'s last argument (a name string held as `s32` through
+  `CCache__AllocateInternal`), the CPlayerPool / CCache definitions that use file-local struct
+  types (their own files are put back: the header says `void *`);
+- the put-back files above, by hand (mostly a cast at a dereference);
+- more groups: extend `GROUPS` in genprotos.py (subsystem regex) and run `apply`.
