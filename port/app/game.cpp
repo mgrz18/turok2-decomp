@@ -134,6 +134,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     // T2_SHOT_EVERY=<n> (with T2_SHOT=<file.ppm>): also write <file>.<frame>.ppm every n frames
     const char* shotEnv = getenv("T2_SHOT_EVERY");
     const int shotEvery = shotEnv != nullptr ? atoi(shotEnv) : 0;
+    int nextShot = shotEvery;
     auto t0 = std::chrono::steady_clock::now();
     for (int f = 0; f < args.frames && (!window || window->IsRunning()); f++) {
         if (window) {
@@ -173,7 +174,8 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             }
             if (window->DrawAndRunGraphicsCommands((Gfx*)task.dataPtr, {})) {
                 drawn++;
-                if (const char* shot = getenv("T2_SHOT"); shot != nullptr && shotEvery > 0 && (f + 1) % shotEvery < 2) {
+                if (const char* shot = getenv("T2_SHOT"); shot != nullptr && shotEvery > 0 && f + 1 >= nextShot) {
+                    nextShot = (f + 1) / shotEvery * shotEvery + shotEvery; // the first drawn frame of each period
                     std::string name = std::string(shot) + "." + std::to_string(f + 1) + ".ppm";
                     WriteShot(window, name.c_str());
                 }
