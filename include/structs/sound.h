@@ -124,7 +124,7 @@ typedef struct {
     /* 0x08 */ s32 *data;
     /* 0x0C */ s32 unkC;
     /* 0x10 */ void *unk10;
-    /* 0x14 */ s32 csp;        /* compressed sequence player (alCSPSetVol) */
+    /* 0x14 */ sptr csp;       /* compressed sequence player (alCSPSetVol) */
     /* 0x18 */ s32 unk18;
     /* 0x1C */ u32 flags;      /* 0x2 fading out, 0x4 faded out */
     /* 0x20 */ union {

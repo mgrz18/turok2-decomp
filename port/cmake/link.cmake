@@ -94,6 +94,17 @@ set(T2_LINK_REPLACED
     func_0026FD4C.c   # __amDmaNew
     func_0026FD88.c   # __amHandleFrameMsg
     func_002700D0.c   # __amDMA
+    # the sound player API (m2c views with N64 offsets): port/audio/t2audio_sndp.c
+    func_00293470.c   # alSndpAllocate
+    func_00293530.c   # alSndpDeallocate
+    func_00293580.c   # alSndpGetState
+    func_00293CE0.c   # alSndpPlay
+    func_00293D40.c   # alSndpSetFXMix
+    func_00293D90.c   # alSndpSetPan
+    func_00293DE0.c   # alSndpSetPitch
+    func_00293E60.c   # alSndpSetSound
+    func_00293E70.c   # alSndpSetVol
+    func_00293EC0.c   # alSndpStop
 )
 
 # True if NAME (a src/us/code file name) is module 2 (.virtual_1).

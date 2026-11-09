@@ -1,14 +1,24 @@
 #include "common.h"
 
 /* A bump allocator over a buffer. */
+#ifdef TARGET_PORT
+/* the host layout of ALHeap (structs/libaudio.h) */
+typedef struct {
+    /* 0x0 */ sptr base;            /* 16-byte aligned */
+    /* 0x4 */ sptr cur;
+    /* 0x8 */ s32 size;
+    /* 0xC */ s32 count;
+} Arena;
+#else
 typedef struct {
     /* 0x0 */ s32 base;             /* 16-byte aligned */
     /* 0x4 */ s32 cur;
     /* 0x8 */ s32 size;
     /* 0xC */ s32 count;
 } Arena;
+#endif
 
-void alHeapInit(Arena *arg0, s32 arg1, s32 arg2) {
+void alHeapInit(Arena *arg0, sptr arg1, s32 arg2) {
     s32 temp_v1;
 
     temp_v1 = 0x10 - (arg1 & 0xF);

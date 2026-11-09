@@ -1,16 +1,17 @@
 #include "common.h"
 #include "ultra_types.h"
+#include "structs/sound.h"
 #include "protos/ultra.h"
 
 s32 __osDisableInt();                                /* extern */
 s32 __osRestoreInt(s32);                         /* extern */
 
-void CAudioWorld__Lock(s32 arg0) {
+void CAudioWorld__Lock(CAudioWorld *arg0) {
     s32 temp_a0;
     s32 temp_v1;
     CMutex *temp_s0;
 
-    temp_s0 = (CMutex *) (arg0 + 0x110);
+    temp_s0 = &arg0->lock;
     temp_a0 = __osDisableInt();
     temp_v1 = temp_s0->count + 1;
     temp_s0->count = temp_v1;
