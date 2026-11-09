@@ -1670,9 +1670,18 @@ s32 MenuPool_CountOpen(MenuPool *arg0) {
 }
 
 /* ---------------- MenuPool_GetCamera ---------------- */
+#ifdef TARGET_PORT
+/* The port: the pool is the main camera's m_MenuPool, at its host offset (a pointer-wide
+ * address: the N64 0x53C put the menus' camera, and with it their viewport, 44 bytes into the
+ * camera's start). */
+sptr MenuPool_GetCamera(sptr arg0) {
+    return arg0 - T2_OFFSETOF(CCamera, m_MenuPool);
+}
+#else
 s32 MenuPool_GetCamera(s32 arg0) {
     return arg0 - 0x53C;
 }
+#endif
 
 /* ---------------- MenuPool_CloseAll ---------------- */
 /* WRONG CUT: real function 0x00416B30, size 0x7C (through 0x00416BAC): splat cut the loop
