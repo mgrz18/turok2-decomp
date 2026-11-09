@@ -102,6 +102,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     const void* lastDL = nullptr;
     const char* dumpAtEnv = getenv("T2_DLDUMP_AT");
     const int dumpAt = dumpAtEnv != nullptr ? atoi(dumpAtEnv) : 0;
+    bool dumped = false;
     auto t0 = std::chrono::steady_clock::now();
     for (int f = 0; f < args.frames && (!window || window->IsRunning()); f++) {
         if (window) {
@@ -121,9 +122,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         const bool got = T2Port_TakeGfxTask(&task) && args.draw && task.dataPtr != nullptr;
         if (got) {
             lastDL = task.dataPtr;
-            // T2_DLDUMP_AT=<frame>: dump this frame's display list now, before the game runs
-            // again (no window needed: macOS has no headless GL, MACOS.md)
-            if (dumpAt == f + 1) {
+            // T2_DLDUMP_AT=<frame>: dump the first display list from that frame on, now, before
+            // the game runs again (no window needed: macOS has no headless GL, MACOS.md)
+            if (dumpAt > 0 && f + 1 >= dumpAt && !dumped) {
+                dumped = true;
                 int budget = 4000;
                 printf("dl: frame %d\n", f + 1);
                 DumpDL((const uintptr_t*)lastDL, 0, &budget);
