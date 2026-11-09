@@ -1,6 +1,7 @@
 /* WRONG CUT: the real function starts at 0x0045C688 (size 0x118 = 280): splat
  * cut its first two words (lui/lw gPakMenuAnyPak) as DamagedPakMenu_SelectRetry_2. */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
@@ -31,7 +32,7 @@ s32 DamagedPakMenu_SelectRetry_2(void *arg0, Menu *event) {
     gPakMenuLeaving = 1;
     if (PakMenu_CheckPak_2(event, mode, 1) != 0) {
         if (event->player != NULL) {
-            menu = (u8 *)event->player->m_pCamera + 0x53C;
+            menu = (u8 *)event->player->m_pCamera->m_MenuPool;
         } else {
             menu = &gEngineApp_m_Game_m_MenuPool;
         }

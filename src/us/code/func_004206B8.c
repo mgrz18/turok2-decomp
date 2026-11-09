@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/game.h"
 #include "structs/player.h"
 #include "structs/menu.h"
@@ -47,7 +48,7 @@ s32 CharNoteMenu_SelectYes(s32 unused, Menu *own) {
         own->player = plr;
         O01Restore(plr);
         CPlayer__SetCharacter(plr, gPakProfileRead_character[0]);
-        MenuPool_OpenChildMenu((u8 *)plr->m_pCamera + 0x53C, own, (u8 *)&gPlayerSetupMenuDesc);
+        MenuPool_OpenChildMenu((u8 *)plr->m_pCamera->m_MenuPool, own, (u8 *)&gPlayerSetupMenuDesc);
         return 1;
     }
     if (Pak_DeleteNote(pad, gPakNoteIndex) == 0) {

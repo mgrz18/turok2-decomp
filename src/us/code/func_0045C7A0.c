@@ -1,5 +1,6 @@
 /* Second-module copy of DamagedPakMenu_SelectContinue (first module; this one at link address 0x004237A0), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
@@ -17,7 +18,7 @@ s32 DamagedPakMenu_SelectContinue_2(s32 unused, Menu *event) {
         gPakCheckDone = 1;
     } else {
         if (event->player != NULL) {
-            dst = (char *)event->player->m_pCamera + 0x53C;
+            dst = (char *)event->player->m_pCamera->m_MenuPool;
         } else {
             dst = &gEngineApp_m_Game_m_MenuPool;
         }

@@ -9,6 +9,7 @@
  * (its loop-end note stops cse1, but cse2 runs after loop and ignores it). Twin of PakMenu_InitSaveGame_2 (same C). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00406F7C.c, func_00406F7C, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/save.h"
@@ -55,7 +56,7 @@ void PakMenu_InitSaveGame(Menu *own) {
     if (gDamagedPakContinued != 0) {
         p = plr;
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, &gSavePortalMenuDescB, p, p->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu((u8 *)p->m_pCamera->m_MenuPool, &gSavePortalMenuDescB, p, p->m_ContState.m_pContState, NULL);
         gCameraPoolHideViews = 0;
     } else {
         Pak_ProbeSlot(own->controller->port);
@@ -75,11 +76,11 @@ void PakMenu_InitSaveGame(Menu *own) {
 
             gPakMenuLeaving = one;
             if (Pak_IsRumblePak(sel.v) != 0) {
-                MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, &gPakMsgInsertToSaveDesc, p, p->m_ContState.m_pContState, (void *)one);
+                MenuPool_OpenMenu((u8 *)p->m_pCamera->m_MenuPool, &gPakMsgInsertToSaveDesc, p, p->m_ContState.m_pContState, (void *)one);
             } else if (Pak_NeedsRepair(sel.v) != 0) {
                 MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gDamagedPakAtBootMenuDesc, p, p->m_ContState.m_pContState, &gPakSaveGameMenuDesc);
             } else {
-                MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, &gPakMsgPakNotFoundDesc, p, p->m_ContState.m_pContState, &gSavePortalMenuDescB);
+                MenuPool_OpenMenu((u8 *)p->m_pCamera->m_MenuPool, &gPakMsgPakNotFoundDesc, p, p->m_ContState.m_pContState, &gSavePortalMenuDescB);
             }
         }
     }
