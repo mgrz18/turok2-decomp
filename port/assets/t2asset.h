@@ -9,7 +9,7 @@
  *            unpacked. Read through miniz here; libultraship's ArchiveManager can
  *            replace it later through T2Asset_SetBackend.
  *   rom      the user's ROM image itself (bring-up / development): units are read
- *            straight from the image and RNC streams are unpacked on read (rnc.c).
+ *            straight from the image and RNC streams are unpacked on read (port/assets/rnc.c).
  *
  * Both return the same bytes for every load unit: the ROM bytes, RNC-unpacked where
  * the unit is one RNC stream, still big-endian. Byte swapping for little-endian hosts

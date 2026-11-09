@@ -10,7 +10,7 @@ Everything here is read off the C (docs/assets/MODELS.md has the format and the 
                  RNC-packed geometry: CLevelActor__LoadGeometry, Render_QueueModelByKey).
   * geometry   : Model_DecompressCallback* -> Model_Decompress (src/us/code/func_00209AF4.c).
   * materials  : Material_Unpack (func_0026D070.c), Render_SetupMaterial (func_00207FEC.c).
-The locator part (Rom, on top of tools/assets/romfs.py; RNC through propack.py) is separate from
+The locator part (Rom, on top of tools/assets/romfs.py; RNC through rnc.py) is separate from
 the parser (parse_geometry()). Texture previews use tools/assets/textures.py's decoder and the
 bind pose of animated models uses tools/assets/anim.py (--pose).
 """

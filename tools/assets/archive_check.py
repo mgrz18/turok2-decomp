@@ -27,7 +27,7 @@ import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mkarchive  # noqa: E402
-import propack  # noqa: E402
+import rnc  # noqa: E402
 import romfs  # noqa: E402
 import romid  # noqa: E402
 
@@ -113,15 +113,15 @@ def check(archive, rom_path, folder=None, log=print):
             err("%s: size %d / %d bytes / manifest %d" % (name, size, len(data), r["host_size"]))
         k = r["key"]
         if r["flags"] & romfs.UF_RNC_UNPACKED:
-            hd = propack.header(rom, k)
+            hd = rnc.header(rom, k)
             if 18 + hd["packed"] > r["size"]:
                 err("%s: RNC stream longer than its slot" % name)
-            if len(data) != hd["unpacked"] or propack.crc16(data) != hd["crc_unpacked"] \
-                    or data != propack.decompress(rom, k):
+            if len(data) != hd["unpacked"] or rnc.crc16(data) != hd["crc_unpacked"] \
+                    or data != rnc.decompress(rom, k):
                 err("%s: unpacked bytes differ from the RNC stream" % name)
             n_rnc += 1
         else:
-            if propack.is_rnc(rom, k):
+            if rnc.is_rnc(rom, k):
                 err("%s: RNC stream stored packed" % name)
             if data != rom[k:k + r["size"]]:
                 err("%s: bytes differ from ROM 0x%X+0x%X" % (name, k, r["size"]))
