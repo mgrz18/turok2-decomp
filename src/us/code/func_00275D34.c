@@ -18,7 +18,7 @@ s32 LoopSounds_Stop(void *arg0, void *arg1) {
             if (var_s0 == arg1) {
                 Sound__Stop(((SoundSourceNode *)var_s0)->value);
                 sLoopSoundsLastStopped = ((SoundSourceNode *)var_s0)->value;
-                CList__Remove(&((SoundVoicePool *)arg0)->playing, (s32)var_s0);
+                CList__Remove(&((SoundVoicePool *)arg0)->playing, (sptr)var_s0);
                 CList__AddTail(arg0, var_s0);
                 return 1;
             }

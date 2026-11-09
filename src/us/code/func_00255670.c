@@ -26,9 +26,9 @@ void PlayerJump_Update(CPlayer *arg0, MoveState *arg1) {
         var_f2 = 481.28f;
     }
     if (!(arg0->m_ContState.m_dwButtons & 0x10) || (arg0->m_ModeTime >= 3.0f)) {
-        CPlayer__SetState((s32) arg0, (s32) arg1, 5);
+        CPlayer__SetState(arg0, arg1, 5);
     } else {
         arg1->speed = (f32) (var_f2 * arg1->def->speed);
     }
-    PlayerFall_Update((s32) arg0, (s32) arg1);
+    PlayerFall_Update((sptr) arg0, (sptr) arg1);
 }

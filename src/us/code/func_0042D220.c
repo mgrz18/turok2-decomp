@@ -33,13 +33,13 @@ void CParticleSystem__Construct(CParticleSystem *sys, s32 arg1) {
         sys->m_ParticleVars[i].m_pLoopSound = NULL;
         sys->m_ParticleVars[i].m_pActiveList = NULL;
     }
-    CList__Construct(&sys->m_FreeList, 0x1C4, 0x1C8);
+    CList__Construct(&sys->m_FreeList, T2_OFFSETOF(CParticle, m_pLast), T2_OFFSETOF(CParticle, m_pNext));
     for (i = 0; i < 128; i++) {
         CList__AddTail(&sys->m_FreeList, &sys->m_ParticleVars[i]);
     }
-    CList__Construct(&sys->m_DrawList, 0x1CC, 0x1D0);
+    CList__Construct(&sys->m_DrawList, T2_OFFSETOF(CParticle, m_pDrawLast), T2_OFFSETOF(CParticle, m_pDrawNext));
     for (i = 0; i < 3; i++) {
-        CList__Construct(&sys->m_ActiveList[i], 0x1C4, 0x1C8);
+        CList__Construct(&sys->m_ActiveList[i], T2_OFFSETOF(CParticle, m_pLast), T2_OFFSETOF(CParticle, m_pNext));
     }
     func_0027BD10(&gParticleIntelligence);
     for (j = 0; j < 4; j++) {

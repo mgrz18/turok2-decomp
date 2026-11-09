@@ -26,7 +26,7 @@ void func_00238500(void *unused, ShotActor *actor, CVector3 pos, CVector3 dir, s
     CVector3 p;
     CVector3 origin;
     CQuaternion q;
-    s32 arg;
+    sptr arg;
     CPlayer *pl;
 
     pl = actor->player;

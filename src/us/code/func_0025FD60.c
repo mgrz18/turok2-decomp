@@ -11,6 +11,6 @@ void EnemyMode_FeignDeath_Update(s32 arg0, CAI *ai) {
         if (ai->m_Health != 0) {
             var_a2 = 0x1E;
         }
-        CAI__SetMode(arg0, (s32) ai, var_a2);
+        CAI__SetMode(arg0, ai, var_a2);
     }
 }

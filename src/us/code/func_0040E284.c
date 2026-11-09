@@ -5,6 +5,6 @@
 
 void BlindOne_ActorAttack3Update(s32 arg0, CAI *ai) {
     if (ai->m_AnimRepeatedCount != 0) {
-        CAI__SetMode(arg0, (s32) ai, 2);
+        CAI__SetMode(arg0, ai, 2);
     }
 }

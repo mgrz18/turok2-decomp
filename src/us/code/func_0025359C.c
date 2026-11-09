@@ -28,7 +28,7 @@ void func_0025359C(List002534E0 *arg0) {
     var_s0 = arg0->head;
     if (var_s0 != NULL) {
         do {
-            RumblePool_FreeAll((s32) var_s0->attached->sub140);
+            RumblePool_FreeAll((sptr) var_s0->attached->sub140);
             var_s0->attached->unkD0 = 0;
             var_s0 = var_s0->next;
         } while (var_s0 != NULL);

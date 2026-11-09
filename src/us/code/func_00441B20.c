@@ -12,7 +12,7 @@ typedef struct {
     /* 0x14 */ s32 unk14;
 } ObjState;
 
-s32 CGameObjectInstance__PickRandomAnim(s32, s32, s32);
+sptr CGameObjectInstance__PickRandomAnim(s32, sptr, sptr);
 s32 COnScreen__SetBoss(s32, s32, s32);
 s32 TotemDefense_DrawTotem_2(s32, s32, s32);
 
@@ -26,7 +26,7 @@ void TotemDefense_InitFight_2(ObjState *arg0, CGameObjectInstance *arg1)
   CGameObjectInstance *temp_s0;
   int new_var;
   arg0->obj = arg1;
-  arg0->info = (s32) &arg1->header.m_pIntelligence->m_Destructible;
+  arg0->info = (sptr) &arg1->header.m_pIntelligence->m_Destructible;
   new_var = arg1->header.m_pIntelligence->m_Destructible.m_TotemMissionDuration * 0xF;
   arg0->unk8 = 0;
   arg0->unk10 = 0;
@@ -35,10 +35,10 @@ void TotemDefense_InitFight_2(ObjState *arg0, CGameObjectInstance *arg1)
   temp_s0 = arg0->obj;
   arg0->unk14 = 0;
   temp_a3 = &temp_s0->m_AI;
-  temp_a3->m_AnimIndex = CGameObjectInstance__PickRandomAnim((s32) temp_s0, 0x5334, -1);
+  temp_a3->m_AnimIndex = CGameObjectInstance__PickRandomAnim((sptr) temp_s0, 0x5334, -1);
   temp_a3->m_AnimType = 0x5334;
   temp_s0->m_AI.m_dwFlags = temp_s0->m_AI.m_dwFlags & (~1);
   temp_a3->m_AnimRepeatedCount = 0;
-  COnScreen__SetBoss((s32) &gEngineApp_m_OnScreen, (s32) arg1, (s32) D_800C0560);
+  COnScreen__SetBoss((sptr) &gEngineApp_m_OnScreen, (sptr) arg1, (sptr) D_800C0560);
   COnScreen__SetBoss2(&gEngineApp_m_OnScreen, arg1, D_800C0568);
 }

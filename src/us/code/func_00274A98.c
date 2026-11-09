@@ -9,7 +9,7 @@ s32 SndVoicePool_ReleaseVoice(SndVoicePool *p, s16 idx) {
     SndVoice *v;
     CAudioWorld *m;
     SndCore *c;
-    (v) = (SndVoice *)((idx) * 0xCC + (u32)(p)); (v) = (SndVoice *)((u8 *)(v) + 4);
+    (v) = (SndVoice *)((idx) * 0xCC + (uptr)(p)); (v) = (SndVoice *)((u8 *)(v) + 4);
     m = v->mgr;
     c = (SndCore *)((u8 *)m + 0x7C);
     alSndpDeallocate(&m->player, c->snd[v->index]);

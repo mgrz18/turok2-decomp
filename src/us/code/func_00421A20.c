@@ -7,5 +7,5 @@ void Controller_UnwatchPak(s32);
 
 void func_00421A20(s32 arg0, s32 arg1) {
     Controller_UnwatchPak(arg1);
-    CScene__RequestWarp((s32) &gScene, gScene_m_PendingWarpID, 2);
+    CScene__RequestWarp(&gScene, gScene_m_PendingWarpID, 2);
 }

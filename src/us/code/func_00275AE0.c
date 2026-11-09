@@ -1,12 +1,12 @@
 #include "common.h"
 #include "globals/audio.h"
 
-s32 CAudioWorld__SetListener(s32 *, s32);              /* extern */
+s32 CAudioWorld__SetListener(s32 *, sptr);              /* extern */
 
 #ifdef TARGET_PORT
 int T2Port_AudioReady(void);
 #endif
-void Sound__SetListener(s32 arg0) {
+void Sound__SetListener(sptr arg0) {
 #ifdef TARGET_PORT /* no sound bank on the host yet: audio off (port/game/t2audio.c) */
     if (!T2Port_AudioReady()) {
         return;

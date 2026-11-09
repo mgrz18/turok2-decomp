@@ -31,7 +31,7 @@ static __inline__ void alCSeqNew(ALCSeq *seq, u8 *ptr) {
         if (tmpOff) {
             flagTmp = 1 << i;
             seq->validTracks |= flagTmp;
-            seq->curLoc[i] = (u8 *)((u32)ptr + tmpOff);
+            seq->curLoc[i] = (u8 *)((uptr)ptr + tmpOff);
             seq->evtDeltaTicks[i] = __readVarLen(seq, i);
         } else {
             seq->curLoc[i] = 0;

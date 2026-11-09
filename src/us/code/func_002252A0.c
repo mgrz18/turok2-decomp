@@ -24,7 +24,7 @@ void CScene__FireEventsByKeyOnce(void *arg0, s32 arg1)
     {
       if ((*((u8 *) (((s8 *) var_s1) + 0xF))) == var_s3)
       {
-        func_0026E294((s32) var_s1);
+        func_0026E294((sptr) var_s1);
       }
       var_s0 -= 1;
       var_s1 += 0x14;
@@ -42,7 +42,7 @@ void CScene__FireEventsByKeyOnce(void *arg0, s32 arg1)
     {
       if ((*((u8 *) (((s8 *) var_s1) + 0xF))) == var_s3)
       {
-        func_0026E294((s32) var_s1);
+        func_0026E294((sptr) var_s1);
       }
       var_s0 -= 1;
       var_s1 += 0x14;

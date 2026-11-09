@@ -5,5 +5,5 @@
 
 
 void EnemyAnim_ViolentDeath_B0270(CGameObjectInstance *obj, s32 arg1) {
-    AI_PickAnimFromTable((s32) obj, arg1, (s32) sEnemyAnimViolentDeath_B0270, obj->header.m_pIntelligence->m_Enemy.m_wViolentDeathAnimFlags);
+    AI_PickAnimFromTable((sptr) obj, arg1, sEnemyAnimViolentDeath_B0270, obj->header.m_pIntelligence->m_Enemy.m_wViolentDeathAnimFlags);
 }

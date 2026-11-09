@@ -17,7 +17,7 @@ extern void __osRestoreInt(u32 mask);
 extern s32 Random_Next(void);
 extern f32 Random_Float(f32 range);
 extern s32 BinaryRange(void *ranges, s32 count, s16 id, s32 *lo, s32 *hi);
-extern void CAudioWorld__PlayLayer(CAudioWorld *m, void *layer, CVector3 *pos, s32 variant, s32 handle, s32 a5, s32 a6);
+extern void CAudioWorld__PlayLayer(CAudioWorld *m, void *layer, CVector3 *pos, s32 variant, s32 handle, s32 a5, sptr a6);
 
 static __inline__ void CAudioWorld_Lock(CAudioWorld *m) {
     CMutex *l = &m->lock;
@@ -43,7 +43,7 @@ static __inline__ void CAudioWorld_Unlock(CAudioWorld *m) {
     }
 }
 
-s32 CAudioWorld__PlaySound(CAudioWorld *m, s32 id, CVector3 pos, s32 a5, s32 a6) {
+s32 CAudioWorld__PlaySound(CAudioWorld *m, s32 id, CVector3 pos, sptr a5, s32 a6) {
     s32 i;
     s32 j;
     s32 busy;

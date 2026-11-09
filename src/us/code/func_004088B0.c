@@ -28,7 +28,7 @@ typedef struct {
     /* 0xF8 */ void *onEvent;
 } BossEvents;
 
-extern s8 CGameObjectInstance__PickRandomAnim(BossActor *actor, s32 anim, s32 arg2);
+extern s8 CGameObjectInstance__PickRandomAnim(BossActor *actor, sptr anim, sptr arg2);
 extern void COnScreen__SetBoss(void *hud, BossActor *actor, char *name, void *ai);
 extern void COnScreen__SetBoss2(void *hud, BossActor *actor, char *name);
 extern void TotemDefense_Update();

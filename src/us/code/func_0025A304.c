@@ -16,13 +16,13 @@ s16 EnemyAnim_PickAttack_B0A60(void *arg0, M2C_UNK arg1) {
     temp_s0 = M2C_FIELD(arg0, s32 *, 0x14) + 0x14;
     WeightedTable_Clear(sp10);
     if (M2C_FIELD(temp_s0, u16 *, 0x6A) & 0x1F) {
-        WeightedTable_Add((s32) sp10, (s32) EnemyAnim_Combat_AFE28(arg0, arg1), 0xA);
+        WeightedTable_Add((sptr) sp10, (s32) EnemyAnim_Combat_AFE28(arg0, arg1), 0xA);
     }
     if (M2C_FIELD(temp_s0, u16 *, 0x6C) & 0x1F) {
-        WeightedTable_Add((s32) sp10, (s32) EnemyAnim_Leap_AFEB8(arg0, arg1), 0xA);
+        WeightedTable_Add((sptr) sp10, (s32) EnemyAnim_Leap_AFEB8(arg0, arg1), 0xA);
     }
     if (M2C_FIELD(temp_s0, u16 *, 0x72) & 0x1F) {
-        WeightedTable_Add((s32) sp10, (s32) EnemyAnim_Weapon_B0068(arg0, arg1), 0xA);
+        WeightedTable_Add((sptr) sp10, (s32) EnemyAnim_Weapon_B0068(arg0, arg1), 0xA);
     }
-    return WeightedTable_Pick((s32) sp10);
+    return WeightedTable_Pick((sptr) sp10);
 }

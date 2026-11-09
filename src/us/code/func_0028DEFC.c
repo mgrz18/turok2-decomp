@@ -18,7 +18,7 @@ void VM_UnmapTLBEntry(Mapping *mapping) {
             goto unmap;
         }
         func_0028EE40(slot, 0, gPager_entries[slot].id << 12,
-                      ((s32)&gVMPages & 0x3FFFFFF) + (gPager_entries[slot].team << 12), -1, 7);
+                      ((sptr)&gVMPages & 0x3FFFFFF) + (gPager_entries[slot].team << 12), -1, 7);
     } else {
         gPager_entries[mapping->slot].team = 0xFF;
         slot = mapping->slot;
@@ -28,7 +28,7 @@ void VM_UnmapTLBEntry(Mapping *mapping) {
             gPager_entries[mapping->slot].id = 0xFFFF;
         } else {
             func_0028EE40(slot, 0, gPager_entries[slot].id << 12, -1,
-                          ((s32)&gVMPages & 0x3FFFFFF) + (gPager_entries[slot].slot << 12), 7);
+                          ((sptr)&gVMPages & 0x3FFFFFF) + (gPager_entries[slot].slot << 12), 7);
         }
     }
     mapping->slot = 0xFF;

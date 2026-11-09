@@ -25,7 +25,7 @@ void HostIo_MemoryTransfer(u32 mode) {
         HostIo_ScanTlb();
     }
     if (address > 0xEFFFFFFF) {
-        address += (u32) D_8F128560;
+        address += (uptr) D_8F128560;
     }
     while (remaining != 0) {
         i = 0;

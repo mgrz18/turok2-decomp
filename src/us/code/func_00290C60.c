@@ -10,9 +10,9 @@ void __CSPPostNextSeqEvent(void *arg0) {
     ALSeqPlayer *player = arg0;
     ALEvent sp10;
     s32 sp20;
-    s32 field18;
+    sptr field18;
     if (player->state == 1) {
-        field18 = (s32)player->target;
+        field18 = (sptr)player->target;
         if (field18 != 0 && (__alCSeqNextDelta(field18, &sp20) & 0xFF)) {
             sp10.type = 0;
             alEvtqPostEvent(&player->evtq, &sp10, sp20 * player->uspt);

@@ -74,11 +74,11 @@ void CScene__UpdateDelayedEvents(TimedPool *arg0) {
                 }
             }
             if (var_v1 != 0) {
-                LevelEvent_Fire((s32) temp_a0);
+                LevelEvent_Fire((sptr) temp_a0);
             }
             if (var_s1 != 0) {
-                CList__Remove((s32) &arg0->activeHead, (s32) var_s0);
-                CList__AddHead((s32) &arg0->freeHead, (s32) var_s0);
+                CList__Remove(&arg0->activeHead, var_s0);
+                CList__AddHead(&arg0->freeHead, var_s0);
             }
             var_s0 = temp_s2;
             var_s1 = 0;

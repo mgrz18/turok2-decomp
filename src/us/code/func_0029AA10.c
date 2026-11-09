@@ -3,6 +3,6 @@
 #include "globals/libultra.h"
 
 
-s32 __osViGetCurrentContext(void) {
+sptr __osViGetCurrentContext(void) {
     return __osViCurr;
 }

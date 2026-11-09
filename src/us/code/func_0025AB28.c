@@ -5,5 +5,5 @@
 
 
 void EnemyAnim_Evade_B0450(CGameObjectInstance *obj, s32 arg1) {
-    AI_PickAnimFromTable((s32) obj, arg1, (s32) sEnemyAnimEvade_B0450, obj->header.m_pIntelligence->m_Enemy.m_wEvadeAnimFlags);
+    AI_PickAnimFromTable((sptr) obj, arg1, sEnemyAnimEvade_B0450, obj->header.m_pIntelligence->m_Enemy.m_wEvadeAnimFlags);
 }

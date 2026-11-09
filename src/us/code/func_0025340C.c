@@ -6,6 +6,6 @@ typedef struct {
     /* 0x4 */ u32 base;
 } Pool0025340C;
 
-u32 CPlayerPool__GetIndex(Pool0025340C *arg0, u32 arg1) {
+uptr CPlayerPool__GetIndex(Pool0025340C *arg0, uptr arg1) {
     return (arg1 - arg0->base) / 4904;
 }

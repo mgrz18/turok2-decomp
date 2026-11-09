@@ -13,7 +13,7 @@ static __inline__ s32 __osIdCheckSum(u16 *ptr, u16 *csum, u16 *icsum) {
     u32 j;
     *csum = *icsum = 0;
     for (j = 0; j < 28; j += 2) {
-        data = *(u16 *)((u32)ptr + j);
+        data = *(u16 *)((uptr)ptr + j);
         *csum += data;
         *icsum += ~data;
     }

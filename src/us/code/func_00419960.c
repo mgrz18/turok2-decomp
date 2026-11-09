@@ -11,6 +11,6 @@ s32 QuitMenu_Yes(void) {
     Music_SetTrack(-1);
     Music_RestoreVolume();
     Music_Stop();
-    func_00430330((s32) &gEngineApp);
+    func_00430330((sptr) &gEngineApp);
     return 1;
 }

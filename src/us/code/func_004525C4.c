@@ -10,7 +10,7 @@ s32 SingleMenu_GoBack_2(s32 arg0, void *arg1)
 {
   s8 *new_var2;
   int new_var;
-  CEngineApp__SetupFadeTo((s32) (&gEngineApp), 8);
+  CEngineApp__SetupFadeTo((sptr) (&gEngineApp), 8);
   new_var2 = (s8 *) (*((void **) (((s8 *) arg1) + 0x20)));
   gInSinglePlayerMenu = 0;
   new_var = 1;

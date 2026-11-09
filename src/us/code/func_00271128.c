@@ -30,7 +30,7 @@ static __inline__ void CAudioWorld_Unlock(CAudioWorld *m) {
         __osRestoreInt(mask);
     }
 }
-void CAudioWorld__PlayLayer(CAudioWorld *m, void *rec, CVector3 *pos, s32 id, s32 token, s32 a, s32 flags);
+void CAudioWorld__PlayLayer(CAudioWorld *m, void *rec, CVector3 *pos, s32 id, s32 token, s32 a, sptr flags);
 s32 CAudioWorld__PlaySoundIndex(CAudioWorld *m, s32 id, CVector3 pos, s32 flags) {
     u32 *rec;
     u32 count;

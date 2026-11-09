@@ -67,9 +67,9 @@ void Trail_DetachOwner(R8Mgr *mgr, R8Actor *who) {
             p = e->parts;
             if (p != ((void *)0)) {
                 do {
-                    if (p->owner == (s32)who) {
+                    if (p->owner == (sptr)who) {
                         if (who != ((void *)0)) {
-                            if ((s32)who == -1) {
+                            if ((sptr)who == -1) {
                                 p->mtx[gEvenOdd] = p->mtx[gEvenOdd ^ 1];
                                 p->owner = 0;
                             } else {
@@ -97,7 +97,7 @@ void Trail_DetachOwner(R8Mgr *mgr, R8Actor *who) {
         } else if ((R8Actor *)e->owner == who) {
             if (e->flags & 2) {
               register s32 t asm("$2") = gEvenOdd;
-              register u8 *wm asm("$5") = (u8 *)((t << 6) + (s32)who);
+              register u8 *wm asm("$5") = (u8 *)((t << 6) + (sptr)who);
               __asm__("" : "+r"(wm));
               if (e->unk24 > 0.0f) {
                 wm += 0x48;

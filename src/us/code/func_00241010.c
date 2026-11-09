@@ -27,7 +27,7 @@ typedef struct {
 } Water;
 
 
-void memset(void *p, s32 c, s32 n);                 /* memset */
+void memset(void *p, s32 c, sptr n);                 /* memset */
 s32 Sweep_GetGroundBehavior(Sweep *sweep, CGameRegion *region);
 void CGameRegion__GetNormalRaw(CVector3 *normal, CGameRegion *region);        /* floor plane */
 void CGameRegion__GetCeilingNormalRaw(CVector3 *normal, CGameRegion *region);        /* ceiling plane */

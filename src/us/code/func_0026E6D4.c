@@ -5,7 +5,7 @@
 
 s32 Action_CheckRequiredItem(CGameObjectInstance *, CAI *, s32); /* extern */
 
-s32 LevelEvent_CheckRequiredItem(LevelEvent *arg0, s32 arg1) {
+s32 LevelEvent_CheckRequiredItem(LevelEvent *arg0, sptr arg1) {
     CGameObjectInstance *temp_a1;
 
     if (arg0->level == gScene.m_nLevel) {

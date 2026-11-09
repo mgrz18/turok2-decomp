@@ -5,7 +5,7 @@
 
 extern void Bits_Poke(u32 arg0, u32 arg1, u32 arg2);
 void Bits_Poke(u32 arg0, u32 arg1, u32 arg2) {
-    u32 temp_a0;
+    uptr temp_a0;
     s32 temp_v0;
     s32 temp_v0_2;
     u32 temp_a1;

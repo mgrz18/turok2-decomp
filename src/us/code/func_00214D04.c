@@ -18,8 +18,8 @@ extern s32 D_800A57F8;
 extern s32 CStaticObject__BuildLitVerticesCallback;
 
 void CStaticObject__RequestLitVertices(SpawnSource *arg0) {
-    s32 temp_v0;
-    s32 temp_v0_2;
+    sptr temp_v0;
+    sptr temp_v0_2;
 
     if (!(arg0->flags & 0x40)) {
         temp_v0 = CStaticObject__LoadGeometry();

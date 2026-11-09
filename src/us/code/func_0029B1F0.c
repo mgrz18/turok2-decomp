@@ -13,7 +13,7 @@ extern void osMapTLBRdb();
 extern void __osSetSR(unsigned int sr);
 extern unsigned int __osSetFpcCsr(unsigned int csr);
 extern unsigned int __osGetSR();
-extern void *memset(void *dst, s32 value, u32 size);
+extern void *memset(void *dst, s32 value, uptr size);
 void osInitialize(void)
 {
     u32 pifdata;

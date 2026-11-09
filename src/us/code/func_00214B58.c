@@ -50,7 +50,7 @@ void CStaticObject__SpawnEvents(PlacedProp *prop, s32 all) {
     f32 matrix[16];
     CVector3 position;
     s32 size;
-    s32 name;
+    sptr name;
     s32 count;
     s32 i;
     s32 first;

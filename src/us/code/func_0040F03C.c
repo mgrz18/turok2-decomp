@@ -15,7 +15,7 @@ void BlindOne_SpawnMinion(CGameObjectInstance **self, s32 *budget, s32 *spawned,
     CVector3 pos;
     CVector3 vel;
     CVector3 scale;
-    s32 region;
+    sptr region;
 
     if (budget != NULL && *budget == 0) {
         return;

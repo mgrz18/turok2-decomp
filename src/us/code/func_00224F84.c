@@ -9,7 +9,7 @@ s32 CScene__GetObject(CScene *arg0, s32 arg1) {
 
     table = arg0->m_pObjects;
     if (arg1 < *table) {
-        return CISet__GetROMAddress((s32)table, arg0->m_ObjectsKey, arg1);
+        return CISet__GetROMAddress((sptr)table, arg0->m_ObjectsKey, arg1);
     }
     return 0;
 }

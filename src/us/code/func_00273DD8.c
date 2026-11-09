@@ -23,7 +23,7 @@ void SndVoicePool_StopVoice(s32 arg0, s16 arg1) {
     if (var_s0->vp.frame != temp_a0->frame) {
         alSndpSetSound(var_s1, temp_a0->handles[var_s0->index]);
         if (alSndpGetState(var_s1) != 0) {
-            alSndpStop((s32) var_s1);
+            alSndpStop((sptr) var_s1);
         }
         var_s0->sound = -1;
     }

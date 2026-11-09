@@ -11,7 +11,7 @@ extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 po
 
 void MotherBoss_SpawnPickup(s32 id, s32 lifetime, CVector3 pos) {
     CVector3 vel;
-    s32 region;
+    sptr region;
     CPooledLevelActor *pickup;
 
     region = CScene__FindRegionAt(&gScene, &pos);

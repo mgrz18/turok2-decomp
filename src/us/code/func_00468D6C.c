@@ -1,7 +1,7 @@
 #include "common.h"
 #include "rw/abu_protos.h"
 
-void *memset(void *destination, s32 value, u32 size);
+void *memset(void *destination, s32 value, uptr size);
 s32 CCamera__Advance(s32);
 
 s32 CCamera__Construct_2(void *);                      /* extern */
@@ -30,9 +30,9 @@ void CCameraPool__Construct_2(Unk00468D6C *arg0) {
     void *temp_s1;
 
     memset(arg0, 0, 0x11F0U);
-    CList__Construct(arg0->list0C, 0, 4);
-    CList__Construct(arg0->list20, 0, 4);
-    CList__Construct(arg0->listF0C, 0, 4);
+    CList__Construct(arg0->list0C, 0, sizeof(void *));
+    CList__Construct(arg0->list20, 0, sizeof(void *));
+    CList__Construct(arg0->listF0C, 0, sizeof(void *));
     temp_s1 = arg0->sub40;
     arg0->unk11E8 = 1;
     arg0->unk0 = 0;
@@ -43,5 +43,5 @@ void CCameraPool__Construct_2(Unk00468D6C *arg0) {
     arg0->unkF08 = 0;
     arg0->unk38 = 2;
     CCamera__Construct_2(temp_s1);
-    CCamera__Advance((s32) temp_s1);
+    CCamera__Advance((sptr) temp_s1);
 }

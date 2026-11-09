@@ -4,7 +4,7 @@
 #include "protos/list.h"
 #include "protos/ultra.h"
 
-void *memset(void *dst, s32 value, u32 size);
+void *memset(void *dst, s32 value, uptr size);
 void CLoader__Main(CLoader *thisx);
 
 void CLoader__Construct(CLoader *thisx, OSId threadId) {

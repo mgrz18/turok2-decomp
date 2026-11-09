@@ -10,7 +10,7 @@ void func_004303AC(CEngineApp *arg0) {
     s32 var_s1;
 
     var_s1 = -1;
-    if (CScene__FindWarpDests((s32) &gScene, -1, -1, (s32) sp18, 1) == 0) {
+    if (CScene__FindWarpDests(&gScene, -1, -1, sp18, 1) == 0) {
         var_s1 = 0;
     }
     gEngineApp_m_Settings.match.frames = 0;

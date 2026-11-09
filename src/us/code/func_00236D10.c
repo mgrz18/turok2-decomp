@@ -74,7 +74,7 @@ void *func_00236D10(Owner802A6DF8 *arg0, s32 arg1, s32 arg2) {
     node = arg0->lists.inactive.head;
     if (node != 0) {
         do {
-            if ((s32)node->object == arg1) {
+            if ((sptr)node->object == arg1) {
                 if (node->contextId == arg2) {
                     return node;
                 }

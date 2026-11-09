@@ -38,7 +38,7 @@ void AI_StopSound(Object *obj, CAI *ai);
 s32 EnemyAI_PickDeathMode(Object *obj, CAI *ai, DamageEvent *dmg);
 void TotemDefense_AddKill(void);
 s32 EnemyAnim_PickDeath(Object *obj, CAI *ai);
-s32 CGameObjectInstance__PickRandomAnim(Object *obj, s32 node, s32);
+sptr CGameObjectInstance__PickRandomAnim(Object *obj, sptr node, sptr);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 func_00298470(f32 x);
 f32 CVector3__GetYaw(CVector3 *v);
@@ -66,7 +66,7 @@ void EnemyAI_OnDamage(Object *obj, CAI *ai, DamageEvent *dmg) {
     s32 justDied;
     s32 anim;
     s32 node;
-    s32 slot;
+    sptr slot;
     HitFrame *region;
 
     attacker = NULL;

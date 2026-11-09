@@ -8,6 +8,6 @@ void EnemyMode_WaitForTrigger_Update(CGameObjectInstance *arg0, s32 arg1) {
 
     temp_a2 = arg0->header.m_pIntelligence;
     if ((temp_a2->m_Type == 1) && !(temp_a2->m_dwTypeFlags & 0x800)) {
-        CAI__SetMode((s32) arg0, arg1, 2);
+        CAI__SetMode(arg0, arg1, 2);
     }
 }

@@ -10,6 +10,6 @@ void Primagen_UpdateMode21(CGameObjectInstance *obj, CAI *ai) {
     if (ai->m_AnimRepeatedCount != 0) {
         *animSpeed = 1.0f;
         gLevelScript.script.current = -1;
-        CAI__SetMode((s32) obj, (s32) ai, 0x13);
+        CAI__SetMode(obj, ai, 0x13);
     }
 }

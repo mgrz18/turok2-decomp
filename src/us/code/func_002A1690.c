@@ -22,7 +22,7 @@ void HostIo_ReadBlockDma(u32 source, u8 *destination, u32 count) {
         count--;
     }
     while (count >= 4) {
-        if (count >= 16 && !((u32)destination & 0xF) && dma != -1) {
+        if (count >= 16 && !((uptr)destination & 0xF) && dma != -1) {
             dma = osPiStartDma(&sHostIoDmaMsg, 1, 0, source, destination, count, &sHostIoDmaQueue);
             if (dma != -1) {
                 osRecvMesg(&sHostIoDmaQueue, NULL, 1);

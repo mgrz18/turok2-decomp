@@ -30,7 +30,7 @@ typedef struct {
     /* 0x52 */ u16 flags2;
 } TargetInfo;
 
-s32 CGameObjectInstance__PickRandomAnim(void *, s32, s32);
+sptr CGameObjectInstance__PickRandomAnim(void *, sptr, sptr);
 s32 EnemyAnim_NormalDeath_B0120(void *, void *);
 s32 EnemyAnim_NormalDeath_B0150(void *, void *);
 s32 EnemyAnim_NormalDeath_B0180(void *, void *);
@@ -51,7 +51,7 @@ s32 EnemyAnim_PickDeath(AttackActor *actor, AttackState *state) {
     s32 *def = actor->def;
     s32 index = state->index;
     s32 mode = flags & 0x03F00000;
-    s32 target = actor->target;
+    sptr target = actor->target;
     u16 *masks = (u16 *)((u8 *)def + 0x14); /* [0x3C] close, [0x3D] mid, [0x3E] far */
     s32 rest = flags & ~0x03F00000;
     TargetInfo *t;

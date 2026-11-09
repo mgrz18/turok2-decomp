@@ -9,13 +9,13 @@ void Model_TouchTextures(s32);
 extern void Model_DecompressCallbackExtra(void);
 
 void CGameObjectInstance__LoadGeometry(CGameObjectInstance *arg0) {
-    CCache__Request(0, (s32) arg0->m_rpGeometryHeader, arg0->m_rpGeometryHeaderSize, 0, 0, Model_DecompressCallbackExtra, "anim geometry", 0);
+    CCache__Request(0, (sptr) arg0->m_rpGeometryHeader, arg0->m_rpGeometryHeaderSize, 0, 0, Model_DecompressCallbackExtra, "anim geometry", 0);
 }
 
 void CGameObjectInstance__TouchGeometry(CGameObjectInstance *arg0) {
-    s32 temp_v0;
+    sptr temp_v0;
 
-    temp_v0 = CCache__Request(0, (s32) arg0->m_rpGeometryHeader, arg0->m_rpGeometryHeaderSize, 0, 0, Model_DecompressCallbackExtra,
+    temp_v0 = CCache__Request(0, (sptr) arg0->m_rpGeometryHeader, arg0->m_rpGeometryHeaderSize, 0, 0, Model_DecompressCallbackExtra,
                             "anim geometry", 0);
     if (temp_v0 != 0) {
         Model_TouchTextures(temp_v0);

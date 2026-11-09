@@ -11,25 +11,25 @@
 /* Turok 2 region sizes differ from Rage Wars (0x430, 0x584, 0xB0). */
 s32 Boot_CanOverwrite(u32 address) {
     address |= 0x80000000;
-    if (((address) >= (u32)gBootSignature && (address) < (u32)gBootSignature + (0x10)) || address == (u32)&gWarmBoot) {
+    if (((address) >= (uptr)gBootSignature && (address) < (uptr)gBootSignature + (0x10)) || address == (uptr)&gWarmBoot) {
         return 0;
     }
     if (gWarmBoot != 0) {
         return 1;
     }
-    if (((address) >= (u32)&(gSavedPlayers) && (address) < (u32)&(gSavedPlayers) + (0x1400))) {
+    if (((address) >= (uptr)&(gSavedPlayers) && (address) < (uptr)&(gSavedPlayers) + (0x1400))) {
         return 0;
     }
-    if (((address) >= (u32)&(gEngineApp_m_Settings) && (address) < (u32)&(gEngineApp_m_Settings) + (0x184))) {
+    if (((address) >= (uptr)&(gEngineApp_m_Settings) && (address) < (uptr)&(gEngineApp_m_Settings) + (0x184))) {
         return 0;
     }
-    if (((address) >= (u32)&(gLoadSavePersistentData) && (address) < (u32)&(gLoadSavePersistentData) + (0x5800))) {
+    if (((address) >= (uptr)&(gLoadSavePersistentData) && (address) < (uptr)&(gLoadSavePersistentData) + (0x5800))) {
         return 0;
     }
-    if (((address) >= (u32)&(gGamePersistentData) && (address) < (u32)&(gGamePersistentData) + (0x5000))) {
+    if (((address) >= (uptr)&(gGamePersistentData) && (address) < (uptr)&(gGamePersistentData) + (0x5000))) {
         return 0;
     }
-    if (address >= (u32)&gEngineApp_m_Settings_match && address <= (u32)&gEngineApp_m_Settings_match + 0x4C) {
+    if (address >= (uptr)&gEngineApp_m_Settings_match && address <= (uptr)&gEngineApp_m_Settings_match + 0x4C) {
         return 0;
     }
     return 1;

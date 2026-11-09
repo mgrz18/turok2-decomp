@@ -9,7 +9,7 @@ void GameObject_GetFloorPointAt(void *arg0, void *arg1, void *arg2) {
     CVector3 *source = arg1;
     CVector3 *output = arg2;
     TripleRecAt8 t;
-    s32 sp30;
+    sptr sp30;
     t.a = source->x;
     t.b = 0;
     t.c = source->z;

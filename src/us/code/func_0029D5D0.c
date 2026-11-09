@@ -19,7 +19,7 @@ typedef struct PiHandle {
 
 extern PiHandle CartRomHandle;     /* CartRomHandle */
 extern s32 osPiRawReadIo(u32 devAddr, u32 *data);   /* osPiRawReadIo */
-extern void memset(void *p, s32 c, s32 n);   /* memset */
+extern void memset(void *p, s32 c, sptr n);   /* memset */
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
 

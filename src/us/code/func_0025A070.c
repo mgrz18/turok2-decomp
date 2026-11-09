@@ -6,5 +6,5 @@
 
 
 void EnemyAnim_RightArmWound_AF9C0(CGameObjectInstance *obj, s32 arg1) {
-    AI_PickAnimFromTable((s32) obj, arg1, (s32) sEnemyAnimRightArmWound_AF9C0, obj->header.m_pIntelligence->m_Enemy.m_wRightArmWoundAnimFlags);
+    AI_PickAnimFromTable((sptr) obj, arg1, sEnemyAnimRightArmWound_AF9C0, obj->header.m_pIntelligence->m_Enemy.m_wRightArmWoundAnimFlags);
 }

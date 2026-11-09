@@ -7,8 +7,8 @@ extern s32 alEvtqPostEvent(void *, s16 *, s32);
 extern s32 alEvtqPostEvent(void *, s16 *, s32);
 void alSndpSetFXMix(ALSndPlayer *arg0, s8 arg1) {
     ParamsRecAt8V2 p;
-    s32 acc;
-    acc = (s32)arg0->sndState;
+    sptr acc;
+    acc = (sptr)arg0->sndState;
     p.f0 = 8;
     acc += arg0->target * 0x30;
     p.f8 = arg1;

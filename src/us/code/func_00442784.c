@@ -20,7 +20,7 @@ extern void MotherBoss_DropPickupsAtSpawnPoints_2(s32 delay, void *points);
 
 static __inline__ void SpawnAt(s32 delay, s16 type, CVector3 pos, f32 speed) {
     CVector3 vel;
-    s32 region;
+    sptr region;
     void *actor;
 
     region = CScene__FindRegionAt(&gScene, &pos);

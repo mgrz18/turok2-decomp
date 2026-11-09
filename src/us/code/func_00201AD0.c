@@ -3,7 +3,7 @@
 #include "structs/decompressor.h"
 #include "protos/ultra.h"
 
-void *memset(void *dst, s32 value, u32 size);
+void *memset(void *dst, s32 value, uptr size);
 void CDecompressor__Main(CDecompressor *thisx);
 
 void CDecompressor__Construct(CDecompressor *thisx, OSId threadId) {

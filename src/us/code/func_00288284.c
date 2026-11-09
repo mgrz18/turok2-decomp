@@ -4,7 +4,7 @@
 #include "globals/frame.h"
 #include "protos/ultra.h"
 
-extern void *memset(void *dst, s32 value, u32 size);
+extern void *memset(void *dst, s32 value, uptr size);
 extern void mainproc(void *arg);
 
 void CEngineApp__Idle(CEngineApp *arg0, void *arg1) {

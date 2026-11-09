@@ -14,7 +14,7 @@ struct RecordRecAt24 {
 };
 struct RecordRecAt24;
 extern s32 GameNoteMenu_SelectNo_2(void *unused, struct RecordRecAt24 *record);
-extern void MenuPool_OpenMenu_2(void *, void *, s32, s32, s32);
+extern void MenuPool_OpenMenu_2(void *, void *, sptr, sptr, sptr);
 s32 GameNoteMenu_SelectNo_2(void *unused, struct RecordRecAt24 *record) {
     do {
         if (sGameNoteLoad != 0) {

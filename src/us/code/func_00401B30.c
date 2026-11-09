@@ -13,7 +13,7 @@ typedef struct {
 
 void Automap_RevealAroundPlayer(Obj00401B30 *obj);
 
-void Automap_SetPlayer(Obj00401B30 *obj, s32 a, s32 b, Triple c) {
+void Automap_SetPlayer(Obj00401B30 *obj, sptr a, s32 b, Triple c) {
     obj->a = a;
     obj->b = b;
     obj->c = c;

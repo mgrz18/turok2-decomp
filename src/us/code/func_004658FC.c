@@ -17,7 +17,7 @@ typedef struct {
 } Unk004658FC;
 
 void CScene__UnloadLevel_2(Unk004658FC *arg0) {
-    s32 temp_v0;
+    sptr temp_v0;
 
     temp_v0 = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
     if (temp_v0 != 0) {

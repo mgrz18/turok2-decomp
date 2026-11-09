@@ -7,10 +7,10 @@
 void CScene__SetSavedBit(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
   s32 temp_a0;
-  s32 new_var;
-  s32 temp_a1;
-  s32 temp_v0;
-  s32 var_a0;
+  sptr new_var;
+  sptr temp_a1;
+  sptr temp_v0;
+  sptr var_a0;
   s32 var_v1;
   u8 *temp_v0_2;
   u8 *temp_v1;

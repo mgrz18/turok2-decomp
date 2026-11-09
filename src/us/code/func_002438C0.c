@@ -73,7 +73,7 @@ static __inline__ void Approach(CGameObjectInstance *self, CGameObjectInstance *
 s32 AI_UpdatePathHeading(CGameObjectInstance *self, Plan *plan, CGameObjectInstance *target) {
     CVector3 pos;
     CVector3 hit;
-    s32 region;
+    sptr region;
     s32 mode;
     CPlayer *player;
     Location *loc;
@@ -109,7 +109,7 @@ s32 AI_UpdatePathHeading(CGameObjectInstance *self, Plan *plan, CGameObjectInsta
     switch (mode) {
     case 6:
         pos = self->header.m_vPos;
-        region = ((s32)self->header.m_pCurrentRegion);
+        region = ((sptr)self->header.m_pCurrentRegion);
         break;
     case 4:
         loc = CPathTrack__GetCurrentPoint(&plan->location);
@@ -124,18 +124,18 @@ s32 AI_UpdatePathHeading(CGameObjectInstance *self, Plan *plan, CGameObjectInsta
         Approach(self, target, plan->approachFrom, &pos, &region);
         break;
     case 1:
-        region = Path_FindFleeRegion(self, plan->unk84, target->header.m_vPos, ((s32)target->header.m_pCurrentRegion), plan->info->unkC, &pos);
+        region = Path_FindFleeRegion(self, plan->unk84, target->header.m_vPos, ((sptr)target->header.m_pCurrentRegion), plan->info->unkC, &pos);
         if (region == 0) {
             do {
     default:
                 pos = target->header.m_vPos;
-                region = ((s32)target->header.m_pCurrentRegion);
+                region = ((sptr)target->header.m_pCurrentRegion);
             } while (0);
         }
         break;
     }
     if (Path_FindRegionPath(self, pos, region, plan->info->unkC, &hit) != 0) {
-        if (CGameRegion__ContainsXZ(((s32)self->header.m_pCurrentRegion), hit.x, hit.z) != 0) {
+        if (CGameRegion__ContainsXZ(((sptr)self->header.m_pCurrentRegion), hit.x, hit.z) != 0) {
             plan->height = hit.y;
         } else {
             plan->height = hit.y + 51.199997f;

@@ -7,10 +7,10 @@
 
 extern u32 osMotorStart(struct Triple *);
 extern void __osSiGetAccess(void);
-extern s32 __osSiRawStartDma(s32, s32);
+extern s32 __osSiRawStartDma(s32, sptr);
 extern u32 __osContDataCrc(void *arg0);
 extern void __osSiRelAccess(void);
-extern s32 __osSiRawStartDma(s32, s32);
+extern s32 __osSiRawStartDma(s32, sptr);
 extern u32 __osContDataCrc(void *arg0);
 u32 osMotorStart(Triple *arg0) {
     Block40 saved;

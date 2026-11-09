@@ -5,14 +5,14 @@
 /* AI state: turn towards the target with the 10000 animation, the turn rate
  * depending on the stance; release the grabbed actor near the end of it. */
 
-s32 CGameObjectInstance__PickRandomAnim(void *self, s32 anim, s32 arg2);
+sptr CGameObjectInstance__PickRandomAnim(void *self, sptr anim, sptr arg2);
 void AI_UpdateTargets(void *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
 
 void EnemyMode_PickupThrowObject_Update(CGameObjectInstance *self, CAI *ai) {
     CAITargets t;
     u8 *held = (u8 *) ai->m_Enemy.m_pGrabbed;
     f32 rate;
-    s32 anim;
+    sptr anim;
 
     anim = CGameObjectInstance__PickRandomAnim(self, 10000, -1);
     if (self->m_CurrentAnimation.m_nAnimIndex == anim) {

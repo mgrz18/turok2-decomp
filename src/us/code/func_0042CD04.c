@@ -50,7 +50,7 @@ void CScene__DecompressPaths(LevelState *level, s32 ***handle) {
                 ref = item->ref;
                 if (ref != -1) {
                     entries = (Entry *)((u8 *)CISet__GetBlock(level->table, 2) + 8);
-                    item->ref = (s32)&entries[ref];
+                    item->ref = (sptr)&entries[ref];
                 } else {
                     item->ref = 0;
                 }

@@ -14,6 +14,6 @@ void EnemyMode_ReactionFallDown_Update(s32 arg0, CAI *arg1) {
     temp_f0 = arg1->m_ConditionTimer - gFrameIncrement;
     arg1->m_ConditionTimer = temp_f0;
     if (temp_f0 <= 0.0f) {
-        CAI__SetMode(arg0, (s32) arg1, 0x1E);
+        CAI__SetMode(arg0, arg1, 0x1E);
     }
 }

@@ -63,7 +63,7 @@ void CCache__DrawDebug(s32 unused, s32 left, s32 top, s32 right, s32 bottom) {
     u32 mask2;
     HeapSpan *span;
     HeapNode *node;
-    u32 total;
+    uptr total;
     s32 height;
     s32 upper;
     s32 lower;
@@ -95,13 +95,13 @@ void CCache__DrawDebug(s32 unused, s32 left, s32 top, s32 right, s32 bottom) {
 
     base = 0x80000000;
     span = gHeap_usedHead[0];
-    total = (u32) span - base;
+    total = (uptr) span - base;
     for (; span != 0; span = span->next) {
         total += span->size + span->free;
     }
 
     gDPSetPrimColor(gDList++, 0, 0, 0x64, 0x64, 0x00, 0xFF);
-    upper = (bottom - (u32) (((u32) gHeap_usedHead[0] - base) * (bottom - top)) / total) - 1;
+    upper = (bottom - (u32) (((uptr) gHeap_usedHead[0] - base) * (bottom - top)) / total) - 1;
     height = bottom - top;
     RECTA(gDList++, left, upper, right, bottom + 1);
 

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/onscreen.h"
 
-s32 CGameObjectInstance__PickRandomAnim(s32, s32, s32);
+sptr CGameObjectInstance__PickRandomAnim(s32, sptr, sptr);
 s32 COnScreen__SetBoss(s32, s32, s32);
 s32 TotemDefense_DrawTotem(s32, s32, s32);
 
@@ -15,7 +15,7 @@ void TotemDefense_InitFight(void *arg0, void *arg1)
   void *temp_a3;
   void *temp_s0;
   *((void **) (((s8 *) arg0) + 0)) = arg1;
-  *((s32 *) (((s8 *) arg0) + 4)) = (s32) ((*((void **) (((s8 *) arg1) + 0x14))) + 0x14);
+  *((s32 *) (((s8 *) arg0) + 4)) = (sptr) ((*((void **) (((s8 *) arg1) + 0x14))) + 0x14);
   new_var = *((s32 *) (((s8 *) (*((void **) (((s8 *) arg1) + 0x14)))) + 0x54));
   *((s32 *) (((s8 *) arg0) + 8)) = 0;
   *((s32 *) (((s8 *) arg0) + 0x10)) = 0;
@@ -24,10 +24,10 @@ void TotemDefense_InitFight(void *arg0, void *arg1)
   temp_s0 = *((void **) (((s8 *) arg0) + 0));
   *((s32 *) (((s8 *) arg0) + 0x14)) = 0;
   temp_a3 = temp_s0 + 0x140;
-  *((s8 *) (((s8 *) temp_a3) + 0xC6)) = CGameObjectInstance__PickRandomAnim((s32) temp_s0, 0x5334, -1);
+  *((s8 *) (((s8 *) temp_a3) + 0xC6)) = CGameObjectInstance__PickRandomAnim((sptr) temp_s0, 0x5334, -1);
   *((s16 *) (((s8 *) temp_a3) + 0xC4)) = 0x5334;
   *((s32 *) (((s8 *) temp_s0) + 0x140)) = (s32) ((*((s32 *) (((s8 *) temp_s0) + 0x140))) & (~1));
   *((s8 *) (((s8 *) temp_a3) + 0xC7)) = 0;
-  COnScreen__SetBoss((s32) (&gEngineApp_m_OnScreen), (s32) arg1, (s32) (&D_800C0560));
+  COnScreen__SetBoss((sptr) (&gEngineApp_m_OnScreen), (sptr) arg1, (sptr) (&D_800C0560));
   COnScreen__SetBoss2(&gEngineApp_m_OnScreen, arg1, &D_800C0568);
 }

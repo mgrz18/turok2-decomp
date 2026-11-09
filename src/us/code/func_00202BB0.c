@@ -12,7 +12,7 @@
 #include "protos/ultra.h"
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
-void *memset(void *s, int c, u32 n);
+void *memset(void *s, int c, uptr n);
 typedef struct B12Node B12Node;
 struct B12Node {
                u32 key;

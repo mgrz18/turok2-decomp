@@ -23,7 +23,7 @@ void CScene__FireEventsByKey(void *arg0, s32 arg1)
     {
       if ((*((u8 *) (((s8 *) var_s1) + 0xF))) == var_s3)
       {
-        LevelEvent_Trigger((s32) var_s1);
+        LevelEvent_Trigger((sptr) var_s1);
       }
       var_s0 -= 1;
       var_s1 += 0x14;
@@ -40,7 +40,7 @@ void CScene__FireEventsByKey(void *arg0, s32 arg1)
     {
       if ((*((u8 *) (((s8 *) var_s1) + 0xF))) == var_s3)
       {
-        LevelEvent_Trigger((s32) var_s1);
+        LevelEvent_Trigger((sptr) var_s1);
       }
       var_s0 -= 1;
       var_s1 += 0x14;

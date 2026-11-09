@@ -8,12 +8,12 @@ extern char D_A4694;
 extern char Automap_RevealRegion;
 extern char D_29E60;
 int IsCodePointer(u32 arg0) {
-    if (arg0 >= (u32)&CList__Construct &&
-        arg0 < (u32)&CList__Construct + (u32)&D_A4694) {
+    if (arg0 >= (uptr)&CList__Construct &&
+        arg0 < (uptr)&CList__Construct + (uptr)&D_A4694) {
         return 1;
     }
-    if (arg0 >= (u32)&Automap_RevealRegion &&
-        arg0 < (u32)&Automap_RevealRegion + (u32)&D_29E60) {
+    if (arg0 >= (uptr)&Automap_RevealRegion &&
+        arg0 < (uptr)&Automap_RevealRegion + (uptr)&D_29E60) {
         return 1;
     }
     return 0;

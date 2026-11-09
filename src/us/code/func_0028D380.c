@@ -18,36 +18,36 @@ extern Marker sBootMarker;           /* the boot marker string */
 extern char gSavedPlayers[]; /* local type: globals/save.h declares it; this view (its type here) is what keeps the ROM's code */           /* the saved players (0x1400) */
 extern s32 D_8014A000[];            /* BSS end */
 
-void memset(void *dst, s32 value, s32 size);
+void memset(void *dst, s32 value, sptr size);
 s32 Util_StrCmp(char *marker, char *name);
 void Util_StrCpy(char *marker, char *name);
 void osInitialize(void);
 void Engine_Boot(void);
 
 /* Whether a word may be overwritten on reset (Boot_CanOverwrite inlined). */
-static __inline__ s32 isRestorable(u32 address) {
-    if (address >= (u32)gBootSignature && address < (u32)gBootSignature + 0x10) {
+static __inline__ s32 isRestorable(uptr address) {
+    if (address >= (uptr)gBootSignature && address < (uptr)gBootSignature + 0x10) {
         return 0;
     }
-    if (address == (u32)&gWarmBoot) {
+    if (address == (uptr)&gWarmBoot) {
         return 0;
     }
     if (gWarmBoot != 0) {
         return 1;
     }
-    if (address >= (u32)gSavedPlayers && address < (u32)gSavedPlayers + 0x1400) {
+    if (address >= (uptr)gSavedPlayers && address < (uptr)gSavedPlayers + 0x1400) {
         return 0;
     }
-    if (address >= (u32)&gEngineApp_m_Settings && address < (u32)&gEngineApp_m_Settings + 0x184) {
+    if (address >= (uptr)&gEngineApp_m_Settings && address < (uptr)&gEngineApp_m_Settings + 0x184) {
         return 0;
     }
-    if (address >= (u32)gLoadSavePersistentData && address < (u32)gLoadSavePersistentData + 0x5800) {
+    if (address >= (uptr)gLoadSavePersistentData && address < (uptr)gLoadSavePersistentData + 0x5800) {
         return 0;
     }
-    if (address >= (u32)gGamePersistentData && address < (u32)gGamePersistentData + 0x5000) {
+    if (address >= (uptr)gGamePersistentData && address < (uptr)gGamePersistentData + 0x5000) {
         return 0;
     }
-    if (address >= (u32)&gEngineApp_m_Settings.match && address <= (u32)&gEngineApp_m_Settings.match.unk4C) {
+    if (address >= (uptr)&gEngineApp_m_Settings.match && address <= (uptr)&gEngineApp_m_Settings.match.unk4C) {
         return 0;
     }
     return 1;
@@ -81,15 +81,15 @@ s32 func_0028D380(void) {
             status = *piStatus & 3;
             while (status != 0) {
             }
-            if (isRestorable((u32)dst | 0x80000000)) {
+            if (isRestorable((uptr)dst | 0x80000000)) {
                 *dst = *src;
             }
             dst++;
             src++;
         } while (count-- != 0);
     }
-    for (dst = (u32 *)gGfxYieldBuffer; (u32)dst < (u32)D_8014A000; dst++) {
-        if (isRestorable((u32)dst | 0x80000000)) {
+    for (dst = (u32 *)gGfxYieldBuffer; (uptr)dst < (uptr)D_8014A000; dst++) {
+        if (isRestorable((uptr)dst | 0x80000000)) {
             *dst = 0;
         }
     }

@@ -9,7 +9,7 @@
 
 /* Display list dlist is done: wakes CCache__WaitForDisplayLists if it waits
  * for it and clears the list's lock bit on every CMemEntry. */
-void CCache__ReleaseDisplayList(s32 unused, s32 dlist) {
+void CCache__ReleaseDisplayList(s32 unused, sptr dlist) {
     s32 mask;
     u32 i;
     u32 count;

@@ -13,16 +13,16 @@ void _Putfld(_Pft *px, va_list *pap, char code, char *ac) {
         px->nz2 = 0;
     switch (code) {
         case 'c':
-            ac[px->n0++] = ((int *) (void *) (*pap = (char *) ((__alignof__(int) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (int) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
+            ac[px->n0++] = ((int *) (void *) (*pap = (char *) ((__alignof__(int) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (int) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
             break;
         case 'd':
         case 'i':
             if (px->qual == 'l') {
-                px->v.ll = ((long *) (void *) (*pap = (char *) ((__alignof__(long) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (long) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
+                px->v.ll = ((long *) (void *) (*pap = (char *) ((__alignof__(long) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (long) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
             } else if (px->qual == 'L') {
-                px->v.ll = ((long long *) (void *) (*pap = (char *) ((__alignof__(long long) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (long long) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
+                px->v.ll = ((long long *) (void *) (*pap = (char *) ((__alignof__(long long) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (long long) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
             } else {
-                px->v.ll = ((int *) (void *) (*pap = (char *) ((__alignof__(int) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (int) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
+                px->v.ll = ((int *) (void *) (*pap = (char *) ((__alignof__(int) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (int) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
             }
             if (px->qual == 'h') {
                 px->v.ll = (short)px->v.ll;
@@ -42,11 +42,11 @@ void _Putfld(_Pft *px, va_list *pap, char code, char *ac) {
         case 'u':
         case 'o':
             if (px->qual == 'l') {
-                px->v.ll = ((long *) (void *) (*pap = (char *) ((__alignof__(long) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (long) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
+                px->v.ll = ((long *) (void *) (*pap = (char *) ((__alignof__(long) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (long) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
             } else if (px->qual == 'L') {
-                px->v.ll = ((long long *) (void *) (*pap = (char *) ((__alignof__(long long) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (long long) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
+                px->v.ll = ((long long *) (void *) (*pap = (char *) ((__alignof__(long long) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (long long) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
             } else {
-                px->v.ll = ((int *) (void *) (*pap = (char *) ((__alignof__(int) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (int) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
+                px->v.ll = ((int *) (void *) (*pap = (char *) ((__alignof__(int) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (int) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
             }
             if (px->qual == 'h') {
                 px->v.ll = (unsigned short)px->v.ll;
@@ -67,7 +67,7 @@ void _Putfld(_Pft *px, va_list *pap, char code, char *ac) {
         case 'g':
         case 'E':
         case 'G':
-            px->v.ld = px->qual == 'L' ? ((ldouble *) (void *) (*pap = (char *) ((__alignof__(ldouble) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (ldouble) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1] : ((double *) (void *) (*pap = (char *) ((__alignof__(double) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (double) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
+            px->v.ld = px->qual == 'L' ? ((ldouble *) (void *) (*pap = (char *) ((__alignof__(ldouble) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (ldouble) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1] : ((double *) (void *) (*pap = (char *) ((__alignof__(double) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (double) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
             if ((((unsigned short *)&(px->v.ld))[0] & 0x8000))
                 ac[px->n0++] = '-';
             else if (px->flags & 2)
@@ -79,22 +79,22 @@ void _Putfld(_Pft *px, va_list *pap, char code, char *ac) {
             break;
         case 'n':
             if (px->qual == 'h') {
-                *((unsigned short * *) (void *) (*pap = (char *) ((__alignof__(unsigned short *) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (unsigned short *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1] = px->nchar;
+                *((unsigned short * *) (void *) (*pap = (char *) ((__alignof__(unsigned short *) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (unsigned short *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1] = px->nchar;
             } else if (px->qual == 'l') {
-                *((unsigned long * *) (void *) (*pap = (char *) ((__alignof__(unsigned long *) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (unsigned long *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1] = px->nchar;
+                *((unsigned long * *) (void *) (*pap = (char *) ((__alignof__(unsigned long *) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (unsigned long *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1] = px->nchar;
             } else if (px->qual == 'L') {
-                *((unsigned long long * *) (void *) (*pap = (char *) ((__alignof__(unsigned long long *) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (unsigned long long *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1] = px->nchar;
+                *((unsigned long long * *) (void *) (*pap = (char *) ((__alignof__(unsigned long long *) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (unsigned long long *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1] = px->nchar;
             } else {
-                *((unsigned int * *) (void *) (*pap = (char *) ((__alignof__(unsigned int *) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (unsigned int *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1] = px->nchar;
+                *((unsigned int * *) (void *) (*pap = (char *) ((__alignof__(unsigned int *) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (unsigned int *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1] = px->nchar;
             }
             break;
         case 'p':
-            px->v.ll = (long)((void * *) (void *) (*pap = (char *) ((__alignof__(void *) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (void *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
+            px->v.ll = (long)((void * *) (void *) (*pap = (char *) ((__alignof__(void *) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (void *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
             px->s = (char *)&ac[px->n0];
             _Litob(px, 'x');
             break;
         case 's':
-            px->s = ((char * *) (void *) (*pap = (char *) ((__alignof__(char *) > 4 ? ((int)*pap + 8 - 1) & -8 : ((int)*pap + 4 - 1) & -4) + (((sizeof (char *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
+            px->s = ((char * *) (void *) (*pap = (char *) ((__alignof__(char *) > 4 ? ((sptr)*pap + 8 - 1) & -8 : ((sptr)*pap + 4 - 1) & -4) + (((sizeof (char *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))))[-1];
             px->n1 = strlen(px->s);
             if (px->prec >= 0 && px->prec < px->n1) {
                 px->n1 = px->prec;

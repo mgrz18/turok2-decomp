@@ -5,7 +5,7 @@
 #include "globals/menu.h"
 #include "globals/menu_desc.h"
 
-void MenuPool_OpenMenu_2(char *dst, char *fmt, void *player, s32 controller, s32 arg4);
+void MenuPool_OpenMenu_2(char *dst, char *fmt, void *player, sptr controller, sptr arg4);
 
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 

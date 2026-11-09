@@ -6,5 +6,5 @@
 
 
 void EnemyAnim_Idle_AF750(CGameObjectInstance *obj, s32 arg1) {
-    AI_PickAnimFromTable((s32) obj, arg1, (s32) sEnemyAnimIdle_AF750, obj->header.m_pIntelligence->m_Enemy.m_wIdleAnimFlags);
+    AI_PickAnimFromTable((sptr) obj, arg1, sEnemyAnimIdle_AF750, obj->header.m_pIntelligence->m_Enemy.m_wIdleAnimFlags);
 }

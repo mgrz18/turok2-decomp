@@ -12,10 +12,10 @@ typedef struct Owner {
     StrideTable *table;   /* 0x7C */
 } Owner;
 
-extern s32 BinarySearch(void *entries, s32 count, s32 id);
+extern s32 BinarySearch(void *entries, s32 count, sptr id);
 extern u8 ProPack__Decompress[];
 
-s32 CScene__LoadGraphicSet(Owner *owner, s32 id, s32 flags, s32 arg3) {
+sptr CScene__LoadGraphicSet(Owner *owner, s32 id, s32 flags, s32 arg3) {
     s32 index;
     s32 out;
 

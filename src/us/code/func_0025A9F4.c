@@ -5,5 +5,5 @@
 
 
 void EnemyAnim_ExplosiveDeath_B0300(CGameObjectInstance *arg0, s32 arg1) {
-    AI_PickAnimFromTable((s32) arg0, arg1, (s32) sEnemyAnimExplosiveDeath_B0300, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wExplosiveDeathAnimFlags);
+    AI_PickAnimFromTable((sptr) arg0, arg1, sEnemyAnimExplosiveDeath_B0300, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wExplosiveDeathAnimFlags);
 }

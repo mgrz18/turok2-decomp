@@ -18,5 +18,5 @@ void CParticle__SpawnAtWallHit(CParticle *actor, s32 kind) {
     }
     CQuaternion__FromDirection(&rot, &origin);
     CParticleSystem__Spawn(&gScene.m_ParticleSystem, actor, actor->m_pOwner, actor->m_pOwnerCount, actor->m_pTarget, kind, origin, rot,
-                  gCollisionResults.m_vWallPos, (s32)gCollisionResults.m_pWallRegion, gCollisionResults.m_nWallEdge, (actor->m_dwFlags & 0x200006) | 1);
+                  gCollisionResults.m_vWallPos, gCollisionResults.m_pWallRegion, gCollisionResults.m_nWallEdge, (actor->m_dwFlags & 0x200006) | 1);
 }

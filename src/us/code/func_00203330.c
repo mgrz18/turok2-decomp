@@ -22,7 +22,7 @@ void CCache__Compact(s32 unused, s32 all) {
     CMemEntry *scan;
     u8 *newData;
 
-    CList__Construct(&moved, 0x20, 0x24);
+    CList__Construct(&moved, T2_OFFSETOF(CMemEntry, lockedLast), T2_OFFSETOF(CMemEntry, lockedNext));
     if (all != 0 || gCache.currentCompressPos == NULL) {
         gCache.currentCompressPos = gCache.memLockedList.m_pHead;
         if (gCache.memLockedList.m_pHead == NULL) {
@@ -32,7 +32,7 @@ void CCache__Compact(s32 unused, s32 all) {
     do {
         entry = gCache.currentCompressPos;
         gCache.currentCompressPos = entry->lockedNext;
-        if (!(entry->flags & 0x701) && (u32)gHeap.freeHead + sizeof(CHeapBlock) < (u32)entry->data) {
+        if (!(entry->flags & 0x701) && (uptr)gHeap.freeHead + sizeof(CHeapBlock) < (uptr)entry->data) {
             CHeap__Free(&gHeap, entry->data);
             newData = CHeap__Alloc(&gHeap, entry->size);
             if (newData < (u8 *)entry->data) {
@@ -53,7 +53,7 @@ drain:
         CList__RemoveHead(&moved);
         scan = gCache_memLockedList.m_pHead;
         while (scan != NULL) {
-            if ((u32)scan->data > (u32)entry->data) {
+            if ((uptr)scan->data > (uptr)entry->data) {
                 CList__InsertBefore(&gCache_memLockedList, scan, entry);
                 break;
             }

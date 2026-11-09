@@ -33,7 +33,7 @@ void SndVoicePool_Construct(s32 *arg0, s32 arg1) {
     one = 1;
     off = i;
     do {
-        rec = (RecordCode8025A3EC *)((u32)off + (u32)arg0);
+        rec = (RecordCode8025A3EC *)((u32)off + (uptr)arg0);
         rec = &((ObjRecAt4V6 *)(rec))->unk4;
         rec->index = i;
         i += 1;

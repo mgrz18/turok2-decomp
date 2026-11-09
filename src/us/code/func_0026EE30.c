@@ -7,7 +7,7 @@ typedef struct {
     /* 0x08 */ s32 unk8;
 } Triple;
 
-void RumbleCurve_Init(Triple *arg0, s32 arg1) {
+void RumbleCurve_Init(Triple *arg0, sptr arg1) {
     arg0->value = arg1;
     arg0->unk4 = 0;
     arg0->unk8 = 0;

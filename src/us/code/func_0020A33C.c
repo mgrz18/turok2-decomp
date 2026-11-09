@@ -27,7 +27,7 @@ void Render_DrawModel(void **resource, void *matrix, s32 segment, char *lights, 
     s32 count;
     s32 i;
 
-    if (gDisplayListSize - ((u32)gDList - (u32)gEngineApp_m_pCurrentFrameData->m_pDisplayList) / sizeof(Gfx) < 3000) {
+    if (gDisplayListSize - ((uptr)gDList - (uptr)gEngineApp_m_pCurrentFrameData->m_pDisplayList) / sizeof(Gfx) < 3000) {
         return;
     }
     header = *resource;

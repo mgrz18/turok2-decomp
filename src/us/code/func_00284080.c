@@ -11,11 +11,11 @@ extern int Cinema_IsActive(void);
 extern void Cinema_Close(void);
 void Cinema_Stop(void) {
     if (Cinema_IsActive() != 0) {
-        s32 temp_a1;
+        sptr temp_a1;
         Cinema *record;
         Cinema_RunEnd(1);
         Cinema_Close();
-        temp_a1 = (s32)gCinemaPlayerP->owner;
+        temp_a1 = (sptr)gCinemaPlayerP->owner;
         if (temp_a1 != 0) {
             CCache__Deallocate(0, temp_a1);
         }

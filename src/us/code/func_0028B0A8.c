@@ -15,6 +15,6 @@ s32 __scTaskComplete(void *arg0, void *arg1) {
     if (((((s32)((struct OSScTask_s *)arg1)->flags)) & 0x60) != 0x60) {
         return 1;
     }
-    osViSwapBuffer(((s32)((struct OSScTask_s *)arg1)->framebuffer));
+    osViSwapBuffer(((sptr)((struct OSScTask_s *)arg1)->framebuffer));
     return 1;
 }

@@ -19,7 +19,7 @@ extern CPlayer **CCache__Allocate(s32 heap, s32 size, s32 tag, char *name);
 extern void CCache__Deallocate(s32 heap, CPlayer **handle);
 extern void CCache__Flush(s32);
 extern void Controller_SetRumbleOptionAll(s32);
-extern void memset(void *p, s32 c, s32 n); /* memset */
+extern void memset(void *p, s32 c, sptr n); /* memset */
 extern void CPlayerContState__Init(void *, ControllerProfile *);
 extern void CPlayer__Reset(CPlayer *p);
 extern void CPlayer__NewGame_2(CPlayer *p, s32 character, s32 arg2);
@@ -44,8 +44,8 @@ void CPlayerPool__NewGame_2(PlayerList *list, s32 count, s32 arg2) {
     CPlayer *p;
     s32 i;
 
-    CList__Construct(list->list0, 0x131C, 0x1320);
-    CList__Construct(list->list1, 0x131C, 0x1320);
+    CList__Construct(list->list0, T2_OFFSETOF(CPlayer, m_pLast), T2_OFFSETOF(CPlayer, m_pNext));
+    CList__Construct(list->list1, T2_OFFSETOF(CPlayer, m_pLast), T2_OFFSETOF(CPlayer, m_pNext));
     Controller_SetRumbleOptionAll(0);
     CCache__Flush(0);
     flags = &gEngineApp_m_Settings;

@@ -20,5 +20,5 @@ void WeaponActor_InitAI(s32 arg0, void *arg1) {
     M2C_FIELD(arg1, s32 *, 0x12C) = 0;
     M2C_FIELD(arg1, s32 *, 0x130) = 0;
     M2C_FIELD(arg1, f32 *, 0x114) = 1.0f;
-    WeaponActor_SwitchToRequestedInline(arg0, (s32) arg1);
+    WeaponActor_SwitchToRequestedInline(arg0, (sptr) arg1);
 }

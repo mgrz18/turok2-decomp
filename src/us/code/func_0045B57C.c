@@ -16,7 +16,7 @@ struct ItemRecAt24 {
     char *label;
 };
 extern int CharNoteMenu_SelectNo_2(int unused, ItemRecAt24 *item);
-extern void MenuPool_OpenMenu_2(char *, char *, int, int, int);
+extern void MenuPool_OpenMenu_2(char *, char *, sptr, sptr, sptr);
 int CharNoteMenu_SelectNo_2(int unused, ItemRecAt24 *item) {
     if (sCharNoteLoad != 0) {
         MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (char *)&gPakLoadProfileMenuDesc_2, item->x, item->y, 0);

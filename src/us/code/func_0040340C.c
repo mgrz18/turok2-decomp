@@ -13,5 +13,5 @@ void MantidQueen_SetBossAnim(BossOwner *arg0, s32 arg1) {
     CGameObjectInstance *temp_a0;
 
     temp_a0 = arg0->boss;
-    AI_PlayAnim((s32) temp_a0, (s32) &temp_a0->m_AI, arg1);
+    AI_PlayAnim((sptr) temp_a0, &temp_a0->m_AI, arg1);
 }

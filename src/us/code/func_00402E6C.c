@@ -13,7 +13,7 @@ extern u8 gMantidQueen[]; /* local type: globals/boss.h declares it; this view (
 void MantidQueen_UpdateMode6(s32 arg0, void *arg1)
 {
   s32 *var_s1;
-  s32 var_s0;
+  sptr var_s0;
   void *temp_v0;
   void *var_s2;
   s32 temp_v1;
@@ -32,7 +32,7 @@ void MantidQueen_UpdateMode6(s32 arg0, void *arg1)
   if ((*((s8 *) (((s8 *) var_s2) + 0xC7))) != 0)
   {
     AI_PlayAnim(*((s32 *) (((s8 *) (&gMantidQueen)) + 0x220)), (*((s32 *) (((s8 *) (&gMantidQueen)) + 0x220))) + 0x140, 0x5ADC);
-    CAI__SetMode(var_s0, (s32) var_s2, 7);
+    CAI__SetMode(var_s0, var_s2, 7);
     temp_v1 = *((s32 *) (((s8 *) (*((void **) (((s8 *) (&gMantidQueen)) + 0x214)))) + 0x14));
     if (temp_v1 != (-1))
     {

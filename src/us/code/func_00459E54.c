@@ -8,7 +8,7 @@
 
 s32 PakMenu_CheckPak_2(void *event, s32 port, s32 arg2);
 char *PakMenu_GetReturnMenu_2(void *event);
-void MenuPool_OpenMenu_2(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
+void MenuPool_OpenMenu_2(char *dst, char *fmt, CPlayer *player, sptr arg3, char *arg4);
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {
@@ -20,9 +20,9 @@ static __inline__ s32 GetPort(Menu *event) {
 static __inline__ void ShowEvent(Menu *event) {
     if (PakMenu_CheckPak_2(event, GetPort(event), 1) != 0) {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (sptr) event->controller, NULL);
     } else {
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (sptr) event->controller, NULL);
     }
 }
 
@@ -60,7 +60,7 @@ s32 PakConfirmMenu_SelectNo_2(s32 unused, Menu *event) {
             } else {
                 dst = &gEngineApp_m_Game_m_MenuPool;
             }
-            MenuPool_OpenMenu_2(dst, text, event->player, (s32) event->controller, NULL);
+            MenuPool_OpenMenu_2(dst, text, event->player, (sptr) event->controller, NULL);
             break;
     }
     return 1;

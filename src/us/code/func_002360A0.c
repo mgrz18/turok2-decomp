@@ -36,8 +36,8 @@ void func_002360A0(World002360A0 *arg0, s32 arg1, s32 arg2) {
             if ((var_s0->inst == arg1) && (var_s0->strength > 0.0f)) {
                 CMtxF__Copy(sp10, arg2 + (var_s0->ref->index << 6));
                 CMtxF__ScaleAxes(sp10, 0.00000015258789f, 0.00000015258789f, 0.00000015258789f);
-                CMtxF__ClampEntries((s32) sp10);
-                Swoosh_NewNode((s32) arg0, (s32) var_s0, (s32) sp10);
+                CMtxF__ClampEntries((sptr) sp10);
+                Swoosh_NewNode((sptr) arg0, (sptr) var_s0, (sptr) sp10);
             }
             var_s0 = var_s0->next;
         } while (var_s0 != NULL);

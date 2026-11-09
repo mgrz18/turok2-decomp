@@ -5,8 +5,13 @@
 #include "protos/list.h"
 #include "protos/iset.h"
 
-typedef struct ListRec {
+typedef struct ListRec {   /* a CList (structs/list.h) whose m_nCount is read as count */
+#ifdef TARGET_PORT
+    /* 0x00 */ void *pad0[2];
+    /* 0x08 */ s32 pad8[2];
+#else
     /* 0x00 */ u8 pad0[0x10];
+#endif
     /* 0x10 */ s32 count;
     /* 0x14 */ u8 pad14[4];
 } ListRec;
@@ -25,8 +30,8 @@ typedef struct Placed {
 
 extern char D_800A5D8C[];
 
-extern void CCache__LoadPersistantIndex(s32, s32 *, s32, char *);
-extern void **CCache__LoadPersistantSubBlock(s32, s32, s32, s32, void *, s32, char *);
+extern void CCache__LoadPersistantIndex(s32, s32 *, sptr, char *);
+extern void **CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, void *, s32, char *);
 extern s32 BinaryRange(s32 *keys, s32 count, s32 key, s32 *first, s32 *last);
 extern void CCache__Deallocate(s32, void *);
 
@@ -59,7 +64,7 @@ s32 CScene__FindWarpDests(void *world, s32 kind, s32 key, Placed *out, s32 max) 
     objectTable = CISet__GetBlock(table, 1);
     objects = (Placed *)(objectTable + 2);
     if (BinaryRange(keys, count, key, &first, &last) != 0) {
-        CList__Construct(&list, 4, 8);
+        CList__Construct(&list, T2_OFFSETOF(Node, prev), T2_OFFSETOF(Node, next));
         node = nodes;
         for (i = first; i <= last; i++) {
             match = 1;

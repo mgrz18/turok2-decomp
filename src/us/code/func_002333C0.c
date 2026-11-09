@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern void *Swoosh_TakeNode(void *arg0, s32 arg1);
+extern void *Swoosh_TakeNode(void *arg0, sptr arg1);
 extern void CMtxF__GetTranslation(char *object, f32 *output);
 extern void CMtxF__GetScale(void *arg0, f32 *arg1);
 extern void CMtxF__ToMtxAffine(void *arg0, f32 *arg1);
@@ -17,7 +17,7 @@ void *Swoosh_NewNode(void *arg0, void *arg1, void *arg2) {
     void *temp_s1;
     char *var_s0;
     char *temp_s2;
-    temp_s2 = Swoosh_TakeNode(arg0, (s32)arg1);
+    temp_s2 = Swoosh_TakeNode(arg0, (sptr)arg1);
     var_s0 = temp_s2;
     if (temp_s2 != 0) {
         ((ObjectLinks54 *)(arg1))->unk_50 = 0;

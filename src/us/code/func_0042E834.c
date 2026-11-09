@@ -11,7 +11,7 @@
 #define PLAYER_NEXT 0x1320
 #endif
 
-extern void memset(void *p, s32 c, s32 n); /* memset */
+extern void memset(void *p, s32 c, sptr n); /* memset */
 
 void CPlayerPool__Construct(CPlayerPool *pl) {
     memset(pl, 0, sizeof(CPlayerPool));

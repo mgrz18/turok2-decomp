@@ -46,7 +46,7 @@ s32 CAudioWorld__StartVoice(CAudioWorld *m, s32 id)
     SndQueue_RequeueVoice(&m->queue, 16, id);
     return -1;
   }
-  p = (SndVoiceParams *) ((u8 *)((((s16) idx) * 0xCC) + (u32) m) + 0x1DCC);
+  p = (SndVoiceParams *) ((u8 *)((((s16) idx) * 0xCC) + (uptr) m) + 0x1DCC);
   pl = &m->player;
   if (p->vol == 0)
   {

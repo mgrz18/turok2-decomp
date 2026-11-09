@@ -5,5 +5,5 @@
 
 
 void EnemyAnim_NormalDeath_B0360(CGameObjectInstance *obj, s32 arg1) {
-    AI_PickAnimFromTable((s32) obj, arg1, (s32) sEnemyAnimNormalDeath_B0360, obj->header.m_pIntelligence->m_Enemy.m_wNormalDeathAnimFlags);
+    AI_PickAnimFromTable((sptr) obj, arg1, sEnemyAnimNormalDeath_B0360, obj->header.m_pIntelligence->m_Enemy.m_wNormalDeathAnimFlags);
 }

@@ -11,8 +11,8 @@ f32 Angle_StepToward(f32 arg0, f32 arg1, s32 arg2, f32 arg3) {
     f32 var_f1;
     f32 var_f2;
 
-    Angle_Wrap((s32) &arg0);
-    Angle_Wrap((s32) &arg1);
+    Angle_Wrap((sptr) &arg0);
+    Angle_Wrap((sptr) &arg1);
     if (arg2 > 0) {
         if (arg1 < arg0) {
             var_f0 = arg1 + 6.283186f;

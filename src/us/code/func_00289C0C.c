@@ -41,7 +41,7 @@ void EngineMode16_Ending_Init(s32 arg0)
   }
   if (gEndingPrimagenDefeated != 0)
   {
-    CScene__RequestWarp((s32) &gScene, ~Cinema_RequestById(0x82), 0);
+    CScene__RequestWarp(&gScene, ~Cinema_RequestById(0x82), 0);
   }
   else
   {

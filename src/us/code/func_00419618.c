@@ -14,6 +14,6 @@ typedef struct {
 
 s32 SingleMenu_Load(s32 arg0, Unk00419618 *arg1) {
     func_00421250();
-    MenuPool_OpenMenu((s32) &gEngineApp_m_Game_m_MenuPool, (s32) &gPakLoadGameMenuDesc, arg1->unk1C, arg1->unk20, 0);
+    MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakLoadGameMenuDesc, arg1->unk1C, arg1->unk20, 0);
     return 1;
 }

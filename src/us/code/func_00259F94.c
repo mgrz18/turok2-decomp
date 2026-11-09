@@ -6,5 +6,5 @@
 
 
 void EnemyAnim_TakeCover_AF8D0(CGameObjectInstance *obj, s32 arg1) {
-    AI_PickAnimFromTable((s32) obj, arg1, (s32) sEnemyAnimTakeCover_AF8D0, obj->header.m_pIntelligence->m_Enemy.m_wTakeCoverAnimFlags);
+    AI_PickAnimFromTable((sptr) obj, arg1, sEnemyAnimTakeCover_AF8D0, obj->header.m_pIntelligence->m_Enemy.m_wTakeCoverAnimFlags);
 }

@@ -50,7 +50,7 @@ s32 SndVoicePool_FindSlot(SndVoicePool *p, s32 a, s32 b, s16 pri, s32 c) {
         return (s16)bestIdx;
     }
     {
-        (s) = (SndVoice *)(((s16)bestIdx) * 0xCC + (u32)(p)); (s) = (SndVoice *)((u8 *)(s) + 4);
+        (s) = (SndVoice *)(((s16)bestIdx) * 0xCC + (uptr)(p)); (s) = (SndVoice *)((u8 *)(s) + 4);
         m2 = s->mgr;
         s->stopping = 1;
         s->vp.follow = 0;

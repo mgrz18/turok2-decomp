@@ -20,7 +20,7 @@ void CCache__Main(void) {
     u32 m2;
     while (1) {
         osRecvMesg(&D_800D7BE0.q870, (OSMesg *)&msg, 1);
-        if ((u32)msg < 2) {
+        if ((uptr)msg < 2) {
             mask = __osDisableInt();
             if (++gCache_mutex_count != 1) {
                 __osRestoreInt(mask);
@@ -28,7 +28,7 @@ void CCache__Main(void) {
             } else {
                 __osRestoreInt(mask);
             }
-            CCache__ReleaseDisplayList(0, (u32)msg);
+            CCache__ReleaseDisplayList(0, (uptr)msg);
             m2 = __osDisableInt();
             if (--gCache_mutex_count != 0) {
                 __osRestoreInt(m2);

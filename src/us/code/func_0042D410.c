@@ -41,9 +41,9 @@ void func_0042D410(World *world) {
     for (i = 0; i < 96; i++) {
         DList_AddTail(world->nodeList, world->nodes[i]);
     }
-    CList__Construct(&world->freeSlots, 0, 4);
+    CList__Construct(&world->freeSlots, 0, sizeof(void *));
     for (i = 0; i < 10; i++) {
-        CList__Construct(&world->lists[i], 0, 4);
+        CList__Construct(&world->lists[i], 0, sizeof(void *));
     }
     for (i = 0; i < 100; i++) {
         CList__AddTail(&world->freeSlots, world->slots[i]);

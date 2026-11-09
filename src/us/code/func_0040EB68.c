@@ -24,7 +24,7 @@ void BlindOne_PhaseVictoryUpdate(void **arg0)
       temp_v1 = &gEngineApp_m_Game.m_Settings;
       *new_var = 1;
       temp_v1->unlockedCheats = (s32) (temp_v1->unlockedCheats | 0x120);
-      CPlayer__Warp((s32) temp_v0, 0x1387, 2, 0);
+      CPlayer__Warp((sptr) temp_v0, 0x1387, 2, 0);
     }
   }
 }

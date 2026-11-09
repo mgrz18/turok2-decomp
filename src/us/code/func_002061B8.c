@@ -23,8 +23,8 @@ loop_1:
         } while (ai->m_InitialHealth != 0);
     }
     if (!(ai->m_VisBits & 0x702)) {
-        CCache__DetachCacheEntry(0, (s32) ai);
+        CCache__DetachCacheEntry(0, (sptr) ai);
         CHeap__Free(&gHeap, ai->m_dwFlags);
-        CCache__FreeMemEntry(0, (s32) ai);
+        CCache__FreeMemEntry(0, (sptr) ai);
     }
 }

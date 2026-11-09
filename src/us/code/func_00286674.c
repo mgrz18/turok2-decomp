@@ -27,7 +27,7 @@ extern void GfxPool_Clear(void *p);
 extern void GfxPool_Alloc(void *p);
 extern void Demo_Reset(void);
 extern void CEngineApp__Construct(CEngineApp *e);
-extern void memset(void *p, s32 c, s32 n);   /* memset */
+extern void memset(void *p, s32 c, sptr n);   /* memset */
 extern void CCameraPool__Construct(void *p);
 extern void CPlayerPool__Construct(void *p);
 extern void CCollisionInfo__Reset(void);

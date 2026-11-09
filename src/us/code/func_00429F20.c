@@ -23,5 +23,5 @@ void MatrixHeap_Construct(ItemList *arg0, s32 arg1, s32 arg2) {
             var_s0 += 0x40;
         } while (var_s1 < arg2);
     }
-    MtxPool_Reset((s32) arg0);
+    MtxPool_Reset((sptr) arg0);
 }

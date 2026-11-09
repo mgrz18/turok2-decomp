@@ -51,7 +51,7 @@ s32 CParticle__IsUnderWater(CParticle *p);
 s32 func_00268148(Target *target);
 void ImpactEvent_Send(void *source, CParticle *p, s32 effect, s32 arg3, CVector3 pos, CEventValue params);
 void CParticle__SpawnChild(CParticle *p, s32 model, s32 arg2, s32 enabled);
-void Sound__Play(s16 sound, CVector3 pos, s32 arg2, s32 arg3);
+void Sound__Play(s16 sound, CVector3 pos, sptr arg2, s32 arg3);
 void CParticleSystem__Free(CParticleSystem *list, CParticle *p);
 void CParticle__StopLoopSound(CParticle *p);
 

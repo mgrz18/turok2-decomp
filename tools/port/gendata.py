@@ -288,6 +288,19 @@ class Elf:
 # layout: leaves of a described type
 # ---------------------------------------------------------------------------
 
+# Runtime state that sits, by address, inside the loaded .libultra section
+# (0x800C2474..0x800F632C): what the ELF has there is other bytes (code, tables,
+# strings), the game writes these before it reads them. Their pointer slots were
+# the "not a known address" list of data_report.txt (docs/port/DATA.md).
+RUNTIME_BSS = frozenset("""
+    gDemoPlayer_match_decode gAudioWorld gRumbleEntries gDemoPlayer sPathSearch
+    gAudioFrameMsgBuf gAudioReplyMsgBuf gLoopSoundEntries gAudioThread gLoopSounds
+    gRumblePool sMapSweep sPathNeighbour D_800F1FF4 gAudioDmaBuffers sCinema50Player
+    sPathSorted sPoseChildren D_800F55F0 D_800F55F4 gAudioReplyMsgQ sDeathCinemaPlayer
+    gAudioGlobals gCollisionResultsP gPakMesgBuf sPathSwap sPoseRegion
+""".split())
+
+
 def dsize(d):
     """(n64 size, host size) of a description."""
     t = d[0]
@@ -609,9 +622,12 @@ class Generator:
     def is_bss(self, s):
         """Linker-script symbols (SHN_ABS: placed by address, no .s data
         behind them) are .bss: the ELF bytes at their address belong to
-        whatever splat put there (libultra code, strings), not to them."""
+        whatever splat put there (libultra code, strings), not to them.
+        RUNTIME_BSS: the same for runtime structs that splat's labels put
+        inside the .libultra section (their pointer slots read code bytes)."""
         info = self.elf.syms[s.name]
-        return info[2] == 'SHN_ABS' or self.elf.section_of(s.key) is None
+        return (info[2] == 'SHN_ABS' or self.elf.section_of(s.key) is None
+                or s.name in RUNTIME_BSS)
 
     def size_of(self, s):
         ext = self.elf.extent(s.key)
@@ -712,6 +728,11 @@ class Generator:
                     iv = int.from_bytes(v, 'big')
                     if (0x80000400 <= iv < 0x80400000 or 0x00200500 <= iv < 0x002C3000
                             or 0x00400000 <= iv < 0x0043CC14) and self.elf.containing(phys(iv)) is not None:
+                        if hs == 8:
+                            # a pointer-wide integer (sptr/uptr in src/: "an integer or an
+                            # address") that holds an address: relocated like a void *
+                            ptrs.append((hoff, iv, None))
+                            continue
                         self.int_addr[s.name] += 1
                 if extra == 'f' or ns == hs:
                     img[hoff:hoff + hs] = v[::-1] if ns > 1 else v

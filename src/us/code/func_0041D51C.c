@@ -17,7 +17,7 @@ extern void Hud_DrawBevelBox(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s3
 extern void MenuItem_DrawText(void *menu, MenuItemLayout *item, s32 arg2, Menu *win);
 
 void NameEntryMenu_DrawName(void *menu, MenuItemLayout *item, s32 arg2, Menu *win) {
-    s32 index;
+    sptr index;
     f32 width;
     f32 alpha;
     s32 x;

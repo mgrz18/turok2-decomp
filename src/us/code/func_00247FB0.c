@@ -18,8 +18,8 @@ typedef struct Hit {
 
 s32 *CISet__GetBlock(s32 arg0, s32 arg1);
 s32 CPlayer__IsInMatchEndState(CPlayer *player);
-void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, s32 arg1, void *hit);
-void CGameObjectInstance__DrawModel(CGameObjectInstance *actor, s32 arg1, void *hit);
+void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, sptr arg1, void *hit);
+void CGameObjectInstance__DrawModel(CGameObjectInstance *actor, sptr arg1, void *hit);
 void Render_DrawModelShared(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
 void Render_QueueModelInstance(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
 
@@ -61,12 +61,12 @@ void Player_DrawNodeCallback(CGameObjectInstance *actor, s32 arg1, Hit *hit) {
             gBlendState_m_Color[4] = 255.0f;
             CGameObjectInstance__DrawModelImmediate(actor, arg1, hit);
             if (player->m_ShockedTimer > 0.0f && CPlayer__IsInMatchEndState(player) == 0) {
-                Render_DrawModelShared(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, (s8) hit->amount, -1);
+                Render_DrawModelShared(hit->unkC, ((sptr)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, (s8) hit->amount, -1);
             }
             if (player->m_Data.m_nDeathmatchCharacter != 10 && player->m_Data.m_Health != 0) {
                 index = WEAPON_INDEX(player);
                 if (index >= 0 && index < HIT_LIMIT(hit)) {
-                    Render_DrawModel(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, index, actor->m_AI.m_nTexture);
+                    Render_DrawModel(hit->unkC, ((sptr)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, index, actor->m_AI.m_nTexture);
                 }
             }
             return;
@@ -74,14 +74,14 @@ void Player_DrawNodeCallback(CGameObjectInstance *actor, s32 arg1, Hit *hit) {
     }
     if (player->m_ShockedTimer > 0.0f && CPlayer__IsInMatchEndState(player) == 0) {
         CGameObjectInstance__DrawModelImmediate(actor, arg1, hit);
-        Render_DrawModelShared(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, (s8) hit->amount, -1);
+        Render_DrawModelShared(hit->unkC, ((sptr)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, (s8) hit->amount, -1);
     } else {
         CGameObjectInstance__DrawModel(actor, arg1, hit);
     }
     if (player->m_Data.m_nDeathmatchCharacter != 10 && player->m_pOptions->m_TagMode == 0 && player->m_Data.m_Health != 0 && player->m_CharacterActor.m_nTypeFlag != gTagModeModel) {
         index = WEAPON_INDEX(player);
         if (index >= 0 && index < HIT_LIMIT(hit)) {
-            Render_QueueModelInstance(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, WEAPON_INDEX(player), actor->m_AI.m_nTexture);
+            Render_QueueModelInstance(hit->unkC, ((sptr)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, WEAPON_INDEX(player), actor->m_AI.m_nTexture);
         }
     }
 }

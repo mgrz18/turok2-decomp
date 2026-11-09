@@ -32,7 +32,7 @@ extern CPlayer **CCache__Allocate(s32 heap, s32 size, s32 tag, char *name);
 extern void CCache__Deallocate(s32 heap, CPlayer **handle);
 extern void CCache__Flush(s32);
 extern void Controller_SetRumbleOptionAll(s32);
-extern void memset(void *p, s32 c, s32 n); /* memset */
+extern void memset(void *p, s32 c, sptr n); /* memset */
 extern void CPlayerContState__Init(void *, ControllerProfile *);
 extern void CPlayer__Reset(CPlayer *p);
 extern void CPlayer__NewGame(CPlayer *p, s32 character, s32 arg2);

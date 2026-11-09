@@ -15,14 +15,14 @@ s32 RumbleMenu_Play(s32 arg0, void *arg1)
   {
     if (arg1)
     {
-      Controller_ResetRumble((s32) (*((void **) (((s8 *) arg1) + 0x20))));
-      Controller_SetRumbleOption((s32) (*((void **) (((s8 *) arg1) + 0x20))), 1);
+      Controller_ResetRumble((sptr) (*((void **) (((s8 *) arg1) + 0x20))));
+      Controller_SetRumbleOption((sptr) (*((void **) (((s8 *) arg1) + 0x20))), 1);
       *((s32 *) (((s8 *) (*((void **) (((s8 *) arg1) + 0x1C)))) + 0xBF8)) = 0;
     }
     else
     {
-      Controller_ResetRumble((s32) (*((void **) (((s8 *) arg1) + 0x20))));
-      Controller_SetRumbleOption((s32) (*((void **) (((s8 *) arg1) + 0x20))), 1);
+      Controller_ResetRumble((sptr) (*((void **) (((s8 *) arg1) + 0x20))));
+      Controller_SetRumbleOption((sptr) (*((void **) (((s8 *) arg1) + 0x20))), 1);
       *((s32 *) (((s8 *) (*((void **) (((s8 *) arg1) + 0x1C)))) + 0xBF8)) = 0;
     }
   }

@@ -23,7 +23,7 @@ void Actor_SpawnParticle(SpawnObj *obj, s32 kind, CVector3 at) {
     CVector3 pos;
     CVector3 vel;
     CQuaternion rot;
-    s32 region;
+    sptr region;
     s32 mode;
     s32 target;
 

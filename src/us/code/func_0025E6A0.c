@@ -11,6 +11,6 @@ void EnemyMode_StartDelay_Update(s32 arg0, CAI *arg1) {
     temp_f0 = arg1->m_ConditionTimer - gFrameIncrement;
     arg1->m_ConditionTimer = temp_f0;
     if (temp_f0 <= 0.0f) {
-        CAI__SetMode(arg0, (s32) arg1, 2);
+        CAI__SetMode(arg0, arg1, 2);
     }
 }

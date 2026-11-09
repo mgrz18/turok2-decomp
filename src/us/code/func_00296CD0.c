@@ -7,7 +7,7 @@ extern f32 _doModFunc(ALDelay *d, s32 count);
 extern Acmd *_loadBuffer(ALFx *, s16 *, s32, s32, Acmd *);
 Acmd *_loadOutputBuffer(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
 {
-    extern s32 osVirtualToPhysical(s32);
+    extern s32 osVirtualToPhysical(sptr);
     Acmd *ptr = p;
     s32 ratio, count, rbuff = 640;
     s16 *out_ptr;
@@ -26,11 +26,11 @@ Acmd *_loadOutputBuffer(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
         count = (s32)fincount;
         d->rs->delta = fincount - (f32)count;
         out_ptr = &r->input[-(d->output - d->rsdelta)];
-        ramalign = ((s32)out_ptr & 0x7) >> 1;
+        ramalign = ((sptr)out_ptr & 0x7) >> 1;
         ptr = _loadBuffer(r, out_ptr - ramalign, rbuff, count + ramalign, ptr);
         ratio = (s32)(fratio * unity);
         { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(8) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(rbuff + (ramalign << 1)) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(buff) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(incount << 1) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
-        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(5) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(d->rs->first) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(ratio) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (unsigned int)(osVirtualToPhysical((s32)d->rs->state)); };
+        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(5) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(d->rs->first) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(ratio) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (unsigned int)(osVirtualToPhysical((sptr)d->rs->state)); };
         d->rs->first = 0;
         d->rsdelta += count - incount;
     } else {

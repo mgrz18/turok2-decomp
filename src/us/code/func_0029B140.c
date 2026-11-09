@@ -3,6 +3,6 @@
 #include "globals/libultra.h"
 
 
-s32 __osGetCurrFaultedThread(void) {
+sptr __osGetCurrFaultedThread(void) {
     return __osFaultedThread;
 }

@@ -43,7 +43,7 @@ void *osViGetCurrentFramebuffer(void);
 void *osViGetNextFramebuffer(void);
 void osViSetEvent(OSMesgQueue *, OSMesg, u32);
 void osViSetMode(OSViMode *);
-s32 osContStartReadData(OSMesgQueue *);
+sptr osContStartReadData(OSMesgQueue *);
 void osContGetReadData(OSContPad *);
 s32 osContInit(OSMesgQueue *, u8 *, OSContStatus *);
 void osSpTaskLoad(OSTask *);

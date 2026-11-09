@@ -43,7 +43,7 @@ void CPlayerPool__EndMatch(List002534E0 *arg0) {
                 var_a0 = var_s0;
                 if (var_s0 != NULL) {
                     do {
-                        CPlayer__SetState((s32) var_a0, (s32) var_s0, 0x12);
+                        CPlayer__SetState(var_a0, var_s0, 0x12);
                         var_s0 = var_s0->next;
                         var_a0 = var_s0;
                     } while (var_s0 != NULL);
@@ -55,7 +55,7 @@ void CPlayerPool__EndMatch(List002534E0 *arg0) {
             var_a0_2 = var_s0;
             if (var_s0 != NULL) {
                 do {
-                    CPlayer__SetState((s32) var_a0_2, (s32) var_s0, 0x12);
+                    CPlayer__SetState(var_a0_2, var_s0, 0x12);
                     var_s0 = var_s0->next;
                     var_a0_2 = var_s0;
                 } while (var_s0 != NULL);

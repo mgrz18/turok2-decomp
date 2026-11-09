@@ -11,7 +11,7 @@ void SndVoicePool_PlayVoice(SlotRecAtB8 *base, s16 index)
   char *entry = (char *) offset;
   SlotRecAtB8 *slots;
   SlotRecAtB8 *selected;
-  entry += (unsigned int) base;
+  entry += (uptr) base;
   slots = base;
  do { alSndpPlay(0x84 + ((SlotRecAtB8 *) entry)->owner); entry = (char *) slots; entry += offset; selected = (SlotRecAtB8 *) entry; } while (0);
   selected->flags |= 8;

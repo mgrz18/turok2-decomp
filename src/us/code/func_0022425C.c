@@ -18,7 +18,7 @@ struct Shared_ParticleLighting {
     u8 reserved13[5];
 } __attribute__((aligned(4)));
 void *CScene__GetRegionInfo(CScene *arg0, u16 *arg1) {
-    s32 base;
+    sptr base;
     s32 idx;
     if (arg1 == 0) {
         return 0;

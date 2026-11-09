@@ -6,5 +6,5 @@
 
 
 void EnemyAnim_Move_AFBF0(CGameObjectInstance *arg0, s32 arg1) {
-    AI_PickAnimFromTable((s32) arg0, arg1, (s32) sEnemyAnimMove_AFBF0, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wMoveAnimFlags);
+    AI_PickAnimFromTable((sptr) arg0, arg1, sEnemyAnimMove_AFBF0, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wMoveAnimFlags);
 }

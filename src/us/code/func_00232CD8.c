@@ -12,7 +12,7 @@ void *CParticleSystem__FindOwned(CParticleSystem *arg0, s32 arg1, CROMParticleEf
     if (arg2 != 0) {
         if (record != 0) {
             do {
-                if ((s32) record->m_pOwnerID == arg1) {
+                if ((sptr) record->m_pOwnerID == arg1) {
                     if (record->m_pEffect == arg2) {
                         return record;
                     }
@@ -22,7 +22,7 @@ void *CParticleSystem__FindOwned(CParticleSystem *arg0, s32 arg1, CROMParticleEf
         }
     } else if (record != 0) {
         do {
-            if ((s32) record->m_pOwnerID == arg1) {
+            if ((sptr) record->m_pOwnerID == arg1) {
                 return record;
             }
             record = record->m_pNext;

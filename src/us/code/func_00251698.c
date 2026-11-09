@@ -28,7 +28,7 @@ extern s32 PlayerDeath_CinemaDone;
 
 void CPlayer__StartDeathCinema(CPlayer *arg0, s32 arg1, s32 arg2) {
     s32 temp_a0;
-    s32 temp_a1;
+    sptr temp_a1;
     ModelRecord *temp_v0;
     Found0xC45 *temp_v0_2;
     s32 var_s0;
@@ -39,7 +39,7 @@ void CPlayer__StartDeathCinema(CPlayer *arg0, s32 arg1, s32 arg2) {
     temp_a1 = arg0->m_CharacterActor.header.m_pCurrentRegion;
     var_s1 = 0;
     if (temp_a1 != 0) {
-        temp_v0 = CScene__GetRegionInfo((s32) &gScene, temp_a1);
+        temp_v0 = CScene__GetRegionInfo(&gScene, temp_a1);
         if (temp_v0 != 0) {
             var_s1 = temp_v0->flags;
         }
@@ -83,7 +83,7 @@ void CPlayer__StartDeathCinema(CPlayer *arg0, s32 arg1, s32 arg2) {
         sDeathCinemaPlayer = arg0;
         Cinema_SetNextCallbacks(arg2, 0, &PlayerDeath_CinemaDone);
     }
-    temp_v0_2 = CScene__FindIntelligence((s32) &gScene, -1, 0xC45);
+    temp_v0_2 = CScene__FindIntelligence(&gScene, -1, 0xC45);
     if (temp_v0_2 != 0) {
         arg0->m_CharacterActor.m_vScale.x = temp_v0_2->unk38;
         arg0->m_CharacterActor.m_vScale.y = temp_v0_2->unk3C;

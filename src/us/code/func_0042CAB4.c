@@ -10,7 +10,7 @@ void CScene__DecompressParticles(s32 arg0, void ***arg1) {
     void *obj;
     GroupCode8044E2B8 *group;
     Piece *piece;
-    s32 base;
+    sptr base;
     s32 count;
     s32 i;
     if (ProPackDecompress(arg1, 0) != 0) {
@@ -19,7 +19,7 @@ void CScene__DecompressParticles(s32 arg0, void ***arg1) {
         count = group->count;
         piece = group->pieces;
         i = 0;
-        base = (s32) CISet__GetBlock(obj, i);
+        base = (sptr) CISet__GetBlock(obj, i);
         if (count > 0) {
             do {
                 if (piece[i].tag == -1) {

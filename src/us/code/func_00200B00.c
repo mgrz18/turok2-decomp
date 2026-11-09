@@ -46,7 +46,7 @@ s32 ProPackDecompress(void **arg0, s32 arg1) {
     temp_s0 = temp_a2->unk0;
     if ((temp_s0->unk0 & ~0xFF) == 0x524E4300) {
         if (arg1 != 0) {
-            var_s1 = CCache__AllocateMemoryForDecompressionTop(0, (s32) arg0, temp_s0->unk4);
+            var_s1 = CCache__AllocateMemoryForDecompressionTop(0, (sptr) arg0, temp_s0->unk4);
         } else {
             var_s1 = CCache__AllocateMemoryForDecompression(0, arg0, temp_s0->unk4);
         }

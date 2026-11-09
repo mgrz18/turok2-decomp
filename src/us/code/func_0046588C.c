@@ -26,8 +26,8 @@ void func_0046588C(Unk0046588C *arg0) {
         do {
             temp_s0 = var_s1->next;
             LevelEvent_Fire(var_s1->handle);
-            CList__Remove((s32) &arg0->activeHead, (s32) var_s1);
-            CList__AddHead((s32) arg0->freeList, (s32) var_s1);
+            CList__Remove(&arg0->activeHead, var_s1);
+            CList__AddHead(arg0->freeList, var_s1);
             var_s1 = temp_s0;
         } while (var_s1 != NULL);
     }

@@ -7,5 +7,5 @@
 
 void MantidQueen_EnterMode2(CGameObjectInstance *arg0) {
     arg0->m_dwFlags = (s32) (arg0->m_dwFlags & ~0x2000);
-    CScene__MarkGeneratorsSaved((s32) &gScene);
+    CScene__MarkGeneratorsSaved(&gScene);
 }

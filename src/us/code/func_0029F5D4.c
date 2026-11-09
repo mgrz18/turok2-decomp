@@ -11,8 +11,8 @@ Acmd *alRaw16Pull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd 
     s32 dramLoc;
     s32 dramAlign;
     s32 dmemAlign;
-    s32 overFlow;
-    s32 startZero;
+    sptr overFlow;
+    sptr startZero;
     s32 nSam;
     s32 op;
     ALLoadFilter *f = (ALLoadFilter *)filter;
@@ -31,7 +31,7 @@ Acmd *alRaw16Pull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd 
         } else
             dramAlign = 0;
         *outp += dramAlign;
-        f->memin = (s32)f->table->base + (f->loop.start << 1);
+        f->memin = (sptr)f->table->base + (f->loop.start << 1);
         f->sample = f->loop.start;
         op = *outp;
         while (outCount > nSam) {
@@ -58,7 +58,7 @@ Acmd *alRaw16Pull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd 
         return ptr;
     }
     nbytes = outCount << 1;
-    overFlow = f->memin + nbytes - ((s32)f->table->base + f->table->len);
+    overFlow = f->memin + nbytes - ((sptr)f->table->base + f->table->len);
     if (overFlow < 0)
         overFlow = 0;
     if (overFlow > nbytes)

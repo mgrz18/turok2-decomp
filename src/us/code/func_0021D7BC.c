@@ -9,7 +9,7 @@
  * death models (by AI mode) for an enemy (type 1), then its shadow (CGameObjectInstance__DrawShadow). */
 
 
-void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
+void CGameObjectInstance__DrawShadow(CGameObjectInstance *, sptr, CDrawArgs *);
 void Render_QueueModelInstance(s32, s32, s32, void *, s32, s32, s32);
 
 static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0, s32 *set1) {
@@ -53,13 +53,13 @@ static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0
     }
 }
 
-void CGameObjectInstance__DrawModel(CGameObjectInstance *actor, s32 arg1, CDrawArgs *params) {
+void CGameObjectInstance__DrawModel(CGameObjectInstance *actor, sptr arg1, CDrawArgs *params) {
     pickSets(actor, params->m_nVariant, &params->m_nModel, &params->m_nShadowModel);
     actor->m_AI.m_VisBits = 1 << params->m_nModel;
     if (params->m_bShadow != 0) {
         CGameObjectInstance__DrawShadow(actor, arg1, params);
     }
     if (params->m_bDraw != 0) {
-        Render_QueueModelInstance(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, params->m_nModel, actor->m_AI.m_nTexture);
+        Render_QueueModelInstance(params->m_hModel, ((sptr)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, params->m_nModel, actor->m_AI.m_nTexture);
     }
 }

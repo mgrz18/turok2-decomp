@@ -48,7 +48,7 @@ static __inline__ void spawnMinion(BlindOneState *state, s32 *toSpawn, s32 *aliv
     CVector3 pos;
     CVector3 vel;
     CVector3 scale;
-    s32 region;
+    sptr region;
 
     if (toSpawn != NULL && *toSpawn == 0) {
         return;

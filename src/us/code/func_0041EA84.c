@@ -64,8 +64,8 @@ void PakMenu_InitSaveGame(Menu *own) {
             SaveGame_Build(plr);
             {
                 u32 crc = Crc32_Compute(gSaveBuffer, D_800F70A8 + 0x684, 0xB);
-                s32 buf = (s32)gSaveBuffer;
-                s32 size = D_800F70A8;
+                s32 buf = (sptr)gSaveBuffer;
+                sptr size = D_800F70A8;
 
                 *(u32 *)(size + buf + 0x684) = crc;
             }

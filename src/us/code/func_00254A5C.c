@@ -10,7 +10,7 @@
 s32 CPlayerPool__IsScoreLimitReached(CPlayerPool *list) {
     GameMatch *state;
     CPlayer *p;
-    s32 skip;
+    sptr skip;
     s32 sum;
     s32 i;
 

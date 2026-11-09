@@ -29,7 +29,7 @@ static __inline__ s32 nameCmp(u8 *a, u8 *b, s32 n) {
 }
 
 void NameEntryMenu_Init(Menu *menu) {
-    s32 index;
+    sptr index;
     s32 i;
     s32 spaces;
     u8 *name;

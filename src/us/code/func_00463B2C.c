@@ -26,7 +26,7 @@ extern void CDecompressor__Flush(CDecompressor *thisx);
 extern void **CCache__Allocate(s32 unused, s32 size, s32 mode, char *name);
 extern void CCache__Deallocate(s32 unused, void **block);
 extern void CCache__Flush(s32);
-extern void **CCache__LoadPersistantIndex(s32 unused, void **out, s32 key, char *name);
+extern void **CCache__LoadPersistantIndex(s32 unused, void **out, sptr key, char *name);
 extern void **CCache__LoadPersistantSubBlock(s32 unused, void *file, s32 index, s32 key, CScene *owner, void *callback, char *name);
 extern void CCache__SetFrameDelay(s32);
 extern void CGameObjectInstance__UpdateAnimation(u8 *actor);

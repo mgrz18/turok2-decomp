@@ -13,7 +13,7 @@ extern s32 func_0026C0E0(void *region);
  * through gCollisionResults does not give this code. */
 extern void ImpactEvent_Send(CParticle *, CParticle *, s32 effect, s32, CVector3 pos, CEventValue params);
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
-extern void Sound__Play(s16 sound, CVector3 pos, s32, s32);
+extern void Sound__Play(s16 sound, CVector3 pos, sptr, s32);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
 extern void CParticleSystem__Free(CParticleSystem *sys, CParticle *p);
 extern void CParticle__StopLoopSound(CParticle *p);

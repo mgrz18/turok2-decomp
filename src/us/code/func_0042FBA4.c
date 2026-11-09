@@ -15,7 +15,7 @@ void Sound__SetListener(void *);
 void CCache__Flush(s32);
 void CCache__Deallocate(s32, void *);
 struct CMemEntry *CCache__Allocate(s32, s32, s32, char *);
-void *memset(void *destination, s32 value, u32 size);
+void *memset(void *destination, s32 value, uptr size);
 
 static __inline__ void clearAxis(CShakeAxis *axis) {
     axis->m_Shake = 0;

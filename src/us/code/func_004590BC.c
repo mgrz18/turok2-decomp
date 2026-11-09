@@ -16,7 +16,7 @@ extern s32 D_8011B114;
 void CCache__Flush(s32 a);
 void CCache__Deallocate(s32 a, s32 b);
 CPlayer *CPlayerPool__FindByController(void *a, void *b);
-void MenuPool_OpenMenu_2(void *a, void *b, s32 c, s32 d, s32 e);
+void MenuPool_OpenMenu_2(void *a, void *b, sptr c, sptr d, sptr e);
 
 s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
     struct {
@@ -52,14 +52,14 @@ s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
         gPakMenuStartPressed = 0;
         D_8011F144 = 1;
         D_8011B114 = 0;
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakSaveGameAnyPakMenuDesc_2, 0, (s32)arg->controller, 0);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakSaveGameAnyPakMenuDesc_2, 0, (sptr)arg->controller, 0);
         return 1;
     }
     if (gPakMenuIsProfile != 0) {
         if (gPakMenuIsLoad != 0) {
             gPakMenuLeaving = 1;
             plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, arg->controller);
-            MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, (u8 *)&gCharacterMenuDesc_2, (s32)plr, plr->m_ContState.m_pContState, mm.m);
+            MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, (u8 *)&gCharacterMenuDesc_2, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
         if (gPakMenuIsSave != 0) {
@@ -83,7 +83,7 @@ s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
                 tbl = (u8 *)&gStatsAfterPakMenuDesc4_2;
                 break;
             }
-            MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, tbl, (s32)plr, plr->m_ContState.m_pContState, mm.m);
+            MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, tbl, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
         return 0;
@@ -91,14 +91,14 @@ s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
     plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, arg->controller);
     if (gPakMenuIsLoad != 0) {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu_2(gEngineApp_m_Game.m_MenuPool, (u8 *)&gSingleMenuAfterPakDesc_2, (s32)plr, plr->m_ContState.m_pContState, mm.m);
+        MenuPool_OpenMenu_2(gEngineApp_m_Game.m_MenuPool, (u8 *)&gSingleMenuAfterPakDesc_2, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
         return 1;
     }
     if (gPakMenuIsSave == 0) {
         return 0;
     } else {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, (u8 *)&gSavePortalMenuDescB_2, (s32)plr, plr->m_ContState.m_pContState, mm.m);
+        MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, (u8 *)&gSavePortalMenuDescB_2, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
         gCameraPoolHideViews = 0;
         return 1;
     }

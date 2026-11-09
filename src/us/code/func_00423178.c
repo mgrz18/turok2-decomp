@@ -16,7 +16,7 @@ static __inline__ s32 func_00422EE0_inline(void) {
 }
 
 s32 SavePortalMenu_SelectSave(s32 unused, Menu *event) {
-    s32 player = event->player;
+    sptr player = event->player;
 
     if (func_00422EE0_inline()) {
         return 0;

@@ -9,5 +9,5 @@ s32 Cinema_RequestForObject(s32, s32);
 void InteractiveAnim_EventPlayCinema(CGameObjectInstance *arg0, s32 arg1, s32 arg2) {
     Cinema_RequestForObject(arg0, arg2);
     arg0->m_dwFlags = (s32) (arg0->m_dwFlags | 0x2100);
-    CScene__SetInstanceSavedBit((s32) &gScene, arg0, 0);
+    CScene__SetInstanceSavedBit(&gScene, arg0, 0);
 }

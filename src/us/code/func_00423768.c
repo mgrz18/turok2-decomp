@@ -31,13 +31,13 @@ s32 DamagedPakMenu_SelectRetry(s32 unused, Menu *event) {
         if (event->context == &gSavePortalMenuDescB || event->context == &gSavePortalMenuDesc) {
             gCameraPoolHideViews = 0;
         }
-        MenuPool_OpenMenu(dst, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu(dst, event->context, event->player, (sptr) event->controller, NULL);
         return 1;
     } else {
         if (event->context == &gSavePortalMenuDescB || event->context == &gSavePortalMenuDesc) {
             gCameraPoolHideViews = 0;
         }
-        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (sptr) event->controller, NULL);
         return 1;
     }
 }

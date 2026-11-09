@@ -68,7 +68,7 @@ s32 GameNoteMenu_SelectYes(void *menu, Menu *c) {
         }
         gEngineApp_m_Game_m_PlayerList_m_bCinema[0] = 0;
         gEngineApp_m_Game_m_PlayerList_m_bCinema[1] = 0;
-        MenuPool_OpenMenu((u8 *) gEngineApp_m_Game_m_PlayerList_m_bCinema + 0x588, &gPakMsgRumblePakDesc, (s32) player, player->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu((u8 *) gEngineApp_m_Game_m_PlayerList_m_bCinema + 0x588, &gPakMsgRumblePakDesc, (sptr) player, player->m_ContState.m_pContState, NULL);
         return 1;
     }
     if (Pak_DeleteNote(slot, gPakNoteIndex) == 0) {

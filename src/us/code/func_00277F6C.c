@@ -9,14 +9,14 @@
 
 extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[2]; /* local type: the field's real type (or the member path) changes the ROM's code here */       /* font spacing */
 
-extern s32 COnScreen__GetFontTexture(void);
+extern sptr COnScreen__GetFontTexture(void);
 extern void Render_SetCombineMode(s32 mode);
 extern void Render_SetRenderMode(s32 mode);
 extern void COnScreen__SetFontColor(s32 r0, s32 g0, s32 b0, s32 r1, s32 g1, s32 b1);
 extern void COnScreen__SetFontScale(f32 x, f32 y);
 
 void COnScreen__BeginText(void) {
-    s32 texture;
+    sptr texture;
 
     texture = COnScreen__GetFontTexture();
     if (texture != 0) {

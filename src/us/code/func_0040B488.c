@@ -20,7 +20,7 @@ void MotherBoss_Mode16_TeleportTarget(s32 arg0, void *arg1)
     *((s32 *) (((s8 *) new_var) + 0x67C)) = temp_v0;
     if (temp_v0 >= 0x1F)
     {
-      CAI__SetMode(arg0, (s32) arg1, 0x11);
+      CAI__SetMode(arg0, arg1, 0x11);
     }
   }
 }

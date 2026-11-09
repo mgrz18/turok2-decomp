@@ -6,5 +6,5 @@
 
 
 void EnemyAnim_Combat_AFE28(CGameObjectInstance *arg0, s32 arg1) {
-    AI_PickAnimFromTable((s32) arg0, arg1, (s32) sEnemyAnimCombat_AFE28, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wCombatAnimFlags);
+    AI_PickAnimFromTable((sptr) arg0, arg1, sEnemyAnimCombat_AFE28, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wCombatAnimFlags);
 }

@@ -24,7 +24,7 @@ void CCameraPool__AddText(CGameFromCameraPool *game, void *camera, char *text);
 void Sound__PlaySpeech(s32 sound);
 void CCamera__SetHitFlash(void *camera, s32 alpha, s32 time);
 void Sound__Play2D(s32 sound);
-void Sound__Play(s16 sound, CVector3 pos, s32, s32);
+void Sound__Play(s16 sound, CVector3 pos, sptr, s32);
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))

@@ -42,11 +42,11 @@ void Crash_PrintStack(u8 *stack, s32 size, Thread *thread, u8 fill) {
     putString(D_800AA0F0);
     putString("Call stack ");
     putString("(top:");
-    putHex32((u32)(stack + size));
+    putHex32((uptr)(stack + size));
     putString(" bot:");
-    putHex32((u32)stack);
+    putHex32((uptr)stack);
     putString(" low:");
-    putHex32((u32)low);
+    putHex32((uptr)low);
     putString(")\n");
     sCrashTextColor = 0xF7A9;
     for (sp = thread->sp, count = 1; sp < top && count < 6; sp++) {

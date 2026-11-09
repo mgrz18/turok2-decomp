@@ -8,7 +8,7 @@
 void Throwable_SetModeAnim(CPlayer *player, CAI *ai, CGameObjectInstance *obj);
 
 void EnemyAI_Mount(CGameObjectInstance *obj, CAI *ai, CPlayer *player) {
-    ai->m_VarBuffer[2] = (u32) player;
+    ai->m_VarBuffer[2] = (uptr) player;
     if (player != NULL) {
         Throwable_SetModeAnim(player, &player->m_CharacterActor.m_AI, obj);
     }

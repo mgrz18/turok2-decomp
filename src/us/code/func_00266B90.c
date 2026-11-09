@@ -11,7 +11,7 @@ void memmove(u8 *dst, u8 *src, s32 len) {
     if (len == 0) {
         return;
     }
-    if (((u32)src | (u32)dst | len) & 3) {
+    if (((uptr)src | (uptr)dst | len) & 3) {
         d = dst;
         s = src;
         if (dst < src) {
