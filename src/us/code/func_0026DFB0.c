@@ -1,4 +1,10 @@
 #include "common.h"
+#ifdef TARGET_PORT
+#include "structs/game.h"
+#include "structs/camera.h"
+#endif
+#include "structs/player.h"
+#include "structs/game_object.h"
 #include "structs/event.h"
 #include "globals/game.h"
 #include "globals/camera.h"
@@ -22,6 +28,15 @@ void LevelEvent_Fire(LevelEvent *event) {
         return;
     }
     game = &gEngineApp_m_Settings.multiplayer;
+#ifdef TARGET_PORT /* the camera pool by name (host layout) */
+    camera = &gEngineApp_m_Game.m_CameraPool->m_MainCamera;
+    if (*game == 0) {
+        camera = gEngineApp_m_Game.m_CameraPool->m_ActiveList.m_pHead;
+        if (camera == NULL) {
+            camera = &gEngineApp_m_Game.m_CameraPool->m_MainCamera;
+        }
+    }
+#else
     camera = game - 0x1201;                         /* gEngineApp_m_Game_m_CameraPool_m_MainCamera: fallback camera */
     if (*game == 0) {
         camera = *(void **)(game - 0x1221);         /* gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead: first viewer */
@@ -29,6 +44,7 @@ void LevelEvent_Fire(LevelEvent *event) {
             camera = game - 0x1201;
         }
     }
+#endif
     if (gScene.m_Mode == 4) {
         if (event->message != 0) {
             CCameraPool__AddMultiLineText(&gEngineApp_m_Game_m_CameraPool, camera, gLevelMessages[event->message].text, gFrameCountGameplay, 4.0f);
@@ -42,9 +58,9 @@ void LevelEvent_Fire(LevelEvent *event) {
     }
     entry += event->handler;
     if (event->level == gScene.m_nLevel) {
-        actor = (u8 *)gScene.m_pActors + event->actor * 0x288;
+        actor = (u8 *)gScene.m_pActors + event->actor * (s32)sizeof(CGameObjectInstance);
         if (entry->onActor != NULL) {
-            entry->onActor(actor, actor + 0x140, event);
+            entry->onActor(actor, actor + T2_OFFSETOF(CGameObjectInstance, m_AI), event);
         }
     } else if (entry->onEvent != NULL) {
         entry->onEvent(event);

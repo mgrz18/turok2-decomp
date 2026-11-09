@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/model.h"
@@ -40,7 +41,7 @@ void WeaponActor_Draw(WeaponActor *obj, CAI *state, CDrawArgs *args) {
     }
     muzzle = ((WeaponActor *)player->m_pOnEnemy);
     if (muzzle != NULL) {
-        EnemyAI_CalcOrientationMatrix(muzzle, (u8 *)muzzle + 0x140);
+        EnemyAI_CalcOrientationMatrix(muzzle, (u8 *)muzzle + T2_OFFSETOF(CGameObjectInstance, m_AI));
         muzzle->render = obj->render;
         muzzle->drawHook = CGameObjectInstance__DrawModel;
         CGameObjectInstance__Draw(muzzle, args->m_pCamera);

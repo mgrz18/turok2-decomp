@@ -7,6 +7,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/player.h"
 #include "structs/world.h"
 typedef struct M04Part {
@@ -42,7 +43,7 @@ void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04P
             i = 0;
             if (n > 0) {
                 do {
-                    cur = base + i * 0x288;
+                    cur = base + i * (s32)sizeof(CGameObjectInstance);
                     if (cur != src) {
                         send_(cur, dst, kind, pos, part);
                     }

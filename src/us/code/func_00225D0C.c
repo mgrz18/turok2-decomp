@@ -4,6 +4,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "structs/player.h"
+#include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
 #include "protos/scene.h"
@@ -164,7 +166,7 @@ void CScene__UnmarkGeneratorsSaved(void *arg0) {
                 CScene__SetInstanceSavedBit(arg0, entry, 0);
                 i += 1;
             }
-            offset += 0x288; /* sizeof(LevelActor) in Turok 2 */
+            offset += (s32)sizeof(CGameObjectInstance); /* sizeof(LevelActor) in Turok 2 */
         } while (i < count);
     }
 }
