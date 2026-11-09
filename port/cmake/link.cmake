@@ -85,6 +85,8 @@ set(T2_LINK_REPLACED
     func_0028D820.c   # VM_Initialize (no pager)
     func_0028E60C.c   # VM_Alloc (resident copy)
     func_0028E6DC.c   # VM_Free
+    # audio (t2boot.c): off until the sound bank is converted for the host (STATUS.md)
+    func_00275520.c   # Sound__Initialize
 )
 
 # True if NAME (a src/us/code file name) is module 2 (.virtual_1).

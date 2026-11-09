@@ -15,6 +15,9 @@ project(turok2_port LANGUAGES C CXX)
 
 set(T2_PORT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(T2_REPO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
+# tools/port/gendata.py reads each game file's compile flags from compile_commands.json;
+# set before any target exists (the property is taken at target creation).
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(T2_BUILD_GAME_LIB "Build turok2_game (the game C, host static library)" ON)
 if(T2_BUILD_GAME_LIB)

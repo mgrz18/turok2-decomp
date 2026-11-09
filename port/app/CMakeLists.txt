@@ -32,19 +32,32 @@ if(T2_LINK_GAME AND TARGET turok2_game)
     set_source_files_properties(${T2_PORT_DIR}/runtime/t2os.c PROPERTIES
         COMPILE_OPTIONS "-include;${T2_PORT_DIR}/include/t2_rename.h")
     find_package(Threads REQUIRED)
-    target_link_libraries(t2runtime PUBLIC Threads::Threads m)
+    # RNC_UnpackMethod1/2 (t2boot.c) use the clean-room decompressor in t2asset (port/assets/rnc.c)
+    target_link_libraries(t2runtime PUBLIC Threads::Threads m t2asset)
 
     add_library(t2placeholders STATIC ${T2_PORT_DIR}/runtime/t2_placeholders.c)
     target_compile_options(t2placeholders PRIVATE -w)
+
+    # q2's generated data (port/cmake/data.cmake; port/gen/ from tools/port/gendata.py), in the
+    # rescanned group: the data points at game functions and the game names the data.
+    set(_t2_data "")
+    set(_t2_data_group "")
+    if(TARGET turok2_data)
+        set(_t2_data turok2_data)
+        set(_t2_data_group ",turok2_data")
+    else()
+        message(WARNING "turok2: no generated data in port/gen (tools/port/gendata.py): "
+                        "every game data symbol falls to a zero placeholder")
+    endif()
 
     target_sources(turok2 PRIVATE game.cpp)
     target_compile_definitions(turok2 PRIVATE T2_HAVE_GAME=1)
     if(APPLE)
         # ld64 resolves archive members in any order
-        target_link_libraries(turok2 PRIVATE t2runtime turok2_game t2placeholders)
+        target_link_libraries(turok2 PRIVATE t2runtime turok2_game ${_t2_data} t2placeholders)
     else()
         # t2runtime <-> turok2_game reference each other: one rescanned group
-        target_link_libraries(turok2 PRIVATE "$<LINK_GROUP:RESCAN,t2runtime,turok2_game>" t2placeholders)
+        target_link_libraries(turok2 PRIVATE "$<LINK_GROUP:RESCAN,t2runtime,turok2_game${_t2_data_group}>" t2placeholders)
     endif()
 
     # Bring-up aid (Linux x86-64): a non-PIE executable keeps the game's statics below 2 GB,

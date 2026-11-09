@@ -12,7 +12,7 @@
  * replaced as a whole (their files are left out of the link, port/cmake/link.cmake):
  *   InitializeSystemResources  heap on a host allocation instead of [end of image, top of RDRAM)
  *   VM_Initialize/Alloc/Free   no pager: module 1 is linked, VM regions are plain allocations
- *   RNC_UnpackMethod1/2        asm on the N64 (func_00200C40/func_002010C0): not linked yet
+ *   RNC_UnpackMethod1/2        asm on the N64 (func_00200C40/func_002010C0): port/assets/rnc.c
  *   sprintf                    SN64 varargs on the N64 (func_0029E3E0): host vsprintf
  *   func_00298470              sqrtf (sqrt.s): host libm */
 #include <stdarg.h>
@@ -25,6 +25,7 @@
 #include "t2_rename.h"
 #include "t2os.h"
 #include "t2port.h"
+#include "rnc.h"
 
 void t2ultra_configure(const T2PortConfig *cfg);
 int t2ultra_load_rom(const char *path);
@@ -65,6 +66,21 @@ void InitializeSystemResources(void) {
     CCache__Construct(0, 5);
 }
 
+/* The console's heap ends 512 KB under the top of RDRAM (InitializeSystemResources with the
+ * expansion pak); code that places blocks by RDRAM address (GfxPool_Alloc: frame and depth
+ * buffers under the top) asks for this instead of GetMemSize() | 0x80000000. */
+uintptr_t T2Port_RdramTop(void) {
+    return (uintptr_t)sArena + sArenaSize + 0x80000;
+}
+
+/* func_00275520: audio is off on the host for now (docs/port/STATUS.md). The synthesizer itself
+ * initializes (alInit, amCreateAudioMgr), but CAudioWorld__Initialize then reads the sound bank
+ * from a VM_Alloc copy of the ROM (0x1E0000): big-endian, N64 layout, pointers that are VM
+ * addresses. It needs the bank converted (T2Asset / swap_spec.json) first. */
+void Sound__Initialize(void) {
+    t2_log_once("Sound__Initialize: audio off on the host (sound bank not converted yet)");
+}
+
 /* func_0028D820: no pager, no TLB, no VM threads; module 1 is linked into the executable
  * (RUNTIME.md §1.4). */
 void VM_Initialize(s32 a, s32 b) {
@@ -90,18 +106,31 @@ void VM_Free(s32 region) {
     (void)region; /* resident copies are kept */
 }
 
-/* func_00200C40 / func_002010C0 (asm). The host reads assets already unpacked (ARCHIVE.md);
- * the decompressor thread still calls these for data it DMAs from the ROM. Not connected yet:
- * q1's clean-room port/assets/rnc.c is the implementation to call once merged. */
+/* func_00200C40 / func_002010C0 (asm on the N64): ProPackDecompress (func_00200B00.c) calls
+ *   RNC_UnpackMethod1(header + 0x12, dst, packed, unpacked)   (the data after the header)
+ *   RNC_UnpackMethod2(header, dst, packed, unpacked)          (the header itself)
+ * Both go to q1's clean-room decompressor (port/assets/rnc.c), which parses the 18-byte header
+ * itself (big-endian, as in the ROM) and never writes past the unpacked size it states. The
+ * size arguments are not used: the host would read them from big-endian ROM bytes in native
+ * order, so the header is the authority. Returns the unpacked size, 0 on error. */
+static s32 t2_rnc_unpack(const u8 *hdr, void *dst, const char *who) {
+    RncHeader h;
+    if (Rnc_ReadHeader(hdr, RNC_HEADER_LEN, &h) != RNC_OK) {
+        t2_log_once("RNC_UnpackMethod: no RNC header (output left as is)");
+        return 0;
+    }
+    int64_t n = Rnc_Unpack(hdr, RNC_HEADER_LEN + (size_t)h.packed, dst, h.unpacked, 0);
+    if (n < 0) {
+        fprintf(stderr, "t2: %s: %s\n", who, Rnc_ErrorString(n));
+        return 0;
+    }
+    return (s32)n;
+}
 s32 RNC_UnpackMethod1(void *src, void *dst) {
-    (void)src, (void)dst;
-    t2_log_once("RNC_UnpackMethod1 called: not connected yet (output left as is)");
-    return 0;
+    return t2_rnc_unpack((const u8 *)src - RNC_HEADER_LEN, dst, "RNC_UnpackMethod1");
 }
 s32 RNC_UnpackMethod2(void *src, void *dst) {
-    (void)src, (void)dst;
-    t2_log_once("RNC_UnpackMethod2 called: not connected yet (output left as is)");
-    return 0;
+    return t2_rnc_unpack((const u8 *)src, dst, "RNC_UnpackMethod2");
 }
 
 /* func_0029E3E0: SN64's sprintf walks MIPS varargs by hand; the host has its own. (On SysV

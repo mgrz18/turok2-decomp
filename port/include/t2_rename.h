@@ -12,9 +12,10 @@
  * Port code that wants libultraship's or libc's real function simply does not include this
  * header (port/app/*.cpp).
  *
- * Only functions are renamed. libultra data (osMemSize, osTvType, __osContPifRam, ...) keep
- * their names: they are game data (q2's generator / the placeholders), and LUS's data objects
- * are only pulled in by LUS functions the game no longer references. */
+ * Functions are renamed. libultra data (osMemSize, osTvType, __osContPifRam, ...) keep their
+ * names: they are game data (q2's generator, port/gen), except the few that a libultraship
+ * object the executable links also defines (last block below); tools/port/gendata.py
+ * generates those from the N64 symbol of the unprefixed name. */
 #ifndef T2_RENAME_H
 #define T2_RENAME_H
 
@@ -117,5 +118,9 @@
 #define __assert t2___assert
 #define sprintf t2_sprintf
 #endif
+
+/* data libultraship also defines (libultra/os.cpp is linked for the controller hooks):
+ * the game's copy under t2_ (gendata.py emits it with `#define X t2_X`) */
+#define __osCurrentTime t2___osCurrentTime
 
 #endif

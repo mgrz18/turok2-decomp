@@ -443,6 +443,16 @@ def main():
         if obj not in mod2:
             needed |= us - defined
 
+    # data the game names through port/include/t2_rename.h (t2_X: libultraship also defines X):
+    # generated from X's N64 data, emitted under the t2_ name (#define X t2_X in every file)
+    renamed = set()
+    for n in sorted(needed):
+        if n.startswith('t2_') and n not in elf.syms:
+            s = elf.syms.get(n[3:])
+            if s and s[3] != 'STT_FUNC':
+                renamed.add(n[3:])
+    needed = (needed - {'t2_' + n for n in renamed}) | renamed
+
     # which needed names are data, which are functions/other
     data_names, func_names, abs_rom, missing = [], [], [], []
     for n in sorted(needed):
@@ -488,6 +498,7 @@ def main():
             json.dump(decls, open(a.cache, 'w'))
 
     gen = Generator(elf, funcs, local, types)
+    gen.renamed = renamed
     gen.run(data_names, decls)
     gen.write(a.out, abs_rom, func_names, missing, mod2)
 
@@ -754,6 +765,7 @@ class Generator:
                '#define T2_ALIGN(n) __attribute__((aligned(n)))\n#endif\n'
                '#define T2_STR_(x) #x\n#define T2_STR(x) T2_STR_(x)\n'
                '#define T2_SYM(x) T2_STR(__USER_LABEL_PREFIX__) #x\n\n')
+        hdr += self.rename_defines()
         self.alias_nonelf = []
         written = []
         for reg, ss in sorted(regions.items()):
@@ -851,6 +863,15 @@ class Generator:
         lines = [','.join(parts[i:i + 24]) for i in range(0, len(parts), 24)]
         return ',\n'.join(lines)
 
+    def rename_defines(self):
+        """#define X t2_X for the data port/include/t2_rename.h renames (not aliases: .set
+        would stringify the unexpanded name)."""
+        rn = sorted(getattr(self, 'renamed', ()))
+        if not rn:
+            return ''
+        return ('/* renamed by port/include/t2_rename.h (the host libraries define these names) */\n'
+                + ''.join('#define %s t2_%s\n' % (n, n) for n in rn) + '\n')
+
     def write_relocs(self, out):
         rows = []
         for s in self.syms.values():
@@ -865,6 +886,7 @@ class Generator:
                     ' * N64 address -> host address of the generated data, for integer slots\n'
                     ' * that still carry an N64 address (the "handle" is that address). */\n'
                     '#include <stdint.h>\n#include <stddef.h>\n\n')
+            f.write(self.rename_defines())
             for n in names:
                 f.write('extern char %s[];\n' % n)
             f.write('\ntypedef struct { uint32_t n64; uint32_t size; char *host; } T2DataSym;\n')
