@@ -30,7 +30,7 @@ s32 CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, s32 action, 
     s32 found;
 
     if (actor->m_dwFlags & 0x40000) {
-        res = CCache__Request(0, ((s32)actor->m_rpObject), actor->m_rpObjectHeader, 0, 0, 0, (s32) D_800A5AC4, 1);
+        res = CCache__Request(0, ((sptr)actor->m_rpObject), actor->m_rpObjectHeader, 0, 0, 0, D_800A5AC4, 1);
         if (res != NULL) {
             data = CISet__GetBlock(*res, 1);
             entries = data + 2;

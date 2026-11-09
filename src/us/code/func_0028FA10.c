@@ -14,7 +14,7 @@ void alCSPNew(ALCSPlayer *arg0, ALSeqpConfig *arg1) {
     ALSeqpConfig *params = arg1;
     ALHeap *heap = params->heap;
     ALSynth *drvr = &alGlobals->drvr;
-    s32 allocation;
+    sptr allocation;
     s32 i;
     obj->chanMask = 0xFF;
     obj->uspt = 0x1E8;

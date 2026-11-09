@@ -11,7 +11,7 @@ typedef struct {
 
 void Model_AdvanceMorph(s32 *arg0, f32 arg1) {
     f32 temp_f0;
-    s32 temp_s0;
+    sptr temp_s0;
     Param *temp_v0;
 
     temp_s0 = *arg0;

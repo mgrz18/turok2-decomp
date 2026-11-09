@@ -44,7 +44,7 @@ static __inline__ void loadGeomHeader(CScene *w, CGeomHeader *out, s32 id) {
     file = CScene__GetObject(w, index);
     objIndex = CCache__Request(0, file, 0x18, 0, 0, NULL, "object index", 1);
     if (objIndex != NULL) {
-        geometry = CCache__Request(0, CISet__GetROMAddressAndSize((s32)*objIndex, file, 1, &size), size, 0, 0, Model_DecompressCallback,
+        geometry = CCache__Request(0, CISet__GetROMAddressAndSize((sptr)*objIndex, file, 1, &size), size, 0, 0, Model_DecompressCallback,
                                  "geometry", 1);
         if (geometry != NULL) {
             *out = *(CGeomHeader *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(*geometry, 2), 0), 0), 0);
@@ -55,8 +55,8 @@ static __inline__ void loadGeomHeader(CScene *w, CGeomHeader *out, s32 id) {
 }
 
 void CScene__Construct(CScene *w, s32 file) {
-    s32 cart;
-    s32 res;
+    sptr cart;
+    sptr res;
     f32 *vec;
 
     CScene__ClearListCounts();

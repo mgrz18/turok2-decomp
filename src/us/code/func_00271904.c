@@ -25,7 +25,7 @@ s32 CAudioWorld__CountHandleVoices(CAudioWorld *mgr, s32 sound)
   if (count != 1)
   {
     __osRestoreInt(mask);
-    osRecvMesg((s32) lock, 0, 1);
+    osRecvMesg(lock, 0, 1);
     i = 0;
   }
   else
@@ -51,7 +51,7 @@ s32 CAudioWorld__CountHandleVoices(CAudioWorld *mgr, s32 sound)
   if (count2 != 0)
   {
     __osRestoreInt(mask2);
-    osSendMesg((s32) lock2, 0, 1);
+    osSendMesg(lock2, 0, 1);
     return n;
   }
   if (mgr)

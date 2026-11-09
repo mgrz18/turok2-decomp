@@ -48,19 +48,19 @@ void CGameObjectInstance__SetupAnimation(Actor *actor, s32 a1, s32 a2, s32 anim)
     s32 *model;
     s32 *set;
     s32 id;
-    s32 tree;
-    s32 setTree;
+    sptr tree;
+    sptr setTree;
     void *data;
 
     actor->flags &= ~0x40000;
     id = CISet__GetROMAddress(a1, a2, actor->unk2);
-    model = CCache__Request(0, id, 0x18, 0, 0, 0, (s32) "anim object index", 1);
+    model = CCache__Request(0, id, 0x18, 0, 0, 0, (sptr) "anim object index", 1);
     if (model != NULL) {
         tree = *model;
         actor->unkAC = CISet__GetROMAddressAndSize(tree, id, 1, &actor->unkB4);
         actor->unkA4 = CISet__GetROMAddressAndSize(tree, id, 0, &actor->unkB0);
         actor->unkA8 = CISet__GetROMAddress(tree, id, 2);
-        set = CCache__Request(0, actor->unkA4, actor->unkB0, 0, 0, 0, (s32) D_800A5AC4, 1);
+        set = CCache__Request(0, actor->unkA4, actor->unkB0, 0, 0, 0, D_800A5AC4, 1);
         if (set != NULL) {
             setTree = *set;
             data = CISet__GetBlock(setTree, 0);

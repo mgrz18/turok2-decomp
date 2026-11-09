@@ -98,9 +98,9 @@ s32 PakMenu_WriteSaveGame(s32 unused, Menu *own) {
     }
     err = r;
     if (err == 0) {
-        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakMsgSaveDoneDesc, plr, plr->m_ContState.m_pContState, (s32)&gSavePortalMenuDescB);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakMsgSaveDoneDesc, plr, plr->m_ContState.m_pContState, (sptr)&gSavePortalMenuDescB);
     } else {
-        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakMsgSaveFailedDesc, plr, plr->m_ContState.m_pContState, (s32)&gSavePortalMenuDescB);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakMsgSaveFailedDesc, plr, plr->m_ContState.m_pContState, (sptr)&gSavePortalMenuDescB);
     }
     return 1;
 }

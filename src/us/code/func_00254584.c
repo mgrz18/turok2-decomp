@@ -16,9 +16,9 @@ void CPlayer__UpdateSubmerged(CPlayer *arg0, CGameObjectInstance *arg1) {
     }
     if (var_v0 != 0) {
         if (arg1->m_AI.m_dwFlags & 0x80) {
-            CPlayer__UpdateOxygen((s32) arg0, (s32) arg1);
+            CPlayer__UpdateOxygen((sptr) arg0, (sptr) arg1);
         }
     } else {
-        CPlayer__Hurt((s32) arg0, (s32) arg1, 0xA00, 0x02000000, 0x1C);
+        CPlayer__Hurt((sptr) arg0, (sptr) arg1, 0xA00, 0x02000000, 0x1C);
     }
 }

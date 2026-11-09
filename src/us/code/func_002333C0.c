@@ -17,7 +17,7 @@ void *Swoosh_NewNode(void *arg0, void *arg1, void *arg2) {
     void *temp_s1;
     char *var_s0;
     char *temp_s2;
-    temp_s2 = Swoosh_TakeNode(arg0, (s32)arg1);
+    temp_s2 = Swoosh_TakeNode(arg0, (sptr)arg1);
     var_s0 = temp_s2;
     if (temp_s2 != 0) {
         ((ObjectLinks54 *)(arg1))->unk_50 = 0;

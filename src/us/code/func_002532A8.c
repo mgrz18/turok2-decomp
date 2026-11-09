@@ -2,5 +2,5 @@
 #include "structs/player.h"
 
 s32 CPlayerPool__GetFirstActive(CPlayerPool *arg0) {
-    return (s32) arg0->m_ActiveList.m_pHead;
+    return (sptr) arg0->m_ActiveList.m_pHead;
 }

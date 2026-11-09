@@ -8,19 +8,19 @@
 
 extern void *__scTaskReady(struct OSScTask_s *arg0);
 void *__scTaskReady(struct OSScTask_s *arg0) {
-    s32 f1a;
-    s32 f1b;
+    sptr f1a;
+    sptr f1b;
     void *v2;
     if (arg0 == 0) {
         return 0;
     }
-    f1a = (s32)arg0->framebuffer;
+    f1a = (sptr)arg0->framebuffer;
     if (f1a == gCurrentFB) {
         return 0;
     }
     v2 = osViGetCurrentFramebuffer();
-    f1b = (s32)arg0->framebuffer;
-    if (f1b == (s32)v2) {
+    f1b = (sptr)arg0->framebuffer;
+    if (f1b == (sptr)v2) {
         return 0;
     }
     if (f1b != gPendingFB) {

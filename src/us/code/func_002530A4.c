@@ -17,7 +17,7 @@ void CPlayerPool__RegisterActors(void *arg0, void *arg1)
     {
       *((s32 *) (((s8 *) var_s0) + 0x54)) = 0;
       *((s32 *) (((s8 *) var_s0) + 0x2DC)) = 0;
-      if (GameObject_IsSolid((s32) var_s0) != 0)
+      if (GameObject_IsSolid((sptr) var_s0) != 0)
       {
         temp_v1 = *((s32 *) (((s8 *) arg1) + 0x8EC));
         if (temp_v1 != 0x200)

@@ -22,7 +22,7 @@ s32 VM_Alloc(s32 arg0, s32 arg1_unused, s32 arg2)
   new_var = (temp_s1 + 1) & (~1);
   if (1)
   {
-    osCreateMesgQueue(sp10, (s32) (&sp38), 1);
+    osCreateMesgQueue(sp10, (&sp38), 1);
     blk.f28 = 3;
     blk.f2C = arg0;
     blk.f34 = (void **) sp10;

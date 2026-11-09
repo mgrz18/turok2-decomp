@@ -11,7 +11,7 @@ extern void alSndpSetPitch(void *arg0, f32 arg1);
 void SndVoice_SetPitch(void *arg0, f32 arg1) {
     RecordCode8025A3EC *slot = arg0;
     OwnerCode8025A3EC8025B5F0 *owner;
-    s32 temp_s0;
+    sptr temp_s0;
     void *temp_s0_2;
     f32 scaled;
     temp_s0 = slot->owner;

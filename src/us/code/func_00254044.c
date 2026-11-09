@@ -24,11 +24,11 @@ void CPlayer__PickSpawnPoint(CPlayer *arg0) {
     }
     var_s1 = &gScene;
     var_s1 = &gScene;
-    var_v0 = CScene__FindIntelligence((s32) &gScene, 0xB, var_a2);
+    var_v0 = CScene__FindIntelligence(&gScene, 0xB, var_a2);
     if (var_v0 == 0) {
-        var_v0 = CScene__FindIntelligence((s32) &gScene, 0xB, -1);
+        var_v0 = CScene__FindIntelligence(&gScene, 0xB, -1);
         if (var_v0 == 0) {
-            var_v0 = CScene__FindIntelligence((s32) &gScene, -1, -1);
+            var_v0 = CScene__FindIntelligence(&gScene, -1, -1);
         }
     }
     var_s0->m_CharacterActor.header.m_pIntelligence = var_v0;

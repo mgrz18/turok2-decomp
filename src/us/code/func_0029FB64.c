@@ -14,7 +14,7 @@ s32 alLoadParam(void *filter, s32 paramID, ALWaveTable *param)
     switch (paramID) {
         case 5:
             a->table = param;
-            a->memin = (s32)a->table->base;
+            a->memin = (sptr)a->table->base;
             a->sample = 0;
             switch (a->table->type) {
                 case 0:
@@ -54,7 +54,7 @@ s32 alLoadParam(void *filter, s32 paramID, ALWaveTable *param)
             a->first = 1;
             a->sample = 0;
             if (a->table) {
-                a->memin = (s32)a->table->base;
+                a->memin = (sptr)a->table->base;
                 if (a->table->type == 0) {
                     if (a->table->waveInfo.adpcmWave.loop)
                         a->loop.count = a->table->waveInfo.adpcmWave.loop->count;

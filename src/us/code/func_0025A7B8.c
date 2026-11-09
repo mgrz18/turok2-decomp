@@ -6,5 +6,5 @@
 
 
 void EnemyAnim_Weapon_B0068(CGameObjectInstance *obj, s32 arg1) {
-    AI_PickAnimFromTable((s32) obj, arg1, (s32) sEnemyAnimWeapon_B0068, obj->header.m_pIntelligence->m_Enemy.m_wWeaponAnimFlags);
+    AI_PickAnimFromTable((sptr) obj, arg1, sEnemyAnimWeapon_B0068, obj->header.m_pIntelligence->m_Enemy.m_wWeaponAnimFlags);
 }

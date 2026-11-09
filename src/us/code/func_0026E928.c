@@ -19,7 +19,7 @@ void Rumble_Init(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2,
         *arg7 = arg0;
     }
     RumbleCurve_Init(&arg0->amplitudeHandle,
-                  (unsigned int)CScene__GetCurve(&gScene, arg1->mode));
+                  (uptr)CScene__GetCurve(&gScene, arg1->mode));
     RumbleCurve_Init(&arg0->lifetimeHandle,
-                  (unsigned int)CScene__GetCurve(&gScene, arg1->frames));
+                  (uptr)CScene__GetCurve(&gScene, arg1->frames));
 }

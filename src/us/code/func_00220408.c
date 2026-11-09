@@ -17,18 +17,18 @@ s32 CScene__GetInstanceSavedBit(void *arg0, void *arg1) {
     u8 *base;
     s32 field1B40C;
     s32 mask;
-    s32 index;
-    s32 i;
+    sptr index;
+    sptr i;
     s32 lastOffset;
-    u32 first;
+    uptr first;
     if (!(actor->m_dwFlags & 0x80000)) {
-        first = ((u32)world->m_pActors);
+        first = ((uptr)world->m_pActors);
         index = -1;
-        if ((u32) arg1 >= first) {
+        if ((uptr) arg1 >= first) {
             lastOffset = world->m_nActors * 0x288;
             lastOffset -= 0x288;
-            if (first + lastOffset >= (u32) arg1) {
-                index = ((u32) arg1 - first) / 0x288;
+            if (first + lastOffset >= (uptr) arg1) {
+                index = ((uptr) arg1 - first) / 0x288;
             }
         }
     } else {
@@ -41,7 +41,7 @@ s32 CScene__GetInstanceSavedBit(void *arg0, void *arg1) {
     field1B40C = world->m_nLevel;
     temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(field80, 0), field1B40C), 0);
     CISet__GetBlock(temp_v0, 0);
-    CISet__GetBlockSize((s32) temp_v0, 1);
+    CISet__GetBlockSize(temp_v0, 1);
     base = (u8 *) CISet__GetBlock(temp_v0, 1);
     mask = 1 << (index & 7);
     i = index;

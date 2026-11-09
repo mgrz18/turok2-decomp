@@ -18,5 +18,5 @@ void PlayerOptions_SetDefaults(void *arg0, s8 arg1)
   *((s8 *) (((s8 *) arg0) + 0x30)) = 0;
   *((s8 *) (((s8 *) arg0) + 0x31)) = 1;
   *((s8 *) (((s8 *) arg0) + 0x32)) = 0;
-  PlayerOptions_SetDefaultName((s32) arg0);
+  PlayerOptions_SetDefaultName((sptr) arg0);
 }

@@ -17,10 +17,10 @@ void osCreateThread(OSThread *t, s32 id, void (*entry)(void *), void *arg, void 
     t->priority = p;
     t->next = 0;
     t->queue = 0;
-    t->context.pc = (u32)entry;
-    t->context.a0 = (s64)(s32)arg;
-    t->context.sp = (s64)(s32)sp - 16;
-    t->context.ra = (s64)(s32)__osCleanupThread;
+    t->context.pc = (uptr)entry;
+    t->context.a0 = (s64)(sptr)arg;
+    t->context.sp = (s64)(sptr)sp - 16;
+    t->context.ra = (s64)(sptr)__osCleanupThread;
     mask = 0x3FFF01;
     t->context.sr = (mask & 0xFF01) | 0x04000002;
     t->context.rcp = (mask & 0x3F0000) >> 16;

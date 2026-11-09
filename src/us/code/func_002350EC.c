@@ -78,8 +78,8 @@ void Trail_AddNode(TrailMgr *mgr, TrailActor *a, s32 type) {
     f32 start;
     TrailInfo *t;
     TrailNode *node;
-    s32 tex0;
-    s32 tex1;
+    sptr tex0;
+    sptr tex1;
     s32 key;
     s32 id;
 
@@ -108,8 +108,8 @@ void Trail_AddNode(TrailMgr *mgr, TrailActor *a, s32 type) {
             return;
         }
         t = CScene__GetSwoosh(&gScene, type);
-        tex0 = (s32) sTrailTextures[t->tex0];
-        tex1 = (s32) sTrailTextures[t->tex1];
+        tex0 = (sptr) sTrailTextures[t->tex0];
+        tex1 = (sptr) sTrailTextures[t->tex1];
         func_0026D230(s->nodes);
         s->flags = 2;
         if (a->def->flags < 0) {
@@ -120,7 +120,7 @@ void Trail_AddNode(TrailMgr *mgr, TrailActor *a, s32 type) {
             s->owner = a->key;
             s->id = a->id;
         } else {
-            s->owner = (s32)a;
+            s->owner = (sptr)a;
             s->id = -1;
         }
         s->info = t;

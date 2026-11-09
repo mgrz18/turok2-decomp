@@ -29,7 +29,7 @@ void Destructible_Hurt(CGameObjectInstance *arg0, CAI *arg1, DamageEvent *arg2) 
             if (arg0->header.m_pIntelligence->m_dwTypeFlags & 0x40) {
                 var_a2 = 2;
             }
-            CAI__SetMode((s32) arg0, (s32) arg1, var_a2);
+            CAI__SetMode(arg0, arg1, var_a2);
         }
     }
 }

@@ -57,7 +57,7 @@ void __scHandleRSP(Vid *o) {
     Job *b;
     View *s;
     View *base;
-    u32 fb;
+    uptr fb;
     s32 mode;
     j = o->cur2F4;
     o->cur2F4 = 0;
@@ -86,7 +86,7 @@ void __scHandleRSP(Vid *o) {
             gSchedRspTotalTime = sGfxRspTime;
             gSchedRspTime = (f32)(((osGetTime() - sAudioTaskStartTime) * 64) / 3) * 0.000001f;
             base = (View *)gEngineApp.m_FrameData;
-            fb = (u32)j->unkC;
+            fb = (uptr)j->unkC;
             if (fb == base[0].fb) {
                 s = base;
                 goto sel;

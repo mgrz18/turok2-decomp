@@ -4,7 +4,7 @@
 
 
 void CInstancePool__Construct(s32 arg0) {
-    s32 var_s0;
+    sptr var_s0;
     s32 var_s1;
 
     CList__Construct(arg0 + 0x5300, 0x288, 0x28C);

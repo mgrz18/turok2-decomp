@@ -11,7 +11,7 @@ extern CVector3 D_8011AAB4;
 /* Marks the regions around the camera, recursing into neighbours that have
  * a corner within ~410 units of it. */
 void Automap_RevealRegion(CGameRegion *region) {
-    if (region == NULL || (u32) &region < (u32) &D_800C894C) {
+    if (region == NULL || (uptr) &region < (uptr) &D_800C894C) {
         return;
     }
     if (!(region->m_wFlags & 0x400)) {

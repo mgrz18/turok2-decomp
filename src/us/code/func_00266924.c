@@ -10,5 +10,5 @@ void InteractiveAnim_EventHide(CGameObjectInstance *arg0)
   int new_var;
   new_var = ~0x2000;
   arg0->m_dwFlags = (s32) ((arg0->m_dwFlags & new_var) & (~0x100));
-  CScene__SetInstanceSavedBit((s32) (&gScene), (s32) arg0, 1);
+  CScene__SetInstanceSavedBit((&gScene), arg0, 1);
 }

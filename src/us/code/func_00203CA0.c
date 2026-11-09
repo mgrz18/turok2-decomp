@@ -116,7 +116,7 @@ done:
         if (found != 0) {
             found->requestId = key;
             found->requestLength = 0;
-            found->notifyId = (s32)owner;
+            found->notifyId = (sptr)owner;
             found->decompressCallback = tag;
             found->memFlags = mode;
             found->memEntry = first;

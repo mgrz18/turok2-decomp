@@ -62,7 +62,7 @@ void VM_Initialize(void) {
     gPager.regions.pages = 0x80;
     gPager.regions.map = gPager.lookup;
     gPager.regions.next = NULL;
-    gPager.regions.source = (u8 *)((u32)D_14A000 | 0xB0000000);
+    gPager.regions.source = (u8 *)((uptr)D_14A000 | 0xB0000000);
     gPager.mapped = 0;
     if (GetMemSize() > 0x4FFFFF) {
         CLoader__LoadSync(&gLoader, D_14A000, D_3CAE0, extra);

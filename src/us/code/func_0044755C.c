@@ -21,5 +21,5 @@ void BlindOne_PhaseMinionsInit_2(PosCopy *arg0) {
     temp_v0 = arg0->pos;
     arg0->y = temp_v0->y;
     arg0->z = temp_v0->z;
-    CScene__MarkGeneratorsSaved((s32) &gScene);
+    CScene__MarkGeneratorsSaved(&gScene);
 }

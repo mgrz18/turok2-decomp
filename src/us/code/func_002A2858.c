@@ -22,5 +22,5 @@ s32 PCinitThreaded(void) {
     req.reply = &sHostIoReplyQueue;
     osSendMesg(&sHostIoRequestQueue, &req, 1);
     osRecvMesg(&sHostIoReplyQueue, &reply, 1);
-    return (s32)reply;
+    return (sptr)reply;
 }

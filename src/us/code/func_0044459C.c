@@ -11,6 +11,6 @@ typedef struct {
 void MotherBoss_Mode14_ChargeStep_2(s32 arg0, CAI *ai) {
     ((ModeData *) ai->m_pModeCurrent->m_pData)->state = 7;
     if (ai->m_AnimRepeatedCount != 0) {
-        CAI__SetMode(arg0, (s32) ai, 0xB);
+        CAI__SetMode(arg0, ai, 0xB);
     }
 }

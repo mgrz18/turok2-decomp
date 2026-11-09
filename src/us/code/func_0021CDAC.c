@@ -279,7 +279,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, s32 arg2)
             CAnimationState__Release(channel);
             ok = 1;
         }
-        CCache__Unlock(0, (s32) handle);
+        CCache__Unlock(0, handle);
     }
     if (!ok) {
         obj->animIndex = 0;

@@ -82,7 +82,7 @@ void EnemyAI_Update(Object *obj, AI *ai) {
     CEnemyBehaviorInfo *handler;
     s32 index;
     s32 mode;
-    s32 anim;
+    sptr anim;
     s32 state;
     s32 swimming;
 
@@ -107,13 +107,13 @@ void EnemyAI_Update(Object *obj, AI *ai) {
     if (handler != NULL) {
         switch (index) {
             case 0:
-                anim = (s32) handler->m_pGroundModeTable;
+                anim = (sptr) handler->m_pGroundModeTable;
                 break;
             case 1:
-                anim = (s32) handler->m_pAirModeTable;
+                anim = (sptr) handler->m_pAirModeTable;
                 break;
             case 2:
-                anim = (s32) handler->m_pUnderwaterModeTable;
+                anim = (sptr) handler->m_pUnderwaterModeTable;
                 break;
             default:
                 anim = 0;

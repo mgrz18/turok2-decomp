@@ -60,6 +60,6 @@ void CGameObjectInstance__DrawModel(CGameObjectInstance *actor, s32 arg1, CDrawA
         CGameObjectInstance__DrawShadow(actor, arg1, params);
     }
     if (params->m_bDraw != 0) {
-        Render_QueueModelInstance(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, params->m_nModel, actor->m_AI.m_nTexture);
+        Render_QueueModelInstance(params->m_hModel, ((sptr)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, params->m_nModel, actor->m_AI.m_nTexture);
     }
 }

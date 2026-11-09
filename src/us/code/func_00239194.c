@@ -24,5 +24,5 @@ void ImpactEvent_SpawnAnimInstance(CGameObjectInstance *actor, s32 arg1, s32 arg
     scale.x = params.size;
     scale.y = params.size;
     scale.z = params.size;
-    CInstancePool__SpawnAnimInstance(&gScene.m_InstancePool, params.unk0, ((s32)actor->header.m_pCurrentRegion), actor->header.m_vPos, 0, rot, scale, 0);
+    CInstancePool__SpawnAnimInstance(&gScene.m_InstancePool, params.unk0, ((sptr)actor->header.m_pCurrentRegion), actor->header.m_vPos, 0, rot, scale, 0);
 }

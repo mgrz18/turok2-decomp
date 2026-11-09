@@ -68,7 +68,7 @@ void CGameObjectInstance__UpdateAnimation(Actor *actor) {
             }
         }
         func_0021A500(actor);
-        set = CCache__Request(0, actor->unkA4, actor->unkB0, 0, 0, 0, (s32) D_800A5AC4, 1);
+        set = CCache__Request(0, actor->unkA4, actor->unkB0, 0, 0, 0, D_800A5AC4, 1);
         if (set != NULL) {
             data = CISet__GetBlock(*set, 0);
             actor->init(actor, actor->ai);

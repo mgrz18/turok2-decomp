@@ -19,7 +19,7 @@ extern void Actor_SpawnParticle(void *actor, s32 id, CVector3 pos, s32 a5);
 
 static __inline__ void SpawnAt(s32 arg0, s16 type, CVector3 pos, f32 speed) {
     CVector3 vel;
-    s32 region;
+    sptr region;
     void *actor;
 
     region = CScene__FindRegionAt(&gScene, &pos);

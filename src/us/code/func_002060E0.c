@@ -4,7 +4,7 @@
 
 
 CMemEntry *CCache__AllocateInternal(s32 arg0, s32 arg1, s32 arg2) {
-    s32 temp_v0;
+    sptr temp_v0;
     s32 temp_v0_2;
     CMemEntry *var_s0;
 

@@ -5,5 +5,5 @@
 
 
 void MantidQueen_EnterMode14(void) {
-    CScene__UnmarkGeneratorsSaved((s32) &gScene);
+    CScene__UnmarkGeneratorsSaved(&gScene);
 }

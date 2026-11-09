@@ -35,7 +35,7 @@ void CScene__SetInstanceSavedBitInLevel(void *arg0, s32 arg1, s32 arg2, s32 arg3
     field80 = ((CScene *)arg0)->m_pBitSections;
     temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(field80, 0), (s32) arg1), 0);
     CISet__GetBlock(temp_v0, 0);
-    CISet__GetBlockSize((s32) temp_v0, 1);
+    CISet__GetBlockSize(temp_v0, 1);
     base1 = (u8 *) CISet__GetBlock(temp_v0, 1);
     base2 = base1;
     mask = 1 << (arg2 & 7);

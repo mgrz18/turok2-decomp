@@ -39,10 +39,10 @@ Acmd *alAdpcmPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd 
     s32 nframes;
     s32 nSam;
     s32 tsam;
-    s32 overFlow;
+    sptr overFlow;
     s32 dmemOut;
-    s32 overBytes;
-    s32 off;
+    sptr overBytes;
+    sptr off;
     s32 dmemAlign;
     s32 looped;
     s32 decoded = 0;
@@ -53,7 +53,7 @@ Acmd *alAdpcmPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd 
         return ptr;
 
     /* the codebook of the wave table goes through the game's DMA cache */
-    aLoadADPCM(ptr++, f->bookSize, AudioDMA_CacheBlock((void *)((u32)f->table->waveInfo.adpcmWave.book + 8), f->bookSize));
+    aLoadADPCM(ptr++, f->bookSize, AudioDMA_CacheBlock((void *)((uptr)f->table->waveInfo.adpcmWave.book + 8), f->bookSize));
 
     looped = 0;
     inp = 0;
@@ -80,7 +80,7 @@ Acmd *alAdpcmPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd 
         else
             *outp += 32;
         f->lastsam = f->loop.start & 0xF;
-        f->memin = (s32)f->table->base + ((f->loop.start >> 4) + 1) * 9;
+        f->memin = (sptr)f->table->base + ((f->loop.start >> 4) + 1) * 9;
         f->sample = f->loop.start;
         dmemOut = *outp;
         while (nSam < outCount) {
@@ -104,7 +104,7 @@ Acmd *alAdpcmPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd 
         return ptr;
     } else {
         nSam = nframes << 4;
-        overBytes = f->memin + nbytes - ((s32)f->table->base + f->table->len);
+        overBytes = f->memin + nbytes - ((sptr)f->table->base + f->table->len);
         if (overBytes < 0)
             overBytes = 0;
         overFlow = (overBytes / 9) << 4;

@@ -17,12 +17,12 @@ void Model_TouchTextures(s32 *arg0) {
     var_s1 = 0;
     if (temp_s4 > 0) {
         do {
-            temp_v0_2 = CISet__GetBlock((s32) temp_v0, var_s1);
+            temp_v0_2 = CISet__GetBlock(temp_v0, var_s1);
             temp_s2 = *temp_v0_2;
             var_s0 = 0;
             if (temp_s2 > 0) {
                 do {
-                    temp_a1 = ((s32 *) CISet__GetBlock(CISet__GetBlock((s32) temp_v0_2, var_s0), 0))[2];
+                    temp_a1 = ((s32 *) CISet__GetBlock(CISet__GetBlock(temp_v0_2, var_s0), 0))[2];
                     if (temp_a1 != 0) {
                         CCache__Touch(0, temp_a1);
                     }

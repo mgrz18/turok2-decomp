@@ -6,11 +6,11 @@
 
 extern void GfxPool_Free_2(struct RecordRecAt1C *arg0);
 void GfxPool_Free_2(struct RecordRecAt1C *arg0) {
-    s32 temp_a1;
-    s32 temp_a1_2;
-    s32 temp_a1_3;
-    s32 temp_a1_4;
-    s32 temp_a1_5;
+    sptr temp_a1;
+    sptr temp_a1_2;
+    sptr temp_a1_3;
+    sptr temp_a1_4;
+    sptr temp_a1_5;
     s32 var_s1;
     s32 var_v1;
     temp_a1 = arg0->b;

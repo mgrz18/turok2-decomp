@@ -141,12 +141,12 @@ void CAI__UpdateModeAnim(Source110 *src, Dest *dst) {
             if (callback != 0) {
                 if (IsCodePointer(callback) != 0) {
                     callback = callback(src, dst);
-                } else if (IsDataPointer((u32)callback) != 0) {
+                } else if (IsDataPointer((uptr)callback) != 0) {
                     callback = (StateCallback)CGameObjectInstance__PickAvailableAction(src, callback, dst->state_result);
                 }
                 if (callback != 0) {
                     if (callback != (StateCallback)-1) {
-                        dst->state_result = CGameObjectInstance__PickRandomAnim(src, (s32)callback, dst->state_result);
+                        dst->state_result = CGameObjectInstance__PickRandomAnim(src, (sptr)callback, dst->state_result);
                         dst->result = (s16)callback;
                         if (src->current_state == dst->state_result) {
                             src->limit = 0.0f;

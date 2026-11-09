@@ -25,13 +25,13 @@ void CScene__QueueDelayedEvent(VoiceOwner *arg0, LevelEvent *arg1) {
 
     var_s0 = arg0->freeVoices.m_pHead;
     if (var_s0 != 0) {
-        CList__Remove((s32) &arg0->freeVoices, (s32) var_s0);
-        CList__AddHead((s32) &arg0->activeVoices, (s32) var_s0);
-        var_s0->def = (s32) arg1;
+        CList__Remove(&arg0->freeVoices, var_s0);
+        CList__AddHead(&arg0->activeVoices, var_s0);
+        var_s0->def = (sptr) arg1;
     } else {
         var_s0 = arg0->activeVoices.m_pTail;
         LevelEvent_Fire(var_s0->def);
-        var_s0->def = (s32) arg1;
+        var_s0->def = (sptr) arg1;
     }
     temp_f0 = HalfToFloat(arg1->delay);
     var_s0->length = temp_f0;

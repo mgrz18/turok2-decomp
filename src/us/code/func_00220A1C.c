@@ -54,7 +54,7 @@ Floor *CScene__FindRegionAt(CScene *world, f32 *pos) {
         if (pos[0] >= cell->minX && pos[0] <= cell->maxX && pos[2] >= cell->minZ && pos[2] <= cell->maxZ) {
             j = 0;
             if (cell->count != 0) {
-                floor = (Floor *)(k * sizeof(Floor) + (u32)floors);
+                floor = (Floor *)(k * sizeof(Floor) + (uptr)floors);
                 do {
                     if (CGameRegion__ContainsXZ(floor, pos[0], pos[2])) {
                         d = pos[1] - CGameRegion__GetHeight(floor, pos[0], pos[2]);

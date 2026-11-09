@@ -9,14 +9,14 @@ s32 BinaryRange(s32 a, s32 b, s32 c, s32 *lo, s32 *hi);
 void CScene__GetEventRecords(CScene *lv, s32 which, s32 id, CSceneRecord **outRecs, s32 *outCount) {
     s32 lo;
     s32 hi;
-    s32 a;
+    sptr a;
     s32 b;
     s32 off;
     if (which != 0) {
-        a = (s32) lv->m_pAltRecordIndex;
+        a = (sptr) lv->m_pAltRecordIndex;
         b = lv->m_nAltRecords;
     } else {
-        a = (s32) lv->m_pRecordIndex;
+        a = (sptr) lv->m_pRecordIndex;
         b = lv->m_nRecords;
     }
     if (BinaryRange(a, b, id, &lo, &hi) != 0) {

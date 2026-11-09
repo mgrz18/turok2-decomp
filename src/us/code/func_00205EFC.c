@@ -10,19 +10,19 @@ void __osRestoreInt(s32);
 s32 CCache__AllocateMemoryForDecompressionTop(s32 arg0, s32 arg1, s32 arg2)
 {
   s32 temp_a0;
-  s32 temp_v0;
+  sptr temp_v0;
   s32 temp_v0_2;
   s32 temp_v0_3;
   s32 temp_v1;
   s32 temp_v1_2;
-  s32 var_s0;
+  sptr var_s0;
   temp_a0 = __osDisableInt();
   temp_v1 = gCache_mutex_count + 1;
   gCache_mutex_count = temp_v1;
   if (temp_v1 != 1)
   {
     __osRestoreInt(temp_a0);
-    osRecvMesg((s32) (&gCache_mutex), 0, 1);
+    osRecvMesg((&gCache_mutex), 0, 1);
   }
   else
   {
@@ -61,13 +61,13 @@ s32 CCache__AllocateMemoryForDecompressionTop(s32 arg0, s32 arg1, s32 arg2)
     if (temp_v1_2 || temp_v0_2)
     {
       __osRestoreInt(temp_v0_3);
-      osSendMesg((s32) (&gCache_mutex), 0, 1);
+      osSendMesg((&gCache_mutex), 0, 1);
       return var_s0;
     }
     else
     {
       __osRestoreInt(temp_v0_3);
-      osSendMesg((s32) (&gCache_mutex), 0, 1);
+      osSendMesg((&gCache_mutex), 0, 1);
       return var_s0;
     }
   }

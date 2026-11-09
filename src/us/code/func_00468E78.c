@@ -13,13 +13,13 @@ typedef struct {
 s32 CCamera__Construct_2(s32);                         /* extern */
 
 s32 CCameraPool__AllocCamera_2(Pool *arg0) {
-    s32 temp_s0;
+    sptr temp_s0;
 
-    temp_s0 = (s32) arg0->freeList.m_pHead;
+    temp_s0 = (sptr) arg0->freeList.m_pHead;
     if (temp_s0 != 0) {
         CCamera__Construct_2(temp_s0);
-        CList__Remove((s32) &arg0->freeList, temp_s0);
-        CList__AddTail((s32) &arg0->usedList, temp_s0);
+        CList__Remove(&arg0->freeList, temp_s0);
+        CList__AddTail(&arg0->usedList, temp_s0);
     }
     return temp_s0;
 }

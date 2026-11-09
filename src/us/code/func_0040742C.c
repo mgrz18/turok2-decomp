@@ -17,11 +17,11 @@ extern LevelScriptF978 D_8012F978;
 
 void Primagen_UpdateMode6(s32 arg0, CAI *ai) {
     if (ai->m_AnimRepeatedCount != 0) {
-        CAI__SetMode((s32) D_8012F978.actor, (s32) &D_8012F978.actor->m_AI, 1);
-        CAI__SetMode((s32) (&D_8012F978.actor)[-1], (s32) &(&D_8012F978.actor)[-1]->m_AI, 1);
+        CAI__SetMode(D_8012F978.actor, &D_8012F978.actor->m_AI, 1);
+        CAI__SetMode((sptr) (&D_8012F978.actor)[-1], (sptr) &(&D_8012F978.actor)[-1]->m_AI, 1);
         D_8012F978.mode = 8;
         D_800F1C40[0] |= 0x300;
         D_800F1F50[0] |= 0x300;
-        CAI__SetMode(arg0, (s32) ai, 0x12);
+        CAI__SetMode(arg0, ai, 0x12);
     }
 }

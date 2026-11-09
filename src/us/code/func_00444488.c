@@ -21,7 +21,7 @@ void MotherBoss_Mode16_TeleportTarget_2(s32 arg0, CAI *ai)
     gMotherBoss.counter = temp_v0;
     if (temp_v0 >= 0x1F)
     {
-      CAI__SetMode(arg0, (s32) ai, 0x11);
+      CAI__SetMode(arg0, ai, 0x11);
     }
   }
 }

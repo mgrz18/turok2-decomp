@@ -91,7 +91,7 @@ void __osDevMgrMain(void *args) {
             blockInfo = &info->block[info->blockNum];
             info->sectorNum = -1;
             if (info->transferMode != 3) {
-                blockInfo->dramAddr = (void *)((u32)blockInfo->dramAddr - blockInfo->sectorSize);
+                blockInfo->dramAddr = (void *)((uptr)blockInfo->dramAddr - blockInfo->sectorSize);
             }
             if (info->transferMode == 2 && mb->piHandle->transferInfo.cmdType == 0) {
                 messageSend = 1;

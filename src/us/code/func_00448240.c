@@ -55,7 +55,7 @@ static __inline__ f32 *TempAlloc(s32 size) {
     handle = CCache__Allocate(0, size + 0x10, 0x13, "Cinema temp alloc");
     if (handle != NULL) {
         block = *handle;
-        *block = (s32) handle;
+        *block = (sptr) handle;
         return (f32 *) (block + 4);
     }
     return NULL;
@@ -1325,7 +1325,7 @@ void *Cinema_TempAlloc_2(s32 size) {
     handle = CCache__Allocate(0, size + 0x10, 0x13, "Cinema temp alloc");
     if (handle != NULL) {
         block = *handle;
-        *block = (s32) handle;
+        *block = (sptr) handle;
         return block + 4;
     }
     return NULL;

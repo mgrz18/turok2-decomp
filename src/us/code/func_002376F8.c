@@ -38,7 +38,7 @@ static __inline__ void sprayBlood(CGameObjectInstance *target, CGameObjectInstan
     CVector3 point;
     CVector3 zero;
     CQuaternion rotation;
-    s32 region;
+    sptr region;
 
     player = ((CPlayer *)actor->m_AI.m_pParent);
     v.x = -direction.x;

@@ -15,7 +15,7 @@ void alFxNew(ALFx *r, ALSynConfig *c, ALHeap *hp)
     s32 *param = 0;
     ALFilter *f = &r->filter;
     ALDelay *d;
-    alFilterNew(f, 0, (s32)alFxParam, 5);
+    alFilterNew(f, 0, (sptr)alFxParam, 5);
     f->handler = alFxPull;
     r->paramHdl = alFxParamHdl;
     switch (c->fxType) {

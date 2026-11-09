@@ -11,9 +11,9 @@ void *CCache__TakeFreeCacheEntry(void) {
     void **p = &gCache_cacheFreeList;
     void *temp_s0 = *p;
     if (temp_s0 != 0) {
-        CList__Remove(p, (s32) temp_s0);
+        CList__Remove(p, (sptr) temp_s0);
         ((ResourceLoadRequest *)temp_s0)->flags = 1;
-        CList__AddHead(((char *)p + sizeof(CList)), (s32) temp_s0);
+        CList__AddHead(((char *)p + sizeof(CList)), (sptr) temp_s0);
     }
     return temp_s0;
 }

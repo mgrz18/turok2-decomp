@@ -20,7 +20,7 @@ void CCamera__UpdateVisBits(CCamera *arg0) {
     struct CGameRegion *temp_s1;
 
     if (Cinema_PathPlaying() != 0) {
-        arg0->m_ViewParams.m_pCurrentRegion = CScene__FindRegionAt((s32) &gScene, &arg0->m_ViewParams.m_vPos);
+        arg0->m_ViewParams.m_pCurrentRegion = CScene__FindRegionAt(&gScene, &arg0->m_ViewParams.m_vPos);
     }
     temp_s1 = arg0->m_ViewParams.m_pCurrentRegion;
     temp_f21 = arg0->m_ViewParams.m_vPos.x;

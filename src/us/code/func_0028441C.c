@@ -8,11 +8,11 @@
 
 void Cinema_Reset(void)
 {
-  s32 temp_a1;
-  temp_a1 = (s32) gCinemaPlayerP->owner;
+  sptr temp_a1;
+  temp_a1 = (sptr) gCinemaPlayerP->owner;
   if (temp_a1 != 0)
   {
     CCache__Deallocate(0, temp_a1);
   }
-  gCinemaPlayerP->fading = (gCinemaPlayerP->finished = (gCinemaPlayerP->active = (s32) (gCinemaPlayerP->resource = (gCinemaPlayerP->owner = 0))));
+  gCinemaPlayerP->fading = (gCinemaPlayerP->finished = (gCinemaPlayerP->active = (sptr) (gCinemaPlayerP->resource = (gCinemaPlayerP->owner = 0))));
 }

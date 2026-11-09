@@ -107,7 +107,7 @@ void CEmitterPool__Advance(CEmitterPool *owner, CCamera *camera) {
     CEmitterDef *def;
     CEmitter *e;
     CEmitter *next;
-    s32 region;
+    sptr region;
     s32 n;
     s32 bit;
     s32 mask;
@@ -116,7 +116,7 @@ void CEmitterPool__Advance(CEmitterPool *owner, CCamera *camera) {
     f32 boost;
     f32 depth;
 
-    region = (s32)camera->m_ViewParams.m_pCurrentRegion;
+    region = (sptr)camera->m_ViewParams.m_pCurrentRegion;
     if (region == 0) {
         return;
     }

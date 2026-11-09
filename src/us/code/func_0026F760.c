@@ -86,7 +86,7 @@ void amCreateAudioMgr(ALSynConfig *cfg, s32 pri, B12AiCfg *c2) {
     osCreateMesgQueue(&gAudioDmaMessageQ, gAudioDmaMessageBuf, 0x3C);
     osSetEventMesg(6, &gAudioFrameMsgQ, (OSMesg)7);
     gAudioDmaCache = 0;
-    gAudioHeap = (s32)cfg->heap;
+    gAudioHeap = (sptr)cfg->heap;
     memset(gThreadStackAudio, 8, 0x2800);
     osCreateThread(&gAudioThread, 8, __amMain, 0, gThreadStackAudio + 0x2800, pri);
     osStartThread(&gAudioThread);

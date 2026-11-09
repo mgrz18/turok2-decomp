@@ -23,7 +23,7 @@ void CCache__DeallocAndReplaceCompressedData(s32 arg0, CMemEntry **arg1, CMemEnt
     gCache_mutex_count = temp_v1;
     if (temp_v1 != 1) {
         __osRestoreInt(temp_a0);
-        osRecvMesg((s32) &gCache_mutex, 0, 1);
+        osRecvMesg(&gCache_mutex, 0, 1);
     } else {
         __osRestoreInt(temp_a0);
     }
@@ -41,9 +41,9 @@ loop_4:
         } while (temp_s0->lockCount != 0);
     }
     if (!(temp_s0->flags & 0x702)) {
-        CCache__DetachCacheEntry(0, (s32) temp_s0);
+        CCache__DetachCacheEntry(0, temp_s0);
         CHeap__Free(&gHeap, temp_s0->data);
-        CCache__FreeMemEntry(0, (s32) temp_s0);
+        CCache__FreeMemEntry(0, temp_s0);
     }
     *arg1 = arg2;
     temp_v0_2 = __osDisableInt();
@@ -51,7 +51,7 @@ loop_4:
     gCache_mutex_count = temp_v1_2;
     if (temp_v1_2 != 0) {
         __osRestoreInt(temp_v0_2);
-        osSendMesg((s32) &gCache_mutex, 0, 1);
+        osSendMesg(&gCache_mutex, 0, 1);
         return;
     }
     __osRestoreInt(temp_v0_2);

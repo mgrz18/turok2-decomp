@@ -42,7 +42,7 @@ void GameObject_EmitHotPoints(Attachment *ents, s32 n, CMtxF *mtxs, CGameObjectI
     CVector3 zero;
     CQuaternion rot;
     PuffArgs puff;
-    s32 region;
+    sptr region;
     f32 len;
     s32 kind;
     s32 flag;

@@ -21,8 +21,8 @@ void MantidQueen_ChooseAttack(CGameObjectInstance *actor, CAI *ai) {
     WaveBossStep *step;
     WaveBossState *boss = &gMantidQueen;
     f32 turn;
-    s32 side;
-    s32 visible;
+    sptr side;
+    sptr visible;
 
     step = boss->step;
     actor->m_dwFlags |= 0x2000;

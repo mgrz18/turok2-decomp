@@ -7,10 +7,10 @@
 void CScene__SetLevelBit(void *arg0, s32 arg1, s32 arg2)
 {
   s32 temp_a0;
-  s32 new_var;
-  s32 temp_a1;
+  sptr new_var;
+  sptr temp_a1;
   s32 temp_s0;
-  s32 temp_v0;
+  sptr temp_v0;
   s32 var_a1;
   s32 var_v1;
   u8 *temp_v0_2;

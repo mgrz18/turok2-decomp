@@ -17,9 +17,9 @@ typedef struct Entry0026C5C4 {
 s32 CGameRegion__FloodSetWaterSame(s32, s32);                    /* extern */
 
 void CGameRegion__FloodSetWater(Entry0026C5C4 *arg0) {
-    s32 temp_a0;
-    s32 temp_a0_2;
-    s32 temp_a0_3;
+    sptr temp_a0;
+    sptr temp_a0_2;
+    sptr temp_a0_3;
     CRegionInfo *temp_v0;
     s32 temp_s0;
     u16 temp_v1;
@@ -27,22 +27,22 @@ void CGameRegion__FloodSetWater(Entry0026C5C4 *arg0) {
     if (arg0 != NULL) {
         temp_v1 = arg0->flags;
         if (!(temp_v1 & 1)) {
-            temp_a0 = (s32) arg0->child0;
+            temp_a0 = (sptr) arg0->child0;
             temp_s0 = arg0->key;
             arg0->flags = (u16) (temp_v1 | 1);
             if (temp_a0 != 0) {
                 CGameRegion__FloodSetWaterSame(temp_a0, temp_s0);
             }
-            temp_a0_2 = (s32) arg0->child1;
+            temp_a0_2 = (sptr) arg0->child1;
             if (temp_a0_2 != 0) {
                 CGameRegion__FloodSetWaterSame(temp_a0_2, temp_s0);
             }
-            temp_a0_3 = (s32) arg0->child2;
+            temp_a0_3 = (sptr) arg0->child2;
             if (temp_a0_3 != 0) {
                 CGameRegion__FloodSetWaterSame(temp_a0_3, temp_s0);
             }
         }
-        temp_v0 = CScene__GetRegionInfo(&gScene, (s32) arg0);
+        temp_v0 = CScene__GetRegionInfo(&gScene, arg0);
         if (temp_v0 != NULL) {
             temp_v0->m_MapColour = 2;
             temp_v0->m_dwFlags = temp_v0->m_dwFlags | 1;

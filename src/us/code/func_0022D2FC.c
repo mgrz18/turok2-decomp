@@ -664,7 +664,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     u8 *envFrom;
     u8 *primFrom;
 
-    if (gDisplayListSize - ((u32)gDList - (u32)gEngineApp_m_pCurrentFrameData->m_pDisplayList) / sizeof(Gfx) < 3000) {
+    if (gDisplayListSize - ((uptr)gDList - (uptr)gEngineApp_m_pCurrentFrameData->m_pDisplayList) / sizeof(Gfx) < 3000) {
         return;
     }
     if (particle->time < 0.0f) {
@@ -1253,7 +1253,7 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
         up = gCollisionResults.m_vVelocity;
         CVector3__Normalize(&up);
         CMtxF__RotateVector(&targetInv, &up, vel);
-        effect->target = (s32) targetActor;
+        effect->target = (sptr) targetActor;
         effect->flags |= 0x10000;
         effect->shake = gCollisionResults.m_nInstanceNode;
         if (targetActor->def->m_Type == 1) {
@@ -1303,7 +1303,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
     s32 spread;
     u32 *bits;
     u8 mask;
-    s32 resource;
+    sptr resource;
     EntryBlock *block;
     s32 numEntries;
     Entry *templates;

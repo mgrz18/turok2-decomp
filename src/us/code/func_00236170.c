@@ -35,14 +35,14 @@ void Swoosh_AddParticleNode(World00236170 *arg0, CParticle *arg1, s32 arg2) {
                 temp_f0 = var_s0->strength;
                 if (temp_f0 > 0.0f) {
                     if (temp_f0 > 0.0f) {
-                        CMtxF__FromMtxAffine((s32) sp10, arg2);
+                        CMtxF__FromMtxAffine((sptr) sp10, arg2);
                         var_f0 = 0.01f;
                         if (arg1->m_pEffect->m_pModel != 0) {
                             var_f0 = 0.29257143f;
                         }
                         CMtxF__ScaleAxes(sp10, var_f0, var_f0, var_f0);
-                        CMtxF__ClampEntries((s32) sp10);
-                        Swoosh_NewNode((s32) arg0, (s32) var_s0, (s32) sp10);
+                        CMtxF__ClampEntries((sptr) sp10);
+                        Swoosh_NewNode((sptr) arg0, (sptr) var_s0, (sptr) sp10);
                     }
                 }
             }

@@ -27,7 +27,7 @@ void Render_DrawModelFlat(u8 alpha, void **resource, void *matrix, s32 segment, 
     u32 geom;
     Gfx *sync;
 
-    if (gDisplayListSize - ((u32)gDList - (u32)gEngineApp_m_pCurrentFrameData->m_pDisplayList) / sizeof(Gfx) < 3000) {
+    if (gDisplayListSize - ((uptr)gDList - (uptr)gEngineApp_m_pCurrentFrameData->m_pDisplayList) / sizeof(Gfx) < 3000) {
         return;
     }
     header = *resource;

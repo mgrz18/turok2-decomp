@@ -41,11 +41,11 @@ void CParticle__BuildCameraMatrix(void *arg0) {
             amount = -amount;
         }
         CParticle__BuildMatrix(arg0,
-                      (s32)((char *)arg0 + ((gEvenOdd << 6) + 0x48)),
-                      (s32)arg1, amount);
+                      (sptr)((char *)arg0 + ((gEvenOdd << 6) + 0x48)),
+                      (sptr)arg1, amount);
     } else {
         CParticle__BuildMatrix(arg0,
-                      (s32)((char *)arg0 + ((gEvenOdd << 6) + 0x48)),
+                      (sptr)((char *)arg0 + ((gEvenOdd << 6) + 0x48)),
                       0, 0.0f);
     }
     ((Shared_Particle *)arg0)->flags |= 0x100000;

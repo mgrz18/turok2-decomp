@@ -24,12 +24,12 @@ s16 CGameObjectInstance__PickAvailableAction(s32 arg0, s16 *arg1, s32 arg2)
       {
         new_var = 2;
         new_var2 = (s32) (*((s16 *) (((s8 *) var_s0) + 0)));
-        WeightedTable_Add((s32) (sp10), new_var2, (s32) (*((s16 *) (((s8 *) var_s0) + new_var))));
+        WeightedTable_Add((sptr) (sp10), new_var2, (s32) (*((s16 *) (((s8 *) var_s0) + new_var))));
       }
       var_s0 = (typeof(var_s0)) ((s8 *) ((typeof(var_s0)) (((s8 *) var_s0) + 4)));
       var_a1 = (u16) (*var_s0);
     }
     while ((*var_s0) != (-1));
   }
-  return WeightedTable_Pick((s32) (sp10));
+  return WeightedTable_Pick((sptr) (sp10));
 }

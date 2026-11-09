@@ -24,10 +24,10 @@ void WeaponMode_Ready_Update(CGameObjectInstance *arg0, s32 arg1) {
 
     temp_s0 = (Unk00258B74 *)arg0->m_AI.m_pParent;
     temp_s2 = gPlayerStateTable[temp_s0->unkA08].pose;
-    if (CPlayer__GetWeaponAmmo((s32) temp_s0, (s32) temp_s0->unk996) == 0) {
-        temp_s0->unkB14 = CPlayer__GetNextUsableWeapon((s32) temp_s0);
+    if (CPlayer__GetWeaponAmmo((sptr) temp_s0, (s32) temp_s0->unk996) == 0) {
+        temp_s0->unkB14 = CPlayer__GetNextUsableWeapon((sptr) temp_s0);
     }
-    if ((WeaponActor_CheckFire((s32) arg0, arg1) == 0) && !(arg0->m_dwFlags & 0x400)) {
-        CAI__SetMode((s32) arg0, arg1, (s32) temp_s2);
+    if ((WeaponActor_CheckFire((sptr) arg0, arg1) == 0) && !(arg0->m_dwFlags & 0x400)) {
+        CAI__SetMode(arg0, arg1, (s32) temp_s2);
     }
 }

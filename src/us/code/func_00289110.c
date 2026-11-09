@@ -13,7 +13,7 @@ void EngineMode00_PakCheck_Init(s32 arg0) {
     gPakMenuPort = -1;
     gPakCheckTimedOut = 0;
     func_002888BC(arg0, 0, 0);
-    CScene__LoadLevel((s32)&gScene, 0, 0);
+    CScene__LoadLevel(&gScene, 0, 0);
     PakMenu_PickDefaultPort();
     gPakCheckHasPak = PakMenu_HasPort();
     gPakCheckStarted = 1;

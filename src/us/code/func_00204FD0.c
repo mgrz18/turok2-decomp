@@ -21,7 +21,7 @@ B12Node *CCache__AllocateAt(s32 arg0, s32 arg1, s32 arg2)
   if (temp_v1 != 1)
   {
     __osRestoreInt(temp_a0);
-    osRecvMesg((s32) (&gCache_mutex), 0, 1);
+    osRecvMesg((&gCache_mutex), 0, 1);
   }
   else
   {
@@ -52,13 +52,13 @@ B12Node *CCache__AllocateAt(s32 arg0, s32 arg1, s32 arg2)
     if (gCache_mutex_count || var_s0)
     {
       __osRestoreInt(temp_v0_2);
-      osSendMesg((s32) (&gCache_mutex), 0, 1);
+      osSendMesg((&gCache_mutex), 0, 1);
       return var_s0;
     }
     else
     {
       __osRestoreInt(temp_v0_2);
-      osSendMesg((s32) (&gCache_mutex), 0, 1);
+      osSendMesg((&gCache_mutex), 0, 1);
       return var_s0;
     }
   }

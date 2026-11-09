@@ -55,17 +55,17 @@ void CParticle__ReportCollision(CParticle *p) {
 
         if (owner != NULL && owner->header.m_Type == 1 && (owner->m_dwFlags & 0x300000)) {
             if (isGroupA(p)) {
-                CGameRegion__FireTriggers((s32)gCollisionResults.m_pWallRegion, 0x10, p);
+                CGameRegion__FireTriggers((sptr)gCollisionResults.m_pWallRegion, 0x10, p);
             }
             if (isGroupB(p)) {
-                CGameRegion__FireTriggers((s32)gCollisionResults.m_pWallRegion, 8, p);
+                CGameRegion__FireTriggers((sptr)gCollisionResults.m_pWallRegion, 8, p);
             }
             if (isGroupC(p)) {
-                CGameRegion__FireTriggers((s32)gCollisionResults.m_pWallRegion, 0x20, p);
+                CGameRegion__FireTriggers((sptr)gCollisionResults.m_pWallRegion, 0x20, p);
             }
         } else if (p->header.m_pIntelligence->m_Type == 1 || p->header.m_pIntelligence->m_Type == 4) {
             if (isGroupC(p)) {
-                CGameRegion__FireTriggers((s32)gCollisionResults.m_pWallRegion, 0x200, p);
+                CGameRegion__FireTriggers((sptr)gCollisionResults.m_pWallRegion, 0x200, p);
             }
         }
     }

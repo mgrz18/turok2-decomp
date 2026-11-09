@@ -13,5 +13,5 @@ void Primagen_EnterMode2_2(CGameObjectInstance *arg0, s32 arg1) {
     *(s32 *) ((s8 *) &gLevelScript.unk3CA + 0x1A) = 0;
     *(s32 *) ((s8 *) &arg0->m_dwFlags) |= 0x2000;
     Sound__Play(0x2779, *(s32 *) &arg0->header.m_vPos.x, *(s32 *) &arg0->header.m_vPos.y, *(s32 *) &arg0->header.m_vPos.z, 0, -1);
-    AI_StartSound((s32) arg0, arg1, 0x3B21);
+    AI_StartSound((sptr) arg0, arg1, 0x3B21);
 }

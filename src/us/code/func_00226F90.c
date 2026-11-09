@@ -25,7 +25,7 @@ void Sort_Quick(char *base, u32 num, u32 width, s32 (*compare)(char *, char *), 
 recurse:
     size = (hi - lo) / width + 1;
     if (size <= 8) {
-        Sort_Insertion((u32)lo, (u32)hi, width, (s32 (*)(u32, u32))compare, (void (*)(u32, u32))swap);
+        Sort_Insertion((uptr)lo, (uptr)hi, width, (s32 (*)(u32, u32))compare, (void (*)(u32, u32))swap);
     } else {
         swap(lo + (size / 2) * width, lo);
         loguy = lo;

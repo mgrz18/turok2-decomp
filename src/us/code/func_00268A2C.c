@@ -9,8 +9,8 @@ typedef struct {
 
 
 s32 GameObject_GetRegionInfo(Link *arg0) {
-    s32 temp_a1;
-    s32 var_v0;
+    sptr temp_a1;
+    sptr var_v0;
 
     temp_a1 = arg0->targetId;
     var_v0 = 0;

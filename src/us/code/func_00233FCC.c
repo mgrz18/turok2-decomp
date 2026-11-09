@@ -62,12 +62,12 @@ no_pair:
             matrix[14] = first->position.z;
         }
 apply:
-        CMtxF__ToMtxAffine(matrix, (s32)first->matrices[gEvenOdd]);
+        CMtxF__ToMtxAffine(matrix, (sptr)first->matrices[gEvenOdd]);
         first = next;
         next = first->next;
     }
     matrix[12] = first->position.x;
     matrix[13] = first->position.y;
     matrix[14] = first->position.z;
-    CMtxF__ToMtxAffine(matrix, (s32)first->matrices[gEvenOdd]);
+    CMtxF__ToMtxAffine(matrix, (sptr)first->matrices[gEvenOdd]);
 }

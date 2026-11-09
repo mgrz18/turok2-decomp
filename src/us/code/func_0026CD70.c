@@ -22,6 +22,6 @@ void BoundingRect_FromPoints(Bounds2D *arg0, s32 arg1, CVector3 *arg2) {
         temp_f0_2 = arg2->z;
         arg0->maxZ = temp_f0_2;
         arg0->minZ = temp_f0_2;
-        BoundingRect_AddPoints((s32) arg0, arg1 - 1, (s32) (arg2 + 1));
+        BoundingRect_AddPoints((sptr) arg0, arg1 - 1, (sptr) (arg2 + 1));
     }
 }

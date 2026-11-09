@@ -24,7 +24,7 @@ void BlindOne_UpdateFight(BlindOneState *arg0)
     var_s1 = 0x3C;      /* faders[i] */
     do
     {
-      Animator_Update((s32) ((u8 *) arg0 + var_s1));
+      Animator_Update((sptr) ((u8 *) arg0 + var_s1));
       var_s0 += 1;
       var_s1 += sizeof(ScriptAnimator);
       var_s0++;
@@ -32,8 +32,8 @@ void BlindOne_UpdateFight(BlindOneState *arg0)
     }
     while (var_s0 < arg0->faderCount);
   }
-  BlindOne_UpdateMover((s32) &arg0->movers[0]);
-  BlindOne_UpdateMover((s32) &arg0->movers[1]);
-  BlindOne_UpdateMover((s32) &arg0->movers[2]);
-  COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, BlindOne_GetHealthPercent((s32) arg0));
+  BlindOne_UpdateMover((sptr) &arg0->movers[0]);
+  BlindOne_UpdateMover((sptr) &arg0->movers[1]);
+  BlindOne_UpdateMover((sptr) &arg0->movers[2]);
+  COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, BlindOne_GetHealthPercent((sptr) arg0));
 }

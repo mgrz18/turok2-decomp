@@ -14,14 +14,14 @@ extern s32 __osSpDeviceBusy(void);
 OSTask *_VirtualToPhysicalTask(OSTask *intp);
 void osSpTaskLoad(OSTask *arg0) {
     OSTask *block;
-    s32 result;
+    sptr result;
     block = _VirtualToPhysicalTask(arg0);
     if (block->t.flags & 1) {
         block->t.ucode_data = block->t.yield_data_ptr;
         block->t.ucode_data_size = block->t.yield_data_size;
         arg0->t.flags &= ~1;
         if (block->t.flags & 4) {
-            block->t.ucode = (u64 *)(*(volatile u32 *)(((u32)arg0->t.yield_data_ptr + 0xBFCU) | 0xA0000000U));
+            block->t.ucode = (u64 *)(*(volatile u32 *)(((uptr)arg0->t.yield_data_ptr + 0xBFCU) | 0xA0000000U));
         }
     }
     osWritebackDCache(block, 0x40);
@@ -30,11 +30,11 @@ void osSpTaskLoad(OSTask *arg0) {
         result = __osSpSetPc(0x04001000);
     } while (result == -1);
     do {
-        result = __osSpRawStartDma(1, 0x04000FC0, (s32)block, 0x40);
+        result = __osSpRawStartDma(1, 0x04000FC0, (sptr)block, 0x40);
     } while (result == -1);
     while (__osSpDeviceBusy() != 0) {
     }
     do {
-        result = __osSpRawStartDma(1, 0x04001000, (s32)block->t.ucode_boot, block->t.ucode_boot_size);
+        result = __osSpRawStartDma(1, 0x04001000, (sptr)block->t.ucode_boot, block->t.ucode_boot_size);
     } while (result == -1);
 }

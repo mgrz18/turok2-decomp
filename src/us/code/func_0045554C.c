@@ -19,6 +19,6 @@ s32 OptionsMenu_StepStickVert_2(s32 arg0, Menu *arg1) {
             var_s0 = temp_v0_2;
         }
     }
-    var_s0->m_SettingY = Menu_StepValue_2((s32) arg1, var_s0->m_SettingY, 8, 8, 0xF8, 0);
+    var_s0->m_SettingY = Menu_StepValue_2((sptr) arg1, var_s0->m_SettingY, 8, 8, 0xF8, 0);
     return 0;
 }

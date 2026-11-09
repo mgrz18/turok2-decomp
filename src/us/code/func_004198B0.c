@@ -5,6 +5,6 @@
 
 
 s32 TitleMenu_Cheats(s32 arg0, s32 arg1, s32 arg2) {
-    MenuPool_OpenChildMenu(arg2, arg1, (s32) &gCheatsMenuDesc);
+    MenuPool_OpenChildMenu(arg2, arg1, &gCheatsMenuDesc);
     return 1;
 }

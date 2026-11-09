@@ -11,6 +11,6 @@ void MantidQueen_UpdateMode4(s32 arg0, CAI *arg1) {
     arg1->m_vDesiredPos.x = Math_DecayToZero(arg1->m_vDesiredPos.x, temp_f20);
     arg1->m_vDesiredPos.z = Math_DecayToZero(arg1->m_vDesiredPos.z, temp_f20);
     if (arg1->m_AnimRepeatedCount != 0) {
-        CAI__SetMode(arg0, (s32) arg1, 5);
+        CAI__SetMode(arg0, arg1, 5);
     }
 }

@@ -11,13 +11,13 @@ void Hud_GetSpriteSize(s32 arg0, s32 arg1, s32 *arg2, s32 *arg3)
   void *sp10;
   s32 sp14;
   void *new_var;
-  s32 temp_v0;
+  sptr temp_v0;
   if (gPersistentDataLoaded != 0)
   {
-    temp_v0 = CScene__LoadGraphicSet((s32) (&gScene), arg0, 0, 1);
+    temp_v0 = CScene__LoadGraphicSet((&gScene), arg0, 0, 1);
     if (temp_v0 != 0)
     {
-      Hud_GetImageFrame(temp_v0, arg1, (s32) (&sp10), (s32) (&sp14));
+      Hud_GetImageFrame(temp_v0, arg1, (sptr) (&sp10), (sptr) (&sp14));
       new_var = sp10;
       *arg2 = (s32) (*((u16 *) (((s8 *) new_var) + 4)));
       *arg3 = (s32) (*((u16 *) (((s8 *) new_var) + 6)));

@@ -24,6 +24,6 @@ void CParticle__StartLoopSound(CParticle *arg0, s32 arg1) {
     } else {
 block_4:
         temp_a2 = &var_s0->header.m_vPos;
-        var_s0->m_pLoopSound = (SndSource *) LoopSounds_Start(LoopSounds_Get(), var_s1, (s32) temp_a2, (s32) temp_a2, -1);
+        var_s0->m_pLoopSound = (SndSource *) LoopSounds_Start(LoopSounds_Get(), var_s1, (sptr) temp_a2, (sptr) temp_a2, -1);
     }
 }

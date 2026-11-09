@@ -4,7 +4,7 @@
 
 
 s32 PakMenu_GetPlayerAndPort(Menu *arg0, s32 *arg1) {
-    s32 var_a0;
+    sptr var_a0;
     s32 var_v0;
 
     if (gPakMenuAnyPak != 0) {

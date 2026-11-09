@@ -17,7 +17,7 @@ void GameObject_TraceMove(Obj004028F4 *obj, Vec3_004028F4 pos, Vec3_004028F4 *po
 void MantidQueen_SpawnMinion(s32 a0, Obj004028F4 *obj, s32 a2, Vec3_004028F4 pos) {
     WaveBossState *s = &gMantidQueen;
     s32 index;
-    s32 region;
+    sptr region;
 
     index = WeightedTable_PickStatic(s->step->partPicks);
     GameObject_TraceMove(obj, pos, &pos, &region, 0, 0);

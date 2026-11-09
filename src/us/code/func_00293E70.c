@@ -6,8 +6,8 @@
 extern s32 alEvtqPostEvent(void *, s16 *, s32);
 void alSndpSetVol(ALSndPlayer *arg0, s16 arg1) {
     ParamsRecAt8V1 p;
-    s32 acc;
-    acc = (s32)arg0->sndState;
+    sptr acc;
+    acc = (sptr)arg0->sndState;
     p.f0 = 3;
     acc += arg0->target * 0x30;
     p.f8 = arg1;

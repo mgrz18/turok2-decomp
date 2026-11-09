@@ -25,7 +25,7 @@ s32 CScene__GetInstanceIndex(void *arg0, void *arg1) {
     base = scene->actors;
     if (arg1 >= base &&
         (char *)arg1 <= (char *)base + ((u32)scene->actorCount * sizeof(CGameObjectInstance) - sizeof(CGameObjectInstance))) {
-        return ((u32)arg1 - (u32)base) / sizeof(CGameObjectInstance);
+        return ((uptr)arg1 - (uptr)base) / sizeof(CGameObjectInstance);
     }
     return -1;
 }

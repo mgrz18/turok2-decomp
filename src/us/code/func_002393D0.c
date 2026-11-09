@@ -21,7 +21,7 @@ void Path_ExpandNode(PathNode *parent, CGameRegion *region) {
     s8 next[3];
     PathNode *node;
 
-    if ((u32) &parent < (u32) &D_800C894C) {
+    if ((uptr) &parent < (uptr) &D_800C894C) {
         return;
     }
     if (sPathSearch->nodeCount >= 150) {

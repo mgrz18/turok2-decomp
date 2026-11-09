@@ -13,6 +13,6 @@ void Primagen_UpdateMode14_2(s32 arg0, CAI *arg1) {
         if (gLevelScript.unk3CA == 0) {
             var_a2 = 7;
         }
-        CAI__SetMode(arg0, (s32) arg1, var_a2);
+        CAI__SetMode(arg0, arg1, var_a2);
     }
 }

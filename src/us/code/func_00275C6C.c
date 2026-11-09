@@ -17,7 +17,7 @@ void *LoopSounds_Start(void *arg0, s32 arg1, CVector3 *arg2, void *arg3, s32 arg
         node->state = -1;
         node->value = -1;
         result = Sound__Play((s16)arg1, *arg2,
-                                (s32)arg3, arg4);
+                                (sptr)arg3, arg4);
         node->value = result;
         sLoopSoundsLastStarted = result;
         node->state = arg1;

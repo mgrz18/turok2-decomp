@@ -11,6 +11,6 @@ void EngineMode08_MainMenu_Retrace(CEngineApp *arg0) {
         arg0->m_Settings.modeTimer = 0.0f;
     }
     if (arg0->m_Settings.modeTimer > 4.5e2f) {
-        CEngineApp__SetupFadeTo((s32) arg0, 7);
+        CEngineApp__SetupFadeTo((sptr) arg0, 7);
     }
 }

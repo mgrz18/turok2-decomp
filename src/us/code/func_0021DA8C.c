@@ -83,6 +83,6 @@ void CGameObjectInstance__DrawModelLitVertices(CGameObjectInstance *actor, s32 a
     } else {
         data = (char *) (header + 2);
     }
-    Render_QueueModelInstance(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, 0, data, params->m_nModel, actor->m_AI.m_nTexture);
+    Render_QueueModelInstance(params->m_hModel, ((sptr)actor->m_pmtDrawMtxs), 1, 0, data, params->m_nModel, actor->m_AI.m_nTexture);
     CCache__Unlock(0, resource);
 }

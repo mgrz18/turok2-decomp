@@ -59,7 +59,7 @@ void Generator_SpawnEnter(CGameObjectInstance *actor, CAI *ai) {
     PickTable picks;
     PickTable unlocked;
     CGeneratorIntelligence *info;
-    s32 region;
+    sptr region;
     s32 *model;
     s32 id;
     f32 ground;

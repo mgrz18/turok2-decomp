@@ -3,5 +3,5 @@
 #include "globals/hud.h"
 
 s32 COnScreen__GetFontTexture(void) {
-    return (s32) sOnScreenFontTexture;
+    return (sptr) sOnScreenFontTexture;
 }

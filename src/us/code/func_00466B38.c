@@ -92,12 +92,12 @@ void CPlayer__NewGame_2(CPlayer *p, s32 character, s32 arg2) {
             p->m_Data.m_nDeathmatchCharacter = 0;
             p->m_bEnteringDeathmatch = 1;
             if (flags->match.teams) {
-                MenuPool_OpenMenu_2(p->m_pCamera->m_MenuPool, func_00438800, p, (s32) p->m_ContState.m_pContState, p->m_nController);
+                MenuPool_OpenMenu_2(p->m_pCamera->m_MenuPool, func_00438800, p, (sptr) p->m_ContState.m_pContState, p->m_nController);
             } else {
-                MenuPool_OpenMenu_2(p->m_pCamera->m_MenuPool, func_00438728, p, (s32) p->m_ContState.m_pContState, p->m_nController);
+                MenuPool_OpenMenu_2(p->m_pCamera->m_MenuPool, func_00438728, p, (sptr) p->m_ContState.m_pContState, p->m_nController);
             }
         } else {
-            MenuPool_OpenMenu_2(p->m_pCamera->m_MenuPool, func_0043908C, p, (s32) p->m_ContState.m_pContState, p->m_nController);
+            MenuPool_OpenMenu_2(p->m_pCamera->m_MenuPool, func_0043908C, p, (sptr) p->m_ContState.m_pContState, p->m_nController);
         }
     }
 }

@@ -4,5 +4,5 @@
 void CPlayer__StartWeaponBackgroundSound(s32, s32);                       /* extern */
 
 void WeaponMode_AE794_Enter(CGameObjectInstance *arg0) {
-    CPlayer__StartWeaponBackgroundSound((s32) arg0->m_AI.m_pParent, 0x464);
+    CPlayer__StartWeaponBackgroundSound((sptr) arg0->m_AI.m_pParent, 0x464);
 }

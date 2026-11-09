@@ -16,7 +16,7 @@ s32 SavedPlayers_IsActive();                                /* extern */
 
 void CScene__LoadBitSections(Arg0 *arg0) {
     if (SavedPlayers_IsActive() == 0) {
-        CLoader__LoadSync(&gLoader, arg0->unk28, arg0->unk30, (s32) &gLoadSavePersistentData);
+        CLoader__LoadSync(&gLoader, arg0->unk28, arg0->unk30, (sptr) &gLoadSavePersistentData);
         arg0->done = 1;
     }
 }

@@ -10,7 +10,7 @@ void EnemyAI_SaveDeadAndFireTriggers(CGameObjectInstance *arg0) {
 
     if (!(arg0->m_dwFlags & 0x80000)) {
         if (!(sub->m_dwTypeFlags & 0x20)) {
-            CScene__SetInstanceSavedBit((s32) &gScene, (s32) arg0, 1);
+            CScene__SetInstanceSavedBit(&gScene, arg0, 1);
         }
         GameObject_FireTriggers(arg0, 1, arg0);
     }

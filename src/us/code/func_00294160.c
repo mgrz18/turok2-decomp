@@ -24,7 +24,7 @@ void alSynFreeVoice(void *arg0, void *arg1) {
                 ((ObjectStateC_2 *)(arg1))->unk_8.v0 = 0;
             }
         } else {
-            _freePVoice((s32) arg0, ((ObjectStateC_2 *)(arg1))->unk_8.v0);
+            _freePVoice((sptr) arg0, ((ObjectStateC_2 *)(arg1))->unk_8.v0);
             ((ObjectStateC_2 *)(arg1))->unk_8.v0 = 0;
         }
     }

@@ -24,6 +24,6 @@ void EnemyMode_TeleportIn_Enter(CGameObjectInstance *self, CAI *ai) {
     pos.x = ai->m_vLeashPos.x + dist * func_002974C0(angle);
     pos.y = ai->m_vLeashPos.y;
     pos.z = ai->m_vLeashPos.z + dist * func_002982F0(angle);
-    Collision_MoveInstance(self, pos, (s32) ai->m_pModeCurrent->m_pData);
+    Collision_MoveInstance(self, pos, (sptr) ai->m_pModeCurrent->m_pData);
     ai->m_vDesiredPos = self->header.m_vPos;
 }

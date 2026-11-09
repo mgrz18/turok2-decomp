@@ -114,15 +114,15 @@ L004079A0:
         s0 = s0 << 8;
     }
     m = CCache__Allocate(0, s0, 0x33, D_800C13F0);
-    gLoadBufferHandle = (s32)m;
+    gLoadBufferHandle = (sptr)m;
     gLoadBuffer = (SaveGame *)m->addr;
     memset((void *)gLoadBuffer, 0, s0);
     if (Pak_ReadNote(s4, s5, gLoadBuffer, sp4C << 8) != 0) goto L00407ACC;
     hs = *(s32 *)gLoadBuffer;
     if (hs != s7) goto L00407ACC;
-    if (Crc32_Compute(gLoadBuffer, hs - 4, 0xB) != *(s32 *)(*(s32 *)gLoadBuffer + (s32)gLoadBuffer - 4)) goto L00407ACC;
+    if (Crc32_Compute(gLoadBuffer, hs - 4, 0xB) != *(s32 *)(*(s32 *)gLoadBuffer + (sptr)gLoadBuffer - 4)) goto L00407ACC;
     s0 = 0;
-    if (D_800F70A8 != *(s32 *)((s32)gLoadBuffer + 4)) { s2 = 1; goto L00407AD0; }
+    if (D_800F70A8 != *(s32 *)((sptr)gLoadBuffer + 4)) { s2 = 1; goto L00407AD0; }
     gPakNoteIndex = s5;
     MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gGameNoteDeleteMenuDesc, arg1->f1C, arg1->f20, arg1->f14);
     return 1;
@@ -193,14 +193,14 @@ L00407CDC:
         s0 = s0 << 8;
     }
     m = CCache__Allocate(0, s0, 0x33, D_800C13F0);
-    gLoadBufferHandle = (s32)m;
+    gLoadBufferHandle = (sptr)m;
     gLoadBuffer = (SaveGame *)m->addr;
     memset((void *)gLoadBuffer, 0, s0);
     if (Pak_ReadNote(s4, s5, gLoadBuffer, sp4C << 8) != 0) goto L00407E70;
     hs = *(s32 *)gLoadBuffer;
     if (hs != s7) goto L00407E70;
-    if (Crc32_Compute(gLoadBuffer, hs - 4, 0xB) != *(s32 *)(*(s32 *)gLoadBuffer + (s32)gLoadBuffer - 4)) goto L00407E70;
-    if (D_800F70A8 != *(s32 *)((s32)gLoadBuffer + 4)) goto L00407E70;
+    if (Crc32_Compute(gLoadBuffer, hs - 4, 0xB) != *(s32 *)(*(s32 *)gLoadBuffer + (sptr)gLoadBuffer - 4)) goto L00407E70;
+    if (D_800F70A8 != *(s32 *)((sptr)gLoadBuffer + 4)) goto L00407E70;
     MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gGameNoteLoadMenuDesc, arg1->f1C, arg1->f20, 0);
     return 1;
 L00407E70:

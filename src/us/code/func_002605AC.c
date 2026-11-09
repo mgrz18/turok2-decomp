@@ -17,5 +17,5 @@ void EnemyAI_DrawFadeOut(s32 arg0, Unk002605AC *arg1, s32 arg2) {
         var_f1 = 0.0f;
     }
     gBlendState_m_Color[3] = var_f1;
-    CGameObjectInstance__DrawModelImmediate(arg0, (s32) arg1, arg2);
+    CGameObjectInstance__DrawModelImmediate(arg0, (sptr) arg1, arg2);
 }

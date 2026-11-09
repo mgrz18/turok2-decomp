@@ -21,10 +21,10 @@ s32 DamagedPakMenu_SelectRepair_2(s32 unused, Menu *event) {
         if (event->context == (char *)&gSavePortalMenuDescB_2 || event->context == (char *)&gSavePortalMenuDesc_2) {
             gCameraPoolHideViews = 0;
         }
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (sptr) event->controller, NULL);
         return 1;
     } else {
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (char *)&gPakConfirmRepairDesc_2, event->player, (s32) event->controller, event->context);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (char *)&gPakConfirmRepairDesc_2, event->player, (sptr) event->controller, event->context);
         return 1;
     }
 }

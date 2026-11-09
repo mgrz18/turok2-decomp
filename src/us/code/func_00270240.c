@@ -68,8 +68,8 @@ void CAudioWorld__Initialize(CAudioWorld *m) {
     s32 i;
     s32 j;
     s32 n;
-    u32 a;
-    u32 b;
+    uptr a;
+    uptr b;
     u8 *e;
 
     CMutex__Construct(&m->lock);

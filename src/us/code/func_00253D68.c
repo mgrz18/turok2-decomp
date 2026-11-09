@@ -13,7 +13,7 @@ typedef struct Shared_ActorView {
 } Shared_ActorView;
 typedef struct Shared_World Shared_World;
 int CPlayer__SetPosition(void *arg0, void *arg1) {
-    int region;
+    sptr region;
     CVector3 *src = arg1;
     Shared_ActorView *view = arg0;
     region = ((int (*)(void *))CScene__FindRegionAt)(&gScene);

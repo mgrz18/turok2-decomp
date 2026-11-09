@@ -62,7 +62,7 @@ void CGameObjectInstance__Draw(Actor *actor, CCamera *view) {
     s32 flags;
     void **anim;
     void **model;
-    s32 info;
+    sptr info;
     s32 inView;
     s32 near;
     f32 y;
@@ -140,7 +140,7 @@ void CGameObjectInstance__Draw(Actor *actor, CCamera *view) {
             args.m_bDraw = inView;
             args.m_bShadow = near;
             args.m_pCamera = view;
-            args.m_hModel = (s32)model;
+            args.m_hModel = (sptr)model;
             args.m_pOffset = offset;
             args.m_nVariant = 0;
             args.m_nModel = 0;

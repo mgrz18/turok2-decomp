@@ -50,7 +50,7 @@ s32 CAudioWorld__PlayLayer(CAudioWorld *m, SoundEffectInfo *info, s32 id, s32 a3
         if (SndVoicePool_IsSoundPlaying(&m->pool, m->cueId) != 0) {
             return -1;
         }
-        if (Sound_DistanceFalloff(id, (s32)&m->listener->m_vPos) == 0.0f) {
+        if (Sound_DistanceFalloff(id, (sptr)&m->listener->m_vPos) == 0.0f) {
             return -1;
         }
     }

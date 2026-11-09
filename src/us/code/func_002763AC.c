@@ -11,5 +11,5 @@ s32 SndVoice_Construct(s32, s32, s32);
 void SndQueue_InitNode(ListHead *arg0, s32 arg1) {
     arg0->prev = arg0;
     arg0->next = arg0;
-    SndVoice_Construct((s32) arg0->data, arg1, -1);
+    SndVoice_Construct((sptr) arg0->data, arg1, -1);
 }

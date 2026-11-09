@@ -22,7 +22,7 @@ void HostIo_WriteBlockDma(u32 address, u8 *source, u32 remaining) {
         remaining--;
     }
     while (remaining >= 4) {
-        if (remaining >= 16 && ((u32) source & 15) == 0 && dmaResult != -1) {
+        if (remaining >= 16 && ((uptr) source & 15) == 0 && dmaResult != -1) {
             dmaResult = osPiStartDma(&sHostIoDmaMsg, 1, 1, address, source, remaining, &sHostIoDmaQueue);
             if (dmaResult != -1) {
                 osRecvMesg(&sHostIoDmaQueue, NULL, 1);

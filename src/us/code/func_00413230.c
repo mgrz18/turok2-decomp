@@ -730,8 +730,8 @@ void Menu_Construct(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, 
   ext = ((u8 *) ib) + (t->count * 0x28);
   for (i = 0; i < t->count; i++)
   {
-    MenuItem *it = (MenuItem *) ((i * 0x28) + ((s32) p->items));
-    MenuItemDesc *tp = (MenuItemDesc *) ((i * 0x24) + ((s32) t->items));
+    MenuItem *it = (MenuItem *) ((i * 0x28) + ((sptr) p->items));
+    MenuItemDesc *tp = (MenuItemDesc *) ((i * 0x24) + ((sptr) t->items));
     it->index = i;
     pc = &ext;
     {
@@ -1184,7 +1184,7 @@ s32 MenuPool_OpenSubmenu(MenuPool *a, Menu *c) {
     MenuDesc *b = c->submenu;
     s32 p1, p2, p3, p4;
     if (b != 0) {
-        p1 = b->param; p2 = (s32) c->player; p3 = (s32) c->controller; p4 = (s32) c->context;
+        p1 = b->param; p2 = (sptr) c->player; p3 = (sptr) c->controller; p4 = (sptr) c->context;
         size = b->count * 40 + 0x1D8;
         for (i = 0; i < b->count; i++) size += O06_ItemSize_415FB8(&b->items[i].type);
         r = CCache__Allocate(0, size, 0x3B, "menu");
@@ -1228,7 +1228,7 @@ s32 MenuItem_TextLength(MenuItem *a) {
 s32 func_00413F74_416168(s32, s32, s32, s32, s32) __asm__("MenuItem_DrawString");
 
 void MenuItem_DrawText(Menu *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    func_00413F74_416168((s32) arg0, arg1, arg2, arg3, (s32) arg0->desc);
+    func_00413F74_416168((sptr) arg0, arg1, arg2, arg3, (sptr) arg0->desc);
 }
 
 /* ---------------- MenuItem_DrawChar ---------------- */
@@ -1289,7 +1289,7 @@ s32 func_004162E4(Menu *arg0) {
     temp_v1 = arg0->controller;
     var_v0 = 0;
     if (temp_v1 != 0) {
-        var_v0 = (s32) &temp_v1->buttonHistory[29]; /* 0xA0 */
+        var_v0 = (sptr) &temp_v1->buttonHistory[29]; /* 0xA0 */
     }
     return var_v0;
 }
@@ -1414,7 +1414,7 @@ s32 Menu_StepValueLR(Menu *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg
   var_s1 = arg4;
   var_s5 = arg5;
   var_s2 = arg3;
-  if (func_00285628_416558((s32) arg0->controller) != 0)
+  if (func_00285628_416558((sptr) arg0->controller) != 0)
   {
     var_s0 -= var_s4;
     if (var_s0 < var_s2)
@@ -1505,7 +1505,7 @@ s32 MenuPool_OpenMenuFrom(MenuPool *a, Menu *c, MenuDesc *b) {
     s32 size, i;
     s32 *r;
     s32 s;
-    s32 p1 = c->param, p2 = (s32) c->player, p3 = (s32) c->controller, p4 = (s32) c->context;
+    s32 p1 = c->param, p2 = (sptr) c->player, p3 = (sptr) c->controller, p4 = (sptr) c->context;
     size = b->count * 40 + 0x1D8;
     for (i = 0; i < b->count; i++) size += O06_ItemSize_416760(&b->items[i].type);
     r = func_00204EDC_416760(0, size, 0x3B, "menu");
@@ -1589,7 +1589,7 @@ void MenuPool_Update(MenuPool *arg0) {
                 }
             } else {
 block_6:
-                if (func_0041531C_4169C8((s32) var_s0, (s32) arg0) != 0) {
+                if (func_0041531C_4169C8((sptr) var_s0, (sptr) arg0) != 0) {
                     temp_v0 = var_s0->desc->close;
                     if (temp_v0 != NULL) {
                         temp_v0(var_s0, arg0);
@@ -1598,7 +1598,7 @@ block_6:
                     temp_v0_2->buttons = 0;
                     temp_v0_2->buttonsSingle = 0;
                     temp_v0_2->buttonsDouble = 0;
-                    CList__Remove((s32) arg0, (s32) var_s0);
+                    CList__Remove((sptr) arg0, (sptr) var_s0);
                     CCache__Deallocate(0, var_s0->block);
                 }
             }
@@ -1858,7 +1858,7 @@ void MenuItem_SetBindingValue(MenuItem *item,float value) {
 s32 CGameObjectInstance__DrawModelWithLights(s32, s32, s32, s32);
 
 void MenuModel_DrawUnselected(s32 arg0, s32 arg1, s32 arg2) {
-    CGameObjectInstance__DrawModelWithLights(arg0, arg1, arg2, (s32) &gDefaultLights);
+    CGameObjectInstance__DrawModelWithLights(arg0, arg1, arg2, (sptr) &gDefaultLights);
 }
 
 /* ---------------- MenuModel_DrawSelected ---------------- */
@@ -1947,6 +1947,6 @@ void MenuPool_CloseMenu(s32 arg0, Menu *arg1) {
     temp_v0_2->buttons = 0;
     temp_v0_2->buttonsSingle = 0;
     temp_v0_2->buttonsDouble = 0;
-    CList__Remove_417418(arg0, (s32) arg1);
+    CList__Remove_417418(arg0, (sptr) arg1);
     func_002052D8_417418(0, arg1->block);
 }

@@ -43,5 +43,5 @@ void CCameraPool__Construct_2(Unk00468D6C *arg0) {
     arg0->unkF08 = 0;
     arg0->unk38 = 2;
     CCamera__Construct_2(temp_s1);
-    CCamera__Advance((s32) temp_s1);
+    CCamera__Advance((sptr) temp_s1);
 }

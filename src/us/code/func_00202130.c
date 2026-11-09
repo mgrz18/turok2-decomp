@@ -20,14 +20,14 @@ extern u8 D_8014A000[];   /* end of the loaded image */
 void InitializeSystemResources(void) {
     u8 *base;
     u32 top;
-    u32 size;
+    uptr size;
 
     top = 0x80400000;
     base = D_8014A000;
     if (GetMemSize() != 0x400000) {
         top = (GetMemSize() | 0x80000000) - 0x80000;
     }
-    size = top - (u32) base;
+    size = top - (uptr) base;
     memset(base, 0, size);
     CHeap__Construct(&gHeap, base, size);
     CDecompressor__Construct(&gDecompressor, 3);
