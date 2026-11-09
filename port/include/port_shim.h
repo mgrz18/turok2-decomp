@@ -15,4 +15,8 @@
 #define T2_STR(x) T2_STR_(x)
 #define T2_LABEL_PREFIX T2_STR(__USER_LABEL_PREFIX__)
 
+/* The libultra/libc functions the port implements itself are called under t2_ names, so they
+ * cannot clash with libultraship's or the host libc's (docs/port/LINK.md). */
+#include "t2_rename.h"
+
 #endif
