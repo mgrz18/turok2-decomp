@@ -133,6 +133,8 @@ struct Args {
     bool draw = false;
     bool audio = false;
     bool verbose = false;
+    bool skipPakCheck = false; // DEBUG-ONLY (t2debug.c)
+    int startMode = -1;        // DEBUG-ONLY (t2debug.c)
 #ifdef T2_LOW_MEMORY_DEFAULT
     bool lowMemory = true;
 #else
@@ -162,11 +164,16 @@ Args ParseArgs(int argc, char** argv) {
             a.audio = true;
         } else if (s == "--verbose") {
             a.verbose = true;
+        } else if (s == "--skip-pak-check") {
+            a.skipPakCheck = true;
+        } else if (s == "--start-mode" && i + 1 < argc) {
+            a.startMode = atoi(argv[++i]);
         } else if (s == "--high-memory") {
             a.lowMemory = false;
         } else {
             fprintf(stderr, "usage: %s [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]\n"
-                            "          [--game [--draw] [--audio] [--verbose] [--high-memory]]\n",
+                            "          [--game [--draw] [--audio] [--verbose] [--high-memory]\n"
+                            "                  [--skip-pak-check] [--start-mode N]]   (the last two: debug only)\n",
                     argv[0]);
             exit(2);
         }
@@ -403,6 +410,8 @@ int main(int argc, char** argv) {
         g.audio = args.audio;
         g.lowMemory = args.lowMemory;
         g.verbose = args.verbose;
+        g.skipPakCheck = args.skipPakCheck;
+        g.startMode = args.startMode;
         CHECK(T2Game_Run(window, g) == 0, "game run");
     }
 #endif

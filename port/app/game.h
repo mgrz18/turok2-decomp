@@ -15,6 +15,9 @@ struct T2GameArgs {
     int audio = 0;      // --audio: the game's sound (docs/port/AUDIO.md) through LUS's AudioPlayer
     int lowMemory = 0;  // game memory below 2 GB (Linux bring-up aid)
     int verbose = 0;
+    // DEBUG-ONLY bring-up switches (port/game/t2debug.c) until the Controller Pak is modelled:
+    int skipPakCheck = 0; // --skip-pak-check: mode 0 ends as "continue without saving"
+    int startMode = -1;   // --start-mode N: switch to engine mode N once mode 0 has started
 };
 
 // Boots the game and runs args.frames frames; window may be null (--no-window).

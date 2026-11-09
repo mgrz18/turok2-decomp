@@ -22,6 +22,9 @@
 extern "C" {
 #include "t2port.h"
 #include "t2audio.h"
+// port/game/t2debug.c
+int T2Port_EngineMode(void);
+void T2Port_DebugSwitches(int skipPak, int startMode);
 }
 
 #include "game.h"
@@ -80,6 +83,33 @@ void ContRead(void* pads) {
     }
 }
 
+// Reads back the last frame Fast3D drew and writes it as a binary PPM (T2_SHOT).
+void WriteShot(const std::shared_ptr<Fast::Fast3dWindow>& window, const char* shot) {
+    if (!window) {
+        return;
+    }
+    auto interp = window->GetInterpreterWeak().lock();
+    if (!interp || !interp->mRapi) {
+        return;
+    }
+    const uint32_t w = interp->mCurDimensions.width, h = interp->mCurDimensions.height;
+    std::vector<uint16_t> fb((size_t)w * h);
+    interp->mRapi->ReadFramebufferToCPU(0, w, h, fb.data());
+    if (FILE* fp = fopen(shot, "wb")) {
+        fprintf(fp, "P6\n%u %u\n255\n", w, h);
+        for (uint32_t y = 0; y < h; y++) {
+            for (uint32_t x = 0; x < w; x++) {
+                uint16_t c = fb[(size_t)(h - 1 - y) * w + x];
+                uint8_t px[3] = { (uint8_t)((c >> 11 & 31) << 3), (uint8_t)((c >> 6 & 31) << 3),
+                                  (uint8_t)((c >> 1 & 31) << 3) };
+                fwrite(px, 1, 3, fp);
+            }
+        }
+        fclose(fp);
+        printf("game: wrote %s (%ux%u)\n", shot, w, h);
+    }
+}
+
 } // namespace
 
 int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameArgs& args) {
@@ -100,12 +130,24 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
 
     int drawn = 0;
     const void* lastDL = nullptr;
+    int mode = -1;
+    // T2_SHOT_EVERY=<n> (with T2_SHOT=<file.ppm>): also write <file>.<frame>.ppm every n frames
+    const char* shotEnv = getenv("T2_SHOT_EVERY");
+    const int shotEvery = shotEnv != nullptr ? atoi(shotEnv) : 0;
     auto t0 = std::chrono::steady_clock::now();
     for (int f = 0; f < args.frames && (!window || window->IsRunning()); f++) {
         if (window) {
             window->HandleEvents();
         }
         T2Port_Frame();
+        if (int m = T2Port_EngineMode(); m != mode) {
+            printf("game: frame %d: engine mode %d -> %d\n", f + 1, mode, m);
+            fflush(stdout);
+            mode = m;
+        }
+        if (args.skipPakCheck || args.startMode >= 0) {
+            T2Port_DebugSwitches(args.skipPakCheck, args.startMode); // DEBUG-ONLY
+        }
         if (args.audio) {
             // the frames the audio manager produced this retrace (22050 Hz stereo s16) to LUS's
             // AudioPlayer (a no-op when it has no audio backend, e.g. headless)
@@ -131,6 +173,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             }
             if (window->DrawAndRunGraphicsCommands((Gfx*)task.dataPtr, {})) {
                 drawn++;
+                if (const char* shot = getenv("T2_SHOT"); shot != nullptr && shotEvery > 0 && (f + 1) % shotEvery < 2) {
+                    std::string name = std::string(shot) + "." + std::to_string(f + 1) + ".ppm";
+                    WriteShot(window, name.c_str());
+                }
             }
         }
         if (args.verbose || (f + 1) % 60 == 0) {
@@ -149,26 +195,8 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         DumpDL((const uintptr_t*)lastDL, 0, &budget);
     }
     // T2_SHOT=<file.ppm>: the last frame Fast3D drew, read back (bring-up screenshots).
-    if (const char* shot = getenv("T2_SHOT"); shot != nullptr && window && drawn > 0) {
-        auto interp = window->GetInterpreterWeak().lock();
-        if (interp && interp->mRapi) {
-            const uint32_t w = interp->mCurDimensions.width, h = interp->mCurDimensions.height;
-            std::vector<uint16_t> fb((size_t)w * h);
-            interp->mRapi->ReadFramebufferToCPU(0, w, h, fb.data());
-            if (FILE* fp = fopen(shot, "wb")) {
-                fprintf(fp, "P6\n%u %u\n255\n", w, h);
-                for (uint32_t y = 0; y < h; y++) {
-                    for (uint32_t x = 0; x < w; x++) {
-                        uint16_t c = fb[(size_t)(h - 1 - y) * w + x];
-                        uint8_t px[3] = { (uint8_t)((c >> 11 & 31) << 3), (uint8_t)((c >> 6 & 31) << 3),
-                                          (uint8_t)((c >> 1 & 31) << 3) };
-                        fwrite(px, 1, 3, fp);
-                    }
-                }
-                fclose(fp);
-                printf("game: wrote %s (%ux%u)\n", shot, w, h);
-            }
-        }
+    if (const char* shot = getenv("T2_SHOT"); shot != nullptr && drawn > 0) {
+        WriteShot(window, shot);
     }
     double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
     T2PortStats s;
