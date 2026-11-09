@@ -164,3 +164,98 @@ asset-layout items.
   or the `--no-window` path with an offscreen context.
 - `--draw` was not tried: no game frame is produced yet.
 - No `gamecontrollerdb.txt` next to the binary. LUS logs an error and carries on.
+
+## 6. Round 4 (part s3): macOS reaches mode 0, the legal screen and the first cinema
+
+Branch `names-R4_s3` (from 474e40af). Every `src/`/`include/` change was checked with
+`tools/asm_diff.py --base 474e40af -j 8` **on the box** (a scratch copy in `/root/R4_s3/repo`:
+`OUT/asmcheck.sh` sends the diff over ssh, applies it and runs asm_diff over the whole tree when
+`include/` changed). Every commit: **0 differences over 3,938 files**.
+
+### Build and run on the Mac
+
+As in section 1, plus: the ELF is the box's `build/turok2.us.elf` at 474e40af, and the
+archive is the box's format-2.0 `C18out/turok2.o2r`. Build `t2runtime` and `t2audio` with the
+game library before gendata (`OUT/rebuild.sh` does this). Run headless only:
+
+```sh
+SDL_VIDEODRIVER=offscreen OUT/build/app/turok2 --archive OUT/turok2_474.o2r --rom baserom.us.z64 \
+    --game --no-window --draw --frames 300            # T2_DLDUMP_AT=<frame>: dump a frame's DL
+```
+
+**No headless rendering on macOS.** SDL's offscreen driver has no Metal and no GL: LUS logs
+"Error creating SDL window" and crashes in `GfxRenderingAPIMetal::Init`
+(`newSamplerState` on a null device) or `glewContextInit`, because offscreen needs EGL and
+macOS has none. A hidden Cocoa window would work, but the user asked for no windows. So `--draw`
+on the Mac runs the game's whole draw path (`CEngineApp__Draw` and every display list), but
+Fast3D does not execute it. Frames are compared as **display lists** instead of pixels:
+`T2_DLDUMP_AT=<frame>` (game.cpp, new) prints the first display list at or after that frame,
+before the game runs again. It also works without a window. Linux frames are compared the
+same way.
+
+### Crash and fix table (s3)
+
+| # | where | cause | fix |
+|---|---|---|---|
+| s3-1 | `CISet__GetROMAddressAndSize` from `func_00207914` from `Material_Unpack` | `func_00207914(s32 arg0)` took `&Material.texture` (the texture's ROM address, then its size at +4) as an int | `sptr` arg; `CScene__GetTextureSet(..., s32 *, sptr)`. Both words are ROM values, not host pointers: no host-typed Material is needed |
+| s3-2 | `CScene__GetLevelName` | levels table read as `s32` at N64 0x38 of CScene; index out-slot `s32 sp20`; sub-block handle at N64 offsets | typed on `CScene` (`m_pLevels`, `m_LevelsKey`, `m_nLevel`), `CMemEntry` (`data`, `size`), `sptr` slot |
+| s3-3 | `guMtxIdent` from `MatrixHeap_Construct` | the matrix pool `{s32 items; ...}` in `CScene.m_Heap` (u8[0x10]) | `MtxPool {MtxBlock *base; s32 n; s32 remaining; MtxBlock *next}` (structs/world.h) as `CScene.m_Heap[1]`; `MatrixHeap_Construct`, `MtxPool_Reset`, `MtxPool_Alloc` typed |
+| s3-4 | `CScene__FindNearestWarpDest`, `CScene__Construct(_2)`, `func_0042C194` | `CCache__LoadPersistantIndex(s32, s32 *out, ...)`: the out-slot gets a pointer | `sptr *` slots |
+| s3-5 | `raw_normal` from `GameObject_GetGroundRotation` | `CScene__GetRegion`'s port body returned `(s32)(sptr)`; `FindRegionAt`/`GetRegion` declared `s32` | `sptr` returns (scene.h, abu_protos.h, the local decls) |
+| s3-6 | `CGameObjectInstance__SetupAnimation` (port body) | object table `s32 a1`; request handles read as `s32 *` (`tree = *model`) | `s32 *` table, `CMemEntry *` handles (`->data`) |
+| s3-7 | `memset` from `Pak_AllocDirectory` | `Shape_typemap_165.field_0` (int view of the block's data pointer) | `->data` |
+| s3-8 | `SndSeq_FadeOut` from `CAudioWorld__FadeOutMusic` | `s32 arg0 + 0x1D64` | `&world->seq` (CAudioWorld typed) |
+| s3-9 | `CCameraPool__NewGame` from `EngineMode00_PakCheck_Init` | all 28 `EngineModeNN_*` handlers take the app as `s32` | `sptr` (plus `func_002888BC`, `CEngineApp__StartWarp`, `CEngineApp__DrawWorld` and the callee decls); `EngineMode00_PakCheck_Draw` / `EngineMode08_MainMenu_Draw` pass the app on to `EngineMode13_Game_Draw` (the N64 left it in a0) |
+| s3-10 | `Automap_IsShown` | `s32 temp_s0 = app + APP_AUTOMAP` | `sptr` |
+| s3-11 | `Menu_Construct` from `MenuPool_OpenMenu` | `s32 *r; s32 s = *r` (block handle) and `s32` player/controller/context in all four `MenuPool_Open*` | `sptr`; prototypes in protos/menu.h return `sptr` |
+| s3-12 | `Menu_TextWidth` from `MenuItem_Layout` | text read through `(u8 *)it->data` (s32 union view) | `it->text` |
+| s3-13 | **(Linux too)** damaged-pak menu lines draw nothing | `MenuItem_DrawText(Menu *arg0, ...)` is the item's draw callback; it passed `arg0->desc`. N64: Menu.desc = MenuItem.text = 0x14. Host: Menu.desc is at 0x20 = `MenuItem.def`, the item's desc pointer. This is the "text points into the desc table" of STATUS §4.1 | typed `(MenuItem *, MenuItemLayout *, MenuItemLayout *, Menu *)`, passes `arg0->text`; the same in `MenuItem_DrawText_2`; DrawChar/DrawBinding without `s32` pointers |
+| s3-14 | `CCameraViewParams__Construct(0x31)` from `CCameraPool__AllocCamera` (mode 4) | `CElementPool { pad[0xC]; CList free; CList active }`: N64 layout of CCameraPool | typed on `CCameraPool` (both copies) |
+| s3-15 | `Controller_SetRumbleOption` (truncated profile) | `CPlayerContState__Init(Record14 *, s32)`: 14-word view | host body on `CPlayerContState` (`#ifdef TARGET_PORT`); `CPlayer__ResetControlState` passes `&player->m_ContState` instead of `+ 0xA40` |
+| s3-16 | `MenuPool_CountOpen` from `Automap_Update` | `(u8 *)cam + 0x53C` (N64 offset of `CCamera.m_MenuPool`) | `cam->m_MenuPool`: 29 sites in 19 files. The 4 sites that also read the player at N64 offsets (`+ 0x51C`, `P_S32(player, 0x51C)`) are left to the offset sweep |
+| s3-17 | `func_00267DBC` from `CScene__DecompressAnimatedInstances` | intelligence read at N64 0x14 as a word view | host body on `CInstanceHeader`/`CIntelligence` |
+| s3-18 | `func_0021E5D4` from `CScene__LoadLevel(162)` | `LevelActor` view (0x14, 0xD4, 0x207), player stride 0x1328, weapon actor +0x288, AI +0x140; the caller walked the actors by 0x288 | host body on `CGameObjectInstance`/`CPlayer`; `CScene__LoadLevel(_2)` steps by `sizeof(CGameObjectInstance)` and `T2_OFFSETOF(CPlayer, m_WeaponActor/m_pNext)` |
+| s3-19 | **(all hosts)** colour image truncated in every display list (`FF` w1 = low 32 bits); the scheduler's `frameOf` never matched, so it always used frame 0 | `CFrameData.m_pFrameBuffer` was `u32` | `uptr` (structs/frame.h); `frameOf` compares `uptr`; `(uptr) gDepthBuffer` in `func_0027D160` |
+
+### How far it runs
+
+`turok2 --game --draw --frames 300` (headless, `--no-window`): boot, level 0, **mode 0 for
+300 frames**: 1,414 thread switches and 151 gfx tasks, the same counts as Linux; no crash. The
+pak timer opens the pak menu at frame ~120, the same as Linux.
+
+With a local probe that ends the pak check when the menu opens (not committed: s1/s2 own the
+way out of mode 0), the Mac goes through **mode 0 → 1 (legal) → 3 (expansion pak) → 4 (first
+intro cinema)**. Mode 4 warps to level 162 and constructs its actors. It then stops in the
+AI:
+
+```
+CScene__SetInstanceSavedBit(arg1=0xffffffffcf4c5e70)  <- Action_IdleEnter(s32 arg0)
+  <- CAI__SetMode (Source110/Dest views at N64 offsets) <- Action_Advance <- func_0021E5D4
+  <- CScene__LoadLevel(162) <- CScene__UpdateWarp <- EngineMode04_Cinema_Draw
+```
+
+The AI mode/action callbacks take the actor as `s32` (`Action_*`, `GameObject_FireTriggers`,
+`CScene__SetInstanceSavedBit`). `CAI__SetMode` uses N64-offset views. This is the next sweep
+item, and Linux low-memory hides it.
+
+### Display lists, Mac vs Linux
+
+The same tree was built on the box (`/root/R4_s3/out`, low memory) and run with the same
+arguments. `T2_DLDUMP_AT=101` and `=301`, headless `--no-window`, on both:
+
+| frame | Mac | Linux | op + w0 | w1 of non-address commands |
+|---|---|---|---|---|
+| 101 | 83 commands, 0 texture rectangles | 83, 0 | identical | identical |
+| 301 | 2,066 commands, 109 texture rectangles | 2,066, 109 | identical | identical |
+
+The display lists differ only in host addresses (G_DL, G_MTX, G_MOVEMEM, colour/depth/texture
+images). Since s3-19 the colour image carries the full 64-bit address (`FF ... 00000075C1B80000`).
+
+**Without a window LUS reports no controller**, so `Pak_GetStatus(0)` is -2 on both hosts,
+`gPakCheckHasPak` is 0, and mode 0 draws the scene and then the pak menu, not the "ACCESSING THE
+CONTROLLER PAK" text. The Linux windowed run (keyboard controller on port 0) draws the text, and
+since s3-13 also the menu lines:
+`scratchpad/assets_preview/R4_s3_linux_s3branch_f300.png` shows "PROBLEM!", "DAMAGED
+CONTROLLER PAK FOUND IN CONTROLLER #1.", "ATTEMPT REPAIR" (highlighted), "RETRY", "CONTINUE
+WITHOUT SAVING". On the Mac that path needs a controller without a window: s1's PIF/controller
+work, or a port flag that connects a virtual pad headless.
