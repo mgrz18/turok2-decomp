@@ -71,7 +71,7 @@ s32 CScene__GetLinkGroupCount(struct CScene *, s32);
 sptr CScene__GetLinkGroupCountPtr(struct CScene *, s32);
 s32 CScene__GetObject(struct CScene *, s32);
 u16 CScene__GetObjectTypeID(struct CScene *, s32);
-s32 CScene__GetRegion(void *, s32);
+sptr CScene__GetRegion(void *, s32);
 void CScene__GetRegionEventRecords(struct CScene *, u16 *, struct CSceneRecord **, s32 *);
 u32 CScene__GetRegionIndex(struct CScene *, sptr);
 void *CScene__GetRegionInfo(struct CScene *, u16 *);
