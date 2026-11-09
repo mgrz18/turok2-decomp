@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 
+#ifndef TARGET_PORT
 void SndQueue_CancelSoundId(void *arg0, s32 arg1)
 {
     OwnerRecAtD8 *owner = arg0;
@@ -27,3 +28,23 @@ void SndQueue_CancelSoundId(void *arg0, s32 arg1)
         } while (node != sentinel);
     }
 }
+#else
+#include "structs/sound.h"
+/* The port: the same on the typed queue (the view above has N64 offsets; the node's key (+0xB0)
+ * is body.soundId). Matching active requests move to the free list's tail. */
+void SndQueue_CancelSoundId(SndQueue *q, s32 arg1) {
+    SndLink *node = q->active.link.next;
+    while (node != &q->active.link) {
+        SndLink *next = node->next;
+        if (((SndNode *)node)->body.soundId == arg1) {
+            node->prev->next = next;
+            node->next->prev = node->prev;
+            node->next = &q->free.link;
+            node->prev = q->free.link.prev;
+            q->free.link.prev->next = node;
+            q->free.link.prev = node;
+        }
+        node = next;
+    }
+}
+#endif
