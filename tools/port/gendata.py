@@ -297,6 +297,9 @@ class Elf:
 # layout: leaves of a described type
 # ---------------------------------------------------------------------------
 
+# Sections whose address-only (SHN_ABS) labels are read as data, not left as .bss.
+ABS_DATA_SECTIONS = ('.code_rodata', '.code_rodata_tail')
+
 # Runtime state that sits, by address, inside the loaded .libultra section
 # (0x800C2474..0x800F632C): what the ELF has there is other bytes (code, tables,
 # strings), the game writes these before it reads them. Their pointer slots were
@@ -657,8 +660,13 @@ class Generator:
         RUNTIME_BSS: the same for runtime structs that splat's labels put
         inside the .libultra section (their pointer slots read code bytes)."""
         info = self.elf.syms[s.name]
-        return (info[2] == 'SHN_ABS' or self.elf.section_of(s.key) is None
-                or s.name in RUNTIME_BSS)
+        r = self.elf.section_of(s.key)
+        if r is None or s.name in RUNTIME_BSS:
+            return True
+        # an address-only label inside the game's rodata is ROM data all the same (the menu
+        # strings D_800B50C0 "damaged controller pak found in" ...: with no bytes the pak
+        # menu measured every line as 0 wide and drew no text)
+        return info[2] == 'SHN_ABS' and r[3] not in ABS_DATA_SECTIONS
 
     def size_of(self, s):
         ext = self.elf.extent(s.key)
