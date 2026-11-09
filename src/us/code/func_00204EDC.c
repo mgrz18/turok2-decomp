@@ -3,11 +3,10 @@
 
 #include "rw/junk_types.h"
 #include "globals/cache.h"
+#include "protos/ultra.h"
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 B12Node *CCache__AllocateInternal(s32 a, s32 b, u32 c, s32 d);
 B12Node *CCache__Allocate(s32 unused, s32 a1, u32 a2, s32 a3) {
     u32 mask;

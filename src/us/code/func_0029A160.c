@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 extern void *func_0029E460(void *destination, const void *source, int count);
-extern u32 osVirtualToPhysical(void *addr);
 extern OSTask *_VirtualToPhysicalTask(OSTask *arg0);
 OSTask *_VirtualToPhysicalTask(OSTask *intp)
 {

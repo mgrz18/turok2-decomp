@@ -45,6 +45,8 @@ GROUPS = collections.OrderedDict([
     ('game', (r'LoopSounds_Get|CParticleSystem__Spawn|GameObject_FireTriggers|Controller_SetRumbleOption|'
               r'ImpactEvent_ApplyBlast|CInstancePool__Spawn|Render_DrawModel|GameObject_GetRegionFloorHeight',
               'other functions with many disagreeing declarations')),
+    # written by hand (SDK types, not the m2c-typed definitions): apply only
+    ('ultra', (None, 'libultra entry points the game calls')),
 ])
 
 SCALAR = {'s8', 'u8', 's16', 'u16', 's32', 'u32', 's64', 'u64', 'f32', 'f64', 'sptr', 'uptr', 'void',
@@ -199,6 +201,10 @@ def gen(groups, verbose=True):
     result = {}
     for g in groups:
         rx, comment = GROUPS[g]
+        if rx is None:
+            hand = open(os.path.join(OUT, g + '.h')).read()
+            result[g] = sorted(set(re.findall(r'\b(\w+)\((?!\*)', strip_comments(hand))) - {'void'})
+            continue
         names = sorted(n for n in defs if re.fullmatch(rx, n) and not n.endswith('_2'))
         fwd, lines, skipped = set(), [], []
         for n in names:

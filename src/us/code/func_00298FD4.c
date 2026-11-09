@@ -3,12 +3,11 @@
 
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 extern u32 osMotorStart(struct Triple *);
-extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern void __osSiGetAccess(void);
 extern s32 __osSiRawStartDma(s32, s32);
-extern s32 osRecvMesg(OSMesgQueue *, void **, s32);
 extern u32 __osContDataCrc(void *arg0);
 extern void __osSiRelAccess(void);
 extern s32 __osSiRawStartDma(s32, s32);

@@ -4,8 +4,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/libultra.h"
-extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-extern u32 osGetCount(void);
+#include "protos/ultra.h"
 extern void __osSetTimerIntr(u64 tim);
 extern u64 __osInsertTimer(OSTimer *t);
 extern void __osSetCompare(u32 compare);

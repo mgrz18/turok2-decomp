@@ -2,10 +2,10 @@
 #include "structs/game.h"
 #include "globals/render.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 /* The game state (CEngineApp in CEngineApp__Construct). */
 
-void osViSetMode(s32);
 s32 osViSetSpecialFeatures(s32);
 
 s32 osViSetYScale(f32);                         /* extern */

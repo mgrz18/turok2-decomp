@@ -4,6 +4,7 @@
 #include "globals/engine.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
+#include "protos/ultra.h"
 
 /* Builds an animated object's bone matrices: binds its animation index,
  * loads the current (and, when blending, the next) animation into the two
@@ -110,7 +111,6 @@ s32 CAnimationState__IsLoaded(AnimChannel *channel);
 void CGameObjectInstance__PoseBone(AnimObject *obj, PoseContext *ctx, s32, f32 mtx[4][4]);
 void func_002360A0(void *effects, AnimObject *obj, void *bones);
 void GameObject_EmitHotPoints(void *list, s32 count, void *bones, AnimObject *obj, void *anims);
-u32 osGetCount(void);
 
 /* OS_CYCLES_TO_USEC */
 static __inline__ void addMicroseconds(f32 *usec, u32 cycles) {

@@ -4,11 +4,9 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/libultra.h"
-extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
+#include "protos/ultra.h"
 extern void __osViSwapContext();
 extern struct __OSViContext *__osViGetCurrentContext(void);
-extern u32 osGetCount(void);
 extern void __osTimerInterrupt(void);
 static __inline__ u16 *viRetrace(void) {
     return &__osViRetraceCount;

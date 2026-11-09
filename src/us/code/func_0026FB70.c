@@ -4,9 +4,8 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/audio.h"
-OSTime osGetTime(void);
+#include "protos/ultra.h"
 u32 osAiGetStatus(void);
-s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern u8 gScheduler[];
 extern s32 gAudioInfo[];
 typedef struct B12Timer2 {

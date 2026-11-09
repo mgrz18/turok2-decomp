@@ -6,6 +6,7 @@
 #include "common.h"
 #include "globals/engine.h"
 #include "protos/game.h"
+#include "protos/ultra.h"
 
 typedef struct Client {
     /* 0x0 */ struct Client *next;
@@ -22,8 +23,6 @@ typedef struct {
 } Sched;
 
 
-extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
-extern s32 osSendMesg(void *queue, void *msg, s32 flag);
 extern void osViBlack(s32 black);   /* osViBlack */
 extern void __scHandleRetrace(Sched *sc);
 extern void Video_UpdateResolution(void);

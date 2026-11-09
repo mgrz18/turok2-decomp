@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/sound.h"
+#include "protos/ultra.h"
 
-s32 osRecvMesg(s32, s32, s32);
-s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 /* How many of the manager's voices play the given sound (CMutex taken

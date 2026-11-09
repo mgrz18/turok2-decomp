@@ -13,6 +13,7 @@
 #include "globals/libultra.h"
 #include "globals/framebuffer.h"
 #include "protos/scene.h"
+#include "protos/ultra.h"
 
 extern u8 gPoolBuffers[];
 extern s32 D_800F6CA8;
@@ -24,7 +25,6 @@ extern void osCreateViManager(s32 pri);
 extern void osViBlack(s32 black);           /* osViBlack */
 extern void GfxPool_Clear(void *p);
 extern void GfxPool_Alloc(void *p);
-extern void osViSwapBuffer(void *frameBuffer);   /* osViSwapBuffer */
 extern void Demo_Reset(void);
 extern void CEngineApp__Construct(CEngineApp *e);
 extern void memset(void *p, s32 c, s32 n);   /* memset */
@@ -39,7 +39,6 @@ extern void Pak_AllocDirectory(void);
 extern void Controller_WatchAllPaks(void);
 extern s32 SavedPlayers_IsActive(void);
 extern void CEngineApp__SetMode(CEngineApp *e, s32 mode);
-extern s32 osRecvMesg(void *mq, void *msg, s32 flag);
 extern void CEngineApp__Retrace(CEngineApp *e);
 extern void CEngineApp__Update(CEngineApp *e);
 extern void Controller_ResetAllRumble(void);

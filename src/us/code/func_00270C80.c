@@ -4,6 +4,7 @@
 #include "structs/sound.h"
 #include "structs/table.h"
 #include "protos/iset.h"
+#include "protos/ultra.h"
 
 /* Plays a sound or a music cue at pos: refuses while another cue is pending,
  * when 6 of the 17 voices already play this sound id (or for cue 0x44C while
@@ -11,8 +12,6 @@
  * id avoids repeating its last variant), then starts each of its layers under
  * a new play handle, which it returns (-1 when nothing plays). */
 
-extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
-extern s32 osSendMesg(void *queue, void *msg, s32 flag);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
 extern s32 Random_Next(void);

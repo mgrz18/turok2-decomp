@@ -2,10 +2,9 @@
 #include "globals/cache.h"
 #include "globals/sysrc.h"
 #include "protos/cache.h"
+#include "protos/ultra.h"
 
 s32 CHeap__AllocAt(CHeap *, s32, s32);
-s32 osRecvMesg(s32, s32, s32);
-s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 B12Node *CCache__AllocateAt(s32 arg0, s32 arg1, s32 arg2)

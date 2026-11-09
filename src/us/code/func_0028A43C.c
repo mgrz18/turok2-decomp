@@ -7,8 +7,7 @@
 #include "structs/game.h"
 #include "globals/engine.h"
 #include "protos/cache.h"
-OSTime osGetTime(void);
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
+#include "protos/ultra.h"
 s32 osSpTaskYielded(OSTask *task);
 typedef struct Qn Qn;
 struct Qn { Qn *next; OSMesgQueue *q; };
@@ -49,7 +48,6 @@ typedef struct {
     u32 unk114;
     u8 pad118[0x28];
 } View;
-OSTime osGetTime(void);
 void __scTaskComplete(Vid *o, Job *j);
 s32 __scSchedule(Vid *o, Job **a, Job **b, s32 mode);
 void __scExec(Vid *o, Job *a, Job *b);

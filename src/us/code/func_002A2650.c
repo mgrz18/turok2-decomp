@@ -9,9 +9,8 @@
 #include "ultra_types.h"
 #include "globals/hostio.h"
 #include "structs/hostio.h"
+#include "protos/ultra.h"
 
-extern s32 osRecvMesg(OSMesgQueue *mq, void *msg, s32 flag);
-extern s32 osSendMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern u32 HostIo_ReadWord(u32 address);
 extern void HostIo_WriteWord(u32 address, u32 value);
 extern void HostIo_WriteBlockDma(u32 address, u8 *source, u32 count);

@@ -6,11 +6,10 @@
 #include "globals/sysrc.h"
 #include "protos/list.h"
 #include "protos/cache.h"
+#include "protos/ultra.h"
 
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
-extern s32 osRecvMesg(void *mq, void **msg, s32 flag);
-extern s32 osSendMesg(void *mq, void *msg, s32 flag);
 extern void CDecompressor__DecompressSync(CDecompressor *, CCacheEntry *);
 extern void CLoader__LoadSync(CLoader *, u32, u32, void *);
 extern void CLoader__LoadAsync(CLoader *, u32, u32, void *, void *, CCacheEntry *, s32);

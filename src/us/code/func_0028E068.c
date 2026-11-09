@@ -3,6 +3,7 @@
 #include "ultra_types.h"
 #include "structs/pager.h"
 #include "globals/pager.h"
+#include "protos/ultra.h"
 
 
 typedef struct FaultedThread {
@@ -18,16 +19,11 @@ typedef struct FaultedThread {
 extern s32 D_800B7658;
 
 extern FaultedThread *__osGetCurrFaultedThread(void);     /* __osGetCurrFaultedThread */
-extern u64 osGetTime(void);                /* osGetTime */
 extern void VM_MapTLBEntry(s16 page, PageMapping *mapping, s32 slot, u8 *map);
 extern void VM_UnmapTLBEntry(PageMapping *mapping);   /* releases its TLB slot */
 extern PageRegion *VM_FindRegion(u16 page);
-extern s32 osRecvMesg(OSMesgQueue *queue, void **msg, s32 block);
-extern s32 osSendMesg(OSMesgQueue *queue, void *msg, s32 block);
-extern void osWritebackDCacheAll(void);
 extern void osSetIntMask(s32);
 extern void SavedPlayers_Arm(void);
-extern void osStartThread(void *thread);
 
 static __inline__ void writeLink(PageMapping **where, PageMapping *value) {
     *where = value;

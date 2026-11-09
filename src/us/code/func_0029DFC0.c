@@ -3,8 +3,8 @@
 /* NOTE: the Rage Wars match was a generic getter; Turok 2 has the libultra-style
  * CP0 Count read here (osGetCount). */
 
-typedef unsigned int u32;
 
+#include "protos/ultra.h"
 u32 osGetCount(void) {
     u32 count;
     __asm__ __volatile__("mfc0 %0, $9" : "=r"(count)); /* CP0 $9 = Count */

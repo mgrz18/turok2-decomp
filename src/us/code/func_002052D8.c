@@ -1,9 +1,8 @@
 #include "common.h"
 #include "globals/cache.h"
 #include "protos/cache.h"
+#include "protos/ultra.h"
 
-s32 osRecvMesg(s32, s32, s32);
-s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 

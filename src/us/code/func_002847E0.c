@@ -6,10 +6,9 @@
 #include "structs/controller.h"
 #include "globals/pak.h"
 #include "globals/controller.h"
-void osContGetReadData(OSContPad *pad);
+#include "protos/ultra.h"
 s32 osContReset(OSMesgQueue *mq, OSContStatus *data);
 void osContGetQuery(OSContStatus *data);
-s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 void Controller_UpdateConnection(ControllerProfile *c);
 void Controller_ProcessInput(ControllerProfile *c, s8 x, s8 y, u16 b);
 void Controller_ReadAll(void) {

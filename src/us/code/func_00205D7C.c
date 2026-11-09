@@ -1,8 +1,7 @@
 #include "globals/cache.h"
 #include "protos/cache.h"
+#include "protos/ultra.h"
 
-s32 osRecvMesg(s32, s32, s32);
-s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 s32 CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)

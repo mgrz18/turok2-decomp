@@ -5,15 +5,12 @@
 #include "globals/pak.h"
 #include "globals/controller.h"
 #include "globals/rumble.h"
+#include "protos/ultra.h"
 
 /* Controller / rumble slot, 0x224 bytes (Controller in Controller_ResetRumble). */
 
 
 s32 RumblePool_Init(RumblePool *pool, RumbleEffect *effects, s32 count);
-void osCreateMesgQueue(void *mq, void *msgBuf, s32 count); /* osCreateMesgQueue */
-void osSetEventMesg(s32 event, void *mq, s32 msg);     /* osSetEventMesg */
-s32 osContInit(void *mq, u8 *bitpattern, OSContStatus *status); /* osContInit */
-s32 osSendMesg(void *mq, void *msg, s32 flag);
 void Controller_UnwatchPak(s32);
 s32 Cont_ResetSlot_2(ControllerProfile *, s32);
 

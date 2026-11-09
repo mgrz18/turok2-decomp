@@ -3,6 +3,7 @@
 #include "globals/render.h"
 #include "globals/engine.h"
 #include "globals/ucode.h"
+#include "protos/ultra.h"
 
 typedef struct {
     /* 0x00 */ u32 type;
@@ -55,7 +56,6 @@ typedef struct {
 
 extern u8 gScheduler[];
 
-extern void osWritebackDCacheAll(void);
 extern void Sched_SubmitTask(void *, ScTask *);
 
 /* Builds the RSP task(s) for a frame, hands them to the scheduler, moves to the next frame. */

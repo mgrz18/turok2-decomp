@@ -5,14 +5,9 @@
 #include "globals/audio.h"
 #include "globals/ucode.h"
 #include "globals/frame.h"
+#include "protos/ultra.h"
 
-void osSetEventMesg(OSEvent e, OSMesgQueue *mq, OSMesg msg);
-void osStartThread(OSThread *thread);
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 void *memset(void *s, int c, u32 n);
-void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
-void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msgBuf, s32 count);
-s32 osAiSetFrequency(u32 freq);
 extern s8 gAudioDmaState[];
 extern s32 gAudioDmaCache;
 extern B12DbEnt2 gAudioDmaBuffers[];

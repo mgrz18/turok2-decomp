@@ -3,11 +3,11 @@
 /* __osPfsGetStatus (libultra pfsgetstatus.c). */
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 extern void __osPfsRequestOneChannel(int channel);
 extern void __osPfsGetOneChannelData(s32 channel, EntryRecAt3 *data);
 extern s32 __osSiRawStartDma(s32 direction, void *dramAddr);
-extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 
 s32 __osPfsGetStatus(void *queue, int channel)
 {

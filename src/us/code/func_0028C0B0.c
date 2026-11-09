@@ -6,6 +6,7 @@
 #include "globals/render.h"
 #include "globals/crash.h"
 #include "globals/engine.h"
+#include "protos/ultra.h"
 
 /* libultra __OSThreadContext: 64-bit registers, read here as their low words. */
 typedef struct ThreadContext {
@@ -38,15 +39,12 @@ extern char D_8010FED4[];
 extern s32 D_800F1FF0;              /* failed assertion: line */
 extern char *D_800F1FF4;            /* failed assertion: expression */
 
-extern u64 osGetTime(void);                 /* osGetTime */
 extern void Video_SetResolution(s32);
-extern void osViSwapBuffer(u16 *frameBuffer);    /* osViSwapBuffer */
 extern void Crash_PutChar(u8 c);                /* draws one character */
 extern void Crash_PrintString(char *s);             /* draws a string */
 extern void Crash_PrintFlags(u32 value, char *name, FlagDesc *descriptions);
 extern void Crash_PrintRegPair(char *name1, u32 value1, char *name2, u32 value2);
 extern void Crash_PrintStack(u8 *stack, s32 size, ThreadContext *context, u8 id);
-extern void osWritebackDCacheAll(void);
 
 static __inline__ void clearScreen(void) {
     u16 *p = sCrashFrameBuffer;

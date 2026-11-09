@@ -5,8 +5,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/hostio.h"
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
+#include "protos/ultra.h"
 typedef struct IoReq {
                s32 unk0;
                s32 unk4;

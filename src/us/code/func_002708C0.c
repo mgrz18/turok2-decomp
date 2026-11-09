@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/ultra.h"
 
-extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern void SndQueue_CancelHandle(struct ChannelSet *arg0, s32 arg1);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
-extern void osSendMesg(void *, s32, s32);
 extern void SndVoicePool_StopVoice(void *, s16);
 s32 CAudioWorld__StopHandle(void *arg0, s32 id) {
     void *temp_s0;
@@ -70,4 +69,3 @@ s32 CAudioWorld__StopHandle(void *arg0, s32 id) {
 }
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
-extern void osSendMesg(void *, s32, s32);

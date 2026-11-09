@@ -7,8 +7,7 @@
 #include "ultra_types.h"
 #include "globals/hostio.h"
 #include "structs/hostio.h"
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
+#include "protos/ultra.h"
 s32 HostIo_DisableInt(void);
 void HostIo_RestoreInt(s32 mask);
 void HostIo_WriteBlock(u32 dst, u8 *src, u32 n);

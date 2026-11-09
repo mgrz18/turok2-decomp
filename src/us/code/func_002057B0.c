@@ -3,10 +3,9 @@
 #include "globals/cache.h"
 #include "globals/sysrc.h"
 #include "protos/cache.h"
+#include "protos/ultra.h"
 
 s32 CHeap__Free(CHeap *, s32);
-s32 osRecvMesg(s32, s32, s32);
-s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 

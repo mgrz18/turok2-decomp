@@ -4,6 +4,7 @@
 #include "globals/frame.h"
 #include "globals/audio.h"
 #include "globals/engine.h"
+#include "protos/ultra.h"
 
 typedef struct {
     s32 rate;
@@ -22,8 +23,6 @@ extern u8 gEngineApp_m_Settings_unk15[]; /* local type: the field's real type (o
 
 extern s32 __osDisableInt(void);         /* disable interrupts */
 extern void __osRestoreInt(s32 mask);    /* restore interrupts */
-extern s32 osRecvMesg(void *mq, void *msg, s32 flag);
-extern s32 osSendMesg(void *mq, void *msg, s32 flag);
 extern void CMutex__Construct(CMutex *lock);
 extern void alHeapInit(void *heap, s32 base, s32 len);    /* alHeapInit */
 extern void amCreateAudioMgr(ALSynConfig *cfg, s32 a, AiCfg *ai);

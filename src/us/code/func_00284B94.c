@@ -4,18 +4,16 @@
 #include "globals/pak.h"
 #include "globals/controller.h"
 #include "globals/rumble.h"
+#include "protos/ultra.h"
 
 /* Controller pak / rumble service, run once per frame while enabled. */
 
 
-extern s32 osRecvMesg(void *queue, void *msg, s32 flags);
-extern s32 osSendMesg(void *queue, void *msg, s32 flags);
 extern void RumblePool_FreeFinished(RumblePool *pool);
 extern void Controller_ReadAll(void);
 extern void Controller_UpdateRumble(ControllerProfile *);
 extern s32 Controller_AnyPakWatched(void);
 extern void osContStartQuery(void *);
-extern void osContStartReadData(void *);
 
 void Controller_Service(void) {
     ControllerProfile *pad;

@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
 extern void __osViSwapContext();
-extern u32 osVirtualToPhysical(void *addr);
 void __osViSwapContext(void)
 {
     register OSViMode *vm;

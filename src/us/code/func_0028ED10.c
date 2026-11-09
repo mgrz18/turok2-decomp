@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "protos/ultra.h"
 struct EntryRecAt3;
 struct EntryRecAt3 {
     u16 id;
@@ -82,7 +83,6 @@ struct Region;
 typedef struct Region Region;
 struct PagerState;
 typedef struct PagerState PagerState;
-extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 extern ResourcePageMapping *gPager_chain_tail; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
 extern void VM_MapTLBEntry(s16 flags, ResourcePageMapping *item, s32 unused, u8 *out);
 extern ResourcePageMapping *gPager_chain_head; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
@@ -100,9 +100,6 @@ typedef struct ResourcePageJob {
 } ResourcePageJob;
 extern PagerState gPager; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
 extern char gPager_jobs[]; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
-extern void osInvalDCache(u32, s32);
-extern void osInvalICache(u32, s32);
-extern void osStartThread(void *);
 static __inline__ void writeLink(ResourcePageMapping **where, ResourcePageMapping *value) { *where = value; }
 void VM_FinishPageJob(ResourcePageJob *req) {
     ResourcePageMapping *link;

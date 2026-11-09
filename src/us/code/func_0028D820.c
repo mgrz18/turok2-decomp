@@ -6,6 +6,7 @@
 #include "structs/pager.h"
 #include "globals/pager.h"
 #include "globals/sysrc.h"
+#include "protos/ultra.h"
 
 
 extern u8 D_14A000[];               /* the paged data in the ROM */
@@ -14,14 +15,9 @@ extern u8 D_3CAE0[];                /* its size */
 u32 GetMemSize(void);            /* osGetMemSize */
 void __osUnmapTLBAll(void);           /* osUnmapTLBAll */
 void VM_ListAddTail(PageChain *chain, PageMapping *slot);
-void osCreateMesgQueue(OSMesgQueue *queue, void **msg, s32 count);
-s32 osSendMesg(OSMesgQueue *queue, void *msg, s32 block);
 void CLoader__LoadSync(CLoader *reader, u8 *source, void *size, u32 dest);
 void func_0028EE40(s32 arg0, s32 arg1, s32 arg2, u32 addr, u32 arg4, s32 arg5);
-void osSetEventMesg(s32 event, OSMesgQueue *queue, s16 *msg);
 void memset(void *dst, s32 value, s32 size);
-void osCreateThread(void *thread, s32 id, void (*entry)(void), void *arg, void *sp, s32 pri);
-void osStartThread(void *thread);
 void VM_ManagerThread(void);
 
 static __inline__ void fill(void *dst, u8 value, s32 n) {

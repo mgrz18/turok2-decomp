@@ -1,8 +1,7 @@
 #include "common.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 
-void osCreateMesgQueue(void *, void *, s32); /* extern */
-void osSendMesg(void *, s32, s32); /* extern */
 
 void __osSiCreateAccessQueue(void) {
     __osSiAccessQueueEnabled = 1;

@@ -9,14 +9,10 @@
 #include "globals/sysrc.h"
 #include "protos/list.h"
 #include "protos/cache.h"
+#include "protos/ultra.h"
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
-void osStartThread(OSThread *thread);
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 void *memset(void *s, int c, u32 n);
-void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
-void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msgBuf, s32 count);
-s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 typedef struct B12Node B12Node;
 struct B12Node {
                u32 key;

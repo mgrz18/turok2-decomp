@@ -2,12 +2,9 @@
 #include "globals/engine.h"
 #include "structs/loader.h"
 #include "protos/list.h"
+#include "protos/ultra.h"
 
 void *memset(void *dst, s32 value, u32 size);
-void osCreateMesgQueue(OSMesgQueue *queue, OSMesg *messages, s32 count);
-void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
-void osSetEventMesg(s32 event, OSMesgQueue *queue, OSMesg msg);
-void osStartThread(OSThread *thread);
 void CLoader__Main(CLoader *thisx);
 
 void CLoader__Construct(CLoader *thisx, OSId threadId) {

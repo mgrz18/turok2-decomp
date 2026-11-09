@@ -7,8 +7,7 @@
 #include "ultra_types.h"
 #include "globals/hostio.h"
 #include "structs/hostio.h"
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
+#include "protos/ultra.h"
 void HostIo_StartThread(s32 arg);
 s32 PCinitThreaded(void) {
     HostIoRequest req;

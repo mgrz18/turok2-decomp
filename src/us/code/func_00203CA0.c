@@ -9,11 +9,10 @@
 #include "globals/sysrc.h"
 #include "protos/list.h"
 #include "protos/cache.h"
+#include "protos/ultra.h"
 
 extern void __osRestoreInt(OSIntMask mask);
 extern OSIntMask __osDisableInt(void);
-extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 extern void CDecompressor__DecompressSync(CDecompressor *, CCacheEntry *);
 static __inline__ void addref(CMemEntry *node) {
     node->lockCount += 1;

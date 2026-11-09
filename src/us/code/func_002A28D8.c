@@ -5,9 +5,8 @@
 #include "ultra_types.h"
 #include "globals/hostio.h"
 #include "structs/hostio.h"
+#include "protos/ultra.h"
 
-extern s32 osRecvMesg(OSMesgQueue *mq, void *msg, s32 flag);
-extern s32 osSendMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern s32 HostIo_StrSize(u8 *s);
 extern s32 HostIo_DisableInt(void);
 extern void HostIo_RestoreInt(s32 saved);

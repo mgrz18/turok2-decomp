@@ -6,11 +6,10 @@
 #include "globals/sysrc.h"
 #include "protos/list.h"
 #include "protos/cache.h"
+#include "protos/ultra.h"
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern B12Mgr D_800D7BE0;
 s32 CDecompressor__DecompressAsync(CDecompressor *port, B12Msg *n, void *q);
 void CHeap__Free(CHeap *heap, s32 key);

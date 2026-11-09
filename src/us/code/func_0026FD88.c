@@ -1,5 +1,6 @@
 #include "common.h"
 #include "globals/audio.h"
+#include "protos/ultra.h"
 
 /* A frame task: a buffer at 0, its size at 4, a message block at 8, and the result range at 0x48 / 0x4C. */
 typedef struct {
@@ -12,10 +13,6 @@ typedef struct {
 } FrameTask;
 
 s32 alAudioFrame(s32, s32, s32, s32);
-s32 osAiSetNextBuffer(s32, s32);
-s32 osRecvMesg(s32, s32, s32);
-s32 osVirtualToPhysical(s32);
-void osWritebackDCacheAll(void);
 
 s32 __clearAudioDMA();                            /* extern */
 s32 Sound__Update();                            /* extern */

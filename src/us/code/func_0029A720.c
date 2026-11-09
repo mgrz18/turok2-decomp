@@ -4,18 +4,13 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/libultra.h"
+#include "protos/ultra.h"
 extern void __osRestoreInt(OSIntMask mask);
-extern void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msg, s32 msgCount);
 extern OSIntMask __osDisableInt(void);
 extern void __osTimerServicesInit();
 extern void __osViInit(void);
 extern void osCreateViManager(s32 pri);
 extern void viMgrMain(void *arg);
-extern void osSetEventMesg(s32 event, OSMesgQueue *mq, OSMesg msg);
-extern s32 osGetThreadPri(OSThread *t);
-extern void osSetThreadPri(OSThread *t, s32 pri);
-extern void osCreateThread(OSThread *t, s32 id, void (*entry)(void *), void *arg, void *sp, s32 pri);
-extern void osStartThread(OSThread *t);
 void osCreateViManager(s32 pri)
 {
     u32 savedMask;

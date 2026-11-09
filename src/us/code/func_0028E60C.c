@@ -4,12 +4,8 @@
 #include "rw/abu_types.h"
 #include "globals/pager.h"
 #include "protos/cache.h"
+#include "protos/ultra.h"
 
-extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-void osCreateMesgQueue(void *arg0, s32 arg1, s32 arg2);
-void osSendMesg(void *arg0, void *arg1, s32 arg2);
-extern void osCreateMesgQueue(void *arg0, s32 arg1, s32 arg2);
-extern void osSendMesg(void *arg0, void *arg1, s32 arg2);
 s32 VM_Alloc(s32 arg0, s32 arg1_unused, s32 arg2)
 {
   char sp10[0x18];

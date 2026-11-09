@@ -7,10 +7,9 @@
 #include "ultra_types.h"
 #include "structs/sound.h"
 #include "protos/iset.h"
+#include "protos/ultra.h"
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
-s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 static __inline__ void CAudioWorld_Lock(CAudioWorld *m) {
     CMutex *l = &m->lock;
     u32 mask = __osDisableInt();
