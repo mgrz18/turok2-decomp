@@ -1,4 +1,6 @@
 #include "common.h"
+#include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
 
@@ -11,19 +13,25 @@ typedef struct ProjVertex {
     /* 0x10 */ s16 *pos;
 } ProjVertex;
 
+/* One command of a model part's display list (Model_Decompress's output). The port's Gfx
+ * has host-sized words in host byte order, and Model_Decompress marks segment addresses
+ * with bit 0 (include/gbi_t2.h): read the opcode and the segment offset with shifts. */
+#ifdef TARGET_PORT
+typedef Gfx DLCmd;
+#define DLCMD_OP(c) ((u8) ((c)->w0 >> 24))
+#define DLCMD_SEGOFF(c) ((c)->w1 & 0xFFFFFE)
+#else
 typedef union DLCmd {
     struct { u32 w0; u32 w1; };
     u8 b[8];
 } DLCmd;
+#define DLCMD_OP(c) ((c)->b[0])
+#define DLCMD_SEGOFF(c) ((c)->w1 & 0xFFFFFF)
+#endif
 
 char *CISet__GetBlock(s32 *list, s32 index);
 void CMtxF__TransformPoint(f32 (*mtx)[4], CVector3 *in, ProjVertex *out);
 void ModelSweep_TestTriangle(ModelSweep *ms, ProjVertex **tri);
-
-#define G_VTX 0x01
-#define G_TRI1 0x05
-#define G_TRI2 0x06
-#define G_ENDDL 0xDF
 
 /* Walk one polygon group's display list (F3DEX2 G_VTX/G_TRI1/G_TRI2) and
  * sweep against every triangle that is not wholly outside the sweep. */
@@ -54,7 +62,7 @@ void ModelSweep_TestGroup(ModelSweep *ms, s32 *group) {
         if (sweep->stop != 0) {
             return;
         }
-        op = cmd->b[0];
+        op = DLCMD_OP(cmd);
         switch (op) {
             case G_TRI1:
             case G_TRI2:
@@ -86,7 +94,7 @@ void ModelSweep_TestGroup(ModelSweep *ms, s32 *group) {
                 }
                 break;
             case G_VTX:
-                src = (s16 *)((cmd->w1 & 0xFFFFFF) + (u32)ms->meshes);
+                src = (s16 *)(DLCMD_SEGOFF(cmd) + GBI_ADDR(ms->meshes));
                 n = (cmd->w0 >> 12) & 0xFF;
                 v = &verts[((cmd->w0 & 0xFE) >> 1) - n];
                 do {

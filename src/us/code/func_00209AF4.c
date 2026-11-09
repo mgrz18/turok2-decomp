@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/table.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 
 /* An F3DEX2 vertex (libultra's Vtx), 16 bytes. */
 typedef struct Vtx {
@@ -14,7 +15,6 @@ typedef struct Vtx {
 /* F3DEX2 triangle word: three vertex indices, each times 2 (libultra's __gsSP1Triangle_w1). */
 #define TRI_WORD(a, b, c) (((((a) * 2) & 0xFF) << 16) | ((((b) * 2) & 0xFF) << 8) | (((c) * 2) & 0xFF))
 
-#define GFX_W(pkt, a, b) { Gfx *_g = (Gfx *)(pkt); _g->w0 = (a); _g->w1 = (b); }
 
 /* Bytes of an offset table of n entries: the count, n offsets and the next free offset, 8-aligned. */
 #define TABLE_SIZE(n) (((n) * 4 + 0xF) & ~7)
@@ -131,7 +131,8 @@ void Model_Decompress(s32 unused, void ***handle, s32 withExtra, s32 withTermina
         for (j = 0; j < partCount; j++) {
             u8 op;
 
-            /* Display list bytes: one command per packed command, plus the end and 8-alignment. */
+            /* Display list bytes: one command per packed command, plus the end and 8-alignment
+             * (GFX_SIZE: 8 on the N64, 16 with the port's 64-bit Gfx). */
             part = CISet__GetBlock(parts, j);
             size += 0x30;
             p = CISet__GetBlock(part, 1);
@@ -140,7 +141,7 @@ void Model_Decompress(s32 unused, void ***handle, s32 withExtra, s32 withTermina
             while (op != 0) {
                 if (op & 0x80) {
                     p += 2;
-                    len += 8;
+                    len += GFX_SIZE;
                     if (*p & 0x80) {
                         p += 2;
                     }
@@ -149,17 +150,17 @@ void Model_Decompress(s32 unused, void ***handle, s32 withExtra, s32 withTermina
                     case 0x20:
                     case 0x40:
                         p += 2;
-                        len += 8;
+                        len += GFX_SIZE;
                         break;
                     case 0x60:
                         p += 5;
-                        len += 8;
+                        len += GFX_SIZE;
                         break;
                     }
                 }
                 op = *p;
             }
-            size += (len + 0xF) & ~7;
+            size += (len + GFX_SIZE + 7) & ~7;
         }
     }
     if (withTerminator != 0) {
@@ -243,13 +244,13 @@ void Model_Decompress(s32 unused, void ***handle, s32 withExtra, s32 withTermina
                                 cnt = 32;
                             }
                             GFX_W(gfx++, (cnt << 12) | (((first + cnt) << 1) | segment1),     /* gSPVertex */
-                                  (u32)&vtxBase[vtxCounter] - (u32)vtxTbl + 0x02000000);    /* segment 2 */
+                                  GBI_SEGADDR(GBI_ADDR(&vtxBase[vtxCounter]) - GBI_ADDR(vtxTbl) + 0x02000000)); /* segment 2 */
                             vtxCounter += cnt;
                             break;
                         case 0x40:
                             p++;
                             mtx = *p++;
-                            GFX_W(gfx++, 0xDA380003, (mtx << 6) + segment1);                    /* gSPMatrix */
+                            GFX_W(gfx++, 0xDA380003, GBI_SEGADDR((mtx << 6) + segment1));                    /* gSPMatrix */
                             break;
                         case 0x60:
                             first = c & 0x1F;
@@ -265,7 +266,7 @@ void Model_Decompress(s32 unused, void ***handle, s32 withExtra, s32 withTermina
                     c = *p;
                 }
                 len = (u8 *)gfx - (u8 *)start;
-                partSize += (len + 0xF) & ~7;
+                partSize += (len + GFX_SIZE + 7) & ~7;
                 partOff += partSize;
                 GFX_W(gfx++, 0xDF000000, 0);                                                   /* gSPEndDisplayList */
                 TableSet(outPart, 2, partSize);

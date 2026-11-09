@@ -165,7 +165,7 @@ except where code assumes the N64 size or offset:
 - **`include/rw/abu_types.h`**: 10 pads of the form `char pad[0x4 - 0x0 - sizeof(char *)]`
   (negative on 64-bit). Port build: the shim defines them away or the header gets `T2_PTRSZ`
   (= 4 on N64).
-- **Gfx is 16 bytes in libultraship** (`Gwords { uintptr_t w0, w1; }`). The game writes display
+- **Gfx is 16 bytes in libultraship** (done in Phase 7 round 2: docs/port/GBI.md, include/gbi_t2.h) (`Gwords { uintptr_t w0, w1; }`). The game writes display
   lists word by word (`GFX_W`, `GFX`, `GFX_CMD`, expanded `gbi.h` macros: 680 writes in 87
   files) through its own `Gfx { u32 w0, w1; }` (include/gfx.h). That works on the host if the
   port's `gfx.h` makes `Gfx` LUS's type and the address-carrying commands put a full pointer in

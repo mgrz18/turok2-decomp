@@ -1,10 +1,10 @@
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/camera.h"
 
 void Render_InvalidateModeCache(void);
 
-#define GFX(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 /* gDPFillRectangle with float corners, each converted to an unsigned int. */
 #define FILL_RECT(ulx, uly, lrx, lry)                                               \
     {                                                                               \
@@ -23,11 +23,11 @@ void CCamera__DrawBorder(CCamera *cam) {
     y = cam->m_Viewport.m_ScreenPosY;
     width = cam->m_Viewport.m_Width;
     height = cam->m_Viewport.m_Height;
-    GFX(0xE7000000, 0);                     /* gDPPipeSync */
-    GFX(0xE3000A01, 0x300000);              /* gDPSetCycleType(G_CYC_FILL) */
-    GFX(0xFCFFFFFF, 0xFFFE793C);            /* gDPSetCombineMode */
-    GFX(0xE200001C, 0);                     /* gDPSetRenderMode */
-    GFX(0xF7000000, 0x10001);               /* gDPSetFillColor */
+    GFX_CMD(0xE7000000, 0);                     /* gDPPipeSync */
+    GFX_CMD(0xE3000A01, 0x300000);              /* gDPSetCycleType(G_CYC_FILL) */
+    GFX_CMD(0xFCFFFFFF, 0xFFFE793C);            /* gDPSetCombineMode */
+    GFX_CMD(0xE200001C, 0);                     /* gDPSetRenderMode */
+    GFX_CMD(0xF7000000, 0x10001);               /* gDPSetFillColor */
     FILL_RECT(x, y, x + width - 1.0f, y);
     FILL_RECT(x, y + height - 1.0f, x + width - 1.0f, y + height - 1.0f);
     FILL_RECT(x, y, x, y + height - 1.0f);

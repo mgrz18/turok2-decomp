@@ -19,6 +19,7 @@
 #include "structs/menu_model.h"
 #include "structs/camera.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "globals/game.h"
 #include "globals/menu.h"
 #include "globals/scene.h"
@@ -592,7 +593,7 @@ void MenuItem_DrawModel(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused
                 Gfx **pp = &gDList;
                 d = (*pp)++;
                 d->w0 = 0xDA380007;
-                d->w1 = (u32) &w->camera->m_mProjection[gEvenOdd];
+                d->w1 = GBI_ADDR(&w->camera->m_mProjection[gEvenOdd]);
             }
             c = w->camera;
             k = c->m_Viewport.m_Width / (f32) gScreenWidth;

@@ -2,11 +2,11 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/frame.h"
 #include "globals/render.h"
 
 
-#define GFX_W(pkt, a, b) { Gfx *_g = (Gfx *)(pkt); _g->w0 = (a); _g->w1 = (b); }
 
 
 void *CISet__GetBlock(void *resource, s32 index);
@@ -36,19 +36,19 @@ void Render_DrawModel(void **resource, void *matrix, s32 segment, char *lights, 
     }
     CCache__LockForDisplayList(0, resource);
     if (segment != 0) {
-        GFX_W(gDList++, 0xDB060004, (u32)matrix);   /* gSPSegment(1, matrix) */
+        GFX_W(gDList++, 0xDB060004, GBI_ADDR(matrix));   /* gSPSegment(1, matrix) */
     } else {
-        GFX_W(gDList++, 0xDA380003, (u32)matrix);   /* gSPMatrix(matrix, G_MTX_LOAD) */
+        GFX_W(gDList++, 0xDA380003, GBI_ADDR(matrix));   /* gSPMatrix(matrix, G_MTX_LOAD) */
     }
     base = textures;
     if (base == 0) {
         base = CISet__GetBlock(header, 0);
     }
-    GFX_W(gDList++, 0xDB060008, (u32)base);     /* gSPSegment(2, base) */
+    GFX_W(gDList++, 0xDB060008, GBI_ADDR(base));     /* gSPSegment(2, base) */
     if (lights != 0) {
         GFX_W(gDList++, 0xDB020000, 0x18);           /* gSPNumLights(1) */
-        GFX_W(gDList++, 0xDC08060A, (u32)(lights + 8)); /* gSPLight(lights + 8, 1) */
-        GFX_W(gDList++, 0xDC08090A, (u32)lights);        /* gSPLight(lights, 2): ambient */
+        GFX_W(gDList++, 0xDC08060A, GBI_ADDR(lights + 8)); /* gSPLight(lights + 8, 1) */
+        GFX_W(gDList++, 0xDC08090A, GBI_ADDR(lights));        /* gSPLight(lights, 2): ambient */
     }
     lodParts = CISet__GetBlock(parts, lod);
     count = *(s32 *)lodParts;
@@ -57,7 +57,7 @@ void Render_DrawModel(void **resource, void *matrix, s32 segment, char *lights, 
         if (Render_SetupMaterial(CISet__GetBlock(part, 0), pass) != 0) {
             void *list = CISet__GetBlock(part, 1);
 
-            GFX_W(gDList++, 0xDE000000, (u32)list);     /* gSPDisplayList */
+            GFX_W(gDList++, 0xDE000000, GBI_ADDR(list));     /* gSPDisplayList */
         }
     }
 }

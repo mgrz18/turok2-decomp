@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004058B0.c, func_004058B0, with Turok 2's layouts. */
 #include "common.h"
+#include "gfx.h"
 #include "globals/frame.h"
 #include "globals/render.h"
 #include "globals/framebuffer.h"
@@ -94,13 +95,13 @@ void GfxPool_Alloc(GfxPool *pool) {
         memset((void *) gCFB[i], 0, size);
     }
     memset((void *) gDepthBuffer, 0, size);
-    pool->gfx = CCache__Allocate(0, (gDisplayListSize + gLineListSize) * 16, 0x23, "display lists");
+    pool->gfx = CCache__Allocate(0, (gDisplayListSize + gLineListSize) * (2 * GFX_SIZE), 0x23, "display lists");
     pool->dynamic = CCache__Allocate(0, 0x8000, 0x23, "fifo");
     pool->vtx = CCache__Allocate(0, 0x22000, 0x23, D_800C1864);
     gDisplayList1 = pool->gfx->addr;
-    gLineList0 = gDisplayList1 + gDisplayListSize * 8;
-    gDisplayList0 = gLineList0 + gLineListSize * 8;
-    gLineList1 = gDisplayList0 + gDisplayListSize * 8;
+    gLineList0 = gDisplayList1 + gDisplayListSize * GFX_SIZE;
+    gDisplayList0 = gLineList0 + gLineListSize * GFX_SIZE;
+    gLineList1 = gDisplayList0 + gDisplayListSize * GFX_SIZE;
     gRspFifoSize = 0x8000;
     gAudioHeapSize = 0x22000;
     gRspFifoBuffer = (u64 *) pool->dynamic->addr;

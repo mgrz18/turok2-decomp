@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/table.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/world.h"
 #include "structs/level_actor.h"
 #include "structs/camera.h"
@@ -224,12 +225,12 @@ void CScene__BuildGeometryDisplayList(CScene *w) {
         {
             Gfx *g = gSceneGeometryDL++;
             g->w0 = 0xDE010000;
-            g->w1 = (u32)gDList;
+            g->w1 = GBI_ADDR(gDList);
         }
     }
     {
         Gfx *g = gDList++;
         g->w0 = 0xDE000000;
-        g->w1 = (u32)gSceneGeometryDL;
+        g->w1 = GBI_ADDR(gSceneGeometryDL);
     }
 }

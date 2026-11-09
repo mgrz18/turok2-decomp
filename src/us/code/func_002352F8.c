@@ -2,8 +2,8 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 
-#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 typedef struct Trail Trail;
 struct Trail {

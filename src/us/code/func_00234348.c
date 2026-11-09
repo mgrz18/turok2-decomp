@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_3/CODE_802A35C0.CPP, func_802A3718_de, with Turok 2's layouts. */
 #include "common.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "globals/engine.h"
 
 /* Draws a textured trail: spaces the texture along the tail by length, picks
@@ -74,7 +75,6 @@ typedef struct {
     /* 0x20 */ f32 texStepT;
 } Morph;
 
-#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 extern void *Texture_Request(void *model);
 extern void Texture_GetInfo(void *model, AnimInfo *info);
@@ -149,19 +149,19 @@ void Trail_DrawTextured(void *pool, Trail *trail, s32 unused) {
     frame = Trail_GetAnimFrame(trail, track, &info);
     Texture_Load(trail->model, model, frame, 0, 0xFFFF, 0xFFFF, 0, 0, 0);
     edges = count - 1;
-    GFX_CMD(0xDA380003, (u32)clock->matrix[gEvenOdd])
+    GFX_CMD(0xDA380003, GBI_ADDR(clock->matrix[gEvenOdd]))
     while (clock != 0 && next != 0 && 0.0f < clock->time && 0.0f < next->time) {
         vertices = RibbonVtxPool_Alloc(pool, count);
         if (vertices == 0) break;
         Morph_BlendVerticesTex(trail, clock, vertices, clock->offset, &storage);
-        GFX_CMD(0x01000000 | (count << 12) | ((count & 0x7F) << 1), (u32)vertices)
-        GFX_CMD(0xDA380003, (u32)next->matrix[gEvenOdd])
+        GFX_CMD(0x01000000 | (count << 12) | ((count & 0x7F) << 1), GBI_ADDR(vertices))
+        GFX_CMD(0xDA380003, GBI_ADDR(next->matrix[gEvenOdd]))
         vertices = RibbonVtxPool_Alloc(pool, count);
         if (vertices == 0) break;
         scale = next->offset;
         while (clock->offset < scale) scale -= period;
         Morph_BlendVerticesTex(trail, next, vertices, scale, &storage);
-        GFX_CMD(0x01000000 | (count << 12) | (((count * 2) & 0x7F) << 1), (u32)vertices)
+        GFX_CMD(0x01000000 | (count << 12) | (((count * 2) & 0x7F) << 1), GBI_ADDR(vertices))
         for (i = 0; i < edges; i++) {
             GFX_CMD((((i * 2 & 255) << 16) | (((count + i) * 2 & 255) << 8) | ((count + i + 1) * 2 & 255)) | (6 << 24), ((i * 2 & 255) << 16) | (((count + i + 1) * 2 & 255) << 8) | ((i + 1) * 2 & 255))
         }

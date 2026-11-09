@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/player.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/weapon.h"
 #include "structs/camera.h"
 #include "structs/game.h"
 
-#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 void Render_InvalidateModeCache(void);
 void Render_ResetBatches(void);

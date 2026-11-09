@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "gfx.h"
+#include "gbi_t2.h"
 #include "structs/camera.h"
 #include "structs/emitter.h"
 #include "globals/engine.h"
@@ -229,7 +230,7 @@ void CEmitter__Draw(CEmitter *object, CCamera *view) {
                         {
                             Gfx *g = gDList++;
                             g->w0 = 0x01003006;     /* gSPVertex(v, 3, 0) */
-                            g->w1 = (u32)&object->m_Vertices[gEvenOdd][face * 3];
+                            g->w1 = GBI_ADDR(&object->m_Vertices[gEvenOdd][face * 3]);
                         }
                         {
                             Gfx *g = gDList++;

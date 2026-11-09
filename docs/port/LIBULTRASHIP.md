@@ -221,7 +221,7 @@ Ordered; each step ends in something that runs.
    `DrawAndRunGraphicsCommands`. The L3DEX task (lines) is a gap: LUS defines
    `F3DEX2_G_LINE3D` (opcode 0x08) but the interpreter has no handler for it, so the
    game's line display lists need a port-side handler (draw each line as a thin quad) or
-   a LUS patch; find which screens use L3DEX first. `osViSwapBuffer(gCFB[i])` stays LUS's. Two code changes the asset side already
+   a LUS patch; find which screens use L3DEX first. `osViSwapBuffer(gCFB[i])` stays LUS's. (Both changes below are done: docs/port/GBI.md.) Two code changes the asset side already
    flagged (PORT.md 1.6): `Model_Decompress` sizes output as 8 bytes per command (must be
    `sizeof(Gfx)` = 16), and it emits segmented addresses (segment 1 matrices, segment 2
    vertices) which **Fast3D resolves only with bit 0 set**: emit `seg<<24 | off | 1`
