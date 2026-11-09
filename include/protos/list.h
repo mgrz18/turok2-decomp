@@ -1,4 +1,4 @@
-/* CList, the intrusive list (func_00200500..).
+/* CList, the intrusive list (CList__Construct..).
  *
  * Canonical prototypes, generated from the definitions by tools/port/genprotos.py
  * (do not edit; re-run it). Types the header cannot name without a struct header

@@ -5,6 +5,11 @@
 library of WEAK placeholders for the game data that is still defined only in assembly
 (`t2placeholders`, until q2's generated data lands). `turok2 --game` boots it and pumps frames.
 
+**Merged state (end of round 2): [STATUS.md](STATUS.md).** q2's data is linked (`turok2_data`,
+placeholders 597 -> 1), RNC goes to `port/assets/rnc.c`, and the run gets past the CHeap /
+CCache / GfxPool / synthesizer crashes below to `CCameraPool__Construct`. §6 and §7 describe
+q5 alone.
+
 ## 1. Build and run
 
 ```sh
@@ -66,7 +71,7 @@ are only pulled in through LUS functions the game no longer names.
 |---|---|
 | `t2os.c/.h` | p4's threads/queues/events (unchanged model), compiled under the t2_ names; new: `t2os_set_stack_allocator` |
 | `t2ultra.c` | device layer: VI (retrace per frame, swaps recorded), SP/DP (tasks recorded, gfx task to the app, SP+DP done posted at the next frame), AI (FIFO reported full: no audio yet), PI (raw DMA from the ROM image + OS_EVENT_PI), SI (controllers via the app's hooks on LUS, OS_EVENT_SI after every StartReadData/StartQuery, no pak, no rumble), virtual clock (46.875 MHz per retrace, deterministic), `osSetTimer` list, caches/TLB/FPU/interrupt no-ops, `t2_missing` |
-| `t2boot.c` | `T2Port_Boot`: arena, ROM, IPL data (`osMemSize` = 8 MB so `GetMemSize` takes the expansion-pak paths, `osTvType` NTSC), thread priorities, `mainproc` on `gThreadMain` (id 1, pri 13) without the idle thread; replaced game functions `InitializeSystemResources` (heap = host arena, 32 MB), `VM_Initialize` (empty), `VM_Alloc`/`VM_Free` (resident copy from the ROM), `RNC_UnpackMethod1/2` (stubs until q1's `port/assets/rnc.c`), `t2_sprintf` (host vsprintf) |
+| `t2boot.c` | `T2Port_Boot`: arena, ROM, IPL data (`osMemSize` = 8 MB so `GetMemSize` takes the expansion-pak paths, `osTvType` NTSC), thread priorities, `mainproc` on `gThreadMain` (id 1, pri 13) without the idle thread; replaced game functions `InitializeSystemResources` (heap = host arena, 32 MB), `VM_Initialize` (empty), `VM_Alloc`/`VM_Free` (resident copy from the ROM), `RNC_UnpackMethod1/2` (`port/assets/rnc.c` since the merge), `t2_sprintf` (host vsprintf) |
 | `t2port.h` | the platform API: `T2Port_Boot`, `T2Port_Frame`, `T2Port_TakeGfxTask`, `T2Port_GetStats`, controller hooks |
 | `t2_placeholders.c` | GENERATED (tools/port/genplaceholders.py) |
 
@@ -122,7 +127,7 @@ It is not a design (macOS reserves the low 4 GB; struct layouts still widen) but
 | `--high-memory` | `CHeap__Construct` (func_00202474.c:13): `block` = `(u32)start` aligned, truncated host pointer |
 | low memory (default) | `CHashTable__Construct` (func_00202860.c:35), one step later (below) |
 
-## 6. How far it runs
+## 6. How far it ran (q5 alone; merged: STATUS.md §2)
 
 `SDL_VIDEODRIVER=offscreen turok2 --archive turok2.o2r --rom baserom.us.z64 --game --no-window
 --frames 120` under gdb (box, -j8 build, 2026-11-09):
@@ -157,7 +162,7 @@ inconsistent from the first block. Then `HashEntry` (16 bytes on N64, 32 on the 
 overflows the `half << 5` allocation. Both are the 64-bit layout problem (BUILD.md "offset
 arithmetic over structs that change layout"), not link or runtime problems.
 
-## 7. What the next round needs
+## 7. What the next round needed (done or carried over: STATUS.md §3-4)
 
 1. **CHeap host-correct** (6 functions): header size as `sizeof(CHeapBlock)` (the N64
    constant folds to the same 0x20/0x2F, asm_diff-provable) and pointer alignment through

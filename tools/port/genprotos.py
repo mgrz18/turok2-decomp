@@ -33,7 +33,7 @@ OUT = os.path.join(ROOT, 'include/protos')
 
 # group -> (name regex, comment)
 GROUPS = collections.OrderedDict([
-    ('list', (r'CList__\w+', 'CList, the intrusive list (func_00200500..)')),
+    ('list', (r'CList__\w+', 'CList, the intrusive list (CList__Construct..)')),
     ('iset', (r'C[IU]Set__\w+', 'CISet / CUSet, offset-table containers')),
     ('cache', (r'CCache__\w+', 'CCache, the memory / ROM cache')),
     ('scene', (r'CScene__\w+', 'CScene, the level world')),
