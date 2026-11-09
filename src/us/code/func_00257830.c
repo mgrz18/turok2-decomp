@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/cache.h"
 
 typedef struct {
     /* 0x00 */ s32 *block;
@@ -6,7 +7,6 @@ typedef struct {
     /* 0x08 */ s32 count;
 } PlayerPool;
 
-s32 *CCache__Allocate(s32, s32, s32, s32 *); /* extern */
 s32 memset(s32, s32, s32);           /* extern */
 extern s32 D_800A7080;
 

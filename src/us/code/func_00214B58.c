@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 typedef struct {
     s32 words[2];
@@ -34,8 +35,6 @@ typedef struct {
     /* 0x8A */ u8 colorFrame;
 } PlacedProp;
 
-void *CCache__Request(s32, s32, s32, s32, s32, void *, void *, s32);
-void CCache__Unlock(s32, void *);
 void CMtxF__FromMtxAffine(f32 *, f32 *);
 void CMtxF__TransformPoint(f32 *, CVector3 *, CVector3 *);
 void ImpactEvent_Send(void *, void *, s32, s32, CVector3, AttachmentParams);

@@ -21,6 +21,7 @@
 #include "globals/collision.h"
 #include "globals/engine.h"
 #include "globals/player.h"
+#include "protos/cache.h"
 
 void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
@@ -487,7 +488,6 @@ extern u32 D_800F1E30;
 extern u32 D_800F1F10;
 
 s32 Cinema_PathPlaying(void);
-void CCache__SetFrameDelay(s32);
 void Sound__SetMuted(s32 enable);
 void AI_UpdateRegionFlags(Player *, u32 *ai);
 void CGameObjectInstance__UpdateAnimation(Player *);

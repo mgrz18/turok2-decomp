@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
 
 EntryRecAt18V3 *CCache__FindOldestMemEntry(s32 unused, EntryList *list, EntryRecAt18V3 **recent)
 {

@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
 
 extern void osSendMesg(OSMesgQueue *queue, OSMesg msg, s32 flags);
 

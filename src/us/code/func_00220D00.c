@@ -4,6 +4,7 @@
 #include "structs/world.h"
 #include "structs/level_actor.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 /* Instantiates a level's actor data: from the level file's four tables
  * (two kinds of placed objects, the level actors, and a fourth kind of
@@ -29,8 +30,6 @@ typedef struct { u8 pad0[0x90]; } ItemA;                               /* 0x90 *
 typedef struct { u8 pad0[0xC0]; } ItemD;                               /* 0xC0 */
 
 s32 ProPackDecompress(s32 ***, s32);
-void **CCache__AllocateMemoryForDecompression(s32, s32 ***, s32);
-void CCache__DeallocAndReplaceCompressedData(s32, s32 ***, void **);
 void CStaticObject__ConstructCompact(ItemA *, SrcA *, s32, void *, f32);
 void CStaticObject__Construct(ItemA *, SrcB *, s32, void *);
 void CLevelActor__Construct(CLevelActor *, SrcC *, s32, void *);

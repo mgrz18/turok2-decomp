@@ -3,12 +3,12 @@
 
 #include "rw/abu_types.h"
 #include "globals/cinema.h"
+#include "protos/cache.h"
 
 extern void Cinema_RunEnd(s32 unused);
 extern void Cinema_Stop();
 extern int Cinema_IsActive(void);
 extern void Cinema_Close(void);
-extern void CCache__Deallocate(void *arg0, void *arg1);
 void Cinema_Stop(void) {
     if (Cinema_IsActive() != 0) {
         s32 temp_a1;

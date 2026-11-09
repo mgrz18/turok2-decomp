@@ -3,6 +3,7 @@
 #include "gfx.h"
 #include "globals/render.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 /* The libultra GBI (F3DEX2) commands this function writes, as in PR/gbi.h. */
 #define _SHIFTL(v, s, w) (((unsigned int) (v) & (0xFFFFFFFFU >> (32 - (w)))) << (s))
@@ -79,7 +80,6 @@
         gDPPipeSync(gDList++);                                                   \
     }
 
-extern void CCache__LockForDisplayList(s32 unused, void **resource);
 
 /* Loads frame `frame` of the texture `resource` (and its palette `secondary`)
  * into TMEM, skipping what the last call already loaded, then turns texturing on. */

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/cache.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
 
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);

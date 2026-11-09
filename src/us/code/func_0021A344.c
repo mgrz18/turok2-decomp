@@ -2,6 +2,7 @@
 #include "structs/vector.h"
 #include "globals/scene.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 /* Advance an actor's animation (CGameObjectInstance__AdvanceAnimation) and move it by the root motion
  * that produced: the new position is taken back out, turned by the actor's
@@ -30,8 +31,6 @@ struct Actor {
 
 extern u8 D_800A5AC4[];     /* "anim object info" */
 
-s32 *CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
-void CCache__Unlock(s32, s32 *);
 void CMtxF__TransformBox(void *, void *, void *);
 void CVector3__Add(CVector3 *, CVector3 *, void *);
 void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);

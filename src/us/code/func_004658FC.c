@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "protos/cache.h"
 
-s32 CCache__Deallocate(s32, s32);
 
 s32 CPlayerPool__GetFirstActive(CPlayerPool *);                       /* extern */
 s32 Sound__StopFlags(s32);                     /* extern */

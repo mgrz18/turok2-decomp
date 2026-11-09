@@ -3,16 +3,15 @@
 #include "structs/game_object.h"
 #include "structs/camera.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 /* The weapon actor's owner, at 0x1A8 (inside m_AI). */
 #define OWNER(obj) (*(CPlayer **)((u8 *)(obj) + 0x1A8))
 
 extern char D_800A7094[];       /* "player anim object info" */
 
-extern void **CCache__Request(s32, s32, s32, s32, s32, s32, void *, s32);
 extern void CGameObjectInstance__UpdateBounds(CGameObjectInstance *obj, void *info);
 extern void Shadow_DrawBlob(CGameObjectInstance *obj, CVector3 *offset, s32 arg2);
-extern void CCache__Unlock(s32 arg0, void **res);
 
 /* Reload the animation object info of every player's actor that has one. For
  * the player viewing through cam (while cam's word 0x24 is clear) it is the

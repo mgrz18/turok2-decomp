@@ -8,10 +8,10 @@
 #include "globals/render.h"
 #include "globals/camera.h"
 #include "globals/engine.h"
+#include "protos/cache.h"
 
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-void CCache__LockForDisplayList(s32 unused, void *resource);
 void Render_InvalidateModeCache(void);
 void CCamera__DisplayListSetup(CCamera *cam);
 void CCamera__DrawScene(CCamera *cam, void *world);

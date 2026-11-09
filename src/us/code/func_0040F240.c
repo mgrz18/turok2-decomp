@@ -14,6 +14,7 @@
 #include "globals/cinema.h"
 #include "globals/collision.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 /* The cinema system: one file from Cinema_SplineSecondDerivs to Cinema_IsWaitCue (0x40F240-0x413228).
  * Its strings ("Cinema temp alloc", "Cinema") are shared by functions all over
@@ -26,10 +27,6 @@ extern f32 D_800C1BC8;
 extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */ /* current player */
 /* gScene: a function that reads two of its fields does it through a local CScene * (one register). */
 
-extern s32 **CCache__Request(s32 a, s32 data, s32 size, s32 tag, s32 e, void *prepare, const char *name, s32 h);
-extern s32 **CCache__Allocate(s32 heap, s32 size, s32 tag, const char *name);
-extern void CCache__Unlock(s32 unused, s32 **handle);
-extern void CCache__Deallocate(s32 heap, s32 *block);
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = b - a */
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale); /* out = in * scale */
@@ -224,8 +221,6 @@ typedef union SplineSourceCursor { SplineSource *header; CVector3 *points; f32 *
 extern void Pack_Init(void *,s32);
 extern char *Pack_Add(Pack *,s32,s32);
 extern s32 ProPackDecompress(void **, s32);
-extern struct Shape_typemap_165 *CCache__AllocateMemoryForDecompression(s32,void *,s32);
-extern void CCache__DeallocAndReplaceCompressedData(s32,struct Shape_typemap_165 **,struct Shape_typemap_165 *);
 static __inline__ char *packAppend(Pack *pack,void *prepare,s32 size) { return Pack_Add(pack,(s32)prepare,size); }
 static __inline__ s32 splineRecordSize(s32 left,s32 right) { s32 a=left*9,b=right*9; return (b+a)*4+48; }
 void Cinema_PrepareResource(s32 unused, struct Shape_typemap_165 **handle) {

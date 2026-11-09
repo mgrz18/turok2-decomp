@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
-s32 CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
-s32 CCache__Unlock(s32, s32);
 
 extern s32 D_800A5AC4;
 

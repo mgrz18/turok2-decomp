@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 #include "globals/cinema.h"
+#include "protos/cache.h"
 
 extern void Cinema_Close();
-extern void CCache__Deallocate(void *arg0, void *arg1);
 void Cinema_Close(void) {
     if (gCinemaPlayerP->closed == 0) {
         {

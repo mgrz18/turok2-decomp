@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 /* Start a 4-step chain on `b` from entry `idx` (following each entry's next
  * link), unless the entry is flagged 3, and give `b` a direction: v1 relative
@@ -31,7 +32,6 @@ typedef struct {
 } B10Ent2;
 
 s32 **CGameObjectInstance__LoadGeometry(void);
-void CCache__Unlock(s32, s32 **);
 void CVector3__Subtract(CVector3 *o, CVector3 *a, CVector3 *b);
 void CVector3__Cross(CVector3 *o, CVector3 *a, CVector3 *b);
 void CVector3__Scale(CVector3 *o, CVector3 *a, f32 s);

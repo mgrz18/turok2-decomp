@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/model.h"
 #include "globals/scene.h"
+#include "protos/cache.h"
 
 /* As CGameObjectInstance__DrawModelLitVertices (engine), for a model drawn from its cached "lit vertices"
  * resource: the region sets come from CGameObjectInstance__GetDeathModels and the colour from the
@@ -12,10 +13,7 @@ extern s32 D_8012FB64;
 void CGameObjectInstance__GetDeathModels(CGameObjectInstance *, s32, s32 *, s32 *);
 void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
 void Render_QueueModelInstance(s32, s32, s32, s32, char *, s32, s32);
-s32 **CCache__RequestDecompression(s32, s32, s32, s32, s32, CGameObjectInstance *, void *, char *, s32);
-void CCache__LockForDisplayList(s32, s32 **);
 void Model_PulseVertexColors(char *, char *);
-void CCache__Unlock(s32, s32 **);
 void CGameObjectInstance__ConstructLitVertices();
 
 void TotemDefense_DrawTotem(CGameObjectInstance *actor, s32 arg1, CDrawArgs *params) {

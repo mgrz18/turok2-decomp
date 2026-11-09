@@ -8,15 +8,13 @@
 #include "globals/cache.h"
 #include "globals/sysrc.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 
 extern void __osRestoreInt(OSIntMask mask);
 extern OSIntMask __osDisableInt(void);
 extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-extern void CCache__FreeCacheEntry(s32 arg0, void *arg1);
-extern CCacheEntry *CCache__AllocCacheEntry(s32, s32);
 extern void CDecompressor__DecompressSync(CDecompressor *, CCacheEntry *);
-extern CCacheEntry *CCache__CompleteRequest(s32 unused, CCacheEntry *request, s32 dropReference);
 static __inline__ void addref(CMemEntry *node) {
     node->lockCount += 1;
     node->flags |= 0x100;

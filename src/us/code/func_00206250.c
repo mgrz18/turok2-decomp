@@ -5,6 +5,7 @@
 #include "structs/cache.h"
 #include "globals/cache.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 
 
 /* Takes a CMemEntry off the free stack and puts it at the head of the age list. */

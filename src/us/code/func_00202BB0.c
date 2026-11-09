@@ -8,6 +8,7 @@
 #include "globals/engine.h"
 #include "globals/sysrc.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 void osStartThread(OSThread *thread);
@@ -71,7 +72,6 @@ void CMutex__Construct(void *lock);
 u32 GetMemSize(void);
 u8 *CHeap__Alloc(CHeap *heap, u32 size);
 void CHashTable__Construct(u32 n);
-void CCache__Main(void *arg);
 void CCache__Construct(s32 unused, s32 id) {
     u32 mask;
     u32 m2;

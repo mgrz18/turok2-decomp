@@ -4,9 +4,9 @@
 #include "rw/abu_types.h"
 #include "globals/pak.h"
 #include "structs/pak.h"
+#include "protos/cache.h"
 
 void Pak_AllocDirectory(void);
-struct Shape_typemap_165 *CCache__Allocate(s32, s32, u32, void *);
 void *memset(void *, s32, u32);
 void Pak_AllocDirectory(void) {
     struct Shape_typemap_165 *temp_v0;

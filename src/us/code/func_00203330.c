@@ -6,6 +6,7 @@
 #include "globals/cache.h"
 #include "globals/sysrc.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 
 extern u8 *CHeap__Alloc(CHeap *heap, s32 size);
 extern void CHeap__Free(CHeap *heap, u8 *data);

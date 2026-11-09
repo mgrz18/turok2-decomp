@@ -6,6 +6,7 @@
 #include "globals/scene.h"
 #include "globals/render.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 typedef struct Box3 {
     CVector3 mn;
@@ -29,7 +30,6 @@ typedef struct WTab {
 
 extern char D_800A57B8[];
 
-s32 **CCache__Allocate(s32, s32 size, s32, char *name);
 void Actors_AccumulateVertexLighting(WRec **recs, s32 count, void *verts, s32 arg3, CVector3 *points, s32 arg5);
 void Lighting_DebugHueColors(void *verts, s32 arg3, CVector3 *points, s32 arg5);
 void Lighting_CopyVertexColors(void *verts, void *colors);

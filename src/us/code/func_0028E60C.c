@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 #include "globals/pager.h"
+#include "protos/cache.h"
 
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 void osCreateMesgQueue(void *arg0, s32 arg1, s32 arg2);
-void **CCache__Allocate(s32 arg0, s32 arg1, s32 arg2, void *arg3);
 void osSendMesg(void *arg0, void *arg1, s32 arg2);
 extern void osCreateMesgQueue(void *arg0, s32 arg1, s32 arg2);
 extern void osSendMesg(void *arg0, void *arg1, s32 arg2);

@@ -6,6 +6,7 @@
 #include "structs/vector.h"
 #include "globals/ai.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 /* AI head tracking: turns the head bones toward the target (or the player in state 0xC). */
 
@@ -16,8 +17,6 @@ typedef struct {
     /* 0x1A */ s8 boneCount;
 } AnimObjectInfo;
 
-extern s32 *CCache__Request(s32, s32, s32, s32, s32, s32, const char *, s32);
-extern void CCache__Unlock(s32 arg0, s32 *resource);
 extern f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor); /* height */
 extern f32 AI_AngleToPoint(CGameObjectInstance *actor, CVector3 point);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);

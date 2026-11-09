@@ -4,6 +4,7 @@
 #include "globals/game.h"
 #include "globals/cinema.h"
 #include "globals/engine.h"
+#include "protos/cache.h"
 
 typedef struct GameState {
     s32 busy;               /* 0x0000 */
@@ -21,9 +22,7 @@ extern void Cinema_RestorePlayer(void);
 extern void Cinema_FireCues(void);
 extern void Cinema_RunEnd(s32);
 extern void Cinema_Close(void);
-extern void CCache__Deallocate(void *, void *);
 extern void Sound__StopAllExcept(s32);
-extern void CCache__SetFrameDelay(s32);
 
 void Cinema_Update(void) {
     Cinema *ctx;

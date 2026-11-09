@@ -1,14 +1,14 @@
 #include "common.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
 
-s32 CCache__DeallocateInternal(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
 
-void CCache__Deallocate(s32 arg0, s32 arg1) {
+void CCache__Deallocate(s32 arg0, void *arg1) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v1;

@@ -1,10 +1,7 @@
 #include "common.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
 
-s32 CCache__AllocMemEntry(s32, s32);
-s32 CCache__FreeMemEntry(s32, s32);
-s32 CCache__HeapAlloc(s32, s32, s32, s32);
-s32 CCache__AddToAddressList(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);

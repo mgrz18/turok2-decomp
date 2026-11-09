@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "globals/game.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 typedef struct Box {
     CVector3 corners[8];            /* 0x00 */
@@ -18,7 +19,6 @@ void CVector3__Scale(CVector3 *dst, CVector3 *src, f32 scale);
 void CMtxF__FromMtxAffine(CMtxF *dst, CMtxF *src);
 void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
 void CVector3__Subtract(CVector3 *dst, CVector3 *a, CVector3 *b);    /* subtract */
-void CCache__Unlock(s32 arg0, void **handle);
 
 /* Copies the actor's bounding box whose center is nearest to pos into out. */
 s32 CGameObjectInstance__GetNearestBox(CGameObjectInstance *actor, CVector3 pos, Box *out) {

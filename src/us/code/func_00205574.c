@@ -3,6 +3,7 @@
 
 #include "rw/junk_types.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);

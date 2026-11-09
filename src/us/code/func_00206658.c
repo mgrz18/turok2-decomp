@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
 
 void *CCache__TakeFreeCacheEntry(void) {
     extern void CList__Remove(void *, s32);

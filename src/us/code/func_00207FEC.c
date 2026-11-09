@@ -13,6 +13,7 @@
 #include "globals/engine.h"
 #include "structs/light.h"
 #include "globals/render.h"
+#include "protos/cache.h"
 
 /* The libultra GBI (F3DEX2) commands this function writes, as in PR/gbi.h. */
 #define _SHIFTL(v, s, w) (((unsigned int) (v) & (0xFFFFFFFFU >> (32 - (w)))) << (s))
@@ -274,7 +275,6 @@ extern void *Texture_Request(s32 *texture);
 extern void Texture_GetInfo(void *node, TextureInfo *info);
 extern void Texture_Load(s32 *, void *, s32, s32, s32, s32, s32, s32, s32);
 extern void Render_SetCombineMode(s32 combine);
-extern void CCache__Unlock(s32 unused, void *node);
 
 /* Sets up the RDP for drawing with `mat`: its texture frame `pass` (or the
  * animated one when negative), colours, combiner, render and geometry modes.

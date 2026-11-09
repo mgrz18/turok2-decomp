@@ -3,6 +3,7 @@
 #include "structs/cache.h"
 #include "globals/cache.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 
 
 /* Takes a CMemEntry off the age and address lists and returns it to the free stack. */

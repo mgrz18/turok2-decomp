@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "protos/cache.h"
 
-s32 *CCache__Allocate(s32, s32, s32, void *);          /* extern */
 void memset(s32, s32, s32);                  /* extern */
 extern u8 D_800A9A00[];
 

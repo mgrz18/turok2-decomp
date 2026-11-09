@@ -28,6 +28,7 @@
 #include "globals/particle.h"
 #include "protos/list.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -595,7 +596,6 @@ extern void CMtxF__TransformPoint(void *m, void *in, void *out);
 extern void *MtxPool_Alloc(void *pool, s32 count);
 extern void Render_SetCombineMode(s32 mode);
 extern void Render_SetRenderMode(s32 mode);
-extern void CCache__Unlock(s32 arg0, void *model);
 extern s32 Random_Next(void);
 
 static __inline__ s32 Particle_Occluded(Particle *particle, ParticleView *view) {

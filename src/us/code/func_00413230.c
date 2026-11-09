@@ -28,6 +28,7 @@
 #include "structs/light.h"
 #include "globals/player.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 
 /* ---------------- MenuItem_FormatBinding ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -554,8 +555,6 @@ extern void CGameObjectInstance__Construct(CGameObjectInstance *fx, s32 a, s32 b
 extern void func_0021E5D4(CGameObjectInstance *fx);
 extern void CGameObjectInstance__ClearDrawMatrices(CGameObjectInstance *fx);
 extern void CGameObjectInstance__UpdateAnimation(CGameObjectInstance *fx);
-extern s32 CCache__GetFrameDelay(void);
-extern void CCache__SetFrameDelay(s32 a);
 extern void CScene__SetInstanceObjectType(void *world, CGameObjectInstance *fx, s32 c, s32 d);
 extern void Render_ResetBatches(void);
 extern void Render_FlushBatches(void);
@@ -1174,7 +1173,6 @@ void Menu_DrawBar(Menu *a, MenuItem *b, s32 c) {
 
 /* Static inline in the Rage Wars source file (dropped by the importer); 0x330 in Turok 2, 0x480 in Rage Wars. */
 static inline s32 O06_ItemSize_415FB8(s16 *a) { if (*a == 3) return 0x330; return 0; }
-extern s32 *CCache__Allocate();
 extern void func_00414EA8_415FB8() __asm__("Menu_Construct");
 /* Opens the window c's submenu in the pool a (an item's select callback,
  * MenuItem_SelectSubmenu): the window, its items and their extras in one block. */
@@ -1572,7 +1570,6 @@ s32 MenuPool_OpenChildMenu(MenuPool *pool, Menu *c, MenuDesc *t) {
 }
 
 /* ---------------- MenuPool_Update ---------------- */
-s32 CCache__Deallocate(s32, s32);
 s32 func_0041531C_4169C8(s32, s32) __asm__("Menu_Update");
 
 void MenuPool_Update(MenuPool *arg0) {

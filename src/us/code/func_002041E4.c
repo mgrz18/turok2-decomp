@@ -5,19 +5,15 @@
 #include "globals/cache.h"
 #include "globals/sysrc.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern B12Mgr D_800D7BE0;
-void CCache__ReleaseDisplayList(s32 a, u32 b);
 s32 CDecompressor__DecompressAsync(CDecompressor *port, B12Msg *n, void *q);
-void CCache__DetachCacheEntry(s32 a, B12Node *n);
 void CHeap__Free(CHeap *heap, s32 key);
-void CCache__FreeMemEntry(s32 a, B12Node *n);
-void CCache__FreeCacheEntry(s32 a, B12Msg *n);
-void CCache__CompleteRequest(s32 a, B12Msg *n, s32 b);
 void CCache__Main(void) {
     B12Msg *msg;
     B12Node *p;

@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 typedef struct Counted {
     /* 0x00 */ s32 unk0;
@@ -26,12 +27,10 @@ typedef struct ObjB {
 
 extern void CScene__DecompressGridSection(void);
 
-extern void **CCache__Request(s32 unused, s32 key, s32 size, s32 mode, CScene *owner, void *tag, char *name, s32 direct);
 extern void CStaticObject__RequestLitVertices(ObjA *a, s32);
 extern void *CStaticObject__LoadGeometry(ObjA *a);
 extern void *CLevelActor__LoadGeometry(ObjB *b);
 extern void Model_RequestTextures(void *handle);
-extern void CCache__Unlock(s32, void *);
 
 /* Streams in every grid cell of the level that is not loaded yet and spawns its objects. The loops run over
  * a rectangle of cells (firstRow..lastRow, firstCol..lastCol), here the whole grid: the column loop starting

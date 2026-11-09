@@ -3,9 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "globals/cache.h"
+#include "protos/cache.h"
 
-extern void CCache__ClearDisplayListLocks(s32, s32);
-extern void CCache__ClearCurrentDisplayList(void);
 void CCache__ClearCurrentDisplayList(void) {
     s32 *p = &gCache_currentDlist;
     CCache__ClearDisplayListLocks(0, *p);

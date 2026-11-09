@@ -8,6 +8,7 @@
  * allocation order and the dead else replaces the asms). */
 #include "common.h"
 #include "gfx.h"
+#include "protos/cache.h"
 
 /* A tracked allocation (list at gCache_memLockedList). */
 typedef struct HeapNode HeapNode;

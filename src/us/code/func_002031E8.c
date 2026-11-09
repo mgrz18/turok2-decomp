@@ -5,8 +5,8 @@
 #include "structs/cache.h"
 #include "globals/cache.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 
-extern s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keepRecent);
 
 /* CCache__PopFreeMemEntry, inlined. */
 static __inline__ CMemEntry *pool_alloc(s32 flags) {

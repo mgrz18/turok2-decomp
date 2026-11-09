@@ -2,6 +2,7 @@
 #include "common.h"
 #include "globals/camera.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 typedef struct CollisionBuildVertex {
     f32 x;
@@ -56,8 +57,6 @@ typedef struct CollisionBuildWorld {
 
 
 extern s32 ProPackDecompress(CollisionBuildMeshHandle **handle, s32);
-extern CollisionBuildMeshHandle *CCache__AllocateMemoryForDecompression(s32, CollisionBuildMeshHandle **handle, s32 size);
-extern void CCache__DeallocAndReplaceCompressedData(s32, CollisionBuildMeshHandle **handle, CollisionBuildMeshHandle *block);
 extern void UnpackScaledVec4(CollisionBuildVertex *v);
 extern void CGameRegion__Unpack(CollisionBuildTriangle *tri, CollisionBuildFace *face, CollisionBuildVertex *verts,
                           s32 nverts, CollisionBuildTriangle *tris, s32 ntris);

@@ -2,6 +2,7 @@
 #include "structs/cache.h"
 #include "globals/cache.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 
 
 /* Files a CMemEntry in the locked list, which is sorted by address. */

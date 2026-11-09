@@ -4,8 +4,8 @@
 #include "gfx.h"
 #include "globals/render.h"
 #include "globals/engine.h"
+#include "protos/cache.h"
 
-s32 CCache__Unlock(s32, s32);                /* extern */
 s32 CScene__LoadGraphicSet(s32 *, s32, s32, s32); /* extern */
 s32 Hud_DrawImageFrame(s32, s32, s16, s16, f32, f32, s32); /* extern */
 

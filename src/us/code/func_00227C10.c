@@ -10,6 +10,7 @@
 #include "globals/camera.h"
 #include "protos/list.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 /* The animation header: what this reads of it. */
 typedef struct AnimInfo {
@@ -22,11 +23,9 @@ extern char D_800A6070[];               /* "anim object index" */
 extern char D_800A6084[];               /* "anim object info" */
 
 s32 CScene__FindObjectType(CScene *world, s32 id);
-s32 *CCache__Request(s32 heap, s32 src, s32 size, s32 type, s32 arg4, s32 callback, char *name, s32 arg7);
 s32 CScene__GetIntelligence(CScene *world, s32 index);
 f32 HalfToFloat(s32 angle);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 angle);
-void CCache__Unlock(s32 heap, s32 *block);
 void CGameObjectInstance__Construct(CListedInstance *effect, s32 id, s32 variant, s32 unused, s32 count, s32 sound, s32 owner,
                    f32 scale, CVector3 position, s32 flags, CVector3 color, CVector3 direction, s32 arg12);
 void func_0021E5D4(CListedInstance *effect);

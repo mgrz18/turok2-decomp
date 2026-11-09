@@ -6,6 +6,7 @@
 #include "globals/engine.h"
 #include "globals/scene.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xE];
@@ -48,10 +49,7 @@ extern char D_800A57F8[];
 s32 Actor_GetTypeClass(void);
 void **CStaticObject__LoadGeometry(PlacedProp *prop);
 void CStaticObject__BuildLitVerticesCallback(void);
-s32 **CCache__RequestDecompression(s32, s32, void **, s32, s32, void *, void *, void *, s32);
-void CCache__LockForDisplayList(s32, s32 **);
 void Render_QueueModelInstance(void **resource, void *matrix, s32 segment, void *lights, void *textures, s32 lod, s32 pass);
-void CCache__Unlock(s32, void *);
 
 /* The colour pulse (Rage Wars' func_8027892C_de): every vertex flagged 0x70
  * gets its base colour from colors plus a step of the pulse table. */

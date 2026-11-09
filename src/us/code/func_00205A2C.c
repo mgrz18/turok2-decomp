@@ -4,6 +4,7 @@
 #include "rw/abu_types.h"
 #include "globals/cache.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern u32 __osDisableInt(void);

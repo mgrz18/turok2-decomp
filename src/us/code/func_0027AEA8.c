@@ -1,8 +1,8 @@
 #include "common.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/cache.h"
 
-s32 CCache__Unlock(s32, s32);
 s32 CScene__LoadGraphicSet(s32, s32, s32, s32);
 s32 Hud_GetImageFrame(s32, s32, s32, s32);
 

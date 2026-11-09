@@ -4,11 +4,9 @@
 #include "structs/controller.h"
 #include "globals/pak.h"
 #include "globals/controller.h"
+#include "protos/cache.h"
 
 
-extern void **CCache__Allocate(s32, s32, s32, char *);
-extern void CCache__Flush(s32);
-extern void CCache__Deallocate(s32, void **);
 extern void Controller_Lock(s32);
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);

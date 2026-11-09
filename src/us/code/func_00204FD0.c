@@ -1,15 +1,13 @@
 #include "rw/junk_types.h" /* B12Node: a cached resource */
 #include "globals/cache.h"
 #include "globals/sysrc.h"
+#include "protos/cache.h"
 
 s32 CHeap__AllocAt(CHeap *, s32, s32);
-B12Node *CCache__AllocMemEntry(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
-void CCache__FreeMemEntry(s32, B12Node *);
-void CCache__AddToAddressList(s32, B12Node *);
 B12Node *CCache__AllocateAt(s32 arg0, s32 arg1, s32 arg2)
 {
   s32 temp_a0;

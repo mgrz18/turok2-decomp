@@ -10,6 +10,7 @@
 #include "globals/camera.h"
 #include "globals/scene.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 /* Builds (once per frame) the display list of the level geometry: for every
  * grid region seen by one of the views, every static object and every level
@@ -29,7 +30,6 @@ extern ViewState gEngineApp_m_Settings_difficulty; /* local type: the field's re
 
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
-void CCache__LockForDisplayList(s32, void **);
 s32 Frustum_TestBox(void *, CBox *);
 void CStaticObject__Draw(CStaticObject *, CCamera *);
 void CLevelActor__Draw(CLevelActor *);

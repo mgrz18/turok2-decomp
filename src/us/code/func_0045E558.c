@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/cache.h"
 
 extern void GfxPool_Free_2(struct RecordRecAt1C *arg0);
-extern void CCache__Deallocate(void *arg0, void *arg1);
 void GfxPool_Free_2(struct RecordRecAt1C *arg0) {
     s32 temp_a1;
     s32 temp_a1_2;

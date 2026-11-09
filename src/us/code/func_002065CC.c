@@ -2,6 +2,7 @@
 #include "structs/cache.h"
 #include "globals/cache.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 
 
 /* Stamps a CMemEntry with this frame and moves it to the head of the age list. */

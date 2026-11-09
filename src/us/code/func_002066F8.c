@@ -6,8 +6,8 @@
 #include "structs/cache.h"
 #include "globals/cache.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 
-extern s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent);
 static __inline__ CCacheEntry *take(s32 active) {
  CCacheEntry *node=gCache_cacheFreeList.m_pHead;
  if(node) {CList__Remove(&gCache_cacheFreeList,node); node->flags=active;CList__AddHead(&gCache_cacheUsedList,node);}

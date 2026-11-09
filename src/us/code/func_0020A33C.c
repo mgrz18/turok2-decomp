@@ -5,12 +5,12 @@
 #include "structs/frame.h"
 #include "globals/render.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 
 #define GFX_W(pkt, a, b) { Gfx *_g = (Gfx *)(pkt); _g->w0 = (a); _g->w1 = (b); }
 
 
-void CCache__LockForDisplayList(s32 unused, void **resource);
 s32 Render_SetupMaterial(void *material, s32 pass);
 
 /* Draws one level of detail of a model resource when the frame's command buffer still has 3000

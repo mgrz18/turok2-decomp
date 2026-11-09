@@ -2,10 +2,9 @@
 #include "structs/cache.h"
 #include "globals/cache.h"
 #include "globals/sysrc.h"
+#include "protos/cache.h"
 
 s32 CHeap__Free(CHeap *, s32);
-s32 CCache__FreeMemEntry(s32, s32);
-s32 CCache__DetachCacheEntry(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);

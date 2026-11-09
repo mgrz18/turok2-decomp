@@ -2,12 +2,11 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "globals/game.h"
+#include "protos/cache.h"
 
 extern char D_800B4158[];
 extern char D_800B4170[];
 extern char D_800C1318[];
-extern s32 CCache__GetFrameDelay(void);
-extern void CCache__SetFrameDelay(s32);
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 

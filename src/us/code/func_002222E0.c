@@ -12,6 +12,7 @@
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 /* Draws the level geometry seen by one view: every static object and level
  * actor of the grid regions inside the view's box that is shown in this view
@@ -26,7 +27,6 @@ CPlayer *CCamera__GetPlayer(CCamera *);
 s32 CPlayer__GetPickupCountLow(CPlayer *, s32);
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
-void CCache__LockForDisplayList(s32, void **);
 s32 Frustum_TestBox(void *, CBox *);
 void CStaticObject__RequestLitVertices(CStaticObject *, CCamera *);
 void CStaticObject__Draw(CStaticObject *, CCamera *);

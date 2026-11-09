@@ -3,6 +3,7 @@
 #include "globals/object.h"
 #include "globals/particle.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80246E34_2.CPP, func_802476C8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -41,7 +42,6 @@ typedef struct BoneInfo {
     s32 mask;
 } BoneInfo;
 extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
-extern void CCache__Unlock(void *heap, s32 *resource);
 extern CROMEventEntry *CAnimationState__GetEvents(void *);
 extern s32 CAnimationState__GetEventCount(void *);
 extern s32 *CGameObjectInstance__LoadGeometry(ObjectLinks *);

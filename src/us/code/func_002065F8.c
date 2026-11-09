@@ -2,6 +2,7 @@
 #include "m2c_macros.h"
 #include "globals/cache.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 
 s32 CHashTable__Remove(s32);
 

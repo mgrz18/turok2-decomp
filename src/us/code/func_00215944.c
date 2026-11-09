@@ -3,6 +3,7 @@
  * file's whole .rodata. */
 #include "common.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
 /* Only the field read here: the key of the resource this loads. */
 typedef struct {
@@ -10,8 +11,6 @@ typedef struct {
     /* 0x34 */ s32 key;
 } ResourceOwner;
 
-s32 *CCache__Request(s32 heap, s32 src, s32 size, s32 type, s32 arg4, void *callback, void *name, s32 arg7);
-void CCache__Unlock(s32 heap, s32 *block);
 void Model_TouchTextures(s32 *);
 extern void Model_DecompressCallbackTerminated();
 

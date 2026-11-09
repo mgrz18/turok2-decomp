@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "protos/iset.h"
+#include "protos/cache.h"
 
-s32 CCache__Unlock(s32, s32);
 
 s32 Texture_RequestSync(void *);                          /* extern */
 
