@@ -3,6 +3,19 @@
 #include "globals/scene.h"
 #include "globals/pickup.h"
 
+#ifdef TARGET_PORT
+/* the picker is the CPlayer: the view at its host offsets (round 7 v2); the camera (N64
+ * 0x51C) is a pointer, pointer-wide here */
+#include "structs/player.h"
+#define T2_HOFF_Picker(m) __builtin_offsetof(CPlayer, m)
+typedef struct Picker {
+    union {
+        struct { u8 _hp_x[T2_HOFF_Picker(m_CharacterActor.header.m_vPos)]; s32 x; s32 y; s32 z; }; /* N64 0x4 */
+        struct { u8 _hp_hud[T2_HOFF_Picker(m_pCamera)]; sptr hud; }; /* N64 0x51C */
+        struct { u8 _hp_keys[T2_HOFF_Picker(m_Data.m_KeySet6LevelFlags)]; u8 keys[6]; }; /* N64 0xA02 */
+    };
+} Picker;
+#else
 typedef struct Picker {
     /* 0x000 */ u8 pad0[4];
     /* 0x004 */ s32 x;
@@ -13,6 +26,7 @@ typedef struct Picker {
     /* 0x520 */ u8 pad520[0x4E2];
     /* 0xA02 */ u8 keys[6];
 } Picker;
+#endif
 
 extern u8 D_800B37BC[];
 extern u8 D_800B37CC[];

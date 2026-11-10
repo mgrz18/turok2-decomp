@@ -37,10 +37,18 @@ static __inline__ s32 GetMaxAmmo(CPlayer *player, s32 type, s32 heldOnly) {
     return max;
 }
 
+#ifdef TARGET_PORT
+/* the ammo pickup row (CPickupRow14): its ammo type follows the message pointer, at
+ * m_Params.m_Ammo.m_Type on the host (N64 0xC) */
+#include "structs/pickup.h"
+typedef CPickupRow14 PickupInfo;
+#define ammoType m_Params.m_Ammo.m_Type
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0xC];
     /* 0x0C */ s16 ammoType;
 } PickupInfo;
+#endif
 
 extern PickupInfo *Pickup_FindAmmoEntry(s32);
 
