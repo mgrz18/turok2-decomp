@@ -16,7 +16,8 @@
  * The one byte stream, VADPCM frames from the ROM, is read byte by byte.
  *
  * Addresses. The command words hold 32-bit addresses (osVirtualToPhysical, t2ultra.c): the
- * host address itself in low memory mode. Segments (A_SEGMENT) are recorded; the game only
+ * host address itself below 2 GB (low memory mode), a region handle above; ram() resolves both
+ * through T2Port_PhysToVirtual. Segments (A_SEGMENT) are recorded; the game only
  * ever sets segment 0 to 0 (alAudioFrame), so addresses are used as they are. */
 #include <stdint.h>
 #include <stdio.h>
@@ -80,8 +81,9 @@ static inline int16_t *D16(uint32_t a) {
 static inline uint8_t *D8(uint32_t a) {
     return sDmem.b + (a & (DMEM_SIZE - 1));
 }
+void *T2Port_PhysToVirtual(uint32_t h); /* t2ultra.c */
 static inline void *ram(uint32_t a) {
-    return (void *)(uintptr_t)a;
+    return T2Port_PhysToVirtual(a);
 }
 
 /* A_ADPCM: VADPCM, order 2 (the microcode's), 9-byte frames -> 16 samples */
