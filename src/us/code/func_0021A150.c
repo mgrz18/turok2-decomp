@@ -41,7 +41,14 @@ void CGameObjectInstance__SetupAnimation(CGameObjectInstance *actor, s32 *a1, s3
             CMtxF__TransformBox(&actor->m_mfOrient, data, &actor->m_vMin);
             CAnimationState__Reset(&actor->m_CurrentAnimation);
             CAnimationState__Reset(&actor->m_BlendAnimation);
+#ifdef TARGET_PORT
+            /* block 1 is a CUSet (s32 element size, s32 count): the u16 at +6 is the
+             * count's low half on the N64; the archive swaps the words, so on a
+             * little-endian host it is the word at +4 */
+            actor->m_nAnims = (u16) ((u32 *) CISet__GetBlock((void *)(sptr)setTree, 1))[1];
+#else
             actor->m_nAnims = ((u16 *) CISet__GetBlock((void *)(sptr)setTree, 1))[3];
+#endif
             actor->m_dwFlags |= 0x40000;
             if (anim > 0) {
                 anim = CGameObjectInstance__PickRandomAnim(actor, anim, -1);
