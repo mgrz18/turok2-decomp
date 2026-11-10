@@ -20,7 +20,7 @@ void CScene__QueueDelayedEvent(CScene *scene, LevelEvent *event) {
         d->m_pEvent = event;
     } else {
         d = scene->m_DelayedEvents.m_pTail;
-        LevelEvent_Fire((s32)(sptr)d->m_pEvent);
+        LevelEvent_Fire((sptr)d->m_pEvent);
         d->m_pEvent = event;
     }
     t = HalfToFloat(event->delay);

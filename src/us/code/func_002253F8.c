@@ -24,7 +24,7 @@ void CScene__UpdateDelayedEvents(CScene *scene) {
             }
         }
         if (fire) {
-            LevelEvent_Fire((s32)(sptr)event);
+            LevelEvent_Fire((sptr)event);
             CList__Remove(&scene->m_DelayedEvents, d);
             CList__AddHead(&scene->m_FreeDelayedEvents, d);
         }
