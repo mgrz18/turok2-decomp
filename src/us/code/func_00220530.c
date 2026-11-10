@@ -60,7 +60,10 @@ void CScene__Update(CScene *world) {
     }
     CCameraPool__Draw(gEngineApp_m_Game_m_CameraPool, world);
     CParticleSystem__Update(&world->m_ParticleSystem);
-#ifdef TARGET_PORT /* camera pool + 0x13F4 = gEngineApp_m_Settings.paused (CGameFromCameraPool) */
+#ifdef TARGET_PORT
+    /* The port: GameSettings.paused by member (CGame + 0x40 + 0x13F4 on the N64; on the host the
+     * literal offset read inside the camera pool and every level stood still: no AdvanceInstances,
+     * no CPlayerPool__Update, no player input). */
     if (world->m_WarpState == 0 && gEngineApp_m_Settings.paused == 0) {
 #else
     if (world->m_WarpState == 0 && *(s32 *)(gEngineApp_m_Game_m_CameraPool + 0x13F4) == 0) {

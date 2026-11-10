@@ -19,7 +19,7 @@ def depth_map(s):
     d = 0; out = bytearray(len(s))
     for i, c in enumerate(s):
         if c == '{': d += 1
-        out[i] = min(d, 255)
+        out[i] = max(0, min(d, 255))  # #ifdef-split function heads can unbalance the braces
         if c == '}': d -= 1
     return out
 

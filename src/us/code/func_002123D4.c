@@ -6,19 +6,88 @@
 
 extern void CVector3__Normalize(f32 *);
 #ifdef TARGET_PORT
-/* ABI: the callers pass the point as three floats (SSE registers on x86-64, s registers on arm64),
- * the ROM's code reads them as words from its argument slots (a1..a3, contiguous in the home
- * area: *(CVector3 *)&arg1). Here they are floats, kept contiguous in a local. */
-s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, f32 px, f32 py, f32 pz,
-                  CVector3 *arg4, f32 *arg5) {
-    union { f32 f[3]; u32 u[3]; } args_ = {{px, py, pz}};
-#define arg1 args_.u[0]
-#define arg2 args_.u[1]
-#define arg3 args_.u[2]
+/* The port: the point as three floats, as func_00212680 and abu_protos.h pass it. The N64 body
+ * below takes them as u32 words and reads them back as one CVector3 from the argument save
+ * area (*(CVector3 *)&arg1), which only works with the MIPS o32 convention; on x86-64/arm64
+ * three f32 arguments go in float registers, and CScene__ComputeLights passed a CVector3 by
+ * value (two SSE registers) to a callee that took integer registers. */
+s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, f32 x, f32 y, f32 z, CVector3 *arg4, f32 *arg5) {
+    CVector3 v;
+    f32 d;
+    f32 w;
+
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    w = 0.0f;
+    if (1.0f <= v.x || v.x <= -1.0f || 1.0f <= v.y || v.y <= -1.0f || 1.0f <= v.z || v.z <= -1.0f) {
+        goto fail;
+    }
+    switch (arg0->shape) {
+        case 0:
+            w = v.x * v.x + v.y * v.y + v.z * v.z;
+            if (1.0f < w) {
+                goto fail;
+            }
+            w = sLightSphereFalloff[(s32) (w * 64.0f)];
+            break;
+        case 2:
+            if (v.x <= 0.0f) {
+                goto fail;
+            }
+            w = v.y * v.y + v.z * v.z;
+            if (v.x * v.x < w) {
+                goto fail;
+            }
+            w = sLightConeFalloff[(s32) (w * 64.0f)];
+            w /= v.x;
+            break;
+        case 1:
+            if (v.x < 0.0f) {
+                v.x = -v.x;
+            }
+            if (v.y < 0.0f) {
+                v.y = -v.y;
+            }
+            if (v.z < 0.0f) {
+                v.z = -v.z;
+            }
+            w = v.z;
+            if (!(v.y <= w)) {
+                w = v.y;
+            }
+            if (!(v.x <= w)) {
+                w = v.x;
+            }
+            break;
+        default:
+            break;
+    }
+    w = 1.0f - w;
+    d = arg0->falloff;
+    if (w < d) {
+        w /= d;
+    } else {
+        w = 1.0f;
+    }
+    if (arg0->shape == 1) {
+        *arg4 = arg0->axis;
+    } else {
+        *arg4 = v;
+    }
+    CVector3__Normalize((f32 *) arg4);
+    *arg5 = w;
+    return 1;
+fail:
+    arg4->y = 0.0f;
+    arg4->z = 0.0f;
+    arg4->x = 1.0f;
+    *arg5 = 0.0f;
+    return 0;
+}
 #else
 s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, u32 arg1, u32 arg2, u32 arg3,
                   CVector3 *arg4, f32 *arg5) {
-#endif
     f32 temp_f0;
     f32 var_f0;
     f32 var_f1;
@@ -102,8 +171,4 @@ fail:
         return 0;
     }
 }
-#ifdef TARGET_PORT
-#undef arg1
-#undef arg2
-#undef arg3
 #endif

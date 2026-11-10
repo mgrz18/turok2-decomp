@@ -22,10 +22,20 @@ struct B19Obj {
     s32 unk118;      /* 0x118 */
 };
 extern u8 gEngineApp_m_SwooshSystem[];
+#ifdef TARGET_PORT
+#include "structs/particle.h"
+#include "globals/scene.h"
+#define D_8010FF34 (&gScene.m_DLightSet)
+#else
 extern u8 D_8010FF34[];
+#endif
 void CParticle__Attach(B19Obj *, sptr, sptr);
 void Trail_AddNode(void *, B19Obj *, s32);
-s32 DLight_Spawn(void *, s32);
+#ifdef TARGET_PORT
+void *DLight_Spawn(void *, s32);
+#else
+sptr DLight_Spawn(void *, s32);
+#endif
 void CParticle__StartLoopSound(B19Obj *, s32);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define Sound__Play Sound__Play_f3
@@ -35,8 +45,14 @@ void CParticle__StartEffects(B19Obj *o, B19Def *def) {
     s32 t;
     CParticle__Attach(o, 0, 0);
     if (def->b6 != -1) Trail_AddNode(gEngineApp_m_SwooshSystem, o, def->b6);
+#ifdef TARGET_PORT
+    /* the light pointer-wide, in the host CParticle's member (the view has the N64 offset) */
+    if (def->b7 != -1) ((CParticle *) o)->m_pDLight = DLight_Spawn(D_8010FF34, def->b7);
+    else ((CParticle *) o)->m_pDLight = NULL;
+#else
     if (def->b7 != -1) o->unk118 = DLight_Spawn(D_8010FF34, def->b7);
     else o->unk118 = 0;
+#endif
     if (!(o->flags & 0x200000) && (t = def->sC) != 0) {
         switch (o->id) {
         case 0x22:

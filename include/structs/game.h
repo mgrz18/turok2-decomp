@@ -151,6 +151,11 @@ typedef struct CAutomap {
     /* 0x04 */ s32 unk4;
     /* 0x08 */ s32 unk8;
     /* 0x0C */ s32 m_Counts[11];
+#if defined(TARGET_PORT) && !defined(__mips__)
+    /* The port: the player's region pointer-wide (Automap_SetPlayer; on the N64 the word at 0xC,
+     * between fields that leave no room for a host pointer). */
+    struct CGameRegion *m_pHostRegion;
+#endif
 } CAutomap; /* size 0x38 */
 
 /* The engine's globals at gEngineApp_m_Game: the players, the cameras and the

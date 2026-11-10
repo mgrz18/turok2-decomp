@@ -190,10 +190,8 @@ void AI_TurnHeadToTarget_i(sptr actor, void *ai, s32 pitchOffset) {
     AI_TurnHeadToTarget((void *) actor, ai, bits_f(pitchOffset));
 }
 
-extern void Automap_SetPlayer(void *obj, sptr region, s32 yaw, CVector3 pos);
-void Automap_SetPlayer_f(void *obj, sptr region, f32 yaw, CVector3 pos) {
-    Automap_SetPlayer(obj, region, f_bits(yaw), pos);
-}
+/* Automap_SetPlayer: its host definition takes the caller's types (f32 facing, CVector3 by
+ * value, the region pointer-wide; func_00401B30.c, round 5 t1), so no adapter. */
 
 extern void *CInstancePool__SpawnAnimInstance(void *scene, s32 variant, s32 owner, CVector3 position,
                                               f32 scale, CVector3 direction, CVector3 color, s32 *ref);

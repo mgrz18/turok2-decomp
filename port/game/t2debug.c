@@ -39,3 +39,53 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
         gPakCheckDone = 1;
     }
 }
+
+/* T2_STATE_LOG=1 (game.cpp, every 60 frames): the level and the first active player
+ * (position, facing, health, its body's AI mode, weapon), to follow gameplay headless. */
+#include "structs/world.h"
+#include "structs/player.h"
+#include "globals/game.h"
+#include "globals/scene.h"
+#include "structs/camera.h"
+#include "structs/menu.h"
+#include "structs/controller.h"
+#include <stdio.h>
+
+void T2Port_LogState(int frame) {
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+
+    printf("state: frame %d mode %d level %d warp %d paused %d", frame, (int) gEngineApp.m_Settings.mode,
+           (int) gScene.m_nLevel, (int) gScene.m_WarpState, (int) gEngineApp.m_Settings.paused);
+    if (p != NULL) {
+        CGameObjectInstance *a = &p->m_CharacterActor;
+        printf(" player pos (%.1f %.1f %.1f) rotY %.2f health %d aimode %d weapon %d",
+               a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z, a->m_RotY,
+               (int) (p->m_Data.m_Health >> 8), (int) a->m_AI.m_Mode, (int) p->m_Data.m_CurrentWeapon);
+        if (a->header.m_pCurrentRegion != NULL) {
+            extern f32 CGameRegion__GetHeight(void *, f32, f32);
+            printf(" region %p floor %.1f", (void *) a->header.m_pCurrentRegion,
+                   CGameRegion__GetHeight(a->header.m_pCurrentRegion, a->header.m_vPos.x, a->header.m_vPos.z));
+        } else {
+            printf(" region NULL");
+        }
+        printf(" lives %d", (int) p->m_Data.m_Lives);
+        printf(" pmode %d buttons %x move (%.2f %.2f) look (%.2f %.2f) contp %p", (int) p->m_Mode,
+               (unsigned) p->m_ContState.m_dwButtons, p->m_ContState.m_MoveX, p->m_ContState.m_MoveY,
+               p->m_ContState.m_LookX, p->m_ContState.m_LookY, (void *) p->m_ContState.m_pContState);
+        if (p->m_ContState.m_pContState != NULL) {
+            ControllerProfile *c = p->m_ContState.m_pContState;
+            printf(" pad %x/%x stick %d %d", (unsigned) c->inputButtons, (unsigned) c->buttons, c->stickX, c->stickY);
+        }
+    }
+    if (p != NULL && p->m_pCamera != NULL && ((MenuPool *) p->m_pCamera->m_MenuPool)->head != NULL) {
+        Menu *m = ((MenuPool *) p->m_pCamera->m_MenuPool)->head;
+        printf(" cammenu %p cursor %d", (void *) m->desc, (int) m->cursor);
+    }
+    {
+        extern s32 gCameraPoolHideViews;
+        CCameraPool *pool = gEngineApp.m_Game.m_CameraPool;
+        printf(" cams %d hide %d", (int) pool->m_ActiveList.m_nCount, (int) gCameraPoolHideViews);
+    }
+    printf("\n");
+    fflush(stdout);
+}

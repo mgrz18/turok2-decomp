@@ -1,3 +1,37 @@
+#ifdef TARGET_PORT
+/* The port: typed on CGameObjectInstance (the m2c fields were N64 offsets: the velocity at 0x1C,
+ * the definition at 0x14); the platform pointer-wide; the jump sound takes the position as the
+ * CVector3 Sound__Play is defined with (three s32 words went in integer registers). */
+#include "common.h"
+#include "structs/game_object.h"
+#include "globals/game.h"
+#include "globals/scene.h"
+
+sptr GameObject_GetPlatformBelow(CGameObjectInstance *);
+void GameObject_GetFrameDelta(sptr, CVector3 *);
+s32 Sound__Play(s16, CVector3, sptr, sptr);
+void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
+
+void PlayerJump_Enter(void *arg0, CGameObjectInstance *arg1) {
+    CVector3 delta;
+    f32 speed;
+    sptr platform;
+
+    speed = 389.12f;
+    if (gScene_m_LevelID == 0x1DB1) {
+        speed = 481.28f;
+    }
+    arg1->m_vVelocity.y = speed * *(f32 *) ((u8 *) arg1->header.m_pIntelligence + 0x20);
+    platform = GameObject_GetPlatformBelow(arg1);
+    if (platform != 0) {
+        GameObject_GetFrameDelta(platform, &delta);
+        CVector3__Add(&arg1->m_vVelocity, &arg1->m_vVelocity, &delta);
+    }
+    if (gEngineApp_m_Settings.multiplayer == 0) {
+        Sound__Play(0x3AC1, arg1->header.m_vPos, 0, -1);
+    }
+}
+#else
 #include "common.h"
 #include "m2c_macros.h"
 #include "globals/game.h"
@@ -33,3 +67,4 @@ void PlayerJump_Enter(sptr arg0, void *arg1) {
         Sound__Play(0x3AC1, M2C_FIELD(arg1, s32 *, 4), M2C_FIELD(arg1, s32 *, 8), M2C_FIELD(arg1, s32 *, 0xC), 0, -1);
     }
 }
+#endif

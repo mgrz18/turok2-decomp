@@ -214,6 +214,38 @@ animated instance and the actor path (`CGameObjectInstance__Draw` -> `BuildBoneM
 `PoseBone` -> `CAnimationState`) is still on N64 views (RENDER.md section 3; a host
 `CGameObjectInstance__Draw` is ready as a patch). New debug aid: `T2_DLDUMP_VTX=1`.
 
+# Round 5 t1: gameplay runner (branch names-R5_t1)
+
+Details, fix table t1-1..t1-20 and the debug aids: [GAMEPLAY.md](GAMEPLAY.md).
+
+**Rebuild the archive**: `tools/assets/swap_spec.json` changed (collision table 3, the region
+grid, is swapped now: t1-3). An archive from round 4 still loads but the grid counts are
+byte-reversed (`CScene__FindRegionAt` walks garbage).
+
+```
+--game --draw --pak-blank --frames 26000                      (no input: the attract demos)
+frame 5469:  mode 13, level 81   demo 1 plays to its end (8794), the player moves
+frame 13684: mode 13, level 131  demo 2 plays, the player moves
+frame 20948: level 109 (demo 3) loading: abort in T2Port_ReadAsset(0x40291210), a host pointer
+             as a cache key <- CStaticObject__LoadGeometry <- CScene__StreamAllSections
+
+--game --draw --pak-blank --input START@4400,A@4500,A@4700,A@4800 (+ CU@13300,CU@13304,...)
+frame 4455:  mode 8 main menu; 4555 mode 13 (single-player menu D_0043916C, New game)
+frame 4855:  mode 11 new-game intro cinemas (levels 50, 49); 8977 mode 12 (47, 45, 46, 48, 49)
+frame 12903: mode 13, level 51: GAMEPLAY. The player stands on the floor (y -566.4) and walks
+             with C-up (state 3), down to y -1228.8, into the water (states 11/10), across a
+             dozen regions; C-left strafes; Z presses run. No crash to frame 15000.
+```
+
+Every gameplay frame is black (no vertices in the display list; the scene draw is t3's), so the
+progress is shown by `T2_STATE_LOG` (player position, state, region, floor height). Four ABI
+mismatches fixed locally (t1-6 CVector3 by value vs three u32, t1-13 s32/Triple vs f32/CVector3,
+t1-16 struct return vs hidden result pointer, t1-20 three s32 vs CVector3): t2's checker should
+find their siblings. Files the merge may meet: `include/structs/{particle,world,game,weapon}.h`
+(CDLightSet, `CScene.m_DLightSet`, `CAutomap.m_pHostRegion`, `gWeaponInfoTable[35]`),
+`port/game/t2debug.c`, `port/app/game.cpp` (the state log), `func_0024C47C.c` (CPlayer__Update
+host views), `func_00220530.c` (CScene__Update), `tools/assets/swap_spec.json`.
+
 # Round 3, merged state (history)
 
 Round 3 merged five branches, in this order: r2 (archive format 2.0, the loader through the

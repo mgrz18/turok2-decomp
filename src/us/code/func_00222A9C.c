@@ -21,7 +21,8 @@ typedef struct B19bLObj {
                u8 fBA;
 } B19bLObj;
 void CMtxF__TransformPoint(void *, void *, void *);
-#ifdef TARGET_PORT /* ABI: the definition takes three floats (a 12-byte float struct by value is xmm0 {x,y} + xmm1 {z} on x86-64) */
+#ifdef TARGET_PORT
+/* The port: the point as three floats (the definition's host signature, func_002123D4.c). */
 s32 Actors_GetLightVolumeFalloff(void *, f32, f32, f32, void *, f32 *);
 #else
 s32 Actors_GetLightVolumeFalloff(void *, B19bV3f, void *, f32 *);

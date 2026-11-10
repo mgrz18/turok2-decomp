@@ -18,6 +18,25 @@ typedef struct SlotLists {
 } SlotLists;
 
 
+#ifdef TARGET_PORT
+/* The port: on CDLightSet (the N64 view's slots have 4-byte links; on the host the lists
+ * overran the set into the scene's level and warp state). */
+#include "structs/particle.h"
+void func_0042D120(CDLightSet *lists) {
+    s32 i;
+    CDLight *slot;
+
+    CList__Construct(&lists->m_UsedList, 0, sizeof(void *));
+    CList__Construct(&lists->m_FreeList, 0, sizeof(void *));
+    for (i = 0; i < 8; i++) {
+        slot = &lists->m_Lights[i];
+        CList__AddTail(&lists->m_FreeList, slot);
+        slot->m_pROMLight = NULL;
+        slot->m_ColorFade = 1.0f;
+        slot->m_bEnabled = 0;
+    }
+}
+#else
 void func_0042D120(SlotLists *lists) {
     s32 i;
     Slot *slot;
@@ -32,3 +51,4 @@ void func_0042D120(SlotLists *lists) {
         slot->unk16 = 0;
     }
 }
+#endif

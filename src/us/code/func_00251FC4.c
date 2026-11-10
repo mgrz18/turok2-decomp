@@ -12,6 +12,26 @@
 #include "protos/ai.h"
 #include "protos/menu.h"
 
+#ifdef TARGET_PORT
+/* The port: the player pool at its host layout (CPlayerPool, structs/player_list.h: the two
+ * leading pointers and the list links are pointer-wide). */
+typedef struct {
+    CPlayer *head;
+    CPlayer *tail;
+    s32 lastOffset;
+    s32 nextOffset;
+    u32 count;
+} PlayerCList;
+
+typedef struct {
+    void *pad0[2];
+    s32 nPlayers;
+    PlayerCList idle;
+    PlayerCList active;
+    s32 cinema;
+    s32 cinemaStarted;
+} PlayerList;
+#else
 typedef struct {
     /* 0x00 */ CPlayer *head;
     /* 0x04 */ u8 pad4[0x10 - 4];
@@ -25,6 +45,7 @@ typedef struct {
     /* 0x34 */ s32 cinema;
     /* 0x38 */ s32 cinemaStarted;
 } PlayerList;
+#endif
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -33,6 +54,19 @@ typedef struct {
     /* 0x1C */ s32 over;
 } MatchState;
 
+#ifdef TARGET_PORT
+/* The port: the settings fields at their host distance from the menu pool (CGame.m_MenuPool to
+ * m_Settings.multiplayer, .paused, .match). */
+#define G_OFF(m) __builtin_offsetof(CGame, m)
+typedef struct {
+    u8 pad0[G_OFF(m_Settings.multiplayer) - G_OFF(m_MenuPool)];
+    u8 timed;
+    u8 padCC6[G_OFF(m_Settings.paused) - G_OFF(m_Settings.multiplayer) - 1];
+    s32 paused;
+    u8 padE7C[G_OFF(m_Settings.match) - G_OFF(m_Settings.paused) - sizeof(s32)];
+    MatchState match;
+} Globals;
+#else
 /* The globals from gEngineApp_m_Game_m_MenuPool: a menu pool first. */
 typedef struct {
     /* 0x000 */ void *menus;            /* CMenuPool */
@@ -43,6 +77,7 @@ typedef struct {
     /* 0xE7C */ u8 padE7C[0xE84 - 0xE7C];
     /* 0xE84 */ MatchState match;       /* gEngineApp_m_Settings_match */
 } Globals;
+#endif
 
 typedef struct {
     /* 0x00 */ s8 character;
@@ -54,9 +89,6 @@ extern PortSetup D_8011AB88[];
 
 void CPlayer__Update(CPlayer *p);
 void CPlayer__UpdateOrbitCamera(CPlayer *p, CPlayer *other);
-#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
-#define Automap_SetPlayer Automap_SetPlayer_f
-#endif
 void Automap_SetPlayer(void *, sptr region, f32 yaw, CVector3 pos);
 void CPlayer__ReadInput(void *input, CPlayer *p);
 s32 Controller_StartPressedNoCinema(ControllerProfile *c);

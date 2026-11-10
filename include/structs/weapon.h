@@ -91,6 +91,7 @@ typedef struct {
     /* 0x390 */ s32 m_Hover;
 } CBarrel; /* size 0x394 */
 
-extern WeaponInfo *gWeaponInfoTable[]; /* the weapon table */
+extern WeaponInfo *gWeaponInfoTable[35]; /* the weapon table: 35 (CPlayer__Update walks them all;
+                                           * the splat label gWeaponInfoTable_22 lies inside it) */
 
 #endif
