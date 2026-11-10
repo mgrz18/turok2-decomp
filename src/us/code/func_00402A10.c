@@ -8,7 +8,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ void (*onReset)(s32 a0, void *obj);
+    /* 0x08 */ void (*onReset)(sptr a0, void *obj);
 } Def00402A10;
 
 typedef struct {
@@ -32,7 +32,7 @@ extern s32 gMantidQueen_waveActive[]; /* local type: the field's real type (or t
 void AI_TurnHeadToTarget(sptr a0, Obj00402A10 *obj, s32 a2);
 void MantidQueen_Update(void *state);
 
-void MantidQueen_Step(s32 a0, Obj00402A10 *obj) {
+void MantidQueen_Step(sptr a0, Obj00402A10 *obj) {
     obj->prevPos = obj->pos;
     obj->prevAngle = obj->angle;
     if (gMantidQueen_waveActive[0] != 0 || obj->kind == 15) {

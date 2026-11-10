@@ -16,7 +16,7 @@ void Throwable_Step(void *arg0, CAI *arg1) {
     }
 }
 #else
-void Throwable_Step(s32 arg0, CAI *ai) {
+void Throwable_Step(sptr arg0, CAI *ai) {
     s32 (*temp_v0_2)();
     CAIModeInfo *temp_v0;
 
@@ -24,7 +24,13 @@ void Throwable_Step(s32 arg0, CAI *ai) {
     if (temp_v0 != NULL) {
         temp_v0_2 = temp_v0->m_pfCallback;
         if (temp_v0_2 != NULL) {
+#ifdef TARGET_PORT
+            /* ABI: on MIPS the mode callback receives this function's a0/a1 (the actor, its AI)
+             * untouched; the host passes them. */
+            ((s32 (*)(sptr, CAI *)) temp_v0_2)(arg0, ai);
+#else
             temp_v0_2();
+#endif
         }
     }
 }
