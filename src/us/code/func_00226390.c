@@ -1,5 +1,25 @@
 #include "common.h"
 
+#ifdef TARGET_PORT
+#include "structs/world.h"
+
+/* Host body: the N64 body clears the counts through a view at N64 offsets; on the host those
+ * offsets land inside the (8-byte) pointer arrays of CScene (round 7, v4). */
+void CScene__ClearListCounts(CScene *arg0) {
+    arg0->m_nDrawActors = 0;
+    arg0->m_nMovers = 0;
+    arg0->m_nListed = 0;
+    arg0->m_nRegistered = 0;
+    arg0->m_nKind1 = 0;
+    arg0->m_nFlagged = 0;
+    arg0->m_nKind5 = 0;
+    arg0->m_nList6 = 0;
+    arg0->m_nList7 = 0;
+    arg0->m_nDeferred = 0;
+    arg0->m_nSectors = 0;
+}
+#else
+
 /* The counts this clears, scattered over a large block. */
 typedef struct {
     /* 0x0000 */ u8 pad0[0x8EC];
@@ -38,3 +58,4 @@ void CScene__ClearListCounts(Arg0 *arg0) {
     arg0->unk1064 = 0;
     arg0->unk14A8 = 0;
 }
+#endif
