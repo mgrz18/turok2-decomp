@@ -26,3 +26,6 @@ bool T2Offscreen_Draw(void* gfx);
 // The framebuffer that holds the game frame (the interpreter's game framebuffer: there is no
 // default framebuffer without a drawable).
 int T2Offscreen_ShotFramebuffer();
+// --bench: wait until the GL commands of the frame have finished on the GPU (glFinish), so the
+// draw time includes the GPU work (no-op without a context).
+void T2Offscreen_Finish();

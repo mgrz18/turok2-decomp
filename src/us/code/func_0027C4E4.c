@@ -1,6 +1,13 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/80233920_2.CPP,
  * func_80233DFC_de, with Turok 2's CCamera. */
 #include "common.h"
+/* float -> u32 as the R4300 does it (cvt.w.s: a negative value wraps). arm64's fcvtzu saturates
+ * negatives to 0 (MACOS.md section 9, tools/port/f2ucheck.py); x86-64 happens to wrap. */
+#ifdef TARGET_PORT
+#define T2_F2U(x) ((u32)(s32)(x))
+#else
+#define T2_F2U(x) ((u32)(x))
+#endif
 #include "structs/camera.h"
 #include "structs/light.h"
 #include "globals/engine.h"
@@ -47,9 +54,9 @@ void CCamera__CycleLightAndFog(CCamera *cam) {
     direction.x *= 120.0f;
     direction.y *= 120.0f;
     direction.z *= 120.0f;
-    gSceneLights.m_Dir[0] = (u32) direction.x;
-    gSceneLights.m_Dir[1] = (u32) direction.y;
-    gSceneLights.m_Dir[2] = (u32) direction.z;
+    gSceneLights.m_Dir[0] = T2_F2U(direction.x);
+    gSceneLights.m_Dir[1] = T2_F2U(direction.y);
+    gSceneLights.m_Dir[2] = T2_F2U(direction.z);
     red = (func_002982F0(2.0f * (phaseScale * (f32) gFrameCountGameplay) * 0.06981317698955536f) * 64.0f) + 128.0f;
     redByte = (u32) red & 0xF8;
     cam->m_FogColor[0] = redByte;

@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "common.h"
 #include "ultra_types.h"
@@ -177,7 +178,21 @@ s32 __amDMA(s32 offset, s32 length, void *state) {
 
 /* ---- the manager ---- */
 
+static uint64_t sSynthNs, sAspNs; /* T2Audio_GetTimes (--bench) */
+
+static uint64_t am_now_ns(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (uint64_t)ts.tv_sec * 1000000000u + (uint64_t)ts.tv_nsec;
+}
+
+void T2Audio_GetTimes(uint64_t *synthNs, uint64_t *aspNs) {
+    *synthNs = sSynthNs;
+    *aspNs = sAspNs;
+}
+
 static void am_frame(void) {
+    uint64_t t0 = am_now_ns(), t1;
     s32 cmdLen = 0;
     Acmd *end;
     s16 *out = sOut[sCur];
@@ -196,8 +211,11 @@ static void am_frame(void) {
         fprintf(stderr, "t2audio: command list overflow (%d > %d)\n", (int)cmdLen, (int)sMaxCmds);
         abort();
     }
+    t1 = am_now_ns();
+    sSynthNs += t1 - t0;
     if (cmdLen > 0)
         T2Asp_Run((const uint32_t *)sCmd[sCur], (size_t)cmdLen);
+    sAspNs += am_now_ns() - t1;
     aiq_push(out, (size_t)n);
     sStats.frames++;
     if (sStats.frames % 21 == 0)

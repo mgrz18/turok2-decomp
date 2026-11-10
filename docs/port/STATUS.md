@@ -399,6 +399,46 @@ The matching build is unchanged. `tools/asm_diff.py --base 98574f3c -j 8` report
 over all 3,938 files after every merge and fix. A clean `make clean && make setup && make build &&
 make verify` gives the identical ROM (CRCs good, 123 shared .rodata objects agree).
 
+## Round 7, part v4: macOS, arm64 float conversions, performance (branch names-R7_v4)
+
+Commits (on the Mac clone `~/Documents/Proyectos/turok2_macport`, branch `names-R7_v4` from
+d3f05a74). Every `src/` change: asm_diff 0 against d3f05a74 on the box. No `include/` changes.
+The archive is unchanged (`47e8f73c…`).
+
+| commit | what |
+|---|---|
+| 6b74c760 | `WeaponActor_Update` (func_00257D48) host body. The N64 AI view zeroed the high half of `m_pfStep`, which crashed macOS entering mode 13. It also ran the mode table's row 0 instead of the current mode, **on Linux too**, and that is why the weapon switch never completed. Now the level-51 journey switches to weapon 2 (the bow, 20 arrows in the HUD) and Z enters the fire mode |
+| de2fe1cd | `--bench [FROM]` and `--pace` (debug): see [PERF.md](PERF.md) |
+| b07b8d5d, 37a8cf99 | `func_00225C08` (noise to kind-1 actors) host body: its FAKEMATCH tests an uninitialised local, which clang -O2 compiles to a trap. `CScene__ClearListCounts`: names-R7_v1's version taken byte for byte, so it merges clean |
+| 18150edd | **arm64**: negative float -> u32 conversions saturate to 0 (`fcvtzu`); the R4300 and x86-64 wrap. `T2_F2U` (TARGET_PORT: through s32) in the bone-matrix packing (packMtx: the Acclaim logo and every skinned actor lost their negative matrix elements on the Mac), the vertex-pattern hash, the scene light direction, the fill-rectangle corners. `tools/port/f2ucheck.py` lists all 99 float -> unsigned conversions. `-fsanitize=float-cast-overflow` confirms that none is left on the level-51 journey |
+| 321d1c9b, 37a8cf99 | `T2_DLDUMP_VTX=2/3`: every vertex, G_SETTIMG image hashes/bytes, G_MOVEMEM bytes (debug) |
+| ac622745 | `CScene__GetSwoosh`: `CISet__GetBlock` declared (an implicit `int` return truncated it on macOS once v1's particles spawn trails) |
+
+Results ([MACOS.md](MACOS.md) section 9, [PERF.md](PERF.md)):
+
+- macOS, this branch: the new game with the scripted journey runs to 15,000 frames with
+  `T2_STATE_LOG` identical to Linux. Debug and an `-O2` build agree. 26 of 30 screenshots match
+  Linux within 1% of the pixels. The other 4 are actor parts that Linux draws and the Mac does
+  not (the boat and Turok's hand in level 51), although the display lists are identical, every
+  vertex and matrix included. That is open.
+- The boot stops entering attract demo 1 (frame ~5470) **on both hosts**: v4-1 makes the demo's
+  weapon fire, and firing needs v1's `CParticleSystem__Spawn`. With v1 merged (scratch), the Mac
+  runs into the demo and the new game into the mode-12 cinemas. Truncations found there were
+  fixed by v1 (`ModelSweep_TestModel`, b8bca0e3) and v3
+  (`ImpactEvent_AreaDamage` & co., e26d87e9; `ImpactEvent_LevelSpecial` fixed by v5 in 06477da5); `RumbleCurve_Advance` (`gCurrentFB[1]` NULL,
+  `--offscreen-gl` only) is open: retest with v2's rumble fixes (be9c4bf8).
+- Performance (M5): level 51 costs 0.55 ms per drawn frame in Release and 1.05 ms in Debug (the
+  N64 budget is 33.3 ms). Drawing (Fast3D + GL) is about 80% of that. Paced at 60 Hz VIs / 30
+  fps, Release has no late VI in level 51; the late VIs are level loads only.
+
+To merge: `src/us/code/func_00257D48.c` (v2 may write the same function: keep one; mine runs
+the current mode), `func_00226390.c` (identical to v1's), `func_00223F50.c` (one line; v1 fixed it too in 5e724e40: keep either),
+`func_0021B95C.c`/`func_0021285C.c`/`func_0027C4E4.c`/`func_0027F64C.c` (a `T2_F2U` macro at the
+top of each), `port/app/game.cpp`/`main.cpp`/`game.h`/`offscreen_gl.*`,
+`port/audio/t2audio_mgr.c`/`t2audio.h` (`T2Audio_GetTimes`). After the merge, rerun
+`tools/port/f2ucheck.py` on new host bodies, and run the merged tree on the Mac and with Linux
+`--high-memory`.
+
 ## Round 5: build and run (Linux x86_64, the box)
 
 ```sh
