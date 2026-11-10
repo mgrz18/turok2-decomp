@@ -48,17 +48,26 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
 #include "globals/scene.h"
 #include "structs/camera.h"
 #include "structs/menu.h"
+#include "structs/controller.h"
 #include <stdio.h>
 
 void T2Port_LogState(int frame) {
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
 
-    printf("state: frame %d mode %d level %d", frame, (int) gEngineApp.m_Settings.mode, (int) gScene.m_nLevel);
+    printf("state: frame %d mode %d level %d warp %d paused %d", frame, (int) gEngineApp.m_Settings.mode,
+           (int) gScene.m_nLevel, (int) gScene.m_WarpState, (int) gEngineApp.m_Settings.paused);
     if (p != NULL) {
         CGameObjectInstance *a = &p->m_CharacterActor;
         printf(" player pos (%.1f %.1f %.1f) rotY %.2f health %d aimode %d weapon %d",
                a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z, a->m_RotY,
                (int) (p->m_Data.m_Health >> 8), (int) a->m_AI.m_Mode, (int) p->m_Data.m_CurrentWeapon);
+        printf(" pmode %d buttons %x move (%.2f %.2f) look (%.2f %.2f) contp %p", (int) p->m_Mode,
+               (unsigned) p->m_ContState.m_dwButtons, p->m_ContState.m_MoveX, p->m_ContState.m_MoveY,
+               p->m_ContState.m_LookX, p->m_ContState.m_LookY, (void *) p->m_ContState.m_pContState);
+        if (p->m_ContState.m_pContState != NULL) {
+            ControllerProfile *c = p->m_ContState.m_pContState;
+            printf(" pad %x/%x stick %d %d", (unsigned) c->inputButtons, (unsigned) c->buttons, c->stickX, c->stickY);
+        }
     }
     if (p != NULL && p->m_pCamera != NULL && ((MenuPool *) p->m_pCamera->m_MenuPool)->head != NULL) {
         Menu *m = ((MenuPool *) p->m_pCamera->m_MenuPool)->head;

@@ -256,8 +256,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             lastMenu = menu;
             lastCursor = cursor;
         }
-        static const bool stateLog = getenv("T2_STATE_LOG") != nullptr;
-        if (stateLog && (f + 1) % 60 == 0) {
+        // T2_STATE_LOG=1: every 60 frames; =N (N > 1): every N frames
+        static const int statePeriod = getenv("T2_STATE_LOG") == nullptr ? 0
+                                       : (atoi(getenv("T2_STATE_LOG")) > 1 ? atoi(getenv("T2_STATE_LOG")) : 60);
+        if (statePeriod > 0 && (f + 1) % statePeriod == 0) {
             T2Port_LogState(f + 1); // DEBUG-ONLY: T2_STATE_LOG=1
         }
         if (int m = T2Port_EngineMode(); m != mode) {
