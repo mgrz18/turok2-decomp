@@ -4,6 +4,15 @@ typedef unsigned char u8;
 typedef signed short s16;
 typedef unsigned short u16;
 typedef signed int s32;
+#ifndef COMMON_H
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef signed int sptr;
+typedef unsigned int uptr;
+#endif
+#endif
 typedef unsigned int u32;
 typedef signed long long s64;
 typedef unsigned long long u64;
@@ -12,7 +21,7 @@ typedef double f64;
 s32 osSetIntMask(s32);
 s32 alUnlink(void *);
 s32 alLink(void *, void *);
-void _removeEvents(void *arg0, s32 arg1)
+void _removeEvents(void *arg0, sptr arg1)
 {
   long long new_var;
   s32 temp_s3;

@@ -23,7 +23,7 @@ s32 Pak_FindFreeExtLetter_2(s32 pad, u8 *ext);
 s32 Pak_SaveNoteVerified_2(s32 pad, s32 size, char *n1, char *n2, u8 *ext, u8 *buf);
 void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, void *d, void *e);
 void CCache__Flush(s32 a);
-void CCache__Deallocate(s32 a, void *p);
+void CCache__Deallocate(sptr a, void *p);
 /* Controller-pak name for the selected pad (inlined). */
 static __inline__ char *O01Pick(O01Pad *sel) {
     switch (sel->v) {

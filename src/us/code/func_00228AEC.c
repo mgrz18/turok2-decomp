@@ -16,7 +16,7 @@ typedef struct {
     /* 0x14 */ PoolNode00228AEC *freeHead;
 } Pool00228AEC;
 
-void *CDLightSet__Alloc(Pool00228AEC *arg0, s32 arg1) {
+void *CDLightSet__Alloc(Pool00228AEC *arg0, sptr arg1) {
     PoolNode00228AEC *temp_s0;
 
     temp_s0 = arg0->freeHead;

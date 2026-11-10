@@ -9,7 +9,7 @@ typedef struct {
     /* 0x1E */ s16 unk1E;
 } Sound;
 
-s32 CAudioWorld__GetSndPlayer(s32);                             /* extern */
+s32 CAudioWorld__GetSndPlayer(sptr);                             /* extern */
 s32 alSndpSetSound(sptr, s16);                    /* extern */
 s32 alSndpStop(sptr);                         /* extern */
 

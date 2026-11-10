@@ -7,7 +7,7 @@
 
 extern void LoopSounds_Stop(void *pool, struct CLoopingSoundData *sound);
 extern struct CLoopingSoundData *LoopSounds_Start(void *pool, s32 id, CVector3 *pos,
-                                               CVector3 *pos2, s32 arg4);
+                                               CVector3 *pos2, sptr arg4);
 
 /* Restarts the player's weapon firing looping sound with sound id. */
 void CPlayer__StartWeaponFiringSound(CPlayer *player, s32 id) {

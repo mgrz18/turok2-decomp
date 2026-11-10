@@ -15,7 +15,7 @@ extern s32 gPakMenuIsSave; /* local type: globals/pak.h declares it; this view (
 extern u8 gPakProfile[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern char gPakCharacterNoteName[]; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
 extern char gPakGameCode[]; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
-s32 Pak_BytesToPages(s32 n);
+s32 Pak_BytesToPages(sptr n);
 s32 Pak_GetFreePages(s32 pad, s32 *out);
 s32 Pak_CountEmptyNotes(s32 pad, s32 *out);
 s32 Pak_FindFreeExtLetter(s32 pad, u8 *ext);
@@ -23,7 +23,7 @@ s32 Pak_SaveNoteVerified(s32 pad, s32 size, u8 *buf, char *n1, u8 *ext, char *n2
 extern s32 gSaveBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
 extern s32 gLoadBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
 void CCache__Flush(s32 a);
-void CCache__Deallocate(s32 a, sptr b);
+void CCache__Deallocate(sptr a, sptr b);
 /* Static inlines in the Rage Wars source file (dropped by the importer). */
 static inline u8 *O01Pick(O01Pad *sel) {
     u8 *p;
@@ -59,7 +59,7 @@ static inline void O01FreeAll(void) {
     gSaveBuffer = 0;
     gLoadBuffer = 0;
 }
-s32 PakMenu_WriteProfile(s32 unused, Menu *own, s32 unused3) {
+s32 PakMenu_WriteProfile(sptr unused, Menu *own, s32 unused3) {
     CPlayer *plr;
     CPlayer *pp;
     s32 pv;

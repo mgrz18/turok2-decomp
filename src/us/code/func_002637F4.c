@@ -2,7 +2,7 @@
 #include "structs/vector.h"
 #include "globals/scene.h"
 
-u8 *CLevelActorPool__Spawn(CLevelActorPool *table, void *slot, s32 arg, CVector3 origin, CVector3 pos, s32 b, s32 c);
+u8 *CLevelActorPool__Spawn(CLevelActorPool *table, void *slot, s32 arg, CVector3 origin, CVector3 pos, sptr b, s32 c);
 void Actor_SpawnParticle(void *actor, s32 event, CVector3 pos, s32 n);
 
 void Generator_SpawnPickup(u8 *actor, u8 *state, CVector3 pos, s32 arg, s32 kind) {

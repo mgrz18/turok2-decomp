@@ -9,7 +9,7 @@ typedef struct {
 
 void COverlay__Update();                               /* extern */
 
-void COverlay__StartScript(ModeState *arg0, s32 arg1) {
+void COverlay__StartScript(ModeState *arg0, sptr arg1) {
     arg0->value = arg1;
     arg0->mode = 2;
     COverlay__Update();

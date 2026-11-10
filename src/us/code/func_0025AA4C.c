@@ -4,6 +4,6 @@
 #include "protos/ai.h"
 
 
-void EnemyAnim_NormalDeath_B0360(CGameObjectInstance *obj, s32 arg1) {
+void EnemyAnim_NormalDeath_B0360(CGameObjectInstance *obj, sptr arg1) {
     AI_PickAnimFromTable((sptr) obj, arg1, sEnemyAnimNormalDeath_B0360, obj->header.m_pIntelligence->m_Enemy.m_wNormalDeathAnimFlags);
 }

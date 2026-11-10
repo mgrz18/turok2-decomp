@@ -3,7 +3,7 @@
 #include "globals/engine.h"
 
 f32 Math_DecayToZero(f32, f32);
-s32 EnemyAI_GetBehaviorIndex(s32, sptr);
+s32 EnemyAI_GetBehaviorIndex(sptr, sptr);
 
 
 void EnemyHover_Advance(sptr arg0, CAI *ai) {

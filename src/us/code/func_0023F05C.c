@@ -7,9 +7,9 @@ s32 CPooledLevelActor__Release(s32);
 s32 CPlayer__CollectPickup(sptr, sptr, s32);
 s32 GameObject_GetTypeId(sptr);
 
-s32 CGameRegion__FireTriggers(sptr, s32, s32);           /* extern */
+s32 CGameRegion__FireTriggers(sptr, s32, sptr);           /* extern */
 
-void CPlayer__TouchPickup(s32 arg0, CPooledLevelActor *arg1) {
+void CPlayer__TouchPickup(sptr arg0, CPooledLevelActor *arg1) {
     u16 temp_v0;
     u16 temp_v1;
 

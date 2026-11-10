@@ -4,7 +4,7 @@
 
 void LevelEvent_ProcessTriggers(sptr, s32, s32, s32, s32, s32, sptr); /* extern */
 
-void CGameRegion__FireTriggers(sptr arg0, s32 arg1, s32 arg2) {
+void CGameRegion__FireTriggers(sptr arg0, s32 arg1, sptr arg2) {
     sptr sp20;
     s32 sp24;
 

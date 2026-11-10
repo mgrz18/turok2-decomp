@@ -12,8 +12,8 @@
 s32 Render_SetupMaterial(s32, s32);
 void Render_SetRenderMode(s32);
 
-void func_0020BBE4(s32 arg0, s32 renderMode, s32 **model, s32 matrix, s32 projected,
-                   s32 lights, s32 *segment, s32 group, s32 arg8) {
+void func_0020BBE4(sptr arg0, s32 renderMode, s32 **model, sptr matrix, s32 projected,
+                   sptr lights, s32 *segment, s32 group, s32 arg8) {
     s32 *obj;
     s32 *list;
     s32 *entry;

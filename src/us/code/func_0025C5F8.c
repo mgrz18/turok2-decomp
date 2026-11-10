@@ -69,7 +69,7 @@ void *CPlayerPool__FindNearest(CPlayerPool *players, CVector3 pos);
 f32 Random_Blend(f32 lo, f32 hi);
 void EnemyAI_TickTimers(Object *obj, AI *ai);
 void AI_TurnHeadToTarget(Object *obj, AI *ai, f32);
-void Sound__Play(s16 sound, CVector3 pos, sptr, s32);
+void Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
 void AI_StartSound(Object *obj, AI *ai, s32 sound);
 void AI_StopSound(Object *obj, AI *ai);
 

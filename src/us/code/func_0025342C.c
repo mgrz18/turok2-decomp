@@ -2,6 +2,15 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 typedef signed int s32;
+#ifndef COMMON_H
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef signed int sptr;
+typedef unsigned int uptr;
+#endif
+#endif
 
 /* Turok 2 player record (Rage Wars: controller 0x698, next 0x16E0). */
 typedef struct PlayerRecord {
@@ -17,7 +26,7 @@ typedef struct Round {
 } Round;
 
 /* Find the player record driven by controller arg1. */
-void *CPlayerPool__FindByController(char *object, s32 arg1) {
+void *CPlayerPool__FindByController(char *object, sptr arg1) {
     Round *round = (Round *)object;
     PlayerRecord *record = round->players;
     if (record != 0) {

@@ -11,7 +11,7 @@ typedef struct {
     /* 0x30 */ s32 unk30;
 } Loader;
 
-s32 CLoader__LoadSync(CLoader *reader, sptr, s32, sptr);
+s32 CLoader__LoadSync(CLoader *reader, sptr, sptr, sptr);
 s32 SavedPlayers_IsActive();                                /* extern */
 
 void CScene__LoadBitSections_2(Loader *arg0) {

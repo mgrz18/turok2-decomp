@@ -10,7 +10,7 @@ void CVector3__Normalize(CVector3 *v);
 f32 Math_AcosLookup(f32 x);
 f32 func_002982F0(f32 x);
 f32 __builtin_fabsf(f32 x);
-s32 Sound_CalcPan(s32 a0, u8 *obj) {
+s32 Sound_CalcPan(sptr a0, u8 *obj) {
     CVector3 r;
     CVector3 d;
     CVector3 w;

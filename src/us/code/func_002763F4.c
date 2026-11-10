@@ -59,7 +59,7 @@ static __inline__ void func_802596D4_voiceInit(VoiceRecAt8 *voice, s32 owner) {
     func_802596D4_linkInit(&voice->link);
     SndVoice_Construct(&voice->header, owner, -1);
 }
-void SndQueue_Construct(ChannelSet *set, s32 owner) {
+void SndQueue_Construct(ChannelSet *set, sptr owner) {
     s32 i;
     set->owner = owner;
     func_802596D4_linkInit(&set->free);

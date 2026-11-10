@@ -14,13 +14,13 @@
  * stops the pak sounds and shows the result (or the "not enough space" message). */
 
 extern s32 D_800F70A8;
-u32 Pak_BytesToPages(u32 n);
+u32 Pak_BytesToPages(uptr n);
 s32 Pak_GetFreePages(s32 pad, s32 *out);
 s32 Pak_CountEmptyNotes(s32 pad, s32 *out);
 s32 Pak_FindFreeExtLetter(s32 pad, u8 *ext);
 s32 Pak_SaveNoteVerified(s32 pad, s32 size, sptr buf, char *n1, u8 *ext, char *n2);
 void CCache__Flush(s32 a);
-void CCache__Deallocate(s32 a, sptr b);
+void CCache__Deallocate(sptr a, sptr b);
 void Cinema_StopAtEnd(void);
 void Cinema_RequestById(s32 a);
 

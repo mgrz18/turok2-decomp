@@ -6,7 +6,7 @@
 #include "globals/menu_data.h"
 #include "protos/menu.h"
 
-extern s32 Controller_MenuRight(s32);
+extern s32 Controller_MenuRight(sptr);
 extern s32 Controller_ConfirmPressed(sptr);
 
 /* Steps the selection (twice when the controller reports busy) and sets the scale

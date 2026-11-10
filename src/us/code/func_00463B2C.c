@@ -25,7 +25,7 @@ extern s32 ProPack__Decompress(s32, sptr);
 extern void CCollisionInfo__Reset(void);
 extern void CDecompressor__Flush(CDecompressor *thisx);
 extern void **CCache__Allocate(s32 unused, s32 size, s32 mode, char *name);
-extern void CCache__Deallocate(s32 unused, void **block);
+extern void CCache__Deallocate(sptr unused, void **block);
 extern void CCache__Flush(s32);
 extern void **CCache__LoadPersistantIndex(s32 unused, void **out, sptr key, char *name);
 extern void **CCache__LoadPersistantSubBlock(s32 unused, void *file, s32 index, s32 key, CScene *owner, void *callback, char *name);

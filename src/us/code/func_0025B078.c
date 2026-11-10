@@ -32,7 +32,7 @@ typedef struct {
 extern s32 Random_Next(void); /* rand */
 extern sptr CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, sptr model, sptr arg2);
 
-s32 EnemyAI_PickDeathMode(CGameObjectInstance *actor, s32 unused, HitInfo *hit) {
+s32 EnemyAI_PickDeathMode(CGameObjectInstance *actor, sptr unused, HitInfo *hit) {
     CEnemyIntelligence *anims;
     Source *src;
     s32 front = 0;

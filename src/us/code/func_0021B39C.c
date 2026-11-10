@@ -37,7 +37,7 @@ void CVector3__Cross(CVector3 *o, CVector3 *a, CVector3 *b);
 void CVector3__Scale(CVector3 *o, CVector3 *a, f32 s);
 void CVector3__Normalize(CVector3 *v);
 
-void func_0021B39C(s32 a, B10Pb *b, B10Pc *c, CVector3 v1, CVector3 v2, s32 idx) {
+void func_0021B39C(sptr a, B10Pb *b, B10Pc *c, CVector3 v1, CVector3 v2, s32 idx) {
     CVector3 r;
     CVector3 t;
     CVector3 x;

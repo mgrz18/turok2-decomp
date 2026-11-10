@@ -17,7 +17,7 @@ void CInstancePool__Construct_2(CInstancePool *pool) {
     }
 }
 #else
-void CInstancePool__Construct_2(s32 arg0) {
+void CInstancePool__Construct_2(sptr arg0) {
     sptr var_s0;
     s32 var_s1;
 

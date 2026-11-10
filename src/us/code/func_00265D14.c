@@ -68,7 +68,7 @@ struct Shared_Actor {
     struct Shared_Entity * entity;
 };
 extern void Actor_SpawnParticle(void *, s32, Triple, s32);
-extern s32 Sound__Play(s16, CVector3, sptr, s32);
+extern s32 Sound__Play(s16, CVector3, sptr, sptr);
 struct Player;
 extern void AI_DropPickupsOnce(struct Player *, s32 *, s32, s32, s32);
 typedef struct {

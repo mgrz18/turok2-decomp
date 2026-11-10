@@ -8,7 +8,7 @@
 #include "protos/list.h"
 #include "protos/cache.h"
 
-extern s32 CHeap__Free(CHeap *, s32);
+extern s32 CHeap__Free(CHeap *, sptr);
 static __inline__ CMemEntry *find_stale(CMemEntry **recent) {
     CMemEntry *node;
     for (node = gCache.memAgeList.m_pTail; node != 0; node = node->last) {

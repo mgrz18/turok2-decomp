@@ -8,7 +8,7 @@
 /* Same family as CParticle__UpdateHomingMissile (homing missile): here a projectile that flies
  * back to a point beside its owner's player and is caught there. */
 
-extern void *LoopSounds_Start(s32 bank, s32 sound, CVector3 *pos, CVector3 *pos2, s32 loops);  /* starts a sound */
+extern void *LoopSounds_Start(sptr bank, s32 sound, CVector3 *pos, CVector3 *pos2, sptr loops);  /* starts a sound */
 extern void CParticle__StopLoopSound(void *obj);
 
 extern f32 HalfToFloat(s32 half);                         /* half float -> f32 */

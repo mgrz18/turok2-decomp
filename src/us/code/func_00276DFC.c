@@ -11,7 +11,7 @@ typedef struct {
 
 void CAudioWorld__Lock(sptr);                            /* extern */
 void CAudioWorld__Unlock(sptr);                            /* extern */
-s32 CAudioWorld__GetSndPlayer(s32);                             /* extern */
+s32 CAudioWorld__GetSndPlayer(sptr);                             /* extern */
 void alSndpSetSound(sptr, s16);                       /* extern */
 void alSndpStop(sptr);                            /* extern */
 

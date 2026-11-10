@@ -2,7 +2,7 @@
 #include "globals/menu.h"
 #include "structs/game.h"
 
-void Controller_UnwatchPak(s32);
+void Controller_UnwatchPak(sptr);
 s32 CEngineApp__SetupFadeTo(sptr, s32);
 
 

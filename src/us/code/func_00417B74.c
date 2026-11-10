@@ -5,7 +5,7 @@
 
 extern void func_00417B74(void *arg0, s32 arg1);
 extern void Controller_WatchPak(s32 arg);
-extern void Controller_UnwatchPak(s32 arg);
+extern void Controller_UnwatchPak(sptr arg);
 void func_00417B74(void *arg0, s32 arg1) {
     s32 val;
     MenuRecAt20V2 *menu = arg0;

@@ -11,7 +11,7 @@ extern u8 D_801100D4[];
 extern void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params);
 extern void CGameObjectInstance__DrawModel(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params);
 extern void Render_DrawModelShared(sptr model, sptr matrix, s32 segment, void *lights, sptr textures, s32 lod, s32 pass);
-extern void func_0020BBE4(void *arg0, s32 renderMode, sptr model, s32 matrix, s32 projected, void *lights, sptr segment, s32 group, s32 arg8);
+extern void func_0020BBE4(void *arg0, s32 renderMode, sptr model, sptr matrix, s32 projected, void *lights, sptr segment, s32 group, s32 arg8);
 
 void EnemyAI_DrawFaded(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params) {
     u8 alpha;

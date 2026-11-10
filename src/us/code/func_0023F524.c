@@ -9,7 +9,7 @@
 void Sound__Play2D(s32 sound);
 void CCamera__StartFlash(void *ui, s32 red, s32 green, s32 blue, s32 alpha, s32 a5, s32 a6, s32 a7);
 void CCameraPool__AddText(void *arg0, void *ui, void *resource);
-s32 Sound__Play(s32 sound, CVector3 position, sptr arg4, s32 arg5);
+s32 Sound__Play(s32 sound, CVector3 position, sptr arg4, sptr arg5);
 void Sound__PlaySpeech(s32 callback);
 
 /* Flashes the screen and plays the descriptor's optional resource, sound and callback. */

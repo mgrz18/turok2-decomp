@@ -5,7 +5,7 @@
 #include "protos/cache.h"
 #include "protos/ultra.h"
 
-s32 CHeap__Free(CHeap *, s32);
+s32 CHeap__Free(CHeap *, sptr);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 

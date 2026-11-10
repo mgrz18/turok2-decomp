@@ -19,7 +19,7 @@ void Trail_DrawTextured(TrailMgr *, Trail *, s32);
 void Trail_DrawUntextured(TrailMgr *, Trail *, s32);
 
 /* Draws the trails: the negative layers first, then the positive ones. */
-void Trail_DrawAll(TrailMgr *mgr, s32 arg) {
+void Trail_DrawAll(TrailMgr *mgr, sptr arg) {
     Trail *e;
 
     GFX_CMD(0xE7000000, 0)

@@ -39,7 +39,7 @@ void Sound__Play(s32 sound, f32 x, f32 y, f32 z, s32 arg4, s32 arg5);
 #define DOT(a, b) ((a).x * (b).x + (a).y * (b).y + (a).z * (b).z)
 
 /* Sweep against the six faces of a box given by its eight corners. */
-s32 Sweep_TestBoxFaces(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start, CVector3 *corners,
+s32 Sweep_TestBoxFaces(Sweep *sweep, sptr unused, HitInst *other, CVector3 *start, CVector3 *corners,
                   HitFrame *frame, s32 hitKind) {
     CVector3 *quad[4];
     CVector3 normal;

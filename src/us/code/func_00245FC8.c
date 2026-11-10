@@ -9,7 +9,7 @@ s32 Collision_MoveInstance(void *obj, CVector3 to, struct CollisionInfo *info);
 
 /* Whether the line from the top of `from` to the top of `target` is blocked,
  * by something other than `target` itself. */
-s32 AI_IsLineOfSightBlocked(CGameObjectInstance *target, s32 unused, CGameObjectInstance *from) {
+s32 AI_IsLineOfSightBlocked(CGameObjectInstance *target, sptr unused, CGameObjectInstance *from) {
     CObjectHead saved;
     CVector3 to;
     s32 hit;

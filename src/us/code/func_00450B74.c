@@ -3,6 +3,15 @@
 
 typedef signed char s8;
 typedef signed int s32;
+#ifndef COMMON_H
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef signed int sptr;
+typedef unsigned int uptr;
+#endif
+#endif
 struct PakMenuSlot;
 struct PakMenuSlot {
     char pad0[0x4];
@@ -29,7 +38,7 @@ struct MenuRecAt20V2 {
 };
 extern void func_00450B74(void *arg0, s32 arg1);
 extern void Controller_WatchPak(s32 arg);
-extern void Controller_UnwatchPak(s32 arg);
+extern void Controller_UnwatchPak(sptr arg);
 void func_00450B74(void *arg0, s32 arg1) {
     s32 val;
     MenuRecAt20V2 *menu = arg0;

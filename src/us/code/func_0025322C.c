@@ -4,7 +4,7 @@
 s32 CPlayer__DrawHud(void *, s32);                 /* extern */
 s32 CCamera__LoadOnScreenProjection(sptr);                         /* extern */
 
-void CPlayerPool__DrawHuds(CPlayerPool *arg0, s32 arg1) {
+void CPlayerPool__DrawHuds(CPlayerPool *arg0, sptr arg1) {
     CPlayer *var_s0;
 
     CCamera__LoadOnScreenProjection(arg1);

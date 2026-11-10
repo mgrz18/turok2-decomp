@@ -12,7 +12,7 @@ u32 CPlayer__GetPickupCountHigh(CPlayer *player, s32 item) {
     return 1;
 }
 #else
-u32 CPlayer__GetPickupCountHigh(s32 arg0, s32 arg1)
+u32 CPlayer__GetPickupCountHigh(sptr arg0, s32 arg1)
 {
   s32 new_var;
   if (!(gEngineApp_m_Settings.cheatFlags & 0x10))

@@ -1396,7 +1396,7 @@ f32 Menu_TextWidth(u8 *p, f32 sx, f32 sy) {
 /* ---------------- MenuItem_SelectSubmenu ---------------- */
 s32 func_00415FB8_416454(s32, s32) __asm__("MenuPool_OpenSubmenu");
 
-s32 MenuItem_SelectSubmenu(s32 arg0, s32 arg1, s32 arg2) {
+s32 MenuItem_SelectSubmenu(s32 arg0, sptr arg1, s32 arg2) {
     return func_00415FB8_416454(arg2, arg1) != 0;
 }
 

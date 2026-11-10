@@ -24,7 +24,7 @@ s32 Pak_GetFreePages(s32 a, s32 *b);
 void Pak_GetNoteGameName(s32 a, s32 b, sptr *c);
 s32 Pak_NeedsRepair(s32 a);
 void Pak_DecodeText(sptr a, u8 *b, s32 c);
-s32 Pak_BytesToPages(s32 a);
+s32 Pak_BytesToPages(sptr a);
 void PakMenu_UpdateNoteRows(Menu *o);
 s32 PakMenu_CheckSlotForSave(Menu *o, s32 a, s32 *b, s32 *c);
 

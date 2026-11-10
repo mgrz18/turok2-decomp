@@ -3,7 +3,7 @@
 #include "globals/game.h"
 #include "protos/game.h"
 
-void Controller_UnwatchPak(s32);
+void Controller_UnwatchPak(sptr);
 s32 Controller_ResetRumble(sptr);
 
 

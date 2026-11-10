@@ -14,7 +14,7 @@ void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, sptr arg3)
 
 /* Lays out the eight slots of the weapon wheel, dropping in as it opens,
  * and draws them. */
-void CBarrel__DrawEight(CBarrel *menu, s32 arg1, s32 arg2) {
+void CBarrel__DrawEight(CBarrel *menu, sptr arg1, sptr arg2) {
     f32 m[16];
     CVector3 position;
     CBarrelIcon items[36];

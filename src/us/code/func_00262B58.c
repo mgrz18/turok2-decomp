@@ -11,7 +11,7 @@ typedef struct {
     /* 0x90 */ s32 value;
 } Effect00262B58;
 
-void Turret_Effects(s32 arg0, Effect00262B58 *arg1) {
+void Turret_Effects(sptr arg0, Effect00262B58 *arg1) {
     CGameObjectInstance *temp_a0;
     CTurretIntelligence *temp_s1;
     CGameObjectInstance *temp_v0;

@@ -12,7 +12,7 @@ s32 CPlayer__GetPickupCountLow(CPlayer *player, s32 item) {
     return 1;
 }
 #else
-s32 CPlayer__GetPickupCountLow(s32 arg0, s32 arg1)
+s32 CPlayer__GetPickupCountLow(sptr arg0, s32 arg1)
 {
   unsigned long long new_var;
   new_var = 1;

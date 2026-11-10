@@ -10,7 +10,7 @@ s32 MantidQueen_Draw(sptr, sptr, sptr);
 
 extern s32 EnemyAI_HeadNodeCallback;
 
-void MantidQueen_InitAI(s32 arg0, CAI *arg1) {
+void MantidQueen_InitAI(sptr arg0, CAI *arg1) {
     gScene_m_LevelID = 0x1D4D;
     arg1->m_pModeTable = (CAIModeInfo *) sMantidQueenModeTable;
     arg1->m_pfStep = MantidQueen_Step;

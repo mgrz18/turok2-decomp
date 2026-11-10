@@ -13,7 +13,7 @@
 
 
 
-extern s32 Controller_ConfirmPressed(s32 pad);
+extern s32 Controller_ConfirmPressed(sptr pad);
 extern s32 Controller_MenuLeft(sptr pad);
 extern s32 Controller_MenuRight(sptr pad);
 extern void Menu_ClaimPressingController(Menu *c);

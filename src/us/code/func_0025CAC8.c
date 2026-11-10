@@ -24,7 +24,7 @@ typedef struct Projectile {
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 extern f32 CVector3__Distance(CVector3 *a, CVector3 *b);
-extern void Sound__Play(s16 sound, CVector3 pos, sptr, s32);
+extern void Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
 
 /* A noise at pos within 3072 units lengthens the wait and is remembered. */
 static __inline__ void hearNoise(CGameObjectInstance *actor, CAI *ai, CVector3 *pos) {

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-void Destructible_Step(s32 arg0, CAI *arg1) {
+void Destructible_Step(sptr arg0, CAI *arg1) {
     s32 (*temp_v0_2)();
     CAIModeInfo *temp_v0;
 

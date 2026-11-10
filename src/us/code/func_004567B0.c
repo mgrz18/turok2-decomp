@@ -27,7 +27,7 @@ typedef struct {
 extern char D_800C13F0[];
 
 void CCache__Flush(s32 heap);
-void CCache__Deallocate(s32 heap, MemHandle *handle);
+void CCache__Deallocate(sptr heap, MemHandle *handle);
 MemHandle *CCache__Allocate(s32 heap, s32 size, s32 tag, char *name);
 void memset(void *dst, s32 value, sptr size);
 void func_0029E460(void *dst, void *src, s32 size);

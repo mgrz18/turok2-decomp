@@ -23,7 +23,7 @@ void CCache__DeallocateInternal(s32 arg0, CMemEntry *e) {
     }
 }
 #else
-s32 CHeap__Free(CHeap *, s32);
+s32 CHeap__Free(CHeap *, sptr);
 s32 CCache__FreeMemEntry(s32, sptr);
 s32 CCache__DetachCacheEntry(s32, sptr);
 

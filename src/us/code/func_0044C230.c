@@ -1367,7 +1367,7 @@ f32 Menu_TextWidth_2(u8 *p, f32 sx, f32 sy) {
 /* ---------------- MenuItem_SelectSubmenu_2 ---------------- */
 s32 func_00415FB8_416454(s32, s32) __asm__("MenuPool_OpenSubmenu_2");
 
-s32 MenuItem_SelectSubmenu_2(s32 arg0, s32 arg1, s32 arg2) {
+s32 MenuItem_SelectSubmenu_2(sptr arg0, sptr arg1, sptr arg2) {
     return func_00415FB8_416454(arg2, arg1) != 0;
 }
 
@@ -1475,7 +1475,7 @@ extern s32 *func_00204EDC_416644() __asm__("CCache__Allocate");
 extern void func_00414EA8_416644() __asm__("Menu_Construct_2");
 extern void CList__AddHead_416644(MenuPool *a, s32 b) __asm__("CList__AddHead");
 /* Opens the window described by b in the pool a. */
-s32 MenuPool_OpenMenu_2(MenuPool *a, MenuDesc *b, s32 c, s32 d, s32 e) {
+s32 MenuPool_OpenMenu_2(MenuPool *a, MenuDesc *b, sptr c, sptr d, sptr e) {
     s32 size, i;
     s32 *r;
     s32 s;
