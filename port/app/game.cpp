@@ -170,43 +170,115 @@ int ContInit(uint8_t* bits) {
     return osContInit(&sContQueue, bits, status);
 }
 
-// --input "START@200,A@320,DD@400": scripted presses on port 1 for headless runs (debug aid,
-// docs/port/INPUT.md). Each press holds the button for kInputHold host frames from FRAME on.
+// --input: scripted input on port 1 for headless runs (debug aid, docs/port/INPUT.md section 3).
+// Entries are separated by commas or whitespace; "@FILE" reads them from a file (# comments).
+//   BUTTON@F        press BUTTON for kInputHold host frames from frame F on
+//   BUTTON@F1..F2   hold BUTTON from frame F1 to F2 (inclusive)
+//   SX=V@F1..F2     stick X = V (-128..127, + = right) over the range (SY: + = up);
+//   SX=V@F          ... for kInputHold frames. Overlapping stick entries: the last one wins.
+// Buttons: A B Z START DU DD DL DR L R CU CD CL CR.
 struct ScriptedPress {
     int frame;
+    int last; // inclusive
     uint16_t button;
+    int axis; // 0 = button, 1 = stick X, 2 = stick Y
+    int value;
 };
 std::vector<ScriptedPress> sScript;
 int sFrame;
 constexpr int kInputHold = 4;
 
-bool ParseInputScript(const std::string& spec) {
+bool ParseInputItem(const std::string& item) {
     static const struct {
         const char* name;
         uint16_t bit;
     } kButtons[] = { { "A", 0x8000 },  { "B", 0x4000 },  { "Z", 0x2000 },  { "START", 0x1000 }, { "DU", 0x0800 },
                      { "DD", 0x0400 }, { "DL", 0x0200 }, { "DR", 0x0100 }, { "L", 0x0020 },     { "R", 0x0010 },
                      { "CU", 0x0008 }, { "CD", 0x0004 }, { "CL", 0x0002 }, { "CR", 0x0001 } };
-    size_t pos = 0;
-    while (pos < spec.size()) {
-        size_t end = spec.find(',', pos);
-        std::string item = spec.substr(pos, end == std::string::npos ? std::string::npos : end - pos);
-        pos = end == std::string::npos ? spec.size() : end + 1;
-        size_t at = item.find('@');
-        if (at == std::string::npos) {
+    size_t at = item.find('@');
+    if (at == std::string::npos) {
+        return false;
+    }
+    std::string name = item.substr(0, at);
+    std::string range = item.substr(at + 1);
+    ScriptedPress p = {};
+    size_t dots = range.find("..");
+    char* endp = nullptr;
+    p.frame = (int)strtol(range.c_str(), &endp, 10);
+    if (endp == range.c_str()) {
+        return false;
+    }
+    if (dots != std::string::npos) {
+        const char* l = range.c_str() + dots + 2;
+        p.last = (int)strtol(l, &endp, 10);
+        if (endp == l || p.last < p.frame) {
             return false;
         }
-        std::string name = item.substr(0, at);
-        uint16_t bit = 0;
-        for (auto& b : kButtons) {
-            if (name == b.name) {
-                bit = b.bit;
+    } else {
+        p.last = p.frame + kInputHold - 1;
+    }
+    size_t eq = name.find('=');
+    if (eq != std::string::npos) {
+        std::string axis = name.substr(0, eq);
+        if (axis == "SX") {
+            p.axis = 1;
+        } else if (axis == "SY") {
+            p.axis = 2;
+        } else {
+            return false;
+        }
+        const char* v = name.c_str() + eq + 1;
+        p.value = (int)strtol(v, &endp, 10);
+        if (endp == v || p.value < -128 || p.value > 127) {
+            return false;
+        }
+        sScript.push_back(p);
+        return true;
+    }
+    for (auto& b : kButtons) {
+        if (name == b.name) {
+            p.button = b.bit;
+        }
+    }
+    if (p.button == 0) {
+        return false;
+    }
+    sScript.push_back(p);
+    return true;
+}
+
+bool ParseInputScript(const std::string& spec) {
+    std::string text = spec;
+    if (!spec.empty() && spec[0] == '@') {
+        FILE* fp = fopen(spec.c_str() + 1, "r");
+        if (!fp) {
+            fprintf(stderr, "--input: cannot open %s\n", spec.c_str() + 1);
+            return false;
+        }
+        text.clear();
+        char line[512];
+        while (fgets(line, sizeof line, fp)) {
+            char* hash = strchr(line, '#');
+            if (hash) {
+                *hash = '\0';
             }
+            text += line;
+            text += ' ';
         }
-        if (bit == 0) {
-            return false;
+        fclose(fp);
+    }
+    std::string item;
+    for (size_t i = 0; i <= text.size(); i++) {
+        char c = i < text.size() ? text[i] : ',';
+        if (c == ',' || c == ' ' || c == '\t' || c == '\n' || c == '\r') {
+            if (!item.empty() && !ParseInputItem(item)) {
+                fprintf(stderr, "--input: bad entry '%s'\n", item.c_str());
+                return false;
+            }
+            item.clear();
+        } else {
+            item += c;
         }
-        sScript.push_back({ atoi(item.c_str() + at + 1), bit });
     }
     return true;
 }
@@ -214,11 +286,23 @@ bool ParseInputScript(const std::string& spec) {
 uint16_t ScriptedButtons() {
     uint16_t b = 0;
     for (auto& p : sScript) {
-        if (sFrame >= p.frame && sFrame < p.frame + kInputHold) {
+        if (p.axis == 0 && sFrame >= p.frame && sFrame <= p.last) {
             b |= p.button;
         }
     }
     return b;
+}
+
+// The scripted stick: true (and x/y set) when an SX/SY entry covers this frame.
+bool ScriptedStick(int8_t* x, int8_t* y) {
+    bool any = false;
+    for (auto& p : sScript) {
+        if (p.axis != 0 && sFrame >= p.frame && sFrame <= p.last) {
+            *(p.axis == 1 ? x : y) = (int8_t)p.value;
+            any = true;
+        }
+    }
+    return any;
 }
 
 // LUS's OSContPad carries gyro and right-stick fields (0x24 bytes); the game's is the N64's
@@ -235,8 +319,12 @@ void ContRead(void* pads) {
         }
         // N64 byte order is not an issue here: OSContPad.button is read as a u16 by the game
         memcpy(out + i * 6, &b, 2);
-        out[i * 6 + 2] = (uint8_t)lus[i].stick_x;
-        out[i * 6 + 3] = (uint8_t)lus[i].stick_y;
+        int8_t sx = (int8_t)lus[i].stick_x, sy = (int8_t)lus[i].stick_y;
+        if (i == 0) {
+            ScriptedStick(&sx, &sy);
+        }
+        out[i * 6 + 2] = (uint8_t)sx;
+        out[i * 6 + 3] = (uint8_t)sy;
         out[i * 6 + 4] = lus[i].err_no;
     }
 }
@@ -252,8 +340,12 @@ int ContInitHeadless(uint8_t* bits) {
 void ContReadHeadless(void* pads) {
     auto* out = static_cast<uint8_t*>(pads);
     uint16_t b = ScriptedButtons();
+    int8_t sx = 0, sy = 0;
+    ScriptedStick(&sx, &sy);
     memcpy(out, &b, 2);
-    out[2] = out[3] = out[4] = 0;
+    out[2] = (uint8_t)sx;
+    out[3] = (uint8_t)sy;
+    out[4] = 0;
 }
 
 // The interpreter that draws: the window's, or --offscreen-gl's (macOS, no window).
@@ -319,7 +411,8 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     cfg.pakMode = args.pakMode;
     cfg.pakDir = args.pakDir.empty() ? nullptr : args.pakDir.c_str();
     if (!args.input.empty() && !ParseInputScript(args.input)) {
-        fprintf(stderr, "--input: expected BUTTON@FRAME[,...] (A B Z START DU DD DL DR L R CU CD CL CR)\n");
+        fprintf(stderr, "--input: expected BUTTON@FRAME[..LAST], SX=V@FRAME[..LAST], SY=V@..., or @FILE "
+                        "(buttons: A B Z START DU DD DL DR L R CU CD CL CR)\n");
         return 1;
     }
     if (T2Port_Boot(&cfg) != 0) {

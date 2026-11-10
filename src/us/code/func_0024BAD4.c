@@ -33,7 +33,9 @@ void CBarrel__RunStick(CBarrel *menu, CPlayer *player, u32 *input) {
     s32 open;
     s32 next;
     s32 slot;
+#ifndef TARGET_PORT
     MenuRow *entry;
+#endif
     s16 weapon;
     s16 alternate;
 
@@ -89,6 +91,40 @@ stick:
     if (slot == menu->m_Hover) {
         return;
     }
+#ifdef TARGET_PORT
+    if (slot != -1) {
+        /* the slot as CBarrelItem: MenuRow puts m_Items at the N64 offset 0x1C (0x20 on the host,
+         * after the pointer-wide m_pInfo the item is 0x20 bytes) and reads the weapon as the low
+         * half of a big-endian word (half.lo): on the host that is the high half, 0 */
+        CBarrelItem *item = &menu->m_Items[slot];
+
+        if (item->m_bAvailable == 0) {
+            Sound__Play2D(0x1455);
+            return;
+        }
+        if (item->m_Weapon == -1) {
+            menu->m_Hover = -1;
+            return;
+        }
+        if (slot != menu->m_nCursor) {
+            menu->m_nCursor = slot;
+        }
+        weapon = (s16) item->m_Weapon;
+        if (weapon == player->m_Data.m_CurrentWeapon) {
+            menu->m_Hover = slot;
+            return;
+        }
+        player->m_RequestedWeapon = weapon;
+        if (*input & 0x80) {
+            menu->m_Hover = slot;
+            return;
+        }
+        alternate = gWeaponInfoTable[weapon]->alternate;
+        if (alternate != -1 && player->m_Data.m_WeaponList[alternate] != 0) {
+            item->m_Weapon = alternate;
+        }
+    }
+#else
     if (slot != -1) {
         entry = (MenuRow *) ((u8 *) menu + slot * sizeof(CBarrelItem));
         if (entry->available == 0) {
@@ -117,5 +153,6 @@ stick:
             entry->weapon.id = alternate;
         }
     }
+#endif
     menu->m_Hover = slot;
 }
