@@ -18,10 +18,21 @@ typedef struct ModelBounds {
 } ModelBounds;
 
 /* One model instance of the scene, as listed for collisions. */
+#ifdef TARGET_PORT
+/* the host CStaticObject (0xA0): its bounds by offsetof, the view the record's full size */
+#include "structs/level_actor.h"
+typedef struct SceneModel {
+    u8 data[__builtin_offsetof(CStaticObject, m_Bounds)];
+    ModelBounds bounds;
+} SceneModel;
+_Static_assert(sizeof(SceneModel) == sizeof(CStaticObject), "SceneModel size");
+_Static_assert(__builtin_offsetof(CStaticObject, m_wFlags) - __builtin_offsetof(CStaticObject, m_Bounds) == 0x20, "bounds flags");
+#else
 typedef struct SceneModel {
     /* 0x00 */ u8 data[0x68];
     /* 0x68 */ ModelBounds bounds;
 } SceneModel; /* size 0x90 */
+#endif
 
 typedef struct SceneModels {
     /* 0x00 */ u8 pad0[4];

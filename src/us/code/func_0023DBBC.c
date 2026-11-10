@@ -2,13 +2,28 @@
 #include "structs/collision.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
+#ifdef TARGET_PORT
+#include "structs/level_actor.h"
+#endif
 
+#ifdef TARGET_PORT
+typedef struct SweepModel {
+/* the view at the host offsets of CStaticObject (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_SweepModel(m) __builtin_offsetof(CStaticObject, m)
+    union {
+        struct { u8 _hp_def[T2_HOFF_SweepModel(header.m_pIntelligence)]; struct { u8 pad[0xE]; s8 variant; } *def; }; /* N64 0x14 */
+        struct { u8 _hp_matrix[T2_HOFF_SweepModel(m_Matrix)]; u8 matrix[0x40]; }; /* N64 0x28 */
+    };
+} SweepModel;
+#else
 typedef struct SweepModel {
     /* 0x00 */ u8 pad0[0x14];
     /* 0x14 */ struct { u8 pad[0xE]; s8 variant; } *def;
     /* 0x18 */ u8 pad18[0x10];
     /* 0x28 */ u8 matrix[0x40];
 } SweepModel;
+#endif
 
 void CMtxF__MultiplyAffine(f32 (*dst)[4], f32 (*a)[4], f32 (*b)[4]);
 void CMtxF__FromMtxAffine(f32 (*mtx)[4], void *packed);

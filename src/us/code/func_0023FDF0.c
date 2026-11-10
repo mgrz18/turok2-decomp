@@ -22,6 +22,25 @@ typedef struct HitNode {
 } HitNode;
 
 /* An instance that can be hit. */
+#ifdef TARGET_PORT
+typedef struct HitInst {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_HitInst(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_type[T2_HOFF_HitInst(header.m_Type)]; u8 type; }; /* N64 0x0 */
+        struct { u8 _hp_pos[T2_HOFF_HitInst(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_def[T2_HOFF_HitInst(header.m_pIntelligence)]; CIntelligence *def; }; /* N64 0x14 */
+        struct { u8 _hp_scale[T2_HOFF_HitInst(m_vScale)]; CVector3 scale; }; /* N64 0x34 */
+        struct { u8 _hp_mtx[T2_HOFF_HitInst(m_mfOrient)]; f32 mtx[4][4]; }; /* N64 0x58 */
+        struct { u8 _hp_joints[T2_HOFF_HitInst(m_pmtDrawMtxs)]; Joint *joints; }; /* N64 0x98 */
+        struct { u8 _hp_animKey[T2_HOFF_HitInst(m_rpObject)]; sptr animKey; }; /* N64 0xA4 */
+        struct { u8 _hp_animSize[T2_HOFF_HitInst(m_rpObjectHeader)]; s32 animSize; }; /* N64 0xB0 */
+        struct { u8 _hp_bounds[T2_HOFF_HitInst(m_vMin)]; CBox bounds; }; /* N64 0xBC: m_vMin, m_vMax */
+        struct { u8 _hp_hitMask[T2_HOFF_HitInst(m_AI.m_VisBits)]; s32 hitMask; }; /* N64 0x14C */
+    };
+} HitInst;
+#else
 typedef struct HitInst {
     /* 0x000 */ u8 type;
     /* 0x004 */ CVector3 pos;
@@ -41,6 +60,7 @@ typedef struct HitInst {
     /* 0x0D4 */ u8 padD4[0x78];
     /* 0x14C */ s32 hitMask;
 } HitInst;
+#endif
 
 void *CGameObjectInstance__LoadGeometry(HitInst *inst);
 void CMtxF__FromMtxAffine(f32 (*mtx)[4], Joint *joint);
