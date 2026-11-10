@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 Throwable_SetModeAnim(sptr, s32, sptr);               /* extern */
+s32 Throwable_SetModeAnim(sptr, sptr, sptr);               /* extern */
 
 void EnemyAI_SetGrabbed(sptr arg0, CAI *arg1, s32 arg2) {
     arg1->m_VarBuffer[2] = arg2;

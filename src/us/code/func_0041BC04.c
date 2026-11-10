@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 PlayerOptions_SetDefaultName(s32);
+s32 PlayerOptions_SetDefaultName(sptr);
 
 void PlayerOptions_SetDefaults(void *arg0, s8 arg1)
 {

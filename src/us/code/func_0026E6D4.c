@@ -3,7 +3,7 @@
 #include "structs/game_object.h"
 #include "globals/scene.h"
 
-s32 Action_CheckRequiredItem(CGameObjectInstance *, CAI *, s32); /* extern */
+s32 Action_CheckRequiredItem(CGameObjectInstance *, CAI *, sptr); /* extern */
 
 s32 LevelEvent_CheckRequiredItem(LevelEvent *arg0, sptr arg1) {
     CGameObjectInstance *temp_a1;

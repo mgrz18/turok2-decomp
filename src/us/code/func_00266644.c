@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/light.h"
 
-s32 CGameObjectInstance__DrawModelImmediate(s32, sptr, s32);
+s32 CGameObjectInstance__DrawModelImmediate(sptr, sptr, sptr);
 
 
 

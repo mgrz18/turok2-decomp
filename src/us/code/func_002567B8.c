@@ -10,7 +10,7 @@
 
 s32 Actor_IsInRegionFlag40(CGameObjectInstance *actor)
 {
-    s32 id = ((sptr)actor->header.m_pCurrentRegion);
+    sptr id = ((sptr)actor->header.m_pCurrentRegion);
     if (id != 0) {
         void *p = CScene__GetRegionInfo(&gScene, id);
         if (p != ((void *)0)) {

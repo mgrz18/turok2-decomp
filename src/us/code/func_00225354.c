@@ -8,7 +8,7 @@
  * offsets. */
 #include "structs/world.h"
 
-s32 LevelEvent_Fire(s32);
+s32 LevelEvent_Fire(sptr);
 f32 HalfToFloat(u16);
 void CScene__QueueDelayedEvent(CScene *scene, LevelEvent *event) {
     CDelayedEvent *d = scene->m_FreeDelayedEvents.m_pHead;

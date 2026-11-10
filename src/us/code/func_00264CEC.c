@@ -2,7 +2,7 @@
 #include "structs/collision.h"
 #include "globals/collision.h"
 
-void DamageEvent_Set(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, s32 arg5);
+void DamageEvent_Set(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, sptr arg5);
 void CAI__CallHurt(void *actor, void *behavior, DamageEvent *event);
 s32 CAI__SetMode(void *actor, void *state, s32 mode);
 

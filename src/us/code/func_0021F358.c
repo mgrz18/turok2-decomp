@@ -5,7 +5,7 @@
 #include "structs/game_object.h"
 #include "protos/cache.h"
 
-void Model_TouchTextures(s32);
+void Model_TouchTextures(sptr);
 extern void Model_DecompressCallbackExtra(void);
 
 #ifdef TARGET_PORT

@@ -12,7 +12,7 @@ extern s32 Controller_MenuLeft(void *a);
 extern s32 Controller_MenuRight(void *a);
 extern f32 D_800C1348;
 s32 NameEntryMenu_UpdateName_2(s32 a, O06A2 *b) {
-    s32 n = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, *(s32 *)((u8 *)b + 0x1C));
+    sptr n = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, *(s32 *)((u8 *)b + 0x1C));
     f32 v = gNameEntries[n].timer + gFrameIncrement;
     gNameEntries[n].timer = v;
     if (D_800C1348 <= v) gNameEntries[n].timer = v - D_800C1348;

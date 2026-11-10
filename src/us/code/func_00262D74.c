@@ -23,7 +23,7 @@
  * if it is unlocked), kind 1 a particle effect, kind 2 a pickup picked at
  * random from the weapon/ammo/item tables the definition enables. */
 
-extern f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);
+extern f32 CGameRegion__GetHeight(sptr region, f32 x, f32 z);
 extern s32 *CScene__GetIntelligence(void *level, s32 model);
 extern s32 CScene__GetObjectTypeID(void *level, s32 id);
 extern s32 Generator_IsPickupUnlocked(s32 id);

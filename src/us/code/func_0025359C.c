@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 RumblePool_FreeAll(s32);                         /* extern */
+s32 RumblePool_FreeAll(sptr);                         /* extern */
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xD0];

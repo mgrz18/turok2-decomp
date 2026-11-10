@@ -4,7 +4,7 @@
 #include "globals/scene.h"
 #include "protos/player.h"
 
-s32 CPlayer__LoseLife(s32);
+s32 CPlayer__LoseLife(sptr);
 
 void PlayerDeath_CinemaDone(void) {
     if (sDeathCinemaPlayer->m_Data.m_Lives == 1) {

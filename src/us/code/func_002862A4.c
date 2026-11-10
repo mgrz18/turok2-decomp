@@ -7,7 +7,7 @@
 #include "globals/text.h"
 #include "protos/player.h"
 
-extern void CEngineApp__StartGameAtWarp(s32, s32);
+extern void CEngineApp__StartGameAtWarp(sptr, s32);
 extern void CEngineApp__SetupFadeTo(sptr, s32);
 extern void Sound__PlaySpeech(s32);
 

@@ -49,7 +49,7 @@ x86-64 eightbyte classes (INTEGER/SSE, MEMORY when larger than 16 bytes) and its
 | `variadic` | a variadic declaration vs a non-variadic definition, or the reverse | Apple arm64 passes variadic arguments on the stack |
 | `int_from_ptr`, `extra_args`, `narrow_ext`, `struct_layout` | information: truncation of a pointer the callee uses as an int, surplus arguments, s8/s16 extension, same classes with another member layout | harmless or low risk |
 
-Not checked: calls through function pointers (184 sites; the AI/state/impact tables: a handler's
+Not checked before round 6 (section 5 adds them): calls through function pointers (184 sites; the AI/state/impact tables: a handler's
 own parameters vs what the dispatcher passes) and calls to functions without a C definition (asm,
 the host runtime's C++). The impact handlers below were fixed from the definition side for that
 reason.
@@ -143,3 +143,73 @@ reports 0 differences over all 3,938 files.
   table's element type.
 - `ptr_from_int` 498: the macOS truncation sweep (`genprotos.py apply`), not an x86-64 Linux
   problem today.
+
+## 5. Round 6 (u5): indirect calls, the width class, asm labels
+
+### Indirect calls
+
+`abicheck.py` now follows calls through function pointers (184 sites). For each call it records
+the pointer's type and where the pointer is loaded from (`var:` a global table, `rec:S.f` a struct
+field, a local or parameter followed back to its load in the same function), and for every place
+a function's address is taken (2,039, the gendata initializers of `turok2_data` included) the
+pointer type it is converted to and the table/field it goes into. Two views, printed after the
+direct-call table:
+
+- **store**: each stored function against the prototyped pointer type it is converted to;
+- **call**: each indirect call against the definitions stored where its pointer comes from
+  (an unprototyped `()` pointer type with no table is not matched by type: too broad).
+
+109 of the 184 calls find no stored function (tables reached through a struct whose stores use
+another struct name, the audio/OS hooks set by the host runtime, the menu descriptors): they are
+reported as a count only. Two new info classes: `struct_word` (an integer struct of <= 8 bytes
+vs a 32-bit int: the same register on x86-64 and AArch64, the int is the struct's first four
+bytes, what MIPS read as the first word) and `struct_layout` also for two one-register integer
+structs of different sizes (`SevenBytes` vs the 8-byte event value).
+
+Indirect harmful findings: **210 call + 4 store -> 0 call + 4 store**. Fixed (host-only):
+
+| site | MIPS | host fix |
+|---|---|---|
+| `Turret/Throwable/Door/Destructible/Action/InteractiveAnim_Step` | `cb()`: the mode callback gets the step's a0/a1 | `cb(actor, ai)`, actor `void *` (was s32/sptr) |
+| `CAI__CallHurt(s32, CAI *)` | `m_pfHurt()` gets (actor, ai, damage) | `(void *, CAI *, void *)`, passes the three |
+| `BlindOne_UpdateFight` | phase `update()` gets the state | passes it |
+| `ImpactEvent_PlaySound` (`Quad`), `func_00239350` (`IntPair, fifth, sixth`), `func_00239398` | the CVector3 + event value fill a3 and the stack words | host signature `(.., CVector3 pos, s32 value)`: the sound id came from a garbage register |
+| Destructible `ActionState` view (func_00265A30/00265954) | N64 offsets 0x2C/0xF0/0xF8 into CAI | `hostview.py --apply` (host 0x30/0x130/0x140): the step and hurt callbacks were never installed |
+
+The 4 store findings are declarations only: `Destructible_Hurt` stored into a 2-parameter
+`onEvent` type (called through `CAI__CallHurt` with 3), and `TotemDefense_InitFight`
+(func_00408B20) storing `TotemDefense_DrawTotem` through `s32 (**)(s32, s32, s32)` at the
+raw N64 offset `arg1 + 0x234` (the whole function is N64-offset code: a hostview job).
+
+The impact handlers that read the event value as one `s32` (`ImpactEvent_SetHotPoint`,
+`ClearHotPoint`, `SetWeaponFirePos`, `func_00238134`, the new host bodies) get the struct's
+first four bytes. That is the MIPS first word when the sender filled it as a word (the animation
+events' `IntPair`), but a `CEventValue`/`EffectParams` built as two `s16` halves gives
+`lower << 16 | upper` on a little-endian host where MIPS saw `upper << 16 | lower`: a data/endian
+question for the particle and collision senders, not an ABI one (not changed).
+
+### The width class
+
+`tools/port/abiptrfix.py FINDINGS.json [--apply]` (FINDINGS from `abicheck --json`): for each
+`ptr_from_int` argument site it retypes the parameter of the declaration the caller sees from
+`s32/int/u32` to `sptr/uptr` (the same types on the N64); for a return site, the definition's
+return. 115 declarations by the tool, 9 by hand (renamed libc/libultra names: `osSendMesg`,
+`memset`, `strlen`; `M2C_UNK` parameters). `asm_diff` 0.
+
+`abicheck` also resolves **asm labels** now (`s32 f_alias(s32, s32) __asm__("Menu_Update")`:
+the call goes to `Menu_Update`): 60 more calls checked, which found the menu file's aliases
+(fixed, see 64BIT.md part 4).
+
+### Counts (Linux build, 3,072 TUs with turok2_data; 10,823 direct calls checked, 186 indirect)
+
+| class | 6d04fabb | now |
+|---|---:|---:|
+| ptr_from_int | 185 | **4** (CCache__Deallocate(0, ...) through `void CCache__Deallocate();` in func_0041F32C: a literal 0, harmless) |
+| void_used | 2 | 2 |
+| missing_args | 6 | 6 (the asm-label pass shows 2 more, `MenuItem_FormatBinding` through its aliases: fixed) |
+| struct_class / struct_scalar / float_int / float_double / variadic | 0 | 0 |
+| harmful total | 193 | **12** (+ 4 store-side indirect, declaration-only) |
+| indirect harmful (call / store) | not checked | 0 / 4 |
+
+The `void_used` and `missing_args` sites left are the section 4 list (they need the MIPS code
+read: what v0/a1/a2 hold at the call).

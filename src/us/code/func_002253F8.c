@@ -7,7 +7,7 @@
 #include "structs/world.h"
 #include "structs/event.h"
 
-s32 LevelEvent_Fire(s32);
+s32 LevelEvent_Fire(sptr);
 void CScene__UpdateDelayedEvents(CScene *scene) {
     CDelayedEvent *d = scene->m_DelayedEvents.m_pHead;
     CDelayedEvent *next;

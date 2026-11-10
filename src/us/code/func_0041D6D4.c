@@ -9,7 +9,7 @@
 
 /* Name entry: delete the last character. */
 s32 NameEntryMenu_DeleteChar(s32 menu, Menu *c) {
-    s32 i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, c->player);
+    sptr i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, c->player);
 
     gNameEntries[i].timer = 0;
     if (gNameEntries[i].length == 0) {

@@ -2,7 +2,7 @@
 #include "m2c_macros.h"
 #include "protos/scene.h"
 
-s32 func_0026E294(s32);
+s32 func_0026E294(sptr);
 
 void CScene__FireEventsByKeyOnce(void *arg0, s32 arg1)
 {

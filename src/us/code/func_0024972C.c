@@ -7,7 +7,7 @@
 #include "globals/player.h"
 #include "protos/scene.h"
 
-void CGameObjectInstance__Draw(CPlayer *player, s32 arg1);
+void CGameObjectInstance__Draw(CPlayer *player, sptr arg1);
 
 /* Draws the player's model: picks it (single player, tag mode or the
    character), then sets up the render state before CGameObjectInstance__Draw. */

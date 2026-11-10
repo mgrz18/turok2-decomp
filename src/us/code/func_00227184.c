@@ -9,12 +9,18 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-void Sort_Insertion(u32 arg0, u32 arg1, s32 arg2, s32 (*arg3)(u32, u32), s32 (*arg4)(u32, u32))
+#ifdef TARGET_PORT
+/* the elements are host pointers (docs/port/64BIT.md): u32 on the N64 */
+typedef __UINTPTR_TYPE__ t2_uptr;
+#else
+typedef u32 t2_uptr;
+#endif
+void Sort_Insertion(t2_uptr arg0, t2_uptr arg1, s32 arg2, s32 (*arg3)(t2_uptr, t2_uptr), s32 (*arg4)(t2_uptr, t2_uptr))
 {
-  u32 var_a0;
-  u32 var_s0;
-  u32 var_s1;
-  u32 var_s2;
+  t2_uptr var_a0;
+  t2_uptr var_s0;
+  t2_uptr var_s1;
+  t2_uptr var_s2;
   var_s2 = arg1;
   if (arg0 < var_s2)
   {

@@ -9,7 +9,7 @@ extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 void CCache__WaitForDisplayLists(void) {
-    extern s32 osSendMesg(void *, s32, s32);
+    extern s32 osSendMesg(void *, sptr, s32);
     s32 temp_v1;
     s32 temp_v1_2;
     s32 var_s0;

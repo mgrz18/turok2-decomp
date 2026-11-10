@@ -119,7 +119,7 @@ f32 Rumble_GetLevelAt_i3(void *list, s32 x, s32 y, s32 z) {
     return Rumble_GetLevelAt(list, v3_words(x, y, z));
 }
 
-extern s32 Sound__Play(s16 id, CVector3 pos, sptr follow, s32 owner);
+extern s32 Sound__Play(s16 id, CVector3 pos, sptr follow, sptr owner);
 void Sound__Play_f3(s32 id, f32 x, f32 y, f32 z, s32 follow, s32 owner) {
     Sound__Play(id, v3_floats(x, y, z), follow, owner);
 }
@@ -175,9 +175,9 @@ void Primagen_HandleAnimEvent_ev(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, T2A
 
 /* ---- a float parameter the caller passes as an integer word (its bits), or the reverse ---- */
 
-extern void AI_SetTargetOverride(s32 obj, void *ai, s32 owner, s32 time);
+extern void AI_SetTargetOverride(sptr obj, void *ai, sptr owner, s32 time);
 void AI_SetTargetOverride_f(void *obj, void *ai, void *owner, f32 time) {
-    AI_SetTargetOverride((s32) (sptr) obj, ai, (s32) (sptr) owner, f_bits(time));
+    AI_SetTargetOverride((sptr) obj, ai, (sptr) owner, f_bits(time));
 }
 
 extern void AI_TurnClamped(void *obj, sptr ai, f32 angle, f32 rate);
@@ -202,7 +202,7 @@ void CInstancePool__SpawnAnimInstance_i(void *scene, s32 variant, s32 owner, CVe
 }
 
 extern void *CLevelActorPool__Spawn(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos,
-                                    s32 arg9, f32 lifetime);
+                                    sptr arg9, f32 lifetime);
 void *CLevelActorPool__Spawn_i(void *pool, void *refCount, s32 id, CVector3 vel, CVector3 pos, s32 arg9,
                                s32 lifetime) {
     return CLevelActorPool__Spawn(pool, refCount, id, vel, pos, arg9, bits_f(lifetime));

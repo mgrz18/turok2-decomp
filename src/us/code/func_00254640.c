@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/game.h"
 
-s32 GameObject_IsOnGround(s32);
+s32 GameObject_IsOnGround(sptr);
 
 
 void CPlayer__UpdateSpeedScale(void *arg0, void *arg1, void *arg2)

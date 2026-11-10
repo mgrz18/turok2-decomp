@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 CDLightSet__Free(s32 *, s32);              /* extern */
+s32 CDLightSet__Free(s32 *, sptr);              /* extern */
 extern s32 D_8010FF34;
 
 void Particle_FreeSlot(s32 arg0, s32 *arg1) {

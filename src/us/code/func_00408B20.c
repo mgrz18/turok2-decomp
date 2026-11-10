@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/onscreen.h"
 
-sptr CGameObjectInstance__PickRandomAnim(s32, sptr, sptr);
+sptr CGameObjectInstance__PickRandomAnim(sptr, sptr, sptr);
 s32 COnScreen__SetBoss(sptr, sptr, sptr);
 s32 TotemDefense_DrawTotem(sptr, s32, sptr);
 

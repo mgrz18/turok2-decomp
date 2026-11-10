@@ -126,6 +126,31 @@ names; it is not compiled).
 
 macOS: t5 ran its own tree to the title; the merged tree was not rerun on the Mac this round.
 
+## Round 6, part u5: ABI and pointer width (branch names-R6_u5)
+
+- `tools/port/abicheck.py` checks **indirect calls** (function-pointer tables/fields, gendata
+  initializers included) and **asm-label aliases**; new `tools/port/abiptrfix.py` retypes the
+  declarations behind `ptr_from_int`. Harmful sites **193 -> 12** (ptr_from_int 185 -> 4, a
+  literal 0; void_used 2 and missing_args 6 left, ABI.md section 4); indirect 210 call + 4 store
+  -> 0 call + 4 store (declaration-only). ABI.md section 5.
+- Gameplay-relevant ABI fixes: the six AI step functions now pass (actor, ai) to the mode
+  callbacks (doors, turrets, destructibles, throwables, actions, interactive anims: MIPS
+  pass-through), `CAI__CallHurt` passes (actor, ai, damage) to the hurt handler, the
+  Destructible view writes its callbacks at host CAI offsets, impact handlers PlaySound /
+  func_00239350 read the sound id from the right register.
+- **Linux `--high-memory` runs**: the boot, both cinemas, the title, attract demo 1, demo 2's
+  start (14,000 frames) and a **new game to level 51 identical to low memory** (was: crash at
+  boot). 64BIT.md part 4 lists the six crash sites fixed on the way (texture image words
+  truncated by `(unsigned int)(GBI_ADDR(p))`, the menu file's `s32` asm aliases, the lit-vertex
+  model pointer, `GameObject_GetRegionInfo`, `Sort_Insertion`). audit64: pointer-width warnings
+  1,580 -> 1,465, disagreeing declarations 158 -> 93 functions.
+- Low memory unchanged: 26,000-frame boot loop with 3 attract demos, new game to level 51
+  (player stops at the water at (-1266.6, -779.5, 260.0) as before). asm_diff 0 over every
+  touched file (152 src files).
+- Merge notes: many one-line declaration retypes (s32 -> sptr) spread over ~150 src files; a
+  conflict with another part is a declaration line: keep both changes. func_002034F4/00205A2C
+  (osSendMesg declaration) also carry u1's hash-stride fix on other lines.
+
 ## 3. Merge conflicts and crash/fix table (round 5 merge)
 
 Conflicts and how they were resolved (asm_diff 0 after each merge):

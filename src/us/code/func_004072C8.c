@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 AI_StartSound(s32, s32, s32);
+s32 AI_StartSound(sptr, sptr, s32);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define Sound__Play Sound__Play_i3
 #endif

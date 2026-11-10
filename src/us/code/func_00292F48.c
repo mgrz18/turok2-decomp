@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 __alSeqReadWord(s32);
+s32 __alSeqReadWord(sptr);
 
 /* MIDI file reader state (checks the "MThd" and "MTrk" chunk tags). */
 typedef struct {

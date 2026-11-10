@@ -3,7 +3,7 @@
 #include "structs/particle.h"
 #include "protos/game.h"
 
-sptr LoopSounds_Start(sptr, s32, s32, s32, sptr);
+sptr LoopSounds_Start(sptr, s32, sptr, sptr, sptr);
 s32 CParticle__StopLoopSound(CParticle *);                      /* extern */
 
 /* Starts (or restarts) the looping sound on the object. */
