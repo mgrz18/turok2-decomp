@@ -18,6 +18,45 @@ struct func_80216F44_S1 {
     f32 unk50;  /* yaw */
 };
 extern f32 func_00298470(f32);
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+
+/* The port: the same on CGameObjectInstance. The view above reads the yaw at N64 0x50; on the
+ * host m_RotY lies later (the header holds pointers), so every AI saw its targets at an angle
+ * that ignored its own rotation: an enemy in reach of the player turned in place forever and
+ * never faced him to attack (round 7 merge, demo 1). */
+f32 AI_AngleToPoint(void *actor_, CVector3 point) {
+    CGameObjectInstance *actor = (CGameObjectInstance *) actor_;
+    f32 dx;
+    f32 dz;
+    f32 dist;
+    f32 s;
+    f32 c;
+    f32 dot;
+    f32 angle;
+
+    dx = point.x - actor->header.m_vPos.x;
+    dz = point.z - actor->header.m_vPos.z;
+    dist = func_00298470(dx * dx + dz * dz);
+    if (dist == 0.0f) {
+        return 0.0f;
+    }
+    s = func_002982F0(actor->m_RotY);
+    c = -func_002974C0(actor->m_RotY);
+    dot = (dx * -s + dz * c) / dist;
+    if (dot > 1.0f) {
+        dot = 1.0f;
+    }
+    if (dot < -1.0f) {
+        dot = -1.0f;
+    }
+    angle = Math_AcosLookup(dot);
+    if (dx * c + dz * s > 0.0f) {
+        return angle;
+    }
+    return -angle;
+}
+#else
 f32 AI_AngleToPoint(void *actor, CVector3 point) {
     f32 dx;
     f32 dz;
@@ -44,3 +83,4 @@ f32 AI_AngleToPoint(void *actor, CVector3 point) {
     }
     return -angle;
 }
+#endif
