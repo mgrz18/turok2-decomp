@@ -11,6 +11,14 @@
 #include "protos/cache.h"
 #include "protos/ultra.h"
 
+#ifdef TARGET_PORT /* the bucket stride is the host entry's size (pointer-wide value/next): with the
+                    * N64 0x10 the lookup probed the wrong bucket, never found a resident entry and
+                    * re-requested it every frame (asynchronous loads, i.e. gameplay, never drew) */
+#define HASH_STRIDE sizeof(HashEntry)
+#else
+#define HASH_STRIDE 0x10
+#endif
+
 extern void __osRestoreInt(OSIntMask mask);
 extern OSIntMask __osDisableInt(void);
 extern void CDecompressor__DecompressSync(CDecompressor *, CCacheEntry *);
@@ -72,7 +80,7 @@ CMemEntry *CCache__RequestDecompression(s32 unused, s32 key, CMemEntry *first, C
     out = &found;
     node = (HashEntry *)((u8 *)gHashTable +
         ((((key << 5) ^ ((u32)key >> 1) ^ ((u32)key >> 9) ^
-           ((u32)key >> 17)) & gHashMask) * 0x10));
+           ((u32)key >> 17)) & gHashMask) * HASH_STRIDE));
     if (node->key != key) {
         goto not_initial;
     }
