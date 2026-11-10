@@ -21,11 +21,39 @@ extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF m);               /* to 
 extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);  /* transform */
 extern void CParticle__Wobble(void *obj, f32 scale);
 
+#ifdef TARGET_PORT
+typedef struct Target {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Target(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_Target(m_AI.m_vBoreTarget)]; CVector3 pos; }; /* N64 0x214 */
+    };
+} Target;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x214];
     /* 0x214 */ CVector3 pos;
 } Target;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct Missile {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Missile(m) __builtin_offsetof(CParticle, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_Missile(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_vel[T2_HOFF_Missile(m_vVelocity)]; CVector3 vel; }; /* N64 0x18 */
+        struct { u8 _hp_flags[T2_HOFF_Missile(m_dwFlags)]; s32 flags; }; /* N64 0x40 */
+        struct { u8 _hp_parent[T2_HOFF_Missile(m_pEffect)]; CROMParticleEffect *parent; }; /* N64 0xF8 */
+        struct { u8 _hp_target[T2_HOFF_Missile(m_pTarget)]; Target *target; }; /* N64 0x114 */
+        struct { u8 _hp_speed[T2_HOFF_Missile(m_cFrame)]; f32 speed; }; /* N64 0x11C */
+        struct { u8 _hp_dir[T2_HOFF_Missile(m_vDirection)]; CVector3 dir; }; /* N64 0x150 */
+        struct { u8 _hp_loop[T2_HOFF_Missile(m_pLoopSound)]; SndSource *loop; }; /* N64 0x1B8 */
+    };
+} Missile;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
     /* 0x004 */ CVector3 pos;
@@ -44,6 +72,7 @@ typedef struct {
     /* 0x15C */ u8 pad15C[0x1B8 - 0x15C];
     /* 0x1B8 */ SndSource *loop;
 } Missile;
+#endif
 
 /* Same as CParticle__Accelerate: accelerate along dir, clamp to the max speed. */
 static __inline__ void Missile_Accelerate(Missile *obj) {

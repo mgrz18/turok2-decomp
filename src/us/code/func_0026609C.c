@@ -16,7 +16,7 @@ void Action_Step(void *arg0, CAI *arg1) {
     }
 }
 #else
-void Action_Step(s32 arg0, CAI *arg1) {
+void Action_Step(sptr arg0, CAI *arg1) {
     s32 (*temp_v0_2)();
     CAIModeInfo *temp_v0;
 
@@ -24,7 +24,13 @@ void Action_Step(s32 arg0, CAI *arg1) {
     if (temp_v0 != NULL) {
         temp_v0_2 = temp_v0->m_pfCallback;
         if (temp_v0_2 != NULL) {
+#ifdef TARGET_PORT
+            /* ABI: on MIPS the mode callback receives this function's a0/a1 (the actor, its AI)
+             * untouched; the host passes them. */
+            ((s32 (*)(sptr, CAI *)) temp_v0_2)(arg0, arg1);
+#else
             temp_v0_2();
+#endif
         }
     }
 }

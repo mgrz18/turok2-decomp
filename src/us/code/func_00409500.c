@@ -10,7 +10,11 @@
  * closer than 460.8 to the target of the module object. */
 
 extern f32 MotherBoss_GetTargetDist(void *obj, CGameObjectInstance **found);
+#ifdef TARGET_PORT
+extern s16 WeightedTable_PickStatic(void *a); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+#else
 extern s32 WeightedTable_PickStatic(void *a);
+#endif
 extern f32 Random_Blend(f32 min, f32 max);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern f32 func_00298470(f32 x); /* sqrt */

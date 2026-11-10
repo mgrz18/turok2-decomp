@@ -3,7 +3,11 @@
 #include "globals/engine.h"
 
 f32 Math_DecayToZero(f32, f32);
+#ifdef TARGET_PORT
+s8 EnemyAI_GetBehaviorIndex(sptr, sptr); /* ABI: returns s8 (the host leaves the upper bits of the return register undefined) */
+#else
 s32 EnemyAI_GetBehaviorIndex(sptr, sptr);
+#endif
 
 
 void EnemyHover_Advance(sptr arg0, CAI *ai) {

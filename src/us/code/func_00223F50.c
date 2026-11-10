@@ -3,6 +3,7 @@
 #include "protos/scene.h"
 
 #ifdef TARGET_PORT
+#include "protos/iset.h" /* CISet__GetBlock returns a pointer: implicit int truncated it (--high-memory) */
 /* ABI (docs/port/ABI.md, abicheck void_used + missing_args): the caller (func_002350EC) passes the
  * swoosh type in a1 and uses the block address; on MIPS a1 passes straight through to
  * CISet__GetBlock and its v0 is returned. */

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/boss.h"
+#include "structs/game_object.h"
 #include "globals/boss.h"
 #include "globals/onscreen.h"
 #include "globals/engine.h"
@@ -9,22 +10,57 @@ typedef struct {
     f32 x, y, z;
 } Vec3_00403F3C;
 
+#ifdef TARGET_PORT
+typedef struct Actor00403F3C {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Actor00403F3C(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_unk0[T2_HOFF_Actor00403F3C(header)]; s32 unk0; }; /* N64 0x0 */
+        struct { u8 _hp_pos[T2_HOFF_Actor00403F3C(header.m_vPos)]; Vec3_00403F3C pos; }; /* N64 0x4 */
+    };
+} Actor00403F3C;
+#else
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ Vec3_00403F3C pos;
 } Actor00403F3C;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct Def00403F3C {
+/* the view at the host offsets of CAIModeInfo (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Def00403F3C(m) __builtin_offsetof(CAIModeInfo, m)
+    union {
+        struct { u8 _hp_onReset[T2_HOFF_Def00403F3C(m_pfCallback)]; void (*onReset)(Actor00403F3C *actor, void *level); }; /* N64 0x8 */
+    };
+} Def00403F3C;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x8];
     /* 0x08 */ void (*onReset)(Actor00403F3C *actor, void *level);
 } Def00403F3C;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct Level00403F3C {
+/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Level00403F3C(m) __builtin_offsetof(CAI, m)
+    union {
+        struct { u8 _hp_def[T2_HOFF_Level00403F3C(m_pModeCurrent)]; Def00403F3C *def; }; /* N64 0x30 */
+        struct { u8 _hp_spawn[T2_HOFF_Level00403F3C(m_vDesiredPos)]; Vec3_00403F3C spawn; }; /* N64 0x54 */
+    };
+} Level00403F3C;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x30];
     /* 0x30 */ Def00403F3C *def;
     /* 0x34 */ u8 pad1[0x54 - 0x34];
     /* 0x54 */ Vec3_00403F3C spawn;
 } Level00403F3C;
+#endif
 
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define AI_TurnHeadToTarget AI_TurnHeadToTarget_i

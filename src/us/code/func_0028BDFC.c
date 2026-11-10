@@ -5,7 +5,7 @@ extern u8 D_800AA0F0[];           /* "\n" */
 
 void Crash_PutChar(s32 c);          /* debug console: draws one character */
 void Crash_PrintHex8(s32 byte);       /* debug console: draws a byte in hex */
-s32 IsCodePointer(u32 address);   /* nonzero for a code address */
+s32 IsCodePointer(uptr address);   /* nonzero for a code address */
 
 static __inline__ void putString(u8 *s) {
     while (*s) {

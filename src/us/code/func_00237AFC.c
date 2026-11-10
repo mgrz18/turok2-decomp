@@ -6,6 +6,10 @@
 #include "globals/game.h"
 #include "globals/collision.h"
 #include "globals/player.h"
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#include "structs/player.h"
+#endif
 
 /* A blast: radius, damage, then the push (strength, x, y, z). */
 typedef struct Blast {
@@ -17,13 +21,40 @@ typedef struct Blast {
     s8 z;
 } __attribute__((aligned(4))) Blast;
 
+#ifdef TARGET_PORT
+typedef struct BlastOwner {
+/* the view at the host offsets of CPlayer (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_BlastOwner(m) __builtin_offsetof(CPlayer, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_BlastOwner(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_weapon[T2_HOFF_BlastOwner(m_Data.m_CurrentWeapon)]; u16 weapon; }; /* N64 0x996 */
+    };
+} BlastOwner;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[4];
     /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x996 - 0x10];
     /* 0x996 */ u16 weapon;
 } BlastOwner;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct BlastActor {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_BlastActor(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_kind[T2_HOFF_BlastActor(header.m_Type)]; u8 kind; }; /* N64 0x0 */
+        struct { u8 _hp_pos[T2_HOFF_BlastActor(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_height[T2_HOFF_BlastActor(m_CollisionYOffset)]; f32 height; }; /* N64 0x54 */
+        struct { u8 _hp_flags[T2_HOFF_BlastActor(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_ai[T2_HOFF_BlastActor(m_AI)]; u8 ai[0x1A8 - 0x140]; }; /* N64 0x140 */
+        struct { u8 _hp_owner[T2_HOFF_BlastActor(m_AI.m_pParent)]; BlastOwner *owner; }; /* N64 0x1A8 */
+    };
+} BlastActor;
+#else
 typedef struct {
     /* 0x000 */ u8 kind;            /* 1: player, 2: object */
     /* 0x001 */ u8 pad1[3];
@@ -36,6 +67,7 @@ typedef struct {
     /* 0x140 */ u8 ai[0x1A8 - 0x140];
     /* 0x1A8 */ BlastOwner *owner;
 } BlastActor;
+#endif
 
 s32 Blast_CanHit(BlastActor *victim, BlastActor *source);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);

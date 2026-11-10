@@ -2,7 +2,11 @@
 #include "structs/game_object.h"
 #include "globals/scene.h"
 
+#ifdef TARGET_PORT
+extern u16 CScene__GetObjectTypeID(void *, s32); /* ABI: returns u16 (the host leaves the upper bits of the return register undefined) */
+#else
 extern s32 CScene__GetObjectTypeID(void *, s32);
+#endif
 
 /* The type id of an object (kind 1) or of a particle. */
 s32 GameObject_GetTypeId(CGameObjectInstance *arg0) {

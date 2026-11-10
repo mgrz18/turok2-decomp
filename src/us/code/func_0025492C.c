@@ -32,6 +32,35 @@ extern void CPlayerPool__EndMatch(PlayerList *list);
 
 /* Run the match clock and end the match when the time is up or, outside tag
  * mode, when the frag limit is reached. Not while a menu is open. */
+#ifdef TARGET_PORT
+#include "structs/game.h"
+#include "globals/game.h"
+
+/* The port: the settings by member of gEngineApp_m_Settings (the N64 code reaches multiplayer,
+ * paused and the match through a view of the menu pool at 0xCC5/0xE78/0xE84, N64 offsets past
+ * the host menu pool); the menu pool itself is the first member of that view. */
+void CPlayerPool__UpdateMatchClock(PlayerList *list) {
+    GameMatch *match = &gEngineApp_m_Settings.match;
+
+    if (match->over || !gEngineApp_m_Settings.multiplayer) {
+        return;
+    }
+    if (!MenuPool_CountOpen(&gEngineApp_m_Game_m_MenuPool) && match->timeLeft > 0.0f && !gEngineApp_m_Settings.paused) {
+        if (CPlayerPool__CountIdleMenus(list)) {
+            match->timeLeft -= gFrameIncrement;
+        }
+        if (match->timeLeft <= 0.0f && !match->over) {
+            match->timeLeft = 0.0f;
+            CPlayerPool__EndMatch(list);
+        }
+    }
+    if (!MenuPool_CountOpen(&gEngineApp_m_Game_m_MenuPool) && CPlayerPool__IsFragLimitReached(list)) {
+        if (!match->over && !gEngineApp_m_Settings.paused && match->scoreLimit > 0 && !match->tag) {
+            CPlayerPool__EndMatch(list);
+        }
+    }
+}
+#else
 void CPlayerPool__UpdateMatchClock(PlayerList *list) {
     MatchState *match = &gEngineApp_m_Game_m_MenuPool.match;
     Globals *g;
@@ -57,3 +86,4 @@ void CPlayerPool__UpdateMatchClock(PlayerList *list) {
         }
     }
 }
+#endif

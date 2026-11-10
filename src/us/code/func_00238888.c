@@ -12,9 +12,29 @@ typedef struct { float x, y, z; } T2HostTriple;
 #endif
 
 
+#ifndef TARGET_PORT
 extern void ImpactEvent_FlashScreens(s32 arg0, s32 arg1, s32 arg2, Triple arg3, SevenBytes arg6);
+#endif
 extern void CCamera__StartFlash(void *view, s32 red, s32 green, s32 blue, s32 mode, s32 alpha, s32 duration, s32 delay);
 extern s32 CCamera__IsPointVisible(Node_func_80267CE4_de *arg0, Triple arg1);
+#ifdef TARGET_PORT
+/* Host body (round 7 v2): an event's 8-byte value reaches the handler as two host-order
+ * words (the archive swaps the animation events' values as two u32: struct IntPair), word 0
+ * the N64's first big-endian word; the bytes/halves this handler reads are taken from them. */
+typedef struct { u32 w0, w1; } T2EventWords;
+
+void ImpactEvent_FlashScreens(s32 arg0, s32 arg1, s32 arg2, Triple arg3, T2EventWords v) {
+    Node_func_80267CE4_de *node;
+    node = gEngineApp_m_Game_m_CameraPool.m_ActiveList.m_pHead;
+    while (node != 0) {
+        if (CCamera__IsPointVisible(node, arg3) != 0) {
+            CCamera__StartFlash(node, (u8) (v.w0 >> 24), (u8) (v.w0 >> 16), (u8) (v.w0 >> 8), (u8) v.w0,
+                                (u8) (v.w1 >> 24), (u8) (v.w1 >> 16), (u8) (v.w1 >> 8));
+        }
+        node = node->next;
+    }
+}
+#else
 void ImpactEvent_FlashScreens(s32 arg0, s32 arg1, s32 arg2, Triple arg3, SevenBytes arg6) {
     Node_func_80267CE4_de *node;
     node = gEngineApp_m_Game_m_CameraPool.m_ActiveList.m_pHead;
@@ -26,3 +46,4 @@ void ImpactEvent_FlashScreens(s32 arg0, s32 arg1, s32 arg2, Triple arg3, SevenBy
         node = node->next;
     }
 }
+#endif

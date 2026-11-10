@@ -8,8 +8,16 @@ extern f32 Random_Blend(f32 arg0, f32 arg1);
 extern f32 HalfToFloat(s32);
 extern struct Bytes12 *CAudioWorld__GetPitchEnvelope(ContextRecAt2BC0 *, s32);
 extern s16 FloatToHalf(f32);
+#ifdef TARGET_PORT
+extern s16 SoundEffectInfo_GetRandomRange0(ControllerCode802591C0 *); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+#else
 extern s32 SoundEffectInfo_GetRandomRange0(ControllerCode802591C0 *);
+#endif
+#ifdef TARGET_PORT
+extern s16 SoundEffectInfo_GetRandomRange1(ControllerCode802591C0 *); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+#else
 extern s32 SoundEffectInfo_GetRandomRange1(ControllerCode802591C0 *);
+#endif
 void SndVoice_InitPitch(ViewRecAtB0 *view, ControllerCode802591C0 *controller, s32 flags) {
     s16 x;
     s16 y;

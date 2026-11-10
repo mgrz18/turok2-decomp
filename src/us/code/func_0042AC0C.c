@@ -53,7 +53,12 @@ extern void func_0042C96C(void);
 extern void SceneActorPool_Construct(CLevelActorPool *);
 extern void CInstancePool__Construct(void *);
 extern void func_0042D120(void *);
+#ifdef TARGET_PORT
+/* the particle data is a pointer: m_pParticleEffects is the cache handle (read pointer-wide) */
+extern void CParticleSystem__Construct(CParticleSystem *, sptr);
+#else
 extern void CParticleSystem__Construct(CParticleSystem *, s32);
+#endif
 extern void func_0042D410(void *);
 extern void CPlayerPool__LevelStart(void *);
 extern void CPlayer__StopLoopingSounds(void *);
@@ -129,7 +134,11 @@ loaded:
     gFrameCountGameplay = 0;
     CCache__SetFrameDelay(8);
     CScene__ClearListCounts(w);
+#ifdef TARGET_PORT
+    CParticleSystem__Construct(&w->m_ParticleSystem, *(sptr *) w->m_pParticleEffects);
+#else
     CParticleSystem__Construct(&w->m_ParticleSystem, *w->m_pParticleEffects);
+#endif
     SceneActorPool_Construct(&w->m_ActorPool);
     CInstancePool__Construct(&w->m_InstancePool);
     func_0042D410(gEngineApp_m_SwooshSystem);
@@ -314,7 +323,11 @@ loaded:
     gFrameCountGameplay = 0;
     CCache__SetFrameDelay(8);
     CScene__ClearListCounts(w);
+#ifdef TARGET_PORT
+    CParticleSystem__Construct(&w->m_ParticleSystem, *(sptr *) w->m_pParticleEffects);
+#else
     CParticleSystem__Construct(&w->m_ParticleSystem, *w->m_pParticleEffects);
+#endif
     SceneActorPool_Construct(&w->m_ActorPool);
     CInstancePool__Construct(&w->m_InstancePool);
     func_0042D410(gEngineApp_m_SwooshSystem);

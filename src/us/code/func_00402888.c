@@ -5,7 +5,7 @@
 #include "protos/ai.h"
 
 s32 MantidQueen_Hurt(s32, s32, s32);
-s32 MantidQueen_Step(s32, sptr);
+s32 MantidQueen_Step(sptr, sptr);
 s32 MantidQueen_Draw(sptr, sptr, sptr);
 
 extern s32 EnemyAI_HeadNodeCallback;

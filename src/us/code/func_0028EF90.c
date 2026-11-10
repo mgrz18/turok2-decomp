@@ -42,7 +42,11 @@ struct DecodeResult;
 typedef struct DecodeResult DecodeResult;
 struct MeasuredRecAt18 { unsigned char padding[24]; void * value; };
 struct MeasuredRecAt0V3 { u8 value; };
+#ifdef TARGET_PORT
+extern u8 __getTrackByte(sptr, s32); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+#else
 extern s32 __getTrackByte(sptr, s32);
+#endif
 extern u32 __readVarLen(RuntimeState *, u32);
 s32 __alCSeqGetTrackEvent(RuntimeState *state, u32 index, DecodeResult *result) {
     u8 first;

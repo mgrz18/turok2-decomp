@@ -1,4 +1,441 @@
-# Port status after Phase 7 round 6 (merged state)
+# Port status after Phase 7 round 7 (merged state)
+
+Round 7 merged five branches, in this order: v1 (the particle system on the host), v4 (macOS
+arm64 float conversions, `--bench`/`--pace`), v2 (weapons and firing), v5 (real level warps and
+the boss levels) and v3 (level triggers, enemy AI, damage). Then it fixed what only the merged
+tree reaches (C22-1..9 below: the enemies' attack path, the path tracks, `--high-memory`). This
+page says how to build and run the result, how far it gets, and what comes next. The part
+sections below keep each branch's own notes (detail pages: [GAMEPLAY.md](GAMEPLAY.md) sections
+6 (v2), 7 (v5) and 8 (v3), [RENDER.md](RENDER.md) section 6 (v1), [PERF.md](PERF.md) and
+[MACOS.md](MACOS.md) section 9 (v4), [ABI.md](ABI.md) section 6 (v5)); round 6 and earlier
+follow as history.
+
+The matching build is unchanged: `tools/asm_diff.py --base d3f05a74 -j 8` reports 0 differences
+over all 3,938 files after every merge and every fix, and a clean `make clean && make setup &&
+make build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`, 123 shared
+.rodata objects agree).
+
+## 1. Build and run
+
+```sh
+# 0. the matching build first: gendata and asm_diff read its ELF; keep a copy as build/ref.elf
+make setup && make -j8 build && make verify && cp build/turok2.us.elf build/ref.elf
+
+# 1. the archive, format 2.0. REBUILD IT this round: tools/assets/swap_spec.json changed (v1:
+#    the particle block 0 stays big-endian; v3: the LevelEvent trigger mask is a u32; C22: the
+#    path group header {s16 mode, s16 count} and the path point's tail as f32 + four u16).
+python tools/assets/mkarchive.py baserom.us.z64 -o OUT/turok2.o2r -j 4     # ~12 s
+python tools/assets/archive_check.py OUT/turok2.o2r baserom.us.z64          # OK, format 2.0
+
+# 2. configure; the game library AND the runtime/audio libraries (gendata reads all three)
+cmake -S port -B OUT/build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_BUILD_TYPE=Debug
+ninja -C OUT/build -j8 turok2_game t2runtime t2audio
+
+# 3. the game data as C into port/gen/ (gitignored). Drop the cache after ANY header change
+#    (this round: structs/controller.h, structs/boss.h, globals/boss.h, structs/event.h,
+#    rw/abu_protos.h).
+rm -f OUT/decls.json
+python3 tools/port/gendata.py --build OUT/build --cache OUT/decls.json -j 4      # ~1 min
+
+# 4. re-run cmake so data.cmake sees port/gen/*.c, then the executable
+cmake OUT/build && ninja -C OUT/build -j8 turok2
+
+# 5. run headless (Linux: SDL's offscreen driver, no window)
+cd OUT && SDL_VIDEODRIVER=offscreen T2_SHOT=shot.ppm T2_SHOT_EVERY=300 \
+    build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
+    --game --draw --pak-blank --frames 26000
+```
+
+The archive of this tree: 26,124 units, sha1 `71317b96cefb3b321aad3516d29ac6a0b98fd7a1`;
+`turok2` without `--game` reports fnv1a64 `952c0748e8d5f4a4` on all 3 backends. gendata: 1,537
+data symbols (1,531 typed from a C declaration), 93 pointer targets typed as tables, 386 zero
+.bss symbols, 4,041 pointer slots (2,932 relocated, 1,077 null, 32 unresolved).
+
+**The runs** (`turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --draw --pak-blank`
+plus):
+
+| what | input and switches | frames |
+|---|---|---|
+| boot + the 3 attract demos | (none) | 26,000 |
+| new game, the bow fired on the dock, the harbour swim | `--input @journey_fire.txt` ([GAMEPLAY.md](GAMEPLAY.md) section 6), `T2_STATE_LOG=60` | 15,000 |
+| a real warp to level 52 and back | `T2_WARP_TO=1813 --input @exit52.txt` (section 7) | 16,000 |
+| a boss level | new game, `T2_WARP_TO=-4` (Mother, level 3), `7501` (Mantid Queen), `7602` (Primagen) | 15,000 |
+| enemies in demo 1 | `T2_TELEPORT=5600:2334.7,307.2,-1054.7 T2_WAKE_ENEMIES=1500 T2_ACTOR_LOG=4 T2_STATE_LOG=60` (section 8) | 8,600 |
+| every weapon | new game, `T2_GIVE_WEAPONS=1` (+ `T2_WEAPON=<n>`, `T2_WEAPON_LIST=1`), Z to fire | |
+
+`journey_fire.txt` (the bow from the wheel, two arrows on the dock, then the harbour):
+
+```
+START@4400 A@4500 A@4700 A@4800    # title -> main menu -> single player -> new game -> OK
+A@12950..12990 SX=80@12960..12990  # weapon wheel, stick right: the bow (weapon 2)
+Z@13060..13120                     # draw (hold Z), release: the arrow flies (20 -> 19)
+Z@13200..13204                     # a quick second shot (19 -> 18)
+CU@13300..13740                    # down the ramp, into the harbour water
+SX=80@13750..13774                 # turn right about 90 degrees
+CU@13780..14300                    # swim across the basin
+```
+
+`exit52.txt`: `START@4400 A@4500 A@4700 A@4800`, `CU@13100..13120` (out of the exit strip
+`T2_WARP_TO=1813` put him in), `CD@13140..13300` (back into it: the game's own warp 1098 to level
+52), `CU@15000..15300` (level 52's exit back to level 51).
+
+Options (`turok2 --game`):
+
+- `--input`: `BUTTON@F`, `BUTTON@F1..F2` (held), `SX=V@F1..F2` / `SY=V@...` (stick), `@FILE`
+  ([INPUT.md](INPUT.md) section 6). The stick turns, C-up/C-down move, C-left/C-right strafe,
+  R jumps, Z fires, A/B hold the weapon wheel, L the map.
+- `--audio` / `--wav out.wav`; `--high-memory` (Linux: host pointers above 4 GB);
+  `--offscreen-gl` (**macOS**: pixels with no window); `--no-window`.
+- `--bench [FROM]` (per-VI host times: game CPU, audio, draw, per drawn frame, percentiles) and
+  `--pace` (real-time 60 Hz VI pacing): [PERF.md](PERF.md).
+- Debug switches (port/game/t2debug.c and game.cpp, **debug only**): `T2_STATE_LOG=N` (mode,
+  level, the player, the weapon and its ammo, the wheel), `T2_ACTOR_LOG=N` (with
+  `T2_STATE_LOG`: the N nearest enemies/turrets: AI mode, animation, health, target, the mode
+  callback), `T2_TELEPORT=F:x,y,z[;...]`, `T2_WAKE_ENEMIES=R`, `T2_WARP_TO=<id>[@frame][,...]`
+  (a negative id is `~level`), `T2_GIVE_WEAPONS=1`, `T2_WEAPON=<n>`, `T2_WEAPON_LIST=1`,
+  `T2_SHOT_FROM=<frame>`, `T2_PARTICLE_LOG=N` (particle spawn calls), `T2_ANIM_EVENTS=0`
+  (the animation events and hot points are ON by default now), `T2_SCENE_LOG`, `T2_MENU_LOG=1`,
+  `T2_DLDUMP_AT=<frame>` (+ `T2_DLDUMP_VTX=1/2/3`: vertices, G_MOVEMEM bytes, image hashes),
+  `T2_V2P_TRAP=1`, `--skip-pak-check`, `--start-mode N`.
+
+## 2. How far it gets (Linux, headless)
+
+The boot loop (26,000 frames, no crash; the same mode switches at the same frames as round 6):
+
+```
+frame 2: mode 0 pak check;  298: mode 1 legal;  1070: mode 3 the 3D expansion pak
+frame 1362: mode 4 the Acclaim logo;  1850: mode 5 the Iguana jungle;  4212: mode 7 TITLE
+frame 5467: demo 1 (level 81);  13680: demo 2 (level 131);  20946: demo 3 (level 109)
+frame 25778: the title again; frame 26000
+```
+
+**Firing** (the journey above, 15,000 frames, no crash): 12960 the wheel open; 13020 weapon 2,
+the tek bow, ammo 20; 13080 the fire mode (weapon AI 4, the bow drawn); 13140 the arrow flies,
+ammo 19; 13260 the second arrow, 18; 13300-13740 down the ramp into the water; 15000 the player
+at (315.9, -793.4, -1352.3). With `T2_GIVE_WEAPONS=1`, 13 land weapons fire (v2's table in
+GAMEPLAY.md section 6); the pistol in level 52 fires 24 rounds (50 -> 26) with the muzzle flash,
+the shell casings and the bullet decals on the wall.
+
+**The warp** (16,000 frames): 12955 `T2_WARP_TO=1813` reloads level 51 at its exit strip; 13200
+the player walks back into it (warp state 1, the game's own warp 1098); **13260 level 52** at
+(1280.0, 0.0, -3225.6), its stone corridor with ladders and walkways drawn; 15060 level 52's exit;
+15120 level 51 again at (3819.5, 307.2, 614.4). The same run passes with `--high-memory`.
+
+**A boss level**: `T2_WARP_TO=-4` loads level 3: the Mother's intro cinema draws the boss and
+Turok in the slime pit (frame 14003), then gameplay at (83.4, 0.0, -723.9) to frame 15,000.
+The Mantid Queen and the Primagen as in v5's table (GAMEPLAY.md section 7; the Primagen still
+stops in `Path_ExpandNode` at 13,260: not rerun this round).
+
+**Enemies** (demo 1, the switches above): the two enemies (type 0x190) wake, walk to the player,
+take him as their sight target, **turn to face him and attack**: mode 18 (the projectile attack,
+`EnemyMode_Attack_Update`), its animation (index 10, anim type 4300) plays and loops, and its
+animation event spawns the projectile (`Actor_SpawnParticle` -> `CParticleSystem__Spawn`), which
+flies at the player. **The player's health stays 100**: the projectile passes over his collision
+cylinder (top 92 units above his feet) on a downward line from the enemy's hand and the sweep
+tests only the cylinder's side (`Sweep_HitCylinder` with `frontOnly`), so it hits a static object
+behind him (`CParticle__HitInstanceBody`). In level 52 (13 enemies, `T2_ACTOR_LOG`), an enemy of type
+0xC8 woken next to the player takes him as its target and stays in mode 10 (its idle animation,
+backing off); the pistol fired straight ahead does not reach it. **No enemy has died yet**:
+next steps 1-2.
+
+- `--audio --wav` through the boot (6,000 frames): 100.1 s, peak 22,928, RMS 2,226.2 (round 6:
+  21,621 / 1,998.6; the animation events and the particles now play their sounds).
+- **Linux `--high-memory`**: the 26,000-frame boot loop (all three demos, after C22-7..9), the
+  firing journey (15,000) and the warp to level 52 and back (16,000): no crash.
+- macOS: not rerun on the merged tree this round (v4 ran its branch and a scratch merge with v1:
+  MACOS.md section 9; open there: some actor parts not drawn on the Mac with display lists
+  identical to Linux, a post-display-list difference, G_MOVEMEM lights/viewports suspected).
+
+Screenshots (640x480, checked by eye; not committed): the bow drawn with an arrow nocked on the
+dock, the counter 20 (13121), the arrow gone and the counter 19 (13131); level 52's corridor with
+its ladder and walkways (13401); the Mother's cinema: the boss and
+Turok in the yellow-lit slime pit (level 3, 14003); level 52, the pistol's muzzle smoke, a shell
+casing in the air and bullet decals on the wall, counter 49 (13381); demo 2 (14002); demo 1's
+enemy test (the player faces the wall; the enemy is beside him).
+
+Performance (v4, [PERF.md](PERF.md), Apple M5, Release): about 0.55 ms per drawn game frame in
+level 51 with audio (the N64 budget is 33.3 ms), drawing is ~80% of it; unpaced the game runs
+~60x real time; `--pace` holds 60 Hz VIs.
+
+The port tests pass: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (26,124 units, 0
+mismatches, ROM backend + the archive's plans identical), `t2asset_typed_test` (1,585 checks,
+0 errors), `gbi_test` (0 mismatches), `t2os_test` (trace hash `2b2775877e0d226b`, the same on 3
+runs), `t2audio_test --direct 0` (19 frames, peak 32,433), `t2audio_test --adec 0xC29AB4 7464`
+(27,136 samples), the swoosh self test (OK, 0 failed).
+
+ABI (`tools/port/abicheck.py --build OUT/build -j 4`: 3,074 TUs, 11,217 calls, 10,880 checked
+against a definition, 186 function-pointer calls): harmful direct sites **0** (v5 fixed the 11),
+indirect 1 (a `Destructible_Hurt` store, declaration only). `ptrdecls.py`: 0 left in `src/` (it
+still lists the strlen returns and the uncompiled `include/functions.h`); `ptrargs.py` on a
+clean game-library build log: 0. `f2ucheck.py`: 79 float -> unsigned conversions in 3,894
+files, none new on a value that can be negative.
+
+## 3. Merge resolutions and fixes (round 7)
+
+| where | branches | resolution |
+|---|---|---|
+| func_00223F50 (`CScene__GetSwoosh`) | v1, v4 | v1's `protos/iset.h` include (5e724e40); v4's duplicate local declaration dropped |
+| func_00226390 (`CScene__ClearListCounts`) | v1, v4 | already v1's on v4's branch (37a8cf99) |
+| func_00257D48 (`WeaponActor_Update`) | v2, v4 | the same commit on both: one body |
+| func_0022BA88, func_0022BFA0, func_0022C228 (u8 surface getters) | v1, v2 | v1's declarations (146bc42e); v2's reverted |
+| func_00268460 (the wall radius) | v5, v3 | both gave it a host body and git merged them **without a conflict** into nested `#ifdef`s that did not compile: v3's kept (typed `CIntelligence`) |
+| port/app/game.cpp, port/game/t2debug.c | v2, v5, v3 | every debug switch kept |
+| GAMEPLAY.md | v2, v5, v3 | v2 is section 6, v5 section 7, v3 section 8 |
+| STATUS.md | all | every part section kept |
+
+Fixed on the merged tree (asm_diff 0 for each):
+
+| # | symptom | cause | fix |
+|---|---|---|---|
+| C22-1 | ptrdecls: `IsCodePointer` declared `(u32)` in func_0028BDFC | v2 retyped its definition | `(uptr)` |
+| C22-2 | the warp back into level 51 crashed in `Action_GoEnter` | N64 offsets (0x14, 0xD4); reached once v3's triggers matched | host body on `CGameObjectInstance`/`CActionIntelligence` |
+| C22-3 | demo 2 crashed in `Path_ExpandNode` (an enemy on its path track) | the path points' regions resolved at the N64 0x20 stride into host `CGameRegion`s (0x40), stored in a 4-byte slot (`--high-memory`); the path header `{s16 mode, s16 count}` was unswapped, so `CPathTrack__Advance` never wrapped and walked off the points | the point keeps its ROM index, `CScene__GetPathRegion` resolves it; swap_spec: the header and the point's tail (f32 rotY + four u16 flags) typed. **Archive rebuilt** |
+| C22-4 | the demo-1 enemies turned in place forever beside the player | `AI_AngleToPoint` read the yaw at N64 0x50: the angle to a target ignored the AI's own rotation | host body |
+| C22-5 | then they picked an attack and nothing happened (mode 0x42BF0012) | `EnemyAI_PickAttack` returns s16, its callers declared s32: the host leaves the upper bits of the return register undefined (MIPS extends them) | 49 declarations of s16/u16/s8/u8 functions declared s32/int (11 functions: `EnemyAI_PickAttack`, `EnemyAI_GetBehaviorIndex`, `WeightedTable_Pick`, `CScene__GetObjectTypeID`, ...) take the narrow type on `TARGET_PORT` |
+| C22-6 | enemy projectiles without their target | `Actor_SpawnParticle` read the velocity at N64 0x18 and the target at 0x1C0 (`m_pSightTarget`) | host body |
+| C22-7 | `--high-memory`: crash in `CScene__GetInstanceSavedBit` at the demo-1 load | `Generator_Step(s32 actor, ...)` | sptr; `Throwable_Step`/`Action_Step`/`Door_Step` too, and on the host they pass the actor and AI to the mode callback (MIPS leaves a0/a1 untouched for it) |
+| C22-8 | `--high-memory`: crash in `GameObject_TraceMove` in demo 3 (a door opening) | the impact handler func_00238824 took the actors as s32 | sptr |
+| C22-9 | ptrdecls: `MantidQueen_Step` | its definition retyped in C22-7 | `(sptr, ...)` |
+
+## 4. Next
+
+1. **Enemy hits on the player**: the demo-1 projectile passes over the player's cylinder.
+   Compare the aim point and the muzzle height with the N64 (the hot point the anim event
+   spawns at, `CParticleSystem__Spawn`'s aim at `target`, the player's collision height 92.16 and
+   y offset), and check `Sweep_HitCylinder`/`Sweep_TestInstance` against the ROM for the cap
+   test. Then `ImpactEvent_*` -> `CPlayer__Hurt` (the HUD health).
+2. **A kill**: aim at an enemy (the player's facing under `T2_TELEPORT`, or a teleport with a
+   rotation) and fire; the death path is still N64 views: `AI_UpdateRegionFlags`,
+   `DamageEvent_Set`, `EnemyAI_OnHit`, `EnemyAI_PickDeathMode` (func_0025DF04's `AttackState`
+   view), the death animations (func_0025DF04, func_0025E248, func_0025FD98).
+3. **The narrow-return class** is only checked by a regex scan (C22-5's script); teach abicheck
+   the return width, and look at `int`-returning callbacks stored in tables.
+4. **K&R indirect calls** (`temp_v0_2()` in mode-step functions: C22-7 fixed four) rely on MIPS
+   leaving a0/a1 for the callee; search for the rest.
+5. The Primagen fight (`Path_ExpandNode` at 13,260; recheck after C22-3), the boss fights with
+   the boss on screen, the Blind One (level 1).
+6. **macOS**: rerun the merged tree on the Mac (particles, firing, warps, enemies) and chase the
+   undrawn actor parts (post-display-list: G_MOVEMEM lights/viewports).
+7. `--high-memory` was run on the boot, the journey and the warp; run the enemies and the boss
+   levels with it too.
+
+## Round 7, part v1: the particle system (branch names-R7_v1)
+
+`CParticleSystem__Spawn` and the particle path run on host types, so the **animation events
+and hot points are on by default** (`T2_ANIM_EVENTS=0` turns them off). Details:
+[RENDER.md](RENDER.md) section 6. All src/include changes are `TARGET_PORT`;
+`tools/asm_diff.py --base d3f05a74 -j 8` reports 0 over all 3,938 files.
+
+**Merge needs:** the archive rebuilt (`swap_spec.json`: particle-effects block 0 kept
+big-endian, `"block0": "byte"`, honoured by `swapcheck.py`): sha1
+`3ad7d24031060de1b4dad8df85b8c321227fe77c`; `decls.json` deleted (`structs/particle.h` changed:
+`CPackedRange`, `CROMParticleDistance/Oscillation/Colors/Motion`; DLights_Load's
+`gDLightBuffer[0x40]`).
+
+What was wrong, in the order found:
+
+| # | where | cause | fix |
+|---|---|---|---|
+| P1 | the templates (block 2) | nine 32-bit offsets per 0x3C record, relocated in place: no room for host pointers | `port/game/t2particles.c` builds a host copy per load (`CScene__DecompressParticles` and its twin); Spawn indexes it |
+| P2 | block 0 sub-records | swapped as f32 (base and range of every `CPackedRange` exchanged); records overlap across types | kept big-endian, decoded per slot by the builder |
+| P3 | func_0022D2FC.c (FAKEMATCH) | every view at N64 offsets (`EffectSystem.resource` at 0xEC64: `CISet__GetBlock(NULL/garbage, 1)`, the crash of round 6) | hostview twins of all 17 views, host aimEffect, player list head by name |
+| P4 | 22 particle files | views at N64 offsets (projectile updates, HitTarget, Attach, StopLoopSound...) | hostview / host bodies |
+| P5 | `CParticle__BuildCameraMatrix` | wrote the matrix at the N64 0x48, over `m_dwFlags`: freed particles left in the draw list, an endless loop | `m_mtxDraw[gEvenOdd]` |
+| P6 | `CCamera__DrawGlares` | `CGlareSource` view over the particle draw list | hostview |
+| P7 | `CScene__DrawParticles` | `scene + 0x18B0` | `&scene->m_ParticleSystem` |
+| P8 | collision sweeps (particles move with `Collision_MoveInstance`) | static objects at the N64 stride, actor/box/face sweeps' views, the `{pointer, f32}` hit sorts | host CStaticObject stride, hostview, host-size comparators/swaps |
+| P9 | `CScene__ClearListCounts` | N64 view: the scene's per-frame list counts (`m_nMovers`, `m_nKind1`, `m_nRegistered`...) were never reset on the host | hostview |
+| P10 | `gDLightBuffer` | 16 bytes on the host (splat labels inside the 0x400 buffer): DLights_Load overran it | sized declaration for gendata |
+| P11 | host template copies | freed on a reload while particles still used them | kept (one per scene load) |
+| P12 | `CParticle__HitFloor/HitWall/HitCeiling` | the surface getters return u8, declared s32: the impact table indexed with eax garbage | u8 declarations (ABI class not caught by abicheck: see next steps) |
+| P13 | `CParticleSystem__Construct` (and _2) | the particle data passed through the `s32 *m_pParticleEffects` handle: truncated with `--high-memory` | `*(sptr *)`, an `sptr` parameter |
+| P14 | `CScene__GetSwoosh` | `CISet__GetBlock` without a prototype (implicit int): the trail record pointer truncated with `--high-memory` | `protos/iset.h` |
+| P15 | func_0020B9F4 (particle models) | the cache entries' data pointers read as `*(s32 *)` (`--high-memory`) | pointer-wide |
+
+How far it gets with the events on (Linux headless, low memory, `--game --draw --pak-blank`):
+
+- **The boot loop, 26,000 frames: no crash (exit 0).** The mode switches are at the same frames as
+  round 6 (1362 Acclaim, 1850 Iguana, 4212 title, 5467 demo 1, 13680 demo 2, 20946 demo 3,
+  25778 the title again). The animation events fire from the Acclaim logo on (kinds 217/218
+  from its hot points, 442...).
+- **The scripted journey, 15,000 frames: no crash (exit 0).** Level 51 at frame 12,895, the same
+  path as round 6 (13080 (-1540.7 -735.8 -982.4) state 3; 13440 (-1164.7 -780.7 -29.0);
+  13800 (358.3 -780.7 -60.3); 14400 (623.2 -780.7 198.3); 14640 (795.2 -780.7 233.0)),
+  health 100, the wheel requesting weapon 2. `T2_PARTICLE_LOG=50`: 350 spawn calls, all in
+  the cinemas (none in level 51 on this path: no footstep hot points in first person; v2's
+  firing spawns the arrow and its splash).
+- **`--high-memory`: the boot to 12,000 frames, no crash** (after P13-P15).
+- Particles on screen (RENDER.md 6.4): against round 6's binary, 16 of 138 frames from 1 to
+  2770 differ, each where particles show (the Acclaim logo's cyan ring burst and sparks/dust,
+  the Iguana jungle's mist and fireflies).
+- Debug: `T2_PARTICLE_LOG=N` prints every N `CParticleSystem__Spawn` calls that reach templates.
+
+Files others may touch (merge): func_0024032C.c, func_0023F880.c, func_0023FDF0.c,
+func_0023DF70.c, func_0023D050.c, func_0023DBBC.c, the hit sorts (func_002407D8, func_0024079C,
+func_0023DB98, func_0023DB5C) and func_002682CC (v3's collision area: agreed with v3);
+func_00226390.c (`CScene__ClearListCounts`: changes what every list-driven system sees);
+func_002284E0.c (`gDLightBuffer[0x40]`: v2 made the same fix, keep one); func_0022D2FC.c.
+
+Next:
+
+1. **The narrow-return ABI class** (P12) is not caught by abicheck: a regex scan finds 17
+   functions defined with a u8/s8/u16/s16 return and declared s32/u32/sptr elsewhere
+   (EnemyAI_GetBehaviorIndex, EnemyAI_PickAttack, WeightedTable_Pick/_PickStatic,
+   CScene__GetObjectTypeID, Controller_IsPakWatched, __osContDataCrc...). Check each call site
+   (some are in `#else` branches) and teach abicheck the return width.
+2. The particle files not touched because no run reached them: func_00236A34, the Trail/Swoosh
+   drawing (`Trail_DrawTextured`, `Trail_PlaceNodes`: typed but not checked against particles
+   with trails), func_00232F38's big view (only `id` is read), `CParticle__SpawnAlongPath`.
+3. Firing (v2) and enemy hits (v3) spawn projectiles and impacts through this path: their
+   particles (bow arrows, bullets, blood) were not seen in this round's runs.
+4. macOS with the events on was not run (v4); `--high-memory` was run to 12,000 frames only.
+
+## Round 7, part v2: weapons and firing (branch names-R7_v2)
+
+Detail: [GAMEPLAY.md](GAMEPLAY.md) section 6. The weapon change completes and every land weapon
+tested fires in level 51 **once merged with v1** (the fire is an animation event ending in
+`CParticleSystem__Spawn`): tested on a scratch merge of names-R7_v1 (events on, v1's archive
+`3ad7d240`), not committed here. On this branch alone (events off) the boot (26,000 frames) and
+the journey (15,000) run without a crash; the weapon AI switches and runs its fire modes.
+
+- Weapon actor and modes on host types (v2-1..6: `WeaponActor_Update` is v4's commit
+  cherry-picked, the same text on both branches), the barrels' pose callbacks on
+  `T2PoseContext`, the player views in the switch/ready/select code.
+- Rumble on host types: `include/structs/controller.h` (ControllerProfile's rumble pool and
+  effects at host sizes, under TARGET_PORT): **gendata again (delete decls.json)**; the first
+  shot crashed in `RumbleCurve_Advance` without it.
+- Mode animation pickers: `IsCodePointer`/`IsDataPointer` host bodies (the executable's text),
+  `CGameObjectInstance__PickAvailableAction` reads its untyped tables big-endian (pistol,
+  mag 60, shredder, grenade launcher... fire). Enemies use the same pickers (v3 told).
+- Impact-event values are two host-order words (agreed with v1, a9c15e5e): FlashScreens and
+  the shakes extract their bytes/halves from them.
+- Pickups typed (`Pickup_FindWeaponEntry`, `HasRoomForAmmo`, `CollectPickup`), the weapon loop
+  sounds' node, `ImpactEvent_Send`'s registered list.
+- Debug-only: `T2_GIVE_WEAPONS=1`, `T2_WEAPON=<n>`, `T2_WEAPON_LIST=1`, `T2_SHOT_FROM=<frame>`,
+  the ammo in `T2_STATE_LOG`.
+
+Results (scratch merge): 13 weapons spend ammo when fired (tek bow, bow, pistol, mag 60, charge
+dart, shredder, plasma, firestorm, sunfire, PFM, grenade, scorpion, flame thrower), the HUD
+counter follows, muzzle flashes / casings / smoke / the arrow and its splash draw, `--audio`
+firing sounds (RMS 200 -> 2,500-4,200), the Talon swings; no crash over 17,200 frames.
+
+Merge notes: files others touch: func_00257D48.c (v4, identical commit), func_0022BA88/0022BFA0/
+0022C228.c (my u8 getter fix was reverted: keep v1's 146bc42e), func_002284E0.c (gDLightBuffer:
+only v1's change, I dropped mine). The journey's swim after 13450 differs from round 6 (see
+GAMEPLAY.md section 6: round 6's `WeaponMode_Ready_Update` wrote into the player). Open:
+`--high-memory` + events dies in `Blast_CanHit` (v3's damage path).
+
+## Round 7, part v5: level warps, bosses, ABI (branch names-R7_v5)
+
+[GAMEPLAY.md](GAMEPLAY.md) section 7, [ABI.md](ABI.md) section 6. **A real warp works end to
+end**: from level 51 the player walks into the harbour's exit region (warp id 1098, read by
+`CPlayer__Update` from the region info) and level 52 loads and draws at its arrival point; level
+52's exit takes him back (Linux low and `--high-memory`). `T2_WARP_TO=<id>[@frame],...` (debug)
+calls `CPlayer__Warp` from gameplay. The boss levels load: the Mantid Queen (level 2, its intro
+cinema and the arena), and with v1's particles the Mother (level 3) and the Primagen (level 4)
+arenas draw; the Primagen stops at 13,260 in `Path_ExpandNode`. abicheck: **0 harmful direct
+sites** (was 11), 1 indirect store. The remaining player-path views of round 6 are done.
+
+Regressions checked: the scripted journey (15,000 frames) gives the same positions as round 6
+(358.3/-60.3 at 13800, 795.2/233.0 at 15000), alone and merged with v1.
+
+**Merge notes.**
+- **Merge v1 (particles) with or before v5.** v5's `Generator_Setup` fix installs the
+  generators' step callback, which the host never had: their spawns now reach
+  `CParticleSystem__Spawn`, so this branch ALONE crashes the boot in attract demo 3 (level 109,
+  `Generator_SpawnEnter`). With v1 merged (scratch test, v1 at 146bc42e) the boot runs 26,000
+  frames clean and the journey is unchanged.
+- **Header change**: `include/structs/boss.h` (TotemDefenseState moved above LevelScriptState and
+  placed in it as `totemDefense`; `LevelScriptBlock` under TARGET_PORT), `include/globals/boss.h`
+  (`D_8012F604` declared under TARGET_PORT): drop decls.json and rerun gendata. No swap_spec or
+  asset change: the archive is unchanged (v1's archive, 3ad7d240, for the merge).
+- Files others may touch: func_0021A500.c (one call, the IsOnGround argument), func_00219BC0.c
+  (one call), func_0026841C.c, func_00268460.c, func_002685F0.c, func_00268798.c,
+  func_002687FC.c (actor helpers used by AI/collision: v3), func_00262D74.c (generators),
+  func_00238DF8.c + port/game/t2abi.c (boss impact handlers: v3 converted the neighbours),
+  port/game/t2debug.c and port/app/game.cpp (`T2_WARP_TO`).
+
+Next: the Primagen fight (`Path_ExpandNode`; the level-script views anchored at the
+`gLevelScript_*` symbols with N64 deltas, 41 files), the Blind One (level 1), boss fights with
+the boss on screen (scripted triggers or a debug switch).
+
+## Round 7, part v3: enemies and damage (branch names-R7_v3)
+
+Details, the fix table v3-1..14 and next steps: [GAMEPLAY.md](GAMEPLAY.md) section 8.
+
+- **Level triggers work on the host.** The trigger mask (word 0 of every `LevelEvent`) reached
+  the host byte-reversed (the archive copied it as bytes), so no region or actor trigger ever
+  matched; `include/structs/event.h` types it (`u32 m_Mask`, host only) and **the archive must
+  be rebuilt** (this branch alone: sha1 `01311a4b2908acfbd3e9247c9aec27e3f246e4a9`; v1 also
+  changes swap_spec, so the coordinator builds one archive from the merged headers). Plus the
+  CScene record-table and bit-section reads and the trigger state test (v3-2..4), and the
+  delayed-event queue's s32 event casts (v3-14, `--high-memory`).
+- **Enemies run their AI**: level 51 has no enemies (doors, destructibles, actions only); the
+  attract demos have them (level 81: 9, level 131: 53), asleep until their level event
+  (`EnemyMode_WaitForTrigger`). Ported on the way: the wall radius, `AI_FindBestTarget`,
+  `AI_UpdatePathHeading`, `AI_UpdateTargets`, the player-pool walks (`CPlayer.m_pNext`), the area
+  damage handlers' actor params (v4's macOS crash), `Blast_CanHit`/`ApplyBlast` (v2's
+  `--high-memory` crash).
+- Results (scratch merge with names-R7_v1, Linux headless): the boot to 26,000 frames (all three
+  demos, the AI running in demo 2), the new-game journey to 15,000 frames in low and high memory
+  (unchanged end (795.2, -780.7, 233.0)). Demo 1 with `T2_TELEPORT=5600:2334.7,307.2,-1054.7
+  T2_WAKE_ENEMIES=1500`: two enemies wake, walk to the player and keep him as their target;
+  they **do not attack yet** (their animation index stays 0: v2's ce8cb3da `CAI__UpdateModeAnim`
+  pickers are the lead), so no health change and no death was reached this round.
+- Debug (DEBUG-ONLY): `T2_ACTOR_LOG=N`, `T2_TELEPORT=F:x,y,z`, `T2_WAKE_ENEMIES=R`.
+
+Merge notes: **merge v1 before (or with) v3**: on this branch alone the boot crashes in demo 2
+(frame ~13,700) in `Collision_SweepActors` (func_0024032C, ported by v1) as soon as an enemy
+looks for the player. Files: include/structs/event.h (archive), port/game/t2debug.c,
+port/app/game.cpp (two debug hooks after T2_STATE_LOG), src func_0022515C, func_002252A0,
+func_00224CF8, func_0026E4B8, func_002253F8, func_00225354, func_00268460, func_00243C90,
+func_002438C0, func_002399F8, func_00239C28, func_00246108, func_0025EEA4, func_002532EC,
+func_00253370, func_00253018, func_002534E0, func_0023876C, func_002387C4, func_00238B2C,
+func_00238B84, func_00238BDC, func_00238C34, func_00238C8C, func_00238CE4, func_0023726C,
+func_00237AFC. The scratch merge with v1 was conflict-free.
+
+## Round 7, part v4: macOS, arm64 float conversions, performance (branch names-R7_v4)
+
+Commits (on the Mac clone `~/Documents/Proyectos/turok2_macport`, branch `names-R7_v4` from
+d3f05a74). Every `src/` change: asm_diff 0 against d3f05a74 on the box. No `include/` changes.
+The archive is unchanged (`47e8f73c…`).
+
+| commit | what |
+|---|---|
+| 6b74c760 | `WeaponActor_Update` (func_00257D48) host body. The N64 AI view zeroed the high half of `m_pfStep`, which crashed macOS entering mode 13. It also ran the mode table's row 0 instead of the current mode, **on Linux too**, and that is why the weapon switch never completed. Now the level-51 journey switches to weapon 2 (the bow, 20 arrows in the HUD) and Z enters the fire mode |
+| de2fe1cd | `--bench [FROM]` and `--pace` (debug): see [PERF.md](PERF.md) |
+| b07b8d5d, 37a8cf99 | `func_00225C08` (noise to kind-1 actors) host body: its FAKEMATCH tests an uninitialised local, which clang -O2 compiles to a trap. `CScene__ClearListCounts`: names-R7_v1's version taken byte for byte, so it merges clean |
+| 18150edd | **arm64**: negative float -> u32 conversions saturate to 0 (`fcvtzu`); the R4300 and x86-64 wrap. `T2_F2U` (TARGET_PORT: through s32) in the bone-matrix packing (packMtx: the Acclaim logo and every skinned actor lost their negative matrix elements on the Mac), the vertex-pattern hash, the scene light direction, the fill-rectangle corners. `tools/port/f2ucheck.py` lists all 99 float -> unsigned conversions. `-fsanitize=float-cast-overflow` confirms that none is left on the level-51 journey |
+| 321d1c9b, 37a8cf99 | `T2_DLDUMP_VTX=2/3`: every vertex, G_SETTIMG image hashes/bytes, G_MOVEMEM bytes (debug) |
+| ac622745 | `CScene__GetSwoosh`: `CISet__GetBlock` declared (an implicit `int` return truncated it on macOS once v1's particles spawn trails) |
+
+Results ([MACOS.md](MACOS.md) section 9, [PERF.md](PERF.md)):
+
+- macOS, this branch: the new game with the scripted journey runs to 15,000 frames with
+  `T2_STATE_LOG` identical to Linux. Debug and an `-O2` build agree. 26 of 30 screenshots match
+  Linux within 1% of the pixels. The other 4 are actor parts that Linux draws and the Mac does
+  not (the boat and Turok's hand in level 51), although the display lists are identical, every
+  vertex and matrix included. That is open.
+- The boot stops entering attract demo 1 (frame ~5470) **on both hosts**: v4-1 makes the demo's
+  weapon fire, and firing needs v1's `CParticleSystem__Spawn`. With v1 merged (scratch), the Mac
+  runs into the demo and the new game into the mode-12 cinemas. Truncations found there were
+  fixed by v1 (`ModelSweep_TestModel`, b8bca0e3) and v3
+  (`ImpactEvent_AreaDamage` & co., e26d87e9; `ImpactEvent_LevelSpecial` fixed by v5 in 06477da5); `RumbleCurve_Advance` (`gCurrentFB[1]` NULL,
+  `--offscreen-gl` only) is open: retest with v2's rumble fixes (be9c4bf8).
+- Performance (M5): level 51 costs 0.55 ms per drawn frame in Release and 1.05 ms in Debug (the
+  N64 budget is 33.3 ms). Drawing (Fast3D + GL) is about 80% of that. Paced at 60 Hz VIs / 30
+  fps, Release has no late VI in level 51; the late VIs are level loads only.
+
+To merge: `src/us/code/func_00257D48.c` (v2 may write the same function: keep one; mine runs
+the current mode), `func_00226390.c` (identical to v1's), `func_00223F50.c` (one line; v1 fixed it too in 5e724e40: keep either),
+`func_0021B95C.c`/`func_0021285C.c`/`func_0027C4E4.c`/`func_0027F64C.c` (a `T2_F2U` macro at the
+top of each), `port/app/game.cpp`/`main.cpp`/`game.h`/`offscreen_gl.*`,
+`port/audio/t2audio_mgr.c`/`t2audio.h` (`T2Audio_GetTimes`). After the merge, rerun
+`tools/port/f2ucheck.py` on new host bodies, and run the merged tree on the Mac and with Linux
+`--high-memory`.
+
+# Round 6, merged state (history)
 
 Round 6 merged five branches, in this order: u1 (gameplay draws the level: the cache hash
 bucket stride, the camera visibility bits, the HUD), u5 (ABI and pointer width: indirect calls,
@@ -14,7 +451,7 @@ The matching build is unchanged: `tools/asm_diff.py --base 6d04fabb -j 8` report
 over all 3,938 files after every merge and fix, and a clean `make clean && make setup && make
 build && make verify` gives the identical ROM (CRCs good, 123 shared .rodata objects agree).
 
-## 1. Build and run
+## Round 6: build and run
 
 ```sh
 # 0. the matching build first: gendata and asm_diff read its ELF; keep a copy as build/ref.elf
@@ -84,7 +521,7 @@ typed as tables, 386 zero .bss symbols, 4,041 pointer slots (2,932 relocated, 1,
 unresolved). The archive: 26,124 units, sha1 `47e8f73c2bb7304f7f6c3e0ac34ad478f1bdf15f`;
 `turok2` without `--game` reports fnv1a64 `c7909f8a7049feac` on all 3 backends.
 
-## 2. How far it gets (Linux, headless; macOS per u4)
+## Round 6: how far it got (Linux, headless; macOS per u4)
 
 The boot loop, `--game --draw --pak-blank --frames 26000` (158 s, no crash):
 
@@ -150,7 +587,7 @@ struct_scalar, float_int 0. `ptrdecls.py`: 0 left in `src/` after this round's T
 fix (it still lists the strlen returns and the stale, uncompiled `include/functions.h`);
 `ptrargs.py` on a clean game-library build log: 0.
 
-## 3. Merge resolutions and fixes (round 6)
+## Round 6: merge resolutions and fixes
 
 | where | branches | resolution |
 |---|---|---|
@@ -175,7 +612,7 @@ Fixed on the merged tree (asm_diff 0):
 Demo 1's darkness (u1) is gone on the merged tree: with u2's actors, lights and shadows its
 frames show the corridor, the door and the weapon models at normal brightness.
 
-## 4. Next
+## Round 6: next (as written then)
 
 1. **`CParticleSystem__Spawn`** (func_0022D2FC.c, 1,752 lines of local N64-layout views):
    firing, impacts, footsteps, blood and the animation events all end there. With

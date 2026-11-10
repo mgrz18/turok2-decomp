@@ -471,3 +471,96 @@ cinema, title, demo 1), `R6_u4_mac_ng_{9502,13501}.png` (Port of Adia cinema, le
 - The level-51 gameplay frame: sky and fog only, the same as Linux (u1's item).
 - `--offscreen-gl` uses a fixed 640x480. The game frame size follows `gScreenWidth/Height`
   through `SetNativeDimensions`, as in a window.
+
+## 9. Round 7 (part v4): the round-6 merged tree on the Mac, arm64 float conversions, performance
+
+Branch `names-R7_v4` (from d3f05a74). Every `src/` commit was checked on the box with
+`tools/asm_diff.py --base d3f05a74 -j 8` (scratch copy `/root/R7_v4mac/repo`;
+`OUT/r7/asmcheck.sh` applies `git diff d3f05a74 -- src include` there): **0 differences** at
+every commit. No `include/` changes. The Linux runs for comparison are this branch built in
+`/root/R7_v4mac/out` (Debug, low memory, SDL offscreen window).
+
+Build: `OUT/rebuild.sh --fresh` with the box's ELF at d3f05a74 (sha1 `61dcdf3f…`, the same as
+round 6) and the box's round-6 archive (`OUT/turok2_d3f.o2r`, sha1 `47e8f73c…`).
+
+### 9.1 What the merged tree needed on the Mac
+
+| # | where | cause | fix |
+|---|---|---|---|
+| v4-1 | jump to 0x350598 from `CAI__Update` when the boot enters attract demo 1 (mode 13, frame 5467), and when the new game enters level 51 | `WeaponActor_Update` (func_00257D48) reads the CAI through an AI view at N64 offsets: `unk128 = 0` (N64 0x128, the weapon vars) lands on the high half of `m_pfStep` (host 0xF0 + 8). The step pointer truncates. Linux survives because its text is below 4 GB. The same view read `ai->state` at 0x30 = the host `m_pModeTable` (not `m_pModeCurrent`), so the weapon actor always ran the mode table's row-0 callback, **on Linux too** | host body on CAI/CGameObjectInstance: owner `m_AI.m_pParent`, `m_Weapon.m_RefireDelay/m_nLod/m_FireDelay`, `m_pModeCurrent->m_pfCallback`, `m_pModeTable->unk_10`. **The weapon switch now completes**: in the level-51 journey the wheel's weapon 2 becomes current (`weapon 2 reqw 2`), the HUD shows the bow with 20 arrows, and Z goes to the fire mode (`wact 4/27`) and back. All hosts |
+| v4-2 | `EXC_BREAKPOINT` in `func_00225C08` from `GameObject_PlayLandSound` (Release build only, Turok's first landing in level 51) | the FAKEMATCH text tests an uninitialised local (`if (temp_s2)`). clang -O2 turns that into a trap. It also reads the kind-1 actor list at N64 offsets (0xDFC/0xEFC) with s32 actor pointers | host body: `AI_HearNoise` for each of `m_pKind1[0..m_nKind1)` |
+| v4-3 | `CScene__ClearListCounts` | N64-offset view: on the host it cleared words inside the pointer arrays, and the counts were never reset | names-R7_v1's host view (88ec1de3), taken as is so that the branches merge cleanly |
+| v4-4 | **arm64 only**: actors drawn with negative matrix elements zeroed. The Acclaim logo's letters (frame 1501: 7.4% of the pixels differed from Linux, after the fix 0.00%), Turok's hand, the boat in level 51 | C leaves a negative float -> unsigned conversion undefined. The R4300 converts through a signed word (`trunc.w.s`), and x86-64 clang does too in practice (through a 64-bit signed integer). arm64's `fcvtzu` **saturates to 0**. `packMtx` (func_0021B95C, guMtxF2L for the bone matrices) does `(u32) m[i][j]`, so every negative element became 0 on the Mac | `T2_F2U(x)` = `(u32)(s32)(x)` under TARGET_PORT (`(u32)(x)` on the N64, the same text) in packMtx, the vertex-pattern hash (func_0021285C, `worldPosition`), the scene light direction (func_0027C4E4) and the fill-rectangle corners (func_0027F64C) |
+
+**`tools/port/f2ucheck.py --build OUT/build -j 4`** lists every float -> unsigned conversion in
+the game, explicit or implicit (`clang -Xclang -ast-dump`, FloatingToIntegral to an unsigned
+type). There are 99 in 36 files. The ones not changed are clamped colours, alphas and timers
+that cannot be negative. A **runtime check** confirms the static triage:
+`-fsanitize=float-cast-overflow` (CMAKE_C_FLAGS) reports every out-of-range conversion.
+Through the whole level-51 journey (15,000 VIs) it reported only the four sites above (packMtx
+and func_0021285C), and after the fix it reports nothing. Rerun both after merges: new host bodies
+can bring new `(u32)` casts.
+
+### 9.2 How far it runs on the Mac (this branch alone)
+
+- **The new game with the scripted journey** (STATUS.md section 1), `--offscreen-gl`, 15,000
+  frames: no crash. `T2_STATE_LOG` is **identical to Linux** (250 records), and now the weapon
+  switch completes on both (v4-1).
+- **The boot**: the boot, the cinemas and the title as before. Attract demo 1 then stops at frame
+  ~5470, on both hosts. With v4-1, its weapon actor really fires (`WeaponMode_StreamFire_Update` ->
+  `CPlayer__FireWeapon(p, 20)`), which reaches `CParticleSystem__Spawn` and its N64-offset views
+  (`CISet__GetBlock(NULL, 1)`). That is names-R7_v1's work. With v1 merged (section 9.4), the
+  boot gets into the demo, as far as v4-8.
+- Debug and Release (-O2) give the same `T2_STATE_LOG` for the journey.
+
+### 9.3 Pixels, Mac against Linux
+
+The new game's 30 screenshots (every 500 frames): **26 agree to within 1% of the pixels**
+(>24/255). Before v4-4, frame 1501 (the Acclaim logo) differed by 7.4%; now it agrees exactly. The
+other four are all actor parts that Linux draws and the Mac does not: frame 7000 (a new-game
+cinema: Adon matches, but Turok's hand at the right edge is missing on the Mac, 3.2%), 10502 and
+11002 (cinemas, 1.7%), and 13001 (level 51, 6.9%). At 13001 **Linux draws the moored boat and
+Turok's hand; the Mac draws only the boat's rigging lines**. What is known:
+
+- the display lists are identical (`T2_DLDUMP_AT=13001 T2_DLDUMP_VTX=2`): every command word
+  apart from host addresses, **every vertex of every G_VTX, all 181 matrices**, and the first 32
+  bytes of every G_SETTIMG image (115) are the same on both hosts;
+- Linux draws the boat in low memory and in `--high-memory` alike, so pointer width is not the
+  cause;
+- disabling LUS's `GL_DEPTH_CLAMP` (a local experiment, not committed) changes nothing.
+
+So the difference lies after the display list: in Fast3D on the Mac's framebuffer-object path
+(`mGameFb`, used without a window), or in data the dump does not cover (G_MOVEMEM lights and
+viewports: `T2_DLDUMP_VTX=2` now prints their first 16 bytes, but that was added after the
+comparison). It is open (section 9.6).
+
+### 9.4 With names-R7_v1 (scratch merge, not committed)
+
+For the test, names-R7_v1 @ c6ad2fa9 (the particle path, animation events on by default) was
+merged into this branch in a scratch worktree (`OUT/r7/scratch`, not committed) with v1's archive
+(sha1 `3ad7d240…`). On the Mac, with full 64-bit pointers, three truncations show up that Linux's low
+memory hides:
+
+| # | where | cause | status |
+|---|---|---|---|
+| v4-5 | `Trail_AddNode` <- `CParticleSystem__Spawn` (boot frame ~1362, the first trail) | `CScene__GetSwoosh`'s TARGET_PORT body (func_00223F50) calls `CISet__GetBlock` with no declaration: the implicit `int` return truncates the record. It was the only implicit declaration in the game build | **fixed on this branch** (a declaration line; asm_diff 0). v1 fixed it too (5e724e40, by including protos/iset.h): a trivial conflict, keep either |
+| v4-6 | `ModelSweep_TestModel` <- `Collision_MoveInstance` <- `CParticle__Update` | `root = (s32 *)*data;` (func_0023DBBC.c:33) reads the block pointer as s32 | fixed by v1 (names-R7_v1 b8bca0e3, `*(s32 **)data` under TARGET_PORT) |
+| v4-7 | `ImpactEvent_AreaDamage` <- `ImpactEvent_Send(kind 3)` <- `FireAnimEvents` (new-game cinema, mode 12) | `ImpactEvent_AreaDamage(s32 arg0, s32 arg1, ...)`: the actor pointers as s32 | fixed by v3 (names-R7_v3 e26d87e9: the 8 area/explosion/push handlers take sptr). `ImpactEvent_LevelSpecial` (func_00238DF8): fixed by v5 (names-R7_v5 06477da5, sptr plus the boss handler prototypes) |
+| v4-8 | `RumbleCurve_Advance` <- `RumblePool_FreeFinished` <- `Controller_Service` (attract demo 1 fires; `--offscreen-gl` only) | reads `gCurrentFB[1]`, which is NULL there | open; v2 has rumble fixes (names-R7_v2 be9c4bf8) to retest with |
+
+With v4-5 and v4-6, the boot runs into attract demo 1, which fires its weapon and spawns particles,
+and the new game runs through the mode-11 cinemas into mode 12. Linux `--high-memory` should show
+v4-6 and v4-7 as well.
+
+### 9.5 Performance
+
+[PERF.md](PERF.md): `--bench` and `--pace`. Summary: in level 51 a drawn frame costs 0.55 ms
+(Release) or 1.05 ms (Debug) of the N64's 33.3 ms. Real-time pacing at 60 Hz VIs / 30 fps runs
+with no late VI in level 51 (Release), and late VIs only at level loads.
+
+### 9.6 Open on the Mac
+
+- The actor pixels of section 9.3 (the boat, Turok's hand): identical display lists, different
+  pixels. Next: compare the G_MOVEMEM data, then check the FBO path by drawing that frame's
+  display list on Linux with an offscreen FBO (or on the Mac at window size).
+- Attract demo 1 needs names-R7_v1 (the particle path).

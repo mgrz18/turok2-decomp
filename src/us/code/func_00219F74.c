@@ -19,7 +19,11 @@ extern u8 D_800A5AC4[];     /* "anim object info" */
 s32 BinarySearch(s32 *, s32, sptr);
 void WeightedTable_Clear(RandList *);
 void WeightedTable_Add(RandList *, s16, s32);
+#ifdef TARGET_PORT
+s16 WeightedTable_Pick(RandList *); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+#else
 s32 WeightedTable_Pick(RandList *);
+#endif
 
 sptr CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, sptr action, sptr skip) {
     RandList list;

@@ -5,7 +5,11 @@
 void AI_UpdateTargets(CGameObjectInstance *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
 void AI_ComputeFrameMotion(CGameObjectInstance *self, CAI *ai, CAIFrameMotion *out);
 void EnemyFly_SteerToPathScaled(CGameObjectInstance *self, CAI *ai, CAITargets *t, CAIFrameMotion *steer, f32 speed, f32 arg5);
+#ifdef TARGET_PORT
+s16 EnemyAI_PickAttack(CGameObjectInstance *self, CAI *ai, CAITargets *t); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+#else
 s32 EnemyAI_PickAttack(CGameObjectInstance *self, CAI *ai, CAITargets *t);
+#endif
 
 void EnemyRam_MoveUpdate(CGameObjectInstance *self, CAI *ai) {
     CAITargets t;

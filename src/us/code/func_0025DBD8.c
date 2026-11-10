@@ -8,7 +8,11 @@
 
 extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void EnemyMode_Move_Update(CGameObjectInstance *actor, CAI *ai);
+#ifdef TARGET_PORT
+extern s16 EnemyAI_PickAttack(CGameObjectInstance *actor, CAI *ai, CAITargets *t); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+#else
 extern s32 EnemyAI_PickAttack(CGameObjectInstance *actor, CAI *ai, CAITargets *t);
+#endif
 extern void EnemyAI_TryDodge(CGameObjectInstance *actor, CAI *ai);
 
 static __inline__ s8 canTaunt(CAI *ai, CEnemyIntelligence *info) {

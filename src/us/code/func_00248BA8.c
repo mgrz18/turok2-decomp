@@ -15,6 +15,27 @@
  * players in multiplayer) and moves the player there. */
 
 typedef struct WarpPlayer WarpPlayer;
+#ifdef TARGET_PORT
+struct WarpPlayer {
+/* the view at the host offsets of CPlayer (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_WarpPlayer(m) __builtin_offsetof(CPlayer, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_WarpPlayer(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_room[T2_HOFF_WarpPlayer(m_CharacterActor.header.m_pCurrentRegion)]; sptr room; }; /* N64 0x10 */
+        struct { u8 _hp_angle[T2_HOFF_WarpPlayer(m_CharacterActor.m_RotY)]; f32 angle; }; /* N64 0x50 */
+        struct { u8 _hp_spawnPos[T2_HOFF_WarpPlayer(m_WeaponActor.header.m_vPos)]; CVector3 spawnPos; }; /* N64 0x28C */
+        struct { u8 _hp_spawnRoom[T2_HOFF_WarpPlayer(m_WeaponActor.header.m_pCurrentRegion)]; sptr spawnRoom; }; /* N64 0x298 */
+        struct { u8 _hp_spawnAngle[T2_HOFF_WarpPlayer(m_WeaponActor.m_RotY)]; f32 spawnAngle; }; /* N64 0x2D8 */
+        struct { u8 _hp_active[T2_HOFF_WarpPlayer(m_pCamera)]; sptr active; }; /* N64 0x51C */
+        struct { u8 _hp_keys[T2_HOFF_WarpPlayer(m_Data) + 1200]; s32 keys[8]; }; /* N64 0x9D0 */
+        struct { u8 _hp_hubsVisited[T2_HOFF_WarpPlayer(m_Data.m_dwLevelFirstTimeFlags)]; u32 hubsVisited; }; /* N64 0x9F8 */
+        struct { u8 _hp_controller[T2_HOFF_WarpPlayer(m_ContState.m_pContState)]; struct ControllerProfile *controller; }; /* N64 0xA50 */
+        struct { u8 _hp_unkC00[T2_HOFF_WarpPlayer(m_bLevelNotCompleteExit)]; s32 unkC00; }; /* N64 0xC00 */
+        struct { u8 _hp_next[T2_HOFF_WarpPlayer(m_pNext)]; WarpPlayer *next; }; /* N64 0x1320 */
+    };
+};
+#else
 struct WarpPlayer {
     /* 0x0000 */ u8 pad0[4];
     /* 0x0004 */ CVector3 pos;
@@ -39,6 +60,7 @@ struct WarpPlayer {
     /* 0x0C04 */ u8 padC04[0x1320 - 0xC04];
     /* 0x1320 */ WarpPlayer *next;
 };
+#endif
 
 
 #ifdef TARGET_PORT /* unprototyped: the host passes the pass-through arguments */

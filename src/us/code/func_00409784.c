@@ -13,7 +13,11 @@
 
 extern void Animator_Update(void *slot);
 extern s32 Cinema_PathPlaying(void);
+#ifdef TARGET_PORT
+extern s16 WeightedTable_PickStatic(void *table); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+#else
 extern s32 WeightedTable_PickStatic(void *table);
+#endif
 extern f32 Random_Blend(f32 lo, f32 hi);
 extern f32 func_002982F0(f32);
 extern f32 func_002974C0(f32);

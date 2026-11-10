@@ -60,9 +60,16 @@ void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04P
                 } while (o != 0);
             }
         } else {
+#ifdef TARGET_PORT
+            /* N64 0xDF8 / 0xBF8: the registered instances by member (pointer-wide on the host) */
+            n = gScene.m_nRegistered;
+            for (i = 0; i < n; i++) {
+                cur = (void *) gScene.m_pRegistered[i];
+#else
             n = *(s32 *)((u8 *)&gScene + 0xDF8);
             for (i = 0; i < n; i++) {
                 cur = ((M04WorldB *)&gScene)->tab[i];
+#endif
                 if (cur != src) {
                     send_(cur, dst, kind, pos, part);
                 }

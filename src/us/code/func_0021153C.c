@@ -17,7 +17,14 @@ f32 Math_AcosLookup(f32 x) {
         pos = x * 1023.0f;
         neg = 0;
     }
+#ifdef TARGET_PORT
+    /* MIPS trunc.w.s gives 0x7FFFFFFF for a NaN or an out-of-range value (the lookup then takes
+     * its end branch); x86 cvttss2si gives INT_MIN, a negative table index (a NaN reaches here
+     * from CVector3__GetYaw of a zero-length path step in the Mother boss level). */
+    i = (pos == pos && pos < 2147483648.0f) ? (s32) pos : 0x7FFFFFFF;
+#else
     i = pos;
+#endif
     if ((f32) i < 1023.0f) {
         lo = gAcosTable[i];
         r = lo + (pos - (f32) i) * (*(&gAcosTable[i] + 1) - lo);

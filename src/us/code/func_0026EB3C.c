@@ -1,6 +1,13 @@
 #include "common.h"
 #include "structs/rumble.h"
 #include "protos/list.h"
+#ifdef TARGET_PORT
+#include "structs/controller.h"
+_Static_assert(sizeof(((ControllerProfile *) 0)->rumblePool) == __builtin_offsetof(RumblePool, baseLevel), "rumblePool");
+_Static_assert(__builtin_offsetof(ControllerProfile, rumbleBase) - __builtin_offsetof(ControllerProfile, rumblePool) == __builtin_offsetof(RumblePool, baseLevel), "rumbleBase");
+_Static_assert(sizeof(((ControllerProfile *) 0)->rumbleNodes[0]) == sizeof(RumbleEffect), "rumbleNodes");
+_Static_assert(__builtin_offsetof(ControllerProfile, rumbleNodes) - __builtin_offsetof(ControllerProfile, rumblePool) >= sizeof(RumblePool), "rumble pool size");
+#endif
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);

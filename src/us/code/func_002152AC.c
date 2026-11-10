@@ -23,7 +23,11 @@ void CMtxF__SwapYZRows(f32 *);
 void CMtxF__ToMtxAffine(f32 *, f32 *);
 void Model_AdvanceMorph(s32 *, f32);
 void Render_QueueModelInstance(s32 *, f32 *, s32, void *, sptr, s32, s32);
+#ifdef TARGET_PORT
+u16 CScene__GetObjectTypeID(void *, s32); /* ABI: returns u16 (the host leaves the upper bits of the return register undefined) */
+#else
 s32 CScene__GetObjectTypeID(void *, s32);
+#endif
 s32 *CISet__GetBlock(sptr, s32);
 
 void CLevelActor__Draw(CLevelActor *obj) {

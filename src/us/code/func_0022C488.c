@@ -8,12 +8,33 @@
 #include "globals/scene.h"
 #include "globals/collision.h"
 #include "globals/particle.h"
+#ifdef TARGET_PORT
+#include "structs/player.h"
+#endif
 
 typedef struct Bone {
     /* 0x00 */ u8 pad0[0x40];
 } Bone;
 
 typedef struct Target Target;
+#ifdef TARGET_PORT
+struct Target {
+/* the view at the host offsets of CPlayer (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Target(m) __builtin_offsetof(CPlayer, m)
+    union {
+        struct { u8 _hp_kind[T2_HOFF_Target(m_CharacterActor.header.m_Type)]; u8 kind; }; /* N64 0x0 */
+        struct { u8 _hp_pos[T2_HOFF_Target(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_unk10[T2_HOFF_Target(m_CharacterActor.header.m_pCurrentRegion)]; s32 unk10; }; /* N64 0x10 */
+        struct { u8 _hp_def[T2_HOFF_Target(m_CharacterActor.header.m_pIntelligence)]; CIntelligence *def; }; /* N64 0x14 */
+        struct { u8 _hp_bones[T2_HOFF_Target(m_CharacterActor.m_pmtDrawMtxs)]; Bone *bones; }; /* N64 0x98 */
+        struct { u8 _hp_flags[T2_HOFF_Target(m_CharacterActor.m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_aiFlags[T2_HOFF_Target(m_CharacterActor.m_AI.m_dwFlags)]; s32 aiFlags; }; /* N64 0x140 */
+        struct { u8 _hp_callback[T2_HOFF_Target(m_CharacterActor.m_AI.m_pfHit)]; void (*callback)(Target *target, s32 *ai, void *particle); }; /* N64 0x240 */
+        struct { u8 _hp_extraUses[T2_HOFF_Target(m_nNumArrowsStuckInMe)]; s32 extraUses; }; /* N64 0x12B0 */
+    };
+};
+#else
 struct Target {
     /* 0x0000 */ u8 kind;
     /* 0x0001 */ u8 pad1[3];
@@ -31,6 +52,7 @@ struct Target {
     /* 0x0244 */ u8 pad244[0x12B0 - 0x244];
     /* 0x12B0 */ s32 extraUses;
 };
+#endif
 
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];

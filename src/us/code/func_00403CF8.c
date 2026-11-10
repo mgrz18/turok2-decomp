@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/boss.h"
+#include "structs/game_object.h"
 #include "globals/boss.h"
 #include "globals/scene.h"
 #include "globals/boss_ai.h"
@@ -10,11 +11,39 @@ typedef struct {
     f32 x, y, z;
 } Vec3_00403CF8;
 
+#ifdef TARGET_PORT
+typedef struct Actor00403CF8 {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Actor00403CF8(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_unk0[T2_HOFF_Actor00403CF8(header)]; s32 unk0; }; /* N64 0x0 */
+        struct { u8 _hp_pos[T2_HOFF_Actor00403CF8(header.m_vPos)]; Vec3_00403CF8 pos; }; /* N64 0x4 */
+    };
+} Actor00403CF8;
+#else
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ Vec3_00403CF8 pos;
 } Actor00403CF8;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct Level00403CF8 {
+/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Level00403CF8(m) __builtin_offsetof(CAI, m)
+    union {
+        struct { u8 _hp_unkC[T2_HOFF_Level00403CF8(m_VisBits)]; s32 unkC; }; /* N64 0xC */
+        struct { u8 _hp_data[T2_HOFF_Level00403CF8(m_pModeTable)]; void *data; }; /* N64 0x2C */
+        struct { u8 _hp_unk37[T2_HOFF_Level00403CF8(m_Action)]; s8 unk37; }; /* N64 0x37 */
+        struct { u8 _hp_onReset[T2_HOFF_Level00403CF8(m_pfStep)]; void *onReset; }; /* N64 0xF0 */
+        struct { u8 _hp_onEvent[T2_HOFF_Level00403CF8(m_pfDraw)]; void *onEvent; }; /* N64 0xF4 */
+        struct { u8 _hp_onHit[T2_HOFF_Level00403CF8(m_pfHurt)]; void *onHit; }; /* N64 0xF8 */
+        struct { u8 _hp_onDraw[T2_HOFF_Level00403CF8(m_pfEffects)]; void *onDraw; }; /* N64 0x108 */
+    };
+} Level00403CF8;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0xC];
     /* 0x00C */ s32 unkC;
@@ -29,6 +58,7 @@ typedef struct {
     /* 0x0FC */ u8 pad4[0x108 - 0xFC];
     /* 0x108 */ void *onDraw;
 } Level00403CF8;
+#endif
 
 void ScriptAnimator_Start(void *light, void *actor);
 void Primagen_SetStage(s32 mode);

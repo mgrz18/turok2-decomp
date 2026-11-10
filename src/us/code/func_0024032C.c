@@ -6,8 +6,28 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/collision.h"
+#ifdef TARGET_PORT
+#include "structs/particle.h"
+#endif
 
 /* An instance that can be hit: an actor (or the instance sweeping). */
+#ifdef TARGET_PORT
+typedef struct HitInst {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_HitInst(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_type[T2_HOFF_HitInst(header.m_Type)]; u8 type; }; /* N64 0x0 */
+        struct { u8 _hp_pos[T2_HOFF_HitInst(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_def[T2_HOFF_HitInst(header.m_pIntelligence)]; s32 *def; }; /* N64 0x14 */
+        struct { u8 _hp_typeId[T2_HOFF_HitInst(m_nTypeFlag)]; u16 typeId; }; /* N64 0xB8 */
+        struct { u8 _hp_flags[T2_HOFF_HitInst(m_dwFlags)]; s32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_bounds[T2_HOFF_HitInst(m_vMin)]; CBox bounds; }; /* N64 0xBC: m_vMin, m_vMax */
+        struct { u8 _hp_particleDef[__builtin_offsetof(CParticle, m_pEffect)]; s32 *particleDef; }; /* N64 0xF8: a particle's (type 2) */
+        struct { u8 _hp_owner[__builtin_offsetof(CParticle, m_pOwner)]; struct HitInst *owner; }; /* N64 0x10C: a particle's (type 2) */
+    };
+} HitInst;
+#else
 typedef struct HitInst {
     /* 0x000 */ u8 type;
     /* 0x004 */ CVector3 pos;
@@ -23,6 +43,7 @@ typedef struct HitInst {
     /* 0x0FC */ u8 padFC[0x10];
     /* 0x10C */ struct HitInst *owner;
 } HitInst;
+#endif
 
 typedef struct InstanceHit {
     /* 0x00 */ HitInst *inst;

@@ -3,7 +3,23 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00284E70.c, func_00284E70.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#ifdef TARGET_PORT
+#include "common.h"
+#include "structs/particle.h"
+#endif
 typedef struct B19Obj B19Obj;
+#ifdef TARGET_PORT
+struct B19Obj {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_B19Obj(m) __builtin_offsetof(CParticle, m)
+    union {
+        struct { u8 _hp_id[T2_HOFF_B19Obj(header.m_nObjType)]; u16 id; }; /* N64 0x2 */
+        struct { u8 _hp_pos[T2_HOFF_B19Obj(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_unk128[T2_HOFF_B19Obj(m_nFrames)]; s16 unk128; }; /* N64 0x128 */
+    };
+};
+#else
 struct B19Obj {
     u8 pad0[0x2];
     u16 id;          /* 0x2 */
@@ -11,6 +27,7 @@ struct B19Obj {
     u8 pad10[0x118];
     s16 unk128;      /* 0x128 */
 };
+#endif
 void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
 void CParticle__CheckProximity(void *, B19Obj *, B19Obj **, s32);
 void CParticleSystem__ResolveInteractions(void *owner, B19Obj **arr, s32 n) {

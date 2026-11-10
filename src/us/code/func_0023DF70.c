@@ -10,6 +10,20 @@ typedef struct HitDef {
 } HitDef;
 
 /* An instance that can be hit (or the instance sweeping). */
+#ifdef TARGET_PORT
+typedef struct HitInst {
+/* the view at the host offsets of CObjectHead (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_HitInst(m) __builtin_offsetof(CObjectHead, m)
+    union {
+        struct { u8 _hp_type[T2_HOFF_HitInst(header.m_Type)]; u8 type; }; /* N64 0x0 */
+        struct { u8 _hp_pos[T2_HOFF_HitInst(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_def[T2_HOFF_HitInst(header.m_pIntelligence)]; HitDef *def; }; /* N64 0x14 */
+        struct { u8 _hp_fallSpeed[T2_HOFF_HitInst(m_vVelocity.y)]; f32 fallSpeed; }; /* N64 0x1C */
+        struct { u8 _hp_standingOn[T2_HOFF_HitInst(m_pInstanceBelow)]; struct HitInst *standingOn; }; /* N64 0x30 */
+    };
+} HitInst;
+#else
 typedef struct HitInst {
     /* 0x00 */ u8 type;
     /* 0x04 */ CVector3 pos;
@@ -20,6 +34,7 @@ typedef struct HitInst {
     /* 0x20 */ u8 pad20[0x10];
     /* 0x30 */ struct HitInst *standingOn;
 } HitInst;
+#endif
 
 
 f32 GameObject_GetCollisionHeight(HitInst *inst);

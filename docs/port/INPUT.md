@@ -128,6 +128,10 @@ A@14050..14090 SX=80@14060..14090   # hold A (the weapon wheel), stick right: we
 Z@14150..14250                      # fire
 ```
 
+A journey that also fires (the bow from the wheel, two arrows on the dock; round 7, v2) is in
+[GAMEPLAY.md](GAMEPLAY.md) section 6: the bow is drawn while Z is held and fires on release;
+the land weapons do not fire in the water.
+
 Turok 2's default controls as the port sees them (control type 0, `m_WeaponSelect` 1, the
 eight-slot stick wheel): **stick** turns (X, about 3.8 rad per second at 80) and looks (Y);
 **C-up/C-down** forward/back, **C-left/C-right** strafe; **R** jumps (pressed bit 0x10:

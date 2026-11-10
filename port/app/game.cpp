@@ -20,6 +20,8 @@
 #include <cstdlib>
 #include <cmath>
 #include <vector>
+#include <thread>
+#include <pthread.h>
 
 extern "C" {
 #include "t2port.h"
@@ -27,6 +29,10 @@ extern "C" {
 // port/game/t2debug.c
 int T2Port_EngineMode(void);
 void T2Port_LogState(int frame);
+void T2Port_GiveWeapons(void); // DEBUG-ONLY: T2_GIVE_WEAPONS=1 (t2debug.c)
+void T2Port_DebugWarp(int frame);
+void T2Port_Teleport(int frame, const char *spec);
+void T2Port_WakeEnemies(int frame, const char *spec);
 void T2Port_DebugSwitches(int skipPak, int startMode);
 }
 
@@ -41,8 +47,9 @@ namespace {
 
 // T2_DLDUMP=1: print the commands of the last frame's display list (following G_DL), for
 // bring-up. Words are host-sized (gfx.h GfxWord).
-// T2_DLDUMP_VTX=1 also prints the vertices of each G_VTX (segments from G_MW_SEGMENT) and the
-// 16 words of each G_MTX (s15.16, Fast3D's host-order int32[16]) (docs/port/RENDER.md).
+// T2_DLDUMP_VTX=1 also prints the vertices of each G_VTX (the first 4; =2: all), segments from
+// G_MW_SEGMENT, the 16 words of each G_MTX (s15.16, Fast3D's host-order int32[16]) and a hash
+// of the first 256 bytes of each G_SETTIMG image (docs/port/RENDER.md, MACOS.md section 9).
 uintptr_t sDumpSegments[16];
 void DumpVtxMtx(uint8_t op, uint32_t w0, uintptr_t w1, int depth) {
     static const bool on = getenv("T2_DLDUMP_VTX") != nullptr;
@@ -60,10 +67,34 @@ void DumpVtxMtx(uint8_t op, uint32_t w0, uintptr_t w1, int depth) {
     if (op == 0x01) {
         int n = (w0 >> 12) & 0xFF;
         const int16_t* v = (const int16_t*)addr;
-        for (int i = 0; i < n && i < 4; i++, v += 8) {
+        static const int maxV = getenv("T2_DLDUMP_VTX") != nullptr && atoi(getenv("T2_DLDUMP_VTX")) > 1 ? 64 : 4;
+        for (int i = 0; i < n && i < maxV; i++, v += 8) {
             const uint8_t* c = (const uint8_t*)(v + 6);
             printf("%*s   v%d ob %d %d %d flag %d tc %d %d cn %02X%02X%02X%02X\n", depth * 2, "", i, v[0], v[1], v[2],
                    v[3], v[4], v[5], c[0], c[1], c[2], c[3]);
+        }
+    } else if (op == 0xFD && addr >= 0x10000 && !(addr & 1)) {
+        // G_SETTIMG: fnv1a64 of the image's first 256 bytes (texture data differences between hosts)
+        uint64_t h = 1469598103934665603ull;
+        for (int i = 0; i < 256; i++) {
+            h = (h ^ ((const uint8_t*)addr)[i]) * 1099511628211ull;
+        }
+        printf("%*s   timg %016llx hash\n", depth * 2, "", (unsigned long long)h);
+        if (atoi(getenv("T2_DLDUMP_VTX")) > 2) {
+            printf("%*s   timg bytes", depth * 2, "");
+            for (int i = 0; i < 32; i++) {
+                printf(" %02x", ((const uint8_t*)addr)[i]);
+            }
+            printf("\n");
+        }
+    } else if (op == 0xDC && addr >= 0x10000 && !(addr & 1)) {
+        // G_MOVEMEM (viewport, lights): the first 16 bytes (=2 and up)
+        if (atoi(getenv("T2_DLDUMP_VTX")) > 1) {
+            printf("%*s   mem", depth * 2, "");
+            for (int i = 0; i < 16; i++) {
+                printf(" %02x", ((const uint8_t*)addr)[i]);
+            }
+            printf("\n");
         }
     } else if (op == 0xDA) {
         const int32_t* m = (const int32_t*)addr;
@@ -379,6 +410,63 @@ void WriteShot(const std::shared_ptr<Fast::Fast3dWindow>& window, const char* sh
     }
 }
 
+// ---- --bench / --pace (DEBUG-ONLY measurement, docs/port/PERF.md) ----
+
+using BenchClock = std::chrono::steady_clock;
+
+static double Ms(BenchClock::duration d) {
+    return std::chrono::duration<double, std::milli>(d).count();
+}
+
+// Prints count, mean, p50/p95/p99 and max of one series (milliseconds).
+static void BenchLine(const char* name, std::vector<double> v, const char* unit = "ms") {
+    if (v.empty()) {
+        return;
+    }
+    double sum = 0.0;
+    for (double x : v) {
+        sum += x;
+    }
+    std::sort(v.begin(), v.end());
+    auto pct = [&](double p) { return v[std::min(v.size() - 1, (size_t)(p * (double)(v.size() - 1) + 0.5))]; };
+    printf("bench:   %-22s n %6zu  mean %8.3f  p50 %8.3f  p95 %8.3f  p99 %8.3f  max %8.3f %s\n", name, v.size(),
+           sum / (double)v.size(), pct(0.50), pct(0.95), pct(0.99), v.back(), unit);
+}
+
+// The cost of one t2os thread switch, measured with the same primitive t2os uses (one mutex,
+// a condition variable per thread, the baton handed over with pthread_cond_signal and awaited
+// with pthread_cond_wait): two host threads pass a baton n times. Returns ns per handoff.
+static double BenchSwitchNs(int n) {
+    struct Shared {
+        pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+        pthread_cond_t cv[2] = { PTHREAD_COND_INITIALIZER, PTHREAD_COND_INITIALIZER };
+        int owner = 0;
+        int left = 0;
+    } sh;
+    sh.left = n;
+    auto run = [&sh](int me) {
+        pthread_mutex_lock(&sh.lock);
+        for (;;) {
+            while (sh.owner != me && sh.left > 0) {
+                pthread_cond_wait(&sh.cv[me], &sh.lock);
+            }
+            if (sh.left <= 0) {
+                break;
+            }
+            sh.left--;
+            sh.owner = 1 - me;
+            pthread_cond_signal(&sh.cv[1 - me]);
+        }
+        pthread_cond_signal(&sh.cv[1 - me]);
+        pthread_mutex_unlock(&sh.lock);
+    };
+    auto t0 = BenchClock::now();
+    std::thread a(run, 0), b(run, 1);
+    a.join();
+    b.join();
+    return std::chrono::duration<double, std::nano>(BenchClock::now() - t0).count() / (double)n;
+}
+
 } // namespace
 
 extern "C" {
@@ -444,11 +532,38 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     const char* shotEnv = getenv("T2_SHOT_EVERY");
     const int shotEvery = shotEnv != nullptr ? atoi(shotEnv) : 0;
     int nextShot = shotEvery;
+    // T2_SHOT_FROM=<frame> (debug, round 7 v2): the periodic shots start at that frame
+    if (const char* from = getenv("T2_SHOT_FROM"); from != nullptr && shotEvery > 0 && atoi(from) > nextShot) {
+        nextShot = atoi(from);
+    }
     const char* dumpAtEnv = getenv("T2_DLDUMP_AT");
     const int dumpAt = dumpAtEnv != nullptr ? atoi(dumpAtEnv) : 0;
     bool dumped = false;
+    // --bench: per VI, the host time of the game (T2Port_Frame: the game threads and the t2os
+    // switches, minus the audio manager), the audio manager (synthesizer + ASP), the draw (dlcheck,
+    // Fast3D's interpreter and, offscreen, glFinish), the whole iteration; per drawn game frame,
+    // the time since the previous drawn frame (the cost of one displayed frame).
+    const bool bench = args.benchFrom >= 0;
+    std::vector<double> bGame, bAudio, bDraw, bTotal, bGameFrame, bSwitches;
+    double bSumSynth = 0.0, bSumAsp = 0.0;
+    auto bLastDrawn = BenchClock::time_point{};
+    // --pace: one VI every 1/60 s of real time (absolute deadlines, no catch-up: a late VI moves
+    // the schedule)
+    const auto viPeriod = std::chrono::duration_cast<BenchClock::duration>(std::chrono::duration<double>(1.0 / 60.0));
+    auto paceNext = BenchClock::now() + viPeriod;
+    int paceLate = 0;
+    std::vector<std::pair<int, double>> paceLateList; // (VI, ms late), the worst printed at the end
+    double paceWorstLateMs = 0.0, paceSleptMs = 0.0;
     auto t0 = std::chrono::steady_clock::now();
     for (int f = 0; f < args.frames && (!window || window->IsRunning()); f++) {
+        const auto bt0 = BenchClock::now();
+        uint64_t bSynth0 = 0, bAsp0 = 0;
+        T2PortStats bS0 = {};
+        if (bench) {
+            T2Audio_GetTimes(&bSynth0, &bAsp0);
+            T2Port_GetStats(&bS0);
+        }
+        BenchClock::time_point bt1 = bt0, bt2 = bt0, bt3 = bt0;
         if (window) {
             window->HandleEvents();
         }
@@ -469,6 +584,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             printf("game: T2_TEST_SONG: Music_SetTrack(%s)\n", testSong);
         }
         T2Port_Frame();
+        bt1 = BenchClock::now();
         static const bool menuLog = getenv("T2_MENU_LOG") != nullptr;
         static const void* lastMenu = nullptr;
         static int lastCursor = -1;
@@ -481,14 +597,24 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         // T2_STATE_LOG=1: every 60 frames; =N (N > 1): every N frames
         static const int statePeriod = getenv("T2_STATE_LOG") == nullptr ? 0
                                        : (atoi(getenv("T2_STATE_LOG")) > 1 ? atoi(getenv("T2_STATE_LOG")) : 60);
+        T2Port_GiveWeapons(); // DEBUG-ONLY: T2_GIVE_WEAPONS=1
         if (statePeriod > 0 && (f + 1) % statePeriod == 0) {
             T2Port_LogState(f + 1); // DEBUG-ONLY: T2_STATE_LOG=1
+        }
+        static const char* teleport = getenv("T2_TELEPORT");
+        if (teleport != nullptr) {
+            T2Port_Teleport(f + 1, teleport); // DEBUG-ONLY: T2_TELEPORT=F:x,y,z[;F:x,y,z...]
+        }
+        static const char* wake = getenv("T2_WAKE_ENEMIES");
+        if (wake != nullptr) {
+            T2Port_WakeEnemies(f + 1, wake); // DEBUG-ONLY: T2_WAKE_ENEMIES=R
         }
         if (int m = T2Port_EngineMode(); m != mode) {
             printf("game: frame %d: engine mode %d -> %d\n", f + 1, mode, m);
             fflush(stdout);
             mode = m;
         }
+        T2Port_DebugWarp(f + 1); // DEBUG-ONLY: T2_WARP_TO=<id>[@frame][,...]
         if (args.skipPakCheck || args.startMode >= 0) {
             T2Port_DebugSwitches(args.skipPakCheck, args.startMode); // DEBUG-ONLY
         }
@@ -512,7 +638,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             }
         }
         T2PortTask task;
-        const bool got = T2Port_TakeGfxTask(&task) && args.draw && task.dataPtr != nullptr;
+        bt2 = BenchClock::now();
+        bool drewThis = false;
+        const bool hadTask = T2Port_TakeGfxTask(&task);
+        const bool got = hadTask && args.draw && task.dataPtr != nullptr;
         if (got) {
             lastDL = task.dataPtr;
             // T2_DLDUMP_AT=<frame>: dump the first display list from that frame on, now, before
@@ -548,11 +677,36 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             if (badWords == 0 &&
                 (window ? window->DrawAndRunGraphicsCommands((Gfx*)task.dataPtr, {}) : T2Offscreen_Draw(const_cast<void*>(task.dataPtr)))) {
                 drawn++;
+                drewThis = true;
+                if (bench && !window) {
+                    T2Offscreen_Finish(); // the GPU's part of the frame too
+                }
                 if (const char* shot = getenv("T2_SHOT"); shot != nullptr && shotEvery > 0 && f + 1 >= nextShot) {
                     nextShot = (f + 1) / shotEvery * shotEvery + shotEvery; // the first drawn frame of each period
                     std::string name = std::string(shot) + "." + std::to_string(f + 1) + ".ppm";
                     WriteShot(window, name.c_str());
                 }
+            }
+        }
+        bt3 = BenchClock::now();
+        if (bench && f >= args.benchFrom) {
+            uint64_t synth1, asp1;
+            T2Audio_GetTimes(&synth1, &asp1);
+            T2PortStats bS1;
+            T2Port_GetStats(&bS1);
+            const double audioMs = (double)((synth1 - bSynth0) + (asp1 - bAsp0)) / 1e6;
+            bSumSynth += (double)(synth1 - bSynth0) / 1e6;
+            bSumAsp += (double)(asp1 - bAsp0) / 1e6;
+            bGame.push_back(Ms(bt1 - bt0) - audioMs);
+            bAudio.push_back(audioMs);
+            bDraw.push_back(Ms(bt3 - bt2));
+            bTotal.push_back(Ms(bt3 - bt0));
+            bSwitches.push_back((double)(bS1.switches - bS0.switches));
+            if (drewThis || (hadTask && !(got && (window || T2Offscreen_Interpreter())))) {
+                if (bLastDrawn != BenchClock::time_point{}) {
+                    bGameFrame.push_back(Ms(bt3 - bLastDrawn));
+                }
+                bLastDrawn = bt3;
             }
         }
         if (args.verbose || (f + 1) % 60 == 0) {
@@ -564,6 +718,19 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
                    (unsigned long long)s.audioTasks, (unsigned long long)s.piDmas, (unsigned long long)s.piBytes,
                    (unsigned long long)s.viSwaps, (unsigned long long)s.missingCalls);
             fflush(stdout);
+        }
+        if (args.pace) {
+            auto now = BenchClock::now();
+            if (now < paceNext) {
+                paceSleptMs += Ms(paceNext - now);
+                std::this_thread::sleep_until(paceNext);
+                paceNext += viPeriod;
+            } else {
+                paceLate++;
+                paceWorstLateMs = std::max(paceWorstLateMs, Ms(now - paceNext));
+                paceLateList.emplace_back(f + 1, Ms(now - paceNext));
+                paceNext = now + viPeriod;
+            }
         }
     }
     if (getenv("T2_DLDUMP") != nullptr && lastDL != nullptr) {
@@ -600,6 +767,58 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
            (unsigned long long)s.audioTasks, (unsigned long long)s.piDmas, (unsigned long long)s.missingCalls);
     if (skippedBad > 0) {
         printf("game: %d display lists not drawn: truncated host addresses (dlcheck)\n", skippedBad);
+    }
+    if (bench) {
+        // with --pace the totals still exclude the sleep (it comes after the iteration)
+        printf("bench: VIs %d..%d (%zu measured), %s, %s\n", args.benchFrom, args.frames, bTotal.size(),
+               args.draw ? (window ? "drawn in a window" : (T2Offscreen_Interpreter() ? "drawn offscreen (glFinish per frame)" : "display lists not drawn")) : "--draw off",
+               args.audio ? "audio on" : "audio off");
+        BenchLine("game (CPU, per VI)", bGame);
+        BenchLine("audio (per VI)", bAudio);
+        BenchLine("draw (per VI)", bDraw);
+        BenchLine("total (per VI)", bTotal);
+        BenchLine("game frame (drawn)", bGameFrame);
+        BenchLine("t2os switches/VI", bSwitches, "");
+        double sum = 0.0, sumF = 0.0;
+        for (double x : bTotal) {
+            sum += x;
+        }
+        for (double x : bGameFrame) {
+            sumF += x;
+        }
+        if (!bTotal.empty()) {
+            const double viMs = sum / (double)bTotal.size();
+            printf("bench: mean %.3f ms per VI -> %.0f VI/s unpaced (%.1fx the N64's 60); synth %.3f + ASP %.3f ms per VI\n",
+                   viMs, 1000.0 / viMs, 1000.0 / viMs / 60.0, bSumSynth / (double)bTotal.size(), bSumAsp / (double)bTotal.size());
+        }
+        if (!bGameFrame.empty()) {
+            const double frMs = sumF / (double)bGameFrame.size();
+            printf("bench: mean %.3f ms per drawn game frame -> equivalent %.0f fps (the N64 game: 30 fps, 33.3 ms)\n",
+                   frMs, 1000.0 / frMs);
+        }
+        const double swNs = BenchSwitchNs(200000);
+        double swSum = 0.0;
+        for (double x : bSwitches) {
+            swSum += x;
+        }
+        printf("bench: t2os switch (pthread cond handoff, 200000 x): %.0f ns -> %.3f ms per VI at %.1f switches/VI\n", swNs,
+               bSwitches.empty() ? 0.0 : swNs * swSum / (double)bSwitches.size() / 1e6,
+               bSwitches.empty() ? 0.0 : swSum / (double)bSwitches.size());
+    }
+    if (args.pace) {
+        printf("pace: %d VIs at 60 Hz in %.2f s (ideal %.2f s), %d late (worst %.3f ms), slept %.1f%% of the time\n",
+               args.frames, secs, args.frames / 60.0, paceLate, paceWorstLateMs, secs > 0 ? 100.0 * paceSleptMs / 1000.0 / secs : 0.0);
+        std::sort(paceLateList.begin(), paceLateList.end(), [](auto& a, auto& b) { return a.second > b.second; });
+        int lateMs = 0, lateBench = 0;
+        for (auto& l : paceLateList) {
+            lateMs += l.second >= 1.0;
+            lateBench += bench && l.first > args.benchFrom;
+        }
+        printf("pace: %d late by 1 ms or more; %d late from VI %d on; the worst:", lateMs, lateBench, std::max(args.benchFrom, 0));
+        for (size_t i = 0; i < paceLateList.size() && i < 12; i++) {
+            printf(" %d:%.1f", paceLateList[i].first, paceLateList[i].second);
+        }
+        printf(" (VI:ms)\n");
     }
     T2PifStats pif;
     T2Port_GetPifStats(&pif);

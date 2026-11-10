@@ -7,7 +7,11 @@
  * the level actors (actor, in level). Fired late, it waits in the world's
  * voice queue first (CScene__QueueDelayedEvent), for its delay. */
 typedef struct LevelEvent {
-    /* 0x00 */ u8 pad0[4];
+#ifdef TARGET_PORT
+    /* 0x00 */ u32 m_Mask;     /* the triggers it answers (Trigger.mask in LevelEvent_ProcessTriggers): a word the archive swaps */
+#else
+    u8 pad0[4];                /* the same word; as bytes the struct keeps the N64 build's 2-byte alignment */
+#endif
     /* 0x04 */ u16 actor;       /* index into the level actors */
     /* 0x06 */ s16 sound;       /* Event_PlaySoundRemote */
     /* 0x08 */ u16 music;       /* track to start (>= 2) */

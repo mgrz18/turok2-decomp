@@ -228,6 +228,18 @@ typedef struct BossScript3 {
     /* 0xC */ s32 current;
 } BossScript3; /* size 0x10 */
 
+/* gTotemDefense: the totem defense missions (TotemDefense_Init-TotemDefense_Fail).
+ * It lies in LevelScriptState at 0x548 (0x8012FB50, member totemDefense). Fields with symbols of
+ * their own: gTotemDefense_def, _state, _timer, _kills. */
+typedef struct TotemDefenseState {
+    /* 0x00 */ struct CGameObjectInstance *obj;  /* the totem */
+    /* 0x04 */ void *def;                        /* its definition + 0x14 */
+    /* 0x08 */ s32 state;
+    /* 0x0C */ f32 timer;                        /* the time left */
+    /* 0x10 */ s32 kills;                        /* TotemDefense_AddKill */
+    /* 0x14 */ s32 warned;                       /* also the totem's draw colour (TotemDefense_DrawTotem) */
+} TotemDefenseState; /* size 0x18 */
+
 /* gLevelScript: the state of the running level script, shared by the mode
  * handlers of the first VM module (Primagen_Hurt-Primagen_UpdateMode10, second copy
  * func_0043C7B0-Primagen_UpdateMode10_2): the stage the script is in, the lights and
@@ -296,8 +308,23 @@ typedef struct LevelScriptState {
     /* 0x440 */ CVector3 point;
     /* 0x44C */ u8 pad44C[0x540 - 0x44C];
     /* 0x540 */ s32 path;
-    /* 0x544 */ u8 pad544[0x568 - 0x544];
+    /* 0x544 */ u8 pad544[0x548 - 0x544];
+    /* 0x548 */ TotemDefenseState totemDefense;  /* gTotemDefense */
+    /* 0x560 */ u8 pad560[0x568 - 0x560];
 } LevelScriptState; /* size 0x568 */
+
+#ifdef TARGET_PORT
+/* D_8012F604 on the host: the word before gLevelScript and gLevelScript, one typed block, so
+ * that gendata gives it the host size and places the symbols inside it (gLevelScript,
+ * gLevelScript_values, gLevelScript_path, gTotemDefense...) at their host offsets. As bytes
+ * (0x448, the splat label's extent) the host LevelScriptState (0x608) ran past its end: the
+ * members from partsDone on overlapped gLevelScript_path, and Primagen_InitAI's
+ * `gLevelScript_path = 0` cleared partsDone (Primagen_Step divided by zero). */
+typedef struct LevelScriptBlock {
+    /* 0x000 */ s32 m_Word;
+    /* 0x004 */ LevelScriptState m_Script;
+} LevelScriptBlock;
+#endif
 
 /* LevelScriptState from bossState on (gLevelScript_bossState, +0x3D0). */
 typedef struct BossState {
@@ -388,16 +415,5 @@ typedef struct WaveBossState {
 } WaveBossState; /* size 0x25C */
 
 
-/* gTotemDefense: the totem defense missions (TotemDefense_Init-TotemDefense_Fail).
- * It lies in LevelScriptState pad544 (0x8012FB50). Fields with symbols of
- * their own: gTotemDefense_def, _state, _timer, _kills. */
-typedef struct TotemDefenseState {
-    /* 0x00 */ struct CGameObjectInstance *obj;  /* the totem */
-    /* 0x04 */ void *def;                        /* its definition + 0x14 */
-    /* 0x08 */ s32 state;
-    /* 0x0C */ f32 timer;                        /* the time left */
-    /* 0x10 */ s32 kills;                        /* TotemDefense_AddKill */
-    /* 0x14 */ s32 warned;                       /* also the totem's draw colour (TotemDefense_DrawTotem) */
-} TotemDefenseState; /* size 0x18 */
 
 #endif

@@ -10,10 +10,21 @@
 /* Boss fight setup: finds the six level actors with id 0x1DB1 and the one
  * with 0x1DB2, installs the AI callbacks and resets the 15 attack slots. */
 
+#ifdef TARGET_PORT
+typedef struct Obj {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Obj(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_flags[T2_HOFF_Obj(m_dwFlags)]; s32 flags; }; /* N64 0xD4 */
+    };
+} Obj;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0xD4];
     /* 0x0D4 */ s32 flags;
 } Obj;
+#endif
 
 extern u32 D_800F1F10[];
 

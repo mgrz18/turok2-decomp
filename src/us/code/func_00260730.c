@@ -7,7 +7,11 @@
  * one and pitch/roll with it; then turn. Chasing a target in the other
  * behaviour (ground/air), cut the behaviour-switch timer to 0-15 frames. */
 
+#ifdef TARGET_PORT
+s8 EnemyAI_GetBehaviorIndex(CGameObjectInstance *self, void *ai); /* ABI: returns s8 (the host leaves the upper bits of the return register undefined) */
+#else
 s32 EnemyAI_GetBehaviorIndex(CGameObjectInstance *self, void *ai);
+#endif
 f32 Math_StepClamped(f32 value, f32 target, f32 step);
 f32 Math_Approach(f32 cur, f32 target, f32 rate);
 f32 Random_Blend(f32 lo, f32 hi);

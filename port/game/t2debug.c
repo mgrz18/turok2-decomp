@@ -51,8 +51,100 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
 #include "structs/controller.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "structs/rect.h"
 #include "globals/engine.h"
+#include "structs/weapon.h"
+
+#include <math.h>
+#include "structs/intelligence.h"
+
+/* T2_ACTOR_LOG=N (with T2_STATE_LOG, round 7 v3): the level's enemies and turrets (gScene's level
+ * actors with intelligence type 1 or 4), nearest to the player first (N of them, default 8), and
+ * the live pooled instances: index, type, flags, position, distance, health, AI mode, animation. */
+static void T2Port_LogOne(const char *kind, int i, CGameObjectInstance *o, CGameObjectInstance *pl) {
+    CIntelligence *info = o->header.m_pIntelligence;
+    f32 d = -1.0f;
+    if (pl != NULL) {
+        f32 dx = o->header.m_vPos.x - pl->header.m_vPos.x, dy = o->header.m_vPos.y - pl->header.m_vPos.y;
+        f32 dz = o->header.m_vPos.z - pl->header.m_vPos.z;
+        d = sqrtf(dx * dx + dy * dy + dz * dz);
+    }
+    printf("actor: %s %d it %d id %d fl %x aifl %x pos (%.1f %.1f %.1f) d %.0f hp %d/%d mode %d act %d anim %d %.1f/%d tgt %p ty %x cb %p\n",
+           kind, i, info != NULL ? (int) info->m_Type : -1, info != NULL ? (int) info->m_Id : -1,
+           (unsigned) o->m_dwFlags, (unsigned) o->m_AI.m_dwFlags, o->header.m_vPos.x, o->header.m_vPos.y,
+           o->header.m_vPos.z, d, (int) (o->m_AI.m_Health >> 8), (int) (o->m_AI.m_InitialHealth >> 8),
+           (int) o->m_AI.m_Mode, (int) o->m_AI.m_Action, (int) o->m_CurrentAnimation.m_nAnimIndex,
+           o->m_CurrentAnimation.m_AnimationFrame, (int) o->m_nAnims, (void *) o->m_AI.m_pSightTarget,
+           (unsigned) o->m_nTypeFlag, o->m_AI.m_pModeCurrent != NULL ? (void *) o->m_AI.m_pModeCurrent->m_pfCallback : NULL);
+}
+
+static void T2Port_LogActors(CPlayer *p) {
+    CGameObjectInstance *pl = (p != NULL) ? &p->m_CharacterActor : NULL;
+    int n = atoi(getenv("T2_ACTOR_LOG"));
+    int i, k, used[64];
+    int nUsed = 0;
+    if (n <= 0) {
+        n = 8;
+    }
+    if (n > 64) {
+        n = 64;
+    }
+    {
+        int hist[16] = {0};
+        for (i = gScene.m_nFirstActor; gScene.m_pActors != NULL && i < gScene.m_nActors; i++) {
+            CIntelligence *info = gScene.m_pActors[i].header.m_pIntelligence;
+            hist[info == NULL ? 15 : (info->m_Type & 15)]++;
+        }
+        printf("actors: %p first %d n %d by type:", (void *) gScene.m_pActors, (int) gScene.m_nFirstActor,
+               (int) gScene.m_nActors);
+        for (i = 0; i < 16; i++) {
+            if (hist[i] != 0) {
+                printf(" %d:%d", i, hist[i]);
+            }
+        }
+        printf("\n");
+    }
+    if (gScene.m_pActors != NULL) {
+        for (k = 0; k < n; k++) {
+            int best = -1;
+            f32 bestD = 1e30f;
+            for (i = gScene.m_nFirstActor; i < gScene.m_nActors; i++) {
+                CGameObjectInstance *o = &gScene.m_pActors[i];
+                CIntelligence *info = o->header.m_pIntelligence;
+                int j, skip = 0;
+                f32 dx, dz, d;
+                if (info == NULL || (info->m_Type != INTELLIGENCE_ENEMY && info->m_Type != INTELLIGENCE_TURRET)) {
+                    continue;
+                }
+                for (j = 0; j < nUsed; j++) {
+                    skip |= used[j] == i;
+                }
+                if (skip) {
+                    continue;
+                }
+                dx = pl != NULL ? o->header.m_vPos.x - pl->header.m_vPos.x : 0.0f;
+                dz = pl != NULL ? o->header.m_vPos.z - pl->header.m_vPos.z : 0.0f;
+                d = dx * dx + dz * dz;
+                if (d < bestD) {
+                    bestD = d;
+                    best = i;
+                }
+            }
+            if (best < 0) {
+                break;
+            }
+            used[nUsed++] = best;
+            T2Port_LogOne("lvl", best, &gScene.m_pActors[best], pl);
+        }
+    }
+    {
+        CListedInstance *li = (CListedInstance *) gScene.m_InstancePool.m_ActiveList.m_pHead;
+        for (k = 0; li != NULL && k < 32; k++, li = li->m_pNext) {
+            T2Port_LogOne("dyn", k, &li->m_Instance, pl);
+        }
+    }
+}
 
 void T2Port_LogState(int frame) {
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
@@ -72,6 +164,11 @@ void T2Port_LogState(int frame) {
             printf(" region NULL");
         }
         printf(" lives %d", (int) p->m_Data.m_Lives);
+        {
+            /* round 7 (v2): the current weapon's ammo, what the HUD counter shows */
+            extern s32 CPlayer__GetWeaponAmmo(CPlayer *, s32);
+            printf(" ammo %d", (int) CPlayer__GetWeaponAmmo(p, p->m_Data.m_CurrentWeapon));
+        }
         /* weapons (round 6): the requested weapon, the wheel (state, count, cursor), the pressed
          * bits of this frame */
         printf(" reqw %d wheel %d/%d/%d single %x", (int) p->m_RequestedWeapon, (int) p->m_Barrel.m_State,
@@ -131,5 +228,210 @@ void T2Port_LogState(int frame) {
             printf("scene:   sector %d x %.0f..%.0f z %.0f..%.0f\n", i, r->minX, r->maxX, r->minZ, r->maxZ);
         }
     }
+    if (getenv("T2_ACTOR_LOG") != NULL) {
+        T2Port_LogActors(p);
+    }
     fflush(stdout);
+}
+
+/* T2_GIVE_WEAPONS=1 (game.cpp, every frame; DEBUG-ONLY, round 7 v2): in gameplay (mode 13, a
+ * level loaded) every active player gets every weapon of gWeaponInfoTable that can be used on
+ * land or under water, with full ammo (CPlayer__FillAllAmmo), once per player and level. To
+ * test firing and the weapons without finding their pickups; not a game option. T2_WEAPON=<n>
+ * also requests weapon n, T2_WEAPON_LIST=1 prints the weapon table. */
+void T2Port_GiveWeapons(void) {
+    extern s32 CPlayer__FillAllAmmo(CPlayer *);
+    static CPlayer *sGiven[4];
+    static int sLevel = -1;
+    static int sEnabled = -1;
+    CPlayer *p;
+    int i;
+
+    if (sEnabled < 0) {
+        const char *e = getenv("T2_GIVE_WEAPONS");
+        sEnabled = (e != NULL && e[0] == '1');
+    }
+    if (!sEnabled || gEngineApp.m_Settings.mode != 13 || gScene.m_nLevel <= 0) {
+        return;
+    }
+    if (gScene.m_nLevel != sLevel) {
+        sLevel = gScene.m_nLevel;
+        for (i = 0; i < 4; i++) {
+            sGiven[i] = NULL;
+        }
+    }
+    for (p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
+        int slot = -1;
+        for (i = 0; i < 4; i++) {
+            if (sGiven[i] == p) {
+                slot = -2;
+                break;
+            }
+            if (sGiven[i] == NULL && slot == -1) {
+                slot = i;
+            }
+        }
+        if (slot < 0) {
+            continue;
+        }
+        sGiven[slot] = p;
+        for (i = 0; i < 35; i++) {
+            if (gWeaponInfoTable[i] != NULL && (gWeaponInfoTable[i]->flags & 3) != 0) {
+                p->m_Data.m_WeaponList[i] = 1;
+            }
+        }
+        CPlayer__FillAllAmmo(p);
+        if (getenv("T2_WEAPON") != NULL) {
+            /* T2_WEAPON=<n>: request weapon n (the weapon actor switches to it as from the wheel) */
+            p->m_RequestedWeapon = (s16) atoi(getenv("T2_WEAPON"));
+        }
+        if (getenv("T2_WEAPON_LIST") != NULL) {
+            /* T2_WEAPON_LIST=1: the weapon table (name, flags, model, first ammo class) */
+            for (i = 0; i < 35; i++) {
+                WeaponInfo *w = gWeaponInfoTable[i];
+                if (w == NULL) {
+                    continue;
+                }
+                printf("debug: weapon %2d %-24s flags %x model %d fireDelay %.2f ammo0 %d/%d proj %d cost %d\n", i,
+                       w->name != NULL ? (const char *) w->name : "-", (unsigned) w->flags, (int) w->model,
+                       w->fireDelay, w->ammo[0] != NULL ? w->ammo[0]->type : -1,
+                       w->ammo[0] != NULL ? w->ammo[0]->max : -1, w->ammo[0] != NULL ? w->ammo[0]->projectile : -1,
+                       w->ammo[0] != NULL ? w->ammo[0]->cost : -1);
+            }
+        }
+        printf("debug: T2_GIVE_WEAPONS: level %d player %p: all weapons, full ammo\n", (int) gScene.m_nLevel,
+               (void *) p);
+    }
+}
+
+/* T2_WARP_TO=<id>[@frame][,<id>[@frame]...] (DEBUG-ONLY, round 7 v5): a level warp through the
+ * game's own path. At <frame> (default: 60 frames into gameplay: mode 13 in a level > 0, a player,
+ * no warp running) CPlayer__Warp(player, id, 2, 0) runs as if the player had entered a region
+ * whose CRegionInfo.m_WarpID is <id>: the hub/key redirects, CScene__FindWarpDests, then either
+ * a move inside the loaded level or CScene__RequestWarp (the fade, CScene__UpdateWarp,
+ * CScene__LoadLevel of the destination). Warp ids: tools/assets/levels.py (warp_dests.json).
+ * The entries run in order, each once its frame is reached and no warp is running. */
+void CPlayer__Warp(CPlayer *player, s32 warp, s32 arg2, s32 respawn);
+
+void T2Port_DebugWarp(int frame) {
+    static const char *spec;
+    static int init;
+    static int sGameplayStart = -1;
+    static int sDone; /* how many entries of the list have run */
+    CPlayer *p;
+    const char *s;
+    char *end;
+    long id;
+    long at;
+    int i;
+
+    if (!init) {
+        init = 1;
+        spec = getenv("T2_WARP_TO");
+    }
+    if (spec == NULL) {
+        return;
+    }
+    p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    /* gameplay: mode 13 in a level (level 0 is the backdrop of the single-player menu) */
+    if (gEngineApp.m_Settings.mode != 13 || gScene.m_nLevel <= 0) {
+        sGameplayStart = -1;
+    } else if (sGameplayStart < 0 && p != NULL && gScene.m_WarpState == 0) {
+        sGameplayStart = frame;
+    }
+    s = spec;
+    for (i = 0; i < sDone && s != NULL; i++) {
+        s = strchr(s, ',');
+        if (s != NULL) {
+            s++;
+        }
+    }
+    if (s == NULL || *s == 0) {
+        return;
+    }
+    id = strtol(s, &end, 0);
+    at = (*end == '@') ? strtol(end + 1, NULL, 0) : -1;
+    if (at < 0 ? (sGameplayStart < 0 || frame < sGameplayStart + 60) : frame < at) {
+        return;
+    }
+    if (p == NULL || gScene.m_WarpState != 0 || sGameplayStart < 0) {
+        return;
+    }
+    printf("debug: frame %d: T2_WARP_TO: CPlayer__Warp(player, %ld, 2, 0) in level %d\n", frame, id,
+           (int) gScene.m_nLevel);
+    fflush(stdout);
+    sDone++;
+    CPlayer__Warp(p, (s32) id, 2, 0);
+}
+
+/* T2_TELEPORT=F:x,y,z[;F:x,y,z...] (DEBUG-ONLY, round 7 v3): at frame F, in gameplay, put the
+ * first active player at (x, y, z) (its region looked up with CScene__FindRegionAt), to reach a
+ * level's enemies without a long --input script. Called every frame by game.cpp. */
+extern sptr CScene__FindRegionAt(CScene *world, CVector3 *pos);
+void T2Port_Teleport(int frame, const char *spec) {
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    const char *s = spec;
+
+    if (p == NULL || gEngineApp.m_Settings.mode != 13) {
+        return;
+    }
+    while (s != NULL && *s != '\0') {
+        int f;
+        float x, y, z;
+        if (sscanf(s, "%d:%f,%f,%f", &f, &x, &y, &z) == 4 && f == frame) {
+            CGameObjectInstance *a = &p->m_CharacterActor;
+            CVector3 pos;
+            sptr region;
+            pos.x = x;
+            pos.y = y;
+            pos.z = z;
+            region = CScene__FindRegionAt(&gScene, &pos);
+            printf("teleport: frame %d player (%.1f %.1f %.1f) -> (%.1f %.1f %.1f) region %p\n", frame,
+                   a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z, x, y, z, (void *) region);
+            if (region != 0) {
+                a->header.m_vPos = pos;
+                a->header.m_pCurrentRegion = (struct CGameRegion *) region;
+                a->m_vVelocity.x = a->m_vVelocity.y = a->m_vVelocity.z = 0.0f;
+            }
+            fflush(stdout);
+        }
+        s = strchr(s, ';');
+        if (s != NULL) {
+            s++;
+        }
+    }
+}
+
+/* T2_WAKE_ENEMIES=R (DEBUG-ONLY, round 7 v3): in gameplay, wake every dormant level enemy within R
+ * units of the player (default 1500) the way its level event does (EnemyAI_SleepIfOffscreen, the
+ * enemy event handler 1: flags 0x2100 and mode 2). Enemies whose definition has flag 0x1000 sleep until a
+ * level trigger wakes them; this reaches them without the trigger. Called every frame. */
+extern void EnemyAI_SleepIfOffscreen(CGameObjectInstance *actor, CAI *ai, s32 unused);
+void T2Port_WakeEnemies(int frame, const char *spec) {
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    f32 r = (f32) atof(spec);
+    int i;
+
+    if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL) {
+        return;
+    }
+    if (r <= 0.0f) {
+        r = 1500.0f;
+    }
+    for (i = gScene.m_nFirstActor; i < gScene.m_nActors; i++) {
+        CGameObjectInstance *o = &gScene.m_pActors[i];
+        CIntelligence *info = o->header.m_pIntelligence;
+        f32 dx, dz;
+        s32 dummy = 0;
+        if (info == NULL || info->m_Type != INTELLIGENCE_ENEMY || (o->m_dwFlags & 0x100)) {
+            continue;
+        }
+        dx = o->header.m_vPos.x - p->m_CharacterActor.header.m_vPos.x;
+        dz = o->header.m_vPos.z - p->m_CharacterActor.header.m_vPos.z;
+        if (dx * dx + dz * dz < r * r) {
+            EnemyAI_SleepIfOffscreen(o, &o->m_AI, dummy);
+            printf("wake: frame %d enemy %d type %x at (%.1f %.1f %.1f) flags %x\n", frame, i, (unsigned) o->m_nTypeFlag,
+                   o->header.m_vPos.x, o->header.m_vPos.y, o->header.m_vPos.z, (unsigned) o->m_dwFlags);
+        }
+    }
 }

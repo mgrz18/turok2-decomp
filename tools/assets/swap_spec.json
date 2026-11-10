@@ -80,7 +80,7 @@
 
   "RegionVertex": {"op": "struct", "fields": "s32[4]:xyzw"},
   "PackedRegion": {"op": "struct", "fields": "u16:info u16:flags u16[3]:vertex u16[3]:neighbour s32:visBits"},
-  "PathItem": {"op": "struct", "fields": "f32[3]:pos s32:region f32[3]:data"},
+  "PathItem": {"op": "struct", "fields": "f32[3]:pos s32:region f32:rotY u16:flags u16:flagsA u16:flagsB u16:unk1A"},
   "AnimInstance": {"op": "struct", "fields": "s32:unused f32[3]:pos f32[3]:scale u16:object u16:type u16:region u16:intelligence s16:rotY u8:flags u8:sound"},
   "CompactStatic": {"op": "struct", "fields": "s32:vis f32:scale u16:object u16:region u16:flags u16:intelligence s16:y s8[6]:extents u8:bits u8:x u8:z pad[1]"},
   "StaticObject": {"op": "struct", "fields": "s32:vis f32[3]:pos f32[3]:scale u16[6]:halfExtents u16:object u16:region u16:intelligence u8:flags s8[4]:quat pad[1]"},
@@ -148,16 +148,17 @@
      {"op": "iset", "each": {"op": "rdp", "note": "RGBA5551/IA16 TLUT: Fast3D reads big-endian u16 from bytes; keep. Texture_DecompressCallback's recolour must use BE accessors in the port"}}
   ]},
   "particle effects": {"op": "particles", "template": {"op": "cstruct", "name": "CROMParticleEffect"},
-     "note": "block 0 = pool of sub-records at the offsets of the templates' 9 pointer fields (relocated by CScene__DecompressParticles); records several templates share are typed once",
+     "note": "block 0 = pool of sub-records at the offsets of the templates' 9 pointer fields (relocated by CScene__DecompressParticles); records several templates share are typed once. block0 byte: kept big-endian (records overlap and share bytes across types); the port decodes each by its slot (port/game/t2particles.c); remove block0 to see the typed report",
+     "block0": "byte",
      "slots": [
        [24, {"op": "cstruct", "name": "CROMParticleImpact"}],
-       [28, "f32?[3]:offset"],
-       [32, "f32?[6]:unk20"],
+       [28, "u16[6]:offset"],
+       [32, "u16[12]:rotation"],
        [36, {"op": "cstruct", "name": "CROMParticleDistance"}],
-       [40, "f32?[3]:direction"],
-       [44, "unk[28]:oscillation"],
+       [40, "u16[6]:direction"],
+       [44, {"op": "cstruct", "name": "CROMParticleOscillation"}],
        [48, {"op": "cstruct", "name": "CROMParticleMotion"}],
-       [52, "u8?[16]:colors"],
+       [52, {"op": "cstruct", "name": "CROMParticleColors"}],
        [56, {"op": "cstruct", "name": "CROMParticleParams"}]]},
   "level info": {"op": "seq", "parts": [{"size": 20, "rule": {"op": "cstruct", "name": "CLevelHeader"}}, {"rule": {"op": "unk", "note": "level info bytes 0x14..0x17"}}]},
   "collision": {"op": "iset", "entries": [
@@ -166,7 +167,7 @@
      {"op": "uset", "transposed": true, "elem": "@PackedRegion"},
      {"op": "uset", "transposed": true, "elem": "f32[4]:rect u32:count"}
   ]},
-  "level paths": {"op": "iset", "each": {"op": "iset", "entries": [{"op": "unk", "note": "path group block 0 (8 bytes)"}, {"op": "uset", "elem": "@PathItem"}]}},
+  "level paths": {"op": "iset", "each": {"op": "iset", "entries": [{"op": "struct", "fields": "s16:mode s16:count unk[4]:unk4", "note": "path group block 0 (8 bytes): mode (0 ping-pong, 1 loop) and point count, read as s16 by CPathTrack__Advance"}, {"op": "uset", "elem": "@PathItem"}]}},
   "animated instances": {"op": "uset", "transposed": true, "elem": "@AnimInstance"},
   "grid bounds": {"op": "iset", "entries": ["@f32set", "@f32set", "@f32set", "@f32set", {"op": "uset", "elem": "f32[4]:rect s32:empty"}]},
   "grid section": {"op": "switch", "on": "size", "cases": {"<=8": {"op": "array", "type": "u32", "name": "emptyCell"}},

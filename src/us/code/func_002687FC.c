@@ -10,6 +10,23 @@ struct FloatState3C {
     unsigned char padding_0[56];
     f32 unk_38;
 };
+#ifdef TARGET_PORT
+#include "common.h"
+#include "structs/game_object.h"
+
+/* The port: the AI at its host offset (N64 0x140), the turn by member (N64 buffer + 0x38). */
+void AI_ComputeFrameMotion(CGameObjectInstance *a, CAI *b, CAIFrameMotion *o);
+f32 GameObject_GetFrameTurn(u8 *arg0) {
+    CGameObjectInstance *obj = (CGameObjectInstance *) arg0;
+    CAIFrameMotion motion;
+
+    if (obj->header.m_Type == 1) {
+        AI_ComputeFrameMotion(obj, &obj->m_AI, &motion);
+        return motion.m_Turn;
+    }
+    return 0.0f;
+}
+#else
 extern void AI_ComputeFrameMotion(void *arg0, void *arg1, void *arg2);
 f32 GameObject_GetFrameTurn(u8 *arg0) {
     char buf[0x40];
@@ -19,3 +36,4 @@ f32 GameObject_GetFrameTurn(u8 *arg0) {
     }
     return 0.0f;
 }
+#endif

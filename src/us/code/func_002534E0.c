@@ -13,17 +13,40 @@ typedef struct {
 } Attached002534E0;
 
 /* 0x1328-byte list entries (see CPlayerPool__GetIndex) linked through 0x1320. */
+#ifdef TARGET_PORT
+typedef struct Node002534E0 {
+/* the view at the host offsets of CPlayer (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Node002534E0(m) __builtin_offsetof(CPlayer, m)
+    union {
+        struct { u8 _hp_attached[T2_HOFF_Node002534E0(m_ContState.m_pContState)]; Attached002534E0 *attached; }; /* N64 0xA50 */
+        struct { u8 _hp_next[T2_HOFF_Node002534E0(m_pNext)]; struct Node002534E0 *next; }; /* N64 0x1320 */
+    };
+} Node002534E0;
+#else
 typedef struct Node002534E0 {
     /* 0x0000 */ u8 pad0[0xA50];
     /* 0x0A50 */ Attached002534E0 *attached;
     /* 0x0A54 */ u8 padA54[0x1320 - 0xA54];
     /* 0x1320 */ struct Node002534E0 *next;
 } Node002534E0;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct List002534E0 {
+/* the view at the host offsets of CPlayerPool (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_List002534E0(m) __builtin_offsetof(CPlayerPool, m)
+    union {
+        struct { u8 _hp_head[T2_HOFF_List002534E0(m_ActiveList.m_pHead)]; Node002534E0 *head; }; /* N64 0x20 */
+    };
+} List002534E0;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x20];
     /* 0x20 */ Node002534E0 *head;
 } List002534E0;
+#endif
 
 void CPlayerPool__EndMatch(List002534E0 *arg0) {
     Node002534E0 *var_a0;

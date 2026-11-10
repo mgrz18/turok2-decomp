@@ -1,4 +1,7 @@
 #include "common.h"
+#ifdef TARGET_PORT
+#include "structs/world.h"
+#endif
 #include "m2c_macros.h"
 #include "protos/scene.h"
 
@@ -12,8 +15,16 @@ void CScene__FireEventsByKey(void *arg0, s32 arg1)
   void *var_s2;
   void *var_s1;
   var_s2 = arg0;
+#ifdef TARGET_PORT /* the record tables by member (host CScene layout) */
+  var_s0 = ((CScene *) var_s2)->m_nRecords;
+#else
   var_s0 = *((s32 *) (((s8 *) var_s2) + 0x1168));
+#endif
+#ifdef TARGET_PORT /* the record tables by member (host CScene layout) */
+  var_s1 = ((CScene *) var_s2)->m_pRecords;
+#else
   var_s1 = *((void **) (((s8 *) var_s2) + 0x1178));
+#endif
   var_s0 -= 1;
   var_s3 = arg1;
   if (var_s0 != (-1))
@@ -30,8 +41,16 @@ void CScene__FireEventsByKey(void *arg0, s32 arg1)
     }
     while (var_s0 != (-1));
   }
+#ifdef TARGET_PORT /* the record tables by member (host CScene layout) */
+  var_s0 = ((CScene *) var_s2)->m_nAltRecords;
+#else
   var_s0 = *((s32 *) (((s8 *) var_s2) + 0x116C));
+#endif
+#ifdef TARGET_PORT /* the record tables by member (host CScene layout) */
+  var_s1 = ((CScene *) var_s2)->m_pAltRecords;
+#else
   var_s1 = *((void **) (((s8 *) var_s2) + 0x117C));
+#endif
   var_s0 -= 1;
   if (var_s0 != (-1))
   {

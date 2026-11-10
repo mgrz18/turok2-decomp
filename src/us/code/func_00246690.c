@@ -17,6 +17,45 @@ CQuaternion CGameObjectInstance__GetRotation(SpawnObj *obj);
 CQuaternion func_002156D4(SpawnObj *obj);
 s32 func_0021F1F8(SpawnObj *obj);
 
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#include "structs/particle.h"
+
+/* The port: the same on host types. SpawnObj is the N64 layout: the velocity at 0x18 and the
+ * target at 0x1C0 (CAI 0x140 + 0x80, m_pSightTarget) missed the host members, so an enemy's
+ * projectile left with a garbage velocity and no target to home on (round 7 merge: demo 1's
+ * enemies fired past the player). */
+void Actor_SpawnParticle(SpawnObj *obj, s32 kind, CVector3 at) {
+    CVector3 pos;
+    CVector3 vel;
+    CQuaternion rot;
+    sptr region;
+    s32 mode;
+    sptr target;
+
+    mode = 1;
+    GameObject_TraceMove(obj, at, &pos, (s32 *) &region, 0, 1);
+    target = 0;
+    vel.x = vel.y = vel.z = 0.0f;
+    rot.x = rot.y = rot.z = 0.0f;
+    rot.w = 1.0f;
+    switch (obj->type) {
+    case 1:
+        vel = ((CGameObjectInstance *) obj)->m_vVelocity;
+        rot = CGameObjectInstance__GetRotation(obj);
+        target = (sptr) ((CGameObjectInstance *) obj)->m_AI.m_pSightTarget;
+        if (func_0021F1F8(obj) == 5) {
+            mode = 3;
+        }
+        break;
+    case 3:
+        vel = ((CParticle *) obj)->m_vVelocity;
+        rot = func_002156D4(obj);
+        break;
+    }
+    CParticleSystem__Spawn(&gScene.m_ParticleSystem, obj, obj, NULL, target, kind, vel, rot, pos, (void *) region, -1, mode);
+}
+#else
 /* Spawns a particle of `kind` from `obj` at `at`, moving with it and
  * oriented like it. */
 void Actor_SpawnParticle(SpawnObj *obj, s32 kind, CVector3 at) {
@@ -52,3 +91,4 @@ void Actor_SpawnParticle(SpawnObj *obj, s32 kind, CVector3 at) {
     }
     CParticleSystem__Spawn(&gScene.m_ParticleSystem, obj, obj, NULL, target, kind, vel, rot, pos, region, -1, mode);
 }
+#endif

@@ -213,3 +213,23 @@ the call goes to `Menu_Update`): 60 more calls checked, which found the menu fil
 
 The `void_used` and `missing_args` sites left are the section 4 list (they need the MIPS code
 read: what v0/a1/a2 hold at the call).
+
+## 6. Round 7 (v5): the 11 harmful direct sites
+
+`abicheck.py` on names-R7_v5: **harmful direct sites 0** (was 11), indirect stores 1 (was 4:
+the `Destructible_Hurt` declaration-only store remains; `TotemDefense_InitFight`'s went with its
+host body). Each read against the MIPS (`mips-linux-gnu-objdump -d build/ref.elf`):
+
+| site | class | MIPS | host |
+|---|---|---|---|
+| `CGameRegion__GetCeilingTiltRotation` -> `CGameRegion__GetCeilingNormal` | missing_args | $a1 untouched: the region its only caller (func_0022CF40) passes | `(out, region)`, passed on |
+| func_002261A8 -> inner `CISet__GetBlock` | missing_args | $a1 = its own second argument (the path index) | passed |
+| `CPathTrack__StartAtNearestPoint` -> func_002261A8 | missing_args | $a1 (index) and $a2 (position, from func_00219BC0) untouched | `(arg0, index, pt)`; the caller's path track by member (was `obj + 0x1D4`) |
+| `Sweep_GetGroundBehavior` -> `CScene__GetRegionInfo` | missing_args | $a1 = the region both callers pass | `(sweep, region)` |
+| func_0021A500 -> `GameObject_IsOnGround` | missing_args | $a0 = the object | passed (and its body on host offsets) |
+| `CCamera__DrawTints` returns `Cinema_DrawOverlay()` | void_used | $v0 = the cinema flag or Cinema_DrawFade's | dropped: no caller of DrawTints uses it |
+| `CGameRegion__SetGroupHeight` returns `CGameRegion__FloodSetHeight()` | void_used | garbage $f0 | dropped: no caller uses it |
+| func_0041F32C `CCache__Deallocate(0, handle)` x4 | ptr_from_int | - | prototyped `(sptr, sptr)` |
+
+Also pointer width: `ImpactEvent_LevelSpecial` (and the boss handlers' t2abi wrappers) and the
+generators' `spawnPickup` take their pointers as sptr.

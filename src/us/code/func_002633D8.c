@@ -6,12 +6,22 @@
 
 /* Turok 2: def 0x14, type id 0xB8, flags 0xD4 (Rage Wars 0x18 / 0xE4 / 0x100). */
 /* Turok 2: update hook at 0xF0 (Rage Wars 0x108). */
+#ifdef TARGET_PORT
+/* The port: the view at the host offsets of CAI (m_pModeTable, m_pfStep). */
+typedef struct ActorMotionState {
+    union {
+        struct { u8 _hp_table[__builtin_offsetof(CAI, m_pModeTable)]; void *table; };
+        struct { u8 _hp_update[__builtin_offsetof(CAI, m_pfStep)]; void *update; };
+    };
+} ActorMotionState;
+#else
 typedef struct ActorMotionState {
     char pad0[0x2C];
     void *table;
     char pad30[0xC0];
     void *update;
 } ActorMotionState;
+#endif
 void Generator_Step();
 void Generator_Setup(void *arg0, void *arg1) {
     CGameObjectInstance *actor = arg0;
