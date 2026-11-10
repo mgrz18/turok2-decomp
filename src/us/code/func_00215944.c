@@ -5,11 +5,21 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 
+#ifdef TARGET_PORT
+/* The port: the key is CLevelActor.m_Resource (N64 0x34; the host CInstanceHeader holds pointers,
+ * so it sits further on). The grid sections build their level actors at the host layout. */
+#include "structs/level_actor.h"
+typedef CLevelActor ResourceOwner;
+#define key m_Resource
+#define LEVEL_ACTOR_KEY(obj) (((CLevelActor *) (obj))->m_Resource)
+#else
 /* Only the field read here: the key of the resource this loads. */
 typedef struct {
     /* 0x00 */ u8 pad0[0x34];
     /* 0x34 */ s32 key;
 } ResourceOwner;
+#define LEVEL_ACTOR_KEY(obj) (*(s32 *) ((u8 *) (obj) + 0x34))
+#endif
 
 void Model_TouchTextures(s32 *);
 extern void Model_DecompressCallbackTerminated();
@@ -21,11 +31,11 @@ s32 *CLevelActor__LoadGeometry(void *obj) {
     sptr src;
     s32 size;
 
-    index = CCache__Request(0, *(s32 *) ((u8 *) obj + 0x34), 0x18, 4, 0, NULL, "simp object index", 0);
+    index = CCache__Request(0, LEVEL_ACTOR_KEY(obj), 0x18, 4, 0, NULL, "simp object index", 0);
     if (index == NULL) {
         geometry = NULL;
     } else {
-        src = CISet__GetROMAddressAndSize(*index, *(s32 *) ((u8 *) obj + 0x34), 1, &size);
+        src = CISet__GetROMAddressAndSize(*index, LEVEL_ACTOR_KEY(obj), 1, &size);
         CCache__Unlock(0, index);
         geometry = CCache__Request(0, src, size, 4, 0, Model_DecompressCallbackTerminated, "simp geometry", 0);
     }
