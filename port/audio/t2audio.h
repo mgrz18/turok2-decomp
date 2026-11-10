@@ -66,6 +66,10 @@ void T2Asp_GetStats(T2AspStats *out);
 size_t T2Audio_TakeSamples(int16_t *dst, size_t max);
 size_t T2Audio_Queued(void);
 uint32_t T2Audio_Rate(void);
+/* --bench (docs/port/PERF.md): host time spent in the audio manager's frames so far, in ns:
+ * the synthesizer (alAudioFrame: the game's sound player/sequencer and the command list) and the
+ * ASP (T2Asp_Run: the mixer). Always counted (two clock reads per audio frame). */
+void T2Audio_GetTimes(uint64_t *synthNs, uint64_t *aspNs);
 
 typedef struct T2AudioStats {
     uint64_t frames;      /* synthesizer frames (alAudioFrame calls) */

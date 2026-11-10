@@ -22,6 +22,9 @@ struct T2GameArgs {
     // DEBUG-ONLY bring-up switches (port/game/t2debug.c) until the Controller Pak is modelled:
     int skipPakCheck = 0; // --skip-pak-check: mode 0 ends as "continue without saving"
     int startMode = -1;   // --start-mode N: switch to engine mode N once mode 0 has started
+    // DEBUG-ONLY measurement (docs/port/PERF.md):
+    int benchFrom = -1;   // --bench [FROM]: per-frame host times from VI FROM on (0: all), printed at the end
+    int pace = 0;         // --pace: real time, one VI per 1/60 s (the game draws every second VI: 30 fps)
 };
 
 // Boots the game and runs args.frames frames; window may be null (--no-window).

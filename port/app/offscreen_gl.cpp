@@ -193,6 +193,12 @@ int T2Offscreen_ShotFramebuffer() {
     return sInterp ? sInterp->mGameFb : 0;
 }
 
+void T2Offscreen_Finish() {
+    if (sInterp) {
+        glFinish();
+    }
+}
+
 #else // !__APPLE__: Linux has SDL's offscreen driver with EGL; nothing to do here
 
 bool T2Offscreen_Init(const std::shared_ptr<Ship::ConsoleVariable>&, const std::shared_ptr<Ship::ResourceManager>&,
@@ -208,6 +214,8 @@ bool T2Offscreen_Draw(void*) {
 }
 int T2Offscreen_ShotFramebuffer() {
     return 0;
+}
+void T2Offscreen_Finish() {
 }
 
 #endif

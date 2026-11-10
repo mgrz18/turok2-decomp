@@ -144,6 +144,8 @@ struct Args {
     bool skipPakCheck = false; // DEBUG-ONLY (t2debug.c)
     int startMode = -1;        // DEBUG-ONLY (t2debug.c)
     bool offscreenGl = false;  // --offscreen-gl (macOS)
+    int benchFrom = -1;        // --bench [FROM] (debug, PERF.md)
+    bool pace = false;         // --pace (debug, PERF.md)
 #ifdef T2_LOW_MEMORY_DEFAULT
     bool lowMemory = true;
 #else
@@ -190,6 +192,13 @@ Args ParseArgs(int argc, char** argv) {
             a.pakDir = argv[++i];
         } else if (s == "--input" && i + 1 < argc) {
             a.input = argv[++i];
+        } else if (s == "--bench") {
+            a.benchFrom = 0; // optional first frame to measure
+            if (i + 1 < argc && argv[i + 1][0] >= '0' && argv[i + 1][0] <= '9') {
+                a.benchFrom = atoi(argv[++i]);
+            }
+        } else if (s == "--pace") {
+            a.pace = true;
         } else if (s == "--offscreen-gl") {
             a.offscreenGl = true; // macOS: draw with no window (offscreen_gl.cpp); implies --no-window
             a.window = false;
@@ -198,7 +207,8 @@ Args ParseArgs(int argc, char** argv) {
                             "          [--game [--draw] [--audio] [--wav out.wav] [--verbose] [--high-memory]\n"
                             "                  [--no-pak | --pak-blank | --pak-dir DIR]\n"
                             "                  [--input BUTTON@FRAME[..LAST],SX=V@F..L,...|@FILE] [--skip-pak-check] [--start-mode N]]   (the last three: debug only)\n"
-                            "          [--offscreen-gl]   (macOS: Fast3D on a CGL context with no window; T2_SHOT works)\n",
+                            "          [--offscreen-gl]   (macOS: Fast3D on a CGL context with no window; T2_SHOT works)\n"
+                            "          [--bench [FROM]] [--pace]   (debug: frame times from VI FROM; real-time 60 Hz VI pacing)\n",
                     argv[0]);
             exit(2);
         }
@@ -468,6 +478,8 @@ int main(int argc, char** argv) {
         g.input = args.input;
         g.skipPakCheck = args.skipPakCheck;
         g.startMode = args.startMode;
+        g.benchFrom = args.benchFrom;
+        g.pace = args.pace;
         CHECK(T2Game_Run(window, g) == 0, "game run");
         CHECK(T2Swoosh_SelfTest() == 0, "swoosh system self test");   // port/game/t2swoosh.c
     }
