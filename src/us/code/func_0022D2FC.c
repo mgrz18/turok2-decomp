@@ -27,10 +27,19 @@
 #include "globals/math.h"
 #include "globals/engine.h"
 #include "globals/particle.h"
+#ifdef TARGET_PORT
+#include "structs/level_actor.h"
+#include "structs/player.h"
+struct CROMParticleEffect *T2Port_ParticleEffects(void *data, s32 *count); /* port/game/t2particles.c */
+#endif
 #include "protos/list.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
 #include "protos/scene.h"
+#ifdef TARGET_PORT
+#include "structs/particle.h"
+#include "structs/camera.h"
+#endif
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -71,6 +80,21 @@ typedef struct {
     /* 0x18 */ s8 ramp;
 } Oscillation;
 
+#ifdef TARGET_PORT
+typedef struct MtxParticleDesc {
+/* the view at the host offsets of CROMParticleEffect (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_MtxParticleDesc(m) __builtin_offsetof(CROMParticleEffect, m)
+    union {
+        struct { u8 _hp_flags[T2_HOFF_MtxParticleDesc(m_dwFlags)]; u32 flags; }; /* N64 0x0 */
+        struct { u8 _hp_animMode[T2_HOFF_MtxParticleDesc(m_AnimMode)]; s8 animMode; }; /* N64 0x8 */
+        struct { u8 _hp_clampToGround[T2_HOFF_MtxParticleDesc(m_bClampToGround)]; s8 clampToGround; }; /* N64 0xA */
+        struct { u8 _hp_renderModel[T2_HOFF_MtxParticleDesc(m_pModel)]; s32 renderModel; }; /* N64 0x14 */
+        struct { u8 _hp_distanceRange[T2_HOFF_MtxParticleDesc(m_pDistanceRange)]; DistanceRange *distanceRange; }; /* N64 0x24 */
+        struct { u8 _hp_oscillation[T2_HOFF_MtxParticleDesc(m_pOscillation)]; Oscillation *oscillation; }; /* N64 0x2C */
+    };
+} MtxParticleDesc;
+#else
 typedef struct {
     /* 0x00 */ u32 flags;
     /* 0x04 */ u8 pad4[0x8 - 0x4];
@@ -84,12 +108,47 @@ typedef struct {
     /* 0x28 */ u8 pad28[0x2C - 0x28];
     /* 0x2C */ Oscillation *oscillation;
 } MtxParticleDesc;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct MtxCamera {
+/* the view at the host offsets of CCamera (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_MtxCamera(m) __builtin_offsetof(CCamera, m)
+    union {
+        struct { u8 _hp_fovY[T2_HOFF_MtxCamera(m_Fov)]; f32 fovY; }; /* N64 0x6C */
+    };
+} MtxCamera;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x6C];
     /* 0x6C */ f32 fovY;
 } MtxCamera;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct MtxParticle {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_MtxParticle(m) __builtin_offsetof(CParticle, m)
+    union {
+        struct { u8 _hp_region[T2_HOFF_MtxParticle(header.m_pCurrentRegion)]; void *region; }; /* N64 0x10 */
+        struct { u8 _hp_flags[T2_HOFF_MtxParticle(m_dwFlags)]; u32 flags; }; /* N64 0x40 */
+        struct { u8 _hp_desc[T2_HOFF_MtxParticle(m_pEffect)]; MtxParticleDesc *desc; }; /* N64 0xF8 */
+        struct { u8 _hp_time[T2_HOFF_MtxParticle(m_cFrame)]; f32 time; }; /* N64 0x11C */
+        struct { u8 _hp_size[T2_HOFF_MtxParticle(m_vSize)]; CVector3 size; }; /* N64 0x12C */
+        struct { u8 _hp_direction[T2_HOFF_MtxParticle(m_vDirection)]; CVector3 direction; }; /* N64 0x150 */
+        struct { u8 _hp_rot[T2_HOFF_MtxParticle(m_vRot)]; CVector3 rot; }; /* N64 0x15C */
+        struct { u8 _hp_phaseA[T2_HOFF_MtxParticle(m_WobblePhase)]; f32 phaseA; }; /* N64 0x178 */
+        struct { u8 _hp_phaseB[T2_HOFF_MtxParticle(m_WobblePhase[1])]; f32 phaseB; }; /* N64 0x17C */
+        struct { u8 _hp_amplitudeA[T2_HOFF_MtxParticle(m_WobbleAmplitude)]; f32 amplitudeA; }; /* N64 0x188 */
+        struct { u8 _hp_amplitudeB[T2_HOFF_MtxParticle(m_WobbleAmplitude[1])]; f32 amplitudeB; }; /* N64 0x18C */
+        struct { u8 _hp_space[T2_HOFF_MtxParticle(m_Alignment)]; s8 space; }; /* N64 0x1AC */
+        struct { u8 _hp_shake[T2_HOFF_MtxParticle(m_Shake)]; s8 shake; }; /* N64 0x1AD */
+        struct { u8 _hp_opacity[T2_HOFF_MtxParticle(m_Opacity)]; u8 opacity; }; /* N64 0x1B4 */
+    };
+} MtxParticle;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x10];
     /* 0x010 */ void *region;
@@ -116,6 +175,7 @@ typedef struct {
     /* 0x1AE */ u8 pad1AE[0x1B4 - 0x1AE];
     /* 0x1B4 */ u8 opacity;
 } MtxParticle;
+#endif
 
 /* CParticle__Attach under this part's view (the effect code below declares it as (Effect *, s32, s32)). */
 extern void MtxParticle_Place(MtxParticle *p, CVector3 *outPosition, CVector3 *outHeading) asm("CParticle__Attach");
@@ -381,6 +441,18 @@ typedef struct {
     /* 0x18 */ f32 shadowScale;
 } ShadowParams;
 
+#ifdef TARGET_PORT
+typedef struct ShadowDef {
+/* the view at the host offsets of CROMParticleEffect (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ShadowDef(m) __builtin_offsetof(CROMParticleEffect, m)
+    union {
+        struct { u8 _hp_flags[T2_HOFF_ShadowDef(m_dwFlags)]; u32 flags; }; /* N64 0x0 */
+        struct { u8 _hp_bigShadow[T2_HOFF_ShadowDef(m_pModel)]; s32 bigShadow; }; /* N64 0x14 */
+        struct { u8 _hp_params[T2_HOFF_ShadowDef(m_pDistanceRange)]; ShadowParams *params; }; /* N64 0x24 */
+    };
+} ShadowDef;
+#else
 typedef struct {
     /* 0x00 */ u32 flags;
     u8 pad4[0x10];
@@ -388,7 +460,23 @@ typedef struct {
     u8 pad18[0xC];
     /* 0x24 */ ShadowParams *params;
 } ShadowDef;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct ShadowActor {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ShadowActor(m) __builtin_offsetof(CParticle, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_ShadowActor(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_region[T2_HOFF_ShadowActor(header.m_pCurrentRegion)]; void *region; }; /* N64 0x10 */
+        struct { u8 _hp_def[T2_HOFF_ShadowActor(m_pEffect)]; ShadowDef *def; }; /* N64 0xF8 */
+        struct { u8 _hp_fade[T2_HOFF_ShadowActor(m_cFrame)]; f32 fade; }; /* N64 0x11C */
+        struct { u8 _hp_fadeTime[T2_HOFF_ShadowActor(m_nFrames)]; s16 fadeTime; }; /* N64 0x128 */
+        struct { u8 _hp_radius[T2_HOFF_ShadowActor(m_vSize.z)]; f32 radius; }; /* N64 0x134 */
+    };
+} ShadowActor;
+#else
 typedef struct {
     u8 pad0[0x4];
     /* 0x004 */ CVector3 pos;
@@ -402,6 +490,7 @@ typedef struct {
     u8 pad12A[0xA];
     /* 0x134 */ f32 radius;
 } ShadowActor;
+#endif
 
 void *MtxPool_Alloc(void *pool, s32 count);
 void CGameRegion__GetTiltRotation(CQuaternion *out, void *region);
@@ -504,12 +593,25 @@ typedef struct { u8 pad0[0x40]; } Mtx;
 #endif
 
 /* The leading 0x34 bytes of a game object, as the collision test reads them. */
+#ifdef TARGET_PORT
+typedef struct ParticleHead {
+/* the view at the host offsets of CObjectHead (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ParticleHead(m) __builtin_offsetof(CObjectHead, m)
+    union {
+        struct { u8 _hp_type[T2_HOFF_ParticleHead(header.m_nObjType)]; u16 type; }; /* N64 0x2 */
+        struct { u8 _hp_pos[T2_HOFF_ParticleHead(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        u8 _hp_size[sizeof(CObjectHead)];
+    };
+} ParticleHead;
+#else
 typedef struct {
     /* 0x00 */ u16 pad0;
     /* 0x02 */ u16 type;
     /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0x24];
-} ParticleHead; /* size 0x34 */
+} ParticleHead;
+#endif /* size 0x34 */
 
 typedef struct {
     /* 0x0 */ u8 kind;
@@ -540,6 +642,19 @@ typedef struct {
     /* 0xE */ s8 unkE;
 } ParticleFade;
 
+#ifdef TARGET_PORT
+typedef struct ParticleDesc {
+/* the view at the host offsets of CROMParticleEffect (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ParticleDesc(m) __builtin_offsetof(CROMParticleEffect, m)
+    union {
+        struct { u8 _hp_flags[T2_HOFF_ParticleDesc(m_dwFlags)]; u32 flags; }; /* N64 0x0 */
+        struct { u8 _hp_animMode[T2_HOFF_ParticleDesc(m_AnimMode)]; s8 animMode; }; /* N64 0x8 */
+        struct { u8 _hp_colors[T2_HOFF_ParticleDesc(m_pColors)]; ParticleColors *colors; }; /* N64 0x34 */
+        struct { u8 _hp_fade[T2_HOFF_ParticleDesc(m_pParams)]; ParticleFade *fade; }; /* N64 0x38 */
+    };
+} ParticleDesc;
+#else
 typedef struct {
     /* 0x00 */ u32 flags;
     /* 0x04 */ u8 pad4[0x4];
@@ -548,7 +663,31 @@ typedef struct {
     /* 0x34 */ ParticleColors *colors;
     /* 0x38 */ ParticleFade *fade;
 } ParticleDesc;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct Particle {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Particle(m) __builtin_offsetof(CParticle, m)
+    union {
+        ParticleHead inst; /* N64 0x0: the CObjectHead the particle starts with */
+        struct { u8 _hp_flags[T2_HOFF_Particle(m_dwFlags)]; u32 flags; }; /* N64 0x40 */
+        struct { u8 _hp_mtx[T2_HOFF_Particle(m_mtxDraw)]; Mtx mtx[2]; }; /* N64 0x48 */
+        struct { u8 _hp_desc[T2_HOFF_Particle(m_pEffect)]; ParticleDesc *desc; }; /* N64 0xF8 */
+        struct { u8 _hp_model[T2_HOFF_Particle(unk_0FC)]; s32 model; }; /* N64 0xFC */
+        struct { u8 _hp_time[T2_HOFF_Particle(m_cFrame)]; f32 time; }; /* N64 0x11C */
+        struct { u8 _hp_frame[T2_HOFF_Particle(m_AnimFrame)]; f32 frame; }; /* N64 0x120 */
+        struct { u8 _hp_life[T2_HOFF_Particle(m_nFrames)]; s16 life; }; /* N64 0x128 */
+        struct { u8 _hp_builtFrame[T2_HOFF_Particle(m_BuiltFrame)]; s8 builtFrame; }; /* N64 0x12A */
+        struct { u8 _hp_randomFrame[T2_HOFF_Particle(m_RandomFrame)]; s8 randomFrame; }; /* N64 0x12B */
+        struct { u8 _hp_alpha[T2_HOFF_Particle(m_Alpha)]; f32 alpha; }; /* N64 0x174 */
+        struct { u8 _hp_prim[T2_HOFF_Particle(m_PrimColor)]; u8 prim[3]; }; /* N64 0x1AE */
+        struct { u8 _hp_env[T2_HOFF_Particle(m_EnvColor)]; u8 env[3]; }; /* N64 0x1B1 */
+        struct { u8 _hp_opacity[T2_HOFF_Particle(m_Opacity)]; u8 opacity; }; /* N64 0x1B4 */
+    };
+} Particle;
+#else
 typedef struct {
     /* 0x000 */ ParticleHead inst;
     /* 0x034 */ u8 pad34[0x40 - 0x34];
@@ -572,7 +711,22 @@ typedef struct {
     /* 0x1B1 */ u8 env[3];
     /* 0x1B4 */ u8 opacity;
 } Particle;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct ParticleView {
+/* the view at the host offsets of CCamera (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ParticleView(m) __builtin_offsetof(CCamera, m)
+    union {
+        struct { u8 _hp_index[T2_HOFF_ParticleView(m_Index)]; s32 index; }; /* N64 0x8 */
+        struct { u8 _hp_unk24[T2_HOFF_ParticleView(m_ViewParams.m_nType)]; s32 unk24; }; /* N64 0x24 */
+        struct { u8 _hp_eye[T2_HOFF_ParticleView(m_vPos)]; CVector3 eye; }; /* N64 0x114 */
+        struct { u8 _hp_viewMtx[T2_HOFF_ParticleView(m_mfView)]; f32 viewMtx[4][4]; }; /* N64 0x20C */
+        struct { u8 _hp_fadeRange[T2_HOFF_ParticleView(m_FarClip)]; f32 fadeRange; }; /* N64 0x510 */
+    };
+} ParticleView;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x8];
     /* 0x008 */ s32 index;
@@ -585,6 +739,7 @@ typedef struct {
     /* 0x24C */ u8 pad24C[0x510 - 0x24C];
     /* 0x510 */ f32 fadeRange;
 } ParticleView;
+#endif
 
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */ /* the current view */
@@ -879,6 +1034,24 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
 }
 
 /* Engine actor instance (only the fields used here). */
+#ifdef TARGET_PORT
+typedef struct EffectActor {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_EffectActor(m) __builtin_offsetof(CParticle, m)
+    union {
+        struct { u8 _hp_kind[T2_HOFF_EffectActor(header.m_Type)]; u8 kind; }; /* N64 0x0 */
+        struct { u8 _hp_typeId[T2_HOFF_EffectActor(header.m_nObjType)]; u16 typeId; }; /* N64 0x2 */
+        struct { u8 _hp_flags[T2_HOFF_EffectActor(m_dwFlags)]; u32 flags; }; /* N64 0x40 */
+        struct { u8 _hp_child[T2_HOFF_EffectActor(m_pSource)]; struct EffectActor *child; }; /* N64 0x108 */
+        struct { u8 _hp_parent[T2_HOFF_EffectActor(m_pOwner)]; u8 *parent; }; /* N64 0x10C */
+        struct { u8 _hp_liveCount[T2_HOFF_EffectActor(m_pOwnerCount)]; s32 *liveCount; }; /* N64 0x110 */
+        struct { u8 _hp_sound[T2_HOFF_EffectActor(m_pDLight)]; s32 sound; }; /* N64 0x118 */
+        struct { u8 _hp_registered[T2_HOFF_EffectActor(m_ActiveSwooshes)]; u8 registered; }; /* N64 0x1B5 */
+        struct { u8 _hp_list[T2_HOFF_EffectActor(m_pActiveList)]; void *list; }; /* N64 0x1C0 */
+    };
+} EffectActor;
+#else
 typedef struct EffectActor {
     /* 0x000 */ u8 kind;
     u8 pad1;
@@ -896,6 +1069,7 @@ typedef struct EffectActor {
     u8 pad1B6[0xA];
     /* 0x1C0 */ void *list;
 } EffectActor;
+#endif
 
 extern u8 gEngineApp_m_SwooshSystem[];
 #ifdef TARGET_PORT
@@ -926,8 +1100,14 @@ void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
     }
     if (!(flags & 0x800)) {
         if (actor->typeId == 0x68) {
+#ifdef TARGET_PORT
+            /* the owner's m_AI.m_pParent is its player: m_Data.m_AmmoList by member */
+            owner = (u8 *) ((CGameObjectInstance *) actor->parent)->m_AI.m_pParent;
+            ((CPlayer *) owner)->m_Data.m_AmmoList[*CPlayer__GetFiringAmmo(owner, 0x15)] = 1;
+#else
             owner = *(u8 **) (actor->parent + 0x1A8);
             *(s16 *) (owner + *CPlayer__GetFiringAmmo(owner, 0x15) * 2 + 0x934) = 1;
+#endif
         }
         child = actor->child;
         if (child != NULL && (kind = child->kind) == 2 && (child->flags & 0x100) &&
@@ -958,10 +1138,17 @@ void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
         actor->flags &= ~0x02000100;
         CList__Remove(actor->list, actor);
         actor->list = NULL;
+#ifdef TARGET_PORT
+        CList__AddHead(&((CParticleSystem *) mgr)->m_FreeList, actor);
+        if (actor->flags & 0x01000000) {
+            CList__Remove(&((CParticleSystem *) mgr)->m_DrawList, actor);
+        }
+#else
         CList__AddHead(mgr + 0xEC00, actor);
         if (actor->flags & 0x01000000) {
             CList__Remove(mgr + 0xEC14, actor);
         }
+#endif
     }
 }
 
@@ -1019,6 +1206,36 @@ typedef struct {
     /* 0x94 */ u16 type;
 } EntryModel;
 
+#ifdef TARGET_PORT
+typedef struct Entry {
+/* the view at the host offsets of CROMParticleEffect (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Entry(m) __builtin_offsetof(CROMParticleEffect, m)
+    union {
+        struct { u8 _hp_flags[T2_HOFF_Entry(m_dwFlags)]; u32 flags; }; /* N64 0x0 */
+        struct { u8 _hp_unk4[T2_HOFF_Entry(unk_04)]; s16 unk4; }; /* N64 0x4 */
+        struct { u8 _hp_unk6[T2_HOFF_Entry(unk_06)]; s8 unk6; }; /* N64 0x6 */
+        struct { u8 _hp_unk7[T2_HOFF_Entry(m_DLightType)]; s8 unk7; }; /* N64 0x7 */
+        struct { u8 _hp_unk8[T2_HOFF_Entry(m_AnimMode)]; s8 unk8; }; /* N64 0x8 */
+        struct { u8 _hp_unk9[T2_HOFF_Entry(unk_09)]; u8 unk9; }; /* N64 0x9 */
+        struct { u8 _hp_unkA[T2_HOFF_Entry(m_bClampToGround)]; u8 unkA; }; /* N64 0xA */
+        struct { u8 _hp_unkB[T2_HOFF_Entry(unk_0B)]; u8 unkB; }; /* N64 0xB */
+        struct { u8 _hp_sound[T2_HOFF_Entry(m_nSound)]; s16 sound; }; /* N64 0xC */
+        struct { u8 _hp_playerMask[T2_HOFF_Entry(m_PlayerMask)]; u8 playerMask; }; /* N64 0x10 */
+        struct { u8 _hp_unk14[T2_HOFF_Entry(m_pModel)]; sptr unk14; }; /* N64 0x14 */
+        struct { u8 _hp_model[T2_HOFF_Entry(m_pImpact)]; EntryModel *model; }; /* N64 0x18 */
+        struct { u8 _hp_offset[T2_HOFF_Entry(m_pOffset)]; PackedRange *offset; }; /* N64 0x1C */
+        struct { u8 _hp_unk20[T2_HOFF_Entry(m_pRotation)]; PackedRange *unk20; }; /* N64 0x20 */
+        struct { u8 _hp_unk24[T2_HOFF_Entry(m_pDistanceRange)]; PackedRange *unk24; }; /* N64 0x24 */
+        struct { u8 _hp_direction[T2_HOFF_Entry(m_pDirection)]; PackedRange *direction; }; /* N64 0x28 */
+        struct { u8 _hp_unk2C[T2_HOFF_Entry(m_pOscillation)]; PackedRange *unk2C; }; /* N64 0x2C */
+        struct { u8 _hp_motion[T2_HOFF_Entry(m_pMotion)]; EntryMotion *motion; }; /* N64 0x30 */
+        struct { u8 _hp_color[T2_HOFF_Entry(m_pColors)]; EntryColor *color; }; /* N64 0x34 */
+        struct { u8 _hp_params[T2_HOFF_Entry(m_pParams)]; EntryParams *params; }; /* N64 0x38 */
+        u8 _hp_size[sizeof(CROMParticleEffect)];
+    };
+} Entry;
+#else
 typedef struct Entry {
     /* 0x00 */ u32 flags;
     /* 0x04 */ s16 unk4;
@@ -1042,7 +1259,8 @@ typedef struct Entry {
     /* 0x30 */ EntryMotion *motion;
     /* 0x34 */ EntryColor *color;
     /* 0x38 */ EntryParams *params;
-} Entry; /* 0x3C bytes */
+} Entry;
+#endif /* 0x3C bytes */
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -1063,12 +1281,43 @@ typedef struct {
     /* 0x18 */ f32 unk18;
 } Render;
 
+#ifdef TARGET_PORT
+typedef struct SourceModel {
+/* the view at the host offsets of CROMParticleEffect (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_SourceModel(m) __builtin_offsetof(CROMParticleEffect, m)
+    union {
+        struct { u8 _hp_flags[T2_HOFF_SourceModel(m_dwFlags)]; u32 flags; }; /* N64 0x0 */
+        struct { u8 _hp_large[T2_HOFF_SourceModel(m_pModel)]; s32 large; }; /* N64 0x14 */
+    };
+} SourceModel;
+#else
 typedef struct {
     /* 0x00 */ u32 flags;
     /* 0x04 */ u8 pad4[0x10];
     /* 0x14 */ s32 large;
 } SourceModel;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct Actor {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Actor(m) __builtin_offsetof(CParticle, m)
+    union {
+        struct { u8 _hp_type[T2_HOFF_Actor(header.m_Type)]; u8 type; }; /* N64 0x0 */
+        struct { u8 _hp_pos[T2_HOFF_Actor(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_def[T2_HOFF_Actor(header.m_pIntelligence)]; CIntelligence *def; }; /* N64 0x14 */
+        struct { u8 _hp_flags[T2_HOFF_Actor(m_dwFlags)]; u32 flags; }; /* N64 0x40 */
+        struct { u8 _hp_matrices[T2_HOFF_Actor(m_mtxDraw)]; CMtxF matrices[1]; }; /* N64 0x48 */
+        struct { u8 _hp_bones[T2_HOFF_Actor(m_mtxDraw) + 80]; CMtxF *bones; }; /* N64 0x98 */
+        struct { u8 _hp_model[T2_HOFF_Actor(m_pEffect)]; SourceModel *model; }; /* N64 0xF8 */
+        struct { u8 _hp_unk130[T2_HOFF_Actor(m_vSize.y)]; f32 unk130; }; /* N64 0x130 */
+        struct { u8 _hp_unk134[T2_HOFF_Actor(m_vSize.z)]; f32 unk134; }; /* N64 0x134 */
+        struct { u8 _hp_ai[T2_HOFF_Actor(m_vGrowth.z)]; s32 ai; }; /* N64 0x140 */
+    };
+} Actor;
+#else
 typedef struct Actor {
     /* 0x000 */ u8 type;
     /* 0x001 */ u8 pad1[3];
@@ -1089,6 +1338,7 @@ typedef struct Actor {
     /* 0x138 */ u8 pad138[0x140 - 0x138];
     /* 0x140 */ s32 ai;
 } Actor;
+#endif
 
 typedef struct Owner {
     /* 0x00 */ u8 type;
@@ -1096,6 +1346,57 @@ typedef struct Owner {
     /* 0x80 */ void *ownerId;
 } Owner;
 
+#ifdef TARGET_PORT
+typedef struct Effect {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Effect(m) __builtin_offsetof(CParticle, m)
+    union {
+        struct { u8 _hp_kind[T2_HOFF_Effect(header.m_nObjType)]; u16 kind; }; /* N64 0x2 */
+        struct { u8 _hp_pos[T2_HOFF_Effect(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_region[T2_HOFF_Effect(header.m_pCurrentRegion)]; void *region; }; /* N64 0x10 */
+        struct { u8 _hp_velocity[T2_HOFF_Effect(m_vVelocity)]; CVector3 velocity; }; /* N64 0x18 */
+        struct { u8 _hp_unk24[T2_HOFF_Effect(unk_024)]; s32 unk24; }; /* N64 0x24 */
+        struct { u8 _hp_unk28[T2_HOFF_Effect(unk_024[4])]; s32 unk28; }; /* N64 0x28 */
+        struct { u8 _hp_unk2C[T2_HOFF_Effect(unk_024[8])]; s32 unk2C; }; /* N64 0x2C */
+        struct { u8 _hp_unk30[T2_HOFF_Effect(unk_024[12])]; s32 unk30; }; /* N64 0x30 */
+        struct { u8 _hp_attachPos[T2_HOFF_Effect(m_vAttachPos)]; CVector3 attachPos; }; /* N64 0x34 */
+        struct { u8 _hp_flags[T2_HOFF_Effect(m_dwFlags)]; u32 flags; }; /* N64 0x40 */
+        struct { u8 _hp_entry[T2_HOFF_Effect(m_pEffect)]; Entry *entry; }; /* N64 0xF8 */
+        struct { u8 _hp_bits[T2_HOFF_Effect(unk_0FC)]; u32 bits; }; /* N64 0xFC */
+        struct { u8 _hp_ownerId[T2_HOFF_Effect(m_pOwnerID)]; void *ownerId; }; /* N64 0x104 */
+        struct { u8 _hp_source[T2_HOFF_Effect(m_pSource)]; Actor *source; }; /* N64 0x108 */
+        struct { u8 _hp_owner[T2_HOFF_Effect(m_pOwner)]; Actor *owner; }; /* N64 0x10C */
+        struct { u8 _hp_refCount[T2_HOFF_Effect(m_pOwnerCount)]; s32 *refCount; }; /* N64 0x110 */
+        struct { u8 _hp_target[T2_HOFF_Effect(m_pTarget)]; sptr target; }; /* N64 0x114 */
+        struct { u8 _hp_sound[T2_HOFF_Effect(m_pDLight)]; s32 sound; }; /* N64 0x118 */
+        struct { u8 _hp_spread[T2_HOFF_Effect(m_cFrame)]; f32 spread; }; /* N64 0x11C */
+        struct { u8 _hp_age[T2_HOFF_Effect(m_AnimFrame)]; f32 age; }; /* N64 0x120 */
+        struct { u8 _hp_unk124[T2_HOFF_Effect(m_AnimSpeed)]; f32 unk124; }; /* N64 0x124 */
+        struct { u8 _hp_life[T2_HOFF_Effect(m_nFrames)]; s16 life; }; /* N64 0x128 */
+        struct { u8 _hp_unk12A[T2_HOFF_Effect(m_BuiltFrame)]; u8 unk12A; }; /* N64 0x12A */
+        struct { u8 _hp_unk12B[T2_HOFF_Effect(m_RandomFrame)]; s8 unk12B; }; /* N64 0x12B */
+        struct { u8 _hp_unk12C[T2_HOFF_Effect(m_vSize)]; f32 unk12C[6]; }; /* N64 0x12C: m_vSize, m_vGrowth */
+        struct { u8 _hp_startPos[T2_HOFF_Effect(m_vLastPos)]; CVector3 startPos; }; /* N64 0x144 */
+        struct { u8 _hp_direction[T2_HOFF_Effect(m_vDirection)]; CVector3 direction; }; /* N64 0x150 */
+        struct { u8 _hp_unk15C[T2_HOFF_Effect(m_vRot)]; f32 unk15C[6]; }; /* N64 0x15C: m_vRot, m_vRotSpeed */
+        struct { u8 _hp_alpha[T2_HOFF_Effect(m_Alpha)]; f32 alpha; }; /* N64 0x174 */
+        struct { u8 _hp_rot[T2_HOFF_Effect(m_WobblePhase)]; f32 rot[6]; }; /* N64 0x178: the scalars to 0x190 */
+        struct { u8 _hp_render[T2_HOFF_Effect(m_dwHitFlags)]; Render render; }; /* N64 0x190: the scalars to 0x1AC */
+        struct { u8 _hp_mode[T2_HOFF_Effect(m_Alignment)]; s8 mode; }; /* N64 0x1AC */
+        struct { u8 _hp_shake[T2_HOFF_Effect(m_Shake)]; u8 shake; }; /* N64 0x1AD */
+        struct { u8 _hp_rgb0[T2_HOFF_Effect(m_PrimColor)]; u8 rgb0[3]; }; /* N64 0x1AE */
+        struct { u8 _hp_rgb1[T2_HOFF_Effect(m_EnvColor)]; u8 rgb1[3]; }; /* N64 0x1B1 */
+        struct { u8 _hp_alphaByte[T2_HOFF_Effect(m_Opacity)]; u8 alphaByte; }; /* N64 0x1B4 */
+        struct { u8 _hp_unk1B5[T2_HOFF_Effect(m_ActiveSwooshes)]; u8 unk1B5; }; /* N64 0x1B5 */
+        struct { u8 _hp_unk1BC[T2_HOFF_Effect(m_Scale)]; f32 unk1BC; }; /* N64 0x1BC */
+        struct { u8 _hp_list[T2_HOFF_Effect(m_pActiveList)]; void *list; }; /* N64 0x1C0 */
+        struct { u8 _hp_next[T2_HOFF_Effect(m_pNext)]; struct Effect *next; }; /* N64 0x1C8 */
+        struct { u8 _hp_unk1CC[T2_HOFF_Effect(m_pDrawLast)]; s32 unk1CC; }; /* N64 0x1CC */
+        struct { u8 _hp_groupNext[T2_HOFF_Effect(m_pDrawNext)]; struct Effect *groupNext; }; /* N64 0x1D0 */
+    };
+} Effect;
+#else
 typedef struct Effect {
     /* 0x000 */ u8 pad0[2];
     /* 0x002 */ u16 kind;
@@ -1146,13 +1447,40 @@ typedef struct Effect {
     /* 0x1CC */ s32 unk1CC;
     /* 0x1D0 */ struct Effect *groupNext;
 } Effect;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct EffectList {
+/* the view at the host offsets of CList (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_EffectList(m) __builtin_offsetof(CList, m)
+    union {
+        struct { u8 _hp_head[T2_HOFF_EffectList(m_pHead)]; Effect *head; }; /* N64 0x0 */
+        struct { u8 _hp_tail[T2_HOFF_EffectList(m_pTail)]; Effect *tail; }; /* N64 0x4 */
+        u8 _hp_size[sizeof(CList)];
+    };
+} EffectList;
+#else
 typedef struct {
     /* 0x00 */ Effect *head;
     /* 0x04 */ Effect *tail;
     /* 0x08 */ u8 pad8[0xC];
 } EffectList;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct EffectSystem {
+/* the view at the host offsets of CParticleSystem (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_EffectSystem(m) __builtin_offsetof(CParticleSystem, m)
+    union {
+        struct { u8 _hp_free[T2_HOFF_EffectSystem(m_FreeList)]; EffectList free; }; /* N64 0xEC00 */
+        struct { u8 _hp_groups[T2_HOFF_EffectSystem(m_DrawList)]; EffectList groups; }; /* N64 0xEC14 */
+        struct { u8 _hp_lists[T2_HOFF_EffectSystem(m_ActiveList)]; EffectList lists[3]; }; /* N64 0xEC28 */
+        struct { u8 _hp_resource[T2_HOFF_EffectSystem(m_pParticleData)]; void *resource; }; /* N64 0xEC64 */
+    };
+} EffectSystem;
+#else
 typedef struct {
     /* 0x0000 */ u8 pad0[0xEC00];
     /* 0xEC00 */ EffectList free;
@@ -1160,13 +1488,34 @@ typedef struct {
     /* 0xEC28 */ EffectList lists[3];
     /* 0xEC64 */ s32 resource;
 } EffectSystem;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct Camera {
+/* the view at the host offsets of CCamera (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Camera(m) __builtin_offsetof(CCamera, m)
+    union {
+        struct { u8 _hp_view[T2_HOFF_Camera(m_mfView)]; CMtxF view; }; /* N64 0x20C */
+    };
+} Camera;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x20C];
     /* 0x20C */ CMtxF view;
 } Camera;
+#endif
 
 extern Render D_800F1BA0;
+#ifdef TARGET_PORT
+/* the Effect view's spans over runs of CParticle scalars: contiguous on the host too */
+_Static_assert(__builtin_offsetof(CParticle, m_vGrowth) == __builtin_offsetof(CParticle, m_vSize) + 12, "m_vSize/m_vGrowth");
+_Static_assert(__builtin_offsetof(CParticle, m_vRotSpeed) == __builtin_offsetof(CParticle, m_vRot) + 12, "m_vRot/m_vRotSpeed");
+_Static_assert(__builtin_offsetof(CParticle, m_dwHitFlags) == __builtin_offsetof(CParticle, m_WobblePhase) + 0x18, "rot[6]");
+_Static_assert(__builtin_offsetof(CParticle, m_Alignment) == __builtin_offsetof(CParticle, m_dwHitFlags) + sizeof(Render), "render");
+_Static_assert(sizeof(Entry) == sizeof(CROMParticleEffect), "Entry");
+_Static_assert(sizeof(ParticleHead) == sizeof(CObjectHead), "ParticleHead");
+#endif
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern u8 gEngineApp_m_SwooshSystem[];
 #ifndef TARGET_PORT
@@ -1262,6 +1611,43 @@ static __inline__ Effect *allocateEffect(EffectSystem *sys, u8 index) {
     return effect;
 }
 
+#ifdef TARGET_PORT
+/* The host aimEffect: the hit target is a CGameObjectInstance (bones, intelligence, AI by member). */
+static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
+    CMtxF targetMtx;
+    CMtxF targetInv;
+    CVector3 up;
+    CGameObjectInstance *targetActor;
+    s32 targetTeam;
+    CCollisionResults *scene;
+
+    if (gCollisionResults.m_nInstanceNode != -1) {
+        effect->mode = -4;
+        targetActor = (CGameObjectInstance *) gCollisionResults.m_pInstance;
+        targetTeam = gCollisionResults.m_Frame.action;
+        CMtxF__FromMtxAffine(&targetMtx, (CMtxF *) ((u8 *) targetActor->m_pmtDrawMtxs + gCollisionResults.m_nInstanceNode * 0x40));
+        CMtxF__InvertAffine(&targetInv, &targetMtx);
+        scene = &gCollisionResults;
+        CMtxF__TransformPoint(&targetInv, &scene->m_vInstancePos, &effect->attachPos);
+        up = gCollisionResults.m_vVelocity;
+        CVector3__Normalize(&up);
+        CMtxF__RotateVector(&targetInv, &up, vel);
+        effect->target = (sptr) targetActor;
+        effect->flags |= 0x10000;
+        effect->shake = gCollisionResults.m_nInstanceNode;
+        if (targetActor->header.m_pIntelligence->m_Type == 1) {
+            if (effect->owner != 0) {
+                AI_HearNoise((Actor *) targetActor, (s32 *) &targetActor->m_AI, &effect->owner->pos, 3);
+            } else {
+                AI_HearNoise((Actor *) targetActor, (s32 *) &targetActor->m_AI, &scene->m_vInstancePos, 3);
+            }
+        }
+        if (effect->kind == 0x56 && targetTeam == 2) {
+            effect->flags |= 0x4000000;
+        }
+    }
+}
+#else
 static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
     CMtxF targetMtx;
     CMtxF targetInv;
@@ -1296,6 +1682,7 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
         }
     }
 }
+#endif
 
 s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount, sptr arg4, s32 kind,
                   CVector3 arg6, CQuaternion rotation, CVector3 pos, void *region, s32 arg10, s32 arg11) {
@@ -1331,7 +1718,11 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
     s32 spread;
     u32 *bits;
     u8 mask;
+#ifdef TARGET_PORT
+    void *resource;
+#else
     sptr resource;
+#endif
     EntryBlock *block;
     s32 numEntries;
     Entry *templates;
@@ -1360,12 +1751,27 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
         CScene__Blast(&gScene, &pos);
     }
     if (BinaryRange(templates, numEntries, kind, &first, &last) != 0) {
+#ifdef TARGET_PORT
+        /* the host's copy of the templates (full-width pointers: port/game/t2particles.c) */
+        entries = (Entry *) T2Port_ParticleEffects(resource, NULL);
+        if (entries == NULL) {
+            gCollisionResultsP = &gCollisionResults;
+            return 0;
+        }
+#else
         entries = ((EntryBlock *) CISet__GetBlock(resource, 2))->entries;
+#endif
         anchor = 0;
         /* The current player list, gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead, addressed from gEngineApp_m_Settings_paused. */
+#ifdef TARGET_PORT
+        if (gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead != 0) {
+            anchor = (Actor *) gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+        }
+#else
         if (((Actor **) global)[-0x505] != 0) {
             anchor = ((Actor **) global)[-0x505];
         }
+#endif
         ownerId = 0;
         if (owner != 0) {
             switch (owner->type) {
@@ -1374,7 +1780,12 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     ownerId = owner;
                     break;
                 case 0:
+#ifdef TARGET_PORT
+                    /* type 0 (a static object): its id word at N64 0x80 */
+                    ownerId = (void *) (sptr) ((CStaticObject *) owner)->m_LitKey;
+#else
                     ownerId = owner->ownerId;
+#endif
                     owner = 0;
                     break;
             }
