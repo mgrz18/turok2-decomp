@@ -25,6 +25,7 @@ extern "C" {
 #include "t2audio.h"
 // port/game/t2debug.c
 int T2Port_EngineMode(void);
+void T2Port_LogState(int frame);
 void T2Port_DebugSwitches(int skipPak, int startMode);
 }
 
@@ -254,6 +255,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             printf("game: frame %d: menu desc %p cursor %d\n", f, menu, cursor);
             lastMenu = menu;
             lastCursor = cursor;
+        }
+        static const bool stateLog = getenv("T2_STATE_LOG") != nullptr;
+        if (stateLog && (f + 1) % 60 == 0) {
+            T2Port_LogState(f + 1); // DEBUG-ONLY: T2_STATE_LOG=1
         }
         if (int m = T2Port_EngineMode(); m != mode) {
             printf("game: frame %d: engine mode %d -> %d\n", f + 1, mode, m);

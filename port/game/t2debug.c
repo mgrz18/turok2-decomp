@@ -39,3 +39,31 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
         gPakCheckDone = 1;
     }
 }
+
+/* T2_STATE_LOG=1 (game.cpp, every 60 frames): the level and the first active player
+ * (position, facing, health, its body's AI mode, weapon), to follow gameplay headless. */
+#include "structs/world.h"
+#include "structs/player.h"
+#include "globals/game.h"
+#include "globals/scene.h"
+#include "structs/camera.h"
+#include "structs/menu.h"
+#include <stdio.h>
+
+void T2Port_LogState(int frame) {
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+
+    printf("state: frame %d mode %d level %d", frame, (int) gEngineApp.m_Settings.mode, (int) gScene.m_nLevel);
+    if (p != NULL) {
+        CGameObjectInstance *a = &p->m_CharacterActor;
+        printf(" player pos (%.1f %.1f %.1f) rotY %.2f health %d aimode %d weapon %d",
+               a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z, a->m_RotY,
+               (int) (p->m_Data.m_Health >> 8), (int) a->m_AI.m_Mode, (int) p->m_Data.m_CurrentWeapon);
+    }
+    if (p != NULL && p->m_pCamera != NULL && ((MenuPool *) p->m_pCamera->m_MenuPool)->head != NULL) {
+        Menu *m = ((MenuPool *) p->m_pCamera->m_MenuPool)->head;
+        printf(" cammenu %p cursor %d", (void *) m->desc, (int) m->cursor);
+    }
+    printf("\n");
+    fflush(stdout);
+}
