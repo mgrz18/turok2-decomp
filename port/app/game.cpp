@@ -7,6 +7,7 @@
 // come from LUS's ControlDeck through the runtime's hooks.
 #include <libultraship/libultraship.h>
 
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <cstring>
@@ -30,6 +31,7 @@ void T2Port_DebugSwitches(int skipPak, int startMode);
 }
 
 #include "game.h"
+#include "offscreen_gl.h"
 
 // the game's screen size (render.h; Video_SetMode writes it)
 extern "C" int32_t gScreenWidth, gScreenHeight;
@@ -96,6 +98,66 @@ void DumpDL(const uintptr_t* dl, int depth, int* budget) {
             return;
         }
     }
+}
+
+// --offscreen-gl / T2_DLCHECK=1: a display list whose address words cannot be host pointers
+// (64-bit hosts only: a value below 4 GB that is not a segmented address is a truncated pointer,
+// harmless on Linux low memory, fatal in Fast3D on macOS). Returns the number of bad words and
+// prints the first few of each run with their position (MACOS.md section 8).
+bool AddrOk(uintptr_t w1) {
+    if (sizeof(uintptr_t) < 8 || w1 == 0) {
+        return true;
+    }
+    if ((w1 & 1) && w1 < 0x10000000u) {
+        return true; // GBI_SEGADDR: segment-relative
+    }
+    return w1 >= 0x100000000ull;
+}
+int CheckDL(const uintptr_t* dl, int depth, int* budget, int frame) {
+    int bad = 0;
+    static int reported = 0;
+    for (; *budget > 0; dl += 2) {
+        (*budget)--;
+        uint32_t w0 = (uint32_t)dl[0];
+        uint8_t op = w0 >> 24;
+        bool addr = op == 0x01 || op == 0xDA || op == 0xDC || op == 0xDE || op == 0xFD || op == 0xFE || op == 0xFF ||
+                    (op == 0xDB && ((w0 >> 16) & 0xFF) == 0x06);
+        if (addr && !AddrOk(dl[1])) {
+            bad++;
+            // one report per (command, the three commands before it), up to 60
+            static std::vector<uint64_t> seen;
+            uint64_t sig = (uint64_t)w0 << 32 ^ (uint32_t)dl[-2] * 31u ^ (uint32_t)dl[-4] * 17u ^ (uint32_t)dl[-6];
+            bool fresh = std::find(seen.begin(), seen.end(), sig) == seen.end();
+            if (fresh && reported < 60) {
+                seen.push_back(sig);
+                reported++;
+                printf("dlcheck: frame %d: %02X %08X %016llX at %p (depth %d); before:", frame, op, w0,
+                       (unsigned long long)dl[1], (const void*)dl, depth);
+                for (int k = 3; k >= 1; k--) {
+                    printf(" %08X:%llX", (uint32_t)dl[-2 * k], (unsigned long long)dl[-2 * k + 1]);
+                }
+                printf("\n");
+            }
+            if (op == 0xDE) {
+                if ((w0 >> 16 & 0xFF) == 1) {
+                    return bad;
+                }
+                continue;
+            }
+        }
+        if (op == 0xDE) {
+            if (dl[1] & 1) {
+                continue;
+            }
+            bad += CheckDL((const uintptr_t*)dl[1], depth + 1, budget, frame);
+            if ((w0 >> 16 & 0xFF) == 1) {
+                return bad;
+            }
+        } else if (op == 0xDF) {
+            return bad;
+        }
+    }
+    return bad;
 }
 
 OSMesgQueue sContQueue;
@@ -194,23 +256,27 @@ void ContReadHeadless(void* pads) {
     out[2] = out[3] = out[4] = 0;
 }
 
-// Reads back the last frame Fast3D drew and writes it as a binary PPM (T2_SHOT).
+// The interpreter that draws: the window's, or --offscreen-gl's (macOS, no window).
+std::shared_ptr<Fast::Interpreter> DrawInterpreter(const std::shared_ptr<Fast::Fast3dWindow>& window) {
+    return window ? window->GetInterpreterWeak().lock() : T2Offscreen_Interpreter();
+}
+
+// Reads back the last frame Fast3D drew and writes it as a binary PPM (T2_SHOT): the window's
+// framebuffer 0, or with --offscreen-gl the interpreter's game framebuffer.
 void WriteShot(const std::shared_ptr<Fast::Fast3dWindow>& window, const char* shot) {
-    if (!window) {
-        return;
-    }
-    auto interp = window->GetInterpreterWeak().lock();
+    auto interp = DrawInterpreter(window);
     if (!interp || !interp->mRapi) {
         return;
     }
     const uint32_t w = interp->mCurDimensions.width, h = interp->mCurDimensions.height;
     std::vector<uint16_t> fb((size_t)w * h);
-    interp->mRapi->ReadFramebufferToCPU(0, w, h, fb.data());
+    interp->mRapi->ReadFramebufferToCPU(window ? 0 : T2Offscreen_ShotFramebuffer(), w, h, fb.data());
     if (FILE* fp = fopen(shot, "wb")) {
         fprintf(fp, "P6\n%u %u\n255\n", w, h);
         for (uint32_t y = 0; y < h; y++) {
             for (uint32_t x = 0; x < w; x++) {
-                uint16_t c = fb[(size_t)(h - 1 - y) * w + x];
+                // framebuffer 0 is bottom-up; the game framebuffer is stored flipped (invertY)
+                uint16_t c = fb[(size_t)(window ? h - 1 - y : y) * w + x];
                 uint8_t px[3] = { (uint8_t)((c >> 11 & 31) << 3), (uint8_t)((c >> 6 & 31) << 3),
                                   (uint8_t)((c >> 1 & 31) << 3) };
                 fwrite(px, 1, 3, fp);
@@ -278,7 +344,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         }
     }
 
-    int drawn = 0;
+    int drawn = 0, skippedBad = 0;
     const void* lastDL = nullptr;
     int mode = -1;
     // T2_SHOT_EVERY=<n> (with T2_SHOT=<file.ppm>): also write <file>.<frame>.ppm every n frames
@@ -360,24 +426,34 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             // the game runs again (no window needed: macOS has no headless GL, MACOS.md)
             if (dumpAt > 0 && f + 1 >= dumpAt && !dumped) {
                 dumped = true;
-                int budget = 4000;
+                int budget = getenv("T2_DLDUMP_MAX") != nullptr ? atoi(getenv("T2_DLDUMP_MAX")) : 4000;
                 printf("dl: frame %d\n", f + 1);
                 DumpDL((const uintptr_t*)lastDL, 0, &budget);
             }
         }
-        if (got && window) {
+        if (got && (window || T2Offscreen_Interpreter())) {
             // Only with --draw: the game's display lists are not host-correct yet (GBI words
             // hold 32-bit addresses; docs/port/BUILD.md "GBI").
             // Fast3D maps RDP coordinates from its native size (320x240 by default) to the
             // window: the game draws at the size Video_SetMode chose (gScreenWidth x
             // gScreenHeight, 480x360 in mode 0), so tell it before every frame.
-            if (auto interp = window->GetInterpreterWeak().lock();
+            if (auto interp = DrawInterpreter(window);
                 interp && gScreenWidth > 0 && gScreenHeight > 0 &&
                 (interp->mNativeDimensions.width != (uint32_t)gScreenWidth ||
                  interp->mNativeDimensions.height != (uint32_t)gScreenHeight)) {
                 interp->SetNativeDimensions((float)gScreenWidth, (float)gScreenHeight);
             }
-            if (window->DrawAndRunGraphicsCommands((Gfx*)task.dataPtr, {})) {
+            static const bool dlCheck = !window || getenv("T2_DLCHECK") != nullptr;
+            int badWords = 0;
+            if (dlCheck) {
+                int budget = 200000;
+                badWords = CheckDL((const uintptr_t*)task.dataPtr, 0, &budget, f + 1);
+                if (badWords > 0) {
+                    skippedBad++; // Fast3D would dereference a truncated pointer: not drawn
+                }
+            }
+            if (badWords == 0 &&
+                (window ? window->DrawAndRunGraphicsCommands((Gfx*)task.dataPtr, {}) : T2Offscreen_Draw(const_cast<void*>(task.dataPtr)))) {
                 drawn++;
                 if (const char* shot = getenv("T2_SHOT"); shot != nullptr && shotEvery > 0 && f + 1 >= nextShot) {
                     nextShot = (f + 1) / shotEvery * shotEvery + shotEvery; // the first drawn frame of each period
@@ -429,6 +505,9 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
            "%llu PI DMAs, %llu missing-function calls\n",
            (unsigned long long)s.frames, secs, (unsigned long long)s.switches, (unsigned long long)s.gfxTasks, drawn,
            (unsigned long long)s.audioTasks, (unsigned long long)s.piDmas, (unsigned long long)s.missingCalls);
+    if (skippedBad > 0) {
+        printf("game: %d display lists not drawn: truncated host addresses (dlcheck)\n", skippedBad);
+    }
     T2PifStats pif;
     T2Port_GetPifStats(&pif);
     printf("game: PIF %llu SI DMAs, %llu status, %llu pak reads, %llu pak writes\n", (unsigned long long)pif.dmas,

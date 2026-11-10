@@ -103,6 +103,10 @@ target_compile_options(t2_game_flags INTERFACE
     -fsigned-char
     # The decomp punning (M2C_FIELD, s32<->f32 views) is everywhere.
     -fno-strict-aliasing -fwrapv
+    # The R4300 has no fused multiply-add: arm64 clang contracts a * b + c into fmadd by
+    # default, which changes the float results, so the attract demos (recorded inputs
+    # replayed through the physics) drift away from the x86-64 runs. Same results everywhere.
+    -ffp-contract=off
     # Tentative definitions repeated across files (SN64 linked them as common).
     -fcommon
     # Clang 16+ makes these errors in C; the code predates them. They stay

@@ -8,6 +8,14 @@ typedef struct {
 } Link;
 
 
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+/* host: the actor's current region is a pointer at 0x10 of its header */
+sptr GameObject_GetRegionInfo(CInstanceHeader *arg0) {
+    struct CGameRegion *r = arg0->m_pCurrentRegion;
+    return r != NULL ? (sptr) CScene__GetRegionInfo(&gScene, (u16 *) r) : 0;
+}
+#else
 sptr GameObject_GetRegionInfo(Link *arg0) {
     sptr temp_a1;
     sptr var_v0;
@@ -19,3 +27,4 @@ sptr GameObject_GetRegionInfo(Link *arg0) {
     }
     return var_v0;
 }
+#endif

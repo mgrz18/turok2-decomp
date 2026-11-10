@@ -230,6 +230,35 @@ Merge notes: `src/us/code/func_00203CA0.c`, `func_002034F4.c`, `func_00205A2C.c`
 blocks, asm_diff 0), `port/game/t2debug.c` (`T2_SCENE_LOG`). The archive and gendata are unchanged
 (no header edits).
 
+## Round 6, part u4: macOS runs the merged tree, with sound and pixels (branch names-R6_u4)
+
+Details in [MACOS.md](MACOS.md) section 8. On the Mac (arm64, full 64-bit pointers, headless, no
+window of any kind):
+- **The boot to frame 26,000** (cinemas, title, all three attract demos, the loop) and **the new game
+  into level 51** run with every mode switch at the same frame as Linux and the same player states.
+- **`--audio --wav`**: peak 21,304, RMS 1,996.4 over 6,000 frames, the same as Linux.
+- **Pixels without a window**: `--offscreen-gl` (port/app/offscreen_gl.cpp) runs LUS's OpenGL
+  renderer on a CGL context with no drawable, and T2_SHOT reads the game framebuffer. Mac against
+  Linux screenshots: all 29 new-game frames match (at most 0.37% of the pixels off), and 15 of 17
+  boot frames match.
+- dlcheck (game.cpp): display lists with truncated host addresses are reported and not drawn. None
+  is left on the boot or new-game path.
+- Fixes, all asm_diff 0 against 6d04fabb: lit-vertex callbacks, GameObject_GetRegionInfo,
+  Sort_Insertion, three audio truncations (ALLowPass, the A_SAVEBUFF output handle, the ALDMAproc),
+  the font/glyph G_SETTIMG images, and **Cinema_DrawFade's camera viewport at the N64 offset**.
+  The last one is a bug on all hosts: the cinema fades now draw on Linux too.
+- `-ffp-contract=off` for the game (game.cmake).
+- **Lead for u1**: in attract demo 2 the Mac draws the level's static objects and Linux draws none.
+  On Linux the camera's `m_ViewParams.m_VisBits` is 0 (CCamera__UpdateVisBits), so
+  CScene__DrawGeometry rejects every CStaticObject.
+
+Files others may touch: port/app/game.cpp (WriteShot, the draw call, dlcheck, T2_DLDUMP_MAX),
+port/app/main.cpp (`--offscreen-gl`), port/app/CMakeLists.txt, port/cmake/game.cmake,
+port/audio/t2audio_mgr.c, port/runtime/t2ultra.c (T2_V2P_TRAP), and src func_00213A70,
+func_00214F14, func_00220208, func_00268A2C, func_00227184, func_00295304, func_002971BC,
+func_00278188, func_0027836C, func_0027854C, func_0027B0FC, func_00279158, func_0027A2C4,
+func_0027A4DC, func_0040F240, func_00448240.
+
 ## Round 5, part t2: the ABI checker and sweep
 
 [ABI.md](ABI.md). `tools/port/abicheck.py --build OUT/build -j 4` parses the 3,099 linked C files
