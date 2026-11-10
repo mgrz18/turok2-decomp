@@ -196,6 +196,41 @@ frames show the corridor, the door and the weapon models at normal brightness.
 7. The remaining N64 views on the player path (GAMEPLAY.md section 5):
    `CPlayerPool__UpdateMatchClock`, `Action_CheckRequiredItem`, func_00271694.
 
+## Round 7, part v3: enemies and damage (branch names-R7_v3)
+
+Details, the fix table v3-1..14 and next steps: [GAMEPLAY.md](GAMEPLAY.md) section 6.
+
+- **Level triggers work on the host.** The trigger mask (word 0 of every `LevelEvent`) reached
+  the host byte-reversed (the archive copied it as bytes), so no region or actor trigger ever
+  matched; `include/structs/event.h` types it (`u32 m_Mask`, host only) and **the archive must
+  be rebuilt** (this branch alone: sha1 `01311a4b2908acfbd3e9247c9aec27e3f246e4a9`; v1 also
+  changes swap_spec, so the coordinator builds one archive from the merged headers). Plus the
+  CScene record-table and bit-section reads and the trigger state test (v3-2..4), and the
+  delayed-event queue's s32 event casts (v3-14, `--high-memory`).
+- **Enemies run their AI**: level 51 has no enemies (doors, destructibles, actions only); the
+  attract demos have them (level 81: 9, level 131: 53), asleep until their level event
+  (`EnemyMode_WaitForTrigger`). Ported on the way: the wall radius, `AI_FindBestTarget`,
+  `AI_UpdatePathHeading`, `AI_UpdateTargets`, the player-pool walks (`CPlayer.m_pNext`), the area
+  damage handlers' actor params (v4's macOS crash), `Blast_CanHit`/`ApplyBlast` (v2's
+  `--high-memory` crash).
+- Results (scratch merge with names-R7_v1, Linux headless): the boot to 26,000 frames (all three
+  demos, the AI running in demo 2), the new-game journey to 15,000 frames in low and high memory
+  (unchanged end (795.2, -780.7, 233.0)). Demo 1 with `T2_TELEPORT=5600:2334.7,307.2,-1054.7
+  T2_WAKE_ENEMIES=1500`: two enemies wake, walk to the player and keep him as their target;
+  they **do not attack yet** (their animation index stays 0: v2's ce8cb3da `CAI__UpdateModeAnim`
+  pickers are the lead), so no health change and no death was reached this round.
+- Debug (DEBUG-ONLY): `T2_ACTOR_LOG=N`, `T2_TELEPORT=F:x,y,z`, `T2_WAKE_ENEMIES=R`.
+
+Merge notes: **merge v1 before (or with) v3**: on this branch alone the boot crashes in demo 2
+(frame ~13,700) in `Collision_SweepActors` (func_0024032C, ported by v1) as soon as an enemy
+looks for the player. Files: include/structs/event.h (archive), port/game/t2debug.c,
+port/app/game.cpp (two debug hooks after T2_STATE_LOG), src func_0022515C, func_002252A0,
+func_00224CF8, func_0026E4B8, func_002253F8, func_00225354, func_00268460, func_00243C90,
+func_002438C0, func_002399F8, func_00239C28, func_00246108, func_0025EEA4, func_002532EC,
+func_00253370, func_00253018, func_002534E0, func_0023876C, func_002387C4, func_00238B2C,
+func_00238B84, func_00238BDC, func_00238C34, func_00238C8C, func_00238CE4, func_0023726C,
+func_00237AFC. The scratch merge with v1 was conflict-free.
+
 ## Round 6, part u1: gameplay draws the level (branch names-R6_u1)
 
 [RENDER.md](RENDER.md) section 4. Level 51 now **draws in gameplay**: the Port of Adia start
