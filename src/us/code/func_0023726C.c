@@ -10,6 +10,25 @@ typedef struct B15Def {
                s8 unkE;
 } B15Def;
 typedef struct B15Obj B15Obj;
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#include "structs/particle.h"
+/* The port: the same fields at their host offsets. The view reads a CGameObjectInstance (type 1)
+ * and, for a particle target (type 2), the CParticle's effect (0xF8) and owner (0x10C). */
+#define T2_B15_GOI(m) __builtin_offsetof(CGameObjectInstance, m)
+#define T2_B15_PART(m) __builtin_offsetof(CParticle, m)
+struct B15Obj {
+    union {
+        struct { u8 type; };
+        struct { u8 _hp_unk4[T2_B15_GOI(header.m_nObjType)]; u16 unk4; };
+        struct { u8 _hp_def[T2_B15_GOI(header.m_pIntelligence)]; B15Def *def; };
+        struct { u8 _hp_unkE4[T2_B15_GOI(m_nTypeFlag)]; u16 unkE4; };
+        struct { u8 _hp_flags[T2_B15_GOI(m_dwFlags)]; u32 flags; };
+        struct { u8 _hp_unk118[T2_B15_PART(m_pEffect)]; s32 *unk118; };
+        struct { u8 _hp_unk12C[T2_B15_PART(m_pOwner)]; B15Obj *unk12C; };
+    };
+};
+#else
 struct B15Obj {               /* Turok 2 layout (Rage Wars offsets in comments) */
                 u8 type;
                 u8 pad1;
@@ -25,6 +44,7 @@ struct B15Obj {               /* Turok 2 layout (Rage Wars offsets in comments) 
                 u8 padFC[0x10];
                 B15Obj *unk12C;       /* 0x10C (0x12C) */
 };
+#endif
 s32 GameObject_IsSolid(B15Obj *a);
 static __inline__ s32 chk(B15Obj *a, B15Obj *t) {
     u32 f;
