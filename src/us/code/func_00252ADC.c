@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game_object.h"
+#include "structs/camera.h"
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "protos/game.h"
@@ -16,7 +17,12 @@ static __inline__ s32 menu_open(CPlayer *p) {
     s32 open = 0;
 
     if (cam != NULL) {
+#ifdef TARGET_PORT
+        /* N64 0x54C = m_Menus.count; the host CCamera is laid out differently: by member */
+        open = ((CCamera *) cam)->m_Menus.count != 0;
+#else
         open = *(s32 *)((u8 *)cam + 0x54C) != 0;
+#endif
     }
     return open;
 }

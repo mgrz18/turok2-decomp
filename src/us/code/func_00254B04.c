@@ -10,7 +10,11 @@ CPlayer *CPlayerPool__GetViewPlayer(CPlayerPool *list, u32 index) {
 
     if (index < 4) {
         for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
+#ifdef TARGET_PORT /* N64 0x54C = m_Menus.count, by member on the host */
+            if (p->m_pCamera != NULL && ((CCamera *) p->m_pCamera)->m_Menus.count == 0
+#else
             if (p->m_pCamera != NULL && *(s32 *)((u8 *)p->m_pCamera + 0x54C) == 0
+#endif
                 && ((CPlayerOptions *)p->m_pOptions)->m_LastTagMode == 0) {
                 if (n == index) {
                     return p;
