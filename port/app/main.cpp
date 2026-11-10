@@ -192,7 +192,7 @@ Args ParseArgs(int argc, char** argv) {
             fprintf(stderr, "usage: %s [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]\n"
                             "          [--game [--draw] [--audio] [--wav out.wav] [--verbose] [--high-memory]\n"
                             "                  [--no-pak | --pak-blank | --pak-dir DIR]\n"
-                            "                  [--input BUTTON@FRAME,...] [--skip-pak-check] [--start-mode N]]   (the last three: debug only)\n",
+                            "                  [--input BUTTON@FRAME[..LAST],SX=V@F..L,...|@FILE] [--skip-pak-check] [--start-mode N]]   (the last three: debug only)\n",
                     argv[0]);
             exit(2);
         }
