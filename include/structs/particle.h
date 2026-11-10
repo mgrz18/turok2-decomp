@@ -44,11 +44,22 @@ typedef struct CDLightSet {
 
 /* The value an impact event passes to the effect it starts (ImpactEvent_Send):
  * two halfwords, or the pair as one word. */
+#ifdef TARGET_PORT
+/* The host: the value is two host-order words, word 0 = the N64's first big-endian word
+ * ((upper << 16) | lower), as the archive gives the animation events' values (s32[2]): the
+ * halves by name, the words for the handlers that read them as ints (docs/port/RENDER.md 6). */
+typedef struct CEventValue {
+    s16 lower;
+    s16 upper;
+    s32 extra;
+} CEventValue;
+#else
 typedef struct CEventValue {
     /* 0x0 */ s16 upper;
     /* 0x2 */ s16 lower;
     /* 0x4 */ s32 extra;
 } CEventValue; /* size 0x8 */
+#endif
 
 /* What a particle does when something happens to it (it hits an object, the
  * floor, a wall, it expires...), one entry per event index: the particle,
