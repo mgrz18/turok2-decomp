@@ -142,6 +142,26 @@ x86-64 and arm64 do not. 31 files use `Triple`; the impact-event handlers
    (`T2_DLDUMP_AT`). A Metal offscreen target (or a window run by a person) for pixels.
 7. Input: drive the title menu into a level (`--input` scripted presses, s1) once the AI runs.
 
+## Round 5, part t2: the ABI checker and sweep
+
+[ABI.md](ABI.md). `tools/port/abicheck.py --build OUT/build -j 4` parses the 3,099 linked C files
+with libclang (about 15 s) and compares every direct call (10,724) with the callee's definition
+under the x86-64 SysV and AArch64 rules: struct classes, struct vs scalars and hidden result
+pointers, float vs int, f32 vs f64, pointer width, void results used, MIPS pass-through
+(missing) arguments, variadic mismatches. Harmful sites 779 (294 callees) -> 510 (214), of which
+498 are the 64-bit width class (`ptr_from_int`, the macOS truncations): struct_class 26 -> 0,
+struct_scalar 62 -> 0, float_int 43 -> 0, void_used 85 -> 4, missing_args 67 -> 7. The fixes are
+host-only (adapters in `port/game/t2abi.c` reached by a `#define` in the caller, by-value
+definitions wrapped for hidden-pointer callers, `Triple` as three floats in the impact handlers,
+host copies that return the last call's value or pass the pass-through registers); asm_diff 0
+over all 3,938 files.
+
+With these fixes the boot runs the same sequence to the title and then **into the attract demo
+without the `EnemyAI_Update` crash**: `--game --draw --pak-blank --frames 7000` reaches mode 13
+at frame 5469 and runs to frame 7000 (the gdb run exits normally); the frames are black (the 3D
+scene draw, t3). The checker does not see function-pointer calls (184 sites: the handler
+tables); that is the next thing to add (ABI.md section 4).
+
 # Round 3, merged state (history)
 
 Round 3 merged five branches, in this order: r2 (archive format 2.0, the loader through the
