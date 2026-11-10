@@ -59,9 +59,18 @@ typedef struct ControllerProfile {
     /* 0x0D0 */ f32 rumbleLevel;
     /* 0x0D4 */ f32 rumbleTimer;
     /* 0x0D8 */ u8 rumblePfs[0x68]; /* the OSPfs osMotorInit fills */
+#ifdef TARGET_PORT
+    /* the host sizes of RumblePool (its baseLevel is rumbleBase) and RumbleEffect
+     * (structs/rumble.h: pointers), checked by func_0026EB3C.c; the N64 sizes overran the
+     * profile once an effect started (firing, round 7 v2) */
+    u8 rumblePool[0x40] __attribute__((aligned(8)));
+    f32 rumbleBase;
+    u8 rumbleNodes[3][0x58] __attribute__((aligned(8)));
+#else
     /* 0x140 */ u8 rumblePool[0x28]; /* the rumble effects' free and active lists (RumblePool_Init) */
     /* 0x168 */ f32 rumbleBase;     /* the level the effects add to (the weapon spin...) */
     /* 0x16C */ u8 rumbleNodes[3][0x3C]; /* the pool's 3 effects */
+#endif
     /* 0x220 */ s32 reset;
 } ControllerProfile; /* size 0x224 */
 
