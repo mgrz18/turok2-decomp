@@ -543,10 +543,10 @@ memory hides:
 
 | # | where | cause | status |
 |---|---|---|---|
-| v4-5 | `Trail_AddNode` <- `CParticleSystem__Spawn` (boot frame ~1362, the first trail) | `CScene__GetSwoosh`'s TARGET_PORT body (func_00223F50) calls `CISet__GetBlock` with no declaration: the implicit `int` return truncates the record. It was the only implicit declaration in the game build | **fixed on this branch** (a declaration line; asm_diff 0) |
-| v4-6 | `ModelSweep_TestModel` <- `Collision_MoveInstance` <- `CParticle__Update` | `root = (s32 *)*data;` (func_0023DBBC.c:33) reads the block pointer as s32 | sent to v1: `*(s32 **)data` under TARGET_PORT (patched only in the scratch copy) |
+| v4-5 | `Trail_AddNode` <- `CParticleSystem__Spawn` (boot frame ~1362, the first trail) | `CScene__GetSwoosh`'s TARGET_PORT body (func_00223F50) calls `CISet__GetBlock` with no declaration: the implicit `int` return truncates the record. It was the only implicit declaration in the game build | **fixed on this branch** (a declaration line; asm_diff 0). v1 fixed it too (5e724e40, by including protos/iset.h): a trivial conflict, keep either |
+| v4-6 | `ModelSweep_TestModel` <- `Collision_MoveInstance` <- `CParticle__Update` | `root = (s32 *)*data;` (func_0023DBBC.c:33) reads the block pointer as s32 | fixed by v1 (names-R7_v1 b8bca0e3, `*(s32 **)data` under TARGET_PORT) |
 | v4-7 | `ImpactEvent_AreaDamage` <- `ImpactEvent_Send(kind 3)` <- `FireAnimEvents` (new-game cinema, mode 12) | `ImpactEvent_AreaDamage(s32 arg0, s32 arg1, ...)`: the actor pointers as s32 | sent to v3 (the damage pipeline) |
-| v4-8 | `RumbleCurve_Advance` <- `RumblePool_FreeFinished` <- `Controller_Service` (attract demo 1 fires; `--offscreen-gl` only) | reads `gCurrentFB[1]`, which is NULL there | open |
+| v4-8 | `RumbleCurve_Advance` <- `RumblePool_FreeFinished` <- `Controller_Service` (attract demo 1 fires; `--offscreen-gl` only) | reads `gCurrentFB[1]`, which is NULL there | open; v2 has rumble fixes (names-R7_v2 be9c4bf8) to retest with |
 
 With v4-5 and v4-6, the boot runs into attract demo 1, which fires its weapon and spawns particles,
 and the new game runs through the mode-11 cinemas into mode 12. Linux `--high-memory` should show

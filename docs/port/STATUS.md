@@ -353,15 +353,15 @@ Results ([MACOS.md](MACOS.md) section 9, [PERF.md](PERF.md)):
 - The boot stops entering attract demo 1 (frame ~5470) **on both hosts**: v4-1 makes the demo's
   weapon fire, and firing needs v1's `CParticleSystem__Spawn`. With v1 merged (scratch), the Mac
   runs into the demo and the new game into the mode-12 cinemas. Truncations found there were
-  sent to v1 (`ModelSweep_TestModel` `root = (s32 *)*data`) and v3
+  fixed by v1 (`ModelSweep_TestModel`, b8bca0e3) or sent to v3
   (`ImpactEvent_AreaDamage(s32, s32, ...)`); `RumbleCurve_Advance` (`gCurrentFB[1]` NULL,
-  `--offscreen-gl` only) is open.
+  `--offscreen-gl` only) is open: retest with v2's rumble fixes (be9c4bf8).
 - Performance (M5): level 51 costs 0.55 ms per drawn frame in Release and 1.05 ms in Debug (the
   N64 budget is 33.3 ms). Drawing (Fast3D + GL) is about 80% of that. Paced at 60 Hz VIs / 30
   fps, Release has no late VI in level 51; the late VIs are level loads only.
 
 To merge: `src/us/code/func_00257D48.c` (v2 may write the same function: keep one; mine runs
-the current mode), `func_00226390.c` (identical to v1's), `func_00223F50.c` (one line),
+the current mode), `func_00226390.c` (identical to v1's), `func_00223F50.c` (one line; v1 fixed it too in 5e724e40: keep either),
 `func_0021B95C.c`/`func_0021285C.c`/`func_0027C4E4.c`/`func_0027F64C.c` (a `T2_F2U` macro at the
 top of each), `port/app/game.cpp`/`main.cpp`/`game.h`/`offscreen_gl.*`,
 `port/audio/t2audio_mgr.c`/`t2audio.h` (`T2Audio_GetTimes`). After the merge, rerun
