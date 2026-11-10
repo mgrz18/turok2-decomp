@@ -158,3 +158,102 @@ s32 at 0x10, a pointer truncation on macOS), `CParticleSystem__Spawn` (above), t
 `unk_48` bytes (0x48 warp ID and 0x4C pending warp are u16 read by `CPlayer__Update`'s `Surface`
 view, but `swap_spec.json` keeps them as bytes: warps between levels will read byte-reversed IDs;
 type them in `structs/region.h` and rebuild the archive).
+
+## 6. Round 7, part v2: weapons and firing
+
+The weapon change completes and the weapons fire in level 51: the weapon actor's state machine,
+the fire animations, the projectiles (through v1's `CParticleSystem__Spawn` port), the ammo
+counter in the HUD, the muzzle flashes, shell casings and smoke, the firing sounds, the Talon's
+melee swings. Firing needs the animation events (the fire event, `ImpactEvent_SetWeaponFirePos`,
+is an animation event) and the particle spawn, so it was tested on a **scratch** merge of
+names-R7_v1 (`T2_ANIM_EVENTS` on, v1's archive sha1 `3ad7d240`); this branch alone (events off)
+switches weapons and runs the fire modes but launches nothing. All fixes are `TARGET_PORT`
+host bodies or views; `asm_diff` 0 (the whole tree after the `controller.h` change).
+
+**The path.** Z sets `m_dwButtons` 0x2000; `WeaponActor_CheckFire` puts the weapon AI in mode 4
+(or 5); the mode's animation (`CAIModeInfo.unk_10`: an id, a picker function or an (id, weight)
+table, `CAI__UpdateModeAnim`) plays; its fire event calls `ImpactEvent_SetWeaponFirePos` ->
+`WeaponActor_FireCallback` -> `CPlayer__FireWeapon` (ammo spent, the projectile type from the
+weapon's ammo class) -> `CParticleSystem__Spawn`. The spin/stream weapons call
+`CPlayer__FireWeapon` from their mode updates instead (`WeaponMode_SpinFire_Update`,
+`WeaponMode_StreamFire_Update`, `WeaponMode_AE634_Enter`).
+
+| # | where | cause | fix |
+|---|---|---|---|
+| v2-1 | the switch never completed (v4 found it on the Mac too; its commit is cherry-picked here, keep one at merge) | `WeaponActor_Update` (func_00257D48): AI view at N64 offsets: ran the mode table's row 0 instead of `m_pModeCurrent`, and its `unk128 = 0` cut `m_pfStep` | host body on `CAI` |
+| v2-2 | the weapon modes | `WeaponActor_EquipRequested`, `WeaponMode_AE714_Enter`, `WeaponMode_AE794_Update`, `WeaponBarrel_Spin_AF180`/`AF324`: State/Spin views of the CAI (mode table 0x2C, effects 0x108, the weapon vars 0x10C..0x130) and of the player's controller (0xA50 -> `rumbleBase`) | host bodies on `CAI.m_Weapon` (`CWeaponAIVars`) |
+| v2-3 | the barrels' bone callbacks | `WeaponBarrel_NodeMatrix_AEE38`, `WeaponNode_Rotate_AF324/AF084/AF1D4/AF180` read the pose context at N64 0x00/0x90 | `T2PoseContext` (`obj`, `bone`) |
+| v2-4 | `WeaponMode_Switch_Update`, `WeaponMode_Ready_Update`, `CPlayer__CanSelectWeapon` | CPlayer views (0xB2C/0xB30/0xB38 crosshair, 0xA64 buttons, 0x996/0xA08/0xB14, 0x3C8/0x972); `Ready_Update` wrote the next weapon into host `m_WeaponList[26]` | members |
+| v2-5 | `CBarrel__MarkUsable` | the wheel items at the N64 stride 0x18 | `CBarrel.m_Items[]` |
+| v2-6 | spin weapons' sounds | the camera position at N64 0x114 | `m_pCamera->m_vPos` |
+| v2-7 | `ImpactEvent_Send` (broadcast kinds) | `gScene + 0xDF8 / 0xBF8` | `m_nRegistered` / `m_pRegistered[]` |
+| v2-8 | `CPlayer__StopWeaponFiringSound` / `StopWeaponBackgroundSound` | the LoopSounds node's id at N64 0xC (after a pointer) | the host node layout |
+| v2-9 | pickups | `Pickup_FindWeaponEntry` walked rows at 0x18 with the id at +4; `CPlayer__HasRoomForAmmo` read the ammo type at 0xC; `CPlayer__CollectPickup`'s picker view cut the camera pointer | `CPickupRow18`, `CPickupRow14`, a host view of CPlayer |
+| v2-10 | first shot: crash in `RumbleCurve_Advance` | `ControllerProfile.rumblePool[0x28]` / `rumbleNodes[3][0x3C]` were N64-sized byte arrays (the host `RumblePool`/`RumbleEffect` hold pointers); `Rumble_Start` views; `RumbleCurve_Init` stored the curve pointer as s32 | host sizes in `structs/controller.h` (static asserts in func_0026EB3C.c), host bodies |
+| v2-11 | pistol, mag 60, shredder, grenade launcher, PFM layer: mode 4 but the idle animation, no shot | `IsCodePointer`/`IsDataPointer` test the N64 segments (`CList__Construct + D_A4694`: size symbols, meaningless in the host link); `CGameObjectInstance__PickAvailableAction` read its (id, weight) table, left as ROM-order bytes by gendata (reached only through an sptr), little-endian, and returned s16 to a caller expecting a pointer | host text range (Linux `__executable_start..etext`, macOS `getsectiondata(__TEXT,__text)`); the table read big-endian; the result pointer-wide |
+| v2-12 | the shotgun's flash: the screen an opaque cyan for 8 frames | `ImpactEvent_FlashScreens` took its 7 bytes from the event value in memory order; the camera shakes their 4 halves | the value is two host-order words (below) |
+| v2-13 | `func_0023801C` (event sound) | the instance's intelligence at N64 0x14 | `header.m_pIntelligence` |
+| (v1) | crash in the new-game cinemas, `CParticle__HitFloor` | the region surface getters return u8, declared s32 | v1's 146bc42e (mine reverted, keep v1's) |
+
+**Event values.** `ImpactEvent_Send`'s last 8 bytes reach the handler as **two host-order
+words**, word 0 = the N64's first big-endian word: the archive swaps the animation events'
+values as `s32[2]` (swap_spec `AnimEvent`), and v1 declares `CEventValue` `{lower, upper, extra}`
+on the host (a9c15e5e) so the particle impacts give the same words. The integer handlers
+(damage `IntPair`, sound id, message index, `SetWeaponFirePos`) read the words; the byte/half
+handlers extract from them.
+
+**Results (scratch merge with v1, Linux, low memory).** With `T2_GIVE_WEAPONS=1` and the wheel
+(A and B groups, 8 directions each, Z held 60 frames each; 17,200 frames, no crash):
+
+| weapon | ammo | | weapon | ammo |
+|---|---|---|---|---|
+| 1 war blade | melee (mode 4) | | 12 sunfire pod | 6 -> 5 |
+| 3 tek bow | 10 -> 9 | | 13 cerebral bore | no lock, no shot (needs a target: crosshair mode 2) |
+| 5 mag 60 | 50 -> 41 | | 14 p.f.m. layer | 10 -> 9 |
+| 7 charge dart rifle | 30 -> 29 | | 15 grenade launcher | 10 -> 9 |
+| 9 shredder | 10 -> 8 | | 16 scorpion launcher | 12 -> 11 |
+| 10 plasma rifle | 150 -> 145 | | 20 flame thrower | 50 -> 41 |
+| 11 firestorm cannon | 145 -> 140 (shares plasma's ammo) | | 21 razor wind, 22 nuke, 23 flare | fire modes run, ammo unchanged (to check) |
+
+`T2_WEAPON=4` (pistol), Z held 40 frames: ammo 50 -> 44, `--audio --wav`: RMS 200 before the
+first shot, 2,500-4,200 while firing (peak 12,782). The Talon (no `T2_GIVE_WEAPONS`) swings
+through its combo animations (4, 5, 6). The journey with the events on (the bow picked at
+14050 in the water) runs to 15,000 frames; the bow does not fire under water (its flags allow
+land only). `--high-memory` with the events on stops in the new-game cinemas in the damage
+pipeline (`Blast_CanHit`, func_0023726C: N64 views; v3).
+
+Frames (`T2_SHOT_FROM`): the arrow of the tek bow flying from the dock (13121) and its splash on
+the water (13161); the pistol's muzzle flash, ejected shell casings and smoke (13111-13121), the
+counter 50 -> 49; the shotgun's flash star and smoke, then a full-screen purple flash fading over
+8 frames (the event's colour: opacity 0xF0, RGB C8 40 FF, as the data says; not checked against
+the N64); the bow drawn with an arrow nocked and released (counter 20 -> 19 -> 18).
+
+**Firing in the scripted journey** (INPUT.md section 6): the bow from the wheel and two arrows on
+the dock before the harbour:
+
+```
+START@4400 A@4500 A@4700 A@4800    # title -> main menu -> single player -> new game -> OK
+A@12950..12990 SX=80@12960..12990  # weapon wheel, stick right: the bow (weapon 2)
+Z@13060..13120                     # draw (hold Z), release: the arrow flies (20 -> 19)
+Z@13200..13204                     # a quick second shot (19 -> 18)
+CU@13300..13740                    # down the ramp, into the harbour water
+SX=80@13750..13774                 # turn right about 90 degrees
+CU@13780..14300                    # swim across the basin
+```
+
+Debug switches (port/game/t2debug.c, debug-only): `T2_GIVE_WEAPONS=1` every weapon usable on land
+or in water with full ammo once per level in gameplay; `T2_WEAPON=<n>` also requests weapon n;
+`T2_WEAPON_LIST=1` prints the weapon table (names, flags, model, ammo class); `T2_STATE_LOG`
+prints the current weapon's ammo; `T2_SHOT_FROM=<frame>` starts the periodic screenshots there.
+
+**The journey on this branch alone** (events off) runs to 15,000 frames and the boot to 26,000
+(no crash), but from the turn at 13450 the swim differs from round 6 (13800: x 691.8, rotY -1.67
+instead of x 358.3, -1.55; both end at (795.2, 233.0)): round 6's `WeaponMode_Ready_Update` read
+the player's pose from a wrong host offset and wrote into `m_WeaponList[26]`; with v2-1/v2-4 the
+weapon AI follows the player's pose. Treat the new numbers as the reference.
+
+**Next.** The cerebral bore (lock-on: crosshair mode 2, `Player_UpdateAim`), the nuke's charge,
+the flare and the razor wind ammo; the underwater weapons (harpoon, torpedo) in the water; the
+weapon pickups lying in level 51 (the pickup handlers are typed; walking over one is untested);
+the projectiles hitting enemies (v3's damage path, which also fails `--high-memory`);
+`CPlayer__CollectKeyPiece` (func_00248644) still has raw CPlayer offsets.
