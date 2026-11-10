@@ -45,7 +45,11 @@ void ModelSweep_TestModel(ModelSweep *ms) {
     if (data != NULL) {
         CMtxF__FromMtxAffine(ms->mtx, model->matrix);
         CMtxF__MultiplyAffine(ms->inverse, ms->mtx, ms->view);
+#ifdef TARGET_PORT
+        root = *(s32 **)data; /* the cache entry holds a host pointer */
+#else
         root = (s32 *)*data;
+#endif
         ms->meshes = CISet__GetBlock(root, 0);
         groups = (s32 *)CISet__GetBlock((s32 *)CISet__GetBlock(root, 2), model->def->variant);
         count = *groups;
