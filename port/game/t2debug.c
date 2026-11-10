@@ -265,3 +265,37 @@ void T2Port_Teleport(int frame, const char *spec) {
         }
     }
 }
+
+/* T2_WAKE_ENEMIES=R (DEBUG-ONLY, round 7 v3): in gameplay, wake every dormant level enemy within R
+ * units of the player (default 1500) the way its level event does (EnemyAI_SleepIfOffscreen, the
+ * enemy event handler 1: flags 0x2100 and mode 2). Enemies whose definition has flag 0x1000 sleep until a
+ * level trigger wakes them; this reaches them without the trigger. Called every frame. */
+extern void EnemyAI_SleepIfOffscreen(CGameObjectInstance *actor, CAI *ai, s32 unused);
+void T2Port_WakeEnemies(int frame, const char *spec) {
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    f32 r = (f32) atof(spec);
+    int i;
+
+    if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL) {
+        return;
+    }
+    if (r <= 0.0f) {
+        r = 1500.0f;
+    }
+    for (i = gScene.m_nFirstActor; i < gScene.m_nActors; i++) {
+        CGameObjectInstance *o = &gScene.m_pActors[i];
+        CIntelligence *info = o->header.m_pIntelligence;
+        f32 dx, dz;
+        s32 dummy = 0;
+        if (info == NULL || info->m_Type != INTELLIGENCE_ENEMY || (o->m_dwFlags & 0x100)) {
+            continue;
+        }
+        dx = o->header.m_vPos.x - p->m_CharacterActor.header.m_vPos.x;
+        dz = o->header.m_vPos.z - p->m_CharacterActor.header.m_vPos.z;
+        if (dx * dx + dz * dz < r * r) {
+            EnemyAI_SleepIfOffscreen(o, &o->m_AI, dummy);
+            printf("wake: frame %d enemy %d type %x at (%.1f %.1f %.1f) flags %x\n", frame, i, (unsigned) o->m_nTypeFlag,
+                   o->header.m_vPos.x, o->header.m_vPos.y, o->header.m_vPos.z, (unsigned) o->m_dwFlags);
+        }
+    }
+}
