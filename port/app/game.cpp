@@ -43,8 +43,9 @@ namespace {
 
 // T2_DLDUMP=1: print the commands of the last frame's display list (following G_DL), for
 // bring-up. Words are host-sized (gfx.h GfxWord).
-// T2_DLDUMP_VTX=1 also prints the vertices of each G_VTX (segments from G_MW_SEGMENT) and the
-// 16 words of each G_MTX (s15.16, Fast3D's host-order int32[16]) (docs/port/RENDER.md).
+// T2_DLDUMP_VTX=1 also prints the vertices of each G_VTX (the first 4; =2: all), segments from
+// G_MW_SEGMENT, the 16 words of each G_MTX (s15.16, Fast3D's host-order int32[16]) and a hash
+// of the first 256 bytes of each G_SETTIMG image (docs/port/RENDER.md, MACOS.md section 9).
 uintptr_t sDumpSegments[16];
 void DumpVtxMtx(uint8_t op, uint32_t w0, uintptr_t w1, int depth) {
     static const bool on = getenv("T2_DLDUMP_VTX") != nullptr;
@@ -62,10 +63,25 @@ void DumpVtxMtx(uint8_t op, uint32_t w0, uintptr_t w1, int depth) {
     if (op == 0x01) {
         int n = (w0 >> 12) & 0xFF;
         const int16_t* v = (const int16_t*)addr;
-        for (int i = 0; i < n && i < 4; i++, v += 8) {
+        static const int maxV = getenv("T2_DLDUMP_VTX") != nullptr && atoi(getenv("T2_DLDUMP_VTX")) > 1 ? 64 : 4;
+        for (int i = 0; i < n && i < maxV; i++, v += 8) {
             const uint8_t* c = (const uint8_t*)(v + 6);
             printf("%*s   v%d ob %d %d %d flag %d tc %d %d cn %02X%02X%02X%02X\n", depth * 2, "", i, v[0], v[1], v[2],
                    v[3], v[4], v[5], c[0], c[1], c[2], c[3]);
+        }
+    } else if (op == 0xFD && addr >= 0x10000 && !(addr & 1)) {
+        // G_SETTIMG: fnv1a64 of the image's first 256 bytes (texture data differences between hosts)
+        uint64_t h = 1469598103934665603ull;
+        for (int i = 0; i < 256; i++) {
+            h = (h ^ ((const uint8_t*)addr)[i]) * 1099511628211ull;
+        }
+        printf("%*s   timg %016llx hash\n", depth * 2, "", (unsigned long long)h);
+        if (atoi(getenv("T2_DLDUMP_VTX")) > 2) {
+            printf("%*s   timg bytes", depth * 2, "");
+            for (int i = 0; i < 32; i++) {
+                printf(" %02x", ((const uint8_t*)addr)[i]);
+            }
+            printf("\n");
         }
     } else if (op == 0xDA) {
         const int32_t* m = (const int32_t*)addr;
