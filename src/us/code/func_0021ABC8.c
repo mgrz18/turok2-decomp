@@ -133,9 +133,8 @@ void CGameObjectInstance__FireAnimEvents(ObjectLinks *obj, void *anim, f32 from,
                 }
             }
 #ifdef TARGET_PORT
-            /* The events end in CParticleSystem__Spawn (func_0022D2FC.c), still on N64
-             * views on the host: it corrupts memory. Off until it is ported; T2_ANIM_EVENTS=1
-             * turns them on (docs/port/RENDER.md, actors). */
+            /* The events end in CParticleSystem__Spawn (func_0022D2FC.c), on host types since
+             * round 7: on by default, T2_ANIM_EVENTS=0 turns them off (docs/port/RENDER.md 6). */
             if (fire != 0 && !T2Port_AnimEventsEnabled()) {
                 fire = 0;
             }

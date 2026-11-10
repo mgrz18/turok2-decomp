@@ -52,8 +52,8 @@ void GameObject_EmitHotPoints(Attachment *ents, s32 n, CMtxF *mtxs, CGameObjectI
     s32 size;
 
 #ifdef TARGET_PORT
-    /* the hot-point effects end in CParticleSystem__Spawn, still on N64 views on the
-     * host (see CGameObjectInstance__FireAnimEvents) */
+    /* the hot-point effects end in CParticleSystem__Spawn: on by default, T2_ANIM_EVENTS=0
+     * turns them off (see CGameObjectInstance__FireAnimEvents) */
     if (!T2Port_AnimEventsEnabled()) {
         return;
     }
