@@ -57,7 +57,11 @@ void CScene__UpdateWarp(CScene *scene) {
                 if (scene->m_bWarpSpawn != 0) {
                     settings = &gEngineApp_m_Game_m_CameraPool.m_Settings;
                     if (scene->m_PreviewOptions != settings->unlockedCheats && !Demo_GetPlayerCount()) {
+#ifdef TARGET_PORT
+                        CCameraPool__AddTimedText(&gEngineApp_m_Game_m_CameraPool, &gEngineApp_m_Game_m_CameraPool.m_CameraPool[0].m_MainCamera, D_800B54E0, 4.0f);
+#else
                         CCameraPool__AddTimedText(&gEngineApp_m_Game_m_CameraPool, gEngineApp_m_Game_m_CameraPool.m_CameraPool + 0x40, D_800B54E0, 4.0f);
+#endif
                         scene->m_PreviewOptions = settings->unlockedCheats;
                     }
                 }
