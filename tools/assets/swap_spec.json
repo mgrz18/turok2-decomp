@@ -167,7 +167,7 @@
      {"op": "uset", "transposed": true, "elem": "@PackedRegion"},
      {"op": "uset", "transposed": true, "elem": "f32[4]:rect u32:count"}
   ]},
-  "level paths": {"op": "iset", "each": {"op": "iset", "entries": [{"op": "unk", "note": "path group block 0 (8 bytes)"}, {"op": "uset", "elem": "@PathItem"}]}},
+  "level paths": {"op": "iset", "each": {"op": "iset", "entries": [{"op": "struct", "fields": "s16:mode s16:count unk[4]:unk4", "note": "path group block 0 (8 bytes): mode (0 ping-pong, 1 loop) and point count, read as s16 by CPathTrack__Advance"}, {"op": "uset", "elem": "@PathItem"}]}},
   "animated instances": {"op": "uset", "transposed": true, "elem": "@AnimInstance"},
   "grid bounds": {"op": "iset", "entries": ["@f32set", "@f32set", "@f32set", "@f32set", {"op": "uset", "elem": "f32[4]:rect s32:empty"}]},
   "grid section": {"op": "switch", "on": "size", "cases": {"<=8": {"op": "array", "type": "u32", "name": "emptyCell"}},

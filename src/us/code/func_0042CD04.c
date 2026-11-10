@@ -14,9 +14,17 @@ typedef struct ItemList {
     /* 0x08 */ ListItem items[1];
 } ItemList;
 
+#ifdef TARGET_PORT
+#include "structs/region.h"
+/* The port: the region table (block 2 of m_pRegionData) holds host CGameRegions (0x40 bytes, as
+ * CScene__GetRegion reads it), not the N64's 0x20: the path points' regions were misaligned
+ * (round 7 merge: an enemy following its path track, demo 2, crashed in Path_ExpandNode). */
+typedef CGameRegion Entry;
+#else
 typedef struct Entry {
     u8 data[0x20];
 } Entry;
+#endif
 
 
 extern s32 ProPackDecompress(s32 ***handle, s32);
