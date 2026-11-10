@@ -51,6 +51,7 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
 #include "structs/controller.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "structs/rect.h"
 #include "globals/engine.h"
 
@@ -132,4 +133,64 @@ void T2Port_LogState(int frame) {
         }
     }
     fflush(stdout);
+}
+
+/* T2_WARP_TO=<id>[@frame][,<id>[@frame]...] (DEBUG-ONLY, round 7 v5): a level warp through the
+ * game's own path. At <frame> (default: 60 frames into gameplay: mode 13 in a level > 0, a player,
+ * no warp running) CPlayer__Warp(player, id, 2, 0) runs as if the player had entered a region
+ * whose CRegionInfo.m_WarpID is <id>: the hub/key redirects, CScene__FindWarpDests, then either
+ * a move inside the loaded level or CScene__RequestWarp (the fade, CScene__UpdateWarp,
+ * CScene__LoadLevel of the destination). Warp ids: tools/assets/levels.py (warp_dests.json).
+ * The entries run in order, each once its frame is reached and no warp is running. */
+void CPlayer__Warp(CPlayer *player, s32 warp, s32 arg2, s32 respawn);
+
+void T2Port_DebugWarp(int frame) {
+    static const char *spec;
+    static int init;
+    static int sGameplayStart = -1;
+    static int sDone; /* how many entries of the list have run */
+    CPlayer *p;
+    const char *s;
+    char *end;
+    long id;
+    long at;
+    int i;
+
+    if (!init) {
+        init = 1;
+        spec = getenv("T2_WARP_TO");
+    }
+    if (spec == NULL) {
+        return;
+    }
+    p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    /* gameplay: mode 13 in a level (level 0 is the backdrop of the single-player menu) */
+    if (gEngineApp.m_Settings.mode != 13 || gScene.m_nLevel <= 0) {
+        sGameplayStart = -1;
+    } else if (sGameplayStart < 0 && p != NULL && gScene.m_WarpState == 0) {
+        sGameplayStart = frame;
+    }
+    s = spec;
+    for (i = 0; i < sDone && s != NULL; i++) {
+        s = strchr(s, ',');
+        if (s != NULL) {
+            s++;
+        }
+    }
+    if (s == NULL || *s == 0) {
+        return;
+    }
+    id = strtol(s, &end, 0);
+    at = (*end == '@') ? strtol(end + 1, NULL, 0) : -1;
+    if (at < 0 ? (sGameplayStart < 0 || frame < sGameplayStart + 60) : frame < at) {
+        return;
+    }
+    if (p == NULL || gScene.m_WarpState != 0 || sGameplayStart < 0) {
+        return;
+    }
+    printf("debug: frame %d: T2_WARP_TO: CPlayer__Warp(player, %ld, 2, 0) in level %d\n", frame, id,
+           (int) gScene.m_nLevel);
+    fflush(stdout);
+    sDone++;
+    CPlayer__Warp(p, (s32) id, 2, 0);
 }
