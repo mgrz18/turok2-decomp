@@ -20,10 +20,17 @@
 #include "globals/engine.h"
 #include "protos/scene.h"
 
+#ifdef TARGET_PORT /* the camera's region is a host CGameRegion (pointer-wide vertex and neighbour
+                    * slots): at 0x1C the view read the high half of m_pNeighbours[1], 0, and the
+                    * gameplay camera's visibility mask hid every static object */
+#include "structs/region.h"
+typedef CGameRegion CFloor;
+#else
 typedef struct {
     /* 0x00 */ u8 _pad0[0x1C];
     /* 0x1C */ u32 m_VisBits;
 } CFloor;
+#endif
 
 /* The camera pool, seen from its main camera. */
 #ifdef TARGET_PORT /* m_MainCamera's host offset (0x40 on the N64): with 0x40, the main camera test in
