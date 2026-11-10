@@ -3,6 +3,39 @@
 #include "structs/player.h"
 
 
+#ifdef TARGET_PORT
+#include "globals/engine.h"
+/* Host body: the State view is the CAI (m_Mode 0x34, m_AnimType 0xC4, the weapon vars
+ * 0x10C/0x110/0x128/0x12C); the player's ammo by member (N64 0x934 = m_Data.m_AmmoList). */
+f32 Math_Approach(f32 value, f32 target, f32 rate);
+s16 *CPlayer__GetFiringAmmo(CPlayer *player, s32 id);
+
+void WeaponBarrel_Spin_AF180(CGameObjectInstance *actor, CAI *state) {
+    f32 v;
+
+    v = Math_Approach(state->m_Weapon.m_BarrelSpeed, 0.174532949924469f /* 10 deg */, 0.0175f);
+    state->m_Weapon.m_BarrelSpeed = v;
+    state->m_Weapon.m_BarrelAngle += v * gFrameIncrement;
+    if (state->m_Mode == 4 && state->m_AnimType != 0x4E84) {
+        if (7.0f <= actor->m_CurrentAnimation.m_AnimationFrame) {
+            if (state->m_Weapon.m_nLod == 0) {
+                state->m_Weapon.m_nPass = 0;
+            }
+            state->m_Weapon.m_nLod = 1;
+        } else {
+            state->m_Weapon.m_nLod = 0;
+        }
+    } else {
+        CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);
+
+        if (player->m_Data.m_AmmoList[*CPlayer__GetFiringAmmo(player, 0x15)] != 0) {
+            state->m_Weapon.m_nLod = 0;
+        } else {
+            state->m_Weapon.m_nLod = 1;
+        }
+    }
+}
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x34];
     /* 0x034 */ s8 unk34;
@@ -50,3 +83,4 @@ void WeaponBarrel_Spin_AF180(CGameObjectInstance *actor, State *state) {
         }
     }
 }
+#endif
