@@ -3,7 +3,11 @@
 
 #include "rw/abu_types.h"
 
+#ifdef TARGET_PORT
+extern u8 __getTrackByte(s32, s32); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+#else
 extern s32 __getTrackByte(s32, s32);
+#endif
 s32 __readVarLen(sptr arg0, s32 arg1) {
     sptr temp_v0;
     sptr var_s0;

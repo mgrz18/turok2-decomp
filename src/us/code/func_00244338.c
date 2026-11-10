@@ -10,7 +10,11 @@ typedef struct {
 } Location;
 
 
+#ifdef TARGET_PORT
+s8 EnemyAI_GetBehaviorIndex(CGameObjectInstance *self, CAI *plan); /* ABI: returns s8 (the host leaves the upper bits of the return register undefined) */
+#else
 s32 EnemyAI_GetBehaviorIndex(CGameObjectInstance *self, CAI *plan);
+#endif
 s32 AI_UpdatePathHeading(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *target);
 CGameObjectInstance *AI_FindBestTarget(CGameObjectInstance *self, CAI *plan, s32 arg2, s32 arg3);
 f32 AI_FindClearHeading(CGameObjectInstance *self, CVector3 pos, CGameObjectInstance *target, f32 scale);

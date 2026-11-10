@@ -7,11 +7,19 @@
 
 extern void __osSiGetAccess(void);
 extern s32 __osSiRawStartDma(s32, sptr);
+#ifdef TARGET_PORT
+extern u8 __osContDataCrc(void *arg0); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+#else
 extern u32 __osContDataCrc(void *arg0);
+#endif
 extern void __osSiRelAccess(void);
 extern void __osPackRamWriteData(s32 arg0, s32 arg1, u8 *arg2);
 extern s32 __osSiRawStartDma(s32, sptr);
+#ifdef TARGET_PORT
+extern u8 __osContDataCrc(void *arg0); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+#else
 extern u32 __osContDataCrc(void *arg0);
+#endif
 #ifdef TARGET_PORT /* the queue is a pointer (s32 truncates it on LP64) */
 extern u32 __osPfsGetStatus(OSMesgQueue *arg0, s32 arg1);
 u32 __osContRamWrite(OSMesgQueue * arg0, s32 arg1, u16 arg2, u8 *arg3, s32 arg4) {

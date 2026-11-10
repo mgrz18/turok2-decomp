@@ -2,7 +2,11 @@
 
 sptr CGameObjectInstance__PickRandomAnim(sptr, sptr, sptr);
 s32 WeightedTable_Add(sptr, s32, s32);
+#ifdef TARGET_PORT
+s16 WeightedTable_Pick(sptr); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+#else
 s32 WeightedTable_Pick(sptr);
+#endif
 
 s32 WeightedTable_Clear(void *);                   /* extern */
 

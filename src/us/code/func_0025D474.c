@@ -30,7 +30,11 @@ extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t,
 extern void AI_ComputeFrameMotion(CGameObjectInstance *actor, CAI *ai, Dir *dir);
 extern f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
 extern f32 Math_Approach(f32 value, f32 target, f32 rate);
+#ifdef TARGET_PORT
+extern s16 EnemyAI_PickAttack(CGameObjectInstance *actor, CAI *ai, CAITargets *t); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+#else
 extern s32 EnemyAI_PickAttack(CGameObjectInstance *actor, CAI *ai, CAITargets *t);
+#endif
 extern void EnemyAI_TryDodge(CGameObjectInstance *actor, CAI *ai);
 extern void EnemyAI_IdleSoundCallback(CGameObjectInstance *actor, CAI *ai, CAITargets *t);
 extern PathNode *CPathTrack__GetCurrentPoint(void *path);

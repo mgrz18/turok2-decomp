@@ -1,7 +1,11 @@
 #include "common.h"
 
 s32 WeightedTable_Add(sptr, s32, s32);
+#ifdef TARGET_PORT
+s16 WeightedTable_Pick(sptr); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+#else
 s32 WeightedTable_Pick(sptr);
+#endif
 
 s16 EnemyAnim_Combat_AFE58(sptr, sptr);                    /* extern */
 s16 EnemyAnim_Leap_AFEE8(sptr, sptr);                    /* extern */

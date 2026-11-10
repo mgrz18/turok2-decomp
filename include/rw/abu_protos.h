@@ -232,8 +232,16 @@ s8 SoundEffectInfo_GetPriority(void *);
 u8 SoundEffectInfo_GetPan(void *);
 s8 SoundEffectInfo_GetPitch(void *);
 s16 SoundEffectInfo_GetFlags(void *);
+#ifdef TARGET_PORT
+s16 SoundEffectInfo_GetRandomRange0(ControllerCode802591C0 *); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+#else
 s32 SoundEffectInfo_GetRandomRange0(ControllerCode802591C0 *);
+#endif
+#ifdef TARGET_PORT
+s16 SoundEffectInfo_GetRandomRange1(ControllerCode802591C0 *); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+#else
 s32 SoundEffectInfo_GetRandomRange1(ControllerCode802591C0 *);
+#endif
 int SpeechPlayer_Play(void *arg0, int arg1, float arg2, int arg3);
 s32 SpeechPlayer_PickEntry(void **arg0, s16 id, s16 avoid);
 void COnScreen__SelectSmallFont();
@@ -265,7 +273,11 @@ s32 Controller_Lock(s32 arg0);
 void Controller_Unlock(void);
 s32 Controller_PakChanged(s32);
 int Controller_PakInserted(int arg0);
+#ifdef TARGET_PORT
+u8 Controller_IsPakWatched(int arg0); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+#else
 int Controller_IsPakWatched(int arg0);
+#endif
 void Controller_WatchPak(s32 arg);
 void Controller_UnwatchPak(sptr arg);
 void CEngineApp__UpdateControllers(void *arg0);
@@ -282,7 +294,11 @@ void VM_GetStats(struct Shape_typemap_110 *arg0);
 Node_func_8023CC08_de *VM_FindRegion(u32 arg0);
 void VM_FreeRegion(OwnerRecAt8V2 *arg0);
 void func_0028EEC0(int arg0);
+#ifdef TARGET_PORT
+u8 __getTrackByte(sptr, s32); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+#else
 s32 __getTrackByte(sptr, s32);
+#endif
 f32 alCSeqTicksToSec(void **arg0, s32 arg1, s32 arg2);
 void alCSeqSetLoc(CopyDest802B3998 *dst, CopySource802B3998 *src);
 void alCSeqGetLoc(CopyDest802B3998 *src, CopySource802B3998 *dst);
@@ -370,7 +386,11 @@ void __osPackRamReadData(s32 arg0, s32 arg1);
 s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
 void __osPackRamWriteData(s32 arg0, s32 arg1, u8 *arg2);
 u32 __osContAddressCrc(u32 arg0);
+#ifdef TARGET_PORT
+u8 __osContDataCrc(void *arg0); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+#else
 u32 __osContDataCrc(void *arg0);
+#endif
 void __osSiCreateAccessQueue();
 void __osSiGetAccess(void);
 void __osSiRelAccess(void);

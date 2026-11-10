@@ -4,7 +4,11 @@
 #include "rw/abu_types.h"
 #include "globals/pak.h"
 
+#ifdef TARGET_PORT
+extern u8 Controller_IsPakWatched(int arg0); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+#else
 extern int Controller_IsPakWatched(int arg0);
+#endif
 s32 Controller_TakePakChanged(s32 arg0) {
     s32 old;
     if (Controller_IsPakWatched(arg0) == 0) {
@@ -14,4 +18,8 @@ s32 Controller_TakePakChanged(s32 arg0) {
     gPakChanged[arg0] = 0;
     return old;
 }
+#ifdef TARGET_PORT
+u8 Controller_IsPakWatched(int arg0); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+#else
 int Controller_IsPakWatched(int arg0);
+#endif

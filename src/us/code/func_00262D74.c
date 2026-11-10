@@ -25,7 +25,11 @@
 
 extern f32 CGameRegion__GetHeight(sptr region, f32 x, f32 z);
 extern s32 *CScene__GetIntelligence(void *level, s32 model);
+#ifdef TARGET_PORT
+extern u16 CScene__GetObjectTypeID(void *level, s32 id); /* ABI: returns u16 (the host leaves the upper bits of the return register undefined) */
+#else
 extern s32 CScene__GetObjectTypeID(void *level, s32 id);
+#endif
 extern s32 Generator_IsPickupUnlocked(s32 id);
 extern CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, sptr region, f32 lifetime);
 extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);

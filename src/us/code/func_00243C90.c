@@ -81,8 +81,16 @@ typedef struct {
 
 s32 AI_UpdatePathHeading(Actor *self, Plan *plan, Actor *target);
 s32 AI_IsInViewCone(Actor *viewer, Actor *target, f32 range, f32 across, f32 up);
+#ifdef TARGET_PORT
+s8 EnemyAI_GetCurrentBehavior(Actor *self, Plan *plan); /* ABI: returns s8 (the host leaves the upper bits of the return register undefined) */
+#else
 s32 EnemyAI_GetCurrentBehavior(Actor *self, Plan *plan);
+#endif
+#ifdef TARGET_PORT
+s8 EnemyAI_GetBehaviorIndex(Actor *self, Plan *plan); /* ABI: returns s8 (the host leaves the upper bits of the return register undefined) */
+#else
 s32 EnemyAI_GetBehaviorIndex(Actor *self, Plan *plan);
+#endif
 void AI_HearNoise(Actor *self, Plan *plan, CVector3 *pos, s32 arg3);
 s32 Cinema_PathPlaying(void);
 s32 Cinema_GetScriptId(void);

@@ -8,10 +8,18 @@
 extern u32 osMotorStart(struct Triple *);
 extern void __osSiGetAccess(void);
 extern s32 __osSiRawStartDma(s32, sptr);
+#ifdef TARGET_PORT
+extern u8 __osContDataCrc(void *arg0); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+#else
 extern u32 __osContDataCrc(void *arg0);
+#endif
 extern void __osSiRelAccess(void);
 extern s32 __osSiRawStartDma(s32, sptr);
+#ifdef TARGET_PORT
+extern u8 __osContDataCrc(void *arg0); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+#else
 extern u32 __osContDataCrc(void *arg0);
+#endif
 u32 osMotorStart(Triple *arg0) {
     Block40 saved;
     u8 *source;
