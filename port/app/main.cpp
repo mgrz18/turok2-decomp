@@ -60,6 +60,7 @@
 #include "t2asset_lus.h"
 #ifdef T2_HAVE_GAME
 #include "game.h"
+#include "offscreen_gl.h"
 #endif
 extern "C" {
 #include "t2asset.h"
@@ -142,6 +143,7 @@ struct Args {
     std::string input;
     bool skipPakCheck = false; // DEBUG-ONLY (t2debug.c)
     int startMode = -1;        // DEBUG-ONLY (t2debug.c)
+    bool offscreenGl = false;  // --offscreen-gl (macOS)
 #ifdef T2_LOW_MEMORY_DEFAULT
     bool lowMemory = true;
 #else
@@ -188,11 +190,15 @@ Args ParseArgs(int argc, char** argv) {
             a.pakDir = argv[++i];
         } else if (s == "--input" && i + 1 < argc) {
             a.input = argv[++i];
+        } else if (s == "--offscreen-gl") {
+            a.offscreenGl = true; // macOS: draw with no window (offscreen_gl.cpp); implies --no-window
+            a.window = false;
         } else {
             fprintf(stderr, "usage: %s [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]\n"
                             "          [--game [--draw] [--audio] [--wav out.wav] [--verbose] [--high-memory]\n"
                             "                  [--no-pak | --pak-blank | --pak-dir DIR]\n"
-                            "                  [--input BUTTON@FRAME,...] [--skip-pak-check] [--start-mode N]]   (the last three: debug only)\n",
+                            "                  [--input BUTTON@FRAME,...] [--skip-pak-check] [--start-mode N]]   (the last three: debug only)\n"
+                            "          [--offscreen-gl]   (macOS: Fast3D on a CGL context with no window; T2_SHOT works)\n",
                     argv[0]);
             exit(2);
         }
@@ -443,6 +449,9 @@ int main(int argc, char** argv) {
         printf("window: backend %s, video driver %s, %ux%u\n", window->GetWindowBackendName().c_str(),
                SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "?", window->GetWidth(),
                window->GetHeight());
+    }
+    if (args.offscreenGl && !T2Offscreen_Init(cvars, resourceManager, 640, 480)) {
+        return 1;
     }
 #ifdef T2_HAVE_GAME
     if (args.game) {
