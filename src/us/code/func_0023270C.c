@@ -2,10 +2,20 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "structs/particle.h"
+#ifdef TARGET_PORT
+#include "structs/camera.h"
+/* the camera's field of view by member */
+typedef struct B19Q2 {
+    union {
+        struct { u8 _hp_f6C[__builtin_offsetof(CCamera, m_Fov)]; f32 f6C; }; /* N64 0x6C */
+    };
+} B19Q2;
+#else
 typedef struct B19Q2 {
     u8 pad0[0x6C];
     f32 f6C;
 } B19Q2;
+#endif
 extern f32 D_800A6404;
 extern f32 D_800A6408;
 extern f32 D_800A640C;

@@ -1,6 +1,9 @@
 #include "common.h"
 #include "structs/vector.h"
 
+#ifdef TARGET_PORT
+#include "structs/particle.h"
+#endif
 typedef struct { f32 x, y, z, w; } Vector4f;
 typedef struct { f32 m[16]; } MatrixF;
 
@@ -10,16 +13,42 @@ typedef struct {
     /* 0x12 */ u16 limit;
 } ProjectileMotion;
 
+#ifdef TARGET_PORT
+typedef struct ProjectileDef {
+/* the view at the host offsets of CROMParticleEffect (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ProjectileDef(m) __builtin_offsetof(CROMParticleEffect, m)
+    union {
+        struct { u8 _hp_motion[T2_HOFF_ProjectileDef(m_pMotion)]; ProjectileMotion *motion; }; /* N64 0x30 */
+    };
+} ProjectileDef;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x30];
     /* 0x30 */ ProjectileMotion *motion;
 } ProjectileDef;
+#endif
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
     /* 0x04 */ CVector3 pos;
 } TargetActor;
 
+#ifdef TARGET_PORT
+typedef struct Projectile {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Projectile(m) __builtin_offsetof(CParticle, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_Projectile(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_vel[T2_HOFF_Projectile(m_vVelocity)]; CVector3 vel; }; /* N64 0x18 */
+        struct { u8 _hp_def[T2_HOFF_Projectile(m_pEffect)]; ProjectileDef *def; }; /* N64 0xF8 */
+        struct { u8 _hp_target[T2_HOFF_Projectile(m_pTarget)]; TargetActor *target; }; /* N64 0x114 */
+        struct { u8 _hp_speed[T2_HOFF_Projectile(m_cFrame)]; f32 speed; }; /* N64 0x11C */
+        struct { u8 _hp_dir[T2_HOFF_Projectile(m_vDirection)]; CVector3 dir; }; /* N64 0x150 */
+    };
+} Projectile;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[4];
     /* 0x004 */ CVector3 pos;
@@ -34,6 +63,7 @@ typedef struct {
     /* 0x120 */ u8 pad120[0x150 - 0x120];
     /* 0x150 */ CVector3 dir;
 } Projectile;
+#endif
 
 extern f32 func_00298470(f32);                              /* sqrtf */
 extern f32 func_0026841C(TargetActor *actor);               /* its height */

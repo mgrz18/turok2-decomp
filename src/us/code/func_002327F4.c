@@ -27,6 +27,31 @@ extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern void CParticle__BuildMatrix(void *, sptr, sptr, f32);
 
+#ifdef TARGET_PORT
+#include "structs/particle.h"
+#include "structs/camera.h"
+extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
+/* the host CParticle and CCamera by member (the camera list head by name: state[-4] is N64 layout) */
+void CParticle__BuildCameraMatrix(void *arg0) {
+    CParticle *p = (CParticle *) arg0;
+    CCamera *cam;
+    CVector3 delta;
+    f32 amount;
+
+    if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount[0] == 1) {
+        cam = (CCamera *) gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
+        CMtxF__TransformPoint(&cam->m_mfView, &p->header.m_vPos, &delta);
+        amount = delta.z;
+        if (amount < 0.0f) {
+            amount = -amount;
+        }
+        CParticle__BuildMatrix(arg0, (sptr) p->m_mtxDraw[gEvenOdd], (sptr) cam, amount);
+    } else {
+        CParticle__BuildMatrix(arg0, (sptr) p->m_mtxDraw[gEvenOdd], 0, 0.0f);
+    }
+    p->m_dwFlags |= 0x100000;
+}
+#else
 void CParticle__BuildCameraMatrix(void *arg0) {
     CVector3 delta;
     void *arg1;
@@ -50,3 +75,4 @@ void CParticle__BuildCameraMatrix(void *arg0) {
     }
     ((Shared_Particle *)arg0)->flags |= 0x100000;
 }
+#endif

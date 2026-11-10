@@ -2,6 +2,9 @@
 #include "structs/game_object.h"
 #include "structs/particle.h"
 #include "globals/scene.h"
+#ifdef TARGET_PORT
+#include "structs/player.h"
+#endif
 
 s32 CParticleSystem__Free(CParticleSystem *, void *);           /* extern */
 s32 CParticle__StopLoopSound(void *);                      /* extern */
@@ -21,7 +24,11 @@ void func_0023181C(CParticle *arg0) {
 
     if (arg0->header.m_nObjType == 0x68) {
         temp_s0 = (sptr) arg0->m_pOwner->m_AI.m_pParent;
+#ifdef TARGET_PORT
+        ((CPlayer *) temp_s0)->m_Data.m_AmmoList[*CPlayer__GetFiringAmmo(temp_s0, 0x15)] = 1;
+#else
         ((Parent0023181C *)((*CPlayer__GetFiringAmmo(temp_s0, 0x15) * 2) + temp_s0))->flags934[0] = 1;
+#endif
     }
     temp_s0_2 = arg0->m_pSource;
     if (temp_s0_2 != NULL) {

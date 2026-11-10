@@ -10,6 +10,21 @@ struct EntryRecAt4V1 {
 struct EntryRecAt4V1;
 typedef struct EntryRecAt4V1 EntryRecAt4V1;
 extern void CParticleSystem__Free(char *obj, void *handle);
+#ifdef TARGET_PORT
+#include "common.h"
+#include "structs/particle.h"
+/* the host CParticleSystem by member: the tail of the first non-empty active list up to count */
+void CParticleSystem__FreeOldest(char *obj, unsigned char count) {
+    CParticleSystem *sys = (CParticleSystem *) obj;
+    int i;
+    for (i = 0; i <= count; i++) {
+        if (sys->m_ActiveList[i].m_pTail != 0) {
+            CParticleSystem__Free(obj, sys->m_ActiveList[i].m_pTail);
+            return;
+        }
+    }
+}
+#else
 void CParticleSystem__FreeOldest(char *obj, unsigned char count) {
     int i;
     for (i = 0; i <= count; i++) {
@@ -20,3 +35,4 @@ void CParticleSystem__FreeOldest(char *obj, unsigned char count) {
         }
     }
 }
+#endif

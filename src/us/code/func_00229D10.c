@@ -28,6 +28,23 @@ extern void CParticle__Wobble(void *obj, f32 scale);
 extern void CPlayer__TransformByView(CPlayer *player, CVector3 *pos);      /* player-relative point to world */
 extern f32 GameObject_GetCollisionHeight(CGameObjectInstance *owner);                     /* height */
 
+#ifdef TARGET_PORT
+typedef struct Missile {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Missile(m) __builtin_offsetof(CParticle, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_Missile(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_vel[T2_HOFF_Missile(m_vVelocity)]; CVector3 vel; }; /* N64 0x18 */
+        struct { u8 _hp_parent[T2_HOFF_Missile(m_pEffect)]; CROMParticleEffect *parent; }; /* N64 0xF8 */
+        struct { u8 _hp_owner[T2_HOFF_Missile(m_pOwner)]; CGameObjectInstance *owner; }; /* N64 0x10C */
+        struct { u8 _hp_speed[T2_HOFF_Missile(m_cFrame)]; f32 speed; }; /* N64 0x11C */
+        struct { u8 _hp_caught[T2_HOFF_Missile(m_nFrames)]; s16 caught; }; /* N64 0x128 */
+        struct { u8 _hp_dir[T2_HOFF_Missile(m_vDirection)]; CVector3 dir; }; /* N64 0x150 */
+        struct { u8 _hp_loop[T2_HOFF_Missile(m_pLoopSound)]; SndSource *loop; }; /* N64 0x1B8 */
+    };
+} Missile;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
     /* 0x004 */ CVector3 pos;
@@ -46,6 +63,7 @@ typedef struct {
     /* 0x15C */ u8 pad15C[0x1B8 - 0x15C];
     /* 0x1B8 */ SndSource *loop;
 } Missile;
+#endif
 
 extern f32 D_800ACE68; /* speed above which it flies home (15) */
 extern f32 D_800ACE6C; /* catch radius (512) */

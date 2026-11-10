@@ -13,6 +13,18 @@ typedef struct {
     /* 0xF8 */ AnimData *anim;
 } ObjAnimView;
 
+#ifdef TARGET_PORT
+#include "structs/particle.h"
+/* a particle (N64 0xF8 is CParticle.m_pEffect, 0x160 m_vRot.y): the host members */
+f32 func_00232ECC(CGameObjectInstance *arg0) {
+    CParticle *p = (CParticle *) arg0;
+
+    if (p->m_pEffect->m_pModel == NULL) {
+        return p->m_vRot.y;
+    }
+    return 0.0f;
+}
+#else
 f32 func_00232ECC(CGameObjectInstance *arg0) {
     f32 var_f0;
 
@@ -22,3 +34,4 @@ f32 func_00232ECC(CGameObjectInstance *arg0) {
     }
     return var_f0;
 }
+#endif

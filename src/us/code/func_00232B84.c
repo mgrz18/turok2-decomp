@@ -24,6 +24,37 @@ typedef struct PoolNode84478 {
     s32 flags;
 } PoolNode84478;
 extern void CParticleSystem__Free(PoolOwner84478 *, PoolNode84478 *);
+#ifdef TARGET_PORT
+#include "structs/particle.h"
+/* the host CParticleSystem/CParticle by member (the views are at N64 offsets) */
+PoolNode84478 *CParticleSystem__AllocNode(PoolOwner84478 *owner, s32 index) {
+    CParticleSystem *sys = (CParticleSystem *) owner;
+    CParticle *node;
+    CList *slot;
+    s32 i;
+
+    if (sys->m_FreeList.m_pHead == 0) {
+        for (i = 0; i <= (index & 0xFF); i++) {
+            if (sys->m_ActiveList[i].m_pTail != 0) {
+                CParticleSystem__Free(owner, sys->m_ActiveList[i].m_pTail);
+                break;
+            }
+        }
+    }
+    node = sys->m_FreeList.m_pHead;
+    if (node == 0) {
+        return 0;
+    }
+    CList__Remove(&sys->m_FreeList, node);
+    slot = &sys->m_ActiveList[index & 0xFF];
+    CList__AddHead(slot, node);
+    node->m_pActiveList = slot;
+    node->m_pDrawNext = 0;
+    node->m_pDrawLast = 0;
+    node->m_dwFlags = 0x100;
+    return (PoolNode84478 *) node;
+}
+#else
 PoolNode84478 *CParticleSystem__AllocNode(PoolOwner84478 *owner, s32 index) {
     PoolNode84478 *node;
     PoolBucket84478 *slot;
@@ -51,3 +82,4 @@ PoolNode84478 *CParticleSystem__AllocNode(PoolOwner84478 *owner, s32 index) {
     node->state = 0x100;
     return node;
 }
+#endif

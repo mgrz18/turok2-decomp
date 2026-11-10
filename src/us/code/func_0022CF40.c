@@ -2,6 +2,9 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "globals/particle.h"
+#ifdef TARGET_PORT
+#include "structs/camera.h"
+#endif
 
 /* The transform a particle's position is relative to, picked by its
  * attachment mode: the particle's own facing, the owner's effect transforms,
@@ -28,13 +31,21 @@ CMtxF *CParticle__GetParentTransform(CParticle *p, u8 *view) {
         if (view == NULL) {
             return NULL;
         }
+#ifdef TARGET_PORT
+        return &((CCamera *) view)->m_mfFaceScreenYAxisUp;
+#else
         return (CMtxF *)(view + 0xE7C);
+#endif
     case -4:
     case -1:
         if (view == NULL) {
             return NULL;
         }
+#ifdef TARGET_PORT
+        return &((CCamera *) view)->m_mfFaceScreen;
+#else
         return (CMtxF *)(view + 0xE3C);
+#endif
     case -3:
         if (p->header.m_vPos.y - CGameRegion__GetHeight(p->header.m_pCurrentRegion, p->header.m_vPos.x, p->header.m_vPos.z) <= 0.01f) {
             CGameRegion__GetTiltRotation(&state, p->header.m_pCurrentRegion);

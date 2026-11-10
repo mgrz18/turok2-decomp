@@ -2,6 +2,9 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/particle.h"
+#ifdef TARGET_PORT
+#include "structs/camera.h"
+#endif
 
 /* Moves a particle attached to an actor along with it: onto a bone of its
  * parent's skeleton (or the parent's position) and/or through its owner's
@@ -56,7 +59,11 @@ void CParticle__Attach(CParticle *actor, CVector3 *outPosition, CVector3 *outHea
         link = actor->m_pOwner;
         if (link->m_dwFlags & 0x300000) {
             /* a player: its view's transform */
+#ifdef TARGET_PORT
+            CMtxF__TransformPoint(((CPlayer *)link->m_AI.m_pParent)->m_pCamera->m_mfViewOrient, &actor->m_vAttachPos, &position);
+#else
             CMtxF__TransformPoint(((PlayerView *)((CPlayer *)link->m_AI.m_pParent)->m_pCamera)->transform, &actor->m_vAttachPos, &position);
+#endif
         } else {
             CMtxF__TransformPoint(link->m_mfOrient, &actor->m_vAttachPos, &position);
         }

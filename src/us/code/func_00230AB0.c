@@ -25,6 +25,52 @@ struct B18Ent {
     B18Ent *next;       /* 0x1320 (0x16E0) */
 };
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+#ifdef TARGET_PORT
+#include "structs/particle.h"
+#include "structs/player.h"
+/* the host structs by member: kind-1 instances (m_AI.m_Health), the players (m_Data.m_Health,
+ * m_pNext), the particles (m_pOwner, m_nFrames, the type) */
+void CParticle__CheckProximity(sptr unused, B18Ent *ov, B18Ent **arrv, s32 n) {
+    CParticle *o = (CParticle *) ov;
+    CParticle **arr = (CParticle **) arrv;
+    CVector3 d;
+    s32 i;
+    s32 cnt;
+    CScene *scene = &gScene;
+    CPlayer *p;
+
+    cnt = scene->m_nKind1;
+    for (i = 0; i < cnt; i++) {
+        CGameObjectInstance *e = scene->m_pKind1[i];
+        if (e->m_AI.m_Health > 0) {
+            CVector3__Subtract(&d, &e->header.m_vPos, &o->header.m_vPos);
+            if (d.x * d.x + d.y * d.y + d.z * d.z <= 65536.0f) {
+                o->m_nFrames = 1;
+                return;
+            }
+        }
+    }
+    for (p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
+        if ((void *) o->m_pOwner != (void *) p && p->m_Data.m_Health > 0) {
+            CVector3__Subtract(&d, &p->m_CharacterActor.header.m_vPos, &o->header.m_vPos);
+            if (d.x * d.x + d.y * d.y + d.z * d.z <= 65536.0f) {
+                o->m_nFrames = 1;
+                return;
+            }
+        }
+    }
+    for (i = 0; i < n; i++) {
+        CParticle *e = arr[i];
+        if (e != o && (e->header.m_nObjType == 0xC || e->header.m_nObjType == 0x22)) {
+            CVector3__Subtract(&d, &e->header.m_vPos, &o->header.m_vPos);
+            if (d.x * d.x + d.y * d.y + d.z * d.z <= 262144.0f) {
+                o->m_nFrames = 1;
+                return;
+            }
+        }
+    }
+}
+#else
 void CParticle__CheckProximity(sptr unused, B18Ent *o, B18Ent **arr, s32 n) {
     CVector3 d;
     s32 i;
@@ -64,3 +110,4 @@ void CParticle__CheckProximity(sptr unused, B18Ent *o, B18Ent **arr, s32 n) {
         }
     }
 }
+#endif
