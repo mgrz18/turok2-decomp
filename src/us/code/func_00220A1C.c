@@ -3,9 +3,15 @@
 #include "globals/engine.h"
 #include "protos/iset.h"
 
+#ifdef TARGET_PORT
+/* The port: the runtime regions CGameRegion__Unpack built, at the host stride (as CScene__GetRegion). */
+#include "structs/region.h"
+typedef CGameRegion Floor;
+#else
 typedef struct Floor {
     u8 data[0x20];
 } Floor;                        /* 0x20 bytes */
+#endif
 
 typedef struct FloorCell {
     f32 minX, minZ;             /* 0x00 */
