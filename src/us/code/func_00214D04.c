@@ -13,7 +13,7 @@ typedef struct {
 } SpawnSource;
 
 s32 Model_RequestTextures(sptr);                         /* extern */
-s32 CStaticObject__LoadGeometry();                                /* extern */
+sptr CStaticObject__LoadGeometry();                                /* extern */
 extern s32 D_800A57F8;
 extern s32 CStaticObject__BuildLitVerticesCallback;
 

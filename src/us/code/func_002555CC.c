@@ -3,7 +3,7 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 
-s32 GameObject_GetPlatformBelow(s32);
+sptr GameObject_GetPlatformBelow(s32);
 s32 GameObject_GetFrameDelta(sptr, sptr);
 s32 Sound__Play(s32, s32, sptr, s32, s32, s32);
 

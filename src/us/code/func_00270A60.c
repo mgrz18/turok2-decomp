@@ -32,7 +32,7 @@ static inline void CAudioWorld_Unlock(CAudioWorld *m) {
         __osRestoreInt(mask);
     }
 }
-s32 CCameraPool__GetNearestCamera(void *p, sptr id);
+sptr CCameraPool__GetNearestCamera(void *p, sptr id);
 s32 SndVoicePool_IsSoundPlaying(void *pool, s16 a);
 f32 Sound_DistanceFalloff(sptr id, sptr p);
 s32 SndVoicePool_FindSoundWithOwner(void *pool, s16 a, s32 b);

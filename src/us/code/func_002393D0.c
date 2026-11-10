@@ -8,7 +8,7 @@ extern u8 D_800C894C;                   /* bottom of the stack */
 
 f32 CGameRegion__GetCentreDistance(CGameRegion *from, CGameRegion *to);
 void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
-s32 Sweep_CrossRegionEdge(void *mover, CGameRegion *region, s32 edge, CVector3 *centre);
+sptr Sweep_CrossRegionEdge(void *mover, CGameRegion *region, s32 edge, CVector3 *centre);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 
 #define IN_BOUNDS(p) ((p)->x >= sPathSearch->bounds[0] && (p)->x <= sPathSearch->bounds[2] \

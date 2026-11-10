@@ -43,7 +43,7 @@ void CVector3__Normalize(CVector3 *v);                          /* normalise */
 f32 CVector3__GetYaw(CVector3 *v);                           /* heading */
 f32 GameObject_GetCollisionRadius(CGameObjectInstance *a);                           /* radius */
 void GameObject_TraceMove(CGameObjectInstance *a, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
-s32 Path_FindFleeRegion(CGameObjectInstance *a, sptr b, CVector3 pos, sptr region, s32 d, CVector3 *out);
+sptr Path_FindFleeRegion(CGameObjectInstance *a, sptr b, CVector3 pos, sptr region, s32 d, CVector3 *out);
 s32 Path_FindRegionPath(CGameObjectInstance *a, CVector3 pos, sptr region, s32 d, CVector3 *hit);
 s32 CGameRegion__ContainsXZ(sptr region, f32 x, f32 z);
 f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);

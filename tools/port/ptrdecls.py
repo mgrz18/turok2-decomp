@@ -85,4 +85,21 @@ for f in files:
         print(f'{f[len(ROOT):]}: {name} param {i}: {p!r} -> {np!r}')
     if apply and out != s:
         open(f, 'w').write(out)
-print('total', total, 'functions', len(changes))
+# declared int returns of definitions that return a pointer
+RD = re.compile(r'(?m)^([ \t]*(?:extern\s+)?(?:volatile\s+)?)(s32|u32|int|unsigned int|signed int)(\s+([A-Za-z_]\w*)\s*\([^;{}]*\)\s*;)')
+rtotal = 0
+for f in files:
+    s = texts[f] if not apply else open(f, errors='replace').read()
+    def fix(m):
+        global rtotal
+        name = m.group(4)
+        if only and name not in only: return m.group(0)
+        if name in defs and any('*' in r or r.split()[-1] in ('sptr', 'uptr') for p, r in defs[name]):
+            rtotal += 1
+            print(f'{f[len(ROOT):]}: {name} return: {m.group(2)!r}')
+            return m.group(1) + ('uptr' if m.group(2) in ('u32', 'unsigned int') else 'sptr') + m.group(3)
+        return m.group(0)
+    out = RD.sub(fix, s)
+    if apply and out != s:
+        open(f, 'w').write(out)
+print('total', total, 'functions', len(changes), 'returns', rtotal)
