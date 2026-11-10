@@ -164,7 +164,7 @@ clock), `Action_CheckRequiredItem` (func_00265F90, the camera pool), func_002716
 
 ## 4. Next
 
-1. **Gameplay frames draw no level geometry**: the sky, the fog fill and the HUD text are there, the
+1. (done in round 6 u1, see its section) **Gameplay frames draw no level geometry**: the sky, the fog fill and the HUD text are there, the
    gameplay display list has no `G_VTX`/`G_MTX`, `CStaticObject__Draw` runs ~3 times a frame (the
    level-51 cinema, same level, draws everything). The player camera's draw setup (view/projection
    matrices, the viewer box `CScene__LoadVisibleGridSections` culls with) is the place to start;
@@ -185,6 +185,25 @@ clock), `Action_CheckRequiredItem` (func_00265F90, the camera pool), func_002716
    fixes are merged, untested together; pixel screenshots there need a Metal offscreen target.
 7. **ABI**: abicheck's 185 `ptr_from_int` sites (the macOS truncations), 6 missing_args, 2
    void_used; function-pointer calls (184 sites, the handler tables) are not checked yet.
+
+## Round 6, part u1: gameplay draws the level (branch names-R6_u1)
+
+[RENDER.md](RENDER.md) section 4. Level 51 now **draws in gameplay**: the Port of Adia start
+(the ramp, brick and panelled walls, the arch row, crates, sky, fog) from frame 12903 on, with the
+health HUD. Attract demos 2 and 3 draw their levels; demo 1 draws its geometry, very dark (maybe its
+real look). "NEW CHEAT ENABLED" no longer appears. Four causes:
+the gameplay camera's visibility mask read at an N64 offset of the host `CGameRegion` (0: every
+object culled), **the cache hash lookups' N64 bucket stride** (0x10 vs the host's 32-byte
+`HashEntry`: no asynchronous request ever hit, so gameplay never got lit vertices; cinemas load
+synchronously and got through), the preview-options field written at an N64 offset of `gScene`
+(the cheat message), and the `COverlay` constructors/script start on N64 views (no HUD). Boot
+26,000 frames (158 s) and the new game to frame 15,000 (82 s) run without a crash. The player
+still stops at (-1266.6, -779.5, 260.0) (u3).
+
+Merge notes: `src/us/code/func_00203CA0.c`, `func_002034F4.c`, `func_00205A2C.c`,
+`func_0027D160.c`, `func_0042C3BC.c`, `func_0027ACC4.c`, `func_0027AD00.c` (all `TARGET_PORT`
+blocks, asm_diff 0), `port/game/t2debug.c` (`T2_SCENE_LOG`). The archive and gendata are unchanged
+(no header edits).
 
 ## Round 5, part t2: the ABI checker and sweep
 

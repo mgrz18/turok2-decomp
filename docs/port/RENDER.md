@@ -60,3 +60,48 @@ pickup, the player's weapon and the cinema logos go through this path.
 
 Also seen, not fixed: `CScene__BuildGeometryDisplayList` (multiplayer) reads the camera list at
 `&gEngineApp_m_Settings_difficulty - 0x1210`.
+
+## 4. Gameplay draws the level (Phase 7 round 6, u1)
+
+Level 51 (the first gameplay level after a new game) drew only the sky, the fog fill and
+"NEW CHEAT ENABLED". Its display list had no `G_VTX`/`G_MTX` although `CScene__DrawGeometry` ran
+every frame. Five causes, found in this order with gdb on the gameplay frame (breakpoints on
+`CScene__DrawGeometry if w->m_nLevel == 51`, then a watchpoint or stepping):
+
+| # | where | cause | fix |
+|---|---|---|---|
+| G1 | `CCamera__Advance` (func_0027D160) | its `CFloor` view read the camera region's `m_VisBits` at N64 offset 0x1C; the region is a host `CGameRegion` (pointer-wide vertex/neighbour slots), so it read the high half of `m_pNeighbours[1]`, 0. With view mask 0, `vmask & m_ViewMask` rejected every static object. (`CCamera__SetViewParams` sets the right mask during the update; `CCamera__Advance` overwrote it before the draw.) Cinemas use `gDefaultVisBits`, so they were not affected. | `CFloor` = `CGameRegion` under `TARGET_PORT` |
+| G2 | `CCache__RequestDecompression` (func_00203CA0), `CCache__LookupAndLock` (func_002034F4), `CCache__Touch` (func_00205A2C) | **the cache hash lookup** used the N64 bucket stride `* 0x10`; the host `HashEntry` is 32 bytes. These lookups probed the wrong bucket and never found a resident entry, so each frame made a new request. In the asynchronous mode (`gCache.frameDelay` 0: gameplay) the request returns NULL, so `CStaticObject__Draw` dropped every object (no lit vertices). The cinemas load synchronously, and that path returns `CCache__CompleteRequest`'s existing entry, which is why they drew. | `HASH_STRIDE` = `sizeof(HashEntry/HashNode)` under `TARGET_PORT` |
+| G3 | `CScene__InitPersistentData` (func_0042C3BC) | a `MenuState` view wrote the preview fields at N64 offsets 0x18FE0-0x18FE8 of `gScene`. On the host this hit other `gScene` bytes, and `m_PreviewOptions` stayed 0, so the first warp of every new game announced `unlockedCheats` (0x4000000, the default) as "NEW CHEAT ENABLED". | `CScene` members (`m_PreviewState/Timer/Options`) |
+| G4 | `COverlay__Construct` (func_0027ACC4), `COverlay__StartScript` (func_0027AD00) | N64 views of `COverlay`: on the host `m_pScript` is pointer-wide. The script pointer was stored in 4 bytes and the start position landed in `m_Mode`/`m_Time`, so no HUD element (health, ammo, lives...) was positioned or scripted. | host bodies on `COverlay` |
+
+All under `TARGET_PORT`; `tools/asm_diff.py --base 6d04fabb` = 0 for each file.
+
+G2 matters beyond the level geometry: every asynchronous cache lookup (`CCache__RequestDecompression`
+and `CCache__LookupAndLock`/`CCache__Touch` callers: lit vertices, models, textures, sounds loaded
+during play) missed, so anything requested after the level load was re-requested every frame.
+
+Frames (Linux, headless, `--input START@4400,A@4500,A@4700,A@4800`, T2_SHOT):
+
+- 13001 (the first gameplay frames): the Port of Adia start. A ramp runs down between a brick
+  wall with an arch row (left) and a panelled wall (right); crates on the ledge, a rope and
+  pole, the sky above, fog in the distance. Textures, vertex colours and depth look right.
+  Health HUD "+ 100" bottom left (after G4). No first-person weapon yet (u2's actor path).
+- 13201-14401 with C-up held (the player walks to (-1266.6, -779.5, 260.0), u3's water stop):
+  the arch row with red lights in each arch and the poles, seen from the water level.
+- Attract demos: demo 2 (level 131, frame 14502) and demo 3 (level 109, frame 21501) draw their
+  levels (corridors, a door, walls) with the weapon wheel's 3D models over them. They were a
+  grey fill or a texture close-up before. Demo 1 (level 81, frames 5501-8001) draws its geometry,
+  but very dark: the lit vertex colours are mostly 0x050505 with blue lamp highlights, and the fog
+  colour is 0x101010. That may be the level's real look (a dark interior); not verified against a console.
+- The boot still runs 26,000 frames (158 s) through 3 demos and the boot loop, the Iguana
+  cinema and title as before.
+
+Debug aid: `T2_SCENE_LOG=1` (with `T2_STATE_LOG=N`) prints the first player's camera (position,
+view box, far clip, FOV, visibility mask, region), `gCameraVisibleBox`/`gCameraViewBox`, the
+camera's animation box, and the level, the grid sections (`m_nSectors` is 0 between frames: it is
+filled by `CScene__LoadVisibleGridSections` in the draw), the difficulty mask and the cheat flags.
+
+Next on this path: the animated actors (section 3; the player's weapon, enemies, pickups), the water
+surface (a translucent level actor, not checked), demo 1's brightness, and
+`CScene__BuildGeometryDisplayList` (multiplayer: reads the camera list at `&difficulty - 0x1210`).
