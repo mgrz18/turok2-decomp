@@ -1563,7 +1563,13 @@ void SndSeq_UpdateVolume(SndSeq *s) {
 /* func_00276D98 (Shape_typemap_110: the sound player through GetSndPlayer(m) = m + 0x84; with
  * the N64 offset that allocation wrote into the bank pointers and the sound player's event
  * queue: r4's evtq corruption) */
+/* The speech sound's wave table: on the N64 an ALWaveTable at 0x800F55F0 (gAudioWorld + 0x303C,
+ * past the N64 CAudioWorld; the host CAudioWorld covers that offset), which sSpeechSound's
+ * wavetable pointer names and SpeechPlayer_Update fills (base = the stream, type 2 = adec). */
+static ALWaveTable sSpeechWave;
+
 void SpeechPlayer_Construct(T2SpeechPlayer *sp, CAudioWorld *m) {
+    sSpeechSound.wavetable = &sSpeechWave;
     sp->owner = m;
     sp->request = -1;
     sp->loop = -1;
@@ -1669,29 +1675,59 @@ s32 SpeechPlayer_PickEntry(T2SpeechPlayer *sp, s16 id, s16 avoid) {
     return entry;
 }
 
-/* func_002768D0 (PlayerRecAt24 view). State 1 opens an adec stream (adecStreamOpen and the
- * adec globals D_800F55F4, written through N64-offset views): the adec player is not typed for
- * the host yet, so a speech request ends at once (state 0) and says so once. */
+/* func_002768D0 (PlayerRecAt24 view; D_800F55F4 = the speech wave table's len/type/waveInfo).
+ * State 1 opens the song's adec stream (t2audio_adec.c) and plays sSpeechSound with it: the
+ * song header's first word / 100 scales the volume, its u16 at 4 is the FX mix; the stream's
+ * length becomes the sound's decay time and its rate the pitch (rate / 22050). State 3 is
+ * playing (the N64 calls adecGetStopFlag there and drops the result). */
+u32 adecStreamOpen(void *source, u32 divisor, s32 *rate);
+s32 adecGetStopFlag(void);
+void adecClearStopFlag(void);
 void SpeechPlayer_Update(T2SpeechPlayer *sp) {
-    static int warned;
     ALSndPlayer *pl;
     CAudioWorld__Lock(sp->owner);
     pl = CAudioWorld__GetSndPlayer(sp->owner);
     switch (sp->state) {
+    case 3:
+        adecGetStopFlag();
+        break;
     case 2:
         alSndpSetSound(pl, (s16)sp->sndId);
         if (alSndpGetState(pl) == 0) {
+            adecClearStopFlag();
             sp->state = (sp->loop >= 0) ? 1 : 0;
         }
         break;
-    case 1:
-        if (!warned) {
-            warned = 1;
-            fprintf(stderr, "t2audio: speech (adec stream, song %d) not played on the host yet\n", sp->song);
-        }
+    case 1: {
+        s32 index = sp->song * 2, rate;
+        const u8 *header;
+        u32 tempo;
+        u16 vol;
+        f32 fx;
+        void *stream;
+        sSpeechWave.len = 0;
+        sSpeechWave.type = 2;
+        sSpeechWave.waveInfo.adpcmWave.loop = NULL;
+        header = CISet__GetBlock(sp->owner->node2B50, index);
+        memcpy(&tempo, header, 4);
+        memcpy(&vol, header + 4, 2);
+        sp->tempoScale = (f32)tempo * 0.01f;
+        sp->volume = (f32)vol;
+        stream = CISet__GetBlock(sp->owner->node2B50, index | 1);
+        sSpeechWave.base = stream;
+        sSpeechSound.envelope->decayTime = (ALMicroTime)adecStreamOpen(stream, 22050, &rate);
+        sp->state = 3;
+        alSndpSetSound(pl, (s16)sp->sndId);
+        alSndpSetPitch(pl, (f32)rate * 4.5351473e-05f);
+        alSndpSetVol(pl, (s16)(s32)((f32)sp->speed * sp->tempoScale));
+        alSndpSetPan(pl, (u8)sp->pan);
+        alSndpSetPriority(pl, (s16)sp->sndId, 0x7F);
+        fx = sp->volume;
+        alSndpSetFXMix(pl, (u8)(u32)fx);
+        alSndpPlay(pl);
         sp->loop = -1;
-        sp->state = 0;
         break;
+    }
     default:
         break;
     }

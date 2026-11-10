@@ -254,6 +254,13 @@ set(T2_LINK_REPLACED
     func_002928F0.c   # __initChanState
     func_00292844.c   # __initFromBank
     func_00292B94.c   # __seqpStopOsc
+    # the adec speech decoder and its loader pull (views at N64 offsets, the frame pointer in an
+    # s32): port/audio/t2audio_adec.c (docs/port/AUDIO.md §10)
+    func_002A1170.c   # adecStreamOpen
+    func_002A122C.c   # adecNextFrame
+    func_002A12CC.c   # adecGetStopFlag
+    func_002A12DC.c   # adecClearStopFlag
+    func_0029F958.c   # alAdecPull
     # the scheduler, typed for the host (port/game/t2sched.c: its views overran on LP64)
     func_0028A020.c   # __scMain
     func_0028A17C.c   # __scHandleRetrace
