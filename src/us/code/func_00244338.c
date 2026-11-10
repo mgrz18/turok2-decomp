@@ -3,6 +3,9 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "globals/scene.h"
+#ifdef TARGET_PORT
+sptr CScene__GetPathRegion(s32 ref);
+#endif
 
 typedef struct {
     /* 0x00 */ CVector3 pos;
@@ -156,7 +159,11 @@ void AI_GetPathTargetInfo(CGameObjectInstance *self, CAI *plan, CGameObjectInsta
             loc = CPathTrack__GetCurrentPoint(&plan->m_PathTrack.m_Mode);
             pos = loc->pos;
             gap = 0.0f;
+#ifdef TARGET_PORT
+            region = CScene__GetPathRegion(loc->region); /* the region index (func_0042CD04.c) */
+#else
             region = loc->region;
+#endif
             if (plan->m_PathTrack.m_Mode == 2 || plan->m_PathTrack.m_Mode == kind) {
                 boost = 1;
             }

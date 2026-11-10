@@ -3,6 +3,9 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "globals/scene.h"
+#ifdef TARGET_PORT
+sptr CScene__GetPathRegion(s32 ref);
+#endif
 
 
 typedef struct {
@@ -145,7 +148,11 @@ s32 AI_UpdatePathHeading(CGameObjectInstance *self, Plan *plan, CGameObjectInsta
     case 4:
         loc = CPathTrack__GetCurrentPoint(&plan->location);
         pos = loc->pos;
+#ifdef TARGET_PORT
+        region = CScene__GetPathRegion(loc->region); /* the region index (func_0042CD04.c) */
+#else
         region = loc->region;
+#endif
         break;
     case 3:
         pos = plan->pos;

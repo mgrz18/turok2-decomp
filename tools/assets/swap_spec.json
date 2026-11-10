@@ -80,7 +80,7 @@
 
   "RegionVertex": {"op": "struct", "fields": "s32[4]:xyzw"},
   "PackedRegion": {"op": "struct", "fields": "u16:info u16:flags u16[3]:vertex u16[3]:neighbour s32:visBits"},
-  "PathItem": {"op": "struct", "fields": "f32[3]:pos s32:region f32[3]:data"},
+  "PathItem": {"op": "struct", "fields": "f32[3]:pos s32:region f32:rotY u16:flags u16:flagsA u16:flagsB u16:unk1A"},
   "AnimInstance": {"op": "struct", "fields": "s32:unused f32[3]:pos f32[3]:scale u16:object u16:type u16:region u16:intelligence s16:rotY u8:flags u8:sound"},
   "CompactStatic": {"op": "struct", "fields": "s32:vis f32:scale u16:object u16:region u16:flags u16:intelligence s16:y s8[6]:extents u8:bits u8:x u8:z pad[1]"},
   "StaticObject": {"op": "struct", "fields": "s32:vis f32[3]:pos f32[3]:scale u16[6]:halfExtents u16:object u16:region u16:intelligence u8:flags s8[4]:quat pad[1]"},
