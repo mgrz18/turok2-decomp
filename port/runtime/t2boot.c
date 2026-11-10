@@ -37,6 +37,7 @@ void t2os_set_stack_allocator(void *(*alloc)(size_t size));
 extern u32 osMemSize;
 extern s32 osTvType;
 extern s32 osResetType;
+extern s32 gWarmBoot;
 extern s32 gThreadPriorityMain, gThreadPriorityScheduler, gThreadPriorityLoader, gThreadPriorityCache,
     gThreadPriorityAudio, gThreadPriorityDecompressorLow, gThreadPriorityDecompressorHigh, gThreadPriorityIdle,
     gThreadPriorityIdleInit;
@@ -187,6 +188,12 @@ int T2Port_Boot(const T2PortConfig *cfg) {
     osMemSize = 0x800000;
     set_if_zero(&osTvType, 1); /* NTSC */
     osResetType = 0;           /* cold boot */
+    /* main (func_0028D380, not linked) sets gWarmBoot = 1 when the boot marker in RDRAM does not
+     * match, i.e. on power-on (the name is the opposite of what it means: globals/frame.h);
+     * CEngineApp__Construct then clears the saved players and runs GameSettings_SetDefaults
+     * (music/sfx volumes 0xFF/0xFA, difficulty, HUD alpha, multiplayer rules). Without it every
+     * setting stayed 0: the music played at volume 0. */
+    gWarmBoot = 1;
     set_if_zero(&gThreadPriorityIdleInit, 10);
     set_if_zero(&gThreadPriorityDecompressorLow, 11);
     set_if_zero(&gThreadPriorityMain, 13);

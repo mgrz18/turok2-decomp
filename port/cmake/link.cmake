@@ -221,6 +221,39 @@ set(T2_LINK_REPLACED
     func_00290EF0.c   # alCSPStop
     func_00296690.c   # alResampleParam
     func_0026FFA0.c   # AudioDMA_CacheBlock
+    # libultra's compressed sequence player, cseq.c and the shared seqplayer.c helpers (Rage Wars
+    # views at N64 offsets, s32 pointers): port/audio/t2audio_csp.c (docs/port/AUDIO.md §9)
+    func_0028FA10.c   # alCSPNew
+    func_00290C60.c   # __CSPPostNextSeqEvent
+    func_00290D5C.c   # __CSPSetUsptFromTempo
+    func_00290CCC.c   # __CSPRepostEvent
+    func_00290ACC.c   # __CSPHandleMetaMsg
+    func_0028F460.c   # __getTrackByte
+    func_0028F98C.c   # __readVarLen
+    func_0028F518.c   # alCSeqNew
+    func_0028EF90.c   # __alCSeqGetTrackEvent
+    func_0028F61C.c   # alCSeqNextEvent
+    func_0028F910.c   # __alCSeqNextDelta
+    func_0028F71C.c   # alCSeqTicksToSec
+    func_0028F784.c   # alCSeqSecToTicks
+    func_0028F710.c   # alCSeqGetTicks
+    func_0028F1F0.c   # alCSeqNewMarker
+    func_0028F828.c   # alCSeqSetLoc
+    func_0028F89C.c   # alCSeqGetLoc
+    func_0029247C.c   # __mapVoice
+    func_002924CC.c   # __unmapVoice
+    func_002925E0.c   # __lookupVoice
+    func_00292640.c   # __lookupSoundQuick
+    func_00292774.c   # __vsVol
+    func_002927E8.c   # __vsDelta
+    func_00292804.c   # __vsPan
+    func_00292A74.c   # __seqpReleaseVoice
+    func_00292530.c   # __voiceNeedsNoteKill
+    func_00292A20.c   # __setInstChanState
+    func_002929A0.c   # __resetPerfChanState
+    func_002928F0.c   # __initChanState
+    func_00292844.c   # __initFromBank
+    func_00292B94.c   # __seqpStopOsc
     # the scheduler, typed for the host (port/game/t2sched.c: its views overran on LP64)
     func_0028A020.c   # __scMain
     func_0028A17C.c   # __scHandleRetrace
