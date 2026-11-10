@@ -92,7 +92,7 @@ static __inline__ s32 countVerts(s32 *src) {
 /* The do { } while (0) blocks around the clearing loop and the copy weight
  * total's references (GCC counts refs by loop depth), so total gets $s4
  * before blk, as in the ROM. */
-s32 **Lighting_BuildLitVertices(s32 model, s32 *regions, Box3 *box, sptr arg3, s32 arg4) {
+s32 **Lighting_BuildLitVertices(sptr model, s32 *regions, Box3 *box, sptr arg3, s32 arg4) {
     WRec *recs[64];
     s32 count;
     s32 size;

@@ -258,6 +258,16 @@ def _work(job):
         name = ref.spelling
         if name.startswith('__builtin'):
             return
+        # an asm label (`s32 f_alias(s32) __asm__("Real")`) calls the function it names
+        try:
+            mn = ref.mangled_name or ''
+        except Exception:  # noqa: BLE001
+            mn = ''
+        mn = mn.lstrip('\x01')
+        if sys.platform == 'darwin' and mn.startswith('_'):
+            mn = mn[1:]
+        if mn and mn != name and re.match(r'^[A-Za-z_]\w*$', mn):
+            name = mn
         ft = ref.type.get_canonical()
         proto = ft.kind == _ci.TypeKind.FUNCTIONPROTO
         argsx = list(c.get_arguments())
