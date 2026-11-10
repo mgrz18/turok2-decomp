@@ -164,7 +164,7 @@
      {"op": "uset", "transposed": true, "elem": {"op": "cstruct", "name": "CRegionInfo"}},
      {"op": "uset", "transposed": true, "elem": "@RegionVertex"},
      {"op": "uset", "transposed": true, "elem": "@PackedRegion"},
-     {"op": "uset", "transposed": true, "elem": "unk[20]:table3"}
+     {"op": "uset", "transposed": true, "elem": "f32[4]:rect u32:count"}
   ]},
   "level paths": {"op": "iset", "each": {"op": "iset", "entries": [{"op": "unk", "note": "path group block 0 (8 bytes)"}, {"op": "uset", "elem": "@PathItem"}]}},
   "animated instances": {"op": "uset", "transposed": true, "elem": "@AnimInstance"},
