@@ -143,7 +143,8 @@ void T2Port_LogState(int frame) {
 /* T2_GIVE_WEAPONS=1 (game.cpp, every frame; DEBUG-ONLY, round 7 v2): in gameplay (mode 13, a
  * level loaded) every active player gets every weapon of gWeaponInfoTable that can be used on
  * land or under water, with full ammo (CPlayer__FillAllAmmo), once per player and level. To
- * test firing and the weapons without finding their pickups; not a game option. */
+ * test firing and the weapons without finding their pickups; not a game option. T2_WEAPON=<n>
+ * also requests weapon n, T2_WEAPON_LIST=1 prints the weapon table. */
 void T2Port_GiveWeapons(void) {
     extern s32 CPlayer__FillAllAmmo(CPlayer *);
     static CPlayer *sGiven[4];
@@ -186,6 +187,10 @@ void T2Port_GiveWeapons(void) {
             }
         }
         CPlayer__FillAllAmmo(p);
+        if (getenv("T2_WEAPON") != NULL) {
+            /* T2_WEAPON=<n>: request weapon n (the weapon actor switches to it as from the wheel) */
+            p->m_RequestedWeapon = (s16) atoi(getenv("T2_WEAPON"));
+        }
         if (getenv("T2_WEAPON_LIST") != NULL) {
             /* T2_WEAPON_LIST=1: the weapon table (name, flags, model, first ammo class) */
             for (i = 0; i < 35; i++) {
