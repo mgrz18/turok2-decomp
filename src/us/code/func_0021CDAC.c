@@ -21,7 +21,11 @@ typedef struct AnimChannel {
     /* 0x0A */ s8 active;
     /* 0x0B */ s8 blending;
     /* 0x0C */ u32 loopStart;
+#ifdef TARGET_PORT
+    /* 0x10 */ void *resource; /* CAnimationState.pmeAnimData */
+#else
     /* 0x10 */ s32 resource;
+#endif
 } AnimChannel;
 
 typedef struct KeyLookup {
@@ -36,6 +40,27 @@ typedef struct KeyLookup {
     /* 0x20 */ f32 frac;
 } KeyLookup;
 
+#ifdef TARGET_PORT
+typedef struct AnimObject {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_AnimObject(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_def[T2_HOFF_AnimObject(header.m_pIntelligence)]; s32 *def; }; /* N64 0x14 */
+        struct { u8 _hp_mtx[T2_HOFF_AnimObject(m_mfOrient)]; f32 mtx[4][4]; }; /* N64 0x58 */
+        struct { u8 _hp_animIndex[T2_HOFF_AnimObject(m_pmtDrawMtxs)]; sptr animIndex; }; /* N64 0x98: the MtxPool block, a pointer */
+        struct { u8 _hp_animFile[T2_HOFF_AnimObject(m_rpAnims)]; sptr animFile; }; /* N64 0xA8: a ROM address */
+        struct { u8 _hp_animCount[T2_HOFF_AnimObject(m_nAnims)]; s16 animCount; }; /* N64 0xBA */
+        struct { u8 _hp_flags[T2_HOFF_AnimObject(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_channel[T2_HOFF_AnimObject(m_CurrentAnimation)]; AnimChannel channel; }; /* N64 0xD8 */
+        struct { u8 _hp_blendChannel[T2_HOFF_AnimObject(m_BlendAnimation)]; AnimChannel blendChannel; }; /* N64 0xEC */
+        struct { u8 _hp_hasEffects[T2_HOFF_AnimObject(m_ActiveSwooshes)]; u8 hasEffects; }; /* N64 0x10F */
+        struct { u8 _hp_attachMask[T2_HOFF_AnimObject(m_AI.m_VisBits)]; u32 attachMask; }; /* N64 0x14C */
+        struct { u8 _hp_owner[T2_HOFF_AnimObject(m_AI.m_pParent)]; struct AnimObject *owner; }; /* N64 0x1A8 */
+        struct { u8 _hp_hasAttachments[T2_HOFF_AnimObject(m_dwHotPointFlags)]; s32 hasAttachments; }; /* N64 0x27C */
+    };
+} AnimObject;
+#else
 typedef struct AnimObject {
     /* 0x000 */ u8 pad0[0x14];
     /* 0x014 */ s32 *def;           /* type id first */
@@ -59,15 +84,25 @@ typedef struct AnimObject {
     /* 0x1AC */ u8 pad1AC[0xD0];
     /* 0x27C */ s32 hasAttachments;
 } AnimObject;
+#endif
 
 /* What CGameObjectInstance__PoseBone reads to pose the skeleton. */
 typedef struct PoseContext {
     /* 0x00 */ AnimObject *obj;
+#ifdef TARGET_PORT
+    /* the bone matrices (PoseBone's `out`): pointer-wide on the host */
+    /* 0x04 */ sptr animIndex;
+#else
     /* 0x04 */ s32 animIndex;
+#endif
     /* 0x08 */ void *bones;
     /* 0x0C */ s32 *anims;
     /* 0x10 */ s32 *file;
+#ifdef TARGET_PORT
+    /* 0x14 */ sptr arg2;
+#else
     /* 0x14 */ s32 arg2;
+#endif
     /* 0x18 */ AnimChannel *channel;
     /* 0x1C */ AnimChannel *blendChannel;
     /* 0x20 */ KeyLookup keys;
@@ -81,7 +116,14 @@ typedef struct PoseContext {
     /* 0x80 */ s32 f80;
     /* 0x84 */ s32 f84;
     /* 0x88 */ s32 f88;
+#ifdef TARGET_PORT
+    /* as CGameObjectInstance__PoseBone's view (func_0021B95C.c) */
+    /* 0x8C */ u8 *boneData;
+    /* 0x90 */ s32 bone;
+    /* 0x94 */ u8 pad94[4];
+#else
     /* 0x8C */ u8 pad8C[0xC];
+#endif
 } PoseContext;
 
 /* A profile slot (osGetCount timings). */
@@ -123,7 +165,11 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2
     u8 bones[0x2000];
     f32 mtx[4][4];
     s32 *anims;
+#ifdef TARGET_PORT
+    sptr *handle; /* *handle: the animation table's data, a pointer */
+#else
     s32 *handle;
+#endif
     s32 ok;
     s32 hidden;
     s32 isType9;
@@ -150,7 +196,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2
     hidden = obj->flags & 1;
     isType9 = *obj->def == 9;
     inCinema = 0;
-    handle = (s32 *) CCache__Request(0, obj->animFile, ((obj->animCount * 4) + 0xF) & ~7, 4, 0, 0, D_800A5AF8 + 4, 0);
+    handle = (void *) CCache__Request(0, obj->animFile, ((obj->animCount * 4) + 0xF) & ~7, 4, 0, 0, D_800A5AF8 + 4, 0);
     if (handle != NULL) {
         channel = &obj->channel;
         blendChannel = &obj->blendChannel;

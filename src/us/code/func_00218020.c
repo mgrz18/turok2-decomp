@@ -2,6 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#ifdef TARGET_PORT
+/* bit addresses are offsets from the stream base on the host (func_00217B04.c) */
+extern unsigned long gT2BitStreamBase;
+#endif
 
 f32 Bits_ReadFloat(u32 *stream, Func802608ECResult range) {
     u32 bitAddress;
@@ -18,8 +22,12 @@ f32 Bits_ReadFloat(u32 *stream, Func802608ECResult range) {
     bitAddress = *streamPtr;
     local.range = range;
     width = local.range.value;
+#ifdef TARGET_PORT
+    word = (u32 *) ((gT2BitStreamBase + (((u32) bitAddress >> 3) & ~3u)));
+#else
     word = (u32 *) ((bitAddress & 0xF0000000) |
                     ((bitAddress & 0x0FFFFFE0) >> 3));
+#endif
     shift = bitAddress & 0x1F;
     value = word[0];
     next = word[1];

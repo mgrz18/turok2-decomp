@@ -24,6 +24,29 @@
 
 typedef struct Actor Actor;
 
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+struct Actor {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Actor(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_Actor(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_region[T2_HOFF_Actor(header.m_pCurrentRegion)]; CGameRegion *region; }; /* N64 0x10 */
+        struct { u8 _hp_height[T2_HOFF_Actor(m_CollisionYOffset)]; f32 height; }; /* N64 0x54 */
+        struct { u8 _hp_matrix[T2_HOFF_Actor(m_mfOrient)]; u8 matrix[0x40]; }; /* N64 0x58 */
+        struct { u8 _hp_animFile[T2_HOFF_Actor(m_rpObject)]; sptr animFile; }; /* a ROM address, pointer-wide */ /* N64 0xA4 */
+        struct { u8 _hp_animIndex[T2_HOFF_Actor(m_rpObjectHeader)]; s32 animIndex; }; /* N64 0xB0 */
+        struct { u8 _hp_boxMin[T2_HOFF_Actor(m_vMin)]; f32 boxMin[3]; }; /* N64 0xBC */
+        struct { u8 _hp_boxMax[T2_HOFF_Actor(m_vMax)]; f32 boxMax[3]; }; /* N64 0xC8 */
+        struct { u8 _hp_flags[T2_HOFF_Actor(m_dwFlags)]; s32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_lights[T2_HOFF_Actor(m_Lights)]; u8 lights[2][0x18]; }; /* N64 0x110 (CLights1[2]) */
+        struct { u8 _hp_ai[T2_HOFF_Actor(m_AI)]; u8 ai[0xF4]; }; /* N64 0x140 */
+        struct { u8 _hp_draw[T2_HOFF_Actor(m_AI.m_pfDraw)]; void (*draw)(Actor *, void *, CDrawArgs *); }; /* N64 0x234 */
+        struct { u8 _hp_update[T2_HOFF_Actor(m_AI.m_pfCalculateOrientationMatrix)]; void (*update)(Actor *, void *); }; /* N64 0x244 */
+    };
+};
+#else
 struct Actor {
     u8 pad0[0x4];
     CVector3 pos;               /* 0x04 */
@@ -45,6 +68,7 @@ struct Actor {
     u8 pad238[0xC];
     void (*update)(Actor *, void *);            /* 0x244 */
 };
+#endif
 
 extern char D_800A5AC4[];   /* "anim object info" */
 

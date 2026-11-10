@@ -50,6 +50,24 @@ typedef struct PoseObject PoseObject;
 typedef struct PoseContext PoseContext;
 typedef void (*PoseCallback)(f32 (*)[4], PoseContext *);
 
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+struct PoseObject {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_PoseObject(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_PoseObject(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_region[T2_HOFF_PoseObject(header.m_pCurrentRegion)]; CGameRegion *region; }; /* N64 0x10 */
+        struct { u8 _hp_def[T2_HOFF_PoseObject(header.m_pIntelligence)]; s32 *def; }; /* N64 0x14 */
+        struct { u8 _hp_height[T2_HOFF_PoseObject(m_CollisionYOffset)]; f32 height; }; /* N64 0x54 */
+        struct { u8 _hp_flags[T2_HOFF_PoseObject(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_blend[T2_HOFF_PoseObject(m_Blend)]; f32 blend; }; /* N64 0x104 */
+        struct { u8 _hp_part[T2_HOFF_PoseObject(m_AI)]; TwistPart part; }; /* N64 0x140 */
+        struct { u8 _hp_callback[T2_HOFF_PoseObject(m_AI.m_pfEffects)]; PoseCallback callback; }; /* N64 0x248 */
+    };
+};
+#else
 struct PoseObject {
     /* 0x000 */ u8 pad0[4];
     /* 0x004 */ CVector3 pos;
@@ -66,6 +84,7 @@ struct PoseObject {
     /* 0x164 */ u8 pad164[0xE4];
     /* 0x248 */ PoseCallback callback;
 };
+#endif
 
 struct PoseContext {
     /* 0x00 */ PoseObject *obj;
@@ -73,7 +92,11 @@ struct PoseContext {
     /* 0x08 */ f32 (*bones)[4][4];
     /* 0x0C */ void *anims;
     /* 0x10 */ void *file;
+#ifdef TARGET_PORT
+    /* 0x14 */ sptr arg2;
+#else
     /* 0x14 */ s32 arg2;
+#endif
     /* 0x18 */ void *channel;
     /* 0x1C */ void *blendChannel;
     /* 0x20 */ KeyLookup keys;
