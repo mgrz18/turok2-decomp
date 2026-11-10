@@ -42,7 +42,11 @@ extern f32 Random_Blend(f32 lo, f32 hi);
 extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
+#ifdef TARGET_PORT
+#define D_8012F604 (*(LevelScriptF604 *) &D_8012F604) /* the view over the typed block (globals/boss.h); NOT host offsets: Primagen_UpdateMode19 still reads N64 offsets */
+#else
 extern LevelScriptF604 D_8012F604;
+#endif
 typedef struct {
     /* 0x00 */ s32 unk0;   /* 0x8012F9D4 */
     /* 0x04 */ s32 state;  /* 0x8012F9D8 */

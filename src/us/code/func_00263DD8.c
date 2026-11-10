@@ -1,4 +1,6 @@
 #include "structs/vector.h"
+#include "common.h"
+#include "structs/game_object.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00206DD4.c, func_00206DD4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -50,6 +52,19 @@ struct M1Def {
                 M1Info info;
 };
 /* Turok 2 LevelActor / state: only the fields used here. */
+#ifdef TARGET_PORT
+struct M1Actor {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_M1Actor(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_M1Actor(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_unk10[T2_HOFF_M1Actor(header.m_pCurrentRegion)]; sptr unk10; }; /* pointer-wide */ /* N64 0x10 */
+        struct { u8 _hp_def[T2_HOFF_M1Actor(header.m_pIntelligence)]; M1Def *def; }; /* N64 0x14 */
+        struct { u8 _hp_f50[T2_HOFF_M1Actor(m_RotY)]; f32 f50; }; /* N64 0x50 */
+    };
+};
+#else
 struct M1Actor {
     u8 pad0[0x4];
     CVector3 pos;      /* 0x4 */
@@ -58,6 +73,27 @@ struct M1Actor {
     u8 pad18[0x38];
     f32 f50;        /* 0x50 (0x6C in Rage Wars) */
 };
+#endif
+#ifdef TARGET_PORT
+struct M1State {
+/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_M1State(m) __builtin_offsetof(CAI, m)
+    union {
+        struct { u8 _hp_flags3C[T2_HOFF_M1State(m_ModeFlags)]; u32 flags3C; }; /* N64 0x3C */
+        struct { u8 _hp_v54[T2_HOFF_M1State(m_vDesiredPos)]; CVector3 v54; }; /* N64 0x54 */
+        struct { u8 _hp_f60[T2_HOFF_M1State(m_RotYLastFrame)]; f32 f60; }; /* N64 0x60 */
+        struct { u8 _hp_f64[T2_HOFF_M1State(m_ConditionTimer)]; f32 f64; }; /* N64 0x64 */
+        struct { u8 _hp_f98[T2_HOFF_M1State(m_InitialRotY)]; f32 f98; }; /* N64 0x98 */
+        struct { u8 _hp_v9C[T2_HOFF_M1State(m_vInitialPos)]; CVector3 v9C; }; /* N64 0x9C */
+        /* m_VarBuffer (by hand: hostview does not map into the union) */
+        struct { u8 _hp_unk110[T2_HOFF_M1State(m_VarS32[1])]; M1IF unk110; }; /* N64 0x110 */
+        struct { u8 _hp_unk114[T2_HOFF_M1State(m_VarS32[2])]; M1IF unk114; }; /* N64 0x114 */
+        struct { u8 _hp_vec118[T2_HOFF_M1State(m_VarF32[3])]; CVector3 vec118; }; /* N64 0x118 */
+        struct { u8 _hp_f124[T2_HOFF_M1State(m_VarF32[6])]; f32 f124; }; /* N64 0x124 */
+    };
+};
+#else
 struct M1State {
     u8 pad0[0x3C];
     u32 flags3C;    /* 0x3C */
@@ -74,6 +110,7 @@ struct M1State {
     CVector3 vec118;
     f32 f124;       /* 0x124 */
 };
+#endif
 f32 SmoothStep(f32 x);
 void CVector3__Lerp(CVector3 *dst, f32 t, CVector3 *src, CVector3 *v);
 f32 CGameRegion__GetHeight(sptr id, f32 x, f32 z);

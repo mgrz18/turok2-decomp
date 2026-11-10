@@ -16,6 +16,38 @@ typedef struct {
 } MotionState;
 
 
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+/* The port: the intelligence from CGameObjectInstance (N64 0x14), the AI's m_ModeTime (N64 0x40). */
+void Platform_AtStartUpdate(u8 *actor_, MotionState *state_) {
+    CGameObjectInstance *actor = (CGameObjectInstance *) actor_;
+    CAI *state = (CAI *) state_;
+    StateInfo *info = (StateInfo *) ((u8 *) actor->header.m_pIntelligence + 0x14);
+    s32 ok = 1;
+
+    if (info->flags & 0x10) {
+        u32 f = state->m_dwFlags & 0x8000000;
+        ok = f != 0;
+    }
+    if (info->flags & 0x100) {
+        if (!(state->m_dwFlags & 0x20000)) {
+            ok = 0;
+        }
+    }
+    if (info->flags & 0x400) {
+        if (state->m_dwFlags & 0x20000) {
+            ok = 0;
+        }
+    }
+    if (ok != 0) {
+        if (state->m_ModeTime >= info->delay) {
+            CAI__SetMode(actor, state, 1);
+        }
+    } else {
+        state->m_ModeTime = 0.0f;
+    }
+}
+#else
 void Platform_AtStartUpdate(u8 *actor, MotionState *state) {
     StateInfo *info = (StateInfo *) (*(u8 **) (actor + 0x14) + 0x14);
     s32 ok = 1;
@@ -42,3 +74,4 @@ void Platform_AtStartUpdate(u8 *actor, MotionState *state) {
         state->timer = 0.0f;
     }
 }
+#endif

@@ -115,7 +115,11 @@ void CGameObjectInstance__Construct(CGameObjectInstance *obj, s32 model, s32 typ
     }
     obj->m_AI.m_pParent = 0;
     if (sound != -1) {
+#ifdef TARGET_PORT
+        CPathTrack__StartAtNearestPoint(&obj->m_AI.m_PathTrack, sound, &obj->header.m_vPos); /* N64 0x1D4 */
+#else
         CPathTrack__StartAtNearestPoint((u8 *) obj + 0x1D4, sound, &obj->header.m_vPos);
+#endif
     }
     world = &gScene;
     CGameObjectInstance__SetupAnimation(obj, world->m_pObjects, world->m_ObjectsKey, animIndex);

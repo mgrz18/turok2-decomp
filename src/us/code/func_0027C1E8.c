@@ -11,7 +11,11 @@ void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 righ
 void CCamera__UpdateFlash(CCamera *cam);
 s32 Cinema_PathPlaying(void);
 void CPlayerPool__DrawHuds(CPlayerPool *list, CCamera *cam);
+#ifdef TARGET_PORT
+void Cinema_DrawOverlay(CCamera *cam); /* returns void: on MIPS its $v0 is the cinema flag or Cinema_DrawFade's; every caller of CCamera__DrawTints drops it */
+#else
 s32 Cinema_DrawOverlay(CCamera *cam);
+#endif
 
 /* The tints over a camera's view (LibTEngine's CCamera DrawTints): the fog
  * colour while its player is under water (AI flags 0x880) or a forced
@@ -82,6 +86,11 @@ found:
         if (Cinema_PathPlaying() == 0 && gEngineApp_m_Game.m_Settings.mode == 13) {
             CPlayerPool__DrawHuds(&gEngineApp_m_Game.m_PlayerList, cam);
         }
+#ifdef TARGET_PORT
+        Cinema_DrawOverlay(cam);
+        return 0;
+#else
         return Cinema_DrawOverlay(cam);
+#endif
     }
 }

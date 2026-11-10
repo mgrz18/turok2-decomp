@@ -30,6 +30,7 @@ extern "C" {
 int T2Port_EngineMode(void);
 void T2Port_LogState(int frame);
 void T2Port_GiveWeapons(void); // DEBUG-ONLY: T2_GIVE_WEAPONS=1 (t2debug.c)
+void T2Port_DebugWarp(int frame);
 void T2Port_DebugSwitches(int skipPak, int startMode);
 }
 
@@ -603,6 +604,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             fflush(stdout);
             mode = m;
         }
+        T2Port_DebugWarp(f + 1); // DEBUG-ONLY: T2_WARP_TO=<id>[@frame][,...]
         if (args.skipPakCheck || args.startMode >= 0) {
             T2Port_DebugSwitches(args.skipPakCheck, args.startMode); // DEBUG-ONLY
         }

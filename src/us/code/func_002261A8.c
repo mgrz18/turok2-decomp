@@ -7,7 +7,11 @@
 #include "structs/world.h"
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, u8 *b);
+#ifdef TARGET_PORT
+void *CISet__GetBlock(s32 *table, s32 index);
+#else
 void *CISet__GetBlock();
+#endif
 s32 func_002261A8(CScene *lv, s32 unused, CVector3 *pt) {
     CVector3 d;
     f32 bestIdx = -1.0f;
@@ -16,7 +20,14 @@ s32 func_002261A8(CScene *lv, s32 unused, CVector3 *pt) {
     s32 *t;
     s32 n;
     u8 *p;
+#ifdef TARGET_PORT
+    /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS the inner CISet__GetBlock gets this
+     * function's second argument in $a1 untouched (the path index, passed down the same way by
+     * CPathTrack__StartAtNearestPoint); the host passes it. */
+    t = CISet__GetBlock(CISet__GetBlock((s32 *) lv->unk_68, unused), 1);
+#else
     t = CISet__GetBlock(CISet__GetBlock(lv->unk_68), 1);
+#endif
     n = t[1];
     p = (u8 *)(t + 2);
     if (n > 0) {

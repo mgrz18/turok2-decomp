@@ -9,6 +9,11 @@
 #include "structs/game_object.h"
 #include "protos/ai.h"
 
+#ifdef TARGET_PORT
+#define T2_AI(e) ((u8 *) &(e)->m_AI) /* the AI by member (N64 0x140) */
+#else
+#define T2_AI(e) ((u8 *)(e) + 0x140)
+#endif
 f32 func_0026841C(CGameObjectInstance *e);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *e);
 s32 Action_CheckRequiredItem(CGameObjectInstance *e, u8 *p, CGameObjectInstance *me);
@@ -135,10 +140,10 @@ void CScene__CheckAutoActivation(CScene *lv, CGameObjectInstance *me, CVector3 *
                         }
                         if (ok != 0) {
                             if (e->header.m_pIntelligence->m_Type == 10 && s2 == 1) {
-                                ok = Action_CheckRequiredItem(e, (u8 *)e + 0x140, me);
+                                ok = Action_CheckRequiredItem(e, T2_AI(e), me);
                             }
                             if (ok != 0) {
-                                CAI__SetMode(e, (u8 *)e + 0x140, s2);
+                                CAI__SetMode(e, T2_AI(e), s2);
                             }
                         }
                     }
@@ -157,7 +162,7 @@ void CScene__CheckAutoActivation(CScene *lv, CGameObjectInstance *me, CVector3 *
                             }
                         }
                         if (ok != 0) {
-                            CAI__SetMode(e, (u8 *)e + 0x140, s3);
+                            CAI__SetMode(e, T2_AI(e), s3);
                         }
                     }
                 }

@@ -37,7 +37,7 @@ extern s32 WeightedTable_Add(PickTable *t, s16 id, s16 weight);
 extern s16 WeightedTable_Pick(PickTable *t);
 
 /* Spawns pool pickup id at pos. */
-static __inline__ void spawnPickup(CGameObjectInstance *actor, CAI *ai, CVector3 pos, s32 region, s32 id) {
+static __inline__ void spawnPickup(CGameObjectInstance *actor, CAI *ai, CVector3 pos, sptr region, s32 id) {
     CPooledLevelActor *pickup;
 
     pickup = CLevelActorPool__Spawn(&gScene.m_ActorPool, &ai->m_Generator.m_nActive, id, actor->m_vVelocity, pos, region, 0.0f);

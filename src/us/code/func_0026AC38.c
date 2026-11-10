@@ -10,10 +10,21 @@ extern float func_002982F0(float x);
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern f32 func_00298470(f32);
+#ifdef TARGET_PORT
+extern void CGameRegion__GetCeilingNormal(CVector3 *, void *);
+#else
 extern void CGameRegion__GetCeilingNormal(CVector3 *);
+#endif
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 extern void CVector3__Scale(CVector3 *, CVector3 *, float);
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CGameRegion__GetCeilingNormal gets the
+ * region in $a1 untouched from this function's own second argument (its only caller,
+ * func_0022CF40, passes the region); the host takes and passes it. */
+Vector4f *CGameRegion__GetCeilingTiltRotation(Vector4f *out, void *region) {
+#else
 Vector4f *CGameRegion__GetCeilingTiltRotation(Vector4f *out) {
+#endif
     CVector3 a;
     CVector3 up;
     CVector3 axis;
@@ -22,7 +33,11 @@ Vector4f *CGameRegion__GetCeilingTiltRotation(Vector4f *out) {
     float angle;
     float scale;
     float one;
+#ifdef TARGET_PORT
+    CGameRegion__GetCeilingNormal(&a, region);
+#else
     CGameRegion__GetCeilingNormal(&a);
+#endif
     one = 1.0f;
     up.x = 0;
     up.y = one;
