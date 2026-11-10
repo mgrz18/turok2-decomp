@@ -96,3 +96,65 @@ Every source fix is under `TARGET_PORT` or a typed rewrite with identical N64 co
   are not in that count. hostview.py makes each one a few seconds of work once a crash names it.
 - Turning: `--input` has no stick; a `SX`/`SY` stick entry would let scripts turn the player.
 - Frames: the 3D scene and the HUD draw nothing in gameplay (section 1); t3.
+
+## 5. Round 6, part u3: turning, the water, the weapon wheel
+
+With the stick in `--input` ([INPUT.md](INPUT.md) section 6) the player turns and can be steered
+through level 51. Fixes (all `TARGET_PORT`, asm_diff 0 against 6d04fabb):
+
+| # | where | cause | fix |
+|---|---|---|---|
+| u3-1 | the player never turns (rotY fixed at -3.14 whatever the stick) | `CPlayer__TurnAndLook` (func_0024EF70) reads the region info's u16 pair at 0x50 (`m_DamageAmount`, `m_wFlags52`) as one big-endian word and tests the low half for 0x2000 (no turning on that floor); the archive swaps the pair as two u16, so the host low half is `m_DamageAmount` (0x2710 in level 51: 0x2710 & 0x6000 = 0x2000) | the view reads the u16 at 0x52 |
+| u3-2 | the weapon wheel's stick picks nothing (requested weapon stays 0) | `CBarrel__RunStick` (func_0024BAD4): the `MenuRow` view puts the items at N64 0x1C with stride 0x18 and reads the weapon id as `half.lo` of a big-endian word (the high half on the host) | host body on `CBarrelItem` (`m_Items[slot]`, `(s16) m_Weapon`) |
+| u3-3 | the weapon actor never runs its AI (mode 0 for ever) | `CPlayerPool__AnimateWeapons` (func_00252ADC) and `CPlayerPool__GetViewPlayer` (func_00254B04) test camera word N64 0x54C (`m_Menus.count`) at the raw offset: non-zero on the host, so "a menu is open" | `CCamera.m_Menus.count` by member |
+| u3-4 | (gameplay path, found reading) | `CGameObjectInstance__MoveWithCollision` (func_0021A658): ObjectLinks23C/CallbackState288 views at N64 offsets (flags 0xD4, the mode's collision info, path-avoid region, anim type, collision callback); `CGameObjectInstance__FireAnimEvents` (func_0021ABC8) ObjectLinks | host body on `CGameObjectInstance`; hostview.py for ObjectLinks plus `anim` = `m_CurrentAnimation` by hand |
+| u3-5 | (surfacing) | `PlayerSwim_Update` (func_00250BF0) plays the gasp at `((Ui *) m_pCamera)->pos` = N64 0x114 | `m_pCamera->m_vPos` |
+
+**The water is not a bug.** The round-5 "stuck in state 9 at (-1266.6, -779.5, 260.0)" is a
+corner: walking straight on (rotY -3.14, no turning possible before u3-1) the player goes down
+the ramp, swims (state 11) under the surface, surfaces into state 9 (treading water: wade
+tuning, the surface at y -779.5 over a floor at -1228.8) and slides along the walls into a
+corner. Turned right (`SX=80` for 25 frames, rotY -1.55) he crosses the basin to x 358
+(frame 13800), where the next wall stops him. t1's run went to x 772 because its tree had no
+static-object collision yet (t3's grid sections were not merged), not because the swim path
+differs. Journey (this branch, `T2_STATE_LOG=60`, the script in INPUT.md section 6):
+
+```
+12903 mode 13 level 51, (-1540.7 -566.4 -1481.6) state 2
+13080 (-1540.7 -735.8  -982.4) state 3, down the ramp
+13140 (-1157.1 -879.0  -911.3) state 11, swimming under water (floor -1228.8)
+13200 (-1111.0 -779.6  -603.6) state 9, at the surface
+13440 (-1266.6 -779.5   260.0) the corner; turn right
+13560 ( -872.6 -779.5    58.6) rotY -1.55
+13800 (  358.4 -779.5   -52.5) the far wall (slides 0.12/frame)
+14100 wheel open (A + stick right): requested weapon 2; Z fires: no crash
+```
+
+Frames with u1's branch merged on top (scratch only): frame 13051 the stone ramp down to the
+harbour, the brick walls, the hanging lamp and boxes; 13501 a wooden pier against the wall at
+the corner; 13801 a close-up of the rock at the far wall (that scratch run stopped at frame 14400, no crash). This branch alone runs the same script to frame 15000 without a crash.
+
+**Weapons.** The wheel opens and closes (state 1, 2, 3) with A or B, the stick picks a slot
+(u3-2), `m_RequestedWeapon` follows; `CBarrel__OpenWheel` no longer crashes. The switch and
+firing need the weapon actor's animation: after u3-3 the weapon AI runs (mode 1, raising) but
+waits for `m_AI.m_AnimRepeatedCount`, and the actor's animation never loads because
+**`m_nAnims` is 0 for every actor**: `CGameObjectInstance__SetupAnimation` (func_0021A150,
+host body) reads it as `((u16 *) block1)[3]`, the low half of the second big-endian word;
+the archive swaps that block as words, so on the host `[3]` is the high half, 0 (the block
+reads 4, 6, 20000, 20010 as words: the weapon has 6 animations). Reading
+`(u16) ((u32 *) block1)[1]` fixes it (tested), **but it is not committed**: with animations
+loading, the animation events fire, and `CGameObjectInstance__FireAnimEvents` ->
+`ImpactEvent_Send` -> `Actor_SpawnParticle` -> `CParticleSystem__Spawn` (func_0022D2FC) crashes
+at frame 1362 (the Acclaim cinema): `EffectSystem` (sys->resource at N64 0xEC64; hostview.py
+maps it, the resource must be `sptr`) and then the `Effect`/`Owner`/`Actor` views and the
+particle table entries (`entry->params`) are all N64 layouts. Port the particle spawn first,
+then apply the m_nAnims fix (with u2's animation chain: AdvanceAnimation, UpdateAnimation,
+func_0021A500, RootActor, the bit readers, which u2 committed in its branch).
+
+Not done (the C20-1 sweep): only the sites the player path hit were fixed (u3-1..5). Remaining
+known views on this path: `CPlayerPool__UpdateMatchClock` (func_0025492C), `Action_CheckRequiredItem`
+(func_00265F90), func_00271694, `GameObject_GetRegionInfo` (func_00268A2C: the region read as
+s32 at 0x10, a pointer truncation on macOS), `CParticleSystem__Spawn` (above), the region info's
+`unk_48` bytes (0x48 warp ID and 0x4C pending warp are u16 read by `CPlayer__Update`'s `Surface`
+view, but `swap_spec.json` keeps them as bytes: warps between levels will read byte-reversed IDs;
+type them in `structs/region.h` and rebuild the archive).

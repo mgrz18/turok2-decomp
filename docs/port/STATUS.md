@@ -186,6 +186,22 @@ clock), `Action_CheckRequiredItem` (func_00265F90, the camera pool), func_002716
 7. **ABI**: abicheck's 185 `ptr_from_int` sites (the macOS truncations), 6 missing_args, 2
    void_used; function-pointer calls (184 sites, the handler tables) are not checked yet.
 
+## Round 6, part u3: player input, the water, the weapon wheel (branch names-R6_u3)
+
+Details and the fix table u3-1..5: [GAMEPLAY.md](GAMEPLAY.md) section 5, [INPUT.md](INPUT.md)
+section 6. `--input` now takes held ranges (`CU@13000..13440`), the stick (`SX=80@13450..13474`,
+`SY=...`) and `@FILE` scripts. The player turns (the region-info word bug, u3-1), the water was
+a corner, not a merge regression: steered, he swims across the level-51 basin to x 358. The
+weapon wheel opens with A/B and the stick picks the weapon (u3-2); the weapon actor's AI runs
+(u3-3); switching and firing wait for animations: `m_nAnims` is read as the wrong half of a
+swapped word (fix known, not committed: it exposes a crash in `CParticleSystem__Spawn`'s N64
+views at frame 1362; GAMEPLAY.md section 5). Files the merge may meet: `port/app/game.cpp`,
+`port/app/main.cpp` (usage line), `port/game/t2debug.c` (state log: weapon/wheel fields; u1
+also edits it: auto-merged in my scratch test), func_0024EF70, func_0024BAD4, func_00252ADC,
+func_00254B04, func_00250BF0, func_0021A658, func_0021ABC8 (not touched by u1 or u2's
+branches as of their tips; u2 changes func_0021A344/0021A500/0021A7EC/00218B10 nearby).
+Merged with u1's branch (scratch, not committed) the gameplay frames show the level.
+
 ## Round 5, part t2: the ABI checker and sweep
 
 [ABI.md](ABI.md). `tools/port/abicheck.py --build OUT/build -j 4` parses the 3,099 linked C files
