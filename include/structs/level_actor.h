@@ -29,16 +29,27 @@
 
 /* A static scenery object of the level, 0x90 bytes. */
 typedef struct CStaticObject {
-    /* 0x00 */ CInstanceHeader header;
-    /* 0x18 */ u8 pad18[0x24 - 0x18];
-    /* 0x24 */ void **m_pOwner;
-    /* 0x28 */ u8 pad28[0x68 - 0x28];
+    /* 0x00 */ CInstanceHeader header;  /* m_pCurrentRegion: its segment (region), m_pIntelligence: its descriptor */
+    /* 0x18 */ s32 m_ObjectAddr;        /* the object's ROM address (CISet__GetROMAddress): CStaticObject__LoadGeometry */
+    /* 0x1C */ s32 m_GeometryAddr;      /* its geometry's ROM address, found once */
+    /* 0x20 */ s32 m_GeometrySize;
+    /* 0x24 */ void **m_pOwner;         /* the grid section's cache handle (CScene__DrawGeometry) */
+    /* 0x28 */ f32 m_Matrix[16];        /* an Mtx (CMtxF__ToMtxAffine), or a CMtxF with flag 0x40 */
     /* 0x68 */ CBox m_Bounds;
-    /* 0x80 */ u8 pad80[0x84 - 0x80];
+    /* 0x80 */ s32 m_LitKey;            /* the cache key of its lit vertices (| gLitVerticesKey) */
     /* 0x84 */ s32 m_ViewMask;          /* the views it shows in */
-    /* 0x88 */ u16 m_wFlags;            /* 4: translucent, 8: listed */
-    /* 0x8A */ u8 pad8A[0x90 - 0x8A];
-} CStaticObject; /* size 0x90 */
+    /* 0x88 */ u16 m_wFlags;            /* 4: translucent, 8: listed, 0x40: no geometry */
+    /* 0x8A */ u8 m_LitFrame;           /* the frame its colours were last pulsed */
+    /* 0x8B */ u8 pad8B[0x90 - 0x8B];
+} CStaticObject; /* size 0x90; host 0xA0 */
+#ifdef TARGET_PORT
+/* The files that read a static object through their own view (PlacedProp, SpawnSource, Drawable)
+ * declare a host twin of it; these sizes keep both in step. */
+#define T2_STATIC_OBJECT_CHECK(T, matrix, flags) \
+    _Static_assert(sizeof(T) == sizeof(CStaticObject), #T " size"); \
+    _Static_assert(__builtin_offsetof(T, matrix) == __builtin_offsetof(CStaticObject, m_Matrix), #T " matrix"); \
+    _Static_assert(__builtin_offsetof(T, flags) == __builtin_offsetof(CStaticObject, m_wFlags), #T " flags")
+#endif
 
 /* A level actor, 0x198 bytes: set up from its placement record by
  * CLevelActor__Construct, drawn by CLevelActor__Draw. The first 0x34 bytes are a

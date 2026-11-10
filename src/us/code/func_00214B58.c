@@ -25,7 +25,11 @@ typedef struct {
     /* 0x18 */ s32 owner;
     /* 0x1C */ s32 field1C;
     /* 0x20 */ s32 field20;
+#ifdef TARGET_PORT /* m_pOwner, a pointer */
+    void **resource;
+#else
     /* 0x24 */ s32 resource;
+#endif
     /* 0x28 */ f32 matrix[16];
     /* 0x68 */ f32 min[3];
     /* 0x74 */ f32 max[3];
@@ -34,6 +38,10 @@ typedef struct {
     /* 0x88 */ u16 flags;
     /* 0x8A */ u8 colorFrame;
 } PlacedProp;
+#ifdef TARGET_PORT
+#include "structs/level_actor.h"
+T2_STATIC_OBJECT_CHECK(PlacedProp, matrix, flags);
+#endif
 
 void CMtxF__FromMtxAffine(f32 *, f32 *);
 void CMtxF__TransformPoint(f32 *, CVector3 *, CVector3 *);

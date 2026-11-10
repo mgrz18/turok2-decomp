@@ -128,13 +128,8 @@ s32 Sound__Play_i3(s32 id, s32 x, s32 y, s32 z, s32 follow, s32 owner) {
 }
 
 /* the vector as three u32 words in the definition, three floats in the caller */
-extern s32 Actors_GetLightVolumeFalloff(void *obj, u32 x, u32 y, u32 z, CVector3 *dir, f32 *amount);
-s32 Actors_GetLightVolumeFalloff_f3(void *obj, f32 x, f32 y, f32 z, f32 *dir, f32 *amount) {
-    return Actors_GetLightVolumeFalloff(obj, f_bits(x), f_bits(y), f_bits(z), (CVector3 *) dir, amount);
-}
-s32 Actors_GetLightVolumeFalloff_v(void *obj, CVector3 v, void *dir, f32 *amount) {
-    return Actors_GetLightVolumeFalloff(obj, f_bits(v.x), f_bits(v.y), f_bits(v.z), dir, amount);
-}
+/* Actors_GetLightVolumeFalloff: its host definition takes the point as three floats
+ * (func_002123D4.c, round 5 t3), so its callers need no adapter. */
 
 extern void DLights_GetAtPoint(void *lights, u32 x, u32 y, u32 z, CVector3 *dir, f32 *amount);
 void DLights_GetAtPoint_f3(void *lights, f32 x, f32 y, f32 z, CVector3 *dir, f32 *amount) {

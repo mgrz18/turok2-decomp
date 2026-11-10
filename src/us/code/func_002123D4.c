@@ -5,8 +5,20 @@
 #include "globals/scene.h"
 
 extern void CVector3__Normalize(f32 *);
+#ifdef TARGET_PORT
+/* ABI: the callers pass the point as three floats (SSE registers on x86-64, s registers on arm64),
+ * the ROM's code reads them as words from its argument slots (a1..a3, contiguous in the home
+ * area: *(CVector3 *)&arg1). Here they are floats, kept contiguous in a local. */
+s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, f32 px, f32 py, f32 pz,
+                  CVector3 *arg4, f32 *arg5) {
+    union { f32 f[3]; u32 u[3]; } args_ = {{px, py, pz}};
+#define arg1 args_.u[0]
+#define arg2 args_.u[1]
+#define arg3 args_.u[2]
+#else
 s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, u32 arg1, u32 arg2, u32 arg3,
                   CVector3 *arg4, f32 *arg5) {
+#endif
     f32 temp_f0;
     f32 var_f0;
     f32 var_f1;
@@ -90,3 +102,8 @@ fail:
         return 0;
     }
 }
+#ifdef TARGET_PORT
+#undef arg1
+#undef arg2
+#undef arg3
+#endif

@@ -5,6 +5,9 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "protos/scene.h"
+#ifdef TARGET_PORT
+#include "structs/world.h"
+#endif
 
 
 extern u8 gEngineApp_m_SwooshSystem[];
@@ -35,7 +38,11 @@ void CCamera__DrawScene(CCamera *cam, u8 *world) {
     CScene__DrawRegisteredInstances(world, cam);
     func_00235C30(gEngineApp_m_SwooshSystem, cam);
     if (Cinema_PathPlaying() == 0) {
+#ifdef TARGET_PORT
+        CLevelActorPool__Draw((u8 *) &((CScene *) world)->m_ActorPool, cam);
+#else
         CLevelActorPool__Draw(world + 0x10518, cam);
+#endif
     }
     CScene__DrawSortedList(world, cam);
     CEmitterPool__Draw(cam->m_SkySystem, cam);

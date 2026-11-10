@@ -157,12 +157,19 @@ void CCamera__AdvanceAttributes(CCamera *cam) {
     t = t * (t * 3.0f);
     k = kn + t;
     for (i = 0; i < 4; i++) {
+#ifdef TARGET_PORT /* 0x50C/0x508: the N64 offsets of m_LastFogColor/m_FogColor */
+        last = cam->m_LastFogColor[i];
+        v = last + k * ((f32) target[i] - last);
+        c8 = (u32) (((255.0f < v) ? 255.0f : v) < 0.0f ? 0.0f : ((255.0f < v) ? 255.0f : v));
+        cam->m_FogColor[i] = c8;
+#else
         u8 *colour = (u8 *) cam + i;
 
         last = colour[0x50C];
         v = last + k * ((f32) target[i] - last);
         c8 = (u32) (((255.0f < v) ? 255.0f : v) < 0.0f ? 0.0f : ((255.0f < v) ? 255.0f : v));
         colour[0x508] = c8;
+#endif
     }
     /* The fog start blends as a float, clamped to [0, 995]. */
 #define FOG_START ((f32) (u32) cam->m_LastFogStart + k * ((f32) fogStart - (f32) (u32) cam->m_LastFogStart))

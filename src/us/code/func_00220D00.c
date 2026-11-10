@@ -27,7 +27,15 @@ typedef struct { u8 pad0[8]; u16 type; u8 padA[0x12]; } SrcA;          /* 0x1C *
 typedef struct { u8 pad0[0x28]; u16 type; u8 pad2A[0xA]; } SrcB;       /* 0x34 */
 typedef struct { u8 pad0[0x14]; u16 type; u8 pad16[0xA]; } SrcC;       /* 0x20 */
 typedef struct { u8 pad0[0x48]; } SrcD;                                /* 0x48 */
+#ifdef TARGET_PORT /* the records at their host sizes (structs/level_actor.h) */
+typedef CStaticObject ItemA;
+#define SIZEOF_ITEMA ((s32) sizeof(CStaticObject))
+#define SIZEOF_ACTOR ((s32) sizeof(CLevelActor))
+#else
 typedef struct { u8 pad0[0x90]; } ItemA;                               /* 0x90 */
+#define SIZEOF_ITEMA 0x90
+#define SIZEOF_ACTOR 0x198
+#endif
 typedef struct { u8 pad0[0xC0]; } ItemD;                               /* 0xC0 */
 
 s32 ProPackDecompress(s32 ***, s32);
@@ -97,10 +105,10 @@ void CScene__DecompressGridSection(CScene *world, s32 ***file) {
         tB = CISet__GetBlock(root, 1);
         nB = tB->count;
         n = nA + nB;
-        szA = (n * 0x90) | 8;
+        szA = (n * SIZEOF_ITEMA) | 8;
         tC = CISet__GetBlock(root, 2);
         nC = tC->count;
-        szx = nC * 0x198;
+        szx = nC * SIZEOF_ACTOR;
         szC = szx + 8;
         tD = CISet__GetBlock(root, 3);
         nD = tD->count;
@@ -118,7 +126,7 @@ void CScene__DecompressGridSection(CScene *world, s32 ***file) {
             CUSet__Transpose(tA, sec, 1);
             CUSet__Transpose(tB, sec, 1);
             nv = tA->entries;
-            ((StrideTable *)sec)->stride = 0x90;
+            ((StrideTable *)sec)->stride = SIZEOF_ITEMA;
             ((StrideTable *)sec)->count = n;
             tAux = CISet__GetBlock(world->m_pRegionData, 2);
             pB = (SrcB *)tB->entries;
@@ -148,7 +156,7 @@ void CScene__DecompressGridSection(CScene *world, s32 ***file) {
             secC = base + off;
             block->offsets[block->count] = off;
             CUSet__Transpose(tC, secC, 1);
-            ((StrideTable *)secC)->stride = 0x198;
+            ((StrideTable *)secC)->stride = SIZEOF_ACTOR;
             ((StrideTable *)secC)->count = nC;
             actors = (CLevelActor *)(secC + 8);
             pC = (SrcC *)tC->entries;

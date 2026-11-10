@@ -38,12 +38,51 @@ namespace {
 
 // T2_DLDUMP=1: print the commands of the last frame's display list (following G_DL), for
 // bring-up. Words are host-sized (gfx.h GfxWord).
+// T2_DLDUMP_VTX=1 also prints the vertices of each G_VTX (segments from G_MW_SEGMENT) and the
+// 16 words of each G_MTX (s15.16, Fast3D's host-order int32[16]) (docs/port/RENDER.md).
+uintptr_t sDumpSegments[16];
+void DumpVtxMtx(uint8_t op, uint32_t w0, uintptr_t w1, int depth) {
+    static const bool on = getenv("T2_DLDUMP_VTX") != nullptr;
+    if (!on) {
+        return;
+    }
+    if (op == 0xDB && ((w0 >> 16) & 0xFF) == 0x06) {
+        sDumpSegments[((w0 & 0xFFFF) / 4) & 15] = w1;
+        return;
+    }
+    uintptr_t addr = w1;
+    if (addr & 1) {
+        addr = sDumpSegments[(addr >> 24) & 15] + (addr & 0x00FFFFFE);
+    }
+    if (op == 0x01) {
+        int n = (w0 >> 12) & 0xFF;
+        const int16_t* v = (const int16_t*)addr;
+        for (int i = 0; i < n && i < 4; i++, v += 8) {
+            const uint8_t* c = (const uint8_t*)(v + 6);
+            printf("%*s   v%d ob %d %d %d flag %d tc %d %d cn %02X%02X%02X%02X\n", depth * 2, "", i, v[0], v[1], v[2],
+                   v[3], v[4], v[5], c[0], c[1], c[2], c[3]);
+        }
+    } else if (op == 0xDA) {
+        const int32_t* m = (const int32_t*)addr;
+        printf("%*s   mtx", depth * 2, "");
+        for (int i = 0; i < 16; i++) {
+            // the integer halves (m[0..7], pairs) and the fractions (m[8..15]): element i of row r
+            int r = i / 4, c = i % 4;
+            int32_t ip = (int16_t)(c & 1 ? m[r * 2 + c / 2] & 0xFFFF : (uint32_t)m[r * 2 + c / 2] >> 16);
+            uint32_t fp = c & 1 ? m[8 + r * 2 + c / 2] & 0xFFFF : (uint32_t)m[8 + r * 2 + c / 2] >> 16;
+            printf(" %.3f", ip + fp / 65536.0);
+        }
+        printf("\n");
+    }
+}
+
 void DumpDL(const uintptr_t* dl, int depth, int* budget) {
     for (; *budget > 0; dl += 2) {
         (*budget)--;
         uint32_t w0 = (uint32_t)dl[0];
         uint8_t op = w0 >> 24;
         printf("%*s%02X %08X %016llX\n", depth * 2, "", op, w0, (unsigned long long)dl[1]);
+        DumpVtxMtx(op, w0, dl[1], depth);
         if (op == 0xDE) {
             if (dl[1] & 1) {
                 continue; // segmented: not followed

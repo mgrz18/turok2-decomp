@@ -37,6 +37,7 @@ void t2os_set_stack_allocator(void *(*alloc)(size_t size));
 extern u32 osMemSize;
 extern s32 osTvType;
 extern s32 osResetType;
+extern s32 gWarmBoot;
 extern s32 gThreadPriorityMain, gThreadPriorityScheduler, gThreadPriorityLoader, gThreadPriorityCache,
     gThreadPriorityAudio, gThreadPriorityDecompressorLow, gThreadPriorityDecompressorHigh, gThreadPriorityIdle,
     gThreadPriorityIdleInit;
@@ -187,6 +188,12 @@ int T2Port_Boot(const T2PortConfig *cfg) {
     osMemSize = 0x800000;
     set_if_zero(&osTvType, 1); /* NTSC */
     osResetType = 0;           /* cold boot */
+    /* func_0028D380 on a power-on: no boot signature in RDRAM, so gWarmBoot = 1 ("first boot"),
+     * and CEngineApp__Construct then runs GameSettings_SetDefaults (difficulty mask 0x10, the
+     * HUD alpha, the multiplayer slots...). Left 0, the settings stayed zero: the difficulty
+     * mask CScene__DrawGeometry tests every object's flags against was 0 and no level geometry
+     * was drawn (docs/port/RENDER.md). */
+    gWarmBoot = 1;
     set_if_zero(&gThreadPriorityIdleInit, 10);
     set_if_zero(&gThreadPriorityDecompressorLow, 11);
     set_if_zero(&gThreadPriorityMain, 13);

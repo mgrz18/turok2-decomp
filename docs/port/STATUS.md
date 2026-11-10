@@ -129,8 +129,8 @@ x86-64 and arm64 do not. 31 files use `Triple`; the impact-event handlers
 2. **By-value struct ABI audit**: a checker (libclang over all declarations of each function:
    parameter/return classes on x86-64 and arm64) and then the `Triple` handlers; cheaper than
    finding them one crash at a time.
-3. **Black cinemas**: both intro cinemas run their timing to the end but draw no geometry (no
-   `G_VTX` in their display lists, s2): the cinema scene's draw path.
+3. **Black cinemas**: done for static geometry in round 5 (t3, RENDER.md); animated instances
+   (the Acclaim logo, every actor) need the bone/animation path on the host layout.
 4. **Audio**: a sound effect without gdb crashes in `t2asp.c` `cmd_adpcm` (the ADPCM state
    address, `osVirtualToPhysical`); music stops in `__CSPSetUsptFromTempo` (the `__CSP*`/`alCSeq*`
    player is still m2c views); speech is stubbed (s4).
@@ -198,6 +198,21 @@ Merge notes: 351+ files in `src/` change, almost all on declaration/parameter li
 (`include/rw/abu_protos.h` too). Conflicts are likely with any branch that edits the same
 function headers (t1's enemy AI files, t2's ABI sweep: rerun `ptrdecls.py`/`ptrargs.py` after
 merging instead of resolving by hand), t4's audio files (`func_0029*.c`).
+
+## Round 5, part t3: cinemas and the 3D scene ([RENDER.md](RENDER.md))
+
+The second intro cinema (mode 5, level 44) now **draws**: the Iguana logo in the jungle, the
+camera moving through trees, ferns and the vine, letterboxed (frames 2401-3901). The boot still
+reaches the title (frame 4214) and the attract demo (frame 5465, mode 13, level 81), where it stops
+in `EnemyAI_Update` as before (t1's). 11 fixes, RENDER.md section 1: the region attributes typed
+(far clip / FOV were big-endian: **rebuild the archive**), the grid sections loaded (camera view at
+N64 offsets), `CStaticObject` on the host layout in 9 files, `gWarmBoot = 1` (the settings defaults:
+the difficulty mask was 0), a float/word ABI mismatch in the light volumes, the main camera's frame
+clear over the scene (`m_MainCamera - 0x40`), `sLitVertexOffsets` sized 0x9000 (it overran into
+`gAudioWorld`/`gLoopSounds`). The first cinema (Acclaim logo, level 162) stays black: its logo is an
+animated instance and the actor path (`CGameObjectInstance__Draw` -> `BuildBoneMatrices` ->
+`PoseBone` -> `CAnimationState`) is still on N64 views (RENDER.md section 3; a host
+`CGameObjectInstance__Draw` is ready as a patch). New debug aid: `T2_DLDUMP_VTX=1`.
 
 # Round 3, merged state (history)
 
