@@ -213,7 +213,7 @@ handlers extract from them.
 | 7 charge dart rifle | 30 -> 29 | | 15 grenade launcher | 10 -> 9 |
 | 9 shredder | 10 -> 8 | | 16 scorpion launcher | 12 -> 11 |
 | 10 plasma rifle | 150 -> 145 | | 20 flame thrower | 50 -> 41 |
-| 11 firestorm cannon | 145 -> 140 (shares plasma's ammo) | | 21 razor wind, 22 nuke, 23 flare | fire modes run, ammo unchanged (to check) |
+| 11 firestorm cannon | 145 -> 140 (shares plasma's ammo) | | 21 razor wind, 22 nuke, 23 flare | fire modes run, ammo unchanged (the flare costs 0; razor wind and nuke to check) |
 
 `T2_WEAPON=4` (pistol), Z held 40 frames: ammo 50 -> 44, `--audio --wav`: RMS 200 before the
 first shot, 2,500-4,200 while firing (peak 12,782). The Talon (no `T2_GIVE_WEAPONS`) swings
