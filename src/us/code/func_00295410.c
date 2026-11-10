@@ -9,7 +9,7 @@ extern s32 alAuxBusParam(s32, s32, s32);
 extern void alFilterNew(void *, void *, void *, s32);
 
 /* alAuxBusNew */
-void alAuxBusNew(ALAuxBus *arg0, s32 arg1, s32 arg2) {
+void alAuxBusNew(ALAuxBus *arg0, sptr arg1, s32 arg2) {
 #ifdef TARGET_PORT
     /* func_00294D54 + 0xC is alAuxBusPull (func_00294D60): the ROM points into a stray word */
     alFilterNew(arg0, alAuxBusPull, alAuxBusParam, 6);

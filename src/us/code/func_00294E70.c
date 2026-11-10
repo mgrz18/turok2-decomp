@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 #include "globals/libaudio.h"
 
-extern void alFilterNew(void *f, int h, sptr s, int type);
-extern s32 alHeapDBAlloc(s32 file, s32 line, void *hp, s32 num, s32 size);
+extern void alFilterNew(void *f, sptr h, sptr s, int type);
+extern sptr alHeapDBAlloc(sptr file, s32 line, void *hp, s32 num, s32 size);
 extern s32 alFxParam(void *filter, s32 paramID, void *param);
 extern Acmd *alFxPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p);
 extern s32 alFxParamHdl(void *filter, s32 paramID, void *param);
