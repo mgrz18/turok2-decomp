@@ -83,6 +83,15 @@ void DumpVtxMtx(uint8_t op, uint32_t w0, uintptr_t w1, int depth) {
             }
             printf("\n");
         }
+    } else if (op == 0xDC && addr >= 0x10000 && !(addr & 1)) {
+        // G_MOVEMEM (viewport, lights): the first 16 bytes (=2 and up)
+        if (atoi(getenv("T2_DLDUMP_VTX")) > 1) {
+            printf("%*s   mem", depth * 2, "");
+            for (int i = 0; i < 16; i++) {
+                printf(" %02x", ((const uint8_t*)addr)[i]);
+            }
+            printf("\n");
+        }
     } else if (op == 0xDA) {
         const int32_t* m = (const int32_t*)addr;
         printf("%*s   mtx", depth * 2, "");
