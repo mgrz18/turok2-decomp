@@ -16,6 +16,24 @@ typedef struct StreamCell {
     /* 0x10 */ s32 occupied;
 } StreamCell; /* 0x14 */
 
+#ifdef TARGET_PORT
+/* The port: the grid sections hold their static objects and level actors at the host sizes
+ * (CScene__DecompressGridSection), so these views are host twins of CStaticObject (block =
+ * m_pOwner) and CLevelActor. With the N64 stride and offset the third attract demo's level load
+ * (level 109) wrote the handle into the wrong objects and passed a garbage m_pOwner to
+ * CCache__RequestDecompression. */
+#include "structs/level_actor.h"
+typedef struct ObjA {
+    u8 pad0[__builtin_offsetof(CStaticObject, m_pOwner)];
+    void **block;
+    u8 pad28[sizeof(CStaticObject) - __builtin_offsetof(CStaticObject, m_pOwner) - sizeof(void **)];
+} ObjA;
+_Static_assert(sizeof(ObjA) == sizeof(CStaticObject), "ObjA size");
+
+typedef struct ObjB {
+    u8 pad0[sizeof(CLevelActor)];
+} ObjB;
+#else
 typedef struct ObjA {
     /* 0x00 */ u8 pad0[0x24];
     /* 0x24 */ void **block;
@@ -25,6 +43,7 @@ typedef struct ObjA {
 typedef struct ObjB {
     /* 0x000 */ u8 pad0[0x198];
 } ObjB; /* 0x198 */
+#endif
 
 
 extern void CStaticObject__RequestLitVertices(ObjA *a, s32);
