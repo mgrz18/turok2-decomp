@@ -60,7 +60,11 @@ void CScene__Update(CScene *world) {
     }
     CCameraPool__Draw(gEngineApp_m_Game_m_CameraPool, world);
     CParticleSystem__Update(&world->m_ParticleSystem);
+#ifdef TARGET_PORT /* camera pool + 0x13F4 = gEngineApp_m_Settings.paused (CGameFromCameraPool) */
+    if (world->m_WarpState == 0 && gEngineApp_m_Settings.paused == 0) {
+#else
     if (world->m_WarpState == 0 && *(s32 *)(gEngineApp_m_Game_m_CameraPool + 0x13F4) == 0) {
+#endif
         SwooshSystem_Update(gEngineApp_m_SwooshSystem);
         CScene__AdvanceInstances(world);
         CScene__AdvanceListedInstances(world);
