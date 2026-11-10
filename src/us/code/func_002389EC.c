@@ -13,6 +13,18 @@ typedef struct { float x, y, z; } T2HostTriple;
 
 
 extern s32 CCameraPool__StartShake(void *arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, s32 arg5, Triple arg6);
+#ifdef TARGET_PORT
+/* Host body (round 7 v2): an event's 8-byte value reaches the handler as two host-order
+ * words (the archive swaps the animation events' values as two u32: struct IntPair), word 0
+ * the N64's first big-endian word; the bytes/halves this handler reads are taken from them. */
+typedef struct { u32 w0, w1; } T2EventWords;
+
+void func_002389EC(s32 arg0, s32 arg1, s32 arg2, Triple t, T2EventWords v) {
+    CCameraPool__StartShake(&gEngineApp_m_Game_m_CameraPool, (f32) (s16) (v.w0 >> 16), (f32) (s16) v.w0,
+                            (f32) (s16) (v.w1 >> 16), (f32) (s16) v.w1 * 10.24f, 0, t);
+}
+#else
 void func_002389EC(s32 arg0, s32 arg1, s32 arg2, Triple t, Vec4s v) {
     CCameraPool__StartShake(&gEngineApp_m_Game_m_CameraPool, (f32) v.x, (f32) v.y, (f32) v.z, (f32) v.w * 10.24f, 0, t);
 }
+#endif

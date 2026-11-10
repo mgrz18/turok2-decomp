@@ -267,6 +267,41 @@ Next:
    particles (bow arrows, bullets, blood) were not seen in this round's runs.
 4. macOS with the events on was not run (v4); `--high-memory` was run to 12,000 frames only.
 
+## Round 7, part v2: weapons and firing (branch names-R7_v2)
+
+Detail: [GAMEPLAY.md](GAMEPLAY.md) section 6. The weapon change completes and every land weapon
+tested fires in level 51 **once merged with v1** (the fire is an animation event ending in
+`CParticleSystem__Spawn`): tested on a scratch merge of names-R7_v1 (events on, v1's archive
+`3ad7d240`), not committed here. On this branch alone (events off) the boot (26,000 frames) and
+the journey (15,000) run without a crash; the weapon AI switches and runs its fire modes.
+
+- Weapon actor and modes on host types (v2-1..6: `WeaponActor_Update` is v4's commit
+  cherry-picked, the same text on both branches), the barrels' pose callbacks on
+  `T2PoseContext`, the player views in the switch/ready/select code.
+- Rumble on host types: `include/structs/controller.h` (ControllerProfile's rumble pool and
+  effects at host sizes, under TARGET_PORT): **gendata again (delete decls.json)**; the first
+  shot crashed in `RumbleCurve_Advance` without it.
+- Mode animation pickers: `IsCodePointer`/`IsDataPointer` host bodies (the executable's text),
+  `CGameObjectInstance__PickAvailableAction` reads its untyped tables big-endian (pistol,
+  mag 60, shredder, grenade launcher... fire). Enemies use the same pickers (v3 told).
+- Impact-event values are two host-order words (agreed with v1, a9c15e5e): FlashScreens and
+  the shakes extract their bytes/halves from them.
+- Pickups typed (`Pickup_FindWeaponEntry`, `HasRoomForAmmo`, `CollectPickup`), the weapon loop
+  sounds' node, `ImpactEvent_Send`'s registered list.
+- Debug-only: `T2_GIVE_WEAPONS=1`, `T2_WEAPON=<n>`, `T2_WEAPON_LIST=1`, `T2_SHOT_FROM=<frame>`,
+  the ammo in `T2_STATE_LOG`.
+
+Results (scratch merge): 13 weapons spend ammo when fired (tek bow, bow, pistol, mag 60, charge
+dart, shredder, plasma, firestorm, sunfire, PFM, grenade, scorpion, flame thrower), the HUD
+counter follows, muzzle flashes / casings / smoke / the arrow and its splash draw, `--audio`
+firing sounds (RMS 200 -> 2,500-4,200), the Talon swings; no crash over 17,200 frames.
+
+Merge notes: files others touch: func_00257D48.c (v4, identical commit), func_0022BA88/0022BFA0/
+0022C228.c (my u8 getter fix was reverted: keep v1's 146bc42e), func_002284E0.c (gDLightBuffer:
+only v1's change, I dropped mine). The journey's swim after 13450 differs from round 6 (see
+GAMEPLAY.md section 6: round 6's `WeaponMode_Ready_Update` wrote into the player). Open:
+`--high-memory` + events dies in `Blast_CanHit` (v3's damage path).
+
 ## Round 6, part u1: gameplay draws the level (branch names-R6_u1)
 
 [RENDER.md](RENDER.md) section 4. Level 51 now **draws in gameplay**: the Port of Adia start

@@ -53,6 +53,7 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
 #include <stdlib.h>
 #include "structs/rect.h"
 #include "globals/engine.h"
+#include "structs/weapon.h"
 
 void T2Port_LogState(int frame) {
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
@@ -72,6 +73,11 @@ void T2Port_LogState(int frame) {
             printf(" region NULL");
         }
         printf(" lives %d", (int) p->m_Data.m_Lives);
+        {
+            /* round 7 (v2): the current weapon's ammo, what the HUD counter shows */
+            extern s32 CPlayer__GetWeaponAmmo(CPlayer *, s32);
+            printf(" ammo %d", (int) CPlayer__GetWeaponAmmo(p, p->m_Data.m_CurrentWeapon));
+        }
         /* weapons (round 6): the requested weapon, the wheel (state, count, cursor), the pressed
          * bits of this frame */
         printf(" reqw %d wheel %d/%d/%d single %x", (int) p->m_RequestedWeapon, (int) p->m_Barrel.m_State,
@@ -132,4 +138,74 @@ void T2Port_LogState(int frame) {
         }
     }
     fflush(stdout);
+}
+
+/* T2_GIVE_WEAPONS=1 (game.cpp, every frame; DEBUG-ONLY, round 7 v2): in gameplay (mode 13, a
+ * level loaded) every active player gets every weapon of gWeaponInfoTable that can be used on
+ * land or under water, with full ammo (CPlayer__FillAllAmmo), once per player and level. To
+ * test firing and the weapons without finding their pickups; not a game option. T2_WEAPON=<n>
+ * also requests weapon n, T2_WEAPON_LIST=1 prints the weapon table. */
+void T2Port_GiveWeapons(void) {
+    extern s32 CPlayer__FillAllAmmo(CPlayer *);
+    static CPlayer *sGiven[4];
+    static int sLevel = -1;
+    static int sEnabled = -1;
+    CPlayer *p;
+    int i;
+
+    if (sEnabled < 0) {
+        const char *e = getenv("T2_GIVE_WEAPONS");
+        sEnabled = (e != NULL && e[0] == '1');
+    }
+    if (!sEnabled || gEngineApp.m_Settings.mode != 13 || gScene.m_nLevel <= 0) {
+        return;
+    }
+    if (gScene.m_nLevel != sLevel) {
+        sLevel = gScene.m_nLevel;
+        for (i = 0; i < 4; i++) {
+            sGiven[i] = NULL;
+        }
+    }
+    for (p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
+        int slot = -1;
+        for (i = 0; i < 4; i++) {
+            if (sGiven[i] == p) {
+                slot = -2;
+                break;
+            }
+            if (sGiven[i] == NULL && slot == -1) {
+                slot = i;
+            }
+        }
+        if (slot < 0) {
+            continue;
+        }
+        sGiven[slot] = p;
+        for (i = 0; i < 35; i++) {
+            if (gWeaponInfoTable[i] != NULL && (gWeaponInfoTable[i]->flags & 3) != 0) {
+                p->m_Data.m_WeaponList[i] = 1;
+            }
+        }
+        CPlayer__FillAllAmmo(p);
+        if (getenv("T2_WEAPON") != NULL) {
+            /* T2_WEAPON=<n>: request weapon n (the weapon actor switches to it as from the wheel) */
+            p->m_RequestedWeapon = (s16) atoi(getenv("T2_WEAPON"));
+        }
+        if (getenv("T2_WEAPON_LIST") != NULL) {
+            /* T2_WEAPON_LIST=1: the weapon table (name, flags, model, first ammo class) */
+            for (i = 0; i < 35; i++) {
+                WeaponInfo *w = gWeaponInfoTable[i];
+                if (w == NULL) {
+                    continue;
+                }
+                printf("debug: weapon %2d %-24s flags %x model %d fireDelay %.2f ammo0 %d/%d proj %d cost %d\n", i,
+                       w->name != NULL ? (const char *) w->name : "-", (unsigned) w->flags, (int) w->model,
+                       w->fireDelay, w->ammo[0] != NULL ? w->ammo[0]->type : -1,
+                       w->ammo[0] != NULL ? w->ammo[0]->max : -1, w->ammo[0] != NULL ? w->ammo[0]->projectile : -1,
+                       w->ammo[0] != NULL ? w->ammo[0]->cost : -1);
+            }
+        }
+        printf("debug: T2_GIVE_WEAPONS: level %d player %p: all weapons, full ammo\n", (int) gScene.m_nLevel,
+               (void *) p);
+    }
 }

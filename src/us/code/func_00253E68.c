@@ -2,10 +2,21 @@
 #include "structs/player.h"
 #include "protos/game.h"
 
+#ifdef TARGET_PORT
+/* LoopSounds' node (SoundSourceNode, rw/abu_types.h): the sound id at N64 0xC follows a
+ * pointer, so on the host it is at 0x14 */
+typedef struct {
+    s32 unk0;
+    void *next;
+    s32 value;
+    s32 id;
+} LoopSound;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0xC];
     /* 0x0C */ s32 id;
 } LoopSound;
+#endif
 
 s32 Sound__StopSoundId(s32);                         /* extern */
 s32 LoopSounds_Stop(sptr, void *);                 /* extern */

@@ -3,6 +3,9 @@
 #include "structs/player.h"
 #include "globals/engine.h"
 #include "protos/ai.h"
+#ifdef TARGET_PORT
+#include "structs/camera.h"
+#endif
 
 /* Weapon state: winding a spun-up weapon (barrel spin) while fire is held, else stopping it. */
 
@@ -18,7 +21,11 @@ extern void Math_EaseToward(f32 *value, f32 target, f32 rate);
 
 void WeaponMode_SpinFire_Update(void *obj, CAI *state) {
     CPlayer *player = (*(CPlayer **)&((CGameObjectInstance *)obj)->m_AI.m_pParent);
+#ifdef TARGET_PORT
+    CVector3 *pos = &player->m_pCamera->m_vPos; /* N64 camera 0x114 */
+#else
     CVector3 *pos = (CVector3 *)(((u8 *)player->m_pCamera) + 0x114);
+#endif
 
     if (!(player->m_ContState.m_dwButtons & 0x2000) || player->m_bHeadMovementDisabled != 0
         || CPlayer__GetWeaponAmmo(player, player->m_Data.m_CurrentWeapon) == 0) {

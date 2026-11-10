@@ -6,6 +6,29 @@ s32 WeightedTable_Pick(sptr);
 
 s32 WeightedTable_Clear(void *);                   /* extern */
 
+#ifdef TARGET_PORT
+/* Host body (round 7 v2). The table (id, weight) s16 pairs ending in -1 is reached only through
+ * a mode row's animation word (CAIModeInfo.unk_10, an sptr: CAI__UpdateModeAnim), so gendata
+ * has no type for it and copies it as bytes in ROM order: read the halves big-endian. The
+ * caller declares the result as a pointer: return it sign-extended and pointer-wide (an s16
+ * return left the high bits of the register undefined). */
+static s16 T2_BE16(const s16 *p) {
+    const u8 *b = (const u8 *) p;
+    return (s16) ((b[0] << 8) | b[1]);
+}
+sptr CGameObjectInstance__PickAvailableAction(sptr arg0, s16 *arg1, s32 arg2) {
+    u8 sp10[0x68];
+    s16 *entry;
+
+    WeightedTable_Clear(sp10);
+    for (entry = arg1; T2_BE16(entry) != -1; entry += 2) {
+        if (CGameObjectInstance__PickRandomAnim(arg0, (sptr) T2_BE16(entry), arg2) != -1) {
+            WeightedTable_Add((sptr) sp10, (s32) T2_BE16(entry), (s32) T2_BE16(entry + 1));
+        }
+    }
+    return (sptr) (s16) WeightedTable_Pick((sptr) sp10);
+}
+#else
 s16 CGameObjectInstance__PickAvailableAction(sptr arg0, s16 *arg1, s32 arg2)
 {
   s32 new_var2;
@@ -33,3 +56,4 @@ s16 CGameObjectInstance__PickAvailableAction(sptr arg0, s16 *arg1, s32 arg2)
   }
   return WeightedTable_Pick((sptr) (sp10));
 }
+#endif

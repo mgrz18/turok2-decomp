@@ -1,6 +1,9 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "globals/game.h"
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#endif
 
 typedef struct Kind {
     s32 value;
@@ -34,7 +37,12 @@ void func_0023801C(s32 arg0, Object *obj, s32 arg2, CVector3 pos, EventParams pa
     if (obj != NULL) {
         switch (obj->type) {
             case 1:
+#ifdef TARGET_PORT
+                /* the instance's intelligence (N64 0x14) by member (round 7 v2) */
+                if (*(s32 *) ((CGameObjectInstance *) obj)->header.m_pIntelligence == obj->type) {
+#else
                 if (obj->kind->value == obj->type) {
+#endif
                     if (global[-115] & 0x40) {
                         scale = 2.5f;
                     } else if (global[-115] & 0x20) {
