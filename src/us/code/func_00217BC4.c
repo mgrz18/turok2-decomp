@@ -2,6 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#ifdef TARGET_PORT
+/* bit addresses are offsets from the stream base on the host (func_00217B04.c) */
+extern unsigned long gT2BitStreamBase;
+#endif
 
 extern void Bits_Poke(u32 arg0, u32 arg1, u32 arg2);
 void Bits_Poke(u32 arg0, u32 arg1, u32 arg2) {
@@ -30,7 +34,11 @@ void Bits_Poke(u32 arg0, u32 arg1, u32 arg2) {
         var_a3 = temp_a2 << temp_shift;
         var_a2 = temp_a2 >> temp_v0_2;
     }
+#ifdef TARGET_PORT
+    temp_a0 = (gT2BitStreamBase + (((u32) arg0 >> 3) & ~3u));
+#else
     temp_a0 = (arg0 & 0xF0000000) | ((u32)(arg0 & 0x0FFFFFE0) >> 3);
+#endif
     *(s32 *)temp_a0 = (*(s32 *)temp_a0 & ~var_v1) | var_a3;
     ((struct func_80203E78_S1 *) temp_a0)->unk4 = (((struct func_80203E78_S1 *) temp_a0)->unk4 & ~temp_a1) | var_a2;
 }

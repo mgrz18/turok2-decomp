@@ -2,6 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/junk_types.h"
+#ifdef TARGET_PORT
+/* bit addresses are offsets from the stream base on the host (func_00217B04.c) */
+extern unsigned long gT2BitStreamBase;
+#endif
 
 f32 func_00218398(B14FieldRd *f) {
     B14Tmp t1;
@@ -17,7 +21,11 @@ f32 func_00218398(B14FieldRd *f) {
     addr = f->addr;
     t2.r = t1.r;
     n = t2.r.n;
+#ifdef TARGET_PORT
+    p = (u32 *)((gT2BitStreamBase + (((u32) addr >> 3) & ~3u)));
+#else
     p = (u32 *)((addr & 0xF0000000) | ((addr & 0x0FFFFFE0) >> 3));
+#endif
     sh = addr & 0x1F;
     v = p[0];
     hi = p[1];

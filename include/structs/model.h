@@ -16,7 +16,7 @@ typedef struct CDrawArgs {
     /* 0x00 */ s32 m_bDraw;                 /* in the view: draw the model */
     /* 0x04 */ s32 m_bShadow;               /* near enough: draw the shadow */
     /* 0x08 */ struct CCamera *m_pCamera;
-    /* 0x0C */ s32 m_hModel;                /* the model resource (a handle, void **) */
+    /* 0x0C */ sptr m_hModel;               /* the model resource (a handle, void **): pointer-wide */
     /* 0x10 */ f32 *m_pOffset;              /* where the shadow goes, from the actor */
     /* 0x14 */ s32 m_nVariant;              /* which of the intelligence's models */
     /* 0x18 */ s32 m_nModel;                /* set by the callback: (&m_nModel)[m_nVariant] or a death model */

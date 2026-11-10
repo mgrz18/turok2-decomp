@@ -41,7 +41,7 @@ all 3,938 files after each commit.
 `G_VTX` (segments followed through `G_MW_SEGMENT`) and every `G_MTX` as s15.16 values: that is how
 the camera clear (R10) was found (sane vertices and matrices, a fill over them at the end).
 
-## 3. Next: animated instances (actors)
+## 3. Animated instances (actors): done in round 6, see section 5
 
 `CGameObjectInstance__Draw` (func_0021D39C) reads the instance through an `Actor` view at N64
 offsets. A host body on `CGameObjectInstance` members is ready (saved on the box as
@@ -105,3 +105,44 @@ filled by `CScene__LoadVisibleGridSections` in the draw), the difficulty mask an
 Next on this path: the animated actors (section 3; the player's weapon, enemies, pickups), the water
 surface (a translucent level actor, not checked), demo 1's brightness, and
 `CScene__BuildGeometryDisplayList` (multiplayer: reads the camera list at `&difficulty - 0x1210`).
+
+## 5. Animated actors (Phase 7 round 6, u2)
+
+The actor path now runs on host types: the **Acclaim logo cinema (mode 4) renders** (the
+letters flip in and settle into "Acclaim entertainment, inc."), the new-game cinemas draw their
+characters (Adon, Turok, the enemies, the prisoner in the cage, posed and animated), and with
+u1's level fixes merged the **player's weapon (the Talon in Turok's hand) draws in level 51**.
+Pose check: the logo's 11 bone matrices at its first frame equal `tools/assets/anim.py`'s
+`pose()` times the instance matrix (x65536) within 2 units of s15.16 (script used:
+`/root/R6_u2/oracle.py`, ROM + object-info ROM address + a gdb dump of `ctx.animIndex`).
+
+What stopped it, in the order found (all `TARGET_PORT`, asm_diff 0 over 3,938 files):
+
+| # | where | cause | fix |
+|---|---|---|---|
+| A1 | `CGameObjectInstance__Draw` (func_0021D39C), `BuildBoneMatrices` (func_0021CDAC), `PoseBone` (func_0021B95C), `AdvanceAnimation` (func_0021A7EC), `UpdateAnimation` (func_0021A344), func_0021A500, `CAnimationState__GetRootMotion` (`RootActor`, func_00218B10) | instance views at N64 offsets | `tools/port/hostview.py --apply` + hand fixes: ROM addresses/matrix block `sptr`, `m_mfOrient`/`m_vMin` added where the tool found no member, `m_AI.m_vDesiredPos` (the tool's byte delta inside `m_AI` was wrong) |
+| A2 | BuildBoneMatrices / PoseBone | the two `PoseContext` views differ on the host (`s32 animIndex` vs `u32 *out`, `arg2`) and the animation handle `*handle` read as s32 | one layout (`structs/pose_host.h` `T2PoseContext`, `_Static_assert`ed against PoseBone's); handle `sptr *` |
+| A3 | `CScene__AdvanceInstances` (func_00226490) | `m_pRegistered`/`m_nRegistered` at N64 0xBF8/0xDF8: no instance ever advanced | host views of `CScene`/`CGameObjectInstance` |
+| A4 | `CAnimationState__Load` | frame count read as the u16 at +6 of a CUSet header (the low half of the count on BE; the archive swaps words): 0 frames | the s32 count at +4 |
+| A5 | `CGameObjectInstance__SetupAnimation` (func_0021A150) | same for `m_nAnims` (u3's find) | same |
+| A6 | `Bits_Read`, `Bits_Peek`, `Bits_ReadFloat`, `Bits_PeekFloat`, `BitAddr_*`, func_00218248/002182EC/00218398, `Bits_Poke` | KSEG bit addresses (`seg | offset*8`) overflow above 32 MB of arena (and drop 64-bit pointers): SIGSEGV in `Anim_DecodeTracks` | a bit offset from `gT2BitStreamBase`, set by `BitAddr_FromPointer` (one stream at a time: the decompressor thread). func_00217EFC (an encoder) is not converted |
+| A7 | `CAI__UpdateModeAnim` (func_00243170) | `Source110`/`Dest`/`StateEntry` views: `gFrameIncrement *= garbage` for every actor (animations frozen) | host views of `CGameObjectInstance`/`CAI`/`CAIModeInfo` |
+| A8 | `CGameObjectInstance__DrawShadow` (func_0021DC84), `SubmitShadowModel` (func_0021ED04), func_00268160 | `CDrawArgs` at N64 offsets; the shadow loaded and "restored" the projection from N64 camera offsets (every actor after a shadow drew with a garbage projection); func_00268160 got the instance through MIPS `$a0` pass-through | `CCamera::m_mfProjection/m_mProjection`, `CDrawArgs` members; the instance passed explicitly. `CDrawArgs.m_hModel` is `sptr` (include change) |
+| A9 | `Action_Draw`, `InteractiveAnim_DrawAllModels`, `WeaponActor_Draw` | raw N64 offsets | members |
+| A10 | `CGameObjectInstance__ConstructLitVertices`, `Lighting_CollectVolumes`, `Lighting_BuildLitVertices` | model pointer as s32; sectors walked with the 8-byte N64 stride (demo 1 SIGSEGV) | pointer-wide; `m_Sectors[i]` |
+| A11 | `CScene__GetLightsAt` | `u8 buf[0x28]` for 10 pointers: overran `CGameObjectInstance__Draw`'s frame (new-game cinema SIGSEGV) | `10 * sizeof(void *)` |
+| A12 | `EnemyAI_HeadNodeCallback` (m_pfEffects) | pose context and `m_HeadTurn/m_HeadTilt` at N64 offsets, matrix through an s32 adapter | `T2PoseContext`, members, float `CMtxF__RotateX/Z` |
+| A13 | `CGameObjectInstance__FireAnimEvents` (func_0021ABC8) | `ObjectLinks` view | host view |
+| A14 | `CPlayerPool__AnimateWeapons` (func_00252ADC), `CPlayerPool__GetViewPlayer` (func_00254B04) | camera word 0x54C (`m_Menus.count`): the weapon actor never animated | by member |
+
+**Off for now:** the animation events and hot points (footstep/splash sounds and particles) end
+in `CParticleSystem__Spawn` (func_0022D2FC.c, 1,752 lines, FAKEMATCH, every view at N64
+offsets), which corrupts memory on the host. `T2Port_AnimEventsEnabled()` (port/game/t2actors.c)
+returns 0 unless `T2_ANIM_EVENTS=1`; FireAnimEvents and GameObject_EmitHotPoints skip their
+events. Porting CParticleSystem__Spawn (its `Effect`/`EffectSystem`/`Actor`/`Owner` views, the
+`CParticle` host layout) is the next step; weapon fire and impacts reach it too.
+
+Not done: the bosses' draw callbacks (`MantidQueen_Draw` func_00403660, `Primagen_Draw`
+func_00407DC0, `MotherBoss_Draw` func_0040BEE4) still use raw offsets; the other m_pfEffects
+callbacks (`gWeaponInfoTable[]->effects`, `Actor_PlayRangedSound`, `MotherBoss_PartEffects`)
+were not checked against `T2PoseContext`.

@@ -4,6 +4,9 @@
 #include "structs/player.h"
 #include "globals/scene.h"
 #include "protos/game.h"
+#ifdef TARGET_PORT
+int T2Port_AnimEventsEnabled(void); /* port/game/t2actors.c */
+#endif
 
 /* Animation attachment events: for each attachment whose event bit is enabled
  * on the object, moves its offset through the bone matrix to world space and
@@ -48,6 +51,13 @@ void GameObject_EmitHotPoints(Attachment *ents, s32 n, CMtxF *mtxs, CGameObjectI
     s32 flag;
     s32 size;
 
+#ifdef TARGET_PORT
+    /* the hot-point effects end in CParticleSystem__Spawn, still on N64 views on the
+     * host (see CGameObjectInstance__FireAnimEvents) */
+    if (!T2Port_AnimEventsEnabled()) {
+        return;
+    }
+#endif
     for (n = n - 1; n != -1; n--) {
         if (ents->event & obj->m_dwHotPointFlags) {
             flag = (CISet__GetBlock(CISet__GetBlock(bones, ents->bone), 1)[0x66] == 5) * 2;

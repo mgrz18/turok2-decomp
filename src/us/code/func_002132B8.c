@@ -57,7 +57,11 @@ s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
     off = 0x14AC;
     do
     {
+#ifdef TARGET_PORT
+      e = &g->m_Sectors[i]; /* N64 0x14AC + 8 * i: the host CSceneSector is two pointers */
+#else
       e = (CSceneSector *) (((u8 *) g) + off);
+#endif
       c = e->m_pBounds;
       if ((((c->x1 > q->mn.x) && (c->x0 < q->mx.x)) && (c->z1 > q->mn.z)) && (c->z0 < q->mx.z))
       {

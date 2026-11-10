@@ -17,14 +17,29 @@
  * grown by 0.003 per unit of height, turned like the actor and set on the
  * ground; then it is submitted (CGameObjectInstance__SubmitShadowModel). */
 
+#ifdef TARGET_PORT
+#include "structs/model.h"
+/* CDrawArgs.m_pOffset at its host offset */
+typedef struct {
+    u8 pad0[__builtin_offsetof(CDrawArgs, m_pOffset)];
+    sptr blobType;
+} ShadowParams;
+#else
 typedef struct {
     u8 pad0[0x10];
     s32 blobType;           /* 0x10 */
 } ShadowParams;
+#endif
 
 extern u8 D_8010FF34[];
 
+#ifdef TARGET_PORT
+/* on MIPS the instance reaches it in $a0 (the caller's first argument, untouched) */
+s32 func_00268160(CGameObjectInstance *);
+#define func_00268160() func_00268160(a)
+#else
 s32 func_00268160(void);
+#endif
 void *MtxPool_Alloc(void *, s32);
 f32 func_00298470(f32);     /* sqrtf */
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */

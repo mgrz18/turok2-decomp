@@ -2,6 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#ifdef TARGET_PORT
+/* bit addresses are offsets from the stream base on the host (func_00217B04.c) */
+extern unsigned long gT2BitStreamBase;
+#endif
 
 extern int func_00218248(BitFieldSource *arg0, int arg1);
 int func_00218248(BitFieldSource *arg0, int arg1) {
@@ -13,8 +17,12 @@ int func_00218248(BitFieldSource *arg0, int arg1) {
     unsigned int width;
     width = arg0->width;
     bitAddress = arg0->base + (width * arg1);
+#ifdef TARGET_PORT
+    word = (int *) ((gT2BitStreamBase + (((u32) bitAddress >> 3) & ~3u)));
+#else
     word = (int *) ((bitAddress & 0xF0000000) |
                     ((unsigned int) (bitAddress & 0x0FFFFFE0) >> 3));
+#endif
     shift = bitAddress & 0x1F;
     value = word[0];
     next = word[1];
