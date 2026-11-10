@@ -426,7 +426,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             // the game runs again (no window needed: macOS has no headless GL, MACOS.md)
             if (dumpAt > 0 && f + 1 >= dumpAt && !dumped) {
                 dumped = true;
-                int budget = 4000;
+                int budget = getenv("T2_DLDUMP_MAX") != nullptr ? atoi(getenv("T2_DLDUMP_MAX")) : 4000;
                 printf("dl: frame %d\n", f + 1);
                 DumpDL((const uintptr_t*)lastDL, 0, &budget);
             }
