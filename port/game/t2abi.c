@@ -162,15 +162,15 @@ typedef struct {
 } T2AbiAnimEvent;
 /* ImpactEvent_LevelSpecial: (a0, a1, a2, CVector3 pos at word 3, EventParams at word 6) */
 extern void MotherBoss_AnimEvent(s32 arg0, void *self, s32 arg2, T2AbiAnimEvent ev);
-void MotherBoss_AnimEvent_ev(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, T2AbiEventParams params) {
+void MotherBoss_AnimEvent_ev(sptr arg0, sptr arg1, s32 arg2, CVector3 pos, T2AbiEventParams params) {
     T2AbiAnimEvent ev;
     ev.pos = pos;
     ev.type = params.unk0;
-    MotherBoss_AnimEvent(arg0, (void *) (sptr) arg1, arg2, ev);
+    MotherBoss_AnimEvent((s32) arg0, (void *) arg1, arg2, ev);
 }
 extern void Primagen_HandleAnimEvent(s32 arg0, void *obj, s32 arg2, CVector3 pos, s32 event);
-void Primagen_HandleAnimEvent_ev(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, T2AbiEventParams params) {
-    Primagen_HandleAnimEvent(arg0, (void *) (sptr) arg1, arg2, pos, params.unk0);
+void Primagen_HandleAnimEvent_ev(sptr arg0, sptr arg1, s32 arg2, CVector3 pos, T2AbiEventParams params) {
+    Primagen_HandleAnimEvent((s32) arg0, (void *) arg1, arg2, pos, params.unk0);
 }
 
 /* ---- a float parameter the caller passes as an integer word (its bits), or the reverse ---- */
