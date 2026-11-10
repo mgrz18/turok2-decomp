@@ -61,6 +61,14 @@ void T2Port_LogState(int frame) {
         printf(" player pos (%.1f %.1f %.1f) rotY %.2f health %d aimode %d weapon %d",
                a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z, a->m_RotY,
                (int) (p->m_Data.m_Health >> 8), (int) a->m_AI.m_Mode, (int) p->m_Data.m_CurrentWeapon);
+        if (a->header.m_pCurrentRegion != NULL) {
+            extern f32 CGameRegion__GetHeight(void *, f32, f32);
+            printf(" region %p floor %.1f", (void *) a->header.m_pCurrentRegion,
+                   CGameRegion__GetHeight(a->header.m_pCurrentRegion, a->header.m_vPos.x, a->header.m_vPos.z));
+        } else {
+            printf(" region NULL");
+        }
+        printf(" lives %d", (int) p->m_Data.m_Lives);
         printf(" pmode %d buttons %x move (%.2f %.2f) look (%.2f %.2f) contp %p", (int) p->m_Mode,
                (unsigned) p->m_ContState.m_dwButtons, p->m_ContState.m_MoveX, p->m_ContState.m_MoveY,
                p->m_ContState.m_LookX, p->m_ContState.m_LookY, (void *) p->m_ContState.m_pContState);
