@@ -25,7 +25,7 @@ static __inline__ s32 nameEquals(u8 *a, u8 *b, s32 count) {
 }
 
 void NameEntryMenu_Init_2(Menu *event) {
-    s32 i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, event->player);
+    sptr i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, event->player);
     s32 trailing;
     char *dst;
     u8 *src;

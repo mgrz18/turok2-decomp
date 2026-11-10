@@ -7,7 +7,7 @@
 
 /* Name entry: append the item's character, up to 8. */
 s32 NameEntryMenu_AddChar(MenuItem *a, Menu *c) {
-    s32 i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, c->player);
+    sptr i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, c->player);
 
     gNameEntries[i].timer = 0;
     if (gNameEntries[i].length == 8) {

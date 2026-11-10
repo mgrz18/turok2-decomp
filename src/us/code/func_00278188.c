@@ -10,7 +10,7 @@ sptr COnScreen__GetFontTexture(void);
  * tile and its size (16x16). */
 void COnScreen__SelectNormalFont(void) {
     Gfx *g;
-    s32 tex = COnScreen__GetFontTexture();
+    sptr tex = COnScreen__GetFontTexture();
 
     if (tex != 0) {
         gLoadedFont = 0;

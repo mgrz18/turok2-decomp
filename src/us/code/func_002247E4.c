@@ -7,7 +7,7 @@ typedef struct { u8 pad0[0x6C]; s32 f6C; } P4OwnB;
 void CScene__SetLevelActorKilled(P4OwnB *o, P4EntB *e, s32 set) {
     s32 bit = e->f16E;
     s32 idx = *(s32 *)((u8 *)o + 0x18FA8);
-    s32 n = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(o->f6C, 0), idx), 1);
+    sptr n = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(o->f6C, 0), idx), 1);
     CISet__GetBlock(n, 0);
     CISet__GetBlockSize(n, 1);
     {
