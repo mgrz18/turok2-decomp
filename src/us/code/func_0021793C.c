@@ -7,5 +7,10 @@ typedef struct {
 } Holder;
 
 sptr CAnimationState__GetData(Holder *arg0) {
+#ifdef TARGET_PORT
+    /* the entry's first word is a host pointer (8 bytes): read it whole (--high-memory) */
+    return *(sptr *) arg0->unk10;
+#else
     return *arg0->unk10;
+#endif
 }

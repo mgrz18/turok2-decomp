@@ -4,7 +4,7 @@
 
 s32 func_00264994(s32, s32);
 s32 Throwable_Collision(sptr, sptr);
-s32 Throwable_Step(s32, sptr);
+s32 Throwable_Step(sptr, sptr);
 
 void Throwable_Setup(sptr arg0, CAI *ai) {
     ai->m_pModeTable = gThrowableModeTable;
