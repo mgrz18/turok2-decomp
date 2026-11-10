@@ -30,14 +30,19 @@ typedef struct {
     u32 offs[9];        /* 0x18..0x38: offsets into block 0 */
 } T2ROMParticleEffect; /* 0x3C */
 
-typedef struct {
+typedef struct T2ParticleHost {
     void *data;                    /* the unit (CParticleSystem.m_pParticleData) */
     CROMParticleEffect *effects;
     s32 count;
     u8 *pool;
+    struct T2ParticleHost *next;   /* older copies */
 } T2ParticleHost;
 
-static T2ParticleHost sHost[2];    /* the last two units (the second module has its own copy) */
+/* Every copy built, newest first. They are never freed: particles spawned from an older copy
+ * may outlive the load that replaced it (the unit is decompressed again on scene loads, often
+ * at the same address), and a freed copy was read by CParticle__HitFloor in the new-game
+ * cinemas. A copy is ~150 KB; one per scene load. */
+static T2ParticleHost *sHost;
 
 static u16 be16(const u8 *p) { return (u16) ((p[0] << 8) | p[1]); }
 static u32 be32(const u8 *p) { return ((u32) p[0] << 24) | ((u32) p[1] << 16) | ((u32) p[2] << 8) | p[3]; }
@@ -83,17 +88,9 @@ void T2Port_ParticlesBuild(void *scene, void *data) {
         fprintf(stderr, "[t2particles] template size %d, expected 0x3C\n", ((s32 *) b2)[0]);
         return;
     }
-    h = &sHost[0];
-    if (h->data != NULL && h->data != data) {
-        /* keep the previous unit's copy one more load (the other module's scene) */
-        free(sHost[1].effects);
-        free(sHost[1].pool);
-        sHost[1] = sHost[0];
-    }
-    if (h->data == data) {
-        free(h->effects);
-        free(h->pool);
-    }
+    h = (T2ParticleHost *) calloc(1, sizeof(T2ParticleHost));
+    h->next = sHost;
+    sHost = h;
     h->data = data;
     h->count = count;
     h->effects = (CROMParticleEffect *) calloc(count > 0 ? count : 1, sizeof(CROMParticleEffect));
@@ -171,14 +168,25 @@ void T2Port_ParticlesBuild(void *scene, void *data) {
 
 /* The host templates of a particle unit (NULL if it was never built), and their count. */
 CROMParticleEffect *T2Port_ParticleEffects(void *data, s32 *count) {
-    s32 i;
+    T2ParticleHost *h;
+    static long sCalls = 0;
+    static long sEvery = -1;
 
-    for (i = 0; i < 2; i++) {
-        if (sHost[i].data == data && data != NULL) {
+    /* debug: T2_PARTICLE_LOG=N prints every N spawn calls (CParticleSystem__Spawn asks once per call) */
+    if (sEvery < 0) {
+        const char *e = getenv("T2_PARTICLE_LOG");
+        sEvery = e != NULL ? atol(e) : 0;
+    }
+    if (sEvery > 0 && ++sCalls % sEvery == 0) {
+        fprintf(stderr, "[t2particles] %ld spawn calls\n", sCalls);
+    }
+
+    for (h = sHost; h != NULL; h = h->next) {
+        if (h->data == data && data != NULL) {
             if (count != NULL) {
-                *count = sHost[i].count;
+                *count = h->count;
             }
-            return sHost[i].effects;
+            return h->effects;
         }
     }
     if (count != NULL) {
