@@ -17,6 +17,26 @@ s32 CStaticObject__LoadGeometry();                                /* extern */
 extern s32 D_800A57F8;
 extern s32 CStaticObject__BuildLitVerticesCallback;
 
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CStaticObject__LoadGeometry receives CStaticObject__RequestLitVertices's own argument
+ * registers (pass-through); the host passes them. */
+void CStaticObject__RequestLitVertices(SpawnSource *arg0) {
+    sptr temp_v0;
+    sptr temp_v0_2;
+
+    if (!(arg0->flags & 0x40)) {
+        temp_v0 = CStaticObject__LoadGeometry(arg0);
+        if (temp_v0 != 0) {
+            Model_RequestTextures(temp_v0);
+            temp_v0_2 = CCache__RequestDecompression(0, arg0->spawnFlags | gLitVerticesKey, temp_v0, arg0->id, 8, arg0, &CStaticObject__BuildLitVerticesCallback, &D_800A57F8, 0);
+            if (temp_v0_2 != 0) {
+                CCache__Unlock(0, temp_v0_2);
+            }
+            CCache__Unlock(0, temp_v0);
+        }
+    }
+}
+#else
 void CStaticObject__RequestLitVertices(SpawnSource *arg0) {
     sptr temp_v0;
     sptr temp_v0_2;
@@ -33,3 +53,4 @@ void CStaticObject__RequestLitVertices(SpawnSource *arg0) {
         }
     }
 }
+#endif

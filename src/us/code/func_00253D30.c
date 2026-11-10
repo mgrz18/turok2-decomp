@@ -126,7 +126,22 @@ struct LevelActor;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
+#ifdef TARGET_PORT /* unprototyped: the host passes the pass-through arguments */
+extern f32 GameObject_GetCollisionHeight();
+#else
 extern f32 GameObject_GetCollisionHeight(void);
+#endif
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS GameObject_GetCollisionHeight receives Actor_GetHeightOrDefault's own argument
+ * registers (pass-through); the host passes them. */
+f32 Actor_GetHeightOrDefault(LevelActor *arg0) {
+    if (arg0->definition != 0) {
+        return GameObject_GetCollisionHeight(arg0);
+    } else {
+        return 92.159996f;
+    }
+}
+#else
 f32 Actor_GetHeightOrDefault(LevelActor *arg0) {
     if (arg0->definition != 0) {
         return GameObject_GetCollisionHeight();
@@ -134,3 +149,4 @@ f32 Actor_GetHeightOrDefault(LevelActor *arg0) {
         return 92.159996f;
     }
 }
+#endif

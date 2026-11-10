@@ -12,8 +12,48 @@
 
 /* Multiplayer/menu state: byte 0x1281 (gEngineApp_m_Settings_multiplayer) is the "enabled" flag. */
 
+#ifdef TARGET_PORT /* unprototyped: the host passes the pass-through arguments */
+extern void CPlayer__StopLoopingSounds();
+#else
 extern void CPlayer__StopLoopingSounds(void);
+#endif
 
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CPlayer__StopLoopingSounds receives PlayerState15_Enter's own argument
+ * registers (pass-through); the host passes them. */
+void PlayerState15_Enter(CPlayer *player, CGameObjectInstance *actor) {
+    char *text;
+
+    actor->m_vVelocity.x = 0.0f;
+    actor->m_vVelocity.y = 0.0f;
+    actor->m_vVelocity.z = 0.0f;
+    CPlayer__StopLoopingSounds(player);
+    if (gEngineApp_m_Game.m_Settings.multiplayer != 0) {
+        switch ((u32) CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, player)) {
+        default:
+        case 0:
+            text = (char *)&gStatsContinueMenuDesc1;
+            break;
+        case 1:
+            text = (char *)&gStatsContinueMenuDesc2;
+            break;
+        case 2:
+            text = (char *)&gStatsContinueMenuDesc3;
+            break;
+        case 3:
+            text = (char *)&gStatsContinueMenuDesc4;
+            break;
+        }
+        MenuPool_OpenMenu((u8 *)player->m_pCamera->m_MenuPool, text, player, (sptr) player->m_ContState.m_pContState, NULL);
+    } else {
+        text = (char *)&gGameOverMenuDesc;
+        if (P_S16(player, 0x52A) != 0) {
+            text = (char *)&gContinueMenuDesc;
+        }
+        MenuPool_OpenMenu((u8 *)player->m_pCamera->m_MenuPool, text, player, (sptr) player->m_ContState.m_pContState, NULL);
+    }
+}
+#else
 void PlayerState15_Enter(CPlayer *player, CGameObjectInstance *actor) {
     char *text;
 
@@ -46,3 +86,4 @@ void PlayerState15_Enter(CPlayer *player, CGameObjectInstance *actor) {
         MenuPool_OpenMenu((u8 *)player->m_pCamera->m_MenuPool, text, player, (sptr) player->m_ContState.m_pContState, NULL);
     }
 }
+#endif

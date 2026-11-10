@@ -465,10 +465,13 @@ s32 CAudioWorld__Update(CAudioWorld *m) {
 }
 
 /* func_00271630 (alpha at 0x2BBC = unk2BBC, the pitch scale new voices take) */
-void CAudioWorld__PlaySoundPitched(CAudioWorld *m, s32 id, CVector3 pos, sptr follow, s32 owner, f32 pitch) {
+s32 CAudioWorld__PlaySoundPitched(CAudioWorld *m, s32 id, CVector3 pos, sptr follow, s32 owner, f32 pitch) {
+    s32 r;
+
     m->unk2BBC = pitch;
-    CAudioWorld__PlaySound(m, id, pos, follow, owner);
+    r = CAudioWorld__PlaySound(m, id, pos, follow, owner); /* the caller uses it (abicheck void_used) */
     m->unk2BBC = 1.0f;
+    return r;
 }
 
 /* func_00271694 (the game mode read through a CCameraPool view at 0x13D8, the camera position

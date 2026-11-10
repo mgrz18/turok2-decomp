@@ -41,7 +41,11 @@ void CCache__Flush(void);
 void CCache__FreeCacheEntry(s32, void *);
 void CCache__FreeMemEntry(s32, struct CMemEntry *);
 s32 CCache__FreeOldestMemEntry(s32, s32, s32);
+#ifdef TARGET_PORT
+s32 CCache__FreeOldestMemEntryWithFlags(s32, s32, s32); /* host: returns (docs/port/ABI.md) */
+#else
 void CCache__FreeOldestMemEntryWithFlags(s32, s32, s32);
+#endif
 s32 CCache__GetFrameDelay(void);
 s32 CCache__GetFreeCacheEntryCount(void);
 s32 CCache__GetFreeMemEntryCount(void);

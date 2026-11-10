@@ -77,7 +77,11 @@ u32 CScene__GetRegionIndex(struct CScene *, sptr);
 void *CScene__GetRegionInfo(struct CScene *, u16 *);
 void *CScene__GetRumble(struct CScene *, s32);
 s32 CScene__GetSavedBit(struct CScene *, s32, s32, s32, s32);
+#ifdef TARGET_PORT
+void *CScene__GetSwoosh(struct CScene *, s32); /* host: returns the block (docs/port/ABI.md) */
+#else
 void CScene__GetSwoosh(struct CScene *);
+#endif
 void CScene__GetTextureSet(struct CScene *, s32, s32 *, sptr);
 void CScene__InitPersistentData(void *);
 s32 CScene__IsEventFired(struct CScene *, void *);
