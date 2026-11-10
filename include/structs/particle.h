@@ -33,6 +33,15 @@ typedef struct CDLight {
     /* 0x16 */ s16 m_bEnabled;
 } CDLight; /* size 0x18 */
 
+/* The scene's dynamic lights (CScene.m_DLightSet, the N64 alias D_8010FF34): eight CDLights
+ * on a used and a free list (func_0042D120 builds it; CDLightSet__Alloc/__Free move one
+ * between them; DLights_Load walks the used list). */
+typedef struct CDLightSet {
+    /* 0x00 */ CList m_UsedList;
+    /* 0x14 */ CList m_FreeList;
+    /* 0x28 */ CDLight m_Lights[8];
+} CDLightSet; /* size 0xE8 */
+
 /* The value an impact event passes to the effect it starts (ImpactEvent_Send):
  * two halfwords, or the pair as one word. */
 typedef struct CEventValue {

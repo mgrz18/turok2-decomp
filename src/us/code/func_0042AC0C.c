@@ -127,7 +127,7 @@ loaded:
     CInstancePool__Construct(&w->m_InstancePool);
     func_0042D410(gEngineApp_m_SwooshSystem);
     CCollisionInfo__Reset();
-    func_0042D120(w->unk_18EBC);
+    func_0042D120(&w->m_DLightSet);
     LoopSounds_Construct(&gLoopSounds, gLoopSoundEntries, 0xF);
     func_0042EBBC(gEngineApp_m_SwooshSystem - 0x1C8);
     if (*w->m_pLevels < level) {

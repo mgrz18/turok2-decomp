@@ -6,6 +6,27 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 /* Turok 2 layout (Rage Wars: pos 0x8, timer 0x678, fx 0x67C..0x684, flags 0x6B0). */
+#ifdef TARGET_PORT
+/* The port: the same views at the host offsets of CPlayer (m_CharacterActor.header.m_vPos,
+ * m_FlashlightTime, m_pDLFlashlight1/2, m_pDLDarkCityLight, m_ContState.m_dwButtonsSingle) and
+ * of CDLight (structs/particle.h). */
+#include "structs/player.h"
+#include "structs/particle.h"
+#define B05_OFF(m) __builtin_offsetof(CPlayer, m)
+typedef struct B05P14 {
+    u8 pad0[B05_OFF(m_CharacterActor.header.m_vPos)];
+    CVector3 pos;
+    u8 pad10[B05_OFF(m_FlashlightTime) - B05_OFF(m_CharacterActor.header.m_vPos) - sizeof(CVector3)];
+    f32 timer;
+    u8 padT[B05_OFF(m_pDLFlashlight1) - B05_OFF(m_FlashlightTime) - sizeof(f32)];
+    void *fx1;
+    void *fx2;
+    void *fx3;
+    u8 padA40[B05_OFF(m_ContState.m_dwButtonsSingle) - B05_OFF(m_pDLDarkCityLight) - sizeof(void *)];
+    u32 flagsA68;
+} B05P14;
+typedef struct B05Fx { void *pad0[2]; void *unk8; f32 unkC; s16 unk10; s16 unk12; s16 unk14; s16 unk16; } B05Fx;
+#else
 typedef struct B05P14 {
     u8 pad0[0x4];
     CVector3 pos;              /* 0x004 */
@@ -18,7 +39,13 @@ typedef struct B05P14 {
     u32 flagsA68;           /* 0xA68 */
 } B05P14;
 typedef struct B05Fx { u8 pad0[8]; void *unk8; f32 unkC; s16 unk10; s16 unk12; s16 unk14; s16 unk16; } B05Fx;
+#endif
+#ifdef TARGET_PORT
+#include "globals/scene.h"
+#define D_8010FF34 ((u8 *) &gScene.m_DLightSet)
+#else
 extern u8 D_8010FF34[];
+#endif
 void CDLightSet__Free(u8 *, void *);
 s32 Random_Next();
 B05Fx *CDLightSet__Alloc(u8 *, u8 *);

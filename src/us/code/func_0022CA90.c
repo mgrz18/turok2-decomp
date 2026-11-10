@@ -12,7 +12,11 @@
 typedef struct Target Target;
 
 extern u8 gEngineApp_m_SwooshSystem[];
+#ifdef TARGET_PORT
+#define D_8010FF34 (&gScene.m_DLightSet)
+#else
 extern u8 D_8010FF34[];
+#endif
 
 s32 Actor_GetTypeClass(Target *target);
 s32 CParticle__IsUnderWater(CParticle *p);
