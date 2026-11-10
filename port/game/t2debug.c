@@ -186,6 +186,20 @@ void T2Port_GiveWeapons(void) {
             }
         }
         CPlayer__FillAllAmmo(p);
+        if (getenv("T2_WEAPON_LIST") != NULL) {
+            /* T2_WEAPON_LIST=1: the weapon table (name, flags, model, first ammo class) */
+            for (i = 0; i < 35; i++) {
+                WeaponInfo *w = gWeaponInfoTable[i];
+                if (w == NULL) {
+                    continue;
+                }
+                printf("debug: weapon %2d %-24s flags %x model %d fireDelay %.2f ammo0 %d/%d proj %d cost %d\n", i,
+                       w->name != NULL ? (const char *) w->name : "-", (unsigned) w->flags, (int) w->model,
+                       w->fireDelay, w->ammo[0] != NULL ? w->ammo[0]->type : -1,
+                       w->ammo[0] != NULL ? w->ammo[0]->max : -1, w->ammo[0] != NULL ? w->ammo[0]->projectile : -1,
+                       w->ammo[0] != NULL ? w->ammo[0]->cost : -1);
+            }
+        }
         printf("debug: T2_GIVE_WEAPONS: level %d player %p: all weapons, full ammo\n", (int) gScene.m_nLevel,
                (void *) p);
     }
