@@ -86,7 +86,8 @@ static inline void *ram(uint32_t a) {
     return T2Port_PhysToVirtual(a);
 }
 
-/* A_ADPCM: VADPCM, order 2 (the microcode's), 9-byte frames -> 16 samples */
+/* A_ADPCM: VADPCM, order 2 (the microcode's), 9-byte frames -> 16 samples, after the 16 samples of
+ * the previous frame */
 static void cmd_adpcm(uint32_t w0, uint32_t w1) {
     unsigned flags = (w0 >> 16) & 0xFF;
     int16_t st[16];
@@ -99,6 +100,10 @@ static void cmd_adpcm(uint32_t w0, uint32_t w1) {
         memcpy(st, ram(sLoop), sizeof st);
     else
         memcpy(st, ram(w1), sizeof st);
+    /* the microcode writes the previous frame (the state) first and the new frames after it:
+     * alAdpcmPull then skips 32 bytes, or lastsam samples into that frame (*outp += ...) */
+    memcpy(dst, st, sizeof st);
+    dst += 16;
     for (f = 0; f < frames; f++, src += 9) {
         int scale = 1 << (src[0] >> 4);
         int pred = src[0] & 0xF;

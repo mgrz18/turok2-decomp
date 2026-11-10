@@ -250,7 +250,7 @@ static int run_direct(const char *rom, int k, const char *rawPath, const char *w
         p = cmd(p, 4u << 24, A32(src));                                             /* A_LOADBUFF */
         p = cmd(p, (8u << 24) | D_IN, ((u32)D_DEC << 16) | (FRAME * 2));
         p = cmd(p, (1u << 24) | ((first ? 1u : 0u) << 16), A32(adpcmState));       /* A_ADPCM */
-        p = cmd(p, (8u << 24) | D_DEC, ((u32)D_RS << 16) | (FRAME * 2));
+        p = cmd(p, (8u << 24) | (D_DEC + 32), ((u32)D_RS << 16) | (FRAME * 2)); /* past the previous frame */
         p = cmd(p, (5u << 24) | ((first ? 1u : 0u) << 16) | 0x8000, A32(rsState)); /* A_RESAMPLE 1.0 */
         p = cmd(p, (2u << 24) | D_L, FRAME * 2);                                    /* A_CLEARBUFF */
         p = cmd(p, (2u << 24) | D_R, FRAME * 2);
