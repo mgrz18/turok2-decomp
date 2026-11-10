@@ -21,7 +21,11 @@ typedef struct B19bLObj {
                u8 fBA;
 } B19bLObj;
 void CMtxF__TransformPoint(void *, void *, void *);
+#ifdef TARGET_PORT /* ABI: the definition takes three floats (a 12-byte float struct by value is xmm0 {x,y} + xmm1 {z} on x86-64) */
+s32 Actors_GetLightVolumeFalloff(void *, f32, f32, f32, void *, f32 *);
+#else
 s32 Actors_GetLightVolumeFalloff(void *, B19bV3f, void *, f32 *);
+#endif
 void CVector3__Add(void *, void *, void *);
 void CMtxF__TransformPointProjective(void *, void *, void *);
 void CVector3__Subtract(void *, void *, void *);
@@ -73,7 +77,11 @@ void CScene__ComputeLights(B19bLObj **ents, s32 n, f32 *pos, u8 *out) {
         do {
             o = ents[k];
             CMtxF__TransformPoint((u8 *)o + 0x20, pos, &t0);
+#ifdef TARGET_PORT
+            if (Actors_GetLightVolumeFalloff(o, t0.x, t0.y, t0.z, &g, &wb[k]) != 0) {
+#else
             if (Actors_GetLightVolumeFalloff(o, t0, &g, &wb[k]) != 0) {
+#endif
                 CVector3__Add(&h, &g, &t0);
                 CMtxF__TransformPointProjective((u8 *)o + 0x60, &h, &g);
                 CVector3__Subtract((&db[k]), pos, &g);
