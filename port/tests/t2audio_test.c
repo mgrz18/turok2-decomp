@@ -250,7 +250,7 @@ static int run_direct(const char *rom, int k, const char *rawPath, const char *w
         p = cmd(p, 4u << 24, A32(src));                                             /* A_LOADBUFF */
         p = cmd(p, (8u << 24) | D_IN, ((u32)D_DEC << 16) | (FRAME * 2));
         p = cmd(p, (1u << 24) | ((first ? 1u : 0u) << 16), A32(adpcmState));       /* A_ADPCM */
-        p = cmd(p, (8u << 24) | D_DEC, ((u32)D_RS << 16) | (FRAME * 2));
+        p = cmd(p, (8u << 24) | (D_DEC + 32), ((u32)D_RS << 16) | (FRAME * 2)); /* past the previous frame */
         p = cmd(p, (5u << 24) | ((first ? 1u : 0u) << 16) | 0x8000, A32(rsState)); /* A_RESAMPLE 1.0 */
         p = cmd(p, (2u << 24) | D_L, FRAME * 2);                                    /* A_CLEARBUFF */
         p = cmd(p, (2u << 24) | D_R, FRAME * 2);
@@ -288,6 +288,36 @@ static int run_direct(const char *rom, int k, const char *rawPath, const char *w
     return peak > 200 ? 0 : 1;
 }
 
+/* ---- --adec ROMADDR SIZE out.raw: the host adec decoder (t2audio_adec.c) on one speech stream
+ * of the ROM, to compare with tools/assets/audio.py (AdecDecoder) ---- */
+int T2Audio_AdecDecode(const uint8_t *romBytes, size_t size, int16_t *out, size_t maxSamples, uint32_t *rate);
+static int run_adec(const char *rom, unsigned addr, unsigned size, const char *rawPath) {
+    T2PortConfig cfg;
+    size_t rs;
+    const uint8_t *r;
+    int16_t *pcm;
+    uint32_t rate;
+    int n;
+    FILE *fp;
+    memset(&cfg, 0, sizeof cfg);
+    t2ultra_configure(&cfg);
+    if (t2ultra_load_rom(rom) != 0)
+        return 1;
+    r = t2_rom(&rs);
+    if (addr + (size_t)size > rs)
+        return 1;
+    pcm = calloc(1 << 22, sizeof(int16_t));
+    n = T2Audio_AdecDecode(r + addr, size, pcm, 1 << 22, &rate);
+    fp = fopen(rawPath, "wb");
+    if (fp == NULL || n < 0)
+        return 1;
+    fwrite(pcm, sizeof(int16_t), (size_t)n, fp);
+    fclose(fp);
+    printf("adec: ROM %X (%u bytes): %d samples at %u Hz -> %s\n", addr, size, n, rate, rawPath);
+    free(pcm);
+    return 0;
+}
+
 int main(int argc, char **argv) {
     T2PortConfig cfg;
     const char *wav = NULL;
@@ -302,6 +332,9 @@ int main(int argc, char **argv) {
         return 2;
     }
     for (i = 2; i < argc; i++) {
+        if (!strcmp(argv[i], "--adec") && i + 3 < argc)
+            return run_adec(argv[1], (unsigned)strtoul(argv[i + 1], NULL, 0), (unsigned)strtoul(argv[i + 2], NULL, 0),
+                            argv[i + 3]);
         if (!strcmp(argv[i], "--direct") && i + 2 < argc) {
             int k = atoi(argv[i + 1]);
             const char *rawp = argv[i + 2];

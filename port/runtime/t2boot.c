@@ -188,11 +188,13 @@ int T2Port_Boot(const T2PortConfig *cfg) {
     osMemSize = 0x800000;
     set_if_zero(&osTvType, 1); /* NTSC */
     osResetType = 0;           /* cold boot */
-    /* func_0028D380 on a power-on: no boot signature in RDRAM, so gWarmBoot = 1 ("first boot"),
-     * and CEngineApp__Construct then runs GameSettings_SetDefaults (difficulty mask 0x10, the
-     * HUD alpha, the multiplayer slots...). Left 0, the settings stayed zero: the difficulty
-     * mask CScene__DrawGeometry tests every object's flags against was 0 and no level geometry
-     * was drawn (docs/port/RENDER.md). */
+    /* main (func_0028D380, not linked) sets gWarmBoot = 1 when the boot marker in RDRAM does not
+     * match, i.e. on power-on (the name is the opposite of what it means: globals/frame.h);
+     * CEngineApp__Construct then clears the saved players and runs GameSettings_SetDefaults
+     * (music/sfx volumes 0xFF/0xFA, the difficulty mask 0x10, the HUD alpha, multiplayer rules).
+     * Left 0, every setting stayed 0: the music played at volume 0 (docs/port/AUDIO.md) and the
+     * difficulty mask CScene__DrawGeometry tests every object's flags against was 0, so no level
+     * geometry was drawn (docs/port/RENDER.md). */
     gWarmBoot = 1;
     set_if_zero(&gThreadPriorityIdleInit, 10);
     set_if_zero(&gThreadPriorityDecompressorLow, 11);

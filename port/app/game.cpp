@@ -225,6 +225,7 @@ void WriteShot(const std::shared_ptr<Fast::Fast3dWindow>& window, const char* sh
 extern "C" {
 int Sound__Play2D(int id);
 void Music_SetTrack(int track);
+void Sound__PlaySpeech(int group);
 void T2Audio_TestVolumes(void);
 }
 
@@ -235,6 +236,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     // is idle). Needs --audio.
     const char* testSfx = getenv("T2_TEST_SFX");
     const char* testSong = getenv("T2_TEST_SONG");
+    const char* testSpeech = getenv("T2_TEST_SPEECH"); // Sound__PlaySpeech(<group>) at frame 90
     if (window) {
         static const T2PortContHooks hooks = { ContInit, ContRead };
         T2Port_SetContHooks(&hooks);
@@ -291,12 +293,16 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             window->HandleEvents();
         }
         sFrame = f;
-        if (args.audio && (testSfx != nullptr || testSong != nullptr) && f == 29) {
+        if (args.audio && (testSfx != nullptr || testSong != nullptr || testSpeech != nullptr) && f == 29) {
             T2Audio_TestVolumes();
         }
         if (args.audio && testSfx != nullptr && f == 30) {
             int h = Sound__Play2D((int)strtol(testSfx, nullptr, 0));
             printf("game: T2_TEST_SFX: Sound__Play2D(%s) -> handle %d\n", testSfx, h);
+        }
+        if (args.audio && testSpeech != nullptr && f == 90) {
+            Sound__PlaySpeech((int)strtol(testSpeech, nullptr, 0));
+            printf("game: T2_TEST_SPEECH: Sound__PlaySpeech(%s)\n", testSpeech);
         }
         if (args.audio && testSong != nullptr && f == 60) {
             Music_SetTrack((int)strtol(testSong, nullptr, 0));

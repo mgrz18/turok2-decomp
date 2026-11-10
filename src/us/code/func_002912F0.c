@@ -18,16 +18,22 @@ typedef struct {
 } Arena;
 #endif
 
+#ifdef TARGET_PORT
+#define ARENA_ADDR(x) ((sptr)(x)) /* the (s32) casts truncated a heap above 4 GB (macOS, --high-memory) */
+#else
+#define ARENA_ADDR(x) ((s32)(x))
+#endif
+
 void alHeapInit(Arena *arg0, sptr arg1, s32 arg2) {
     s32 temp_v1;
 
     temp_v1 = 0x10 - (arg1 & 0xF);
     if (temp_v1 != 0x10) {
-        arg0->base = (sptr) (arg1 + temp_v1);
+        arg0->base = ARENA_ADDR(arg1 + temp_v1);
     } else {
         arg0->base = arg1;
     }
     arg0->size = arg2;
     arg0->count = 0;
-    arg0->cur = (sptr) arg0->base;
+    arg0->cur = ARENA_ADDR(arg0->base);
 }

@@ -64,7 +64,7 @@ static s32 sMaxCmds;
 static int sCur;
 static u32 sRate = 22050;
 
-static const u8 *sTbl; /* the ROM from gAudioRomBase on (resident, below 2 GB) */
+static const u8 *sTbl; /* the whole ROM image, resident (below 2 GB in low-memory mode) */
 static size_t sTblSize;
 
 static T2AudioStats sStats;
@@ -127,11 +127,30 @@ size_t T2Audio_Queued(void) {
 
 /* ---- DMA (func_0026FD4C __amDmaNew, func_002700D0 __amDMA) ---- */
 
+/* The resident copy is the whole ROM, indexed by ROM address: amCreateAudioMgr runs before
+ * CAudioWorld__Initialize sets gAudioRomBase = 0x20F194 (func_00270240.c), so a copy taken
+ * "from gAudioRomBase on" at that point started at the stale value and every wave decoded
+ * garbage (the sfx and music came out as clipped noise). */
+static void load_tbl(void) {
+    size_t rs = 0;
+    const u8 *rom = t2_rom(&rs);
+    u8 *p;
+    if (rom == NULL) {
+        t2_log_once("t2audio: no ROM image: no wave data");
+        return;
+    }
+    p = t2_lowmem_alloc(rs + 16);
+    memcpy(p, rom, rs);
+    sTblSize = rs;
+    sTbl = p;
+}
+
 const uint8_t *T2Audio_TblBytes(uint32_t romAddr, uint32_t len) {
-    u32 base = (u32)gAudioRomBase;
-    if (sTbl == NULL || romAddr < base || romAddr - base > sTblSize || len > sTblSize - (romAddr - base))
+    if (sTbl == NULL)
+        load_tbl();
+    if (sTbl == NULL || romAddr > sTblSize || len > sTblSize - romAddr)
         return NULL;
-    return sTbl + (romAddr - base);
+    return sTbl + romAddr;
 }
 
 /* ALDMAproc: the wave table bytes at gAudioRomBase + offset, as the 32-bit address the command
@@ -154,21 +173,6 @@ ALDMAproc __amDmaNew(void **state) {
 }
 s32 __amDMA(s32 offset, s32 length, void *state) {
     return am_dma(offset, length, state);
-}
-
-static void load_tbl(void) {
-    size_t rs = 0;
-    const u8 *rom = t2_rom(&rs);
-    u32 base = (u32)gAudioRomBase;
-    u8 *p;
-    if (rom == NULL || base >= rs) {
-        t2_log_once("t2audio: no ROM image: no wave data");
-        return;
-    }
-    sTblSize = rs - base;
-    p = t2_lowmem_alloc(sTblSize + 16);
-    memcpy(p, rom + base, sTblSize);
-    sTbl = p;
 }
 
 /* ---- the manager ---- */
