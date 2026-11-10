@@ -3,6 +3,13 @@
  * scratch values in file statics (sPoseChildren-sPoseCeilingOverlap). */
 
 #include "common.h"
+/* float -> u32 as the R4300 does it (cvt.w.s: a negative value wraps). arm64's fcvtzu saturates
+ * negatives to 0 (MACOS.md section 9, tools/port/f2ucheck.py); x86-64 happens to wrap. */
+#ifdef TARGET_PORT
+#define T2_F2U(x) ((u32)(s32)(x))
+#else
+#define T2_F2U(x) ((u32)(x))
+#endif
 #include "structs/vector.h"
 #include "structs/region.h"
 #include "globals/object.h"
@@ -260,35 +267,35 @@ static __inline__ void packMtx(u32 *out, f32 (*m)[4]) {
     u32 e1;
     u32 e2;
 
-    e1 = (u32) m[0][0];
-    e2 = (u32) m[0][1];
+    e1 = T2_F2U(m[0][0]);
+    e2 = T2_F2U(m[0][1]);
     *hi++ = (e1 & 0xFFFF0000) | (e2 >> 16);
     *lo++ = (e1 << 16) | (e2 & 0xFFFF);
-    e1 = (u32) m[0][2];
+    e1 = T2_F2U(m[0][2]);
     e2 = 0;
     *hi++ = (e1 & 0xFFFF0000) | (e2 >> 16);
     *lo++ = (e1 << 16) | (e2 & 0xFFFF);
-    e1 = (u32) m[1][0];
-    e2 = (u32) m[1][1];
+    e1 = T2_F2U(m[1][0]);
+    e2 = T2_F2U(m[1][1]);
     *hi++ = (e1 & 0xFFFF0000) | (e2 >> 16);
     *lo++ = (e1 << 16) | (e2 & 0xFFFF);
-    e1 = (u32) m[1][2];
+    e1 = T2_F2U(m[1][2]);
     e2 = 0;
     *hi++ = (e1 & 0xFFFF0000) | (e2 >> 16);
     *lo++ = (e1 << 16) | (e2 & 0xFFFF);
-    e1 = (u32) m[2][0];
-    e2 = (u32) m[2][1];
+    e1 = T2_F2U(m[2][0]);
+    e2 = T2_F2U(m[2][1]);
     *hi++ = (e1 & 0xFFFF0000) | (e2 >> 16);
     *lo++ = (e1 << 16) | (e2 & 0xFFFF);
-    e1 = (u32) m[2][2];
+    e1 = T2_F2U(m[2][2]);
     e2 = 0;
     *hi++ = (e1 & 0xFFFF0000) | (e2 >> 16);
     *lo++ = (e1 << 16) | (e2 & 0xFFFF);
-    e1 = (u32) m[3][0];
-    e2 = (u32) m[3][1];
+    e1 = T2_F2U(m[3][0]);
+    e2 = T2_F2U(m[3][1]);
     *hi++ = (e1 & 0xFFFF0000) | (e2 >> 16);
     *lo++ = (e1 << 16) | (e2 & 0xFFFF);
-    e1 = (u32) m[3][2];
+    e1 = T2_F2U(m[3][2]);
     e2 = 65536;
     *hi++ = (e1 & 0xFFFF0000) | (e2 >> 16);
     *lo++ = (e1 << 16) | (e2 & 0xFFFF);

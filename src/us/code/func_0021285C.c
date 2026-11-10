@@ -1,6 +1,13 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/ACTORS/actors_volume_lighting.CPP, Actors_AccumulateVertexLighting, with Turok 2's layouts. */
 
 #include "common.h"
+/* float -> u32 as the R4300 does it (cvt.w.s: a negative value wraps). arm64's fcvtzu saturates
+ * negatives to 0 (MACOS.md section 9, tools/port/f2ucheck.py); x86-64 happens to wrap. */
+#ifdef TARGET_PORT
+#define T2_F2U(x) ((u32)(s32)(x))
+#else
+#define T2_F2U(x) ((u32)(x))
+#endif
 #include "structs/vector.h"
 #include "protos/iset.h"
 
@@ -131,9 +138,9 @@ void Actors_AccumulateVertexLighting(LightVolume **lights, s32 lightCount, s32 *
                 }
                 if (mode == 2) {
                     pattern = 0;
-                    pattern += (u32)worldPosition.x / 10;
-                    pattern += (u32)worldPosition.y / 10;
-                    pattern += (u32)worldPosition.z / 10;
+                    pattern += T2_F2U(worldPosition.x) / 10;
+                    pattern += T2_F2U(worldPosition.y) / 10;
+                    pattern += T2_F2U(worldPosition.z) / 10;
                     pattern = pattern % 7 + 1;
                     vertex->flags = (vertex->flags & 0xFF8F) | ((pattern << 4) & 0x70);
                 }
