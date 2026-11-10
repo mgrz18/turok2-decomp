@@ -6,8 +6,16 @@
 #include "protos/game.h"
 
 extern s32 CGameRegion__IsSteep(void *region);
+#ifdef TARGET_PORT
+extern u8 func_0026C114(void *region); /* returns u8: the high bits of the s32 return register are not cleared on the host */
+#else
 extern s32 func_0026C114(void *region);
+#endif
+#ifdef TARGET_PORT
+extern u8 func_0026C0E0(void *region); /* returns u8: the high bits of the s32 return register are not cleared on the host */
+#else
 extern s32 func_0026C0E0(void *region);
+#endif
 /* gCollisionResults_m_pFloorRegion / gCollisionResults_m_vFloorPos are CCollisionResults (gCollisionResults, structs/collision.h)
  * m_pFloorRegion and m_vFloorPos; kept as their own symbols: reading them
  * through gCollisionResults does not give this code. */
