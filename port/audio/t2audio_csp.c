@@ -22,6 +22,9 @@
 #include "structs/libaudio.h"
 #include "globals/libaudio.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 s32 osSetIntMask(s32 mask);
 void alLink(ALLink *ln, ALLink *to);
 void alUnlink(ALLink *ln);
@@ -285,6 +288,9 @@ void alCSeqNew(ALCSeq *seq, u8 *ptr) {
         }
     }
     seq->qnpt = 1.0f / (f32)seq->base->division;
+    if (getenv("T2_AUDIO_LOG"))
+        fprintf(stderr, "t2audio: alCSeqNew: division %u, tracks %04X, offsets %X %X %X\n", seq->base->division,
+                seq->validTracks, seq->base->trackOffset[0], seq->base->trackOffset[1], seq->base->trackOffset[2]);
 }
 
 /* func_0028EF90 */
@@ -463,6 +469,8 @@ void alCSeqGetLoc(ALCSeq *seq, ALCSeqMarker *m) {
 
 /* ---------------------------------------------------------------- seqplayer.c helpers */
 
+static int sCspLog = -1; /* T2_AUDIO_LOG: alCSeqNew and every note on */
+
 /* func_0029247C */
 ALVoiceState *__mapVoice(ALSeqPlayer *seqp, u8 key, u8 vel, u8 channel) {
     ALVoiceState *vs = seqp->vFreeList;
@@ -479,6 +487,11 @@ ALVoiceState *__mapVoice(ALSeqPlayer *seqp, u8 key, u8 vel, u8 channel) {
         vs->velocity = vel;
         vs->voice.clientPrivate = vs;
     }
+    if (sCspLog < 0)
+        sCspLog = getenv("T2_AUDIO_LOG") != NULL;
+    if (sCspLog)
+        fprintf(stderr, "t2audio: note on t=%d us key %u vel %u chan %u%s\n", (int)seqp->curTime, key, vel, channel,
+                vs ? "" : " (no voice)");
     return vs;
 }
 
