@@ -21,7 +21,11 @@ extern DirLight gParticleSpriteVtx[4];
 extern void func_0027BD10(void *def);
 extern void CMtxF__SetRotateX(void *, f32);
 
+#ifdef TARGET_PORT
+void CParticleSystem__Construct(CParticleSystem *sys, sptr arg1) { /* the particle data pointer-wide */
+#else
 void CParticleSystem__Construct(CParticleSystem *sys, s32 arg1) {
+#endif
     s32 i;
     s32 j;
     DirLight *light;
