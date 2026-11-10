@@ -11,6 +11,20 @@
 #include "globals/ai.h"
 
 
+#ifdef TARGET_PORT
+typedef struct ActionState {
+/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ActionState(m) __builtin_offsetof(CAI, m)
+    union {
+        struct { u8 _hp_table[T2_HOFF_ActionState(m_pModeTable)]; void *table; }; /* N64 0x2C */
+        struct { u8 _hp_anim[T2_HOFF_ActionState(m_AnimIndex)]; u8 anim; }; /* N64 0xC6 */
+        struct { u8 _hp_active[T2_HOFF_ActionState(m_AnimRepeatedCount)]; s8 active; }; /* N64 0xC7 */
+        struct { u8 _hp_update[T2_HOFF_ActionState(m_pfStep)]; void (*update)(CGameObjectInstance *, void *); }; /* N64 0xF0 */
+        struct { u8 _hp_onEvent[T2_HOFF_ActionState(m_pfHurt)]; void (*onEvent)(CGameObjectInstance *, void *); }; /* N64 0xF8 */
+    };
+} ActionState;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x2C];
     /* 0x2C */ void *table;
@@ -22,6 +36,7 @@ typedef struct {
     /* 0xF4 */ u8 padF4[4];
     /* 0xF8 */ void (*onEvent)(CGameObjectInstance *, void *);
 } ActionState;
+#endif
 
 extern void Destructible_Step(CGameObjectInstance *actor, void *state);
 extern void Destructible_Hurt(CGameObjectInstance *actor, void *state);
