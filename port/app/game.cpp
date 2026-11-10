@@ -445,6 +445,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     const char* shotEnv = getenv("T2_SHOT_EVERY");
     const int shotEvery = shotEnv != nullptr ? atoi(shotEnv) : 0;
     int nextShot = shotEvery;
+    // T2_SHOT_FROM=<frame> (debug, round 7 v2): the periodic shots start at that frame
+    if (const char* from = getenv("T2_SHOT_FROM"); from != nullptr && shotEvery > 0 && atoi(from) > nextShot) {
+        nextShot = atoi(from);
+    }
     const char* dumpAtEnv = getenv("T2_DLDUMP_AT");
     const int dumpAt = dumpAtEnv != nullptr ? atoi(dumpAtEnv) : 0;
     bool dumped = false;
