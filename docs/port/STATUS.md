@@ -196,6 +196,77 @@ frames show the corridor, the door and the weapon models at normal brightness.
 7. The remaining N64 views on the player path (GAMEPLAY.md section 5):
    `CPlayerPool__UpdateMatchClock`, `Action_CheckRequiredItem`, func_00271694.
 
+## Round 7, part v1: the particle system (branch names-R7_v1)
+
+`CParticleSystem__Spawn` and the particle path run on host types, so the **animation events
+and hot points are on by default** (`T2_ANIM_EVENTS=0` turns them off). Details:
+[RENDER.md](RENDER.md) section 6. All src/include changes are `TARGET_PORT`;
+`tools/asm_diff.py --base d3f05a74 -j 8` reports 0 over all 3,938 files.
+
+**Merge needs:** the archive rebuilt (`swap_spec.json`: particle-effects block 0 kept
+big-endian, `"block0": "byte"`, honoured by `swapcheck.py`): sha1
+`3ad7d24031060de1b4dad8df85b8c321227fe77c`; `decls.json` deleted (`structs/particle.h` changed:
+`CPackedRange`, `CROMParticleDistance/Oscillation/Colors/Motion`; DLights_Load's
+`gDLightBuffer[0x40]`).
+
+What was wrong, in the order found:
+
+| # | where | cause | fix |
+|---|---|---|---|
+| P1 | the templates (block 2) | nine 32-bit offsets per 0x3C record, relocated in place: no room for host pointers | `port/game/t2particles.c` builds a host copy per load (`CScene__DecompressParticles` and its twin); Spawn indexes it |
+| P2 | block 0 sub-records | swapped as f32 (base and range of every `CPackedRange` exchanged); records overlap across types | kept big-endian, decoded per slot by the builder |
+| P3 | func_0022D2FC.c (FAKEMATCH) | every view at N64 offsets (`EffectSystem.resource` at 0xEC64: `CISet__GetBlock(NULL/garbage, 1)`, the crash of round 6) | hostview twins of all 17 views, host aimEffect, player list head by name |
+| P4 | 22 particle files | views at N64 offsets (projectile updates, HitTarget, Attach, StopLoopSound...) | hostview / host bodies |
+| P5 | `CParticle__BuildCameraMatrix` | wrote the matrix at the N64 0x48, over `m_dwFlags`: freed particles left in the draw list, an endless loop | `m_mtxDraw[gEvenOdd]` |
+| P6 | `CCamera__DrawGlares` | `CGlareSource` view over the particle draw list | hostview |
+| P7 | `CScene__DrawParticles` | `scene + 0x18B0` | `&scene->m_ParticleSystem` |
+| P8 | collision sweeps (particles move with `Collision_MoveInstance`) | static objects at the N64 stride, actor/box/face sweeps' views, the `{pointer, f32}` hit sorts | host CStaticObject stride, hostview, host-size comparators/swaps |
+| P9 | `CScene__ClearListCounts` | N64 view: the scene's per-frame list counts (`m_nMovers`, `m_nKind1`, `m_nRegistered`...) were never reset on the host | hostview |
+| P10 | `gDLightBuffer` | 16 bytes on the host (splat labels inside the 0x400 buffer): DLights_Load overran it | sized declaration for gendata |
+| P11 | host template copies | freed on a reload while particles still used them | kept (one per scene load) |
+| P12 | `CParticle__HitFloor/HitWall/HitCeiling` | the surface getters return u8, declared s32: the impact table indexed with eax garbage | u8 declarations (ABI class not caught by abicheck: see next steps) |
+| P13 | `CParticleSystem__Construct` (and _2) | the particle data passed through the `s32 *m_pParticleEffects` handle: truncated with `--high-memory` | `*(sptr *)`, an `sptr` parameter |
+| P14 | `CScene__GetSwoosh` | `CISet__GetBlock` without a prototype (implicit int): the trail record pointer truncated with `--high-memory` | `protos/iset.h` |
+| P15 | func_0020B9F4 (particle models) | the cache entries' data pointers read as `*(s32 *)` (`--high-memory`) | pointer-wide |
+
+How far it gets with the events on (Linux headless, low memory, `--game --draw --pak-blank`):
+
+- **The boot loop, 26,000 frames: no crash (exit 0).** The mode switches are at the same frames as
+  round 6 (1362 Acclaim, 1850 Iguana, 4212 title, 5467 demo 1, 13680 demo 2, 20946 demo 3,
+  25778 the title again). The animation events fire from the Acclaim logo on (kinds 217/218
+  from its hot points, 442...).
+- **The scripted journey, 15,000 frames: no crash (exit 0).** Level 51 at frame 12,895, the same
+  path as round 6 (13080 (-1540.7 -735.8 -982.4) state 3; 13440 (-1164.7 -780.7 -29.0);
+  13800 (358.3 -780.7 -60.3); 14400 (623.2 -780.7 198.3); 14640 (795.2 -780.7 233.0)),
+  health 100, the wheel requesting weapon 2. `T2_PARTICLE_LOG=50`: 350 spawn calls, all in
+  the cinemas (none in level 51 on this path: no footstep hot points in first person; v2's
+  firing spawns the arrow and its splash).
+- **`--high-memory`: the boot to 12,000 frames, no crash** (after P13-P15).
+- Particles on screen (RENDER.md 6.4): against round 6's binary, 16 of 138 frames from 1 to
+  2770 differ, each where particles show (the Acclaim logo's cyan ring burst and sparks/dust,
+  the Iguana jungle's mist and fireflies).
+- Debug: `T2_PARTICLE_LOG=N` prints every N `CParticleSystem__Spawn` calls that reach templates.
+
+Files others may touch (merge): func_0024032C.c, func_0023F880.c, func_0023FDF0.c,
+func_0023DF70.c, func_0023D050.c, func_0023DBBC.c, the hit sorts (func_002407D8, func_0024079C,
+func_0023DB98, func_0023DB5C) and func_002682CC (v3's collision area: agreed with v3);
+func_00226390.c (`CScene__ClearListCounts`: changes what every list-driven system sees);
+func_002284E0.c (`gDLightBuffer[0x40]`: v2 made the same fix, keep one); func_0022D2FC.c.
+
+Next:
+
+1. **The narrow-return ABI class** (P12) is not caught by abicheck: a regex scan finds 17
+   functions defined with a u8/s8/u16/s16 return and declared s32/u32/sptr elsewhere
+   (EnemyAI_GetBehaviorIndex, EnemyAI_PickAttack, WeightedTable_Pick/_PickStatic,
+   CScene__GetObjectTypeID, Controller_IsPakWatched, __osContDataCrc...). Check each call site
+   (some are in `#else` branches) and teach abicheck the return width.
+2. The particle files not touched because no run reached them: func_00236A34, the Trail/Swoosh
+   drawing (`Trail_DrawTextured`, `Trail_PlaceNodes`: typed but not checked against particles
+   with trails), func_00232F38's big view (only `id` is read), `CParticle__SpawnAlongPath`.
+3. Firing (v2) and enemy hits (v3) spawn projectiles and impacts through this path: their
+   particles (bow arrows, bullets, blood) were not seen in this round's runs.
+4. macOS with the events on was not run (v4); `--high-memory` was run to 12,000 frames only.
+
 ## Round 6, part u1: gameplay draws the level (branch names-R6_u1)
 
 [RENDER.md](RENDER.md) section 4. Level 51 now **draws in gameplay**: the Port of Adia start

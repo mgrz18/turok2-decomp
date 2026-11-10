@@ -152,7 +152,7 @@ were not checked against `T2PoseContext`.
 The particle system runs on host types: `CParticleSystem__Spawn` and the rest of the particle
 path, so the animation events and hot points are **on by default** (`T2_ANIM_EVENTS=0` turns
 them off). Footsteps, splashes, muzzle flashes, sparks and the cinemas' ambient particles
-(the Acclaim logo's, the Iguana jungle's) now spawn, move, collide, light and draw.
+(the Acclaim logo's, the Iguana jungle's) now spawn, move, collide, light and draw (6.4).
 
 ### 6.1 The templates: a host copy
 
@@ -217,3 +217,22 @@ the scene's per-frame list counts through an N64 view, so on the host `m_nMovers
 `m_nRegistered`, `m_nDrawActors`... were never reset (the movers list was full of stale and
 NULL entries). The dynamic lights: `gDLightBuffer` was 16 bytes on the host (splat labels inside
 it); DLights_Load declares it with its size (0x40 lights) on TARGET_PORT for gendata.
+
+### 6.4 Frames and checks
+
+Compared with round 6's binary (no particles at all; `T2_SHOT_EVERY=20`, frames 1..2770): 16 of
+138 frames differ, all where particles show. Frame 1421, a cyan ring burst as the Acclaim letters
+flip in; 1561-1701, yellow sparks and dark dust puffs around the letters; 2443-2763, the Iguana
+jungle's mist sprite and fireflies (yellow points). The rest are pixel-identical. With
+`T2_ANIM_EVENTS=0` the same frames are identical to the default: the particles seen in these
+cinemas come from their scripted events, not from the animation events (whose particles, kinds
+217/218/442 from the logo's hot points, carry a light and a trail).
+
+A display list with sprites (`T2_DLDUMP_AT=2763 T2_DLDUMP_VTX=1`): 18 sprites, each a G_MTX load
+of `m_mtxDraw[gEvenOdd]` (world scale/rotation and position, e.g. (-2924.8, 403.5, -925.1),
+which the frame's projection puts at NDC (-0.02, 0.17), w 333), the texture, the combiner and
+prim colour, one G_VTX of `gParticleSpriteVtx` and one G_TRI2.
+
+Level 51 on the journey spawns no particles (no `CParticleSystem__Spawn` call after frame 11,340):
+the first-person player has no footstep hot points, and swimming does not spawn splashes through
+this path. Firing (round 7 v2) and the enemies (v3) are the next users.
