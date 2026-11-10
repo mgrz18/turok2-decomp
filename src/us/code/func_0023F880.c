@@ -4,6 +4,26 @@
 #include "globals/collision.h"
 
 /* An instance that can be hit, or the one sweeping (a particle: type 2). */
+#ifdef TARGET_PORT
+/* the host view: the sweeping particle's members (CParticle), its owner's player link
+ * (CGameObjectInstance.m_AI.m_pParent) and the player word at N64 0x4F4 (m_WeaponActor's AI
+ * variables + 0x20), each at its host offset (one union) */
+#include "structs/particle.h"
+#include "structs/player.h"
+typedef struct HitInst {
+    union {
+        struct { u8 _hp_type[__builtin_offsetof(CParticle, header.m_Type)]; u8 type; };
+        struct { u8 _hp_kind[__builtin_offsetof(CParticle, header.m_nObjType)]; u16 kind; };
+        struct { u8 _hp_pos[__builtin_offsetof(CParticle, header.m_vPos)]; CVector3 pos; };
+        struct { u8 _hp_def[__builtin_offsetof(CParticle, header.m_pIntelligence)]; CIntelligence *def; };
+        struct { u8 _hp_colour[__builtin_offsetof(CParticle, m_vVelocity)]; f32 colour[3]; };
+        struct { u8 _hp_owner[__builtin_offsetof(CParticle, m_pOwner)]; struct HitInst *owner; };
+        struct { u8 _hp_target[__builtin_offsetof(CParticle, m_pTarget)]; struct HitInst *target; };
+        struct { u8 _hp_player[__builtin_offsetof(CGameObjectInstance, m_AI.m_pParent)];
+                 struct { u8 pad[__builtin_offsetof(CPlayer, m_WeaponActor.m_AI.m_VarU8) + 0x20]; s32 hitByLaser; } *player; };
+    };
+} HitInst;
+#else
 typedef struct HitInst {
     /* 0x000 */ u8 type;
     /* 0x002 */ u16 kind;
@@ -18,6 +38,7 @@ typedef struct HitInst {
     /* 0x118 */ u8 pad118[0x90];
     /* 0x1A8 */ struct { u8 pad[0x4F4]; s32 hitByLaser; } *player;
 } HitInst;
+#endif
 
 typedef struct EffectParams {
     /* 0x0 */ s16 type;

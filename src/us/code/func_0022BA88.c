@@ -5,7 +5,11 @@
 #include "globals/collision.h"
 #include "protos/game.h"
 
+#ifdef TARGET_PORT
+extern u8 func_0026C114(void *region); /* ABI: it returns u8 (as s32 the host read garbage upper bits) */
+#else
 extern s32 func_0026C114(void *region);                     /* region's surface type */
+#endif
 extern void ImpactEvent_Send(CParticle *, CParticle *, s32 effect, s32, CVector3 pos, CEventValue params);
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
 extern void Sound__Play(s16 sound, CVector3 pos, sptr, sptr);

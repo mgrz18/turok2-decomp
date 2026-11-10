@@ -3,6 +3,9 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002838F4.c, func_002838F4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#ifdef TARGET_PORT
+#include "structs/particle.h"
+#endif
 typedef struct B19Def B19Def;
 typedef struct B19Obj B19Obj;
 struct B19Def {
@@ -12,6 +15,19 @@ struct B19Def {
               u8 pad8[0x4];
               s16 sC;
 };
+#ifdef TARGET_PORT
+struct B19Obj {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_B19Obj(m) __builtin_offsetof(CParticle, m)
+    union {
+        struct { u8 _hp_id[T2_HOFF_B19Obj(header.m_nObjType)]; u16 id; }; /* N64 0x2 */
+        struct { u8 _hp_pos[T2_HOFF_B19Obj(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_flags[T2_HOFF_B19Obj(m_dwFlags)]; u32 flags; }; /* N64 0x40 */
+        struct { u8 _hp_unk118[T2_HOFF_B19Obj(m_pDLight)]; s32 unk118; }; /* N64 0x118 */
+    };
+};
+#else
 struct B19Obj {
     u8 pad0[0x2];
     u16 id;          /* 0x2 */
@@ -21,6 +37,7 @@ struct B19Obj {
     u8 pad44[0xD4];
     s32 unk118;      /* 0x118 */
 };
+#endif
 extern u8 gEngineApp_m_SwooshSystem[];
 #ifdef TARGET_PORT
 #include "structs/particle.h"

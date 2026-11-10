@@ -6,6 +6,18 @@
 #include "globals/game.h"
 #include "protos/game.h"
 
+#ifdef TARGET_PORT
+typedef struct ProjNode {
+/* the view at the host offsets of CPlayer (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ProjNode(m) __builtin_offsetof(CPlayer, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_ProjNode(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_height[T2_HOFF_ProjNode(m_CharacterActor.m_CollisionYOffset)]; f32 height; }; /* N64 0x54 */
+        struct { u8 _hp_next[T2_HOFF_ProjNode(m_pNext)]; struct ProjNode *next; }; /* N64 0x1320 */
+    };
+} ProjNode;
+#else
 typedef struct ProjNode {
     /* 0x0000 */ u8 pad0[4];
     /* 0x0004 */ CVector3 pos;
@@ -14,6 +26,7 @@ typedef struct ProjNode {
     /* 0x0058 */ u8 pad58[0x1320 - 0x58];
     /* 0x1320 */ struct ProjNode *next;
 } ProjNode;
+#endif
 
 typedef struct ProjLimits {
     /* 0x00 */ u8 pad0[0x10];
@@ -21,6 +34,18 @@ typedef struct ProjLimits {
     /* 0x12 */ u16 maxSpeed;               /* high half of an f32 */
 } ProjLimits;
 
+#ifdef TARGET_PORT
+typedef struct ProjDef {
+/* the view at the host offsets of CROMParticleEffect (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ProjDef(m) __builtin_offsetof(CROMParticleEffect, m)
+    union {
+        struct { u8 _hp_flags[T2_HOFF_ProjDef(m_dwFlags)]; u32 flags; }; /* N64 0x0 */
+        struct { u8 _hp_turnRate[T2_HOFF_ProjDef(unk_0E)]; s16 turnRate; }; /* N64 0xE */
+        struct { u8 _hp_limits[T2_HOFF_ProjDef(m_pMotion)]; ProjLimits *limits; }; /* N64 0x30 */
+    };
+} ProjDef;
+#else
 typedef struct ProjDef {
     /* 0x00 */ u32 flags;
     /* 0x04 */ u8 pad4[0xA];
@@ -28,13 +53,46 @@ typedef struct ProjDef {
     /* 0x10 */ u8 pad10[0x20];
     /* 0x30 */ ProjLimits *limits;
 } ProjDef;
+#endif
 
+#ifdef TARGET_PORT
+#include "structs/sound.h"
+#endif
+#ifdef TARGET_PORT
+typedef struct ProjSound {
+/* the view at the host offsets of SndSource (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ProjSound(m) __builtin_offsetof(SndSource, m)
+    union {
+        struct { u8 _hp_state[T2_HOFF_ProjSound(handle)]; s32 state; }; /* N64 0x8 */
+        struct { u8 _hp_id[T2_HOFF_ProjSound(sound.w)]; s32 id; }; /* N64 0xC */
+    };
+} ProjSound;
+#else
 typedef struct ProjSound {
     /* 0x00 */ u8 pad0[8];
     /* 0x08 */ s32 state;
     /* 0x0C */ s32 id;
 } ProjSound;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct Projectile {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Projectile(m) __builtin_offsetof(CParticle, m)
+    union {
+        struct { u8 _hp_type[T2_HOFF_Projectile(header.m_nObjType)]; u16 type; }; /* N64 0x2 */
+        struct { u8 _hp_pos[T2_HOFF_Projectile(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_velocity[T2_HOFF_Projectile(m_vVelocity)]; CVector3 velocity; }; /* N64 0x18 */
+        struct { u8 _hp_flags[T2_HOFF_Projectile(m_dwFlags)]; u32 flags; }; /* N64 0x40 */
+        struct { u8 _hp_def[T2_HOFF_Projectile(m_pEffect)]; ProjDef *def; }; /* N64 0xF8 */
+        struct { u8 _hp_target[T2_HOFF_Projectile(m_pTarget)]; ProjNode *target; }; /* N64 0x114 */
+        struct { u8 _hp_heading[T2_HOFF_Projectile(m_vDirection)]; CVector3 heading; }; /* N64 0x150 */
+        struct { u8 _hp_sound[T2_HOFF_Projectile(m_pLoopSound)]; ProjSound *sound; }; /* N64 0x1B8 */
+    };
+} Projectile;
+#else
 typedef struct Projectile {
     /* 0x000 */ u8 pad0[2];
     /* 0x002 */ u16 type;
@@ -52,6 +110,7 @@ typedef struct Projectile {
     /* 0x15C */ u8 pad15C[0x1B8 - 0x15C];
     /* 0x1B8 */ ProjSound *sound;
 } Projectile;
+#endif
 
 
 extern f32 HalfToFloat(s32 halfFloat);

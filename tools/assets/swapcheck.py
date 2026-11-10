@@ -586,6 +586,12 @@ class Spec:
         self.apply({"op": "uset", "elem": r["template"]}, u, a + offs[2], a + offs[3], ctx + "[2]")
         u.mark(a + offs[3], b, PAD)
         es, n = struct.unpack_from(">II", d, a + offs[2])
+        if r.get("block0") == "byte":
+            # kept big-endian: the records overlap (one byte string serves records of several
+            # types), so no in-place swap is right for every reader; the port decodes each record
+            # by the slot that points at it (port/game/t2particles.c)
+            u.mark(p0, p1, BYTE)
+            return
         slots = r["slots"]          # [[template offset, record rule], ...]
         claims = {}
         for i in range(n):

@@ -146,3 +146,93 @@ Not done: the bosses' draw callbacks (`MantidQueen_Draw` func_00403660, `Primage
 func_00407DC0, `MotherBoss_Draw` func_0040BEE4) still use raw offsets; the other m_pfEffects
 callbacks (`gWeaponInfoTable[]->effects`, `Actor_PlayRangedSound`, `MotherBoss_PartEffects`)
 were not checked against `T2PoseContext`.
+
+## 6. Particles (Phase 7 round 7, v1)
+
+The particle system runs on host types: `CParticleSystem__Spawn` and the rest of the particle
+path, so the animation events and hot points are **on by default** (`T2_ANIM_EVENTS=0` turns
+them off). Footsteps, splashes, muzzle flashes, sparks and the cinemas' ambient particles
+(the Acclaim logo's, the Iguana jungle's) now spawn, move, collide, light and draw (6.4).
+
+### 6.1 The templates: a host copy
+
+The particle-effects unit (cart 4) is an ISet of three blocks: block 0 a pool of sub-records,
+block 1 the sorted kinds (u32), block 2 the `CROMParticleEffect` templates (USet, 0x3C each)
+whose nine pointer fields are offsets into block 0. The N64 relocates them in place
+(`CScene__DecompressParticles`); a 0x3C record cannot hold 8-byte pointers. On the host,
+`CScene__DecompressParticles` (and its second-module twin) calls `T2Port_ParticlesBuild`
+(port/game/t2particles.c), which builds a host array of `CROMParticleEffect`
+(`sizeof` 0x60 on x86_64/arm64) whose pointers point at host copies of the sub-records, and
+`CParticleSystem__Spawn` indexes that copy (`T2Port_ParticleEffects`) instead of block 2.
+`CParticle.m_pEffect` then points into it, so every typed reader (`m_pEffect->m_pImpact`,
+`m_pMotion`, `m_pModel`...) works unchanged. The model field holds the object's ROM address
+(`CScene__GetObject`) as a pointer-sized value.
+
+Block 0 stays **big-endian** in the archive (`swap_spec.json` `"block0": "byte"`, honoured by
+`swapcheck.py op_particles`): the packer shares byte strings between records of different types
+(an impact record's tail is a colour record's head; 3 records hold data of several types), so
+no in-place swap is right for every reader. The builder decodes each record by the slot that
+points at it. The sub-records are typed in `structs/particle.h` from their readers:
+`CPackedRange` (two half floats, base and range: every random value of a template),
+`CROMParticleDistance` (size/growth ranges, the shadow scale, the near/far scales),
+`CROMParticleOscillation` (the wobble ranges and the opacity ramp), `CROMParticleMotion`
+(gravity and speed ranges, four render half floats, acceleration, top speed),
+`CROMParticleColors` (two colours and the hue/saturation/value ranges). The old spec swapped
+the offset/direction/rotation records as f32, which swapped each range's base with its range.
+
+### 6.2 The views
+
+`func_0022D2FC.c` (BuildMatrix, DrawShadow, DrawSprite, Free, Spawn: a FAKEMATCH file) keeps
+its N64 text; every local view has a `TARGET_PORT` twin from `tools/port/hostview.py` (fields
+at `__builtin_offsetof` of the real member, in one union): `MtxParticle`, `ShadowActor`,
+`Particle`, `EffectActor`, `Effect`, `Actor` -> `CParticle`; `MtxParticleDesc`, `ShadowDef`,
+`ParticleDesc`, `Entry`, `SourceModel` -> `CROMParticleEffect`; `MtxCamera`, `ParticleView`,
+`Camera` -> `CCamera`; `ParticleHead` -> `CObjectHead`; `EffectList` -> `CList`;
+`EffectSystem` -> `CParticleSystem`. By hand: the views the tool cannot place (the Effect's
+`unk12C`/`unk15C`/`rot`/`render` spans over runs of CParticle scalars, `_Static_assert`ed
+contiguous on the host; `shake` in the anonymous union), the sizes of views used as arrays or
+copied (`Entry`, `ParticleHead`, `EffectList`), pointer-wide `resource`/`target`/`unk14`, a
+host `aimEffect` (the hit target is a `CGameObjectInstance`: bones, intelligence, AI by
+member), the player list head by name (the N64 reads it at `&settings.paused - 0x1414`), the
+type-0 owner id (`CStaticObject.m_LitKey`), Free's lists and the firing-ammo flag by member.
+
+The other particle files (hostview or a host body, asm_diff 0): the projectile updates
+(`CParticle__Wobble`, `__UpdateHomingMissile`, `__UpdateReturning`, `__UpdateHoming`,
+`__Steer`), `__HitTarget`, `__Attach`, `__GetParentTransform` (the camera's face-screen
+matrices), `__CheckProximity`, `CParticleSystem__ResolveInteractions`, `__StartEffects`,
+`__StopLoopSound` (the loop sound pointer-wide), `__AttachToHitNode` (the bone is the low
+byte of the node: byte 0 on a little-endian host, not byte 3), `__GetDistanceScale`,
+`__BuildCameraMatrix` (it wrote the matrix at the N64 0x48, over `m_dwFlags`: the draw list
+then held freed particles and looped forever), `FreeAll`, `FreeOldest`, `AllocNode`,
+func_00232018, func_00232ECC, `CCamera__DrawGlares` (walks the particle draw list).
+
+### 6.3 What the particles reached
+
+A particle moves with `Collision_MoveInstance`, so the sweeps ran on host data for the first
+time in the cinemas: `Collision_TestModels` (static objects at the host `CStaticObject` stride,
+0xA0), `ModelSweep_TestModel`, `Collision_SweepActors`, `Sweep_TestInstance`, `Sweep_TestBox`,
+`Sweep_TestBoxFaces`, func_002682CC, and the two hit sorts (`{pointer, f32}` records: the
+comparators read the key at +4 and the swaps moved 8 bytes). `CScene__ClearListCounts` cleared
+the scene's per-frame list counts through an N64 view, so on the host `m_nMovers`, `m_nKind1`,
+`m_nRegistered`, `m_nDrawActors`... were never reset (the movers list was full of stale and
+NULL entries). The dynamic lights: `gDLightBuffer` was 16 bytes on the host (splat labels inside
+it); DLights_Load declares it with its size (0x40 lights) on TARGET_PORT for gendata.
+
+### 6.4 Frames and checks
+
+Compared with round 6's binary (no particles at all; `T2_SHOT_EVERY=20`, frames 1..2770): 16 of
+138 frames differ, all where particles show. Frame 1421, a cyan ring burst as the Acclaim letters
+flip in; 1561-1701, yellow sparks and dark dust puffs around the letters; 2443-2763, the Iguana
+jungle's mist sprite and fireflies (yellow points). The rest are pixel-identical. With
+`T2_ANIM_EVENTS=0` the same frames are identical to the default: the particles seen in these
+cinemas come from their scripted events, not from the animation events (whose particles, kinds
+217/218/442 from the logo's hot points, carry a light and a trail).
+
+A display list with sprites (`T2_DLDUMP_AT=2763 T2_DLDUMP_VTX=1`): 18 sprites, each a G_MTX load
+of `m_mtxDraw[gEvenOdd]` (world scale/rotation and position, e.g. (-2924.8, 403.5, -925.1),
+which the frame's projection puts at NDC (-0.02, 0.17), w 333), the texture, the combiner and
+prim colour, one G_VTX of `gParticleSpriteVtx` and one G_TRI2.
+
+Level 51 on the journey spawns no particles (no `CParticleSystem__Spawn` call after frame 11,340):
+the first-person player has no footstep hot points, and swimming does not spawn splashes through
+this path. Firing (round 7 v2) and the enemies (v3) are the next users.

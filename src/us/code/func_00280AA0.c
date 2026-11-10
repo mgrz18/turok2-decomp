@@ -4,8 +4,25 @@
 #include "structs/camera.h"
 #include "gfx.h"
 #include "globals/render.h"
+#ifdef TARGET_PORT
+#include "structs/particle.h"
+#endif
 
 /* An object that can shine a glare (only the fields read here). */
+#ifdef TARGET_PORT
+typedef struct CGlareSource {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_CGlareSource(m) __builtin_offsetof(CParticle, m)
+    union {
+        struct { u8 _hp_m_vPos[T2_HOFF_CGlareSource(header.m_vPos)]; CVector3 m_vPos; }; /* N64 0x4 */
+        struct { u8 _hp_m_CameraMask[T2_HOFF_CGlareSource(m_dwFlags)]; u32 m_CameraMask; }; /* N64 0x40 */
+        struct { u8 _hp_m_pFlags[T2_HOFF_CGlareSource(m_pEffect)]; u32 *m_pFlags; }; /* N64 0xF8 */
+        struct { u8 _hp_m_GlareScale[T2_HOFF_CGlareSource(m_Alpha)]; f32 m_GlareScale; }; /* N64 0x174 */
+        struct { u8 _hp_m_pNext[T2_HOFF_CGlareSource(m_pDrawNext)]; struct CGlareSource *m_pNext; }; /* N64 0x1D0 */
+    };
+} CGlareSource;
+#else
 typedef struct CGlareSource {
     /* 0x000 */ u8 pad0[4];
     /* 0x004 */ CVector3 m_vPos;
@@ -18,8 +35,9 @@ typedef struct CGlareSource {
     /* 0x178 */ u8 pad178[0x58];
     /* 0x1D0 */ struct CGlareSource *m_pNext;
 } CGlareSource;
+#endif
 
-extern CGlareSource *D_8010753C;
+extern CGlareSource *D_8010753C; /* the particle draw list head (gendata aliases it to the host member) */
 void Hud_SetupTextureMode(s32 a);
 void Render_SetRenderMode(s32 a);
 void CMtxF__TransformPointProjective(CMtxF *m, CVector3 *in, CVector3 *out);

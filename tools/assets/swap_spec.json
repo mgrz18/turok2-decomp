@@ -148,16 +148,17 @@
      {"op": "iset", "each": {"op": "rdp", "note": "RGBA5551/IA16 TLUT: Fast3D reads big-endian u16 from bytes; keep. Texture_DecompressCallback's recolour must use BE accessors in the port"}}
   ]},
   "particle effects": {"op": "particles", "template": {"op": "cstruct", "name": "CROMParticleEffect"},
-     "note": "block 0 = pool of sub-records at the offsets of the templates' 9 pointer fields (relocated by CScene__DecompressParticles); records several templates share are typed once",
+     "note": "block 0 = pool of sub-records at the offsets of the templates' 9 pointer fields (relocated by CScene__DecompressParticles); records several templates share are typed once. block0 byte: kept big-endian (records overlap and share bytes across types); the port decodes each by its slot (port/game/t2particles.c); remove block0 to see the typed report",
+     "block0": "byte",
      "slots": [
        [24, {"op": "cstruct", "name": "CROMParticleImpact"}],
-       [28, "f32?[3]:offset"],
-       [32, "f32?[6]:unk20"],
+       [28, "u16[6]:offset"],
+       [32, "u16[12]:rotation"],
        [36, {"op": "cstruct", "name": "CROMParticleDistance"}],
-       [40, "f32?[3]:direction"],
-       [44, "unk[28]:oscillation"],
+       [40, "u16[6]:direction"],
+       [44, {"op": "cstruct", "name": "CROMParticleOscillation"}],
        [48, {"op": "cstruct", "name": "CROMParticleMotion"}],
-       [52, "u8?[16]:colors"],
+       [52, {"op": "cstruct", "name": "CROMParticleColors"}],
        [56, {"op": "cstruct", "name": "CROMParticleParams"}]]},
   "level info": {"op": "seq", "parts": [{"size": 20, "rule": {"op": "cstruct", "name": "CLevelHeader"}}, {"rule": {"op": "unk", "note": "level info bytes 0x14..0x17"}}]},
   "collision": {"op": "iset", "entries": [
