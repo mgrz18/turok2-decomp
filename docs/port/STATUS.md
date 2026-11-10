@@ -354,7 +354,7 @@ Results ([MACOS.md](MACOS.md) section 9, [PERF.md](PERF.md)):
   weapon fire, and firing needs v1's `CParticleSystem__Spawn`. With v1 merged (scratch), the Mac
   runs into the demo and the new game into the mode-12 cinemas. Truncations found there were
   fixed by v1 (`ModelSweep_TestModel`, b8bca0e3) and v3
-  (`ImpactEvent_AreaDamage` & co., e26d87e9; `ImpactEvent_LevelSpecial` still s32, v5); `RumbleCurve_Advance` (`gCurrentFB[1]` NULL,
+  (`ImpactEvent_AreaDamage` & co., e26d87e9; `ImpactEvent_LevelSpecial` fixed by v5 in 06477da5); `RumbleCurve_Advance` (`gCurrentFB[1]` NULL,
   `--offscreen-gl` only) is open: retest with v2's rumble fixes (be9c4bf8).
 - Performance (M5): level 51 costs 0.55 ms per drawn frame in Release and 1.05 ms in Debug (the
   N64 budget is 33.3 ms). Drawing (Fast3D + GL) is about 80% of that. Paced at 60 Hz VIs / 30
