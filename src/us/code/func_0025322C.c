@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 
-s32 CPlayer__DrawHud(void *, s32);                 /* extern */
+s32 CPlayer__DrawHud(void *, sptr);                 /* extern */
 s32 CCamera__LoadOnScreenProjection(sptr);                         /* extern */
 
 void CPlayerPool__DrawHuds(CPlayerPool *arg0, sptr arg1) {

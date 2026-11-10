@@ -2,7 +2,7 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-s32 BinarySearch(s32, s32, sptr);
+s32 BinarySearch(sptr, s32, sptr);
 
 extern s32 ProPack__Decompress;
 

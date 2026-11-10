@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 AI_HearNoise(s32, s32, s32, s32);
+s32 AI_HearNoise(sptr, sptr, sptr, s32);
 
 void func_00225C08(void *arg0, s32 arg1, sptr arg2)
 {

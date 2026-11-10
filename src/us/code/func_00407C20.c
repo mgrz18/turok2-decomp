@@ -3,7 +3,7 @@
 #include "globals/onscreen.h"
 #include "protos/ai.h"
 
-s32 COnScreen__SetBoss(s32, s32, s32);
+s32 COnScreen__SetBoss(sptr, sptr, sptr);
 
 void Primagen_UpdateMode28(sptr arg0, sptr arg1)
 {

@@ -3,7 +3,7 @@
 #include "globals/engine.h"
 #include "protos/scene.h"
 
-s32 CStaticObject__SpawnEvents(s32, s32);
+s32 CStaticObject__SpawnEvents(sptr, s32);
 
 
 void CScene__AdvanceListedInstances(void *arg0)

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern f32 CGameObjectInstance__GetAverageScale(s32);
+extern f32 CGameObjectInstance__GetAverageScale(sptr);
 
 f32 Blast_GetSourceScale(u8 *arg0) {
     if (*arg0 == 1) {

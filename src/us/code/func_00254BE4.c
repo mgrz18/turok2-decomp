@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 
-s32 MenuPool_CountOpen(s32);                             /* extern */
+s32 MenuPool_CountOpen(sptr);                             /* extern */
 
 /* Counts the active players whose camera's menu pool is idle. */
 s32 CPlayerPool__CountIdleMenus(CPlayerPool *arg0) {

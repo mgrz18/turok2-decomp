@@ -4,7 +4,7 @@
 #include "protos/cache.h"
 #include "protos/scene.h"
 
-s32 Hud_GetImageFrame(s32, s32, s32, s32);
+s32 Hud_GetImageFrame(sptr, s32, sptr, sptr);
 
 void Hud_GetSpriteSize(s32 arg0, s32 arg1, s32 *arg2, s32 *arg3)
 {

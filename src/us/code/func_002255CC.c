@@ -5,7 +5,7 @@
 #include "protos/scene.h"
 
 
-s32 GameObject_IsSolid(s32);
+s32 GameObject_IsSolid(sptr);
 s32 func_002681BC(sptr);
 
 s32 CGameObjectInstance__ClearDrawMatrices(sptr);                         /* extern */

@@ -1,6 +1,6 @@
 #include "common.h"
 
-void AI_UpdateTargets(s32 a0, s32 a1, void *out, s32 a3, s32 a4);
+void AI_UpdateTargets(sptr a0, sptr a1, void *out, s32 a3, s32 a4);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define AI_TurnClamped AI_TurnClamped_i
 #endif

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 strlen(u8 *arg0) {
+sptr strlen(u8 *arg0) {
     u8 *var_v1;
 
     var_v1 = arg0;

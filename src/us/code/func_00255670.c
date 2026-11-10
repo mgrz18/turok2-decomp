@@ -3,7 +3,7 @@
 #include "globals/scene.h"
 #include "protos/player.h"
 
-s32 PlayerFall_Update(s32, s32);
+s32 PlayerFall_Update(sptr, sptr);
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x20];

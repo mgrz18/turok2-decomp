@@ -573,7 +573,7 @@ extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode *
 extern void memset(void *p, s32 c, sptr n); /* memset */
 extern f32 func_002982F0(f32 angle);             /* sin */
 extern void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
-extern void CGameObjectInstance__Construct(CGameObjectInstance *fx, s32 a, s32 b, s32 c, void *d, s32 e, s32 f, f32 g, CVector3 h, s32 i, CVector3 j,
+extern void CGameObjectInstance__Construct(CGameObjectInstance *fx, s32 a, s32 b, s32 c, void *d, s32 e, sptr f, f32 g, CVector3 h, s32 i, CVector3 j,
                           CVector3 k, s32 l);
 extern void func_0021E5D4(CGameObjectInstance *fx);
 extern void CGameObjectInstance__ClearDrawMatrices(CGameObjectInstance *fx);

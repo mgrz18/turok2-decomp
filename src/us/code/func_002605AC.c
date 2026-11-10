@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/light.h"
 
-s32 CGameObjectInstance__DrawModelImmediate(s32, sptr, s32);
+s32 CGameObjectInstance__DrawModelImmediate(sptr, sptr, sptr);
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x40];

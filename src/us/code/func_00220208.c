@@ -2,7 +2,7 @@
 #include "m2c_macros.h"
 #include "protos/cache.h"
 
-sptr Lighting_BuildLitVertices(s32, s32, s32, sptr, s32);
+sptr Lighting_BuildLitVertices(s32, sptr, sptr, sptr, s32);
 
 void CGameObjectInstance__ConstructLitVertices(void *arg0, s32 **arg1)
 {

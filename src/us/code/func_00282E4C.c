@@ -9,7 +9,7 @@
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
-f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);
+f32 CGameRegion__GetHeight(sptr region, f32 x, f32 z);
 CVector3 CCamera__GetViewOrigin(CCamera *camera);
 void func_00207914(s32 *resource, s32 id);
 

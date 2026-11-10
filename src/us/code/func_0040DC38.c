@@ -1,6 +1,6 @@
 
 #include "protos/ai.h"
-s32 AI_UpdateTargets(s32, s32, s32, s32, s32);
+s32 AI_UpdateTargets(sptr, sptr, sptr, s32, s32);
 void BlindOne_BossMode3Update(sptr arg0, sptr arg1)
 {
   u8 sp18[0x88];

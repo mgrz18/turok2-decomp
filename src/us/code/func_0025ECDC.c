@@ -2,7 +2,7 @@
 #include "m2c_macros.h"
 #include "globals/engine.h"
 
-s32 Render_DrawModelShared(s32, s32, s32, s32, s32, s32, s32);
+s32 Render_DrawModelShared(sptr, sptr, s32, sptr, sptr, s32, s32);
 s32 CGameObjectInstance__DrawModelImmediate(sptr, sptr, sptr);
 
 

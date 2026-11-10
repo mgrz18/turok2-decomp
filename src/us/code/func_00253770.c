@@ -3,7 +3,7 @@
 #include "structs/particle.h"
 #include "protos/player.h"
 
-s32 CPlayer__IsInMatchEndState(s32);
+s32 CPlayer__IsInMatchEndState(sptr);
 
 void CPlayer__OnParticleHit(CPlayer *arg0, sptr arg1, s32 arg2, CParticle *arg3) {
     f32 temp_f0;

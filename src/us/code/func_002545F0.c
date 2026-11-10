@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/region.h"
 
-CRegionInfo *GameObject_GetRegionInfo(s32);                     /* extern */
+CRegionInfo *GameObject_GetRegionInfo(sptr);                     /* extern */
 
 void CPlayer__EaseEyeOffset(CPlayer *arg0, sptr arg1) {
     f32 temp_f1;

@@ -25,7 +25,7 @@ extern char D_800A6084[];               /* "anim object info" */
 
 f32 HalfToFloat(s32 angle);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 angle);
-void CGameObjectInstance__Construct(CListedInstance *effect, s32 id, s32 variant, s32 unused, s32 count, s32 sound, s32 owner,
+void CGameObjectInstance__Construct(CListedInstance *effect, s32 id, s32 variant, s32 unused, sptr count, s32 sound, sptr owner,
                    f32 scale, CVector3 position, s32 flags, CVector3 color, CVector3 direction, s32 arg12);
 void func_0021E5D4(CListedInstance *effect);
 

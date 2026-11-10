@@ -2,7 +2,7 @@
 #include "globals/boss.h"
 #include "protos/ai.h"
 
-s32 MotherBoss_TeleportTarget(s32, s32);
+s32 MotherBoss_TeleportTarget(sptr, s32);
 
 
 void MotherBoss_Mode16_TeleportTarget(sptr arg0, void *arg1)

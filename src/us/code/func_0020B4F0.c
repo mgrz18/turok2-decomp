@@ -2,7 +2,7 @@
 #include "globals/engine.h"
 #include "protos/iset.h"
 
-s32 Model_BlendMorphFrames(s32, f32, void *);            /* extern */
+s32 Model_BlendMorphFrames(sptr, f32, void *);            /* extern */
 
 typedef struct {
     /* 0x00 */ s32 id;

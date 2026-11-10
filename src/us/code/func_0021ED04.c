@@ -28,7 +28,7 @@ Mtx *MtxPool_Alloc(void *pool, s32 count);
 void CMtxF__Multiply(f32 (*mf)[4], void *arg1, void *arg2);
 void CMtxF__ClampEntries(f32 (*mf)[4]);
 void CMtxF__ToMtx(f32 (*mf)[4], Mtx *m);
-void Render_DrawModelFlat(s32, s32, s32, s32, Slot24 *, s32, s32, s32);
+void Render_DrawModelFlat(s32, sptr, sptr, s32, Slot24 *, sptr, s32, s32);
 
 void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *owner, ModelRef *ref, void *arg2, s32 arg3) {
     f32 mf[4][4];

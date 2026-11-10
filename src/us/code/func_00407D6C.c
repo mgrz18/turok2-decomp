@@ -4,7 +4,7 @@
 #include "globals/game.h"
 #include "protos/player.h"
 
-s32 CPlayer__Warp(s32, s32, s32, s32);
+s32 CPlayer__Warp(sptr, s32, s32, s32);
 
 s32 Cinema_IsIdle();                                /* extern */
 

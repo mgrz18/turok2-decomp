@@ -9,7 +9,7 @@ extern void Render_FlushModelBatch();
 extern void Render_FlushBatches();
 extern void CCache__Unlock(s32 arg0, sptr arg1);
 void Render_FlushBatches(void) {
-    extern void CCache__LockForDisplayList(s32 arg0, s32 arg1);
+    extern void CCache__LockForDisplayList(s32 arg0, sptr arg1);
     sptr temp_s0;
     s32 var_s1;
     Render_FlushModelBatch();

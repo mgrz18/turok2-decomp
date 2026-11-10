@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/scene.h"
 
-void CParticleSystem__Free(CParticleSystem *, s32);              /* extern */
+void CParticleSystem__Free(CParticleSystem *, sptr);              /* extern */
 void CParticle__StopLoopSound(sptr);                         /* extern */
 
 void CParticle__Kill(s32 arg0) {

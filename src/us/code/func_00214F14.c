@@ -5,7 +5,7 @@
 #include "structs/level_actor.h"
 #endif
 
-sptr Lighting_BuildLitVertices(s32, s32, s32, sptr, s32);
+sptr Lighting_BuildLitVertices(s32, sptr, sptr, sptr, s32);
 
 void CStaticObject__BuildLitVerticesCallback(void *arg0, s32 **arg1)
 {

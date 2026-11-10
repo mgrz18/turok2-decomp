@@ -4,7 +4,7 @@
 #include "globals/engine.h"
 #include "protos/game.h"
 
-s32 *CISet__GetBlock(s32 base, s32 index);
+s32 *CISet__GetBlock(sptr base, s32 index);
 void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
 
 void InteractiveAnim_DrawAllModels(u8 *actor, u8 *state, CDrawArgs *req) {

@@ -4,7 +4,7 @@
 #include "protos/scene.h"
 #include "protos/ai.h"
 
-s32 Turret_EventShow(s32, void *, s32);        /* extern */
+s32 Turret_EventShow(sptr, void *, s32);        /* extern */
 
 void Turret_EventActivate(sptr arg0, CAI *ai, sptr arg2) {
     if ((CScene__GetInstanceSavedBit(&gScene, arg0) == 0) && (ai->m_Mode == 0)) {
