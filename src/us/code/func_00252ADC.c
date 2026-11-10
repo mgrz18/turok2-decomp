@@ -4,6 +4,9 @@
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "protos/game.h"
+#ifdef TARGET_PORT
+#include "structs/camera.h"
+#endif
 
 extern s32 Cinema_PathPlaying(void);
 extern void LoopSounds_Stop(void *mgr, void *sound);
@@ -16,7 +19,11 @@ static __inline__ s32 menu_open(CPlayer *p) {
     s32 open = 0;
 
     if (cam != NULL) {
+#ifdef TARGET_PORT
+        open = ((CCamera *) cam)->m_Menus.count != 0; /* N64 0x54C: the menu pool's count */
+#else
         open = *(s32 *)((u8 *)cam + 0x54C) != 0;
+#endif
     }
     return open;
 }
