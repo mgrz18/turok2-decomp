@@ -4,10 +4,10 @@
 #include "protos/scene.h"
 #include "protos/game.h"
 
-s32 LevelEvent_ProcessTriggers(s32, s32, s32, s32, s32, s32, sptr); /* extern */
+s32 LevelEvent_ProcessTriggers(sptr, s32, s32, s32, s32, s32, sptr); /* extern */
 
 void GameObject_FireTriggers(CGameObjectInstance *arg0, s32 arg1, sptr arg2) {
-    s32 sp20;
+    sptr sp20;
     s32 sp24;
 
     if (!(arg0->m_dwFlags & 0x80000)) {

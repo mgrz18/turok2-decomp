@@ -42,7 +42,7 @@ void ImpactEvent_Send(void *, void *, s32, s32, CVector3, AttachmentParams);
 extern u8 D_800A5808[];
 
 void CStaticObject__SpawnEvents(PlacedProp *prop, s32 all) {
-    s32 *model;
+    sptr *model;
     s32 **table;
     s32 *header;
     Attachment *attachment;

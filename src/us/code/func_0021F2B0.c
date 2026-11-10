@@ -15,7 +15,7 @@ extern s32 D_800A5AC4;
 f32 func_0021F2B0(CGameObjectInstance *arg0) {
     f32 var_f0;
     f32 var_f20;
-    s32 *temp_v0;
+    sptr *temp_v0;
 
     var_f20 = 1.0f;
     if (arg0->m_dwFlags & 0x40000) {

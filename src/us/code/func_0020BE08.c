@@ -6,7 +6,7 @@
 
 s32 Texture_RequestSync(void *);                          /* extern */
 
-void Model_RequestTextures(s32 *arg0)
+void Model_RequestTextures(sptr *arg0)
 {
   s32 *temp_v0;
   s32 *temp_v0_2;

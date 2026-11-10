@@ -3,7 +3,7 @@
 #include "protos/cache.h"
 
 
-void Model_TouchTextures(s32 *arg0) {
+void Model_TouchTextures(sptr *arg0) {
     s32 *temp_v0;
     s32 *temp_v0_2;
     s32 temp_a1;

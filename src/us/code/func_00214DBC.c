@@ -8,7 +8,7 @@ extern M2C_UNK D_800A582C;
 extern M2C_UNK Model_DecompressCallback;
 
 s32 *CStaticObject__LoadGeometry(void *arg0) {
-    s32 *temp_v0;
+    sptr *temp_v0;
 
     if (M2C_FIELD(arg0, s32 *, 0x1C) == 0) {
         temp_v0 = CCache__Request(0, M2C_FIELD(arg0, s32 *, 0x18), 0x18, 4, 0, NULL, &D_800A5808, 0);
