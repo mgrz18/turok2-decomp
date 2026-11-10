@@ -114,6 +114,18 @@ struct PoseContext {
     /* 0x90 */ s32 bone;
 };
 
+#ifdef TARGET_PORT
+#include "structs/pose_host.h"
+/* the callbacks read the context through T2PoseContext (structs/pose_host.h) */
+_Static_assert(__builtin_offsetof(PoseContext, obj) == __builtin_offsetof(T2PoseContext, obj), "pose ctx");
+_Static_assert(__builtin_offsetof(PoseContext, arg2) == __builtin_offsetof(T2PoseContext, info), "pose ctx");
+_Static_assert(__builtin_offsetof(PoseContext, keys) == __builtin_offsetof(T2PoseContext, keys), "pose ctx");
+_Static_assert(__builtin_offsetof(PoseContext, f88) == __builtin_offsetof(T2PoseContext, f88), "pose ctx");
+_Static_assert(__builtin_offsetof(PoseContext, boneData) == __builtin_offsetof(T2PoseContext, boneData), "pose ctx");
+_Static_assert(__builtin_offsetof(PoseContext, bone) == __builtin_offsetof(T2PoseContext, bone), "pose ctx");
+_Static_assert(sizeof(PoseContext) == sizeof(T2PoseContext), "pose ctx");
+#endif
+
 void CMtxF__MultiplyAffine(f32 (*out)[4], f32 (*a)[4], f32 (*b)[4]);
 void CQuaternion__Slerp(CQuaternion *out, f32 amount, CQuaternion *a, CQuaternion *b);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
