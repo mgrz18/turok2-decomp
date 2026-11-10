@@ -36,6 +36,35 @@ struct Container {
 };
 struct Sub18;
 typedef struct Sub18 Sub18;
+#ifdef TARGET_PORT
+#include "common.h"
+#include "structs/world.h"
+
+/* The port: the same on CScene/CGameObjectInstance (the N64 views put the actor table at 0xE0,
+ * the instance's definition at 0x14 and its type id at 0xB8, with the N64 stride 0x288); the
+ * definition (asset data) keeps its words: the type at 0, the id (s16) at 0xC. */
+s32 CScene__FindInstances(void *arg0, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max) {
+    CScene *scene = (CScene *) arg0;
+    s32 i = scene->m_nFirstActor;
+    s32 end = scene->m_nActors;
+    CGameObjectInstance *base = scene->m_pActors;
+    s32 count = 0;
+    CGameObjectInstance *rec;
+
+    for (; i < end; i++) {
+        rec = &base[i];
+        if (count >= max) {
+            return count;
+        }
+        if ((key0 == -1 || rec->m_nTypeFlag == key0) && (key1 == -1 || rec->header.m_pIntelligence->m_Type == key1)
+            && (key2 == -1 || rec->header.m_pIntelligence->m_Id == key2)) {
+            *out++ = rec;
+            count++;
+        }
+    }
+    return count;
+}
+#else
 extern s32 CScene__FindInstances(Container *arg0, s32 key0, s32 key1, s32 key2, RecordRecAtE4 **out, s32 max);
 s32 CScene__FindInstances(Container *arg0, s32 key0, s32 key1, s32 key2, RecordRecAtE4 **out, s32 max) {
     s32 i = arg0->unkE4;
@@ -56,3 +85,4 @@ s32 CScene__FindInstances(Container *arg0, s32 key0, s32 key1, s32 key2, RecordR
     }
     return count;
 }
+#endif
