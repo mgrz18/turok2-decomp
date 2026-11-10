@@ -6,7 +6,7 @@
 #include "gbi_t2.h"
 #include "globals/hud.h"
 
-void Hud_DrawGlyph16x16(s32 texture, f32 x, f32 y, f32 sx, f32 sy) {
+void Hud_DrawGlyph16x16(sptr texture, f32 x, f32 y, f32 sx, f32 sy) {
     Gfx *g;
     s32 xh, yh, xl, yl;
     s32 dsdx;
