@@ -16,6 +16,26 @@ typedef struct {
     /* 0x54 */ f32 value;
 } ItemCode;
 
+#ifdef TARGET_PORT
+#include "common.h"
+#include "structs/game_object.h"
+
+/* The port: the object's collision y offset by member (N64: the type at 0, the definition at
+ * 0x14, m_CollisionYOffset at 0x54); the definition (asset data) keeps its byte offset 0x20. */
+f32 func_0026841C(ItemCode *item_) {
+    CGameObjectInstance *item = (CGameObjectInstance *) item_;
+    ItemSource *src;
+
+    if (item->header.m_Type == 1) {
+        return item->m_CollisionYOffset;
+    }
+    src = (ItemSource *) item->header.m_pIntelligence;
+    if (src->active == 0) {
+        return src->value;
+    }
+    return 0.0f;
+}
+#else
 f32 func_0026841C(ItemCode *item) {
     ItemSource *src;
 
@@ -28,3 +48,4 @@ f32 func_0026841C(ItemCode *item) {
     }
     return 0.0f;
 }
+#endif

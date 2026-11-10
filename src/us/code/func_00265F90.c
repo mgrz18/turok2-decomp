@@ -40,6 +40,45 @@ extern void CCameraPool__AddMultiLineText(void *game, void *camera, char *text, 
 extern void Sound__PlaySpeech(s32 sound);
 
 /* A touch on a pickup: give the item, or show why it cannot be taken. */
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#include "structs/camera.h"
+
+/* The port: the pickup, its AI and the toucher by member of CGameObjectInstance/CAI (N64: the
+ * definition 0x14, the AI's m_Mode 0x34, the toucher's type 0, flags 0xD4, its AI's m_pParent
+ * 0x1A8 = the player); the definition's body (asset data) keeps PickupDef's byte layout; the
+ * fallback camera by member of the camera pool (the N64 symbol is the pool + 0x40). */
+s32 Action_CheckRequiredItem(Pickup *obj_, PickupState *state_, Toucher *toucher_) {
+    CGameObjectInstance *obj = (CGameObjectInstance *) obj_;
+    CAI *state = (CAI *) state_;
+    CGameObjectInstance *toucher = (CGameObjectInstance *) toucher_;
+    PickupInfo *info = &((PickupDef *) obj->header.m_pIntelligence)->info;
+    CPlayer *player;
+    void *camera;
+
+    if (info->item == 0 || state->m_Mode != 0 || toucher->header.m_Type != 1 || !(toucher->m_dwFlags & 0x300000)) {
+        return 1;
+    }
+    player = (CPlayer *) toucher->m_AI.m_pParent;
+    if (CPlayer__GetPickupCountLow(player, info->item)) {
+        CPlayer__UseSpecialPickup(player, info->item);
+        return 1;
+    }
+    if (info->message == 0) {
+        return 0;
+    }
+    camera = &((CCameraPool *) gEngineApp_m_Game_m_CameraPool)->m_MainCamera;
+    if (player->m_pCamera != NULL) {
+        camera = player->m_pCamera;
+    }
+    CCameraPool__AddMultiLineText(gEngineApp_m_Game_m_CameraPool, camera,
+                  gLevelMessages[info->message].text, obj_, 4.0f);
+    if (gLevelMessages[info->message].speech != 0) {
+        Sound__PlaySpeech(gLevelMessages[info->message].speech);
+    }
+    return 0;
+}
+#else
 s32 Action_CheckRequiredItem(Pickup *obj, PickupState *state, Toucher *toucher) {
     PickupInfo *info = &obj->def->info;
     CPlayer *player;
@@ -67,3 +106,4 @@ s32 Action_CheckRequiredItem(Pickup *obj, PickupState *state, Toucher *toucher) 
     }
     return 0;
 }
+#endif
