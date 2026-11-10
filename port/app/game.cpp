@@ -27,6 +27,7 @@ extern "C" {
 // port/game/t2debug.c
 int T2Port_EngineMode(void);
 void T2Port_LogState(int frame);
+void T2Port_GiveWeapons(void); // DEBUG-ONLY: T2_GIVE_WEAPONS=1 (t2debug.c)
 void T2Port_DebugSwitches(int skipPak, int startMode);
 }
 
@@ -481,6 +482,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         // T2_STATE_LOG=1: every 60 frames; =N (N > 1): every N frames
         static const int statePeriod = getenv("T2_STATE_LOG") == nullptr ? 0
                                        : (atoi(getenv("T2_STATE_LOG")) > 1 ? atoi(getenv("T2_STATE_LOG")) : 60);
+        T2Port_GiveWeapons(); // DEBUG-ONLY: T2_GIVE_WEAPONS=1
         if (statePeriod > 0 && (f + 1) % statePeriod == 0) {
             T2Port_LogState(f + 1); // DEBUG-ONLY: T2_STATE_LOG=1
         }
