@@ -5,7 +5,11 @@
 #include "globals/collision.h"
 #include "protos/game.h"
 
+#ifdef TARGET_PORT
+extern u8 func_0026C114(void *region); /* ABI: it returns u8 (as s32 the host read garbage upper bits) */
+#else
 extern s32 func_0026C114(void *region);
+#endif
 /* gCollisionResults_m_pFloorRegion / gCollisionResults_m_vFloorPos are CCollisionResults (gCollisionResults, structs/collision.h)
  * m_pFloorRegion and m_vFloorPos; kept as their own symbols: reading them
  * through gCollisionResults does not give this code. */

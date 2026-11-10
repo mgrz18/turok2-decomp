@@ -178,7 +178,8 @@ CROMParticleEffect *T2Port_ParticleEffects(void *data, s32 *count) {
         sEvery = e != NULL ? atol(e) : 0;
     }
     if (sEvery > 0 && ++sCalls % sEvery == 0) {
-        fprintf(stderr, "[t2particles] %ld spawn calls\n", sCalls);
+        printf("[t2particles] %ld spawn calls\n", sCalls);
+        fflush(stdout);
     }
 
     for (h = sHost; h != NULL; h = h->next) {
