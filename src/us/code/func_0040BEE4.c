@@ -10,10 +10,21 @@
 /* Draw callback of the module's actors: draws each body part (anim group) whose slot is active in the
  * module object's mask, refreshing the slot's state first unless a cinema path is playing. */
 
+#ifdef TARGET_PORT
+typedef struct ModuleObj {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ModuleObj(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_partMask[T2_HOFF_ModuleObj(m_AI.m_VisBits)]; s32 partMask; }; /* N64 0x14C */
+    };
+} ModuleObj;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x14C];
     /* 0x14C */ s32 partMask;
 } ModuleObj;
+#endif
 
 extern void CGameObjectInstance__DrawShadow(CGameObjectInstance *actor, void *ai, CDrawArgs *req);
 extern s32 Cinema_PathPlaying(void);
