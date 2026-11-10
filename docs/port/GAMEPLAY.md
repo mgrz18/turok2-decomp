@@ -255,5 +255,6 @@ weapon AI follows the player's pose. Treat the new numbers as the reference.
 **Next.** The cerebral bore (lock-on: crosshair mode 2, `Player_UpdateAim`), the nuke's charge,
 the flare and the razor wind ammo; the underwater weapons (harpoon, torpedo) in the water; the
 weapon pickups lying in level 51 (the pickup handlers are typed; walking over one is untested);
-the projectiles hitting enemies (v3's damage path, which also fails `--high-memory`);
-`CPlayer__CollectKeyPiece` (func_00248644) still has raw CPlayer offsets.
+the projectiles hitting enemies (v3's damage path, which also fails `--high-memory`).
+(`CPlayer__CollectKeyPiece`, func_00248644, the key and nuke pieces: raw CPlayer offsets, now
+by member; untested.)
