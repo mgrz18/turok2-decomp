@@ -1,3 +1,6 @@
+#include "common.h"
+#include "structs/game_object.h"
+#include "structs/region.h"
 #include "structs/vector.h"
 #include "globals/collision.h"
 #include "protos/game.h"
@@ -58,6 +61,50 @@ typedef struct CollisionInfo CollisionInfo;
 extern CollisionInfo D_800F1EB0;
 extern s32 Collision_MoveInstance(void *arg0, CVector3 arg1, CollisionInfo *arg2);
 extern void CGameRegion__FireTriggers(sptr arg0, s32 arg1, void *arg2);
+#ifdef TARGET_PORT
+/* The host body on CGameObjectInstance: ObjectLinks23C/CallbackState288 are N64 offsets
+ * (round 6, u3). */
+void CGameObjectInstance__MoveWithCollision(char *arg0, CVector3 *arg1) {
+    CGameObjectInstance *o = (CGameObjectInstance *) arg0;
+    CollisionInfo *collision;
+    CGameRegion *old_contact;
+    s32 collided;
+    f32 saved;
+    void (*callback)(void *, void *, CollisionInfo *);
+
+    if ((o->m_dwFlags & 0x10000) && o->m_AI.m_pModeCurrent != NULL) {
+        collision = (CollisionInfo *) o->m_AI.m_pModeCurrent->m_pData;
+        if (collision == NULL) {
+            collision = &D_800F1EB0;
+        }
+        saved = ((ObjectStateC *) collision)->unk_8.v0;
+        if ((u32) ((u16) o->m_AI.m_AnimType - 0x2B0C) < 8) {
+            ((ObjectStateC *) collision)->unk_8.v1 = 0;
+        }
+        old_contact = o->header.m_pCurrentRegion;
+        collided = Collision_MoveInstance(o, *arg1, collision);
+        if (old_contact != o->header.m_pCurrentRegion) {
+            o->m_AI.m_pPathAvoidRegion = old_contact;
+        }
+        ((ObjectStateC *) collision)->unk_8.v0 = saved;
+        if (old_contact != NULL && o->header.m_pCurrentRegion != NULL
+            && old_contact->m_nInfo != o->header.m_pCurrentRegion->m_nInfo && o->header.m_pIntelligence->m_Type == 1) {
+            CGameRegion__FireTriggers((sptr) old_contact, 0x80, o);
+            CGameRegion__FireTriggers((sptr) o->header.m_pCurrentRegion, 0x40, o);
+        }
+        if (collided != 0 && !(o->m_dwFlags & 0x300000) && o->header.m_pIntelligence->m_Type == 1
+            && gCollisionResults.m_pInstance != NULL && *(u8 *) gCollisionResults.m_pInstance == 1) {
+            GameObject_FireTriggers(gCollisionResults.m_pInstance, 0x20, arg0);
+        }
+        callback = (void (*)(void *, void *, CollisionInfo *)) o->m_AI.m_pfCollision;
+        if (callback != NULL) {
+            callback(o, &o->m_AI, collision);
+        }
+    } else {
+        o->header.m_vPos = *arg1;
+    }
+}
+#else
 void CGameObjectInstance__MoveWithCollision(char *arg0, CVector3 *arg1) {
     CollisionInfo *collision;
     u16 *old_contact;
@@ -98,3 +145,4 @@ void CGameObjectInstance__MoveWithCollision(char *arg0, CVector3 *arg1) {
         ((ObjectLinks23C *)(arg0))->unk_8 = *arg1;
     }
 }
+#endif

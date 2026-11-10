@@ -1,3 +1,5 @@
+#include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/particle_event.h"
 #include "globals/object.h"
@@ -23,6 +25,22 @@ typedef struct CROMEventEntry {
 /* Turok 2 offsets (Rage Wars in parentheses): pos 0x4 (0x8), transform 0x58
  * (0x74), bone matrices 0x98 (0xB8), type id 0xB8 (0xE4), flags 0xD4 (0x100),
  * animation 0xD8 (0x104), bone mask 0x14C (0x17C). */
+#ifdef TARGET_PORT
+typedef struct ObjectLinks {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ObjectLinks(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_ObjectLinks(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_transform[T2_HOFF_ObjectLinks(m_mfOrient)]; char transform[0x40]; }; /* N64 0x58 */
+        struct { u8 _hp_boneMatrices[T2_HOFF_ObjectLinks(m_pmtDrawMtxs)]; char *boneMatrices; }; /* N64 0x98 */
+        struct { u8 _hp_type[T2_HOFF_ObjectLinks(m_nTypeFlag)]; u16 type; }; /* N64 0xB8 */
+        struct { u8 _hp_flags[T2_HOFF_ObjectLinks(m_dwFlags)]; s32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_anim[T2_HOFF_ObjectLinks(m_CurrentAnimation)]; char anim[sizeof(CAnimationState)]; }; /* N64 0xD8 (by hand) */
+        struct { u8 _hp_boneMask[T2_HOFF_ObjectLinks(m_AI.m_VisBits)]; s32 boneMask; }; /* N64 0x14C */
+    };
+} ObjectLinks;
+#else
 typedef struct ObjectLinks {
     char pad0[4];
     CVector3 pos;
@@ -36,6 +54,7 @@ typedef struct ObjectLinks {
     char anim[0x74];
     s32 boneMask;
 } ObjectLinks;
+#endif
 /* Bone record: the mask bits sit at 0x6C. */
 typedef struct BoneInfo {
     char pad0[0x6C];
