@@ -259,3 +259,81 @@ the round-4 screenshot `R4_s3_linux_s3branch_f300.png` (not in the repo) shows "
 CONTROLLER PAK FOUND IN CONTROLLER #1.", "ATTEMPT REPAIR" (highlighted), "RETRY", "CONTINUE
 WITHOUT SAVING". On the Mac that path needs a controller without a window: s1's PIF/controller
 work, or a port flag that connects a virtual pad headless.
+
+## 7. Round 5 (part t5): the merged tree to the title screen
+
+Branch `names-R5_t5` (from 98574f3c). Every `src/`/`include/` commit was checked with
+`tools/asm_diff.py --base 98574f3c -j 8` on the box (a scratch copy in `/root/R5_t5mac/repo`;
+the local `OUT/r5/asmcheck.sh` sends `git diff 98574f3c -- src include` over ssh, applies it and
+runs asm_diff over the whole tree): **0 differences over 3,938 files** at every commit.
+
+### Build and run on the Mac
+
+As in section 1, with the box's ELF at 98574f3c (`scp decomp:/root/turok2_decomp/build/turok2.us.elf
+build/`) and a format-2.0 archive (`OUT/turok2_474.o2r` from round 4 still checks). `OUT/rebuild.sh
+--fresh` builds the three libraries, runs gendata (same report as Linux: 1,543 symbols, 3,881
+pointer slots) and links. Run headless only:
+
+```sh
+SDL_VIDEODRIVER=offscreen OUT/build/app/turok2 --archive OUT/turok2_474.o2r --rom baserom.us.z64 \
+    --game --no-window --draw --pak-blank --frames 6000      # T2_DLDUMP_AT=<frame>: one frame's DL
+```
+
+`--no-window` now connects one virtual pad on port 1 (its pak per `--pak-*`, its buttons from
+`--input`): LUS's ControlDeck has no device without a window, so before this the game saw no
+controller and no pak and never left mode 0 (PIF 0 SI DMAs). With it: 812 SI DMAs, 236 pak
+reads, 169 pak writes, the same as Linux windowed.
+
+### How far it runs
+
+```
+game: frame 2:    engine mode 17 -> 0      pak check (the virtual pak passes)
+game: frame 298:  engine mode 17 -> 1      legal screen
+game: frame 1070: engine mode 17 -> 3      expansion pak
+game: frame 1362: engine mode 17 -> 4      intro cinema (level 162)
+game: frame 1852: engine mode 17 -> 5      intro cinema (level 44)
+game: frame 4214: engine mode 17 -> 7      TITLE SCREEN
+game: frame 5469: engine mode 17 -> 13     attract demo (level 81), runs to its end
+game: frame 8802: engine mode 17 -> 1      the boot loops: legal, cinemas, title (12429)
+SIGSEGV (second attract demo): CGameRegion__ContainsXZ(tri = garbage) <- CScene__FindRegionAt
+    <- CScene__DecompressAnimatedInstances <- CDecompressor__Main            (Linux: the same)
+```
+
+Display lists, Mac vs Linux (the same branch built on the box, both `--no-window --draw
+--pak-blank`, `T2_DLDUMP_AT`):
+
+| frame | mode | commands Mac / Linux | op + w0 | w1 of non-address commands |
+|---|---|---|---|---|
+| 601 | 1 legal | 4,000 / 4,000 (dump budget; 351 texture rectangles) | identical | identical |
+| 1201 | 3 expansion pak | 680 / 680 (36 rectangles, 5 G_VTX) | identical | identical |
+| 1501, 2401 | 4, 5 cinemas | 246 / 246 (no G_VTX: the black cinemas, t3) | identical | identical |
+| 4500 | 7 title | 1,250 / 1,250 (63 rectangles) | identical | identical |
+| 6000 | 13 attract demo | 354 / 354 | identical | one `D9` (G_GEOMETRYMODE) whose w1 is a host address on both: a pointer passed as mode bits |
+
+The Linux title at frame 4500 from this branch was checked by eye (the TUROK logo, the eye in
+the O, "SEEDS OF EVIL", the red "2"); the Mac draws nothing (no headless Metal/GL) but its
+display list is the same.
+
+### Fix table (t5)
+
+| # | where | cause | fix |
+|---|---|---|---|
+| t5-1 | mode 0 forever (no SI DMA) | no controller without a window | virtual pad for `--no-window` (game.cpp) |
+| t5-2 | `Pak_DecodeText(src = truncated)` from `PakMenu_InitSaveGameAnyPak` | `Pak_GetNoteGameName(.., s32 *out)`: the note name pointer in an s32 | sptr out-slots in 5 files (both pak menus, `_2` copies) |
+| t5-3 | `CISet__GetBlock(truncated)` from `CGameObjectInstance__PickRandomAnim`, `Actor_ReloadAnimInfo` | cache handles as `s32 *`, `*res` = the data pointer's low half | `CMemEntry *` / `sptr *` (14 files) |
+| t5-4 | `CScene__SetInstanceSavedBit` from `Action_IdleEnter(s32 actor)` | AI callbacks take the actor/AI as s32 | sptr params (151 in 120 files) |
+| t5-5 | `CScene__IsEventFired`, `findSorted` (event tables) | event-record pointers in s32 locals; `BinaryRange(s32 table)` | sptr |
+| t5-6 | `CMtxF__TransformBox(box = truncated)` | `UpdateBounds(.., s32)`, `TransformBox(s32, s32, s32)` | sptr |
+| t5-7 | `CPlayer__GetPickupCountLow(s32 player)` | player as s32 and N64 offset `-0xA74` | host bodies on `m_Data.m_SpecialPickupCount` |
+| t5-8 | `AI_PlayAnim` and the rest of the class | prototypes s32 where the definition has a pointer, and definitions s32 where callers pass pointers | `tools/port/ptrdecls.py` (385 params, 27 returns), `tools/port/ptrargs.py` (331 params of 127 functions) |
+| t5-9 | `--audio`: `alSaveNew(truncated)`, `alFxNew`, `alMainBusParam`, `alHeapDBAlloc`, `alFxPull` | `alHeapInit`'s `(s32)` casts, `alHeapDBAlloc` declared s32, bus/resampler constructors with s32 pointer params, `alFxParam(s32 *)` | sptr |
+
+### Open on the Mac
+
+- `--audio`: the mixer now runs, then `T2Asp_Run` -> `cmd_savebuff` memmoves to a truncated
+  address: the Acmd words carry 32-bit DRAM addresses (`osVirtualToPhysical`), fine below 4 GB
+  on Linux, not on the Mac. That is t4's item (1) (a handle table or full-width host Acmd).
+- The second attract demo stops in the level load on both hosts (above).
+- 1,218 port-build warnings remain (`-Wint-conversion` 895 mostly benign int-to-pointer of
+  sptr values, `-Wshorten-64-to-32` 229 `sptr` -> `s32` assignments): the remaining s32
+  locals/fields that hold pointers. Rerun `ptrdecls.py`/`ptrargs.py` after merges.
