@@ -22,7 +22,11 @@ extern void CCache__LoadPersistantIndex(s32, sptr *, sptr, char *);
 extern void **CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, CScene *, s32 (*)(), char *);
 extern s32 CScene__FindObjectType(CScene *w, s32 id);
 extern s32 CScene__GetObject(CScene *w, s32 index);
+#ifdef TARGET_PORT /* unprototyped: the host passes the pass-through arguments */
+extern void CScene__ClearListCounts();
+#else
 extern void CScene__ClearListCounts(void);
+#endif
 extern void CScene__LoadLevel(CScene *w, s32, s32);
 extern void CScene__InitPersistentData(CScene *w, s32 file);
 extern void CScene__ConstructWarp(CScene *w);
@@ -54,6 +58,71 @@ static __inline__ void loadGeomHeader(CScene *w, CGeomHeader *out, s32 id) {
     }
 }
 
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CScene__ClearListCounts receives CScene__Construct's own argument
+ * registers (pass-through); the host passes them. */
+void CScene__Construct(CScene *w, s32 file) {
+    sptr cart;
+    sptr res;
+    f32 *vec;
+
+    CScene__ClearListCounts(w);
+    w->m_Mode = 0;
+    CScene__ConstructWarp(w);
+    w->unk_04 = 0;
+    w->unk_08 = 0;
+    w->m_nLevel = -1;
+    w->unk_18EB8 = 0;
+    w->m_SkyAngle = 0;
+    CPlayerPool__LevelStart(&gEngineApp_m_Game.m_PlayerList);
+    vec = &w->m_qSky.x;
+    w->m_qSky.x = vec[1] = vec[2] = 0.0f;
+    w->m_qSky.w = 1.0f;
+    CCache__Flush(0);
+    CCache__LoadPersistantIndex(0, &cart, file, "cartridge index");
+    res = CISet__GetROMAddress(cart, file, 5);
+    w->m_LevelsKey = res;
+    CCache__LoadPersistantIndex(0, (sptr *)&w->m_pLevels, res, "levels index");
+    res = CISet__GetROMAddress(cart, file, 3);
+    w->m_TextureSetsKey = res;
+    CCache__LoadPersistantIndex(0, (sptr *)&w->m_pTextureSets, res, "texture sets index");
+    w->m_pObjectTypes = *CCache__LoadPersistantSubBlock(0, cart, 2, file, w, NULL, "object types");
+    res = CISet__GetROMAddress(cart, file, 0);
+    w->m_ObjectsKey = res;
+    CCache__LoadPersistantIndex(0, (sptr *)&w->m_pObjects, res, "objects index");
+    w->m_pIntelligence = *CCache__LoadPersistantSubBlock(0, cart, 1, file, w, CScene__DecompressIntelligence, "intelligence");
+    w->m_pParticleEffects = (s32 *)CCache__LoadPersistantSubBlock(0, cart, 4, file, w, CScene__DecompressParticles, "particle effects");
+    w->m_pObjectTypes2 = *CCache__LoadPersistantSubBlock(0, cart, 0xA, file, w, NULL, "object types");
+    res = CISet__GetROMAddress(cart, file, 9);
+    w->m_BinariesKey = res;
+    CCache__LoadPersistantIndex(0, (sptr *)&w->m_pBinaries, res, "binaries index");
+    w->m_pSwooshes = *CCache__LoadPersistantSubBlock(0, cart, 0xB, file, w, NULL, "particle swooshes");
+    w->m_pLights = *CCache__LoadPersistantSubBlock(0, cart, 0xC, file, w, NULL, "dynamic lights");
+    w->m_pBitSections = gLoadSavePersistentData;
+    w->unk_28 = CISet__GetROMAddressAndSize(cart, file, 6, &w->unk_30);
+    w->m_pBitSections2 = gGamePersistentData;
+    w->unk_2C = CISet__GetROMAddressAndSize(cart, file, 7, &w->unk_34);
+    w->m_pCurves = *CCache__LoadPersistantSubBlock(0, cart, 0xD, file, w, ProPack__Decompress, "curves");
+    w->m_pRumbles = *CCache__LoadPersistantSubBlock(0, cart, 0xE, file, w, ProPack__Decompress, "rumbles");
+    w->m_pRumbleTypes = *CCache__LoadPersistantSubBlock(0, cart, 0xF, file, w, ProPack__Decompress, "rumble types");
+    w->m_pGraphicSetTypes = *CCache__LoadPersistantSubBlock(0, cart, 0x11, file, w, NULL, "graphicset type");
+    res = CISet__GetROMAddress(cart, file, 0x10);
+    w->m_GraphicSetsKey = res;
+    CCache__LoadPersistantIndex(0, (sptr *)&w->m_pGraphicSets, res, "graphicset index");
+    res = CISet__GetROMAddress(cart, file, 0x12);
+    w->m_CinemasKey = res;
+    CCache__LoadPersistantIndex(0, (sptr *)&w->m_pCinemas, res, "Cinemas index");
+    w->m_pLinkGroupTypes = *CCache__LoadPersistantSubBlock(0, cart, 0x13, file, w, NULL, "link group types");
+    CScene__InitPersistentData(w, file);
+    gPersistentDataLoaded = 1;
+    loadGeomHeader(w, &w->m_Geom[0], 0xDAC);
+    loadGeomHeader(w, &w->m_Geom[1], 0xDAD);
+    loadGeomHeader(w, &w->m_Geom[2], 0xDAE);
+    loadGeomHeader(w, &w->m_Geom[3], 0xDAF);
+    loadGeomHeader(w, &w->m_Geom[4], 0xDB0);
+    CScene__LoadLevel(w, 0, 0);
+}
+#else
 void CScene__Construct(CScene *w, s32 file) {
     sptr cart;
     sptr res;
@@ -115,3 +184,4 @@ void CScene__Construct(CScene *w, s32 file) {
     loadGeomHeader(w, &w->m_Geom[4], 0xDB0);
     CScene__LoadLevel(w, 0, 0);
 }
+#endif

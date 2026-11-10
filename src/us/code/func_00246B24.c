@@ -6,6 +6,9 @@ typedef unsigned int u32;
 typedef signed int s32;
 typedef float f32;
 f32 Random_Blend(f32, f32);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define GameObject_DropPickupAt GameObject_DropPickupAt_i3
+#endif
 void GameObject_DropPickupAt(void *, s32, s32, s32, s32, f32);
 typedef struct { u32 mask; s32 val; } B04Ent;
 typedef struct { u8 pad0[4]; s32 x, y, z; } B04O; /* Turok 2: pos at 0x4 */

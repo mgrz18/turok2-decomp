@@ -16,9 +16,20 @@
 #endif
 
 s32 CPlayerPool__NewGame(sptr, s32, s32);       /* extern */
-s32 CCameraPool__NewGame(sptr);                         /* extern */
+#ifdef TARGET_PORT
+s32 CCameraPool__NewGame(sptr, s32);
+#else
+s32 CCameraPool__NewGame(sptr);
+#endif                         /* extern */
 
 void func_002888BC(sptr arg0, s32 arg1, s32 arg2) {
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck missing_args): a1 passes through to CCameraPool__NewGame on MIPS */
+    CCameraPool__NewGame(arg0 + APP_CAMERAPOOL, arg1);
+
+#else
     CCameraPool__NewGame(arg0 + APP_CAMERAPOOL);
+
+#endif
     CPlayerPool__NewGame(arg0 + APP_GAME, arg1, arg2);
 }

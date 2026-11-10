@@ -43,6 +43,9 @@ extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);  /* out
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
 extern void CVector3__Normalize(CVector3 *v);                        /* normalize */
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
+#define CQuaternion__FromDirection CQuaternion__FromDirection_byval
+#endif
 extern Vector4f CQuaternion__FromDirection(CVector3 *dir);                  /* quaternion facing dir */
 extern void CQuaternion__SlerpFast(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b);
 extern void CQuaternion__ToMatrix(Vector4f *q, MatrixF *m);

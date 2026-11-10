@@ -9,8 +9,18 @@ typedef struct {
 
 void COverlay__Update();                               /* extern */
 
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS COverlay__Update receives COverlay__StartScript's own argument
+ * registers (pass-through); the host passes them. */
+void COverlay__StartScript(ModeState *arg0, s32 arg1) {
+    arg0->value = arg1;
+    arg0->mode = 2;
+    COverlay__Update(arg0);
+}
+#else
 void COverlay__StartScript(ModeState *arg0, s32 arg1) {
     arg0->value = arg1;
     arg0->mode = 2;
     COverlay__Update();
 }
+#endif

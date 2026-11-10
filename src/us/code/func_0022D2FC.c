@@ -1169,6 +1169,9 @@ extern void CMtxF__Translate(CMtxF *m, f32 x, f32 y, f32 z);
 extern void CMtxF__SetScale(CMtxF *m, f32 x, f32 y, f32 z);
 extern void CMtxF__SetTranslate(CMtxF *m, f32 x, f32 y, f32 z);
 extern void CMtxF__Identity(CMtxF *m);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
+#define GameObject_GetAimRotation GameObject_GetAimRotation_sret
+#endif
 extern void GameObject_GetAimRotation(CQuaternion *q, Owner *owner, CVector3 pos);
 extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *m);
 extern void func_00207914(u32 *bits, s32 value);

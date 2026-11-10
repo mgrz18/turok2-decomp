@@ -46,7 +46,11 @@ typedef struct {
 
 extern char D_800A57F8[];
 
+#ifdef TARGET_PORT /* unprototyped: the host passes the pass-through arguments */
+s32 Actor_GetTypeClass();
+#else
 s32 Actor_GetTypeClass(void);
+#endif
 void **CStaticObject__LoadGeometry(PlacedProp *prop);
 void CStaticObject__BuildLitVerticesCallback(void);
 void Render_QueueModelInstance(void **resource, void *matrix, s32 segment, void *lights, void *textures, s32 lod, s32 pass);
@@ -108,6 +112,76 @@ static __inline__ void pulseColors(s32 *object, u8 *colors) {
 /* Queues a placed prop's model: the level of detail from its descriptor (in
  * multiplayer, from the game setup for some modes), and its vertex colours
  * pulsed once a frame. */
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS Actor_GetTypeClass receives CStaticObject__Draw's own argument
+ * registers (pass-through); the host passes them. */
+void CStaticObject__Draw(PlacedProp *prop) {
+    s32 argument;
+    s32 mode;
+    void **instance;
+    s32 lod;
+    s32 **resource;
+    s32 *header;
+    s32 *object;
+    u8 *colors;
+    void *data;
+
+    do { /* a block of its own, as an early-out macro would make; it decides the register allocation */
+        if (prop->flags & 0x40) {
+            return;
+        }
+    } while (0);
+    argument = prop->descriptor->argument;
+    if (gEngineApp_m_Settings.multiplayer) {
+        mode = Actor_GetTypeClass(prop);
+        switch (mode) {
+            case 1:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+                lod = prop->descriptor->lod;
+                break;
+            default: {
+                GameMatch *game = &gEngineApp_m_Settings.match;
+                if (game->tag) {
+                    lod = ((s8 *) game)[-0x1B0];
+                } else {
+                    lod = ((s8 *) game)[-0x1B5];
+                }
+                break;
+            }
+        }
+    } else {
+        lod = prop->descriptor->lod;
+    }
+    instance = CStaticObject__LoadGeometry(prop);
+    if (instance == NULL) {
+        return;
+    }
+    resource = CCache__RequestDecompression(0, prop->colorKey | gLitVerticesKey, instance, prop->cache, 8, prop, CStaticObject__BuildLitVerticesCallback, D_800A57F8, 0);
+    if (resource != NULL) {
+        CCache__LockForDisplayList(0, resource);
+        header = *resource;
+        if (header[0] == 1) {
+            data = (u8 *) header + header[1];
+            object = (s32 *) data;
+            colors = (u8 *) header + header[2];
+            if (prop->colorFrame != (u8)gFrameCount) {
+                pulseColors(object, colors);
+            }
+            Render_QueueModelInstance(instance, prop->matrix, 0, 0, data, argument, lod);
+        } else {
+            Render_QueueModelInstance(instance, prop->matrix, 0, 0, header + 2, argument, lod);
+        }
+        CCache__Unlock(0, resource);
+    }
+    CCache__Unlock(0, instance);
+    prop->colorFrame = (u8)gFrameCount;
+}
+#else
 void CStaticObject__Draw(PlacedProp *prop) {
     s32 argument;
     s32 mode;
@@ -174,3 +248,4 @@ void CStaticObject__Draw(PlacedProp *prop) {
     CCache__Unlock(0, instance);
     prop->colorFrame = (u8)gFrameCount;
 }
+#endif

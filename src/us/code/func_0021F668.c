@@ -5,6 +5,9 @@
 
 typedef struct B11Box B11Box;
 void CAnimationState__GetBonePosition(f32 *p, s32 a, f32 t, f32 *out);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define CMtxF__SetRotateY CMtxF__SetRotateY_i
+#endif
 void CMtxF__SetRotateY(f32 *m, s32 a);
 void CMtxF__TransformPoint(f32 *m, f32 *v, f32 *out);
 void GameObject_TraceMove(CGameObjectInstance *a, CVector3 v, CVector3 *out, B11Box **box, s32 e, s32 f);

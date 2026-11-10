@@ -9,6 +9,9 @@ typedef f32 Mtx4[4][4];
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 func_00298470(f32 x);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
+#define CGameObjectInstance__GetRotation CGameObjectInstance__GetRotation_sret
+#endif
 void CGameObjectInstance__GetRotation(CQuaternion *q, CGameObjectInstance *actor);
 void CQuaternion__ToMatrix(CQuaternion *q, Mtx4 *mtx);
 void CMtxF__TransformPoint(Mtx4 *mtx, CVector3 *in, CVector3 *out);

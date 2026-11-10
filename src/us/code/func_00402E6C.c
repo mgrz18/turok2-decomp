@@ -4,6 +4,9 @@
 #include "protos/ai.h"
 #include "protos/player.h"
 
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define AI_AngleToPoint AI_AngleToPoint_i3
+#endif
 f32 AI_AngleToPoint(s32, s32, s32, s32);
 
 s32 ScriptAnimator_SetScript(void *, s32 *);           /* extern */

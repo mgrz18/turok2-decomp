@@ -21,6 +21,9 @@ typedef struct B19bLObj {
                u8 fBA;
 } B19bLObj;
 void CMtxF__TransformPoint(void *, void *, void *);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Actors_GetLightVolumeFalloff Actors_GetLightVolumeFalloff_v
+#endif
 s32 Actors_GetLightVolumeFalloff(void *, B19bV3f, void *, f32 *);
 void CVector3__Add(void *, void *, void *);
 void CMtxF__TransformPointProjective(void *, void *, void *);

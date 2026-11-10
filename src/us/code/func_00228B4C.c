@@ -15,8 +15,18 @@ typedef struct {
 void CList__AddHead(CList *, void *);               /* extern */
 void CList__Remove();                               /* extern */
 
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CList__Remove receives CDLightSet__Free's own argument
+ * registers (pass-through); the host passes them. */
+void CDLightSet__Free(ListOwner *arg0, ListNode *arg1) {
+    arg1->unk16 = 0;
+    CList__Remove(arg0, arg1);
+    CList__AddHead(&arg0->m_List, arg1);
+}
+#else
 void CDLightSet__Free(ListOwner *arg0, ListNode *arg1) {
     arg1->unk16 = 0;
     CList__Remove();
     CList__AddHead(&arg0->m_List, arg1);
 }
+#endif

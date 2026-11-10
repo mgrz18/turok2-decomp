@@ -1,6 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define CMtxF__RotateX CMtxF__RotateX_i
+#endif
 s32 CMtxF__RotateX(s32, s32);                    /* extern */
 s32 CMtxF__RotateZ(s32, f32);                    /* extern */
 

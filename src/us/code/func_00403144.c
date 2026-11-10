@@ -15,6 +15,9 @@ typedef struct {
 } Item00403144;
 
 void AI_UpdateTargets(s32 a0, Item00403144 *item, Info00403144 *info, s32 a3, s32 a4);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define AI_TurnClamped AI_TurnClamped_i
+#endif
 void AI_TurnClamped(s32 a0, Item00403144 *item, f32 a2, s32 a3);
 s32 AI_IsAimedAt(s32 a0, Item00403144 *item, s32 a2, f32 a3);
 void CAI__SetMode(s32 a0, Item00403144 *item, s32 a2);

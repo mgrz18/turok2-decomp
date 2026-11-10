@@ -4,6 +4,14 @@
 #include "protos/ai.h"
 
 
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck void_used): the callers use the result, on MIPS v0 of
+ * the last call; the host returns it. */
+s32 EnemyAnim_NormalDeath_B0390(CGameObjectInstance *obj, CAI *ai) {
+    return AI_PickAnimFromTable(obj, ai, sEnemyAnimNormalDeath_B0390, obj->header.m_pIntelligence->m_Enemy.m_wNormalDeathAnimFlags);
+}
+#else
 void EnemyAnim_NormalDeath_B0390(CGameObjectInstance *obj, CAI *ai) {
     AI_PickAnimFromTable(obj, ai, sEnemyAnimNormalDeath_B0390, obj->header.m_pIntelligence->m_Enemy.m_wNormalDeathAnimFlags);
 }
+#endif

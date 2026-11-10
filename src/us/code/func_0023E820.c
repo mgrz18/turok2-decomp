@@ -41,6 +41,9 @@ void CPlayer__CollectKeyPiece(Picker *picker, s32 id);
 s32 Level_GetHub(s32 arg0);
 void CCamera__StartFlash(s32 hud, s32 a, s32 r, s32 g, s32 b, s32 arg5, s32 arg6, s32 arg7);
 void CCameraPool__AddText(u8 *arg0, s32 hud, u8 *msg);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Sound__Play Sound__Play_i3
+#endif
 void Sound__Play(s32 sound, s32 x, sptr y, s32 z, s32 arg4, s32 arg5);
 void Sound__PlaySpeech(s32 arg0);
 

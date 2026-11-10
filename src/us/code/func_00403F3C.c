@@ -26,6 +26,9 @@ typedef struct {
     /* 0x54 */ Vec3_00403F3C spawn;
 } Level00403F3C;
 
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define AI_TurnHeadToTarget AI_TurnHeadToTarget_i
+#endif
 void AI_TurnHeadToTarget(Actor00403F3C *actor, Level00403F3C *level, s32 a2);
 void Animator_Update(void *light);
 s16 WeightedTable_PickStatic(void *table);

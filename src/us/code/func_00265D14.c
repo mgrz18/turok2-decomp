@@ -30,6 +30,14 @@ struct Triple {
 };
 struct Triple;
 typedef struct Triple Triple;
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck struct_class): the position is a float struct on the host.
+ * MIPS passes the Rage Wars Triple (three s32) and a CVector3 in the same registers; x86-64
+ * and arm64 do not (integer vs SSE/FP registers), so Triple means three floats here. */
+typedef struct { float x, y, z; } T2HostTriple;
+#define Triple T2HostTriple
+#endif
+
 struct CQuatern_t;
 typedef struct CQuatern_t CQuatern;
 struct CQuatern_t;
