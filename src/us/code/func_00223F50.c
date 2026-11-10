@@ -6,6 +6,8 @@
 /* ABI (docs/port/ABI.md, abicheck void_used + missing_args): the caller (func_002350EC) passes the
  * swoosh type in a1 and uses the block address; on MIPS a1 passes straight through to
  * CISet__GetBlock and its v0 is returned. */
+void *CISet__GetBlock(void *, s32); /* without it the call is implicit (int): the address truncated on macOS */
+
 void *CScene__GetSwoosh(CScene *arg0, s32 index) {
     return CISet__GetBlock(arg0->m_pSwooshes, index);
 }
