@@ -6,6 +6,9 @@
 #include "protos/scene.h"
 
 extern s32 ProPackDecompress(void ***, s32);
+#ifdef TARGET_PORT
+void T2Port_ParticlesBuild(void *scene, void *data); /* port/game/t2particles.c */
+#endif
 void CScene__DecompressParticles(sptr arg0, void ***arg1) {
     void *obj;
     GroupCode8044E2B8 *group;
@@ -15,6 +18,12 @@ void CScene__DecompressParticles(sptr arg0, void ***arg1) {
     s32 i;
     if (ProPackDecompress(arg1, 0) != 0) {
         obj = **arg1;
+#ifdef TARGET_PORT
+        /* the host copies the templates with full-width pointers (port/game/t2particles.c);
+         * block 2 keeps its offsets */
+        T2Port_ParticlesBuild((void *) (sptr) arg0, obj);
+        return;
+#endif
         group = CISet__GetBlock(obj, 2);
         count = group->count;
         piece = group->pieces;

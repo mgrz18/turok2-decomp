@@ -60,13 +60,42 @@ typedef struct CROMParticleImpact {
     /* 0xA8 */ u16 m_ImpactSoundType[14];
 } CROMParticleImpact; /* size 0xC4 */
 
-/* How a particle's size follows its distance from the camera (CParticle__GetDistanceScale,
- * CParticle__BuildMatrix): the scale near and far. */
+/* Two half floats (HalfToFloat): a base and a random range (RandomInPackedRange takes the
+ * pair by value). Every random value of a template is one of these. */
+typedef struct CPackedRange {
+    /* 0x0 */ u16 m_Base;
+    /* 0x2 */ u16 m_Range;
+} CPackedRange; /* size 0x4 */
+
+/* A template's starting size and growth (CParticle.m_vSize/m_vGrowth), and how the size follows
+ * its distance from the camera (CParticle__GetDistanceScale, CParticle__BuildMatrix): the scale
+ * near and far. */
 typedef struct CROMParticleDistance {
-    /* 0x00 */ u8 unk_00[0x1C];
+    /* 0x00 */ CPackedRange m_Size[6];
+    /* 0x18 */ f32 m_ShadowScale;      /* the blob shadow's size (CParticle__DrawShadow) */
     /* 0x1C */ f32 m_NearScale;
     /* 0x20 */ f32 m_FarScale;
-} CROMParticleDistance;
+} CROMParticleDistance; /* size 0x24 */
+
+/* A template's wobble (CParticle.m_WobblePhase/Amplitude) and the frames its opacity ramps up
+ * over (CParticle__BuildMatrix). */
+typedef struct CROMParticleOscillation {
+    /* 0x00 */ CPackedRange m_Wobble[6];
+    /* 0x18 */ s8 m_Ramp;
+    /* 0x19 */ u8 unk_19[3];
+} CROMParticleOscillation; /* size 0x1C */
+
+/* A template's two colours, each shifted in hue, saturation and value by a random amount up to
+ * the ranges when a particle spawns. */
+typedef struct CROMParticleColors {
+    /* 0x00 */ u8 m_Color0[3];
+    /* 0x03 */ u8 m_Color1[3];
+    /* 0x06 */ u8 unk_06[6];
+    /* 0x0C */ s8 m_HueRange;
+    /* 0x0D */ s8 m_SatRange;
+    /* 0x0E */ s8 m_ValRange;
+    /* 0x0F */ u8 unk_0F;
+} CROMParticleColors; /* size 0x10 */
 
 /* How a template spawns: life, chance, count, which active list... */
 typedef struct CROMParticleParams {
@@ -85,16 +114,22 @@ typedef struct CROMParticleParams {
     /* 0x0F */ u8 m_Event;
 } CROMParticleParams; /* size 0x10 */
 
-/* How a template's particles speed up (CParticle__Accelerate): the
- * acceleration along m_vDirection and the speed it stops at, half floats
- * (HalfToFloat). */
+/* How a template's particles start and speed up: the gravity (CParticle.m_Gravity) and the
+ * speed along m_vDirection (random pairs), four half floats copied to CParticle 0x19C..0x1A8,
+ * the acceleration along m_vDirection and the speed it stops at (CParticle__Accelerate). All
+ * half floats (HalfToFloat). */
 typedef struct CROMParticleMotion {
-    /* 0x00 */ u8 unk_00[0x10];
+    /* 0x00 */ CPackedRange m_Gravity;
+    /* 0x04 */ CPackedRange m_Speed;
+    /* 0x08 */ u16 m_Render[4];
     /* 0x10 */ u16 m_Accel;
     /* 0x12 */ u16 m_MaxSpeed;
-} CROMParticleMotion;
+} CROMParticleMotion; /* size 0x14 */
 
-/* A particle template (block 2 of the particle data; CParticle.m_pEffect). */
+/* A particle template (block 2 of the particle data; CParticle.m_pEffect). On the N64 the nine
+ * pointers are offsets into block 0 that CScene__DecompressParticles relocates in place; the
+ * host builds its own copy of the templates with full-width pointers instead
+ * (port/game/t2particles.c, docs/port/RENDER.md section 6). */
 typedef struct CROMParticleEffect {
     /* 0x00 */ u32 m_dwFlags;
     /* 0x04 */ s16 unk_04;
@@ -110,13 +145,13 @@ typedef struct CROMParticleEffect {
     /* 0x11 */ u8 unk_11[3];
     /* 0x14 */ void *m_pModel;          /* drawn as this model, not as a sprite */
     /* 0x18 */ CROMParticleImpact *m_pImpact;
-    /* 0x1C */ void *m_pOffset;
-    /* 0x20 */ void *unk_20;
+    /* 0x1C */ CPackedRange *m_pOffset;        /* [3]: x, y, z */
+    /* 0x20 */ CPackedRange *m_pRotation;      /* [6]: CParticle.m_vRot / m_vRotSpeed */
     /* 0x24 */ CROMParticleDistance *m_pDistanceRange;
-    /* 0x28 */ void *m_pDirection;
-    /* 0x2C */ void *m_pOscillation;
+    /* 0x28 */ CPackedRange *m_pDirection;     /* [3]: x, y, z */
+    /* 0x2C */ CROMParticleOscillation *m_pOscillation;
     /* 0x30 */ CROMParticleMotion *m_pMotion;
-    /* 0x34 */ void *m_pColors;
+    /* 0x34 */ CROMParticleColors *m_pColors;
     /* 0x38 */ CROMParticleParams *m_pParams;
 } CROMParticleEffect; /* size 0x3C */
 
