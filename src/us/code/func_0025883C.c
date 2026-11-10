@@ -2,6 +2,9 @@
 #include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/model.h"
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#endif
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "structs/camera.h"
@@ -12,6 +15,20 @@ typedef struct {
     s32 w[6];
 } RenderBlock; /* 0x18 bytes */
 
+#ifdef TARGET_PORT
+typedef struct WeaponActor {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_WeaponActor(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_model[T2_HOFF_WeaponActor(m_pmtDrawMtxs)]; sptr model; }; /* N64 0x98 */
+        struct { u8 _hp_render[T2_HOFF_WeaponActor(m_vMin)]; RenderBlock render; }; /* N64 0xBC: m_vMin, m_vMax */
+        struct { u8 _hp_slots[T2_HOFF_WeaponActor(m_Lights)]; u8 slots[2][0x18]; }; /* N64 0x110 */
+        struct { u8 _hp_owner[T2_HOFF_WeaponActor(m_AI.m_pParent)]; struct CPlayer *owner; }; /* N64 0x1A8 */
+        struct { u8 _hp_drawHook[T2_HOFF_WeaponActor(m_AI.m_pfDraw)]; void *drawHook; }; /* N64 0x234 */
+    };
+} WeaponActor;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x98];
     /* 0x098 */ s32 model;
@@ -24,6 +41,7 @@ typedef struct {
     /* 0x1AC */ u8 pad1AC[0x234 - 0x1AC];
     /* 0x234 */ void *drawHook;
 } WeaponActor;
+#endif
 
 extern s32 MenuPool_CountOpen(void *arg0);
 extern void EnemyAI_CalcOrientationMatrix(WeaponActor *actor, void *ai);
