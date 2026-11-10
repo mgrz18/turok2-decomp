@@ -25,7 +25,7 @@ typedef struct {
     /* 0x10 */ s32 unk10;
 } List;
 
-s32 alLink(s32, List *);                 /* extern */
+s32 alLink(sptr, List *);                 /* extern */
 
 /* Clears the list and adds arg2 0x1C-byte entries from arg1. */
 void alEvtqNew(List *arg0, s32 arg1, s32 arg2) {

@@ -3,7 +3,7 @@
 #include "structs/game.h"
 
 void Controller_UnwatchPak(s32);
-s32 CEngineApp__SetupFadeTo(s32, s32);
+s32 CEngineApp__SetupFadeTo(sptr, s32);
 
 
 s32 SingleMenu_GoBack_2(s32 arg0, void *arg1)

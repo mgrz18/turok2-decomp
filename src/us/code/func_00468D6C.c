@@ -2,7 +2,7 @@
 #include "rw/abu_protos.h"
 
 void *memset(void *destination, s32 value, uptr size);
-s32 CCamera__Advance(s32);
+s32 CCamera__Advance(sptr);
 
 s32 CCamera__Construct_2(void *);                      /* extern */
 

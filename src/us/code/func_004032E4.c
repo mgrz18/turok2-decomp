@@ -1,7 +1,7 @@
 #include "common.h"
 
 void AI_UpdateTargets(s32 a0, s32 a1, void *out, s32 a3, s32 a4);
-void AI_TurnClamped(s32 a0, sptr a1, f32 a2, s32 a3);
+void AI_TurnClamped(sptr a0, sptr a1, f32 a2, s32 a3);
 
 void MantidQueen_UpdateMode15(s32 a0, s32 a1) {
     u8 buf[0x88];

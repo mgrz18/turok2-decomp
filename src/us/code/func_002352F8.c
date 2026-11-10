@@ -14,7 +14,7 @@ void Render_SetRenderMode(s32);
 void Render_SetCombineMode(s32);
 void Texture_InvalidateCache(void);
 void Trail_PlaceNodes(Trail *);
-void Trail_ComputeFrames(Trail *, s32);
+void Trail_ComputeFrames(Trail *, sptr);
 void Trail_DrawTextured(TrailMgr *, Trail *, s32);
 void Trail_DrawUntextured(TrailMgr *, Trail *, s32);
 

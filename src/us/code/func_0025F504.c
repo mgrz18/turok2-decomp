@@ -6,7 +6,7 @@ f32 GameObject_GetLeashRadius(CGameObjectInstance *);
 f32 Random_Blend(f32, f32);
 f32 func_002974C0(f32);
 f32 func_002982F0(f32);
-void Collision_MoveInstance(CGameObjectInstance *, CVector3, s32);
+void Collision_MoveInstance(CGameObjectInstance *, CVector3, sptr);
 
 void EnemyMode_TeleportIn_Enter(CGameObjectInstance *self, CAI *ai) {
     f32 radius;

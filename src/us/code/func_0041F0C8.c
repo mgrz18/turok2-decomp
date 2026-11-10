@@ -18,9 +18,9 @@ u32 Pak_BytesToPages(u32 n);
 s32 Pak_GetFreePages(s32 pad, s32 *out);
 s32 Pak_CountEmptyNotes(s32 pad, s32 *out);
 s32 Pak_FindFreeExtLetter(s32 pad, u8 *ext);
-s32 Pak_SaveNoteVerified(s32 pad, s32 size, s32 buf, char *n1, u8 *ext, char *n2);
+s32 Pak_SaveNoteVerified(s32 pad, s32 size, sptr buf, char *n1, u8 *ext, char *n2);
 void CCache__Flush(s32 a);
-void CCache__Deallocate(s32 a, s32 b);
+void CCache__Deallocate(s32 a, sptr b);
 void Cinema_StopAtEnd(void);
 void Cinema_RequestById(s32 a);
 

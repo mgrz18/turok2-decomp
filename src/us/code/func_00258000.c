@@ -16,7 +16,7 @@ extern struct {
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 extern s32 CPlayer__GetNextUsableWeapon(CPlayer *player);
 extern void Sound__Play(s32 sound, CVector3 pos, CVector3 *source, s32 arg);
-extern void CCameraPool__AddText(void *buf, s32 camera, s32 model);
+extern void CCameraPool__AddText(void *buf, sptr camera, sptr model);
 
 /* Switches the weapon model to the player's next weapon (see WeaponActor_EquipRequested)
  * and puts the weapon AI back in mode 0. */

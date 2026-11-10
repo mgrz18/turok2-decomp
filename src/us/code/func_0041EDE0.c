@@ -23,7 +23,7 @@ s32 Pak_SaveNoteVerified(s32 pad, s32 size, u8 *buf, char *n1, u8 *ext, char *n2
 extern s32 gSaveBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
 extern s32 gLoadBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
 void CCache__Flush(s32 a);
-void CCache__Deallocate(s32 a, s32 b);
+void CCache__Deallocate(s32 a, sptr b);
 /* Static inlines in the Rage Wars source file (dropped by the importer). */
 static inline u8 *O01Pick(O01Pad *sel) {
     u8 *p;

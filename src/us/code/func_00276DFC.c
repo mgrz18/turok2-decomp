@@ -9,11 +9,11 @@ typedef struct {
     /* 0x1E */ s16 sound;
 } SoundSlot;
 
-void CAudioWorld__Lock(s32);                            /* extern */
-void CAudioWorld__Unlock(s32);                            /* extern */
+void CAudioWorld__Lock(sptr);                            /* extern */
+void CAudioWorld__Unlock(sptr);                            /* extern */
 s32 CAudioWorld__GetSndPlayer(s32);                             /* extern */
-void alSndpSetSound(s32, s16);                       /* extern */
-void alSndpStop(s32);                            /* extern */
+void alSndpSetSound(sptr, s16);                       /* extern */
+void alSndpStop(sptr);                            /* extern */
 
 void SpeechPlayer_Stop(SoundSlot *arg0) {
     s32 temp_v0;

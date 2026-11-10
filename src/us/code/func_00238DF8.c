@@ -8,7 +8,7 @@ typedef struct EventParams {
 } EventParams;
 
 extern void MantidQueen_SpawnMinion(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, EventParams params);
-extern void Primagen_HandleAnimEvent(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, EventParams params);
+extern void Primagen_HandleAnimEvent(s32 arg0, sptr arg1, s32 arg2, CVector3 pos, EventParams params);
 extern void MotherBoss_AnimEvent(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, EventParams params);
 
 void ImpactEvent_LevelSpecial(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, EventParams params) {

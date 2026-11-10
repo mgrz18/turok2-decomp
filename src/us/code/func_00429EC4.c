@@ -15,6 +15,15 @@ void __osPfsSelectBank(OSPfs *pfs)
 #else
 typedef unsigned char u8;
 typedef signed int s32;
+#ifndef COMMON_H
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef signed int sptr;
+typedef unsigned int uptr;
+#endif
+#endif
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -24,7 +33,7 @@ typedef struct {
     /* 0x65 */ u8 fill;
 } Arg0;
 
-s32 __osContRamWrite(s32, s32, s32, s32, s32);
+s32 __osContRamWrite(sptr, s32, s32, sptr, s32);
 
 /* Writes 0x20 bytes of the fill value at offset 0x400. */
 void __osPfsSelectBank(Arg0 *arg0)

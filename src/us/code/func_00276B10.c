@@ -21,7 +21,7 @@ typedef struct MusicPlayer {
     /* 0x1E */ s16 id;
 } MusicPlayer;
 
-extern s32 BinaryRange(s32 table, s32 count, s32 group, s32 *first, s32 *last);
+extern s32 BinaryRange(sptr table, s32 count, s32 group, s32 *first, s32 *last);
 extern s32 Random_Next(void);                     /* random */
 extern void *CAudioWorld__GetSndPlayer(MusicBank *bank);        /* the bank's sound player */
 extern void CAudioWorld__Lock(MusicBank *bank);

@@ -14,7 +14,7 @@ typedef struct Entry0026C5C4 {
 } Entry0026C5C4;
 
 
-s32 CGameRegion__FloodSetWaterSame(s32, s32);                    /* extern */
+s32 CGameRegion__FloodSetWaterSame(sptr, s32);                    /* extern */
 
 void CGameRegion__FloodSetWater(Entry0026C5C4 *arg0) {
     sptr temp_a0;

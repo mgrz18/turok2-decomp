@@ -7,7 +7,7 @@ typedef struct {
     /* 0x90 */ s32 id;
 } Obj00403AD4;
 
-void CMtxF__ScaleAxes(s32 a0, f32 r, f32 g, f32 b);
+void CMtxF__ScaleAxes(sptr a0, f32 r, f32 g, f32 b);
 
 void Primagen_Effects(s32 a0, Obj00403AD4 *obj) {
     f32 level = 1.0f - gLevelScript.partTimer * 0.011111111f;

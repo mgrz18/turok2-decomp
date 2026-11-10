@@ -12,7 +12,7 @@ typedef struct {
     /* 0x4C */ s32 length;
 } FrameTask;
 
-s32 alAudioFrame(s32, s32, s32, s32);
+s32 alAudioFrame(sptr, sptr, sptr, s32);
 
 s32 __clearAudioDMA();                            /* extern */
 s32 Sound__Update();                            /* extern */

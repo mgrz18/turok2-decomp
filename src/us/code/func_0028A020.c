@@ -30,7 +30,7 @@ extern void __scHandleRSP(Sched *sc);
 extern void __scHandleRDP(Sched *sc);
 extern void Music_FadeOut(void);
 extern void Sound__StopAllExcept(s32);
-extern void LoopSounds_StopAll(s32);
+extern void LoopSounds_StopAll(sptr);
 extern void Sched_HandleCmdMsg(Sched *sc);
 
 /* Scheduler thread: serves retrace, RSP/RDP done, pre-NMI and fault messages forever. */

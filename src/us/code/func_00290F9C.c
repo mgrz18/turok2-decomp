@@ -29,8 +29,8 @@ ALMicroTime alEvtqNextEvent(ALEventQueue *evtq, ALEvent *evt) {
 s32 alLink(s32, s32);
 s32 osSetIntMask(s32);
 
-s32 alCopy(s32, s16 *, s32);         /* extern */
-s32 alUnlink(s32);                         /* extern */
+s32 alCopy(sptr, s16 *, s32);         /* extern */
+s32 alUnlink(sptr);                         /* extern */
 
 s32 alEvtqNextEvent(void *arg0, s16 *arg1)
 {

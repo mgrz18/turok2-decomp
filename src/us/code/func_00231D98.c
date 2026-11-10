@@ -23,7 +23,7 @@ struct B19Obj {
 };
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
-void CParticle__Attach(B19Obj *, s32, s32);
+void CParticle__Attach(B19Obj *, sptr, sptr);
 void Trail_AddNode(void *, B19Obj *, s32);
 s32 DLight_Spawn(void *, s32);
 void CParticle__StartLoopSound(B19Obj *, s32);

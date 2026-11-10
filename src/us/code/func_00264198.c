@@ -3,7 +3,7 @@
 #include "globals/ai.h"
 
 void Platform_CalcOrientation(s32, s32);
-s32 Platform_Step(s32, s32);
+s32 Platform_Step(sptr, sptr);
 
 void Platform_Setup(CGameObjectInstance *arg0, CAI *arg1) {
     CTurretIntelligence *temp_v0;

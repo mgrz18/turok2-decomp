@@ -2,7 +2,7 @@
 #include "structs/sound.h"
 
 s32 alSndpSetVol(s32, s32);
-s32 alSndpSetSound(s32, s16);                    /* extern */
+s32 alSndpSetSound(sptr, s16);                    /* extern */
 
 void SndVoice_SetVolume(SndVoice *arg0, s32 arg1) {
     CAudioWorld *temp_s0;

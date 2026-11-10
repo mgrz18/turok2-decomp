@@ -14,8 +14,8 @@
 
 
 extern s32 Controller_ConfirmPressed(s32 pad);
-extern s32 Controller_MenuLeft(s32 pad);
-extern s32 Controller_MenuRight(s32 pad);
+extern s32 Controller_MenuLeft(sptr pad);
+extern s32 Controller_MenuRight(sptr pad);
 extern void Menu_ClaimPressingController(Menu *c);
 extern void CEngineApp__SetupFadeTo(void *game, s32 mode);
 extern void CEngineApp__StartGameAtWarp(void *game, s32 level);

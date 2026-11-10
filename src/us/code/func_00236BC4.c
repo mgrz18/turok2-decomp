@@ -5,7 +5,7 @@
 /* A swoosh (structs/swoosh.h); layer < 0: drawn untextured (Trail_DrawUntextured). */
 typedef Swoosh Trail;
 
-s32 Trail_ComputeFrames(Trail *, s32);             /* extern */
+s32 Trail_ComputeFrames(Trail *, sptr);             /* extern */
 s32 Trail_PlaceNodes(Trail *);                  /* extern */
 s32 Trail_DrawTextured(sptr, Trail *, s32);        /* extern */
 s32 Trail_DrawUntextured(sptr, Trail *, s32);        /* extern */

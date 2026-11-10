@@ -4,8 +4,8 @@
 #include "globals/audio.h"
 #include "protos/iset.h"
 extern void alCSPSetBank(s32 arg0, s32 arg1);
-extern void alCSPSetSeq(s32 arg0, s32 arg1);
-extern void alCSPSetVol(s32 arg0, s16 arg1);
+extern void alCSPSetSeq(sptr arg0, s32 arg1);
+extern void alCSPSetVol(sptr arg0, s16 arg1);
 struct IntPair;
 struct IntPair {
     int field_0;
@@ -61,9 +61,9 @@ extern void alCSPPlay(s32);
 extern int alCSPGetState(void *object);
 struct Track;
 extern void alCSPSetChlFXMix(s32 arg0, s32 arg1, s8 arg2);
-extern s32 BinarySearch(s32,s32,sptr);
+extern s32 BinarySearch(sptr, s32, sptr);
 extern f32 HalfToFloat(u16);
-extern void alCSeqNew(s32, void *);
+extern void alCSeqNew(sptr, void *);
 static __inline__ f32 fade_rate(Track *track,f32 time,f32 rate) {track->unk30=time;return (f32)track->unk20/(time*rate);}
 void SndSeq_Update(Track *arg0) {
     f32 temp_f0;

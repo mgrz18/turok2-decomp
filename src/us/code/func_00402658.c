@@ -11,7 +11,7 @@ typedef struct {
 
 extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void AI_ComputeFrameMotion(CGameObjectInstance *actor, CAI *ai, Path *path);
-extern s32 AI_IsAimedAt(CGameObjectInstance *actor, CAI *ai, s32 visible, f32 angle);
+extern s32 AI_IsAimedAt(CGameObjectInstance *actor, CAI *ai, sptr visible, f32 angle);
 extern f32 func_00298470(f32); /* sqrtf */
 
 void MantidQueen_ChooseAttack(CGameObjectInstance *actor, CAI *ai) {

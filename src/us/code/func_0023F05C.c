@@ -4,8 +4,8 @@
 #include "protos/scene.h"
 
 s32 CPooledLevelActor__Release(s32);
-s32 CPlayer__CollectPickup(s32, s32, s32);
-s32 GameObject_GetTypeId(s32);
+s32 CPlayer__CollectPickup(sptr, sptr, s32);
+s32 GameObject_GetTypeId(sptr);
 
 s32 CGameRegion__FireTriggers(sptr, s32, s32);           /* extern */
 

@@ -19,8 +19,8 @@ typedef struct SndOwner {
     u8 pad0[0xEC];
     SndHandle *sound;       /* 0xEC (0xFC in Rage Wars) */
 } SndOwner;
-void *LoopSounds_Start(s32 a, s32 b, CVector3 *c, CVector3 *d, void *e);
-void LoopSounds_Stop(s32 a, SndHandle *h);
+void *LoopSounds_Start(sptr a, s32 b, CVector3 *c, CVector3 *d, void *e);
+void LoopSounds_Stop(sptr a, SndHandle *h);
 void AI_StartSound(SndSrc *src, SndOwner *owner, s32 id) {
     void *s0 = (void *)-1;
     if (owner->sound != ((void *)0)) {

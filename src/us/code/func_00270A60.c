@@ -32,14 +32,14 @@ static inline void CAudioWorld_Unlock(CAudioWorld *m) {
         __osRestoreInt(mask);
     }
 }
-s32 CCameraPool__GetNearestCamera(void *p, s32 id);
+s32 CCameraPool__GetNearestCamera(void *p, sptr id);
 s32 SndVoicePool_IsSoundPlaying(void *pool, s16 a);
-f32 Sound_DistanceFalloff(s32 id, s32 p);
+f32 Sound_DistanceFalloff(sptr id, sptr p);
 s32 SndVoicePool_FindSoundWithOwner(void *pool, s16 a, s32 b);
-s32 SndQueue_Add(void *q, SoundEffectInfo *info, s32 id, s32 a3, s32 a5);
+s32 SndQueue_Add(void *q, SoundEffectInfo *info, sptr id, s32 a3, s32 a5);
 void SndVoicePool_StopGroupVoice(void *pool, s16 a, s16 b);
 SndVoice *SndVoicePool_AllocVoice(void *pool, SoundEffectInfo *info, s32 a3, s32 a4);
-void SndVoice_SetPosition(SndVoice *v, s32 id, sptr a6);
+void SndVoice_SetPosition(SndVoice *v, sptr id, sptr a6);
 void SndVoice_SetSoundId(SndVoice *v, s16 a);
 void SndVoice_Setup(SndVoice *v, SoundEffectInfo *info, s32 a5);
 s32 CAudioWorld__StartVoice(CAudioWorld *m, s32 id, s32 a2, s32 a3);

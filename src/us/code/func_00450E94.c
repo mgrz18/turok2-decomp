@@ -4,7 +4,7 @@
 #include "protos/game.h"
 
 void Controller_UnwatchPak(s32);
-s32 Controller_ResetRumble(s32);
+s32 Controller_ResetRumble(sptr);
 
 
 s32 RumbleMenu_Play_2(s32 arg0, void *arg1)

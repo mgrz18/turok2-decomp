@@ -2,7 +2,7 @@
 #include "structs/sound.h"
 
 extern void *alMainBusPull(void *, s16 *, s32, s32, void *); /* alMainBusPull */
-extern s32 alMainBusParam(s32, s32, s32);
+extern s32 alMainBusParam(sptr, s32, sptr);
 extern void alFilterNew(void *, void *, void *, s32);
 
 /* alMainBusNew */

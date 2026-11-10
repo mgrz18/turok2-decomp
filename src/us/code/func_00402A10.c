@@ -26,7 +26,7 @@ typedef struct {
 } Obj00402A10;
 
 extern s32 gMantidQueen_waveActive[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
-void AI_TurnHeadToTarget(s32 a0, Obj00402A10 *obj, s32 a2);
+void AI_TurnHeadToTarget(sptr a0, Obj00402A10 *obj, s32 a2);
 void MantidQueen_Update(void *state);
 
 void MantidQueen_Step(s32 a0, Obj00402A10 *obj) {

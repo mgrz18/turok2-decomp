@@ -2,8 +2,8 @@
 #include "globals/onscreen.h"
 
 sptr CGameObjectInstance__PickRandomAnim(s32, sptr, sptr);
-s32 COnScreen__SetBoss(s32, s32, s32);
-s32 TotemDefense_DrawTotem(s32, s32, s32);
+s32 COnScreen__SetBoss(sptr, sptr, sptr);
+s32 TotemDefense_DrawTotem(sptr, s32, sptr);
 
 s32 COnScreen__SetBoss2(s32 *, void *, s32 *); /* extern */
 extern s32 D_800C0560;

@@ -76,8 +76,8 @@ struct M1State {
 };
 f32 SmoothStep(f32 x);
 void CVector3__Lerp(CVector3 *dst, f32 t, CVector3 *src, CVector3 *v);
-f32 CGameRegion__GetHeight(s32 id, f32 x, f32 z);
-void CGameRegion__SetGroupHeight(s32 id, f32 y);
+f32 CGameRegion__GetHeight(sptr id, f32 x, f32 z);
+void CGameRegion__SetGroupHeight(sptr id, f32 y);
 void Platform_UpdatePosition(M1Actor *actor, M1State *state) {
     M1Info *info;
     f32 t;

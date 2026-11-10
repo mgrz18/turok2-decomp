@@ -22,7 +22,7 @@ typedef struct {
 
 extern u8 D_800B6684[];
 
-void CCameraPool__AddTimedText(void *, s32, void *, f32);
+void CCameraPool__AddTimedText(void *, sptr, void *, f32);
 void Sound__PlaySpeech(s32);
 void COnScreen__SetBossPercent(void *, s32);
 void COnScreen__SetBossPercent2(void *, s32);

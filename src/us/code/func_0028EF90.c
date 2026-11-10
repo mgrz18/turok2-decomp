@@ -5,6 +5,13 @@ typedef unsigned char u8;
 typedef signed short s16;
 typedef signed int s32;
 typedef unsigned int u32;
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef s32 sptr;
+typedef u32 uptr;
+#endif
 struct RuntimeState;
 typedef struct RuntimeState RuntimeState;
 struct RuntimeState;
@@ -35,7 +42,7 @@ struct DecodeResult;
 typedef struct DecodeResult DecodeResult;
 struct MeasuredRecAt18 { unsigned char padding[24]; void * value; };
 struct MeasuredRecAt0V3 { u8 value; };
-extern s32 __getTrackByte(s32, s32);
+extern s32 __getTrackByte(sptr, s32);
 extern u32 __readVarLen(RuntimeState *, u32);
 s32 __alCSeqGetTrackEvent(RuntimeState *state, u32 index, DecodeResult *result) {
     u8 first;

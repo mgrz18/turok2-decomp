@@ -4,7 +4,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 f32 func_002982F0(f32 x);
-void CVector3__Subtract(CVector3 *out, void *src, s32 a);
+void CVector3__Subtract(CVector3 *out, void *src, sptr a);
 void CMtxF__InverseRotateVector(void *src, CVector3 *a, CVector3 *out);
 void CVector3__Normalize(CVector3 *v);
 f32 Math_AcosLookup(f32 x);

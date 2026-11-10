@@ -3,7 +3,7 @@
 #include "globals/menu_desc.h"
 
 s32 Music_SetTrack(s32);
-s32 MenuPool_OpenChildMenu_2(s32, s32, s32);
+s32 MenuPool_OpenChildMenu_2(sptr, sptr, sptr);
 
 s32 Sound__StopAllExcept(s32);                     /* extern */
 s32 Sound__SetForce2D(s32);                     /* extern */

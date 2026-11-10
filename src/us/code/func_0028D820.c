@@ -15,7 +15,7 @@ extern u8 D_3CAE0[];                /* its size */
 u32 GetMemSize(void);            /* osGetMemSize */
 void __osUnmapTLBAll(void);           /* osUnmapTLBAll */
 void VM_ListAddTail(PageChain *chain, PageMapping *slot);
-void CLoader__LoadSync(CLoader *reader, u8 *source, void *size, u32 dest);
+void CLoader__LoadSync(CLoader *reader, u8 *source, void *size, uptr dest);
 void func_0028EE40(s32 arg0, s32 arg1, s32 arg2, u32 addr, u32 arg4, s32 arg5);
 void memset(void *dst, s32 value, sptr size);
 void VM_ManagerThread(void);

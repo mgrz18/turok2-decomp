@@ -5,7 +5,7 @@
 #include "protos/ai.h"
 
 s32 CPlayer__GetWeaponAmmo(s32, s32);
-s32 WeaponActor_CheckFire(s32, s32);
+s32 WeaponActor_CheckFire(sptr, sptr);
 
 
 void WeaponMode_Fire_Update(CGameObjectInstance *obj, CAI *ai) {

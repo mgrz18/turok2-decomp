@@ -6,7 +6,7 @@
 extern Acmd *alResamplePull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p);
 extern s32 alResampleParam(void *filter, s32 paramID, void *param);
 void alFilterNew(void *arg0, void *a, void *b, s32 c);
-s32 alHeapDBAlloc(s32 a, s32 b, s32 c, s32 d, s32 e);
+s32 alHeapDBAlloc(s32 a, s32 b, sptr c, s32 d, s32 e);
 void alResampleNew(ALResampler *arg0, s32 arg1) {
     sptr result;
     f32 k;

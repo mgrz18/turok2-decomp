@@ -9,9 +9,9 @@ extern u32 HostIo_ReadWord(u32 address);
 extern void HostIo_ScanTlb(void);
 extern void HostIo_FillBlock(u32 address, s32 value, u32 count);
 extern void HostIo_CopyCartBytes(u32 dst, u32 src, u32 count);
-extern void HostIo_WriteBlock(u32 address, u32 source, u32 count);
+extern void HostIo_WriteBlock(u32 address, uptr source, u32 count);
 extern void HostIo_ReadBlockRmw(u32 port, u32 address, u32 count);
-extern void HostIo_ReadBlock(u32 port, u32 address, u32 count);
+extern void HostIo_ReadBlock(u32 port, uptr address, u32 count);
 
 /* Split the debugger's memory transfer at permission boundaries. */
 void HostIo_MemoryTransfer(u32 mode) {

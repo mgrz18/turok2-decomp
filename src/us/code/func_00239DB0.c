@@ -8,7 +8,7 @@ typedef struct Sphere {
     /* 0x10 */ f32 radiusSq;
 } Sphere;
 
-f32 func_00268460(s32);
+f32 func_00268460(sptr);
 void Sphere_Set(Sphere *sphere, CVector3 *center, f32 radius);
 s32 Cylinder_ContainsPoint(Sphere *sphere, CVector3 *point);
 s32 Circle_SegmentIntersects(Sphere *sphere, CVector3 *a, CVector3 *b);

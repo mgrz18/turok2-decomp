@@ -104,7 +104,7 @@ extern u8 gEngineApp_m_SwooshSystem[];
 
 s32 Cinema_PathPlaying(void);
 s32 MtxPool_Alloc(void *table, s32 id);
-void CAnimationState__SwitchToQueued(AnimChannel *channel, sptr anims, s32 file, s32, s32, s32);
+void CAnimationState__SwitchToQueued(AnimChannel *channel, sptr anims, s32 file, s32, sptr, sptr);
 void CAnimationState__FindKeys(AnimChannel *channel, KeyLookup *keys);
 void CAnimationState__Release(AnimChannel *channel);
 s32 CAnimationState__IsLoaded(AnimChannel *channel);

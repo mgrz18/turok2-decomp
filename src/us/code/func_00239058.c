@@ -13,7 +13,7 @@ typedef struct B15Src {
     u8 pad1[3];
     CVector3 pos;          /* 0x04 */
 } B15Src;
-void ImpactEvent_ApplyBlast(B15Src *a, s32 b, s32 c, CVector3 pos, B15Blk8 blk, s32 e, s32 f, s32 g);
+void ImpactEvent_ApplyBlast(B15Src *a, sptr b, s32 c, CVector3 pos, B15Blk8 blk, s32 e, s32 f, s32 g);
 /* Static inline in the Rage Wars source file (dropped by the importer);
  * Turok 2 passes 0x400000 where Rage Wars passes 0x200. */
 static inline void w(B15Src *a, s32 b, s32 c, CVector3 pos, B15Blk8 blk) {

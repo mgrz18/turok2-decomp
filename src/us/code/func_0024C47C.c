@@ -503,7 +503,7 @@ void CPlayer__EaseEyeOffset(Player *, Player *);
 f32 func_00298470(f32);
 s32 CPlayer__IsInMatchEndState(Player *);
 f32 Random_Float(f32);
-void DamageEvent_Set(DamageEvent *, s32, s32, f32, s32, s32);
+void DamageEvent_Set(DamageEvent *, sptr, s32, f32, s32, sptr);
 void Player_OnMultiplayerKill(Player *, u32 *ai, DamageEvent *);
 void Sound__Play(s32 sound, CVector3 pos, sptr, s32);
 s32 GameObject_IsOnGround(Player *);

@@ -3,7 +3,7 @@
 #include "structs/world.h"
 
 char *CISet__GetBlock(s32 *, s32);
-s32 CISet__GetBlockSize(s32, s32);
+s32 CISet__GetBlockSize(sptr, s32);
 
 /* Tests a bit of the current level's second saved bitmap. */
 s32 CScene__GetLevelBit(CScene *arg0, s32 arg1) {

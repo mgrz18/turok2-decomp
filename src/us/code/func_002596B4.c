@@ -19,7 +19,7 @@ typedef struct {
     /* 0x128 */ s32 unk128;
 } State;
 
-void CCameraPool__AddText(void *buf, s32 a, s32 b);
+void CCameraPool__AddText(void *buf, sptr a, sptr b);
 void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 id);
 
 void WeaponActor_EquipRequested(CGameObjectInstance *actor, State *state) {

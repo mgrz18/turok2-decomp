@@ -1,8 +1,8 @@
 #include "common.h"
 
 sptr CGameObjectInstance__PickRandomAnim(s32, sptr, sptr);
-s32 WeightedTable_Add(s32, s32, s32);
-s32 WeightedTable_Pick(s32);
+s32 WeightedTable_Add(sptr, s32, s32);
+s32 WeightedTable_Pick(sptr);
 
 s32 WeightedTable_Clear(void *);                   /* extern */
 

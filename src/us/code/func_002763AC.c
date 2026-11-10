@@ -6,7 +6,7 @@ typedef struct ListHead {
     /* 0x08 */ u8 data[1];
 } ListHead;
 
-s32 SndVoice_Construct(s32, s32, s32);
+s32 SndVoice_Construct(sptr, sptr, s32);
 
 void SndQueue_InitNode(ListHead *arg0, s32 arg1) {
     arg0->prev = arg0;

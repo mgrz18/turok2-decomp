@@ -4,7 +4,7 @@
 #include "structs/world.h"
 
 char *CISet__GetBlock(s32 *, s32);
-s32 CISet__GetBlockSize(s32, s32);
+s32 CISet__GetBlockSize(sptr, s32);
 
 s32 CScene__GetInstanceSavedBitInLevel(CScene *arg0, s32 arg1, s32 arg2) {
     s32 *temp_v0;

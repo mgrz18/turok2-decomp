@@ -8,7 +8,7 @@ typedef struct {
 } LoopSound;
 
 s32 Sound__StopSoundId(s32);                         /* extern */
-s32 LoopSounds_Stop(s32, void *);                 /* extern */
+s32 LoopSounds_Stop(sptr, void *);                 /* extern */
 
 void CPlayer__StopWeaponBackgroundSound(CPlayer *arg0) {
     LoopSound *temp_v0;

@@ -1,7 +1,7 @@
 #include "common.h"
 
 s32 CMtxF__RotateX(s32, s32);                    /* extern */
-s32 CMtxF__RotateZ(s32, s32);                    /* extern */
+s32 CMtxF__RotateZ(sptr, s32);                    /* extern */
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x164];

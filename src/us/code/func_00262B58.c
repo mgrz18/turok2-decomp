@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 s32 CMtxF__RotateX(s32, s32);                    /* extern */
-s32 CMtxF__RotateZ(s32, f32);                    /* extern */
+s32 CMtxF__RotateZ(sptr, f32);                    /* extern */
 
 /* Effect callback context: the actor it runs for and the current value. */
 typedef struct {

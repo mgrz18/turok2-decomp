@@ -8,7 +8,7 @@
  * side away from the threat (animation 8 or 9). */
 
 extern s32 Random_Next(void);
-extern s32 AI_IsAimedAt(CGameObjectInstance *actor, CAI *ai, s32 threat, f32 angle);
+extern s32 AI_IsAimedAt(CGameObjectInstance *actor, CAI *ai, sptr threat, f32 angle);
 
 void EnemyAI_TryDodge(CGameObjectInstance *actor, CAI *ai) {
     f32 skill;

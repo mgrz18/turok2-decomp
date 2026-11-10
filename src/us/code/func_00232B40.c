@@ -6,7 +6,7 @@ typedef struct {
     /* 0x1B8 */ s32 loop;               /* looping sound handle */
 } SoundObject;
 
-s32 LoopSounds_Stop(s32, s32);                    /* extern */
+s32 LoopSounds_Stop(sptr, sptr);                    /* extern */
 
 void CParticle__StopLoopSound(SoundObject *arg0) {
     if (arg0->loop != 0) {

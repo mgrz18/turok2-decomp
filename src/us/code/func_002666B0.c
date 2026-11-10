@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 s32 CGameObjectInstance__AdvanceAnimation(s32);
-s32 CGameObjectInstance__SetAnimByAction(s32, s32, s32);
+s32 CGameObjectInstance__SetAnimByAction(sptr, s32, s32);
 
 void AI_PlayAnim(sptr arg0, CAI *arg1, s32 arg2) {
     arg1->m_ModeLastFrame = -1;

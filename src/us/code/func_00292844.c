@@ -6,7 +6,7 @@ typedef struct {
 } Bank;
 
 s32 __resetPerfChanState(void *, s32);                 /* extern */
-s32 __setInstChanState(void *, s32, s32);            /* extern */
+s32 __setInstChanState(void *, sptr, s32);            /* extern */
 
 void __initFromBank(Bank *arg0, s32 *arg1) {
     s32 temp_s1;
