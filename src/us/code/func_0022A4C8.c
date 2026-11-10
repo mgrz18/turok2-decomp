@@ -69,7 +69,7 @@ extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 extern void CQuaternion__SlerpFast(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b);
 extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *out);
 extern void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
-extern ProjSound *LoopSounds_Start(void *pool, s32 id, CVector3 *pos, CVector3 *pos2, s32 arg4);
+extern ProjSound *LoopSounds_Start(void *pool, s32 id, CVector3 *pos, CVector3 *pos2, sptr arg4);
 extern void CParticle__StopLoopSound(Projectile *p);
 extern void CParticle__Wobble(Projectile *p, f32 scale);
 extern void CParticle__UpdateHomingMissile(Projectile *p);

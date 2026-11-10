@@ -17,7 +17,7 @@ extern void CParticle__Update(CParticle *p);
 extern s32 CParticle__IsUnderWater(CParticle *p);
 extern void ImpactEvent_Send(CParticle *p, CParticle *source, s32 type, s32 id, CVector3 pos, CEventValue value);
 extern void CParticle__SpawnChild(CParticle *p, s32 type, s32 alignment, s32 count);
-extern void Sound__Play(s16 sound, CVector3 pos, sptr a, s32 b);
+extern void Sound__Play(s16 sound, CVector3 pos, sptr a, sptr b);
 extern void CParticleSystem__Free(CParticleSystem *world, CParticle *p);
 extern void CParticle__CheckProximity(CParticleSystem *world, CParticle *p, CParticle **others, s32 count);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);    /* out = a - b */

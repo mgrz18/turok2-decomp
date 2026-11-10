@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <pthread.h>
 
 #define T2_RENAME_NO_LIBC
 #include "t2_rename.h"
@@ -204,11 +205,64 @@ static void run_timers(void) {
 void osInitialize(void) {
 }
 
+/* osVirtualToPhysical / T2Port_PhysToVirtual: the 32-bit "physical" addresses the game puts in
+ * RSP command words (audio Acmd w1, the DMA callback's result) must name any host address, not
+ * only the low 32 bits of one (AUDIO.md §2). Addresses below 2 GB (Linux low-memory mode) are
+ * their own handle, as before. Any other host address is mapped through a table of 16 MB host
+ * regions: handle = 0x80000000 | slot << 24 | (address & 0xFFFFFF), 128 slots. Slots are taken
+ * in pairs (region R and R + 1), so a handle plus a small offset that runs past R's end still
+ * resolves (the builders add lengths and subtract alignment to handles: curr_ptr + count,
+ * dramLoc - dramAlign). Registration takes a lock; resolving reads published slots only. */
+#define T2_V2P_SHIFT 24
+#define T2_V2P_SLOTS 128
+static uintptr_t sV2pBase[T2_V2P_SLOTS]; /* region base (address >> 24 << 24) */
+static int sV2pUsed;                     /* published slot count (atomic) */
+static pthread_mutex_t sV2pLock = PTHREAD_MUTEX_INITIALIZER;
+
+static int v2p_find(uintptr_t region, int used) {
+    for (int i = 0; i < used; i++)
+        if (sV2pBase[i] == region)
+            return i;
+    return -1;
+}
+
 u32 osVirtualToPhysical(void *p) {
-    /* RUNTIME.md §5.3 wants arena offsets here (for the audio HLE); while the game still keeps
-     * pointers in 32-bit words, the low 32 bits of the host pointer are what round-trips
-     * (exact in lowMemory mode). */
-    return (u32)(uintptr_t)p;
+    uintptr_t a = (uintptr_t)p, region = a >> T2_V2P_SHIFT << T2_V2P_SHIFT;
+    int used, slot;
+    if (a < 0x80000000u)
+        return (u32)a;
+    used = __atomic_load_n(&sV2pUsed, __ATOMIC_ACQUIRE);
+    slot = v2p_find(region, used);
+    if (slot < 0) {
+        pthread_mutex_lock(&sV2pLock);
+        used = sV2pUsed;
+        slot = v2p_find(region, used);
+        if (slot < 0) {
+            if (used + 2 > T2_V2P_SLOTS) {
+                fprintf(stderr, "t2: osVirtualToPhysical: more than %d host regions (%p)\n", T2_V2P_SLOTS / 2, p);
+                abort();
+            }
+            slot = used;
+            sV2pBase[used] = region;
+            sV2pBase[used + 1] = region + ((uintptr_t)1 << T2_V2P_SHIFT);
+            __atomic_store_n(&sV2pUsed, used + 2, __ATOMIC_RELEASE);
+        }
+        pthread_mutex_unlock(&sV2pLock);
+    }
+    return 0x80000000u | ((u32)slot << T2_V2P_SHIFT) | (u32)(a & (((uintptr_t)1 << T2_V2P_SHIFT) - 1));
+}
+
+void *T2Port_PhysToVirtual(uint32_t h) {
+    int slot, used;
+    if (h < 0x80000000u)
+        return (void *)(uintptr_t)h;
+    slot = (int)((h >> T2_V2P_SHIFT) & (T2_V2P_SLOTS - 1));
+    used = __atomic_load_n(&sV2pUsed, __ATOMIC_ACQUIRE);
+    if (slot >= used) {
+        fprintf(stderr, "t2: T2Port_PhysToVirtual(0x%08X): unmapped handle\n", h);
+        return NULL;
+    }
+    return (void *)(sV2pBase[slot] + (h & ((1u << T2_V2P_SHIFT) - 1)));
 }
 
 void osMapTLB(s32 index, u32 pm, void *vaddr, u32 evenpaddr, u32 oddpaddr, s32 asid) {

@@ -19,12 +19,21 @@ typedef unsigned char u8;
 typedef signed short s16;
 typedef unsigned short u16;
 typedef signed int s32;
+#ifndef COMMON_H
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef signed int sptr;
+typedef unsigned int uptr;
+#endif
+#endif
 typedef unsigned int u32;
 typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-volatile int __osContRamWrite(s32, s32, s32, s32, s32);
+volatile int __osContRamWrite(sptr, s32, s32, sptr, s32);
 void __osPfsSelectBank_2(void *arg0)
 {
   u8 sp18[0x20];

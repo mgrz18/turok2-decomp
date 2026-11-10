@@ -3,6 +3,9 @@
 
 #include "rw/abu_types.h"
 
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define GameObject_TraceMove GameObject_TraceMove_fif
+#endif
 extern void GameObject_TraceMove(void *arg0, TripleRecAt8 t, void *arg4, s32 *arg5, s32 arg6, s32 arg7);
 extern f32 CGameRegion__GetHeight(struct Node75 *node, f32 x, f32 z);
 void GameObject_GetFloorPointAt(void *arg0, void *arg1, void *arg2) {

@@ -3,18 +3,27 @@
  * N64 offsets and passes the buffer as an s32) */
 #include "ultra_types.h"
 extern s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
-void __osPfsSelectBank(OSPfs *pfs)
+s32 __osPfsSelectBank(OSPfs *pfs) /* s32: libultra returns __osContRamWrite's result (abicheck void_used) */
 {
     u8 temp[32];
     int i;
     for (i = 0; i < 32; i++) {
         temp[i] = pfs->activebank;
     }
-    __osContRamWrite(pfs->queue, pfs->channel, 0x8000 / 32, temp, 0);
+    return __osContRamWrite(pfs->queue, pfs->channel, 0x8000 / 32, temp, 0);
 }
 #else
 typedef unsigned char u8;
 typedef signed int s32;
+#ifndef COMMON_H
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef signed int sptr;
+typedef unsigned int uptr;
+#endif
+#endif
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -24,7 +33,7 @@ typedef struct {
     /* 0x65 */ u8 fill;
 } Arg0;
 
-s32 __osContRamWrite(s32, s32, s32, s32, s32);
+s32 __osContRamWrite(sptr, s32, s32, sptr, s32);
 
 /* Writes 0x20 bytes of the fill value at offset 0x400. */
 void __osPfsSelectBank(Arg0 *arg0)

@@ -22,7 +22,7 @@ typedef struct {
 
 extern void Controller_ResetAllRumble(void);
 extern void RumblePool_FreeAll(RumblePool *pool);
-extern void LoopSounds_Pause(s32);
+extern void LoopSounds_Pause(sptr);
 
 void PauseMenu_Init(A254Menu *menu) {
     s32 i;

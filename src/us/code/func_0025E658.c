@@ -3,7 +3,7 @@
 #include "protos/ai.h"
 
 
-void EnemyMode_WaitForTrigger_Update(CGameObjectInstance *arg0, s32 arg1) {
+void EnemyMode_WaitForTrigger_Update(CGameObjectInstance *arg0, sptr arg1) {
     CIntelligence *temp_a2;
 
     temp_a2 = arg0->header.m_pIntelligence;

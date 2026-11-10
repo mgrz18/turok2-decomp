@@ -4,6 +4,15 @@
 typedef unsigned char u8;
 typedef unsigned int u32;
 typedef signed int s32;
+#ifndef COMMON_H
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef signed int sptr;
+typedef unsigned int uptr;
+#endif
+#endif
 typedef float f32;
 #ifdef TARGET_PORT
 #include "structs/swoosh.h"
@@ -75,7 +84,7 @@ typedef struct EmitMgr {
                  Emit *head;     /* 0x7520 in Turok 2 (0x7528 in Rage Wars) */
 } EmitMgr;
 void Trail_PlaceNodes(Emit *);
-void Trail_ComputeFrames(Emit *, s32);
+void Trail_ComputeFrames(Emit *, sptr);
 void Trail_DrawTextured(EmitMgr *, Emit *, s32);
 void Trail_DrawUntextured(EmitMgr *, Emit *, s32);
 /* Static inline in the Rage Wars source file (dropped by the importer). */

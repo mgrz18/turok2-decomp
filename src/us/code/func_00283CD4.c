@@ -76,7 +76,15 @@ void Cinema_Update(void) {
         return;
     }
     Cinema_StartPending();
+#ifdef TARGET_PORT
+    /* The port: the GameState view reads its second word at N64 offset 0x1450 from
+     * m_PlayerList.m_bCinema, which is gEngineApp_m_Settings.match.unk44 (0x801198A4 + 0x1450 =
+     * 0x8011AAD8 + 0x1D8 + 0x44). On the host that offset lands elsewhere in CGame (round 5: in
+     * the settings once CAutomap grew m_pHostRegion), the test failed and no cinema ever ended. */
+    if (Cinema_IsActive() != 0 && Cinema_IsFinished() == 0 && gEngineApp_m_Game_m_PlayerList_m_bCinema.busy == 0 && gEngineApp_m_Settings.match.unk44 == 0) {
+#else
     if (Cinema_IsActive() != 0 && Cinema_IsFinished() == 0 && gEngineApp_m_Game_m_PlayerList_m_bCinema.busy == 0 && gEngineApp_m_Game_m_PlayerList_m_bCinema.paused == 0) {
+#endif
         if (gCinemaPlayerP->time >= gCinemaPlayerP->endTime && gCinemaPlayerP->ended == 0) {
             CinemaCallback cue;
 

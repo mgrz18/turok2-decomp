@@ -5,7 +5,7 @@
 #include "globals/audio.h"
 
 #ifndef TARGET_PORT
-void SndVoicePool_Construct(s32 *arg0, s32 arg1) {
+void SndVoicePool_Construct(s32 *arg0, sptr arg1) {
     s32 i;
     s32 idx;
     f32 t;

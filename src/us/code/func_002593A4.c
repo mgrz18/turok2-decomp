@@ -7,9 +7,9 @@ typedef struct {
     /* 0x90 */ s32 state;
 } Arg1;
 
-f32 CMtxF__PreRotateY(s32, f32);
+f32 CMtxF__PreRotateY(sptr, f32);
 
-void WeaponNode_Rotate_AF084(s32 arg0, Arg1 *arg1) {
+void WeaponNode_Rotate_AF084(sptr arg0, Arg1 *arg1) {
     if (arg1->state == 2) {
         CMtxF__PreRotateY(arg0, arg1->owner->m_AI.m_Weapon.m_BarrelAngle);
     }

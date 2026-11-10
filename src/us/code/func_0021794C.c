@@ -4,6 +4,9 @@
 #include "rw/abu_types.h"
 #include "protos/iset.h"
 
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define CVector3__Lerp CVector3__Lerp_i
+#endif
 extern void CVector3__Lerp(CVector3 *arg0, s32 arg1, void *arg2, void *arg3);
 void func_0021794C(void *arg0, s32 arg1, void *arg2) {
     extern void *CISet__GetBlock(void *arg0, s32 arg1);

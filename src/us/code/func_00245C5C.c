@@ -3,6 +3,9 @@
 #include "common.h"
 #include "globals/engine.h"
 
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define AI_FindClearHeading AI_FindClearHeading_i3
+#endif
 f32 AI_FindClearHeading(void *, s32, s32, s32, void *, f32);
 void Actor_TurnBy(void *, f32);
 typedef struct { u8 pad0[4]; s32 x, y, z; } B04Tg; /* Turok 2: pos at 0x4 */

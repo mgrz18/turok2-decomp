@@ -3,6 +3,6 @@
 #include "globals/pak.h"
 
 
-void Controller_UnwatchPak(s32 arg0) {
+void Controller_UnwatchPak(sptr arg0) {
     *(((u8 *)(gPakWatched + arg0))) = 0;
 }

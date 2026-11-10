@@ -26,7 +26,7 @@ CQuaternion CGameObjectInstance__GetRotation(CGameObjectInstance *body);
 void CQuaternion__ToMatrix(CQuaternion *q, f32 *mtx);
 void CMtxF__TransformPoint(f32 *mtx, CVector3 *in, CVector3 *out);
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
-void Sound__Play(s16 sound, CVector3 pos, sptr, s32);
+void Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
 
 /* Swimming movement: forward and strafe speeds, the dodge impulses and the
  * climb, turned by the body's facing and added to the velocity, with drag

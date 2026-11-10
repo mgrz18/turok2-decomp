@@ -15,18 +15,33 @@ typedef struct {
     /* 0x12 */ s8 lod;
 } PropDescriptor;
 
+#ifdef TARGET_PORT /* CStaticObject's host layout (structs/level_actor.h) */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x18];
+    /* 0x18 */ PropDescriptor *descriptor;
+    /* 0x20 */ u8 pad20[0xC];
+    void **cache;
+    f32 matrix[16];
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
     /* 0x14 */ PropDescriptor *descriptor;
     /* 0x18 */ u8 pad18[0xC];
     /* 0x24 */ s32 cache;
     /* 0x28 */ f32 matrix[16];
+#endif
     /* 0x68 */ u8 pad68[0x18];
     /* 0x80 */ s32 colorKey;
     /* 0x84 */ s32 value;
     /* 0x88 */ u16 flags;
     /* 0x8A */ u8 colorFrame;
 } PlacedProp;
+#ifdef TARGET_PORT
+#include "structs/level_actor.h"
+T2_STATIC_OBJECT_CHECK(PlacedProp, matrix, flags);
+_Static_assert(__builtin_offsetof(PlacedProp, cache) == __builtin_offsetof(CStaticObject, m_pOwner), "cache");
+_Static_assert(__builtin_offsetof(PlacedProp, colorKey) == __builtin_offsetof(CStaticObject, m_LitKey), "colorKey");
+#endif
 
 /* A vertex (0x10 bytes). */
 typedef struct {
@@ -46,7 +61,11 @@ typedef struct {
 
 extern char D_800A57F8[];
 
+#ifdef TARGET_PORT /* unprototyped: the host passes the pass-through arguments */
+s32 Actor_GetTypeClass();
+#else
 s32 Actor_GetTypeClass(void);
+#endif
 void **CStaticObject__LoadGeometry(PlacedProp *prop);
 void CStaticObject__BuildLitVerticesCallback(void);
 void Render_QueueModelInstance(void **resource, void *matrix, s32 segment, void *lights, void *textures, s32 lod, s32 pass);
@@ -108,6 +127,76 @@ static __inline__ void pulseColors(s32 *object, u8 *colors) {
 /* Queues a placed prop's model: the level of detail from its descriptor (in
  * multiplayer, from the game setup for some modes), and its vertex colours
  * pulsed once a frame. */
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS Actor_GetTypeClass receives CStaticObject__Draw's own argument
+ * registers (pass-through); the host passes them. */
+void CStaticObject__Draw(PlacedProp *prop) {
+    s32 argument;
+    s32 mode;
+    void **instance;
+    s32 lod;
+    s32 **resource;
+    s32 *header;
+    s32 *object;
+    u8 *colors;
+    void *data;
+
+    do { /* a block of its own, as an early-out macro would make; it decides the register allocation */
+        if (prop->flags & 0x40) {
+            return;
+        }
+    } while (0);
+    argument = prop->descriptor->argument;
+    if (gEngineApp_m_Settings.multiplayer) {
+        mode = Actor_GetTypeClass(prop);
+        switch (mode) {
+            case 1:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+                lod = prop->descriptor->lod;
+                break;
+            default: {
+                GameMatch *game = &gEngineApp_m_Settings.match;
+                if (game->tag) {
+                    lod = ((s8 *) game)[-0x1B0];
+                } else {
+                    lod = ((s8 *) game)[-0x1B5];
+                }
+                break;
+            }
+        }
+    } else {
+        lod = prop->descriptor->lod;
+    }
+    instance = CStaticObject__LoadGeometry(prop);
+    if (instance == NULL) {
+        return;
+    }
+    resource = CCache__RequestDecompression(0, prop->colorKey | gLitVerticesKey, instance, prop->cache, 8, prop, CStaticObject__BuildLitVerticesCallback, D_800A57F8, 0);
+    if (resource != NULL) {
+        CCache__LockForDisplayList(0, resource);
+        header = *resource;
+        if (header[0] == 1) {
+            data = (u8 *) header + header[1];
+            object = (s32 *) data;
+            colors = (u8 *) header + header[2];
+            if (prop->colorFrame != (u8)gFrameCount) {
+                pulseColors(object, colors);
+            }
+            Render_QueueModelInstance(instance, prop->matrix, 0, 0, data, argument, lod);
+        } else {
+            Render_QueueModelInstance(instance, prop->matrix, 0, 0, header + 2, argument, lod);
+        }
+        CCache__Unlock(0, resource);
+    }
+    CCache__Unlock(0, instance);
+    prop->colorFrame = (u8)gFrameCount;
+}
+#else
 void CStaticObject__Draw(PlacedProp *prop) {
     s32 argument;
     s32 mode;
@@ -174,3 +263,4 @@ void CStaticObject__Draw(PlacedProp *prop) {
     CCache__Unlock(0, instance);
     prop->colorFrame = (u8)gFrameCount;
 }
+#endif

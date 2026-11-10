@@ -1,11 +1,11 @@
 #include "common.h"
 
-s32 alCSeqNew(s32, s32);
+s32 alCSeqNew(s32, sptr);
 s32 alCSPSetChlFXMix(s32, s32, s32);
 
-s32 alCSPSetBank(s32, s32);                    /* extern */
-s32 alCSPSetSeq(s32, s32);                    /* extern */
-s32 alCSPSetVol(s32, s16);                    /* extern */
+s32 alCSPSetBank(sptr, s32);                    /* extern */
+s32 alCSPSetSeq(sptr, s32);                    /* extern */
+s32 alCSPSetVol(sptr, s16);                    /* extern */
 
 void SndSeq_Load(void *arg0)
 {

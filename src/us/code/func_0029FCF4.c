@@ -3,6 +3,15 @@
 
 #include "rw/abu_types.h"
 
+#ifdef TARGET_PORT
+/* K0_TO_PHYS masked a host address to 29 bits: the port's RSP addresses come from
+ * osVirtualToPhysical (t2ultra.c), which names any host address (docs/port/AUDIO.md). */
+extern u32 osVirtualToPhysical(void *);
+#define DECODE_K0_TO_PHYS(p) osVirtualToPhysical((void *)(p))
+#else
+#define DECODE_K0_TO_PHYS(p) ((uptr)(p) & 0x1FFFFFFF)
+#endif
+
 Acmd *_decodeChunk(Acmd *ptr, ALLoadFilter *f, sptr tsam, s32 nbytes, s16 outp, s16 inp, u32 flags)
 {
     s32 dramAlign, dramLoc;
@@ -15,10 +24,10 @@ Acmd *_decodeChunk(Acmd *ptr, ALLoadFilter *f, sptr tsam, s32 nbytes, s16 outp, 
     } else
         dramAlign = 0;
     if (flags & 0x02) {
-        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(15) & (0xFFFFFFFFU >> (32 - (8)))) << (24)); _a->words.w1 = (unsigned int)(((uptr)(f->lstate) & 0x1FFFFFFF)); };
+        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(15) & (0xFFFFFFFFU >> (32 - (8)))) << (24)); _a->words.w1 = (unsigned int)(DECODE_K0_TO_PHYS(f->lstate)); };
     }
     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(8) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(inp + dramAlign) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(outp) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(tsam << 1) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
-    { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(1) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(flags) & (0xFFFFFFFFU >> (32 - (8)))) << (16)); _a->words.w1 = (unsigned int)(((uptr)(f->state) & 0x1FFFFFFF)); };
+    { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(1) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(flags) & (0xFFFFFFFFU >> (32 - (8)))) << (16)); _a->words.w1 = (unsigned int)(DECODE_K0_TO_PHYS(f->state)); };
     f->first = 0;
     return ptr;
 }

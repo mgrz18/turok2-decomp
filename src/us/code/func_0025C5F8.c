@@ -1,126 +1,79 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
+#include "structs/game_object.h"
+#include "structs/ai_behavior.h"
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "globals/ai.h"
 #include "protos/ai.h"
 
-typedef struct Object Object;
-typedef struct AI AI;
+/* Typed on CGameObjectInstance / CAI (m2c's Object/AI views had the N64 offsets:
+ * the behaviour index at 0x133 was m_Enemy.m_BehaviorIndex, the current mode row at 0x30). */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[8];
-    /* 0x08 */ void (*update)(Object *obj, AI *ai);
-} Behaviour;
-
+/* The attached looping sound (only its id). */
 typedef struct {
     /* 0x00 */ u8 pad0[0xC];
     /* 0x0C */ s32 id;
 } Sound;
 
-struct AI {
-    /* 0x000 */ u32 flags;
-    /* 0x004 */ s32 active;
-    /* 0x008 */ u8 pad8[0x2C - 0x8];
-    /* 0x02C */ s32 anim;
-    /* 0x030 */ Behaviour *behaviour;
-    /* 0x034 */ s8 state;
-    /* 0x035 */ u8 pad35[0x54 - 0x35];
-    /* 0x054 */ f32 homeX;
-    /* 0x058 */ u8 pad58[4];
-    /* 0x05C */ f32 homeZ;
-    /* 0x060 */ u8 pad60[0x80 - 0x60];
-    /* 0x080 */ Object *target;
-    /* 0x084 */ u8 pad84[0x9C - 0x84];
-    /* 0x09C */ f32 posX;
-    /* 0x0A0 */ u8 padA0[4];
-    /* 0x0A4 */ f32 posZ;
-    /* 0x0A8 */ u8 padA8[0xCB - 0xA8];
-    /* 0x0CB */ s8 age;
-    /* 0x0CC */ u8 padCC[0xD0 - 0xCC];
-    /* 0x0D0 */ f32 burnTime;
-    /* 0x0D4 */ u8 padD4[0xEC - 0xD4];
-    /* 0x0EC */ Sound *sound;
-    /* 0x0F0 */ u8 padF0[0x120 - 0xF0];
-    /* 0x120 */ f32 timer120;
-    /* 0x124 */ f32 idleTime;
-    /* 0x128 */ u8 pad128[0x130 - 0x128];
-    /* 0x130 */ s8 mode[2];
-    /* 0x132 */ s8 mode2;
-    /* 0x133 */ s8 modeIndex;
-};
-
-struct Object {
-    /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ CIntelligence *def;
-    /* 0x018 */ u8 pad18[0xD4 - 0x18];
-    /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ u8 padD8[0x140 - 0xD8];
-    /* 0x140 */ AI ai;
-    /* 0x274 */ u8 pad274[0x27C - 0x274];
-    /* 0x27C */ u32 fxFlags;
-};
-
 void *CPlayerPool__FindNearest(CPlayerPool *players, CVector3 pos);
 f32 Random_Blend(f32 lo, f32 hi);
-void EnemyAI_TickTimers(Object *obj, AI *ai);
-void AI_TurnHeadToTarget(Object *obj, AI *ai, f32);
-void Sound__Play(s16 sound, CVector3 pos, sptr, s32);
-void AI_StartSound(Object *obj, AI *ai, s32 sound);
-void AI_StopSound(Object *obj, AI *ai);
+s32 EnemyAI_TickTimers(CGameObjectInstance *obj, CAI *ai);
+void AI_TurnHeadToTarget(CGameObjectInstance *obj, CAI *ai, f32);
+s32 Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
+void AI_StartSound(CGameObjectInstance *obj, CAI *ai, s32 sound);
+void AI_StopSound(CGameObjectInstance *obj, CAI *ai);
 
 /* AI update: age, scale the frame time, run the current mode handler (its
  * enter callback when the animation changes), count down the timers, start
  * idle animations and the swim/land switches, run the behaviour, and keep
  * the burning effect and its sound going while burnTime lasts. */
-void EnemyAI_Update(Object *obj, AI *ai) {
-    Object *target;
+void EnemyAI_Update(CGameObjectInstance *obj, CAI *ai) {
+    CGameObjectInstance *target;
     CEnemyBehaviorInfo *handler;
     s32 index;
     s32 mode;
-    sptr anim;
+    CAIModeInfo *anim;
     s32 state;
     s32 swimming;
 
-    if (!(obj->flags & 0x2000)) {
-        obj->flags &= ~0x100;
+    if (!(obj->m_dwFlags & 0x2000)) {
+        obj->m_dwFlags &= ~0x100;
         return;
     }
-    target = ai->target;
-    if (target != NULL && *(s32 *)target->def == 1 && (target->ai.state == 0x3C || !(target->flags & 0x100))) {
-        ai->flags &= ~0x20000000;
-        ai->flags &= ~0x40000000;
+    target = ai->m_pSightTarget;
+    if (target != NULL && target->header.m_pIntelligence->m_Type == 1 && (target->m_AI.m_Mode == 0x3C || !(target->m_dwFlags & 0x100))) {
+        ai->m_dwFlags &= ~0x20000000;
+        ai->m_dwFlags &= ~0x40000000;
     }
-    if (ai->age < 100) {
-        ai->age++;
+    if (ai->m_LastHurtSFXTimer < 100) {
+        ai->m_LastHurtSFXTimer++;
     }
     gFrameIncrement *= gEnemyTimeScale;
-    CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, obj->pos);
-    mode = ai->mode[ai->modeIndex];
-    index = ai->modeIndex;
+    CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, obj->header.m_vPos);
+    mode = ai->m_Enemy.m_Behavior[ai->m_Enemy.m_BehaviorIndex];
+    index = ai->m_Enemy.m_BehaviorIndex;
     handler = gEnemyBehaviorInfo[mode];
     swimming = mode == 2;
     if (handler != NULL) {
         switch (index) {
             case 0:
-                anim = (sptr) handler->m_pGroundModeTable;
+                anim = handler->m_pGroundModeTable;
                 break;
             case 1:
-                anim = (sptr) handler->m_pAirModeTable;
+                anim = handler->m_pAirModeTable;
                 break;
             case 2:
-                anim = (sptr) handler->m_pUnderwaterModeTable;
+                anim = handler->m_pUnderwaterModeTable;
                 break;
             default:
-                anim = 0;
+                anim = NULL;
                 break;
         }
-        if (ai->anim != anim) {
-            ai->anim = anim;
+        if (ai->m_pModeTable != anim) {
+            ai->m_pModeTable = anim;
             if (handler->m_pfSetup != NULL) {
                 handler->m_pfSetup(obj, ai);
             }
@@ -129,65 +82,65 @@ void EnemyAI_Update(Object *obj, AI *ai) {
             handler->m_pfUpdate(obj, ai);
         }
     }
-    if (!(ai->state == 0x11 || ai->state == 0x12)) {
-        ai->timer120 -= gFrameIncrement;
-        if (ai->timer120 < 0.0f) {
-            ai->timer120 = 0.0f;
+    if (!(ai->m_Mode == 0x11 || ai->m_Mode == 0x12)) {
+        ai->m_Enemy.m_AttackDelay -= gFrameIncrement;
+        if (ai->m_Enemy.m_AttackDelay < 0.0f) {
+            ai->m_Enemy.m_AttackDelay = 0.0f;
         }
     }
-    index = ai->modeIndex;
-    if (obj->def->m_dwTypeFlags & 0x40) {
-        ai->idleTime -= gFrameIncrement;
-        if (ai->idleTime < 0.0f) {
-            ai->idleTime = 0.0f;
+    index = ai->m_Enemy.m_BehaviorIndex;
+    if (obj->header.m_pIntelligence->m_dwTypeFlags & 0x40) {
+        ai->m_VarF32[6] -= gFrameIncrement;
+        if (ai->m_VarF32[6] < 0.0f) {
+            ai->m_VarF32[6] = 0.0f;
         }
-        if (ai->active && ai->idleTime <= 0.0f) {
-            state = ai->state;
+        if (ai->m_Health && ai->m_VarF32[6] <= 0.0f) {
+            state = ai->m_Mode;
             if (state == 4 || state == 0xE || state == 0xF || state == 0x10 || state == 0x11 || state == 0x12
                 || state == 0xA) {
-                ai->idleTime = Random_Blend(75.0f, 150.0f);
+                ai->m_VarF32[6] = Random_Blend(75.0f, 150.0f);
                 CAI__SetMode(obj, ai, 0x17);
             }
         }
     }
     EnemyAI_TickTimers(obj, ai);
-    if (ai->active) {
-        if (index != 2 && (ai->flags & 0x80) && ai->state != 0x27 && ai->state != 0x29 && ai->mode2 != 0) {
+    if (ai->m_Health) {
+        if (index != 2 && (ai->m_dwFlags & 0x80) && ai->m_Mode != 0x27 && ai->m_Mode != 0x29 && ai->m_Enemy.m_Behavior[2] != 0) {
             if (index == 0) {
                 CAI__SetMode(obj, ai, 0x27);
             } else if (index == 1) {
                 CAI__SetMode(obj, ai, 0x29);
             }
         }
-        if (ai->active && index == 2 && !(ai->flags & 0x80) && ai->state != 0x2A && ai->state != 0x2B
-            && ai->mode[0] != 0) {
+        if (ai->m_Health && index == 2 && !(ai->m_dwFlags & 0x80) && ai->m_Mode != 0x2A && ai->m_Mode != 0x2B
+            && ai->m_Enemy.m_Behavior[0] != 0) {
             CAI__SetMode(obj, ai, 0x2A);
         }
     }
-    if (ai->behaviour != NULL && ai->behaviour->update != NULL) {
-        ai->behaviour->update(obj, ai);
+    if (ai->m_pModeCurrent != NULL && ai->m_pModeCurrent->m_pfCallback != NULL) {
+        ai->m_pModeCurrent->m_pfCallback(obj, ai);
     }
-    if (ai->active && swimming) {
-        ai->homeX = ai->posX;
-        ai->homeZ = ai->posZ;
-        obj->flags &= ~0x20000;
+    if (ai->m_Health && swimming) {
+        ai->m_vDesiredPos.x = ai->m_vInitialPos.x;
+        ai->m_vDesiredPos.z = ai->m_vInitialPos.z;
+        obj->m_dwFlags &= ~0x20000;
     }
     AI_TurnHeadToTarget(obj, ai, 0.0f);
-    if (ai->burnTime > 0.0f) {
-        ai->burnTime -= gFrameIncrement;
-        obj->fxFlags |= 2;
-        Sound__Play(0x3D1, obj->pos, 0, -1);
-        if (ai->active) {
+    if (ai->m_OnFireTimer > 0.0f) {
+        ai->m_OnFireTimer -= gFrameIncrement;
+        obj->m_dwHotPointFlags |= 2;
+        Sound__Play(0x3D1, obj->header.m_vPos, 0, -1);
+        if (ai->m_Health) {
             AI_StartSound(obj, ai, 0x3D2);
-        } else if (ai->sound != NULL && ai->sound->id != 0x3D2) {
+        } else if (ai->m_pAttachedLoopingSound != NULL && ((Sound *) ai->m_pAttachedLoopingSound)->id != 0x3D2) {
             AI_StopSound(obj, ai);
         }
     } else {
-        obj->fxFlags &= ~2;
+        obj->m_dwHotPointFlags &= ~2;
     }
-    if (ai->state == 6) {
-        obj->flags |= 0x800000;
+    if (ai->m_Mode == 6) {
+        obj->m_dwFlags |= 0x800000;
     } else {
-        obj->flags &= ~0x800000;
+        obj->m_dwFlags &= ~0x800000;
     }
 }

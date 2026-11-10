@@ -27,6 +27,9 @@ extern u8 D_8010FF34[];
 s32 func_00268160(void);
 void *MtxPool_Alloc(void *, s32);
 f32 func_00298470(f32);     /* sqrtf */
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define DLights_GetAtPoint DLights_GetAtPoint_f3
+#endif
 void DLights_GetAtPoint(void *, f32, f32, f32, CVector3 *, f32 *);
 void CVector3__Normalize(CVector3 *);
 void CMtxF__SetShadowProjection(void *, CVector3 *, f32);
@@ -35,7 +38,7 @@ void CMtxF__ScaleColumns(void *, f32, f32, f32);
 void CQuaternion__ToMatrix(void *, void *);
 void CMtxF__MultiplyAffine(void *, void *, void *);
 void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *, ShadowParams *, void *, u8);
-void Shadow_DrawBlob(CGameObjectInstance *, s32, s32);
+void Shadow_DrawBlob(CGameObjectInstance *, sptr, s32);
 
 void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, sptr unused, ShadowParams *s) {
     CVector3 dir;

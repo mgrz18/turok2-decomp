@@ -8,7 +8,13 @@ typedef struct EventParams {
 } EventParams;
 
 extern void MantidQueen_SpawnMinion(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, EventParams params);
-extern void Primagen_HandleAnimEvent(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, EventParams params);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Primagen_HandleAnimEvent Primagen_HandleAnimEvent_ev
+#endif
+extern void Primagen_HandleAnimEvent(s32 arg0, sptr arg1, s32 arg2, CVector3 pos, EventParams params);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define MotherBoss_AnimEvent MotherBoss_AnimEvent_ev
+#endif
 extern void MotherBoss_AnimEvent(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, EventParams params);
 
 void ImpactEvent_LevelSpecial(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, EventParams params) {

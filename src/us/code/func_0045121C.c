@@ -7,6 +7,15 @@ typedef signed char s8;
 typedef signed short s16;
 typedef unsigned int u32;
 typedef signed int s32;
+#ifndef COMMON_H
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef signed int sptr;
+typedef unsigned int uptr;
+#endif
+#endif
 typedef struct S10Ctrl {
                s32 active;
                s8 port;
@@ -43,7 +52,7 @@ extern s32 Menu_StepValueLR_2(S10Menu *a, s32 cur, s32 step, s32 lo, s32 hi, s32
 extern void CPlayer__SetCharacter_2(S10Ctx *c, s32 v);
 extern void MenuItem_SetModel_2(void *a, s32 b, s32 c);
 extern void Sound__Play2D(s32 a);
-extern void MenuPool_OpenChildMenu_2(s32 a, s32 b, void *c);
+extern void MenuPool_OpenChildMenu_2(sptr a, sptr b, void *c);
 extern S10Pair D_800C1E7A[];
 s32 CharacterMenu_SelectCharacter_2(void *x, S10Menu *m, void *y) {
     S10Ctx *ctx = m->ctx;

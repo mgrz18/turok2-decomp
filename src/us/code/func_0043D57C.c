@@ -77,8 +77,7 @@ extern ModeState0040457C gLevelScript; /* local type: globals/boss.h declares it
 extern s32 D_800F1F50;
 Entity0040457C *CPlayerPool__FindNearest(void *game, Vec3_0040457C pos);
 f32 Random_Blend(f32 lo, f32 hi);
-s32 CInstancePool__Spawn(void *a0, s32 a1, s32 model, s32 handle, s32 region, Vec3_0040457C pos, f32 a6,
-                  Vec3_0040457C rot, Vec3_0040457C scale, s32 a9);
+sptr CInstancePool__Spawn(void *a0, s32 a1, s32 model, sptr handle, sptr region, Vec3_0040457C pos, f32 a6, Vec3_0040457C rot, Vec3_0040457C scale, sptr a9);
 void AI_UpdateTargets(Entity0040457C *actor, void *level, Info0040457C *info, s32 a3, s32 a4);
 void Primagen_NextSpawnStep_2(void);
 void Primagen_RunSpawnStep_2(Entity0040457C *actor, void *level, s32 a2);

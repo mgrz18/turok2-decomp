@@ -22,12 +22,12 @@ void CMtxF__Translate(f32 *, f32, f32, f32);
 void CMtxF__SwapYZRows(f32 *);
 void CMtxF__ToMtxAffine(f32 *, f32 *);
 void Model_AdvanceMorph(s32 *, f32);
-void Render_QueueModelInstance(s32 *, f32 *, s32, void *, s32, s32, s32);
+void Render_QueueModelInstance(s32 *, f32 *, s32, void *, sptr, s32, s32);
 s32 CScene__GetObjectTypeID(void *, s32);
-s32 *CISet__GetBlock(s32, s32);
+s32 *CISet__GetBlock(sptr, s32);
 
 void CLevelActor__Draw(CLevelActor *obj) {
-    s32 *geometry;
+    sptr *geometry;
     f32 matrix[16];
     s32 variant;
     s32 index;

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
 
-s32 CCache__Deallocate(s32, s32);                /* extern */
+s32 CCache__Deallocate(sptr, sptr);                /* extern */
 s32 CCache__Flush(s32);                     /* extern */
 s32 Sound__SetListener(sptr);                         /* extern */
 

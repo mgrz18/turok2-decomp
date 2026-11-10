@@ -21,11 +21,11 @@
 
 extern u8 gEngineApp_m_SwooshSystem[];
 
-extern s32 ProPack__Decompress(s32, s32);
+extern s32 ProPack__Decompress(s32, sptr);
 extern void CCollisionInfo__Reset(void);
 extern void CDecompressor__Flush(CDecompressor *thisx);
 extern void **CCache__Allocate(s32 unused, s32 size, s32 mode, char *name);
-extern void CCache__Deallocate(s32 unused, void **block);
+extern void CCache__Deallocate(sptr unused, void **block);
 extern void CCache__Flush(s32);
 extern void **CCache__LoadPersistantIndex(s32 unused, void **out, sptr key, char *name);
 extern void **CCache__LoadPersistantSubBlock(s32 unused, void *file, s32 index, s32 key, CScene *owner, void *callback, char *name);
@@ -36,16 +36,16 @@ extern void func_0021F1B4(u8 *actor);
 extern void Sound__StopFlags(s32);
 extern void Sound__DetachAll(void);
 extern void LoopSounds_Construct(void *, void *, s32);
-extern void LoopSounds_StopAll(s32);
+extern void LoopSounds_StopAll(sptr);
 extern s32 Demo_GetPlayerCount(void);
 extern void CCameraPool__Advance(void *);
 extern s32 Cinema_IsActive(void);
 extern void Cinema_RequestOnce_2(s32 sound);
 extern void func_00462E40(void *heap, void *data, s32 size);
 extern void CScene__LoadLightSettings_2(CScene *w);
-extern s32 CScene__DecompressLinks_2(s32, s32);
+extern s32 CScene__DecompressLinks_2(sptr, sptr);
 extern s32 func_004645D0(s32, s32);
-extern s32 CScene__DecompressAnimatedInstances_2(s32, s32);
+extern s32 CScene__DecompressAnimatedInstances_2(sptr, sptr);
 extern void func_00464E68(CScene *w);
 extern void func_004656BC(CScene *w);
 extern void func_00465760(CScene *w);
@@ -132,7 +132,7 @@ loaded:
     CInstancePool__Construct_2(&w->m_InstancePool);
     func_00466330(gEngineApp_m_SwooshSystem);
     CCollisionInfo__Reset();
-    func_00466040(w->unk_18EBC);
+    func_00466040(&w->m_DLightSet);
     LoopSounds_Construct(&gLoopSounds, gLoopSoundEntries, 0xF);
     func_00467ADC(gEngineApp_m_SwooshSystem - 0x1C8);
     if (*w->m_pLevels < level) {

@@ -8,9 +8,17 @@
 void Model_TouchTextures(s32);
 extern void Model_DecompressCallbackExtra(void);
 
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck void_used): the callers use the result, on MIPS v0 of
+ * the last call; the host returns it. */
+void * CGameObjectInstance__LoadGeometry(CGameObjectInstance *arg0) {
+    return CCache__Request(0, (sptr) arg0->m_rpGeometryHeader, arg0->m_rpGeometryHeaderSize, 0, 0, Model_DecompressCallbackExtra, "anim geometry", 0);
+}
+#else
 void CGameObjectInstance__LoadGeometry(CGameObjectInstance *arg0) {
     CCache__Request(0, (sptr) arg0->m_rpGeometryHeader, arg0->m_rpGeometryHeaderSize, 0, 0, Model_DecompressCallbackExtra, "anim geometry", 0);
 }
+#endif
 
 void CGameObjectInstance__TouchGeometry(CGameObjectInstance *arg0) {
     sptr temp_v0;

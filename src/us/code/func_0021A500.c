@@ -18,6 +18,9 @@ struct B10H {
 };
 extern f32 D_800A5AF8;
 s32 GameObject_IsOnGround();
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
+#define GameObject_GetGroundRotation GameObject_GetGroundRotation_sret
+#endif
 void GameObject_GetGroundRotation(f32 *loc, B10Obj *o);
 s32 func_002682A4(B10Obj *o);
 void CQuaternion__TurnToward(f32 *a, f32 *loc);

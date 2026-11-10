@@ -4,7 +4,7 @@
 #include "globals/boss.h"
 
 extern f32 Random_Blend(f32 lo, f32 hi);
-extern s32 WeightedTable_PickStatic(s32 id);
+extern s32 WeightedTable_PickStatic(sptr id);
 extern void Sound__Play(s16 sound, CVector3 pos, sptr arg2, CGameObjectInstance *source);
 
 

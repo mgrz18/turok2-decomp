@@ -898,12 +898,21 @@ typedef struct EffectActor {
 } EffectActor;
 
 extern u8 gEngineApp_m_SwooshSystem[];
+#ifdef TARGET_PORT
+#include "structs/particle.h"
+#define D_8010FF34 (&gScene.m_DLightSet)
+#else
 extern u8 D_8010FF34[];
+#endif
 s16 *CPlayer__GetFiringAmmo(u8 *, s32);
 void CParticle__StopLoopSound(EffectActor *);
 void CParticle__BuildCameraMatrix(EffectActor *);
 void Trail_DetachOwner(void *, EffectActor *);
+#ifdef TARGET_PORT
+void CDLightSet__Free(void *, CDLight *);
+#else
 void CDLightSet__Free(void *, s32);
+#endif
 
 void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
     EffectActor *child;
@@ -931,10 +940,18 @@ void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
             CParticle__BuildCameraMatrix(actor);
             Trail_DetachOwner(gEngineApp_m_SwooshSystem, actor);
         }
+#ifdef TARGET_PORT
+        /* the light pointer-wide, in the host CParticle's member (the view has the N64 offset) */
+        if (((CParticle *) actor)->m_pDLight != NULL) {
+            CDLightSet__Free(D_8010FF34, ((CParticle *) actor)->m_pDLight);
+            ((CParticle *) actor)->m_pDLight = NULL;
+        }
+#else
         if (actor->sound != 0) {
             CDLightSet__Free(D_8010FF34, actor->sound);
             actor->sound = 0;
         }
+#endif
         if (actor->liveCount != NULL) {
             (*actor->liveCount)--;
         }
@@ -1152,7 +1169,9 @@ typedef struct {
 extern Render D_800F1BA0;
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern u8 gEngineApp_m_SwooshSystem[];
+#ifndef TARGET_PORT
 extern u8 D_8010FF34[];
+#endif
 
 extern s32 BinaryRange(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
 extern void func_00225C08(void *, s32, CVector3 *);
@@ -1169,6 +1188,9 @@ extern void CMtxF__Translate(CMtxF *m, f32 x, f32 y, f32 z);
 extern void CMtxF__SetScale(CMtxF *m, f32 x, f32 y, f32 z);
 extern void CMtxF__SetTranslate(CMtxF *m, f32 x, f32 y, f32 z);
 extern void CMtxF__Identity(CMtxF *m);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
+#define GameObject_GetAimRotation GameObject_GetAimRotation_sret
+#endif
 extern void GameObject_GetAimRotation(CQuaternion *q, Owner *owner, CVector3 pos);
 extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *m);
 extern void func_00207914(u32 *bits, s32 value);
@@ -1179,11 +1201,15 @@ extern void Color_ShiftHue(s8, u8, u8, u8, u8 *, u8 *, u8 *);
 extern void Color_Saturate(u8, u8, u8, u8, u8 *, u8 *, u8 *);
 extern void Color_Darken(u8, u8, u8, u8, u8 *, u8 *, u8 *);
 extern void AI_HearNoise(Actor *actor, s32 *ai, CVector3 *from, s32 arg3);
-extern void CParticle__Attach(Effect *effect, s32, s32);
+extern void CParticle__Attach(Effect *effect, sptr, sptr);
 extern void Trail_AddNode(void *, Effect *, s32);
-extern s32 DLight_Spawn(void *, s32);
+#ifdef TARGET_PORT
+extern void *DLight_Spawn(void *, s32);
+#else
+extern sptr DLight_Spawn(void *, s32);
+#endif
 extern void CParticle__StartLoopSound(Effect *effect, s32 sound);
-extern void Sound__Play(s16 sound, CVector3 pos, sptr a, s32 b);
+extern void Sound__Play(s16 sound, CVector3 pos, sptr a, sptr b);
 
 static __inline__ s32 randomCount(s32 range) {
     return range != 0 ? Random_Next() % (range + 1) : 0;
@@ -1271,7 +1297,7 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
     }
 }
 
-s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount, s32 arg4, s32 kind,
+s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount, sptr arg4, s32 kind,
                   CVector3 arg6, CQuaternion rotation, CVector3 pos, void *region, s32 arg10, s32 arg11) {
     CMtxF mtx;
     CVector3 dir;
@@ -1695,10 +1721,17 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     Trail_AddNode(gEngineApp_m_SwooshSystem, effect, entry->unk6);
                 }
                 if (entry->unk7 != -1) {
+#ifdef TARGET_PORT
+                    ((CParticle *) effect)->m_pDLight = DLight_Spawn(D_8010FF34, entry->unk7);
+                } else {
+                    ((CParticle *) effect)->m_pDLight = NULL;
+                }
+#else
                     effect->sound = DLight_Spawn(D_8010FF34, entry->unk7);
                 } else {
                     effect->sound = 0;
                 }
+#endif
                 if (!(effect->flags & 0x200000) && (sound = entry->sound) != 0) {
                     switch (effect->kind) {
                         case 0x22:

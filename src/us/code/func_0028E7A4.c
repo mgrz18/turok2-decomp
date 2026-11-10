@@ -14,7 +14,7 @@
 
 
 void memset(void *dst, s32 value, sptr size);
-void CLoader__LoadSync(CLoader *reader, u8 *source, s32 size, void *dest);
+void CLoader__LoadSync(CLoader *reader, u8 *source, sptr size, void *dest);
 void VM_HandleTLBMiss(void);
 void VM_FinishPageJob(PageJob *job);
 void VM_FreeRegion(PageJob *job);

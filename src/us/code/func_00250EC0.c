@@ -21,7 +21,7 @@ f32 Math_DecayToZero(f32 value, f32 rate);
 f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
 void CPlayer__BobView(CPlayer *player, CGameObjectInstance *body);
 void Sound__Play2D(s32 sound);
-void Sound__Play(s16 sound, CVector3 pos, sptr, s32);
+void Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 

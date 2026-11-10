@@ -14,8 +14,8 @@ typedef struct B11Rec {
     CVector3 pos;
     B11Pair unk14;
 } B11Rec;
-B11Rec *CAnimationState__GetEvents(s32 a);
-s32 CAnimationState__GetEventCount(s32 a);
+B11Rec *CAnimationState__GetEvents(sptr a);
+s32 CAnimationState__GetEventCount(sptr a);
 void CMtxF__TransformPoint(void *m, void *v, CVector3 *out);
 void ImpactEvent_Send(CGameObjectInstance *a, CGameObjectInstance *b, u16 c, s32 d, CVector3 e, B11Pair f);
 void func_0021F4E8(CGameObjectInstance *a, s32 b) {

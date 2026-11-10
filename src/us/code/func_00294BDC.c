@@ -7,9 +7,9 @@ typedef struct {
     /* 0x14 */ s32 head;
 } ListOwner294;
 
-s32 alLink(s32, s32);
+s32 alLink(sptr, sptr);
 
-s32 alUnlink(s32);                         /* extern */
+s32 alUnlink(sptr);                         /* extern */
 
 void _collectPVoices(ListOwner294 *arg0) {
     s32 var_s0;

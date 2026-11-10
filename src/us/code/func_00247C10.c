@@ -36,7 +36,7 @@ static __inline__ s32 inSpecialRegion(CPlayer *player) {
 
 /* A player's actor took a lethal hit in multiplayer: works out the killer and
    updates the kill, death, tag and team counts. */
-void Player_OnMultiplayerKill(CGameObjectInstance *actor, s32 arg1, DamageEvent *hit) {
+void Player_OnMultiplayerKill(CGameObjectInstance *actor, sptr arg1, DamageEvent *hit) {
     CPlayer *player;
     CPlayer *killer = NULL;
     s32 arg4 = -1;

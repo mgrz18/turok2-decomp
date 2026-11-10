@@ -45,7 +45,7 @@ static __inline__ f32 AngleTo(CGameObjectInstance *actor, CVector3 point) {
 
 /* Whether `self` sees `target` (a player holding a ready weapon, or a
  * creature in an attack pose) aiming at it: 0 if not, else the side (-1/1). */
-s32 AI_IsAimedAt(CGameObjectInstance *self, s32 unused, CGameObjectInstance *target, f32 cone) {
+s32 AI_IsAimedAt(CGameObjectInstance *self, sptr unused, CGameObjectInstance *target, f32 cone) {
     CVector3 dir;
     CVector3 facing;
     CVector3 fwd;

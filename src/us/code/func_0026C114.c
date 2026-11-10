@@ -8,7 +8,7 @@ typedef struct {
 } Entry;
 
 
-u8 func_0026C114(s32 arg0) {
+u8 func_0026C114(sptr arg0) {
     Entry *temp_v0;
 
     temp_v0 = CScene__GetRegionInfo(&gScene, arg0);

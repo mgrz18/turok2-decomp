@@ -1,4 +1,10 @@
 #include "structs/vector.h"
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck struct_scalar): the callers pass a result pointer first, as
+ * MIPS does for a struct returned by value; x86-64 and arm64 return this struct in registers.
+ * The definition keeps its by-value form as CVector3__ProjectKeepLength_byval; CVector3__ProjectKeepLength below takes the pointer. */
+#define CVector3__ProjectKeepLength CVector3__ProjectKeepLength_byval
+#endif
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80271B18_3.CPP, func_802723FC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -32,3 +38,10 @@ CVector3 CVector3__ProjectKeepLength(CVector3 *arg0, CVector3 *arg1) {
     }
     return projected;
 }
+
+#ifdef TARGET_PORT
+#undef CVector3__ProjectKeepLength
+void CVector3__ProjectKeepLength(CVector3 *out, CVector3 *arg0, CVector3 *arg1) {
+    *out = CVector3__ProjectKeepLength_byval(arg0, arg1);
+}
+#endif

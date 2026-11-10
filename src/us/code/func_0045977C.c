@@ -14,7 +14,7 @@
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
 void Controller_ResetRumble(ControllerProfile *a);
-void Controller_UnwatchPak(s32 a);
+void Controller_UnwatchPak(sptr a);
 s32 Controller_TakePakChanged(s32 a);
 void Pak_ProbeSlot_2(s32 a);
 s32 Pak_GetStatus_2(s32 a);

@@ -13,7 +13,7 @@
 void CCamera__Construct(void *);
 void Sound__SetListener(void *);
 void CCache__Flush(s32);
-void CCache__Deallocate(s32, void *);
+void CCache__Deallocate(sptr, void *);
 struct CMemEntry *CCache__Allocate(s32, s32, s32, char *);
 void *memset(void *destination, s32 value, uptr size);
 

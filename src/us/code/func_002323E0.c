@@ -6,6 +6,9 @@
 s32 CParticle__IsUnderWater(CParticle *);
 void ImpactEvent_Send(CParticle *, CParticle *, s32, s32, CVector3, CEventValue);
 void CParticle__SpawnChild(CParticle *, s32, s32, s32);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Sound__Play Sound__Play_f3
+#endif
 void Sound__Play(s16, f32, f32, f32, s32, s32);
 void CParticle__FireUpdateEvent(CParticle *o) {
     CROMParticleEffect *par = o->m_pEffect;

@@ -9,7 +9,7 @@ extern u8 D_800A53D8[];
 extern u8 D_800A53EC[];
 extern void Model_DecompressCallbackTerminated();
 
-void func_0020B9F4(sptr res, s32 arg1, s32 arg2, s32 index, s32 arg4) {
+void func_0020B9F4(sptr res, sptr arg1, sptr arg2, s32 index, s32 arg4) {
     s32 size;
     sptr file;
     sptr handle;

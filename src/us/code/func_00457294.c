@@ -28,7 +28,7 @@ static __inline__ s32 FindNote(s32 pad, char *name) {
     return 0;
 }
 
-s32 PakMenu_CheckSlotForSave_2(s32 unused, s32 pad, s32 *outPad, s32 *outBlocks) {
+s32 PakMenu_CheckSlotForSave_2(sptr unused, s32 pad, s32 *outPad, s32 *outBlocks) {
     s32 f1;
     s32 f2;
     s32 r;

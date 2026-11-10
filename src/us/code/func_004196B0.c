@@ -13,21 +13,15 @@
 #include "structs/controller.h"
 #include "structs/list.h"
 #include "structs/table.h"
-struct ObjRecAt20V2;
-struct ObjRecAt20V2 {
-    char pad0[0x20];
-    char * unk20;
-};
-struct ObjRecAt20V2;
-typedef struct ObjRecAt20V2 ObjRecAt20V2;
-struct ObjRecAt20V2;
+#include "structs/menu.h"
 /* Turok 2 layouts (Rage Wars: 8 records of 0x96 bytes at 0xD0, local/mode at 0x1D/0x1E). */
-extern void TitleMenu_Single(void *arg0, struct ObjRecAt20V2 *menu);
+extern void TitleMenu_Single(void *arg0, Menu *menu);
 extern void Music_RestoreVolume();
 extern s32 Controller_ConfirmPressed(char *);
 extern void Music_RestoreVolume(void);
 extern void func_00430454(char *, s32);
-void TitleMenu_Single(void *arg0, struct ObjRecAt20V2 *menu) {
+/* The window's controller by member (an m2c view wrote it at N64 offset 0x20: Menu.desc on the host). */
+void TitleMenu_Single(void *arg0, Menu *menu) {
     GameSettings *globals;
     CPlayerOptions *settings;
     ControllerProfile *profile;
@@ -46,7 +40,7 @@ void TitleMenu_Single(void *arg0, struct ObjRecAt20V2 *menu) {
         if (Controller_ConfirmPressed(profile) != 0) {
             settings->m_bActive = on;
             gEngineApp_m_Settings.defaultSlot.m_nController = i;
-            menu->unk20 = profile;
+            menu->controller = profile;
             break;
         }
         profile++;

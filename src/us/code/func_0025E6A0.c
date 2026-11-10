@@ -5,7 +5,7 @@
 
 
 
-void EnemyMode_StartDelay_Update(s32 arg0, CAI *arg1) {
+void EnemyMode_StartDelay_Update(sptr arg0, CAI *arg1) {
     f32 temp_f0;
 
     temp_f0 = arg1->m_ConditionTimer - gFrameIncrement;

@@ -8,7 +8,7 @@
 #include "protos/player.h"
 
 extern void CEngineApp__StartGameAtWarp(s32, s32);
-extern void CEngineApp__SetupFadeTo(s32, s32);
+extern void CEngineApp__SetupFadeTo(sptr, s32);
 extern void Sound__PlaySpeech(s32);
 
 /* Scrolls the credits up; once past the last line, waits and leaves. */

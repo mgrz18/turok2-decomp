@@ -24,7 +24,7 @@ typedef struct {
 
 extern MemHandle *CCache__Allocate(s32 heap, s32 size, s32 flags, char *name); /* allocate */
 extern MemHandle *CCache__AllocateAt(s32 heap, sptr addr, s32 size, char *name);  /* claim a fixed block */
-extern void CCache__Deallocate(s32 heap, MemHandle *handle);                     /* free */
+extern void CCache__Deallocate(sptr heap, MemHandle *handle);                     /* free */
 extern u32 GetMemSize(void);                                             /* osGetMemSize */
 extern void memset(void *dst, s32 value, uptr size);                  /* memset */
 

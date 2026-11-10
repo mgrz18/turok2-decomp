@@ -15,6 +15,14 @@ struct Triple {
 };
 struct Triple;
 typedef struct Triple Triple;
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck struct_class): the position is a float struct on the host.
+ * MIPS passes the Rage Wars Triple (three s32) and a CVector3 in the same registers; x86-64
+ * and arm64 do not (integer vs SSE/FP registers), so Triple means three floats here. */
+typedef struct { float x, y, z; } T2HostTriple;
+#define Triple T2HostTriple
+#endif
+
 typedef struct Shared_ParticleLighting Shared_ParticleLighting;
 struct Shared_ParticleLighting {
     u8 ambient[3], reserved3;
@@ -41,9 +49,7 @@ typedef struct T2MotionState {
     s32 counter;               /* 0x110 (0x128) */
 } T2MotionState;
 
-extern s32 CInstancePool__Spawn(void *arg0, s32 arg1, s32 arg2, s32 arg3,
-                         s32 arg4, Triple arg5, f32 arg6, CVector3 arg7,
-                         Triple arg8, void *arg9);
+extern sptr CInstancePool__Spawn(void *arg0, s32 arg1, s32 arg2, sptr arg3, sptr arg4, Triple arg5, f32 arg6, CVector3 arg7, Triple arg8, void *arg9);
 void Generator_SpawnObject(T2Actor *arg0, T2MotionState *arg1, Triple arg2, Triple arg3,
                    s32 arg4, s32 arg5, s32 arg6) {
     if (CInstancePool__Spawn(&gScene.m_InstancePool, arg5, 0, arg6,

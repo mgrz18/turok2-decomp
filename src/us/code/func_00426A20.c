@@ -6,7 +6,7 @@
 #include "globals/pak.h"
 
 extern s32 Pak_GetNotePages(s32 index, s32 entry, s32 *out);
-extern s32 Pak_BytesToPages(s32);
+extern s32 Pak_BytesToPages(sptr);
 s32 Pak_GetNotePages(s32 index, s32 entry, s32 *out) {
     if (gPakState[index] != 3) {
         return -2;

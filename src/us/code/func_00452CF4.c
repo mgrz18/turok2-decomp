@@ -2,7 +2,7 @@
 #include "m2c_macros.h"
 
 s32 Music_SetTrack(s32);
-s32 Menu_StepValue_2(s32, s32, s32, s32, s32, s32);
+s32 Menu_StepValue_2(sptr, s32, s32, s32, s32, s32);
 
 s32 Music_GetTrack();                                /* extern */
 extern u8 gEngineApp_m_Settings_unk14[]; /* local type: the field's real type (or the member path) changes the ROM's code here */

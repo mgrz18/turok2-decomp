@@ -7,7 +7,7 @@
 
 
 /* Returns the 8-way stick direction (0 = up, clockwise) or -1 inside the dead zone. */
-s32 CBarrel__GetStickDirection(s32 unused, CPlayer *player) {
+s32 CBarrel__GetStickDirection(sptr unused, CPlayer *player) {
     ControllerProfile *pad = player->m_ContState.m_pContState;
     s8 x = pad->stickX;
     s8 y = pad->stickY;

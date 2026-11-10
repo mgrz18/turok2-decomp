@@ -3,6 +3,10 @@
 #include "gfx.h"
 #include "structs/weapon.h"
 #include "globals/game.h"
+#ifdef TARGET_PORT
+#include "structs/player.h"
+#include "structs/camera.h"
+#endif
 
 /* Draws the weapon menu's icons: sorts the listed items, places each one in
  * the player's viewport (on the wheel, or in a vertical strip that fades out
@@ -13,17 +17,40 @@
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
 
+#ifdef TARGET_PORT
+typedef struct MenuView {
+/* the view at the host offsets of CCamera (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_MenuView(m) __builtin_offsetof(CCamera, m)
+    union {
+        struct { u8 _hp_viewport[T2_HOFF_MenuView(m_Viewport)]; f32 viewport[4]; }; /* N64 0x288 */
+    };
+} MenuView;
+#else
 typedef struct MenuView {
     /* 0x000 */ u8 pad0[0x288];
     /* 0x288 */ f32 viewport[4];
 } MenuView;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct MenuPlayer {
+/* the view at the host offsets of CPlayer (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_MenuPlayer(m) __builtin_offsetof(CPlayer, m)
+    union {
+        struct { u8 _hp_view[T2_HOFF_MenuPlayer(m_pCamera)]; MenuView *view; }; /* N64 0x51C */
+        struct { u8 _hp_owned[T2_HOFF_MenuPlayer(m_Data.m_WeaponList)]; s8 owned[1]; }; /* N64 0x972 */
+    };
+} MenuPlayer;
+#else
 typedef struct MenuPlayer {
     /* 0x000 */ u8 pad0[0x51C];
     /* 0x51C */ MenuView *view;
     /* 0x520 */ u8 pad520[0x972 - 0x520];
     /* 0x972 */ s8 owned[1];
 } MenuPlayer;
+#endif
 
 
 void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());

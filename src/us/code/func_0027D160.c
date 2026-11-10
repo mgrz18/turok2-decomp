@@ -26,7 +26,12 @@ typedef struct {
 } CFloor;
 
 /* The camera pool, seen from its main camera. */
+#ifdef TARGET_PORT /* m_MainCamera's host offset (0x40 on the N64): with 0x40, the main camera test in
+                    * CCamera__DisplayListSetup failed and it cleared the frame over the scene */
+#define gEngineApp_m_Game_m_CameraPool (*(CCameraPool *) ((u8 *) &gEngineApp_m_Game_m_CameraPool.m_MainCamera - __builtin_offsetof(CCameraPool, m_MainCamera)))
+#else
 #define gEngineApp_m_Game_m_CameraPool (*(CCameraPool *) ((u8 *) &gEngineApp_m_Game_m_CameraPool.m_MainCamera - 0x40))
+#endif
 void CCamera__AdvanceAttributes(CCamera *cam);
 s32 Cinema_PathPlaying(void);
 void guLookAtF(CMtxF m, f32 eyeX, f32 eyeY, f32 eyeZ, f32 atX, f32 atY, f32 atZ, f32 upX, f32 upY, f32 upZ);

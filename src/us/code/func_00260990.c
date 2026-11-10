@@ -3,10 +3,10 @@
 #include "globals/engine.h"
 
 f32 Math_DecayToZero(f32, f32);
-s32 EnemyAI_GetBehaviorIndex(s32, s32);
+s32 EnemyAI_GetBehaviorIndex(sptr, sptr);
 
 
-void EnemyHover_Advance(s32 arg0, CAI *ai) {
+void EnemyHover_Advance(sptr arg0, CAI *ai) {
     f32 temp_f0;
     f32 temp_f20;
 

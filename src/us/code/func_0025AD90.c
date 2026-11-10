@@ -28,7 +28,7 @@ void AI_TurnHeadToTarget(CGameObjectInstance *actor, CAI *ai, f32 pitchOffset) {
     CVector3 to;
     CVector3 delta;
     f32 value;
-    s32 *res;
+    sptr *res;
     AnimObjectInfo *info;
     s32 count;
     f32 yaw;

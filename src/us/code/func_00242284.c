@@ -16,6 +16,9 @@ f32 GameObject_GetCollisionRadius(CGameObjectInstance *collider);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *collider);
 void Sphere_Set(Cylinder *cyl, CVector3 *center, f32 radius);
 s32 Cylinder_ContainsPoint(Cylinder *cyl, CVector3 *point);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Sweep_HitCylinder Sweep_HitCylinder_i
+#endif
 s32 Sweep_HitCylinder(Sweep *ctrl, CVector3 *center, f32 radius, s32 arg3, f32 top, f32 bottom, s32 arg6, s32 arg7, s32 arg8, s32 arg9);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);

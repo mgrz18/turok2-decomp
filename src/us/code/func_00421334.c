@@ -3,8 +3,15 @@
 
 typedef signed int s32;
 typedef unsigned int u32;
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef s32 sptr;
+typedef u32 uptr;
+#endif
 extern void Pak_AllocBuffer(void ***handle, void **data, s32 units);
-extern void * memset(void *arg0, int arg1, u32 arg2);
+extern void * memset(void *arg0, int arg1, uptr arg2);
 extern char *D_800F70A8;
 extern char D_800C13F0[];
 extern void CCache__Flush(s32 a);

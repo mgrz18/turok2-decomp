@@ -16,7 +16,7 @@
 extern s32 D_8011F144;
 extern s32 D_8011B114;
 void CCache__Flush(s32 a);
-void CCache__Deallocate(s32 a, s32 b);
+void CCache__Deallocate(sptr a, sptr b);
 CPlayer *CPlayerPool__FindByController(void *a, void *b);
 void MenuPool_OpenMenu_2(void *a, void *b, sptr c, sptr d, sptr e);
 

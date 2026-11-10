@@ -9,7 +9,7 @@ extern void SavedPlayers_Deactivate(void);
 extern void SavedPlayers_Restore(void);
 extern void CPlayer__LevelStart(CPlayer *p);
 extern void CPlayer__UpdateOrbitCamera(CPlayer *p, CPlayer *q);
-extern void Cinema_UpdateCameraIfActive(s32);
+extern void Cinema_UpdateCameraIfActive(sptr);
 
 void CPlayerPool__LevelStart(CPlayerPool *list) {
     CPlayer *p;

@@ -12,6 +12,9 @@ void Quad_SetBoxBottom(CollisionQuad *quad, CVector3 *points);
 s32 Quad_ContainsPointXZ(CollisionQuad *quad, f32 x, f32 z);
 s32 Plane_SegmentCrosses(CollisionQuad *quad, CVector3 *pos, CVector3 *move);
 s32 Plane_IntersectSegment(CollisionQuad *quad, CVector3 *pos, CVector3 *move, CVector3 *hit);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Quad_ContainsPoint Quad_ContainsPoint_f3
+#endif
 s32 Quad_ContainsPoint(CollisionQuad *quad, f32 x, f32 y, f32 z);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);

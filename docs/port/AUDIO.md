@@ -41,9 +41,11 @@ interpreter or by host C, so it is host order; VADPCM frames are read byte by by
 layouts (ENVMIX/RESAMPLE/POLEF) are the interpreter's own (only the microcode reads them).
 Not bit-exact with the RSP (resampler filter, envelope rounding), which nothing depends on.
 
-Addresses: command words carry `osVirtualToPhysical` = the low 32 bits of the host address,
-exact only in low-memory mode (Linux `T2_LOW_MEMORY`). macOS (r5) needs a 32-bit handle table
-in `osVirtualToPhysical` that `t2asp.c`'s `ram()` resolves (one place to change).
+Addresses: command words carry `osVirtualToPhysical` (t2ultra.c). Below 2 GB (Linux
+low-memory mode) that is the host address itself; any other host address gets a region handle
+(`0x80000000 | slot << 24 | offset`, 16 MB regions, slots taken in pairs so a handle plus a
+length or minus an alignment still resolves), and `t2asp.c`'s `ram()` resolves both through
+`T2Port_PhysToVirtual` (round 5, §9).
 
 ## 3. Verification
 
@@ -157,16 +159,87 @@ T2_TEST_SFX=300 turok2 ... --wav sfx.wav --frames 300
 Mode 0 alone is silent (volume options 0, nothing played). With `T2_TEST_SFX=300` (under gdb)
 the sound is there: per 10-frame window peaks 0, 0, 1021, 1029, 1037, ...; peak 1037, rms 88.
 
-### Open
+### Open (round 4; all four closed in round 5, §9)
 
-1. Without gdb (ASLR on) the playing sound crashes in `t2asp.c` `cmd_adpcm` writing the ADPCM
-   state to `ram(w1)`: check the addresses `alAdpcmPull`/`_decodeChunk` hand
-   `osVirtualToPhysical` (a pointer above 4 GB, or the loop state).
-2. Music: the compressed sequence player is still m2c (`__CSPVoiceHandler`,
-   `__CSPSetUsptFromTempo` crashes first, `__CSPHandleNextSeqEvent`, `__CSPHandleMIDIMsg`,
-   `__CSPRepostEvent`, `alCSeq*`): type them from libultra's csplayer.c/cseq.c like
-   t2audio_lib.c does.
-3. Speech (adec streams: `SpeechPlayer_Update` state 1, `adecStreamOpen`, `D_800F55F4`) is
-   stubbed.
-4. macOS: `osVirtualToPhysical` addresses (section 2) and the s32 pointer arguments still in
-   the game's libaudio files that are typed but take `s32` (e.g. `alLoadNew`'s heap).
+1. ~~The sfx crash without gdb in `cmd_adpcm`~~: `_decodeChunk` masked the state address with
+   `& 0x1FFFFFFF` (K0_TO_PHYS), §9.
+2. ~~Music~~: the compressed sequence player, §9.
+3. ~~Speech~~: the adec streams, §10.
+4. macOS: the handle table is in; the audio start-up runs above 4 GB (`--high-memory`) up to
+   the game's own non-audio crash (`CHeap__Free` from the decompressor, also without `--audio`).
+
+## 9. Round 5 (t4): sound effects, music
+
+`turok2 --game --draw --pak-blank --audio --wav boot.wav --frames 5400` now runs the boot to the
+title with sound: the first cinema's sounds from 26 s, song 22 over the second cinema (31-70 s),
+song 16 (the title theme) from 70 s; the WAV is 90 s, peak 20,820, rms 2,088, no clipping.
+
+What was wrong, in the order it was found:
+
+| # | where | cause | fix |
+|---|---|---|---|
+| t4-1 | `cmd_adpcm` writes `ram(w1)` (sfx without gdb) | `_decodeChunk` (func_0029FCF4.c) builds the ADPCM/SETLOOP state addresses with K0_TO_PHYS (`& 0x1FFFFFFF`), not `osVirtualToPhysical`: the low-memory arena is at 0x41000000, so the state went to 0x0xxxxxxx (gdb's layout happened to fit) | `TARGET_PORT`: `osVirtualToPhysical`; `osVirtualToPhysical` names any host address (region handle table, §2), `ram()` = `T2Port_PhysToVirtual` |
+| t4-2 | `__CSPSetUsptFromTempo` (music, mode 5) | the compressed sequence player, cseq.c and the seqplayer.c helpers it shares are Rage Wars views (`AnimState.frames` at 0x24 for `uspt`, `RuntimeState` for `ALCSeq`, `Node_func_802AFD6C_de` for event items) and s32 pointers (`alCSeqNew`'s base, `__alCSeqNextDelta`'s sequence, `alCSPNew`'s heap blocks) | `port/audio/t2audio_csp.c`: 31 functions from the SDK source on `structs/libaudio.h` (`alCSPNew`, `__CSPPostNextSeqEvent`, `__CSPHandleMetaMsg`, `__CSPRepostEvent`, `__CSPSetUsptFromTempo`, all of cseq.c, `__mapVoice` ... `__seqpStopOsc`); the game's files are out of the link. `__CSPVoiceHandler`, `__CSPHandleNextSeqEvent` and `__CSPHandleMIDIMsg` stay the game's (typed) |
+| t4-3 | (silent) music at volume 0 | `GameSettings_SetDefaults` (music 0xFF, sfx 0xFA, ...) runs from `CEngineApp__Construct` only when `gWarmBoot` != 0, which `main` (func_0028D380, not linked) sets on power-on (the boot marker did not match: the name says the opposite) | `T2Port_Boot` sets `gWarmBoot = 1` (port/runtime/t2boot.c). This sets **every** default setting (difficulty, HUD alpha, multiplayer rules), not only the volumes |
+| t4-4 | (noise) every wave decoded garbage, clipped | the resident wave data copy was taken in `amCreateAudioMgr`, "from `gAudioRomBase` on", but `CAudioWorld__Initialize` sets `gAudioRomBase` = 0x20F194 only after that call: the copy started at the stale value | the copy is the whole ROM, indexed by ROM address (`T2Audio_TblBytes`) |
+| t4-5 | (garble) the resampler read the wrong samples | `A_ADPCM` writes the previous frame (16 samples, the state) before the new frames; `alAdpcmPull` skips it (`*outp += 32`, or `lastsam << 1` into it). The interpreter wrote only the new frames | `cmd_adpcm` writes the state first; `t2audio_test --direct` reads past it |
+| t4-6 | `--high-memory`: `alSaveNew(NULL)` in `alSynNew` | heap/block/source pointers kept in s32: `alHeapInit` (`(s32)` casts), `alLoadNew` and `alResampleNew` (heap as s32), `alFxNew` (`alHeapDBAlloc` declared s32), `alMainBusNew`/`alAuxBusNew` (sources as s32) | pointer-wide under `TARGET_PORT` (asm_diff 0) |
+
+### Verifying
+
+```sh
+# the voice path, bit-exact: the samples the resampler consumes = audio.py's VADPCM decode
+T2_TEST_SFX=300 turok2 ... --game --pak-blank --audio --wav sfx.wav --frames 200
+#   (checked with a temporary dump in cmd_resample: 2,544 samples, max difference 0)
+# sequencing: T2_AUDIO_LOG=1 logs every alCSeqNew and note on (player clock, key, vel, chan)
+T2_AUDIO_LOG=1 turok2 ... --game --pak-blank --audio --wav boot.wav --frames 5400 > run.log 2>&1
+python3 tools/port/audio_notes_check.py . run.log 44 1C6 2AD   # song 22 (key 22)
+#   order-free over 25.9 s: game 510 notes, reference 510, identical: True (0 us error)
+python3 tools/port/audio_notes_check.py . run.log 44 CF 377    # song 16, the title
+#   order-free over 19.3 s: game 251 notes, reference 251, identical: True
+```
+
+`audio_notes_check.py` reads the song's note-ons from the ROM with audio.py's track reader and
+converts ticks the way the player does (`uspt = (s32)(tempo / division)`): every note on of the
+two songs comes at the same microsecond, key and channel. The WAV itself (spectra by eye): the
+cinema music is tonal (spectral flatness 0.07 at 50 s), no flat-topped clipping any more.
+
+Debug hooks (game.cpp): `T2_TEST_SFX`, `T2_TEST_SONG`, and now `T2_TEST_SPEECH=<group>`
+(`Sound__PlaySpeech` at frame 90; the group is the song key, e.g. 311). The music only advances
+while the mixer runs: with `--audio` it runs with or without `--wav`.
+
+## 10. Round 5 (t4): speech (adec streams)
+
+The speech player (`SpeechPlayer_Update`, t2audio_world.c) now does what func_002768D0 does:
+state 1 takes the song's header (u32 volume x 100, u16 FX mix) and its adec stream from the
+sound data file, opens the stream, sets `sSpeechSound`'s decay time to the stream's length, and
+plays `sSpeechSound` through the sound player at pitch rate / 22050. The wave table it names was
+an ALWaveTable at 0x800F55F0 (= `gAudioWorld + 0x303C`, inside the host `CAudioWorld`): the
+host uses its own (`sSpeechWave`), which `SpeechPlayer_Construct` puts in `sSpeechSound`.
+
+`port/audio/t2audio_adec.c` replaces the game's decoder (`adecStreamOpen`, `adecNextFrame`,
+`adecGetStopFlag`, `adecClearStopFlag`, `alAdecPull`; their files are out of the link): a C
+version of tools/assets/audio.py's `AdecDecoder` (band scales, Huffman trees and phrases, band
+dequantization, 128-point FFT IMDCT with overlap), with the tables read from the ROM image's
+code .rodata as the Python does. The stream in memory is host-order u32 x 3 + host-order u16
+words (`T2Audio_SwapSoundData`); the bit reader takes byte i from word i / 2. `alAdecPull` is
+the game's (frames of 256 samples, DMEM alignment) with the frame pointer pointer-wide.
+
+```sh
+# the decoder alone vs audio.py, any stream (ROM address and size from parse_tree's songs)
+t2audio_test baserom.us.z64 --adec 0xC29AB4 7464 s20.raw
+#   streams 19, 20, 21, 60, 100, 158: same sample count, max difference 0
+# through the game: Sound__PlaySpeech(311) at frame 90
+T2_TEST_SPEECH=311 turok2 ... --game --pak-blank --audio --wav sp.wav --frames 400
+#   peak 16,308, rms 3,652; correlation with the stream resampled 9450 -> 22050 Hz: 0.986
+```
+
+## 11. Next (audio)
+
+1. A full reference render would make the WAV checks stronger: the notes match (§9), the voice
+   path is bit-exact for ADPCM, but the envelopes/pan/reverb are only checked by eye.
+2. The reverb output carries a small DC offset in the tail (about -25 after song 1 ends).
+3. `t2audio_test`'s game path (no `--direct`/`--adec`) aborts at the sound data `VM_Alloc`
+   ("no backend open": the test opens no archive); `turok2 --game --audio` covers that path.
+4. macOS: rerun with `--audio` once the merged tree runs there (the handle table and the
+   pointer-wide heap code are in; the AI/AudioPlayer output path is untested there).

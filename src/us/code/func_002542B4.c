@@ -9,7 +9,7 @@ extern void CGameObjectInstance__UpdateBounds(CGameObjectInstance *, void *);
 extern void Shadow_DrawBlob(CGameObjectInstance *, CVector3 *, s32);
 
 void Actor_ReloadAnimInfo(CGameObjectInstance *actor, s32 arg1) {
-    s32 *res;
+    sptr *res;
     CPlayer *owner;
     CVector3 dir;
 

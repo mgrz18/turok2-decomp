@@ -42,7 +42,7 @@ typedef struct {
     /* 0x1194 */ CList freeVoices;
 } VoiceOwner;
 
-s32 LevelEvent_Fire(s32);
+s32 LevelEvent_Fire(sptr);
 
 f32 HalfToFloat(u16);                             /* extern */
 

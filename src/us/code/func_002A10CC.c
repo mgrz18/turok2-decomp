@@ -8,7 +8,7 @@ typedef struct {
     /* 0xC */ s32 n;
 } FFTTables;
 
-s32 mdctFft(s32, s32, s32, s32, s32, s32);
+s32 mdctFft(sptr, s32, s32, sptr, sptr, sptr);
 
 void mdctFftCtx(s32 arg0, FFTTables *arg1, s32 arg2) {
     mdctFft(arg0, arg1->n, arg2, arg1->cosTable, arg1->sinTable, arg1->bitrev);

@@ -3,7 +3,7 @@
 
 s32 AI_HearNoise(s32, s32, s32, s32);
 
-void func_00225C08(void *arg0, s32 arg1, s32 arg2)
+void func_00225C08(void *arg0, s32 arg1, sptr arg2)
 {
   s32 temp_a0;
   s32 temp_s2;

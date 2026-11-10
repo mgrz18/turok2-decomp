@@ -27,7 +27,7 @@ extern f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);
 extern s32 *CScene__GetIntelligence(void *level, s32 model);
 extern s32 CScene__GetObjectTypeID(void *level, s32 id);
 extern s32 Generator_IsPickupUnlocked(s32 id);
-extern CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
+extern CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, sptr region, f32 lifetime);
 extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
 extern s32 CPlayer__HasRoomForAmmo(void *player, s32 id);
 extern s32 CPlayer__IsBelowFullHealth(void *player, s32 id);

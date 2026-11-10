@@ -7,7 +7,7 @@ s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
 
-void CCache__Deallocate(s32 arg0, void *arg1) {
+void CCache__Deallocate(sptr arg0, void *arg1) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v1;

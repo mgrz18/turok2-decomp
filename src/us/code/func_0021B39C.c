@@ -31,13 +31,62 @@ typedef struct {
     u8 b65;             /* 0x65 */
 } B10Ent2;
 
+#ifdef TARGET_PORT /* unprototyped: the host passes the pass-through arguments */
+s32 **CGameObjectInstance__LoadGeometry();
+#else
 s32 **CGameObjectInstance__LoadGeometry(void);
+#endif
 void CVector3__Subtract(CVector3 *o, CVector3 *a, CVector3 *b);
 void CVector3__Cross(CVector3 *o, CVector3 *a, CVector3 *b);
 void CVector3__Scale(CVector3 *o, CVector3 *a, f32 s);
 void CVector3__Normalize(CVector3 *v);
 
-void func_0021B39C(s32 a, B10Pb *b, B10Pc *c, CVector3 v1, CVector3 v2, s32 idx) {
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CGameObjectInstance__LoadGeometry receives func_0021B39C's own argument
+ * registers (pass-through); the host passes them. */
+void func_0021B39C(sptr a, B10Pb *b, B10Pc *c, CVector3 v1, CVector3 v2, s32 idx) {
+    CVector3 r;
+    CVector3 t;
+    CVector3 x;
+    s32 **n;
+    void *node;
+    B10Ent2 *e;
+    s32 i;
+    s32 cur;
+
+    if (b->b34 != 0x3C && b->b12 < 0x17 && (n = CGameObjectInstance__LoadGeometry(a)) != 0) {
+        node = CISet__GetBlock(*n, 3);
+        e = CISet__GetBlock(CISet__GetBlock(node, idx), 1);
+        cur = idx;
+        if ((e->b65 & 3) == 3) {
+            CCache__Unlock(0, n);
+            return;
+        }
+        for (i = 0; i < 4; i++) {
+            b->b14[i] = cur;
+            cur = e->b64;
+            if (cur != -1) {
+                e = CISet__GetBlock(CISet__GetBlock(node, cur), 1);
+            }
+        }
+        CCache__Unlock(0, n);
+        b->b12 = 0x19;
+        t.x = c->f30;
+        t.y = c->f34;
+        t.z = c->f38;
+        CVector3__Subtract(&v1, &v1, &t);
+        CVector3__Cross(&r, &v1, &v2);
+        CVector3__Normalize(&r);
+        CVector3__Normalize(&v1);
+        CVector3__Normalize(&v2);
+        CVector3__Cross(&x, &r, &v1);
+        CVector3__Scale(&r, &r, x.x * v2.x + x.y * v2.y + x.z * v2.z);
+        CVector3__Normalize(&r);
+        b->v18 = r;
+    }
+}
+#else
+void func_0021B39C(sptr a, B10Pb *b, B10Pc *c, CVector3 v1, CVector3 v2, s32 idx) {
     CVector3 r;
     CVector3 t;
     CVector3 x;
@@ -78,3 +127,4 @@ void func_0021B39C(s32 a, B10Pb *b, B10Pc *c, CVector3 v1, CVector3 v2, s32 idx)
         b->v18 = r;
     }
 }
+#endif

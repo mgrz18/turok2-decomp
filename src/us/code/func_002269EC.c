@@ -8,7 +8,7 @@ typedef struct {
 } BitTableOwner;
 
 char *CISet__GetBlock(s32 *, s32);
-s32 CISet__GetBlockSize(s32, s32);
+s32 CISet__GetBlockSize(sptr, s32);
 
 s32 CScene__GetLevelBitInLevel(BitTableOwner *arg0, s32 arg1, s32 arg2) {
     s32 *temp_v0;

@@ -3,7 +3,7 @@
 #include "structs/world.h"
 
 char *CISet__GetBlock(s32 *, s32);
-s32 CISet__GetBlockSize(s32, s32);
+s32 CISet__GetBlockSize(sptr, s32);
 
 /* Tests a bit of the given level's saved-actor bitmap. */
 s32 CScene__IsEventFiredInLevel(CScene *arg0, s32 arg1, s32 arg2) {

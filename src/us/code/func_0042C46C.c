@@ -5,7 +5,7 @@
 
 
 extern s32 SavedPlayers_IsActive(void);
-extern void CLoader__LoadSync(CLoader *reader, sptr, s32, void *);
+extern void CLoader__LoadSync(CLoader *reader, sptr, sptr, void *);
 
 typedef struct MenuState {
     /* 0x00 */ u8 pad0[0x2C];

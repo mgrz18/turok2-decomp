@@ -7,9 +7,9 @@ typedef struct Emitter {
     /* 0x24 */ f32 unk24;
 } Emitter;
 
-s32 CMtxF__FromMtxAffine(s32, s32);
-s32 CMtxF__ClampEntries(s32);
-s32 Swoosh_NewNode(s32, s32, s32);
+s32 CMtxF__FromMtxAffine(sptr, sptr);
+s32 CMtxF__ClampEntries(sptr);
+sptr Swoosh_NewNode(sptr, sptr, sptr);
 s32 CMtxF__ScaleAxes(u8 *, f32, f32, f32);    /* extern */
 
 

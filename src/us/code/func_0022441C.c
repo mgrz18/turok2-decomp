@@ -4,6 +4,24 @@
 #include "protos/scene.h"
 
 
+#ifdef TARGET_PORT
+/* The port: the level index and the game bit sections by member of CScene (the N64 offsets
+ * 0x18FA8 / 0x70 read other members on the host). */
+#include "structs/world.h"
+void CScene__SetLevelBit(void *scene, s32 arg1, s32 arg2) {
+    CScene *arg0 = scene;
+    sptr bits;
+    u8 *p;
+
+    bits = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(arg0->m_pBitSections2, 0), arg0->m_nLevel), 0);
+    p = (u8 *) CISet__GetBlock(bits, 1) + arg1 / 8;
+    if (arg2 != 0) {
+        *p |= 1 << (arg1 & 7);
+    } else {
+        *p &= ~(1 << (arg1 & 7));
+    }
+}
+#else
 void CScene__SetLevelBit(void *arg0, s32 arg1, s32 arg2)
 {
   s32 temp_a0;
@@ -41,3 +59,4 @@ void CScene__SetLevelBit(void *arg0, s32 arg1, s32 arg2)
   temp_v0_2 = temp_a1 + (var_a1 >> 3);
   *temp_v0_2 &= ~temp_a0;
 }
+#endif

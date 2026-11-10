@@ -7,7 +7,7 @@ typedef struct {
 } Unk002973E0;
 
 /* Sets parameter arg1 (1 or 6) to arg2. */
-s32 alSaveParam(Unk002973E0 *arg0, s32 arg1, s32 arg2) {
+s32 alSaveParam(Unk002973E0 *arg0, s32 arg1, sptr arg2) {
     switch (arg1) {
         case 1:
             arg0->param1 = arg2;

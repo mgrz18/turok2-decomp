@@ -4,6 +4,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 f32 GameObject_GetCollisionRadius(void *);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define GameObject_TraceMove GameObject_TraceMove_f3
+#endif
 void GameObject_TraceMove(void *, f32, f32, f32, s32, s32, s32, s32);
 void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
 void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);

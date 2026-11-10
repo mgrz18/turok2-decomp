@@ -10,7 +10,7 @@ void Math_EaseToward(f32 *value, f32 target, f32 rate);
 void CPlayer__BobViewStride(CPlayer *player, CGameObjectInstance *body);
 void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuning);
 void CPlayer__MoveOnFoot(CPlayer *player, CGameObjectInstance *body, void *tuning);
-void Sound__Play(s16 sound, CVector3 pos, sptr, s32);
+void Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
 
 static __inline__ s32 try_jump(CPlayer *player, CGameObjectInstance *body) {
     if (player->m_SniperMode == 0 && !(11.25f < player->m_TimeOffGround) && !(body->m_AI.m_dwFlags & 0x6000)

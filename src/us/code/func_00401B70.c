@@ -1,13 +1,22 @@
 #include "common.h"
 #include "structs/region.h"
 
+#ifdef TARGET_PORT
+/* The port: the region Automap_SetPlayer keeps pointer-wide (CAutomap.m_pHostRegion). */
+#include "structs/game.h"
+typedef struct {
+    u8 pad0[__builtin_offsetof(CAutomap, m_pHostRegion)];
+    CGameRegion *node;
+} Arg0;
+#else
 typedef struct {
     /* 0x0 */ u8 pad0[0xC];
     /* 0xC */ CGameRegion *node;
 } Arg0;
+#endif
 
-s32 Automap_RevealRegion(s32);
-s32 Automap_ClearVisited(s32);
+s32 Automap_RevealRegion(sptr);
+s32 Automap_ClearVisited(sptr);
 
 void Automap_RevealAroundPlayer(Arg0 *arg0) {
     CGameRegion *temp_s0;

@@ -6,7 +6,7 @@
 #include "protos/ultra.h"
 
 extern Acmd *alAdecPull(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p);
-extern s32 adecNextFrame();
+extern sptr adecNextFrame();
 Acmd *alAdecPull(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p)
 {
     Acmd *ptr = p;

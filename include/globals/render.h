@@ -75,7 +75,14 @@ extern s32 sTexLastWrapS;
 extern s32 sTexLastWrapT;
 
 /* Lit vertices and the expansion-pak screen */
+#ifdef TARGET_PORT
+/* 0x800DD790-0x800E6790 on the N64: 0x9000 bytes, 3072 vertices (D_800DD794/8 and D_800DE1E0 inside it
+ * are labels, not objects). The ELF gives the symbol no size, so gendata made it one CVector3 and
+ * Actors_AccumulateVertexLighting overran it into gAudioWorld and gLoopSounds. */
+extern CVector3 sLitVertexOffsets[0x9000 / 12];
+#else
 extern CVector3 sLitVertexOffsets[];
+#endif
 extern f32 sExpansionPakMtx[2][16];   /* per-frame matrices (Mtx) */
 
 /* The VI mode: the selected mode index */

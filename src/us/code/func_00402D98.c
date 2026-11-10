@@ -4,7 +4,7 @@
 
 f32 Math_DecayToZero(f32, f32);
 
-void MantidQueen_UpdateMode4(s32 arg0, CAI *arg1) {
+void MantidQueen_UpdateMode4(sptr arg0, CAI *arg1) {
     f32 temp_f20;
 
     temp_f20 = 51.199997f;

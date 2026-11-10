@@ -3,7 +3,7 @@
 #include "protos/ai.h"
 
 
-void BlindOne_BossMode8Update(s32 arg0, CAI *arg1) {
+void BlindOne_BossMode8Update(sptr arg0, CAI *arg1) {
     if (arg1->m_AnimRepeatedCount != 0) {
         CAI__SetMode(arg0, arg1, 3);
     }

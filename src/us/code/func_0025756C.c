@@ -5,7 +5,7 @@
 
 extern void Sound__SetReverb(f32 arg0);
 extern f32 CGameRegion__GetCeilingHeight(void *arg0, f32 arg1, f32 arg2);
-extern f32 CGameRegion__GetHeight(s32, f32, f32);
+extern f32 CGameRegion__GetHeight(sptr, f32, f32);
 void Sound_SetUnderwaterFilter(void *arg0, CVector3 *arg1) {
     f32 first;
     f32 amount;

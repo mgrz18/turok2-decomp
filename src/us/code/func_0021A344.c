@@ -42,7 +42,7 @@ void CGameObjectInstance__AdvanceAnimation(Actor *);
 void CGameObjectInstance__UpdateAnimation(Actor *actor) {
     CVector3 oldPos;
     CVector3 newPos;
-    s32 *set;
+    sptr *set;
     void *data;
     s32 *game;
     u32 flags;

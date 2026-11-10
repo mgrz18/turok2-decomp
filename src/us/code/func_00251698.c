@@ -23,7 +23,7 @@ typedef struct {
 } Found0xC45;
 
 
-s32 Cinema_SetNextCallbacks(s32, s32, s32 *);     /* extern */
+s32 Cinema_SetNextCallbacks(s32, sptr, s32 *);     /* extern */
 extern s32 PlayerDeath_CinemaDone;
 
 void CPlayer__StartDeathCinema(CPlayer *arg0, s32 arg1, s32 arg2) {

@@ -91,6 +91,8 @@ void t2_log_once(const char *what);
 
 /* Memory below 2 GB when lowMemory is set (else plain calloc). Never freed. */
 void *t2_lowmem_alloc(size_t size);
+/* osVirtualToPhysical's inverse: an address from an RSP command word -> the host pointer */
+void *T2Port_PhysToVirtual(uint32_t h);
 
 /* ROM image (if one was given), for PI DMA. */
 const uint8_t *t2_rom(size_t *size);

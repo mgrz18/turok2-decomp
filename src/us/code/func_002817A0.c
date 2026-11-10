@@ -26,7 +26,7 @@ static __inline__ CCameraText *TakeText(CCameraPool *pool, CCamera *cam) {
  * camera for `secs`, one text per line, centred, 80 pixels above the bottom.
  * Texts the camera shows under the same id go first. Returns the last line's
  * text. */
-CCameraText *CCameraPool__AddMultiLineText(CCameraPool *pool, CCamera *cam, u8 *string, s32 id, f32 secs) {
+CCameraText *CCameraPool__AddMultiLineText(CCameraPool *pool, CCamera *cam, u8 *string, sptr id, f32 secs) {
     CCameraText *cur;
     CCameraText *next;
     CCameraText *text;

@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void alSynStartVoice(void *arg0, void *arg1, s32 arg2);
+extern void alSynStartVoice(void *arg0, void *arg1, sptr arg2);
 extern void *__allocParam(void);
-void alSynStartVoice(void *arg0, void *arg1, s32 arg2) {
+void alSynStartVoice(void *arg0, void *arg1, sptr arg2) {
     s32 new_var;
     void *Shared_func_802B3540_de_v0;
     void *temp_a0;

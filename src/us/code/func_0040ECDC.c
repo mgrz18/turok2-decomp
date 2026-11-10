@@ -4,8 +4,8 @@
 #include "globals/boss.h"
 
 s32 Animator_Update(s32);
-s32 BlindOne_UpdateMover(s32);
-s32 BlindOne_GetHealthPercent(s32);
+s32 BlindOne_UpdateMover(sptr);
+s32 BlindOne_GetHealthPercent(sptr);
 s32 COnScreen__SetBossPercent(s32 *, s32);
 
 void BlindOne_UpdateFight(BlindOneState *arg0)

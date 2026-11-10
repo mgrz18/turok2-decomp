@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void alCSeqNew(RuntimeStateRecAtB8 *state, u32 base) {
+void alCSeqNew(RuntimeStateRecAtB8 *state, uptr base) {
     extern u32 __readVarLen(RuntimeStateRecAtB8 *state, u32 index);
     f64 converted;
     s32 count;

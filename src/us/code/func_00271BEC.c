@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern s32 CAudioWorld__PickVariant(SceneRecAt2B5C *scene, s16 id, s16 avoid);
-extern s32 BinaryRange(s32, s32, s32, s32 *, s32 *);
+extern s32 BinaryRange(sptr, s32, s32, s32 *, s32 *);
 extern s32 Random_Next(void);
 s32 CAudioWorld__PickVariant(SceneRecAt2B5C *scene, s16 id, s16 avoid) {
     s32 first;

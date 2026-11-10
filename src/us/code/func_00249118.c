@@ -23,7 +23,7 @@ static __inline__ s32 inWater(CPlayer *player) {
 
 /* Kills the player: drops the weapon in multiplayer and plays a death
    animation picked from the cause (`flags`) unless `anim` is given. */
-void CPlayer__Kill(CPlayer *player, s32 arg1, s32 flags, s32 anim) {
+void CPlayer__Kill(CPlayer *player, sptr arg1, s32 flags, s32 anim) {
     s16 weapon;
     s16 mode;
 

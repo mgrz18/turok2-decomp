@@ -2,7 +2,7 @@
 #include "globals/scene.h"
 #include "globals/sysrc.h"
 
-s32 CLoader__LoadSync(CLoader *reader, sptr, s32, s32);
+s32 CLoader__LoadSync(CLoader *reader, sptr, sptr, s32);
 
 s32 SavedPlayers_IsActive();                                /* extern */
 

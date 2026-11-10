@@ -4,6 +4,15 @@
 #ifndef TARGET_PORT
 typedef unsigned char u8;
 typedef signed int s32;
+#ifndef COMMON_H
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef signed int sptr;
+typedef unsigned int uptr;
+#endif
+#endif
 struct ListLink;
 struct ListLink {
     struct ListLink *next;
@@ -35,7 +44,7 @@ struct ChannelSet {
 };
 struct ChannelSet;
 typedef struct ChannelSet ChannelSet;
-extern void SndVoice_Construct(Header *header, s32 owner, s32 arg2);
+extern void SndVoice_Construct(Header *header, sptr owner, s32 arg2);
 static __inline__ void func_802596D4_linkInit(ListLink *link) {
     link->prev = link;
     link->next = link;
@@ -50,7 +59,7 @@ static __inline__ void func_802596D4_voiceInit(VoiceRecAt8 *voice, s32 owner) {
     func_802596D4_linkInit(&voice->link);
     SndVoice_Construct(&voice->header, owner, -1);
 }
-void SndQueue_Construct(ChannelSet *set, s32 owner) {
+void SndQueue_Construct(ChannelSet *set, sptr owner) {
     s32 i;
     set->owner = owner;
     func_802596D4_linkInit(&set->free);

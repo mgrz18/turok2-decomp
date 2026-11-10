@@ -2,6 +2,9 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "globals/text.h"
+#ifdef TARGET_PORT
+#include "structs/camera.h"
+#endif
 
 typedef struct EventParams {
     s32 index;          /* 0x0 */
@@ -16,7 +19,11 @@ void ImpactEvent_PlaySoundAndEffect(s32 arg0, CGameObjectInstance *actor, s32 ar
     if (actor->header.m_Type == 1 && (actor->m_dwFlags & 0x300000)) {
         CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, ((CPlayer *)actor->m_AI.m_pParent)->m_pCamera, gLevelMessages[params.index].text);
     } else {
+#ifdef TARGET_PORT
+        CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, gEngineApp_m_Game_m_CameraPool + T2_OFFSETOF(CCameraPool, m_MainCamera), gLevelMessages[params.index].text);
+#else
         CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, gEngineApp_m_Game_m_CameraPool + 0x40, gLevelMessages[params.index].text);
+#endif
     }
     if (gLevelMessages[params.index].speech != 0) {
         Sound__PlaySpeech(gLevelMessages[params.index].speech);

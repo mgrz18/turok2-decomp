@@ -6,7 +6,7 @@
 
 void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
-s32 GameObject_CanMoveTo(CInstanceHeader *inst, CVector3 pos, s32 arg);
+s32 GameObject_CanMoveTo(CInstanceHeader *inst, CVector3 pos, sptr arg);
 
 /* Picks the neighbouring region whose centre is farthest from pos and still
  * passes GameObject_CanMoveTo; its centre goes to *out. */

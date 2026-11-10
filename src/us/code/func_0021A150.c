@@ -12,7 +12,7 @@ extern u8 D_800A5AC4[];     /* "anim object info" */
 
 void CMtxF__TransformBox(void *, void *, void *);
 void CAnimationState__Reset(void *);
-s32 CGameObjectInstance__PickRandomAnim(CGameObjectInstance *, s32, s32);
+sptr CGameObjectInstance__PickRandomAnim(CGameObjectInstance *, sptr, sptr);
 
 void CGameObjectInstance__SetupAnimation(CGameObjectInstance *actor, s32 *a1, s32 a2, s32 anim) {
     CMemEntry *model;
@@ -107,7 +107,7 @@ void CMtxF__TransformBox(void *, void *, void *);
 void CAnimationState__Reset(void *);
 sptr CGameObjectInstance__PickRandomAnim(Actor *, sptr, sptr);
 
-void CGameObjectInstance__SetupAnimation(Actor *actor, s32 a1, s32 a2, sptr anim) {
+void CGameObjectInstance__SetupAnimation(Actor *actor, sptr a1, s32 a2, sptr anim) {
     s32 *model;
     s32 *set;
     s32 id;

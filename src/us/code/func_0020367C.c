@@ -11,7 +11,7 @@
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 extern void CDecompressor__DecompressSync(CDecompressor *, CCacheEntry *);
-extern void CLoader__LoadSync(CLoader *, uptr, u32, void *);
+extern void CLoader__LoadSync(CLoader *, uptr, uptr, void *);
 extern void CLoader__LoadAsync(CLoader *, u32, u32, void *, void *, CCacheEntry *, s32);
 #ifdef TARGET_PORT
 #include "t2asset_game.h"

@@ -33,7 +33,7 @@ extern char D_800A5D8C[];
 extern void CCache__LoadPersistantIndex(s32, sptr *, sptr, char *);
 extern void **CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, void *, sptr, char *);
 extern s32 BinaryRange(s32 *keys, s32 count, s32 key, s32 *first, s32 *last);
-extern void CCache__Deallocate(s32, void *);
+extern void CCache__Deallocate(sptr, void *);
 
 /* Copies up to max placed objects of the given kind (-1: any) whose key matches into out; returns how many. */
 s32 CScene__FindWarpDests(void *world, s32 kind, s32 key, Placed *out, s32 max) {

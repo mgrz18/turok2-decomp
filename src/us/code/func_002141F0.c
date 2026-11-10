@@ -30,7 +30,12 @@ typedef struct {
     /* 0x14 */ void *model;
     /* 0x18 */ s32 owner;
     /* 0x1C */ s32 unk1C;
+#ifdef TARGET_PORT /* CStaticObject's host layout: m_GeometrySize, then the pointer m_pOwner */
+    s32 pad20;
+    void **pad24;
+#else
     /* 0x20 */ u8 pad20[8];
+#endif
     /* 0x28 */ f32 matrix[16];
     /* 0x68 */ CVector3 min;
     /* 0x74 */ CVector3 max;
@@ -39,6 +44,10 @@ typedef struct {
     /* 0x88 */ u16 flags;
     /* 0x8A */ u8 colorFrame;
 } PlacedProp;
+#ifdef TARGET_PORT
+#include "structs/level_actor.h"
+T2_STATIC_OBJECT_CHECK(PlacedProp, matrix, flags);
+#endif
 
 void CMtxF__SetRotateY(f32 *mtx, f32 angle);
 void CMtxF__ScaleAxes(f32 *mtx, f32 x, f32 y, f32 z);

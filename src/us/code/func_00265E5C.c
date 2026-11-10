@@ -5,7 +5,7 @@
 
 
 
-void Destructible_EventGo(s32 arg0, s32 arg1) {
+void Destructible_EventGo(sptr arg0, sptr arg1) {
     CAI__SetMode(arg0, arg1, 1);
     CScene__SetInstanceSavedBit(&gScene, arg0, 1);
 }

@@ -21,10 +21,10 @@ void Pak_ProbeSlot(s32 a);
 s32 Pak_GetStatus(s32 a);
 s32 Pak_CountEmptyNotes(s32 a, s32 *b);
 s32 Pak_GetFreePages(s32 a, s32 *b);
-void Pak_GetNoteGameName(s32 a, s32 b, s32 *c);
+void Pak_GetNoteGameName(s32 a, s32 b, sptr *c);
 s32 Pak_NeedsRepair(s32 a);
-void Pak_DecodeText(s32 a, u8 *b, s32 c);
-s32 Pak_BytesToPages(s32 a);
+void Pak_DecodeText(sptr a, u8 *b, s32 c);
+s32 Pak_BytesToPages(sptr a);
 void PakMenu_UpdateNoteRows(Menu *o);
 s32 PakMenu_CheckSlotForSave(Menu *o, s32 a, s32 *b, s32 *c);
 
@@ -37,7 +37,9 @@ s32 PakMenu_CheckSlotForSave(Menu *o, s32 a, s32 *b, s32 *c);
 
 void PakMenu_InitSaveGameAnyPak(Menu *arg0) {
     u8 buf[16];
-    s32 sp28, sp2C, sp30, sp34, sp38, sp3C;
+    s32 sp28, sp2C;
+    sptr sp30, sp34;
+    s32 sp38, sp3C;
     s32 s0, s1, s2, s3, f1, v0, m1, r2;
 
     gPakMenuIsSave = 0;

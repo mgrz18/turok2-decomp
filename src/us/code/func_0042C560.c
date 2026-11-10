@@ -29,7 +29,7 @@ extern char D_800A5FC4[];
 extern void CCache__LoadPersistantIndex(s32, sptr *, sptr, char *);
 extern void **CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, void *, sptr, char *);
 extern f32 CVector3__Distance(void *a, void *b);
-extern void CCache__Deallocate(s32, void *);
+extern void CCache__Deallocate(sptr, void *);
 
 /* Finds the point of the given type nearest to position; copies it to out and returns its value (0 when none). */
 s32 CScene__FindNearestWarpDest(void *world, void *position, s32 type, SearchPoint *out) {

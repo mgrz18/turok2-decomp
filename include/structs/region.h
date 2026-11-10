@@ -36,14 +36,24 @@ typedef struct CGameRegion {
 
 /* The attributes of a set of regions: water, damage, ceilings, map colour... */
 typedef struct CRegionInfo {
-    /* 0x00 */ u8 unk_00[0x20];
+    /* The camera attributes CCamera__AdvanceAttributes blends to (its CRegionSetAttributes view);
+     * typed so that the archive's byte-swap plan (tools/assets/swap_spec.json reads this header)
+     * swaps the fog start, far clip and field of view: as bytes they reached the host big-endian. */
+    /* 0x00 */ u8 m_FogColor[4];
+    /* 0x04 */ u8 m_HeldFogColor[4];                 /* under water / held by the player's flags */
+    /* 0x08 */ u32 m_FogStart;
+    /* 0x0C */ u32 m_HeldFogStart;
+    /* 0x10 */ f32 m_FarClip;
+    /* 0x14 */ f32 m_FieldOfView;
+    /* 0x18 */ f32 m_HeldFarClip;
+    /* 0x1C */ f32 m_HeldFieldOfView;
     /* 0x20 */ f32 m_WaterHeight;
-    /* 0x24 */ u8 unk_24[0x4];
+    /* 0x24 */ f32 m_BlendTime;                      /* in 15ths of a second */
     /* 0x28 */ f32 m_DamageInterval;
     /* 0x2C */ f32 unk_2C;
-    /* 0x30 */ u8 unk_30[0x4];
+    /* 0x30 */ f32 unk_30;                           /* 1.0 in the data */
     /* 0x34 */ CVector3 m_vPos;
-    /* 0x40 */ u8 unk_40[0x4];
+    /* 0x40 */ f32 unk_40;                           /* 665.6 in the data */
     /* 0x44 */ u32 m_dwFlags;
     /* 0x48 */ u8 unk_48[0x8];
     /* 0x50 */ u16 m_DamageAmount;

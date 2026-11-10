@@ -4,7 +4,7 @@
 #include "globals/engine.h"
 
 void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
-void Render_QueueModelInstance(s32 anim, s32 model, s32 one, CLights1 *slot, s32 zero, s32 first, s32 second);
+void Render_QueueModelInstance(sptr anim, sptr model, s32 one, CLights1 *slot, sptr zero, s32 first, s32 second);
 
 void Action_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
     u8 *info = *(u8 **) (actor + 0x14) + 0x14;

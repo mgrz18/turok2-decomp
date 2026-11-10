@@ -1,7 +1,13 @@
 #include "common.h"
 
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define CMtxF__RotateX CMtxF__RotateX_i
+#endif
 s32 CMtxF__RotateX(s32, s32);                    /* extern */
-s32 CMtxF__RotateZ(s32, s32);                    /* extern */
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define CMtxF__RotateZ CMtxF__RotateZ_i
+#endif
+s32 CMtxF__RotateZ(sptr, s32);                    /* extern */
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x164];

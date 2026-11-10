@@ -18,7 +18,7 @@ typedef u32 HeapWord;
 #endif
 
 /* Takes a 16-byte aligned count*size block from the heap, or 0 if it does not fit. */
-HeapWord alHeapDBAlloc(s32 arg0, s32 arg1, Heap *arg2, s32 arg3, s32 arg4) {
+HeapWord alHeapDBAlloc(sptr arg0, s32 arg1, Heap *arg2, s32 arg3, s32 arg4) {
     HeapWord temp_a1;
     HeapWord temp_v1;
     HeapWord var_a3;

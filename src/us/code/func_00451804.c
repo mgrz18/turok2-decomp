@@ -6,8 +6,8 @@
 #include "globals/menu_data.h"
 
 s32 Menu_StepValue_2(Menu *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap);
-s32 Controller_MenuRight(s32 controller);
-s32 Controller_ConfirmPressed(s32 controller);
+s32 Controller_MenuRight(sptr controller);
+s32 Controller_ConfirmPressed(sptr controller);
 
 #define MIN(a, b) ((b) < (a) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))

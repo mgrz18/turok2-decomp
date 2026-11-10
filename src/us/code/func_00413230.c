@@ -570,7 +570,7 @@ void MenuItem_DrawSlider(MenuItem *it, MenuItemLayout *box, MenuItemLayout *colu
 
 extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
 
-extern void memset(void *p, s32 c, s32 n); /* memset */
+extern void memset(void *p, s32 c, sptr n); /* memset */
 extern f32 func_002982F0(f32 angle);             /* sin */
 extern void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
 extern void CGameObjectInstance__Construct(CGameObjectInstance *fx, s32 a, s32 b, s32 c, void *d, s32 e, s32 f, f32 g, CVector3 h, s32 i, CVector3 j,
@@ -1396,7 +1396,7 @@ f32 Menu_TextWidth(u8 *p, f32 sx, f32 sy) {
 /* ---------------- MenuItem_SelectSubmenu ---------------- */
 s32 func_00415FB8_416454(s32, s32) __asm__("MenuPool_OpenSubmenu");
 
-s32 MenuItem_SelectSubmenu(s32 arg0, s32 arg1, s32 arg2) {
+s32 MenuItem_SelectSubmenu(s32 arg0, sptr arg1, s32 arg2) {
     return func_00415FB8_416454(arg2, arg1) != 0;
 }
 
@@ -1899,7 +1899,7 @@ void MenuItem_SetBindingValue(MenuItem *item,float value) {
 }
 
 /* ---------------- MenuModel_DrawUnselected ---------------- */
-s32 CGameObjectInstance__DrawModelWithLights(s32, s32, s32, s32);
+s32 CGameObjectInstance__DrawModelWithLights(sptr, s32, s32, sptr);
 
 void MenuModel_DrawUnselected(s32 arg0, s32 arg1, s32 arg2) {
     CGameObjectInstance__DrawModelWithLights(arg0, arg1, arg2, (sptr) &gDefaultLights);
@@ -1909,7 +1909,7 @@ void MenuModel_DrawUnselected(s32 arg0, s32 arg1, s32 arg2) {
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00443298.c, func_00443298.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern void CGameObjectInstance__DrawModelImmediate(void *a, s32 b, s32 c);
+extern void CGameObjectInstance__DrawModelImmediate(void *a, sptr b, sptr c);
 /* The selected model item's draw callback (MenuItem_DrawModel): drawn with the
  * lights of gDefaultLights and a fade by sMenuModelFade. */
 void MenuModel_DrawSelected(CGameObjectInstance *a, s32 b, s32 c) {

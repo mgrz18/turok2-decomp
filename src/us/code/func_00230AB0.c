@@ -25,7 +25,7 @@ struct B18Ent {
     B18Ent *next;       /* 0x1320 (0x16E0) */
 };
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
-void CParticle__CheckProximity(s32 unused, B18Ent *o, B18Ent **arr, s32 n) {
+void CParticle__CheckProximity(sptr unused, B18Ent *o, B18Ent **arr, s32 n) {
     CVector3 d;
     s32 i;
     s32 cnt;

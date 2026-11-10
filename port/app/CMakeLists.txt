@@ -46,6 +46,8 @@ if(T2_LINK_GAME AND TARGET turok2_game)
         ${T2_PORT_DIR}/audio/t2audio_sndp.c
         ${T2_PORT_DIR}/audio/t2audio_world.c
         ${T2_PORT_DIR}/audio/t2audio_lib.c
+        ${T2_PORT_DIR}/audio/t2audio_csp.c
+        ${T2_PORT_DIR}/audio/t2audio_adec.c
         ${T2_PORT_DIR}/audio/t2asp.c)
     target_link_libraries(t2audio PRIVATE t2_game_flags)
     target_include_directories(t2audio PUBLIC ${T2_PORT_DIR}/audio PRIVATE ${T2_PORT_DIR}/runtime)

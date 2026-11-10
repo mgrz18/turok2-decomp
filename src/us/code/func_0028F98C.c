@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern s32 __getTrackByte(s32, s32);
-s32 __readVarLen(s32 arg0, s32 arg1) {
+s32 __readVarLen(sptr arg0, s32 arg1) {
     s32 temp_v0;
     s32 var_s0;
     var_s0 = (u8) __getTrackByte(arg0, arg1);

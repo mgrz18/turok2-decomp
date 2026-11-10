@@ -30,9 +30,12 @@ struct Object {
 };
 
 void EnemyAI_NukedFrozenRemove(Object *obj, CAI *ai);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define AI_SetTargetOverride AI_SetTargetOverride_f
+#endif
 void AI_SetTargetOverride(Object *obj, CAI *ai, Object *owner, f32 time);
 void AI_HearNoise(Object *obj, CAI *ai, CVector3 *from, s32);
-void Sound__PlayPitched(s16 sound, CVector3 pos, s32, s32, f32 volume);
+void Sound__PlayPitched(s16 sound, CVector3 pos, s32, sptr, f32 volume);
 s32 Random_Next(void);
 void AI_StopSound(Object *obj, CAI *ai);
 s32 EnemyAI_PickDeathMode(Object *obj, CAI *ai, DamageEvent *dmg);

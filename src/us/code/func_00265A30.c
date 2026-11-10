@@ -25,8 +25,24 @@ typedef struct {
 
 extern void Destructible_Step(CGameObjectInstance *actor, void *state);
 extern void Destructible_Hurt(CGameObjectInstance *actor, void *state);
+#ifdef TARGET_PORT /* unprototyped: the host passes the pass-through arguments */
+extern void TotemDefense_Init();
+#else
 extern void TotemDefense_Init(void);
+#endif
 
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS TotemDefense_Init receives Destructible_Setup's own argument
+ * registers (pass-through); the host passes them. */
+void Destructible_Setup(CGameObjectInstance *actor, ActionState *state) {
+    state->table = gDestructibleModeTable;
+    state->update = Destructible_Step;
+    state->onEvent = Destructible_Hurt;
+    if (actor->m_nTypeFlag == 0x64D) {
+        TotemDefense_Init(actor, state);
+    }
+}
+#else
 void Destructible_Setup(CGameObjectInstance *actor, ActionState *state) {
     state->table = gDestructibleModeTable;
     state->update = Destructible_Step;
@@ -35,3 +51,4 @@ void Destructible_Setup(CGameObjectInstance *actor, ActionState *state) {
         TotemDefense_Init();
     }
 }
+#endif

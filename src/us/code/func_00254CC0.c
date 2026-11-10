@@ -2,8 +2,8 @@
 #include "gfx.h"
 
 extern void Hud_SetupTextureMode(s32);
-extern void CBarrel__DrawEight(void *, s32, s32);
-extern void CBarrel__DrawRing(void *, s32, s32);
+extern void CBarrel__DrawEight(void *, sptr, sptr);
+extern void CBarrel__DrawRing(void *, sptr, sptr);
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x380];

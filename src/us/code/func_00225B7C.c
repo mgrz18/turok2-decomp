@@ -260,7 +260,7 @@ struct Shared_ReactionPlayerRecord {
     s32 unk324;
     Shared_ReactionPlayer *unk328;
 };
-extern void DamageEvent_Set(Shared_DamageEvent *event, s32 arg1, s32 damage, f32 radius, s32 flags, s32 arg5);
+extern void DamageEvent_Set(Shared_DamageEvent *event, sptr arg1, s32 damage, f32 radius, s32 flags, sptr arg5);
 extern void CAI__CallHurt(LevelActor *actor, s32 *behavior, Shared_DamageEvent *event);
 void CScene__DamageAllEnemies(CScene *world, s32 damage, s32 flags) {
     Shared_DamageEvent event;

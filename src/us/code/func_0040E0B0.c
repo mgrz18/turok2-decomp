@@ -3,7 +3,7 @@
 #include "protos/ai.h"
 
 
-void BlindOne_ActorAppearUpdate(s32 arg0, CAI *arg1) {
+void BlindOne_ActorAppearUpdate(sptr arg0, CAI *arg1) {
     if (arg1->m_AnimRepeatedCount != 0) {
         CAI__SetMode(arg0, arg1, 2);
     }

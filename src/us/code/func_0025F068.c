@@ -8,6 +8,9 @@ typedef struct {
 } TargetInfo; /* size 0x88 */
 
 void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, TargetInfo *info, s32 a, s32 b);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define AI_TurnClamped AI_TurnClamped_i
+#endif
 void AI_TurnClamped(CGameObjectInstance *obj, CAI *ai, f32 angle, s32 unk);
 void CPathTrack__Advance(CPathTrack *track);
 void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
