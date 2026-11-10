@@ -48,7 +48,11 @@ void LevelEvent_ProcessTriggers(Trigger *triggers, s32 count, s32 require, s32 e
         if ((trigger->mask & group) && !(trigger->mask & group & exclude)) {
             active = 0;
         }
+#ifdef TARGET_PORT /* the big-endian word's 0x1100 bits are the state byte's 0x11 (byte 0xE) */
+        if ((trigger->flags.bytes.state & 0x11) == 0x10) {
+#else
         if ((trigger->flags.word & 0x1100) == 0x1000) {
+#endif
             active = 0;
         }
         if (LevelEvent_CheckRequiredItem(trigger, arg) == 0) {

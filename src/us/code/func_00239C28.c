@@ -11,7 +11,7 @@ s32 GameObject_CanMoveTo(CInstanceHeader *inst, CVector3 pos, sptr arg);
 /* Picks the neighbouring region whose centre is farthest from pos and still
  * passes GameObject_CanMoveTo; its centre goes to *out. */
 CGameRegion *Path_FindFleeRegion(CInstanceHeader *inst, CGameRegion *exclude, CVector3 pos, CGameRegion *none,
-                      s32 arg, CVector3 *out) {
+                      sptr arg, CVector3 *out) {
     CGameRegion *cur;
     CGameRegion *region;
     CGameRegion *best;

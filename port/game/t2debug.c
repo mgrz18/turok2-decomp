@@ -56,6 +56,96 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
 #include "globals/engine.h"
 #include "structs/weapon.h"
 
+#include <math.h>
+#include "structs/intelligence.h"
+
+/* T2_ACTOR_LOG=N (with T2_STATE_LOG, round 7 v3): the level's enemies and turrets (gScene's level
+ * actors with intelligence type 1 or 4), nearest to the player first (N of them, default 8), and
+ * the live pooled instances: index, type, flags, position, distance, health, AI mode, animation. */
+static void T2Port_LogOne(const char *kind, int i, CGameObjectInstance *o, CGameObjectInstance *pl) {
+    CIntelligence *info = o->header.m_pIntelligence;
+    f32 d = -1.0f;
+    if (pl != NULL) {
+        f32 dx = o->header.m_vPos.x - pl->header.m_vPos.x, dy = o->header.m_vPos.y - pl->header.m_vPos.y;
+        f32 dz = o->header.m_vPos.z - pl->header.m_vPos.z;
+        d = sqrtf(dx * dx + dy * dy + dz * dz);
+    }
+    printf("actor: %s %d it %d id %d fl %x aifl %x pos (%.1f %.1f %.1f) d %.0f hp %d/%d mode %d act %d anim %d %.1f/%d tgt %p ty %x cb %p\n",
+           kind, i, info != NULL ? (int) info->m_Type : -1, info != NULL ? (int) info->m_Id : -1,
+           (unsigned) o->m_dwFlags, (unsigned) o->m_AI.m_dwFlags, o->header.m_vPos.x, o->header.m_vPos.y,
+           o->header.m_vPos.z, d, (int) (o->m_AI.m_Health >> 8), (int) (o->m_AI.m_InitialHealth >> 8),
+           (int) o->m_AI.m_Mode, (int) o->m_AI.m_Action, (int) o->m_CurrentAnimation.m_nAnimIndex,
+           o->m_CurrentAnimation.m_AnimationFrame, (int) o->m_nAnims, (void *) o->m_AI.m_pSightTarget,
+           (unsigned) o->m_nTypeFlag, o->m_AI.m_pModeCurrent != NULL ? (void *) o->m_AI.m_pModeCurrent->m_pfCallback : NULL);
+}
+
+static void T2Port_LogActors(CPlayer *p) {
+    CGameObjectInstance *pl = (p != NULL) ? &p->m_CharacterActor : NULL;
+    int n = atoi(getenv("T2_ACTOR_LOG"));
+    int i, k, used[64];
+    int nUsed = 0;
+    if (n <= 0) {
+        n = 8;
+    }
+    if (n > 64) {
+        n = 64;
+    }
+    {
+        int hist[16] = {0};
+        for (i = gScene.m_nFirstActor; gScene.m_pActors != NULL && i < gScene.m_nActors; i++) {
+            CIntelligence *info = gScene.m_pActors[i].header.m_pIntelligence;
+            hist[info == NULL ? 15 : (info->m_Type & 15)]++;
+        }
+        printf("actors: %p first %d n %d by type:", (void *) gScene.m_pActors, (int) gScene.m_nFirstActor,
+               (int) gScene.m_nActors);
+        for (i = 0; i < 16; i++) {
+            if (hist[i] != 0) {
+                printf(" %d:%d", i, hist[i]);
+            }
+        }
+        printf("\n");
+    }
+    if (gScene.m_pActors != NULL) {
+        for (k = 0; k < n; k++) {
+            int best = -1;
+            f32 bestD = 1e30f;
+            for (i = gScene.m_nFirstActor; i < gScene.m_nActors; i++) {
+                CGameObjectInstance *o = &gScene.m_pActors[i];
+                CIntelligence *info = o->header.m_pIntelligence;
+                int j, skip = 0;
+                f32 dx, dz, d;
+                if (info == NULL || (info->m_Type != INTELLIGENCE_ENEMY && info->m_Type != INTELLIGENCE_TURRET)) {
+                    continue;
+                }
+                for (j = 0; j < nUsed; j++) {
+                    skip |= used[j] == i;
+                }
+                if (skip) {
+                    continue;
+                }
+                dx = pl != NULL ? o->header.m_vPos.x - pl->header.m_vPos.x : 0.0f;
+                dz = pl != NULL ? o->header.m_vPos.z - pl->header.m_vPos.z : 0.0f;
+                d = dx * dx + dz * dz;
+                if (d < bestD) {
+                    bestD = d;
+                    best = i;
+                }
+            }
+            if (best < 0) {
+                break;
+            }
+            used[nUsed++] = best;
+            T2Port_LogOne("lvl", best, &gScene.m_pActors[best], pl);
+        }
+    }
+    {
+        CListedInstance *li = (CListedInstance *) gScene.m_InstancePool.m_ActiveList.m_pHead;
+        for (k = 0; li != NULL && k < 32; k++, li = li->m_pNext) {
+            T2Port_LogOne("dyn", k, &li->m_Instance, pl);
+        }
+    }
+}
+
 void T2Port_LogState(int frame) {
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
 
@@ -137,6 +227,9 @@ void T2Port_LogState(int frame) {
             CRect *r = (CRect *) gScene.m_Sectors[i].m_pBounds;
             printf("scene:   sector %d x %.0f..%.0f z %.0f..%.0f\n", i, r->minX, r->maxX, r->minZ, r->maxZ);
         }
+    }
+    if (getenv("T2_ACTOR_LOG") != NULL) {
+        T2Port_LogActors(p);
     }
     fflush(stdout);
 }
@@ -269,4 +362,76 @@ void T2Port_DebugWarp(int frame) {
     fflush(stdout);
     sDone++;
     CPlayer__Warp(p, (s32) id, 2, 0);
+}
+
+/* T2_TELEPORT=F:x,y,z[;F:x,y,z...] (DEBUG-ONLY, round 7 v3): at frame F, in gameplay, put the
+ * first active player at (x, y, z) (its region looked up with CScene__FindRegionAt), to reach a
+ * level's enemies without a long --input script. Called every frame by game.cpp. */
+extern sptr CScene__FindRegionAt(CScene *world, CVector3 *pos);
+void T2Port_Teleport(int frame, const char *spec) {
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    const char *s = spec;
+
+    if (p == NULL || gEngineApp.m_Settings.mode != 13) {
+        return;
+    }
+    while (s != NULL && *s != '\0') {
+        int f;
+        float x, y, z;
+        if (sscanf(s, "%d:%f,%f,%f", &f, &x, &y, &z) == 4 && f == frame) {
+            CGameObjectInstance *a = &p->m_CharacterActor;
+            CVector3 pos;
+            sptr region;
+            pos.x = x;
+            pos.y = y;
+            pos.z = z;
+            region = CScene__FindRegionAt(&gScene, &pos);
+            printf("teleport: frame %d player (%.1f %.1f %.1f) -> (%.1f %.1f %.1f) region %p\n", frame,
+                   a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z, x, y, z, (void *) region);
+            if (region != 0) {
+                a->header.m_vPos = pos;
+                a->header.m_pCurrentRegion = (struct CGameRegion *) region;
+                a->m_vVelocity.x = a->m_vVelocity.y = a->m_vVelocity.z = 0.0f;
+            }
+            fflush(stdout);
+        }
+        s = strchr(s, ';');
+        if (s != NULL) {
+            s++;
+        }
+    }
+}
+
+/* T2_WAKE_ENEMIES=R (DEBUG-ONLY, round 7 v3): in gameplay, wake every dormant level enemy within R
+ * units of the player (default 1500) the way its level event does (EnemyAI_SleepIfOffscreen, the
+ * enemy event handler 1: flags 0x2100 and mode 2). Enemies whose definition has flag 0x1000 sleep until a
+ * level trigger wakes them; this reaches them without the trigger. Called every frame. */
+extern void EnemyAI_SleepIfOffscreen(CGameObjectInstance *actor, CAI *ai, s32 unused);
+void T2Port_WakeEnemies(int frame, const char *spec) {
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    f32 r = (f32) atof(spec);
+    int i;
+
+    if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL) {
+        return;
+    }
+    if (r <= 0.0f) {
+        r = 1500.0f;
+    }
+    for (i = gScene.m_nFirstActor; i < gScene.m_nActors; i++) {
+        CGameObjectInstance *o = &gScene.m_pActors[i];
+        CIntelligence *info = o->header.m_pIntelligence;
+        f32 dx, dz;
+        s32 dummy = 0;
+        if (info == NULL || info->m_Type != INTELLIGENCE_ENEMY || (o->m_dwFlags & 0x100)) {
+            continue;
+        }
+        dx = o->header.m_vPos.x - p->m_CharacterActor.header.m_vPos.x;
+        dz = o->header.m_vPos.z - p->m_CharacterActor.header.m_vPos.z;
+        if (dx * dx + dz * dz < r * r) {
+            EnemyAI_SleepIfOffscreen(o, &o->m_AI, dummy);
+            printf("wake: frame %d enemy %d type %x at (%.1f %.1f %.1f) flags %x\n", frame, i, (unsigned) o->m_nTypeFlag,
+                   o->header.m_vPos.x, o->header.m_vPos.y, o->header.m_vPos.z, (unsigned) o->m_dwFlags);
+        }
+    }
 }

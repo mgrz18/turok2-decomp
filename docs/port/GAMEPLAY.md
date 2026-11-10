@@ -331,3 +331,99 @@ script through local views anchored at `gLevelScript_*` symbols with N64 deltas,
 `Primagen_UpdateMode19`'s `LevelScriptF604`/`BossCtl`: the anchors are now right, the deltas
 past a pointer member are not); a boss fight with the boss on screen (the Queen and the Mother
 appear on triggers the scripts do not reach yet); the Blind One (level 1, 7401).
+
+## 8. Round 7, part v3: enemies and damage
+
+Branch names-R7_v3. All fixes `TARGET_PORT` or a pointer-wide retype (`s32` -> `sptr`, the same
+type on the N64); `tools/asm_diff.py --base d3f05a74 -j 8` 0 over the whole tree.
+
+### 8.1 How enemies come alive (what the port was missing)
+
+- **Level 51 has no enemies.** Its 29 level actors are doors, destructibles, interactive
+  animations and actions (`T2_ACTOR_LOG`: `by type: 6:3 7:5 9:2 10:18`, no type 1 or 3, no
+  pooled instances during the whole journey). The first enemies of the Port of Adia are in the
+  next area, behind a warp (v5). The test bed this round is attract demo 1 (level 81: 9 enemies)
+  and demo 2 (level 131: 53 enemies).
+- **Enemies sleep until a level trigger wakes them.** `EnemyAI_Init` clears the live flag 0x100
+  when the definition has flag 0x1000 (every enemy of levels 81 and 131), and the mode table
+  starts in mode 0, `EnemyMode_WaitForTrigger_Update`. The trigger is a level event of kind 1
+  (`D_800B06B8`): handler 1 `EnemyAI_SleepIfOffscreen` (flags 0x2100, mode 2), handler 2
+  `EnemyAI_CheckOffscreen` (flags 0x2100). Region/actor triggers fire them
+  (`CPlayer__Update` -> `CGameRegion__FireTriggers` on a region-info change ->
+  `LevelEvent_ProcessTriggers` -> `LevelEvent_Trigger`/`LevelEvent_Fire`).
+- **No trigger could match on the host** (v3-1): the trigger mask, the first word of each
+  `LevelEvent` record, was `u8 pad0[4]` in `structs/event.h`, so the archive copied it as bytes
+  and the host read it byte-reversed (`00 00 00 01` = 0x01000000 for mask 1; gdb on
+  `LevelEvent_ProcessTriggers`). Now `u32 m_Mask` (host only: the N64 struct keeps its 2-byte
+  alignment, `LevelEvent_CheckRequiredItem` changed code with a u32 there); **the archive must be
+  rebuilt**.
+
+### 8.2 Fix table (v3)
+
+| # | where | cause | fix |
+|---|---|---|---|
+| v3-1 | level triggers never matched | `LevelEvent` word 0 (the mask) copied as bytes by the archive | `u32 m_Mask` under TARGET_PORT (event.h), archive rebuilt |
+| v3-2 | `LevelEvent_ProcessTriggers` (func_0026E4B8) | `(flags.word & 0x1100) == 0x1000` tests the big-endian word's byte 0xE | `(flags.bytes.state & 0x11) == 0x10` |
+| v3-3 | `CScene__FireEventsByKey`/`...Once` (func_0022515C, func_002252A0) | the record tables at N64 CScene offsets 0x1168..0x117C | `m_nRecords`, `m_pRecords`, `m_nAltRecords`, `m_pAltRecords` |
+| v3-4 | `CScene__IsLinkGroupDone` (func_00224CF8) | `m_pBitSections` at N64 0x6C | by member |
+| v3-5 | demo 2 crash in `func_00268460` (the wall radius, from `Collision_SweepMapWalls`) once enemies move | instance/player at N64 offsets (0x14, 0xD4, 0x1A8, CPlayer 0xBB0) | host body |
+| v3-6 | `AI_FindBestTarget` (func_00243C90) | `Actor` (CPlayer) and `Plan` (CAI) views | hostview.py; the regions pointer-wide |
+| v3-7 | `Path_ExpandNode` crash from `AI_UpdatePathHeading` (func_002438C0) | `Plan` (CAI) / `PlanInfo` (CAIModeInfo) views: the leash region read at N64 0xB8 | hostview.py; the collision info pointer-wide through `Path_FindRegionPath`/`Path_FindFleeRegion` (sptr) |
+| v3-8 | enemies never got a target | `AI_UpdateTargets` (func_00246108) read the target override / sight / path target words at N64 CAI offsets | hostview.py, sptr |
+| v3-9 | `AI_FindBestTarget` found no player | `CPlayerPool__FindNearest`/`FindNearestOther` walked `CPlayer.m_pNext` at N64 0x1320 (the view never applied: the files had no player headers) | headers + hostview.py; also `CPlayerPool__PreUpdate`, `CPlayerPool__EndMatch` |
+| v3-10 | `EnemyAI_SleepIfOffscreen` (func_0025EEA4) | `m_Mode` at N64 0x34 | by member |
+| v3-11 | (macOS, v4) `ImpactEvent_AreaDamage` truncated actors | the 8 area/explosion/push handlers took (s32 victim, s32 source) | sptr |
+| v3-12 | (`--high-memory`, v2) `Blast_CanHit` (func_0023726C) | `B15Obj`: instance fields and a particle target's effect/owner at N64 offsets | host view (CGameObjectInstance + CParticle offsets) |
+| v3-13 | `ImpactEvent_ApplyBlast` (func_00237AFC) | `BlastActor`/`BlastOwner` views | hostview.py |
+| v3-14 | `--high-memory`: `LevelEvent_Fire` crash at the level-51 load | `CScene__UpdateDelayedEvents` (func_002253F8) and func_00225354 cast the event pointer to s32 | `(sptr)` |
+
+### 8.3 Debug aids (DEBUG-ONLY, port/game/t2debug.c)
+
+- `T2_ACTOR_LOG=N` (with `T2_STATE_LOG`): a histogram of the level actors by intelligence type,
+  then the N nearest enemies/turrets (`actor: lvl <index> it <type> fl <flags> pos d <distance>
+  hp <health> mode <AI mode> act anim <index> <frame>/<count> tgt <sight target> ty <type id>
+  cb <mode callback>`; `addr2line` the callback) and the live pooled instances (`dyn`).
+- `T2_TELEPORT=F:x,y,z[;F:x,y,z]`: at frame F in gameplay, put the player there (its region by
+  `CScene__FindRegionAt`; skipped when none). Region triggers fire as he moves on.
+- `T2_WAKE_ENEMIES=R`: every frame, wake the sleeping enemies within R of the player as their
+  level event would (`EnemyAI_SleepIfOffscreen`).
+
+### 8.4 What runs (Linux, headless)
+
+- Demo 2 (level 131) runs its AI now (before: every enemy stood in mode 0; with the triggers
+  matching, actor 52 (type 0x12C) wakes, `EnemyMode_Move_Update`): the crashes it met on the way
+  are v3-5..v3-9. With `T2_TELEPORT=13900:440,160,-3700` the player lands next to it and, with
+  v1's branch merged (scratch), it **acquires the player as its sight target** and turns/steps
+  (`tgt 0x4297d990` = the player, position 440 -> 455).
+- Demo 1 (level 81), scratch merge with v1, `T2_TELEPORT=5600:2334.7,307.2,-1054.7
+  T2_WAKE_ENEMIES=1500`: enemies 6 and 7 (type 0x190) wake into mode 2, then
+  `EnemyMode_Move_Update`, walk 70 units toward the player (2334.7 -> 2405.0), keep the player
+  as their target, enter mode 18 once (frame 6300), but **do not attack: their animation index
+  stays 0** (`anim 0 x/30`), and the player's health stays 100.
+- This branch alone: the new-game journey to frame 15,000 is unchanged (level 51, the player ends
+  at (795.2, -780.7, 233.0)). The 26,000-frame boot crashes at frame ~13,700 (demo 2) in
+  `Collision_SweepActors` (func_0024032C: v1 ported it on names-R7_v1); **merge v1 before
+  v3** (or together): the scratch merge runs demo 2.
+
+### 8.5 Next
+
+1. **Enemy animations**: the mode animation never changes (index 0), so attacks never start.
+   v2 found the cause on its branch (ce8cb3da): `CAI__UpdateModeAnim` (func_00243170) classifies
+   `CAIModeInfo.unk_10` with IsCodePointer/IsDataPointer (func_00267024/func_00266FC0), whose
+   N64 bodies test segment-size symbols meaningless on the host, and
+   `CGameObjectInstance__PickAvailableAction` (func_0021EA3C) read the (id, weight) table
+   little-endian. Retest demo 1 with v2 merged: attack -> `ImpactEvent_*` -> `CAI__CallHurt`
+   on the player (the HUD health), then a firing test (v2) for an enemy death
+   (`EnemyAI_PickDeathMode`, `EnemyAnim_NormalDeath_*`: still N64 views).
+2. The remaining views on the enemy path (candidates by a grep for pad views / M2C_FIELD in
+   EnemyAI_/EnemyMode_/AI_/ImpactEvent_ files): `AI_UpdateRegionFlags` (func_00242E34 `Dest`:
+   the region damage timer at N64 CAI 0xCC), `DamageEvent_Set` (func_00225B7C), `EnemyAI_OnHit`
+   (func_0025CAC8), `EnemyAI_PickDeathMode` (func_0025B078), `EnemyAnim_NormalDeath_*`
+   (func_0025DF04, func_0025E248), `EnemyAnim_ExtremeDeath` (func_0025FD98),
+   `AI_StartSound` (func_00246860, v2's note), `ImpactEvent_Call` (func_00265838/func_002658A0),
+   `EnemyAI_TickTimers` (func_0025C5F8), `AI_HearNoise` (func_0025E52C, func_00225C08).
+3. Level 51's enemies: once v5's warp works, script the journey through the warp to them.
+4. `ImpactEvent_LevelSpecial` (func_00238DF8) still passes actors as s32 to the boss handlers (v5).
+5. Why no trigger wakes demo 1's enemies along the demo's own path (gdb on
+   `LevelEvent_ProcessTriggers` after the level loads: the region-info ids with events, 4/9/10,
+   are not on the path; probably correct).

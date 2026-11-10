@@ -13,7 +13,7 @@ s32 Path_ExpandNode(sptr, CGameRegion *);
 /* Searches a path of regions from obj to goalRegion (Path_ExpandNode,
  * CGameRegion__ClearVisited) and puts in *out the centre of the region to head for.
  * Returns 0 if no path was found. */
-s32 Path_FindRegionPath(CGameObjectInstance *obj, CVector3 goal, CGameRegion *goalRegion, s32 arg, CVector3 *out) {
+s32 Path_FindRegionPath(CGameObjectInstance *obj, CVector3 goal, CGameRegion *goalRegion, sptr arg, CVector3 *out) {
     PathSearch search;
     CGameRegion *region;
     PathNode *node;
