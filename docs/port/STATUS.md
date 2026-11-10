@@ -196,6 +196,40 @@ frames show the corridor, the door and the weapon models at normal brightness.
 7. The remaining N64 views on the player path (GAMEPLAY.md section 5):
    `CPlayerPool__UpdateMatchClock`, `Action_CheckRequiredItem`, func_00271694.
 
+## Round 7, part v5: level warps, bosses, ABI (branch names-R7_v5)
+
+[GAMEPLAY.md](GAMEPLAY.md) section 6, [ABI.md](ABI.md) section 6. **A real warp works end to
+end**: from level 51 the player walks into the harbour's exit region (warp id 1098, read by
+`CPlayer__Update` from the region info) and level 52 loads and draws at its arrival point; level
+52's exit takes him back (Linux low and `--high-memory`). `T2_WARP_TO=<id>[@frame],...` (debug)
+calls `CPlayer__Warp` from gameplay. The boss levels load: the Mantid Queen (level 2, its intro
+cinema and the arena), and with v1's particles the Mother (level 3) and the Primagen (level 4)
+arenas draw; the Primagen stops at 13,260 in `Path_ExpandNode`. abicheck: **0 harmful direct
+sites** (was 11), 1 indirect store. The remaining player-path views of round 6 are done.
+
+Regressions checked: the scripted journey (15,000 frames) gives the same positions as round 6
+(358.3/-60.3 at 13800, 795.2/233.0 at 15000), alone and merged with v1.
+
+**Merge notes.**
+- **Merge v1 (particles) with or before v5.** v5's `Generator_Setup` fix installs the
+  generators' step callback, which the host never had: their spawns now reach
+  `CParticleSystem__Spawn`, so this branch ALONE crashes the boot in attract demo 3 (level 109,
+  `Generator_SpawnEnter`). With v1 merged (scratch test, v1 at 146bc42e) the boot runs 26,000
+  frames clean and the journey is unchanged.
+- **Header change**: `include/structs/boss.h` (TotemDefenseState moved above LevelScriptState and
+  placed in it as `totemDefense`; `LevelScriptBlock` under TARGET_PORT), `include/globals/boss.h`
+  (`D_8012F604` declared under TARGET_PORT): drop decls.json and rerun gendata. No swap_spec or
+  asset change: the archive is unchanged (v1's archive, 3ad7d240, for the merge).
+- Files others may touch: func_0021A500.c (one call, the IsOnGround argument), func_00219BC0.c
+  (one call), func_0026841C.c, func_00268460.c, func_002685F0.c, func_00268798.c,
+  func_002687FC.c (actor helpers used by AI/collision: v3), func_00262D74.c (generators),
+  func_00238DF8.c + port/game/t2abi.c (boss impact handlers: v3 converted the neighbours),
+  port/game/t2debug.c and port/app/game.cpp (`T2_WARP_TO`).
+
+Next: the Primagen fight (`Path_ExpandNode`; the level-script views anchored at the
+`gLevelScript_*` symbols with N64 deltas, 41 files), the Blind One (level 1), boss fights with
+the boss on screen (scripted triggers or a debug switch).
+
 ## Round 6, part u1: gameplay draws the level (branch names-R6_u1)
 
 [RENDER.md](RENDER.md) section 4. Level 51 now **draws in gameplay**: the Port of Adia start

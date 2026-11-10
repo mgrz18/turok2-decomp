@@ -158,3 +158,76 @@ s32 at 0x10, a pointer truncation on macOS), `CParticleSystem__Spawn` (above), t
 `unk_48` bytes (0x48 warp ID and 0x4C pending warp are u16 read by `CPlayer__Update`'s `Surface`
 view, but `swap_spec.json` keeps them as bytes: warps between levels will read byte-reversed IDs;
 type them in `structs/region.h` and rebuild the archive).
+
+## 6. Round 7, part v5: level warps and the boss levels
+
+**A real warp, end to end.** Level 51's exit is region info 21 (`CRegionInfo.m_WarpID` 1098,
+flags 0x40340060: 0x40000 "changes the player's state", 0x200000 "entered from a region without
+it"), a strip at x 3778..3893, z 529..683, y 307.2, on the high ledge at the east end of the
+harbour. `tools/assets/levels.py --level 51` decodes it (the region infos' `rest` bytes 12..13 are
+the warp id); `warp_dests.json` gives the destinations: 1098 -> level 52 (1280, 0, -3225.6),
+1813 -> level 51 (3819.5, 307.2, 614.4), the arrival point inside that same strip.
+
+The test (`T2_STATE_LOG=30 T2_WARP_TO=1813 ... --input @exit52.txt`, 16,000 frames):
+
+```
+START@4400 A@4500 A@4700 A@4800     # new game
+CU@13100..13120                     # step out of the exit strip (west)
+CD@13140..13300                     # back into it: CPlayer__Update -> enter_surface -> CPlayer__Warp(1098)
+CU@15000..15300                     # level 52: forward into its exit back to level 51 (warp 1813)
+```
+
+```
+12955 T2_WARP_TO: CPlayer__Warp(player, 1813, 2, 0): fade, level 51 reloaded at the exit
+13140 (3712.6 307.2 614.4) out of the strip
+13200 warp state 1: the player walked back in (the game's own trigger)
+13260 level 52, (1280.0 0.0 -3225.6) rotY -3.14: the arrival point of 1098
+15060 level 52's exit, warp state 1;  15120 level 51 at (3819.5 307.2 614.4)
+```
+
+Level 52 draws (frame 13351: a stone corridor with ladders and wooden walkways, the HUD). The
+same run passes with `--high-memory`, and on the scratch merge with v1's particles.
+
+`T2_WARP_TO=<id>[@frame][,<id>[@frame]...]` (port/game/t2debug.c, **debug only**): at the frame
+(default 60 frames into gameplay: mode 13 in a level > 0, a player, no warp running) it calls
+`CPlayer__Warp(player, id, 2, 0)`, the path a warp region takes (the hub/key redirects of
+`CPlayer__Warp`, `CScene__FindWarpDests`, `CScene__RequestWarp`, the fade in
+`CScene__UpdateWarp`, `CScene__LoadLevel`). A negative id is `~level`: that level index at its
+default spawn (`CScene__UpdateWarp`'s ~id path). Ids redirect like the game does: 7100..7601
+send the player to the hub (1000..6000) while the hub's objectives are not done (7100 -> 1000
+with the "level not complete" message, 7601 -> hub 6, level 114, after its first-visit
+cinemas 155..161).
+
+**The boss levels** (warp ids from warp_dests.json; Linux, headless):
+
+| warp | level | boss | this branch alone | with v1's particles (scratch merge) |
+|---|---|---|---|---|
+| 7501 | 2 | Mantid Queen | loads; the boss intro cinema (Turok, the Queen's legs, letterboxed); gameplay at the arena entrance to frame 18,500 | the same |
+| `-4` (~3) | 3 | Mother | needs the particles | loads, the arena draws (the slime pit, the grating, the pipe) to frame 17,000 |
+| 7602 | 4 | Primagen | `CParticleSystem__Spawn` (Primagen_SpawnTossedObject) | loads, the arena draws (frame 13201: the green-lit floor, the blue panels); stops at 13260 in `Path_ExpandNode` (AI pathfinding: a region read through garbage) |
+| `-110` (~109) | 109 | totem 1 | `CParticleSystem__Spawn` (Generator_SpawnEnter) | loads and runs to frame 16,000 |
+
+Fixes (all `TARGET_PORT`, asm_diff 0 against d3f05a74; include/ edits: whole tree):
+
+| # | where it stopped / what | cause | fix |
+|---|---|---|---|
+| v5-1 | `CPlayer__Warp` | `WarpPlayer` view of CPlayer at N64 offsets; region, camera and controller words as s32 | hostview.py, pointer-wide fields |
+| v5-2 | `Turret_Advance` (level 3 load) | raw N64 offsets on the actor and its CAI | host body |
+| v5-3 | `Action_Advance`, `Generator_Setup` | type id/flags at 0xB8/0xD4; the mode table/step at CAI 0x2C/0xF0 (generators never got their step: no spawns) | members; host view |
+| v5-4 | `Platform_Step`, `_AtStartUpdate`, `_AtEndUpdate`, `_ForwardUpdate`, `_BackEnter`, `_GetModeAnim`, `_UpdatePosition` | raw offsets / views (the region read as s32) | host bodies, hostview |
+| v5-5 | `Primagen_InitAI`, `Primagen_Step`, `MotherBoss_Init` | CAI/actor views: the mode table, callbacks and flags written at N64 offsets | hostview |
+| v5-6 | `MantidQueen_Draw`, `Primagen_Draw`, `MotherBoss_Draw` | the boss views (mask 0x14C, mode 0x174); `Render_DrawModel` given the draw matrices as `*(s32 *)(actor + 0x98)`; the weak-spot stride 0x68 | hostview; members; `sizeof(BossWeakSpot)` |
+| v5-7 | `TotemDefense_InitFight` | all N64 offsets (and a pointer stored in an s32) | host body on `TotemDefenseState`, after module 2's typed twin |
+| v5-8 | `func_00268460` (collision radius), `func_0026841C` (collision y offset) | raw offsets (0x14, 0xD4, 0x1A8 -> CPlayer 0xBB0, 0x54) | host bodies |
+| v5-9 | `GameObject_GetFrameDelta`/`GetFrameTurn` (stack smash in `AI_RideMovingPlatform`) | `AI_ComputeFrameMotion` fills a 0x40-byte `CAIFrameMotion` into a 12-byte buffer (safe only in the MIPS frame), the AI at N64 0x140 | the whole `CAIFrameMotion`, `&obj->m_AI` |
+| v5-10 | `CScene__FindInstances` (the bosses found no parts: `MotherBoss_Init` NULL) | the scene's actor table at 0xE0 and the N64 instance stride 0x288 | host body |
+| v5-11 | `Math_AcosLookup` (Mother level) | NaN -> int: MIPS `trunc.w.s` gives 0x7FFFFFFF (the end branch), x86 INT_MIN (a negative index) | MIPS result on the host |
+| v5-12 | `Primagen_Step` divided by zero | `D_8012F604` (the block gLevelScript lies in) was bytes of its N64 label extent 0x448; the host `LevelScriptState` is 0x608: `partsDone` overlapped `gLevelScript_path`, which `Primagen_InitAI` clears | `LevelScriptBlock` (structs/boss.h, TARGET_PORT) declared for `D_8012F604`: gendata sizes it and places `gLevelScript_*`, `gTotemDefense*` at host offsets; `TotemDefenseState` as `LevelScriptState.totemDefense` (N64 layout unchanged). **gendata reruns** |
+| v5-13 | the player path (STATUS round 6 next 7) | `Action_CheckRequiredItem` (Pickup/State/Toucher views), `CPlayerPool__UpdateMatchClock` (settings through a menu-pool view at N64 0xCC5/0xE78/0xE84), `CScene__CheckAutoActivation` (`e + 0x140`), `GameObject_IsOnGround` (0xD4/0x140), the path track at `obj + 0x1D4` | members (`func_00271694` is replaced by port/audio; `GameObject_GetRegionInfo` was already host) |
+| v5-14 | `spawnPickup` (generators), `ImpactEvent_LevelSpecial` | the region / the actors as s32 | sptr |
+
+Not done: the Primagen fight past its start (`Path_ExpandNode`; the 41 files that read the level
+script through local views anchored at `gLevelScript_*` symbols with N64 deltas, e.g.
+`Primagen_UpdateMode19`'s `LevelScriptF604`/`BossCtl`: the anchors are now right, the deltas
+past a pointer member are not); a boss fight with the boss on screen (the Queen and the Mother
+appear on triggers the scripts do not reach yet); the Blind One (level 1, 7401).
