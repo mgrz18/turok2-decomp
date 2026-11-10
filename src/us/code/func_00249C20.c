@@ -18,17 +18,68 @@
  * within the weapon's cone and returns the rotation that turns the aim
  * toward it (identity when there is none). */
 
+#ifdef TARGET_PORT
+typedef struct AimOptions {
+/* the view at the host offsets of CPlayerOptions (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_AimOptions(m) __builtin_offsetof(CPlayerOptions, m)
+    union {
+        struct { u8 _hp_autoAim[T2_HOFF_AimOptions(m_bAutoAim)]; u8 autoAim; }; /* N64 0x2E */
+    };
+} AimOptions;
+#else
 typedef struct AimOptions {
     /* 0x00 */ u8 pad0[0x2E];
     /* 0x2E */ u8 autoAim;
 } AimOptions;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct AimView {
+/* the view at the host offsets of CCamera (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_AimView(m) __builtin_offsetof(CCamera, m)
+    union {
+        struct { u8 _hp_mtx[T2_HOFF_AimView(m_mfViewOrient)]; f32 mtx[4][4]; }; /* N64 0x14C */
+    };
+} AimView;
+#else
 typedef struct AimView {
     /* 0x000 */ u8 pad0[0x14C];
     /* 0x14C */ f32 mtx[4][4];
 } AimView;
+#endif
 
 typedef struct AimActor AimActor;
+#ifdef TARGET_PORT
+struct AimActor {
+/* the view at the host offsets of CPlayer (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_AimActor(m) __builtin_offsetof(CPlayer, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_AimActor(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_height[T2_HOFF_AimActor(m_CharacterActor.m_CollisionYOffset)]; f32 height; }; /* N64 0x54 */
+        struct { u8 _hp_aimPos[T2_HOFF_AimActor(m_CharacterActor.m_AI.m_vBoreTarget)]; CVector3 aimPos; }; /* N64 0x214 */
+        struct { u8 _hp_options[T2_HOFF_AimActor(m_pOptions)]; AimOptions *options; }; /* N64 0x518 */
+        struct { u8 _hp_view[T2_HOFF_AimActor(m_pCamera)]; AimView *view; }; /* N64 0x51C */
+        struct { u8 _hp_weapon[T2_HOFF_AimActor(m_Data.m_CurrentWeapon)]; s16 weapon; }; /* N64 0x996 */
+        struct { u8 _hp_lockState[T2_HOFF_AimActor(m_CrossHairMode)]; s32 lockState; }; /* N64 0xB2C */
+        struct { u8 _hp_lockTimer[T2_HOFF_AimActor(m_CrossHairTimer)]; f32 lockTimer; }; /* N64 0xB30 */
+        struct { u8 _hp_lockTarget[T2_HOFF_AimActor(m_pCrossHairTarget)]; AimActor *lockTarget; }; /* N64 0xB38 */
+        struct { u8 _hp_hold[T2_HOFF_AimActor(m_CrossHairIcon)]; s32 hold; }; /* N64 0xB3C */
+        struct { u8 _hp_aimPoint[T2_HOFF_AimActor(m_vCrossHairPos)]; CVector3 aimPoint; }; /* N64 0xB40 */
+        struct { u8 _hp_aimVel[T2_HOFF_AimActor(m_vCrossHairVel)]; CVector3 aimVel; }; /* N64 0xB4C */
+        struct { u8 _hp_seenTarget[T2_HOFF_AimActor(m_pSightTarget)]; AimActor *seenTarget; }; /* N64 0xB58 */
+        struct { u8 _hp_range[T2_HOFF_AimActor(m_SightIcon)]; s32 range; }; /* N64 0xB5C */
+        struct { u8 _hp_viewPoint[T2_HOFF_AimActor(m_vSightPos)]; CVector3 viewPoint; }; /* N64 0xB64 */
+        struct { u8 _hp_viewVel[T2_HOFF_AimActor(m_vSightVel)]; CVector3 viewVel; }; /* N64 0xB70 */
+        struct { u8 _hp_aimRot[T2_HOFF_AimActor(m_qAutoAim)]; CQuaternion aimRot; }; /* N64 0xB7C */
+        struct { u8 _hp_unkB8C[T2_HOFF_AimActor(m_SniperMode)]; s32 unkB8C; }; /* N64 0xB8C */
+        struct { u8 _hp_unkCC4[T2_HOFF_AimActor(m_Overlay.m_Mode)]; s32 unkCC4; }; /* N64 0xCC4 */
+        struct { u8 _hp_next[T2_HOFF_AimActor(m_pNext)]; AimActor *next; }; /* N64 0x1320 */
+    };
+};
+#else
 struct AimActor {
     /* 0x0000 */ u8 pad0[4];
     /* 0x0004 */ CVector3 pos;
@@ -61,6 +112,7 @@ struct AimActor {
     /* 0x0CC8 */ u8 padCC8[0x1320 - 0xCC8];
     /* 0x1320 */ AimActor *next;
 };
+#endif
 
 void CGameObjectInstance__LocalToWorld(CVector3 *out, AimActor *actor, CVector3 off);
 f32 Actor_GetEyeHeight(AimActor *);

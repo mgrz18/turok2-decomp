@@ -126,6 +126,8 @@ def main():
     ap.add_argument('file')
     ap.add_argument('view')
     ap.add_argument('real')
+    ap.add_argument('--apply', action='store_true',
+                    help='rewrite the file: the host view under #ifdef TARGET_PORT, the N64 one in #else')
     a = ap.parse_args()
     ci.Config.set_library_file(LIBCLANG)
     idx = ci.Index.create()
@@ -155,14 +157,44 @@ def main():
         lines.append('        struct { u8 _hp_%s[%s]; %s; }; /* N64 0x%X */' % (n, hoff, decl, o))
         if delta == 0 and size != rsize:
             warn.append('%s (0x%X, %d bytes) over %s (%d bytes)' % (n, o, size, path, rsize))
-    print('/* the view at the host offsets of %s (tools/port/hostview.py): each field in its own' % R)
-    print(' * member of one union, placed by __builtin_offsetof of the member it reads */')
-    print('#define T2_HOFF(m) __builtin_offsetof(%s, m)' % R)
-    print('    union {')
-    print('\n'.join(lines))
-    print('    };')
+    mac = 'T2_HOFF_' + a.view
+    out = ['/* the view at the host offsets of %s (tools/port/hostview.py): each field in its own' % R,
+           ' * member of one union, placed by __builtin_offsetof of the member it reads */',
+           '#define %s(m) __builtin_offsetof(%s, m)' % (mac, R),
+           '    union {']
+    out += [l.replace('T2_HOFF(', mac + '(') for l in lines]
+    out += ['    };']
     for w in warn:
         print('WARNING: ' + w, file=sys.stderr)
+    if not a.apply:
+        print('\n'.join(out))
+        return
+    # the definition's extent (with its typedef when it has one)
+    text = src.decode()
+    td = None
+    for c in tm.cursor.get_children():
+        if c.location.file is None or os.path.abspath(c.location.file.name) != os.path.abspath(a.file):
+            continue
+        if c.kind == ci.CursorKind.TYPEDEF_DECL and c.spelling == a.view:
+            kids = list(c.get_children())
+            if kids and kids[0].is_definition() and kids[0].kind == ci.CursorKind.STRUCT_DECL:
+                td = c
+    if td is not None:
+        b, e = td.extent.start.offset, td.extent.end.offset
+        tag = list(td.get_children())[0].spelling
+        head = 'typedef struct %s' % tag if tag and not tag.startswith('(') and 'unnamed' not in tag else 'typedef struct'
+        tail = ' %s;' % a.view
+    else:
+        b, e = vm.extent.start.offset, vm.extent.end.offset
+        head = 'struct %s' % vm.spelling
+        tail = ';'
+    while text[e] != ';':
+        e += 1
+    e += 1
+    orig = text[b:e]
+    host = '#ifdef TARGET_PORT\n%s {\n%s\n}%s\n#else\n%s\n#endif' % (head, '\n'.join(out), tail, orig)
+    open(a.file, 'w').write(text[:b] + host + text[e:])
+    print('%s: %s rewritten (%d fields)' % (a.file, a.view, len(lines)))
 
 
 if __name__ == '__main__':
