@@ -81,6 +81,11 @@ void T2Port_LogState(int frame) {
         Menu *m = ((MenuPool *) p->m_pCamera->m_MenuPool)->head;
         printf(" cammenu %p cursor %d", (void *) m->desc, (int) m->cursor);
     }
+    {
+        extern s32 gCameraPoolHideViews;
+        CCameraPool *pool = gEngineApp.m_Game.m_CameraPool;
+        printf(" cams %d hide %d", (int) pool->m_ActiveList.m_nCount, (int) gCameraPoolHideViews);
+    }
     printf("\n");
     fflush(stdout);
 }
