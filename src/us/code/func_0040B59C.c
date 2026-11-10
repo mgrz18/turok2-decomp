@@ -9,7 +9,7 @@ typedef struct {
     /* 0x4 */ s8 state;
 } ModeAnim;
 
-void MotherBoss_Mode14_ChargeStep(s32 arg0, CAI *arg1) {
+void MotherBoss_Mode14_ChargeStep(sptr arg0, CAI *arg1) {
     ((ModeAnim *) arg1->m_pModeCurrent->m_pData)->state = 7;
     if (arg1->m_AnimRepeatedCount != 0) {
         CAI__SetMode(arg0, arg1, 0xB);

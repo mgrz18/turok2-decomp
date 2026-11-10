@@ -3,6 +3,6 @@
 #include "protos/player.h"
 
 
-void PlayerDeath0C_Enter(s32 arg0, s32 arg1) {
+void PlayerDeath0C_Enter(sptr arg0, sptr arg1) {
     CPlayer__StartDeathCinema(arg0, arg1, 0xC);
 }

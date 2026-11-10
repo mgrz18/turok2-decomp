@@ -3,6 +3,6 @@
 #include "protos/scene.h"
 
 
-void Generator_EventOn(s32 arg0) {
+void Generator_EventOn(sptr arg0) {
     CScene__SetInstanceSavedBit(&gScene, arg0, 1);
 }

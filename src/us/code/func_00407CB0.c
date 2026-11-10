@@ -17,7 +17,7 @@ extern void CPlayerPool__SetInvincibility(CPlayerPool *list, f32 arg1);
 extern void Cinema_RequestById(s32 id);
 
 
-void Primagen_EnterDeath(s32 arg0, Holder *obj) {
+void Primagen_EnterDeath(sptr arg0, Holder *obj) {
     CPlayer *player;
     GameSettings *flags;
 

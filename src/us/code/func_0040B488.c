@@ -5,7 +5,7 @@
 s32 MotherBoss_TeleportTarget(s32, s32);
 
 
-void MotherBoss_Mode16_TeleportTarget(s32 arg0, void *arg1)
+void MotherBoss_Mode16_TeleportTarget(sptr arg0, void *arg1)
 {
   s32 temp_v0;
   s32 *new_var;

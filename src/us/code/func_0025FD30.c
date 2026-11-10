@@ -3,7 +3,7 @@
 
 s32 EnemyMode_Move_Update(s32, s32);
 
-void EnemyMode_WoundedArm_Update(s32 arg0, CAI *arg1) {
+void EnemyMode_WoundedArm_Update(sptr arg0, CAI *arg1) {
     if (arg1->m_AnimRepeatedCount != 0) {
         EnemyMode_Move_Update(arg0, (sptr) arg1);
     }

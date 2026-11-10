@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 WeaponAnim_Alternate4F1A(s32 arg0, CAI *ai) {
+s32 WeaponAnim_Alternate4F1A(sptr arg0, CAI *ai) {
     f32 temp_f0;
     s32 var_v0;
 

@@ -3,7 +3,7 @@
 
 extern s32 EnemyAnim_Idle_AF6F0(void *, s32, void *);
 
-s32 EnemyAnim_WaitForTrigger(CGameObjectInstance *arg0, s32 arg1) {
+s32 EnemyAnim_WaitForTrigger(CGameObjectInstance *arg0, sptr arg1) {
     u16 kind;
     CEnemyIntelligence *sub;
 

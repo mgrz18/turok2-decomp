@@ -9,7 +9,7 @@ s32 Sound__Play(s32, s32, sptr, s32, s32, s32);
 #define OBJ_FIELD(obj, type, field) (*(type *)((s8 *)(obj) + (s32) &((CGameObjectInstance *)0)->field))
 extern s8 gLevelScript_unk3CA[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
-void Primagen_EnterMode2(void *arg0, s32 arg1) {
+void Primagen_EnterMode2(void *arg0, sptr arg1) {
     OBJ_FIELD(arg0, f32, m_AI.m_AnimSpeed) = 1.0f;
     gLevelScript_unk3CA[0] = 0;
     *(s32 *)&gLevelScript_unk3CA[0x1A] = 0;

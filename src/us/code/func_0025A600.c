@@ -5,6 +5,6 @@
 
 
 
-void EnemyAnim_Combat_AFE88(CGameObjectInstance *obj, s32 arg1) {
+void EnemyAnim_Combat_AFE88(CGameObjectInstance *obj, sptr arg1) {
     AI_PickAnimFromTable((sptr) obj, arg1, sEnemyAnimCombat_AFE88, obj->header.m_pIntelligence->m_Enemy.m_wCombatAnimFlags);
 }

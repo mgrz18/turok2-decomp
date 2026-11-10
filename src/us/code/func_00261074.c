@@ -9,9 +9,9 @@ typedef struct {
 } AITurnVars;
 
 f32 Math_DecayToZero(f32, f32);
-s32 EnemyAI_GetBehaviorIndex(s32, s32);
+s32 EnemyAI_GetBehaviorIndex(s32, sptr);
 
-void EnemyRam_Advance(s32 arg0, CAI *arg1) {
+void EnemyRam_Advance(sptr arg0, CAI *arg1) {
     f32 temp_f0;
     f32 temp_f20;
     s8 temp_v1;

@@ -6,7 +6,7 @@ typedef struct {
     /* 0x7 */ u8 value;
 } ByteArg;
 
-void InteractiveAnim_EventSetModel(CGameObjectInstance *arg0, s32 arg1, ByteArg *arg2) {
+void InteractiveAnim_EventSetModel(CGameObjectInstance *arg0, sptr arg1, ByteArg *arg2) {
     arg0->header.m_pIntelligence->m_nModel = (u8) arg2->value;
     arg0->header.m_pIntelligence->m_nShadowModel = (u8) arg2->value;
 }

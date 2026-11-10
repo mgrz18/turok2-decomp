@@ -12,11 +12,11 @@ typedef struct {
     /* 0x248 */ void *onUpdate;
 } Actor00402ADC;
 
-void MantidQueen_Init(void *state, s32 a1);
-s32 MantidQueen_Draw(s32 a0, s32 a1, s32 a2);
+void MantidQueen_Init(void *state, sptr a1);
+s32 MantidQueen_Draw(sptr a0, sptr a1, sptr a2);
 void EnemyAI_HeadNodeCallback(void);
 
-void MantidQueen_EnterStart(s32 a0, s32 a1) {
+void MantidQueen_EnterStart(sptr a0, sptr a1) {
     Actor00402ADC *found[2];
     Actor00402ADC *actor;
     s32 count;
