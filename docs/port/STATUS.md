@@ -864,3 +864,36 @@ For the merge: new files `port/audio/t2audio_world.c`, `port/audio/t2audio_lib.c
 s2 also adds a flag in main.cpp), `port/audio/t2audio_mgr.c`, `port/audio/t2audio_sndp.c`
 (`alSndpSetPriority`), `include/structs/sound.h`, `include/structs/libaudio.h`, three src files.
 Drop OUT/decls.json (header changes). asm_diff 0 (see the commit).
+
+## Round 5, part t4: audio part 3 (sfx without gdb, music, speech)
+
+Details, crash table t4-1..6 and verification commands: [AUDIO.md](AUDIO.md) sections 9-11.
+
+`turok2 --game --draw --pak-blank --audio --wav boot.wav --frames 5400` runs the boot to the
+title screen (mode 7 at frame 4214, as without `--audio`) with sound: the first cinema from 26 s,
+music song 22 over the second cinema, song 16 (the title theme) from 70 s; WAV 90 s, peak
+20,820, rms 2,088, no clipping. Every note on of songs 22 and 16 matches the ROM sequence in
+time (0 us error), key and channel (`tools/port/audio_notes_check.py`, 510 and 251 notes); the
+ADPCM voice path is bit-exact against tools/assets/audio.py; speech streams decode with 0
+difference against audio.py (`t2audio_test --adec`) and play in game (`T2_TEST_SPEECH=311`:
+correlation 0.986 with the reference stream).
+
+| # | fix |
+|---|---|
+| t4-1 | `osVirtualToPhysical` names any host address (region handle table, `T2Port_PhysToVirtual`); `_decodeChunk` used K0_TO_PHYS (`& 0x1FFFFFFF`) for the ADPCM state: the sfx crash without gdb |
+| t4-2 | the compressed sequence player, cseq.c and the shared seqplayer.c helpers typed (port/audio/t2audio_csp.c, 31 functions, their game files out of the link) |
+| t4-3 | **`gWarmBoot = 1` in `T2Port_Boot`**: `CEngineApp__Construct` runs `GameSettings_SetDefaults` only then (on the N64: power-on). Every setting was 0 before (music/sfx volume, difficulty 0 instead of 0x10, HUD alpha, multiplayer rules) |
+| t4-4 | the resident wave data copy is the whole ROM (it was taken before `gAudioRomBase` was set: every wave decoded garbage) |
+| t4-5 | `A_ADPCM` writes the previous frame before the new ones, as the microcode does |
+| t4-6 | the audio start-up runs above 4 GB (`--high-memory`): heap/block/source pointers pointer-wide in `alHeapInit`, `alLoadNew`, `alResampleNew`, `alFxNew`, `alMainBusNew`, `alAuxBusNew` |
+| t4-7 | speech: port/audio/t2audio_adec.c (the adec decoder from audio.py, `alAdecPull`), `SpeechPlayer_Update` as func_002768D0 with a host wave table |
+
+For the merge: t4-3 changes the game state of every run, not only audio: the other parts' runs
+(t1's demo and new game, t3's cinemas) start from the default settings after it. Files others
+may touch: port/runtime/t2boot.c (one line and a comment), port/runtime/t2ultra.c
+(`osVirtualToPhysical`), port/runtime/t2port.h, port/app/game.cpp (the `T2_TEST_SPEECH` hook),
+port/app/CMakeLists.txt (two sources in t2audio), port/cmake/link.cmake (36 files added to the
+exclusion list, in two blocks before the scheduler's). src/ (asm_diff 0 against 98574f3c):
+func_0029FCF4.c, func_002912F0.c, func_00295304.c, func_0029546C.c, func_00294E70.c,
+func_002953B4.c, func_00295410.c. `--high-memory` on Linux still stops in `CHeap__Free` from
+the decompressor, with or without `--audio` (not audio).
