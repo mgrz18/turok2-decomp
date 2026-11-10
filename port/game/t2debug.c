@@ -69,6 +69,15 @@ void T2Port_LogState(int frame) {
             printf(" region NULL");
         }
         printf(" lives %d", (int) p->m_Data.m_Lives);
+        /* weapons (round 6): the requested weapon, the wheel (state, count, cursor), the pressed
+         * bits of this frame */
+        printf(" reqw %d wheel %d/%d/%d single %x", (int) p->m_RequestedWeapon, (int) p->m_Barrel.m_State,
+               (int) p->m_Barrel.m_nCount, (int) p->m_Barrel.m_nCursor, (unsigned) p->m_ContState.m_dwButtonsSingle);
+        /* the weapon actor: its AI mode, animation repeats, animation index and frame */
+        printf(" wact %d/%d anim %d %.1f", (int) p->m_WeaponActor.m_AI.m_Mode,
+               (int) p->m_WeaponActor.m_AI.m_AnimRepeatedCount,
+               (int) p->m_WeaponActor.m_CurrentAnimation.m_nAnimIndex,
+               p->m_WeaponActor.m_CurrentAnimation.m_AnimationFrame);
         printf(" pmode %d buttons %x move (%.2f %.2f) look (%.2f %.2f) contp %p", (int) p->m_Mode,
                (unsigned) p->m_ContState.m_dwButtons, p->m_ContState.m_MoveX, p->m_ContState.m_MoveY,
                p->m_ContState.m_LookX, p->m_ContState.m_LookY, (void *) p->m_ContState.m_pContState);
