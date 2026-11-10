@@ -2,6 +2,7 @@
 #include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/camera.h"
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "globals/player.h"
@@ -48,7 +49,11 @@ void PlayerSwim_Update(CPlayer *player, CGameObjectInstance *body) {
             if (player->m_bOxygenOut) {
                 Sound__Play(0x3AC3, player->m_CharacterActor.header.m_vPos, &player->m_CharacterActor.header.m_vPos, -1);
             } else if (52.5f < player->m_Oxygen) {
+#ifdef TARGET_PORT /* the Ui view reads N64 offset 0x114 = CCamera.m_vPos: by member */
+                Sound__Play(0x3AC2, player->m_pCamera->m_vPos, &player->m_pCamera->m_vPos, -1);
+#else
                 Sound__Play(0x3AC2, ((Ui *)player->m_pCamera)->pos, &((Ui *)player->m_pCamera)->pos, -1);
+#endif
             }
         }
         if (body->m_AI.m_dwFlags & 0xC0000) {
