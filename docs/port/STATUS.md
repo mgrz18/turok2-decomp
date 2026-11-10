@@ -186,6 +186,33 @@ clock), `Action_CheckRequiredItem` (func_00265F90, the camera pool), func_002716
 7. **ABI**: abicheck's 185 `ptr_from_int` sites (the macOS truncations), 6 missing_args, 2
    void_used; function-pointer calls (184 sites, the handler tables) are not checked yet.
 
+## Round 6, part u2: animated actors (branch names-R6_u2)
+
+[RENDER.md](RENDER.md) section 5. The actor draw and animation chain (`CGameObjectInstance__Draw`
+-> `BuildBoneMatrices` -> `PoseBone` -> `CAnimationState__*`, `AdvanceAnimation`,
+`CScene__AdvanceInstances`, `CAI__UpdateModeAnim`, the shadow and draw callbacks) runs on host
+types. Linux, headless, this branch alone:
+
+- mode 4 (frame 1362-1846): **the Acclaim logo renders** and animates (letters flip in, settle
+  into "Acclaim entertainment, inc."); bone matrices = `tools/assets/anim.py` pose (2 units of
+  s15.16).
+- the Iguana cinema as before; the title; demo 1 runs to its end and the boot loops (8,800
+  frames, no crash).
+- new game (`--input START@4400,A@4500,A@4700,A@4800`): the mode-11/12 cinemas draw their
+  characters (Adon, Turok, enemies, the caged prisoner) and the run reaches level 51 (frame
+  12899) and runs to 14,500 without a crash (before: a stack overrun in `CScene__GetLightsAt`
+  crashed the cinemas once actors drew).
+- with u1's branch merged in a scratch branch (not committed): level 51 draws the level **and the
+  Talon in Turok's hand** (frames 13001-13601).
+
+Merge notes: `include/structs/model.h` (`CDrawArgs.m_hModel` sptr), new
+`include/structs/pose_host.h` and `port/game/t2actors.c`. Files others may touch:
+func_0021A150 (u3 has the same m_nAnims fix uncommitted: take one), func_00243170
+(`CAI__UpdateModeAnim`: changes enemy animation timing), func_00218B10 (`GetRootMotion` flags),
+func_00252ADC/func_00254B04 (player pool), func_00214F14 (t3's static lit vertices: prototype
+pointer-wide). Anim events/hot points are **off** (`T2_ANIM_EVENTS=1` to enable) until
+`CParticleSystem__Spawn` (func_0022D2FC) is ported.
+
 ## Round 5, part t2: the ABI checker and sweep
 
 [ABI.md](ABI.md). `tools/port/abicheck.py --build OUT/build -j 4` parses the 3,099 linked C files
