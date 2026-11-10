@@ -34,7 +34,11 @@ s32 Pak_TextHasInvalidChar();
 void PakMenu_UpdateNoteRows();
 void Str_Copy();
 void CCache__Flush();
+#ifdef TARGET_PORT
+void CCache__Deallocate(sptr, sptr); /* prototyped: the 0 reaches the sptr as a full word (the handle is an sptr) */
+#else
 void CCache__Deallocate();
+#endif
 K7Mem *CCache__Allocate();
 void *memset();
 /* Game code / company code check on the controller-pak note (inlined). */
