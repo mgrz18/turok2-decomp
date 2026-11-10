@@ -6,7 +6,7 @@
 extern s32 CGameObjectInstance__SetAnim(void *arg0, sptr arg1, s32 arg2);
 extern sptr CGameObjectInstance__PickRandomAnim(void *, sptr, sptr);
 s32 CGameObjectInstance__SetAnimByAction(void *a, s32 c, s32 flag) {
-    s32 temp_v0 = CGameObjectInstance__PickRandomAnim(a, c, -1);
+    sptr temp_v0 = CGameObjectInstance__PickRandomAnim(a, c, -1);
     if (temp_v0 != -1) {
         return CGameObjectInstance__SetAnim(a, temp_v0, flag);
     }

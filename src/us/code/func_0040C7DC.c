@@ -8,7 +8,7 @@
 #include "protos/player.h"
 
 
-s32 CPlayer__Warp(s32, s32, s32, s32);
+s32 CPlayer__Warp(sptr, s32, s32, s32);
 
 
 void MotherBoss_OnDefeatCinemaDone(void) {

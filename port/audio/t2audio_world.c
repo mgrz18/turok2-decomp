@@ -101,7 +101,7 @@ void SndVoice_UpdatePitch(SndVoice *v);
 void SndSeq_FadeOut(SndSeq *s);
 void SndSeq_UpdateFade(SndSeq *s);
 f32 Sound_DistanceFalloff(CVector3 *a, CVector3 *b);
-s32 Sound__Play(s16 id, CVector3 pos, sptr follow, s32 owner);
+s32 Sound__Play(s16 id, CVector3 pos, sptr follow, sptr owner);
 void Sound__Stop(s32 handle);
 s32 Sound__IsPlaying(s32 handle);
 

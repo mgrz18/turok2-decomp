@@ -10,8 +10,16 @@ u32 Bits_Read(u32 *stream, u32 width) {
     u32 value;
     u32 next;
     bitAddress = *stream;
+#ifdef TARGET_PORT
+    /* a bit offset from the stream's base (BitAddr_FromPointer, func_00217B04.c) */
+    {
+        extern unsigned long gT2BitStreamBase;
+        word = (u32 *) (gT2BitStreamBase + ((bitAddress >> 3) & ~3u));
+    }
+#else
     word = (u32 *) ((bitAddress & 0xF0000000) |
                     ((bitAddress & 0x0FFFFFE0) >> 3));
+#endif
     shift = bitAddress & 0x1F;
     value = word[0];
     next = word[1];

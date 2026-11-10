@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-extern s32 EnemyAnim_Idle_AF6F0(void *, s32, void *);
+extern s32 EnemyAnim_Idle_AF6F0(void *, sptr, void *);
 
 s32 EnemyAnim_WaitForTrigger(CGameObjectInstance *arg0, sptr arg1) {
     u16 kind;

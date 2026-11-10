@@ -4,7 +4,7 @@
 
 /* Only the field read here: a timer far into this (large) state. */
 
-extern s32 CEngineApp__SetupFadeTo(s32, s32);
+extern s32 CEngineApp__SetupFadeTo(sptr, s32);
 
 void EngineMode08_MainMenu_Retrace(CEngineApp *arg0) {
     if (gMergedController.buttons != 0) {

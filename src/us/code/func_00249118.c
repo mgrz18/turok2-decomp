@@ -8,7 +8,7 @@
 
 
 
-void CPlayer__Dismount(CPlayer *player, s32 arg1);
+void CPlayer__Dismount(CPlayer *player, sptr arg1);
 void CPlayer__StopLoopingSounds(CPlayer *player);
 void GameObject_DropPickupAt(CPlayer *player, CVector3 pos, s32 id, f32 arg);
 void Sound__Play2D(s32 sound);

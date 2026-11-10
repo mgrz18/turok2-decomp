@@ -7,7 +7,7 @@ typedef struct EventParams {
     s32 unk4;
 } EventParams;
 
-extern void MantidQueen_SpawnMinion(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, EventParams params);
+extern void MantidQueen_SpawnMinion(s32 arg0, sptr arg1, s32 arg2, CVector3 pos, EventParams params);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define Primagen_HandleAnimEvent Primagen_HandleAnimEvent_ev
 #endif

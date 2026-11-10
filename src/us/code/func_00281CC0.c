@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-u32 CShakeAxis__Advance(s32);                             /* extern */
+u32 CShakeAxis__Advance(sptr);                             /* extern */
 
 s32 CShake__Advance(s32 arg0) {
     s32 var_v1;

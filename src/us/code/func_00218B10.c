@@ -13,6 +13,9 @@
  * CAnimationState__GetRootMotion and CAnimationState__FindKeys are Rage Wars imports. */
 #include "common.h"
 #include "structs/vector.h"
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#endif
 #include "globals/engine.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
@@ -81,7 +84,14 @@ __inline__ s32 CAnimationState__Load(AnimPlayer *player, sptr file, s32 base, s3
         return 0;
     }
     tree = CAnimationState__GetData(player);
+#ifdef TARGET_PORT
+    /* block 0 is a CUSet (s32 element size, s32 count: the frames); the u16 view reads the
+     * count's low half at +6, which on a little-endian host (the archive swaps the words)
+     * is at +4 */
+    player->frames = ((s32 *) CISet__GetBlock(tree, 0))[1];
+#else
     player->frames = ((AnimHeader *) CISet__GetBlock(tree, 0))->frames;
+#endif
     player->current = index;
     player->keys = ((AnimHeader *) CISet__GetBlock(CISet__GetBlock(tree, 3), 0))->field2;
     return 1;
@@ -138,10 +148,21 @@ typedef struct RootClip {
     /* 0x8 */ f32 rate;
 } RootClip;
 
+#ifdef TARGET_PORT
+typedef struct RootActor {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_RootActor(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_flags[T2_HOFF_RootActor(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
+    };
+} RootActor;
+#else
 typedef struct RootActor {
     /* 0x00 */ u8 pad0[0xD4];
     /* 0xD4 */ u32 flags;
 } RootActor;
+#endif
 
 
 void CGameObjectInstance__FireAnimEvents(RootActor *actor, AnimPlayer *anim, f32 from, f32 to);

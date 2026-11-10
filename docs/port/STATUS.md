@@ -1,4 +1,318 @@
-# Port status after Phase 7 round 5 (merged state)
+# Port status after Phase 7 round 6 (merged state)
+
+Round 6 merged five branches, in this order: u1 (gameplay draws the level: the cache hash
+bucket stride, the camera visibility bits, the HUD), u5 (ABI and pointer width: indirect calls,
+`--high-memory`), u4 (macOS parity and `--offscreen-gl`), u2 (animated actors) and u3 (stick
+input, turning, the water, the weapon wheel). Then it fixed what only the merged tree reaches.
+This page says how to build and run the result, how far it gets, and what comes next. The part
+sections below keep each branch's own notes (detail pages: [RENDER.md](RENDER.md) sections 4-5,
+[ABI.md](ABI.md) section 5, [64BIT.md](64BIT.md) part 4, [MACOS.md](MACOS.md) section 8,
+[GAMEPLAY.md](GAMEPLAY.md) section 5, [INPUT.md](INPUT.md) section 6); round 5 and earlier
+follow as history.
+
+The matching build is unchanged: `tools/asm_diff.py --base 6d04fabb -j 8` reports 0 differences
+over all 3,938 files after every merge and fix, and a clean `make clean && make setup && make
+build && make verify` gives the identical ROM (CRCs good, 123 shared .rodata objects agree).
+
+## 1. Build and run
+
+```sh
+# 0. the matching build first: gendata and asm_diff read its ELF; keep a copy as build/ref.elf
+#    (the asm_diff/gendata tools expect it, and `make clean` deletes it)
+make setup && make -j8 build && make verify && cp build/turok2.us.elf build/ref.elf
+
+# 1. the archive, format 2.0. REBUILD IT this round: include/structs/region.h types the warp
+#    ids (CRegionInfo 0x48/0x4C as u16), so the swap plans changed.
+python tools/assets/mkarchive.py baserom.us.z64 -o OUT/turok2.o2r -j 4     # ~12 s
+python tools/assets/archive_check.py OUT/turok2.o2r baserom.us.z64          # OK, format 2.0
+
+# 2. configure; the game library AND the runtime/audio libraries (gendata reads all three)
+cmake -S port -B OUT/build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_BUILD_TYPE=Debug
+ninja -C OUT/build -j8 turok2_game t2runtime t2audio
+
+# 3. the game data as C into port/gen/ (gitignored). Drop the cache after ANY header change
+#    (this round: structs/model.h, structs/pose_host.h, structs/region.h).
+rm -f OUT/decls.json
+python3 tools/port/gendata.py --build OUT/build --cache OUT/decls.json -j 4      # ~1 min
+
+# 4. re-run cmake so data.cmake sees port/gen/*.c, then the executable
+cmake OUT/build && ninja -C OUT/build -j8 turok2
+
+# 5. run headless (Linux: SDL's offscreen driver, no window). --pak-blank: a blank formatted
+#    Controller Pak in memory (--pak-dir DIR: turok2_pak<N>.mpk files; --no-pak: none).
+cd OUT && SDL_VIDEODRIVER=offscreen T2_SHOT=shot.ppm T2_SHOT_EVERY=300 \
+    build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
+    --game --draw --pak-blank --frames 26000
+```
+
+Options (`turok2 --game`):
+
+- `--input` (INPUT.md section 6): `BUTTON@F` (4 frames), `BUTTON@F1..F2` (held), `SX=V@F1..F2` /
+  `SY=V@...` (stick, -128..127), `@FILE` (a script, `#` comments). Buttons: A B Z START DU DD DL
+  DR L R CU CD CL CR. Controls: the stick turns/looks, C-up/C-down move, C-left/C-right strafe,
+  R jumps, Z fires, A/B hold the weapon wheel (the stick picks the slot), L the map.
+- **The scripted journey** (a new game to level 51 and through the harbour), as a file:
+
+  ```
+  START@4400 A@4500 A@4700 A@4800     # title -> main menu -> single player -> new game -> OK
+  CU@13000..13440                     # level 51: down the ramp, into the harbour water
+  SX=80@13450..13474                  # turn right about 90 degrees
+  CU@13480..14000                     # swim across the basin to the far wall
+  A@14050..14090 SX=80@14060..14090   # weapon wheel open, stick right: weapon 2 requested
+  Z@14150..14250                      # fire
+  SX=-80@14300..14324                 # turn back left
+  CU@14330..14800
+  ```
+
+  `T2_STATE_LOG=60 build/app/turok2 ... --game --draw --pak-blank --input @journey.txt --frames 15000`
+- `--audio` / `--wav out.wav`: sound (sfx, music, speech).
+- `--high-memory` (Linux): no 32-bit arena, no low stacks: host pointers above 4 GB, the
+  closest thing to macOS on the box.
+- `--offscreen-gl` (**macOS**): Fast3D's OpenGL renderer on a CGL context with no drawable and
+  no window; `T2_SHOT` reads the game framebuffer (MACOS.md section 8). `--no-window` (any
+  host): a virtual pad on port 1, no pixels.
+- Logs: `T2_STATE_LOG=60` (mode, level, the player: position, rotation, state, region, floor,
+  the requested weapon, the wheel, the weapon actor's AI and animation), `T2_SCENE_LOG` (the
+  camera view box, the visible box, the loaded grid sections), `T2_MENU_LOG=1`,
+  `T2_DLDUMP_AT=<frame>` (+ `T2_DLDUMP_VTX=1`, `T2_DLDUMP_MAX`), `T2_V2P_TRAP=1` (trap truncated
+  addresses), `T2_ANIM_EVENTS=1` (animation events on: crashes, section 4). Debug:
+  `--skip-pak-check`, `--start-mode N`, `gdb -batch -ex run -ex bt --args ...`.
+
+gendata on this tree: 1,537 data symbols (1,531 typed from a C declaration), 93 pointer targets
+typed as tables, 386 zero .bss symbols, 4,041 pointer slots (2,932 relocated, 1,077 null, 32
+unresolved). The archive: 26,124 units, sha1 `47e8f73c2bb7304f7f6c3e0ac34ad478f1bdf15f`;
+`turok2` without `--game` reports fnv1a64 `c7909f8a7049feac` on all 3 backends.
+
+## 2. How far it gets (Linux, headless; macOS per u4)
+
+The boot loop, `--game --draw --pak-blank --frames 26000` (158 s, no crash):
+
+```
+frame 2:     mode 0    pak check;   frame 298: mode 1, the legal screen
+frame 1070:  mode 3    "EXPANSION PAK FOUND!", the 3D pak
+frame 1362:  mode 4    cinema 100: THE ACCLAIM LOGO RENDERS AND ANIMATES (an animated actor)
+frame 1850:  mode 5    cinema 90: the Iguana jungle
+frame 4212:  mode 7    TITLE SCREEN
+frame 5467:  mode 13   attract demo 1 (level 81): the level, the Talon in Turok's hand, the HUD
+frame 8800:  the boot again; 13680 attract demo 2 (level 131); 20946 attract demo 3 (level 109)
+frame 25778: the title again; frame 26000
+```
+
+The new game with the scripted journey (`T2_STATE_LOG=60`, 15,000 frames, no crash):
+
+```
+frame 4455:  mode 8    main menu;  4555 mode 13, the single-player menu
+frame 4855:  mode 11   new-game cinemas: Adon and Turok, the Port of Adia, soldiers, enemies
+frame 8973:  mode 12   the next cinemas (levels 47, 45, 46, 48, 49), the warp portal
+frame 12895: mode 13   LEVEL 51 GAMEPLAY: the Port of Adia harbour draws with the HUD
+                       (health 100) and the Talon in Turok's hand
+13080 (-1540.7 -735.8  -982.4) state 3, walking down the ramp (C-up)
+13200 (-1530.8 -789.8  -485.4) state 9, in the harbour water
+13440 (-1164.7 -780.7   -29.0) turn right (SX=80): rotY -3.14 -> -1.55
+13800 (  358.3 -780.7   -60.3) swum across the basin to the far wall
+14100 the weapon wheel opens (A), its 3D weapon models draw; the stick picks weapon 2
+      (requested 2; the switch waits, the Talon stays: section 4); Z: no crash
+14400 (  623.2 -780.7   198.3) turned back left (rotY -2.28), swimming on to (795.2, 233.0)
+```
+
+The path differs from u3's branch only where u1's loaded grid sections add collision (the ramp
+now takes him into the water at x -1530 instead of -1157).
+
+- `--audio --wav` through the boot (6,000 frames): 100.1 s, peak 21,621, RMS 1,998.6 (round 5:
+  21,304 / 1,996).
+- **Linux `--high-memory`**: the 26,000-frame boot loop (all three demos, the same mode switches
+  at the same frames as low memory) and the new game to level 51 (15,000 frames), no crash, after
+  one fix (C21-1 below).
+- macOS (u4, on its branch before the merge): the boot to 26,000 frames, the new game into level
+  51 and `--audio` identical to Linux; `--offscreen-gl` screenshots match Linux (29/29 new-game
+  frames). The merged tree was not rerun on the Mac this round.
+
+Screenshots (640x480, `T2_SHOT_EVERY`, checked by eye; not committed): frame 1801 the Acclaim
+logo (the letters in place, the rainbow swoosh); 2403 the IGUANA letters in the jungle; 4500 the
+title; 6500 demo 1 (a blue-grey corridor with a door, the Talon in hand, the weapon models,
+health 100); 21200 demo 3 (green brick walls, the Talon); 8800 a new-game cinema with Adon and
+Turok standing on a blue backdrop; 10302 soldiers fighting in a stone hall; level 51: 13001 the
+harbour from the ramp in fog (towers, a moored boat, the Talon and the HUD), 13451 the boat's
+hull and mast at the dock, 13601 the brick arches across the basin, 14101 the open weapon wheel
+with the weapons in 3D.
+
+The port tests pass: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (26,124 units, 0
+mismatches; ROM backend + the archive's plans identical), `t2asset_typed_test` (1,585 checks x3,
+0 errors), `gbi_test` (0 mismatches), `t2os_test` (trace hash `2b2775877e0d226b`, the same on 3
+runs), `t2audio_test --direct 0` (19 frames, peak 32,433), `t2audio_test --adec 0xC29AB4 7464`
+(27,136 samples), the swoosh self test (OK, 0 failed).
+
+ABI (`tools/port/abicheck.py --build OUT/build -j 4`: 3,073 TUs, 10,824 direct calls checked,
+186 function-pointer calls): harmful direct sites **11** (ptr_from_int 4, void_used 2,
+missing_args 5; u5's branch: 12), indirect 4 (stores, declaration-only); struct_class,
+struct_scalar, float_int 0. `ptrdecls.py`: 0 left in `src/` after this round's Throwable_Step
+fix (it still lists the strlen returns and the stale, uncompiled `include/functions.h`);
+`ptrargs.py` on a clean game-library build log: 0.
+
+## 3. Merge resolutions and fixes (round 6)
+
+| where | branches | resolution |
+|---|---|---|
+| func_00279158, func_0027A2C4, func_0027A4DC (`G_SETTIMG` image words) | u5, u4 | the same fix (`(GBI_ADDR(p))` without the truncating cast); u5's text kept |
+| func_00213A70 (`Lighting_BuildLitVertices`) | u5, u4 | u5's `sptr model` (one signature on both targets) |
+| func_00214F14, func_00220208 (lit-vertex callbacks) | u5, u4, u2 | u4's host bodies: the model from `CCacheEntry.memEntry->data`, the box and matrices by member (u5's and u2's `*(sptr *) *arg1` read the same pointer); the N64 path unchanged |
+| func_00227184 (`Sort_Insertion`) | u5, u4 | u5's `t2_uptr` retype of the matched body |
+| func_00252ADC, func_00254B04 (camera word 0x54C) | u2, u3 | the same fix (`m_Menus.count` by member): u2's text |
+| func_0021ABC8 (`FireAnimEvents`) | u2, u3 | u2's version, a superset of u3's (the ObjectLinks view, the pointer-wide `CISet__GetBlock`, the events gate) |
+| func_0021A150 (`m_nAnims`) | u2 | u2's committed fix (u3's was uncommitted) |
+| port/app/main.cpp (usage) | u4, u3 | both lines |
+| STATUS.md, RENDER.md | all | every part section kept |
+
+Fixed on the merged tree (asm_diff 0):
+
+| # | symptom | cause | fix |
+|---|---|---|---|
+| C21-1 | `--high-memory` crashed at frame 1362 (the Acclaim cinema) in `CISet__GetBlock` from `CAnimationState__Load` | `CAnimationState__GetData` (func_0021793C) read the cache entry's first word, a host pointer, as `s32` (reached only once u2's actors animate) | `*(sptr *)` |
+| C21-2 | ptrdecls.py: `Throwable_Step` declared `(s32, sptr)` in func_00264C94 | u5 retyped the step callbacks after its last ptrdecls run | `(sptr, sptr)` |
+| C21-3 | warp ids between levels would read byte-reversed | `CRegionInfo` 0x48/0x4C were `u8 unk_48[8]` (copied as bytes) but `CPlayer__Update` reads u16 there | `u16 m_WarpID` (0x48), `u16 m_PendingWarpID` (0x4C), bytes 0x4A/0x4E unchanged; the archive rebuilt; the level-51 journey is unchanged |
+
+Demo 1's darkness (u1) is gone on the merged tree: with u2's actors, lights and shadows its
+frames show the corridor, the door and the weapon models at normal brightness.
+
+## 4. Next
+
+1. **`CParticleSystem__Spawn`** (func_0022D2FC.c, 1,752 lines of local N64-layout views):
+   firing, impacts, footsteps, blood and the animation events all end there. With
+   `T2_ANIM_EVENTS=1` the boot crashes at frame 1362 in `CISet__GetBlock(sys->resource, 1)`
+   (`FireAnimEvents` -> `ImpactEvent_Send` -> `Actor_SpawnParticle` -> `Spawn`): the
+   `EffectSystem` view (the resource at N64 0xEC64, which must be `sptr`), then the
+   Effect/Owner/Actor views and the particle table entries (`entry->params`). Port it on host
+   types (hostview.py for the views), then turn the events on by default.
+2. **The weapon switch**: the wheel requests weapon 2 but the switch waits for the weapon
+   actor's animation (events off, in the water); retest on land once (1) is in.
+3. **Bosses and the remaining actors**: `TotemDefense_InitFight` is all N64 offsets; the boss
+   draw paths are untested.
+4. **Warp ids**: typed this round (C21-3); test a real warp (a level exit) end to end.
+5. **ABI**: abicheck's 11 harmful direct sites (ptr_from_int 4, void_used 2, missing_args 5) and
+   4 indirect stores.
+6. **macOS**: rerun the merged tree on the Mac (u2's actors and u3's input were not on u4's
+   branch) with `--offscreen-gl` screenshots.
+7. The remaining N64 views on the player path (GAMEPLAY.md section 5):
+   `CPlayerPool__UpdateMatchClock`, `Action_CheckRequiredItem`, func_00271694.
+
+## Round 6, part u1: gameplay draws the level (branch names-R6_u1)
+
+[RENDER.md](RENDER.md) section 4. Level 51 now **draws in gameplay**: the Port of Adia start
+(the ramp, brick and panelled walls, the arch row, crates, sky, fog) from frame 12903 on, with the
+health HUD. Attract demos 2 and 3 draw their levels; demo 1 draws its geometry, very dark (maybe its
+real look). "NEW CHEAT ENABLED" no longer appears. Four causes:
+the gameplay camera's visibility mask read at an N64 offset of the host `CGameRegion` (0: every
+object culled), **the cache hash lookups' N64 bucket stride** (0x10 vs the host's 32-byte
+`HashEntry`: no asynchronous request ever hit, so gameplay never got lit vertices; cinemas load
+synchronously and got through), the preview-options field written at an N64 offset of `gScene`
+(the cheat message), and the `COverlay` constructors/script start on N64 views (no HUD). Boot
+26,000 frames (158 s) and the new game to frame 15,000 (82 s) run without a crash. The player
+still stops at (-1266.6, -779.5, 260.0) (u3).
+
+Merge notes: `src/us/code/func_00203CA0.c`, `func_002034F4.c`, `func_00205A2C.c`,
+`func_0027D160.c`, `func_0042C3BC.c`, `func_0027ACC4.c`, `func_0027AD00.c` (all `TARGET_PORT`
+blocks, asm_diff 0), `port/game/t2debug.c` (`T2_SCENE_LOG`). The archive and gendata are unchanged
+(no header edits).
+
+## Round 6, part u5: ABI and pointer width (branch names-R6_u5)
+
+- `tools/port/abicheck.py` checks **indirect calls** (function-pointer tables/fields, gendata
+  initializers included) and **asm-label aliases**; new `tools/port/abiptrfix.py` retypes the
+  declarations behind `ptr_from_int`. Harmful sites **193 -> 12** (ptr_from_int 185 -> 4, a
+  literal 0; void_used 2 and missing_args 6 left, ABI.md section 4); indirect 210 call + 4 store
+  -> 0 call + 4 store (declaration-only). ABI.md section 5.
+- Gameplay-relevant ABI fixes: the six AI step functions now pass (actor, ai) to the mode
+  callbacks (doors, turrets, destructibles, throwables, actions, interactive anims: MIPS
+  pass-through), `CAI__CallHurt` passes (actor, ai, damage) to the hurt handler, the
+  Destructible view writes its callbacks at host CAI offsets, impact handlers PlaySound /
+  func_00239350 read the sound id from the right register.
+- **Linux `--high-memory` runs**: the boot, both cinemas, the title, attract demo 1, demo 2's
+  start (14,000 frames) and a **new game to level 51 identical to low memory** (was: crash at
+  boot). 64BIT.md part 4 lists the six crash sites fixed on the way (texture image words
+  truncated by `(unsigned int)(GBI_ADDR(p))`, the menu file's `s32` asm aliases, the lit-vertex
+  model pointer, `GameObject_GetRegionInfo`, `Sort_Insertion`). audit64: pointer-width warnings
+  1,580 -> 1,465, disagreeing declarations 158 -> 93 functions.
+- Low memory unchanged: 26,000-frame boot loop with 3 attract demos, new game to level 51
+  (player stops at the water at (-1266.6, -779.5, 260.0) as before). asm_diff 0 over every
+  touched file (152 src files).
+- Merge notes: many one-line declaration retypes (s32 -> sptr) spread over ~150 src files; a
+  conflict with another part is a declaration line: keep both changes. func_002034F4/00205A2C
+  (osSendMesg declaration) also carry u1's hash-stride fix on other lines.
+
+## Round 6, part u4: macOS runs the merged tree, with sound and pixels (branch names-R6_u4)
+
+Details in [MACOS.md](MACOS.md) section 8. On the Mac (arm64, full 64-bit pointers, headless, no
+window of any kind):
+- **The boot to frame 26,000** (cinemas, title, all three attract demos, the loop) and **the new game
+  into level 51** run with every mode switch at the same frame as Linux and the same player states.
+- **`--audio --wav`**: peak 21,304, RMS 1,996.4 over 6,000 frames, the same as Linux.
+- **Pixels without a window**: `--offscreen-gl` (port/app/offscreen_gl.cpp) runs LUS's OpenGL
+  renderer on a CGL context with no drawable, and T2_SHOT reads the game framebuffer. Mac against
+  Linux screenshots: all 29 new-game frames match (at most 0.37% of the pixels off), and 15 of 17
+  boot frames match.
+- dlcheck (game.cpp): display lists with truncated host addresses are reported and not drawn. None
+  is left on the boot or new-game path.
+- Fixes, all asm_diff 0 against 6d04fabb: lit-vertex callbacks, GameObject_GetRegionInfo,
+  Sort_Insertion, three audio truncations (ALLowPass, the A_SAVEBUFF output handle, the ALDMAproc),
+  the font/glyph G_SETTIMG images, and **Cinema_DrawFade's camera viewport at the N64 offset**.
+  The last one is a bug on all hosts: the cinema fades now draw on Linux too.
+- `-ffp-contract=off` for the game (game.cmake).
+- **Lead for u1**: in attract demo 2 the Mac draws the level's static objects and Linux draws none.
+  On Linux the camera's `m_ViewParams.m_VisBits` is 0 (CCamera__UpdateVisBits), so
+  CScene__DrawGeometry rejects every CStaticObject.
+
+Files others may touch: port/app/game.cpp (WriteShot, the draw call, dlcheck, T2_DLDUMP_MAX),
+port/app/main.cpp (`--offscreen-gl`), port/app/CMakeLists.txt, port/cmake/game.cmake,
+port/audio/t2audio_mgr.c, port/runtime/t2ultra.c (T2_V2P_TRAP), and src func_00213A70,
+func_00214F14, func_00220208, func_00268A2C, func_00227184, func_00295304, func_002971BC,
+func_00278188, func_0027836C, func_0027854C, func_0027B0FC, func_00279158, func_0027A2C4,
+func_0027A4DC, func_0040F240, func_00448240.
+
+## Round 6, part u2: animated actors (branch names-R6_u2)
+
+[RENDER.md](RENDER.md) section 5. The actor draw and animation chain (`CGameObjectInstance__Draw`
+-> `BuildBoneMatrices` -> `PoseBone` -> `CAnimationState__*`, `AdvanceAnimation`,
+`CScene__AdvanceInstances`, `CAI__UpdateModeAnim`, the shadow and draw callbacks) runs on host
+types. Linux, headless, this branch alone:
+
+- mode 4 (frame 1362-1846): **the Acclaim logo renders** and animates (letters flip in, settle
+  into "Acclaim entertainment, inc."); bone matrices = `tools/assets/anim.py` pose (2 units of
+  s15.16).
+- the Iguana cinema as before; the title; demo 1 runs to its end and the boot loops (8,800
+  frames, no crash).
+- new game (`--input START@4400,A@4500,A@4700,A@4800`): the mode-11/12 cinemas draw their
+  characters (Adon, Turok, enemies, the caged prisoner) and the run reaches level 51 (frame
+  12899) and runs to 14,500 without a crash (before: a stack overrun in `CScene__GetLightsAt`
+  crashed the cinemas once actors drew).
+- with u1's branch merged in a scratch branch (not committed): level 51 draws the level **and the
+  Talon in Turok's hand** (frames 13001-13601).
+
+Merge notes: `include/structs/model.h` (`CDrawArgs.m_hModel` sptr), new
+`include/structs/pose_host.h` and `port/game/t2actors.c`. Files others may touch:
+func_0021A150 (u3 has the same m_nAnims fix uncommitted: take one), func_00243170
+(`CAI__UpdateModeAnim`: changes enemy animation timing), func_00218B10 (`GetRootMotion` flags),
+func_00252ADC/func_00254B04 (player pool), func_00214F14 (t3's static lit vertices: prototype
+pointer-wide). Anim events/hot points are **off** (`T2_ANIM_EVENTS=1` to enable) until
+`CParticleSystem__Spawn` (func_0022D2FC) is ported.
+
+## Round 6, part u3: player input, the water, the weapon wheel (branch names-R6_u3)
+
+Details and the fix table u3-1..5: [GAMEPLAY.md](GAMEPLAY.md) section 5, [INPUT.md](INPUT.md)
+section 6. `--input` now takes held ranges (`CU@13000..13440`), the stick (`SX=80@13450..13474`,
+`SY=...`) and `@FILE` scripts. The player turns (the region-info word bug, u3-1), the water was
+a corner, not a merge regression: steered, he swims across the level-51 basin to x 358. The
+weapon wheel opens with A/B and the stick picks the weapon (u3-2); the weapon actor's AI runs
+(u3-3); switching and firing wait for animations: `m_nAnims` is read as the wrong half of a
+swapped word (fix known, not committed: it exposes a crash in `CParticleSystem__Spawn`'s N64
+views at frame 1362; GAMEPLAY.md section 5). Files the merge may meet: `port/app/game.cpp`,
+`port/app/main.cpp` (usage line), `port/game/t2debug.c` (state log: weapon/wheel fields; u1
+also edits it: auto-merged in my scratch test), func_0024EF70, func_0024BAD4, func_00252ADC,
+func_00254B04, func_00250BF0, func_0021A658, func_0021ABC8 (not touched by u1 or u2's
+branches as of their tips; u2 changes func_0021A344/0021A500/0021A7EC/00218B10 nearby).
+Merged with u1's branch (scratch, not committed) the gameplay frames show the level.
+
+# Round 5, merged state (history)
 
 Round 5 merged five branches, in this order: t2 (the ABI checker and the ABI sweep), t5 (macOS to
 the title: the virtual pad on `--no-window`, pointer-wide prototypes and parameters), t3 (the 3D
@@ -14,7 +328,7 @@ The matching build is unchanged. `tools/asm_diff.py --base 98574f3c -j 8` report
 over all 3,938 files after every merge and fix. A clean `make clean && make setup && make build &&
 make verify` gives the identical ROM (CRCs good, 123 shared .rodata objects agree).
 
-## 1. Build and run (Linux x86_64, the box)
+## Round 5: build and run (Linux x86_64, the box)
 
 ```sh
 # 0. the matching build first: gendata and asm_diff read its ELF; keep a copy as build/ref.elf
@@ -61,7 +375,7 @@ pointer targets typed as tables, 386 zero .bss symbols, 4,041 pointer slots (2,9
 `ae9b88e69adc541a2cd9accee142da0d3ea8207c` (the plans changed, so `turok2` without `--game` now
 reports fnv1a64 `ac3d498348be24c2` on all 3 backends).
 
-## 2. How far `turok2 --game` gets (Linux, headless)
+## Round 5: how far `turok2 --game` gets (Linux, headless)
 
 The boot, the cinemas, the title and **all three attract demos** run on their own, and the boot
 loops as on the console:
@@ -126,7 +440,7 @@ names; it is not compiled).
 
 macOS: t5 ran its own tree to the title; the merged tree was not rerun on the Mac this round.
 
-## 3. Merge conflicts and crash/fix table (round 5 merge)
+## Round 5: merge conflicts and crash/fix table (round 5 merge)
 
 Conflicts and how they were resolved (asm_diff 0 after each merge):
 
@@ -162,9 +476,9 @@ plus an N64 offset (`extern <LocalView> gEngineApp_m_Game_...`). Without a `TARG
 clock), `Action_CheckRequiredItem` (func_00265F90, the camera pool), func_00271694
 (`MenuMatchGlobals`), `EngineMode03_ExpansionPak_Draw` (func_00285CF0), func_00459374.
 
-## 4. Next
+## Round 5: next
 
-1. **Gameplay frames draw no level geometry**: the sky, the fog fill and the HUD text are there, the
+1. (done in round 6 u1, see its section) **Gameplay frames draw no level geometry**: the sky, the fog fill and the HUD text are there, the
    gameplay display list has no `G_VTX`/`G_MTX`, `CStaticObject__Draw` runs ~3 times a frame (the
    level-51 cinema, same level, draws everything). The player camera's draw setup (view/projection
    matrices, the viewer box `CScene__LoadVisibleGridSections` culls with) is the place to start;

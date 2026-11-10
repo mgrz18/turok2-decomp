@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-M2C_UNK CCache__Deallocate(M2C_UNK, sptr);                /* extern */
+M2C_UNK CCache__Deallocate(sptr, sptr);                /* extern */
 M2C_UNK CCache__Flush(M2C_UNK);                     /* extern */
 M2C_UNK Controller_SetRumbleOptionAll(M2C_UNK);                     /* extern */
 

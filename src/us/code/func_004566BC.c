@@ -13,7 +13,7 @@ void MenuItem_SelectSubmenu_2(void *menu, Menu *event, void *arg2);
 
 s32 NameEntryMenu_Confirm_2(void *menu, Menu *event, void *arg2) {
     u8 *player = event->player;
-    s32 i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, player);
+    sptr i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, player);
     u8 *src = (u8 *)gNameEntries[i].name;
     u8 *dst = gEngineApp_m_Game.m_Settings.slots[0].m_Name + i * 64;
     s32 count = 0;

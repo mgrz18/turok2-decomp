@@ -22,13 +22,13 @@ typedef void (*TrackDecoder)(u32 *, f32 *, s32);
 void Anim_DecodeCurveChannel(u32 *, f32 *, s32);
 void Anim_DecodeQuantizedChannel(u32 *, f32 *, s32);
 void Anim_DecodeRawChannel(u32 *, f32 *, s32);
-u32 BitAddr_FromPointer(s32);
+u32 BitAddr_FromPointer(sptr);
 u32 Bits_Read(u32 *, u32);
 void CQuaternion__Normalize(Quaternion *);
 
 s32 Anim_DecodeTracks(sptr source, TrackTable *table, s32 tracks, s32 channels, s32 radius, s32 encoding) {
     TrackDecoder decode;
-    u32 stream;
+    uptr stream;
     s32 index;
     s32 i;
     s32 j;

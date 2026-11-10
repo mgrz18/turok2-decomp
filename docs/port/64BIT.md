@@ -446,3 +446,33 @@ struct field, a by-hand prototype or an unnamed raw offset.
   (`M2C_FIELD`, byte-pointer casts, derefs, `P_xx(p, 0xNN)`): 378 sites in 135 files at
   474e40af, 345 in 118 after this part (the camera menu pool `+ 0x53C` in 21 files, CPlayer
   views, `CScene__LoadLevel`, two camera functions).
+
+## Part 4 (Phase 7 round 6, u5): Linux `--high-memory` past the boot
+
+`--high-memory` (Linux: no `MAP_32BIT` arena, no low stacks; the closest thing to macOS on the
+box) stopped in `CHeap__Free` at boot in round 5. After the ABI width sweep (ABI.md section 5:
+185 `ptr_from_int` sites retyped) and the fixes below it runs **14,000 frames: pak check, legal,
+expansion pak, both intro cinemas, the title, attract demo 1 to its end, the boot again and
+demo 2** (Linux, headless, gdb, no crash), and **a new game to level 51 exactly as in low memory** (`--input START@4400,A@4500,A@4700,A@4800,CU@13000..13600`: mode 13 level 51 at frame 12903, the player walks to (-1266.6, -779.5, 260.0); 15,000 frames, no crash).
+
+| crash (high memory) | cause | fix (asm_diff 0) |
+|---|---|---|
+| boot, `CHeap__Free` | caller declarations taking pointers as `s32` | abiptrfix.py (ABI.md section 5) |
+| frame 2, Fast3D `G_SETTIMG` 0xBE0BF670 | `_gbi->w1 = ((unsigned int)(GBI_ADDR(pTexture)))`: the outer cast truncates | `(GBI_ADDR(p))` (func_0027A4DC, 00279158, 0027A2C4); `s32 tex` in COnScreen__SelectNormalFont (retype.py) |
+| frame 2, `Menu_Update(menu=0xabfd2ab0)` | asm-label aliases in func_00413230.c declared `(s32, s32)` | sptr (Menu_Update, MenuPool_OpenSubmenu, Controller_MenuLeft/Right, Menu_Construct, CList__Remove, CCache__Deallocate); MenuItem_FormatBinding gets its a0 |
+| frame 1362, `CISet__GetBlockAndSize(t=0xffffffffbe0c42b0)` | `new_var = *(*arg1)`: the decompress callbacks read the block's first word, an 8-byte host pointer, as s32 | `*(sptr *)*arg1`, `Lighting_BuildLitVertices(sptr model, ..)` (func_00214F14, 00220208, 00213A70) |
+| frame 5469 (demo 1), `CScene__GetRegionInfo(arg1=0xffffffffbe0c7e38)` | `Link.targetId` s32 over `header.m_pCurrentRegion` | sptr (func_00268A2C) |
+| demo 1, `CBarrel__CompareIcons(0xbdffd5cc, ..)` | `Sort_Insertion(u32 lo, u32 hi, ..)` (a file with its own typedefs) | `t2_uptr` = uintptr_t on the host, u32 on the N64 |
+
+`tools/port/retype.py` rule C also takes a one-declarator initialization now
+(`s32 x = f();` where f returns a pointer or sptr): 19 more files.
+
+`tools/port/audit64.py` (6d04fabb -> now): pointer-width warnings 1,580 -> **1,465**,
+`-Wshorten-64-to-32` 367 -> 253, "other (locals, returns, casts)" 326 -> about 220; functions
+with a declaration that disagrees pointer vs 32-bit int **158 -> 93** (prototype census).
+retype.py's truncating count (pointer meets a 32-bit int): 543 -> 527.
+
+Known left on the high-memory path: `CGameObjectInstance__ConstructLitVertices` (func_00220208)
+still reads the actor at N64 offsets 0x98/0xBC (u2's actor work); `TotemDefense_InitFight` is
+all N64 offsets. Next: the rest of the attract demos and gameplay beyond the water under `--high-memory`; the
+macOS run (u4) should now get past the same sites.

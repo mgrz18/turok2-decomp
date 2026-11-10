@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 WeightedTable_Add(s32, s32, s32);
+s32 WeightedTable_Add(sptr, s32, s32);
 s32 WeightedTable_Pick(sptr);
 
 s16 EnemyAnim_Combat_AFE88(sptr, sptr);                    /* extern */

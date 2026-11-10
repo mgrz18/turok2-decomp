@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 
-f32 CVector3__Distance(s32, void *);                 /* extern */
+f32 CVector3__Distance(sptr, void *);                 /* extern */
 
 f32 CPlayerPool__SumViewWeights(CPlayerPool *arg0, s32 arg1) {
     f32 var_f20;

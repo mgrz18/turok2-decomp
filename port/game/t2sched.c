@@ -38,7 +38,7 @@ extern u32 D_800F6CA8;
 extern void Video_UpdateResolution(void);
 extern void Music_FadeOut(void);
 extern void Sound__StopAllExcept(s32);
-extern void LoopSounds_StopAll(s32);
+extern void LoopSounds_StopAll(sptr);
 extern s32 LoopSounds_Get(void);
 extern void Controller_Service(void);
 extern void func_00228BBC(CFrameData *frame);

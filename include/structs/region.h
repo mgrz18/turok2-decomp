@@ -55,7 +55,10 @@ typedef struct CRegionInfo {
     /* 0x34 */ CVector3 m_vPos;
     /* 0x40 */ f32 unk_40;                           /* 665.6 in the data */
     /* 0x44 */ u32 m_dwFlags;
-    /* 0x48 */ u8 unk_48[0x8];
+    /* 0x48 */ u16 m_WarpID;                         /* entering the region warps here (CPlayer__Warp) */
+    /* 0x4A */ u8 unk_4A[0x2];
+    /* 0x4C */ u16 m_PendingWarpID;                  /* the scene's pending warp id (CPlayer__Update) */
+    /* 0x4E */ u8 unk_4E[0x2];
     /* 0x50 */ u16 m_DamageAmount;
     /* 0x52 */ u16 m_wFlags52;
     /* 0x54 */ u16 m_wFlags54;

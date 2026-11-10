@@ -2,7 +2,7 @@
 #include "m2c_macros.h"
 #include "protos/scene.h"
 
-s32 LevelEvent_Trigger(s32);
+s32 LevelEvent_Trigger(sptr);
 
 void CScene__FireEventsByKey(void *arg0, s32 arg1)
 {

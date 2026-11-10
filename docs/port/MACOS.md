@@ -337,3 +337,137 @@ display list is the same.
 - 1,218 port-build warnings remain (`-Wint-conversion` 895 mostly benign int-to-pointer of
   sptr values, `-Wshorten-64-to-32` 229 `sptr` -> `s32` assignments): the remaining s32
   locals/fields that hold pointers. Rerun `ptrdecls.py`/`ptrargs.py` after merges.
+
+## 8. Round 6 (part u4): the merged tree on the Mac, `--audio`, pixels without a window
+
+Branch `names-R6_u4` (from 6d04fabb). Every `src/` commit was checked with
+`tools/asm_diff.py --base 6d04fabb -j 8` on the box (scratch copy `/root/R6_u4mac/repo`;
+`OUT/r6/asmcheck.sh` sends `git diff 6d04fabb -- src include` over ssh, applies it and runs
+asm_diff on the changed files): **0 differences** at every commit. No `include/` changes.
+
+### Build and run on the Mac
+
+As in section 7, with the box's ELF at 6d04fabb and its round-5 archive
+(`scp decomp:/root/turok2_decomp/OUT/turok2.o2r OUT/turok2_6d0.o2r`). `OUT/rebuild.sh --fresh`
+(about 30 s). Every run is headless, and none creates a window:
+
+```sh
+cd OUT
+# the boot, the cinemas, the title, the three attract demos, the loop (no pixels)
+SDL_VIDEODRIVER=offscreen build/app/turok2 --archive turok2_6d0.o2r --rom ../baserom.us.z64 \
+    --game --no-window --draw --pak-blank --frames 26000
+# with PIXELS: Fast3D on a CGL context with no drawable (section 8.3); T2_SHOT works
+SDL_VIDEODRIVER=offscreen T2_SHOT=shot.ppm T2_SHOT_EVERY=500 build/app/turok2 --archive turok2_6d0.o2r \
+    --rom ../baserom.us.z64 --game --offscreen-gl --draw --pak-blank --frames 15000 \
+    --input START@4400,A@4500,A@4700,A@4800,CU@13000,CU@13004,...        # a new game
+# sound
+... --game --no-window --audio --wav out.wav --frames 6000
+```
+
+### 8.1 How far it runs (the same as Linux, frame for frame)
+
+`--no-window` and `--offscreen-gl` both: no crash to frame 26,000 (the boot, both intro cinemas,
+the title, **all three attract demos**, the loop back to the title at 25,786), with every mode
+switch at the same frame as Linux (2, 298, 1070, 1362, 1852, 4214, 5469, 8802, 9577, 10067, 12429,
+13684, 16073, 16845, 17335, 19697, 20952, 22160, 22934, 23424, 25786). The new game reaches level 51
+at frame 12,903 and the player walks into the water: `T2_STATE_LOG` gives the same positions and
+states as Linux ((-1111.0, -779.6, -603.6) state 9 at 13,200; stuck at (-1266.6, -779.5, 260.0) from
+13,500). `T2_STATE_LOG=30` through demo 2 (frames 5,400-15,100, 324 records) is identical on both
+hosts apart from the host addresses.
+
+`--audio --wav` (6,000 frames: boot, cinemas, title, into demo 1): 100.10 s, **peak 21,304,
+RMS 1,996.4**, the numbers the Linux run gives (STATUS.md section 2). The new game with `--audio`
+runs to frame 15,000 (250 s of sound, peak 21,304, RMS 2,221).
+
+### 8.2 Fix table (u4)
+
+| # | where | cause | fix |
+|---|---|---|---|
+| u4-1 | `CISet__GetBlockAndSize` from `Lighting_BuildLitVertices` from `CStaticObject__BuildLitVerticesCallback` (mode 4) | the callback read the decompressed block as `*(*arg1)` (s32) and both lit-vertex callbacks declared `Lighting_BuildLitVertices(s32, s32, s32, ...)`: the model block, the regions and the box truncated; `CGameObjectInstance__ConstructLitVertices` also read the box and the draw matrices at N64 0xBC/0x98 | host bodies: `((CCacheEntry *) arg1)->memEntry->data`, sptr prototype, `&o->m_vMin`, `o->m_pmtDrawMtxs`; the definition takes `s32 *model` |
+| u4-2 | `CScene__GetRegionInfo` from `GameObject_GetRegionInfo` from `CPlayer__Update` (demo 1) | the actor's region read through a `Link {pad[0x10]; s32}` view: the low half of the header's `m_pCurrentRegion` | host body on `CInstanceHeader` |
+| u4-3 | `CBarrel__CompareIcons` from `Sort_Insertion` (demo 1, the weapon wheel) | `Sort_Insertion(u32 lo, u32 hi, ...)`: element addresses truncated | host body with 64-bit addresses |
+| u4-4 | `--audio`: `cmd_polef` | `_filterBuffer` read `ALLowPass` at N64 offsets (`fstate` at 0x28 as s32, `first` at 0x2F) | host body on `ALLowPass` (`fstate` 0x28 pointer, `first` 0x30) |
+| u4-5 | `--audio`: `cmd_savebuff` to a truncated address | the port's `am_frame` passed the host output buffer to `alAudioFrame`, whose `alSavePull` puts `dramout` in A_SAVEBUFF's 32-bit w1. The N64 `__amHandleFrameMsg` passes `osVirtualToPhysical(buffer)` | `am_frame` passes `osVirtualToPhysical(out)` (t4's handle table resolves it) |
+| u4-6 | `--audio`: a call to 0x2D55D4 from `_decodeChunk` | `alLoadNew` stored the `ALDMANew` result through `typedef s32 (*FuncPtr)(void *)`: the DMA routine's address truncated | `void *(*)(void *)` |
+| u4-7 | `--offscreen-gl`: Fast3D reads 0x6987E4 (G_SETTIMG) | the font texture image in an `s32` (`COnScreen__SelectNormalFont`), `(u32) v0` (`COnScreen__SelectSmallFont`), `Hud_DrawGlyph16x8/16x16(s32 texture)`, and three `(unsigned int)(GBI_ADDR(p))` casts (func_00279158, func_0027A2C4, func_0027A4DC) | `sptr` / `GBI_ADDR` (identical on the N64) |
+| u4-8 | **(all hosts)** the cinema fades and flashes drew a garbage rectangle (Linux: zero height, so nothing; macOS: a black or orange block) | `Cinema_DrawFade(_2)` read the camera viewport through a `ScreenRectangle {pad[0x288]; ...}` view: N64 offset of `CCamera.m_Viewport` | the view's pad is `offsetof(CCamera, m_Viewport)` under TARGET_PORT. The new-game cinemas now fade from and to black and show the orange flash of cinema `L1handcam` (its fade keys: colour (0.9, 0.45, 0), alpha 1) |
+
+`T2_V2P_TRAP=1` (macOS, t2ultra.c): `osVirtualToPhysical` traps on an address that cannot be a
+host pointer there (below 4 GB, or sign-extended from 32 bits), so a truncated pointer on its way
+into an RSP command stops at its source. It found u4-5 by elimination (no trap: the address never
+went through `osVirtualToPhysical`).
+
+`-ffp-contract=off` for the game (game.cmake): arm64 clang fuses `a * b + c` by default and the
+R4300 has no fused multiply-add. It changed no observed result (the demo-2 difference in 8.4 is
+not float drift), but keeps the float results the same as the x86-64 build.
+
+### 8.3 Pixel screenshots without a window: `--offscreen-gl`
+
+SDL's offscreen driver has no GL or Metal on macOS, and a hidden Cocoa window is still a window.
+**Core OpenGL (CGL) can create a context with no drawable at all**: `CGLChoosePixelFormat`
+(3.2 core profile, accelerated) + `CGLCreateContext` + `CGLSetCurrentContext`. That makes no
+window, no NSApplication and no window-server surface; it gets "Apple M5, 4.1 Metal - 91.7".
+Every draw then has to go to framebuffer objects, which Fast3D does on macOS anyway:
+`Interpreter::ViewportMatchesRendererResolution()` is false there, so the game frame is rendered
+into the interpreter's game framebuffer (`mGameFb`), and only the GUI copies it to framebuffer 0.
+
+`port/app/offscreen_gl.cpp` builds that interpreter by hand, as `Fast3dWindow::OnInit` does, with
+LUS's own `GfxRenderingAPIOGL` on the CGL context and a `GfxWindowBackend` that has no window
+(a fixed 640x480, no events, `glFlush` as the swap). Per frame it runs `StartFrame`, `Run` and
+`EndFrame`, without the GUI. `T2_SHOT` reads `mGameFb` back (top-down, so no row flip). Nothing in
+LUS is patched. The few clears Fast3D sends to framebuffer 0 (no storage without a drawable) are
+GL errors that change nothing. The GfxDebugger and the interpreter are kept alive to the exit,
+because a Ship::Component's destructor terminates outside a component tree. On Linux the flag
+prints a message and does nothing. There, `SDL_VIDEODRIVER=offscreen` with a window already gives
+pixels through EGL.
+
+Metal was not used. LUS's Metal backend takes its device and drawable from an SDL renderer's
+`CAMetalLayer` (`SDL_GetRenderMetalLayer`), and that needs a window. A Metal device and an
+offscreen texture would need a new rendering API: about 2,000 lines of gfx_metal.cpp without the
+layer.
+
+**dlcheck.** Before each `--offscreen-gl` frame (and with `T2_DLCHECK=1` in a window), game.cpp
+walks the display list. A G_VTX/G_MTX/G_MOVEMEM/G_DL/G_SETTIMG/G_SETZIMG/G_SETCIMG/segment word
+must be segmented (bit 0, below 0x10000000), null, or at least 4 GB. Anything else is a truncated
+host pointer: it is reported once per site (`dlcheck: frame N: FD ... before: ...`) and the frame
+is not drawn, instead of Fast3D crashing on it. After u4-7, **no display list fails, in all
+26,000 boot frames and in the new game to frame 15,000.**
+
+### 8.4 Mac vs Linux, pixels and display lists
+
+The same branch was built on the box (`/root/R6_u4mac/out`, low memory, SDL offscreen window).
+Both hosts ran the new game (screenshots every 500 frames, 29 frames) and the boot (every 1,500
+frames, 17 frames):
+
+- **New game: all 29 screenshots match.** At most 0.37% of the pixels differ by more than 24/255
+  (GPU rounding: Apple's GL-on-Metal against Mesa). This covers the pak check, legal, the
+  expansion pak, both intro cinemas, the title, the menus, the new-game cinemas (Port of Adia,
+  the boat, the portal), and level 51 (sky and fog only, as on Linux, u1).
+- Display lists at frames 4500, 9502, 13501: same command count, identical `w0`, identical `w1`
+  apart from host addresses (one `D9` whose w1 is a host address on both hosts).
+- **Boot: 15 of 17 frames match.** Frame 22,501 (the legal screen fading in) is darker on the Mac,
+  which is fade timing. Frame 15,001 (attract demo 2, the weapon wheel) **differs in content**:
+  the Mac draws level geometry behind the wheel (49 batched models: 63 G_VTX, 54 G_MTX in the
+  display list), and Linux draws none (`sOpaqueSortFirst` is NULL at `Render_DrawBatches`, 4
+  G_VTX). The player state is identical on both (above), so the difference is in the
+  model-queueing path (`Render_QueueModelInstance` / `Render_QueueModelByKey` /
+  `func_0020B9F4` -> `Render_FlushModelBatch`). Something there depends on the host. Linux
+  low memory is the suspect, because the Mac's full-width pointers draw. This is the same symptom
+  as u1's "level 51 draws no geometry", so it is a lead for u1. Found with gdb on Linux at
+  `CScene__DrawGeometry` (func_002222E0.c:166): `vmask = v->m_ViewParams.m_VisBits` is **0**, so
+  `vmask & a->m_ViewMask` (0x4000008) rejects every static object. The intelligence flags,
+  the view box and the frustum all pass. `m_VisBits` comes from `CCamera__UpdateVisBits`
+  (func_00281E4C.c): it is either `gDefaultVisBits`, or the camera region's `m_VisBits` when the
+  camera is 5 to 11 units above that region's floor. So either the region record or
+  `m_pCurrentRegion` is wrong on Linux. This was sent to u1.
+
+Screenshots (not in the repo): `assets_preview/R6_u4_mac_boot_{3001,4500,7501}.png` (Iguana
+cinema, title, demo 1), `R6_u4_mac_ng_{9502,13501}.png` (Port of Adia cinema, level 51),
+`R6_u4_sbs*_*.png` (Mac | Linux side by side).
+
+### 8.5 Open on the Mac
+
+- The demo-2 difference above (draws on the Mac, not on Linux).
+- The level-51 gameplay frame: sky and fog only, the same as Linux (u1's item).
+- `--offscreen-gl` uses a fixed 640x480. The game frame size follows `gScreenWidth/Height`
+  through `SetNativeDimensions`, as in a window.

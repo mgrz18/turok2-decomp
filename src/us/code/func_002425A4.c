@@ -2,7 +2,7 @@
 #include "structs/vector.h"
 #include "structs/collision.h"
 
-void Platform_GetCollisionBox(void *object, CVector3 *points, s32 arg2);
+void Platform_GetCollisionBox(void *object, CVector3 *points, sptr arg2);
 void Quad_SetBoxBottom(CollisionQuad *quad, CVector3 *points);
 f32 Quad_GetHeightAt(CollisionQuad *quad, f32 x, f32 z);
 

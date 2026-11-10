@@ -29,6 +29,26 @@ typedef struct {
     /* 0x90 */ s32 value;
 } Effect0025E4B8;
 
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#include "structs/pose_host.h"
+/* Host body: the pose context (structs/pose_host.h) and the instance by member (N64
+ * 0x164/0x168: m_AI.m_HeadTurn/m_HeadTilt) and the float CMtxF__RotateX/Z directly; the
+ * matrix pointer-wide. */
+#undef CMtxF__RotateX
+#undef CMtxF__RotateZ
+void CMtxF__RotateX_f(void *m, f32 a) __asm__("CMtxF__RotateX"); /* the float definitions */
+void CMtxF__RotateZ_f(void *m, f32 a) __asm__("CMtxF__RotateZ");
+void EnemyAI_HeadNodeCallback(sptr arg0, T2PoseContext *ctx) {
+    Range0025E4B8 *range = (Range0025E4B8 *) ctx->info;
+    s32 bone = ctx->bone;
+
+    if ((bone >= range->min) && (range->max >= bone)) {
+        CMtxF__RotateZ_f((void *) arg0, ctx->obj->m_AI.m_HeadTurn);
+        CMtxF__RotateX_f((void *) arg0, ctx->obj->m_AI.m_HeadTilt);
+    }
+}
+#else
 void EnemyAI_HeadNodeCallback(s32 arg0, Effect0025E4B8 *arg1) {
     s32 temp_v1;
     Range0025E4B8 *temp_a0;
@@ -40,3 +60,4 @@ void EnemyAI_HeadNodeCallback(s32 arg0, Effect0025E4B8 *arg1) {
         CMtxF__RotateX(arg0, arg1->owner->unk168);
     }
 }
+#endif

@@ -3,7 +3,7 @@
 #include "globals/frame.h"
 #include "globals/engine.h"
 
-s32 CEngineApp__Update(s32);
+s32 CEngineApp__Update(sptr);
 s32 SavedPlayers_UpdateTimer(void);
 
 /* The frame/game state block passed to the per-mode handlers (the

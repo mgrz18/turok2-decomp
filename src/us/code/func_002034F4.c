@@ -7,11 +7,19 @@
 #include "protos/list.h"
 #include "protos/cache.h"
 
+#ifdef TARGET_PORT /* the bucket stride is the host entry's size (pointer-wide value/next): with the
+                    * N64 0x10 the lookup probed the wrong bucket, never found a resident entry and
+                    * re-requested it every frame (asynchronous loads, i.e. gameplay, never drew) */
+#define HASH_STRIDE sizeof(HashNode)
+#else
+#define HASH_STRIDE 0x10
+#endif
+
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 void *CCache__LookupAndLock(s32 arg0, s32 arg1) {
-    extern s32 osSendMesg(OSMesgQueue *, s32, s32);
+    extern s32 osSendMesg(OSMesgQueue *, sptr, s32);
     s32 temp_v1;
     s32 temp_v1_2;
     u32 temp_a0;
@@ -32,7 +40,7 @@ void *CCache__LookupAndLock(s32 arg0, s32 arg1) {
     out = &value;
     node = (HashNode *)((u8 *)gHashTable +
         ((((arg1 << 5) ^ ((u32)arg1 >> 1) ^ ((u32)arg1 >> 9) ^
-           ((u32)arg1 >> 17)) & gHashMask) * 0x10));
+           ((u32)arg1 >> 17)) & gHashMask) * HASH_STRIDE));
     if (node->key != arg1) {
         goto not_initial;
     }

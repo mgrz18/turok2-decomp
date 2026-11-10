@@ -75,7 +75,7 @@ queue/channel at N64 offsets: typed on `OSPfs`.
 | `--pak-dir DIR` | the .mpk files live in DIR |
 | `--pak-blank` | a blank formatted pak in memory, never saved (tests, headless runs) |
 | `--no-pak` | no pak in any slot |
-| `--input BUTTON@FRAME[,...]` | **debug**: scripted presses on port 1 for headless runs, each held 4 host frames. Buttons: `A B Z START DU DD DL DR L R CU CD CL CR` |
+| `--input SPEC` | **debug**: scripted input on port 1 for headless runs (section 6). `BUTTON@F` (held 4 frames), `BUTTON@F1..F2`, `SX=V@F1..F2` / `SY=V@...` (stick), `@FILE` |
 
 Env: `T2_PIF_LOG=1` logs every pak block read/write (host-order view); `T2_MENU_LOG=1` logs the
 newest open menu (desc address and cursor: resolve the address with `nm`); the run always logs
@@ -103,3 +103,35 @@ lead with the host `Menu` fields now (TARGET_PORT).
   formats 1-bank paks).
 - `--input` is a bring-up aid; real input is LUS's ControlDeck (keyboard/gamepad mapping in
   `turok2.cfg.json`).
+
+## 6. Scripted input (round 6, u3)
+
+`--input` (`port/app/game.cpp`) takes entries separated by commas or whitespace, or `@FILE`
+(one or more entries per line, `#` comments):
+
+| entry | effect |
+|---|---|
+| `BUTTON@F` | press BUTTON for 4 host frames from frame F |
+| `BUTTON@F1..F2` | hold BUTTON from F1 to F2 inclusive |
+| `SX=V@F1..F2`, `SY=V@F1..F2` | stick X/Y = V (-128..127; X + = right, Y + = up) over the range; `SX=V@F` for 4 frames; overlapping stick entries: the last wins |
+
+Buttons: `A B Z START DU DD DL DR L R CU CD CL CR` (the N64 bits). The stick goes into the
+6-byte pad record on both paths (the LUS ControlDeck path when a window exists, and the
+`--no-window` virtual pad). A script file for a new game and a walk:
+
+```
+START@4400 A@4500 A@4700 A@4800     # title -> main menu -> single player -> new game -> OK
+CU@13000..13440                     # level 51 from frame 12903: walk forward (C-up)
+SX=80@13450..13474                  # turn right about 90 degrees
+CU@13480..14000
+A@14050..14090 SX=80@14060..14090   # hold A (the weapon wheel), stick right: weapon 2
+Z@14150..14250                      # fire
+```
+
+Turok 2's default controls as the port sees them (control type 0, `m_WeaponSelect` 1, the
+eight-slot stick wheel): **stick** turns (X, about 3.8 rad per second at 80) and looks (Y);
+**C-up/C-down** forward/back, **C-left/C-right** strafe; **R** jumps (pressed bit 0x10:
+`PlayerJump`, state 4); **Z** fires; **A** / **B** hold the weapon wheel (two button groups;
+the stick picks the slot, 8 directions, 0 = up, clockwise, dead zone 60); **L** is the map.
+The game folds the stick into its own button word too (`m_dwButtons` 0x10000 up, 0x40000
+right, 0x20000 left), as the state log shows. Stick 80 reads as 77 after the game's dead zone.

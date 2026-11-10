@@ -50,6 +50,9 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
 #include "structs/menu.h"
 #include "structs/controller.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include "structs/rect.h"
+#include "globals/engine.h"
 
 void T2Port_LogState(int frame) {
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
@@ -69,6 +72,15 @@ void T2Port_LogState(int frame) {
             printf(" region NULL");
         }
         printf(" lives %d", (int) p->m_Data.m_Lives);
+        /* weapons (round 6): the requested weapon, the wheel (state, count, cursor), the pressed
+         * bits of this frame */
+        printf(" reqw %d wheel %d/%d/%d single %x", (int) p->m_RequestedWeapon, (int) p->m_Barrel.m_State,
+               (int) p->m_Barrel.m_nCount, (int) p->m_Barrel.m_nCursor, (unsigned) p->m_ContState.m_dwButtonsSingle);
+        /* the weapon actor: its AI mode, animation repeats, animation index and frame */
+        printf(" wact %d/%d anim %d %.1f", (int) p->m_WeaponActor.m_AI.m_Mode,
+               (int) p->m_WeaponActor.m_AI.m_AnimRepeatedCount,
+               (int) p->m_WeaponActor.m_CurrentAnimation.m_nAnimIndex,
+               p->m_WeaponActor.m_CurrentAnimation.m_AnimationFrame);
         printf(" pmode %d buttons %x move (%.2f %.2f) look (%.2f %.2f) contp %p", (int) p->m_Mode,
                (unsigned) p->m_ContState.m_dwButtons, p->m_ContState.m_MoveX, p->m_ContState.m_MoveY,
                p->m_ContState.m_LookX, p->m_ContState.m_LookY, (void *) p->m_ContState.m_pContState);
@@ -87,5 +99,37 @@ void T2Port_LogState(int frame) {
         printf(" cams %d hide %d", (int) pool->m_ActiveList.m_nCount, (int) gCameraPoolHideViews);
     }
     printf("\n");
+    if (getenv("T2_SCENE_LOG") != NULL) {
+        /* T2_SCENE_LOG=1 (with T2_STATE_LOG): the view of the first player's camera, what
+         * CScene__DrawGeometry culls with, and the loaded grid sections */
+        CCamera *c = (p != NULL) ? p->m_pCamera : NULL;
+        int i;
+        if (c != NULL) {
+            printf("scene: cam pos (%.1f %.1f %.1f) view (%.1f %.1f %.1f)-(%.1f %.1f %.1f) far %.1f fov %.1f vis %x region %p\n",
+                   c->m_vPos.x, c->m_vPos.y, c->m_vPos.z, c->m_ViewMin.x, c->m_ViewMin.y, c->m_ViewMin.z,
+                   c->m_ViewMax.x, c->m_ViewMax.y, c->m_ViewMax.z, c->m_FarClip, c->m_FieldOfView,
+                   (unsigned) c->m_ViewParams.m_VisBits, (void *) c->m_ViewParams.m_pCurrentRegion);
+        }
+        {
+            extern CBox gCameraVisibleBox;
+            extern CBox gCameraViewBox;
+            printf("scene: visible box (%.1f %.1f %.1f)-(%.1f %.1f %.1f) view box (%.1f %.1f %.1f)-(%.1f %.1f %.1f)\n",
+                   gCameraVisibleBox.m_vMin.x, gCameraVisibleBox.m_vMin.y, gCameraVisibleBox.m_vMin.z,
+                   gCameraVisibleBox.m_vMax.x, gCameraVisibleBox.m_vMax.y, gCameraVisibleBox.m_vMax.z,
+                   gCameraViewBox.m_vMin.x, gCameraViewBox.m_vMin.y, gCameraViewBox.m_vMin.z,
+                   gCameraViewBox.m_vMax.x, gCameraViewBox.m_vMax.y, gCameraViewBox.m_vMax.z);
+            if (c != NULL) {
+                printf("scene: cam anim (%.1f %.1f %.1f)-(%.1f %.1f %.1f) next %p\n", c->m_AnimMin.x, c->m_AnimMin.y,
+                       c->m_AnimMin.z, c->m_AnimMax.x, c->m_AnimMax.y, c->m_AnimMax.z, (void *) c->m_pNext);
+            }
+        }
+        printf("scene: level %d sectors %d difficulty %x multiplayer %d cheats %x\n", (int) gScene.m_nLevel,
+               (int) gScene.m_nSectors, (unsigned) gEngineApp_m_Settings.difficulty,
+               (int) gEngineApp_m_Settings.multiplayer, (unsigned) gEngineApp_m_Settings.cheatFlags);
+        for (i = 0; i < gScene.m_nSectors && i < 8; i++) {
+            CRect *r = (CRect *) gScene.m_Sectors[i].m_pBounds;
+            printf("scene:   sector %d x %.0f..%.0f z %.0f..%.0f\n", i, r->minX, r->maxX, r->minZ, r->maxZ);
+        }
+    }
     fflush(stdout);
 }

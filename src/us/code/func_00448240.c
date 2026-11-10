@@ -890,6 +890,17 @@ void Cinema_DrawLetterbox_2(void) {
     Cinema_DrawFrameEdges_2(sh);
 }
 
+#ifdef TARGET_PORT
+/* host: the camera's viewport (CCameraViewport m_Width, m_Height, m_ScreenPosX, m_ScreenPosY) at
+ * its host offset; the N64 view below reads it at 0x288, past the host CCamera's pointer fields */
+typedef struct {
+    u8 pad0[__builtin_offsetof(CCamera, m_Viewport)];
+    f32 x;
+    f32 y;
+    f32 width;
+    f32 height;
+} ScreenRectangle;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x288];
     /* 0x288 */ f32 x;
@@ -897,6 +908,7 @@ typedef struct {
     /* 0x290 */ f32 width;
     /* 0x294 */ f32 height;
 } ScreenRectangle;
+#endif
 
 extern void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 

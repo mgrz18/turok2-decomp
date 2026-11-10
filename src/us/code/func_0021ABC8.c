@@ -1,4 +1,9 @@
 #include "structs/vector.h"
+#ifdef TARGET_PORT
+#include "common.h"
+#include "structs/game_object.h"
+int T2Port_AnimEventsEnabled(void); /* port/game/t2actors.c */
+#endif
 #include "structs/particle_event.h"
 #include "globals/object.h"
 #include "globals/particle.h"
@@ -23,6 +28,22 @@ typedef struct CROMEventEntry {
 /* Turok 2 offsets (Rage Wars in parentheses): pos 0x4 (0x8), transform 0x58
  * (0x74), bone matrices 0x98 (0xB8), type id 0xB8 (0xE4), flags 0xD4 (0x100),
  * animation 0xD8 (0x104), bone mask 0x14C (0x17C). */
+#ifdef TARGET_PORT
+typedef struct ObjectLinks {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ObjectLinks(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_ObjectLinks(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_transform[T2_HOFF_ObjectLinks(m_mfOrient)]; char transform[0x40]; }; /* N64 0x58 */
+        struct { u8 _hp_boneMatrices[T2_HOFF_ObjectLinks(m_pmtDrawMtxs)]; char *boneMatrices; }; /* N64 0x98 */
+        struct { u8 _hp_type[T2_HOFF_ObjectLinks(m_nTypeFlag)]; u16 type; }; /* N64 0xB8 */
+        struct { u8 _hp_flags[T2_HOFF_ObjectLinks(m_dwFlags)]; s32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_anim[T2_HOFF_ObjectLinks(m_CurrentAnimation)]; char anim[sizeof(CAnimationState)]; }; /* N64 0xD8 */
+        struct { u8 _hp_boneMask[T2_HOFF_ObjectLinks(m_AI.m_VisBits)]; s32 boneMask; }; /* N64 0x14C */
+    };
+} ObjectLinks;
+#else
 typedef struct ObjectLinks {
     char pad0[4];
     CVector3 pos;
@@ -36,6 +57,7 @@ typedef struct ObjectLinks {
     char anim[0x74];
     s32 boneMask;
 } ObjectLinks;
+#endif
 /* Bone record: the mask bits sit at 0x6C. */
 typedef struct BoneInfo {
     char pad0[0x6C];
@@ -91,7 +113,11 @@ void CGameObjectInstance__FireAnimEvents(ObjectLinks *obj, void *anim, f32 from,
                         if (resource == 0) {
                             goto masked;
                         }
+#ifdef TARGET_PORT
+                        table = CISet__GetBlock(*(void **)resource, 3); /* the data pointer, pointer-wide */
+#else
                         table = CISet__GetBlock((void *)*resource, 3);
+#endif
                     }
                     fire = ((BoneInfo *)CISet__GetBlock(CISet__GetBlock(table, events[i].bone), 1))->mask & obj->boneMask;
                 }
@@ -106,6 +132,14 @@ void CGameObjectInstance__FireAnimEvents(ObjectLinks *obj, void *anim, f32 from,
                     pos = obj->pos;
                 }
             }
+#ifdef TARGET_PORT
+            /* The events end in CParticleSystem__Spawn (func_0022D2FC.c), still on N64
+             * views on the host: it corrupts memory. Off until it is ported; T2_ANIM_EVENTS=1
+             * turns them on (docs/port/RENDER.md, actors). */
+            if (fire != 0 && !T2Port_AnimEventsEnabled()) {
+                fire = 0;
+            }
+#endif
             if (fire != 0) {
                 ImpactEvent_Send(obj, obj, events[i].effect, -1, pos, events[i].params);
                 gAnimEventCount++;

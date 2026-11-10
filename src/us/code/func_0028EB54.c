@@ -6,7 +6,7 @@
 
 extern void VM_FreeRegion(OwnerRecAt8V2 *arg0);
 void VM_FreeRegion(OwnerRecAt8V2 *arg0) {
-    extern s32 osSendMesg(s32, Node_func_8023CCD4_de *, s32);
+    extern s32 osSendMesg(sptr, Node_func_8023CCD4_de *, s32);
     extern void VM_UnmapTLBEntry(PageMapping *);
     Node_func_8023CCD4_de *node;
     Node_func_8023CCD4_de *prev;

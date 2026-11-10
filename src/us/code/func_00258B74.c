@@ -3,7 +3,7 @@
 #include "globals/player.h"
 #include "protos/ai.h"
 
-s32 CPlayer__GetWeaponAmmo(s32, s32);
+s32 CPlayer__GetWeaponAmmo(sptr, s32);
 s32 CPlayer__GetNextUsableWeapon(sptr);
 s32 WeaponActor_CheckFire(sptr, sptr);
 

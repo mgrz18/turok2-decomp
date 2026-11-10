@@ -10,6 +10,27 @@ typedef struct Slot24 {
     s32 w[6];
 } Slot24;
 
+#ifdef TARGET_PORT
+#include "structs/camera.h"
+#include "structs/model.h"
+/* Model is the view's CCamera (m_mfProjection, m_mProjection[2]) and ModelRef the
+ * CDrawArgs: their host members (the N64 offsets put the shadow's projection, and the
+ * one restored after it, on the wrong bytes: every actor drawn after a shadow got it) */
+typedef struct Model {
+    union {
+        struct { u8 _hp_unk1CC[__builtin_offsetof(CCamera, m_mfProjection)]; u8 unk1CC[0x40]; };
+        struct { u8 _hp_mtx[__builtin_offsetof(CCamera, m_mProjection)]; Mtx mtx[2]; };
+    };
+} Model;
+
+typedef struct ModelRef {
+    union {
+        struct { u8 _hp_model[__builtin_offsetof(CDrawArgs, m_pCamera)]; Model *model; };
+        struct { u8 _hp_unkC[__builtin_offsetof(CDrawArgs, m_hModel)]; sptr unkC; };
+        struct { u8 _hp_unk1C[__builtin_offsetof(CDrawArgs, m_nShadowModel)]; s32 unk1C; };
+    };
+} ModelRef;
+#else
 typedef struct Model {
     u8 pad0[0x1CC];
     u8 unk1CC[0x368 - 0x1CC];   /* 0x1CC */
@@ -23,12 +44,13 @@ typedef struct ModelRef {
     u8 pad10[0x1C - 0x10];
     s32 unk1C;                  /* 0x1C */
 } ModelRef;
+#endif
 
 Mtx *MtxPool_Alloc(void *pool, s32 count);
 void CMtxF__Multiply(f32 (*mf)[4], void *arg1, void *arg2);
 void CMtxF__ClampEntries(f32 (*mf)[4]);
 void CMtxF__ToMtx(f32 (*mf)[4], Mtx *m);
-void Render_DrawModelFlat(s32, s32, s32, s32, Slot24 *, s32, s32, s32);
+void Render_DrawModelFlat(s32, sptr, sptr, s32, Slot24 *, sptr, s32, s32);
 
 void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *owner, ModelRef *ref, void *arg2, s32 arg3) {
     f32 mf[4][4];

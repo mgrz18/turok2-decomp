@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "globals/game.h"
 
-s32 CPlayer__Hurt(s32, s32, s32, s32, s32);
+s32 CPlayer__Hurt(sptr, sptr, s32, s32, s32);
 s32 CPlayer__UpdateOxygen(sptr, sptr);
 
 

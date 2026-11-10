@@ -186,7 +186,9 @@ static void am_frame(void) {
         load_tbl();
     memset(out, 0, (size_t)n * 4);
     Sound__Lock();
-    end = alAudioFrame(sCmd[sCur], &cmdLen, out, n);
+    /* the output buffer as the N64 passes it (__amHandleFrameMsg): its 32-bit "physical" address,
+     * which alSavePull writes into A_SAVEBUFF's w1 (a host pointer there truncates on macOS) */
+    end = alAudioFrame(sCmd[sCur], &cmdLen, (s16 *)(uintptr_t)osVirtualToPhysical(out), n);
     Sound__Unlock();
     if (end != NULL && end > sCmd[sCur])
         cmdLen = (s32)(end - sCmd[sCur]);

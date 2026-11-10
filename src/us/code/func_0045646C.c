@@ -15,7 +15,7 @@ void Hud_DrawBevelBox(s32 x0, s32 y0, s32 x1, s32 y1, s32 border, s32 invert, s3
 void MenuItem_DrawText_2(void *menu, MenuItemLayout *item, void *arg2, Menu *event);
 
 void NameEntryMenu_DrawName_2(void *menu, MenuItemLayout *item, void *arg2, Menu *event) {
-    s32 i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, event->player);
+    sptr i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, event->player);
     f32 charWidth;
     f32 alpha;
     s32 x;

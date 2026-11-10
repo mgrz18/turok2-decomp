@@ -33,17 +33,27 @@ and compares them across translation units. Classes (most harmful first):
                   arm64 passes variadic arguments on the stack)
   extra_args      more arguments than the definition takes (harmless on both ABIs)
   narrow_ext      s8/s16/u8/u16 vs a wider or other-signed int (low risk)
-  struct_layout   same ABI classes, different member layout (a type pun, no ABI change)
+  struct_layout   same ABI classes, different member layout (a type pun, no ABI change),
+                  or two integer structs of <= 8 bytes (one general register, same bytes)
+  struct_word     an integer struct of <= 8 bytes vs a 32-bit int: the same register, the
+                  int is the struct's first four bytes (what MIPS read as the first word;
+                  mind the halfword order of a struct of two s16)
+
+Indirect calls (calls through function pointers; section 5 of ABI.md) are checked in two
+views: STORE compares each function whose address is converted to a prototyped
+function-pointer type with that type; CALL matches each call through a pointer with the
+functions stored where the pointer is loaded from (the same global, the same struct
+field, a local/parameter followed back to its load in the same function) and compares the
+call's arguments with their definitions.
 
   python3 tools/port/abicheck.py --build OUT/build [-j 4] [--json out.json]
          [--detail CLASS ...] [--files PATTERN ...] [--callee NAME ...] [--quiet]
 
-Function-pointer calls are counted but not checked (no definition to compare).
 """
 import argparse, collections, json, os, re, shlex, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-TARGETS = ('turok2_game', 't2runtime', 't2audio', 't2placeholders')
+TARGETS = ('turok2_game', 't2runtime', 't2audio', 't2placeholders', 'turok2_data')
 if sys.platform == 'darwin':
     DEFAULT_LIBCLANG = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
 else:
@@ -51,7 +61,7 @@ else:
 
 ORDER = ['struct_class', 'struct_scalar', 'float_int', 'float_double', 'ptr_from_int',
          'void_used', 'noreturn_used', 'missing_args', 'variadic', 'int_from_ptr',
-         'extra_args', 'narrow_ext', 'struct_layout']
+         'extra_args', 'narrow_ext', 'struct_layout', 'struct_word']
 HARMFUL = set(ORDER[:9])
 
 # ---------------------------------------------------------------------------
@@ -212,7 +222,7 @@ def _work(job):
     K = _ci.CursorKind
     args = _parse_args(cmd) + ['-Wno-everything', '-Wreturn-type']
     res = {'file': os.path.relpath(path, ROOT), 'defs': [], 'calls': [], 'fptr': 0,
-           'noreturn': [], 'error': None}
+           'icalls': [], 'stores': [], 'noreturn': [], 'error': None}
     try:
         tu = _index.parse(path, args=args)
     except Exception as ex:  # noqa: BLE001
@@ -239,14 +249,25 @@ def _work(job):
             'rspell': c.result_type.spelling,
             'variadic': proto and ft.is_function_variadic(), 'proto': proto})
 
-    def call(c, parent):
+    def call(c, parent, anc):
         ref = c.referenced
         if ref is None or ref.kind != K.FUNCTION_DECL:
             res['fptr'] += 1
+            icall(c, parent, anc)
             return
         name = ref.spelling
         if name.startswith('__builtin'):
             return
+        # an asm label (`s32 f_alias(s32) __asm__("Real")`) calls the function it names
+        try:
+            mn = ref.mangled_name or ''
+        except Exception:  # noqa: BLE001
+            mn = ''
+        mn = mn.lstrip('\x01')
+        if sys.platform == 'darwin' and mn.startswith('_'):
+            mn = mn[1:]
+        if mn and mn != name and re.match(r'^[A-Za-z_]\w*$', mn):
+            name = mn
         ft = ref.type.get_canonical()
         proto = ft.kind == _ci.TypeKind.FUNCTIONPROTO
         argsx = list(c.get_arguments())
@@ -266,13 +287,115 @@ def _work(job):
             'decl': ('%s:%d' % (os.path.relpath(dl.file.name, ROOT), dl.line)) if dl.file else 'implicit',
             'used': _used(parent, c, K)})
 
-    def walk(c, parent):
+    def icall(c, parent, anc):
+        # a call through a function pointer: the pointer's type and where it comes from
+        kids = list(c.get_children())
+        if not kids:
+            return
+        callee = kids[0]
+        pt = callee.type.get_canonical()
+        if pt.kind == _ci.TypeKind.POINTER:
+            pt = pt.get_pointee().get_canonical()
+        if pt.kind not in (_ci.TypeKind.FUNCTIONPROTO, _ci.TypeKind.FUNCTIONNOPROTO):
+            return
+        proto = pt.kind == _ci.TypeKind.FUNCTIONPROTO
+        ptypes = list(pt.argument_types()) if proto else []
+        argsx = list(c.get_arguments())
+        sigs = []
+        for i, a in enumerate(argsx):
+            s_ = _sig(a.type)
+            if not proto or (pt.is_function_variadic() and i >= len(ptypes)):
+                s_ = _promote(s_)
+            sigs.append(s_)
+        res['icalls'].append({
+            'loc': _loc(c), 'keys': _src_keys(callee), 'ftype': _fspell(pt),
+            'proto': proto, 'variadic': proto and pt.is_function_variadic(),
+            'ret': _sig(c.type), 'rspell': c.type.spelling, 'args': sigs,
+            'aspell': [a.type.spelling for a in argsx],
+            'tparams': [_sig(t) for t in ptypes], 'tspell': [t.spelling for t in ptypes],
+            'expr': _text(callee), 'used': _used(parent, c, K),
+            'func': anc[0].spelling if anc else '?'})
+
+    def store(c, anc):
+        # a function named outside a direct call: where does its address go?
+        i = len(anc) - 1
+        x = c
+        while i >= 0 and anc[i].kind in (K.UNEXPOSED_EXPR, K.PAREN_EXPR, K.CSTYLE_CAST_EXPR) \
+                or (i >= 0 and anc[i].kind == K.UNARY_OPERATOR and _optok(anc[i]) == '&'):
+            x = anc[i]
+            i -= 1
+        p = anc[i] if i >= 0 else None
+        if p is not None and p.kind == K.CALL_EXPR and next(p.get_children(), None) == x:
+            return                                  # the direct call itself
+        dt = x.type.get_canonical()
+        dproto = None
+        dsig = None
+        if dt.kind == _ci.TypeKind.POINTER:
+            pe = dt.get_pointee().get_canonical()
+            if pe.kind in (_ci.TypeKind.FUNCTIONPROTO, _ci.TypeKind.FUNCTIONNOPROTO):
+                dproto = pe.kind == _ci.TypeKind.FUNCTIONPROTO
+                dsig = {'ret': _sig(pe.get_result()),
+                        'params': [_sig(t) for t in pe.argument_types()] if dproto else [],
+                        'variadic': dproto and pe.is_function_variadic(),
+                        'pspell': [t.spelling for t in pe.argument_types()] if dproto else [],
+                        'rspell': pe.get_result().spelling}
+        keys = []
+        ctx = '?'
+        if p is not None and p.kind == K.BINARY_OPERATOR and _optok(p) == '=':
+            lhs = next(p.get_children(), None)
+            if lhs is not None and lhs != x:
+                keys = _src_keys(lhs)
+                ctx = 'assign ' + _text(lhs)
+        elif p is not None and p.kind == K.CALL_EXPR:
+            r = p.referenced
+            ai = [a for a in p.get_arguments()]
+            idx = ai.index(x) if x in ai else -1
+            nm = r.spelling if r is not None else _text(next(p.get_children()))
+            keys = ['arg:%s#%d' % (nm, idx)]
+            ctx = 'argument %d of %s' % (idx + 1, nm)
+        else:
+            for a in reversed(anc):
+                if a.kind == K.VAR_DECL:
+                    keys = ['var:' + a.spelling]
+                    et = a.type.get_canonical()
+                    while et.kind in (_ci.TypeKind.CONSTANTARRAY, _ci.TypeKind.INCOMPLETEARRAY):
+                        et = et.element_type.get_canonical()
+                    if et.kind == _ci.TypeKind.RECORD:
+                        keys.append('rec:' + et.spelling)
+                    ctx = 'initializer of ' + a.spelling
+                    break
+                if a.kind == K.RETURN_STMT:
+                    ctx = 'returned'
+                    break
+        res['stores'].append({
+            'name': c.referenced.spelling, 'loc': _loc(c), 'keys': keys, 'ctx': ctx,
+            'dtype': _fspell(dt.get_pointee()) if dsig else dt.spelling, 'dsig': dsig,
+            'func': anc[0].spelling if anc and anc[0].kind == K.FUNCTION_DECL else None})
+
+    locals_ = collections.defaultdict(list)    # local/param name -> source keys
+
+    def walk(c, parent, anc):
         k = c.kind
+        if k == K.VAR_DECL and anc:
+            kids = list(c.get_children())
+            if kids and kids[-1].kind not in (K.TYPE_REF, K.PARM_DECL):
+                locals_[c.spelling].extend(_src_keys(kids[-1]))
+        elif k == K.BINARY_OPERATOR and _optok(c) == '=':
+            kids = list(c.get_children())
+            if len(kids) == 2 and kids[0].kind == K.DECL_REF_EXPR and kids[0].referenced is not None \
+                    and kids[0].referenced.kind in (K.VAR_DECL, K.PARM_DECL):
+                locals_[kids[0].spelling].extend(_src_keys(kids[1]))
         if k == K.CALL_EXPR:
             # a call through a function pointer has no FUNCTION_DECL referenced
-            call(c, parent)
+            call(c, parent, anc)
+        elif k == K.DECL_REF_EXPR:
+            r = c.referenced
+            if r is not None and r.kind == K.FUNCTION_DECL and not r.spelling.startswith('__builtin'):
+                store(c, anc)
+        anc.append(c)
         for ch in c.get_children():
-            walk(ch, c)
+            walk(ch, c, anc)
+        anc.pop()
 
     for c in tu.cursor.get_children():
         f = c.location.file
@@ -280,10 +403,97 @@ def _work(job):
             continue
         if c.kind == K.FUNCTION_DECL and c.is_definition():
             fdef(c)
-            walk(c, None)
+            locals_.clear()
+            n0 = len(res['icalls'])
+            walk(c, None, [])
+            for ic in res['icalls'][n0:]:
+                # a local/parameter pointer: where it was loaded from in this function
+                extra, todo, done = [], list(ic['keys']), set()
+                while todo:
+                    kk = todo.pop()
+                    if kk in done:
+                        continue
+                    done.add(kk)
+                    if kk.startswith(('local:', 'param:')):
+                        for k2 in locals_.get(kk.split(':', 1)[1], []):
+                            if k2 not in ic['keys'] and k2 not in extra:
+                                extra.append(k2)
+                                todo.append(k2)
+                ic['keys'] = ic['keys'] + extra
         elif c.kind == K.VAR_DECL:
-            walk(c, None)
+            walk(c, None, [])
     return res
+
+
+def _text(c, n=12):
+    try:
+        return ' '.join(t.spelling for t in list(c.get_tokens())[:n])
+    except Exception:  # noqa: BLE001
+        return '?'
+
+
+def _optok(c):
+    # the operator token of a unary/binary operator cursor
+    try:
+        ts = [t.spelling for t in c.get_tokens()]
+    except Exception:  # noqa: BLE001
+        return '?'
+    K = _ci.CursorKind
+    if c.kind == K.UNARY_OPERATOR:
+        return ts[0] if ts else '?'
+    kids = list(c.get_children())
+    if kids:
+        n = len(list(kids[0].get_tokens()))
+        return ts[n] if len(ts) > n else '?'
+    return '?'
+
+
+def _fspell(t):
+    return t.get_canonical().spelling
+
+
+def _src_keys(e):
+    """Where a function-pointer value comes from: var:<global>, rec:<struct>.<field>, ..."""
+    K = _ci.CursorKind
+    keys = []
+    depth = 0
+    while e is not None and depth < 16:
+        depth += 1
+        k = e.kind
+        if k in (K.UNEXPOSED_EXPR, K.PAREN_EXPR, K.CSTYLE_CAST_EXPR):
+            kids = list(e.get_children())
+            e = kids[-1] if kids else None
+            continue
+        if k == K.UNARY_OPERATOR:
+            e = next(e.get_children(), None)
+            continue
+        if k == K.ARRAY_SUBSCRIPT_EXPR:
+            e = next(e.get_children(), None)
+            continue
+        if k == K.MEMBER_REF_EXPR:
+            r = e.referenced
+            if r is not None and r.semantic_parent is not None:
+                keys.append('rec:%s.%s' % (r.semantic_parent.type.get_canonical().spelling,
+                                           r.spelling))
+            e = next(e.get_children(), None)
+            continue
+        if k == K.DECL_REF_EXPR:
+            r = e.referenced
+            if r is not None and r.kind == K.VAR_DECL:
+                if r.semantic_parent is not None and r.semantic_parent.kind == K.TRANSLATION_UNIT \
+                        or r.storage_class == _ci.StorageClass.STATIC:
+                    keys.append('var:' + r.spelling)
+                else:
+                    keys.append('local:' + r.spelling)
+            elif r is not None and r.kind == K.PARM_DECL:
+                keys.append('param:' + r.spelling)
+            break
+        if k == K.CALL_EXPR:
+            r = e.referenced
+            keys.append('ret:' + (r.spelling if r is not None else '?'))
+            break
+        break
+    return keys
 
 
 # ---------------------------------------------------------------------------
@@ -299,9 +509,16 @@ def cmp_sig(a, b):
         return None
     if ka == 's' and kb == 's':
         if a[1] != b[1] or a[2] != b[2] or a[3] != b[3]:
+            if a[2] == b[2] == 'I' and a[3] == b[3] == 'G1':
+                return 'struct_layout'      # both one general register, the same bytes
             return 'struct_class'
         return 'struct_layout' if a[4] != b[4] else None
     if 's' in (ka, kb):
+        st, sc = (a, b) if ka == 's' else (b, a)
+        if st[2] == 'I' and st[3] == 'G1' and sc[0] == 'i' and sc[1] <= 4:
+            # an integer struct of <= 8 bytes and a 32-bit int share the register (x86-64 and
+            # AArch64): the int is the struct's first four bytes, as MIPS read the first word
+            return 'struct_word'
         return 'struct_scalar'
     if ka == 'i' and kb == 'i':
         if a[1] != b[1]:
@@ -391,6 +608,117 @@ def check(results):
     return defs, dups, findings, stats, nodef
 
 
+def _cmp_call(c, d, add):
+    """Compare one call view c (args/ret/used/variadic/proto) with definition d."""
+    if d['ret'][0] == 'v':
+        if c['used'] and c['ret'][0] != 'v':
+            add('void_used', 'result (%s) used, the definition returns void' % c['rspell'])
+    elif c['used'] or c['ret'][0] == 's' or d['ret'][0] == 's':
+        cl = cmp_sig(d['ret'], c['ret']) if c['ret'][0] != 'v' else (
+            'struct_scalar' if d['ret'][0] == 's' else None)
+        if cl:
+            add(cl, 'return: caller %s, definition %s' % (c['rspell'], d['rspell']))
+        if c['used'] and d.get('noreturn'):
+            add('noreturn_used', 'result used, the definition can fall off its end')
+    if c['variadic'] != d['variadic'] and (c['proto'] or d['variadic']):
+        add('variadic', 'declaration %svariadic, definition %svariadic'
+            % ('' if c['variadic'] else 'not ', '' if d['variadic'] else 'not '))
+    na, nd = len(c['args']), len(d['params'])
+    for i in range(min(na, nd)):
+        cl = cmp_sig(c['args'][i], d['params'][i])
+        if cl:
+            add(cl, 'arg %d: caller %s, definition %s'
+                % (i + 1, c['aspell'][i], d['pspell'][i] if i < len(d['pspell']) else '?'))
+    if na < nd and not d['variadic']:
+        add('missing_args', '%d argument(s), the definition takes %d' % (na, nd))
+    elif na > nd and not d['variadic'] and (d['proto'] or nd):
+        add('extra_args', '%d argument(s), the definition takes %d' % (na, nd))
+
+
+def check_indirect(results, defs):
+    """Calls through function pointers against the functions stored where they load from.
+
+    Two views. STORE: a function whose address is converted to a prototyped function-pointer
+    type (a table's element, a struct field, a parameter) is compared with that type, as if
+    the type were a caller. CALL: each call through a pointer is matched with the functions
+    stored where the pointer comes from (the same global table `var:`, the same struct field
+    `rec:S.f`, or an initializer of a variable of struct S whose slot has the call's type;
+    a parameter/local falls back to every function stored with the call's exact type) and
+    compared argument by argument with their definitions (this catches the tables typed
+    void*/u32 that the STORE view cannot see)."""
+    stores = collections.defaultdict(list)
+    allstores = []
+    for r in results:
+        for st in r.get('stores', []):
+            st['file'] = r['file']
+            allstores.append(st)
+            for k in st['keys']:
+                stores[k].append(st)
+            stores['type:' + st['dtype']].append(st)
+
+    def getdef(name, file):
+        return defs.get((name, file)) or defs.get((name, None))
+
+    sfind, cfind = [], []
+    seen = set()
+    for st in allstores:
+        d = getdef(st['name'], st['file'])
+        if d is None or not st['dsig']:
+            continue
+        key = (st['name'], st['dtype'])
+        if key in seen:
+            continue
+        seen.add(key)
+        ds = st['dsig']
+        view = {'args': ds['params'], 'aspell': ds['pspell'], 'ret': ds['ret'],
+                'rspell': ds['rspell'], 'used': ds['ret'][0] != 'v', 'proto': True,
+                'variadic': ds['variadic']}
+        if not ds['params'] and not ds['variadic'] and st['dtype'].endswith('()'):
+            continue    # unprototyped pointer type: nothing to compare here
+        def add(cls, what, st=st, d=d):
+            sfind.append({'cls': cls, 'callee': st['name'], 'loc': st['loc'], 'what': what,
+                          'def': d['loc'], 'decl': st['dtype'], 'ctx': st['ctx']})
+        _cmp_call(view, d, add)
+
+    unmatched = 0
+    for r in results:
+        for c in r.get('icalls', []):
+            cands = {}
+            how = None
+            for k in c['keys']:
+                if k.startswith('var:') or (k.startswith('rec:') and '.' in k):
+                    for st in stores.get(k, []):
+                        if st['dsig'] and st['dtype'] != c['ftype'] and k.startswith('var:') \
+                                and any(kk.startswith('rec:') for kk in c['keys']):
+                            continue
+                        cands.setdefault(st['name'], st)
+                    if k.startswith('rec:'):
+                        rec = k[4:].rsplit('.', 1)[0]
+                        for st in stores.get('rec:' + rec, []):
+                            if st['dtype'] == c['ftype'] or not st['dsig']:
+                                cands.setdefault(st['name'], st)
+                    if cands:
+                        how = k
+                        break
+            if not cands and c['proto'] and (c['args'] or c['ret'][0] != 'v'):
+                # last resort: every function stored with exactly the call's pointer type
+                for st in stores.get('type:' + c['ftype'], []):
+                    cands.setdefault(st['name'], st)
+                how = 'type'
+            if not cands:
+                unmatched += 1
+            for name, st in cands.items():
+                d = getdef(name, st['file'])
+                if d is None:
+                    continue
+                def add(cls, what, c=c, d=d, name=name, how=how):
+                    cfind.append({'cls': cls, 'callee': name, 'loc': c['loc'], 'what': what,
+                                  'def': d['loc'], 'decl': '%s via %s' % (c['expr'], how),
+                                  'ctx': c['func']})
+                _cmp_call(c, d, add)
+    return sfind, cfind, unmatched
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('--build', default=os.path.join(ROOT, 'OUT/build'))
@@ -466,8 +794,37 @@ def main():
             for f in sorted(fs, key=lambda f: (f['callee'], f['loc'])):
                 print('  %-36s %-34s %s   [decl %s, def %s]' % (
                     f['callee'], f['loc'], f['what'], f['decl'], f['def']))
+    sfind, cfind, unmatched = check_indirect(results, defs)
+    if a.callee:
+        sfind = [f for f in sfind if f['callee'] in a.callee]
+        cfind = [f for f in cfind if f['callee'] in a.callee]
+    nic = sum(len(r.get('icalls', [])) for r in results)
+    nst = sum(len(r.get('stores', [])) for r in results)
+    print('\nindirect: %d function-pointer calls (%d with no stored function found), %d places '
+          'that take a function\'s address' % (nic, unmatched, nst))
+    bs = collections.Counter(f['cls'] for f in sfind)
+    bc = collections.Counter(f['cls'] for f in cfind)
+    print('%-14s %6s %6s %8s' % ('class', 'store', 'call', 'callees'))
+    for cls in ORDER:
+        cs = set(f['callee'] for f in sfind + cfind if f['cls'] == cls)
+        print('%-14s %6d %6d %8d  %s' % (cls, bs[cls], bc[cls], len(cs),
+                                          'harmful' if cls in HARMFUL else 'info'))
+    print('%-14s %6d %6d' % ('total harmful', sum(bs[c] for c in HARMFUL),
+                             sum(bc[c] for c in HARMFUL)))
+    if a.detail is not None:
+        want = set(a.detail) if a.detail else HARMFUL
+        for title, fl in (('store', sfind), ('call', cfind)):
+            for cls in ORDER:
+                fs = [f for f in fl if f['cls'] == cls and cls in want]
+                if not fs:
+                    continue
+                print('\n== indirect %s %s (%d)' % (title, cls, len(fs)))
+                for f in sorted(fs, key=lambda f: (f['callee'], f['loc'])):
+                    print('  %-36s %-34s %s   [%s; %s; def %s]' % (
+                        f['callee'], f['loc'], f['what'], f['decl'], f['ctx'], f['def']))
     if a.json:
         json.dump({'stats': dict(stats), 'counts': dict(by), 'findings': findings,
+                   'indirect_store': sfind, 'indirect_call': cfind,
                    'nodef': dict(nodef)}, open(a.json, 'w'), indent=1)
 
 

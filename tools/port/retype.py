@@ -111,6 +111,8 @@ LHS = re.compile(r'^\s*(?:(?:s32|u32|int|unsigned int)\s+)?(\w+)\s*(?:[-+|&^]?=)
 def find_decl(lines, fstart, use, name):
     """index of the local declaration `T ... name ...;` (T a 32-bit int) between fstart and use"""
     rx = re.compile(r'^(\s+)(s32|u32|int|unsigned int)\s+([^;()]*)\b%s\b([^;()]*);\s*$' % re.escape(name))
+    if INIT1(name).match(lines[use]):
+        return use        # `s32 name = f(...);` (one declarator, any initializer)
     for i in range(use, fstart, -1):
         m = rx.match(lines[i])
         if m:
@@ -122,7 +124,15 @@ def find_decl(lines, fstart, use, name):
     return None
 
 
+def INIT1(name):
+    return re.compile(r'^(\s+)(s32|u32|int|unsigned int)(\s+%s\s*=[^=])' % re.escape(name))
+
+
 def retype_decl(lines, i, name):
+    m1 = INIT1(name).match(lines[i])
+    if m1:
+        lines[i] = m1.group(1) + NARROW[m1.group(2)] + lines[i][m1.end(2):]
+        return True
     m = re.match(r'^(\s+)(s32|u32|int|unsigned int)\s+(.*);(\s*)$', lines[i])
     ind, t, body = m.group(1), m.group(2), m.group(3)
     parts = [p.strip() for p in body.split(',')]

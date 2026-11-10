@@ -10,7 +10,7 @@ extern void Controller_UpdatePakInsertion();
 extern s32 D_8011F144;
 extern void CEngineApp__UpdateControllers(void *arg0);
 s32 PakMenu_PollBootPak(s32 arg0) {
-    extern s32 PakMenu_CheckPak(s32, s32, s32);
+    extern s32 PakMenu_CheckPak(sptr, s32, s32);
     if (gPakMenuStartPressed == 0) {
         CEngineApp__UpdateControllers(&gEngineApp);
         Controller_UpdatePakInsertion();

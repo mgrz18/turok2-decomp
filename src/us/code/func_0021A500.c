@@ -2,8 +2,23 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
 #include "globals/engine.h"
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#endif
 typedef struct B10Obj B10Obj;
 typedef struct B10H B10H;
+#ifdef TARGET_PORT
+struct B10Obj {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_B10Obj(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_p14[T2_HOFF_B10Obj(header.m_pCurrentRegion)]; B10H* p14; }; /* N64 0x10 */
+        struct { u8 _hp_f5C[T2_HOFF_B10Obj(m_qGround.x)]; f32 f5C; }; /* N64 0x40 */
+        struct { u8 _hp_flags100[T2_HOFF_B10Obj(m_dwFlags)]; u32 flags100; }; /* N64 0xD4 */
+    };
+};
+#else
 struct B10Obj { /* Turok 2 layout (Rage Wars: p14, f5C, flags100) */
     u8 pad0[0x10];
     B10H* p14;          /* 0x10 */
@@ -12,6 +27,7 @@ struct B10Obj { /* Turok 2 layout (Rage Wars: p14, f5C, flags100) */
     u8 pad44[0x90];
     u32 flags100;       /* 0xD4 */
 };
+#endif
 struct B10H {
     u8 pad0[0x2];
                 u16 h2;

@@ -22,7 +22,12 @@ static inline s32 hasTbl(CScene *lv) {
     return 0;
 }
 void CScene__GetLightsAt(CScene *lv, CVector3 *a1, CLights1 *out) {
+#ifdef TARGET_PORT
+    u8 buf[10 * sizeof(void *)]; /* CScene__FindLightsAt stores up to 10 record pointers:
+                                  * 0x28 bytes overran into the caller's frame on LP64 */
+#else
     u8 buf[0x28];
+#endif
     s32 n;
     if (hasTbl(lv) == 0 || gLevelLightsEnabled == 0) {
         *out = gSceneLights;

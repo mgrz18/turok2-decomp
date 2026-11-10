@@ -9,7 +9,7 @@
 
 
 s32 NameEntryMenu_AddChar_2(MenuItem *item, Menu *event) {
-    s32 i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, event->player);
+    sptr i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, event->player);
 
     gNameEntries[i].timer = 0.0f;
     if (gNameEntries[i].length == 8) {

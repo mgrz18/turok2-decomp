@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "globals/player.h"
 
-s32 Cinema_SetNextCallbacks(s32, s32, s32 *); /* extern */
+s32 Cinema_SetNextCallbacks(s32, sptr, s32 *); /* extern */
 extern s32 PlayerCinema50_Done;
 
 void PlayerCinema50_Enter(CPlayer *player) {

@@ -2,6 +2,9 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#endif
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "protos/cache.h"
@@ -28,6 +31,31 @@ typedef struct {
     /* 0x7 */ u8 end;
 } AnimBlendEntry;
 
+#ifdef TARGET_PORT
+typedef struct AnimActor {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_AnimActor(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_position[T2_HOFF_AnimActor(header.m_vPos)]; CVector3 position; }; /* N64 0x4 */
+        struct { u8 _hp_scaleX[T2_HOFF_AnimActor(m_vScale.x)]; f32 scaleX; }; /* N64 0x34 */
+        struct { u8 _hp_scaleY[T2_HOFF_AnimActor(m_vScale.y)]; f32 scaleY; }; /* N64 0x38 */
+        struct { u8 _hp_scaleZ[T2_HOFF_AnimActor(m_vScale.z)]; f32 scaleZ; }; /* N64 0x3C */
+        struct { u8 _hp_heading[T2_HOFF_AnimActor(m_RotY)]; f32 heading; }; /* N64 0x50 */
+        struct { u8 _hp_animationKey[T2_HOFF_AnimActor(m_rpAnims)]; sptr animationKey; }; /* N64 0xA8: a ROM address */
+        struct { u8 _hp_type[T2_HOFF_AnimActor(m_nTypeFlag)]; u16 type; }; /* N64 0xB8 */
+        struct { u8 _hp_animationCount[T2_HOFF_AnimActor(m_nAnims)]; s16 animationCount; }; /* N64 0xBA */
+        struct { u8 _hp_flags[T2_HOFF_AnimActor(m_dwFlags)]; s32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_currentTrack[T2_HOFF_AnimActor(m_CurrentAnimation)]; AnimTrack currentTrack; }; /* N64 0xD8 */
+        struct { u8 _hp_previousTrack[T2_HOFF_AnimActor(m_BlendAnimation)]; AnimTrack previousTrack; }; /* N64 0xEC */
+        struct { u8 _hp_blendFrames[T2_HOFF_AnimActor(m_BlendLength)]; s16 blendFrames; }; /* N64 0x100 */
+        struct { u8 _hp_blend[T2_HOFF_AnimActor(m_Blend)]; f32 blend; }; /* N64 0x104 */
+        struct { u8 _hp_blendTime[T2_HOFF_AnimActor(m_BlendPercent)]; f32 blendTime; }; /* N64 0x108 */
+        struct { u8 _hp_blendStart[T2_HOFF_AnimActor(m_BlendStart)]; u8 blendStart; }; /* N64 0x10C */
+        struct { u8 _hp_blendEnd[T2_HOFF_AnimActor(m_BlendFinish)]; u8 blendEnd; }; /* N64 0x10D */
+    };
+} AnimActor;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[4];
     /* 0x004 */ CVector3 position;
@@ -53,6 +81,7 @@ typedef struct {
     /* 0x10C */ u8 blendStart;
     /* 0x10D */ u8 blendEnd;
 } AnimActor;
+#endif
 
 void CAnimationState__SwitchToQueued(AnimTrack *track, sptr data, s32 key, s32 primary, s32 *active, AnimTrack *other);
 s32 CAnimationState__IsLoaded(AnimTrack *track);

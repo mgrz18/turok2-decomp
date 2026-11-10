@@ -8,12 +8,19 @@ target_include_directories(t2asset PUBLIC ${T2_PORT_DIR}/assets)
 target_compile_definitions(t2asset PRIVATE MINIZ_NO_ZLIB_COMPATIBLE_NAMES _LARGEFILE64_SOURCE)
 set_source_files_properties(${T2_PORT_DIR}/third_party/miniz/miniz.c PROPERTIES COMPILE_OPTIONS "-w")
 
-add_executable(turok2 main.cpp t2asset_lus.cpp testdl.c)
+add_executable(turok2 main.cpp t2asset_lus.cpp testdl.c offscreen_gl.cpp)
 set_target_properties(turok2 PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON C_STANDARD 11)
 # The game's GBI family: F3DEX2 (F3DEX.NoN fifo 2.05 + L3DEX 2.05, include/globals/ucode.h).
 # Must match libultraship's GBI_UCODE so macros encode what the interpreter decodes.
 target_compile_definitions(turok2 PRIVATE ${GBI_UCODE})
 target_link_libraries(turok2 PRIVATE libultraship t2asset)
+if(APPLE)
+    # --offscreen-gl (offscreen_gl.cpp): LUS's OpenGL renderer on a CGL context with no window
+    set_source_files_properties(offscreen_gl.cpp PROPERTIES COMPILE_DEFINITIONS "ENABLE_OPENGL"
+                                COMPILE_OPTIONS "-Wno-deprecated-declarations")
+    find_package(GLEW REQUIRED)
+    target_link_libraries(turok2 PRIVATE GLEW::GLEW "-framework OpenGL")
+endif()
 
 # The game linked into turok2 (docs/port/LINK.md): turok2_game (engine + module 1, minus the
 # files port/runtime replaces) + t2runtime (t2os threads, device shims, boot glue) + the

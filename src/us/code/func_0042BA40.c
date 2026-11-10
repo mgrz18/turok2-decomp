@@ -58,7 +58,7 @@ extern f32 AI_DistSqToPointAtHeight(CGameObjectInstance *obj, CVector3 pos);
 void CScene__DecompressAnimatedInstances(CScene *world, Handle **handle) {
     CWarpPoint spawns[4];
     CGameObjectInstance *objects;
-    s32 mode;
+    sptr mode;
     Handle *block;
     s32 nspawns;
     LevelNode *node;

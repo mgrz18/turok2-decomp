@@ -573,7 +573,7 @@ extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode *
 extern void memset(void *p, s32 c, sptr n); /* memset */
 extern f32 func_002982F0(f32 angle);             /* sin */
 extern void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
-extern void CGameObjectInstance__Construct(CGameObjectInstance *fx, s32 a, s32 b, s32 c, void *d, s32 e, s32 f, f32 g, CVector3 h, s32 i, CVector3 j,
+extern void CGameObjectInstance__Construct(CGameObjectInstance *fx, s32 a, s32 b, s32 c, void *d, s32 e, sptr f, f32 g, CVector3 h, s32 i, CVector3 j,
                           CVector3 k, s32 l);
 extern void func_0021E5D4(CGameObjectInstance *fx);
 extern void CGameObjectInstance__ClearDrawMatrices(CGameObjectInstance *fx);
@@ -1244,7 +1244,12 @@ s32 MenuItem_TextLength(MenuItem *a) {
     u8 *s;
 
     if (a->type == 5) {
+#ifdef TARGET_PORT
+        /* ABI (docs/port/ABI.md): MIPS passes a (a0) through */
+        s = ((u8 *(*)(MenuItem *))func_00413230_4160F0)(a);
+#else
         s = func_00413230_4160F0();
+#endif
     } else {
         s = (u8 *) a->text;
     }
@@ -1318,7 +1323,7 @@ CIntelligence *MenuItem_SetModel(MenuItem *a, s32 id, s32 arg) {
 /* ---------------- func_004162E4 ---------------- */
 s32 func_004162E4(Menu *arg0) {
     ControllerProfile *temp_v1;
-    s32 var_v0;
+    sptr var_v0;
 
     temp_v1 = arg0->controller;
     var_v0 = 0;
@@ -1394,7 +1399,7 @@ f32 Menu_TextWidth(u8 *p, f32 sx, f32 sy) {
 }
 
 /* ---------------- MenuItem_SelectSubmenu ---------------- */
-s32 func_00415FB8_416454(s32, s32) __asm__("MenuPool_OpenSubmenu");
+s32 func_00415FB8_416454(sptr, sptr) __asm__("MenuPool_OpenSubmenu");
 
 s32 MenuItem_SelectSubmenu(s32 arg0, sptr arg1, s32 arg2) {
     return func_00415FB8_416454(arg2, arg1) != 0;
@@ -1429,8 +1434,8 @@ s32 Menu_StepValue(Menu *menu,s32 value,s32 step,s32 minimum,s32 maximum,s32 wra
 }
 
 /* ---------------- Menu_StepValueLR ---------------- */
-s32 func_00285628_416558(s32) __asm__("Controller_MenuLeft");
-s32 func_00285670_416558(s32) __asm__("Controller_MenuRight");
+s32 func_00285628_416558(sptr) __asm__("Controller_MenuLeft");
+s32 func_00285670_416558(sptr) __asm__("Controller_MenuRight");
 /* Menu_StepValue with its own left/right reading (Menu controller). */
 s32 Menu_StepValueLR(Menu *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
@@ -1606,7 +1611,7 @@ sptr MenuPool_OpenChildMenu(MenuPool *pool, Menu *c, MenuDesc *t) {
 }
 
 /* ---------------- MenuPool_Update ---------------- */
-s32 func_0041531C_4169C8(s32, s32) __asm__("Menu_Update");
+s32 func_0041531C_4169C8(sptr, sptr) __asm__("Menu_Update");
 
 void MenuPool_Update(MenuPool *arg0) {
     s32 (*temp_v0)(Menu *, MenuPool *);
@@ -1692,7 +1697,7 @@ s32 MenuPool_GetCamera(s32 arg0) {
  * off as func_00416B44. */
 
 extern void CList__Remove_416B30(MenuPool *list, Menu *item) __asm__("CList__Remove");
-extern void func_002052D8_416B30(s32, void *mem) __asm__("CCache__Deallocate");
+extern void func_002052D8_416B30(sptr, void *mem) __asm__("CCache__Deallocate");
 
 /* Closes and frees every open menu. */
 void MenuPool_CloseAll(MenuPool *pool) {
@@ -1724,7 +1729,12 @@ f32 MenuItem_TextWidth(MenuItem *a, f32 scale) {
     u8 *s;
 
     if (a->type == 5) {
+#ifdef TARGET_PORT
+        /* ABI (docs/port/ABI.md): MIPS passes a (a0) through */
+        s = ((u8 *(*)(MenuItem *))func_00413230_416BAC)(a);
+#else
         s = func_00413230_416BAC();
+#endif
     } else {
         s = (u8 *) a->text;
     }
@@ -1943,7 +1953,7 @@ void Menu_Close(Menu *arg0) {
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/ITEMS/80442BC8_11.CPP, func_8044322C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern void func_00414EA8_4172F8(void *, void **, MenuDesc *, s32, s32, s32, s32, MenuPool *) __asm__("Menu_Construct");
+extern void func_00414EA8_4172F8(void *, void **, MenuDesc *, s32, sptr, sptr, sptr, MenuPool *) __asm__("Menu_Construct");
 void CList__AddHead_4172F8(void *list, void *node) __asm__("CList__AddHead");
 extern void **func_00204EDC_4172F8(s32, s32, s32, char *) __asm__("CCache__Allocate");
 /* Opens the window described by list in the pool owner. */
@@ -1976,8 +1986,8 @@ void *MenuPool_OpenMenuParam(MenuPool *owner, MenuDesc *list, s32 a, s32 b, s32 
 }
 
 /* ---------------- MenuPool_CloseMenu ---------------- */
-s32 CList__Remove_417418(s32, s32) __asm__("CList__Remove");
-s32 func_002052D8_417418(s32, s32) __asm__("CCache__Deallocate");
+s32 CList__Remove_417418(sptr, sptr) __asm__("CList__Remove");
+s32 func_002052D8_417418(sptr, sptr) __asm__("CCache__Deallocate");
 
 void MenuPool_CloseMenu(s32 arg0, Menu *arg1) {
     s32 (*temp_v0)(Menu *, s32);

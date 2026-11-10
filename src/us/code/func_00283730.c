@@ -1,8 +1,8 @@
 #include "common.h"
 
-s32 CList__AddHead(s32, s32);                /* extern */
+s32 CList__AddHead(sptr, sptr);                /* extern */
 #ifdef TARGET_PORT
-s32 CList__Remove(s32, s32);
+s32 CList__Remove(sptr, sptr);
 #else
 s32 CList__Remove(s32);
 #endif                         /* extern */

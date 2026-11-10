@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern s32 Bits_Read(s32 arg0, s32 arg1);
+extern s32 Bits_Read(sptr arg0, s32 arg1);
 void Anim_DecodeRawChannel(sptr arg0, void *arg1, s32 arg2)
 {
   int new_var;

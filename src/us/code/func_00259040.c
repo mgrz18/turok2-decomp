@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-s32 CPlayer__FireWeapon(s32, s32);
+s32 CPlayer__FireWeapon(sptr, s32);
 s32 CPlayer__StartWeaponBackgroundSound(sptr, s32);
 s32 CPlayer__StartWeaponFiringSound(sptr, s32);
 

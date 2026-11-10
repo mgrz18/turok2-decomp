@@ -6,7 +6,7 @@
 #include "globals/audio.h"
 
 extern s32 CAudioWorld__PlaySoundPitched(struct ContextRecAt2BC0 *arg0, s32 arg1, CVector3 arg2,
-                         s32 arg3, s32 arg4, f32 arg5);
+                         sptr arg3, s32 arg4, f32 arg5);
 #ifdef TARGET_PORT
 int T2Port_AudioReady(void);
 #endif

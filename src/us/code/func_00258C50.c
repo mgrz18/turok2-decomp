@@ -4,7 +4,7 @@
 #include "structs/weapon.h"
 #include "protos/ai.h"
 
-s32 CPlayer__GetWeaponAmmo(s32, s32);
+s32 CPlayer__GetWeaponAmmo(sptr, s32);
 s32 WeaponActor_CheckFire(sptr, sptr);
 
 

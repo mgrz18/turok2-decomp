@@ -1,5 +1,8 @@
 #include "structs/vector.h"
 #include "globals/engine.h"
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#endif
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80213ED4.CPP, func_80213ED4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -24,6 +27,42 @@ typedef struct Source110 Source110;
 struct StateEntry;
 typedef struct StateEntry StateEntry;
 struct Source110;
+#ifdef TARGET_PORT
+/* Host views (tools/port/hostview.py, the fields this file reads): Source110 is the
+ * CGameObjectInstance, Dest its CAI. At the N64 offsets Dest's scale/entry_scale/
+ * state_result missed CAI::m_AnimSpeed/m_AnimModeSpeed/m_AnimIndex, so
+ * gFrameIncrement was multiplied by garbage for every animated actor (their animations
+ * never advanced). */
+#define T2_HOFF_Source110(m) __builtin_offsetof(CGameObjectInstance, m)
+struct Source110 {
+    union {
+        struct { u8 _hp_flags[T2_HOFF_Source110(m_dwFlags)]; u32 flags; };
+        struct { u8 _hp_limit[T2_HOFF_Source110(m_CurrentAnimation.m_AnimationFrame)]; f32 limit; };
+        struct { u8 _hp_current_state[T2_HOFF_Source110(m_CurrentAnimation.m_nAnimIndex)]; s16 current_state; };
+        struct { u8 _hp_previous_state[T2_HOFF_Source110(m_CurrentAnimation.m_nRequestedAnimIndex)]; s16 previous_state; };
+        struct { u8 _hp_counter[T2_HOFF_Source110(m_CurrentAnimation.m_nFrames)]; s16 counter; };
+        struct { u8 _hp_state_changed[T2_HOFF_Source110(m_CurrentAnimation.m_bCycleCompleted)]; s8 state_changed; };
+        struct { u8 _hp_animationChanged[T2_HOFF_Source110(m_CurrentAnimation.m_bAnimActive)]; u8 animationChanged; };
+        struct { u8 _hp_stateChanged[T2_HOFF_Source110(m_BlendAnimation.m_bAnimActive)]; u8 stateChanged; };
+    };
+};
+#define T2_HOFF_Dest(m) __builtin_offsetof(CAI, m)
+struct Dest {
+    union {
+        struct { u8 _hp_flags[T2_HOFF_Dest(m_dwFlags)]; u32 flags; };
+        struct { u8 _hp_entry[T2_HOFF_Dest(m_pModeCurrent)]; StateEntry *entry; };
+        struct { u8 _hp_state[T2_HOFF_Dest(m_Mode)]; s8 state; };
+        struct { u8 _hp_old_state[T2_HOFF_Dest(m_ModeLastFrame)]; s8 old_state; };
+        struct { u8 _hp_old_entry_flags[T2_HOFF_Dest(m_ModeLastFrameFlags)]; u32 old_entry_flags; };
+        struct { u8 _hp_entry_flags[T2_HOFF_Dest(m_ModeFlags)]; u32 entry_flags; };
+        struct { u8 _hp_scale[T2_HOFF_Dest(m_AnimSpeed)]; f32 scale; };
+        struct { u8 _hp_entry_scale[T2_HOFF_Dest(m_AnimModeSpeed)]; f32 entry_scale; };
+        struct { u8 _hp_result[T2_HOFF_Dest(m_AnimType)]; s16 result; };
+        struct { u8 _hp_state_result[T2_HOFF_Dest(m_AnimIndex)]; s8 state_result; };
+        struct { u8 _hp_count[T2_HOFF_Dest(m_AnimRepeatedCount)]; u8 count; };
+    };
+};
+#else
 struct Source110 {
     char pad0[0x1C];
     CVector3 velocity;
@@ -110,7 +149,22 @@ struct Dest {
     s32 field144, field148, field14C, field150;
     u8 reserved154[0x1C];
 };
+#endif
 typedef void *( *StateCallback)(struct Source110 *, struct Dest *);
+#ifdef TARGET_PORT
+/* a CAIModeInfo row (structs/game_object.h) at its host offsets */
+#define T2_HOFF_StateEntry(m) __builtin_offsetof(CAIModeInfo, m)
+struct StateEntry {
+    union {
+        struct { u8 _hp_id[T2_HOFF_StateEntry(m_Mode)]; sptr id; };
+        struct { u8 _hp_enter[T2_HOFF_StateEntry(unk_04)]; void (*enter)(struct Source110 *, struct Dest *); };
+        struct { u8 _hp_callback[T2_HOFF_StateEntry(unk_10)]; StateCallback callback; };
+        struct { u8 _hp_scale[T2_HOFF_StateEntry(m_AnimSpeed)]; f32 scale; };
+        struct { u8 _hp_threshold[T2_HOFF_StateEntry(unk_18)]; s32 threshold; };
+        struct { u8 _hp_flags[T2_HOFF_StateEntry(unk_1C)]; u32 flags; };
+    };
+};
+#else
 struct StateEntry {
     s32 id;
     void (*enter)(struct Source110 *, struct Dest *);
@@ -120,6 +174,7 @@ struct StateEntry {
     s32 threshold;
     u32 flags;
 };
+#endif
 extern s32 IsCodePointer(StateCallback);
 extern s32 IsDataPointer(uptr);
 extern void *CGameObjectInstance__PickAvailableAction(void *, void *, s32);

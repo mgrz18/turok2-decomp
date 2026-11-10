@@ -3,7 +3,7 @@
 #include "globals/ai.h"
 #include "protos/ai.h"
 
-f32 AI_AngleToPoint(s32, CVector3);               /* angle from the actor heading to a point */
+f32 AI_AngleToPoint(sptr, CVector3);               /* angle from the actor heading to a point */
 
 
 void EnemyAI_TurnToPoint(s32 arg0, CAI *arg1) {

@@ -1,5 +1,23 @@
 
 #include "protos/ultra.h"
+#ifdef TARGET_PORT
+#include "structs/libaudio.h"
+/* host: the low-pass filter's fields at the host offsets (fstate is a pointer at 0x28, first at 0x30) */
+void *_filterBuffer(void *arg0, s32 arg1, s32 arg2, void *arg3)
+{
+  ALLowPass *lp = arg0;
+  u32 *cmd = arg3;
+  s32 buf = arg1 & 0xFFFF;
+  cmd[0] = buf | 0x08000000;
+  cmd[1] = (buf << 0x10) | ((arg2 * 2) & 0xFFFF);
+  cmd[2] = 0x0B000020;
+  cmd[3] = osVirtualToPhysical(&lp->fcvec);
+  cmd[4] = ((lp->first & 0xFF) << 0x10) | (u16) lp->fgain | 0x0E000000;
+  cmd[5] = osVirtualToPhysical(lp->fstate);
+  lp->first = 0;
+  return cmd + 6;
+}
+#else
 void *_filterBuffer(void *arg0, s32 arg1, s32 arg2, void *arg3)
 {
   s32 temp_a1;
@@ -22,3 +40,4 @@ void *_filterBuffer(void *arg0, s32 arg1, s32 arg2, void *arg3)
   *((s32 *) ((new_var = (s8 *) var_s2) + 0x2C)) = 0;
   return var_s1;
 }
+#endif

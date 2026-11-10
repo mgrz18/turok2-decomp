@@ -45,7 +45,7 @@ extern OSThread gThreadMain;
 extern u8 gHeap[], gDecompressor[], gLoader[];
 
 void mainproc(void *arg);
-void CHeap__Construct(void *heap, void *base, u32 size);
+void CHeap__Construct(void *heap, void *base, uintptr_t size);
 void CDecompressor__Construct(void *p, s32 n);
 void CLoader__Construct(void *p, s32 n);
 void CCache__Construct(s32 a, s32 b);

@@ -3,7 +3,7 @@
 #include "globals/scene.h"
 #include "protos/scene.h"
 
-s32 CPooledLevelActor__Release(s32);
+s32 CPooledLevelActor__Release(sptr);
 s32 CPlayer__CollectPickup(sptr, sptr, s32);
 s32 GameObject_GetTypeId(sptr);
 
