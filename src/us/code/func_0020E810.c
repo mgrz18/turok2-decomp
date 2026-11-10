@@ -3,6 +3,12 @@
 
 #include "rw/abu_types.h"
 #include "globals/math.h"
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck struct_scalar): the callers pass a result pointer first, as
+ * MIPS does for a struct returned by value; x86-64 and arm64 return this struct in registers.
+ * The definition keeps its by-value form as CQuaternion__FromDirection_byval; CQuaternion__FromDirection below takes the pointer. */
+#define CQuaternion__FromDirection CQuaternion__FromDirection_byval
+#endif
 
 extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
@@ -91,3 +97,10 @@ general:
     }
     return result;
 }
+
+#ifdef TARGET_PORT
+#undef CQuaternion__FromDirection
+void CQuaternion__FromDirection(Vector4f *out, CVector3 *input) {
+    *out = CQuaternion__FromDirection_byval(input);
+}
+#endif

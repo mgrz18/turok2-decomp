@@ -6,6 +6,9 @@
 extern void CMtxF__TransformPoint(void *, void *, void *);
 extern void CMtxF__RotateVector(void *arg0, void *arg1, void *arg2);
 extern void CVector3__Normalize(f32 *);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Actors_GetLightVolumeFalloff Actors_GetLightVolumeFalloff_f3
+#endif
 extern s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, f32 arg1, f32 arg2, f32 arg3,
                         f32 *arg4, f32 *arg5);
 extern void CVector3__Scale(void *, void *, f32);

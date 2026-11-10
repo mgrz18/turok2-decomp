@@ -27,6 +27,9 @@ void CParticle__Attach(B19Obj *, s32, s32);
 void Trail_AddNode(void *, B19Obj *, s32);
 s32 DLight_Spawn(void *, s32);
 void CParticle__StartLoopSound(B19Obj *, s32);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Sound__Play Sound__Play_f3
+#endif
 void Sound__Play(s16, f32, f32, f32, s32, s32);
 void CParticle__StartEffects(B19Obj *o, B19Def *def) {
     s32 t;

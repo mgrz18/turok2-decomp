@@ -3,6 +3,9 @@
 #include "globals/pickup.h"
 
 f32 Random_Blend(f32, f32);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define GameObject_DropPickupAt GameObject_DropPickupAt_i3
+#endif
 void GameObject_DropPickupAt(void *, s32, s32, s32, s32, f32);
 typedef struct { u8 pad0[4]; s32 x, y, z; /* pos at 0x4 */ } B04O;
 void AI_DropPickupsOnce(B04O *o, u32 *flags, u32 bit, u32 m1, u32 m2) {

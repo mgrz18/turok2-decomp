@@ -24,6 +24,9 @@ typedef struct B10Obj {
 } B10Obj;
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
+#define CGameObjectInstance__GetRotation CGameObjectInstance__GetRotation_sret
+#endif
 void CGameObjectInstance__GetRotation(B10Q4 *out, B10Obj *o);
 f32 GameObject_GetCollisionHeight(B10Obj *o);
 void CVector3__Subtract(CVector3 *o, CVector3 *a, CVector3 *b);

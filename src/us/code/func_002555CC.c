@@ -5,6 +5,9 @@
 
 s32 GameObject_GetPlatformBelow(s32);
 s32 GameObject_GetFrameDelta(s32, s32);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Sound__Play Sound__Play_i3
+#endif
 s32 Sound__Play(s32, s32, sptr, s32, s32, s32);
 
 M2C_UNK CVector3__Add(void *, void *, M2C_UNK *);   /* extern */

@@ -1,6 +1,12 @@
 #include "common.h"
 #include "structs/region.h"
 #include "globals/region.h"
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck struct_scalar): the callers pass a result pointer first, as
+ * MIPS does for a struct returned by value; x86-64 and arm64 return this struct in registers.
+ * The definition keeps its by-value form as CGameRegion__GetNormalRaw_byval; CGameRegion__GetNormalRaw below takes the pointer. */
+#define CGameRegion__GetNormalRaw CGameRegion__GetNormalRaw_byval
+#endif
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -22,3 +28,10 @@ CVector3 CGameRegion__GetNormalRaw(CGameRegion *polygon) {
     sCachedRawNormalRegion = polygon;
     return sRegionNormal;
 }
+
+#ifdef TARGET_PORT
+#undef CGameRegion__GetNormalRaw
+void CGameRegion__GetNormalRaw(CVector3 *out, CGameRegion *polygon) {
+    *out = CGameRegion__GetNormalRaw_byval(polygon);
+}
+#endif

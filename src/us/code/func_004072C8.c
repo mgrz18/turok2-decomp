@@ -2,6 +2,9 @@
 #include "structs/game_object.h"
 
 s32 AI_StartSound(s32, s32, s32);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Sound__Play Sound__Play_i3
+#endif
 s32 Sound__Play(s32, s32, sptr, s32, s32, s32);
 
 /* Field access by byte offset: a struct member reference here would let the

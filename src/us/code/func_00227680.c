@@ -19,6 +19,9 @@ typedef struct Pickup {
 extern u8 D_800F1EF0[];
 
 void CLevelActor__Update(Pickup *obj);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Collision_MoveInstance Collision_MoveInstance_f3
+#endif
 void Collision_MoveInstance(Pickup *obj, f32 x, f32 y, f32 z, void *arg4);
 
 /* Counts the timer down, moves the object (CLevelActor__Update), stops it unless its definition is

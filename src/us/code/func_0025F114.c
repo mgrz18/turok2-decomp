@@ -7,6 +7,9 @@
  * interior symbols gEnemyAlertPoint_y/_z (the member path shares one base register
  * and does not match). */
 
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define AI_AngleToPoint AI_AngleToPoint_f3
+#endif
 f32 AI_AngleToPoint(CGameObjectInstance *self, f32 x, f32 y, f32 z); /* angle to a point (a CVector3 by value) */
 void EnemyMode_Move_Update(CGameObjectInstance *self, CAI *ai);
 

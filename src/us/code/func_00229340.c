@@ -7,6 +7,9 @@
 #include "protos/game.h"
 
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define CMtxF__SetRotateZ CMtxF__SetRotateZ_i
+#endif
 extern void CMtxF__SetRotateZ(CMtxF m, s32 angle);              /* rotation about Y */
 extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);  /* transform */
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */

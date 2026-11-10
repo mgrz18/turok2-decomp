@@ -54,6 +54,9 @@ extern PortSetup D_8011AB88[];
 
 void CPlayer__Update(CPlayer *p);
 void CPlayer__UpdateOrbitCamera(CPlayer *p, CPlayer *other);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Automap_SetPlayer Automap_SetPlayer_f
+#endif
 void Automap_SetPlayer(void *, sptr region, f32 yaw, CVector3 pos);
 void CPlayer__ReadInput(void *input, CPlayer *p);
 s32 Controller_StartPressedNoCinema(ControllerProfile *c);

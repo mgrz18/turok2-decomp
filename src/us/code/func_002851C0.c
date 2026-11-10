@@ -8,6 +8,9 @@
 
 extern void RumblePool_FreeFinished(RumblePool *pool);
 extern u32 osMotorStop(struct Triple *);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Rumble_GetLevelAt Rumble_GetLevelAt_i3
+#endif
 extern f32 Rumble_GetLevelAt(void *arg0, s32 arg1, s32 arg2, s32 arg3);
 extern void RumblePool_FreeAll(RumblePool *pool);
 extern unsigned int osMotorStart(void *arg0);

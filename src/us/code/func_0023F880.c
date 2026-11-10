@@ -34,6 +34,9 @@ void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 s32 Sweep_HitPlane(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
 s32 func_002682CC(HitInst *inst);
 void ImpactEvent_Send(HitInst *a, HitInst *b, s32 type, s32 arg3, CVector3 pos, EffectParams params);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define Sound__Play Sound__Play_f3
+#endif
 void Sound__Play(s32 sound, f32 x, f32 y, f32 z, s32 arg4, s32 arg5);
 
 #define DOT(a, b) ((a).x * (b).x + (a).y * (b).y + (a).z * (b).z)

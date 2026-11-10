@@ -3,6 +3,14 @@
 
 #include "rw/abu_types.h"
 #include "globals/camera.h"
+#ifdef TARGET_PORT
+/* ABI (docs/port/ABI.md, abicheck struct_class): the position is a float struct on the host.
+ * MIPS passes the Rage Wars Triple (three s32) and a CVector3 in the same registers; x86-64
+ * and arm64 do not (integer vs SSE/FP registers), so Triple means three floats here. */
+typedef struct { float x, y, z; } T2HostTriple;
+#define Triple T2HostTriple
+#endif
+
 
 extern s32 CCameraPool__StartShake(void *arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, s32 arg5, Triple arg6);
 void func_00238958(s32 arg0, s32 arg1, s32 arg2, Triple t, Vec4s v) {

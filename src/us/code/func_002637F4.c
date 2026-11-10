@@ -2,6 +2,9 @@
 #include "structs/vector.h"
 #include "globals/scene.h"
 
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define CLevelActorPool__Spawn CLevelActorPool__Spawn_i
+#endif
 u8 *CLevelActorPool__Spawn(CLevelActorPool *table, void *slot, s32 arg, CVector3 origin, CVector3 pos, s32 b, s32 c);
 void Actor_SpawnParticle(void *actor, s32 event, CVector3 pos, s32 n);
 
