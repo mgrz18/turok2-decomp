@@ -19,10 +19,20 @@ typedef struct {
     /* 0x14 */ f32 lookUp;
 } LookTuning;
 
+#ifdef TARGET_PORT
+/* The N64 reads the u16 pair at 0x50 (m_DamageAmount, m_wFlags52) as one big-endian word and
+ * tests its low half; the archive swaps them as two u16 (structs/region.h), so on the host the
+ * word's low half is m_DamageAmount (0x2710 in level 51: & 0x6000 == 0x2000 blocked turning). */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x52];
+    /* 0x52 */ u16 flags;
+} Floor;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x50];
     /* 0x50 */ u32 flags;
 } Floor;
+#endif
 
 Floor *GameObject_GetRegionInfo(CGameObjectInstance *body);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
