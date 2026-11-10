@@ -9,6 +9,23 @@
 #include "globals/collision.h"
 #include "globals/player.h"
 
+#ifdef TARGET_PORT
+typedef struct Actor {
+/* the view at the host offsets of CPlayer (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Actor(m) __builtin_offsetof(CPlayer, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_Actor(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_region[T2_HOFF_Actor(m_CharacterActor.header.m_pCurrentRegion)]; sptr region; }; /* N64 0x10 */
+        struct { u8 _hp_def[T2_HOFF_Actor(m_CharacterActor.header.m_pIntelligence)]; CIntelligence *def; }; /* N64 0x14 */
+        struct { u8 _hp_eye[T2_HOFF_Actor(m_CharacterActor.m_CollisionYOffset)]; f32 eye; }; /* N64 0x54 */
+        struct { u8 _hp_flags[T2_HOFF_Actor(m_CharacterActor.m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_owner[T2_HOFF_Actor(m_CharacterActor.m_AI.m_pParent)]; void *owner; }; /* N64 0x1A8 */
+        struct { u8 _hp_alive[T2_HOFF_Actor(m_Data.m_Lives)]; s16 alive; }; /* N64 0x52A */
+        struct { u8 _hp_character[T2_HOFF_Actor(m_Mode)]; s16 character; }; /* N64 0xA08 */
+    };
+} Actor;
+#else
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];
     /* 0x004 */ CVector3 pos;
@@ -25,12 +42,28 @@ typedef struct Actor {
     /* 0x52C */ u8 pad52C[0xA08 - 0x52C];
     /* 0xA08 */ s16 character;      /* players */
 } Actor;
+#endif
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x10];
     /* 0x10 */ f32 height;
 } CameraInfo;
 
+#ifdef TARGET_PORT
+typedef struct Plan {
+/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Plan(m) __builtin_offsetof(CAI, m)
+    union {
+        struct { u8 _hp_unk37[T2_HOFF_Plan(m_Action)]; s8 unk37; }; /* N64 0x37 */
+        struct { u8 _hp_ignore[T2_HOFF_Plan(m_pParent)]; Actor *ignore; }; /* N64 0x68 */
+        struct { u8 _hp_forced[T2_HOFF_Plan(m_pTargetOverride)]; Actor *forced; }; /* N64 0x78 */
+        struct { u8 _hp_approachFrom[T2_HOFF_Plan(m_pSightTarget)]; Actor *approachFrom; }; /* N64 0x80 */
+        struct { u8 _hp_pos[T2_HOFF_Plan(m_vLeashPos)]; CVector3 pos; }; /* N64 0xAC */
+        struct { u8 _hp_region[T2_HOFF_Plan(m_pLeashRegion)]; sptr region; }; /* N64 0xB8 */
+    };
+} Plan;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x37];
     /* 0x37 */ s8 unk37;
@@ -44,6 +77,7 @@ typedef struct {
     /* 0xAC */ CVector3 pos;
     /* 0xB8 */ s32 region;
 } Plan;
+#endif
 
 s32 AI_UpdatePathHeading(Actor *self, Plan *plan, Actor *target);
 s32 AI_IsInViewCone(Actor *viewer, Actor *target, f32 range, f32 across, f32 up);

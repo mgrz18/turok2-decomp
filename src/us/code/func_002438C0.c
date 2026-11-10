@@ -10,11 +10,41 @@ typedef struct {
     /* 0x0C */ s32 region;
 } Location;
 
+#ifdef TARGET_PORT
+typedef struct PlanInfo {
+/* the view at the host offsets of CAIModeInfo (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_PlanInfo(m) __builtin_offsetof(CAIModeInfo, m)
+    union {
+        struct { u8 _hp_unkC[T2_HOFF_PlanInfo(m_pData)]; sptr unkC; }; /* N64 0xC */
+    };
+} PlanInfo;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0xC];
     /* 0x0C */ s32 unkC;
 } PlanInfo;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct Plan {
+/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Plan(m) __builtin_offsetof(CAI, m)
+    union {
+        struct { u8 _hp_active[T2_HOFF_Plan(m_Health)]; s32 active; }; /* N64 0x4 */
+        struct { u8 _hp_info[T2_HOFF_Plan(m_pModeCurrent)]; PlanInfo *info; }; /* N64 0x30 */
+        struct { u8 _hp_ignore[T2_HOFF_Plan(m_pParent)]; CGameObjectInstance *ignore; }; /* N64 0x68 */
+        struct { u8 _hp_approachFrom[T2_HOFF_Plan(m_pSightTarget)]; CGameObjectInstance *approachFrom; }; /* N64 0x80 */
+        struct { u8 _hp_unk84[T2_HOFF_Plan(m_pPathAvoidRegion)]; sptr unk84; }; /* N64 0x84 */
+        struct { u8 _hp_rotY[T2_HOFF_Plan(m_PathRotY)]; f32 rotY; }; /* N64 0x8C */
+        struct { u8 _hp_height[T2_HOFF_Plan(m_PathHeight)]; f32 height; }; /* N64 0x90 */
+        struct { u8 _hp_location[T2_HOFF_Plan(m_PathTrack.m_Mode)]; s8 location; }; /* N64 0x94 */
+        struct { u8 _hp_pos[T2_HOFF_Plan(m_vLeashPos)]; CVector3 pos; }; /* N64 0xAC */
+        struct { u8 _hp_region[T2_HOFF_Plan(m_pLeashRegion)]; sptr region; }; /* N64 0xB8 */
+    };
+} Plan;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[4];
     /* 0x04 */ s32 active;
@@ -33,6 +63,7 @@ typedef struct {
     /* 0xAC */ CVector3 pos;
     /* 0xB8 */ s32 region;
 } Plan;
+#endif
 
 
 Location *CPathTrack__GetCurrentPoint(s8 *location);
@@ -43,8 +74,8 @@ void CVector3__Normalize(CVector3 *v);                          /* normalise */
 f32 CVector3__GetYaw(CVector3 *v);                           /* heading */
 f32 GameObject_GetCollisionRadius(CGameObjectInstance *a);                           /* radius */
 void GameObject_TraceMove(CGameObjectInstance *a, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
-sptr Path_FindFleeRegion(CGameObjectInstance *a, sptr b, CVector3 pos, sptr region, s32 d, CVector3 *out);
-s32 Path_FindRegionPath(CGameObjectInstance *a, CVector3 pos, sptr region, s32 d, CVector3 *hit);
+sptr Path_FindFleeRegion(CGameObjectInstance *a, sptr b, CVector3 pos, sptr region, sptr d, CVector3 *out);
+s32 Path_FindRegionPath(CGameObjectInstance *a, CVector3 pos, sptr region, sptr d, CVector3 *hit);
 s32 CGameRegion__ContainsXZ(sptr region, f32 x, f32 z);
 f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);
 

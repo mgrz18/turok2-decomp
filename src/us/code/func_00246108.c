@@ -6,7 +6,21 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 typedef struct { u8 pad0[4]; CVector3 pos; } B04A; /* pos at 0x4 in Turok 2 (0x8 in Rage Wars) */
+#ifdef TARGET_PORT
+typedef struct B04B {
+/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_B04B(m) __builtin_offsetof(CAI, m)
+    union {
+        struct { u8 _hp_unk78[T2_HOFF_B04B(m_pTargetOverride)]; sptr unk78; }; /* N64 0x78 */
+        struct { u8 _hp_unk7C[T2_HOFF_B04B(m_TargetOverrideTime)]; f32 unk7C; }; /* N64 0x7C */
+        struct { u8 _hp_unk80[T2_HOFF_B04B(m_pSightTarget)]; sptr unk80; }; /* N64 0x80 */
+        struct { u8 _hp_unk88[T2_HOFF_B04B(m_pPathTarget)]; sptr unk88; }; /* N64 0x88 */
+    };
+} B04B;
+#else
 typedef struct { u8 pad0[0x78]; s32 unk78; f32 unk7C; s32 unk80; u8 pad84[4]; s32 unk88; } B04B;
+#endif
 typedef struct { CAITarget a; CAITarget b; } B04C;
 void AI_GetPathTargetInfo(B04A *, B04B *, sptr, CAITarget *);
 void AI_GetSightTargetInfo(B04A *, B04B *, s32, CAITarget *);
