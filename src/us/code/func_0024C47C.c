@@ -361,6 +361,21 @@ typedef struct Controller {
     /* 0x08 */ CVector3 pos;
 } Controller;
 
+#ifdef TARGET_PORT
+typedef struct Input {
+/* the view at the host offsets of CPlayerContState (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_IN(m) __builtin_offsetof(CPlayerContState, m)
+    union {
+        struct { u8 _hp_controller[T2_HOFF_IN(m_pContState)]; Controller *controller; }; /* N64 0x10 */
+        struct { u8 _hp_held[T2_HOFF_IN(m_dwButtons)]; u32 held; }; /* N64 0x24 */
+        struct { u8 _hp_pressed[T2_HOFF_IN(m_dwButtonsSingle)]; u32 pressed; }; /* N64 0x28 */
+        struct { u8 _hp_unk2C[T2_HOFF_IN(m_dwButtonsSingleNoHold)]; s32 unk2C; }; /* N64 0x2C */
+        struct { u8 _hp_unk30[T2_HOFF_IN(m_dwButtonsDouble)]; s32 unk30; }; /* N64 0x30 */
+        struct { u8 _hp_unk34[T2_HOFF_IN(m_dwButtonsRepeat)]; s32 unk34; }; /* N64 0x34 */
+    };
+} Input;
+#else
 typedef struct Input {
     /* 0x00 */ u8 pad0[0x10];
     /* 0x10 */ Controller *controller;
@@ -371,17 +386,101 @@ typedef struct Input {
     /* 0x30 */ s32 unk30;
     /* 0x34 */ s32 unk34;
 } Input;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct Voice {
+/* the view at the host offsets of CAIModeInfo (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_VO(m) __builtin_offsetof(CAIModeInfo, m)
+    union {
+        struct { u8 _hp_bank[T2_HOFF_VO(unk_10)]; s32 bank; }; /* N64 0x10 */
+    };
+} Voice;
+#else
 typedef struct Voice {
     /* 0x00 */ u8 pad0[0x10];
     /* 0x10 */ s32 bank;
 } Voice;
+#endif
 
 /* CPlayer (structs/player.h) as CPlayer__Update reads it, kept local: it uses
  * the player both as itself and as its m_CharacterActor (actor = p), and
  * several words are typed against the header (0x10 the region as a Model,
  * the controller's 0x08 as a position, the weapon actor's 0x3F4 as a voice,
  * u32 flags), which would take a cast at most uses. */
+#ifdef TARGET_PORT
+typedef struct Player {
+/* the view at the host offsets of CPlayer (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_PL(m) __builtin_offsetof(CPlayer, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_PL(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_model[T2_HOFF_PL(m_CharacterActor.header.m_pCurrentRegion)]; Model *model; }; /* N64 0x10 */
+        struct { u8 _hp_def[T2_HOFF_PL(m_CharacterActor.header.m_pIntelligence)]; CIntelligence *def; }; /* N64 0x14 */
+        struct { u8 _hp_velY[T2_HOFF_PL(m_CharacterActor.m_vVelocity.y)]; f32 velY; }; /* N64 0x1C */
+        struct { u8 _hp_unk40[T2_HOFF_PL(m_CharacterActor.m_qGround)]; Quad unk40; }; /* N64 0x40 */
+        struct { u8 _hp_yaw[T2_HOFF_PL(m_CharacterActor.m_RotY)]; f32 yaw; }; /* N64 0x50 */
+        struct { u8 _hp_flags[T2_HOFF_PL(m_CharacterActor.m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_anim[T2_HOFF_PL(m_CharacterActor.m_CurrentAnimation.m_nAnimIndex)]; s16 anim; }; /* N64 0xDC */
+        struct { u8 _hp_animPending[T2_HOFF_PL(m_CharacterActor.m_CurrentAnimation.m_bCycleCompleted)]; s8 animPending; }; /* N64 0xE2 */
+        struct { u8 _hp_aiFlags[T2_HOFF_PL(m_CharacterActor.m_AI.m_dwFlags)]; u32 aiFlags; }; /* N64 0x140 */
+        struct { u8 _hp_owner[T2_HOFF_PL(m_CharacterActor.m_AI.m_pParent)]; struct Player *owner; }; /* N64 0x1A8 */
+        struct { u8 _hp_emitter[T2_HOFF_PL(m_WeaponActor.header)]; u8 emitter[4]; }; /* N64 0x288 */
+        struct { u8 _hp_emitterPos[T2_HOFF_PL(m_WeaponActor.header.m_vPos)]; CVector3 emitterPos; }; /* N64 0x28C */
+        struct { u8 _hp_emitterModel[T2_HOFF_PL(m_WeaponActor.header.m_pCurrentRegion)]; Model *emitterModel; }; /* N64 0x298 */
+        struct { u8 _hp_emitter40[T2_HOFF_PL(m_WeaponActor.m_qGround)]; Quad emitter40; }; /* N64 0x2C8 */
+        struct { u8 _hp_emitterYaw[T2_HOFF_PL(m_WeaponActor.m_RotY)]; f32 emitterYaw; }; /* N64 0x2D8 */
+        struct { u8 _hp_unk3C8[T2_HOFF_PL(m_WeaponActor.m_AI)]; u8 unk3C8[0x3F4 - 0x3C8]; }; /* N64 0x3C8 */
+        struct { u8 _hp_voice[T2_HOFF_PL(m_WeaponActor.m_AI.m_pModeTable)]; Voice *voice; }; /* N64 0x3F4 */
+        struct { u8 _hp_unk430[T2_HOFF_PL(m_WeaponActor.m_AI.m_pParent)]; struct Player *unk430; }; /* N64 0x430 */
+        struct { u8 _hp_control[T2_HOFF_PL(m_bActive)]; s32 control; }; /* N64 0x510 */
+        struct { u8 _hp_options[T2_HOFF_PL(m_pOptions)]; CPlayerOptions *options; }; /* N64 0x518 */
+        struct { u8 _hp_character[T2_HOFF_PL(m_Data.m_nDeathmatchCharacter)]; s32 character; }; /* N64 0x520 */
+        struct { u8 _hp_health[T2_HOFF_PL(m_Data.m_Health)]; s32 health; }; /* N64 0x524 */
+        struct { u8 _hp_collide[T2_HOFF_PL(m_Data.m_Lives)]; s16 collide; }; /* N64 0x52A */
+        struct { u8 _hp_unk6A9[T2_HOFF_PL(m_Data.m_SpecialPickupCount[381])]; u8 unk6A9; }; /* N64 0x6A9 */
+        struct { u8 _hp_unk6AB[T2_HOFF_PL(m_Data.m_SpecialPickupCount[383])]; u8 unk6AB; }; /* N64 0x6AB */
+        struct { u8 _hp_item[T2_HOFF_PL(m_Data.m_CheckPointWarpID)]; s32 item; }; /* N64 0x92C */
+        struct { u8 _hp_lastItem[T2_HOFF_PL(m_Data.m_SavePointWarpID)]; s32 lastItem; }; /* N64 0x930 */
+        struct { u8 _hp_ammo[T2_HOFF_PL(m_Data.m_AmmoList)]; s16 ammo[31]; }; /* N64 0x934 */
+        struct { u8 _hp_owned[T2_HOFF_PL(m_Data) + 1106]; s8 owned[36]; }; /* N64 0x972 */
+        struct { u8 _hp_weapon[T2_HOFF_PL(m_Data.m_CurrentWeapon)]; s16 weapon; }; /* N64 0x996 */
+        struct { u8 _hp_state[T2_HOFF_PL(m_Mode)]; s16 state; }; /* N64 0xA08 */
+        struct { u8 _hp_prevState[T2_HOFF_PL(m_ModeLastFrame)]; s16 prevState; }; /* N64 0xA0C */
+        struct { u8 _hp_stateTime[T2_HOFF_PL(m_ModeTime)]; f32 stateTime; }; /* N64 0xA10 */
+        struct { u8 _hp_prevStateFlags[T2_HOFF_PL(m_ModeLastFrameFlags)]; u32 prevStateFlags; }; /* N64 0xA14 */
+        struct { u8 _hp_stateFlags[T2_HOFF_PL(m_ModeFlags)]; u32 stateFlags; }; /* N64 0xA1C */
+        struct { u8 _hp_step[T2_HOFF_PL(m_FrameIncrementScaled)]; f32 step; }; /* N64 0xA24 */
+        struct { u8 _hp_unkA28[T2_HOFF_PL(m_InvincibilityTime)]; f32 unkA28; }; /* N64 0xA28 */
+        struct { u8 _hp_unkA30[T2_HOFF_PL(m_FlashlightTime)]; f32 unkA30; }; /* N64 0xA30 */
+        struct { u8 _hp_input[T2_HOFF_PL(m_ContState)]; Input input; }; /* N64 0xA40 */
+        struct { u8 _hp_velX[T2_HOFF_PL(m_Speed)]; f32 velX; }; /* N64 0xA78 */
+        struct { u8 _hp_velZ[T2_HOFF_PL(m_SideSpeed)]; f32 velZ; }; /* N64 0xA7C */
+        struct { u8 _hp_speed[T2_HOFF_PL(m_TotalSpeed)]; f32 speed; }; /* N64 0xA80 */
+        struct { u8 _hp_lastVelY[T2_HOFF_PL(m_YVelLastFrame)]; f32 lastVelY; }; /* N64 0xA84 */
+        struct { u8 _hp_onGround[T2_HOFF_PL(m_bOnGround)]; s32 onGround; }; /* N64 0xA88 */
+        struct { u8 _hp_airTime[T2_HOFF_PL(m_TimeOffGround)]; f32 airTime; }; /* N64 0xA9C */
+        struct { u8 _hp_goal[T2_HOFF_PL(m_vDesiredPos)]; CVector3 goal; }; /* N64 0xAA0 */
+        struct { u8 _hp_unkAAC[T2_HOFF_PL(m_FleeTime)]; f32 unkAAC; }; /* N64 0xAAC */
+        struct { u8 _hp_crouch[T2_HOFF_PL(m_DuckOffset)]; f32 crouch; }; /* N64 0xAC0 */
+        struct { u8 _hp_crouchToggle[T2_HOFF_PL(m_bDuckMode)]; s32 crouchToggle; }; /* N64 0xAC4 */
+        struct { u8 _hp_unkAC8[T2_HOFF_PL(m_vHeadRotOffset.x)]; f32 unkAC8; }; /* N64 0xAC8 */
+        struct { u8 _hp_unkAFC[T2_HOFF_PL(m_BreathAmp)]; f32 unkAFC; }; /* N64 0xAFC */
+        struct { u8 _hp_unkB00[T2_HOFF_PL(m_BreathSpeed)]; f32 unkB00; }; /* N64 0xB00 */
+        struct { u8 _hp_nextWeapon[T2_HOFF_PL(m_RequestedWeapon)]; s16 nextWeapon; }; /* N64 0xB14 */
+        struct { u8 _hp_lastPos[T2_HOFF_PL(m_vWeaponFirePos)]; CVector3 lastPos; }; /* N64 0xB18 */
+        struct { u8 _hp_unkB28[T2_HOFF_PL(m_CameraMovementScaler)]; f32 unkB28; }; /* N64 0xB28 */
+        struct { u8 _hp_action[T2_HOFF_PL(m_CharAnim)]; s32 action; }; /* N64 0xC04 */
+        struct { u8 _hp_lastAction[T2_HOFF_PL(m_LastCharAnim)]; s32 lastAction; }; /* N64 0xC08 */
+        struct { u8 _hp_unkCD0[T2_HOFF_PL(m_Barrel.m_State)]; s32 unkCD0; }; /* N64 0xCD0 */
+        struct { u8 _hp_unk1050[T2_HOFF_PL(m_Barrel.m_bStickWheel)]; s32 unk1050; }; /* N64 0x1050 */
+        struct { u8 _hp_shake[T2_HOFF_PL(m_ShockedTimer)]; f32 shake; }; /* N64 0x1298 */
+        struct { u8 _hp_unk12A4[T2_HOFF_PL(m_UseLowerAmmo)]; s32 unk12A4; }; /* N64 0x12A4 */
+        struct { u8 _hp_unk12AC[T2_HOFF_PL(m_pHitMeWithChargeDart)]; s32 unk12AC; }; /* N64 0x12AC */
+    };
+} Player;
+#else
 typedef struct Player {
     /* 0x0000 */ u8 pad0[4];
     /* 0x0004 */ CVector3 pos;
@@ -485,6 +584,7 @@ typedef struct Player {
     /* 0x12A8 */ u8 pad12A8[4];
     /* 0x12AC */ s32 unk12AC;
 } Player;
+#endif
 
 extern u32 D_800F1E30;
 extern u32 D_800F1F10;
