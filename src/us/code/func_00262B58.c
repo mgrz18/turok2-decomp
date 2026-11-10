@@ -5,7 +5,7 @@
 #define CMtxF__RotateX CMtxF__RotateX_i
 #endif
 s32 CMtxF__RotateX(s32, s32);                    /* extern */
-s32 CMtxF__RotateZ(s32, f32);                    /* extern */
+s32 CMtxF__RotateZ(sptr, f32);                    /* extern */
 
 /* Effect callback context: the actor it runs for and the current value. */
 typedef struct {
@@ -14,7 +14,7 @@ typedef struct {
     /* 0x90 */ s32 value;
 } Effect00262B58;
 
-void Turret_Effects(s32 arg0, Effect00262B58 *arg1) {
+void Turret_Effects(sptr arg0, Effect00262B58 *arg1) {
     CGameObjectInstance *temp_a0;
     CTurretIntelligence *temp_s1;
     CGameObjectInstance *temp_v0;

@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern void *alSavePull(void *, s16 *, s32, s32, void *); /* alSavePull */
-extern s32 alSaveParam(s32, s32, s32);
+extern s32 alSaveParam(sptr, s32, sptr);
 extern void alFilterNew(void *, void *, void *, s32);
 
 typedef struct {

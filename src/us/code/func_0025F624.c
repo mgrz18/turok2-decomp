@@ -5,7 +5,7 @@
 f32 Random_Blend(f32 arg0, f32 arg1);
 
 
-void EnemyMode_CloakActivate_Enter(s32 arg0, CAI *arg1) {
+void EnemyMode_CloakActivate_Enter(sptr arg0, CAI *arg1) {
     f32 temp_f20;
     f32 temp_f21;
 

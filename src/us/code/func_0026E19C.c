@@ -2,10 +2,10 @@
 #include "globals/scene.h"
 #include "protos/scene.h"
 
-void LevelEvent_ProcessTriggers(s32, s32, s32, s32, s32, s32, sptr); /* extern */
+void LevelEvent_ProcessTriggers(sptr, s32, s32, s32, s32, s32, sptr); /* extern */
 
-void CGameRegion__FireTriggers(sptr arg0, s32 arg1, s32 arg2) {
-    s32 sp20;
+void CGameRegion__FireTriggers(sptr arg0, s32 arg1, sptr arg2) {
+    sptr sp20;
     s32 sp24;
 
     CScene__GetRegionEventRecords(&gScene, arg0, &sp20, &sp24);

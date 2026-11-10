@@ -8,8 +8,8 @@
 
 s32 Sound__StopFlags(s32);                     /* extern */
 s32 Sound__DetachAll();                            /* extern */
-s32 LoopSounds_StopAll(s32);                         /* extern */
-s32 CPlayer__StopLoopingSounds_2(s32);                         /* extern */
+s32 LoopSounds_StopAll(sptr);                         /* extern */
+s32 CPlayer__StopLoopingSounds_2(sptr);                         /* extern */
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x98];

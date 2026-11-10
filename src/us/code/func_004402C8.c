@@ -3,7 +3,7 @@
 #include "globals/boss.h"
 
 s32 AI_StartSound(s32, s32, s32);
-s32 Sound__Play(s32, s32, sptr, s32, s32, s32);
+s32 Sound__Play(s32, s32, sptr, sptr, s32, s32);
 
 /* The (s8 *) casts keep these stores char-based, as the original code had
  * them; plain member stores schedule differently. */

@@ -6,7 +6,7 @@
 
 /* Spawns pool pickup id at pos, thrown upward, lasting the given time, and plays its spawn sound. */
 
-extern CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
+extern CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, sptr region, f32 lifetime);
 extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
 
 void MotherBoss_SpawnPickup(s32 id, s32 lifetime, CVector3 pos) {

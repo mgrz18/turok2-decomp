@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 Video_GetResolutionText(void);
+sptr Video_GetResolutionText(void);
 
 s32 GetMemSize();                                /* extern */
 

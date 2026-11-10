@@ -3,10 +3,10 @@
 #include "rw/abu_protos.h"
 
 f32 Random_Blend(f32 arg0, f32 arg1);
-s32 EnemyRam_Collision(s32, s32);
+s32 EnemyRam_Collision(sptr, sptr);
 
 
-void EnemyRam_Setup(s32 arg0, CAI *arg1) {
+void EnemyRam_Setup(sptr arg0, CAI *arg1) {
     f32 temp_f20;
     f32 temp_f21;
 

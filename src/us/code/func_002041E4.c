@@ -12,7 +12,7 @@ u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 extern B12Mgr D_800D7BE0;
 s32 CDecompressor__DecompressAsync(CDecompressor *port, B12Msg *n, void *q);
-void CHeap__Free(CHeap *heap, s32 key);
+void CHeap__Free(CHeap *heap, sptr key);
 #ifdef TARGET_PORT
 #include "structs/cache.h"
 #include "globals/cache.h"

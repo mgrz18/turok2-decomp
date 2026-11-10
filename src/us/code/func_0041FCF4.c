@@ -18,7 +18,7 @@ extern char D_800B48B4[];
 extern char D_800B4914[];
 extern char D_800C140C[];
 s32 Pak_GetFreePages(s32 pad, s32 *out);
-u32 Pak_BytesToPages(u32 n);
+u32 Pak_BytesToPages(uptr n);
 #ifdef TARGET_PORT
 /* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
 void sprintf(char *dst, const char *fmt, ...);

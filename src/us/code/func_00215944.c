@@ -16,7 +16,7 @@ extern void Model_DecompressCallbackTerminated();
 
 /* Loads a simple object geometry: reads its index, then the geometry block it points at. */
 s32 *CLevelActor__LoadGeometry(void *obj) {
-    s32 *index;
+    sptr *index;
     s32 *geometry;
     sptr src;
     s32 size;
@@ -34,7 +34,7 @@ s32 *CLevelActor__LoadGeometry(void *obj) {
 
 void CLevelActor__TouchGeometry(ResourceOwner *arg0) {
     s32 sp20;
-    s32 *temp_v0;
+    sptr *temp_v0;
     s32 *var_s0;
     sptr temp_s0;
 

@@ -12,7 +12,7 @@ typedef struct SoundVoice {
 } SoundVoice;
 
 
-extern s32 CCameraPool__GetNearestCamera(void *game, CVector3 *pos);
+extern sptr CCameraPool__GetNearestCamera(void *game, CVector3 *pos);
 extern void alSndpSetSound(void *player, s32 id);    /* alSndpSetSound */
 extern s32 alSndpGetState(void *player);             /* alSndpGetState */
 extern void alSndpStop(void *player);            /* alSndpStop */

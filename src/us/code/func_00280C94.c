@@ -58,7 +58,7 @@ void CCamera__SetViewParams(CCamera *cam, s32 type, f32 rotY, f32 rx, f32 ry, f3
 #else
 extern f32 CGameRegion__GetHeight(s32 arg0, f32 arg1, f32 arg2);
 void CCamera__SetViewParams(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6,
-                   f32 arg7, f32 arg8, f32 arg9, Shared_Quad arg10, s32 arg11, f32 arg12,
+                   f32 arg7, f32 arg8, f32 arg9, Shared_Quad arg10, sptr arg11, f32 arg12,
                    f32 arg13) {
     sptr object;
     f32 value;

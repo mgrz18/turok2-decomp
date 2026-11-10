@@ -2,7 +2,7 @@
 #include "structs/camera.h"
 #include "protos/list.h"
 
-s32 CCameraText__Reset(s32);                         /* extern */
+s32 CCameraText__Reset(sptr);                         /* extern */
 
 /* Takes a free text from the pool and puts it on the camera's active texts. */
 CCameraText *CCameraPool__TakeText(CCameraPool *pool, CCamera *cam) {

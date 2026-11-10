@@ -13,7 +13,7 @@ s32 ScriptAnimator_SetScript(void *, s32 *);           /* extern */
 extern s32 sMantidQueenMode6SpotScript; /* local type: f32[] in globals/boss.h, whose structs/boss.h clashes with this file's u8 [] gMantidQueen */
 extern u8 gMantidQueen[]; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
 
-void MantidQueen_UpdateMode6(s32 arg0, void *arg1)
+void MantidQueen_UpdateMode6(sptr arg0, void *arg1)
 {
   s32 *var_s1;
   sptr var_s0;

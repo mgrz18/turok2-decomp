@@ -10,7 +10,7 @@ typedef struct {
     /* 0xC7 */ s8 count;
 } Item004030D4;
 
-void MantidQueen_UpdateAttackAnim(s32 a0, Item004030D4 *item) {
+void MantidQueen_UpdateAttackAnim(sptr a0, Item004030D4 *item) {
     s32 needed;
 
     switch (item->id) {

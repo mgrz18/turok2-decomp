@@ -12,7 +12,7 @@ typedef struct {
 
 extern SaveSize D_800F70A8;
 extern void CCache__Flush(s32);
-extern void CCache__Deallocate(s32, void *);
+extern void CCache__Deallocate(sptr, void *);
 extern s32 *CCache__Allocate(s32, s32, s32, void *);
 extern void memset(void *dst, s32 value, sptr size);
 extern void func_0029E460(char *dst, char *src, s32 n);

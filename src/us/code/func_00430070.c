@@ -10,7 +10,7 @@
 
 
 s32 RumblePool_Init(RumblePool *pool, RumbleEffect *effects, s32 count);
-void Controller_UnwatchPak(s32);
+void Controller_UnwatchPak(sptr);
 s32 Cont_ResetSlot(ControllerProfile *, s32);
 
 /* Initialises the controllers; returns the lowest port with one plugged in, or -1. */

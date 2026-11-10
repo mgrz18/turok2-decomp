@@ -44,7 +44,7 @@ void CVector3__Normalize(CVector3 *v);
 #ifdef TARGET_PORT
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CGameObjectInstance__LoadGeometry receives func_0021B39C's own argument
  * registers (pass-through); the host passes them. */
-void func_0021B39C(s32 a, B10Pb *b, B10Pc *c, CVector3 v1, CVector3 v2, s32 idx) {
+void func_0021B39C(sptr a, B10Pb *b, B10Pc *c, CVector3 v1, CVector3 v2, s32 idx) {
     CVector3 r;
     CVector3 t;
     CVector3 x;
@@ -86,7 +86,7 @@ void func_0021B39C(s32 a, B10Pb *b, B10Pc *c, CVector3 v1, CVector3 v2, s32 idx)
     }
 }
 #else
-void func_0021B39C(s32 a, B10Pb *b, B10Pc *c, CVector3 v1, CVector3 v2, s32 idx) {
+void func_0021B39C(sptr a, B10Pb *b, B10Pc *c, CVector3 v1, CVector3 v2, s32 idx) {
     CVector3 r;
     CVector3 t;
     CVector3 x;

@@ -8,7 +8,7 @@ typedef struct {
 } Trail;
 
 s32 func_00207914(void *, s32);                 /* extern */
-s32 func_002316A0(s32, void *);                 /* extern */
+s32 func_002316A0(sptr, void *);                 /* extern */
 
 void func_0023685C(s32 arg0, Trail *arg1, s32 arg2) {
     s32 temp_a1;

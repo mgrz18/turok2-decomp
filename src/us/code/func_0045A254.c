@@ -2,9 +2,18 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 typedef signed int s32;
+#ifndef COMMON_H
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef signed int sptr;
+typedef unsigned int uptr;
+#endif
+#endif
 typedef unsigned int u32;
 extern void Pak_AllocBuffer_2(void ***handle, void **data, s32 units);
-extern void * memset(void *arg0, int arg1, u32 arg2);
+extern void * memset(void *arg0, int arg1, uptr arg2);
 extern char *D_800F70A8;
 extern char D_800C13F0[];
 extern void CCache__Flush(s32 a);

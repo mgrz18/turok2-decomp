@@ -34,7 +34,7 @@ static __inline__ s32 overlaps(Effect_func_80262E88_de *effect, f32 *max) {
     }
     return 0;
 }
-void CInstancePool__UpdateVisibility(struct SceneEffectPool *scene, s32 arg1) {
+void CInstancePool__UpdateVisibility(struct SceneEffectPool *scene, sptr arg1) {
     Effect_func_80262E88_de *effect;
     Effect_func_80262E88_de *next;
     f32 *max;

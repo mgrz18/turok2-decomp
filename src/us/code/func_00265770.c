@@ -3,6 +3,6 @@
 #include "protos/ai.h"
 
 
-void Door_EventOpen(s32 arg0, s32 arg1) {
+void Door_EventOpen(sptr arg0, sptr arg1) {
     CAI__SetMode(arg0, arg1, 0);
 }

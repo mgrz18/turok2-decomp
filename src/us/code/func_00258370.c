@@ -9,7 +9,7 @@
 
 
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
-extern s32 Sound__Play(s32 sound, CVector3 position, CVector3 *source, s32 arg5);
+extern s32 Sound__Play(s32 sound, CVector3 position, CVector3 *source, sptr arg5);
 extern void CPlayer__StopWeaponFiringSound(CPlayer *player);
 extern void CPlayer__StopWeaponBackgroundSound(CPlayer *player);
 extern s32 CPlayer__StartWeaponFiringSound(CPlayer *player, s32 sound);

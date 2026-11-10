@@ -3,6 +3,6 @@
 #include "protos/ai.h"
 
 
-void Action_EventIdle(s32 arg0, s32 arg1) {
+void Action_EventIdle(sptr arg0, sptr arg1) {
     CAI__SetMode(arg0, arg1, 0);
 }

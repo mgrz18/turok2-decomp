@@ -7,7 +7,7 @@ typedef struct {
     /* 0x2 */ s16 unk2;
 } Arg0;
 
-s32 func_00226160(s32 *, u8, s16);          /* extern */
+sptr func_00226160(s32 *, u8, s16);          /* extern */
 
 #ifdef TARGET_PORT
 /* ABI (docs/port/ABI.md, abicheck void_used): the callers use the result, on MIPS v0 of

@@ -4,7 +4,7 @@
 #include "protos/scene.h"
 #include "protos/ai.h"
 
-s32 CGameObjectInstance__AdvanceAnimation(s32);
+s32 CGameObjectInstance__AdvanceAnimation(sptr);
 
 /* The mode parameter this AI callback is handed: only the field it reads. */
 typedef struct AIModeParam {
@@ -13,7 +13,7 @@ typedef struct AIModeParam {
 } AIModeParam;
 
 
-void InteractiveAnim_EventPlay(CGameObjectInstance *arg0, s32 arg1, AIModeParam *arg2) {
+void InteractiveAnim_EventPlay(CGameObjectInstance *arg0, sptr arg1, AIModeParam *arg2) {
     AI_PlayAnim(arg0, arg1, (s32) arg2->value);
     arg0->m_dwFlags = (s32) (arg0->m_dwFlags | 0x2100);
     CGameObjectInstance__AdvanceAnimation(arg0);

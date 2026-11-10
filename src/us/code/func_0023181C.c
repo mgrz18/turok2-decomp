@@ -5,7 +5,7 @@
 
 s32 CParticleSystem__Free(CParticleSystem *, void *);           /* extern */
 s32 CParticle__StopLoopSound(void *);                      /* extern */
-s16 *CPlayer__GetFiringAmmo(s32, s32);                   /* extern */
+s16 *CPlayer__GetFiringAmmo(sptr, s32);                   /* extern */
 
 /* The parent actor block reached through actor->m_AI.m_pParent. */
 typedef struct {

@@ -139,6 +139,21 @@ void ContRead(void* pads) {
     }
 }
 
+// Without a window (--no-window: macOS has no headless GL/Metal, MACOS.md) LUS's ControlDeck
+// has no device, so the game would see no controller and no pak. Headless runs get one virtual
+// pad on port 1 instead: connected, its pak per --pak-*, buttons from --input only.
+int ContInitHeadless(uint8_t* bits) {
+    *bits = 1;
+    return 0;
+}
+
+void ContReadHeadless(void* pads) {
+    auto* out = static_cast<uint8_t*>(pads);
+    uint16_t b = ScriptedButtons();
+    memcpy(out, &b, 2);
+    out[2] = out[3] = out[4] = 0;
+}
+
 // Reads back the last frame Fast3D drew and writes it as a binary PPM (T2_SHOT).
 void WriteShot(const std::shared_ptr<Fast::Fast3dWindow>& window, const char* shot) {
     if (!window) {
@@ -184,6 +199,9 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     if (window) {
         static const T2PortContHooks hooks = { ContInit, ContRead };
         T2Port_SetContHooks(&hooks);
+    } else {
+        static const T2PortContHooks headless = { ContInitHeadless, ContReadHeadless };
+        T2Port_SetContHooks(&headless);
     }
     T2PortConfig cfg = {};
     cfg.romPath = args.rom.empty() ? nullptr : args.rom.c_str();

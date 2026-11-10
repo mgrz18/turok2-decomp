@@ -12,7 +12,7 @@ struct RecordRecAt14 {
     s32 value;
 };
 extern s32 GetMemSize(void);
-extern s32 Video_GetResolutionText_2();
+extern sptr Video_GetResolutionText_2();
 s32 OptionsMenu_ResolutionText_2(struct RecordRecAt14 *record) {
     sResolutionToggleDelay -= gFrameIncrement;
     if (sResolutionToggleDelay <= 0.0f) {

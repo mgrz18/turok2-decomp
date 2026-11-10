@@ -9,7 +9,7 @@ struct CLoopingSoundData {
 };
 
 void Sound__StopSoundId(s32);                            /* extern */
-void LoopSounds_Stop(s32, struct CLoopingSoundData *); /* extern */
+void LoopSounds_Stop(sptr, struct CLoopingSoundData *); /* extern */
 
 /* Stops the player's weapon firing looping sound. */
 void CPlayer__StopWeaponFiringSound(CPlayer *arg0) {

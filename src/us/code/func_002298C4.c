@@ -4,8 +4,8 @@
 #include "structs/sound.h"
 #include "protos/game.h"
 
-extern void *LoopSounds_Start(s32 bank, s32 sound, CVector3 *pos, CVector3 *pos2, s32 loops);  /* starts a sound */
-extern void LoopSounds_Stop(s32 bank, void *handle);                                  /* stops a sound */
+extern void *LoopSounds_Start(sptr bank, s32 sound, CVector3 *pos, CVector3 *pos2, sptr loops);  /* starts a sound */
+extern void LoopSounds_Stop(sptr bank, void *handle);                                  /* stops a sound */
 extern void CParticle__StopLoopSound(void *obj);
 
 extern f32 HalfToFloat(s32 half);                         /* half float -> f32 */

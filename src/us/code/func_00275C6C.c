@@ -5,8 +5,8 @@
 #include "globals/audio.h"
 
 extern s32 CList__AddTail(CList *list, void *node);
-extern s32 Sound__Play(s16 arg0, CVector3 position, sptr arg4, s32 arg5);
-void *LoopSounds_Start(void *arg0, s32 arg1, CVector3 *arg2, void *arg3, s32 arg4) {
+extern s32 Sound__Play(s16 arg0, CVector3 position, sptr arg4, sptr arg5);
+void *LoopSounds_Start(void *arg0, s32 arg1, CVector3 *arg2, void *arg3, sptr arg4) {
     extern void CList__Remove(void *arg0, void *arg1);
     SoundSourceNode *node;
     s32 result;

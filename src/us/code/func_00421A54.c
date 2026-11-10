@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern void Pak_GetNoteGameName(s32,s32,s32 *),Pak_DecodeText(s32,void *,s32);
+extern void Pak_GetNoteGameName(s32,s32,sptr *),Pak_DecodeText(sptr,void *,s32);
 extern s32 Str_Compare(void *,void *);
 s32 PakMenu_FindNoteByName(void *unused, void *arg1, s32 arg2, s32 *arg3) {
     char sp10[16];
-    s32 sp20;
+    sptr sp20;
     s32 var_s0;
     for(var_s0=0;var_s0<16;var_s0++) {
         Pak_GetNoteGameName(arg2,var_s0,&sp20);

@@ -72,8 +72,8 @@ CListedInstance *CInstancePool__SpawnAnimInstance(CInstancePool *scene, s32 vari
                            CVector3 direction, CVector3 color, s32 *ref) {
     CListedInstance *effect;
     AnimInfo *info;
-    s32 *index;
-    s32 *block;
+    sptr *index;
+    sptr *block;
     s32 id;
     s32 model;
     s32 src;

@@ -5,7 +5,7 @@
 
 
 
-void MantidQueen_UpdateMode2(s32 arg0, s32 arg1) {
+void MantidQueen_UpdateMode2(sptr arg0, sptr arg1) {
     if (gMantidQueen.waveActive == 0) {
         CAI__SetMode(arg0, arg1, 3);
     }

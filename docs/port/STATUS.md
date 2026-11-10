@@ -162,6 +162,43 @@ at frame 5469 and runs to frame 7000 (the gdb run exits normally); the frames ar
 scene draw, t3). The checker does not see function-pointer calls (184 sites: the handler
 tables); that is the next thing to add (ABI.md section 4).
 
+## Round 5, part t5: macOS runs the merged tree to the title screen (branch names-R5_t5)
+
+The Mac (arm64, full 64-bit pointers) now boots the merged tree on its own, headless, with the
+pak flags, through the **same mode sequence at the same frames as Linux**: 0 (2), 1 (298), 3
+(1070), 4 (1362), 5 (1852), **7 title (4214)**, 13 attract demo (5469). Display lists match Linux
+at frames 601, 1201, 1501, 2401, 4500 and 6000 (same command count, op and w0; w1 differs only in
+host addresses). Details, the commands and the fix table: [MACOS.md](MACOS.md) section 7.
+
+What changed (all `src/` changes are s32 -> sptr / u32 -> uptr, the same types on N64: asm_diff
+0 over 3,938 files at every commit):
+
+- `port/app/game.cpp`: `--no-window` runs get a virtual pad on port 1 (pak per `--pak-*`,
+  buttons from `--input`). Without it the Mac (no headless GL/Metal, so always `--no-window`)
+  saw no controller and stayed in mode 0. **Linux `--no-window` runs change the same way.**
+- `tools/port/ptrdecls.py`: prototypes that declare s32/u32 where the definition takes or returns a
+  pointer (385 parameters + 27 returns). `tools/port/ptrargs.py`: definitions whose s32 parameter
+  receives a pointer, from the port build's `-Wint-conversion` notes (331 parameters of 127
+  functions, with all their declarations). Both re-runnable; they report 0 left on this branch.
+- AI mode/event callbacks (`Action_*`, `Door_*`, `Enemy*`, `PlayerDeath*`, `Turret_*`, `Weapon*`,
+  the bosses...): the actor/AI/event parameters as sptr (151 parameters in 120 files).
+- Hand fixes on the path: pak note names, cache handles read as `s32 *` (`CISet__GetBlock(*res)`,
+  13 files), `CPlayer__GetPickupCountLow/High` host bodies, event-record tables, the audio heap
+  and filters (`alHeapInit`, `alHeapDBAlloc`, bus/resampler constructors, `alFxParam`).
+
+**Side effect on Linux:** with this branch the Linux build (rebuilt from it on the box,
+`/root/R5_t5mac`) no longer stops at the first attract demo either: windowed and `--no-window`
+both run demo 1 to its end (mode 13, frames 5469-8794), loop the boot (legal 8802, cinemas,
+title 12429) and stop in the **second** attract demo's level load, the same place as the Mac:
+`CGameRegion__ContainsXZ(tri = garbage) <- CScene__FindRegionAt <- CScene__DecompressAnimatedInstances`.
+`EnemyAI_Update` still reads the enemy AI at N64 offsets (t1's item); its garbage just does not
+crash any more.
+
+Merge notes: 351+ files in `src/` change, almost all on declaration/parameter lines
+(`include/rw/abu_protos.h` too). Conflicts are likely with any branch that edits the same
+function headers (t1's enemy AI files, t2's ABI sweep: rerun `ptrdecls.py`/`ptrargs.py` after
+merging instead of resolving by hand), t4's audio files (`func_0029*.c`).
+
 # Round 3, merged state (history)
 
 Round 3 merged five branches, in this order: r2 (archive format 2.0, the loader through the

@@ -3,6 +3,15 @@
 
 typedef signed short s16;
 typedef signed int s32;
+#ifndef COMMON_H
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef signed int sptr;
+typedef unsigned int uptr;
+#endif
+#endif
 typedef unsigned int u32;
 struct Glyphs;
 struct Glyphs {
@@ -86,7 +95,7 @@ struct Font;
 typedef struct Font Font;
 extern void CAudioWorld__Lock(s32 *arg0);
 extern void CAudioWorld__Unlock(s32 *arg0);
-extern s16 alSndpAllocate(char *, s32);
+extern s16 alSndpAllocate(char *, sptr);
 extern void *func_0029E460(void *destination, const void *source, int count);
 extern void CAudioWorld__StartVoice(ContextCode802591C0 *, s32, s32, char *);
 static __inline__ void append(ListHead *head, Entry_func_80259440_de *entry) {

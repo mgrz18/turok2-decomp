@@ -28,7 +28,7 @@ CVector3 *CGameObjectInstance__LocalToWorld(CVector3 *out, void *actor, CVector3
 extern void CGameObjectInstance__GetRotation(void *arg0);
 extern void CQuaternion__ToMatrix(void *arg0, void *arg1);
 extern void CMtxF__TransformPoint(void *, void *, void *);
-void *CGameObjectInstance__LocalToWorld(void *arg0, s32 unused1, struct IntPair arg2) {
+void *CGameObjectInstance__LocalToWorld(void *arg0, sptr unused1, struct IntPair arg2) {
     s32 sp10[4];
     s32 sp20[16];
     Triple sp60;

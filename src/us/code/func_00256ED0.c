@@ -7,7 +7,7 @@
 #include "structs/intelligence.h"
 #include "structs/game_object.h"
 extern u8 D_8010FF34[];
-void *CDLightSet__Alloc(void *tbl, s32 id);
+void *CDLightSet__Alloc(void *tbl, sptr id);
 void CGameObjectInstance__LocalToWorld(CVector3 *out, CGameObjectInstance *actor, CVector3 dir);
 void CVector3__Add(CVector3 *out, CVector3 *a, void *b);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);

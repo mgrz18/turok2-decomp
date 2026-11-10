@@ -5,7 +5,7 @@
 #include "protos/iset.h"
 #include "protos/scene.h"
 
-s32 CCache__Deallocate(s32, sptr);
+s32 CCache__Deallocate(sptr, sptr);
 sptr CCache__LoadPersistantIndex(s32, sptr, sptr, sptr);
 sptr CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, sptr, sptr, sptr);
 

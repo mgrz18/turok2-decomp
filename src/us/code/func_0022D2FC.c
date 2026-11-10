@@ -903,7 +903,7 @@ s16 *CPlayer__GetFiringAmmo(u8 *, s32);
 void CParticle__StopLoopSound(EffectActor *);
 void CParticle__BuildCameraMatrix(EffectActor *);
 void Trail_DetachOwner(void *, EffectActor *);
-void CDLightSet__Free(void *, s32);
+void CDLightSet__Free(void *, sptr);
 
 void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
     EffectActor *child;
@@ -1182,11 +1182,11 @@ extern void Color_ShiftHue(s8, u8, u8, u8, u8 *, u8 *, u8 *);
 extern void Color_Saturate(u8, u8, u8, u8, u8 *, u8 *, u8 *);
 extern void Color_Darken(u8, u8, u8, u8, u8 *, u8 *, u8 *);
 extern void AI_HearNoise(Actor *actor, s32 *ai, CVector3 *from, s32 arg3);
-extern void CParticle__Attach(Effect *effect, s32, s32);
+extern void CParticle__Attach(Effect *effect, sptr, sptr);
 extern void Trail_AddNode(void *, Effect *, s32);
 extern s32 DLight_Spawn(void *, s32);
 extern void CParticle__StartLoopSound(Effect *effect, s32 sound);
-extern void Sound__Play(s16 sound, CVector3 pos, sptr a, s32 b);
+extern void Sound__Play(s16 sound, CVector3 pos, sptr a, sptr b);
 
 static __inline__ s32 randomCount(s32 range) {
     return range != 0 ? Random_Next() % (range + 1) : 0;
@@ -1274,7 +1274,7 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
     }
 }
 
-s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount, s32 arg4, s32 kind,
+s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount, sptr arg4, s32 kind,
                   CVector3 arg6, CQuaternion rotation, CVector3 pos, void *region, s32 arg10, s32 arg11) {
     CMtxF mtx;
     CVector3 dir;

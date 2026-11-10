@@ -4,7 +4,7 @@
 #include "protos/scene.h"
 
 
-u8 func_0026C0E0(s32 arg0) {
+u8 func_0026C0E0(sptr arg0) {
     CRegionInfo *temp_v0;
 
     temp_v0 = CScene__GetRegionInfo(&gScene, arg0);

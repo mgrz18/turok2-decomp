@@ -8,7 +8,7 @@ typedef struct {
     /* 0x0C */ f32 maxZ;
 } Bounds2D;
 
-s32 BoundingRect_AddPoints(s32, s32, s32);
+s32 BoundingRect_AddPoints(sptr, s32, sptr);
 
 /* Starts the x/z bounds at the first point, then grows them over the rest. */
 void BoundingRect_FromPoints(Bounds2D *arg0, s32 arg1, CVector3 *arg2) {

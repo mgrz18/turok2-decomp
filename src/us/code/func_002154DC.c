@@ -15,7 +15,7 @@ typedef struct {
     /* 0xB8 */ f32 shadowMatrices[4][16];
 } ShadowActor;
 
-f32 CGameRegion__GetHeight(s32, f32, f32);
+f32 CGameRegion__GetHeight(sptr, f32, f32);
 f32 GameObject_GetWallRadius(ShadowActor *);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
 #define GameObject_GetGroundRotation GameObject_GetGroundRotation_sret

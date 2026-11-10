@@ -31,7 +31,7 @@ struct Entity {
 
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
-void DamageEvent_Set(DamageEvent *event, s32 source, s32 damage, f32 radius, s32 flags, s32 arg5);
+void DamageEvent_Set(DamageEvent *event, sptr source, s32 damage, f32 radius, s32 flags, sptr arg5);
 void CAI__CallHurt(Entity *e, void *ai, DamageEvent *event);
 s32 CAI__SetMode(Entity *e, void *ai, s32 state);
 

@@ -11,7 +11,7 @@ typedef struct {
     /* 0x8C */ s32 unk8C;
 } Unk0027AD54;
 
-void COnScreen__SetBoss2(Unk0027AD54 *arg0, s32 arg1, s32 arg2) {
+void COnScreen__SetBoss2(Unk0027AD54 *arg0, sptr arg1, sptr arg2) {
     arg0->unk88 = arg1;
     arg0->unk84 = arg2;
     arg0->unk8C = 0x64;

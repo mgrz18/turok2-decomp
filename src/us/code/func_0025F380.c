@@ -3,7 +3,7 @@
 #include "protos/ai.h"
 
 
-void EnemyMode_PickupThrowObject_Enter(s32 arg0, CAI *arg1) {
+void EnemyMode_PickupThrowObject_Enter(sptr arg0, CAI *arg1) {
     sptr temp_a0;
 
     temp_a0 = arg1->m_VarBuffer[2];

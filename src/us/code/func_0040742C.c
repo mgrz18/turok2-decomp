@@ -15,7 +15,7 @@ extern s32 D_800F1C40[];
 extern s32 D_800F1F50[];
 extern LevelScriptF978 D_8012F978;
 
-void Primagen_UpdateMode6(s32 arg0, CAI *ai) {
+void Primagen_UpdateMode6(sptr arg0, CAI *ai) {
     if (ai->m_AnimRepeatedCount != 0) {
         CAI__SetMode(D_8012F978.actor, &D_8012F978.actor->m_AI, 1);
         CAI__SetMode((sptr) (&D_8012F978.actor)[-1], (sptr) &(&D_8012F978.actor)[-1]->m_AI, 1);

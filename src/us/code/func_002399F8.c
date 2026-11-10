@@ -8,7 +8,7 @@
 void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
 void BoundingRect_AddPoints(f32 *bounds, s32 count, CVector3 *points);
 void CGameRegion__ClearVisited(CGameRegion *region);
-s32 Path_ExpandNode(s32, CGameRegion *);
+s32 Path_ExpandNode(sptr, CGameRegion *);
 
 /* Searches a path of regions from obj to goalRegion (Path_ExpandNode,
  * CGameRegion__ClearVisited) and puts in *out the centre of the region to head for.

@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern void __CSPPostNextSeqEvent(void *arg0);
-extern s32 __alCSeqNextDelta(s32 arg0, s32 *arg1);
+extern s32 __alCSeqNextDelta(sptr arg0, s32 *arg1);
 extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, s32);
 void __CSPPostNextSeqEvent(void *arg0) {
     ALSeqPlayer *player = arg0;

@@ -4,7 +4,7 @@ void AI_UpdateTargets(s32 a0, s32 a1, void *out, s32 a3, s32 a4);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define AI_TurnClamped AI_TurnClamped_i
 #endif
-void AI_TurnClamped(s32 a0, sptr a1, f32 a2, s32 a3);
+void AI_TurnClamped(sptr a0, sptr a1, f32 a2, s32 a3);
 
 void MantidQueen_UpdateMode15(s32 a0, s32 a1) {
     u8 buf[0x88];

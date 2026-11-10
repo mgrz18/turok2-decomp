@@ -16,7 +16,7 @@ extern void Player_DrawNodeCallback();
 extern void WeaponActor_BuildMatrix();
 extern void WeaponActor_SwitchToRequested(void *, void *);
 extern void CPlayer__UpdateOrbitCamera(CPlayer *p, CPlayer *q);
-extern void Cinema_UpdateCameraIfActive(s32);
+extern void Cinema_UpdateCameraIfActive(sptr);
 
 void CPlayer__SetupActors(CPlayer *p, void *rec, s32 mode) {
     f32 half;

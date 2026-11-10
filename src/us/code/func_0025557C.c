@@ -3,7 +3,7 @@
 #include "protos/player.h"
 
 
-void PlayerStand_Enter(CPlayer *arg0, s32 arg1) {
+void PlayerStand_Enter(CPlayer *arg0, sptr arg1) {
     if ((arg0->m_Speed != 0.0f) || (arg0->m_SideSpeed != 0.0f)) {
         CPlayer__SetState(arg0, arg1, 3);
     }

@@ -33,7 +33,7 @@ struct ObjectRecAt17C {
     u8 pad84[0x14C - 0x84];
     u32 mask;
 };
-extern s32 Sound__PlayPitched(s32 arg0, CVector3 arg1, s32 arg4, s32 arg5,
+extern s32 Sound__PlayPitched(s32 arg0, CVector3 arg1, s32 arg4, sptr arg5,
                          f32 arg6);
 void func_00238EE4(ObjectRecAt17C *arg0, ObjectRecAt17C *arg1, s32 arg2, CVector3 arg3,
                    ParamsRecAt4 arg6) {

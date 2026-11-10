@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 
-f32 EnemyAI_GetModeTurnRate(s32 arg0, CAI *arg1) {
+f32 EnemyAI_GetModeTurnRate(sptr arg0, CAI *arg1) {
     f32 var_f0;
 
     var_f0 = 0.26179942f;

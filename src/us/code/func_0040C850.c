@@ -132,7 +132,7 @@ s32 BlindOne_GetHealthPercent(BlindOneState *state) {
 /* Plays a sequence of bit masks: every interval seconds, each set bit sends the matching actor (bits 0-3:
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
-extern void ScriptAnimator_Start(void *slot, s32 arg1);
+extern void ScriptAnimator_Start(void *slot, sptr arg1);
 extern void COnScreen__SetBoss(void *hud, CGameObjectInstance *obj, char *name);
 
 /* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */

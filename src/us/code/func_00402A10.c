@@ -29,7 +29,7 @@ extern s32 gMantidQueen_waveActive[]; /* local type: the field's real type (or t
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define AI_TurnHeadToTarget AI_TurnHeadToTarget_i
 #endif
-void AI_TurnHeadToTarget(s32 a0, Obj00402A10 *obj, s32 a2);
+void AI_TurnHeadToTarget(sptr a0, Obj00402A10 *obj, s32 a2);
 void MantidQueen_Update(void *state);
 
 void MantidQueen_Step(s32 a0, Obj00402A10 *obj) {

@@ -13,7 +13,7 @@ void CCamera__ConstructSkySystem(CCamera *cam) {
 #else
 s32 CEmitterPool__Construct(s32);                         /* extern */
 
-void CCamera__ConstructSkySystem(s32 arg0) {
+void CCamera__ConstructSkySystem(sptr arg0) {
     CEmitterPool__Construct(arg0 + 0x558);
 }
 #endif

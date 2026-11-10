@@ -10,10 +10,10 @@ f32 Math_Approach(f32 value, f32 target, f32 rate);
 void CMtxF__Identity(f32 *m);
 void CMtxF__RotateX(f32 *m, f32 angle);
 void CMtxF__TransformPoint(f32 *m, CVector3 *in, CVector3 *out);
-void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, s32 arg3);
+void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, sptr arg3);
 
 /* Lays out the weapon menu's slots around the wheel and draws them. */
-void CBarrel__DrawRing(CBarrel *menu, s32 arg1, s32 arg2) {
+void CBarrel__DrawRing(CBarrel *menu, sptr arg1, sptr arg2) {
     f32 m[16];
     CVector3 position;
     CVector3 offset;

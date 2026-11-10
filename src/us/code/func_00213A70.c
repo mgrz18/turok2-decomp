@@ -30,12 +30,12 @@ typedef struct WTab {
 
 extern char D_800A57B8[];
 
-void Actors_AccumulateVertexLighting(WRec **recs, s32 count, void *verts, s32 arg3, CVector3 *points, s32 arg5);
-void Lighting_DebugHueColors(void *verts, s32 arg3, CVector3 *points, s32 arg5);
+void Actors_AccumulateVertexLighting(WRec **recs, s32 count, void *verts, sptr arg3, CVector3 *points, s32 arg5);
+void Lighting_DebugHueColors(void *verts, sptr arg3, CVector3 *points, s32 arg5);
 void Lighting_CopyVertexColors(void *verts, void *colors);
-void Lighting_ApplyDirectional(void *verts, s32 arg3, CVector3 *points, s32 arg5);
+void Lighting_ApplyDirectional(void *verts, sptr arg3, CVector3 *points, s32 arg5);
 s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt);
-void Model_ApplyPackedOffsets(s32 file, s32 count, CVector3 *points);
+void Model_ApplyPackedOffsets(sptr file, s32 count, CVector3 *points);
 void Lighting_WriteVertexColors(void *verts, CVector3 *points);
 void func_0029E460(void *dst, void *src, s32 size);
 

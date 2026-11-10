@@ -553,7 +553,7 @@ void MenuItem_DrawSlider_2(MenuItem *it, MenuItemLayout *box, MenuItemLayout *co
 
 extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
 
-extern void memset(void *p, s32 c, s32 n); /* memset */
+extern void memset(void *p, s32 c, sptr n); /* memset */
 extern f32 func_002982F0(f32 angle);             /* sin */
 extern void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
 extern void CGameObjectInstance__Construct(CGameObjectInstance *fx, s32 a, s32 b, s32 c, void *d, s32 e, s32 f, f32 g, CVector3 h, s32 i, CVector3 j,
@@ -1367,7 +1367,7 @@ f32 Menu_TextWidth_2(u8 *p, f32 sx, f32 sy) {
 /* ---------------- MenuItem_SelectSubmenu_2 ---------------- */
 s32 func_00415FB8_416454(s32, s32) __asm__("MenuPool_OpenSubmenu_2");
 
-s32 MenuItem_SelectSubmenu_2(s32 arg0, s32 arg1, s32 arg2) {
+s32 MenuItem_SelectSubmenu_2(sptr arg0, sptr arg1, sptr arg2) {
     return func_00415FB8_416454(arg2, arg1) != 0;
 }
 
@@ -1475,7 +1475,7 @@ extern s32 *func_00204EDC_416644() __asm__("CCache__Allocate");
 extern void func_00414EA8_416644() __asm__("Menu_Construct_2");
 extern void CList__AddHead_416644(MenuPool *a, s32 b) __asm__("CList__AddHead");
 /* Opens the window described by b in the pool a. */
-s32 MenuPool_OpenMenu_2(MenuPool *a, MenuDesc *b, s32 c, s32 d, s32 e) {
+s32 MenuPool_OpenMenu_2(MenuPool *a, MenuDesc *b, sptr c, sptr d, sptr e) {
     s32 size, i;
     s32 *r;
     s32 s;
@@ -1867,7 +1867,7 @@ void MenuItem_SetBindingValue_2(MenuItem *item,float value) {
 }
 
 /* ---------------- MenuModel_DrawUnselected_2 ---------------- */
-s32 CGameObjectInstance__DrawModelWithLights(s32, s32, s32, s32);
+s32 CGameObjectInstance__DrawModelWithLights(sptr, s32, s32, sptr);
 
 void MenuModel_DrawUnselected_2(s32 arg0, s32 arg1, s32 arg2) {
     CGameObjectInstance__DrawModelWithLights(arg0, arg1, arg2, (sptr) &gDefaultLights);
@@ -1877,7 +1877,7 @@ void MenuModel_DrawUnselected_2(s32 arg0, s32 arg1, s32 arg2) {
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00443298.c, func_00443298.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern void CGameObjectInstance__DrawModelImmediate(void *a, s32 b, s32 c);
+extern void CGameObjectInstance__DrawModelImmediate(void *a, sptr b, sptr c);
 /* The selected model item's draw callback (MenuItem_DrawModel_2): drawn with the
  * lights of gDefaultLights and a fade by sMenuModelFade. */
 void MenuModel_DrawSelected_2(CGameObjectInstance *a, s32 b, s32 c) {

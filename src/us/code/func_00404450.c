@@ -5,7 +5,7 @@
 
 void Primagen_SetStage(s32 mode);
 
-void Primagen_UpdateHealth(s32 a0, s32 a1) {
+void Primagen_UpdateHealth(sptr a0, sptr a1) {
     s32 count;
     s32 i;
     s32 bit;

@@ -10,7 +10,7 @@ f32 GameObject_GetLeashRadius(CGameObjectInstance *);
 f32 Random_Blend(f32, f32);
 f32 func_002974C0(f32);
 f32 func_002982F0(f32);
-void Collision_MoveInstance(CGameObjectInstance *, CVector3, s32);
+void Collision_MoveInstance(CGameObjectInstance *, CVector3, sptr);
 
 #ifdef TARGET_PORT
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS func_00267E74 receives EnemyMode_TeleportIn_Enter's own argument

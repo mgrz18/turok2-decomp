@@ -6,7 +6,7 @@
 
 extern char __CSPVoiceHandler;
 extern void __initChanState(void *);
-extern s32 alHeapDBAlloc(s32, s32, void *, s32, s32);
+extern sptr alHeapDBAlloc(sptr, s32, void *, s32, s32);
 extern void alEvtqNew(void *, void *, s32);
 extern void alSynAddPlayer(ALSynth *, ALPlayer *); /* alSynAddPlayer */
 void alCSPNew(ALCSPlayer *arg0, ALSeqpConfig *arg1) {

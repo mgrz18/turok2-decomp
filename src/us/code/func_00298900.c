@@ -3,7 +3,7 @@
 
 s32 __osPackResetData(void);
 s32 __osPackRequestData(s32);
-s32 __osContGetInitData(s32, s32);
+s32 __osContGetInitData(sptr, sptr);
 s32 __osSiGetAccess(void);
 s32 __osSiRawStartDma(s32, sptr);
 

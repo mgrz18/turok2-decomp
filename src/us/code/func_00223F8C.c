@@ -9,7 +9,7 @@
 #include "protos/scene.h"
 void Render_ResetBatches();
 void Render_FlushBatches(void);
-void CGameObjectInstance__Draw(CGameObjectInstance *e, s32 a);
+void CGameObjectInstance__Draw(CGameObjectInstance *e, sptr a);
 void CScene__DrawRegisteredInstances(CScene *lv, sptr arg) {
     Gfx *g;
     s32 i;

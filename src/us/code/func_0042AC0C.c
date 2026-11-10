@@ -22,11 +22,11 @@
 
 extern u8 gEngineApp_m_SwooshSystem[];
 
-extern s32 ProPack__Decompress(s32, s32);
+extern s32 ProPack__Decompress(s32, sptr);
 extern void CCollisionInfo__Reset(void);
 extern void CDecompressor__Flush(CDecompressor *thisx);
 extern void **CCache__Allocate(s32 unused, s32 size, s32 mode, char *name);
-extern void CCache__Deallocate(s32 unused, void **block);
+extern void CCache__Deallocate(sptr unused, void **block);
 extern void CCache__Flush(s32);
 extern void **CCache__LoadPersistantIndex(s32 unused, void **out, sptr key, char *name);
 extern void **CCache__LoadPersistantSubBlock(s32 unused, void *file, s32 index, s32 key, CScene *owner, void *callback, char *name);
@@ -37,7 +37,7 @@ extern void func_0021F1B4(u8 *actor);
 extern void Sound__StopFlags(s32);
 extern void Sound__DetachAll(void);
 extern void LoopSounds_Construct(void *, void *, s32);
-extern void LoopSounds_StopAll(s32);
+extern void LoopSounds_StopAll(sptr);
 extern s32 Demo_GetPlayerCount(void);
 extern void CCameraPool__Advance(void *);
 extern s32 Cinema_IsActive(void);

@@ -13,7 +13,7 @@
 #include "globals/text.h"
 #include "globals/event.h"
 
-extern void CCameraPool__AddMultiLineText(void *game, void *camera, char *text, s32 arg3, f32 time);
+extern void CCameraPool__AddMultiLineText(void *game, void *camera, char *text, sptr arg3, f32 time);
 extern void Sound__PlaySpeech(s32 sound);
 extern void Cinema_RequestById(s32 track);
 

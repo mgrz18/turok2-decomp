@@ -6,8 +6,8 @@ typedef struct {
     /* 0xB0 */ s32 header;
 } Model;
 
-s32 alSndpGetState(s32);                         /* extern */
-s32 alSndpSetSound(s32, s16);                    /* extern */
+s32 alSndpGetState(sptr);                         /* extern */
+s32 alSndpSetSound(sptr, s16);                    /* extern */
 
 void SndVoice_GetState(Model *arg0) {
     sptr temp_s0;

@@ -4,8 +4,8 @@
 #include "protos/ai.h"
 
 s32 CPlayer__GetWeaponAmmo(s32, s32);
-s32 CPlayer__GetNextUsableWeapon(s32);
-s32 WeaponActor_CheckFire(s32, s32);
+s32 CPlayer__GetNextUsableWeapon(sptr);
+s32 WeaponActor_CheckFire(sptr, sptr);
 
 
 /* The AI parent of the actor (m_AI.m_pParent), seen as a larger object. */
@@ -18,7 +18,7 @@ typedef struct {
     /* 0xB14 */ s16 unkB14;
 } Unk00258B74;
 
-void WeaponMode_Ready_Update(CGameObjectInstance *arg0, s32 arg1) {
+void WeaponMode_Ready_Update(CGameObjectInstance *arg0, sptr arg1) {
     s32 temp_s2;
     Unk00258B74 *temp_s0;
 

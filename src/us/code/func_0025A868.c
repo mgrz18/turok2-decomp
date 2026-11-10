@@ -7,11 +7,11 @@
 #ifdef TARGET_PORT
 /* ABI (docs/port/ABI.md, abicheck void_used): the callers use the result, on MIPS v0 of
  * the last call; the host returns it. */
-s32 EnemyAnim_NormalDeath_B0150(CGameObjectInstance *arg0, s32 arg1) {
+s32 EnemyAnim_NormalDeath_B0150(CGameObjectInstance *arg0, sptr arg1) {
     return AI_PickAnimFromTable((sptr) arg0, arg1, sEnemyAnimNormalDeath_B0150, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wNormalDeathAnimFlags);
 }
 #else
-void EnemyAnim_NormalDeath_B0150(CGameObjectInstance *arg0, s32 arg1) {
+void EnemyAnim_NormalDeath_B0150(CGameObjectInstance *arg0, sptr arg1) {
     AI_PickAnimFromTable((sptr) arg0, arg1, sEnemyAnimNormalDeath_B0150, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wNormalDeathAnimFlags);
 }
 #endif

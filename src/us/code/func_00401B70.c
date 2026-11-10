@@ -6,8 +6,8 @@ typedef struct {
     /* 0xC */ CGameRegion *node;
 } Arg0;
 
-s32 Automap_RevealRegion(s32);
-s32 Automap_ClearVisited(s32);
+s32 Automap_RevealRegion(sptr);
+s32 Automap_ClearVisited(sptr);
 
 void Automap_RevealAroundPlayer(Arg0 *arg0) {
     CGameRegion *temp_s0;

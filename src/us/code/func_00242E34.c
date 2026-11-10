@@ -21,7 +21,7 @@ s32 CGameRegion__IsSteep(CGameRegion *region);
 s32 func_0021F080(CGameObjectInstance *actor);
 f32 CGameRegion__GetHeight(CGameRegion *region, f32 x, f32 z);
 s32 GameObject_IsOnGround(CGameObjectInstance *actor);
-void DamageEvent_Set(DamageEvent *damage, s32 arg1, s32 amount, f32 force, s32 kind, s32 arg5);
+void DamageEvent_Set(DamageEvent *damage, sptr arg1, s32 amount, f32 force, s32 kind, sptr arg5);
 void CAI__CallHurt(CGameObjectInstance *actor, Dest *dst, DamageEvent *damage);
 
 /* CGameRegion flags for the actor (water, ground...) and periodic damage from the region it stands in. */

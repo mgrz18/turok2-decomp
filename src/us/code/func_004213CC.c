@@ -2,7 +2,7 @@
 #include "structs/save.h"
 #include "globals/pak.h"
 
-s32 CCache__Deallocate(s32, s32);                /* extern */
+s32 CCache__Deallocate(sptr, sptr);                /* extern */
 s32 CCache__Flush(s32);                     /* extern */
 
 void Pak_FreeSaveBuffers(void) {

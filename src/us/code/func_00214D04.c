@@ -12,8 +12,8 @@ typedef struct {
     /* 0x88 */ u16 flags;
 } SpawnSource;
 
-s32 Model_RequestTextures(s32);                         /* extern */
-s32 CStaticObject__LoadGeometry();                                /* extern */
+s32 Model_RequestTextures(sptr);                         /* extern */
+sptr CStaticObject__LoadGeometry();                                /* extern */
 extern s32 D_800A57F8;
 extern s32 CStaticObject__BuildLitVerticesCallback;
 

@@ -43,7 +43,7 @@ struct Owner_func_8044D794_de {
     char pad1184[0x10]; /* active at 0x1180, spare at 0x1194 */
     struct Entry_func_8044D794_de *spare;
 };
-extern void LevelEvent_Fire(s32);
+extern void LevelEvent_Fire(sptr);
 void func_0042C96C(Owner_func_8044D794_de *arg0) {
     Entry_func_8044D794_de *entry;
     Entry_func_8044D794_de *next;

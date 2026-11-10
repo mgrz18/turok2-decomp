@@ -31,7 +31,7 @@ void CCache__Compact(s32, s32);
 struct CCacheEntry *CCache__CompleteRequest(s32, struct CCacheEntry *, s32);
 void CCache__Construct(s32, s32);
 void CCache__DeallocAndReplaceCompressedData(s32, struct CMemEntry **, struct CMemEntry *);
-void CCache__Deallocate(s32, void *);
+void CCache__Deallocate(sptr, void *);
 void CCache__DeallocateInternal(s32, void *);
 void CCache__DetachCacheEntry(s32, void *);
 void CCache__DrawDebug(s32, s32, s32, s32, s32);
@@ -55,7 +55,7 @@ void **CCache__LoadPersistantIndex(s32, void **, sptr, void *);
 #ifdef TARGET_PORT
 void *CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, sptr, sptr, sptr); /* callers read the request it leaves in v0 */
 #else
-void CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, sptr, s32, sptr);
+void CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, sptr, sptr, sptr);
 #endif
 void CCache__LockForDisplayList(s32, struct B12Node *);
 void *CCache__LookupAndLock(s32, s32);

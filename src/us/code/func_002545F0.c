@@ -4,7 +4,7 @@
 
 CRegionInfo *GameObject_GetRegionInfo(s32);                     /* extern */
 
-void CPlayer__EaseEyeOffset(CPlayer *arg0, s32 arg1) {
+void CPlayer__EaseEyeOffset(CPlayer *arg0, sptr arg1) {
     f32 temp_f1;
     CRegionInfo *temp_v0;
 

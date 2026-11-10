@@ -5,7 +5,7 @@
 
 s32 CMtxF__FromMtxAffine(sptr, sptr);
 s32 CMtxF__ClampEntries(sptr);
-s32 Swoosh_NewNode(sptr, sptr, sptr);
+sptr Swoosh_NewNode(sptr, sptr, sptr);
 
 s32 CMtxF__ScaleAxes(s32 *, f32, f32, f32);    /* extern */
 

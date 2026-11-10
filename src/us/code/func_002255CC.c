@@ -6,9 +6,9 @@
 
 
 s32 GameObject_IsSolid(s32);
-s32 func_002681BC(s32);
+s32 func_002681BC(sptr);
 
-s32 CGameObjectInstance__ClearDrawMatrices(s32);                         /* extern */
+s32 CGameObjectInstance__ClearDrawMatrices(sptr);                         /* extern */
 
 /* Files a new actor into every actor list of the world it belongs to. */
 void CScene__FileInstance(CScene *arg0, CGameObjectInstance *arg1) {

@@ -11,7 +11,7 @@ extern void __osSiCreateAccessQueue();
 extern void osCreateMesgQueue(void *, sptr, s32);
 extern u64 osGetTime(void);
 extern void __osPackRequestData(s32 arg0);
-extern void __osContGetInitData(s32 *arg0, s32 arg1);
+extern void __osContGetInitData(s32 *arg0, sptr arg1);
 extern void osSetTimer(void *arg0, u64 arg1, u64 arg2, void *arg3, void *arg4);
 s32 osContInit(s32 arg0, s32 *arg1, s32 arg2) {
     s32 sp20[8];

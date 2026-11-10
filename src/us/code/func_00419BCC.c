@@ -2,7 +2,7 @@
 #include "globals/menu.h"
 
 s32 Music_SetTrack(s32);
-s32 MenuItem_SelectSubmenu(s32, s32, s32);
+s32 MenuItem_SelectSubmenu(s32, sptr, s32);
 
 s32 Sound__StopAllExcept(s32);                     /* extern */
 s32 Sound__SetForce2D(s32);                     /* extern */

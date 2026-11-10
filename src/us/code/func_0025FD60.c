@@ -3,7 +3,7 @@
 #include "protos/ai.h"
 
 
-void EnemyMode_FeignDeath_Update(s32 arg0, CAI *ai) {
+void EnemyMode_FeignDeath_Update(sptr arg0, CAI *ai) {
     s32 var_a2;
 
     if (ai->m_AnimRepeatedCount != 0) {

@@ -5,7 +5,7 @@
 
 
 
-void EnemyMode_ReactionFallDown_Update(s32 arg0, CAI *arg1) {
+void EnemyMode_ReactionFallDown_Update(sptr arg0, CAI *arg1) {
     f32 temp_f0;
 
     if (arg1->m_ConditionTimer > 240.0f) {

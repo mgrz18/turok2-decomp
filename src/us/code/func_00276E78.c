@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern s32 SpeechPlayer_PickEntry(void **arg0, s16 id, s16 avoid);
-extern s32 BinaryRange(s32, s32, s32, s32 *, s32 *);
+extern s32 BinaryRange(sptr, s32, s32, s32 *, s32 *);
 extern s32 Random_Next(void);
 s32 SpeechPlayer_PickEntry(void **arg0, s16 id, s16 avoid) {
     s32 first;

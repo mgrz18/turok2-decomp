@@ -18,7 +18,7 @@ typedef struct {
     /* 0x14 */ s32 unk14[9];
 } Record14;
 
-void CPlayerContState__Init(Record14 *arg0, s32 arg1) {
+void CPlayerContState__Init(Record14 *arg0, sptr arg1) {
     arg0->unk0[0] = 0;
     arg0->unk0[1] = 0;
     arg0->unk0[2] = 0;

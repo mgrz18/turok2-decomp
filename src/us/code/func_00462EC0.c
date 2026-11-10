@@ -17,7 +17,7 @@ extern s32 CScene__DecompressIntelligence_2();
 extern s32 CScene__DecompressParticles_2();
 
 extern void **CCache__Request(s32, sptr, s32, s32, s32, s32 (*)(), char *, s32);
-extern void CCache__Deallocate(s32, void **);
+extern void CCache__Deallocate(sptr, void **);
 extern void CCache__Flush(s32);
 extern void CCache__LoadPersistantIndex(s32, sptr *, sptr, char *);
 extern void **CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, CScene *, s32 (*)(), char *);

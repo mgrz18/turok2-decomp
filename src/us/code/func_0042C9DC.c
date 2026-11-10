@@ -22,7 +22,7 @@ typedef struct LevelState {
 
 
 extern void CPlayer__StopLoopingSounds(void *);
-extern void LoopSounds_StopAll(s32);
+extern void LoopSounds_StopAll(sptr);
 extern void Sound__DetachAll(void);
 extern void Sound__StopFlags(s32);
 

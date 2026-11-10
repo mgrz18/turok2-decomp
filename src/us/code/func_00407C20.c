@@ -5,7 +5,7 @@
 
 s32 COnScreen__SetBoss(s32, s32, s32);
 
-void Primagen_UpdateMode28(s32 arg0, int arg1)
+void Primagen_UpdateMode28(sptr arg0, sptr arg1)
 {
   s32 *new_var3;
   BossStep2 **new_var2;

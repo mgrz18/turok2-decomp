@@ -3,7 +3,7 @@
 #include "globals/engine.h"
 #include "globals/menu.h"
 
-s32 Video_GetResolutionText(void);
+sptr Video_GetResolutionText(void);
 
 s32 GetMemSize();                                /* extern */
 

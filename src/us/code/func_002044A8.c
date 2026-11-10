@@ -8,7 +8,7 @@
 #include "protos/cache.h"
 
 void CHashTable__Remove(u32 key);
-void CHeap__Free(CHeap *heap, s32 data);
+void CHeap__Free(CHeap *heap, sptr data);
 void CHashTable__Insert(u32 key, CCacheEntry *value);
 
 static __inline__ void find(u32 key, CCacheEntry **out) {

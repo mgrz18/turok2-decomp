@@ -1,7 +1,7 @@
 
 #include "common.h"
 #include "globals/game.h"
-s32 CPlayer__IsSpecialPickup(s32 arg0, s32 arg1)
+s32 CPlayer__IsSpecialPickup(sptr arg0, s32 arg1)
 {
   int new_var;
   if (!(gEngineApp_m_Settings.cheatFlags & 0x10))

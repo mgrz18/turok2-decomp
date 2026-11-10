@@ -41,7 +41,7 @@ static __inline__ CPooledLevelActor *allocActor(CLevelActorPool *pool) {
 
 /* Spawns a pool actor of the given level id at pos with velocity vel, taking a free slot (or
  * the oldest one, released first) and linking it at the head; counts it in *refCount. */
-CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 arg9, f32 lifetime) {
+CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, sptr arg9, f32 lifetime) {
     CPooledLevelActor *actor;
     CVector3 p;
     s32 index;

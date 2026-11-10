@@ -16,7 +16,7 @@ typedef struct PlayerList {
 } PlayerList;
 
 extern CPlayer **CCache__Allocate(s32 heap, s32 size, s32 tag, char *name);
-extern void CCache__Deallocate(s32 heap, CPlayer **handle);
+extern void CCache__Deallocate(sptr heap, CPlayer **handle);
 extern void CCache__Flush(s32);
 extern void Controller_SetRumbleOptionAll(s32);
 extern void memset(void *p, s32 c, sptr n); /* memset */

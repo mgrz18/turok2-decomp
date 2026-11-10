@@ -2,7 +2,7 @@
 #include "rw/abu_protos.h"
 
 char *CISet__GetBlock(s32 *, s32);
-s32 CISet__GetBlockSize(s32, s32);
+s32 CISet__GetBlockSize(sptr, s32);
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x6C];

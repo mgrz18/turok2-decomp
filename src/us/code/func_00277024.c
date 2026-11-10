@@ -9,9 +9,9 @@ typedef struct {
     /* 0x1E */ s16 unk1E;
 } Sound;
 
-s32 CAudioWorld__GetSndPlayer(s32);                             /* extern */
-s32 alSndpSetSound(s32, s16);                    /* extern */
-s32 alSndpStop(s32);                         /* extern */
+s32 CAudioWorld__GetSndPlayer(sptr);                             /* extern */
+s32 alSndpSetSound(sptr, s16);                    /* extern */
+s32 alSndpStop(sptr);                         /* extern */
 
 void SpeechPlayer_StopUnlocked(Sound *arg0) {
     s32 temp_v0;

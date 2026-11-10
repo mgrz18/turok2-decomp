@@ -6,6 +6,6 @@ typedef struct {
     /* 0x16 */ s16 unk16;
 } Voice16;
 
-void alSynSetPriority(s32 arg0, Voice16 *arg1, s16 arg2) {
+void alSynSetPriority(sptr arg0, Voice16 *arg1, s16 arg2) {
     arg1->unk16 = arg2;
 }

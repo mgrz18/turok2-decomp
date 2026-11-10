@@ -3,7 +3,7 @@
 #include "globals/game.h"
 
 s32 CPlayer__Hurt(s32, s32, s32, s32, s32);
-s32 CPlayer__UpdateOxygen(s32, sptr);
+s32 CPlayer__UpdateOxygen(sptr, sptr);
 
 
 void CPlayer__UpdateSubmerged(CPlayer *arg0, CGameObjectInstance *arg1) {

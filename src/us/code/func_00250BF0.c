@@ -16,7 +16,7 @@ void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuni
 void CPlayer__MoveInWater(CPlayer *player, CGameObjectInstance *body, void *tuning);
 f32 func_002982F0(f32 x);
 f32 Random_Float(f32 scale);
-void Sound__Play(s16 sound, CVector3 pos, void *source, s32);
+void Sound__Play(s16 sound, CVector3 pos, void *source, sptr);
 
 static __inline__ void reset_strokes(CBarrel *s) {
     s->m_State = 0;

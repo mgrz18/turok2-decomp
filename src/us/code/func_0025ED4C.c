@@ -8,7 +8,7 @@ typedef struct {
 } FillAlpha;
 
 
-void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *obj, CAI *ai, s32 arg2);
+void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *obj, CAI *ai, sptr arg2);
 
 void EnemyAI_DrawWithBlend(CGameObjectInstance *obj, CAI *ai, s32 arg2) {
     f32 fade = 1.0f;

@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 MenuItem_SelectSubmenu_2(s32, s32, s32);
+s32 MenuItem_SelectSubmenu_2(sptr, sptr, sptr);
 
 void Music_RestoreVolume();                            /* extern */
 

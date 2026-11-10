@@ -17,7 +17,7 @@ extern void TotemDefense_DrawTotem();
 extern void TotemDefense_UpdateFight(TotemDefenseState *fight);
 extern f32 Random_Float(f32 range);
 extern void Actor_SpawnParticle(CListedInstance *actor, s32 sound, CVector3 pos, s32 arg);
-extern void DamageEvent_Set(void *out, s32 a, s32 b, f32 c, s32 d, s32 e);
+extern void DamageEvent_Set(void *out, sptr a, s32 b, f32 c, s32 d, sptr e);
 extern void EnemyAI_OnDamage(CListedInstance *actor, void *ai, void *anim);
 extern void CPlayer__Warp(CPlayer *player, s32 track, s32 a, s32 b);
 

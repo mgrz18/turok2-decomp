@@ -5,7 +5,7 @@
 #include "globals/audio.h"
 
 extern s16 alSndpAllocate(void *, void *);
-void SpeechPlayer_Construct(struct Shape_typemap_110 *record, s32 resource) {
+void SpeechPlayer_Construct(struct Shape_typemap_110 *record, sptr resource) {
     extern void *CAudioWorld__GetSndPlayer(s32);
     record->field_0 = resource;
     record->field_4 = -1;

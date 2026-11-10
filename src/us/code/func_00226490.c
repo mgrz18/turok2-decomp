@@ -25,7 +25,7 @@ void CGameObjectInstance__UpdateAnimation(DrawActor *actor);
 void CPlayerPool__Update(CPlayerPool *list);
 s32 CPlayerPool__CheckAllReady(CPlayerPool *list);
 void func_00430330(u8 *);
-void LoopSounds_Update(s32);
+void LoopSounds_Update(sptr);
 
 /* Draws one actor, keeping the frame time step. */
 static __inline__ void drawActor(DrawActor *actor) {

@@ -3,7 +3,7 @@
 #include "protos/scene.h"
 
 void Render_ResetBatches(void);
-void CParticleSystem__Draw(void *, s32);
+void CParticleSystem__Draw(void *, sptr);
 void Render_FlushBatches(void);
 
 void CScene__DrawParticles(u8 *arg0, sptr arg1) {
