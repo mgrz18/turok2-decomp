@@ -146,7 +146,7 @@ macOS: t5 ran its own tree to the title; the merged tree was not rerun on the Ma
   1,580 -> 1,465, disagreeing declarations 158 -> 93 functions.
 - Low memory unchanged: 26,000-frame boot loop with 3 attract demos, new game to level 51
   (player stops at the water at (-1266.6, -779.5, 260.0) as before). asm_diff 0 over every
-  touched file (166 src files).
+  touched file (152 src files).
 - Merge notes: many one-line declaration retypes (s32 -> sptr) spread over ~150 src files; a
   conflict with another part is a declaration line: keep both changes. func_002034F4/00205A2C
   (osSendMesg declaration) also carry u1's hash-stride fix on other lines.
