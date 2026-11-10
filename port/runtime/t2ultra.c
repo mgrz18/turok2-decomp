@@ -229,6 +229,17 @@ static int v2p_find(uintptr_t region, int used) {
 u32 osVirtualToPhysical(void *p) {
     uintptr_t a = (uintptr_t)p, region = a >> T2_V2P_SHIFT << T2_V2P_SHIFT;
     int used, slot;
+#ifdef __APPLE__
+    /* T2_V2P_TRAP=1 (macOS): trap on an address that cannot be a host pointer here (below 4 GB, or
+     * sign-extended from 32 bits): a truncated pointer on its way into an RSP command (MACOS.md §8) */
+    if ((a >> 32) == 0 ? a != 0 : (a >> 32) == 0xFFFFFFFFu) {
+        static int trap = -1;
+        if (trap < 0)
+            trap = getenv("T2_V2P_TRAP") != NULL;
+        if (trap)
+            __builtin_trap();
+    }
+#endif
     if (a < 0x80000000u)
         return (u32)a;
     used = __atomic_load_n(&sV2pUsed, __ATOMIC_ACQUIRE);

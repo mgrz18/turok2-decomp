@@ -3,15 +3,17 @@
 #include "common.h"
 #include "structs/libaudio.h"
 
-typedef s32 (*FuncPtr)(void *);
 extern void alFilterNew(void *arg0, void *a, void *b, s32 c);
 #ifdef TARGET_PORT
+/* ALDMANew returns the ALDMAproc (a host function pointer: s32 truncated it on macOS) */
+typedef void *(*FuncPtr)(void *);
 /* the heap and the blocks are host pointers (64-bit: the s32 versions truncated them) */
 extern void *alHeapDBAlloc(sptr, s32, void *, s32, s32);
 typedef sptr LoadNewHeap;
 #else
 extern s32 alHeapDBAlloc(s32, s32, void *, s32, s32);
 typedef s32 LoadNewHeap;
+typedef s32 (*FuncPtr)(void *);
 #endif
 extern void alAdpcmPull(void);
 extern s32 alLoadParam(void *filter, s32 paramID, void *param);
