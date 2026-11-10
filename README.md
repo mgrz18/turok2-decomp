@@ -21,6 +21,28 @@ Work-in-progress **matching decompilation** of **Turok 2: Seeds of Evil** (Ninte
 >
 > **Next: a native PC port built from this source**, in the line of Ship of Harkinian, 2 Ship 2 Harkinian, Starship, SpaghettiKart and Ghostship. Before that, the code has to be readable end to end: named functions, globals and structs. See the [roadmap](#roadmap).
 
+## Screenshots
+
+The native PC port (Phase 7) running the game's own decompiled C on libultraship, 64-bit, headless on Linux. Frames are captured from the port's framebuffer. It boots on its own through the Controller Pak check, the legal screen and the Expansion Pak screen to the title screen. The intro cinemas still draw black, and the attract demo is the current crash ([docs/port/STATUS.md](docs/port/STATUS.md)).
+
+| | |
+|:-:|:-:|
+| <img src="docs/media/pc_title.png" alt="Title screen on the PC port" width="400"> | <img src="docs/media/pc_legal.png" alt="Legal screen on the PC port" width="400"> |
+| Title screen (mode 7, frame 4214) | Legal screen (mode 1) |
+| <img src="docs/media/pc_expansion_pak.png" alt="Expansion Pak screen with the 3D pak model" width="400"> | <img src="docs/media/pc_pak_menu.png" alt="Controller Pak menu" width="400"> |
+| Expansion Pak screen, a 3D model drawn by Fast3D (mode 3) | Controller Pak menu (mode 0) |
+
+Assets decoded from the ROM by `tools/assets/` (Phase 6), with no game data in the repository:
+
+| | | |
+|:-:|:-:|:-:|
+| <img src="docs/media/asset_model_posed.png" alt="Animated model posed with its skeleton" width="220"> | <img src="docs/media/asset_model_textured.png" alt="Static model with textures" width="220"> | <img src="docs/media/asset_textures.png" alt="Texture sample" width="260"> |
+| Animated model, posed with its skeleton | Static model, textured | Textures (CI4/CI8 with palettes) |
+
+<p align="center"><img src="docs/media/asset_level_map.png" alt="Top-down map of a level" width="640"><br>A level's collision regions and actor placements, top down</p>
+
+Screenshots of copyrighted game content, shown to document the project's progress. The images are generated from a ROM the user provides; the ROM itself is never included.
+
 ## Why
 
 This decomp is a stepping stone. The end goals are:
