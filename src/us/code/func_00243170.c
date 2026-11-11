@@ -195,7 +195,16 @@ void CAI__UpdateModeAnim(Source110 *src, Dest *dst) {
             callback = entry->callback;
             if (callback != 0) {
                 if (IsCodePointer(callback) != 0) {
+#ifdef TARGET_PORT
+                    /* The pickers return a 16-bit animation action id (MotherBoss_PickPhaseAnim and
+                     * the rest return s16; the action tables are BE16, func_0021EA3C). MIPS hands the
+                     * caller a sign-extended v0; x86-64 and arm64 leave the register's upper bits
+                     * unspecified (Linux: 0x42BF55FA for 0x55FA), and PickRandomAnim then found no
+                     * animation: the Mother's attack anim never played on Linux. */
+                    callback = (StateCallback)(sptr)(s16)(sptr)callback(src, dst);
+#else
                     callback = callback(src, dst);
+#endif
                 } else if (IsDataPointer((uptr)callback) != 0) {
                     callback = (StateCallback)CGameObjectInstance__PickAvailableAction(src, callback, dst->state_result);
                 }
