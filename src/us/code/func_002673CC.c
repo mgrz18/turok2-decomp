@@ -149,6 +149,75 @@ extern void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 extern void CQuaternion__Multiply(CQuatern *, CQuatern *, CQuatern *);
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+
+/* The port: the same on host types. The N64 views read the aiming actor's sight target at 0x1C0
+ * (LevelActor.lockOn: CAI m_pSightTarget) and the target's collision y offset at 0x54
+ * (m_CollisionYOffset): on the host both missed (LevelActor has pointers before them), so an
+ * enemy's projectile aimed at the nearest player's feet plus a garbage height, over his head. */
+CQuatern GameObject_GetAimRotation(char *actor, CVector3 point) {
+    CVector3 origin;
+    CVector3 dir;
+    CVector3 forward;
+    CVector3 local;
+    CVector3 axis;
+    CQuatern turn;
+    CQuatern aim;
+    CQuatern result;
+    f32 matrix[16];
+    CGameObjectInstance *target;
+    CGameObjectInstance *found;
+    f32 angle;
+    f32 scale;
+
+    target = NULL;
+    if (actor != 0 && *(u8 *)actor == 1) {
+        target = ((CGameObjectInstance *) actor)->m_AI.m_pSightTarget;
+        aim = CGameObjectInstance__GetRotation(actor);
+        CQuaternion__ToMatrix(&aim, matrix);
+        local.x = 0.0f;
+        local.y = 0.0f;
+        local.z = 1.0f;
+        CMtxF__TransformPoint(matrix, &local, &forward);
+    } else {
+        forward.x = 0.0f;
+        forward.y = 0.0f;
+        forward.z = 1.0f;
+    }
+    if (target == NULL) {
+        found = (CGameObjectInstance *) CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, point);
+        if (found != NULL) {
+            target = found;
+        }
+        if (target == NULL) {
+            result.x = result.y = result.z = 0.0f;
+            result.w = 1.0f;
+            return result;
+        }
+    }
+    origin = target->header.m_vPos;
+    origin.y += target->m_CollisionYOffset;
+    origin.y += GameObject_GetCollisionHeight((char *) target) * 0.75f;
+    CVector3__Subtract(&dir, &origin, &point);
+    CVector3__Normalize((f32 *) &dir);
+    CVector3__Cross(&axis, &forward, &dir);
+    CVector3__Normalize((f32 *) &axis);
+    angle = Math_AcosLookup(forward.x * dir.x + forward.y * dir.y + forward.z * dir.z) * 0.5f;
+    scale = func_002982F0(angle);
+    turn.x = axis.x * scale;
+    turn.y = axis.y * scale;
+    turn.z = axis.z * scale;
+    gQuaternionSin = scale;
+    turn.w = func_002974C0(angle);
+    if (actor != 0 && *(u8 *)actor == 1) {
+        CQuaternion__Multiply(&result, &aim, &turn);
+    } else {
+        result = turn;
+    }
+    return result;
+}
+#else
 CQuatern GameObject_GetAimRotation(char *actor, CVector3 point) {
     CVector3 origin;
     CVector3 dir;
@@ -209,3 +278,4 @@ CQuatern GameObject_GetAimRotation(char *actor, CVector3 point) {
     }
     return result;
 }
+#endif
