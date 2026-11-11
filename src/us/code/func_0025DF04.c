@@ -1,6 +1,9 @@
 #include "common.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#endif
 
 /* Picks the death animation for an AI actor (modes 0x33/0x34): a special one
  * when the region under it is flagged, then the explosive, violent, moving or
@@ -9,12 +12,36 @@
  * death-flag words enables it. Not an attack picker, as this comment once
  * said. */
 
+#ifdef TARGET_PORT
+typedef struct AttackActor {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_AttackActor(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_target[T2_HOFF_AttackActor(header.m_pCurrentRegion)]; sptr target; }; /* N64 0x10: the region pointer, pointer-wide */
+        struct { u8 _hp_def[T2_HOFF_AttackActor(header.m_pIntelligence)]; s32 *def; }; /* N64 0x14 */
+    };
+} AttackActor;
+#else
 typedef struct {
     /* 0x00 */ u8 pad00[0x10];
     /* 0x10 */ s32 target;
     /* 0x14 */ s32 *def;
 } AttackActor;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct AttackState {
+/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_AttackState(m) __builtin_offsetof(CAI, m)
+    union {
+        struct { u8 _hp_flags[T2_HOFF_AttackState(m_dwFlags)]; s32 flags; }; /* N64 0x0 */
+        struct { u8 _hp_anim[T2_HOFF_AttackState(m_AnimType)]; s16 anim; }; /* N64 0xC4 */
+        struct { u8 _hp_index[T2_HOFF_AttackState(m_Enemy.m_BehaviorIndex)]; s8 index; }; /* N64 0x133 (round 8 w2: by hand, inside the m_VarBuffer union) */
+    };
+} AttackState;
+#else
 typedef struct {
     /* 0x00 */ s32 flags;
     /* 0x04 */ u8 pad04[0xC0];
@@ -22,6 +49,7 @@ typedef struct {
     /* 0xC6 */ u8 padC6[0x6D];
     /* 0x133 */ s8 index;
 } AttackState;
+#endif
 
 typedef struct {
     /* 0x00 */ u8 pad00[0x44];

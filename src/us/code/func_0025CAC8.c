@@ -6,11 +6,27 @@
 #include "globals/collision.h"
 #include "globals/ai.h"
 #include "protos/ai.h"
+#ifdef TARGET_PORT
+#include "structs/particle.h"
+#endif
 
 /* AI hit callback: a projectile (or its owner) close enough lengthens the
  * wait and becomes the last-heard position; then the projectile type picks a
  * reaction animation (flinch, burn, freeze, shock...) the definition allows. */
 
+#ifdef TARGET_PORT
+typedef struct Projectile {
+/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Projectile(m) __builtin_offsetof(CParticle, m)
+    union {
+        struct { u8 _hp_type[T2_HOFF_Projectile(header.m_nObjType)]; u16 type; }; /* N64 0x2 */
+        struct { u8 _hp_pos[T2_HOFF_Projectile(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_owner[T2_HOFF_Projectile(m_pOwner)]; struct Projectile *owner; }; /* N64 0x10C */
+        struct { u8 _hp_charge[T2_HOFF_Projectile(m_Scale)]; f32 charge; }; /* N64 0x1BC */
+    };
+} Projectile;
+#else
 typedef struct Projectile {
     /* 0x000 */ u8 pad0[0x2];
     /* 0x002 */ u16 type;
@@ -20,6 +36,7 @@ typedef struct Projectile {
     /* 0x110 */ u8 pad110[0x1BC - 0x110];
     /* 0x1BC */ f32 charge;
 } Projectile;
+#endif
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 

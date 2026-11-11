@@ -11,6 +11,26 @@
 typedef struct Object Object;
 
 /* An object or a particle: the first byte tells which. */
+#ifdef TARGET_PORT
+#include "structs/particle.h"
+struct Object {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py; round 8 w2), the
+ * particle owner at CParticle's: each field in its own member of one union, placed by
+ * __builtin_offsetof of the member it reads */
+#define T2_HOFF_Object(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_kind[T2_HOFF_Object(header.m_Type)]; u8 kind; }; /* N64 0x0 */
+        struct { u8 _hp_particleType[T2_HOFF_Object(header.m_nObjType)]; u16 particleType; }; /* N64 0x2 */
+        struct { u8 _hp_pos[T2_HOFF_Object(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_def[T2_HOFF_Object(header.m_pIntelligence)]; CIntelligence *def; }; /* N64 0x14 */
+        struct { u8 _hp_typeId[T2_HOFF_Object(m_nTypeFlag)]; u16 typeId; }; /* N64 0xB8 */
+        struct { u8 _hp_flags[T2_HOFF_Object(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_particleOwner[__builtin_offsetof(CParticle, m_pOwner)]; Object *particleOwner; }; /* N64 0x10C: a particle's (kind 2) */
+        struct { u8 _hp_ai[T2_HOFF_Object(m_AI)]; CAI ai; }; /* N64 0x140 */
+        struct { u8 _hp_fxFlags[T2_HOFF_Object(m_dwHotPointFlags)]; u32 fxFlags; }; /* N64 0x27C */
+    };
+};
+#else
 struct Object {
     /* 0x000 */ u8 kind;            /* 1: object, 2: particle */
     /* 0x001 */ u8 pad1;
@@ -28,6 +48,7 @@ struct Object {
     /* 0x140 */ CAI ai;
     /* 0x27C */ u32 fxFlags;
 };
+#endif
 
 void EnemyAI_NukedFrozenRemove(Object *obj, CAI *ai);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
