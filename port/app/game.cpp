@@ -29,6 +29,7 @@ extern "C" {
 // port/game/t2debug.c
 int T2Port_EngineMode(void);
 void T2Port_LogState(int frame);
+void T2Port_LogDet(int frame);
 void T2Port_GiveWeapons(void); // DEBUG-ONLY: T2_GIVE_WEAPONS=1 (t2debug.c)
 void T2Port_DebugWarp(int frame);
 void T2Port_Teleport(int frame, const char *spec);
@@ -603,6 +604,12 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         T2Port_GiveWeapons(); // DEBUG-ONLY: T2_GIVE_WEAPONS=1
         if (statePeriod > 0 && (f + 1) % statePeriod == 0) {
             T2Port_LogState(f + 1); // DEBUG-ONLY: T2_STATE_LOG=1
+        }
+        // T2_DET_LOG=N: the determinism trace every N frames (exact bits; T2_DET_FROM, T2_DET_ACTORS)
+        static const int detPeriod = getenv("T2_DET_LOG") == nullptr ? 0
+                                     : (atoi(getenv("T2_DET_LOG")) > 0 ? atoi(getenv("T2_DET_LOG")) : 1);
+        if (detPeriod > 0 && (f + 1) % detPeriod == 0) {
+            T2Port_LogDet(f + 1); // DEBUG-ONLY: T2_DET_LOG=N
         }
         static const char* teleport = getenv("T2_TELEPORT");
         if (teleport != nullptr) {
