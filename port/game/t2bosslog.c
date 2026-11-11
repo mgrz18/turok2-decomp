@@ -46,6 +46,24 @@ void T2Port_LogBosses(void) {
             printf("\n");
             logActor("boss", s->boss);
             logActor("owner", s->actor);
+            for (i = 0; i < s->memberCount && i < 8; i++) {
+                logActor("member", s->members[i]);
+            }
+            {
+                CListedInstance *e;
+                int n = 0, live = 0;
+                for (e = gScene.m_InstancePool.m_ActiveList.m_pHead; e != NULL; e = e->m_pNext) {
+                    n++;
+                    live += e->m_Instance.m_AI.m_Health > 0;
+                    if (n <= 6) {
+                        printf("boss:   inst type %x intel %d mode %d", (unsigned) e->m_Instance.m_nTypeFlag,
+                               e->m_Instance.header.m_pIntelligence ? (int) e->m_Instance.header.m_pIntelligence->m_Type : -1,
+                               (int) e->m_Instance.m_AI.m_Mode);
+                        logActor("", &e->m_Instance);
+                    }
+                }
+                printf("boss:   instances %d live %d\n", n, live);
+            }
             break;
         }
         case 3: {
@@ -241,7 +259,16 @@ void T2Port_AimNode(int frame, const char *spec) {
         dx = o->header.m_vPos.x - eye.x;
         dz = o->header.m_vPos.z - eye.z;
         d = dx * dx + dz * dz;
-        if (d < bestD && aimBoxCentre(o, mask, &eye, &aim, &nodeMask)) {
+        if (d < bestD && mask == -1 && !aimBoxCentre(o, mask, &eye, &aim, &nodeMask)) {
+            /* any target, no hit boxes drawn (yet): its position, 50 units up */
+            aim = o->header.m_vPos;
+            aim.y += 50.0f;
+            nodeMask = 0;
+            bestD = d;
+            best = o;
+            bestAim = aim;
+            bestNode = nodeMask;
+        } else if (d < bestD && aimBoxCentre(o, mask, &eye, &aim, &nodeMask)) {
             bestD = d;
             best = o;
             bestAim = aim;
