@@ -200,6 +200,81 @@ Fixes on the merged tree (each `asm_diff` 0):
 8. Gore deaths, the cerebral bore and the dart reactions; an enemy with a drop; health pickups
    with a damaged player (now possible: w1's damage path).
 
+## Round 9, part x2: finishing a boss (branch names-R9_x2)
+
+Detail: [GAMEPLAY.md](GAMEPLAY.md) section 10. Every `src/` change is `TARGET_PORT` (host bodies
+or host views); `tools/asm_diff.py --base 5437cfc0 -j 8` 0 for every touched file. No header in
+`include/` changed: no archive rebuild, no gendata rerun (`decls.json` stays valid).
+
+**The Mother can be beaten on the host.** The damage did not stop after one part for a bug: the
+scripted fire hit her body (node bits 0x201), and only the arms (0xC00), the heads (0x5000) and in
+phase 2 the chest (0x2000) count. Aimed at them (`T2_AIM_NODE=boss`, new), every part dies in
+turn; then four host bugs stood between her phases and her death (fixed). The run, Linux headless
+(new game; one input entry per line, a single line is cut at its buffer):
+
+```sh
+cd OUT && (echo "START@4400 A@4500 A@4700 A@4800 Z@14000..90000 CL@19000..90000";
+  for s in $(seq 19000 600 89000); do echo "CD@$s..$((s+250))"; done) > mother_end.txt
+SDL_VIDEODRIVER=offscreen T2_WARP_TO=-4 T2_GIVE_WEAPONS=1 T2_WEAPON=10 T2_AIM_NODE=boss \
+  T2_CHEATS=1 T2_FILL_AMMO=600 T2_BOSS_LOG=1 T2_STATE_LOG=200 \
+  build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --pak-blank \
+  --frames 36000 --input @mother_end.txt
+```
+
+| frame | what |
+|---|---|
+| 14,800-16,700 | phase 0: the three arm parts, then the three heads, each 10,240 to 0 with its stagger; `parts 6/6 -> 0/6` |
+| 16,800-26,800 | the phase-1 cinema, phase 1 (arm and head, 38,400 each), her teleport attack moves the player |
+| 27,000-33,500 | the phase-2 cinema, phase 2 (the chest, 128,000 to 0) |
+| 33,600 | mode 30 (death), 31: the defeat cinema (the Mother with her arm and head stumps) |
+| 34,800 | `MotherBoss_OnDefeatCinemaDone`: `m_bMotherBossComplete`, unlocked cheat 4, warp 6999 |
+| 35,000 | **level 60, the hub**, "NEW CHEAT ENABLED" |
+
+The same frames with `--draw`; the same fight with `--high-memory` (after x2-7). Screenshots
+(640x480, checked by eye, not committed): her chest under plasma fire (33,600), the defeat cinema
+(34,200), its fade (34,800), the hub with "NEW CHEAT ENABLED" (35,000).
+
+Fixes (each `asm_diff` 0):
+
+| id | where | bug | fix |
+|---|---|---|---|
+| x2-1 | `MotherBoss_Mode16_TeleportTarget` (func_0040B488) | raw N64 offsets (`m_AnimRepeatedCount` 0xC7, `gMotherBoss.counter` 0x67C): she stayed in mode 16 for good in phase 1 | host body by member |
+| x2-2 | `MotherBoss_TeleportTarget` (func_00409A64) | `obj + 0x140` as the CAI: crashed in `AI_UpdatePathHeading` | `&obj->m_Instance.m_AI` |
+| x2-3 | `CScene__GetRegionIndex` (func_002242B4) | `>> 5` (N64 stride) on the host's 0x40-byte regions: twice the index; `Cinema_RestorePlayer` put the player in another region or past the table (crash after the phase-2 cinema); `Automap_RevealRegion` set the wrong level bits | `/ sizeof(CGameRegion)` |
+| x2-7 | `CPlayer__SetPosition` (func_00253D68) | `CScene__FindRegionAt` called through an int-returning one-argument cast: the region cut to 32 bits (`--high-memory` crash at the end of the phase-1 cinema) | the real call |
+| x2-4 | `MotherBoss_PartEffects` (func_0040A25C) | the boss mode at N64 0x174, the pose context's bone at 0x90 | host views |
+| x2-5 | `MantidQueen_Step` (func_00402A10) | the mode update dispatched through an N64 CAI view: **no Mantid Queen mode update ever ran** | host body |
+| x2-6 | the rest of the Mantid Queen module (00401FCC, 00402404, 004028F4, 00402ADC, 00402BB0, 00402CE8, 00402D50, 00402E0C, 00402F4C, 004030D4, 0040340C, 00403430, 00403520, 004035B8, 004035CC, 004035F8) | N64 views of the CAI, the instances, `WaveBossState`/`WaveBossStep`, `DamageEvent`; `gMantidQueen_boss` as s32; the members sorted as 4-byte words; `EnterStart` wrote two callbacks at N64 offsets into other members | host views / bodies |
+
+**The Mantid Queen** (7501) now leaves her intro, takes her place and sends her first wave
+(`toSpawn 3 -> 0`); the wave never ends: the 0x2C3 minions the members spawn stay at their spawn
+points on the walls with no animation (`anim -1`), pile up to 32, and her spots stay shut.
+**The Blind One** (7401): phase 3, its 8 minions not killed by the scripted fire. **The Primagen**
+(7602): its waves run; strafing off its platform is an instant GAME OVER (lives 3 -> 0).
+No crash in any of them (30,000 frames).
+
+Regression (this branch, Linux headless): the boot to 26,000 frames gives round 8's mode switches
+(demo 1 5,467, legal 8,800, demo 2 13,680, demo 3 20,946, title 25,778) and the same demo-1 player
+states as the round-8 binary. Round 8's runs on this binary, exit 0: the warp 51 -> 52 -> 51 (52 at 13,400, 51 again by
+15,200), w2's level-52 kills (the corpses melt, mode 60), w1's deaths, respawns and GAME OVER (the
+legal screen at 19,500: the respawn restores the saved region through the fixed index).
+
+Debug (DEBUG-ONLY, port/game/t2bosslog.c, game.cpp): `T2_AIM_NODE=MASK|boss|-1[,R]` (aim the
+player, yaw and pitch, at a hit box with those node bits of the nearest live actor or spawned
+instance), `T2_CHEATS=MASK` (the game's cheat flags: 1 invincibility), `T2_FILL_AMMO=N`;
+`T2_BOSS_LOG` prints the hits the Mother's/Queen's hurt callbacks get, the Queen's members and the
+instance pool.
+
+**Merge notes.** Files others may touch: func_002242B4.c (`CScene__GetRegionIndex`: x5 stability /
+x1 cinemas and saves: `CSavedPlayers.m_Region` and `Cinema_Start` use it), func_00253D68.c
+(`CPlayer__SetPosition`), port/app/game.cpp and port/game/t2bosslog.c (debug switches),
+GAMEPLAY.md (new section 10 at the end). Raw `+ 0x140` CAI addresses remain in non-boss files
+(func_00254640, 002553BC, 0025E488, 0025F380, 0025F3A4, 00264CEC, 0026508C, 00268E60, 004082A0,
+0040EA24): x5 may meet them.
+
+Next: the Queen's minions (their spawn and animation), then her spots; the Blind One's minions and
+the Primagen's parts with `T2_AIM_NODE`; the boss death cinemas of the other three.
+
 ## Round 8, part w1: enemies hurt the player, death and game over (branch names-R8_w1)
 
 Detail: [GAMEPLAY.md](GAMEPLAY.md) section 9. All src changes are `TARGET_PORT` (host bodies or
