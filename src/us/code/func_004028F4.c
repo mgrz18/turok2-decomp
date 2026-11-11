@@ -6,10 +6,21 @@
 
 typedef CVector3 Vec3_004028F4;
 
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+/* the view at the host offsets (round 9 x2, the Mantid Queen fight): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+typedef struct {
+    union {
+        struct { u8 _hp_rot[__builtin_offsetof(CGameObjectInstance, m_vVelocity)]; Vec3_004028F4 rot; };
+    };
+} Obj004028F4;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
     /* 0x18 */ Vec3_004028F4 rot;
 } Obj004028F4;
+#endif
 
 s16 WeightedTable_PickStatic(struct Pick *table);
 void GameObject_TraceMove(Obj004028F4 *obj, Vec3_004028F4 pos, Vec3_004028F4 *posp, s32 *out, s32 a5, s32 a6);
