@@ -7,7 +7,11 @@
 
 #include "structs/game_object.h"
 
-extern CAIModeInfo sMantidQueenModeTable[];
+/* sized (round 10 y2): the header row, modes 0-16 and the -1 row. Unsized, gendata measured it to
+ * the next label of the module-2 copy that overlaps the same addresses (0x180 of its 0x260 bytes):
+ * the host table stopped after mode 10, so modes 11-16 (the spot-3 opening 14/15, the death 16)
+ * were never found and CAI__SetMode left the Queen in her old mode. */
+extern CAIModeInfo sMantidQueenModeTable[19];
 extern CAIModeInfo sPrimagenModeTable[];
 extern CAIModeInfo sMotherBossModeTable[];
 

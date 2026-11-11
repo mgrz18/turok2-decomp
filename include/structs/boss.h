@@ -20,6 +20,7 @@
  * still define a local CAI: actors are `struct CGameObjectInstance *`. */
 
 #include "structs/vector.h"
+#include "structs/pick.h" /* WaveBossStep's pick tables: a complete type, so gendata types (and swaps) them */
 
 /* The 0x64-byte value/colour animator ScriptAnimator_Start sets up,
  * ScriptAnimator_SetScript starts on a script (fires) and Animator_Update steps;
