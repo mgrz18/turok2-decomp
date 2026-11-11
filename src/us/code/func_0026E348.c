@@ -5,7 +5,7 @@
 s32 Cinema_RequestForObject(sptr, sptr);
 
 
-void Event_PlayCinema(s32 arg0, s32 arg1, s32 arg2) {
+void Event_PlayCinema(sptr arg0, sptr arg1, sptr arg2) {
     if (gScene.m_Mode == 4) {
         Cinema_RequestForObject(arg0, arg2);
     }
