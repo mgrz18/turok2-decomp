@@ -22,6 +22,13 @@ s32 GameObject_IsSolid(CGameObjectInstance *actor) {
     u32 flags;
     u32 mask;
 
+#ifdef TARGET_PORT
+    /* Port guard (STABILITY.md S17): T2_WARP_TO=3999 drops the player into the ending (engine
+     * mode 16) with no body intelligence: not solid (as S8: no ladder jump without one). */
+    if (actor->header.m_pIntelligence == NULL) {
+        return 0;
+    }
+#endif
     switch ((u32) actor->header.m_pIntelligence->m_Type) {
         case 11:
             if (actor->header.m_Type != 1) {
