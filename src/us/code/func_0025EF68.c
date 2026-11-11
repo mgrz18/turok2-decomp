@@ -9,11 +9,15 @@ s32 Throwable_SetModeAnim(void *, void *, sptr);         /* extern */
  * pointer variable: gCollisionResults.m_pInstance does not give this code. */
 extern CGameObjectInstance *gCollisionResults; /* local type: the code reads m_pInstance through this pointer view (see above) */
 
-void EnemyAI_CheckGrab(s32 arg0, CAI *arg1) {
+void EnemyAI_CheckGrab(sptr arg0, CAI *arg1) {
     void *owner;
 
     if ((arg1->m_Health != 0) && (gCollisionResults != NULL) && (owner = arg1->m_pPathTarget, !(arg1->m_ModeFlags & 0x1000)) && (gCollisionResults == owner) && (gCollisionResults->header.m_pIntelligence->m_Type == 5)) {
+#ifdef TARGET_PORT
+        arg1->m_Enemy.m_pGrabbed = gCollisionResults; /* pointer-wide on the host (m_VarBuffer[2] is a u32) */
+#else
         arg1->m_VarBuffer[2] = (uptr) gCollisionResults;
+#endif
         Throwable_SetModeAnim(gCollisionResults, &gCollisionResults->m_AI, arg0);
         CAI__SetMode(arg0, arg1, 0x15);
     }

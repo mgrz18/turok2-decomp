@@ -12,7 +12,7 @@ s16 EnemyAnim_Leap_AFF18(sptr, sptr);                    /* extern */
 s16 EnemyAnim_Weapon_B00F0(sptr, sptr);                    /* extern */
 s32 WeightedTable_Clear(s32 *);                   /* extern */
 
-s16 EnemyAnim_PickAttack_B1200(s32 arg0, s32 arg1) {
+s16 EnemyAnim_PickAttack_B1200(sptr arg0, sptr arg1) {
     u8 sp10[0x68];
 
     WeightedTable_Clear(sp10);

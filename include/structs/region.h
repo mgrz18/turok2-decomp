@@ -32,7 +32,13 @@ typedef struct CGameRegion {
 
 /* m_nInfo and m_wFlags read as one word, as some code tests the flags
  * ((REGION_WORD(r) & 6) == 2: a closed edge region). */
+#ifdef TARGET_PORT
+/* the big-endian word on the host (round 8 w2): read as a host u32 it put m_nInfo in the low
+ * half, so the closed-edge test looked at the info index and no enemy found a path to the player */
+#define REGION_WORD(r) (((u32) ((CGameRegion *) (r))->m_nInfo << 16) | ((CGameRegion *) (r))->m_wFlags)
+#else
 #define REGION_WORD(r) (*(u32 *)(r))
+#endif
 
 /* The attributes of a set of regions: water, damage, ceilings, map colour... */
 typedef struct CRegionInfo {
