@@ -27,6 +27,12 @@ void MotherBoss_Hurt(void *obj, CAI *ai, DamageEvent *hit) {
     s32 damage;
     s32 bit;
 
+#ifdef TARGET_PORT
+    {
+        extern void T2Port_LogBossHurt(const char *who, void *obj, void *hit); /* DEBUG-ONLY */
+        T2Port_LogBossHurt("mother", obj, hit);
+    }
+#endif
     if (hit->frame == NULL) {
         return;
     }

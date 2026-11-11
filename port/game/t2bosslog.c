@@ -7,7 +7,9 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/scene.h"
+#include "structs/collision.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 static void logActor(const char *what, CGameObjectInstance *a) {
     if (a == NULL) {
@@ -70,6 +72,218 @@ void T2Port_LogBosses(void) {
             logActor("part0", s->found[0]);
             logActor("part1", s->found[1]);
             break;
+        }
+    }
+}
+
+/* T2_BOSS_LOG=1: every hit a boss hurt callback gets (called from the hurt callbacks under
+ * TARGET_PORT, DEBUG-ONLY): the damage, the flags, the node bits of the hit frame. */
+void T2Port_LogBossHurt(const char *who, void *obj, void *arg) {
+    DamageEvent *hit = arg;
+    static int on = -1;
+    if (on < 0) {
+        on = getenv("T2_BOSS_LOG") != NULL;
+    }
+    if (!on) {
+        return;
+    }
+    printf("bosshurt: %s obj %p dmg %d flags %x frame %p nodes %x factor %.2f src %p\n", who, obj,
+           (int) hit->damage, (unsigned) hit->flags, (void *) hit->frame,
+           hit->frame ? (unsigned) hit->frame->unk_6C : 0u, hit->frame ? hit->frame->damageFactor : 0.0f,
+           hit->source);
+    fflush(stdout);
+}
+
+/* T2_AIM_NODE=MASK[,R] (game.cpp, every frame; DEBUG-ONLY, round 9 x2): in gameplay, turn the
+ * first player (yaw, and the camera pitch the weapons fire along) to the centre of the nearest hit
+ * box whose node mask has a bit of MASK (and of the actor's m_VisBits, the parts still there) on
+ * the nearest live actor within R (default 4000) that has one: aims scripted fire at a boss's
+ * weak spots (the Mother's arms 0xC00, heads 0x5000, the chest 0x2000). The box centre is
+ * computed as CGameObjectInstance__GetNearestBox does (the box corners through the node's draw
+ * matrix). T2_AIM_PITCH_SIGN=+-1 flips the pitch convention. */
+#include "structs/player.h"
+#include "structs/camera.h"
+#include "globals/game.h"
+#include "globals/engine.h"
+#include "structs/world.h"
+#include "protos/iset.h"
+#include <math.h>
+#include <string.h>
+
+typedef struct T2AimBox {
+    CVector3 corners[8];
+    f32 size;
+    u8 pad64[8];
+    s32 mask;
+} T2AimBox;
+extern void **CGameObjectInstance__LoadGeometry(CGameObjectInstance *actor);
+extern void CMtxF__FromMtxAffine(CMtxF *dst, void *src);
+extern void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
+extern void CCache__Unlock(s32, void *);
+extern f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);
+
+static int aimBoxCentre(CGameObjectInstance *o, s32 mask, CVector3 *from, CVector3 *out, s32 *nodeMask) {
+    void **handle;
+    void *boxes;
+    void *mtxs = o->m_pmtDrawMtxs != NULL ? (void *) o->m_pmtDrawMtxs : (void *) o->m_pmtLastFrameDrawMtxs;
+    s32 count, i, j;
+    f32 best = 3.4e38f;
+    int found = 0;
+
+    if (mtxs == NULL || (handle = CGameObjectInstance__LoadGeometry(o)) == NULL) {
+        return 0;
+    }
+    boxes = CISet__GetBlock(*handle, 3);
+    count = *(s32 *) boxes;
+    for (i = 0; i < count; i++) {
+        T2AimBox *b = CISet__GetBlock(CISet__GetBlock(boxes, i), 1);
+        CVector3 c = { 0, 0, 0 }, w;
+        CMtxF m;
+        f32 dx, dy, dz, d;
+        if (!(b->mask & mask & o->m_AI.m_VisBits)) {
+            continue;
+        }
+        for (j = 0; j < 8; j++) {
+            c.x += b->corners[j].x;
+            c.y += b->corners[j].y;
+            c.z += b->corners[j].z;
+        }
+        c.x *= 0.125f;
+        c.y *= 0.125f;
+        c.z *= 0.125f;
+        CMtxF__FromMtxAffine(&m, (u8 *) mtxs + i * 0x40);
+        CMtxF__TransformPoint(&m, &c, &w);
+        dx = w.x - from->x;
+        dy = w.y - from->y;
+        dz = w.z - from->z;
+        d = dx * dx + dy * dy + dz * dz;
+        if (d < best) {
+            best = d;
+            *out = w;
+            *nodeMask = b->mask;
+            found = 1;
+        }
+    }
+    CCache__Unlock(0, handle);
+    return found;
+}
+
+/* T2_AIM_NODE=boss: the weak spot the current boss phase wants (the Mother: MotherBoss_Hurt's
+ * spot kinds, phase 0 the arms 0xC00 while slots 2..4 live then the heads 0x5000 (6..8), phase 1
+ * slot 1 (0xC00) then 5 (0x5000), phase 2 the chest 0x2000); otherwise a number. */
+static CGameObjectInstance *sAimSkip;
+
+static s32 T2Port_AimMask(const char *spec) {
+    sAimSkip = NULL;
+    if (strncmp(spec, "boss", 4) == 0) {
+        if (gScene.m_nLevel == 3) {
+            MotherBossState *s = &gMotherBoss;
+            switch (s->phase) {
+                case 0:
+                    return (s->slots[2].health > 0 || s->slots[3].health > 0 || s->slots[4].health > 0) ? 0xC00 : 0x5000;
+                case 1:
+                    return s->slots[1].health > 0 ? 0xC00 : 0x5000;
+                default:
+                    return 0x2000;
+            }
+        }
+        if (gScene.m_nLevel == 2) {
+            /* the Mantid Queen: the open spot (1 << step->weakSpot) between the waves; during a
+             * wave (or no open spot) the nearest minion, any box (the boss is skipped) */
+            WaveBossState *q = &gMantidQueen;
+            if (q->step != NULL && !q->waveActive && q->step->weakSpot >= 0) {
+                return 1 << q->step->weakSpot;
+            }
+            sAimSkip = q->boss;
+            return -1;
+        }
+        return -1;
+    }
+    return (s32) strtol(spec, NULL, 0);
+}
+
+void T2Port_AimNode(int frame, const char *spec) {
+    static s32 sLastMask = -1;
+    static int sLastFrame;
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    CGameObjectInstance *pl, *best = NULL;
+    CVector3 eye, aim, bestAim;
+    s32 mask = T2Port_AimMask(spec), nodeMask = 0, bestNode = 0;
+    const char *comma = strchr(spec, ',');
+    const char *sign = getenv("T2_AIM_PITCH_SIGN");
+    f32 r = comma != NULL ? (f32) atof(comma + 1) : 4000.0f, bestD, dx, dy, dz, h;
+    int i;
+
+    if (p == NULL || p->m_pCamera == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL ||
+        gScene.m_WarpState != 0) {
+        return;
+    }
+    pl = &p->m_CharacterActor;
+    eye = p->m_pCamera->m_vPos;
+    bestD = r * r;
+    /* the level's actors, then the spawned instances (the bosses' minions) */
+    for (i = gScene.m_nFirstActor; i < gScene.m_nActors + 512; i++) {
+        static CListedInstance *sNext;
+        CGameObjectInstance *o;
+        f32 d;
+        if (i < gScene.m_nActors) {
+            o = &gScene.m_pActors[i];
+        } else {
+            sNext = i == gScene.m_nActors ? gScene.m_InstancePool.m_ActiveList.m_pHead : sNext->m_pNext;
+            if (sNext == NULL) {
+                break;
+            }
+            o = &sNext->m_Instance;
+        }
+        if (o == pl || o == sAimSkip || o->header.m_pIntelligence == NULL || o->m_AI.m_Health <= 0 || !(o->m_dwFlags & 0x100)) {
+            continue;
+        }
+        dx = o->header.m_vPos.x - eye.x;
+        dz = o->header.m_vPos.z - eye.z;
+        d = dx * dx + dz * dz;
+        if (d < bestD && aimBoxCentre(o, mask, &eye, &aim, &nodeMask)) {
+            bestD = d;
+            best = o;
+            bestAim = aim;
+            bestNode = nodeMask;
+        }
+    }
+    if (best == NULL) {
+        return;
+    }
+    pl->m_RotY += AI_AngleToPoint(pl, bestAim);
+    dx = bestAim.x - eye.x;
+    dy = bestAim.y - eye.y;
+    dz = bestAim.z - eye.z;
+    h = sqrtf(dx * dx + dz * dz);
+    p->m_pCamera->m_ViewParams.m_vRotOffset.x = (sign != NULL ? (f32) atof(sign) : 1.0f) * atan2f(dy, h);
+    if (bestNode != sLastMask || frame - sLastFrame >= 300) {
+        sLastMask = bestNode;
+        sLastFrame = frame;
+        printf("aim: frame %d eye (%.1f %.1f %.1f) -> actor %d node %x at (%.1f %.1f %.1f) pitch %.2f\n", frame,
+               eye.x, eye.y, eye.z, (best >= gScene.m_pActors && best < gScene.m_pActors + gScene.m_nActors) ? (int) (best - gScene.m_pActors) : -1, (unsigned) bestNode, bestAim.x, bestAim.y,
+               bestAim.z, p->m_pCamera->m_ViewParams.m_vRotOffset.x);
+        fflush(stdout);
+    }
+}
+
+/* T2_CHEATS=MASK, T2_FILL_AMMO=N (game.cpp, every frame; DEBUG-ONLY, round 9 x2): OR the game's own cheat flags
+ * (gEngineApp_m_Settings.cheatFlags, what the cheat menu sets) in gameplay: 1 invincibility
+ * (CPlayer__Hurt returns early), as the cheat menu's toggles do. For long boss fights. */
+void T2Port_Cheats(int frame, const char *spec, const char *fill) {
+    extern s32 CPlayer__FillAllAmmo(CPlayer *);
+    CPlayer *p;
+
+    if (gEngineApp.m_Settings.mode != 13) {
+        return;
+    }
+    if (spec != NULL) {
+        gEngineApp_m_Settings.cheatFlags |= (s32) strtol(spec, NULL, 0);
+    }
+    /* T2_FILL_AMMO=N: every N frames the active players' ammo is filled (CPlayer__FillAllAmmo) */
+    if (fill != NULL && atoi(fill) > 0 && frame % atoi(fill) == 0) {
+        for (p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
+            CPlayer__FillAllAmmo(p);
         }
     }
 }
