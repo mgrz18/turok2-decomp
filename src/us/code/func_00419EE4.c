@@ -6,7 +6,7 @@ s32 Sound__Play2D(s32);
 
 extern u8 gEngineApp_m_Settings_unk15[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
-s32 SoundMenu_StepSfxVolume(s32 arg0, s32 arg1)
+s32 SoundMenu_StepSfxVolume(sptr arg0, sptr arg1)
 {
   s32 var_a1;
   s32 new_var;

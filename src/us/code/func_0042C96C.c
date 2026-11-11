@@ -14,7 +14,7 @@ void func_0042C96C(CScene *scene) {
 
     while (d != NULL) {
         next = d->m_pNext;
-        LevelEvent_Fire((s32)(sptr)d->m_pEvent);
+        LevelEvent_Fire((sptr)d->m_pEvent); /* full width (soak S12, --high-memory) */
         CList__Remove(&scene->m_DelayedEvents, d);
         CList__AddHead(&scene->m_FreeDelayedEvents, d);
         d = next;
