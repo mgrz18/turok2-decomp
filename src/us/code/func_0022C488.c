@@ -25,7 +25,7 @@ struct Target {
     union {
         struct { u8 _hp_kind[T2_HOFF_Target(m_CharacterActor.header.m_Type)]; u8 kind; }; /* N64 0x0 */
         struct { u8 _hp_pos[T2_HOFF_Target(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_unk10[T2_HOFF_Target(m_CharacterActor.header.m_pCurrentRegion)]; s32 unk10; }; /* N64 0x10 */
+        struct { u8 _hp_unk10[T2_HOFF_Target(m_CharacterActor.header.m_pCurrentRegion)]; sptr unk10; }; /* N64 0x10: a region pointer */
         struct { u8 _hp_def[T2_HOFF_Target(m_CharacterActor.header.m_pIntelligence)]; CIntelligence *def; }; /* N64 0x14 */
         struct { u8 _hp_bones[T2_HOFF_Target(m_CharacterActor.m_pmtDrawMtxs)]; Bone *bones; }; /* N64 0x98 */
         struct { u8 _hp_flags[T2_HOFF_Target(m_CharacterActor.m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
