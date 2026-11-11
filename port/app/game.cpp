@@ -561,6 +561,16 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     int paceLate = 0;
     std::vector<std::pair<int, double>> paceLateList; // (VI, ms late), the worst printed at the end
     double paceWorstLateMs = 0.0, paceSleptMs = 0.0;
+    // --pace --audio (round 10 y4): a simulated 22,050 Hz sound device fed by the audio manager,
+    // to count underruns without one (headless runs have no audio backend): it starts with
+    // kSinkPrefill frames queued at the first audio frame, then drains in real time; a VI that
+    // finds it empty is an underrun (the sink then restarts with the prefill).
+    constexpr double kSinkRate = 22050.0, kSinkPrefill = 2048.0;
+    bool sinkOn = false;
+    auto sinkStart = BenchClock::time_point{};
+    double sinkQueued = 0.0, sinkMin = 1e9, sinkMax = 0.0, sinkProduced = 0.0;
+    int sinkUnder = 0;
+    std::vector<int> sinkUnderVIs;
     auto t0 = std::chrono::steady_clock::now();
     for (int f = 0; f < args.frames && (!window || window->IsRunning()); f++) {
         const auto bt0 = BenchClock::now();
@@ -660,6 +670,29 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             size_t n = T2Audio_TakeSamples(pcm, 4096);
             if (n > 0) {
                 AudioPlayerPlayFrame(reinterpret_cast<const uint8_t*>(pcm), n * 4);
+            }
+            if (args.pace && (n > 0 || sinkOn)) {
+                const auto now = BenchClock::now();
+                if (!sinkOn) {
+                    sinkOn = true;
+                    sinkStart = now;
+                    sinkQueued = kSinkPrefill;
+                }
+                const double drained = std::chrono::duration<double>(now - sinkStart).count() * kSinkRate;
+                double level = sinkQueued - drained;
+                if (level < 0.0) {
+                    sinkUnder++;
+                    if (sinkUnderVIs.size() < 12) {
+                        sinkUnderVIs.push_back(f + 1);
+                    }
+                    sinkStart = now;
+                    sinkQueued = kSinkPrefill;
+                    level = kSinkPrefill;
+                }
+                sinkMin = std::min(sinkMin, level);
+                sinkQueued += (double)n;
+                sinkProduced += (double)n;
+                sinkMax = std::max(sinkMax, level + (double)n);
             }
             if (wav != nullptr && n > 0) {
                 fwrite(pcm, 4, n, wav);
@@ -854,6 +887,16 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             printf(" %d:%.1f", paceLateList[i].first, paceLateList[i].second);
         }
         printf(" (VI:ms)\n");
+        if (args.audio) {
+            printf("pace: audio %.0f frames produced (%.1f Hz over the run), simulated %.0f Hz device with %.0f "
+                   "prefilled: %d underruns, buffer min %.0f max %.0f frames",
+                   sinkProduced, secs > 0 ? sinkProduced / secs : 0.0, kSinkRate, kSinkPrefill, sinkUnder,
+                   sinkOn ? sinkMin : 0.0, sinkMax);
+            for (int v : sinkUnderVIs) {
+                printf(" %d", v);
+            }
+            printf("\n");
+        }
     }
     T2PifStats pif;
     T2Port_GetPifStats(&pif);

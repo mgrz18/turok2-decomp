@@ -226,6 +226,8 @@ def run_one(job):
         args.append("--low-memory")  # Linux debug: the game memory below 2 GB (the default is high)
     if a.draw:
         args.append("--draw")
+        if sys.platform == "darwin":
+            args.append("--offscreen-gl")  # macOS: GL with no window (the offscreen driver would still open one)
         env.setdefault("SDL_VIDEODRIVER", "offscreen")
         env.setdefault("vblank_mode", "0")
     else:
