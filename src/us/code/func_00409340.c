@@ -34,6 +34,9 @@ void MotherBoss_Draw();
 void MotherBoss_Collision();
 void EnemyAI_HeadNodeCallback();
 extern u8 func_00408FF8[];
+#ifdef TARGET_PORT
+void MotherBoss_Hurt(void *obj, CAI *ai, void *hit); /* (.., DamageEvent *) */
+#endif
 
 void MotherBoss_Init(Obj *obj, CAI *ai) {
     MotherBossState *s = &gMotherBoss;
@@ -52,7 +55,13 @@ void MotherBoss_Init(Obj *obj, CAI *ai) {
     s->intel = (void *)CScene__FindIntelligence(&gScene, 1, 0x1DB1);
     ai->m_pModeTable = sMotherBossModeTable;
     ai->m_pfStep = MotherBoss_Step;
+#ifdef TARGET_PORT
+    /* func_00408FF8 + 8 is MotherBoss_Hurt in the ROM (splat started its object two junk words
+     * early); on the host func_00408FF8 is not code at that distance: the first hit called data */
+    ai->m_pfHurt = MotherBoss_Hurt;
+#else
     ai->m_pfHurt = func_00408FF8 + 8;
+#endif
     ai->m_pfEffects = EnemyAI_HeadNodeCallback;
     ai->m_pfCollision = MotherBoss_Collision;
     ai->m_pfDraw = MotherBoss_Draw;

@@ -348,6 +348,34 @@ include/structs/intelligence.h; port/game/t2debug.c and port/app/game.cpp (debug
 Next: GAMEPLAY.md 9.5 (enemy lighting near the player, `EnemyAI_DrawNode` still N64 offsets,
 the gore deaths, an enemy that drops something).
 
+## Round 8, part w3: the boss fights and the ABI tail (branch names-R8_w3)
+
+Detail: [GAMEPLAY.md](GAMEPLAY.md) section 9, [ABI.md](ABI.md) section 7. Every src/include change
+is `TARGET_PORT`; `tools/asm_diff.py --base 5bf03fd0 -j 8` 0 over all 3,938 files after the
+include edits, 0 on each later file.
+
+- **The four boss levels run their fights** (Linux headless, low and `--high-memory`): the Primagen
+  past its old stop (the spawner spawns its waves), the Blind One to its minion phase, the Mother
+  takes plasma hits (`MotherBoss_Hurt` reached; the first hit used to crash), the Mantid Queen's
+  8-wave script. No spot damage yet (the hits land on the Mother's body node).
+- **gendata**: struct tables cut by splat labels now get their whole extent (20 tables: all the
+  boss scripts, two mode tables, `gLevelMessages`, `gAdecHuffSegments`).
+- **abicheck**: `narrow_ret` class, 0 sites; the K&R indirect calls reviewed (14, none harmful in
+  linked code).
+- Debug: `T2_BOSS_LOG=1` (port/game/t2bosslog.c, with `T2_STATE_LOG`).
+
+**Merge notes.** Header changes: `include/structs/boss.h` (`LevelScriptState.region` sptr on
+the host, `BossStep2` 0x08/0x0C typed, `BossMode` packed on the host), `include/globals/boss.h`
+(sized toss tables): **drop decls.json and rerun gendata**; gendata itself changed (more data:
+check `data_report.txt`'s "struct tables extended" list). No swap_spec change: the archive is
+unchanged. Files others may touch: port/game/t2debug.c (one `T2_BOSS_LOG` hook after
+`T2_ACTOR_LOG`), func_00225C84.c (`CScene__MarkGeneratorsSaved`), func_002683CC.c
+(`GameObject_GetDeadCollisionHeight`: used by every dead actor's collision height: w1/w2),
+tools/port/hostview.py, tools/port/abicheck.py. w4 (Mac) reported the Primagen spawner crash:
+fixed here, w4 does not touch func_0040457C.
+
+Next: the bosses' weak spots (GAMEPLAY.md 9.3), the Blind One after w2's kills.
+
 
 ## Round 7, part v1: the particle system (branch names-R7_v1)
 

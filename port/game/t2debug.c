@@ -233,6 +233,10 @@ void T2Port_LogState(int frame) {
     if (getenv("T2_ACTOR_LOG") != NULL) {
         T2Port_LogActors(p);
     }
+    if (getenv("T2_BOSS_LOG") != NULL) {
+        extern void T2Port_LogBosses(void); /* t2bosslog.c, DEBUG-ONLY */
+        T2Port_LogBosses();
+    }
     fflush(stdout);
 }
 

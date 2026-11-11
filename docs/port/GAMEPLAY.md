@@ -568,3 +568,52 @@ run at the player (mode 4), melee him (modes 14/19) and his health goes 100 -> 2
    and the tranquilizer/charge dart reactions (`EnemyAI_OnHit` modes 0x1D/0x1F/0x20).
 4. An enemy with non-zero drop masks (other levels) to see a drop and its collection.
 
+## 9. Round 8, part w3: the boss fights
+
+All four boss levels now run their fight code to the end of the test (Linux headless, low memory
+and `--high-memory`, 16,000-20,000 frames, no crash). Before this round the Primagen stopped at
+frame 12,955 (`Primagen_UpdateSpawner`; w4 hit the same crash on the Mac) and the Blind One at its
+setup (`BlindOne_Setup` called through a garbage phase table). The bosses' *spot damage* is not
+proven yet (below).
+
+### 9.1 What was wrong
+
+| # | where | cause | fix |
+|---|---|---|---|
+| w3-1 | **data**: every table of structs that splat cut with a label of its own (`D_xxx`) | gendata sized `extern T x[]` to the next ELF label: `sBlindOneScript` 5 of 17 steps, `sBlindOnePhases` 1 of 11 entries (so phase 1 called whatever followed), `sMantidQueenScript` 1 of 8 waves (a field label 4 bytes in), the Primagen attack/spawn/sound scripts cut before their end markers; the labels after them were left out or emitted as raw big-endian bytes | `tools/port/gendata.py` `split_table_extent`: a declared, unsized table of structs extends over labels the C does not declare, up to the next declared symbol, to the farthest label that ends a whole element (at most 256), stopping before an element whose pointer slots are not 0 or N64 addresses. 20 tables (listed in `port/gen/data_report.txt`: the boss scripts, `sMotherBossModeTable` 0x360 -> 0x440, `sPrimagenModeTable`, `gLevelMessages` 0x4 -> 0x2D0 bytes, `gAdecHuffSegments` 4 -> 24 segments, `gCharacterSelectSounds`). Pointer slots unresolved: 32, unchanged. Scalar tables (s16 toss tables, a float animator script) sized in `globals/boss.h` under `TARGET_PORT` |
+| w3-2 | the Primagen: `Primagen_UpdateSpawner` (func_0040457C) | the level-script view at N64 offsets (handle, waves, found[], resetRegion...); its `CAITargets` buffer 0x88 bytes on the stack (host 0xA0: the stack smashed, "corrupt stack" in gdb); the player's region kept in an s32 | hostview (`ModeState0040457C`, `Entity0040457C`, `Actor0040457C`, `Info0040457C --whole`); `LevelScriptState.region` `sptr` on the host; `BossStep2` words 0x08/0x0C typed (`waveSize`, `waveDelay`: the wave view reads them, the archive left them big-endian) |
+| w3-3 | the other level-script views anchored at a `gLevelScript_*` symbol with N64 deltas | `LevelScriptF950` (spawn steps, func_00404FE0/004050E0), `BossTimers` (func_0040688C), `LevelScriptF9D0` (func_00407BBC), `LevelScriptF604` + `BossCtl` (`Primagen_UpdateMode19`, func_00406000) | `hostview.py --anchor MEMBER`: the view starts at that member of the real struct; offsets relative to it |
+| w3-4 | `Primagen_UpdateMode28` (func_00407C20), `Primagen_EnterMode18` (func_004075F8), `Primagen_EnterMode7`'s `MODULE` | N64 deltas from `script3.cursor` (the step pointer half-written: the first `Primagen_NextSoundStep` crashed), the actor at 0x1FC/0xD4 | host bodies; `MODULE` = `&gLevelScript` |
+| w3-5 | script C steps 2 and 3 (`Primagen_RunSoundStep`, func_004053C4) | the step's `arg` is an N64 data address (a sound table, the next script) stored in an s32 | `t2_n64_to_host` |
+| w3-6 | `BossMode` (the view at `gLevelScript_bossMode`) | host natural alignment put its `BossScript` at +0x20; in `LevelScriptState` it is at bossMode + 0x1C | `#pragma pack(4)` on the host (BossState, at +0x20, was already right) |
+| w3-7 | the Mother: the first hit crashed (`CAI__CallHurt` called `gCollisionSetupTable`) | `MotherBoss_Init` installs `func_00408FF8 + 8` (splat started the hurt function's object two words early): on the host that is data | `MotherBoss_Hurt` by name |
+| w3-8 | the Mantid Queen | `MantidQueen_UpdateMode6` and `MantidQueen_FlashWeakSpot`: the actor, its CAI and `gMantidQueen` (boss 0x220, step 0x214, spots at the 0x68 stride) at N64 offsets | host bodies on `WaveBossState` |
+| w3-9 | the Blind One level (7401) | `GameObject_GetDeadCollisionHeight` (intelligence at 0x14, the height at 0x34); `CScene__MarkGeneratorsSaved` (the actor table at 0xE0/0xE8, stride 0x288); `BlindOne_PhaseMinionsInit` and `BlindOne_ActorAppearEnter` views (regions as s32) | host bodies / hostview, regions `sptr` |
+
+### 9.2 What runs
+
+New game, then `T2_WARP_TO=<warp>`; `T2_BOSS_LOG=1` (with `T2_STATE_LOG`) prints the fight
+state; firing tests add `T2_GIVE_WEAPONS=1 T2_WEAPON=10` and `Z@14800..15100 Z@15300..15600 ...`.
+
+| level | to | what happens |
+|---|---|---|
+| Mother (`-4`, level 3) | 18,000 | the boss (25,600 hp) cycles its modes 2/3/4 facing the player at 1,239 units. **Plasma rifle fire hits her** (150 shots, the explosions on her belly: frame 14900/15000) and reaches `MotherBoss_Hurt` (18 explosion hits in one run). The spots do not lose health: every hit's `HitFrame.unk_6C` is 0x201 (the body node); the spots of phase 0 need 0xC00 (kind 0) or 0x5000 (kind 1), i.e. the arms/head. Aiming at them (or a different `HitFrame` copy for blasts) is next |
+| Mantid Queen (7501, level 2) | 18,000 | the wave script runs with all 8 waves now (`step 1, toSpawn 3, members 8, wave 1`), spot health 0/0xFF00/0x9600/0x1E00/0x1900 as `MantidQueen_Init` sets them; no hit on a spot yet (the Queen stays in mode 1 at the arena centre; the player was teleported to (400, 0, -500)) |
+| Primagen (7602, level 4) | 17,000 | past the old stop: the spawner opens the doors and spawns its type-0x387 enemies (4 seen at (+-1700, 1065, 2850), 8 hp each) on its wave script, the attack and sound scripts step |
+| Blind One (7401, level 1) | 20,000 | with `T2_TELEPORT=14000:-400,204.8,0`: the setup finds its 4/4/3 actors, the player in range steps the script to phase 3 (the minions, 8 alive), which waits for the minions to die (w2's kills) |
+
+All four also run to 16,000 frames with `--high-memory`. Regressions on the same binary: the boot
+to 26,000 frames (title again), the firing journey (end (315.9, -793.4, -1352.3) as in round 7),
+demo 1 with the enemy switches (8,600).
+
+### 9.3 Next
+
+1. The Mother's weak spots: aim at the arms (the spot bits 0xC00/0x5000 in `HitFrame.unk_6C`), or
+   check that blasts carry the hit node the projectile struck (`ImpactEvent_ApplyBlast` hands
+   `gCollisionResults.m_Frame`, the last sweep's node).
+2. The Mantid Queen and the Primagen: get a hit on a spot/part (`MantidQueen_Hurt`,
+   `Primagen_*` parts) and follow the fight to the death cinemas.
+3. The Blind One: once w2's enemies die, phases 4.. (the groups' movers, `BlindOne_UpdateMover`).
+4. Boss files with raw N64 offsets not reached yet: `MantidQueen_UpdateMode15` (func_004032E4),
+   `MantidQueen_Draw` (func_00403660), the module-2 copies (not linked).
+

@@ -233,3 +233,26 @@ host body). Each read against the MIPS (`mips-linux-gnu-objdump -d build/ref.elf
 
 Also pointer width: `ImpactEvent_LevelSpecial` (and the boss handlers' t2abi wrappers) and the
 generators' `spawnPickup` take their pointers as sptr.
+
+## 7. Round 8 (w3): the narrow-return class and the K&R indirect calls
+
+- `abicheck.py` has a **`narrow_ret`** class (harmful): the definition returns an s8/u8/s16/u16
+  and the caller reads a wider integer (MIPS extends v0 in the callee; x86-64/AArch64 leave the
+  upper bits undefined: round 7's C22-5). It is checked on direct calls, function-pointer stores
+  and indirect calls. On names-R8_w3: **0 sites** (C22-5 fixed the 49 declarations); the 38
+  `narrow_ext` return findings left are the safe direction (a caller declaring s16 for an s32
+  definition truncates on the host as the N64 code expects).
+- **K&R indirect calls** (a call through a pointer with no arguments, the MIPS callee reading the
+  caller's a0/a1): 14 sites in the linked code. The camera mode `enter` handlers, the cinema
+  `onEnd`/`onClose`/next callbacks (the cinema-done functions, `PlayerDeath_CinemaDone`...) take
+  no parameters: harmless. `DemoStream_Decode`, func_0042F650/0042F670/0042F838 call a `Timer`
+  callback that takes the timer (pass-through a0) through views at N64 offsets, but nothing in
+  the linked game calls them (their only caller is module 2). The mode-step callbacks were all
+  fixed in round 7 (C22-7).
+- Data side of the same audit: `tools/port/gendata.py` extends struct tables cut by splat labels
+  (GAMEPLAY.md section 9, w3-1); `tools/port/hostview.py --anchor MEMBER` handles views that start
+  at a member symbol (`gLevelScript_spawnsLeft`...), `--whole` pads a view to the real struct's
+  size (a stack buffer the callee fills).
+
+abicheck on names-R8_w3: 3,075 TUs, 11,238 calls (10,890 checked), harmful direct 0, indirect
+call 0, store 1 (the `Destructible_Hurt` declaration, unchanged).
