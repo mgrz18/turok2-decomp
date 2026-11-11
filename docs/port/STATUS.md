@@ -220,6 +220,40 @@ the boot's mode switches change (5,467 demo 1 -> 8,157; 13,035 demo 2; 19,920 de
 Files: src func_0041D890, func_0025689C, func_00253770, func_002819E0, func_00254F24; port/app/game.cpp
 (one hook), port/game/t2det.c (new).
 
+## Round 9, part x3: fidelity oracle and the actors' lighting (branch names-R9_x3)
+
+Detail: [FIDELITY.md](FIDELITY.md). An N64 reference now runs headless on the box:
+mupen64plus 2.6 with the Rice video plugin under Xvfb, driven by **`tools/port/refshots.py`**
+(screenshots and 8 MB RDRAM dumps at chosen emulator frames, and button presses). Captured images
+and dumps are never committed.
+
+Commits (asm_diff 0 against 5437cfc0 for each `src/` one):
+
+| commit | what |
+|---|---|
+| 714792dd | `CScene__DrawSortedList` (func_0022077C) read the deferred list at N64 offsets 0x1064/0x1068 of `CScene`, so **no translucent (flag 4) instance or deferred static object was ever drawn**. The Iguana cinema had no iguanas; now its three iguana shots match the N64 |
+| 4b0d13a6 | `Model_AdvanceMorph` (func_0020B4F0) read the model handle through `s32 *`. The morphing level actors (type 12), now reached through that list, crashed with `--high-memory` |
+| (this) | `tools/port/refshots.py`, FIDELITY.md |
+
+Findings:
+
+- **The black silhouettes are not a port bug.** The light volumes in RDRAM equal the port's.
+  At the same point, `CScene__ComputeLights` gives the N64 instance's lights (level 81, demo 1:
+  ambient 2d1a05, colour fff80b on both). The dark enemies stand where the volumes give almost
+  nothing, and the N64 draws its own dark-corridor enemies the same way (red eyes only).
+- **Demo 1 diverges from its first frame on both hosts**: on the N64 the player faces a door,
+  takes the plasma rifle and is hurt down to 51 health. On the port he spins with the wheel open
+  and keeps 100. Reported to the coordinator for x4.
+- **The legal screen's text is ~2x dimmer and more orange** than the N64's (open).
+
+**Merge notes**: func_0022077C.c, func_0020B4F0.c and func_002152AC.c are only touched here. The
+deferred list now draws objects that never drew before (translucent level actors, morphers and
+static objects), so rerun every scenario: x1 (Port of Adia) and x5 (soak) may meet new paths in
+it. Smoke runs after both fixes, all exit 0: the boot and 3 demos (26,000 frames; the mode
+switches are those of the coordinator's 5437cfc0 binary. Note that demo 3 ends at 22,148 there
+too, not near 25,000 as section 2 says), the same with `--high-memory`, and w2's fight with
+`--high-memory` (14,800: enemies 11 and 12 at 0/20, melting, mode 60).
+
 ## Round 8, part w1: enemies hurt the player, death and game over (branch names-R8_w1)
 
 Detail: [GAMEPLAY.md](GAMEPLAY.md) section 9. All src changes are `TARGET_PORT` (host bodies or

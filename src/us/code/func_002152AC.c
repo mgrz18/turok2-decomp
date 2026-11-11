@@ -21,7 +21,7 @@ void CVector3__ClampLength(CVector3 *, f32);
 void CMtxF__Translate(f32 *, f32, f32, f32);
 void CMtxF__SwapYZRows(f32 *);
 void CMtxF__ToMtxAffine(f32 *, f32 *);
-void Model_AdvanceMorph(s32 *, f32);
+void Model_AdvanceMorph(sptr *, f32); /* the model handle: a host pointer (--high-memory) */
 void Render_QueueModelInstance(s32 *, f32 *, s32, void *, sptr, s32, s32);
 #ifdef TARGET_PORT
 u16 CScene__GetObjectTypeID(void *, s32); /* ABI: returns u16 (the host leaves the upper bits of the return register undefined) */
