@@ -129,7 +129,14 @@ void CScene__ComputeLights(B19bLObj **ents, s32 n, f32 *pos, u8 *out) {
         do {
             o = ents[k];
             pw = &wp[k];
+#ifdef TARGET_PORT
+            /* dirs[k]: the ROM reaches it as w + 128 because its frame puts dirs right after w;
+             * a host frame need not (macOS arm64 read other stack words there, so the actors'
+             * light colours changed with unrelated code, e.g. T2_ACTOR_LOG) */
+            s2 = a.x * dirs[k].x + a.y * dirs[k].y + a.z * dirs[k].z;
+#else
             s2 = a.x * ((B19bV3f *)(wp + 128))[k].x + a.y * ((B19bV3f *)(wp + 128))[k].y + a.z * ((B19bV3f *)(wp + 128))[k].z;
+#endif
             s0 = s1 - s2;
             if (s2 < zero) s0 = s1;
             s0 = s0 * 0.5f;
