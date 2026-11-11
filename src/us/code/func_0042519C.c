@@ -6,9 +6,9 @@ void Music_RestoreVolume(void);
 void LoopSounds_Resume(sptr);
 void Controller_ResetAllRumble(void);
 void Controller_SetRumbleOptionAll(s32);
-void MenuItem_SelectSubmenu(s32, sptr, s32);
+void MenuItem_SelectSubmenu(sptr, sptr, sptr);
 
-s32 MissionMenu_SelectOk(s32 arg0, s32 arg1, s32 arg2) {
+s32 MissionMenu_SelectOk(sptr arg0, sptr arg1, sptr arg2) {
     s32 ret;
 
     Music_RestoreVolume();

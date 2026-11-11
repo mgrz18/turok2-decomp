@@ -5,7 +5,7 @@
 #include "protos/menu.h"
 
 
-s32 DeathmatchMenu_OpenTeamBlood(s32 arg0, s32 arg1, s32 arg2)
+s32 DeathmatchMenu_OpenTeamBlood(sptr arg0, sptr arg1, sptr arg2)
 {
   GameMatch *match;
   match = &gEngineApp_m_Settings.match;

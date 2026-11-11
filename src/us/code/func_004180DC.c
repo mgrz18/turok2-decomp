@@ -4,7 +4,7 @@
 
 
 
-s32 PlayerSetupMenu_EditName(s32 arg0, s32 arg1, s32 arg2) {
+s32 PlayerSetupMenu_EditName(sptr arg0, sptr arg1, sptr arg2) {
     MenuPool_OpenChildMenu(arg2, arg1, &gNameEntryMenuDesc);
     return 1;
 }
