@@ -10,12 +10,22 @@ typedef struct {
     /* 0x00 */ u8 pad0[0x18];
 } Matrix18;
 
+#ifdef TARGET_PORT
+#include "structs/model.h"
+/* The draw args (CDrawArgs) at the host offsets: the model handle is pointer-wide (STABILITY.md
+ * section 7: Render_DrawModel got the handle's high half after a warp to the Blind One). */
+typedef union {
+    struct { u8 _h_unkC[__builtin_offsetof(CDrawArgs, m_hModel)]; sptr unkC; };
+    struct { u8 _h_flag[__builtin_offsetof(CDrawArgs, m_nModel)]; s32 flag; };
+} DrawInfo;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0xC];
     /* 0x0C */ s32 unkC;
     /* 0x10 */ u8 pad10[0x18 - 0x10];
     /* 0x18 */ s32 flag;
 } DrawInfo;
+#endif
 
 extern void ScriptAnimator_Apply(ScriptAnimator *light);
 extern void ScreenTint_UpdateMode(void);
