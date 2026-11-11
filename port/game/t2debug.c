@@ -492,6 +492,9 @@ void T2Port_FaceNearest(int frame, const char *spec) {
     if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL || gScene.m_WarpState != 0) {
         return;
     }
+    if (strchr(spec, '@') != NULL && atoi(strchr(spec, '@') + 1) != gScene.m_nLevel) {
+        return; /* R@LEVEL: only in that level (round 9 x1: the totem fight of a scripted run) */
+    }
     if (r <= 0.0f) {
         r = 2000.0f;
     }

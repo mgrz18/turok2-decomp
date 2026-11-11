@@ -675,3 +675,10 @@ touched: id, position, taken or not, health/life force/lives/ammo after), `T2_AC
    ones; `D_800A5EC0` "level index" is only a cache label).
 6. Not run this round: `--high-memory` and macOS on these paths.
 
+## 10. Round 9, part x1: the first level played through
+
+The Port of Adia from a new game to the hub: its level graph (warp regions, objectives, switches,
+cages, power cells, portals), the scripted run (`tools/port/playthrough.py`, `T2_EVENT_LOG`) and
+the nine fixes it needed (climbing, region indexes, action objects, the totem defense, the
+instance pool's visibility pass that kept every generator spawn frozen) are in
+[PLAYTHROUGH.md](PLAYTHROUGH.md); the summary is in STATUS.md (round 9, part x1).

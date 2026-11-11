@@ -8,9 +8,14 @@ then C-up: the game's own logic does the rest (the pickup, the trigger, the leve
 objective counters and messages, the warp). Steps are timed relative to the start of their
 segment; a segment starts at an absolute frame (each one after the previous warp has loaded).
 
-    python3 tools/port/playthrough.py OUTDIR      # OUTDIR/playthrough.txt, OUTDIR/teleport.env
+    python3 tools/port/playthrough.py OUTDIR [--fight WEAPON]
+        # OUTDIR/playthrough.txt, OUTDIR/teleport.env
+
+--fight WEAPON: also fight the Harbor Totem's defense: fire taps (Z every 15 frames) from the
+totem's arrival, and teleport.env gets T2_GIVE_WEAPONS=1 T2_WEAPON=WEAPON and
+T2_FACE_NEAREST=4000@109 (the aim assist only in level 109).
 """
-import os, sys
+import argparse, os
 
 NEW_GAME = "START@4400 A@4500 A@4700 A@4800"
 
@@ -79,13 +84,29 @@ def build(segments):
     return inputs, tps
 
 
+TOTEM_ARRIVAL = 18850   # level 109 is loaded (the warp 7100 at 18,650)
+TOTEM_END = 26000       # the 120 s defense is over by then
+
+
 def main():
-    out = sys.argv[1] if len(sys.argv) > 1 else "."
+    ap = argparse.ArgumentParser()
+    ap.add_argument("out", nargs="?", default=".")
+    ap.add_argument("--fight", type=int, metavar="WEAPON", help="fight the totem defense with this weapon")
+    a = ap.parse_args()
     inputs, tps = build(SEGMENTS)
-    with open(os.path.join(out, "playthrough.txt"), "w") as fp:
+    env = []
+    if a.fight is not None:
+        inputs.append("# 109 the Harbor Totem: fire taps (T2_FACE_NEAREST aims)")
+        for f in range(TOTEM_ARRIVAL, TOTEM_END, 15):
+            inputs.append("Z@%d..%d" % (f, f + 6))
+        env += ["T2_GIVE_WEAPONS=1", "T2_WEAPON=%d" % a.fight, "T2_FACE_NEAREST=4000@109"]
+    with open(os.path.join(a.out, "playthrough.txt"), "w") as fp:
         fp.write("\n".join(inputs) + "\n")
-    with open(os.path.join(out, "teleport.env"), "w") as fp:
+    with open(os.path.join(a.out, "teleport.env"), "w") as fp:
         fp.write("T2_TELEPORT=\"%s\"\n" % ";".join(tps))
+        for e in env:
+            fp.write(e + "\n")
+        fp.write("export T2_TELEPORT %s\n" % " ".join(e.split("=")[0] for e in env))
     print("%d inputs, %d teleports; last frame %d" % (len(inputs), len(tps), max(int(t.split(":")[0]) for t in tps)))
 
 
