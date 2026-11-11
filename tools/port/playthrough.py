@@ -13,7 +13,8 @@ segment; a segment starts at an absolute frame (each one after the previous warp
 
 --fight WEAPON: also fight the Harbor Totem's defense: fire taps (Z every 15 frames) from the
 totem's arrival, and teleport.env gets T2_GIVE_WEAPONS=1 T2_WEAPON=WEAPON and
-T2_FACE_NEAREST=4000@109 (the aim assist only in level 109).
+T2_FACE_NEAREST=4000@109 (the aim assist only in level 109) and T2_FILL_AMMO=600 (the ammo
+refilled every 600 frames: the plasma rifle's 150 cells run out at 4 kills of 8).
 """
 import argparse, os
 
@@ -99,7 +100,9 @@ def main():
         inputs.append("# 109 the Harbor Totem: fire taps (T2_FACE_NEAREST aims)")
         for f in range(TOTEM_ARRIVAL, TOTEM_END, 15):
             inputs.append("Z@%d..%d" % (f, f + 6))
-        env += ["T2_GIVE_WEAPONS=1", "T2_WEAPON=%d" % a.fight, "T2_FACE_NEAREST=4000@109"]
+        # T2_FILL_AMMO (round 10 y4): 150 plasma cells last to ~20,600, 4 kills; round 9's win
+        # came from a host read past gImpactEventHandlers (fixed in CParticleSystem__Spawn)
+        env += ["T2_GIVE_WEAPONS=1", "T2_WEAPON=%d" % a.fight, "T2_FACE_NEAREST=4000@109", "T2_FILL_AMMO=600"]
     with open(os.path.join(a.out, "playthrough.txt"), "w") as fp:
         fp.write("\n".join(inputs) + "\n")
     with open(os.path.join(a.out, "teleport.env"), "w") as fp:
