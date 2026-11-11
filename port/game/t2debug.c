@@ -59,6 +59,7 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
 
 #include <math.h>
 #include "structs/intelligence.h"
+#include "structs/boss.h"
 
 /* T2_ACTOR_LOG=N (with T2_STATE_LOG, round 7 v3): the level's enemies and turrets (gScene's level
  * actors with intelligence type 1 or 4), nearest to the player first (N of them, default 8), and
@@ -71,7 +72,7 @@ static void T2Port_LogOne(const char *kind, int i, CGameObjectInstance *o, CGame
         f32 dz = o->header.m_vPos.z - pl->header.m_vPos.z;
         d = sqrtf(dx * dx + dy * dy + dz * dz);
     }
-    printf("actor: %s %d it %d id %d fl %x aifl %x pos (%.1f %.1f %.1f) d %.0f hp %d/%d mode %d act %d anim %d %.1f/%d tgt %p ty %x cb %p drop %x/%x\n",
+    printf("actor: %s %d it %d id %d fl %x aifl %x pos (%.1f %.1f %.1f) d %.0f hp %d/%d mode %d act %d anim %d %.1f/%d tgt %p ty %x cb %p drop %x/%x aianim %x/%d/%d start %x\n",
            kind, i, info != NULL ? (int) info->m_Type : -1, info != NULL ? (int) info->m_Id : -1,
            (unsigned) o->m_dwFlags, (unsigned) o->m_AI.m_dwFlags, o->header.m_vPos.x, o->header.m_vPos.y,
            o->header.m_vPos.z, d, (int) (o->m_AI.m_Health >> 8), (int) (o->m_AI.m_InitialHealth >> 8),
@@ -79,7 +80,9 @@ static void T2Port_LogOne(const char *kind, int i, CGameObjectInstance *o, CGame
            o->m_CurrentAnimation.m_AnimationFrame, (int) o->m_nAnims, (void *) o->m_AI.m_pSightTarget,
            (unsigned) o->m_nTypeFlag, o->m_AI.m_pModeCurrent != NULL ? (void *) o->m_AI.m_pModeCurrent->m_pfCallback : NULL,
            info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_DropMask : 0u,
-           info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_DropMask2 : 0u);
+           info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_DropMask2 : 0u,
+           (unsigned) (u16) o->m_AI.m_AnimType, (int) o->m_AI.m_AnimIndex, (int) o->m_AI.m_AnimRepeatedCount,
+           info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_StartAnim : 0u);
 }
 
 static void T2Port_LogActors(CPlayer *p) {
@@ -252,6 +255,19 @@ void T2Port_LogState(int frame) {
         extern void T2Port_LogBosses(void); /* t2bosslog.c, DEBUG-ONLY */
         T2Port_LogBosses();
     }
+    {
+        /* a totem defense (the energy totem levels, TotemDefense_*): state 0 fight, 1 saved,
+         * 2 failed; the time left, the kills against the definition's target (round 9 x1) */
+        extern TotemDefenseState gTotemDefense;
+        if (gTotemDefense.obj != NULL && gScene.m_nLevel > 0) {
+            CDestructibleIntelligence *d = (CDestructibleIntelligence *) gTotemDefense.def;
+            printf("totem: state %d time %.0f/%d s kills %d/%d attackers %d warned %d totem hp %d\n",
+                   (int) gTotemDefense.state, gTotemDefense.timer / 15.0f, d != NULL ? (int) d->m_TotemMissionDuration : -1,
+                   (int) gTotemDefense.kills, d != NULL ? (int) d->m_EnemiesToKillToSaveTotem : -1,
+                   d != NULL ? (int) d->m_EnemiesAttackingTurok : -1, (int) gTotemDefense.warned,
+                   (int) (gTotemDefense.obj->m_AI.m_Health >> 8));
+        }
+    }
     fflush(stdout);
 }
 
@@ -397,9 +413,9 @@ void T2Port_Teleport(int frame, const char *spec) {
         return;
     }
     while (s != NULL && *s != '\0') {
-        int f;
-        float x, y, z;
-        if (sscanf(s, "%d:%f,%f,%f", &f, &x, &y, &z) == 4 && f == frame) {
+        int f, n;
+        float x, y, z, ry;
+        if ((n = sscanf(s, "%d:%f,%f,%f,%f", &f, &x, &y, &z, &ry)) >= 4 && f == frame) {
             CGameObjectInstance *a = &p->m_CharacterActor;
             CVector3 pos;
             sptr region;
@@ -413,6 +429,9 @@ void T2Port_Teleport(int frame, const char *spec) {
                 a->header.m_vPos = pos;
                 a->header.m_pCurrentRegion = (struct CGameRegion *) region;
                 a->m_vVelocity.x = a->m_vVelocity.y = a->m_vVelocity.z = 0.0f;
+                if (n == 5) {
+                    a->m_RotY = ry; /* F:x,y,z,rotY: also the facing (round 9 x1) */
+                }
             }
             fflush(stdout);
         }
@@ -473,6 +492,9 @@ void T2Port_FaceNearest(int frame, const char *spec) {
     if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL || gScene.m_WarpState != 0) {
         return;
     }
+    if (strchr(spec, '@') != NULL && atoi(strchr(spec, '@') + 1) != gScene.m_nLevel) {
+        return; /* R@LEVEL: only in that level (round 9 x1: the totem fight of a scripted run) */
+    }
     if (r <= 0.0f) {
         r = 2000.0f;
     }
@@ -491,6 +513,25 @@ void T2Port_FaceNearest(int frame, const char *spec) {
         if (d < bestD) {
             bestD = d;
             best = o;
+        }
+    }
+    {
+        /* also the pooled instances (generator spawns: the totem defense waves; round 9 x1) */
+        CListedInstance *li;
+        for (li = gScene.m_InstancePool.m_ActiveList.m_pHead; li != NULL; li = li->m_pNext) {
+            CGameObjectInstance *o = &li->m_Instance;
+            CIntelligence *info = o->header.m_pIntelligence;
+            f32 dx, dz, d;
+            if (info == NULL || info->m_Type != INTELLIGENCE_ENEMY || o->m_AI.m_Health <= 0) {
+                continue;
+            }
+            dx = o->header.m_vPos.x - pl->header.m_vPos.x;
+            dz = o->header.m_vPos.z - pl->header.m_vPos.z;
+            d = dx * dx + dz * dz;
+            if (d < bestD) {
+                bestD = d;
+                best = o;
+            }
         }
     }
     if (best == NULL) {
@@ -573,5 +614,37 @@ void T2Port_DoorOpen(int frame, const char *spec) {
             CAI__SetMode(o, &o->m_AI, 0);
         }
     }
+    fflush(stdout);
+}
+
+/* T2_EVENT_LOG=1 (DEBUG-ONLY, round 9 x1): LevelEvent_Fire reports every level event it fires: the
+ * gameplay frame, the level, the event's actor/level, its kind and handler (gLevelEventHandlers),
+ * the message (gLevelMessages: "distress beacon activated.", "child rescued.", "portal
+ * activated." ...) and the music cue. To follow a level's objectives, switches and portals. */
+#include "structs/event.h"
+extern s32 CScene__GetLinkGroupCount(CScene *lv, s32 key);
+int gT2HostFrame; /* game.cpp's frame number, for the logs */
+void T2Port_LogEvent(LevelEvent *e, const char *text) {
+    static int on = -1;
+    char buf[96];
+    int i;
+
+    if (on < 0) {
+        on = getenv("T2_EVENT_LOG") != NULL;
+    }
+    if (!on) {
+        return;
+    }
+    for (i = 0; text != NULL && text[i] != 0 && i < (int) sizeof(buf) - 1; i++) {
+        buf[i] = (text[i] == '\n') ? '|' : text[i];
+    }
+    buf[i] = 0;
+    /* the objective counters of the level's hub (Mission_LevelObjectivesDone: link group types
+     * 2k and 2k+1, k = 1..6; level 1: 2 = distress beacons, 3 = children) */
+    printf("event: frame %d (gameplay %d) level %d mode %d: actor %d of level %d kind %d handler %d msg %d \"%s\" music %d flags %x"
+           " key %d objectives %d/%d\n",
+           gT2HostFrame, (int) gFrameCountGameplay, (int) gScene.m_nLevel, (int) gScene.m_Mode, (int) e->actor, (int) e->level,
+           (int) e->kind, (int) e->handler, (int) e->message, buf, (int) e->music, (unsigned) e->flags, (int) e->padF,
+           (int) CScene__GetLinkGroupCount(&gScene, 2), (int) CScene__GetLinkGroupCount(&gScene, 3));
     fflush(stdout);
 }

@@ -6,11 +6,9 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
+#include "structs/region.h"
 #include "protos/iset.h"
 #include "protos/scene.h"
-#ifdef TARGET_PORT
-#include "structs/region.h"
-#endif
 typedef struct Shared_ParticleLighting Shared_ParticleLighting;
 struct Shared_ParticleLighting {
     u8 ambient[3], reserved3;
@@ -29,11 +27,15 @@ u32 CScene__GetRegionIndex(CScene *arg0, sptr arg1) {
     offset = ((char *)CISet__GetBlock(arg0->m_pRegionData, 2)) + 8;
     result = arg1 - offset;
 #ifdef TARGET_PORT
-    /* the host CGameRegion stride (0x40: three pointer pairs), as CScene__GetRegion indexes it; the
-     * N64's >> 5 gave twice the index, so a cinema that saved the player's region
-     * (Cinema_Start) restored him into another region or past the table (round 9 x2: the
-     * camera's region read floats and crashed after the Mother's phase-2 cinema) */
-    return (u32) (result / (sptr) sizeof(CGameRegion));
+    /* the host CGameRegion stride (sizeof(CGameRegion), three pointer pairs), as
+     * CScene__GetRegion indexes it, not the N64's 0x20 bytes (>> 5). Round 9 fixed it twice:
+     * x1: the index came out too big, Automap_RevealRegion's CScene__SetLevelBit set map bits
+     * past the level's bit section into the next level's block of gGamePersistentData (the
+     * warp 55 -> 54 crashed in CScene__DecompressCollision); x2: a cinema that saved the
+     * player's region (Cinema_Start) restored him into another region or past the table (the
+     * camera's region read floats and crashed after the Mother's phase-2 cinema). Unsigned,
+     * like the N64's shift. */
+    return (u32) ((uptr) result / sizeof(CGameRegion));
 #else
     return (u32)result >> 5;
 #endif

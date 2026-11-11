@@ -82,7 +82,7 @@ Options (`turok2 --game`):
     ammo, the wheel), `T2_ACTOR_LOG=N` (with `T2_STATE_LOG`: the N nearest enemies: AI mode,
     animation, health, target, drop masks), `T2_ACTOR_TYPES=t,...` (`T2_ACTOR_LOG` for other
     intelligence types, e.g. 6 = doors), `T2_BOSS_LOG=1` (the boss: phase, health, parts, spots),
-    `T2_PICKUP_LOG=1` (every pickup touched), `T2_SCENE_LOG`, `T2_MENU_LOG=1`,
+    `T2_PICKUP_LOG=1` (every pickup touched), `T2_EVENT_LOG=1` (every level event, the objective counters; round 9 x1), `T2_SCENE_LOG`, `T2_MENU_LOG=1`,
     `T2_PARTICLE_LOG=N`;
   - moving and combat: `T2_WARP_TO=<id>[@frame][,...]` (a negative id is `~level`),
     `T2_TELEPORT=F:x,y,z[;...]`, `T2_WAKE_ENEMIES=R`, `T2_FACE_NEAREST=R` (turn to the nearest
@@ -328,6 +328,61 @@ GAMEPLAY.md (new section 10 at the end). Raw `+ 0x140` CAI addresses remain in n
 
 Next: the Queen's minions (their spawn and animation), then her spots; the Blind One's minions and
 the Primagen's parts with `T2_AIM_NODE`; the boss death cinemas of the other three.
+
+## Round 9, part x1: the Port of Adia played through (branch names-R9_x1)
+
+Level 1 runs from a new game to its end and back to the hub, the game's own logic doing every
+step: details, the level graph and the script in [PLAYTHROUGH.md](PLAYTHROUGH.md).
+
+**The run** (Linux, headless, exit 0; `--high-memory` the same to 22,500):
+
+```sh
+cd OUT && python3 ../tools/port/playthrough.py . --fight 10 && . ./teleport.env
+SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_STATE_LOG=100 build/app/turok2 --archive turok2.o2r \
+    --rom ../baserom.us.z64 --game --draw --pak-blank --frames 27000 --input @playthrough.txt
+```
+
+51 -> 52 -> 53 -> 52 -> 55 -> 54 -> 56 -> 57 -> 58 -> 59 -> 109 (the Harbor Totem) -> 60 (the
+hub): 3 power cells, 3 distress beacons ("all distress beacons activated. mission complete." at
+14,751), 4 cage switches and 4 children ("the children are safe. mission complete." at 17,499),
+the two portal switches ("portal activated."), the exit warp 7100 (objectives done: the totem,
+18,800), the totem defense won 8/8 with 3 s left ("MISSION COMPLETE", 25,800), the warp 1999 to
+the hub (26,500). Without `--fight` the defense times out (`TotemDefense_Fail`) and the same
+warp takes him to the hub (26,400).
+
+**Fixes** (all `TARGET_PORT`, `asm_diff --base 5437cfc0` 0 for every touched file):
+
+| id | where | bug (what it stopped) |
+|---|---|---|
+| X1-1 | `PlayerClimb_Enter` | N64 view of the body: cleared the header's `m_pIntelligence`; **every climb crashed** (`PlayerClimb_Update`) |
+| X1-2 | `CScene__GetRegionIndex` | `>> 5` (the N64 region stride): map bits written past the level's block of `gGamePersistentData` into the next level's header; **the warp into level 54 crashed** (only with ASLR: gdb hid it). Also every saved region index |
+| X1-3, X1-4 | `Action_GoUpdate`, `Action_ChildVanishUpdate` | N64 CAI/instance offsets: switches never back to idle; the rescued child's fade wrote into other fields |
+| X1-5, X1-6 | `TotemDefense_Init`, `_UpdateFight`, `_Complete`, `_Fail`, `_StopEnemies` | N64 views of the totem, its CAI, `gTotemDefense`, the player (camera cut to s32, flee time) |
+| X1-7 | **`CInstancePool__UpdateVisibility`** | a Rage Wars view of the pool: **generator spawns never ran their AI** (every generator in the game: the totem's waves stood still) and never freed their slots |
+| X1-8 | `EnemyAI_DrawFaded` | the N64 byte 0x1B of `CDrawArgs` (crash drawing a teleporting enemy) |
+| X1-9 | `EnemyAI_GetBehaviorAt`, `EnemyAnim_PickStart` | `m_Enemy.m_Behavior` at N64 CAI 0x130 |
+
+**Tools and switches (debug only)**: `T2_EVENT_LOG=1` (every level event: message, actor, kind,
+handler, the objective counters), the `totem:` state line, `T2_TELEPORT=F:x,y,z,rotY` (a
+facing), `T2_FACE_NEAREST=R@LEVEL` (and pooled instances), the actor log's AI animation fields;
+`tools/assets/levels.py` exports `warp_id`; `tools/port/approach.py` (a teleport point facing a
+warp region or a point), `tools/port/playthrough.py` (the script).
+
+Checked again: the boot loop (26,000, exit 0, the same mode switches; demo 3 is the totem level
+and its Raptoids now attack), demo 1 unchanged on Linux (no enemy hurt).
+
+**For the merge**: src files touched: func_00255C5C, func_0026DFB0 (a `T2Port_LogEvent` hook),
+func_002242B4, func_00266380, func_002664A0, func_00407F20, func_0040813C, func_004082A0,
+func_004088B0, func_00408DCC, func_0022828C, func_0025BA80, func_0025E46C, func_0025E6E0; port:
+port/game/t2debug.c (`gT2HostFrame`, the event/totem logs, teleport facing, face-nearest) and
+port/app/game.cpp (sets `gT2HostFrame`); no header and no archive change. X1-7 changes every
+level with generators (enemies thrown in now move and fight): other parts' scenarios with
+generators may now see more enemies.
+
+**Next**: the optional areas (72, the talisman; 78, the flesh-eater portal), the level keys lying
+in 52/55/58/59, walking the level with its enemies awake instead of teleporting, the other N64
+views of the totem code not on this path (`TotemDefense_KillsLeft`,
+`TotemDefense_TryHitEnemyAfterDelay` and the module-2 twins), then level 2 from the hub.
 
 ## Round 8, part w1: enemies hurt the player, death and game over (branch names-R8_w1)
 

@@ -800,3 +800,11 @@ death).
    wrong mode on the host when reached): func_00254640, 002553BC (`EnemyAI_Dismount`), 0025E488,
    0025F380, 0025F3A4, 00264CEC, 0026508C, 00268E60, 004082A0, 0040EA24 (and the module-2 twins
    00442A64, 00447A24, not linked).
+
+## 10. Round 9, part x1: the first level played through
+
+The Port of Adia from a new game to the hub: its level graph (warp regions, objectives, switches,
+cages, power cells, portals), the scripted run (`tools/port/playthrough.py`, `T2_EVENT_LOG`) and
+the nine fixes it needed (climbing, region indexes, action objects, the totem defense, the
+instance pool's visibility pass that kept every generator spawn frozen) are in
+[PLAYTHROUGH.md](PLAYTHROUGH.md); the summary is in STATUS.md (round 9, part x1).

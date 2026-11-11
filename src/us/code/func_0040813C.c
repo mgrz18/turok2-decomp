@@ -25,6 +25,18 @@ s8 CGameObjectInstance__PickRandomAnim(CListedInstance *actor, sptr id, sptr);
 void COnScreen__ClearBoss(void *);
 void COnScreen__ClearBoss2(void *);
 
+#ifdef TARGET_PORT
+/* the port (round 9 x1): the totem's CAI by member (the N64 view put m_AnimType/m_AnimIndex/
+ * m_AnimRepeatedCount at 0xC4/0xC6/0xC7 from m_dwFlags) */
+static __inline__ void setAnim(CListedInstance *actor, s32 id) {
+    s8 anim = CGameObjectInstance__PickRandomAnim(actor, id, -1);
+
+    actor->m_Instance.m_AI.m_AnimIndex = anim;
+    actor->m_Instance.m_AI.m_AnimType = id;
+    actor->m_Instance.m_AI.m_dwFlags &= ~1;
+    actor->m_Instance.m_AI.m_AnimRepeatedCount = 0;
+}
+#else
 static __inline__ void setAnim(CListedInstance *actor, s32 id) {
     BossAI *ai;
     s8 anim = CGameObjectInstance__PickRandomAnim(actor, id, -1);
@@ -35,6 +47,7 @@ static __inline__ void setAnim(CListedInstance *actor, s32 id) {
     actor->m_Instance.m_AI.m_dwFlags &= ~1;
     ai->unkC7 = 0;
 }
+#endif
 
 /* The fight starts: message, the boss's intro animation, and the helpers
  * (those not dead and, unless the fight is over, targeting the boss) turn on
