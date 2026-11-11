@@ -5,12 +5,24 @@
 #include "protos/scene.h"
 #include "protos/ai.h"
 
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+/* the view at the host offsets (round 9 x2, the Mantid Queen fight): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+typedef struct {
+    union {
+        struct { u8 _hp_onEvent[__builtin_offsetof(CGameObjectInstance, m_AI.m_pfDraw)]; void * onEvent; };
+        struct { u8 _hp_onUpdate[__builtin_offsetof(CGameObjectInstance, m_AI.m_pfEffects)]; void * onUpdate; };
+    };
+} Actor00402ADC;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x234];
     /* 0x234 */ void *onEvent;
     /* 0x238 */ u8 pad1[0x248 - 0x238];
     /* 0x248 */ void *onUpdate;
 } Actor00402ADC;
+#endif
 
 void MantidQueen_Init(void *state, sptr a1);
 s32 MantidQueen_Draw(sptr a0, sptr a1, sptr a2);

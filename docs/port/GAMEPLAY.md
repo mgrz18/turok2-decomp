@@ -675,3 +675,128 @@ touched: id, position, taken or not, health/life force/lives/ammo after), `T2_AC
    ones; `D_800A5EC0` "level index" is only a cache label).
 6. Not run this round: `--high-memory` and macOS on these paths.
 
+## 10. Round 9, part x2: finishing a boss
+
+Branch names-R9_x2. **The Mother fight runs to its end on the host**: her three phases, the
+death, the defeat cinema, "NEW CHEAT ENABLED" and the warp to the hub (level 60, warp 6999), all
+by the game's own logic; the debug switches only aim the player and keep him alive. Linux,
+headless, low memory and `--high-memory`. The Mantid Queen fight now leaves its intro and sends
+its first wave; the Blind One and the Primagen were rerun (below).
+
+### 10.1 Why the damage stopped after the first part
+
+It was the aim, then two host bugs further on:
+
+1. **Aim.** `MotherBoss_Hurt` takes damage only from a hit whose `HitFrame.unk_6C` (the node bits of
+   the hit box the projectile struck: `Sweep_TestBox` -> `Sweep_TestBoxFaces` ->
+   `gCollisionResults.m_Frame`, or the nearest box for a blast) meets `activeMask` (0x5C00 in phases
+   0/1, 0x2000 in phase 2): the arms 0xC00 (kind 0: slots 2, 3, 4 in phase 0, slot 1 in phase 1), the
+   heads 0x5000 (kind 1: slots 6, 7, 8 / 5), the chest 0x2000 (kind 2: slot 13, phase 2). The
+   scripted fire straight ahead hit the body (0x201) or node 1 (23 of 26 hits); 3 hits on a head
+   took slot 6 down (10,240 = 3 x 3,840: the "one part" of round 8). Nothing was wrong in the hurt
+   path, the masks (gendata swaps them right: 0x5C00/0x1DC/0x7DDD) or the part state machine:
+   with `T2_AIM_NODE` (below) every phase-0 part dies in turn (`parts 6/6 -> 0/6`, health
+   61,440 -> 0 in ~2,700 frames of plasma fire), then mode 9 and the phase-1 cinema.
+2. **x2-1 `MotherBoss_Mode16_TeleportTarget`** (func_0040B488): raw N64 offsets, the CAI's
+   `m_AnimRepeatedCount` at 0xC7 and `gMotherBoss.counter` at 0x67C (host: elsewhere, the state
+   holds pointers). In phase 1 her teleport attack (mode 16) never counted its repeats: **she stayed
+   in mode 16 for good** (no attacks, no hits). Host body by member.
+3. **x2-2 `MotherBoss_TeleportTarget`** (func_00409A64, `FindTarget`): `AI_UpdateTargets(obj, obj +
+   0x140)`: with the mode-16 fix it ran and **crashed** in `AI_UpdatePathHeading` (a garbage plan).
+   The CAI by member.
+4. **x2-3 `CScene__GetRegionIndex`** (func_002242B4): `>> 5`, the N64 CGameRegion stride; the host
+   table has 0x40-byte regions (`CScene__GetRegion` indexes them so). Every cinema that saves the
+   player (`Cinema_Start`, flag 8) restored him into the region at twice the index or past the table:
+   after the Mother's phase-2 cinema `CCamera__SetViewParams` read floats as a region and
+   **crashed**. Divide by `sizeof(CGameRegion)` on the host. (General: any level's cinemas.)
+5. **x2-7 `CPlayer__SetPosition`** (func_00253D68): the ROM calls `CScene__FindRegionAt` through an
+   int-returning one-argument cast (the position rides in a1 from its own caller): on the host the
+   region came back cut to 32 bits; with `--high-memory` the end of the phase-1 cinema
+   (`MotherBoss_OnPhase1CinemaDone` puts the player at his phase-1 spot) **crashed** the camera. The
+   real call on the host. (General: every caller of `CPlayer__SetPosition`.)
+6. **x2-4 `MotherBoss_PartEffects`** (func_0040A25C, the pose callback): the boss mode at N64 0x174
+   and the pose context's bone at 0x90 (host `T2PoseContext`): the parts' grow/pulse scaling read
+   other bytes. Host views (visual).
+
+### 10.2 The Mother, start to end
+
+```sh
+cd OUT && (echo "START@4400 A@4500 A@4700 A@4800 Z@14000..90000 CL@19000..90000";
+  for s in $(seq 19000 600 89000); do echo "CD@$s..$((s+250))"; done) > mother_end.txt
+SDL_VIDEODRIVER=offscreen T2_WARP_TO=-4 T2_GIVE_WEAPONS=1 T2_WEAPON=10 T2_AIM_NODE=boss \
+  T2_CHEATS=1 T2_FILL_AMMO=600 T2_BOSS_LOG=1 T2_STATE_LOG=200 \
+  build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --pak-blank \
+  --frames 36000 --input @mother_end.txt      # + --draw T2_SHOT=m.ppm T2_SHOT_EVERY=100
+```
+
+(new game, the warp to level 3, the plasma rifle held from 14,000, strafing left from 19,000 and
+stepping back 250 of every 600 frames; the input file takes one entry per line: a single line is
+cut at its buffer.) What happens (the same frames with and without `--draw`):
+
+| frame | what (`T2_BOSS_LOG`) |
+|---|---|
+| 13,100 | level 3, the intro cinema; `phase 0 health 61440 parts 6/6 active 5c00 live 1dc` |
+| 14,800-16,700 | the arms then the heads: slots 2, 3, 4, then 6, 7, 8 to 0, each a stagger (modes 7/8), `parts 0/6` |
+| ~16,700 | mode 9, the phase-1 cinema; the player is put at (0, 0, -2078.7) |
+| 16,800-26,800 | phase 1 (`76800`: slot 1 arm, slot 5 head, 38,400 each; hits from 18,400); her teleport attack (mode 16) moves the player; mode 0x13, the phase-2 cinema (`Cinema_RestorePlayer`) |
+| 27,000-33,500 | phase 2 (`128000`, the chest 0x2000, slot 13): `health 0/128000 live 0` at ~33,500 |
+| 33,600 | mode 30 (`MotherBoss_Mode30_DeathStep`: the players invincible), then 31: the defeat cinema 0xE6 (Turok and the Mother, the destroyed arms and heads as red stumps, letterboxed) |
+| 34,800 | `MotherBoss_OnDefeatCinemaDone`: `m_bMotherBossComplete = 1`, the unlocked cheat 4, `CPlayer__Warp(6999)` |
+| 35,000 | **level 60, the hub**, "NEW CHEAT ENABLED" |
+
+Without the step back (`CL` only) she dies at ~40,000 and the hub follows at 41,400. Without
+`T2_AIM_NODE` the fire never reaches the arms or the chest; without `T2_CHEATS=1` the player
+dies first (her attacks: health 100 -> 0 in ~2,400 frames, as round 8).
+
+`--high-memory`: the same run (below, STATUS.md). Screenshots (640x480, checked by eye, not
+committed): the last plasma hits on her chest (33,600), the defeat cinema (34,200: the Mother over
+Turok, her arm and head stumps), the end of the cinema in the blue fade (34,800), the hub with
+"NEW CHEAT ENABLED" (35,000).
+
+### 10.3 The Mantid Queen (7501), the Blind One (7401), the Primagen (7602)
+
+**The Mantid Queen** stayed in her intro (mode 1) for good: `MantidQueen_Step` (func_00402A10)
+dispatches the mode update through an N64 view of the CAI (`m_pModeCurrent` at 0x30, its
+`m_pfCallback` at +8): on the host it read bytes of the mode-table pointers, so **no mode update
+ever ran** (x2-5). With the host body and host views for the rest of her module (x2-6: 
+`MantidQueen_UpdateIntro`, `SendMinions` + its sort (`SortCompare`/`SortSwap`: the member pointers
+are 8 bytes wide), `Hurt` (the CAI mode and the DamageEvent's frame/damage/flags at host offsets),
+`SpawnMinion`, `EnterStart` (wrote `m_pfDraw`/`m_pfEffects` at N64 0x234/0x248, i.e. into other
+members), `UpdateAttackAnim`, `SetBossAnim`, `UpdateBossAnim`, `CountActiveMinions`,
+`EnterMode3..6` (`gMantidQueen_boss` an s32 and `+ 0x140`), `NextStep`) she leaves the intro, takes
+her place, her modes run (5, 8, 11...) and **the first wave is sent** (`toSpawn 3 -> 0`). The wave
+does not end: the 0x2C3 minions the members spawn stay at their spawn points high on the walls
+((+-1200..1488, 632, ...), mode 2, `anim -1`: no animation, no hit boxes) and pile up to the
+pool's 32; `MantidQueen_CountActiveMinions` counts every live instance, so the wave and its
+closed spots last for ever. Next: why the spawned instances get no animation (their spawn through
+the members, `CInstancePool__Spawn` with the member's model/offset).
+
+**The Blind One** (`T2_TELEPORT=14000:-400,204.8,0`): phase 3, its 8 minions alive to 30,000;
+the scripted fire does not kill them (next round: aim, their hit boxes). **The Primagen**: the
+spawner's waves (4 alive), stage 1 state 1/5; strafing off the platform drops the player into the
+abyss: health 0, lives 3 -> 0, GAME OVER at 20,450 (the invincibility cheat does not stop that
+death).
+
+### 10.4 Debug aids (DEBUG-ONLY, port/game/t2bosslog.c, game.cpp)
+
+- `T2_AIM_NODE=MASK[,R]` / `=boss`: every frame turn the player (yaw, and the camera pitch
+  `m_ViewParams.m_vRotOffset.x` the weapons fire along) to the centre of the nearest hit box with
+  one of the node bits in MASK (and in the actor's `m_VisBits`) of the nearest live actor or
+  spawned instance within R (4,000). `boss`: the Mother's spot for her phase, the Queen's open spot
+  or, during a wave, the nearest minion; `-1` any box (an actor with no drawn boxes: its position).
+  `T2_AIM_PITCH_SIGN=-1` flips the pitch.
+- `T2_CHEATS=MASK`: OR the game's cheat flags (1 invincibility, what the cheat menu sets);
+  `T2_FILL_AMMO=N`: fill the players' ammo every N frames.
+- `T2_BOSS_LOG=1` also prints every hit the Mother's and the Queen's hurt callbacks get
+  (`bosshurt: ... dmg flags frame nodes`), the Queen's members and the instance pool.
+- `tools`: none new; the mode tables were read from build/ref.elf (pyelftools: 0x20-byte
+  `CAIModeInfo` rows, function symbols).
+
+### 10.5 Next
+
+1. The Queen's minions (above), then her spots (`T2_AIM_NODE=boss` aims at `1 << step->weakSpot`).
+2. The Blind One's minions and the Primagen's parts with `T2_AIM_NODE`.
+3. Raw `+ 0x140` CAI addresses left in non-boss files (all `TARGET_PORT`-less, each a crash or a
+   wrong mode on the host when reached): func_00254640, 002553BC (`EnemyAI_Dismount`), 0025E488,
+   0025F380, 0025F3A4, 00264CEC, 0026508C, 00268E60, 004082A0, 0040EA24 (and the module-2 twins
+   00442A64, 00447A24, not linked).
