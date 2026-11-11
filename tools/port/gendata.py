@@ -617,6 +617,8 @@ class Generator:
         self.ext_funcs = set()
         self.int_addr = collections.Counter()  # integer leaves that hold an address
         self.bss_slack = []   # .bss byte views given twice their N64 size
+        self.bss_tails = []   # typed .bss structs that data points past (grow_bss_tails)
+        self.ptr_offs = []    # (target, N64 offset) of every relocated pointer with an offset
         self.gfx_syms = []    # display lists (Gfx data)
         self.ptr_tables = 0   # pointer targets typed as arrays of their pointee
         self.split_tables = []  # (name, N64 extent, extended): split_table_extent
@@ -662,6 +664,30 @@ class Generator:
             self.layout(self.queue[i])
             i += 1
         self.resolve_aliases()
+        self.grow_bss_tails()
+
+    def grow_bss_tails(self):
+        """A typed .bss struct that data points PAST (gCinemaPlayerP = gBlindOne + 0x560: the
+        cinema player is the 0x100 unlabelled N64 bytes after the BlindOne struct): those pointers
+        translate to host offset h + (off - n), after the host struct, where the next host symbol
+        was (the cinema player overran sMenuBindingText...: soak S3). Give such a struct room up to
+        its N64 extent past the type, twice that size for host pointers."""
+        need = {}
+        for t, off in self.ptr_offs:
+            if t.alias_of:  # D_801306F8 + 0x68: the alias's base, at the base's offset
+                off += t.key - t.alias_of[0].key
+                t = t.alias_of[0]
+            if not t.bss or t.layout_desc is None or off < t.nsize:
+                continue
+            need[t.name] = (t, max(off, need.get(t.name, (t, 0))[1]))
+        for t, off in need.values():
+            i = bisect.bisect_right(self.elf.keys, t.key + off)
+            nxt = self.elf.keys[i] if i < len(self.elf.keys) else t.key + off + 0x10
+            tail = max(nxt - t.key - t.nsize, off - t.nsize + 0x10)
+            h = t.hsize
+            t.hsize = max(t.hsize, h + 2 * tail)
+            t.align = max(t.align, 8)
+            self.bss_tails.append((t.name, t.nsize, h, tail))
 
     # -- layout of one symbol --------------------------------------------
     def is_bss(self, s):
@@ -927,6 +953,8 @@ class Generator:
             if pd is not None and pd[0] in ('x', 'F'):
                 pd = None
             t = self.add(n, pd, 'pointer target')
+            if off > 0:
+                self.ptr_offs.append((t, off))
             return ('d', t, off)
         return False
 
@@ -1163,6 +1191,26 @@ class Generator:
         P('pointer targets generated in addition: %d' % (len(ss) - len(from_c)))
         P('bss (zero) symbols: %d' % sum(1 for s in ss if s.bss))
         P("bss byte views given twice their N64 size (host pointers): %d" % len(self.bss_slack))
+        P("typed bss structs with an N64 tail (tail given twice its size): %d" % len(self.bss_tails))
+        for nm, n, h, t in self.bss_tails:
+            P("  %s: n64 0x%X + tail 0x%X -> host 0x%X + 0x%X" % (nm, n, t, h, 2 * t))
+        # the audit of round 9 (x5): a symbol whose C type is larger than its N64 extent swallows
+        # the next symbols as aliases at translated offsets: right only if they really are fields
+        # of it. List each (base, its N64 extent, its type size, the aliases past the extent).
+        foreign = []
+        for b in ss:
+            if b.alias_of or b.layout_desc is None:
+                continue
+            ext = self.elf.extent(b.key)
+            if b.nsize <= ext:
+                continue
+            al = sorted((a.key - b.key, a.name) for a in ss if a.alias_of and a.alias_of[0] is b
+                        and a.key - b.key >= ext)
+            if al:
+                foreign.append((b.name, ext, b.nsize, al))
+        P("typed symbols larger than their N64 extent, with aliases past it: %d" % len(foreign))
+        for nm, ext, n, al in foreign:
+            P("  %s: extent 0x%X, type 0x%X: %s" % (nm, ext, n, ", ".join("%s@0x%X" % (a, o) for o, a in al[:8])))
         P("display lists: %d, w1 addresses relocated: %d, other w1 kept as numbers: %d" % (len(self.gfx_syms), self.gfx_relocs, self.gfx_w1_ints))
         P("pointer targets typed as tables of their pointee: %d" % self.ptr_tables)
         P("struct tables extended over splat labels: %d" % len(self.split_tables))

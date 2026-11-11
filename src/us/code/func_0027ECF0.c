@@ -28,7 +28,12 @@ void CCamera__Advance(CCamera *cam);
 
 /* A camera's m_pNext, read as a plain word (not as a structure field, which
  * would let GCC move the read above the store to gCameraVisBits before it). */
+#ifdef TARGET_PORT
+/* the host CCamera: m_pNext after the 8-byte m_pLast (soak S2: a second active camera crashed) */
+#define NEXT_CAMERA(c) ((c)->m_pNext)
+#else
 #define NEXT_CAMERA(c) (*(CCamera **) ((u8 *) (c) + 4))
+#endif
 
 /* Advances the camera pool (LibTEngine's CCameraPool Advance): returns the
  * finished shakes to the free list, lays out the viewports of the active
