@@ -401,7 +401,7 @@ void T2Port_DebugWarp(int frame) {
     CPlayer__Warp(p, (s32) id, 2, 0);
 }
 
-/* T2_TELEPORT=F:x,y,z[;F:x,y,z...] (DEBUG-ONLY, round 7 v3): at frame F, in gameplay, put the
+/* T2_TELEPORT=F:x,y,z[,rotY][!][;F:x,y,z...] (DEBUG-ONLY, round 7 v3): at frame F, in gameplay, put the
  * first active player at (x, y, z) (its region looked up with CScene__FindRegionAt), to reach a
  * level's enemies without a long --input script. Called every frame by game.cpp. */
 extern sptr CScene__FindRegionAt(CScene *world, CVector3 *pos);
@@ -431,6 +431,19 @@ void T2Port_Teleport(int frame, const char *spec) {
                 a->m_vVelocity.x = a->m_vVelocity.y = a->m_vVelocity.z = 0.0f;
                 if (n == 5) {
                     a->m_RotY = ry; /* F:x,y,z,rotY: also the facing (round 9 x1) */
+                }
+                {
+                    /* F:x,y,z[,rotY]! (round 10 y1): also fire the region's "entered" triggers
+                     * (CGameRegion__FireTriggers(region, 1), what the player walking into it does in
+                     * CPlayer's move, func_0024C47C): the level's own region events (enemy wake
+                     * ups, "graveyard located." ...) that a teleport would otherwise skip */
+                    const char *end = strchr(s, ';');
+                    const char *bang = strchr(s, '!');
+                    if (bang != NULL && (end == NULL || bang < end)) {
+                        extern void CGameRegion__FireTriggers(sptr arg0, s32 arg1, sptr arg2);
+                        printf("teleport: frame %d: the region's enter triggers\n", frame);
+                        CGameRegion__FireTriggers(region, 1, (sptr) p);
+                    }
                 }
             }
             fflush(stdout);
@@ -548,6 +561,64 @@ void T2Port_FaceNearest(int frame, const char *spec) {
     }
 }
 
+/* T2_AIM_AT=F1-F2:x,y,z[;...] (DEBUG-ONLY, round 10 y1): from frame F1 to F2, in gameplay, turn the
+ * first player (yaw, and the camera pitch as T2_AIM_NODE does) at the point (x, y, z): a scripted
+ * shot at a level object that is not an enemy (the River of Souls' soul gates, a target). */
+void T2Port_AimAt(int frame, const char *spec) {
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    const char *s = spec;
+
+    if (p == NULL || p->m_pCamera == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_WarpState != 0) {
+        return;
+    }
+    while (s != NULL && *s != '\0') {
+        int f1, f2;
+        float x, y, z;
+        if (sscanf(s, "%d-%d:%f,%f,%f", &f1, &f2, &x, &y, &z) == 5 && frame >= f1 && frame <= f2) {
+            CGameObjectInstance *pl = &p->m_CharacterActor;
+            CVector3 eye = p->m_pCamera->m_vPos, at;
+            f32 dx = x - eye.x, dy = y - eye.y, dz = z - eye.z;
+            at.x = x;
+            at.y = y;
+            at.z = z;
+            pl->m_RotY += AI_AngleToPoint(pl, at);
+            p->m_pCamera->m_ViewParams.m_vRotOffset.x = atan2f(dy, sqrtf(dx * dx + dz * dz));
+            if (frame == f1) {
+                printf("aimat: frame %d eye (%.1f %.1f %.1f) -> (%.1f %.1f %.1f) pitch %.2f\n", frame, eye.x, eye.y,
+                       eye.z, x, y, z, p->m_pCamera->m_ViewParams.m_vRotOffset.x);
+                fflush(stdout);
+            }
+            return;
+        }
+        s = strchr(s, ';');
+        if (s != NULL) {
+            s++;
+        }
+    }
+}
+
+/* T2_AIM_ENEMY=F1-F2[,R][;...] (DEBUG-ONLY, round 10 y1): T2_AIM_NODE=-1 (yaw and pitch at the
+ * nearest live actor within R, default 4000) only from frame F1 to F2: the fights of a scripted run
+ * between its walks (a flying Sister of Despair needs the pitch). */
+void T2Port_AimNode(int frame, const char *spec);
+void T2Port_AimEnemy(int frame, const char *spec) {
+    const char *s = spec;
+
+    while (s != NULL && *s != '\0') {
+        int f1, f2, r = 4000;
+        if (sscanf(s, "%d-%d,%d", &f1, &f2, &r) >= 2 && frame >= f1 && frame <= f2) {
+            char buf[32];
+            snprintf(buf, sizeof(buf), "-1,%d", r);
+            T2Port_AimNode(frame, buf);
+            return;
+        }
+        s = strchr(s, ';');
+        if (s != NULL) {
+            s++;
+        }
+    }
+}
+
 /* T2_SAVE_PORTAL=F (DEBUG-ONLY, round 8 w5): at frame F, in gameplay, open the save portal menu
  * (gSavePortalMenuDesc) for the first player, as CPlayerPool__Update does when a save portal's
  * cinema (script 400) ends, to reach the game's own save path (PakMenu_InitSaveGame,
@@ -624,6 +695,27 @@ void T2Port_DoorOpen(int frame, const char *spec) {
 #include "structs/event.h"
 extern s32 CScene__GetLinkGroupCount(CScene *lv, s32 key);
 int gT2HostFrame; /* game.cpp's frame number, for the logs */
+
+/* The hub level (1..6, Mission_LevelObjectivesDone) a level index belongs to: its sub-levels,
+ * its talisman and flesh-eater portal levels and its totem (tools/assets/levels.py names). */
+int T2Port_HubLevelOf(int level) {
+    if ((level >= 125 && level <= 135) || level == 73 || level == 79 || level == 110) {
+        return 2;
+    }
+    if ((level >= 61 && level <= 71) || level == 74 || level == 80 || level == 111) {
+        return 3;
+    }
+    if ((level >= 98 && level <= 108) || level == 75 || level == 81 || level == 112) {
+        return 4;
+    }
+    if ((level >= 84 && level <= 96) || level == 76 || level == 82 || level == 113) {
+        return 5;
+    }
+    if ((level >= 114 && level <= 124) || level == 77 || level == 83) {
+        return 6;
+    }
+    return 1;
+}
 void T2Port_LogEvent(LevelEvent *e, const char *text) {
     static int on = -1;
     char buf[96];
@@ -640,11 +732,13 @@ void T2Port_LogEvent(LevelEvent *e, const char *text) {
     }
     buf[i] = 0;
     /* the objective counters of the level's hub (Mission_LevelObjectivesDone: link group types
-     * 2k and 2k+1, k = 1..6; level 1: 2 = distress beacons, 3 = children) */
+     * 2k and 2k+1, k = 1..6; level 1: 2 = distress beacons, 3 = children; level 2 (round 10 y1):
+     * 4 = soul gates, 5 = sisters of despair) */
+    int k = T2Port_HubLevelOf((int) gScene.m_nLevel);
     printf("event: frame %d (gameplay %d) level %d mode %d: actor %d of level %d kind %d handler %d msg %d \"%s\" music %d flags %x"
            " key %d objectives %d/%d\n",
            gT2HostFrame, (int) gFrameCountGameplay, (int) gScene.m_nLevel, (int) gScene.m_Mode, (int) e->actor, (int) e->level,
            (int) e->kind, (int) e->handler, (int) e->message, buf, (int) e->music, (unsigned) e->flags, (int) e->padF,
-           (int) CScene__GetLinkGroupCount(&gScene, 2), (int) CScene__GetLinkGroupCount(&gScene, 3));
+           (int) CScene__GetLinkGroupCount(&gScene, 2 * k), (int) CScene__GetLinkGroupCount(&gScene, 2 * k + 1));
     fflush(stdout);
 }

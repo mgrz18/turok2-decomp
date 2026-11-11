@@ -37,6 +37,8 @@ extern int gT2HostFrame;
 void T2Port_WakeEnemies(int frame, const char *spec);
 void T2Port_FaceNearest(int frame, const char *spec);
 void T2Port_AimNode(int frame, const char *spec);
+void T2Port_AimAt(int frame, const char *spec);
+void T2Port_AimEnemy(int frame, const char *spec);
 void T2Port_Cheats(int frame, const char *spec, const char *fill);
 void T2Port_SavePortal(int frame, const char *spec);
 void T2Port_DoorOpen(int frame, const char *spec);
@@ -630,6 +632,14 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         static const char* aimNode = getenv("T2_AIM_NODE");
         if (aimNode != nullptr) {
             T2Port_AimNode(f + 1, aimNode); // DEBUG-ONLY: T2_AIM_NODE=MASK[,R]
+        }
+        static const char* aimAt = getenv("T2_AIM_AT");
+        if (aimAt != nullptr) {
+            T2Port_AimAt(f + 1, aimAt); // DEBUG-ONLY: T2_AIM_AT=F1-F2:x,y,z[;...]
+        }
+        static const char* aimEnemy = getenv("T2_AIM_ENEMY");
+        if (aimEnemy != nullptr) {
+            T2Port_AimEnemy(f + 1, aimEnemy); // DEBUG-ONLY: T2_AIM_ENEMY=F1-F2[,R][;...]
         }
         static const char* cheats = getenv("T2_CHEATS");
         static const char* fillAmmo = getenv("T2_FILL_AMMO");
