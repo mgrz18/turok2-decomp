@@ -35,7 +35,11 @@ void SaveGame_Build(CPlayer *p) {
     }
     allocSize = SaveFileSize();
     handle = CCache__Allocate(0, allocSize, 0x33, "Single Save Block");
+#ifdef TARGET_PORT
+    buf = *(SaveGame **) handle; /* the block's data pointer (CMemEntry.data), pointer-wide on the host */
+#else
     buf = (SaveGame *) *handle;
+#endif
     gSaveBufferHandle = handle;
     gSaveBuffer = buf;
     memset(gSaveBuffer, 0, allocSize);
