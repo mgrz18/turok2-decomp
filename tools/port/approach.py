@@ -25,6 +25,7 @@ def main():
     ap.add_argument("--warp", type=int)
     ap.add_argument("--point")
     ap.add_argument("--steps", type=int, default=3, help="regions away from the target")
+    ap.add_argument("--water", action="store_true", help="also walk through water regions")
     a = ap.parse_args()
     d = json.load(open(glob.glob("%s/levels/%03d_*.json" % (a.levels, a.level))[0]))
     c = d["collision"]
@@ -49,7 +50,7 @@ def main():
                     continue
                 if a.warp is not None and R[n]["info"] in infos:
                     continue
-                if I[R[n]["info"]]["flags"] & 1:
+                if I[R[n]["info"]]["flags"] & 1 and not a.water:
                     continue
                 seen.add(n)
                 nxt.append(n)

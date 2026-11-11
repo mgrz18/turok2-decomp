@@ -59,6 +59,7 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
 
 #include <math.h>
 #include "structs/intelligence.h"
+#include "structs/boss.h"
 
 /* T2_ACTOR_LOG=N (with T2_STATE_LOG, round 7 v3): the level's enemies and turrets (gScene's level
  * actors with intelligence type 1 or 4), nearest to the player first (N of them, default 8), and
@@ -251,6 +252,19 @@ void T2Port_LogState(int frame) {
     if (getenv("T2_BOSS_LOG") != NULL) {
         extern void T2Port_LogBosses(void); /* t2bosslog.c, DEBUG-ONLY */
         T2Port_LogBosses();
+    }
+    {
+        /* a totem defense (the energy totem levels, TotemDefense_*): state 0 fight, 1 saved,
+         * 2 failed; the time left, the kills against the definition's target (round 9 x1) */
+        extern TotemDefenseState gTotemDefense;
+        if (gTotemDefense.obj != NULL && gScene.m_nLevel > 0) {
+            CDestructibleIntelligence *d = (CDestructibleIntelligence *) gTotemDefense.def;
+            printf("totem: state %d time %.0f/%d s kills %d/%d attackers %d warned %d totem hp %d\n",
+                   (int) gTotemDefense.state, gTotemDefense.timer / 15.0f, d != NULL ? (int) d->m_TotemMissionDuration : -1,
+                   (int) gTotemDefense.kills, d != NULL ? (int) d->m_EnemiesToKillToSaveTotem : -1,
+                   d != NULL ? (int) d->m_EnemiesAttackingTurok : -1, (int) gTotemDefense.warned,
+                   (int) (gTotemDefense.obj->m_AI.m_Health >> 8));
+        }
     }
     fflush(stdout);
 }
@@ -494,6 +508,25 @@ void T2Port_FaceNearest(int frame, const char *spec) {
         if (d < bestD) {
             bestD = d;
             best = o;
+        }
+    }
+    {
+        /* also the pooled instances (generator spawns: the totem defense waves; round 9 x1) */
+        CListedInstance *li;
+        for (li = gScene.m_InstancePool.m_ActiveList.m_pHead; li != NULL; li = li->m_pNext) {
+            CGameObjectInstance *o = &li->m_Instance;
+            CIntelligence *info = o->header.m_pIntelligence;
+            f32 dx, dz, d;
+            if (info == NULL || info->m_Type != INTELLIGENCE_ENEMY || o->m_AI.m_Health <= 0) {
+                continue;
+            }
+            dx = o->header.m_vPos.x - pl->header.m_vPos.x;
+            dz = o->header.m_vPos.z - pl->header.m_vPos.z;
+            d = dx * dx + dz * dz;
+            if (d < bestD) {
+                bestD = d;
+                best = o;
+            }
         }
     }
     if (best == NULL) {
