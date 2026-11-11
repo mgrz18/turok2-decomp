@@ -321,6 +321,13 @@ RUNTIME_BSS = frozenset("""
 # four profiles over whatever the linker put next (on macOS the legal screen's strings).
 N64_EXTENT = {'gMergedController': 0x224, 'gControllers': 4 * 0x224}
 
+# Pointees that are a header followed by raw bytes, not a table of headers (round 9 x4): an
+# attract demo (gDemoTable -> DemoHeader) is a 0x28-byte header of s16 fields, then the input
+# bit streams, read byte by byte MSB first (DemoStream_ReadBit). Typed as a table of DemoHeader
+# the whole demo was swapped as s16 pairs, so every stream decoded garbage on the host: the
+# demos played the wrong input from their first frame (the wheel open, the player spinning).
+HEADER_POINTEES = frozenset(('DemoHeader', 'struct DemoHeader'))
+
 
 def dsize(d):
     """(n64 size, host size) of a description."""
@@ -619,6 +626,7 @@ class Generator:
         self.bss_slack = []   # .bss byte views given twice their N64 size
         self.gfx_syms = []    # display lists (Gfx data)
         self.ptr_tables = 0   # pointer targets typed as arrays of their pointee
+        self.header_tables = 0  # HEADER_POINTEES targets: the header, then raw bytes
         self.split_tables = []  # (name, N64 extent, extended): split_table_extent
         self.count_hint = {}  # key -> element count stored next to a pointer to it
         self.gfx_relocs = 0   # their w1 addresses made host pointers
@@ -700,6 +708,13 @@ class Generator:
             n, _ = dsize(d)
             if ext > n and ext % n == 0 and ext // n <= 4096 and not self.is_bss(s):
                 d = ['a', ext // n, d]  # m2c `extern s32 D_x;` indexed as an array
+        elif d[0] == 'r' and getattr(s, 'header_only', False) and not self.is_bss(s):
+            # the header, then the rest of the symbol as bytes in ROM order
+            n, h = dsize(d)
+            if n > 0 and ext > n and n == h:
+                d = ['r', ext, ext, d[3], d[4], 0,
+                     [[0, 0, -1, d], [n * 8, n * 8, -1, ['a', ext - n, ['s', 1, 1, 'u']]]]]
+                self.header_tables += 1
         elif d[0] == 'r' and s.why == 'pointer target' and not self.is_bss(s):
             # a table reached through a pointer to its first element (MenuDesc.items ->
             # MenuItemDesc[count]): the count stored next to the pointer when there is one
@@ -927,6 +942,8 @@ class Generator:
             if pd is not None and pd[0] in ('x', 'F'):
                 pd = None
             t = self.add(n, pd, 'pointer target')
+            if pd is not None and pointee in HEADER_POINTEES:
+                t.header_only = True
             return ('d', t, off)
         return False
 
@@ -1165,6 +1182,7 @@ class Generator:
         P("bss byte views given twice their N64 size (host pointers): %d" % len(self.bss_slack))
         P("display lists: %d, w1 addresses relocated: %d, other w1 kept as numbers: %d" % (len(self.gfx_syms), self.gfx_relocs, self.gfx_w1_ints))
         P("pointer targets typed as tables of their pointee: %d" % self.ptr_tables)
+        P("pointer targets typed as a header and raw bytes (HEADER_POINTEES): %d" % self.header_tables)
         P("struct tables extended over splat labels: %d" % len(self.split_tables))
         for nm, a, b in self.split_tables:
             P("  %s: 0x%X -> 0x%X" % (nm, a, b))
