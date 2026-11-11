@@ -220,6 +220,21 @@ Fixed on the merged tree (asm_diff 0 for each):
 7. `--high-memory` was run on the boot, the journey and the warp; run the enemies and the boss
    levels with it too.
 
+## Round 8, part w4: macOS, and host-dependent bugs both hosts had (branch names-R8_w4)
+
+Detail: [MACOS.md](MACOS.md) section 10. Commits (asm_diff 0 against 5bf03fd0 for each `src/` one):
+baea6826 (DirectDamage/func_00239058 sptr: the Mac crashed at frame 2400), dbf89598
+(`CAI__UpdateModeAnim` takes a picker's result as s16: the Mother's attack anim now plays and hurts
+the player on both hosts), 96845732 (`CScene__ComputeLights` reads `dirs[k]`, not `w + 128`),
+6d67f0c8 (gendata: display-list w1 operands stay numbers: sShadowQuadDL's geometry mode was a code
+address), ff7785b9 (gendata: `gMergedController`/`gControllers` N64 extents: Cont_InitAll wrote 4
+host profiles over the following data; the legal screen lost lines; demo 1 now follows its input).
+After them the journey, the warp and the Mother runs give identical logs and matching screenshots
+on the Mac and on Linux. **Merge notes**: gendata.py also changed in w3 (558c0f04): both edits are
+local (N64_EXTENT/RUNTIME_BSS, the Gfx w1 branch, the report line); drop decls.json and rerun
+gendata. func_00243170.c (CAI__UpdateModeAnim) may meet w2's death-path work. With ff7785b9 the
+boot's demo 1 kills an enemy at ~8200 and needs w2 58b5668a (EnemyAnim_PickDeath).
+
 ## Round 7, part v1: the particle system (branch names-R7_v1)
 
 `CParticleSystem__Spawn` and the particle path run on host types, so the **animation events
