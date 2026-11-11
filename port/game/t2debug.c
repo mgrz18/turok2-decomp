@@ -70,13 +70,15 @@ static void T2Port_LogOne(const char *kind, int i, CGameObjectInstance *o, CGame
         f32 dz = o->header.m_vPos.z - pl->header.m_vPos.z;
         d = sqrtf(dx * dx + dy * dy + dz * dz);
     }
-    printf("actor: %s %d it %d id %d fl %x aifl %x pos (%.1f %.1f %.1f) d %.0f hp %d/%d mode %d act %d anim %d %.1f/%d tgt %p ty %x cb %p\n",
+    printf("actor: %s %d it %d id %d fl %x aifl %x pos (%.1f %.1f %.1f) d %.0f hp %d/%d mode %d act %d anim %d %.1f/%d tgt %p ty %x cb %p drop %x/%x\n",
            kind, i, info != NULL ? (int) info->m_Type : -1, info != NULL ? (int) info->m_Id : -1,
            (unsigned) o->m_dwFlags, (unsigned) o->m_AI.m_dwFlags, o->header.m_vPos.x, o->header.m_vPos.y,
            o->header.m_vPos.z, d, (int) (o->m_AI.m_Health >> 8), (int) (o->m_AI.m_InitialHealth >> 8),
            (int) o->m_AI.m_Mode, (int) o->m_AI.m_Action, (int) o->m_CurrentAnimation.m_nAnimIndex,
            o->m_CurrentAnimation.m_AnimationFrame, (int) o->m_nAnims, (void *) o->m_AI.m_pSightTarget,
-           (unsigned) o->m_nTypeFlag, o->m_AI.m_pModeCurrent != NULL ? (void *) o->m_AI.m_pModeCurrent->m_pfCallback : NULL);
+           (unsigned) o->m_nTypeFlag, o->m_AI.m_pModeCurrent != NULL ? (void *) o->m_AI.m_pModeCurrent->m_pfCallback : NULL,
+           info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_DropMask : 0u,
+           info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_DropMask2 : 0u);
 }
 
 static void T2Port_LogActors(CPlayer *p) {
