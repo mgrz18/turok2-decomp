@@ -584,6 +584,7 @@ void T2Port_DoorOpen(int frame, const char *spec) {
  * the message (gLevelMessages: "distress beacon activated.", "child rescued.", "portal
  * activated." ...) and the music cue. To follow a level's objectives, switches and portals. */
 #include "structs/event.h"
+extern s32 CScene__GetLinkGroupCount(CScene *lv, s32 key);
 int gT2HostFrame; /* game.cpp's frame number, for the logs */
 void T2Port_LogEvent(LevelEvent *e, const char *text) {
     static int on = -1;
@@ -600,8 +601,12 @@ void T2Port_LogEvent(LevelEvent *e, const char *text) {
         buf[i] = (text[i] == '\n') ? '|' : text[i];
     }
     buf[i] = 0;
-    printf("event: frame %d (gameplay %d) level %d mode %d: actor %d of level %d kind %d handler %d msg %d \"%s\" music %d flags %x\n",
+    /* the objective counters of the level's hub (Mission_LevelObjectivesDone: link group types
+     * 2k and 2k+1, k = 1..6; level 1: 2 = distress beacons, 3 = children) */
+    printf("event: frame %d (gameplay %d) level %d mode %d: actor %d of level %d kind %d handler %d msg %d \"%s\" music %d flags %x"
+           " key %d objectives %d/%d\n",
            gT2HostFrame, (int) gFrameCountGameplay, (int) gScene.m_nLevel, (int) gScene.m_Mode, (int) e->actor, (int) e->level,
-           (int) e->kind, (int) e->handler, (int) e->message, buf, (int) e->music, (unsigned) e->flags);
+           (int) e->kind, (int) e->handler, (int) e->message, buf, (int) e->music, (unsigned) e->flags, (int) e->padF,
+           (int) CScene__GetLinkGroupCount(&gScene, 2), (int) CScene__GetLinkGroupCount(&gScene, 3));
     fflush(stdout);
 }
