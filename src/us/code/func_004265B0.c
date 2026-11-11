@@ -16,6 +16,9 @@ extern s32 Pak_Mount(s32 ch);
 extern s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
 
 extern char D_800C18B0[];
+#ifdef TARGET_PORT
+void T2Save_FromPak(void *dst, s32 size);
+#endif
 
 /* Reads note file_no of the pak on channel ch into dst. */
 s32 Pak_ReadNote(s32 ch, s32 file_no, void *dst, s32 size) {
@@ -40,6 +43,10 @@ s32 Pak_ReadNote(s32 ch, s32 file_no, void *dst, s32 size) {
         }
         if (result == 0) {
             func_0029E460(dst, buf, size);
+#ifdef TARGET_PORT
+            /* the port: a big-endian save record to host order (port/game/t2save.c) */
+            T2Save_FromPak(dst, size);
+#endif
         }
     }
     Controller_Unlock();

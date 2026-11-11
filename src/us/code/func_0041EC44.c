@@ -12,6 +12,48 @@ extern void Pak_ProbeSlot(s32 ch);
 extern s32 Pak_GetStatus(s32 ch);
 extern s32 Pak_IsRumblePak(s32 ch);
 extern s32 Pak_NeedsRepair(s32 ch);
+#ifdef TARGET_PORT
+/* The port: the Rage Wars view (Shared_PakMenu, PakNotesMenuItem) puts the items, the player and the
+ * controller at N64 offsets (0xC, 0x1C, 0x20; items 0x28 apart): on the host it read the channel from
+ * the menu's param and cleared the disabled bit of the wrong item (the load button stayed disabled,
+ * the cursor bounced between it and CANCEL). The same code on the typed Menu (structs/menu.h). */
+#include "structs/menu.h"
+void PakMenu_InitLoadGame(Menu *menu) {
+    s32 ch;
+
+    gPakMenuMode = 2;
+    gPakMenuIsSave = 0;
+    gPakMenuWrites = 0;
+    gPakMenuIsLoad = 1;
+    gPakMenuIsProfile = 0;
+    gPakMenuLeaving = 0;
+    gPakMenuAnyPak = 0;
+    ch = menu->controller->port;
+    if (gDamagedPakContinued != 0) {
+        gPakMenuLeaving = 1;
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (char *) &gSingleMenuAfterPakDesc, (sptr) menu->player,
+                          (sptr) menu->controller, 0);
+        return;
+    }
+    menu->items[20].flags &= ~0x01000000;
+    Pak_ProbeSlot(menu->controller->port);
+    if (Pak_GetStatus(ch) == 0) {
+        PakMenu_UpdateNoteRows((Shared_PakMenu *) menu);
+        return;
+    }
+    gPakMenuLeaving = 1;
+    if (Pak_IsRumblePak(ch) != 0) {
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (char *) &gPakMsgInsertToLoadDesc, (sptr) menu->player,
+                          (sptr) menu->controller, 1);
+    } else if (Pak_NeedsRepair(ch) != 0) {
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (char *) &gDamagedPakAtBootMenuDesc, (sptr) menu->player,
+                          (sptr) menu->controller, (sptr) &gPakLoadGameMenuDesc);
+    } else {
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (char *) &gPakMsgPakNotFoundDesc, (sptr) menu->player,
+                          (sptr) menu->controller, (sptr) &gSingleMenuAfterPakDesc);
+    }
+}
+#else
 void PakMenu_InitLoadGame(Shared_PakMenu *menu)
 {
   Shared_PakMenu *new_var3;
@@ -60,3 +102,4 @@ void PakMenu_InitLoadGame(Shared_PakMenu *menu)
     }
   }
 }
+#endif

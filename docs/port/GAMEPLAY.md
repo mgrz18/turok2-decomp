@@ -617,3 +617,61 @@ demo 1 with the enemy switches (8,600).
 4. Boss files with raw N64 offsets not reached yet: `MantidQueen_UpdateMode15` (func_004032E4),
    `MantidQueen_Draw` (func_00403660), the module-2 copies (not linked).
 
+## 9. Round 8, part w5: progression (pickups, saves, the pause and options menus)
+
+Branch names-R8_w5. Everything on Linux, headless, low memory, `--game --draw` (the pak runs:
+`--pak-dir DIR` instead of `--pak-blank`). Saves on the Controller Pak: [INPUT.md](INPUT.md)
+section 7.
+
+### 9.1 What works
+
+| what | how it was run | result |
+|---|---|---|
+| level pickups | `T2_PICKUP_LOG=1`, `T2_TELEPORT` onto the placed level actors (positions from `tools/assets/levels.py --level 51/52`) | life force in level 51 (ids 1706 = 10, 1705 = 1: 0 -> 10 -> 16, the HUD counter top right), the **level 2 key** in level 52 (id 4310, "LEVEL 2 KEY" on screen), **10 pistol bullets** (id 2500, the message); health pickups (2200, 2201) are left alone at full health, as on the N64 |
+| save | new game, `T2_SAVE_PORTAL=13100` (the save portal menu as after a portal's cinema), A: SAVE, A: SAVE GAME | "SAVE WAS SUCCESSFUL"; the note "TUROK 2" (NT2E/51, ext A, 90 pages) on the .mpk, big-endian, checked by `tools/port/mpk_saves.py`: checksum OK, health 100, lives 3, clock 0:02:20, 663 ISets of level flags. After OK the game goes to the portal room (level 97, Adon) as on the console |
+| save in level 52 | `T2_WARP_TO=1813` + exit52.txt, `T2_SAVE_PORTAL=13500` | checkpoint warp 1098 in the note |
+| load | boot with that .mpk: `START@4400 A@4500 DD@4700 A@4800` (main menu -> LOAD GAME), `DU@4900 A@5000` (note 1), `A@5200` (LOAD? YES), `A@5400` (the rumble pak notice) | NOTE INFO shows PORT OF ADIA, TIME 0:02:20, NORMAL, HEALTH 100, LIVES 3; the game loads level 51 (frame ~5600); the level-52 save loads **level 52** at its entry (1280.0, 0.0, -3225.6), frame ~6200 |
+| pause menu | `START` in gameplay | PAUSED: resume, mission status, inventory (drawn), options, sound options, enter cheat, cheats, quit |
+| sound options | pause, `DD`x4, A; `DL` held on MUSIC VOLUME / SFX VOLUME | NORM -> 4, MAX -> 13; the mixer follows: music volume to its minimum takes the run's RMS from ~1,700 to ~40 (`--audio --wav`, 600 frames) |
+| options | pause, `DD`x3, A | the 13 rows (difficulty greyed in game); CONTROL TYPE expert -> ARCADE, CONTROL SIDE right -> LEFT, LOOK SPRING on -> OFF; GO BACK returns to the pause menu, RESUME to the game |
+
+### 9.2 Fix table (w5)
+
+| # | where | cause | fix |
+|---|---|---|---|
+| W5-1 | `SingleMenu_Load` (func_00419618) | view read the player/controller at N64 0x1C/0x20: the load menu got half the desc pointer as its controller (cursor ran up every frame, A never confirmed) | typed Menu |
+| W5-2 | `PakMenu_InitLoadGame` (func_0041EC44) | Rage Wars view (`Shared_PakMenu`, items 0x28 apart): wrong channel, the wrong item enabled | typed Menu |
+| W5-3 | `PakMenu_SelectNote` (func_0041F32C) | `K7Obj` at N64 offsets, the cache block address in an s32 | host view; `K7Mem` pointer-wide |
+| W5-4 | `Pak_FindNote` (func_00425E74) | memcpy of the integer game/company codes: "E2TN"/"15" on the host, so the game's own note never matched (greyed, not loadable) | the codes spelled high byte first |
+| W5-5 | `GameNoteMenu_SelectYes` (func_00420454) | `m_bCinema + 0x588` as the menu pool | `gEngineApp_m_Game.m_MenuPool` |
+| W5-6 | `GameNoteMenu_SelectNo` (func_00422124) | `RecordRecAt24` view | typed Menu |
+| W5-7 | `CPlayerPool__FindByController` (func_0025342C) | N64 offsets 0x20/0xA50/0x1320: NULL, the load crashed | typed CPlayerPool/CPlayer |
+| W5-8 | menu strings declared `s32` (func_00421E44, 004220F0, 00422608, 00421DFC, 0041C034, 0041B1E4, 0041B26C, 00408B20) | gendata types a symbol by its declaration and swapped the text as words ("ETONFNI", "DAOL", "TNOC LOREDIS") | `char[]` on TARGET_PORT (gendata again) |
+| W5-9 | `CScene__SetLevelActorKilled` (func_002247E4) + `IsLevelActorKilled`, `...InLevel` (func_002248D4, func_00224700, func_00226B34) | the scene's bit sections and level at N64 0x6C/0x18FA8, the killed index at 0x16E: collecting a pickup crashed | typed CScene/CLevelActor |
+| W5-10 | `Menu_Construct` and its 5 callers (func_00413230) | the window param stored as an s32 into the pointer-wide `param`/`submenu` union, K&R calls with int args: Options -> GO BACK crashed in `MenuPool_OpenSubmenu` | sptr param, N64 desc params resolved with `t2_n64_to_host` |
+| W5-11 | save notes | host order on the pak | port/game/t2save.c (INPUT.md section 7) |
+
+### 9.3 Debug aids (DEBUG-ONLY, port/game/t2debug.c)
+
+`T2_SAVE_PORTAL=F` (open the save portal menu at frame F), `T2_PICKUP_LOG=1` (every pickup
+touched: id, position, taken or not, health/life force/lives/ammo after), `T2_ACTOR_TYPES=6,8,...`
+(with `T2_ACTOR_LOG`: the nearest actors of these intelligence types instead of enemies),
+`T2_DOOR_OPEN=F` (the door-open event to the doors within 800 units).
+
+### 9.4 Open
+
+1. **Doors**: walking into level 51's door at (1382.4, -307.2, 0.0) stops the player 78 units
+   from it and the door stays in mode 1 (closed); `T2_DOOR_OPEN` (`CAI__SetMode(door, ai, 0)`,
+   what `Door_EventOpen` does) does not change its mode either. Next: why the mode request is not
+   taken (the door's step/mode change path), the proximity trigger system (func_002233A8:
+   `CAI__SetMode` by distance), and `Door_OpenNow`/`Door_CloseNow` (func_00265838/func_002658A0:
+   a Rage Wars `LevelActor` view, position at 4). Switches and levers were not reached.
+2. Health pickups need a damaged player (w1's damage path) to show being taken.
+3. The save-portal walk itself (the portal actor and cinema 400) was replaced by
+   `T2_SAVE_PORTAL`; the menus and the save after it are the game's.
+4. Module 2 (`_2` twins of the pak menus) is not linked and was not touched.
+5. `MenuPool_OpenMenuParam` still takes the player/controller/context as s32 (truncates with
+   `--high-memory`); other strings declared s32 may remain (the scan in 9.2 found the 8 visible
+   ones; `D_800A5EC0` "level index" is only a cache label).
+6. Not run this round: `--high-memory` and macOS on these paths.
+

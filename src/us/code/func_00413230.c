@@ -727,7 +727,23 @@ extern MenuColorInit D_800C1CD2[];
 /* Builds a window in its block: the items from the desc's table, the
  * extras after them, the colours, then the desc's init and the items' select
  * callbacks flagged 0x04000000. */
+#ifdef TARGET_PORT
+/* The port: the window's param is pointer-wide (Menu.param shares its slot with Menu.submenu, the desc
+ * that "go back" items reopen: MenuPool_OpenChildMenu passes the parent's desc). A desc's own param is
+ * still the N64 word gendata kept: an address in RDRAM becomes the host pointer. Stored as an s32
+ * before, the pointer's upper half was whatever the cache block held (Options -> GO BACK crashed). */
+static sptr T2_MenuParam(sptr v) {
+    u32 lo = (u32) v;
+
+    if (v == (sptr) (s32) lo && lo >= 0x80000000u && lo < 0x80800000u) {
+        return (sptr) t2_n64_to_host(lo);
+    }
+    return v;
+}
+void Menu_Construct(Menu *p, void *a1, MenuDesc *t, sptr a3, struct CPlayer *a4, ControllerProfile *a5, void *a6, MenuPool *a7)
+#else
 void Menu_Construct(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, ControllerProfile *a5, void *a6, MenuPool *a7)
+#endif
 {
   s32 i;
   s32 j;
@@ -802,7 +818,11 @@ void Menu_Construct(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, 
     }
   }
   p->desc = t;
+#ifdef TARGET_PORT
+  p->submenu = (MenuDesc *) T2_MenuParam(a3);
+#else
   p->param = a3;
+#endif
   p->player = a4;
   p->controller = a5;
   p->context = a6;
@@ -1213,7 +1233,11 @@ sptr MenuPool_OpenSubmenu(MenuPool *a, Menu *c) {
     sptr *r;            /* the block's handle: its data pointer first */
     sptr s;
     MenuDesc *b = c->submenu;
+#ifdef TARGET_PORT
+    sptr p1; /* the desc's param, sign-extended: Menu_Construct takes it pointer-wide */
+#else
     s32 p1;
+#endif
     sptr p2, p3, p4;
     if (b != 0) {
         p1 = b->param; p2 = (sptr) c->player; p3 = (sptr) c->controller; p4 = (sptr) c->context;
@@ -1519,7 +1543,11 @@ sptr MenuPool_OpenMenu(MenuPool *a, MenuDesc *b, sptr c, sptr d, sptr e) {
     if (r == 0) return 0;
     s = *r;
     if (s == 0) return 0;
+#ifdef TARGET_PORT
+    func_00414EA8_416644(s, r, b, (sptr) 0, c, d, e, a); /* a full-width 0 through the K&R call */
+#else
     func_00414EA8_416644(s, r, b, 0, c, d, e, a);
+#endif
     CList__AddHead_416644(a, s);
     { s16 t = a->opened + 1; a->opened = t; if (t >= 4) a->opened = 0; }
     return s;
@@ -1544,7 +1572,11 @@ sptr MenuPool_OpenMenuFrom(MenuPool *a, Menu *c, MenuDesc *b) {
     s32 size, i;
     sptr *r;            /* the block's handle: its data pointer first */
     sptr s;
+#ifdef TARGET_PORT
+    sptr p1 = (sptr) c->submenu; /* the window's param, pointer-wide */
+#else
     s32 p1 = c->param;
+#endif
     sptr p2 = (sptr) c->player, p3 = (sptr) c->controller, p4 = (sptr) c->context;
     size = b->count * MENUITEM_SIZE + MENU_SIZE;
     for (i = 0; i < b->count; i++) size += O06_ItemSize_416760(&b->items[i].type);
@@ -1953,7 +1985,11 @@ void Menu_Close(Menu *arg0) {
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/ITEMS/80442BC8_11.CPP, func_8044322C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#ifdef TARGET_PORT
+extern void func_00414EA8_4172F8(void *, void **, MenuDesc *, sptr, sptr, sptr, sptr, MenuPool *) __asm__("Menu_Construct");
+#else
 extern void func_00414EA8_4172F8(void *, void **, MenuDesc *, s32, sptr, sptr, sptr, MenuPool *) __asm__("Menu_Construct");
+#endif
 void CList__AddHead_4172F8(void *list, void *node) __asm__("CList__AddHead");
 extern void **func_00204EDC_4172F8(s32, s32, s32, char *) __asm__("CCache__Allocate");
 /* Opens the window described by list in the pool owner. */
