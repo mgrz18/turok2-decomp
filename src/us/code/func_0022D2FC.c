@@ -2116,7 +2116,14 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     }
                     effect->flags |= 0x1000000;
                 }
+#ifdef TARGET_PORT
+                /* (round 10: the same fix as y4's 627b899b; keep y4's on merge) type 0xFFFF reads past
+                 * the 34-entry table; the N64 finds 0x00C800FF there (RDRAM 0x8012D07C): bit 0 set */
+                if (((entry->model->type == 0xFFFF ? 0x00C800FF : gImpactEventHandlers[entry->model->type].flags) & 1)
+                    || kind == 0x68) {
+#else
                 if ((gImpactEventHandlers[entry->model->type].flags & 1) || kind == 0x68) {
+#endif
                     render->flags |= 0x80000000;
                 }
                 vel = &effect->velocity;
