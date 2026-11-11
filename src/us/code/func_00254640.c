@@ -22,7 +22,14 @@ void CPlayer__UpdateSpeedScale(void *arg0, void *arg1, void *arg2) {
         player->m_CameraMovementScaler = 1.0f;
         return;
     }
-    s = *(f32 *) ((u8 *) actor->header.m_pIntelligence + __builtin_offsetof(CIntelligence, m_Player.pad08));
+    {
+        /* CPlayerIntelligence types 0x1C as pad08 (u8[]): the archive's swap plan leaves those
+         * bytes big-endian (1.0f reads as 4.6e-41 little-endian). Read them as the N64 does.
+         * The real fix: name the field in structs/intelligence.h + swap_spec (archive rebuild). */
+        const u8 *b = (const u8 *) actor->header.m_pIntelligence + __builtin_offsetof(CIntelligence, m_Player.pad08);
+        u32 w = ((u32) b[0] << 24) | ((u32) b[1] << 16) | ((u32) b[2] << 8) | b[3];
+        s = *(f32 *) &w;
+    }
     player->m_CameraMovementScaler = s;
     if (gEngineApp_m_Settings.multiplayer != 0) {
         player->m_CameraMovementScaler = s * gEngineApp_m_Settings.speed;
