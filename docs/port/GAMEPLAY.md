@@ -455,8 +455,8 @@ Branch names-R8_w1; the fix table and the run are in STATUS.md (round 8, part w1
   its collision height) and a direction of (0, 0.195, 0.98): 11 degrees above the aim line, then
   gravity (about 2,050 units/s^2) at about 1,430 units/s. From point-blank range (81 units, both
   cylinders touching) it crosses the player's axis at y about 392 and the cylinder's front at
-  about 410, above its top (92.16): a miss, by the ROM's own numbers; from about 300 units it
-  hits. Hits go `Collision_SweepActors` -> `Sweep_TestInstance` (the player has flags 0x300000)
+  about 410, above its top (399.4: the feet + 92.16): a miss, by the ROM's own numbers; by the
+  same numbers it would hit from about 300 units (not run). Hits go `Collision_SweepActors` -> `Sweep_TestInstance` (the player has flags 0x300000)
   -> `CParticle__HitTarget` -> `ImpactEvent_DirectDamage` -> `CAI__CallHurt`.
 - **The player's hurt callback** is `Player_OnMultiplayerKill` (its name; it runs in single
   player too): `CPlayer__Hurt` (damage 8.8, invincibility, cheats, the red flash
