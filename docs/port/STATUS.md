@@ -220,6 +220,48 @@ Fixed on the merged tree (asm_diff 0 for each):
 7. `--high-memory` was run on the boot, the journey and the warp; run the enemies and the boss
    levels with it too.
 
+## Round 8, part w5: progression: pickups, saves, the pause and options menus (branch names-R8_w5)
+
+Detail: [GAMEPLAY.md](GAMEPLAY.md) section 9, [INPUT.md](INPUT.md) section 7. All src changes
+are `TARGET_PORT`; `tools/asm_diff.py --base 5bf03fd0 -j 8` = 0 on every file changed (no
+include/ change). **Merge needs: gendata again (delete decls.json)**: eight menu strings are now
+declared `char[]` (they were swapped as words). The archive is unchanged.
+
+- **Saves are big-endian on the pak** (port/game/t2save.c): the save game and the multiplayer
+  profile swapped field by field, the level flags by their ISet plan, checksums over the
+  big-endian bytes; a pre-round-8 host-order note still loads. `tools/port/mpk_saves.py` checks
+  a .mpk the console's way.
+- **Save -> quit -> load works**: `T2_SAVE_PORTAL` + the game's own save menus write the note
+  ("SAVE WAS SUCCESSFUL"); a new boot, LOAD GAME, the note, NOTE INFO (Port of Adia, 0:02:20,
+  Normal, 100, 3), YES: level 51 again; a save made in level 52 loads level 52 at its entry.
+- **Pickups**: walking onto level actors collects them: life force (HUD counter 0 -> 16), the
+  level 2 key ("LEVEL 2 KEY"), pistol bullets ("10 PISTOL BULLETS (CLIP)"); health is left at
+  full health. Collecting crashed before (W5-9).
+- **Pause, sound options, options** work: the sliders step (music volume to its minimum: the
+  mix RMS ~1,700 -> ~40), the options toggle (control type, side, look spring...), GO BACK and
+  RESUME (W5-10: crashed).
+- Regression (final build, Linux low memory): the 26,000-frame boot loop (title again at 25,778),
+  the firing journey (15,000: the player at (315.9, -793.4, -1352.3) as before), the warp to 52
+  and back (16,000): exit 0.
+- Debug-only: `T2_SAVE_PORTAL=F`, `T2_PICKUP_LOG=1`, `T2_ACTOR_TYPES=...`, `T2_DOOR_OPEN=F`.
+
+Screenshots (640x480, by eye): the PAUSED menu; INVENTORY; the save portal menu (SAVE / HEALTH
+AMMO / GO BACK) over level 51 and over Adon in the portal room; CONTROLLER PAK #1 SAVE NOTE (free
+123, needed 90); SAVE WAS SUCCESSFUL; LOAD NOTE with "1. TUROK 2 A 90"; NOTE INFO; level 51 and
+level 52 after loading; the life force counter 11 underwater; LEVEL 2 KEY; 10 PISTOL BULLETS
+(CLIP); SOUND OPTIONS (music 4, SFX 13); OPTIONS (ARCADE, L, LOOK SPRING OFF).
+
+Files others may touch (merge): func_00413230.c (`Menu_Construct` and the open functions: shared
+menu code), func_0023F05C.c (`CPlayer__TouchPickup`: a debug hook), port/game/t2debug.c and
+port/app/game.cpp (debug switches appended), docs. **Not changed here**: func_002683CC.c
+(`GameObject_GetDeadCollisionHeight`): w1 fixed it (a1d24455); a fall to death in level 52
+crashed there on this branch without it. Not touched: func_0041A420.c/func_0041A4D0.c (w1).
+
+Next: doors (level 51's door stays closed when walked into, and `CAI__SetMode(door, 0)` does not
+take: GAMEPLAY.md 9.4), switches/levers, health pickups with a damaged player (after w1), a
+console/emulator save loaded on the port, `--high-memory` and macOS on these paths,
+`MenuPool_OpenMenuParam`'s s32 pointers.
+
 ## Round 7, part v1: the particle system (branch names-R7_v1)
 
 `CParticleSystem__Spawn` and the particle path run on host types, so the **animation events
