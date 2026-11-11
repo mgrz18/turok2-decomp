@@ -12,6 +12,23 @@
 #include "protos/player.h"
 
 typedef struct Entity Entity;
+#ifdef TARGET_PORT
+struct Entity {
+/* the view at the host offsets of CListedInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Entity(m) __builtin_offsetof(CListedInstance, m)
+    union {
+        struct { u8 _hp_kind[T2_HOFF_Entity(m_Instance.header.m_Type)]; u8 kind; }; /* N64 0x0 */
+        struct { u8 _hp_pos[T2_HOFF_Entity(m_Instance.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_def[T2_HOFF_Entity(m_Instance.header.m_pIntelligence)]; CIntelligence *def; }; /* N64 0x14 */
+        struct { u8 _hp_typeId[T2_HOFF_Entity(m_Instance.m_nTypeFlag)]; u16 typeId; }; /* N64 0xB8 */
+        struct { u8 _hp_ai[T2_HOFF_Entity(m_Instance.m_AI.m_dwFlags)]; u8 ai[4]; }; /* N64 0x140 */
+        struct { u8 _hp_health[T2_HOFF_Entity(m_Instance.m_AI.m_Health)]; s32 health; }; /* N64 0x144 */
+        struct { u8 _hp_state[T2_HOFF_Entity(m_Instance.m_AI.m_Mode)]; s8 state; }; /* N64 0x174 */
+        struct { u8 _hp_next[T2_HOFF_Entity(m_pNext)]; Entity *next; }; /* N64 0x28C */
+    };
+};
+#else
 struct Entity {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1[3];
@@ -28,6 +45,7 @@ struct Entity {
     /* 0x175 */ u8 pad175[0x28C - 0x175];
     /* 0x28C */ Entity *next;
 };
+#endif
 
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);

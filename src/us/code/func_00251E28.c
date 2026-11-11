@@ -30,6 +30,10 @@ void PlayerShock_Update(CPlayer *player) {
         CPlayer__SetState(player, player, 2);
         DamageEvent_Set(&event, player->m_pHitMeWithCBore, 0x3200, 25.599998f, 0x100000, 0);
         player->m_pHitMeWithCBore = NULL;
+#ifdef TARGET_PORT /* the AI by member (N64 0x140) */
+        Player_OnMultiplayerKill(player, (u8 *) &player->m_CharacterActor.m_AI, &event);
+#else
         Player_OnMultiplayerKill(player, (u8 *) player + 0x140, &event);
+#endif
     }
 }

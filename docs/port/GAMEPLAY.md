@@ -427,3 +427,58 @@ type on the N64); `tools/asm_diff.py --base d3f05a74 -j 8` 0 over the whole tree
 5. Why no trigger wakes demo 1's enemies along the demo's own path (gdb on
    `LevelEvent_ProcessTriggers` after the level loads: the region-info ids with events, 4/9/10,
    are not on the path; probably correct).
+
+## 9. Round 8, part w1: enemies hurt the player, death and game over
+
+Branch names-R8_w1; the fix table and the run are in STATUS.md (round 8, part w1).
+
+### 9.1 How an enemy gets to hurt the player
+
+- **Alert.** An enemy's alert level is `CAI::m_ActionTime`; `AI_HearNoise(actor, ai, pos, kind)`
+  raises it by 45/105/150 (noise kinds 1/2/3) scaled by the distance (0 at 3072 units), and
+  `AI_FindBestTarget` calls it with kind 3 whenever the enemy sees its target in its view cone.
+  `EnemyAI_AttackWait` turns an alert level over 30 into `m_Action = 1` (and mode 12, the alert
+  animation, when the definition has one). Definitions without type flag 0x8000 start alerted
+  (`EnemyAI_InitDispatch`: level 52's type 0xC8).
+- **Targets.** `AI_FindBestTarget(self, ai, 0, 1)` (the path target) skips every candidate while an
+  enemy is unalerted (`m_Action == 0`); the sight target (`AI_UpdateTargets`) does not need it.
+- **Attack choice.** `EnemyAI_PickAttack` adds melee (mode 0x0E) when the path target is within
+  `m_AttackCombatRadius` (81.92 for type 0x190), leap/dart (0x0F/0x10) at their radii, the
+  projectile (0x12) and weapon (0x11) attacks by the sight distance (1024 / 409.6) once
+  `m_AttackDelay` has run out. With w1-1 broken on the host, only the projectile was ever picked.
+- **Melee.** An animation event of mode 14 sends `ImpactEvent_AreaDamage` around the hot
+  point -> `ImpactEvent_ApplyBlast` -> `CAI__CallHurt(player, ai, event)`.
+- **Projectiles.** The type-0x190 shot is particle kind 66, spawned by an animation event at
+  `local (54, -124, 242)` through `m_mfOrient` (scale 0.5): 121 units above the feet, at the
+  enemy's x/z after `GameObject_TraceMove`. Its template has flag 0x40000 (aimed:
+  `GameObject_GetAimRotation` turns it toward the sight target's position + y offset + 0.75 x
+  its collision height) and a direction of (0, 0.195, 0.98): 11 degrees above the aim line, then
+  gravity (about 2,050 units/s^2) at about 1,430 units/s. From point-blank range (81 units, both
+  cylinders touching) it crosses the player's axis at y about 392 and the cylinder's front at
+  about 410, above its top (399.4: the feet + 92.16): a miss, by the ROM's own numbers; by the
+  same numbers it would hit from about 300 units (not run). Hits go `Collision_SweepActors` -> `Sweep_TestInstance` (the player has flags 0x300000)
+  -> `CParticle__HitTarget` -> `ImpactEvent_DirectDamage` -> `CAI__CallHurt`.
+- **The player's hurt callback** is `Player_OnMultiplayerKill` (its name; it runs in single
+  player too): `CPlayer__Hurt` (damage 8.8, invincibility, cheats, the red flash
+  `CCamera__SetHitFlash(alpha, 30)`, rumble, the low-health text and speech 0x156 under 15, the
+  pain sound 0x3AC0), then the kill counters in multiplayer. Each type-0x190 hit costs about 7.5.
+
+### 9.2 Death, respawn, game over
+
+- Health 0: `CPlayer__Kill`, player mode 19 (the camera drops to the floor, letterboxed), then
+  the death cinema (level 164) unless one life is left; `PlayerDeath_CinemaDone` ->
+  `CPlayer__LoseLife` (lives - 1) -> `CPlayer__Warp(checkpoint, respawn)`.
+- The checkpoint is `m_Data.m_CheckPointWarpID`, set by `CPlayer__LevelStart` to the warp id of
+  the level just entered (not during a cinema). On the host every cinema cleared it (w1-4), so
+  a death went to level 0.
+- With no life left: player mode 15, `PlayerState15_Enter` opens `gGameOverMenuDesc` (or
+  `gContinueMenuDesc` while `m_Data.m_Lives` is non-zero), `GameOverMenu_Init` starts the
+  countdown, and when it runs out the engine goes back to the legal screen.
+
+### 9.3 Debug aids used
+
+`T2_WARP_TO=-82` (level 81), `T2_TELEPORT` onto the enemy's spawn point (2334.7, 307.2,
+-1054.7), `T2_WAKE_ENEMIES=1500`, `T2_ACTOR_LOG` (`act` is `m_Action`: 1 = alerted). gdb
+breakpoints that answered the questions: `CPlayer__Hurt` (damage, `bt` to tell melee from
+projectile), `CPlayer__Warp` (the checkpoint), a watchpoint on
+`((CPlayer*)player)->m_Data.m_CheckPointWarpID`.
