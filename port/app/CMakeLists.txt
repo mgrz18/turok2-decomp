@@ -102,7 +102,9 @@ if(T2_LINK_GAME AND TARGET turok2_game)
     # and T2Port_Boot puts the heap and game thread stacks there too (MAP_32BIT), so pointers
     # that the not-yet-typed game code passes through s32 survive (LINK.md §5). Not a design:
     # the typing work (64BIT.md) removes the need; macOS cannot do it at all.
-    option(T2_LOW_MEMORY "Non-PIE executable + game memory below 2 GB (Linux bring-up aid)" ON)
+    # OFF since round 10 (STABILITY.md 7.6): the default Linux build is a PIE (code and data
+    # above 4 GB, like macOS); -DT2_LOW_MEMORY=ON brings back -no-pie and --low-memory.
+    option(T2_LOW_MEMORY "Non-PIE executable + game memory below 2 GB (Linux bring-up aid)" OFF)
     if(T2_LOW_MEMORY AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
         target_link_options(turok2 PRIVATE -no-pie)
         target_link_options(t2audio_test PRIVATE -no-pie)
