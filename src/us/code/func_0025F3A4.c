@@ -23,7 +23,11 @@ void EnemyMode_PickupThrowObject_Update(CGameObjectInstance *self, CAI *ai) {
         }
         AI_TurnClamped(self, ai, rate * 1.5f, t.m_Sight.m_Angle);
         if (held != NULL && self->m_CurrentAnimation.m_nFrames * 0.7f <= self->m_CurrentAnimation.m_AnimationFrame) {
+#ifdef TARGET_PORT
+            CAI__SetMode(held, &((CGameObjectInstance *) held)->m_AI, 2); /* N64 +0x140 */
+#else
             CAI__SetMode(held, held + 0x140, 2);
+#endif
             ai->m_Enemy.m_pGrabbed = NULL;
         }
     }

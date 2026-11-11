@@ -22,7 +22,11 @@ extern f32 func_002974C0(f32 x);   /* cosf */
 
 void CPlayer__Dismount(CPlayer *player, Thrown *obj) {
     if (player->m_ModeFlags & 0x8000) {
+#ifdef TARGET_PORT
+        EnemyAI_Dismount(((u8 *)player->m_pOnEnemy), (u8 *)&((CGameObjectInstance *)player->m_pOnEnemy)->m_AI, player); /* N64 +0x140 */
+#else
         EnemyAI_Dismount(((u8 *)player->m_pOnEnemy), ((u8 *)player->m_pOnEnemy) + 0x140, player);
+#endif
         player->m_pOnEnemy = NULL;
         player->m_Speed = 0;
         player->m_SideSpeed = 0;
