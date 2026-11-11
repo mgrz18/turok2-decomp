@@ -115,7 +115,21 @@ static void T2Port_LogActors(CPlayer *p) {
                 CIntelligence *info = o->header.m_pIntelligence;
                 int j, skip = 0;
                 f32 dx, dz, d;
-                if (info == NULL || (info->m_Type != INTELLIGENCE_ENEMY && info->m_Type != INTELLIGENCE_TURRET)) {
+                /* T2_ACTOR_TYPES=a,b,... (round 8 w5): log these intelligence types instead (6 doors, 8 pickups...) */
+                static int sMask = -1;
+                if (sMask < 0) {
+                    const char *t = getenv("T2_ACTOR_TYPES");
+                    sMask = (1 << INTELLIGENCE_ENEMY) | (1 << INTELLIGENCE_TURRET);
+                    if (t != NULL) {
+                        sMask = 0;
+                        while (*t != 0) {
+                            sMask |= 1 << (atoi(t) & 31);
+                            while (*t != 0 && *t != ',') t++;
+                            if (*t == ',') t++;
+                        }
+                    }
+                }
+                if (info == NULL || !(sMask & (1 << (info->m_Type & 31)))) {
                     continue;
                 }
                 for (j = 0; j < nUsed; j++) {
@@ -473,5 +487,35 @@ void T2Port_LogPickup(sptr player, void *actor, s32 id, s32 got) {
            (int) gScene.m_nLevel, (int) id, h->m_vPos.x, h->m_vPos.y, h->m_vPos.z, got ? "collected" : "not taken",
            (int) (p->m_Data.m_Health >> 8), (int) p->m_Data.m_LifeForce, (int) p->m_Data.m_Lives,
            (int) p->m_Data.m_CurrentWeapon, (int) CPlayer__GetWeaponAmmo(p, p->m_Data.m_CurrentWeapon));
+    fflush(stdout);
+}
+
+/* T2_DOOR_OPEN=F (DEBUG-ONLY, round 8 w5): at frame F, every door (intelligence type 6) within 800
+ * units of the player gets the event a level trigger or a key sends it (Door_EventOpen:
+ * CAI__SetMode(door, ai, 0)), to check the door's open path (Door_OpenEnter, Door_OpenUpdate,
+ * the open animation, the saved bit) without the trigger. Called every frame. */
+extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 mode);
+void T2Port_DoorOpen(int frame, const char *spec) {
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    int i;
+
+    if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL || frame != atoi(spec)) {
+        return;
+    }
+    for (i = gScene.m_nFirstActor; i < gScene.m_nActors; i++) {
+        CGameObjectInstance *o = &gScene.m_pActors[i];
+        CIntelligence *info = o->header.m_pIntelligence;
+        f32 dx, dz;
+        if (info == NULL || info->m_Type != INTELLIGENCE_DOOR) {
+            continue;
+        }
+        dx = o->header.m_vPos.x - p->m_CharacterActor.header.m_vPos.x;
+        dz = o->header.m_vPos.z - p->m_CharacterActor.header.m_vPos.z;
+        if (dx * dx + dz * dz < 800.0f * 800.0f) {
+            printf("door: frame %d door %d at (%.1f %.1f %.1f) mode %d -> open\n", frame, i, o->header.m_vPos.x,
+                   o->header.m_vPos.y, o->header.m_vPos.z, (int) o->m_AI.m_Mode);
+            CAI__SetMode(o, &o->m_AI, 0);
+        }
+    }
     fflush(stdout);
 }

@@ -34,6 +34,7 @@ void T2Port_DebugWarp(int frame);
 void T2Port_Teleport(int frame, const char *spec);
 void T2Port_WakeEnemies(int frame, const char *spec);
 void T2Port_SavePortal(int frame, const char *spec);
+void T2Port_DoorOpen(int frame, const char *spec);
 void T2Port_DebugSwitches(int skipPak, int startMode);
 }
 
@@ -609,6 +610,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         static const char* wake = getenv("T2_WAKE_ENEMIES");
         if (wake != nullptr) {
             T2Port_WakeEnemies(f + 1, wake); // DEBUG-ONLY: T2_WAKE_ENEMIES=R
+        }
+        static const char* doorOpen = getenv("T2_DOOR_OPEN");
+        if (doorOpen != nullptr) {
+            T2Port_DoorOpen(f + 1, doorOpen); // DEBUG-ONLY: T2_DOOR_OPEN=F
         }
         static const char* savePortal = getenv("T2_SAVE_PORTAL");
         if (savePortal != nullptr) {
