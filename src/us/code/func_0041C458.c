@@ -4,7 +4,7 @@
 #include "protos/menu.h"
 
 
-s32 OptionsMenu_StepOpacity(s32 arg0, s32 arg1) {
+s32 OptionsMenu_StepOpacity(sptr arg0, sptr arg1) {
     u16 temp_v0;
     u8 var_v1;
 

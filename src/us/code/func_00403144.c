@@ -1,6 +1,18 @@
 #include "common.h"
 #include "globals/boss.h"
 
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+/* the view at the host offsets of CAITargets (soak S7); unk4 is the sight target (a pointer) */
+typedef struct {
+    union {
+        struct { s32 unk0; };
+        struct { u8 _hp_unk4[__builtin_offsetof(CAITargets, m_Sight.m_pTarget)]; sptr unk4; };
+        struct { u8 _hp_unk4C[__builtin_offsetof(CAITargets, m_Path.m_Angle)]; s32 unk4C; }; /* N64 0x4C */
+        u8 _hp_whole[sizeof(CAITargets)];
+    };
+} Info00403144;
+#else
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 unk4;
@@ -8,6 +20,7 @@ typedef struct {
     /* 0x4C */ s32 unk4C;
     /* 0x50 */ u8 pad1[0x88 - 0x50];
 } Info00403144;
+#endif
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC7];
@@ -22,7 +35,7 @@ void AI_TurnClamped(sptr a0, Item00403144 *item, f32 a2, s32 a3);
 s32 AI_IsAimedAt(sptr a0, Item00403144 *item, sptr a2, f32 a3);
 void CAI__SetMode(sptr a0, Item00403144 *item, s32 a2);
 
-static __inline__ s32 func_00403774_inline(s32 a0, Item00403144 *item, s32 a2) {
+static __inline__ s32 func_00403774_inline(sptr a0, Item00403144 *item, sptr a2) {
     s32 result;
 
     if (gMantidQueen.blink == 0) {
@@ -33,7 +46,7 @@ static __inline__ s32 func_00403774_inline(s32 a0, Item00403144 *item, s32 a2) {
     return result;
 }
 
-void MantidQueen_UpdateTurn(s32 a0, Item00403144 *item) {
+void MantidQueen_UpdateTurn(sptr a0, Item00403144 *item) {
     Info00403144 info;
     s32 side;
 

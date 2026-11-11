@@ -4,7 +4,7 @@
 #include "protos/ai.h"
 
 
-void Turret_Hurt(s32 arg0, CAI *arg1, DamageEvent *arg2) {
+void Turret_Hurt(sptr arg0, CAI *arg1, DamageEvent *arg2) { /* sptr: the actor (soak S11, --high-memory) */
     s32 var_v1;
 
     var_v1 = arg1->m_Health - arg2->damage;

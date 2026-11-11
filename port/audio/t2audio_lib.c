@@ -244,6 +244,9 @@ void _removeEvents(ALEventQueue *evtq, ALSoundState *state) {
 
 /* func_0028FA00 (state at 0x2C) */
 s32 alCSPGetState(ALCSPlayer *seqp) {
+    if (seqp == NULL) {
+        return 0; /* AL_STOPPED: audio off */
+    }
     return seqp->state;
 }
 
@@ -298,6 +301,9 @@ s32 alSaveParam(void *filter, s32 paramID, void *param) {
 
 static void csp_post(ALCSPlayer *seqp, ALEvent *evt) {
     void alEvtqPostEvent(ALEventQueue *evtq, ALEvent *evt, ALMicroTime delta);
+    if (seqp == NULL) {
+        return; /* audio off (no --audio): no sequence players; the menus still stop the music (soak S1) */
+    }
     alEvtqPostEvent(&seqp->evtq, evt, 0);
 }
 /* func_00290E90 */

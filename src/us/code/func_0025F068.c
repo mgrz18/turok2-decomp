@@ -1,11 +1,22 @@
 #include "common.h"
 #include "structs/game_object.h"
 
+#ifdef TARGET_PORT
+/* the view at the host offsets of CAITargets (soak S7: AI_UpdateTargets wrote the host CAITargets
+ * over a 0x88-byte local and the caller's saved obj/ai: a crash in the next line) */
+typedef struct {
+    union {
+        struct { u8 _hp_unk8[__builtin_offsetof(CAITargets, m_Sight.m_Angle)]; s32 unk8; }; /* N64 0x08 */
+        u8 _hp_whole[sizeof(CAITargets)];
+    };
+} TargetInfo;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x8];
     /* 0x08 */ s32 unk8;
     /* 0x0C */ u8 padC[0x88 - 0xC];
 } TargetInfo; /* size 0x88 */
+#endif
 
 void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, TargetInfo *info, s32 a, s32 b);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */

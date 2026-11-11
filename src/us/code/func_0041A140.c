@@ -12,7 +12,7 @@ extern void Sound__SetForce2D(s32 on);
 extern void Controller_DisableMenuSounds(void);
 
 /* Opens the menu gSoundOptionsMenuDesc, switching the music (restored by SoundMenu_GoBack). */
-s32 PauseMenu_SoundOptions(s32 arg0, s32 arg1, s32 arg2) {
+s32 PauseMenu_SoundOptions(sptr arg0, sptr arg1, sptr arg2) {
     Sound__StopAllExcept(300);
     Sound__DisableAmbientTrack();
     sSoundMenuSavedTrack = Music_GetTrack();

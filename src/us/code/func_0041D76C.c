@@ -9,7 +9,7 @@
 
 
 extern void PlayerOptions_SetDefaultName(void *options);
-extern void MenuItem_SelectSubmenu(s32 menu, Menu *c, s32 pool);
+extern void MenuItem_SelectSubmenu(sptr menu, Menu *c, sptr pool);
 
 /* Name entry: confirm. Copies the name (blanks for unused characters) into the setup slot;
  * an empty name resets the player's options. */
