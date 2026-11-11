@@ -4,6 +4,25 @@
 #include "structs/intelligence.h"
 #include "globals/game.h"
 
+#ifdef TARGET_PORT
+/* The host (round 10 y3, docs/port/FIDELITY.md 5): the view at the host offsets of CAI
+ * (tools/port/hostview.py). By N64 offset, the aggression (0xC8) landed inside the host CAI's
+ * earlier members (pointers widen the CAI before it) and every enemy kept m_Aggression 0: its
+ * projectile attack delay was 60 instead of 15 (EnemyMode_Attack_Enter), so demo 1's enemies
+ * shot less often than on the N64, and the aggression-scaled dodges and stuns differed. */
+#include "structs/game_object.h"
+typedef struct Dest {
+#define T2_HOFF_Dest(m) __builtin_offsetof(CAI, m)
+    union {
+        struct { u8 _hp_health[T2_HOFF_Dest(m_Health)]; s32 health; }; /* N64 0x4 */
+        struct { u8 _hp_maxHealth[T2_HOFF_Dest(m_InitialHealth)]; s32 maxHealth; }; /* N64 0x8 */
+        struct { u8 _hp_handle[T2_HOFF_Dest(m_VisBits)]; s32 handle; }; /* N64 0xC */
+        struct { u8 _hp_unk10[T2_HOFF_Dest(m_TranqHealth)]; s8 unk10; }; /* N64 0x10 */
+        struct { u8 _hp_level[T2_HOFF_Dest(m_nTexture)]; s8 level; }; /* N64 0x11 */
+        struct { u8 _hp_unkC8[T2_HOFF_Dest(m_Aggression)]; u8 unkC8; }; /* N64 0xC8 */
+    };
+} Dest;
+#else
 typedef struct Dest {
     char pad0[4];
     s32 health;        /* 0x04 */
@@ -14,6 +33,7 @@ typedef struct Dest {
     char pad12[0xC8 - 0x12];
     u8 unkC8;          /* 0xC8 */
 } Dest;
+#endif
 
 
 /* Initial health and level of an actor from its definition, scaled by difficulty. */
