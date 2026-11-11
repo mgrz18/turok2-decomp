@@ -7,11 +7,21 @@
 #include "protos/ai.h"
 
 /* The ridden creature (an AI actor). */
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+/* The host view (STABILITY.md section 7): the mount's CAI and its mode at their host offsets
+ * (the N64 view put them at 0x140 and 0x174). */
+typedef union {
+    struct { u8 _h_ai[__builtin_offsetof(CGameObjectInstance, m_AI)]; u8 ai[0x34]; };
+    struct { u8 _h_state[__builtin_offsetof(CGameObjectInstance, m_AI.m_Mode)]; s8 aiState; };
+} Mount;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x140];
     /* 0x140 */ u8 ai[0x34];
     /* 0x174 */ s8 aiState;
 } Mount;
+#endif
 
 extern f32 D_800AE344;          /* step length */
 extern f32 D_800ADDE4;          /* charge speed: gRidingForwardMoveTuning.forwardMax, its own symbol (through the struct 4 words differ) */
