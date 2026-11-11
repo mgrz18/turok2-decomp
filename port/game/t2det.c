@@ -1,16 +1,21 @@
 /* t2det.c: DEBUG-ONLY determinism trace for `turok2 --game` (round 9 x4, docs/port/MACOS.md section 11).
  * Called from game.cpp between retraces, while every game thread is blocked. */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE /* dladdr (T2_RNG_TRACE) on glibc */
+#endif
 #include "common.h"
 #include "structs/world.h"
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/intelligence.h"
+#include "structs/particle.h"
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dlfcn.h>
 
 /* T2_DET_LOG=N (round 9 x4, DEBUG-ONLY): a determinism trace to diff between hosts. Every N frames
  * (from T2_DET_FROM, default 0) one line with the exact bits of the RNG seeds, the first player
@@ -60,13 +65,14 @@ static u64 T2Det_Actor(u64 h, CGameObjectInstance *o, const char *kind, int i, i
 }
 
 void T2Port_LogDet(int frame) {
-    static int sFrom = -1, sVerbose;
+    static int sFrom = -1, sVerbose, sParticles;
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
     u64 h = 0xCBF29CE484222325ull;
     int i, n = 0;
     if (sFrom < 0) {
         sFrom = getenv("T2_DET_FROM") != NULL ? atoi(getenv("T2_DET_FROM")) : 0;
         sVerbose = getenv("T2_DET_ACTORS") != NULL;
+        sParticles = getenv("T2_DET_PARTICLES") != NULL; /* one line per live particle */
     }
     if (frame < sFrom) {
         return;
@@ -93,6 +99,58 @@ void T2Port_LogDet(int frame) {
             h = T2Det_Actor(h, &li->m_Instance, "dyn", k, sVerbose);
         }
     }
-    printf("det: frame %d actors %d hash %016llx\n", frame, n, (unsigned long long) h);
+    {
+        /* round 10 y4: the particle pool (position, velocity, flags of all 128 slots; free slots
+         * keep their last values, the same on every host), so a shot that flies differently
+         * shows up before it hits something */
+        u64 hp = 0xCBF29CE484222325ull;
+        int k;
+        for (k = 0; k < 128; k++) {
+            CParticle *pt = &gScene.m_ParticleSystem.m_ParticleVars[k];
+            hp = T2Det_Mix(hp, T2Det_Bits(pt->header.m_vPos.x));
+            hp = T2Det_Mix(hp, T2Det_Bits(pt->header.m_vPos.y));
+            hp = T2Det_Mix(hp, T2Det_Bits(pt->header.m_vPos.z));
+            hp = T2Det_Mix(hp, T2Det_Bits(pt->m_vVelocity.x));
+            hp = T2Det_Mix(hp, T2Det_Bits(pt->m_vVelocity.y));
+            hp = T2Det_Mix(hp, T2Det_Bits(pt->m_vVelocity.z));
+            hp = T2Det_Mix(hp, pt->m_dwFlags);
+            if (sParticles && pt->m_pEffect != NULL) {
+                printf("det:  ptcl %d pos %08x %08x %08x vel %08x %08x %08x fl %x\n", k,
+                       T2Det_Bits(pt->header.m_vPos.x), T2Det_Bits(pt->header.m_vPos.y),
+                       T2Det_Bits(pt->header.m_vPos.z), T2Det_Bits(pt->m_vVelocity.x),
+                       T2Det_Bits(pt->m_vVelocity.y), T2Det_Bits(pt->m_vVelocity.z), (unsigned) pt->m_dwFlags);
+            }
+        }
+        printf("det: frame %d actors %d hash %016llx ptcl %016llx\n", frame, n, (unsigned long long) h,
+               (unsigned long long) hp);
+    }
     fflush(stdout);
+}
+
+/* T2_RNG_TRACE=F1..F2 (round 10 y4, DEBUG-ONLY): one line per Random_Next call in host frames
+ * F1..F2: the frame, the seed before the call, and the caller's return address (absolute, and
+ * relative to its image: `atos -o turok2 -l BASE ADDR` on macOS, `addr2line -fe turok2 ADDR` on
+ * Linux). Diffing two hosts' traces names the caller that draws a different number of times. */
+extern int gT2HostFrame;
+
+void T2Port_RngTrace(void *ra) {
+    static int sLo = -2, sHi;
+    Dl_info info;
+    if (sLo == -2) {
+        const char *s = getenv("T2_RNG_TRACE");
+        sLo = -1;
+        if (s != NULL) {
+            sLo = atoi(s);
+            sHi = strstr(s, "..") != NULL ? atoi(strstr(s, "..") + 2) : sLo;
+        }
+    }
+    if (sLo < 0 || gT2HostFrame < sLo || gT2HostFrame > sHi) {
+        return;
+    }
+    if (dladdr(ra, &info) != 0 && info.dli_fbase != NULL) {
+        printf("rng: frame %d seed %08x ra %p off %lx %s\n", gT2HostFrame, (unsigned) gRandomValue, ra,
+               (unsigned long) ((char *) ra - (char *) info.dli_fbase), info.dli_sname ? info.dli_sname : "?");
+    } else {
+        printf("rng: frame %d seed %08x ra %p\n", gT2HostFrame, (unsigned) gRandomValue, ra);
+    }
 }
