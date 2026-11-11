@@ -74,7 +74,7 @@ Options (`turok2 --game`):
 - `--pak-blank` (a blank formatted Controller Pak in memory), `--pak-dir DIR` (the paks are
   `DIR/turok2_pak<N>.mpk`, written on the first save, N64 byte order: `tools/port/mpk_saves.py
   FILE.mpk` checks the save notes), `--no-pak`.
-- `--audio` / `--wav out.wav`; `--high-memory` (Linux: host pointers above 4 GB);
+- `--audio` / `--wav out.wav`; game memory above 4 GB by default since round 9 (x5), `--low-memory` (Linux debug: below 2 GB; `--high-memory` still accepted);
   `--offscreen-gl` (**macOS**: pixels with no window); `--no-window`; `--bench [FROM]`,
   `--pace` ([PERF.md](PERF.md)).
 - Debug switches (port/game/t2debug.c, t2bosslog.c and game.cpp, **debug only**):
@@ -2341,3 +2341,39 @@ exclusion list, in two blocks before the scheduler's). src/ (asm_diff 0 against 
 func_0029FCF4.c, func_002912F0.c, func_00295304.c, func_0029546C.c, func_00294E70.c,
 func_002953B4.c, func_00295410.c. `--high-memory` on Linux still stops in `CHeap__Free` from
 the decompressor, with or without `--audio` (not audio).
+
+## Round 9, part x5: stability: soak runs, 13 crash classes, high memory by default (branch names-R9_x5)
+
+Detail: [STABILITY.md](STABILITY.md). Every src change is `TARGET_PORT` or `s32` -> `sptr`;
+`tools/asm_diff.py --base 5437cfc0 -j 8` 0 on every touched file; no `include/` or archive change.
+**Merge needs: gendata changed (`grow_bss_tails`, two audit lists in data_report.txt): drop
+decls.json and rerun gendata.**
+
+- `tools/port/soak.py`: attract / newgame / warp runs with random but valid input, under gdb,
+  crashes deduplicated by their top frames (`crashes.txt`, `summary.json`, a `cmd.sh` per run).
+- Fixed classes S1-S13 (STABILITY.md section 3): the audio-off music stop (quit to title), the
+  second camera (`NEXT_CAMERA`), **the cinema player laid over the menu globals** (gendata: the
+  0x100 bytes after `gBlindOne`: every cinema end could call garbage), `Menu::controller` written
+  over `Menu::desc`, `CBarrel__ShouldClose`, `CAITargets` locals smaller than the host struct
+  (stack smash in the enemy idle modes and the boss modes), the strip wheel past 36 slots, the
+  ladder jump with no intelligence, and the `--high-memory` truncations of the menu callbacks
+  (31 files), `Turret_Hurt`, the delayed level events and `Player_DrawNodeCallback`.
+- Totals (final binary): attract 100,000 frames x 4 runs (high and low memory): 0 crashes;
+  160 new games of 36,000 frames (seeds 0-79, both memories): 156 clean, 2 open classes (a texture
+  key that is a host address in level 46, the death cinema HUD overlay); 80 debug-warp runs: 7 open
+  classes (STABILITY.md section 4). At the start: 6 of 8 new games and both attract loops crashed.
+- **`--high-memory` is the default** (port/app/main.cpp); `--low-memory` is the Linux debug flag
+  (the executable is still non-PIE: the statics stay below 2 GB). Checked with it: the boot loop
+  with `--draw` (the same mode switches, the title again at 25,778), w2's level-52 kills.
+- gendata audit (w4's): the list of typed symbols larger than their N64 extent with foreign aliases
+  (42; `__osThreadTail`, `gCrashFont`, `gThreadStackMain`... none used by the port's paths) is
+  printed, not changed.
+
+Files others may touch (merge): tools/port/gendata.py (local: `grow_bss_tails`, the report),
+port/app/main.cpp (the memory flags), func_00413230.c (`MenuItem_SelectSubmenu`'s signature only),
+func_0025F068.c / func_00403144.c / func_004032E4.c / func_0040DC38.c / func_00446C38.c /
+func_00442A64.c (boss/enemy AI: x2), func_00250EC0.c (player climb), func_0024BF1C.c (the wheel).
+Scripts that pass `--high-memory` still work; the docs' "low memory" runs are now `--low-memory`.
+
+Next: the open classes (SetupAnimation's CAI callback after a warp, the texture key, the overlay
+script), a PIE build on Linux, `--draw` soak runs (the GL path), the foreign-alias list.

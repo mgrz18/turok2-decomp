@@ -7,7 +7,7 @@ thread's backtrace. Crashes are deduplicated by their top game frames.
 
     python3 tools/port/soak.py --exe OUT/build/app/turok2 --archive OUT/turok2.o2r \
         --rom baserom.us.z64 --out OUT/soak [--kind attract|newgame|warp] [--seeds 0:40]
-        [--frames N] [--high-memory] [--draw] [--jobs 4] [--warps OUT/warp_dests.json]
+        [--frames N] [--low-memory | --both-memory] [--draw] [--jobs 4] [--warps OUT/warp_dests.json]
 
 Kinds:
   attract  no input: the boot loop and the demos (use --frames 100000)
@@ -17,7 +17,7 @@ Kinds:
   warp     newgame + T2_WARP_TO with 1-3 random warp ids from warp_dests.json (levels.py),
            T2_GIVE_WEAPONS=1 and T2_WAKE_ENEMIES=1500
 
-Everything a run needs to be repeated is in OUT/<kind>-<seed>[-hm]/cmd.sh (input.txt, env).
+Everything a run needs to be repeated is in OUT/<kind>-<seed>[-lm]/cmd.sh (input.txt, env).
 The summary is OUT/summary.json and OUT/crashes.txt (one entry per crash class: the key,
 the runs that hit it and one backtrace).
 """
@@ -98,7 +98,7 @@ def gen_play(rng, start, end):
     return out
 
 
-def make_run(kind, seed, frames, warps, hm):
+def make_run(kind, seed, frames, warps):
     rng = random.Random(seed * 7919 + {"attract": 1, "newgame": 2, "warp": 3}[kind])
     env = {}
     items = []
@@ -166,12 +166,12 @@ def crash_key(sig, frames, depth=4):
 
 
 def run_one(job):
-    a, kind, seed, hm = job
-    tag = "%s-%d%s" % (kind, seed, "-hm" if hm else "")
+    a, kind, seed, lm = job
+    tag = "%s-%d%s" % (kind, seed, "-lm" if lm else "")
     d = os.path.join(a.out, tag)
     os.makedirs(d, exist_ok=True)
     frames = a.frames
-    env, items = make_run(kind, seed, frames, a.warp_ids, hm)
+    env, items = make_run(kind, seed, frames, a.warp_ids)
     if a.env:
         for kv in a.env:
             k, v = kv.split("=", 1)
@@ -183,8 +183,8 @@ def run_one(job):
             os.path.abspath(a.rom), "--game", "--pak-blank", "--frames", str(frames)]
     if items:
         args += ["--input", "@" + os.path.abspath(os.path.join(d, "input.txt"))]
-    if hm:
-        args.append("--high-memory")
+    if lm:
+        args.append("--low-memory")  # Linux debug: the game memory below 2 GB (the default is high)
     if a.draw:
         args.append("--draw")
         env.setdefault("SDL_VIDEODRIVER", "offscreen")
@@ -228,7 +228,7 @@ def run_one(job):
     for m in re.finditer(r"^\s*frame (\d+):|^game: frame (\d+):|^state: f(?:rame)? ?(\d+)", out, re.M):
         last_frame = int(next(g for g in m.groups() if g))
     levels = sorted(set(int(x) for x in re.findall(r"\blevel (\d+)", out)))
-    res = {"tag": tag, "kind": kind, "seed": seed, "high_memory": hm, "rc": rc, "secs": round(dt, 1),
+    res = {"tag": tag, "kind": kind, "seed": seed, "low_memory": lm, "rc": rc, "secs": round(dt, 1),
            "last_frame": last_frame, "levels": levels[:40], "env": env}
     if sig:
         res["signal"] = sig
@@ -246,8 +246,8 @@ def main():
     ap.add_argument("--kind", default="newgame", choices=["attract", "newgame", "warp"])
     ap.add_argument("--seeds", default="0:8", help="A:B (B exclusive)")
     ap.add_argument("--frames", type=int, default=30000)
-    ap.add_argument("--high-memory", action="store_true")
-    ap.add_argument("--both-memory", action="store_true", help="every seed low AND high memory")
+    ap.add_argument("--low-memory", action="store_true", help="--low-memory (Linux debug; high memory is the default)")
+    ap.add_argument("--both-memory", action="store_true", help="every seed with the default (high) AND --low-memory")
     ap.add_argument("--draw", action="store_true", help="--draw (SDL offscreen, vblank_mode=0)")
     ap.add_argument("--jobs", type=int, default=4)
     ap.add_argument("--timeout", type=int, default=1800)
@@ -262,7 +262,7 @@ def main():
         a.warp_ids = sorted(set(w["warp_id"] for w in json.load(open(a.warps))))
     s0, s1 = (int(x) for x in a.seeds.split(":"))
     os.makedirs(a.out, exist_ok=True)
-    mems = [False, True] if a.both_memory else [a.high_memory]
+    mems = [False, True] if a.both_memory else [a.low_memory]
     jobs = [(a, a.kind, s, hm) for s in range(s0, s1) for hm in mems]
     results = []
     with cf.ThreadPoolExecutor(a.jobs) as ex:
