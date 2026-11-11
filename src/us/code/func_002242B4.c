@@ -8,6 +8,9 @@
 #include "structs/world.h"
 #include "protos/iset.h"
 #include "protos/scene.h"
+#ifdef TARGET_PORT
+#include "structs/region.h"
+#endif
 typedef struct Shared_ParticleLighting Shared_ParticleLighting;
 struct Shared_ParticleLighting {
     u8 ambient[3], reserved3;
@@ -25,5 +28,13 @@ u32 CScene__GetRegionIndex(CScene *arg0, sptr arg1) {
     }
     offset = ((char *)CISet__GetBlock(arg0->m_pRegionData, 2)) + 8;
     result = arg1 - offset;
+#ifdef TARGET_PORT
+    /* the host CGameRegion stride (0x40: three pointer pairs), as CScene__GetRegion indexes it; the
+     * N64's >> 5 gave twice the index, so a cinema that saved the player's region
+     * (Cinema_Start) restored him into another region or past the table (round 9 x2: the
+     * camera's region read floats and crashed after the Mother's phase-2 cinema) */
+    return (u32) (result / (sptr) sizeof(CGameRegion));
+#else
     return (u32)result >> 5;
+#endif
 }
