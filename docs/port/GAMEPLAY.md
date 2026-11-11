@@ -427,3 +427,88 @@ type on the N64); `tools/asm_diff.py --base d3f05a74 -j 8` 0 over the whole tree
 5. Why no trigger wakes demo 1's enemies along the demo's own path (gdb on
    `LevelEvent_ProcessTriggers` after the level loads: the region-info ids with events, 4/9/10,
    are not on the path; probably correct).
+
+## 9. Round 8, part w2: the player kills enemies
+
+Branch names-R8_w2. Every src/include change is `TARGET_PORT` or an `s32` -> `sptr` retype (the
+same type on the N64); `tools/asm_diff.py --base 5bf03fd0 -j 8` reports 0 over all 3,938 files.
+**The archive must be rebuilt** (`structs/intelligence.h`: the enemy drop masks; sha1
+`b6b9d484e6f97718e48ddc6d7f0ce9188dbb11c5`) and `decls.json` deleted.
+
+### 9.1 The test
+
+Level 52 (warp 1098), the corridor west of the 0xC8 enemy 11, enemies 11 and 12 woken, the
+player turned to the nearest live enemy every frame, Z held in bursts (`fight.txt`:
+`START@4400 A@4500 A@4700 A@4800`, then `Z@13320..13420`, `Z@13460..13560`... every 140 frames
+to 14600):
+
+```sh
+T2_WARP_TO=1098 T2_GIVE_WEAPONS=1 T2_WEAPON=4 T2_TELEPORT="13300:-1143.6,0,-2034.7" \
+T2_WAKE_ENEMIES=500 T2_FACE_NEAREST=1500 T2_STATE_LOG=30 T2_ACTOR_LOG=2 \
+turok2 ... --game --draw --pak-blank --frames 14800 --input @fight.txt
+```
+
+Without `--input` firing (only the new game) the same setup shows the enemies' side: they
+run at the player (mode 4), melee him (modes 14/19) and his health goes 100 -> 20 by frame
+14,970 (w1 owns the player's side: damage flash, death).
+
+### 9.2 Fix table (w2)
+
+| # | where | cause | fix |
+|---|---|---|---|
+| w2-1 | no shot ever hit an enemy (the bullets passed through; `CParticle__HitTarget` never ran) | `Sweep_TestBox` (func_0023FDF0) read each node box's centre as the s16 halves at 0x18 of the joint's fixed-point `Mtx`: the host keeps the Mtx as host-order u32 words (as `CMtxF__FromMtxAffine` reads it), so the view read y, x, w | the halves of words 6 and 7 (as func_00235C30's decals already did) |
+| w2-2 | the first kill crashed in `GameObject_GetDeadCollisionHeight` | the definition at the instance's N64 0x14 | host body |
+| w2-3 | `EnemyAI_OnDamage` (func_0025B2D4) | its `Object` view (an instance or a particle): the type id, flags, the particle owner, the hot-point flags at N64 offsets (the definition only matched by alignment luck) | host view (CGameObjectInstance, the owner at `CParticle.m_pOwner`) |
+| w2-4 | `EnemyAI_OnHit` (func_0025CAC8) | `Projectile` view: owner, charge at N64 CParticle offsets | hostview.py |
+| w2-5 | `EnemyAI_PickDeathMode` (func_0025B078) | `Source`: flags and owner at N64 offsets (its `HitInfo` matches the host `DamageEvent` by alignment) | hostview.py |
+| w2-6 | `EnemyAnim_PickDeath` (func_0025DF04) | `AttackState` (CAI flags, anim, the behaviour index inside m_VarBuffer); the region as s32 | host views, the region pointer-wide |
+| w2-7 | corpses stayed in mode 52 forever, nothing dropped | `EnemyMode_Death_Update` (func_0025E248): its CAI view read the animation's repeat count, mode and time at N64 offsets, its instance flags at N64 0xD4 (it wrote them into the wrong field) | host views: the death animation ends, `AI_DropPickupsOnce`, mode 60 (`EnemyMode_DeathMelt_Update`: the corpse sinks and stops drawing) |
+| w2-8 | `EnemyAnim_ExtremeDeath` (func_0025FD98, the gib deaths' animation picker) | N64 0x14 / CAI 0x36 | host body |
+| w2-9 | `AI_UpdateRegionFlags` (func_00242E34: region damage) | `Dest`: the damage timer at N64 CAI 0xCC | hostview.py (`m_DeathRegionTimer`) |
+| w2-10 | `AI_StartSound`/`AI_StopSound` (func_00246860, func_00246918) | the AI's looping sound at N64 CAI 0xEC and the sound node's id at N64 0xC: every enemy death wrote 0 into the host CAI | host bodies on `m_pAttachedLoopingSound` / `SndSource.sound` |
+| w2-11 | the enemy drop masks | `CEnemyIntelligence` 0x0C was `s16 unk0C; u8 pad0E[2]`: the archive swapped a u32 bit mask (sDropPickups bits, all 32 used) as a half and two bytes | `u32 m_DropMask; u32 m_DropMask2` (no N64 code read the old names): **archive rebuilt** |
+| w2-12 | no enemy chased the player: woken and alerted, they stood in mode 10 (the level-52 0xC8 "stuck in mode 10") | `REGION_WORD` read `{u16 m_nInfo, u16 m_wFlags}` as one host u32: `Sweep_CrossRegionEdge`'s closed-edge test `(word & 6) == 2` tested the info index, so `Path_FindRegionPath` found no region path, `AI_UpdatePathHeading` failed, `AI_FindBestTarget` gave no path target (path kind 3, the home point) and `EnemyAI_PickAttack` never had one for a melee | the big-endian word built from the members on `TARGET_PORT` (structs/region.h; also func_00400000) |
+| w2-13 | `AI_HearNoise` (func_0025E52C): no enemy was ever alerted | the behaviour table and the alert timer at N64 CAI offsets | **the same fix as w1's 8afda2c4: take w1's** (my copy is not committed) |
+| w2-14 | the first melee crashed in `EnemyAnim_PickAttack_B0A60` (func_0025A304) | definition at N64 0x14 (`M2C_FIELD`) | host body |
+| w2-15 | `EnemyAI_CurrentHasComboEndAnim` (func_00260360) | N64 0x14, CAI 0x34/0x133 | host body |
+| w2-16 | `--high-memory` | `EnemyAnim_PickAttack_B0E80/_B1200`, `EnemyAI_TurnToPoint`, `EnemyAI_CheckGrab` took the actor as s32; `EnemyAI_CheckGrab`/`EnemyAI_GetGrabbed` kept the grabbed throwable in the u32 `m_VarBuffer[2]` | sptr; `m_Enemy.m_pGrabbed` |
+
+### 9.3 What runs (Linux, headless)
+
+- **The pistol fight** (above, 14,800 frames, exit 0): enemy 12 is hit at 13,350 (hp 20 -> 15:
+  `CParticle__HitTarget` -> `EnemyAI_OnHit`, `ImpactEvent_DirectDamage` ->
+  `ImpactEvent_ApplyBlast` -> `DamageEvent_Set` + `CAI__CallHurt` -> `EnemyAI_OnDamage`), enemy
+  11 flinches (mode 36, the arm wound), both die by 13,500 (mode 52, `EnemyAnim_PickDeath`'s
+  death animation 18), the corpses lie on the floor and at 14,130 enemy 11 enters mode 60 (the
+  melt: flags 0x100/0x2000 cleared). The player's health stays 100. Ammo 50 -> 12.
+- **Shotgun** (`T2_WEAPON=8`): one-shot kills, enemy 12 in mode 56 (0x38, the side death).
+  **Grenade launcher** (15): the explosion (flash, rings, the blast through
+  `ImpactEvent_ApplyBlast`) kills both, mode 52. **Cerebral bore** (13): fires, no kill in the
+  scripted test (it needs its lock-on). The gib deaths (modes 0x35/0x36) need the gore setting
+  (`gEngineApp_m_Settings.unk17`): not seen.
+- Screenshots (checked by eye, `R8_w2_*` in the scratchpad): the enemy in the crosshair with
+  red blood bursts from the pistol hits (13,401..13,521), the death fall and the corpse on the
+  floor (13,661..13,741), the shotgun hit and the grenade explosion.
+- **Drops**: `AI_DropPickupsOnce` runs at the end of the death animation; every enemy of levels
+  52 (0xC8, 0xC9) and 81 (0x190-0x192) has drop masks 0/0 (`T2_ACTOR_LOG` prints them now), so
+  nothing drops there; the destructibles' drops (func_00265D14) work (level 51: ids 1702, 2201,
+  2500).
+- **Kill counters**: single player has none to see; `TotemDefense_AddKill` (the totem defence
+  mode) is called from `EnemyAI_OnDamage`.
+
+### 9.4 Debug aids (DEBUG-ONLY)
+
+- `T2_FACE_NEAREST=R` (port/game/t2debug.c): every gameplay frame the first player turns to the
+  nearest live level enemy within R (default 2000): `pl->m_RotY += AI_AngleToPoint(pl, enemy)`;
+  prints `face:` when the target changes. Yaw only (level 52's corridor is flat).
+- `T2_ACTOR_LOG` lines end with `drop <mask>/<mask2>`.
+
+### 9.5 Next
+
+1. The enemies are black silhouettes near the player except under the muzzle flash (level 52's
+   dark corridor): compare the actor lighting (`G_MOVEMEM` lights) with an emulator.
+2. `EnemyAI_DrawNode` (func_0025ECDC) is still N64 offsets (0x98, the 0x18 stride, the node
+   record's 0xC/0x1B): find which enemies draw through it.
+3. Gore deaths (0x35/0x36, `EnemyAnim_ExtremeDeath`) with the gore option on; the cerebral bore
+   and the tranquilizer/charge dart reactions (`EnemyAI_OnHit` modes 0x1D/0x1F/0x20).
+4. An enemy with non-zero drop masks (other levels) to see a drop and its collection.
