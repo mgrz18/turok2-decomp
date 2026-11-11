@@ -11,11 +11,25 @@ typedef struct ParamsRecAt4 ParamsRecAt4;
 struct ObjectRecAt17C;
 typedef struct ObjectRecAt17C ObjectRecAt17C;
 struct ParamsRecAt4;
+#ifdef TARGET_PORT
+/* The host (round 10 y3, docs/port/FIDELITY.md 5): an impact event's 8-byte value arrives as two
+ * host-order words (the event values' convention: CEventValue in structs/particle.h, the
+ * animation events' s32[2] from the archive), word 0 the N64's first big-endian word. On the
+ * little-endian hosts the halves and bytes of each word sit in reverse order, so the fields
+ * that read them by position are declared reversed. (With the N64 order, every particle hit
+ * swapped radius and damage: demo 1's first enemy shot took 1 health instead of 8.) */
+struct ParamsRecAt4 {
+    s16 value;  /* the low half of word 0 */
+    s16 unk0;
+    s32 team;
+};
+#else
 struct ParamsRecAt4 {
     s16 unk0;
     s16 value;
     s32 team;
 };
+#endif
 struct Kind;
 struct Kind {
     s32 value;
