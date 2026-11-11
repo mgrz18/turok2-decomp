@@ -14,7 +14,14 @@
 #include "t2asset.h"
 #include "t2port.h"
 
+/* The PI decodes a 29-bit physical address: the game keeps flags in a key's top bits and the
+ * N64 DMA ignores them. CParticleSystem__Spawn ORs the draw layer into a texture key
+ * (`*bits |= layer << 30`): layer 2 (a model's translucent particles) requests 0x81AE935C for
+ * the ROM block 0x01AE935C (STABILITY.md S16: the loader aborted on it). */
+#define T2_PI_ADDR(a) ((a) & 0x1FFFFFFFu)
+
 void T2Port_ReadAsset(u32 address, void *dst, u32 len) {
+    address = T2_PI_ADDR(address);
     if (T2Asset_ReadInto(address, 0, dst, len) < 0) {
         fprintf(stderr, "t2: cartridge read %08X+%X: %s (backend %s)\n", address, len, T2Asset_Error(),
                 T2Asset_BackendName());
@@ -23,7 +30,7 @@ void T2Port_ReadAsset(u32 address, void *dst, u32 len) {
 }
 
 u32 T2Port_AssetHostSize(u32 key, u32 size) {
-    return T2Asset_HostSize(key, size);
+    return T2Asset_HostSize(T2_PI_ADDR(key), size);
 }
 
 /* VM_Alloc (t2boot.c): the N64 pages a ROM window in through the TLB (the audio control block
