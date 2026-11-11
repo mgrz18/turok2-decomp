@@ -48,6 +48,7 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
 #include "globals/scene.h"
 #include "structs/camera.h"
 #include "structs/menu.h"
+#include "protos/menu.h"
 #include "structs/controller.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -434,4 +435,21 @@ void T2Port_WakeEnemies(int frame, const char *spec) {
                    o->header.m_vPos.x, o->header.m_vPos.y, o->header.m_vPos.z, (unsigned) o->m_dwFlags);
         }
     }
+}
+
+/* T2_SAVE_PORTAL=F (DEBUG-ONLY, round 8 w5): at frame F, in gameplay, open the save portal menu
+ * (gSavePortalMenuDesc) for the first player, as CPlayerPool__Update does when a save portal's
+ * cinema (script 400) ends, to reach the game's own save path (PakMenu_InitSaveGame,
+ * SaveGame_Build, PakMenu_WriteSaveGame) without walking to a portal. Called every frame. */
+extern struct MenuDesc gSavePortalMenuDesc;
+void T2Port_SavePortal(int frame, const char *spec) {
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+
+    if (p == NULL || p->m_pCamera == NULL || gEngineApp.m_Settings.mode != 13 || frame != atoi(spec)) {
+        return;
+    }
+    printf("debug: frame %d: T2_SAVE_PORTAL: the save portal menu in level %d\n", frame, (int) gScene.m_nLevel);
+    fflush(stdout);
+    MenuPool_OpenMenu((struct MenuPool *) p->m_pCamera->m_MenuPool, &gSavePortalMenuDesc, (sptr) p,
+                      (sptr) p->m_ContState.m_pContState, 0);
 }

@@ -31,8 +31,24 @@ s32 Pak_FindNote(s32 ch, s32 index, s32 *exists, u8 *name, u8 *ext, s32 *size, u
     } else {
         *exists = 1;
         *size = gPakDirectories[ch].notes[index].file_size >> 8;
+#ifdef TARGET_PORT
+        /* the port: the codes are integers in the cached OSPfsState; the console copies their bytes, which are
+         * big-endian there ("NT2E", "51"). Spelled out high byte first so the text compares as on the console. */
+        {
+            u16 cc = gPakDirectories[ch].notes[index].company_code;
+            u32 gc = gPakDirectories[ch].notes[index].game_code;
+
+            company[0] = cc >> 8;
+            company[1] = cc;
+            code[0] = gc >> 24;
+            code[1] = gc >> 16;
+            code[2] = gc >> 8;
+            code[3] = gc;
+        }
+#else
         func_0029E460(company, &gPakDirectories[ch].notes[index].company_code, 2);
         func_0029E460(code, &gPakDirectories[ch].notes[index].game_code, 4);
+#endif
         DecodePakText(name, gPakDirectories[ch].notes[index].game_name, 16);
         DecodePakText(ext, gPakDirectories[ch].notes[index].ext_name, 4);
         code[4] = 0;

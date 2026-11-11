@@ -68,7 +68,12 @@ s32 GameNoteMenu_SelectYes(void *menu, Menu *c) {
         }
         gEngineApp_m_Game_m_PlayerList_m_bCinema[0] = 0;
         gEngineApp_m_Game_m_PlayerList_m_bCinema[1] = 0;
+#ifdef TARGET_PORT
+        /* the port: m_bCinema + 0x588 is gEngineApp_m_Game.m_MenuPool at the N64 offsets */
+        MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, &gPakMsgRumblePakDesc, (sptr) player, (sptr) player->m_ContState.m_pContState, 0);
+#else
         MenuPool_OpenMenu((u8 *) gEngineApp_m_Game_m_PlayerList_m_bCinema + 0x588, &gPakMsgRumblePakDesc, (sptr) player, player->m_ContState.m_pContState, NULL);
+#endif
         return 1;
     }
     if (Pak_DeleteNote(slot, gPakNoteIndex) == 0) {

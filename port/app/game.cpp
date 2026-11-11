@@ -33,6 +33,7 @@ void T2Port_GiveWeapons(void); // DEBUG-ONLY: T2_GIVE_WEAPONS=1 (t2debug.c)
 void T2Port_DebugWarp(int frame);
 void T2Port_Teleport(int frame, const char *spec);
 void T2Port_WakeEnemies(int frame, const char *spec);
+void T2Port_SavePortal(int frame, const char *spec);
 void T2Port_DebugSwitches(int skipPak, int startMode);
 }
 
@@ -608,6 +609,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         static const char* wake = getenv("T2_WAKE_ENEMIES");
         if (wake != nullptr) {
             T2Port_WakeEnemies(f + 1, wake); // DEBUG-ONLY: T2_WAKE_ENEMIES=R
+        }
+        static const char* savePortal = getenv("T2_SAVE_PORTAL");
+        if (savePortal != nullptr) {
+            T2Port_SavePortal(f + 1, savePortal); // DEBUG-ONLY: T2_SAVE_PORTAL=F
         }
         if (int m = T2Port_EngineMode(); m != mode) {
             printf("game: frame %d: engine mode %d -> %d\n", f + 1, mode, m);
