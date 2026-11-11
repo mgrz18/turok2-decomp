@@ -898,8 +898,19 @@ void Menu_Construct(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, 
 void Menu_MoveCursor(Menu *menu, u8 dir) {
     MenuItem *entry;
     s32 old;
+#ifdef TARGET_PORT
+    s32 guard = 0;
+#endif
     entry = &menu->items[menu->cursor];
     do {
+#ifdef TARGET_PORT
+        /* Port guard (STABILITY.md S15): with the cursor on an item that is no longer selectable
+         * (the save portal's "health" once taken) and a link of 0 in that direction, the loop
+         * never moves and the game thread spins forever. Stop after a full turn. */
+        if (++guard > menu->count + 1) {
+            break;
+        }
+#endif
         old = menu->cursor;
         menu->cursor += ((s8 *)entry)[dir];
         if (menu->cursor < 0) {
