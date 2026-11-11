@@ -622,3 +622,101 @@ dinosoid lit differently; the Mother) were w4-3.
   `sCrashCursorX`): worth a check.
 - `T2_DLDUMP_VTX=3`'s texture hash covers bytes past small palettes, so it differs between hosts
   where the image does not.
+
+## 11. Round 9 (part x4): the round-8 merged tree on the Mac, host determinism, the attract demos
+
+Branch `names-R9_x4` (from 5437cfc0). Every `src/` commit was checked on the box with
+`tools/asm_diff.py --base 5437cfc0 -j 8` (scratch copy `/root/R9_x4mac/repo`; `OUT/r9/asmcheck.sh`
+applies `git diff 5437cfc0 -- port src include tools` there): **0 differences** at every commit.
+No `include/` changes. The Linux runs for comparison are this branch built in `/root/R9_x4mac/out`
+(Debug, low memory, `/root/R9_x4mac/build.sh`, `FRESH=1` drops decls.json; `run.sh NAME FRAMES
+[args]`). The box's ELF is unchanged (sha1 `61dcdf3f…`); the archive is the box's round-8 one
+(`OUT/turok2_543.o2r`, sha1 `b6b9d484…`).
+
+Build on the Mac: `OUT/rebuild.sh --fresh` (about 35 s). Runs: `OUT/r9/battery.sh` (boot, journey,
+warp, fight, Mother, door, save then load, `--audio`), `OUT/r9/dets.sh` (the same scenarios with
+`T2_DET_LOG=1`), all headless (`--offscreen-gl` or `--no-window`).
+
+### 11.1 Fixes
+
+| # | where | cause | fix |
+|---|---|---|---|
+| x4-1 | **macOS crash** on the first save (`T2_SAVE_PORTAL`, SAVE GAME): `t2_memset` <- `SaveGame_Build` | `buf = (SaveGame *) *handle` with `s32 *handle`: the low half of `CMemEntry.data` | `*(SaveGame **) handle` under TARGET_PORT |
+| x4-2 | **macOS crash** when an enemy shot hits the player (demo 1 with `T2_TELEPORT`/`T2_WAKE_ENEMIES`, frame 6041): `CPlayer__OnParticleHit` | the hit callback `CPlayer__OnParticleHitCallback(actor, s32 aiFlags, s32 particle)`: the particle pointer truncated | `sptr` (both functions) |
+| x4-3 | **macOS crash** on the player's death cinema: `CCameraPool__ReleaseAllTexts` <- `Cinema_Start` | the text lists walked with `s32` links (`temp = *node`) and the camera list by `+ 4` (N64 `m_pNext`) | pointer-wide links, `T2_OFFSETOF(CCamera, m_pNext)` |
+| x4-4 | **all hosts**: every attract demo played garbage input from its first frame | gendata typed each demo (`gDemoTable` -> `DemoHeader *`) as a **table of DemoHeader** (27 of them in 0x438 bytes), so the whole demo was swapped as s16 pairs, the input bit streams too (`DemoStream_ReadBit` reads bytes MSB first) | gendata `HEADER_POINTEES`: the 0x28-byte header typed, the rest as bytes in ROM order. All 24 demos checked against the ROM |
+| x4-5 | **all hosts**: the stick weapon wheel closed on its first frame while A was held (state 2 -> 3 every other frame), so the stick turned the player instead of choosing; demo 1 then walked into the wall beside its door | `CBarrel__ShouldClose` was an N64-offset view (`self + 0x380` `m_bStickWheel`, `other + 0xA50` the controller) | host body by member |
+
+`T2_DET_LOG=N` (new, port/game/t2det.c, debug only): every N frames from `T2_DET_FROM` one line
+with the RNG seeds, the player's position/facing/velocity as **float bits**, health, mode, buttons,
+stick, and an FNV-1a hash over every level actor and pooled instance (position, facing, health, AI
+mode/action, animation index/frame, flags); `T2_DET_ACTORS=1` adds one line per actor. `%.1f` in
+`T2_STATE_LOG` hides drift; this does not.
+
+### 11.2 Host determinism: Mac = Linux, frame for frame
+
+`T2_DET_LOG=1` (every frame) on both hosts, host addresses masked, the same binary sources:
+
+| run | frames traced | lines that differ |
+|---|---|---|
+| boot, the 3 attract demos, the loop (no input) | 1-26,000 | **0** (before and after x4-4/x4-5) |
+| journey (bow, ramp, swim) | 12,800-15,000 | 0 |
+| warp 51 -> 52 -> 51 | 12,800-16,000 | 0 |
+| level-52 fight (kills) | 12,800-14,800 | 0 |
+| the Mother | 12,800-18,000 | 0 |
+| the door | 12,800-14,000 | 0 |
+| demo 1 with `T2_TELEPORT`/`T2_WAKE_ENEMIES` | 5,400-8,800 | 0 (after x4-2/x4-3; before them the Mac crashed at 6041, identical up to 6040) |
+
+Rendering does not feed back: `--offscreen-gl` and `--no-window` give the same trace on the Mac,
+and Linux with and without its SDL window agree too. So **there is no float divergence between
+x86-64 and arm64** in any of these runs (the game is built with `-ffp-contract=off`, and the
+arm64 float -> unsigned conversions were fixed in round 7, v4-4).
+
+**"Demo 1 kills an enemy on the Mac, not on Linux" (STATUS round 8) was not a host divergence.**
+On w4's branch it was the teleported demo-1 scenario (`T2_TELEPORT=5600:... T2_WAKE_ENEMIES=1500`),
+and the Mac's "kill" was a crash: on the merged tree it is x4-2 (the enemy's shot hitting the player
+crashed the Mac; Linux low memory carried on). The plain boot's demo 1 kills nothing on either host
+(checked on 08391f6f, names-R8_w4 and 5437cfc0 with the same trace, `OUT/r9/bis.sh`).
+
+### 11.3 The attract demos against the N64 (x3's mupen64plus reference)
+
+x3's reference frames (mupen64plus on the box, `/root/R9_x3/ref/s_d`, every 10 emulator frames from
+the title): the player stands facing a door with the war blade, opens the wheel, picks the PLASMA
+RIFLE, walks straight through the door into an amber room, meets the first enemy, takes damage
+(100 -> 51) and the demo ends. Before x4-4 the port played noise (the wheel open from the first
+frame, the player spinning). After x4-4 and x4-5, on both hosts:
+
+- frames 5,467-5,520: level 81, the war blade; A opens the wheel (~15 game frames in, as on the
+  N64); the plasma rifle (weapon 10, 150 cells) is picked at 5,586 with **no turn** (rotY -3.14 ->
+  -3.15);
+- 5,600-6,300: straight through the door ((1884, -2601) -> (1878, -1101)), the amber room; frame
+  6,302 is **the same view as the reference at the first enemy** (pipe, grating, the enemy on the
+  left, 100 / 150 on the HUD);
+- **then the enemies diverge**: on the N64 the first enemy is still turned away there; on the port
+  it already faces and attacks. The player takes more damage (100 -> 91 by 6,660, then 76 ... 0 at
+  7,920) and dies; the demo ends at 8,157 (it used to end at 8,800) instead of with 51 health.
+
+So the input path is right now; what remains is in the enemies (their wake-up/hearing or the RNG
+state at the demo's start: `Demo_Start` draws `Random_Next` and nothing reseeds it). Next: compare
+the RNG seeds and the enemy's AI mode at the first enemy against the emulator's RAM (mupen64plus
+debugger or a RAM dump at a known frame).
+
+New boot mode switches (both hosts): 5,467 demo 1 -> 8,157 legal; 13,035 demo 2 (level 131) ->
+15,040; 19,920 demo 3 (level 109) -> 21,127; the title again at 24,749.
+
+### 11.4 The round-8 runs on the Mac (merged tree + x4)
+
+All headless, all exit 0, no dlcheck reports: the boot (26,000); the journey (now ends at **(352.5,
+-780.7, 879.4), rotY -1.55**: with x4-5 the bow is chosen with no turn; the old (795.2, -781.5,
+-37.4) came from the stick turning the player while the wheel closed); the warp 51 -> 52 -> 51;
+the level-52 fight (enemies 11 and 12: 20 -> 0, death mode 52, melt); the Mother (61,440 -> 51,200,
+`parts 5/6`, the same as Linux); the door (the player through it at (1650.5, -307.2, 136.9)); save
+("SAVE WAS SUCCESSFUL", `mpk_saves.py`: NT2E 51 "TUROK 2" A, 90 pages, checksum OK) then a new boot
+loading it (level 51 at frame 4,555); `--audio --wav` 8,000 frames: 133.48 s, peak 32,768, RMS
+3,248.7 (the demo now plays its own sounds).
+
+### 11.5 Open on the Mac
+
+- Demo 1's enemies (11.3).
+- The x5 soak and the `--high-memory` checks on Linux cover what the Mac hits with full pointers;
+  x4-1..3 were all found by the Mac first (Linux low memory hides them).

@@ -200,6 +200,26 @@ Fixes on the merged tree (each `asm_diff` 0):
 8. Gore deaths, the cerebral bore and the dart reactions; an enemy with a drop; health pickups
    with a damaged player (now possible: w1's damage path).
 
+## Round 9, part x4: macOS and host determinism (branch names-R9_x4)
+
+Detail: [MACOS.md](MACOS.md) section 11. Commits (asm_diff 0 vs 5437cfc0): 8b8697a6 (`SaveGame_Build`:
+the save block pointer; the Mac crashed on the first save), 3f6328bc (`CPlayer__OnParticleHit(Callback)`
+pointer-wide; `CCameraPool__ReleaseAllTexts` pointer-wide links: Mac crashes when an enemy shot hits the
+player and on the death cinema), 792b59ec (`T2_DET_LOG=N`, `T2_DET_FROM`, `T2_DET_ACTORS`: per-frame
+trace with float bits, RNG and an actor hash), e96538c2 (**gendata `HEADER_POINTEES`**: the attract
+demos were typed as tables of `DemoHeader` and their input streams swapped as s16 pairs: every demo
+played noise), 11492a55 (**`CBarrel__ShouldClose` host body**: the stick wheel closed on its first frame
+and the stick turned the player). **Mac and Linux give the same per-frame trace** in every run (the
+boot with the 3 demos, journey, warp, fight, Mother, door, teleported demo 1): no float divergence.
+The round-8 "demo 1 kills on the Mac" was the Mac crashing on an enemy's hit (x4-2), not a divergence.
+**Demo 1 now follows the N64** (x3's reference): plasma rifle, straight through the door, the first
+enemy in the same view; then the enemies attack sooner than on the N64 and the player dies (7,920).
+**Merge notes**: `tools/port/gendata.py` (drop decls.json, rerun; report line "pointer targets typed
+as a header and raw bytes: 24"); the journey reference changes to (352.5, -780.7, 879.4) rotY -1.55;
+the boot's mode switches change (5,467 demo 1 -> 8,157; 13,035 demo 2; 19,920 demo 3; title 24,749).
+Files: src func_0041D890, func_0025689C, func_00253770, func_002819E0, func_00254F24; port/app/game.cpp
+(one hook), port/game/t2det.c (new).
+
 ## Round 8, part w1: enemies hurt the player, death and game over (branch names-R8_w1)
 
 Detail: [GAMEPLAY.md](GAMEPLAY.md) section 9. All src changes are `TARGET_PORT` (host bodies or
