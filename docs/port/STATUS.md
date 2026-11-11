@@ -220,6 +220,77 @@ Fixed on the merged tree (asm_diff 0 for each):
 7. `--high-memory` was run on the boot, the journey and the warp; run the enemies and the boss
    levels with it too.
 
+## Round 8, part w1: enemies hurt the player, death and game over (branch names-R8_w1)
+
+Detail: [GAMEPLAY.md](GAMEPLAY.md) section 9. All src changes are `TARGET_PORT` (host bodies or
+macros); `tools/asm_diff.py --base 5bf03fd0 -j 8` 0 for every touched file. No header in
+`include/` changed, no archive or gendata change (`decls.json` stays valid). One new port header,
+`port/include/t2_player_offsets.h`.
+
+The script (new game, then demo 1's level and its two type-0x190 enemies):
+
+```sh
+cd OUT && SDL_VIDEODRIVER=offscreen T2_STATE_LOG=60 T2_WARP_TO=-82 T2_WAKE_ENEMIES=1500 \
+  T2_TELEPORT="13300:2334.7,307.2,-1054.7;15400:2334.7,307.2,-1054.7;17500:2334.7,307.2,-1054.7" \
+  build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --pak-blank --frames 20000 \
+  --input "START@4400 A@4500 A@4700 A@4800 SX=80@13310..13358"     # (+ --draw for pixels)
+```
+
+(`T2_WARP_TO=-82` is level 81: a negative id is `~level`; the stick input turns the player
+toward the enemy for the screenshots.)
+
+What runs (Linux headless, low memory and `--high-memory`, no crash to frame 20,000):
+
+| frame | what |
+|---|---|
+| 13300 | the teleport onto the enemy's spawn point; the enemy wakes, is alerted (`act 1`) |
+| 13400-14340 | **15 hits**: 14 melee (mode 14, `ImpactEvent_AreaDamage` from its animation event) and 1 projectile (`CParticle__HitTarget`); health 100 -> 99 -> 97 -> 90 ... 6; each hit the red flash (`CCamera__SetHitFlash` 128/30), the pain sound 0x3AC0, rumble; the low-health speech 0x156 below 15 |
+| 14400 | health 0: `CPlayer__Kill`, player mode 19, the death camera falls to the floor (letterboxed) |
+| 14700 | the death cinema (level 164: Turok in the spirit void) |
+| 15300 | **respawn** at level 81's checkpoint (1884.2, -153.6, -2601.0), health 100, **lives 3 -> 2** (HUD `x2`) |
+| 16500 / 18660 | second and third deaths (lives 2 -> 1 -> 0; with 1 life left there is no cinema, as in the ROM) |
+| 18960 | player mode 15: the **GAME OVER** window (lives 0) |
+| 19500 | its countdown runs out: back to the legal screen and the boot sequence |
+
+`--audio --wav` over the same run to 15,500 frames: no crash; the death cinema is the loudest
+stretch (RMS 10,000-15,600).
+
+Fixes (in the order found):
+
+| # | where | cause | fix |
+|---|---|---|---|
+| w1-1 | `AI_HearNoise` (func_0025E52C) | `AlertState` view: the behaviour table/index at N64 CAI 0x130/0x133 | host body on CAI's members. **Enemies were never alerted** (`m_ActionTime` never rose, `m_Action` stayed 0): `AI_FindBestTarget` skips unalerted enemies for path targets, so `EnemyAI_PickAttack` never saw a path target and never chose melee; they only fired projectiles from point-blank range, which pass over the player (the hand is 121 units up, the template aims 11 degrees above the line: the ROM's behaviour) |
+| w1-2 | `GameObject_GetAimRotation` (func_002673CC) | `LevelActor.lockOn` (N64 0x1C0, `m_pSightTarget`) and the target's y offset (0x54, `m_CollisionYOffset`) read at N64 offsets | host body (correctness: the fallback to the nearest player hid it in demo 1) |
+| w1-3 | `GameObject_GetDeadCollisionHeight` (func_002683CC) | `m_pIntelligence` at N64 0x14: **the player's death crashed** (from `GameObject_GetCollisionHeight` once health is 0) | by member |
+| w1-4 | 9 player-state files with `P_S32(player, 0xAB8)`-style raw N64 offsets (`CPlayer__ResetControlState`, `CPlayer__ResetHeadSway`, `PlayerDeathWait_Update`, `PlayerState15_Enter`, `PlayerState17_Enter`, `PlayerJumpPad_Enter`, `PlayerWade_Enter(Alt)`, `CPlayer__RegenerateHealth`) | the host CPlayer is larger: N64 0xAB8 (`m_DesiredJumpAngle`) is `m_Data.m_CheckPointWarpID` on the host, so **every cinema reset the checkpoint to 0** and a death respawned in level 0; `PlayerState15_Enter` read the lives at 0x52A to pick game over / continue | the P_* macros map the N64 offset to the host member under TARGET_PORT (`port/include/t2_player_offsets.h`, `T2PlayerOff`; an unknown offset traps); the JumpPad region store and `Player_OnMultiplayerKill`'s `player + 0x140` too; `PlayerState17_Enter`'s controller pointer pointer-wide |
+| w1-5 | `GameOverMenu_Init` (func_0041A420), `CheatsMenu_Init` (func_0041A4D0) | the window's items + 0x30 / + 0x2D8 (MenuItem is larger on the host): **the game over window crashed** | `items[1].flags`, `items[18].flags` |
+| w1-6 | `CScene__Blast` (func_00223A94) | `Entity` view (the AI, health and mode at N64 0x140/0x144/0x174) | hostview.py on CListedInstance (not reached in a run) |
+
+Files others may touch (merge): func_0025E52C.c (AI_HearNoise: w2's enemy reactions depend on
+it), func_002673CC.c, func_00223A94.c, func_0041A420.c / func_0041A4D0.c (menus: w5),
+func_00255C80.c and func_00255E4C.c (the continue / multiplayer menus), func_002568CC.c.
+
+Open (next):
+
+1. **Level 52's type-0xC8 enemies** woken next to the player stay in mode 10
+   (`EnemyMode_Move_Update`) with the player as sight target and do not move (w2's subject).
+   The type-0x190 enemies of level 81 now walk, melee and fire.
+2. `Menu_Construct_2` (func_0044C230.c, the paged copy) still puts the items at N64 0x1D8 after
+   the window (func_00413230.c uses `MENU_SIZE` on the host): the menus built through it overlap
+   their window on the host.
+3. The level-81 enemies draw as black silhouettes with red eyes: check against the N64 (the
+   level is dark; lighting suspected).
+4. Region damage (lava, `AI_UpdateRegionFlags`' `m_DeathRegionTimer` view, func_00242E34) and
+   drowning were not run; fall damage was (health 100 -> 99).
+5. The continue path (a continue left: `gContinueMenuDesc`) was not reached: the game gives
+   none on a fresh game.
+
+Screenshots (640x480, checked by eye; not committed): the red hit flash over the enemy's
+silhouette with the HUD at 91 (13481), the enemy's glowing eyes at point-blank range (13511),
+the HUD falling 100 -> 98 -> 91 -> 45 -> 7, the letterboxed death camera on the floor (14401),
+the death cinema (14801), the respawn at the level start with `x2` and 100 (15321), the GAME
+OVER window over the level with `x0` and health 0 (18960-19320), the legal screen after it.
+
 ## Round 7, part v1: the particle system (branch names-R7_v1)
 
 `CParticleSystem__Spawn` and the particle path run on host types, so the **animation events
