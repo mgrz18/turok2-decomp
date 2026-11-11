@@ -139,9 +139,19 @@ void Sweep_TestBox(Sweep *sweep, HitInst *other, CVector3 *start, CBox *box) {
                 }
             }
             joint = &other->joints[i];
+#ifdef TARGET_PORT
+            /* the integer halves of the fixed-point Mtx's translation (round 8 w2): the host keeps
+             * the Mtx as host-order u32 words (CMtxF__FromMtxAffine reads them so), so the s16
+             * view at 0x18 read y, x, w: every node box was in the wrong place and no shot hit an
+             * enemy. Word 6 is x << 16 | y, word 7 z << 16 | w. */
+            centre.x = (s16) (((u32 *) joint)[6] >> 16);
+            centre.y = (s16) ((u32 *) joint)[6];
+            centre.z = (s16) (((u32 *) joint)[7] >> 16);
+#else
             centre.x = joint->pos[0];
             centre.y = joint->pos[1];
             centre.z = joint->pos[2];
+#endif
             radius = node->size * scale + 1.0f;
             if (big) {
                 radius *= 1.5f;

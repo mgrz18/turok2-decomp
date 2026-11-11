@@ -306,6 +306,48 @@ local (N64_EXTENT/RUNTIME_BSS, the Gfx w1 branch, the report line); drop decls.j
 gendata. func_00243170.c (CAI__UpdateModeAnim) may meet w2's death-path work. With ff7785b9 the
 boot's demo 1 kills an enemy at ~8200 and needs w2 58b5668a (EnemyAnim_PickDeath).
 
+## Round 8, part w2: the player kills enemies (branch names-R8_w2)
+
+Detail: [GAMEPLAY.md](GAMEPLAY.md) section 9. All src/include changes are `TARGET_PORT` or
+`s32` -> `sptr`; `tools/asm_diff.py --base 5bf03fd0 -j 8`: 0 over all 3,938 files.
+
+**Merge needs:** the archive rebuilt (`structs/intelligence.h`: `CEnemyIntelligence` 0x0C/0x10
+are the u32 drop masks `m_DropMask`/`m_DropMask2`): sha1
+`b6b9d484e6f97718e48ddc6d7f0ce9188dbb11c5`; `decls.json` deleted. `structs/region.h`
+(`REGION_WORD` on the host) rebuilds most of the game library.
+
+- **Shots hit enemies**: `Sweep_TestBox` read the node boxes' centres from the host `Mtx` as
+  N64 halves; fixed, the pistol/shotgun/grenade launcher hit, wound and kill level 52's 0xC8
+  enemies: blood, flinch (mode 36), death animations (modes 52/56), the corpse, the melt
+  (mode 60). The death path is on host types (`EnemyAI_OnDamage`, `EnemyAI_OnHit`,
+  `EnemyAI_PickDeathMode`, `EnemyAnim_PickDeath`, `EnemyMode_Death_Update`,
+  `EnemyAnim_ExtremeDeath`, `GameObject_GetDeadCollisionHeight`, `AI_StartSound/StopSound`,
+  `AI_UpdateRegionFlags`).
+- **The 0xC8 "stuck in mode 10"**: `REGION_WORD` (a big-endian `{u16 info, u16 flags}` word)
+  read as a host u32: every region edge looked closed to `Sweep_CrossRegionEdge`, so no enemy
+  found a path to the player (path kind 3, the home point). With it and the alert fix (w1's
+  `AI_HearNoise`, the same as mine) they run at the player and melee him: in level 52 his
+  health goes 100 -> 20 in 1,600 frames; in demo 1 (v3's teleport) the two 0x190 enemies kill
+  him (health 0 at frame 6,840), no crash to 8,600. Two more crashes on the melee path fixed
+  (`EnemyAnim_PickAttack_B0A60`, `EnemyAI_CurrentHasComboEndAnim`).
+- Debug-only: `T2_FACE_NEAREST=R` (aim at the nearest live enemy), the drop masks in
+  `T2_ACTOR_LOG`.
+- Regression (this branch, Linux headless, low memory): the 26,000-frame boot loop exit 0 (the
+  same mode switches, the title again at 25,778); demo 1 with v3's enemy switches to 8,600 exit 0;
+  **the firing journey (`journey_fire.txt`) exit 0 but its swim now ends at (795.2, -780.0,
+  -37.4) against a wall instead of round 7's (315.9, -793.4, -1352.3)**: the divergence starts
+  between 13,620 and 13,800 and goes away with the old `REGION_WORD` (checked), i.e. the closed
+  water-region edges now stop the player as `Sweep_CrossRegionEdge` intends (its test read the
+  info index before). Update the journey's reference positions after the merge.
+
+Files others may touch (merge): **func_0025E52C.c (`AI_HearNoise`): take w1's 8afda2c4, mine is
+the same fix and is not committed**; func_00242E34.c (`AI_UpdateRegionFlags`, region damage: w1
+may touch the player's side of it); func_0025B2D4.c (`EnemyAI_OnDamage`); include/structs/region.h,
+include/structs/intelligence.h; port/game/t2debug.c and port/app/game.cpp (debug switches).
+
+Next: GAMEPLAY.md 9.5 (enemy lighting near the player, `EnemyAI_DrawNode` still N64 offsets,
+the gore deaths, an enemy that drops something).
+
 
 ## Round 7, part v1: the particle system (branch names-R7_v1)
 

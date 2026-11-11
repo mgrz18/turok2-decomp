@@ -63,9 +63,8 @@ typedef struct CEnemyIntelligence {
     /* 0x00 (0x14) */ u32 m_dwFlags;
     /* 0x04 (0x18) */ u32 m_Health;
     /* 0x08 (0x1C) */ s32 m_StartAnim;
-    /* 0x0C (0x20) */ s16 unk0C;
-    /* 0x0E (0x22) */ u8 pad0E[2];
-    /* 0x10 (0x24) */ s32 unk10;
+    /* 0x0C (0x20) */ u32 m_DropMask;     /* sDropPickups bits: what it drops when it dies (AI_DropPickupsOnce) */
+    /* 0x10 (0x24) */ u32 m_DropMask2;    /* sDropPickups2 bits */
     /* 0x14 (0x28) */ f32 m_CollisionRadius;
     /* 0x18 (0x2C) */ f32 m_CollisionWallRadius;
     /* 0x1C (0x30) */ f32 m_CollisionHeight;

@@ -70,13 +70,15 @@ static void T2Port_LogOne(const char *kind, int i, CGameObjectInstance *o, CGame
         f32 dz = o->header.m_vPos.z - pl->header.m_vPos.z;
         d = sqrtf(dx * dx + dy * dy + dz * dz);
     }
-    printf("actor: %s %d it %d id %d fl %x aifl %x pos (%.1f %.1f %.1f) d %.0f hp %d/%d mode %d act %d anim %d %.1f/%d tgt %p ty %x cb %p\n",
+    printf("actor: %s %d it %d id %d fl %x aifl %x pos (%.1f %.1f %.1f) d %.0f hp %d/%d mode %d act %d anim %d %.1f/%d tgt %p ty %x cb %p drop %x/%x\n",
            kind, i, info != NULL ? (int) info->m_Type : -1, info != NULL ? (int) info->m_Id : -1,
            (unsigned) o->m_dwFlags, (unsigned) o->m_AI.m_dwFlags, o->header.m_vPos.x, o->header.m_vPos.y,
            o->header.m_vPos.z, d, (int) (o->m_AI.m_Health >> 8), (int) (o->m_AI.m_InitialHealth >> 8),
            (int) o->m_AI.m_Mode, (int) o->m_AI.m_Action, (int) o->m_CurrentAnimation.m_nAnimIndex,
            o->m_CurrentAnimation.m_AnimationFrame, (int) o->m_nAnims, (void *) o->m_AI.m_pSightTarget,
-           (unsigned) o->m_nTypeFlag, o->m_AI.m_pModeCurrent != NULL ? (void *) o->m_AI.m_pModeCurrent->m_pfCallback : NULL);
+           (unsigned) o->m_nTypeFlag, o->m_AI.m_pModeCurrent != NULL ? (void *) o->m_AI.m_pModeCurrent->m_pfCallback : NULL,
+           info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_DropMask : 0u,
+           info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_DropMask2 : 0u);
 }
 
 static void T2Port_LogActors(CPlayer *p) {
@@ -433,5 +435,55 @@ void T2Port_WakeEnemies(int frame, const char *spec) {
             printf("wake: frame %d enemy %d type %x at (%.1f %.1f %.1f) flags %x\n", frame, i, (unsigned) o->m_nTypeFlag,
                    o->header.m_vPos.x, o->header.m_vPos.y, o->header.m_vPos.z, (unsigned) o->m_dwFlags);
         }
+    }
+}
+
+/* T2_FACE_NEAREST=R (DEBUG-ONLY, round 8 w2): in gameplay, every frame, turn the first player to
+ * face the nearest live level enemy (intelligence type 1, the live flag 0x100, health > 0)
+ * within R units (default 2000), by adding AI_AngleToPoint (the angle from his heading to the
+ * enemy) to his yaw. An aim assist for scripted firing tests (--input Z@...): the stick cannot
+ * aim at a moving enemy from a script. Not a game option. */
+extern f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);
+void T2Port_FaceNearest(int frame, const char *spec) {
+    static CGameObjectInstance *sLast;
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    CGameObjectInstance *pl, *best = NULL;
+    f32 r = (f32) atof(spec), bestD;
+    int i;
+
+    if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL || gScene.m_WarpState != 0) {
+        return;
+    }
+    if (r <= 0.0f) {
+        r = 2000.0f;
+    }
+    pl = &p->m_CharacterActor;
+    bestD = r * r;
+    for (i = gScene.m_nFirstActor; i < gScene.m_nActors; i++) {
+        CGameObjectInstance *o = &gScene.m_pActors[i];
+        CIntelligence *info = o->header.m_pIntelligence;
+        f32 dx, dz, d;
+        if (info == NULL || info->m_Type != INTELLIGENCE_ENEMY || !(o->m_dwFlags & 0x100) || o->m_AI.m_Health <= 0) {
+            continue;
+        }
+        dx = o->header.m_vPos.x - pl->header.m_vPos.x;
+        dz = o->header.m_vPos.z - pl->header.m_vPos.z;
+        d = dx * dx + dz * dz;
+        if (d < bestD) {
+            bestD = d;
+            best = o;
+        }
+    }
+    if (best == NULL) {
+        return;
+    }
+    pl->m_RotY += AI_AngleToPoint(pl, best->header.m_vPos);
+    if (best != sLast) {
+        sLast = best;
+        printf("face: frame %d player (%.1f %.1f %.1f) -> enemy %d type %x at (%.1f %.1f %.1f) d %.0f rotY %.2f\n", frame,
+               pl->header.m_vPos.x, pl->header.m_vPos.y, pl->header.m_vPos.z, (int) (best - gScene.m_pActors),
+               (unsigned) best->m_nTypeFlag, best->header.m_vPos.x, best->header.m_vPos.y, best->header.m_vPos.z,
+               sqrtf(bestD), pl->m_RotY);
+        fflush(stdout);
     }
 }

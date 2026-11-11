@@ -9,11 +9,23 @@
 #include "globals/engine.h"
 #include "protos/scene.h"
 
+#ifdef TARGET_PORT
+typedef struct Dest {
+/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Dest(m) __builtin_offsetof(CAI, m)
+    union {
+        struct { u8 _hp_flags[T2_HOFF_Dest(m_dwFlags)]; u32 flags; }; /* N64 0x0 */
+        struct { u8 _hp_timer[T2_HOFF_Dest(m_DeathRegionTimer)]; f32 timer; }; /* N64 0xCC */
+    };
+} Dest;
+#else
 typedef struct Dest {
     u32 flags;         /* 0x00 */
     char pad4[0xCC - 0x4];
     f32 timer;         /* 0xCC */
 } Dest;
+#endif
 
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);
 f32 GameObject_GetWaterHeight(CGameObjectInstance *actor);
