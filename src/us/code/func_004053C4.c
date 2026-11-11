@@ -10,6 +10,15 @@ extern s16 WeightedTable_PickStatic(sptr id); /* ABI: returns s16 (the host leav
 extern s32 WeightedTable_PickStatic(sptr id);
 #endif
 extern void Sound__Play(s16 sound, CVector3 pos, sptr arg2, CGameObjectInstance *source);
+#ifdef TARGET_PORT
+/* A step's arg is an N64 data address for steps 2 (a sound table) and 3 (the next script):
+ * BossStep3.arg is an s32 in the data, so gendata keeps the N64 word; the host pointer comes
+ * from the data symbol table (port/gen/relocs.c). */
+void *t2_n64_to_host(u32 addr);
+#define BOSS_STEP_PTR(v) ((sptr) t2_n64_to_host((u32) (v)))
+#else
+#define BOSS_STEP_PTR(v) (v)
+#endif
 
 
 /* Run the current step of the third script (sounds, jumps, waits). */
@@ -31,14 +40,14 @@ s32 Primagen_RunSoundStep(CGameObjectInstance *obj) {
             gLevelScript.script3.current = -1;
             return 1;
         case 2:
-            sound = (s16) WeightedTable_PickStatic(gLevelScript.script3.steps[gLevelScript.script3.current].arg);
+            sound = (s16) WeightedTable_PickStatic(BOSS_STEP_PTR(gLevelScript.script3.steps[gLevelScript.script3.current].arg));
             if (sound != -1) {
                 Sound__Play(sound, obj->header.m_vPos, 0, obj);
             }
             gLevelScript.script3.current = -1;
             return 1;
         case 3:
-            gLevelScript.script3.steps = (BossStep3 *) gLevelScript.script3.steps[gLevelScript.script3.current].arg;
+            gLevelScript.script3.steps = (BossStep3 *) BOSS_STEP_PTR(gLevelScript.script3.steps[gLevelScript.script3.current].arg);
             gLevelScript.script3.cursor = -1;
             gLevelScript.script3.current = -1;
             return 1;

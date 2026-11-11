@@ -1,15 +1,29 @@
 #include "common.h"
+#include "structs/boss.h"
 #include "structs/game_object.h"
 #include "globals/engine.h"
 #include "protos/ai.h"
 
 /* Boss module state from 0x8012F9E4. */
+#ifdef TARGET_PORT
+typedef struct BossTimers {
+/* the view at the host offsets of LevelScriptState (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_BossTimers(m) __builtin_offsetof(LevelScriptState, m)
+    union {
+        struct { u8 _hp_timer[T2_HOFF_BossTimers(timer) - T2_HOFF_BossTimers(timer)]; f32 timer; }; /* N64 0x0 */
+        struct { u8 _hp_pushTimer[T2_HOFF_BossTimers(swayTimer) - T2_HOFF_BossTimers(timer)]; f32 pushTimer; }; /* N64 0x4 */
+        struct { u8 _hp_index[T2_HOFF_BossTimers(script.current) - T2_HOFF_BossTimers(timer)]; s32 index; }; /* N64 0x20 */
+    };
+} BossTimers;
+#else
 typedef struct {
     /* 0x00 */ f32 timer;           /* 0x8012F9E4 */
     /* 0x04 */ f32 pushTimer;       /* 0x8012F9E8 */
     /* 0x08 */ u8 pad08[0x18];
     /* 0x20 */ s32 index;           /* 0x8012FA04 */
 } BossTimers;
+#endif
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a - b */

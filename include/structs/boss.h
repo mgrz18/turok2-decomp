@@ -179,7 +179,8 @@ typedef struct BossStep {
 typedef struct BossStep2 {
     /* 0x00 */ u8 type;
     /* 0x04 */ s32 arg;
-    /* 0x08 */ u8 pad08[0x10 - 0x8];
+    /* 0x08 */ s32 waveSize;                      /* read by Primagen_UpdateSpawner's wave view (Wave0040457C.count) */
+    /* 0x0C */ f32 waveDelay;                     /* (Wave0040457C.delay) */
     /* 0x10 */ s32 chance;
     /* 0x14 */ s32 unk14;
     /* 0x18 */ f32 delay;
@@ -272,7 +273,11 @@ typedef struct LevelScriptState {
     /* 0x34C */ s32 wavesLeft;
     /* 0x350 */ s32 enemiesAlive;
     /* 0x354 */ f32 spawnTimer;
+#ifdef TARGET_PORT
+    /* 0x358 */ sptr region;                         /* a CGameRegion pointer (the player's, Primagen_UpdateSpawner) */
+#else
     /* 0x358 */ s32 region;
+#endif
     /* 0x35C */ u8 doorsOpen;
     /* 0x35D */ u8 pad35D[0x360 - 0x35D];
     /* 0x360 */ f32 waveTimer;
@@ -342,6 +347,11 @@ typedef struct BossState {
 } BossState; /* size 0x30 */
 
 /* LevelScriptState from bossMode on (gLevelScript_bossMode, +0x3D4). */
+#ifdef TARGET_PORT
+/* Host: 4-byte packing keeps script at 0x1C as in LevelScriptState (bossMode + 0x1C = script):
+ * natural alignment put the pointer-carrying BossScript at 0x20, 4 bytes past the real one. */
+#pragma pack(push, 4)
+#endif
 typedef struct BossMode {
     /* 0x00 */ s32 mode;
     /* 0x04 */ u8 armed;
@@ -354,6 +364,9 @@ typedef struct BossMode {
     /* 0x18 */ f32 timer3EC;
     /* 0x1C */ BossScript script;
 } BossMode; /* size 0x2C */
+#ifdef TARGET_PORT
+#pragma pack(pop)
+#endif
 
 /* A spawn point of the Mother fight (gMotherSpawnPoints, and gMotherSpawnPoints_2 in the
  * second copy of the module): where its pickups drop (MotherBoss_DropPickupsAtSpawnPoints) and

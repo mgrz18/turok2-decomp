@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/game.h"
+#include "structs/boss.h"
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "protos/ai.h"
@@ -20,15 +21,55 @@ typedef struct {
     /* 0x18 */ u8 pad18[0x1C - 0x18];
 } Wave0040457C;
 
+#ifdef TARGET_PORT
+typedef struct Actor0040457C {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Actor0040457C(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_ai[T2_HOFF_Actor0040457C(m_AI.m_dwFlags)]; u8 ai[1]; }; /* N64 0x140 */
+    };
+} Actor0040457C;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x140];
     /* 0x140 */ u8 ai[1];
 } Actor0040457C;
+#endif
 
 /* gLevelScript is LevelScriptState (structs/boss.h); this file keeps its own
  * view because the wave spawner reads script2 as its own wave table (steps
  * laid out as Wave0040457C, not BossStep2: steps = waves, current = wave,
  * script2On = wavesDone) and found[] as its own actor type. */
+#ifdef TARGET_PORT
+typedef struct ModeState0040457C {
+/* the view at the host offsets of LevelScriptState (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ModeState0040457C(m) __builtin_offsetof(LevelScriptState, m)
+    union {
+        struct { u8 _hp_mode[T2_HOFF_ModeState0040457C(stage)]; s32 mode; }; /* N64 0x0 */
+        struct { u8 _hp_handle[T2_HOFF_ModeState0040457C(intel)]; sptr handle; }; /* host: the intelligence pointer */ /* N64 0x344 */
+        struct { u8 _hp_spawnsLeft[T2_HOFF_ModeState0040457C(spawnsLeft)]; s32 spawnsLeft; }; /* N64 0x348 */
+        struct { u8 _hp_wavesLeft[T2_HOFF_ModeState0040457C(wavesLeft)]; s32 wavesLeft; }; /* N64 0x34C */
+        struct { u8 _hp_enemiesAlive[T2_HOFF_ModeState0040457C(enemiesAlive)]; s32 enemiesAlive; }; /* N64 0x350 */
+        struct { u8 _hp_spawnTimer[T2_HOFF_ModeState0040457C(spawnTimer)]; f32 spawnTimer; }; /* N64 0x354 */
+        struct { u8 _hp_region[T2_HOFF_ModeState0040457C(region)]; sptr region; }; /* host: a region pointer */ /* N64 0x358 */
+        struct { u8 _hp_doorsOpen[T2_HOFF_ModeState0040457C(doorsOpen)]; u8 doorsOpen; }; /* N64 0x35C */
+        struct { u8 _hp_waveTimer[T2_HOFF_ModeState0040457C(waveTimer)]; f32 waveTimer; }; /* N64 0x360 */
+        struct { u8 _hp_nextTimer[T2_HOFF_ModeState0040457C(nextTimer)]; f32 nextTimer; }; /* N64 0x364 */
+        struct { u8 _hp_actor[T2_HOFF_ModeState0040457C(actor)]; void *actor; }; /* N64 0x368 */
+        struct { u8 _hp_found[T2_HOFF_ModeState0040457C(found)]; Actor0040457C *found[5]; }; /* N64 0x36C */
+        struct { u8 _hp_unk3D0[T2_HOFF_ModeState0040457C(bossState)]; s32 unk3D0; }; /* N64 0x3D0 */
+        struct { u8 _hp_unk3D4[T2_HOFF_ModeState0040457C(bossMode)]; s32 unk3D4; }; /* N64 0x3D4 */
+        struct { u8 _hp_unk400[T2_HOFF_ModeState0040457C(script2.timer)]; f32 unk400; }; /* N64 0x400 */
+        struct { u8 _hp_waves[T2_HOFF_ModeState0040457C(script2.steps)]; Wave0040457C *waves; }; /* N64 0x404 */
+        struct { u8 _hp_wave[T2_HOFF_ModeState0040457C(script2.current)]; s32 wave; }; /* N64 0x40C */
+        struct { u8 _hp_wavesDone[T2_HOFF_ModeState0040457C(script2On)]; u8 wavesDone; }; /* N64 0x410 */
+        struct { u8 _hp_unk420[T2_HOFF_ModeState0040457C(script3.current)]; s32 unk420; }; /* N64 0x420 */
+        struct { u8 _hp_resetRegion[T2_HOFF_ModeState0040457C(resetRegion)]; s32 resetRegion; }; /* N64 0x424 */
+    };
+} ModeState0040457C;
+#else
 typedef struct {
     /* 0x000 */ s32 mode;
     /* 0x004 */ u8 pad004[0x344 - 0x4];
@@ -57,7 +98,21 @@ typedef struct {
     /* 0x420 */ s32 unk420;
     /* 0x424 */ s32 resetRegion;
 } ModeState0040457C;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct Entity0040457C {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Entity0040457C(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_unk0[T2_HOFF_Entity0040457C(header)]; s32 unk0; }; /* N64 0x0 */
+        struct { u8 _hp_pos[T2_HOFF_Entity0040457C(header.m_vPos)]; Vec3_0040457C pos; }; /* N64 0x4 */
+        struct { u8 _hp_region[T2_HOFF_Entity0040457C(header.m_pCurrentRegion)]; sptr region; }; /* N64 0x10 */
+        struct { u8 _hp_rot[T2_HOFF_Entity0040457C(m_vVelocity)]; Vec3_0040457C rot; }; /* N64 0x18 */
+    };
+} Entity0040457C;
+#else
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ Vec3_0040457C pos;
@@ -65,12 +120,25 @@ typedef struct {
     /* 0x14 */ u8 pad14[0x18 - 0x14];
     /* 0x18 */ Vec3_0040457C rot;
 } Entity0040457C;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct Info0040457C {
+/* the view at the host offsets of CAITargets (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Info0040457C(m) __builtin_offsetof(CAITargets, m)
+    union {
+        struct { u8 _hp_unk24[T2_HOFF_Info0040457C(m_Sight.m_Dist)]; s32 unk24; }; /* N64 0x24 */
+        u8 _hp_whole[sizeof(CAITargets)]; /* the whole CAITargets */
+    };
+} Info0040457C;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x24];
     /* 0x24 */ s32 unk24;
     /* 0x28 */ u8 pad1[0x88 - 0x28];
 } Info0040457C;
+#endif
 
 extern ModeState0040457C gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 D_800F1F50;

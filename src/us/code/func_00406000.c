@@ -8,6 +8,27 @@
 
 /* LevelScriptState (structs/boss.h) seen from 0x8012F604, one word before it
  * (offsets below are from 0x8012F608): the ROM addresses it through D_8012F604. */
+#ifdef TARGET_PORT
+typedef struct LevelScriptF604 {
+/* the view at the host offsets of LevelScriptBlock (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_LevelScriptF604(m) __builtin_offsetof(LevelScriptBlock, m)
+    union {
+        struct { u8 _hp_stage[T2_HOFF_LevelScriptF604(m_Script.stage)]; s32 stage; }; /* N64 0x4 */
+        struct { u8 _hp_speed[T2_HOFF_LevelScriptF604(m_Script.speed)]; f32 speed; }; /* N64 0x10 */
+        struct { u8 _hp_partA[T2_HOFF_LevelScriptF604(m_Script.found)]; CGameObjectInstance *partA; }; /* N64 0x370 */
+        struct { u8 _hp_partB[T2_HOFF_LevelScriptF604(m_Script.found[1])]; CGameObjectInstance *partB; }; /* N64 0x374 */
+        struct { u8 _hp_unk3CC[T2_HOFF_LevelScriptF604(m_Script.unk3CC)]; s32 unk3CC; }; /* N64 0x3D0 */
+        struct { u8 _hp_state[T2_HOFF_LevelScriptF604(m_Script.bossState)]; s32 state; }; /* N64 0x3D4 */
+        struct { u8 _hp_mode[T2_HOFF_LevelScriptF604(m_Script.bossMode)]; s32 mode; }; /* N64 0x3D8 */
+        struct { u8 _hp_scriptOn[T2_HOFF_LevelScriptF604(m_Script.scriptOn)]; u8 scriptOn; }; /* N64 0x3DD */
+        struct { u8 _hp_script[T2_HOFF_LevelScriptF604(m_Script.script.steps)]; BossStep *script; }; /* N64 0x3F8 */
+        struct { u8 _hp_cursor[T2_HOFF_LevelScriptF604(m_Script.script.cursor)]; s32 cursor; }; /* N64 0x3FC */
+        struct { u8 _hp_index[T2_HOFF_LevelScriptF604(m_Script.script.current)]; s32 index; }; /* N64 0x400 */
+        struct { u8 _hp_dest[T2_HOFF_LevelScriptF604(m_Script.dest)]; CVector3 dest; }; /* N64 0x42C */
+    };
+} LevelScriptF604;
+#else
 typedef struct {
     /* -0x04 */ s32 padF604;
     /* 0x000 */ s32 stage;
@@ -29,6 +50,7 @@ typedef struct {
     /* 0x400 */ u8 pad400[0x28];
     /* 0x428 */ CVector3 dest;              /* 0x8012FA30 */
 } LevelScriptF604;
+#endif
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern f32 AI_AngleToPoint(CGameObjectInstance *obj, CVector3 point);       /* angle to a point */
@@ -43,16 +65,29 @@ extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
 #ifdef TARGET_PORT
-#define D_8012F604 (*(LevelScriptF604 *) &D_8012F604) /* the view over the typed block (globals/boss.h); NOT host offsets: Primagen_UpdateMode19 still reads N64 offsets */
+#define D_8012F604 (*(LevelScriptF604 *) &D_8012F604) /* the view over the typed block (globals/boss.h), at host offsets (hostview) */
 #else
 extern LevelScriptF604 D_8012F604;
 #endif
+#ifdef TARGET_PORT
+typedef struct BossCtl {
+/* the view at the host offsets of LevelScriptState (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_BossCtl(m) __builtin_offsetof(LevelScriptState, m)
+    union {
+        struct { u8 _hp_unk0[T2_HOFF_BossCtl(unk3CC) - T2_HOFF_BossCtl(unk3CC)]; s32 unk0; }; /* N64 0x0 */
+        struct { u8 _hp_state[T2_HOFF_BossCtl(bossState) - T2_HOFF_BossCtl(unk3CC)]; s32 state; }; /* N64 0x4 */
+        struct { u8 _hp_dest[T2_HOFF_BossCtl(dest) - T2_HOFF_BossCtl(unk3CC)]; CVector3 dest; }; /* N64 0x5C */
+    };
+} BossCtl;
+#else
 typedef struct {
     /* 0x00 */ s32 unk0;   /* 0x8012F9D4 */
     /* 0x04 */ s32 state;  /* 0x8012F9D8 */
     /* 0x08 */ u8 pad8[0x5C - 0x8];
     /* 0x5C */ CVector3 dest; /* 0x8012FA30 */
 } BossCtl;
+#endif
 extern f32 gLevelScript_script; /* local type: the field's real type (or the member path) changes the ROM's code here */          /* cooldown */
 extern s32 gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */          /* stage, as the script selection reads it */
 
