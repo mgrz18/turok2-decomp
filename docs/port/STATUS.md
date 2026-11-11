@@ -223,6 +223,48 @@ every file the merges touched). No fix was needed on the merged tree: every scen
 8. **macOS**: run this merged tree on the Mac (the playthrough and the Mother defeat have only run
    on Linux).
 
+## Round 10, part y4: the merged tree on macOS, host determinism, real time (branch names-R10_y4)
+
+Detail: [MACOS.md](MACOS.md) section 12, [PERF.md](PERF.md) section 5. Commits (asm_diff 0 vs
+cc0c322b on every src file touched):
+
+- 627b899b **`CParticleSystem__Spawn` read `gImpactEventHandlers[0xFFFF]`** (m_ImpactEventType[4],
+  no 0xFFFF check): 1 MB past the table on the host, so the particle's hit flag (the 1.5x node
+  boxes) came from host memory and **the Mother recipe and the totem defence diverged between macOS
+  and Linux**. The fix uses the N64's value: RAM 0x8012D07C = 0x00C800FF in every reference dump.
+  This changes gameplay on both hosts (N64-faithful hit boxes for those effects).
+- 00867058 `T2_AIM_NODE`'s pitch from a portable atan2f: libm's last bit differs between hosts.
+- 755b1fc7 `TotemDefense` `stunHelper`: the DamageEvent buffer at its host size (the Mac aborted
+  with `__stack_chk_fail` right after the totem was won; Linux overwrote its stack silently).
+- 4623ef71 the cheat-entry and name-entry text fields: `Menu.controller`/`player` by member, not an
+  s32 at N64 0x20 through an s32 call (13 of 26 Mac soak runs crashed; Linux non-PIE hid it).
+- 68a74023 `playthrough.py --fight` adds `T2_FILL_AMMO=600`: with the N64's flags the plasma
+  rifle runs dry at 4 of 8 totem kills (round 9's Linux win came from the y4-1 overread).
+- 1768ff13 `T2_DET_LOG` ends with a particle-pool hash (`T2_DET_PARTICLES=1`: one line per particle);
+  `T2_RNG_TRACE=F1..F2`: every RNG draw with its caller (a `#ifdef TARGET_PORT` hook in Random_Next,
+  Random_Float, Random_Blend, RandomInPackedRange).
+- 5081df6f `--pace --audio`: a simulated 22,050 Hz device counts audio underruns headless.
+- b44c5388 + 5081df6f `soak.py` under lldb on macOS (`--debugger lldb`, the default without gdb),
+  `--draw` -> `--offscreen-gl` there.
+
+Results: **Mac = Linux frame for frame** (`T2_DET_LOG=1`, final binaries: boot + 3 demos, the
+playthrough, the Mother, the warp, the fight: 0 differing lines). On the Mac: the playthrough to the
+hub (totem 8/8 at 22,700, hub 23,400, "NEW CHEAT ENABLED"), the Mother (hub at 32,400), warp, fight,
+save -> load, `--audio` (150.17 s, RMS 3,480.8): all exit 0. Mac soak (lldb): 30 runs, 1.06 M frames,
+1 crash (the `T2Port_ReadAsset` warp class, fixed by y5's S16). Real time (Debug): the whole
+playthrough at 60 VI/s in 450.52 s, 12 late VIs in gameplay (loads), 2.6 ms of work per 16.7 ms VI,
+1 audio underrun (a load, none in gameplay). The SDL gamepad path is documented (MACOS.md 12.6:
+left stick = turn/look, right stick = C buttons (move), LT = Z (fire), RT = R (jump); a window is
+needed).
+
+**Merge notes**: y3 carries the same 0xFFFF fix (its 6716be2e: keep this one); y5 carries the menu
+fix for 0041AAA0/0041D2C4 only (keep this one, it also covers func_00453A08). The particle fix and
+the stunHelper fix change the Linux playthrough's totem timing (8/8 at 22,700, hub at 23,400
+instead of 24,200) and the Mother's hub frame (32,400). Files: src func_0022D2FC, func_004085A0,
+func_0041AAA0, func_0041D2C4, func_00453A08, func_002113A4, func_0021149C, func_002119FC,
+func_0026D128; port/app/game.cpp (the --pace audio sink), port/game/t2det.c, port/game/t2bosslog.c;
+tools/port/soak.py, tools/port/playthrough.py (y1 also extends it).
+
 ## Round 9, part x4: macOS and host determinism (branch names-R9_x4)
 
 Detail: [MACOS.md](MACOS.md) section 11. Commits (asm_diff 0 vs 5437cfc0): 8b8697a6 (`SaveGame_Build`:
