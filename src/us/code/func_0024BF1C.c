@@ -24,6 +24,14 @@ void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *pla
     n = 0;
     for (i = 0; i < rows; i++) {
         for (w = 0; w < 35; w++) {
+#ifdef TARGET_PORT
+            /* soak S9: rows * count slots can pass the 36 of m_Items (CBarrel__Open picks 2 rows for
+             * up to 26 weapons: 19+ weapons in the strip wheel, e.g. T2_GIVE_WEAPONS): the slots past
+             * 36 overran the CBarrel into the player, and the items[36] of CBarrel__DrawRing (stack) */
+            if (n >= (s32) (sizeof(menu->m_Items) / sizeof(menu->m_Items[0]))) {
+                break;
+            }
+#endif
             if (owned[w] != 0) {
                 info = gWeaponInfoTable[w];
                 ok = CPlayer__GetWeaponAmmo(player, w) != 0;

@@ -4,7 +4,7 @@
 
 
 
-s32 TeamBloodMenu_StepTextureSet(s32 arg0, s32 arg1)
+s32 TeamBloodMenu_StepTextureSet(sptr arg0, sptr arg1)
 {
   s8 *new_var;
   new_var = (s8 *) (&gEngineApp_m_Settings);

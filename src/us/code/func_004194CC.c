@@ -4,7 +4,7 @@
 
 
 
-s32 DeathmatchMenu_OpenFragTag(s32 arg0, s32 arg1, s32 arg2) {
+s32 DeathmatchMenu_OpenFragTag(sptr arg0, sptr arg1, sptr arg2) {
     MenuPool_OpenChildMenu(arg2, arg1, &gFragTagMenuDesc);
     return 1;
 }

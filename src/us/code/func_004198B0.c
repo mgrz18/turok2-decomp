@@ -4,7 +4,7 @@
 
 
 
-s32 TitleMenu_Cheats(s32 arg0, s32 arg1, s32 arg2) {
+s32 TitleMenu_Cheats(sptr arg0, sptr arg1, sptr arg2) { /* sptr: menu callback args (--high-memory) */
     MenuPool_OpenChildMenu(arg2, arg1, &gCheatsMenuDesc);
     return 1;
 }

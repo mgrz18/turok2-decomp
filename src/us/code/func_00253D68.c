@@ -16,7 +16,16 @@ int CPlayer__SetPosition(void *arg0, void *arg1) {
     sptr region;
     CVector3 *src = arg1;
     Shared_ActorView *view = arg0;
+#ifdef TARGET_PORT
+    /* the region pointer-wide, and the position passed (round 9 x2): the ROM calls
+     * CScene__FindRegionAt through an int-returning one-argument cast (the position stays in a1
+     * from its own caller); on the host that cut the region to 32 bits: with --high-memory the
+     * Mother's phase-1 cinema end (MotherBoss_OnPhase1CinemaDone) put the player in a truncated
+     * region and the camera crashed */
+    region = (sptr) CScene__FindRegionAt((struct CScene *) &gScene, (f32 *) src);
+#else
     region = ((int (*)(void *))CScene__FindRegionAt)(&gScene);
+#endif
     view->actor.header.m_vPos = *src;
     view->actor.header.m_pCurrentRegion = (struct CGameRegion *) region;
     view->weapon.header.m_vPos = *src;

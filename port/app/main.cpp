@@ -20,7 +20,7 @@
 // With --game (when the game is linked, T2_HAVE_GAME; docs/port/LINK.md) step 2 only mounts
 // the archive and installs the T2Asset backend, and step 3 runs the game (game.cpp) instead of
 // the test display list: [--draw] hands its display lists to Fast3D, [--verbose] logs every
-// frame and task, [--high-memory] turns off the low-memory bring-up aid.
+// frame and task, [--low-memory] (Linux debug) puts the game memory below 2 GB.
 #include <libultraship/libultraship.h>
 
 #include <chrono>
@@ -146,11 +146,11 @@ struct Args {
     bool offscreenGl = false;  // --offscreen-gl (macOS)
     int benchFrom = -1;        // --bench [FROM] (debug, PERF.md)
     bool pace = false;         // --pace (debug, PERF.md)
-#ifdef T2_LOW_MEMORY_DEFAULT
-    bool lowMemory = true;
-#else
+    // Round 9 (x5, STABILITY.md): the game memory above 4 GB is the default everywhere; the
+    // soak runs (tools/port/soak.py) pass with it. --low-memory (Linux, debug) brings back the
+    // bring-up aid: the arena and the game thread stacks below 2 GB (MAP_32BIT), which hides
+    // pointers truncated through s32 instead of crashing on them.
     bool lowMemory = false;
-#endif
 };
 
 Args ParseArgs(int argc, char** argv) {
@@ -183,7 +183,13 @@ Args ParseArgs(int argc, char** argv) {
         } else if (s == "--start-mode" && i + 1 < argc) {
             a.startMode = atoi(argv[++i]);
         } else if (s == "--high-memory") {
-            a.lowMemory = false;
+            a.lowMemory = false; // the default since round 9; kept for old scripts
+        } else if (s == "--low-memory") {
+#ifdef T2_LOW_MEMORY_DEFAULT
+            a.lowMemory = true; // Linux non-PIE builds only (T2_LOW_MEMORY)
+#else
+            fprintf(stderr, "--low-memory: not available in this build (T2_LOW_MEMORY off or not Linux)\n");
+#endif
         } else if (s == "--no-pak") {
             a.pakMode = 2; // T2_PAK_NONE
         } else if (s == "--pak-blank") {
@@ -204,7 +210,7 @@ Args ParseArgs(int argc, char** argv) {
             a.window = false;
         } else {
             fprintf(stderr, "usage: %s [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]\n"
-                            "          [--game [--draw] [--audio] [--wav out.wav] [--verbose] [--high-memory]\n"
+                            "          [--game [--draw] [--audio] [--wav out.wav] [--verbose] [--low-memory]\n"
                             "                  [--no-pak | --pak-blank | --pak-dir DIR]\n"
                             "                  [--input BUTTON@FRAME[..LAST],SX=V@F..L,...|@FILE] [--skip-pak-check] [--start-mode N]]   (the last three: debug only)\n"
                             "          [--offscreen-gl]   (macOS: Fast3D on a CGL context with no window; T2_SHOT works)\n"

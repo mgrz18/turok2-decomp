@@ -3,11 +3,19 @@
 #include "structs/intelligence.h"
 
 
+#ifdef TARGET_PORT
+/* the port (round 9 x1): the CAI by member: N64 0x130/0x131 are m_Enemy.m_Behavior[0]/[1] (the
+ * host's variable buffer is elsewhere and CEnemyAIVars holds a pointer before them) */
+typedef CAI State;
+#define unk130 m_Enemy.m_Behavior[0]
+#define unk131 m_Enemy.m_Behavior[1]
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x130];
     /* 0x130 */ s8 unk130;
     /* 0x131 */ s8 unk131;
 } State;
+#endif
 
 s32 EnemyAnim_Idle_AF6F0(CGameObjectInstance *actor, State *state);
 s32 EnemyAnim_Idle_AF720(CGameObjectInstance *actor, State *state);

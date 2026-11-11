@@ -4,7 +4,7 @@
 #include "protos/menu.h"
 
 
-s32 FragTagMenu_StepCrosshairs(s32 arg0, s32 arg1) {
+s32 FragTagMenu_StepCrosshairs(sptr arg0, sptr arg1) {
     GameSettings *var_s0;
 
     var_s0 = &gEngineApp_m_Settings;

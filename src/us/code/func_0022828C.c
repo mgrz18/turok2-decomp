@@ -34,6 +34,44 @@ static __inline__ s32 overlaps(Effect_func_80262E88_de *effect, f32 *max) {
     }
     return 0;
 }
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#include "structs/world.h"
+/* The port (round 9 x1): the pool by member (CInstancePool, CListedInstance: the N64 view's
+ * 0xBC/0xC8 are m_vMin/m_vMax, 0xD4 m_dwFlags, 0x144 m_AI.m_Health, 0x28C m_pNext, 0x290
+ * m_pOwnerCount, 0x5314 the active list). Through the N64 view the host never found the pool's
+ * active instances: the generators' spawns (the totem defense's waves, enemies thrown in by a
+ * generator anywhere) were never filed into the frame's lists, so their AI never ran (they
+ * stood in mode 2 at the spawn point) and a dead one never gave its generator slot back. */
+void CInstancePool__UpdateVisibility(struct SceneEffectPool *scene_, sptr arg1) {
+    CInstancePool *scene = (CInstancePool *) scene_;
+    CListedInstance *effect;
+    CListedInstance *next;
+    CGameObjectInstance *o;
+    f32 *max = (&D_800F5A18 + 1);
+
+    for (effect = scene->m_ActiveList.m_pHead; effect != NULL; effect = next) {
+        next = effect->m_pNext;
+        o = &effect->m_Instance;
+        if (max[0] > o->m_vMin.x && max[-3] < o->m_vMax.x && max[2] > o->m_vMin.z && max[-1] < o->m_vMax.z &&
+            max[1] > o->m_vMin.y && max[-2] < o->m_vMax.y) {
+            CScene__FileInstance((struct CScene *) arg1, o);
+            if (effect->m_pOwnerCount != NULL && o->m_AI.m_Health == 0) {
+                *effect->m_pOwnerCount -= 1;
+                effect->m_pOwnerCount = NULL;
+            }
+        } else {
+            o->m_AI.m_Health = 0;
+            o->m_dwFlags &= ~0x200;
+            if (effect->m_pOwnerCount != NULL) {
+                *effect->m_pOwnerCount -= 1;
+            }
+            CList__Remove(&scene->m_ActiveList, effect);
+            CList__AddTail(&scene->m_FreeList, effect);
+        }
+    }
+}
+#else
 void CInstancePool__UpdateVisibility(struct SceneEffectPool *scene, sptr arg1) {
     Effect_func_80262E88_de *effect;
     Effect_func_80262E88_de *next;
@@ -67,3 +105,4 @@ void CInstancePool__UpdateVisibility(struct SceneEffectPool *scene, sptr arg1) {
         goto next_effect;
     }
 }
+#endif

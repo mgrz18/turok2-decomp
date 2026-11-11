@@ -39,7 +39,13 @@ static __inline__ void FindTarget(CListedInstance *obj, CListedInstance **target
     CAITargets targets;
 
     *target = NULL;
+#ifdef TARGET_PORT
+    /* the AI by member (N64 obj + 0x140): the host CAI is at another offset; the N64 address made
+     * AI_UpdatePathHeading read a garbage plan and crash on the Mother's first teleport (round 9 x2) */
+    AI_UpdateTargets(obj, &obj->m_Instance.m_AI, &targets, 1, 0);
+#else
     AI_UpdateTargets(obj, (u8 *)obj + 0x140, &targets, 1, 0);
+#endif
     if (targets.m_Path.m_pTarget != NULL && (targets.m_Path.m_pTarget->m_dwFlags & 0x300000)) {
         *target = (CListedInstance *) targets.m_Path.m_pTarget;
     }

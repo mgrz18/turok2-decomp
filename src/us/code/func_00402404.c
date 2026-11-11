@@ -71,16 +71,38 @@ static __inline__ void State_UpdateBoss(WaveBossState *s) {
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
 typedef struct {
+    /* 0x00 */ u8 pad0[0x6C];
+    /* 0x6C */ s32 mask;
+} Source00402404;
+
+#ifdef TARGET_PORT
+#include "structs/collision.h"
+/* the views at the host offsets of CAI (m_VisBits, m_Mode) and DamageEvent (damage, flags, frame)
+ * (round 9 x2): the N64 0x34 read a byte of the host CAI's mode table pointer as the mode, the
+ * hit's frame (the node mask) was read from its damage/radius words: no spot ever took a hit */
+#define T2_HOFF_AI(m) __builtin_offsetof(CAI, m)
+#define T2_HOFF_HIT(m) __builtin_offsetof(DamageEvent, m)
+typedef struct {
+    union {
+        struct { u8 _hp_flags[T2_HOFF_AI(m_VisBits)]; s32 flags; };
+        struct { u8 _hp_kind[T2_HOFF_AI(m_Mode)]; s8 kind; };
+    };
+} Obj00402404;
+
+typedef struct {
+    union {
+        struct { u8 _hp_damage[T2_HOFF_HIT(damage)]; s32 damage; };
+        struct { u8 _hp_flags[T2_HOFF_HIT(flags)]; s32 flags; };
+        struct { u8 _hp_source[T2_HOFF_HIT(frame)]; Source00402404 *source; };
+    };
+} Hit00402404;
+#else
+typedef struct {
     /* 0x00 */ u8 pad0[0xC];
     /* 0x0C */ s32 flags;
     /* 0x10 */ u8 pad1[0x34 - 0x10];
     /* 0x34 */ s8 kind;
 } Obj00402404;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x6C];
-    /* 0x6C */ s32 mask;
-} Source00402404;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
@@ -89,6 +111,7 @@ typedef struct {
     /* 0x0C */ s32 flags;
     /* 0x10 */ Source00402404 *source;
 } Hit00402404;
+#endif
 
 void ScriptAnimator_SetScript(void *slot, void *arg);
 void COnScreen__SetBossPercent(void *a0, s32 percent);
@@ -102,6 +125,12 @@ void MantidQueen_Hurt(void *a0, Obj00402404 *obj, Hit00402404 *hit) {
     s32 i;
     s32 percent;
 
+#ifdef TARGET_PORT
+    {
+        extern void T2Port_LogBossHurt(const char *who, void *obj, void *hit); /* DEBUG-ONLY */
+        T2Port_LogBossHurt("queen", a0, hit);
+    }
+#endif
     if (hit->source == NULL) {
         return;
     }

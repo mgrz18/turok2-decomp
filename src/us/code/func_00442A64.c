@@ -19,7 +19,11 @@ static __inline__ void FindTarget(CGameObjectInstance *obj, CGameObjectInstance 
     CAITargets targets;
 
     *target = NULL;
+#ifdef TARGET_PORT
+    AI_UpdateTargets(obj, &obj->m_AI, &targets, 1, 0);
+#else
     AI_UpdateTargets(obj, (u8 *)obj + 0x140, &targets, 1, 0);
+#endif
     if (targets.m_Path.m_pTarget != NULL && (targets.m_Path.m_pTarget->m_dwFlags & 0x300000)) {
         *target = targets.m_Path.m_pTarget;
     }

@@ -6,10 +6,20 @@
 #include "structs/player_options.h"
 #include "globals/game.h"
 struct func_80250BD4_S1;
+#ifdef TARGET_PORT
+/* Menu::controller at its host offset (the N64 0x20 is inside Menu::desc on the host: a menu that
+ * claimed a controller had its desc replaced by the profile; soak S5, the cheats menu) */
+#include "structs/menu.h"
+struct func_80250BD4_S1 {
+    char pad0[__builtin_offsetof(Menu, controller)];
+    ControllerProfile *unk20; /* Menu::controller */
+};
+#else
 struct func_80250BD4_S1 {
     char pad0[0x20];
     ControllerProfile *unk20; /* Menu::controller */
 };
+#endif
 struct func_80250BD4_S1;
 typedef struct func_80250BD4_S1 func_80250BD4_S1;
 struct SharedRecAtA8;

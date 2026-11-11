@@ -9,7 +9,7 @@ typedef struct {
     /* 0x04 */ f32 value;
 } Param;
 
-void Model_AdvanceMorph(s32 *arg0, f32 arg1) {
+void Model_AdvanceMorph(sptr *arg0, f32 arg1) { /* the handle holds a pointer: s32 truncated it on the host */
     f32 temp_f0;
     sptr temp_s0;
     Param *temp_v0;

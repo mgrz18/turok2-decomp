@@ -27,6 +27,9 @@ void Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
 
 static __inline__ s32 try_jump(CPlayer *player, CGameObjectInstance *body) {
     if (player->m_SniperMode == 0 && !(11.25f < player->m_TimeOffGround) && !(body->m_AI.m_dwFlags & 0x6000)
+#ifdef TARGET_PORT /* soak S8: a body with no intelligence (climbing after a debug warp) read NULL: no jump */
+        && body->header.m_pIntelligence != NULL
+#endif
         && (body->header.m_pIntelligence->m_dwTypeFlags & 2) && (player->m_ContState.m_dwButtonsSingle & 0x10)) {
         CPlayer__SetState(player, body, 4);
         return 1;

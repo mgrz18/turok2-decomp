@@ -18,7 +18,14 @@ void EnemyAI_DrawFaded(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params) {
 
     if (ai->m_Mode == 0x20) {
         CGameObjectInstance__DrawModelImmediate(actor, ai, params);
+#ifdef TARGET_PORT
+        /* the port (round 9 x1): N64 byte 0x1B is the low byte of the big-endian m_nModel; on the
+         * host that byte is in m_nModel's neighbour (the totem defense's teleporting enemies crashed
+         * drawing with a model index read from the wrong byte) */
+        Render_DrawModelShared(params->m_hModel, actor->m_pmtDrawMtxs, 1, &actor->m_Lights[gEvenOdd], 0, (s8) params->m_nModel, -1);
+#else
         Render_DrawModelShared(params->m_hModel, actor->m_pmtDrawMtxs, 1, &actor->m_Lights[gEvenOdd], 0, ((s8 *)params)[0x1B], -1);
+#endif
         return;
     }
     if (ai->m_Enemy.m_Timer > 0.0f) {

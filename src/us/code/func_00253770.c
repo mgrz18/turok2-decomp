@@ -5,7 +5,7 @@
 
 s32 CPlayer__IsInMatchEndState(sptr);
 
-void CPlayer__OnParticleHit(CPlayer *arg0, sptr arg1, s32 arg2, CParticle *arg3) {
+void CPlayer__OnParticleHit(CPlayer *arg0, sptr arg1, sptr arg2, CParticle *arg3) {
     f32 temp_f0;
     f32 temp_f1;
     f32 var_f0;

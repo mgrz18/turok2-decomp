@@ -321,6 +321,13 @@ RUNTIME_BSS = frozenset("""
 # four profiles over whatever the linker put next (on macOS the legal screen's strings).
 N64_EXTENT = {'gMergedController': 0x224, 'gControllers': 4 * 0x224}
 
+# Pointees that are a header followed by raw bytes, not a table of headers (round 9 x4): an
+# attract demo (gDemoTable -> DemoHeader) is a 0x28-byte header of s16 fields, then the input
+# bit streams, read byte by byte MSB first (DemoStream_ReadBit). Typed as a table of DemoHeader
+# the whole demo was swapped as s16 pairs, so every stream decoded garbage on the host: the
+# demos played the wrong input from their first frame (the wheel open, the player spinning).
+HEADER_POINTEES = frozenset(('DemoHeader', 'struct DemoHeader'))
+
 
 def dsize(d):
     """(n64 size, host size) of a description."""
@@ -617,8 +624,11 @@ class Generator:
         self.ext_funcs = set()
         self.int_addr = collections.Counter()  # integer leaves that hold an address
         self.bss_slack = []   # .bss byte views given twice their N64 size
+        self.bss_tails = []   # typed .bss structs that data points past (grow_bss_tails)
+        self.ptr_offs = []    # (target, N64 offset) of every relocated pointer with an offset
         self.gfx_syms = []    # display lists (Gfx data)
         self.ptr_tables = 0   # pointer targets typed as arrays of their pointee
+        self.header_tables = 0  # HEADER_POINTEES targets: the header, then raw bytes
         self.split_tables = []  # (name, N64 extent, extended): split_table_extent
         self.count_hint = {}  # key -> element count stored next to a pointer to it
         self.gfx_relocs = 0   # their w1 addresses made host pointers
@@ -662,6 +672,30 @@ class Generator:
             self.layout(self.queue[i])
             i += 1
         self.resolve_aliases()
+        self.grow_bss_tails()
+
+    def grow_bss_tails(self):
+        """A typed .bss struct that data points PAST (gCinemaPlayerP = gBlindOne + 0x560: the
+        cinema player is the 0x100 unlabelled N64 bytes after the BlindOne struct): those pointers
+        translate to host offset h + (off - n), after the host struct, where the next host symbol
+        was (the cinema player overran sMenuBindingText...: soak S3). Give such a struct room up to
+        its N64 extent past the type, twice that size for host pointers."""
+        need = {}
+        for t, off in self.ptr_offs:
+            if t.alias_of:  # D_801306F8 + 0x68: the alias's base, at the base's offset
+                off += t.key - t.alias_of[0].key
+                t = t.alias_of[0]
+            if not t.bss or t.layout_desc is None or off < t.nsize:
+                continue
+            need[t.name] = (t, max(off, need.get(t.name, (t, 0))[1]))
+        for t, off in need.values():
+            i = bisect.bisect_right(self.elf.keys, t.key + off)
+            nxt = self.elf.keys[i] if i < len(self.elf.keys) else t.key + off + 0x10
+            tail = max(nxt - t.key - t.nsize, off - t.nsize + 0x10)
+            h = t.hsize
+            t.hsize = max(t.hsize, h + 2 * tail)
+            t.align = max(t.align, 8)
+            self.bss_tails.append((t.name, t.nsize, h, tail))
 
     # -- layout of one symbol --------------------------------------------
     def is_bss(self, s):
@@ -700,6 +734,13 @@ class Generator:
             n, _ = dsize(d)
             if ext > n and ext % n == 0 and ext // n <= 4096 and not self.is_bss(s):
                 d = ['a', ext // n, d]  # m2c `extern s32 D_x;` indexed as an array
+        elif d[0] == 'r' and getattr(s, 'header_only', False) and not self.is_bss(s):
+            # the header, then the rest of the symbol as bytes in ROM order
+            n, h = dsize(d)
+            if n > 0 and ext > n and n == h:
+                d = ['r', ext, ext, d[3], d[4], 0,
+                     [[0, 0, -1, d], [n * 8, n * 8, -1, ['a', ext - n, ['s', 1, 1, 'u']]]]]
+                self.header_tables += 1
         elif d[0] == 'r' and s.why == 'pointer target' and not self.is_bss(s):
             # a table reached through a pointer to its first element (MenuDesc.items ->
             # MenuItemDesc[count]): the count stored next to the pointer when there is one
@@ -927,6 +968,10 @@ class Generator:
             if pd is not None and pd[0] in ('x', 'F'):
                 pd = None
             t = self.add(n, pd, 'pointer target')
+            if pd is not None and pointee in HEADER_POINTEES:
+                t.header_only = True
+            if off > 0:
+                self.ptr_offs.append((t, off))
             return ('d', t, off)
         return False
 
@@ -1163,8 +1208,29 @@ class Generator:
         P('pointer targets generated in addition: %d' % (len(ss) - len(from_c)))
         P('bss (zero) symbols: %d' % sum(1 for s in ss if s.bss))
         P("bss byte views given twice their N64 size (host pointers): %d" % len(self.bss_slack))
+        P("typed bss structs with an N64 tail (tail given twice its size): %d" % len(self.bss_tails))
+        for nm, n, h, t in self.bss_tails:
+            P("  %s: n64 0x%X + tail 0x%X -> host 0x%X + 0x%X" % (nm, n, t, h, 2 * t))
+        # the audit of round 9 (x5): a symbol whose C type is larger than its N64 extent swallows
+        # the next symbols as aliases at translated offsets: right only if they really are fields
+        # of it. List each (base, its N64 extent, its type size, the aliases past the extent).
+        foreign = []
+        for b in ss:
+            if b.alias_of or b.layout_desc is None:
+                continue
+            ext = self.elf.extent(b.key)
+            if b.nsize <= ext:
+                continue
+            al = sorted((a.key - b.key, a.name) for a in ss if a.alias_of and a.alias_of[0] is b
+                        and a.key - b.key >= ext)
+            if al:
+                foreign.append((b.name, ext, b.nsize, al))
+        P("typed symbols larger than their N64 extent, with aliases past it: %d" % len(foreign))
+        for nm, ext, n, al in foreign:
+            P("  %s: extent 0x%X, type 0x%X: %s" % (nm, ext, n, ", ".join("%s@0x%X" % (a, o) for o, a in al[:8])))
         P("display lists: %d, w1 addresses relocated: %d, other w1 kept as numbers: %d" % (len(self.gfx_syms), self.gfx_relocs, self.gfx_w1_ints))
         P("pointer targets typed as tables of their pointee: %d" % self.ptr_tables)
+        P("pointer targets typed as a header and raw bytes (HEADER_POINTEES): %d" % self.header_tables)
         P("struct tables extended over splat labels: %d" % len(self.split_tables))
         for nm, a, b in self.split_tables:
             P("  %s: 0x%X -> 0x%X" % (nm, a, b))
