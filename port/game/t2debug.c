@@ -453,3 +453,25 @@ void T2Port_SavePortal(int frame, const char *spec) {
     MenuPool_OpenMenu((struct MenuPool *) p->m_pCamera->m_MenuPool, &gSavePortalMenuDesc, (sptr) p,
                       (sptr) p->m_ContState.m_pContState, 0);
 }
+
+/* T2_PICKUP_LOG=1 (DEBUG-ONLY, round 8 w5): CPlayer__TouchPickup reports every pickup the player
+ * touches: its object type id, where it lies, whether CPlayer__CollectPickup took it, and the
+ * player's health, life force, lives and current weapon ammo after it. */
+void T2Port_LogPickup(sptr player, void *actor, s32 id, s32 got) {
+    static int on = -1;
+    CPlayer *p = (CPlayer *) player;
+    CInstanceHeader *h = (CInstanceHeader *) actor;
+    extern s32 CPlayer__GetWeaponAmmo(CPlayer *, s32);
+
+    if (on < 0) {
+        on = getenv("T2_PICKUP_LOG") != NULL;
+    }
+    if (!on) {
+        return;
+    }
+    printf("pickup: level %d id %d at (%.1f %.1f %.1f) %s: health %d life force %d lives %d weapon %d ammo %d\n",
+           (int) gScene.m_nLevel, (int) id, h->m_vPos.x, h->m_vPos.y, h->m_vPos.z, got ? "collected" : "not taken",
+           (int) (p->m_Data.m_Health >> 8), (int) p->m_Data.m_LifeForce, (int) p->m_Data.m_Lives,
+           (int) p->m_Data.m_CurrentWeapon, (int) CPlayer__GetWeaponAmmo(p, p->m_Data.m_CurrentWeapon));
+    fflush(stdout);
+}

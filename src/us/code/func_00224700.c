@@ -2,6 +2,9 @@
 #include "m2c_macros.h"
 #include "protos/iset.h"
 #include "protos/scene.h"
+#ifdef TARGET_PORT
+#include "structs/world.h"
+#endif
 
 
 void CScene__SetLevelActorKilledInLevel(void *arg0, s32 arg1, s32 arg2, s32 arg3)
@@ -14,7 +17,12 @@ void CScene__SetLevelActorKilledInLevel(void *arg0, s32 arg1, s32 arg2, s32 arg3
   s32 var_v1;
   u8 *temp_v0_2;
   u8 *temp_v1;
+#ifdef TARGET_PORT
+  /* the port: the scene's bit sections at their host offset (CScene.m_pBitSections) */
+  temp_v0 = (sptr) CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(((CScene *) arg0)->m_pBitSections, 0), arg1), 1);
+#else
   temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(*((s32 *) (((s8 *) arg0) + 0x6C)), 0), arg1), 1);
+#endif
   CISet__GetBlock(temp_v0, 0);
   CISet__GetBlockSize(temp_v0, 1);
   new_var = CISet__GetBlock(temp_v0, 1);
