@@ -23,6 +23,12 @@ void LevelEvent_Fire(LevelEvent *event) {
     void *camera;
     u8 *actor;
 
+#ifdef TARGET_PORT
+    {
+        extern void T2Port_LogEvent(LevelEvent *event, const char *text);
+        T2Port_LogEvent(event, event->message != 0 ? gLevelMessages[event->message].text : NULL);
+    }
+#endif
     entry = gLevelEventHandlers[event->kind];
     if (entry == NULL) {
         return;

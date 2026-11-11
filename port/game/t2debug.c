@@ -397,9 +397,9 @@ void T2Port_Teleport(int frame, const char *spec) {
         return;
     }
     while (s != NULL && *s != '\0') {
-        int f;
-        float x, y, z;
-        if (sscanf(s, "%d:%f,%f,%f", &f, &x, &y, &z) == 4 && f == frame) {
+        int f, n;
+        float x, y, z, ry;
+        if ((n = sscanf(s, "%d:%f,%f,%f,%f", &f, &x, &y, &z, &ry)) >= 4 && f == frame) {
             CGameObjectInstance *a = &p->m_CharacterActor;
             CVector3 pos;
             sptr region;
@@ -413,6 +413,9 @@ void T2Port_Teleport(int frame, const char *spec) {
                 a->header.m_vPos = pos;
                 a->header.m_pCurrentRegion = (struct CGameRegion *) region;
                 a->m_vVelocity.x = a->m_vVelocity.y = a->m_vVelocity.z = 0.0f;
+                if (n == 5) {
+                    a->m_RotY = ry; /* F:x,y,z,rotY: also the facing (round 9 x1) */
+                }
             }
             fflush(stdout);
         }
@@ -573,5 +576,32 @@ void T2Port_DoorOpen(int frame, const char *spec) {
             CAI__SetMode(o, &o->m_AI, 0);
         }
     }
+    fflush(stdout);
+}
+
+/* T2_EVENT_LOG=1 (DEBUG-ONLY, round 9 x1): LevelEvent_Fire reports every level event it fires: the
+ * gameplay frame, the level, the event's actor/level, its kind and handler (gLevelEventHandlers),
+ * the message (gLevelMessages: "distress beacon activated.", "child rescued.", "portal
+ * activated." ...) and the music cue. To follow a level's objectives, switches and portals. */
+#include "structs/event.h"
+int gT2HostFrame; /* game.cpp's frame number, for the logs */
+void T2Port_LogEvent(LevelEvent *e, const char *text) {
+    static int on = -1;
+    char buf[96];
+    int i;
+
+    if (on < 0) {
+        on = getenv("T2_EVENT_LOG") != NULL;
+    }
+    if (!on) {
+        return;
+    }
+    for (i = 0; text != NULL && text[i] != 0 && i < (int) sizeof(buf) - 1; i++) {
+        buf[i] = (text[i] == '\n') ? '|' : text[i];
+    }
+    buf[i] = 0;
+    printf("event: frame %d (gameplay %d) level %d mode %d: actor %d of level %d kind %d handler %d msg %d \"%s\" music %d flags %x\n",
+           gT2HostFrame, (int) gFrameCountGameplay, (int) gScene.m_nLevel, (int) gScene.m_Mode, (int) e->actor, (int) e->level,
+           (int) e->kind, (int) e->handler, (int) e->message, buf, (int) e->music, (unsigned) e->flags);
     fflush(stdout);
 }

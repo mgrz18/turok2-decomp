@@ -160,6 +160,8 @@ def parse_region_info(r):
         "unk_2C": f(struct.unpack_from(">f", r, 0x2C)[0]),
         "pos": [f(v) for v in struct.unpack_from(">3f", r, 0x34)],
         "flags": struct.unpack_from(">I", r, 0x44)[0],
+        "warp_id": struct.unpack_from(">H", r, 0x48)[0],
+        "pending_warp_id": struct.unpack_from(">H", r, 0x4C)[0],
         "damage_amount": struct.unpack_from(">H", r, 0x50)[0],
         "flags52": struct.unpack_from(">H", r, 0x52)[0],
         "flags54": struct.unpack_from(">H", r, 0x54)[0],
