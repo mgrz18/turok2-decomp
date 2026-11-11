@@ -22,10 +22,21 @@ typedef struct {
 } Info00403144;
 #endif
 
+#ifdef TARGET_PORT
+/* the CAI's m_AnimRepeatedCount at its host offset (round 10 y2): the N64 0xC7 read another byte,
+ * the turn never counted its 4 repeats and the Queen turned (mode 11) for good once the full mode
+ * table let her reach it */
+typedef struct {
+    union {
+        struct { u8 _hp_count[__builtin_offsetof(CAI, m_AnimRepeatedCount)]; s8 count; }; /* N64 0xC7 */
+    };
+} Item00403144;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0xC7];
     /* 0xC7 */ s8 count;
 } Item00403144;
+#endif
 
 void AI_UpdateTargets(sptr a0, Item00403144 *item, Info00403144 *info, s32 a3, s32 a4);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
