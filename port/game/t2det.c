@@ -5,6 +5,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/intelligence.h"
+#include "structs/particle.h"
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
@@ -19,6 +20,7 @@
  * T2_DET_ACTORS=1 also one line per live actor, so the first actor whose bits differ shows up.
  * Floats are printed as their bit patterns: %.1f hides the drift that leads to a divergence. */
 #include "globals/math.h"
+#include "globals/frame.h"
 
 static u32 T2Det_Bits(f32 f) {
     u32 u;
@@ -60,18 +62,29 @@ static u64 T2Det_Actor(u64 h, CGameObjectInstance *o, const char *kind, int i, i
 }
 
 void T2Port_LogDet(int frame) {
-    static int sFrom = -1, sVerbose;
+    static int sFrom = -1, sVerbose, sGameFrames;
+    static u32 sLastGf = 0xFFFFFFFF;
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
     u64 h = 0xCBF29CE484222325ull;
     int i, n = 0;
     if (sFrom < 0) {
         sFrom = getenv("T2_DET_FROM") != NULL ? atoi(getenv("T2_DET_FROM")) : 0;
         sVerbose = getenv("T2_DET_ACTORS") != NULL;
+        sGameFrames = getenv("T2_DET_GF") != NULL;
     }
     if (frame < sFrom) {
         return;
     }
-    printf("det: frame %d mode %d level %d rng %08x %08x", frame, (int) gEngineApp.m_Settings.mode,
+    /* T2_DET_GF=1 (round 10 y3): one line set per game frame (a new gFrameCountGameplay), as
+     * tools/port/n64trace.py writes them from the N64's RDRAM; tools/port/detdiff.py aligns both. */
+    if (sGameFrames) {
+        if (gFrameCountGameplay == sLastGf) {
+            return;
+        }
+        sLastGf = gFrameCountGameplay;
+    }
+    printf("det: frame %d gf %u ticks %d mode %d level %d rng %08x %08x", frame, (unsigned) gFrameCountGameplay,
+           (int) gNextTicks, (int) gEngineApp.m_Settings.mode,
            (int) gScene.m_nLevel, (unsigned) gRandomValue, (unsigned) gRandomValueB);
     if (p != NULL) {
         CGameObjectInstance *a = &p->m_CharacterActor;
@@ -91,6 +104,19 @@ void T2Port_LogDet(int frame) {
         int k;
         for (k = 0; li != NULL && k < 256; k++, li = li->m_pNext, n++) {
             h = T2Det_Actor(h, &li->m_Instance, "dyn", k, sVerbose);
+        }
+    }
+    if (sVerbose) {
+        /* the live particles (round 10 y3): the shots and effects, which hit the actors */
+        int j, k;
+        for (j = 0; j < 3; j++) {
+            CParticle *q = (CParticle *) gScene.m_ParticleSystem.m_ActiveList[j].m_pHead;
+            for (k = 0; q != NULL && k < 128; k++, q = q->m_pNext) {
+                printf("det:  prt %d %d type %d pos %08x %08x %08x vel %08x %08x %08x age %08x\n", j, k,
+                       (int) q->header.m_nObjType, T2Det_Bits(q->header.m_vPos.x), T2Det_Bits(q->header.m_vPos.y),
+                       T2Det_Bits(q->header.m_vPos.z), T2Det_Bits(q->m_vVelocity.x), T2Det_Bits(q->m_vVelocity.y),
+                       T2Det_Bits(q->m_vVelocity.z), T2Det_Bits(q->m_cFrame));
+            }
         }
     }
     printf("det: frame %d actors %d hash %016llx\n", frame, n, (unsigned long long) h);
