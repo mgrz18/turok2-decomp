@@ -310,7 +310,16 @@ RUNTIME_BSS = frozenset("""
     gRumblePool sMapSweep sPathNeighbour D_800F1FF4 gAudioDmaBuffers sCinema50Player
     sPathSorted sPoseChildren D_800F55F0 D_800F55F4 gAudioReplyMsgQ sDeathCinemaPlayer
     gAudioGlobals gCollisionResultsP gPakMesgBuf sPathSwap sPoseRegion
+    gMergedController gControllers gPakWatched gPakInserted gFirstControllerPort
 """.split())
+
+# N64 sizes of symbols whose C type has TARGET_PORT-only members: the declarations are parsed
+# for the host, so their "n64" layout counts the host members too. ControllerProfile is 0x224
+# on the N64 and 0x298 with the host rumble pool (structs/controller.h); taken as 0x298, the
+# symbols after gMergedController (gPakMesgBuf, gPakWatched, gPakInserted, gFirstControllerPort
+# and gControllers itself) became aliases inside its 0x298 host bytes, so Cont_InitAll wrote the
+# four profiles over whatever the linker put next (on macOS the legal screen's strings).
+N64_EXTENT = {'gMergedController': 0x224, 'gControllers': 4 * 0x224}
 
 
 def dsize(d):
@@ -612,6 +621,7 @@ class Generator:
         self.ptr_tables = 0   # pointer targets typed as arrays of their pointee
         self.count_hint = {}  # key -> element count stored next to a pointer to it
         self.gfx_relocs = 0   # their w1 addresses made host pointers
+        self.gfx_w1_ints = 0  # their other w1 words, kept as numbers
 
     # -- choosing a type --------------------------------------------------
     def pick(self, name, ds):
@@ -726,6 +736,8 @@ class Generator:
             n = min(ext, 0x100000)
             h = n
         s.nsize, s.hsize = n, h
+        if s.name in N64_EXTENT and N64_EXTENT[s.name] < n:
+            s.nsize = N64_EXTENT[s.name]  # the N64 object (aliases, ROM bytes); hsize stays the host's
         s.align = max(4, dalign(d)) if d is not None else 4
         s.layout_desc = d
         raw = None if self.is_bss(s) else self.elf.read(s.key, n)
@@ -759,6 +771,14 @@ class Generator:
                     ptrs.append((hoff, v, None))
                     self.gfx_relocs += 1
                     continue
+                # any other w1 is a command operand, never an address: keep it as the number it
+                # is. The address heuristics below took sShadowQuadDL's gSPSetGeometryMode(0x210004)
+                # for the code address CMtxF__SetShadowProjection (a host pointer as geometry
+                # mode: G_LIGHTING_POSITIONAL and random bits, the dark/light actors of MACOS.md
+                # section 10) and its gSPTexture scale 0x80008000 for an unresolved pointer (0).
+                img[hoff:hoff + hs] = v.to_bytes(hs, 'little')
+                self.gfx_w1_ints += 1
+                continue
             if kind == 's':
                 v = raw[noff:noff + ns]
                 if len(v) < ns:
@@ -1096,7 +1116,7 @@ class Generator:
         P('pointer targets generated in addition: %d' % (len(ss) - len(from_c)))
         P('bss (zero) symbols: %d' % sum(1 for s in ss if s.bss))
         P("bss byte views given twice their N64 size (host pointers): %d" % len(self.bss_slack))
-        P("display lists: %d, w1 addresses relocated: %d" % (len(self.gfx_syms), self.gfx_relocs))
+        P("display lists: %d, w1 addresses relocated: %d, other w1 kept as numbers: %d" % (len(self.gfx_syms), self.gfx_relocs, self.gfx_w1_ints))
         P("pointer targets typed as tables of their pointee: %d" % self.ptr_tables)
         P('aliases inside another symbol: %d' % sum(1 for s in ss if s.alias_of))
         np = sum(1 for s in ss for it in s.items if it[1] == 'P')
