@@ -6,7 +6,7 @@
 f32 AI_AngleToPoint(sptr, CVector3);               /* angle from the actor heading to a point */
 
 
-void EnemyAI_TurnToPoint(s32 arg0, CAI *arg1) {
+void EnemyAI_TurnToPoint(sptr arg0, CAI *arg1) {
     f32 var_f20;
 
     var_f20 = 0.26179942f;

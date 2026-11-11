@@ -5,6 +5,19 @@
 
 /* Picks an actor's death animation from what killed it (weapon, projectile, hit direction). */
 
+#ifdef TARGET_PORT
+typedef struct Source {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Source(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_kind[T2_HOFF_Source(header.m_Type)]; u8 kind; }; /* N64 0x0 */
+        struct { u8 _hp_type[T2_HOFF_Source(header.m_nObjType)]; u16 type; }; /* N64 0x2 */
+        struct { u8 _hp_flags[T2_HOFF_Source(m_dwFlags)]; s32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_owner[T2_HOFF_Source(m_AI.m_pParent)]; CPlayer *owner; }; /* N64 0x1A8 */
+    };
+} Source;
+#else
 typedef struct {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1;
@@ -14,6 +27,7 @@ typedef struct {
     /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
     /* 0x1A8 */ CPlayer *owner;
 } Source;
+#endif
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x65];

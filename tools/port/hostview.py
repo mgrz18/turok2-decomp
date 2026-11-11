@@ -126,6 +126,13 @@ def main():
     ap.add_argument('file')
     ap.add_argument('view')
     ap.add_argument('real')
+    ap.add_argument('--anchor', default=None,
+                    help='the view starts at this member of REAL (a symbol inside the struct, e.g. '
+                         'gLevelScript_spawnsLeft = LevelScriptState.spawnsLeft): view offset 0 is '
+                         'that member, the host offsets are relative to it')
+    ap.add_argument('--whole', action='store_true',
+                    help='make the host view at least as large as REAL (from the anchor on): a '
+                         'buffer the callee fills as REAL (a stack CAITargets)')
     ap.add_argument('--apply', action='store_true',
                     help='rewrite the file: the host view under #ifdef TARGET_PORT, the N64 one in #else')
     a = ap.parse_args()
@@ -139,6 +146,12 @@ def main():
     rh = find_record(th, a.real)
     lvm = leaves(rm)
     lvh = {p: (o, s) for (p, o, s, t) in leaves(rh)}
+    anchor_n = 0
+    if a.anchor:
+        hits = [o for (p, o, s, t) in lvm if p == a.anchor]
+        if not hits:
+            sys.exit('no member %s in %s' % (a.anchor, a.real))
+        anchor_n = hits[0]
     src = open(a.file).read().encode()
     R = a.real
     lines = []
@@ -147,12 +160,13 @@ def main():
         if n.startswith('pad') or n.startswith('_pad'):
             continue
         size = t.get_canonical().get_size()
-        loc = locate(lvm, o, max(size, 1))
+        loc = locate(lvm, anchor_n + o, max(size, 1))
         if loc is None:
             warn.append('%s at 0x%X: no member of %s there' % (n, o, R))
             continue
         path, delta, rsize = loc
-        hoff = 'T2_HOFF(%s)%s' % (path, (' + %d' % delta) if delta else '')
+        hoff = 'T2_HOFF(%s)%s%s' % (path, (' + %d' % delta) if delta else '',
+                                    (' - T2_HOFF(%s)' % a.anchor) if a.anchor else '')
         decl = src[c.extent.start.offset:c.extent.end.offset].decode()
         lines.append('        struct { u8 _hp_%s[%s]; %s; }; /* N64 0x%X */' % (n, hoff, decl, o))
         if delta == 0 and size != rsize:
@@ -162,6 +176,9 @@ def main():
            ' * member of one union, placed by __builtin_offsetof of the member it reads */',
            '#define %s(m) __builtin_offsetof(%s, m)' % (mac, R),
            '    union {']
+    if a.whole:
+        lines.append('        u8 _hp_whole[sizeof(%s)%s]; /* the whole %s */' % (
+            R, (' - T2_HOFF(%s)' % a.anchor) if a.anchor else '', R))
     out += [l.replace('T2_HOFF(', mac + '(') for l in lines]
     out += ['    };']
     for w in warn:

@@ -11,6 +11,20 @@
 
 void *memset(void *s, int c, uptr n);
 typedef struct K7Sub { u8 pad0[4]; s8 b4; } K7Sub;
+#ifdef TARGET_PORT
+/* The port: the window (Menu, structs/menu.h) at its host offsets: the cursor, the desc, the player and
+ * the controller (pointer-wide); the cache block's address pointer-wide. */
+#include "structs/menu.h"
+typedef struct K7Obj {
+    union {
+        struct { u8 _hp_state[__builtin_offsetof(Menu, cursor)]; s16 state; };
+        struct { u8 _hp_f14[__builtin_offsetof(Menu, desc)]; sptr f14; };
+        struct { u8 _hp_f1C[__builtin_offsetof(Menu, player)]; sptr f1C; };
+        struct { u8 _hp_f20[__builtin_offsetof(Menu, controller)]; K7Sub *f20; };
+    };
+} K7Obj;
+typedef struct K7Mem { sptr addr; } K7Mem;
+#else
 typedef struct K7Obj {
     s16 state;
     u8 pad2[0x12];
@@ -20,6 +34,7 @@ typedef struct K7Obj {
     K7Sub *f20;
 } K7Obj;
 typedef struct K7Mem { s32 addr; } K7Mem;
+#endif
 extern s32 D_800F70A8;
 extern u8 D_800B48D4[];
 extern u8 D_800B4B1C[];

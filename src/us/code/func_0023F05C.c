@@ -20,7 +20,16 @@ void CPlayer__TouchPickup(sptr arg0, CPooledLevelActor *arg1) {
         }
     } else if (!(temp_v1 & 1)) {
 block_4:
+#ifdef TARGET_PORT
+        /* the port: DEBUG-ONLY T2_PICKUP_LOG=1 logs each touch (port/game/t2debug.c) */
+        s32 id = GameObject_GetTypeId((sptr) arg1);
+        s32 got = CPlayer__CollectPickup(arg0, (sptr) arg1, id);
+        extern void T2Port_LogPickup(sptr player, void *actor, s32 id, s32 got);
+        T2Port_LogPickup(arg0, arg1, id, got);
+        if (got != 0) {
+#else
         if (CPlayer__CollectPickup(arg0, (sptr) arg1, GameObject_GetTypeId((sptr) arg1)) != 0) {
+#endif
             temp_v0 = arg1->m_Actor.m_wFlags | 1;
             arg1->m_Actor.m_wFlags = temp_v0;
             if (temp_v0 & 8) {

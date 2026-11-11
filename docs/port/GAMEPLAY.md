@@ -427,3 +427,251 @@ type on the N64); `tools/asm_diff.py --base d3f05a74 -j 8` 0 over the whole tree
 5. Why no trigger wakes demo 1's enemies along the demo's own path (gdb on
    `LevelEvent_ProcessTriggers` after the level loads: the region-info ids with events, 4/9/10,
    are not on the path; probably correct).
+
+## 9. Round 8, part w1: enemies hurt the player, death and game over
+
+Branch names-R8_w1; the fix table and the run are in STATUS.md (round 8, part w1).
+
+### 9.1 How an enemy gets to hurt the player
+
+- **Alert.** An enemy's alert level is `CAI::m_ActionTime`; `AI_HearNoise(actor, ai, pos, kind)`
+  raises it by 45/105/150 (noise kinds 1/2/3) scaled by the distance (0 at 3072 units), and
+  `AI_FindBestTarget` calls it with kind 3 whenever the enemy sees its target in its view cone.
+  `EnemyAI_AttackWait` turns an alert level over 30 into `m_Action = 1` (and mode 12, the alert
+  animation, when the definition has one). Definitions without type flag 0x8000 start alerted
+  (`EnemyAI_InitDispatch`: level 52's type 0xC8).
+- **Targets.** `AI_FindBestTarget(self, ai, 0, 1)` (the path target) skips every candidate while an
+  enemy is unalerted (`m_Action == 0`); the sight target (`AI_UpdateTargets`) does not need it.
+- **Attack choice.** `EnemyAI_PickAttack` adds melee (mode 0x0E) when the path target is within
+  `m_AttackCombatRadius` (81.92 for type 0x190), leap/dart (0x0F/0x10) at their radii, the
+  projectile (0x12) and weapon (0x11) attacks by the sight distance (1024 / 409.6) once
+  `m_AttackDelay` has run out. With w1-1 broken on the host, only the projectile was ever picked.
+- **Melee.** An animation event of mode 14 sends `ImpactEvent_AreaDamage` around the hot
+  point -> `ImpactEvent_ApplyBlast` -> `CAI__CallHurt(player, ai, event)`.
+- **Projectiles.** The type-0x190 shot is particle kind 66, spawned by an animation event at
+  `local (54, -124, 242)` through `m_mfOrient` (scale 0.5): 121 units above the feet, at the
+  enemy's x/z after `GameObject_TraceMove`. Its template has flag 0x40000 (aimed:
+  `GameObject_GetAimRotation` turns it toward the sight target's position + y offset + 0.75 x
+  its collision height) and a direction of (0, 0.195, 0.98): 11 degrees above the aim line, then
+  gravity (about 2,050 units/s^2) at about 1,430 units/s. From point-blank range (81 units, both
+  cylinders touching) it crosses the player's axis at y about 392 and the cylinder's front at
+  about 410, above its top (399.4: the feet + 92.16): a miss, by the ROM's own numbers; by the
+  same numbers it would hit from about 300 units (not run). Hits go `Collision_SweepActors` -> `Sweep_TestInstance` (the player has flags 0x300000)
+  -> `CParticle__HitTarget` -> `ImpactEvent_DirectDamage` -> `CAI__CallHurt`.
+- **The player's hurt callback** is `Player_OnMultiplayerKill` (its name; it runs in single
+  player too): `CPlayer__Hurt` (damage 8.8, invincibility, cheats, the red flash
+  `CCamera__SetHitFlash(alpha, 30)`, rumble, the low-health text and speech 0x156 under 15, the
+  pain sound 0x3AC0), then the kill counters in multiplayer. Each type-0x190 hit costs about 7.5.
+
+### 9.2 Death, respawn, game over
+
+- Health 0: `CPlayer__Kill`, player mode 19 (the camera drops to the floor, letterboxed), then
+  the death cinema (level 164) unless one life is left; `PlayerDeath_CinemaDone` ->
+  `CPlayer__LoseLife` (lives - 1) -> `CPlayer__Warp(checkpoint, respawn)`.
+- The checkpoint is `m_Data.m_CheckPointWarpID`, set by `CPlayer__LevelStart` to the warp id of
+  the level just entered (not during a cinema). On the host every cinema cleared it (w1-4), so
+  a death went to level 0.
+- With no life left: player mode 15, `PlayerState15_Enter` opens `gGameOverMenuDesc` (or
+  `gContinueMenuDesc` while `m_Data.m_Lives` is non-zero), `GameOverMenu_Init` starts the
+  countdown, and when it runs out the engine goes back to the legal screen.
+
+### 9.3 Debug aids used
+
+`T2_WARP_TO=-82` (level 81), `T2_TELEPORT` onto the enemy's spawn point (2334.7, 307.2,
+-1054.7), `T2_WAKE_ENEMIES=1500`, `T2_ACTOR_LOG` (`act` is `m_Action`: 1 = alerted). gdb
+breakpoints that answered the questions: `CPlayer__Hurt` (damage, `bt` to tell melee from
+projectile), `CPlayer__Warp` (the checkpoint), a watchpoint on
+`((CPlayer*)player)->m_Data.m_CheckPointWarpID`.
+
+## 9. Round 8, part w2: the player kills enemies
+
+Branch names-R8_w2. Every src/include change is `TARGET_PORT` or an `s32` -> `sptr` retype (the
+same type on the N64); `tools/asm_diff.py --base 5bf03fd0 -j 8` reports 0 over all 3,938 files.
+**The archive must be rebuilt** (`structs/intelligence.h`: the enemy drop masks; sha1
+`b6b9d484e6f97718e48ddc6d7f0ce9188dbb11c5`) and `decls.json` deleted.
+
+### 9.1 The test
+
+Level 52 (warp 1098), the corridor west of the 0xC8 enemy 11, enemies 11 and 12 woken, the
+player turned to the nearest live enemy every frame, Z held in bursts (`fight.txt`:
+`START@4400 A@4500 A@4700 A@4800`, then `Z@13320..13420`, `Z@13460..13560`... every 140 frames
+to 14600):
+
+```sh
+T2_WARP_TO=1098 T2_GIVE_WEAPONS=1 T2_WEAPON=4 T2_TELEPORT="13300:-1143.6,0,-2034.7" \
+T2_WAKE_ENEMIES=500 T2_FACE_NEAREST=1500 T2_STATE_LOG=30 T2_ACTOR_LOG=2 \
+turok2 ... --game --draw --pak-blank --frames 14800 --input @fight.txt
+```
+
+Without `--input` firing (only the new game) the same setup shows the enemies' side: they
+run at the player (mode 4), melee him (modes 14/19) and his health goes 100 -> 20 by frame
+14,970 (w1 owns the player's side: damage flash, death).
+
+### 9.2 Fix table (w2)
+
+| # | where | cause | fix |
+|---|---|---|---|
+| w2-1 | no shot ever hit an enemy (the bullets passed through; `CParticle__HitTarget` never ran) | `Sweep_TestBox` (func_0023FDF0) read each node box's centre as the s16 halves at 0x18 of the joint's fixed-point `Mtx`: the host keeps the Mtx as host-order u32 words (as `CMtxF__FromMtxAffine` reads it), so the view read y, x, w | the halves of words 6 and 7 (as func_00235C30's decals already did) |
+| w2-2 | the first kill crashed in `GameObject_GetDeadCollisionHeight` | the definition at the instance's N64 0x14 | host body |
+| w2-3 | `EnemyAI_OnDamage` (func_0025B2D4) | its `Object` view (an instance or a particle): the type id, flags, the particle owner, the hot-point flags at N64 offsets (the definition only matched by alignment luck) | host view (CGameObjectInstance, the owner at `CParticle.m_pOwner`) |
+| w2-4 | `EnemyAI_OnHit` (func_0025CAC8) | `Projectile` view: owner, charge at N64 CParticle offsets | hostview.py |
+| w2-5 | `EnemyAI_PickDeathMode` (func_0025B078) | `Source`: flags and owner at N64 offsets (its `HitInfo` matches the host `DamageEvent` by alignment) | hostview.py |
+| w2-6 | `EnemyAnim_PickDeath` (func_0025DF04) | `AttackState` (CAI flags, anim, the behaviour index inside m_VarBuffer); the region as s32 | host views, the region pointer-wide |
+| w2-7 | corpses stayed in mode 52 forever, nothing dropped | `EnemyMode_Death_Update` (func_0025E248): its CAI view read the animation's repeat count, mode and time at N64 offsets, its instance flags at N64 0xD4 (it wrote them into the wrong field) | host views: the death animation ends, `AI_DropPickupsOnce`, mode 60 (`EnemyMode_DeathMelt_Update`: the corpse sinks and stops drawing) |
+| w2-8 | `EnemyAnim_ExtremeDeath` (func_0025FD98, the gib deaths' animation picker) | N64 0x14 / CAI 0x36 | host body |
+| w2-9 | `AI_UpdateRegionFlags` (func_00242E34: region damage) | `Dest`: the damage timer at N64 CAI 0xCC | hostview.py (`m_DeathRegionTimer`) |
+| w2-10 | `AI_StartSound`/`AI_StopSound` (func_00246860, func_00246918) | the AI's looping sound at N64 CAI 0xEC and the sound node's id at N64 0xC: every enemy death wrote 0 into the host CAI | host bodies on `m_pAttachedLoopingSound` / `SndSource.sound` |
+| w2-11 | the enemy drop masks | `CEnemyIntelligence` 0x0C was `s16 unk0C; u8 pad0E[2]`: the archive swapped a u32 bit mask (sDropPickups bits, all 32 used) as a half and two bytes | `u32 m_DropMask; u32 m_DropMask2` (no N64 code read the old names): **archive rebuilt** |
+| w2-12 | no enemy chased the player: woken and alerted, they stood in mode 10 (the level-52 0xC8 "stuck in mode 10") | `REGION_WORD` read `{u16 m_nInfo, u16 m_wFlags}` as one host u32: `Sweep_CrossRegionEdge`'s closed-edge test `(word & 6) == 2` tested the info index, so `Path_FindRegionPath` found no region path, `AI_UpdatePathHeading` failed, `AI_FindBestTarget` gave no path target (path kind 3, the home point) and `EnemyAI_PickAttack` never had one for a melee | the big-endian word built from the members on `TARGET_PORT` (structs/region.h; also func_00400000) |
+| w2-13 | `AI_HearNoise` (func_0025E52C): no enemy was ever alerted | the behaviour table and the alert timer at N64 CAI offsets | **the same fix as w1's 8afda2c4: take w1's** (my copy is not committed) |
+| w2-14 | the first melee crashed in `EnemyAnim_PickAttack_B0A60` (func_0025A304) | definition at N64 0x14 (`M2C_FIELD`) | host body |
+| w2-15 | `EnemyAI_CurrentHasComboEndAnim` (func_00260360) | N64 0x14, CAI 0x34/0x133 | host body |
+| w2-16 | `--high-memory` | `EnemyAnim_PickAttack_B0E80/_B1200`, `EnemyAI_TurnToPoint`, `EnemyAI_CheckGrab` took the actor as s32; `EnemyAI_CheckGrab`/`EnemyAI_GetGrabbed` kept the grabbed throwable in the u32 `m_VarBuffer[2]` | sptr; `m_Enemy.m_pGrabbed` |
+
+### 9.3 What runs (Linux, headless)
+
+- **The pistol fight** (above, 14,800 frames, exit 0): enemy 12 is hit at 13,350 (hp 20 -> 15:
+  `CParticle__HitTarget` -> `EnemyAI_OnHit`, `ImpactEvent_DirectDamage` ->
+  `ImpactEvent_ApplyBlast` -> `DamageEvent_Set` + `CAI__CallHurt` -> `EnemyAI_OnDamage`), enemy
+  11 flinches (mode 36, the arm wound), both die by 13,500 (mode 52, `EnemyAnim_PickDeath`'s
+  death animation 18), the corpses lie on the floor and at 14,130 enemy 11 enters mode 60 (the
+  melt: flags 0x100/0x2000 cleared). The player's health stays 100. Ammo 50 -> 12.
+- **Shotgun** (`T2_WEAPON=8`): one-shot kills, enemy 12 in mode 56 (0x38, the side death).
+  **Grenade launcher** (15): the explosion (flash, rings, the blast through
+  `ImpactEvent_ApplyBlast`) kills both, mode 52. **Cerebral bore** (13): fires, no kill in the
+  scripted test (it needs its lock-on). The gib deaths (modes 0x35/0x36) need the gore setting
+  (`gEngineApp_m_Settings.unk17`): not seen.
+- Screenshots (checked by eye, `R8_w2_*` in the scratchpad): the enemy in the crosshair with
+  red blood bursts from the pistol hits (13,401..13,521), the death fall and the corpse on the
+  floor (13,661..13,741), the shotgun hit and the grenade explosion.
+- **Drops**: `AI_DropPickupsOnce` runs at the end of the death animation; every enemy of levels
+  52 (0xC8, 0xC9) and 81 (0x190-0x192) has drop masks 0/0 (`T2_ACTOR_LOG` prints them now), so
+  nothing drops there; the destructibles' drops (func_00265D14) work (level 51: ids 1702, 2201,
+  2500).
+- **Kill counters**: single player has none to see; `TotemDefense_AddKill` (the totem defence
+  mode) is called from `EnemyAI_OnDamage`.
+
+### 9.4 Debug aids (DEBUG-ONLY)
+
+- `T2_FACE_NEAREST=R` (port/game/t2debug.c): every gameplay frame the first player turns to the
+  nearest live level enemy within R (default 2000): `pl->m_RotY += AI_AngleToPoint(pl, enemy)`;
+  prints `face:` when the target changes. Yaw only (level 52's corridor is flat).
+- `T2_ACTOR_LOG` lines end with `drop <mask>/<mask2>`.
+
+### 9.5 Next
+
+1. The enemies are black silhouettes near the player except under the muzzle flash (level 52's
+   dark corridor): compare the actor lighting (`G_MOVEMEM` lights) with an emulator.
+2. `EnemyAI_DrawNode` (func_0025ECDC) is still N64 offsets (0x98, the 0x18 stride, the node
+   record's 0xC/0x1B): find which enemies draw through it.
+3. Gore deaths (0x35/0x36, `EnemyAnim_ExtremeDeath`) with the gore option on; the cerebral bore
+   and the tranquilizer/charge dart reactions (`EnemyAI_OnHit` modes 0x1D/0x1F/0x20).
+4. An enemy with non-zero drop masks (other levels) to see a drop and its collection.
+
+## 9. Round 8, part w3: the boss fights
+
+All four boss levels now run their fight code to the end of the test (Linux headless, low memory
+and `--high-memory`, 16,000-20,000 frames, no crash). Before this round the Primagen stopped at
+frame 12,955 (`Primagen_UpdateSpawner`; w4 hit the same crash on the Mac) and the Blind One at its
+setup (`BlindOne_Setup` called through a garbage phase table). The bosses' *spot damage* is not
+proven yet (below).
+
+### 9.1 What was wrong
+
+| # | where | cause | fix |
+|---|---|---|---|
+| w3-1 | **data**: every table of structs that splat cut with a label of its own (`D_xxx`) | gendata sized `extern T x[]` to the next ELF label: `sBlindOneScript` 5 of 17 steps, `sBlindOnePhases` 1 of 11 entries (so phase 1 called whatever followed), `sMantidQueenScript` 1 of 8 waves (a field label 4 bytes in), the Primagen attack/spawn/sound scripts cut before their end markers; the labels after them were left out or emitted as raw big-endian bytes | `tools/port/gendata.py` `split_table_extent`: a declared, unsized table of structs extends over labels the C does not declare, up to the next declared symbol, to the farthest label that ends a whole element (at most 256), stopping before an element whose pointer slots are not 0 or N64 addresses. 20 tables (listed in `port/gen/data_report.txt`: the boss scripts, `sMotherBossModeTable` 0x360 -> 0x440, `sPrimagenModeTable`, `gLevelMessages` 0x4 -> 0x2D0 bytes, `gAdecHuffSegments` 4 -> 24 segments, `gCharacterSelectSounds`). Pointer slots unresolved: 32, unchanged. Scalar tables (s16 toss tables, a float animator script) sized in `globals/boss.h` under `TARGET_PORT` |
+| w3-2 | the Primagen: `Primagen_UpdateSpawner` (func_0040457C) | the level-script view at N64 offsets (handle, waves, found[], resetRegion...); its `CAITargets` buffer 0x88 bytes on the stack (host 0xA0: the stack smashed, "corrupt stack" in gdb); the player's region kept in an s32 | hostview (`ModeState0040457C`, `Entity0040457C`, `Actor0040457C`, `Info0040457C --whole`); `LevelScriptState.region` `sptr` on the host; `BossStep2` words 0x08/0x0C typed (`waveSize`, `waveDelay`: the wave view reads them, the archive left them big-endian) |
+| w3-3 | the other level-script views anchored at a `gLevelScript_*` symbol with N64 deltas | `LevelScriptF950` (spawn steps, func_00404FE0/004050E0), `BossTimers` (func_0040688C), `LevelScriptF9D0` (func_00407BBC), `LevelScriptF604` + `BossCtl` (`Primagen_UpdateMode19`, func_00406000) | `hostview.py --anchor MEMBER`: the view starts at that member of the real struct; offsets relative to it |
+| w3-4 | `Primagen_UpdateMode28` (func_00407C20), `Primagen_EnterMode18` (func_004075F8), `Primagen_EnterMode7`'s `MODULE` | N64 deltas from `script3.cursor` (the step pointer half-written: the first `Primagen_NextSoundStep` crashed), the actor at 0x1FC/0xD4 | host bodies; `MODULE` = `&gLevelScript` |
+| w3-5 | script C steps 2 and 3 (`Primagen_RunSoundStep`, func_004053C4) | the step's `arg` is an N64 data address (a sound table, the next script) stored in an s32 | `t2_n64_to_host` |
+| w3-6 | `BossMode` (the view at `gLevelScript_bossMode`) | host natural alignment put its `BossScript` at +0x20; in `LevelScriptState` it is at bossMode + 0x1C | `#pragma pack(4)` on the host (BossState, at +0x20, was already right) |
+| w3-7 | the Mother: the first hit crashed (`CAI__CallHurt` called `gCollisionSetupTable`) | `MotherBoss_Init` installs `func_00408FF8 + 8` (splat started the hurt function's object two words early): on the host that is data | `MotherBoss_Hurt` by name |
+| w3-8 | the Mantid Queen | `MantidQueen_UpdateMode6` and `MantidQueen_FlashWeakSpot`: the actor, its CAI and `gMantidQueen` (boss 0x220, step 0x214, spots at the 0x68 stride) at N64 offsets | host bodies on `WaveBossState` |
+| w3-9 | the Blind One level (7401) | `GameObject_GetDeadCollisionHeight` (intelligence at 0x14, the height at 0x34); `CScene__MarkGeneratorsSaved` (the actor table at 0xE0/0xE8, stride 0x288); `BlindOne_PhaseMinionsInit` and `BlindOne_ActorAppearEnter` views (regions as s32) | host bodies / hostview, regions `sptr` |
+
+### 9.2 What runs
+
+New game, then `T2_WARP_TO=<warp>`; `T2_BOSS_LOG=1` (with `T2_STATE_LOG`) prints the fight
+state; firing tests add `T2_GIVE_WEAPONS=1 T2_WEAPON=10` and `Z@14800..15100 Z@15300..15600 ...`.
+
+| level | to | what happens |
+|---|---|---|
+| Mother (`-4`, level 3) | 18,000 | the boss (25,600 hp) cycles its modes 2/3/4 facing the player at 1,239 units. **Plasma rifle fire hits her** (150 shots, the explosions on her belly: frame 14900/15000) and reaches `MotherBoss_Hurt` (18 explosion hits in one run). The spots do not lose health: every hit's `HitFrame.unk_6C` is 0x201 (the body node); the spots of phase 0 need 0xC00 (kind 0) or 0x5000 (kind 1), i.e. the arms/head. Aiming at them (or a different `HitFrame` copy for blasts) is next |
+| Mantid Queen (7501, level 2) | 18,000 | the wave script runs with all 8 waves now (`step 1, toSpawn 3, members 8, wave 1`), spot health 0/0xFF00/0x9600/0x1E00/0x1900 as `MantidQueen_Init` sets them; no hit on a spot yet (the Queen stays in mode 1 at the arena centre; the player was teleported to (400, 0, -500)) |
+| Primagen (7602, level 4) | 17,000 | past the old stop: the spawner opens the doors and spawns its type-0x387 enemies (4 seen at (+-1700, 1065, 2850), 8 hp each) on its wave script, the attack and sound scripts step |
+| Blind One (7401, level 1) | 20,000 | with `T2_TELEPORT=14000:-400,204.8,0`: the setup finds its 4/4/3 actors, the player in range steps the script to phase 3 (the minions, 8 alive), which waits for the minions to die (w2's kills) |
+
+All four also run to 16,000 frames with `--high-memory`. Regressions on the same binary: the boot
+to 26,000 frames (title again), the firing journey (end (315.9, -793.4, -1352.3) as in round 7),
+demo 1 with the enemy switches (8,600).
+
+### 9.3 Next
+
+1. The Mother's weak spots: aim at the arms (the spot bits 0xC00/0x5000 in `HitFrame.unk_6C`), or
+   check that blasts carry the hit node the projectile struck (`ImpactEvent_ApplyBlast` hands
+   `gCollisionResults.m_Frame`, the last sweep's node).
+2. The Mantid Queen and the Primagen: get a hit on a spot/part (`MantidQueen_Hurt`,
+   `Primagen_*` parts) and follow the fight to the death cinemas.
+3. The Blind One: once w2's enemies die, phases 4.. (the groups' movers, `BlindOne_UpdateMover`).
+4. Boss files with raw N64 offsets not reached yet: `MantidQueen_UpdateMode15` (func_004032E4),
+   `MantidQueen_Draw` (func_00403660), the module-2 copies (not linked).
+
+## 9. Round 8, part w5: progression (pickups, saves, the pause and options menus)
+
+Branch names-R8_w5. Everything on Linux, headless, low memory, `--game --draw` (the pak runs:
+`--pak-dir DIR` instead of `--pak-blank`). Saves on the Controller Pak: [INPUT.md](INPUT.md)
+section 7.
+
+### 9.1 What works
+
+| what | how it was run | result |
+|---|---|---|
+| level pickups | `T2_PICKUP_LOG=1`, `T2_TELEPORT` onto the placed level actors (positions from `tools/assets/levels.py --level 51/52`) | life force in level 51 (ids 1706 = 10, 1705 = 1: 0 -> 10 -> 16, the HUD counter top right), the **level 2 key** in level 52 (id 4310, "LEVEL 2 KEY" on screen), **10 pistol bullets** (id 2500, the message); health pickups (2200, 2201) are left alone at full health, as on the N64 |
+| save | new game, `T2_SAVE_PORTAL=13100` (the save portal menu as after a portal's cinema), A: SAVE, A: SAVE GAME | "SAVE WAS SUCCESSFUL"; the note "TUROK 2" (NT2E/51, ext A, 90 pages) on the .mpk, big-endian, checked by `tools/port/mpk_saves.py`: checksum OK, health 100, lives 3, clock 0:02:20, 663 ISets of level flags. After OK the game goes to the portal room (level 97, Adon) as on the console |
+| save in level 52 | `T2_WARP_TO=1813` + exit52.txt, `T2_SAVE_PORTAL=13500` | checkpoint warp 1098 in the note |
+| load | boot with that .mpk: `START@4400 A@4500 DD@4700 A@4800` (main menu -> LOAD GAME), `DU@4900 A@5000` (note 1), `A@5200` (LOAD? YES), `A@5400` (the rumble pak notice) | NOTE INFO shows PORT OF ADIA, TIME 0:02:20, NORMAL, HEALTH 100, LIVES 3; the game loads level 51 (frame ~5600); the level-52 save loads **level 52** at its entry (1280.0, 0.0, -3225.6), frame ~6200 |
+| pause menu | `START` in gameplay | PAUSED: resume, mission status, inventory (drawn), options, sound options, enter cheat, cheats, quit |
+| sound options | pause, `DD`x4, A; `DL` held on MUSIC VOLUME / SFX VOLUME | NORM -> 4, MAX -> 13; the mixer follows: music volume to its minimum takes the run's RMS from ~1,700 to ~40 (`--audio --wav`, 600 frames) |
+| options | pause, `DD`x3, A | the 13 rows (difficulty greyed in game); CONTROL TYPE expert -> ARCADE, CONTROL SIDE right -> LEFT, LOOK SPRING on -> OFF; GO BACK returns to the pause menu, RESUME to the game |
+
+### 9.2 Fix table (w5)
+
+| # | where | cause | fix |
+|---|---|---|---|
+| W5-1 | `SingleMenu_Load` (func_00419618) | view read the player/controller at N64 0x1C/0x20: the load menu got half the desc pointer as its controller (cursor ran up every frame, A never confirmed) | typed Menu |
+| W5-2 | `PakMenu_InitLoadGame` (func_0041EC44) | Rage Wars view (`Shared_PakMenu`, items 0x28 apart): wrong channel, the wrong item enabled | typed Menu |
+| W5-3 | `PakMenu_SelectNote` (func_0041F32C) | `K7Obj` at N64 offsets, the cache block address in an s32 | host view; `K7Mem` pointer-wide |
+| W5-4 | `Pak_FindNote` (func_00425E74) | memcpy of the integer game/company codes: "E2TN"/"15" on the host, so the game's own note never matched (greyed, not loadable) | the codes spelled high byte first |
+| W5-5 | `GameNoteMenu_SelectYes` (func_00420454) | `m_bCinema + 0x588` as the menu pool | `gEngineApp_m_Game.m_MenuPool` |
+| W5-6 | `GameNoteMenu_SelectNo` (func_00422124) | `RecordRecAt24` view | typed Menu |
+| W5-7 | `CPlayerPool__FindByController` (func_0025342C) | N64 offsets 0x20/0xA50/0x1320: NULL, the load crashed | typed CPlayerPool/CPlayer |
+| W5-8 | menu strings declared `s32` (func_00421E44, 004220F0, 00422608, 00421DFC, 0041C034, 0041B1E4, 0041B26C, 00408B20) | gendata types a symbol by its declaration and swapped the text as words ("ETONFNI", "DAOL", "TNOC LOREDIS") | `char[]` on TARGET_PORT (gendata again) |
+| W5-9 | `CScene__SetLevelActorKilled` (func_002247E4) + `IsLevelActorKilled`, `...InLevel` (func_002248D4, func_00224700, func_00226B34) | the scene's bit sections and level at N64 0x6C/0x18FA8, the killed index at 0x16E: collecting a pickup crashed | typed CScene/CLevelActor |
+| W5-10 | `Menu_Construct` and its 5 callers (func_00413230) | the window param stored as an s32 into the pointer-wide `param`/`submenu` union, K&R calls with int args: Options -> GO BACK crashed in `MenuPool_OpenSubmenu` | sptr param, N64 desc params resolved with `t2_n64_to_host` |
+| W5-11 | save notes | host order on the pak | port/game/t2save.c (INPUT.md section 7) |
+
+### 9.3 Debug aids (DEBUG-ONLY, port/game/t2debug.c)
+
+`T2_SAVE_PORTAL=F` (open the save portal menu at frame F), `T2_PICKUP_LOG=1` (every pickup
+touched: id, position, taken or not, health/life force/lives/ammo after), `T2_ACTOR_TYPES=6,8,...`
+(with `T2_ACTOR_LOG`: the nearest actors of these intelligence types instead of enemies),
+`T2_DOOR_OPEN=F` (the door-open event to the doors within 800 units).
+
+### 9.4 Open
+
+1. **Doors**: walking into level 51's door at (1382.4, -307.2, 0.0) stops the player 78 units
+   from it and the door stays in mode 1 (closed); `T2_DOOR_OPEN` (`CAI__SetMode(door, ai, 0)`,
+   what `Door_EventOpen` does) does not change its mode either. Next: why the mode request is not
+   taken (the door's step/mode change path), the proximity trigger system (func_002233A8:
+   `CAI__SetMode` by distance), and `Door_OpenNow`/`Door_CloseNow` (func_00265838/func_002658A0:
+   a Rage Wars `LevelActor` view, position at 4). Switches and levers were not reached.
+2. Health pickups need a damaged player (w1's damage path) to show being taken.
+3. The save-portal walk itself (the portal actor and cinema 400) was replaced by
+   `T2_SAVE_PORTAL`; the menus and the save after it are the game's.
+4. Module 2 (`_2` twins of the pak menus) is not linked and was not touched.
+5. `MenuPool_OpenMenuParam` still takes the player/controller/context as s32 (truncates with
+   `--high-memory`); other strings declared s32 may remain (the scan in 9.2 found the 8 visible
+   ones; `D_800A5EC0` "level index" is only a cache label).
+6. Not run this round: `--high-memory` and macOS on these paths.
+

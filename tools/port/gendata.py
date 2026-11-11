@@ -310,7 +310,16 @@ RUNTIME_BSS = frozenset("""
     gRumblePool sMapSweep sPathNeighbour D_800F1FF4 gAudioDmaBuffers sCinema50Player
     sPathSorted sPoseChildren D_800F55F0 D_800F55F4 gAudioReplyMsgQ sDeathCinemaPlayer
     gAudioGlobals gCollisionResultsP gPakMesgBuf sPathSwap sPoseRegion
+    gMergedController gControllers gPakWatched gPakInserted gFirstControllerPort
 """.split())
+
+# N64 sizes of symbols whose C type has TARGET_PORT-only members: the declarations are parsed
+# for the host, so their "n64" layout counts the host members too. ControllerProfile is 0x224
+# on the N64 and 0x298 with the host rumble pool (structs/controller.h); taken as 0x298, the
+# symbols after gMergedController (gPakMesgBuf, gPakWatched, gPakInserted, gFirstControllerPort
+# and gControllers itself) became aliases inside its 0x298 host bytes, so Cont_InitAll wrote the
+# four profiles over whatever the linker put next (on macOS the legal screen's strings).
+N64_EXTENT = {'gMergedController': 0x224, 'gControllers': 4 * 0x224}
 
 
 def dsize(d):
@@ -610,8 +619,10 @@ class Generator:
         self.bss_slack = []   # .bss byte views given twice their N64 size
         self.gfx_syms = []    # display lists (Gfx data)
         self.ptr_tables = 0   # pointer targets typed as arrays of their pointee
+        self.split_tables = []  # (name, N64 extent, extended): split_table_extent
         self.count_hint = {}  # key -> element count stored next to a pointer to it
         self.gfx_relocs = 0   # their w1 addresses made host pointers
+        self.gfx_w1_ints = 0  # their other w1 words, kept as numbers
 
     # -- choosing a type --------------------------------------------------
     def pick(self, name, ds):
@@ -681,6 +692,8 @@ class Generator:
             n, _ = dsize(d[2])
             if n <= 0:
                 return None, ext
+            if d[2][0] == 'r' and s.why == 'C' and not self.is_bss(s):
+                ext = self.split_table_extent(s, ext, n, d[2])
             cnt = max(1, ext // n)
             d = ['a', cnt, d[2]]
         elif d[0] in ('s', 'p'):
@@ -713,6 +726,50 @@ class Generator:
             return None, ext
         return d, ext
 
+    def split_table_extent(self, s, ext, n, elem):
+        """An `extern T x[];` table of structs that splat cut with labels of its own (D_xxx: m2c
+        refs into an element, or an unreferenced split): the N64 extent to the next label can be
+        a part of the table (sBlindOneScript: 5 of 17 steps; sMantidQueenScript: 1 of 8 waves,
+        cut by a field label 4 bytes in), and the labels after it are left out or emitted as
+        raw big-endian bytes. Extend it over labels the C does not declare, up to the next
+        declared symbol (or the section end), to the farthest label that ends a whole element
+        (at most 256 elements). An element whose pointer slots do not all hold 0 or an N64
+        address (RAM, or the 0x004xxxxx module) ends it: the table stops before it."""
+        r = self.elf.section_of(s.key)
+        end = r[1] if r else s.key + ext
+        i = bisect.bisect_right(self.elf.keys, s.key)
+        best = ext
+        while True:
+            k = self.elf.keys[i] if i < len(self.elf.keys) else end
+            stop = k >= end or any(nm in self.declared for nm in self.elf.at.get(k, ()))
+            k = min(k, end)
+            if k - s.key > n * 256:
+                break
+            if (k - s.key) % n == 0:
+                best = k - s.key
+            if stop:
+                break
+            i += 1
+        lv = []
+        leaves(elem, 0, 0, lv)
+        pslots = [lf[0] for lf in lv if lf[2] == 'p']
+        if pslots and best > ext:
+            raw = self.elf.read(s.key, best) or b''
+            for e in range(best // n):
+                ok = True
+                for o in pslots:
+                    b = raw[e * n + o:e * n + o + 4]
+                    v = int.from_bytes(b, 'big') if len(b) == 4 else -1
+                    if not (v == 0 or 0x80000000 <= v < 0x80800000 or 0x00400000 <= v < 0x00500000):
+                        ok = False
+                        break
+                if not ok:
+                    best = e * n
+                    break
+        if best > ext:
+            self.split_tables.append((s.name, ext, best))
+        return max(ext, best)
+
     def layout(self, s):
         if s.items or s.alias_of:
             return
@@ -726,6 +783,8 @@ class Generator:
             n = min(ext, 0x100000)
             h = n
         s.nsize, s.hsize = n, h
+        if s.name in N64_EXTENT and N64_EXTENT[s.name] < n:
+            s.nsize = N64_EXTENT[s.name]  # the N64 object (aliases, ROM bytes); hsize stays the host's
         s.align = max(4, dalign(d)) if d is not None else 4
         s.layout_desc = d
         raw = None if self.is_bss(s) else self.elf.read(s.key, n)
@@ -759,6 +818,14 @@ class Generator:
                     ptrs.append((hoff, v, None))
                     self.gfx_relocs += 1
                     continue
+                # any other w1 is a command operand, never an address: keep it as the number it
+                # is. The address heuristics below took sShadowQuadDL's gSPSetGeometryMode(0x210004)
+                # for the code address CMtxF__SetShadowProjection (a host pointer as geometry
+                # mode: G_LIGHTING_POSITIONAL and random bits, the dark/light actors of MACOS.md
+                # section 10) and its gSPTexture scale 0x80008000 for an unresolved pointer (0).
+                img[hoff:hoff + hs] = v.to_bytes(hs, 'little')
+                self.gfx_w1_ints += 1
+                continue
             if kind == 's':
                 v = raw[noff:noff + ns]
                 if len(v) < ns:
@@ -1096,8 +1163,11 @@ class Generator:
         P('pointer targets generated in addition: %d' % (len(ss) - len(from_c)))
         P('bss (zero) symbols: %d' % sum(1 for s in ss if s.bss))
         P("bss byte views given twice their N64 size (host pointers): %d" % len(self.bss_slack))
-        P("display lists: %d, w1 addresses relocated: %d" % (len(self.gfx_syms), self.gfx_relocs))
+        P("display lists: %d, w1 addresses relocated: %d, other w1 kept as numbers: %d" % (len(self.gfx_syms), self.gfx_relocs, self.gfx_w1_ints))
         P("pointer targets typed as tables of their pointee: %d" % self.ptr_tables)
+        P("struct tables extended over splat labels: %d" % len(self.split_tables))
+        for nm, a, b in self.split_tables:
+            P("  %s: 0x%X -> 0x%X" % (nm, a, b))
         P('aliases inside another symbol: %d' % sum(1 for s in ss if s.alias_of))
         np = sum(1 for s in ss for it in s.items if it[1] == 'P')
         P('pointer slots: %d (relocated %d, null %d, unresolved %d)' % (

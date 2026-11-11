@@ -1,3 +1,32 @@
+#ifdef TARGET_PORT
+#include "common.h"
+#include "structs/game_object.h"
+#include "structs/sound.h"
+#include "protos/game.h"
+
+extern void Sound__StopOwner(void *);
+extern s32 LoopSounds_Stop(struct LoopSounds *, SndSource *);
+
+/* host body (round 8 w2): the AI's looping sound by member (the N64 text below reads and clears
+ * the N64 CAI 0xEC: on the host that wrote 0 into the CAI at every enemy death). */
+void AI_StopSound(CInstanceHeader *arg0, CAI *arg1) {
+    void *owner = NULL;
+
+    switch (arg0->m_Type) {
+    case 1:
+    case 2:
+        owner = arg0;
+        break;
+    }
+    if (arg1->m_pAttachedLoopingSound != NULL) {
+        Sound__StopOwner(owner);
+        if (arg1->m_pAttachedLoopingSound != NULL) {
+            LoopSounds_Stop(LoopSounds_Get(), (SndSource *) arg1->m_pAttachedLoopingSound);
+            arg1->m_pAttachedLoopingSound = NULL;
+        }
+    }
+}
+#else
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/TEAM/80217388.CPP, func_80217388_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
@@ -39,3 +68,4 @@ void AI_StopSound(void *arg0, Dest *arg1) {
         }
     }
 }
+#endif

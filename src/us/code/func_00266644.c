@@ -6,7 +6,7 @@ s32 CGameObjectInstance__DrawModelImmediate(sptr, sptr, sptr);
 
 
 
-void Action_DrawFade(s32 arg0, CAI *arg1, s32 arg2) {
+void Action_DrawFade(sptr arg0, CAI *arg1, sptr arg2) {
     f32 var_f1;
 
     var_f1 = 255.0f - (arg1->m_ModeTime * 8.5f);

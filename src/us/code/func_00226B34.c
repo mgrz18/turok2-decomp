@@ -4,10 +4,19 @@
 char *CISet__GetBlock(s32 *, s32);
 s32 CISet__GetBlockSize(sptr, s32);
 
+#ifdef TARGET_PORT
+/* the port: the scene's bit sections at their host offset (CScene.m_pBitSections) */
+#include "structs/world.h"
+typedef struct {
+    u8 pad0[__builtin_offsetof(CScene, m_pBitSections)];
+    s32 *data;
+} Unk00226B34;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x6C];
     /* 0x6C */ s32 *data;
 } Unk00226B34;
+#endif
 
 s32 CScene__IsLevelActorKilledInLevel(Unk00226B34 *arg0, s32 arg1, s32 arg2) {
     s32 *temp_v0;

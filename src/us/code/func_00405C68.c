@@ -5,7 +5,11 @@
 
 s32 ScriptAnimator_SetScript(void *, f32 *);           /* extern */
 
+#ifdef TARGET_PORT
+#define MODULE (&gLevelScript) /* the N64 delta 0x3D4 is not the host's */
+#else
 #define MODULE ((LevelScriptState *) ((u8 *) &gLevelScript_bossMode - 0x3D4))
+#endif
 
 void Primagen_EnterMode7(CGameObjectInstance *arg0) {
     LevelScriptState *temp_s2;

@@ -18,6 +18,9 @@ extern s32 Pak_WriteNote(s32 ch, s32 size, void *data, u8 *game_name, s32 *file_
                          u8 *company, u8 *code);
 extern s32 Pak_DeleteNote(s32 ch, s32 index);
 extern s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
+#ifdef TARGET_PORT
+void *T2Save_ToPak(void *data, s32 size);
+#endif
 
 /* Reads note file_no of the pak on channel ch into dst. */
 static __inline__ s32 readNote(s32 ch, s32 file_no, void *dst, s32 size) {
@@ -61,6 +64,10 @@ s32 Pak_SaveNoteVerified(s32 ch, s32 size, void *data, u8 *name, u8 *ext, u8 *co
     s32 blocks;
     s32 tries;
 
+#ifdef TARGET_PORT
+    /* the port: the note goes to the pak big-endian, as the console writes it (port/game/t2save.c) */
+    data = T2Save_ToPak(data, size);
+#endif
     blocks = (size + 0xFF) & ~0xFF;
     if (gPakState[ch] != 3) {
         return -2;

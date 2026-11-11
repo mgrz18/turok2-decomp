@@ -32,6 +32,8 @@ and compares them across translation units. Classes (most harmful first):
   variadic        variadic declaration vs non-variadic definition or the reverse (Apple
                   arm64 passes variadic arguments on the stack)
   extra_args      more arguments than the definition takes (harmless on both ABIs)
+  narrow_ret      the definition returns s8/u8/s16/u16, the caller reads a wider int (the
+                  host leaves the upper bits undefined; MIPS extends them)
   narrow_ext      s8/s16/u8/u16 vs a wider or other-signed int (low risk)
   struct_layout   same ABI classes, different member layout (a type pun, no ABI change),
                   or two integer structs of <= 8 bytes (one general register, same bytes)
@@ -60,9 +62,17 @@ else:
     DEFAULT_LIBCLANG = '/usr/lib/llvm-19/lib/libclang-19.so.1'
 
 ORDER = ['struct_class', 'struct_scalar', 'float_int', 'float_double', 'ptr_from_int',
-         'void_used', 'noreturn_used', 'missing_args', 'variadic', 'int_from_ptr',
+         'void_used', 'noreturn_used', 'missing_args', 'variadic', 'narrow_ret', 'int_from_ptr',
          'extra_args', 'narrow_ext', 'struct_layout', 'struct_word']
-HARMFUL = set(ORDER[:9])
+HARMFUL = set(ORDER[:10])
+
+
+def narrow_ret(d, c):
+    """The definition returns an s8/u8/s16/u16 and the caller reads a wider integer: MIPS
+    extends the value in v0 (the callee's own sign/zero extension), x86-64 and AArch64 leave
+    the upper bits of eax/w0 undefined (round 7, C22-5: EnemyAI_PickAttack's s16 as an s32)."""
+    dr, cr = d['ret'], c['ret']
+    return (c['used'] and dr[0] == 'i' and cr[0] == 'i' and dr[1] < 4 and cr[1] >= 4)
 
 # ---------------------------------------------------------------------------
 # worker: one translation unit
@@ -586,6 +596,8 @@ def check(results):
                 # the definition produces the value, the caller consumes it
                 cl = cmp_sig(d['ret'], c['ret']) if c['ret'][0] != 'v' else (
                     'struct_scalar' if d['ret'][0] == 's' else None)
+                if narrow_ret(d, c):
+                    cl = 'narrow_ret'
                 if cl:
                     add(cl, 'return: caller %s, definition %s' % (c['rspell'], d['rspell']))
                 if c['used'] and d.get('noreturn'):
@@ -616,6 +628,8 @@ def _cmp_call(c, d, add):
     elif c['used'] or c['ret'][0] == 's' or d['ret'][0] == 's':
         cl = cmp_sig(d['ret'], c['ret']) if c['ret'][0] != 'v' else (
             'struct_scalar' if d['ret'][0] == 's' else None)
+        if narrow_ret(d, c):
+            cl = 'narrow_ret'
         if cl:
             add(cl, 'return: caller %s, definition %s' % (c['rspell'], d['rspell']))
         if c['used'] and d.get('noreturn'):

@@ -48,6 +48,7 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
 #include "globals/scene.h"
 #include "structs/camera.h"
 #include "structs/menu.h"
+#include "protos/menu.h"
 #include "structs/controller.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,13 +71,15 @@ static void T2Port_LogOne(const char *kind, int i, CGameObjectInstance *o, CGame
         f32 dz = o->header.m_vPos.z - pl->header.m_vPos.z;
         d = sqrtf(dx * dx + dy * dy + dz * dz);
     }
-    printf("actor: %s %d it %d id %d fl %x aifl %x pos (%.1f %.1f %.1f) d %.0f hp %d/%d mode %d act %d anim %d %.1f/%d tgt %p ty %x cb %p\n",
+    printf("actor: %s %d it %d id %d fl %x aifl %x pos (%.1f %.1f %.1f) d %.0f hp %d/%d mode %d act %d anim %d %.1f/%d tgt %p ty %x cb %p drop %x/%x\n",
            kind, i, info != NULL ? (int) info->m_Type : -1, info != NULL ? (int) info->m_Id : -1,
            (unsigned) o->m_dwFlags, (unsigned) o->m_AI.m_dwFlags, o->header.m_vPos.x, o->header.m_vPos.y,
            o->header.m_vPos.z, d, (int) (o->m_AI.m_Health >> 8), (int) (o->m_AI.m_InitialHealth >> 8),
            (int) o->m_AI.m_Mode, (int) o->m_AI.m_Action, (int) o->m_CurrentAnimation.m_nAnimIndex,
            o->m_CurrentAnimation.m_AnimationFrame, (int) o->m_nAnims, (void *) o->m_AI.m_pSightTarget,
-           (unsigned) o->m_nTypeFlag, o->m_AI.m_pModeCurrent != NULL ? (void *) o->m_AI.m_pModeCurrent->m_pfCallback : NULL);
+           (unsigned) o->m_nTypeFlag, o->m_AI.m_pModeCurrent != NULL ? (void *) o->m_AI.m_pModeCurrent->m_pfCallback : NULL,
+           info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_DropMask : 0u,
+           info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_DropMask2 : 0u);
 }
 
 static void T2Port_LogActors(CPlayer *p) {
@@ -114,7 +117,21 @@ static void T2Port_LogActors(CPlayer *p) {
                 CIntelligence *info = o->header.m_pIntelligence;
                 int j, skip = 0;
                 f32 dx, dz, d;
-                if (info == NULL || (info->m_Type != INTELLIGENCE_ENEMY && info->m_Type != INTELLIGENCE_TURRET)) {
+                /* T2_ACTOR_TYPES=a,b,... (round 8 w5): log these intelligence types instead (6 doors, 8 pickups...) */
+                static int sMask = -1;
+                if (sMask < 0) {
+                    const char *t = getenv("T2_ACTOR_TYPES");
+                    sMask = (1 << INTELLIGENCE_ENEMY) | (1 << INTELLIGENCE_TURRET);
+                    if (t != NULL) {
+                        sMask = 0;
+                        while (*t != 0) {
+                            sMask |= 1 << (atoi(t) & 31);
+                            while (*t != 0 && *t != ',') t++;
+                            if (*t == ',') t++;
+                        }
+                    }
+                }
+                if (info == NULL || !(sMask & (1 << (info->m_Type & 31)))) {
                     continue;
                 }
                 for (j = 0; j < nUsed; j++) {
@@ -230,6 +247,10 @@ void T2Port_LogState(int frame) {
     }
     if (getenv("T2_ACTOR_LOG") != NULL) {
         T2Port_LogActors(p);
+    }
+    if (getenv("T2_BOSS_LOG") != NULL) {
+        extern void T2Port_LogBosses(void); /* t2bosslog.c, DEBUG-ONLY */
+        T2Port_LogBosses();
     }
     fflush(stdout);
 }
@@ -434,4 +455,123 @@ void T2Port_WakeEnemies(int frame, const char *spec) {
                    o->header.m_vPos.x, o->header.m_vPos.y, o->header.m_vPos.z, (unsigned) o->m_dwFlags);
         }
     }
+}
+
+/* T2_FACE_NEAREST=R (DEBUG-ONLY, round 8 w2): in gameplay, every frame, turn the first player to
+ * face the nearest live level enemy (intelligence type 1, the live flag 0x100, health > 0)
+ * within R units (default 2000), by adding AI_AngleToPoint (the angle from his heading to the
+ * enemy) to his yaw. An aim assist for scripted firing tests (--input Z@...): the stick cannot
+ * aim at a moving enemy from a script. Not a game option. */
+extern f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);
+void T2Port_FaceNearest(int frame, const char *spec) {
+    static CGameObjectInstance *sLast;
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    CGameObjectInstance *pl, *best = NULL;
+    f32 r = (f32) atof(spec), bestD;
+    int i;
+
+    if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL || gScene.m_WarpState != 0) {
+        return;
+    }
+    if (r <= 0.0f) {
+        r = 2000.0f;
+    }
+    pl = &p->m_CharacterActor;
+    bestD = r * r;
+    for (i = gScene.m_nFirstActor; i < gScene.m_nActors; i++) {
+        CGameObjectInstance *o = &gScene.m_pActors[i];
+        CIntelligence *info = o->header.m_pIntelligence;
+        f32 dx, dz, d;
+        if (info == NULL || info->m_Type != INTELLIGENCE_ENEMY || !(o->m_dwFlags & 0x100) || o->m_AI.m_Health <= 0) {
+            continue;
+        }
+        dx = o->header.m_vPos.x - pl->header.m_vPos.x;
+        dz = o->header.m_vPos.z - pl->header.m_vPos.z;
+        d = dx * dx + dz * dz;
+        if (d < bestD) {
+            bestD = d;
+            best = o;
+        }
+    }
+    if (best == NULL) {
+        return;
+    }
+    pl->m_RotY += AI_AngleToPoint(pl, best->header.m_vPos);
+    if (best != sLast) {
+        sLast = best;
+        printf("face: frame %d player (%.1f %.1f %.1f) -> enemy %d type %x at (%.1f %.1f %.1f) d %.0f rotY %.2f\n", frame,
+               pl->header.m_vPos.x, pl->header.m_vPos.y, pl->header.m_vPos.z, (int) (best - gScene.m_pActors),
+               (unsigned) best->m_nTypeFlag, best->header.m_vPos.x, best->header.m_vPos.y, best->header.m_vPos.z,
+               sqrtf(bestD), pl->m_RotY);
+        fflush(stdout);
+    }
+}
+
+/* T2_SAVE_PORTAL=F (DEBUG-ONLY, round 8 w5): at frame F, in gameplay, open the save portal menu
+ * (gSavePortalMenuDesc) for the first player, as CPlayerPool__Update does when a save portal's
+ * cinema (script 400) ends, to reach the game's own save path (PakMenu_InitSaveGame,
+ * SaveGame_Build, PakMenu_WriteSaveGame) without walking to a portal. Called every frame. */
+extern struct MenuDesc gSavePortalMenuDesc;
+void T2Port_SavePortal(int frame, const char *spec) {
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+
+    if (p == NULL || p->m_pCamera == NULL || gEngineApp.m_Settings.mode != 13 || frame != atoi(spec)) {
+        return;
+    }
+    printf("debug: frame %d: T2_SAVE_PORTAL: the save portal menu in level %d\n", frame, (int) gScene.m_nLevel);
+    fflush(stdout);
+    MenuPool_OpenMenu((struct MenuPool *) p->m_pCamera->m_MenuPool, &gSavePortalMenuDesc, (sptr) p,
+                      (sptr) p->m_ContState.m_pContState, 0);
+}
+
+/* T2_PICKUP_LOG=1 (DEBUG-ONLY, round 8 w5): CPlayer__TouchPickup reports every pickup the player
+ * touches: its object type id, where it lies, whether CPlayer__CollectPickup took it, and the
+ * player's health, life force, lives and current weapon ammo after it. */
+void T2Port_LogPickup(sptr player, void *actor, s32 id, s32 got) {
+    static int on = -1;
+    CPlayer *p = (CPlayer *) player;
+    CInstanceHeader *h = (CInstanceHeader *) actor;
+    extern s32 CPlayer__GetWeaponAmmo(CPlayer *, s32);
+
+    if (on < 0) {
+        on = getenv("T2_PICKUP_LOG") != NULL;
+    }
+    if (!on) {
+        return;
+    }
+    printf("pickup: level %d id %d at (%.1f %.1f %.1f) %s: health %d life force %d lives %d weapon %d ammo %d\n",
+           (int) gScene.m_nLevel, (int) id, h->m_vPos.x, h->m_vPos.y, h->m_vPos.z, got ? "collected" : "not taken",
+           (int) (p->m_Data.m_Health >> 8), (int) p->m_Data.m_LifeForce, (int) p->m_Data.m_Lives,
+           (int) p->m_Data.m_CurrentWeapon, (int) CPlayer__GetWeaponAmmo(p, p->m_Data.m_CurrentWeapon));
+    fflush(stdout);
+}
+
+/* T2_DOOR_OPEN=F (DEBUG-ONLY, round 8 w5): at frame F, every door (intelligence type 6) within 800
+ * units of the player gets the event a level trigger or a key sends it (Door_EventOpen:
+ * CAI__SetMode(door, ai, 0)), to check the door's open path (Door_OpenEnter, Door_OpenUpdate,
+ * the open animation, the saved bit) without the trigger. Called every frame. */
+extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 mode);
+void T2Port_DoorOpen(int frame, const char *spec) {
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    int i;
+
+    if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL || frame != atoi(spec)) {
+        return;
+    }
+    for (i = gScene.m_nFirstActor; i < gScene.m_nActors; i++) {
+        CGameObjectInstance *o = &gScene.m_pActors[i];
+        CIntelligence *info = o->header.m_pIntelligence;
+        f32 dx, dz;
+        if (info == NULL || info->m_Type != INTELLIGENCE_DOOR) {
+            continue;
+        }
+        dx = o->header.m_vPos.x - p->m_CharacterActor.header.m_vPos.x;
+        dz = o->header.m_vPos.z - p->m_CharacterActor.header.m_vPos.z;
+        if (dx * dx + dz * dz < 800.0f * 800.0f) {
+            printf("door: frame %d door %d at (%.1f %.1f %.1f) mode %d -> open\n", frame, i, o->header.m_vPos.x,
+                   o->header.m_vPos.y, o->header.m_vPos.z, (int) o->m_AI.m_Mode);
+            CAI__SetMode(o, &o->m_AI, 0);
+        }
+    }
+    fflush(stdout);
 }

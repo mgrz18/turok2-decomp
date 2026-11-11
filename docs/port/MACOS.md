@@ -564,3 +564,61 @@ with no late VI in level 51 (Release), and late VIs only at level loads.
   pixels. Next: compare the G_MOVEMEM data, then check the FBO path by drawing that frame's
   display list on Linux with an offscreen FBO (or on the Mac at window size).
 - Attract demo 1 needs names-R7_v1 (the particle path).
+
+## 10. Round 8 (part w4): the round-7 merged tree on the Mac, host-dependent bugs
+
+Branch `names-R8_w4` (from 5bf03fd0). Every `src/` commit was checked on the box with
+`tools/asm_diff.py --base 5bf03fd0 -j 8` (scratch copy `/root/R8_w4mac/repo`; `OUT/r8/asmcheck.sh`
+applies `git diff 5bf03fd0 -- src include` there): **0 differences** at every commit. No `include/`
+changes. For comparison the same branch was built on the box in `/root/R8_w4mac/out` (Debug, low
+memory, `/root/R8_w4mac/build.sh`; set `FRESH=1` to drop decls.json).
+
+Build: `OUT/rebuild.sh --fresh` with the box's ELF at 5bf03fd0 (sha1 `61dcdf3f…`, unchanged) and
+the box's round-7 archive (`OUT/turok2_5bf.o2r`, sha1 `71317b96…`). The runs: `OUT/r8/battery.sh`
+(boot 26,000; journey with firing; warp to 52 and back; Mother, Mantid Queen, Primagen; demo-1
+enemies; `--audio`), all `--offscreen-gl` except the audio one; `OUT/r8/cmpall.sh` fetches the box
+runs and compares the logs (host addresses masked) and the screenshots.
+
+### 10.1 Fixes
+
+| # | where | cause | fix |
+|---|---|---|---|
+| w4-1 | **macOS crash**, every run at frame ~2400 (the Iguana cinema): `Blast_CanHit` <- `ImpactEvent_ApplyBlast` <- `ImpactEvent_DirectDamage` | `ImpactEvent_DirectDamage(.., s32 arg1, ..)` and `func_00239058(.., s32 b, ..)`: the source actor truncated | `sptr` (asm_diff 0) |
+| w4-2 | **all hosts**: the Mother never played her attack animation (mode 4 ended after 3 frames), so she never hurt the player | `CAI__UpdateModeAnim` called the mode row's animation picker as returning a pointer; the pickers return `s16` (`MotherBoss_PickPhaseAnim`) and x86-64/arm64 leave the upper bits of the return register unspecified. Linux got `0x42BF55FA` for `0x55FA`, so `PickRandomAnim` found no animation | port branch takes the result as `(s16)`: the action ids are 16-bit (the tables are BE16, func_0021EA3C). Now the Mother's slam hits the player on both hosts (health 100 -> 75 by frame 15,000) |
+| w4-3 | **macOS**: actors lit differently from Linux, and the lighting changed with unrelated code (`T2_ACTOR_LOG` made the Mother and the hand dark) | `CScene__ComputeLights` read `dirs[k]` as `((B19bV3f *)(w + 128))[k]`: the ROM's frame puts `dirs` right after `w[128]`; the host frame need not (Linux happened to) | port branch reads `dirs[k]` (asm_diff 0) |
+| w4-4 | **all hosts**: `sShadowQuadDL`, `sShadowQuadDL2`, `D_800ACFC8` | gendata's address heuristics took a display list's non-address w1 for a pointer: `gSPSetGeometryMode(0x210004)` became the address of `CMtxF__SetShadowProjection` (random geometry-mode bits, including G_LIGHTING_POSITIONAL) and the `gSPTexture` scale `0x80008000` a null pointer | gendata: a Gfx w1 that is not an address operand stays a number (168 words in 11 lists) |
+| w4-5 | **all hosts**: the legal screen lost most of its lines (macOS: different lines per run); attract demo 1 did not follow its recorded input | `ControllerProfile` has TARGET_PORT-only members (the host rumble pool), so gendata's "N64" layout made `gMergedController` 0x298 bytes and put `gControllers` (and gPakMesgBuf, gPakWatched, gPakInserted, gFirstControllerPort) inside it as aliases. `Cont_InitAll` then wrote four host profiles past the 0x298-byte object: over the legal strings on the Mac, over other data on Linux | gendata `N64_EXTENT` (gMergedController 0x224, gControllers 0x890) and both in `RUNTIME_BSS` (they were initialised from code bytes). Now `gControllers` is its own 0xA60-byte object and `gControllers_buttons` an alias inside it |
+
+w4-5 changes the attract demos: demo 1 now opens the weapon wheel and fires, and an enemy dies at
+frame ~8200. Both hosts then crash in `EnemyAnim_PickDeath` (the N64 view of the death path),
+which names-R8_w2 58b5668a fixes. So the 26,000-frame boot needs w2 merged.
+
+### 10.2 Mac against Linux after the fixes
+
+Same branch on both hosts, both headless (Mac `--offscreen-gl`, Linux SDL offscreen):
+
+| run | frames | logs (state, actors, mode switches) | screenshots (>1% of the pixels off by >24/255) |
+|---|---|---|---|
+| journey with firing | 15,000 | 272 lines, identical | 0 of 29 |
+| warp 51 -> 52 -> 51 | 16,000 | 288 lines, identical | 0 of 31 |
+| Mother (`T2_WARP_TO=-4`) | 15,000 | 556 lines, identical (the player hurt the same way) | 1 of 30: frame 14,500, the Mother's spot flash is green on Linux and not on the Mac |
+| Mantid Queen (7501) | 15,000 | identical | 0 of 30 (before w4-5) |
+| demo-1 enemies | 8,600 | identical before w4-5 (508 lines) | the legal screen only (fixed by w4-5) |
+| boot | 26,000 | identical before w4-5 | the legal screen only (fixed by w4-5) |
+| `--audio --wav`, 6,000 | | | 100.10 s, peak 28,806, RMS 2,270 |
+
+The round-7 open item (the boat and Turok's hand missing on the Mac, section 9.3) is gone: frame
+13,001 of the journey matches Linux. The other round-7 differences (frame 10,502, the cinema
+dinosoid lit differently; the Mother) were w4-3.
+
+### 10.3 Open on the Mac
+
+- The Primagen (`T2_WARP_TO=7602`) crashes in `Primagen_UpdateSpawner` (N64-offset view of
+  gLevelScript): fixed on names-R8_w3 ad18ae32 / 558c0f04 (rerun gendata after the merge).
+- The 14,500 Mother frame (the green spot flash): a render-side difference not chased.
+- More `gendata` "N64" sizes may count TARGET_PORT members. The aliases list
+  (`port/gen/data_*.c`, `/* X = Y + off */`) still has declared symbols inside bases of another
+  name (`__osThreadTail` holds `gAdecBandEnds`, `__osRunQueue`...; `gCrashFont` holds
+  `sCrashCursorX`): worth a check.
+- `T2_DLDUMP_VTX=3`'s texture hash covers bytes past small palettes, so it differs between hosts
+  where the image does not.

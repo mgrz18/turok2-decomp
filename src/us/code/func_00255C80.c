@@ -7,8 +7,15 @@
 #include "protos/menu.h"
 #include "protos/player.h"
 
+#ifdef TARGET_PORT
+/* the N64 CPlayer offsets mapped to the host members (port/include/t2_player_offsets.h) */
+#include "t2_player_offsets.h"
+#define P_S32(p, off) (*(s32 *)((u8 *)(p) + T2PlayerOff(off)))
+#define P_S16(p, off) (*(s16 *)((u8 *)(p) + T2PlayerOff(off)))
+#else
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 #define P_S16(p, off) (*(s16 *)((u8 *)(p) + (off)))
+#endif
 
 /* Multiplayer/menu state: byte 0x1281 (gEngineApp_m_Settings_multiplayer) is the "enabled" flag. */
 

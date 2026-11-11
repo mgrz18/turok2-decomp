@@ -56,10 +56,9 @@ blocks as they cross the DMA, and the game's C runs unchanged on a standard file
 
 These are 1-bank paks (the standard 32 KB pak); the block numbers above assume it.
 
-**Open (saves):** the note data is whatever the game writes: its save records in host order
-today. Notes written by the port and by an emulator are not interchangeable until the save
-records get a swap plan (like the archive's `t2/swap`). The pak's filesystem itself is
-compatible both ways.
+**Saves (round 8):** the note data is big-endian too now: the save game and the profile are
+swapped field by field as they cross `Pak_SaveNoteVerified`/`Pak_ReadNote` (section 7), so .mpk
+files move between the port and emulators both ways.
 
 Game-side fixes that the PIF needed (`TARGET_PORT` only, asm_diff 0):
 `__osPackRamReadData`/`__osPackRamWriteData` stored the address word with a u16 store (low byte
@@ -95,8 +94,7 @@ lead with the host `Menu` fields now (TARGET_PORT).
 
 ## 5. Next
 
-- Save records: a swap plan for the notes Turok 2 writes (profile, save game), so .mpk saves
-  move between the port and emulators; then test save/load through the game's menus.
+- Saves: done in round 8 (section 7); still to do: load a save made on a console or an emulator.
 - Rumble: a Rumble Pak mode (answer the 0x8000 probe with 0x80, route `osMotorStart/Stop` to
   LUS's rumble) instead of "not present".
 - Ports 2-4 with paks (`pakPorts` is there; no flag yet), multi-bank paks (not needed: Turok 2
@@ -139,3 +137,54 @@ eight-slot stick wheel): **stick** turns (X, about 3.8 rad per second at 80) and
 the stick picks the slot, 8 directions, 0 = up, clockwise, dead zone 60); **L** is the map.
 The game folds the stick into its own button word too (`m_dwButtons` 0x10000 up, 0x40000
 right, 0x20000 left), as the state log shows. Stick 80 reads as 77 after the game's dead zone.
+
+## 7. Save notes in the console's byte order (round 8, w5)
+
+The pak's filesystem was already the console's (section 2); now the **note data** is too, so a
+.mpk written by the port loads on an emulator or a console with a pak, and the other way round.
+Code: `port/game/t2save.c`, called from `Pak_SaveNoteVerified` (func_00426164, the only note
+writer) and `Pak_ReadNote` (func_004265B0) under TARGET_PORT.
+
+Turok 2 writes two records (game code `NT2E`, company `51`):
+
+| note | record | layout | checksum |
+|---|---|---|---|
+| "TUROK 2" (ext A, B...) | the save game, `SaveGame` (structs/save.h): size, level-flags size, the play clock (4 f32), `CPlayerLoadSaveData`, the first 0x184 bytes of `GameSettings`, the level's persistent bit sections, a checksum | 0x688 + the level flags (0x5310 in level 51: 90 pages) | `Crc32_Compute(save, size - 4, 0xB)` in the last word |
+| "T2 MULTI" | `PakProfile` (structs/pak.h): 4 u16 counts, character, name | 0x18 | `Crc32_Compute(p, 0x14, 4)` at 0x14 |
+
+The swap plan (`t2save.c`): the header words; in `CPlayerLoadSaveData` the s32/s16 fields
+(health, life force, lives, warps, ammo list, weapons, Adon and totem/boss flags, the intro and
+first-time masks; the 1024 pickup counts and the nuke/key bytes stay bytes); in the settings the
+cheat/difficulty words, the HUD alpha u16, the speed f32 and the 20 u16 counts of each of the
+five `CPlayerOptions`; the level flags by their ISet structure (`swap_spec.json` "load/save
+persistent bit sections": the ISet headers and each section's u32 bit count; the flag bits are
+bytes). The archive swapped those ISet words to host order when the level loaded, so the note
+swaps them back.
+
+- **Write**: the record (host order, its checksum computed by the game in host order) is copied,
+  swapped and its checksum recomputed over the big-endian bytes, stored big-endian (what the
+  console computes). The verify read-back compares that image.
+- **Read**: when the big-endian checksum holds the record is swapped to host order and its
+  checksum recomputed in host order, so `PakMenu_SelectNote`'s checks and every reader run
+  unchanged. A note whose host-order checksum holds (written by a port build before round 8) is
+  taken as it is; anything else is left alone (the game calls it damaged).
+- `Pak_FindNote` now spells the note's game/company codes high byte first (the console copies
+  the bytes of its big-endian integers): before, no Turok 2 note was recognised on the host.
+
+`python3 tools/port/mpk_saves.py PAK.mpk [--dump-save out.bin]` lists the notes and checks them
+the console's way (standard CRC-32 with the game's seeds: `zlib.crc32(data, seed)`), decodes the
+save's health, lives, warps, clock and walks the level-flag ISets; exit 1 if a Turok 2 note does
+not check big-endian. A save written by the port:
+
+```
+note  1: NT2E 51 "TUROK 2" ext "A" 90 pages: big-endian, 22936 bytes, checksum OK; health 100
+lives 3 life force 0 weapon 0 difficulty 16 checkpoint warp 1000 save warp 0 clock 0:02:20;
+level flags: 663 ISets
+```
+
+Not tested here: a save from a real console or an emulator (none at hand); the checker reads
+port saves the console's way, which is the same code path in reverse.
+
+Scripted save and load (GAMEPLAY.md section 9): `T2_SAVE_PORTAL=13100 --pak-dir DIR --input
+"START@4400 A@4500 A@4700 A@4800 A@13250 A@13400"`, then boot again with the same DIR and
+`--input "START@4400 A@4500 DD@4700 A@4800 DU@4900 A@5000 A@5200 A@5400"`.
