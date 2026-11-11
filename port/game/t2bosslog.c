@@ -258,6 +258,11 @@ static s32 T2Port_AimMask(const char *spec) {
              * of partsDone is set (the parts the stage opens), or bit 1 only while a part is
              * staggered (partActive) */
             LevelScriptState *ls = &gLevelScript;
+            if (ls->enemiesAlive > 0 || !ls->armed) {
+                /* its spawner's waves (spawned instances) first: the stage goes on when they die */
+                sAimPoolOnly = 1;
+                return -1;
+            }
             if (ls->partActive) {
                 return 2;
             }
