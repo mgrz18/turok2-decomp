@@ -2,6 +2,35 @@
 #include "gfx.h"
 #include "structs/vector.h"
 
+#ifdef TARGET_PORT
+#include "structs/world.h"
+#include "structs/level_actor.h"
+/* The port: the list is CScene.m_nDeferred / m_pDeferred (the caller passes the world). The N64
+ * reads them at 0x1064 / 0x1068; on the host those offsets fall elsewhere in CScene, so no
+ * translucent (flag 4) instance or static object was ever drawn (the Iguana cinema's iguanas:
+ * round 9 x3, docs/port/FIDELITY.md). An item is a CStaticObject (type 0: its box) or an
+ * instance (its header position); the views at the host offsets. */
+typedef struct Drawable {
+    union {
+        struct { u8 type; };                                   /* 0x00: 0 box, 1 point, 3 ... */
+        struct { u8 _hp_pos[__builtin_offsetof(CInstanceHeader, m_vPos)]; CVector3 pos; }; /* N64 0x04 */
+        struct { u8 _hp_min[__builtin_offsetof(CStaticObject, m_Bounds.m_vMin)]; CVector3 min; }; /* N64 0x68 */
+        struct { u8 _hp_max[__builtin_offsetof(CStaticObject, m_Bounds.m_vMax)]; CVector3 max; }; /* N64 0x74 */
+    };
+} Drawable;
+
+typedef struct SortEntry {
+    Drawable *item;             /* 0x00 */
+    f32 dist;                   /* 0x04: squared, doubled */
+} SortEntry;
+
+typedef struct DrawList {
+    union {
+        struct { u8 _hp_count[__builtin_offsetof(CScene, m_nDeferred)]; s32 count; }; /* N64 0x1064 */
+        struct { u8 _hp_items[__builtin_offsetof(CScene, m_pDeferred)]; Drawable *items[0x40]; }; /* N64 0x1068 */
+    };
+} DrawList;
+#else
 typedef struct Drawable {
     u8 type;                    /* 0x00: 0 box, 1 point, 3 ... */
     u8 pad1[3];
@@ -21,6 +50,7 @@ typedef struct DrawList {
     s32 count;                  /* 0x1064 */
     Drawable *items[1];         /* 0x1068 */
 } DrawList;
+#endif
 
 CVector3 CCamera__GetViewOrigin(void *cam);  /* camera position */
 void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
