@@ -13,13 +13,17 @@ The hub arrivals are measured on the merged tree (STATUS.md); a change upstream 
 moves every later level: re-measure them with `T2_STATE_LOG=50` (the first "level 60" line after
 each totem/boss) and edit HUB_AT below.
 
-Levels 5 and 6 (parts a1/a2 of round 12) append through LEVEL_HOOKS: a function
-(start_frame) -> (inputs, teleports, env_windows) like the ones below.
+Levels 5 and 6 (round 12 C27) append through LEVEL_HOOKS: level 5 (the Hive of the Mantids, the
+Hive Totem, the Mantid Queen), a save, level 6 (the Lightship, the Mother), the hop to the Primagen,
+his death, the ending, the credits and the hub (routes56.py's routes moved in time, each sub-level
+start re-anchored with T2_ANCHOR). The per-level settings (the shredder on level 5, the ammo fill,
+the Queen's and the Primagen's T2_BOSS_FRONT) are frame-scheduled values ("V@F;...").
 """
 import math, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import playthrough as pt  # noqa: E402
+import routes56 as r56  # noqa: E402
 
 
 class Route:
@@ -37,6 +41,12 @@ class Route:
         self.timeline = []
         self.fill_ammo = 300
         self.anchors = []
+        # frame-scheduled values (round 12 C27): [(from frame, value), ...]
+        self.weapon = [(0, "10")]
+        self.fill = [(0, "300")]
+        self.boss_front = []
+        self.warps = []
+        self.give = []
 
     def note(self, frame, text):
         self.inputs.append("# %d: %s" % (frame, text))
@@ -69,6 +79,9 @@ class Route:
                         self.aim_enemy.append("%d-%d" % (a, b))
                     elif isinstance(aim, str) and aim.startswith("enemy:"):
                         self.aim_enemy.append("%d-%d,4000,%s" % (a, b, aim[6:]))
+                    elif isinstance(aim, tuple) and aim[0] == "actor":
+                        # routes56 (round 12 a1): the level actor A first, then the nearest live actor
+                        self.aim_enemy.append("%d-%d,%d,%d" % (a, b, aim[2] if len(aim) > 2 else 4000, aim[1]))
                     elif aim:
                         self.aim_at.append("%d-%d:%.1f,%.1f,%.1f" % ((a, b) + tuple(aim)))
 
@@ -76,16 +89,25 @@ class Route:
         for a, b in self.fire:
             for f in range(a, b, pt.FIRE_EVERY):
                 self.inputs.append("Z@%d..%d" % (f, f + 6))
-        env = ["T2_GIVE_WEAPONS=1", "T2_WEAPON=10", "T2_CHEATS=1", "T2_FILL_AMMO=%d" % self.fill_ammo,
+        def sched(vals):
+            return ";".join(v if f == 0 else "%s@%d" % (v, f) for f, v in sorted(vals))
+        env = ["T2_GIVE_WEAPONS=1", "T2_WEAPON=\"%s\"" % sched(self.weapon), "T2_CHEATS=1",
+               "T2_FILL_AMMO=\"%s\"" % sched(self.fill),
                "T2_FACE_NEAREST=4000@%s" % ",".join(str(l) for l in self.face_levels),
                "T2_FACE_PITCH=1", "T2_FACE_STICKY=1", "T2_BOSS_LOG=1",
                "T2_AIM_AT=\"%s\"" % ";".join(self.aim_at), "T2_AIM_ENEMY=\"%s\"" % ";".join(self.aim_enemy)]
         if self.aim_node:
             env.append("T2_AIM_NODE=%s" % self.aim_node)
         if self.anchors:
-            env.append("T2_ANCHOR=\"%s\"" % ";".join("%d@%d" % (l, f) for f, l in sorted(self.anchors)))
+            env.append("T2_ANCHOR=\"%s\"" % ";".join("%s@%d" % (l, f) for f, l in sorted(self.anchors, key=lambda a: a[0])))
         if self.saves:
             env.append("T2_SAVE_PORTAL=%s" % ",".join(str(f) for f in self.saves))
+        if self.boss_front:
+            env.append("T2_BOSS_FRONT=\"%s\"" % sched(self.boss_front))
+        if self.warps:
+            env.append("T2_WARP_TO=%s" % ",".join("%d@%d" % (w, f) for f, w in sorted(self.warps)))
+        if self.give:
+            env.append("T2_GIVE_ITEMS=\"%s\"" % ";".join("%s@%d" % (v, f) for f, v in sorted(self.give)))
         env += list(env_extra)
         with open(os.path.join(out, "playthrough.txt"), "w") as fp:
             fp.write("\n".join(self.inputs) + "\n")
@@ -97,7 +119,7 @@ class Route:
         with open(os.path.join(out, "fullrun.txt"), "w") as fp:
             for f, t in sorted(self.timeline):
                 fp.write("%7d  %s\n" % (f, t))
-        last = max(int(t.split(":")[0]) for t in self.tps)
+        last = max([int(t.split(":")[0]) for t in self.tps] + [getattr(self, "end", 0)])
         print("%d inputs, %d teleports; last frame %d" % (len(self.inputs), len(self.tps), last))
         return last
 
@@ -267,7 +289,7 @@ def hub(r, arrival, grant=(), primagen=(), save=True, go=None):
     return t + CINEMA_AFTER[go]
 
 
-def main_all(out, upto=4, extras=True, hubs_in=None):
+def main_all(out, upto=6, extras=True, hubs_in=None):
     """hubs: the measured hub arrivals {after level: frame} (HUB_AT)."""
     hubs = dict(HUB_AT); hubs.update(hubs_in or {})
     r = Route()
@@ -324,7 +346,7 @@ def main_all(out, upto=4, extras=True, hubs_in=None):
     r.note(f, "1 the Blind One: fire held, T2_AIM_NODE=boss@1")
     r.inputs.append("Z@%d..%d" % (f + 10, f + length))
     r.tp(f, x, y, z, ry)
-    r.aim_node = "boss@1"
+    r.aim_node = "boss@1/2/3/4"   # the Blind One 1, the Mantid Queen 2, the Mother 3, the Primagen 4
     r.note(hubs[4], "60 the hub (after level 4)")
     r.anchors.append((hubs[4], 60))
     end = hub(r, hubs[4], primagen=(4,))
@@ -337,16 +359,110 @@ def main_all(out, upto=4, extras=True, hubs_in=None):
 # Measured hub arrivals (the first "level 60" T2_STATE_LOG line after each level's totem/boss)
 HUB_AT = {1: 23780, 2: 84124, 3: 108124, 4: 140500}
 
-# Levels 5 and 6 (round 12 a1/a2): {level: function(route, start_frame) -> end frame}
-LEVEL_HOOKS = {}
+# ---- levels 5 and 6 (round 12 C27): routes56.py's routes from the hub after level 4 ----
+# The level 5 and 6 doors of the hub are not opened (their keys are not all in the route: 62/68's
+# level-5 keys, 103's level-6 key, levels 5/6's Primagen keys): the run teleports onto each portal's
+# approach in the plaza past the door, as --level 5/6 do (DEBUG-ASSISTED). The Primagen (7602) is a
+# T2_WARP_TO hop from the hub (the hub's way to him needs the six Primagen keys).
+PORTAL_TO_START = {5: r56.L5_START - (r56.HUB_ARRIVAL + 200), 6: r56.L6_START - (r56.HUB_ARRIVAL + 200)}
+LOAD_EARLY = 200        # each level is loaded ~200 frames before its route's start
+L5_HUB_AFTER = 25800    # the hub after the Mantid Queen, from L5_START (--level 5: 43,500 - 17,700)
+L5_TOTEM_AT = 14300     # 113 (the Hive Totem) reached, from L5_START
+L5_QUEEN_AT = 15900     # level 2 (the Queen) reached
+# After the Mother: her fight's length varies (her death 17,100 frames after her arena is loaded in
+# --level 6, 21,500 in the continuous run), and where her death leads too (--level 6: 114 by her
+# warp 6999, then its pad 7601 to the hub; the continuous run: the hub straight). So the steps
+# after her hang on anchors: "114/60" at L6_BACK_114 after her arena (she dying earlier only means
+# a wait, the anchor fires from 3,000 before), then "60" (in the hub straight, it fires at once and
+# skips the 114 teleport). The hop to the Primagen a fixed time after, as in --level 6 (the hub
+# 53,000, the hop 54,000, the hub after the credits 105,000).
+L6_BACK_114 = 26000
+L6_EXIT_AFTER = 500     # the exit teleport, after 114 is reached again
+L6_HUB_AFTER = 800      # the hub
+L6_HOP_AFTER = 1800     # the hop to the Primagen
+L6_HUB_END = 51000      # the hub after the credits, from the hop
+
+
+def to_portal(r, t, lv):
+    x, y, z, ry = r56.L5_PORTAL if lv == 5 else r56.L6_PORTAL
+    r.note(t, "60 the hub: onto the level %d portal (warp %d000; teleported past its door)" % (lv, lv))
+    r.tp(t, x, y, z, ry)
+    r.inputs.append("CU@%d..%d" % (t + 10, t + 300))
+    return t + PORTAL_TO_START[lv]
+
+
+def level5(r, t):
+    s = to_portal(r, t, 5)
+    r.anchors.append((s - LOAD_EARLY, 124))
+    r.note(s - LOAD_EARLY, "124.. the Hive of the Mantids (level 5 route from %d)" % s)
+    r.weapon.append((t, "9"))       # the shredder (the cocoons; a1's route)
+    r.fill.append((t, "100"))
+    r.steps(r56.L5_SEGMENTS, s)
+    rel, length, lv = r56.L5_TOTEM
+    r.anchors.append((s + L5_TOTEM_AT, lv))
+    r.note(s + rel, "113 the Hive Totem: fire taps (T2_FACE_NEAREST aims)")
+    r.fire.append((s + rel, s + rel + length))
+    r.face_levels.append(lv)
+    rel, length = r56.L5_BOSS
+    r.anchors.append((s + L5_QUEEN_AT, 2))
+    r.note(s + rel, "2 the Mantid Queen: fire held, T2_AIM_NODE=boss@2, T2_BOSS_FRONT=450,200")
+    r.inputs.append("Z@%d..%d" % (s + rel, s + rel + length))
+    r.boss_front.append((s + rel - 100, "450,200"))
+    hub_at = s + L5_HUB_AFTER
+    r.note(hub_at, "60 the hub (after level 5)")
+    r.anchors.append((hub_at, 60))
+    return hub(r, hub_at)          # a save; no key goes in
+
+
+def level6(r, t):
+    s = to_portal(r, t, 6)
+    r.anchors.append((s - LOAD_EARLY, 114))
+    r.note(s - LOAD_EARLY, "114.. the Lightship (level 6 route from %d)" % s)
+    r.weapon.append((t, "10"))
+    r.fill.append((t, "600"))
+    for rel, spec in r56.L6_GIVE:   # DEBUG-ASSISTED: the capacitors and the red laser cells
+        r.give.append((s + rel, spec))
+    r.steps(r56.L6_SEGMENTS, s)
+    m = s + r56.L6_MOTHER
+    r.anchors.append((m, 3))
+    r.note(m, "3 the Mother: fire held, T2_AIM_NODE=boss@3, strafing with steps back")
+    r.inputs += ["Z@%d..%d" % (m + 800, m + L6_BACK_114), "CL@%d..%d" % (m + 5800, m + 15000)]
+    r.inputs += ["CD@%d..%d" % (f, f + 250) for f in range(m + 5800, s + r56.L6_MOTHER_END, 600)]
+    back = m + L6_BACK_114
+    r.anchors.append((back, "114/60"))
+    _, x, y, z, ry = r56.L6_EXIT
+    r.note(back, "114 again after the Mother (her death warps 6999), or the hub straight (anchor 114/60)")
+    r.note(back + L6_EXIT_AFTER, "114: the pad 7601 by the start -> the hub")
+    r.tp(back + L6_EXIT_AFTER, x, y, z, ry)
+    r.inputs.append("CU@%d..%d" % (back + L6_EXIT_AFTER + 10, back + L6_EXIT_AFTER + 130))
+    r.note(back + L6_HUB_AFTER, "60 the hub (after level 6)")
+    r.anchors.append((back + L6_HUB_AFTER, 60))
+    hop = back + L6_HOP_AFTER
+    r.note(hop, "60 -> 4 the Primagen (T2_WARP_TO=7602, DEBUG-ASSISTED): fire held, T2_BOSS_FRONT=450,600,2.5,1")
+    r.warps.append((hop, 7602))
+    # the spot cycles (",K,1": another one each 600 frames of a lair wait that does not end): the
+    # first continuous run's Primagen rested at z 2,924 in stage 3, where 450 beside / 2.5 x 450 in
+    # front did not see his eye
+    r.boss_front.append((hop, "450,600,2.5,1"))
+    r.inputs.append("Z@%d..%d" % (hop + 200, hop + L6_HUB_END))
+    end = hop + L6_HUB_END
+    r.note(end - 21000, "the Primagen dead (~30,000 after the hop): the ending cinema, then the credits")
+    r.note(end, "60 the hub (after the credits)")
+    r.end = end + 1500
+    return r.end
+
+
+LEVEL_HOOKS = {5: level5, 6: level6}
 
 
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
-    ap.add_argument("--upto", type=int, default=4)
+    ap.add_argument("--upto", type=int, default=6)
     ap.add_argument("--no-extras", action="store_true")
     ap.add_argument("--hub", action="append", default=[], help="N=FRAME: the hub arrival after level N")
+    ap.add_argument("--hop", type=int, default=L6_HOP_AFTER, help="the hop to the Primagen, frames after the hub (level 6)")
     a = ap.parse_args()
+    L6_HOP_AFTER = a.hop
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub})

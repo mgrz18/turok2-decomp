@@ -255,7 +255,15 @@ void T2Port_BossFront(int frame, const char *spec0) {
          * z 2141, x about -300..300 at the player's eye line), so from the middle of the floor no line
          * of sight reaches it. After EVERY frames of that wait, put the player D units to the right of
          * the lair and 2.5 D in front of it (D 450: (451, 0, 1799), the line passes beside found[0]) */
-        static int sWait;
+        static int sWait, sTry;
+        /* ",K,1" (round 12 C27): each placement of one wait tries the next spot of this list (side,
+         * scale of D, scale of K): where he rests at the lair varies with the run before him, and a
+         * spot that sees his eye from one rest may not from another (PLAYTHROUGH.md 9.5) */
+        static const f32 kSpots[][3] = {{1, 1, 1}, {-1, 1, 1}, {1, 1, 0.8f}, {-1, 1, 0.8f}, {1, 0.67f, 1},
+                                        {-1, 0.67f, 1}, {1, 1.33f, 0.85f}, {-1, 1.33f, 0.85f}, {1, 1, 1.2f}, {-1, 1, 1.2f}};
+        const char *comma3 = comma2 != NULL ? strchr(comma2 + 1, ',') : NULL;
+        int cycle = comma3 != NULL && atoi(comma3 + 1) != 0;
+        f32 side = 1.0f, dscale = 1.0f, kscale = 1.0f;
         CGameObjectInstance *b = gLevelScript.actor;
         if (b != NULL && b->m_AI.m_Mode == 24 && frame % 300 == 0) {
             /* DEBUG-ONLY (round 12 a2): mode 24 waits for its timer and the end of an animation loop */
@@ -266,6 +274,7 @@ void T2Port_BossFront(int frame, const char *spec0) {
         }
         if (b == NULL || b->m_AI.m_Mode != 25) {
             sWait = 0;
+            sTry = 0;
             return;
         }
         if (++sWait < every) {
@@ -329,9 +338,15 @@ void T2Port_BossFront(int frame, const char *spec0) {
             return;
         }
         sWait = 0;
-        pos.x = b->header.m_vPos.x + dist;
+        if (cycle) {
+            int k = sTry++ % (int) (sizeof(kSpots) / sizeof(kSpots[0]));
+            side = kSpots[k][0];
+            dscale = kSpots[k][1];
+            kscale = kSpots[k][2];
+        }
+        pos.x = b->header.m_vPos.x + side * dscale * dist;
         pos.y = 0.0f;
-        pos.z = b->header.m_vPos.z - ahead * dist;
+        pos.z = b->header.m_vPos.z - ahead * kscale * dist;
         region = CScene__FindRegionAt(&gScene, &pos);
         printf("bossfront: frame %d primagen (%.1f %.1f %.1f) mode 25 -> player (%.1f %.1f %.1f) region %p"
                " pathfind %d kind1 %d/%d sight %p cinema %d/%d pmode %d aifl %x over %p path %p dest (%.1f %.1f %.1f) bstate %d\n", frame,

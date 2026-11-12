@@ -539,7 +539,8 @@ void T2Port_Teleport(int frame, const char *spec) {
  * done) for the next pending anchor, the schedule frame becomes N there and runs on from it. A
  * totem fight or a door that ends a few frames earlier or later then no longer shifts every later
  * step of a continuous run (tools/port/fullrun.py). The anchors fire in order, each once, and only
- * once the schedule frame is within 3,000 frames before N (a hub visited twice). */
+ * once the schedule frame is within 3,000 frames before N (a hub visited twice). "L1/L2@N": the first
+ * of those levels reached (round 12 C27). */
 int T2Port_ScheduleFrame(int frame) {
     static const char *spec;
     static int init, delta;
@@ -551,10 +552,20 @@ int T2Port_ScheduleFrame(int frame) {
         next = spec;
     }
     if (next != NULL && *next != '\0' && gEngineApp.m_Settings.mode == 13 && gScene.m_WarpState == 0) {
-        int l = atoi(next);
         const char *at = strchr(next, '@');
         int n = at != NULL ? atoi(at + 1) : 0;
-        if (at != NULL && l == gScene.m_nLevel && frame - delta >= n - 3000) {
+        /* "L1/L2@N" (round 12 C27): any of the levels (after the Mother: 114, or the hub straight) */
+        int l = atoi(next), in = 0;
+        const char *q = next;
+        while (at != NULL && q != NULL && q < at) {
+            if (atoi(q) == gScene.m_nLevel) {
+                in = 1;
+                l = gScene.m_nLevel;
+            }
+            q = strchr(q, '/');
+            q = q != NULL && q < at ? q + 1 : NULL;
+        }
+        if (at != NULL && in && frame - delta >= n - 3000) {
             printf("anchor: frame %d level %d: schedule frame %d -> %d (offset %+d)\n", frame, l, frame - delta, n,
                    frame - delta - n);
             fflush(stdout);
