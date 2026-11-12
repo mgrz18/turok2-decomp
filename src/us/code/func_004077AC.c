@@ -11,6 +11,22 @@ typedef struct {
     f32 unk_5C;                 /* 0x5C */
 } State;
 
+#ifdef TARGET_PORT
+/* The port (round 12 a2): State views LevelScriptState from its timer with N64 deltas (0x50 dest.y,
+ * 0x5C home.y, -0xC bossState); the host's script blocks hold pointers, so dest and home sit later
+ * and the write missed dest.y: mode 24 then waited for good for the Primagen to reach a dest.y it
+ * never set (stage 2's bossState 6 path, he lands on the floor at y 0). Members instead. */
+void Primagen_EnterMode24(CGameObjectInstance *actor) {
+    actor->m_AI.m_AnimSpeed = 1.0f;
+    actor->m_dwFlags |= 0x2000;
+    gLevelScript.timer = 1.0f;
+    if (gLevelScript.bossState == 3) {
+        gLevelScript.dest.y = gLevelScript.home.y;
+    } else {
+        gLevelScript.dest.y = 0.0f;
+    }
+}
+#else
 void Primagen_EnterMode24(CGameObjectInstance *actor) {
     f32 one = 1.0f;
     State *state;
@@ -25,3 +41,4 @@ void Primagen_EnterMode24(CGameObjectInstance *actor) {
         state->unk_50 = 0;
     }
 }
+#endif
