@@ -282,10 +282,12 @@ def main():
         where = 4 + "0123".index(reg[1]) if re.match(r"a[0-3]$", reg) else reg  # a register or a global
         argspec.append(("arg%d" % k, typ, mem, where, fmt, spec))
     offs = n64_offsets([(n, t, m) for (n, t, m, _, _, _) in argspec])
-    syms = symbols(([a.at] if a.at != "vi" and not a.at.startswith("0x") else []) + calls
+    syms = symbols(([a.at] if a.at != "vi" and not a.at.startswith("0x") else []) + [c for c in calls if not re.match(r"(0x|func_)[0-9A-Fa-f]+$", c)]
                    + [r for (_, _, _, r, _, _) in argspec if isinstance(r, str)])
     bp_addr = (int(a.at, 16) if a.at.startswith("0x") else syms[a.at]) if a.at != "vi" else None
-    call_at = {syms[c]: c for c in calls}
+    # a symbol, or an address for a function with no name yet: 0x0021A500 or func_0021A500
+    call_at = {(int(c.replace("func_", "0x"), 16) if re.match(r"(0x|func_)[0-9A-Fa-f]+$", c) else syms[c]): c
+               for c in calls}
     if a.offsets:
         for k, (o, s) in offs.items():
             print("%-28s 0x%05x %d" % (k, o, s))
