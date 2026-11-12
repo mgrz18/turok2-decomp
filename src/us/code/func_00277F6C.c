@@ -31,6 +31,19 @@ void COnScreen__BeginText(void) {
         }
 
         Render_SetCombineMode(0x1A);
+#ifdef TARGET_PORT
+        /* Mode 0x1A is ((ENV - PRIM) * TEXEL1 + PRIM, TEXEL0 * ENV alpha) in two cycles, and tile 1
+         * (below) has line 0. The RDP's texel address is tmem + t * line + s, so every row of tile 1
+         * is row 0 of the font block, 16 texels of 0xF: TEXEL1 is 1 and the text is the environment
+         * colour. Fast3D makes an empty texture of a line-0 tile (TEXEL1 0): the text came out in the
+         * dark primitive colour (docs/port/FIDELITY.md 2.3). The same colour on the host: ENV for
+         * the colour, the alpha unchanged (round 11 z5). */
+        {
+            Gfx *g = gDList++;
+            g->w0 = 0xFCFF9BFF;     /* gDPSetCombineLERP(0, 0, 0, ENV, TEXEL0, 0, ENV, 0, 0, 0, 0, COMBINED, ...) */
+            g->w1 = 0xFFFEFE38;
+        }
+#endif
         Render_SetRenderMode(0x15);
 
         gLoadedFont = 0;
