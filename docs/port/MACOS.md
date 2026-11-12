@@ -904,3 +904,81 @@ hosts. Not fixed this round (the game runs on; the level-2 events after it are L
 
 - The level-2 divergence above.
 - The crash in level 122 (section 9 of PLAYTHROUGH.md): **both hosts**.
+
+## 14. Round 12 (part a4): the round-11 merged tree on the Mac, flush-to-zero, the level-2 divergence
+
+Branch `names-R12_a4` (from 046a67f9). No `src/` or `include/` change (nothing to asm_diff). The
+box's ELF and archive are unchanged (ELF sha1 `61dcdf3f…`, archive `b6b9d484…`; the Mac uses
+`OUT/turok2_543.o2r`, the same bytes). Linux runs for comparison: this branch built in
+`/root/R12_a4mac/out` (Debug, PIE, LUS from the coordinator's checkout; `/root/R12_a4mac/build.sh
+[gen]`). Scripts in `OUT/r12/` (the same files on the box in `/root/R12_a4mac/r12/` with a
+`box.env`): `scen.sh` (every scenario of STATUS.md section 1: `boot play1..play4 mother blind
+queen prima save audio`), `run.sh NAME FRAMES [args]` (`--offscreen-gl` on the Mac, `--no-window`
+with `NOGL=1`), `battery.sh [names]` (pixels, state logs), `dets.sh [names]` (`T2_DET_LOG=1`, two
+at a time), `rng.sh` (the level-2 frames with `T2_DET_PARTICLES` + `T2_RNG_TRACE`), `soak.sh`,
+`sync.sh [gen]` (applies `git diff 046a67f9` to the box copy and rebuilds there). Build on the
+Mac: `OUT/rebuild.sh --fresh` (26 s).
+
+### 14.1 arm64 flush-to-zero (z5's FPCR FZ, port/runtime/t2os.c)
+
+- The game thread runs with **FPCR = 0x01000000** (FZ, bit 24; read with lldb at a breakpoint on
+  `CEngineApp__Update`, thread 5: the thread `osCreateThread`'s trampoline started).
+- The boot and the 3 attract demos (26,000 frames, `T2_DET_LOG=1`): **Mac = Linux, 0 lines differ**
+  (52,000 det lines), so demos 1/2/3 give Linux's trace (which is the N64's RAM for demos 1 and 3,
+  demo 2 to gf 607: FIDELITY.md 6).
+- Control run: the same with FZ cleared by lldb (`register write fpcr 0` at the first
+  `CEngineApp__Update`, then continue): demo 2 diverges at **frame 14,130 (gf 426)**: the player's
+  velocity z is the denormal `0x80439b0b` where Linux (and the N64) have `0x80000000`, z5's exact
+  finding. So the FZ path is live and needed on arm64.
+
+### 14.2 The level-2 divergence: libm's `atan2f` in `T2_AIM_AT` (fixed)
+
+The round-11 route (`playthrough.py --level 2`) now diverged at frame **42,184**, and only in the
+`ptcl` hash (actors and RNG stay equal; the particles reconverge at 42,186). `rng.sh` on both
+hosts: the RNG draws in frames 42,180-42,186 are the same seeds in the same order; the particle
+lines differ in **one bit**: the player's plasma shot spawned in gf 663 (slots 52 and 67) has
+velocity y `0x4487698f` on the Mac and `0x4487698e` on Linux. The frame is inside the route's
+`T2_AIM_AT=41160-42310:...` window, and `T2Port_AimAt` (port/game/t2debug.c, round 10 y1) set the
+camera pitch with **libm's `atan2f`**, whose last bit differs between macOS and glibc (the same
+class as round 10's y4-2 in `T2_AIM_NODE`). Fix (8e12748c): `T2Port_AimAt` calls `T2Port_Atan2f`
+(the + - * / atan2 of port/game/t2bosslog.c). It was the last libm transcendental in a game-state
+path: the game's own sin/cos/acos are decompiled code, and `port/` has no other `atan2f`, `sinf`,
+`powf` ... call.
+
+After the fix both level-2 routes are identical on both hosts to their end: this round's
+(64,000 frames) and **round 11's route** (`OUT/r11/p2`, 49,500 frames), which is the run where z4
+saw `allocateEffect` return 0 on the Mac only at 42,124 (its frame is in the same `T2_AIM_AT`
+window: a shot 1 ulp apart flies/hits a frame differently, which changes the free list inside
+the frame). So the per-`allocateEffect` free-list print was not needed: the divergence is gone,
+not explained away. **Linux's level-2 trace changes too** (from frame 20,416, the first
+`T2_AIM_AT` window): the events, the soul gates, the sisters and the hub at 62,000 stay the same.
+
+### 14.3 The round-11 runs on the Mac (headless `--offscreen-gl`, exit 0, 0 dlcheck reports)
+
+| run | frames | the hub (level 60) | Mac = Linux (`T2_DET_LOG`, lines) |
+|---|---|---|---|
+| boot + the 3 demos | 26,000 | - | 52,000: 0 differ |
+| level 1 (`--fight 10`): beacons, the children, the totem | 27,000 | 22,000 | 54,000: 0 |
+| level 2: "all soul gates destroyed", "all sisters of despair banished" | 64,000 | 62,000 | 128,000: 0 (after 14.2) |
+| level 3: "all prisoners free" ... 111 | 36,000 | 31,500 | 72,000: 0 |
+| level 4: "blind ones trapped", the Blind One (112 -> 1) | 46,000 | 42,000 | 92,000: 0 |
+| the Mother (health 0/128,000) | 36,000 | 29,000 | 72,000: 0 |
+| the Blind One | 25,000 | 23,500 | 50,000: 0 |
+| the Mantid Queen | 30,000 | 28,500 | 60,000: 0 |
+| **the Primagen**: the ending cinema (levels 11 and 10 from 40,000), the credits, the hub | 62,000 | 59,000 (Linux: 58,828) | 124,000: 0 |
+| save (`T2_SAVE_PORTAL`) / load (level 51) | 14,100 / 6,500 | - | 28,200 / 13,000: 0 |
+
+(The hub frames are the first `T2_STATE_LOG=500` sample in level 60.) `--audio --wav` 9,000
+frames: 150.17 s, peak 32,768, **RMS 3,399.5** (= Linux, STATUS.md section 2). Screenshots
+(checked by eye, not committed): the Primagen's ending cinema (the lightship over the portal,
+40,001), the credits ("RYAN WICKERHAM AS THE PRIMAGEN ...", 50,003), the hub after level 4
+(46,000).
+
+Soak (`OUT/r12/soak.sh`, lldb, 4 jobs, no `--draw`): new game seeds 0-7 x 36,000 and levels seeds
+0-40 x 25,000 (every level id 1-164): **49 runs, 1.31 M frames, 0 crashes, 0 hangs**.
+
+### 14.4 Open on the Mac
+
+- A windowed run with a real gamepad (section 12.6; still headless only).
+- Levels 5/6 (a1/a2) and the continuous playthrough (a3) of round 12: rerun `dets.sh` on the
+  merged tree (add their scenarios to `scen.sh`).

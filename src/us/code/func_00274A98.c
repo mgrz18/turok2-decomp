@@ -9,9 +9,16 @@ s32 SndVoicePool_ReleaseVoice(SndVoicePool *p, s16 idx) {
     SndVoice *v;
     CAudioWorld *m;
     SndCore *c;
+#ifdef TARGET_PORT
+    /* round 12 a5 (tools/port/n64viewcheck.py): the handles and the voices at their host offsets */
+    v = &p->voices[idx];
+    m = v->mgr;
+    c = (SndCore *)((u8 *)m->handles - __builtin_offsetof(SndCore, snd));
+#else
     (v) = (SndVoice *)((idx) * 0xCC + (uptr)(p)); (v) = (SndVoice *)((u8 *)(v) + 4);
     m = v->mgr;
     c = (SndCore *)((u8 *)m + 0x7C);
+#endif
     alSndpDeallocate(&m->player, c->snd[v->index]);
     c->snd[v->index] = -1;
     v->vp.priority = 0;

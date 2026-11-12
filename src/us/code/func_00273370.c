@@ -23,7 +23,12 @@ s32 SndVoicePool_FindSlot(SndVoicePool *p, s32 a, s32 b, s16 pri, s32 c) {
     v = p->voices;
     lim = best;
     m = p->owner;
+#ifdef TARGET_PORT
+    /* round 12 a5 (tools/port/n64viewcheck.py): the handles and the voices at their host offsets */
+    core = (SndCore *)((u8 *)m->handles - __builtin_offsetof(SndCore, snd));
+#else
     core = (SndCore *)((u8 *)m + 0x7C);
+#endif
     for (i = 0; i < 16; i++) {
         if (core->snd[i] == -1) {
             return (s16)i;
@@ -50,7 +55,11 @@ s32 SndVoicePool_FindSlot(SndVoicePool *p, s32 a, s32 b, s16 pri, s32 c) {
         return (s16)bestIdx;
     }
     {
+#ifdef TARGET_PORT
+        s = &p->voices[(s16)bestIdx];
+#else
         (s) = (SndVoice *)(((s16)bestIdx) * 0xCC + (uptr)(p)); (s) = (SndVoice *)((u8 *)(s) + 4);
+#endif
         m2 = s->mgr;
         s->stopping = 1;
         s->vp.follow = 0;

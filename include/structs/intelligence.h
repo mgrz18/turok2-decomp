@@ -255,11 +255,13 @@ typedef struct CActionIntelligence {
 typedef struct CPlayerIntelligence {
     /* 0x00 (0x14) */ u32 m_dwFlags;
     /* 0x04 (0x18) */ u32 m_StartHealth;
-    /* 0x08 (0x1C) */ u8 pad08[0x14 - 0x08];
+    /* 0x08 (0x1C) */ f32 m_SpeedScale;        /* the movement scale (CPlayer__UpdateSpeedScale): 1.0 Turok, 0.6-2.0 the others */
+    /* 0x0C (0x20) */ f32 m_JumpScale;         /* the jump speed scale (PlayerJump_Enter, PlayerJump_Update) */
+    /* 0x10 (0x24) */ f32 m_Unk24;             /* 1.0 in every record of the ROM */
     /* 0x14 (0x28) */ f32 m_CollisionRadius;   /* where the enemy keeps its own */
-    /* 0x18 (0x2C) */ u8 pad18[4];
+    /* 0x18 (0x2C) */ f32 m_Unk2C;             /* 50.69 (33.79 in the four type-0x1B records) */
     /* 0x1C (0x30) */ f32 m_CollisionHeight;   /* the view bobs from 0.9 of it */
-    /* 0x20 (0x34) */ u8 pad20[4];
+    /* 0x20 (0x34) */ f32 m_Unk34;             /* 30.72 in every record */
     /* 0x24 (0x38) */ f32 m_ScaleX;
     /* 0x28 (0x3C) */ f32 m_ScaleY;
     /* 0x2C (0x40) */ f32 m_ScaleZ;

@@ -58,6 +58,9 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
 #include "structs/weapon.h"
 
 #include <math.h>
+/* dladdr (glibc and macOS share this layout of Dl_info): the AI callbacks by name in T2_ACTOR_LOG */
+typedef struct { const char *dli_fname; void *dli_fbase; const char *dli_sname; void *dli_saddr; } T2DlInfo;
+extern int dladdr(const void *, T2DlInfo *);
 #include "structs/intelligence.h"
 #include "structs/boss.h"
 
@@ -83,6 +86,40 @@ static void T2Port_LogOne(const char *kind, int i, CGameObjectInstance *o, CGame
            info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_DropMask2 : 0u,
            (unsigned) (u16) o->m_AI.m_AnimType, (int) o->m_AI.m_AnimIndex, (int) o->m_AI.m_AnimRepeatedCount,
            info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_StartAnim : 0u);
+    /* round 12 a1: the body flags (m_dwTypeFlags), an action's auto radius and needed pickup */
+    if (info != NULL) {
+        printf("actor+: %s %d itf %x", kind, i, (unsigned) info->m_dwTypeFlags);
+        if (info->m_Type == INTELLIGENCE_ACTION) {
+            printf(" auto %.1f need %d text %d", info->m_Action.m_AutoGoRadius, (int) info->m_Action.m_GoPickupNeeded,
+                   (int) info->m_Action.m_GoPickupNeededText);
+        } else if (info->m_Type == INTELLIGENCE_DESTRUCTIBLE) {
+            printf(" health %d auto %.1f", (int) info->m_Destructible.m_Health, info->m_Destructible.m_AutoGoRadius);
+        }
+        {
+            /* the AI callbacks by name (dladdr: the binary's dynamic symbols) */
+            T2DlInfo di;
+            void *fns[3] = {(void *) o->m_AI.m_pfHurt, (void *) o->m_AI.m_pfStep,
+                            o->m_AI.m_pModeCurrent != NULL ? (void *) o->m_AI.m_pModeCurrent->m_pfCallback : NULL};
+            int k;
+            for (k = 0; k < 3; k++) {
+                if (fns[k] != NULL && dladdr(fns[k], &di) && di.dli_sname != NULL) {
+                    printf(" %s", di.dli_sname);
+                } else {
+                    /* no dynamic symbols: the offset from T2Port_LogOne (nm turok2) */
+                    printf(" %+lld", fns[k] != NULL ? (long long) ((char *) fns[k] - (char *) T2Port_LogOne) : 0LL);
+                }
+            }
+        }
+        printf("\n");
+    }
+    if (info != NULL && info->m_Type == INTELLIGENCE_ACTION) {
+        /* round 12 a2: an action object (a switch, a coupling): what works it (CScene__CheckAutoActivation:
+         * type flag 4 the player within m_AutoGoRadius, Action_CheckRequiredItem the pickup needed) */
+        printf("actor:   action fl %x radius %.1f height %.1f gorad %.1f goanim %d need %d text %d\n",
+               (unsigned) info->m_Action.m_dwFlags, info->m_Action.m_CollisionRadius,
+               info->m_Action.m_CollisionHeight, info->m_Action.m_AutoGoRadius, (int) info->m_Action.m_GoAnim,
+               (int) info->m_Action.m_GoPickupNeeded, (int) info->m_Action.m_GoPickupNeededText);
+    }
 }
 
 static void T2Port_LogActors(CPlayer *p) {
@@ -271,12 +308,48 @@ void T2Port_LogState(int frame) {
     fflush(stdout);
 }
 
+/* A frame-scheduled value (DEBUG-ONLY, round 12 C27): "V[@F][;V@F...]", the V of the last entry whose F
+ * (0 without "@") is <= frame, copied into buf; NULL before the first. The continuous run's per-level
+ * settings (T2_WEAPON, T2_FILL_AMMO, T2_BOSS_FRONT: level 5 on the shredder, the Queen's and the
+ * Primagen's T2_BOSS_FRONT) on the schedule frame. A plain value is returned as it is. */
+const char *T2Port_Scheduled(const char *spec, int frame, char *buf, int n) {
+    const char *best = NULL, *e;
+    int len = 0;
+    if (spec == NULL || strchr(spec, '@') == NULL) {
+        return spec;
+    }
+    for (e = spec; e != NULL && *e != 0;) {
+        const char *end = strchr(e, ';'), *at = strchr(e, '@');
+        int l = end != NULL ? (int) (end - e) : (int) strlen(e);
+        int f = 0;
+        if (at != NULL && (end == NULL || at < end)) {
+            f = atoi(at + 1);
+            l = (int) (at - e);
+        }
+        if (f <= frame) {
+            best = e;
+            len = l;
+        }
+        e = end != NULL ? end + 1 : NULL;
+    }
+    if (best == NULL) {
+        return NULL;
+    }
+    if (len >= n) {
+        len = n - 1;
+    }
+    memcpy(buf, best, len);
+    buf[len] = 0;
+    return buf;
+}
+
 /* T2_GIVE_WEAPONS=1 (game.cpp, every frame; DEBUG-ONLY, round 7 v2): in gameplay (mode 13, a
  * level loaded) every active player gets every weapon of gWeaponInfoTable that can be used on
  * land or under water, with full ammo (CPlayer__FillAllAmmo), once per player and level. To
  * test firing and the weapons without finding their pickups; not a game option. T2_WEAPON=<n>
- * also requests weapon n, T2_WEAPON_LIST=1 prints the weapon table. */
-void T2Port_GiveWeapons(void) {
+ * also requests weapon n ("N@F;...": the one scheduled for this frame, T2Port_Scheduled),
+ * T2_WEAPON_LIST=1 prints the weapon table. */
+void T2Port_GiveWeapons(int frame) {
     extern s32 CPlayer__FillAllAmmo(CPlayer *);
     static CPlayer *sGiven[4];
     static int sLevel = -1;
@@ -318,9 +391,13 @@ void T2Port_GiveWeapons(void) {
             }
         }
         CPlayer__FillAllAmmo(p);
-        if (getenv("T2_WEAPON") != NULL) {
+        {
             /* T2_WEAPON=<n>: request weapon n (the weapon actor switches to it as from the wheel) */
-            p->m_RequestedWeapon = (s16) atoi(getenv("T2_WEAPON"));
+            char wbuf[16];
+            const char *w = T2Port_Scheduled(getenv("T2_WEAPON"), frame, wbuf, sizeof(wbuf));
+            if (w != NULL) {
+                p->m_RequestedWeapon = (s16) atoi(w);
+            }
         }
         if (getenv("T2_WEAPON_LIST") != NULL) {
             /* T2_WEAPON_LIST=1: the weapon table (name, flags, model, first ammo class) */
@@ -455,6 +532,53 @@ void T2Port_Teleport(int frame, const char *spec) {
     }
 }
 
+/* T2_ANCHOR=L@N[;L@N...] (DEBUG-ONLY, round 12 a3): re-anchor the schedule clock of a long scripted
+ * run. The --input entries and the frame-scheduled switches (T2_TELEPORT, T2_AIM_*, T2_FACE_*,
+ * T2_BOSS_FRONT, T2_FILL_AMMO, T2_DOOR_OPEN, T2_SAVE_PORTAL, T2_WARP_TO) read the schedule frame,
+ * which is the host frame until the first anchor: when the game is in gameplay in level L (its warp
+ * done) for the next pending anchor, the schedule frame becomes N there and runs on from it. A
+ * totem fight or a door that ends a few frames earlier or later then no longer shifts every later
+ * step of a continuous run (tools/port/fullrun.py). The anchors fire in order, each once, and only
+ * once the schedule frame is within 3,000 frames before N (a hub visited twice). "L1/L2@N": the first
+ * of those levels reached (round 12 C27). */
+int T2Port_ScheduleFrame(int frame) {
+    static const char *spec;
+    static int init, delta;
+    static const char *next;
+
+    if (!init) {
+        init = 1;
+        spec = getenv("T2_ANCHOR");
+        next = spec;
+    }
+    if (next != NULL && *next != '\0' && gEngineApp.m_Settings.mode == 13 && gScene.m_WarpState == 0) {
+        const char *at = strchr(next, '@');
+        int n = at != NULL ? atoi(at + 1) : 0;
+        /* "L1/L2@N" (round 12 C27): any of the levels (after the Mother: 114, or the hub straight) */
+        int l = atoi(next), in = 0;
+        const char *q = next;
+        while (at != NULL && q != NULL && q < at) {
+            if (atoi(q) == gScene.m_nLevel) {
+                in = 1;
+                l = gScene.m_nLevel;
+            }
+            q = strchr(q, '/');
+            q = q != NULL && q < at ? q + 1 : NULL;
+        }
+        if (at != NULL && in && frame - delta >= n - 3000) {
+            printf("anchor: frame %d level %d: schedule frame %d -> %d (offset %+d)\n", frame, l, frame - delta, n,
+                   frame - delta - n);
+            fflush(stdout);
+            delta = frame - n;
+            next = strchr(next, ';');
+            if (next != NULL) {
+                next++;
+            }
+        }
+    }
+    return frame - delta;
+}
+
 /* T2_WAKE_ENEMIES=R (DEBUG-ONLY, round 7 v3): in gameplay, wake every dormant level enemy within R
  * units of the player (default 1500) the way its level event does (EnemyAI_SleepIfOffscreen, the
  * enemy event handler 1: flags 0x2100 and mode 2). Enemies whose definition has flag 0x1000 sleep until a
@@ -509,8 +633,23 @@ void T2Port_FaceNearest(int frame, const char *spec) {
     if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL || gScene.m_WarpState != 0) {
         return;
     }
-    if (strchr(spec, '@') != NULL && atoi(strchr(spec, '@') + 1) != gScene.m_nLevel) {
-        return; /* R@LEVEL: only in that level (round 9 x1: the totem fight of a scripted run) */
+    if (strchr(spec, '@') != NULL) {
+        /* R@LEVEL: only in that level (round 9 x1: the totem fight of a scripted run);
+         * R@L1,L2,...: in any of them (round 12 a3: the totems of one continuous run) */
+        const char *l = strchr(spec, '@') + 1;
+        int in = 0;
+        while (l != NULL && *l != '\0') {
+            if (atoi(l) == gScene.m_nLevel) {
+                in = 1;
+            }
+            l = strchr(l, ',');
+            if (l != NULL) {
+                l++;
+            }
+        }
+        if (!in) {
+            return;
+        }
     }
     if (r <= 0.0f) {
         r = 2000.0f;
@@ -615,7 +754,10 @@ void T2Port_AimAt(int frame, const char *spec) {
             at.y = y;
             at.z = z;
             pl->m_RotY += AI_AngleToPoint(pl, at);
-            p->m_pCamera->m_ViewParams.m_vRotOffset.x = atan2f(dy, sqrtf(dx * dx + dz * dz));
+            extern f32 T2Port_Atan2f(f32 y, f32 x);
+            /* not libm's atan2f: its last bit differs between macOS and glibc (round 12 a4: a
+             * level-2 shot's velocity 1 ulp apart at frame 42,184) */
+            p->m_pCamera->m_ViewParams.m_vRotOffset.x = T2Port_Atan2f(dy, sqrtf(dx * dx + dz * dz));
             if (frame == f1) {
                 printf("aimat: frame %d eye (%.1f %.1f %.1f) -> (%.1f %.1f %.1f) pitch %.2f\n", frame, eye.x, eye.y,
                        eye.z, x, y, z, p->m_pCamera->m_ViewParams.m_vRotOffset.x);
@@ -660,7 +802,7 @@ void T2Port_AimEnemy(int frame, const char *spec) {
     }
 }
 
-/* T2_SAVE_PORTAL=F (DEBUG-ONLY, round 8 w5): at frame F, in gameplay, open the save portal menu
+/* T2_SAVE_PORTAL=F[,F2...] (DEBUG-ONLY, round 8 w5): at frame F, in gameplay, open the save portal menu
  * (gSavePortalMenuDesc) for the first player, as CPlayerPool__Update does when a save portal's
  * cinema (script 400) ends, to reach the game's own save path (PakMenu_InitSaveGame,
  * SaveGame_Build, PakMenu_WriteSaveGame) without walking to a portal. Called every frame. */
@@ -668,7 +810,20 @@ extern struct MenuDesc gSavePortalMenuDesc;
 void T2Port_SavePortal(int frame, const char *spec) {
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
 
-    if (p == NULL || p->m_pCamera == NULL || gEngineApp.m_Settings.mode != 13 || frame != atoi(spec)) {
+    const char *f = spec;
+    int at = 0;
+
+    /* F1,F2,... (round 12 a3): a save after each level of one continuous run */
+    while (f != NULL && *f != '\0') {
+        if (atoi(f) == frame) {
+            at = 1;
+        }
+        f = strchr(f, ',');
+        if (f != NULL) {
+            f++;
+        }
+    }
+    if (p == NULL || p->m_pCamera == NULL || gEngineApp.m_Settings.mode != 13 || !at) {
         return;
     }
     printf("debug: frame %d: T2_SAVE_PORTAL: the save portal menu in level %d\n", frame, (int) gScene.m_nLevel);

@@ -10,7 +10,7 @@ s32 GameObject_IsOnGround(sptr);
 #include "structs/region.h"
 /* The host body on the members (STABILITY.md section 7): the N64 offsets (CPlayer 0xA08 m_Mode,
  * 0xB28 m_CameraMovementScaler; the actor's CAI flags at 0x140) wrote a float into the host
- * CPlayer every frame. The intelligence (0x1C: the player body's speed) and the region info
+ * CPlayer every frame. The intelligence (0x1C: m_SpeedScale) and the region info
  * (0x30, 0x52) are ROM records at the same offsets on both sides (offsetof checks them). */
 void CPlayer__UpdateSpeedScale(void *arg0, void *arg1, void *arg2) {
     CPlayer *player = arg0;
@@ -22,14 +22,9 @@ void CPlayer__UpdateSpeedScale(void *arg0, void *arg1, void *arg2) {
         player->m_CameraMovementScaler = 1.0f;
         return;
     }
-    {
-        /* CPlayerIntelligence types 0x1C as pad08 (u8[]): the archive's swap plan leaves those
-         * bytes big-endian (1.0f reads as 4.6e-41 little-endian). Read them as the N64 does.
-         * The real fix: name the field in structs/intelligence.h + swap_spec (archive rebuild). */
-        const u8 *b = (const u8 *) actor->header.m_pIntelligence + __builtin_offsetof(CIntelligence, m_Player.pad08);
-        u32 w = ((u32) b[0] << 24) | ((u32) b[1] << 16) | ((u32) b[2] << 8) | b[3];
-        s = *(f32 *) &w;
-    }
+    /* m_SpeedScale: typed in structs/intelligence.h, so the archive's swap plan swaps it (round 12
+     * a5; round 11 read the big-endian bytes of CPlayerIntelligence.pad08 here). */
+    s = actor->header.m_pIntelligence->m_Player.m_SpeedScale;
     player->m_CameraMovementScaler = s;
     if (gEngineApp_m_Settings.multiplayer != 0) {
         player->m_CameraMovementScaler = s * gEngineApp_m_Settings.speed;
@@ -39,7 +34,7 @@ void CPlayer__UpdateSpeedScale(void *arg0, void *arg1, void *arg2) {
         player->m_CameraMovementScaler *= info->unk_30;
     }
 }
-_Static_assert(__builtin_offsetof(CIntelligence, m_Player.pad08) == 0x1C, "CIntelligence 0x1C");
+_Static_assert(__builtin_offsetof(CIntelligence, m_Player.m_SpeedScale) == 0x1C, "CIntelligence 0x1C");
 _Static_assert(__builtin_offsetof(CRegionInfo, unk_30) == 0x30, "CRegionInfo 0x30");
 _Static_assert(__builtin_offsetof(CRegionInfo, m_wFlags52) == 0x52, "CRegionInfo 0x52");
 #else

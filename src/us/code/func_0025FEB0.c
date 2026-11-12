@@ -9,6 +9,20 @@
 /* Places a projectile at its owner's muzzle: inherits the shooter's rotation,
  * yaws it by its own angle and pushes it 10.24 units along the result. */
 
+#ifdef TARGET_PORT
+typedef struct Projectile {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Projectile(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_Projectile(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_unk10[T2_HOFF_Projectile(header.m_pCurrentRegion)]; sptr unk10; }; /* N64 0x10 */
+        struct { u8 _hp_vel[T2_HOFF_Projectile(m_vScale)]; CVector3 vel; }; /* N64 0x34 */
+        struct { u8 _hp_rot[T2_HOFF_Projectile(m_qGround)]; CQuaternion rot; }; /* N64 0x40 */
+        struct { u8 _hp_yaw[T2_HOFF_Projectile(m_RotY)]; f32 yaw; }; /* N64 0x50 */
+    };
+} Projectile;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[4];
     /* 0x04 */ CVector3 pos;
@@ -18,6 +32,7 @@ typedef struct {
     /* 0x40 */ CQuaternion rot;
     /* 0x50 */ f32 yaw;
 } Projectile;
+#endif
 
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);

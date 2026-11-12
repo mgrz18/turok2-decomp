@@ -217,3 +217,88 @@ class (S23); fixed, the final PIE binary ran the 123 runs above with 0 crashes a
 a PIE; `-DT2_LOW_MEMORY=ON` brings back `-no-pie` and `--low-memory` (debug). With a PIE build
 use soak.py without `--both-memory`. An existing build dir keeps its cached `T2_LOW_MEMORY=ON`:
 reconfigure with `-DT2_LOW_MEMORY=OFF`.
+
+## 8. Round 12 (part a5): the N64-offset sweep (`tools/port/n64viewcheck.py`)
+
+Round 11 fixed twelve functions that viewed an instance at its N64 offsets, one at a time, as
+crashes and wrong events found them. This round's checker finds the class statically:
+
+```sh
+python3 tools/port/n64viewcheck.py --build OUT/build -j 4 [--json out.json] [--all] [--unlinked] [files]
+```
+
+It parses every linked `src/` file the way the host compiles it (libclang, `x86_64-linux-gnu`;
+only the `TARGET_PORT` side of each `#ifdef` exists) and, for files with a candidate, again for
+`mips-linux-gnu` (the N64 layout). Three kinds of site: **raw** (a pointer cast of `base +/- C`
+or `((u8 *) base)[C]`: `M2C_FIELD`, `*(s32 *)((u8 *) p + 0x1C)`, the `P_xx` macros), **stride**
+(the same with an `i * K` term) and **view** (a member read through a struct defined in the .c
+file whose fields are placed by pads). Classes: `BAD` (the base's static type is an `include/`
+struct and its member at that N64 offset is elsewhere on the host), `suspect` (a view whose
+fields fit a key struct: CGameObjectInstance, CIntelligence, CPlayer, CAI, CGameRegion, CCamera,
+CRegionInfo, CScene, ...; and some of those members move), `moves` (the view's own host layout
+differs from its N64 one), `global` (`&symbol +/- C`), `untyped` (void * / sptr base; the
+`guess` lists key-struct members that move), `local`, `same`. ~90 s for 3,020 linked files with
+`-j 4`. A view's field counts as moved only when the member's host offset differs from the
+view field's own host offset (a pointer field realigns a view, so `u8 pad[0x14]; void *def;`
+lands on the host `m_pIntelligence` at 0x18).
+
+First run (046a67f9 + the PIE build): raw BAD 15, stride BAD 3, view suspect 60, moves 83,
+untyped raw 115. Reviewed by hand; **fixed (asm_diff 0, all under `TARGET_PORT`, the views
+rebuilt with `tools/port/hostview.py --apply` where they are whole-struct views):**
+
+| function (file) | what it read on the host |
+|---|---|
+| `Blast_GetPush` (func_002374AC) | the source's flags (0xD4), owner (0x1A8), the target's velocity, yaw (0x50) and mode flags (0x17C); the owner's 0xBB0 is `CPlayer.m_pOnEnemy` (a pointer): every blast pushed in the wrong frame |
+| `Blast_GetReach` (func_00238334) | the foot height `m_CollisionYOffset` (0x54) |
+| `func_0021B038` | the target's flags (0xD4), health (0x144), foot height |
+| `CPlayer__TryMount` (func_0024EAF8) | the mount's yaw and type flag (0xB8), its CAI (0x140) |
+| `CPlayer__Dismount` (func_002553BC) | the thrown body's velocity and yaw |
+| `Projectile_PlaceAtMuzzle` (func_0025FEB0) | wrote the muzzle velocity, rotation and yaw over the wrong members, and the region pointer through an `s32` (cut to 32 bits) |
+| `Turret_Aim` (func_002623EC) | the turret's yaw (0x50) |
+| `CLevelActor__BuildMatrix` (func_00215884) | the actor's yaw (0x144), scale (0x164), height (0x168), its matrices |
+| `CPooledLevelActor__Update` (func_00227680) | the velocity, bounds and the pooled timer (0x19C) |
+| `func_00238EE4` (impact sounds) | the hit object's word at 0x80 and `m_AI.m_VisBits` (0x14C) |
+| `CGameRegion__FloodSetWater`, `CGameRegion__FloodClearFlag4Same` (func_0026C5C4, func_0026C934) | the neighbours at N64 0x10-0x18: on the host the vertex pointers, so the flood walked into vertex data and set flags there |
+| `CCamera__DrawHitFlash` (func_00280EE8), `CPlayer__DrawScope` (`HudView`, func_00247438), `func_00254834`, `func_00254768` | the camera viewport (0x288-0x294) and the flash (0x530); func_00254768 also `CPlayer.m_SightIconFrame` (0xB60) |
+| `CCameraText__Reset` (func_00281B58) | `m_nId` is pointer-wide since round 11 (z3): the reset cleared the padding and kept the old owner id |
+| `CPlayer__CheckJumpOn` (func_00255340) | `m_SniperMode` (0xB8C), `m_TimeOffGround` (0xA9C), `m_ContState.m_dwButtonsSingle` (0xA68) |
+| `CPlayerPool__ReloadAnimInfo` (func_00252C70) | the camera's `m_ViewParams.m_nType` (0x24) |
+| `CPlayer__Update` (func_0024C47C) | the menu pool's first word as `gEngineApp_m_Settings - 0xCAC`: the host's blocks are not N64-sized (0xDB8 apart) |
+| `SndVoicePool_FindSlot`, `SndVoicePool_ReleaseVoice`, `SndVoice_Update` (func_00273370, func_00274A98, func_0027314C) | the sound handles through `CAudioWorld + 0x7C` (host `handles` is at 0x12C, not 0xE8) and the voices at the N64 stride 0xCC + 4 (host 0xD8 + 8) |
+| `CAudioWorld__PlaySound` (func_00270C80) | the low half of `lastVariant` at +0x132 (big-endian position) |
+
+**Left, with the reason** (`/root/R12_a5/vc/final.txt` after the fixes: raw BAD 10, stride
+BAD 3, suspect 44):
+
+- raw BAD that are fine: `GameMatch` minus 0x1B0/0x1B5/0x1D8 (`CStaticObject__Draw`,
+  `EngineMode01_Legal_Init`): inside `GameSettings`, which has no pointer (match at 0x1D8 on both);
+  `Quad_ComputeNormal` / `Quad_Translate`: arrays of `CVector3`; `Primagen_EnterMode18`
+  (`gLevelScript_bossMode - 0xA`, a run of scalars, its own comment).
+- strides: 20-byte animation keys (`func_002179F0`, `Anim_GetBoneRotationSlerp`: ROM data),
+  `Video_SetMode` (a u16 table); the 18 untyped ones are ISet offsets, matrices, ROM tables.
+- suspects that are look-alikes: ROM records (the platform/destructible intelligences
+  `StateInfo`, `M1Info`, `Rec54E0`, the movement `Tuning`, `SoundEvent`, `TurretParams`), the
+  views of the game's own allocations used consistently (`PoseContext`, `Profile`, the swoosh and
+  trail `SSlot`/`SEnt`/`Emitter`/`EmitNode`, `FontStyle`, the menus, `PlayerList` (the same
+  `PlayerCList` members as `CPlayerPool`)), the scope `HudModel` (it views `CPlayerOverlay`: its
+  only pointer, `m_rpObject`, holds an s32 key, and `m_mOrient` is at 0x10 on both),
+  `animReached` (the N64-only helper; the host `Door_OpenUpdate` uses `animReachedHost`).
+- **not resolved** (the struct behind the view is not known; worth a trace):
+  `Turret_Effects` (`Effect00262B58`: a node-callback context, `value` at 0x90),
+  `Generator_SpawnObject` (`T2MotionState` 0x10C/0x110: no CAI member there),
+  `CStaticObject__Draw` / `CStaticObject__RequestLitVertices` (`PlacedProp`, `SpawnSource`: no
+  clean fit with `CStaticObject`), `RumbleMenu_Play` (`+0x1C` -> `+0xBF8`, maybe
+  `CPlayer.m_bEnteringDeathmatch`), and the 110 `untyped` raw sites (mostly menus and
+  m2c-only code on `void *` arguments).
+
+**Checks after the fixes** (Linux headless PIE, the rebuilt archive below):
+
+- boot + the 3 demos, `T2_DET_LOG=1 T2_DET_GF=1 T2_DET_ACTORS=1`, 26,000 frames: **523,287
+  det lines identical** to the round-11 tree (046a67f9) built here (both commits).
+- `playthrough.py --level 1..4` (`--fight 10` for level 1): every level ends at the hub (60)
+  with every "mission complete" and the totem saved, as on 046a67f9. Levels 1 and 3:
+  every `state`/`event`/`totem`/`boss` line identical (pointers masked); level 2 from 30,000
+  (the sisters' level 133) and level 4 from 27,000 (the Cave Totem 112): fights with
+  explosions, where the blast push/reach fixes change where the player is thrown (level 4's
+  defence: 56 kills instead of 59; the Blind One still dies, mode 9).
+- soak (PIE, the new archive): levels seeds 0-39 x 25,000 (40 runs, 998,400 frames, every level id warped into) and new game seeds 0-9 x 36,000 (10 runs, 360,000 frames): **0 crashes, 0 hangs**.

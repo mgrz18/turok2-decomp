@@ -19,6 +19,9 @@
 #include "globals/scene.h"
 #include "globals/render.h"
 #include "globals/collision.h"
+#ifdef TARGET_PORT
+#include "globals/menu.h"
+#endif
 #include "globals/engine.h"
 #include "globals/player.h"
 #include "protos/cache.h"
@@ -719,7 +722,12 @@ void CPlayer__Update(Player *p) {
     p->owner = p;
     p->unk430 = p;
     if ((p->aiFlags & 0x80) && game->multiplayer == 0) {
+#ifdef TARGET_PORT
+        /* the host's blocks are not N64-sized: name the menu pool (round 12 a5, n64viewcheck.py) */
+        enable = *(u32 *) &gEngineApp_m_Game_m_MenuPool == 0;
+#else
         enable = *(u32 *) ((u8 *) game - 0xCAC) == 0; /* gEngineApp_m_Game_m_MenuPool, the block before */
+#endif
     }
     Sound__SetMuted(enable);
     if (gEngineApp_m_Settings.multiplayer == 0) {

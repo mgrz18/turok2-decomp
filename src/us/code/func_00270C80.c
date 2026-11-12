@@ -90,7 +90,11 @@ chk:
     }
 
     if (id < 0x100) {
+#ifdef TARGET_PORT
+        last = (u16) m->lastVariant; /* the N64's 0x132: the low half of the big-endian word (round 12 a5) */
+#else
         last = *(u16 *)((u8 *)m + 0x132);
+#endif
         sum = 0;
         if (m->rangeCount != 0) {
             if (BinaryRange(m->ranges, m->rangeCount, id, &lo, &hi) != 0) {

@@ -24,7 +24,11 @@ void CPlayerPool__ReloadAnimInfo(CPlayerPool *list, CCamera *cam) {
     CVector3 d;
 
     for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
+#ifdef TARGET_PORT
+        if (p->m_pCamera == cam && cam->m_ViewParams.m_nType == 0) { /* N64 0x24 (round 12 a5) */
+#else
         if (p->m_pCamera == cam && *(s32 *)((u8 *)cam + 0x24) == 0) {
+#endif
             obj = &p->m_WeaponActor;
             if (obj->m_dwFlags & 0x40000) {
                 res = CCache__Request(0, (sptr)obj->m_rpObject, obj->m_rpObjectHeader, 4, 0, 0, D_800A7094, 1);

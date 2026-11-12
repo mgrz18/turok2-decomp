@@ -3,6 +3,16 @@
 #include "structs/menu.h"
 #include "globals/menu.h"
 
+#ifdef TARGET_PORT
+/* The port (round 12 C27): the byte reads below are N64 offsets of CPlayer (m_Data at 0x520:
+ * 0x9FC m_NukePartLevelFlags, 0xA05/0xA06 m_KeySet6LevelFlags[3]/[4]); CPlayerLoadSaveData holds
+ * scalars only, so its own layout is the N64's and only m_Data's place in CPlayer moves. */
+#include "structs/player.h"
+#define PLAYER_BYTE(p, off) (((u8 *) &((CPlayer *) (p))->m_Data)[(off) - 0x520])
+#else
+#define PLAYER_BYTE(p, off) (p)[off]
+#endif
+
 
 s32 CPlayer__GetPickupCountHigh(u8 *player, s32 type);
 void Hud_SetupTextureMode(s32 alpha);
@@ -30,13 +40,13 @@ void InventoryMenu_DrawItem(MenuItem *item, MenuItemLayout *box, s32 unused, Men
             }
             break;
         first_row:
-            owned = index < player[0xA05];
+            owned = index < PLAYER_BYTE(player, 0xA05);
             break;
         second_row:
-            owned = index - 3 < player[0xA06];
+            owned = index - 3 < PLAYER_BYTE(player, 0xA06);
             break;
         case 0x1194:
-            owned = (player + index)[0x9FC] != 0;
+            owned = PLAYER_BYTE(player + index, 0x9FC) != 0;
             break;
     }
     if (gMenuCurrentFont != 0x14) {
