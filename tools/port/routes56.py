@@ -132,6 +132,12 @@ L5_SEGMENTS = [
     ]),
 ]
 
+# the Hive Totem (113) arrives at ~31,300 (rel 13,600); saved (8 kills) by ~33,000
+L5_TOTEM = (13650, 2000, 113)
+# the Mantid Queen (level 2, ~33,100 after the totem): fire held to the end of the run; her death
+# (mode 16) at ~43,400, the hub (60) by ~45,500 (run 48,000 frames)
+L5_BOSS = (15300, 16000)
+
 L6_SEGMENTS = [
     ("114 Level 6A: exit 6100", 0, [
         (0, -3019.7, 38.3, -3525.4, 0.1928, W, {}),          # warp 6100 -> 115
@@ -210,6 +216,20 @@ def build_level56(level, new_game, fire_every):
                     aim_enemy.append("%d-%d,%d,%d" % (a, b, o["aim"][2] if len(o["aim"]) > 2 else 4000, o["aim"][1]))
                 elif o.get("aim"):
                     aim_at.append("%d-%d:%.1f,%.1f,%.1f" % ((a, b) + tuple(o["aim"])))
+    extra_env = []
+    if level == 5:
+        # the Hive Totem (113, from the exit 7500 once both objectives are done): fire taps with the
+        # aim assist on the nearest enemy (as levels 1-4), 8 kills save it
+        rel, length, lv = L5_TOTEM
+        inputs.append("# %d the Hive Totem: fire taps (T2_FACE_NEAREST aims)" % lv)
+        fire.append((start + rel, start + rel + length))
+        # then the Mantid Queen (level 2): fire held, T2_AIM_NODE=boss@2, T2_BOSS_FRONT (z2's recipe;
+        # the shredder kills her too); her death cinema and the hub
+        rel, length = L5_BOSS
+        inputs += ["# 2 the Mantid Queen: fire held, T2_AIM_NODE=boss@2, T2_BOSS_FRONT=450,200",
+                   "Z@%d..%d" % (start + rel, start + rel + length)]
+        extra_env = ["T2_FACE_NEAREST=4000@%d" % lv, "T2_AIM_NODE=boss@2", "T2_BOSS_FRONT=450,200",
+                     "T2_BOSS_LOG=1"]
     for a, b in fire:
         for f in range(a, b, fire_every):
             inputs.append("Z@%d..%d" % (f, f + 6))
@@ -217,6 +237,7 @@ def build_level56(level, new_game, fire_every):
     # level 5: the shredder (the cocoons); level 6: the plasma rifle
     env = ["T2_WARP_TO=%s" % ",".join(warps), "T2_GIVE_WEAPONS=1", "T2_WEAPON=%d" % (9 if level == 5 else 10),
            "T2_CHEATS=1", "T2_FILL_AMMO=%d" % (100 if level == 5 else 300)]
+    env += extra_env
     if aim_at:
         env.append("T2_AIM_AT=\"%s\"" % ";".join(aim_at))
     if aim_enemy:
