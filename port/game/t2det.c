@@ -9,6 +9,7 @@
 #include "structs/game.h"
 #include "structs/intelligence.h"
 #include "structs/particle.h"
+#include "structs/camera.h"
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
@@ -103,6 +104,20 @@ void T2Port_LogDet(int frame) {
     printf("\n");
     if (p != NULL && sVerbose) {
         T2Det_Actor(0, &p->m_WeaponActor, "wpn", 0, 1); /* the weapon actor: its bones place the shots */
+        if (p->m_pCamera != NULL) { /* round 11 z5: the camera (view inputs, tremor, shake, view translation) */
+            CCamera *c = p->m_pCamera;
+            CCameraViewParams *vp = &c->m_ViewParams;
+            printf("det:  cam vp %08x %08x %08x roty %08x off %08x %08x %08x yoff %08x trem %08x %08x "
+                   "shk %08x %08x %08x amp %08x %08x %08x pos %08x %08x %08x\n",
+                   T2Det_Bits(vp->m_vPos.x), T2Det_Bits(vp->m_vPos.y), T2Det_Bits(vp->m_vPos.z),
+                   T2Det_Bits(vp->m_RotY), T2Det_Bits(vp->m_vRotOffset.x), T2Det_Bits(vp->m_vRotOffset.y),
+                   T2Det_Bits(vp->m_vRotOffset.z), T2Det_Bits(vp->m_YPosOffset), T2Det_Bits(c->m_TremorAngle),
+                   T2Det_Bits(c->m_TremorHeight), T2Det_Bits(c->m_Shake.m_XAxis.m_Shake),
+                   T2Det_Bits(c->m_Shake.m_YAxis.m_Shake), T2Det_Bits(c->m_Shake.m_ZAxis.m_Shake),
+                   T2Det_Bits(c->m_Shake.m_XAxis.m_Amp), T2Det_Bits(c->m_Shake.m_YAxis.m_Amp),
+                   T2Det_Bits(c->m_Shake.m_ZAxis.m_Amp), T2Det_Bits(c->m_vPos.x), T2Det_Bits(c->m_vPos.y),
+                   T2Det_Bits(c->m_vPos.z));
+        }
     }
     for (i = gScene.m_nFirstActor; gScene.m_pActors != NULL && i < gScene.m_nActors; i++, n++) {
         h = T2Det_Actor(h, &gScene.m_pActors[i], "lvl", i, sVerbose && gScene.m_pActors[i].header.m_pIntelligence != NULL);

@@ -7,6 +7,9 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/level_actor.h"
+#ifdef TARGET_PORT
+#include "structs/region.h"
+#endif
 #include "structs/light.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
@@ -52,7 +55,12 @@ void CLevelActor__Construct(CLevelActor *actor, PlacedActorRecord *record, s32 o
     if (record->segment == 0xFFFF) {
         actor->header.m_pCurrentRegion = NULL;
     } else {
+#ifdef TARGET_PORT /* the region array at the host CGameRegion stride (0x40; 32 on the N64), as the static
+                    * objects' (func_00214564.c, round 11 z5): at 32 a placed actor's region was a wrong address */
+        actor->header.m_pCurrentRegion = (struct CGameRegion *) segments + record->segment;
+#else
         actor->header.m_pCurrentRegion = (struct CGameRegion *) (segments + record->segment * 32);
+#endif
     }
     actor->m_wFlags = record->flags | 2;
     actor->m_Timer = 0;

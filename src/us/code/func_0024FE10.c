@@ -1,9 +1,15 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
+#include "structs/game_object.h"
 
 typedef struct {
+#ifdef TARGET_PORT /* the body is a CGameObjectInstance: m_RotY at its host offset (at 0x50 the view read
+                    * 0 on the host, so the side bob went along the wrong axis: demo 1's camera, round 11 z5) */
+    u8 pad0[__builtin_offsetof(CGameObjectInstance, m_RotY)];
+#else
     /* 0x00 */ u8 pad0[0x50];
+#endif
     /* 0x50 */ f32 yaw;
 } BobObject;
 

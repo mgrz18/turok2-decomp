@@ -43,6 +43,7 @@ typedef struct {
 } PlacedProp;
 #ifdef TARGET_PORT
 #include "structs/level_actor.h"
+#include "structs/region.h"
 T2_STATIC_OBJECT_CHECK(PlacedProp, matrix, flags);
 #endif
 
@@ -108,7 +109,13 @@ void CStaticObject__Construct(PlacedProp *prop, PlacedPropRecord *record, s32 ow
     if (record->segment == 0xFFFF) {
         prop->segment = 0;
     } else {
+#ifdef TARGET_PORT /* the region array (section 2 of the region data) at the host CGameRegion stride: at
+                    * 32 bytes a static object's region was a wrong address (pointer-wide host regions), and
+                    * its first event (a particle traced from that region) crashed in Collision_SweepRegions */
+        prop->segment = (void *) ((CGameRegion *) segments + record->segment);
+#else
         prop->segment = segments + record->segment * 32;
+#endif
     }
     prop->key = next_key() << 10;
     prop->colorFrame = (u8)gFrameCount - 1;
