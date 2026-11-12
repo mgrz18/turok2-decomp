@@ -30,7 +30,7 @@ extern "C" {
 int T2Port_EngineMode(void);
 void T2Port_LogState(int frame);
 void T2Port_LogDet(int frame);
-void T2Port_GiveWeapons(void); // DEBUG-ONLY: T2_GIVE_WEAPONS=1 (t2debug.c)
+void T2Port_GiveWeapons(int frame); // DEBUG-ONLY: T2_GIVE_WEAPONS=1 (t2debug.c)
 void T2Port_DebugWarp(int frame);
 void T2Port_Teleport(int frame, const char *spec);
 int T2Port_ScheduleFrame(int frame);
@@ -623,7 +623,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         static const int statePeriod = getenv("T2_STATE_LOG") == nullptr ? 0
                                        : (atoi(getenv("T2_STATE_LOG")) > 1 ? atoi(getenv("T2_STATE_LOG")) : 60);
         gT2HostFrame = f + 1;
-        T2Port_GiveWeapons(); // DEBUG-ONLY: T2_GIVE_WEAPONS=1
+        T2Port_GiveWeapons(sFrame + 1); // DEBUG-ONLY: T2_GIVE_WEAPONS=1
         if (statePeriod > 0 && (f + 1) % statePeriod == 0) {
             T2Port_LogState(f + 1); // DEBUG-ONLY: T2_STATE_LOG=1
         }

@@ -225,8 +225,13 @@ static int aimBoxCentre(CGameObjectInstance *o, s32 mask, CVector3 *from, CVecto
 extern f32 GameObject_GetCollisionHeight(CGameObjectInstance *e);
 extern s32 Cinema_PathPlaying(void);
 extern s32 Cinema_GetScriptId(void);
-void T2Port_BossFront(int frame, const char *spec) {
+const char *T2Port_Scheduled(const char *spec, int frame, char *buf, int n);
+void T2Port_BossFront(int frame, const char *spec0) {
     static int sLast = -100000;
+    /* "D,EVERY@F;..." (round 12 C27): the spec scheduled for this frame (the Queen's, then the Primagen's) */
+    char sbuf[48];
+    const char *sched = T2Port_Scheduled(spec0, frame, sbuf, sizeof(sbuf));
+    const char *spec = sched != NULL ? sched : ""; /* none yet: "" (returns below) */
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
     WaveBossState *q = &gMantidQueen;
     const char *comma = strchr(spec, ',');
@@ -241,7 +246,7 @@ void T2Port_BossFront(int frame, const char *spec) {
     f32 dx, dz, len;
     sptr region;
 
-    if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_WarpState != 0) {
+    if (spec[0] == 0 || p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_WarpState != 0) {
         return;
     }
     if (gScene.m_nLevel == 4) {
@@ -589,6 +594,8 @@ void T2Port_Cheats(int frame, const char *spec, const char *fill) {
         gEngineApp_m_Settings.cheatFlags |= (s32) strtol(spec, NULL, 0);
     }
     /* T2_FILL_AMMO=N: every N frames the active players' ammo is filled (CPlayer__FillAllAmmo) */
+    char fbuf[16];
+    fill = T2Port_Scheduled(fill, frame, fbuf, sizeof(fbuf)); /* "N@F;..." (round 12 C27) */
     if (fill != NULL && atoi(fill) > 0 && frame % atoi(fill) == 0) {
         for (p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
             CPlayer__FillAllAmmo(p);

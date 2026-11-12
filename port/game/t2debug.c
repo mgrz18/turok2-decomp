@@ -308,12 +308,48 @@ void T2Port_LogState(int frame) {
     fflush(stdout);
 }
 
+/* A frame-scheduled value (DEBUG-ONLY, round 12 C27): "V[@F][;V@F...]", the V of the last entry whose F
+ * (0 without "@") is <= frame, copied into buf; NULL before the first. The continuous run's per-level
+ * settings (T2_WEAPON, T2_FILL_AMMO, T2_BOSS_FRONT: level 5 on the shredder, the Queen's and the
+ * Primagen's T2_BOSS_FRONT) on the schedule frame. A plain value is returned as it is. */
+const char *T2Port_Scheduled(const char *spec, int frame, char *buf, int n) {
+    const char *best = NULL, *e;
+    int len = 0;
+    if (spec == NULL || strchr(spec, '@') == NULL) {
+        return spec;
+    }
+    for (e = spec; e != NULL && *e != 0;) {
+        const char *end = strchr(e, ';'), *at = strchr(e, '@');
+        int l = end != NULL ? (int) (end - e) : (int) strlen(e);
+        int f = 0;
+        if (at != NULL && (end == NULL || at < end)) {
+            f = atoi(at + 1);
+            l = (int) (at - e);
+        }
+        if (f <= frame) {
+            best = e;
+            len = l;
+        }
+        e = end != NULL ? end + 1 : NULL;
+    }
+    if (best == NULL) {
+        return NULL;
+    }
+    if (len >= n) {
+        len = n - 1;
+    }
+    memcpy(buf, best, len);
+    buf[len] = 0;
+    return buf;
+}
+
 /* T2_GIVE_WEAPONS=1 (game.cpp, every frame; DEBUG-ONLY, round 7 v2): in gameplay (mode 13, a
  * level loaded) every active player gets every weapon of gWeaponInfoTable that can be used on
  * land or under water, with full ammo (CPlayer__FillAllAmmo), once per player and level. To
  * test firing and the weapons without finding their pickups; not a game option. T2_WEAPON=<n>
- * also requests weapon n, T2_WEAPON_LIST=1 prints the weapon table. */
-void T2Port_GiveWeapons(void) {
+ * also requests weapon n ("N@F;...": the one scheduled for this frame, T2Port_Scheduled),
+ * T2_WEAPON_LIST=1 prints the weapon table. */
+void T2Port_GiveWeapons(int frame) {
     extern s32 CPlayer__FillAllAmmo(CPlayer *);
     static CPlayer *sGiven[4];
     static int sLevel = -1;
@@ -355,9 +391,13 @@ void T2Port_GiveWeapons(void) {
             }
         }
         CPlayer__FillAllAmmo(p);
-        if (getenv("T2_WEAPON") != NULL) {
+        {
             /* T2_WEAPON=<n>: request weapon n (the weapon actor switches to it as from the wheel) */
-            p->m_RequestedWeapon = (s16) atoi(getenv("T2_WEAPON"));
+            char wbuf[16];
+            const char *w = T2Port_Scheduled(getenv("T2_WEAPON"), frame, wbuf, sizeof(wbuf));
+            if (w != NULL) {
+                p->m_RequestedWeapon = (s16) atoi(w);
+            }
         }
         if (getenv("T2_WEAPON_LIST") != NULL) {
             /* T2_WEAPON_LIST=1: the weapon table (name, flags, model, first ammo class) */
