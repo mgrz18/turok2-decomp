@@ -13,7 +13,7 @@ sptr GameObject_GetPlatformBelow(CGameObjectInstance *);
 void GameObject_GetFrameDelta(sptr, CVector3 *);
 s32 Sound__Play(s16, CVector3, sptr, sptr);
 void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
-_Static_assert(__builtin_offsetof(CIntelligence, m_Player.pad08) + 4 == 0x20, "CIntelligence 0x20");
+_Static_assert(__builtin_offsetof(CIntelligence, m_Player.m_JumpScale) == 0x20, "CIntelligence 0x20");
 
 void PlayerJump_Enter(void *arg0, CGameObjectInstance *arg1) {
     CVector3 delta;
@@ -24,17 +24,10 @@ void PlayerJump_Enter(void *arg0, CGameObjectInstance *arg1) {
     if (gScene_m_LevelID == 0x1DB1) {
         speed = 481.28f;
     }
-    {
-        /* The jump scale, a float at 0x20 of the player's intelligence: inside CPlayerIntelligence's
-         * pad08, which the archive's swap plan leaves big-endian (1.0f read 4.6e-41 little-endian,
-         * so every jump left with no upward speed: demo 3 fell at gf 71 where the N64 jumps).
-         * Read as the N64 does, as CPlayer__UpdateSpeedScale reads 0x1C (round 11 z5). */
-        const u8 *b = (const u8 *) arg1->header.m_pIntelligence + 0x20;
-        u32 w = ((u32) b[0] << 24) | ((u32) b[1] << 16) | ((u32) b[2] << 8) | b[3];
-        f32 scale;
-        memcpy(&scale, &w, sizeof(scale));
-        arg1->m_vVelocity.y = speed * scale;
-    }
+    /* The jump scale, CPlayerIntelligence.m_JumpScale (0x20 of the intelligence). Round 11 (z5) read
+     * its big-endian bytes (the field was pad08, left unswapped: every jump left with no upward
+     * speed); round 12 (a5) typed it, so the archive swaps it. */
+    arg1->m_vVelocity.y = speed * arg1->header.m_pIntelligence->m_Player.m_JumpScale;
     platform = GameObject_GetPlatformBelow(arg1);
     if (platform != 0) {
         GameObject_GetFrameDelta(platform, &delta);
