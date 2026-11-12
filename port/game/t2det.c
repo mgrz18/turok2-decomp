@@ -96,6 +96,9 @@ void T2Port_LogDet(int frame) {
                T2Det_Bits(p->m_ContState.m_LookX));
     }
     printf("\n");
+    if (p != NULL && sVerbose) {
+        T2Det_Actor(0, &p->m_WeaponActor, "wpn", 0, 1); /* the weapon actor: its bones place the shots */
+    }
     for (i = gScene.m_nFirstActor; gScene.m_pActors != NULL && i < gScene.m_nActors; i++, n++) {
         h = T2Det_Actor(h, &gScene.m_pActors[i], "lvl", i, sVerbose && gScene.m_pActors[i].header.m_pIntelligence != NULL);
     }

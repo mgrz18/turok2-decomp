@@ -45,6 +45,7 @@ FIELDS = [
     ("game_players", "CGame", "m_PlayerList.m_ActiveList.m_pHead"),
     ("pl_actor", "CPlayer", "m_CharacterActor"),
     ("pl_health", "CPlayer", "m_Data.m_Health"),
+    ("pl_weapon", "CPlayer", "m_WeaponActor"),
     ("pl_buttons", "CPlayer", "m_ContState.m_dwButtons"),
     ("pl_movex", "CPlayer", "m_ContState.m_MoveX"),
     ("pl_lookx", "CPlayer", "m_ContState.m_LookX"),
@@ -192,6 +193,8 @@ class Tracer:
                 r.sval(p + o["pl_health"][0], o["pl_health"][1]), r.sval(a + o["o_mode"][0], o["o_mode"][1]),
                 r.u32(p + o["pl_buttons"][0]), r.u32(p + o["pl_movex"][0]), r.u32(p + o["pl_lookx"][0])))
         self.out.write("\n")
+        if valid(p) and self.actors:
+            self.actor(0, p + o["pl_weapon"][0], "wpn", 0, True)
         h, cnt = 0xCBF29CE484222325, 0
         base, first, na = (r.u32(sc + o["sc_actors"][0]), r.sval(sc + o["sc_first"][0], 4),
                            r.sval(sc + o["sc_nactors"][0], 4))
