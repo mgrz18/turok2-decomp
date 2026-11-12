@@ -19,11 +19,12 @@ refilled every 600 frames: the plasma rifle's 150 cells run out at 4 kills of 8)
 --level 2 (round 10 y1): the River of Souls instead, from the hub (T2_WARP_TO=1999 on the new
 game's first level) through the hub portal 2000 and its intro cinemas to level 125, then the
 sub-levels 125 -> 126 -> 127 -> 128 -> 129 (soul gate 1) -> 130 -> 133 (sister of despair 1) ->
-130 -> 131 -> 134 (sister 2) -> 131 -> 132 (soul gate 2) -> 135 (the graveyard) -> 132 and the
-level exit 7200. Fights: T2_AIM_AT (a soul gate) or T2_AIM_ENEMY (the nearest live actor) windows
-with fire taps, the plasma rifle, T2_CHEATS=1 and T2_FILL_AMMO; a "!" teleport also fires the
-region's enter triggers (the enemy wake-ups a walk-in would fire). docs/port/PLAYTHROUGH.md
-section 6.
+130 -> 131 -> 134 (sister 2) -> 131 -> 132 (soul gate 2) -> 135 (the graveyard keys, sister 3)
+-> 132 and the level exit 7200 to the City Totem (110), its defense, and the hub (round 11 z1).
+Fights: T2_AIM_AT (a soul gate) or T2_AIM_ENEMY windows (the nearest live actor, or "enemy:A":
+level actor A first) with fire taps, the plasma rifle, T2_CHEATS=1 and T2_FILL_AMMO; in 110
+T2_FACE_NEAREST=4000@110 with T2_FACE_PITCH=1; a "!" teleport also fires the region's enter
+triggers (the enemy wake-ups a walk-in would fire). docs/port/PLAYTHROUGH.md sections 6.2, 6.5.
 """
 import argparse, os
 
