@@ -311,6 +311,39 @@ Fixes on the merged tree (asm_diff 0):
    so far).
 10. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
 
+## Round 12, part a2: level 6 to its end, the Mother, the Primagen (branch names-R12_a2)
+
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) section 9.5. One `src/` change (TARGET_PORT, `tools/asm_diff.py
+--base 046a67f9 -j 8` 0); no `include/` or archive change.
+
+- **`playthrough.py DIR --level 6` completes the Lightship** (112,000 frames, Linux headless PIE):
+  the four power generators (115, 117, 119, 123: "all power generators recalibrated. mission
+  complete." 30,481), the three assembly plants (121, 122, 123: "all assembly plants destroyed.
+  mission complete." 29,625), the four force field generators ("force field down." 31,265), the
+  exit 7601 to **the Mother** (level 3, ~31,700; her death ~48,800), back to 114, its pad 7601
+  to **the hub** (53,000), a hop (`T2_WARP_TO=7602@54000`) to **the Primagen**: his death (mode 29)
+  at 84,218, **the ending cinema** (86,000), **the credits** 90,234-104,324, **the hub** at 105,000.
+  Exit 0.
+- **How the objectives work**: the couplings (object 288) and the force field generators (object
+  232) are actions the player walks into (`CScene__CheckAutoActivation`, radius 41); each coupling
+  uses a **crystal ion capacitor** (item 4231, `Action_CheckRequiredItem`), plant 3 is two laser
+  power crystal slots (a red laser cell, 4229, each). The items come from levels 3-5; the route
+  gives them with the new `T2_GIVE_ITEMS=ID[:N][,...][@F][;...]`. **Open**: the game places one
+  capacitor for 16 couplings (one used per coupling, a nibble holds 15): N64 check needed.
+- **Fixed: `Primagen_EnterMode24`** (func_004077AC): an N64-delta view of `LevelScriptState` from
+  its `timer` (`dest.y`, `home.y`, `bossState`) missed `dest.y` on the host; stage 2's landing
+  path (bossState 6, mode 24) then hung for good. z2's fresh recipe never took that path.
+- **Recipes**: 119's couplings sit 154 units above the floor (approached from the air: the jump
+  does not reach them, open); the Primagen's stage-2 lair wait is a fragile line of sight past the
+  lair door, and after the Mother he rested where no safe spot saw him with a hop at 53,700: the
+  hop frame is tuned (54,000: the wait ends by itself). Debug: `T2_BOSS_FRONT=D,EVERY,K`,
+  `T2_BOSS_FRONT_PROBE`, `T2_BOSS_FRONT_SCAN`, `T2_AIM_NODE=...@3/4`, the action line of
+  `T2_ACTOR_LOG`.
+- **Merge notes**: `tools/port/routes56.py` (level 6 only: `L6_*`, the `level == 6` block of
+  `build_level56`; part a1 edits the level-5 half), `port/game/t2bosslog.c` (`T2Port_GiveItems`,
+  `T2Port_BossFront`, `T2Port_AimNode`'s `@`), `port/game/t2debug.c` (`T2Port_LogOne`),
+  `port/app/game.cpp` (one call), `docs/port/PLAYTHROUGH.md` (appended 9.5; 9.3 untouched).
+
 ## Round 11, part z5: demo fidelity, static object events, the font colour (branch names-R11_z5)
 
 Detail: [FIDELITY.md](FIDELITY.md) section 6. Every `src/` change is TARGET_PORT;
