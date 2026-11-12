@@ -689,8 +689,11 @@ in the compile-only library.
 
 - 119's couplings stand on the generator at y -153.6, 154 units above the room's floor (y -307).
   Walking into them from the floor never overlaps their vertical extents, and the jump does not
-  reach them. The route starts each approach in the air (y -110, 45 units out). Whether the N64's
-  jump reaches them is open (part a5 types the player intelligence's jump fields).
+  reach them: a jump from 45 units out (R 2 frames into the walk) peaks at y -247.7, 59.5 units
+  up, within 17 units of the coupling in x/z, but the overlap needs y >= -245.8 (the coupling's
+  bottom -153.6 minus the player's height 92.2). That is 2 units short, so the N64's jump is
+  probably a little higher: recheck with part a5's typed jump fields. Until then the route starts
+  each approach in the air (y -110, 45 units out).
 - **The Primagen after the Mother.** Stage 2's lair wait (mode 25) needs a line of sight from
   the player to his eye (y ~1,542) past the lair door (found[0], type 0x641). With the hop at
   53,700 he came to rest at z 2,925 (2,918 in z2's fresh runs), and no `T2_BOSS_FRONT` spot ended

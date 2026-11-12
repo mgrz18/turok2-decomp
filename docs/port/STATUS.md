@@ -334,7 +334,7 @@ Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) section 9.5. One `src/` change (TARGET_
   its `timer` (`dest.y`, `home.y`, `bossState`) missed `dest.y` on the host; stage 2's landing
   path (bossState 6, mode 24) then hung for good. z2's fresh recipe never took that path.
 - **Recipes**: 119's couplings sit 154 units above the floor (approached from the air: the jump
-  does not reach them, open); the Primagen's stage-2 lair wait is a fragile line of sight past the
+  peaks 2 units too low, open); the Primagen's stage-2 lair wait is a fragile line of sight past the
   lair door, and after the Mother he rested where no safe spot saw him with a hop at 53,700: the
   hop frame is tuned (54,000: the wait ends by itself). Debug: `T2_BOSS_FRONT=D,EVERY,K`,
   `T2_BOSS_FRONT_PROBE`, `T2_BOSS_FRONT_SCAN`, `T2_AIM_NODE=...@3/4`, the action line of
