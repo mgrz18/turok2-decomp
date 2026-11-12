@@ -499,9 +499,13 @@ void T2Port_FaceNearest(int frame, const char *spec) {
     static CGameObjectInstance *sLast;
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
     CGameObjectInstance *pl, *best = NULL;
-    f32 r = (f32) atof(spec), bestD;
+    f32 r = (f32) atof(spec), bestD, lastD = -1.0f;
     int i;
+    static int sSticky = -1;
 
+    if (sSticky < 0) {
+        sSticky = getenv("T2_FACE_STICKY") != NULL;
+    }
     if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL || gScene.m_WarpState != 0) {
         return;
     }
@@ -523,6 +527,9 @@ void T2Port_FaceNearest(int frame, const char *spec) {
         dx = o->header.m_vPos.x - pl->header.m_vPos.x;
         dz = o->header.m_vPos.z - pl->header.m_vPos.z;
         d = dx * dx + dz * dz;
+        if (o == sLast) {
+            lastD = d;
+        }
         if (d < bestD) {
             bestD = d;
             best = o;
@@ -541,6 +548,9 @@ void T2Port_FaceNearest(int frame, const char *spec) {
             dx = o->header.m_vPos.x - pl->header.m_vPos.x;
             dz = o->header.m_vPos.z - pl->header.m_vPos.z;
             d = dx * dx + dz * dz;
+            if (o == sLast) {
+                lastD = d;
+            }
             if (d < bestD) {
                 bestD = d;
                 best = o;
@@ -550,7 +560,30 @@ void T2Port_FaceNearest(int frame, const char *spec) {
     if (best == NULL) {
         return;
     }
+    /* T2_FACE_STICKY=1 (round 11 C26): keep the last target while it lives and is at most 25 %
+     * farther than the nearest: two City Totem attackers at the same distance below the ledge
+     * took the aim in turns every few frames and neither died (the defence failed at 6/8) */
+    if (sSticky && best != sLast && lastD >= 0.0f && lastD <= r * r && lastD <= bestD * 1.5625f) {
+        best = sLast;
+        bestD = lastD;
+    }
     pl->m_RotY += AI_AngleToPoint(pl, best->header.m_vPos);
+    {
+        /* T2_FACE_PITCH=1 (round 11 z1): also the camera pitch at the enemy (its position, 50 units
+         * up, as T2_AIM_NODE=-1 aims): the City Totem's attackers come from below and above the
+         * player's ledge; yaw alone hit one every ~750 frames and won with 3 s left */
+        static int sPitch = -1;
+        if (sPitch < 0) {
+            sPitch = getenv("T2_FACE_PITCH") != NULL;
+        }
+        if (sPitch && p->m_pCamera != NULL) {
+            extern f32 T2Port_Atan2f(f32 y, f32 x);
+            CVector3 eye = p->m_pCamera->m_vPos;
+            f32 dx = best->header.m_vPos.x - eye.x, dz = best->header.m_vPos.z - eye.z;
+            p->m_pCamera->m_ViewParams.m_vRotOffset.x =
+                T2Port_Atan2f(best->header.m_vPos.y + 50.0f - eye.y, sqrtf(dx * dx + dz * dz));
+        }
+    }
     if (best != sLast) {
         sLast = best;
         printf("face: frame %d player (%.1f %.1f %.1f) -> enemy %d type %x at (%.1f %.1f %.1f) d %.0f rotY %.2f\n", frame,
@@ -598,16 +631,24 @@ void T2Port_AimAt(int frame, const char *spec) {
 }
 
 /* T2_AIM_ENEMY=F1-F2[,R][;...] (DEBUG-ONLY, round 10 y1): T2_AIM_NODE=-1 (yaw and pitch at the
- * nearest live actor within R, default 4000) only from frame F1 to F2: the fights of a scripted run
+ * nearest live actor within R, default 4000) only from frame F1 to F2 (,A: actor A first): the fights of a scripted run
  * between its walks (a flying Sister of Despair needs the pitch). */
-void T2Port_AimNode(int frame, const char *spec);
+int T2Port_AimNode(int frame, const char *spec);
 void T2Port_AimEnemy(int frame, const char *spec) {
     const char *s = spec;
 
     while (s != NULL && *s != '\0') {
-        int f1, f2, r = 4000;
-        if (sscanf(s, "%d-%d,%d", &f1, &f2, &r) >= 2 && frame >= f1 && frame <= f2) {
-            char buf[32];
+        int f1, f2, r = 4000, a = -1;
+        if (sscanf(s, "%d-%d,%d,%d", &f1, &f2, &r, &a) >= 2 && frame >= f1 && frame <= f2) {
+            char buf[48];
+            /* ,A (round 11 z1): the level actor A first (a Sister of Despair), the nearest live actor
+             * when A is dead or out of range */
+            if (a >= 0) {
+                snprintf(buf, sizeof(buf), "actor:%d,%d", a, r);
+                if (T2Port_AimNode(frame, buf)) {
+                    return;
+                }
+            }
             snprintf(buf, sizeof(buf), "-1,%d", r);
             T2Port_AimNode(frame, buf);
             return;
@@ -711,7 +752,10 @@ int T2Port_HubLevelOf(int level) {
     if ((level >= 84 && level <= 96) || level == 76 || level == 82 || level == 113) {
         return 5;
     }
-    if ((level >= 114 && level <= 124) || level == 77 || level == 83) {
+    if (level == 124) { /* HIVE TOP: level 5's start (round 11 z4) */
+        return 5;
+    }
+    if ((level >= 114 && level <= 123) || level == 77 || level == 83) {
         return 6;
     }
     return 1;
@@ -731,14 +775,17 @@ void T2Port_LogEvent(LevelEvent *e, const char *text) {
         buf[i] = (text[i] == '\n') ? '|' : text[i];
     }
     buf[i] = 0;
-    /* the objective counters of the level's hub (Mission_LevelObjectivesDone: link group types
-     * 2k and 2k+1, k = 1..6; level 1: 2 = distress beacons, 3 = children; level 2 (round 10 y1):
-     * 4 = soul gates, 5 = sisters of despair) */
+    /* the objective counters of the level's hub (Mission_LevelObjectivesDone's link group types:
+     * level 1: 2 = distress beacons, 3 = children; level 2 (round 10 y1): 4 = soul gates, 5 =
+     * sisters of despair; 3: 6/7; 4: 8 only; level 5 (round 11 z4): 9 = embryos, 10 = the master
+     * computer; level 6: 11 = power generators, 12 = assembly plants) */
+    static const signed char kObjTypes[7][2] = { { 2, 3 }, { 2, 3 }, { 4, 5 }, { 6, 7 }, { 8, -1 }, { 9, 10 }, { 11, 12 } };
     int k = T2Port_HubLevelOf((int) gScene.m_nLevel);
     printf("event: frame %d (gameplay %d) level %d mode %d: actor %d of level %d kind %d handler %d msg %d \"%s\" music %d flags %x"
            " key %d objectives %d/%d\n",
            gT2HostFrame, (int) gFrameCountGameplay, (int) gScene.m_nLevel, (int) gScene.m_Mode, (int) e->actor, (int) e->level,
            (int) e->kind, (int) e->handler, (int) e->message, buf, (int) e->music, (unsigned) e->flags, (int) e->padF,
-           (int) CScene__GetLinkGroupCount(&gScene, 2 * k), (int) CScene__GetLinkGroupCount(&gScene, 2 * k + 1));
+           (int) CScene__GetLinkGroupCount(&gScene, kObjTypes[k][0]),
+           kObjTypes[k][1] < 0 ? -1 : (int) CScene__GetLinkGroupCount(&gScene, kObjTypes[k][1]));
     fflush(stdout);
 }

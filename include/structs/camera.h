@@ -73,7 +73,7 @@ typedef struct CCameraText {
     /* 0x10 */ f32 m_Scale;
     /* 0x14 */ s32 m_nMode;
     /* 0x18 */ s32 m_nAlpha;
-    /* 0x1C */ s32 m_nId;
+    /* 0x1C */ sptr m_nId;   /* the owner pointer (an object) or a small id: pointer-wide on the host (round 11 z3) */
     /* 0x20 */ s32 m_bSmall;
     /* 0x24 */ char *m_pString;
     /* 0x28 */ f32 m_ModeTime;

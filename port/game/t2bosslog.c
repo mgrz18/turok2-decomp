@@ -20,6 +20,9 @@ static void logActor(const char *what, CGameObjectInstance *a) {
            (int) a->m_AI.m_Health, (int) a->m_AI.m_InitialHealth, (int) a->m_AI.m_Mode,
            (int) a->m_CurrentAnimation.m_nAnimIndex, a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z,
            (unsigned) a->m_dwFlags);
+    printf("boss:   %s type %x bounds (%.1f %.1f %.1f)..(%.1f %.1f %.1f) scale (%.2f %.2f %.2f) rotY %.2f\n", what,
+           (unsigned) a->m_nTypeFlag, a->m_vMin.x, a->m_vMin.y, a->m_vMin.z, a->m_vMax.x, a->m_vMax.y, a->m_vMax.z,
+           a->m_vScale.x, a->m_vScale.y, a->m_vScale.z, a->m_RotY);
 }
 
 void T2Port_LogBosses(void) {
@@ -105,7 +108,9 @@ void T2Port_LogBossHurt(const char *who, void *obj, void *arg) {
     if (!on) {
         return;
     }
-    printf("bosshurt: %s obj %p dmg %d flags %x frame %p nodes %x factor %.2f src %p\n", who, obj,
+    printf("bosshurt: %s obj %p vis %x mode %d dmg %d flags %x frame %p nodes %x factor %.2f src %p\n", who, obj,
+           obj ? (unsigned) ((CGameObjectInstance *) obj)->m_AI.m_VisBits : 0u,
+           obj ? (int) ((CGameObjectInstance *) obj)->m_AI.m_Mode : -1,
            (int) hit->damage, (unsigned) hit->flags, (void *) hit->frame,
            hit->frame ? (unsigned) hit->frame->unk_6C : 0u, hit->frame ? hit->frame->damageFactor : 0.0f,
            hit->source);
@@ -207,6 +212,96 @@ static int aimBoxCentre(CGameObjectInstance *o, s32 mask, CVector3 *from, CVecto
     return found;
 }
 
+/* T2_BOSS_FRONT=D[,EVERY] (game.cpp, every frame; DEBUG-ONLY, round 11 z2): the Mantid Queen's open
+ * weak spot faces one way (she turns to her path target, not to the player), and her body's boxes
+ * (node mask 1, never a weak spot) take every shot fired from her side or back: from the recipe's
+ * fixed spot no hit reached spot 3 in mode 15 (MantidQueen_Hurt counts spot 3 only in mode 15).
+ * Every EVERY frames (default 600) while a spot is open between her waves, put the first player D
+ * units (flat) in front of her, on the line from her centre through the open spot's box: what a
+ * player standing in front of her does. The Primagen (level 4): after EVERY frames of its mode-25
+ * wait for a line of sight, the player D units to the right of its lair (below). */
+extern sptr CScene__FindRegionAt(CScene *world, CVector3 *pos);
+static int aimBoxCentre(CGameObjectInstance *o, s32 mask, CVector3 *from, CVector3 *out, s32 *nodeMask);
+void T2Port_BossFront(int frame, const char *spec) {
+    static int sLast = -100000;
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    WaveBossState *q = &gMantidQueen;
+    const char *comma = strchr(spec, ',');
+    f32 dist = (f32) atof(spec);
+    int every = comma != NULL ? atoi(comma + 1) : 600;
+    CGameObjectInstance *o;
+    CVector3 c, box, pos;
+    s32 node = 0;
+    f32 dx, dz, len;
+    sptr region;
+
+    if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_WarpState != 0) {
+        return;
+    }
+    if (gScene.m_nLevel == 4) {
+        /* the Primagen: mode 25 flies to its lair and waits for the player as its sight target; at
+         * the lair its eye sits behind the front node boxes of found[0] (type 0x641, faces at
+         * z 2141, x about -300..300 at the player's eye line), so from the middle of the floor no line
+         * of sight reaches it. After EVERY frames of that wait, put the player D units to the right of
+         * the lair and 2.5 D in front of it (D 450: (451, 0, 1799), the line passes beside found[0]) */
+        static int sWait;
+        CGameObjectInstance *b = gLevelScript.actor;
+        if (b == NULL || b->m_AI.m_Mode != 25) {
+            sWait = 0;
+            return;
+        }
+        if (++sWait < every) {
+            return;
+        }
+        sWait = 0;
+        pos.x = b->header.m_vPos.x + dist;
+        pos.y = 0.0f;
+        pos.z = b->header.m_vPos.z - 2.5f * dist;
+        region = CScene__FindRegionAt(&gScene, &pos);
+        printf("bossfront: frame %d primagen (%.1f %.1f %.1f) mode 25 -> player (%.1f %.1f %.1f) region %p\n", frame,
+               b->header.m_vPos.x, b->header.m_vPos.y, b->header.m_vPos.z, pos.x, pos.y, pos.z, (void *) region);
+        fflush(stdout);
+        if (region != 0) {
+            CGameObjectInstance *a = &p->m_CharacterActor;
+            a->header.m_vPos = pos;
+            a->header.m_pCurrentRegion = (struct CGameRegion *) region;
+            a->m_vVelocity.x = a->m_vVelocity.y = a->m_vVelocity.z = 0.0f;
+        }
+        return;
+    }
+    if (gScene.m_nLevel != 2 || frame - sLast < every) {
+        return;
+    }
+    if (q->step == NULL || q->waveActive || q->step->weakSpot < 0 || (o = q->actor) == NULL ||
+        o->m_AI.m_Health <= 0) {
+        return;
+    }
+    c = o->header.m_vPos;
+    if (!aimBoxCentre(o, 1 << q->step->weakSpot, &c, &box, &node)) {
+        return;
+    }
+    dx = box.x - c.x;
+    dz = box.z - c.z;
+    len = sqrtf(dx * dx + dz * dz);
+    if (len < 1.0f) {
+        return;
+    }
+    pos.x = c.x + dx / len * dist;
+    pos.y = c.y;
+    pos.z = c.z + dz / len * dist;
+    region = CScene__FindRegionAt(&gScene, &pos);
+    sLast = frame;
+    printf("bossfront: frame %d spot %d queen (%.1f %.1f %.1f) box (%.1f %.1f) -> player (%.1f %.1f %.1f) region %p\n",
+           frame, (int) q->step->weakSpot, c.x, c.y, c.z, box.x, box.z, pos.x, pos.y, pos.z, (void *) region);
+    fflush(stdout);
+    if (region != 0) {
+        CGameObjectInstance *a = &p->m_CharacterActor;
+        a->header.m_vPos = pos;
+        a->header.m_pCurrentRegion = (struct CGameRegion *) region;
+        a->m_vVelocity.x = a->m_vVelocity.y = a->m_vVelocity.z = 0.0f;
+    }
+}
+
 /* T2_AIM_NODE=boss: the weak spot the current boss phase wants (the Mother: MotherBoss_Hurt's
  * spot kinds, phase 0 the arms 0xC00 while slots 2..4 live then the heads 0x5000 (6..8), phase 1
  * slot 1 (0xC00) then 5 (0x5000), phase 2 the chest 0x2000); otherwise a number. */
@@ -227,6 +322,14 @@ static s32 T2Port_AimMask(const char *spec) {
     sAimSkip = NULL;
     sAimSetN = 0;
     sAimPoolOnly = 0;
+    if (strncmp(spec, "actor:", 6) == 0) {
+        /* actor:N (round 11 z1): only the level actor N (a Sister of Despair among her zombies) */
+        int n = atoi(spec + 6);
+        if (gScene.m_pActors != NULL && n >= 0 && n < gScene.m_nActors) {
+            sAimSet[sAimSetN++] = &gScene.m_pActors[n];
+        }
+        return -1;
+    }
     if (strncmp(spec, "boss", 4) == 0) {
         if (gScene.m_nLevel == 1) {
             /* the Blind One's script (sBlindOneScript): phase 3 its minions, 4/5/6 the actors of
@@ -294,7 +397,12 @@ static s32 T2Port_AimMask(const char *spec) {
     return (s32) strtol(spec, NULL, 0);
 }
 
-void T2Port_AimNode(int frame, const char *spec) {
+/* the portable atan2f for t2debug.c's aims (round 11 z1) */
+f32 T2Port_Atan2f(f32 y, f32 x) {
+    return T2Aim_Atan2f(y, x);
+}
+
+int T2Port_AimNode(int frame, const char *spec) {
     static s32 sLastMask = -1;
     static int sLastFrame;
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
@@ -306,9 +414,14 @@ void T2Port_AimNode(int frame, const char *spec) {
     f32 r = comma != NULL ? (f32) atof(comma + 1) : 4000.0f, bestD, dx, dy, dz, h;
     int i;
 
+    /* T2_AIM_NODE=...@LEVEL (round 11 z3): only in that level (a whole-level route ends in a boss) */
+    const char *at = strchr(spec, '@');
+    if (at != NULL && atoi(at + 1) != (int) gScene.m_nLevel) {
+        return 0;
+    }
     if (p == NULL || p->m_pCamera == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL ||
         gScene.m_WarpState != 0) {
-        return;
+        return 0;
     }
     pl = &p->m_CharacterActor;
     eye = p->m_pCamera->m_vPos;
@@ -362,7 +475,7 @@ void T2Port_AimNode(int frame, const char *spec) {
         }
     }
     if (best == NULL) {
-        return;
+        return 0;
     }
     pl->m_RotY += AI_AngleToPoint(pl, bestAim);
     dx = bestAim.x - eye.x;
@@ -378,6 +491,7 @@ void T2Port_AimNode(int frame, const char *spec) {
                bestAim.z, p->m_pCamera->m_ViewParams.m_vRotOffset.x);
         fflush(stdout);
     }
+    return 1;
 }
 
 /* T2_CHEATS=MASK, T2_FILL_AMMO=N (game.cpp, every frame; DEBUG-ONLY, round 9 x2): OR the game's own cheat flags

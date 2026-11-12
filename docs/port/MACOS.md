@@ -851,3 +851,56 @@ later (33-67 ms), like the console; at 2.6 ms of work per VI the host adds no qu
 - A windowed run with a real gamepad (12.6) and real CoreAudio output: not done (headless only).
 - Release build pacing (round 7 had 0 late VIs in level 51; Debug now has 12 in the full
   playthrough, all at loads).
+
+## 13. Round 11 (part z4): the round-10 merged tree on the Mac, levels 5 and 6
+
+Branch `names-R11_z4` (from 2df5517d). No `src/` or `include/` change (nothing to asm_diff). The
+box's ELF and archive are unchanged (ELF sha1 `61dcdf3f…`, archive `b6b9d484…`; the Mac uses
+`OUT/turok2_543.o2r`). Linux runs for comparison: this branch built in `/root/R11_z4mac/out`
+(Debug, PIE, LUS from the coordinator's checkout; `/root/R11_z4mac/build.sh`, `FRESH=1` drops
+decls.json). Scripts in `OUT/r11/` (the same files on the box in `/root/R11_z4mac/r11/` with a
+`box.env`): `run.sh NAME FRAMES [args]` (`--offscreen-gl` on the Mac, nothing on Linux, `--no-window`
+with `NOGL=1`), `battery.sh [names]`, `dets.sh [names]` (`T2_DET_LOG=1`), `sync.sh` (applies
+`git diff 2df5517d` to the box copy and rebuilds there). Build on the Mac: `OUT/rebuild.sh --fresh`
+(28 s).
+
+### 13.1 The round-10 runs on the Mac (headless, exit 0, no dlcheck reports)
+
+- boot + the 3 demos (26,000); **level 1** (`playthrough.py --fight 10`, 27,000): the totem
+  defence won (kills 10/8), **the hub at 21,500** (Linux's frame); **level 2** (49,500): soul gate 1
+  (21,313), the second sister (37,623), "all soul gates destroyed. mission complete." (42,063),
+  135's two "graveyard gate open." (45,107 / 45,909), the exit -> 125: Linux's events;
+- **the Mother** (36,000): death and cinema (30,817), the hub; **the Blind One** (25,000): death
+  (mode 9) at 22,683, the hub (23,400);
+- save (`--pak-dir`, `T2_SAVE_PORTAL`) then load (level 51); `--audio --wav` 9,000 frames: 150.17 s,
+  peak 32,768, **RMS 3,402.2** (= Linux, STATUS.md section 2).
+
+- soak (`tools/port/soak.py --kind newgame --seeds 0:8 --frames 36000`, lldb, 4 jobs): **8 runs,
+  288,000 frames, 0 crashes**.
+
+### 13.2 Mac = Linux, frame for frame (`T2_DET_LOG=1`)
+
+| run | lines | differ |
+|---|---|---|
+| boot, the 3 demos, the loop | 52,000 | 0 |
+| level 1 playthrough | 28,402 | 0 |
+| the Mother | 46,402 | 0 |
+| the Blind One | 24,402 | 0 |
+| the level-52 fight | 4,002 | 0 |
+| **level 2** | 73,402 | **from 42,124** (gf 633, level 132, 61 frames after the second soul gate falls) |
+
+The level-2 divergence: in frame 42,123 the RNG sequence is the same on both hosts up to a
+`CParticleSystem__Spawn` loop (`n = countBase + randomCount(countRange)`, then `allocateEffect`
+per particle) where the Mac stops after 6 effects of one emitter entry and starts the next entry
+(the chance draw, func_0022D2FC.c ~1868) while Linux spawns a 7th: `allocateEffect` returned 0 on
+the Mac only. The slot hash (`ptcl`) was equal, so this round's det line also hashes **the pool's
+lists** (free, draw, the 3 active lists, as slot sequences, port/game/t2det.c): still equal up to
+42,123 on both hosts. So the state at the frame's end matches; the difference is made inside
+frame 42,123 (between its start and the spawn, or a free/alloc inside the spawn itself). Next:
+`T2_DET_PARTICLES` + a print of `free.m_nCount` at each `allocateEffect` in that frame on both
+hosts. Not fixed this round (the game runs on; the level-2 events after it are Linux's).
+
+### 13.3 Open on the Mac
+
+- The level-2 divergence above.
+- The crash in level 122 (section 9 of PLAYTHROUGH.md): **both hosts**.

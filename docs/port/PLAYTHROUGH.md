@@ -1,4 +1,4 @@
-# The first levels, played through (Phase 7 round 9 x1: level 1; round 10 y1: level 2)
+# The first levels, played through (Phase 7 round 9 x1: level 1; round 10 y1 and round 11 z1: level 2; round 11 z3: levels 3 and 4)
 
 Level 1 of Turok 2, the Port of Adia, played from a new game to its end on the native port
 (Linux, headless): every sub-level from 51 to 59, both mission objectives (the three distress
@@ -222,13 +222,13 @@ python3 ../tools/port/playthrough.py . --level 2   # playthrough.txt, teleport.e
 . ./teleport.env
 SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_STATE_LOG=250 T2_SHOT=shot.ppm T2_SHOT_EVERY=250 \
     T2_SHOT_FROM=13000 build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --draw \
-    --pak-blank --frames 49500 --input @playthrough.txt
+    --pak-blank --frames 64000 --input @playthrough.txt   # round 11: to the hub (63,000)
 ```
 
 `teleport.env` sets `T2_WARP_TO=1999` (the hub from level 51, at 12,955), the plasma rifle
 (`T2_GIVE_WEAPONS=1 T2_WEAPON=10`), `T2_CHEATS=1` (invincible: the graveyard fights are long),
 `T2_FILL_AMMO=300`, and the aim windows `T2_AIM_AT` (a soul gate) and `T2_AIM_ENEMY` (new, see
-6.4). The event log now prints the objective counters of the level's own hub (level 2: soul gates
+6.4; round 11: `T2_FACE_NEAREST=4000@110 T2_FACE_PITCH=1` for the City Totem). The event log now prints the objective counters of the level's own hub (level 2: soul gates
 / sisters).
 
 What happens (Linux, headless, `--draw`, high memory, 49,500 frames, exit 0):
@@ -276,14 +276,319 @@ graveyard tests (all with `--draw`, high memory) exit 0.
   (`CGameRegion__FireTriggers(region, 1)`, what the player's move does): the graveyards' zombies
   only wake when the player walks into their halls.
 - `T2_EVENT_LOG`: `objectives A/B` is now the counters of the current level's hub (`T2Port_HubLevelOf`).
+- Round 11 (z1): `T2_AIM_ENEMY=F1-F2,R,A`: level actor A first (the nearest live actor when A is
+  dead or out of range; `T2_AIM_NODE=actor:N[,R]` underneath); `T2_FACE_PITCH=1`: `T2_FACE_NEAREST`
+  also sets the camera pitch (the portable atan2f of t2bosslog.c).
 
-### 6.5 Open (level 2)
+### 6.5 Round 11 (z1): to the end of level 2
 
-1. **The third sister (135)**: the gates 62 and 63 open from the switches, but the two action
-   objects 46 and 47 (object 156, key 12: the platform 1 that opens door 60 to her hall) do not fire
-   when walked into from the scripted points, and after a teleport into her hall (391.6, 0, 5862.8)
-   no frame is drawn any more (`--draw`: no picture, the game state runs on: no crash). Next: how
-   object 156 is used (an "action" with the use button?), then her fight; then 7200 -> the City
-   Totem (110) and its defense, and the hub.
-2. Walk the sub-levels instead of hopping (the 45 enemies of 125 are never met); the keys, the
-   talisman (73) and flesh-eater (79) portals.
+`playthrough.py --level 2` now plays the River of Souls to its end: the three Sisters of Despair,
+"all sisters of despair banished. mission complete.", the exit 7200 to the City Totem (level 110),
+its defense and the hub. Round 10 made the enemies as dangerous as on the N64 (the impact damage
+and `AI_InitHealth`'s aggression), so the scripted fights needed better aims; and the third
+graveyard needed its keys. No port bug in the sisters' AI was found: with the aim on her, each
+sister falls within ~400-500 frames of waking.
+
+| what | why it stopped | now |
+|---|---|---|
+| sister 1 (133, actor 20) | the nearest-actor aim (`T2_AIM_ENEMY`) stayed on the zombies and doors 27/28 (doors have health and the live flag) while she pushed the player back | `T2_AIM_ENEMY=F1-F2,R,A` (new): level actor A first, the nearest live actor when A is dead or out of range; the hall window aims at actor 20 |
+| sister 2 (134, actor 1) | with the merged tree's state the nearest aim went to the generators' spawns and gate 8: zombies 2-4 never died, gate 8 (key 7, three deaths) stayed shut | zombie 2, zombie 3 (at the start), zombie 4 (at the gate), then the sister, one aimed window each |
+| sister 3 (135, actor 31) | the actions 46/47 (object 156, intelligence 446) need **a graveyard key each** (`m_GoPickupNeeded` 4025, text 78 "requires graveyard key.", consumed by `Action_CheckRequiredItem`); they stand in the water hall's corners (regions 894/947, auto-go radius 256), so y1's walk-ins stopped 280 units away | the keys (level actors, object 580) lie in the two crypts; the crypt doors 75/76 open on the deaths of zombies 45/44, which wake in region info 19/20 (the rooms behind the crypts). A `!` teleport there, an aimed window, the key, then a step into each action's corner: key 12 -> platform 1 -> door 60 -> she wakes |
+| the City Totem (110) | not reached | the exit 7200 with both objectives done -> 110; fire taps with `T2_FACE_NEAREST=4000@110` and the new `T2_FACE_PITCH=1` (its attackers come from below and above the ledge) |
+| a crash in 135 (`CAnimationState__FindKeys`) | `Shadow_DrawBlob` wrote the blob shadow's alpha through the N64 view (0x10E) into byte 2 of the weapon actor's `m_CurrentAnimation.pmeAnimData` (NULL -> 0x630000); the next weapon animation switch copied it into the blend channel | the function by member (asm_diff 0); the weapon's blob shadow (`CPlayerPool__ReloadAnimInfo`) is drawn only in some places, so it first showed in 135 |
+
+A teleport into a point outside every region is refused (the player stays): (-750, 0, 2152) next
+to action 46 is in the wall; the corners' regions are 894 ((-808, 2178), (-1110, 2171),
+(-1102, 2467)) and 947. Region info centres: `levels.py`'s `collision.regions` (`info`, `v`)
+with `collision.vertices`.
+
+The run (Linux, headless, high memory, 64,000 frames, exit 0; `T2_EVENT_LOG=1 T2_STATE_LOG=250`,
+the commands of 6.2):
+
+| frame | level | the game's own result |
+|---|---|---|
+| 21,313 | 129 | "soul gate destroyed." |
+| 30,165 | 133 | **"sister of despair banished."** (sister 1; door 28 opened at 29,801) |
+| 31,355 / 37,483 | 134 | "graveyard located."; gate 8 opens on the third zombie death (36,481), **"sister of despair banished."** (sister 2) |
+| 42,063 | 132 | "soul gate destroyed.", "all soul gates destroyed. mission complete." |
+| 42,950-45,909 | 135 | "graveyard located.", both "graveyard gate open." |
+| 47,281 / 50,121 | 135 | crypt doors 75 / 76 open (zombies 45 / 44 dead); both graveyard keys collected (`T2_PICKUP_LOG`: id 4025) |
+| 52,065 / 52,245 | 135 | actions 46 + 47: platform 1 (key 12); door 60 opens, sister 3 wakes |
+| 52,767 | 135 | **"sister of despair banished."**, **"all sisters of despair banished. mission complete."** (objectives 0/0) |
+| 54,750 -> 55,250 | 132 -> 110 | warps 2608, 7200: **the City Totem** |
+| 55,250-62,250 | 110 | the defense: one attacker at a time, a kill every ~750 frames, **8/8 at 62,250** (22 s left at 7/8) |
+| 63,000 | 60 | **the hub** (`keys[1]`, `m_bLevel2TotemFlags`) |
+
+Level 1 (`--fight 10`) is unchanged: the totem 8/8 at 20,800, the hub at 21,500.
+
+### 6.6 Open (level 2)
+
+1. Walk the sub-levels instead of hopping (the 45 enemies of 125 are never met); the
+   talisman (73) and flesh-eater (79) portals; the platform 1 bridge walked over instead of a
+   teleport to door 60.
+2. The City Totem's kill pace (one attacker at a time, ~750 frames each): compare with the N64.
+
+## 7. Level 3: the Death Marshes (Phase 7 round 11, part z3)
+
+From the hub, through the level-3 portal (warp 3000) and its intro cinemas (levels 12-17), every
+sub-level of the Death Marshes is visited. Both objectives get done, the Marsh Totem (level 111)
+is defended, and the run ends back in the hub. Method as in sections 2 and 6: one input file and
+one `T2_TELEPORT` list from `playthrough.py --level 3`. Teleports put the player next to a
+progression point, facing it. C-up walks into it, and the game's own logic does the rest: the
+pickup, the action, the level events with their messages and counters, the warp and the totem.
+
+### 7.1 The level graph and the objectives
+
+Level 3 is "(17) Lev3 A" to "(27) Lev3 K", indexes 61 to 71. The hub portal 3000 leads to level
+61 at (-1264, 617, -6396). The exit is 7300 in 61 or 68: before the objectives are done it goes
+to 3000 with the "level not complete" objectives screen; once they are done it goes to the Marsh
+Totem, 111.
+
+| level | warp regions |
+|---|---|
+| 61 A (start) | 3501 -> 62, 3777 -> 69, 7300 (exit) |
+| 62 B | 3502 -> 61, 3503 -> 63, 999 (save) |
+| 63 C | 3504 -> 62, 3505 -> 64, 3003 -> 80 (flesh-eater portal), 999 |
+| 64 D | 3506 -> 63, 3289 -> 65, 3780 -> 70, 3507 / 3510 (inside 64), 999 |
+| 65 E | 3290 -> 64, 3511 -> 66 |
+| 66 F | 3512 -> 65, 3513 -> 67, 3001 -> 74 (the Breath of Life talisman) |
+| 67 G | 3514 -> 66, 3288 -> 68, 3782 -> 71 |
+| 68 H | 3287 -> 67, **7300 (exit)** |
+| 69 I, 70 J, 71 K | 3778 -> 61, 3779 -> 64, 3781 -> 67 (the three ammo storage facilities) |
+
+`Mission_LevelObjectivesDone(3)` checks link-group types 6 and 7. The types table (cart 19) puts
+them at groups 38 and 95.
+
+- **5 prisoners** (type 6, group 38): object 328 (type 0x64C, an action) in 61 (actor 39), 65
+  (16) and 66 (29, 30, 31). Walking into one fires its mask-2 record ("bumped by the player",
+  `CPlayer` move, func_0024C47C): "prisoner free.". The record of action 41 counts the group
+  down. The fifth prisoner gives **"all prisoners free. mission complete."**
+- **3 ammo storage facilities** (type 7, group 95): one charge point per armory room, object 231
+  (action intelligence 498: `m_GoPickupNeeded` 4100, the satchel charge, text 15). Without a
+  charge, the bump shows "satchel charge required.". With one, the charge is used and the event
+  "warning, five seconds until detonation." fires. About 6 s later "armory destroyed." follows,
+  and the crates go off one by one (their delayed records). The third armory gives **"armories
+  destroyed. mission complete."**
+- **The 3 satchel charges** (item 4100, object 598) are level actors in the grid sections: 61
+  (4710, -410, -3635), 64 (-1331, 3, 4608) and 66 (-308, -256, -1229, on a ledge over prisoner
+  29). `levels.py` lists them only without `--no-sections`. A level actor's item id is its
+  object's type: cart 2 is a u16 per object (the satchel 598 -> 4100, the power cell of level 1,
+  593 -> 4200).
+
+The level keys of later portals lie in 61, 62 and 68 (item 4340) and 63 (4362). The route does
+not take them.
+
+### 7.2 The run
+
+```sh
+cd OUT
+python3 ../tools/port/playthrough.py . --level 3     # [--direct: T2_WARP_TO=3502, level 61 at ~13,100]
+. ./teleport.env
+SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=100 build/app/turok2 \
+    --archive turok2.o2r --rom ../baserom.us.z64 --game --draw --pak-blank --frames 36000 \
+    --input @playthrough.txt
+```
+
+`teleport.env` sets `T2_WARP_TO=1999` (the hub), the plasma rifle, `T2_CHEATS=1` (invincible:
+the same choice as level 2's recipe; enemies have their real aggression since round 10),
+`T2_FILL_AMMO=300` and `T2_FACE_NEAREST=4000@111` (the aim during the totem defence only).
+
+What happens (Linux, headless, `--draw`, PIE, 36,000 frames, exit 0):
+
+| frame | level | the game's own result |
+|---|---|---|
+| 13,300 | 60 | portal 3000, walked into: the Death Marshes intro cinemas |
+| ~18,200 | 61 | the start; satchel charge 1 picked up; **"prisoner free."** (18,549; prisoners 5 -> 4) |
+| 18,700 | 61 -> 69 | warp 3777 |
+| 19,181 / 19,539 | 69 | the charge point: "warning, five seconds until detonation.", **"armory destroyed."** (armories 3 -> 2), the crates blow up |
+| 19,700-20,700 | 69 -> 61 -> 62 -> 63 -> 64 | warps 3778, 3501, 3503, 3505 |
+| ~21,300 | 64 | satchel charge 2; warp 3780 -> 70 |
+| 21,761 / 22,119 | 70 | the second armory: **"armory destroyed."** (3 -> 1) |
+| 23,045 | 64 -> 65 | warps 3779, 3289; **"prisoner free."** (4 -> 3) |
+| 23,600-24,243 | 66 | satchel charge 3 (the ledge); prisoners 29, 30, 31: **"all prisoners free. mission complete."** (24,243) |
+| 25,039 / 25,097 | 67 -> 71 | the third armory: **"armories destroyed. mission complete."** (25,097) |
+| ~26,500 | 67 -> 68 -> 111 | warps 3781, 3288, then the exit 7300: **the Marsh Totem** |
+| 26,500-31,600 | 111 | the defence: kills 1/8 at 108 s left ... **8/8 at 34 s left (31,600), totem untouched (hp 5/5)** |
+| ~32,400 | 60 | **the hub**, at the portal (warp record 3999) |
+
+Screenshots (640x480, checked by eye, not committed): "prisoner free." (18,601), the armory
+warning and "armory destroyed." (19,301 / 19,601 / 22,201), "all prisoners free. mission
+complete." (24,301), "armories destroyed. mission complete." (25,201), the totem defence with
+a Dinosoid coming down the path under plasma fire (29,001), and the hub with the portal (32,601).
+
+The direct variant (`--direct`, 32,000 frames) gives the same events. One extra was found on the
+way: with an armory left, the exit 7300 shows the game's "level not complete" objectives screen
+("rescued 5 of 5 prisoners, destroyed 2 of 3 ammo storage facilities", OK) and waits for A. Its
+title text looked mirrored at that frame (21,503); this was not compared with the N64.
+
+## 8. Level 4: the Lair of the Blind (Phase 7 round 11, part z3)
+
+### 8.1 The level graph and the objective
+
+Level 4 is "(53) LEV4 A" to "(63) LEV4 K", indexes 98 to 108. The hub portal 4000 plays the
+intro cinemas (levels 18-24; a `T2_WARP_TO=4000` does too) and leads to level 98 at
+(558, -614, -2937). The exit is 7400 in 98 or 103 (`CPlayer__Warp`: before the objective -> 4000;
+after -> 7401, the Blind One, while `keys[5]` is not set; then 4999, the hub).
+
+| level | warp regions |
+|---|---|
+| 98 A (start) | 4115 -> 99 (a drop), 4132 (inside 98), 7400 (exit) |
+| 99 B | 4116 -> 98, 4101 -> 100 (the pit), 4001 -> 75 (the Heart of Fire talisman), 4656 (inside) |
+| 100 C | 4100 -> 99, 4109 -> 101, 999 |
+| 101 D | 4110 -> 100, 4111 -> 102, 4128 -> 106, 4109 (inside) |
+| 102 E | 4112 -> 101, 4117 -> 103, 4130 -> 107 |
+| 103 F | 4118 -> 102, 4107 -> 105, 4124 -> 104, 4108 (inside), 4003 -> 81 (flesh-eater portal), **7400 (exit)** |
+| 104 G | 4125 -> 103, 4104 -> 105 |
+| 105 H | 4106 -> 103, 4105 -> 104, 4113 -> 108, 999 |
+| 106 I, 107 J, 108 K | 4129 -> 101, 4131 -> 102, 4114 -> 105 (the three vent chambers) |
+
+`Mission_LevelObjectivesDone(4)` checks link-group type 8 only (group 21):
+
+- **3 thermal vents**: object 174 (action intelligence 461, item 4111 = a satchel charge, text
+  15), one per vent chamber. Bumping one with a charge gives "thermal vent sealed.". The third
+  gives **"blind ones trapped. mission complete."** The charges (object 600) lie in 101
+  (-324, -2714, -870), 102 (-2771, -2150, 2100) and 105 (-7680, -1536, 4659).
+- Each chamber's door (object 442) opens from a switch (object 176, action intelligence 464, item
+  4020 = a key, text 57: "this door requires a key."), which gives "vent chamber located.". The
+  keys (object 579) are in 98, 100, 101, 102 (2), 105 and 108 (2). The route takes 100, 101 and
+  102's. It also hops past each door: the vent is reached by teleport after the switch.
+- The level keys of later portals are item 4350 (100, 103, 105). The route takes 100's.
+
+### 8.2 The run
+
+```sh
+python3 ../tools/port/playthrough.py . --level 4 && . ./teleport.env    # [--direct: T2_WARP_TO=4132]
+SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_STATE_LOG=250 build/app/turok2 --archive turok2.o2r \
+    --rom ../baserom.us.z64 --game --draw --pak-blank --frames 42000 --input @playthrough.txt
+```
+
+Besides level 3's switches, `teleport.env` adds the Blind One part of round 10 y2's recipe for
+the arena (level 1): the ledge (-400, 204.8, 0), fire held, `T2_AIM_NODE=boss@1` (new: `@LEVEL`
+limits the aim to that level), `T2_BOSS_LOG=1` and `T2_FILL_AMMO=600`.
+
+| frame | level | the game's own result |
+|---|---|---|
+| 13,300 | 60 | portal 4000: the Lair of the Blind intro cinemas |
+| ~16,900 | 98 | the start; warp 4115 (drop) -> 99, 4101 (pit) -> 100 |
+| 18,000-18,800 | 100 -> 101 | key 1, the level key, warp 4109; satchel charge 1, key 2 |
+| 19,739 / 19,979 | 106 | the switch: **"vent chamber located."** (door 23); the vent: **"thermal vent sealed."** (vents 3 -> 2) |
+| 20,900-21,600 | 101 -> 102 | warps 4129, 4111; key 3, satchel charge 2 |
+| 22,089 / 22,277 | 107 | "vent chamber located.", **"thermal vent sealed."** (2 -> 1) |
+| 23,200-24,000 | 102 -> 103 -> 105 | warps 4131, 4117, 4107; satchel charge 3 |
+| 25,199 | 108 | **"thermal vent sealed."**, **"blind ones trapped. mission complete."** |
+| ~26,700 | 105 -> 103 -> 112 | warps 4114, 4106 (drop), the exit 7400: **the Cave Totem** |
+| 26,700-29,600 | 112 | the defence: **8/8 kills at 72 s left (29,600)**, totem hp 5/5 |
+| ~30,500 | 1 | 7401: **the Blind One's arena** |
+| 31,000-39,693 | 1 | the ledge, fire held: the minion and group phases, the vulnerable eye, **the Blind One's death (mode 9) at 39,693** |
+| ~40,250 | 60 | the cave, then **the hub with "NEW CHEAT ENABLED"** (warp record 4999, at the portal) |
+
+Screenshots (checked by eye, not committed): "vent chamber located." (19,801), "thermal vent
+sealed." (20,001), "blind ones trapped. mission complete." (25,301), the Cave Totem's defence
+under plasma fire (28,001), the Blind One's eye under fire (39,600), the white flash of her death
+(39,700), the cave (40,000), and the hub with "NEW CHEAT ENABLED" (40,500).
+
+### 8.3 Open (levels 3 and 4)
+
+1. The routes hop: the vent chambers' doors (opened by the switches) are passed by teleport,
+   level 104 is not entered, and most enemies are not fought (invincible, `T2_CHEATS=1`). Next:
+   walk them.
+2. The talisman portals (74, 75), the flesh-eater portals (80, 81) and the level keys.
+3. The "level not complete" screen's title (mirrored letters at one frame) against the N64.
+
+## 9. Levels 5 and 6: the Hive of the Mantids, the Lightship (Phase 7 round 11, part z4)
+
+Mapped with `tools/assets/levels.py` (the warp regions, the link records and their messages,
+the link group types table, cart 19: `{4, 104, s32 type[104]}`, a type's index is its link
+group). Routes in `tools/port/routes56.py`, used by `playthrough.py --level 5 | 6`; same method as
+level 2 (one `--input` file and one `T2_TELEPORT` list; the game's own warps, cinemas and events).
+Run on the Mac (the same files run on Linux):
+
+```sh
+python3 tools/port/playthrough.py DIR --level 5 && . DIR/teleport.env
+SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_STATE_LOG=50 build/app/turok2 --archive turok2.o2r \
+    --rom ../baserom.us.z64 --game --draw --pak-blank --frames 33000 --input @DIR/playthrough.txt
+```
+
+### 9.1 The level graph
+
+| level | hub portal | start | sub-levels (warp -> level) | exit |
+|---|---|---|---|---|
+| 5 | 5000 (hub 60, region by (-1802, -289, 954)), intro cinemas 31, 25-30, 32 | 124 HIVE TOP (-1921, 0, 2367) | 124: 5201 -> 84; 84: 5100 -> 85; 85: 5013 -> 86; 86: 5120 -> 87; 87: 5023 -> 88 (5003 -> 82 flesh portal); 88: 5033 -> 89 (5001 -> 76 talisman); 89: 5053 -> 90; 90: 5010 -> 94; 94: 5021 -> 91; 91 (the hive's hub): 5500 -> 95, 5073 -> 96, 5060 -> 93, 5813 -> 92, 7500 | 7500 (91 or 124) -> the Hive Totem (113) |
+| 6 | 6000 (hub 60, region by (-93, -147, 2384)), intro cinemas 157, 158, 155, 156, 159-161 | 114 Level 6A (1232, 0, -4007) | 114 (the ship's hub): 6100 -> 115, 6200 -> 116, 6300 -> 118, 6010 -> 120; 116: 6202 -> 117; 118: 6302 -> 119; 120: 6400 -> 121, 6499 -> 123; 121: 6402 -> 122 (6001 -> 77 talisman); 122: 6404 -> 123; 123: 6003 -> 83 flesh portal | 7601 (114) -> the Primagen (level 3) |
+
+**Objectives** (`Mission_LevelObjectivesDone`: level 5 link group types 9/10 = groups 44/98,
+level 6 types 11/12 = groups 97/89; the menu's totals 3 and 4):
+
+- level 5: **3 embryos** (object 109: 94 actor 19 at (1229, 0, -4301), 95 actor 27 at (307, 0,
+  -1075), 96 actor 31 at (-2765, 1229, 768); "embryo destroyed.", the last "all embryos
+  destroyed. mission complete.") and **the master computer** (93 actor 54, object 331, at (1843,
+  922, 154); actor 8 "warning, five seconds until detonation."). The hive in 124 is closed by a
+  **force field** (actor 23) that drops when the 4 pylons (object 139, actors 9-12 at (0, 0,
+  -1971), (0, 0, 2867), (±2406, 0, 461)) are gone (group 49: "force field down."). More force
+  fields in 84, 85, 87, 88, 89 ("force field generator destroyed.").
+- level 6: **4 power generators**, each 4 couplings (object 288) around 115 (4915, 51, 1536),
+  117 (2457, 51, -2304), 119 (-5683, -154, -2457), 123 (0, 51, -4608) ("power generator
+  recalibrated.", "all power generators recalibrated. mission complete."); **3 assembly plants**
+  (121 actor 37, object 376; 122 actor 23, object 283; 123 actors 24/25, object 183: "assembly
+  plant destroyed.", "all assembly plants destroyed. mission complete."). The force field round
+  the exit 7601 in 114 (object 320, actors 69-72) drops with the 4 "force field generator
+  disabled." objects (object 232: 115 actor 38, 116 actor 53, 119 actor 23, 123 actor 33).
+
+**Warp regions.** A warp fires in `enter_surface` (func_0024C47C) when the player enters a
+region whose info has flag 0x40000: with flag 0x200000 only from a region without 0x40000,
+otherwise only standing on its floor. Level 5's warp regions are 0x241000: the route teleports to
+the next region in (`approach.py --steps 1`) and walks 80 frames; level 6's are floor pads: onto
+the region's centroid and 40 frames of walk.
+
+### 9.2 The runs (Mac, headless, `--draw`; Linux the same up to the crash)
+
+**Level 5** (33,000): the portal at 13,310, the intro cinemas, **124 at 17,300**; the four pylon
+windows (plasma, `T2_AIM_AT`) do not bring the field down (open); a debug hop
+(`T2_WARP_TO=5201@20150`, `routes56.L5_HOPS`) into 84; then the game's own warps through **every
+sub-level**: 84 (20,250), 85 (20,600), 86 (21,050), 87 (21,450), 88 (21,850), 89 (22,250), 90
+(22,650), 94 (23,000), 91 (24,400), 95 (24,800), 91, 96 (26,600), 91, **93 (28,400)**; in 93 the
+player dies (level 164, the death sequence, back to 93 at 29,600 with `T2_CHEATS=1`: not damage,
+an instant death; open), then 91 and the exit 7500, which with the objectives open sends the
+player back to 124 (30,200). No crash. The embryo and computer windows score nothing yet (the
+aims are placeholders: no event).
+
+**Level 6** (33,000): the portal, the cinemas 157-161, **114 at 18,950**; 115 (19,300), 114, 116
+(21,100), 117 (21,500), 114, 118 (23,300), 119 (23,700), 114, 120 (25,500), 121 (25,900), 122
+(27,300): **"assembly plant destroyed."** (27,793, the plant in 122 under plasma fire), then a
+**crash on both hosts** (Mac SIGSEGV, Linux exit 1 with its backtrace handler):
+
+    Model_Decompress (func_00209AF4.c:126, partCount = *parts)  <- Model_DecompressCallbackExtra
+      <- CDecompressor__Main   (the decompressor thread, running a queued job for object 283,
+                                the plant's own model: block 0 344 bytes, block 1 8, block 2 garbage:
+                                lodCount 0x3F3F00)
+    game thread: COnScreen__DrawText("assembly plant destroyed.") -> CScene__LoadGraphicSet(2)
+      -> CCache__Request(key 0x1F8509C, 25,304 bytes, direct) -> CDecompressor__DecompressSync
+      -> osSetThreadPri: the decompressor runs its pending model job
+
+The message text needs the font graphicset, which the cache loads synchronously; the pending model
+decompression then reads memory that no longer holds object 283's unpacked data (its set header
+is intact, block 2 is not). Suspect: the synchronous allocation evicts or moves cache memory under
+a queued decompress job (host-sized entries are larger than the N64's, so the cache is fuller than
+on the console). Not fixed this round.
+
+**Fixed on the merged tree (round 11 C26, d129e748).** The suspect was wrong: no cache memory
+moved. A hardware watchpoint on the plant's `m_rpGeometryHeaderSize` caught
+`Destructible_GoEnter` (func_00265B58) clearing bit 0x100 of it when the plant was destroyed: its
+N64 view of the instance puts `flags` at 0xD4, which on the host falls 8 bytes late (after the
+pointer-wide `def` at 0x14) on the geometry size, so 0x160 became 0x60. The plant's next model
+request then loaded 0x60 of the unit's 0x2E0 unpacked bytes, and `Model_Decompress` read its
+level-of-detail table past them. The view (and the same one in five other functions) now has its
+members at their host offsets; the level-6 run goes on past 122 to 123 (29,000) and back to 114.
+
+The generator couplings (aimed fire at each cluster in 115, 117, 119) score nothing yet: how
+"recalibrate" works (shot, touched, or the use button) is open.
+
+### 9.3 Open (levels 5 and 6)
+
+1. ~~The 122 crash above~~ (fixed on the merged tree, round 11 C26: see 9.2).
+2. Level 5: the pylons (what kills object 139: the aim height, a weapon, a switch); the death in
+   93; the embryos and the master computer with real aims (the embryos are type 403; the
+   computers type 1610).
+3. Level 6: the couplings (object 288, intelligence 574); the force field generators (object 232);
+   then 7601 -> the Primagen (z2's boss recipe starts there).
+4. The flesh-eater (82, 83) and talisman (76, 77, 92) portals; the totem 113.

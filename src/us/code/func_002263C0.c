@@ -6,6 +6,30 @@
 s32 CStaticObject__SpawnEvents(sptr, s32);
 
 
+#ifdef TARGET_PORT
+/* Host body (round 10 y3, docs/port/FIDELITY.md 5): the same by member. The N64 view read the
+ * timer (0x18EB8), the count (0xBF4) and the s32 list (0xAF4) at N64 offsets of CScene, so on
+ * the host no listed static object ever fired its events: demo 1's ambient particle (type 103,
+ * kind 8 at gf 201, every second after) never spawned. */
+#include "structs/world.h"
+void CScene__AdvanceListedInstances(void *arg0) {
+    CScene *world = (CScene *) arg0;
+    f32 *timer = (f32 *) &world->unk_18EB8; /* a float: the second's fraction */
+    f32 t;
+    s32 all;
+    s32 i;
+
+    t = *timer + gFrameIncrement;
+    *timer = t;
+    all = t > 0.0f;
+    if (all) {
+        *timer = t - (f32) ((s32) t + 1);
+    }
+    for (i = 0; i < world->m_nListed; i++) {
+        CStaticObject__SpawnEvents((sptr) world->m_pListed[i], all);
+    }
+}
+#else
 void CScene__AdvanceListedInstances(void *arg0)
 {
   f32 temp_f1;
@@ -40,3 +64,4 @@ void CScene__AdvanceListedInstances(void *arg0)
     while (var_s0 < (*((s32 *) (((s8 *) arg0) + 0xBF4))));
   }
 }
+#endif

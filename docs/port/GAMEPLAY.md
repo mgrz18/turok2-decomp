@@ -865,3 +865,72 @@ stand elsewhere or a host collision/eye-height difference blocks it: compare wit
 
 Falling off the platform: one life per fall, the respawn is right; x2's strafe-left input walked the
 player off three times.
+
+## 12. Round 11, part z2: the Mantid Queen and the Primagen beaten, the ending
+
+Every boss now dies on Linux headless (PIE, high memory). The recipes are new game + boss env
+(`T2_GIVE_WEAPONS=1 T2_WEAPON=10 T2_AIM_NODE=boss T2_CHEATS=1 T2_FILL_AMMO=600 T2_BOSS_LOG=1`),
+input `START@4400 A@4500 A@4700 A@4800 Z@14000..200000`:
+
+| boss | switches | frames | result |
+|---|---|---|---|
+| the Mantid Queen | `T2_WARP_TO=7501 T2_BOSS_FRONT=450` | 40,000 | steps 1-8 by 33,507 (step 4 at 18,087, step 7 at 32,607), her death (mode 16) at 33,507, her death cinema, **the hub at 35,000** |
+| the Primagen | `T2_WARP_TO=7602 T2_BOSS_FRONT=450` | 56,000 | stage 2 at 20,306, stage 3 at 27,566, the stage-3 wait ends at 28,330, **his death (mode 29) at 32,828**, his death cinema, the ending cinema (levels 11 and 10, 34,000-38,999), **the credits (engine mode 15) from 39,000**, **the hub at 53,000** |
+| the Mother | the round-10 recipe (`T2_WARP_TO=-4`, `mother_end.txt`) | 36,000 | unchanged: death 30,641, defeat cinema 30,817, the hub at 32,200 |
+| the Blind One | the round-10 recipe (`T2_WARP_TO=7401 T2_TELEPORT=14000:-400,204.8,0`) | 25,000 | unchanged: death 22,683, the hub at 23,500 |
+
+### 12.1 The Mantid Queen: her body shields spot 3
+
+`T2_BOSS_LOG`'s `bosshurt:` lines now print the boss's `m_VisBits` and AI mode. In step 7 (mode 15,
+spot 3 open) every hit after the first two came with node mask 1: the boxes with mask 1 are her
+body (spot 0 has health 0 from the start and no step opens it, so bit 0 stays in `m_VisBits` and
+those boxes keep taking shots),
+and `MantidQueen_Hurt` counts only hits whose node mask has the open spot's bit. She does not
+turn to the player in mode 15 (`AI_TurnClamped` to her path target), so from the recipe's fixed
+spot beside her the body takes every shot after the first two. The same shield made step 4
+(spot 1) take ~73,000 frames. No host bug found: the hit test (`func_0023FDF0`) skips only the boxes
+whose mask is not in `m_VisBits`, as the N64 code does.
+
+`T2_BOSS_FRONT=D[,EVERY]` (DEBUG-ONLY, port/game/t2bosslog.c) puts the player D units in front of
+her every EVERY frames (default 600) while a spot is open between her waves (on the line from her
+centre through the open spot's box, as `T2_AIM_NODE` computes it). With 450: the whole fight takes
+~20,000 frames instead of ~95,000.
+
+Her death sprite (`CParticle__DrawSprite` with the key 0x81ACAD9C that aborted y2's run): no abort
+with `--draw` (frames 94,300-96,400 of the long run, every 60): y5's S16 masks the draw layer off the
+key, so the sprite loads. Frames seen: the plasma hits on her head (94,440-94,620), the cinema of
+her fall and collapse (94,742-95,642), the hub portal (96,361).
+
+### 12.2 The Primagen: stage 3's line of sight
+
+Stage 3's mode 25 flies to the lair (0, 937, 2918) and waits until the player is its sight
+target (`Primagen_UpdateMode19`: the arrival check runs only with a target). `AI_FindBestTarget`'s
+line of sight from the player's eye to the Primagen's (y 1,427) is cut by `found[0]` (type 0x641,
+the lair door 0xC9: world bounds (-842, -414, 2141)..(1030, 1741, 3941), scale 0.5): every probe from
+the middle of the floor stops on the plane z = 2141 (a temporary trace in `AI_FindBestTarget`). Its
+eye hovers behind that box, so the wait passes only when the line goes beside it: from (400, 0,
+1800) or (800, 0, 2200) the next probe sees him (mode 26 within 2-4 frames); from (0, 0, 500..1800),
+(-400, 0, 1800) or the spawn (1.4, 0, -1789.6) it never does. Stage 2 passed on the merged tree only
+because the target seen during the flight was still set when he arrived (`AI_GetSightTargetInfo`
+re-runs the search once per round-robin turn, `m_PathFindCount == m_Kind1Cursor`). A player who
+moves sees him from the side; the recipe's player stands still, so `T2_BOSS_FRONT` (level 4) puts
+him at (lair x + D, 0, lair z - 2.5 D) after EVERY frames of a mode-25 wait. **Not compared with the
+N64**: the emulator has no warp switch and no recorded run reaches this fight, so whether the N64's
+door boxes are the same is open (the bounds come from the archive's geometry through the same
+code).
+
+Two host bugs after his death (asm_diff 0):
+
+- `EngineMode15_Ending_Init` (func_00289A9C) read `m_bPrimagenBossComplete` at the N64 offset 0x9F0
+  of CPlayer: on the host that is other data, so `gEndingPrimagenDefeated` was 0, the credits never
+  ended (`Credits_Update` waits for good without it). Now a view at the host offset (the mode-16
+  copy, func_00289C0C, already used the member).
+- `Credits_Update` (func_002862A4) took the engine as `s32`: on the 64-bit host the pointer was cut
+  and `CEngineApp__StartGameAtWarp` crashed when the credits ended. Now `sptr`.
+
+After the credits `CEngineApp__StartGameAtWarp(0x1B57)` starts the game again in the hub (60).
+
+Frames (Linux, `--draw`, an earlier run with `T2_TELEPORT=27900:0,0,1500` instead of `T2_BOSS_FRONT`:
+death at 32,726): the Primagen under plasma fire (32,401-32,601), his death cinema
+(32,801-33,801), the ending with Adon (35,001-38,001), the credits ("TUROK 2 TEAM" from ~39,600
+to the Acclaim staff at 45,803).

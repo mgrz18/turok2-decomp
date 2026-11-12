@@ -6,7 +6,11 @@
 /* Turok 2: def at 0x14, flags at 0xD4 (Rage Wars 0x18 / 0x100). */
 /* Turok 2: this state byte is at 0xC7 (Rage Wars 0xCB). */
 typedef struct ObjectStateC7 {
+#ifdef TARGET_PORT /* CAI m_AnimRepeatedCount at its host offset (round 11 C26: 0xC7 read another member) */
+    char pad0[__builtin_offsetof(CAI, m_AnimRepeatedCount)];
+#else
     char pad0[0xC7];
+#endif
     s8 unk_C7;
 } ObjectStateC7;
 void Destructible_GoDeathUpdate(void *arg0, void *arg1) {

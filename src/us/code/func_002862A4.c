@@ -12,7 +12,7 @@ extern void CEngineApp__SetupFadeTo(sptr, s32);
 extern void Sound__PlaySpeech(s32);
 
 /* Scrolls the credits up; once past the last line, waits and leaves. */
-void Credits_Update(s32 arg0) {
+void Credits_Update(sptr arg0) { /* the engine pointer-wide (sptr: s32 on the N64; the host cut it: crash after the credits) */
     f32 spacing;
 
     if (gCreditsDone != 0) {

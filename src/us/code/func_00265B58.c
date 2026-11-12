@@ -51,6 +51,21 @@ struct M1Def {
                 u8 pad8[0xC];
                 M1Info info;
 };
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+/* The port (round 11 C26): the members at their host offsets. With the N64 pads the flags (0xD4)
+ * fell 8 bytes late, after the pointer-wide def, on m_rpGeometryHeaderSize: a destroyed object's
+ * geometry size lost bit 0x100 (0x160 -> 0x60), and the next model request of that object (the
+ * assembly plant of level 122) loaded 0x60 of its 0x2E0 bytes: Model_Decompress read past them
+ * and crashed on the decompressor thread. */
+struct M1Actor {
+    union {
+        struct { u8 _hpPos[__builtin_offsetof(CGameObjectInstance, header.m_vPos)]; CVector3 pos; };
+        struct { u8 _hpDef[__builtin_offsetof(CGameObjectInstance, header.m_pIntelligence)]; M1Def *def; };
+        struct { u8 _hpFlags[__builtin_offsetof(CGameObjectInstance, m_dwFlags)]; u32 flags; };
+    };
+};
+#else
 struct M1Actor { /* Turok 2 layout */
                 u8 pad0[0x4];
                 CVector3 pos;          /* 0x04 */
@@ -59,6 +74,7 @@ struct M1Actor { /* Turok 2 layout */
                 u8 pad18[0xBC];
                 u32 flags;          /* 0xD4 (Rage Wars: 0x100) */
 };
+#endif
 struct M1State {
                 u8 pad0[0x4];
                 s32 unk4;

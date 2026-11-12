@@ -103,6 +103,18 @@ typedef union {
     CVector3 v;
     Triple t;
 } Pos54E0;
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+/* The port (round 11 C26): the members at their host offsets (the N64 pads put the flags on
+ * m_rpGeometryHeaderSize, as in Destructible_GoEnter, func_00265B58.c). */
+typedef struct {
+    union {
+        struct { char _hpPos[__builtin_offsetof(CGameObjectInstance, header.m_vPos)]; Pos54E0 pos; };
+        struct { char _hpHolder[__builtin_offsetof(CGameObjectInstance, header.m_pIntelligence)]; Hold54E0 *holder; };
+        struct { char _hpFlags[__builtin_offsetof(CGameObjectInstance, m_dwFlags)]; s32 flags; };
+    };
+} Obj54E0;
+#else
 typedef struct {
     char pad0[0x4];
     Pos54E0 pos;       /* 0x04 (0x08 in Rage Wars) */
@@ -111,6 +123,7 @@ typedef struct {
     char pad18[0xBC];
     s32 flags;         /* 0xD4 (0x100) */
 } Obj54E0;
+#endif
 struct Object_func_8028B274_de {
     char pad0[4];
     s16 index;

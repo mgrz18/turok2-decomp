@@ -5,6 +5,17 @@
 #include "common.h"
 #include "globals/game.h"
 typedef struct { s32 kind; } P3Kind;
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+/* The port: the members at their host offsets (round 11 C26: the N64 pads put the flags (0xD4) on host m_rpGeometryHeader/m_rpObjectHeader) */
+typedef struct {
+    union {
+        struct { u8 _hpInfo[__builtin_offsetof(CGameObjectInstance, header.m_pIntelligence)]; P3Kind *info; };
+        struct { u8 _hpId[__builtin_offsetof(CGameObjectInstance, m_nTypeFlag)]; u16 id; };
+        struct { u8 _hpFlags[__builtin_offsetof(CGameObjectInstance, m_dwFlags)]; u32 flags; };
+    };
+} P3Actor;
+#else
 typedef struct {
     u8 pad0[0x14];
     P3Kind *info;           /* 0x14 (0x18 in Rage Wars) */
@@ -13,6 +24,7 @@ typedef struct {
     u8 padBA[0xD4 - 0xBA];
     u32 flags;              /* 0xD4 (0x100) */
 } P3Actor;
+#endif
 s32 func_00238258(P3Actor *a, P3Actor *b) {
     if (gEngineApp_m_Settings.multiplayer != 0) {
         return 1;
