@@ -592,3 +592,137 @@ The generator couplings (aimed fire at each cluster in 115, 117, 119) score noth
 3. Level 6: the couplings (object 288, intelligence 574); the force field generators (object 232);
    then 7601 -> the Primagen (z2's boss recipe starts there).
 4. The flesh-eater (82, 83) and talisman (76, 77, 92) portals; the totem 113.
+
+## 10. One continuous playthrough, the keys and the hub (Phase 7 round 12, part a3)
+
+`tools/port/playthrough.py OUTDIR --all` (= `tools/port/fullrun.py OUTDIR [--upto N] [--hub N=FRAME]`)
+writes one input file and one `teleport.env` for **a single process from a new game through
+levels 1, 2, 3 and 4 in order, through the hub's own portals**, with every level key the
+routes pass, the keys placed at the hub, and **a save on the Controller Pak after each level**
+(the hub's save portal walked into). Run it with `--pak-dir` to keep the saves:
+
+```sh
+python3 tools/port/playthrough.py RUN --all            # RUN/playthrough.txt, teleport.env, fullrun.txt
+cd OUT && . RUN/teleport.env && SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=500 \
+  build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --pak-dir RUN/pak \
+  --frames 146000 --input @RUN/playthrough.txt          # ~76 s headless
+python3 ../tools/port/mpk_saves.py RUN/pak/turok2_pak1.mpk
+```
+
+`fullrun.txt` is the timeline (frame, step). One process was practical: the four levels take
+146,000 frames (~76 s without `--draw`).
+
+### 10.1 How the hub portals open (the game's own logic)
+
+- The hub portal warps (region warp ids 1000-6000) are **not** gated in code
+  (`CPlayer__Warp`'s switch only redirects the level exits 7100-7601 by the objectives and
+  `keys[]`). The gate is physical: **each portal's way out of the hub's central plaza is a door**
+  (object 426, intelligence 724: type 6, a door; instances 25-29 of level 60).
+- Around each door stand its **key slots**: actions (type 0x648, objects 153/258/294/296/297,
+  intelligences 444/533/...) whose required item is that level's key (4310 "level 2 key" ...
+  4350 "level 6 key"; `Action_CheckRequiredItem` -> `CPlayer__UseSpecialPickup`). Walking over a
+  slot with the key puts it in (link records kind 10 for the slot); when a door's slots are all
+  filled its link group (keys 80/79/81/82/66) fires kind 6 to the door with the message
+  **"access to level N granted."** (level messages 50-54) and the door opens.
+  Level 2 and 3 need 3 keys each, 4 and 5 three, level 6 six (24 slots: 18 level keys + 6
+  Primagen key slots around the centre: objects 154/158/159/161/291/292, items 4360-4365; their
+  events go to level 43, the Primagen's).
+- The previous `--level 2/3/4` routes teleported **past** these doors straight into the portal
+  regions, which is why they ran from a new game with no keys.
+
+The keys (level actors; the item id is the object type's id in cart entry 2, object 582 =
+4310 ... 592 = 4365):
+
+| item | where (level: position) | route |
+|---|---|---|
+| 4310 level 2 key | 52 (-153.6, 30.7, -1789.3), 52 (-153.5, 952.3, 2152.7), 58 (1262.1, 337.9, -1395.9) | all 3 (level 1) |
+| 4320 level 3 key | 55 (1568.6, 30.7, -765.0), 59 (-613.6, 337.9, 639.4), 59 (-5682.8, 645.1, 6556.4) | all 3 (level 1) |
+| 4330 level 4 key | 127 (3760.1, 645.1, -302.3), 131 (1740.8, 440.3, 4968.8), 132 (2044.9, 1361.9, -255.9) | all 3 (level 2) |
+| 4340 level 5 key | 61 (1075.3, -276.5, 2663.8), 62 (-4761.5, 337.9, -1074.0), 68 (-2150.5, 30.7, -1381.4) | 61's only (the 62/68 picks land before the warp has loaded: open) |
+| 4350 level 6 key | 100, 103, 105 (level 4); 84, 87, 89 (level 5) | 100 and 105 (103 missed) |
+| 4360-4365 Primagen keys 1-6 | 55, 132, 63, 98, 92 (level 5's talisman level), 114 | 1, 2, 3, 4 |
+| 4380-4384 talismans | 73-77, one each at (-2.6, 46.2, 746.3) | not yet |
+| 4500 nuke part | the flesh-eater levels 78-83 | not yet |
+
+### 10.2 The run (Linux, headless, PIE, the merged tree + a3)
+
+| frame (host) | level | what |
+|---|---|---|
+| 4,400-4,800 | | new game |
+| 13,100-19,850 | 51-59 | level 1 (playthrough.py's route), plus the 3 level-2 keys, the 3 level-3 keys and Primagen key 1 (150 frames each) |
+| 19,850-23,600 | 109 | the Harbor Totem: **won (8/8)** |
+| 23,657 | 60 | the hub (anchor) |
+| ~23,950-25,400 | 60 -> 97 -> 60 | **the save portal walked into** (warp 999 -> 97, Adon's cinema 400, the save menu): SAVE, note 1, OK, GO BACK, the rumble notice: back at the portal (warp 99). Note "TUROK 2" written |
+| ~25,900 | 60 | the level 2 slots: **"access to level 2 granted."**, Primagen key 1 in its slot |
+| ~26,800 | 60 -> 34 | **walked through the level-2 door into the portal 2000**: the intro cinemas |
+| 32,100-76,100 | 125-135 | level 2 (the route + the 3 level-4 keys and Primagen key 2; the three sisters, both soul gates) |
+| ~76,100-83,400 | 110 | the City Totem: **failed (4/8)** in this run (won 11/8 in another: section 10.4) |
+| 83,758 | 60 | the hub; save 2 (overwrite note 1); **"access to level 3 granted."**, Primagen key 2; the level-3 door, the portal 3000 |
+| 87,219-100,600 | 12-71 | level 3 (prisoners, armories, Primagen key 3, one level-5 key) |
+| 100,600-107,750 | 111 | the Marsh Totem: **won (8/8)** |
+| 108,433 | 60 | the hub; save 3; **"access to level 4 granted."**, Primagen key 3; portal 4000 |
+| 111,480-125,100 | 18-108 | level 4 (vents: "blind ones trapped. mission complete.", Primagen key 4, 2 level-6 keys) |
+| 125,100-128,700 | 112 | the Cave Totem: **won (8/8)** |
+| 129,400-140,250 | 1 | **the Blind One: dead (mode 9)**, the cave |
+| 140,287 | 60 | the hub; **save 4** (clock 0:37:26, life force 58, checksum OK) |
+
+Every level's objectives are scored by the game itself; the level exits 7200/7300/7400 go to the
+totems (objectives done), the totems and the Blind One to the hub.
+
+### 10.3 Tools (DEBUG-ONLY)
+
+- `T2_ANCHOR=L@N[;L@N...]` (port/game/t2debug.c `T2Port_ScheduleFrame`, game.cpp): the scripted
+  input and the frame-scheduled switches (`T2_TELEPORT`, `T2_AIM_*`, `T2_FACE_*`,
+  `T2_BOSS_FRONT`, `T2_FILL_AMMO`, `T2_DOOR_OPEN`, `T2_SAVE_PORTAL`, `T2_WARP_TO`) run on a
+  schedule clock that jumps to N when level L is reached (in order, each once, only within 3,000
+  frames before N). The totem fights end at different frames from one run to the next (the
+  Harbor Totem: 23,600 vs 23,800 with another `T2_FILL_AMMO`); without anchors every later step
+  moved with them. fullrun.py anchors each hub arrival, each level's first intro cinema and the
+  City Totem (110).
+- `T2_FACE_NEAREST=R@L1,L2,...` (a list of levels: the four totems), `T2_SAVE_PORTAL=F1,F2,...`.
+- fullrun.py: `L1_KEYS`/`L2_KEYS`/`L3_KEYS`/`L4_KEYS` (inserted at a segment's start, 150
+  frames each, the later steps moved), `L2_RETRY` (a second walk at a key), `L2_STRETCH` (longer
+  fire windows for the three sisters), `PAD` (the hub's walks), `SAVE_MENU`/`SAVE_MENU_AGAIN`
+  (a later save overwrites note 1: its dialog opens on NO, so DU first), `HUB_AT` (the nominal
+  hub arrivals), `LEVEL_HOOKS` (**levels 5 and 6 append here**: `{5: fn(route, start) -> end}`).
+
+### 10.4 Teleports left, T2_CHEATS, findings
+
+- **Walked now**: the hub (the save portal, the key slots, through the level 2 and 3 doors into
+  their portals). The teleports that remain in the hub land in the open plaza (no door crossed).
+  The level-4 door is opened by its keys and walked through, but no straight walk from it to the
+  portal 4000 was found (blocked at (482.8, 0, 452.0)): the last leg is a teleport to the old
+  approach point (1711.7, -412.4, 968.4).
+- Inside the levels the routes are playthrough.py's (sections 2, 6, 7, 8): every step is a
+  teleport next to its target and a short walk; the doors in them are opened by the game
+  (switches, keys, kills) before the teleport goes past them, except level 4's vent-room doors
+  (the switch opens them, the teleport skips the walk) and the Blind One's ledge.
+- **T2_CHEATS=1** (invincibility) is still needed: the sisters, the zombies of 133/134/135 and
+  the totem waves hit the player while the aimed fire works through them; `T2_FILL_AMMO=300`
+  likewise.
+- **The fights depend on the state a level is entered with.** The same level-2 route that wins
+  from a new game (`--level 2`) lost sister 1 once and the crypt key once in the continuous run:
+  hence `L2_STRETCH` (+3,000/+2,000/+2,000 frames on the sisters) and `L2_RETRY`. **The City
+  Totem (110) is the open one**: won 11/8 in two runs, failed 4/8 and 7/8 in two others.
+- **Hub doors after a reload**: a door opened by its slots in one hub visit was found closed in
+  a later visit after a level (the slots stay used, so it cannot reopen: level 3's door, opened
+  in the first visit, blocked the walk in the second). Within one visit (also across the save
+  portal's 97 round trip) it stays open. On the console a granted level must stay reachable, so
+  this is likely a port bug in the door's persistent state (open). fullrun.py works around it:
+  each door is opened in the visit that uses it.
+- `InventoryMenu_DrawItem` (func_00424780.c) reads the level-6 key counts as `player[0xA05]`/
+  `player[0xA06]` and the nuke parts at `player + 0x9FC`: N64 offsets of CPlayer on a host
+  `CPlayer` (for a5's sweep).
+
+### 10.5 Next
+
+1. The City Totem's defence in the continuous run (aim or fire changes; it decides the ending's
+   five totem flags).
+2. The remaining keys (62/68's level-5 keys: anchor the segment on the warp's load, as
+   `level_segments(..., anchor=True)` tries; 103's level-6 key) and the hub door persistence.
+3. The talisman portals: level 1's 55 switch opens portal 21 (warp 1001 -> 72, Adon); 73 (Leap of
+   Faith, 2001 in 132), 74 (Breath of Life, 3001 in 66), 75 (Heart of Fire, 4001 in 99), 76/77;
+   each talisman level holds its talisman at (-2.6, 46.2, 746.3) and its exit N002. The
+   flesh-eater portals (1003 in 59 after switch 52, 2003, 3003, 4003) lead to 78-81, a nuke part
+   (4500) each. Not in the route yet.
+4. Levels 5 and 6 (a1/a2) through `LEVEL_HOOKS`, and the Primagen.

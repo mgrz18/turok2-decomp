@@ -311,6 +311,39 @@ Fixes on the merged tree (asm_diff 0):
    so far).
 10. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
 
+## Round 12, part a3: one continuous playthrough, the keys and the hub (branch names-R12_a3)
+
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) section 10. Port/tools only (no `src/`, `include/` or
+archive change).
+
+- **One process from a new game through levels 1, 2, 3 and 4 in order**:
+  `tools/port/playthrough.py RUN --all` (tools/port/fullrun.py), 146,000 frames, ~76 s headless,
+  `--pak-dir`. Every level through the hub's own portal, every objective scored by the game, the
+  Harbor, Marsh and Cave Totems won, **the Blind One dead**, back to the hub, and **a save after
+  each level by walking into the hub's save portal** (warp 999 -> 97, Adon's cinema, SAVE, GO
+  BACK): 4 saves, note "TUROK 2" checksum OK, clock 0:37:26. **The City Totem (110) is the weak
+  step**: won 11/8 in two runs, failed (4/8, 7/8) in two (its flag matters for the ending only).
+- **How the hub portals open**: not in code (the portal warps are free) but by doors: each
+  portal's way out of the central plaza is a door (object 426) that opens when its key slots
+  (actions needing items 4310-4350) are filled ("access to level N granted."). The old
+  `--level 2/3/4` routes teleported past them. The run collects the 3 level-2, 3 level-3 and 3
+  level-4 keys, Primagen keys 1-4, places them, and walks through the level 2 and 3 doors into
+  their portals (level 4: the door is walked through, the last stretch to the portal is still a
+  teleport).
+- `T2_ANCHOR=L@N;...` (a schedule clock re-anchored when a level is reached: totems ending at a
+  different frame no longer shift the rest of the route), `T2_FACE_NEAREST=R@L1,L2,...`,
+  `T2_SAVE_PORTAL=F1,F2,...`.
+- Found: a hub door opened in one visit is closed again in a later one (its slots stay used):
+  likely a port bug in the door's persistent state; `InventoryMenu_DrawItem` reads CPlayer at N64
+  offsets (0xA05/0xA06/0x9FC). Not fixed.
+- Not done: the talisman and flesh-eater portals (mapped in section 10.5), the level-5 keys of 62
+  and 68, the level-6 key of 103.
+
+Merge notes: port/app/game.cpp (the debug calls now take `sFrame + 1`, the schedule frame; other
+branches adding a frame-scheduled switch should pass the same), port/game/t2debug.c
+(`T2Port_ScheduleFrame`, the two list parsers), tools/port/playthrough.py (`--all`, 8 lines),
+tools/port/fullrun.py (new; levels 5/6 append through `LEVEL_HOOKS`), PLAYTHROUGH.md section 10.
+
 ## Round 11, part z5: demo fidelity, static object events, the font colour (branch names-R11_z5)
 
 Detail: [FIDELITY.md](FIDELITY.md) section 6. Every `src/` change is TARGET_PORT;
