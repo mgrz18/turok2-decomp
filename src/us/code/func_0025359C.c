@@ -2,6 +2,24 @@
 
 s32 RumblePool_FreeAll(sptr);                         /* extern */
 
+#ifdef TARGET_PORT
+#include "structs/game.h"
+#include "structs/player.h"
+#include "structs/controller.h"
+/* The port (round 11 C26): the players and their controller profiles by member. The N64 views
+ * (0x20 the list head, 0xA50 m_ContState.m_pContState, 0x1320 m_pNext; the profile 0xD0
+ * rumbleLevel, 0x140 rumblePool) read other host members: the walk went off the list. */
+void func_0025359C(CPlayerPool *arg0) {
+    CPlayer *p = arg0->m_ActiveList.m_pHead;
+
+    while (p != NULL) {
+        ControllerProfile *c = p->m_ContState.m_pContState;
+        RumblePool_FreeAll((sptr) c->rumblePool);
+        c->rumbleLevel = 0.0f;
+        p = p->m_pNext;
+    }
+}
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0xD0];
     /* 0xD0 */ s32 unkD0;
@@ -34,3 +52,4 @@ void func_0025359C(List002534E0 *arg0) {
         } while (var_s0 != NULL);
     }
 }
+#endif
