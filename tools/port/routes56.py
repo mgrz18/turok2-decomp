@@ -196,7 +196,7 @@ L6_SEGMENTS = [
 
 # 7601 with both objectives done is the Mother's arena (level 3, ~12,500 after L6_START): z5's
 # Mother recipe (docs/port/STATUS.md: fire held, the aim on her weak spots, strafing left with a
-# step back every 600 frames). Her death (~18,000 after her arena) warps 6999: back to 114 at its
+# step back every 600 frames). Her death (~17,000 frames into her arena) warps 6999: back to 114 at its
 # start; its other 7601 pad (regions 151/152, by the start) then leads to the hub (CPlayer__Warp:
 # objectives done and the level's key 7 -> 6999). The hub has no warp region to the Primagen (7602):
 # the route hops there (T2_WARP_TO, L6_PRIMAGEN_HOP) and runs z2's recipe (T2_BOSS_FRONT=450): his
@@ -205,7 +205,7 @@ L6_SEGMENTS = [
 # 2925) varies with the run before; from a hop at 53,700 he rested where no floor spot sees him
 # (docs/port/PLAYTHROUGH.md 9.5).
 L6_MOTHER = 12500          # the Mother's arena is loaded (relative to L6_START)
-L6_MOTHER_END = 31000      # relative: the strafing and the steps back stop (her death ~30,500, her cinema)
+L6_MOTHER_END = 31000      # relative: the strafing and the steps back stop (her death ~29,600, her cinema)
 L6_EXIT = (33500, 1231.8, 0.0, -4006.8, -1.5708)  # from 114's start (+x) onto its pad 7601 (regions 151/152) -> the hub
 L6_PRIMAGEN_HOP = 34800    # relative: T2_WARP_TO=7602 from the hub (54,000)
 L6_END = 90000             # relative: the end of the held fire
