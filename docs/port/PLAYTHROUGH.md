@@ -609,16 +609,16 @@ SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_STATE_LOG=500 build/app/turok2 --arc
 | 17,300 | 124 HIVE TOP (after the portal 5000 and its cinemas) |
 | 17,700-19,200 | the four pylons die (one window of `T2_AIM_ENEMY ,R,A` each) |
 | 18,913 | **"force field down."** (link group 49 at 0) |
-| 19,600 | 84 through the game's own warp 5201 (walked in from the next region), then 85-90 |
-| 24,007 | 94: **"embryo destroyed."** |
-| 24,500 | 91: the four satchel charges (`T2_PICKUP_LOG`: id 4110 x 4) |
-| 26,707 | 95: **"embryo destroyed."** |
-| 28,607 | 96: **"all embryos destroyed. mission complete."** (link group 44, type 9) |
-| 30,401 | 93: the four sockets filled: **"warning, five seconds until detonation."** |
-| 30,759 | **"master computer destroyed. mission complete."** (actor 53, link group 98, type 10) |
-| 31,500 | the exit 7500 (both objectives done) -> **the Hive Totem (113)**: saved, 10/8 kills by ~33,000 |
-| 33,118 | the Mantid Queen (level 2); **her death (mode 16) at 43,397**, her death cinema |
-| **45,000** | **the hub (60)**; exit 0 |
+| 19,600 | 84 through the game's own warp 5201 (walked in from the next region), then 85-90; **the three level 6 keys** (object 586, item 0x10FE) in 84, 87 and 89 |
+| 24,607 | 94: **"embryo destroyed."** |
+| 25,500 | 91: the four satchel charges (`T2_PICKUP_LOG`: id 4110 x 4) |
+| 27,307 | 95: **"embryo destroyed."** |
+| 29,207 | 96: **"all embryos destroyed. mission complete."** (link group 44, type 9) |
+| 31,001 | 93: the four sockets filled: **"warning, five seconds until detonation."** |
+| 31,359 | **"master computer destroyed. mission complete."** (actor 53, link group 98, type 10) |
+| 32,000 | the exit 7500 (both objectives done) -> **the Hive Totem (113)**: saved, 10/8 kills by ~33,500 |
+| 33,598 | the Mantid Queen (level 2); **her death (mode 16) at 42,095**, her death cinema |
+| **43,500** | **the hub (60)**; exit 0 (`--frames 48000` leaves room: the Queen's fight varies by ~1,500 frames with the route's timing) |
 
 What each objective needed (none was a host bug; every one was a route gap):
 
@@ -653,6 +653,11 @@ Tools: `T2_ACTOR_LOG` now prints an `actor+:` line per actor: the body flags
 AI callbacks (hurt, step, mode) as offsets from `T2Port_LogOne` (`nm turok2` names them).
 `routes56.py` steps take `"aim": ("actor", A[, R])` (`T2_AIM_ENEMY` with the actor first).
 
-Open (level 5): the level key and the Primagen key pickups of the level (not needed by the route);
-the flesh-eater portal 82 (5003 in 87) and the talisman 76 (5001 in 88) and 92.
+Keys: level 5 holds **the three level 6 keys** (object 586, "level 6 key"): 84 (1075.2, 10.2,
+-2300.9), 87 (615.1, -2119.7, 3383.5), 89 (6743.2, -583.7, -303.6); the route takes all three
+(the hub portal 6000 needs them in a continuous game). Object 608 (item 0x1133) lies in 88 at
+(-2819.8, -307.2, -1478.5), not taken.
+
+Open (level 5): object 608 in 88 (item 0x1133) and the Primagen key; the flesh-eater portal 82
+(5003 in 87) and the talismans 76 (5001 in 88) and 92.
 

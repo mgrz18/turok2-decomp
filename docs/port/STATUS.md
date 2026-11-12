@@ -324,11 +324,11 @@ SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_STATE_LOG=500 build/app/turok2 --arc
 ```
 
 124 at 17,300; "force field down." 18,913 (the four pylons); the game's warp 5201 into 84 (no
-hop); "embryo destroyed." 24,007 (94) and 26,707 (95); "all embryos destroyed. mission complete."
-28,607 (96); the four satchel charges from 91 into the computer's sockets in 93: "warning, five
-seconds until detonation." 30,401, "master computer destroyed. mission complete." 30,759; the
-exit 7500 to the Hive Totem (113, 31,500), saved (10/8 kills); the Mantid Queen (33,118), her
-death (mode 16) at 43,397; **the hub at 45,000**; exit 0.
+hop); the three level 6 keys (84, 87, 89); "embryo destroyed." 24,607 (94) and 27,307 (95); "all
+embryos destroyed. mission complete." 29,207 (96); the four satchel charges from 91 into the
+computer's sockets in 93: "warning, five seconds until detonation." 31,001, "master computer
+destroyed. mission complete." 31,359; the exit 7500 to the Hive Totem (113, 32,000), saved (10/8
+kills); the Mantid Queen (33,598), her death (mode 16) at 42,095; **the hub at 43,500**; exit 0.
 
 **No host bug was behind level 5's blocks**: each was a route gap. The pylons are turrets whose
 hit boxes are ~170 units up (z4 aimed at 100); the embryos sleep inside cocoons (destructibles)

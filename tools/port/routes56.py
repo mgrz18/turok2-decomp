@@ -60,25 +60,29 @@ L5_SEGMENTS = [
         # "force field down." (link group 49 at 0): the hive's centre is open
         (1700, 154.9, -228.3, 445.2, 1.6811, W2, {}),      # warp 5201 -> 84 (approach.py --steps 1)
     ]),
-    ("84 Lev5 A: exit 5100", 2800, [
-        (0, 4628.7, -307.0, 1077.8, -1.5437, W2, {}),          # warp 5100 -> 85
+    # the three level 6 keys (object 586, item 0x10FE: "level 6 key") lie in 84, 87 and 89
+    ("84 Lev5 A: a level 6 key, exit 5100", 2800, [
+        (0, 1016.5, -20.5, -2241.2, -0.7767, 40, {}),         # level 6 key (1075.2, 10.2, -2300.9)
+        (200, 4628.7, -307.0, 1077.8, -1.5437, W2, {}),          # warp 5100 -> 85
     ]),
-    ("85 Lev5 B: exit 5013", 3200, [
+    ("85 Lev5 B: exit 5013", 3400, [
         (0, -2152.3, -1228.6, -6033.8, -3.1373, W2, {}),      # warp 5013 -> 86
     ]),
-    ("86 Lev5 C: exit 5120", 3600, [
+    ("86 Lev5 C: exit 5120", 3800, [
         (0, 5811.3, -1843.0, 360.6, -1.3395, W2, {}),         # warp 5120 -> 87
     ]),
-    ("87 Lev5 D: exit 5023", 4000, [
-        (0, -2264.2, -2764.6, 2714.7, 1.8080, W2, {}),        # warp 5023 -> 88
+    ("87 Lev5 D: a level 6 key, exit 5023", 4200, [
+        (0, 713.3, -2150.4, 3471.0, 0.8432, 40, {}),          # level 6 key (615.1, -2119.7, 3383.5)
+        (200, -2264.2, -2764.6, 2714.7, 1.8080, W2, {}),        # warp 5023 -> 88
     ]),
-    ("88 Lev5 E: exit 5033", 4400, [
+    ("88 Lev5 E: exit 5033", 4800, [
         (0, -262.4, -614.2, -4583.0, 0.2630, W2, {}),          # warp 5033 -> 89
     ]),
-    ("89 Lev5 F: exit 5053", 4800, [
-        (0, 6873.9, -921.4, 7364.7, -1.5618, W2, {}),         # warp 5053 -> 90
+    ("89 Lev5 F: a level 6 key, exit 5053", 5200, [
+        (0, 6772.1, -614.4, -369.6, 2.7291, 40, {}),          # level 6 key (6743.2, -583.7, -303.6)
+        (200, 6873.9, -921.4, 7364.7, -1.5618, W2, {}),         # warp 5053 -> 90
     ]),
-    ("90 Lev5 G: exit 5010", 5200, [
+    ("90 Lev5 G: exit 5010", 5800, [
         (0, -4513.8, 614.4, 3509.7, -2.8650, W2, {}),          # warp 5010 -> 94
     ]),
     # the embryos (object 109, an enemy, 255 health) sleep (EnemyMode_WaitForTrigger, no hits) in
@@ -87,34 +91,34 @@ L5_SEGMENTS = [
     # the level actor A, then the nearest live actor: the embryo). The shredder (weapon 9) breaks
     # a cocoon in ~250 frames (the plasma rifle needs ~1,500). Each embryo counts link group 44
     # (type 9) down: "embryo destroyed.", the last "all embryos destroyed. mission complete."
-    ("94 Lev5 J: embryo 1, exit 5021", 5600, [
+    ("94 Lev5 J: embryo 1, exit 5021", 6200, [
         (0, 1399.3, 0.0, -4106.0, 0.7189, 0, {"fire": 400, "aim": ("actor", 78)}),   # the cocoon 78
         (450, 1399.3, 0.0, -4106.0, 0.7189, 0, {"fire": 600, "aim": ("actor", 19)}), # the embryo 19
         (1100, -3550.0, 0.0, -2814.5, 1.9267, W2, {}),        # warp 5021 -> 91
     ]),
     # the 4 satchel charges (object 599, item 0x100E: CPlayer__CollectKeyPiece) lie in 91; the
     # master computer's 4 sockets in 93 take one each (Action_CheckRequiredItem)
-    ("91 Lev5 H: the 4 satchel charges, exit 5500", 7100, [
+    ("91 Lev5 H: the 4 satchel charges, exit 5500", 7700, [
         (0, 921.6, -307.2, -7944.8, 3.1416, 40, {}),          # satchel (921.6, -307.2, -7884.8)
         (200, 3072.0, -307.2, -5845.6, 3.1416, 40, {}),       # satchel (3072, -307.2, -5785.6)
         (400, 1536.0, 614.4, -3080.8, 3.1416, 40, {}),        # satchel (1536, 614.4, -3020.8)
         (600, 307.2, -307.2, -1903.2, 3.1416, 40, {}),        # satchel (307.2, -307.2, -1843.2)
         (800, -299.6, 0.0, 4504.8, -1.2299, W2, {}),          # warp 5500 -> 95
     ]),
-    ("95 Lev5 K: embryo 2, exit 5501", 8300, [
+    ("95 Lev5 K: embryo 2, exit 5501", 8900, [
         (0, 511.1, 0.0, -1246.8, 2.2706, 0, {"fire": 400, "aim": ("actor", 94)}),   # the cocoon 94
         (450, 511.1, 0.0, -1246.8, 2.2706, 0, {"fire": 600, "aim": ("actor", 27)}), # the embryo 27
         (1100, 2674.2, 0.0, 4158.1, 0.2983, W2, {}),         # warp 5501 -> 91
     ]),
-    ("91 Lev5 H again: exit 5073", 9800, [
+    ("91 Lev5 H again: exit 5073", 10400, [
         (0, 3389.8, 614.4, -3787.7, -1.2373, W2, {}),         # warp 5073 -> 96
     ]),
-    ("96 Lev5 L: embryo 3, exit 5072", 10200, [
+    ("96 Lev5 L: embryo 3, exit 5072", 10800, [
         (0, -2570.0, 1228.8, 597.5, 2.2899, 0, {"fire": 400, "aim": ("actor", 95)}),   # the cocoon 95
         (450, -2570.0, 1228.8, 597.5, 2.2899, 0, {"fire": 600, "aim": ("actor", 31)}), # the embryo 31
         (1100, -142.3, 921.6, -1027.8, -1.2276, W2, {}),      # warp 5072 -> 91
     ]),
-    ("91 Lev5 H again: exit 5060", 11700, [
+    ("91 Lev5 H again: exit 5060", 12300, [
         (0, -731.8, 614.4, -1447.8, -2.0128, W2, {}),         # warp 5060 -> 93
     ]),
     # the master computer: its 4 sockets (actors 7-10, actions needing item 0x100E, auto radius
@@ -122,23 +126,23 @@ L5_SEGMENTS = [
     # "warning, five seconds until detonation.", then actor 53 (group 98, type 10): "master
     # computer destroyed. mission complete." z4's aim point (1843, 922, 900) was over the pit
     # round the room: the fall killed the player (level 164) even with T2_CHEATS.
-    ("93 Lev5 I: the master computer, exit 5062", 12100, [
+    ("93 Lev5 I: the master computer, exit 5062", 12700, [
         (0, 1510.0, 921.6, 662.3, -0.1282, 40, {}),           # socket actor 7 (1536, 921.6, 460.8)
         (200, 931.6, 921.6, 629.3, 0.0592, 40, {}),           # socket actor 8 (921.6, 921.6, 460.8)
         (400, 1564.7, 921.6, -94.0, 0.4488, 40, {}),          # socket actor 9 (1536, 921.6, -153.6)
         (600, 942.6, 921.6, -317.0, 3.0140, 40, {}),          # socket actor 10 (921.6, 921.6, -153.6)
         (1000, 1277.1, 921.6, -2778.9, 0.3221, W2, {}),       # warp 5062 -> 91 (after the blast)
     ]),
-    ("91 Lev5 H again: the level exit 7500", 13500, [
+    ("91 Lev5 H again: the level exit 7500", 14100, [
         (0, 2765.4, -614.4, -7569.4, 3.1309, W2, {}),         # warp 7500 (the Hive Totem, 113)
     ]),
 ]
 
-# the Hive Totem (113) arrives at ~31,300 (rel 13,600); saved (8 kills) by ~33,000
-L5_TOTEM = (13650, 2000, 113)
+# the Hive Totem (113) arrives at ~31,900 (rel 14,200); saved (8 kills) by ~33,600
+L5_TOTEM = (14250, 2000, 113)
 # the Mantid Queen (level 2, ~33,100 after the totem): fire held to the end of the run; her death
-# (mode 16) at ~43,400, the hub (60) by ~45,500 (run 48,000 frames)
-L5_BOSS = (15300, 16000)
+# (mode 16) at ~44,000, the hub (60) by ~46,000 (run 49,000 frames)
+L5_BOSS = (15900, 16000)
 
 L6_SEGMENTS = [
     ("114 Level 6A: exit 6100", 0, [
