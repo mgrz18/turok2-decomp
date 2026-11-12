@@ -2116,7 +2116,19 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     }
                     effect->flags |= 0x1000000;
                 }
+#ifdef TARGET_PORT
+                /* type is the impact's m_ImpactEventType[4] (the extra effect), 0xFFFF (none) for
+                 * most effects; CParticle__HandleImpactEvent checks for 0xFFFF, this does not. The N64
+                 * then reads 0x7FFF8 bytes past the 34-entry table, RAM 0x8012D07C: 0x00C800FF in
+                 * every reference dump (flags & 1 set: the particle's hit flags get 0x80000000, the
+                 * enlarged node boxes of Sweep_TestBox). The host read went 1 MB past the table into
+                 * host memory, so a shot hit the boss on macOS and missed on Linux (round 10 y4). */
+                if (((entry->model->type < sizeof(gImpactEventHandlers) / sizeof(gImpactEventHandlers[0])
+                          ? gImpactEventHandlers[entry->model->type].flags
+                          : (entry->model->type == 0xFFFF ? 0x00C800FFu : 0u)) & 1) || kind == 0x68) {
+#else
                 if ((gImpactEventHandlers[entry->model->type].flags & 1) || kind == 0x68) {
+#endif
                     render->flags |= 0x80000000;
                 }
                 vel = &effect->velocity;

@@ -128,6 +128,27 @@ void T2Port_LogBossHurt(const char *who, void *obj, void *arg) {
 #include <math.h>
 #include <string.h>
 
+/* atan2f from + - * / only (round 10 y4): libm's atan2f differs in the last bit between macOS
+ * and glibc, so the aim pitch, the player's shots and everything they hit drifted apart between
+ * the hosts (the Mother recipe, Mac against Linux, frame 14,543). Max error ~1e-5 rad. */
+static f32 T2Aim_Atan2f(f32 y, f32 x) {
+    f32 ax = x < 0.0f ? -x : x, ay = y < 0.0f ? -y : y;
+    f32 a, s, r;
+    if (ax == 0.0f && ay == 0.0f) {
+        return 0.0f;
+    }
+    a = ax > ay ? ay / ax : ax / ay;
+    s = a * a;
+    r = ((-0.0464964749f * s + 0.15931422f) * s - 0.327622764f) * s * a + a;
+    if (ay > ax) {
+        r = 1.57079637f - r;
+    }
+    if (x < 0.0f) {
+        r = 3.14159274f - r;
+    }
+    return y < 0.0f ? -r : r;
+}
+
 typedef struct T2AimBox {
     CVector3 corners[8];
     f32 size;
@@ -283,7 +304,7 @@ void T2Port_AimNode(int frame, const char *spec) {
     dy = bestAim.y - eye.y;
     dz = bestAim.z - eye.z;
     h = sqrtf(dx * dx + dz * dz);
-    p->m_pCamera->m_ViewParams.m_vRotOffset.x = (sign != NULL ? (f32) atof(sign) : 1.0f) * atan2f(dy, h);
+    p->m_pCamera->m_ViewParams.m_vRotOffset.x = (sign != NULL ? (f32) atof(sign) : 1.0f) * T2Aim_Atan2f(dy, h);
     if (bestNode != sLastMask || frame - sLastFrame >= 300) {
         sLastMask = bestNode;
         sLastFrame = frame;

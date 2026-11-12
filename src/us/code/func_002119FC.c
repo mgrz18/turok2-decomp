@@ -3,11 +3,17 @@
 #include "globals/engine.h"
 
 s32 Demo_GetPlayerCount(void);
+#ifdef TARGET_PORT
+void T2Port_RngTrace(void *ra); /* DEBUG-ONLY: T2_RNG_TRACE (port/game/t2det.c) */
+#endif
 
 /* Random blend between a and b (t in [0, 1] from seed A, steps of 1/9999). */
 f32 Random_Blend(f32 a, f32 b) {
     f32 t;
 
+#ifdef TARGET_PORT
+    T2Port_RngTrace(__builtin_return_address(0));
+#endif
     if (Demo_GetPlayerCount()) {
         gRandomValue = gFrameCountGameplay * 0xA84A5B53 + 0x58348C2D;
     } else {

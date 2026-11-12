@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """soak.py - long-run / fuzz harness for the native port (docs/port/STABILITY.md).
 
-Runs `turok2 --game` many times headless with random but valid input scripts, under gdb, and
-collects every crash (signal, LUS crash handler, trap, hang, non-zero exit) with the crashing
+Runs `turok2 --game` many times headless with random but valid input scripts, under gdb (Linux)
+or lldb (macOS: `--debugger lldb`, the default when there is no gdb on PATH), and collects every crash (signal, LUS crash handler, trap, hang, non-zero exit) with the crashing
 thread's backtrace. Crashes are deduplicated by their top game frames.
 
     python3 tools/port/soak.py --exe OUT/build/app/turok2 --archive OUT/turok2.o2r \
         --rom baserom.us.z64 --out OUT/soak [--kind attract|newgame|warp] [--seeds 0:40]
         [--frames N] [--low-memory | --both-memory] [--draw] [--jobs 4] [--warps OUT/warp_dests.json]
+        [--debugger gdb|lldb]
 
 Kinds:
   attract  no input: the boot loop and the demos (use --frames 100000)
@@ -28,6 +29,8 @@ import os
 import random
 import re
 import shlex
+import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -133,9 +136,45 @@ GDB_CMDS = [
     "echo \\n=== SOAK-END ===\\n",
 ]
 
+# lldb (macOS): `-k` commands run only when the process stops (a crash); a clean exit prints
+# "Process N exited with status = RC". -b alone exits 0 whatever the game returned.
+LLDB_CMDS = [
+    "process handle SIGPIPE -n false -p true -s false",
+    "process handle SIGUSR1 -n false -p true -s false",
+    "process handle SIGUSR2 -n false -p true -s false",
+]
+LLDB_CRASH = ["script print('\\n=== SOAK-BT ===')", "bt 30", "script print('\\n=== SOAK-REGS ===')",
+              "register read pc sp", "script print('\\n=== SOAK-END ===')", "quit"]
+LLDB_FRAME_RE = re.compile(r"^\*?\s*frame #(\d+): 0x[0-9a-f]+ [^`\s]+`([^\s(]+)(?:\(.*?\))?(?: \+ \d+)?(?: at (\S+))?")
+LLDB_STOP_RE = re.compile(r"stop reason = (?:signal )?(EXC_[A-Z_]+|SIG[A-Z0-9]+)")
+LLDB_EXIT_RE = re.compile(r"Process \d+ exited with status = (-?\d+)")
+LLDB_PID_RE = re.compile(r"Process (\d+) launched")
+
 FRAME_RE = re.compile(r"^#(\d+)\s+(?:0x[0-9a-f]+ in )?(\S+) \(.*?\)(?: at (\S+))?")
 SKIP_FUNCS = ("raise", "abort", "__pthread_kill", "pthread_kill", "__GI_", "gsignal",
               "__restore_rt", "<signal")
+
+
+def classify_lldb(text, timed_out):
+    if timed_out:
+        return "HANG", [], -1
+    em = LLDB_EXIT_RE.search(text)
+    sm = LLDB_STOP_RE.search(text) if "=== SOAK-BT ===" in text else None
+    if sm is None:
+        rc = int(em.group(1)) if em else -2
+        if rc == 0:
+            return None, [], 0
+        kind = "EXIT%d" % rc
+        if "CrashHandler" in text or "Received signal" in text:
+            kind = "LUSCRASH"
+        return kind, [], rc
+    frames = []
+    bt = text.split("=== SOAK-BT ===", 1)[-1].split("=== SOAK-REGS ===", 1)[0]
+    for line in bt.splitlines():
+        fm = LLDB_FRAME_RE.match(line.strip())
+        if fm:
+            frames.append((fm.group(2), fm.group(3) or ""))
+    return sm.group(1), frames, -1
 
 
 def classify(text, rc, timed_out):
@@ -187,6 +226,8 @@ def run_one(job):
         args.append("--low-memory")  # Linux debug: the game memory below 2 GB (the default is high)
     if a.draw:
         args.append("--draw")
+        if sys.platform == "darwin":
+            args.append("--offscreen-gl")  # macOS: GL with no window (the offscreen driver would still open one)
         env.setdefault("SDL_VIDEODRIVER", "offscreen")
         env.setdefault("vblank_mode", "0")
     else:
@@ -194,10 +235,18 @@ def run_one(job):
     env.setdefault("T2_STATE_LOG", "600")
     full_env = dict(os.environ)
     full_env.update(env)
-    gdb = ["gdb", "-nx", "-batch", "-return-child-result"]
-    for c in GDB_CMDS:
-        gdb += ["-ex", c]
-    gdb += ["--args"] + args
+    if a.debugger == "lldb":
+        gdb = ["lldb", "-b"]
+        for c in LLDB_CMDS + ["run"]:
+            gdb += ["-o", c]
+        for c in LLDB_CRASH:
+            gdb += ["-k", c]
+        gdb += ["--"] + args
+    else:
+        gdb = ["gdb", "-nx", "-batch", "-return-child-result"]
+        for c in GDB_CMDS:
+            gdb += ["-ex", c]
+        gdb += ["--args"] + args
     with open(os.path.join(d, "cmd.sh"), "w") as fp:
         fp.write("#!/bin/sh\n# soak.py %s seed %d\ncd %s\n" % (kind, seed, shlex.quote(d)))
         fp.write(" ".join("%s=%s" % (k, shlex.quote(v)) for k, v in sorted(env.items())))
@@ -217,13 +266,24 @@ def run_one(job):
             p.wait()
     with open(logp, "rb") as lf:
         out = lf.read().decode("utf-8", "replace")
+    if timed_out and a.debugger == "lldb":
+        # lldb's debugserver launches the game in its own process group: kill it by its pid
+        pm = LLDB_PID_RE.search(out)
+        if pm:
+            try:
+                os.kill(int(pm.group(1)), signal.SIGKILL)
+            except OSError:
+                pass
     os.unlink(logp)
     dt = time.time() - t0
     # keep only the useful tail of a passing run's log
     lines = [l for l in out.splitlines() if "[info]" not in l and "[debug]" not in l]
     with open(os.path.join(d, "run.log"), "w") as fp:
         fp.write("\n".join(lines) + "\n")
-    sig, frames_bt = classify(out, rc, timed_out)
+    if a.debugger == "lldb":
+        sig, frames_bt, rc = classify_lldb(out, timed_out)
+    else:
+        sig, frames_bt = classify(out, rc, timed_out)
     last_frame = 0
     for m in re.finditer(r"^\s*frame (\d+):|^game: frame (\d+):|^state: f(?:rame)? ?(\d+)", out, re.M):
         last_frame = int(next(g for g in m.groups() if g))
@@ -253,6 +313,9 @@ def main():
     ap.add_argument("--timeout", type=int, default=1800)
     ap.add_argument("--warps", help="warp_dests.json from tools/assets/levels.py (--kind warp)")
     ap.add_argument("--env", action="append", help="K=V for every run")
+    ap.add_argument("--debugger", choices=["gdb", "lldb"],
+                    default="gdb" if shutil.which("gdb") else "lldb",
+                    help="gdb (Linux) or lldb (macOS; the default when gdb is not on PATH)")
     a = ap.parse_args()
     a.jobs = min(a.jobs, 4)  # the box: python pools <= 4
     a.warp_ids = []
