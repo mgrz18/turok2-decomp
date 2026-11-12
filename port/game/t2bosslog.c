@@ -258,8 +258,11 @@ void T2Port_BossFront(int frame, const char *spec) {
         pos.y = 0.0f;
         pos.z = b->header.m_vPos.z - 2.5f * dist;
         region = CScene__FindRegionAt(&gScene, &pos);
-        printf("bossfront: frame %d primagen (%.1f %.1f %.1f) mode 25 -> player (%.1f %.1f %.1f) region %p\n", frame,
-               b->header.m_vPos.x, b->header.m_vPos.y, b->header.m_vPos.z, pos.x, pos.y, pos.z, (void *) region);
+        printf("bossfront: frame %d primagen (%.1f %.1f %.1f) mode 25 -> player (%.1f %.1f %.1f) region %p"
+               " pathfind %d kind1 %d/%d sight %p\n", frame,
+               b->header.m_vPos.x, b->header.m_vPos.y, b->header.m_vPos.z, pos.x, pos.y, pos.z, (void *) region,
+               (int) b->m_AI.m_PathFindCount, (int) gScene.m_Kind1Cursor, (int) gScene.m_nKind1,
+               (void *) b->m_AI.m_pSightTarget);
         fflush(stdout);
         if (region != 0) {
             CGameObjectInstance *a = &p->m_CharacterActor;
@@ -414,10 +417,18 @@ int T2Port_AimNode(int frame, const char *spec) {
     f32 r = comma != NULL ? (f32) atof(comma + 1) : 4000.0f, bestD, dx, dy, dz, h;
     int i;
 
-    /* T2_AIM_NODE=...@LEVEL (round 11 z3): only in that level (a whole-level route ends in a boss) */
+    /* T2_AIM_NODE=...@LEVEL (round 11 z3): only in that level (a whole-level route ends in a boss);
+     * @L1/L2/... (round 12 a2): in any of them (level 6's route: the Mother 3, then the Primagen 4) */
     const char *at = strchr(spec, '@');
-    if (at != NULL && atoi(at + 1) != (int) gScene.m_nLevel) {
-        return 0;
+    if (at != NULL) {
+        int in = 0;
+        do {
+            in |= atoi(at + 1) == (int) gScene.m_nLevel;
+            at = strchr(at + 1, '/');
+        } while (at != NULL);
+        if (!in) {
+            return 0;
+        }
     }
     if (p == NULL || p->m_pCamera == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL ||
         gScene.m_WarpState != 0) {
@@ -512,6 +523,61 @@ void T2Port_Cheats(int frame, const char *spec, const char *fill) {
         for (p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
             CPlayer__FillAllAmmo(p);
         }
+    }
+}
+
+/* T2_GIVE_ITEMS=ID[:N][,...] (game.cpp, every frame; DEBUG-ONLY, round 12 a2): once, on the first gameplay
+ * frame with a player, set the special pickup counts the earlier levels would have given
+ * (m_Data.m_SpecialPickupCount[ID - 4000], low nibble the count held, high nibble the count found,
+ * as CPlayer__CollectKeyPiece keeps them): the crystal ion capacitor 4231 (level 3), the red laser
+ * cells 4229 (level 5), the blue laser cells 4230 (level 4) that level 6's actions need
+ * (CActionIntelligence.m_GoPickupNeeded, Action_CheckRequiredItem). N defaults to 1; "@F": not before
+ * frame F (a new game clears the counts: give them once the player is in the hub); several groups
+ * "...@F1;...@F2" are each applied once (the count is set, not added). */
+void T2Port_GiveItems(int frame, const char *spec) {
+    static unsigned sDone = 0;
+    CPlayer *p;
+    int group = 0;
+    if (gEngineApp.m_Settings.mode != 13) {
+        return;
+    }
+    p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    if (p == NULL) {
+        return;
+    }
+    /* groups "ID[:N],...[@F]" separated by ';', each applied once */
+    for (; *spec != 0 && group < 32; group++) {
+        const char *end = strchr(spec, ';'), *at = strchr(spec, '@');
+        if (end == NULL) {
+            end = spec + strlen(spec);
+        }
+        if (at != NULL && at > end) {
+            at = NULL;
+        }
+        if (!(sDone & (1u << group)) && (at == NULL || frame >= atoi(at + 1))) {
+            const char *q = spec;
+            sDone |= 1u << group;
+            while (q < end && *q != '@') {
+                char *e;
+                long id = strtol(q, &e, 0), n = 1;
+                if (e == q) {
+                    break;
+                }
+                q = e;
+                if (*q == ':') {
+                    n = strtol(q + 1, &e, 0);
+                    q = e;
+                }
+                if (id >= 4000 && id < 4000 + 1024 && n >= 0 && n <= 15) {
+                    p->m_Data.m_SpecialPickupCount[id - 4000] = (u8) ((n << 4) | n);
+                    printf("debug: T2_GIVE_ITEMS: frame %d level %d item %ld x%ld\n", frame, (int) gScene.m_nLevel, id, n);
+                }
+                while (*q == ',' || *q == ' ') {
+                    q++;
+                }
+            }
+        }
+        spec = *end == ';' ? end + 1 : end;
     }
 }
 

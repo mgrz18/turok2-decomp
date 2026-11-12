@@ -83,6 +83,14 @@ static void T2Port_LogOne(const char *kind, int i, CGameObjectInstance *o, CGame
            info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_DropMask2 : 0u,
            (unsigned) (u16) o->m_AI.m_AnimType, (int) o->m_AI.m_AnimIndex, (int) o->m_AI.m_AnimRepeatedCount,
            info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_StartAnim : 0u);
+    if (info != NULL && info->m_Type == INTELLIGENCE_ACTION) {
+        /* round 12 a2: an action object (a switch, a coupling): what works it (CScene__CheckAutoActivation:
+         * type flag 4 the player within m_AutoGoRadius, Action_CheckRequiredItem the pickup needed) */
+        printf("actor:   action fl %x radius %.1f height %.1f gorad %.1f goanim %d need %d text %d\n",
+               (unsigned) info->m_Action.m_dwFlags, info->m_Action.m_CollisionRadius,
+               info->m_Action.m_CollisionHeight, info->m_Action.m_AutoGoRadius, (int) info->m_Action.m_GoAnim,
+               (int) info->m_Action.m_GoPickupNeeded, (int) info->m_Action.m_GoPickupNeededText);
+    }
 }
 
 static void T2Port_LogActors(CPlayer *p) {
