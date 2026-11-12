@@ -202,10 +202,16 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("out", nargs="?", default=".")
     ap.add_argument("--fight", type=int, metavar="WEAPON", help="fight the totem defense with this weapon")
-    ap.add_argument("--level", type=int, default=1, choices=(1, 2), help="1: the Port of Adia, 2: the River of Souls")
+    ap.add_argument("--level", type=int, default=1, choices=(1, 2, 5, 6),
+                    help="1: the Port of Adia, 2: the River of Souls, 5: the Hive of the Mantids, 6: the Lightship (tools/port/routes56.py)")
     a = ap.parse_args()
     if a.level == 2:
         inputs, tps, env = build_level2()
+    elif a.level in (5, 6):
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import routes56  # round 11 z4: levels 5 and 6
+        inputs, tps, env = routes56.build_level56(a.level, NEW_GAME, FIRE_EVERY)
     else:
         inputs, tps = build(SEGMENTS)
         env = []
