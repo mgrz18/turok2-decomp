@@ -220,7 +220,7 @@ def build_level2(fight_frames=True):
             inputs.append("Z@%d..%d" % (f, f + 6))
     env = ["T2_WARP_TO=1999", "T2_GIVE_WEAPONS=1", "T2_WEAPON=10", "T2_CHEATS=1", "T2_FILL_AMMO=300",
            "T2_AIM_AT=\"%s\"" % ";".join(aim_at), "T2_AIM_ENEMY=\"%s\"" % ";".join(aim_enemy),
-           "T2_FACE_NEAREST=4000@110", "T2_FACE_PITCH=1"]
+           "T2_FACE_NEAREST=4000@110", "T2_FACE_PITCH=1", "T2_FACE_STICKY=1"]
     return inputs, tps, env
 
 
@@ -363,7 +363,9 @@ L4_SEGMENTS = [
 L4_TOTEM = (9850, 4000, 112)   # the Cave Totem's defence is won by ~29,600 (8/8)
 # The Blind One (level 1, 7401 after the totem: keys[3] set, keys[5] not): at ~30,500. Round 10 y2's
 # recipe: on the ledge (-400, 204.8, 0), fire held, T2_AIM_NODE=boss (only in level 1 here).
-L4_BOSS = (14000, 12000, (-400.0, 204.8, 0.0, -1.5708), 1)
+# Round 11 C26: the teleport 1,000 frames later (on the merged tree the Cave Totem is won at
+# ~31,000 and the warp to level 1 lands at 31,264: the old 31,000 teleport came before it)
+L4_BOSS = (15000, 12000, (-400.0, 204.8, 0.0, -1.5708), 1)
 
 
 def build_hub_level(segments, start, portal=None, warp="1999", totem=None, boss=None):

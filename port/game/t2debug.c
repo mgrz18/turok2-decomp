@@ -499,9 +499,13 @@ void T2Port_FaceNearest(int frame, const char *spec) {
     static CGameObjectInstance *sLast;
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
     CGameObjectInstance *pl, *best = NULL;
-    f32 r = (f32) atof(spec), bestD;
+    f32 r = (f32) atof(spec), bestD, lastD = -1.0f;
     int i;
+    static int sSticky = -1;
 
+    if (sSticky < 0) {
+        sSticky = getenv("T2_FACE_STICKY") != NULL;
+    }
     if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL || gScene.m_WarpState != 0) {
         return;
     }
@@ -523,6 +527,9 @@ void T2Port_FaceNearest(int frame, const char *spec) {
         dx = o->header.m_vPos.x - pl->header.m_vPos.x;
         dz = o->header.m_vPos.z - pl->header.m_vPos.z;
         d = dx * dx + dz * dz;
+        if (o == sLast) {
+            lastD = d;
+        }
         if (d < bestD) {
             bestD = d;
             best = o;
@@ -541,6 +548,9 @@ void T2Port_FaceNearest(int frame, const char *spec) {
             dx = o->header.m_vPos.x - pl->header.m_vPos.x;
             dz = o->header.m_vPos.z - pl->header.m_vPos.z;
             d = dx * dx + dz * dz;
+            if (o == sLast) {
+                lastD = d;
+            }
             if (d < bestD) {
                 bestD = d;
                 best = o;
@@ -549,6 +559,13 @@ void T2Port_FaceNearest(int frame, const char *spec) {
     }
     if (best == NULL) {
         return;
+    }
+    /* T2_FACE_STICKY=1 (round 11 C26): keep the last target while it lives and is at most 25 %
+     * farther than the nearest: two City Totem attackers at the same distance below the ledge
+     * took the aim in turns every few frames and neither died (the defence failed at 6/8) */
+    if (sSticky && best != sLast && lastD >= 0.0f && lastD <= r * r && lastD <= bestD * 1.5625f) {
+        best = sLast;
+        bestD = lastD;
     }
     pl->m_RotY += AI_AngleToPoint(pl, best->header.m_vPos);
     {
