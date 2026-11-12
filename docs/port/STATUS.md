@@ -458,6 +458,31 @@ Next for levels 3/4: walk the sub-levels instead of hopping (the doors behind th
 flesh-eater (80, 81) portals and the level keys (4340/4362, 4350); the "level not complete"
 screen's mirrored title against the N64 (PLAYTHROUGH.md 7.2); and levels 5 and 6 (z4).
 
+## Round 11, part z4: the round-10 merged tree on macOS, levels 5 and 6 (branch names-R11_z4)
+
+No `src/`/`include/` change. Detail: [MACOS.md](MACOS.md) section 13, [PLAYTHROUGH.md](PLAYTHROUGH.md)
+section 9 (section 7 on the branch).
+
+- **The Mac runs the merged tree** (headless, `--offscreen-gl`): boot + 3 demos, level 1 (hub at
+  21,500), level 2 (Linux's events), the Mother, the Blind One, save/load, `--audio` (RMS 3,402.2),
+  a new-game soak (8 x 36,000, 0 crashes). **Mac = Linux frame for frame** (`T2_DET_LOG`) in the
+  boot, level 1, the Mother, the Blind One and the fight; **level 2 diverges at frame 42,124**
+  (a `CParticleSystem__Spawn` allocates one effect fewer on the Mac; open, MACOS.md 13.2). The det
+  line's `ptcl` hash now also covers the particle pool's lists (port/game/t2det.c).
+- **Levels 5 and 6 mapped and entered**: `playthrough.py --level 5 | 6` (tools/port/routes56.py)
+  walks into the hub portals 5000 / 6000, plays the intro cinemas and tours the sub-levels by
+  their own warps: level 5 all of 124, 84-91, 93-96 (one debug hop past the hive's force field);
+  level 6 114-122, then **a crash on both hosts** in `Model_Decompress` after "assembly plant
+  destroyed." in 122 (a queued model decompression reads clobbered cache memory while the font is
+  loaded synchronously; open). No objective is scored yet (pylons, embryos, the computer,
+  couplings: open).
+- `T2_EVENT_LOG`: the objective counters of levels 4-6 (types 8, 9/10, 11/12); level 124 counts as
+  level 5.
+- Merge notes: `tools/port/playthrough.py` (z1/z3 also edit it): only the `--level` choices and a
+  4-line branch calling `routes56.build_level56`; `port/game/t2debug.c` (`T2Port_HubLevelOf`,
+  `T2Port_LogEvent`'s counters: z3 may touch the level 3/4 mapping); `port/game/t2det.c` (the
+  list hash: z5 also works on the det log).
+
 ## Round 10, part y4: the merged tree on macOS, host determinism, real time (branch names-R10_y4)
 
 Detail: [MACOS.md](MACOS.md) section 12, [PERF.md](PERF.md) section 5. Commits (asm_diff 0 vs

@@ -494,3 +494,92 @@ under plasma fire (28,001), the Blind One's eye under fire (39,600), the white f
    walk them.
 2. The talisman portals (74, 75), the flesh-eater portals (80, 81) and the level keys.
 3. The "level not complete" screen's title (mirrored letters at one frame) against the N64.
+
+## 9. Levels 5 and 6: the Hive of the Mantids, the Lightship (Phase 7 round 11, part z4)
+
+Mapped with `tools/assets/levels.py` (the warp regions, the link records and their messages,
+the link group types table, cart 19: `{4, 104, s32 type[104]}`, a type's index is its link
+group). Routes in `tools/port/routes56.py`, used by `playthrough.py --level 5 | 6`; same method as
+level 2 (one `--input` file and one `T2_TELEPORT` list; the game's own warps, cinemas and events).
+Run on the Mac (the same files run on Linux):
+
+```sh
+python3 tools/port/playthrough.py DIR --level 5 && . DIR/teleport.env
+SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_STATE_LOG=50 build/app/turok2 --archive turok2.o2r \
+    --rom ../baserom.us.z64 --game --draw --pak-blank --frames 33000 --input @DIR/playthrough.txt
+```
+
+### 9.1 The level graph
+
+| level | hub portal | start | sub-levels (warp -> level) | exit |
+|---|---|---|---|---|
+| 5 | 5000 (hub 60, region by (-1802, -289, 954)), intro cinemas 31, 25-30, 32 | 124 HIVE TOP (-1921, 0, 2367) | 124: 5201 -> 84; 84: 5100 -> 85; 85: 5013 -> 86; 86: 5120 -> 87; 87: 5023 -> 88 (5003 -> 82 flesh portal); 88: 5033 -> 89 (5001 -> 76 talisman); 89: 5053 -> 90; 90: 5010 -> 94; 94: 5021 -> 91; 91 (the hive's hub): 5500 -> 95, 5073 -> 96, 5060 -> 93, 5813 -> 92, 7500 | 7500 (91 or 124) -> the Hive Totem (113) |
+| 6 | 6000 (hub 60, region by (-93, -147, 2384)), intro cinemas 157, 158, 155, 156, 159-161 | 114 Level 6A (1232, 0, -4007) | 114 (the ship's hub): 6100 -> 115, 6200 -> 116, 6300 -> 118, 6010 -> 120; 116: 6202 -> 117; 118: 6302 -> 119; 120: 6400 -> 121, 6499 -> 123; 121: 6402 -> 122 (6001 -> 77 talisman); 122: 6404 -> 123; 123: 6003 -> 83 flesh portal | 7601 (114) -> the Primagen (level 3) |
+
+**Objectives** (`Mission_LevelObjectivesDone`: level 5 link group types 9/10 = groups 44/98,
+level 6 types 11/12 = groups 97/89; the menu's totals 3 and 4):
+
+- level 5: **3 embryos** (object 109: 94 actor 19 at (1229, 0, -4301), 95 actor 27 at (307, 0,
+  -1075), 96 actor 31 at (-2765, 1229, 768); "embryo destroyed.", the last "all embryos
+  destroyed. mission complete.") and **the master computer** (93 actor 54, object 331, at (1843,
+  922, 154); actor 8 "warning, five seconds until detonation."). The hive in 124 is closed by a
+  **force field** (actor 23) that drops when the 4 pylons (object 139, actors 9-12 at (0, 0,
+  -1971), (0, 0, 2867), (±2406, 0, 461)) are gone (group 49: "force field down."). More force
+  fields in 84, 85, 87, 88, 89 ("force field generator destroyed.").
+- level 6: **4 power generators**, each 4 couplings (object 288) around 115 (4915, 51, 1536),
+  117 (2457, 51, -2304), 119 (-5683, -154, -2457), 123 (0, 51, -4608) ("power generator
+  recalibrated.", "all power generators recalibrated. mission complete."); **3 assembly plants**
+  (121 actor 37, object 376; 122 actor 23, object 283; 123 actors 24/25, object 183: "assembly
+  plant destroyed.", "all assembly plants destroyed. mission complete."). The force field round
+  the exit 7601 in 114 (object 320, actors 69-72) drops with the 4 "force field generator
+  disabled." objects (object 232: 115 actor 38, 116 actor 53, 119 actor 23, 123 actor 33).
+
+**Warp regions.** A warp fires in `enter_surface` (func_0024C47C) when the player enters a
+region whose info has flag 0x40000: with flag 0x200000 only from a region without 0x40000,
+otherwise only standing on its floor. Level 5's warp regions are 0x241000: the route teleports to
+the next region in (`approach.py --steps 1`) and walks 80 frames; level 6's are floor pads: onto
+the region's centroid and 40 frames of walk.
+
+### 9.2 The runs (Mac, headless, `--draw`; Linux the same up to the crash)
+
+**Level 5** (33,000): the portal at 13,310, the intro cinemas, **124 at 17,300**; the four pylon
+windows (plasma, `T2_AIM_AT`) do not bring the field down (open); a debug hop
+(`T2_WARP_TO=5201@20150`, `routes56.L5_HOPS`) into 84; then the game's own warps through **every
+sub-level**: 84 (20,250), 85 (20,600), 86 (21,050), 87 (21,450), 88 (21,850), 89 (22,250), 90
+(22,650), 94 (23,000), 91 (24,400), 95 (24,800), 91, 96 (26,600), 91, **93 (28,400)**; in 93 the
+player dies (level 164, the death sequence, back to 93 at 29,600 with `T2_CHEATS=1`: not damage,
+an instant death; open), then 91 and the exit 7500, which with the objectives open sends the
+player back to 124 (30,200). No crash. The embryo and computer windows score nothing yet (the
+aims are placeholders: no event).
+
+**Level 6** (33,000): the portal, the cinemas 157-161, **114 at 18,950**; 115 (19,300), 114, 116
+(21,100), 117 (21,500), 114, 118 (23,300), 119 (23,700), 114, 120 (25,500), 121 (25,900), 122
+(27,300): **"assembly plant destroyed."** (27,793, the plant in 122 under plasma fire), then a
+**crash on both hosts** (Mac SIGSEGV, Linux exit 1 with its backtrace handler):
+
+    Model_Decompress (func_00209AF4.c:126, partCount = *parts)  <- Model_DecompressCallbackExtra
+      <- CDecompressor__Main   (the decompressor thread, running a queued job for object 283,
+                                the plant's own model: block 0 344 bytes, block 1 8, block 2 garbage:
+                                lodCount 0x3F3F00)
+    game thread: COnScreen__DrawText("assembly plant destroyed.") -> CScene__LoadGraphicSet(2)
+      -> CCache__Request(key 0x1F8509C, 25,304 bytes, direct) -> CDecompressor__DecompressSync
+      -> osSetThreadPri: the decompressor runs its pending model job
+
+The message text needs the font graphicset, which the cache loads synchronously; the pending model
+decompression then reads memory that no longer holds object 283's unpacked data (its set header
+is intact, block 2 is not). Suspect: the synchronous allocation evicts or moves cache memory under
+a queued decompress job (host-sized entries are larger than the N64's, so the cache is fuller than
+on the console). Not fixed this round.
+
+The generator couplings (aimed fire at each cluster in 115, 117, 119) score nothing yet: how
+"recalibrate" works (shot, touched, or the use button) is open.
+
+### 9.3 Open (levels 5 and 6)
+
+1. The 122 crash above (both hosts): first in the way of level 6.
+2. Level 5: the pylons (what kills object 139: the aim height, a weapon, a switch); the death in
+   93; the embryos and the master computer with real aims (the embryos are type 403; the
+   computers type 1610).
+3. Level 6: the couplings (object 288, intelligence 574); the force field generators (object 232);
+   then 7601 -> the Primagen (z2's boss recipe starts there).
+4. The flesh-eater (82, 83) and talisman (76, 77, 92) portals; the totem 113.

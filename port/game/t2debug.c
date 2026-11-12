@@ -735,7 +735,10 @@ int T2Port_HubLevelOf(int level) {
     if ((level >= 84 && level <= 96) || level == 76 || level == 82 || level == 113) {
         return 5;
     }
-    if ((level >= 114 && level <= 124) || level == 77 || level == 83) {
+    if (level == 124) { /* HIVE TOP: level 5's start (round 11 z4) */
+        return 5;
+    }
+    if ((level >= 114 && level <= 123) || level == 77 || level == 83) {
         return 6;
     }
     return 1;
@@ -755,18 +758,17 @@ void T2Port_LogEvent(LevelEvent *e, const char *text) {
         buf[i] = (text[i] == '\n') ? '|' : text[i];
     }
     buf[i] = 0;
-    /* the objective counters of the level's hub (Mission_LevelObjectivesDone: link group types
-     * 2k and 2k+1, k = 1..6; level 1: 2 = distress beacons, 3 = children; level 2 (round 10 y1):
-     * 4 = soul gates, 5 = sisters of despair) */
-    /* (round 11 z3) Mission_LevelObjectivesDone's own types per hub level: 2/3, 4/5, 6/7, 8 alone
-     * (level 4: the second number is printed as 0), 9/10, 11/12 */
-    static const signed char kTypes[7][2] = { { 0, 0 }, { 2, 3 }, { 4, 5 }, { 6, 7 }, { 8, 0 }, { 9, 10 }, { 11, 12 } };
+    /* the objective counters of the level's hub (Mission_LevelObjectivesDone's link group types:
+     * level 1: 2 = distress beacons, 3 = children; level 2 (round 10 y1): 4 = soul gates, 5 =
+     * sisters of despair; 3: 6/7; 4: 8 only; level 5 (round 11 z4): 9 = embryos, 10 = the master
+     * computer; level 6: 11 = power generators, 12 = assembly plants) */
+    static const signed char kObjTypes[7][2] = { { 2, 3 }, { 2, 3 }, { 4, 5 }, { 6, 7 }, { 8, -1 }, { 9, 10 }, { 11, 12 } };
     int k = T2Port_HubLevelOf((int) gScene.m_nLevel);
     printf("event: frame %d (gameplay %d) level %d mode %d: actor %d of level %d kind %d handler %d msg %d \"%s\" music %d flags %x"
            " key %d objectives %d/%d\n",
            gT2HostFrame, (int) gFrameCountGameplay, (int) gScene.m_nLevel, (int) gScene.m_Mode, (int) e->actor, (int) e->level,
            (int) e->kind, (int) e->handler, (int) e->message, buf, (int) e->music, (unsigned) e->flags, (int) e->padF,
-           (int) CScene__GetLinkGroupCount(&gScene, kTypes[k][0]),
-           kTypes[k][1] ? (int) CScene__GetLinkGroupCount(&gScene, kTypes[k][1]) : 0);
+           (int) CScene__GetLinkGroupCount(&gScene, kObjTypes[k][0]),
+           kObjTypes[k][1] < 0 ? -1 : (int) CScene__GetLinkGroupCount(&gScene, kObjTypes[k][1]));
     fflush(stdout);
 }
