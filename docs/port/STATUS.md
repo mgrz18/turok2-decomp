@@ -281,6 +281,57 @@ Fixes on the merged tree (asm_diff 0):
    so far), and this merged tree on the Mac.
 10. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
 
+## Round 11, part z3: levels 3 and 4 (branch names-R11_z3)
+
+Branch names-R11_z3 from 2df5517d. Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) sections 7 and 8.
+Commits (`include/` change: `asm_diff --base 2df5517d -j 8` over the whole tree = 0 of 3,938):
+
+- dfd3216c **`CCameraText.m_nId` is `sptr`** (include/structs/camera.h). `CCameraPool__AddMultiLineText`
+  drops a camera's texts with the same id before it adds the new one. On the host the id (the
+  owning object's pointer) was cut to s32 and never matched, so a message re-added every frame,
+  like "satchel charge required." while the player pushes against the charge point, stacked into
+  a full screen of copies. decls.json dropped and gendata rerun (no data uses the struct).
+- c2f3976f `T2_EVENT_LOG`: the "objectives A/B" counters now use `Mission_LevelObjectivesDone`'s
+  own link-group types (level 3: 6/7, level 4: 8 alone, level 5: 9/10, level 6: 11/12; levels 1-2
+  unchanged).
+- 9c791996 `T2_AIM_NODE=SPEC@LEVEL`: aim only in that level (the level-4 route ends at the Blind One).
+- d60bafb7 **`playthrough.py --level 3` and `--level 4`** (+ `--direct`: no hub, no cinemas, for
+  quick runs; `--level 1/2` output is byte-identical to before).
+
+Results (Linux, headless, `--draw`, PIE, exit 0, no crash):
+
+- **Level 3, the Death Marshes, to completion** (36,000): hub portal 3000 -> the intro cinemas
+  -> 61 at ~18,200. **5/5 prisoners freed** ("all prisoners free. mission complete." at 24,243)
+  and **3/3 ammo storage facilities destroyed** with the 3 satchel charges ("armories destroyed.
+  mission complete." at 25,097). Then exit 7300 -> **the Marsh Totem (111) at ~26,500, defence
+  won 8/8 at 31,600** (totem untouched), **the hub at ~32,400**.
+- **Level 4, the Lair of the Blind, to completion** (42,000): portal 4000 -> 98 at ~16,900. The 3
+  vent chambers: key -> switch ("vent chamber located.") -> satchel charge -> "thermal vent
+  sealed.", three times: **"blind ones trapped. mission complete."** at 25,199. Then exit 7400 ->
+  **the Cave Totem (112), defence won 8/8 at 29,600**, then 7401 -> **the Blind One's arena
+  (level 1) at ~30,500**. The rest of round 10 y2's recipe (`T2_AIM_NODE=boss@1`, fire held): the minion phases, **the Blind One's death (mode 9) at 39,693**, the cave, **the hub at ~40,250 with "NEW CHEAT ENABLED"** (at the portal, warp record 4999).
+- How the objectives work (found this round): the prisoners, the armories' charge points and the
+  vents are type-10 actions. A bump by the player fires their mask-2 records. An action whose
+  intelligence names a `m_GoPickupNeeded` item (+0x2A; 4100/4111 satchel charge, 4020 key, 4025
+  level 2's graveyard key) uses one or shows its text (`Action_CheckRequiredItem`). The items are
+  level actors in the grid sections; their id is the object's type (cart 2, a u16 per object).
+- No port crash or data/ABI blocker was hit in levels 3 or 4. All sub-levels on the routes
+  (61-71, 98-103, 105-108, 111, 112, 1) load, draw and run their events. 104 was not entered.
+
+Merge notes: `port/game/t2bosslog.c` (`T2Port_AimNode`: the early `@LEVEL` return; z1 changes the
+function to return int and adds `actor:N`, so the return needs a value there) and
+`port/game/t2debug.c` (the `kTypes` table in `T2Port_LogEvent`; z1 touches `AimEnemy`/`FaceNearest`
+in the same file). `tools/port/playthrough.py`: z1 and z4 extend it too (z3 adds
+`build_hub_level`, `L3_*`, `L4_*`, `--direct`). The counter change shifts the "objectives A/B"
+numbers quoted in other parts' docs for levels 3+ (levels 1 and 2 are unchanged).
+`include/structs/camera.h` (z5 works on the camera: one line). Not committed:
+captures, logs.
+
+Next for levels 3/4: walk the sub-levels instead of hopping (the doors behind the switches of
+106-108; 104; the enemies of the routes are mostly not fought). Also: the talisman (74, 75) and
+flesh-eater (80, 81) portals and the level keys (4340/4362, 4350); the "level not complete"
+screen's mirrored title against the N64 (PLAYTHROUGH.md 7.2); and levels 5 and 6 (z4).
+
 ## Round 10, part y4: the merged tree on macOS, host determinism, real time (branch names-R10_y4)
 
 Detail: [MACOS.md](MACOS.md) section 12, [PERF.md](PERF.md) section 5. Commits (asm_diff 0 vs
