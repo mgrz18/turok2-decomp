@@ -306,6 +306,11 @@ void T2Port_AimNode(int frame, const char *spec) {
     f32 r = comma != NULL ? (f32) atof(comma + 1) : 4000.0f, bestD, dx, dy, dz, h;
     int i;
 
+    /* T2_AIM_NODE=...@LEVEL (round 11 z3): only in that level (a whole-level route ends in a boss) */
+    const char *at = strchr(spec, '@');
+    if (at != NULL && atoi(at + 1) != (int) gScene.m_nLevel) {
+        return;
+    }
     if (p == NULL || p->m_pCamera == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL ||
         gScene.m_WarpState != 0) {
         return;
