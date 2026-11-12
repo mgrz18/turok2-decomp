@@ -420,7 +420,15 @@ def main():
                     help="1: the Port of Adia, 2: the River of Souls, 3: the Death Marshes, 4: the Lair of the Blind, "
                          "5: the Hive of the Mantids, 6: the Lightship (tools/port/routes56.py)")
     ap.add_argument("--direct", action="store_true", help="level 3+: warp straight to the first sub-level (no hub)")
+    ap.add_argument("--all", action="store_true", help="one continuous run from a new game: levels 1-4 through the hub "
+                    "portals, the keys, a save after each level (tools/port/fullrun.py, PLAYTHROUGH.md section 10)")
     a = ap.parse_args()
+    if a.all:
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import fullrun  # round 12 a3
+        fullrun.main_all(a.out)
+        return
     if a.level == 4:
         if a.direct:
             inputs, tps, env = build_hub_level(L4_SEGMENTS, L4_DIRECT_START, warp="4132", totem=L4_TOTEM, boss=L4_BOSS)

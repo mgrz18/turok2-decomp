@@ -492,6 +492,42 @@ void T2Port_Teleport(int frame, const char *spec) {
     }
 }
 
+/* T2_ANCHOR=L@N[;L@N...] (DEBUG-ONLY, round 12 a3): re-anchor the schedule clock of a long scripted
+ * run. The --input entries and the frame-scheduled switches (T2_TELEPORT, T2_AIM_*, T2_FACE_*,
+ * T2_BOSS_FRONT, T2_FILL_AMMO, T2_DOOR_OPEN, T2_SAVE_PORTAL, T2_WARP_TO) read the schedule frame,
+ * which is the host frame until the first anchor: when the game is in gameplay in level L (its warp
+ * done) for the next pending anchor, the schedule frame becomes N there and runs on from it. A
+ * totem fight or a door that ends a few frames earlier or later then no longer shifts every later
+ * step of a continuous run (tools/port/fullrun.py). The anchors fire in order, each once, and only
+ * once the schedule frame is within 3,000 frames before N (a hub visited twice). */
+int T2Port_ScheduleFrame(int frame) {
+    static const char *spec;
+    static int init, delta;
+    static const char *next;
+
+    if (!init) {
+        init = 1;
+        spec = getenv("T2_ANCHOR");
+        next = spec;
+    }
+    if (next != NULL && *next != '\0' && gEngineApp.m_Settings.mode == 13 && gScene.m_WarpState == 0) {
+        int l = atoi(next);
+        const char *at = strchr(next, '@');
+        int n = at != NULL ? atoi(at + 1) : 0;
+        if (at != NULL && l == gScene.m_nLevel && frame - delta >= n - 3000) {
+            printf("anchor: frame %d level %d: schedule frame %d -> %d (offset %+d)\n", frame, l, frame - delta, n,
+                   frame - delta - n);
+            fflush(stdout);
+            delta = frame - n;
+            next = strchr(next, ';');
+            if (next != NULL) {
+                next++;
+            }
+        }
+    }
+    return frame - delta;
+}
+
 /* T2_WAKE_ENEMIES=R (DEBUG-ONLY, round 7 v3): in gameplay, wake every dormant level enemy within R
  * units of the player (default 1500) the way its level event does (EnemyAI_SleepIfOffscreen, the
  * enemy event handler 1: flags 0x2100 and mode 2). Enemies whose definition has flag 0x1000 sleep until a
@@ -546,8 +582,23 @@ void T2Port_FaceNearest(int frame, const char *spec) {
     if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL || gScene.m_WarpState != 0) {
         return;
     }
-    if (strchr(spec, '@') != NULL && atoi(strchr(spec, '@') + 1) != gScene.m_nLevel) {
-        return; /* R@LEVEL: only in that level (round 9 x1: the totem fight of a scripted run) */
+    if (strchr(spec, '@') != NULL) {
+        /* R@LEVEL: only in that level (round 9 x1: the totem fight of a scripted run);
+         * R@L1,L2,...: in any of them (round 12 a3: the totems of one continuous run) */
+        const char *l = strchr(spec, '@') + 1;
+        int in = 0;
+        while (l != NULL && *l != '\0') {
+            if (atoi(l) == gScene.m_nLevel) {
+                in = 1;
+            }
+            l = strchr(l, ',');
+            if (l != NULL) {
+                l++;
+            }
+        }
+        if (!in) {
+            return;
+        }
     }
     if (r <= 0.0f) {
         r = 2000.0f;
@@ -700,7 +751,7 @@ void T2Port_AimEnemy(int frame, const char *spec) {
     }
 }
 
-/* T2_SAVE_PORTAL=F (DEBUG-ONLY, round 8 w5): at frame F, in gameplay, open the save portal menu
+/* T2_SAVE_PORTAL=F[,F2...] (DEBUG-ONLY, round 8 w5): at frame F, in gameplay, open the save portal menu
  * (gSavePortalMenuDesc) for the first player, as CPlayerPool__Update does when a save portal's
  * cinema (script 400) ends, to reach the game's own save path (PakMenu_InitSaveGame,
  * SaveGame_Build, PakMenu_WriteSaveGame) without walking to a portal. Called every frame. */
@@ -708,7 +759,20 @@ extern struct MenuDesc gSavePortalMenuDesc;
 void T2Port_SavePortal(int frame, const char *spec) {
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
 
-    if (p == NULL || p->m_pCamera == NULL || gEngineApp.m_Settings.mode != 13 || frame != atoi(spec)) {
+    const char *f = spec;
+    int at = 0;
+
+    /* F1,F2,... (round 12 a3): a save after each level of one continuous run */
+    while (f != NULL && *f != '\0') {
+        if (atoi(f) == frame) {
+            at = 1;
+        }
+        f = strchr(f, ',');
+        if (f != NULL) {
+            f++;
+        }
+    }
+    if (p == NULL || p->m_pCamera == NULL || gEngineApp.m_Settings.mode != 13 || !at) {
         return;
     }
     printf("debug: frame %d: T2_SAVE_PORTAL: the save portal menu in level %d\n", frame, (int) gScene.m_nLevel);
