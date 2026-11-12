@@ -615,7 +615,10 @@ void T2Port_AimAt(int frame, const char *spec) {
             at.y = y;
             at.z = z;
             pl->m_RotY += AI_AngleToPoint(pl, at);
-            p->m_pCamera->m_ViewParams.m_vRotOffset.x = atan2f(dy, sqrtf(dx * dx + dz * dz));
+            extern f32 T2Port_Atan2f(f32 y, f32 x);
+            /* not libm's atan2f: its last bit differs between macOS and glibc (round 12 a4: a
+             * level-2 shot's velocity 1 ulp apart at frame 42,184) */
+            p->m_pCamera->m_ViewParams.m_vRotOffset.x = T2Port_Atan2f(dy, sqrtf(dx * dx + dz * dz));
             if (frame == f1) {
                 printf("aimat: frame %d eye (%.1f %.1f %.1f) -> (%.1f %.1f %.1f) pitch %.2f\n", frame, eye.x, eye.y,
                        eye.z, x, y, z, p->m_pCamera->m_ViewParams.m_vRotOffset.x);
