@@ -149,6 +149,25 @@ void T2Port_LogDet(int frame) {
                        T2Det_Bits(pt->m_vVelocity.y), T2Det_Bits(pt->m_vVelocity.z), (unsigned) pt->m_dwFlags);
             }
         }
+        /* round 11 z4: the pool's lists (free, draw, the 3 active lists) as slot sequences: a slot
+         * freed or allocated in another order keeps its values, so the slot hash above misses it */
+        {
+            CList *ls[5];
+            int j;
+            ls[0] = &gScene.m_ParticleSystem.m_FreeList;
+            ls[1] = &gScene.m_ParticleSystem.m_DrawList;
+            for (j = 0; j < 3; j++) {
+                ls[2 + j] = &gScene.m_ParticleSystem.m_ActiveList[j];
+            }
+            for (j = 0; j < 5; j++) {
+                u8 *e = (u8 *) ls[j]->m_pHead;
+                hp = T2Det_Mix(hp, (u32) ls[j]->m_nCount);
+                for (k = 0; e != NULL && k < 129; k++) {
+                    hp = T2Det_Mix(hp, (u32) ((e - (u8 *) gScene.m_ParticleSystem.m_ParticleVars) / (int) sizeof(CParticle)));
+                    e = *(u8 **) (e + ls[j]->m_NextOffset);
+                }
+            }
+        }
         printf("det: frame %d actors %d hash %016llx ptcl %016llx\n", frame, n, (unsigned long long) h,
                (unsigned long long) hp);
     }
