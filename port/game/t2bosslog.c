@@ -105,7 +105,9 @@ void T2Port_LogBossHurt(const char *who, void *obj, void *arg) {
     if (!on) {
         return;
     }
-    printf("bosshurt: %s obj %p dmg %d flags %x frame %p nodes %x factor %.2f src %p\n", who, obj,
+    printf("bosshurt: %s obj %p vis %x mode %d dmg %d flags %x frame %p nodes %x factor %.2f src %p\n", who, obj,
+           obj ? (unsigned) ((CGameObjectInstance *) obj)->m_AI.m_VisBits : 0u,
+           obj ? (int) ((CGameObjectInstance *) obj)->m_AI.m_Mode : -1,
            (int) hit->damage, (unsigned) hit->flags, (void *) hit->frame,
            hit->frame ? (unsigned) hit->frame->unk_6C : 0u, hit->frame ? hit->frame->damageFactor : 0.0f,
            hit->source);
@@ -205,6 +207,62 @@ static int aimBoxCentre(CGameObjectInstance *o, s32 mask, CVector3 *from, CVecto
     }
     CCache__Unlock(0, handle);
     return found;
+}
+
+/* T2_BOSS_FRONT=D[,EVERY] (game.cpp, every frame; DEBUG-ONLY, round 11 z2): the Mantid Queen's open
+ * weak spot faces one way (she turns to her path target, not to the player), and her body's boxes
+ * (node mask 1, never a weak spot) take every shot fired from her side or back: from the recipe's
+ * fixed spot no hit reached spot 3 in mode 15 (MantidQueen_Hurt counts spot 3 only in mode 15).
+ * Every EVERY frames (default 600) while a spot is open between her waves, put the first player D
+ * units (flat) in front of her, on the line from her centre through the open spot's box: what a
+ * player standing in front of her does. */
+extern sptr CScene__FindRegionAt(CScene *world, CVector3 *pos);
+static int aimBoxCentre(CGameObjectInstance *o, s32 mask, CVector3 *from, CVector3 *out, s32 *nodeMask);
+void T2Port_BossFront(int frame, const char *spec) {
+    static int sLast = -100000;
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    WaveBossState *q = &gMantidQueen;
+    const char *comma = strchr(spec, ',');
+    f32 dist = (f32) atof(spec);
+    int every = comma != NULL ? atoi(comma + 1) : 600;
+    CGameObjectInstance *o;
+    CVector3 c, box, pos;
+    s32 node = 0;
+    f32 dx, dz, len;
+    sptr region;
+
+    if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_nLevel != 2 || gScene.m_WarpState != 0 ||
+        frame - sLast < every) {
+        return;
+    }
+    if (q->step == NULL || q->waveActive || q->step->weakSpot < 0 || (o = q->actor) == NULL ||
+        o->m_AI.m_Health <= 0) {
+        return;
+    }
+    c = o->header.m_vPos;
+    if (!aimBoxCentre(o, 1 << q->step->weakSpot, &c, &box, &node)) {
+        return;
+    }
+    dx = box.x - c.x;
+    dz = box.z - c.z;
+    len = sqrtf(dx * dx + dz * dz);
+    if (len < 1.0f) {
+        return;
+    }
+    pos.x = c.x + dx / len * dist;
+    pos.y = c.y;
+    pos.z = c.z + dz / len * dist;
+    region = CScene__FindRegionAt(&gScene, &pos);
+    sLast = frame;
+    printf("bossfront: frame %d spot %d queen (%.1f %.1f %.1f) box (%.1f %.1f) -> player (%.1f %.1f %.1f) region %p\n",
+           frame, (int) q->step->weakSpot, c.x, c.y, c.z, box.x, box.z, pos.x, pos.y, pos.z, (void *) region);
+    fflush(stdout);
+    if (region != 0) {
+        CGameObjectInstance *a = &p->m_CharacterActor;
+        a->header.m_vPos = pos;
+        a->header.m_pCurrentRegion = (struct CGameRegion *) region;
+        a->m_vVelocity.x = a->m_vVelocity.y = a->m_vVelocity.z = 0.0f;
+    }
 }
 
 /* T2_AIM_NODE=boss: the weak spot the current boss phase wants (the Mother: MotherBoss_Hurt's

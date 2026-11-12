@@ -37,6 +37,7 @@ extern int gT2HostFrame;
 void T2Port_WakeEnemies(int frame, const char *spec);
 void T2Port_FaceNearest(int frame, const char *spec);
 void T2Port_AimNode(int frame, const char *spec);
+void T2Port_BossFront(int frame, const char *spec);
 void T2Port_TraceBoss(int frame);
 void T2Port_AimAt(int frame, const char *spec);
 void T2Port_AimEnemy(int frame, const char *spec);
@@ -647,6 +648,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         static const char* aimNode = getenv("T2_AIM_NODE");
         if (aimNode != nullptr) {
             T2Port_AimNode(f + 1, aimNode); // DEBUG-ONLY: T2_AIM_NODE=MASK[,R]
+        }
+        static const char* bossFront = getenv("T2_BOSS_FRONT");
+        if (bossFront != nullptr) {
+            T2Port_BossFront(f + 1, bossFront); // DEBUG-ONLY: T2_BOSS_FRONT=D[,EVERY]
         }
         static const char* aimAt = getenv("T2_AIM_AT");
         if (aimAt != nullptr) {
