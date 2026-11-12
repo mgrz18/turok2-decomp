@@ -808,3 +808,60 @@ cages, power cells, portals), the scripted run (`tools/port/playthrough.py`, `T2
 the nine fixes it needed (climbing, region indexes, action objects, the totem defense, the
 instance pool's visibility pass that kept every generator spawn frozen) are in
 [PLAYTHROUGH.md](PLAYTHROUGH.md); the summary is in STATUS.md (round 9, part x1).
+
+## 11. Round 10, part y2: the Blind One, the Mantid Queen and the Primagen
+
+Summary and recipes: STATUS.md (round 10, part y2). Follow a fight with `T2_BOSS_LOG=1`: the
+`bosstrace:` lines give `frame, level, mode old -> new, state A B C, hp` on every change (A B C:
+Blind One phase/step/minions alive; Queen step/waveActive/toSpawn; Mother phase/parts; Primagen
+stage/bossState/bossMode).
+
+### 11.1 The Blind One (7401): beaten
+
+| frame | what |
+|---|---|
+| 14,002 | phase 3 (8 minions), killed under aimed fire |
+| 15,945-21,663 | phases 5, 3, 4, 3, 6: groups 2, 1 and 3 appear and die in turn |
+| 23,211 | phase 9, vulnerable: 12,800 -> 0 |
+| 23,403 | death (mode 9), phase 10 (victory): the cave collapses |
+| ~24,000 | `CPlayer__Warp(0x1387)`: the hub, "NEW CHEAT ENABLED" |
+
+Fixes: `BlindOne_Draw` (func_0040EDB0: CDrawArgs, the model handle was read as an s32: crash),
+`func_0022594C` (gScene m_pList6 at N64 offsets: a garbage cover target), `AI_SetTargetOverride`
+(func_002460FC: the N64 view wrote the target and its time over the host CAI's `m_pParent`; any enemy
+hurt by another actor then crashed in AI_FindBestTarget), `BlindOne_PhaseVulnerableInit` (boss as
+s32 + 0x140), `BlindOne_PhaseVictoryUpdate` (mode time, `m_bBlindBossComplete` by member).
+
+### 11.2 The Mantid Queen (7501): to her death
+
+The minions animate and die on the merged tree (x1's pool visibility fix). Steps 1-3 run; step 4
+(spot 1, 65,280) is the long one (~47,000 frames of fire from a fixed spot); steps 5-7; step 8 at
+67,947: mode 16 (`MantidQueen_EnterDeath`, cinema 0x136). Then an abort in `CParticle__DrawSprite`
+-> `Texture_Request` with a garbage key 0x81ACAD9C (the soak's texture-key class), so the cinema and
+`MantidQueen_UpdateDeath`'s warp (0x176F) are not seen yet.
+
+Fixes: `struct Pick` was incomplete in structs/boss.h, so gendata left the wave pick tables as
+big-endian bytes (mode 10's anim picked garbage, 8<->10 every 2 frames); gendata's `{T *items; count}`
+hint took the int after `partPicks` (spawnCount) and after `picks10` (weakSpot) as counts: now never
+over another pointer target, never short of the extent. `sMantidQueenModeTable` measured to a label
+of the module-2 copy at the same addresses: 12 of 19 rows, modes 11-16 missing (SetMode(14) kept the
+old row: spot 3 never opened): sized `[19]`. Modes 13/14 took the actor as s32; `UpdateTurn`,
+`UpdatePush`, `UpdateDeath` N64 views.
+
+### 11.3 The Primagen (7602): stage 1
+
+Stage 1 runs to its end: the spawner's waves die, mode 6 -> 18 (UpdateMode6 set bossMode through a
+wrong delta: it idled for good), attacks, hits on the parts (Primagen_Hurt read the DamageEvent at
+N64 offsets: no hit counted), stage 2 at 24,206. Also: `Primagen_Effects` (pose view, the matrix as
+s32), `UpdateMode0` (the 0x453 actors' draw/effects callbacks), `EnterDeath`, and the sound pick
+tables of script C type-2 steps (D_004315C8, D_004315DC, D_00431608, D_00431618) that nothing
+emitted (`t2_n64_to_host` NULL: crash).
+
+Stage 2 (open): mode 25 flies to (0, 588.8, 2918.4), hovers at 937 and needs the player as its sight
+target to open its lair doors (found[0]/[1], ids 0xC9/0xC8) and attack. AI_FindBestTarget's line of
+sight from the player to its eye (y 1,427) hits door 0xC9; with the doors opened (`T2_DOOR_OPEN`,
+player teleported to (0, 0, 2200)) it hits level geometry. Not known yet whether the N64 player must
+stand elsewhere or a host collision/eye-height difference blocks it: compare with the N64 oracle.
+
+Falling off the platform: one life per fall, the respawn is right; x2's strafe-left input walked the
+player off three times.

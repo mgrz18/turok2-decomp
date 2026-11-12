@@ -37,6 +37,7 @@ extern int gT2HostFrame;
 void T2Port_WakeEnemies(int frame, const char *spec);
 void T2Port_FaceNearest(int frame, const char *spec);
 void T2Port_AimNode(int frame, const char *spec);
+void T2Port_TraceBoss(int frame);
 void T2Port_Cheats(int frame, const char *spec, const char *fill);
 void T2Port_SavePortal(int frame, const char *spec);
 void T2Port_DoorOpen(int frame, const char *spec);
@@ -636,6 +637,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         static const char* faceNearest = getenv("T2_FACE_NEAREST");
         if (faceNearest != nullptr) {
             T2Port_FaceNearest(f + 1, faceNearest); // DEBUG-ONLY: T2_FACE_NEAREST=R
+        }
+        static const bool bossTrace = getenv("T2_BOSS_LOG") != nullptr;
+        if (bossTrace) {
+            T2Port_TraceBoss(f + 1); // DEBUG-ONLY: T2_BOSS_LOG=1, the boss mode/phase changes
         }
         static const char* aimNode = getenv("T2_AIM_NODE");
         if (aimNode != nullptr) {

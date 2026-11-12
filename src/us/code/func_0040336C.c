@@ -6,6 +6,24 @@
 
 
 
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+/* the views at the host offsets (tools/port/hostview.py; round 10 y2): the actor's m_dwFlags and
+ * the CAI's m_pfHurt (N64 0xF8), cleared as a whole pointer (an s32 store left its high half) */
+#define T2_HOFF_Obj0040336C(m) __builtin_offsetof(CGameObjectInstance, m)
+#define T2_HOFF_Item0040336C(m) __builtin_offsetof(CAI, m)
+typedef struct {
+    union {
+        struct { u8 _hp_flags[T2_HOFF_Obj0040336C(m_dwFlags)]; s32 flags; }; /* N64 0xD4 */
+    };
+} Obj0040336C;
+
+typedef struct {
+    union {
+        struct { u8 _hp_unkF8[T2_HOFF_Item0040336C(m_pfHurt)]; void *unkF8; }; /* N64 0xF8 */
+    };
+} Item0040336C;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0xD4];
     /* 0xD4 */ s32 flags;
@@ -15,6 +33,7 @@ typedef struct {
     /* 0x00 */ u8 pad0[0xF8];
     /* 0xF8 */ s32 unkF8;
 } Item0040336C;
+#endif
 
 void CPlayerPool__SetInvincibility(CPlayerPool *list, f32 value);
 s32 Cinema_IsIdle(void);

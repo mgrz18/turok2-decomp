@@ -750,12 +750,21 @@ class Generator:
             cnt = self.count_hint.get(s.key, 0)
             if n > 0 and cnt <= 1:
                 cnt = ext // n if ext // n <= 4096 else 0
+            if n > 0 and 1 < cnt < ext // n <= 4096:
+                # a hint short of the symbol (WaveBossStep.picks10 is followed by weakSpot 2, the
+                # table has 4 picks): the rest would stay raw bytes in ROM order; type it all
+                cnt = ext // n
             if n > 0 and cnt * n > ext:
-                # never over a symbol the C declares (it keeps its own type)
+                # never over a symbol the C declares (it keeps its own type), nor over another
+                # pointer target (a table of its own: the int after WaveBossStep.partPicks is the
+                # wave's spawnCount, not the pick count; taken as one it ran the partPicks table
+                # over the picks10 table the next slot points to, which then lost its tail)
                 i = bisect.bisect_right(self.elf.keys, s.key)
                 while i < len(self.elf.keys) and self.elf.keys[i] < s.key + cnt * n:
                     k = self.elf.keys[i]
-                    if any(nm in self.declared for nm in self.elf.at[k]):
+                    if any(nm in self.declared or (nm in self.syms and self.syms[nm].why == 'pointer target'
+                                                   and self.syms[nm] is not s)
+                           for nm in self.elf.at[k]):
                         cnt = (k - s.key) // n
                         break
                     i += 1

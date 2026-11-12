@@ -8,10 +8,20 @@
 #include "protos/player.h"
 
 /* The object this callback gets (only +0xF8 is used). */
+#ifdef TARGET_PORT
+/* the CAI's m_pfHurt at its host offset (tools/port/hostview.py; round 10 y2): the N64 0xF8
+ * cleared other bytes, the hurt callback stayed */
+typedef struct {
+    union {
+        struct { u8 _hp_held[__builtin_offsetof(CAI, m_pfHurt)]; void *held; }; /* N64 0xF8 */
+    };
+} Holder;
+#else
 typedef struct {
     /* 0x00 */ u8 pad00[0xF8];
     /* 0xF8 */ void *held;
 } Holder;
+#endif
 
 extern void CPlayerPool__SetInvincibility(CPlayerPool *list, f32 arg1);
 extern void Cinema_RequestById(s32 id);

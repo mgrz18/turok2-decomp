@@ -334,6 +334,48 @@ Files others may touch: func_00237AFC.c, func_002374AC.c (blast), func_00239254.
 func_00238EE4.c, func_002427E0.c (AI health init: y2/y5's AI code), func_0022D2FC.c (y4 too),
 port/game/t2det.c (the trace format: Mac/Linux comparisons need both sides rebuilt).
 
+## Round 10, part y2: the other bosses (branch names-R10_y2)
+
+Detail: [GAMEPLAY.md](GAMEPLAY.md) section 11. Every `src/` change is `TARGET_PORT` (host bodies or
+views) or a type that compiles the same: `tools/asm_diff.py --base cc0c322b -j 8` reports 0 over all
+3,938 files. Two headers changed (`structs/boss.h`, `globals/boss_ai.h`) and gendata changed:
+**delete `decls.json` and rerun gendata**; no archive rebuild.
+
+| boss | result (Linux headless, high memory) |
+|---|---|
+| **the Blind One** (7401) | **beaten**: phases 3-6 (minions, groups 1-3), the vulnerable phase, death (mode 9) at 23,403, the cave collapses, **the hub at 24,000 with "NEW CHEAT ENABLED"** |
+| **the Mantid Queen** (7501) | all 8 steps run, the 5 spots go to 0, **her death (mode 16) at 67,947**; then an abort: a particle sprite asks for a texture at a garbage ROM key (`0x81ACAD9C`, `CParticle__DrawSprite` -> `Texture_Request`), with or without `--draw` (STABILITY's "texture key" class): her death cinema and the warp are not seen yet |
+| **the Primagen** (7602) | stage 1 complete (waves, parts hit, stage 2 at 24,206); **stuck in stage 2**: in mode 25 it flies to its lair (0, 937, 2929) and waits to see the player; the line of sight is blocked (first by lair door 0xC9 (found[0]), then by the level geometry even with the doors opened). Not solved |
+
+The platform fall is **not** a bug: each fall costs one life and respawns the player on the
+platform; x2's recipe held strafe-left, so he walked off three times in a row (GAME OVER).
+
+Recipes (new game, `T2_GIVE_WEAPONS=1 T2_WEAPON=10 T2_AIM_NODE=boss T2_CHEATS=1 T2_FILL_AMMO=600
+T2_BOSS_LOG=1`, input `START@4400 A@4500 A@4700 A@4800 Z@14000..90000`):
+Blind One `T2_WARP_TO=7401 T2_TELEPORT=14000:-400,204.8,0`, 25,000 frames;
+Queen `T2_WARP_TO=7501`, 70,000 frames; Primagen `T2_WARP_TO=7602` (no strafing), 30,000.
+
+Fixes: BlindOne_Draw (the model handle as s32), func_0022594C (scene list at N64 offsets),
+**AI_SetTargetOverride** (wrote over every CAI's m_pParent: shared AI code), BlindOne vulnerable and
+victory phases; the Queen's Pick tables (incomplete `struct Pick` in boss.h: raw big-endian bytes),
+gendata count hints, **her mode table cut at 12 of 19 rows** (overlapping module sections),
+modes 13/14 (actor as s32), UpdateTurn/UpdatePush/UpdateDeath views; Primagen_Hurt (DamageEvent at
+N64 offsets: no part was ever hit), UpdateMode6 (bossMode by a wrong delta: idled for good),
+Effects, UpdateMode0, EnterDeath, the sound pick tables (never emitted: NULL crash).
+Debug: `T2_BOSS_LOG` prints a `bosstrace:` line on every boss mode/phase change; `T2_AIM_NODE=boss`
+covers the Blind One (per phase) and the Primagen (waves first, then partsDone).
+
+Regression: boot to 26,000 with the same mode switches (demo 1 5,467, legal 8,157, demo 2 13,035,
+title 24,749).
+
+**Merge notes.** Shared files: func_002460FC.c (AI_SetTargetOverride, every enemy),
+func_0022594C.c, tools/port/gendata.py (pointer-target count hints), include/structs/boss.h,
+include/globals/boss_ai.h, port/game/t2bosslog.c, port/app/game.cpp.
+
+Next: the Queen's death texture key (then her cinema and warp 0x176F); the Primagen stage-2 line of
+sight (check against the N64: where the player stands, the doors, the eye height); the Primagen
+death cinema.
+
 ## Round 9, part x4: macOS and host determinism (branch names-R9_x4)
 
 Detail: [MACOS.md](MACOS.md) section 11. Commits (asm_diff 0 vs 5437cfc0): 8b8697a6 (`SaveGame_Build`:
