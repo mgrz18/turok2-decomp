@@ -924,4 +924,111 @@ totems (objectives done), the totems and the Blind One to the hub.
    each talisman level holds its talisman at (-2.6, 46.2, 746.3) and its exit N002. The
    flesh-eater portals (1003 in 59 after switch 52, 2003, 3003, 4003) lead to 78-81, a nuke part
    (4500) each. Not in the route yet.
-4. Levels 5 and 6 (a1/a2) through `LEVEL_HOOKS`, and the Primagen.
+4. ~~Levels 5 and 6 (a1/a2) through `LEVEL_HOOKS`, and the Primagen~~ (round 12 C27: section 11).
+
+## 11. The whole game in one run (Phase 7 round 12, the merge C27)
+
+`tools/port/playthrough.py RUN --all` (`tools/port/fullrun.py RUN [--upto N] [--hop F]`) now
+appends levels 5 and 6 to a3's levels 1-4 through `LEVEL_HOOKS`: **one process plays a new game,
+levels 1 to 6 in order with their totems and bosses, the Primagen, the ending cinema and the
+credits, and returns to the hub**, saving on the pak after levels 1-5:
+
+```sh
+python3 tools/port/playthrough.py RUN --all            # RUN/playthrough.txt, teleport.env, fullrun.txt
+cd OUT && . RUN/teleport.env && SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=500 \
+  build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --pak-dir RUN/pak \
+  --frames 266000 --input @RUN/playthrough.txt          # an EMPTY pak dir
+python3 ../tools/port/mpk_saves.py RUN/pak/turok2_pak1.mpk
+```
+
+### 11.1 How levels 5 and 6 are hooked
+
+- After level 4's hub visit (save 4, Primagen key 4), `level5()` teleports onto the level-5
+  portal's approach in the plaza (`routes56.L5_PORTAL`: **past the level-5 door**, whose keys the
+  route does not all collect) and walks in; the route of `--level 5` (`routes56.L5_SEGMENTS`, the
+  Hive Totem, the Mantid Queen) follows, moved in time. **`T2_ANCHOR`** re-anchors the schedule at
+  124 (the hive top), 113 (the totem), 2 (the Queen) and 60 (the hub), so a fight that ends
+  earlier or later does not shift what follows.
+- The hub after level 5: **save 5** (the save portal, as after levels 1-4), then `level6()`: the
+  level-6 portal (again past its door), `routes56.L6_SEGMENTS` anchored at 114 and at the Mother
+  (3), `T2_GIVE_ITEMS` for the capacitors and laser cells (`routes56.L6_GIVE`).
+- **After the Mother** her death led **straight to the hub** in the continuous run (in `--level 6`
+  it warps 6999 to 114, whose pad 7601 then leads to the hub), and her fight lasted 21,500 frames
+  (17,100 in `--level 6`). The steps after her hang on two anchors: `114/60@N` (the new
+  `T2_ANCHOR` form: whichever of 114 and 60 comes first, from 3,000 frames before N, N = her arena
+  + 26,000) and `60@N+800` (in the hub straight it fires at once and skips the 114 teleport).
+- **The hop to the Primagen** (`T2_WARP_TO=7602`) comes 1,300 frames after the hub. The hop time
+  decides where he rests at his lair in stage 3 (his flight there differs), and from there whether
+  the stage-3 wait ends: hop 1,000 after the hub: he rested at z 2,924 and no spot ended the wait
+  in 40,000 frames (`T2_BOSS_FRONT=450,600,2.5,1` tried 10 spots on both sides, ~70 placements);
+  1,300: the wait ended by itself, his death at 240,814; 2,600: still waiting at the end; 3,400: he
+  rested at z 2,919 and the first spot (450, 1,794) ended it (death 242,968). `--hop F` sets it.
+- **Per-level settings in one process**: `T2_WEAPON="10;9@F1;10@F2"` (the shredder on level 5),
+  `T2_FILL_AMMO="300;100@F1;600@F2"`, `T2_BOSS_FRONT="450,200@F3;450,600,2.5,1@F4"` (the Queen,
+  then the Primagen), `T2_AIM_NODE=boss@1/2/3/4`, `T2_FACE_NEAREST=4000@109,110,111,112,113`
+  (`T2Port_Scheduled` in t2debug.c: "V@F;..." is the value of the last entry whose frame has
+  passed, on the schedule frame).
+
+### 11.2 The run (Linux, headless, PIE, the merged tree)
+
+`RUN/fullrun.txt` lists the planned steps (schedule frames); the host frames below are the run's
+(`T2_STATE_LOG=500`: a level change is seen to ~500 frames). 266,000 frames, exit 0, identical on
+two runs (the det-relevant lines: anchors, events, boss traces).
+
+| frame (host) | level | what |
+|---|---|---|
+| 4,400-4,800 | | new game |
+| 13,000-20,000 | 51-59 | level 1 + 3 level-2 keys, 3 level-3 keys, Primagen key 1; "all distress beacons activated. mission complete." 15,051, "the children are safe. mission complete." 18,099 |
+| ~20,000-23,000 | 109 | the Harbor Totem: **won (8/8)** |
+| 23,657 | 60 | the hub (anchor); **save 1** (97, ~24,000); "access to level 2 granted." 25,918; the level-2 door, portal 2000 |
+| ~27,000-76,100 | 34, 125-135 | level 2: "all soul gates destroyed. mission complete." 61,076, "all sisters of despair banished. mission complete." 71,780 |
+| 76,138-83,500 | 110 | the City Totem: **failed (5/8)** |
+| 83,758 | 60 | the hub; **save 2**; "access to level 3 granted." 86,047; portal 3000 |
+| 87,219-101,000 | 12-71 | level 3: "all prisoners free. mission complete." 98,501, "armories destroyed. mission complete." 99,355 |
+| ~101,000-104,500 | 111 | the Marsh Totem: **won (8/8)** |
+| 105,143 | 60 | the hub; **save 3**; "access to level 4 granted." 107,444; portal 4000 |
+| 108,190-122,000 | 18-108 | level 4: "blind ones trapped. mission complete." 120,268 |
+| ~122,000-126,000 | 112 | the Cave Totem: **won (10/8)** |
+| ~126,500-136,092 | 1 | **the Blind One dead (mode 9) at 136,092** |
+| 136,697 | 60 | the hub; **save 4**; Primagen key 4 |
+| ~139,500 | 60 | **onto the level-5 portal** (teleport past the door), the intro cinemas |
+| 142,976-157,000 | 124, 84-96 | level 5: "force field down." 144,388, the embryos ("all embryos destroyed. mission complete." 154,682), "master computer destroyed. mission complete." 156,834 |
+| 157,422-159,500 | 113 | the Hive Totem: **won (9/8)** |
+| 160,080-167,646 | 2 | **the Mantid Queen dead (mode 16) at 167,646** |
+| 169,010 | 60 | the hub; **save 5** (97, ~169,500) |
+| ~171,500 | 60 | **onto the level-6 portal**, the intro cinemas (157-161) |
+| 176,765-189,029 | 114-123 | level 6: "all assembly plants destroyed. mission complete." 187,389, "all power generators recalibrated. mission complete." 188,245, "force field down." 189,029 |
+| 189,539-211,535 | 3 | **the Mother dead (mode 30) at 211,535** (her fight 22,000 frames) |
+| 212,981 | 60 | the hub straight (anchors `114/60`, `60`) |
+| ~214,300 | 60 -> 4 | the hop (`T2_WARP_TO=7602`) |
+| 214,500-240,814 | 4 | the Primagen: his stage-2 lair wait (from 230,250) and stage-3 wait (from 235,588) end by themselves; **his death (mode 29) at 240,814** |
+| 242,000-246,822 | 11, 10 | **the ending cinema** |
+| 246,830-260,920 | (mode 15) | **the credits** |
+| 260,928 | 60 | **the hub** |
+
+The pak after the run: note 1 "TUROK 2", checksum OK, life force 78, weapon 9, clock 0:45:15
+(save 5, `mpk_saves.py`; each save overwrites note 1).
+
+### 11.3 What is still debug-assisted
+
+- `T2_CHEATS=1` (invincibility) all through, `T2_FILL_AMMO`, `T2_GIVE_WEAPONS` (every weapon at
+  each level load) and the aim assists (`T2_FACE_NEAREST`, `T2_AIM_AT`, `T2_AIM_ENEMY`,
+  `T2_AIM_NODE`, `T2_BOSS_FRONT`'s placements).
+- **Teleports** between route steps (`T2_TELEPORT`): every level's sub-levels are walked into
+  their warp regions, but the way between two points of a sub-level is a teleport.
+- **The level-5 and level-6 doors of the hub** are passed by a teleport onto the portal's approach
+  (the keys: 62/68's level-5 keys and 103's level-6 key are not picked up; the level-6 keys of
+  level 5 are, a1).
+- **`T2_GIVE_ITEMS`**: the crystal ion capacitors (4231, 16 for level 6's couplings; the ROM places
+  one, in level 3's 66) and the two red laser cells (4229, level 5's 91 has four: not in the route).
+- **The hop to the Primagen** (`T2_WARP_TO=7602`): the hub's way to him needs the six Primagen
+  keys (keys 5 and 6, of levels 5 and 6, are not in the route; 1-4 are placed).
+
+### 11.4 Findings
+
+- The City Totem (110) failed (5/8) in this run, as in two of a3's four (its flag only changes
+  the ending's totem count; the ending and the credits play either way).
+- The Mother's death leads to the hub straight in the continuous run but to 114 in `--level 6`
+  (both are the game's own warps; which one depends on state the two runs do not share: not
+  traced further).
+- The Primagen's stage-3 lair wait depends on where he rests (above); compare with the N64.
