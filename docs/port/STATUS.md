@@ -281,6 +281,47 @@ Fixes on the merged tree (asm_diff 0):
    so far), and this merged tree on the Mac.
 10. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
 
+## Round 11, part z5: demo fidelity, static object events, the font colour (branch names-R11_z5)
+
+Detail: [FIDELITY.md](FIDELITY.md) section 6. Every `src/` change is TARGET_PORT;
+`tools/asm_diff.py --base 2df5517d -j 8` 0 on every touched file; no `include/` or archive change.
+
+- **Demo 1 identical to the N64 to its end.** Round 10's "camera 0.18 off at gf 412" started at
+  gf 74: `CPlayer__BobViewStride` / `CPlayer__BobView` read the body's yaw through an N64-offset
+  view (0 on the host), so the walk's side bob went along the world x axis. With the fix, every
+  traced field (player, camera, weapon actor, actors, pooled instances, particles) is
+  bit-identical from gf 1 to gf 1,128 (health 12,814 on both, the HUD's 51).
+- **Static object events work on the host**: y3's `CScene__AdvanceListedInstances` host body
+  again, plus the static objects' region at the host `CGameRegion` stride (0x40, not the N64's
+  32: demo 2's crash in `Collision_SweepRegions`). Demo 1's ambient particle now matches.
+- **The font colour**: `COnScreen__BeginText`'s combiner mixes PRIM to ENV by TEXEL1 from a
+  line-0 tile, which the RDP reads as row 0 (1.0) and Fast3D as an empty texture (0): every text
+  was in the dark primitive colour. The host emits the equivalent ENV combiner: the legal text
+  peaks at (200, 200, 136), the N64 reference (200, 200, 138), was (80, 64, 40).
+- **Trace tools**: a `cam` line in `T2_DET_ACTORS` / `n64trace.py --actors`, compared by
+  `detdiff.py` (rebuild both sides of a Mac/Linux comparison).
+- **Demos 2 and 3**: every game thread now runs with the N64's flush-to-zero (the R4300 FS bit;
+  `t2os.c`): demo 2 left at gf 426 on a denormal velocity. The player's jump had no upward speed
+  on the host (the jump scale in the big-endian `CPlayerIntelligence.pad08`, and an N64 view of
+  the body in `PlayerJump_Update` / `PlayerDodge_Enter`): demo 3 left at gf 71. **Demo 3 is now
+  identical to the N64 to its end; demo 2 to gf 607**, where an enemy's tilt comes from stale
+  heap memory read by `CGameObjectInstance__Construct` (an N64 uninitialised read, not matchable).
+- Also: placed level actors' region at the host stride (`CLevelActor__Construct`, the same
+  32-byte bug as the static objects).
+- Regression (Linux headless, exit 0 each): boot + 3 demos 26,000 (demo 1 5,467, demo 2 13,037,
+  demo 3 19,922, title 24,751, as before); level 1 playthrough: the hub at 21,600 with 10/8 totem
+  kills; level 2 playthrough: both soul gates (21,313 and 42,063), as before; the Mother: death
+  27,459 (was 30,641), hub 29,000; the Blind One: death 22,623, hub 23,200. The jump fix changes
+  every scripted run that presses R (jumps now leave the ground as on the N64).
+- Not run on the Mac: the arm64 flush-to-zero path (FPCR FZ) compiles only there; a Mac == Linux
+  check of this branch needs it (Linux had denormals before, the Mac too: both change together).
+
+Files others may touch: func_0024FC08.c / func_0024FE10.c (the view bob), func_002555CC.c /
+func_00255670.c / func_00255840.c (jump, dodge), func_002263C0.c, func_00214564.c,
+func_002141F0.c, func_002150C0.c (static objects and level actors), func_00277F6C.c (the font),
+port/runtime/t2os.c (thread start), port/game/t2det.c + tools/port/n64trace.py +
+tools/port/detdiff.py (the trace format: a Mac/Linux comparison needs both sides rebuilt).
+
 ## Round 10, part y4: the merged tree on macOS, host determinism, real time (branch names-R10_y4)
 
 Detail: [MACOS.md](MACOS.md) section 12, [PERF.md](PERF.md) section 5. Commits (asm_diff 0 vs
