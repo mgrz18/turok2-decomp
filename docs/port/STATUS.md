@@ -223,6 +223,45 @@ every file the merges touched). No fix was needed on the merged tree: every scen
 8. **macOS**: run this merged tree on the Mac (the playthrough and the Mother defeat have only run
    on Linux).
 
+## Round 10, part y1: level 2, the River of Souls (branch names-R10_y1)
+
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) section 6. From the hub through the level-2 portal
+(warp 2000) and its intro cinemas into level 125, then every sub-level 125-135 by its own warp
+regions; **both soul gates destroyed ("all soul gates destroyed. mission complete.")**, **two of
+the three Sisters of Despair banished** (133 at 29,743, 134 at 38,763), the third graveyard (135) up to its two
+"graveyard gate open." gates; the exit 7200 then sends the player back to 125 ("level not
+complete": one sister left). No crash in any level-2 run (Linux, headless, `--draw`, high memory).
+
+```sh
+cd OUT && python3 ../tools/port/playthrough.py . --level 2 && . ./teleport.env
+SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_STATE_LOG=250 build/app/turok2 --archive turok2.o2r \
+    --rom ../baserom.us.z64 --game --draw --pak-blank --frames 49500 --input @playthrough.txt
+```
+
+Commits (asm_diff 0 against cc0c322b for the `src/` one):
+
+| commit | what |
+|---|---|
+| 85dd95b3 | **Y1-1** `CInstancePool__SpawnAnimInstance` (func_00227C10) / `ImpactEvent_SpawnAnimInstance` (func_00239194) / `CInstancePool__SpawnAnimInstance_i` (t2abi.c): the owner region and the effect's intelligence as `sptr` (they were `s32`: with high memory the River of Souls intro cinema crashed on its first impact effect in `CGameRegion__GetNormal`) |
+| b159beea | debug: `T2_AIM_AT=F1-F2:x,y,z`, `T2_AIM_ENEMY=F1-F2[,R]`, `T2_TELEPORT=...!` (fire the region's enter triggers, mask 1 as the player's move does), the event log's objectives per hub (`T2Port_HubLevelOf`) |
+| (next) | `tools/port/playthrough.py --level 2`, PLAYTHROUGH.md section 6, this section; the face log's index of pooled instances (-1) |
+
+Findings: the level's event records are keyed by the **owning actor index** (first table: an
+actor's death (mask 1), a door opening (0x4000), an action "go" (0x80000)) and by the **region
+info index** (second table: the player entering one of its regions, mask 1); the key byte is the
+link group a record counts down. Level 2's objectives are link groups 18 (soul gates, type 4) and
+16 (sisters, type 5).
+
+**Merge notes**: port/game/t2debug.c and port/app/game.cpp (new switches next to x2's
+`T2_AIM_NODE`; the event log line's `objectives` now follows the level's hub: level 1 runs print
+the same numbers), tools/port/playthrough.py (`--level 1` output unchanged, checked by diff),
+func_00227C10.c / func_00239194.c / t2abi.c (the spawn chain: y5's 64-bit work may touch them).
+No header and no archive change; gendata unchanged (decls.json stays valid).
+
+Next: the third sister (135: the action objects 46/47, object 156, do not fire when walked into,
+and a teleport into her hall draws no frame), then the exit 7200 to the City Totem (110), its
+defense and the hub; levels 3-6 entry (not reached this round).
+
 ## Round 9, part x4: macOS and host determinism (branch names-R9_x4)
 
 Detail: [MACOS.md](MACOS.md) section 11. Commits (asm_diff 0 vs 5437cfc0): 8b8697a6 (`SaveGame_Build`:

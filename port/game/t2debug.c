@@ -554,7 +554,7 @@ void T2Port_FaceNearest(int frame, const char *spec) {
     if (best != sLast) {
         sLast = best;
         printf("face: frame %d player (%.1f %.1f %.1f) -> enemy %d type %x at (%.1f %.1f %.1f) d %.0f rotY %.2f\n", frame,
-               pl->header.m_vPos.x, pl->header.m_vPos.y, pl->header.m_vPos.z, (int) (best - gScene.m_pActors),
+               pl->header.m_vPos.x, pl->header.m_vPos.y, pl->header.m_vPos.z, (best >= gScene.m_pActors && best < gScene.m_pActors + gScene.m_nActors) ? (int) (best - gScene.m_pActors) : -1 /* -1: a pooled instance */,
                (unsigned) best->m_nTypeFlag, best->header.m_vPos.x, best->header.m_vPos.y, best->header.m_vPos.z,
                sqrtf(bestD), pl->m_RotY);
         fflush(stdout);

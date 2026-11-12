@@ -1,4 +1,4 @@
-# The first level, played through (Phase 7 round 9, part x1)
+# The first levels, played through (Phase 7 round 9 x1: level 1; round 10 y1: level 2)
 
 Level 1 of Turok 2, the Port of Adia, played from a new game to its end on the native port
 (Linux, headless): every sub-level from 51 to 59, both mission objectives (the three distress
@@ -159,3 +159,131 @@ kills, the totem's health).
 4. The other N64 views of the action/enemy code met here but not on this path:
    `TotemDefense_KillsLeft` (`Unk00408BFC`), `TotemDefense_TryHitEnemyAfterDelay` (`HurtTimer` at
    0xC) and their module-2 twins.
+
+## 6. Level 2: the River of Souls (Phase 7 round 10, part y1)
+
+From the hub, through the level-2 portal and its intro cinemas, into the River of Souls: every
+sub-level from 125 to 135 entered and left through its own warp regions, both soul gates
+destroyed ("all soul gates destroyed. mission complete."), two of the three Sisters of Despair
+banished, and the level exit 7200 (which, with a sister left, sends the player back to the
+level's start: "level not complete"). Same method as level 1: one `--input @FILE` and one
+`T2_TELEPORT` list from `tools/port/playthrough.py --level 2`; teleports put the player at each
+progression point and the game's own logic does the rest (the warp regions, the destructible
+soul gates and their events, the enemies' wake-ups, deaths and the doors and gates their deaths
+open, the sisters, the objective counters and messages).
+
+### 6.1 The level graph
+
+Level 2 is "(80) LEV2 A" to "(90) LEV2 K", indexes 125 to 135; the hub portal is warp 2000
+(level 125 at (-2611, 0, -10650)); the exit is warp 7200 (the City Totem, level 110, once the
+objectives are done; `CPlayer__Warp`: 2000 with "level not complete" before, 2999 (the hub) once
+`keys[1]` is set). Warp regions (`warp_id` -> level):
+
+| level | warp regions |
+|---|---|
+| 125 A (start) | 2500 -> 126, 7200 (exit), 999 (save portal) |
+| 126 B | 2600 -> 125, 2601 -> 127 |
+| 127 C | 2610 -> 126, 2100 -> 128 |
+| 128 D | 2611 -> 127, 2101 -> 129, 2003 -> 79 (flesh-eater portal), 999 |
+| 129 E | 2602 -> 128, 2102 -> 130, 2666 (inside 129) |
+| 130 F | 2603 -> 129, 2103 -> 131, 2614 -> 133, 2200 / 2201 (inside 130) |
+| 131 G | 2604 -> 130, 2104 -> 132, 2612 -> 134, 2617 (inside 131) |
+| 132 H | 2605 -> 131, 2501 -> 135, 2001 -> 73 (the Leap of Faith talisman), **7200 (exit)**, 999 |
+| 133 I, 134 J, 135 K | 2615 -> 130, 2613 -> 131, 2608 -> 132 (the three graveyards) |
+
+**The objectives** (`Mission_LevelObjectivesDone(2)`: link group types 4 and 5; the types table,
+cart 19, puts them at link groups 18 and 16):
+
+- **2 soul gates** (type 4, group 18): destructible 649 on a raised platform, 129 actor 64 at
+  (-4147, -256, 5094) and 132 actor 50 at (11878, 1229, -1485), each with its two generators and
+  doors. Destroyed: "soul gate destroyed." (record of actor 63 / 49), the generators' doors open;
+  the second: **"all soul gates destroyed. mission complete."** (the key-18 record).
+- **3 Sisters of Despair** (type 5, group 16): the flying enemy object 101 (intelligence 188, type
+  0x324), one per graveyard: 133 actor 20, 134 actor 1, 135 actor 31, each behind a gate that the
+  deaths of three zombies (object 102, type 0x323) open. Her death: "sister of despair banished."
+  (the last one: "all sisters of despair banished. mission complete.", the key-16 record).
+- The graveyard keys of 135 ("requires graveyard key.", "graveyard gate open."): its gates 58,
+  62 and 63 open on 2 zombie deaths, 3 crypt switches (53, 54, 55) and 4 more (48, 49, 50, 56).
+
+How the records work (`CScene__GetInstanceEventRecords`, `CScene__GetRegionEventRecords`): the
+first table of a level's links block is sorted by the **owning actor index** (`levels.py`'s
+`id`): an actor's records fire when it fires its triggers (mask 1: its death, 0x4000: a door
+opening, 0x80000: an action object "go"); the second table is sorted by **region info index**:
+the player entering a region of that info fires them (mask 1, `CPlayer` move,
+func_0024C47C). The record's key byte is the link group it counts down (the doors that open
+after N deaths). The graveyards wake their zombies by region (133: info 4 near door 27, info 7
+the sister's hall; 135: info 8 opens door 59, info 9 "graveyard located." and the generators).
+
+### 6.2 The run
+
+```sh
+cd OUT
+python3 ../tools/port/playthrough.py . --level 2   # playthrough.txt, teleport.env (exports)
+. ./teleport.env
+SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_STATE_LOG=250 T2_SHOT=shot.ppm T2_SHOT_EVERY=250 \
+    T2_SHOT_FROM=13000 build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --draw \
+    --pak-blank --frames 49500 --input @playthrough.txt
+```
+
+`teleport.env` sets `T2_WARP_TO=1999` (the hub from level 51, at 12,955), the plasma rifle
+(`T2_GIVE_WEAPONS=1 T2_WEAPON=10`), `T2_CHEATS=1` (invincible: the graveyard fights are long),
+`T2_FILL_AMMO=300`, and the aim windows `T2_AIM_AT` (a soul gate) and `T2_AIM_ENEMY` (new, see
+6.4). The event log now prints the objective counters of the level's own hub (level 2: soul gates
+/ sisters).
+
+What happens (Linux, headless, `--draw`, high memory, 49,500 frames, exit 0):
+
+| frame | level | step | the game's own result |
+|---|---|---|---|
+| 12,955 | 51 | `T2_WARP_TO=1999` | the hub (60) at 13,100 |
+| 13,300 | 60 | the portal 2000, walked into | the River of Souls intro cinemas (levels 34, 35, 33, 34, 36, 35) from 13,450 to 18,600 |
+| 18,750 | 125 | level 2's start (-2611, 0, -10650) | |
+| 18,800-20,250 | 125 -> 126 -> 127 -> 128 -> 129 | warps 2500, 2601, 2100, 2101 | each sub-level loads and starts its own events |
+| 20,400-21,373 | 129 | on the soul gate's platform, plasma fire at the gate | **"soul gate destroyed."** (21,373; soul gates 2 -> 1), its generators' doors 86, 88 open |
+| 21,650 / 22,050 | 129 -> 130 -> 133 | warps 2102, 2614 | the first graveyard (133) at 22,250 |
+| 22,450 | 133 | `!` into region info 4 (by door 27) | zombies 9, 16, 17 wake and come |
+| 23,850-29,743 | 133 | `!` into the sister's hall (info 7), aimed fire | zombies 22-24 wake and die: **door 28 opens** (29,141, key 15), the sister wakes, flies, dies: **"sister of despair banished."** (29,743; sisters 3 -> 2) |
+| 30,650 -> 31,355 | 133 -> 130 -> 131 -> 134 | warps 2615, 2103, 2612 | the second graveyard: "graveyard located." |
+| 31,750-38,763 | 134 | zombies 2, 3 die at the start; at the gate zombie 4 comes out and dies | **gate 8 opens** (37,741, 3 deaths, key 7), the generators stop, the sister wakes; **"sister of despair banished."** (38,763; sisters 2 -> 1) |
+| 40,800 -> 41,000 | 134 -> 131 -> 132 | warps 2613, 2104 | |
+| 41,100-42,123 | 132 | the second soul gate | **"soul gate destroyed."**, **"all soul gates destroyed. mission complete."** (42,123; soul gates 0) |
+| 42,750-46,300 | 135 | warp 2501: the big graveyard; `!` into info 8 (door 59) and 9 | **"graveyard located."** (42,950); crypt switches 53, 54, 55: **"graveyard gate open."** (gate 62, 45,107); 48, 49, 50, 56: **"graveyard gate open."** (gate 63, 45,909); the actions 46, 47: nothing (open, 6.5) |
+| 48,500 / 48,750 | 135 -> 132 -> 125 | warps 2608, 7200 | a sister left: `CPlayer__Warp(7200)` -> 2000, "level not complete": level 125's start |
+
+Screenshots (640x480, checked by eye, not committed): the hub's level-2 portal bridge (13,301),
+the intro cinema (the dinosoid, the Blind One's hall, 13,500-18,000), level 125's courtyard with
+the cage (18,751), the sub-levels 126-128 (19,001-20,001), the soul gate under plasma fire
+(20,501, 21,251) and "SOUL GATE DESTROYED." (21,501), level 130 (22,001), the dark graveyard of
+133 with the zombies under fire (23,251-29,501), 134's gate and the flying sister (17,501-19,251
+of the 134 run), 132's soul gate.
+
+### 6.3 Fixes on the way
+
+| id | where | bug | fix |
+|---|---|---|---|
+| Y1-1 | `CInstancePool__SpawnAnimInstance` (func_00227C10), `ImpactEvent_SpawnAnimInstance` (func_00239194), the ABI adapter (port/game/t2abi.c) | the owner region (and the effect's intelligence) passed as `s32`: with high memory the region pointer was cut to 32 bits, and the first impact effect in the River of Souls intro cinema (level 36, 16,970) crashed in `CGameRegion__GetNormal` (`GameObject_GetGroundRotation` of the new instance) | `sptr` through the chain (asm_diff 0) |
+
+No other crash in level 2: the full run, the 14-warp tour through every sub-level and the
+graveyard tests (all with `--draw`, high memory) exit 0.
+
+### 6.4 New debug switches (DEBUG-ONLY, port/game/t2debug.c)
+
+- `T2_AIM_AT=F1-F2:x,y,z[;...]`: from F1 to F2 turn the player (yaw and camera pitch) at a
+  point: the soul gates (not actors the aim assists know).
+- `T2_AIM_ENEMY=F1-F2[,R][;...]`: `T2_AIM_NODE=-1` (the nearest live actor, yaw and pitch) only in
+  those windows, so the walks between fights keep their facing. The flying sisters need the pitch.
+- `T2_TELEPORT=F:x,y,z[,rotY]!`: a `!` also fires the region's "entered" triggers
+  (`CGameRegion__FireTriggers(region, 1)`, what the player's move does): the graveyards' zombies
+  only wake when the player walks into their halls.
+- `T2_EVENT_LOG`: `objectives A/B` is now the counters of the current level's hub (`T2Port_HubLevelOf`).
+
+### 6.5 Open (level 2)
+
+1. **The third sister (135)**: the gates 62 and 63 open from the switches, but the two action
+   objects 46 and 47 (object 156, key 12: the platform 1 that opens door 60 to her hall) do not fire
+   when walked into from the scripted points, and after a teleport into her hall (391.6, 0, 5862.8)
+   no frame is drawn any more (`--draw`: no picture, the game state runs on: no crash). Next: how
+   object 156 is used (an "action" with the use button?), then her fight; then 7200 -> the City
+   Totem (110) and its defense, and the hub.
+2. Walk the sub-levels instead of hopping (the 45 enemies of 125 are never met); the keys, the
+   talisman (73) and flesh-eater (79) portals.
