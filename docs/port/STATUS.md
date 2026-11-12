@@ -225,8 +225,8 @@ Every run below exits 0.
 - **Soak** (PIE, no `--draw`): attract 100,000 (1 run, 99,960 frames), new game seeds 0-19 x
   36,000 (20 runs, 720,000 frames), levels seeds 0-40 x 25,000 (every level id 1-164 warped into,
   41 runs, 1.02 M frames): **0 crashes, 0 hangs**.
-- **macOS**: not rerun on this merged tree (z4 ran the round-10 tree: Mac == Linux except level 2
-  from frame 42,124). z5's arm64 flush-to-zero path (FPCR FZ) is untested.
+- **macOS** (round 12 a4): the whole battery above runs on the Mac and equals Linux frame for
+  frame (level 2 after the `T2_AIM_AT` fix); z5's arm64 flush-to-zero is live (MACOS.md 14).
 
 Screenshots (640x480, checked by eye, not committed): the legal screen in the N64's text colour (701);
 level 3's "ARMORY DESTROYED." (25,501); level 4's "VENT CHAMBER LOCATED. THERMAL VENT SEALED."
@@ -297,9 +297,8 @@ Fixes on the merged tree (asm_diff 0):
 3. **Walk the teleported parts** of every route (the sub-levels hop by `T2_TELEPORT`: level 2's
    125 with its 45 enemies, level 3's 104 and the vent chamber doors of 106-108).
 4. **The talisman and flesh-eater portals and the level keys** (73-77/92, 79-83), the totem 113.
-5. **The Mac's level-2 divergence at frame 42,124** (one particle effect fewer from
-   `CParticleSystem__Spawn`, z4) and this merged tree on the Mac; **z5's arm64 flush-to-zero**
-   (FPCR FZ) has not run yet.
+5. ~~The Mac's level-2 divergence at frame 42,124~~ and z5's arm64 flush-to-zero: done in round
+   12 (a4: libm's `atan2f` in `T2_AIM_AT`; FZ verified).
 6. **More N64-pad instance views**: this round's sweep covered the 0xD4 flags; the same pattern
    (a pointer field before a padded member, in a file with no `TARGET_PORT`) is worth one more
    pass (`tools/port/hostview.py`).
@@ -310,6 +309,26 @@ Fixes on the merged tree (asm_diff 0):
 9. **A windowed run with a real gamepad** (MACOS.md 12.6 documents the mapping; only headless runs
    so far).
 10. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
+
+## Round 12, part a4: the round-11 merged tree on macOS, flush-to-zero, level 2 (branch names-R12_a4)
+
+No `src/`/`include/` change. Detail: [MACOS.md](MACOS.md) section 14. One commit in `port/`:
+
+- 8e12748c **`T2_AIM_AT` used libm's `atan2f`** (port/game/t2debug.c `T2Port_AimAt`): its last bit
+  differs between macOS and glibc, so level 2's scripted shots flew 1 ulp apart (the Mac/Linux
+  divergence at 42,124 in round 11, 42,184 on this tree). Now `T2Port_Atan2f`, like `T2_AIM_NODE`
+  and `T2_FACE_PITCH`. **Linux's level-2 det trace changes from frame 20,416** (the events and
+  the hub frame do not). Both level-2 routes (round 11's and this one) are then identical on both
+  hosts to their end.
+- **arm64 flush-to-zero works**: the game thread runs with FPCR FZ set; boot + the 3 demos are
+  identical to Linux (`T2_DET_LOG`); with FZ cleared by lldb demo 2 diverges at gf 426 (z5's
+  denormal velocity), so the path is live.
+- **The whole round-11 battery on the Mac** (headless `--offscreen-gl`, exit 0, 0 dlcheck): levels
+  1-4 to the hub, the Mother, the Blind One, the Mantid Queen, the Primagen with the ending cinema
+  and the credits, save/load, `--audio` (RMS 3,399.5 = Linux); **Mac = Linux frame for frame in
+  every one** (0.84 M det lines with round 11's level-2 route, 0 differ). Soak (lldb): 49 runs, 1.31 M frames, 0 crashes.
+- Merge notes: `port/game/t2debug.c` (one call in `T2Port_AimAt`; a1-a3 may touch the same file
+  elsewhere). The scripts are not committed (`OUT/r12/`, box `/root/R12_a4mac/r12/`).
 
 ## Round 11, part z5: demo fidelity, static object events, the font colour (branch names-R11_z5)
 
