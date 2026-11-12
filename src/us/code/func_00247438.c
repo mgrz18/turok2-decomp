@@ -25,6 +25,19 @@ typedef struct HudModel {
     /* 0xB8 */ f32 time;
 } HudModel;
 
+#ifdef TARGET_PORT
+typedef struct HudView {
+/* the view at the host offsets of CCamera (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_HudView(m) __builtin_offsetof(CCamera, m)
+    union {
+        struct { u8 _hp_width[T2_HOFF_HudView(m_Viewport.m_Width)]; f32 width; }; /* N64 0x288 */
+        struct { u8 _hp_height[T2_HOFF_HudView(m_Viewport.m_Height)]; f32 height; }; /* N64 0x28C */
+        struct { u8 _hp_left[T2_HOFF_HudView(m_Viewport.m_ScreenPosX)]; f32 left; }; /* N64 0x290 */
+        struct { u8 _hp_top[T2_HOFF_HudView(m_Viewport.m_ScreenPosY)]; f32 top; }; /* N64 0x294 */
+    };
+} HudView;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x288];
     /* 0x288 */ f32 width;
@@ -32,6 +45,7 @@ typedef struct {
     /* 0x290 */ f32 left;
     /* 0x294 */ f32 top;
 } HudView;
+#endif
 
 extern f32 D_800ADDB8;
 

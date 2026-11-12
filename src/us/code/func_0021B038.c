@@ -12,6 +12,19 @@ typedef struct B10Mt {
     f32 m[16];
 } B10Mt;
 /* Turok 2 layout (Rage Wars: pos 0x8, f70 0x70, flags 0x100, f174 0x174). */
+#ifdef TARGET_PORT
+typedef struct B10Obj {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_B10Obj(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_B10Obj(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_f54[T2_HOFF_B10Obj(m_CollisionYOffset)]; f32 f54; }; /* N64 0x54 */
+        struct { u8 _hp_flags[T2_HOFF_B10Obj(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_f144[T2_HOFF_B10Obj(m_AI.m_Health)]; s32 f144; }; /* N64 0x144 */
+    };
+} B10Obj;
+#else
 typedef struct B10Obj {
     u8 pad0[0x4];
     CVector3 pos;              /* 0x004 */
@@ -22,6 +35,7 @@ typedef struct B10Obj {
     u8 padD8[0x144 - 0xD8];
     s32 f144;               /* 0x144 */
 } B10Obj;
+#endif
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */

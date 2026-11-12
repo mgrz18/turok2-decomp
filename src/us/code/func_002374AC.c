@@ -29,11 +29,34 @@ typedef struct Blast {
 } __attribute__((aligned(4))) Blast;
 #endif
 
+#ifdef TARGET_PORT
+/* The owner is a player (CPlayer starts with its actor): 0xBB0 is CPlayer.m_pOnEnemy, a pointer
+ * (round 12 a5, tools/port/n64viewcheck.py). */
+#include "structs/player.h"
+typedef struct PushOwner {
+    union {
+        struct { u8 _hp_reduced[__builtin_offsetof(CPlayer, m_pOnEnemy)]; void *reduced; };
+    };
+} PushOwner;
+#else
 typedef struct PushOwner {
     /* 0x000 */ u8 pad0[0xBB0];
     /* 0xBB0 */ s32 reduced;
 } PushOwner;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct PushSource {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_PushSource(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_PushSource(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_flags[T2_HOFF_PushSource(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
+        struct { u8 _hp_owner[T2_HOFF_PushSource(m_AI.m_pParent)]; PushOwner *owner; }; /* N64 0x1A8 */
+    };
+} PushSource;
+#else
 typedef struct PushSource {
     /* 0x000 */ u8 pad0[0x4];
     /* 0x004 */ CVector3 pos;
@@ -42,7 +65,23 @@ typedef struct PushSource {
     /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
     /* 0x1A8 */ PushOwner *owner;
 } PushSource;
+#endif
 
+#ifdef TARGET_PORT
+typedef struct PushTarget {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_PushTarget(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_kind[T2_HOFF_PushTarget(header.m_Type)]; u8 kind; }; /* N64 0x0 */
+        struct { u8 _hp_type[T2_HOFF_PushTarget(header.m_nObjType)]; u16 type; }; /* N64 0x2 */
+        struct { u8 _hp_pos[T2_HOFF_PushTarget(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_dir[T2_HOFF_PushTarget(m_vVelocity)]; CVector3 dir; }; /* N64 0x18 */
+        struct { u8 _hp_angle[T2_HOFF_PushTarget(m_RotY)]; f32 angle; }; /* N64 0x50 */
+        struct { u8 _hp_playerFlags[T2_HOFF_PushTarget(m_AI.m_ModeFlags)]; u32 playerFlags; }; /* N64 0x17C */
+    };
+} PushTarget;
+#else
 typedef struct PushTarget {
     /* 0x000 */ u8 kind;            /* 1: player, 2: object */
     /* 0x001 */ u8 pad1;
@@ -55,6 +94,7 @@ typedef struct PushTarget {
     /* 0x054 */ u8 pad54[0x17C - 0x54];
     /* 0x17C */ u32 playerFlags;
 } PushTarget;
+#endif
 
 
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);

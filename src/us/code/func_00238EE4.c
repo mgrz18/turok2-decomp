@@ -38,6 +38,19 @@ struct Kind {
 };
 struct Kind;
 struct ObjectRecAt17C;
+#ifdef TARGET_PORT
+struct ObjectRecAt17C {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_ObjectRecAt17C(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_type[T2_HOFF_ObjectRecAt17C(header.m_Type)]; u8 type; }; /* N64 0x0 */
+        struct { u8 _hp_kind[T2_HOFF_ObjectRecAt17C(header.m_pIntelligence)]; struct Kind *kind; }; /* N64 0x14 */
+        struct { u8 _hp_value[T2_HOFF_ObjectRecAt17C(m_mfOrient) + 40]; s32 value; }; /* N64 0x80 */
+        struct { u8 _hp_mask[T2_HOFF_ObjectRecAt17C(m_AI.m_VisBits)]; u32 mask; }; /* N64 0x14C */
+    };
+};
+#else
 struct ObjectRecAt17C {
     u8 type;
     u8 pad1[0x13];
@@ -47,6 +60,7 @@ struct ObjectRecAt17C {
     u8 pad84[0x14C - 0x84];
     u32 mask;
 };
+#endif
 extern s32 Sound__PlayPitched(s32 arg0, CVector3 arg1, s32 arg4, sptr arg5,
                          f32 arg6);
 void func_00238EE4(ObjectRecAt17C *arg0, ObjectRecAt17C *arg1, s32 arg2, CVector3 arg3,

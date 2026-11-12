@@ -7,14 +7,35 @@
  * the player: it is moved 102.4 units along the facing (angle 0x50 + pi),
  * raised 163.84, and given a velocity of 358.4 forward and 358.4 up. */
 
+#ifdef TARGET_PORT
+typedef struct Thrown {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Thrown(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_x[T2_HOFF_Thrown(header.m_vPos.x)]; f32 x; }; /* N64 0x4 */
+        struct { u8 _hp_y[T2_HOFF_Thrown(header.m_vPos.y)]; f32 y; }; /* N64 0x8 */
+        struct { u8 _hp_z[T2_HOFF_Thrown(header.m_vPos.z)]; f32 z; }; /* N64 0xC */
+        struct { u8 _hp_vx[T2_HOFF_Thrown(m_vVelocity.x)]; f32 vx; }; /* N64 0x18 */
+        struct { u8 _hp_vy[T2_HOFF_Thrown(m_vVelocity.y)]; f32 vy; }; /* N64 0x1C */
+        struct { u8 _hp_vz[T2_HOFF_Thrown(m_vVelocity.z)]; f32 vz; }; /* N64 0x20 */
+        struct { u8 _hp_angle[T2_HOFF_Thrown(m_RotY)]; f32 angle; }; /* N64 0x50 */
+    };
+} Thrown;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ f32 x, y, z;
+    /* 0x04 */ f32 x;
+    /* 0x08 */ f32 y;
+    /* 0x0C */ f32 z;
     /* 0x10 */ u8 pad10[8];
-    /* 0x18 */ f32 vx, vy, vz;
+    /* 0x18 */ f32 vx;
+    /* 0x1C */ f32 vy;
+    /* 0x20 */ f32 vz;
     /* 0x24 */ u8 pad24[0x50 - 0x24];
     /* 0x50 */ f32 angle;
 } Thrown;
+#endif
 
 extern void EnemyAI_Dismount(void *obj, void *ai, CPlayer *player);
 extern f32 func_002982F0(f32 x);   /* sinf */

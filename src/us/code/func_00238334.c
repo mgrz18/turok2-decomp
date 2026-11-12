@@ -5,6 +5,18 @@
 #include "globals/collision.h"
 #include "globals/player.h"
 
+#ifdef TARGET_PORT
+typedef struct BlastActor {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_BlastActor(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_kind[T2_HOFF_BlastActor(header.m_Type)]; u8 kind; }; /* N64 0x0 */
+        struct { u8 _hp_pos[T2_HOFF_BlastActor(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_footY[T2_HOFF_BlastActor(m_CollisionYOffset)]; f32 footY; }; /* N64 0x54 */
+    };
+} BlastActor;
+#else
 typedef struct BlastActor {
     /* 0x000 */ u8 kind;            /* 1: player, 2: object */
     /* 0x001 */ u8 pad1[0x3];
@@ -12,6 +24,7 @@ typedef struct BlastActor {
     /* 0x010 */ u8 pad10[0x54 - 0x10];
     /* 0x054 */ f32 footY;
 } BlastActor;
+#endif
 
 f32 CVector3__Distance(CVector3 *a, CVector3 *b);
 s32 CGameObjectInstance__GetNearestBox(BlastActor *a, CVector3 pos, HitFrame *out);

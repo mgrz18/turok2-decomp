@@ -9,6 +9,20 @@
 #include "protos/player.h"
 
 /* The creature to mount (an AI actor). */
+#ifdef TARGET_PORT
+typedef struct Mount {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Mount(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_kind[T2_HOFF_Mount(header.m_Type)]; u8 kind; }; /* N64 0x0 */
+        struct { u8 _hp_pos[T2_HOFF_Mount(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_yaw[T2_HOFF_Mount(m_RotY)]; f32 yaw; }; /* N64 0x50 */
+        struct { u8 _hp_type[T2_HOFF_Mount(m_nTypeFlag)]; u16 type; }; /* N64 0xB8 */
+        struct { u8 _hp_ai[T2_HOFF_Mount(m_AI.m_dwFlags)]; u8 ai[4]; }; /* N64 0x140 */
+    };
+} Mount;
+#else
 typedef struct {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1[3];
@@ -20,6 +34,7 @@ typedef struct {
     /* 0x0BA */ u8 padBA[0x140 - 0xBA];
     /* 0x140 */ u8 ai[4];
 } Mount;
+#endif
 
 f32 AI_AngleToPoint(CGameObjectInstance *body, CVector3 point);   /* angle to a point */
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);
