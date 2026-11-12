@@ -749,10 +749,20 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
                 DumpDL((const uintptr_t*)lastDL, 0, &budget);
             }
         }
-        // T2_DRAW_FROM=F (DEBUG-ONLY, round 12 C27): with --draw, draw (and shoot) from frame F on only:
-        // the pictures of the end of a long scripted run without drawing all of it (the game runs the same)
-        static const int drawFrom = getenv("T2_DRAW_FROM") != nullptr ? atoi(getenv("T2_DRAW_FROM")) : 0;
-        if (got && f + 1 >= drawFrom && (window || T2Offscreen_Interpreter())) {
+        // T2_DRAW_FROM=F or A-B[;A-B...] (DEBUG-ONLY, round 12 C27): with --draw, draw (and shoot) from
+        // frame F on, or in those frame ranges, only: pictures of a long scripted run without drawing
+        // all of it (offscreen drawing is ~40 frames a second on the box; the game runs the same)
+        static const char* drawFrom = getenv("T2_DRAW_FROM");
+        bool drawNow = drawFrom == nullptr;
+        for (const char* d = drawFrom; d != nullptr && *d != 0 && !drawNow;) {
+            const int a = atoi(d);
+            const char* dash = strchr(d, '-');
+            const char* semi = strchr(d, ';');
+            const bool range = dash != nullptr && (semi == nullptr || dash < semi);
+            drawNow = range ? (f + 1 >= a && f + 1 <= atoi(dash + 1)) : f + 1 >= a;
+            d = semi != nullptr ? semi + 1 : nullptr;
+        }
+        if (got && drawNow && (window || T2Offscreen_Interpreter())) {
             // Only with --draw: the game's display lists are not host-correct yet (GBI words
             // hold 32-bit addresses; docs/port/BUILD.md "GBI").
             // Fast3D maps RDP coordinates from its native size (320x240 by default) to the
