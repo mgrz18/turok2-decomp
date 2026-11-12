@@ -588,8 +588,8 @@ The generator couplings (aimed fire at each cluster in 115, 117, 119) score noth
 1. ~~The 122 crash above~~ (fixed on the merged tree, round 11 C26: see 9.2).
 2. ~~Level 5: the pylons, the death in 93, the embryos and the master computer~~ (round 12 a1:
    section 9.4, the whole level to the hub).
-3. Level 6: the couplings (object 288, intelligence 574); the force field generators (object 232);
-   then 7601 -> the Primagen (z2's boss recipe starts there).
+3. ~~Level 6: the couplings (object 288, intelligence 574); the force field generators (object 232);
+   then 7601 -> the Primagen~~ (round 12 a2: section 9.5, the whole level, the Mother, the Primagen).
 4. The flesh-eater (82, 83) and talisman (76, 77, 92) portals; ~~the totem 113~~ (9.4).
 
 ### 9.4 Level 5 complete (Phase 7 round 12, part a1)
@@ -661,3 +661,126 @@ Keys: level 5 holds **the three level 6 keys** (object 586, "level 6 key"): 84 (
 Open (level 5): object 608 in 88 (item 0x1133) and the Primagen key; the flesh-eater portal 82
 (5003 in 87) and the talismans 76 (5001 in 88) and 92.
 
+
+### 9.5 Round 12 (a2): level 6 to its end, the Mother, the Primagen
+
+`playthrough.py DIR --level 6` (tools/port/routes56.py) now completes the Lightship by its own
+objectives and chains its two bosses, the ending and the credits:
+
+```sh
+python3 tools/port/playthrough.py DIR --level 6 && . DIR/teleport.env
+SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_STATE_LOG=1000 build/app/turok2 --archive turok2.o2r \
+    --rom ../baserom.us.z64 --game --pak-blank --frames 112000 --input @DIR/playthrough.txt
+```
+
+**How the objectives work.** `T2_ACTOR_LOG` now prints an action's intelligence (`actor:   action
+fl .. gorad .. need .. text ..`), which answered the round-11 question:
+
+- **The couplings** (object 288, type 0x648, action intelligence 574) are walked into, like level
+  1's switches. `CScene__CheckAutoActivation` sets an action going when the player moves within
+  its `m_AutoGoRadius` (41) and the vertical extents overlap (type flag 4). First it asks
+  `Action_CheckRequiredItem` for `m_GoPickupNeeded` 4231, the **crystal ion capacitor** (text 67
+  "crystal ion capacitor required."; "ion capacitor" in the pickup feedback, 0x1087). One capacitor
+  is used per coupling (`CPlayer__UseSpecialPickup` takes one from the low nibble of
+  `m_SpecialPickupCount[231]`; checked in the ROM's asm at 0x2536E0 and 0x265F90). A generator's 4
+  couplings count its link group down (keys 85, 91, 92, 88). Their 4 records fire together with
+  the fourth: "power generator recalibrated.". The fourth generator gives "all power generators
+  recalibrated. mission complete." (group 97, type 11).
+- **The force field generators** (object 232 with a record to 114's actors 69-72, message 87:
+  115 actor 38, 116 actor 53, 119 actor 23, 123 actor 33) are actions too (radius 41, no item):
+  "force field generator disabled.". The fourth drops the field round 114's exit 7601 (group 86,
+  "force field down.").
+- **The assembly plants**: plasma fire destroys 121's (object 376, type 0x649) and 122's (object
+  283). 123's plant is two **laser power crystal** slots (object 183, actions 24 and 25, item 4229,
+  the red laser cell; text 75 "laser power crystal required.", group 87): "assembly plant
+  destroyed.". The third plant gives "all assembly plants destroyed. mission complete." (group 89,
+  type 12). 123's other slots (object 184, actions 26-29, item 4230, the blue laser cell) open its
+  doors; the route teleports past them.
+- **7601** (114's regions 1348/1349 at (0, -306, 6215)). Their info has flag 0x200000, so the
+  warp fires when the player walks in, not after a teleport onto them. With both objectives done
+  it leads to **the Mother** (level 3). Her death warps 6999 (`func_004457DC`), which is 114's
+  start. Its other 7601 pad (regions 151/152, beside the start, a floor pad) then leads to the
+  hub (`CPlayer__Warp`: objectives done and the level's key 7). No warp region anywhere leads to
+  the Primagen (7602); the route hops there.
+
+**The items.** The couplings and the crystal slots need items from the earlier levels. The
+crystal ion capacitor (object 601, item 4231) lies only in level 3's 66 at (-2033.5, -307.2,
+-1457.5). The red laser cells (object 599) lie in level 5's 91 (four), the blue ones (object 600)
+in level 4's 101, 102 and 105 (`tools/assets/levels.py` without `--no-sections`; cart 2 maps
+object to item). A level-6 run from a new game has none of them. The route hands them over with
+the new debug switch `T2_GIVE_ITEMS=ID[:N][,...][@F][;...]` (port/game/t2bosslog.c). It sets
+the count (both nibbles), once per group, at frame F: 4 capacitors in each generator room and 2
+red cells in 123.
+
+**Open: one capacitor for 16 couplings.** The game places one capacitor, but each of the 16
+couplings uses one, and a nibble holds at most 15. So either a source this survey missed exists
+(the drop tables `sDropPickups`/`sDropPickups2` have no 4231, and no level actor or instance
+elsewhere uses object 601), or the N64 does not use one per coupling. Check on the emulator: a
+run into 115 with one capacitor.
+
+**The run** (Linux, headless, PIE, 112,000 frames; the frames below come from this run):
+
+| frames | what |
+|---|---|
+| 13,100 | the hub; the portal 6000, the intro cinemas 158, 156, 159-161 |
+| 19,000 | 114, the ship's hub |
+| 20,223 | 115: the four couplings: "power generator recalibrated." (generators 4 -> 3) |
+| 20,527 / 21,627 | "force field generator disabled." (115, 116) |
+| 22,823 | 117: generator 2 |
+| 24,919 / 25,227 | 119: generator 3, force field generator 3 |
+| 26,853 / 28,193 | 121 and 122: "assembly plant destroyed." (plasma fire) |
+| 29,625 | 123: the two red cells in their slots: plant 3, **"all assembly plants destroyed. mission complete."** |
+| 30,481 | 123: generator 4, **"all power generators recalibrated. mission complete."** |
+| 30,727 / 31,265 | force field generator 4; back in 114: **"force field down."** |
+| ~31,700 | 7601: **the Mother** (level 3) |
+| ~48,800 | **her death** (mode 30), her death cinema; 114 at ~51,000 |
+| 52,700 / 53,000 | the pad 7601 by 114's start: **the hub** |
+| 54,000 | the hop: **the Primagen** (level 4) |
+| 65,682 | stage 2's lair wait passes by itself |
+| 71,976 -> 74,618 | stage 2's landing (mode 24, bossState 6): **hung for good before the fix below** |
+| 78,918 / 79,520 | stage 3, its lair wait (`T2_BOSS_FRONT`) |
+| 84,218 | **the Primagen's death** (mode 29), his death cinema |
+| 86,000 / 88,000 | **the ending cinema** (levels 11, 10) |
+| 90,234 - 104,324 | **the credits** (engine mode 15) |
+| 105,000 | **the hub** (level 60) |
+
+**Fixed: `Primagen_EnterMode24`** (func_004077AC, asm_diff 0). This is the recurring N64-offset
+view bug. The function views `LevelScriptState` from its `timer` with N64 deltas: 0x50 for
+`dest.y`, 0x5C for `home.y`, -0xC for `bossState`. On the host the script blocks between them hold
+pointers, so the write `dest.y = home.y` (or 0) landed on another field. Mode 24 (stage 2's landing
+after bossState 6, Primagen_UpdateMode24) waits until he reaches `dest.y`. He lands on the floor
+at y 0 while `dest.y` still held the lair's 588.8, so the fight hung in mode 24 for good. z2's
+fresh recipe never takes that branch. The host body sets the members. The module-2 twin
+`Primagen_EnterMode24_2` (func_004407AC, raw 0x1FC/0xD4 actor offsets and the same deltas) is only
+in the compile-only library.
+
+**Host notes and recipe tuning.**
+
+- 119's couplings stand on the generator at y -153.6, 154 units above the room's floor (y -307).
+  Walking into them from the floor never overlaps their vertical extents, and the jump does not
+  reach them: a jump from 45 units out (R 2 frames into the walk) peaks at y -247.7, 59.5 units
+  up, within 17 units of the coupling in x/z, but the overlap needs y >= -245.8 (the coupling's
+  bottom -153.6 minus the player's height 92.2). That is 2 units short, so the N64's jump is
+  probably a little higher: recheck with part a5's typed jump fields. Until then the route starts
+  each approach in the air (y -110, 45 units out).
+- **The Primagen after the Mother.** Stage 2's lair wait (mode 25) needs a line of sight from
+  the player to his eye (y ~1,542) past the lair door (found[0], type 0x641). With the hop at
+  53,700 he came to rest at z 2,925 (2,918 in z2's fresh runs), and no `T2_BOSS_FRONT` spot ended
+  the wait: (450, 1,800) and (600-750, 1,650-2,150) on the platform, (550, 2,215) on the edge
+  ring. (800, 2,210) and (700, 2,225) ended it, but they lie over the pits (instant death, a life
+  lost). gdb inside the real search (`AI_FindBestTarget` under `Primagen_UpdateMode19`'s 0x8000
+  flag): `Collision_MoveInstance` from (548, 0, 2,217) to his eye returns blocked. A probe from
+  `T2Port_BossFront` (after the frame, `T2_BOSS_FRONT_SCAN=1`) does not agree with it everywhere,
+  so treat the scan as a hint only. Where he comes to rest varies with the run before him (his
+  flight there differs), so the route's hop frame (54,000) is tuned: from it he rests where the
+  stage-2 wait ends by itself (65,682), and z2's spot passes stage 3's (79,520). Not compared
+  with the N64.
+  New debug options: `T2_BOSS_FRONT=D,EVERY,K` (the spot K D in front of the lair, default 2.5),
+  `T2_BOSS_FRONT_PROBE=1` (the search, 3 and EVERY/2 frames into a wait: what the probe hit,
+  found[0]'s state) and `T2_BOSS_FRONT_SCAN=1` (a floor grid of S/. results).
+- `T2_AIM_NODE=boss@3/4`: `@` takes a list of levels, so the route aims at the Mother and then at
+  the Primagen.
+
+New debug switches (round 12 a2, DEBUG-ONLY): `T2_GIVE_ITEMS`, `T2_BOSS_FRONT`'s K,
+`T2_BOSS_FRONT_PROBE`, `T2_BOSS_FRONT_SCAN`, `T2_AIM_NODE=...@L1/L2`, the action line of
+`T2_ACTOR_LOG`, the round-robin and destination fields of the `bossfront:` line.

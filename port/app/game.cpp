@@ -44,6 +44,7 @@ void T2Port_AimEnemy(int frame, const char *spec);
 void T2Port_Cheats(int frame, const char *spec, const char *fill);
 void T2Port_SavePortal(int frame, const char *spec);
 void T2Port_DoorOpen(int frame, const char *spec);
+void T2Port_GiveItems(int frame, const char *spec);
 void T2Port_DebugSwitches(int skipPak, int startMode);
 }
 
@@ -665,6 +666,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         static const char* fillAmmo = getenv("T2_FILL_AMMO");
         if (cheats != nullptr || fillAmmo != nullptr) {
             T2Port_Cheats(f + 1, cheats, fillAmmo); // DEBUG-ONLY: T2_CHEATS=MASK, T2_FILL_AMMO=N
+        }
+        static const char* giveItems = getenv("T2_GIVE_ITEMS");
+        if (giveItems != nullptr) {
+            T2Port_GiveItems(f + 1, giveItems); // DEBUG-ONLY: T2_GIVE_ITEMS=ID[:N][,...]
         }
         static const char* doorOpen = getenv("T2_DOOR_OPEN");
         if (doorOpen != nullptr) {

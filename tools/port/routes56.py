@@ -10,7 +10,8 @@ through the hub portal 5000 and its intro cinemas to level 124 (HIVE TOP), then 
 --level 6, the Primagen's Lightship: the hub portal 6000 and its intro cinemas to level 114 (the
 ship's hub), the three power-generator wings 115, 117 (via 116) and 119 (via 118), the assembly
 plants 121, 122, 123 (via 120, with the fourth generator in 123) and back to 114, whose exit
-7601 is the Primagen's arena (level 3).
+7601 is the Mother's arena (level 3); after her, the hub and a hop to the Primagen (7602, level 4),
+his death, the ending and the credits (round 12 a2: PLAYTHROUGH.md 9.4).
 
 The objectives (Mission_LevelObjectivesDone: link group types 9/10 and 11/12, the types table
 puts them at link groups 44/98 and 97/89):
@@ -20,9 +21,11 @@ puts them at link groups 44/98 and 97/89):
            actor 53: "master computer destroyed. mission complete.").
   level 6: 4 power generators (each one 4 couplings, object 288, around actor 45 of 115, 42 of
            117, 31 of 119, 37 of 123: "power generator recalibrated.", the last "all power
-           generators recalibrated. mission complete."), 3 assembly plants (121 actor 37, object
-           376; 122 actor 23, object 283; 123 actors 24 and 25, object 183: "assembly plant
-           destroyed.", "all assembly plants destroyed. mission complete.").
+           generators recalibrated. mission complete."; walked into, each one uses a crystal ion
+           capacitor, item 4231), 3 assembly plants (121 actor 37, object 376; 122 actor 23,
+           object 283: plasma fire; 123: its two laser power crystal slots, actions 24 and 25,
+           object 183, a red laser cell (4229) each: "assembly plant destroyed.", "all assembly
+           plants destroyed. mission complete.").
 
 Step format as playthrough.py's L2_SEGMENTS: (dt, x, y, z, rotY, walk, opts); opts "trig" (a "!"
 teleport), "fire" (frames of fire taps), "aim" ((x, y, z) for T2_AIM_AT or "enemy").
@@ -144,57 +147,105 @@ L5_TOTEM = (14250, 2000, 113)
 # (mode 16) at ~42,100, the hub (60) by ~43,500 (run 48,000 frames: the fight varies)
 L5_BOSS = (15900, 16000)
 
+def _couplings(dt0, cx, y, cz, half=102.4, out=60.0, gap=200, walk=50):
+    """Steps that walk into the 4 couplings (object 288, action intelligence 574) round a power
+    generator at (cx, cz): each one from `out` units outside it along x, facing it, C-up `walk`
+    frames. A coupling goes when the player comes within its m_AutoGoRadius (41; 35.8 in 123)
+    (CScene__CheckAutoActivation, type flag 4) and holds a crystal ion capacitor (item 4231,
+    Action_CheckRequiredItem uses one per coupling)."""
+    steps = []
+    for k, (sx, sz) in enumerate(((1, 1), (1, -1), (-1, -1), (-1, 1))):
+        x, z = cx + sx * half, cz + sz * half
+        steps.append((dt0 + k * gap, x + sx * out, y, z, sx * 1.5708, walk, {}))
+    return steps
+
+
+# round 12 a2: the items the earlier levels give, handed by T2_GIVE_ITEMS (relative frame, spec):
+# the couplings need a crystal ion capacitor each (item 4231; the game has one, in level 3's 66:
+# docs/port/PLAYTHROUGH.md 9.4), plant 3's two laser power crystal slots a red laser cell each
+# (4229, level 5's 91 has four)
+L6_GIVE = [(400, "4231:4"), (3000, "4231:4"), (5100, "4231:4"), (10200, "4231:4,4229:2")]
+
 L6_SEGMENTS = [
     ("114 Level 6A: exit 6100", 0, [
         (0, -3019.7, 38.3, -3525.4, 0.1928, W, {}),          # warp 6100 -> 115
     ]),
-    ("115 Level 6B: power generator 1, exit 6101", 400, [
-        (0, 4915.0, 51.0, 2300.0, 0.0, 0, {"fire": 900, "aim": (4915.0, 100.0, 1536.0)}),  # couplings 49-52
-        (1000, 3679.0, 38.3, 6552.4, 0.7521, W, {}),         # warp 6101 -> 114
+    ("115 Level 6B: power generator 1 (couplings 49-52), force field generator 38, exit 6101", 400,
+     _couplings(0, 4915.2, 51.2, 1536.0) + [
+        (800, 1201.0, 640.4, -2522.3, 2.0461, 80, {}),        # force field generator 38: "force field generator disabled."
+        (1100, 3679.0, 38.3, 6552.4, 0.7521, W, {}),         # warp 6101 -> 114
     ]),
-    ("114 Level 6A again: exit 6200", 1800, [
+    ("114 Level 6A again: exit 6200", 1900, [
         (0, -3941.2, 38.3, 3218.2, -1.5381, W, {}),          # warp 6200 -> 116
     ]),
-    ("116 Level 6C: exit 6202", 2200, [
-        (0, -775.4, -1190.4, 5016.4, 2.2423, W, {}),         # warp 6202 -> 117
+    ("116 Level 6C: force field generator 53, exit 6202", 2300, [
+        (0, 3290.3, 1254.8, 1969.0, 0.4721, 80, {}),         # force field generator 53
+        (300, -775.4, -1190.4, 5016.4, 2.2423, W, {}),       # warp 6202 -> 117
     ]),
-    ("117 Level 6D: power generator 2, exit 6298", 2600, [
-        (0, 2457.0, 51.0, -1500.0, 0.0, 0, {"fire": 900, "aim": (2457.0, 100.0, -2304.0)}),  # couplings 45-48
-        (1000, 3986.2, 38.3, 3173.2, 0.0380, W, {}),         # warp 6298 -> 114
+    ("117 Level 6D: power generator 2 (couplings 45-48), exit 6298", 3000,
+     _couplings(0, 2457.6, 51.2, -2304.0) + [
+        (900, 3986.2, 38.3, 3173.2, 0.0380, W, {}),          # warp 6298 -> 114
     ]),
-    ("114 Level 6A again: exit 6300", 4000, [
+    ("114 Level 6A again: exit 6300", 4300, [
         (0, 2603.8, 38.3, 4555.6, 0.0308, W, {}),            # warp 6300 -> 118
     ]),
-    ("118 Level 6E: exit 6302", 4400, [
+    ("118 Level 6E: exit 6302", 4700, [
         (0, -3019.6, 1420.8, 3064.6, -0.8187, W, {}),        # warp 6302 -> 119
     ]),
-    ("119 Level 6F: power generator 3, exit 6398", 4800, [
-        (0, -5683.0, -154.0, -1700.0, 0.0, 0, {"fire": 900, "aim": (-5683.0, -100.0, -2457.0)}),  # couplings 33-36
-        (1000, -607.0, -115.3, -3787.6, -0.8993, W, {}),     # warp 6398 -> 114
+    ("119 Level 6F: power generator 3 (couplings 33-36), force field generator 23, exit 6398", 5100,
+     # its couplings stand 154 units over the room's floor (y -307): the jump does not reach them
+     # (open, PLAYTHROUGH.md 9.4), so each approach starts in the air at y -110, 45 units out
+     _couplings(0, -5683.2, -110.0, -2457.6, out=45.0) + [
+        (800, -703.2, 486.8, 7037.8, 0.4754, 80, {}),        # force field generator 23
+        (1100, -607.0, -115.3, -3787.6, -0.8993, W, {}),     # warp 6398 -> 114
     ]),
-    ("114 Level 6A again: exit 6010", 6200, [
+    ("114 Level 6A again: exit 6010", 6600, [
         (0, 4252.5, 38.3, -2911.0, -2.4701, W, {}),          # warp 6010 -> 120
     ]),
-    ("120 Level 6G: exit 6400", 6600, [
-        (0, 3787.6, 38.3, 7.4, -2.4701, W, {}),           # warp 6400 -> 121
+    ("120 Level 6G: exit 6400", 7000, [
+        (0, 3787.6, 38.3, 7.4, -2.4701, W, {}),              # warp 6400 -> 121
     ]),
-    ("121 Level 6H: assembly plant 1, exit 6402", 7000, [
-        (0, -614.0, 307.0, -700.0, 0.0, 0, {"fire": 900, "aim": (-614.0, 400.0, -1382.0)}),
+    ("121 Level 6H: assembly plant 1 (object 376, actor 37), exit 6402", 7400, [
+        (0, -532.0, 307.6, -1703.4, 2.8916, 0, {"fire": 900, "aim": (-614.4, 400.0, -1382.4)}),
         (1000, -146.2, 345.6, -4093.8, -0.8993, W, {}),      # warp 6402 -> 122
     ]),
-    ("122 Level 6I: assembly plant 2, exit 6404", 8400, [
+    ("122 Level 6I: assembly plant 2 (object 283, actor 23), exit 6404", 8800, [
         (0, -1000.0, 307.0, 0.0, 1.5708, 0, {"fire": 900, "aim": (-1690.0, 400.0, 0.0)}),
         (1000, -605.9, 345.6, -3328.5, -3.1096, W, {}),      # warp 6404 -> 123
     ]),
-    ("123 Level 6J: assembly plant 3, power generator 4, exit 6498", 9800, [
-        (0, 1185.0, 46.0, 2100.0, 0.0, 0, {"fire": 900, "aim": (1185.0, 140.0, 1382.0)}),
-        (1000, 0.0, 51.0, -3800.0, 0.0, 0, {"fire": 900, "aim": (0.0, 100.0, -4608.0)}),  # couplings 39-42
-        (2000, -1637.2, 38.3, -775.4, -1.5242, W, {}),       # warp 6498 -> 120
+    ("123 Level 6J: assembly plant 3 (the laser power crystal slots 24/25), power generator 4 "
+     "(couplings 39-42), force field generator 33, exit 6498", 10200, [
+        (0, 1245.1, 45.7, 1254.4, 1.5708, 50, {}),           # slot 24 (object 183, item 4229)
+        (200, 1245.1, 45.7, 1510.4, 1.5708, 50, {}),         # slot 25: "assembly plant destroyed."
+    ] + _couplings(400, 0.0, 51.2, -4608.0) + [
+        (1200, 1871.0, 179.6, -7767.6, -1.0855, 80, {}),     # force field generator 33
+        (1500, -1637.2, 38.3, -775.4, -1.5242, W, {}),       # warp 6498 -> 120
     ]),
-    ("120 Level 6G again: exit 6020", 12200, [
-        (0, -3787.6, 38.3, -7.4, 0.6715, W, {}),            # warp 6020 -> 114
+    ("120 Level 6G again: exit 6020", 12000, [
+        (0, -3787.6, 38.3, -7.4, 0.6715, W, {}),             # warp 6020 -> 114
+    ]),
+    ("114 Level 6A again: the force field is down: exit 7601 to the Primagen", 12400, [
+        # the pad's region info has flag 0x200000: the warp fires on walking in from a region
+        # without 0x40000 (enter_surface), not on a teleport onto it
+        (0, 31.1, -305.6, 6000.0, 3.1416, W2, {}),           # warp 7601 (regions 1348/1349) -> the Primagen
     ]),
 ]
+
+# 7601 with both objectives done is the Mother's arena (level 3, ~12,500 after L6_START): z5's
+# Mother recipe (docs/port/STATUS.md: fire held, the aim on her weak spots, strafing left with a
+# step back every 600 frames). Her death (~17,000 frames into her arena) warps 6999: back to 114 at its
+# start; its other 7601 pad (regions 151/152, by the start) then leads to the hub (CPlayer__Warp:
+# objectives done and the level's key 7 -> 6999). The hub has no warp region to the Primagen (7602):
+# the route hops there (T2_WARP_TO, L6_PRIMAGEN_HOP) and runs z2's recipe (T2_BOSS_FRONT=450): his
+# death, the ending cinema, the credits, the hub. The hop frame is tuned: his lair waits pass only
+# when the player sees his eye past the lair door, and where he comes to rest at the lair (z 2918 to
+# 2925) varies with the run before; from a hop at 53,700 he rested where no floor spot sees him
+# (docs/port/PLAYTHROUGH.md 9.5).
+L6_MOTHER = 12500          # the Mother's arena is loaded (relative to L6_START)
+L6_MOTHER_END = 31000      # relative: the strafing and the steps back stop (her death ~29,600, her cinema)
+L6_EXIT = (33500, 1231.8, 0.0, -4006.8, -1.5708)  # from 114's start (+x) onto its pad 7601 (regions 151/152) -> the hub
+L6_PRIMAGEN_HOP = 34800    # relative: T2_WARP_TO=7602 from the hub (54,000)
+L6_END = 90000             # relative: the end of the held fire
 
 
 def build_level56(level, new_game, fire_every):
@@ -244,6 +295,20 @@ def build_level56(level, new_game, fire_every):
     env = ["T2_WARP_TO=%s" % ",".join(warps), "T2_GIVE_WEAPONS=1", "T2_WEAPON=%d" % (9 if level == 5 else 10),
            "T2_CHEATS=1", "T2_FILL_AMMO=%d" % (100 if level == 5 else 300)]
     env += extra_env
+    if level == 6:
+        # round 12 a2: the earlier levels' items, the Mother (level 3), the hop to the Primagen
+        # (level 4), each boss with the boss env
+        env.append("T2_GIVE_ITEMS=\"%s\"" % ";".join("%s@%d" % (spec, start + rel) for rel, spec in L6_GIVE))
+        m = start + L6_MOTHER
+        inputs += ["# 3 the Mother, then 4 the Primagen: fire held, T2_AIM_NODE=boss@3/4",
+                   "Z@%d..%d" % (m + 800, start + L6_END), "CL@%d..%d" % (m + 5800, m + 15000)]
+        inputs += ["CD@%d..%d" % (f, f + 250) for f in range(m + 5800, start + L6_MOTHER_END, 600)]
+        rel, x, y, z, ry = L6_EXIT
+        inputs += ["# 114 after the Mother: the pad 7601 by the start -> the hub", "CU@%d..%d" % (start + rel + 10, start + rel + 130)]
+        tps.append("%d:%.1f,%.1f,%.1f,%.4f" % (start + rel, x, y, z, ry))
+        env[0] += ",7602@%d" % (start + L6_PRIMAGEN_HOP)
+        env[env.index("T2_FILL_AMMO=300")] = "T2_FILL_AMMO=600"
+        env += ["T2_AIM_NODE=boss@3/4", "T2_BOSS_FRONT=450", "T2_BOSS_LOG=1"]
     if aim_at:
         env.append("T2_AIM_AT=\"%s\"" % ";".join(aim_at))
     if aim_enemy:
