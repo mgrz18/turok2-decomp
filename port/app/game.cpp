@@ -36,7 +36,7 @@ void T2Port_Teleport(int frame, const char *spec);
 extern int gT2HostFrame;
 void T2Port_WakeEnemies(int frame, const char *spec);
 void T2Port_FaceNearest(int frame, const char *spec);
-void T2Port_AimNode(int frame, const char *spec);
+int T2Port_AimNode(int frame, const char *spec);
 void T2Port_TraceBoss(int frame);
 void T2Port_AimAt(int frame, const char *spec);
 void T2Port_AimEnemy(int frame, const char *spec);

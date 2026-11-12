@@ -227,6 +227,14 @@ static s32 T2Port_AimMask(const char *spec) {
     sAimSkip = NULL;
     sAimSetN = 0;
     sAimPoolOnly = 0;
+    if (strncmp(spec, "actor:", 6) == 0) {
+        /* actor:N (round 11 z1): only the level actor N (a Sister of Despair among her zombies) */
+        int n = atoi(spec + 6);
+        if (gScene.m_pActors != NULL && n >= 0 && n < gScene.m_nActors) {
+            sAimSet[sAimSetN++] = &gScene.m_pActors[n];
+        }
+        return -1;
+    }
     if (strncmp(spec, "boss", 4) == 0) {
         if (gScene.m_nLevel == 1) {
             /* the Blind One's script (sBlindOneScript): phase 3 its minions, 4/5/6 the actors of
@@ -294,7 +302,12 @@ static s32 T2Port_AimMask(const char *spec) {
     return (s32) strtol(spec, NULL, 0);
 }
 
-void T2Port_AimNode(int frame, const char *spec) {
+/* the portable atan2f for t2debug.c's aims (round 11 z1) */
+f32 T2Port_Atan2f(f32 y, f32 x) {
+    return T2Aim_Atan2f(y, x);
+}
+
+int T2Port_AimNode(int frame, const char *spec) {
     static s32 sLastMask = -1;
     static int sLastFrame;
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
@@ -308,7 +321,7 @@ void T2Port_AimNode(int frame, const char *spec) {
 
     if (p == NULL || p->m_pCamera == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_pActors == NULL ||
         gScene.m_WarpState != 0) {
-        return;
+        return 0;
     }
     pl = &p->m_CharacterActor;
     eye = p->m_pCamera->m_vPos;
@@ -362,7 +375,7 @@ void T2Port_AimNode(int frame, const char *spec) {
         }
     }
     if (best == NULL) {
-        return;
+        return 0;
     }
     pl->m_RotY += AI_AngleToPoint(pl, bestAim);
     dx = bestAim.x - eye.x;
@@ -378,6 +391,7 @@ void T2Port_AimNode(int frame, const char *spec) {
                bestAim.z, p->m_pCamera->m_ViewParams.m_vRotOffset.x);
         fflush(stdout);
     }
+    return 1;
 }
 
 /* T2_CHEATS=MASK, T2_FILL_AMMO=N (game.cpp, every frame; DEBUG-ONLY, round 9 x2): OR the game's own cheat flags
