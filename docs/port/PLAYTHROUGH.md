@@ -586,9 +586,78 @@ The generator couplings (aimed fire at each cluster in 115, 117, 119) score noth
 ### 9.3 Open (levels 5 and 6)
 
 1. ~~The 122 crash above~~ (fixed on the merged tree, round 11 C26: see 9.2).
-2. Level 5: the pylons (what kills object 139: the aim height, a weapon, a switch); the death in
-   93; the embryos and the master computer with real aims (the embryos are type 403; the
-   computers type 1610).
+2. ~~Level 5: the pylons, the death in 93, the embryos and the master computer~~ (round 12 a1:
+   section 9.4, the whole level to the hub).
 3. Level 6: the couplings (object 288, intelligence 574); the force field generators (object 232);
    then 7601 -> the Primagen (z2's boss recipe starts there).
-4. The flesh-eater (82, 83) and talisman (76, 77, 92) portals; the totem 113.
+4. The flesh-eater (82, 83) and talisman (76, 77, 92) portals; ~~the totem 113~~ (9.4).
+
+### 9.4 Level 5 complete (Phase 7 round 12, part a1)
+
+`playthrough.py DIR --level 5` now plays the Hive of the Mantids **from the hub portal to the hub
+with both objectives, the Hive Totem saved and the Mantid Queen dead**, all by the game's own
+logic (no debug warp: z4's `T2_WARP_TO=5201` hop is gone). Linux, headless, PIE:
+
+```sh
+python3 tools/port/playthrough.py DIR --level 5 && . DIR/teleport.env
+SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_STATE_LOG=500 build/app/turok2 --archive turok2.o2r \
+    --rom ../baserom.us.z64 --game --pak-blank --frames 48000 --input @DIR/playthrough.txt
+```
+
+| frame | what |
+|---|---|
+| 17,300 | 124 HIVE TOP (after the portal 5000 and its cinemas) |
+| 17,700-19,200 | the four pylons die (one window of `T2_AIM_ENEMY ,R,A` each) |
+| 18,913 | **"force field down."** (link group 49 at 0) |
+| 19,600 | 84 through the game's own warp 5201 (walked in from the next region), then 85-90; **the three level 6 keys** (object 586, item 0x10FE) in 84, 87 and 89 |
+| 24,607 | 94: **"embryo destroyed."** |
+| 25,500 | 91: the four satchel charges (`T2_PICKUP_LOG`: id 4110 x 4) |
+| 27,307 | 95: **"embryo destroyed."** |
+| 29,207 | 96: **"all embryos destroyed. mission complete."** (link group 44, type 9) |
+| 31,001 | 93: the four sockets filled: **"warning, five seconds until detonation."** |
+| 31,359 | **"master computer destroyed. mission complete."** (actor 53, link group 98, type 10) |
+| 32,000 | the exit 7500 (both objectives done) -> **the Hive Totem (113)**: saved, 10/8 kills by ~33,500 |
+| 33,598 | the Mantid Queen (level 2); **her death (mode 16) at 42,095**, her death cinema |
+| **43,500** | **the hub (60)**; exit 0 (`--frames 48000` leaves room: the Queen's fight varies by ~1,500 frames with the route's timing) |
+
+What each objective needed (none was a host bug; every one was a route gap):
+
+- **The pylons** (124 actors 9-12, object 139) are **turrets** (intelligence type 4, 100 health,
+  `Turret_Hurt`: any damage). Their hit boxes are the gun node ~170 units up; z4's fixed aim at
+  y 100 passed under them. `T2_AIM_ENEMY=F1-F2,4000,A` (the level actor A first) kills each in
+  ~3 plasma hits. Each death counts link group 49; at 0 the hive's field (actor 23) drops.
+- **The embryos** (94 actor 19, 95 actor 27, 96 actor 31; object 109, an enemy with 255
+  health) sleep in `EnemyMode_WaitForTrigger`, outside every blast's victim list, inside a
+  **cocoon** (94 actor 78, 95 actor 94, 96 actor 95: object 380, a destructible with 255 health,
+  body flags 7: any damage). The cocoon's death (its link records, head 0x40000) wakes the embryo
+  (kind 1). The route breaks the cocoon (400 frames), then fires at the embryo (600 frames). The
+  level runs on **the shredder** (weapon 9, ~250 frames a cocoon; the plasma rifle needs
+  ~1,500), `T2_FILL_AMMO=100`.
+- **The master computer** (93): its four sockets (actors 7-10, object 177, actions with
+  `m_GoPickupNeeded` 0x100E, auto radius 174) each take one **satchel charge** (object 599 = item
+  0x100E in the object types table, cart 2; four lie in 91 at (921.6, -307.2, -7884.8),
+  (3072, -307.2, -5785.6), (1536, 614.4, -3020.8), (307.2, -307.2, -1843.2):
+  `CPlayer__CollectKeyPiece`; `Action_CheckRequiredItem` spends one). Each socket counts link
+  group 99; at 0 the computer (actor 54) warns, and 358 frames later actor 53 scores the objective.
+  The computer itself takes no shots.
+- **The death in 93** was z4's aim point (1843, 922, 900): it lies over the pit round the
+  computer room; the player fell to y -919 and died (level 164) whatever `T2_CHEATS` says. The
+  sockets are walked to from points on the room's floor (`approach.py 93 --point`).
+- **The Hive Totem** (113): fire taps and `T2_FACE_NEAREST=4000@113`, as levels 1-4. Without a
+  fight the defence fails (state 2) and the game still goes on to the Queen.
+- **The Mantid Queen**: z2's recipe inside the route (`T2_AIM_NODE=boss@2 T2_BOSS_FRONT=450,200`,
+  fire held); the shredder kills her too.
+
+Tools: `T2_ACTOR_LOG` now prints an `actor+:` line per actor: the body flags
+(`m_dwTypeFlags`), an action's auto radius and needed pickup, a destructible's health, and its
+AI callbacks (hurt, step, mode) as offsets from `T2Port_LogOne` (`nm turok2` names them).
+`routes56.py` steps take `"aim": ("actor", A[, R])` (`T2_AIM_ENEMY` with the actor first).
+
+Keys: level 5 holds **the three level 6 keys** (object 586, "level 6 key"): 84 (1075.2, 10.2,
+-2300.9), 87 (615.1, -2119.7, 3383.5), 89 (6743.2, -583.7, -303.6); the route takes all three
+(the hub portal 6000 needs them in a continuous game). Object 608 (item 0x1133) lies in 88 at
+(-2819.8, -307.2, -1478.5), not taken.
+
+Open (level 5): object 608 in 88 (item 0x1133) and the Primagen key; the flesh-eater portal 82
+(5003 in 87) and the talismans 76 (5001 in 88) and 92.
+
