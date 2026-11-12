@@ -379,7 +379,8 @@ L5_QUEEN_AT = 15900     # level 2 (the Queen) reached
 L6_BACK_114 = 26000
 L6_EXIT_AFTER = 500     # the exit teleport, after 114 is reached again
 L6_HUB_AFTER = 800      # the hub
-L6_HOP_AFTER = 1800     # the hop to the Primagen
+L6_HOP_AFTER = 2100     # the hop to the Primagen (1,300 frames after the hub: his stage-3 lair wait then ends
+                        # by itself; from 1,000 after it he rested at z 2,924, where no T2_BOSS_FRONT spot ends it)
 L6_HUB_END = 51000      # the hub after the credits, from the hop
 
 

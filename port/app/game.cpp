@@ -749,7 +749,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
                 DumpDL((const uintptr_t*)lastDL, 0, &budget);
             }
         }
-        if (got && (window || T2Offscreen_Interpreter())) {
+        // T2_DRAW_FROM=F (DEBUG-ONLY, round 12 C27): with --draw, draw (and shoot) from frame F on only:
+        // the pictures of the end of a long scripted run without drawing all of it (the game runs the same)
+        static const int drawFrom = getenv("T2_DRAW_FROM") != nullptr ? atoi(getenv("T2_DRAW_FROM")) : 0;
+        if (got && f + 1 >= drawFrom && (window || T2Offscreen_Interpreter())) {
             // Only with --draw: the game's display lists are not host-correct yet (GBI words
             // hold 32-bit addresses; docs/port/BUILD.md "GBI").
             // Fast3D maps RDP coordinates from its native size (320x240 by default) to the
