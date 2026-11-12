@@ -148,9 +148,29 @@ static HThread *find(OSThread *t) {
 
 /* ---- threads ---- */
 
+/* The N64's FPU state on every game thread (round 11 z5, docs/port/FIDELITY.md 6): the game runs
+ * with the R4300's FS bit set (FCR31: denormal results flush to zero). The host keeps
+ * denormals by default, so a velocity that decays to 0 on the N64 became -6.2e-39 on the host
+ * and demo 2 drifted from game frame 426 (player velocity, then a hit's damage at gf 608).
+ * x86-64: MXCSR FTZ | DAZ; arm64: FPCR FZ. Round to nearest stays the default on both. */
+static void set_n64_fpu(void) {
+#if defined(__x86_64__) || defined(__i386__)
+    unsigned int csr;
+    __asm__ volatile("stmxcsr %0" : "=m"(csr));
+    csr |= 0x8040; /* FTZ (bit 15) | DAZ (bit 6) */
+    __asm__ volatile("ldmxcsr %0" : : "m"(csr));
+#elif defined(__aarch64__)
+    unsigned long fpcr;
+    __asm__ volatile("mrs %0, fpcr" : "=r"(fpcr));
+    fpcr |= 1ul << 24; /* FZ */
+    __asm__ volatile("msr fpcr, %0" : : "r"(fpcr));
+#endif
+}
+
 static void *trampoline(void *p) {
     HThread *h = p;
     tSelf = h;
+    set_n64_fpu();
     pthread_mutex_lock(&sLock);
     wait_baton(h);
     pthread_mutex_unlock(&sLock);
