@@ -571,12 +571,21 @@ is intact, block 2 is not). Suspect: the synchronous allocation evicts or moves 
 a queued decompress job (host-sized entries are larger than the N64's, so the cache is fuller than
 on the console). Not fixed this round.
 
+**Fixed on the merged tree (round 11 C26, d129e748).** The suspect was wrong: no cache memory
+moved. A hardware watchpoint on the plant's `m_rpGeometryHeaderSize` caught
+`Destructible_GoEnter` (func_00265B58) clearing bit 0x100 of it when the plant was destroyed: its
+N64 view of the instance puts `flags` at 0xD4, which on the host falls 8 bytes late (after the
+pointer-wide `def` at 0x14) on the geometry size, so 0x160 became 0x60. The plant's next model
+request then loaded 0x60 of the unit's 0x2E0 unpacked bytes, and `Model_Decompress` read its
+level-of-detail table past them. The view (and the same one in five other functions) now has its
+members at their host offsets; the level-6 run goes on past 122 to 123 (29,000) and back to 114.
+
 The generator couplings (aimed fire at each cluster in 115, 117, 119) score nothing yet: how
 "recalibrate" works (shot, touched, or the use button) is open.
 
 ### 9.3 Open (levels 5 and 6)
 
-1. The 122 crash above (both hosts): first in the way of level 6.
+1. ~~The 122 crash above~~ (fixed on the merged tree, round 11 C26: see 9.2).
 2. Level 5: the pylons (what kills object 139: the aim height, a weapon, a switch); the death in
    93; the embryos and the master computer with real aims (the embryos are type 403; the
    computers type 1610).
