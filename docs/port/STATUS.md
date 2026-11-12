@@ -1,21 +1,23 @@
-# Port status after Phase 7 round 9 (merged state)
+# Port status after Phase 7 round 10 (merged state)
 
-Round 9 merged five branches, in this order: x4 (macOS and host determinism: the attract demos'
-input, the weapon wheel, Mac crashes on the save and the hit paths), x5 (stability: the soak
-harness, 13 crash classes, high memory by default), x3 (fidelity: the N64 reference oracle and
-the translucent draw list), x2 (the first boss defeated: the Mother from start to end) and x1
-(the first level played through: the Port of Adia from a new game to the hub, with the totem
-defence won). Two fixes came twice (`CBarrel__ShouldClose` from x4 and x5,
-`CScene__GetRegionIndex` from x1 and x2): one body each (section 3). The merged tree needed no
-other fix: every scenario below runs to its end. This page says how to build and run the result,
-what the game does now, and what comes next. The part sections below keep each branch's own
-notes (detail pages: [PLAYTHROUGH.md](PLAYTHROUGH.md) (x1), [GAMEPLAY.md](GAMEPLAY.md) section 10
-(x2, x1), [STABILITY.md](STABILITY.md) (x5), [FIDELITY.md](FIDELITY.md) (x3), [MACOS.md](MACOS.md)
-section 11 (x4)); round 8 and earlier follow as history.
+Round 10 merged five branches, in this order: y4 (the merged tree on macOS, host determinism,
+real time), y5 (stability: S14-S23, no raw `+ 0x140` CAI address on the host, the levels soak,
+**a PIE by default on Linux**), y3 (fidelity: the N64's RAM game frame by game frame,
+`n64trace.py` / `detdiff.py`), y2 (the other bosses: the Blind One beaten, the Mantid Queen, the
+Primagen) and y1 (level 2, the River of Souls). Four fixes came twice (the `gImpactEventHandlers`
+0xFFFF read from y4 and y3, the menu text fields from y4 and y5, `BlindOne_Draw` /
+`BlindOne_PhaseVulnerableInit` from y2 and y5, the spawn chain's `sptr` from y1 and y5): one
+body each (section 3). The merged tree needed two small fixes of its own (a compile-only
+module-2 file, `t2audio_test` on the PIE build). This
+page says how to build and run the result, what the game does now, and what comes next. The part
+sections below keep each branch's own notes (detail pages: [MACOS.md](MACOS.md) section 12 and
+[PERF.md](PERF.md) section 5 (y4), [STABILITY.md](STABILITY.md) section 7 and [64BIT.md](64BIT.md)
+part 5 (y5), [FIDELITY.md](FIDELITY.md) section 5 (y3), [GAMEPLAY.md](GAMEPLAY.md) section 11 (y2),
+[PLAYTHROUGH.md](PLAYTHROUGH.md) section 6 (y1)); round 9 and earlier follow as history.
 
-The matching build is unchanged: `tools/asm_diff.py --base 5437cfc0 -j 8` reports 0 differences
-over all 3,938 files after every merge, and a clean `make clean && make setup && make build &&
-make verify` gives the identical ROM (`build/turok2.us.z64: OK`, 123 shared .rodata objects agree).
+The matching build is unchanged: `tools/asm_diff.py --base cc0c322b -j 8` reports 0 differences
+over all 3,938 files after every merge and every fix, and a clean `make clean && make setup &&
+make build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
 ## 1. Build and run
 
@@ -23,53 +25,56 @@ make verify` gives the identical ROM (`build/turok2.us.z64: OK`, 123 shared .rod
 # 0. the matching build first: gendata and asm_diff read its ELF; keep a copy as build/ref.elf
 make setup && make -j8 build && make verify && cp build/turok2.us.elf build/ref.elf
 
-# 1. the archive, format 2.0. Unchanged this round (no swapped struct changed): sha1 b6b9d484...
-python tools/assets/mkarchive.py baserom.us.z64 -o OUT/turok2.o2r -j 4     # ~12 s
+# 1. the archive, format 2.0. Unchanged this round (rebuilt from the merged tree: the same bytes)
+python tools/assets/mkarchive.py baserom.us.z64 -o OUT/turok2.o2r -j 4     # ~12 s, sha1 b6b9d484...
 python tools/assets/archive_check.py OUT/turok2.o2r baserom.us.z64          # OK, format 2.0
 
-# 2. configure; the game library AND the runtime/audio libraries (gendata reads all three)
+# 2. configure IN A FRESH BUILD DIR (the Linux default changed to a PIE this round: an old cache
+#    keeps T2_LOW_MEMORY=ON); the game library AND the runtime/audio libraries (gendata reads all three)
+rm -rf OUT/build
 cmake -S port -B OUT/build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
-      -DCMAKE_BUILD_TYPE=Debug
+      -DCMAKE_BUILD_TYPE=Debug                      # -DT2_LOW_MEMORY=ON: the old -no-pie build
 ninja -C OUT/build -j8 turok2_game t2runtime t2audio
 
 # 3. the game data as C into port/gen/ (gitignored). Drop the cache after ANY header change.
-#    RERUN IT this round: gendata changed (x4's HEADER_POINTEES, x5's grow_bss_tails + audit).
+#    RERUN IT this round: y2 changed structs/boss.h, globals/boss_ai.h and gendata's count hints.
 rm -f OUT/decls.json
 python3 tools/port/gendata.py --build OUT/build --cache OUT/decls.json -j 4      # ~1 min
 
-# 4. re-run cmake so data.cmake sees port/gen/*.c, then the executable
-cmake OUT/build && ninja -C OUT/build -j8 turok2
+# 4. re-run cmake so data.cmake sees port/gen/*.c, then everything (turok2, t2audio_test and the
+#    compile-only module-2 library, which checks that every C file builds for the host)
+cmake OUT/build && ninja -C OUT/build -j8
 
-# 5. run headless (Linux: SDL's offscreen driver, no window). High memory is the default now.
+# 5. run headless (Linux: SDL's offscreen driver, no window). High memory (and a PIE) is the default.
 cd OUT && SDL_VIDEODRIVER=offscreen T2_SHOT=shot.ppm T2_SHOT_EVERY=300 \
     build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
     --game --draw --pak-blank --frames 26000
 ```
 
-The archive: 26,124 units, sha1 `b6b9d484e6f97718e48ddc6d7f0ce9188dbb11c5` (rebuilt from the
-merged tree: the same bytes); `turok2` without `--game` reports fnv1a64 `88179a9b862ded6c` on all 3
-backends. gendata: 1,532 data symbols (1,526 typed from a C declaration), 69 pointer targets
-typed as tables, **24 pointer targets typed as a header and raw bytes** (`HEADER_POINTEES`: the
-attract demos), 20 struct tables extended over splat labels, 387 zero .bss symbols, 3 typed .bss
-structs given their N64 tail (`__osTimerCounter`, `gBlindOne` + the cinema player,
-`sMdctFft`), 42 typed symbols larger than their N64 extent listed by the audit, 4,195 pointer
-slots (3,059 relocated, 1,108 null, 28 unresolved).
+The archive: 26,124 units, sha1 `b6b9d484e6f97718e48ddc6d7f0ce9188dbb11c5` (round 9's bytes;
+`archive_check.py`: OK, format 2.0). gendata: 1,534 data symbols (1,529 typed from a C
+declaration), 402 pointer targets, 386 zero .bss symbols, 3 typed .bss structs with their N64
+tail.
 
-**The scripted runs** (`turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --draw
---pak-blank` plus; "new game" is `START@4400 A@4500 A@4700 A@4800`):
+**The scripted runs** (`turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --pak-blank`
+plus, `--draw` for pictures; "new game" is `START@4400 A@4500 A@4700 A@4800`; "boss env" is
+`T2_GIVE_WEAPONS=1 T2_WEAPON=10 T2_AIM_NODE=boss T2_CHEATS=1 T2_FILL_AMMO=600 T2_BOSS_LOG=1`):
 
 | what | how | frames |
 |---|---|---|
 | boot + the 3 attract demos | (none) | 26,000 |
-| **the Port of Adia, start to finish** (x1) | `python3 ../tools/port/playthrough.py . --fight 10 && . ./teleport.env`, then `T2_EVENT_LOG=1 T2_STATE_LOG=100 ... --input @playthrough.txt` ([PLAYTHROUGH.md](PLAYTHROUGH.md)) | 27,000 |
-| **the Mother defeated** (x2) | the input file of the "boss recipe" below, `T2_WARP_TO=-4 T2_GIVE_WEAPONS=1 T2_WEAPON=10 T2_AIM_NODE=boss T2_CHEATS=1 T2_FILL_AMMO=600 T2_BOSS_LOG=1 T2_STATE_LOG=200` | 36,000 |
+| **level 1, the Port of Adia, start to finish** | `python3 ../tools/port/playthrough.py DIR --fight 10 && . DIR/teleport.env`, then `T2_EVENT_LOG=1 T2_STATE_LOG=100 ... --input @DIR/playthrough.txt` ([PLAYTHROUGH.md](PLAYTHROUGH.md)) | 27,000 |
+| **level 2, the River of Souls** (y1) | `python3 ../tools/port/playthrough.py DIR --level 2 && . DIR/teleport.env`, then `T2_EVENT_LOG=1 T2_STATE_LOG=250 ... --input @DIR/playthrough.txt` (PLAYTHROUGH.md section 6) | 49,500 |
+| **the Mother defeated** | the input file of the Mother recipe below, `T2_WARP_TO=-4` + boss env, `T2_STATE_LOG=200` | 36,000 |
+| **the Blind One defeated** (y2) | new game + `Z@14000..90000`, `T2_WARP_TO=7401 T2_TELEPORT=14000:-400,204.8,0` + boss env | 25,000 |
+| the Mantid Queen (y2) | new game + `Z@14000..200000`, `T2_WARP_TO=7501` + boss env | 120,000 |
+| the Primagen (y2) | new game + `Z@14000..90000`, `T2_WARP_TO=7602` + boss env (no strafing) | 30,000 |
 | the player kills enemies (round 8 w2) | `--input @fight.txt` (new game, `Z@13320..13420` and every 140 frames to 14,680), `T2_WARP_TO=1098 T2_GIVE_WEAPONS=1 T2_WEAPON=4 T2_TELEPORT="13300:-1143.6,0,-2034.7" T2_WAKE_ENEMIES=500 T2_FACE_NEAREST=1500` | 14,800 |
-| a real warp to level 52 and back | `T2_WARP_TO=1813 --input @exit52.txt` (round 7) | 16,000 |
 | save | `--pak-dir DIR`, new game + `A@13250 A@13400`, `T2_SAVE_PORTAL=13100` | 14,100 |
 | load | `--pak-dir DIR` (the same DIR), `START@4400 A@4500 DD@4700 A@4800 DU@4900 A@5000 A@5200 A@5400` | 6,500 |
-| enemies hurt the player, a door, the bow journey | round 8's recipes (history below) | |
+| demo 1 against the N64 (y3) | below | 8,300 |
 
-The boss recipe (x2; one input entry per line, a single line is cut at its buffer):
+The Mother recipe (one input entry per line, a single line is cut at its buffer):
 
 ```sh
 cd OUT && (echo "START@4400 A@4500 A@4700 A@4800 Z@14000..90000 CL@19000..90000";
@@ -80,18 +85,34 @@ SDL_VIDEODRIVER=offscreen T2_WARP_TO=-4 T2_GIVE_WEAPONS=1 T2_WEAPON=10 T2_AIM_NO
   --frames 36000 --input @mother_end.txt
 ```
 
+Demo 1 against the N64's RAM (y3, [FIDELITY.md](FIDELITY.md) section 5; the emulator side takes
+~2 minutes):
+
+```sh
+xvfb-run -a -s "-screen 0 1024x768x24" python3 tools/port/n64trace.py --rom baserom.us.z64 \
+    --from 1980 --to 3300 --actors > n64.det
+cd OUT && SDL_VIDEODRIVER=offscreen T2_DET_LOG=1 T2_DET_GF=1 T2_DET_ACTORS=1 T2_DET_FROM=5400 \
+    build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --pak-blank \
+    --frames 8300 > port.log
+python3 ../tools/port/detdiff.py ../n64.det port.log --shift 0 --skip rng,flags   # + ,prt: actors only
+```
+
 **The tools** (Linux box):
 
-- `tools/port/playthrough.py OUTDIR [--fight WEAPON]` writes `playthrough.txt` and
-  `teleport.env` for the level-1 run; `tools/port/approach.py` gives a teleport point facing a
-  warp region or a point (x1).
+- `tools/port/playthrough.py OUTDIR [--fight WEAPON] [--level 2]` writes `playthrough.txt` and
+  `teleport.env` (level 1 by default; `--level 2`: the River of Souls from the hub);
+  `tools/port/approach.py` gives a teleport point facing a warp region or a point.
 - `tools/port/soak.py --exe OUT/build/app/turok2 --archive OUT/turok2.o2r --rom baserom.us.z64
-  --out DIR --kind attract|newgame|warp --seeds A:B [--frames N] [--both-memory] [--jobs 4]`:
-  random but valid input under gdb, crashes grouped by their top frames (`crashes.txt`,
-  `summary.json`, a `cmd.sh` per run) ([STABILITY.md](STABILITY.md), x5).
-- `xvfb-run -a -s "-screen 0 1024x768x24" python3 tools/port/refshots.py ...`: the N64
-  reference (mupen64plus + Rice, headless): screenshots and RDRAM dumps at chosen emulator frames,
-  with input ([FIDELITY.md](FIDELITY.md), x3). Captured frames and dumps are never committed.
+  --out DIR --kind attract|newgame|warp|levels --seeds A:B [--frames N] [--both-memory] [--jobs N]
+  [--debugger gdb|lldb]`: random but valid input under gdb (lldb on macOS), crashes grouped by
+  their top frames, hangs interrupted and classed by the busy thread (`crashes.txt`,
+  `summary.json`, a `cmd.sh` per run). `--kind levels` warps through every level id 1-164, four
+  per seed ([STABILITY.md](STABILITY.md)). `--both-memory` needs a `-DT2_LOW_MEMORY=ON` build now.
+- `tools/port/n64trace.py` + `tools/port/detdiff.py`: the N64's per-game-frame state from RDRAM
+  (mupen64plus's debugger, a breakpoint at `CEngineApp__Update`; `--calls`, `--args`) against
+  the port's `T2_DET_LOG=1 T2_DET_GF=1 T2_DET_ACTORS=1` trace, aligned by `gFrameCountGameplay`
+  (y3). `xvfb-run -a ... tools/port/refshots.py ...`: the N64 reference screenshots and RDRAM
+  dumps (round 9 x3). Captured frames, traces and dumps are never committed.
 
 Options (`turok2 --game`):
 
@@ -100,128 +121,165 @@ Options (`turok2 --game`):
   R jumps, Z fires, A/B hold the weapon wheel, L the map, START pauses; the D-pad moves in menus.
 - `--pak-blank`, `--pak-dir DIR` (`DIR/turok2_pak<N>.mpk`, N64 byte order; `tools/port/mpk_saves.py
   FILE.mpk` checks the notes), `--no-pak`.
-- `--audio` / `--wav out.wav`; **high memory is the default** (Linux: host pointers above 4 GB;
-  `--low-memory` is the Linux debug flag; the executable is still non-PIE); `--offscreen-gl`
-  (**macOS**: pixels with no window); `--no-window`; `--bench [FROM]`, `--pace` ([PERF.md](PERF.md)).
+- `--audio` / `--wav out.wav`; **high memory and a PIE are the default** (`-DT2_LOW_MEMORY=ON`
+  brings back `-no-pie` and `--low-memory`); `--offscreen-gl` (**macOS**: pixels with no window);
+  `--no-window`; `--bench [FROM]`, `--pace` (`--pace --audio`: a simulated 22,050 Hz device counts
+  underruns, y4) ([PERF.md](PERF.md)).
 - Debug switches (port/game/t2debug.c, t2bosslog.c, t2det.c and game.cpp, **debug only**):
   - state: `T2_STATE_LOG=N`, `T2_ACTOR_LOG=N`, `T2_ACTOR_TYPES=t,...`, `T2_BOSS_LOG=1` (the boss,
-    the hits its hurt callback gets, the Queen's members and the instance pool), `T2_PICKUP_LOG=1`,
-    `T2_EVENT_LOG=1` (every level event with the objective counters; the `totem:` state line),
-    `T2_SCENE_LOG`, `T2_MENU_LOG=1`, `T2_PARTICLE_LOG=N`; `T2_DET_LOG=N` (`T2_DET_FROM`,
-    `T2_DET_ACTORS`: a per-frame trace with exact float bits, the RNG seeds and an actor hash, to
-    diff two hosts: x4);
+    its hits, and a `bosstrace:` line on every boss mode/phase change), `T2_PICKUP_LOG=1`,
+    `T2_EVENT_LOG=1` (every level event with the objective counters of the level's own hub; the
+    `totem:` state line), `T2_SCENE_LOG`, `T2_MENU_LOG=1`, `T2_PARTICLE_LOG=N`;
+  - determinism: `T2_DET_LOG=N` (`T2_DET_FROM`; `T2_DET_ACTORS`: the actors, the weapon actor and
+    the live particles; `T2_DET_GF=1`: one line set per game frame; `T2_DET_PARTICLES=1`: the
+    particle pool; the line ends with an actor hash and a particle-pool hash), `T2_RNG_TRACE=F1..F2`
+    (every RNG draw with its caller);
   - moving and combat: `T2_WARP_TO=<id>[@frame][,...]` (a negative id is `~level`),
-    `T2_TELEPORT=F:x,y,z[,rotY][;...]`, `T2_WAKE_ENEMIES=R`, `T2_FACE_NEAREST=R[@LEVEL]` (also
-    pooled instances), `T2_AIM_NODE=MASK|boss|-1[,R]` (aim at a hit box with those node bits),
-    `T2_CHEATS=MASK` (1 invincibility), `T2_FILL_AMMO=N`, `T2_GIVE_WEAPONS=1`, `T2_WEAPON=<n>`,
-    `T2_WEAPON_LIST=1`;
+    `T2_TELEPORT=F:x,y,z[,rotY][!][;...]` (`!`: also fire the region's enter triggers),
+    `T2_WAKE_ENEMIES=R`, `T2_FACE_NEAREST=R[@LEVEL]`, `T2_AIM_NODE=MASK|boss|-1[,R]`,
+    `T2_AIM_AT=F1-F2:x,y,z[;...]`, `T2_AIM_ENEMY=F1-F2[,R][;...]`, `T2_CHEATS=MASK`
+    (1 invincibility), `T2_FILL_AMMO=N`, `T2_GIVE_WEAPONS=1`, `T2_WEAPON=<n>`, `T2_WEAPON_LIST=1`;
   - progression: `T2_SAVE_PORTAL=F`, `T2_DOOR_OPEN=F`;
   - capture: `T2_SHOT=FILE T2_SHOT_EVERY=N T2_SHOT_FROM=F`, `T2_DLDUMP_AT=<frame>`
     (+ `T2_DLDUMP_VTX=1/2/3`), `T2_ANIM_EVENTS=0`, `T2_V2P_TRAP=1`, `--skip-pak-check`,
     `--start-mode N`.
 
-## 2. What the game does now (Linux, headless, final binary)
+## 2. What the game does now (Linux, headless, PIE, high memory, final binary)
 
-Every run below exits 0, with the default high memory unless it says `--low-memory`.
+Every run below exits 0. The frames moved against the branches' own runs: y3's impact-value fix
+(a particle hit did the wrong damage with the wrong radius) and `AI_InitHealth` (every enemy had
+aggression 0) and y4's N64 hit flags change every fight, so the merged tree's fights end sooner
+(or later) than on any one branch.
 
-- **Level 1 is playable from start to finish.** The Port of Adia playthrough (x1's script with
-  `--fight 10`, 27,000 frames): 51 -> 52 -> 53 -> 52 -> 55 -> 54 -> 56 -> 57 -> 58 -> 59 -> 109 ->
-  60, every level event at x1's frames ("cage open." 13,715, "child rescued." 13,857, "all
-  distress beacons activated. mission complete." 14,751, "portal activated." 15,951, "the
-  children are safe. mission complete." 17,499, the last portal switch 18,601), the Harbor Totem
-  at 18,800 ("DEFEND THE TOTEM"), the generator Raptoids come over the walls and die under the
-  plasma rifle (kills 1/8 at 19,500 ... 8/8 at 23,500), **`TotemDefense_Complete` with 3 s left,
-  "MISSION COMPLETE"**, then the hub (level 60) at 24,200 with "NEW CHEAT ENABLED", Turok at the
-  1999 spawn (-101.9, -255.7, -2138.0), health 70. (The merged tree wins the defence ~2,300
-  frames sooner than x1's branch run: same kills, other spawn timing.)
-- **The first boss is defeated.** The Mother (x2's recipe, 36,000): phase 0 (the three arms,
-  then the three heads, parts 6/6 -> 0/6), phase 1 at 16,600, phase 2 (the chest, 128,000 to 0)
-  at 25,800, her death (mode 30) at 31,200, the defeat cinema (mode 31) at 31,400, then **the hub
-  at 32,600 with "NEW CHEAT ENABLED"** (x2's branch: 35,000).
+- **Level 1 from start to finish.** The Port of Adia playthrough (`--fight 10`, 27,000): 51 ->
+  52 -> 53 -> 52 -> 55 -> 54 -> 56 -> 57 -> 58 -> 59 -> 109 -> 60, "all distress beacons
+  activated. mission complete." (14,751), "the children are safe. mission complete." (17,499), the
+  Harbor Totem from 18,800, **the defence won with 8/8 kills by 20,800** (y4's branch 22,700),
+  **the hub (60) at 21,500 with "NEW CHEAT ENABLED"** (y4: 23,400).
+- **Level 2, the River of Souls** (49,500): the hub portal and the intro cinemas, level 125 at
+  18,750, the sub-levels 125 -> 129, **soul gate 1 destroyed** (21,313), the first graveyard (133:
+  the zombies die, door 28 opens at 29,801), the second graveyard (134: "graveyard located."
+  31,355, **the second Sister of Despair banished** at 37,623), **"all soul gates destroyed.
+  mission complete."** (132, 42,063), the big graveyard (135: "graveyard located." 42,950, both
+  "graveyard gate open." at 45,107 and 45,909), then the exit 7200 -> level 125 ("level not
+  complete"). **The first sister (133) is no longer banished**: she wakes when door 28 opens
+  (y1's branch: 29,141, banished at 29,743), drives the player back ~650 units and keeps ~1,100
+  away, and the scripted aim (the nearest live actor) stays on the zombies the generators keep
+  sending; a longer window and a teleport into her hall did not change that (the merged AI has
+  its real aggression now, y3). No crash.
+- **The Mother defeated** (36,000): phase 1 at 16,525, phase 2 at 24,386, her death (mode 30) at
+  30,641, the defeat cinema (31) at 30,817, **the hub at 32,200** (y4: 32,400).
+- **The Blind One defeated** (25,000): the minion phases, the vulnerable phase, **her death
+  (mode 9) at 22,683** (y2: 23,403), the cave collapses, **the hub at 23,400 with "NEW CHEAT
+  ENABLED"** (y2: ~24,000).
+- **The Mantid Queen** (run to 117,000): steps 1-3, step 4 (spot 1: 65,280 -> 0, a hit every few
+  thousand frames) to 91,407, steps 5 and 6 (spot 2: 38,400 -> 0 by 94,200), step 7 at 94,107
+  (spot 3: 7,680 -> 3,072 by 94,600, mode 15 at 94,413), then **no further hit on spot 3** to the
+  end of the run: she does not reach her death mode on the merged tree (y2's branch: step 8 and
+  mode 16 at 67,947), so whether y5's S16 fixed the texture-key abort after it is still open
+  (S16 is the same key pattern: the draw layer in the top bits). No crash.
+- **The Primagen** (70,000): stage 1 (the spawner's waves, the parts), stage 2 at 20,306, **mode
+  25 -> 26 at 20,906: the stage-2 wait for the player's line of sight that stopped y2 now passes**
+  (attacks, the parts hit again), **stage 3 at 27,566**; then mode 25 again at 27,728 and the same
+  wait to the end of the run: stage 3 is where it stops now.
 - **The boot loop** (26,000): the pak check (2), legal (298), expansion pak (1,070), Acclaim
-  (1,362), the Iguana jungle (1,850; **its three iguana shots now draw**: x3), the title (4,212),
-  **demo 1 5,467 -> legal 8,157, demo 2 13,035, demo 3 19,920, the title again 24,749** (the new
-  reference: the demos now play their real input, x4). **Demo 1 follows the N64** (checked
-  against x3's mupen64plus reference): the plasma rifle from the wheel, through the door, the
-  first enemy in the same view; after that the enemies attack sooner than on the N64 (the port
-  ends the demo at 31 health, the N64 at 51). `--low-memory`: the same mode switches at the same
-  frames.
-- **The player kills enemies** (level 52, 14,800): enemies 11 and 12 20 -> 0, the death
-  animations (mode 52), the corpses melt (mode 60).
-- **The warp 51 -> 52 -> 51** (16,000): level 52 at 13,400, level 51 again at 15,200.
-- **Save -> title -> load**: SAVE NOTE (free 123, needed 90), "SAVE WAS SUCCESSFUL"; the note
-  (`mpk_saves.py`): NT2E 51 "TUROK 2" ext A, 90 pages, big-endian, checksum OK, health 100, lives
-  3, clock 0:02:20, 663 ISets of level flags. A new boot with that pak: LOAD NOTE "1. TUROK 2 A
-  90", NOTE INFO (Port of Adia, 0:02:20, normal), level 51 at 5,500.
-- **Audio** (`--audio --wav`, 9,000 frames): 150.2 s, peak 32,768, RMS 3,480.8 (sound from 22 s,
-  the Iguana cinema, on).
-- **Soak** (x5's harness on the merged binary, no `--draw`): attract 100,000 frames x 2 (high and
-  low memory): 0 crashes; new game seeds 0-19 x 36,000 frames, both memories (40 runs, 1.44 M
-  frames): **0 crashes**. (x5's branch totals: 400 k attract and 2.88 M new-game frames clean, 2
-  open new-game classes and 7 in the debug-warp runs: STABILITY.md section 4.)
-- **macOS** (x4's branch, not rerun on this merged tree): Mac == Linux frame for frame
-  (`T2_DET_LOG`) in the boot with the 3 demos, the journey, the warp, the fight, the Mother, the
-  door and demo 1.
+  (1,362), the Iguana jungle (1,850), the title (4,212), **demo 1 5,467 -> legal 8,157, demo 2
+  13,037, demo 3 19,922, the title again 24,751** (y3's frames).
+- **Demo 1 against the N64's RAM** (`n64trace.py` + `detdiff.py`): every traced field (the player,
+  the weapon actor, the 24 level actors, the pooled instances, the particles) is **bit-identical
+  from game frame 1 to 416**, except y3's known transients (generator 21's mode one frame late at
+  gf 236-238; the ambient particle the N64 spawns from gf 202 on, see next steps). At gf 417 the
+  first plasma shots start ~0.17 units off in x/z (the camera's view translation, gf 412); the
+  first actor field to differ is enemy 7's health at gf 590 (the shot hits enemy 6 first).
+- **Save -> title -> load**: SAVE NOTE, "SAVE WAS SUCCESSFUL"; the note (`mpk_saves.py`): NT2E 51
+  "TUROK 2" ext A, 90 pages, big-endian, checksum OK, health 100, lives 3, clock 0:02:20, 663
+  ISets of level flags; a new boot with that pak loads it: level 51 at 5,500.
+- **Audio** (`--audio --wav`, 9,000 frames): 150.17 s, peak 32,768, RMS 3,402.2 (round 9 and
+  y4's branch: 3,480.8; the run includes demo 1, whose fight now plays out differently).
+- **Soak** (y5's harness, PIE, no `--draw`, `--jobs 2`): attract 100,000 (1 run, 99,960 frames),
+  new game seeds 0-39 x 36,000 (40 runs, 1.44 M frames), levels seeds 0-40 x 25,000 (every level id
+  1-164 warped into, 41 runs, 1.02 M frames): **0 crashes, 0 hangs**.
+- **macOS** (y4's branch, not rerun on this merged tree): Mac == Linux frame for frame
+  (`T2_DET_LOG`, particle hash included) in the boot with the 3 demos, the playthrough, the
+  Mother, the warp and the fight.
 
-Screenshots (640x480, checked by eye, not committed): the Iguana cinema with the iguana on the logo
-and the iguana with the gun (2,251, 3,251); demo 1 with the plasma rifle at the door, the first
-enemy and its plasma hit (6,000-7,500), next to the N64's frames of the same scenes; the Port of
-Adia's "DISTRESS BEACON ACTIVATED.", "CAGE OPEN." with the child behind the bars, "ALL DISTRESS
-BEACONS ACTIVATED. MISSION COMPLETE.", the rescued child at the ladder, "DEFEND THE TOTEM" with a
-Raptoid warping in (18,901); a Raptoid in the plasma rifle's sights (21,001), "MISSION
-COMPLETE." (23,501), a Raptoid's corpse at the totem (24,001), the hub with "NEW CHEAT ENABLED"
-(24,201); the Mother under plasma fire (15,000, 30,000), her defeat cinema (32,000), the hub with
-"NEW CHEAT ENABLED" (32,601); SAVE NOTE, SAVE WAS SUCCESSFUL, LOAD NOTE, NOTE INFO.
+Screenshots (640x480, checked by eye, not committed): the Port of Adia's totem defence (a Raptoid
+warping in under plasma fire, 20,401 and 20,701; the totem after the win, 21,001; the hub with
+"NEW CHEAT ENABLED", 21,601); the Blind One's closed eye (22,620), the eye open under plasma
+fire as she dies (22,680; death at 22,683), the cave (22,710) and its collapse with falling rocks
+(22,770), the warp fade with "NEW CHEAT ENABLED" (23,250) and the hub (23,550); level 2's first
+soul gate under fire (21,001) and "SOUL GATE DESTROYED." (21,501), 134's graveyard gates (37,501),
+132's soul gate (42,001); the Mantid Queen under plasma fire (93,000-110,000); the Primagen's
+arena (21,001-29,001); level 51 after the load (5,500).
 
-Port tests: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (26,124 units, 0 mismatches),
-`t2asset_typed_test` (1,585 checks, 0 errors), `gbi_test` (0 mismatches), `t2os_test` (trace hash
-`2b2775877e0d226b` on 3 runs), `t2audio_test --direct 0` (19 frames, peak 32,433; audio_compare:
-max difference 0), `t2audio_test --adec 0xC29AB4 7464` (27,136 samples), the self test with the
-swoosh system (OK, 0 failed).
+Port tests: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (26,124 units, 0 mismatches,
+the archive and the ROM backend), `t2asset_typed_test` (1,585 checks, 0 errors), `gbi_test` (0
+mismatches), `t2os_test` (trace hash `2b2775877e0d226b` on 3 runs), `t2audio_test --direct 0`
+and `--direct 40` (audio_compare: max difference 0; this needed the PIE fix below), `t2audio_test
+--adec 0xC29AB4 7464 out.raw` (27,136 samples), the swoosh self test (OK, 0 failed).
 
-ABI (`tools/port/abicheck.py --build OUT/build -j 4`: 3,077 TUs, 11,434 calls, 10,970 checked
-against a definition, 185 function-pointer calls): harmful direct sites **0**, indirect 1 (the
+ABI (`tools/port/abicheck.py --build OUT/build -j 4`: 3,077 TUs, 11,503 calls, 11,018 checked
+against a definition, 181 function-pointer calls): harmful direct sites **0**, indirect 1 (the
 known `Destructible_Hurt` store). `ptrdecls.py`: 0 left in `src/` (the strlen returns and
 `include/functions.h` as before); `ptrargs.py` on a clean game-library build log: 0.
 `f2ucheck.py`: 79 float -> unsigned conversions, none new.
 
-## 3. Merge resolutions (round 9)
+## 3. Merge resolutions and fixes (round 10)
 
 | where | branches | resolution |
 |---|---|---|
-| func_00254F24 (`CBarrel__ShouldClose`) | x4, x5 | both rewrote it by member (x4: the wheel closed on its first frame, demo 1's stick turned the player; x5 S6: the stick wheel crashed on a garbage controller). One body: x4's, typed `(CBarrel *, CPlayer *)` as its caller (func_0024BD18) declares it; both reasons in its comment |
-| func_002242B4 (`CScene__GetRegionIndex`) | x1, x2 | both divided by the host `CGameRegion` stride (x1: map bits written into the next level's block, the warp into 54 crashed; x2: `Cinema_Start` restored the player into another region, the camera crashed after the Mother's phase-2 cinema). One body: `(uptr) result / sizeof(CGameRegion)` (unsigned, like the N64 shift), `structs/region.h` included once |
-| tools/port/gendata.py | x4, x5 | the union: x4's `HEADER_POINTEES` (`header_only` targets) and x5's `ptr_offs` / `grow_bss_tails` / the size audit, in the same pointer-target branch |
-| docs (STATUS.md, GAMEPLAY.md) | all | every part section kept, in merge order; GAMEPLAY.md section 10 has x2 then x1 |
-| the archive | none | no header in `include/` changed: rebuilt from the merged tree, the same sha1 `b6b9d484...` |
+| func_0022D2FC (`CParticleSystem__Spawn`, `gImpactEventHandlers[0xFFFF]`) | y4 627b899b, y3 6716be2e | the same fix (the N64 word 0x00C800FF): y4's body (it also bounds every other type) |
+| func_0041AAA0 / func_0041D2C4 (the cheat and name entry fields) | y4 4623ef71, y5 fbaf3697 (S23) | the same fix: y4's body (`T2_MENU_LEFT/RIGHT` through `Menu.controller`, also in func_00453A08); `Menu.cursor` and the view's `state` are both the s16 at 0 |
+| func_0040EDB0 (`BlindOne_Draw`) | y5 758a5afc (S19), y2 31106a44 | y5's body (a `CDrawArgs` view under `TARGET_PORT`; y2 had retyped the N64 view itself) |
+| func_0040EA24 (`BlindOne_PhaseVulnerableInit`) | y5 cc7a8bc8, y2 1caa520d | **git merged both silently**: y5's host body ended up nested in the `#else` of y2's. One body: y2's (`BlindOneState *`), the `#else` is the N64 original. (`func_00447A24`, the module-2 copy, has y5's.) |
+| func_00227C10 / func_00239194 / t2abi.c (the spawn chain's region and intelligence as `sptr`) | y5 89f298d3 (S18), y1 85dd95b3 | the same code; t2abi.c's comment from y5 |
+| port/game/t2det.c | y4, y3 | the union: y3's `T2_DET_GF`, `gf`/`ticks` on the header line, the `wpn` and `prt` lines (what `detdiff.py` reads); y4's particle-pool hash at the end of the line, `T2_DET_PARTICLES`, `T2_RNG_TRACE` |
+| tools/port/soak.py | y4, y5 | both: y4's lldb path (`--debugger`) and y5's hang classification (`hang_frames`, SIGINT to the game) |
+| port/app/game.cpp, tools/port/playthrough.py | y2, y1, y4 | both sets of declarations; the `--fight` ammo note (y4) and the `--level 2` text (y1) |
+| docs (STATUS.md) | all | every part section kept, in merge order |
+| the archive | none | rebuilt from the merged tree: the same sha1 `b6b9d484...`; gendata rerun (y2's headers) |
 
-No nested `#ifdef TARGET_PORT` blocks and no duplicate host bodies after any merge (checked over
-every file the merges touched). No fix was needed on the merged tree: every scenario of section
-2 ran to its end on the first build.
+A script checks every C file the merges touched for a `#if... TARGET_PORT` inside another
+`TARGET_PORT` block (either branch): only func_0040EA24 had one, fixed as above.
+
+Fixes on the merged tree (asm_diff 0):
+
+- 8ef7f691 **func_0043F000** (`Primagen_UpdateMode19_2`, module 2, compile-only on the host): its
+  local `extern LevelScriptF604 D_8012F604` clashed with `globals/boss.h`'s `LevelScriptBlock`
+  (since 87e899f3): `turok2_game_unlinked` did not compile (the documented `ninja ... turok2`
+  never built it). The view is a cast on the host.
+- d4f1d5e3 **`t2audio_test` on the PIE build**: `--direct` put its buffers in the command words
+  as a plain 32-bit cast (crash in `A_LOADADPCM`): now `osVirtualToPhysical`; `gAudioHeapBase` is
+  pointer-wide as `globals/frame.h` declares it. (The game-path mode, `--frames/--sfx/--song`,
+  still aborts: it opens no asset backend since 21090d75, `VM window ...: no backend open`.)
 
 ## 4. Next
 
-1. **Level 2 from the hub**: the hub's portals and level keys (the keys lying in 52/55/58/59),
-   level 1's optional areas (72, the talisman; 78, the flesh-eater portal), walking level 1
-   with its enemies awake instead of teleporting.
-2. **The other bosses**: the Mantid Queen's minions (spawned on the walls with `anim -1`, they pile
-   up to 32 and her spots stay shut), the Blind One's minions, the Primagen (strafing off its
-   platform is an instant GAME OVER; its fall); then their death cinemas.
-3. **Demo 1 after the first enemy**: the port's enemies attack sooner than the N64's (31 vs 51
-   health at the end). Compare the RNG seeds and the AI's hearing/sight against an RDRAM dump
-   (`refshots.py`, `T2_DET_LOG`).
-4. **The legal screen's text colour**: ~2x dimmer and more orange than the N64's (x3).
-5. **The 9 open soak classes** (STABILITY.md section 4): `SetupAnimation`'s CAI callback after a
-   warp, a texture key that is a host address (level 46), the death-cinema HUD overlay script and
-   the debug-warp classes; `--draw` soak runs (the GL path).
-6. **A PIE build** on Linux (the statics still below 2 GB) and the foreign-alias list of the
-   gendata audit (42).
-7. Raw `+ 0x140` CAI addresses left in non-boss files (func_00254640, 002553BC, 0025E488,
-   0025F380, 0025F3A4, 00264CEC, 0026508C, 00268E60, 004082A0, 0040EA24): each a crash or a
-   wrong mode on the host when reached; the totem's other N64 views (`TotemDefense_KillsLeft`,
-   `TotemDefense_TryHitEnemyAfterDelay`).
-8. **macOS**: run this merged tree on the Mac (the playthrough and the Mother defeat have only run
-   on Linux).
+1. **Level 2's Sisters of Despair**: the first (133) again (on the merged tree she keeps away
+   from the player and the scripted aim; an aim at her actor, or her flight and pushback against
+   the N64 with `n64trace.py --calls`), the third (135: the action objects 46/47, object 156, do
+   not fire when walked into and a teleport into her hall draws no frame); then 7200 -> the City
+   Totem (110), its defence and the hub.
+2. **The Mantid Queen**: step 7 stops at spot 3 = 3,072 in mode 15 (no more hits: where the
+   recipe's aim goes in that mode, a `T2_AIM_NODE=boss` entry for her spots); then her death
+   (mode 16), the S16 check on the texture key that aborted y2's run, her cinema and the warp
+   0x176F.
+3. **The Primagen's stage 3**: the same mode-25 wait for the player's line of sight that y2 saw
+   in stage 2 (now passed): compare where the N64 player stands, the lair doors and the eye
+   height with `n64trace.py`; then the death cinema.
+4. **Demo 1 at gf 412**: the camera's view translation is (0.18, 0.03) off in x/z
+   (`CCamera__Update`, func_0027D160: the tremor and `CShake__ApplyOffset`); then demos 2 and 3
+   against the N64 with `n64trace.py`.
+5. **Static objects' events**: `CScene__AdvanceListedInstances` (func_002263C0) reads CScene at
+   N64 offsets, so no listed static object fires its events (demo 1's ambient particle); y3's
+   host body crashed demo 2 in `Collision_SweepRegions` (a static object's region): fix both.
+6. **The legal screen's text colour** (~2x dimmer and more orange than the N64's).
+7. **Levels 3-6**: the hub's other portals and keys.
+8. The intelligence's speed field (`CPlayerIntelligence` 0x1C is `u8 pad08[]`, left big-endian
+   by the archive's swap plan): type it in `swap_spec` and drop the big-endian read.
+9. **A windowed run with a real gamepad** (MACOS.md 12.6 documents the mapping; only headless runs
+   so far), and this merged tree on the Mac.
+10. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
 
 ## Round 10, part y4: the merged tree on macOS, host determinism, real time (branch names-R10_y4)
 
@@ -414,6 +472,231 @@ No header and no archive change; gendata unchanged (decls.json stays valid).
 Next: the third sister (135: the action objects 46/47, object 156, do not fire when walked into,
 and a teleport into her hall draws no frame), then the exit 7200 to the City Totem (110), its
 defense and the hub; levels 3-6 entry (not reached this round).
+
+# Round 9, merged state (history)
+
+Round 9 merged five branches, in this order: x4 (macOS and host determinism: the attract demos'
+input, the weapon wheel, Mac crashes on the save and the hit paths), x5 (stability: the soak
+harness, 13 crash classes, high memory by default), x3 (fidelity: the N64 reference oracle and
+the translucent draw list), x2 (the first boss defeated: the Mother from start to end) and x1
+(the first level played through: the Port of Adia from a new game to the hub, with the totem
+defence won). Two fixes came twice (`CBarrel__ShouldClose` from x4 and x5,
+`CScene__GetRegionIndex` from x1 and x2): one body each (section 3). The merged tree needed no
+other fix: every scenario below runs to its end. This page says how to build and run the result,
+what the game does now, and what comes next. The part sections below keep each branch's own
+notes (detail pages: [PLAYTHROUGH.md](PLAYTHROUGH.md) (x1), [GAMEPLAY.md](GAMEPLAY.md) section 10
+(x2, x1), [STABILITY.md](STABILITY.md) (x5), [FIDELITY.md](FIDELITY.md) (x3), [MACOS.md](MACOS.md)
+section 11 (x4)); round 8 and earlier follow as history.
+
+The matching build is unchanged: `tools/asm_diff.py --base 5437cfc0 -j 8` reports 0 differences
+over all 3,938 files after every merge, and a clean `make clean && make setup && make build &&
+make verify` gives the identical ROM (`build/turok2.us.z64: OK`, 123 shared .rodata objects agree).
+
+## Round 9: build and run
+
+```sh
+# 0. the matching build first: gendata and asm_diff read its ELF; keep a copy as build/ref.elf
+make setup && make -j8 build && make verify && cp build/turok2.us.elf build/ref.elf
+
+# 1. the archive, format 2.0. Unchanged this round (no swapped struct changed): sha1 b6b9d484...
+python tools/assets/mkarchive.py baserom.us.z64 -o OUT/turok2.o2r -j 4     # ~12 s
+python tools/assets/archive_check.py OUT/turok2.o2r baserom.us.z64          # OK, format 2.0
+
+# 2. configure; the game library AND the runtime/audio libraries (gendata reads all three)
+cmake -S port -B OUT/build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_BUILD_TYPE=Debug
+ninja -C OUT/build -j8 turok2_game t2runtime t2audio
+
+# 3. the game data as C into port/gen/ (gitignored). Drop the cache after ANY header change.
+#    RERUN IT this round: gendata changed (x4's HEADER_POINTEES, x5's grow_bss_tails + audit).
+rm -f OUT/decls.json
+python3 tools/port/gendata.py --build OUT/build --cache OUT/decls.json -j 4      # ~1 min
+
+# 4. re-run cmake so data.cmake sees port/gen/*.c, then the executable
+cmake OUT/build && ninja -C OUT/build -j8 turok2
+
+# 5. run headless (Linux: SDL's offscreen driver, no window). High memory is the default now.
+cd OUT && SDL_VIDEODRIVER=offscreen T2_SHOT=shot.ppm T2_SHOT_EVERY=300 \
+    build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
+    --game --draw --pak-blank --frames 26000
+```
+
+The archive: 26,124 units, sha1 `b6b9d484e6f97718e48ddc6d7f0ce9188dbb11c5` (rebuilt from the
+merged tree: the same bytes); `turok2` without `--game` reports fnv1a64 `88179a9b862ded6c` on all 3
+backends. gendata: 1,532 data symbols (1,526 typed from a C declaration), 69 pointer targets
+typed as tables, **24 pointer targets typed as a header and raw bytes** (`HEADER_POINTEES`: the
+attract demos), 20 struct tables extended over splat labels, 387 zero .bss symbols, 3 typed .bss
+structs given their N64 tail (`__osTimerCounter`, `gBlindOne` + the cinema player,
+`sMdctFft`), 42 typed symbols larger than their N64 extent listed by the audit, 4,195 pointer
+slots (3,059 relocated, 1,108 null, 28 unresolved).
+
+**The scripted runs** (`turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --draw
+--pak-blank` plus; "new game" is `START@4400 A@4500 A@4700 A@4800`):
+
+| what | how | frames |
+|---|---|---|
+| boot + the 3 attract demos | (none) | 26,000 |
+| **the Port of Adia, start to finish** (x1) | `python3 ../tools/port/playthrough.py . --fight 10 && . ./teleport.env`, then `T2_EVENT_LOG=1 T2_STATE_LOG=100 ... --input @playthrough.txt` ([PLAYTHROUGH.md](PLAYTHROUGH.md)) | 27,000 |
+| **the Mother defeated** (x2) | the input file of the "boss recipe" below, `T2_WARP_TO=-4 T2_GIVE_WEAPONS=1 T2_WEAPON=10 T2_AIM_NODE=boss T2_CHEATS=1 T2_FILL_AMMO=600 T2_BOSS_LOG=1 T2_STATE_LOG=200` | 36,000 |
+| the player kills enemies (round 8 w2) | `--input @fight.txt` (new game, `Z@13320..13420` and every 140 frames to 14,680), `T2_WARP_TO=1098 T2_GIVE_WEAPONS=1 T2_WEAPON=4 T2_TELEPORT="13300:-1143.6,0,-2034.7" T2_WAKE_ENEMIES=500 T2_FACE_NEAREST=1500` | 14,800 |
+| a real warp to level 52 and back | `T2_WARP_TO=1813 --input @exit52.txt` (round 7) | 16,000 |
+| save | `--pak-dir DIR`, new game + `A@13250 A@13400`, `T2_SAVE_PORTAL=13100` | 14,100 |
+| load | `--pak-dir DIR` (the same DIR), `START@4400 A@4500 DD@4700 A@4800 DU@4900 A@5000 A@5200 A@5400` | 6,500 |
+| enemies hurt the player, a door, the bow journey | round 8's recipes (history below) | |
+
+The boss recipe (x2; one input entry per line, a single line is cut at its buffer):
+
+```sh
+cd OUT && (echo "START@4400 A@4500 A@4700 A@4800 Z@14000..90000 CL@19000..90000";
+  for s in $(seq 19000 600 89000); do echo "CD@$s..$((s+250))"; done) > mother_end.txt
+SDL_VIDEODRIVER=offscreen T2_WARP_TO=-4 T2_GIVE_WEAPONS=1 T2_WEAPON=10 T2_AIM_NODE=boss \
+  T2_CHEATS=1 T2_FILL_AMMO=600 T2_BOSS_LOG=1 T2_STATE_LOG=200 \
+  build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --pak-blank \
+  --frames 36000 --input @mother_end.txt
+```
+
+**The tools** (Linux box):
+
+- `tools/port/playthrough.py OUTDIR [--fight WEAPON]` writes `playthrough.txt` and
+  `teleport.env` for the level-1 run; `tools/port/approach.py` gives a teleport point facing a
+  warp region or a point (x1).
+- `tools/port/soak.py --exe OUT/build/app/turok2 --archive OUT/turok2.o2r --rom baserom.us.z64
+  --out DIR --kind attract|newgame|warp --seeds A:B [--frames N] [--both-memory] [--jobs 4]`:
+  random but valid input under gdb, crashes grouped by their top frames (`crashes.txt`,
+  `summary.json`, a `cmd.sh` per run) ([STABILITY.md](STABILITY.md), x5).
+- `xvfb-run -a -s "-screen 0 1024x768x24" python3 tools/port/refshots.py ...`: the N64
+  reference (mupen64plus + Rice, headless): screenshots and RDRAM dumps at chosen emulator frames,
+  with input ([FIDELITY.md](FIDELITY.md), x3). Captured frames and dumps are never committed.
+
+Options (`turok2 --game`):
+
+- `--input`: `BUTTON@F`, `BUTTON@F1..F2` (held), `SX=V@F1..F2` / `SY=V@...` (stick), `@FILE`
+  ([INPUT.md](INPUT.md) section 6). The stick turns, C-up/C-down move, C-left/C-right strafe,
+  R jumps, Z fires, A/B hold the weapon wheel, L the map, START pauses; the D-pad moves in menus.
+- `--pak-blank`, `--pak-dir DIR` (`DIR/turok2_pak<N>.mpk`, N64 byte order; `tools/port/mpk_saves.py
+  FILE.mpk` checks the notes), `--no-pak`.
+- `--audio` / `--wav out.wav`; **high memory is the default** (Linux: host pointers above 4 GB;
+  `--low-memory` is the Linux debug flag; the executable is still non-PIE); `--offscreen-gl`
+  (**macOS**: pixels with no window); `--no-window`; `--bench [FROM]`, `--pace` ([PERF.md](PERF.md)).
+- Debug switches (port/game/t2debug.c, t2bosslog.c, t2det.c and game.cpp, **debug only**):
+  - state: `T2_STATE_LOG=N`, `T2_ACTOR_LOG=N`, `T2_ACTOR_TYPES=t,...`, `T2_BOSS_LOG=1` (the boss,
+    the hits its hurt callback gets, the Queen's members and the instance pool), `T2_PICKUP_LOG=1`,
+    `T2_EVENT_LOG=1` (every level event with the objective counters; the `totem:` state line),
+    `T2_SCENE_LOG`, `T2_MENU_LOG=1`, `T2_PARTICLE_LOG=N`; `T2_DET_LOG=N` (`T2_DET_FROM`,
+    `T2_DET_ACTORS`: a per-frame trace with exact float bits, the RNG seeds and an actor hash, to
+    diff two hosts: x4);
+  - moving and combat: `T2_WARP_TO=<id>[@frame][,...]` (a negative id is `~level`),
+    `T2_TELEPORT=F:x,y,z[,rotY][;...]`, `T2_WAKE_ENEMIES=R`, `T2_FACE_NEAREST=R[@LEVEL]` (also
+    pooled instances), `T2_AIM_NODE=MASK|boss|-1[,R]` (aim at a hit box with those node bits),
+    `T2_CHEATS=MASK` (1 invincibility), `T2_FILL_AMMO=N`, `T2_GIVE_WEAPONS=1`, `T2_WEAPON=<n>`,
+    `T2_WEAPON_LIST=1`;
+  - progression: `T2_SAVE_PORTAL=F`, `T2_DOOR_OPEN=F`;
+  - capture: `T2_SHOT=FILE T2_SHOT_EVERY=N T2_SHOT_FROM=F`, `T2_DLDUMP_AT=<frame>`
+    (+ `T2_DLDUMP_VTX=1/2/3`), `T2_ANIM_EVENTS=0`, `T2_V2P_TRAP=1`, `--skip-pak-check`,
+    `--start-mode N`.
+
+## Round 9: what the game did (Linux, headless, final binary)
+
+Every run below exits 0, with the default high memory unless it says `--low-memory`.
+
+- **Level 1 is playable from start to finish.** The Port of Adia playthrough (x1's script with
+  `--fight 10`, 27,000 frames): 51 -> 52 -> 53 -> 52 -> 55 -> 54 -> 56 -> 57 -> 58 -> 59 -> 109 ->
+  60, every level event at x1's frames ("cage open." 13,715, "child rescued." 13,857, "all
+  distress beacons activated. mission complete." 14,751, "portal activated." 15,951, "the
+  children are safe. mission complete." 17,499, the last portal switch 18,601), the Harbor Totem
+  at 18,800 ("DEFEND THE TOTEM"), the generator Raptoids come over the walls and die under the
+  plasma rifle (kills 1/8 at 19,500 ... 8/8 at 23,500), **`TotemDefense_Complete` with 3 s left,
+  "MISSION COMPLETE"**, then the hub (level 60) at 24,200 with "NEW CHEAT ENABLED", Turok at the
+  1999 spawn (-101.9, -255.7, -2138.0), health 70. (The merged tree wins the defence ~2,300
+  frames sooner than x1's branch run: same kills, other spawn timing.)
+- **The first boss is defeated.** The Mother (x2's recipe, 36,000): phase 0 (the three arms,
+  then the three heads, parts 6/6 -> 0/6), phase 1 at 16,600, phase 2 (the chest, 128,000 to 0)
+  at 25,800, her death (mode 30) at 31,200, the defeat cinema (mode 31) at 31,400, then **the hub
+  at 32,600 with "NEW CHEAT ENABLED"** (x2's branch: 35,000).
+- **The boot loop** (26,000): the pak check (2), legal (298), expansion pak (1,070), Acclaim
+  (1,362), the Iguana jungle (1,850; **its three iguana shots now draw**: x3), the title (4,212),
+  **demo 1 5,467 -> legal 8,157, demo 2 13,035, demo 3 19,920, the title again 24,749** (the new
+  reference: the demos now play their real input, x4). **Demo 1 follows the N64** (checked
+  against x3's mupen64plus reference): the plasma rifle from the wheel, through the door, the
+  first enemy in the same view; after that the enemies attack sooner than on the N64 (the port
+  ends the demo at 31 health, the N64 at 51). `--low-memory`: the same mode switches at the same
+  frames.
+- **The player kills enemies** (level 52, 14,800): enemies 11 and 12 20 -> 0, the death
+  animations (mode 52), the corpses melt (mode 60).
+- **The warp 51 -> 52 -> 51** (16,000): level 52 at 13,400, level 51 again at 15,200.
+- **Save -> title -> load**: SAVE NOTE (free 123, needed 90), "SAVE WAS SUCCESSFUL"; the note
+  (`mpk_saves.py`): NT2E 51 "TUROK 2" ext A, 90 pages, big-endian, checksum OK, health 100, lives
+  3, clock 0:02:20, 663 ISets of level flags. A new boot with that pak: LOAD NOTE "1. TUROK 2 A
+  90", NOTE INFO (Port of Adia, 0:02:20, normal), level 51 at 5,500.
+- **Audio** (`--audio --wav`, 9,000 frames): 150.2 s, peak 32,768, RMS 3,480.8 (sound from 22 s,
+  the Iguana cinema, on).
+- **Soak** (x5's harness on the merged binary, no `--draw`): attract 100,000 frames x 2 (high and
+  low memory): 0 crashes; new game seeds 0-19 x 36,000 frames, both memories (40 runs, 1.44 M
+  frames): **0 crashes**. (x5's branch totals: 400 k attract and 2.88 M new-game frames clean, 2
+  open new-game classes and 7 in the debug-warp runs: STABILITY.md section 4.)
+- **macOS** (x4's branch, not rerun on this merged tree): Mac == Linux frame for frame
+  (`T2_DET_LOG`) in the boot with the 3 demos, the journey, the warp, the fight, the Mother, the
+  door and demo 1.
+
+Screenshots (640x480, checked by eye, not committed): the Iguana cinema with the iguana on the logo
+and the iguana with the gun (2,251, 3,251); demo 1 with the plasma rifle at the door, the first
+enemy and its plasma hit (6,000-7,500), next to the N64's frames of the same scenes; the Port of
+Adia's "DISTRESS BEACON ACTIVATED.", "CAGE OPEN." with the child behind the bars, "ALL DISTRESS
+BEACONS ACTIVATED. MISSION COMPLETE.", the rescued child at the ladder, "DEFEND THE TOTEM" with a
+Raptoid warping in (18,901); a Raptoid in the plasma rifle's sights (21,001), "MISSION
+COMPLETE." (23,501), a Raptoid's corpse at the totem (24,001), the hub with "NEW CHEAT ENABLED"
+(24,201); the Mother under plasma fire (15,000, 30,000), her defeat cinema (32,000), the hub with
+"NEW CHEAT ENABLED" (32,601); SAVE NOTE, SAVE WAS SUCCESSFUL, LOAD NOTE, NOTE INFO.
+
+Port tests: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (26,124 units, 0 mismatches),
+`t2asset_typed_test` (1,585 checks, 0 errors), `gbi_test` (0 mismatches), `t2os_test` (trace hash
+`2b2775877e0d226b` on 3 runs), `t2audio_test --direct 0` (19 frames, peak 32,433; audio_compare:
+max difference 0), `t2audio_test --adec 0xC29AB4 7464` (27,136 samples), the self test with the
+swoosh system (OK, 0 failed).
+
+ABI (`tools/port/abicheck.py --build OUT/build -j 4`: 3,077 TUs, 11,434 calls, 10,970 checked
+against a definition, 185 function-pointer calls): harmful direct sites **0**, indirect 1 (the
+known `Destructible_Hurt` store). `ptrdecls.py`: 0 left in `src/` (the strlen returns and
+`include/functions.h` as before); `ptrargs.py` on a clean game-library build log: 0.
+`f2ucheck.py`: 79 float -> unsigned conversions, none new.
+
+## Round 9: merge resolutions
+
+| where | branches | resolution |
+|---|---|---|
+| func_00254F24 (`CBarrel__ShouldClose`) | x4, x5 | both rewrote it by member (x4: the wheel closed on its first frame, demo 1's stick turned the player; x5 S6: the stick wheel crashed on a garbage controller). One body: x4's, typed `(CBarrel *, CPlayer *)` as its caller (func_0024BD18) declares it; both reasons in its comment |
+| func_002242B4 (`CScene__GetRegionIndex`) | x1, x2 | both divided by the host `CGameRegion` stride (x1: map bits written into the next level's block, the warp into 54 crashed; x2: `Cinema_Start` restored the player into another region, the camera crashed after the Mother's phase-2 cinema). One body: `(uptr) result / sizeof(CGameRegion)` (unsigned, like the N64 shift), `structs/region.h` included once |
+| tools/port/gendata.py | x4, x5 | the union: x4's `HEADER_POINTEES` (`header_only` targets) and x5's `ptr_offs` / `grow_bss_tails` / the size audit, in the same pointer-target branch |
+| docs (STATUS.md, GAMEPLAY.md) | all | every part section kept, in merge order; GAMEPLAY.md section 10 has x2 then x1 |
+| the archive | none | no header in `include/` changed: rebuilt from the merged tree, the same sha1 `b6b9d484...` |
+
+No nested `#ifdef TARGET_PORT` blocks and no duplicate host bodies after any merge (checked over
+every file the merges touched). No fix was needed on the merged tree: every scenario of section
+2 ran to its end on the first build.
+
+## Round 9: next (as written then)
+
+1. **Level 2 from the hub**: the hub's portals and level keys (the keys lying in 52/55/58/59),
+   level 1's optional areas (72, the talisman; 78, the flesh-eater portal), walking level 1
+   with its enemies awake instead of teleporting.
+2. **The other bosses**: the Mantid Queen's minions (spawned on the walls with `anim -1`, they pile
+   up to 32 and her spots stay shut), the Blind One's minions, the Primagen (strafing off its
+   platform is an instant GAME OVER; its fall); then their death cinemas.
+3. **Demo 1 after the first enemy**: the port's enemies attack sooner than the N64's (31 vs 51
+   health at the end). Compare the RNG seeds and the AI's hearing/sight against an RDRAM dump
+   (`refshots.py`, `T2_DET_LOG`).
+4. **The legal screen's text colour**: ~2x dimmer and more orange than the N64's (x3).
+5. **The 9 open soak classes** (STABILITY.md section 4): `SetupAnimation`'s CAI callback after a
+   warp, a texture key that is a host address (level 46), the death-cinema HUD overlay script and
+   the debug-warp classes; `--draw` soak runs (the GL path).
+6. **A PIE build** on Linux (the statics still below 2 GB) and the foreign-alias list of the
+   gendata audit (42).
+7. Raw `+ 0x140` CAI addresses left in non-boss files (func_00254640, 002553BC, 0025E488,
+   0025F380, 0025F3A4, 00264CEC, 0026508C, 00268E60, 004082A0, 0040EA24): each a crash or a
+   wrong mode on the host when reached; the totem's other N64 views (`TotemDefense_KillsLeft`,
+   `TotemDefense_TryHitEnemyAfterDelay`).
+8. **macOS**: run this merged tree on the Mac (the playthrough and the Mother defeat have only run
+   on Linux).
 
 ## Round 9, part x4: macOS and host determinism (branch names-R9_x4)
 
