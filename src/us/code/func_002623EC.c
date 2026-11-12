@@ -21,6 +21,18 @@ typedef struct {
     /* 0x14 */ TurretParams params;
 } TurretDef;
 
+#ifdef TARGET_PORT
+typedef struct Turret {
+/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_Turret(m) __builtin_offsetof(CGameObjectInstance, m)
+    union {
+        struct { u8 _hp_pos[T2_HOFF_Turret(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
+        struct { u8 _hp_def[T2_HOFF_Turret(header.m_pIntelligence)]; TurretDef *def; }; /* N64 0x14 */
+        struct { u8 _hp_rotY[T2_HOFF_Turret(m_RotY)]; f32 rotY; }; /* N64 0x50 */
+    };
+} Turret;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
     /* 0x04 */ CVector3 pos;
@@ -29,6 +41,7 @@ typedef struct {
     /* 0x18 */ u8 pad18[0x50 - 0x18];
     /* 0x50 */ f32 rotY;
 } Turret;
+#endif
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];

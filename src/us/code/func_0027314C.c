@@ -63,7 +63,12 @@ void SndVoice_Update(SndVoice *s) {
     }
     if (!playing) {
         CAudioWorld *b = s->mgr;
+#ifdef TARGET_PORT
+        /* round 12 a5 (tools/port/n64viewcheck.py): the handles and the voices at their host offsets */
+        SoundVoice *v = (SoundVoice *)((u8 *)b->handles - __builtin_offsetof(SoundVoice, ids));
+#else
         SoundVoice *v = (SoundVoice *)((u8 *)b + 0x7C);
+#endif
         alSndpDeallocate(&b->player, v->ids[s->index]);
         v->ids[s->index] = -1;
         s->vp.priority = 0;
