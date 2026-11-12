@@ -1,4 +1,4 @@
-# Stability: soak runs, crash classes, the gendata size audit (Phase 7 round 9, part x5)
+# Stability: soak runs, crash classes, the gendata size audit (Phase 7 rounds 9 (x5) and 10 (y5): section 7)
 
 Branch names-R9_x5 (from 5437cfc0). Every `src/` change is `TARGET_PORT` or `s32` -> `sptr`
 (`sptr` is `s32` on the N64): `tools/asm_diff.py --base 5437cfc0 -j 8` = 0 on every touched file.
@@ -116,3 +116,104 @@ the game never does; the newgame and attract classes are the ones a player can r
 2 GB). `--high-memory` is still accepted. The executable stays non-PIE on Linux (`T2_LOW_MEMORY`
 CMake option, ON): the statics are still below 2 GB; a PIE build is the next step (it moves the
 game's data too). macOS has no low-memory mode (unchanged).
+
+## 7. Round 10 (part y5): the open classes closed, a level-warp soak, the raw CAI offsets, PIE
+
+Branch names-R10_y5 (from cc0c322b). Every `src/` change is under `TARGET_PORT` or `s32` ->
+`sptr`: `tools/asm_diff.py --base cc0c322b -j 8` = 0 on every touched file. No `include/` change,
+no archive change, no gendata change (the archive and `port/gen` of round 9 are reused as they
+are).
+
+### 7.1 soak.py
+
+- `--kind levels`: a new game, then `T2_WARP_TO=~level` (a level's start) through **every level
+  id 1-164**, four per seed in order (seed s: levels 4s+1..4s+4, so seeds 0-40 cover them all),
+  random play in each (`T2_GIVE_WEAPONS=1`, `T2_WAKE_ENEMIES=1500`); `--frames 25000` gives each
+  level about 2,800 frames.
+- A hang (no exit within `--timeout`, now 600 s: a run takes 3-12 s) is interrupted with SIGINT:
+  gdb stops the game and prints every thread (`thread apply all bt 10`, after the crashing
+  thread's `bt`); the class is `HANG:` + the busy thread's top frames (the first thread with no
+  wait in its stack). Round 9 killed the session and kept no stack.
+- `/root/R10_y5/gdbrun.sh RUNDIR [-ex ...]` (box helper, not committed): a run's `cmd.sh` under
+  gdb with a backtrace, for the watchpoint work below (gdb disables ASLR: the heap and the static
+  addresses repeat, so `watch -l *(long *)ADDR if ...` on a corrupted field finds the writer).
+
+### 7.2 Classes found and fixed (S14-S23)
+
+| id | where | crash | cause | fix |
+|---|---|---|---|---|
+| S14 | `CGameObjectInstance__SetupAnimation` calls a data address | warp 13/22/24/26/34 (type 1150, a throwable) | `Throwable_Setup` stores `func_00264994 + 0xC` (a splat mis-cut: the real function is `Throwable_CalcOrientation` at 0x2649A0); on the host that address is inside data | the function itself; the whole throwable family on the host: the owner is pointer-wide (`m_VarPtr[0]`, so the tilt moves to `m_VarF32[2]/[3]`; `Throwable_Advance` zeroed the owner's high half), the `OwnedState`/`SpinObject`/`SpinState` views by `offsetof`, `EnemyAI_SetGrabbed`/`EnemyAI_Mount` write `m_Enemy.m_pGrabbed` (13 files) |
+| S15 | HANG in `Menu_MoveCursor` | warp 28 (both memories; round 9: `t2_memset` in `SaveGame_Build`) | the save portal menu with the cursor on "health" (no longer selectable) and a link of 0 to the left: the loop never moves | port guard: stop after a full turn (the N64 would spin too; reached only after a debug warp) |
+| S9b | `COverlay__Update` (`*ov->m_pScript++`) | warp 19, newgame 72 | `CBarrel__Fill`'s slot layout loop (2 rows of 24 = 48 slots) past the 36 `m_Items`: angles and scales over the player's HUD overlays (S9 had capped only the fill loop) | the layout loop capped at 36 too (found with a watchpoint on the overlay's script pointer) |
+| S16 | `T2Port_ReadAsset` abort 0x81AE935C | warp 25/19/33, newgame 59 | `CParticleSystem__Spawn` ORs the draw layer into the texture key (`*bits \|= layer << 30`); the N64 PI decodes 29 bits and ignores it | `T2Port_ReadAsset`/`T2Port_AssetHostSize` mask the key with 0x1FFFFFFF (the PI's physical address) |
+| S17 | `GameObject_IsSolid` NULL intelligence | warp 38 (`T2_WARP_TO=3999`: the ending, engine mode 16) | the player body has no intelligence there | port guard: not solid |
+| S18 | `raw_normal` via `floorTilt`; then `CGameObjectInstance__Construct` | warp 17 (high memory) | `CInstancePool__SpawnAnimInstance` / `spawn_effect` / `CInstancePool__SpawnAnimInstance_i` took the region (`owner`) and the intelligence (`count`) as `s32` | `sptr` |
+| S19 | `Render_DrawModel(resource=0x7fff)` in `BlindOne_Draw` | levels 0 (level 1, the Blind One) | the draw args read at N64 offsets (the model handle's high half) | the view on `CDrawArgs` by `offsetof` |
+| S20 | (no crash of its own) `CPlayer__UpdateSpeedScale`, every frame | | all N64 offsets: it read the mode at CPlayer 0xA08 and wrote the speed scale at 0xB28, which on the host are inside `m_Data` (0xB28 is `m_Data.m_AdonAmmoFlagHelped[0]`, set to 1.0f every frame), and the actor's CAI flags at 0x140; `m_CameraMovementScaler` (the head bob) was never set | a host body on the members. The intelligence's speed (0x1C) is typed `u8 pad08[]` in `CPlayerIntelligence`, so the archive's swap plan leaves it big-endian: read big-endian (a little-endian read gave 4.6e-41 and froze the player; this briefly hid S22). The attract demos' `T2_DET_LOG` stays identical to round 9 (52,000 lines) |
+| S21 | (no crash seen) the raw `+ 0x140` CAI addresses still compiled on the host | | `BlindOne_PhaseVulnerableInit` (+ `_2`), `EnemyMode_PickupThrowObject_Enter` (also `m_VarBuffer[2]` as the held pointer), `EnemyMode_PickupThrowObject_Update`, `CPlayer__Dismount`, `GameObject_GetFloorKind`, the riding view (`Mount`, func_00251A2C), `ImpactEvent_Rumble` (the hit player's controller rumble pool, N64 0x1A8/0xA50/0x140) | `&actor->m_AI`, the members, host views |
+| S22 | `Player_OnMultiplayerKill` (`m_KilledBy[killerIndex]++`), `Cinema_RequestForObject` | levels 2/3/4/5/6/8/15/16/38 (high memory and PIE) | `CPlayerPool__GetIndex` read the player array as a u32 and divided by the N64 CPlayer size (0x1328; host 5,800); `Event_PlayCinema`/`Event_PlayCinemaRemote` took the actor/event as `s32` | host body; `sptr` |
+| S23 | `Controller_MenuLeft` via `EnterCheatMenu_UpdateTextField` | PIE only: 22/40 newgame, 16/40 warp, 18/41 levels | the cheat/name entry fields (Rage Wars views) read `Menu::controller` as an s32 at N64 0x20 (on the host `Menu::desc`) and called through `(s32 (*)(s32))`: in a PIE `&gControllers` is above 4 GB | the window's members (`cursor`, `controller`, `player`). y4 fixed the same on the Mac (also the `_2` copy func_00453A08.c): keep one body |
+
+### 7.3 Totals (final binaries, Linux headless, `/root/R10_y5/out/soak/s2`)
+
+| set | binary | runs | frames | crashed |
+|---|---|---|---|---|
+| attract 100,000, seeds 0-1, high + low | non-PIE | 4 | 399,840 | 0 |
+| newgame 36,000, seeds 0-39, high + low | non-PIE | 80 | 2,880,000 | 0 |
+| warp 30,000, seeds 0-39, high + low | non-PIE | 80 | 2,400,000 | 0 |
+| levels 25,000, seeds 0-40 (levels 1-164), high + low | non-PIE | 82 | 2,046,720 | 0 |
+| levels 25,000, seeds 0-40 | PIE (final) | 41 | 1,023,360 | 0 |
+| warp 30,000, seeds 0-39 | PIE (final) | 40 | 1,200,000 | 0 |
+| newgame 36,000, seeds 0-39 | PIE (final) | 40 | 1,440,000 | 0 |
+| attract 100,000, seeds 0-1 | PIE (final) | 2 | 199,920 | 0 |
+
+The non-PIE rows ran before S22/S23 and before the big-endian read of S20 (the little-endian
+read froze the player, so those runs missed S22: the final rows are the PIE ones). The baseline
+at cc0c322b (warp 0-39, both memories) had 21 crashes in 6 classes; the first levels soak 10
+crashes in 5 classes. Boot + 3 demos: `T2_DET_LOG` identical to round 9's binary.
+
+### 7.4 The 42 typed symbols larger than their N64 extent
+
+None needs a change: gendata places an alias at the host address of the member path that
+holds its N64 offset (DATA.md point 7), so an alias is wrong only where the base's host layout
+differs AND the alias is read through the base's type by host code. By kind:
+
+- **fields named as symbols** (28: `gEngineApp_*`/`gScene_*`, `gCollisionResults_*`,
+  `gMotherBoss_*`, `gPager_*`, `gCache_*`, `gControllers_buttons`, `gMergedController_*`,
+  `gDemoPlayer_*`, `gLevelScript*` in `D_8012F604`, `gThrowableCollisionInfo_*` in
+  `D_800F1F90`, `gEnemyAlertPoint_y/z`, `sRegionNormal_y/z`, `sRegionUnitNormal_y/z`,
+  `gPakProfileRead_character`, `gHeap_usedHead`, `gMantidQueen_blink`, `gCheatEntryText`
+  (`TextEntry.text`), `gVideoModesPAL`, `D_801306F8` (`gBlindOne.script`), `D_00430F90`,
+  `D_800F55F0`, the `sWeaponActorModeTable` rows): right by construction.
+- **byte/scalar neighbours** (10: `sPlayerSpeedTable` after `D_004388E0`, `D_800ADDB8` after
+  `gCharacterHealthRegen`, `sWobbleSineTable` after `gSwingAmplitudes`, `sBoneMatrixCount`,
+  `D_800F1CC6`, `D_800F5C66`, `D_800F677A/B`, `D_800F5A34`/`D_800F5A18` (the camera boxes),
+  `D_800ADDE4`, `D_800AE9D2`, `D_800C203B`, `D_800D8E13`, `D_800F5EA3`, `D_800AB0D8`): the base
+  is f32/u8/s16 data, the same bytes on both sides; the C type is a few bytes too long (m2c's
+  guess). Harmless; shortening the declarations is an `include/` change for no behaviour.
+- **foreign objects in a base with pointers** (4): `__osThreadTail` (`__osRunQueue`,
+  `__osTimerList`, the printf tables: libultra's thread code is t2os on the host; the tables
+  are read by the crash printer only), `gCrashFont` (the crash screen), `__osViContexts`
+  (`D_800B7A90`: libultra VI, replaced), `gThreadStackMain` (`D_800C894C`, "the bottom of the
+  stack"): `Collision_SweepRegionWalls` and its twin compare `&local < &D_800C894C` to stop a
+  deep recursion. On the host the game threads' stacks are never below a static, so the guard
+  never fires (harmless: host stacks are 8 MB; it would matter only with a tiny stack).
+
+### 7.5 The raw `+ 0x140` CAI accesses
+
+After this round no `+ 0x140` actor->CAI address is compiled on the host (checked on the
+preprocessed `TARGET_PORT` code of every file in compile_commands.json: `clang -E` with each
+file's flags, grep `+ 0x140`). What is left: the N64 `#else` branches (they stay for the
+matching build), the module-2 `_2` copies (compile-only), the prototype-only view
+`Member00401FCC`, and func_0043D57C (`Actor0040457C`, a `_2`-module copy). Not reached and left:
+`TotemDefense_KillsLeft` / `TotemDefense_TryHitEnemyAfterDelay` (N64 views over
+`TotemDefenseState`, no C caller in the tree).
+
+### 7.6 PIE
+
+`-DT2_LOW_MEMORY=OFF` links a PIE (code and statics above 4 GB). The first PIE soak found one
+class (S23); fixed, the final PIE binary ran the 123 runs above with 0 crashes and the demos'
+`T2_DET_LOG` identical to round 9. **`T2_LOW_MEMORY` now defaults to OFF**: the Linux build is
+a PIE; `-DT2_LOW_MEMORY=ON` brings back `-no-pie` and `--low-memory` (debug). With a PIE build
+use soak.py without `--both-memory`. An existing build dir keeps its cached `T2_LOW_MEMORY=ON`:
+reconfigure with `-DT2_LOW_MEMORY=OFF`.
