@@ -10,10 +10,22 @@
 
 s32 Cinema_RequestById(s32);
 
+#ifdef TARGET_PORT
+#include "structs/player.h"
+/* the view at the host offset of CPlayer m_Data.m_bPrimagenBossComplete (N64 0x9F0): the N64
+ * offset read other player data on the host, so the credits after the Primagen never knew he was
+ * beaten (no cinema 0x82, Credits_Update waited for good; round 11 z2) */
+typedef struct {
+    union {
+        struct { u8 _hp_unk9F0[__builtin_offsetof(CPlayer, m_Data.m_bPrimagenBossComplete)]; s32 unk9F0; };
+    };
+} Unk002532A8;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x9F0];
     /* 0x9F0 */ s32 unk9F0;
 } Unk002532A8;
+#endif
 
 s32 CEngineApp__StartWarp(sptr, s32);                /* extern */
 
