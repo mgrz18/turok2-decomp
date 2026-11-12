@@ -4,7 +4,8 @@
 through the hub portal 5000 and its intro cinemas to level 124 (HIVE TOP), then the sub-levels
 124 -> 84 -> 85 -> 86 -> 87 -> 88 -> 89 -> 90 -> 94 (embryo 1) -> 91 (the hive's hub) -> 95
 (embryo 2) -> 91 -> 96 (embryo 3) -> 91 -> 93 (the master computer) -> 91 and the level exit 7500
-(the Hive Totem, level 113, once the objectives are done).
+(the Hive Totem, level 113, once the objectives are done), the totem's defence, the Mantid Queen
+(level 2) and the hub (round 12 a1: the whole level, docs/port/PLAYTHROUGH.md section 9.4).
 
 --level 6, the Primagen's Lightship: the hub portal 6000 and its intro cinemas to level 114 (the
 ship's hub), the three power-generator wings 115, 117 (via 116) and 119 (via 118), the assembly
@@ -13,9 +14,10 @@ plants 121, 122, 123 (via 120, with the fourth generator in 123) and back to 114
 
 The objectives (Mission_LevelObjectivesDone: link group types 9/10 and 11/12, the types table
 puts them at link groups 44/98 and 97/89):
-  level 5: 3 embryos (object 109: 94 actor 19, 95 actor 27, 96 actor 31; "embryo destroyed.",
-           the last "all embryos destroyed. mission complete."), the master computer (93 actor 54,
-           object 331: "master computer destroyed. mission complete.").
+  level 5: 3 embryos (object 109: 94 actor 19, 95 actor 27, 96 actor 31, each in a cocoon: 78, 94,
+           95; "embryo destroyed.", the last "all embryos destroyed. mission complete."), the
+           master computer (93: four sockets, actors 7-10, each fed a satchel charge from 91;
+           actor 53: "master computer destroyed. mission complete.").
   level 6: 4 power generators (each one 4 couplings, object 288, around actor 45 of 115, 42 of
            117, 31 of 119, 37 of 123: "power generator recalibrated.", the last "all power
            generators recalibrated. mission complete."), 3 assembly plants (121 actor 37, object

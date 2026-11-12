@@ -311,6 +311,44 @@ Fixes on the merged tree (asm_diff 0):
    so far).
 10. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
 
+## Round 12, part a1: level 5 complete (branch names-R12_a1)
+
+**Level 5, the Hive of the Mantids, plays from the hub portal back to the hub** with both
+objectives, the Hive Totem saved and the Mantid Queen dead, by the game's own logic (no debug
+warp; [PLAYTHROUGH.md](PLAYTHROUGH.md) section 9.4):
+
+```sh
+python3 tools/port/playthrough.py DIR --level 5 && . DIR/teleport.env
+SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_STATE_LOG=500 build/app/turok2 --archive turok2.o2r \
+    --rom ../baserom.us.z64 --game --pak-blank --frames 48000 --input @DIR/playthrough.txt
+```
+
+124 at 17,300; "force field down." 18,913 (the four pylons); the game's warp 5201 into 84 (no
+hop); "embryo destroyed." 24,007 (94) and 26,707 (95); "all embryos destroyed. mission complete."
+28,607 (96); the four satchel charges from 91 into the computer's sockets in 93: "warning, five
+seconds until detonation." 30,401, "master computer destroyed. mission complete." 30,759; the
+exit 7500 to the Hive Totem (113, 31,500), saved (10/8 kills); the Mantid Queen (33,118), her
+death (mode 16) at 43,397; **the hub at 45,000**; exit 0.
+
+**No host bug was behind level 5's blocks**: each was a route gap. The pylons are turrets whose
+hit boxes are ~170 units up (z4 aimed at 100); the embryos sleep inside cocoons (destructibles)
+whose death wakes them; the computer is not shot but fed four satchel charges (item 0x100E,
+object 599, in level 91) at its four sockets (actions needing that item); "the instant death in
+93" was the route's aim point over the pit round the computer room (a fall, which kills whatever
+`T2_CHEATS` says). The route runs on the shredder (weapon 9) with `T2_FILL_AMMO=100`.
+
+Tools (debug only): `T2_ACTOR_LOG` adds an `actor+:` line per actor (body flags, an action's auto
+radius and needed pickup, a destructible's health, the AI's hurt/step/mode callbacks as offsets
+from `T2Port_LogOne`); `routes56.py` steps take `"aim": ("actor", A)`.
+
+Files others may touch: `tools/port/routes56.py` (a2 edits the level-6 half: my changes are the
+level-5 half, `build_level56`'s weapon/ammo per level and its level-5 totem/boss block, and the
+`("actor", A)` aim); `port/game/t2debug.c` (`T2Port_LogOne` only); `docs/port/PLAYTHROUGH.md`
+(9.3 items 2 and 4, new 9.4). Nothing in `src/` or `include/`.
+
+Next (level 5): its level key and Primagen key pickups; the flesh-eater portal 82 and the talismans
+76 and 92 (a3's talisman work).
+
 ## Round 11, part z5: demo fidelity, static object events, the font colour (branch names-R11_z5)
 
 Detail: [FIDELITY.md](FIDELITY.md) section 6. Every `src/` change is TARGET_PORT;
