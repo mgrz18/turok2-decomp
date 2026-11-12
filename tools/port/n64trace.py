@@ -67,10 +67,24 @@ FIELDS = [
     ("prt_age", "CParticle", "m_cFrame"),
     ("prt_next", "CParticle", "m_pNext"),
     ("li_inst", "CListedInstance", "m_Instance"),
+    ("pl_cam", "CPlayer", "m_pCamera"),
+    ("c_vp", "CCamera", "m_ViewParams.m_vPos"),
+    ("c_roty", "CCamera", "m_ViewParams.m_RotY"),
+    ("c_off", "CCamera", "m_ViewParams.m_vRotOffset"),
+    ("c_yoff", "CCamera", "m_ViewParams.m_YPosOffset"),
+    ("c_trema", "CCamera", "m_TremorAngle"),
+    ("c_tremh", "CCamera", "m_TremorHeight"),
+    ("c_shx", "CCamera", "m_Shake.m_XAxis.m_Shake"),
+    ("c_shy", "CCamera", "m_Shake.m_YAxis.m_Shake"),
+    ("c_shz", "CCamera", "m_Shake.m_ZAxis.m_Shake"),
+    ("c_ampx", "CCamera", "m_Shake.m_XAxis.m_Amp"),
+    ("c_ampy", "CCamera", "m_Shake.m_YAxis.m_Amp"),
+    ("c_ampz", "CCamera", "m_Shake.m_ZAxis.m_Amp"),
+    ("c_pos", "CCamera", "m_vPos"),
 ]
 SIZEOF = ["CGameObjectInstance"]
 HEADERS = ["common.h", "structs/particle.h", "structs/world.h", "structs/player.h", "structs/game.h",
-           "structs/game_object.h", "structs/intelligence.h", "structs/collision.h"]
+           "structs/game_object.h", "structs/intelligence.h", "structs/collision.h", "structs/camera.h"]
 SYMS = ["gRandomValue", "gRandomValueB", "gFrameCountGameplay", "gNextTicks", "gEngineApp",
         "gEngineApp_m_Game", "gScene", "gDemoPlayer"]
 
@@ -195,6 +209,15 @@ class Tracer:
         self.out.write("\n")
         if valid(p) and self.actors:
             self.actor(0, p + o["pl_weapon"][0], "wpn", 0, True)
+            c = r.u32(p + o["pl_cam"][0])
+            if valid(c):  # round 11 z5: the camera (t2det.c's cam line)
+                w = lambda n, k=0: r.u32(c + o[n][0] + 4 * k)
+                self.out.write("det:  cam vp %08x %08x %08x roty %08x off %08x %08x %08x yoff %08x trem %08x %08x "
+                               "shk %08x %08x %08x amp %08x %08x %08x pos %08x %08x %08x\n" % (
+                                   w("c_vp"), w("c_vp", 1), w("c_vp", 2), w("c_roty"), w("c_off"), w("c_off", 1),
+                                   w("c_off", 2), w("c_yoff"), w("c_trema"), w("c_tremh"), w("c_shx"), w("c_shy"),
+                                   w("c_shz"), w("c_ampx"), w("c_ampy"), w("c_ampz"), w("c_pos"), w("c_pos", 1),
+                                   w("c_pos", 2)))
         h, cnt = 0xCBF29CE484222325, 0
         base, first, na = (r.u32(sc + o["sc_actors"][0]), r.sval(sc + o["sc_first"][0], 4),
                            r.sval(sc + o["sc_nactors"][0], 4))

@@ -21,10 +21,14 @@ PLAYER = re.compile(r" player (\w+) (\w+) (\w+) rot (\w+) vel (\w+) (\w+) (\w+) 
 ACTOR = re.compile(r"det:  (\w+) (\d+) pos (\w+) (\w+) (\w+) \(.*\) rot (\w+) hp (-?\d+) mode (-?\d+) act (-?\d+) "
                    r"anim (-?\d+) (\w+) fl (\w+)")
 PRT = re.compile(r"det:  prt (\d+) (\d+) type (-?\d+) pos (\w+) (\w+) (\w+) vel (\w+) (\w+) (\w+) age (\w+)")
+CAM = re.compile(r"det:  cam vp (\w+) (\w+) (\w+) roty (\w+) off (\w+) (\w+) (\w+) yoff (\w+) trem (\w+) (\w+) "
+                 r"shk (\w+) (\w+) (\w+) amp (\w+) (\w+) (\w+) pos (\w+) (\w+) (\w+)")
+CAMF = ["vpx", "vpy", "vpz", "roty", "offx", "offy", "offz", "yoff", "trema", "tremh", "shkx", "shky", "shkz",
+        "ampx", "ampy", "ampz", "posx", "posy", "posz"]
 PRTF = ["type", "x", "y", "z", "vx", "vy", "vz", "age"]
 PF = ["x", "y", "z", "rot", "vx", "vy", "vz", "hp", "mode", "btn", "movex", "lookx"]
 AF = ["x", "y", "z", "rot", "hp", "mode", "act", "anim", "aframe", "flags"]
-FLOATS = {"x", "y", "z", "rot", "vx", "vy", "vz", "movex", "lookx", "aframe", "age"}
+FLOATS = set(CAMF) | {"x", "y", "z", "rot", "vx", "vy", "vz", "movex", "lookx", "aframe", "age"}
 
 
 def load(path, level):
@@ -49,6 +53,10 @@ def load(path, level):
             if p:
                 cur["player"] = dict(zip(PF, p.groups()))
             frames[gf] = cur
+            continue
+        c = CAM.match(line)
+        if c and cur is not None:
+            cur["actors"][("cam", 0)] = dict(zip(CAMF, c.groups()))
             continue
         q = PRT.match(line)
         if q and cur is not None:
@@ -87,7 +95,7 @@ def diff(a, b, skip):
         if x is None or y is None:
             out.append("%s %d only in %s" % (key[0], key[1], "A" if y is None else "B"))
             continue
-        for k in (PRTF if key[0].startswith("prt") else AF):
+        for k in (CAMF if key[0] == "cam" else PRTF if key[0].startswith("prt") else AF):
             if k not in skip and x[k] != y[k]:
                 out.append("%s %d.%s %s | %s" % (key[0], key[1], k, show(k, x[k]), show(k, y[k])))
     return out
