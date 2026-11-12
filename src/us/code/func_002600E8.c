@@ -5,6 +5,19 @@
 #include "protos/scene.h"
 #include "protos/game.h"
 
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+/* The port (round 11 C26): the members at their host offsets (the N64 pads put the flags on
+ * m_rpGeometryHeaderSize, as in Destructible_GoEnter, func_00265B58.c); the flag bits by mask
+ * below (the bit-fields are laid out from the other end on a little-endian host) */
+typedef struct {
+    union {
+        struct { u8 _hpPos[__builtin_offsetof(CGameObjectInstance, header.m_vPos)]; CVector3 pos; };
+        struct { u8 _hpDef[__builtin_offsetof(CGameObjectInstance, header.m_pIntelligence)]; CIntelligence *def; };
+        struct { u8 _hpFlags[__builtin_offsetof(CGameObjectInstance, m_dwFlags)]; union { u32 word; } flags; };
+    };
+} Actor;
+#else
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
     /* 0x004 */ CVector3 pos;
@@ -24,6 +37,7 @@ typedef struct {
         } bits;
     } flags;
 } Actor;
+#endif
 
 
 void Actor_SpawnParticle(Actor *self, s32 type, CVector3 pos, s32 arg4);
@@ -43,8 +57,13 @@ void EnemyAI_NukedFrozenRemove(Actor *self, void *ai) {
         }
         GameObject_FireTriggers(self, 1, self);
     }
+#ifdef TARGET_PORT
+    self->flags.word &= ~0x100;
+    self->flags.word &= ~0x2000;
+#else
     self->flags.bits.b100 = 0;
     self->flags.bits.b2000 = 0;
+#endif
     AI_StopSound(self, ai);
     if (self->flags.word & 0x80000) {
         CListedInstance__Free(self);
