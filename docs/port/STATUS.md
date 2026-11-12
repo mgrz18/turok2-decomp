@@ -314,7 +314,8 @@ Results (Linux, headless, PIE, high memory; every run exits 0):
 `port/game/t2bosslog.c` (`T2Port_AimNode` now returns int; `T2Port_AimMask` `actor:N`;
 `T2Port_Atan2f`), `port/app/game.cpp` (one declaration), `tools/port/playthrough.py` (the level-2
 segments 133/134/135/132, the totem fire window and env), `src/us/code/func_0021E03C.c`. z2 (the
-bosses) also uses `T2_AIM_NODE` in t2bosslog.c: keep both.
+bosses) also uses `T2_AIM_NODE` in t2bosslog.c: keep both. z3 (9c791996) adds an early `return` for `SPEC@LEVEL` at the top of
+`T2Port_AimNode`: with the int return it must be `return 0;`.
 
 Next: walk level 2's sub-levels instead of hopping; the City Totem's kill pace against the N64
 (PLAYTHROUGH.md 6.6). The other files that define a `shadowAlpha` (0x10E) view never touch it.
