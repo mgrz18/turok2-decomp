@@ -33,6 +33,7 @@ void T2Port_LogDet(int frame);
 void T2Port_GiveWeapons(void); // DEBUG-ONLY: T2_GIVE_WEAPONS=1 (t2debug.c)
 void T2Port_DebugWarp(int frame);
 void T2Port_Teleport(int frame, const char *spec);
+int T2Port_ScheduleFrame(int frame);
 extern int gT2HostFrame;
 void T2Port_WakeEnemies(int frame, const char *spec);
 void T2Port_FaceNearest(int frame, const char *spec);
@@ -588,7 +589,9 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         if (window) {
             window->HandleEvents();
         }
-        sFrame = f;
+        // T2_ANCHOR (round 12 a3): the scripted input and the frame-scheduled debug switches run
+        // on the schedule clock (the host frame, re-anchored when a listed level is reached)
+        sFrame = T2Port_ScheduleFrame(f + 1) - 1;
         if (args.audio && (testSfx != nullptr || testSong != nullptr || testSpeech != nullptr) && f == 29) {
             T2Audio_TestVolumes();
         }
@@ -631,15 +634,15 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         }
         static const char* teleport = getenv("T2_TELEPORT");
         if (teleport != nullptr) {
-            T2Port_Teleport(f + 1, teleport); // DEBUG-ONLY: T2_TELEPORT=F:x,y,z[;F:x,y,z...]
+            T2Port_Teleport(sFrame + 1, teleport); // DEBUG-ONLY: T2_TELEPORT=F:x,y,z[;F:x,y,z...]
         }
         static const char* wake = getenv("T2_WAKE_ENEMIES");
         if (wake != nullptr) {
-            T2Port_WakeEnemies(f + 1, wake); // DEBUG-ONLY: T2_WAKE_ENEMIES=R
+            T2Port_WakeEnemies(sFrame + 1, wake); // DEBUG-ONLY: T2_WAKE_ENEMIES=R
         }
         static const char* faceNearest = getenv("T2_FACE_NEAREST");
         if (faceNearest != nullptr) {
-            T2Port_FaceNearest(f + 1, faceNearest); // DEBUG-ONLY: T2_FACE_NEAREST=R
+            T2Port_FaceNearest(sFrame + 1, faceNearest); // DEBUG-ONLY: T2_FACE_NEAREST=R
         }
         static const bool bossTrace = getenv("T2_BOSS_LOG") != nullptr;
         if (bossTrace) {
@@ -647,39 +650,39 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         }
         static const char* aimNode = getenv("T2_AIM_NODE");
         if (aimNode != nullptr) {
-            T2Port_AimNode(f + 1, aimNode); // DEBUG-ONLY: T2_AIM_NODE=MASK[,R]
+            T2Port_AimNode(sFrame + 1, aimNode); // DEBUG-ONLY: T2_AIM_NODE=MASK[,R]
         }
         static const char* bossFront = getenv("T2_BOSS_FRONT");
         if (bossFront != nullptr) {
-            T2Port_BossFront(f + 1, bossFront); // DEBUG-ONLY: T2_BOSS_FRONT=D[,EVERY]
+            T2Port_BossFront(sFrame + 1, bossFront); // DEBUG-ONLY: T2_BOSS_FRONT=D[,EVERY]
         }
         static const char* aimAt = getenv("T2_AIM_AT");
         if (aimAt != nullptr) {
-            T2Port_AimAt(f + 1, aimAt); // DEBUG-ONLY: T2_AIM_AT=F1-F2:x,y,z[;...]
+            T2Port_AimAt(sFrame + 1, aimAt); // DEBUG-ONLY: T2_AIM_AT=F1-F2:x,y,z[;...]
         }
         static const char* aimEnemy = getenv("T2_AIM_ENEMY");
         if (aimEnemy != nullptr) {
-            T2Port_AimEnemy(f + 1, aimEnemy); // DEBUG-ONLY: T2_AIM_ENEMY=F1-F2[,R][;...]
+            T2Port_AimEnemy(sFrame + 1, aimEnemy); // DEBUG-ONLY: T2_AIM_ENEMY=F1-F2[,R][;...]
         }
         static const char* cheats = getenv("T2_CHEATS");
         static const char* fillAmmo = getenv("T2_FILL_AMMO");
         if (cheats != nullptr || fillAmmo != nullptr) {
-            T2Port_Cheats(f + 1, cheats, fillAmmo); // DEBUG-ONLY: T2_CHEATS=MASK, T2_FILL_AMMO=N
+            T2Port_Cheats(sFrame + 1, cheats, fillAmmo); // DEBUG-ONLY: T2_CHEATS=MASK, T2_FILL_AMMO=N
         }
         static const char* doorOpen = getenv("T2_DOOR_OPEN");
         if (doorOpen != nullptr) {
-            T2Port_DoorOpen(f + 1, doorOpen); // DEBUG-ONLY: T2_DOOR_OPEN=F
+            T2Port_DoorOpen(sFrame + 1, doorOpen); // DEBUG-ONLY: T2_DOOR_OPEN=F
         }
         static const char* savePortal = getenv("T2_SAVE_PORTAL");
         if (savePortal != nullptr) {
-            T2Port_SavePortal(f + 1, savePortal); // DEBUG-ONLY: T2_SAVE_PORTAL=F
+            T2Port_SavePortal(sFrame + 1, savePortal); // DEBUG-ONLY: T2_SAVE_PORTAL=F
         }
         if (int m = T2Port_EngineMode(); m != mode) {
             printf("game: frame %d: engine mode %d -> %d\n", f + 1, mode, m);
             fflush(stdout);
             mode = m;
         }
-        T2Port_DebugWarp(f + 1); // DEBUG-ONLY: T2_WARP_TO=<id>[@frame][,...]
+        T2Port_DebugWarp(sFrame + 1); // DEBUG-ONLY: T2_WARP_TO=<id>[@frame][,...]
         if (args.skipPakCheck || args.startMode >= 0) {
             T2Port_DebugSwitches(args.skipPakCheck, args.startMode); // DEBUG-ONLY
         }
