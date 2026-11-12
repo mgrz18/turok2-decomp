@@ -223,6 +223,39 @@ every file the merges touched). No fix was needed on the merged tree: every scen
 8. **macOS**: run this merged tree on the Mac (the playthrough and the Mother defeat have only run
    on Linux).
 
+## Round 10, part y3: demo fidelity against the N64's RAM (branch names-R10_y3)
+
+Detail: [FIDELITY.md](FIDELITY.md) section 5. Every `src/` change is TARGET_PORT;
+`tools/asm_diff.py --base cc0c322b -j 8` 0 on every touched file; no `include/` or archive change.
+
+- **Tools**: `tools/port/n64trace.py` (the N64's per-game-frame state from RDRAM through the
+  mupen64plus debugger: a breakpoint at `CEngineApp__Update`, offsets from `include/` with clang
+  for mips, `--calls`/`--args` to log function entries with their arguments),
+  `tools/port/detdiff.py` (aligns it with the port's `T2_DET_LOG=1 T2_DET_GF=1 T2_DET_ACTORS=1`
+  by gFrameCountGameplay and prints the first differing fields); the port trace gained `gf`,
+  `ticks`, the weapon actor and the particles.
+- **Fixed** (the first divergent field each time): impact event values read by position
+  (`Blast` radius/damage swapped: every particle hit did the wrong damage; also the floor and team
+  sound handlers), `AI_InitHealth`'s aggression written at an N64 offset (every enemy had
+  aggression 0: attack delay 60 instead of 15), and y4's `gImpactEventHandlers[0xFFFF]` read
+  (same fix as y4 627b899b: keep y4's on merge).
+- **Result**: demo 1 is bit-identical to the N64 (player, weapon actor, all actors, pooled
+  instances, particles) from game frame 1 to 416; it ends at **50 health (N64 51; before 31)**.
+  Next divergence: the camera's view translation is 0.18 units off in x/z by gf 412 (tremor or
+  shake in `CCamera__Update`, func_0027D160), so the first plasma shots leave from a slightly
+  different point and later hit another enemy.
+- **Open**: `CScene__AdvanceListedInstances` (func_002263C0) reads CScene at N64 offsets, so no
+  static object fires its events on the host (demo 1's ambient particle, gf 202). A host body
+  fixed demo 1 there but crashed demo 2 (level 131) in `Collision_SweepRegions` through a static
+  object's spawn event; reverted (3c790a0b + b12d96c7). The legal screen's text colour was not
+  worked on.
+- Regression (Linux headless, 26,000 frames, exit 0): demo 1 5,467 -> legal 8,157, demo 2 13,037,
+  demo 3 19,922, as before.
+
+Files others may touch: func_00237AFC.c, func_002374AC.c (blast), func_00239254.c,
+func_00238EE4.c, func_002427E0.c (AI health init: y2/y5's AI code), func_0022D2FC.c (y4 too),
+port/game/t2det.c (the trace format: Mac/Linux comparisons need both sides rebuilt).
+
 ## Round 9, part x4: macOS and host determinism (branch names-R9_x4)
 
 Detail: [MACOS.md](MACOS.md) section 11. Commits (asm_diff 0 vs 5437cfc0): 8b8697a6 (`SaveGame_Build`:

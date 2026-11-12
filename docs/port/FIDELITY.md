@@ -129,3 +129,61 @@ x4's determinism subject, reported to the coordinator. Neither host matches the 
 2. The legal text's colour (2.3); then the HUD and menu text, which may share the cause.
 3. A new-game route on the N64 with `--input` (keyboard presses through `M64CMD_SEND_SDL_KEYDOWN`
    are wired but not yet checked in a menu) so levels 51/52 can be compared by position.
+
+## 5. Demo 1 against the N64's RAM, game frame by game frame (round 10, y3)
+
+### 5.1 The tools
+
+- **`tools/port/n64trace.py`**: runs the ROM on mupen64plus (the refshots.py setup, under
+  `xvfb-run`) with the core's **debugger**: a breakpoint at `CEngineApp__Update` (the start of each
+  game frame, so every read sees a finished frame; reading from the frame callback instead,
+  `--at vi`, lands at a varying point of the frame and is noisy). There it reads RDRAM in place
+  at the N64 offsets (computed from `include/` with `clang --target=mips-linux-gnu`, no
+  TARGET_PORT; `--offsets` prints them) and writes the port's `T2_DET_LOG` lines: gf, ticks, the
+  RNG seeds, the player, the weapon actor, every level actor and pooled instance and the live
+  particles. `--calls SYM,...` prints every entry into those functions with `ra` and `a0-a3`;
+  `--args REG:TYPE:MEMBER[:f|d|x]` reads members through an argument register or a global
+  (`gCollisionResults:CCollisionResults:m_Frame.action:x`). ~1,000 emulator frames a minute
+  (the cached interpreter: the debugger needs it).
+
+```sh
+xvfb-run -a -s "-screen 0 1024x768x24" python3 tools/port/n64trace.py --rom baserom.us.z64 \
+    --from 1980 --to 3300 --actors > n64.det           # demo 1: emulator 1986 = gf 1
+SDL_VIDEODRIVER=offscreen T2_DET_LOG=1 T2_DET_GF=1 T2_DET_ACTORS=1 T2_DET_FROM=5400 \
+    build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --pak-blank \
+    --frames 8300 > port.log
+python3 tools/port/detdiff.py n64.det port.log --shift 0 --skip rng,flags
+```
+
+- `T2_DET_GF=1` (port): one line set per game frame (a new `gFrameCountGameplay`), with `gf`
+  and `ticks`; `T2_DET_ACTORS=1` adds the weapon actor (`wpn`) and the particles (`prt`).
+- **`tools/port/detdiff.py`**: aligns both by gf (`--shift 0` for n64trace's breakpoint
+  reads; the port logs between frames: the same state) and prints the first frames whose fields
+  differ (`--skip rng,flags,prt,dyn`).
+- The RNG field is a phase marker only: in a demo `Random_Next` reseeds from
+  `gFrameCountGameplay` on every call, so every draw of a frame returns the same number; the
+  N64 draws once more between frames on even gf (a non-game thread), so `rng` differs on even
+  frames with no effect.
+
+### 5.2 The divergences found and fixed (asm_diff 0 each)
+
+| first divergent field (gf) | cause | fix |
+|---|---|---|
+| player hp at gf 414: N64 100 -> 92, port 100 -> 99 | an impact event's 8-byte value reaches its handler as two host-order words (word 0 = the N64's (upper << 16) \| lower: the `CEventValue` convention). `Blast` read it by position: radius and damage swapped (damage 256 = 1 hp instead of 2048 = 8) | `Blast` (func_00237AFC, func_002374AC), `B15Blk8` (func_00239254: the floor sound) and `ParamsRecAt4` (func_00238EE4: the team sound) declared in host order under TARGET_PORT. Every particle hit (shots, explosions) did the wrong damage with the wrong radius |
+| enemy 7 mode at gf 439: N64 18 (projectile attack), port 4 | `AI_InitHealth` (func_002427E0) wrote `m_Aggression` through an N64-offset view of CAI (0xC8): every enemy had aggression 0, so its attack delay was 60 instead of 15 (`EnemyMode_Attack_Enter`), and the aggression-scaled dodges and stuns were off | host view (hostview.py) |
+| particle type 103 at gf 202, N64 only (**open, fix reverted**) | `CScene__AdvanceListedInstances` (func_002263C0) reads the timer, count and list at N64 offsets of CScene: on the host no listed static object ever fires its events (demo 1's ambient particle, every second) | a host body by member (3c790a0b) made demo 1 match here, but in demo 2 (level 131, gf 1) a static object's kind-8 event (func_00238134 -> Actor_SpawnParticle -> GameObject_TraceMove) crashed in `Collision_SweepRegions` (the static object's `m_pCurrentRegion` is its grid segment, not a host CGameRegion?). Reverted (b12d96c7); next step |
+| particle hit flags (y4's finding) | `CParticleSystem__Spawn` read `gImpactEventHandlers[0xFFFF]` past the table | the N64 word 0x00C800FF (same fix as y4 627b899b: keep y4's) |
+
+### 5.3 Where demo 1 stands
+
+With the fixes (and 3c790a0b, see above), every traced field (the player, the weapon actor, the 24 level actors, the
+pooled instances and every particle) is bit-identical to the N64 **from gf 1 to gf 416**, except
+two transients with no lasting effect: enemy 21 (a generator) toggles mode 0 -> 1 -> 0 one frame
+later than on the N64 (gf 236-238), and actor flag 0x200 (drawn this frame). At gf 417 the
+player's first plasma shots leave from a point 0.18 units off sideways: the weapon actor's
+position, rotation and animation are identical, but its `m_mfOrient` translation (and so every
+bone matrix and the fire position) differs, because the **camera's `m_mfViewOrient` translation
+already differs by (0.18, 0.03) in x/z at gf 412** (the rotation part is identical).
+`CCamera__Update` (func_0027D160) adds the tremor and the camera shake (`CShake__ApplyOffset`)
+to the view position: that is the next lead. From there the shot hits enemy 6 instead of 7
+(gf 589) and the demo drifts. It now ends at 50 health on the port (N64 51; before these fixes 31).
