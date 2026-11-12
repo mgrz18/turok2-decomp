@@ -30,7 +30,7 @@
 #include "t2audio.h"
 
 extern CAudioWorld gAudioWorld;
-extern s32 gAudioHeapBase;
+extern sptr gAudioHeapBase; /* include/globals/frame.h: pointer-wide on the host */
 extern s32 gAudioHeapSize;
 extern s32 gAudioWorldReady;
 void Sound__Initialize(void);
@@ -58,7 +58,7 @@ static void test_main(void *arg) {
     OSMesg m;
     (void)arg;
     gAudioHeapSize = AUDIO_HEAP_SIZE;
-    gAudioHeapBase = (s32)(uptr)t2_lowmem_alloc(AUDIO_HEAP_SIZE);
+    gAudioHeapBase = (sptr)t2_lowmem_alloc(AUDIO_HEAP_SIZE);
     Sound__Initialize();
     sInitOk = gAudioWorldReady;
     fprintf(stderr, "test: Sound__Initialize done (gAudioWorldReady %d, bank %p, %d instruments in bank 0)\n",
@@ -170,7 +170,11 @@ static u32 *cmd(u32 *p, u32 w0, u32 w1) {
     p[1] = w1;
     return p + 2;
 }
-#define A32(p) ((u32)(uptr)(p))
+/* the 32-bit address an RSP command word holds: osVirtualToPhysical (t2ultra.c) gives a pointer
+ * below 2 GB as itself and any other host address a region handle that T2Asp's ram() resolves
+ * (the PIE build, the default since round 10, puts the test's heap above 4 GB: a plain cast
+ * truncated it and --direct crashed in A_LOADADPCM) */
+#define A32(p) ((u32)osVirtualToPhysical((void *)(p)))
 
 /* Plays sound K of the sfx bank (instrument 0) at pitch 1.0 through a libaudio-shaped command
  * list per frame (LOADADPCM, LOADBUFF, ADPCM, RESAMPLE, SETVOL, ENVMIXER, INTERLEAVE, SAVEBUFF).

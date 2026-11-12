@@ -113,3 +113,29 @@ other runs, so these numbers are rough.
   in `--bench` serialises the GPU. A real presenter overlaps it.
 - Level loads: the late VIs are synchronous loads (the N64 also stalls there). A paced player
   could hide them behind the fade.
+
+## 5. Round 10 (part y4): the whole playthrough in real time on the Mac
+
+Debug build (the default), M5, headless with pixels: `--offscreen-gl --draw --audio --pace --bench
+13000`, the Port of Adia playthrough (`playthrough.py --fight 10`, 27,000 VIs: a new game, level 1
+start to finish, the totem defence won, the hub).
+
+| | value |
+|---|---|
+| wall time | 450.52 s for 450.00 (60 VI/s) |
+| late VIs | 48 (44 by 1 ms or more); **12 in gameplay** (from VI 13,000), worst 16.3 ms (VI 13,552, a level load) |
+| worst of the run | 90.9 ms at VI 8,000 (demo -> legal switch), 28-39 ms at VIs 10,923-10,934 (the new game's load) |
+| per VI in gameplay, mean (p99) | game 0.36 (1.33), audio 0.36 (1.02: synth 0.04 + ASP 0.32), draw 1.87 (7.6), total 2.63 (8.4) ms |
+| drawn frame | 33.35 ms mean, p99 37.5 (30 fps) |
+| slept | 73.4% of the time |
+| t2os | 6.3 switches per VI x 1.6 µs |
+| audio | 9,935,264 frames produced (22,052.9 Hz); simulated 22,050 Hz device, 2,048 frames prefilled: **1 underrun** (VI 11,263, the new game's load), 0 in gameplay; buffer 48-8,161 frames |
+
+The simulated device (`--pace --audio`, round 10): headless runs have no sound device, so the
+loop keeps a virtual queue that the audio manager's frames fill and real time drains at 22,050 Hz
+from the first audio frame; when a VI finds it empty, that is an underrun and the queue restarts
+with the prefill. The line `pace: audio ...` reports it.
+
+Combat (the totem defence: up to 26 instances, plasma fire every 15 frames) costs more game CPU than
+round 7's walk (0.36 against 0.07 ms per VI) but is still 2% of the budget; drawing is still most of
+it. Every late VI is a load (the N64 also stalls there); a Release build halves the costs (section 2).

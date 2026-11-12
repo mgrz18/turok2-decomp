@@ -10,11 +10,19 @@ void Throwable_Collision(u8 *actor, u8 *state) {
     DamageEvent event;
     u8 **player;
 
+#ifdef TARGET_PORT
+    if (((CAI *) state)->m_Mode == 2) { /* N64 0x34 */
+#else
     if (*(s8 *) (state + 0x34) == 2) {
+#endif
         player = (u8 **)&gCollisionResults.m_pInstance;
         if (*player != NULL && gCollisionResults.m_pInstance->header.m_Type == 1) {
             DamageEvent_Set(&event, actor, 0x500, 25.599998f, 0x100000, 0);
+#ifdef TARGET_PORT
+            CAI__CallHurt(*player, &((CGameObjectInstance *) *player)->m_AI, &event); /* N64 +0x140 */
+#else
             CAI__CallHurt(*player, *player + 0x140, &event);
+#endif
             CAI__SetMode(actor, state, 0);
         }
     }

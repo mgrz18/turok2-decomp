@@ -128,6 +128,27 @@ void T2Port_LogBossHurt(const char *who, void *obj, void *arg) {
 #include <math.h>
 #include <string.h>
 
+/* atan2f from + - * / only (round 10 y4): libm's atan2f differs in the last bit between macOS
+ * and glibc, so the aim pitch, the player's shots and everything they hit drifted apart between
+ * the hosts (the Mother recipe, Mac against Linux, frame 14,543). Max error ~1e-5 rad. */
+static f32 T2Aim_Atan2f(f32 y, f32 x) {
+    f32 ax = x < 0.0f ? -x : x, ay = y < 0.0f ? -y : y;
+    f32 a, s, r;
+    if (ax == 0.0f && ay == 0.0f) {
+        return 0.0f;
+    }
+    a = ax > ay ? ay / ax : ax / ay;
+    s = a * a;
+    r = ((-0.0464964749f * s + 0.15931422f) * s - 0.327622764f) * s * a + a;
+    if (ay > ax) {
+        r = 1.57079637f - r;
+    }
+    if (x < 0.0f) {
+        r = 3.14159274f - r;
+    }
+    return y < 0.0f ? -r : r;
+}
+
 typedef struct T2AimBox {
     CVector3 corners[8];
     f32 size;
@@ -190,10 +211,48 @@ static int aimBoxCentre(CGameObjectInstance *o, s32 mask, CVector3 *from, CVecto
  * spot kinds, phase 0 the arms 0xC00 while slots 2..4 live then the heads 0x5000 (6..8), phase 1
  * slot 1 (0xC00) then 5 (0x5000), phase 2 the chest 0x2000); otherwise a number. */
 static CGameObjectInstance *sAimSkip;
+/* the Blind One (round 10 y2): only the actors its phase waits for (sAimSet), or only the spawned
+ * instances (its minions, sAimPoolOnly) */
+static CGameObjectInstance *sAimSet[8];
+static int sAimSetN, sAimPoolOnly;
+
+static void aimSet(CGameObjectInstance **actors, s32 n) {
+    int i;
+    for (i = 0; i < n && i < 8; i++) {
+        sAimSet[sAimSetN++] = actors[i];
+    }
+}
 
 static s32 T2Port_AimMask(const char *spec) {
     sAimSkip = NULL;
+    sAimSetN = 0;
+    sAimPoolOnly = 0;
     if (strncmp(spec, "boss", 4) == 0) {
+        if (gScene.m_nLevel == 1) {
+            /* the Blind One's script (sBlindOneScript): phase 3 its minions, 4/5/6 the actors of
+             * group 1/2/3 (BlindOne_PhaseGroupNUpdate waits for aliveN == 0), 7-9 the boss */
+            BlindOneState *b = &gBlindOne;
+            switch (b->phase) {
+                case 3:
+                    sAimPoolOnly = 1;
+                    break;
+                case 4:
+                    aimSet(b->actors1, b->count1);
+                    break;
+                case 5:
+                    aimSet(b->actors2, b->count2);
+                    break;
+                case 6:
+                    aimSet(b->actors3, b->count3);
+                    break;
+                default:
+                    if (b->boss != NULL) {
+                        sAimSet[sAimSetN++] = b->boss;
+                    }
+                    break;
+            }
+            return -1;
+        }
         if (gScene.m_nLevel == 3) {
             MotherBossState *s = &gMotherBoss;
             switch (s->phase) {
@@ -214,6 +273,21 @@ static s32 T2Port_AimMask(const char *spec) {
             }
             sAimSkip = q->boss;
             return -1;
+        }
+        if (gScene.m_nLevel == 4) {
+            /* the Primagen (round 10 y2): Primagen_Hurt counts a hit on node bit i (0..7) when bit i
+             * of partsDone is set (the parts the stage opens), or bit 1 only while a part is
+             * staggered (partActive) */
+            LevelScriptState *ls = &gLevelScript;
+            if (ls->enemiesAlive > 0 || !ls->armed) {
+                /* its spawner's waves (spawned instances) first: the stage goes on when they die */
+                sAimPoolOnly = 1;
+                return -1;
+            }
+            if (ls->partActive) {
+                return 2;
+            }
+            return (ls->partsDone & 0xFF) != 0 ? (ls->partsDone & 0xFF) : -1;
         }
         return -1;
     }
@@ -256,6 +330,18 @@ void T2Port_AimNode(int frame, const char *spec) {
         if (o == pl || o == sAimSkip || o->header.m_pIntelligence == NULL || o->m_AI.m_Health <= 0 || !(o->m_dwFlags & 0x100)) {
             continue;
         }
+        if (sAimPoolOnly && i < gScene.m_nActors) {
+            continue;
+        }
+        if (sAimSetN > 0) {
+            int k, in = 0;
+            for (k = 0; k < sAimSetN; k++) {
+                in |= sAimSet[k] == o;
+            }
+            if (!in) {
+                continue;
+            }
+        }
         dx = o->header.m_vPos.x - eye.x;
         dz = o->header.m_vPos.z - eye.z;
         d = dx * dx + dz * dz;
@@ -283,7 +369,7 @@ void T2Port_AimNode(int frame, const char *spec) {
     dy = bestAim.y - eye.y;
     dz = bestAim.z - eye.z;
     h = sqrtf(dx * dx + dz * dz);
-    p->m_pCamera->m_ViewParams.m_vRotOffset.x = (sign != NULL ? (f32) atof(sign) : 1.0f) * atan2f(dy, h);
+    p->m_pCamera->m_ViewParams.m_vRotOffset.x = (sign != NULL ? (f32) atof(sign) : 1.0f) * T2Aim_Atan2f(dy, h);
     if (bestNode != sLastMask || frame - sLastFrame >= 300) {
         sLastMask = bestNode;
         sLastFrame = frame;
@@ -312,5 +398,57 @@ void T2Port_Cheats(int frame, const char *spec, const char *fill) {
         for (p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
             CPlayer__FillAllAmmo(p);
         }
+    }
+}
+
+/* T2_BOSS_LOG=1 (game.cpp, every frame; DEBUG-ONLY, round 10 y2): one line whenever the boss of
+ * the level changes its CAI mode or its fight state (the Blind Ones phase, the Queens step and
+ * wave, the Mothers phase, the Primagens stage/state/mode), to follow the phase scripts
+ * frame by frame between the T2_STATE_LOG dumps. */
+void T2Port_TraceBoss(int frame) {
+    static int sMode = -999, sA = -999, sB = -999, sC = -999, sLevel = -1;
+    CGameObjectInstance *boss = NULL;
+    int a = 0, b = 0, c = 0, mode;
+
+    if (gEngineApp.m_Settings.mode != 13) {
+        return;
+    }
+    switch (gScene.m_nLevel) {
+        case 1:
+            boss = gBlindOne.boss;
+            a = gBlindOne.phase;
+            b = gBlindOne.script ? (int) (gBlindOne.script - sBlindOneScript) : -1;
+            c = gBlindOne.minionsAlive;
+            break;
+        case 2:
+            boss = gMantidQueen.actor;
+            a = gMantidQueen.stepIndex;
+            b = gMantidQueen.waveActive;
+            c = gMantidQueen.toSpawn;
+            break;
+        case 3:
+            boss = gMotherBoss.obj;
+            a = gMotherBoss.phase;
+            b = gMotherBoss.partsLeft;
+            break;
+        case 4:
+            boss = gLevelScript.actor;
+            a = gLevelScript.stage;
+            b = gLevelScript.bossState;
+            c = gLevelScript.bossMode;
+            break;
+        default:
+            return;
+    }
+    mode = boss != NULL ? (int) boss->m_AI.m_Mode : -1;
+    if (sLevel != gScene.m_nLevel || mode != sMode || a != sA || b != sB || c != sC) {
+        printf("bosstrace: frame %d level %d mode %d -> %d state %d %d %d hp %d\n", frame,
+               (int) gScene.m_nLevel, sMode, mode, a, b, c, boss != NULL ? (int) boss->m_AI.m_Health : -1);
+        fflush(stdout);
+        sLevel = gScene.m_nLevel;
+        sMode = mode;
+        sA = a;
+        sB = b;
+        sC = c;
     }
 }

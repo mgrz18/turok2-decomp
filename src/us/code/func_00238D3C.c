@@ -8,6 +8,10 @@
 #include "structs/intelligence.h"
 #include "structs/world.h"
 #include "globals/rumble.h"
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+#include "structs/player.h"
+#endif
 struct Triple;
 struct Triple;
 struct Triple {
@@ -75,8 +79,18 @@ struct Triple;
 extern void CScene__StartRumbles(void *, void *, s32, Triple, f32, f32);
 void ImpactEvent_Rumble(func_8024E8F0_S1 *arg0, Context_func_802681A8_de *arg1, s32 arg2, Triple arg3, Params_func_802681A8_de arg6) {
     void *resource;
+#ifdef TARGET_PORT
+    /* Host members (STABILITY.md section 7): the N64 view read the actor's flags at 0xD4, its
+     * player (CAI m_pParent, actor 0x1A8), the player's controller (0xA50) and the rumble pool
+     * in it (0x140) at N64 offsets. */
+    CGameObjectInstance *hitActor = (CGameObjectInstance *) arg0;
+    if (hitActor->header.m_Type == 1 && (hitActor->m_dwFlags & 0x300000)) {
+        CPlayer *player = (CPlayer *) ((CGameObjectInstance *) arg1)->m_AI.m_pParent;
+        resource = player->m_ContState.m_pContState->rumblePool;
+#else
     if ((arg0->unk0 == 1) && (arg0->unkD4 & 0x300000)) {
         resource = arg1->inner->resource + 0x140;
+#endif
         arg3.x = 0;
         arg3.y = 0;
         arg3.z = 0;

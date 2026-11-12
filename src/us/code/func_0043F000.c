@@ -43,7 +43,13 @@ extern f32 Random_Blend(f32 lo, f32 hi);
 extern s32 Primagen_RunAttackStep_2(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
+#ifdef TARGET_PORT
+/* globals/boss.h types D_8012F604 as the host LevelScriptBlock; this module-2 twin is compile-only
+ * on the host (port/cmake/link.cmake), so its view only has to compile */
+#define D_8012F604 (*(LevelScriptF604 *) &D_8012F604)
+#else
 extern LevelScriptF604 D_8012F604;
+#endif
 typedef struct {
     /* 0x00 */ s32 unk0;   /* 0x8012F9D4 */
     /* 0x04 */ s32 state;  /* 0x8012F9D8 */

@@ -16,6 +16,13 @@ extern void Sound__Play(s16 sound, CVector3 pos, sptr arg2, CGameObjectInstance 
  * from the data symbol table (port/gen/relocs.c). */
 void *t2_n64_to_host(u32 addr);
 #define BOSS_STEP_PTR(v) ((sptr) t2_n64_to_host((u32) (v)))
+/* the sound pick tables the type-2 steps name (round 10 y2): only an s32 in the data reaches them,
+ * so nothing emitted them and t2_n64_to_host returned NULL (the first type-2 step crashed in
+ * WeightedTable_PickStatic once the Primagen left its first stage). Referenced here, gendata
+ * emits them as Pick tables (host byte order) and the symbol table maps their N64 addresses. */
+#include "structs/pick.h"
+extern Pick D_004315C8[], D_004315DC[], D_00431608[], D_00431618[];
+Pick *const t2_sPrimagenSoundPicks[] = { D_004315C8, D_004315DC, D_00431608, D_00431618 };
 #else
 #define BOSS_STEP_PTR(v) (v)
 #endif

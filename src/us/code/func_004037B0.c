@@ -8,6 +8,20 @@ typedef struct {
     /* 0x6C */ s32 mask;
 } Source004037B0;
 
+#ifdef TARGET_PORT
+#include "structs/collision.h"
+/* the DamageEvent at its host offsets (round 10 y2, as x2's MantidQueen_Hurt): the N64 view read
+ * the hit's frame (the node mask) from the damage/radius words and the damage from the source
+ * pointer's high half: no part of the Primagen ever took a hit */
+#define T2_HOFF_HIT(m) __builtin_offsetof(DamageEvent, m)
+typedef struct {
+    union {
+        struct { u8 _hp_damage[T2_HOFF_HIT(damage)]; s32 damage; };
+        struct { u8 _hp_flags[T2_HOFF_HIT(flags)]; s32 flags; };
+        struct { u8 _hp_source[T2_HOFF_HIT(frame)]; Source004037B0 *source; };
+    };
+} Hit004037B0;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
     /* 0x04 */ s32 damage;
@@ -15,6 +29,7 @@ typedef struct {
     /* 0x0C */ s32 flags;
     /* 0x10 */ Source004037B0 *source;
 } Hit004037B0;
+#endif
 
 void ScriptAnimator_SetScript(void *light, void *arg);
 void Primagen_SetSpawnScript(s32 a0);
@@ -26,6 +41,12 @@ void Primagen_Hurt(void *a0, void *a1, Hit004037B0 *hit) {
     s32 bit;
     s32 i;
 
+#ifdef TARGET_PORT
+    {
+        extern void T2Port_LogBossHurt(const char *who, void *obj, void *hit); /* DEBUG-ONLY */
+        T2Port_LogBossHurt("primagen", a0, hit);
+    }
+#endif
     if (hit->source == NULL) {
         return;
     }

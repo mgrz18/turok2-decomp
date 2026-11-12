@@ -6,10 +6,23 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00268768.c, func_00268768.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#ifdef TARGET_PORT
+/* The host (round 10 y3, docs/port/FIDELITY.md 5): an impact event's 8-byte value arrives as two
+ * host-order words (the event values' convention: CEventValue in structs/particle.h, the
+ * animation events' s32[2] from the archive), word 0 the N64's first big-endian word. On the
+ * little-endian hosts the halves and bytes of each word sit in reverse order, so the fields
+ * that read them by position are declared reversed. (With the N64 order, every particle hit
+ * swapped radius and damage: demo 1's first enemy shot took 1 health instead of 8.) */
+typedef struct B15Blk8 {
+    s16 b, a;   /* b (the sound) is the low half of word 0 */
+    s32 c;
+} B15Blk8;
+#else
 typedef struct B15Blk8 {
     s16 a, b;
     s32 c;
 } B15Blk8;
+#endif
 typedef struct B15Def {
                s32 type;
                u8 pad4[0xA];

@@ -720,3 +720,134 @@ loading it (level 51 at frame 4,555); `--audio --wav` 8,000 frames: 133.48 s, pe
 - Demo 1's enemies (11.3).
 - The x5 soak and the `--high-memory` checks on Linux cover what the Mac hits with full pointers;
   x4-1..3 were all found by the Mac first (Linux low memory hides them).
+
+## 12. Round 10 (part y4): the round-9 merged tree on the Mac, host determinism again, real time, the controller
+
+Branch `names-R10_y4` (from cc0c322b). Every `src/` commit was checked on the box with
+`tools/asm_diff.py --base cc0c322b -j 8 FILES` (scratch copy `/root/R10_y4mac/repo`;
+`OUT/r10/sync.sh` applies `git diff cc0c322b -- port src include tools` there): **0 differences**
+at every commit. No `include/` changes. The box's ELF and archive are unchanged (ELF sha1
+`61dcdf3f…`, archive `b6b9d484…`, the Mac uses `OUT/turok2_543.o2r`). The Linux runs for comparison
+are this branch built in `/root/R10_y4mac/out` (Debug, default high memory, LUS from the
+coordinator's checkout: `/root/R10_y4mac/build.sh`, `FRESH=1` drops decls.json).
+
+Build on the Mac: `OUT/rebuild.sh --fresh` (22 s; gendata: 1,532 symbols, 1,526 typed, the 3 typed
+.bss tails: the same report as Linux). Scripts (`OUT/r10/`, the same files on the box in
+`/root/R10_y4mac/r10/` with a `box.env`): `run.sh NAME FRAMES [args]` (headless: `--offscreen-gl`, or
+`--no-window` with `NOGL=1`), `battery.sh` (boot, playthrough, Mother, warp, fight, save, load,
+audio), `dets.sh [names]` (the same with `T2_DET_LOG=1`, two at a time), `soak.sh`.
+
+### 12.1 Fixes
+
+| # | where | cause | fix |
+|---|---|---|---|
+| y4-1 | **all hosts**: the Mother recipe and the totem defence **diverged between macOS and Linux** (Mother: frame 30,163; playthrough: 21,010; with the particle hash below, 14,427 and 19,114) | `CParticleSystem__Spawn` reads `gImpactEventHandlers[m_ImpactEventType[4]].flags & 1` with no 0xFFFF check (the other readers check). The N64 reads RAM 0x8012D07C (table 0x800AD080 + 0xFFFF * 8 + 4): **0x00C800FF in every reference RDRAM dump** (x3's `ig/`, `d1/`). The host read went 1 MB past the table into whatever host memory held, so bit 0, and with it the particle's hit flag 0x80000000 (`Sweep_TestBox`'s 1.5x node boxes), depended on the host: a plasma shot hit the Mother's node 41 on the Mac and missed on Linux | under TARGET_PORT the index is checked: 0xFFFF gives the N64's 0x00C800FF |
+| y4-2 | **all hosts** (debug switch): after y4-1 the Mother recipe still drifted by 1 ulp at 14,543 | `T2_AIM_NODE`'s pitch used libm's `atan2f`, whose last bit differs between macOS libm and glibc (the player's fire quaternion then differs by 1 ulp) | `T2Aim_Atan2f`: + - * / only (max error ~1e-5 rad) |
+| y4-3 | **macOS crash** (`__stack_chk_fail`) at 22,900 of the playthrough, right after the totem defence is won | `TotemDefense` `stunHelper`: `u8 anim[0x18]` passed to `DamageEvent_Set` as a `DamageEvent` (0x28 bytes on the host: two pointers). Linux overwrote its stack silently | `DamageEvent anim[1]` under TARGET_PORT |
+| y4-4 | **macOS crash** in the soak, 13 of 26 new-game/warp runs: `Controller_MenuLeft` <- `EnterCheatMenu_UpdateTextField` | the cheat-entry and name-entry fields (func_0041AAA0, func_0041D2C4, func_00453A08) read the controller as an `s32` at N64 0x20 and called through `(s32 (*)(s32))`: the host `Menu.controller` is a pointer at another offset, and the Mac's statics are above 4 GB (Linux non-PIE ones fit, so Linux never crashed). `func_0041D2C4` also passed `Menu.player` as an s32 | `((Menu *) menu)->controller` / `->player` under TARGET_PORT |
+
+The playthrough without y4-1 "won" the totem on Linux only by that host read: with the N64's
+flags the plasma rifle's 150 cells run out at 4 of the 8 kills (on both hosts; the Mac already lost
+it before the fix). `playthrough.py --fight` now also sets `T2_FILL_AMMO=600`.
+
+New debug tools (both hosts): `T2_DET_LOG` lines now end with `ptcl HASH`, a hash of the 128
+particles (position, velocity, flags), and `T2_DET_PARTICLES=1` prints one line per live particle:
+a shot that flies or hits differently shows up frames before it changes the RNG or an actor.
+`T2_RNG_TRACE=F1..F2` prints every RNG draw (`Random_Next`, `Random_Float`, `Random_Blend`,
+`RandomInPackedRange`) with the seed and the caller's address (`atos -o turok2 -l BASE ADDR` on the
+Mac, `addr2line -fie turok2 ADDR` on Linux). The chain that found y4-1: RNG step counts (Mac 28 /
+Linux 26 draws in frame 21,009) -> `RandomInPackedRange` callers (two extra particle spawns) ->
+`CParticle__HitInstanceBody` -> the particle hash (the shot stops earlier) -> `Sweep_TestBox`'s node
+box (radius x1.5) -> the particle's `m_dwHitFlags` sign -> the handler-table read.
+
+### 12.2 Mac = Linux, frame for frame (`T2_DET_LOG=1`, final binaries)
+
+| run | frames traced | lines that differ |
+|---|---|---|
+| boot, the 3 demos, the loop | 1-26,000 | 0 |
+| **the Port of Adia playthrough** (`--fight 10`) | 12,800-27,000 | **0** (before y4-1: from 21,010) |
+| **the Mother recipe** | 12,800-36,000 | **0** (before y4-1/y4-2: from 14,427 / 14,543) |
+| warp 51 -> 52 -> 51 | 12,800-16,000 | 0 |
+| the level-52 fight | 12,800-14,800 | 0 |
+
+### 12.3 The round-9 runs on the Mac (all headless, exit 0, no dlcheck reports)
+
+- boot (26,000): every mode switch at Linux's frame (demo 1 5,467 -> 8,157, demo 2 13,035, demo 3
+  19,920, the title 24,749);
+- **the playthrough** (27,000): every level event at x1's frames (51 -> 52 -> 53 -> 52 -> 55 -> 54
+  -> 56 -> 57 -> 58 -> 59 -> 109), the totem defence won (kills 8/8 at 22,700, "MISSION
+  COMPLETE"), **the hub at 23,400 with "NEW CHEAT ENABLED"**, health 89 (Linux: the same);
+- **the Mother** (36,000): phase 1 at 16,600, phase 2 at 26,000, health 0, **the hub at 32,400**
+  (then the recipe's held stick walks Turok into the hub's portals: 157, 158 ...);
+- warp 51 -> 52 -> 51, the fight (enemies 11 and 12 to 0, mode 60), save (`mpk_saves.py`: NT2E 51
+  "TUROK 2" A, 90 pages, checksum OK) then load (level 51 at 5,520), `--audio --wav` 9,000 frames:
+  150.17 s, peak 32,768, RMS 3,480.8 (Linux's numbers).
+
+### 12.4 Soak on the Mac (`tools/port/soak.py`, lldb)
+
+`soak.py` now runs under lldb when there is no gdb (`--debugger lldb`): `lldb -b -o run -k bt`,
+the stop reason (`EXC_BAD_ACCESS`, `SIGABRT` ...) and the backtrace parsed from lldb's `frame #N:
+... module`func at file:line`, the exit status from "Process N exited with status = RC", a hung
+game killed by its pid (debugserver starts it in its own process group). `--draw` adds
+`--offscreen-gl` on macOS (no window). `OUT/r10/soak.sh`: attract 2 x 100,000, new game seeds 0-11
+x 36,000, warp seeds 0-11 x 30,000 (`levels.py` -> `OUT/r10/lv/warp_dests.json`), new game
+`--draw` seeds 100-103 x 20,000.
+
+Before y4-4: attract 0 crashes (199,920 frames, 11 s per 100,000 frames); new game 7 of 12 and warp
+6 of 12 runs crashed in `Controller_MenuLeft` (y4-4), warp seed 2 in `T2Port_ReadAsset` (the known
+open class of STABILITY.md: a host address used as a ROM key, here after `T2_WARP_TO=6010@13744`).
+After y4-4 (30 runs, 1,062,660 frames): attract 0, new game 0 of 12, `--draw` new game 0 of 4,
+warp 1 of 12: only the `T2Port_ReadAsset` abort (warp seed 2). y5 fixes that class on its branch
+(S16, dea84b6c: the asset key masked with 0x1FFFFFFF; `CParticleSystem__Spawn` puts the draw
+layer in the texture key's top bits, which the N64's PI ignores).
+
+### 12.5 Real time on the Mac (`--pace`, Debug build, M5)
+
+The whole playthrough paced at 60 VI/s with sound and pixels (`--offscreen-gl --audio --pace
+--bench 13000`, 27,000 VIs): **450.52 s for 450.00**, the totem won and the hub reached as unpaced
+(pacing does not change the game: it only sleeps between VIs). 48 late VIs, 44 by 1 ms or more,
+**12 in gameplay** (from VI 13,000), the worst 16.3 ms (13,552, the first level's load); the worst of
+the run 90.9 ms at VI 8,000 (the boot's demo -> legal switch) and 28-39 ms at 10,923-10,934 (the new
+game's load). Per VI in gameplay: game 0.36 ms, audio 0.36 ms, draw 1.87 ms (glFinish), total 2.63
+ms (p99 8.4) of the 16.7 ms budget; a drawn frame every 33.35 ms (p99 37.5). The process sleeps 73%
+of the time. PERF.md section 5 has the table.
+
+**Audio underruns**: headless runs have no sound device (LUS's AudioPlayer is a no-op), so `--pace
+--audio` now drives a simulated 22,050 Hz device: 2,048 frames prefilled at the first audio frame,
+drained in real time; a VI that finds it empty counts as an underrun. Over the paced playthrough the
+audio manager produced 9,935,264 frames (22,052.9 Hz), **1 underrun** (VI 11,263: the new game's
+load, the 28-39 ms late VIs just before it), **none in gameplay**; the buffer stayed between 48 and
+8,161 frames.
+
+**Input latency** (from the code path; no window this round): with a window, each VI starts with
+`window->HandleEvents()` (SDL polls the gamepad and keyboard into LUS's ControlDeck); the game reads
+the pads once per game frame (`osContGetReadData` -> `ContRead` -> LUS `osContGetReadData`), every
+second VI, as on the N64; the display list built in that frame is drawn and swapped at the end of
+the same VI. A press therefore reaches the game within 1 VI (16.7 ms) and the screen 1-2 game frames
+later (33-67 ms), like the console; at 2.6 ms of work per VI the host adds no queueing.
+
+### 12.6 The controller for a human player (code path checked, not run with a window)
+
+- **Only with a window** (`turok2 --archive turok2.o2r --rom baserom.us.z64 --game --draw`, no
+  `--no-window`/`--offscreen-gl`): `T2Game_Run` installs `ContInit`/`ContRead` (port/app/game.cpp),
+  which call LUS's libultra replacements: `osContInit` initializes SDL gamepads and the ControlDeck
+  (it loads `gamecontrollerdb.txt` if one is found in the app directories; SDL3's built-in mappings
+  cover the common pads), `osContGetReadData` fills each port's buttons and stick from its mapped
+  devices. Port 1 also ORs in `--input` (the scripted buttons and stick work with a pad too).
+  Headless runs install a virtual pad on port 1 instead (`--input` only, the pak per `--pak-*`).
+- **Default mapping** (LUS, `ControllerDefaultMappings.cpp`): gamepad A (south) -> A, B (east) ->
+  B, left shoulder -> L, left trigger -> **Z (fire)**, right trigger -> **R (jump)**, Start ->
+  START, D-pad -> D-pad, **left stick -> the N64 stick (turn/look)**, **right stick -> the C
+  buttons (C-up/C-down walk, C-left/C-right strafe)**: Turok 2's default N64 layout maps onto a
+  modern pad as a twin-stick. Keyboard: WASD the stick, the arrow keys the C buttons, X = A, C = B,
+  Z = Z, E = L, R = R, Space = START, T/F/G/H the D-pad. The mapping is saved in the LUS config
+  (`turok2.cfg.json`) once changed.
+- The Controller Pak is per port (`--pak-dir`, `--pak-blank`); rumble is not wired (`osMotorInit`
+  returns "no pack").
+
+### 12.7 Open on the Mac
+
+- The `T2Port_ReadAsset` abort after some debug warps (fixed on names-R10_y5, S16).
+- A windowed run with a real gamepad (12.6) and real CoreAudio output: not done (headless only).
+- Release build pacing (round 7 had 0 late VIs in level 51; Debug now has 12 in the full
+  playthrough, all at loads).

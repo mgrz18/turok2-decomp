@@ -49,7 +49,7 @@ static __inline__ CListedInstance *take_effect(CInstancePool *scene, s32 *ref) {
     return effect;
 }
 
-static __inline__ CListedInstance *spawn_effect(CInstancePool *scene, s32 id, s32 variant, s32 count, s32 owner,
+static __inline__ CListedInstance *spawn_effect(CInstancePool *scene, s32 id, s32 variant, sptr count, sptr owner,
                                             CVector3 position, f32 scale, CVector3 direction, CVector3 color, s32 *ref) {
     CListedInstance *effect;
 
@@ -68,7 +68,7 @@ static __inline__ CListedInstance *spawn_effect(CInstancePool *scene, s32 id, s3
 /* Spawns an effect of the given type in a scene: loads the type's animation index and header
  * ("anim object index", "anim object info"), takes its intelligence from the header and turns
  * color by the header's angle, then spawns it (see spawn_effect). Returns the effect or NULL. */
-CListedInstance *CInstancePool__SpawnAnimInstance(CInstancePool *scene, s32 variant, s32 owner, CVector3 position, f32 scale,
+CListedInstance *CInstancePool__SpawnAnimInstance(CInstancePool *scene, s32 variant, sptr owner, CVector3 position, f32 scale,
                            CVector3 direction, CVector3 color, s32 *ref) {
     CListedInstance *effect;
     AnimInfo *info;

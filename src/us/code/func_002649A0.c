@@ -19,6 +19,23 @@ extern void CVector3__ClampLength(f32 *vec, f32 limit);
 extern void CMtxF__SwapYZRows(f32 *mtx);
 
 
+#ifdef TARGET_PORT
+#include "structs/game_object.h"
+/* Host views: the instance and its CAI at their host offsets; the tilt at m_VarF32[2]/[3]
+ * (the owner pointer takes [0..1] on the host: func_00264DF0.c, STABILITY.md S14). */
+typedef union {
+    struct { u8 _h_pos[__builtin_offsetof(CGameObjectInstance, header.m_vPos)]; f32 pos[3]; };
+    struct { u8 _h_scale[__builtin_offsetof(CGameObjectInstance, m_vScale)]; f32 scale[3]; };
+    struct { u8 _h_rot[__builtin_offsetof(CGameObjectInstance, m_qGround)]; f32 rotation[4]; };
+    struct { u8 _h_angle[__builtin_offsetof(CGameObjectInstance, m_RotY)]; f32 angle; };
+    struct { u8 _h_mtx[__builtin_offsetof(CGameObjectInstance, m_mfOrient)]; f32 matrix[16]; };
+} SpinObject;
+
+typedef union {
+    struct { u8 _h_tilt[__builtin_offsetof(CAI, m_VarF32[2])]; f32 tiltAngle; };
+    struct { u8 _h_head[__builtin_offsetof(CAI, m_VarF32[3])]; f32 tiltHeading; };
+} SpinState;
+#else
 typedef struct {
     /* 0x00 */ u8 pad0[4];
     /* 0x04 */ f32 pos[3];
@@ -35,6 +52,7 @@ typedef struct {
     /* 0x110 */ f32 tiltAngle;
     /* 0x114 */ f32 tiltHeading;
 } SpinState;
+#endif
 
 void Throwable_CalcOrientation(SpinObject *obj, SpinState *state) {
     f32 rotMtx[16];
