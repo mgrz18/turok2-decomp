@@ -41,20 +41,22 @@ W = 40                   # C-up frames on a warp region (teleported onto its cen
                          # player stands on its floor, enter_surface in func_0024C47C)
 
 # debug hops (T2_WARP_TO, relative to the level's start) where the route cannot pass yet
-L5_HOPS = [(2450, 5201)]   # the hive's force field (actor 23) is still up: into level 84
+L5_HOPS = []             # round 12 a1: none (z4's 5201 hop: the pylons fall now, the field drops)
 L6_HOPS = []
 
 L5_SEGMENTS = [
     ("124 HIVE TOP: the 4 force field pylons, exit 5201", 0, [
         # the pylons (object 139, actors 9-12): each death counts link group 49 down; at 0 the
         # hive's force field (actor 23) goes: "force field down."
-        (0, 393.2, 0.0, -2020.3, 1.6954, 0, {"fire": 500, "aim": (0.0, 100.0, -1971.0)}),
-        (600, -393.2, 0.0, 2941.9, -1.3826, 0, {"fire": 500, "aim": (0.0, 100.0, 2867.0)}),
-        (1200, 2481.1, 0.0, 854.0, 0.1887, 0, {"fire": 500, "aim": (2406.0, 100.0, 461.0)}),
-        (1800, -2480.3, 0.0, 858.0, -0.1850, 0, {"fire": 500, "aim": (-2406.0, 100.0, 461.0)}),
-        # the pylons do not fall to the plasma rifle in this run (open, PLAYTHROUGH.md 9.3): the
-        # field stays, so the route hops through the warp the field guards (T2_WARP_TO, L5_HOPS)
-        (2400, 3.2, -228.3, 462.0, 1.3172, W, {}),         # warp 5201 -> 84 (inside the field)
+        # round 12 a1: the pylons are turrets (intelligence type 4, 100 health, Turret_Hurt): the
+        # plasma rifle kills each in ~3 hits at its gun node (~170 high); z4's fixed aim at 100
+        # passed under it. T2_AIM_ENEMY with the pylon as its first actor ("aim": ("actor", A)).
+        (0, 393.2, 0.0, -2020.3, 1.6954, 0, {"fire": 300, "aim": ("actor", 9)}),
+        (400, -393.2, 0.0, 2941.9, -1.3826, 0, {"fire": 300, "aim": ("actor", 10)}),
+        (800, 2481.1, 0.0, 854.0, 0.1887, 0, {"fire": 300, "aim": ("actor", 11)}),
+        (1200, -2480.3, 0.0, 858.0, -0.1850, 0, {"fire": 300, "aim": ("actor", 12)}),
+        # "force field down." (link group 49 at 0): the hive's centre is open
+        (1700, 154.9, -228.3, 445.2, 1.6811, W2, {}),      # warp 5201 -> 84 (approach.py --steps 1)
     ]),
     ("84 Lev5 A: exit 5100", 2800, [
         (0, 4628.7, -307.0, 1077.8, -1.5437, W2, {}),          # warp 5100 -> 85
@@ -77,32 +79,55 @@ L5_SEGMENTS = [
     ("90 Lev5 G: exit 5010", 5200, [
         (0, -4513.8, 614.4, 3509.7, -2.8650, W2, {}),          # warp 5010 -> 94
     ]),
+    # the embryos (object 109, an enemy, 255 health) sleep (EnemyMode_WaitForTrigger, no hits) in
+    # a cocoon (object 380, a destructible, 255 health, at the same place); the cocoon's death
+    # (link head 0x40000) wakes the embryo (kind 1). Fire at the cocoon first (T2_AIM_ENEMY ,R,A:
+    # the level actor A, then the nearest live actor: the embryo). The shredder (weapon 9) breaks
+    # a cocoon in ~250 frames (the plasma rifle needs ~1,500). Each embryo counts link group 44
+    # (type 9) down: "embryo destroyed.", the last "all embryos destroyed. mission complete."
     ("94 Lev5 J: embryo 1, exit 5021", 5600, [
-        (0, 1229.0, 0.0, -3500.0, 0.0, 0, {"fire": 900, "aim": (1229.0, 60.0, -4301.0)}),  # embryo actor 19
-        (1000, -3550.0, 0.0, -2814.5, 1.9267, W2, {}),        # warp 5021 -> 91
+        (0, 1399.3, 0.0, -4106.0, 0.7189, 0, {"fire": 400, "aim": ("actor", 78)}),   # the cocoon 78
+        (450, 1399.3, 0.0, -4106.0, 0.7189, 0, {"fire": 600, "aim": ("actor", 19)}), # the embryo 19
+        (1100, -3550.0, 0.0, -2814.5, 1.9267, W2, {}),        # warp 5021 -> 91
     ]),
-    ("91 Lev5 H: exit 5500", 7000, [
-        (0, -299.6, 0.0, 4504.8, -1.2299, W2, {}),            # warp 5500 -> 95
+    # the 4 satchel charges (object 599, item 0x100E: CPlayer__CollectKeyPiece) lie in 91; the
+    # master computer's 4 sockets in 93 take one each (Action_CheckRequiredItem)
+    ("91 Lev5 H: the 4 satchel charges, exit 5500", 7100, [
+        (0, 921.6, -307.2, -7944.8, 3.1416, 40, {}),          # satchel (921.6, -307.2, -7884.8)
+        (200, 3072.0, -307.2, -5845.6, 3.1416, 40, {}),       # satchel (3072, -307.2, -5785.6)
+        (400, 1536.0, 614.4, -3080.8, 3.1416, 40, {}),        # satchel (1536, 614.4, -3020.8)
+        (600, 307.2, -307.2, -1903.2, 3.1416, 40, {}),        # satchel (307.2, -307.2, -1843.2)
+        (800, -299.6, 0.0, 4504.8, -1.2299, W2, {}),          # warp 5500 -> 95
     ]),
-    ("95 Lev5 K: embryo 2, exit 5501", 7400, [
-        (0, 307.0, 0.0, -300.0, 0.0, 0, {"fire": 900, "aim": (307.0, 60.0, -1075.0)}),     # embryo actor 27
-        (1000, 2674.2, 0.0, 4158.1, 0.2983, W2, {}),         # warp 5501 -> 91
+    ("95 Lev5 K: embryo 2, exit 5501", 8300, [
+        (0, 511.1, 0.0, -1246.8, 2.2706, 0, {"fire": 400, "aim": ("actor", 94)}),   # the cocoon 94
+        (450, 511.1, 0.0, -1246.8, 2.2706, 0, {"fire": 600, "aim": ("actor", 27)}), # the embryo 27
+        (1100, 2674.2, 0.0, 4158.1, 0.2983, W2, {}),         # warp 5501 -> 91
     ]),
-    ("91 Lev5 H again: exit 5073", 8800, [
+    ("91 Lev5 H again: exit 5073", 9800, [
         (0, 3389.8, 614.4, -3787.7, -1.2373, W2, {}),         # warp 5073 -> 96
     ]),
-    ("96 Lev5 L: embryo 3, exit 5072", 9200, [
-        (0, -2000.0, 1229.0, 768.0, 1.5708, 0, {"fire": 900, "aim": (-2765.0, 1290.0, 768.0)}),  # embryo actor 31
-        (1000, -142.3, 921.6, -1027.8, -1.2276, W2, {}),      # warp 5072 -> 91
+    ("96 Lev5 L: embryo 3, exit 5072", 10200, [
+        (0, -2570.0, 1228.8, 597.5, 2.2899, 0, {"fire": 400, "aim": ("actor", 95)}),   # the cocoon 95
+        (450, -2570.0, 1228.8, 597.5, 2.2899, 0, {"fire": 600, "aim": ("actor", 31)}), # the embryo 31
+        (1100, -142.3, 921.6, -1027.8, -1.2276, W2, {}),      # warp 5072 -> 91
     ]),
-    ("91 Lev5 H again: exit 5060", 10600, [
+    ("91 Lev5 H again: exit 5060", 11700, [
         (0, -731.8, 614.4, -1447.8, -2.0128, W2, {}),         # warp 5060 -> 93
     ]),
-    ("93 Lev5 I: the master computer, exit 5062", 11000, [
-        (0, 1843.0, 922.0, 900.0, 0.0, 0, {"fire": 900, "aim": (1843.0, 1000.0, 154.0)}),  # master computer actor 54
-        (1000, 1277.1, 921.6, -2778.9, 0.3221, W2, {}),      # warp 5062 -> 91
+    # the master computer: its 4 sockets (actors 7-10, actions needing item 0x100E, auto radius
+    # 174) each take a satchel charge and count link group 99 down; at 0 the computer (actor 54):
+    # "warning, five seconds until detonation.", then actor 53 (group 98, type 10): "master
+    # computer destroyed. mission complete." z4's aim point (1843, 922, 900) was over the pit
+    # round the room: the fall killed the player (level 164) even with T2_CHEATS.
+    ("93 Lev5 I: the master computer, exit 5062", 12100, [
+        (0, 1510.0, 921.6, 662.3, -0.1282, 40, {}),           # socket actor 7 (1536, 921.6, 460.8)
+        (200, 931.6, 921.6, 629.3, 0.0592, 40, {}),           # socket actor 8 (921.6, 921.6, 460.8)
+        (400, 1564.7, 921.6, -94.0, 0.4488, 40, {}),          # socket actor 9 (1536, 921.6, -153.6)
+        (600, 942.6, 921.6, -317.0, 3.0140, 40, {}),          # socket actor 10 (921.6, 921.6, -153.6)
+        (1000, 1277.1, 921.6, -2778.9, 0.3221, W2, {}),       # warp 5062 -> 91 (after the blast)
     ]),
-    ("91 Lev5 H again: the level exit 7500", 12400, [
+    ("91 Lev5 H again: the level exit 7500", 13500, [
         (0, 2765.4, -614.4, -7569.4, 3.1309, W2, {}),         # warp 7500 (the Hive Totem, 113)
     ]),
 ]
@@ -180,13 +205,18 @@ def build_level56(level, new_game, fire_every):
                 fire.append((a, b))
                 if o.get("aim") == "enemy":
                     aim_enemy.append("%d-%d" % (a, b))
+                elif isinstance(o.get("aim"), tuple) and o["aim"][0] == "actor":
+                    # the level actor A first (T2_AIM_ENEMY's ,R,A), then the nearest live actor
+                    aim_enemy.append("%d-%d,%d,%d" % (a, b, o["aim"][2] if len(o["aim"]) > 2 else 4000, o["aim"][1]))
                 elif o.get("aim"):
                     aim_at.append("%d-%d:%.1f,%.1f,%.1f" % ((a, b) + tuple(o["aim"])))
     for a, b in fire:
         for f in range(a, b, fire_every):
             inputs.append("Z@%d..%d" % (f, f + 6))
     warps = ["1999@12955"] + ["%d@%d" % (w, start + rel) for rel, w in hops]
-    env = ["T2_WARP_TO=%s" % ",".join(warps), "T2_GIVE_WEAPONS=1", "T2_WEAPON=10", "T2_CHEATS=1", "T2_FILL_AMMO=300"]
+    # level 5: the shredder (the cocoons); level 6: the plasma rifle
+    env = ["T2_WARP_TO=%s" % ",".join(warps), "T2_GIVE_WEAPONS=1", "T2_WEAPON=%d" % (9 if level == 5 else 10),
+           "T2_CHEATS=1", "T2_FILL_AMMO=%d" % (100 if level == 5 else 300)]
     if aim_at:
         env.append("T2_AIM_AT=\"%s\"" % ";".join(aim_at))
     if aim_enemy:

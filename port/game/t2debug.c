@@ -58,6 +58,9 @@ void T2Port_DebugSwitches(int skipPak, int startMode) {
 #include "structs/weapon.h"
 
 #include <math.h>
+/* dladdr (glibc and macOS share this layout of Dl_info): the AI callbacks by name in T2_ACTOR_LOG */
+typedef struct { const char *dli_fname; void *dli_fbase; const char *dli_sname; void *dli_saddr; } T2DlInfo;
+extern int dladdr(const void *, T2DlInfo *);
 #include "structs/intelligence.h"
 #include "structs/boss.h"
 
@@ -83,6 +86,32 @@ static void T2Port_LogOne(const char *kind, int i, CGameObjectInstance *o, CGame
            info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_DropMask2 : 0u,
            (unsigned) (u16) o->m_AI.m_AnimType, (int) o->m_AI.m_AnimIndex, (int) o->m_AI.m_AnimRepeatedCount,
            info != NULL && info->m_Type == INTELLIGENCE_ENEMY ? (unsigned) info->m_Enemy.m_StartAnim : 0u);
+    /* round 12 a1: the body flags (m_dwTypeFlags), an action's auto radius and needed pickup */
+    if (info != NULL) {
+        printf("actor+: %s %d itf %x", kind, i, (unsigned) info->m_dwTypeFlags);
+        if (info->m_Type == INTELLIGENCE_ACTION) {
+            printf(" auto %.1f need %d text %d", info->m_Action.m_AutoGoRadius, (int) info->m_Action.m_GoPickupNeeded,
+                   (int) info->m_Action.m_GoPickupNeededText);
+        } else if (info->m_Type == INTELLIGENCE_DESTRUCTIBLE) {
+            printf(" health %d auto %.1f", (int) info->m_Destructible.m_Health, info->m_Destructible.m_AutoGoRadius);
+        }
+        {
+            /* the AI callbacks by name (dladdr: the binary's dynamic symbols) */
+            T2DlInfo di;
+            void *fns[3] = {(void *) o->m_AI.m_pfHurt, (void *) o->m_AI.m_pfStep,
+                            o->m_AI.m_pModeCurrent != NULL ? (void *) o->m_AI.m_pModeCurrent->m_pfCallback : NULL};
+            int k;
+            for (k = 0; k < 3; k++) {
+                if (fns[k] != NULL && dladdr(fns[k], &di) && di.dli_sname != NULL) {
+                    printf(" %s", di.dli_sname);
+                } else {
+                    /* no dynamic symbols: the offset from T2Port_LogOne (nm turok2) */
+                    printf(" %+lld", fns[k] != NULL ? (long long) ((char *) fns[k] - (char *) T2Port_LogOne) : 0LL);
+                }
+            }
+        }
+        printf("\n");
+    }
 }
 
 static void T2Port_LogActors(CPlayer *p) {
