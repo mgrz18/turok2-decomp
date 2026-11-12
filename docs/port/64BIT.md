@@ -490,3 +490,30 @@ pager, which is not built. Results: boot + 3 demos identical to the non-PIE buil
 The fixes of this round that were pointer width (S14 the throwable owner, S18 the spawn's region
 and intelligence, S19 the Blind One's model handle, S20/S21 the CAI at N64 0x140 and the CPlayer
 offsets of `CPlayer__UpdateSpeedScale`) are in STABILITY.md section 7.
+
+## Part 6 (Phase 7 round 12, a5): `n64viewcheck.py`, the player intelligence typed
+
+**The static checker** `tools/port/n64viewcheck.py` (STABILITY.md section 8) finds the views
+of engine structs at N64 offsets in the host-compiled code (raw offsets, N64 strides, pad-placed
+local views), classes each by the struct behind it, and listed the 24 functions fixed this round
+(asm_diff 0). Run it after any change that adds a pointer to an engine struct or hostifies a
+file.
+
+**`CPlayerIntelligence` 0x1C-0x34.** `pad08[12]`, `pad18[4]` and `pad20[4]` were left
+big-endian by the archive's swap plan (`swap_spec.json` takes the layout from the C header), so
+round 11 read the speed (0x1C) and jump (0x20) scales byte by byte. Every type-11 record of the
+ROM has floats there (15 distinct records):
+
+| offset | field | values |
+|---|---|---|
+| 0x1C | `m_SpeedScale` (CPlayer__UpdateSpeedScale) | 1.0 (Turok), 0.6-2.0 |
+| 0x20 | `m_JumpScale` (PlayerJump_Enter / _Update) | 1.0-1.5 |
+| 0x24 | `m_Unk24` | 1.0 everywhere |
+| 0x2C | `m_Unk2C` | 50.69 (33.79 in the four flag-0x1B records) |
+| 0x34 | `m_Unk34` | 30.72 everywhere |
+
+Typed as `f32` in `include/structs/intelligence.h` (asm_diff over the whole tree: 0 of 3,938),
+the three readers use the members. **The archive changes**: sha1
+`a9d14a47dba3f75ab30a0e4cdfdb1cee56977d22` (26,124 units, `archive_check.py`: OK, format 2.0;
+round 11: `b6b9d484...`). A new binary with the old archive reads the scales byte-swapped
+(4.6e-41: no jump); rebuild the archive and rerun gendata (`rm decls.json`) with this tree.

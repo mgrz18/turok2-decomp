@@ -311,6 +311,30 @@ Fixes on the merged tree (asm_diff 0):
    so far).
 10. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
 
+## Round 12, part a5: the N64-offset sweep, the player intelligence typed (branch names-R12_a5)
+
+Detail: [STABILITY.md](STABILITY.md) section 8, [64BIT.md](64BIT.md) part 6.
+
+- **`tools/port/n64viewcheck.py --build OUT/build -j 4`**: a libclang checker of the
+  host-compiled code (only the `TARGET_PORT` side) for raw N64 offsets, N64 strides and
+  pad-placed views of engine structs; classes BAD / suspect / moves / global / untyped / local /
+  same. **24 functions fixed** (asm_diff 0): the blasts' push and reach, the mount and dismount,
+  the projectile muzzle (its region pointer was cut to 32 bits), the turret's aim, the level
+  actors' matrix and pooled timer, the impact sounds, **the water flood across region
+  neighbours (it walked the vertex pointers)**, the camera viewport/hit flash/scope,
+  `CCameraText__Reset` (`m_nId` pointer-wide), `CPlayer__CheckJumpOn`, the menu pool word in
+  `CPlayer__Update`, and the sound voice pool (handles at `+0x7C`, the 0xCC voice stride).
+  The rest is listed with a reason; 4 views are not resolved (STABILITY.md 8).
+- **`CPlayerIntelligence` 0x1C-0x34 typed** (`m_SpeedScale`, `m_JumpScale`, `m_Unk24`,
+  `m_Unk2C`, `m_Unk34`): the archive swaps them, the big-endian reads of z5 are gone.
+  **New archive sha1 `a9d14a47dba3f75ab30a0e4cdfdb1cee56977d22`**: rebuild it (mkarchive) and
+  rerun gendata with this tree; the old archive + this binary cannot jump.
+- Results (Linux, PIE): the 3 demos' `T2_DET_LOG` identical to 046a67f9 (523,287 lines);
+  `playthrough.py --level 1..4` all to the hub (levels 1, 3 identical logs; 2 and 4 differ
+  from the blast fixes in fights, same outcomes); soak: levels 40 runs x 25,000 + new game 10 x 36,000, **0 crashes**.
+- **Merge notes**: `include/structs/intelligence.h` (whole-tree asm_diff done), 27 files in
+  `src/us/code` (none of them a level/boss script); nothing in `port/` or `playthrough.py`.
+
 ## Round 11, part z5: demo fidelity, static object events, the font colour (branch names-R11_z5)
 
 Detail: [FIDELITY.md](FIDELITY.md) section 6. Every `src/` change is TARGET_PORT;
