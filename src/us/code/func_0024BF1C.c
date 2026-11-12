@@ -17,6 +17,13 @@ void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *pla
 
     menu->m_nCount = 0;
     for (i = 0; i < perRow * rows; i++) {
+#ifdef TARGET_PORT
+        /* soak S9b: the slot layout loop overruns the same way (2 rows of 24: 48 slots; the
+         * 37th..48th wrote angles and scales over the player's HUD overlays) */
+        if (i >= (s32) (sizeof(menu->m_Items) / sizeof(menu->m_Items[0]))) {
+            break;
+        }
+#endif
         menu->m_Items[i].m_Angle = -(i * (360.0f / (perRow * rows)) * 0.017453294f);
         menu->m_Items[i].m_Lift = 0;
         menu->m_Items[i].m_Scale = gBarrelSlotScale;

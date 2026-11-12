@@ -476,3 +476,17 @@ Known left on the high-memory path: `CGameObjectInstance__ConstructLitVertices` 
 still reads the actor at N64 offsets 0x98/0xBC (u2's actor work); `TotemDefense_InitFight` is
 all N64 offsets. Next: the rest of the attract demos and gameplay beyond the water under `--high-memory`; the
 macOS run (u4) should now get past the same sites.
+
+## Part 5 (Phase 7 round 10, y5): PIE on Linux, the last raw CAI offsets
+
+**PIE builds and runs.** clang on the box already compiles PIE objects (`-pic-is-pie` is its
+default); only the executable's link was `-no-pie` (`T2_LOW_MEMORY`). With
+`-DT2_LOW_MEMORY=OFF` the executable is an ELF PIE: code and statics at 0x5555_5555_4000 under
+gdb, 0x5xxx_xxxx_xxxx with ASLR, i.e. above 4 GB like the heap and the game thread stacks; any
+static address still passed through an `s32` truncates. `port/gen/data_abs.c` (the absolute
+symbols that DATA.md said needed `-no-pie`) is empty today: `D_14A000` is read only by the VM
+pager, which is not built. Results: boot + 3 demos identical to the non-PIE build (`T2_DET_LOG`, 52,000 lines); one PIE-only class (S23, the cheat/name entry fields calling through an `(s32)` cast); after it 123 soak runs (attract, newgame, warp, levels), 0 crashes. PIE is the default now (`T2_LOW_MEMORY` OFF).
+
+The fixes of this round that were pointer width (S14 the throwable owner, S18 the spawn's region
+and intelligence, S19 the Blind One's model handle, S20/S21 the CAI at N64 0x140 and the CPlayer
+offsets of `CPlayer__UpdateSpeedScale`) are in STABILITY.md section 7.

@@ -265,6 +265,42 @@ func_0041AAA0, func_0041D2C4, func_00453A08, func_002113A4, func_0021149C, func_
 func_0026D128; port/app/game.cpp (the --pace audio sink), port/game/t2det.c, port/game/t2bosslog.c;
 tools/port/soak.py, tools/port/playthrough.py (y1 also extends it).
 
+## Round 10, part y5: stability and 64-bit debt (branch names-R10_y5)
+
+Branch names-R10_y5 from cc0c322b. Detail: [STABILITY.md](STABILITY.md) section 7,
+[64BIT.md](64BIT.md) part 5. `src/` changes are `TARGET_PORT` or `s32` -> `sptr`
+(`asm_diff --base cc0c322b -j 8` = 0 on every touched file); no `include/`, archive or gendata
+change.
+
+- **The 9 open soak classes of round 9 are closed**, plus 3 new ones the level-warp soak found
+  (S14-S21): the throwables (`func_00264994 + 0xC`, a splat mis-cut, stored as a callback; their
+  owner pointer truncated), the save portal menu hang, the weapon wheel's slot layout writing
+  over the HUD overlays (the death-cinema overlay crash), the particle draw layer in a texture
+  key (the PI ignores the top bits; the loader aborted), the ending without a body
+  intelligence, the spawn's region/intelligence as `s32`, the Blind One's draw view.
+- **`CPlayer__UpdateSpeedScale` was all N64 offsets and ran every frame**: it wrote the speed
+  scale into the player's save data (`m_Data.m_AdonAmmoFlagHelped[0]` = 1.0f) and read the mode
+  from it; `m_CameraMovementScaler` (the head bob phase) was never set. Host body now. Its speed
+  byte field is unswapped in the archive (read big-endian). The attract demos' `T2_DET_LOG` is
+  identical to round 9.
+- **No raw `+ 0x140` CAI address is compiled on the host any more** (BlindOne_PhaseVulnerableInit,
+  the throw pickup, CPlayer__Dismount, GameObject_GetFloorKind, the riding view,
+  ImpactEvent_Rumble).
+- **soak.py**: `--kind levels` (every level id 1-164 through `T2_WARP_TO=~level`), hangs
+  interrupted with SIGINT and classed by the busy thread, timeout 600 s.
+- **PIE**: the Linux build is now a PIE by default (`T2_LOW_MEMORY` OFF; `-DT2_LOW_MEMORY=ON` for the old `-no-pie` + `--low-memory`). One PIE-only class (S23) fixed; S22 (`CPlayerPool__GetIndex` with the N64 CPlayer size, cinema events as `s32`) found by the levels soak.
+- The 42 gendata aliases: classified, none needs a change (STABILITY.md 7.4).
+
+Soak (final binaries): non-PIE 246 runs (attract, newgame, warp, levels; both memories) and final PIE 123 runs: 0 crashes. Round 9 baseline: 21 warp crashes in 6 classes.
+
+**For the merge**: shared files touched that others may also touch: `func_0040EA24.c` /
+`func_00447A24.c` (BlindOne_PhaseVulnerableInit) and `func_0040EDB0.c` (BlindOne_Draw) (y2's
+Blind One), `func_00254640.c` (CPlayer__UpdateSpeedScale: player movement code, y1/y3),
+`func_0025E488.c`, `func_0025EB80.c`, `func_0025F380.c`, `func_0025F3A4.c` (enemy grab/ride
+modes), `func_00413230.c` (Menu_MoveCursor), `func_0041AAA0.c`/`func_0041D2C4.c` (S23: keep y4's body, it covers the `_2` copy too), `func_0025340C.c`, `func_0026E348.c`, `func_0026E378.c`, `func_0024BF1C.c` (CBarrel__Fill),
+`port/runtime/t2loader.c`, `port/game/t2abi.c`, `port/app/CMakeLists.txt` (T2_LOW_MEMORY default),
+`tools/port/soak.py`.
+
 ## Round 9, part x4: macOS and host determinism (branch names-R9_x4)
 
 Detail: [MACOS.md](MACOS.md) section 11. Commits (asm_diff 0 vs 5437cfc0): 8b8697a6 (`SaveGame_Build`:
