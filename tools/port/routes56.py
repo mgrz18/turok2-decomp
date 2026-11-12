@@ -138,10 +138,10 @@ L5_SEGMENTS = [
     ]),
 ]
 
-# the Hive Totem (113) arrives at ~31,900 (rel 14,200); saved (8 kills) by ~33,600
+# the Hive Totem (113) arrives at ~32,000 (rel 14,300); saved (8 kills) by ~33,500
 L5_TOTEM = (14250, 2000, 113)
 # the Mantid Queen (level 2, ~33,100 after the totem): fire held to the end of the run; her death
-# (mode 16) at ~44,000, the hub (60) by ~46,000 (run 49,000 frames)
+# (mode 16) at ~42,100, the hub (60) by ~43,500 (run 48,000 frames: the fight varies)
 L5_BOSS = (15900, 16000)
 
 L6_SEGMENTS = [
