@@ -136,7 +136,7 @@ Options (`turok2 --game`):
     (every RNG draw with its caller);
   - moving and combat: `T2_WARP_TO=<id>[@frame][,...]` (a negative id is `~level`),
     `T2_TELEPORT=F:x,y,z[,rotY][!][;...]` (`!`: also fire the region's enter triggers),
-    `T2_WAKE_ENEMIES=R`, `T2_FACE_NEAREST=R[@LEVEL]`, `T2_AIM_NODE=MASK|boss|-1[,R]`,
+    `T2_WAKE_ENEMIES=R`, `T2_FACE_NEAREST=R[@LEVEL]`, `T2_AIM_NODE=MASK|boss|-1[,R]`, `T2_BOSS_FRONT=D[,EVERY]` (round 11 z2: the player in front of the Queen's open spot / beside the Primagen's lair),
     `T2_AIM_AT=F1-F2:x,y,z[;...]`, `T2_AIM_ENEMY=F1-F2[,R][;...]`, `T2_CHEATS=MASK`
     (1 invincibility), `T2_FILL_AMMO=N`, `T2_GIVE_WEAPONS=1`, `T2_WEAPON=<n>`, `T2_WEAPON_LIST=1`;
   - progression: `T2_SAVE_PORTAL=F`, `T2_DOOR_OPEN=F`;
@@ -360,6 +360,52 @@ bosses) also uses `T2_AIM_NODE` in t2bosslog.c: keep both. z3 (9c791996) adds an
 
 Next: walk level 2's sub-levels instead of hopping; the City Totem's kill pace against the N64
 (PLAYTHROUGH.md 6.6). The other files that define a `shadowAlpha` (0x10E) view never touch it.
+
+## Round 11, part z2: the bosses finished, the ending (branch names-R11_z2)
+
+Detail: [GAMEPLAY.md](GAMEPLAY.md) section 12. **All four bosses die and the game returns to the hub;
+the Primagen's death plays the ending cinema and the credits, then the hub.** Linux headless, PIE,
+high memory; every run exits 0. `src/` changes: 2 files, `tools/asm_diff.py --base 2df5517d -j 8`
+reports 0 for both; no header changes (no gendata or archive rerun needed).
+
+| boss | recipe (new game + boss env, `Z@14000..200000`) | frames | result |
+|---|---|---|---|
+| **the Mantid Queen** | `T2_WARP_TO=7501 T2_BOSS_FRONT=450` | 40,000 | death (mode 16) at 33,507, her cinema, **the hub at 35,000** |
+| **the Primagen** | `T2_WARP_TO=7602 T2_BOSS_FRONT=450` | 56,000 | stage 3 at 27,566, **death (mode 29) at 32,828**, the ending cinema, **the credits from 39,000**, **the hub at 53,000** |
+| the Mother | unchanged (section 1) | 36,000 | death 30,641, the hub at 32,200 (as round 10) |
+| the Blind One | unchanged (section 1) | 25,000 | death 22,683, the hub at 23,500 (as round 10) |
+
+Boot + 3 demos (26,000 frames): `T2_DET_LOG=30` identical, line for line, to the round-10 merged
+binary.
+
+Commits:
+
+- 19a1b9be **the ending after the Primagen**: `EngineMode15_Ending_Init` (func_00289A9C) read
+  `m_bPrimagenBossComplete` at N64 offset 0x9F0 of CPlayer (other data on the host: the credits
+  never ended); `Credits_Update` (func_002862A4) took the engine as `s32` (cut pointer: crash in
+  `CEngineApp__StartGameAtWarp` when the credits ended).
+- 6f6871cd + ec910bfe **`T2_BOSS_FRONT=D[,EVERY]`** (DEBUG-ONLY, t2bosslog.c, game.cpp): the
+  Queen's open spot faces one way and her body's boxes (mask 1, spot 0 has no health) take every
+  shot from her side (why step 7 stopped at 3,072 and step 4 took 73,000 frames): the player is put
+  D units in front of the open spot every EVERY frames. The Primagen: after EVERY frames of a mode-25
+  wait, the player beside the lair (its eye hovers behind the node boxes of `found[0]`, type 0x641:
+  no line of sight from the middle of the floor; stage 2 passed only on a sight target kept from the
+  flight). `bosshurt:` lines print the boss's `m_VisBits` and mode; boss lines its type, bounds,
+  scale.
+
+The Queen's death sprite key (0x81ACAD9C, y2's abort): no abort with `--draw`; S16 covers it.
+
+**Not done:** the Primagen's line of sight against the N64 (the emulator cannot warp to the fight,
+and no recorded run reaches it): whether the N64's door boxes block the same lines is open. The
+final ending (engine mode 16, `EngineMode16_Ending_Init`, the 100% ending) was not reached.
+
+Merge notes: port/game/t2bosslog.c (`logActor`, `T2Port_LogBossHurt`, the new `T2Port_BossFront`
+before `T2Port_AimMask`), port/app/game.cpp (one getenv hook after `T2_AIM_NODE`),
+docs/port/GAMEPLAY.md (section 12 appended).
+
+Next: the Primagen stage-3 line of sight against the N64 (a RAM-poke warp in `n64trace.py`, or a
+save state at the Lightship); the 100% ending (engine mode 16); boss recipes in a script
+(`playthrough.py --boss NAME`).
 
 ## Round 10, part y4: the merged tree on macOS, host determinism, real time (branch names-R10_y4)
 
