@@ -222,6 +222,9 @@ static int aimBoxCentre(CGameObjectInstance *o, s32 mask, CVector3 *from, CVecto
  * wait for a line of sight, the player D units to the right of its lair (below). */
 extern sptr CScene__FindRegionAt(CScene *world, CVector3 *pos);
 static int aimBoxCentre(CGameObjectInstance *o, s32 mask, CVector3 *from, CVector3 *out, s32 *nodeMask);
+extern f32 GameObject_GetCollisionHeight(CGameObjectInstance *e);
+extern s32 Cinema_PathPlaying(void);
+extern s32 Cinema_GetScriptId(void);
 void T2Port_BossFront(int frame, const char *spec) {
     static int sLast = -100000;
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
@@ -229,6 +232,9 @@ void T2Port_BossFront(int frame, const char *spec) {
     const char *comma = strchr(spec, ',');
     f32 dist = (f32) atof(spec);
     int every = comma != NULL ? atoi(comma + 1) : 600;
+    /* ,K (round 12 a2): the Primagen's spot is K D in front of the lair (default 2.5) */
+    const char *comma2 = comma != NULL ? strchr(comma + 1, ',') : NULL;
+    f32 ahead = comma2 != NULL ? (f32) atof(comma2 + 1) : 2.5f;
     CGameObjectInstance *o;
     CVector3 c, box, pos;
     s32 node = 0;
@@ -246,23 +252,87 @@ void T2Port_BossFront(int frame, const char *spec) {
          * the lair and 2.5 D in front of it (D 450: (451, 0, 1799), the line passes beside found[0]) */
         static int sWait;
         CGameObjectInstance *b = gLevelScript.actor;
+        if (b != NULL && b->m_AI.m_Mode == 24 && frame % 300 == 0) {
+            /* DEBUG-ONLY (round 12 a2): mode 24 waits for its timer and the end of an animation loop */
+            printf("bossfront: frame %d primagen mode 24 bossMode %d timer %.2f anim %d frame %.2f repeated %d pos (%.1f %.1f %.1f)\n",
+                   frame, (int) gLevelScript.bossMode, gLevelScript.timer, (int) b->m_CurrentAnimation.m_nAnimIndex,
+                   b->m_CurrentAnimation.m_AnimationFrame, (int) b->m_AI.m_AnimRepeatedCount, b->header.m_vPos.x,
+                   b->header.m_vPos.y, b->header.m_vPos.z);
+        }
         if (b == NULL || b->m_AI.m_Mode != 25) {
             sWait = 0;
             return;
         }
         if (++sWait < every) {
+            if ((sWait == 3 || sWait == every / 2) && getenv("T2_BOSS_FRONT_PROBE") != NULL) {
+                /* DEBUG-ONLY (round 12 a2): the sight search the wait needs, two frames after the move */
+                extern void *AI_FindBestTarget(void *self, void *plan, s32 checkSight, s32 flag);
+                extern CCollisionResults gCollisionResults;
+                extern s32 D_800F1F50[];   /* the Primagen's searches run with 0x8000 set (Primagen_UpdateMode19) */
+                void *t;
+                CGameObjectInstance *a = &p->m_CharacterActor;
+                D_800F1F50[0] |= 0x8000;
+                t = AI_FindBestTarget(b, &b->m_AI, 1, 0);
+                printf("bossfront: probe frame %d sight %p hit %p wall %p edge %d player (%.1f %.1f %.1f) yoff %.1f h %.1f\n",
+                       frame, t, (void *) gCollisionResults.m_pInstance, (void *) gCollisionResults.m_pWallRegion,
+                       (int) gCollisionResults.m_nWallEdge, a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z,
+                       a->m_CollisionYOffset, GameObject_GetCollisionHeight(a));
+                if (getenv("T2_BOSS_FRONT_SCAN") != NULL) {
+                    /* which floor spots see him: the player moved there for one search each */
+                    CVector3 keep = a->header.m_vPos, q;
+                    struct CGameRegion *keepR = a->header.m_pCurrentRegion;
+                    int gx, gz;
+                    for (gz = 2250; gz >= 1500; gz -= 50) {
+                        printf("bossfront: scan z %4d:", gz);
+                        for (gx = -800; gx <= 800; gx += 50) {
+                            sptr rg;
+                            q.x = (f32) gx;
+                            q.y = 0.0f;
+                            q.z = (f32) gz;
+                            rg = CScene__FindRegionAt(&gScene, &q);
+                            if (rg == 0) {
+                                printf(" ");
+                                continue;
+                            }
+                            a->header.m_vPos = q;
+                            a->header.m_pCurrentRegion = (struct CGameRegion *) rg;
+                            printf("%c", AI_FindBestTarget(b, &b->m_AI, 1, 0) != NULL ? 'S' : '.');
+                        }
+                        printf("\n");
+                    }
+                    a->header.m_vPos = keep;
+                    a->header.m_pCurrentRegion = keepR;
+                }
+                D_800F1F50[0] &= ~0x8000;
+                if (gLevelScript.found[0] != NULL) {
+                    CGameObjectInstance *d = gLevelScript.found[0];
+                    printf("bossfront:   found[0] ty %x fl %x mode %d anim %d %.2f pos (%.1f %.1f %.1f)\n",
+                           (unsigned) d->m_nTypeFlag, (unsigned) d->m_dwFlags, (int) d->m_AI.m_Mode,
+                           (int) d->m_CurrentAnimation.m_nAnimIndex, d->m_CurrentAnimation.m_AnimationFrame,
+                           d->header.m_vPos.x, d->header.m_vPos.y, d->header.m_vPos.z);
+                }
+                if (gCollisionResults.m_pInstance != NULL) {
+                    CGameObjectInstance *h = gCollisionResults.m_pInstance;
+                    long idx = gScene.m_pActors != NULL ? (long) (h - gScene.m_pActors) : -1;
+                    printf("bossfront:   hit actor %ld ty %x it %d fl %x pos (%.1f %.1f %.1f) mode %d\n", idx,
+                           (unsigned) h->m_nTypeFlag,
+                           h->header.m_pIntelligence != NULL ? (int) h->header.m_pIntelligence->m_Type : -1,
+                           (unsigned) h->m_dwFlags, h->header.m_vPos.x, h->header.m_vPos.y, h->header.m_vPos.z,
+                           (int) h->m_AI.m_Mode);
+                }
+            }
             return;
         }
         sWait = 0;
         pos.x = b->header.m_vPos.x + dist;
         pos.y = 0.0f;
-        pos.z = b->header.m_vPos.z - 2.5f * dist;
+        pos.z = b->header.m_vPos.z - ahead * dist;
         region = CScene__FindRegionAt(&gScene, &pos);
         printf("bossfront: frame %d primagen (%.1f %.1f %.1f) mode 25 -> player (%.1f %.1f %.1f) region %p"
-               " pathfind %d kind1 %d/%d sight %p\n", frame,
+               " pathfind %d kind1 %d/%d sight %p cinema %d/%d pmode %d aifl %x over %p path %p dest (%.1f %.1f %.1f) bstate %d\n", frame,
                b->header.m_vPos.x, b->header.m_vPos.y, b->header.m_vPos.z, pos.x, pos.y, pos.z, (void *) region,
                (int) b->m_AI.m_PathFindCount, (int) gScene.m_Kind1Cursor, (int) gScene.m_nKind1,
-               (void *) b->m_AI.m_pSightTarget);
+               (void *) b->m_AI.m_pSightTarget, (int) Cinema_PathPlaying(), (int) Cinema_GetScriptId(), (int) p->m_Mode, (unsigned) b->m_AI.m_dwFlags, (void *) b->m_AI.m_pTargetOverride, (void *) b->m_AI.m_pPathTarget, gLevelScript.dest.x, gLevelScript.dest.y, gLevelScript.dest.z, (int) gLevelScript.bossState);
         fflush(stdout);
         if (region != 0) {
             CGameObjectInstance *a = &p->m_CharacterActor;
