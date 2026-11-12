@@ -1,4 +1,4 @@
-# The first levels, played through (Phase 7 round 9 x1: level 1; round 10 y1: level 2)
+# The first levels, played through (Phase 7 round 9 x1: level 1; round 10 y1 and round 11 z1: level 2)
 
 Level 1 of Turok 2, the Port of Adia, played from a new game to its end on the native port
 (Linux, headless): every sub-level from 51 to 59, both mission objectives (the three distress
@@ -222,13 +222,13 @@ python3 ../tools/port/playthrough.py . --level 2   # playthrough.txt, teleport.e
 . ./teleport.env
 SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_STATE_LOG=250 T2_SHOT=shot.ppm T2_SHOT_EVERY=250 \
     T2_SHOT_FROM=13000 build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --draw \
-    --pak-blank --frames 49500 --input @playthrough.txt
+    --pak-blank --frames 64000 --input @playthrough.txt   # round 11: to the hub (63,000)
 ```
 
 `teleport.env` sets `T2_WARP_TO=1999` (the hub from level 51, at 12,955), the plasma rifle
 (`T2_GIVE_WEAPONS=1 T2_WEAPON=10`), `T2_CHEATS=1` (invincible: the graveyard fights are long),
 `T2_FILL_AMMO=300`, and the aim windows `T2_AIM_AT` (a soul gate) and `T2_AIM_ENEMY` (new, see
-6.4). The event log now prints the objective counters of the level's own hub (level 2: soul gates
+6.4; round 11: `T2_FACE_NEAREST=4000@110 T2_FACE_PITCH=1` for the City Totem). The event log now prints the objective counters of the level's own hub (level 2: soul gates
 / sisters).
 
 What happens (Linux, headless, `--draw`, high memory, 49,500 frames, exit 0):
@@ -276,14 +276,54 @@ graveyard tests (all with `--draw`, high memory) exit 0.
   (`CGameRegion__FireTriggers(region, 1)`, what the player's move does): the graveyards' zombies
   only wake when the player walks into their halls.
 - `T2_EVENT_LOG`: `objectives A/B` is now the counters of the current level's hub (`T2Port_HubLevelOf`).
+- Round 11 (z1): `T2_AIM_ENEMY=F1-F2,R,A`: level actor A first (the nearest live actor when A is
+  dead or out of range; `T2_AIM_NODE=actor:N[,R]` underneath); `T2_FACE_PITCH=1`: `T2_FACE_NEAREST`
+  also sets the camera pitch (the portable atan2f of t2bosslog.c).
 
-### 6.5 Open (level 2)
+### 6.5 Round 11 (z1): to the end of level 2
 
-1. **The third sister (135)**: the gates 62 and 63 open from the switches, but the two action
-   objects 46 and 47 (object 156, key 12: the platform 1 that opens door 60 to her hall) do not fire
-   when walked into from the scripted points, and after a teleport into her hall (391.6, 0, 5862.8)
-   no frame is drawn any more (`--draw`: no picture, the game state runs on: no crash). Next: how
-   object 156 is used (an "action" with the use button?), then her fight; then 7200 -> the City
-   Totem (110) and its defense, and the hub.
-2. Walk the sub-levels instead of hopping (the 45 enemies of 125 are never met); the keys, the
-   talisman (73) and flesh-eater (79) portals.
+`playthrough.py --level 2` now plays the River of Souls to its end: the three Sisters of Despair,
+"all sisters of despair banished. mission complete.", the exit 7200 to the City Totem (level 110),
+its defense and the hub. Round 10 made the enemies as dangerous as on the N64 (the impact damage
+and `AI_InitHealth`'s aggression), so the scripted fights needed better aims; and the third
+graveyard needed its keys. No port bug in the sisters' AI was found: with the aim on her, each
+sister falls within ~400-500 frames of waking.
+
+| what | why it stopped | now |
+|---|---|---|
+| sister 1 (133, actor 20) | the nearest-actor aim (`T2_AIM_ENEMY`) stayed on the zombies and doors 27/28 (doors have health and the live flag) while she pushed the player back | `T2_AIM_ENEMY=F1-F2,R,A` (new): level actor A first, the nearest live actor when A is dead or out of range; the hall window aims at actor 20 |
+| sister 2 (134, actor 1) | with the merged tree's state the nearest aim went to the generators' spawns and gate 8: zombies 2-4 never died, gate 8 (key 7, three deaths) stayed shut | zombie 2, zombie 3 (at the start), zombie 4 (at the gate), then the sister, one aimed window each |
+| sister 3 (135, actor 31) | the actions 46/47 (object 156, intelligence 446) need **a graveyard key each** (`m_GoPickupNeeded` 4025, text 78 "requires graveyard key.", consumed by `Action_CheckRequiredItem`); they stand in the water hall's corners (regions 894/947, auto-go radius 256), so y1's walk-ins stopped 280 units away | the keys (level actors, object 580) lie in the two crypts; the crypt doors 75/76 open on the deaths of zombies 45/44, which wake in region info 19/20 (the rooms behind the crypts). A `!` teleport there, an aimed window, the key, then a step into each action's corner: key 12 -> platform 1 -> door 60 -> she wakes |
+| the City Totem (110) | not reached | the exit 7200 with both objectives done -> 110; fire taps with `T2_FACE_NEAREST=4000@110` and the new `T2_FACE_PITCH=1` (its attackers come from below and above the ledge) |
+| a crash in 135 (`CAnimationState__FindKeys`) | `Shadow_DrawBlob` wrote the blob shadow's alpha through the N64 view (0x10E) into byte 2 of the weapon actor's `m_CurrentAnimation.pmeAnimData` (NULL -> 0x630000); the next weapon animation switch copied it into the blend channel | the function by member (asm_diff 0); the weapon's blob shadow (`CPlayerPool__ReloadAnimInfo`) is drawn only in some places, so it first showed in 135 |
+
+A teleport into a point outside every region is refused (the player stays): (-750, 0, 2152) next
+to action 46 is in the wall; the corners' regions are 894 ((-808, 2178), (-1110, 2171),
+(-1102, 2467)) and 947. Region info centres: `levels.py`'s `collision.regions` (`info`, `v`)
+with `collision.vertices`.
+
+The run (Linux, headless, high memory, 64,000 frames, exit 0; `T2_EVENT_LOG=1 T2_STATE_LOG=250`,
+the commands of 6.2):
+
+| frame | level | the game's own result |
+|---|---|---|
+| 21,313 | 129 | "soul gate destroyed." |
+| 30,165 | 133 | **"sister of despair banished."** (sister 1; door 28 opened at 29,801) |
+| 31,355 / 37,483 | 134 | "graveyard located."; gate 8 opens on the third zombie death (36,481), **"sister of despair banished."** (sister 2) |
+| 42,063 | 132 | "soul gate destroyed.", "all soul gates destroyed. mission complete." |
+| 42,950-45,909 | 135 | "graveyard located.", both "graveyard gate open." |
+| 47,281 / 50,121 | 135 | crypt doors 75 / 76 open (zombies 45 / 44 dead); both graveyard keys collected (`T2_PICKUP_LOG`: id 4025) |
+| 52,065 / 52,245 | 135 | actions 46 + 47: platform 1 (key 12); door 60 opens, sister 3 wakes |
+| 52,767 | 135 | **"sister of despair banished."**, **"all sisters of despair banished. mission complete."** (objectives 0/0) |
+| 54,750 -> 55,250 | 132 -> 110 | warps 2608, 7200: **the City Totem** |
+| 55,250-62,250 | 110 | the defense: one attacker at a time, a kill every ~750 frames, **8/8 at 62,250** (22 s left at 7/8) |
+| 63,000 | 60 | **the hub** (`keys[1]`, `m_bLevel2TotemFlags`) |
+
+Level 1 (`--fight 10`) is unchanged: the totem 8/8 at 20,800, the hub at 21,500.
+
+### 6.6 Open (level 2)
+
+1. Walk the sub-levels instead of hopping (the 45 enemies of 125 are never met); the
+   talisman (73) and flesh-eater (79) portals; the platform 1 bridge walked over instead of a
+   teleport to door 60.
+2. The City Totem's kill pace (one attacker at a time, ~750 frames each): compare with the N64.

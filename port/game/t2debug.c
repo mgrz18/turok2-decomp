@@ -551,6 +551,22 @@ void T2Port_FaceNearest(int frame, const char *spec) {
         return;
     }
     pl->m_RotY += AI_AngleToPoint(pl, best->header.m_vPos);
+    {
+        /* T2_FACE_PITCH=1 (round 11 z1): also the camera pitch at the enemy (its position, 50 units
+         * up, as T2_AIM_NODE=-1 aims): the City Totem's attackers come from below and above the
+         * player's ledge; yaw alone hit one every ~750 frames and won with 3 s left */
+        static int sPitch = -1;
+        if (sPitch < 0) {
+            sPitch = getenv("T2_FACE_PITCH") != NULL;
+        }
+        if (sPitch && p->m_pCamera != NULL) {
+            extern f32 T2Port_Atan2f(f32 y, f32 x);
+            CVector3 eye = p->m_pCamera->m_vPos;
+            f32 dx = best->header.m_vPos.x - eye.x, dz = best->header.m_vPos.z - eye.z;
+            p->m_pCamera->m_ViewParams.m_vRotOffset.x =
+                T2Port_Atan2f(best->header.m_vPos.y + 50.0f - eye.y, sqrtf(dx * dx + dz * dz));
+        }
+    }
     if (best != sLast) {
         sLast = best;
         printf("face: frame %d player (%.1f %.1f %.1f) -> enemy %d type %x at (%.1f %.1f %.1f) d %.0f rotY %.2f\n", frame,
@@ -598,16 +614,24 @@ void T2Port_AimAt(int frame, const char *spec) {
 }
 
 /* T2_AIM_ENEMY=F1-F2[,R][;...] (DEBUG-ONLY, round 10 y1): T2_AIM_NODE=-1 (yaw and pitch at the
- * nearest live actor within R, default 4000) only from frame F1 to F2: the fights of a scripted run
+ * nearest live actor within R, default 4000) only from frame F1 to F2 (,A: actor A first): the fights of a scripted run
  * between its walks (a flying Sister of Despair needs the pitch). */
-void T2Port_AimNode(int frame, const char *spec);
+int T2Port_AimNode(int frame, const char *spec);
 void T2Port_AimEnemy(int frame, const char *spec) {
     const char *s = spec;
 
     while (s != NULL && *s != '\0') {
-        int f1, f2, r = 4000;
-        if (sscanf(s, "%d-%d,%d", &f1, &f2, &r) >= 2 && frame >= f1 && frame <= f2) {
-            char buf[32];
+        int f1, f2, r = 4000, a = -1;
+        if (sscanf(s, "%d-%d,%d,%d", &f1, &f2, &r, &a) >= 2 && frame >= f1 && frame <= f2) {
+            char buf[48];
+            /* ,A (round 11 z1): the level actor A first (a Sister of Despair), the nearest live actor
+             * when A is dead or out of range */
+            if (a >= 0) {
+                snprintf(buf, sizeof(buf), "actor:%d,%d", a, r);
+                if (T2Port_AimNode(frame, buf)) {
+                    return;
+                }
+            }
             snprintf(buf, sizeof(buf), "-1,%d", r);
             T2Port_AimNode(frame, buf);
             return;

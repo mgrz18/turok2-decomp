@@ -322,6 +322,45 @@ func_002141F0.c, func_002150C0.c (static objects and level actors), func_00277F6
 port/runtime/t2os.c (thread start), port/game/t2det.c + tools/port/n64trace.py +
 tools/port/detdiff.py (the trace format: a Mac/Linux comparison needs both sides rebuilt).
 
+## Round 11, part z1: level 2 to the end (branch names-R11_z1)
+
+Branch names-R11_z1 from 2df5517d. Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) section 6.5.
+Commits (`src/`: asm_diff 0 against 2df5517d; no `include/`, archive or gendata change):
+
+- 6ab4362d **`Shadow_DrawBlob`** (func_0021E03C) by member on the host: through the N64 view the
+  blob shadow's alpha (0x10E) was written into byte 2 of `m_CurrentAnimation.pmeAnimData`; the
+  first-person weapon's blob shadow (`CPlayerPool__ReloadAnimInfo`) turned a released animation
+  into 0x630000 and `CAnimationState__FindKeys` crashed (level 135, frame ~50,770 of the run).
+  Every actor drawn with a blob shadow had that byte rewritten; its region, ground quaternion and
+  collision y offset were also read at N64 offsets.
+- 6e772517 **`playthrough.py --level 2` to the end**: the three Sisters of Despair, the City
+  Totem (110) and the hub. New debug options: `T2_AIM_ENEMY=F1-F2,R,A` (level actor A first,
+  the nearest live actor when A is dead or out of range; `T2_AIM_NODE` accepts `actor:N`), and
+  `T2_FACE_PITCH=1` (`T2_FACE_NEAREST` also sets the camera pitch, the portable atan2f).
+  The third sister needed the level's own route: the actions 46/47 want a graveyard key each
+  (pickup 4025) from the two crypts (zombies 45/44 open the crypt doors 75/76).
+
+Results (Linux, headless, PIE, high memory; every run exits 0):
+
+- **Level 2 complete** (`playthrough.py --level 2`, 64,000 frames): soul gate 1 (21,313), sister
+  1 (133, 30,165), sister 2 (134, 37,483), "all soul gates destroyed. mission complete." (42,063),
+  the crypt keys (47,281 / 50,121), the actions, door 60 (52,245), **"all sisters of despair
+  banished. mission complete."** (52,767), 7200 -> **the City Totem (110) at 55,250**, its defense
+  won **8/8 at 62,250**, **the hub (60) at 63,000**.
+- **Level 1** (`--fight 10`): unchanged, the totem 8/8 at 20,800, the hub at 21,500.
+- No port bug in the sisters' AI: with the aim on her each falls ~400-500 frames after waking
+  (133: door 28 at 29,801, banished 30,165).
+
+**Merge notes**: `port/game/t2debug.c` (`T2Port_AimEnemy`, `T2Port_FaceNearest`),
+`port/game/t2bosslog.c` (`T2Port_AimNode` now returns int; `T2Port_AimMask` `actor:N`;
+`T2Port_Atan2f`), `port/app/game.cpp` (one declaration), `tools/port/playthrough.py` (the level-2
+segments 133/134/135/132, the totem fire window and env), `src/us/code/func_0021E03C.c`. z2 (the
+bosses) also uses `T2_AIM_NODE` in t2bosslog.c: keep both. z3 (9c791996) adds an early `return` for `SPEC@LEVEL` at the top of
+`T2Port_AimNode`: with the int return it must be `return 0;`.
+
+Next: walk level 2's sub-levels instead of hopping; the City Totem's kill pace against the N64
+(PLAYTHROUGH.md 6.6). The other files that define a `shadowAlpha` (0x10E) view never touch it.
+
 ## Round 10, part y4: the merged tree on macOS, host determinism, real time (branch names-R10_y4)
 
 Detail: [MACOS.md](MACOS.md) section 12, [PERF.md](PERF.md) section 5. Commits (asm_diff 0 vs
