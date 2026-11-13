@@ -182,6 +182,8 @@ L4_KEYS = {
 
 # Retries inside a segment (no shift): (segment index, dt, x, y, z, approach angle). In the
 # continuous run 135's first crypt key was missed once (the walk-in was pushed aside)
+# The City Totem (110): playthrough.CITY_TOTEM_SPOT, this long after 110 is reached (round 13 b2)
+CITY_TOTEM_TP_AFTER = 150
 L2_RETRY = [(12, 5950, -714.0, 0.0, 488.0, 0.0)]
 
 
@@ -189,7 +191,7 @@ L2_RETRY = [(12, 5950, -714.0, 0.0, 488.0, 0.0)]
 # rest of the run moves. The fights of level 2 depend on the state the level is entered with
 # (here: after level 1 and the hub, not a new game): in one run the zombies of 133 died ~2,000
 # frames later than in --level 2 and the route left before the sister woke.
-L2_STRETCH = [(6, 1, 3000), (9, 3, 2000), (12, 15, 2000)]
+L2_STRETCH = [(6, 4, 3000), (9, 3, 2000), (12, 15, 2000)]   # (6, 4): sister 1 s window (round 13 b2: after the zombies)
 
 
 def stretch(segments, extra):
@@ -256,6 +258,13 @@ SAVE_MENU_AGAIN = [(740, "A"), (890, "A"), (990, "DU"), (1090, "A"), (1290, "A")
 SAVE_TIME = 2000
 
 
+# The key slots filled in each hub visit (after level N): every door as soon as its keys are in
+# hand (level 3s keys lie in level 1, level 4s in level 2). Round 13 b2: an opened door stays
+# open on later visits (the fired events are replayed when a level loads); round 12 opened each
+# door in the visit that used it because a used key slot blocked the walk on a later visit.
+GRANT = {1: (2, 3), 2: (4,), 3: ()}
+
+
 def hub(r, arrival, grant=(), primagen=(), save=True, go=None):
     """The hub from `arrival`: pads `grant` (their keys in), Primagen key slots, a save, then
     the portal of level `go`; returns (the frame the level's first cinema starts, or the end)."""
@@ -298,9 +307,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None):
     r.note(hubs[1], "60 the hub (after level 1)")
     r.anchors.append((hubs[1], 60))
     if upto < 2:
-        hub(r, hubs[1], grant=(2,), primagen=(1,))
+        hub(r, hubs[1], grant=GRANT[1], primagen=(1,))
         return r.write(out)
-    c = hub(r, hubs[1], grant=(2,), primagen=(1,), go=2)
+    c = hub(r, hubs[1], grant=GRANT[1], primagen=(1,), go=2)
     shift = c - OLD_CINEMA[2]
     r.anchors.append((c, 34))
     r.note(c, "34.. the River of Souls intro cinemas (level 2 route shifted by %d)" % shift)
@@ -310,13 +319,16 @@ def main_all(out, upto=6, extras=True, hubs_in=None):
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
     r.fire.append((t_arr, t_arr + 7200))
     r.anchors.append((t_arr, 110))   # the fire window starts when 110 is reached
+    # Round 13 b2: down from the arrival ledge (642 units from the totem, the attackers 450-1,150
+    # away: 4-5 kills of 8 in 120 s) to the south side of the totem, where they come to the player
+    r.tp(t_arr + CITY_TOTEM_TP_AFTER, *pt.CITY_TOTEM_SPOT)
     r.face_levels.append(110)
     r.note(hubs[2], "60 the hub (after level 2)")
     r.anchors.append((hubs[2], 60))
     if upto < 3:
-        hub(r, hubs[2], grant=(3,), primagen=(2,))
+        hub(r, hubs[2], grant=GRANT[2], primagen=(2,))
         return r.write(out)
-    c = hub(r, hubs[2], grant=(3,), primagen=(2,), go=3)
+    c = hub(r, hubs[2], grant=GRANT[2], primagen=(2,), go=3)
     shift = c - OLD_CINEMA[3]
     r.anchors.append((c, 12))
     r.note(c, "12.. the Death Marshes intro cinemas (level 3 route shifted by %d)" % shift)
@@ -329,9 +341,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None):
     r.note(hubs[3], "60 the hub (after level 3)")
     r.anchors.append((hubs[3], 60))
     if upto < 4:
-        hub(r, hubs[3], grant=(4,), primagen=(3,))
+        hub(r, hubs[3], grant=GRANT[3], primagen=(3,))
         return r.write(out)
-    c = hub(r, hubs[3], grant=(4,), primagen=(3,), go=4)
+    c = hub(r, hubs[3], grant=GRANT[3], primagen=(3,), go=4)
     shift = c - OLD_CINEMA[4]
     r.anchors.append((c, 18))
     r.note(c, "18.. the Lair of the Blind intro cinemas (level 4 route shifted by %d)" % shift)

@@ -944,3 +944,85 @@ void T2Port_LogEvent(LevelEvent *e, const char *text) {
            kObjTypes[k][1] < 0 ? -1 : (int) CScene__GetLinkGroupCount(&gScene, kObjTypes[k][1]));
     fflush(stdout);
 }
+
+/* T2_BITS_LOG=L1,L2,... (DEBUG-ONLY, round 13 b2): each listed level s persistent bit blocks, the
+ * instance bits (gLoadSavePersistentData via m_pBitSections: opened doors, taken pickups, dead
+ * actors) and the level bits (gGamePersistentData via m_pBitSections2: map regions, flags), printed
+ * whenever they change (a hex dump), to follow per-level state across visits, saves and loads.
+ * Called every frame. */
+#include "protos/iset.h"
+static void T2Port_BitsBlock(void *sections, int level, unsigned char **data, int *size) {
+    void *b = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(sections, 0), level), 0);
+    *data = (unsigned char *) CISet__GetBlock(b, 1);
+    *size = (int) CISet__GetBlockSize((s32 *) b, 1);
+}
+void T2Port_BitsLog(int frame, const char *spec) {
+    static unsigned sHash[2][16];
+    static int sInit[2][16];
+    const char *s = spec;
+    int n = 0;
+
+    if (gScene.m_pBitSections == NULL || gScene.m_pBitSections2 == NULL) {
+        return;
+    }
+    while (*s != 0 && n < 16) {
+        int level = atoi(s);
+        int k;
+        for (k = 0; k < 2; k++) {
+            unsigned char *d;
+            int size, i;
+            unsigned h = 2166136261u;
+            T2Port_BitsBlock(k == 0 ? gScene.m_pBitSections : gScene.m_pBitSections2, level, &d, &size);
+            if (size < 0 || size > 4096) {
+                continue;
+            }
+            for (i = 0; i < size; i++) {
+                h = (h ^ d[i]) * 16777619u;
+            }
+            if (!sInit[k][n] || sHash[k][n] != h) {
+                sInit[k][n] = 1;
+                sHash[k][n] = h;
+                printf("bits: frame %d level %d (now %d mode %d) %s %d bytes:", frame, level, (int) gScene.m_nLevel,
+                       (int) gEngineApp.m_Settings.mode, k == 0 ? "instance" : "level", size);
+                for (i = 0; i < size; i++) {
+                    printf("%s%02x", (i % 4) == 0 ? " " : "", d[i]);
+                }
+                printf("\n");
+            }
+        }
+        n++;
+        while (*s != 0 && *s != 44) {
+            s++;
+        }
+        if (*s == 44) {
+            s++;
+        }
+    }
+    fflush(stdout);
+}
+
+/* T2_DUMP_ACTOR=F:I[;F:I...] (DEBUG-ONLY, round 13 b2): a hex dump of level actor I (the whole
+ * CGameObjectInstance) at frame F, to diff an actor between two moments (a door opened by its
+ * event against the same door restored open on a later visit). Called every frame. */
+void T2Port_DumpActor(int frame, const char *spec) {
+    const char *s = spec;
+    while (*s != 0) {
+        int f = atoi(s), idx = -1;
+        while (*s != 0 && *s != 58 && *s != 59) s++;
+        if (*s == 58) { s++; idx = atoi(s); }
+        while (*s != 0 && *s != 59) s++;
+        if (*s == 59) s++;
+        if (f == frame && idx >= 0 && gScene.m_pActors != NULL && idx < gScene.m_nActors) {
+            const unsigned char *b = (const unsigned char *) &gScene.m_pActors[idx];
+            int i;
+            printf("dump: frame %d level %d actor %d size %d\n", frame, (int) gScene.m_nLevel, idx, (int) sizeof(CGameObjectInstance));
+            for (i = 0; i < (int) sizeof(CGameObjectInstance); i += 16) {
+                int j;
+                printf("dump: %04x:", i);
+                for (j = 0; j < 16 && i + j < (int) sizeof(CGameObjectInstance); j++) printf(" %02x", b[i + j]);
+                printf("\n");
+            }
+            fflush(stdout);
+        }
+    }
+}

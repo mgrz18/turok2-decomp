@@ -934,3 +934,30 @@ Frames (Linux, `--draw`, an earlier run with `T2_TELEPORT=27900:0,0,1500` instea
 death at 32,726): the Primagen under plasma fire (32,401-32,601), his death cinema
 (32,801-33,801), the ending with Adon (35,001-38,001), the credits ("TUROK 2 TEAM" from ~39,600
 to the Acclaim staff at 45,803).
+
+## 13. Round 13, part b2: what a level keeps between visits
+
+Each level has a section in `gLoadSavePersistentData` (the block written to the pak's note and
+read back by a load; `CScene::m_pBitSections`) with three bit blocks: block 0 the instance bits
+(one per level actor: a door opened, an action used, a pickup taken, an actor dead), block 2 the
+fired-event bits (one per event record, `CScene__SetEventFired` from `LevelEvent_Trigger` and
+`LevelEvent_ProcessTriggers`). `gGamePersistentData` (`m_pBitSections2`) holds the level bits
+(`CScene__SetLevelBit`: map regions seen, flags).
+
+When a level loads (`CScene__LoadLevel`):
+
+1. the actors are decompressed (scene mode 2), then **every fired event is fired again**
+   (`func_0042C79C` -> `CScene__RestoreFiredEvent`, `LevelEvent_Fire` with the scene in mode 2: no
+   text, no music; an event whose record names a flag byte (offset 0xF) is skipped when that byte
+   of the bit sections' block 1 is set);
+2. each actor is set up (mode 3, `func_0021E5D4`; for an action `Action_Setup`, which turns its
+   collision on);
+3. the fired events of kinds 1, 2, 4 and 10 (10: the actions' table) are fired again
+   (`func_0042C840`), then `func_0021F1B4` runs on each actor (the doors' and actions' modes come
+   from their instance bits: `Door_Advance`, `Action_Advance`);
+4. mode 4: the level runs.
+
+A used hub key slot thus gets its `Event_DisableCollision` (kind 10 handler 8) again after its
+setup turned the collision on. On the host steps 1 and 3 did nothing until round 13 (the views of
+`CScene` at N64 offsets): every state an event had made (a collision off, a platform moved, a gate
+open by event) was lost on the next visit, while the states held in instance bits survived.

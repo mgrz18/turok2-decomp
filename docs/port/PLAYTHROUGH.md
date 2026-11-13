@@ -1032,3 +1032,79 @@ The pak after the run: note 1 "TUROK 2", checksum OK, life force 78, weapon 9, c
   (both are the game's own warps; which one depends on state the two runs do not share: not
   traced further).
 - The Primagen's stage-3 lair wait depends on where he rests (above); compare with the N64.
+
+## Round 13 b2: level state across visits, the City Totem
+
+### Hub doors closed on a later visit: the fired events were never replayed (fixed)
+
+Reproduced in ~38,000 frames (no level played, no save needed): level 1, the hub (both the
+level-2 and the level-3 key slots filled: "access to level 3 granted.", door 28 opens), a
+`T2_WARP_TO=-111` hop to the City Totem (lost on purpose), back in the hub, the walk at the
+level-3 door: blocked 139 units short of it. The door itself was restored open: its instance
+bit (`gLoadSavePersistentData`, `T2_BITS_LOG=60`) was kept, `Door_Advance` put it in mode 0, and
+a hex dump of the door actor (`T2_DUMP_ACTOR`) matched the first visit's byte for byte. What
+blocked the walk was **key slot 22** (an action, type 0x648) beside the door: filling a slot fires
+its events, among them kind 10 handler 8 (`Event_DisableCollision`); on a later load the slot
+came back in its used mode (its instance bit) but solid (`Action_Setup` sets the collision flag
+0x10000).
+
+On the N64 a level load replays every fired event (their bits: block 2 of the level's section of
+`gLoadSavePersistentData`): `func_0042C79C` (all of them, before the actors are set up) and
+`func_0042C840` (kinds 1, 2, 4 and 10, after) call `CScene__RestoreFiredEvent`. On the host all
+three viewed `CScene` at N64 offsets (0x1168-0x117C for the record tables, 0x6C and 0x18FA8 for
+the bit sections and the level): **no fired event was ever replayed on a level load**. Commit
+2881ad54: the three (and their module-2 twins `func_004656BC`/`func_00465760`, and the raw 0x6C
+of `CScene__SetEventFiredInLevel`) by member (asm_diff 0). With it the walk passes the door on the
+second visit; the same after a save, a new boot and a load from that pak (`START@4400 A@4500
+DD@4700 A@4800 DU@4900 A@5000 A@5200 A@5400`: the hub at 5,600, the walk reaches level 12 at
+7,700). On every hub load the event log now shows the replayed "access to level N granted."
+events in scene modes 2 and 3 (no message, no music: those need mode 4).
+
+fullrun.py's workaround is gone: `GRANT = {1: (2, 3), 2: (4,), 3: ()}` fills each door's slots as
+soon as its keys are in hand (level 3's keys lie in level 1, level 4's in level 2), and the door
+is walked through on a later visit.
+
+The other per-level state lives in the same blocks and was host-correct before: the instance bits
+(opened doors, used actions, taken pickups, dead actors: `CScene__SetInstanceSavedBit`, members
+already), the killed-actor bits (`CScene__SetLevelActorKilled`, round 11) and the level bits
+(`CScene__SetLevelBit`, round 9). The replay covers every other event a level fired before
+(switches, gates, collision changes) in every level, so a revisited sub-level now looks as it
+was left (level 2's 130, 131, 132 and level 5's 91 are revisited by the routes).
+
+a5's `n64viewcheck.py` lists `CScene__RestoreFiredEvent` among its 44 *suspect* sites (the view
+fits CScene, both fields moved) and the raw 0x6C as *untyped*: the suspect list holds real bugs.
+The two loops' views (pad 0x1168, fields `counts`/`items`) were not matched to CScene.
+
+### Level 2: sister 1 woke too late in some runs
+
+With the first hub visit 300 frames longer (the level-3 slots filled there) sister 1 (133, actor
+20) was left at 7/50 when her window ended: she sleeps until zombies 22-24 die and door 28 opens,
+and with her aimed from the start (`enemy:20`) the zombies died only from stray shots (~5,000
+frames). playthrough.py now aims zombies 22, 23 and 24 one by one (1,500 frames each), then the
+sister (1,900, + `L2_STRETCH`'s 3,000, now on that step): she dies at 42,436 (43,186 before).
+**This step is shared with `--level 2` and b5's work on levels 1-2.**
+
+### The City Totem (110): won from the totem's side
+
+The route fired from the arrival ledge (-665.6, 307.2, -153.6), 642 units from the totem (level
+actor 1, (-102.4, 0, -153.6)); the attackers (three alive at a time from the generators, two of
+them going for the totem, one for the player) stood 450-1,150 units away: 4/8 in 120 s from a
+`T2_WARP_TO=-111` start, 4-5/8 in the continuous runs. The totem kept its 5 health in every lost
+run: the fights were lost on time, not on damage. fullrun.py (150 frames after 110 is reached) and
+`--level 2` (400 frames after its nominal arrival) now teleport to `playthrough.CITY_TOTEM_SPOT` =
+(-102.4, 0, -330.0), facing the totem: **won 8/8 in all 8 runs** (the continuous run, `--level 2`,
+and six warps at 14,000 + 0/37/91/150/233/400 frames, i.e. six RNG states): the 8th kill 3,000 (the continuous run) to 5,200 frames after the start of the 7,200-frame fight (~375-650
+frames a kill). Not compared with the N64 (no N64 save at 110): the kill rate was the shooter's
+distance, not a host bug seen in the logs.
+
+### The whole game with these changes (Linux, headless, PIE, 266,000 frames, exit 0)
+
+The run of section 11.2 with this branch (the doors opened as soon as their keys are in hand,
+sister 1's zombies first, the City Totem from its side): every objective of levels 1-6; **the five
+totems won** (109 8/8, 110 at 79,500, 111, 112 8/8, 113); the Blind One dead (mode 9) at 134,418,
+the Mantid Queen (16) at 164,516, the Mother (30) at 205,405, the Primagen (29) at 235,842; the
+credits 242,634-256,724, the hub at 257,000. The pak: note 1 checksum OK, life force 78, clock
+0:44:23. `T2_PICKUP_LOG`: each level key once (4310-4330 three each, 4340 one, 4350 five, Primagen
+keys 1-4), nothing taken twice on the revisits. The hub visits fill the level-2 and level-3 slots
+after level 1 and the level-4 slots after level 2; the walk through the level-3 door on the second
+visit passes (it was opened in the first).

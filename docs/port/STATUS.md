@@ -364,6 +364,44 @@ Details: [MACOS.md](MACOS.md) section 15, [QUICKSTART.md](QUICKSTART.md) (new).
     valgrind on the level-135 window (`OUT/r13/allwin.sh` with `T2_DET_FROM=71440`) would find it;
   - a windowed run with a real gamepad is still not done (QUICKSTART.md documents it).
 
+## Round 13, part b2: level state across visits, the City Totem (branch names-R13_b2)
+
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) "Round 13 b2", [GAMEPLAY.md](GAMEPLAY.md) section 13.
+
+- **Hub doors closed on a later visit: fixed (a port bug).** The door was restored open; what
+  blocked the walk was a used key slot beside it, solid again because **no fired level event was
+  ever replayed when a level loaded on the host**: `CScene__RestoreFiredEvent` and the two
+  load-time loops (`func_0042C79C`, `func_0042C840`, + module-2 twins) viewed `CScene` at N64
+  offsets (0x6C, 0x18FA8, 0x1168-0x117C); `CScene__SetEventFiredInLevel` had a raw 0x6C. By
+  member now (commit 2881ad54, asm_diff 0 on the 6 files). Verified: the level-3 door walked
+  through on the next hub visit, and after a save, a new boot and a load. fullrun.py's
+  workaround removed (`GRANT`: each door as soon as its keys are in hand).
+- **The replay changes every level revisit** (whatever a level's events did before is redone on
+  its next load, as on the N64): switches, gates, collision changes; the event log shows the
+  replayed events in scene modes 2/3.
+- **The City Totem (110): won 8/8 in 8 of 8 runs** (the continuous run, `--level 2` and six RNG
+  states from a warp): fullrun.py teleports from the arrival ledge (642 units from the totem) to its south side
+  (`CITY_TOTEM_SPOT`). The lost runs had lost on time with the totem at full health (4-5 kills).
+  Not compared with the N64.
+- **Level 2's sister 1** (133): the zombies that open her door aimed one by one first
+  (playthrough.py, shared with `--level 2`): in some runs she woke too late for her window.
+- New debug switches: `T2_BITS_LOG=L1,L2,...` (a level's instance and level bit blocks, dumped on
+  every change), `T2_DUMP_ACTOR=F:I[;...]` (a hex dump of level actor I at frame F).
+
+Runs (Linux, headless, PIE): the whole game (`playthrough.py --all`, 266,000 frames) exit 0: every
+objective; **all five totems won** (109 8/8, 110 at 79,500, 111, 112 8/8, 113); the Blind One dead
+134,418, the Mantid Queen 164,516, the Mother 205,405, the Primagen (mode 29) 235,842; the credits
+242,634-256,724; the hub 257,000; the pak's note checksum OK (clock 0:44:23); each level key picked
+up once (no pickup back on a revisit); `--level 2` the three sisters, both soul gates, **the City
+Totem won 8/8** (~2,700 frames), the hub at 58,500 (63,000 before).
+
+For the merge: `tools/port/playthrough.py` (L2_SEGMENTS, the 133 steps) and `tools/port/fullrun.py`
+(`GRANT`, `CITY_TOTEM_SPOT`, `L2_STRETCH`) are also b1/b5 territory; `port/game/t2debug.c` and
+`port/app/game.cpp` get two appended switches. The Primagen's stage-3 lair wait is still
+fragile: an intermediate run (the fix, the round-12 hub order) had the Mother die ~3,700 frames
+later, the hop came later and he rested at z 2,922 (the known no-end spot) to the end; with this
+branch's route the timeline moved earlier and he died. b1's real portal entrance replaces the hop.
+
 ## Round 12, part a5: the N64-offset sweep, the player intelligence typed (branch names-R12_a5)
 
 Detail: [STABILITY.md](STABILITY.md) section 8, [64BIT.md](64BIT.md) part 6.
