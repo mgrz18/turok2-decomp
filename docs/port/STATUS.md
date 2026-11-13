@@ -238,8 +238,9 @@ section 17.
   rests where his wait never ends: he oscillates round `dest` (z 2,906/2,923), but
   `Primagen_UpdateMode19`'s sight target stays NULL whatever floor spot `T2_BOSS_FRONT` uses.
   The committed route therefore ends at the lair (all five totems won, every boss but the
-  Primagen). For the good ending as in round 13 add `--hop`. The cinema still plays, and the hop
-  reloads the lair 150 frames after it (not yet verified in a whole run this round).
+  Primagen). For the good ending as in round 13 add `--hop`. Checked: the six keys, cinema 43,
+  the lair at 222,579, the hop reloads it at 232,830, **the Primagen dead at 246,874 with cinema
+  370**, END 2, the credits, the hub at 267,764 (cheats 0x7ffe7fd, as round 13).
 - **`--level 6` regression bisected to round 13 b2** (46cd78dc: fired events restored when a level
   loads; b4 45570c74 still kills him). b2's code matches the N64 code. The runs diverge at the
   start of the lair fight (the first boss mode change at 54,698 instead of 54,774), and he then
