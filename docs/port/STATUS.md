@@ -346,11 +346,14 @@ changed, so asm_diff does not apply. `playthrough.py RUN --all` is now 280,000 f
 - **The hub's level-5 and level-6 doors are walked through**: one walk from the plaza goes over the
   slots ("access to level 5 granted." / "... 6 granted."), through the door and into the portal.
   The teleports past the doors are gone.
-- **The Primagen through the hub**: **the six Primagen keys in their hub slots play the hub portal
-  cinema (level 43), which ends in the Primagen's lair (7602's place)**. Primagen key 5 is in 92
-  (the hive's talisman level, by 91's warp 5813: a +1,200-frame detour in level 5). Key 6 is at
-  114's centre, taken on 114's last visit. Key 5 goes in after level 5, key 6 after the Mother.
-  `T2_WARP_TO=7602` and fullrun's `--hop` are gone (`--slot F`: when key 6 goes in, frames after
+- **The Primagen's real entrance found**: **the six Primagen keys in their hub slots play the hub
+  portal cinema (level 43), which ends in the Primagen's lair (7602's place)**. This was checked
+  with the six keys given. The route now picks up Primagen key 5 in 92 (the hive's talisman level,
+  by 91's warp 5813: a +1,200-frame detour) and key 6 at 114's centre (on 114's last visit), and
+  puts keys 5 and 6 in their slots. **Open: keys 2 and 3 never go in during the continuous run**
+  (round 12 either): the walks to slots 2 and 3 are deflected round the hub's centre. So the
+  cinema does not fire, and the route falls back on the old hop (`T2_WARP_TO=7602`, now 150 frames
+  after the cinema would have ended). `--hop` became `--slot F` (key 6 into its slot, frames after
   the hub).
 - **Level 6's items from level 6**: the capacitor question is answered by the data. a2's
   object-to-item reading was wrong: object 597 is the capacitor (4231) and 595 the red laser cell
@@ -366,7 +369,17 @@ changed, so asm_diff does not apply. `playthrough.py RUN --all` is now 280,000 f
   corridor stops at it (z 651), and the route's plaza teleport crosses it. This is b2's door
   persistence bug.
 
-RUN_RESULTS_PLACEHOLDER
+**The run** (Linux, headless, PIE, `playthrough.py RUN --all`, 280,000 frames, exit 0, host frames):
+"access to level 5 granted." 141,150 (walked through the door into 5000); level 5 with Primagen key
+5 from 92: "force field down." 146,830, "all embryos destroyed." 158,324, "master computer
+destroyed." 160,476, the Queen dead (mode 16) 170,698; "access to level 6 granted." 174,511 (walked
+into 6000); 16 capacitors and 2 red cells picked up, "all assembly plants destroyed." 193,671,
+"all power generators recalibrated." 194,527, "force field down." 195,311; the Mother dead (mode
+30) 213,827; Primagen key 6 into its slot 219,637; the fallback hop; the Primagen dead (mode 29)
+248,754; the ending cinema (levels 11, 10) from ~250,000, the credits (mode 15) ~255,000-268,000,
+the hub ~269,000. The pak: note 1 "TUROK 2", checksum OK, clock 0:46:06.
+In the same run every level key is picked up: 61, 62, 68 for level 5; 100, 103, 105, 84, 87, 89 for
+level 6; Primagen keys 1, 2, 3, 4, 5, 6 (`T2_PICKUP_LOG`). Slot events: instances 4, 7, 11 and 12 only.
 
 Next: extend 117's bridges (object 412, actors 58/60; their link records come from instances
 34/35/39, object 232) instead of the pit pickups; find what pushes the player away from 114's

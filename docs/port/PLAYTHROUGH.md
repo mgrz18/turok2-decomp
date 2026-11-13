@@ -1083,12 +1083,19 @@ in, the six records fire together and play **the hub portal cinema (level 43,
 18,115, the cinema from 18,173, the lair at 19,303. In the port the cinema does not wait for the
 Mother.
 
-**Primagen keys 2 and 3 had never gone in** (rounds 12 and earlier): the hub's centre has no
-region inside the ring of slots, and a walk straight in at slot 2 (133, 38) or slot 3 (37, -85)
-was deflected round it, with no slot event. The walk that starts at slot 1's outside point goes on
-to slot 2. Once slot 2 holds its key, the walk that starts at slot 2's point goes on to slot 3. So
-`PRIMAGEN_FROM` starts key 2's walk at slot 1 and key 3's at slot 2. Any slot takes any Primagen
-key. With keys 2 and 3 given, the walks at slots 4 and 5 filled 6 and 5.
+**Open: Primagen keys 2 and 3 do not go in during the continuous run** (they never did in round 12
+either: no slot event for instances 5 and 6). The hub has no region inside the ring of slots. In
+the continuous run, a walk straight in at slot 2 (133, 38) or slot 3 (37, -85) is deflected round
+the ring to (147, 128) with no slot event. Neither of the two alternatives works: starting at slot
+1's outside point (`PRIMAGEN_FROM`), or starting from the previous slot's pad along the ring
+(`PRIMAGEN_ALONG`). In the experiment above, which held all six keys with every slot empty, the
+walk at slot 1 went on to fill slot 2, and the walk at slot 2 then filled slot 3. Any slot takes
+any Primagen key: with only keys 2 and 3 given, the walks at slots 4 and 5 filled slots 6 and 5.
+So in the continuous run only four slots fill, the cinema does not play, and **the route falls back
+on the old hop** (`T2_WARP_TO=7602`, 150 frames after the cinema would have ended; after a real
+cinema it would only put the player back on the lair's start). Next: walk to slots 2 and 3 from
+another side, or carry keys 2-3 until the hub after level 6 and use the slot-4/5 walks, which took
+them in the experiment.
 
 The keys: Primagen key 5 (item 4364, object 591) lies in **92** (`092_91_Lev5_H_TALISMAN`, the
 hive's talisman level) at (614.4, 2151.2, 2918.4). 91's region 25 warps there (5813), and 92's exit
@@ -1097,8 +1104,7 @@ between 91's satchel charges and its exit 5500 (+1,200 frames). Primagen key 6 (
 lies at the centre of **114** (0, -50.8, 0). On the first visit to 114 a walk from 90 units out was
 pushed back 70 units (by something round the key that was not identified), so the route takes the
 key on 114's last visit, after "force field down.". Key 5 goes into its slot in the hub visit after
-level 5. Key 6 goes in after the Mother: the six keys are then in, the cinema plays, and the
-Primagen's fight follows.
+level 5, and key 6 after the Mother.
 
 ### 12.4 Level 6's items: the capacitor question answered
 
@@ -1132,3 +1138,17 @@ port uses one per coupling as the N64 asm does.
 picked from the air and **then teleported back onto a safe floor** 14-30 frames later ("pit",
 DEBUG-ASSISTED: 117's bridges are not extended, 116's floor kills). `--level 6` still uses
 `T2_GIVE_ITEMS` (`L6_GIVE`).
+
+### 12.5 The run
+
+**The run** (Linux, headless, PIE, `playthrough.py RUN --all`, 280,000 frames, exit 0, host frames):
+"access to level 5 granted." 141,150 (walked through the door into 5000); level 5 with Primagen key
+5 from 92: "force field down." 146,830, "all embryos destroyed." 158,324, "master computer
+destroyed." 160,476, the Queen dead (mode 16) 170,698; "access to level 6 granted." 174,511 (walked
+into 6000); 16 capacitors and 2 red cells picked up, "all assembly plants destroyed." 193,671,
+"all power generators recalibrated." 194,527, "force field down." 195,311; the Mother dead (mode
+30) 213,827; Primagen key 6 into its slot 219,637; the fallback hop; the Primagen dead (mode 29)
+248,754; the ending cinema (levels 11, 10) from ~250,000, the credits (mode 15) ~255,000-268,000,
+the hub ~269,000. The pak: note 1 "TUROK 2", checksum OK, clock 0:46:06.
+In the same run every level key is picked up: 61, 62, 68 for level 5; 100, 103, 105, 84, 87, 89 for
+level 6; Primagen keys 1, 2, 3, 4, 5, 6 (`T2_PICKUP_LOG`). Slot events: instances 4, 7, 11 and 12 only.
