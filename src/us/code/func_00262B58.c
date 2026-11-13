@@ -37,7 +37,21 @@ void Turret_Effects(sptr arg0, Effect00262B58 *arg1) {
     temp_a0 = arg1->owner;
     temp_s1 = &temp_a0->header.m_pIntelligence->m_Turret;
     if (arg1->value == temp_s1->m_GunNode) {
+#ifdef TARGET_PORT
+        /* the gun's pitch: the float whose bits m_VarBuffer[0] holds (MIPS passes them in $a1); the
+         * s32 shim CMtxF__RotateX_i would cut the matrix pointer to 32 bits (round 13 b5: reached
+         * once the bone index above is read right) */
+#undef CMtxF__RotateX
+        {
+            void CMtxF__RotateX(void *m, f32 a);
+            f32 pitch;
+            s32 bits = temp_a0->m_AI.m_VarBuffer[0];
+            __builtin_memcpy(&pitch, &bits, sizeof(pitch));
+            CMtxF__RotateX((void *) arg0, pitch);
+        }
+#else
         CMtxF__RotateX(arg0, temp_a0->m_AI.m_VarBuffer[0]);
+#endif
     }
     if (arg1->value == temp_s1->m_RotNode) {
         temp_v0 = arg1->owner;
