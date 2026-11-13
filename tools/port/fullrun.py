@@ -226,6 +226,74 @@ L3_KEYS = {
 # (and 68's sat at index 15 of a 14-segment list: never inserted): their segments are anchored on the
 # sub-level (T2_ANCHOR) and the picks wait KEY_WAIT frames after it
 L3_ANCHOR = {3, 13}
+# ---- level 3 without invincibility (round 14 c1, --cheats-off 3) ----
+# Health on the way (object 542 health +10, 545 full health, 548 ultra health: the level actors of
+# tools/assets/levels.py's grid sections; y is the floor): 61's two +10 beside the first satchel
+# charge, 69's full health (only reachable from -z) before its ammo storage.
+L3_HEALTH = {
+    0: [(4608.5, -431.0, -3682.8, 0.0), (4762.4, -431.0, -3531.5, 0.0)],   # 61: 2 health +10
+    1: [(149.8, 0.0, -165.0, 3.1416)],                                     # 69: full health
+    5: [(-1280.0, 2.8, 4505.6, 3.1416), (-1280.0, 2.8, 4710.4, 0.0)],      # 64: 2 health +10 on the satchel's island
+    9: [(2634.4, -560.0, 2051.6, 1.5708)],                                 # 66: ultra health (the Marsh Totem next)
+}
+# 69 (the first ammo storage): "armory destroyed." (~440 frames after the charge walk starts) wakes
+# an ambush of obj-230 gunners on the balconies over the charge point (instances 7, 8, 12, 13; their
+# bursts take 13-42 health per shot, 3 shots a burst: 44 health was gone in 16 frames). Round 12
+# stood by the charge point until 600; now the player waits at the exit warp 3778 (a floor below,
+# out of their sight) and walks into it when the armory has blown.
+L3_69_NOCHEATS = [
+    (0, 1103.2, 308.4, -1854.4, 0.0466, 300, {}),        # the charge point, actor 23 (1075, 307, -2458)
+    (330, -1492.1, -305.2, -1428.2, 0.1738, 0, {}),      # by the warp 3778, standing
+    (480, -1492.1, -305.2, -1428.2, 0.1738, 150, {}),    # warp 3778 -> 61 (the armory blew at ~440)
+]
+
+
+# 64: the second satchel charge (-1331, 3, 4608) lies on an island (region info 14, floor 2.8) in the
+# marsh; round 12 stood in the water beside it (region info 12: 75 health every 15 game frames,
+# the run's first death). Now from the island's +x side, through its third health +10 (-1229, 4608).
+L3_64_NOCHEATS = [
+    (0, -1150.0, 2.8, 4608.0, 1.5708, 25, {}),          # satchel charge (-1331, 3, 4608), from +x (a longer walk leaves the island)
+    (150, -1820.5, 614.3, 2531.9, -1.2796, 150, {}),    # warp 3780 -> 70
+]
+# 70 and 71 (the other two ammo storages): the same ambush when the armory blows (70: four gunners
+# woke 4 frames after "armory destroyed.", 100 health in 36 frames), the same way out
+L3_70_NOCHEATS = [
+    (0, 1629.3, -921.4, -524.6, -0.0187, 200, {}),      # the charge point, actor 37 (1638, -922, -992)
+    (330, -887.1, -614.2, 1300.7, 0.1285, 0, {}),       # by the warp 3779, standing
+    (460, -887.1, -614.2, 1300.7, 0.1285, 150, {}),     # warp 3779 -> 64 (the armory blew at ~420)
+]
+L3_71_NOCHEATS = [
+    (0, 1113.3, -1533.8, -1090.6, 1.1009, 200, {}),     # the charge point, actor 32 (833, -1536, -1233)
+    (330, -800.8, -919.4, 191.7, 0.1449, 0, {}),        # by the warp 3781, standing
+    (480, -800.8, -919.4, 191.7, 0.1449, 100, {}),      # warp 3781 -> 67
+]
+L3_NOCHEATS = {1: ("69 ", L3_69_NOCHEATS), 5: ("64 ", L3_64_NOCHEATS), 6: ("70 ", L3_70_NOCHEATS),
+               11: ("71 ", L3_71_NOCHEATS)}
+
+
+def l3_segments(nocheats):
+    """playthrough.L3_SEGMENTS, with L3_NOCHEATS's steps when level 3 has no invincibility."""
+    if not nocheats:
+        return pt.L3_SEGMENTS
+    segs = list(pt.L3_SEGMENTS)
+    for i, (prefix, steps) in L3_NOCHEATS.items():
+        name, rel, _ = segs[i]
+        assert name.startswith(prefix)
+        segs[i] = (name, rel, steps)
+    return segs
+
+
+# ---- level 4 without invincibility (round 14 c1, --cheats-off 4) ----
+# Health on the way (as L3_HEALTH): 100's full health by the level key, 105's full health on its
+# second visit and 103's ultra health by the level exit 7400 (the Cave Totem, then the Blind One).
+L4_HEALTH = {
+    2: [(1075.2, -2451.3, 3123.2, 0.0)],                                   # 100: full health
+    12: [(-5404.5, -2150.5, 216.8, 1.5708)],                               # 105 again: full health
+    13: [(-9594.8, -3684.6, -157.0, 1.5708)],                              # 103 again: ultra health
+}
+
+L4_TOTEM_WEAPON_BEFORE = 600   # the scorpion launcher this long before the Cave Totem's fire window
+
 L4_KEYS = {
     0: [(6758.4, -614.4, 2304.0, 0.0)],                                  # 98: Primagen key 4 (4363)
     9: [(-8652.4, -3634.9, -149.1, 0.0)],                                # 103: level 6 key (4350)
@@ -509,7 +577,15 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.anchors.append((c, 12))
     r.note(c, "12.. the Death Marshes intro cinemas (level 3 route shifted by %d)" % shift)
     l3s = pt.L3_START + shift
-    a3 = level_segments(r, pt.L3_SEGMENTS, l3s, L3_KEYS if extras else {}, anchor=L3_ANCHOR, detours=det.get(3))
+    h3 = health and 3 in r.no_cheats
+    a3 = level_segments(r, l3_segments(3 in r.no_cheats), l3s,
+                        merged(L3_KEYS, L3_HEALTH if h3 else {}) if extras else {}, anchor=L3_ANCHOR, detours=det.get(3))
+    a3x = sum(len(v) for v in L3_HEALTH.values()) * KEY_STEP if h3 and extras else 0
+    for k in hubs:   # round 14 c1: the hub anchors after level 3 move with its health picks
+        if k >= 3:
+            hubs[k] += a3x
+            if k + 1 in r.level_start:
+                r.level_start[k + 1] = hubs[k]
     rel, length, lv = pt.L3_TOTEM
     r.note(l3s + rel + a3, "111 the Marsh Totem: fire taps")
     r.fire.append((l3s + rel + a3, l3s + rel + a3 + length))
@@ -524,10 +600,26 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.anchors.append((c, 18))
     r.note(c, "18.. the Lair of the Blind intro cinemas (level 4 route shifted by %d)" % shift)
     l4s = pt.L4_START + shift
-    a4 = level_segments(r, pt.L4_SEGMENTS, l4s, L4_KEYS if extras else {}, anchor=L4_ANCHOR)
+    h4 = health and 4 in r.no_cheats
+    a4 = level_segments(r, pt.L4_SEGMENTS, l4s, merged(L4_KEYS, L4_HEALTH if h4 else {}) if extras else {},
+                        anchor=L4_ANCHOR)
+    a4x = sum(len(v) for v in L4_HEALTH.values()) * KEY_STEP if h4 and extras else 0
+    for k in hubs:   # round 14 c1: the hub anchors after level 4 move with its health picks
+        if k >= 4:
+            hubs[k] += a4x
+            if k + 1 in r.level_start:
+                r.level_start[k + 1] = hubs[k]
     rel, length, lv = pt.L4_TOTEM
     r.note(l4s + rel + a4, "112 the Cave Totem: fire taps")
     r.fire.append((l4s + rel + a4, l4s + rel + a4 + length))
+    if 4 in r.no_cheats:
+        # round 14 c1: the scorpion launcher (16) for the Cave Totem and the Blind One, the plasma
+        # rifle again from the hub. T2_WEAPON is applied when a level loads (T2_GIVE_WEAPONS), so
+        # the switch is scheduled in 103, before the totem's level loads. The plasma rifle: the
+        # totem 200 damage and a life lost, the Blind One never hurt (hp 12,800/12,800 at the end);
+        # the scorpion launcher: the totem 88 damage, the Blind One dead in 5,200 frames
+        r.weapon.append((l4s + rel + a4 - L4_TOTEM_WEAPON_BEFORE, "16"))
+        r.weapon.append((hubs[4] - 200, "10"))
     r.face_levels.append(lv)
     rel, length, (x, y, z, ry), lv = pt.L4_BOSS
     f = l4s + rel + a4
