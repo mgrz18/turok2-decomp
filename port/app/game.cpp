@@ -14,6 +14,7 @@
 #include <memory>
 
 #include "fast/Fast3dWindow.h"
+#include "t2controls.h"
 #include "fast/interpreter.h"
 #include "fast/backends/gfx_rendering_api.h"
 
@@ -216,7 +217,9 @@ OSMesg sContMsg[1];
 int ContInit(uint8_t* bits) {
     OSContStatus status[MAXCONTROLLERS] = {};
     osCreateMesgQueue(&sContQueue, sContMsg, 1);
-    return osContInit(&sContQueue, bits, status);
+    const int rc = osContInit(&sContQueue, bits, status);
+    T2Controls_AfterContInit(); // the pads present at start, --pad-test's virtual pad
+    return rc;
 }
 
 // --input: scripted input on port 1 for headless runs (debug aid, docs/port/INPUT.md section 3).
@@ -354,10 +357,24 @@ bool ScriptedStick(int8_t* x, int8_t* y) {
     return any;
 }
 
+// T2_PAD_LOG=1 (debug, round 14 c4): port 1's pad as the game receives it, one line per change
+// ("pad: frame F buttons XXXX stick X Y"); =2: every read.
+void PadLog(uint16_t b, int8_t sx, int8_t sy) {
+    static const int level = getenv("T2_PAD_LOG") != nullptr ? atoi(getenv("T2_PAD_LOG")) : 0;
+    static uint32_t last = 0xFFFFFFFFu;
+    const uint32_t cur = (uint32_t)b << 16 | (uint32_t)(uint8_t)sx << 8 | (uint8_t)sy;
+    if (level > 0 && (cur != last || level > 1)) {
+        printf("pad: frame %d buttons %04X stick %d %d\n", sFrame + 1, b, sx, sy);
+        last = cur;
+    }
+}
+
 // LUS's OSContPad carries gyro and right-stick fields (0x24 bytes); the game's is the N64's
 // 6-byte record.
 void ContRead(void* pads) {
     OSContPad lus[MAXCONTROLLERS] = {};
+    T2PadTest_Apply(sFrame + 1); // --pad-test (debug): this frame's scripted device events
+    T2Controls_PollHotplug();     // gamepads plugged in or out
     osContStartReadData(&sContQueue);
     osContGetReadData(lus);
     auto* out = static_cast<uint8_t*>(pads);
@@ -370,7 +387,10 @@ void ContRead(void* pads) {
         memcpy(out + i * 6, &b, 2);
         int8_t sx = (int8_t)lus[i].stick_x, sy = (int8_t)lus[i].stick_y;
         if (i == 0) {
+            T2Controls_Mouse(&b, &sx, &sy); // captured mouse: look, fire, jump
+            memcpy(out, &b, 2);
             ScriptedStick(&sx, &sy);
+            PadLog(b, sx, sy);
         }
         out[i * 6 + 2] = (uint8_t)sx;
         out[i * 6 + 3] = (uint8_t)sy;
@@ -391,6 +411,7 @@ void ContReadHeadless(void* pads) {
     uint16_t b = ScriptedButtons();
     int8_t sx = 0, sy = 0;
     ScriptedStick(&sx, &sy);
+    PadLog(b, sx, sy);
     memcpy(out, &b, 2);
     out[2] = (uint8_t)sx;
     out[3] = (uint8_t)sy;
@@ -502,7 +523,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     const char* testSfx = getenv("T2_TEST_SFX");
     const char* testSong = getenv("T2_TEST_SONG");
     const char* testSpeech = getenv("T2_TEST_SPEECH"); // Sound__PlaySpeech(<group>) at frame 90
-    if (window) {
+    if (window || T2PadTest_Active()) {
         static const T2PortContHooks hooks = { ContInit, ContRead };
         T2Port_SetContHooks(&hooks);
     } else {
@@ -581,6 +602,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     auto sinkStart = BenchClock::time_point{};
     double sinkQueued = 0.0, sinkMin = 1e9, sinkMax = 0.0, sinkProduced = 0.0;
     int sinkUnder = 0;
+    int devMin = 1 << 30, devMax = 0, devSlow = 0, devFast = 0; // the real device's buffer (--pace)
     std::vector<int> sinkUnderVIs;
     auto t0 = std::chrono::steady_clock::now();
     for (int f = 0; f < args.frames && (!window || window->IsRunning()); f++) {
@@ -716,7 +738,11 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             static int16_t pcm[4096 * 2];
             size_t n = T2Audio_TakeSamples(pcm, 4096);
             if (n > 0) {
-                AudioPlayerPlayFrame(reinterpret_cast<const uint8_t*>(pcm), n * 4);
+                // T2_AUDIO_SILENT=1 (debug, round 14 c4): the device gets silence (tests of the
+                // device path that should not be heard); --wav still gets the sound
+                static const bool silent = getenv("T2_AUDIO_SILENT") != nullptr;
+                static int16_t zeros[4096 * 2];
+                AudioPlayerPlayFrame(reinterpret_cast<const uint8_t*>(silent ? zeros : pcm), n * 4);
             }
             if (args.pace && (n > 0 || sinkOn)) {
                 const auto now = BenchClock::now();
@@ -853,6 +879,22 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
                 paceSleptMs += Ms(paceNext - now);
                 std::this_thread::sleep_until(paceNext);
                 paceNext += viPeriod;
+                if (args.audioDevice && sinkOn) {
+                    // a real sound device (round 14 c4): the VI clock follows its buffer, so the
+                    // host's 60 Hz and the device's 22,050 Hz cannot drift apart (a long session
+                    // would overflow or starve LUS's 6,000-frame ring). At most +-1 ms per VI.
+                    const int buffered = AudioPlayerBuffered();
+                    const int desired = std::max(AudioPlayerGetDesiredBuffered(), 1470);
+                    devMin = std::min(devMin, buffered);
+                    devMax = std::max(devMax, buffered);
+                    if (buffered > desired + 735) {
+                        paceNext += std::chrono::milliseconds(1);
+                        devSlow++;
+                    } else if (buffered < desired - 735) {
+                        paceNext -= std::chrono::milliseconds(1);
+                        devFast++;
+                    }
+                }
             } else {
                 paceLate++;
                 paceWorstLateMs = std::max(paceWorstLateMs, Ms(now - paceNext));
@@ -956,6 +998,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
                 printf(" %d", v);
             }
             printf("\n");
+        }
+        if (args.audioDevice) {
+            printf("pace: sound device buffer min %d max %d frames; VI clock slowed %d, sped up %d times\n",
+                   devMin == (1 << 30) ? 0 : devMin, devMax, devSlow, devFast);
         }
     }
     T2PifStats pif;
