@@ -363,6 +363,19 @@ L6_PRIMAGEN_HOP = 34800    # relative: T2_WARP_TO=7602 from the hub (54,000)
 L6_END = 90000             # relative: the end of the held fire
 
 
+def lair_strafe(first, last, period=80):
+    """round 14 C29: strafe left and right in the Primagen's lair (C-left / C-right, half a period each).
+    His home waits (Primagen_UpdateMode19, stages 2 and 3) end only when his own target search sees the
+    player, and from his home (0, 937, ~2,915) the line of sight from the floor grazes the lair's back
+    structure (static object 1911): a player standing still can stay hidden for good (the wait never
+    ends, PLAYTHROUGH.md 21). A player who keeps moving crosses the spots that see him."""
+    out = []
+    for f in range(first, last, period):
+        out.append("CL@%d..%d" % (f, f + period // 2 - 1))
+        out.append("CR@%d..%d" % (f + period // 2, f + period - 1))
+    return out
+
+
 def build_level56(level, new_game, fire_every):
     """The --input lines, the T2_TELEPORT entries and the env lines for level 5 or 6."""
     portal, start, segs, hops = ((L5_PORTAL, L5_START, L5_SEGMENTS, L5_HOPS) if level == 5 else
@@ -422,8 +435,10 @@ def build_level56(level, new_game, fire_every):
         inputs += ["# 114 after the Mother: the pad 7601 by the start -> the hub", "CU@%d..%d" % (start + rel + 10, start + rel + 130)]
         tps.append("%d:%.1f,%.1f,%.1f,%.4f" % (start + rel, x, y, z, ry))
         env[0] += ",7602@%d" % (start + L6_PRIMAGEN_HOP)
+        inputs += ["# 4 the Primagen: strafing (his home waits need a sight line, round 14 C29)"]
+        inputs += lair_strafe(start + L6_PRIMAGEN_HOP + 2000, start + L6_END)
         env[env.index("T2_FILL_AMMO=300")] = "T2_FILL_AMMO=600"
-        env += ["T2_AIM_NODE=boss@3/4", "T2_BOSS_FRONT=450", "T2_BOSS_LOG=1"]
+        env += ["T2_AIM_NODE=boss@3/4", "T2_BOSS_FRONT=450,3000,2.5,1", "T2_BOSS_LOG=1"]
     if aim_at:
         env.append("T2_AIM_AT=\"%s\"" % ";".join(aim_at))
     if aim_enemy:

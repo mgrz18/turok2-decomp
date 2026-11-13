@@ -769,10 +769,13 @@ def level6(r, t):
         # round 14 c2: the Primagen invincible in a --cheats-off 6 run (--cheats-on 4): ~280 damage and
         # a life lost in a rescue run (the ending's own life loss at his death is not this)
         r.cheat_windows.append((lair - 200, lair + L6_HUB_END))
-    r.note(lair, "4 the Primagen's lair: fire held, T2_BOSS_FRONT=450,600,2.5,1")
-    # the spot cycles (",K,1": another one each 600 frames of a lair wait that does not end)
-    r.boss_front.append((lair - 100, "450,600,2.5,1"))
+    r.note(lair, "4 the Primagen's lair: fire held, strafing, T2_BOSS_FRONT=450,3000,2.5,1")
+    # the spot cycles (",K,1": another one each 3,000 frames of a lair wait that does not end; round 14 C29:
+    # 600 -> 3,000: the strafing by the lair start (lair_strafe) ends his home waits, the front spots do not)
+    r.boss_front.append((lair - 100, "450,3000,2.5,1"))
     r.inputs.append("Z@%d..%d" % (lair + 200, lair + L6_HUB_END))
+    # round 14 C29: strafing until his death (his home waits need a sight line: routes56.lair_strafe)
+    r.inputs += r56.lair_strafe(lair + 200, lair + L6_HUB_END - 18000)
     end = lair + L6_HUB_END
     r.note(end - 21000, "the Primagen dead (~30,000 after his lair): the ending cinema, then the credits")
     r.note(end, "60 the hub (after the credits)")
