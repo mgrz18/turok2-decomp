@@ -473,6 +473,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     for lv in (2, 3, 4, 5):
         r.level_start[lv] = hubs[lv - 1]
     r.saves_at = []
+    r.health = health
     # the health pickups only in the levels played without invincibility (with it the route stays
     # round 12's: the picks move every later step, and the Primagen's lair wait depends on the timing)
     arrival, added = level1(r, health=health and 1 in r.no_cheats)
@@ -585,6 +586,10 @@ def level5(r, t):
     """t: the frame the hub portal 5000 warps (hub(..., go=5))."""
     s = t + WARP_TO_START[5]
     segs, add = r56.l5_with_primagen_key()
+    if 5 in r.no_cheats and getattr(r, "health", True):
+        # round 14 c2: the ultra healths of 92 and 95 (every later step moves by the time added)
+        segs, more = r56.with_items(segs, r56.L5_HEALTH)
+        add += more
     r.anchors.append((s - LOAD_EARLY, 124))
     r.note(s - LOAD_EARLY, "124.. the Hive of the Mantids (level 5 route from %d, + the 92 detour)" % s)
     r.weapon.append((t, "9"))       # the shredder (the cocoons; a1's route)
@@ -622,6 +627,10 @@ def level6(r, t):
     r.inputs += ["Z@%d..%d" % (m + 800, m + L6_BACK_114), "CL@%d..%d" % (m + 5800, m + 15000)]
     r.inputs += ["CD@%d..%d" % (f, f + 250) for f in range(m + 5800, s + r56.L6_MOTHER_END + add, 600)]
     back = m + L6_BACK_114
+    if 3 in r.cheats_on:
+        # round 14 c2: the Mother invincible in a --cheats-off 6 run (--cheats-on 3): she costs ~250-330
+        # health in rescue runs (her 10-damage hits from ~1,240 units), more than the 200 the route has
+        r.cheat_windows.append((m - 200, back))
     r.anchors.append((back, "114/60"))
     _, x, y, z, ry = r56.L6_EXIT
     r.note(back, "114 again after the Mother (her death warps 6999), or the hub straight (anchor 114/60)")
@@ -642,6 +651,10 @@ def level6(r, t):
     # the cinema it only puts the player back on the lair's start, where he already stands
     r.warps.append((lair + 150, 7602))
     r.anchors.append((lair, 4))
+    if 4 in r.cheats_on:
+        # round 14 c2: the Primagen invincible in a --cheats-off 6 run (--cheats-on 4): ~280 damage and
+        # a life lost in a rescue run (the ending's own life loss at his death is not this)
+        r.cheat_windows.append((lair - 200, lair + L6_HUB_END))
     r.note(lair, "4 the Primagen's lair: fire held, T2_BOSS_FRONT=450,600,2.5,1")
     # the spot cycles (",K,1": another one each 600 frames of a lair wait that does not end)
     r.boss_front.append((lair - 100, "450,600,2.5,1"))
@@ -667,7 +680,8 @@ def cli(argv=None):
     ap.add_argument("--hub", action="append", default=[], help="N=FRAME: the hub arrival after level N")
     ap.add_argument("--cheats-off", default="", help="L1,L2,...: the levels played without T2_CHEATS invincibility (round 13 b5)")
     ap.add_argument("--env", action="append", default=[], help="K=V: one more line for teleport.env (e.g. T2_HURT_LOG=1)")
-    ap.add_argument("--cheats-on", default="", help="110: the City Totem invincible even in a --cheats-off level (round 13 b5)")
+    ap.add_argument("--cheats-on", default="", help="110: the City Totem invincible even in a --cheats-off level (round 13 b5); "
+                    "3 / 4: the Mother / the Primagen in a --cheats-off 6 run (round 14 c2)")
     ap.add_argument("--no-health", action="store_true", help="skip the health pickups (round 13 b5)")
     ap.add_argument("--talismans", nargs="?", const="2,3", default="",
                     help="the talisman chambers of these levels (default 2,3; round 13 b3)")

@@ -292,6 +292,29 @@ play mode, settings, saves, logs, controls, a first-run checklist). Mac only, al
   vsync + `--pace`, mouse feel); a self-contained bundle (Homebrew dylibs today); the game
   crashes at boot without the ROM (play mode refuses to start instead).
 
+## Round 14, part c2: levels 5 and 6 without invincibility (branch names-R14_c2)
+
+`playthrough.py RUN --all --talismans 2 --cheats-off 1,2,5,6 --cheats-on 110,3,4` (Linux, headless,
+PIE, `T2_HURT_LOG=1`, 290,000 frames) plays the good ending with **0 deaths in levels 1, 2, 5 and
+6** (two runs identical; PLAYTHROUGH.md section 17). The level-6 deaths were route bugs: approaches
+that ended in damage pools (115, 116, 119) or in 123's laser beam. These are fixed in
+`routes56.py`, together with health pickups (95's ultra health, two of 114's before the Mother).
+Still invincible: the Mother and the Primagen (`--cheats-on 3,4`: ~300 and ~280 damage, more than
+the 200 health the route has) and the City Totem (110: 2 lives lost; no health is reachable
+between sister 3 and the totem). No host bug was found: the pool hits come in pairs because
+`CPlayer__Update` calls `AI_UpdateRegionFlags` twice per frame, and that is matching code.
+
+Merge notes: only `tools/port/routes56.py` (level-5 health, L6_ITEMS, `_couplings(escape=)`) and
+`tools/port/fullrun.py` (`r.health`; `level5` health; `level6` cheat windows; `--cheats-on` help).
+c3 also edits `level6()` (the Primagen/hub part): my lines are the two `cheat_windows` blocks.
+L6_ITEMS[14] now picks 2 ultra healths before Primagen key 6 (+300 frames before the Mother,
+taken up by the anchors). `--level 6` (build_level56) is unchanged except the shared
+`L6_SEGMENTS` coupling steps in 119 (shorter walk, escape teleports).
+
+Next: the Mother without invincibility (compare her 10-damage ranged hit with the N64; try
+other cover in her arena); ride the 504 platforms to 119's couplings instead of the air starts
+and escapes; health for the City Totem (a reachable pickup, or 135's ultra health later).
+
 ## Round 13, part b4: the whole game on macOS, a release build, how to play (branch names-R13_b4)
 
 Details: [MACOS.md](MACOS.md) section 15, [QUICKSTART.md](QUICKSTART.md) (new).
