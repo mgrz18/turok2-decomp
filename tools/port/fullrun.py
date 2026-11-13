@@ -470,19 +470,22 @@ PRIMAGEN_SLOTS = {1: (71.0, 0.0, 183.0),     # actor 4  (object 154), item 4360
                   4: (-119.0, 0.0, -71.0),   # actor 7  (object 161), item 4363
                   5: (36.7, 0.0, -84.5),     # actor 6  (object 159), item 4364
                   6: (133.2, 0.0, 38.0)}     # actor 5  (object 158), item 4365
-# Keys 2 and 3 are picked up in levels 2 and 3 but go into their slots only in the hub visit after
+# Round 14 c3: keys 2 and 3 are picked up in levels 2 and 3 but went into their slots only in the hub visit after
 # level 5 (with key 5). Put in on the visits after levels 2 and 3, they changed the totem fights that
 # follow (the Marsh Totem 7/8 -> 4/8 kills: lost; the defences are marginal, and any change of the
 # game state before them moves their kills; see PLAYTHROUGH.md 20). Those two visits keep round 13's
 # walks instead (ROUND13_BUMP: they bump the slots of keys 6 and 5, "Primagen key N required"), so
 # levels 1-5 play exactly as in round 13; the real order is only a schedule choice of this route.
-PRIMAGEN_LATE = (2, 3)
+# Round 14 C29: the natural order is the default again (PRIMAGEN_LATE = ()): with the round-14 routes of
+# levels 3-6 the totem defences are won with keys 2 and 3 in on time (two runs, all five totems, END 2).
+# --late-keys brings back c3's late insertion and ROUND13_BUMP.
+PRIMAGEN_LATE = ()
 ROUND13_BUMP = {2: (71.0, 0.0, 183.0, -0.4040), 3: (133.0, 0.0, 38.0, 0.6620)}
 
 
 def key_visit(k):
-    """The hub visit after level k (2 or 3): its Primagen key in its own slot (--natural-keys, round 14
-    C29), or round 13's walk (ROUND13_BUMP) with the key put in after level 5 (PRIMAGEN_LATE)."""
+    """The hub visit after level k (2 or 3): its Primagen key in its own slot (round 14
+    C29, the default), or round 13's walk (ROUND13_BUMP) with the key put in after level 5 (--late-keys)."""
     if k in PRIMAGEN_LATE:
         return {"bump": ROUND13_BUMP[k]}
     return {"primagen": (k,)}
@@ -732,7 +735,7 @@ def level5(r, t):
     r.level_start[6] = hub_at
     r.note(hub_at, "60 the hub (after level 5)")
     r.anchors.append((hub_at, 60))
-    # round 14 c3: Primagen keys 2 and 3 go in here, with key 5 (PRIMAGEN_LATE)
+    # round 14 c3: with --late-keys, Primagen keys 2 and 3 go in here, with key 5 (PRIMAGEN_LATE)
     return hub(r, hub_at, primagen=PRIMAGEN_LATE + (5,), go=6)   # a save, the keys, the level-6 door and portal
 
 
@@ -811,14 +814,14 @@ def cli(argv=None):
     ap.add_argument("--talismans", nargs="?", const="2,3", default="",
                     help="the talisman chambers of these levels (default 2,3; round 13 b3)")
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
-    ap.add_argument("--natural-keys", action="store_true",
-                    help="Primagen keys 2 and 3 into their slots on the hub visits after levels 2 and 3 (round 14 C29)")
+    ap.add_argument("--late-keys", action="store_true",
+                    help="Primagen keys 2 and 3 in after level 5, round 13's walks after levels 2 and 3 (round 14 c3)")
     ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
     a = ap.parse_args(argv)
     L6_SLOT_AFTER = a.slot
     HOP = a.hop
-    if a.natural_keys:
-        PRIMAGEN_LATE = ()
+    if a.late_keys:
+        PRIMAGEN_LATE = (2, 3)
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},
              [int(x) for x in a.cheats_off.split(",") if x], a.env, not a.no_health,
              [int(x) for x in a.cheats_on.split(",") if x], [int(v) for v in a.talismans.split(",") if v])
