@@ -1076,3 +1076,18 @@ Points a player needs to know:
   (WASD + arrows, Z fire, R jump).
 
 ### 15.5 Soak on the Mac (lldb, 4 jobs, Debug)
+
+`tools/port/soak.py --debugger lldb --jobs 4` did not work this round. Each game process stayed
+at 0% CPU under `debugserver` from launch until the 600 s timeout, and soak.py classed all 4
+new-game runs as `HANG`. The same `cmd.sh` without lldb finishes in 2-3 s, and a single
+foreground `lldb -b -o run` worked earlier in the round (the b4-1 backtrace). So this is the
+debugger launch under soak.py on this Mac, not the game. The runs were then made from the
+generated `cmd.sh` files without a debugger (Debug, after b4-2): new game seeds 0-3 x 36,000 and
+levels seeds 0-3 x 25,000 (16 level ids). **8 runs, 244,000 frames, all exit 0.** Next: find why
+lldb stalls when soak.py starts it (stdin/tty or `--setsid`), then rerun the round-12 size (49 runs).
+
+### 15.6 Open on the Mac
+
+- The uninitialized local behind b4-2 (zero-init hides it everywhere).
+- `soak.py` under lldb (15.5).
+- A windowed run with a real gamepad (QUICKSTART.md, 15.4).
