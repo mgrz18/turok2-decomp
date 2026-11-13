@@ -1501,3 +1501,106 @@ portal cinema (43) does not fire and the hop stays.
 - `--level 6` on its own no longer kills the Primagen: the run equals round 12's up to the Mother,
   but after the hop (54,000) his stage-2 lair wait (resting at z 2,906) does not end; other hop frames
   (53,700-57,000) and the spot cycle did not help. The whole-game run and the boss recipe kill him.
+
+## 17. The Primagen's real entrance, `--level 6` alone, Adon's chamber (Phase 7 round 14, part c3)
+
+### 17.1 Each Primagen key slot takes one key
+
+Round 13 read the six Primagen key slots as interchangeable and walked them in ring order. They
+are not. Each slot is an action (type 10) whose `m_GoPickupNeeded` is one key, read in the hub with
+gdb (`((PickupDef *) actor->header.m_pIntelligence)->info.item`, the same field
+`Action_CheckRequiredItem` tests):
+
+| key | item | slot actor (level 60) | object | position (x, z) | message without the key |
+|---|---|---|---|---|---|
+| 1 | 4360 | 4 | 154 | (70.7, 182.9) | 43 |
+| 2 | 4361 | 11 | 291 | (-85.7, 202.8) | 44 |
+| 3 | 4362 | 12 | 292 | (-184.9, 72.6) | 45 |
+| 4 | 4363 | 7 | 161 | (-119.3, -71.3) | 46 |
+| 5 | 4364 | 6 | 159 | (36.7, -84.5) | 47 |
+| 6 | 4365 | 5 | 158 | (133.2, 38.0) | 48 |
+
+How a slot works: the slot is solid. When the player runs into it, `CPlayer__Update` calls
+`GameObject_FireTriggers(slot, 2)`. The slot's record with mask 2 (kind 10, handler 1) goes through
+`LevelEvent_CheckRequiredItem` and `Action_CheckRequiredItem`. With the slot's own key in hand, the
+key is used, the slot's handler-8 record turns its collision off, and its kind-9 record (key 75,
+level 43) counts towards the hub portal cinema. Without that key, the check returns 0: the game
+shows "Primagen key N required" and the slot stays solid. The player then slides round it at the
+collision radius (about 91). That slide was round 13's "deflection round the ring": its walks for
+keys 2 and 3 went to the slots of keys 6 and 5. The real cause was found with gdb on
+`LevelEvent_ProcessTriggers` and `Action_CheckRequiredItem` (`info->item` 4365 at the slot round 13
+called slot 2). `CScene__CheckAutoActivation`'s radius test plays no part here: the slots are not
+on the flagged list (instance flags 1, not 2).
+
+Check (a new game, `T2_WARP_TO=1999`, the six keys given, one walk per slot from 90 outside): all
+six slot events, then the six kind-9 records together at 14,473, level 43 (the hub portal cinema)
+from 14,495, and the Primagen's lair (level 4) at 15,603.
+
+### 17.2 The whole-game run enters by the hub portal
+
+`fullrun.py`: `PRIMAGEN_SLOTS[k]` is now key k's slot, and `primagen_slot()` walks into it from 90
+units outside, on the line from the plaza's origin. The 7602 hop is gone. `--hop` brings it back
+(DEBUG-ONLY, for a run whose six keys are not all in). Keys 2 and 3 go in on the hub visit after
+level 5, together with key 5.
+
+The first try put keys 2 and 3 in on the visits right after levels 2 and 3. That changed the totem
+defences that follow: the Marsh Totem fell from 7/8 to 4/8 kills and was lost, so the run got the
+other ending (cinema 371). The defences are marginal, and any change in the game state before them
+changes their kills. All five totems are fought before the visit after level 5. So the visits
+after levels 2 and 3 now keep round 13's walks (`ROUND13_BUMP`: they bump the slots of keys 6 and
+5, which only shows the "required" message), and levels 1 to 5 play exactly as in round 13. The
+teleport and input lists are identical to round 13's up to frame 181,530.
+
+Runs (Linux headless PIE, `playthrough.py RUN --all --talismans 2 --cheats-off 1,2 --cheats-on 110`):
+
+- With keys 2 and 3 in early (first try): the slot events were key 1 at 26,650, key 2 at 88,344,
+  key 3 at 112,515, key 4 at 143,685, key 5 at 177,088 and **key 6 at 222,948**. Then **the hub
+  portal cinema 43 at 223,007**, level 43, **the lair at 224,937** and **the Primagen dead at
+  248,060**, with no `T2_WARP_TO`. But the Marsh Totem was lost (4/8), which gave cinema 371 and
+  END 1b.
+- With keys 2 and 3 late (`ROUND13_BUMP`): all five totems were won (as in round 13), and keys 1-5
+  were in by 176,617. Key 6 went in at 220,591, followed by cinema 43, level 43 at 221,771 and the
+  lair at 222,579. **The Primagen did not die**: he rested at z 2,907.7 in his stage-3 lair wait,
+  and the wait never ended (section 17.3). `--slot 1500` does not help:
+  the corridor walk (C-up until 50 frames before the slot) then runs on into the level-1 portal,
+  and the run is in level 51 by 221,000.
+
+### 17.3 `--level 6` alone: the regression is round 13 b2, and the lair wait at z ~2,906
+
+Bisect (`--level 6` built at each merge of round 13, 100,000 frames): **b4 (45570c74) kills him**
+(the credits by 100,000). **b2 (46cd78dc) does not**. b2 restores fired level events when a level
+loads (`CScene__RestoreFiredEvent` and the four record walkers, by member of CScene). That code
+follows the N64 code, and its `Entity` bytes 0xF/0x13 (flag, index) match the host record layout.
+The runs are identical up to the Mother (her death at 48,847 in both) and the hub. They diverge in
+the lair: the boss's first mode change comes at 54,698 instead of 54,774. Most likely the restore
+on 114's second visit (50,387: "force field down." and the other fired records, replayed under
+`Cinema_Disable`) changes the state the lair fight starts from. This is a legitimate change, not a
+port bug.
+
+Where it ends: the Primagen's mode-25 wait (`Primagen_UpdateMode19`, state 3) ends when
+`AI_UpdateTargets` returns a sight target **and** he is within 50 (x-z) of `dest` (0, 588.8,
+2918.4). In the stuck runs he oscillates between z 2,906.3 and 2,922.9 frame by frame (the 500/s
+step overshoots `dest`; the state lines sample 2,906), so the distance test passes. **The sight
+target stays NULL.** From his z ~2,906:
+
+- a `T2_BOSS_FRONT_SCAN` grid (player moved for one `AI_FindBestTarget` each) shows that only
+  floor spots with z >= 2,150 see him;
+- `T2_BOSS_FRONT`'s spots (z 1,556-2,006) never do, and nor does the cycle (`,600,2.5,1`);
+- placing the player at (450, 0, 2,186) (`450,600,1.6`): the probe sees him. But in gdb,
+  `Primagen_UpdateMode19`'s own `t.m_Sight.m_pTarget` stays NULL for 30 frames after the move.
+  A direct `AI_FindBestTarget(obj, ai, 1, 0)` called from gdb at that point, with and without
+  0x8000, also returns NULL. `T2_BOSS_FRONT_PROBE`'s call, at another point of the same frames,
+  returns the player. So the search's result depends on where in the frame it runs (the player's
+  state between the debug placement and the AI update). Open: compare with the N64 lair.
+
+So `--level 6` and the whole-game run's late-key variant both stop on this wait.
+
+### 17.4 Adon's chamber (72)
+
+Not a stall. Walking in from the warp (`T2_WARP_TO=1001`, C-up 13,300-13,700) plays her scene
+(kind-9 events 13,371-15,119). The scene holds the player at (0, 0, -622) until about 16,300 (C-up
+from 15,400 only moves him from about 16,200). After that he is free, but there is nowhere to go
+ahead: the chamber's door (actor 8, z 467) has no event and never opens. The way out is back, into
+the entrance pad (regions 243/244, region info 2: warp 1002), which leads to 55 (2,965, 348,
+-4,179) at 16,600. `extras.py OUT --adon` plays it: new game, the warp, C-up 13,300-13,700, C-down
+16,400-17,000, level 55 by 16,600.

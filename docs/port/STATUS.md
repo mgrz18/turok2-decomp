@@ -217,6 +217,43 @@ Fixes and additions on the merged tree (asm_diff 0):
 7. **Windowed play with a real gamepad** (QUICKSTART.md documents it; only headless runs so far).
 8. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
 
+## Round 14, part c3: the Primagen's real entrance, `--level 6`, Adon's chamber (branch names-R14_c3)
+
+Tools only: `tools/port/fullrun.py` (the Primagen and hub parts) and `tools/port/extras.py`
+(`--adon`). No `src/`, `include/` or archive change. Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md)
+section 17.
+
+- **Primagen keys 2 and 3 found: each slot takes ONE key.** Slot actor 4 takes key 1, 11 key 2,
+  12 key 3, 7 key 4, 6 key 5 and 5 key 6 (`m_GoPickupNeeded`, read with gdb). Round 13 walked keys
+  2 and 3 to the slots of keys 6 and 5. A slot touched without its key says "Primagen key N
+  required" and stays solid, and the walk slid round it (the "deflection"). With the right slots,
+  **all six keys go in, the hub portal cinema 43 plays, and the run reaches the Primagen's lair
+  without `T2_WARP_TO=7602`**. Run with keys 2 and 3 put in on the visits after levels 2 and 3: key
+  6 at 222,948, cinema 43 at 223,007, the lair at 224,937, **the Primagen dead at 248,060**. But
+  that change of order lost the Marsh Totem (7/8 -> 4/8 kills: the defences are marginal), so the
+  ending was END 1b. The committed route therefore puts keys 2 and 3 in after level 5, and the visits
+  after levels 2 and 3 keep round 13's walks (`ROUND13_BUMP`): levels 1-5 are input-identical to
+  round 13, and all five totems are won. `--hop` (DEBUG-ONLY) keeps the old hop.
+- **Open: the Primagen's lair wait at z ~2,906.** In the committed route (and in `--level 6`) he
+  rests where his wait never ends: he oscillates round `dest` (z 2,906/2,923), but
+  `Primagen_UpdateMode19`'s sight target stays NULL whatever floor spot `T2_BOSS_FRONT` uses.
+  The committed route therefore ends at the lair (all five totems won, every boss but the
+  Primagen). For the good ending as in round 13 add `--hop`. The cinema still plays, and the hop
+  reloads the lair 150 frames after it (not yet verified in a whole run this round).
+- **`--level 6` regression bisected to round 13 b2** (46cd78dc: fired events restored when a level
+  loads; b4 45570c74 still kills him). b2's code matches the N64 code. The runs diverge at the
+  start of the lair fight (the first boss mode change at 54,698 instead of 54,774), and he then
+  comes to rest at z 2,906. Not a port bug to revert. The fix is the open lair wait above.
+- **Adon's chamber (72) is not a stall**: her scene holds the player for about 3,000 frames; then
+  the way out is back into the entrance pad (warp 1002 -> 55). The door ahead (actor 8) never
+  opens. `extras.py OUT --adon` plays it (level 55 by 16,600).
+
+Merge notes: `fullrun.py` `PRIMAGEN_SLOTS`, `primagen_slot()`, `hub(..., bump=)`, `PRIMAGEN_LATE`,
+`ROUND13_BUMP`, `HOP` and `level5()`'s and `level6()`'s Primagen lines. c1 and c2 change levels
+3-6. Once their routes change the totem levels anyway, set `PRIMAGEN_LATE = ()`, pass
+`primagen=(2,)`/`(3,)` to the visits after levels 2 and 3 and drop `ROUND13_BUMP`: that is the
+natural order.
+
 ## Round 13, part b4: the whole game on macOS, a release build, how to play (branch names-R13_b4)
 
 Details: [MACOS.md](MACOS.md) section 15, [QUICKSTART.md](QUICKSTART.md) (new).
