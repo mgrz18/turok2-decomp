@@ -982,3 +982,112 @@ Soak (`OUT/r12/soak.sh`, lldb, 4 jobs, no `--draw`): new game seeds 0-7 x 36,000
 - A windowed run with a real gamepad (section 12.6; still headless only).
 - Levels 5/6 (a1/a2) and the continuous playthrough (a3) of round 12: rerun `dets.sh` on the
   merged tree (add their scenarios to `scen.sh`).
+
+## 15. Round 13 (part b4): the whole game on the Mac, a release build, how to play
+
+Branch `names-R13_b4` (from 324bae6b). The box's ELF is unchanged (sha1 `61dcdf3f…`). The Mac uses
+the box's archive (`OUT/turok2_a9d.o2r`, sha1 `a9d14a47…`). An archive built on the Mac
+(`mkarchive.py`, Python's zlib 1.2.12) has the sha1 `83710b56…`, and `archive_check.py` says OK:
+only the deflate streams differ (section 3). Linux runs for comparison: this branch built in
+`/root/R13_b4mac/out` (Debug, PIE, LUS from the coordinator's checkout; `/root/R13_b4mac/build.sh
+[gen]`). Scripts in `OUT/r13/` (the same files on the box in `/root/R13_b4mac/r13/`):
+
+- `scen.sh`: the round-12 scenarios, plus `all` (`playthrough.py --all`, 266,000 frames, an empty
+  `--pak-dir`) and `play5`/`play6`. A prefix before `_` names the run (`d_all`, `rd_all`).
+- `run.sh`, `dets.sh`, `battery.sh`: as in round 12.
+- `allwin.sh NAME FRAMES`: the `--all` route with extra env, for windows such as `T2_DET_FROM`.
+- `detcmp.py A B`: the first and last differing det frames, and the fields that differ.
+- `lvseq.sh LOG`: the level sequence of a det log.
+- `timed.sh NAME CMD`: the wall time and max RSS.
+- `sync.sh [gen]`: applies `git diff 324bae6b` to the box copy and rebuilds there.
+
+### 15.1 Fixes
+
+| # | symptom | cause | fix |
+|---|---|---|---|
+| b4-1 | **macOS: SIGSEGV at frame 143,198 of the whole-game run** (level 124, the first turret), in `CMtxF__RotateX` from `Turret_Effects` | `Turret_Effects` (one of a5's 4 unresolved views) read the pose context at N64 offsets. Its `value` at 0x90 falls inside the host `T2PoseContext.blendKeys`: uninitialized stack, compared with `m_GunNode`/`m_RotNode`. When it matched, the call went through the s32 shim `CMtxF__RotateX_i`, which truncates the matrix pointer (`sPoseMtx`, a static above 4 GB). Linux had not matched by luck | a host body (func_00262B58.c, `#ifdef TARGET_PORT`): the bone is `ctx->bone`, the owner `ctx->obj` (structs/pose_host.h), and the float `CMtxF__RotateX` is called directly (the `__asm__` label pattern of func_0025E4B8.c). asm_diff: 0. b5 fixed the same function on names-R13_b5: keep one of the two |
+| b4-2 | **Mac != Linux in level 135** (the second sister of despair): from frame 71,469 of `--all` (52,458 of `--level 2`), first a particle 0.7 units off, then the player's aim (det `ptcl` and `rot`; it converges after ~5,300 frames). **The Mac `-O2` build stopped finishing the game**: it diverged from Debug at 95,494 (level 64) and never killed the Primagen | locals read before they are written. The value depended on the host, the optimisation level and **the code layout**: a Linux build with only `printf`s added, or the same objects relinked in another order, gave the Mac's trace. `-ftrivial-auto-var-init=pattern` or `=zero` gave the Mac's trace on Linux too, and Mac Debug zero = pattern = the default. The variable itself was not found (no valgrind on the box) | `-ftrivial-auto-var-init=zero` in `t2_game_flags` (port/cmake/game.cmake, port-only). **Linux's traces change** in level 135 (they now match the Mac). The boot and the demos are unchanged (= round 12, so = the N64 where they matched before) |
+
+### 15.2 Mac = Linux, frame for frame (`T2_DET_LOG=1`, after b4-2; headless, exit 0)
+
+| run | det lines | differ |
+|---|---|---|
+| **the whole game** (`--all`: new game -> levels 1-6 -> the Primagen -> ending -> credits -> hub) | 532,000 | **0** |
+| boot + the 3 demos / level 1 / level 2 / level 3 / level 4 | 52,000 / 54,000 / 128,000 / 72,000 / 92,000 | 0 |
+| **level 5** / **level 6** | 96,000 / 224,000 | 0 |
+| the Mother / the Blind One / the Mantid Queen / the Primagen | 72,000 / 50,000 / 60,000 / 124,000 | 0 |
+| save / load | 28,200 / 13,000 | 0 |
+
+The level sequence of `--all` is the same on both hosts: 1 -> the hub -> levels 2-6 -> 3, 4, 11, 10
+(the ending) -> the hub at 260,928. The Mac `-O2` build gives the same 532,000 det lines as the
+Mac Debug build. The boot and level 1 are also equal to round 12's Mac runs.
+
+With pixels (`battery.sh`, `--offscreen-gl`, 0 dlcheck reports, exit 0): `all`, `play5`, `play6`,
+the 4 bosses, the boot, save/load. `--audio --wav` (9,000 frames): 150.17 s, peak 32,768,
+**RMS 3,399.5** (= round 12). Screenshots checked by eye, not committed:
+
+- level 124 at 144,000, the turret room: the shredder, health 100;
+- the credits ("RYAN WICKERHAM AS THE PRIMAGEN ...") at 252,003;
+- the hub at 266,000.
+
+### 15.3 A release build on the Mac (`-O2`, PIE)
+
+```sh
+cmake -S port -B OUT/build_rel13 -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG" -DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG"
+ninja -C OUT/build_rel13 turok2_game t2runtime t2audio
+.venv/bin/python -I tools/port/gendata.py --build OUT/build_rel13 --cache OUT/decls_rel13.json -j 8
+cmake OUT/build_rel13 && ninja -C OUT/build_rel13 turok2
+```
+
+The whole configure and build takes 60 s on the M5. The result is a Mach-O arm64 `PIE` of 5.6 MB.
+The game files compile with `-O2 -ffp-contract=off -ftrivial-auto-var-init=zero`.
+
+| measure (Apple M5, macOS 27) | Release | Debug |
+|---|---|---|
+| **the whole game** (`--all`, 266,000 VIs, new game -> credits -> hub), headless, no pixels (`--no-window`, `T2_DET_LOG=1`) | **26.3 s** wall (10,100 VI/s, 169x real time), max RSS 111 MB | 46 s |
+| the same with pixels (`--offscreen-gl --draw`, Fast3D + glFinish every drawn frame) | **55.4 s** wall (4,800 VI/s, 80x real time), max RSS 185 MB | - |
+| **level 1 paced** (`--pace --audio --offscreen-gl --bench 13000`, 27,000 VIs, the totem and the hub) | 450.09 s for 450.00. **48 late VIs, 15 by 1 ms or more, 5 in gameplay** (from VI 13,000). Worst in gameplay: 1.9 ms (VI 20,051). Worst of the run: 17.8 ms (VI 1, the start) | round 10: 48 late, 12 in gameplay, worst 16.3 ms |
+| per VI in gameplay (paced) | game 0.19 ms, audio 0.18 ms, draw 1.18 ms, total **1.58 ms** (p99 3.7) of the 16.7 ms budget. A drawn frame every 33.33 ms (p99 39.7): 30 fps as on the N64. The process sleeps 67% of the time | total 2.63 ms (round 10) |
+| audio (simulated 22,050 Hz device) | **0 underruns**, buffer 1,475-14,355 frames | 1 underrun (round 10) |
+| memory (paced level 1, with audio and pixels) | max RSS **200 MB**, peak footprint 251 MB | |
+
+The whole game ends in the same state in Release and in Debug (532,000 det lines, 0 differ). The
+large late VIs are all loads (VIs 1-4,856: the boot and the title). The 5 in gameplay are 1.5-1.9
+ms late. The Mac has about 10x headroom in gameplay.
+
+### 15.4 How a human would play it on the Mac (not run: no windows this round)
+
+[QUICKSTART.md](QUICKSTART.md) has the short version. In brief:
+
+- build the Release above;
+- the archive `OUT/turok2.o2r` comes from your ROM (`mkarchive.py`);
+- run `OUT/build_rel13/app/turok2 --archive OUT/turok2.o2r --rom baserom.us.z64 --game --draw
+  --audio --pace --frames 100000000`, without `--no-window`/`--offscreen-gl`.
+
+Points a player needs to know:
+
+- **`--frames` defaults to 3** (a test value), so give it a large number. Closing the window also
+  ends the run.
+- Without `--pace` the game runs as fast as the host allows (10x the N64 on the M5).
+- The pak file goes to `~/Library/Application Support/turok2/turok2_pak1.mpk` when there is no
+  `--pak-dir`.
+- The controls are those of section 12.6: a pad as a twin-stick layout, or the keyboard
+  (WASD + arrows, Z fire, R jump).
+
+### 15.5 Soak on the Mac (lldb, 4 jobs, Debug)
+
+`tools/port/soak.py --debugger lldb --jobs 4` did not work this round. Each game process stayed
+at 0% CPU under `debugserver` from launch until the 600 s timeout, and soak.py classed all 4
+new-game runs as `HANG`. The same `cmd.sh` without lldb finishes in 2-3 s, and a single
+foreground `lldb -b -o run` worked earlier in the round (the b4-1 backtrace). So this is the
+debugger launch under soak.py on this Mac, not the game. The runs were then made from the
+generated `cmd.sh` files without a debugger (Debug, after b4-2): new game seeds 0-3 x 36,000 and
+levels seeds 0-3 x 25,000 (16 level ids). **8 runs, 244,000 frames, all exit 0.** Next: find why
+lldb stalls when soak.py starts it (stdin/tty or `--setsid`), then rerun the round-12 size (49 runs).
+
+### 15.6 Open on the Mac
+
+- The uninitialized local behind b4-2 (zero-init hides it everywhere).
+- `soak.py` under lldb (15.5).
+- A windowed run with a real gamepad (QUICKSTART.md, 15.4).

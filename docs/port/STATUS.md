@@ -332,6 +332,38 @@ Fixes and additions on the merged tree (asm_diff 0):
    real gamepad** (MACOS.md 12.6 documents the mapping; only headless runs so far).
 8. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
 
+## Round 13, part b4: the whole game on macOS, a release build, how to play (branch names-R13_b4)
+
+Details: [MACOS.md](MACOS.md) section 15, [QUICKSTART.md](QUICKSTART.md) (new).
+
+- **`playthrough.py --all` on the Mac** (headless): new game -> levels 1-6 -> the Primagen -> the
+  ending -> the credits -> the hub. 266,000 frames, exit 0, **Mac = Linux frame for frame**
+  (532,000 det lines, 0 differ). So are levels 5 and 6, the 4 boss recipes, the boot and the
+  demos, save/load and levels 1-4 (det, 0 differ in every scenario). `--audio` RMS 3,399.5.
+- **Two fixes:**
+  - **b4-1** `Turret_Effects` (func_00262B58.c, a host body; asm_diff 0). It read the pose
+    context at N64 offsets, compared the bone with uninitialized stack and truncated the matrix
+    pointer through the s32 `CMtxF__RotateX_i`. On the Mac this was a SIGSEGV at the first level-124
+    turret of the run. **b5 fixed the same function: keep one.**
+  - **b4-2** `-ftrivial-auto-var-init=zero` for the game code (port/cmake/game.cmake). Locals read
+    before they are written made Linux differ from the Mac in level 135 (frame 71,469 of `--all`;
+    the value depended on the code layout), and made a `-O2` build stop finishing the game.
+    **Linux's level-135 trace changes** (it is now the Mac's). The boot and the demos are unchanged.
+- **Release (`-O2`, PIE) on the M5:**
+  - the whole game takes 26.3 s headless without pixels and 55.4 s with offscreen pixels
+    (Debug: 46 s);
+  - the Release trace equals Debug's;
+  - paced level 1 (27,000 VIs): 450.09 s, 5 late VIs in gameplay (max 1.9 ms), 1.58 ms of work per
+    VI, 0 audio underruns;
+  - max RSS 111 MB (no pixels), 185-200 MB (pixels, audio).
+- **For the coordinator:** this branch touches `src/us/code/func_00262B58.c` (also changed by b5),
+  `port/cmake/game.cmake`, `docs/port/MACOS.md`, `docs/port/QUICKSTART.md` and `docs/port/STATUS.md`
+  (this section). After the merge, rebuild every build dir (a flag change: ninja recompiles the game).
+- **Open:**
+  - the uninitialized local itself was not found: zero-init hides it on every host. MSan or
+    valgrind on the level-135 window (`OUT/r13/allwin.sh` with `T2_DET_FROM=71440`) would find it;
+  - a windowed run with a real gamepad is still not done (QUICKSTART.md documents it).
+
 ## Round 12, part a5: the N64-offset sweep, the player intelligence typed (branch names-R12_a5)
 
 Detail: [STABILITY.md](STABILITY.md) section 8, [64BIT.md](64BIT.md) part 6.

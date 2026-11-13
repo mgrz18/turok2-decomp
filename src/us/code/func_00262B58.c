@@ -14,6 +14,32 @@ typedef struct {
     /* 0x90 */ s32 value;
 } Effect00262B58;
 
+#ifdef TARGET_PORT
+#include "structs/pose_host.h"
+/* Host body (round 13 b4): CGameObjectInstance__PoseBone passes the pose context at its
+ * HOST layout (structs/pose_host.h: obj, bone) and the matrix is a host static
+ * (sPoseMtx): the s32 CMtxF__RotateX_i shim truncated it (macOS crash in level 124, the
+ * first turret of the whole-game run). The float CMtxF__RotateX directly, the matrix
+ * pointer-wide; m_VarBuffer[0] holds the gun pitch as float bits. */
+#undef CMtxF__RotateX
+void CMtxF__RotateX_f(void *m, f32 a) __asm__("CMtxF__RotateX"); /* the float definition */
+void Turret_Effects(sptr arg0, T2PoseContext *ctx) {
+    CGameObjectInstance *obj = ctx->obj;
+    CTurretIntelligence *turret = &obj->header.m_pIntelligence->m_Turret;
+    union {
+        u32 u;
+        f32 f;
+    } pitch;
+
+    if (ctx->bone == turret->m_GunNode) {
+        pitch.u = obj->m_AI.m_VarBuffer[0];
+        CMtxF__RotateX_f((void *) arg0, pitch.f);
+    }
+    if (ctx->bone == turret->m_RotNode) {
+        CMtxF__RotateZ(arg0, obj->m_AI.m_InitialRotY - obj->m_RotY);
+    }
+}
+#else
 void Turret_Effects(sptr arg0, Effect00262B58 *arg1) {
     CGameObjectInstance *temp_a0;
     CTurretIntelligence *temp_s1;
@@ -29,3 +55,4 @@ void Turret_Effects(sptr arg0, Effect00262B58 *arg1) {
         CMtxF__RotateZ(arg0, temp_v0->m_AI.m_InitialRotY - temp_v0->m_RotY);
     }
 }
+#endif
