@@ -1165,7 +1165,9 @@ the old defaults (one padtest run showed it: Back -> L appeared only after delet
 The round-13 whole-game route (`OUT/r14/detall.sh`, `T2_DET_LOG=1`, 266,000 frames, headless):
 this branch and a Release build of c8414758 give **532,000 det lines, 0 differ**. Headless runs
 use the virtual pad of round 9 as before; with a window (Linux's offscreen driver) the new code
-only reads devices that are not there.
+only reads devices that are not there. Checked on Linux (box copy `/root/R14_c4mac`, Debug PIE):
+a 20,000-frame new game (`--input`, SDL offscreen window, so `ContRead` with the new code)
+gives the same 40,000 det lines as the coordinator's c8414758 build, and padtest.py passes there too.
 
 ### 16.5 Open on the Mac
 

@@ -244,7 +244,7 @@ play mode, settings, saves, logs, controls, a first-run checklist). Mac only, al
   with the default pak folder loads level 51 at the save portal. App bundle:
   `tools/port/mkapp.sh BUILD [APP]`.
 - **Nothing else moved**: the round-13 whole-game route gives the same 532,000 det lines as
-  c8414758 (Mac, Release). Linux builds the branch (box copy `/root/R14_c4mac`).
+  c8414758 (Mac, Release). **Linux** (box copy `/root/R14_c4mac`, Debug PIE): builds, padtest.py passes (101 + 2), and a 20,000-frame new-game run through the SDL offscreen window path (the real LUS controller read) gives the same 40,000 det lines as the coordinator's c8414758 build.
 - **For the coordinator**: files `port/app/main.cpp`, `port/app/game.cpp`, `port/app/game.h`,
   `port/app/CMakeLists.txt` (adds t2controls.cpp), new `port/app/t2controls.{h,cpp}`,
   `tools/port/padtest.py`, `tools/port/mkapp.sh`, docs QUICKSTART.md, MACOS.md (section 16),
