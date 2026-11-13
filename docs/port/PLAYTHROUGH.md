@@ -1198,3 +1198,123 @@ round's fixes. Two things did not work in quick tests: a held jump from the floo
 coupling (no activation: the player slides along the generator and passes under its top), and a
 teleport onto the generator's top (refused). The air start stays, and it is what makes level 6
 lethal without invincibility (next step: a walk onto the generator top).
+
+## 12. Levels 5 and 6 and the Primagen by the game's own progression (Phase 7 round 13, part b1)
+
+`playthrough.py RUN --all` (fullrun.py, routes56.py) no longer teleports past the hub's level-5
+and level-6 doors, no longer hands out items (`T2_GIVE_ITEMS`) and no longer hops to the Primagen
+(`T2_WARP_TO=7602`). Every key, item and door of levels 5 and 6 and the Primagen's entrance now
+come from the game:
+
+```sh
+python3 tools/port/playthrough.py RUN --all        # 280,000 frames now
+cd OUT && . RUN/teleport.env && SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=500 \
+  build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --pak-dir RUN/pak \
+  --frames 280000 --input @RUN/playthrough.txt
+```
+
+### 12.1 The keys of levels 5 and 6
+
+- **62's level-5 key** was never picked up because its stand point (90 units on +z) has no floor:
+  the teleport was refused (`region (nil)`). It is now approached from +x
+  (`tools/port/itemreach.py`, new: the floor under an item and the approach angles whose way in
+  has a floor at the item's height).
+- **68's level-5 key** sat at index 15 of `L3_KEYS`, but level 3 has 14 segments: it was never
+  inserted. **103's level-6 key** sat at index 12 (105's second visit). Both are now at their
+  sub-level's segment.
+- The three key segments (62, 68, 103) are anchored on their sub-level (`level_segments(...,
+  anchor={...})`): the clock jumps to the segment's start when the sub-level is reached, and the
+  pick waits `KEY_WAIT` (150) frames.
+
+All 18 level keys of the route are now picked up: level 5's three (61, 62, 68) and level 6's six
+(100, 103, 105 of level 4; 84, 87, 89 of level 5).
+
+### 12.2 The level-5 and level-6 doors
+
+Each door is one walk from the plaza (`PAD[5]`, `PAD[6]`, a teleport in the open plaza first). The
+walk crosses the door's key slots, which take the keys: **"access to level 5 granted."** (or 6), and
+the door opens. The walk then goes on through the door and down the way to the portal 5000 (6000).
+Level 5: from (-200, 0, 128) at rotY 2.08, 700 frames (2.03 misses a slot, 2.16 stops 200 units
+short of the portal). Level 6: from (-12, 0, 300) at rotY pi, straight down the corridor, 800
+frames.
+
+### 12.3 The Primagen's entrance: the six Primagen keys
+
+No warp region leads to 7602 (the Primagen's lair). The hub's six Primagen key slots (instances
+4-7, 11, 12, objects 154/158/159/161/291/292) each hold a link record (kind 9, handler 4:
+`Event_PlayCinema`/`Event_PlayCinemaRemote`, the "level" field 43, key 75). When the sixth key goes
+in, the six records fire together and play **the hub portal cinema (level 43,
+`cinema_hubportal`)**. The cinema ends in **level 4, the Primagen's lair**, at 7602's place (1.4,
+0, -1789.6). This was checked with a new game, `T2_WARP_TO=1999` and the six keys given: slot 6 at
+18,115, the cinema from 18,173, the lair at 19,303. In the port the cinema does not wait for the
+Mother.
+
+**Open: Primagen keys 2 and 3 do not go in during the continuous run** (they never did in round 12
+either: no slot event for instances 5 and 6). The hub has no region inside the ring of slots. In
+the continuous run, a walk straight in at slot 2 (133, 38) or slot 3 (37, -85) is deflected round
+the ring to (147, 128) with no slot event. Neither of the two alternatives works: starting at slot
+1's outside point (`PRIMAGEN_FROM`), or starting from the previous slot's pad along the ring
+(`PRIMAGEN_ALONG`). In the experiment above, which held all six keys with every slot empty, the
+walk at slot 1 went on to fill slot 2, and the walk at slot 2 then filled slot 3. Any slot takes
+any Primagen key: with only keys 2 and 3 given, the walks at slots 4 and 5 filled slots 6 and 5.
+So in the continuous run only four slots fill, the cinema does not play, and **the route falls back
+on the old hop** (`T2_WARP_TO=7602`, 150 frames after the cinema would have ended; after a real
+cinema it would only put the player back on the lair's start). Next: walk to slots 2 and 3 from
+another side, or carry keys 2-3 until the hub after level 6 and use the slot-4/5 walks, which took
+them in the experiment.
+
+The keys: Primagen key 5 (item 4364, object 591) lies in **92** (`092_91_Lev5_H_TALISMAN`, the
+hive's talisman level) at (614.4, 2151.2, 2918.4). 91's region 25 warps there (5813), and 92's exit
+5814 leads back to 91 at (4005, 614, -24). `routes56.l5_with_primagen_key()` adds this detour
+between 91's satchel charges and its exit 5500 (+1,200 frames). Primagen key 6 (4365, object 592)
+lies at the centre of **114** (0, -50.8, 0). On the first visit to 114 a walk from 90 units out was
+pushed back 70 units (by something round the key that was not identified), so the route takes the
+key on 114's last visit, after "force field down.". Key 5 goes into its slot in the hub visit after
+level 5, and key 6 after the Mother.
+
+### 12.4 Level 6's items: the capacitor question answered
+
+a2's survey mapped objects to items wrongly. Cart entry 2 (the object types table, `u16
+id[object]`) gives **object 597 = item 4231, the crystal ion capacitor**, **595 = 4229, the red
+laser cell** and 596 = 4230, the blue laser cell. a2 had 601 (= 4400) and 599 (= 4110, the satchel
+charge). **Level 6 itself holds 16 capacitors, one per coupling**:
+
+| level | capacitors | where (item positions) |
+|---|---|---|
+| 115 | 4 | (-3840, 153.1, -1612.8), (-3532.8, 153.1, -1612.8), (2611.2, 41.3, -2304) and (-1228.8, 155.8, 537.6) on machine tops |
+| 116 | 2 | (0, 155.4, -5068.8); (-1862.3, -1945.6, 921.6) on a deadly floor (region info 23, damage 10,000) |
+| 117 | 2 | (0, 51.5, 153.6), (0, 51.5, 1689.6), over the pit where the bridges (object 412, actors 58/60) extend |
+| 118 | 2 | (-3906.8, -256, -1536), (-770.4, 0.3, 1136.3) |
+| 119 | 2 | (-2304, 308, -2380.8), (-1075.2, 308, -2380.8) |
+| 120, 121, 122, 123 | 1 each | (1996.8, -153.2, 0); (307.2, 383.3, 0) on a machine; (-1612.8, 305.6, 0); (0, 1.7, -1331.2) |
+
+These are in route order. Generator 1 (115) takes 115's four. Generator 2 (117) takes 116's and
+117's. Generator 3 (119) takes 118's and 119's. Generator 4 (123) takes one each from 120-123.
+**So one capacitor per coupling (`CPlayer__UseSpecialPickup`, the asm a2 checked) matches the data.
+No port difference:** the run collects 16 (`T2_PICKUP_LOG`), and every generator is recalibrated by
+its own four couplings. The **red laser cells** lie in 123 itself, on the four blue slots (actions
+26-29, object 184): (+-275.7, 45.7, -1228.8) and (+-782.9, 45.7, -4608). They are walked into from
+the floor beside the slot. The route takes the two at -1228.8 before plant 3's slots 24/25. The
+blue cells (596) lie on slots 24/25 and in 122. Not run on the N64: the data shows the 16, and the
+port uses one per coupling as the N64 asm does.
+
+`routes56.L6_ITEMS` lists the pickups by segment. `with_items()` puts them at the segment's start
+(150 frames each, +2,850 frames in all). An item on a machine top is reached from the air ("air":
+40 units out at the item's height - 20, falling through it). The three over a deadly floor are
+picked from the air and **then teleported back onto a safe floor** 14-30 frames later ("pit",
+DEBUG-ASSISTED: 117's bridges are not extended, 116's floor kills). `--level 6` still uses
+`T2_GIVE_ITEMS` (`L6_GIVE`).
+
+### 12.5 The run
+
+**The run** (Linux, headless, PIE, `playthrough.py RUN --all`, 280,000 frames, exit 0, host frames):
+"access to level 5 granted." 141,150 (walked through the door into 5000); level 5 with Primagen key
+5 from 92: "force field down." 146,830, "all embryos destroyed." 158,324, "master computer
+destroyed." 160,476, the Queen dead (mode 16) 170,698; "access to level 6 granted." 174,511 (walked
+into 6000); 16 capacitors and 2 red cells picked up, "all assembly plants destroyed." 193,671,
+"all power generators recalibrated." 194,527, "force field down." 195,311; the Mother dead (mode
+30) 213,827; Primagen key 6 into its slot 219,637; the fallback hop; the Primagen dead (mode 29)
+248,754; the ending cinema (levels 11, 10) from ~250,000, the credits (mode 15) ~255,000-268,000,
+the hub ~269,000. The pak: note 1 "TUROK 2", checksum OK, clock 0:46:06.
+In the same run every level key is picked up: 61, 62, 68 for level 5; 100, 103, 105, 84, 87, 89 for
+level 6; Primagen keys 1, 2, 3, 4, 5, 6 (`T2_PICKUP_LOG`). Slot events: instances 4, 7, 11 and 12 only.
