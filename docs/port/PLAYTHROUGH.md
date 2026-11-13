@@ -1501,3 +1501,63 @@ portal cinema (43) does not fire and the hop stays.
 - `--level 6` on its own no longer kills the Primagen: the run equals round 12's up to the Mother,
   but after the hop (54,000) his stage-2 lair wait (resting at z 2,906) does not end; other hop frames
   (53,700-57,000) and the spot cycle did not help. The whole-game run and the boss recipe kill him.
+
+## 17. Fewer aids in levels 1 and 2 (Phase 7 round 14, part c5)
+
+### 17.1 Aiming with the stick only (`playthrough.py`: `face_yaw`, `stick_turn`, `stick_aim`)
+
+The stick's turn rate was measured on Linux (`T2_STATE_LOG=2`, level 51, extra `SX=` inputs). The
+rate is the same on every frame from the first one, with no ramp-up:
+
+| input | stick read | turn per frame |
+|---|---|---|
+| `SX=127` | 80 (the cap) | 0.0685 rad |
+| `SX=40` | 37 | 0.00675 rad |
+
+So SX=V reads V - 3, and the rate goes with the cube of the reading: 0.0685 * (r / 80)^3.
+Positive SX makes rotY grow. The game's forward vector is (-sin rotY, -cos rotY).
+
+`stick_aim(x, z, ry, target, f)` turns the player from the route step's teleport point and yaw
+towards a point. It uses full-stick frames, then one frame at a partial reading for the rest. The
+pitch is left to the game. A route step can now say `"stick": (x, y, z)` in place of
+`"aim": (x, y, z)`. Both `build_level2` and `fullrun.steps` turn it into `SX` inputs. No game
+state is touched.
+
+**The two soul gates (levels 129 and 132) now use it**: no `T2_AIM_AT` in level 2. The inputs are
+`SX=-54` for one frame (gate 1: 0.018 rad) and `SX=-127` for 10 frames, then `SX=-45` (gate 2:
+0.695 rad). In the `--all` run (Linux Debug, `--talismans 2 --cheats-off 1,2 --cheats-on 110`),
+"soul gate destroyed." comes at **35,404 and 62,204, the same frames as with `T2_AIM_AT`**. "all
+soul gates destroyed." comes at 76,974, and level 2 ends with the Harbor and City totems won
+(progress `totems 11000` at 90,567).
+
+Still on the assists in levels 1 and 2:
+
+- `T2_AIM_ENEMY` (the zombies and the three sisters, 14 windows): the targets move.
+- `T2_FACE_NEAREST` (the Harbor Totem 109 and the City Totem 110 waves).
+
+These need a closed loop. Two ways would work: iterate on the run's own log (the enemy's
+position per frame from `T2_DUMP_ACTOR`/`face:` lines, then `stick_turn` per frame and a rerun),
+or have the route stand where the enemies come to it. Not done this round.
+
+### 17.2 Levels 1 and 2 on picked-up weapons and ammo
+
+`T2_GIVE_WEAPONS` now takes a schedule (`"0;1@F"`, port/game/t2debug.c, `T2Port_Scheduled`). The
+test run: `--env 'T2_GIVE_WEAPONS="0;1@88924"' --env 'T2_FILL_AMMO="0;300@88924;100@148020;600@182150"'`,
+i.e. no weapons given and no ammo filled until the hub after level 2.
+
+The answer is **no, not with the current route**. With nothing given, the player keeps weapon 0
+(the talon, `pickup:` lines say `weapon 0`). `T2_WEAPON` is applied only when weapons are given,
+and the route never switches weapons. The route picks up ammo (thirteen 1702 in level 54) and few
+weapons.
+
+- At the Harbor Totem (109): 157 hits taken, **1 death (23,728), the totem lost** (progress
+  `totems 00000`).
+- In level 2: 2 more deaths at the first sister (134, 58,277 and 58,569, the last life). The run
+  ends in game over.
+
+To make it work, the route needs:
+
+1. a weapon change in the input stream: the game's weapon-cycle button after each weapon
+   pickup;
+2. the weapon and ammo pickups on the way (`itemreach.py` on levels 51-59 and 125-133);
+3. the fights retimed for weaker weapons (more fire windows).
