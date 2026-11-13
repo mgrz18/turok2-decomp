@@ -1032,3 +1032,93 @@ The pak after the run: note 1 "TUROK 2", checksum OK, life force 78, weapon 9, c
   (both are the game's own warps; which one depends on state the two runs do not share: not
   traced further).
 - The Primagen's stage-3 lair wait depends on where he rests (above); compare with the N64.
+
+## 12. Fewer cheats (Phase 7 round 13, part b5)
+
+**Measuring.** `T2_HURT_LOG=1` (port/game/t2debug.c) prints a `hit:` line for every hit the
+player's actor takes: the damage, its flags, the source (an object, or a particle and its owner)
+and the object types. Player_OnMultiplayerKill, the player's damage handler in every mode, calls
+`T2Port_OnPlayerHit` under `TARGET_PORT`. It also prints a `hurt:` line for every drop of health,
+a `death:` line for every death or life lost, and a `hurtsum:` line per sub-level (hits, damage,
+lowest health, deaths). `T2_HURT_LOG=2[,R]` adds a rescue for measuring only: below R health
+(default 30) the health goes back to 100, and a shadow health counts the deaths a run without
+the rescue would have had. Region damage (lava, marsh) does not go through the handler: it shows
+as `hurt:` lines with no `hit:`. `T2_CHEATS` is now frame-scheduled (`"0;1@F;..."`; the bits it
+set are cleared again). fullrun.py takes `--cheats-off L1,L2,...`, which plays those levels
+without invincibility, each from the hub visit before it. `--cheats-on 110` keeps the City Totem
+invincible. `--env K=V` adds a line to teleport.env, and `--no-health` skips the health pickups.
+
+**The host bug: no health pickup was ever taken** (64BIT.md part 7). The health rows' union was
+laid out by its first member, so `m_Max` was 0. Fixed, so the routes can now heal.
+
+**Health on the way** (`L1_HEALTH`, `L2_HEALTH`, 150 frames per pick, only in the `--cheats-off`
+levels; without them the route is round 12's, input for input):
+
+- level 1: 59's ultra health (+100 up to 200) before the Harbor Totem;
+- level 2: in 130, the full health and the ultra health before sister 1 (133), and the second
+  ultra health before sister 2 (134); 131's full health; 135's ultra health at its start (the
+  crypts and sister 3).
+- Rejected: 131's full health (-1996, 6256), 132's full health (12288, -666) and 132's ultra
+  health (-6298, 205). All three lie in damage regions (10 every 2 frames: 330-740 health lost
+  in a rescue run). Also rejected: the six +10 beside sister 3's spot, which lie in the pit's
+  damage region.
+- 135's first crypt key now gets a third walk (dt 8,850). When it is missed, the platform before
+  door 60 stays down, and sister 3's spot becomes a damage pit (10 every 2 frames).
+
+**Levels 1 and 2 without invincibility** (`fullrun.py RUN --upto 2 --cheats-off 1,2 --cheats-on 110
+--env T2_HURT_LOG=1`, 92,000 frames; two runs identical): **0 deaths**.
+
+| sub-level | hits | damage | lowest health |
+|---|---|---|---|
+| 51-59 | 1 | 1 | 99 |
+| 109 the Harbor Totem (won) | 51 | 132 | 68 |
+| 127 | 3 | 3 | 65 |
+| 133 (sister 1) | 65 | 169 | 31 |
+| 134 (sister 2) | 47 | 105 | 26 |
+| 135 (sister 3) | 50 | 168 | 32 |
+| 110 the City Totem | invincible | | |
+
+Before the health fix and without the picks, the same route had 7 shadow deaths in levels 1-2
+(rescue run): 109 1, 133 2, 134 1, 135 2, 110 1. The City Totem took 150-182 damage in rescue runs
+(the gunners' bolts, particle 67, 2 each). With the other totems' state it is b2's part, so it
+stays invincible (`--cheats-on 110`). The firestorm cannon (11) instead of the plasma rifle did
+worse in 133/134 (213 and 380 damage).
+
+**The whole game with levels 1-2 played this way** (`--cheats-off 1,2 --cheats-on 110`, the rest
+invincible, 320,000 frames): levels 1-6, the Primagen dead at 275,872, the ending, the credits and
+the hub at 296,000, exit 0. Two caveats:
+
+- The timeline is ~30,000 frames later than round 12's: the Blind One died at 166,696 (round 12:
+  136,092). The player entered level 4 with 32-82 health instead of 100-200, and with
+  invincibility on, her fight took 34,500 frames instead of ~10,000. Not traced further: the
+  same fight entered with 193 health (`--cheats-off 4`) ended at 139,086.
+- One life was lost to a Primagen spot over a pit (invincibility does not cover the abyss).
+
+The default `--all` (no `--cheats-off`) is still round 12's route plus the 135 key walk: the
+whole game, the Primagen dead at 246,752, the hub at 267,000.
+
+**Levels 3-6, one level at a time without invincibility** (rescue runs; `--cheats-off N`, the other
+levels invincible):
+
+| level | result | why invincibility is still needed |
+|---|---|---|
+| 3 | 69: 381 damage; 64: a death (271 damage in 6 hits); 71: 417 damage; 2 lives lost | **Region damage on the route**: 64's satchel charge step (-1394, -54, 4557) stands in a marsh region (75 every 30 frames, no source), and so does a later walk in 64 (x -887..-924, z 1300->1016). **The obj-230 enemies** (69, 71; intelligence 494/496) hit from 100-700 units with no particle (13-42 damage, larger when closer), **each hit 3 times** (game frames +0, +4, +5). That may be a burst, or a host bug applying one hit three times: **compare on the N64** (n64trace `--calls Player_OnMultiplayerKill` in 69). |
+| 4 | the sub-levels 1-9 damage; the Cave Totem 156 (lowest 56); **the Blind One 206 damage** | a health budget: no full or ultra health between 108 and her arena (108's four +10 only) |
+| 5 | **0 deaths**: 124 33 damage, 95 1, the Hive Totem 34, the Mantid Queen 26 (lowest 106, from 200) | none (entered with 200) |
+| 6 | 117 21 damage; **119: 400 damage, 2 lives lost** | the route's air starts at 119's couplings (y -110, 45 units out): each miss falls ~200 units onto the floor (fall damage ~80) |
+
+**The level-119 jump** (this round's typed `m_JumpScale`). The jump is variable:
+`PlayerJump_Update` keeps the upward speed while R is held and `m_ModeTime < 3`. Measured in 119
+from the floor (y -307.2), walking at a coupling:
+
+- R held 4 frames: the jump rises 47.7 units;
+- R held 28 frames: 57.7 units;
+- R held 78 frames: **94.9 units** (apex y -212.3).
+
+The coupling needs y >= -245.8, i.e. 61.4 units. a2's measurement (59.5) was a short press, not
+a lower jump. The port's jump matches the N64: demo 3's held jump (gf 72) is RAM-identical to the
+N64's through its end, and the boot's 523,287 det lines are identical before and after this
+round's fixes. Two things did not work in quick tests: a held jump from the floor at a corner
+coupling (no activation: the player slides along the generator and passes under its top), and a
+teleport onto the generator's top (refused). The air start stays, and it is what makes level 6
+lethal without invincibility (next step: a walk onto the generator top).
