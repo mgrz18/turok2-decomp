@@ -308,22 +308,27 @@ int main(int argc, char** argv) {
         if (!std::filesystem::exists(args.portArchive, ec)) {
             args.portArchive = FindData("t2port.o2r", dirs);
         }
-        if (args.archive.empty() || !std::filesystem::exists(args.archive, ec)) {
-            fprintf(stderr,
-                    "turok2: the game data archive turok2.o2r was not found. Build it from your ROM\n"
-                    "(tools/assets/mkarchive.py, QUICKSTART.md) and put it in %s,\n"
-                    "next to the executable, or in the current directory, or pass --archive FILE.\n",
-                    data.c_str());
-            return 1;
-        }
-        if (args.portArchive.empty()) {
-            fprintf(stderr, "turok2: t2port.o2r (the shaders, built with the port) was not found next to the "
-                            "executable or in %s\n", data.c_str());
-            return 1;
-        }
-        if (args.rom.empty()) {
-            fprintf(stderr, "turok2: note: baserom.us.z64 not found (%s, next to the executable or the current "
-                            "directory); the game runs from the archive alone\n", data.c_str());
+        // the archive and the ROM are the player's own (QUICKSTART.md); the game needs both (the
+        // ROM holds the sound banks and wave data the audio manager reads at boot)
+        const struct {
+            const std::string& path;
+            const char* what;
+        } need[] = { { args.archive, "The game data archive turok2.o2r (tools/assets/mkarchive.py, built from your ROM)" },
+                     { args.rom, "Your Turok 2 ROM baserom.us.z64 (N64, USA)" },
+                     { args.portArchive, "The port's t2port.o2r (built with the port)" } };
+        for (const auto& n : need) {
+            if (n.path.empty() || !std::filesystem::is_regular_file(n.path, ec)) {
+                char msg[1024];
+                snprintf(msg, sizeof msg,
+                         "%s was not found.\n\nPut it in\n%s\n(or next to the executable, or in the current "
+                         "directory). See docs/port/QUICKSTART.md.",
+                         n.what, data.c_str());
+                fprintf(stderr, "turok2: %s\n", msg);
+                if (args.window) { // a Finder launch has no terminal to show stderr
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Turok 2", msg, nullptr);
+                }
+                return 1;
+            }
         }
         const std::string out = data + "/logs/turok2-stdout.log";
         if (freopen(out.c_str(), "w", stdout) == nullptr) {
@@ -462,16 +467,25 @@ int main(int argc, char** argv) {
         as.SampleRate = 22050; // the game's synthesizer (t2audio_mgr.c, osAiSetFrequency)
         as.SampleLength = 512;
         as.DesiredBuffered = 2205; // 100 ms
+        // LUS saves the backend it falls back to: one launch without a device would leave every
+        // later launch silent. Keep the player's choice (or none) in the config instead.
+        const std::string savedBackend = config->GetString("Window.AudioBackend", "");
         audio = std::make_shared<Ship::Audio>(as, config);
         context->GetChildren().Add(audio);
         audio->Init();
-        auto player = audio->GetAudioPlayer();
-        if ((player == nullptr || !player->IsInitialized()) &&
-            audio->GetCurrentAudioBackend() != Ship::AudioBackend::SDL) {
+        // LUS falls back to no sound when the platform player cannot open: try SDL's first
+        // (it falls back to none in turn)
+        if (audio->GetCurrentAudioBackend() == Ship::AudioBackend::NUL && savedBackend != "null" &&
+            savedBackend != "sdl") {
             audio->SetCurrentAudioBackend(Ship::AudioBackend::SDL);
-            player = audio->GetAudioPlayer();
         }
-        audioDevice = player != nullptr && player->IsInitialized();
+        auto player = audio->GetAudioPlayer();
+        audioDevice = player != nullptr && player->IsInitialized() &&
+                      audio->GetCurrentAudioBackend() != Ship::AudioBackend::NUL;
+        if (config->GetString("Window.AudioBackend", "") != savedBackend) {
+            config->SetString("Window.AudioBackend", savedBackend);
+            config->Save();
+        }
         AudioSetAudioComponent(audio);
         static const char* kNames[] = { "wasapi", "sdl", "coreaudio", "null" }; // AudioBackend order
         const int be = (int)audio->GetCurrentAudioBackend();

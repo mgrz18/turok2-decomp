@@ -885,8 +885,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
                     // would overflow or starve LUS's 6,000-frame ring). At most +-1 ms per VI.
                     const int buffered = AudioPlayerBuffered();
                     const int desired = std::max(AudioPlayerGetDesiredBuffered(), 1470);
-                    devMin = std::min(devMin, buffered);
-                    devMax = std::max(devMax, buffered);
+                    if (f >= 600) { // after the start-up (the boot's loads)
+                        devMin = std::min(devMin, buffered);
+                        devMax = std::max(devMax, buffered);
+                    }
                     if (buffered > desired + 735) {
                         paceNext += std::chrono::milliseconds(1);
                         devSlow++;
@@ -1000,7 +1002,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             printf("\n");
         }
         if (args.audioDevice) {
-            printf("pace: sound device buffer min %d max %d frames; VI clock slowed %d, sped up %d times\n",
+            printf("pace: sound device buffer from VI 600: min %d max %d frames; VI clock slowed %d, sped up %d times\n",
                    devMin == (1 << 30) ? 0 : devMin, devMax, devSlow, devFast);
         }
     }
