@@ -1544,7 +1544,7 @@ teleport.env are identical to c8414758's).
 | 70, 71 | the same wait at the exit warp (3779 / 3781), into it at +460 / +480 |
 | 66 | the ultra health (object 548, (2634, -560, 2052)) before the Marsh Totem |
 | 100, 105, 103 | the full health by the level key, a full health on 105's second visit, 103's ultra health by the exit 7400 (the Cave Totem next) |
-| the Cave Totem and the Blind One | the scorpion launcher (16) instead of the plasma rifle (`T2_WEAPON` is applied when a level loads, so the switch is scheduled in 103; back to 10 at the hub) |
+| the three fights: the Marsh Totem, the Cave Totem, the Blind One | the scorpion launcher (16) instead of the plasma rifle (`T2_WEAPON` is applied when a level loads, so the switch is scheduled in 68 / 103, before the totem's level; back to 10 at the next hub) |
 
 Health objects (the level actors in levels.py's grid sections; the y in the picks is the floor):
 542 health +10, 545 full health, 548 ultra health. The hub anchors after levels 3 and 4 move with
@@ -1555,7 +1555,9 @@ hp 12,800/12,800 to the end of the run (the player stands on the ledge, y 74.9, 
 `T2_AIM_NODE=boss`; with invincibility the same fight ran 10,000-34,500 frames). With the
 scorpion launcher she dies 5,200 frames after her arena loads. At the Cave Totem the plasma
 rifle took 200 damage (17 hits of 9 from obj 92 and 6 of 8 from obj 95) and a life; the scorpion
-launcher 88 and won it 1,160 frames earlier.
+launcher 88 and won it 1,160 frames earlier. The Marsh Totem with the plasma rifle: 62 damage in
+one run, 272 and a life lost in another (levels 1-2 invincible: another entry state); with the
+scorpion launcher 15-16 in both.
 
 ### 17.3 The run (Linux, headless, PIE, Debug; host frames)
 
@@ -1571,18 +1573,29 @@ progress/event/hit/hurt/death/state/bosstrace line):
 |---|---|---|---|
 | 61, 62, 63, 65-68, 69, 70, 71 | 0 | 0 | |
 | 64 | 5 | 24 | 78 |
-| 111 the Marsh Totem (won 107,943) | 62 | 62 | 138 |
-| 106 / 102 / 107 / 108 | 5 / 2 / 6 / 6 | 10 / 2 / 12 / 7 | 128 / 126 / 114 / 107 |
-| 112 the Cave Totem (won 127,534) | 11 | 88 | 112 |
-| 1 the Blind One (dead 136,871) | 43 | 81 | 31 |
+| 111 the Marsh Totem (won 105,987) | 11 | 16 | 184 |
+| 106 / 102 / 107 / 108 | 5 / 2 / 4 / 4 | 6 / 2 / 5 / 7 | 178 / 176 / 171 / 164 |
+| 112 the Cave Totem (won 126,872) | 13 | 97 | 103 |
+| 1 the Blind One (dead 136,119) | 64 | 91 | **12** |
 
-Then levels 5 and 6 as before (the Queen dead 172,465, the Mother 213,690), the Primagen dead
-249,859 with cinema 370 (the good ending), "END 2", the credits and the hub at 270,749; exit 0.
-**`--slot 300` is needed with these levels**: with the default 1,100 the Primagen sat in his
-lair wait (hp 25,600, the known no-end spot of section 16.3) to the end of the run; 300 ends it
-(both values were measured in round 13). The default and `--cheats-off 1,2` runs keep 1,100.
+Then levels 5 and 6 as before (invincible; the Queen dead 170,475, the Mother 214,164) and the
+hub. **The Primagen hop does not end this run**: after the hop his lair wait (hp 25,600, the
+no-end spot of section 16.3) never ends, with `--slot` 300, 400, 650, 800, 1,100 or 1,500 (200 makes
+the slot walk overlap the corridor walk). The same levels 1-4 with the plasma rifle at the Marsh
+Totem (commit e7ec5a5a, one fight different) did end: with `--slot 300` the Primagen died at
+249,859 with cinema 370 (the good ending), "END 2", the credits and the hub at 270,749, exit 0,
+two runs identical (with the default 1,100 it did not). The hop's timing is c3's part this round
+(the real entrance with the six keys); the levels 1-4 part does not depend on it.
+
+Other configurations: `--cheats-off 3,4` alone (levels 1-2 invincible, so another entry state):
+0 deaths with the scorpion launcher at the Marsh Totem (111: 15 damage; the Blind One lowest 79),
+a life lost at the Marsh Totem without it (272 damage). `--cheats-off 1,2,3,4,5,6`: levels 1-4 as
+above, level 5's 124 then kills the player four times (c2's part).
 
 ### 17.4 Still open
 
 - The obj-230 hold-frame double shot against the N64 (an RDRAM warp into 69 for n64trace).
-- The Primagen's lair wait depends on the hop frame (`--slot`): c3's part this round.
+- The Primagen's lair wait depends on the hop frame (`--slot`) and on the state the earlier levels
+  leave: c3's part this round.
+- The Blind One's margin is thin in the whole run (lowest health 12; 31 and 79 in other runs): she
+  is fought from the ledge with fire held; no health lies between the Cave Totem and her arena.
