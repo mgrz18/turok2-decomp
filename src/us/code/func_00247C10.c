@@ -68,6 +68,12 @@ void Player_OnMultiplayerKill(CGameObjectInstance *actor, sptr arg1, DamageEvent
     if (source != NULL && source->header.m_Type == 2 && ((CParticle *) source)->m_pOwner == (CGameObjectInstance *) player) {
         hit->damage = hit->damage * 0.25f;
     }
+#ifdef TARGET_PORT
+    {
+        void T2Port_OnPlayerHit(CPlayer *player, DamageEvent *hit); /* DEBUG-ONLY (T2_HURT_LOG, port/game/t2debug.c) */
+        T2Port_OnPlayerHit(player, hit);
+    }
+#endif
     CPlayer__Hurt(player, actor, hit->damage, hit->flags, arg4);
 
     source = hit->source;

@@ -944,3 +944,168 @@ void T2Port_LogEvent(LevelEvent *e, const char *text) {
            kObjTypes[k][1] < 0 ? -1 : (int) CScene__GetLinkGroupCount(&gScene, kObjTypes[k][1]));
     fflush(stdout);
 }
+
+/* T2_HURT_LOG=1|2[,R] (game.cpp, every frame; DEBUG-ONLY, round 13 b5): the player's damage, to
+ * measure a route without T2_CHEATS invincibility. Every drop of the player's health prints a
+ * `hurt:` line (host frame, level, health before and after, the nearest live enemy: its
+ * intelligence id, its object type and distance), every death (health to 0, or a life lost) a
+ * `death:` line, and every level change a `hurtsum:` line for the level left (hits, damage, the
+ * lowest health, deaths, rescues). =2 adds a RESCUE: below R health (default 30) the health is
+ * set back to 100 and the damage goes on counting on a shadow health that starts at the real
+ * one; a shadow death (shadow <= 0: what a run without the rescue would have died of) is counted
+ * and the shadow starts again at 100. Measurement only: the route must then run with =1 (or
+ * none) and no death. */
+static CGameObjectInstance *T2Port_NearestEnemy(CGameObjectInstance *pl, f32 *dist) {
+    CGameObjectInstance *best = NULL;
+    f32 bestD = 1e30f;
+    int i;
+    CListedInstance *li;
+    for (i = gScene.m_nFirstActor; gScene.m_pActors != NULL && i < gScene.m_nActors; i++) {
+        CGameObjectInstance *o = &gScene.m_pActors[i];
+        CIntelligence *info = o->header.m_pIntelligence;
+        f32 dx, dy, dz, d;
+        if (info == NULL || (info->m_Type != INTELLIGENCE_ENEMY && info->m_Type != 4) || o->m_AI.m_Health <= 0) {
+            continue;
+        }
+        dx = o->header.m_vPos.x - pl->header.m_vPos.x;
+        dy = o->header.m_vPos.y - pl->header.m_vPos.y;
+        dz = o->header.m_vPos.z - pl->header.m_vPos.z;
+        d = dx * dx + dy * dy + dz * dz;
+        if (d < bestD) {
+            bestD = d;
+            best = o;
+        }
+    }
+    for (li = gScene.m_InstancePool.m_ActiveList.m_pHead; li != NULL; li = li->m_pNext) {
+        CGameObjectInstance *o = &li->m_Instance;
+        CIntelligence *info = o->header.m_pIntelligence;
+        f32 dx, dy, dz, d;
+        if (info == NULL || (info->m_Type != INTELLIGENCE_ENEMY && info->m_Type != 4) || o->m_AI.m_Health <= 0) {
+            continue;
+        }
+        dx = o->header.m_vPos.x - pl->header.m_vPos.x;
+        dy = o->header.m_vPos.y - pl->header.m_vPos.y;
+        dz = o->header.m_vPos.z - pl->header.m_vPos.z;
+        d = dx * dx + dy * dy + dz * dz;
+        if (d < bestD) {
+            bestD = d;
+            best = o;
+        }
+    }
+    *dist = best != NULL ? sqrtf(bestD) : -1.0f;
+    return best;
+}
+
+void T2Port_HurtLog(int frame, int sched, const char *spec) {
+    static int sLevel = -1, sLastH = -1, sLastLives = -1, sFrom = 0;
+    static int sHits, sDamage, sMin = 100000, sDeaths, sRescues, sShadowDeaths, sShadow = -1;
+    static int sTotHits, sTotDeaths, sTotShadow;
+    int mode = atoi(spec), rescue = 30, h, lives;
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    const char *comma = strchr(spec, ',');
+
+    if (comma != NULL && atoi(comma + 1) > 0) {
+        rescue = atoi(comma + 1);
+    }
+    if (gEngineApp.m_Settings.mode != 13 || p == NULL) {
+        return;
+    }
+    if (gScene.m_nLevel != sLevel) {
+        if (sLevel >= 0) {
+            printf("hurtsum: level %d frames %d-%d hits %d damage %d min %d deaths %d rescues %d shadow-deaths %d"
+                   " (run: hits %d deaths %d shadow-deaths %d)\n",
+                   sLevel, sFrom, frame, sHits, sDamage, sMin == 100000 ? -1 : sMin, sDeaths, sRescues, sShadowDeaths,
+                   sTotHits, sTotDeaths, sTotShadow);
+        }
+        sLevel = gScene.m_nLevel;
+        sFrom = frame;
+        sHits = sDamage = sDeaths = sRescues = sShadowDeaths = 0;
+        sMin = 100000;
+    }
+    h = (int) (p->m_Data.m_Health >> 8);
+    lives = (int) p->m_Data.m_Lives;
+    if (sShadow < 0) {
+        sShadow = h;
+    }
+    if (sLastH >= 0 && h < sLastH) {
+        f32 d;
+        CGameObjectInstance *e = T2Port_NearestEnemy(&p->m_CharacterActor, &d);
+        CIntelligence *info = e != NULL ? e->header.m_pIntelligence : NULL;
+        int dmg = sLastH - h;
+        sHits++;
+        sTotHits++;
+        sDamage += dmg;
+        sShadow -= dmg;
+        printf("hurt: frame %d sched %d level %d health %d -> %d (-%d) shadow %d nearest it %d ty %x d %.0f\n", frame, sched,
+               (int) gScene.m_nLevel, sLastH, h, dmg, sShadow, info != NULL ? (int) info->m_Id : -1,
+               e != NULL ? (unsigned) e->m_nTypeFlag : 0u, d);
+        if (h == 0) {
+            sDeaths++;
+            sTotDeaths++;
+            printf("death: frame %d sched %d level %d lives %d\n", frame, sched, (int) gScene.m_nLevel, lives);
+        }
+        if (sShadow <= 0) {
+            sShadowDeaths++;
+            sTotShadow++;
+            printf("shadow-death: frame %d sched %d level %d\n", frame, sched, (int) gScene.m_nLevel);
+            sShadow = 100;
+        }
+    } else if (sLastH >= 0 && h > sLastH) {
+        sShadow += h - sLastH; /* a pickup (the rescue below is not counted) */
+        if (sShadow > h) {
+            sShadow = h;
+        }
+    }
+    if (sLastLives >= 0 && lives < sLastLives && !(sLastH >= 0 && h < sLastH && h == 0)) {
+        printf("death: frame %d sched %d level %d lives %d (a life lost)\n", frame, sched, (int) gScene.m_nLevel, lives);
+    }
+    if (h < sMin && h > 0) {
+        sMin = h;
+    }
+    if (mode == 2 && h > 0 && h < rescue && gScene.m_WarpState == 0) {
+        p->m_Data.m_Health = 100 << 8;
+        p->m_CharacterActor.m_AI.m_Health = p->m_Data.m_Health;
+        p->m_WeaponActor.m_AI.m_Health = p->m_Data.m_Health;
+        sRescues++;
+        printf("rescue: frame %d sched %d level %d health %d shadow %d\n", frame, sched, (int) gScene.m_nLevel, h, sShadow);
+        h = 100;
+    }
+    sLastH = h;
+    sLastLives = lives;
+    fflush(stdout);
+}
+
+/* T2_HURT_LOG (round 13 b5): every hit the player's actor takes (Player_OnMultiplayerKill, the player's
+ * damage handler in every mode, calls this before CPlayer__Hurt): the damage, its flags, what dealt it
+ * (the source's instance kind: 1 an object, 2 a particle/projectile, and its object type; a particle's
+ * owner) and the cheat flags, so a route's damage can be traced to the enemy and its weapon. */
+#include "structs/particle.h"
+#include "structs/collision.h"
+void T2Port_OnPlayerHit(CPlayer *player, DamageEvent *hit) {
+    static int sOn = -1;
+    CGameObjectInstance *src, *owner = NULL;
+    CIntelligence *oi = NULL;
+    if (sOn < 0) {
+        sOn = getenv("T2_HURT_LOG") != NULL;
+    }
+    if (!sOn || hit == NULL) {
+        return;
+    }
+    src = (CGameObjectInstance *) hit->source;
+    if (src != NULL && src->header.m_Type == 2) {
+        owner = ((CParticle *) src)->m_pOwner;
+    } else {
+        owner = src;
+    }
+    if (owner != NULL && owner->header.m_Type == 1) {
+        oi = owner->header.m_pIntelligence;
+    }
+    printf("hit: frame %d level %d gf %d damage %.2f flags %x src kind %d obj %d owner kind %d obj %d it %d at (%.1f %.1f %.1f)"
+           " player (%.1f %.1f %.1f) cheats %x\n", gT2HostFrame, (int) gScene.m_nLevel, (int) gFrameCountGameplay, hit->damage / 256.0,
+           (unsigned) hit->flags, src != NULL ? (int) src->header.m_Type : -1, src != NULL ? (int) src->header.m_nObjType : -1,
+           owner != NULL ? (int) owner->header.m_Type : -1, owner != NULL ? (int) owner->header.m_nObjType : -1,
+           oi != NULL ? (int) oi->m_Id : -1, owner != NULL ? owner->header.m_vPos.x : 0.0, owner != NULL ? owner->header.m_vPos.y : 0.0,
+           owner != NULL ? owner->header.m_vPos.z : 0.0, player->m_CharacterActor.header.m_vPos.x,
+           player->m_CharacterActor.header.m_vPos.y, player->m_CharacterActor.header.m_vPos.z,
+           (unsigned) gEngineApp_m_Settings.cheatFlags);
+}
