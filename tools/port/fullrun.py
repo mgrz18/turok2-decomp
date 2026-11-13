@@ -221,6 +221,7 @@ def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=()):
     anchor: the segment indices whose key picks re-anchor the schedule clock when the segment's level
     is reached (T2_ANCHOR) and wait KEY_WAIT frames, so that a pick-up waits for the level when its
     warp loads later than the route assumed (round 13 b1: 62, 68, 103)."""
+    assert all(0 <= i < len(segments) for i in keys), "a key list past the last segment"
     added = 0
     starts = {}
     out = []
@@ -264,6 +265,15 @@ CINEMA_AFTER = {2: 260, 3: 510, 4: 120,     # last leg start -> the level's firs
 OLD_CINEMA = {2: 13420, 3: 13410, 4: 13420}  # the same frame in the level's own --level N run
 PRIMAGEN_SLOTS = {1: (71.0, 0.0, 183.0), 2: (133.0, 0.0, 38.0), 3: (37.0, 0.0, -85.0),
                   4: (-119.0, 0.0, -71.0), 5: (-86.0, 0.0, 203.0), 6: (-185.0, 0.0, 73.0)}
+# round 13 b1: the walk for Primagen key K starts at slot PRIMAGEN_FROM[K]'s outside stand point. A
+# walk straight in at slot 2 or 3 is deflected round them (the plaza's centre: no region inside the
+# ring); the walk at slot 1 goes on to slot 2, and once slot 2 holds its key, the walk at slot 2
+# goes on to slot 3 (a new game with the six keys given: every slot filled; until round 12 keys
+# 2 and 3 never went in, so the hub portal could not open)
+PRIMAGEN_FROM = {1: 1, 2: 1, 3: 2, 4: 4, 5: 5, 6: 6}
+# keys 2 and 3 in the continuous run (slot 1 already full, the walk above stops at (147, 128)): from
+# the previous slot's pad along the ring
+PRIMAGEN_ALONG = {2: (71.0, 0.0, 183.0, -0.4040), 3: (133.0, 0.0, 38.0, 0.6620)}
 SAVE_PORTAL = (-977.9, -221.0, -2035.3, 1.4423)   # the hub's save portal (warp 999 -> level 97)
 SAVE_MENU = [(740, "A"), (890, "A"), (1090, "A"), (1240, "DD"), (1340, "A"), (1490, "A")]
 # a later save overwrites note 1: its "overwrite?" dialog opens with the cursor on NO
@@ -289,9 +299,13 @@ def hub(r, arrival, grant=(), primagen=(), save=True, go=None):
         r.tp(t, x, y, z, ry, walk)
         t += 300
     for k in primagen:
-        x, y, z = PRIMAGEN_SLOTS[k]
         r.note(t, "60 the hub: Primagen key %d slot" % k)
-        r.pick(t, x, y, z, math.atan2(x, z))   # from the outside of the ring
+        if k in PRIMAGEN_ALONG:   # from the previous slot along the ring
+            x, y, z, ry = PRIMAGEN_ALONG[k]
+            r.tp(t, x, y, z, ry, 40)
+        else:
+            x, y, z = PRIMAGEN_SLOTS[PRIMAGEN_FROM[k]]
+            r.pick(t, x, y, z, math.atan2(x, z))   # from the outside of the ring
         t += 150
     if go is None:
         return t
@@ -456,10 +470,13 @@ def level6(r, t):
     r.note(h + L6_WALK_AFTER, "60 the hub: back down the corridor through the level-6 door to the plaza")
     r.inputs.append("CU@%d..%d" % (h + L6_WALK_AFTER, h + L6_SLOT_AFTER - 50))
     f = h + L6_SLOT_AFTER
-    x, y, z = PRIMAGEN_SLOTS[6]
+    x, y, z = PRIMAGEN_SLOTS[PRIMAGEN_FROM[6]]
     r.note(f, "60 the hub: Primagen key 6 slot: the six keys in: the hub portal cinema (43) -> the Primagen")
     r.pick(f, x, y, z, math.atan2(x, z))
     lair = f + L6_CINEMA
+    # FALLBACK (DEBUG-ASSISTED): if the six keys are not all in (no cinema), the old hop 7602; after
+    # the cinema it only puts the player back on the lair's start, where he already stands
+    r.warps.append((lair + 150, 7602))
     r.anchors.append((lair, 4))
     r.note(lair, "4 the Primagen's lair: fire held, T2_BOSS_FRONT=450,600,2.5,1")
     # the spot cycles (",K,1": another one each 600 frames of a lair wait that does not end)

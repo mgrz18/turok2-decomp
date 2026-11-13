@@ -332,6 +332,47 @@ Fixes and additions on the merged tree (asm_diff 0):
    real gamepad** (MACOS.md 12.6 documents the mapping; only headless runs so far).
 8. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
 
+## Round 13, part b1: levels 5, 6 and the Primagen by the game's own progression (branch names-R13_b1)
+
+Only tools and docs changed (`tools/port/fullrun.py`, `tools/port/routes56.py`, the new
+`tools/port/itemreach.py`, PLAYTHROUGH.md section 12); no `src/`, `include/` or `port/` file
+changed, so asm_diff does not apply. `playthrough.py RUN --all` is now 280,000 frames.
+
+- **All 18 level keys** of the route are picked up. 62's level-5 key: its stand point had no
+  floor, so the teleport was refused. 68's key sat at index 15 of a 14-segment list, and 103's
+  level-6 key at 105's index, so neither was ever inserted. All three are now at their segments,
+  anchored on the sub-level (`level_segments(..., anchor={...})`). `level_segments` and
+  `routes56.with_items` now assert that every index exists.
+- **The hub's level-5 and level-6 doors are walked through**: one walk from the plaza goes over the
+  slots ("access to level 5 granted." / "... 6 granted."), through the door and into the portal.
+  The teleports past the doors are gone.
+- **The Primagen through the hub**: **the six Primagen keys in their hub slots play the hub portal
+  cinema (level 43), which ends in the Primagen's lair (7602's place)**. Primagen key 5 is in 92
+  (the hive's talisman level, by 91's warp 5813: a +1,200-frame detour in level 5). Key 6 is at
+  114's centre, taken on 114's last visit. Key 5 goes in after level 5, key 6 after the Mother.
+  `T2_WARP_TO=7602` and fullrun's `--hop` are gone (`--slot F`: when key 6 goes in, frames after
+  the hub).
+- **Level 6's items from level 6**: the capacitor question is answered by the data. a2's
+  object-to-item reading was wrong: object 597 is the capacitor (4231) and 595 the red laser cell
+  (4229). **Level 6 holds 16 capacitors (115: 4, 116-119: 2 each, 120-123: 1 each), one per
+  coupling**, and four red cells in 123. The run picks up all 16 and two red cells
+  (`routes56.L6_ITEMS`), and every generator and plant is completed by them. One per coupling
+  (`CPlayer__UseSpecialPickup`) matches the data, so there is no port difference to fix. Not
+  rerun on the N64. `T2_GIVE_ITEMS` is gone from the continuous run (`--level 6` keeps it).
+- Still debug-assisted (besides `T2_CHEATS`, ammo, aim and the in-level teleports): the three
+  "pit" items (117's two over the pit where its bridges extend, 116's on a deadly floor) are
+  picked from the air, then a teleport puts the player back on a safe floor. **The hub's level-6
+  door is closed again when the player comes back from the Mother.** The walk back down the
+  corridor stops at it (z 651), and the route's plaza teleport crosses it. This is b2's door
+  persistence bug.
+
+RUN_RESULTS_PLACEHOLDER
+
+Next: extend 117's bridges (object 412, actors 58/60; their link records come from instances
+34/35/39, object 232) instead of the pit pickups; find what pushes the player away from 114's
+Primagen key on the first visit; once b2 fixes the doors, drop the plaza teleport after the
+Mother; check the cinema-43 path on the N64 (whether it needs the Mother dead).
+
 ## Round 12, part a5: the N64-offset sweep, the player intelligence typed (branch names-R12_a5)
 
 Detail: [STABILITY.md](STABILITY.md) section 8, [64BIT.md](64BIT.md) part 6.

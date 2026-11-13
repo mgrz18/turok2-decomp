@@ -171,16 +171,17 @@ L6_GIVE = [(400, "4231:4"), (3000, "4231:4"), (5100, "4231:4"), (10200, "4231:4,
 # actors, object 597 = 4231, 595 = 4229, 592 = 4365 Primagen key 6; approaches by
 # tools/port/itemreach.py). Entry: (item x, y, z, approach angle, distance, walk frames[, kind]).
 # kind "air": the item hangs over a lower floor (on a machine's top): the stand point is 40 units
-# out at the item's height - 20, and the walk falls through it. kind "pit": over 117's pit (where
-# its bridges, object 412 actors 58/60, extend; the route does not extend them): picked from the
-# air, then a teleport back onto the floor at (250, 0, z) 30 frames later (DEBUG-ASSISTED).
+# out at the item's height - 20, and the walk falls through it. kind ("pit", dy, (x, y, z, rotY), F):
+# the item hangs over (117: where its bridges, object 412 actors 58/60, extend; the route does not
+# extend them) or lies on (116: region info 23, damage 10,000) a deadly floor: picked from the air
+# (the item's height + dy), then a teleport onto a safe floor F frames later (DEBUG-ASSISTED).
 P2 = 1.5708
 L6_ITEMS = {
-    0: [(0.0, -50.8, 0.0, 0.0, 90, 50)],                                     # 114: Primagen key 6 (4365)
     1: [(-3840.0, 153.1, -1612.8, 0.0, 90, 50), (-3532.8, 153.1, -1612.8, 0.0, 90, 50),
         (2611.2, 41.3, -2304.0, 0.0, 40, 30, "air"), (-1228.8, 155.8, 537.6, 0.0, 40, 30, "air")],  # 115: 4 capacitors
-    3: [(0.0, 155.4, -5068.8, 0.0, 90, 50), (-1862.3, -1945.6, 921.6, -P2, 60, 12)],               # 116: 2 (the second on a ledge: a short walk, it ends ~70 past it)
-    4: [(0.0, 51.5, 153.6, 0.0, 40, 30, "pit"), (0.0, 51.5, 1689.6, 0.0, 40, 30, "pit")],         # 117: 2, over the pit
+    3: [(0.0, 155.4, -5068.8, 0.0, 90, 50), (-1862.3, -1945.6, 921.6, -P2, 40, 12, ("pit", 30.0, (0.0, 155.4, -4978.8, 0.0), 14))],  # 116: 2
+    4: [(0.0, 51.5, 153.6, 0.0, 40, 30, ("pit", -20.0, (250.0, 0.0, 153.6, P2), 30)),
+        (0.0, 51.5, 1689.6, 0.0, 40, 30, ("pit", -20.0, (250.0, 0.0, 1689.6, P2), 30))],     # 117: 2, over the pit
     6: [(-3906.8, -256.0, -1536.0, -P2, 90, 50), (-770.4, 0.3, 1136.3, P2, 90, 50)],               # 118: 2
     7: [(-2304.0, 308.0, -2380.8, P2, 90, 50), (-1075.2, 308.0, -2380.8, P2, 90, 50)],             # 119: 2
     9: [(1996.8, -153.2, 0.0, 0.0, 90, 50)],                                  # 120: 1
@@ -188,6 +189,9 @@ L6_ITEMS = {
     11: [(-1612.8, 305.6, 0.0, P2, 90, 50)],                                  # 122: 1
     12: [(0.0, 1.7, -1331.2, 0.0, 90, 50),                                    # 123: 1, then two red cells (4229)
          (-275.7, 1.7, -1228.8, 0.0, 90, 90), (275.7, 1.7, -1228.8, 0.0, 90, 90)],
+    # 114's last visit: Primagen key 6 (4365) at its centre. On the first visit a walk from 90 units
+    # out was pushed back 70 units (something round it, not identified): taken after "force field down."
+    14: [(0.0, -50.8, 0.0, 0.0, 90, 50)],
 }
 ITEM_STEP = 150
 
@@ -196,17 +200,20 @@ def _item_steps(it, dt):
     import math
     x, y, z, a, d, walk = it[:6]
     kind = it[6] if len(it) > 6 else ""
-    if kind in ("air", "pit"):
+    if kind == "air":
         y -= 20.0
+    elif kind:
+        y += kind[1]
     st = [(dt, x + math.sin(a) * d, y, z + math.cos(a) * d, a, walk, {})]
-    if kind == "pit":
-        st.append((dt + 30, 250.0, 0.0, z, P2, 0, {}))
+    if kind and kind != "air":
+        st.append((dt + kind[3],) + tuple(kind[2]) + (0, {}))
     return st
 
 
 def with_items(segments, items, step=ITEM_STEP):
     """segments with each segment's items picked up at its start (the segment's own steps and every
     later segment move by the time added); returns (segments, total frames added)."""
+    assert all(0 <= i < len(segments) for i in items), "an item list past the last segment"
     out, added = [], 0
     for i, (name, rel, steps) in enumerate(segments):
         new, k = [], 0
