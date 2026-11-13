@@ -1501,3 +1501,75 @@ portal cinema (43) does not fire and the hop stays.
 - `--level 6` on its own no longer kills the Primagen: the run equals round 12's up to the Mother,
   but after the hop (54,000) his stage-2 lair wait (resting at z 2,906) does not end; other hop frames
   (53,700-57,000) and the spot cycle did not help. The whole-game run and the boss recipe kill him.
+
+## 17. Levels 5 and 6 without invincibility (Phase 7 round 14, part c2)
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,5,6 --cheats-on 110,3,4
+```
+
+`--cheats-on` now also takes 3 (the Mother's arena) and 4 (the Primagen's lair): invincible only
+inside that fight, in a `--cheats-off 6` run. Levels 3 and 4 stay invincible here (part c1).
+
+**The result** (Linux, headless, PIE, Debug, 290,000 frames, `T2_HURT_LOG=1`, i.e. no rescue; two
+runs identical, md5 of every `progress`/`event`/`pickup`/`hurt`/`death`/`bosstrace` line): all five
+totems, the four bosses (the Queen 173,645, the Mother 219,614, the Primagen 252,317), cinema 370,
+the credits, the hub at 273,207; exit 0. **0 deaths in levels 1, 2, 5 and 6** (the one `death:`
+line is the Primagen's own death sequence, health set to 0, as in round 13).
+
+| sub-level | hits | damage | lowest health |
+|---|---|---|---|
+| 124 (level 5) | 15 | 41 | 53 |
+| 113 the Hive Totem | 12 | 23 | 130 |
+| 2 the Mantid Queen | 20 | 48 | 82 |
+| 117 (level 6) | 19 | 21 | 61 |
+| 115, 116, 119, 123 | 0 | 0 | |
+
+### 17.1 What killed the player in level 6 (route bugs, not host bugs)
+
+A `--cheats-off 6` run lost all its lives before the Mother. Every death was the route's,
+in the damage regions under the round-13 item and coupling approaches (region info flag 0x80000,
+`AI_UpdateRegionFlags`), and one laser:
+
+- **115**: the third capacitor (2611, 41, -2304) hangs over a pool (y -214.7, 25 every 0.5 s).
+  The "air" walk landed in it. Now it is a `pit` pick: the walk from 40 out collects it within 36
+  frames, and a teleport 38 frames in puts the player on the floor at y -2. The landing would come
+  at 43 frames.
+- **116**: the first capacitor's 50-frame walk went past it and off the ledge (z -5,170) into a
+  pool (25 every 0.5 s). The walk is now 20 frames.
+- **119**: the generator stands in a pool: floor y -307.2, region info 5, **50 every 0.5 s**. The
+  couplings' air starts (y -110) fell into it, 2 lives per run. Now each start has a 20-frame walk
+  (it was 50), and 25 frames in, a teleport onto the room's walkway (y -153.6, ~700 out, no damage),
+  facing away (`routes56.L6_119_ESCAPE`). All 4 couplings still go, and generator 3 recalibrates.
+  How the N64 player gets up there: the four objects 504 (type 1602, intelligences 1095-1098) at
+  the pool's corners are probably moving platforms. 115 has one too, beside the hanging capacitor.
+  Not followed up.
+- **123**: the capacitor (0, 1.7, -1331) was approached from z -1,241. That is inside a laser beam
+  (object 302 at (0, 25.6, -1228.8): 40 + 14 + 12 damage per touch, a touch every 4 frames). It is
+  now approached from -z (z -1,421) with a 20-frame walk.
+
+The pool damage comes 1-2 hits at a time, because `CPlayer__Update` calls `AI_UpdateRegionFlags`
+twice per frame. That is matching code (the ROM does the same), so it is not a host bug.
+
+### 17.2 Health on the way
+
+- Level 5: 95's ultra health (870, 614, 2458; object 548 = item 1704) on embryo 2's visit
+  (`routes56.L5_HEALTH`, only with `--cheats-off 5`). 92's ultra health was tried and dropped: its
+  walk went over the ledge behind it, a fall and a life lost.
+- Level 6: two of 114's four ultra healths ((+-870, 155.7, -1178)) on the last 114 visit, before
+  the Mother. The player enters her arena with 200.
+
+### 17.3 Still invincible, and why
+
+- **The Mother (3)**: 250-330 damage in rescue runs; 300 without rescue, from 200 health: 2
+  lives lost and a GAME OVER. Most of it is her 10-damage hit from her body at ~1,240 units
+  (source kind 1, object 77), every 70-230 frames while the player stands and fires. Other
+  strafes did no better (standalone level 6, `T2_HURT_LOG=2`): strafing left from her arena +5,800
+  (the recipe) 292; from +2,500 256; from +1,500 325; from +800 325; strafing right 480-491. Her
+  arena has no health. Not compared with the N64.
+- **The Primagen (4)**: ~280 damage and a life lost in a rescue run (round-13 route).
+- **The City Totem (110)**: without it, 150 damage and **2 lives lost** (the totem is still won).
+  The player arrives with 44 health. 135's ultra health is taken at 135's start, and sister 3
+  costs ~156. No health is reachable between 135 and 110: the eight +10s of 132 hang in an arc at
+  y 1,229-1,300 over a floor at 1,024, 132's ultra health lies in the water (b5: 330-740 lost
+  there), and 73 has none.
