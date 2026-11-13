@@ -8,11 +8,26 @@ s32 CMtxF__RotateX(s32, s32);                    /* extern */
 s32 CMtxF__RotateZ(sptr, f32);                    /* extern */
 
 /* Effect callback context: the actor it runs for and the current value. */
+#ifdef TARGET_PORT
+/* The port (round 13 b5): the context is CGameObjectInstance__PoseBone's bone-posing context
+ * (the m_AI.m_pfEffects callback), whose host layout is T2PoseContext (structs/pose_host.h): the
+ * N64 view read the bone index at 0x94 (host T2PoseContext.bone is at 0xE0), so the turret's gun
+ * and turn nodes were never rotated (n64viewcheck: the a5 sweep's unresolved Turret_Effects). */
+#include "structs/pose_host.h"
+typedef struct {
+    union {
+        struct { CGameObjectInstance *owner; };
+        struct { u8 _hp_value[__builtin_offsetof(T2PoseContext, bone)]; s32 value; };
+    };
+} Effect00262B58;
+_Static_assert(__builtin_offsetof(Effect00262B58, owner) == __builtin_offsetof(T2PoseContext, obj), "pose ctx");
+#else
 typedef struct {
     /* 0x00 */ CGameObjectInstance *owner;
     /* 0x04 */ u8 pad4[0x90 - 0x4];
     /* 0x90 */ s32 value;
 } Effect00262B58;
+#endif
 
 void Turret_Effects(sptr arg0, Effect00262B58 *arg1) {
     CGameObjectInstance *temp_a0;
