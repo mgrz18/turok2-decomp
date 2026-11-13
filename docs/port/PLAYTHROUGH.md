@@ -1563,7 +1563,7 @@ Runs (Linux headless PIE, `playthrough.py RUN --all --talismans 2 --cheats-off 1
   lair at 222,579. **The Primagen did not die**: he rested at z 2,907.7 in his stage-3 lair wait,
   and the wait never ended (section 17.3). `--slot 1500` does not help:
   the corridor walk (C-up until 50 frames before the slot) then runs on into the level-1 portal,
-  and the run is in level 51 by 221,000. With  (DEBUG-ONLY) the hop at 232,830 reloads the lair, and
+  and the run is in level 51 by 221,000. With `--hop` (DEBUG-ONLY) the hop at 232,830 reloads the lair, and
   the good ending follows: **the Primagen dead at 246,874 with cinema 370**, END 2 (level 10 from
   249,866), the hub at 267,764, cheats 0x7ffe7fd.
 
