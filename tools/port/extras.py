@@ -3,6 +3,7 @@
 
     python3 tools/port/extras.py OUTDIR --talisman 73..77     # a talisman chamber
     python3 tools/port/extras.py OUTDIR --nuke 78..83         # a flesh-eater level's nuke part
+    python3 tools/port/extras.py OUTDIR --adon                # Adon's chamber (72, level 1)
         # OUTDIR/playthrough.txt, OUTDIR/teleport.env (run as playthrough.py's, --pak-blank, 18,000 frames)
 
 A new game, then T2_WARP_TO the level's portal warp (N001 for the chamber of level N, N003 for its
@@ -13,6 +14,10 @@ flesh-eater level), as walking into the portal does:
   T2_GIVE_ITEMS: DEBUG-ASSISTED, in a real run it is picked up in the level, fullrun.TALISMAN);
   then fullrun.CHAMBER's walk: the piece placed (a cinema), the door, the talisman, the exit N002
   back to the portal's level. No teleport.
+- **Adon's chamber** (72, portal 1001 of 55; round 14 c3): walking in (C-up) plays her scene, which
+  holds the player at (0, 0, -622) for ~3,000 frames; then walking back (C-down) into the entrance
+  pad (regions 243/244, warp 1002) returns to 55. The chamber's door (actor 8, z 467) has no event:
+  it never opens (no talisman here). Round 13's "stall" was the route standing still after the scene.
 - **flesh-eater level** (78-83, one nuke part 4500 each, m_NukePartLevelFlags[level - 1]): a
   teleport next to the part and a short walk (DEBUG-ASSISTED: the level's way to it, through its
   flesh eaters, is not routed).
@@ -28,6 +33,7 @@ CHAMBER_AT = 13200      # the chamber is loaded (fullrun.CHAMBER counts from it)
 # chamber level: (portal warp, the piece item, the talisman item)
 TALISMANS = {73: (2001, 4402, 4382), 74: (3001, 4400, 4380), 75: (4001, 4404, 4384),
              76: (5001, 4403, 4383), 77: (6001, 4401, 4381)}
+ADON = (1001, [("CU", 100, 500), ("CD", 3200, 3800)])   # the warp, the walk in, back out (from CHAMBER_AT)
 # flesh-eater level: (portal warp, the nuke part (x, y, z): a level actor of object 611 = item 4500)
 NUKES = {78: (1003, (-1075.2, 0.0, -358.4)), 79: (2003, (2751.9, 307.2, -1244.7)),
          80: (3003, (692.8, 0.0, -2317.3)), 81: (4003, (-2747.0, 0.0, -587.5)),
@@ -50,10 +56,15 @@ def main():
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--talisman", type=int, choices=sorted(TALISMANS))
     g.add_argument("--nuke", type=int, choices=sorted(NUKES))
+    g.add_argument("--adon", action="store_true", help="Adon's chamber (72): her scene, then back to 55")
     a = ap.parse_args()
     inputs = [NEW_GAME]
     env = [("T2_CHEATS", "1")]
-    if a.talisman:
+    if a.adon:
+        warp, walk = ADON
+        inputs += ["%s@%d..%d" % (b, CHAMBER_AT + f0, CHAMBER_AT + f1) for b, f0, f1 in walk]
+        env += [("T2_WARP_TO", str(warp))]
+    elif a.talisman:
         warp, piece, _ = TALISMANS[a.talisman]
         inputs += ["%s@%d..%d" % (b, CHAMBER_AT + f0, CHAMBER_AT + f1) for b, f0, f1 in fullrun.CHAMBER]
         env += [("T2_WARP_TO", str(warp)), ("T2_GIVE_ITEMS", "%d:1@13100" % piece)]
