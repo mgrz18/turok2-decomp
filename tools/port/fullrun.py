@@ -389,17 +389,32 @@ PAD = {   # level: [(teleport x, y, z, rotY, walk), ...] legs; the last one reac
 CINEMA_AFTER = {2: 260, 3: 510, 4: 120,     # last leg start -> the level's first intro cinema
                 5: 420, 6: 470}             # 5, 6: -> the portal's warp (the leg start + 10 + these)
 OLD_CINEMA = {2: 13420, 3: 13410, 4: 13420}  # the same frame in the level's own --level N run
-PRIMAGEN_SLOTS = {1: (71.0, 0.0, 183.0), 2: (133.0, 0.0, 38.0), 3: (37.0, 0.0, -85.0),
-                  4: (-119.0, 0.0, -71.0), 5: (-86.0, 0.0, 203.0), 6: (-185.0, 0.0, 73.0)}
-# round 13 b1: the walk for Primagen key K starts at slot PRIMAGEN_FROM[K]'s outside stand point. A
-# walk straight in at slot 2 or 3 is deflected round them (the plaza's centre: no region inside the
-# ring); the walk at slot 1 goes on to slot 2, and once slot 2 holds its key, the walk at slot 2
-# goes on to slot 3 (a new game with the six keys given: every slot filled; until round 12 keys
-# 2 and 3 never went in, so the hub portal could not open)
-PRIMAGEN_FROM = {1: 1, 2: 1, 3: 2, 4: 4, 5: 5, 6: 6}
-# keys 2 and 3 in the continuous run (slot 1 already full, the walk above stops at (147, 128)): from
-# the previous slot's pad along the ring
-PRIMAGEN_ALONG = {2: (71.0, 0.0, 183.0, -0.4040), 3: (133.0, 0.0, 38.0, 0.6620)}
+# round 14 c3: each Primagen key slot takes ONE key (its action's m_GoPickupNeeded, read in the hub
+# with gdb): key K goes into the slot whose required item is 4359 + K. Round 13's map was by ring
+# order (its "slot 2" was actor 5, which needs key 6): a slot touched without its key refuses it
+# (Action_CheckRequiredItem returns 0, "Primagen key N required") and stays solid, which is why the
+# walks at "slots 2 and 3" slid round them. Key K: (x, y, z) of its slot.
+PRIMAGEN_SLOTS = {1: (70.7, 0.0, 182.9),     # actor 4  (object 154), item 4360
+                  2: (-85.7, 0.0, 202.8),    # actor 11 (object 291), item 4361
+                  3: (-184.9, 0.0, 72.6),    # actor 12 (object 292), item 4362
+                  4: (-119.3, 0.0, -71.3),   # actor 7  (object 161), item 4363
+                  5: (36.7, 0.0, -84.5),     # actor 6  (object 159), item 4364
+                  6: (133.2, 0.0, 38.0)}     # actor 5  (object 158), item 4365
+PRIMAGEN_RING = (-24.9, 56.8)   # the centre of the ring of slots (each ~158 from it)
+# Keys 2 and 3 are picked up in levels 2 and 3 but go into their slots only in the hub visit after
+# level 5: put in on the visits after levels 2 and 3 they changed the later fights (the Marsh Totem
+# 7/8 -> 4/8 kills, lost: the defences are marginal and any change before them moves their kills),
+# so the totem levels keep round 13's schedule (the 150 frames of each old walk kept as a pause).
+PRIMAGEN_LATE = (2, 3)
+HOP = False                     # --hop: round 13's fallback warp 7602 (DEBUG-ONLY)
+
+
+def primagen_slot(r, t, k):
+    """Primagen key k into its slot: stand 90 outside the slot (away from the ring's centre), walk in."""
+    x, y, z = PRIMAGEN_SLOTS[k]
+    r.pick(t, x, y, z, math.atan2(x - PRIMAGEN_RING[0], z - PRIMAGEN_RING[1]))
+
+
 SAVE_PORTAL = (-977.9, -221.0, -2035.3, 1.4423)   # the hub's save portal (warp 999 -> level 97)
 SAVE_MENU = [(740, "A"), (890, "A"), (1090, "A"), (1240, "DD"), (1340, "A"), (1490, "A")]
 # a later save overwrites note 1: its "overwrite?" dialog opens with the cursor on NO
@@ -414,7 +429,7 @@ SAVE_TIME = 2000
 GRANT = {1: (2, 3), 2: (4,), 3: ()}
 
 
-def hub(r, arrival, grant=(), primagen=(), save=True, go=None):
+def hub(r, arrival, grant=(), primagen=(), save=True, go=None, pause=0):
     """The hub from `arrival`: pads `grant` (their keys in), Primagen key slots, a save, then
     the portal of level `go`; returns (the frame the level's first cinema starts, or the end)."""
     t = arrival + 150
@@ -433,13 +448,9 @@ def hub(r, arrival, grant=(), primagen=(), save=True, go=None):
         t += 300
     for k in primagen:
         r.note(t, "60 the hub: Primagen key %d slot" % k)
-        if k in PRIMAGEN_ALONG:   # from the previous slot along the ring
-            x, y, z, ry = PRIMAGEN_ALONG[k]
-            r.tp(t, x, y, z, ry, 40)
-        else:
-            x, y, z = PRIMAGEN_SLOTS[PRIMAGEN_FROM[k]]
-            r.pick(t, x, y, z, math.atan2(x, z))   # from the outside of the ring
+        primagen_slot(r, t, k)
         t += 150
+    t += pause   # round 14 c3: the time of a slot walk moved to a later visit (keeps the schedule)
     if go is None:
         return t
     r.note(t, "60 the hub: through the level %d door to the portal %d000" % (go, go))
@@ -502,9 +513,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.note(hubs[2], "60 the hub (after level 2)")
     r.anchors.append((hubs[2], 60))
     if upto < 3:
-        hub(r, hubs[2], grant=GRANT[2], primagen=(2,))
+        hub(r, hubs[2], grant=GRANT[2], pause=150)
         return r.write(out)
-    c = hub(r, hubs[2], grant=GRANT[2], primagen=(2,), go=3)
+    c = hub(r, hubs[2], grant=GRANT[2], pause=150, go=3)
     shift = c - OLD_CINEMA[3]
     r.anchors.append((c, 12))
     r.note(c, "12.. the Death Marshes intro cinemas (level 3 route shifted by %d)" % shift)
@@ -517,9 +528,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.note(hubs[3], "60 the hub (after level 3)")
     r.anchors.append((hubs[3], 60))
     if upto < 4:
-        hub(r, hubs[3], grant=GRANT[3], primagen=(3,))
+        hub(r, hubs[3], grant=GRANT[3], pause=150)
         return r.write(out)
-    c = hub(r, hubs[3], grant=GRANT[3], primagen=(3,), go=4)
+    c = hub(r, hubs[3], grant=GRANT[3], pause=150, go=4)
     shift = c - OLD_CINEMA[4]
     r.anchors.append((c, 18))
     r.note(c, "18.. the Lair of the Blind intro cinemas (level 4 route shifted by %d)" % shift)
@@ -602,7 +613,8 @@ def level5(r, t):
     r.level_start[6] = hub_at
     r.note(hub_at, "60 the hub (after level 5)")
     r.anchors.append((hub_at, 60))
-    return hub(r, hub_at, primagen=(5,), go=6)   # a save, Primagen key 5, the level-6 door and portal
+    # round 14 c3: Primagen keys 2 and 3 go in here, with key 5 (PRIMAGEN_LATE)
+    return hub(r, hub_at, primagen=PRIMAGEN_LATE + (5,), go=6)   # a save, the keys, the level-6 door and portal
 
 
 def level6(r, t):
@@ -632,13 +644,11 @@ def level6(r, t):
     r.note(h + L6_WALK_AFTER, "60 the hub: back down the corridor through the level-6 door to the plaza")
     r.inputs.append("CU@%d..%d" % (h + L6_WALK_AFTER, h + L6_SLOT_AFTER - 50))
     f = h + L6_SLOT_AFTER
-    x, y, z = PRIMAGEN_SLOTS[PRIMAGEN_FROM[6]]
     r.note(f, "60 the hub: Primagen key 6 slot: the six keys in: the hub portal cinema (43) -> the Primagen")
-    r.pick(f, x, y, z, math.atan2(x, z))
+    primagen_slot(r, f, 6)
     lair = f + L6_CINEMA
-    # FALLBACK (DEBUG-ASSISTED): if the six keys are not all in (no cinema), the old hop 7602; after
-    # the cinema it only puts the player back on the lair's start, where he already stands
-    r.warps.append((lair + 150, 7602))
+    if HOP:   # DEBUG-ONLY (--hop): round 13's warp 7602, for a run whose six keys are not all in
+        r.warps.append((lair + 150, 7602))
     r.anchors.append((lair, 4))
     r.note(lair, "4 the Primagen's lair: fire held, T2_BOSS_FRONT=450,600,2.5,1")
     # the spot cycles (",K,1": another one each 600 frames of a lair wait that does not end)
@@ -656,7 +666,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global L6_SLOT_AFTER
+    global L6_SLOT_AFTER, HOP
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -670,8 +680,10 @@ def cli(argv=None):
     ap.add_argument("--talismans", nargs="?", const="2,3", default="",
                     help="the talisman chambers of these levels (default 2,3; round 13 b3)")
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
+    ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
     a = ap.parse_args(argv)
     L6_SLOT_AFTER = a.slot
+    HOP = a.hop
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},
              [int(x) for x in a.cheats_off.split(",") if x], a.env, not a.no_health,
              [int(x) for x in a.cheats_on.split(",") if x], [int(v) for v in a.talismans.split(",") if v])
