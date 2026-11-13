@@ -478,6 +478,14 @@ PRIMAGEN_SLOTS = {1: (71.0, 0.0, 183.0),     # actor 4  (object 154), item 4360
 # levels 1-5 play exactly as in round 13; the real order is only a schedule choice of this route.
 PRIMAGEN_LATE = (2, 3)
 ROUND13_BUMP = {2: (71.0, 0.0, 183.0, -0.4040), 3: (133.0, 0.0, 38.0, 0.6620)}
+
+
+def key_visit(k):
+    """The hub visit after level k (2 or 3): its Primagen key in its own slot (--natural-keys, round 14
+    C29), or round 13's walk (ROUND13_BUMP) with the key put in after level 5 (PRIMAGEN_LATE)."""
+    if k in PRIMAGEN_LATE:
+        return {"bump": ROUND13_BUMP[k]}
+    return {"primagen": (k,)}
 HOP = False                     # --hop: round 13's fallback warp 7602 (DEBUG-ONLY)
 
 
@@ -591,9 +599,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.note(hubs[2], "60 the hub (after level 2)")
     r.anchors.append((hubs[2], 60))
     if upto < 3:
-        hub(r, hubs[2], grant=GRANT[2], bump=ROUND13_BUMP[2])
+        hub(r, hubs[2], grant=GRANT[2], **key_visit(2))
         return r.write(out)
-    c = hub(r, hubs[2], grant=GRANT[2], bump=ROUND13_BUMP[2], go=3)
+    c = hub(r, hubs[2], grant=GRANT[2], go=3, **key_visit(2))
     shift = c - OLD_CINEMA[3]
     r.anchors.append((c, 12))
     r.note(c, "12.. the Death Marshes intro cinemas (level 3 route shifted by %d)" % shift)
@@ -619,9 +627,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.note(hubs[3], "60 the hub (after level 3)")
     r.anchors.append((hubs[3], 60))
     if upto < 4:
-        hub(r, hubs[3], grant=GRANT[3], bump=ROUND13_BUMP[3])
+        hub(r, hubs[3], grant=GRANT[3], **key_visit(3))
         return r.write(out)
-    c = hub(r, hubs[3], grant=GRANT[3], bump=ROUND13_BUMP[3], go=4)
+    c = hub(r, hubs[3], grant=GRANT[3], go=4, **key_visit(3))
     shift = c - OLD_CINEMA[4]
     r.anchors.append((c, 18))
     r.note(c, "18.. the Lair of the Blind intro cinemas (level 4 route shifted by %d)" % shift)
@@ -788,7 +796,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global L6_SLOT_AFTER, HOP
+    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -803,10 +811,14 @@ def cli(argv=None):
     ap.add_argument("--talismans", nargs="?", const="2,3", default="",
                     help="the talisman chambers of these levels (default 2,3; round 13 b3)")
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
+    ap.add_argument("--natural-keys", action="store_true",
+                    help="Primagen keys 2 and 3 into their slots on the hub visits after levels 2 and 3 (round 14 C29)")
     ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
     a = ap.parse_args(argv)
     L6_SLOT_AFTER = a.slot
     HOP = a.hop
+    if a.natural_keys:
+        PRIMAGEN_LATE = ()
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},
              [int(x) for x in a.cheats_off.split(",") if x], a.env, not a.no_health,
              [int(x) for x in a.cheats_on.split(",") if x], [int(v) for v in a.talismans.split(",") if v])
