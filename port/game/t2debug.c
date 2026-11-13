@@ -953,6 +953,7 @@ void T2Port_LogEvent(LevelEvent *e, const char *text) {
  * game unlocked (m_Settings.unlockedCheats) and the ending flags. */
 extern s32 gFinalEnding;
 extern s32 gEndingPrimagenDefeated;
+extern s32 Cinema_GetScriptId(void);
 void T2Port_ProgressLog(int frame) {
     static int on = -1;
     static char last[256];
@@ -987,11 +988,46 @@ void T2Port_ProgressLog(int frame) {
     for (i = 0; i < 6; i++) {
         n += snprintf(cur + n, sizeof(cur) - n, "%d", d->m_NukePartLevelFlags[i]);
     }
-    snprintf(cur + n, sizeof(cur) - n, " cheats %x ending %d/%d", (unsigned) gEngineApp_m_Game.m_Settings.unlockedCheats,
-             (int) gFinalEnding, (int) gEndingPrimagenDefeated);
+    snprintf(cur + n, sizeof(cur) - n, " cheats %x ending %d/%d cinema %d", (unsigned) gEngineApp_m_Game.m_Settings.unlockedCheats,
+             (int) gFinalEnding, (int) gEndingPrimagenDefeated, (int) Cinema_GetScriptId());
     if (strcmp(cur, last) != 0) {
         strcpy(last, cur);
         printf("progress: frame %d level %d %s\n", frame, (int) gScene.m_nLevel, cur);
         fflush(stdout);
     }
+}
+
+/* T2_TOTEMS=abcde (DEBUG-ONLY, round 13 b3): on the first gameplay frame (mode 13, a level > 0)
+ * set the five totem flags m_bLevel1..5TotemFlags to the digits (1 won, 0 lost), as winning the
+ * totem defences 109-113 would (TotemDefense_Complete). With all five, Primagen_EnterDeath picks
+ * the good ending (cinema 0x172 "PD2-P tired", the totems' cinemas, unlockedCheats |= 0x7FF0019)
+ * instead of 0x173 ("Primagen Death", unlockedCheats |= 2): a way to check that path without
+ * the five fights (the Primagen recipe, STATUS.md section 1). */
+void T2Port_SetTotems(void) {
+    static int done;
+    const char *s;
+    CPlayer *p;
+    s32 *f;
+    int i;
+
+    if (done) {
+        return;
+    }
+    s = getenv("T2_TOTEMS");
+    if (s == NULL) {
+        done = 1;
+        return;
+    }
+    p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_nLevel <= 0) {
+        return;
+    }
+    done = 1;
+    f = &p->m_Data.m_bLevel1TotemFlags;
+    for (i = 0; i < 5 && s[i] != 0; i++) {
+        f[i] = s[i] == '1';
+    }
+    printf("debug: T2_TOTEMS=%s: level %d totem flags %d%d%d%d%d\n", s, (int) gScene.m_nLevel, (int) f[0] != 0,
+           (int) f[1] != 0, (int) f[2] != 0, (int) f[3] != 0, (int) f[4] != 0);
+    fflush(stdout);
 }
