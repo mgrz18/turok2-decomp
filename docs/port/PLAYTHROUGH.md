@@ -1110,8 +1110,8 @@ routed). In 78 the part lies behind a door (actor 10) that was already open.
 
 ### 12.4 The 100% ending in one run
 
-`fullrun.py RUN --talismans 2` (the level-2 chamber trip only; Linux, headless, PIE, 276,000
-frames, `T2_PROGRESS_LOG=1`; the same debug aids as section 11.3): **all five totems won** (109
+`fullrun.py RUN --talismans 2` (the level-2 chamber trip only; Linux, headless, PIE, 276,000 frames, two runs
+with identical `progress:` lines, `T2_PROGRESS_LOG=1`; the debug aids of section 11.3): **all five totems won** (109
 11/8, 110 11/8, 111 11/8, 112 11/8, 113 9/8), the piece 4402 in 132 and **Leap of Faith** (73,
 78,576), the four boss flags, then **the good ending**: the Primagen's death at 238,685 with
 **cinema 370** (the totems' cinemas, level 9 loaded at ~239,500), level 10's "END 2" (241,677,
