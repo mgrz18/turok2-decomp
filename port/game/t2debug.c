@@ -359,7 +359,16 @@ void T2Port_GiveWeapons(int frame) {
 
     if (sEnabled < 0) {
         const char *e = getenv("T2_GIVE_WEAPONS");
-        sEnabled = (e != NULL && e[0] == '1');
+        sEnabled = (e != NULL && e[0] != '\0');
+    }
+    if (sEnabled) {
+        /* round 14 c5: a schedule "0;1@F" (T2Port_Scheduled): from frame F only (levels 1 and 2 on
+         * the weapons and ammo the player picks up) */
+        char gbuf[16];
+        const char *g = T2Port_Scheduled(getenv("T2_GIVE_WEAPONS"), frame, gbuf, sizeof(gbuf));
+        if (g == NULL || g[0] != '1') {
+            return;
+        }
     }
     if (!sEnabled || gEngineApp.m_Settings.mode != 13 || gScene.m_nLevel <= 0) {
         return;
@@ -1277,4 +1286,17 @@ void T2Port_SetTotems(void) {
     printf("debug: T2_TOTEMS=%s: level %d totem flags %d%d%d%d%d\n", s, (int) gScene.m_nLevel, (int) f[0] != 0,
            (int) f[1] != 0, (int) f[2] != 0, (int) f[3] != 0, (int) f[4] != 0);
     fflush(stdout);
+}
+
+/* T2_SCRIBBLE=HEX (DEBUG-ONLY, round 14 c5): before each game frame, fill 256 KB of the stack below
+ * the caller with the 32-bit word HEX. A game local read before it is written then holds HEX (or
+ * what an earlier call of the same frame left) instead of whatever the last frame left there: a
+ * run with it differs from a run without it only through such reads. Build with
+ * -DT2_AUTO_VAR_INIT=none to look for them (STABILITY.md section 10). */
+__attribute__((noinline)) void T2Port_ScribbleStack(unsigned value) {
+    volatile unsigned buf[65536];
+    int i;
+    for (i = 0; i < 65536; i++) {
+        buf[i] = value;
+    }
 }
