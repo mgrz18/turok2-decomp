@@ -292,7 +292,7 @@ L4_HEALTH = {
     13: [(-9594.8, -3684.6, -157.0, 1.5708)],                              # 103 again: ultra health
 }
 
-L4_TOTEM_WEAPON_BEFORE = 600   # the scorpion launcher this long before the Cave Totem's fire window
+TOTEM_WEAPON_BEFORE = 600   # the scorpion launcher this long before a totem's fire window (levels 3, 4)
 
 L4_KEYS = {
     0: [(6758.4, -614.4, 2304.0, 0.0)],                                  # 98: Primagen key 4 (4363)
@@ -589,6 +589,11 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     rel, length, lv = pt.L3_TOTEM
     r.note(l3s + rel + a3, "111 the Marsh Totem: fire taps")
     r.fire.append((l3s + rel + a3, l3s + rel + a3 + length))
+    if 3 in r.no_cheats:
+        # round 14 c1: the scorpion launcher (16) for the Marsh Totem (scheduled in 68, before the
+        # totem's level loads; see level 4): 15 damage instead of 62-272 and a life
+        r.weapon.append((l3s + rel + a3 - TOTEM_WEAPON_BEFORE, "16"))
+        r.weapon.append((hubs[3] - 200, "10"))
     r.face_levels.append(lv)
     r.note(hubs[3], "60 the hub (after level 3)")
     r.anchors.append((hubs[3], 60))
@@ -618,7 +623,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         # the switch is scheduled in 103, before the totem's level loads. The plasma rifle: the
         # totem 200 damage and a life lost, the Blind One never hurt (hp 12,800/12,800 at the end);
         # the scorpion launcher: the totem 88 damage, the Blind One dead in 5,200 frames
-        r.weapon.append((l4s + rel + a4 - L4_TOTEM_WEAPON_BEFORE, "16"))
+        r.weapon.append((l4s + rel + a4 - TOTEM_WEAPON_BEFORE, "16"))
         r.weapon.append((hubs[4] - 200, "10"))
     r.face_levels.append(lv)
     rel, length, (x, y, z, ry), lv = pt.L4_BOSS
