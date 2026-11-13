@@ -23,6 +23,27 @@ extern void Cinema_Disable();
 extern void Cinema_Enable();
 extern void Cinema_Disable(void);
 extern void Cinema_Enable(void);
+#ifdef TARGET_PORT
+/* The port (round 13 b2): the record tables by member of CScene (the N64 view reads them at
+ * 0x1168-0x117C, other members of the host CScene, and keeps the table pointers in s32). */
+#include "structs/world.h"
+void func_00465760(Level *level) {
+    CScene *w = (CScene *) level;
+    s32 i, k, n;
+    Item_func_8044D668_de *item;
+    Cinema_Disable();
+    for (k = 0; k < 2; k++) {
+        n = k == 0 ? w->m_nRecords : w->m_nAltRecords;
+        for (i = 0; i < n; i++) {
+            item = (Item_func_8044D668_de *) &(k == 0 ? w->m_pRecords : w->m_pAltRecords)[i];
+            if (item->kind == 1 || item->kind == 4 || item->kind == 2 || item->kind == 10) {
+                CScene__RestoreFiredEvent(w, item);
+            }
+        }
+    }
+    Cinema_Enable();
+}
+#else
 void func_00465760(Level *level) {
     s32 i;
     s32 n;
@@ -44,3 +65,4 @@ void func_00465760(Level *level) {
     }
     Cinema_Enable();
 }
+#endif
