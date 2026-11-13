@@ -1424,3 +1424,80 @@ b2) makes the ending independent of the route's timing.
 - Adon's chamber (72, portal 1001 of 55): walking in plays her scene (events at 13,533-13,931) and
   the player stays at (0, 0, -622) for 3,000+ frames: what ends the scene (a button?) not found.
 - The good ending against the N64 (the PD2 chain's camera and length).
+
+## 16. The whole game to the good ending in one run (Phase 7 round 13, the merge C28)
+
+The merged tree (b4, b2, b5, b1, b3) with two route fixes plays a new game to the good ending in one
+process:
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2 --cheats-on 110
+```
+
+(`playthrough.py --all` passes its other options to `fullrun.py`; the run command is STATUS.md
+section 1.) 5,018 input entries, 269 teleports; 270,000 frames are enough.
+
+### 16.1 Which aids, and why
+
+The candidates, all Linux, headless, PIE, Debug, 300,000 frames:
+
+| options | result |
+|---|---|
+| (none) | levels 1-6 and the Primagen; **the Marsh Totem lost** (4 of 5 totems): END 1b, the credits, the hub |
+| `--talismans 2,3` | the City Totem won, **the Marsh Totem lost** (as b3 found): END 1b would follow; the Primagen's lair wait never ended (he rested at z 2,923) |
+| `--talismans 2` (key 6 slot at 650, b1's default) | **all five totems won**; the Primagen rested at z 2,923 and his stage-3 lair wait never ended (two runs, identical) |
+| `--talismans 2 --slot 300` / `--slot 1100` | all five totems, the Primagen dead (257,767 / 249,979), **cinema 370, END 2**, the credits, the hub: `--slot 1100` is now the default |
+| `--talismans 2,3 --cheats-off 1,2,5` (b2's sister-1 steps) | level 2 without invincibility: 200 damage among sister 1's zombies (b2 aims them one by one, 4,500 frames), a death, the schedule lost, GAME OVER in 135 |
+| `--talismans 2 --cheats-off 1,5` / `--talismans 2,3 --cheats-off 1,5` | level 1's health pickup moves the route 150 frames; after the Leap of Faith chamber the player went into 125 instead of the City Totem's warp and stayed there |
+| `--talismans 2 --cheats-off 5` | the good ending, but the Mantid Queen kills the player once (a life lost) |
+| `--talismans 2 --cheats-off 1,2,5 --cheats-on 110` (round 12's sister-1 steps when level 2 is not invincible) | levels 1 and 2 with 0 deaths; the Queen kills the player once; the good ending |
+| **`--talismans 2 --cheats-off 1,2 --cheats-on 110`** | **the good ending, 0 deaths in levels 1-5** (below) |
+| `--talismans 2 --cheats-off 1,2` | the City Totem kills the player twice: `--cheats-on 110` stays |
+
+Two route changes came out of this (commit 92a0f12f): Primagen key 6 goes into its slot 1,100
+frames after the hub (650 before: with the merged route the Primagen came to rest at z 2,923, the
+spot from which no `T2_BOSS_FRONT` placement ends his stage-3 lair wait; section 11.1), and a
+level 2 played without invincibility keeps round 12's sister-1 steps (`fullrun.L2_133_NOCHEATS`:
+sister 20 aimed from the start, `L2_STRETCH` on that step), which b5 measured; with invincibility
+b2's zombie-first steps stay.
+
+### 16.2 The run (Linux, headless, PIE, Debug; host frames)
+
+| frame | |
+|---|---|
+| 0-23,130 | a new game; level 1 **without invincibility**: its keys and Primagen key 1, the health in 55 and the ultra health in 59; the Harbor Totem won 23,130 |
+| 24,000-27,300 | the hub: save 1, Primagen key 1, "access to level 2 granted." 26,146, "... 3 granted." 26,474, the door to 2000 |
+| 27,300-85,700 | level 2 **without invincibility** (5 health pickups, lowest health 25, 0 deaths): sister 1 banished 41,674, sister 2 55,174, the soul gates 62,204, "all sisters of despair banished." 73,058; **the Leap of Faith**: the piece in 132, the portal 2001, chamber 73 (the talisman 79,854); **the City Totem won** 85,146 (invincible from 600 frames before it) |
+| 86,000-89,000 | the hub: save 2, Primagen key 2's walk, "access to level 4 granted." 88,180 |
+| 89,000-108,100 | level 3 (invincible): prisoners, armories, Primagen key 3, the level-5 keys of 61, 62 and 68; the Marsh Totem won 108,063 |
+| 109,000-139,900 | the hub (save 3); level 4: "blind ones trapped." 123,683, the Cave Totem won 128,158, **the Blind One dead** 139,897 |
+| 140,000-147,000 | the hub: save 4, the level-5 key slots, **the level-5 door walked through**, "access to level 5 granted." 142,433 |
+| 147,000-172,137 | level 5 (invincible): "force field down." 148,113, Primagen key 5 in 92, "all embryos destroyed." 159,607, "master computer destroyed." 161,759, the Hive Totem won 163,952, **the Mantid Queen dead** 172,137 |
+| 172,500-176,000 | the hub: save 5, Primagen key 5, the six level-6 keys, **the level-6 door walked through**, "access to level 6 granted." 174,714 |
+| 176,000-215,942 | level 6: its 16 capacitors and 2 red laser cells, "all assembly plants destroyed." 193,874, "all power generators recalibrated." 194,730, **the Mother dead** 215,942 |
+| 216,500-222,000 | the hub (the level-6 corridor): **back through the level-6 door** (open: b2's fix; b1 needed a teleport past it), a Primagen key slot, then the hop (`T2_WARP_TO=7602`) |
+| 222,000-240,165 | **the Primagen dead (mode 29) at 240,165**: cinema 370 (0x172, the good ending), unlocked cheats 0x7ffe7fd |
+| 243,157-246,957 | level 10: **"END 2"** |
+| 247,000-261,000 | the credits (engine mode 15) |
+| 261,055 | the hub |
+
+Exit 0. A second run gives the same `progress`, `event`, `pickup`, `hurt`, `death`,
+`bosstrace` and `state` lines (md5 equal). `T2_HURT_LOG`: 239 hits over the run, one death: at
+the Primagen's death his sequence sets the player's health to 0 (57 -> 0; the same with
+invincibility in every run that kills him) and a life is lost; the ending follows. The pak (note 1,
+the save after level 5): checksum OK, clock 0:46:09. All 18 level keys and all six Primagen keys
+are picked up; the slots take keys 1 and 4 (and 2 and 3 later, see below), so the six-key hub
+portal cinema (43) does not fire and the hop stays.
+
+### 16.3 Open
+
+- Primagen keys 2 and 3: the slot walks after levels 2 and 3 never reach their slots; on the
+  merged tree key 4 goes in on the return from the save portal after level 4 (slot actor 7),
+  key 2 on the same return after level 5 (actor 11) and key 3 on the walk back after the Mother
+  (actor 12); keys 5 and 6 stay held. Which slot actor takes which key decides the fix.
+- The talisman trip's return is not anchored: a route shifted by level 1's health pickup (with
+  level 2 invincible) misses the City Totem's warp after chamber 73.
+- The remaining invincibility (levels 3-6, the City Totem): STATUS.md section 4.
+- `--level 6` on its own no longer kills the Primagen: the run equals round 12's up to the Mother,
+  but after the hop (54,000) his stage-2 lair wait (resting at z 2,906) does not end; other hop frames
+  (53,700-57,000) and the spot cycle did not help. The whole-game run and the boss recipe kill him.
