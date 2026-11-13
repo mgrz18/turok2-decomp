@@ -961,3 +961,28 @@ A used hub key slot thus gets its `Event_DisableCollision` (kind 10 handler 8) a
 setup turned the collision on. On the host steps 1 and 3 did nothing until round 13 (the views of
 `CScene` at N64 offsets): every state an event had made (a collision off, a platform moved, a gate
 open by event) was lost on the next visit, while the states held in instance bits survived.
+
+## 14. Round 14, part c1: damage the player takes in levels 3 and 4
+
+**Animation events that hold the last frame fire again.** An enemy's shot is often not a
+projectile but an animation event (`CGameObjectInstance__FireAnimEvents`, func_0021ABC8: the
+events whose frame lies in [from, to) of the frame's time step) whose impact effect hits the
+player directly: effect 3 is `ImpactEvent_DirectDamage` (`ImpactEvent_ApplyBlast` with flags
+0x100000 and no falloff, sent through `ImpactEvent_Send` to every registered instance and player;
+`Blast_CanHit` filters by kind, not by distance or sight). `CAnimationState__GetRootMotion`
+(func_00218B10) advances the time by `gFrameIncrement * rate / 15`; past the last frame it wraps
+to the clip's loopStart (`u16 blendFrames, u16 loopStart, ..., f32 rate`, the clip header in the
+animation's block 3), and a loopStart equal to the last frame holds the clip there: the next
+step starts again from the last frame and fires its events once more, every frame until the AI
+changes the animation. The Death Marshes' obj-230 gunners (type 1608, intelligence 494-497)
+fire this way: their fire animation (3 frames, loopStart 2) hits at frame 0 and at frame 2, and
+frame 2's event fires twice (gf N, N+4, N+5), so a burst takes 3 hits (13-42 each by gunner
+kind). Same code and same data as the N64 (the clip header's swap is two u16), so taken as the
+game's own behaviour; `T2_ANIM_LOG=OBJ[,OBJ]` (DEBUG-ONLY, port/game/t2debug.c) prints each
+event fired (`animev:` lines: the event, its frame, the window, the effect).
+
+**Region damage.** `AI_UpdateRegionFlags` (func_00242E34): a region whose info has flag 0x80000
+hurts an actor standing on the ground in it by `m_DamageAmount` every `m_DamageInterval`
+fifteenths of a second of `gFrameIncrement`. The marsh water of the Death Marshes' 64 (region
+info 12: 75 every 1.0) is a death pit, from the level data; the satchel charge beside it lies
+on an island (info 14, no damage). PLAYTHROUGH.md section 18 has the route.

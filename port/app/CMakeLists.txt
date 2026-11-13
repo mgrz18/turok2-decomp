@@ -75,7 +75,7 @@ if(T2_LINK_GAME AND TARGET turok2_game)
                         "every game data symbol falls to a zero placeholder")
     endif()
 
-    target_sources(turok2 PRIVATE game.cpp)
+    target_sources(turok2 PRIVATE game.cpp t2controls.cpp)
     target_compile_definitions(turok2 PRIVATE T2_HAVE_GAME=1)
     if(APPLE)
         # ld64 resolves archive members in any order

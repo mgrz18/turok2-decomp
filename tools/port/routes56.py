@@ -147,17 +147,30 @@ L5_TOTEM = (14250, 2000, 113)
 # (mode 16) at ~42,100, the hub (60) by ~43,500 (run 48,000 frames: the fight varies)
 L5_BOSS = (15900, 16000)
 
-def _couplings(dt0, cx, y, cz, half=102.4, out=60.0, gap=200, walk=50):
+def _couplings(dt0, cx, y, cz, half=102.4, out=60.0, gap=200, walk=50, escape=None):
     """Steps that walk into the 4 couplings (object 288, action intelligence 574) round a power
     generator at (cx, cz): each one from `out` units outside it along x, facing it, C-up `walk`
     frames. A coupling goes when the player comes within its m_AutoGoRadius (41; 35.8 in 123)
     (CScene__CheckAutoActivation, type flag 4) and holds a crystal ion capacitor (item 4231,
-    Action_CheckRequiredItem uses one per coupling)."""
+    Action_CheckRequiredItem uses one per coupling).
+    escape (round 14 c2): (F, {sx: (x, y, z, rotY)}): F frames after each approach, a teleport onto
+    a safe floor on that side (119: the generator stands in a pool with region damage)."""
     steps = []
     for k, (sx, sz) in enumerate(((1, 1), (1, -1), (-1, -1), (-1, 1))):
         x, z = cx + sx * half, cz + sz * half
         steps.append((dt0 + k * gap, x + sx * out, y, z, sx * 1.5708, walk, {}))
+        if escape:
+            steps.append((dt0 + k * gap + escape[0],) + tuple(escape[1][sx]) + (0, {}))
     return steps
+
+
+# round 14 c2: 119's generator stands in a pool (y -307.2, region info 5: 50 damage every 0.5 s,
+# 1-2 hits each time: CPlayer__Update calls AI_UpdateRegionFlags twice a frame; round 13: 2 lives lost).
+# The air starts (y -110) fall ~40 frames into it: F frames after each start, a teleport onto the
+# room's walkway (y -153.6, ~700 units out, info 9: no damage) on the coupling's side.
+# The walk is 20 frames (50 took the player back into the pool after the teleport), and the escape
+# faces away from the generator.
+L6_119_ESCAPE = (25, {1: (-4987.5, -153.6, -2562.2, -1.5708), -1: (-6383.0, -153.6, -2614.9, 1.5708)})
 
 
 # round 12 a2: the items, handed by T2_GIVE_ITEMS (relative frame, spec) in --level 6 (a run from a
@@ -178,8 +191,14 @@ L6_GIVE = [(400, "4231:4"), (3000, "4231:4"), (5100, "4231:4"), (10200, "4231:4,
 P2 = 1.5708
 L6_ITEMS = {
     1: [(-3840.0, 153.1, -1612.8, 0.0, 90, 50), (-3532.8, 153.1, -1612.8, 0.0, 90, 50),
-        (2611.2, 41.3, -2304.0, 0.0, 40, 30, "air"), (-1228.8, 155.8, 537.6, 0.0, 40, 30, "air")],  # 115: 4 capacitors
-    3: [(0.0, 155.4, -5068.8, 0.0, 90, 50), (-1862.3, -1945.6, 921.6, -P2, 40, 12, ("pit", 30.0, (0.0, 155.4, -4978.8, 0.0), 14))],  # 116: 2
+        # round 14 c2: the third one hangs over 115's pool (y -214.7, region damage 25 every 0.5 s):
+        # picked from the air (collected <= 36 frames into the walk), then a teleport onto the floor at y -2
+        # before the landing in the pool (43 frames)
+        (2611.2, 41.3, -2304.0, 0.0, 40, 30, ("pit", -20.0, (2260.3, -2.1, -2259.2, P2), 38)),
+        (-1228.8, 155.8, 537.6, 0.0, 40, 30, "air")],  # 115: 4 capacitors
+    # round 14 c2: the first one's walk 50 -> 20 (50 frames went past it, off the ledge at z -5,170
+    # into the pool below: y -306.8, region damage 25 every 0.5 s)
+    3: [(0.0, 155.4, -5068.8, 0.0, 90, 20), (-1862.3, -1945.6, 921.6, -P2, 40, 12, ("pit", 30.0, (0.0, 155.4, -4978.8, 0.0), 14))],  # 116: 2
     4: [(0.0, 51.5, 153.6, 0.0, 40, 30, ("pit", -20.0, (250.0, 0.0, 153.6, P2), 30)),
         (0.0, 51.5, 1689.6, 0.0, 40, 30, ("pit", -20.0, (250.0, 0.0, 1689.6, P2), 30))],     # 117: 2, over the pit
     6: [(-3906.8, -256.0, -1536.0, -P2, 90, 50), (-770.4, 0.3, 1136.3, P2, 90, 50)],               # 118: 2
@@ -187,11 +206,16 @@ L6_ITEMS = {
     9: [(1996.8, -153.2, 0.0, 0.0, 90, 50)],                                  # 120: 1
     10: [(307.2, 383.3, 0.0, 0.0, 40, 30, "air")],                            # 121: 1
     11: [(-1612.8, 305.6, 0.0, P2, 90, 50)],                                  # 122: 1
-    12: [(0.0, 1.7, -1331.2, 0.0, 90, 50),                                    # 123: 1, then two red cells (4229)
+    # round 14 c2: the capacitor lies behind a laser beam (object 302 at (0, 25.6, -1228.8): 40 + 14 +
+    # 12 damage per touch, twice in 4 frames): approached from -z (z -1,421), not from inside the beam
+    12: [(0.0, 1.7, -1331.2, 3.1416, 90, 20),                                 # 123: 1, then two red cells (4229)
          (-275.7, 1.7, -1228.8, 0.0, 90, 90), (275.7, 1.7, -1228.8, 0.0, 90, 90)],
     # 114's last visit: Primagen key 6 (4365) at its centre. On the first visit a walk from 90 units
     # out was pushed back 70 units (something round it, not identified): taken after "force field down."
-    14: [(0.0, -50.8, 0.0, 0.0, 90, 50)],
+    # Round 14 c2: before it, two of 114's four ultra healths (object 548, item 1704: +100 to 200, on
+    # the raised floors at y 155.7): the Mother (level 3) costs ~300 health without invincibility.
+    14: [(870.4, 155.7, -1177.6, 0.0, 90, 50), (-870.4, 155.7, -1177.6, 0.0, 90, 50),
+         (0.0, -50.8, 0.0, 0.0, 90, 50)],
 }
 ITEM_STEP = 150
 
@@ -224,6 +248,18 @@ def with_items(segments, items, step=ITEM_STEP):
         out.append((name + ("" if not k else " (+%d items)" % len(items[i])), rel + added, new))
         added += k
     return out, added
+
+
+# Round 14 c2: level 5's health on the way (tools/assets/levels.py level actors: object 548 = item
+# 1704, the ultra health +100 to 200), taken only when level 5 is played without invincibility
+# (fullrun.py --cheats-off 5), by segment index of l5_with_primagen_key()'s list, as L6_ITEMS:
+# (x, y, z, approach angle, distance, walk frames). The run enters level 5 with ~100 health and 124
+# costs ~40; the Hive Totem ~20 and the Mantid Queen ~50 (round 13: once she killed the player).
+L5_HEALTH = {
+    # 92's ultra health (1999.9, 610.8, 644.5) was tried: the walk into it (90 out, 50 frames) went
+    # on over the ledge behind it (a fall, a life lost)
+    12: [(870.4, 614.4, 2457.6, -1.5708, 60, 25)],    # 95: ultra health (embryo 2's room)
+}
 
 
 def l5_with_primagen_key():
@@ -274,7 +310,7 @@ L6_SEGMENTS = [
     ("119 Level 6F: power generator 3 (couplings 33-36), force field generator 23, exit 6398", 5100,
      # its couplings stand 154 units over the room's floor (y -307): the jump does not reach them
      # (open, PLAYTHROUGH.md 9.4), so each approach starts in the air at y -110, 45 units out
-     _couplings(0, -5683.2, -110.0, -2457.6, out=45.0) + [
+     _couplings(0, -5683.2, -110.0, -2457.6, out=45.0, walk=20, escape=L6_119_ESCAPE) + [
         (800, -703.2, 486.8, 7037.8, 0.4754, 80, {}),        # force field generator 23
         (1100, -607.0, -115.3, -3787.6, -0.8993, W, {}),     # warp 6398 -> 114
     ]),
@@ -325,6 +361,19 @@ L6_MOTHER_END = 31000      # relative: the strafing and the steps back stop (her
 L6_EXIT = (33500, 1231.8, 0.0, -4006.8, -1.5708)  # from 114's start (+x) onto its pad 7601 (regions 151/152) -> the hub
 L6_PRIMAGEN_HOP = 34800    # relative: T2_WARP_TO=7602 from the hub (54,000)
 L6_END = 90000             # relative: the end of the held fire
+
+
+def lair_strafe(first, last, period=80):
+    """round 14 C29: strafe left and right in the Primagen's lair (C-left / C-right, half a period each).
+    His home waits (Primagen_UpdateMode19, stages 2 and 3) end only when his own target search sees the
+    player, and from his home (0, 937, ~2,915) the line of sight from the floor grazes the lair's back
+    structure (static object 1911): a player standing still can stay hidden for good (the wait never
+    ends, PLAYTHROUGH.md 21). A player who keeps moving crosses the spots that see him."""
+    out = []
+    for f in range(first, last, period):
+        out.append("CL@%d..%d" % (f, f + period // 2 - 1))
+        out.append("CR@%d..%d" % (f + period // 2, f + period - 1))
+    return out
 
 
 def build_level56(level, new_game, fire_every):
@@ -386,8 +435,10 @@ def build_level56(level, new_game, fire_every):
         inputs += ["# 114 after the Mother: the pad 7601 by the start -> the hub", "CU@%d..%d" % (start + rel + 10, start + rel + 130)]
         tps.append("%d:%.1f,%.1f,%.1f,%.4f" % (start + rel, x, y, z, ry))
         env[0] += ",7602@%d" % (start + L6_PRIMAGEN_HOP)
+        inputs += ["# 4 the Primagen: strafing (his home waits need a sight line, round 14 C29)"]
+        inputs += lair_strafe(start + L6_PRIMAGEN_HOP + 2000, start + L6_END)
         env[env.index("T2_FILL_AMMO=300")] = "T2_FILL_AMMO=600"
-        env += ["T2_AIM_NODE=boss@3/4", "T2_BOSS_FRONT=450", "T2_BOSS_LOG=1"]
+        env += ["T2_AIM_NODE=boss@3/4", "T2_BOSS_FRONT=450,3000,2.5,1", "T2_BOSS_LOG=1"]
     if aim_at:
         env.append("T2_AIM_AT=\"%s\"" % ";".join(aim_at))
     if aim_enemy:

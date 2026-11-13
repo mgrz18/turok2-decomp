@@ -26,7 +26,7 @@ level actor A first) with fire taps, the plasma rifle, T2_CHEATS=1 and T2_FILL_A
 T2_FACE_NEAREST=4000@110 with T2_FACE_PITCH=1; a "!" teleport also fires the region's enter
 triggers (the enemy wake-ups a walk-in would fire). docs/port/PLAYTHROUGH.md sections 6.2, 6.5.
 """
-import argparse, os
+import argparse, math, os
 
 NEW_GAME = "START@4400 A@4500 A@4700 A@4800"
 
@@ -104,9 +104,57 @@ HUB_ARRIVAL = 13100      # T2_WARP_TO=1999 at 12,955 (60 frames into level 51): 
 L2_START = 18800         # level 125, after the portal 2000 (hub +200) and the River of Souls intro cinemas
 FIRE_EVERY = 15
 
+# ---- stick-only aiming (round 14 c5) ----
+# The aim assists (T2_AIM_AT, T2_AIM_ENEMY, T2_FACE_NEAREST) write the player's yaw and the camera
+# pitch every frame. The helpers below aim through the input stream only: the yaw towards a point
+# is computed from positions (the route's own teleport point and the target's position, read from
+# the level data or an earlier run's log), then turned to with the stick (SX). Measured on the
+# Linux build (T2_STATE_LOG=2, level 51, round 14 c5): SX=127 reads stick 80 and turns the player
+# 0.0685 rad per frame from the first frame, linearly; SX=40 reads 37 and turns 0.00675 rad per
+# frame: the rate grows with the cube of the reading (0.0685 * (r / 80) ** 3). + = rotY grows.
+TURN_FULL = 0.0685          # rad per frame at full stick (SX=127, reading 80)
+STICK_DEAD = 3              # SX=V reads V - 3 (SX=40 -> 37)
+
+
+def face_yaw(x, z, tx, tz):
+    """The rotY that faces (tx, tz) from (x, z): the game's forward is (-sin rotY, -cos rotY)."""
+    return math.atan2(-(tx - x), -(tz - z))
+
+
+def wrap(a):
+    while a > math.pi:
+        a -= 2 * math.pi
+    while a < -math.pi:
+        a += 2 * math.pi
+    return a
+
+
+def stick_turn(f, dyaw):
+    """Inputs that turn the player by dyaw radians with the stick from frame f: full-stick frames,
+    then one frame at the partial reading for the rest. Returns (inputs, frames used)."""
+    sign = 1 if dyaw >= 0 else -1
+    left = abs(dyaw)
+    n = int(left / TURN_FULL)
+    rest = left - n * TURN_FULL
+    out = []
+    if n:
+        out.append("SX=%d@%d..%d" % (127 * sign, f, f + n - 1))
+    if rest > 1e-4:
+        r = 80.0 * (rest / TURN_FULL) ** (1.0 / 3.0)
+        out.append("SX=%d@%d..%d" % (sign * min(127, int(round(r)) + STICK_DEAD), f + n, f + n))
+        n += 1
+    return out, n
+
+
+def stick_aim(x, z, ry, target, f):
+    """The stick inputs from frame f that turn a player teleported to (x, z) facing ry towards
+    target (x, y, z): the yaw only (the pitch stays the game's)."""
+    return stick_turn(f, wrap(face_yaw(x, z, target[0], target[2]) - ry))[0]
+
 # (segment name, start frame relative to L2_START, [(dt, x, y, z, rotY, walk, opts), ...])
 # opts: "trig" (a "!" teleport: fire the region's enter triggers), "fire": frames of fire taps from
-# the teleport, "aim": (x, y, z) (T2_AIM_AT) or "enemy" (T2_AIM_ENEMY) during the fire window.
+# the teleport, "aim": (x, y, z) (T2_AIM_AT) or "enemy" (T2_AIM_ENEMY) during the fire window,
+# "stick": (x, y, z): turn to that point with the stick only (stick_aim; round 14 c5: the soul gates).
 L2_SEGMENTS = [
     ("125 Lev2 A: exit 2500", 0, [
         (0, 4047.4, 921.6, 8200.3, 0.9998, 150, {}),          # warp 2500 -> 126
@@ -122,7 +170,7 @@ L2_SEGMENTS = [
     ]),
     ("129 Lev2 E: soul gate 1, exit 2102", 1600, [
         # on the gate's platform (y -259), facing it: soul gate actor 64 (destructible 649) at (-4147, -256, 5094)
-        (0, -4155.0, -259.0, 5541.0, 0.0, 0, {"fire": 1150, "aim": (-4147.0, -150.0, 5094.0)}),
+        (0, -4155.0, -259.0, 5541.0, 0.0, 0, {"fire": 1150, "stick": (-4147.0, -150.0, 5094.0)}),
         (1250, -6778.7, 460.6, -452.6, -1.9684, 150, {}),     # warp 2102 -> 130
     ]),
     ("130 Lev2 F: exit 2614 (the first sister)", 3250, [
@@ -159,7 +207,7 @@ L2_SEGMENTS = [
     ]),
     ("132 Lev2 H: soul gate 2, exit 2501", 22350, [
         # on the gate's platform (y 1225), facing it: soul gate actor 50 (destructible 649) at (11878, 1229, -1485)
-        (0, 12171.4, 1225.4, -1240.4, 1.5708, 0, {"fire": 1150, "aim": (11878.0, 1330.0, -1485.0)}),
+        (0, 12171.4, 1225.4, -1240.4, 1.5708, 0, {"fire": 1150, "stick": (11878.0, 1330.0, -1485.0)}),
         (1250, 924.0, 716.8, -1267.0, 0.6143, 150, {}),       # warp 2501 -> 135
     ]),
     ("135 Lev2 K: the big graveyard (sister 3), exit 2608", 23950, [
@@ -211,6 +259,8 @@ def build_level2(fight_frames=True):
             tps.append("%d:%.1f,%.1f,%.1f,%.4f%s" % (f, x, y, z, ry, "!" if o.get("trig") else ""))
             if walk:
                 inputs.append("CU@%d..%d" % (f + 10, f + 10 + walk))
+            if o.get("stick"):
+                inputs += stick_aim(x, z, ry, o["stick"], f + 2)
             if o.get("fire"):
                 a, b = f + 10, f + 10 + o["fire"]
                 fire.append((a, b))
@@ -396,6 +446,8 @@ def build_hub_level(segments, start, portal=None, warp="1999", totem=None, boss=
             tps.append("%d:%.1f,%.1f,%.1f,%.4f%s" % (f, x, y, z, ry, "!" if o.get("trig") else ""))
             if walk:
                 inputs.append("CU@%d..%d" % (f + 10, f + 10 + walk))
+            if o.get("stick"):
+                inputs += stick_aim(x, z, ry, o["stick"], f + 2)
             if o.get("fire"):
                 a, b = f + 10, f + 10 + o["fire"]
                 fire.append((a, b))

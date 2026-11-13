@@ -78,6 +78,8 @@ class Route:
                 o = st[6] if len(st) > 6 else {}
                 f = start + rel + dt
                 self.tp(f, x, y, z, ry, walk, o.get("trig"))
+                if o.get("stick"):   # round 14 c5: aim with the stick only (playthrough.stick_aim)
+                    self.inputs += pt.stick_aim(x, z, ry, o["stick"], f + 2)
                 if o.get("fire"):
                     a, b = f + 10, f + 10 + o["fire"]
                     self.fire.append((a, b))
@@ -226,6 +228,74 @@ L3_KEYS = {
 # (and 68's sat at index 15 of a 14-segment list: never inserted): their segments are anchored on the
 # sub-level (T2_ANCHOR) and the picks wait KEY_WAIT frames after it
 L3_ANCHOR = {3, 13}
+# ---- level 3 without invincibility (round 14 c1, --cheats-off 3) ----
+# Health on the way (object 542 health +10, 545 full health, 548 ultra health: the level actors of
+# tools/assets/levels.py's grid sections; y is the floor): 61's two +10 beside the first satchel
+# charge, 69's full health (only reachable from -z) before its ammo storage.
+L3_HEALTH = {
+    0: [(4608.5, -431.0, -3682.8, 0.0), (4762.4, -431.0, -3531.5, 0.0)],   # 61: 2 health +10
+    1: [(149.8, 0.0, -165.0, 3.1416)],                                     # 69: full health
+    5: [(-1280.0, 2.8, 4505.6, 3.1416), (-1280.0, 2.8, 4710.4, 0.0)],      # 64: 2 health +10 on the satchel's island
+    9: [(2634.4, -560.0, 2051.6, 1.5708)],                                 # 66: ultra health (the Marsh Totem next)
+}
+# 69 (the first ammo storage): "armory destroyed." (~440 frames after the charge walk starts) wakes
+# an ambush of obj-230 gunners on the balconies over the charge point (instances 7, 8, 12, 13; their
+# bursts take 13-42 health per shot, 3 shots a burst: 44 health was gone in 16 frames). Round 12
+# stood by the charge point until 600; now the player waits at the exit warp 3778 (a floor below,
+# out of their sight) and walks into it when the armory has blown.
+L3_69_NOCHEATS = [
+    (0, 1103.2, 308.4, -1854.4, 0.0466, 300, {}),        # the charge point, actor 23 (1075, 307, -2458)
+    (330, -1492.1, -305.2, -1428.2, 0.1738, 0, {}),      # by the warp 3778, standing
+    (480, -1492.1, -305.2, -1428.2, 0.1738, 150, {}),    # warp 3778 -> 61 (the armory blew at ~440)
+]
+
+
+# 64: the second satchel charge (-1331, 3, 4608) lies on an island (region info 14, floor 2.8) in the
+# marsh; round 12 stood in the water beside it (region info 12: 75 health every 15 game frames,
+# the run's first death). Now from the island's +x side, through its third health +10 (-1229, 4608).
+L3_64_NOCHEATS = [
+    (0, -1150.0, 2.8, 4608.0, 1.5708, 25, {}),          # satchel charge (-1331, 3, 4608), from +x (a longer walk leaves the island)
+    (150, -1820.5, 614.3, 2531.9, -1.2796, 150, {}),    # warp 3780 -> 70
+]
+# 70 and 71 (the other two ammo storages): the same ambush when the armory blows (70: four gunners
+# woke 4 frames after "armory destroyed.", 100 health in 36 frames), the same way out
+L3_70_NOCHEATS = [
+    (0, 1629.3, -921.4, -524.6, -0.0187, 200, {}),      # the charge point, actor 37 (1638, -922, -992)
+    (330, -887.1, -614.2, 1300.7, 0.1285, 0, {}),       # by the warp 3779, standing
+    (460, -887.1, -614.2, 1300.7, 0.1285, 150, {}),     # warp 3779 -> 64 (the armory blew at ~420)
+]
+L3_71_NOCHEATS = [
+    (0, 1113.3, -1533.8, -1090.6, 1.1009, 200, {}),     # the charge point, actor 32 (833, -1536, -1233)
+    (330, -800.8, -919.4, 191.7, 0.1449, 0, {}),        # by the warp 3781, standing
+    (480, -800.8, -919.4, 191.7, 0.1449, 100, {}),      # warp 3781 -> 67
+]
+L3_NOCHEATS = {1: ("69 ", L3_69_NOCHEATS), 5: ("64 ", L3_64_NOCHEATS), 6: ("70 ", L3_70_NOCHEATS),
+               11: ("71 ", L3_71_NOCHEATS)}
+
+
+def l3_segments(nocheats):
+    """playthrough.L3_SEGMENTS, with L3_NOCHEATS's steps when level 3 has no invincibility."""
+    if not nocheats:
+        return pt.L3_SEGMENTS
+    segs = list(pt.L3_SEGMENTS)
+    for i, (prefix, steps) in L3_NOCHEATS.items():
+        name, rel, _ = segs[i]
+        assert name.startswith(prefix)
+        segs[i] = (name, rel, steps)
+    return segs
+
+
+# ---- level 4 without invincibility (round 14 c1, --cheats-off 4) ----
+# Health on the way (as L3_HEALTH): 100's full health by the level key, 105's full health on its
+# second visit and 103's ultra health by the level exit 7400 (the Cave Totem, then the Blind One).
+L4_HEALTH = {
+    2: [(1075.2, -2451.3, 3123.2, 0.0)],                                   # 100: full health
+    12: [(-5404.5, -2150.5, 216.8, 1.5708)],                               # 105 again: full health
+    13: [(-9594.8, -3684.6, -157.0, 1.5708)],                              # 103 again: ultra health
+}
+
+TOTEM_WEAPON_BEFORE = 600   # the scorpion launcher this long before a totem's fire window (levels 3, 4)
+
 L4_KEYS = {
     0: [(6758.4, -614.4, 2304.0, 0.0)],                                  # 98: Primagen key 4 (4363)
     9: [(-8652.4, -3634.9, -149.1, 0.0)],                                # 103: level 6 key (4350)
@@ -389,17 +459,46 @@ PAD = {   # level: [(teleport x, y, z, rotY, walk), ...] legs; the last one reac
 CINEMA_AFTER = {2: 260, 3: 510, 4: 120,     # last leg start -> the level's first intro cinema
                 5: 420, 6: 470}             # 5, 6: -> the portal's warp (the leg start + 10 + these)
 OLD_CINEMA = {2: 13420, 3: 13410, 4: 13420}  # the same frame in the level's own --level N run
-PRIMAGEN_SLOTS = {1: (71.0, 0.0, 183.0), 2: (133.0, 0.0, 38.0), 3: (37.0, 0.0, -85.0),
-                  4: (-119.0, 0.0, -71.0), 5: (-86.0, 0.0, 203.0), 6: (-185.0, 0.0, 73.0)}
-# round 13 b1: the walk for Primagen key K starts at slot PRIMAGEN_FROM[K]'s outside stand point. A
-# walk straight in at slot 2 or 3 is deflected round them (the plaza's centre: no region inside the
-# ring); the walk at slot 1 goes on to slot 2, and once slot 2 holds its key, the walk at slot 2
-# goes on to slot 3 (a new game with the six keys given: every slot filled; until round 12 keys
-# 2 and 3 never went in, so the hub portal could not open)
-PRIMAGEN_FROM = {1: 1, 2: 1, 3: 2, 4: 4, 5: 5, 6: 6}
-# keys 2 and 3 in the continuous run (slot 1 already full, the walk above stops at (147, 128)): from
-# the previous slot's pad along the ring
-PRIMAGEN_ALONG = {2: (71.0, 0.0, 183.0, -0.4040), 3: (133.0, 0.0, 38.0, 0.6620)}
+# round 14 c3: each Primagen key slot takes ONE key (its action's m_GoPickupNeeded, read in the hub
+# with gdb): key K goes into the slot whose required item is 4359 + K. Round 13's map was by ring
+# order (its "slot 2" was actor 5, which needs key 6): a slot touched without its key refuses it
+# (Action_CheckRequiredItem returns 0, "Primagen key N required") and stays solid, which is why the
+# walks at "slots 2 and 3" slid round them. Key K: (x, y, z) of its slot.
+PRIMAGEN_SLOTS = {1: (71.0, 0.0, 183.0),     # actor 4  (object 154), item 4360
+                  2: (-85.7, 0.0, 202.8),    # actor 11 (object 291), item 4361
+                  3: (-184.9, 0.0, 72.6),    # actor 12 (object 292), item 4362
+                  4: (-119.0, 0.0, -71.0),   # actor 7  (object 161), item 4363
+                  5: (36.7, 0.0, -84.5),     # actor 6  (object 159), item 4364
+                  6: (133.2, 0.0, 38.0)}     # actor 5  (object 158), item 4365
+# Round 14 c3: keys 2 and 3 are picked up in levels 2 and 3 but went into their slots only in the hub visit after
+# level 5 (with key 5). Put in on the visits after levels 2 and 3, they changed the totem fights that
+# follow (the Marsh Totem 7/8 -> 4/8 kills: lost; the defences are marginal, and any change of the
+# game state before them moves their kills; see PLAYTHROUGH.md 20). Those two visits keep round 13's
+# walks instead (ROUND13_BUMP: they bump the slots of keys 6 and 5, "Primagen key N required"), so
+# levels 1-5 play exactly as in round 13; the real order is only a schedule choice of this route.
+# Round 14 C29: the natural order is the default again (PRIMAGEN_LATE = ()): with the round-14 routes of
+# levels 3-6 the totem defences are won with keys 2 and 3 in on time (two runs, all five totems, END 2).
+# --late-keys brings back c3's late insertion and ROUND13_BUMP.
+PRIMAGEN_LATE = ()
+ROUND13_BUMP = {2: (71.0, 0.0, 183.0, -0.4040), 3: (133.0, 0.0, 38.0, 0.6620)}
+
+
+def key_visit(k):
+    """The hub visit after level k (2 or 3): its Primagen key in its own slot (round 14
+    C29, the default), or round 13's walk (ROUND13_BUMP) with the key put in after level 5 (--late-keys)."""
+    if k in PRIMAGEN_LATE:
+        return {"bump": ROUND13_BUMP[k]}
+    return {"primagen": (k,)}
+HOP = False                     # --hop: round 13's fallback warp 7602 (DEBUG-ONLY)
+
+
+def primagen_slot(r, t, k):
+    """Primagen key k into its slot: stand 90 outside the slot (on the line from the plaza's origin),
+    walk in (every slot is reached this way: a new game with the six keys given fills all six)."""
+    x, y, z = PRIMAGEN_SLOTS[k]
+    r.pick(t, x, y, z, math.atan2(x, z))
+
+
 SAVE_PORTAL = (-977.9, -221.0, -2035.3, 1.4423)   # the hub's save portal (warp 999 -> level 97)
 SAVE_MENU = [(740, "A"), (890, "A"), (1090, "A"), (1240, "DD"), (1340, "A"), (1490, "A")]
 # a later save overwrites note 1: its "overwrite?" dialog opens with the cursor on NO
@@ -414,7 +513,7 @@ SAVE_TIME = 2000
 GRANT = {1: (2, 3), 2: (4,), 3: ()}
 
 
-def hub(r, arrival, grant=(), primagen=(), save=True, go=None):
+def hub(r, arrival, grant=(), primagen=(), save=True, go=None, bump=None):
     """The hub from `arrival`: pads `grant` (their keys in), Primagen key slots, a save, then
     the portal of level `go`; returns (the frame the level's first cinema starts, or the end)."""
     t = arrival + 150
@@ -433,12 +532,12 @@ def hub(r, arrival, grant=(), primagen=(), save=True, go=None):
         t += 300
     for k in primagen:
         r.note(t, "60 the hub: Primagen key %d slot" % k)
-        if k in PRIMAGEN_ALONG:   # from the previous slot along the ring
-            x, y, z, ry = PRIMAGEN_ALONG[k]
-            r.tp(t, x, y, z, ry, 40)
-        else:
-            x, y, z = PRIMAGEN_SLOTS[PRIMAGEN_FROM[k]]
-            r.pick(t, x, y, z, math.atan2(x, z))   # from the outside of the ring
+        primagen_slot(r, t, k)
+        t += 150
+    if bump:     # round 14 c3: round 13's walk of this visit (ROUND13_BUMP), no key goes in
+        x, y, z, ry = bump
+        r.note(t, "60 the hub: round 13's walk by the Primagen key slots (no key: the RNG of round 13)")
+        r.tp(t, x, y, z, ry, 40)
         t += 150
     if go is None:
         return t
@@ -471,6 +570,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     for lv in (2, 3, 4, 5):
         r.level_start[lv] = hubs[lv - 1]
     r.saves_at = []
+    r.health = health
     # the health pickups only in the levels played without invincibility (with it the route stays
     # round 12's: the picks move every later step, and the Primagen's lair wait depends on the timing)
     arrival, added = level1(r, health=health and 1 in r.no_cheats)
@@ -502,32 +602,61 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.note(hubs[2], "60 the hub (after level 2)")
     r.anchors.append((hubs[2], 60))
     if upto < 3:
-        hub(r, hubs[2], grant=GRANT[2], primagen=(2,))
+        hub(r, hubs[2], grant=GRANT[2], **key_visit(2))
         return r.write(out)
-    c = hub(r, hubs[2], grant=GRANT[2], primagen=(2,), go=3)
+    c = hub(r, hubs[2], grant=GRANT[2], go=3, **key_visit(2))
     shift = c - OLD_CINEMA[3]
     r.anchors.append((c, 12))
     r.note(c, "12.. the Death Marshes intro cinemas (level 3 route shifted by %d)" % shift)
     l3s = pt.L3_START + shift
-    a3 = level_segments(r, pt.L3_SEGMENTS, l3s, L3_KEYS if extras else {}, anchor=L3_ANCHOR, detours=det.get(3))
+    h3 = health and 3 in r.no_cheats
+    a3 = level_segments(r, l3_segments(3 in r.no_cheats), l3s,
+                        merged(L3_KEYS, L3_HEALTH if h3 else {}) if extras else {}, anchor=L3_ANCHOR, detours=det.get(3))
+    a3x = sum(len(v) for v in L3_HEALTH.values()) * KEY_STEP if h3 and extras else 0
+    for k in hubs:   # round 14 c1: the hub anchors after level 3 move with its health picks
+        if k >= 3:
+            hubs[k] += a3x
+            if k + 1 in r.level_start:
+                r.level_start[k + 1] = hubs[k]
     rel, length, lv = pt.L3_TOTEM
     r.note(l3s + rel + a3, "111 the Marsh Totem: fire taps")
     r.fire.append((l3s + rel + a3, l3s + rel + a3 + length))
+    if 3 in r.no_cheats:
+        # round 14 c1: the scorpion launcher (16) for the Marsh Totem (scheduled in 68, before the
+        # totem's level loads; see level 4): 15 damage instead of 62-272 and a life
+        r.weapon.append((l3s + rel + a3 - TOTEM_WEAPON_BEFORE, "16"))
+        r.weapon.append((hubs[3] - 200, "10"))
     r.face_levels.append(lv)
     r.note(hubs[3], "60 the hub (after level 3)")
     r.anchors.append((hubs[3], 60))
     if upto < 4:
-        hub(r, hubs[3], grant=GRANT[3], primagen=(3,))
+        hub(r, hubs[3], grant=GRANT[3], **key_visit(3))
         return r.write(out)
-    c = hub(r, hubs[3], grant=GRANT[3], primagen=(3,), go=4)
+    c = hub(r, hubs[3], grant=GRANT[3], go=4, **key_visit(3))
     shift = c - OLD_CINEMA[4]
     r.anchors.append((c, 18))
     r.note(c, "18.. the Lair of the Blind intro cinemas (level 4 route shifted by %d)" % shift)
     l4s = pt.L4_START + shift
-    a4 = level_segments(r, pt.L4_SEGMENTS, l4s, L4_KEYS if extras else {}, anchor=L4_ANCHOR)
+    h4 = health and 4 in r.no_cheats
+    a4 = level_segments(r, pt.L4_SEGMENTS, l4s, merged(L4_KEYS, L4_HEALTH if h4 else {}) if extras else {},
+                        anchor=L4_ANCHOR)
+    a4x = sum(len(v) for v in L4_HEALTH.values()) * KEY_STEP if h4 and extras else 0
+    for k in hubs:   # round 14 c1: the hub anchors after level 4 move with its health picks
+        if k >= 4:
+            hubs[k] += a4x
+            if k + 1 in r.level_start:
+                r.level_start[k + 1] = hubs[k]
     rel, length, lv = pt.L4_TOTEM
     r.note(l4s + rel + a4, "112 the Cave Totem: fire taps")
     r.fire.append((l4s + rel + a4, l4s + rel + a4 + length))
+    if 4 in r.no_cheats:
+        # round 14 c1: the scorpion launcher (16) for the Cave Totem and the Blind One, the plasma
+        # rifle again from the hub. T2_WEAPON is applied when a level loads (T2_GIVE_WEAPONS), so
+        # the switch is scheduled in 103, before the totem's level loads. The plasma rifle: the
+        # totem 200 damage and a life lost, the Blind One never hurt (hp 12,800/12,800 at the end);
+        # the scorpion launcher: the totem 88 damage, the Blind One dead in 5,200 frames
+        r.weapon.append((l4s + rel + a4 - TOTEM_WEAPON_BEFORE, "16"))
+        r.weapon.append((hubs[4] - 200, "10"))
     r.face_levels.append(lv)
     rel, length, (x, y, z, ry), lv = pt.L4_BOSS
     f = l4s + rel + a4
@@ -583,6 +712,10 @@ def level5(r, t):
     """t: the frame the hub portal 5000 warps (hub(..., go=5))."""
     s = t + WARP_TO_START[5]
     segs, add = r56.l5_with_primagen_key()
+    if 5 in r.no_cheats and getattr(r, "health", True):
+        # round 14 c2: the ultra healths of 92 and 95 (every later step moves by the time added)
+        segs, more = r56.with_items(segs, r56.L5_HEALTH)
+        add += more
     r.anchors.append((s - LOAD_EARLY, 124))
     r.note(s - LOAD_EARLY, "124.. the Hive of the Mantids (level 5 route from %d, + the 92 detour)" % s)
     r.weapon.append((t, "9"))       # the shredder (the cocoons; a1's route)
@@ -602,7 +735,8 @@ def level5(r, t):
     r.level_start[6] = hub_at
     r.note(hub_at, "60 the hub (after level 5)")
     r.anchors.append((hub_at, 60))
-    return hub(r, hub_at, primagen=(5,), go=6)   # a save, Primagen key 5, the level-6 door and portal
+    # round 14 c3: with --late-keys, Primagen keys 2 and 3 go in here, with key 5 (PRIMAGEN_LATE)
+    return hub(r, hub_at, primagen=PRIMAGEN_LATE + (5,), go=6)   # a save, the keys, the level-6 door and portal
 
 
 def level6(r, t):
@@ -620,6 +754,10 @@ def level6(r, t):
     r.inputs += ["Z@%d..%d" % (m + 800, m + L6_BACK_114), "CL@%d..%d" % (m + 5800, m + 15000)]
     r.inputs += ["CD@%d..%d" % (f, f + 250) for f in range(m + 5800, s + r56.L6_MOTHER_END + add, 600)]
     back = m + L6_BACK_114
+    if 3 in r.cheats_on:
+        # round 14 c2: the Mother invincible in a --cheats-off 6 run (--cheats-on 3): she costs ~250-330
+        # health in rescue runs (her 10-damage hits from ~1,240 units), more than the 200 the route has
+        r.cheat_windows.append((m - 200, back))
     r.anchors.append((back, "114/60"))
     _, x, y, z, ry = r56.L6_EXIT
     r.note(back, "114 again after the Mother (her death warps 6999), or the hub straight (anchor 114/60)")
@@ -632,18 +770,23 @@ def level6(r, t):
     r.note(h + L6_WALK_AFTER, "60 the hub: back down the corridor through the level-6 door to the plaza")
     r.inputs.append("CU@%d..%d" % (h + L6_WALK_AFTER, h + L6_SLOT_AFTER - 50))
     f = h + L6_SLOT_AFTER
-    x, y, z = PRIMAGEN_SLOTS[PRIMAGEN_FROM[6]]
     r.note(f, "60 the hub: Primagen key 6 slot: the six keys in: the hub portal cinema (43) -> the Primagen")
-    r.pick(f, x, y, z, math.atan2(x, z))
+    primagen_slot(r, f, 6)
     lair = f + L6_CINEMA
-    # FALLBACK (DEBUG-ASSISTED): if the six keys are not all in (no cinema), the old hop 7602; after
-    # the cinema it only puts the player back on the lair's start, where he already stands
-    r.warps.append((lair + 150, 7602))
+    if HOP:   # DEBUG-ONLY (--hop): round 13's warp 7602, for a run whose six keys are not all in
+        r.warps.append((lair + 150, 7602))
     r.anchors.append((lair, 4))
-    r.note(lair, "4 the Primagen's lair: fire held, T2_BOSS_FRONT=450,600,2.5,1")
-    # the spot cycles (",K,1": another one each 600 frames of a lair wait that does not end)
-    r.boss_front.append((lair - 100, "450,600,2.5,1"))
+    if 4 in r.cheats_on:
+        # round 14 c2: the Primagen invincible in a --cheats-off 6 run (--cheats-on 4): ~280 damage and
+        # a life lost in a rescue run (the ending's own life loss at his death is not this)
+        r.cheat_windows.append((lair - 200, lair + L6_HUB_END))
+    r.note(lair, "4 the Primagen's lair: fire held, strafing, T2_BOSS_FRONT=450,3000,2.5,1")
+    # the spot cycles (",K,1": another one each 3,000 frames of a lair wait that does not end; round 14 C29:
+    # 600 -> 3,000: the strafing by the lair start (lair_strafe) ends his home waits, the front spots do not)
+    r.boss_front.append((lair - 100, "450,3000,2.5,1"))
     r.inputs.append("Z@%d..%d" % (lair + 200, lair + L6_HUB_END))
+    # round 14 C29: strafing until his death (his home waits need a sight line: routes56.lair_strafe)
+    r.inputs += r56.lair_strafe(lair + 200, lair + L6_HUB_END - 18000)
     end = lair + L6_HUB_END
     r.note(end - 21000, "the Primagen dead (~30,000 after his lair): the ending cinema, then the credits")
     r.note(end, "60 the hub (after the credits)")
@@ -656,7 +799,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global L6_SLOT_AFTER
+    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -665,13 +808,20 @@ def cli(argv=None):
     ap.add_argument("--hub", action="append", default=[], help="N=FRAME: the hub arrival after level N")
     ap.add_argument("--cheats-off", default="", help="L1,L2,...: the levels played without T2_CHEATS invincibility (round 13 b5)")
     ap.add_argument("--env", action="append", default=[], help="K=V: one more line for teleport.env (e.g. T2_HURT_LOG=1)")
-    ap.add_argument("--cheats-on", default="", help="110: the City Totem invincible even in a --cheats-off level (round 13 b5)")
+    ap.add_argument("--cheats-on", default="", help="110: the City Totem invincible even in a --cheats-off level (round 13 b5); "
+                    "3 / 4: the Mother / the Primagen in a --cheats-off 6 run (round 14 c2)")
     ap.add_argument("--no-health", action="store_true", help="skip the health pickups (round 13 b5)")
     ap.add_argument("--talismans", nargs="?", const="2,3", default="",
                     help="the talisman chambers of these levels (default 2,3; round 13 b3)")
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
+    ap.add_argument("--late-keys", action="store_true",
+                    help="Primagen keys 2 and 3 in after level 5, round 13's walks after levels 2 and 3 (round 14 c3)")
+    ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
     a = ap.parse_args(argv)
     L6_SLOT_AFTER = a.slot
+    HOP = a.hop
+    if a.late_keys:
+        PRIMAGEN_LATE = (2, 3)
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},
              [int(x) for x in a.cheats_off.split(",") if x], a.env, not a.no_health,
              [int(x) for x in a.cheats_on.split(",") if x], [int(v) for v in a.talismans.split(",") if v])

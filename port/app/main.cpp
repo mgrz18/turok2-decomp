@@ -25,6 +25,8 @@
 
 #include <chrono>
 #include <cinttypes>
+#include <climits>
+#include <unistd.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -60,6 +62,8 @@
 #include "t2asset_lus.h"
 #ifdef T2_HAVE_GAME
 #include "game.h"
+#include "t2controls.h"
+#include "ship/audio/Audio.h"
 #include "offscreen_gl.h"
 #endif
 extern "C" {
@@ -151,18 +155,36 @@ struct Args {
     // bring-up aid: the arena and the game thread stacks below 2 GB (MAP_32BIT), which hides
     // pointers truncated through s32 instead of crashing on them.
     bool lowMemory = false;
+    // Round 14 (c4): `turok2` with no arguments, or `turok2 --play [--archive F] [--rom F]
+    // [--pak-dir D] [--no-audio]`, is the human player's launch: the game in a window, sound,
+    // real time, no frame limit, the files looked up in the usual places (FindData), the
+    // config, logs and saves in the user data directory, stdout to logs/turok2-stdout.log.
+    bool play = false;
+    bool archiveGiven = false, romGiven = false, noAudio = false, noPace = false;
+    std::string padTest; // --pad-test FILE (debug): scripted SDL virtual gamepad/keyboard/mouse
 };
 
 Args ParseArgs(int argc, char** argv) {
     Args a;
+    a.play = argc == 1;
     for (int i = 1; i < argc; i++) {
         std::string s = argv[i];
         if (s == "--archive" && i + 1 < argc) {
             a.archive = argv[++i];
+            a.archiveGiven = true;
         } else if (s == "--port-archive" && i + 1 < argc) {
             a.portArchive = argv[++i];
         } else if (s == "--rom" && i + 1 < argc) {
             a.rom = argv[++i];
+            a.romGiven = true;
+        } else if (s == "--play") {
+            a.play = true;
+        } else if (s == "--no-pace") {
+            a.noPace = true; // play mode: as fast as the host allows (checks)
+        } else if (s == "--no-audio") {
+            a.noAudio = true; // play mode: no sound device
+        } else if (s == "--pad-test" && i + 1 < argc) {
+            a.padTest = argv[++i];
         } else if (s == "--frames" && i + 1 < argc) {
             a.frames = atoi(argv[++i]);
         } else if (s == "--no-window") {
@@ -214,12 +236,48 @@ Args ParseArgs(int argc, char** argv) {
                             "                  [--no-pak | --pak-blank | --pak-dir DIR]\n"
                             "                  [--input BUTTON@FRAME[..LAST],SX=V@F..L,...|@FILE] [--skip-pak-check] [--start-mode N]]   (the last three: debug only)\n"
                             "          [--offscreen-gl]   (macOS: Fast3D on a CGL context with no window; T2_SHOT works)\n"
-                            "          [--bench [FROM]] [--pace]   (debug: frame times from VI FROM; real-time 60 Hz VI pacing)\n",
-                    argv[0]);
+                            "          [--bench [FROM]] [--pace]   (debug: frame times from VI FROM; real-time 60 Hz VI pacing)\n"
+                            "       %s [--play [--archive F] [--rom F] [--pak-dir D] [--no-audio] [--no-pace]]\n"
+                            "          (no arguments = --play: the game in a window with sound, files from the user data dir)\n"
+                            "          [--pad-test FILE]   (debug, headless --game: scripted virtual gamepad/keyboard/mouse)\n",
+                    argv[0], argv[0]);
             exit(2);
         }
     }
+    if (a.play) {
+        a.game = a.draw = true;
+        a.audio = !a.noAudio;
+        a.pace = !a.noPace;
+        if (a.frames == 3) {
+            a.frames = INT_MAX; // until the window closes
+        }
+    }
     return a;
+}
+
+// Play mode: the user data directory (the config, logs, the pak): macOS ~/Library/Application
+// Support/turok2, Linux $XDG_DATA_HOME/turok2 or ~/.local/share/turok2 (= t2pif.c's pak dir).
+std::string UserDataDir() {
+    const char* home = getenv("HOME");
+    std::string base = home ? home : ".";
+#ifdef __APPLE__
+    return base + "/Library/Application Support/turok2";
+#else
+    const char* xdg = getenv("XDG_DATA_HOME");
+    return (xdg && xdg[0] ? std::string(xdg) : base + "/.local/share") + "/turok2";
+#endif
+}
+
+// Play mode: the first of DIRS that holds NAME ("" when none).
+std::string FindData(const std::string& name, const std::vector<std::string>& dirs) {
+    for (const auto& d : dirs) {
+        std::error_code ec;
+        auto p = std::filesystem::path(d) / name;
+        if (!d.empty() && std::filesystem::is_regular_file(p, ec)) {
+            return std::filesystem::absolute(p).string();
+        }
+    }
+    return "";
 }
 
 } // namespace
@@ -227,6 +285,65 @@ Args ParseArgs(int argc, char** argv) {
 int main(int argc, char** argv) {
     setvbuf(stdout, nullptr, _IOLBF, 0);
     Args args = ParseArgs(argc, argv);
+    if (args.play) {
+        // the config and the logs go with the saves (LUS: SHIP_HOME), not into the current
+        // directory; stdout (the port's and the game's diagnostics) into logs/
+        const std::string data = UserDataDir();
+        std::error_code ec;
+        std::filesystem::create_directories(data + "/logs", ec);
+        if (getenv("SHIP_HOME") == nullptr) {
+            setenv("SHIP_HOME", data.c_str(), 1);
+        }
+        std::vector<std::string> dirs = { data };
+        if (const char* base = SDL_GetBasePath(); base != nullptr) { // the executable's dir; .app: Contents/Resources
+            dirs.emplace_back(base);
+        }
+        dirs.emplace_back(std::filesystem::current_path(ec).string());
+        if (!args.archiveGiven) {
+            args.archive = FindData("turok2.o2r", dirs);
+        }
+        if (!args.romGiven) {
+            args.rom = FindData("baserom.us.z64", dirs);
+        }
+        if (!std::filesystem::exists(args.portArchive, ec)) {
+            args.portArchive = FindData("t2port.o2r", dirs);
+        }
+        // the archive and the ROM are the player's own (QUICKSTART.md); the game needs both (the
+        // ROM holds the sound banks and wave data the audio manager reads at boot)
+        const struct {
+            const std::string& path;
+            const char* what;
+        } need[] = { { args.archive, "The game data archive turok2.o2r (tools/assets/mkarchive.py, built from your ROM)" },
+                     { args.rom, "Your Turok 2 ROM baserom.us.z64 (N64, USA)" },
+                     { args.portArchive, "The port's t2port.o2r (built with the port)" } };
+        for (const auto& n : need) {
+            if (n.path.empty() || !std::filesystem::is_regular_file(n.path, ec)) {
+                char msg[1024];
+                snprintf(msg, sizeof msg,
+                         "%s was not found.\n\nPut it in\n%s\n(or next to the executable, or in the current "
+                         "directory). See docs/port/QUICKSTART.md.",
+                         n.what, data.c_str());
+                fprintf(stderr, "turok2: %s\n", msg);
+                if (args.window) { // a Finder launch has no terminal to show stderr
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Turok 2", msg, nullptr);
+                }
+                return 1;
+            }
+        }
+        const std::string out = data + "/logs/turok2-stdout.log";
+        if (freopen(out.c_str(), "w", stdout) == nullptr) {
+            fprintf(stderr, "turok2: cannot write %s\n", out.c_str());
+        }
+        setvbuf(stdout, nullptr, _IOLBF, 0);
+        // the runtime's diagnostics (t2:, t2audio:) go to stderr: into logs/ as well
+        if (isatty(fileno(stderr))) {
+            fprintf(stderr, "turok2: playing; logs in %s/logs\n", data.c_str());
+        }
+        const std::string err = data + "/logs/turok2-stderr.log";
+        if (freopen(err.c_str(), "w", stderr) != nullptr) {
+            setvbuf(stderr, nullptr, _IONBF, 0);
+        }
+    }
     const std::string archivePath = std::filesystem::absolute(args.archive).string();
 
     // ---- 1. Context and components (LUS epoch 2, "manual graph" style as in Ghostship) ----
@@ -281,7 +398,32 @@ int main(int argc, char** argv) {
     context->GetChildren().Add(resourceManager);
     ResourceSetResourceManager(resourceManager);
 
+    // The controls (round 14 c4, t2controls.cpp): Turok 2's default mappings for a fresh config.
+    // --pad-test (debug, headless) gives the deck a window with no window system behind it, so
+    // LUS's real gamepad/keyboard path runs without a display.
+    std::shared_ptr<Ship::Window> inputWindow = window;
+#ifdef T2_HAVE_GAME
+    if (!args.padTest.empty()) {
+        if (args.window || !args.game) {
+            fprintf(stderr, "--pad-test: needs --game and --no-window or --offscreen-gl\n");
+            return 2;
+        }
+        if (!T2PadTest_Load(args.padTest)) {
+            return 2;
+        }
+        inputWindow = T2Controls_MakeHeadlessWindow(cvars);
+    }
+    T2Controls_SetWindow(inputWindow);
+    auto controlDeck = std::make_shared<LUS::ControlDeck>(
+        std::vector<CONTROLLERBUTTONS_T>{}, T2Controls_DefaultMappings(),
+        std::unordered_map<CONTROLLERBUTTONS_T, std::string>{
+            { BTN_A, "A" }, { BTN_B, "B" }, { BTN_L, "L" }, { BTN_R, "R" }, { BTN_Z, "Z" }, { BTN_START, "Start" },
+            { BTN_CLEFT, "CLeft" }, { BTN_CRIGHT, "CRight" }, { BTN_CUP, "CUp" }, { BTN_CDOWN, "CDown" },
+            { BTN_DLEFT, "DLeft" }, { BTN_DRIGHT, "DRight" }, { BTN_DUP, "DUp" }, { BTN_DDOWN, "DDown" } },
+        inputWindow, cvars);
+#else
     auto controlDeck = std::make_shared<LUS::ControlDeck>(window, cvars);
+#endif
     context->GetChildren().Add(controlDeck);
     ControllerSetControlDeck(controlDeck);
 
@@ -313,6 +455,47 @@ int main(int argc, char** argv) {
     auto crashHandler = std::make_shared<Ship::CrashHandler>();
     context->GetChildren().Add(crashHandler);
     CrashHandlerSetComponent(crashHandler);
+#ifdef T2_HAVE_GAME
+    // The sound device (round 14 c4): LUS's Ship::Audio picks CoreAudio on macOS (SDL elsewhere)
+    // from Window.AudioBackend in the config, and falls back to SDL, then to none, when it cannot
+    // open. Only for --audio runs with a window (headless runs keep the simulated device of
+    // --pace; T2_AUDIO_DEVICE=1 opens the real one there too, for tests).
+    std::shared_ptr<Ship::Audio> audio;
+    bool audioDevice = false;
+    if (args.game && args.audio && (args.window || getenv("T2_AUDIO_DEVICE") != nullptr)) {
+        Ship::AudioSettings as;
+        as.SampleRate = 22050; // the game's synthesizer (t2audio_mgr.c, osAiSetFrequency)
+        as.SampleLength = 512;
+        as.DesiredBuffered = 2205; // 100 ms
+        // LUS saves the backend it falls back to: one launch without a device would leave every
+        // later launch silent. Keep the player's choice (or none) in the config instead.
+        const std::string savedBackend = config->GetString("Window.AudioBackend", "");
+        audio = std::make_shared<Ship::Audio>(as, config);
+        context->GetChildren().Add(audio);
+        audio->Init();
+        // LUS falls back to no sound when the platform player cannot open: try SDL's first
+        // (it falls back to none in turn)
+        if (audio->GetCurrentAudioBackend() == Ship::AudioBackend::NUL && savedBackend != "null" &&
+            savedBackend != "sdl") {
+            audio->SetCurrentAudioBackend(Ship::AudioBackend::SDL);
+        }
+        auto player = audio->GetAudioPlayer();
+        audioDevice = player != nullptr && player->IsInitialized() &&
+                      audio->GetCurrentAudioBackend() != Ship::AudioBackend::NUL;
+        if (config->GetString("Window.AudioBackend", "") != savedBackend) {
+            config->SetString("Window.AudioBackend", savedBackend);
+            config->Save();
+        }
+        AudioSetAudioComponent(audio);
+        static const char* kNames[] = { "wasapi", "sdl", "coreaudio", "null" }; // AudioBackend order
+        const int be = (int)audio->GetCurrentAudioBackend();
+        printf("audio: %s device, %s\n", be >= 0 && be < 4 ? kNames[be] : "?",
+               audioDevice ? "open (22,050 Hz stereo)" : "NOT open: no sound");
+        if (!audioDevice) {
+            fprintf(stderr, "turok2: no sound device could be opened; playing without sound\n");
+        }
+    }
+#endif
     auto events = std::make_shared<Ship::Events>();
     context->GetChildren().Add(events);
     EventSystemSetEvents(events);
@@ -486,6 +669,7 @@ int main(int argc, char** argv) {
         g.startMode = args.startMode;
         g.benchFrom = args.benchFrom;
         g.pace = args.pace;
+        g.audioDevice = audioDevice;
         CHECK(T2Game_Run(window, g) == 0, "game run");
         CHECK(T2Swoosh_SelfTest() == 0, "swoosh system self test");   // port/game/t2swoosh.c
     }
@@ -561,6 +745,10 @@ int main(int argc, char** argv) {
     WindowSetWindowComponent(nullptr);
     EventSystemSetEvents(nullptr);
     CrashHandlerSetComponent(nullptr);
+#ifdef T2_HAVE_GAME
+    AudioSetAudioComponent(nullptr);
+    T2Controls_SetWindow(nullptr);
+#endif
     ControllerSetControlDeck(nullptr);
     ResourceSetResourceManager(nullptr);
     CVarSetConsoleVariable(nullptr);

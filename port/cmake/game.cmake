@@ -112,7 +112,6 @@ target_compile_options(t2_game_flags INTERFACE
     # macOS split at level 135 (frame 71,469 of the whole-game run: a particle 0.7 units off,
     # then the player's aim), and a -O2 build no longer finished the game. Zeroed locals give
     # the same run everywhere (Mac Debug = Mac -O2 = Linux, 266,000 frames).
-    -ftrivial-auto-var-init=zero
     # Tentative definitions repeated across files (SN64 linked them as common).
     -fcommon
     # Clang 16+ makes these errors in C; the code predates them. They stay
@@ -123,6 +122,12 @@ target_compile_options(t2_game_flags INTERFACE
     -Wno-error=implicit-int
     -Wno-error=return-type
 )
+# Round 14 c5: T2_AUTO_VAR_INIT = zero (default), pattern or none (the compiler's default: to
+# look for reads of unset locals, see docs/port/STABILITY.md section 10).
+set(T2_AUTO_VAR_INIT "zero" CACHE STRING "-ftrivial-auto-var-init for the game code: zero, pattern or none")
+if(NOT T2_AUTO_VAR_INIT STREQUAL "none")
+    target_compile_options(t2_game_flags INTERFACE -ftrivial-auto-var-init=${T2_AUTO_VAR_INIT})
+endif()
 if(T2_WARN_ALL)
     # everything clang reports by default
 elseif(T2_WARN_64BIT)
