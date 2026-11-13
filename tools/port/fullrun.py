@@ -341,17 +341,16 @@ def hub(r, arrival, grant=(), primagen=(), save=True, go=None):
     return t + CINEMA_AFTER[go]
 
 
-def main_all(out, upto=6, extras=True, hubs_in=None, talismans=False):
-    """hubs: the measured hub arrivals {after level: frame} (HUB_AT). talismans: the chamber
-    trips of levels 2 and 3 (TALISMAN; each moves the later hub arrivals by TALISMAN_TRIP)."""
+def main_all(out, upto=6, extras=True, hubs_in=None, talismans=()):
+    """hubs: the measured hub arrivals {after level: frame} (HUB_AT). talismans: the levels whose
+    chamber trip is made (TALISMAN: 2, 3; each moves the later hub arrivals by TALISMAN_TRIP)."""
     hubs = dict(HUB_AT)
-    if talismans:
-        for lv in TALISMAN:
-            for k in hubs:
-                if k >= lv:
-                    hubs[k] += TALISMAN_TRIP
+    for lv in talismans:
+        for k in hubs:
+            if k >= lv:
+                hubs[k] += TALISMAN_TRIP
     hubs.update(hubs_in or {})
-    det = {lv: {TALISMAN[lv][0]: lv} for lv in TALISMAN} if talismans else {}
+    det = {lv: {TALISMAN[lv][0]: lv} for lv in talismans}
     r = Route()
     r.saves_at = []
     arrival, added = level1(r)
@@ -525,8 +524,9 @@ if __name__ == "__main__":
     ap.add_argument("--no-extras", action="store_true")
     ap.add_argument("--hub", action="append", default=[], help="N=FRAME: the hub arrival after level N")
     ap.add_argument("--hop", type=int, default=L6_HOP_AFTER, help="the hop to the Primagen, frames after the hub (level 6)")
-    ap.add_argument("--talismans", action="store_true", help="the talisman chambers of levels 2 and 3 (round 13 b3)")
+    ap.add_argument("--talismans", nargs="?", const="2,3", default="",
+                    help="the talisman chambers of these levels (default 2,3; round 13 b3)")
     a = ap.parse_args()
     L6_HOP_AFTER = a.hop
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},
-             a.talismans)
+             [int(v) for v in a.talismans.split(",") if v])

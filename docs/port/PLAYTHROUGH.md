@@ -1032,3 +1032,78 @@ The pak after the run: note 1 "TUROK 2", checksum OK, life force 78, weapon 9, c
   (both are the game's own warps; which one depends on state the two runs do not share: not
   traced further).
 - The Primagen's stage-3 lair wait depends on where he rests (above); compare with the N64.
+
+## 12. The talismans, the nuke parts and the 100% ending (Phase 7 round 13, part b3)
+
+### 12.1 What the 100% ending is (the game's own logic)
+
+- **Engine mode 16 is not an ending of play.** `EngineMode16_Ending_Init` (func_00289C0C) runs only
+  from the cheat menu's level select (`CheatsMenu_WarpSelect`, func_0041A5DC/func_0045353C: its
+  last entry, id 8000, `CEngineApp__SetupFadeTo(16)`): the credits with `gFinalEnding = 1`, then
+  the title (`Credits_Update`: `SetupFadeTo(1)`). Killing the Primagen always leads to mode 15
+  (credits, then `CEngineApp__StartGameAtWarp(7007)`: the hub).
+- **The ending is chosen in `Primagen_EnterDeath`** (func_00407CB0) by the **five totem flags**
+  (`m_bLevel1..5TotemFlags`, set by `TotemDefense_Complete` when a totem defence 109-113 is won):
+  - all five: cinema **0x172 (370) "PD2-P tired"**, then its chain in level 4 (the totems'
+    cinemas "PD2-totem-harbor/marsh/cave/hive/city", "PD2-final"), then level 10's "END 2"
+    cinemas, the credits; **`unlockedCheats |= 0x7FF0019`** (the cheat menu's rewards);
+  - otherwise: cinema **0x173 (371) "Primagen Death"**, level 11's "END 1b" cinemas, level 10,
+    the credits; `unlockedCheats |= 2`.
+  (Cinema names and levels: `tools/assets/cinemas.py`.) The talismans, the nuke parts and the
+  Primagen keys are not read by the ending: the talismans are abilities (4380 Breath of Life:
+  `CPlayer__UpdateSubmerged` no drowning damage; 4384 Heart of Fire: `CPlayer__Hurt` ignores
+  regions with flag 0x400000, the lava; cheat flag 0x10 = all talismans), the nuke parts build the
+  Nuke weapon, the Primagen keys open his portal.
+
+Both endings play on the port (Linux, headless; the Primagen recipe of STATUS.md section 1 plus
+`T2_TOTEMS`, a new DEBUG-ONLY switch that sets the five flags at the first gameplay frame):
+
+| T2_TOTEMS | his death | cinema | then | credits (mode 15) | hub | unlockedCheats |
+|---|---|---|---|---|---|---|
+| 11111 | 38,714 | 370 (to 39,074), the PD2 chain in level 4 | level 10 (41,706; 120 at 45,102) | 45,506 | 59,604 | 0x4000000 -> **0x7FF0019** |
+| 11011 | 38,714 | 371 | level 11 (40,378), level 10 (44,326) | 44,730 | 58,828 | 0x4000000 -> 0x4000002 |
+
+`T2_PROGRESS_LOG=1` (DEBUG-ONLY, t2debug.c) prints a `progress:` line whenever the completion
+state changes: totem flags, boss flags, the five talismans and six Primagen keys (count nibbles),
+the nuke parts, `unlockedCheats`, the ending flags and the cinema script.
+
+### 12.2 The talisman chambers (73-77)
+
+Items (object type -> item, cart entry 2): talismans 4380 Breath of Life (object 602), 4381 Eye of
+Truth (604), 4382 Leap of Faith (607), 4383 Whispers (610), 4384 Heart of Fire (605); **talisman
+pieces** 4400-4404 (601/606/603/608/609); the nuke part 4500 (611).
+
+Each chamber is entered from its level's portal N001 and left by N002 back to it. An action by
+the pedestal (intelligence type 10, collision radius 61, `m_GoPickupNeeded` = the piece) is worked
+by walking into it with the piece: the piece is placed (a cinema, ~1,650 frames), the door
+(actor 8, kind 6, z 467) opens and the talisman lies on the dais at (-2.6, 46.2, 746.3). There
+is no fight. Without the piece the walk ends at the closed door (z 439).
+
+| level | chamber | portal (sub-level) | piece (sub-level: position) | talisman |
+|---|---|---|---|---|
+| 2 | 73 | 2001 (132) | 4402 (132: 1230.2, 409.6, -798.7) | 4382 Leap of Faith |
+| 3 | 74 | 3001 (66) | 4400 (66: -2033.5, -307.2, -1457.5, a ledge) | 4380 Breath of Life |
+| 4 | 75 | 4001 (99) | 4404 (101: -1280.1, -1433.6, 2579.8) | 4384 Heart of Fire |
+| 5 | 76 | 5001 (88) | 4403 (88: -2819.8, -307.2, -1478.5) | 4383 Whispers |
+| 6 | 77 | 6001 (121) | 4401 (122: -2005.0, 305.6, 1.4) | 4381 Eye of Truth |
+| 1 | 72 (Adon) | 1001 (55, after the switch) | none | none |
+
+`tools/port/extras.py OUT --talisman 73..77` plays one chamber from a new game (`T2_WARP_TO` the
+portal, the piece given by `T2_GIVE_ITEMS`; the chamber itself is walked, no teleport): **all
+five talismans picked up** (73: 15,505; 74: 17,247 in the slower first recipe; 75: 15,505; 76, 77:
+the same walk). `fullrun.CHAMBER` is the walk, counted from the chamber's arrival.
+
+**In the continuous run**: `fullrun.py RUN --talismans` (`TALISMAN`, `talisman()`, inserted by
+`level_segments(..., detours=...)` at a segment's start, `TALISMAN_TRIP` = 4,800 frames each, the
+later hub arrivals moved by as much) picks the piece, walks into the portal pad (from a
+neighbouring region's centre), anchors the chamber (`T2_ANCHOR 73@N`), plays it and walks out:
+levels 2 (73) and 3 (74). Levels 4 and 6 are not in it (the portal's sub-level comes before the
+piece's in the route: 99 before 101, 121 before 122), level 5 not yet (routes56's segments are not
+built by `level_segments`).
+
+### 12.3 The flesh-eater levels (78-83)
+
+Each has one nuke part (4500; `m_NukePartLevelFlags[level - 1]`) and its exit N004.
+`tools/port/extras.py OUT --nuke 78..83` warps in (N003), teleports next to the part and walks
+into it: **all six picked up** (DEBUG-ASSISTED: the way through each level's flesh eaters is not
+routed). In 78 the part lies behind a door (actor 10) that was already open.

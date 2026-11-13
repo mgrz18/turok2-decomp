@@ -17,6 +17,31 @@ The matching build is unchanged: `tools/asm_diff.py --base 046a67f9 -j 8` report
 over all 3,938 files after every merge and every fix, and a clean `make clean && make setup &&
 make build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
+## Round 13 b3: the talismans, the nuke parts, the 100% ending
+
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) section 12. Port-only (tools/port, port/game/t2debug.c,
+port/app/game.cpp); no `src/`/`include/` change.
+
+- **The 100% ending is decided by the five totem flags, not by engine mode 16.** Mode 16
+  (`EngineMode16_Ending_Init`) is only the cheat menu's level-select "credits" entry. With all five
+  totem defences won `Primagen_EnterDeath` plays cinema 0x172 "PD2-P tired" and its chain (the
+  totems strike), level 10's "END 2", the credits, and unlocks the cheats 0x7FF0019; otherwise
+  0x173 "Primagen Death", level 11's "END 1b", level 10, the credits (cheat 2). **Both play on the
+  port** (the Primagen recipe + `T2_TOTEMS=11111` / `11011`: credits and the hub after each).
+- **Talisman chambers 73-77**: a pedestal action needs the level's talisman piece (4400-4404),
+  then a cinema, a door, the talisman (4380-4384) on the dais; no fight. **All five picked up** by
+  `tools/port/extras.py OUT --talisman N` (walked, the piece given). In the continuous run
+  `fullrun.py RUN --talismans [2,3]` collects levels 2 and 3's pieces and walks their portals and
+  chambers (**Leap of Faith and Breath of Life picked up**, 4,800 frames each).
+- **Flesh-eater levels 78-83**: **all six nuke parts picked up** (`extras.py OUT --nuke N`,
+  teleport-assisted).
+- New DEBUG-ONLY switches: `T2_PROGRESS_LOG=1` (a line per change of the totem/boss flags,
+  talismans, Primagen keys, nuke parts, unlocked cheats, ending flags, cinema script),
+  `T2_TOTEMS=abcde` (the five totem flags at the first gameplay frame).
+- **The totem fights decide the ending and are timing-sensitive**: the base `--all` run loses the
+  City Totem (110, 5/8, twice identically); with the level-2 and 3 chamber trips the City Totem is
+  won (11/8) but the Marsh Totem (111) lost (7/8): one kill short at ~1 kill per 15 s.
+
 ## 1. Build and run
 
 ```sh
