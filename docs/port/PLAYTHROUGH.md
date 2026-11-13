@@ -1032,3 +1032,472 @@ The pak after the run: note 1 "TUROK 2", checksum OK, life force 78, weapon 9, c
   (both are the game's own warps; which one depends on state the two runs do not share: not
   traced further).
 - The Primagen's stage-3 lair wait depends on where he rests (above); compare with the N64.
+
+## 12. Level state across visits, the City Totem (Phase 7 round 13, part b2)
+
+### 12.1 Hub doors closed on a later visit: the fired events were never replayed (fixed)
+
+Reproduced in ~38,000 frames (no level played, no save needed): level 1, the hub (both the
+level-2 and the level-3 key slots filled: "access to level 3 granted.", door 28 opens), a
+`T2_WARP_TO=-111` hop to the City Totem (lost on purpose), back in the hub, the walk at the
+level-3 door: blocked 139 units short of it. The door itself was restored open: its instance
+bit (`gLoadSavePersistentData`, `T2_BITS_LOG=60`) was kept, `Door_Advance` put it in mode 0, and
+a hex dump of the door actor (`T2_DUMP_ACTOR`) matched the first visit's byte for byte. What
+blocked the walk was **key slot 22** (an action, type 0x648) beside the door: filling a slot fires
+its events, among them kind 10 handler 8 (`Event_DisableCollision`); on a later load the slot
+came back in its used mode (its instance bit) but solid (`Action_Setup` sets the collision flag
+0x10000).
+
+On the N64 a level load replays every fired event (their bits: block 2 of the level's section of
+`gLoadSavePersistentData`): `func_0042C79C` (all of them, before the actors are set up) and
+`func_0042C840` (kinds 1, 2, 4 and 10, after) call `CScene__RestoreFiredEvent`. On the host all
+three viewed `CScene` at N64 offsets (0x1168-0x117C for the record tables, 0x6C and 0x18FA8 for
+the bit sections and the level): **no fired event was ever replayed on a level load**. Commit
+2881ad54: the three (and their module-2 twins `func_004656BC`/`func_00465760`, and the raw 0x6C
+of `CScene__SetEventFiredInLevel`) by member (asm_diff 0). With it the walk passes the door on the
+second visit; the same after a save, a new boot and a load from that pak (`START@4400 A@4500
+DD@4700 A@4800 DU@4900 A@5000 A@5200 A@5400`: the hub at 5,600, the walk reaches level 12 at
+7,700). On every hub load the event log now shows the replayed "access to level N granted."
+events in scene modes 2 and 3 (no message, no music: those need mode 4).
+
+fullrun.py's workaround is gone: `GRANT = {1: (2, 3), 2: (4,), 3: ()}` fills each door's slots as
+soon as its keys are in hand (level 3's keys lie in level 1, level 4's in level 2), and the door
+is walked through on a later visit.
+
+The other per-level state lives in the same blocks and was host-correct before: the instance bits
+(opened doors, used actions, taken pickups, dead actors: `CScene__SetInstanceSavedBit`, members
+already), the killed-actor bits (`CScene__SetLevelActorKilled`, round 11) and the level bits
+(`CScene__SetLevelBit`, round 9). The replay covers every other event a level fired before
+(switches, gates, collision changes) in every level, so a revisited sub-level now looks as it
+was left (level 2's 130, 131, 132 and level 5's 91 are revisited by the routes).
+
+a5's `n64viewcheck.py` lists `CScene__RestoreFiredEvent` among its 44 *suspect* sites (the view
+fits CScene, both fields moved) and the raw 0x6C as *untyped*: the suspect list holds real bugs.
+The two loops' views (pad 0x1168, fields `counts`/`items`) were not matched to CScene.
+
+### 12.2 Level 2: sister 1 woke too late in some runs
+
+With the first hub visit 300 frames longer (the level-3 slots filled there) sister 1 (133, actor
+20) was left at 7/50 when her window ended: she sleeps until zombies 22-24 die and door 28 opens,
+and with her aimed from the start (`enemy:20`) the zombies died only from stray shots (~5,000
+frames). playthrough.py now aims zombies 22, 23 and 24 one by one (1,500 frames each), then the
+sister (1,900, + `L2_STRETCH`'s 3,000, now on that step): she dies at 42,436 (43,186 before).
+**This step is shared with `--level 2` and b5's work on levels 1-2.**
+
+### 12.3 The City Totem (110): won from the totem's side
+
+The route fired from the arrival ledge (-665.6, 307.2, -153.6), 642 units from the totem (level
+actor 1, (-102.4, 0, -153.6)); the attackers (three alive at a time from the generators, two of
+them going for the totem, one for the player) stood 450-1,150 units away: 4/8 in 120 s from a
+`T2_WARP_TO=-111` start, 4-5/8 in the continuous runs. The totem kept its 5 health in every lost
+run: the fights were lost on time, not on damage. fullrun.py (150 frames after 110 is reached) and
+`--level 2` (400 frames after its nominal arrival) now teleport to `playthrough.CITY_TOTEM_SPOT` =
+(-102.4, 0, -330.0), facing the totem: **won 8/8 in all 8 runs** (the continuous run, `--level 2`,
+and six warps at 14,000 + 0/37/91/150/233/400 frames, i.e. six RNG states): the 8th kill 3,000 (the continuous run) to 5,200 frames after the start of the 7,200-frame fight (~375-650
+frames a kill). Not compared with the N64 (no N64 save at 110): the kill rate was the shooter's
+distance, not a host bug seen in the logs.
+
+### 12.4 The whole game with these changes (Linux, headless, PIE, 266,000 frames, exit 0)
+
+The run of section 11.2 with this branch (the doors opened as soon as their keys are in hand,
+sister 1's zombies first, the City Totem from its side): every objective of levels 1-6; **the five
+totems won** (109 8/8, 110 at 79,500, 111, 112 8/8, 113); the Blind One dead (mode 9) at 134,418,
+the Mantid Queen (16) at 164,516, the Mother (30) at 205,405, the Primagen (29) at 235,842; the
+credits 242,634-256,724, the hub at 257,000. The pak: note 1 checksum OK, life force 78, clock
+0:44:23. `T2_PICKUP_LOG`: each level key once (4310-4330 three each, 4340 one, 4350 five, Primagen
+keys 1-4), nothing taken twice on the revisits. The hub visits fill the level-2 and level-3 slots
+after level 1 and the level-4 slots after level 2; the walk through the level-3 door on the second
+visit passes (it was opened in the first).
+
+## 13. Fewer cheats (Phase 7 round 13, part b5)
+
+**Measuring.** `T2_HURT_LOG=1` (port/game/t2debug.c) prints a `hit:` line for every hit the
+player's actor takes: the damage, its flags, the source (an object, or a particle and its owner)
+and the object types. Player_OnMultiplayerKill, the player's damage handler in every mode, calls
+`T2Port_OnPlayerHit` under `TARGET_PORT`. It also prints a `hurt:` line for every drop of health,
+a `death:` line for every death or life lost, and a `hurtsum:` line per sub-level (hits, damage,
+lowest health, deaths). `T2_HURT_LOG=2[,R]` adds a rescue for measuring only: below R health
+(default 30) the health goes back to 100, and a shadow health counts the deaths a run without
+the rescue would have had. Region damage (lava, marsh) does not go through the handler: it shows
+as `hurt:` lines with no `hit:`. `T2_CHEATS` is now frame-scheduled (`"0;1@F;..."`; the bits it
+set are cleared again). fullrun.py takes `--cheats-off L1,L2,...`, which plays those levels
+without invincibility, each from the hub visit before it. `--cheats-on 110` keeps the City Totem
+invincible. `--env K=V` adds a line to teleport.env, and `--no-health` skips the health pickups.
+
+**The host bug: no health pickup was ever taken** (64BIT.md part 7). The health rows' union was
+laid out by its first member, so `m_Max` was 0. Fixed, so the routes can now heal.
+
+**Health on the way** (`L1_HEALTH`, `L2_HEALTH`, 150 frames per pick, only in the `--cheats-off`
+levels; without them the route is round 12's, input for input):
+
+- level 1: 59's ultra health (+100 up to 200) before the Harbor Totem;
+- level 2: in 130, the full health and the ultra health before sister 1 (133), and the second
+  ultra health before sister 2 (134); 131's full health; 135's ultra health at its start (the
+  crypts and sister 3).
+- Rejected: 131's full health (-1996, 6256), 132's full health (12288, -666) and 132's ultra
+  health (-6298, 205). All three lie in damage regions (10 every 2 frames: 330-740 health lost
+  in a rescue run). Also rejected: the six +10 beside sister 3's spot, which lie in the pit's
+  damage region.
+- 135's first crypt key now gets a third walk (dt 8,850). When it is missed, the platform before
+  door 60 stays down, and sister 3's spot becomes a damage pit (10 every 2 frames).
+
+**Levels 1 and 2 without invincibility** (`fullrun.py RUN --upto 2 --cheats-off 1,2 --cheats-on 110
+--env T2_HURT_LOG=1`, 92,000 frames; two runs identical): **0 deaths**.
+
+| sub-level | hits | damage | lowest health |
+|---|---|---|---|
+| 51-59 | 1 | 1 | 99 |
+| 109 the Harbor Totem (won) | 51 | 132 | 68 |
+| 127 | 3 | 3 | 65 |
+| 133 (sister 1) | 65 | 169 | 31 |
+| 134 (sister 2) | 47 | 105 | 26 |
+| 135 (sister 3) | 50 | 168 | 32 |
+| 110 the City Totem | invincible | | |
+
+Before the health fix and without the picks, the same route had 7 shadow deaths in levels 1-2
+(rescue run): 109 1, 133 2, 134 1, 135 2, 110 1. The City Totem took 150-182 damage in rescue runs
+(the gunners' bolts, particle 67, 2 each). With the other totems' state it is b2's part, so it
+stays invincible (`--cheats-on 110`). The firestorm cannon (11) instead of the plasma rifle did
+worse in 133/134 (213 and 380 damage).
+
+**The whole game with levels 1-2 played this way** (`--cheats-off 1,2 --cheats-on 110`, the rest
+invincible, 320,000 frames): levels 1-6, the Primagen dead at 275,872, the ending, the credits and
+the hub at 296,000, exit 0. Two caveats:
+
+- The timeline is ~30,000 frames later than round 12's: the Blind One died at 166,696 (round 12:
+  136,092). The player entered level 4 with 32-82 health instead of 100-200, and with
+  invincibility on, her fight took 34,500 frames instead of ~10,000. Not traced further: the
+  same fight entered with 193 health (`--cheats-off 4`) ended at 139,086.
+- One life was lost to a Primagen spot over a pit (invincibility does not cover the abyss).
+
+The default `--all` (no `--cheats-off`) is still round 12's route plus the 135 key walk: the
+whole game, the Primagen dead at 246,752, the hub at 267,000.
+
+**Levels 3-6, one level at a time without invincibility** (rescue runs; `--cheats-off N`, the other
+levels invincible):
+
+| level | result | why invincibility is still needed |
+|---|---|---|
+| 3 | 69: 381 damage; 64: a death (271 damage in 6 hits); 71: 417 damage; 2 lives lost | **Region damage on the route**: 64's satchel charge step (-1394, -54, 4557) stands in a marsh region (75 every 30 frames, no source), and so does a later walk in 64 (x -887..-924, z 1300->1016). **The obj-230 enemies** (69, 71; intelligence 494/496) hit from 100-700 units with no particle (13-42 damage, larger when closer), **each hit 3 times** (game frames +0, +4, +5). That may be a burst, or a host bug applying one hit three times: **compare on the N64** (n64trace `--calls Player_OnMultiplayerKill` in 69). |
+| 4 | the sub-levels 1-9 damage; the Cave Totem 156 (lowest 56); **the Blind One 206 damage** | a health budget: no full or ultra health between 108 and her arena (108's four +10 only) |
+| 5 | **0 deaths**: 124 33 damage, 95 1, the Hive Totem 34, the Mantid Queen 26 (lowest 106, from 200) | none (entered with 200) |
+| 6 | 117 21 damage; **119: 400 damage, 2 lives lost** | the route's air starts at 119's couplings (y -110, 45 units out): each miss falls ~200 units onto the floor (fall damage ~80) |
+
+**The level-119 jump** (this round's typed `m_JumpScale`). The jump is variable:
+`PlayerJump_Update` keeps the upward speed while R is held and `m_ModeTime < 3`. Measured in 119
+from the floor (y -307.2), walking at a coupling:
+
+- R held 4 frames: the jump rises 47.7 units;
+- R held 28 frames: 57.7 units;
+- R held 78 frames: **94.9 units** (apex y -212.3).
+
+The coupling needs y >= -245.8, i.e. 61.4 units. a2's measurement (59.5) was a short press, not
+a lower jump. The port's jump matches the N64: demo 3's held jump (gf 72) is RAM-identical to the
+N64's through its end, and the boot's 523,287 det lines are identical before and after this
+round's fixes. Two things did not work in quick tests: a held jump from the floor at a corner
+coupling (no activation: the player slides along the generator and passes under its top), and a
+teleport onto the generator's top (refused). The air start stays, and it is what makes level 6
+lethal without invincibility (next step: a walk onto the generator top).
+
+## 14. Levels 5 and 6 and the Primagen by the game's own progression (Phase 7 round 13, part b1)
+
+`playthrough.py RUN --all` (fullrun.py, routes56.py) no longer teleports past the hub's level-5
+and level-6 doors, no longer hands out items (`T2_GIVE_ITEMS`) and no longer hops to the Primagen
+(`T2_WARP_TO=7602`). Every key, item and door of levels 5 and 6 and the Primagen's entrance now
+come from the game:
+
+```sh
+python3 tools/port/playthrough.py RUN --all        # 280,000 frames now
+cd OUT && . RUN/teleport.env && SDL_VIDEODRIVER=offscreen T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=500 \
+  build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --pak-dir RUN/pak \
+  --frames 280000 --input @RUN/playthrough.txt
+```
+
+### 14.1 The keys of levels 5 and 6
+
+- **62's level-5 key** was never picked up because its stand point (90 units on +z) has no floor:
+  the teleport was refused (`region (nil)`). It is now approached from +x
+  (`tools/port/itemreach.py`, new: the floor under an item and the approach angles whose way in
+  has a floor at the item's height).
+- **68's level-5 key** sat at index 15 of `L3_KEYS`, but level 3 has 14 segments: it was never
+  inserted. **103's level-6 key** sat at index 12 (105's second visit). Both are now at their
+  sub-level's segment.
+- The three key segments (62, 68, 103) are anchored on their sub-level (`level_segments(...,
+  anchor={...})`): the clock jumps to the segment's start when the sub-level is reached, and the
+  pick waits `KEY_WAIT` (150) frames.
+
+All 18 level keys of the route are now picked up: level 5's three (61, 62, 68) and level 6's six
+(100, 103, 105 of level 4; 84, 87, 89 of level 5).
+
+### 14.2 The level-5 and level-6 doors
+
+Each door is one walk from the plaza (`PAD[5]`, `PAD[6]`, a teleport in the open plaza first). The
+walk crosses the door's key slots, which take the keys: **"access to level 5 granted."** (or 6), and
+the door opens. The walk then goes on through the door and down the way to the portal 5000 (6000).
+Level 5: from (-200, 0, 128) at rotY 2.08, 700 frames (2.03 misses a slot, 2.16 stops 200 units
+short of the portal). Level 6: from (-12, 0, 300) at rotY pi, straight down the corridor, 800
+frames.
+
+### 14.3 The Primagen's entrance: the six Primagen keys
+
+No warp region leads to 7602 (the Primagen's lair). The hub's six Primagen key slots (instances
+4-7, 11, 12, objects 154/158/159/161/291/292) each hold a link record (kind 9, handler 4:
+`Event_PlayCinema`/`Event_PlayCinemaRemote`, the "level" field 43, key 75). When the sixth key goes
+in, the six records fire together and play **the hub portal cinema (level 43,
+`cinema_hubportal`)**. The cinema ends in **level 4, the Primagen's lair**, at 7602's place (1.4,
+0, -1789.6). This was checked with a new game, `T2_WARP_TO=1999` and the six keys given: slot 6 at
+18,115, the cinema from 18,173, the lair at 19,303. In the port the cinema does not wait for the
+Mother.
+
+**Open: Primagen keys 2 and 3 do not go in during the continuous run** (they never did in round 12
+either: no slot event for instances 5 and 6). The hub has no region inside the ring of slots. In
+the continuous run, a walk straight in at slot 2 (133, 38) or slot 3 (37, -85) is deflected round
+the ring to (147, 128) with no slot event. Neither of the two alternatives works: starting at slot
+1's outside point (`PRIMAGEN_FROM`), or starting from the previous slot's pad along the ring
+(`PRIMAGEN_ALONG`). In the experiment above, which held all six keys with every slot empty, the
+walk at slot 1 went on to fill slot 2, and the walk at slot 2 then filled slot 3. Any slot takes
+any Primagen key: with only keys 2 and 3 given, the walks at slots 4 and 5 filled slots 6 and 5.
+So in the continuous run only four slots fill, the cinema does not play, and **the route falls back
+on the old hop** (`T2_WARP_TO=7602`, 150 frames after the cinema would have ended; after a real
+cinema it would only put the player back on the lair's start). Next: walk to slots 2 and 3 from
+another side, or carry keys 2-3 until the hub after level 6 and use the slot-4/5 walks, which took
+them in the experiment.
+
+The keys: Primagen key 5 (item 4364, object 591) lies in **92** (`092_91_Lev5_H_TALISMAN`, the
+hive's talisman level) at (614.4, 2151.2, 2918.4). 91's region 25 warps there (5813), and 92's exit
+5814 leads back to 91 at (4005, 614, -24). `routes56.l5_with_primagen_key()` adds this detour
+between 91's satchel charges and its exit 5500 (+1,200 frames). Primagen key 6 (4365, object 592)
+lies at the centre of **114** (0, -50.8, 0). On the first visit to 114 a walk from 90 units out was
+pushed back 70 units (by something round the key that was not identified), so the route takes the
+key on 114's last visit, after "force field down.". Key 5 goes into its slot in the hub visit after
+level 5, and key 6 after the Mother.
+
+### 14.4 Level 6's items: the capacitor question answered
+
+a2's survey mapped objects to items wrongly. Cart entry 2 (the object types table, `u16
+id[object]`) gives **object 597 = item 4231, the crystal ion capacitor**, **595 = 4229, the red
+laser cell** and 596 = 4230, the blue laser cell. a2 had 601 (= 4400) and 599 (= 4110, the satchel
+charge). **Level 6 itself holds 16 capacitors, one per coupling**:
+
+| level | capacitors | where (item positions) |
+|---|---|---|
+| 115 | 4 | (-3840, 153.1, -1612.8), (-3532.8, 153.1, -1612.8), (2611.2, 41.3, -2304) and (-1228.8, 155.8, 537.6) on machine tops |
+| 116 | 2 | (0, 155.4, -5068.8); (-1862.3, -1945.6, 921.6) on a deadly floor (region info 23, damage 10,000) |
+| 117 | 2 | (0, 51.5, 153.6), (0, 51.5, 1689.6), over the pit where the bridges (object 412, actors 58/60) extend |
+| 118 | 2 | (-3906.8, -256, -1536), (-770.4, 0.3, 1136.3) |
+| 119 | 2 | (-2304, 308, -2380.8), (-1075.2, 308, -2380.8) |
+| 120, 121, 122, 123 | 1 each | (1996.8, -153.2, 0); (307.2, 383.3, 0) on a machine; (-1612.8, 305.6, 0); (0, 1.7, -1331.2) |
+
+These are in route order. Generator 1 (115) takes 115's four. Generator 2 (117) takes 116's and
+117's. Generator 3 (119) takes 118's and 119's. Generator 4 (123) takes one each from 120-123.
+**So one capacitor per coupling (`CPlayer__UseSpecialPickup`, the asm a2 checked) matches the data.
+No port difference:** the run collects 16 (`T2_PICKUP_LOG`), and every generator is recalibrated by
+its own four couplings. The **red laser cells** lie in 123 itself, on the four blue slots (actions
+26-29, object 184): (+-275.7, 45.7, -1228.8) and (+-782.9, 45.7, -4608). They are walked into from
+the floor beside the slot. The route takes the two at -1228.8 before plant 3's slots 24/25. The
+blue cells (596) lie on slots 24/25 and in 122. Not run on the N64: the data shows the 16, and the
+port uses one per coupling as the N64 asm does.
+
+`routes56.L6_ITEMS` lists the pickups by segment. `with_items()` puts them at the segment's start
+(150 frames each, +2,850 frames in all). An item on a machine top is reached from the air ("air":
+40 units out at the item's height - 20, falling through it). The three over a deadly floor are
+picked from the air and **then teleported back onto a safe floor** 14-30 frames later ("pit",
+DEBUG-ASSISTED: 117's bridges are not extended, 116's floor kills). `--level 6` still uses
+`T2_GIVE_ITEMS` (`L6_GIVE`).
+
+### 14.5 The run
+
+**The run** (Linux, headless, PIE, `playthrough.py RUN --all`, 280,000 frames, exit 0, host frames):
+"access to level 5 granted." 141,150 (walked through the door into 5000); level 5 with Primagen key
+5 from 92: "force field down." 146,830, "all embryos destroyed." 158,324, "master computer
+destroyed." 160,476, the Queen dead (mode 16) 170,698; "access to level 6 granted." 174,511 (walked
+into 6000); 16 capacitors and 2 red cells picked up, "all assembly plants destroyed." 193,671,
+"all power generators recalibrated." 194,527, "force field down." 195,311; the Mother dead (mode
+30) 213,827; Primagen key 6 into its slot 219,637; the fallback hop; the Primagen dead (mode 29)
+248,754; the ending cinema (levels 11, 10) from ~250,000, the credits (mode 15) ~255,000-268,000,
+the hub ~269,000. The pak: note 1 "TUROK 2", checksum OK, clock 0:46:06.
+In the same run every level key is picked up: 61, 62, 68 for level 5; 100, 103, 105, 84, 87, 89 for
+level 6; Primagen keys 1, 2, 3, 4, 5, 6 (`T2_PICKUP_LOG`). Slot events: instances 4, 7, 11 and 12 only.
+
+## 15. The talismans, the nuke parts and the 100% ending (Phase 7 round 13, part b3)
+
+### 15.1 What the 100% ending is (the game's own logic)
+
+- **Engine mode 16 is not an ending of play.** `EngineMode16_Ending_Init` (func_00289C0C) runs only
+  from the cheat menu's level select (`CheatsMenu_WarpSelect`, func_0041A5DC/func_0045353C: its
+  last entry, id 8000, `CEngineApp__SetupFadeTo(16)`): the credits with `gFinalEnding = 1`, then
+  the title (`Credits_Update`: `SetupFadeTo(1)`). Killing the Primagen always leads to mode 15
+  (credits, then `CEngineApp__StartGameAtWarp(7007)`: the hub).
+- **The ending is chosen in `Primagen_EnterDeath`** (func_00407CB0) by the **five totem flags**
+  (`m_bLevel1..5TotemFlags`, set by `TotemDefense_Complete` when a totem defence 109-113 is won):
+  - all five: cinema **0x172 (370) "PD2-P tired"**, then its chain in level 4 (the totems'
+    cinemas "PD2-totem-harbor/marsh/cave/hive/city", "PD2-final"), then level 10's "END 2"
+    cinemas, the credits; **`unlockedCheats |= 0x7FF0019`** (the cheat menu's rewards);
+  - otherwise: cinema **0x173 (371) "Primagen Death"**, level 11's "END 1b" cinemas, level 10,
+    the credits; `unlockedCheats |= 2`.
+  (Cinema names and levels: `tools/assets/cinemas.py`.) The talismans, the nuke parts and the
+  Primagen keys are not read by the ending: the talismans are abilities (4380 Breath of Life:
+  `CPlayer__UpdateSubmerged` no drowning damage; 4384 Heart of Fire: `CPlayer__Hurt` ignores
+  regions with flag 0x400000, the lava; cheat flag 0x10 = all talismans), the nuke parts build the
+  Nuke weapon, the Primagen keys open his portal.
+
+Both endings play on the port (Linux, headless; the Primagen recipe of STATUS.md section 1 plus
+`T2_TOTEMS`, a new DEBUG-ONLY switch that sets the five flags at the first gameplay frame):
+
+| T2_TOTEMS | his death | cinema | then | credits (mode 15) | hub | unlockedCheats |
+|---|---|---|---|---|---|---|
+| 11111 | 38,714 | 370 (to 39,074), the PD2 chain in level 4 | level 10 (41,706; 120 at 45,102) | 45,506 | 59,604 | 0x4000000 -> **0x7FF0019** |
+| 11011 | 38,714 | 371 | level 11 (40,378), level 10 (44,326) | 44,730 | 58,828 | 0x4000000 -> 0x4000002 |
+
+`T2_PROGRESS_LOG=1` (DEBUG-ONLY, t2debug.c) prints a `progress:` line whenever the completion
+state changes: totem flags, boss flags, the five talismans and six Primagen keys (count nibbles),
+the nuke parts, `unlockedCheats`, the ending flags and the cinema script.
+
+### 15.2 The talisman chambers (73-77)
+
+Items (object type -> item, cart entry 2): talismans 4380 Breath of Life (object 602), 4381 Eye of
+Truth (604), 4382 Leap of Faith (607), 4383 Whispers (610), 4384 Heart of Fire (605); **talisman
+pieces** 4400-4404 (601/606/603/608/609); the nuke part 4500 (611).
+
+Each chamber is entered from its level's portal N001 and left by N002 back to it. An action by
+the pedestal (intelligence type 10, collision radius 61, `m_GoPickupNeeded` = the piece) is worked
+by walking into it with the piece: the piece is placed (a cinema, ~1,650 frames), the door
+(actor 8, kind 6, z 467) opens and the talisman lies on the dais at (-2.6, 46.2, 746.3). There
+is no fight. Without the piece the walk ends at the closed door (z 439).
+
+| level | chamber | portal (sub-level) | piece (sub-level: position) | talisman |
+|---|---|---|---|---|
+| 2 | 73 | 2001 (132) | 4402 (132: 1230.2, 409.6, -798.7) | 4382 Leap of Faith |
+| 3 | 74 | 3001 (66) | 4400 (66: -2033.5, -307.2, -1457.5, a ledge) | 4380 Breath of Life |
+| 4 | 75 | 4001 (99) | 4404 (101: -1280.1, -1433.6, 2579.8) | 4384 Heart of Fire |
+| 5 | 76 | 5001 (88) | 4403 (88: -2819.8, -307.2, -1478.5) | 4383 Whispers |
+| 6 | 77 | 6001 (121) | 4401 (122: -2005.0, 305.6, 1.4) | 4381 Eye of Truth |
+| 1 | 72 (Adon) | 1001 (55, after the switch) | none | none |
+
+`tools/port/extras.py OUT --talisman 73..77` plays one chamber from a new game (`T2_WARP_TO` the
+portal, the piece given by `T2_GIVE_ITEMS`; the chamber itself is walked, no teleport): **all
+five talismans picked up** (73: 15,505; 74: 17,247 in the slower first recipe; 75: 15,505; 76, 77:
+the same walk). `fullrun.CHAMBER` is the walk, counted from the chamber's arrival.
+
+**In the continuous run**: `fullrun.py RUN --talismans` (`TALISMAN`, `talisman()`, inserted by
+`level_segments(..., detours=...)` at a segment's start, `TALISMAN_TRIP` = 4,800 frames each, the
+later hub arrivals moved by as much) picks the piece, walks into the portal pad (from a
+neighbouring region's centre), anchors the chamber (`T2_ANCHOR 73@N`), plays it and walks out:
+levels 2 (73) and 3 (74). Levels 4 and 6 are not in it (the portal's sub-level comes before the
+piece's in the route: 99 before 101, 121 before 122), level 5 not yet (routes56's segments are not
+built by `level_segments`).
+
+### 15.3 The flesh-eater levels (78-83)
+
+Each has one nuke part (4500; `m_NukePartLevelFlags[level - 1]`) and its exit N004.
+`tools/port/extras.py OUT --nuke 78..83` warps in (N003), teleports next to the part and walks
+into it: **all six picked up** (DEBUG-ASSISTED: the way through each level's flesh eaters is not
+routed). In 78 the part lies behind a door (actor 10) that was already open.
+
+### 15.4 The 100% ending in one run
+
+`fullrun.py RUN --talismans 2` (the level-2 chamber trip only; Linux, headless, PIE, 276,000 frames, two runs
+with identical `progress:` lines, `T2_PROGRESS_LOG=1`; the debug aids of section 11.3): **all five totems won** (109
+11/8, 110 11/8, 111 11/8, 112 11/8, 113 9/8), the piece 4402 in 132 and **Leap of Faith** (73,
+78,576), the four boss flags, then **the good ending**: the Primagen's death at 238,685 with
+**cinema 370** (the totems' cinemas, level 9 loaded at ~239,500), level 10's "END 2" (241,677,
+120 at 245,073), the credits (mode 15) at 245,477, the hub at 259,575; `unlockedCheats`
+0x400e7e0 -> **0x7ffe7fd**.
+
+```sh
+python3 tools/port/fullrun.py RUN --talismans 2
+cd OUT && . RUN/teleport.env && SDL_VIDEODRIVER=offscreen T2_PROGRESS_LOG=1 T2_STATE_LOG=500 \
+  build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --pak-dir RUN/pak \
+  --frames 276000 --input @RUN/playthrough.txt          # an EMPTY pak dir
+```
+
+**The totem defences are marginal and timing-sensitive** (~1 kill per 15 s, 8 needed in 120 s):
+without the trip (`--all`) the City Totem is lost (5/8, two identical runs); with both trips
+(`--talismans`, 2 and 3) the City Totem is won but the Marsh Totem lost (7/8) and the ending is
+the other one (cinema 371, level 11, `unlockedCheats` 0x400e3e6). A sturdier totem defence (part
+b2) makes the ending independent of the route's timing.
+
+### 15.5 Open
+
+- Chambers 75-77 in the continuous run (the route order of levels 4 and 6, routes56's segment
+  builder for level 5); the flesh-eater levels walked (their flesh eaters) instead of teleported.
+- Adon's chamber (72, portal 1001 of 55): walking in plays her scene (events at 13,533-13,931) and
+  the player stays at (0, 0, -622) for 3,000+ frames: what ends the scene (a button?) not found.
+- The good ending against the N64 (the PD2 chain's camera and length).
+
+## 16. The whole game to the good ending in one run (Phase 7 round 13, the merge C28)
+
+The merged tree (b4, b2, b5, b1, b3) with two route fixes plays a new game to the good ending in one
+process:
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2 --cheats-on 110
+```
+
+(`playthrough.py --all` passes its other options to `fullrun.py`; the run command is STATUS.md
+section 1.) 5,018 input entries, 269 teleports; 270,000 frames are enough.
+
+### 16.1 Which aids, and why
+
+The candidates, all Linux, headless, PIE, Debug, 300,000 frames:
+
+| options | result |
+|---|---|
+| (none) | levels 1-6 and the Primagen; **the Marsh Totem lost** (4 of 5 totems): END 1b, the credits, the hub |
+| `--talismans 2,3` | the City Totem won, **the Marsh Totem lost** (as b3 found): END 1b would follow; the Primagen's lair wait never ended (he rested at z 2,923) |
+| `--talismans 2` (key 6 slot at 650, b1's default) | **all five totems won**; the Primagen rested at z 2,923 and his stage-3 lair wait never ended (two runs, identical) |
+| `--talismans 2 --slot 300` / `--slot 1100` | all five totems, the Primagen dead (257,767 / 249,979), **cinema 370, END 2**, the credits, the hub: `--slot 1100` is now the default |
+| `--talismans 2,3 --cheats-off 1,2,5` (b2's sister-1 steps) | level 2 without invincibility: 200 damage among sister 1's zombies (b2 aims them one by one, 4,500 frames), a death, the schedule lost, GAME OVER in 135 |
+| `--talismans 2 --cheats-off 1,5` / `--talismans 2,3 --cheats-off 1,5` | level 1's health pickup moves the route 150 frames; after the Leap of Faith chamber the player went into 125 instead of the City Totem's warp and stayed there |
+| `--talismans 2 --cheats-off 5` | the good ending, but the Mantid Queen kills the player once (a life lost) |
+| `--talismans 2 --cheats-off 1,2,5 --cheats-on 110` (round 12's sister-1 steps when level 2 is not invincible) | levels 1 and 2 with 0 deaths; the Queen kills the player once; the good ending |
+| **`--talismans 2 --cheats-off 1,2 --cheats-on 110`** | **the good ending, 0 deaths in levels 1-5** (below) |
+| `--talismans 2 --cheats-off 1,2` | the City Totem kills the player twice: `--cheats-on 110` stays |
+
+Two route changes came out of this (commit 92a0f12f): Primagen key 6 goes into its slot 1,100
+frames after the hub (650 before: with the merged route the Primagen came to rest at z 2,923, the
+spot from which no `T2_BOSS_FRONT` placement ends his stage-3 lair wait; section 11.1), and a
+level 2 played without invincibility keeps round 12's sister-1 steps (`fullrun.L2_133_NOCHEATS`:
+sister 20 aimed from the start, `L2_STRETCH` on that step), which b5 measured; with invincibility
+b2's zombie-first steps stay.
+
+### 16.2 The run (Linux, headless, PIE, Debug; host frames)
+
+| frame | |
+|---|---|
+| 0-23,130 | a new game; level 1 **without invincibility**: its keys and Primagen key 1, the health in 55 and the ultra health in 59; the Harbor Totem won 23,130 |
+| 24,000-27,300 | the hub: save 1, Primagen key 1, "access to level 2 granted." 26,146, "... 3 granted." 26,474, the door to 2000 |
+| 27,300-85,700 | level 2 **without invincibility** (5 health pickups, lowest health 25, 0 deaths): sister 1 banished 41,674, sister 2 55,174, the soul gates 62,204, "all sisters of despair banished." 73,058; **the Leap of Faith**: the piece in 132, the portal 2001, chamber 73 (the talisman 79,854); **the City Totem won** 85,146 (invincible from 600 frames before it) |
+| 86,000-89,000 | the hub: save 2, Primagen key 2's walk, "access to level 4 granted." 88,180 |
+| 89,000-108,100 | level 3 (invincible): prisoners, armories, Primagen key 3, the level-5 keys of 61, 62 and 68; the Marsh Totem won 108,063 |
+| 109,000-139,900 | the hub (save 3); level 4: "blind ones trapped." 123,683, the Cave Totem won 128,158, **the Blind One dead** 139,897 |
+| 140,000-147,000 | the hub: save 4, the level-5 key slots, **the level-5 door walked through**, "access to level 5 granted." 142,433 |
+| 147,000-172,137 | level 5 (invincible): "force field down." 148,113, Primagen key 5 in 92, "all embryos destroyed." 159,607, "master computer destroyed." 161,759, the Hive Totem won 163,952, **the Mantid Queen dead** 172,137 |
+| 172,500-176,000 | the hub: save 5, Primagen key 5, the six level-6 keys, **the level-6 door walked through**, "access to level 6 granted." 174,714 |
+| 176,000-215,942 | level 6: its 16 capacitors and 2 red laser cells, "all assembly plants destroyed." 193,874, "all power generators recalibrated." 194,730, **the Mother dead** 215,942 |
+| 216,500-222,000 | the hub (the level-6 corridor): **back through the level-6 door** (open: b2's fix; b1 needed a teleport past it), a Primagen key slot, then the hop (`T2_WARP_TO=7602`) |
+| 222,000-240,165 | **the Primagen dead (mode 29) at 240,165**: cinema 370 (0x172, the good ending), unlocked cheats 0x7ffe7fd |
+| 243,157-246,957 | level 10: **"END 2"** |
+| 247,000-261,000 | the credits (engine mode 15) |
+| 261,055 | the hub |
+
+Exit 0. A second run gives the same `progress`, `event`, `pickup`, `hurt`, `death`,
+`bosstrace` and `state` lines (md5 equal). `T2_HURT_LOG`: 239 hits over the run, one death: at
+the Primagen's death his sequence sets the player's health to 0 (57 -> 0; the same with
+invincibility in every run that kills him) and a life is lost; the ending follows. The pak (note 1,
+the save after level 5): checksum OK, clock 0:46:09. All 18 level keys and all six Primagen keys
+are picked up; the slots take keys 1 and 4 (and 2 and 3 later, see below), so the six-key hub
+portal cinema (43) does not fire and the hop stays.
+
+### 16.3 Open
+
+- Primagen keys 2 and 3: the slot walks after levels 2 and 3 never reach their slots; on the
+  merged tree key 4 goes in on the return from the save portal after level 4 (slot actor 7),
+  key 2 on the same return after level 5 (actor 11) and key 3 on the walk back after the Mother
+  (actor 12); keys 5 and 6 stay held. Which slot actor takes which key decides the fix.
+- The talisman trip's return is not anchored: a route shifted by level 1's health pickup (with
+  level 2 invincible) misses the City Totem's warp after chamber 73.
+- The remaining invincibility (levels 3-6, the City Totem): STATUS.md section 4.
+- `--level 6` on its own no longer kills the Primagen: the run equals round 12's up to the Mother,
+  but after the hop (54,000) his stage-2 lair wait (resting at z 2,906) does not end; other hop frames
+  (53,700-57,000) and the spot cycle did not help. The whole-game run and the boss recipe kill him.

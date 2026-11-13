@@ -944,3 +944,337 @@ void T2Port_LogEvent(LevelEvent *e, const char *text) {
            kObjTypes[k][1] < 0 ? -1 : (int) CScene__GetLinkGroupCount(&gScene, kObjTypes[k][1]));
     fflush(stdout);
 }
+
+/* T2_BITS_LOG=L1,L2,... (DEBUG-ONLY, round 13 b2): each listed level s persistent bit blocks, the
+ * instance bits (gLoadSavePersistentData via m_pBitSections: opened doors, taken pickups, dead
+ * actors) and the level bits (gGamePersistentData via m_pBitSections2: map regions, flags), printed
+ * whenever they change (a hex dump), to follow per-level state across visits, saves and loads.
+ * Called every frame. */
+#include "protos/iset.h"
+static void T2Port_BitsBlock(void *sections, int level, unsigned char **data, int *size) {
+    void *b = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(sections, 0), level), 0);
+    *data = (unsigned char *) CISet__GetBlock(b, 1);
+    *size = (int) CISet__GetBlockSize((s32 *) b, 1);
+}
+void T2Port_BitsLog(int frame, const char *spec) {
+    static unsigned sHash[2][16];
+    static int sInit[2][16];
+    const char *s = spec;
+    int n = 0;
+
+    if (gScene.m_pBitSections == NULL || gScene.m_pBitSections2 == NULL) {
+        return;
+    }
+    while (*s != 0 && n < 16) {
+        int level = atoi(s);
+        int k;
+        for (k = 0; k < 2; k++) {
+            unsigned char *d;
+            int size, i;
+            unsigned h = 2166136261u;
+            T2Port_BitsBlock(k == 0 ? gScene.m_pBitSections : gScene.m_pBitSections2, level, &d, &size);
+            if (size < 0 || size > 4096) {
+                continue;
+            }
+            for (i = 0; i < size; i++) {
+                h = (h ^ d[i]) * 16777619u;
+            }
+            if (!sInit[k][n] || sHash[k][n] != h) {
+                sInit[k][n] = 1;
+                sHash[k][n] = h;
+                printf("bits: frame %d level %d (now %d mode %d) %s %d bytes:", frame, level, (int) gScene.m_nLevel,
+                       (int) gEngineApp.m_Settings.mode, k == 0 ? "instance" : "level", size);
+                for (i = 0; i < size; i++) {
+                    printf("%s%02x", (i % 4) == 0 ? " " : "", d[i]);
+                }
+                printf("\n");
+            }
+        }
+        n++;
+        while (*s != 0 && *s != 44) {
+            s++;
+        }
+        if (*s == 44) {
+            s++;
+        }
+    }
+    fflush(stdout);
+}
+
+/* T2_DUMP_ACTOR=F:I[;F:I...] (DEBUG-ONLY, round 13 b2): a hex dump of level actor I (the whole
+ * CGameObjectInstance) at frame F, to diff an actor between two moments (a door opened by its
+ * event against the same door restored open on a later visit). Called every frame. */
+void T2Port_DumpActor(int frame, const char *spec) {
+    const char *s = spec;
+    while (*s != 0) {
+        int f = atoi(s), idx = -1;
+        while (*s != 0 && *s != 58 && *s != 59) s++;
+        if (*s == 58) { s++; idx = atoi(s); }
+        while (*s != 0 && *s != 59) s++;
+        if (*s == 59) s++;
+        if (f == frame && idx >= 0 && gScene.m_pActors != NULL && idx < gScene.m_nActors) {
+            const unsigned char *b = (const unsigned char *) &gScene.m_pActors[idx];
+            int i;
+            printf("dump: frame %d level %d actor %d size %d\n", frame, (int) gScene.m_nLevel, idx, (int) sizeof(CGameObjectInstance));
+            for (i = 0; i < (int) sizeof(CGameObjectInstance); i += 16) {
+                int j;
+                printf("dump: %04x:", i);
+                for (j = 0; j < 16 && i + j < (int) sizeof(CGameObjectInstance); j++) printf(" %02x", b[i + j]);
+                printf("\n");
+            }
+            fflush(stdout);
+        }
+    }
+}
+
+/* T2_HURT_LOG=1|2[,R] (game.cpp, every frame; DEBUG-ONLY, round 13 b5): the player's damage, to
+ * measure a route without T2_CHEATS invincibility. Every drop of the player's health prints a
+ * `hurt:` line (host frame, level, health before and after, the nearest live enemy: its
+ * intelligence id, its object type and distance), every death (health to 0, or a life lost) a
+ * `death:` line, and every level change a `hurtsum:` line for the level left (hits, damage, the
+ * lowest health, deaths, rescues). =2 adds a RESCUE: below R health (default 30) the health is
+ * set back to 100 and the damage goes on counting on a shadow health that starts at the real
+ * one; a shadow death (shadow <= 0: what a run without the rescue would have died of) is counted
+ * and the shadow starts again at 100. Measurement only: the route must then run with =1 (or
+ * none) and no death. */
+static CGameObjectInstance *T2Port_NearestEnemy(CGameObjectInstance *pl, f32 *dist) {
+    CGameObjectInstance *best = NULL;
+    f32 bestD = 1e30f;
+    int i;
+    CListedInstance *li;
+    for (i = gScene.m_nFirstActor; gScene.m_pActors != NULL && i < gScene.m_nActors; i++) {
+        CGameObjectInstance *o = &gScene.m_pActors[i];
+        CIntelligence *info = o->header.m_pIntelligence;
+        f32 dx, dy, dz, d;
+        if (info == NULL || (info->m_Type != INTELLIGENCE_ENEMY && info->m_Type != 4) || o->m_AI.m_Health <= 0) {
+            continue;
+        }
+        dx = o->header.m_vPos.x - pl->header.m_vPos.x;
+        dy = o->header.m_vPos.y - pl->header.m_vPos.y;
+        dz = o->header.m_vPos.z - pl->header.m_vPos.z;
+        d = dx * dx + dy * dy + dz * dz;
+        if (d < bestD) {
+            bestD = d;
+            best = o;
+        }
+    }
+    for (li = gScene.m_InstancePool.m_ActiveList.m_pHead; li != NULL; li = li->m_pNext) {
+        CGameObjectInstance *o = &li->m_Instance;
+        CIntelligence *info = o->header.m_pIntelligence;
+        f32 dx, dy, dz, d;
+        if (info == NULL || (info->m_Type != INTELLIGENCE_ENEMY && info->m_Type != 4) || o->m_AI.m_Health <= 0) {
+            continue;
+        }
+        dx = o->header.m_vPos.x - pl->header.m_vPos.x;
+        dy = o->header.m_vPos.y - pl->header.m_vPos.y;
+        dz = o->header.m_vPos.z - pl->header.m_vPos.z;
+        d = dx * dx + dy * dy + dz * dz;
+        if (d < bestD) {
+            bestD = d;
+            best = o;
+        }
+    }
+    *dist = best != NULL ? sqrtf(bestD) : -1.0f;
+    return best;
+}
+
+void T2Port_HurtLog(int frame, int sched, const char *spec) {
+    static int sLevel = -1, sLastH = -1, sLastLives = -1, sFrom = 0;
+    static int sHits, sDamage, sMin = 100000, sDeaths, sRescues, sShadowDeaths, sShadow = -1;
+    static int sTotHits, sTotDeaths, sTotShadow;
+    int mode = atoi(spec), rescue = 30, h, lives;
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    const char *comma = strchr(spec, ',');
+
+    if (comma != NULL && atoi(comma + 1) > 0) {
+        rescue = atoi(comma + 1);
+    }
+    if (gEngineApp.m_Settings.mode != 13 || p == NULL) {
+        return;
+    }
+    if (gScene.m_nLevel != sLevel) {
+        if (sLevel >= 0) {
+            printf("hurtsum: level %d frames %d-%d hits %d damage %d min %d deaths %d rescues %d shadow-deaths %d"
+                   " (run: hits %d deaths %d shadow-deaths %d)\n",
+                   sLevel, sFrom, frame, sHits, sDamage, sMin == 100000 ? -1 : sMin, sDeaths, sRescues, sShadowDeaths,
+                   sTotHits, sTotDeaths, sTotShadow);
+        }
+        sLevel = gScene.m_nLevel;
+        sFrom = frame;
+        sHits = sDamage = sDeaths = sRescues = sShadowDeaths = 0;
+        sMin = 100000;
+    }
+    h = (int) (p->m_Data.m_Health >> 8);
+    lives = (int) p->m_Data.m_Lives;
+    if (sShadow < 0) {
+        sShadow = h;
+    }
+    if (sLastH >= 0 && h < sLastH) {
+        f32 d;
+        CGameObjectInstance *e = T2Port_NearestEnemy(&p->m_CharacterActor, &d);
+        CIntelligence *info = e != NULL ? e->header.m_pIntelligence : NULL;
+        int dmg = sLastH - h;
+        sHits++;
+        sTotHits++;
+        sDamage += dmg;
+        sShadow -= dmg;
+        printf("hurt: frame %d sched %d level %d health %d -> %d (-%d) shadow %d nearest it %d ty %x d %.0f\n", frame, sched,
+               (int) gScene.m_nLevel, sLastH, h, dmg, sShadow, info != NULL ? (int) info->m_Id : -1,
+               e != NULL ? (unsigned) e->m_nTypeFlag : 0u, d);
+        if (h == 0) {
+            sDeaths++;
+            sTotDeaths++;
+            printf("death: frame %d sched %d level %d lives %d\n", frame, sched, (int) gScene.m_nLevel, lives);
+        }
+        if (sShadow <= 0) {
+            sShadowDeaths++;
+            sTotShadow++;
+            printf("shadow-death: frame %d sched %d level %d\n", frame, sched, (int) gScene.m_nLevel);
+            sShadow = 100;
+        }
+    } else if (sLastH >= 0 && h > sLastH) {
+        sShadow += h - sLastH; /* a pickup (the rescue below is not counted) */
+        if (sShadow > h) {
+            sShadow = h;
+        }
+    }
+    if (sLastLives >= 0 && lives < sLastLives && !(sLastH >= 0 && h < sLastH && h == 0)) {
+        printf("death: frame %d sched %d level %d lives %d (a life lost)\n", frame, sched, (int) gScene.m_nLevel, lives);
+    }
+    if (h < sMin && h > 0) {
+        sMin = h;
+    }
+    if (mode == 2 && h > 0 && h < rescue && gScene.m_WarpState == 0) {
+        p->m_Data.m_Health = 100 << 8;
+        p->m_CharacterActor.m_AI.m_Health = p->m_Data.m_Health;
+        p->m_WeaponActor.m_AI.m_Health = p->m_Data.m_Health;
+        sRescues++;
+        printf("rescue: frame %d sched %d level %d health %d shadow %d\n", frame, sched, (int) gScene.m_nLevel, h, sShadow);
+        h = 100;
+    }
+    sLastH = h;
+    sLastLives = lives;
+    fflush(stdout);
+}
+
+/* T2_HURT_LOG (round 13 b5): every hit the player's actor takes (Player_OnMultiplayerKill, the player's
+ * damage handler in every mode, calls this before CPlayer__Hurt): the damage, its flags, what dealt it
+ * (the source's instance kind: 1 an object, 2 a particle/projectile, and its object type; a particle's
+ * owner) and the cheat flags, so a route's damage can be traced to the enemy and its weapon. */
+#include "structs/particle.h"
+#include "structs/collision.h"
+void T2Port_OnPlayerHit(CPlayer *player, DamageEvent *hit) {
+    static int sOn = -1;
+    CGameObjectInstance *src, *owner = NULL;
+    CIntelligence *oi = NULL;
+    if (sOn < 0) {
+        sOn = getenv("T2_HURT_LOG") != NULL;
+    }
+    if (!sOn || hit == NULL) {
+        return;
+    }
+    src = (CGameObjectInstance *) hit->source;
+    if (src != NULL && src->header.m_Type == 2) {
+        owner = ((CParticle *) src)->m_pOwner;
+    } else {
+        owner = src;
+    }
+    if (owner != NULL && owner->header.m_Type == 1) {
+        oi = owner->header.m_pIntelligence;
+    }
+    printf("hit: frame %d level %d gf %d damage %.2f flags %x src kind %d obj %d owner kind %d obj %d it %d at (%.1f %.1f %.1f)"
+           " player (%.1f %.1f %.1f) cheats %x\n", gT2HostFrame, (int) gScene.m_nLevel, (int) gFrameCountGameplay, hit->damage / 256.0,
+           (unsigned) hit->flags, src != NULL ? (int) src->header.m_Type : -1, src != NULL ? (int) src->header.m_nObjType : -1,
+           owner != NULL ? (int) owner->header.m_Type : -1, owner != NULL ? (int) owner->header.m_nObjType : -1,
+           oi != NULL ? (int) oi->m_Id : -1, owner != NULL ? owner->header.m_vPos.x : 0.0, owner != NULL ? owner->header.m_vPos.y : 0.0,
+           owner != NULL ? owner->header.m_vPos.z : 0.0, player->m_CharacterActor.header.m_vPos.x,
+           player->m_CharacterActor.header.m_vPos.y, player->m_CharacterActor.header.m_vPos.z,
+           (unsigned) gEngineApp_m_Settings.cheatFlags);
+}
+
+/* T2_PROGRESS_LOG=1 (DEBUG-ONLY, round 13 b3): one "progress:" line each time the first
+ * player's game-completion state changes: the five totem flags (Primagen_EnterDeath picks the
+ * ending cinema 0x172 only with all five, else 0x173), the four boss flags, the talismans
+ * (items 4380-4384, m_SpecialPickupCount[item - 4000]: low nibble held, high nibble used), the
+ * Primagen keys (4360-4365), the nuke parts (4500 and m_NukePartLevelFlags), the cheats the
+ * game unlocked (m_Settings.unlockedCheats) and the ending flags. */
+extern s32 gFinalEnding;
+extern s32 gEndingPrimagenDefeated;
+extern s32 Cinema_GetScriptId(void);
+void T2Port_ProgressLog(int frame) {
+    static int on = -1;
+    static char last[256];
+    char cur[256];
+    CPlayer *p;
+    CPlayerLoadSaveData *d;
+    int n, i;
+
+    if (on < 0) {
+        on = getenv("T2_PROGRESS_LOG") != NULL;
+    }
+    if (!on) {
+        return;
+    }
+    p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    if (p == NULL) {
+        return;
+    }
+    d = &p->m_Data;
+    n = snprintf(cur, sizeof(cur), "totems %d%d%d%d%d bosses %d%d%d%d talismans",
+                 d->m_bLevel1TotemFlags != 0, d->m_bLevel2TotemFlags != 0, d->m_bLevel3TotemFlags != 0,
+                 d->m_bLevel4TotemFlags != 0, d->m_bLevel5TotemFlags != 0, d->m_bBlindBossComplete != 0,
+                 d->m_bQueenBossComplete != 0, d->m_bMotherBossComplete != 0, d->m_bPrimagenBossComplete != 0);
+    for (i = 380; i <= 384; i++) {
+        n += snprintf(cur + n, sizeof(cur) - n, " %02x", d->m_SpecialPickupCount[i]);
+    }
+    n += snprintf(cur + n, sizeof(cur) - n, " pkeys");
+    for (i = 360; i <= 365; i++) {
+        n += snprintf(cur + n, sizeof(cur) - n, " %02x", d->m_SpecialPickupCount[i]);
+    }
+    n += snprintf(cur + n, sizeof(cur) - n, " nuke %02x flags ", d->m_SpecialPickupCount[500]);
+    for (i = 0; i < 6; i++) {
+        n += snprintf(cur + n, sizeof(cur) - n, "%d", d->m_NukePartLevelFlags[i]);
+    }
+    snprintf(cur + n, sizeof(cur) - n, " cheats %x ending %d/%d cinema %d", (unsigned) gEngineApp_m_Game.m_Settings.unlockedCheats,
+             (int) gFinalEnding, (int) gEndingPrimagenDefeated, (int) Cinema_GetScriptId());
+    if (strcmp(cur, last) != 0) {
+        strcpy(last, cur);
+        printf("progress: frame %d level %d %s\n", frame, (int) gScene.m_nLevel, cur);
+        fflush(stdout);
+    }
+}
+
+/* T2_TOTEMS=abcde (DEBUG-ONLY, round 13 b3): on the first gameplay frame (mode 13, a level > 0)
+ * set the five totem flags m_bLevel1..5TotemFlags to the digits (1 won, 0 lost), as winning the
+ * totem defences 109-113 would (TotemDefense_Complete). With all five, Primagen_EnterDeath picks
+ * the good ending (cinema 0x172 "PD2-P tired", the totems' cinemas, unlockedCheats |= 0x7FF0019)
+ * instead of 0x173 ("Primagen Death", unlockedCheats |= 2): a way to check that path without
+ * the five fights (the Primagen recipe, STATUS.md section 1). */
+void T2Port_SetTotems(void) {
+    static int done;
+    const char *s;
+    CPlayer *p;
+    s32 *f;
+    int i;
+
+    if (done) {
+        return;
+    }
+    s = getenv("T2_TOTEMS");
+    if (s == NULL) {
+        done = 1;
+        return;
+    }
+    p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    if (p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_nLevel <= 0) {
+        return;
+    }
+    done = 1;
+    f = &p->m_Data.m_bLevel1TotemFlags;
+    for (i = 0; i < 5 && s[i] != 0; i++) {
+        f[i] = s[i] == '1';
+    }
+    printf("debug: T2_TOTEMS=%s: level %d totem flags %d%d%d%d%d\n", s, (int) gScene.m_nLevel, (int) f[0] != 0,
+           (int) f[1] != 0, (int) f[2] != 0, (int) f[3] != 0, (int) f[4] != 0);
+    fflush(stdout);
+}

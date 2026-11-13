@@ -606,7 +606,17 @@ void T2Port_Cheats(int frame, const char *spec, const char *fill) {
         return;
     }
     if (spec != NULL) {
-        gEngineApp_m_Settings.cheatFlags |= (s32) strtol(spec, NULL, 0);
+        /* "MASK@F;..." (round 13 b5): a frame-scheduled value; the bits this switch set are cleared
+         * again when the scheduled mask drops them (the cheat menu's own bits are left alone) */
+        static s32 sSet = 0;
+        char cbuf[16];
+        const char *c = T2Port_Scheduled(spec, frame, cbuf, sizeof(cbuf));
+        s32 want = c != NULL ? (s32) strtol(c, NULL, 0) : 0;
+        if ((sSet & ~want) != 0) {
+            gEngineApp_m_Settings.cheatFlags &= ~(sSet & ~want);
+        }
+        gEngineApp_m_Settings.cheatFlags |= want;
+        sSet = want;
     }
     /* T2_FILL_AMMO=N: every N frames the active players' ammo is filled (CPlayer__FillAllAmmo) */
     char fbuf[16];

@@ -517,3 +517,30 @@ the three readers use the members. **The archive changes**: sha1
 `a9d14a47dba3f75ab30a0e4cdfdb1cee56977d22` (26,124 units, `archive_check.py`: OK, format 2.0;
 round 11: `b6b9d484...`). A new binary with the old archive reads the scales byte-swapped
 (4.6e-41: no jump); rebuild the archive and rerun gendata (`rm decls.json`) with this tree.
+
+## Part 7 (Phase 7 round 13, b5): a union in ROM data, the a5 leftovers
+
+**Health pickups were never taken.** `gendata.py` lays a union out by its first member (a scalar
+member as large as the union wins, DATA.md). The pickup rows' `CPickupParams` is `{ CPickupWeapon
+(3 x s16); CPickupAmmo; CPickupHealth (2 x s32); s16 }`, so the seven health rows
+(`sHealthPickups`, ROM 0x800AD768) were swapped as three halves: `m_Amount` came out with its
+halves exchanged (10 -> 0x000A0000) and `m_Max` as 0 (its low half was past the weapon member).
+`Pickup_GiveHealth` takes a pickup only while `health < m_Max << 8`, so on the host **no health
+pickup was ever taken** (the `pickup:` log: "id 1702 ... not taken" at health 99). The N64 rows
+(the ROM's bytes): 1701 +2 to 200, 1702 +10 to 100, 1703 +100 to 100, 1704 +100 to 200, 1720 +10,
+1721 +25, 1722 +50 (to 100). Fix (asm_diff 0 over the whole tree): `CPickupRow18Health`
+(`include/structs/pickup.h`, `TARGET_PORT` only: the same layout with `CPickupHealth` in place of
+the union) is `sHealthPickups`' host type (`include/globals/pickup.h`), the two walkers
+(`Pickup_FindHealthEntry`, `CPlayer__CollectPickup`'s inline) cast it back. **Rerun gendata**
+(`rm decls.json`): the rows now read `{2, 200}`, `{10, 100}`, ... A sweep of the other data
+symbols with such unions (`decls.json`: unions whose members swap differently) leaves the BSS
+blocks (no initial data: `gEngineApp`, `gScene`, `gAudioWorld`, `__osTmpTask`, ...),
+`sWeaponPickups` (its rows are weapon rows: the first member is right) and the three
+`gLevelActorIntelligence`/`gLevelActorIntelligenceMP`/`gParticleIntelligence` (a union at 0x14,
+not checked further).
+
+**a5's four unresolved views** (STABILITY.md section 9): `Turret_Effects` fixed (the pose
+context's bone index), `RumbleMenu_Play`/`_2` fixed (the window's player and controller),
+`Generator_SpawnObject` unreachable (no call and no pointer to it in the ROM), and
+`CStaticObject__Draw`/`RequestLitVertices` already right (every field they read is pinned to a
+`CStaticObject` member by `_Static_assert`).

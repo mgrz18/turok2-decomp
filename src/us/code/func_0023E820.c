@@ -92,7 +92,11 @@ static __inline__ CPickupRow14 *FindRowB(s32 id) {
 /* Pickup_FindHealthEntry */
 static __inline__ CPickupRow18 *FindRowC(s32 id) {
     s32 i;
+#ifdef TARGET_PORT
+    CPickupRow18 *p = (CPickupRow18 *) sHealthPickups; /* typed for gendata (structs/pickup.h) */
+#else
     CPickupRow18 *p = sHealthPickups;
+#endif
 
     for (i = 6; i != -1; i--) {
         if (p->m_Id == id) {

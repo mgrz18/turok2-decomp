@@ -160,11 +160,90 @@ def _couplings(dt0, cx, y, cz, half=102.4, out=60.0, gap=200, walk=50):
     return steps
 
 
-# round 12 a2: the items the earlier levels give, handed by T2_GIVE_ITEMS (relative frame, spec):
-# the couplings need a crystal ion capacitor each (item 4231; the game has one, in level 3's 66:
-# docs/port/PLAYTHROUGH.md 9.4), plant 3's two laser power crystal slots a red laser cell each
-# (4229, level 5's 91 has four)
+# round 12 a2: the items, handed by T2_GIVE_ITEMS (relative frame, spec) in --level 6 (a run from a
+# new game). Round 13 b1: they are NOT from earlier levels. Cart 2 maps object 597 -> item 4231 (the
+# crystal ion capacitor) and 595 -> 4229 (the red laser cell); a2 read object 601 (item 4400) and 599
+# (4110, the satchel charge). Level 6 itself holds 16 capacitors, one per coupling (L6_ITEMS), and
+# four red cells in 123 (on the blue slots 26-29); the continuous run (fullrun.py) picks them up.
 L6_GIVE = [(400, "4231:4"), (3000, "4231:4"), (5100, "4231:4"), (10200, "4231:4,4229:2")]
+
+# round 13 b1: the level-6 pickups by segment index of L6_SEGMENTS (tools/assets/levels.py: level
+# actors, object 597 = 4231, 595 = 4229, 592 = 4365 Primagen key 6; approaches by
+# tools/port/itemreach.py). Entry: (item x, y, z, approach angle, distance, walk frames[, kind]).
+# kind "air": the item hangs over a lower floor (on a machine's top): the stand point is 40 units
+# out at the item's height - 20, and the walk falls through it. kind ("pit", dy, (x, y, z, rotY), F):
+# the item hangs over (117: where its bridges, object 412 actors 58/60, extend; the route does not
+# extend them) or lies on (116: region info 23, damage 10,000) a deadly floor: picked from the air
+# (the item's height + dy), then a teleport onto a safe floor F frames later (DEBUG-ASSISTED).
+P2 = 1.5708
+L6_ITEMS = {
+    1: [(-3840.0, 153.1, -1612.8, 0.0, 90, 50), (-3532.8, 153.1, -1612.8, 0.0, 90, 50),
+        (2611.2, 41.3, -2304.0, 0.0, 40, 30, "air"), (-1228.8, 155.8, 537.6, 0.0, 40, 30, "air")],  # 115: 4 capacitors
+    3: [(0.0, 155.4, -5068.8, 0.0, 90, 50), (-1862.3, -1945.6, 921.6, -P2, 40, 12, ("pit", 30.0, (0.0, 155.4, -4978.8, 0.0), 14))],  # 116: 2
+    4: [(0.0, 51.5, 153.6, 0.0, 40, 30, ("pit", -20.0, (250.0, 0.0, 153.6, P2), 30)),
+        (0.0, 51.5, 1689.6, 0.0, 40, 30, ("pit", -20.0, (250.0, 0.0, 1689.6, P2), 30))],     # 117: 2, over the pit
+    6: [(-3906.8, -256.0, -1536.0, -P2, 90, 50), (-770.4, 0.3, 1136.3, P2, 90, 50)],               # 118: 2
+    7: [(-2304.0, 308.0, -2380.8, P2, 90, 50), (-1075.2, 308.0, -2380.8, P2, 90, 50)],             # 119: 2
+    9: [(1996.8, -153.2, 0.0, 0.0, 90, 50)],                                  # 120: 1
+    10: [(307.2, 383.3, 0.0, 0.0, 40, 30, "air")],                            # 121: 1
+    11: [(-1612.8, 305.6, 0.0, P2, 90, 50)],                                  # 122: 1
+    12: [(0.0, 1.7, -1331.2, 0.0, 90, 50),                                    # 123: 1, then two red cells (4229)
+         (-275.7, 1.7, -1228.8, 0.0, 90, 90), (275.7, 1.7, -1228.8, 0.0, 90, 90)],
+    # 114's last visit: Primagen key 6 (4365) at its centre. On the first visit a walk from 90 units
+    # out was pushed back 70 units (something round it, not identified): taken after "force field down."
+    14: [(0.0, -50.8, 0.0, 0.0, 90, 50)],
+}
+ITEM_STEP = 150
+
+
+def _item_steps(it, dt):
+    import math
+    x, y, z, a, d, walk = it[:6]
+    kind = it[6] if len(it) > 6 else ""
+    if kind == "air":
+        y -= 20.0
+    elif kind:
+        y += kind[1]
+    st = [(dt, x + math.sin(a) * d, y, z + math.cos(a) * d, a, walk, {})]
+    if kind and kind != "air":
+        st.append((dt + kind[3],) + tuple(kind[2]) + (0, {}))
+    return st
+
+
+def with_items(segments, items, step=ITEM_STEP):
+    """segments with each segment's items picked up at its start (the segment's own steps and every
+    later segment move by the time added); returns (segments, total frames added)."""
+    assert all(0 <= i < len(segments) for i in items), "an item list past the last segment"
+    out, added = [], 0
+    for i, (name, rel, steps) in enumerate(segments):
+        new, k = [], 0
+        for it in items.get(i, ()):
+            new += _item_steps(it, k)
+            k += step
+        new += [(s[0] + k,) + tuple(s[1:]) for s in steps]
+        out.append((name + ("" if not k else " (+%d items)" % len(items[i])), rel + added, new))
+        added += k
+    return out, added
+
+
+def l5_with_primagen_key():
+    """L5_SEGMENTS with the detour to 92 (the hive's talisman level: Primagen key 5, item 4364, at
+    (614.4, 2151.2, 2918.4)) between the satchel charges of 91 and its exit 5500: 91's warp 5813
+    -> 92, the key, 92's exit 5814 -> 91, then 5500. Returns (segments, frames added)."""
+    segs, add = [], 0
+    for name, rel, steps in L5_SEGMENTS:
+        if name.startswith("91 Lev5 H: the 4 satchel charges"):
+            segs.append(("91 Lev5 H: the 4 satchel charges, exit 5813 (92)", rel,
+                         list(steps[:-1]) + [(800, 4013.5, 614.4, -263.9, 3.1023, W2, {})]))   # warp 5813 -> 92
+            segs.append(("92 Lev5 H TALISMAN: Primagen key 5, exit 5814", rel + 1200, [
+                (0, 643.5, 2151.2, 3003.6, 0.3289, 50, {}),                   # Primagen key 5 (4364)
+                (300, 258.0, 307.2, -1368.0, 1.5249, W2, {}),                 # warp 5814 -> 91 (4005, 614, -24)
+            ]))
+            segs.append(("91 Lev5 H again: exit 5500", rel + 2000, [(0,) + tuple(steps[-1][1:])]))
+            add = 1200
+            continue
+        segs.append((name, rel + add, steps))
+    return segs, add
 
 L6_SEGMENTS = [
     ("114 Level 6A: exit 6100", 0, [

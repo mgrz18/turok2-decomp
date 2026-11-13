@@ -130,7 +130,13 @@ L2_SEGMENTS = [
     ]),
     ("133 Lev2 I: the zombies, door 28, sister 1, exit 2615", 3650, [
         (0, -1504.0, -4761.6, -972.0, -1.5708, 0, {"trig": 1, "fire": 1300, "aim": "enemy"}),   # region info 4: zombies 9, 16, 17 -> door 27
-        (1400, -847.0, -4761.6, 1574.0, 3.1416, 0, {"trig": 1, "fire": 6500, "aim": "enemy:20"}),  # region info 7: zombies 22-24 -> door 28 -> sister 20 (aimed first, round 11)
+        # region info 7: zombies 22-24 -> door 28 -> sister 20. Round 13 b2: the zombies aimed one by one
+        # first (with the sister aimed from the start, door 28 opened only when stray shots had killed
+        # them, ~5,000 frames, and she woke too late for the window in some runs), then the sister
+        (1400, -847.0, -4761.6, 1574.0, 3.1416, 0, {"trig": 1, "fire": 1500, "aim": "enemy:22"}),
+        (2950, -847.0, -4761.6, 1574.0, 3.1416, 0, {"fire": 1500, "aim": "enemy:23"}),
+        (4500, -847.0, -4761.6, 1574.0, 3.1416, 0, {"fire": 1500, "aim": "enemy:24"}),
+        (6050, -847.0, -4761.6, 1574.0, 3.1416, 0, {"fire": 1900, "aim": "enemy:20"}),
         (8000, 827.5, -4761.6, -1627.5, -2.8692, 150, {}),    # warp 2615 -> 130
     ]),
     ("130 Lev2 F again: exit 2103", 12050, [
@@ -188,6 +194,10 @@ L2_SEGMENTS = [
 # the City Totem (110): the warp 7200 at L2_START + 36,160; its defense (as level 1's, 109)
 L2_TOTEM_ARRIVAL = L2_START + 36150 + 400
 L2_TOTEM_END = L2_TOTEM_ARRIVAL + 7200
+# Round 13 b2: the defense from the south side of the totem (level actor 1 at (-102.4, 0, -153.6)),
+# facing it; from the arrival ledge (-665.6, 307.2, -153.6), 642 units away, the aimed fire killed
+# 4-6 of the 8 in 120 s (the attackers stay by the totem)
+CITY_TOTEM_SPOT = (-102.4, 0.0, -330.0, 3.1416)
 
 
 def build_level2(fight_frames=True):
@@ -215,6 +225,7 @@ def build_level2(fight_frames=True):
     # by T2_FACE_NEAREST in level 110 only (as level 1's --fight does in 109)
     inputs.append("# 110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
     fire.append((L2_TOTEM_ARRIVAL, L2_TOTEM_END))
+    tps.append("%d:%.1f,%.1f,%.1f,%.4f" % ((L2_TOTEM_ARRIVAL + 400,) + CITY_TOTEM_SPOT))
     for a, b in fire:
         for f in range(a, b, FIRE_EVERY):
             inputs.append("Z@%d..%d" % (f, f + 6))
@@ -422,12 +433,16 @@ def main():
     ap.add_argument("--direct", action="store_true", help="level 3+: warp straight to the first sub-level (no hub)")
     ap.add_argument("--all", action="store_true", help="one continuous run from a new game: levels 1-6 (1-4 through the hub "
                     "portals), the keys, a save after each level, the Primagen, the ending (tools/port/fullrun.py, PLAYTHROUGH.md section 10)")
-    a = ap.parse_args()
+    a, rest = ap.parse_known_args()
+    if rest and not a.all:
+        ap.error("unrecognized arguments: %s" % " ".join(rest))
     if a.all:
         import sys
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         import fullrun  # round 12 a3
-        fullrun.main_all(a.out)   # levels 1-6, the Primagen, the ending (round 12 C27)
+        # levels 1-6, the Primagen, the ending (round 12 C27); the other options go to fullrun.py
+        # (--talismans, --cheats-off, --cheats-on, --no-health, --env, --slot, --upto, --hub; round 13 C28)
+        fullrun.cli([a.out] + rest)
         return
     if a.level == 4:
         if a.direct:

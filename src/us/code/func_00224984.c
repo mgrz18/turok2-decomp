@@ -4,6 +4,20 @@
 #include "protos/scene.h"
 
 
+#ifdef TARGET_PORT
+/* The port (round 13 b2): the bit sections by member of CScene (the N64 offset 0x6C is another
+ * member of the host CScene). */
+#include "structs/world.h"
+void CScene__SetEventFiredInLevel(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    CScene *w = arg0;
+    u8 *p = (u8 *) CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(w->m_pBitSections, 0), arg1), 2), 1) + arg2 / 8;
+    if (arg3 != 0) {
+        *p |= 1 << (arg2 & 7);
+    } else {
+        *p &= ~(1 << (arg2 & 7));
+    }
+}
+#else
 void CScene__SetEventFiredInLevel(void *arg0, s32 arg1, s32 arg2, s32 arg3)
 {
   s32 temp_a0;
@@ -39,3 +53,4 @@ void CScene__SetEventFiredInLevel(void *arg0, s32 arg1, s32 arg2, s32 arg3)
   temp_v0_2 = temp_a1 + (var_a2 >> 3);
   *temp_v0_2 &= ~temp_a0;
 }
+#endif

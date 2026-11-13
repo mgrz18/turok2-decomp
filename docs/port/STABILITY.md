@@ -302,3 +302,18 @@ BAD 3, suspect 44):
   explosions, where the blast push/reach fixes change where the player is thrown (level 4's
   defence: 56 kills instead of 59; the Blind One still dies, mode 9).
 - soak (PIE, the new archive): levels seeds 0-39 x 25,000 (40 runs, 998,400 frames, every level id warped into) and new game seeds 0-9 x 36,000 (10 runs, 360,000 frames): **0 crashes, 0 hangs**.
+
+## 9. Round 13 (part b5): a5's unresolved views
+
+The four views section 8 left open, each read against its caller:
+
+| function | what it is | result |
+|---|---|---|
+| `Turret_Effects` (func_00262B58) | an `m_AI.m_pfEffects` callback: `CGameObjectInstance__PoseBone` passes the bone-posing context (host layout `T2PoseContext`, structs/pose_host.h). Its view `Effect00262B58` read the bone index at 0x94 (N64 0x90 plus the realigned owner pointer); the host member is at 0xE0 | **fixed** (asm_diff 0): the host view places `value` at `offsetof(T2PoseContext, bone)`, the owner asserted on `obj`. Before it, a turret's gun and turn nodes were never rotated |
+| `RumbleMenu_Play`, `RumbleMenu_Play_2` (func_00417EBC, func_00450E94) | the select callback of the rumble notice's last item (`MenuItemDesc.select(item, menu)`): `menu + 0x1C` is `Menu.player`, `+ 0x20` `Menu.controller` (its `port` at +4), `0xBF8` `CPlayer.m_bEnteringDeathmatch` | **fixed** (asm_diff 0): a `TARGET_PORT` body through the members. The m2c body took the window's descriptor for the controller and wrote 0 through a pointer made of padding (host `Menu.player` is at 0x30) |
+| `Generator_SpawnObject` (func_002638A0) | a Rage Wars import | **unreachable**: no `jal` to 0x2638A0 in the ROM's code and no word holding its address in any data section (`build/ref.elf`), and no caller in `src/` or the generated data. Left as it is |
+| `CStaticObject__Draw` / `CStaticObject__RequestLitVertices` (func_00214844, func_00214D04) | `PlacedProp` / `SpawnSource` are host twins of `CStaticObject` | **already right**: `T2_STATIC_OBJECT_CHECK` and the `_Static_assert`s pin the descriptor, the cache handle (`m_pOwner`), the matrix, `m_LitKey`, `m_ViewMask` and the flags to the members; the checker flags them because they are local views |
+
+The `untyped` raw sites (110, `void *` arguments of menus and m2c-only code) were not swept this
+round; `RumbleMenu_Play` was one of them. Also found (64BIT.md part 7): the health pickup table, a
+union laid out by its first member.
