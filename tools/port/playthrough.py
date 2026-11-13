@@ -433,12 +433,16 @@ def main():
     ap.add_argument("--direct", action="store_true", help="level 3+: warp straight to the first sub-level (no hub)")
     ap.add_argument("--all", action="store_true", help="one continuous run from a new game: levels 1-6 (1-4 through the hub "
                     "portals), the keys, a save after each level, the Primagen, the ending (tools/port/fullrun.py, PLAYTHROUGH.md section 10)")
-    a = ap.parse_args()
+    a, rest = ap.parse_known_args()
+    if rest and not a.all:
+        ap.error("unrecognized arguments: %s" % " ".join(rest))
     if a.all:
         import sys
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         import fullrun  # round 12 a3
-        fullrun.main_all(a.out)   # levels 1-6, the Primagen, the ending (round 12 C27)
+        # levels 1-6, the Primagen, the ending (round 12 C27); the other options go to fullrun.py
+        # (--talismans, --cheats-off, --cheats-on, --no-health, --env, --slot, --upto, --hub; round 13 C28)
+        fullrun.cli([a.out] + rest)
         return
     if a.level == 4:
         if a.direct:

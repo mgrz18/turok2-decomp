@@ -45,7 +45,7 @@ make build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
   - level 4: the Blind One (206 damage, no health on the way);
   - level 6: the 119 air starts (fall damage).
 
-  Details: PLAYTHROUGH.md section 12. The 119 jump is variable: a held R rises 95 units, more
+  Details: PLAYTHROUGH.md section 13. The 119 jump is variable: a held R rises 95 units, more
   than the 61.4 needed; a2's 59.5 was a short press. The port matches the N64 (demo 3).
 - Merge notes: tools/port/fullrun.py (b1/b2 also edit it). My additions are the `Route`
   attributes `level_start`, `no_cheats`, `cheat_windows`, `cheats_on` and `extra_env`, the
@@ -56,7 +56,7 @@ make build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
 ## Round 13 b3: the talismans, the nuke parts, the 100% ending
 
-Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) section 12. Port-only (tools/port, port/game/t2debug.c,
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) section 15. Port-only (tools/port, port/game/t2debug.c,
 port/app/game.cpp); no `src/`/`include/` change.
 
 - **The 100% ending is decided by the five totem flags, not by engine mode 16.** Mode 16
@@ -431,7 +431,7 @@ Details: [MACOS.md](MACOS.md) section 15, [QUICKSTART.md](QUICKSTART.md) (new).
 
 ## Round 13, part b2: level state across visits, the City Totem (branch names-R13_b2)
 
-Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) "Round 13 b2", [GAMEPLAY.md](GAMEPLAY.md) section 13.
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) section 12, [GAMEPLAY.md](GAMEPLAY.md) section 13.
 
 - **Hub doors closed on a later visit: fixed (a port bug).** The door was restored open; what
   blocked the walk was a used key slot beside it, solid again because **no fired level event was
@@ -470,7 +470,7 @@ branch's route the timeline moved earlier and he died. b1's real portal entrance
 ## Round 13, part b1: levels 5, 6 and the Primagen by the game's own progression (branch names-R13_b1)
 
 Only tools and docs changed (`tools/port/fullrun.py`, `tools/port/routes56.py`, the new
-`tools/port/itemreach.py`, PLAYTHROUGH.md section 12); no `src/`, `include/` or `port/` file
+`tools/port/itemreach.py`, PLAYTHROUGH.md section 14); no `src/`, `include/` or `port/` file
 changed, so asm_diff does not apply. `playthrough.py RUN --all` is now 280,000 frames.
 
 - **All 18 level keys** of the route are picked up. 62's level-5 key: its stand point had no

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The optional areas of the hub levels on their own (docs/port/PLAYTHROUGH.md section 12, round 13 b3).
+"""The optional areas of the hub levels on their own (docs/port/PLAYTHROUGH.md section 15, round 13 b3).
 
     python3 tools/port/extras.py OUTDIR --talisman 73..77     # a talisman chamber
     python3 tools/port/extras.py OUTDIR --nuke 78..83         # a flesh-eater level's nuke part

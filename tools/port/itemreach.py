@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Where to stand to walk into a pickup (docs/port/PLAYTHROUGH.md section 12, round 13 b1).
+"""Where to stand to walk into a pickup (docs/port/PLAYTHROUGH.md section 14, round 13 b1).
 
     python3 tools/port/itemreach.py LEVELS_DIR LEVEL x,y,z [--d 90]
 

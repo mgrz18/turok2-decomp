@@ -307,7 +307,7 @@ def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back
     return added
 
 
-# ---- the talisman chambers (round 13 b3; PLAYTHROUGH.md section 12) ----
+# ---- the talisman chambers (round 13 b3; PLAYTHROUGH.md section 15) ----
 # Each talisman level (73-77) is a chamber behind a portal N001 of its level: an action by the
 # pedestal (object 274/310/191/226/298, intelligence type 10, auto-go radius 512, collision
 # radius 61) needs the level's talisman piece (items 4400-4404, CActionIntelligence
@@ -631,7 +631,9 @@ def level6(r, t):
 LEVEL_HOOKS = {5: level5, 6: level6}
 
 
-if __name__ == "__main__":
+def cli(argv=None):
+    """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
+    global L6_SLOT_AFTER
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -645,8 +647,12 @@ if __name__ == "__main__":
     ap.add_argument("--talismans", nargs="?", const="2,3", default="",
                     help="the talisman chambers of these levels (default 2,3; round 13 b3)")
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
     L6_SLOT_AFTER = a.slot
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},
              [int(x) for x in a.cheats_off.split(",") if x], a.env, not a.no_health,
              [int(x) for x in a.cheats_on.split(",") if x], [int(v) for v in a.talismans.split(",") if v])
+
+
+if __name__ == "__main__":
+    cli()
