@@ -78,6 +78,8 @@ class Route:
                 o = st[6] if len(st) > 6 else {}
                 f = start + rel + dt
                 self.tp(f, x, y, z, ry, walk, o.get("trig"))
+                if o.get("stick"):   # round 14 c5: aim with the stick only (playthrough.stick_aim)
+                    self.inputs += pt.stick_aim(x, z, ry, o["stick"], f + 2)
                 if o.get("fire"):
                     a, b = f + 10, f + 10 + o["fire"]
                     self.fire.append((a, b))

@@ -317,3 +317,82 @@ The four views section 8 left open, each read against its caller:
 The `untyped` raw sites (110, `void *` arguments of menus and m2c-only code) were not swept this
 round; `RumbleMenu_Play` was one of them. Also found (64BIT.md part 7): the health pickup table, a
 union laid out by its first member.
+
+## 10. Round 14 (part c5): locals read before they are written, a Release build on x86-64
+
+Round 13 (b4-2, [MACOS.md](MACOS.md) 15) added `-ftrivial-auto-var-init=zero` to the game code
+after Linux Debug and the Mac split in level 135. The variable was not found. This round looked
+for it with three tools.
+
+**Switches (port-only, debug):**
+
+- `cmake -DT2_AUTO_VAR_INIT=zero|pattern|none` (port/cmake/game.cmake). `zero` is the default.
+  `none` leaves the compiler's default (no init), which is what you need to look for such reads.
+- `T2_SCRIBBLE=HEX` (port/app/game.cpp, port/game/t2debug.c): before each game frame, fill 256 KB
+  of the stack below the frame with the 32-bit word HEX. A local read before it is written then
+  holds HEX, not what the previous frame left there.
+
+**1. The compiler's warnings.** `-Wuninitialized -Wsometimes-uninitialized
+-Wconditional-uninitialized` (syntax only) over the 4,044 game C files give 19 warnings:
+
+- 5 "is uninitialized": `CCache__HeapAlloc`, `func_0023640C`, `func_00268080`,
+  `GameObject_GetLeashRadius` and `osPiGetCmdQueue`. Each is a matching idiom,
+  `if (unset) { A } else { A }`, with the same code in both branches. The result does not depend
+  on the value.
+- 14 "may be uninitialized": libultra (pfs `fpage`/`start_page`, `alCSeqNextEvent`'s `selected`,
+  `alCSeqNewMarker`'s `firstTrack`, `Pak_SaveNoteVerified`'s `result`), `func_00209AF4`'s extra
+  block sizes, a HUD message switch, the Mother's `p`. In each one, the path that skips the write
+  is not taken.
+
+**2. clang's static analyzer** (`clang --analyze`, the default checkers) over the 3,056 linked
+files finds the same ones, plus two more:
+
+- `Door_OpenUpdate`, `Door_OpenNow` and two siblings pass an 8-byte event argument with its
+  second word unset to `ImpactEvent_Call`. The N64 code passes the same stack leftover.
+- `Path_ExpandNode`'s `next[]` is unset only when there are more than 3 candidates, and there
+  are never more than 3.
+
+None of these changes a run.
+
+**3. Runs, Linux Debug, PIE** (the `--all` run of section 16 of PLAYTHROUGH.md, `T2_DET_LOG=1`):
+
+| build | compared with zero-init | det lines | differ |
+|---|---|---|---|
+| `none`, the same link | the whole game | 160,000 (80,000 frames) | **0** |
+| `none`, the game archive's members linked in **reverse order** (another code layout: round 13 changed the trace this way) | the whole game, 290,000 frames | 580,000 | **0** |
+| `none` + `T2_SCRIBBLE=0x4b4b4b4b` | through level 135 (80,000 frames) | 160,000 | **0** |
+| zero + `T2_SCRIBBLE=0x4b4b4b4b` | the same | 160,000 | **0** |
+
+On c8414758 no unset local changes the run, in either layout, even with a stack full of
+garbage. The round-13 split does not reproduce on the merged tree. One of round 13's later
+merges (b5, b1, b3) most likely removed it. **The zero flag stays as a safety net.** It costs
+nothing, and it makes Mac Debug = Mac -O2 = Linux by construction. The scripts are
+`/root/R14_c5/scan/{uninit,an,mix,rev}.py`: the warning pass, the analyzer, the object mixer for
+a file bisection, and the relink in reverse or shuffled order. To use them again after a new
+split: build `none` and `zero` side by side, then bisect the objects with `mix.py`.
+
+**4. A Release build on Linux x86-64 crashed at frame 2** (`-O2` and CMake's `-O3`). The fault
+is in `Controller_ReadAll`: an SSE `orps 0xb0(%rbx),%xmm1` on `gControllers[i]`. The x86-64 ABI
+gives a global array of 16 bytes or more 16-byte alignment, and clang relies on that for the
+game's typed `extern ControllerProfile gControllers[]`. gendata defined the object as
+`T2_ALIGN(8) unsigned char gControllers[0xA60]` (at ...ea8). The Mac (arm64, no aligned SIMD
+operands) never showed it.
+
+- Giving every gendata object of 16 bytes or more 16-byte alignment broke the game: level 50's
+  trace changed at frame 4,855, then the gfx watchdog fired (`*(u8 *)0 = 0` at frame 6,053, in
+  Debug too). Some code still walks from one N64 object into the next, so moving the objects
+  apart breaks it. That change was reverted.
+- The fix is a list in gendata, `ALIGN16`: only the objects in it get 16-byte alignment.
+  `gControllers` moved the crash to frame 1,069: `movaps (%rbx,%rsi)` on `sBatchInstances` in
+  `Render_FlushModelBatch`. With `{"gControllers", "sBatchInstances", "sBatchResources"}` the -O2
+  build plays the whole `--all` run.
+
+| Linux x86-64, PIE, the `--all` run, 290,000 frames | wall | det lines vs Debug zero-init |
+|---|---|---|
+| Debug, zero-init | 255 s | - |
+| **Release `-O2`, zero-init** (`-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG"`, same for CXX) | **138 s** | 580,000, **0 differ**, exit 0 |
+| Release `-O2`, `none` (register leftovers instead of zero) | 138 s | **differs from frame 15,348** (level 53, actor hash only): not in the game objects (bisected), so likely t2audio (STATUS, c5) |
+
+When a new object faults the same way, add it to `ALIGN16`. To find it: take the faulting
+`movaps`/`movdqa`/`orps mem` address from the crash handler's registers and look it up with
+`nm -n` (`sBatchInstances` was rbx = base + 0x56ec58). Rerun gendata and rebuild.

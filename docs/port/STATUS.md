@@ -217,6 +217,42 @@ Fixes and additions on the merged tree (asm_diff 0):
 7. **Windowed play with a real gamepad** (QUICKSTART.md documents it; only headless runs so far).
 8. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
 
+## Round 14, part c5: locals read before they are written, a Linux -O2 build, fewer aids in levels 1-2 (branch names-R14_c5)
+
+Details: [STABILITY.md](STABILITY.md) section 10, [PLAYTHROUGH.md](PLAYTHROUGH.md) section 17.
+
+- **Switches** (port-only, debug):
+  - `cmake -DT2_AUTO_VAR_INIT=zero|pattern|none` (default `zero`, port/cmake/game.cmake);
+  - `T2_SCRIBBLE=HEX` (fill the stack under each game frame with HEX);
+  - `T2_GIVE_WEAPONS` takes a schedule (`"0;1@F"`).
+- **Debug: no unset local changes a run on c8414758.** The `none` build gives the same
+  580,000 det lines as zero-init over the whole `--all` run, also with the game archive linked in
+  reverse order. With `T2_SCRIBBLE` it matches through level 135. The warnings and clang's
+  analyzer find only matching idioms, paths that are never taken and N64-identical leftovers
+  (STABILITY 10).
+- **Release -O2 on Linux x86-64**:
+  - **It crashed at frame 2**: SSE aligned loads on gendata objects defined `T2_ALIGN(8)` that
+    the x86-64 ABI says are 16-aligned. The Mac (arm64) is not affected.
+  - Fixed with gendata's `ALIGN16 = {gControllers, sBatchInstances, sBatchResources}`. Aligning
+    every object broke the game: some code still walks between N64 objects.
+  - **Now `-O2` plays the whole run, 580,000 det lines = Debug, in 138 s (Debug 255 s).**
+- **-O2 without zero-init differs from -O2 with it from frame 15,348** (level 53: the actor
+  hash; the player and the RNG are equal). That is a real read of an unset local, in registers or
+  stack slots that only -O2 leaves different. It is not in the game objects. A bisection over the 3,056 objects of libturok2_game.a (`/root/R14_c5/scan/bis.py`: zero objects mixed into the none build) found no object that fixes it, and all of them zero-init still differ. The other library built with `t2_game_flags` is **t2audio** (port/app/CMakeLists.txt). A sound handle stored in an actor would explain an actor-only difference. **Next: bisect t2audio's objects the same way.** Until then, keep the zero flag in every build type: the shipped -O2 build has it and equals Debug.
+- **Aiming with the stick only** (`playthrough.py`: `stick_aim`, calibrated to 0.0685 rad per
+  frame at full stick, cube law). The two level-2 soul gates no longer use `T2_AIM_AT`. They fall
+  on the same frames (35,404 / 62,204), and level 2 still ends with totems `11000`. Still on
+  assists: `T2_AIM_ENEMY` (moving zombies and sisters) and `T2_FACE_NEAREST` (the totem waves).
+- **Levels 1-2 on picked-up weapons: not yet.** With nothing given the player keeps the talon,
+  dies at the Harbor Totem (lost) and runs out of lives at the first sister. The route needs
+  weapon-cycle inputs, the weapon pickups and longer fights (PLAYTHROUGH 17.2).
+- **Merge notes**:
+  - Files: port/cmake/game.cmake (the flag is now the cache option), port/app/game.cpp and
+    port/game/t2debug.c (T2_SCRIBBLE, T2_GIVE_WEAPONS), tools/port/gendata.py (ALIGN16:
+    **rerun gendata**; Debug traces are unchanged), tools/port/playthrough.py (level 2's soul
+    gates), tools/port/fullrun.py (3 lines in `steps()`: the `"stick"` option).
+  - No src/ or include/ change.
+
 ## Round 13, part b4: the whole game on macOS, a release build, how to play (branch names-R13_b4)
 
 Details: [MACOS.md](MACOS.md) section 15, [QUICKSTART.md](QUICKSTART.md) (new).

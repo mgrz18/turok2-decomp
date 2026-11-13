@@ -230,6 +230,13 @@ SKIP_SECTIONS = {'.virtual_1', '.audio_ctl', '.audio_wavetable', '.sound_data',
                  '.cartridge', '.trailer', '.header', '.boot'}
 
 
+# round 14 c5: objects the game's code walks with SSE at -O2/-O3 on x86-64. The ABI gives a global
+# array of 16 bytes or more 16-byte alignment and clang relies on it for the typed externs
+# (Controller_ReadAll: orps 0xb0(%rbx) on gControllers[i] faulted at frame 2 with T2_ALIGN(8)).
+# Not for every object: 16 everywhere moved the data apart and broke the game (code that still
+# walks from one N64 object into the next: the level-50 trace changed, then the gfx watchdog).
+ALIGN16 = {"gControllers", "sBatchInstances", "sBatchResources"}
+
 class Elf:
     def __init__(self, path):
         from elftools.elf.elffile import ELFFile
@@ -1099,6 +1106,8 @@ class Generator:
             self.alias_nonelf.append(s.name)
             return
         al = min(max(s.align, 4), 16)
+        if s.name in ALIGN16:
+            al = 16
         what = 'typed' if s.layout_desc is not None else 'bytes'
         if s.bss:
             if phase == 'decl':

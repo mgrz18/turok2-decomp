@@ -39,6 +39,7 @@ int T2Port_ScheduleFrame(int frame);
 extern int gT2HostFrame;
 void T2Port_WakeEnemies(int frame, const char *spec);
 void T2Port_FaceNearest(int frame, const char *spec);
+void T2Port_ScribbleStack(unsigned value);
 int T2Port_AimNode(int frame, const char *spec);
 void T2Port_BossFront(int frame, const char *spec);
 void T2Port_TraceBoss(int frame);
@@ -612,6 +613,12 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         if (args.audio && testSong != nullptr && f == 60) {
             Music_SetTrack((int)strtol(testSong, nullptr, 0));
             printf("game: T2_TEST_SONG: Music_SetTrack(%s)\n", testSong);
+        }
+        // DEBUG-ONLY: T2_SCRIBBLE=HEX (round 14 c5): fill the stack the game frame will use with
+        // HEX, so a local read before it is written shows up (STABILITY.md section 10)
+        static const char* scribble = getenv("T2_SCRIBBLE");
+        if (scribble != nullptr) {
+            T2Port_ScribbleStack((unsigned)strtoul(scribble, nullptr, 0));
         }
         T2Port_Frame();
         bt1 = BenchClock::now();
