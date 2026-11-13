@@ -47,6 +47,13 @@ class Route:
         self.boss_front = []
         self.warps = []
         self.give = []
+        # round 13 b5: where each level starts (its hub visit before it included), for the
+        # per-level T2_CHEATS schedule (--cheats), and extra env lines (--env)
+        self.level_start = {1: 0}
+        self.no_cheats = set()
+        self.extra_env = []
+        self.cheat_windows = []
+        self.cheats_on = set()   # sub-levels (the totems: 109 110 111 112) kept invincible (--cheats-on)
 
     def note(self, frame, text):
         self.inputs.append("# %d: %s" % (frame, text))
@@ -91,7 +98,12 @@ class Route:
                 self.inputs.append("Z@%d..%d" % (f, f + 6))
         def sched(vals):
             return ";".join(v if f == 0 else "%s@%d" % (v, f) for f, v in sorted(vals))
-        env = ["T2_GIVE_WEAPONS=1", "T2_WEAPON=\"%s\"" % sched(self.weapon), "T2_CHEATS=1",
+        cheats = [(f, "0" if lv in self.no_cheats else "1") for lv, f in sorted(self.level_start.items())]
+        for a, b in self.cheat_windows:   # invincible inside [a, b) whatever the level's setting
+            back = [v for f, v in cheats if f <= b][-1] if any(f <= b for f, v in cheats) else "1"
+            cheats = [(f, v) for f, v in cheats if not a <= f < b] + [(a, "1"), (b, back)]
+            cheats.sort()
+        env = ["T2_GIVE_WEAPONS=1", "T2_WEAPON=\"%s\"" % sched(self.weapon), "T2_CHEATS=\"%s\"" % sched(cheats),
                "T2_FILL_AMMO=\"%s\"" % sched(self.fill),
                "T2_FACE_NEAREST=4000@%s" % ",".join(str(l) for l in self.face_levels),
                "T2_FACE_PITCH=1", "T2_FACE_STICKY=1", "T2_BOSS_LOG=1",
@@ -108,7 +120,7 @@ class Route:
             env.append("T2_WARP_TO=%s" % ",".join("%d@%d" % (w, f) for f, w in sorted(self.warps)))
         if self.give:
             env.append("T2_GIVE_ITEMS=\"%s\"" % ";".join("%s@%d" % (v, f) for f, v in sorted(self.give)))
-        env += list(env_extra)
+        env += list(env_extra) + list(self.extra_env)
         with open(os.path.join(out, "playthrough.txt"), "w") as fp:
             fp.write("\n".join(self.inputs) + "\n")
         with open(os.path.join(out, "teleport.env"), "w") as fp:
@@ -138,15 +150,52 @@ L1_KEYS = {
 }
 KEY_STEP = 150
 
+# ---- health on the way (round 13 b5: the run without T2_CHEATS invincibility) ----
+# The health pickups the routes pass near (tools/assets/levels.py; the item id is the object's id
+# in cart entry 2: 1702 health +10 to 100, 1703 full health +100 to 100, 1704 ultra health +100 to
+# 200; they lie on the floor), taken like the keys (150 frames each, at a segment's start).
+# Before round 13 no health pickup was ever taken: the host table had m_Max 0 (gendata swapped the
+# rows' union by its first member; include/structs/pickup.h CPickupRow18Health).
+L1_HEALTH = {
+    9: [(7372.8, 312.3, -256.0, 0.0)],                                   # 59: ultra health (the Harbor Totem next)
+}
+L2_HEALTH = {
+    5: [(2508.2, 10.0, 3788.2, 0.0), (2048.0, -4443.2, 6041.6, 0.0)],   # 130: full + ultra health (sister 1 next, 133)
+    7: [(-4249.6, 418.9, 1484.8, 0.0)],                                  # 130: ultra health (sister 2 next, 134)
+    10: [(-1536.0, 419.6, -3328.0, 0.0)],                                # 131: full health
+    12: [(482.3, 471.5, 6727.5, 0.0)],                                   # 135: ultra health (at its start: the crypts and sister 3 next)
+}
+# Not taken: 131's full health (-1996.3, 102.4, 6255.8), 132's (12288.0, 870.5, -665.6) and 132's
+# ultra health (-6297.6, 102.4, 204.8) lie in damage regions (10 every 2 frames: a stand to pick one
+# cost 330 to 740 health in a rescue run)
+# a pick inside a segment (no shift): 135's ultra health after sister 3, before the City Totem
+L2_HEALTH_LATE = []
+# Not taken: the six health +10 beside sister 3's spot ((-479..681, 0, 3722..3828)): walking to them
+# in the middle of her fight cost ~1,000 health (they lie in the pit's damage region)
+L2_RETURN_LATE = []
+# 135's first crypt key missed: without it the platform before door 60 stays down and sister 3's
+# spot (102, 0, 3600) is a pit with a damage region (10 every 2 frames). A third walk at the key,
+# after the second crypt (the retries are no shift).
+L2_RETRY_B5 = [(12, 8850, -714.0, 0.0, 488.0, 0.0)]
 
-def level1(r, start_shift=0, keys=True):
+
+def merged(*dicts):
+    out = {}
+    for d in dicts:
+        for k, v in d.items():
+            out.setdefault(k, []).extend(v)
+    return out
+
+
+def level1(r, start_shift=0, keys=True, health=True):
     """Level 1 from the new game: (the frame level 109 is reached, the extra frames added)."""
     added = 0
     for i, (name, base, steps) in enumerate(pt.SEGMENTS):
         f0 = base + start_shift + added
         r.note(f0, name)
-        if keys and i in L1_KEYS:
-            for x, y, z, ang in L1_KEYS[i]:
+        picks = merged(L1_KEYS, L1_HEALTH if health else {}) if keys else {}
+        if i in picks:
+            for x, y, z, ang in picks[i]:
                 r.pick(f0, x, y, z, ang)
                 f0 += KEY_STEP
                 added += KEY_STEP
@@ -210,7 +259,7 @@ def stretch(segments, extra):
     return segs
 
 
-def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=False):
+def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=False, back=()):
     """A 7-tuple segment list from `start` with keys inserted; returns the frames added.
     anchor: re-anchor the schedule clock when a key segment's level is reached (T2_ANCHOR), so
     that the key pick-up waits for the level when its warp loads later than the route assumed."""
@@ -233,6 +282,8 @@ def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=False):
     r.steps(out, start)
     for i, dt, x, y, z, ang in retry:
         r.pick(start + starts[i] + dt, x, y, z, ang)
+    for i, dt, x, y, z, ry in back:
+        r.tp(start + starts[i] + dt, x, y, z, ry)
     return added
 
 
@@ -298,12 +349,20 @@ def hub(r, arrival, grant=(), primagen=(), save=True, go=None):
     return t + CINEMA_AFTER[go]
 
 
-def main_all(out, upto=6, extras=True, hubs_in=None):
-    """hubs: the measured hub arrivals {after level: frame} (HUB_AT)."""
+def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(), health=True, cheats_on=()):
+    """hubs: the measured hub arrivals {after level: frame} (HUB_AT). no_cheats: the levels played
+    without T2_CHEATS invincibility (each from its hub visit before it); extra_env: more env lines."""
     hubs = dict(HUB_AT); hubs.update(hubs_in or {})
     r = Route()
+    r.no_cheats = set(no_cheats)
+    r.cheats_on = set(cheats_on)
+    r.extra_env = list(extra_env)
+    for lv in (2, 3, 4, 5):
+        r.level_start[lv] = hubs[lv - 1]
     r.saves_at = []
-    arrival, added = level1(r)
+    # the health pickups only in the levels played without invincibility (with it the route stays
+    # round 12's: the picks move every later step, and the Primagen's lair wait depends on the timing)
+    arrival, added = level1(r, health=health and 1 in r.no_cheats)
     r.note(hubs[1], "60 the hub (after level 1)")
     r.anchors.append((hubs[1], 60))
     if upto < 2:
@@ -314,9 +373,14 @@ def main_all(out, upto=6, extras=True, hubs_in=None):
     r.anchors.append((c, 34))
     r.note(c, "34.. the River of Souls intro cinemas (level 2 route shifted by %d)" % shift)
     l2s = pt.L2_START + shift
-    a2 = level_segments(r, pt.L2_SEGMENTS, l2s, L2_KEYS if extras else {}, L2_RETRY, L2_STRETCH)
+    h2 = health and 2 in r.no_cheats
+    a2 = level_segments(r, pt.L2_SEGMENTS, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}) if extras else {},
+                        L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else []), L2_STRETCH,
+                        back=L2_RETURN_LATE if h2 else ())
     t_arr = pt.L2_TOTEM_ARRIVAL + shift + a2
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
+    if 110 in r.cheats_on:
+        r.cheat_windows.append((t_arr - 600, hubs[2]))
     r.fire.append((t_arr, t_arr + 7200))
     r.anchors.append((t_arr, 110))   # the fire window starts when 110 is reached
     # Round 13 b2: down from the arrival ledge (642 units from the totem, the attackers 450-1,150
@@ -422,6 +486,7 @@ def level5(r, t):
     r.inputs.append("Z@%d..%d" % (s + rel, s + rel + length))
     r.boss_front.append((s + rel - 100, "450,200"))
     hub_at = s + L5_HUB_AFTER
+    r.level_start[6] = hub_at
     r.note(hub_at, "60 the hub (after level 5)")
     r.anchors.append((hub_at, 60))
     return hub(r, hub_at)          # a save; no key goes in
@@ -475,7 +540,13 @@ if __name__ == "__main__":
     ap.add_argument("--upto", type=int, default=6)
     ap.add_argument("--no-extras", action="store_true")
     ap.add_argument("--hub", action="append", default=[], help="N=FRAME: the hub arrival after level N")
+    ap.add_argument("--cheats-off", default="", help="L1,L2,...: the levels played without T2_CHEATS invincibility (round 13 b5)")
+    ap.add_argument("--env", action="append", default=[], help="K=V: one more line for teleport.env (e.g. T2_HURT_LOG=1)")
+    ap.add_argument("--cheats-on", default="", help="110: the City Totem invincible even in a --cheats-off level (round 13 b5)")
+    ap.add_argument("--no-health", action="store_true", help="skip the health pickups (round 13 b5)")
     ap.add_argument("--hop", type=int, default=L6_HOP_AFTER, help="the hop to the Primagen, frames after the hub (level 6)")
     a = ap.parse_args()
     L6_HOP_AFTER = a.hop
-    main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub})
+    main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},
+             [int(x) for x in a.cheats_off.split(",") if x], a.env, not a.no_health,
+             [int(x) for x in a.cheats_on.split(",") if x])
