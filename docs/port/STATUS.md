@@ -38,9 +38,12 @@ port/app/game.cpp); no `src/`/`include/` change.
 - New DEBUG-ONLY switches: `T2_PROGRESS_LOG=1` (a line per change of the totem/boss flags,
   talismans, Primagen keys, nuke parts, unlocked cheats, ending flags, cinema script),
   `T2_TOTEMS=abcde` (the five totem flags at the first gameplay frame).
+- **The 100% ending reached in one run**: `fullrun.py RUN --talismans 2` (276,000 frames, the
+  usual debug aids): all five totems won, Leap of Faith, the Primagen's death at 238,685 with
+  cinema 370, "END 2", the credits, the hub at 259,575, `unlockedCheats` 0x7ffe7fd.
 - **The totem fights decide the ending and are timing-sensitive**: the base `--all` run loses the
-  City Totem (110, 5/8, twice identically); with the level-2 and 3 chamber trips the City Totem is
-  won (11/8) but the Marsh Totem (111) lost (7/8): one kill short at ~1 kill per 15 s.
+  City Totem (110, 5/8, twice identically); with both chamber trips (`--talismans`) the City Totem
+  is won (11/8) but the Marsh Totem (111) lost (7/8): one kill short at ~1 kill per 15 s.
 
 ## 1. Build and run
 

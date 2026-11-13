@@ -1107,3 +1107,34 @@ Each has one nuke part (4500; `m_NukePartLevelFlags[level - 1]`) and its exit N0
 `tools/port/extras.py OUT --nuke 78..83` warps in (N003), teleports next to the part and walks
 into it: **all six picked up** (DEBUG-ASSISTED: the way through each level's flesh eaters is not
 routed). In 78 the part lies behind a door (actor 10) that was already open.
+
+### 12.4 The 100% ending in one run
+
+`fullrun.py RUN --talismans 2` (the level-2 chamber trip only; Linux, headless, PIE, 276,000
+frames, `T2_PROGRESS_LOG=1`; the same debug aids as section 11.3): **all five totems won** (109
+11/8, 110 11/8, 111 11/8, 112 11/8, 113 9/8), the piece 4402 in 132 and **Leap of Faith** (73,
+78,576), the four boss flags, then **the good ending**: the Primagen's death at 238,685 with
+**cinema 370** (the totems' cinemas, level 9 loaded at ~239,500), level 10's "END 2" (241,677,
+120 at 245,073), the credits (mode 15) at 245,477, the hub at 259,575; `unlockedCheats`
+0x400e7e0 -> **0x7ffe7fd**.
+
+```sh
+python3 tools/port/fullrun.py RUN --talismans 2
+cd OUT && . RUN/teleport.env && SDL_VIDEODRIVER=offscreen T2_PROGRESS_LOG=1 T2_STATE_LOG=500 \
+  build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game --pak-dir RUN/pak \
+  --frames 276000 --input @RUN/playthrough.txt          # an EMPTY pak dir
+```
+
+**The totem defences are marginal and timing-sensitive** (~1 kill per 15 s, 8 needed in 120 s):
+without the trip (`--all`) the City Totem is lost (5/8, two identical runs); with both trips
+(`--talismans`, 2 and 3) the City Totem is won but the Marsh Totem lost (7/8) and the ending is
+the other one (cinema 371, level 11, `unlockedCheats` 0x400e3e6). A sturdier totem defence (part
+b2) makes the ending independent of the route's timing.
+
+### 12.5 Open
+
+- Chambers 75-77 in the continuous run (the route order of levels 4 and 6, routes56's segment
+  builder for level 5); the flesh-eater levels walked (their flesh eaters) instead of teleported.
+- Adon's chamber (72, portal 1001 of 55): walking in plays her scene (events at 13,533-13,931) and
+  the player stays at (0, 0, -622) for 3,000+ frames: what ends the scene (a button?) not found.
+- The good ending against the N64 (the PD2 chain's camera and length).
