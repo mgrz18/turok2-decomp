@@ -25,6 +25,7 @@ struct T2GameArgs {
     // DEBUG-ONLY measurement (docs/port/PERF.md):
     int benchFrom = -1;   // --bench [FROM]: per-frame host times from VI FROM on (0: all), printed at the end
     int pace = 0;         // --pace: real time, one VI per 1/60 s (the game draws every second VI: 30 fps)
+    int audioDevice = 0;  // a sound device is open (LUS Ship::Audio): --pace follows its buffer (round 14 c4)
 };
 
 // Boots the game and runs args.frames frames; window may be null (--no-window).

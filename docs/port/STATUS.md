@@ -253,6 +253,45 @@ Details: [STABILITY.md](STABILITY.md) section 10, [PLAYTHROUGH.md](PLAYTHROUGH.m
     gates), tools/port/fullrun.py (3 lines in `steps()`: the `"stick"` option).
   - No src/ or include/ change.
 
+## Round 14, part c4: ready for a human player on macOS (branch names-R14_c4)
+
+Details: [MACOS.md](MACOS.md) section 16, [QUICKSTART.md](QUICKSTART.md) (rewritten: files,
+play mode, settings, saves, logs, controls, a first-run checklist). Mac only, all headless.
+
+- **`turok2` with no arguments (or `--play`) is the player's launch**: the game in a window with
+  sound and `--pace`, no frame limit; `turok2.o2r`, `baserom.us.z64` and `t2port.o2r` looked up
+  in `~/Library/Application Support/turok2` (Linux `~/.local/share/turok2`), next to the
+  executable (`Contents/Resources` in a bundle), then the current directory; the config, the
+  logs and the pak in that folder; stdout and stderr to its `logs/`. Every other command line
+  behaves as before (the test tool, 3 frames by default).
+- **Two things a player could not have done before**: (1) **use a gamepad**: LUS connects SDL
+  pads only through a GUI handler this port does not install, so none ever connected; the port
+  now connects them at start and on hot-plug; (2) **hear the game in a window**: no `Ship::Audio`
+  component existed, so `--audio` only fed `--wav`. Now CoreAudio (macOS), falling back to SDL,
+  then to none (without saving the fallback); with a device, `--pace` follows its buffer.
+- **Turok 2 defaults for the controls** (port/app/t2controls.cpp): left stick / WASD walk and
+  strafe (C buttons), right stick / arrows / captured mouse look (the stick), right trigger /
+  left click / Ctrl fire, left trigger / right shoulder / Space / right click jump, A/B = Q/E,
+  Start = Enter/Esc, map = left shoulder / Back / Tab.
+- **Checked headless** with `--pad-test` (an SDL virtual gamepad, LUS keyboard events and a fake
+  mouse through LUS's real ControlDeck; `T2_PAD_LOG=1`) and `tools/port/padtest.py`: 101 binding
+  checks pass (including unplug/replug), a new game from the title with the pad only and with the
+  keyboard only. Play mode: 0 bytes on stdout, new game reached; save -> quit -> relaunch -> load
+  with the default pak folder loads level 51 at the save portal. App bundle:
+  `tools/port/mkapp.sh BUILD [APP]`.
+- **Nothing else moved**: the round-13 whole-game route gives the same 532,000 det lines as
+  c8414758 (Mac, Release). **Linux** (box copy `/root/R14_c4mac`, Debug PIE): builds, padtest.py passes (101 + 2), and a 20,000-frame new-game run through the SDL offscreen window path (the real LUS controller read) gives the same 40,000 det lines as the coordinator's c8414758 build.
+- **For the coordinator**: files `port/app/main.cpp`, `port/app/game.cpp`, `port/app/game.h`,
+  `port/app/CMakeLists.txt` (adds t2controls.cpp), new `port/app/t2controls.{h,cpp}`,
+  `tools/port/padtest.py`, `tools/port/mkapp.sh`, docs QUICKSTART.md, MACOS.md (section 16),
+  STATUS.md (this section). No src/include change. New debug switches: `--pad-test FILE`,
+  `T2_PAD_LOG=1|2`, `T2_AUDIO_DEVICE=1`, `T2_AUDIO_SILENT=1`; play-mode flags `--play`,
+  `--no-audio`, `--no-pace`. Existing user configs keep LUS's old mappings (delete
+  `turok2.cfg.json`).
+- **Open**: a person with a window, a real pad, the mouse and speakers (focus, capture, F11,
+  vsync + `--pace`, mouse feel); a self-contained bundle (Homebrew dylibs today); the game
+  crashes at boot without the ROM (play mode refuses to start instead).
+
 ## Round 13, part b4: the whole game on macOS, a release build, how to play (branch names-R13_b4)
 
 Details: [MACOS.md](MACOS.md) section 15, [QUICKSTART.md](QUICKSTART.md) (new).
