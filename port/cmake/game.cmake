@@ -107,6 +107,12 @@ target_compile_options(t2_game_flags INTERFACE
     # default, which changes the float results, so the attract demos (recorded inputs
     # replayed through the physics) drift away from the x86-64 runs. Same results everywhere.
     -ffp-contract=off
+    # Some decompiled code still reads a local before writing it (round 13 b4): the value
+    # then depends on the host, the optimisation level and the code layout. Linux Debug and
+    # macOS split at level 135 (frame 71,469 of the whole-game run: a particle 0.7 units off,
+    # then the player's aim), and a -O2 build no longer finished the game. Zeroed locals give
+    # the same run everywhere (Mac Debug = Mac -O2 = Linux, 266,000 frames).
+    -ftrivial-auto-var-init=zero
     # Tentative definitions repeated across files (SN64 linked them as common).
     -fcommon
     # Clang 16+ makes these errors in C; the code predates them. They stay
