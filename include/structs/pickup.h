@@ -57,6 +57,23 @@ typedef struct CPickupRow18 {               /* weapons (m_Weapon), health (m_Hea
     /* 0x14 */ s32 (*m_pHandler)(void *player, struct CPickupRow18 *row);
 } CPickupRow18; /* size 0x18 */
 
+#ifdef TARGET_PORT
+/* The port (round 13 b5): the health rows (sHealthPickups) typed for tools/port/gendata.py, which
+ * lays a union out by its first member: through CPickupRow18's m_Params (CPickupWeapon first, three
+ * s16) the rows' s32 m_Amount came out with its halves swapped and m_Max as 0, so
+ * Pickup_GiveHealth's `health < max` never held and no health pickup was ever taken. The same
+ * layout as CPickupRow18 (the code walks the table as CPickupRow18). */
+typedef struct CPickupRow18Health {
+    /* 0x00 */ void *m_pMessage;
+    /* 0x04 */ s16 m_Id;
+    /* 0x06 */ s16 m_Sound;
+    /* 0x08 */ s16 m_Callback;
+    /* 0x0A */ u8 _padA[2];
+    /* 0x0C */ CPickupHealth m_Health;
+    /* 0x14 */ s32 (*m_pHandler)(void *player, struct CPickupRow18 *row);
+} CPickupRow18Health; /* size 0x18 */
+#endif
+
 typedef struct CPickupRow14 {               /* ammo (m_Ammo), life force (m_Amount) */
     /* 0x00 */ void *m_pMessage;
     /* 0x04 */ s16 m_Id;
