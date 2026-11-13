@@ -1091,3 +1091,89 @@ lldb stalls when soak.py starts it (stdin/tty or `--setsid`), then rerun the rou
 - The uninitialized local behind b4-2 (zero-init hides it everywhere).
 - `soak.py` under lldb (15.5).
 - A windowed run with a real gamepad (QUICKSTART.md, 15.4).
+
+## 16. Round 14 (part c4): ready for a human player on the Mac
+
+Branch `names-R14_c4` (from c8414758), built and run on the Mac only (headless: `--no-window` /
+`--offscreen-gl`, no window was opened). Release build `OUT/build_rel14` (`OUT/r14/build.sh`),
+the box's archive (`OUT/turok2_a9d.o2r`, sha1 `a9d14a47…`). Scripts and run directories in
+`OUT/r14/`. No change to `src/` or `include/`: the N64 build is untouched.
+
+### 16.1 What a player was missing (found by reading LUS and the port, then fixed)
+
+| # | symptom | cause | fix |
+|---|---|---|---|
+| c4-1 | **a gamepad never reached the game** | LUS connects SDL gamepads only through `SDLAddRemoveDeviceEventHandler`, a GUI window the port never installs; nothing else calls `RefreshConnectedSDLGamepads` | `T2Controls_AfterContInit` (the pads present at start) and `T2Controls_PollHotplug` (every read: SDL's add/remove events) in port/app/t2controls.cpp |
+| c4-2 | **no sound in a windowed `--audio` run** | the port never created LUS's `Ship::Audio` component: `AudioPlayerPlayFrame` was a no-op (the sound was only in `--wav`) | main.cpp opens `Ship::Audio` (22,050 Hz stereo, 100 ms target) for `--audio` with a window |
+| c4-3 | a real device and the 60 Hz VI clock drift apart (LUS's ring holds 6,000 frames, 270 ms) | the game makes 367.5 frames per VI on the host clock, the device eats them on its own | with a device, `--pace` moves the next VI deadline by 1 ms when the device buffer leaves 2,205 +- 735 frames |
+| c4-4 | one launch without a sound device would leave every later launch silent | LUS saves the fallback backend (`null`) in the config | the player's `Window.AudioBackend` is put back; CoreAudio -> SDL -> none |
+| c4-5 | the defaults put walking on the right stick / arrow keys, looking on the left stick / WASD | LUS's generic N64 defaults | Turok 2 defaults for a fresh config (`T2Controls_DefaultMappings`): left stick / WASD walk and strafe, right stick / arrows / mouse look; table in QUICKSTART.md section 4 |
+| c4-6 | no mouse look; LUS's mouse-button mappings never fire in this port | LUS blocks mouse buttons unless ImGui hovers its game window, which this port does not draw | port code: the captured mouse's motion is the stick (`gT2MouseSensitivity` 2.0 stick units per pixel, clamp 80, `gT2MouseInvertY`), left button Z, right button R; a click captures, F2 toggles |
+| c4-7 | `turok2` with no arguments ran the archive self-test (3 frames, no game) | the executable is the test tool by default | no arguments = `--play`: game + window + sound + `--pace`, no frame limit, data looked up in `~/Library/Application Support/turok2` / next to the executable (`Contents/Resources` in a bundle) / the current directory; config, logs and pak in that folder (`SHIP_HOME`); stdout and stderr to `logs/` |
+
+### 16.2 The controls, checked headless (`tools/port/padtest.py`)
+
+`turok2 --game --no-window --pad-test FILE` gives LUS's ControlDeck a window with no window
+system behind it (`T2Controls_MakeHeadlessWindow`), attaches an **SDL virtual gamepad** and
+plays the file's events at their frame: gamepad buttons and axes through SDL, keys through
+`ControlDeck::ProcessKeyboardEvent` (what Fast3dWindow's key callbacks call), and a fake mouse.
+`T2_PAD_LOG=1` prints the N64 pad the game reads (`pad: frame F buttons XXXX stick X Y`).
+
+```sh
+python3 -I tools/port/padtest.py --bin OUT/build_rel14/app/turok2 --archive OUT/turok2_a9d.o2r \
+    --rom baserom.us.z64 --work OUT/r14/padtest
+```
+
+| check | result |
+|---|---|
+| `map`: each binding alone, pressed 20 frames and released (15 keys, 4 arrow keys, 12 pad buttons, 10 stick/trigger directions, mouse not captured, 5 captured mouse motions, 2 mouse buttons), unbound West/North give 0, unplug -> press ignored -> plug back -> press works | **101 checks, all pass**; the arrows and full sticks give +-85, the mouse +-20 per 10 px and 80 at the clamp |
+| `newgame` with the gamepad only (Start, then A x3 at playthrough.py's frames) | engine modes 0 -> 1 -> 3 -> 4 -> 5 -> 7 -> 8 -> 13 -> **11** (in level 51) at 4,855, = `--input START@4400 A@4500 A@4700 A@4800` |
+| `newgame` with the keyboard only (Enter x4) | the same, mode 11 at 4,855 |
+
+LUS keeps the mappings in `turok2.cfg.json` once written: a config from an older build keeps
+the old defaults (one padtest run showed it: Back -> L appeared only after deleting the config).
+
+### 16.3 Play mode, saves, sound, the app (headless, a scratch `HOME`)
+
+- **Clean launch**: `HOME=<scratch> turok2 --play --offscreen-gl --no-pace --frames 6000
+  --pad-test ng_pad.txt` from an empty directory: **0 bytes on stdout**, one line on stderr when
+  it is a terminal (where the logs are), `turok2.cfg.json` and `logs/` (turok2-stdout.log,
+  turok2-stderr.log, turok2.log) in `<HOME>/Library/Application Support/turok2`, the archive and
+  ROM found there, new game reached (mode 11 at 4,855). A missing archive, ROM or t2port.o2r
+  stops with a message naming the file and the folder (a dialog when there is a window). Without
+  the ROM the game used to crash at boot (SIGSEGV after `t2audio: no ROM image`): play mode now
+  refuses to start without it.
+- **Save -> quit -> relaunch -> load** in play mode with the default pak location (no
+  `--pak-dir`), the virtual gamepad only: the round-12 save scenario (`T2_SAVE_PORTAL=13100`,
+  pad Start/A) wrote `turok2_pak1.mpk` (32,768 bytes, 2,709 pak writes) in the scratch
+  Application Support folder; a second process (Start, A, D-down, A, D-up, A, A, A) **loaded
+  level 51 at the save portal (-1540.7, -566.4, -1481.6) at frame 6,500**, the same state as
+  round 13's `--pak-dir` load.
+- **Sound** (`T2_AUDIO_DEVICE=1` opens the device without a window; `T2_AUDIO_SILENT=1` sends it
+  silence): CoreAudio opens (`audio: coreaudio device, open`); 3,600 paced VIs in 59.97 s, the
+  device buffer 0-2,965 frames, the VI clock moved 85 times in 3,600 VIs. SDL with its dummy
+  driver opens too; with `SDL_AUDIO_DRIVER=bogus` the game says `NOT open: no sound`, runs at
+  60 Hz (11.68 s for 700 VIs) and the config keeps `sdl`.
+- **App bundle**: `tools/port/mkapp.sh OUT/build_rel14 OUT/r14/Turok2.app` (Info.plist, the
+  executable, t2port.o2r, ad-hoc signature). Run as `Turok2.app/Contents/MacOS/turok2 --play
+  --port-archive /nonexistent ...` with the archive and ROM in `Contents/Resources` (test
+  symlinks): both archives found in `Contents/Resources`, new game reached. Not run from Finder
+  (no windows this round).
+
+### 16.4 Nothing else moved
+
+The round-13 whole-game route (`OUT/r14/detall.sh`, `T2_DET_LOG=1`, 266,000 frames, headless):
+this branch and a Release build of c8414758 give **532,000 det lines, 0 differ**. Headless runs
+use the virtual pad of round 9 as before; with a window (Linux's offscreen driver) the new code
+only reads devices that are not there.
+
+### 16.5 Open on the Mac
+
+- A windowed run with a real gamepad, the mouse and the speakers by a person: the code paths
+  are the ones checked above, but window focus, mouse capture, F11, vsync with `--pace` and the
+  feel of the mouse sensitivity were not seen.
+- The bundle links Homebrew's dylibs; a self-contained bundle (dylibbundler or static SDL3)
+  would run on any Mac.
+- The no-ROM crash itself (play mode avoids it; the test tool still crashes without `--rom`).
+- `gamecontrollerdb.txt` is not shipped (LUS logs an error at every start; SDL3's built-in
+  mappings cover the common pads).
