@@ -169,15 +169,23 @@ L2_KEYS = {
 }
 L3_KEYS = {
     0: [(1075.3, -307.2, 2663.8, 0.0)],                                  # 61: level 5 key (4340)
-    3: [(-4761.5, 307.2, -1074.0, 0.0)],                                 # 62: level 5 key
+    3: [(-4761.5, 308.8, -1074.0, 1.5708)],                              # 62: level 5 key (from +x: no floor at +z, itemreach.py)
     4: [(-102.4, 307.6, 870.4, 0.0)],                                    # 63: Primagen key 3 (4362)
-    15: [(-2150.5, 0.0, -1381.4, 0.0)],                                  # 68: level 5 key
+    13: [(-2150.5, 0.0, -1381.4, 0.0)],                                  # 68: level 5 key
 }
+# round 13 b1: 62's and 68's level-5 keys were picked before the warp into the sub-level had loaded
+# (and 68's sat at index 15 of a 14-segment list: never inserted): their segments are anchored on the
+# sub-level (T2_ANCHOR) and the picks wait KEY_WAIT frames after it
+L3_ANCHOR = {3, 13}
 L4_KEYS = {
     0: [(6758.4, -614.4, 2304.0, 0.0)],                                  # 98: Primagen key 4 (4363)
-    12: [(-8652.4, -3635.2, -149.1, 0.0)],                               # 103: level 6 key (4350)
+    9: [(-8652.4, -3634.9, -149.1, 0.0)],                                # 103: level 6 key (4350)
     10: [(-5429.1, -2764.8, -3174.4, 0.0)],                              # 105: level 6 key
 }
+# round 13 b1: 103's key sat at index 12 (105's second visit: never picked); now at 103's first
+# visit, anchored on 103
+L4_ANCHOR = {9}
+KEY_WAIT = 150
 
 
 # Retries inside a segment (no shift): (segment index, dt, x, y, z, approach angle). In the
@@ -208,18 +216,20 @@ def stretch(segments, extra):
     return segs
 
 
-def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=False):
+def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=()):
     """A 7-tuple segment list from `start` with keys inserted; returns the frames added.
-    anchor: re-anchor the schedule clock when a key segment's level is reached (T2_ANCHOR), so
-    that the key pick-up waits for the level when its warp loads later than the route assumed."""
+    anchor: the segment indices whose key picks re-anchor the schedule clock when the segment's level
+    is reached (T2_ANCHOR) and wait KEY_WAIT frames, so that a pick-up waits for the level when its
+    warp loads later than the route assumed (round 13 b1: 62, 68, 103)."""
     added = 0
     starts = {}
     out = []
     for i, (name, rel, steps, more) in enumerate(stretch(segments, extra)):
         pre = []
         if i in keys:
-            if anchor:
+            if i in anchor:
                 r.anchors.append((start + rel + added, int(name.split()[0])))
+                added += KEY_WAIT
             for k in keys[i]:
                 pre.append((rel + added, k))
                 added += KEY_STEP
@@ -244,8 +254,13 @@ PAD = {   # level: [(teleport x, y, z, rotY, walk), ...] legs; the last one reac
     2: [(150.0, 0.0, 0.0, -0.9270, 240), (546.4, -16.3, -318.1, -0.8180, 530)],
     3: [(-253.0, 0.0, -325.4, 2.0852, 250), (-253.0, 0.0, -325.4, 2.0852, 560)],
     4: [(381.3, 0.0, -5.7, -3.0752, 250), (1711.7, -412.4, 968.4, -0.9589, 300)],   # the last leg: a teleport past the open door (no straight walk found)
+    # round 13 b1: one walk from the plaza over the three slots, through the door that their keys
+    # open and down the way to the portal (5: rotY 2.03 misses the slots, 2.16 stops 200 short)
+    5: [(-200.0, 0.0, 128.0, 2.0800, 700)],
+    6: [(-12.0, 0.0, 300.0, 3.1416, 800)],
 }
-CINEMA_AFTER = {2: 260, 3: 510, 4: 120}     # last leg start -> the level's first intro cinema
+CINEMA_AFTER = {2: 260, 3: 510, 4: 120,     # last leg start -> the level's first intro cinema
+                5: 420, 6: 470}             # 5, 6: -> the portal's warp (the leg start + 10 + these)
 OLD_CINEMA = {2: 13420, 3: 13410, 4: 13420}  # the same frame in the level's own --level N run
 PRIMAGEN_SLOTS = {1: (71.0, 0.0, 183.0), 2: (133.0, 0.0, 38.0), 3: (37.0, 0.0, -85.0),
                   4: (-119.0, 0.0, -71.0), 5: (-86.0, 0.0, 203.0), 6: (-185.0, 0.0, 73.0)}
@@ -321,7 +336,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None):
     r.anchors.append((c, 12))
     r.note(c, "12.. the Death Marshes intro cinemas (level 3 route shifted by %d)" % shift)
     l3s = pt.L3_START + shift
-    a3 = level_segments(r, pt.L3_SEGMENTS, l3s, L3_KEYS if extras else {})
+    a3 = level_segments(r, pt.L3_SEGMENTS, l3s, L3_KEYS if extras else {}, anchor=L3_ANCHOR)
     rel, length, lv = pt.L3_TOTEM
     r.note(l3s + rel + a3, "111 the Marsh Totem: fire taps")
     r.fire.append((l3s + rel + a3, l3s + rel + a3 + length))
@@ -336,7 +351,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None):
     r.anchors.append((c, 18))
     r.note(c, "18.. the Lair of the Blind intro cinemas (level 4 route shifted by %d)" % shift)
     l4s = pt.L4_START + shift
-    a4 = level_segments(r, pt.L4_SEGMENTS, l4s, L4_KEYS if extras else {})
+    a4 = level_segments(r, pt.L4_SEGMENTS, l4s, L4_KEYS if extras else {}, anchor=L4_ANCHOR)
     rel, length, lv = pt.L4_TOTEM
     r.note(l4s + rel + a4, "112 the Cave Totem: fire taps")
     r.fire.append((l4s + rel + a4, l4s + rel + a4 + length))
@@ -349,7 +364,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None):
     r.aim_node = "boss@1/2/3/4"   # the Blind One 1, the Mantid Queen 2, the Mother 3, the Primagen 4
     r.note(hubs[4], "60 the hub (after level 4)")
     r.anchors.append((hubs[4], 60))
-    end = hub(r, hubs[4], primagen=(4,))
+    end = hub(r, hubs[4], primagen=(4,), go=5 if upto >= 5 else None)
     for lvl, hook in sorted(LEVEL_HOOKS.items()):
         if lvl <= upto:
             end = hook(r, end)
@@ -359,12 +374,16 @@ def main_all(out, upto=6, extras=True, hubs_in=None):
 # Measured hub arrivals (the first "level 60" T2_STATE_LOG line after each level's totem/boss)
 HUB_AT = {1: 23780, 2: 84124, 3: 108124, 4: 140500}
 
-# ---- levels 5 and 6 (round 12 C27): routes56.py's routes from the hub after level 4 ----
-# The level 5 and 6 doors of the hub are not opened (their keys are not all in the route: 62/68's
-# level-5 keys, 103's level-6 key, levels 5/6's Primagen keys): the run teleports onto each portal's
-# approach in the plaza past the door, as --level 5/6 do (DEBUG-ASSISTED). The Primagen (7602) is a
-# T2_WARP_TO hop from the hub (the hub's way to him needs the six Primagen keys).
-PORTAL_TO_START = {5: r56.L5_START - (r56.HUB_ARRIVAL + 200), 6: r56.L6_START - (r56.HUB_ARRIVAL + 200)}
+# ---- levels 5 and 6 (round 12 C27; round 13 b1: their keys, doors and items, the Primagen's portal) ----
+# The hub after level 4: Primagen key 4 in its slot, then one walk over the level-5 key slots (the
+# three level-5 keys of 61, 62 and 68), through the door they open and into the portal 5000. Level 5
+# (routes56.py, with the detour to 92 for Primagen key 5), the Hive Totem, the Queen, the hub: a save,
+# Primagen key 5 in its slot, one walk over the six level-6 key slots (100, 103, 105 of level 4; 84,
+# 87, 89 of level 5), through the door and into the portal 6000. Level 6 picks up its own 16 crystal
+# ion capacitors and two red laser cells (routes56.L6_ITEMS) and Primagen key 6 (114). After the
+# Mother, the hub: Primagen key 6 in the sixth slot fires the hub portal cinema (level 43), which
+# ends in the Primagen's lair (the warp 7602's place): no T2_WARP_TO, no T2_GIVE_ITEMS.
+WARP_TO_START = {5: r56.L5_START - (r56.HUB_ARRIVAL + 240), 6: r56.L6_START - (r56.HUB_ARRIVAL + 270)}
 LOAD_EARLY = 200        # each level is loaded ~200 frames before its route's start
 L5_HUB_AFTER = 25800    # the hub after the Mantid Queen, from L5_START (--level 5: 43,500 - 17,700)
 L5_TOTEM_AT = 14300     # 113 (the Hive Totem) reached, from L5_START
@@ -374,61 +393,56 @@ L5_QUEEN_AT = 15900     # level 2 (the Queen) reached
 # warp 6999, then its pad 7601 to the hub; the continuous run: the hub straight). So the steps
 # after her hang on anchors: "114/60" at L6_BACK_114 after her arena (she dying earlier only means
 # a wait, the anchor fires from 3,000 before), then "60" (in the hub straight, it fires at once and
-# skips the 114 teleport). The hop to the Primagen a fixed time after, as in --level 6 (the hub
-# 53,000, the hop 54,000, the hub after the credits 105,000).
+# skips the 114 teleport).
 L6_BACK_114 = 26000
 L6_EXIT_AFTER = 500     # the exit teleport, after 114 is reached again
-L6_HUB_AFTER = 800      # the hub
-L6_HOP_AFTER = 2100     # the hop to the Primagen (1,300 frames after the hub: his stage-3 lair wait then ends
-                        # by itself; from 1,000 after it he rested at z 2,924, where no T2_BOSS_FRONT spot ends it)
-L6_HUB_END = 51000      # the hub after the credits, from the hop
-
-
-def to_portal(r, t, lv):
-    x, y, z, ry = r56.L5_PORTAL if lv == 5 else r56.L6_PORTAL
-    r.note(t, "60 the hub: onto the level %d portal (warp %d000; teleported past its door)" % (lv, lv))
-    r.tp(t, x, y, z, ry)
-    r.inputs.append("CU@%d..%d" % (t + 10, t + 300))
-    return t + PORTAL_TO_START[lv]
+L6_HUB_AFTER = 800      # the hub (6999's place: the level-6 corridor)
+L6_WALK_AFTER = 200     # the walk back down the corridor to the plaza, after the hub
+L6_SLOT_AFTER = 650     # Primagen key 6 into its slot, after the hub
+L6_CINEMA = 1150        # the slot -> the hub portal cinema (43) -> the Primagen's lair (level 4)
+L6_HUB_END = 49500      # the hub after the credits, from the Primagen's lair (the hop's 51,000 - 1,500)
+PRIMAGEN_KEY = "4@%d"   # the anchor on his lair
 
 
 def level5(r, t):
-    s = to_portal(r, t, 5)
+    """t: the frame the hub portal 5000 warps (hub(..., go=5))."""
+    s = t + WARP_TO_START[5]
+    segs, add = r56.l5_with_primagen_key()
     r.anchors.append((s - LOAD_EARLY, 124))
-    r.note(s - LOAD_EARLY, "124.. the Hive of the Mantids (level 5 route from %d)" % s)
+    r.note(s - LOAD_EARLY, "124.. the Hive of the Mantids (level 5 route from %d, + the 92 detour)" % s)
     r.weapon.append((t, "9"))       # the shredder (the cocoons; a1's route)
     r.fill.append((t, "100"))
-    r.steps(r56.L5_SEGMENTS, s)
+    r.steps(segs, s)
     rel, length, lv = r56.L5_TOTEM
-    r.anchors.append((s + L5_TOTEM_AT, lv))
-    r.note(s + rel, "113 the Hive Totem: fire taps (T2_FACE_NEAREST aims)")
-    r.fire.append((s + rel, s + rel + length))
+    r.anchors.append((s + L5_TOTEM_AT + add, lv))
+    r.note(s + rel + add, "113 the Hive Totem: fire taps (T2_FACE_NEAREST aims)")
+    r.fire.append((s + rel + add, s + rel + add + length))
     r.face_levels.append(lv)
     rel, length = r56.L5_BOSS
-    r.anchors.append((s + L5_QUEEN_AT, 2))
-    r.note(s + rel, "2 the Mantid Queen: fire held, T2_AIM_NODE=boss@2, T2_BOSS_FRONT=450,200")
-    r.inputs.append("Z@%d..%d" % (s + rel, s + rel + length))
-    r.boss_front.append((s + rel - 100, "450,200"))
-    hub_at = s + L5_HUB_AFTER
+    r.anchors.append((s + L5_QUEEN_AT + add, 2))
+    r.note(s + rel + add, "2 the Mantid Queen: fire held, T2_AIM_NODE=boss@2, T2_BOSS_FRONT=450,200")
+    r.inputs.append("Z@%d..%d" % (s + rel + add, s + rel + add + length))
+    r.boss_front.append((s + rel + add - 100, "450,200"))
+    hub_at = s + L5_HUB_AFTER + add
     r.note(hub_at, "60 the hub (after level 5)")
     r.anchors.append((hub_at, 60))
-    return hub(r, hub_at)          # a save; no key goes in
+    return hub(r, hub_at, primagen=(5,), go=6)   # a save, Primagen key 5, the level-6 door and portal
 
 
 def level6(r, t):
-    s = to_portal(r, t, 6)
+    """t: the frame the hub portal 6000 warps (hub(..., go=6))."""
+    s = t + WARP_TO_START[6]
+    segs, add = r56.with_items(r56.L6_SEGMENTS, r56.L6_ITEMS)
     r.anchors.append((s - LOAD_EARLY, 114))
-    r.note(s - LOAD_EARLY, "114.. the Lightship (level 6 route from %d)" % s)
+    r.note(s - LOAD_EARLY, "114.. the Lightship (level 6 route from %d, its items picked up: +%d)" % (s, add))
     r.weapon.append((t, "10"))
     r.fill.append((t, "600"))
-    for rel, spec in r56.L6_GIVE:   # DEBUG-ASSISTED: the capacitors and the red laser cells
-        r.give.append((s + rel, spec))
-    r.steps(r56.L6_SEGMENTS, s)
-    m = s + r56.L6_MOTHER
+    r.steps(segs, s)
+    m = s + r56.L6_MOTHER + add
     r.anchors.append((m, 3))
     r.note(m, "3 the Mother: fire held, T2_AIM_NODE=boss@3, strafing with steps back")
     r.inputs += ["Z@%d..%d" % (m + 800, m + L6_BACK_114), "CL@%d..%d" % (m + 5800, m + 15000)]
-    r.inputs += ["CD@%d..%d" % (f, f + 250) for f in range(m + 5800, s + r56.L6_MOTHER_END, 600)]
+    r.inputs += ["CD@%d..%d" % (f, f + 250) for f in range(m + 5800, s + r56.L6_MOTHER_END + add, 600)]
     back = m + L6_BACK_114
     r.anchors.append((back, "114/60"))
     _, x, y, z, ry = r56.L6_EXIT
@@ -436,18 +450,23 @@ def level6(r, t):
     r.note(back + L6_EXIT_AFTER, "114: the pad 7601 by the start -> the hub")
     r.tp(back + L6_EXIT_AFTER, x, y, z, ry)
     r.inputs.append("CU@%d..%d" % (back + L6_EXIT_AFTER + 10, back + L6_EXIT_AFTER + 130))
-    r.note(back + L6_HUB_AFTER, "60 the hub (after level 6)")
-    r.anchors.append((back + L6_HUB_AFTER, 60))
-    hop = back + L6_HOP_AFTER
-    r.note(hop, "60 -> 4 the Primagen (T2_WARP_TO=7602, DEBUG-ASSISTED): fire held, T2_BOSS_FRONT=450,600,2.5,1")
-    r.warps.append((hop, 7602))
-    # the spot cycles (",K,1": another one each 600 frames of a lair wait that does not end): the
-    # first continuous run's Primagen rested at z 2,924 in stage 3, where 450 beside / 2.5 x 450 in
-    # front did not see his eye
-    r.boss_front.append((hop, "450,600,2.5,1"))
-    r.inputs.append("Z@%d..%d" % (hop + 200, hop + L6_HUB_END))
-    end = hop + L6_HUB_END
-    r.note(end - 21000, "the Primagen dead (~30,000 after the hop): the ending cinema, then the credits")
+    h = back + L6_HUB_AFTER
+    r.note(h, "60 the hub (after level 6: 6999's place in the level-6 corridor)")
+    r.anchors.append((h, 60))
+    r.note(h + L6_WALK_AFTER, "60 the hub: back down the corridor through the level-6 door to the plaza")
+    r.inputs.append("CU@%d..%d" % (h + L6_WALK_AFTER, h + L6_SLOT_AFTER - 50))
+    f = h + L6_SLOT_AFTER
+    x, y, z = PRIMAGEN_SLOTS[6]
+    r.note(f, "60 the hub: Primagen key 6 slot: the six keys in: the hub portal cinema (43) -> the Primagen")
+    r.pick(f, x, y, z, math.atan2(x, z))
+    lair = f + L6_CINEMA
+    r.anchors.append((lair, 4))
+    r.note(lair, "4 the Primagen's lair: fire held, T2_BOSS_FRONT=450,600,2.5,1")
+    # the spot cycles (",K,1": another one each 600 frames of a lair wait that does not end)
+    r.boss_front.append((lair - 100, "450,600,2.5,1"))
+    r.inputs.append("Z@%d..%d" % (lair + 200, lair + L6_HUB_END))
+    end = lair + L6_HUB_END
+    r.note(end - 21000, "the Primagen dead (~30,000 after his lair): the ending cinema, then the credits")
     r.note(end, "60 the hub (after the credits)")
     r.end = end + 1500
     return r.end
@@ -463,7 +482,7 @@ if __name__ == "__main__":
     ap.add_argument("--upto", type=int, default=6)
     ap.add_argument("--no-extras", action="store_true")
     ap.add_argument("--hub", action="append", default=[], help="N=FRAME: the hub arrival after level N")
-    ap.add_argument("--hop", type=int, default=L6_HOP_AFTER, help="the hop to the Primagen, frames after the hub (level 6)")
+    ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
     a = ap.parse_args()
-    L6_HOP_AFTER = a.hop
+    L6_SLOT_AFTER = a.slot
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub})
