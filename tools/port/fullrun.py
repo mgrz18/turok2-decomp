@@ -267,15 +267,19 @@ def stretch(segments, extra):
     return segs
 
 
-def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back=()):
+def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back=(), detours=None):
     """A 7-tuple segment list from `start` with keys inserted; returns the frames added.
     anchor: the segment indices whose key picks re-anchor the schedule clock when the segment's level
     is reached (T2_ANCHOR) and wait KEY_WAIT frames, so that a pick-up waits for the level when its
-    warp loads later than the route assumed (round 13 b1: 62, 68, 103)."""
+    warp loads later than the route assumed (round 13 b1: 62, 68, 103).
+    back: (segment index, dt, x, y, z, rotY) teleports inside a segment (round 13 b5).
+    detours: {segment index: level} a talisman chamber trip (talisman()) at the segment's start,
+    after its keys (round 13 b3)."""
     assert all(0 <= i < len(segments) for i in keys), "a key list past the last segment"
     added = 0
     starts = {}
     out = []
+    trips = []
     for i, (name, rel, steps, more) in enumerate(stretch(segments, extra)):
         pre = []
         if i in keys:
@@ -285,17 +289,66 @@ def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back
             for k in keys[i]:
                 pre.append((rel + added, k))
                 added += KEY_STEP
+        if detours and i in detours:
+            trips.append((rel + added, detours[i]))
+            added += TALISMAN_TRIP
         out.append((name, rel + added, steps))
         starts[i] = rel + added
         added += more
         for f, (x, y, z, ang) in pre:
             r.pick(start + f, x, y, z, ang)
+    for f, lv in trips:
+        talisman(r, start + f, lv)
     r.steps(out, start)
     for i, dt, x, y, z, ang in retry:
         r.pick(start + starts[i] + dt, x, y, z, ang)
     for i, dt, x, y, z, ry in back:
         r.tp(start + starts[i] + dt, x, y, z, ry)
     return added
+
+
+# ---- the talisman chambers (round 13 b3; PLAYTHROUGH.md section 12) ----
+# Each talisman level (73-77) is a chamber behind a portal N001 of its level: an action by the
+# pedestal (object 274/310/191/226/298, intelligence type 10, auto-go radius 512, collision
+# radius 61) needs the level's talisman piece (items 4400-4404, CActionIntelligence
+# .m_GoPickupNeeded; one lies in a sub-level of the same level); walking into it with the piece
+# plays a cinema (~1,650 frames), opens the door (actor 8, kind 6) to the talisman's dais and the
+# talisman (items 4380-4384) is picked up there. The chamber's exit N002 (by its entrance) leads
+# back to the portal.
+# level: (segment index, the piece (x, y, z, approach angle, distance) [y the floor; the approach
+#         from a region next to the piece's], the portal pad's approach (x, y, z, rotY)
+#         [a neighbouring region's centre, facing the pad], the chamber level)
+TALISMAN = {
+    2: (13, (1230.2, 409.6, -798.7, -2.2218, 90.0), (-84.8, 436.0, -192.9, 2.9878), 73),    # 132: piece 4402, portal 2001 (Leap of Faith 4382)
+    3: (9, (-2033.5, -307.2, -1457.5, -2.2721, 42.0), (-4139.1, -285.4, -2245.3, 3.0067), 74),  # 66: piece 4400 (on a ledge), portal 3001 (Breath of Life 4380)
+}
+# Not in the route: level 4 (piece 4404 in 101, portal 4001 in 99: the route passes 99 before
+# 101), level 5 (piece 4403 and portal 5001 both in 88), level 6 (piece 4401 in 122, portal 6001
+# in 121, passed before 122); `tools/port/talisman.py` plays each chamber on its own.
+# The chamber, from the frame it is reached (the T2_ANCHOR frame, TALISMAN_ANCHOR after the
+# portal's walk starts; it is reached ~160 frames into the walk): (button, from, to); the player
+# stands at (0, 0, -768) facing +z
+CHAMBER = [("CU", 300, 392),     # into the pedestal's action: the piece placed, the cinema
+           ("CU", 2150, 2550),   # through the opened door (z 467) to the dais (stops at x -62, z 530)
+           ("CR", 2600, 2609),   # a step right
+           ("CU", 2620, 2950),   # onto the dais: the talisman
+           ("CD", 3050, 3550)]   # back to the exit N002 (z -830): the portal's level again
+TALISMAN_ANCHOR = 500
+TALISMAN_TRIP = KEY_STEP + TALISMAN_ANCHOR + 3550 + 600
+
+
+def talisman(r, t, lv):
+    """The piece of level lv's talisman, its portal, the chamber and back (TALISMAN_TRIP frames)."""
+    seg, (px, py, pz, pa, pd), (x, y, z, ry), chamber = TALISMAN[lv]
+    r.note(t, "%d: the talisman piece, the portal %d001 -> %d (the chamber)" % (lv, lv, chamber))
+    r.pick(t, px, py, pz, pa, pd)
+    t += KEY_STEP
+    r.tp(t, x, y, z, ry, 40)
+    c = t + TALISMAN_ANCHOR
+    r.anchors.append((c, chamber))
+    r.note(c, "%d the talisman chamber: the pedestal, the door, the talisman, the exit %d002" % (chamber, lv))
+    for b, f0, f1 in CHAMBER:
+        r.inputs.append("%s@%d..%d" % (b, c + f0, c + f1))
 
 
 # ---- the hub between levels ----
@@ -378,10 +431,19 @@ def hub(r, arrival, grant=(), primagen=(), save=True, go=None):
     return t + CINEMA_AFTER[go]
 
 
-def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(), health=True, cheats_on=()):
+def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(), health=True, cheats_on=(),
+             talismans=()):
     """hubs: the measured hub arrivals {after level: frame} (HUB_AT). no_cheats: the levels played
-    without T2_CHEATS invincibility (each from its hub visit before it); extra_env: more env lines."""
-    hubs = dict(HUB_AT); hubs.update(hubs_in or {})
+    without T2_CHEATS invincibility (each from its hub visit before it); extra_env: more env lines.
+    talismans: the levels whose chamber trip is made (TALISMAN: 2, 3; each moves the later hub
+    arrivals by TALISMAN_TRIP)."""
+    hubs = dict(HUB_AT)
+    for lv in talismans:
+        for k in hubs:
+            if k >= lv:
+                hubs[k] += TALISMAN_TRIP
+    hubs.update(hubs_in or {})
+    det = {lv: {TALISMAN[lv][0]: lv} for lv in talismans}
     r = Route()
     r.no_cheats = set(no_cheats)
     r.cheats_on = set(cheats_on)
@@ -405,7 +467,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     h2 = health and 2 in r.no_cheats
     a2 = level_segments(r, pt.L2_SEGMENTS, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}) if extras else {},
                         L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else []), L2_STRETCH,
-                        back=L2_RETURN_LATE if h2 else ())
+                        back=L2_RETURN_LATE if h2 else (), detours=det.get(2))
     t_arr = pt.L2_TOTEM_ARRIVAL + shift + a2
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
     if 110 in r.cheats_on:
@@ -426,7 +488,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.anchors.append((c, 12))
     r.note(c, "12.. the Death Marshes intro cinemas (level 3 route shifted by %d)" % shift)
     l3s = pt.L3_START + shift
-    a3 = level_segments(r, pt.L3_SEGMENTS, l3s, L3_KEYS if extras else {}, anchor=L3_ANCHOR)
+    a3 = level_segments(r, pt.L3_SEGMENTS, l3s, L3_KEYS if extras else {}, anchor=L3_ANCHOR, detours=det.get(3))
     rel, length, lv = pt.L3_TOTEM
     r.note(l3s + rel + a3, "111 the Marsh Totem: fire taps")
     r.fire.append((l3s + rel + a3, l3s + rel + a3 + length))
@@ -580,9 +642,11 @@ if __name__ == "__main__":
     ap.add_argument("--env", action="append", default=[], help="K=V: one more line for teleport.env (e.g. T2_HURT_LOG=1)")
     ap.add_argument("--cheats-on", default="", help="110: the City Totem invincible even in a --cheats-off level (round 13 b5)")
     ap.add_argument("--no-health", action="store_true", help="skip the health pickups (round 13 b5)")
+    ap.add_argument("--talismans", nargs="?", const="2,3", default="",
+                    help="the talisman chambers of these levels (default 2,3; round 13 b3)")
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
     a = ap.parse_args()
     L6_SLOT_AFTER = a.slot
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},
              [int(x) for x in a.cheats_off.split(",") if x], a.env, not a.no_health,
-             [int(x) for x in a.cheats_on.split(",") if x])
+             [int(x) for x in a.cheats_on.split(",") if x], [int(v) for v in a.talismans.split(",") if v])
