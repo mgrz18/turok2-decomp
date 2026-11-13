@@ -1633,3 +1633,101 @@ twice per frame. That is matching code (the ROM does the same), so it is not a h
   costs ~156. No health is reachable between 135 and 110: the eight +10s of 132 hang in an arc at
   y 1,229-1,300 over a floor at 1,024, 132's ultra health lies in the water (b5: 330-740 lost
   there), and 73 has none.
+
+## 17. Levels 3 and 4 without invincibility (Phase 7 round 14, part c1)
+
+`fullrun.py --cheats-off 3,4` now plays the Death Marshes and the Lair of the Blind with no
+`T2_CHEATS` invincibility, every sub-level, both totems and the Blind One, **with 0 deaths**. All
+the changes apply only to a level named in `--cheats-off` (the default `--all` and the
+`--cheats-off 1,2[,5,6]` routes are input-for-input unchanged: their playthrough.txt and
+teleport.env are identical to c8414758's).
+
+### 17.1 What killed the player (T2_HURT_LOG, rescue runs)
+
+- **69, 70, 71 (the ammo storages): an ambush, not a host bug.** "armory destroyed." wakes a
+  group of obj-230 gunners on the balconies over the charge point (69: instances 7, 8, 12, 13;
+  70: four woke 4 frames after the message). Round 12's route stood by the charge point until
+  +600, so they shot it from +470: 44 health in 16 frames in 69, 100 in 36 frames in 70.
+- **64: the marsh.** The second satchel charge lies on an island (region info 14, floor 2.8);
+  round 12 stood in the water beside it (region info 12: flags 0x40180001, 75 health per
+  `m_DamageInterval` 1.0, i.e. every 15 game frames; the values come straight from the level
+  data, levels.py `collision.region_infos`). Two of those and the player was dead.
+- **The obj-230 "3 hits per hit"**: one burst is two shots by design and the third is the
+  game's own hold of the last frame. `T2_ANIM_LOG=230` (new, DEBUG-ONLY: one `animev:` line per
+  animation event an object type fires) shows the gunner's fire animation (anim 1, 3 frames,
+  clip header blendFrames 0, loopStart 2, rate 15) firing event 2 (frame 0, effect 3: the
+  hit) at gf N and event 3 (frame 2, effect 3) at gf N+4 **and N+5**: at N+4 the time passes the
+  last frame and `CAnimationState__GetRootMotion` (func_00218B10) wraps it to loopStart 2 = the
+  last frame (a hold); at N+5 it advances from 2.0 again and `FireAnimEvents` fires [2.0, 2.5)
+  a second time, until the AI changes the animation. The decomp is byte-identical to the N64's
+  code, the clip header is swapped as two u16 (tools/assets/swap_spec.json: `u16:blendFrames
+  u16:loopStart`), and the damage is effect 3 = `ImpactEvent_DirectDamage` (flags 0x100000, no
+  falloff; 13-42 per shot by gunner kind). So the N64 does the same unless its AI leaves the
+  animation one frame earlier. **Not traced on the N64** (no warp into 69 on the emulator; the
+  route no longer stands in their fire, so it does not matter to the run).
+
+### 17.2 The route changes (fullrun.py `L3_*`, `L4_*`)
+
+| where | change |
+|---|---|
+| 61 | the two health +10 beside the first satchel charge (object 542) |
+| 69 | the full health (object 545, (150, 0, -165), reachable from -z only) before the charge; after the charge walk, the player waits by the exit warp 3778 (a floor below the gunners, out of sight) and walks into it at +480 (the armory blows at ~+440) |
+| 64 | the satchel from the island's +x side (stand x -1150, walk 25: 40 frames run off the island's edge at x -1385), through the island's third health +10; the other two +10 picked first |
+| 70, 71 | the same wait at the exit warp (3779 / 3781), into it at +460 / +480 |
+| 66 | the ultra health (object 548, (2634, -560, 2052)) before the Marsh Totem |
+| 100, 105, 103 | the full health by the level key, a full health on 105's second visit, 103's ultra health by the exit 7400 (the Cave Totem next) |
+| the three fights: the Marsh Totem, the Cave Totem, the Blind One | the scorpion launcher (16) instead of the plasma rifle (`T2_WEAPON` is applied when a level loads, so the switch is scheduled in 68 / 103, before the totem's level; back to 10 at the next hub) |
+
+Health objects (the level actors in levels.py's grid sections; the y in the picks is the floor):
+542 health +10, 545 full health, 548 ultra health. The hub anchors after levels 3 and 4 move with
+the picks (150 frames each), and the next level's `T2_CHEATS` setting starts there.
+
+**The weapon at the Blind One.** With the plasma rifle and no invincibility she was never hurt:
+hp 12,800/12,800 to the end of the run (the player stands on the ledge, y 74.9, with fire held and
+`T2_AIM_NODE=boss`; with invincibility the same fight ran 10,000-34,500 frames). With the
+scorpion launcher she dies 5,200 frames after her arena loads. At the Cave Totem the plasma
+rifle took 200 damage (17 hits of 9 from obj 92 and 6 of 8 from obj 95) and a life; the scorpion
+launcher 88 and won it 1,160 frames earlier. The Marsh Totem with the plasma rifle: 62 damage in
+one run, 272 and a life lost in another (levels 1-2 invincible: another entry state); with the
+scorpion launcher 15-16 in both.
+
+### 17.3 The run (Linux, headless, PIE, Debug; host frames)
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4 --cheats-on 110 --slot 300
+# run as in STATUS.md section 1, --frames 300000
+```
+
+**0 deaths in levels 1-4** (levels 5 and 6 invincible); two runs identical (every
+progress/event/hit/hurt/death/state/bosstrace line):
+
+| sub-level | hits | damage | lowest health |
+|---|---|---|---|
+| 61, 62, 63, 65-68, 69, 70, 71 | 0 | 0 | |
+| 64 | 5 | 24 | 78 |
+| 111 the Marsh Totem (won 105,987) | 11 | 16 | 184 |
+| 106 / 102 / 107 / 108 | 5 / 2 / 4 / 4 | 6 / 2 / 5 / 7 | 178 / 176 / 171 / 164 |
+| 112 the Cave Totem (won 126,872) | 13 | 97 | 103 |
+| 1 the Blind One (dead 136,119) | 64 | 91 | **12** |
+
+Then levels 5 and 6 as before (invincible; the Queen dead 170,475, the Mother 214,164) and the
+hub. **The Primagen hop does not end this run**: after the hop his lair wait (hp 25,600, the
+no-end spot of section 16.3) never ends, with `--slot` 300, 400, 650, 800, 1,100 or 1,500 (200 makes
+the slot walk overlap the corridor walk). The same levels 1-4 with the plasma rifle at the Marsh
+Totem (commit e7ec5a5a, one fight different) did end: with `--slot 300` the Primagen died at
+249,859 with cinema 370 (the good ending), "END 2", the credits and the hub at 270,749, exit 0,
+two runs identical (with the default 1,100 it did not). The hop's timing is c3's part this round
+(the real entrance with the six keys); the levels 1-4 part does not depend on it.
+
+Other configurations: `--cheats-off 3,4` alone (levels 1-2 invincible, so another entry state):
+0 deaths with the scorpion launcher at the Marsh Totem (111: 15 damage; the Blind One lowest 79),
+a life lost at the Marsh Totem without it (272 damage). `--cheats-off 1,2,3,4,5,6`: levels 1-4 as
+above, level 5's 124 then kills the player four times (c2's part).
+
+### 17.4 Still open
+
+- The obj-230 hold-frame double shot against the N64 (an RDRAM warp into 69 for n64trace).
+- The Primagen's lair wait depends on the hop frame (`--slot`) and on the state the earlier levels
+  leave: c3's part this round.
+- The Blind One's margin is thin in the whole run (lowest health 12; 31 and 79 in other runs): she
+  is fought from the ledge with fire held; no health lies between the Cave Totem and her arena.

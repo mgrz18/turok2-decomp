@@ -138,6 +138,10 @@ void CGameObjectInstance__FireAnimEvents(ObjectLinks *obj, void *anim, f32 from,
             if (fire != 0 && !T2Port_AnimEventsEnabled()) {
                 fire = 0;
             }
+            if (fire != 0) {
+                void T2Port_AnimEventLog(void *obj, void *anim, int i, int frame, float from, float to, int effect);
+                T2Port_AnimEventLog(obj, anim, i, events[i].frame, from, to, events[i].effect); /* DEBUG-ONLY (T2_ANIM_LOG) */
+            }
 #endif
             if (fire != 0) {
                 ImpactEvent_Send(obj, obj, events[i].effect, -1, pos, events[i].params);

@@ -315,6 +315,42 @@ Next: the Mother without invincibility (compare her 10-damage ranged hit with th
 other cover in her arena); ride the 504 platforms to 119's couplings instead of the air starts
 and escapes; health for the City Totem (a reachable pickup, or 135's ultra health later).
 
+## Round 14, part c1: levels 3 and 4 without invincibility (branch names-R14_c1)
+
+`fullrun.py --cheats-off 3,4` plays the Death Marshes and the Lair of the Blind, both totems and
+the Blind One with no `T2_CHEATS` invincibility and **0 deaths** (PLAYTHROUGH.md section 17,
+GAMEPLAY.md section 14). The whole game with levels 1-4 played this way:
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4 --cheats-on 110 --slot 300
+# run as in section 1 with --frames 300000
+```
+
+0 deaths in levels 1-4 (levels 5-6 still invincible): the Marsh Totem won 105,987, the Cave
+Totem 126,872, the Blind One dead 136,119 (lowest health 12), two runs identical. **The Primagen
+hop then does not end** (his lair wait, any `--slot` tried: 300-1,500). The same levels with the
+plasma rifle at the Marsh Totem (e7ec5a5a) did: `--slot 300`, the Primagen dead 249,859 (cinema
+370), "END 2", the credits, the hub 270,749, exit 0, two runs identical. The hop is c3's part.
+
+- **Not host bugs**: the deaths came from the route. The ammo storages (69, 70, 71) wake an ambush
+  of obj-230 gunners when the armory blows: the player now waits at the exit warp, out of sight,
+  and leaves after the blast. 64's satchel step stood in marsh water (75 health every 15 game
+  frames, level data): now from the satchel's island. The obj-230 "3 hits per burst" is the
+  game's own last-frame hold re-firing an animation event (same code and data as the N64; not
+  traced on the N64).
+- **Health on the way** (only in a `--cheats-off` level): 61 2x +10, 69 full, 64 2x +10, 66 ultra;
+  100 full, 105 full, 103 ultra. The hub anchors move with them.
+- **The scorpion launcher (16)** for the Marsh Totem, the Cave Totem and the Blind One: with the
+  plasma rifle the Blind One was never hurt without invincibility, and each totem took a life in
+  some runs.
+- New DEBUG-ONLY switch `T2_ANIM_LOG=OBJ[,OBJ]`: one `animev:` line per animation event an object
+  type fires (src/us/code/func_0021ABC8.c under TARGET_PORT, asm_diff 0).
+- Unchanged: the default `--all` and the `--cheats-off 1,2[,5,6]` routes (their generated
+  playthrough.txt and teleport.env are byte-identical to c8414758's).
+- Merge notes: tools/port/fullrun.py (new `L3_HEALTH`, `L3_*_NOCHEATS`, `l3_segments`,
+  `L4_HEALTH`, the weapon schedule and hub shifts in `main_all`'s level-3/4 part; c2 and c3 edit
+  other parts of the same file), port/game/t2debug.c (appended function).
+
 ## Round 13, part b4: the whole game on macOS, a release build, how to play (branch names-R13_b4)
 
 Details: [MACOS.md](MACOS.md) section 15, [QUICKSTART.md](QUICKSTART.md) (new).
