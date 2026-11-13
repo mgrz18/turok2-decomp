@@ -1562,79 +1562,7 @@ To make it work, the route needs:
 2. the weapon and ammo pickups on the way (`itemreach.py` on levels 51-59 and 125-133);
 3. the fights retimed for weaker weapons (more fire windows).
 
-## 17. Levels 5 and 6 without invincibility (Phase 7 round 14, part c2)
-
-```sh
-python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,5,6 --cheats-on 110,3,4
-```
-
-`--cheats-on` now also takes 3 (the Mother's arena) and 4 (the Primagen's lair): invincible only
-inside that fight, in a `--cheats-off 6` run. Levels 3 and 4 stay invincible here (part c1).
-
-**The result** (Linux, headless, PIE, Debug, 290,000 frames, `T2_HURT_LOG=1`, i.e. no rescue; two
-runs identical, md5 of every `progress`/`event`/`pickup`/`hurt`/`death`/`bosstrace` line): all five
-totems, the four bosses (the Queen 173,645, the Mother 219,614, the Primagen 252,317), cinema 370,
-the credits, the hub at 273,207; exit 0. **0 deaths in levels 1, 2, 5 and 6** (the one `death:`
-line is the Primagen's own death sequence, health set to 0, as in round 13).
-
-| sub-level | hits | damage | lowest health |
-|---|---|---|---|
-| 124 (level 5) | 15 | 41 | 53 |
-| 113 the Hive Totem | 12 | 23 | 130 |
-| 2 the Mantid Queen | 20 | 48 | 82 |
-| 117 (level 6) | 19 | 21 | 61 |
-| 115, 116, 119, 123 | 0 | 0 | |
-
-### 17.1 What killed the player in level 6 (route bugs, not host bugs)
-
-A `--cheats-off 6` run lost all its lives before the Mother. Every death was the route's,
-in the damage regions under the round-13 item and coupling approaches (region info flag 0x80000,
-`AI_UpdateRegionFlags`), and one laser:
-
-- **115**: the third capacitor (2611, 41, -2304) hangs over a pool (y -214.7, 25 every 0.5 s).
-  The "air" walk landed in it. Now it is a `pit` pick: the walk from 40 out collects it within 36
-  frames, and a teleport 38 frames in puts the player on the floor at y -2. The landing would come
-  at 43 frames.
-- **116**: the first capacitor's 50-frame walk went past it and off the ledge (z -5,170) into a
-  pool (25 every 0.5 s). The walk is now 20 frames.
-- **119**: the generator stands in a pool: floor y -307.2, region info 5, **50 every 0.5 s**. The
-  couplings' air starts (y -110) fell into it, 2 lives per run. Now each start has a 20-frame walk
-  (it was 50), and 25 frames in, a teleport onto the room's walkway (y -153.6, ~700 out, no damage),
-  facing away (`routes56.L6_119_ESCAPE`). All 4 couplings still go, and generator 3 recalibrates.
-  How the N64 player gets up there: the four objects 504 (type 1602, intelligences 1095-1098) at
-  the pool's corners are probably moving platforms. 115 has one too, beside the hanging capacitor.
-  Not followed up.
-- **123**: the capacitor (0, 1.7, -1331) was approached from z -1,241. That is inside a laser beam
-  (object 302 at (0, 25.6, -1228.8): 40 + 14 + 12 damage per touch, a touch every 4 frames). It is
-  now approached from -z (z -1,421) with a 20-frame walk.
-
-The pool damage comes 1-2 hits at a time, because `CPlayer__Update` calls `AI_UpdateRegionFlags`
-twice per frame. That is matching code (the ROM does the same), so it is not a host bug.
-
-### 17.2 Health on the way
-
-- Level 5: 95's ultra health (870, 614, 2458; object 548 = item 1704) on embryo 2's visit
-  (`routes56.L5_HEALTH`, only with `--cheats-off 5`). 92's ultra health was tried and dropped: its
-  walk went over the ledge behind it, a fall and a life lost.
-- Level 6: two of 114's four ultra healths ((+-870, 155.7, -1178)) on the last 114 visit, before
-  the Mother. The player enters her arena with 200.
-
-### 17.3 Still invincible, and why
-
-- **The Mother (3)**: 250-330 damage in rescue runs; 300 without rescue, from 200 health: 2
-  lives lost and a GAME OVER. Most of it is her 10-damage hit from her body at ~1,240 units
-  (source kind 1, object 77), every 70-230 frames while the player stands and fires. Other
-  strafes did no better (standalone level 6, `T2_HURT_LOG=2`): strafing left from her arena +5,800
-  (the recipe) 292; from +2,500 256; from +1,500 325; from +800 325; strafing right 480-491. Her
-  arena has no health. Not compared with the N64.
-- **The Primagen (4)**: ~280 damage and a life lost in a rescue run (round-13 route).
-- **The City Totem (110)**: without it, 150 damage and **2 lives lost** (the totem is still won).
-  The player arrives with 44 health. 135's ultra health is taken at 135's start, and sister 3
-  costs ~156. No health is reachable between 135 and 110: the eight +10s of 132 hang in an arc at
-  y 1,229-1,300 over a floor at 1,024, 132's ultra health lies in the water (b5: 330-740 lost
-  there), and 73 has none.
-
-## 17. Levels 3 and 4 without invincibility (Phase 7 round 14, part c1)
+## 18. Levels 3 and 4 without invincibility (Phase 7 round 14, part c1)
 
 `fullrun.py --cheats-off 3,4` now plays the Death Marshes and the Lair of the Blind with no
 `T2_CHEATS` invincibility, every sub-level, both totems and the Blind One, **with 0 deaths**. All
@@ -1642,7 +1570,7 @@ the changes apply only to a level named in `--cheats-off` (the default `--all` a
 `--cheats-off 1,2[,5,6]` routes are input-for-input unchanged: their playthrough.txt and
 teleport.env are identical to c8414758's).
 
-### 17.1 What killed the player (T2_HURT_LOG, rescue runs)
+### 18.1 What killed the player (T2_HURT_LOG, rescue runs)
 
 - **69, 70, 71 (the ammo storages): an ambush, not a host bug.** "armory destroyed." wakes a
   group of obj-230 gunners on the balconies over the charge point (69: instances 7, 8, 12, 13;
@@ -1666,7 +1594,7 @@ teleport.env are identical to c8414758's).
   animation one frame earlier. **Not traced on the N64** (no warp into 69 on the emulator; the
   route no longer stands in their fire, so it does not matter to the run).
 
-### 17.2 The route changes (fullrun.py `L3_*`, `L4_*`)
+### 18.2 The route changes (fullrun.py `L3_*`, `L4_*`)
 
 | where | change |
 |---|---|
@@ -1691,7 +1619,7 @@ launcher 88 and won it 1,160 frames earlier. The Marsh Totem with the plasma rif
 one run, 272 and a life lost in another (levels 1-2 invincible: another entry state); with the
 scorpion launcher 15-16 in both.
 
-### 17.3 The run (Linux, headless, PIE, Debug; host frames)
+### 18.3 The run (Linux, headless, PIE, Debug; host frames)
 
 ```sh
 python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4 --cheats-on 110 --slot 300
@@ -1724,7 +1652,7 @@ Other configurations: `--cheats-off 3,4` alone (levels 1-2 invincible, so anothe
 a life lost at the Marsh Totem without it (272 damage). `--cheats-off 1,2,3,4,5,6`: levels 1-4 as
 above, level 5's 124 then kills the player four times (c2's part).
 
-### 17.4 Still open
+### 18.4 Still open
 
 - The obj-230 hold-frame double shot against the N64 (an RDRAM warp into 69 for n64trace).
 - The Primagen's lair wait depends on the hop frame (`--slot`) and on the state the earlier levels
@@ -1732,9 +1660,81 @@ above, level 5's 124 then kills the player four times (c2's part).
 - The Blind One's margin is thin in the whole run (lowest health 12; 31 and 79 in other runs): she
   is fought from the ledge with fire held; no health lies between the Cave Totem and her arena.
 
-## 17. The Primagen's real entrance, `--level 6` alone, Adon's chamber (Phase 7 round 14, part c3)
+## 19. Levels 5 and 6 without invincibility (Phase 7 round 14, part c2)
 
-### 17.1 Each Primagen key slot takes one key
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,5,6 --cheats-on 110,3,4
+```
+
+`--cheats-on` now also takes 3 (the Mother's arena) and 4 (the Primagen's lair): invincible only
+inside that fight, in a `--cheats-off 6` run. Levels 3 and 4 stay invincible here (part c1).
+
+**The result** (Linux, headless, PIE, Debug, 290,000 frames, `T2_HURT_LOG=1`, i.e. no rescue; two
+runs identical, md5 of every `progress`/`event`/`pickup`/`hurt`/`death`/`bosstrace` line): all five
+totems, the four bosses (the Queen 173,645, the Mother 219,614, the Primagen 252,317), cinema 370,
+the credits, the hub at 273,207; exit 0. **0 deaths in levels 1, 2, 5 and 6** (the one `death:`
+line is the Primagen's own death sequence, health set to 0, as in round 13).
+
+| sub-level | hits | damage | lowest health |
+|---|---|---|---|
+| 124 (level 5) | 15 | 41 | 53 |
+| 113 the Hive Totem | 12 | 23 | 130 |
+| 2 the Mantid Queen | 20 | 48 | 82 |
+| 117 (level 6) | 19 | 21 | 61 |
+| 115, 116, 119, 123 | 0 | 0 | |
+
+### 19.1 What killed the player in level 6 (route bugs, not host bugs)
+
+A `--cheats-off 6` run lost all its lives before the Mother. Every death was the route's,
+in the damage regions under the round-13 item and coupling approaches (region info flag 0x80000,
+`AI_UpdateRegionFlags`), and one laser:
+
+- **115**: the third capacitor (2611, 41, -2304) hangs over a pool (y -214.7, 25 every 0.5 s).
+  The "air" walk landed in it. Now it is a `pit` pick: the walk from 40 out collects it within 36
+  frames, and a teleport 38 frames in puts the player on the floor at y -2. The landing would come
+  at 43 frames.
+- **116**: the first capacitor's 50-frame walk went past it and off the ledge (z -5,170) into a
+  pool (25 every 0.5 s). The walk is now 20 frames.
+- **119**: the generator stands in a pool: floor y -307.2, region info 5, **50 every 0.5 s**. The
+  couplings' air starts (y -110) fell into it, 2 lives per run. Now each start has a 20-frame walk
+  (it was 50), and 25 frames in, a teleport onto the room's walkway (y -153.6, ~700 out, no damage),
+  facing away (`routes56.L6_119_ESCAPE`). All 4 couplings still go, and generator 3 recalibrates.
+  How the N64 player gets up there: the four objects 504 (type 1602, intelligences 1095-1098) at
+  the pool's corners are probably moving platforms. 115 has one too, beside the hanging capacitor.
+  Not followed up.
+- **123**: the capacitor (0, 1.7, -1331) was approached from z -1,241. That is inside a laser beam
+  (object 302 at (0, 25.6, -1228.8): 40 + 14 + 12 damage per touch, a touch every 4 frames). It is
+  now approached from -z (z -1,421) with a 20-frame walk.
+
+The pool damage comes 1-2 hits at a time, because `CPlayer__Update` calls `AI_UpdateRegionFlags`
+twice per frame. That is matching code (the ROM does the same), so it is not a host bug.
+
+### 19.2 Health on the way
+
+- Level 5: 95's ultra health (870, 614, 2458; object 548 = item 1704) on embryo 2's visit
+  (`routes56.L5_HEALTH`, only with `--cheats-off 5`). 92's ultra health was tried and dropped: its
+  walk went over the ledge behind it, a fall and a life lost.
+- Level 6: two of 114's four ultra healths ((+-870, 155.7, -1178)) on the last 114 visit, before
+  the Mother. The player enters her arena with 200.
+
+### 19.3 Still invincible, and why
+
+- **The Mother (3)**: 250-330 damage in rescue runs; 300 without rescue, from 200 health: 2
+  lives lost and a GAME OVER. Most of it is her 10-damage hit from her body at ~1,240 units
+  (source kind 1, object 77), every 70-230 frames while the player stands and fires. Other
+  strafes did no better (standalone level 6, `T2_HURT_LOG=2`): strafing left from her arena +5,800
+  (the recipe) 292; from +2,500 256; from +1,500 325; from +800 325; strafing right 480-491. Her
+  arena has no health. Not compared with the N64.
+- **The Primagen (4)**: ~280 damage and a life lost in a rescue run (round-13 route).
+- **The City Totem (110)**: without it, 150 damage and **2 lives lost** (the totem is still won).
+  The player arrives with 44 health. 135's ultra health is taken at 135's start, and sister 3
+  costs ~156. No health is reachable between 135 and 110: the eight +10s of 132 hang in an arc at
+  y 1,229-1,300 over a floor at 1,024, 132's ultra health lies in the water (b5: 330-740 lost
+  there), and 73 has none.
+
+## 20. The Primagen's real entrance, `--level 6` alone, Adon's chamber (Phase 7 round 14, part c3)
+
+### 20.1 Each Primagen key slot takes one key
 
 Round 13 read the six Primagen key slots as interchangeable and walked them in ring order. They
 are not. Each slot is an action (type 10) whose `m_GoPickupNeeded` is one key, read in the hub with
@@ -1766,7 +1766,7 @@ Check (a new game, `T2_WARP_TO=1999`, the six keys given, one walk per slot from
 six slot events, then the six kind-9 records together at 14,473, level 43 (the hub portal cinema)
 from 14,495, and the Primagen's lair (level 4) at 15,603.
 
-### 17.2 The whole-game run enters by the hub portal
+### 20.2 The whole-game run enters by the hub portal
 
 `fullrun.py`: `PRIMAGEN_SLOTS[k]` is now key k's slot, and `primagen_slot()` walks into it from 90
 units outside, on the line from the plaza's origin. The 7602 hop is gone. `--hop` brings it back
@@ -1791,13 +1791,13 @@ Runs (Linux headless PIE, `playthrough.py RUN --all --talismans 2 --cheats-off 1
 - With keys 2 and 3 late (`ROUND13_BUMP`): all five totems were won (as in round 13), and keys 1-5
   were in by 176,617. Key 6 went in at 220,591, followed by cinema 43, level 43 at 221,771 and the
   lair at 222,579. **The Primagen did not die**: he rested at z 2,907.7 in his stage-3 lair wait,
-  and the wait never ended (section 17.3). `--slot 1500` does not help:
+  and the wait never ended (section 20.3). `--slot 1500` does not help:
   the corridor walk (C-up until 50 frames before the slot) then runs on into the level-1 portal,
   and the run is in level 51 by 221,000. With `--hop` (DEBUG-ONLY) the hop at 232,830 reloads the lair, and
   the good ending follows: **the Primagen dead at 246,874 with cinema 370**, END 2 (level 10 from
   249,866), the hub at 267,764, cheats 0x7ffe7fd.
 
-### 17.3 `--level 6` alone: the regression is round 13 b2, and the lair wait at z ~2,906
+### 20.3 `--level 6` alone: the regression is round 13 b2, and the lair wait at z ~2,906
 
 Bisect (`--level 6` built at each merge of round 13, 100,000 frames): **b4 (45570c74) kills him**
 (the credits by 100,000). **b2 (46cd78dc) does not**. b2 restores fired level events when a level
@@ -1827,7 +1827,7 @@ target stays NULL.** From his z ~2,906:
 
 So `--level 6` and the whole-game run's late-key variant both stop on this wait.
 
-### 17.4 Adon's chamber (72)
+### 20.4 Adon's chamber (72)
 
 Not a stall. Walking in from the warp (`T2_WARP_TO=1001`, C-up 13,300-13,700) plays her scene
 (kind-9 events 13,371-15,119). The scene holds the player at (0, 0, -622) until about 16,300 (C-up

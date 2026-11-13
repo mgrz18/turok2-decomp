@@ -296,7 +296,7 @@ play mode, settings, saves, logs, controls, a first-run checklist). Mac only, al
 
 `playthrough.py RUN --all --talismans 2 --cheats-off 1,2,5,6 --cheats-on 110,3,4` (Linux, headless,
 PIE, `T2_HURT_LOG=1`, 290,000 frames) plays the good ending with **0 deaths in levels 1, 2, 5 and
-6** (two runs identical; PLAYTHROUGH.md section 17). The level-6 deaths were route bugs: approaches
+6** (two runs identical; PLAYTHROUGH.md section 19). The level-6 deaths were route bugs: approaches
 that ended in damage pools (115, 116, 119) or in 123's laser beam. These are fixed in
 `routes56.py`, together with health pickups (95's ultra health, two of 114's before the Mother).
 Still invincible: the Mother and the Primagen (`--cheats-on 3,4`: ~300 and ~280 damage, more than
@@ -318,7 +318,7 @@ and escapes; health for the City Totem (a reachable pickup, or 135's ultra healt
 ## Round 14, part c1: levels 3 and 4 without invincibility (branch names-R14_c1)
 
 `fullrun.py --cheats-off 3,4` plays the Death Marshes and the Lair of the Blind, both totems and
-the Blind One with no `T2_CHEATS` invincibility and **0 deaths** (PLAYTHROUGH.md section 17,
+the Blind One with no `T2_CHEATS` invincibility and **0 deaths** (PLAYTHROUGH.md section 18,
 GAMEPLAY.md section 14). The whole game with levels 1-4 played this way:
 
 ```sh
@@ -355,7 +355,7 @@ plasma rifle at the Marsh Totem (e7ec5a5a) did: `--slot 300`, the Primagen dead 
 
 Tools only: `tools/port/fullrun.py` (the Primagen and hub parts) and `tools/port/extras.py`
 (`--adon`). No `src/`, `include/` or archive change. Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md)
-section 17.
+section 20.
 
 - **Primagen keys 2 and 3 found: each slot takes ONE key.** Slot actor 4 takes key 1, 11 key 2,
   12 key 3, 7 key 4, 6 key 5 and 5 key 6 (`m_GoPickupNeeded`, read with gdb). Round 13 walked keys

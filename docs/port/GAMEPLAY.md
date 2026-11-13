@@ -985,4 +985,4 @@ event fired (`animev:` lines: the event, its frame, the window, the effect).
 hurts an actor standing on the ground in it by `m_DamageAmount` every `m_DamageInterval`
 fifteenths of a second of `gFrameIncrement`. The marsh water of the Death Marshes' 64 (region
 info 12: 75 every 1.0) is a death pit, from the level data; the satchel charge beside it lies
-on an island (info 14, no damage). PLAYTHROUGH.md section 17 has the route.
+on an island (info 14, no damage). PLAYTHROUGH.md section 18 has the route.

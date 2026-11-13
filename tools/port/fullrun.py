@@ -473,7 +473,7 @@ PRIMAGEN_SLOTS = {1: (71.0, 0.0, 183.0),     # actor 4  (object 154), item 4360
 # Keys 2 and 3 are picked up in levels 2 and 3 but go into their slots only in the hub visit after
 # level 5 (with key 5). Put in on the visits after levels 2 and 3, they changed the totem fights that
 # follow (the Marsh Totem 7/8 -> 4/8 kills: lost; the defences are marginal, and any change of the
-# game state before them moves their kills; see PLAYTHROUGH.md 17). Those two visits keep round 13's
+# game state before them moves their kills; see PLAYTHROUGH.md 20). Those two visits keep round 13's
 # walks instead (ROUND13_BUMP: they bump the slots of keys 6 and 5, "Primagen key N required"), so
 # levels 1-5 play exactly as in round 13; the real order is only a schedule choice of this route.
 PRIMAGEN_LATE = (2, 3)
