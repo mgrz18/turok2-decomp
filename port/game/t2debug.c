@@ -1278,3 +1278,34 @@ void T2Port_SetTotems(void) {
            (int) f[1] != 0, (int) f[2] != 0, (int) f[3] != 0, (int) f[4] != 0);
     fflush(stdout);
 }
+
+/* T2_ANIM_LOG=OBJ[,OBJ...] (DEBUG-ONLY, round 14 c1): one "animev:" line per animation event
+ * CGameObjectInstance__FireAnimEvents fires for an instance of these object types: the event's
+ * index and frame, the [from, to) window it fell in, its impact effect and the animation, to tell
+ * a burst of distinct events from one event fired more than once. */
+void T2Port_AnimEventLog(void *obj, void *anim, int i, int frame, float from, float to, int effect) {
+    static int sN = -1;
+    static int sObj[8];
+    CGameObjectInstance *o = (CGameObjectInstance *) obj;
+    int k;
+    if (sN < 0) {
+        const char *e = getenv("T2_ANIM_LOG");
+        sN = 0;
+        while (e != NULL && *e && sN < 8) {
+            sObj[sN++] = atoi(e);
+            e = strchr(e, ',');
+            if (e != NULL) {
+                e++;
+            }
+        }
+    }
+    for (k = 0; k < sN; k++) {
+        if (sObj[k] == o->header.m_nObjType) {
+            printf("animev: frame %d level %d gf %d obj %d inst %p anim %d %s ev %d frame %d window [%.2f %.2f) effect %d\n",
+                   gT2HostFrame, (int) gScene.m_nLevel, (int) gFrameCountGameplay, (int) o->header.m_nObjType, obj,
+                   (int) o->m_CurrentAnimation.m_nAnimIndex, anim == (void *) &o->m_CurrentAnimation ? "cur" : "other",
+                   i, frame, from, to, effect);
+            return;
+        }
+    }
+}
