@@ -391,7 +391,7 @@ operands) never showed it.
 |---|---|---|
 | Debug, zero-init | 255 s | - |
 | **Release `-O2`, zero-init** (`-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG"`, same for CXX) | **138 s** | 580,000, **0 differ**, exit 0 |
-| Release `-O2`, `none` (register leftovers instead of zero) | see STATUS (c5) | |
+| Release `-O2`, `none` (register leftovers instead of zero) | 138 s | **differs from frame 15,348** (level 53, actor hash only): not in the game objects (bisected), so likely t2audio (STATUS, c5) |
 
 When a new object faults the same way, add it to `ALIGN16`. To find it: take the faulting
 `movaps`/`movdqa`/`orps mem` address from the crash handler's registers and look it up with
