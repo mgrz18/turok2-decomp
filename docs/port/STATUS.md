@@ -1,221 +1,197 @@
-# Port status after Phase 7 round 13 (merged state)
+# Port status after Phase 7 round 14 (merged state)
 
-Round 13 merged five branches, in this order: b4 (macOS: the whole game on the Mac, Mac == Linux,
-a release build, `-ftrivial-auto-var-init=zero`, [QUICKSTART.md](QUICKSTART.md)), b2 (the hub
-doors persist: fired level events are replayed when a level loads; the City Totem won), b5
-(health pickups are taken again; levels 1 and 2 without invincibility), b1 (the level-5 and
-level-6 keys and doors by the game's own progression, level 6's items from level 6, Primagen keys
-5 and 6) and b3 (the five totem flags choose the ending; the talisman chambers; the good ending).
-On the merged tree **one process plays the whole game to the GOOD ending**: a new game, levels 1
-to 6 in order, all five totems won, the Leap of Faith talisman, every boss, the Primagen, the
-good ending's cinema 0x172 and "END 2", the credits and the hub (section 2). Detail pages:
-[PLAYTHROUGH.md](PLAYTHROUGH.md) sections 12 (b2), 13 (b5), 14 (b1), 15 (b3) and 16 (this merge),
-[GAMEPLAY.md](GAMEPLAY.md) section 13 (b2), [MACOS.md](MACOS.md) section 15 (b4), [64BIT.md](64BIT.md)
-part 7 and [STABILITY.md](STABILITY.md) 9 (b5). The branch sections follow section 4; round 12 and
-earlier follow as history.
+Round 14 merged five branches, in this order: c5 (the `T2_AUTO_VAR_INIT` option, 16-byte
+alignment of three gendata globals that fixes the Linux -O2 crash, stick-only aiming in
+levels 1-2), c4 (macOS: play mode, SDL gamepads and hotplug, the LUS audio player, twin-stick
+controls, `padtest.py`, `mkapp.sh`, QUICKSTART rewritten), c2 (levels 5 and 6 without
+invincibility), c1 (levels 3 and 4 without invincibility, `T2_ANIM_LOG`) and c3 (each Primagen key
+slot takes its own key, so the hub portal opens). On the merged tree **one process plays the whole
+game to the GOOD ending, entering the Primagen's lair by the real hub portal**: a new game, levels
+1 to 6, all five totems, the six Primagen keys in their own slots (keys 2 and 3 on their natural
+visits), cinema 43, the Primagen, cinema 370, "END 2", the credits and the hub. **Invincibility
+remains only at the Mother and in the Primagen's lair** (section 2). Two runs are identical. The
+lair wait that stopped `--level 6` and the whole-game run is explained (the N64's own line of sight
+against the lair's back structure, not a host bug) and passed by moving, as a player would
+(PLAYTHROUGH.md 21). Detail pages: [PLAYTHROUGH.md](PLAYTHROUGH.md) sections 17 (c5), 18 (c1),
+19 (c2), 20 (c3) and 21 (this merge), [GAMEPLAY.md](GAMEPLAY.md) 14 (c1), [MACOS.md](MACOS.md) 16
+(c4), [STABILITY.md](STABILITY.md) 10 (c5) and [QUICKSTART.md](QUICKSTART.md) (c4). The branch
+sections follow section 4. Round 13 and earlier follow as history.
 
-The matching build is unchanged: `tools/asm_diff.py --base 324bae6b -j 8` reports 0 differences
-over all 3,938 files after every merge and every fix, and a clean `make clean && make setup &&
-make build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
+The matching build is unchanged: `tools/asm_diff.py --base c8414758 -j 8` reports 0 differences
+over all 3,938 files after every merge, and a clean `make clean && make setup && make build &&
+make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
 ## 1. Build and run
 
-**To build and play** (Mac or Linux, a Release build, a window and a pad or the keyboard): read
-[QUICKSTART.md](QUICKSTART.md). The development build (Linux box, Debug, headless):
+**To play** (Mac or Linux, a Release build, a window, a gamepad or the keyboard and mouse):
+[QUICKSTART.md](QUICKSTART.md). On macOS, `turok2` with no arguments (or `--play`) opens the
+window with sound at the N64's pace (`--no-audio`, `--no-pace`) and keeps its data, config, logs
+and pak in `~/Library/Application Support/turok2` (Linux `~/.local/share/turok2`).
+`tools/port/mkapp.sh BUILD [APP]` makes `Turok2.app`. Gamepads present at start are attached, and
+hotplug works. The default controls (`port/app/t2controls.cpp`; QUICKSTART has the table):
+left stick or WASD to walk and strafe; right stick, arrows or the captured mouse to look; right
+trigger, left click or Ctrl to fire; left trigger, right shoulder, Space or right click to jump;
+A/B on Q/E; Start on Enter/Esc; the map on the left shoulder, Back or Tab. Delete an old
+`turok2.cfg.json` to get them. Debug switches: `--pad-test FILE`, `T2_PAD_LOG=1|2`,
+`T2_AUDIO_DEVICE=1` and `T2_AUDIO_SILENT=1`.
+
+The development build (Linux box, Debug, headless) is round 13's recipe (the "Round 13: build and
+run" section below) with three changes:
+
+- **Rerun gendata** (c5's `ALIGN16`: `gControllers`, `sBatchInstances` and `sBatchResources`
+  are 16-byte aligned): `rm -f OUT/decls.json` and then `gendata.py`. The archive is unchanged
+  (sha1 `a9d14a47...`, `archive_check` OK).
+- `-DT2_AUTO_VAR_INIT=zero|pattern|none` (default `zero`, as before) selects the locals' fill.
+  `none` and `T2_SCRIBBLE=HEX` look for locals that are read before they are written
+  (STABILITY.md 10).
+- A fresh build dir can reuse the fetched sources:
+  `-DFETCHCONTENT_SOURCE_DIR_LIBULTRASHIP=OUT/build/_deps/libultraship-src` (likewise IMGUI,
+  MONOCYPHER, PRISM, THREADPOOL).
+
+**The whole game to the good ending** (section 2; PLAYTHROUGH.md 21):
 
 ```sh
-# 0. the matching build first: gendata and asm_diff read its ELF; keep a copy as build/ref.elf
-make setup && make -j8 build && make verify && cp build/turok2.us.elf build/ref.elf
-
-# 1. the archive, format 2.0, unchanged this round (sha1 a9d14a47...)
-python tools/assets/mkarchive.py baserom.us.z64 -o OUT/turok2.o2r -j 4
-python tools/assets/archive_check.py OUT/turok2.o2r baserom.us.z64          # OK, format 2.0
-
-# 2. configure IN A FRESH BUILD DIR (this round: game.cmake adds -ftrivial-auto-var-init=zero to
-#    the game code; a PIE is the Linux default)
-rm -rf OUT/build
-cmake -S port -B OUT/build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
-      -DCMAKE_BUILD_TYPE=Debug
-ninja -C OUT/build -j8 turok2_game t2runtime t2audio
-
-# 3. the game data as C into port/gen/ (gitignored). RERUN IT this round: b5 typed the health
-#    pickup table (include/structs/pickup.h). Drop the cache after ANY header change.
-rm -f OUT/decls.json
-python3 tools/port/gendata.py --build OUT/build --cache OUT/decls.json -j 4      # ~1 min
-
-# 4. re-run cmake so data.cmake sees port/gen/*.c, then everything
-cmake OUT/build && ninja -C OUT/build -j8
-
-# 5. run headless (Linux: SDL's offscreen driver)
-cd OUT && SDL_VIDEODRIVER=offscreen build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
-    --game --pak-blank --frames 26000
-```
-
-**The whole game to the good ending in one run** (section 2; PLAYTHROUGH.md section 16).
-`playthrough.py RUN --all` now passes its other options to `fullrun.py`:
-
-```sh
-python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2 --cheats-on 110
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --cheats-on 3,4
 mkdir -p RUN/pak && cd OUT && . ../RUN/teleport.env && SDL_VIDEODRIVER=offscreen \
-  T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=500 T2_PROGRESS_LOG=1 T2_HURT_LOG=1 \
+  T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=500 T2_PROGRESS_LOG=1 T2_HURT_LOG=1 T2_BOSS_LOG=1 \
   build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game \
-  --pak-dir ../RUN/pak --frames 270000 --input @../RUN/playthrough.txt
+  --pak-dir ../RUN/pak --frames 290000 --input @../RUN/playthrough.txt
 python3 ../tools/port/mpk_saves.py ../RUN/pak/turok2_pak1.mpk      # the saves after levels 1-5
 ```
 
-`--all` options (`fullrun.py`): `--talismans [L,...]` (the talisman chamber trips; `2` = the Leap
-of Faith in level 2, `3` = the Breath of Life in level 3: **use 2 only**, with 3 too the Marsh
-Totem is lost 7/8 and the ending is END 1b), `--cheats-off L,...` (the levels played without
-`T2_CHEATS` invincibility, each from the hub visit before it; their health pickups are taken on the
-way), `--cheats-on 110` (the City Totem invincible even in a `--cheats-off` level), `--no-health`,
-`--env K=V` (one more `teleport.env` line), `--slot F` (Primagen key 6 into its slot F frames after
-the hub, default 1,100), `--upto N`, `--hub N=FRAME`. Without options the run is the round-12 aid
-set (all levels invincible) and ends with END 1b (the Marsh Totem is lost: 4 of 5 totems).
+`--all` options (`fullrun.py`): `--talismans 2` (the Leap of Faith; with 3 too the Marsh Totem
+is lost), `--cheats-off L,...` (levels without `T2_CHEATS` invincibility, their health pickups
+taken), `--cheats-on 110,3,4` (invincible anyway: the City Totem / the Mother / the Primagen),
+`--late-keys` (Primagen keys 2 and 3 in after level 5, c3's order), `--hop` (DEBUG-ONLY: round
+13's warp 7602 into the lair), `--slot F`, `--no-health`, `--env K=V`, `--upto N` and `--hub N=FRAME`.
 Use an EMPTY `--pak-dir`. **Kill a stuck run with SIGKILL** (the game ignores SIGTERM).
 
-The level runs, the boss recipes, save/load, the demos against the N64 and the debug switches are
-as in round 12 (the "Round 12: build and run" section below, unchanged), plus this round's
-DEBUG-ONLY switches: `T2_BITS_LOG=L1,...` and `T2_DUMP_ACTOR=F:I[;...]` (b2), `T2_HURT_LOG=1|2[,R]`
-and the frame-scheduled `T2_CHEATS="V;V@F..."` (b5), `T2_PROGRESS_LOG=1` (a `progress:` line per
-change of the totem/boss flags, talismans, Primagen keys, nuke parts, unlocked cheats, ending
-flags and cinema) and `T2_TOTEMS=abcde` (b3). Tools: `tools/port/itemreach.py` (b1: where to stand
-to walk into a pickup), `tools/port/extras.py OUT --talisman 73..77 | --nuke 78..83` (b3: each
-talisman chamber and flesh-eater nuke part on its own).
+**The level runs and the boss recipes** are round 12's table (below), with two changes. `--level 6`
+now strafes in the lair and kills the Primagen again. The Primagen recipe adds the strafing:
+`T2_WARP_TO=7602 T2_BOSS_FRONT=450,3000,2.5,1`, boss env, `Z@14000..200000` and the lines of
+`routes56.lair_strafe(15000, 45000)`. Other tools: `tools/port/padtest.py --bin BIN --archive
+OUT/turok2.o2r` (the controls, headless: 101 checks), `tools/port/extras.py OUT --adon` (Adon's
+chamber), and `T2_ANIM_LOG=OBJ,...` (animation events, c1).
 
-## 2. What the game does now (Linux, headless, PIE, high memory, final binary)
+## 2. What the game does now (Linux, headless, PIE)
 
-- **The whole game to the good ending in one process** (the command above; PLAYTHROUGH.md 16):
-  a new game; **level 1 without invincibility** (its keys, the health in 55 and the ultra health in 59, the Harbor
-  Totem won 23,130); the hub (save 1), the level-2 and level-3 key slots ("access to level 2
-  granted." 26,146, "... 3 granted." 26,474); **level 2 without invincibility** (5 health pickups
-  taken on the way, lowest health 25, **0 deaths**; the sisters 41,674 / 55,174 / 73,058, the
-  piece of the Leap of Faith, its portal and chamber 73 (the talisman at 79,854), **the City
-  Totem won** 85,146 (invincible from 600 frames before it: `--cheats-on 110`)); the hub (save 2,
-  "access to level 4 granted." 88,180); level 3 (the Marsh Totem won 108,063); level 4 (the Cave
-  Totem won 128,158, **the Blind One dead** 139,897); the hub (save 4, the three level-5 keys:
-  **the level-5 door walked through**, "access to level 5 granted." 142,433); level 5 ("force
-  field down." 148,113, "all embryos destroyed." 159,607, "master computer destroyed." 161,759, the
-  Hive Totem won 163,952, **the Mantid Queen dead** 172,137); the hub (save 5, Primagen key 5, the
-  six level-6 keys: **the level-6 door walked through**, "access to level 6 granted." 174,714);
-  level 6 (its own 16 capacitors and 2 red laser cells, "all assembly plants destroyed." 193,874,
-  "all power generators recalibrated." 194,730, **the Mother dead** 215,942); the hub (216,500:
-  **back down the corridor through the level-6 door, open again thanks to b2's fix**, Primagen key
-  6 into a slot); the hop to the Primagen; **the Primagen dead (mode 29) at 240,165 with cinema
-  370 (0x172, the good ending's "PD2-P tired")**, unlocked cheats 0x7ffe7fd; level 10's **"END 2"**
-  243,157-246,957; **the credits (engine mode 15) 247,000-261,000**; **the hub at 261,055**. Exit
-  0. **Two runs identical** (every `progress`/`event`/`pickup`/`hurt`/`death`/`bosstrace` line and
-  every `state` line). The pak's note: checksum OK, clock 0:46:09.
-- **The debug aids that remain in that run**: `T2_CHEATS` invincibility in levels 3, 4, 5 and 6
-  and at the City Totem (110); `T2_GIVE_WEAPONS`, `T2_FILL_AMMO`, the weapon schedule; the aim
-  assists (`T2_FACE_NEAREST` at the totems, `T2_AIM_AT`/`T2_AIM_ENEMY`/`T2_AIM_NODE`,
-  `T2_BOSS_FRONT` for the Queen and the Primagen); the teleports between route steps inside the
-  sub-levels (key and item picks, the pit pickups of 116/117, the City Totem spot); the anchors
-  (`T2_ANCHOR`, the schedule clock only); **the hop to the Primagen** (`T2_WARP_TO=7602`: Primagen
-  keys 2 and 3 never go into their own slots in the continuous run, so the six-key hub portal
-  cinema does not fire). **Gone this round**: the teleports past the hub's level-5 and level-6
-  doors (b1), `T2_GIVE_ITEMS` (b1: level 6's items come from level 6), the door-persistence
-  workarounds (b2), invincibility in levels 1 and 2 (b5). One life is lost at the Primagen's death
-  (health set to 0 by the death sequence; also with invincibility, in every run that kills him);
-  the run goes on to the ending.
-- **The boot loop** (26,000): the pak check, legal, the expansion pak, Acclaim, the Iguana jungle,
-  the title, the three demos (levels 81, 131, 109) and the title again, the same mode/level
-  sequence at the same frames as round 12. Against fresh N64 traces (`n64trace.py`, `detdiff.py`): **demo 1 identical to the N64's RAM from gf 1 to its end (gf 1,128)**, **demo 3 identical from gf 1 to its end (gf 344)**, demo 2 identical to gf 607 (from gf 608 only the player's health: the N64's uninitialised heap read, [FIDELITY.md](FIDELITY.md) 6.3), as in rounds 11 and 12.
-- **The level runs** (`playthrough.py DIR --fight 10 | --level 2..6`, each exit 0, no death):
-  level 1: "all distress beacons activated." 14,751, "the children are safe." 17,499, the Harbor
-  Totem won, the hub by 22,000; level 2: "all sisters of despair banished." 52,707, "all soul
-  gates destroyed." 54,683, the City Totem won (57,754), the hub by 58,500 (62,000 in round 12);
-  level 3: "all prisoners free." 24,243, "armories destroyed." 25,097, the Marsh Totem won, the hub
-  by 30,000; level 4: "blind ones trapped." 25,199, the Cave Totem won, **the Blind One dead**
-  41,413, the hub by 41,500; level 5: "all embryos destroyed." 29,207, "master computer
-  destroyed." 31,359, the Hive Totem won, **the Mantid Queen dead** 43,331, the hub by 43,500;
-  level 6: "all assembly plants destroyed." 29,625, "all power generators recalibrated." 30,481,
-  **the Mother dead (mode 30) at 48,847**, the hub 53,000, the hop to the Primagen (54,000); **regression: his stage-2 lair wait (mode 25, resting at z 2,906) no longer ends** (round 12: his death at 84,218). The run is the same as round 12's up to the Mother (her death frame is equal); the hop at 53,700, 54,300, 55,000, 55,400 or 57,000 and the `450,600,2.5,1` spot cycle did not end it either. The whole-game run and the Primagen recipe kill him (section 4, item 5).
-- **The four boss recipes**, the same frames as round 12: **the Mother** (36,000): her death
-  (mode 30) at 27,459, the hub by 29,000; **the Blind One** (25,000): her death at 22,623, the hub
-  by 23,500; **the Mantid Queen** (30,000): her death (mode 16) at 26,907, the hub by 28,500;
-  **the Primagen** (62,000; no totem flags: the bad ending): his death at 38,714 with cinema 371
-  (0x173), END 1b (level 11) from 40,378, level 10, the credits 44,730-58,820, the hub at 58,828.
-- **Save -> title -> load**: the note (`mpk_saves.py`): NT2E 51 "TUROK 2" ext A, 90 pages,
-  big-endian, checksum OK, health 100, lives 3, clock 0:02:20, 663 ISets of level flags; a new
-  boot with that pak loads it: level 51 at 5,500. **The doors across save/load (b2)**: the
-  whole-game run's pak (its last save, the hub after level 5) loaded from the title puts the
-  player in the hub at 5,500, and the hub's load replays the fired events "access to level 2 /
-  3 / 4 / 5 granted." (gameplay frame 0): the four doors stand open; level 6's is not in that
-  save (its slots are filled after it).
-- **Audio** (`--audio --wav`, 9,000 frames): 150.17 s, peak 32,768, RMS 3,399.5 (= rounds 11 and 12).
-- **Soak** (PIE, no `--draw`, gdb): attract 100,000 (1 run, 99,960 frames), new game seeds 0-19 x 36,000 (20 runs, 720,000 frames), levels seeds 0-40 x 25,000 (every level id 1-164, 41 runs, 1.02 M frames): **0 crashes, 0 hangs**.
-- **macOS** (b4, on b4's tree = round 12 + b4): the whole-game run, Mac Debug = Mac Release -O2 =
-  Linux over all 266,000 frames (with the zero-init flag); the Release build plays the whole game
-  in 26.3 s headless (MACOS.md 15). This merged tree was not rerun on the Mac.
-
-Screenshots (640x480, `T2_DRAW_FROM` windows of the good-ending run, checked by eye, not
-committed): level 1's ultra health in 59 in front of the player with the HUD at 100 (19,501) and the "ULTRA HEALTH" message with the HUD at 200 just after (19,551: the health pickups work again); the hub after level 4, the walk over the level-5 slots: "PRIMAGEN KEY 5 REQUIRED. ACCESS TO LEVEL 5 GRANTED." (142,451); **a door crossed on a later visit**: back from the Mother, the level-6 corridor with the level-6 door standing open ahead (219,500) and, 100 frames later, the plaza and its central pads seen from the doorway (219,600; b1 needed a teleport here); the good ending: Turok before the Primagen in the cinema that follows his death (240,300), level 10's END 2 with Adon (243,400), Adon and Turok on the ship (244,400), Adon's close-up (246,400); the credits' "TUROK 2 TEAM" page (248,002); the hub after the credits, by a portal's green glow (261,551).
+- **The whole game to the good ending in one process, by the real Primagen entrance**
+  (the command above; PLAYTHROUGH.md 21.3 has the timeline): levels 1 to 6 **without
+  invincibility, the City Totem included** (it costs 2 lives and is won at 88,716); all five
+  totems; the Leap of Faith; **the Blind One killed without invincibility** (139,425); the
+  Mantid Queen (173,205); the Mother (216,472, invincible); Primagen keys 1-6 into their own slots
+  (26,651, 91,909, 113,296, 142,944, 175,499, 221,659); **the hub portal cinema 43 (222,839) and
+  the lair (223,647)**; **the Primagen dead at 250,290** (invincible) with cinema 370; level 10's
+  "END 2" from 253,282; the credits; the hub at 271,180. Exit 0. **Two runs identical** (every
+  `progress`, `event`, `pickup`, `hurt`, `death` and `bosstrace` line, and the `state` lines with
+  pointers masked).
+- **The debug aids that remain in that run**: `T2_CHEATS` invincibility at the Mother and in the
+  Primagen's lair only; `T2_GIVE_WEAPONS`, the weapon schedule and `T2_FILL_AMMO`; the aim assists
+  (`T2_FACE_NEAREST` at the totems, `T2_AIM_ENEMY`, `T2_AIM_AT`, `T2_AIM_NODE`, `T2_BOSS_FRONT`
+  for the Queen and after 3,000 frames of a lair wait); the teleports between route steps inside the
+  sub-levels; the anchors. **Gone this round**: invincibility in levels 3-6 (c1, c2) and at the City
+  Totem; the hop to the Primagen (`--hop` is a DEBUG-ONLY fallback); round 13's walks in place of
+  keys 2 and 3.
+- **The same run in a Release build** (-O2, a fresh build dir): identical to Debug (every
+  `progress`, `event`, `pickup`, `hurt`, `death`, `bosstrace` and masked `state` line). c5's
+  `ALIGN16` fixed the frame-2 crash.
+- **A third run, drawn** (`--draw`, `T2_DRAW_FROM` on three windows), has the same lines to 259,000.
+  Its frames show the Blind One's fight with the health falling (144 to 53, no invincibility) and
+  "NEW CHEAT ENABLED" at his death; the hub portal cinema, the lair's opening cinema and the
+  Primagen in his lair; his death cinema (370), the totems' portal and the good ending's scenes.
+- **The boot loop** (26,000, `--pak-blank`): the `T2_DET_LOG` trace from 5,400 is **identical
+  to round 13's** (431,478 lines; the same engine-mode sequence), so the three demos are as before.
+- **The level runs** (`playthrough.py DIR --fight 10 | --level 2..6`): each exits 0 and reaches the
+  hub. Level 1 gives "all distress beacons activated." at 14,751 and "the children are safe." at
+  17,499. **Level 6 kills the Mother (47,179) and the Primagen (78,242) again**, then shows the
+  credits and the hub.
+- **The boss recipes**: the Mother, the Blind One and the Queen are identical to round 13 (every
+  `bosstrace` line). The Primagen recipe, with the strafing, kills him at 43,586 and shows the
+  credits.
+- **Save, title, load**: the save portal writes note 1 (checksum OK), and the load from the title
+  puts the player in level 51 (gameplay at 4,555). The whole run's pak: note 1 checksum OK, clock
+  0:46:27.
+- **`--audio --wav` boot** (9,000): 3,311,264 stereo frames, RMS 3,399.5, as in round 13.
+- **c4's controls on Linux**: `padtest.py` (Release) passes 101 binding checks plus a new game with
+  the pad only and with the keyboard only. Play mode (`turok2` with no arguments) under SDL's
+  offscreen driver opens no window, writes 0 bytes to stdout (its logs go to
+  `~/.local/share/turok2/logs`), opens the sound device and boots to the title at the N64's pace
+  (1,620 VIs in about 27 s). Under SDL's `dummy` driver there is no OpenGL, the window cannot be
+  created and the game crashes (SIGSEGV): play mode should refuse with a message (section 4).
+- **soak.py** (PIE): attract 100,000 frames, newgame seeds 0-19 x 36,000 and levels seeds 0-40 x
+  17,000 (every level id 1-164): **0 crashes**.
 
 Port tests: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (26,124 units, 0 mismatches,
 the archive and the ROM backend), `t2asset_typed_test` (1,585 checks, 0 errors, three passes),
-`gbi_test` (0 mismatches), `t2os_test` (trace hash `2b2775877e0d226b` on 3 runs),
-`t2audio_test --direct 0` and `--direct 40` (audio_compare: max difference 0),
-`t2audio_test --adec 0xC29AB4 7464` (27,136 samples), the swoosh self test (OK at the end of
-every `--game` run). The archive is unchanged (sha1 `a9d14a47...`, rebuilt and compared;
-`archive_check` OK).
+`gbi_test` (0 mismatches), `t2os_test` (trace hash `2b2775877e0d226b`, the same on 3 runs),
+`t2audio_test --direct 0` and `--direct 40` (audio_compare: max difference 0), `t2audio_test
+--adec 0xC29AB4 7464 OUT.raw` (27,136 samples) and the swoosh self test (OK in every run). The
+archive is unchanged (sha1 `a9d14a47...`, `archive_check` OK). 
 
-ABI (`tools/port/abicheck.py --build OUT/build -j 4`: 3,077 TUs, 11,647 calls, 11,076 checked
-against a definition, 181 function-pointer calls): harmful direct sites **0**, indirect 1 (the
-known `Destructible_Hurt` store). `ptrdecls.py`: 0 left in `src/` (the strlen returns and
+ABI (`abicheck.py --build OUT/pie -j 4`: 3,077 TUs, 11,654 calls, 11,079 checked against a
+definition, 181 function-pointer calls): harmful direct sites **0**, indirect 1 (the known
+`Destructible_Hurt` store). `ptrdecls.py`: 0 left in `src/` (the four strlen returns and
 `include/functions.h` as before); `ptrargs.py` on a clean game-library build log: 0.
-`f2ucheck.py`: 79 float -> unsigned conversions (round 12 wrote 78; none is in a file this round changed). `n64viewcheck.py`: raw BAD 10, stride BAD 3, suspect 42 (44 in round 12:
-b5 fixed `Turret_Effects` and `RumbleMenu_Play`).
+`f2ucheck.py`: 79 float -> unsigned conversions (as in round 13). `n64viewcheck.py`: raw BAD 10,
+stride BAD 3, suspect 42 (as in round 13).
 
-## 3. Merge resolutions and fixes (round 13)
+## 3. Merge resolutions and fixes (round 14)
 
 | where | branches | resolution |
 |---|---|---|
-| src/us/code/func_00262B58.c (`Turret_Effects`) | b4 (a31a6d48), b5 (fcdd8be3, 7b17ef9a) | the same function fixed twice (auto-merged into two host bodies): **b4's kept** (T2PoseContext, the float `CMtxF__RotateX`), b5's version of this file dropped; b5's `RumbleMenu_Play`/`_2` fixes (func_00417EBC, func_00450E94, same commit) kept |
-| port/game/t2debug.c | b2 (`T2_BITS_LOG`, `T2_DUMP_ACTOR`), b5 (`T2_HURT_LOG`), b3 (`T2_PROGRESS_LOG`, `T2_TOTEMS`) | all appended, in merge order |
-| tools/port/fullrun.py | b2 (`GRANT`, `CITY_TOTEM_SPOT`, `L2_STRETCH`), b5 (`--cheats-off/--cheats-on/--env/--no-health`, health tables, `back=`), b1 (`anchor={...}`, `KEY_WAIT`, the level-5/6 doors, `PRIMAGEN_*`, `--slot`), b3 (`--talismans`, `detours=`) | every intent kept: `level_segments(..., anchor=(), back=(), detours=None)`, `main_all(..., no_cheats, extra_env, health, cheats_on, talismans)` (the talisman trips move the measured hub arrivals before b5's `level_start` reads them), b1's level 5 + b5's `level_start[6]` |
-| docs/port/STATUS.md, PLAYTHROUGH.md | all | every part section kept; PLAYTHROUGH's three "section 12"s and b2's unnumbered section renumbered 12 (b2), 13 (b5), 14 (b1), 15 (b3), references fixed |
-| the archive, gendata | b5 | the archive is unchanged (a9d14a47...); gendata rerun (the typed health table) |
+| docs/port/STATUS.md | all | every part section kept, in merge order (c5, c4, c2, c1, c3) |
+| docs/port/PLAYTHROUGH.md | c5, c2, c1, c3 (four "section 17"s) | put in game order and renumbered **17 c5** (levels 1-2), **18 c1** (levels 3-4), **19 c2** (levels 5-6), **20 c3** (the Primagen); the references in STATUS, GAMEPLAY and fullrun.py fixed; 21 is this merge |
+| port/game/t2debug.c | c5 (`T2Port_ScribbleStack`), c1 (`T2Port_AnimEventLog`) | both appended (the conflict was the shared closing braces) |
+| port/app/game.cpp | c5 (`T2_SCRIBBLE`), c4 (pads, audio device, `--pad-test`) | auto-merged, both kept |
+| tools/port/fullrun.py, routes56.py, playthrough.py | c5 (`"stick"` steps), c2 (level 5/6 health, `--cheats-on 3/4` windows), c1 (levels 3/4 routes, weapon 16), c3 (key slots, `--hop`) | auto-merged; every intent kept (c2's cheat windows sit next to c3's `HOP` in `level6()`) |
+| the archive, gendata | c5 | the archive is unchanged (a9d14a47..., `archive_check` OK); **gendata rerun** (`ALIGN16`) |
 
-The nested `TARGET_PORT` scan finds no second host body (the two nested files, func_0021A150 and
-func_0042AC0C, are as before). b1's plaza teleport after the Mother is gone: with b2's fix the
-corridor walk passes the level-6 door.
+The nested `TARGET_PORT` scan finds no second host body after any merge (the only src/ change of
+the round is c1's DEBUG-ONLY call in func_0021ABC8.c, inside its existing block). `asm_diff` was 0
+after every merge, and the port built after every merge.
 
-Fixes and additions on the merged tree (asm_diff 0):
+Fixes and additions on the merged tree (asm_diff 0; tools only):
 
 | commit | what |
 |---|---|
-| e8135c37 | `playthrough.py RUN --all [options]` passes its options to `fullrun.py` (`fullrun.cli`); PLAYTHROUGH.md renumbered |
-| 92a0f12f | **Primagen key 6 into its slot 1,100 frames after the hub** (650 before): with the merge the Primagen rested at z 2,923, the known no-end spot of his stage-3 lair wait, in two identical runs; 300 and 1,100 both end it. **Level 2 without invincibility keeps round 12's sister-1 steps** (`L2_133_NOCHEATS`): b2's zombies-one-by-one aim stood the player among them for 4,500 frames (200 damage, a death, and the run lost its schedule: game over in 135) |
+| 5d61acf9 | PLAYTHROUGH round-14 sections renumbered (above) |
+| 0394b0fa | **the Primagen's lair waits**: `routes56.lair_strafe` (C-left/C-right in the lair, in `--level 6` and the whole-game run) and `T2_BOSS_FRONT` relocation after 3,000 frames (600 before). `--level 6` kills him again and the whole run enters by the hub portal (PLAYTHROUGH.md 21.1-21.2) |
+| 8d89d103, 2179f805 | **Primagen keys 2 and 3 into their own slots on their natural hub visits** (c3's suggestion; the five totems are still won); `--late-keys` keeps c3's order |
 
 ## 4. Next
 
-1. **The remaining aids** of the good-ending run: invincibility in level 3 (the marsh damage
-   regions on the route, and the obj-230 hits applied 3 times each: check against the N64), level
-   4 (the Blind One: 206 damage, no health on the way), level 5 (the Mantid Queen killed the
-   player once without it in the continuous run; b5's level-5-alone run needed none) and level 6
-   (the air starts at 119: fall damage), and at the City Totem; then the aim assists and the
-   in-level teleports.
-2. **Primagen keys 2 and 3 into their slots** (then the hub portal cinema 43 replaces the hop).
-   On the merged tree the slots fill in a different order than the route intends: key 4 goes in
-   on the return from the save portal after level 4 (actor 7), key 2 on the same return after
-   level 5 (actor 11), key 3 during the walk back after the Mother (actor 12); keys 5 and 6 stay
-   held, and the slots at 2 and 3 are never reached (the walks are deflected round the centre).
-   Map which slot actor takes which key, then walk the two missing ones.
-3. **The uninitialised local hidden by `-ftrivial-auto-var-init=zero`** (b4: level 135, frame
-   71,469 of the whole-game run): find it with MSan or valgrind on that window and fix it in the
-   source; the flag stays until then.
-4. **The talisman routes**: `--talismans 3` breaks the Marsh Totem (one kill short); levels 4-6's
-   pieces/portals are not on the route; the Adon chamber (72) stalls; the six flesh-eater levels
-   are only walked with teleports (`extras.py`).
-5. **Fragile timing**: the Primagen's lair waits depend on where he rests: `--slot` in the
-   whole-game run (stage 3), and **`--level 6` no longer kills him** (his stage-2 wait at z
-   2,906 does not end on the merged tree; section 2); the
-   level-1 health pickup with level 2 invincible and the Leap of Faith trip ends in 125 instead of
-   110 (a 500-frame lag after the chamber: anchor the chamber's return); compare the Primagen's
-   waits with the N64.
-6. **soak.py on macOS** (its lldb launch stalls; b4 ran 8 debugger-less runs instead).
-7. **Windowed play with a real gamepad** (QUICKSTART.md documents it; only headless runs so far).
-8. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
+1. **The remaining invincibility**: the Mother (run C: every life lost to her; c2 measured
+   ~250-330 damage per rescue run from her 10-damage hits at ~1,240 units, more than the route's
+   200 health) and the Primagen's lair (run E: 3 lives lost; ~280 damage and a life per rescue
+   run). Both need a route that keeps the player out of the hits (cover, distance, health pickups
+   in the arenas), not more aim.
+2. **Weapons, ammo and aim assists in the routes**: `T2_GIVE_WEAPONS`, the weapon schedule and
+   `T2_FILL_AMMO` are on for the whole run. c5 tried levels 1 and 2 on picked-up weapons
+   (`T2_GIVE_WEAPONS` takes a schedule now): the Harbor Totem is lost with the talon alone. The
+   route needs the weapon-cycle button after each pickup, the weapon and ammo pickups on the way
+   (`itemreach.py`) and longer fights (PLAYTHROUGH.md 17.2). Level 2's soul gates already aim
+   with the stick only (c5). Next come `T2_FACE_NEAREST` at the totems and
+   `T2_AIM_ENEMY`/`T2_AIM_NODE`.
+3. **The -O2 uninitialised read** (c5, STABILITY.md 10): with `-DT2_AUTO_VAR_INIT=none` the
+   divergence is not in `libturok2_game.a`; most likely t2audio (not bisected). Zero-fill stays the
+   default.
+4. **The obj-230 double fire on the N64** (c1: the triple hit is the same code and data as the
+   N64; confirm the burst with an N64 trace) and **the Blind One's margin** (c1's fight is won
+   without invincibility with little health to spare).
+5. **119's moving platforms** (level 6: c2's route waits on them; any timing change moves the
+   jumps).
+6. **The Primagen's lair is a knife edge by design**: the home waits need the player to be seen
+   past object 1911, and the strafing finds a sight line, but the time it takes varies (236,206 to
+   239,208 in the final run: the stage-2 wait ended with a 3,000-frame relocation). A route that
+   knows the spots that see him from his home would be steadier (scan at the search's own time,
+   with the grid sections loaded; PLAYTHROUGH.md 21.1).
+7. **macOS**: a self-contained `.app` (Homebrew dylibs today) and **the first windowed session with
+   a human and a real gamepad** (focus, mouse capture, F11, vsync with `--pace`, the feel of the
+   mouse and the sticks).
+8. **Play mode without a GL window** (SDL `dummy` driver, or a machine with no OpenGL): the window
+   is not created and the game crashes; it should say so and exit (as it already does without
+   the ROM).
+9. `t2audio_test`'s game-path mode (open the archive before the boot); soak.py on macOS (lldb).
 
 ## Round 14, part c5: locals read before they are written, a Linux -O2 build, fewer aids in levels 1-2 (branch names-R14_c5)
 
@@ -388,6 +364,225 @@ Merge notes: `fullrun.py` `PRIMAGEN_SLOTS`, `primagen_slot()`, `hub(..., bump=)`
 3-6. Once their routes change the totem levels anyway, set `PRIMAGEN_LATE = ()`, pass
 `primagen=(2,)`/`(3,)` to the visits after levels 2 and 3 and drop `ROUND13_BUMP`: that is the
 natural order.
+
+## Round 13: the merged state
+
+Round 13 merged five branches, in this order: b4 (macOS: the whole game on the Mac, Mac == Linux,
+a release build, `-ftrivial-auto-var-init=zero`, [QUICKSTART.md](QUICKSTART.md)), b2 (the hub
+doors persist: fired level events are replayed when a level loads; the City Totem won), b5
+(health pickups are taken again; levels 1 and 2 without invincibility), b1 (the level-5 and
+level-6 keys and doors by the game's own progression, level 6's items from level 6, Primagen keys
+5 and 6) and b3 (the five totem flags choose the ending; the talisman chambers; the good ending).
+On the merged tree **one process plays the whole game to the GOOD ending**: a new game, levels 1
+to 6 in order, all five totems won, the Leap of Faith talisman, every boss, the Primagen, the
+good ending's cinema 0x172 and "END 2", the credits and the hub ("Round 13: what the game did"). Detail pages:
+[PLAYTHROUGH.md](PLAYTHROUGH.md) sections 12 (b2), 13 (b5), 14 (b1), 15 (b3) and 16 (this merge),
+[GAMEPLAY.md](GAMEPLAY.md) section 13 (b2), [MACOS.md](MACOS.md) section 15 (b4), [64BIT.md](64BIT.md)
+part 7 and [STABILITY.md](STABILITY.md) 9 (b5). The branch sections follow section 4; round 12 and
+earlier follow as history.
+
+The matching build is unchanged: `tools/asm_diff.py --base 324bae6b -j 8` reports 0 differences
+over all 3,938 files after every merge and every fix, and a clean `make clean && make setup &&
+make build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
+
+## Round 13: build and run
+
+**To build and play** (Mac or Linux, a Release build, a window and a pad or the keyboard): read
+[QUICKSTART.md](QUICKSTART.md). The development build (Linux box, Debug, headless):
+
+```sh
+# 0. the matching build first: gendata and asm_diff read its ELF; keep a copy as build/ref.elf
+make setup && make -j8 build && make verify && cp build/turok2.us.elf build/ref.elf
+
+# 1. the archive, format 2.0, unchanged this round (sha1 a9d14a47...)
+python tools/assets/mkarchive.py baserom.us.z64 -o OUT/turok2.o2r -j 4
+python tools/assets/archive_check.py OUT/turok2.o2r baserom.us.z64          # OK, format 2.0
+
+# 2. configure IN A FRESH BUILD DIR (this round: game.cmake adds -ftrivial-auto-var-init=zero to
+#    the game code; a PIE is the Linux default)
+rm -rf OUT/build
+cmake -S port -B OUT/build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_BUILD_TYPE=Debug
+ninja -C OUT/build -j8 turok2_game t2runtime t2audio
+
+# 3. the game data as C into port/gen/ (gitignored). RERUN IT this round: b5 typed the health
+#    pickup table (include/structs/pickup.h). Drop the cache after ANY header change.
+rm -f OUT/decls.json
+python3 tools/port/gendata.py --build OUT/build --cache OUT/decls.json -j 4      # ~1 min
+
+# 4. re-run cmake so data.cmake sees port/gen/*.c, then everything
+cmake OUT/build && ninja -C OUT/build -j8
+
+# 5. run headless (Linux: SDL's offscreen driver)
+cd OUT && SDL_VIDEODRIVER=offscreen build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
+    --game --pak-blank --frames 26000
+```
+
+**The whole game to the good ending in one run** (section 2; PLAYTHROUGH.md section 16).
+`playthrough.py RUN --all` now passes its other options to `fullrun.py`:
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2 --cheats-on 110
+mkdir -p RUN/pak && cd OUT && . ../RUN/teleport.env && SDL_VIDEODRIVER=offscreen \
+  T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=500 T2_PROGRESS_LOG=1 T2_HURT_LOG=1 \
+  build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game \
+  --pak-dir ../RUN/pak --frames 270000 --input @../RUN/playthrough.txt
+python3 ../tools/port/mpk_saves.py ../RUN/pak/turok2_pak1.mpk      # the saves after levels 1-5
+```
+
+`--all` options (`fullrun.py`): `--talismans [L,...]` (the talisman chamber trips; `2` = the Leap
+of Faith in level 2, `3` = the Breath of Life in level 3: **use 2 only**, with 3 too the Marsh
+Totem is lost 7/8 and the ending is END 1b), `--cheats-off L,...` (the levels played without
+`T2_CHEATS` invincibility, each from the hub visit before it; their health pickups are taken on the
+way), `--cheats-on 110` (the City Totem invincible even in a `--cheats-off` level), `--no-health`,
+`--env K=V` (one more `teleport.env` line), `--slot F` (Primagen key 6 into its slot F frames after
+the hub, default 1,100), `--upto N`, `--hub N=FRAME`. Without options the run is the round-12 aid
+set (all levels invincible) and ends with END 1b (the Marsh Totem is lost: 4 of 5 totems).
+Use an EMPTY `--pak-dir`. **Kill a stuck run with SIGKILL** (the game ignores SIGTERM).
+
+The level runs, the boss recipes, save/load, the demos against the N64 and the debug switches are
+as in round 12 (the "Round 12: build and run" section below, unchanged), plus this round's
+DEBUG-ONLY switches: `T2_BITS_LOG=L1,...` and `T2_DUMP_ACTOR=F:I[;...]` (b2), `T2_HURT_LOG=1|2[,R]`
+and the frame-scheduled `T2_CHEATS="V;V@F..."` (b5), `T2_PROGRESS_LOG=1` (a `progress:` line per
+change of the totem/boss flags, talismans, Primagen keys, nuke parts, unlocked cheats, ending
+flags and cinema) and `T2_TOTEMS=abcde` (b3). Tools: `tools/port/itemreach.py` (b1: where to stand
+to walk into a pickup), `tools/port/extras.py OUT --talisman 73..77 | --nuke 78..83` (b3: each
+talisman chamber and flesh-eater nuke part on its own).
+
+## Round 13: what the game did (Linux, headless, PIE, high memory, final binary)
+
+- **The whole game to the good ending in one process** (the command above; PLAYTHROUGH.md 16):
+  a new game; **level 1 without invincibility** (its keys, the health in 55 and the ultra health in 59, the Harbor
+  Totem won 23,130); the hub (save 1), the level-2 and level-3 key slots ("access to level 2
+  granted." 26,146, "... 3 granted." 26,474); **level 2 without invincibility** (5 health pickups
+  taken on the way, lowest health 25, **0 deaths**; the sisters 41,674 / 55,174 / 73,058, the
+  piece of the Leap of Faith, its portal and chamber 73 (the talisman at 79,854), **the City
+  Totem won** 85,146 (invincible from 600 frames before it: `--cheats-on 110`)); the hub (save 2,
+  "access to level 4 granted." 88,180); level 3 (the Marsh Totem won 108,063); level 4 (the Cave
+  Totem won 128,158, **the Blind One dead** 139,897); the hub (save 4, the three level-5 keys:
+  **the level-5 door walked through**, "access to level 5 granted." 142,433); level 5 ("force
+  field down." 148,113, "all embryos destroyed." 159,607, "master computer destroyed." 161,759, the
+  Hive Totem won 163,952, **the Mantid Queen dead** 172,137); the hub (save 5, Primagen key 5, the
+  six level-6 keys: **the level-6 door walked through**, "access to level 6 granted." 174,714);
+  level 6 (its own 16 capacitors and 2 red laser cells, "all assembly plants destroyed." 193,874,
+  "all power generators recalibrated." 194,730, **the Mother dead** 215,942); the hub (216,500:
+  **back down the corridor through the level-6 door, open again thanks to b2's fix**, Primagen key
+  6 into a slot); the hop to the Primagen; **the Primagen dead (mode 29) at 240,165 with cinema
+  370 (0x172, the good ending's "PD2-P tired")**, unlocked cheats 0x7ffe7fd; level 10's **"END 2"**
+  243,157-246,957; **the credits (engine mode 15) 247,000-261,000**; **the hub at 261,055**. Exit
+  0. **Two runs identical** (every `progress`/`event`/`pickup`/`hurt`/`death`/`bosstrace` line and
+  every `state` line). The pak's note: checksum OK, clock 0:46:09.
+- **The debug aids that remain in that run**: `T2_CHEATS` invincibility in levels 3, 4, 5 and 6
+  and at the City Totem (110); `T2_GIVE_WEAPONS`, `T2_FILL_AMMO`, the weapon schedule; the aim
+  assists (`T2_FACE_NEAREST` at the totems, `T2_AIM_AT`/`T2_AIM_ENEMY`/`T2_AIM_NODE`,
+  `T2_BOSS_FRONT` for the Queen and the Primagen); the teleports between route steps inside the
+  sub-levels (key and item picks, the pit pickups of 116/117, the City Totem spot); the anchors
+  (`T2_ANCHOR`, the schedule clock only); **the hop to the Primagen** (`T2_WARP_TO=7602`: Primagen
+  keys 2 and 3 never go into their own slots in the continuous run, so the six-key hub portal
+  cinema does not fire). **Gone this round**: the teleports past the hub's level-5 and level-6
+  doors (b1), `T2_GIVE_ITEMS` (b1: level 6's items come from level 6), the door-persistence
+  workarounds (b2), invincibility in levels 1 and 2 (b5). One life is lost at the Primagen's death
+  (health set to 0 by the death sequence; also with invincibility, in every run that kills him);
+  the run goes on to the ending.
+- **The boot loop** (26,000): the pak check, legal, the expansion pak, Acclaim, the Iguana jungle,
+  the title, the three demos (levels 81, 131, 109) and the title again, the same mode/level
+  sequence at the same frames as round 12. Against fresh N64 traces (`n64trace.py`, `detdiff.py`): **demo 1 identical to the N64's RAM from gf 1 to its end (gf 1,128)**, **demo 3 identical from gf 1 to its end (gf 344)**, demo 2 identical to gf 607 (from gf 608 only the player's health: the N64's uninitialised heap read, [FIDELITY.md](FIDELITY.md) 6.3), as in rounds 11 and 12.
+- **The level runs** (`playthrough.py DIR --fight 10 | --level 2..6`, each exit 0, no death):
+  level 1: "all distress beacons activated." 14,751, "the children are safe." 17,499, the Harbor
+  Totem won, the hub by 22,000; level 2: "all sisters of despair banished." 52,707, "all soul
+  gates destroyed." 54,683, the City Totem won (57,754), the hub by 58,500 (62,000 in round 12);
+  level 3: "all prisoners free." 24,243, "armories destroyed." 25,097, the Marsh Totem won, the hub
+  by 30,000; level 4: "blind ones trapped." 25,199, the Cave Totem won, **the Blind One dead**
+  41,413, the hub by 41,500; level 5: "all embryos destroyed." 29,207, "master computer
+  destroyed." 31,359, the Hive Totem won, **the Mantid Queen dead** 43,331, the hub by 43,500;
+  level 6: "all assembly plants destroyed." 29,625, "all power generators recalibrated." 30,481,
+  **the Mother dead (mode 30) at 48,847**, the hub 53,000, the hop to the Primagen (54,000); **regression: his stage-2 lair wait (mode 25, resting at z 2,906) no longer ends** (round 12: his death at 84,218). The run is the same as round 12's up to the Mother (her death frame is equal); the hop at 53,700, 54,300, 55,000, 55,400 or 57,000 and the `450,600,2.5,1` spot cycle did not end it either. The whole-game run and the Primagen recipe kill him (section 4, item 5).
+- **The four boss recipes**, the same frames as round 12: **the Mother** (36,000): her death
+  (mode 30) at 27,459, the hub by 29,000; **the Blind One** (25,000): her death at 22,623, the hub
+  by 23,500; **the Mantid Queen** (30,000): her death (mode 16) at 26,907, the hub by 28,500;
+  **the Primagen** (62,000; no totem flags: the bad ending): his death at 38,714 with cinema 371
+  (0x173), END 1b (level 11) from 40,378, level 10, the credits 44,730-58,820, the hub at 58,828.
+- **Save -> title -> load**: the note (`mpk_saves.py`): NT2E 51 "TUROK 2" ext A, 90 pages,
+  big-endian, checksum OK, health 100, lives 3, clock 0:02:20, 663 ISets of level flags; a new
+  boot with that pak loads it: level 51 at 5,500. **The doors across save/load (b2)**: the
+  whole-game run's pak (its last save, the hub after level 5) loaded from the title puts the
+  player in the hub at 5,500, and the hub's load replays the fired events "access to level 2 /
+  3 / 4 / 5 granted." (gameplay frame 0): the four doors stand open; level 6's is not in that
+  save (its slots are filled after it).
+- **Audio** (`--audio --wav`, 9,000 frames): 150.17 s, peak 32,768, RMS 3,399.5 (= rounds 11 and 12).
+- **Soak** (PIE, no `--draw`, gdb): attract 100,000 (1 run, 99,960 frames), new game seeds 0-19 x 36,000 (20 runs, 720,000 frames), levels seeds 0-40 x 25,000 (every level id 1-164, 41 runs, 1.02 M frames): **0 crashes, 0 hangs**.
+- **macOS** (b4, on b4's tree = round 12 + b4): the whole-game run, Mac Debug = Mac Release -O2 =
+  Linux over all 266,000 frames (with the zero-init flag); the Release build plays the whole game
+  in 26.3 s headless (MACOS.md 15). This merged tree was not rerun on the Mac.
+
+Screenshots (640x480, `T2_DRAW_FROM` windows of the good-ending run, checked by eye, not
+committed): level 1's ultra health in 59 in front of the player with the HUD at 100 (19,501) and the "ULTRA HEALTH" message with the HUD at 200 just after (19,551: the health pickups work again); the hub after level 4, the walk over the level-5 slots: "PRIMAGEN KEY 5 REQUIRED. ACCESS TO LEVEL 5 GRANTED." (142,451); **a door crossed on a later visit**: back from the Mother, the level-6 corridor with the level-6 door standing open ahead (219,500) and, 100 frames later, the plaza and its central pads seen from the doorway (219,600; b1 needed a teleport here); the good ending: Turok before the Primagen in the cinema that follows his death (240,300), level 10's END 2 with Adon (243,400), Adon and Turok on the ship (244,400), Adon's close-up (246,400); the credits' "TUROK 2 TEAM" page (248,002); the hub after the credits, by a portal's green glow (261,551).
+
+Port tests: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (26,124 units, 0 mismatches,
+the archive and the ROM backend), `t2asset_typed_test` (1,585 checks, 0 errors, three passes),
+`gbi_test` (0 mismatches), `t2os_test` (trace hash `2b2775877e0d226b` on 3 runs),
+`t2audio_test --direct 0` and `--direct 40` (audio_compare: max difference 0),
+`t2audio_test --adec 0xC29AB4 7464` (27,136 samples), the swoosh self test (OK at the end of
+every `--game` run). The archive is unchanged (sha1 `a9d14a47...`, rebuilt and compared;
+`archive_check` OK).
+
+ABI (`tools/port/abicheck.py --build OUT/build -j 4`: 3,077 TUs, 11,647 calls, 11,076 checked
+against a definition, 181 function-pointer calls): harmful direct sites **0**, indirect 1 (the
+known `Destructible_Hurt` store). `ptrdecls.py`: 0 left in `src/` (the strlen returns and
+`include/functions.h` as before); `ptrargs.py` on a clean game-library build log: 0.
+`f2ucheck.py`: 79 float -> unsigned conversions (round 12 wrote 78; none is in a file this round changed). `n64viewcheck.py`: raw BAD 10, stride BAD 3, suspect 42 (44 in round 12:
+b5 fixed `Turret_Effects` and `RumbleMenu_Play`).
+
+## Round 13: merge resolutions and fixes
+
+| where | branches | resolution |
+|---|---|---|
+| src/us/code/func_00262B58.c (`Turret_Effects`) | b4 (a31a6d48), b5 (fcdd8be3, 7b17ef9a) | the same function fixed twice (auto-merged into two host bodies): **b4's kept** (T2PoseContext, the float `CMtxF__RotateX`), b5's version of this file dropped; b5's `RumbleMenu_Play`/`_2` fixes (func_00417EBC, func_00450E94, same commit) kept |
+| port/game/t2debug.c | b2 (`T2_BITS_LOG`, `T2_DUMP_ACTOR`), b5 (`T2_HURT_LOG`), b3 (`T2_PROGRESS_LOG`, `T2_TOTEMS`) | all appended, in merge order |
+| tools/port/fullrun.py | b2 (`GRANT`, `CITY_TOTEM_SPOT`, `L2_STRETCH`), b5 (`--cheats-off/--cheats-on/--env/--no-health`, health tables, `back=`), b1 (`anchor={...}`, `KEY_WAIT`, the level-5/6 doors, `PRIMAGEN_*`, `--slot`), b3 (`--talismans`, `detours=`) | every intent kept: `level_segments(..., anchor=(), back=(), detours=None)`, `main_all(..., no_cheats, extra_env, health, cheats_on, talismans)` (the talisman trips move the measured hub arrivals before b5's `level_start` reads them), b1's level 5 + b5's `level_start[6]` |
+| docs/port/STATUS.md, PLAYTHROUGH.md | all | every part section kept; PLAYTHROUGH's three "section 12"s and b2's unnumbered section renumbered 12 (b2), 13 (b5), 14 (b1), 15 (b3), references fixed |
+| the archive, gendata | b5 | the archive is unchanged (a9d14a47...); gendata rerun (the typed health table) |
+
+The nested `TARGET_PORT` scan finds no second host body (the two nested files, func_0021A150 and
+func_0042AC0C, are as before). b1's plaza teleport after the Mother is gone: with b2's fix the
+corridor walk passes the level-6 door.
+
+Fixes and additions on the merged tree (asm_diff 0):
+
+| commit | what |
+|---|---|
+| e8135c37 | `playthrough.py RUN --all [options]` passes its options to `fullrun.py` (`fullrun.cli`); PLAYTHROUGH.md renumbered |
+| 92a0f12f | **Primagen key 6 into its slot 1,100 frames after the hub** (650 before): with the merge the Primagen rested at z 2,923, the known no-end spot of his stage-3 lair wait, in two identical runs; 300 and 1,100 both end it. **Level 2 without invincibility keeps round 12's sister-1 steps** (`L2_133_NOCHEATS`): b2's zombies-one-by-one aim stood the player among them for 4,500 frames (200 damage, a death, and the run lost its schedule: game over in 135) |
+
+## Round 13: next (as written then)
+
+1. **The remaining aids** of the good-ending run: invincibility in level 3 (the marsh damage
+   regions on the route, and the obj-230 hits applied 3 times each: check against the N64), level
+   4 (the Blind One: 206 damage, no health on the way), level 5 (the Mantid Queen killed the
+   player once without it in the continuous run; b5's level-5-alone run needed none) and level 6
+   (the air starts at 119: fall damage), and at the City Totem; then the aim assists and the
+   in-level teleports.
+2. **Primagen keys 2 and 3 into their slots** (then the hub portal cinema 43 replaces the hop).
+   On the merged tree the slots fill in a different order than the route intends: key 4 goes in
+   on the return from the save portal after level 4 (actor 7), key 2 on the same return after
+   level 5 (actor 11), key 3 during the walk back after the Mother (actor 12); keys 5 and 6 stay
+   held, and the slots at 2 and 3 are never reached (the walks are deflected round the centre).
+   Map which slot actor takes which key, then walk the two missing ones.
+3. **The uninitialised local hidden by `-ftrivial-auto-var-init=zero`** (b4: level 135, frame
+   71,469 of the whole-game run): find it with MSan or valgrind on that window and fix it in the
+   source; the flag stays until then.
+4. **The talisman routes**: `--talismans 3` breaks the Marsh Totem (one kill short); levels 4-6's
+   pieces/portals are not on the route; the Adon chamber (72) stalls; the six flesh-eater levels
+   are only walked with teleports (`extras.py`).
+5. **Fragile timing**: the Primagen's lair waits depend on where he rests: `--slot` in the
+   whole-game run (stage 3), and **`--level 6` no longer kills him** (his stage-2 wait at z
+   2,906 does not end on the merged tree; section 2); the
+   level-1 health pickup with level 2 invincible and the Leap of Faith trip ends in 125 instead of
+   110 (a 500-frame lag after the chamber: anchor the chamber's return); compare the Primagen's
+   waits with the N64.
+6. **soak.py on macOS** (its lldb launch stalls; b4 ran 8 debugger-less runs instead).
+7. **Windowed play with a real gamepad** (QUICKSTART.md documents it; only headless runs so far).
+8. `t2audio_test`'s game-path mode: open the archive (or the ROM backend) before the boot.
 
 ## Round 13, part b4: the whole game on macOS, a release build, how to play (branch names-R13_b4)
 

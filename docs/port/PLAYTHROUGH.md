@@ -1836,3 +1836,121 @@ ahead: the chamber's door (actor 8, z 467) has no event and never opens. The way
 the entrance pad (regions 243/244, region info 2: warp 1002), which leads to 55 (2,965, 348,
 -4,179) at 16,600. `extras.py OUT --adon` plays it: new game, the warp, C-up 13,300-13,700, C-down
 16,400-17,000, level 55 by 16,600.
+
+## 21. The Primagen's lair wait explained, the whole game with fewer aids (Phase 7 round 14, the merge C29)
+
+### 21.1 What the Primagen's search sees
+
+The wait that never ended is `Primagen_UpdateMode19` (AI mode 25) in state 3: at stages 2 and 3
+he flies home (`gLevelScript.home`, his spawn point (0, 588.8, 2,918.4); he hovers at y 937 and
+steps round it at z 2,906-2,923) and waits there until `AI_UpdateTargets` returns a sight target
+**and** he is within 50 of home. He is the level's only kind-1 actor (`m_PathFindCount` 0, the
+cursor 0 of 1), so `AI_GetSightTargetInfo` runs `AI_FindBestTarget` for him every frame.
+
+With the search instrumented (temporary prints, not committed), the only test that fails is the
+line of sight. There is no view cone (his intelligence's `m_dwTypeFlags` is 4, no 0x8000), and
+the range does not matter. The 0x8000 that Mode19 sets in `D_800F1F50` around its search is his own
+movement collision info: the module's AI mode table gives modes 18 and 19 the collision info
+`D_800F1F50`, and `Sweep_FollowGround` reads that bit. The search's own collision info is
+`gCollisionInfoLineOfSight`. The line from the player's eye (y +92.2: the player intelligence's
+`m_CollisionHeight`, eye offset 0) to his eye (937 + 490.5 + 169.9 = 1,597.4) hits a static model,
+the lair's back structure (object 1911, bounds x -920..916, y -104..1,736, z 2,352..4,384). From
+(450, 0, 2,186) it hits the front face at (342.9, 450.7, 2,361.7). He waits in that structure's
+alcove. A frame of the player's view from there shows the wall and not him. No N64-offset view,
+no s32 truncation and no uninitialised field was found on the way.
+
+**Why c3's probe saw him.** `T2_BOSS_FRONT`'s probe and scan run at the start of the host frame.
+The visible grid sections are released at the end of each frame (`CScene__ReleaseSectors`) and
+loaded again by the next draw (`CScene__LoadVisibleGridSections`), so at that point
+`gScene.m_nSectors` is 0. `Collision_TestModels` then tests no static model at all, and every
+line of sight passes. At the time of the search itself, 4 sections are loaded and object 1911 is
+hit. A floor scan run at the search's time (him at z 2,922.9, the player moved to each spot):
+**no solid floor spot from z -1,500 to 2,300 sees him**. The only spots that do are over the pits
+at the arena's front corners. A player placed there (`T2_BOSS_FRONT=800,600,0.82`) falls, and
+after 3 lives the game is over.
+
+**b2's restore is the trigger, not the cause.** `--level 6` with the restores switched off (a
+test switch, not committed) kills him. Skipping one of 114's four "force field down" records
+(index 27), or the two other restored records (33, 35), changes nothing in the lair; skipping all
+four "force field down" records kills him. Those records put 114's force field action
+(actor 68) back in mode 1 when 114 is entered again after the Mother. Both record walkers do this,
+the second only for kinds 1, 2, 4 and 10, in the N64's order. The rest of the run then differs,
+including where he hovers and where the player stands when each wait starts, and the sight line is
+a knife edge. In a run that worked, the stage-3 wait ended with the player at (450.3, 0, 1,795.5)
+and him at (0.3, 937, 2,920.5). In a stuck run, with the player at (450.1, 0, 1,781.3) and him at
+z 2,906.3/2,922.9, it never ended. So this is the N64 code against the N64 geometry, not a host
+bug. A human player keeps moving, but the route stood still.
+
+### 21.2 The fix: keep moving
+
+`routes56.lair_strafe(first, last)` adds C-left and C-right input in the lair, 40 frames each,
+with fire held and the aim on the boss node. In `--level 6` it runs from the hop + 2,000 to the
+end of the fire. In the whole-game run it runs from the lair + 200 to about his death.
+`T2_BOSS_FRONT` for the lair now moves the player only after 3,000 frames of one wait (600
+before), with the same spot cycle. Results (Linux, headless, PIE):
+
+- `--level 6` (112,000): the Mother dead at 47,179. The stage-2 wait runs 68,238-68,716 and the
+  stage-3 wait 73,280-73,762, and **the Primagen is dead at 78,242**, followed by the credits and
+  the hub. 0 deaths.
+- The Primagen boss recipe (new game, `T2_WARP_TO=7602`, boss env, fire held, `lair_strafe`
+  15,000-45,000, `T2_BOSS_FRONT=450,3000,2.5,1`): dead at 43,586, then the credits.
+- The whole game enters by the hub portal: key 6 goes in, cinema 43 plays and the lair follows, with
+  no `T2_WARP_TO`. `--hop` stays as a DEBUG-ONLY fallback. Before the fix, the hop no longer
+  helped either: the run with `--hop` stopped in the stage-3 wait after the hop's reload.
+
+### 21.3 The whole game with fewer aids
+
+All of these runs use `playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6` plus:
+
+| run | further options | result |
+|---|---|---|
+| A | `--cheats-on 110,3,4 --hop` (before the fix) | stuck in the stage-3 lair wait after the hop |
+| B | `--cheats-on 110,3,4` (before the fix) | stuck in the lair wait |
+| C | `--hop` (no invincibility anywhere) | game over at the Mother |
+| D | `--cheats-on 110,3,4` | **END 2** by the real entrance |
+| E | `--cheats-on 110,3` (the Primagen without) | game over in the lair (3 lives lost) |
+| F | `--cheats-on 3,4` (the City Totem without) | **END 2** (its stage-2 wait took 15,000 frames: the 3,000-frame relocations) |
+| G | `--cheats-on 110,3,4`, keys 2 and 3 on their natural visits | **END 2**, all five totems |
+| H1, H2 | `--cheats-on 3,4`, natural key order (the new default) | **END 2**, **identical** |
+
+c3's suggestion therefore holds. With the round-14 routes of levels 3-6, keys 2 and 3 go into
+their own slots on the hub visits after levels 2 and 3, and the five totems are still won. That
+is now the default; `--late-keys` brings back c3's late insertion and `ROUND13_BUMP`.
+
+The run (H1 = H2: every `progress`, `event`, `pickup`, `hurt`, `death` and `bosstrace` line is the
+same, and the `state` lines are the same once pointers are masked; Linux, PIE, Debug; host frames):
+
+| frames | |
+|---|---|
+| 23,130 | the Harbor Totem won (level 1 without invincibility) |
+| 26,651 | Primagen key 1 into its slot |
+| 79,854 | the Leap of Faith talisman (chamber 73) |
+| ~83,500-88,000 | **the City Totem without invincibility**: 2 lives lost, the totem won (88,716) |
+| 91,909 | Primagen key 2 into its slot (the hub visit after level 2) |
+| 110,383 | the Marsh Totem won |
+| 113,296 | Primagen key 3 into its slot (after level 3) |
+| 129,464 / 139,425 | the Cave Totem won / **the Blind One dead** (no invincibility) |
+| 142,944 | Primagen key 4 |
+| 165,072 / 173,205 | the Hive Totem won / the Mantid Queen dead |
+| 175,499 | Primagen key 5 |
+| 204,930-231,130 | invincibility (the Mother's arena: `--cheats-on 3`); **the Mother dead** at 216,472 |
+| 221,659 / 222,839 / 223,647 | **key 6 into its slot / the hub portal cinema 43 / the Primagen's lair** |
+| 233,980- | invincibility (the lair: `--cheats-on 4`) |
+| 236,206-239,208, 244,846-245,046 | his stage-2 and stage-3 home waits |
+| 250,290 | **the Primagen dead**, cinema 370 (the good ending) |
+| 253,282- | level 10, **"END 2"**, then the credits |
+| 271,180 | the hub |
+
+The lives go 3, 2 and 1 at the City Totem, back to 2 with a pickup at ~120,000, and to 1 at the
+Primagen's death (the ending's own life loss, as in every run that kills him).
+
+### 21.4 The aids that remain
+
+- Invincibility at the Mother (`--cheats-on 3`: run C lost every life to her) and in the
+  Primagen's lair (`--cheats-on 4`: run E lost 3 lives there). `T2_CHEATS` is off everywhere else.
+- `T2_GIVE_WEAPONS=1`, the weapon schedule (`T2_WEAPON`) and `T2_FILL_AMMO` (300, then 100 in
+  level 5 and 600 in level 6).
+- The aim assists: `T2_FACE_NEAREST` at the five totems, `T2_AIM_ENEMY` windows, `T2_AIM_AT`
+  (level 6's two generators), `T2_AIM_NODE=boss@1/2/3/4`, and `T2_BOSS_FRONT` (the Queen, and the
+  lair after 3,000 frames of a wait).
+- The teleports between route steps inside the sub-levels, and `T2_ANCHOR` (the schedule clock).
