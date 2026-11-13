@@ -32,6 +32,7 @@ void T2Port_LogState(int frame);
 void T2Port_LogDet(int frame);
 void T2Port_GiveWeapons(int frame); // DEBUG-ONLY: T2_GIVE_WEAPONS=1 (t2debug.c)
 void T2Port_DebugWarp(int frame);
+void T2Port_ProgressLog(int frame);
 void T2Port_Teleport(int frame, const char *spec);
 int T2Port_ScheduleFrame(int frame);
 extern int gT2HostFrame;
@@ -688,6 +689,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             mode = m;
         }
         T2Port_DebugWarp(sFrame + 1); // DEBUG-ONLY: T2_WARP_TO=<id>[@frame][,...]
+        T2Port_ProgressLog(f + 1);    // DEBUG-ONLY: T2_PROGRESS_LOG=1
         if (args.skipPakCheck || args.startMode >= 0) {
             T2Port_DebugSwitches(args.skipPakCheck, args.startMode); // DEBUG-ONLY
         }

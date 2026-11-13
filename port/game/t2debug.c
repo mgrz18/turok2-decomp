@@ -944,3 +944,54 @@ void T2Port_LogEvent(LevelEvent *e, const char *text) {
            kObjTypes[k][1] < 0 ? -1 : (int) CScene__GetLinkGroupCount(&gScene, kObjTypes[k][1]));
     fflush(stdout);
 }
+
+/* T2_PROGRESS_LOG=1 (DEBUG-ONLY, round 13 b3): one "progress:" line each time the first
+ * player's game-completion state changes: the five totem flags (Primagen_EnterDeath picks the
+ * ending cinema 0x172 only with all five, else 0x173), the four boss flags, the talismans
+ * (items 4380-4384, m_SpecialPickupCount[item - 4000]: low nibble held, high nibble used), the
+ * Primagen keys (4360-4365), the nuke parts (4500 and m_NukePartLevelFlags), the cheats the
+ * game unlocked (m_Settings.unlockedCheats) and the ending flags. */
+extern s32 gFinalEnding;
+extern s32 gEndingPrimagenDefeated;
+void T2Port_ProgressLog(int frame) {
+    static int on = -1;
+    static char last[256];
+    char cur[256];
+    CPlayer *p;
+    CPlayerLoadSaveData *d;
+    int n, i;
+
+    if (on < 0) {
+        on = getenv("T2_PROGRESS_LOG") != NULL;
+    }
+    if (!on) {
+        return;
+    }
+    p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    if (p == NULL) {
+        return;
+    }
+    d = &p->m_Data;
+    n = snprintf(cur, sizeof(cur), "totems %d%d%d%d%d bosses %d%d%d%d talismans",
+                 d->m_bLevel1TotemFlags != 0, d->m_bLevel2TotemFlags != 0, d->m_bLevel3TotemFlags != 0,
+                 d->m_bLevel4TotemFlags != 0, d->m_bLevel5TotemFlags != 0, d->m_bBlindBossComplete != 0,
+                 d->m_bQueenBossComplete != 0, d->m_bMotherBossComplete != 0, d->m_bPrimagenBossComplete != 0);
+    for (i = 380; i <= 384; i++) {
+        n += snprintf(cur + n, sizeof(cur) - n, " %02x", d->m_SpecialPickupCount[i]);
+    }
+    n += snprintf(cur + n, sizeof(cur) - n, " pkeys");
+    for (i = 360; i <= 365; i++) {
+        n += snprintf(cur + n, sizeof(cur) - n, " %02x", d->m_SpecialPickupCount[i]);
+    }
+    n += snprintf(cur + n, sizeof(cur) - n, " nuke %02x flags ", d->m_SpecialPickupCount[500]);
+    for (i = 0; i < 6; i++) {
+        n += snprintf(cur + n, sizeof(cur) - n, "%d", d->m_NukePartLevelFlags[i]);
+    }
+    snprintf(cur + n, sizeof(cur) - n, " cheats %x ending %d/%d", (unsigned) gEngineApp_m_Game.m_Settings.unlockedCheats,
+             (int) gFinalEnding, (int) gEndingPrimagenDefeated);
+    if (strcmp(cur, last) != 0) {
+        strcpy(last, cur);
+        printf("progress: frame %d level %d %s\n", frame, (int) gScene.m_nLevel, cur);
+        fflush(stdout);
+    }
+}
