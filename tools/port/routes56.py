@@ -387,10 +387,7 @@ def build_level56(level, new_game, fire_every):
         tps.append("%d:%.1f,%.1f,%.1f,%.4f" % (start + rel, x, y, z, ry))
         env[0] += ",7602@%d" % (start + L6_PRIMAGEN_HOP)
         env[env.index("T2_FILL_AMMO=300")] = "T2_FILL_AMMO=600"
-        # round 14 c3: the spot cycles (",600,2.5,1": another one each 600 frames of a lair wait that does
-        # not end), as in fullrun.py: since round 13 b2 (fired events restored when a level loads) he
-        # rests at z 2,906 in this run, where the single spot never ends his stage-2 wait
-        env += ["T2_AIM_NODE=boss@3/4", "T2_BOSS_FRONT=450,600,2.5,1", "T2_BOSS_LOG=1"]
+        env += ["T2_AIM_NODE=boss@3/4", "T2_BOSS_FRONT=450", "T2_BOSS_LOG=1"]
     if aim_at:
         env.append("T2_AIM_AT=\"%s\"" % ";".join(aim_at))
     if aim_enemy:
