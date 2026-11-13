@@ -394,25 +394,28 @@ OLD_CINEMA = {2: 13420, 3: 13410, 4: 13420}  # the same frame in the level's own
 # order (its "slot 2" was actor 5, which needs key 6): a slot touched without its key refuses it
 # (Action_CheckRequiredItem returns 0, "Primagen key N required") and stays solid, which is why the
 # walks at "slots 2 and 3" slid round them. Key K: (x, y, z) of its slot.
-PRIMAGEN_SLOTS = {1: (70.7, 0.0, 182.9),     # actor 4  (object 154), item 4360
+PRIMAGEN_SLOTS = {1: (71.0, 0.0, 183.0),     # actor 4  (object 154), item 4360
                   2: (-85.7, 0.0, 202.8),    # actor 11 (object 291), item 4361
                   3: (-184.9, 0.0, 72.6),    # actor 12 (object 292), item 4362
-                  4: (-119.3, 0.0, -71.3),   # actor 7  (object 161), item 4363
+                  4: (-119.0, 0.0, -71.0),   # actor 7  (object 161), item 4363
                   5: (36.7, 0.0, -84.5),     # actor 6  (object 159), item 4364
                   6: (133.2, 0.0, 38.0)}     # actor 5  (object 158), item 4365
-PRIMAGEN_RING = (-24.9, 56.8)   # the centre of the ring of slots (each ~158 from it)
 # Keys 2 and 3 are picked up in levels 2 and 3 but go into their slots only in the hub visit after
-# level 5: put in on the visits after levels 2 and 3 they changed the later fights (the Marsh Totem
-# 7/8 -> 4/8 kills, lost: the defences are marginal and any change before them moves their kills),
-# so the totem levels keep round 13's schedule (the 150 frames of each old walk kept as a pause).
+# level 5 (with key 5). Put in on the visits after levels 2 and 3, they changed the totem fights that
+# follow (the Marsh Totem 7/8 -> 4/8 kills: lost; the defences are marginal, and any change of the
+# game state before them moves their kills; see PLAYTHROUGH.md 17). Those two visits keep round 13's
+# walks instead (ROUND13_BUMP: they bump the slots of keys 6 and 5, "Primagen key N required"), so
+# levels 1-5 play exactly as in round 13; the real order is only a schedule choice of this route.
 PRIMAGEN_LATE = (2, 3)
+ROUND13_BUMP = {2: (71.0, 0.0, 183.0, -0.4040), 3: (133.0, 0.0, 38.0, 0.6620)}
 HOP = False                     # --hop: round 13's fallback warp 7602 (DEBUG-ONLY)
 
 
 def primagen_slot(r, t, k):
-    """Primagen key k into its slot: stand 90 outside the slot (away from the ring's centre), walk in."""
+    """Primagen key k into its slot: stand 90 outside the slot (on the line from the plaza's origin),
+    walk in (every slot is reached this way: a new game with the six keys given fills all six)."""
     x, y, z = PRIMAGEN_SLOTS[k]
-    r.pick(t, x, y, z, math.atan2(x - PRIMAGEN_RING[0], z - PRIMAGEN_RING[1]))
+    r.pick(t, x, y, z, math.atan2(x, z))
 
 
 SAVE_PORTAL = (-977.9, -221.0, -2035.3, 1.4423)   # the hub's save portal (warp 999 -> level 97)
@@ -429,7 +432,7 @@ SAVE_TIME = 2000
 GRANT = {1: (2, 3), 2: (4,), 3: ()}
 
 
-def hub(r, arrival, grant=(), primagen=(), save=True, go=None, pause=0):
+def hub(r, arrival, grant=(), primagen=(), save=True, go=None, bump=None):
     """The hub from `arrival`: pads `grant` (their keys in), Primagen key slots, a save, then
     the portal of level `go`; returns (the frame the level's first cinema starts, or the end)."""
     t = arrival + 150
@@ -450,7 +453,11 @@ def hub(r, arrival, grant=(), primagen=(), save=True, go=None, pause=0):
         r.note(t, "60 the hub: Primagen key %d slot" % k)
         primagen_slot(r, t, k)
         t += 150
-    t += pause   # round 14 c3: the time of a slot walk moved to a later visit (keeps the schedule)
+    if bump:     # round 14 c3: round 13's walk of this visit (ROUND13_BUMP), no key goes in
+        x, y, z, ry = bump
+        r.note(t, "60 the hub: round 13's walk by the Primagen key slots (no key: the RNG of round 13)")
+        r.tp(t, x, y, z, ry, 40)
+        t += 150
     if go is None:
         return t
     r.note(t, "60 the hub: through the level %d door to the portal %d000" % (go, go))
@@ -513,9 +520,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.note(hubs[2], "60 the hub (after level 2)")
     r.anchors.append((hubs[2], 60))
     if upto < 3:
-        hub(r, hubs[2], grant=GRANT[2], pause=150)
+        hub(r, hubs[2], grant=GRANT[2], bump=ROUND13_BUMP[2])
         return r.write(out)
-    c = hub(r, hubs[2], grant=GRANT[2], pause=150, go=3)
+    c = hub(r, hubs[2], grant=GRANT[2], bump=ROUND13_BUMP[2], go=3)
     shift = c - OLD_CINEMA[3]
     r.anchors.append((c, 12))
     r.note(c, "12.. the Death Marshes intro cinemas (level 3 route shifted by %d)" % shift)
@@ -528,9 +535,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.note(hubs[3], "60 the hub (after level 3)")
     r.anchors.append((hubs[3], 60))
     if upto < 4:
-        hub(r, hubs[3], grant=GRANT[3], pause=150)
+        hub(r, hubs[3], grant=GRANT[3], bump=ROUND13_BUMP[3])
         return r.write(out)
-    c = hub(r, hubs[3], grant=GRANT[3], pause=150, go=4)
+    c = hub(r, hubs[3], grant=GRANT[3], bump=ROUND13_BUMP[3], go=4)
     shift = c - OLD_CINEMA[4]
     r.anchors.append((c, 18))
     r.note(c, "18.. the Lair of the Blind intro cinemas (level 4 route shifted by %d)" % shift)
