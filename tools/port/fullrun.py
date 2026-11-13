@@ -249,6 +249,26 @@ L2_RETRY = [(12, 5950, -714.0, 0.0, 488.0, 0.0)]
 # (here: after level 1 and the hub, not a new game): in one run the zombies of 133 died ~2,000
 # frames later than in --level 2 and the route left before the sister woke.
 L2_STRETCH = [(6, 4, 3000), (9, 3, 2000), (12, 15, 2000)]   # (6, 4): sister 1 s window (round 13 b2: after the zombies)
+# Round 13 C28: level 2 WITHOUT invincibility (--cheats-off 2) keeps round 12's sister-1 steps (the
+# sister aimed from the start, b5's measured route): b2's zombies-one-by-one aim stands the player
+# among them for 4,500 frames (200 damage in 133, a death, and the run desyncs from there)
+L2_133_NOCHEATS = [
+    (0, -1504.0, -4761.6, -972.0, -1.5708, 0, {"trig": 1, "fire": 1300, "aim": "enemy"}),
+    (1400, -847.0, -4761.6, 1574.0, 3.1416, 0, {"trig": 1, "fire": 6500, "aim": "enemy:20"}),
+    (8000, 827.5, -4761.6, -1627.5, -2.8692, 150, {}),
+]
+L2_STRETCH_NOCHEATS = [(6, 1, 3000), (9, 3, 2000), (12, 15, 2000)]
+
+
+def l2_segments(nocheats):
+    """playthrough.L2_SEGMENTS, with round 12's sister-1 steps when level 2 has no invincibility."""
+    if not nocheats:
+        return pt.L2_SEGMENTS, L2_STRETCH
+    segs = list(pt.L2_SEGMENTS)
+    name, rel, steps = segs[6]
+    assert name.startswith("133 ")
+    segs[6] = (name, rel, L2_133_NOCHEATS)
+    return segs, L2_STRETCH_NOCHEATS
 
 
 def stretch(segments, extra):
@@ -465,8 +485,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.note(c, "34.. the River of Souls intro cinemas (level 2 route shifted by %d)" % shift)
     l2s = pt.L2_START + shift
     h2 = health and 2 in r.no_cheats
-    a2 = level_segments(r, pt.L2_SEGMENTS, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}) if extras else {},
-                        L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else []), L2_STRETCH,
+    l2segs, l2stretch = l2_segments(2 in r.no_cheats)
+    a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}) if extras else {},
+                        L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else []), l2stretch,
                         back=L2_RETURN_LATE if h2 else (), detours=det.get(2))
     t_arr = pt.L2_TOTEM_ARRIVAL + shift + a2
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
@@ -550,7 +571,9 @@ L6_BACK_114 = 26000
 L6_EXIT_AFTER = 500     # the exit teleport, after 114 is reached again
 L6_HUB_AFTER = 800      # the hub (6999's place: the level-6 corridor)
 L6_WALK_AFTER = 200     # the walk back down the corridor to the plaza, after the hub
-L6_SLOT_AFTER = 650     # Primagen key 6 into its slot, after the hub
+L6_SLOT_AFTER = 1100    # Primagen key 6 into its slot, after the hub (round 13 C28: 650 -> 1100; with b2's door fix and
+                        # the Leap of Faith trip the Primagen rested at z 2,923 after a 650 hop, the known no-end spot of
+                        # his stage-3 lair wait; 300 and 1,100 both end it)
 L6_CINEMA = 1150        # the slot -> the hub portal cinema (43) -> the Primagen's lair (level 4)
 L6_HUB_END = 49500      # the hub after the credits, from the Primagen's lair (the hop's 51,000 - 1,500)
 PRIMAGEN_KEY = "4@%d"   # the anchor on his lair
