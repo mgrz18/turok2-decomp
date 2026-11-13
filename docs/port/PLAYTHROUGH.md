@@ -1501,3 +1501,88 @@ portal cinema (43) does not fire and the hop stays.
 - `--level 6` on its own no longer kills the Primagen: the run equals round 12's up to the Mother,
   but after the hop (54,000) his stage-2 lair wait (resting at z 2,906) does not end; other hop frames
   (53,700-57,000) and the spot cycle did not help. The whole-game run and the boss recipe kill him.
+
+## 17. Levels 3 and 4 without invincibility (Phase 7 round 14, part c1)
+
+`fullrun.py --cheats-off 3,4` now plays the Death Marshes and the Lair of the Blind with no
+`T2_CHEATS` invincibility, every sub-level, both totems and the Blind One, **with 0 deaths**. All
+the changes apply only to a level named in `--cheats-off` (the default `--all` and the
+`--cheats-off 1,2[,5,6]` routes are input-for-input unchanged: their playthrough.txt and
+teleport.env are identical to c8414758's).
+
+### 17.1 What killed the player (T2_HURT_LOG, rescue runs)
+
+- **69, 70, 71 (the ammo storages): an ambush, not a host bug.** "armory destroyed." wakes a
+  group of obj-230 gunners on the balconies over the charge point (69: instances 7, 8, 12, 13;
+  70: four woke 4 frames after the message). Round 12's route stood by the charge point until
+  +600, so they shot it from +470: 44 health in 16 frames in 69, 100 in 36 frames in 70.
+- **64: the marsh.** The second satchel charge lies on an island (region info 14, floor 2.8);
+  round 12 stood in the water beside it (region info 12: flags 0x40180001, 75 health per
+  `m_DamageInterval` 1.0, i.e. every 15 game frames; the values come straight from the level
+  data, levels.py `collision.region_infos`). Two of those and the player was dead.
+- **The obj-230 "3 hits per hit"**: one burst is two shots by design and the third is the
+  game's own hold of the last frame. `T2_ANIM_LOG=230` (new, DEBUG-ONLY: one `animev:` line per
+  animation event an object type fires) shows the gunner's fire animation (anim 1, 3 frames,
+  clip header blendFrames 0, loopStart 2, rate 15) firing event 2 (frame 0, effect 3: the
+  hit) at gf N and event 3 (frame 2, effect 3) at gf N+4 **and N+5**: at N+4 the time passes the
+  last frame and `CAnimationState__GetRootMotion` (func_00218B10) wraps it to loopStart 2 = the
+  last frame (a hold); at N+5 it advances from 2.0 again and `FireAnimEvents` fires [2.0, 2.5)
+  a second time, until the AI changes the animation. The decomp is byte-identical to the N64's
+  code, the clip header is swapped as two u16 (tools/assets/swap_spec.json: `u16:blendFrames
+  u16:loopStart`), and the damage is effect 3 = `ImpactEvent_DirectDamage` (flags 0x100000, no
+  falloff; 13-42 per shot by gunner kind). So the N64 does the same unless its AI leaves the
+  animation one frame earlier. **Not traced on the N64** (no warp into 69 on the emulator; the
+  route no longer stands in their fire, so it does not matter to the run).
+
+### 17.2 The route changes (fullrun.py `L3_*`, `L4_*`)
+
+| where | change |
+|---|---|
+| 61 | the two health +10 beside the first satchel charge (object 542) |
+| 69 | the full health (object 545, (150, 0, -165), reachable from -z only) before the charge; after the charge walk, the player waits by the exit warp 3778 (a floor below the gunners, out of sight) and walks into it at +480 (the armory blows at ~+440) |
+| 64 | the satchel from the island's +x side (stand x -1150, walk 25: 40 frames run off the island's edge at x -1385), through the island's third health +10; the other two +10 picked first |
+| 70, 71 | the same wait at the exit warp (3779 / 3781), into it at +460 / +480 |
+| 66 | the ultra health (object 548, (2634, -560, 2052)) before the Marsh Totem |
+| 100, 105, 103 | the full health by the level key, a full health on 105's second visit, 103's ultra health by the exit 7400 (the Cave Totem next) |
+| the Cave Totem and the Blind One | the scorpion launcher (16) instead of the plasma rifle (`T2_WEAPON` is applied when a level loads, so the switch is scheduled in 103; back to 10 at the hub) |
+
+Health objects (the level actors in levels.py's grid sections; the y in the picks is the floor):
+542 health +10, 545 full health, 548 ultra health. The hub anchors after levels 3 and 4 move with
+the picks (150 frames each), and the next level's `T2_CHEATS` setting starts there.
+
+**The weapon at the Blind One.** With the plasma rifle and no invincibility she was never hurt:
+hp 12,800/12,800 to the end of the run (the player stands on the ledge, y 74.9, with fire held and
+`T2_AIM_NODE=boss`; with invincibility the same fight ran 10,000-34,500 frames). With the
+scorpion launcher she dies 5,200 frames after her arena loads. At the Cave Totem the plasma
+rifle took 200 damage (17 hits of 9 from obj 92 and 6 of 8 from obj 95) and a life; the scorpion
+launcher 88 and won it 1,160 frames earlier.
+
+### 17.3 The run (Linux, headless, PIE, Debug; host frames)
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4 --cheats-on 110 --slot 300
+# run as in STATUS.md section 1, --frames 300000
+```
+
+**0 deaths in levels 1-4** (levels 5 and 6 invincible); two runs identical (every
+progress/event/hit/hurt/death/state/bosstrace line):
+
+| sub-level | hits | damage | lowest health |
+|---|---|---|---|
+| 61, 62, 63, 65-68, 69, 70, 71 | 0 | 0 | |
+| 64 | 5 | 24 | 78 |
+| 111 the Marsh Totem (won 107,943) | 62 | 62 | 138 |
+| 106 / 102 / 107 / 108 | 5 / 2 / 6 / 6 | 10 / 2 / 12 / 7 | 128 / 126 / 114 / 107 |
+| 112 the Cave Totem (won 127,534) | 11 | 88 | 112 |
+| 1 the Blind One (dead 136,871) | 43 | 81 | 31 |
+
+Then levels 5 and 6 as before (the Queen dead 172,465, the Mother 213,690), the Primagen dead
+249,859 with cinema 370 (the good ending), "END 2", the credits and the hub at 270,749; exit 0.
+**`--slot 300` is needed with these levels**: with the default 1,100 the Primagen sat in his
+lair wait (hp 25,600, the known no-end spot of section 16.3) to the end of the run; 300 ends it
+(both values were measured in round 13). The default and `--cheats-off 1,2` runs keep 1,100.
+
+### 17.4 Still open
+
+- The obj-230 hold-frame double shot against the N64 (an RDRAM warp into 69 for n64trace).
+- The Primagen's lair wait depends on the hop frame (`--slot`): c3's part this round.
