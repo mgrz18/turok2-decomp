@@ -17,6 +17,43 @@ The matching build is unchanged: `tools/asm_diff.py --base 046a67f9 -j 8` report
 over all 3,938 files after every merge and every fix, and a clean `make clean && make setup &&
 make build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
+## Round 13, part b5: fewer cheats, data debt
+
+- **Host bug fixed: health pickups were never taken.** gendata laid `sHealthPickups`' union out by
+  its first member, so `m_Max` was 0. Now `CPickupRow18Health` (TARGET_PORT, include/structs/pickup.h).
+  **Rerun gendata** (`rm decls.json`). The boot's 523,287 det lines are identical to 324bae6b's
+  (64BIT.md part 7).
+- **a5's four views** (STABILITY.md 9):
+  - `Turret_Effects` fixed: the pose context's bone index, plus the gun pitch passed as a float.
+    The s32 shim cut the matrix pointer, which **crashed at the first level-124 turret** once the
+    index was right. b4 fixed the same function independently: keep one version.
+  - `RumbleMenu_Play`/`_2` fixed: they now read the window's members (it had written 0 through a
+    pointer made of padding).
+  - `Generator_SpawnObject` is unreachable.
+  - `CStaticObject__Draw`/`RequestLitVertices` were already right (their fields are pinned by
+    `_Static_assert`).
+- **Debug**: `T2_HURT_LOG=1|2[,R]` (`hit:`, `hurt:`, `death:`, `hurtsum:` lines, and a rescue
+  with shadow deaths for measuring). `T2_CHEATS` is frame-scheduled. fullrun.py takes
+  `--cheats-off L,...`, `--cheats-on 110`, `--env K=V` and `--no-health`.
+- **Levels 1 and 2 play with no invincibility and 0 deaths**: `fullrun.py RUN --cheats-off 1,2
+  --cheats-on 110`, health picked up on the way, lowest health 26. The City Totem stays
+  invincible. **With that, the whole game still completes** (the hub at 296,000; frames 320,000).
+  Levels 3-6 one at a time:
+  - level 5 needs no invincibility;
+  - level 3: marsh damage regions on the route, and the obj-230 hits applied 3 times each (check
+    on the N64);
+  - level 4: the Blind One (206 damage, no health on the way);
+  - level 6: the 119 air starts (fall damage).
+
+  Details: PLAYTHROUGH.md section 12. The 119 jump is variable: a held R rises 95 units, more
+  than the 61.4 needed; a2's 59.5 was a short press. The port matches the N64 (demo 3).
+- Merge notes: tools/port/fullrun.py (b1/b2 also edit it). My additions are the `Route`
+  attributes `level_start`, `no_cheats`, `cheat_windows`, `cheats_on` and `extra_env`, the
+  `L*_HEALTH` and `L2_RETRY_B5` tables, the `back=` argument of `level_segments`, and the new
+  options. Without `--cheats-off` the output is round 12's plus one key walk in 135.
+  port/game/t2debug.c and t2bosslog.c (appended functions; `T2Port_Cheats`), port/app/game.cpp
+  (one hook), src func_00247C10.c (one TARGET_PORT hook).
+
 ## 1. Build and run
 
 ```sh
