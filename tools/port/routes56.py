@@ -374,11 +374,11 @@ def lair_strafe(first, last, period=80, sweep=0):
         out.append("CL@%d..%d" % (f, f + period // 2 - 1))
         out.append("CR@%d..%d" % (f + period // 2, f + period - 1))
     if sweep:
-        # round 15 d1: and a slow walk back and forth (C-down a quarter of the sweep, C-up a quarter,
+        # round 15 d1: and a slow walk back and forth (C-up a quarter of the sweep, C-down a quarter,
         # no net drift): the sight line past object 1911 also depends on the player's distance
         for f in range(first, last, sweep):
-            out.append("CD@%d..%d" % (f, f + sweep // 4 - 1))
-            out.append("CU@%d..%d" % (f + sweep // 2, f + 3 * sweep // 4 - 1))
+            out.append("CU@%d..%d" % (f, f + sweep // 4 - 1))
+            out.append("CD@%d..%d" % (f + sweep // 2, f + 3 * sweep // 4 - 1))
     return out
 
 

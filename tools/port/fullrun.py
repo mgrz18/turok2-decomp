@@ -490,6 +490,7 @@ def key_visit(k):
         return {"bump": ROUND13_BUMP[k]}
     return {"primagen": (k,)}
 HOP = False                     # --hop: round 13's fallback warp 7602 (DEBUG-ONLY)
+LAIR_FRONT = "450,3000,2.5,1"   # --lair-front: T2_BOSS_FRONT in the lair (round 15 d1)
 LAIR_STRAFE = (80, 0)           # --lair-strafe P[,S]: routes56.lair_strafe's period and z sweep (round 15 d1)
 
 
@@ -800,7 +801,7 @@ def level6(r, t):
         r.weapon.append((lair - 100, "9"))
     # the spot cycles (",K,1": another one each 3,000 frames of a lair wait that does not end; round 14 C29:
     # 600 -> 3,000: the strafing by the lair start (lair_strafe) ends his home waits, the front spots do not)
-    r.boss_front.append((lair - 100, "450,3000,2.5,1"))
+    r.boss_front.append((lair - 100, LAIR_FRONT))
     r.inputs.append("Z@%d..%d" % (lair + 200, lair + L6_HUB_END))
     # round 14 C29: strafing until his death (his home waits need a sight line: routes56.lair_strafe)
     r.inputs += r56.lair_strafe(lair + 200, lair + L6_HUB_END - 18000, *LAIR_STRAFE)
@@ -816,7 +817,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE
+    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -836,7 +837,9 @@ def cli(argv=None):
     ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
     ap.add_argument("--lair-strafe", default="80,0", help="P[,S]: the lair strafing's period (C-left/C-right) and an "
                     "optional z sweep of S frames (C-down then C-up; round 15 d1)")
+    ap.add_argument("--lair-front", default=LAIR_FRONT, help="T2_BOSS_FRONT in the Primagen lair (round 15 d1)")
     a = ap.parse_args(argv)
+    LAIR_FRONT = a.lair_front
     LAIR_STRAFE = tuple(int(v) for v in (a.lair_strafe + ",0").split(",")[:2])
     L6_SLOT_AFTER = a.slot
     HOP = a.hop
