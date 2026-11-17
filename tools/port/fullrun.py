@@ -199,6 +199,11 @@ class Route:
         # PLAYTHROUGH.md 31) leaves it out: the N64's camera shake and RNG, with N64_TUNE's changes
         if not N64_SHAKE:
             env.append("T2_LEGACY_SHAKE=1")
+        # round 17 f3: the type-9 (interactive anim) props as before round 17 (their intelligence body left
+        # big-endian: they start on animation 0); every route so far was tuned on that, the --n64-shake
+        # one included. --n64-props leaves it out (the N64's props, FIDELITY.md 32-f3)
+        if not N64_PROPS:
+            env.append("T2_LEGACY_INTEL9=1")
         env += list(env_extra) + list(self.extra_env)
         with open(os.path.join(out, "playthrough.txt"), "w") as fp:
             fp.write("\n".join(self.inputs) + "\n")
@@ -570,6 +575,7 @@ L2_133_NOCHEATS = [
 L2_STRETCH_NOCHEATS = [(6, 1, 3000), (9, 3, 2000), (12, 15, 2000)]
 # --n64-shake (round 16 merge, PLAYTHROUGH.md 31): the route on the N64's RNG stream (no T2_LEGACY_SHAKE).
 # The extra fire windows it needs, as L2_STRETCH entries (segment, step, frames)
+N64_PROPS = False  # round 17 f3: --n64-props
 N64_SHAKE = False
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
 
@@ -1280,7 +1286,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE
+    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1324,10 +1330,13 @@ def cli(argv=None):
                     "picked up on the way, no T2_GIVE_WEAPONS / T2_FILL_AMMO before the hub after them (round 15 d2)")
     ap.add_argument("--n64-shake", action="store_true", help="the N64's camera shake (no T2_LEGACY_SHAKE) and "
                     "the route changes it needs (N64_L2_STRETCH; round 16 merge, PLAYTHROUGH.md 31)")
+    ap.add_argument("--n64-props", action="store_true", help="the type-9 props as on the N64 (no "
+                    "T2_LEGACY_INTEL9; round 17 f3, FIDELITY.md 32-f3): not tuned yet")
     ap.add_argument("--hub-wait", type=int, default=ARMS_HUB_WAIT,
                     help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
     N64_SHAKE = a.n64_shake
+    N64_PROPS = a.n64_props
     LAIR_FRONT = a.lair_front
     LAIR_DRIVE = a.lair_drive
     LAIR_PEEK = a.lair_peek

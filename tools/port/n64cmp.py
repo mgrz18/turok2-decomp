@@ -25,6 +25,7 @@ import argparse
 import collections
 import json
 import os
+import re
 import shlex
 import struct
 import subprocess
@@ -41,6 +42,34 @@ TYPES = {"SCN ": "CScene", "PLR ": "CPlayer", "CAM ": "CCamera", "LVL ": "CGameO
 N64_ARGS = ["--target=mips-linux-gnu", "-std=gnu89", "-fsigned-char", "-DF3DEX_GBI_2", "-D_LANGUAGE_C",
             '-DGAME_VERSION="us"', "-w"]
 
+
+# Members that differ at a level's first frames for reasons that are not the game's logic, left
+# out unless --no-noise: padding; memory the game never cleared before its first write (the blend
+# state, the shadow alpha and the lights of an actor that has not been drawn yet hold whatever the
+# heap held: zeroes on the freshly booted N64, old data in the port); the unique ids (a counter of
+# every instance made since boot: the attract loops before the warp differ); the animation start
+# time (a tick count); the camera's double-buffered viewport and projection (which of the two
+# buffers is the current one) and the particles' draw matrices (the N64 Mtx fixed-point format).
+NOISE = ["_pad", "m_Blend", "m_ShadowAlpha", "m_Lights", "m_dwUniqueID", "m_nAnimStartFrame", "m_vp",
+         "m_mProjection", "m_mOnScreenProjection", "m_LookAt", "m_mtxDraw", "m_LastOffset", "m_NextOffset"]
+PRT = re.compile(r"m_ParticleSystem\.m_ParticleVars\[(\d+)\]")
+
+
+def active_particles(f):
+    """The particle slots on the scene's three active lists (a free slot keeps stale values)."""
+    out = []
+    for j in range(3):
+        p = f.get("m_ParticleSystem.m_ActiveList[%d].m_pHead" % j)
+        n = 0
+        while isinstance(p, str) and n < 129:
+            m = PRT.search(p)
+            if not m:
+                break
+            k = int(m.group(1))
+            out.append(k)
+            p = f.get("m_ParticleSystem.m_ParticleVars[%d].m_pNext" % k)
+            n += 1
+    return out
 
 # ---------------------------------------------------------------- layouts (libclang)
 
@@ -300,7 +329,7 @@ def compare(n64, port, a):
     if not gfs:
         print("n64cmp: no common game frame (N64 %s..., port %s...)" % (sorted(n64)[:5], sorted(port)[:5]))
         return 0
-    skip = [s for s in a.skip.split(",") if s]
+    skip = [s for s in a.skip.split(",") if s] + ([] if a.no_noise else NOISE)
     for gf in gfs:
         sn = Side(n64[gf], a.lay_n64, True, 4)
         sp = Side(port[gf], a.lay_host, False, 8)
@@ -314,9 +343,19 @@ def compare(n64, port, a):
                 continue
             fn, fp = sn.fields(k), sp.fields(k)
             diffs = []
+            live = None
+            if k[0] == "SCN ":
+                an, ap = active_particles(fn), active_particles(fp)
+                live = set(an) | set(ap)
+                if an != ap:
+                    lines.append("  particles: N64 active slots %s, port %s" % (an, ap))
             for path, vn in fn.items():
                 if path not in fp or any(path.startswith(s) or ("." + s) in path for s in skip):
                     continue
+                if live is not None and path.startswith("m_ParticleSystem.m_ParticleVars["):
+                    m = PRT.match(path)
+                    if m and int(m.group(1)) not in live:
+                        continue  # a free slot: stale values
                 vp = fp[path]
                 if vn is None or vp is None or same(vn, vp, a.tol):
                     continue
@@ -335,13 +374,17 @@ def compare(n64, port, a):
                 "" if len(show) == len(diffs) else ", first %d" % len(show)))
             for (path, vn, vp) in show:
                 lines.append("      %-48s N64 %-14s port %s" % (path, fmt(vn), fmt(vp)))
-        if lines:
+        if a.brief:
+            pass
+        elif lines:
             print("gf %d:" % gf)
             print("\n".join(lines[:a.max_lines]))
             if len(lines) > a.max_lines:
                 print("  ... %d more lines" % (len(lines) - a.max_lines))
         else:
             print("gf %d: the same" % gf)
+    print("n64cmp: %d game frames compared (%s), %d differing members" % (
+        len(gfs), "%d-%d" % (gfs[0], gfs[-1]), total))
     if summary:
         print("\nmembers that differ most often (kind, member: objects x frames, first at):")
         for (kp, n) in summary.most_common(a.summary):
@@ -361,7 +404,7 @@ def run_both(a):
     if not a.skip_n64:
         cmd = ["xvfb-run", "-a", "-s", "-screen 0 1024x768x24", sys.executable,
                os.path.join(HERE, "n64trace.py"), "--rom", a.rom, "--out", os.path.join(a.work, "emu"),
-               "--to", str(a.n64_at + a.n64_frames + 2 * last), "--from", str(a.n64_at),
+               "--to", str(a.n64_at + a.n64_frames + 4 * last), "--from", str(a.n64_at),
                "--start-warp=%d@%d" % (a.warp, a.n64_at),
                "--raw", "%s:%d:%s" % (n64raw, a.level, gfs)]
         if rng:
@@ -406,15 +449,15 @@ def main():
             p.add_argument("n64")
             p.add_argument("port")
         else:
-            p.add_argument("--warp", type=int, required=True, help="the warp id (7602 the lair; -(L+1) level L at its default spawn: -61 the hub)")
-            p.add_argument("--level", type=int, required=True, help="the level the warp leads to (gScene.m_nLevel: 4 the lair, 60 the hub)")
+            p.add_argument("--warp", type=int, required=True, help="the warp id (7602 the lair, -4 the Mother)")
+            p.add_argument("--level", type=int, required=True, help="the level the warp leads to")
             p.add_argument("--work", required=True, help="a scratch dir for the dumps and logs")
             p.add_argument("--port", default=os.path.join(ROOT, "OUT/build/app/turok2"))
             p.add_argument("--archive", default=os.path.join(ROOT, "OUT/turok2.o2r"))
             p.add_argument("--rom", default=os.path.join(ROOT, "baserom.us.z64"))
             p.add_argument("--n64-at", type=int, default=600, help="emulator frame of --start-warp")
             p.add_argument("--port-at", type=int, default=1200, help="port frame of T2_START_WARP")
-            p.add_argument("--n64-frames", type=int, default=1500, help="emulator frames allowed for the load (it stops at the last dump)")
+            p.add_argument("--n64-frames", type=int, default=600, help="emulator frames allowed for the load")
             p.add_argument("--port-frames", type=int, default=1200, help="port frames allowed for the load")
             p.add_argument("--rng", default="12345678", help="gRandomValue set on both sides ('' keeps each)")
             p.add_argument("--rng-gf", type=int, default=1, help="the level's game frame at which both sides set it")
@@ -428,7 +471,9 @@ def main():
         p.add_argument("--build", default=os.path.join(ROOT, "OUT/build"), help="for the host compile flags")
         p.add_argument("--gf", default="", help="game frames: GF[-GF2][,...]")
         p.add_argument("--only", default="", help="record kinds: SCN,PLR,CAM,LVL,DYN")
-        p.add_argument("--skip", default="_pad", help="member names or path prefixes to ignore, comma-separated (default: the padding)")
+        p.add_argument("--skip", default="", help="more member names or path prefixes to ignore, comma-separated")
+        p.add_argument("--no-noise", action="store_true", help="compare the NOISE members too (uninitialised memory...)")
+        p.add_argument("--brief", action="store_true", help="only the summary")
         p.add_argument("--tol", type=float, default=0.0, help="relative float tolerance (0: exact)")
         p.add_argument("--per-object", type=int, default=6, help="members shown per object")
         p.add_argument("--all-fields", action="store_true")

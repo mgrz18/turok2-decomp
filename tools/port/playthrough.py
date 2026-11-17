@@ -504,6 +504,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("out", nargs="?", default=".")
     ap.add_argument("--fight", type=int, metavar="WEAPON", help="fight the totem defense with this weapon")
+    ap.add_argument("--n64-props", action="store_true", help="--level: the type-9 props as on the N64 (no "
+                    "T2_LEGACY_INTEL9; round 17 f3); --all passes it to fullrun.py")
     ap.add_argument("--level", type=int, default=1, choices=(1, 2, 3, 4, 5, 6),
                     help="1: the Port of Adia, 2: the River of Souls, 3: the Death Marshes, 4: the Lair of the Blind, "
                          "5: the Hive of the Mantids, 6: the Lightship (tools/port/routes56.py)")
@@ -519,7 +521,7 @@ def main():
         import fullrun  # round 12 a3
         # levels 1-6, the Primagen, the ending (round 12 C27); the other options go to fullrun.py
         # (--talismans, --cheats-off, --cheats-on, --no-health, --env, --slot, --upto, --hub; round 13 C28)
-        fullrun.cli([a.out] + rest)
+        fullrun.cli([a.out] + rest + (["--n64-props"] if a.n64_props else []))
         return
     if a.level == 4:
         if a.direct:
@@ -552,6 +554,8 @@ def main():
     with open(os.path.join(a.out, "playthrough.txt"), "w") as fp:
         fp.write("\n".join(inputs) + "\n")
     env.append("T2_LEGACY_SHAKE=1")  # round 16 e1: the RNG stream the level routes were tuned on
+    if not a.n64_props:  # round 17 f3: the type-9 props as the routes were tuned (FIDELITY.md 32-f3)
+        env.append("T2_LEGACY_INTEL9=1")
     with open(os.path.join(a.out, "teleport.env"), "w") as fp:
         fp.write("T2_TELEPORT=\"%s\"\n" % ";".join(tps))
         for e in env:
