@@ -1954,3 +1954,55 @@ Primagen's death (the ending's own life loss, as in every run that kills him).
   (level 6's two generators), `T2_AIM_NODE=boss@1/2/3/4`, and `T2_BOSS_FRONT` (the Queen, and the
   lair after 3,000 frames of a wait).
 - The teleports between route steps inside the sub-levels, and `T2_ANCHOR` (the schedule clock).
+
+## 22. Teleports counted, walking instead of teleporting in levels 1-2 (Phase 7 round 15, part d5)
+
+**The count** (the default `--all` command of STATUS.md section 1: 289 teleports). Per level,
+with the sub-levels' teleports summed (`fullrun.txt` timeline, each teleport assigned to the
+segment before it):
+
+| part of the run | teleports | on one floor, 100-4,000 units (walk candidates) |
+|---|---|---|
+| level 1 (51-59, 109; key and health picks included) | 33 | 6: 3 route steps, 2 key picks, the totem spot |
+| level 2 (125-135, the chamber 73, 110) | 52 | 18: 16 route steps, 2 crypt-key retries |
+| level 3 (61-71, 111, its intro cinemas) | 38 | not probed |
+| level 4 (98-108, the Blind One, 112) | 34 | not probed |
+| level 5 (84-96, 124, 113) | 41 | not probed |
+| level 6 and the lair (114-123, 4) | 69 | not probed |
+| the hub, all visits (60) | 22 | 4 (picks) |
+| total | 289 | |
+
+Most teleports go from where a warp drops the player to a point across the sub-level (a pickup,
+a switch, a warp), through doors and corridors, often to another floor: they are routes, not
+walks. The others were tried.
+
+**The walker** (`playthrough.stick_walk`, `fullrun --walk 1,2`, port-free: input only): from where
+the player stands at the step's frame in the default run (x, z and the yaw from its teleport log
+and det log; `tools/port/walkcands.py RUNLOG` lists them), turn with the stick (c5's
+`stick_turn`), hold C-up for the distance, wait, turn to the step's facing; the step's own C-up
+walk follows. The step and every later step of the level move by the walk's frames (the hub's
+`T2_ANCHOR` takes the rest of the run back to its schedule). C-up on level 53's open floor
+(`T2_STATE_LOG=2`): the player moves 5 frames after the press, reaches 7.68 units per frame in
+~24 frames. `--walk-probe` also teleports at each walk's end: the teleport's log line is the
+arrival, and every walk starts from the default route's place (one run measures them all).
+
+**The probe** (`--walk 1,2 --walk-probe`, Linux Release, the 19 route-step candidates):
+
+| where | walks | arrival error |
+|---|---|---|
+| 53: beacon 2, the cage; 54: the cage | 3 | 1,422 (a wall at z 6,950), 233 and 955 (the cages' bars) |
+| 133: the zombie rooms | 3 | 2,143-5,191 (doors) |
+| 134: start -> gate | 1 | **197** (kept) |
+| 134: the gate spot, the exit 2613 | 2 | 867, 1,669 (after aim-assisted fights: the yaw the walk starts from is not the default run's) |
+| 135: switches, crypts, the water hall | 10 | 156 (crypt 1's key, 451 units) and 813-3,383 (graves, crypt walls) |
+
+So in levels 1-2 **one** teleport is a plain walk: 134's from the start to the gate (1,571 units
+straight along +x; it arrives ~200 short, the zombie-4 fight there opens gate 8, and the next step
+teleports back to the gate spot). The others need waypoints around walls and doors, or a walker
+that reads where the player is (the closed-loop input of part d3): open loop, 10% of a long walk
+is already 150 units. L1_WALKS stays empty with the reasons in fullrun.py.
+
+**Runs** (Linux Release `-O2`, PIE): `--walk 2` (one walk): levels 1-5 and 6 as before (all five
+totems, the six keys in their slots, cinema 43, the lair reached at 221,747), but the Primagen is never engaged: 420,000 frames, his hp still 25,600/25,600 in mode 1. This is the lair's home wait (PLAYTHROUGH.md 21: it needs a line of sight past object 1911). The earlier walk moved the run's timing, and the route's strafing window passed without a sight line. This is the known knife edge, not the walk. The
+default command (no `--walk`) writes the same `playthrough.txt` and `teleport.env` as before
+(byte-identical) and its det log is the base build's over 290,000 frames.
