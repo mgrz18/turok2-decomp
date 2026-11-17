@@ -126,6 +126,7 @@ class Route:
                         self.aim_at.append("%d-%d:%.1f,%.1f,%.1f" % ((a, b) + tuple(aim)))
 
     def write(self, out, env_extra=()):
+        os.makedirs(out, exist_ok=True)  # round 16 e4: RUN/ need not exist
         for a, b in self.fire:
             for f in range(a, b, pt.FIRE_EVERY):
                 self.inputs.append("Z@%d..%d" % (f, f + 6))

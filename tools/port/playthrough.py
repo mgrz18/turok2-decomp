@@ -548,6 +548,7 @@ def main():
         # T2_FILL_AMMO (round 10 y4): 150 plasma cells last to ~20,600, 4 kills; round 9's win
         # came from a host read past gImpactEventHandlers (fixed in CParticleSystem__Spawn)
         env += ["T2_GIVE_WEAPONS=1", "T2_WEAPON=%d" % a.fight, "T2_FACE_NEAREST=4000@109", "T2_FILL_AMMO=600"]
+    os.makedirs(a.out, exist_ok=True)  # round 16 e4: RUN/ need not exist
     with open(os.path.join(a.out, "playthrough.txt"), "w") as fp:
         fp.write("\n".join(inputs) + "\n")
     env.append("T2_LEGACY_SHAKE=1")  # round 16 e1: the RNG stream the level routes were tuned on
