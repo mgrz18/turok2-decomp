@@ -18,7 +18,8 @@
 # logs and the Controller Pak are in ~/Library/Application Support/turok2.
 #
 # Env: T2_APP_VERSION (CFBundleShortVersionString, default 0.15), T2_APP_BUILD (CFBundleVersion,
-# default 15).
+# default 15), T2_APP_ZIP=1 (also Turok2-VERSION-macos-arm64.zip next to the app, made with
+# ditto so the signature survives).
 set -e
 B=${1:?usage: mkapp.sh BUILD_DIR [APP]}
 APP=${2:-$(dirname "$B")/Turok2.app}
@@ -146,3 +147,9 @@ done
 codesign --force --deep --sign - "$APP" >/dev/null 2>&1 || { echo "mkapp.sh: codesign failed" >&2; exit 1; }
 codesign --verify --deep --strict "$APP" || { echo "mkapp.sh: codesign --verify failed" >&2; exit 1; }
 echo "$APP (bundled:$done_list; LSMinimumSystemVersion $minos)"
+if [ "${T2_APP_ZIP:-0}" = 1 ]; then
+    Z="$(dirname "$APP")/Turok2-$VER-macos-arm64.zip"
+    rm -f "$Z"
+    ditto -c -k --sequesterRsrc --keepParent "$APP" "$Z"
+    echo "$Z"
+fi
