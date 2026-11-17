@@ -89,7 +89,7 @@ FIELDS = [
     ("sc_wstate", "CScene", "m_WarpState"),
     ("sc_wid", "CScene", "m_WarpID"),
 ]
-SIZEOF = ["CGameObjectInstance"]
+SIZEOF = ["CGameObjectInstance", "CScene", "CPlayer", "CCamera"]
 HEADERS = ["common.h", "structs/particle.h", "structs/world.h", "structs/player.h", "structs/game.h",
            "structs/game_object.h", "structs/intelligence.h", "structs/collision.h", "structs/camera.h"]
 SYMS = ["gRandomValue", "gRandomValueB", "gFrameCountGameplay", "gNextTicks", "gEngineApp",
@@ -173,6 +173,7 @@ class Tracer:
         self.r, self.o, self.s, self.actors, self.out = ram, offs, syms, actors, out
         self.last_gf = None
         self.watch = set()
+        self.raw, self.raw_level, self.raw_gfs = None, None, []
 
     def actor(self, h, a, kind, i, verbose):
         r, o = self.r, self.o
@@ -195,6 +196,44 @@ class Tracer:
                                                      sv[0], sv[1], sv[2], sv[3], v[8], v[9]))
         return h
 
+    def raw_bytes(self, a, n):
+        """n bytes at a as the N64 sees them (big-endian), from the core's host-order words."""
+        n = (n + 3) & ~3
+        w = struct.unpack_from("<%dI" % (n // 4), self.r.m, a & 0x7FFFFF)
+        return struct.pack(">%dI" % (n // 4), *w)
+
+    def raw_put(self, tag, idx, gf, level, a, size):
+        self.raw.write(struct.pack("<4siIiQI", tag.encode(), idx, gf, level, a, size))
+        self.raw.write(self.raw_bytes(a, size)[:size])
+
+    def raw_dump(self, gf):
+        """--raw (round 17 f3): the records of the port's T2_RAW_DUMP (port/game/t2det.c) at the N64
+        layout, big-endian: gScene, the player, its camera, the level actors, the pooled instances."""
+        r, o, s = self.r, self.o, self.s
+        sc = s["gScene"]
+        level = r.sval(sc + o["sc_level"][0], o["sc_level"][1])
+        mode = r.sval(s["gEngineApp"] + o["app_mode"][0], o["app_mode"][1])
+        if mode != 13 or level != self.raw_level or not any(a <= gf <= b for (a, b) in self.raw_gfs):
+            return
+        self.raw_put("SCN ", 0, gf, level, sc, o["sizeof_CScene"][0])
+        p = r.u32(s["gEngineApp_m_Game"] + o["game_players"][0])
+        if valid(p):
+            self.raw_put("PLR ", 0, gf, level, p, o["sizeof_CPlayer"][0])
+            c = r.u32(p + o["pl_cam"][0])
+            if valid(c):
+                self.raw_put("CAM ", 0, gf, level, c, o["sizeof_CCamera"][0])
+        base, na = r.u32(sc + o["sc_actors"][0]), r.sval(sc + o["sc_nactors"][0], 4)
+        stride = o["sizeof_CGameObjectInstance"][0]
+        if valid(base):
+            for i in range(0, min(na, 4096)):
+                self.raw_put("LVL ", i, gf, level, base + i * stride, stride)
+        li, k = r.u32(sc + o["sc_pool"][0]), 0
+        while valid(li) and k < 256:
+            self.raw_put("DYN ", k, gf, level, li + o["li_inst"][0], stride)
+            li = r.u32(li + o["li_next"][0])
+            k += 1
+        self.raw.flush()
+
     def frame(self, n):
         r, o, s = self.r, self.o, self.s
         gf = r.u32(s["gFrameCountGameplay"])
@@ -202,6 +241,8 @@ class Tracer:
             return
         self.last_gf = gf
         sc = s["gScene"]
+        if self.raw is not None:
+            self.raw_dump(gf)
         self.out.write("det: frame %d gf %d ticks %d mode %d level %d rng %08x %08x" % (
             n, gf, r.sval(s["gNextTicks"], 4), r.sval(s["gEngineApp"] + o["app_mode"][0], o["app_mode"][1]),
             r.sval(sc + o["sc_level"][0], o["sc_level"][1]), r.u32(s["gRandomValue"]), r.u32(s["gRandomValueB"])))
@@ -302,6 +343,13 @@ def main():
                     help="N:SPEC[;N:SPEC...] (round 16 e1): at emulator frame N (at the --at breakpoint, in "
                          "gameplay) write into RDRAM. SPEC: 'player=x,y,z' (the player's position, velocity "
                          "cleared), 'lvl=I:hp=V' (level actor I's m_AI.m_Health), 'u32=ADDR:V' or 'f32=ADDR:V'")
+    ap.add_argument("--raw", default="",
+                    help="FILE:LEVEL:GF[-GF2][,...] (round 17 f3): the raw state structs (gScene, the player, "
+                         "its camera, every level actor and pooled instance) at those game frames of LEVEL, "
+                         "the records of the port's T2_RAW_DUMP; tools/port/n64cmp.py compares them")
+    ap.add_argument("--rng-set", default="",
+                    help="LEVEL:GF:HEX (round 17 f3): set gRandomValue to HEX the first time the scene is LEVEL "
+                         "at game frame GF, at the --at breakpoint (the port's T2_RNG_SET twin)")
     ap.add_argument("--at", default="CEngineApp__Update",
                     help="read the state when the CPU reaches this function (the core's debugger, a "
                          "consistent point of the game loop); 'vi' reads it from the frame callback instead "
@@ -392,6 +440,10 @@ def main():
     if a.start_warp:
         sid, _, sat = a.start_warp.partition("@")
         start_warp = [int(sid, 0), int(sat or 0), False]
+    rng_set = None
+    if a.rng_set:
+        lv, gfs, hx = a.rng_set.split(":")
+        rng_set = [int(lv), int(gfs), int(hx, 16), False]
     warp = None
     if a.warp:
         wid, _, wat = a.warp.partition("@")
@@ -411,12 +463,18 @@ def main():
             wr32(ram, app + offs["app_next"][0], 13)
             start_warp[2] = True
             sys.stderr.write("n64trace: frame %d: start at warp %d poked\n" % (state["n"], start_warp[0]))
-        if not pokes and (warp is None or warp["done"]):
+        if not pokes and (warp is None or warp["done"]) and (rng_set is None or rng_set[3]):
             return
         ram = Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM))
         sc = syms["gScene"]
         mode = ram.sval(syms["gEngineApp"] + offs["app_mode"][0], offs["app_mode"][1])
         level = ram.sval(sc + offs["sc_level"][0], offs["sc_level"][1])
+        if rng_set is not None and not rng_set[3] and level == rng_set[0] and \
+                ram.u32(syms["gFrameCountGameplay"]) == rng_set[1]:
+            rng_set[3] = True
+            sys.stderr.write("n64trace: frame %d: gRandomValue %08x -> %08x (level %d gf %d)\n" % (
+                state["n"], ram.u32(syms["gRandomValue"]), rng_set[2], level, rng_set[1]))
+            wr32(ram, syms["gRandomValue"], rng_set[2])
         p = ram.u32(syms["gEngineApp_m_Game"] + offs["game_players"][0])
         wstate = ram.sval(sc + offs["sc_wstate"][0], 4)
         gf = ram.u32(syms["gFrameCountGameplay"])
@@ -464,6 +522,15 @@ def main():
                 state["t"] = Tracer(Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM)), offs, syms,
                                     a.actors, sys.stdout)
                 state["t"].watch = set(int(x) for x in a.watch.split(",") if x)
+                if a.raw:
+                    path, lv, gfs = a.raw.split(":", 2)
+                    t = state["t"]
+                    t.raw = open(path, "wb")
+                    t.raw.write(b"T2RW")
+                    t.raw_level = int(lv)
+                    for it in gfs.split(","):
+                        lo, _, hi = it.partition("-")
+                        t.raw_gfs.append((int(lo), int(hi or lo)))
             state["t"].frame(state["n"])
 
     @FRAMECB

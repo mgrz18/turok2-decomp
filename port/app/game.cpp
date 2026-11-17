@@ -31,6 +31,7 @@ extern "C" {
 int T2Port_EngineMode(void);
 void T2Port_LogState(int frame);
 void T2Port_LogDet(int frame);
+void T2Port_RawDump(const char *spec);
 void T2Port_GiveWeapons(int frame); // DEBUG-ONLY: T2_GIVE_WEAPONS=1 (t2debug.c)
 void T2Port_DebugWarp(int frame);
 void T2Port_ProgressLog(int frame);
@@ -794,6 +795,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
                                      : (atoi(getenv("T2_DET_LOG")) > 0 ? atoi(getenv("T2_DET_LOG")) : 1);
         if (detPeriod > 0 && (f + 1) % detPeriod == 0) {
             T2Port_LogDet(f + 1); // DEBUG-ONLY: T2_DET_LOG=N
+        }
+        static const char* rawDump = getenv("T2_RAW_DUMP");
+        if (rawDump != nullptr) {
+            T2Port_RawDump(rawDump); // DEBUG-ONLY: T2_RAW_DUMP=FILE:LEVEL:GF[-GF2][,...] (round 17 f3)
         }
         static const char* teleport = getenv("T2_TELEPORT");
         if (teleport != nullptr) {
