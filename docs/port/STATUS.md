@@ -258,6 +258,9 @@ Fixes and checks of the merge:
   game.cpp and offscreen_gl.cpp compiled with the box's flags and linked against the coordinator's
   objects (`/root/R17_f4mac/turok2_f4`, the 8-bit shots checked); no full Linux build of the src
   fixes (render-only, Mac det unchanged).
+- **Open (found against the N64)**: the hub pad's cut-scene (warp 7601, level 3) draws its mist
+  cyan and its light beam multicoloured where the N64 has brown and white: the particle sprites'
+  prim colours look R/B-exchanged (RENDER.md 7.1); Adon's room (warp 999) and the lair match.
 - Files others may touch: `tools/port/refshots.py` (a new option), `port/app/game.cpp` (WriteShot,
   the --bench block), `port/app/offscreen_gl.cpp/.h`, `port/app/CMakeLists.txt`, the six src files
   above (HUD only).
