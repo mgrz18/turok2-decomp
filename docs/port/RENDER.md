@@ -236,3 +236,41 @@ prim colour, one G_VTX of `gParticleSpriteVtx` and one G_TRI2.
 Level 51 on the journey spawns no particles (no `CParticleSystem__Spawn` call after frame 11,340):
 the first-person player has no footstep hot points, and swimming does not spawn splashes through
 this path. Firing (round 7 v2) and the enemies (v3) are the next users.
+
+## 7. Round 17 (part f4): the port against Linux and the N64, the boss bars
+
+Tools and the Mac/Linux comparison: [MACOS.md](MACOS.md) 19 (`shotcmp.py`, 8-bit `T2_SHOT`,
+`refshots.py --start-warp`). Mac = Linux up to GPU rounding on edges, apart from the scissor's
+last row at the 4/3 scale (MACOS.md 19.2).
+
+### 7.1 Against the N64 (Rice), 8-bit shots
+
+| scene | N64 (emulator frame) / port (VI) | result |
+|---|---|---|
+| legal screen | 300 / 601 | text peak (200, 200, 138) on the N64, (200, 200, 136) on the port; the port's glyphs are a little wider (three-point filter at 4/3 against Rice's): no bug |
+| title | 1500 / 4500 | same layout; mean (43.1, 37.8, 23.3) against (42.8, 37.6, 23.1) (before the 8-bit readback the port's shot read 2-3 levels darker); the differences are edges (filtering, sub-pixel position) |
+| demo 1, the first enemy | 2370 (`s_d` 041) / 6253 (the best match of 50 port frames) | same view, HUD and lighting: mean (12.6, 19.0, 18.2) against (12.5, 18.7, 17.9); the enemy's pose differs (demo 1's known divergence, FIDELITY 11.3) |
+| the Primagen's lair from `--start-warp 7602@600` / `T2_START_WARP=7602@1400`, gf 75 | 700 / 1601 | **the boss health bar (green, top centre) was missing on the port: fixed (7.2)**; the blue items on the floor near the spawn are drawn on the N64 and not on the port (f3's lead: the 8 static props near the lair spawn, wrong animation); the centre screen's lighting differs a little |
+| hub portal 5000 (level 5's cinema) | 700 / 1745 | not comparable by gf: a cinema camera path advances by `osGetTime` (`gFrameIncrement = elapsed`), not by game frames |
+
+### 7.2 The boss bars (fixed)
+
+`COnScreen` holds two `COverlay`s (the boss bars) and their bosses. On the host `COverlay.m_pScript`
+is pointer-wide, so the struct is 0x48 bytes, not 0x3C, and every member after the first overlay
+moves. Five places used the N64 offsets:
+
+| function | file | what it did on the host |
+|---|---|---|
+| `COnScreen__DrawBossBars` | func_0027ADA8.c | tested `m_pBoss` at 0x40 (= `m_BossOverlay.m_Value`, 0 until the bar is drawn) and `m_pBoss2` at 0x88: **no boss bar was ever drawn** |
+| `COnScreen__SetBoss2` | func_0027AD54.c | the second bar's boss/name/percent and overlay at N64 offsets |
+| `COnScreen__ClearBoss` | func_0027AD98.c | 0 into `m_BossOverlay.m_Value` instead of `m_pBoss`: the bar stayed after the fight |
+| `COnScreen__SetBossPercent` | func_0027AD88.c | the percent into padding: the bar never went down |
+| the boss-bar reset `func_0042EBBC`, called from func_0042AC0C.c (2 sites) | func_0042EBBC.c | the callers pass `gEngineApp_m_SwooshSystem - 0x1C8` (COnScreen at its N64 size: on the host that is COnScreen + 0x40), and the body used N64 offsets: the second overlay was built over `m_pBoss`, which stayed non-NULL from level 1 on |
+
+Each is a `TARGET_PORT` body by member (the callers pass `&gEngineApp_m_OnScreen`);
+`tools/asm_diff.py --base b744bd39` = 0 for the six files. The bars are render-only: the default
+run's det log is unchanged (580,000 lines, md5 `ecb9f9f2…`). With the fix the default run shows
+the totem defence's two bars (green "Enemies", red "Time", as on the N64), the Blind One's, the
+Queen's and the Primagen's bars going down with their health, and no bar between fights
+(checked: `TMPBOSS` instrumentation, not committed, every change of `m_pBoss`/`m_pBoss2` over the
+whole run: set by the totems, Blind, Queen, Primagen; cleared after each).

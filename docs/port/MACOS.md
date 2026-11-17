@@ -1352,3 +1352,73 @@ with ThinLTO; it is **off by default**: same det log, but not faster (below).
 Mac = Linux **including the particle-pool (`ptcl`) lines**, and the two Linux runs agree with
 each other: the round-15 ptcl difference (frames 72,749-82,523) did not show (e1 saw the same
 in 16 Linux runs). All exit 0, END 2 reached. Max RSS 111 MB.
+
+## 19. Round 17 (part f4): render parity with Linux and the N64, frame pacing
+
+Branch `names-R17_f4` (from b744bd39), Mac (M5, macOS 27.2) headless with `--offscreen-gl`, the
+box for Linux (`/root/R17_f4mac`) and for the N64 reference (mupen64plus + Rice under Xvfb). A
+Release build (`-O2`, no LTO) in `OUT/build_r17`. Render details: [RENDER.md](RENDER.md) 7.
+
+### 19.1 Tools
+
+- **`tools/port/shotcmp.py`** (no numpy): two images (PPM P6 or 8-bit PNG) or two directories
+  of shots: differing pixels, pixels over `--tol` (default 8/255), max, PSNR, the box of the
+  differences, `--mean`, `--diff OUT.png` (A | B | the difference x `--gain`, red over tol). A
+  smaller image is fitted nearest-neighbour (the N64 reference shots are 640x480 too).
+- **`T2_SHOT` writes 8 bits per channel** (`T2Gl_ReadRGB8`, port/app/offscreen_gl.cpp, both hosts).
+  LUS's `ReadFramebufferToCPU` returns RGBA5551: every shot before this round had the low 3 bits
+  of each channel dropped, which made the port's frames ~2-3 levels darker than the N64
+  reference's 8-bit PNGs (the title: mean (40.3, 35.2, 21.2) against the N64's (43.1, 37.8,
+  23.3); now (42.8, 37.6, 23.1)). The 5-bit shot is exactly the 8-bit one with the low bits
+  masked. `T2_SHOT_RGB16=1` keeps the old readback. The run prints the framebuffer's colour
+  depth once (`game: T2_SHOT reads framebuffer N: colour bits 8-8-8`: the Mac's game framebuffer
+  and Linux's EGL window are both 8-8-8). `offscreen_gl.cpp` is now built with `ENABLE_OPENGL`
+  on every non-Windows host (port/app/CMakeLists.txt).
+- **`refshots.py --start-warp ID@N`**: N64 reference shots of any level from its warp (the poke
+  of `n64trace.py --start-warp`), with `OUT/shots.txt` giving each shot's gf, mode and level; the
+  port's side is `T2_START_WARP=ID@F` + `T2_DET_LOG=1 T2_DET_GF=1` (pair the shots by gf).
+- `--bench` adds the game's **cadence** (VIs from one drawn frame to the next), a **histogram**
+  of the host ms per VI and **the worst VIs**; `T2_BENCH_CSV=<file>` writes every VI (game, audio,
+  draw, total ms, drawn), and **`tools/port/benchcsv.py CSV [--det LOG]`** reports them: per-VI and
+  per-frame histograms against the 16.7 / 33.3 ms budgets, per level (with a `T2_DET_LOG` run's
+  stdout), the worst VIs and what dominated each.
+
+### 19.2 Mac against Linux, pixel by pixel
+
+Same binary sources, the same archive (`a9d14a47…`), drawn headless: Mac `--offscreen-gl`, Linux
+`SDL_VIDEODRIVER=offscreen` with its EGL window (Mesa llvmpipe).
+
+| run | shots | result |
+|---|---|---|
+| the boot to 26,000 (legal, pak, Acclaim, Iguana, title, the 3 attract demos), every 300 VIs, 8-bit | 86 pairs | 2 identical; outside rows 0 and 478 (below) **at most 85 of 307,200 pixels** differ by more than 8/255 (mean 13.6 per frame); PSNR without those rows min 41.8, median 62.4 dB |
+| the same, 5-bit (before the 8-bit readback) | 86 | the same picture: every difference is a polygon edge, an alpha-tested leaf edge or a 1-step rounding in a fog or vertex-colour gradient |
+| the default `--all` route, drawn only at every 10,000th frame (`T2_DRAW_FROM`), 5-bit | 26 | the same, apart from Linux's first drawn frame of the run (10,002: grey 48,48,48, the window's first swap; the Mac draws the cinema) |
+
+The det log of both drawn route runs is the round-16 one (580,000 lines, md5 `ecb9f9f2…`):
+drawing does not feed back, and Mac = Linux.
+
+**The one systematic difference: the scissor's last row.** The game draws at 480x360 (mode 0) and
+the frame is 640x480, a 4/3 scale. The game's scissor (0,0)-(479,359) becomes a 478.67-pixel-high
+rectangle, and LUS (`Interpreter::AdjustVIewportOrScissor`) truncates it differently by framebuffer
+orientation: Linux draws straight into the window's framebuffer (bottom-up: rows 1..478), the Mac
+into the interpreter's game framebuffer (`invertY`: rows 0..477). So the Mac draws row 0 and leaves
+row 478 black, Linux the reverse (the N64 covers rows 0..478.67: the Mac is the closer one). The
+same rounding leaves columns 638-639 black on both. It is LUS code (no port change); an integer
+scale (960x720) would avoid it.
+
+Texture filtering (three-point on both), gamma, depth, fog and alpha: no Mac-only difference.
+
+### 19.3 Not checked: the player's window on the Mac
+
+- **The Mac window uses LUS's Metal renderer by default** (`Fast3dWindow` lists Metal first on
+  macOS; `Window.Backend.Id` 3 in the config, saved after the first launch). Every Mac frame
+  checked since round 5 went through the OpenGL renderer (`--offscreen-gl`); Metal ran once, in the
+  first rounds (section 5: a crash with the old test display list). A player who sees a
+  rendering problem can switch to OpenGL with the config key `Window.Backend.Id` = 2 (FAST3D_SDL_OPENGL;
+  3 is Metal) in `turok2.cfg.json`. Checking Metal needs a window (or a Metal offscreen backend: ~2,000 lines of
+  gfx_metal.cpp, MACOS.md 8).
+- **Retina**: LUS on macOS sizes the game framebuffer in window points (`GetDimensions` uses
+  `SDL_GetWindowSize` there, pixels elsewhere, and the ImGui content region is in points), so on a
+  2x display the game renders at half the pixel resolution and is scaled up. `gInternalResolution`
+  (a float CVar, default 1; `Interpreter::SetResolutionMultiplier`) = 2 would give full
+  resolution; not changed (untested without a window).
