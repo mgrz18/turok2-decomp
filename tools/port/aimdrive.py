@@ -162,6 +162,17 @@ FIRE_EVERY = int(envf("T2_AIMD_FIRE_EVERY", 15))   # a Z tap of FIRE_HOLD frames
 FIRE_HOLD = int(envf("T2_AIMD_FIRE_HOLD", 6))
 # round 17 f5: T2_AIMD_FIRE_MAX=L:R[,L:R...]: in level L fire only at a target within R units (a --real-weapons
 # run's ammo: 134's zombies walk up from 1,700 units; the driver's Z overrides T2_FIRE_GATE's range)
+# round 17 f5: in a totem defense (the aim line's "tot"), a kind-2 candidate (running at the totem) costs this
+# much (1: as any other; < 1 shoots the totem's attackers first). The defense is lost on time alone (8 kills in
+# 120 s, TotemDefense_UpdateFight: the totem itself is never hurt), so the default keeps the nearest/weakest rule.
+TOTEM_X = envf("T2_AIMD_TOTEM_X", 1.0)
+# round 17 f5: T2_AIMD_THREAT_NEAR=L:R[,L:R...]: in level L a kind-0 candidate farther than R units costs
+# THREAT_FAR times more. Kind 0 stands for the enemy biting the player; in the Blind One's arena (level 1) the
+# kind-0 actors 400-500 units away (her body, the other phases' actors: never hurt) took 300 aimed frames each
+# before the not-hurt rule left them, while her minion bit from the ledge (a --real-weapons run: two lives).
+THREAT_NEAR = {int(a): float(b) for a, b in (v.split(":") for v in os.environ.get("T2_AIMD_THREAT_NEAR", "1:250").split(",")
+                                             if ":" in v)}
+THREAT_FAR = envf("T2_AIMD_THREAT_FAR", 6.0)
 FIRE_MAX = {int(a): float(b) for a, b in (v.split(":") for v in os.environ.get("T2_AIMD_FIRE_MAX", "").split(",") if ":" in v)}
 CAND_EVERY = int(envf("T2_AIMD_CAND_EVERY", 50))   # --stats: the candidates every this many frames
 
@@ -227,7 +238,7 @@ class Picker:
         self.seen[cid] = (frame, pos, v)
         return v
 
-    def pick(self, frame, px, pz, ry, ex, ey, ez, pitch, cands, primary, lv=None):
+    def pick(self, frame, px, pz, ry, ex, ey, ez, pitch, cands, primary, lv=None, totem=None):
         acc = lv in IMMUNE_ACC
         if not cands:
             self.cur = None
@@ -253,8 +264,12 @@ class Picker:
             eyaw = wrap(face_yaw(px, pz, lx, lz) - ry)
             epit = math.atan2(ly - ey, math.hypot(lx - ex, lz - ez)) - pitch
             cost = (d / 1000.0 + 0.1) * (1.0 + W_ANG * (abs(eyaw) + 0.5 * abs(epit)))
+            if kind == 2 and totem is not None:
+                cost *= TOTEM_X   # round 17 f5: an attacker of the totem
             if not kind:
-                cost *= THREAT_X   # a threat outside the assist's set (a boss phase's group, the sister first)
+                cost *= THREAT_X
+                if d > THREAT_NEAR.get(lv, 1e9):
+                    cost *= THREAT_FAR   # a threat outside the assist's set (a boss phase's group, the sister first)
             cost *= 1.0 + W_HP * min(hp, 25600) / 25600.0   # the weak ones first: fewer attackers sooner
             if cid == self.cur:
                 cost *= W_KEEP
@@ -309,7 +324,7 @@ def answer(line, aim, probe=None, picker=None, trig=None):
     cid = None
     if picker is not None:
         cands, _ = parse_cands(f)
-        (tx, ty, tz), cid = picker.pick(frame, px, pz, ry, ex, ey, ez, pitch, cands, (tx, ty, tz), line_level(f))
+        (tx, ty, tz), cid = picker.pick(frame, px, pz, ry, ex, ey, ez, pitch, cands, (tx, ty, tz), line_level(f), line_totem(f))
     sx, sy, eyaw, epitch = aim.answer(frame, px, pz, ry, ex, ey, ez, pitch, tx, ty, tz)
     dist = math.hypot(tx - ex, tz - ez)
     z = trig.z(frame, eyaw, epitch, dist) if trig is not None else None
@@ -653,9 +668,10 @@ def main():
                         fl = line.split()
                         cs, php = parse_cands(fl)
                         ex_, ez_ = float.fromhex(fl[6]), float.fromhex(fl[8])
-                        stats.write("# %d hp %s %s\n" % (frame, php, " ".join(
-                            "%d:%.0f:%d%s" % (c[0], math.hypot(c[1] - ex_, c[3] - ez_), c[4], "" if c[5] else "t")
-                            for c in cs)))
+                        tot = line_totem(fl)   # round 17 f5: "a" = an attacker of the totem, then the totem
+                        stats.write("# %d hp %s %s%s\n" % (frame, php, " ".join(
+                            "%d:%.0f:%d%s" % (c[0], math.hypot(c[1] - ex_, c[3] - ez_), c[4], {0: "t", 2: "a"}.get(c[5], ""))
+                            for c in cs), "" if tot is None else " tot %d %ds %d/%d" % tot))
     finally:
         rc = proc.wait()
         if walk.cur is not None:

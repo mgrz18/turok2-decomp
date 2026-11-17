@@ -574,6 +574,35 @@ N64_SHAKE = False
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
 
 
+# Round 17 f5 (--l2-heal): 135's health +10 pickups (object 542, item 1702: +10, up to 100; tools/assets/levels.py
+# level actors) on the graveyard floor, walked into after sister 3 and before the exit 2608, KEY_STEP frames each:
+# the City Totem's fight (110) comes next with no health on the way, and a stick or real-weapons run reached it
+# with 18-67 health (two lives lost there). Not the six beside sister 3's spot (the pit's damage region).
+L2_HEAL = False
+# (x, y, z, approach angle): the stand point 90 units out along the angle must be graveyard floor (y 0; the
+# graves are y 87; outside every region the teleport fails)
+L2_HEAL_PICKS = [(102.4, 0.0, -358.4, 0.0), (1556.3, 0.0, 76.6, 0.0), (1554.3, 0.0, 589.6, 0.0),
+                 (867.5, 0.0, 1146.0, math.pi), (-545.3, 0.0, 1148.1, math.pi), (-1269.4, 0.0, 1146.0, math.pi),
+                 (-1345.9, 0.0, 457.2, math.pi / 2), (2066.9, 0.2, 1323.4, 0.0), (2554.0, 0.2, 92.6, 0.0),
+                 (1235.9, 0.2, -839.6, 0.0)]
+
+
+def l2_heal(segs):
+    """--l2-heal: L2_HEAL_PICKS before 135's exit step; the later segments move by the frames added.
+    Returns (segments, frames added)."""
+    segs = list(segs)
+    i = [k for k, sg in enumerate(segs) if sg[0].startswith("135 ")][0]
+    name, rel, steps = segs[i]
+    warp = steps[-1]
+    picks = [(warp[0] + KEY_STEP * k, x + math.sin(a) * 90.0, y, z + math.cos(a) * 90.0, a, 50, {})
+             for k, (x, y, z, a) in enumerate(L2_HEAL_PICKS)]
+    d = KEY_STEP * len(picks)
+    segs[i] = (name, rel, list(steps[:-1]) + picks + [(warp[0] + d,) + tuple(warp[1:])])
+    for k in range(i + 1, len(segs)):
+        segs[k] = (segs[k][0], segs[k][1] + d, segs[k][2])
+    return segs, d
+
+
 def l2_segments(nocheats):
     """playthrough.L2_SEGMENTS, with round 12's sister-1 steps when level 2 has no invincibility."""
     if not nocheats:
@@ -1021,10 +1050,17 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         # on zombie 2 from afar); the stick driver's own fire likewise (T2_AIMD_FIRE_MAX)
         r.extra_env.append("T2_FIRE_GATE=133,134:%d,135" % L2_134_FIRE_R)
         r.extra_env.append("T2_AIMD_FIRE_MAX=134:%d" % L2_134_FIRE_R)
+    heal = 0
+    if L2_HEAL:   # round 17 f5
+        l2segs, heal = l2_heal(l2segs)
     a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {}) if extras else {},
                         L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else []), l2stretch,
                         back=L2_RETURN_LATE if h2 else (), detours=det.get(2),
                         walks=nav_table(2) if 2 in NAV else L2_WALKS if 2 in walk else None, nav_walks=2 in NAV)
+    a2 += heal
+    for k in hubs:   # round 17 f5: --l2-heal's picks move the City Totem and every later hub arrival
+        if k >= 2:
+            hubs[k] += heal
     t_arr = pt.L2_TOTEM_ARRIVAL + shift + a2
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
     arms_switch(r, 2, t_arr, real)
@@ -1288,7 +1324,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE
+    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, L2_HEAL
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1332,6 +1368,8 @@ def cli(argv=None):
                     "picked up on the way, no T2_GIVE_WEAPONS / T2_FILL_AMMO before the hub after them (round 15 d2)")
     ap.add_argument("--n64-shake", action="store_true", help="the N64's camera shake (no T2_LEGACY_SHAKE) and "
                     "the route changes it needs (N64_L2_STRETCH; round 16 merge, PLAYTHROUGH.md 31)")
+    ap.add_argument("--l2-heal", action="store_true", help="135: the health +10 pickups after sister 3, before "
+                    "the City Totem (round 17 f5, L2_HEAL_PICKS)")
     ap.add_argument("--hub-wait", type=int, default=ARMS_HUB_WAIT,
                     help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
@@ -1342,6 +1380,7 @@ def cli(argv=None):
     LAIR_STRAFE = tuple(int(v) for v in (a.lair_strafe + ",0").split(",")[:2]) if a.lair_strafe else None
     L6_SLOT_AFTER = a.slot
     ARMS_HUB_WAIT = a.hub_wait
+    L2_HEAL = a.l2_heal
     HOP = a.hop
     STICK_AIM = {int(x) for x in a.stick_aim.split(",") if x}
     NAV = {int(x) for x in a.nav.split(",") if x}
