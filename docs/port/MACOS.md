@@ -1444,8 +1444,9 @@ The default `--all` route under aimdrive.py, Release, every frame drawn on the C
   111, 10-19 ms elsewhere: LUS compiles a GL shader the first time a combiner is seen; there is no
   persistent shader cache). A paced VI costs 3-4x an unpaced one (low clocks while the process
   sleeps 67-72% of the time), still ~1 ms of the 16.7 ms period.
-- **By level** (unpaced p99 per VI): the busiest are 55, 10 (the lair), 111-113 and 0 at 1.5-1.9 ms;
-  particle-heavy fights (the hub 60 and level 4's: p99 1.1 ms) stay far below the budget.
+- **By level** (unpaced p99 per VI): the busiest are 55, 10, 111-113 and 0 at 1.5-1.9 ms; the
+  particle-heavy fights (the hub 60, the Primagen's lair = level 4: p99 1.1 ms) stay far below the
+  budget.
 - **Tried, not kept**: the user-interactive QoS class for `--pace` (to keep the paced threads on the
   performance cores): the paced 20,000-VI run got worse (mean 2.15 ms, 411 late VIs, stalls of
   0.4-0.9 s, 36 underruns), with the desktop in use at the same time; not conclusive, and nothing
