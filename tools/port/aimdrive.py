@@ -85,8 +85,7 @@ class Aim:
                 we = (elev - self.prev[2]) / dt
                 self.rate = (0.5 * self.rate[0] + 0.5 * wb, 0.5 * self.rate[1] + 0.5 * we)
         else:
-            self.rate = (0.0, 0.0)
-            self.sent = []
+            self.rate = (0.0, 0.0)   # a new target (the answers in flight still count)
         self.prev = (frame, bearing, elev, (tx, ty, tz))
         # where the answers already sent will have taken the yaw and the pitch
         yaw_p, pitch_p = ry, pitch

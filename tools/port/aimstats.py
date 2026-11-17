@@ -2,6 +2,7 @@
 """Compare the fights of whole-game runs (round 15 d3: the stick-aimed run against the assisted one).
 
     python3 tools/port/aimstats.py LOG [LOG2 ...]
+    python3 tools/port/aimstats.py --stick STATS     # aimdrive.py --stats: the tracking per aim window
 
 From each run's log (T2_HURT_LOG, T2_PROGRESS_LOG, the totem lines): the damage taken and the
 deaths per fight level, each totem's kills and time left when it was won (or lost), the frame each
@@ -53,7 +54,31 @@ def scan(path):
     return dict(dmg=dmg, deaths=deaths, hits=hits, minh=minh, totems=totems, marks=marks, lives=lives)
 
 
+def stick(path):
+    """aimdrive.py --stats lines (frame sx sy yaw-error pitch-error pitch rotY): one row per aim
+    window (a gap of more than 30 frames starts a new one): its frames, the mean yaw and pitch
+    errors and the share of frames within 0.05 rad of the target in both."""
+    rows = [l.split() for l in open(path)]
+    wins, cur = [], []
+    for r in rows:
+        if cur and int(r[0]) - int(cur[-1][0]) > 30:
+            wins.append(cur)
+            cur = []
+        cur.append(r)
+    if cur:
+        wins.append(cur)
+    print("%8s %8s %6s %9s %9s %7s" % ("from", "to", "frames", "yaw err", "pitch err", "on"))
+    for w in wins:
+        ey = [abs(float(r[3])) for r in w]
+        ep = [abs(float(r[4])) for r in w]
+        on = sum(1 for a, b in zip(ey, ep) if a < 0.05 and b < 0.05)
+        print("%8s %8s %6d %9.3f %9.3f %6.0f%%" % (w[0][0], w[-1][0], len(w), sum(ey) / len(ey), sum(ep) / len(ep),
+                                                 100.0 * on / len(w)))
+
+
 def main():
+    if sys.argv[1:2] == ["--stick"]:
+        return stick(sys.argv[2])
     runs = [(p, scan(p)) for p in sys.argv[1:]]
     print("%-14s" % "fight" + "".join("  %-26s" % p[-26:] for p, _ in runs))
     for lv in FIGHTS:
