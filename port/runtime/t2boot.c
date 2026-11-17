@@ -205,6 +205,12 @@ int T2Port_Boot(const T2PortConfig *cfg) {
     set_if_zero(&gThreadPriorityLoader, 17);
     set_if_zero(&gThreadPriorityScheduler, 18);
 
+    /* Round 15 (d5): the sound bank and the wave data are read from the ROM image; --audio
+     * without --rom used to crash at boot (SIGSEGV after "t2audio: no ROM image"). */
+    if (sCfg.audio && t2_rom(NULL) == NULL) {
+        fprintf(stderr, "t2: --audio needs the ROM (--rom baserom.us.z64): audio off\n");
+        sCfg.audio = 0;
+    }
     T2Audio_Enable(sCfg.audio);
 
     t2os_init();
