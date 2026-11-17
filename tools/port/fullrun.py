@@ -27,6 +27,7 @@ import routes56 as r56  # noqa: E402
 
 
 STICK_AIM = set()   # round 15 d3: the levels aimed with the stick (--stick-aim)
+ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
 
 
 class Route:
@@ -56,6 +57,7 @@ class Route:
         self.no_cheats = set()
         self.extra_env = []
         self.cheat_windows = []
+        self.fights = {}         # round 15 d3: name -> (first, last frame) (--assist-keep)
         self.cheats_on = set()   # sub-levels (the totems: 109 110 111 112) kept invincible (--cheats-on)
 
     def note(self, frame, text):
@@ -119,9 +121,13 @@ class Route:
             # round 15 d3 (--stick-aim): in these levels the assists above only pick the target and
             # tools/port/aimdrive.py aims with the stick (run the game under it: PLAYTHROUGH.md 22)
             starts = sorted(self.level_start.items())
-            wins = ["%d-%d" % (f, ([g for l, g in starts if l == lv + 1] or [10 ** 7])[0] - 1)
+            wins = [(f, ([g for l, g in starts if l == lv + 1] or [10 ** 7])[0] - 1)
                     for lv, f in starts if lv in STICK_AIM]
-            env.append("T2_AIM_STICK=\"%s\"" % ";".join(wins))
+            for k in ASSIST_KEEP:   # --assist-keep: these fights keep the assists' yaw and pitch
+                a, b = self.fights[k]
+                wins = [w for w in wins if w[1] < a or w[0] > b] + \
+                       [(w[0], a - 1) for w in wins if w[0] < a <= w[1]] + [(b + 1, w[1]) for w in wins if w[0] <= b < w[1]]
+            env.append("T2_AIM_STICK=\"%s\"" % ";".join("%d-%d" % w for w in sorted(wins)))
         if self.anchors:
             env.append("T2_ANCHOR=\"%s\"" % ";".join("%s@%d" % (l, f) for f, l in sorted(self.anchors, key=lambda a: a[0])))
         if self.saves:
@@ -604,6 +610,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     if 110 in r.cheats_on:
         r.cheat_windows.append((t_arr - 600, hubs[2]))
     r.fire.append((t_arr, t_arr + 7200))
+    r.fights["110"] = (t_arr - CITY_TOTEM_TP_AFTER, t_arr + 7200)
     r.anchors.append((t_arr, 110))   # the fire window starts when 110 is reached
     # Round 13 b2: down from the arrival ledge (642 units from the totem, the attackers 450-1,150
     # away: 4-5 kills of 8 in 120 s) to the south side of the totem, where they come to the player
@@ -671,6 +678,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     rel, length, (x, y, z, ry), lv = pt.L4_BOSS
     f = l4s + rel + a4
     r.note(f, "1 the Blind One: fire held, T2_AIM_NODE=boss@1")
+    r.fights["1"] = (f, hubs[4])
     r.inputs.append("Z@%d..%d" % (f + 10, f + length))
     r.tp(f, x, y, z, ry)
     r.aim_node = "boss@1/2/3/4"   # the Blind One 1, the Mantid Queen 2, the Mother 3, the Primagen 4
@@ -809,7 +817,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, STICK_AIM
+    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, STICK_AIM, ASSIST_KEEP
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -828,11 +836,14 @@ def cli(argv=None):
                     help="Primagen keys 2 and 3 in after level 5, round 13's walks after levels 2 and 3 (round 14 c3)")
     ap.add_argument("--stick-aim", default="", help="L1,L2,...: these levels aim with the stick only, closed-loop "
                     "(run under tools/port/aimdrive.py; round 15 d3)")
+    ap.add_argument("--assist-keep", default="", help="with --stick-aim: these fights keep the aim assists "
+                    "(1: the Blind One, 110: the City Totem; round 15 d3)")
     ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
     a = ap.parse_args(argv)
     L6_SLOT_AFTER = a.slot
     HOP = a.hop
     STICK_AIM = {int(x) for x in a.stick_aim.split(",") if x}
+    ASSIST_KEEP = [x for x in a.assist_keep.split(",") if x]
     if a.late_keys:
         PRIMAGEN_LATE = (2, 3)
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},

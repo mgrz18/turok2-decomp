@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Closed-loop stick aiming for a headless run (round 15 d3, docs/port/PLAYTHROUGH.md section 22).
 
-    python3 tools/port/aimdrive.py [--probe SX,SY] [--stats FILE] -- turok2 ARGS...
+    python3 tools/port/aimdrive.py [--simple] [--probe SX,SY] [--stats FILE] -- turok2 ARGS...
 
 Runs the game (stdout and stderr pass through) with T2_AIM_FIFO pointing at two fifos in a fresh
 temporary directory. Inside the T2_AIM_STICK windows the aim assists only choose a target; after
@@ -12,6 +12,7 @@ the measured turn rate of the stick (playthrough.TURN_FULL, cube law, dead zone 
 likewise (PITCH_EASE below: the pitch follows a look angle). Nothing else of the game is read and nothing is written into it: the
 same input a player's thumb gives. Deterministic: the same lines give the same answers.
 
+--simple: the first controller (the observed error only, no prediction; round 15 d3's s1 run).
 --probe SX,SY: answer a constant stick instead (calibration: the pitch/yaw change per frame).
 """
 import math, os, subprocess, sys, tempfile
@@ -100,6 +101,19 @@ class Aim:
         return sx, sy, wrap(bearing - ry), elev - pitch
 
 
+class SimpleAim:
+    """--simple: the first controller (no prediction, no target motion): GAIN_SIMPLE of the observed
+    error per tick."""
+
+    def answer(self, frame, px, pz, ry, ex, ey, ez, pitch, tx, ty, tz):
+        eyaw = wrap(face_yaw(px, pz, tx, tz) - ry)
+        epitch = math.atan2(ty - ey, math.hypot(tx - ex, tz - ez)) - pitch
+        return axis(eyaw, TURN_FULL, GAIN_SIMPLE / TICK), pitch_stick(epitch, pitch, GAIN_SIMPLE), eyaw, epitch
+
+
+GAIN_SIMPLE = 0.35
+
+
 def answer(line, aim, probe=None):
     f = line.split()
     frame = int(f[1])
@@ -115,16 +129,20 @@ def answer(line, aim, probe=None):
 def main():
     args = sys.argv[1:]
     probe = None
+    simple = False
     stats = None
     while args and args[0] != "--":
-        if args[0] == "--probe":
+        if args[0] == "--simple":
+            simple = True
+            args = args[1:]
+        elif args[0] == "--probe":
             probe = tuple(int(v) for v in args[1].split(","))
             args = args[2:]
         elif args[0] == "--stats":
             stats = open(args[1], "w")
             args = args[2:]
         else:
-            sys.exit("usage: aimdrive.py [--probe SX,SY] [--stats FILE] -- CMD ...")
+            sys.exit("usage: aimdrive.py [--simple] [--probe SX,SY] [--stats FILE] -- CMD ...")
     cmd = args[1:]
     d = tempfile.mkdtemp(prefix="aimfifo")
     os.mkfifo(os.path.join(d, "out"))
@@ -132,7 +150,7 @@ def main():
     env = dict(os.environ, T2_AIM_FIFO=d)
     proc = subprocess.Popen(cmd, env=env)
     n = 0
-    aim = Aim()
+    aim = SimpleAim() if simple else Aim()
     try:
         with open(os.path.join(d, "out")) as fin, open(os.path.join(d, "in"), "w") as fout:
             for line in fin:
