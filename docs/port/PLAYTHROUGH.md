@@ -1954,3 +1954,568 @@ Primagen's death (the ending's own life loss, as in every run that kills him).
   (level 6's two generators), `T2_AIM_NODE=boss@1/2/3/4`, and `T2_BOSS_FRONT` (the Queen, and the
   lair after 3,000 frames of a wait).
 - The teleports between route steps inside the sub-levels, and `T2_ANCHOR` (the schedule clock).
+
+## 22. Teleports counted, walking instead of teleporting in levels 1-2 (Phase 7 round 15, part d5)
+
+**The count** (the default `--all` command of STATUS.md section 1: 289 teleports). Per level,
+with the sub-levels' teleports summed (`fullrun.txt` timeline, each teleport assigned to the
+segment before it):
+
+| part of the run | teleports | on one floor, 100-4,000 units (walk candidates) |
+|---|---|---|
+| level 1 (51-59, 109; key and health picks included) | 33 | 6: 3 route steps, 2 key picks, the totem spot |
+| level 2 (125-135, the chamber 73, 110) | 52 | 18: 16 route steps, 2 crypt-key retries |
+| level 3 (61-71, 111, its intro cinemas) | 38 | not probed |
+| level 4 (98-108, the Blind One, 112) | 34 | not probed |
+| level 5 (84-96, 124, 113) | 41 | not probed |
+| level 6 and the lair (114-123, 4) | 69 | not probed |
+| the hub, all visits (60) | 22 | 4 (picks) |
+| total | 289 | |
+
+Most teleports go from where a warp drops the player to a point across the sub-level (a pickup,
+a switch, a warp), through doors and corridors, often to another floor: they are routes, not
+walks. The others were tried.
+
+**The walker** (`playthrough.stick_walk`, `fullrun --walk 1,2`, port-free: input only): from where
+the player stands at the step's frame in the default run (x, z and the yaw from its teleport log
+and det log; `tools/port/walkcands.py RUNLOG` lists them), turn with the stick (c5's
+`stick_turn`), hold C-up for the distance, wait, turn to the step's facing; the step's own C-up
+walk follows. The step and every later step of the level move by the walk's frames (the hub's
+`T2_ANCHOR` takes the rest of the run back to its schedule). C-up on level 53's open floor
+(`T2_STATE_LOG=2`): the player moves 5 frames after the press, reaches 7.68 units per frame in
+~24 frames. `--walk-probe` also teleports at each walk's end: the teleport's log line is the
+arrival, and every walk starts from the default route's place (one run measures them all).
+
+**The probe** (`--walk 1,2 --walk-probe`, Linux Release, the 19 route-step candidates):
+
+| where | walks | arrival error |
+|---|---|---|
+| 53: beacon 2, the cage; 54: the cage | 3 | 1,422 (a wall at z 6,950), 233 and 955 (the cages' bars) |
+| 133: the zombie rooms | 3 | 2,143-5,191 (doors) |
+| 134: start -> gate | 1 | **197** (kept) |
+| 134: the gate spot, the exit 2613 | 2 | 867, 1,669 (after aim-assisted fights: the yaw the walk starts from is not the default run's) |
+| 135: switches, crypts, the water hall | 10 | 156 (crypt 1's key, 451 units) and 813-3,383 (graves, crypt walls) |
+
+So in levels 1-2 **one** teleport is a plain walk: 134's from the start to the gate (1,571 units
+straight along +x; it arrives ~200 short, the zombie-4 fight there opens gate 8, and the next step
+teleports back to the gate spot). The others need waypoints around walls and doors, or a walker
+that reads where the player is (the closed-loop input of part d3): open loop, 10% of a long walk
+is already 150 units. L1_WALKS stays empty with the reasons in fullrun.py.
+
+**Runs** (Linux Release `-O2`, PIE): `--walk 2` (one walk): levels 1-5 and 6 as before (all five
+totems, the six keys in their slots, cinema 43, the lair reached at 221,747), but the Primagen is never engaged: 420,000 frames, his hp still 25,600/25,600 in mode 1. This is the lair's home wait (PLAYTHROUGH.md 21: it needs a line of sight past object 1911). The earlier walk moved the run's timing, and the route's strafing window passed without a sight line. This is the known knife edge, not the walk. The
+default command (no `--walk`) writes the same `playthrough.txt` and `teleport.env` as before
+(byte-identical) and its det log is the base build's over 290,000 frames.
+
+## 23. The Mother and the Primagen without invincibility (Phase 7 round 15, part d1)
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --lair-strafe 90
+```
+
+No `--cheats-on`: no `T2_CHEATS` invincibility anywhere in the run. Linux, headless, PIE,
+Release (-O2), `T2_HURT_LOG=1` (no rescue). New options: `fullrun.py --lair-strafe P[,S]` (the lair
+strafing's period, default 80, and an optional forward/back sweep of S frames) and
+`--lair-front SPEC` (the lair's `T2_BOSS_FRONT`, default `450,3000,2.5,1`). The default command
+(`--cheats-on 3,4`) writes the same `playthrough.txt` and `teleport.env` as before (checked with
+`diff -r`).
+
+### 23.1 The Mother: her hit is the N64's; the weapon was the problem
+
+- **Her ~10-damage hit at ~1,240 units is matching code, not a host bug.** `MotherBoss_AnimEvent`
+  (func_00409A64) sends `ImpactEvent_Send(obj, obj, 3, -1, player position, {0xA00, 0x500/0xA00})`
+  on the events of her attack animations: event 1 within 1,228.8, event 4 within 1,433.6, event 3 at
+  any range. The blast is centred on the player, so it always lands (`ImpactEvent_ApplyBlast`, full
+  damage at distance 0). In phase 0 she picks mode 4 (`MotherBoss_Phase0ChooseAttack`: target flat
+  distance under 1,228.8 after the two collision radii are taken off) again and again: one hit per
+  mode-4 animation, every 60-170 host frames.
+- **In phase 0 the player cannot move.** C-up/C-down/C-left/C-right give a move vector but the
+  position stays at (83.4, 0, -723.9) (a teleport works). He moves again from the phase-1 cinema
+  (`MotherBoss_OnPhase1CinemaDone` puts him on his phase-1 spot). Not checked on the N64; the
+  phase-0 damage is therefore set only by how fast her six parts go down.
+- **The fix: the shredder (9, level 5's weapon) at her fight.** Standalone level 6, 100 health,
+  cheats off at her arena, weapon switched at her arena (`T2_WEAPON="10;W@31600"`): phase 0 ends
+  at 36,031 with the plasma rifle (20 hits, 2 lives lost), 34,009 with the firestorm cannon (3 hits),
+  34,805 with the scorpion launcher (10 hits) and **33,679 with the shredder (3 hits)**; the grenade
+  launcher, sunfire pod and p.f.m. layer did not end phase 0 by 39,000. Her whole fight with the
+  shredder: dead at 39,239, 6 hits, 38 damage, lowest health 62 (firestorm: 99 damage, lowest 1).
+- In the whole-game run (`fullrun.level6`, only when 3 is not in `--cheats-on`): the shredder from
+  her arena - 100, the fire held until her arena + 16,000 (`MOTHER_SHREDDER_END`; the discs
+  bounce), then the plasma rifle again. **5 hits, 53 damage, lowest health 147** (she was 238-300
+  damage with the plasma rifle).
+
+### 23.2 The Primagen: the shredder too, and the lair is still a knife edge
+
+- His damage is mostly his melee: `Primagen_HandleAnimEvent` sends the same centred blast (10) on
+  event 2 within 409.6 (sight distance) and event 1 within 716.8, two hits 16 frames apart, when he
+  comes down to the player. The rest is small: particles 337 (owner object 419, 0.5-4.5 each) and
+  his tossed objects 328/330 (up to 14).
+- **The shredder (9) from the lair - 100** (only when 4 is not in `--cheats-on`). The Primagen
+  recipe (`T2_WARP_TO=7602`, cheats off from 13,500, rescue mode): **his death at 27,856 instead
+  of 43,586**, 2 melee hits instead of 28 (20 damage instead of 280); firestorm cannon 33,236.
+- **But his home waits still decide the run** (21.1): with the shredder the fight's timing changes
+  and, with the default strafing (period 80), the stage-2 wait never ended (60,000 frames; the
+  `T2_BOSS_FRONT` spot cycle puts the player at z 1,577-2,027, where no spot sees him at his rest).
+  Variants tried (one run each, all deterministic): period 120 and 80 with a back/forth sweep (the
+  waits end, but the strafing drifts and the player falls: into the pit in front of his home at
+  (135, -695, 2,283), or off the back edge at z ~-2,050), period 100, `--slot 1150`, `--slot 1050`
+  (a wait never ends), period 70 (two lives lost), `--lair-front 450,999999` (no relocation: the
+  player stays at z -1,600..-1,900 and the stage-2 wait never ends: the back of the arena does not
+  see him either). **Period 90 kills him and reaches END 2**, with one life lost: at 228,464 the
+  player, pushed right by the strafing's drift, falls off the arena's right edge (x 1,622).
+  Period 76 also kills him and reaches END 2, also with one fall (235,462, 122 health to 0).
+
+### 23.3 The run (`--lair-strafe 90`, no `--cheats-on`; two runs identical)
+
+Two runs, md5 of every `progress`/`event`/`pickup`/`hurt`/`death`/`bosstrace` line equal. All five
+totems, the four bosses, the Primagen dead (mode 29) at 244,846, cinema 370, END 2 (`ending 0/1`,
+cinema 130) at 251,638, the credits, the hub at 265,736.
+
+| fight | hits | damage | lowest health | lives lost |
+|---|---|---|---|---|
+| the City Totem (110), unchanged | | | | 2 (as in round 14) |
+| the Mother (3), shredder | 5 | 53 | 147 | 0 |
+| the Primagen's lair (4), shredder, strafing period 90 | 17 | 229 (143 of it the fall) | 18 after the fall | 1 (a fall off the right edge at 228,464) |
+
+### 23.4 Next
+
+- The lair fall: the strafing drifts sideways (period 90: +x, about 1,200 units in 2,500 frames)
+  and the pushes of his attacks add to it. A strafe whose halves are tuned to cancel the drift, or a
+  closed-loop driver (part d3's input fifo) that keeps x within +-900 and z within -1,950..1,900,
+  would remove it; the same driver could walk until his home wait ends.
+- Phase 0 of the Mother: check on the N64 that the player cannot move there (mupen64plus, a RAM
+  poke warp to -4).
+
+## 24. Aim assist off: closed-loop stick aiming in levels 1-4 (Phase 7 round 15, part d3)
+
+### 24.1 The mechanism (`T2_AIM_STICK`, `T2_AIM_FIFO`, `tools/port/aimdrive.py`)
+
+The aim assists (`T2_FACE_NEAREST`, `T2_AIM_AT`, `T2_AIM_ENEMY`, `T2_AIM_NODE`) write the
+player's yaw and the camera pitch every frame. Round 14's `stick_aim` (17.1) only turns towards
+a fixed point, open loop. This round adds a closed loop:
+
+- `T2_AIM_STICK=F1-F2[;...]` (schedule frames, `port/game/t2debug.c`). Inside a window the assists
+  write nothing. They still pick their target with the same rules: nearest, sticky, level actor
+  first, the boss phase's node. Then they report its point (`T2Port_AimReport`). `T2_BOSS_FRONT`
+  is not changed: it is not used in levels 1-4.
+- `T2_AIM_FIFO=DIR` (`port/app/game.cpp`). After each frame in which a target was reported, the
+  game writes one line to the fifo `DIR/out`:
+  `aim F px py pz rotY ex ey ez pitch tx ty tz`. These are the player position and yaw, the
+  camera eye and pitch, and the target point, as exact `%a` hex floats. The game then blocks on
+  one line from `DIR/in`: `SX SY`, the stick of port 1 for the next frame (over the script's).
+  It is input only: nothing in the game state is written. Outside the windows nothing is
+  exchanged, and the build without these variables is unchanged: the default `--all` run's det
+  log is byte-identical to 8b42da15's (580 lines).
+- `tools/port/aimdrive.py [--simple] [--stats FILE] -- turok2 ...` makes the two fifos, starts
+  the game with `T2_AIM_FIFO`, and answers each line from that line alone. It is deterministic:
+  two runs give identical logs.
+- `playthrough.py OUT --all ... --stick-aim 1,2,3,4 [--assist-keep 1,110]` (`fullrun.py`) writes
+  `T2_AIM_STICK` with the frame ranges of those levels, minus the fights in `--assist-keep`
+  (`1`: the Blind One, `110`: the City Totem). Run the game under the driver:
+  `runfull.sh`-style `python3 tools/port/aimdrive.py --stats RUN/stats.txt -- build/app/turok2 ...`
+  with the usual `teleport.env`.
+- `tools/port/aimstats.py LOG [LOG2 ...]` compares runs: damage, hits, lowest health and deaths per
+  fight level, the totems' kills and time left, and the frame each totem and boss bit was set.
+  `aimstats.py --stick STATS` shows the tracking per aim window: mean yaw and pitch error, and the
+  share of frames within 0.05 rad of the target.
+
+### 24.2 The stick, measured (`aimdrive.py --probe SX,SY[,N]`, level 51, Linux Release)
+
+- The game reads the pad once per tick: every second host frame. A stick change shows up in the
+  pose 4 host frames later.
+- **Stick X turns at a rate.** Re-measured, the cube law of 17.1 is exact: SX=8, 13, 20, 30 and 45
+  turn 0.000017, 0.000134, 0.000660, 0.002641 and 0.009944 rad per host frame. The model
+  0.0685 * ((SX - 3) / 80)^3 gives 0.000017, 0.000134, 0.000657, 0.002633 and 0.009912.
+- **Stick Y does not turn the pitch at a rate.** It sets a look angle,
+  -(reading / 80) * (pi / 2), where + SY looks down. The camera pitch eases towards that angle
+  by 5.41 % of the difference per tick, and back towards 0 when the stick is released. Examples:
+  SY=127 gives -pi/2, SY=40 gives -0.726 and SY=-60 gives +1.118. The pitch first changes by
+  0.0848, 0.0392 and 0.0604 on a tick. Releasing at -0.67 brings it back to -0.14 in 56 frames.
+- The controller turns by GAIN (0.8) of the predicted error per tick. It is a Smith predictor:
+  the answers still in flight (the last 3) are applied to the pose first. It adds the target's
+  own bearing and elevation rate while the target stays the same. Stick X is the inverse of the
+  cube law; stick Y is the look angle that moves the pitch by that share. `--simple` is the
+  first version: GAIN 0.35 of the observed error, no prediction. On a still point it turns
+  1.2 rad and holds within 0.001 rad in about 30 frames.
+
+### 24.3 Running it
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --cheats-on 3,4 \
+    --stick-aim 3                 # or 1,2,3,4 --assist-keep 1 (the Blind One keeps the assist)
+mkdir -p RUN/pak && cd OUT && . ../RUN/teleport.env && SDL_VIDEODRIVER=offscreen \
+  T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=500 T2_PROGRESS_LOG=1 T2_HURT_LOG=1 T2_BOSS_LOG=1 \
+  python3 ../tools/port/aimdrive.py --stats ../RUN/stats.txt -- \
+  build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game \
+  --pak-dir ../RUN/pak --frames 290000 --input @../RUN/playthrough.txt
+python3 ../tools/port/aimstats.py run.log            # the fights; --stick ../RUN/stats.txt: the tracking
+```
+
+A Linux Release build plays the whole game, with the driver, in about 6 minutes. Two runs of the
+same configuration give identical det logs. s1 and sC are two separate driver runs that share
+their levels 1-4 windows. Their det logs are identical through the stick fights of levels 1-4,
+262 lines up to frame 131,000, where sC's `--assist-keep 1` starts.
+
+### 24.4 Results (Linux Release, PIE, the round-14 command plus `--stick-aim`)
+
+The fights compared with the assisted run (`aimstats.py`). Each cell gives the damage taken,
+the lowest health and the deaths in that level. For a totem it also gives the kills and the seconds
+left when it fell. `v2` is the default controller and `v1` is `--simple`.
+
+| fight | assisted | v1, levels 1-4 (s1) | v2, levels 3-4 (sL) | v1, levels 3-4 (sK) |
+|---|---|---|---|---|
+| Harbor Totem (109) | 132, min 68, 11/8 | **93**, min 107, 8/8 2 s | (assisted) | (assisted) |
+| sister 1 (133) | 131, min 69 | 199, min 1 | | |
+| sister 2 (134) | 144, min 25 | 170, min 1, 1 death | | |
+| sister 3 (135) | 156, min 44 | 200, min 8, 1 death | | |
+| City Totem (110) | 150, min 1, 2 deaths, won | **58**, min 42, won | (assisted) | (assisted) |
+| Marsh Totem (111) | 111, min 89, 8/8 2 s | **64**, min 136, won | **72**, min 128, won | **21**, min 179, won |
+| Cave Totem (112) | 54, min 146, 8/8 3 s | 60, min 140, won | 114, min 86, won | 117, min 83, won |
+| the Blind One (1) | 94, min 52 | 240, 2 deaths: game over | (assisted) 75, min 11 | (assisted) 83, 1 death |
+
+- **The totems of levels 1-4 are won with the stick only.** These are the Harbor,
+  City, Marsh and Cave totems. In 14 whole-game runs every stick-aimed totem fight was won but
+  one: a City Totem at 6/8 kills with 1 s left (s4). In the `--simple` controller's run the Harbor,
+  City and Marsh totems cost less damage than the assisted run. The stick turns smoothly and
+  keeps its target, where the assist snapped to each new nearest target.
+- **The Sisters of Despair (level 2) cost more** with the stick: 170-200 damage each against
+  131-156, and 1-2 lives over the three. They fly fast and close, so the target's bearing moves
+  faster than the stick's turn rate (4.1 rad/s at full stick).
+- **The Blind One is not winnable with the stick in this route.** He has 8 minions in phase 3 and
+  three actor groups in phases 4-6, all around the player, with a target switch every few
+  seconds and many turns of half a turn or more. The yaw error averaged 0.63 rad and the player
+  was on target only 47 % of the time: 240 damage, 2 deaths, game over (s1, s3). With
+  `--assist-keep 1` his fight keeps `T2_AIM_NODE=boss`.
+- **The whole game still depends on the lives carried into the lair.** Every lair visit costs a
+  life (the Primagen's 200-damage hit, `--cheats-on 4`). The assisted run reaches it with 2 lives.
+  - In sL, levels 3-4 by stick took 60 more damage at the Cave Totem. The player then left the
+    Blind One with 11 health and lost a life at level 5's first fight (124). The lair's hit was
+    then a game over.
+  - In sK the extra life went at the Blind One itself.
+  - With levels 1-2 by stick (s1, sC), the level-2 lives run out by the Blind One or level 5.
+  - The validated default command is unaffected (det log identical). See 24.5 for the runs that
+    reached END 2.
+- Tracking, `aimstats.py --stick`, frames within 0.05 rad of the target:
+  - Harbor Totem: 74-82 %. Sisters: 48-95 % per window. City Totem: 75-81 %.
+  - Marsh Totem: 84 %. Cave Totem: 70-78 %. The Blind One: 47 %.
+
+### 24.5 Which commands were validated
+
+- **The default command** (section 21, no `--stick-aim`) with this branch's binary gives the same
+  580-line det log as 8b42da15. It plays the same: all 5 totems, the 4 bosses (the Primagen at
+  250,290) and the credits (cinema 130). Without `T2_AIM_STICK`/`T2_AIM_FIFO` nothing changes.
+- **`--stick-aim 3`** (sM: the Death Marshes by stick, v2):
+  - The Marsh Totem fell with 72 damage, against 111 assisted.
+  - Levels 4 and 5 and the Mother then played as in the assisted run: lives lost 2 by then, as
+    before, and the Mother dead at 215,862.
+  - **But the Primagen stopped at stage 3, state 3** (parts 2/0) until frame 290,000. The assisted
+    run's stage 3 goes on through states 1, 5, 0, 2 and 6. This is the line-of-sight home wait of
+    PLAYTHROUGH 21 (static object 1911): the lair route's strafing timing does not give him sight
+    at the shifted frames. It is not an aim problem, so END 2 is not reached with any
+    `--stick-aim` yet.
+  - sE2 (`--stick-aim 3,4 --assist-keep 1`, 340,000 frames) stopped the same way, at stage 2
+    (parts 5/6).
+- No `--stick-aim` configuration reached END 2 in this round. The levels-1-4 stick fights are
+  playable. The whole-game chain breaks downstream: at the lair wait, or at the lives that level
+  2's sisters and the Blind One cost.
+
+### 24.6 Next
+
+- **The sisters and the Blind One need better targets, not a better controller.** The yaw loop
+  is already as fast as the stick allows. The game could report several candidates
+  (`T2Port_AimPose` with up to N live enemies), and the driver would pick the one closest to
+  the crosshair among those close enough to threaten, as a player does. That means fewer
+  half-turns.
+- **Fire through the driver.** The `SX SY` answer could carry the Z button, to fire only on
+  target. The scripted Z taps fire blind now, and `T2_FILL_AMMO` hides the waste.
+- **Make the lair wait robust first (d1).** Each perturbation upstream changes the lair timing, and
+  the Primagen's home wait then fails. A lair route that strafes until he has line of sight,
+  instead of at fixed frames, would let any stick-aimed run finish.
+
+## 25. Levels 1-3 on picked-up weapons and ammo (Phase 7 round 15, part d2)
+
+`fullrun.py --real-weapons 1[,2[,3]]` plays those levels without `T2_GIVE_WEAPONS` and
+`T2_FILL_AMMO`. Both start in the hub after the last such level (`"0;1@F"`, `"0;300@F"`). The
+weapons and the ammo are picked up on the way, and the weapon is changed through the input stream.
+Without the option the generated `playthrough.txt` and `teleport.env` are byte-identical to
+8b42da15's (checked with `diff -r`), so the default `--all` command is unchanged.
+
+### 25.1 Where the pickups are
+
+Weapons and ammo are level actors in the grid sections (`tools/assets/levels.py`). Cart entry 2
+maps an actor's object to its pickup id: `ids[object + 4]`, where the first 8 bytes are a header.
+The pickup tables are in the ELF:
+
+- `sWeaponPickups`: rows of 0x18 bytes, `{m_Id, weapon, ammo type, amount}`. The ids run from 2001
+  to 2122.
+- `sAmmoPickups`: rows of 0x14 bytes, `{m_Id, type, amount}`. The ids run from 2200 to 3027.
+
+The `m_Id` is the actor's pickup id (`CPlayer__CollectPickup`). Useful ids for levels 1-3:
+
+| id | gives |
+|---|---|
+| 2004 | the pistol (4) +20 bullets |
+| 2005 | the mag 60 (5) |
+| 2008 | the shotgun (8) +10 shells |
+| 2010 | the plasma rifle (10) +100 |
+| 2016 | the grenade launcher (15) +5 |
+| 2017 | the scorpion launcher (16) +3 |
+| 2500 / 2504 | bullets x10 / x40 (type 2, at most 50) |
+| 2501 / 2502 | shells x3 / x10 (type 6, at most 20) |
+| 2503 | explosive shells x3 (type 7, at most 10) |
+| 2200 / 2201 | arrows x5 / x10 |
+| 2202 / 2203 | tek arrows x3 / x5 |
+| 2601 | plasma cells x150 |
+
+Ammo is taken without its weapon. A full type is not taken. A new game starts with the talon (0)
+and the bow (2). `Pickup_GiveWeapon` selects a new weapon when its index is higher than the
+current one's. When a weapon runs dry the game falls back to another one with ammo, down to the
+talon.
+
+### 25.2 Changing weapons through the input stream
+
+The default control style is the stick wheel (`CBarrel__RunStick`). `CBarrel__RunButtons`, the
+A/B cycling, is used only with the other `m_WeaponSelect`, so a tap of A or B does nothing here
+(tried: the weapon stays). The stick wheel works like this:
+
+- Holding A (0x8000) opens `sBarrelLayoutGroup1`: talon, flare, bow, pistol, tranquilizer,
+  shotgun, plasma rifle, firestorm.
+- Holding B (0x4000) opens `sBarrelLayoutGroup0`: sunfire pod, cerebral bore, PFM layer, grenade
+  launcher, scorpion launcher, flame thrower, razor wind, nuke.
+- The analog stick picks one of the 8 slots (`CBarrel__GetStickDirection`: 0 up, then clockwise).
+  The slot's weapon is requested if it has ammo.
+
+`fullrun.wheel(weapon, f)` writes these inputs: the button held for 30 frames, and the stick
+pushed towards the slot from frame 10 to frame 25. A route step can say `{"weapon": W}`. The wheel
+then runs `WHEEL_BEFORE` = 50 frames before the step's teleport, which sets the yaw again.
+Checked in level 129: `A` held with `SX=-90 SY=-90` changes the grenade launcher (15) to the
+shotgun (8) (`state:` `reqw 8 wheel 2/0/5`).
+
+### 25.3 Level 1 (`--real-weapons 1`)
+
+`L1_ARMS` lists the picks. Each one is taken like a key, at a segment's start, 150 frames each,
+seven picks in all:
+
+| level | what | where |
+|---|---|---|
+| 53 | bullets x10, the pistol, bullets x10 | in a row on the platform (-4088..-3988, 79.4, 220..255): one walk |
+| 55 | explosive shells x3, x3 | (1075.2, 0, -921.6), (1075.2, 0, -614.4) |
+| 54 | shells x3, the shotgun | on the switch's line (-3368.8 / -2867.2, 0, -1843) |
+| 56 | explosive shells x3 | (-585, 164.1, 2108.9) |
+| 59 | shells x10, bullets x40, explosive shells x3, tek arrows x5 | a row at z 5427 by the level exit 7100: one walk |
+
+At the Harbor Totem the player has the shotgun (20 shells, 10 explosive shells), the pistol
+(50), the bow (20) and tek arrows. The aim is still `T2_FACE_NEAREST` (part d3's subject).
+
+The totem's 8 kills, by weapon, over 3 runs while the picks were added:
+
+| run | shotgun ammo | kills | result |
+|---|---|---|---|
+| l1a (shotgun only, 13 shells) | shells | 2 by the shotgun and the bow, then the talon | lost (7/8 only with the plasma rifle given late) |
+| l1b (+ pistol, + the 59 row) | shells + 3 explosive | 5 by the shotgun, 1 by the pistol, 0 by the bow | lost, 6/8 at 120 s |
+| l1c (+ 55's and 56's explosive shells) | shells + 10 explosive | **8 by 23,000 (10 by the end)** | **won**, health 200 -> 154 |
+
+The shotgun does nearly all the killing (~3.5 shells a kill). The pistol's 50 bullets give one
+kill, the bow none, and the talon cannot hit the attackers at 500-900 units. The totem is won with
+less damage than the plasma rifle's run takes (46 against 132; minimum health 154 against 68). The
+hub is reached at 23,556 (the default run: 23,824).
+
+Two things change in the schedule for this option:
+
+- The fire taps stop `ARMS_FIRE_END` = 50 frames before the hub arrival. They used to run 7,150
+  frames from the arrival, which emptied the pistol and the bow in the hub.
+- The hub after level 1 is at `REAL_HUB_AT[1]` = 23,750, measured, instead of `HUB_AT` moved by
+  the picks (25,130). A later anchor would have been reached only after the totem's whole 120 s.
+  When a totem is won early, the anchor fires on arrival and the later steps follow. When it is
+  lost the run is over anyway. In l1a the hub's teleports ran inside level 109.
+
+### 25.4 Level 2
+
+**Levels 1 and 2 on their own pickups (`--real-weapons 1,2`) do not get through level 2.** The
+picks in `L2_ARMS` are:
+
+- 125: 10 shells and 3 explosive shells by its exit, then 10 shells more.
+- 129: the grenade launcher with 5 grenades, and 150 plasma cells.
+- 130: the armory row (y 204.8, z 4736). The mag 60 is one pick; the tek bow, the tranquilizer gun
+  and the shotgun are taken in one walk.
+- 133: the shotgun (+10 shells) and the mag 60.
+
+Three spots were left out:
+
+- 128's grenade launcher floats 154 units over a deadly floor (two deaths there).
+- 131's plasma rifle (-1996.8, -1126.4, 5785.6, intelligence 3): a death there.
+- 132's plasma rifle sits 307 units over its floor.
+
+Results:
+
+- **Soul gate 1 (129) is destroyed with the shotgun**, chosen on the wheel (`L2_TAPS`) because the
+  grenades fly over the gate. The gate has 500 hp (`T2_ACTOR_LOG` with `T2_ACTOR_TYPES=7`, actor 76).
+  It took 5 grenades with no damage, then about 60 per shotgun shell. "soul gate destroyed." comes
+  at 36,120; the plasma rifle's run has it at 35,404.
+- **Sister 1 (133) is never hurt.** The window's `T2_AIM_ENEMY` aims at the nearest live actor, so
+  the zombies of the two rooms take all the ammo. Their health is 5 and 80 (the shotgun barely
+  scratches them). The ammo runs out in order: shotgun, grenades, mag 60, tek bow, then the talon
+  at 42,500. The sister keeps 50/50, and the player dies at 43,781. Sister 2 (134) then costs the
+  last two lives: game over at 60,097.
+
+So level 2 needs a different fight, not more pickups:
+
+- fire only at the sister (the zombies can be left alone once door 28 is open);
+- take the ammo lying in 133 and 134 between the windows;
+- use the grenades and explosive shells on her.
+
+The aiming part belongs with part d3's closed-loop aim. Level 3 (`--real-weapons 1,2,3`) waits on
+level 2: its picks would be the shotgun and shells in 61, the plasma rifle in 64 and plasma cells
+x150 in 65 and 68, and the scorpion launcher in 66 just before the Marsh Totem (where c1's route
+uses it).
+
+### 25.5 The whole game with `--real-weapons 1`, and next
+
+**The whole game with `--real-weapons 1`** (Linux Release, PIE; the default `--all`
+options plus `--real-weapons 1`): level 1 is played on its own pickups, and `T2_GIVE_WEAPONS` and
+`T2_FILL_AMMO` start in the hub after it.
+
+| what | `--real-weapons 1` | the default run |
+|---|---|---|
+| the Harbor Totem | won at 22,890 | won |
+| the hub | 23,556 | 23,824 |
+| the City Totem | won at 88,724, 2 lives lost (as in the default run) | won, 2 lives lost |
+| the Marsh Totem | won at 109,081 | won |
+| the Cave Totem | won at 129,770 | won |
+| the Blind One | dead at 140,147; 121 damage, minimum health 25 | 94 damage, minimum 52 |
+| level 5's first sub-level, 124 | health 25 -> 2, then a death at 149,146 | 52 -> 16, no death |
+| the end | the respawned route is out of step: game over at 150,990 | END 2 |
+
+Damage per level, as `hurtsum` (hits / damage / minimum health):
+
+| level | hits | damage | minimum |
+|---|---|---|---|
+| 109 | 23 | 46 | 154 |
+| 133 | 57 | 169 | 31 |
+| 134 | 51 | 117 | 14 |
+| 135 | 57 | 170 | 30 |
+| 110 | 88 | 184 | 1, 2 deaths |
+| 111 | 13 | 13 | 187 |
+| 112 | 9 | 54 | 146 |
+| 1, the Blind One | 81 | 121 | 25 |
+
+The level-2 fights depend on the state they start from, and level 1's totem changes that state.
+`--hub-wait` idles in the hub after level 1. With waits of 0, 20, 30, 60, 90 and 200 frames,
+sister 1 or 2 costs lives. With 40, 50 and 120, neither costs a life. 40 then loses the City
+Totem; 50 and 120 win it, so 50 is the default. Waits of 50 and 120 give the same game from the
+City Totem on, so the level-4/5 loss does not depend on the wait. Part of a second identical run
+with the defaults: every `progress`, `event`, `pickup`, `hurt`, `death` and `bosstrace` line to frame 160,000 is identical (2,435 lines, pointers masked).
+
+**The default `--all` command is unchanged** (byte-identical inputs). On this branch's Release
+build it reaches cinema 43 at 222,839, the lair at 223,647 and the hub at 271,180, the frames of
+STATUS section 2.
+
+Next:
+
+1. **Level 5's start after the Blind One**: the route enters 124 with whatever the Blind One
+   left. The default run has 52 health there, `--real-weapons 1` has 25. 124's hits (36 and 25
+   damage) need a health pickup before 124, or 124's hits avoided. With that, `--real-weapons 1`
+   should play to the end, since every totem is won.
+2. **Level 2 on its own weapons**: aim only at the sisters, take the ammo in 133 and 134 between
+   the windows, and use the grenades and explosive shells on the sisters (25.4). This goes together
+   with part d3's closed-loop aim, because `T2_AIM_ENEMY`'s nearest-actor aim spends everything on
+   zombies.
+3. **Level 3**: the scorpion launcher lies in 66, just before the Marsh Totem, so c1's weapon 16
+   for that totem can be picked up instead of scheduled. 64 has the plasma rifle, and 65 and 68
+   have plasma cells.
+4. The other control style (`m_WeaponSelect` != 1, `CBarrel__RunButtons`: A/B taps cycle) would
+   make weapon changes one tap each. It is an options-menu setting, which a route could set
+   through the menu.
+
+## 26. The whole game with no invincibility at all: the lair driver and the lair peek (Phase 7 round 15, the merge C30)
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6
+mkdir -p RUN/pak && cd OUT && . ../RUN/teleport.env && SDL_VIDEODRIVER=offscreen T2_HURT_LOG=1 \
+  python3 ../tools/port/aimdrive.py -- build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
+  --game --pak-dir ../RUN/pak --frames 290000 --input @../RUN/playthrough.txt
+```
+
+No `--cheats-on`: no `T2_CHEATS` invincibility anywhere. The run goes under `tools/port/aimdrive.py`
+(the lair driver below answers through d3's fifo). The round-14 command (`--cheats-on 3,4`) still
+writes the same `playthrough.txt` and `teleport.env` as at 8b42da15 and needs no driver.
+
+### 26.1 The lair, measured
+
+- **The floor** (`tools/assets/levels.py baserom.us.z64 --out DIR --level 4 --map 4`): a
+  twelve-sided floor at y 0, corners at radius ~2,325 at 15 + 30k degrees from +z, edges 2,246 from
+  the middle; pits all round, the front edge in front of his home too; the entrance ramp behind
+  z -2,150. d1's fall at (1,621.9, -930, -1,726) is just past the corner at 135 degrees.
+- **Where his search sees the player.** A search run from inside `Primagen_UpdateMode19` (temporary
+  instrumentation, not committed: the player moved to each spot of a 100-unit grid over the whole
+  floor for one `AI_FindBestTarget`, at the search's own time, so with the grid sections loaded):
+  - while he flies home he is seen from large parts of the floor; the wait condition needs him
+    within 50 of home, and from that point (him at z 2,876 and nearer) **no floor spot sees him**;
+  - at home he steps between two points 15.5 apart (his step per game tick) round (0, 937, 2,918):
+    (-1.8, 2,923.0)/(4.3, 2,907.5) in one run, (6, 2,926)/(-4, 2,913) and (1, 2,933)/(0, 2,916) in
+    others. For these pairs **no solid floor spot sees him** (also with the eye raised 120 and 250,
+    a jump), only spots over the front pits (z 2,200, x -800 and 800-1,000);
+  - which pair he gets depends on where he took off; d1's run had (-0.1, 2,918.0), seen from about
+    (1,240, 560). So whether a wait ends is decided before the player can do anything.
+- **Moving does not help when the pair hides him.** Three drivers, each one whole run (Release):
+  an ellipse round the floor with strafing; a tour of 17 spots (the ones where waits ended in earlier
+  runs first) with 600 frames of strafing at each, 2.5 laps; arcs round his home from radius 1,000
+  to 4,900, 300 apart, clipped to the floor (269 waypoints, 43,100 units, an arc being a strafe that
+  crosses every sight wedge reaching the floor). The stage-2 wait never ended in any (30,000
+  frames). Turning away from him (stick-driven yaw, a test) made even the stage-1 wait endless.
+- **d1's timed strafe (period 90) with only the fall removed** still stops in the stage-2 wait: the
+  driver turned him back from the edge 2 frames earlier, and his hover pair came out different.
+
+### 26.2 The mechanism
+
+- **`T2_MOVE_DRIVE=F1-F2[;...]`** (port/game/t2bosslog.c `T2Port_MovePose`, port/app/game.cpp over
+  d3's `T2_AIM_FIFO` pipe): every frame in the window, one line "move F px py pz rotY bx by bz"
+  (the player's position and yaw, the boss's position, exact hex floats) goes out, and the answer
+  "SX SY C" gives the next frame's C buttons (hex mask, U 8, D 4, L 2, R 1, replacing the
+  script's; "- -" keeps the script's). Input only.
+- **`tools/port/aimdrive.py` `LairDrive`** (`T2_LAIR_DRIVE`): **guard** (the default) answers
+  "keep the script" while the player is inside the floor less 150 and walks him back towards the
+  middle (C buttons from his yaw: forward (-sin, -cos), right (-cos, sin), the strafe direction
+  calibrated from the game's own response) from there until he is 250 further in; **arcs** walks the
+  arcs of 26.1 all the time.
+- **`T2_LAIR_PEEK=W[@F]`** (DEBUG-ONLY, port/game/t2bosslog.c `T2Port_LairPeek`): after W frames of
+  one home wait (mode 25, him within 60 of home), the player is put at the next spot of a list over
+  the front pits for 4 frames (one search), then back where he stood (velocity cleared both times),
+  until the wait ends. It replaces `T2_BOSS_FRONT`'s relocation in the lair (a move to the floor
+  beside the lair for good, which cannot work for these pairs). Each peek is logged (`lairpeek:`).
+- **`fullrun.py`**: without `--cheats-on 4`, the lair gets the guard driver, the strafing with
+  period 90 (d1's), `T2_LAIR_PEEK=2400`, the shredder (d1) and no `T2_BOSS_FRONT`. Options:
+  `--lair-drive guard|arcs|none` (none: the round-14 strafing and `T2_BOSS_FRONT`), `--lair-peek W`,
+  `--lair-strafe P[,S]`. With `--cheats-on 4` nothing changes.
+
+### 26.3 The run (Linux, PIE, Release and Debug)
+
+Two runs identical (every `progress`, `event`, `pickup`, `hurt`, `death`, `bosstrace` and
+`lairpeek` line, and all 580,000 `T2_DET_LOG` lines). A Release build with
+`-DT2_AUTO_VAR_INIT=none` gives the same 580,000 det lines (d5's fixes hold after the merge).
+
+| | frame | |
+|---|---|---|
+| the City Totem (110) | 88,716 | the only lives lost in the run: 2 (as in round 14) |
+| the Mother (3), shredder | dead by ~204,800 | 5 hits, 53 damage, lowest health 147, 0 lives |
+| the lair (4) | 223,647 | the stage-1 wait ends by the strafing (227,824) |
+| stage-2 wait | 231,956 | ended by peek 0 from (800, 2,200) after 2,400 frames (234,860) |
+| stage-3 wait | 238,654 | ended by peek 1 from (-800, 2,200) (241,614) |
+| the Primagen dead (mode 29) | 245,402 | lair: 21 hits, 124 damage, lowest health 23, 0 lives; the guard drove 224 frames |
+| END 2 (`ending 0/1`, cinema 130) | 252,194 | then the credits |
+| the hub | 266,292 | exit 0 |
+
+Screenshots (640x480, `--draw` with `T2_DRAW_FROM` windows of the no-invincibility run under the driver, same gameplay lines as the undrawn run; checked by eye, not committed): **the Mother fought without invincibility**, a shredder disc on her with the HUD at 180 health (199,251), and her wounded phase cinemas (198,500, 202,050); **the Primagen in his lair** up close with a disc on him, HUD 124 (230,101); **a lair peek**: the view from over the front pit towards his home in the back structure, HUD 104 (234,861, the frame his stage-2 wait ends); the good ending: Adon (248,553), Turok before the portal (251,053); the credits' "TUROK 2 TEAM" over the Lightship (252,503).
+
+Robustness (the same command plus an option, one run each): **`--walk 2`**: END 2, the Primagen
+dead at 241,138, one peek (the guard drove 768 frames), lives lost: the City Totem 1 and one in
+level 5's 164. **`--stick-aim 3`**: END 2, one peek. **`--real-weapons 1`**: game over in 124 at
+150,990 before the lair, as in d2's run (25.5).
+
+### 26.4 What remains, and next
+
+- The aids in the lair now: the aim assist on his node, the shredder from the schedule and
+  `T2_FILL_AMMO`, and the peeks. The peeks stand for a sight line the floor does not give: the N64
+  code against the N64 geometry (21.1), unless the N64 hovers elsewhere. Checking that needs an N64
+  trace of a lair wait (his two hover points, mupen64plus) against the port's.
+- `--real-weapons 1` needs health before 124 (25.5).

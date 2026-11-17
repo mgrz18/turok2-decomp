@@ -1,4 +1,418 @@
-# Port status after Phase 7 round 14 (merged state)
+# Port status after Phase 7 round 15 (merged state)
+
+Round 15 merged five branches, in this order: d5 (the -O2 uninitialised reads fixed, clean startup
+errors, the teleports counted, `stick_walk`), d4 (macOS: a self-contained `Turok2.app`, the
+player's settings, the Mac release run), d1 (the Mother and the Primagen without invincibility,
+the shredder), d3 (closed-loop stick aiming through an input pipe) and d2 (level 1 on picked-up
+weapons, the weapon wheel through the input). The merge added a closed-loop driver and a peek
+for the Primagen's lair. On the merged tree **one process plays the whole game to the GOOD ending
+with no invincibility at all**: a new game, levels 1 to 6, all five totems, the four bosses, the
+six Primagen keys, cinema 43, the Primagen, "END 2", the credits and the hub. Only the City Totem
+costs lives (2, as in round 14); the Mother and the Primagen cost none. Two runs are identical, and
+so are Release `-O2` with zero-init and with no fill. Detail pages: [PLAYTHROUGH.md](PLAYTHROUGH.md)
+sections 22 (d5), 23 (d1), 24 (d3), 25 (d2) and 26 (this merge), [STABILITY.md](STABILITY.md) 11
+(d5), [MACOS.md](MACOS.md) 17 and [QUICKSTART.md](QUICKSTART.md) 0 (d4). The branch sections
+follow section 4; round 14's merged state and earlier rounds follow as history.
+
+The matching build is unchanged: `tools/asm_diff.py --base 8b42da15 -j 8` reports 0 differences
+over all 3,938 files after every merge and at the end, and a clean `make clean && make setup &&
+make build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
+
+## 1. Build and run
+
+**To play** (Mac or Linux, a Release build, a window, a gamepad or the keyboard and mouse):
+[QUICKSTART.md](QUICKSTART.md). On macOS, `turok2` with no arguments (or `--play`) opens the
+window with sound at the N64's pace and keeps its data, config, logs and pak in
+`~/Library/Application Support/turok2` (Linux `~/.local/share/turok2`).
+
+- **The Mac app** (d4, MACOS.md 17): `tools/port/mkapp.sh BUILD [APP]` makes a self-contained
+  `Turok2.app`: the dylib closure (SDL3, GLEW, libzip, tinyxml2, liblzma, libzstd) in
+  `Contents/Frameworks` relinked to `@rpath`, a hard failure if anything still points outside
+  macOS, an ad-hoc signature (`codesign --deep`, verified); `T2_APP_ZIP=1` zips it (9.3 MB app,
+  3.6 MB zip). `tools/port/apptest.sh` runs a copy under a path with spaces with Homebrew hidden.
+  Not yet Developer ID signed or notarised.
+- **The player's settings** (d4): `turok2.cfg.json` gets `gT2MouseSensitivity` (2.0),
+  `gT2MouseInvertY`, `gT2MouseDeadZone` (3), `gT2StickInvertY` (in a level only) and
+  `gT2ShowControlsAtStart` at the first launch; **F1** shows the controls; the window's size and
+  position are saved. The default controls (QUICKSTART has the table): left stick or WASD to walk
+  and strafe; right stick, arrows or the captured mouse to look; right trigger, left click or Ctrl
+  to fire; left trigger, right shoulder, Space or right click to jump; A/B on Q/E; Start on
+  Enter/Esc; the map on the left shoulder, Back or Tab.
+- **Clean errors** (d5): a window that cannot be created (SDL `dummy` driver, no OpenGL, no
+  display) gives "The window could not be created ..." and exit 1; `--audio` without `--rom` turns
+  the audio off with a message.
+
+The development build (Linux box, headless) is round 13's recipe ("Round 13: build and run" below)
+with round 14's changes (rerun gendata; `-DT2_AUTO_VAR_INIT=zero|pattern|none`, default `zero`;
+`-DFETCHCONTENT_SOURCE_DIR_*` to reuse the fetched sources in a fresh build dir). **Use a Release
+(`-O2`) build for long runs**: its det logs are the Debug build's and it runs about twice as
+fast (the whole game in ~130 s on the box). Since d5's two fixes, `none` gives the same whole run
+as `zero` (STABILITY.md 11).
+
+**The whole game to the good ending, no invincibility** (PLAYTHROUGH.md 26):
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6
+mkdir -p RUN/pak && cd OUT && . ../RUN/teleport.env && SDL_VIDEODRIVER=offscreen \
+  T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=500 T2_PROGRESS_LOG=1 T2_HURT_LOG=1 T2_BOSS_LOG=1 \
+  python3 ../tools/port/aimdrive.py -- build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
+  --game --pak-dir ../RUN/pak --frames 290000 --input @../RUN/playthrough.txt
+python3 ../tools/port/mpk_saves.py ../RUN/pak/turok2_pak1.mpk      # the saves after levels 1-5
+```
+
+It runs under `tools/port/aimdrive.py` (the lair driver answers through the input pipe). Round
+14's command (`--cheats-on 3,4`: the Mother and the Primagen invincible) still writes the same
+`playthrough.txt` and `teleport.env` as at 8b42da15 and runs without the driver. Use an EMPTY
+`--pak-dir`. **Kill a stuck run with SIGKILL** (the game ignores SIGTERM).
+
+`--all` options (`fullrun.py`):
+
+- the route: `--talismans 2` (the Leap of Faith), `--cheats-off L,...` (levels without
+  `T2_CHEATS` invincibility, their health pickups taken), `--cheats-on 110,3,4` (invincible anyway:
+  the City Totem / the Mother / the Primagen), `--late-keys`, `--hop` (DEBUG-ONLY), `--slot F`,
+  `--no-health`, `--env K=V`, `--upto N`, `--hub N=FRAME`;
+- the lair (C30, PLAYTHROUGH.md 26): `--lair-drive guard|arcs|none` (default `guard` without
+  `--cheats-on 4`: the strafing, kept off the floor's edge by the driver; `none`: round 14's
+  strafing and `T2_BOSS_FRONT`), `--lair-peek W` (2,400: a home wait not ended after W frames is
+  ended by peeks from over the front pits), `--lair-strafe P[,S]` (d1: default 90 without
+  `--cheats-on 4`, else 80), `--lair-front SPEC` (with `--lair-drive none`);
+- fewer aids, each tested on its own: `--real-weapons 1[,2[,3]]` and `--hub-wait N` (d2: level 1 on
+  the weapons and ammo picked up, the wheel through the input; PLAYTHROUGH.md 25),
+  `--stick-aim L,...` and `--assist-keep 1,110` (d3: those levels aimed with the stick through
+  `aimdrive.py`; PLAYTHROUGH.md 24), `--walk 1,2` and `--walk-probe` (d5: open-floor teleports
+  walked with the stick; PLAYTHROUGH.md 22).
+
+**The level runs and the boss recipes**: round 12's table (below) with round 14's Primagen recipe
+(`T2_WARP_TO=7602 T2_BOSS_FRONT=450,3000,2.5,1`, boss env, `Z@14000..200000` and the lines of
+`routes56.lair_strafe(15000, 45000)`).
+
+**Tools**: `aimdrive.py` (the stick driver for `T2_AIM_STICK`, `--probe`, `--stats`; the lair
+driver for `T2_MOVE_DRIVE`), `aimstats.py` (the aim error of a `--stats` file), `objbisect.py`
+(bisect a det split between two build trees by mixing their objects), `outptr.py` (32-bit locals
+passed to pointer out-parameters), `walkcands.py` (the walkable teleports of a run's log),
+`apptest.sh` and `mkapp.sh` (the Mac app), `padtest.py` (the controls, headless),
+`tools/assets/levels.py` (a level's floor and objects, `--map`), `extras.py` (Adon's chamber).
+
+## 2. What the game does now (Linux, headless, PIE)
+
+- **The whole game to the good ending in one process with no invincibility** (the command above;
+  PLAYTHROUGH.md 26.3): levels 1 to 6; all five totems (the City Totem at 88,716, 2 lives lost);
+  the Leap of Faith; the four bosses; **the Mother with the shredder** (5 hits, 53 damage, lowest
+  health 147, no life lost); the six keys in their slots; cinema 43 and the lair (223,647); **the
+  Primagen with the shredder**: the guard kept him on the floor (224 frames driven, no fall), two
+  home waits ended by peeks (from (800, 2,200) and (-800, 2,200)), dead at 245,402 (21 hits, 124
+  damage, lowest health 23, no life lost); "END 2" at 252,194; the credits; the hub at 266,292.
+  Exit 0. **Two runs identical** (every `progress`, `event`, `pickup`, `hurt`, `death`,
+  `bosstrace` and `lairpeek` line, and all 580,000 det lines). **A Release build with
+  `-DT2_AUTO_VAR_INIT=none` gives the same 580,000 det lines** (d5's fixes hold after the merge).
+- **The same command plus one option**: `--walk 2` and `--stick-aim 3` reach END 2 too (one peek
+  each; with `--walk 2` a life is lost in level 5's 164); `--real-weapons 1` still ends in game
+  over in 124 at 150,990, before the lair (d2's result).
+- **The debug aids that remain**: `T2_GIVE_WEAPONS`, the weapon schedule and `T2_FILL_AMMO` (all
+  levels; level 1 can do without them: `--real-weapons 1`); the aim assists (`T2_FACE_NEAREST` at
+  the totems, `T2_AIM_ENEMY`, `T2_AIM_AT`, `T2_AIM_NODE` at the four bosses, `T2_BOSS_FRONT` for the
+  Queen; levels 1-4 can aim with the stick: `--stick-aim`, the Blind One and the City Totem keep
+  their assists); **the lair peeks** (`T2_LAIR_PEEK`, 2 per run: the floor gives no sight line to
+  his home for most of his hover points, PLAYTHROUGH.md 26.1); **289 teleports** between route steps
+  inside the sub-levels (d5's count: level 1 33, level 2 52, level 3 38, level 4 34, level 5 41,
+  level 6 and the lair 69, the hub 22; of the 19 same-floor ones in levels 1-2 only one is a plain
+  walk, the others stop at walls, bars, doors and graves or follow an aim-assisted fight); the
+  anchors (`T2_ANCHOR`, the schedule clock). **Gone this round**: invincibility at the Mother and
+  the Primagen; `T2_BOSS_FRONT` in the lair; the lair fall.
+- **The boot loop** (26,000, `--pak-blank`): 52,000 det lines identical to the round-14 code.
+  **Round 14's whole-game command** (Release): 580,000 det lines, md5 `229dd7b2…` as in round 14.
+  Its particle-pool hash is not stable from run to run: one run of the merged build and one of the
+  round-14 build gave `204d9db3…`, differing only in the `ptcl` field of frames 72,749-82,523 (the
+  actors and every gameplay line identical). Not a merge effect; not yet explained (section 4).
+- **The level runs** (`playthrough.py DIR --fight 10 | --level 2..6`, Release): each exits 0 and
+  is identical to the round-14 build (level 2's run ends paused in 125 at 64,000 in both).
+  Level 6 kills the Mother (47,179) and the Primagen (78,242), then the credits and the hub.
+- **The boss recipes**: the Mother, the Blind One, the Queen and the Primagen (dead at 43,586):
+  every `bosstrace` line identical to the round-14 build.
+- **Save, title, load**: the save portal writes note 1 (checksum OK); the load from the title puts
+  the player in level 51. **`--audio --wav` boot** (9,000): 3,311,264 stereo frames, RMS 3,399.5.
+- **padtest.py** (Linux Release): OK (map 103 checks, a new game with the pad and with the
+  keyboard, the config round trip 14). d5's errors: the `dummy` driver exits 1 with the message;
+  `--audio` without `--rom` runs with the audio off (swoosh OK, exit 0).
+- **soak.py** (PIE): attract 100,000 frames, newgame seeds 0-19 x 36,000 and levels seeds 0-40 x
+  17,000: **0 crashes**.
+
+Screenshots (640x480, `--draw` with `T2_DRAW_FROM` windows of the no-invincibility run under the driver, same gameplay lines as the undrawn run; checked by eye, not committed): **the Mother fought without invincibility**, a shredder disc on her with the HUD at 180 health (199,251), and her wounded phase cinemas (198,500, 202,050); **the Primagen in his lair** up close with a disc on him, HUD 124 (230,101); **a lair peek**: the view from over the front pit towards his home in the back structure, HUD 104 (234,861, the frame his stage-2 wait ends); the good ending: Adon (248,553), Turok before the portal (251,053); the credits' "TUROK 2 TEAM" over the Lightship (252,503).
+
+Port tests: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (26,124 units, 0 mismatches),
+`t2asset_typed_test` (1,585 checks, 0 errors, both passes), `gbi_test` (0 mismatches), `t2os_test`
+(trace hash `2b2775877e0d226b` on 3 runs), `t2audio_test --direct 0` and `--direct 40`
+(audio_compare: max difference 0), `t2audio_test --adec 0xC29AB4 7464` (27,136 samples), the
+swoosh self test (OK in every run). The archive is unchanged (sha1 `a9d14a47...`, `archive_check`
+OK). ABI (`abicheck.py --build OUT/pie -j 4`: 3,077 TUs, 11,675 calls, 11,087 checked against a
+definition, 181 function-pointer calls): harmful direct sites **0**, indirect 1 (the known
+`Destructible_Hurt` store). `ptrdecls.py`: 0 left in `src/`; `ptrargs.py` on a clean game-library
+build log: 0; `outptr.py`: 0; `f2ucheck.py`: 79; `n64viewcheck.py`: raw BAD 10, stride BAD 3,
+suspect 42 (all as in round 14).
+
+## 3. Merge resolutions and fixes (round 15)
+
+| where | branches | resolution |
+|---|---|---|
+| docs/port/STATUS.md | all | every part section kept, in merge order (d5, d4, d1, d3, d2) |
+| docs/port/PLAYTHROUGH.md | d5, d1, d3, d2 (four "section 22"s; d4 has none) | renumbered **22 d5**, **23 d1**, **24 d3**, **25 d2**; their references in STATUS, aimdrive.py and fullrun.py fixed; 26 is this merge |
+| tools/port/fullrun.py | d5 (`walk`), d1 (`--lair-strafe`, `--lair-front`), d3 (`--stick-aim`), d2 (`--real-weapons`) | `Route.__init__` keeps d5's walk fields and d2's `real_until`; `main_all(walk=, walk_probe=, real_weapons=)`; one `global` line and every option in `cli()`. Each branch's own command (`--walk 2`, `--lair-strafe 90`, `--stick-aim 1,2,3,4 --assist-keep 1,110`, `--real-weapons 1`) writes the same files as on its branch |
+| port/app/game.cpp, main.cpp | d3 (the aim pipe), d4 (`ContRead`, the `--pad-test` window), d5 (`ReportFatal`) | auto-merged, all kept |
+
+`src/` changed only in d5's two files (one host block each); the nested `TARGET_PORT` scan finds
+no new nesting. After every merge: `asm_diff` 0, the port built, and the round-14 default
+command's `playthrough.txt` and `teleport.env` were byte-identical to 8b42da15's.
+
+| commit | what |
+|---|---|
+| 04e0ba12 | PLAYTHROUGH round-15 sections renumbered (above) |
+| 5d19deb6 | **the lair without invincibility**: `T2_MOVE_DRIVE` (the player and boss positions out, the C buttons back, over d3's pipe), `aimdrive.py`'s `LairDrive` (guard, arcs), `T2_LAIR_PEEK`, `fullrun.py --lair-drive/--lair-peek` and the no-invincibility default (PLAYTHROUGH.md 26) |
+
+## 4. Next
+
+1. **The lair peeks**: check on the N64 where the Primagen hovers at his home (two points 15.5
+   apart round (0, 937, 2,918)) and whether a floor spot sees him there; if the port matches,
+   the peek stands for a sight line the game does not give, and a route could steer his take-off
+   (the hover pair depends on it).
+2. **The sisters and the Blind One with the stick**: several candidate targets, fire only when on
+   target (d3: the Blind One needs `--assist-keep 1`).
+3. **Waypoint walking from the region mesh** (`tools/assets/levels.py`, closed-loop over the move
+   pipe) for the 18 same-floor teleports of levels 1-2 that a plain walk cannot replace, then the
+   other levels.
+4. **Real weapons in levels 2-6**: health before 124 so that `--real-weapons 1` finishes, then
+   the pickups of the later levels (PLAYTHROUGH.md 25.5).
+5. **The Mother's phase 0**: the player cannot move there in the port; check on the N64.
+6. **The particle-pool hash that changes between runs** (section 2): find the field (free slots
+   keep their last values; an uninitialised or time-dependent value?).
+7. **macOS**: ThinLTO (the `__asm__` aliases in `func_00413230.c`), Developer ID signing and
+   notarisation, and **the first windowed session with a human and a real gamepad** (focus, mouse
+   capture, F11, vsync with `--pace`, the feel of the mouse and the sticks).
+8. Still open from round 14: the obj-230 double fire and the Blind One's margin (c1), 119's moving
+   platforms (c2), `t2audio_test`'s game-path mode, soak.py on macOS.
+
+## Round 15, part d5: the -O2 uninitialised read found, clean errors, teleports counted (branch names-R15_d5)
+
+**1. The -O2 uninitialised read (round 14's section 4 item 3) is fixed** ([STABILITY.md](STABILITY.md) 11).
+It was in the game library, not t2audio. `tools/port/objbisect.py` (c5's lost `bis.py`, now a
+tool) mixes the objects of a `-DT2_AUTO_VAR_INIT=none` and a `zero` Release tree and bisects on the
+det log. Two functions:
+
+- `AI_FindClearHeading` (src/us/code/func_00244E84.c): `GameObject_TestMove` stores a
+  `CollisionInfo *` into its `s32 out`, so 8 bytes went into a 4-byte local. Without zero-init this
+  clobbered a saved register: SIGSEGV at frame 15,347 (level 53, `AI_GetPathTargetInfo`). Fix:
+  `sptr out` (asm_diff 0). `tools/port/outptr.py` scans for this class (a `T **` out-parameter
+  declared elsewhere with a 32-bit pointee and passed `&` of a 32-bit local). The tree now has none
+  left; the old file is flagged `BAD`.
+- `CCache__HeapAlloc` (func_002063B4.c): `if (value)` on an unset local, with the same call in both
+  branches (a matching idiom). That is undefined behaviour in C: clang -O2 without zero-init took
+  the bottom-of-heap path as unreachable and always allocated from the top. The run diverged at
+  frame 138,436 (the Blind One). Fix: `#ifdef TARGET_PORT`, just the call (asm_diff 0).
+
+On Linux x86-64 PIE Release `-O2`, the default `--all` run (290,000 frames, `T2_DET_LOG=1`) gives
+the same det log for `none` with both fixes, zero-init, and the round-14 Release build:
+**580,000 lines, 0 differ**. The Primagen dies at 250,290, the ending, the hub at 271,180.
+`zero` stays the default.
+
+**2. Clean errors** (port/app/main.cpp, port/runtime/t2boot.c):
+
+- A window that cannot be created (SDL `dummy` driver: no OpenGL; or no display) used to let the
+  game run on and crash at its first frame (SIGSEGV). Now the window count is checked after
+  `window->Init()`. The game reports "The window could not be created (video driver dummy: ...).
+  Turok 2 needs OpenGL and a display. Headless runs: SDL_VIDEODRIVER=offscreen, or --no-window." and
+  exits with 1. The message goes to stderr (in play mode: logs/turok2-stderr.log), to the terminal
+  that started play mode (if any), and to a message box (if the system can show one).
+- `--audio` without `--rom` (the test harness: `turok2 --game --audio`) used to SIGSEGV at boot
+  after "t2audio: no ROM image". Now: "t2: --audio needs the ROM (--rom baserom.us.z64): audio
+  off", and the run goes on (3,000 frames, swoosh OK, exit 0).
+
+**3. Teleports** ([PLAYTHROUGH.md](PLAYTHROUGH.md) 22): the default run has 289. Level 1: 33,
+level 2: 52, level 3: 38, level 4: 34, level 5: 41, level 6 and the lair: 69, the hub visits: 22.
+
+- `playthrough.stick_walk` is the walker: turn with the stick, C-up for the distance, turn to the
+  step's facing. Input only.
+- `fullrun --walk 1,2` replaces listed teleports with walks and moves the later steps.
+- `--walk-probe` measures every candidate in one run.
+- `walkcands.py` lists the candidates from a default run's log.
+
+Of the 19 route teleports in levels 1-2 that stay on one floor, only **134's start-to-gate**
+(1,571 units) is a plain walk; it arrives about 200 units short, which the route absorbs. The
+others stop at walls, cage bars, doors, graves and crypt walls (150-5,200 units short), or start
+after an aim-assisted fight with a yaw the open-loop walker cannot know. They need waypoints or
+d3's closed-loop input. The default command's `playthrough.txt` and `teleport.env` are
+byte-identical to round 14's.
+
+`--walk 2` (that one walk, the default command otherwise): all five totems, the six keys in their
+slots, cinema 43 and the lair, but the Primagen is never engaged: 420,000 frames, his hp still 25,600/25,600 in mode 1. This is the lair's home wait (PLAYTHROUGH.md 21: it needs a line of sight past object 1911). The earlier walk moved the run's timing, and the route's strafing window passed without a sight line. This is the known knife edge, not the walk.
+
+**Validated**: `playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --cheats-on 3,4` on
+the Release `-O2` builds (zero and none, both fixes), det identical to `/root/turok2_decomp/OUT/rel`
+(the 8b42da15 Release build) over 290,000 frames; and the Debug build (zero-init, this branch) gives the same 580,000 det lines, 0 differ.
+
+**For the merge**:
+
+- `src/us/code/func_00244E84.c` and `func_002063B4.c` (asm_diff 0 against 8b42da15).
+- port/app/main.cpp (`ReportFatal`, the window check; d3 may add an input pipe in this file) and
+  port/runtime/t2boot.c.
+- tools/port/fullrun.py: `Route.walk_to`, `walk`, `walk_probe`, `L1_WALKS`/`L2_WALKS`,
+  `level1()`'s step loop, `level_segments(walks=)`, `main_all(walk=, walk_probe=)`, cli `--walk`.
+  d2 and d3 edit levels 1-4 here too.
+- tools/port/playthrough.py: `stick_walk` and the `WALK_*` constants, after c5's `stick_turn`.
+- New files: tools/port/objbisect.py, outptr.py, walkcands.py.
+
+**Next**: a walker that reads the player's position (d3's pipe) and waypoints from the region mesh
+(tools/assets/levels.py) for the 18 teleports that failed. objbisect for any future split between
+builds or hosts (Mac -O2 vs Linux).
+
+## Round 15, part d4: a self-contained Mac app, the release run, the player's settings (branch names-R15_d4)
+
+Mac only, headless; no change to `src/` or `include/`. Detail: [MACOS.md](MACOS.md) section 17,
+[QUICKSTART.md](QUICKSTART.md) section 0.
+
+- **`tools/port/mkapp.sh` makes a self-contained bundle**: the dylib closure (SDL3, GLEW, libzip,
+  tinyxml2, liblzma, libzstd) in `Contents/Frameworks`, relinked to `@rpath`, build rpaths
+  dropped, a hard failure if anything still points outside macOS, `LSMinimumSystemVersion` from
+  the bundle's `minos` (27.0), ad-hoc `codesign --deep` + verify; `T2_APP_ZIP=1` zips it (9.3 MB
+  app, 3.6 MB zip). **`tools/port/apptest.sh`** runs a copy under a path with spaces with
+  `/opt/homebrew` and `/usr/local` hidden by a sandbox profile and the environment cleared: only
+  bundle dylibs load, and play mode starts a new game (mode 11 at 4,855).
+- **The release** (`-O2`, PIE, deployment target 27.0; ThinLTO does not link: `__asm__`-label
+  aliases in `func_00413230.c`): the default whole-game command (`--all --talismans 2
+  --cheats-off 1,2,3,4,5,6 --cheats-on 3,4`, 290,000 frames) gives **580,000 det lines identical
+  to the coordinator's Linux Release** (md5 `229dd7b2…`) and to this branch on Linux, from the build dir and from inside the
+  bundle: END 2, the hub at 271,180, 3 deaths. 38.9 s on the M5. Startup: 0.12 s to the first
+  frame; the title comes at VI 4,212 (70 s of the N64's own logos and cinemas at real time).
+- **Play-mode settings** (port/app/t2controls.cpp, main.cpp, game.cpp's `ContRead`): the look
+  CVars are written to `turok2.cfg.json` at the first launch (`gT2MouseSensitivity` 2.0,
+  `gT2MouseInvertY`, new `gT2MouseDeadZone` 3 so that a 1-pixel mouse motion passes the game's
+  stick dead zone of 3, new `gT2StickInvertY` (in a level only), `gT2ShowControlsAtStart`); the
+  controls table in the log at start and on **F1** (plus a message box with a window); the
+  `--pad-test` headless window reads/writes its geometry through LUS's own save at exit.
+  `padtest.py --only config` checks the round-trip over three launches (size, position,
+  fullscreen, edited settings taking effect); `padtest.py` all passes (map 103, newgame x2,
+  config 14).
+- **For the merge**: files touched `port/app/t2controls.cpp/.h`, `port/app/main.cpp` (the
+  `--pad-test` window block: `T2Controls_MakeHeadlessWindow(cvars, config)` + settings),
+  `port/app/game.cpp` (`ContRead`: 2 lines before `T2Controls_Mouse`), `tools/port/mkapp.sh`,
+  `tools/port/apptest.sh` (new), `tools/port/padtest.py` (mouse rows changed: 23 per 10 px),
+  `docs/port/QUICKSTART.md`, `docs/port/MACOS.md`. d5 also touches `port/app` error paths
+  (main.cpp): expect a small textual merge there. Scripted headless runs are unaffected (they
+  never register the settings or read a mouse).
+
+## Round 15, part d1: the Mother and the Primagen without invincibility (branch names-R15_d1)
+
+Tools only: `tools/port/fullrun.py` (`level6()`: the Mother's and the lair's weapon, `MOTHER_SHREDDER_END`,
+`LAIR_FRONT`, `LAIR_STRAFE`, `--lair-strafe`, `--lair-front`) and `tools/port/routes56.py`
+(`lair_strafe(..., sweep=0)`). The default command (`--cheats-on 3,4`) writes the same input and env
+files as at 8b42da15. PLAYTHROUGH.md 23.
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --lair-strafe 90
+# run as in section 1 (Linux, headless, PIE, Release, --frames 290000)
+```
+
+- **No invincibility anywhere, the good ending**: all five totems, the Mother, the Primagen dead at
+  244,846, END 2 at 251,638, the credits, the hub at 265,736. Two runs identical. **One life lost in
+  the lair** (a fall off its right edge at 228,464), besides the City Totem's two.
+- **The Mother's 10-damage hit at ~1,240 is the N64 code** (`MotherBoss_AnimEvent`: a blast centred
+  on the player, events 1/3/4), and in her phase 0 the player cannot move. The cure is the weapon:
+  **the shredder** ends phase 0 in ~2,000 frames (3 hits) where the plasma rifle needed ~3,500
+  (16-20 hits). In the whole run: 5 hits, 53 damage, lowest health 147.
+- **The Primagen with the shredder**: his recipe kills him at 27,856 instead of 43,586, with 2 melee
+  hits instead of 28. But the shredder changes the lair's timing, and his home waits are the knife
+  edge of PLAYTHROUGH.md 21.1: with the default strafing the stage-2 wait never ends. Of the
+  variants tried, `--lair-strafe 90` and `76` reach END 2, each with one fall; 120, 100, 70, a
+  forward/back sweep, `--slot 1150/1050` and no relocation (`--lair-front 450,999999`) either stall
+  in a wait or fall more.
+- Next: a closed-loop lair driver (keep inside x +-900, z -1,950..1,900; walk until the wait ends)
+  on part d3's input fifo, which would remove the fall; confirm on the N64 that the player is held
+  still in the Mother's phase 0.
+
+## Round 15, part d3: aim assist off, closed-loop stick aiming in levels 1-4 (branch names-R15_d3)
+
+New in this branch (details in [PLAYTHROUGH.md](PLAYTHROUGH.md) section 24):
+
+- **`T2_AIM_STICK=F1-F2[;...]`** (`port/game/t2debug.c`, `t2bosslog.c`). Inside a window,
+  `T2_FACE_NEAREST`, `T2_AIM_AT`, `T2_AIM_ENEMY` and `T2_AIM_NODE` only pick their target and
+  report it. They write no yaw or pitch.
+- **`T2_AIM_FIFO=DIR`** (`port/app/game.cpp`). After each such frame the game writes
+  `aim F px py pz rotY ex ey ez pitch tx ty tz` (exact hex floats) to `DIR/out`. It reads the
+  next frame's stick, `SX SY`, from `DIR/in`. This is input only.
+- **`tools/port/aimdrive.py`** runs the game under the driver:
+  `python3 tools/port/aimdrive.py [--simple] [--stats F] -- turok2 ...`.
+  - The controller is a Smith predictor over the measured stick.
+  - Stick X turns at the cube-law rate (17.1, re-measured exact).
+  - **Stick Y sets a look angle** of -(reading / 80) * pi/2, and the camera pitch eases to it
+    by 5.41 % per tick. It springs back when the stick is released.
+  - The pad is read every second host frame, and a change shows 4 frames later.
+  - It is deterministic: two runs give identical logs.
+- **`fullrun.py --stick-aim L,... [--assist-keep 1,110]`** puts levels 1-4 on the stick. Every fight of
+  another level, and the kept fights, keeps the assist. **`tools/port/aimstats.py`** compares
+  runs fight by fight (`--stick STATS`: the tracking).
+- **Results** (Linux Release; 14 whole-game runs, about 6 minutes each):
+  - Every stick-aimed totem fight of levels 1-4 was won but one: a City Totem at 6/8 with 1 s
+    left. The stick often took less damage than the assist: Harbor 93 against 132, City 58
+    against 150, Marsh 21-72 against 111.
+  - The Sisters of Despair cost 170-200 each against 131-156.
+  - The Blind One by stick was a game over (yaw error 0.63 rad, on target 47 %), so
+    `--assist-keep 1` keeps his assist.
+  - **No `--stick-aim` run reached END 2.** The extra lives (level 2, the Blind One) or the
+    shifted lair timing (the Primagen's stage-3 line-of-sight wait; `--stick-aim 3` stopped there
+    with the lives of the assisted run) end it downstream.
+  - The default command is unchanged: det log identical to 8b42da15, END 2.
+- Files others may touch:
+  - `port/app/game.cpp`: the `AimFifoExchange` block, and the stick override in `ContRead` and
+    `ContReadHeadless`.
+  - `port/game/t2debug.c`: `T2Port_AimReport` hooks in `T2Port_FaceNearest`/`T2Port_AimAt`, and a new
+    block at the end of the file.
+  - `port/game/t2bosslog.c`: one hook in `T2Port_AimNode`.
+  - `tools/port/fullrun.py`: `Route.fights`/`fight_level`, `STICK_AIM`/`ASSIST_KEEP`, two cli
+    options.
+  - New: `tools/port/aimdrive.py`, `tools/port/aimstats.py`.
+
+## Round 15, part d2: levels 1-3 on picked-up weapons and ammo (branch names-R15_d2)
+
+The new option is `fullrun.py` (or `playthrough.py RUN --all`) `--real-weapons 1[,2[,3]]`, with
+`--hub-wait N`. The detail is in PLAYTHROUGH.md 25. Only `tools/port/fullrun.py` and the docs
+change; there are no src/, include/ or port/ changes. Without the option, the generated
+`playthrough.txt` and `teleport.env` are byte-identical to 8b42da15's. The reference `--all` run
+on this branch's Release build reaches the same frames as STATUS section 2: cinema 43 at
+222,839, the lair at 223,647 and the hub at 271,180.
+
+- **Pickups**: weapons and ammo are level actors. Cart entry 2 maps an object to its pickup id
+  (`ids[object + 4]`). The ids are in `sWeaponPickups` (2001-2122) and `sAmmoPickups`
+  (2200-3027). The table and the level 1-3 positions are in PLAYTHROUGH.md 25.1.
+- **Weapon changes in the input stream**: the default control style is the stick wheel. A held
+  (`sBarrelLayoutGroup1`) or B held (`sBarrelLayoutGroup0`), with the analog stick on one of 8
+  slots, requests that weapon. `fullrun.wheel()` writes these inputs, and a route step can say
+  `{"weapon": W}`. A/B taps do nothing in this control style. `T2_WEAPON` acts only with
+  `T2_GIVE_WEAPONS`.
+- **Level 1 with no given weapons or ammo** (`--real-weapons 1`): seven picks. They give the
+  pistol and 50 bullets (53), the shotgun with 20 shells and 10 explosive shells (54, 55, 56, 59),
+  and tek arrows (59). **The Harbor Totem is won**: 8 kills by 23,000, nearly all by the
+  shotgun, and the health goes 200 -> 154. The default run, with the plasma rifle, goes
+  200 -> 68. There are no deaths, and the hub is reached at 23,556.
+- **The whole game with `--real-weapons 1`** (the default `--hub-wait 50`): **all four totems of
+  levels 1-4 and the Blind One, without invincibility**. The City Totem costs 2 lives, as in the
+  default run. Then the Blind One leaves 25 health instead of 52, level 5's first sub-level (124)
+  kills the player, and the run ends in game over at 150,990. PLAYTHROUGH.md 25.5 has the table.
+  The level-2 fights depend on the state they start from: a 50-frame idle in the hub after level
+  1 is what lets sisters 1 and 2 and the City Totem through.
+- **Level 2 on its own pickups** (`--real-weapons 1,2`): **soul gate 1 is destroyed with the shotgun**, chosen on the wheel.
+  **Sister 1 is never hurt**: the nearest-actor aim spends all the ammo on zombies, and it is game
+  over in 134. Level 3 waits on level 2.
+- **Validated**: the default command `playthrough.py RUN --all --talismans 2 --cheats-off
+  1,2,3,4,5,6 --cheats-on 3,4` generates the same files as before and plays the same frames.
+- **For the merge**: only `tools/port/fullrun.py` changes, in these places: `Route` (`real_until`,
+  the `weapon` step option), `write()` (the `T2_GIVE_WEAPONS` and `T2_FILL_AMMO` schedules),
+  `level1(arms=)`, the `level_segments` pick tuples (now 4 or 6 values), `main_all` (levels 1-3)
+  and `cli`, plus the new block before `main_all` (`L1_ARMS`, `L2_ARMS`, `L3_ARMS`, `WHEEL`,
+  `wheel()`, `REAL_HUB_AT`, `ARMS_HUB_WAIT`). d3 changes the aiming steps of levels 1-4 and d5 the
+  walking of levels 1-2: their teleports are where my picks are inserted (segment starts).
+- **Next**: PLAYTHROUGH.md 25.5. In short: a health pickup before 124, the sisters with aim only
+  at them, level 3's scorpion launcher from 66.
+
+
+## Round 14 merged state (history)
 
 Round 14 merged five branches, in this order: c5 (the `T2_AUTO_VAR_INIT` option, 16-byte
 alignment of three gendata globals that fixes the Linux -O2 crash, stick-only aiming in
@@ -21,7 +435,7 @@ The matching build is unchanged: `tools/asm_diff.py --base c8414758 -j 8` report
 over all 3,938 files after every merge, and a clean `make clean && make setup && make build &&
 make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
-## 1. Build and run
+### Round 14, 1. Build and run
 
 **To play** (Mac or Linux, a Release build, a window, a gamepad or the keyboard and mouse):
 [QUICKSTART.md](QUICKSTART.md). On macOS, `turok2` with no arguments (or `--play`) opens the
@@ -73,7 +487,7 @@ now strafes in the lair and kills the Primagen again. The Primagen recipe adds t
 OUT/turok2.o2r` (the controls, headless: 101 checks), `tools/port/extras.py OUT --adon` (Adon's
 chamber), and `T2_ANIM_LOG=OBJ,...` (animation events, c1).
 
-## 2. What the game does now (Linux, headless, PIE)
+### Round 14, 2. What the game does now (Linux, headless, PIE)
 
 - **The whole game to the good ending in one process, by the real Primagen entrance**
   (the command above; PLAYTHROUGH.md 21.3 has the timeline): levels 1 to 6 **without
@@ -135,7 +549,7 @@ definition, 181 function-pointer calls): harmful direct sites **0**, indirect 1 
 `f2ucheck.py`: 79 float -> unsigned conversions (as in round 13). `n64viewcheck.py`: raw BAD 10,
 stride BAD 3, suspect 42 (as in round 13).
 
-## 3. Merge resolutions and fixes (round 14)
+### Round 14, 3. Merge resolutions and fixes (round 14)
 
 | where | branches | resolution |
 |---|---|---|
@@ -158,7 +572,7 @@ Fixes and additions on the merged tree (asm_diff 0; tools only):
 | 0394b0fa | **the Primagen's lair waits**: `routes56.lair_strafe` (C-left/C-right in the lair, in `--level 6` and the whole-game run) and `T2_BOSS_FRONT` relocation after 3,000 frames (600 before). `--level 6` kills him again and the whole run enters by the hub portal (PLAYTHROUGH.md 21.1-21.2) |
 | 8d89d103, 2179f805 | **Primagen keys 2 and 3 into their own slots on their natural hub visits** (c3's suggestion; the five totems are still won); `--late-keys` keeps c3's order |
 
-## 4. Next
+### Round 14, 4. Next
 
 1. **The remaining invincibility**: the Mother (run C: every life lost to her; c2 measured
    ~250-330 damage per rescue run from her 10-damage hits at ~1,240 units, more than the route's
@@ -174,7 +588,9 @@ Fixes and additions on the merged tree (asm_diff 0; tools only):
    `T2_AIM_ENEMY`/`T2_AIM_NODE`.
 3. **The -O2 uninitialised read** (c5, STABILITY.md 10): with `-DT2_AUTO_VAR_INIT=none` the
    divergence is not in `libturok2_game.a`; most likely t2audio (not bisected). Zero-fill stays the
-   default.
+   default. **Resolved in round 15 (d5, STABILITY.md 11)**: two reads in the game
+   library (`AI_FindClearHeading`'s out-pointer, `CCache__HeapAlloc`'s unassigned branch), fixed;
+   `none` = `zero` over the whole game.
 4. **The obj-230 double fire on the N64** (c1: the triple hit is the same code and data as the
    N64; confirm the burst with an N64 trace) and **the Blind One's margin** (c1's fight is won
    without invincibility with little health to spare).

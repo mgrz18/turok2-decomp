@@ -9,6 +9,10 @@ controller read, and T2_PAD_LOG=1 logs the N64 pad the game receives. Checks:
            mouse), unbound buttons give nothing, the pad unplugged and plugged back in
   newgame  a new game from the title with the gamepad only, then with the keyboard only: the
            game must reach engine mode 11 (in a level), as `--input START@4400 A@4500 ...` does
+  config   (round 15 d4) the settings a player keeps, over three launches in one directory: the
+           window size/position and fullscreen (LUS's own save at exit, through the headless
+           window), the CVars written with their defaults, edited sensitivity / invert-Y values
+           taking effect, the pad's invert-Y only in a level, F1 printing the controls
 
   padtest.py --bin OUT/rel/app/turok2 --archive OUT/turok2.o2r [--rom baserom.us.z64] [--work DIR]
 
@@ -35,7 +39,9 @@ AXES = [("LX", -32768, 0x0002, None), ("LX", 32767, 0x0001, None), ("LY", -32768
         ("LY", 32767, 0x0004, None), ("RX", -32768, 0, (-85, 0)), ("RX", 32767, 0, (85, 0)),
         ("RY", -32768, 0, (0, 85)), ("RY", 32767, 0, (0, -85)), ("LT", 32767, 0x0010, None),
         ("RT", 32767, 0x2000, None)]
-MOUSE = [((10, 0), (20, 0)), ((-10, 0), (-20, 0)), ((0, -10), (0, 20)), ((0, 10), (0, -20)), ((100, 0), (80, 0))]
+# the captured mouse: 3 (gT2MouseDeadZone) + 2 (gT2MouseSensitivity) per pixel, clamp 80 (round 15)
+MOUSE = [((10, 0), (23, 0)), ((-10, 0), (-23, 0)), ((0, -10), (0, 23)), ((0, 10), (0, -23)), ((1, 0), (5, 0)),
+         ((100, 0), (80, 0))]
 
 
 def build_map_script():
@@ -86,10 +92,11 @@ def build_map_script():
     return lines, checks, f + 20
 
 
-def run(args, name, frames, script_lines, extra=()):
+def run(args, name, frames, script_lines, extra=(), keep=False, env_extra=None):
     work = os.path.join(args.work, name)
-    shutil.rmtree(work, ignore_errors=True)
-    os.makedirs(work)
+    if not keep:
+        shutil.rmtree(work, ignore_errors=True)
+    os.makedirs(work, exist_ok=True)
     script = os.path.join(work, "pad.txt")
     with open(script, "w") as fp:
         fp.write("\n".join(script_lines) + "\n")
@@ -98,6 +105,8 @@ def run(args, name, frames, script_lines, extra=()):
     if args.rom:
         cmd += ["--rom", args.rom]
     env = dict(os.environ, T2_PAD_LOG="1", SDL_VIDEODRIVER="offscreen")
+    if env_extra is not None:
+        env = dict(os.environ, T2_PAD_LOG="1", **env_extra)
     p = subprocess.run(cmd, cwd=work, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
                        timeout=600)
     with open(os.path.join(work, "log.txt"), "w") as fp:
@@ -157,13 +166,87 @@ def check_newgame(args):
     return bad
 
 
+def check_config(args):
+    import json
+    bad = 0
+    cfg_path = os.path.join(args.work, "config", "turok2.cfg.json")
+
+    def cfg():
+        with open(cfg_path) as fp:
+            return json.load(fp)
+
+    def get(c, dotted, default=None):
+        for k in dotted.split("."):
+            if not isinstance(c, dict) or k not in c:
+                return default
+            c = c[k]
+        return c
+
+    def expect(label, got, want):
+        nonlocal bad
+        ok = got == want
+        bad += not ok
+        print(f"  {'ok  ' if ok else 'FAIL'} {label}: {got!r}" + ("" if ok else f" (want {want!r})"))
+
+    shutil.rmtree(os.path.join(args.work, "config"), ignore_errors=True)
+    # 1: a fresh config; the player resizes and moves the window, presses F1, quits
+    rc, log = run(args, "config", 300, ["100 window 1024 768 40 50", "200 hotkey F1"], keep=True, env_extra={})
+    print(f"config 1: exit {rc}")
+    bad += rc != 0
+    c = cfg()
+    expect("Window.Width/Height/PositionX/Y saved", [get(c, "Window.Width"), get(c, "Window.Height"),
+                                                      get(c, "Window.PositionX"), get(c, "Window.PositionY")],
+           [1024, 768, 40, 50])
+    expect("Window.Fullscreen.Enabled", get(c, "Window.Fullscreen.Enabled"), False)
+    expect("CVars written with their defaults", [get(c, "CVars." + k) for k in (
+        "gT2MouseSensitivity", "gT2MouseInvertY", "gT2MouseDeadZone", "gT2StickInvertY", "gT2ShowControlsAtStart")],
+        [2.0, 0, 3, 0, 1])
+    expect("controls table at start + F1", log.count("Turok 2 controls (F1"), 2)
+    # the player edits the settings in the file
+    c["CVars"]["gT2MouseSensitivity"] = 1.0
+    c["CVars"]["gT2MouseInvertY"] = 1
+    c["CVars"]["gT2StickInvertY"] = 1
+    c["CVars"]["gT2ShowControlsAtStart"] = 0
+    with open(cfg_path, "w") as fp:
+        json.dump(c, fp, indent=4)
+    # 2: the saved size comes back; fullscreen on (F11), quit
+    rc, log = run(args, "config", 300, ["100 fullscreen 1"], keep=True, env_extra={})
+    print(f"config 2: exit {rc}")
+    bad += rc != 0
+    expect("launch 2 window line", re.search(r"^window: config .*$", log, re.M)[0] if "window: config" in log else None,
+           "window: config 1024x768, fullscreen 0 (Window.Width/Height, Window.Fullscreen.Enabled)")
+    expect("launch 2 settings line", re.search(r"^controls: mouse sensitivity .*$", log, re.M)[0],
+           "controls: mouse sensitivity 1, mouse invert Y 1, mouse dead zone 3, stick invert Y 1")
+    expect("controls table off", log.count("Turok 2 controls (F1"), 0)
+    c = cfg()
+    expect("Window.Fullscreen.Enabled saved", get(c, "Window.Fullscreen.Enabled"), True)
+    expect("windowed size kept", [get(c, "Window.Width"), get(c, "Window.Height")], [1024, 768])
+    # 3: fullscreen comes back; the edited mouse values; the pad's invert only in a level
+    lines = ["2000 capture 1", "2010 mouse 10 0", "2050 mouse 0 -10", "2100 capture 0",
+             "3000 axis RY -32768", "3020 axis RY 0"]
+    for f, k in ((4400, "START"), (4500, "SOUTH"), (4700, "SOUTH"), (4800, "SOUTH")):
+        lines += [f"{f} btn {k} down", f"{f + 4} btn {k} up"]
+    lines += ["5200 axis RY -32768", "5220 axis RY 0"]
+    rc, log = run(args, "config", 5300, lines, keep=True, env_extra={})
+    print(f"config 3: exit {rc}")
+    bad += rc != 0
+    expect("launch 3 window line", re.search(r"^window: config .*$", log, re.M)[0],
+           "window: config 1024x768, fullscreen 1 (Window.Width/Height, Window.Fullscreen.Enabled)")
+    ch = pad_states(log)
+    expect("mouse 10,0 at sensitivity 1", state_at(ch, 2010)[1], (13, 0))
+    expect("mouse 0,-10 inverted", state_at(ch, 2050)[1], (0, -13))
+    expect("pad look up at the title (not inverted)", state_at(ch, 3010)[1], (0, 85))
+    expect("pad look up in a level (inverted)", state_at(ch, 5210)[1], (0, -85))
+    return bad
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--bin", required=True)
     ap.add_argument("--archive", required=True)
     ap.add_argument("--rom")
     ap.add_argument("--work", default="padtest_out")
-    ap.add_argument("--only", choices=("map", "newgame"))
+    ap.add_argument("--only", choices=("map", "newgame", "config"))
     ap.add_argument("-v", "--verbose", action="store_true")
     args = ap.parse_args()
     args.bin, args.archive = os.path.abspath(args.bin), os.path.abspath(args.archive)
@@ -174,6 +257,8 @@ def main():
         bad += check_map(args)
     if args.only in (None, "newgame"):
         bad += check_newgame(args)
+    if args.only in (None, "config"):
+        bad += check_config(args)
     print("padtest:", "OK" if bad == 0 else f"{bad} FAILED")
     return 0 if bad == 0 else 1
 

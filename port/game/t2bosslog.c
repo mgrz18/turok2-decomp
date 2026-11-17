@@ -578,6 +578,12 @@ int T2Port_AimNode(int frame, const char *spec) {
     if (best == NULL) {
         return 0;
     }
+    {
+        extern int T2Port_AimReport(int frame, f32 x, f32 y, f32 z);
+        if (T2Port_AimReport(frame, bestAim.x, bestAim.y, bestAim.z)) {
+            return 1; /* T2_AIM_STICK (round 15 d3): the stick driver turns */
+        }
+    }
     pl->m_RotY += AI_AngleToPoint(pl, bestAim);
     dx = bestAim.x - eye.x;
     dy = bestAim.y - eye.y;
@@ -732,5 +738,142 @@ void T2Port_TraceBoss(int frame) {
         sA = a;
         sB = b;
         sC = c;
+    }
+}
+
+/* T2_MOVE_DRIVE=F1-F2[;...] (DEBUG-ONLY, round 15 C30): inside these schedule-frame windows game.cpp
+ * (T2_AIM_FIFO) hands this line to the outside driver every frame ("move F px py pz rotY bx by bz":
+ * the player's position and yaw, the level boss's position, or "nan nan nan" without one; exact hex
+ * floats) and takes back the next frame's C buttons (tools/port/aimdrive.py's lair driver keeps the
+ * player on the Primagen lair's floor while he strafes). What a player sees; nothing is written into
+ * the game: the answer goes through the input stream only. */
+int T2Port_MovePose(int frame, char *buf, int n) {
+    static const char *spec;
+    static int init;
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    CGameObjectInstance *pl, *b = gLevelScript.actor;
+    const char *s;
+    int on = 0;
+
+    if (!init) {
+        init = 1;
+        spec = getenv("T2_MOVE_DRIVE");
+    }
+    for (s = spec; s != NULL && *s != '\0';) {
+        int f1, f2;
+        if (sscanf(s, "%d-%d", &f1, &f2) == 2 && frame >= f1 && frame <= f2) {
+            on = 1;
+            break;
+        }
+        s = strchr(s, ';');
+        if (s != NULL) {
+            s++;
+        }
+    }
+    if (!on || p == NULL || gEngineApp.m_Settings.mode != 13 || gScene.m_WarpState != 0) {
+        return 0;
+    }
+    pl = &p->m_CharacterActor;
+    if (b != NULL) {
+        snprintf(buf, n, "move %d %a %a %a %a %a %a %a\n", frame, pl->header.m_vPos.x, pl->header.m_vPos.y,
+                 pl->header.m_vPos.z, pl->m_RotY, b->header.m_vPos.x, b->header.m_vPos.y, b->header.m_vPos.z);
+    } else {
+        snprintf(buf, n, "move %d %a %a %a %a nan nan nan\n", frame, pl->header.m_vPos.x, pl->header.m_vPos.y,
+                 pl->header.m_vPos.z, pl->m_RotY);
+    }
+    return 1;
+}
+
+/* T2_LAIR_PEEK=W[@F;...] (DEBUG-ONLY, round 15 C30; game.cpp, every frame): the Primagen's home waits
+ * (mode 25, Primagen_UpdateMode19) end only when his own search sees the player. Where he hovers at
+ * his home (the two points he steps between, a few units round (0, 937, 2,918)) depends on how he flew
+ * in, and for most of them no spot of the solid floor sees him past the lair's back structure: a
+ * search run at the search's own time (sections loaded) over the whole floor at 100-unit spacing finds
+ * none, with the eye raised 120 or 250 too (PLAYTHROUGH.md 26). The spots that do are over the pits at
+ * the front corners. After W frames of one such wait with him within 60 of home, this puts the player
+ * at the next spot of kPeek for 4 frames (two game ticks: one search), then back where he stood, with
+ * his velocity cleared both times; the next spot follows 2 frames later, until the wait ends (each
+ * peek is logged). A player cannot stand there (the pits); this replaces T2_BOSS_FRONT's relocation in
+ * the lair, which moved him to the floor beside the lair for good. */
+void T2Port_LairPeek(int frame, const char *spec0) {
+    static const f32 kPeek[][2] = {
+        {800, 2200}, {-800, 2200}, {900, 2200}, {-900, 2200}, {1000, 2200}, {-1000, 2200}, {700, 2200}, {-700, 2200},
+        {800, 2300}, {-800, 2300}, {900, 2300}, {-900, 2300}, {1000, 2300}, {-1000, 2300}, {700, 2300}, {-700, 2300},
+        {800, 2100}, {-800, 2100}, {900, 2100}, {-900, 2100}, {1000, 2100}, {-1000, 2100}, {1100, 2100}, {-1100, 2100},
+        {600, 2250}, {-600, 2250}, {1100, 2250}, {-1100, 2250}, {500, 2300}, {-500, 2300}, {1200, 2200}, {-1200, 2200}};
+    static int sWait, sTry, sPhase, sActive;
+    static CVector3 sKeep;
+    static struct CGameRegion *sKeepR;
+    char sbuf[32];
+    const char *spec = T2Port_Scheduled(spec0, frame, sbuf, sizeof(sbuf));
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    CGameObjectInstance *b = gLevelScript.actor, *a;
+    int after = spec != NULL ? atoi(spec) : 0;
+    f32 hx, hz;
+    int waiting;
+
+    if (p == NULL) {
+        return;
+    }
+    a = &p->m_CharacterActor;
+    waiting = after > 0 && gEngineApp.m_Settings.mode == 13 && gScene.m_WarpState == 0 && gScene.m_nLevel == 4 &&
+              b != NULL && b->m_AI.m_Mode == 25;
+    if (waiting) {
+        hx = b->header.m_vPos.x;
+        hz = b->header.m_vPos.z - 2918.4f;
+        waiting = hx * hx + hz * hz < 3600.0f;
+    }
+    if (!waiting) {
+        if (sActive) { /* the wait ended during a peek: back to the floor */
+            a->header.m_vPos = sKeep;
+            a->header.m_pCurrentRegion = sKeepR;
+            a->m_vVelocity.x = a->m_vVelocity.y = a->m_vVelocity.z = 0.0f;
+            sActive = 0;
+            printf("lairpeek: frame %d the wait ended during peek %d: the player back at (%.1f %.1f %.1f)\n", frame,
+                   sTry - 1, sKeep.x, sKeep.y, sKeep.z);
+            fflush(stdout);
+        }
+        sWait = 0;
+        sPhase = 0;
+        return;
+    }
+    if (++sWait < after) {
+        return;
+    }
+    if (sActive) {
+        if (++sPhase < 4) {
+            return;
+        }
+        a->header.m_vPos = sKeep; /* not seen from this spot: back */
+        a->header.m_pCurrentRegion = sKeepR;
+        a->m_vVelocity.x = a->m_vVelocity.y = a->m_vVelocity.z = 0.0f;
+        sActive = 0;
+        sPhase = 0;
+        return;
+    }
+    if (++sPhase < 2) {
+        return;
+    }
+    {
+        int k = sTry++ % (int) (sizeof(kPeek) / sizeof(kPeek[0]));
+        CVector3 pos;
+        sptr region;
+        pos.x = kPeek[k][0];
+        pos.y = 0.0f;
+        pos.z = kPeek[k][1];
+        region = CScene__FindRegionAt(&gScene, &pos);
+        if (region == 0) {
+            return;
+        }
+        sKeep = a->header.m_vPos;
+        sKeepR = a->header.m_pCurrentRegion;
+        a->header.m_vPos = pos;
+        a->header.m_pCurrentRegion = (struct CGameRegion *) region;
+        a->m_vVelocity.x = a->m_vVelocity.y = a->m_vVelocity.z = 0.0f;
+        sActive = 1;
+        sPhase = 0;
+        printf("lairpeek: frame %d wait %d peek %d at (%.0f 0 %.0f), him at (%.1f %.1f %.1f)\n", frame, sWait, k, pos.x,
+               pos.z, b->header.m_vPos.x, b->header.m_vPos.y, b->header.m_vPos.z);
+        fflush(stdout);
     }
 }

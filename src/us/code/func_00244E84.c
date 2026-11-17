@@ -10,7 +10,10 @@ f32 func_002982F0(f32);         /* sinf */
 f32 func_002974C0(f32);         /* cosf */
 f32 Math_AcosLookup(f32);         /* acosf */
 f32 GameObject_GetCollisionRadius(CGameObjectInstance *a);    /* radius */
-s32 GameObject_TestMove(CGameObjectInstance *self, CVector3 pos, s32 *out); /* blocked at pos */
+/* out receives a CollisionInfo pointer (func_0026961C.c): pointer-sized (sptr). As an s32, the
+ * host's 8-byte store overwrote the 4 bytes after it (round 15 d5: with -O2 and no zero-init they
+ * were part of a saved register, and AI_GetPathTargetInfo crashed in level 53). */
+s32 GameObject_TestMove(CGameObjectInstance *self, CVector3 pos, sptr *out); /* blocked at pos */
 void Angle_Wrap(f32 *angle); /* wrap */
 
 /* AI_AngleToPoint: the angle from the actor's heading to a point. */
@@ -47,7 +50,7 @@ static __inline__ f32 angleTo(CGameObjectInstance *actor, CVector3 point) {
  * tried first alternating between actors), turned 15 degrees further. */
 f32 AI_FindClearHeading(CGameObjectInstance *self, CVector3 pos, CGameObjectInstance *target, f32 scale) {
     CVector3 probe;
-    s32 out;
+    sptr out;
     f32 heading;
     f32 angle;
     f32 step;

@@ -363,7 +363,7 @@ L6_PRIMAGEN_HOP = 34800    # relative: T2_WARP_TO=7602 from the hub (54,000)
 L6_END = 90000             # relative: the end of the held fire
 
 
-def lair_strafe(first, last, period=80):
+def lair_strafe(first, last, period=80, sweep=0):
     """round 14 C29: strafe left and right in the Primagen's lair (C-left / C-right, half a period each).
     His home waits (Primagen_UpdateMode19, stages 2 and 3) end only when his own target search sees the
     player, and from his home (0, 937, ~2,915) the line of sight from the floor grazes the lair's back
@@ -373,6 +373,12 @@ def lair_strafe(first, last, period=80):
     for f in range(first, last, period):
         out.append("CL@%d..%d" % (f, f + period // 2 - 1))
         out.append("CR@%d..%d" % (f + period // 2, f + period - 1))
+    if sweep:
+        # round 15 d1: and a slow walk back and forth (C-up a quarter of the sweep, C-down a quarter,
+        # no net drift): the sight line past object 1911 also depends on the player's distance
+        for f in range(first, last, sweep):
+            out.append("CU@%d..%d" % (f, f + sweep // 4 - 1))
+            out.append("CD@%d..%d" % (f + sweep // 2, f + 3 * sweep // 4 - 1))
     return out
 
 

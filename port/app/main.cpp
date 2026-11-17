@@ -164,6 +164,17 @@ struct Args {
     std::string padTest; // --pad-test FILE (debug): scripted SDL virtual gamepad/keyboard/mouse
 };
 
+// Round 15 (d5): a fatal error in play mode, where stderr goes to logs/: also to the terminal
+// that started the game (when there was one) and in a message box (when the system has one).
+static int sTermErr = -1;
+static void ReportFatal(const char* msg) {
+    fprintf(stderr, "turok2: %s\n", msg);
+    if (sTermErr >= 0) {
+        dprintf(sTermErr, "turok2: %s\n", msg);
+    }
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Turok 2", msg, nullptr);
+}
+
 Args ParseArgs(int argc, char** argv) {
     Args a;
     a.play = argc == 1;
@@ -338,6 +349,7 @@ int main(int argc, char** argv) {
         // the runtime's diagnostics (t2:, t2audio:) go to stderr: into logs/ as well
         if (isatty(fileno(stderr))) {
             fprintf(stderr, "turok2: playing; logs in %s/logs\n", data.c_str());
+            sTermErr = dup(fileno(stderr)); // fatal errors still reach the terminal
         }
         const std::string err = data + "/logs/turok2-stderr.log";
         if (freopen(err.c_str(), "w", stderr) != nullptr) {
@@ -411,7 +423,17 @@ int main(int argc, char** argv) {
         if (!T2PadTest_Load(args.padTest)) {
             return 2;
         }
-        inputWindow = T2Controls_MakeHeadlessWindow(cvars);
+        inputWindow = T2Controls_MakeHeadlessWindow(cvars, config);
+        // a Context child, so that LUS saves its geometry at exit as it does a real window's
+        context->GetChildren().Add(inputWindow);
+    }
+    // the player's settings in the config (play mode, a window, --pad-test; not the scripted
+    // headless runs)
+    if (args.game && (args.play || args.window || !args.padTest.empty())) {
+        T2Controls_RegisterSettings(args.play || args.window);
+        printf("window: config %dx%d, fullscreen %d (Window.Width/Height, Window.Fullscreen.Enabled)\n",
+               config->GetInt("Window.Width", 640), config->GetInt("Window.Height", 480),
+               config->GetBool("Window.Fullscreen.Enabled", false) ? 1 : 0);
     }
     T2Controls_SetWindow(inputWindow);
     auto controlDeck = std::make_shared<LUS::ControlDeck>(
@@ -645,6 +667,21 @@ int main(int argc, char** argv) {
         window->SetRendererUCode(ucode_f3dex2); // "F3DEX.NoN fifo 2.05" = F3DEX2 (include/globals/ucode.h)
         window->SetTargetFps(60);
         window->SetMaximumFrameLatency(1);
+        // Round 15 (d5): no window (no OpenGL in the video driver, e.g. SDL_VIDEODRIVER=dummy, or
+        // no display): LUS logs the error and goes on, and the game crashed at its first frame.
+        int nWindows = 0;
+        SDL_Window** windows = SDL_GetWindows(&nWindows);
+        SDL_free(windows);
+        if (nWindows == 0) {
+            char msg[512];
+            snprintf(msg, sizeof msg,
+                     "The window could not be created (video driver %s: %s).\n\nTurok 2 needs OpenGL "
+                     "and a display. Headless runs: SDL_VIDEODRIVER=offscreen, or --no-window.",
+                     SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "none", SDL_GetError());
+            ReportFatal(msg);
+            fflush(stdout);
+            _Exit(1); // ~Fast3dWindow would dereference the backend that was not created
+        }
         printf("window: backend %s, video driver %s, %ux%u\n", window->GetWindowBackendName().c_str(),
                SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "?", window->GetWidth(),
                window->GetHeight());

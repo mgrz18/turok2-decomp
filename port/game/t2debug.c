@@ -628,6 +628,7 @@ void T2Port_WakeEnemies(int frame, const char *spec) {
  * enemy) to his yaw. An aim assist for scripted firing tests (--input Z@...): the stick cannot
  * aim at a moving enemy from a script. Not a game option. */
 extern f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);
+int T2Port_AimReport(int frame, f32 x, f32 y, f32 z);
 void T2Port_FaceNearest(int frame, const char *spec) {
     static CGameObjectInstance *sLast;
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
@@ -715,6 +716,9 @@ void T2Port_FaceNearest(int frame, const char *spec) {
         best = sLast;
         bestD = lastD;
     }
+    if (T2Port_AimReport(frame, best->header.m_vPos.x, best->header.m_vPos.y + 50.0f, best->header.m_vPos.z)) {
+        /* T2_AIM_STICK (round 15 d3): the stick driver turns; its log line as before */
+    } else {
     pl->m_RotY += AI_AngleToPoint(pl, best->header.m_vPos);
     {
         /* T2_FACE_PITCH=1 (round 11 z1): also the camera pitch at the enemy (its position, 50 units
@@ -731,6 +735,7 @@ void T2Port_FaceNearest(int frame, const char *spec) {
             p->m_pCamera->m_ViewParams.m_vRotOffset.x =
                 T2Port_Atan2f(best->header.m_vPos.y + 50.0f - eye.y, sqrtf(dx * dx + dz * dz));
         }
+    }
     }
     if (best != sLast) {
         sLast = best;
@@ -762,6 +767,9 @@ void T2Port_AimAt(int frame, const char *spec) {
             at.x = x;
             at.y = y;
             at.z = z;
+            if (T2Port_AimReport(frame, x, y, z)) {
+                return; /* T2_AIM_STICK: the stick driver turns */
+            }
             pl->m_RotY += AI_AngleToPoint(pl, at);
             extern f32 T2Port_Atan2f(f32 y, f32 x);
             /* not libm's atan2f: its last bit differs between macOS and glibc (round 12 a4: a
@@ -1330,4 +1338,67 @@ void T2Port_AnimEventLog(void *obj, void *anim, int i, int frame, float from, fl
             return;
         }
     }
+}
+
+/* T2_AIM_STICK=F1-F2[;...] (DEBUG-ONLY, round 15 d3): inside these schedule-frame windows the aim
+ * assists (T2_FACE_NEAREST, T2_AIM_AT, T2_AIM_ENEMY, T2_AIM_NODE) write nothing: no player yaw, no
+ * camera pitch. They still choose their target (the same nearest/sticky/actor-first/boss-node
+ * rules) and report its point here; game.cpp (T2_AIM_FIFO) hands it with the player pose to an
+ * outside stick driver (tools/port/aimdrive.py), whose answer is the next frame's stick: the aim
+ * goes through the input stream only, closed-loop on the game's own output. */
+static int sAimHave;
+static CVector3 sAimPt;
+
+int T2Port_AimStickOn(int frame) {
+    static const char *spec;
+    static int init;
+    const char *s;
+
+    if (!init) {
+        init = 1;
+        spec = getenv("T2_AIM_STICK");
+    }
+    for (s = spec; s != NULL && *s != '\0';) {
+        int f1, f2;
+        if (sscanf(s, "%d-%d", &f1, &f2) == 2 && frame >= f1 && frame <= f2) {
+            return 1;
+        }
+        s = strchr(s, ';');
+        if (s != NULL) {
+            s++;
+        }
+    }
+    return 0;
+}
+
+/* the assists call this where they would turn the player: 1 = report only (write nothing) */
+int T2Port_AimReport(int frame, f32 x, f32 y, f32 z) {
+    if (!T2Port_AimStickOn(frame)) {
+        return 0;
+    }
+    sAimHave = 1;
+    sAimPt.x = x;
+    sAimPt.y = y;
+    sAimPt.z = z;
+    return 1;
+}
+
+/* game.cpp, after the assists ran: this frame's report as one line ("aim F px py pz rotY ex ey ez
+ * pitch tx ty tz", exact hex floats), or 0 when no assist reported a target this frame */
+int T2Port_AimPose(int frame, char *buf, int n) {
+    CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    CGameObjectInstance *pl;
+
+    if (!sAimHave) {
+        return 0;
+    }
+    sAimHave = 0;
+    if (p == NULL || p->m_pCamera == NULL) {
+        return 0;
+    }
+    pl = &p->m_CharacterActor;
+    snprintf(buf, n, "aim %d %a %a %a %a %a %a %a %a %a %a %a\n", frame, pl->header.m_vPos.x, pl->header.m_vPos.y,
+             pl->header.m_vPos.z, pl->m_RotY, p->m_pCamera->m_vPos.x, p->m_pCamera->m_vPos.y, p->m_pCamera->m_vPos.z,
+             p->m_pCamera->m_ViewParams.m_vRotOffset.x, sAimPt.x, sAimPt.y, sAimPt.z);
+    return 1;
 }

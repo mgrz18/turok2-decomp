@@ -146,6 +146,31 @@ def stick_turn(f, dyaw):
     return out, n
 
 
+# ---- walking instead of teleporting (round 15 d5) ----
+# C-up on level 53's open floor (T2_STATE_LOG=2, Linux Release): the player starts moving 5 frames
+# after the press, reaches 7.68 units per frame in ~24 frames (~11 frames' worth of distance lost
+# on the way up) and stops a few frames after the release.
+WALK_SPEED = 7.68     # units per frame at full speed
+WALK_LAG = 16         # frames: 5 before the first step + ~11 lost while accelerating
+WALK_COAST = 20.0     # units travelled after the release
+WALK_SETTLE = 12      # frames for the player to stop before the closing turn
+
+
+def stick_walk(f, frm, ry, to, ry_end):
+    """Walk on open floor from frm (x, z), facing ry, to `to` (x, z), then face ry_end: turn with the
+    stick (stick_turn), C-up for the distance, turn again. From frame f; returns (inputs, frames).
+    Open loop: the route checks the arrival in its logs (the next teleport line, the pickups)."""
+    yaw = face_yaw(frm[0], frm[1], to[0], to[1])
+    out, n1 = stick_turn(f, wrap(yaw - ry))
+    f1 = f + n1 + 1
+    dist = math.hypot(to[0] - frm[0], to[1] - frm[1])
+    n = max(1, int(round(max(0.0, dist - WALK_COAST) / WALK_SPEED)) + WALK_LAG)
+    out.append("CU@%d..%d" % (f1, f1 + n - 1))
+    f2 = f1 + n + WALK_SETTLE
+    o2, n2 = stick_turn(f2, wrap(ry_end - yaw))
+    return out + o2, f2 + n2 + 1 - f
+
+
 def stick_aim(x, z, ry, target, f):
     """The stick inputs from frame f that turn a player teleported to (x, z) facing ry towards
     target (x, y, z): the yaw only (the pitch stays the game's)."""

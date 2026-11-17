@@ -43,9 +43,12 @@ void T2Port_FaceNearest(int frame, const char *spec);
 void T2Port_ScribbleStack(unsigned value);
 int T2Port_AimNode(int frame, const char *spec);
 void T2Port_BossFront(int frame, const char *spec);
+void T2Port_LairPeek(int frame, const char *spec);
 void T2Port_TraceBoss(int frame);
 void T2Port_AimAt(int frame, const char *spec);
 void T2Port_AimEnemy(int frame, const char *spec);
+int T2Port_AimPose(int frame, char *buf, int n);
+int T2Port_MovePose(int frame, char *buf, int n);
 void T2Port_Cheats(int frame, const char *spec, const char *fill);
 void T2Port_SavePortal(int frame, const char *spec);
 void T2Port_DoorOpen(int frame, const char *spec);
@@ -358,6 +361,67 @@ bool ScriptedStick(int8_t* x, int8_t* y) {
     return any;
 }
 
+// T2_AIM_FIFO=DIR (debug, round 15 d3): the stick driver of T2_AIM_STICK (tools/port/aimdrive.py).
+// After each frame in which an aim assist reported a target (t2debug.c, T2Port_AimPose), one line
+// goes to the fifo DIR/out ("aim F px py pz rotY ex ey ez pitch tx ty tz") and one line comes back
+// from DIR/in ("SX SY": the next frame's stick on port 1, over the script's; "-" keeps the script).
+// Input only: the driver sees what the game drew and answers with a stick, as a player would.
+// T2_MOVE_DRIVE=F1-F2[;...] (debug, round 15 C30): inside these windows a second line goes out every
+// frame, "move F px py pz rotY bx by bz" (t2bosslog.c, T2Port_MovePose: the player and the level
+// boss), and the answer "SX SY C" gives the next frame's C buttons (hex mask of U 8, D 4, L 2, R 1),
+// which replace the script's (aimdrive.py's lair driver; "-" for SX SY keeps the stick).
+struct AimStick {
+    bool valid;
+    int8_t x, y;
+    bool cValid;
+    uint16_t c;
+};
+AimStick sAimStick;
+
+void AimFifoExchange(int frame, const char* dir) {
+    static FILE* out = nullptr;
+    static FILE* in = nullptr;
+    static bool broken = false;
+    sAimStick.valid = false;
+    sAimStick.cValid = false;
+    if (broken) {
+        return;
+    }
+    if (out == nullptr) {
+        std::string o = std::string(dir) + "/out", i = std::string(dir) + "/in";
+        out = fopen(o.c_str(), "w"); // blocks until the driver opens it (a fifo)
+        in = out != nullptr ? fopen(i.c_str(), "r") : nullptr;
+        if (out == nullptr || in == nullptr) {
+            fprintf(stderr, "T2_AIM_FIFO: cannot open %s/out and %s/in\n", dir, dir);
+            broken = true;
+            return;
+        }
+    }
+    char line[512];
+    for (int kind = 0; kind < 2; kind++) {
+        if (!(kind == 0 ? T2Port_AimPose(frame, line, sizeof line) : T2Port_MovePose(frame, line, sizeof line))) {
+            continue;
+        }
+        char reply[64];
+        if (fputs(line, out) < 0 || fflush(out) != 0 || fgets(reply, sizeof reply, in) == nullptr) {
+            fprintf(stderr, "T2_AIM_FIFO: the driver went away at frame %d\n", frame);
+            broken = true;
+            return;
+        }
+        int sx, sy;
+        unsigned c;
+        if (sscanf(reply, "%d %d", &sx, &sy) == 2 && sx >= -128 && sx <= 127 && sy >= -128 && sy <= 127) {
+            sAimStick.valid = true;
+            sAimStick.x = (int8_t)sx;
+            sAimStick.y = (int8_t)sy;
+        }
+        if (kind == 1 && sscanf(reply, "%*s %*s %x", &c) == 1) {
+            sAimStick.cValid = true;
+            sAimStick.c = (uint16_t)(c & 0xF);
+        }
+    }
+}
+
 // T2_PAD_LOG=1 (debug, round 14 c4): port 1's pad as the game receives it, one line per change
 // ("pad: frame F buttons XXXX stick X Y"); =2: every read.
 void PadLog(uint16_t b, int8_t sx, int8_t sy) {
@@ -388,9 +452,19 @@ void ContRead(void* pads) {
         memcpy(out + i * 6, &b, 2);
         int8_t sx = (int8_t)lus[i].stick_x, sy = (int8_t)lus[i].stick_y;
         if (i == 0) {
+            T2Controls_Hotkeys();                             // F1: the controls
+            T2Controls_Look(&sy, T2Port_EngineMode() == 11); // gT2StickInvertY
             T2Controls_Mouse(&b, &sx, &sy); // captured mouse: look, fire, jump
             memcpy(out, &b, 2);
             ScriptedStick(&sx, &sy);
+            if (sAimStick.valid) { // T2_AIM_FIFO
+                sx = sAimStick.x;
+                sy = sAimStick.y;
+            }
+            if (sAimStick.cValid) { // T2_MOVE_DRIVE: the driver's C buttons
+                b = (uint16_t)((b & ~0xFu) | sAimStick.c);
+                memcpy(out, &b, 2);
+            }
             PadLog(b, sx, sy);
         }
         out[i * 6 + 2] = (uint8_t)sx;
@@ -412,6 +486,13 @@ void ContReadHeadless(void* pads) {
     uint16_t b = ScriptedButtons();
     int8_t sx = 0, sy = 0;
     ScriptedStick(&sx, &sy);
+    if (sAimStick.valid) { // T2_AIM_FIFO
+        sx = sAimStick.x;
+        sy = sAimStick.y;
+    }
+    if (sAimStick.cValid) { // T2_MOVE_DRIVE: the driver's C buttons
+        b = (uint16_t)((b & ~0xFu) | sAimStick.c);
+    }
     PadLog(b, sx, sy);
     memcpy(out, &b, 2);
     out[2] = (uint8_t)sx;
@@ -691,6 +772,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         if (bossFront != nullptr) {
             T2Port_BossFront(sFrame + 1, bossFront); // DEBUG-ONLY: T2_BOSS_FRONT=D[,EVERY]
         }
+        static const char* lairPeek = getenv("T2_LAIR_PEEK");
+        if (lairPeek != nullptr) {
+            T2Port_LairPeek(sFrame + 1, lairPeek); // DEBUG-ONLY: T2_LAIR_PEEK=W (round 15 C30)
+        }
         static const char* aimAt = getenv("T2_AIM_AT");
         if (aimAt != nullptr) {
             T2Port_AimAt(sFrame + 1, aimAt); // DEBUG-ONLY: T2_AIM_AT=F1-F2:x,y,z[;...]
@@ -698,6 +783,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         static const char* aimEnemy = getenv("T2_AIM_ENEMY");
         if (aimEnemy != nullptr) {
             T2Port_AimEnemy(sFrame + 1, aimEnemy); // DEBUG-ONLY: T2_AIM_ENEMY=F1-F2[,R][;...]
+        }
+        static const char* aimFifo = getenv("T2_AIM_FIFO");
+        if (aimFifo != nullptr) {
+            AimFifoExchange(sFrame + 1, aimFifo); // DEBUG-ONLY: T2_AIM_STICK's stick driver
         }
         static const char* cheats = getenv("T2_CHEATS");
         static const char* fillAmmo = getenv("T2_FILL_AMMO");
