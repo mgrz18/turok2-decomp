@@ -552,6 +552,8 @@ def key_visit(k):
         return {"bump": ROUND13_BUMP[k]}
     return {"primagen": (k,)}
 HOP = False                     # --hop: round 13's fallback warp 7602 (DEBUG-ONLY)
+LAIR_FRONT = "450,3000,2.5,1"   # --lair-front: T2_BOSS_FRONT in the lair (round 15 d1)
+LAIR_STRAFE = (80, 0)           # --lair-strafe P[,S]: routes56.lair_strafe's period and z sweep (round 15 d1)
 
 
 def primagen_slot(r, t, k):
@@ -762,6 +764,7 @@ L5_QUEEN_AT = 15900     # level 2 (the Queen) reached
 # a wait, the anchor fires from 3,000 before), then "60" (in the hub straight, it fires at once and
 # skips the 114 teleport).
 L6_BACK_114 = 26000
+MOTHER_SHREDDER_END = 16000   # round 15 d1: the shredder's fire window at the Mother (her death ~+7,500 standalone)
 L6_EXIT_AFTER = 500     # the exit teleport, after 114 is reached again
 L6_HUB_AFTER = 800      # the hub (6999's place: the level-6 corridor)
 L6_WALK_AFTER = 200     # the walk back down the corridor to the plaza, after the hub
@@ -816,7 +819,17 @@ def level6(r, t):
     m = s + r56.L6_MOTHER + add
     r.anchors.append((m, 3))
     r.note(m, "3 the Mother: fire held, T2_AIM_NODE=boss@3, strafing with steps back")
-    r.inputs += ["Z@%d..%d" % (m + 800, m + L6_BACK_114), "CL@%d..%d" % (m + 5800, m + 15000)]
+    fire_end = m + L6_BACK_114
+    if 3 not in r.cheats_on:
+        # round 15 d1: the Mother without invincibility: the shredder (9, level 5's weapon). In her
+        # phase 0 the player cannot move and she hits him (10) every ~80 frames until her six parts are
+        # down: the plasma rifle takes ~3,500 frames (16-20 hits), the shredder ~2,000 (3 hits); her
+        # whole fight ~7,500 frames, 38 damage (standalone level 6; PLAYTHROUGH.md 22). The fire stops
+        # after her death (the shredder's discs bounce) and the plasma rifle comes back for the hub.
+        r.weapon.append((m - 100, "9"))
+        r.weapon.append((m + MOTHER_SHREDDER_END, "10"))
+        fire_end = m + MOTHER_SHREDDER_END
+    r.inputs += ["Z@%d..%d" % (m + 800, fire_end), "CL@%d..%d" % (m + 5800, m + 15000)]
     r.inputs += ["CD@%d..%d" % (f, f + 250) for f in range(m + 5800, s + r56.L6_MOTHER_END + add, 600)]
     back = m + L6_BACK_114
     if 3 in r.cheats_on:
@@ -846,12 +859,17 @@ def level6(r, t):
         # a life lost in a rescue run (the ending's own life loss at his death is not this)
         r.cheat_windows.append((lair - 200, lair + L6_HUB_END))
     r.note(lair, "4 the Primagen's lair: fire held, strafing, T2_BOSS_FRONT=450,3000,2.5,1")
+    if 4 not in r.cheats_on:
+        # round 15 d1: the Primagen without invincibility: the shredder (9) as at the Mother. The
+        # Primagen recipe (T2_WARP_TO=7602): his death at 27,856 instead of 43,586 (plasma rifle), his
+        # melee (two 10s within 409.6 / 716.8, Primagen_HandleAnimEvent) 2 hits instead of 28
+        r.weapon.append((lair - 100, "9"))
     # the spot cycles (",K,1": another one each 3,000 frames of a lair wait that does not end; round 14 C29:
     # 600 -> 3,000: the strafing by the lair start (lair_strafe) ends his home waits, the front spots do not)
-    r.boss_front.append((lair - 100, "450,3000,2.5,1"))
+    r.boss_front.append((lair - 100, LAIR_FRONT))
     r.inputs.append("Z@%d..%d" % (lair + 200, lair + L6_HUB_END))
     # round 14 C29: strafing until his death (his home waits need a sight line: routes56.lair_strafe)
-    r.inputs += r56.lair_strafe(lair + 200, lair + L6_HUB_END - 18000)
+    r.inputs += r56.lair_strafe(lair + 200, lair + L6_HUB_END - 18000, *LAIR_STRAFE)
     end = lair + L6_HUB_END
     r.note(end - 21000, "the Primagen dead (~30,000 after his lair): the ending cinema, then the credits")
     r.note(end, "60 the hub (after the credits)")
@@ -864,7 +882,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE
+    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -886,7 +904,12 @@ def cli(argv=None):
     ap.add_argument("--late-keys", action="store_true",
                     help="Primagen keys 2 and 3 in after level 5, round 13's walks after levels 2 and 3 (round 14 c3)")
     ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
+    ap.add_argument("--lair-strafe", default="80,0", help="P[,S]: the lair strafing's period (C-left/C-right) and an "
+                    "optional z sweep of S frames (C-down then C-up; round 15 d1)")
+    ap.add_argument("--lair-front", default=LAIR_FRONT, help="T2_BOSS_FRONT in the Primagen lair (round 15 d1)")
     a = ap.parse_args(argv)
+    LAIR_FRONT = a.lair_front
+    LAIR_STRAFE = tuple(int(v) for v in (a.lair_strafe + ",0").split(",")[:2])
     L6_SLOT_AFTER = a.slot
     HOP = a.hop
     if a.late_keys:

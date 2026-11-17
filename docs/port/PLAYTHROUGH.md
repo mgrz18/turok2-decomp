@@ -2006,3 +2006,82 @@ is already 150 units. L1_WALKS stays empty with the reasons in fullrun.py.
 totems, the six keys in their slots, cinema 43, the lair reached at 221,747), but the Primagen is never engaged: 420,000 frames, his hp still 25,600/25,600 in mode 1. This is the lair's home wait (PLAYTHROUGH.md 21: it needs a line of sight past object 1911). The earlier walk moved the run's timing, and the route's strafing window passed without a sight line. This is the known knife edge, not the walk. The
 default command (no `--walk`) writes the same `playthrough.txt` and `teleport.env` as before
 (byte-identical) and its det log is the base build's over 290,000 frames.
+
+## 22. The Mother and the Primagen without invincibility (Phase 7 round 15, part d1)
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --lair-strafe 90
+```
+
+No `--cheats-on`: no `T2_CHEATS` invincibility anywhere in the run. Linux, headless, PIE,
+Release (-O2), `T2_HURT_LOG=1` (no rescue). New options: `fullrun.py --lair-strafe P[,S]` (the lair
+strafing's period, default 80, and an optional forward/back sweep of S frames) and
+`--lair-front SPEC` (the lair's `T2_BOSS_FRONT`, default `450,3000,2.5,1`). The default command
+(`--cheats-on 3,4`) writes the same `playthrough.txt` and `teleport.env` as before (checked with
+`diff -r`).
+
+### 22.1 The Mother: her hit is the N64's; the weapon was the problem
+
+- **Her ~10-damage hit at ~1,240 units is matching code, not a host bug.** `MotherBoss_AnimEvent`
+  (func_00409A64) sends `ImpactEvent_Send(obj, obj, 3, -1, player position, {0xA00, 0x500/0xA00})`
+  on the events of her attack animations: event 1 within 1,228.8, event 4 within 1,433.6, event 3 at
+  any range. The blast is centred on the player, so it always lands (`ImpactEvent_ApplyBlast`, full
+  damage at distance 0). In phase 0 she picks mode 4 (`MotherBoss_Phase0ChooseAttack`: target flat
+  distance under 1,228.8 after the two collision radii are taken off) again and again: one hit per
+  mode-4 animation, every 60-170 host frames.
+- **In phase 0 the player cannot move.** C-up/C-down/C-left/C-right give a move vector but the
+  position stays at (83.4, 0, -723.9) (a teleport works). He moves again from the phase-1 cinema
+  (`MotherBoss_OnPhase1CinemaDone` puts him on his phase-1 spot). Not checked on the N64; the
+  phase-0 damage is therefore set only by how fast her six parts go down.
+- **The fix: the shredder (9, level 5's weapon) at her fight.** Standalone level 6, 100 health,
+  cheats off at her arena, weapon switched at her arena (`T2_WEAPON="10;W@31600"`): phase 0 ends
+  at 36,031 with the plasma rifle (20 hits, 2 lives lost), 34,009 with the firestorm cannon (3 hits),
+  34,805 with the scorpion launcher (10 hits) and **33,679 with the shredder (3 hits)**; the grenade
+  launcher, sunfire pod and p.f.m. layer did not end phase 0 by 39,000. Her whole fight with the
+  shredder: dead at 39,239, 6 hits, 38 damage, lowest health 62 (firestorm: 99 damage, lowest 1).
+- In the whole-game run (`fullrun.level6`, only when 3 is not in `--cheats-on`): the shredder from
+  her arena - 100, the fire held until her arena + 16,000 (`MOTHER_SHREDDER_END`; the discs
+  bounce), then the plasma rifle again. **5 hits, 53 damage, lowest health 147** (she was 238-300
+  damage with the plasma rifle).
+
+### 22.2 The Primagen: the shredder too, and the lair is still a knife edge
+
+- His damage is mostly his melee: `Primagen_HandleAnimEvent` sends the same centred blast (10) on
+  event 2 within 409.6 (sight distance) and event 1 within 716.8, two hits 16 frames apart, when he
+  comes down to the player. The rest is small: particles 337 (owner object 419, 0.5-4.5 each) and
+  his tossed objects 328/330 (up to 14).
+- **The shredder (9) from the lair - 100** (only when 4 is not in `--cheats-on`). The Primagen
+  recipe (`T2_WARP_TO=7602`, cheats off from 13,500, rescue mode): **his death at 27,856 instead
+  of 43,586**, 2 melee hits instead of 28 (20 damage instead of 280); firestorm cannon 33,236.
+- **But his home waits still decide the run** (21.1): with the shredder the fight's timing changes
+  and, with the default strafing (period 80), the stage-2 wait never ended (60,000 frames; the
+  `T2_BOSS_FRONT` spot cycle puts the player at z 1,577-2,027, where no spot sees him at his rest).
+  Variants tried (one run each, all deterministic): period 120 and 80 with a back/forth sweep (the
+  waits end, but the strafing drifts and the player falls: into the pit in front of his home at
+  (135, -695, 2,283), or off the back edge at z ~-2,050), period 100, `--slot 1150`, `--slot 1050`
+  (a wait never ends), period 70 (two lives lost), `--lair-front 450,999999` (no relocation: the
+  player stays at z -1,600..-1,900 and the stage-2 wait never ends: the back of the arena does not
+  see him either). **Period 90 kills him and reaches END 2**, with one life lost: at 228,464 the
+  player, pushed right by the strafing's drift, falls off the arena's right edge (x 1,622).
+  Period 76 also kills him and reaches END 2, also with one fall (235,462, 122 health to 0).
+
+### 22.3 The run (`--lair-strafe 90`, no `--cheats-on`; two runs identical)
+
+Two runs, md5 of every `progress`/`event`/`pickup`/`hurt`/`death`/`bosstrace` line equal. All five
+totems, the four bosses, the Primagen dead (mode 29) at 244,846, cinema 370, END 2 (`ending 0/1`,
+cinema 130) at 251,638, the credits, the hub at 265,736.
+
+| fight | hits | damage | lowest health | lives lost |
+|---|---|---|---|---|
+| the City Totem (110), unchanged | | | | 2 (as in round 14) |
+| the Mother (3), shredder | 5 | 53 | 147 | 0 |
+| the Primagen's lair (4), shredder, strafing period 90 | 17 | 229 (143 of it the fall) | 18 after the fall | 1 (a fall off the right edge at 228,464) |
+
+### 22.4 Next
+
+- The lair fall: the strafing drifts sideways (period 90: +x, about 1,200 units in 2,500 frames)
+  and the pushes of his attacks add to it. A strafe whose halves are tuned to cancel the drift, or a
+  closed-loop driver (part d3's input fifo) that keeps x within +-900 and z within -1,950..1,900,
+  would remove it; the same driver could walk until his home wait ends.
+- Phase 0 of the Mother: check on the N64 that the player cannot move there (mupen64plus, a RAM
+  poke warp to -4).
