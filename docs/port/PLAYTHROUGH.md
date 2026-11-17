@@ -2605,6 +2605,8 @@ Level 2 by stick, damage per sister fight (lowest health), against the assisted 
 - F1234k reached each level about 2,000-9,000 schedule frames earlier (the anchors re-synchronise
   the schedule). Level 5's 117 is a knife edge in the assisted run too: its lowest health there is 3.
   It arrived with less health and died, and the later steps missed their frames.
+- F2k is deterministic: a second run gave identical gameplay lines (md5 `4a92e60a…`) and an identical
+  `--stats` file. The default command with this branch's final binary: md5 `5ed5092b…`, as at 5d835e51.
 - The command validated for END 2 with the sisters by stick:
 
 ```sh
