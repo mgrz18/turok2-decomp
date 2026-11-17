@@ -74,7 +74,10 @@ class Nav:
         self.walk = [self._walkable(i) for i in range(n)]
         self.cent = [self._centroid(i) for i in range(n)]
         self.water = [self._deep(i) for i in range(n)]
-        self.boxes = self._boxes(level)
+        # the static objects' boxes are opt-in (T2_NAV_BOXES=1): a box is only the broad phase, and going round
+        # one made walks fail that went straight through (135, PLAYTHROUGH.md 27-e3); the walker adds the
+        # places it got stuck at instead
+        self.boxes = self._boxes(level) if os.environ.get("T2_NAV_BOXES") == "1" else []
         # the boxes do not close regions (a box is only a broad phase: a closed region was often open floor);
         # the legs of a path go round them (detour)
         self.blocked = [False] * n

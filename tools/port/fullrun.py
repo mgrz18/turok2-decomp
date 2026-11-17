@@ -299,7 +299,26 @@ NAV_WALKS = {
     },
 }
 NAV_SLACK = 150      # frames on top of the path's length at 0.8 of the walking speed: the turns, the stops
-NAV_SKIP = {}        # {level: {(i, j): why}}: candidates the walker does not take (probed)
+# Probed (--nav 1,2,3,4 --walk-probe: each walk from the default route's place, the teleport kept at the
+# window's end; Linux Release; PLAYTHROUGH.md 27-e3): the walks that do not arrive (arrival error in units)
+NAV_SKIP = {   # {level: {(i, j): why}}: candidates the walker does not take
+    1: {(2, 2): "53: a closed door across the power cell's alcove (z 7,120), 1,422",
+        (2, 5): "53: the cage's bars, 237",
+        (4, 0): "55: a ledge and a climb on the way, 3,830",
+        (5, 0): "54: the way down from the ledge, 2,971",
+        (5, 1): "54: the cage's bars, 961",
+        (8, 0): "58: a drop the walker does not find, 218-3,286"},
+    2: {(6, 1): "133: a closed door between the zombies' rooms (x -1,547), 2,639",
+        (6, 2): "133: doors, 3,365",
+        (12, 2): "135: the gate posts at z -3,350, 2,715",
+        (12, 3): "135: the crypts, 1,803", (12, 4): "135: the crypts, 4,939", (12, 5): "135: the crypts, 3,339",
+        (12, 6): "135: the crypts, 4,843", (12, 7): "135: the crypts, 1,912", (12, 8): "135: the crypts, 4,680",
+        (12, 9): "135: the crypts, 3,112", (12, 11): "135: the graves, 1,984", (12, 13): "135: the graves, 2,028",
+        (12, 14): "135: stops 127 short (the fight there needs the spot)"},
+    3: {k: "level 3: the walks start while the player is elsewhere (warps and cinemas move under the anchors)"
+        for k in ((0, 0), (1, 1), (5, 0), (6, 1), (6, 2), (8, 1), (9, 3), (11, 1), (11, 2), (13, 0))},
+    4: {(7, 0): "107: 2,286 (stuck 5 times)"},
+}
 
 
 def nav_frames(sub, frm, to):
@@ -349,8 +368,13 @@ L2_RETURN_LATE = []
 L2_RETRY_B5 = [(12, 8850, -714.0, 0.0, 488.0, 0.0)]
 
 
+NAV_ONLY = None      # --nav-only L:I.J,...: just these walks (testing one at a time)
+
+
 def nav_table(level):
-    """NAV_WALKS[level] less NAV_SKIP[level]."""
+    """NAV_WALKS[level] less NAV_SKIP[level] (or just --nav-only's)."""
+    if NAV_ONLY is not None:
+        return {k: v for k, v in NAV_WALKS.get(level, {}).items() if (level,) + k in NAV_ONLY}
     return {k: v for k, v in NAV_WALKS.get(level, {}).items() if k not in NAV_SKIP.get(level, {})}
 
 
@@ -1169,7 +1193,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global NAV, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT
+    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1187,6 +1211,8 @@ def cli(argv=None):
                     "(the teleport log line gives the arrival; every walk starts from the default route's place)")
     ap.add_argument("--nav", default="", help="L1,L2,...: the route teleports of NAV_WALKS in these levels (1-4) "
                     "walked by the closed-loop waypoint walker (run under tools/port/aimdrive.py; round 16 e3)")
+    ap.add_argument("--nav-only", default=None, help="L:I.J,...: with --nav, only these walks (level, segment, "
+                    "step), NAV_SKIP's included")
     ap.add_argument("--talismans", nargs="?", const="2,3", default="",
                     help="the talisman chambers of these levels (default 2,3; round 13 b3)")
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
@@ -1221,6 +1247,8 @@ def cli(argv=None):
     HOP = a.hop
     STICK_AIM = {int(x) for x in a.stick_aim.split(",") if x}
     NAV = {int(x) for x in a.nav.split(",") if x}
+    if a.nav_only is not None:
+        NAV_ONLY = {tuple(int(v) for v in k.replace(":", ".").split(".")) for k in a.nav_only.split(",") if k}
     ASSIST_KEEP = [x for x in a.assist_keep.split(",") if x]
     if a.late_keys:
         PRIMAGEN_LATE = (2, 3)
