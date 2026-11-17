@@ -3013,3 +3013,138 @@ STATUS.md section 2: the level runs and the boss recipes (with `T2_LEGACY_SHAKE=
 15's det line for det line; the boot with the variable is too, without it only `rng` and the
 particles change; demos 1 and 3 still match the N64's RAM in every field but `rng`; save, title,
 load; the audio boot; padtest; the clean errors; soak (0 crashes in 62 runs).
+
+## 32-f5. The stick and real weapons together: the Blind One and the City Totem by stick (Phase 7 round 17, part f5)
+
+Legacy shake (`T2_LEGACY_SHAKE=1`, the default route's stream) throughout. Linux Release, PIE, under
+`aimdrive.py`, 290,000 frames, the default command plus the options shown.
+
+### 32-f5.1 What the driver sees now (the `aim` line)
+
+Two fields are appended after `hp H` (`port/game/t2debug.c` `T2Port_AimPose`); older parsers ignore them:
+
+- `tot HP TIME KILLS NEED` while a totem defense runs: the totem's health, the seconds left, the kills
+  and the kills needed (the HUD's two bars). **The totem itself is never hurt**:
+  `TotemDefense_OnEvent` is empty and `TotemDefense_UpdateFight` fails the defense on time alone
+  (8 kills in 120 s). Its health stays 1,280 (`5` after `>> 8`) for the whole fight.
+- `lv N`: the level (the driver's per-level rules below).
+- A candidate's `kind` is `2` when it is an attacker of the totem (its sight target is the totem:
+  `TotemDefense_UpdateFight` sends every helper past `maxHelpers` there). Truthy like 1.
+
+`aimdrive.py --stats` prints them in its `#` lines (`a` after an attacker, `tot 5 99s 2/8` at the end).
+
+**A logging bug fixed (`T2Port_TotemLive`).** `gTotemDefense.obj` and `.def` are never cleared:
+after the totem's level is left they point into the freed actor array and level data (the N64
+too; the game never reads them there, only its own step callback does). The `totem:` state line
+read them in every later level (state 1 with `totem hp 0`, `-798464` or `4236247`, different run
+to run: f1's report). Both the line and the aim-line fields now need the totem to be one of
+`gScene.m_pActors` still drawn by `TotemDefense_DrawTotem`; outside its level nothing is printed.
+Debug code only: no game state changes.
+
+### 32-f5.2 The Blind One by stick (`--stick-aim 4`, no `--assist-keep 1`)
+
+e2's run lost 4 lives there (sA: stage 5 took 8,900 frames, stage 9 19,300). `--stats` showed why:
+the driver switched every ~80 frames between flier 17 (the phase's target, swooping 100-1,300
+units) and actor 22 (kind 0, 158 units away, full health, never hurt: an out-of-play actor).
+Round 16's "not hurt" rule counted the frames of the *current* target only and restarted at every
+switch, so neither was ever left.
+
+- **Per-target count** (`T2_AIMD_IMMUNE_ACC`, default `1` = level 1, the Blind One's arena): the
+  frames each candidate was aimed at since its health last dropped, summed over switches. After
+  300 (`T2_AIMD_IMMUNE`) it is left as before. Applied everywhere it moved the sisters (level 2)
+  and the route fell out of step (the run paused in 125 at 82,000): so per level.
+- **Far threats** (`T2_AIMD_THREAT_NEAR=1:250`, `T2_AIMD_THREAT_FAR=6`): in level 1 a kind-0
+  candidate farther than 250 units costs 6 times more. With the shredder (`--real-weapons 1`) her
+  minion bit from the ledge at 96 units (not hit by the discs: left as not hurt), and the driver
+  then took her body and the other phases' actors (kind 0, 400-500 units, never hurt) one by one,
+  300 frames each, while being bitten: 2 lives (c1w0 at 142,513). Kind 0 stands for the enemy that
+  bites; far ones are not that.
+
+| run | the Blind One | hits | health | lives |
+|---|---|---|---|---|
+| default (assist, scorpion launcher) | 130,138-138,945 | 61 | to 52 | 0 |
+| sA `--stick-aim 1,2,4` (round 16 driver) | 127,806-, not killed in the window | | | 4 (game over) |
+| sA3 (+ per-target count) | 127,806-138,675 | 21 | to 63 | 0 |
+| sA4 (+ far threats) | 127,806-137,081 | 17 | 110 to 63 | 0 |
+| c3w0 (`--real-weapons 1`: the shredder) | 131,782-140,597 | 19 | 147 to 87 | 0 |
+
+The fliers are hit when they are far (low angular rate); the Trigger only fires on target, so the
+near passes cost nothing but time. No change to `Aim` was needed.
+
+### 32-f5.3 The City Totem by stick (`--stick-aim 2`, no `--assist-keep 110`)
+
+With `--stick-aim 1,2,4` the City Totem is won by stick **with no life lost** (sA4: 8 kills by
+~86,000, ~3,000 frames of the 120 s, health 106 to 31), where the assisted default loses 2 lives
+there. The candidates' `kind 2` (`a` in `--stats`) and `T2_AIMD_TOTEM_X` (the attackers' cost
+factor, default 1: off) are there for a defense that runs short of time; none of these runs needed
+it (the kill rate decides: the nearest and weakest first is already the fastest).
+
+### 32-f5.4 Real weapons from sister 2 on (`--real-weapons 1,2`): not yet
+
+- **134's zombies come from 1,700 units.** With e5's route the mag 60's 50 bullets went on zombie 2
+  from afar (aimed from 50,760, empty by 51,500) and zombies 2-4 then killed the player with the
+  talon. `T2_FIRE_GATE` now takes a range per level (`L:R`; `--real-weapons 2` writes
+  `133,134:450,135`, `L2_134_FIRE_R`) and the stick driver honours the same range
+  (`T2_AIMD_FIRE_MAX=134:450`). The bullets now last until zombies 2 and 3 are close, but 50 bullets
+  do not kill them (80 health each): the first death moves from 52,769 to 55,277, then game over.
+- **131's plasma rifle** (with 129's 150 plasma cells the weapon for 134): it lies at the bottom of
+  a pool (floor -1,126, water -532) whose regions deal 10 health every 2 frames: 116 to 0 in 22
+  frames (`L2_PLASMA`, kept off). 132's plasma rifle is 307 units over its floor (a jump: the
+  `r1` answer exists, no route uses it yet).
+- Ammo caps (PLAYTHROUGH 25.1): bullets 50, shells 20, explosive shells 10: more pickups cannot
+  carry more. What remains: the jump to 132's plasma rifle (before 135? the route reaches 132 after
+  134) or fewer zombies (only zombie 4's key is needed for gate 8).
+
+### 32-f5.5 Stick and real weapons together
+
+`--real-weapons 1,2 --stick-aim 1,2,4` stops at 134 (above). The combination that works is
+`--real-weapons 1 --stick-aim 1,2,4` with two route changes:
+
+- **`--hub-wait 0`** (e5's `ARMS_HUB_WAIT`, default 50): with level 1 by stick the run reaches the
+  hub ~1,800 frames later and the level-2 fights start from another state; sister 1 (133) cost
+  186 health with 50 (c1, c3) and 141 with 0 (c1w0, c3w0), and with 50 sister 2 (134) then took the
+  first life (c1: 114 health on arrival).
+- **`--l2-heal`** (`L2_HEAL_PICKS`): 135's graveyard costs 133-182 in these runs and the City Totem
+  follows with no health on the way (18-67 on arrival: a life lost there in every such run). Ten
+  health +10 pickups (object 542, +10 up to 100) on the graveyard floor, walked into after sister
+  3, before the exit 2608, 150 frames each (the City Totem and every later hub move by 1,500). The
+  first try lost four: their stand point (90 units out) was a grave (y 87) or outside every region;
+  each now has its own approach angle onto the floor. c3w0: 18 to 99.
+
+**The result** (c3w0: `--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0`): **END 2 at
+250,402**, all five totems (`totems 11111`), the four bosses, the six Primagen keys, **no life lost**
+(the `death` line at 264,500 is the new game after the credits: health 100, every flag cleared; sA3
+has the same one). Level 1 on its own weapons and by stick, level 2 by stick (given weapons from
+the hub on), the Blind One by stick on the shredder. Per fight, health at the start / hits / lowest
+(`hurt` lines), against the default run and sA4 (`--stick-aim 1,2,4`, no real weapons):
+
+| fight | default | sA4 stick 1,2,4 | c3w0 stick 1,2,4 + real 1 |
+|---|---|---|---|
+| Harbor Totem (109) | 200/51/68 | 200/46/85 | 200/41/118 |
+| sister 1 (133) | 200/69/69 | 200/42/89 | 200/47/59 |
+| sister 2 (134) | 169/55/25 | 189/28/121 | 159/40/16 |
+| 135 (crypts, sister 3) | 200/59/44 | 200/31/106 | 200/48/18, healed to 99 |
+| City Totem (110) | 44/71/**0, 2 lives** | 106/33/31 | 100/28/11 |
+| Marsh Totem (111) | 200/58/89 | 200/1/194 | 200/69/5 |
+| Cave Totem (112) | 200/8/146 | 200/15/110 | 200/7/147 |
+| the Blind One (1) | 146/60/52 | 110/17/63 | 147/19/87 |
+| 124 | 52/13/16 | 63/14/26 | 87/14/49 |
+| Hive Totem (113) | 116/24/72 | 126/7/113 | 149/4/143 |
+| the Queen (2) | 72/17/23 | 113/10/88 | 143/13/113 |
+| 117 | 23/15/3 | 88/20/67 | 113/15/94 |
+| the Mother (3) | 200/5/147 | 200/7/137 | 200/9/110 |
+| the Primagen (4) | 147/21/23 | 137/33/**0, 1 life** | 110/22/37 |
+
+sA4 reaches END 2 at 252,332 (5 totems) with one life lost in the Primagen's lair. The knife edges
+left: sister 2 (16) and the City Totem (11) in c3w0, and the Marsh Totem (5: level 3 is still
+assisted). Round 16's `--stick-aim 1,2,4`-style runs died in level 6's 117 (sB: 20 health on
+arrival); the stick-run Blind One now costs less, so level 5 and 117 start with more.
+
+### 32-f5.6 Determinism: run each game in its own directory
+
+Two runs started at the same moment from the same `OUT/` gave different games once (r12b: a
+different hit at 21,973 in the Harbor Totem, every later line different). `turok2.cfg.json` is read
+at start and written back at exit from the current directory; one run read it while the other
+wrote it ("Failed to parse config file ... empty input" in r12's log). With a private directory
+per run (a symlink to the archive and a copy of the config) the same command gave the same lines
+six times (`hurt` md5 `11fa947b` to 23,000, with and without ASLR, 23,000 and 290,000 frames).

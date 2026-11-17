@@ -229,6 +229,52 @@ Fixes and checks of the merge:
 8. Still open: the obj-230 double fire and the Blind One's margin (round 14 c1), 119's moving
    platforms (c2), `t2audio_test`'s game-path mode, soak.py on macOS.
 
+## Round 17, part f5: the stick and real weapons together, the Blind One and the City Totem by stick (branch names-R17_f5)
+
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 32-f5. Legacy shake throughout (the default route's stream).
+
+- **The Blind One by stick** (`--stick-aim 4` with no `--assist-keep 1`): the stick driver's "not
+  hurt" count restarted at every target switch, so it alternated forever between her phase-5
+  flier and an out-of-play actor at full health. `aimdrive.py` now counts per target over the
+  frames it was aimed at (`T2_AIMD_IMMUNE_ACC`, level 1 only) and makes far kind-0 candidates
+  costly there (`T2_AIMD_THREAT_NEAR=1:250`). She dies in ~9,300 frames with 17-21 hits (the
+  assisted default: 61) and no life lost, with the scorpion launcher or the shredder.
+- **The City Totem by stick** (`--stick-aim 2` with no `--assist-keep 110`): won with no life lost in
+  every `--stick-aim 1,2,4` run (the assisted default loses 2 there). The `aim` line now carries the
+  totem defense (`tot HP TIME KILLS NEED`: the totem itself is never hurt, the defense is lost on
+  time only), the level (`lv N`) and `kind 2` for the totem's attackers; `T2_AIMD_TOTEM_X` (off) can
+  favour them.
+- **A logging bug fixed**: the `totem:` line read `gTotemDefense.obj`/`.def` after their level was
+  left (stale pointers into freed level memory: f1's non-deterministic `totem hp`). Printed now only
+  while the totem is a live actor of the loaded level (`T2Port_TotemLive`, t2debug.c).
+- **Real weapons from sister 2 on: not yet.** `T2_FIRE_GATE=133,134:450,135` (per-level ranges, new)
+  and `T2_AIMD_FIRE_MAX` keep 134's bullets until the zombies are close, but 50 bullets do not kill
+  zombies 2 and 3; 131's plasma rifle lies in a deadly pool (`L2_PLASMA`, off).
+- **New options** (fullrun.py): `--l2-heal` (ten health +10 pickups in 135 before the City Totem,
+  1,500 frames); `--hub-wait 0` matters with `--stick-aim 1` (sister 1 and 2 survive).
+- **Determinism**: run each game in its own working directory (turok2.cfg.json is read at start
+  and written at exit; two runs from one `OUT/` diverged once). Same command, own directory: the
+  same lines on every repeat.
+
+Validated (Linux Release, PIE, under `aimdrive.py`, 290,000 frames, default command plus):
+
+| options | result |
+|---|---|
+| (none) | END 2 at 252,194, 5 totems, 2 lives lost (the City Totem): round 16's numbers on this branch |
+| `--stick-aim 1,2,4` | END 2 at 252,332, 5 totems, 1 life lost (the Primagen's lair); City Totem and the Blind One by stick |
+| `--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` | **END 2 at 250,402, 5 totems, no life lost**; RESULT2 |
+| `--real-weapons 1 --stick-aim 1,2,4` (no heal, hub wait 50) | game over in level 2 (sister 2, 134) |
+| `--real-weapons 1,2` | game over: 134 (ammo) |
+
+Files touched (merge): `tools/port/aimdrive.py` (Picker, the `aim` line's new fields, `FIRE_MAX`),
+`tools/port/fullrun.py` (`L2_HEAL*`, `--l2-heal`, `L2_134_FIRE_R`, `L2_PLASMA`, `T2_FIRE_GATE` /
+`T2_AIMD_FIRE_MAX` lines in the `--real-weapons 2` block), `port/game/t2debug.c` (`T2Port_AimCand`,
+`T2Port_AimPose`, `T2Port_TotemLive`, the `totem:` line), `port/game/t2bosslog.c` (the gate's ranges).
+No `src/` or `include/` change.
+
+Next: sister 2 on real weapons (the jump to 132's plasma rifle, or only zombie 4 fought); level 3
+by stick (the Marsh Totem is the closest call left: 5 health); levels 5-6 by stick.
+
 ## Round 16, part e1: the N64 lair and Mother checks, the camera shake's random numbers (branch names-R16_e1)
 
 Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 27.
