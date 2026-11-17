@@ -572,6 +572,54 @@ L2_STRETCH_NOCHEATS = [(6, 1, 3000), (9, 3, 2000), (12, 15, 2000)]
 # The extra fire windows it needs, as L2_STRETCH entries (segment, step, frames)
 N64_SHAKE = False
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
+# Round 17 f1: pick steps put before a step of a segment (segment, before step, [(x, y, z, approach
+# angle)]): each pick is a KEY_STEP-frame step (pick()'s stand and walk-in); the step and the later
+# ones move, and so do the segment's retries and returns at or after that step's frame
+N64_L2_PICKS = [
+    # 135, after zombie 44's fight (the player leaves it with ~25 health), before crypt 76's key: 7 health
+    # +10 (only taken below 100) around the crypts; the approach angles were probed (some angles stand
+    # the player in a wall: no region, no teleport)
+    (12, 12, [(1554.3, 0.0, 589.6, 0.0), (1556.3, 0.0, 76.6, 0.0), (2554.0, 0.2, 92.6, 0.0), (867.5, 0.0, 1146.0, 3.1416),
+              (-545.3, 0.0, 1148.1, 3.1416), (-1269.4, 0.0, 1146.0, 3.1416), (-1345.9, 0.0, 457.2, 1.5708)]),
+]
+
+
+def insert_picks(segments, picks, extra=(), retry=(), back=()):
+    """segments with pick steps inserted (N64_L2_PICKS); returns (segments, stretch entries that only
+    move the later steps (no fire), retry, back) with the in-segment teleports moved as well."""
+    segs = [list(s) for s in segments]
+    shifts = []                       # (segment, original dt, frames)
+    for si, sj, items in sorted(picks, key=lambda p: (p[0], -p[1])):
+        name, rel, steps = segs[si]
+        steps = [list(st) for st in steps]
+        at = steps[sj][0]
+        new = []
+        for k, (x, y, z, ang) in enumerate(items):
+            new.append([at + k * KEY_STEP, x + math.sin(ang) * 90.0, y, z + math.cos(ang) * 90.0, ang, 50, {}])
+        more = len(items) * KEY_STEP
+        for st in steps[sj:]:
+            st[0] += more
+        steps[sj:sj] = new
+        segs[si] = (name, rel, [tuple(st) for st in steps])
+        shifts.append((si, at, more, sj + len(new)))
+    # the stretch entries: no fire window, only the later steps move (stretch() with fire=False); the
+    # steps already moved here, so the entry sits on the segment's last step
+    ext = [(si, len(segs[si][2]) - 1, more, False) for si, at, more, j in shifts]
+
+    def moved(entries):
+        out = []
+        for e in entries:
+            e = list(e)
+            e[1] += sum(m for si, at, m, j in shifts if si == e[0] and e[1] >= at)
+            out.append(tuple(e))
+        return out
+    # the stretch entries of a segment with picks: the step indices past an insertion move too
+    ext0 = []
+    for e in extra:
+        e = list(e)
+        e[1] += sum(len(items) for si, sj, items in picks if si == e[0] and e[1] >= sj)
+        ext0.append(tuple(e))
+    return [tuple(s) for s in segs], ext0 + ext, moved(retry), moved(back)
 
 
 def l2_segments(nocheats):
@@ -597,15 +645,17 @@ def stretch(segments, extra):
     segs = []
     for i, (name, rel, steps) in enumerate(segments):
         steps = [list(st) for st in steps]
-        for si, sj, more in extra:
+        for e in extra:
+            si, sj, more = e[:3]
             if si != i:
                 continue
-            o = dict(steps[sj][6])
-            o["fire"] = o.get("fire", 0) + more
-            steps[sj][6] = o
+            if len(e) < 4 or e[3]:   # round 17 f1: (si, sj, frames, False) only moves the later steps
+                o = dict(steps[sj][6])
+                o["fire"] = o.get("fire", 0) + more
+                steps[sj][6] = o
             for k in range(sj + 1, len(steps)):
                 steps[k][0] += more
-        segs.append((name, rel, [tuple(st) for st in steps], sum(m for si, sj, m in extra if si == i)))
+        segs.append((name, rel, [tuple(st) for st in steps], sum(e[2] for e in extra if e[0] == i)))
     return segs
 
 
@@ -1013,9 +1063,13 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         l2segs = with_taps(l2segs, L2_TAPS)
         r.extra_env.append("T2_AIM_SKIP_TYPES=6")
         r.extra_env.append("T2_FIRE_GATE=133,134,135")
+    l2retry = L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else [])
+    l2back = L2_RETURN_LATE if h2 else ()
+    if N64_SHAKE and N64_L2_PICKS:   # round 17 f1: health picks between 135's crypt steps
+        l2segs, l2stretch, l2retry, l2back = insert_picks(l2segs, N64_L2_PICKS, l2stretch, l2retry, l2back)
     a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {}) if extras else {},
-                        L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else []), l2stretch,
-                        back=L2_RETURN_LATE if h2 else (), detours=det.get(2),
+                        l2retry, l2stretch,
+                        back=l2back, detours=det.get(2),
                         walks=nav_table(2) if 2 in NAV else L2_WALKS if 2 in walk else None, nav_walks=2 in NAV)
     t_arr = pt.L2_TOTEM_ARRIVAL + shift + a2
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
