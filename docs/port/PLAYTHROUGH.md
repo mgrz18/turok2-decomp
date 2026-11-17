@@ -2519,3 +2519,102 @@ level 5's 164. **`--stick-aim 3`**: END 2, one peek. **`--real-weapons 1`**: gam
   code against the N64 geometry (21.1), unless the N64 hovers elsewhere. Checking that needs an N64
   trace of a lair wait (his two hover points, mupen64plus) against the port's.
 - `--real-weapons 1` needs health before 124 (25.5).
+
+## 27-e5. Real weapons: `--real-weapons 1` to the good ending, sister 1 on picked-up weapons (Phase 7 round 16, part e5)
+
+### 27-e5.1 The game over at 124 was the Blind One
+
+With `--real-weapons 1` the run left the Blind One with 25 health (the default run: 52) and 124's
+pylons then killed it (game over at 150,990). No health lies between the Cave Totem and 124: the
+hub, the Blind One's arena (level 1) and 124 have none (124's four objects 543 by the hive's centre
+are life forces, id 1706). The object to pickup map is cart entry 2 (`ids[object + 4]`, u16): 541
+1705 and 543 1706 (life force), 544 1701 (+2, to 200), 542 1702 (+10, to 100), 545 1703 (full
+health, 100), 548 1704 (ultra health, +100 to 200), 546/547 1722. Level 4's health is already
+taken before the boss (the player enters her arena with 146).
+
+The difference was the fight itself. `T2_HURT_LOG` names the biter: an actor with intelligence id
+7401 (type flag 0x1ff), 96 units away on the ledge: her minions, 1-3 damage every ~40 frames until
+she dies. With the scorpion launcher (round 14 c1's weapon 16) the default run took 56 of these
+bites (94 damage), the `--real-weapons 1` run 80 (121 damage) because she died 700 frames later.
+
+| the weapon at the Blind One (`--real-weapons 1`) | damage | lowest health | her death | 124 |
+|---|---|---|---|---|
+| the scorpion launcher (16) | 121 | 25 | 139,667 | game over at 150,990 |
+| the grenade launcher (15) | 56 | 90 | 139,635 | 32 damage, no death |
+| **the shredder (9)** | **32** | **114** | **138,183** | **30 damage, lowest 84, no death** |
+
+The shredder's discs bounce into the minions too. `fullrun.py` now schedules weapon 9
+`BLIND_WEAPON_AFTER` = 2,336 frames after the Cave Totem's fire window starts in any
+`--real-weapons` run: `T2_WEAPON` is applied when a level loads, so it takes effect when her arena
+loads (after 112, before her). The default run keeps the scorpion launcher (its inputs are
+byte-identical to 5d835e51's).
+
+**The whole game with `--real-weapons 1`** (Linux Release, PIE):
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --real-weapons 1
+# then STATUS.md section 1's run command (aimdrive.py), --frames 290000
+```
+
+All five totems (`totems 11111`), the four bosses (`bosses 1111`), the six Primagen keys, **END 2
+(`ending 0/1`, cinema 130) at 252,980**, the credits and the hub at 267,078; 2 lives lost, both at the
+City Totem (as in the default run); the Blind One 32 damage (lowest 114), 124 30 damage
+(lowest 84), the Mother 33, the Primagen 59 (lowest 108). Levels 2-6 still have `T2_GIVE_WEAPONS`
+and `T2_FILL_AMMO` (from the hub after level 1). Two runs (the second on the final binary) are identical: every `progress`, `death`, `hurt`, `pickup`, `event` and `bosstrace` line.
+
+### 27-e5.2 Level 2: sister 1 killed on picked-up weapons (`--real-weapons 1,2`)
+
+`T2_ACTOR_LOG=8` showed why round 15's level 2 spent everything and never hurt sister 1:
+
+- **The aims picked doors.** Doors (intelligence type 6) are "live" actors (health, flag 0x100).
+  The nearest-actor aim of 133's first step chose door 27 (50 units from the player) and the
+  sister step, whose sister is asleep behind it, door 28: the shotgun's shells and the grenades
+  went into them while the zombies with 5 health walked up untouched.
+- **Sleeping actors.** Once the doors were skipped, the aims chose zombies still in AI mode 0 (in
+  the ground, not hittable), and `enemy:22` aimed at zombie 22 asleep for 1,500 frames while
+  zombie 24 bit the player.
+- **Fire taps with no target** (every 15 frames) spent a weapon's ammo in a few hundred frames.
+
+Two DEBUG-ONLY switches (port only, `port/game/t2bosslog.c`, `port/app/game.cpp`) fix the aim,
+not the game:
+
+- `T2_AIM_SKIP_TYPES=T[,T...]`: the aims (`T2_AIM_NODE`, `T2_AIM_ENEMY`) never pick an actor of
+  these intelligence types (6: doors).
+- `T2_FIRE_GATE=L[,L...][@R]`: in these levels, while an aim window is open, the input's Z is held
+  back unless the aimed actor is awake (AI mode != 0) and within R (default 1,500); sleeping actors
+  are never the target there. Outside the aim windows and the levels the input is untouched. It
+  stands in for a player who does not shoot at nothing; e2's driver-controlled fire (the stick
+  driver deciding Z) would replace it.
+
+With `--real-weapons 2` `fullrun.py` sets both (`T2_AIM_SKIP_TYPES=6`, `T2_FIRE_GATE=133,134,135`)
+and plays 133 as `L2_133_REAL`: no fire at the first room's zombies (left behind door 27), the
+shotgun (+10 shells) picked up as a step after the first shells are spent, the second room's
+zombies 22-24 (80 health each; they open door 28) with the mag 60 (`L2_TAPS`: the pistol's slot on
+the wheel), the mag 60 on its ledge (-1996.5, -4454.4, 447.7) picked up as a step when the bullets
+are spent, then the sister with the grenade launcher.
+
+| run (`--real-weapons 1,2`) | 133 | sister 1 |
+|---|---|---|
+| round 15 (d2) | 200 damage, a death, ammo gone at 42,500 | 50/50 |
+| doors skipped | 200 damage, a death | 50/50 (zombies 22, 23 dead) |
+| + zombies one by one, the shotgun picked up | 200 damage, a death | 50/50, awake at 42,500 |
+| + no fire in room 1, the mag 60 on 22-24 | 175 damage, no death | 36/50 (the talon) |
+| + `T2_FIRE_GATE`, nearest awake | 200 damage, a death | 11/50 |
+| **+ the mag 60 picked up before her** | **184 damage, no death (lowest 16)** | **dead at 43,500** |
+
+Sister 2 (134) is not won yet: 131's terrace gives bullets x40, shells x3 and explosive shells x3
+(picked up, `L2_ARMS[8]`), the ultra health of 130 brings the player back to 116, but the zombies
+2-4 at the start and at gate 8 take that ammo by 52,500 while she sleeps (gate 8 opens with zombie
+4's key) and two lives go there. 130's bullets x40 and shells x10 by its exit were not reached by
+plain picks. So `--real-weapons 1,2` still ends in game over in 134.
+
+### 27-e5.3 Next
+
+1. **134**: more ammo before her (125 and 131 have many bullets x10/x40 and shells; 134's mag 60 by
+   the start is taken only when the bullets are not full), and fewer shots at zombies 2 and 3 (they
+   are not needed for gate 8: only zombie 4's key is). Then sister 3 (135) and the City Totem.
+2. **e2's driver-controlled fire** in place of `T2_FIRE_GATE` when it is merged (the gate is an
+   env switch; the route only sets it with `--real-weapons 2`).
+3. **Levels 3-6** (not started): the plasma rifle in 64 and 124, the scorpion launcher in 66
+   (the Marsh Totem), plasma cells in 65 and 68 (PLAYTHROUGH 25.5), the shredder for level 5 and
+   the Mother.
