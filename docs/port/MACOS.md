@@ -1296,3 +1296,59 @@ newgame x2, config 14).
   universal build would need Homebrew's x86-64 dylibs (or SDL3 built from source as a universal
   static library).
 - The no-ROM crash of the test tool and the SDL dummy-driver crash are part d5's.
+
+## 18. Round 16 (part e4): a fresh user's build, ThinLTO, the round-16 whole game
+
+Branch `names-R16_e4` (from 5d835e51), Mac only, headless. No change to `src/` or `include/`.
+
+### 18.1 QUICKSTART from zero
+
+A new clone of `https://github.com/mgrz18/turok2-decomp` (`main` = 5d835e51) in a scratch
+directory, only the ROM added, QUICKSTART section 1 run as written (a scratch `HOME` for
+section 2 so the real Application Support folder was not touched). Tools found: Apple clang
+21.0.0, Homebrew cmake 4.4.4, ninja 1.13.2, sdl3 3.4.18, libzip 1.12, glew 2.3.1, libpng 1.6.59,
+nlohmann-json 3.12.0, tinyxml2 11.0.0, python 3.13.16; pip clang 21.1.7, pyelftools 0.33.
+
+| # | gap | fix |
+|---|---|---|
+| e4-1 | `mkarchive.py ... -o OUT/turok2.o2r` failed: `OUT/` does not exist in a clone | mkarchive creates the output's directory |
+| e4-2 | gendata needs `build/turok2.us.elf`, which only the N64 toolchain on Linux makes (the doc said: copy it from a Linux box). A fresh Mac user cannot get it | `tools/port/mklayout.py` writes the ELF's symbol and section tables to **`versions/port_layout.us.json`** (1 MB, committed; names and addresses, no game data). Every loaded section of the ELF is the ROM's bytes at its load address (25 of 25 checked), so gendata, with no ELF, reads the json + `baserom.us.z64` (sha1 of every section checked: another ROM stops it with a message). The 7 generated files are **byte-identical** to the ELF's. With the ELF present gendata uses it and warns if the json is stale |
+| e4-3 | the app asked for macOS 27.2 (the build machine's): `LSMinimumSystemVersion` follows the executable | `-DCMAKE_OSX_DEPLOYMENT_TARGET=27.0` in the documented `cmake` line (Homebrew's dylibs are 27.0 or 26.0): the app says 27.0 |
+| e4-4 | gendata's libclang path was the Command Line Tools'; Xcode alone has none there | falls back to Xcode's toolchain |
+| e4-5 | "~1 min" for the build; no mention of Homebrew itself, of the download, of `brew install` upgrading old formulae | the times below, the prerequisites, `HOMEBREW_NO_INSTALL_UPGRADE=1` |
+
+Times (M5): clone 35 s; mkarchive 5 s; first `cmake` **7 min 24 s** (FetchContent clones
+libultraship, ImGui and the rest from GitHub); game library 17-27 s; gendata 19-27 s;
+libultraship + link 36-65 s; `mkapp.sh` 1 s; `apptest.sh` 3 s: **passes** (bundle verified, 0
+Homebrew references, a new game reached at 4,855). After the fixes the whole of section 1-2 and
+the app were run again on the committed branch: same result. The fresh archive's sha1 is
+`83710b56…` (macOS's zlib; the box's is `a9d14a47…`): the same units, and the same det log below.
+
+### 18.2 ThinLTO
+
+`-flto=thin` failed with "symbol(s) defined in LTO objects are referenced but missing in
+compiled objects": 9 functions of `func_00413230.c` (`MenuItem_DrawString`, `Menu_Construct`,
+...) are called from the same file through `__asm__` labels. In IR the label is another global
+(`\01_Name`) than the definition, so the LTO code generator dropped the definition. Fix in
+`port/tools/hostify.py` (no `src/` change): a function the file both defines and calls through
+a label gets `__attribute__((used))` on its host copy's definition (17 in `func_00413230.c`, 16
+in module 2's `func_0044C230.c`). The non-LTO object code is **identical** with and without it
+(objdump of the file, Mac and Linux). `-DT2_LTO=ON` (port/CMakeLists.txt) builds everything
+with ThinLTO; it is **off by default**: same det log, but not faster (below).
+
+### 18.3 The round-16 default whole game (under aimdrive.py)
+
+`playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6`, then aimdrive.py over
+`turok2 --game --no-window --frames 290000`, `T2_DET_LOG=1 T2_PROGRESS_LOG=1 T2_HURT_LOG=1`
+(`OUT/r16/det.sh` here, `/root/R16_e4mac/det/run.sh` on the box):
+
+| run | det lines | md5 (all) | md5 (without `ptcl` lines) | wall |
+|---|---|---|---|---|
+| Linux, the coordinator's `OUT/rel` (5d835e51), twice | 580,000 | `ecb9f9f2…` | `cac3ef7e…` | 143 s (box loaded) |
+| Mac Release from the fresh clone, plain `-O2`, 3 runs | 580,000 | `ecb9f9f2…` | `cac3ef7e…` | 40.0, 43.3 (and one 84.5 outlier) s |
+| Mac Release ThinLTO, 3 runs + the `-DT2_LTO=ON` build | 580,000 | `ecb9f9f2…` | `cac3ef7e…` | 42.5, 43.5, 43.1, 38.8 s |
+| Mac fresh binary + the fresh archive | 580,000 | `ecb9f9f2…` | `cac3ef7e…` | 40.1 s |
+
+Mac = Linux **including the particle-pool (`ptcl`) lines**, and the two Linux runs agree with
+each other: the round-15 ptcl difference (frames 72,749-82,523) did not show (e1 saw the same
+in 16 Linux runs). All exit 0, END 2 reached. Max RSS 111 MB.
