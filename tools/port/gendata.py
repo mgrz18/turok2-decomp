@@ -65,7 +65,11 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 # host layout = the machine the port is built on (docs/port/MACOS.md for macOS arm64)
 if sys.platform == 'darwin':
+    # the Command Line Tools' libclang (Homebrew's installer puts them in); Xcode's otherwise
     DEFAULT_LIBCLANG = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
+    if not os.path.exists(DEFAULT_LIBCLANG):
+        DEFAULT_LIBCLANG = ('/Applications/Xcode.app/Contents/Developer/Toolchains/'
+                            'XcodeDefault.xctoolchain/usr/lib/libclang.dylib')
     DEFAULT_HOST_TARGET = 'arm64-apple-macos13'
 else:
     DEFAULT_LIBCLANG = '/usr/lib/llvm-19/lib/libclang-19.so.1'
