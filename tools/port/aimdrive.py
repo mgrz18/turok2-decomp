@@ -135,14 +135,16 @@ PICK = envf("T2_AIMD_PICK", 1.0) != 0
 FIRE = envf("T2_AIMD_FIRE", 1.0) != 0
 W_ANG = envf("T2_AIMD_WANG", 0.5)          # the crosshair angle's weight in a target's cost (Picker)
 W_KEEP = envf("T2_AIMD_WKEEP", 0.75)       # the current target's cost factor: no flicking between two
+W_HP = envf("T2_AIMD_WHP", 2.0)            # the target's health (25,600 = 100) in its cost
 IMMUNE = int(envf("T2_AIMD_IMMUNE", 300))  # frames without a health drop: the target is not being hurt
 IMMUNE_FOR = int(envf("T2_AIMD_IMMUNE_FOR", 900))
 IMMUNE_X = envf("T2_AIMD_IMMUNE_X", 4.0)
-PSPEED = envf("T2_AIMD_PSPEED", 60.0)      # the shot's speed for the lead (units per host frame)
+PSPEED = envf("T2_AIMD_PSPEED", 150.0)      # the shot's speed for the lead (units per host frame)
 LEAD = envf("T2_AIMD_LEAD", 1.0)           # the share of the lead applied
 HIT_R = envf("T2_AIMD_HITR", 40.0)         # the radius counted as on target (units)
 FIRE_EVERY = int(envf("T2_AIMD_FIRE_EVERY", 15))   # a Z tap of FIRE_HOLD frames every FIRE_EVERY, as the script
 FIRE_HOLD = int(envf("T2_AIMD_FIRE_HOLD", 6))
+CAND_EVERY = int(envf("T2_AIMD_CAND_EVERY", 50))   # --stats: the candidates every this many frames
 
 
 def parse_cands(f):
@@ -184,7 +186,7 @@ class Picker:
         if old and 0 < frame - old[0] <= 4 and math.dist(old[1], pos) < 80.0 * (frame - old[0]):
             dt = frame - old[0]
             raw = tuple((a - b) / dt for a, b in zip(pos, old[1]))
-            v = tuple(0.5 * a + 0.5 * b for a, b in zip(raw, old[2]))
+            v = tuple(0.3 * a + 0.7 * b for a, b in zip(raw, old[2]))
         self.seen[cid] = (frame, pos, v)
         return v
 
@@ -196,7 +198,7 @@ class Picker:
         for cid, x, y, z, hp in cands:
             v = self.vel(frame, cid, (x, y, z))
             d = math.hypot(x - ex, z - ez)
-            t = LAG + d / PSPEED
+            t = d / PSPEED   # the stick lag is the controller's (Aim: the bearing rate)
             lx, ly, lz = x + LEAD * v[0] * t, y + LEAD * v[1] * t, z + LEAD * v[2] * t
             pts[cid] = (lx, ly, lz)
             if cid == self.cur:
@@ -209,6 +211,7 @@ class Picker:
             eyaw = wrap(face_yaw(px, pz, lx, lz) - ry)
             epit = math.atan2(ly - ey, math.hypot(lx - ex, lz - ez)) - pitch
             cost = (d / 1000.0 + 0.1) * (1.0 + W_ANG * (abs(eyaw) + 0.5 * abs(epit)))
+            cost *= 1.0 + W_HP * min(hp, 25600) / 25600.0   # the weak ones first: fewer attackers sooner
             if cid == self.cur:
                 cost *= W_KEEP
             if self.immune.get(cid, -1) > frame:
@@ -424,6 +427,12 @@ def main():
                 if stats:
                     stats.write("%d %d %d %.4f %.4f %.4f %.4f %s %s\n" % (frame, sx, sy, ey, ep, pitch, ry,
                                                                         "-" if cid is None else cid, "-" if z is None else z))
+                    if frame % CAND_EVERY == 0:   # the candidates as seen: "# F id:dist:hp ..."
+                        fl = line.split()
+                        cs, php = parse_cands(fl)
+                        ex_, ez_ = float.fromhex(fl[6]), float.fromhex(fl[8])
+                        stats.write("# %d hp %s %s\n" % (frame, php, " ".join(
+                            "%d:%.0f:%d" % (c[0], math.hypot(c[1] - ex_, c[3] - ez_), c[4]) for c in cs)))
     finally:
         rc = proc.wait()
         for name in ("out", "in"):
