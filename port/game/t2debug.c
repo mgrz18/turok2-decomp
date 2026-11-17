@@ -1536,11 +1536,34 @@ void T2Port_RngSet(int frame, const char *spec) {
  * before round 16, its camera shake radius 0 (an N64-offset view): CShake__ApplyOffset then draws no
  * random numbers, 6 a game frame fewer than the N64. The scripted whole-game route was tuned on that
  * RNG stream, so tools/port/fullrun.py sets it; a player gets the N64's behaviour. */
+static int sLegacyShake = -1;
+static int sLegacyShakeUntil = -1; /* T2_LEGACY_SHAKE=1,F: the N64's shake from schedule frame F on */
+
 int T2Port_LegacyShake(void) {
-    static int s = -1;
-    if (s < 0) {
+    if (sLegacyShake < 0) {
         const char *e = getenv("T2_LEGACY_SHAKE");
-        s = e != NULL && *e != '0';
+        const char *c = e != NULL ? strchr(e, ',') : NULL;
+        sLegacyShake = e != NULL && *e != '0';
+        sLegacyShakeUntil = (sLegacyShake && c != NULL) ? atoi(c + 1) : -1;
     }
-    return s;
+    return sLegacyShake;
+}
+
+/* T2_LEGACY_SHAKE=1,F (DEBUG-ONLY, round 17 f2; game.cpp, every frame): the old stream up to schedule
+ * frame F, then the N64's, so that a level of the scripted route can be tried on the N64's random
+ * numbers from the state the legacy route reaches it in (fullrun.py --n64-shake-from L). At F the
+ * cameras get the shake radius the N64's CCamera__Construct gives them (1; the legacy stores left it
+ * 0) and the later constructs take the host path. */
+void T2Port_LegacyShakeTick(int frame) {
+    if (T2Port_LegacyShake() && sLegacyShakeUntil >= 0 && frame >= sLegacyShakeUntil) {
+        CCameraPool *pool = gEngineApp.m_Game.m_CameraPool;
+        int i;
+        sLegacyShake = 0;
+        pool->m_MainCamera.m_Shake.m_Radius = 1.0f;
+        for (i = 0; pool->m_Cameras != NULL && i < pool->m_nCameras; i++) {
+            pool->m_Cameras[i].m_Shake.m_Radius = 1.0f;
+        }
+        printf("legacyshake: off at frame %d (%d cameras)\n", frame, (int) pool->m_nCameras);
+        fflush(stdout);
+    }
 }

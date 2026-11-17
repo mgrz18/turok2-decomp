@@ -359,6 +359,7 @@ L6_SEGMENTS = [
 L6_MOTHER = 12500          # the Mother's arena is loaded (relative to L6_START)
 L6_MOTHER_END = 31000      # relative: the strafing and the steps back stop (her death ~29,600, her cinema)
 L6_EXIT = (33500, 1231.8, 0.0, -4006.8, -1.5708)  # from 114's start (+x) onto its pad 7601 (regions 151/152) -> the hub
+LAIR_PEEK_N64 = 2400       # round 17 f2: T2_LAIR_PEEK's wait in --level 6 --n64-shake (fullrun.LAIR_PEEK)
 L6_PRIMAGEN_HOP = 34800    # relative: T2_WARP_TO=7602 from the hub (54,000)
 L6_END = 90000             # relative: the end of the held fire
 
@@ -382,7 +383,7 @@ def lair_strafe(first, last, period=80, sweep=0):
     return out
 
 
-def build_level56(level, new_game, fire_every):
+def build_level56(level, new_game, fire_every, n64=False):
     """The --input lines, the T2_TELEPORT entries and the env lines for level 5 or 6."""
     portal, start, segs, hops = ((L5_PORTAL, L5_START, L5_SEGMENTS, L5_HOPS) if level == 5 else
                                  (L6_PORTAL, L6_START, L6_SEGMENTS, L6_HOPS))
@@ -445,6 +446,11 @@ def build_level56(level, new_game, fire_every):
         inputs += lair_strafe(start + L6_PRIMAGEN_HOP + 2000, start + L6_END)
         env[env.index("T2_FILL_AMMO=300")] = "T2_FILL_AMMO=600"
         env += ["T2_AIM_NODE=boss@3/4", "T2_BOSS_FRONT=450,3000,2.5,1", "T2_BOSS_LOG=1"]
+        if n64:
+            # round 17 f2 (--n64-shake): on the N64's random numbers his stage-3 home hover (-1.9, 2,907.7)
+            # is one no floor spot sees (the BOSS_FRONT spots, the strafing): the wait never ends. The
+            # lair peek (round 15 C30) ends it, as in the whole run (fullrun.py, T2_LAIR_PEEK)
+            env.append("T2_LAIR_PEEK=\"%d@%d\"" % (LAIR_PEEK_N64, start + L6_PRIMAGEN_HOP))
     if aim_at:
         env.append("T2_AIM_AT=\"%s\"" % ";".join(aim_at))
     if aim_enemy:

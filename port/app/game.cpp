@@ -47,6 +47,7 @@ void T2Port_LairPeek(int frame, const char *spec);
 void T2Port_PrimagenStage(int frame, const char *spec);
 void T2Port_StartWarp(int frame, const char *spec);
 void T2Port_RngSet(int frame, const char *spec);
+void T2Port_LegacyShakeTick(int frame);
 void T2Port_TraceBoss(int frame);
 void T2Port_AimAt(int frame, const char *spec);
 void T2Port_AimEnemy(int frame, const char *spec);
@@ -827,6 +828,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         if (startWarp != nullptr) {
             T2Port_StartWarp(sFrame + 1, startWarp); // DEBUG-ONLY: T2_START_WARP=ID@F (round 16 e1)
         }
+        T2Port_LegacyShakeTick(sFrame + 1); // DEBUG-ONLY: T2_LEGACY_SHAKE=1,F (round 17 f2)
         static const char* rngSet = getenv("T2_RNG_SET");
         if (rngSet != nullptr) {
             T2Port_RngSet(sFrame + 1, rngSet); // DEBUG-ONLY: T2_RNG_SET=LEVEL:GF:HEX (round 16 e1)

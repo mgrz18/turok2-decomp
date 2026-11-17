@@ -37,6 +37,7 @@ class Route:
 
     def __init__(self):
         self.inputs = [pt.NEW_GAME]
+        self.shake_switch = {}   # round 17 f2: {level: the schedule frame --n64-shake-from switches at}
         self.tps = []
         self.aim_at = []
         self.aim_enemy = []
@@ -198,7 +199,12 @@ class Route:
         # the route was tuned on that RNG stream (PLAYTHROUGH.md 27); --n64-shake (round 16 merge,
         # PLAYTHROUGH.md 31) leaves it out: the N64's camera shake and RNG, with N64_TUNE's changes
         if not N64_SHAKE:
-            env.append("T2_LEGACY_SHAKE=1")
+            if N64_FROM is not None:
+                # round 17 f2 (--n64-shake-from L): the old stream up to the hub before level L (7: the
+                # Primagen's lair), the N64's from there (port/game/t2debug.c T2Port_LegacyShakeTick)
+                env.append("T2_LEGACY_SHAKE=1,%d" % self.shake_switch[N64_FROM])
+            else:
+                env.append("T2_LEGACY_SHAKE=1")
         env += list(env_extra) + list(self.extra_env)
         with open(os.path.join(out, "playthrough.txt"), "w") as fp:
             fp.write("\n".join(self.inputs) + "\n")
@@ -571,6 +577,13 @@ L2_STRETCH_NOCHEATS = [(6, 1, 3000), (9, 3, 2000), (12, 15, 2000)]
 # --n64-shake (round 16 merge, PLAYTHROUGH.md 31): the route on the N64's RNG stream (no T2_LEGACY_SHAKE).
 # The extra fire windows it needs, as L2_STRETCH entries (segment, step, frames)
 N64_SHAKE = False
+N64_FROM = None       # --n64-shake-from L (round 17 f2): the N64's stream only from level L's hub visit on
+
+
+def n64(lv):
+    """Round 17 f2: whether level lv (7: the Primagen's lair) is played on the N64's random numbers
+    (--n64-shake, or --n64-shake-from L with lv >= L): the route changes for that stream apply."""
+    return N64_SHAKE or (N64_FROM is not None and lv >= N64_FROM)
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
 
 
@@ -1071,6 +1084,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     if upto < 4:
         hub(r, hubs[3], grant=GRANT[3], **key_visit(3))
         return r.write(out)
+    r.shake_switch[4] = hubs[3]
     c = hub(r, hubs[3], grant=GRANT[3], go=4, **key_visit(3))
     shift = c - OLD_CINEMA[4]
     r.anchors.append((c, 18))
@@ -1099,7 +1113,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         r.weapon.append((l4s + rel + a4 - TOTEM_WEAPON_BEFORE, "16"))
         r.weapon.append((hubs[4] - 200, "10"))
     r.face_levels.append(lv)
-    if real:
+    if real or n64(4):
+        # round 17 f2: on the N64's stream too (the Cave Totem costs ~100 health instead of ~55 there and
+        # the scorpion launcher leaves 11 health after the Blind One: a life lost on 124's pylons)
         # round 16 e5: the shredder (9) at the Blind One in a --real-weapons run. T2_WEAPON is applied when
         # a level loads: scheduled inside the Cave Totem's fire window (after 112 has loaded), it is
         # applied when her arena (level 1) loads. With the scorpion launcher her minions (intelligence
@@ -1117,6 +1133,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.aim_node = "boss@1/2/3/4"   # the Blind One 1, the Mantid Queen 2, the Mother 3, the Primagen 4
     r.note(hubs[4], "60 the hub (after level 4)")
     r.anchors.append((hubs[4], 60))
+    r.shake_switch[5] = hubs[4]
     end = hub(r, hubs[4], primagen=(4,), go=5 if upto >= 5 else None)
     for lvl, hook in sorted(LEVEL_HOOKS.items()):
         if lvl <= upto:
@@ -1185,6 +1202,7 @@ def level5(r, t):
     r.boss_front.append((s + rel + add - 100, "450,200"))
     hub_at = s + L5_HUB_AFTER + add
     r.level_start[6] = hub_at
+    r.shake_switch[6] = hub_at
     r.note(hub_at, "60 the hub (after level 5)")
     r.anchors.append((hub_at, 60))
     # round 14 c3: with --late-keys, Primagen keys 2 and 3 go in here, with key 5 (PRIMAGEN_LATE)
@@ -1235,6 +1253,7 @@ def level6(r, t):
     r.note(f, "60 the hub: Primagen key 6 slot: the six keys in: the hub portal cinema (43) -> the Primagen")
     primagen_slot(r, f, 6)
     lair = f + L6_CINEMA
+    r.shake_switch[7] = lair - 300
     if HOP:   # DEBUG-ONLY (--hop): round 13's warp 7602, for a run whose six keys are not all in
         r.warps.append((lair + 150, 7602))
     r.anchors.append((lair, 4))
@@ -1280,7 +1299,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE
+    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_FROM
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1324,10 +1343,14 @@ def cli(argv=None):
                     "picked up on the way, no T2_GIVE_WEAPONS / T2_FILL_AMMO before the hub after them (round 15 d2)")
     ap.add_argument("--n64-shake", action="store_true", help="the N64's camera shake (no T2_LEGACY_SHAKE) and "
                     "the route changes it needs (N64_L2_STRETCH; round 16 merge, PLAYTHROUGH.md 31)")
+    ap.add_argument("--n64-shake-from", type=int, default=None, choices=(4, 5, 6, 7),
+                    help="DEBUG-ONLY (round 17 f2): the old stream (T2_LEGACY_SHAKE) up to the hub visit before "
+                    "level L (7: the Primagen's lair), the N64's from there; with --n64-shake's level 4-6 changes")
     ap.add_argument("--hub-wait", type=int, default=ARMS_HUB_WAIT,
                     help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
     N64_SHAKE = a.n64_shake
+    N64_FROM = a.n64_shake_from
     LAIR_FRONT = a.lair_front
     LAIR_DRIVE = a.lair_drive
     LAIR_PEEK = a.lair_peek
