@@ -196,7 +196,7 @@ class Route:
             env.append("T2_GIVE_ITEMS=\"%s\"" % ";".join("%s@%d" % (v, f) for f, v in sorted(self.give)))
         # round 16 e1: the camera shake as before round 16 (CCamera__Construct radius 0, no shake draws):
         # the route was tuned on that RNG stream (PLAYTHROUGH.md 27); --n64-shake (round 16 merge,
-        # PLAYTHROUGH.md 31) leaves it out: the N64's camera shake and RNG, with N64_TUNE's changes
+        # PLAYTHROUGH.md 31) leaves it out: the N64's camera shake and RNG, with the N64_* tables
         if not N64_SHAKE:
             env.append("T2_LEGACY_SHAKE=1")
         env += list(env_extra) + list(self.extra_env)
@@ -1377,7 +1377,7 @@ def cli(argv=None):
     ap.add_argument("--real-weapons", default="", help="1 / 1,2 / 1,2,3: these levels on the weapons and ammo "
                     "picked up on the way, no T2_GIVE_WEAPONS / T2_FILL_AMMO before the hub after them (round 15 d2)")
     ap.add_argument("--n64-shake", action="store_true", help="the N64's camera shake (no T2_LEGACY_SHAKE) and "
-                    "the route changes it needs (N64_L2_STRETCH; round 16 merge, PLAYTHROUGH.md 31)")
+                    "the route changes it needs (N64_L2_STRETCH, N64_L2_PICKS; PLAYTHROUGH.md 31, 32-f1)")
     ap.add_argument("--hub-wait", type=int, default=ARMS_HUB_WAIT,
                     help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
