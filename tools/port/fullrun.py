@@ -690,6 +690,7 @@ ARMS = {1: L1_ARMS, 2: L2_ARMS, 3: L3_ARMS}
 ARMS_SWITCH = {1: [], 2: [], 3: []}
 # the hub arrivals of a --real-weapons run (the first "level 60" T2_STATE_LOG=50 line after the totem)
 REAL_HUB_AT = {1: 23750}
+BLIND_WEAPON_AFTER = 2336   # round 16 e5: the shredder for the Blind One, this long after the Cave Totem's fire starts
 ARMS_FIRE_END = 50      # a totem's fire taps end this long before the hub arrival
 # frames idled in the hub after level 1 (--hub-wait): the level-2 fights depend on the state they
 # start from; with --real-weapons 1, waits of 40, 50, 120 frames keep sisters 1 and 2 (133, 134)
@@ -887,6 +888,14 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         r.weapon.append((l4s + rel + a4 - TOTEM_WEAPON_BEFORE, "16"))
         r.weapon.append((hubs[4] - 200, "10"))
     r.face_levels.append(lv)
+    if real:
+        # round 16 e5: the shredder (9) at the Blind One in a --real-weapons run. T2_WEAPON is applied when
+        # a level loads: scheduled inside the Cave Totem's fire window (after 112 has loaded), it is
+        # applied when her arena (level 1) loads. With the scorpion launcher her minions (intelligence
+        # 7401, type 0x1ff) bite the player on the ledge ~1 every 40 frames until she dies: 121 damage,
+        # 25 health left, and 124's pylons then kill him (game over at 150,990). The shredder's discs
+        # bounce into the minions too: 32 damage, she dies ~1,500 frames earlier, 114 health left.
+        r.weapon.append((l4s + pt.L4_TOTEM[0] + a4 + BLIND_WEAPON_AFTER, "9"))
     rel, length, (x, y, z, ry), lv = pt.L4_BOSS
     f = l4s + rel + a4
     r.note(f, "1 the Blind One: fire held, T2_AIM_NODE=boss@1")
