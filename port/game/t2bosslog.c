@@ -496,7 +496,7 @@ f32 T2Port_Atan2f(f32 y, f32 x) {
 }
 
 extern int T2Port_AimStickOn(int frame);
-extern void T2Port_AimCand(int frame, CGameObjectInstance *o, f32 x, f32 y, f32 z, f32 d2);
+extern void T2Port_AimCand(int frame, CGameObjectInstance *o, f32 x, f32 y, f32 z, f32 d2, int kind);
 int T2Port_AimNode(int frame, const char *spec) {
     static s32 sLastMask = -1;
     static int sLastFrame;
@@ -546,15 +546,26 @@ int T2Port_AimNode(int frame, const char *spec) {
         if (o == pl || o == sAimSkip || o->header.m_pIntelligence == NULL || o->m_AI.m_Health <= 0 || !(o->m_dwFlags & 0x100)) {
             continue;
         }
-        if (sAimPoolOnly && i < gScene.m_nActors) {
-            continue;
-        }
-        if (sAimSetN > 0) {
-            int k, in = 0;
-            for (k = 0; k < sAimSetN; k++) {
-                in |= sAimSet[k] == o;
+        {
+            /* round 16 e2: a live enemy outside this phase's set (a boss phase's pool or actor
+             * group, "actor:A") within 600 units still goes to the stick driver, as a threat
+             * (kind 0): the one biting the player is shot first, as a player would */
+            int in = !(sAimPoolOnly && i < gScene.m_nActors), k;
+            if (in && sAimSetN > 0) {
+                in = 0;
+                for (k = 0; k < sAimSetN; k++) {
+                    in |= sAimSet[k] == o;
+                }
             }
             if (!in) {
+                if (T2Port_AimStickOn(frame)) {
+                    dx = o->header.m_vPos.x - eye.x;
+                    dz = o->header.m_vPos.z - eye.z;
+                    if (dx * dx + dz * dz < 600.0f * 600.0f) {
+                        T2Port_AimCand(frame, o, o->header.m_vPos.x, o->header.m_vPos.y + 50.0f, o->header.m_vPos.z,
+                                       dx * dx + dz * dz, 0);
+                    }
+                }
                 continue;
             }
         }
@@ -567,9 +578,9 @@ int T2Port_AimNode(int frame, const char *spec) {
             CVector3 ca;
             s32 cm;
             if (aimBoxCentre(o, mask, &eye, &ca, &cm)) {
-                T2Port_AimCand(frame, o, ca.x, ca.y, ca.z, d);
+                T2Port_AimCand(frame, o, ca.x, ca.y, ca.z, d, 1);
             } else if (mask == -1) {
-                T2Port_AimCand(frame, o, o->header.m_vPos.x, o->header.m_vPos.y + 50.0f, o->header.m_vPos.z, d);
+                T2Port_AimCand(frame, o, o->header.m_vPos.x, o->header.m_vPos.y + 50.0f, o->header.m_vPos.z, d, 1);
             }
         }
         if (d < bestD && mask == -1 && !aimBoxCentre(o, mask, &eye, &aim, &nodeMask)) {

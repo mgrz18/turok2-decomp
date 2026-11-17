@@ -136,6 +136,7 @@ FIRE = envf("T2_AIMD_FIRE", 1.0) != 0
 W_ANG = envf("T2_AIMD_WANG", 0.5)          # the crosshair angle's weight in a target's cost (Picker)
 W_KEEP = envf("T2_AIMD_WKEEP", 0.75)       # the current target's cost factor: no flicking between two
 W_HP = envf("T2_AIMD_WHP", 2.0)            # the target's health (25,600 = 100) in its cost
+THREAT_X = envf("T2_AIMD_THREAT", 1.5)     # a kind-0 candidate's cost factor
 IMMUNE = int(envf("T2_AIMD_IMMUNE", 300))  # frames without a health drop: the target is not being hurt
 IMMUNE_FOR = int(envf("T2_AIMD_IMMUNE_FOR", 900))
 IMMUNE_X = envf("T2_AIMD_IMMUNE_X", 4.0)
@@ -148,16 +149,18 @@ CAND_EVERY = int(envf("T2_AIMD_CAND_EVERY", 50))   # --stats: the candidates eve
 
 
 def parse_cands(f):
-    """The candidates after the 13 fixed fields: [(id, x, y, z, hp)], and the player's health."""
+    """The candidates after the 13 fixed fields: [(id, x, y, z, hp, kind)] (kind 1: the assist's own
+    choice set, 0: a threat outside it within 600 units), and the player's health."""
     if len(f) <= 13:
         return [], None
     n = int(f[13])
     c = []
     for k in range(n):
-        i = 14 + 5 * k
-        if i + 4 >= len(f) or "hp" in f[i:i + 5]:
+        i = 14 + 6 * k
+        if i + 5 >= len(f) or "hp" in f[i:i + 6]:
             break   # a line cut short
-        c.append((int(f[i]), float.fromhex(f[i + 1]), float.fromhex(f[i + 2]), float.fromhex(f[i + 3]), int(f[i + 4])))
+        c.append((int(f[i]), float.fromhex(f[i + 1]), float.fromhex(f[i + 2]), float.fromhex(f[i + 3]), int(f[i + 4]),
+                  int(f[i + 5])))
     hp = int(f[f.index("hp") + 1]) if "hp" in f else None
     return c, hp
 
@@ -195,7 +198,7 @@ class Picker:
             self.cur = None
             return primary, None
         best, bcost, pts = None, None, {}
-        for cid, x, y, z, hp in cands:
+        for cid, x, y, z, hp, kind in cands:
             v = self.vel(frame, cid, (x, y, z))
             d = math.hypot(x - ex, z - ez)
             t = d / PSPEED   # the stick lag is the controller's (Aim: the bearing rate)
@@ -211,6 +214,8 @@ class Picker:
             eyaw = wrap(face_yaw(px, pz, lx, lz) - ry)
             epit = math.atan2(ly - ey, math.hypot(lx - ex, lz - ez)) - pitch
             cost = (d / 1000.0 + 0.1) * (1.0 + W_ANG * (abs(eyaw) + 0.5 * abs(epit)))
+            if not kind:
+                cost *= THREAT_X   # a threat outside the assist's set (a boss phase's group, the sister first)
             cost *= 1.0 + W_HP * min(hp, 25600) / 25600.0   # the weak ones first: fewer attackers sooner
             if cid == self.cur:
                 cost *= W_KEEP
@@ -432,7 +437,8 @@ def main():
                         cs, php = parse_cands(fl)
                         ex_, ez_ = float.fromhex(fl[6]), float.fromhex(fl[8])
                         stats.write("# %d hp %s %s\n" % (frame, php, " ".join(
-                            "%d:%.0f:%d" % (c[0], math.hypot(c[1] - ex_, c[3] - ez_), c[4]) for c in cs)))
+                            "%d:%.0f:%d%s" % (c[0], math.hypot(c[1] - ex_, c[3] - ez_), c[4], "" if c[5] else "t")
+                            for c in cs)))
     finally:
         rc = proc.wait()
         for name in ("out", "in"):
