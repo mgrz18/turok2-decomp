@@ -24,7 +24,7 @@ typedef struct {
  * view zeroed the high half of m_pNext and m_vPos.x, put the radius 1.0 into m_vPos.y and left
  * m_Radius 0: CShake__ApplyOffset (distance 0 < radius 1 on the N64) then never drew its three
  * Random_Blend per camera per frame, so the port's RNG took 6 numbers per game frame in the lair where
- * the N64 takes 12 (n64trace.py --calls Random_Blend; PLAYTHROUGH.md 27-e1). The same writes at the
+ * the N64 takes 12 (n64trace.py --calls Random_Blend; PLAYTHROUGH.md 27). The same writes at the
  * host offsets of the members. */
 void CShake__Construct(Unk00281C08 *arg0) {
     CShake *shake = (CShake *) arg0;

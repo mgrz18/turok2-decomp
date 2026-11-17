@@ -2520,9 +2520,9 @@ level 5's 164. **`--stick-aim 3`**: END 2, one peek. **`--real-weapons 1`**: gam
   trace of a lair wait (his two hover points, mupen64plus) against the port's.
 - `--real-weapons 1` needs health before 124 (25.5).
 
-## 27-e1. The N64 lair and Mother checks, the camera shake's random numbers (Phase 7 round 16, part e1)
+## 27. The N64 lair and Mother checks, the camera shake's random numbers (Phase 7 round 16, part e1)
 
-### 27-e1.1 Driving the N64 without the keyboard
+### 27.1 Driving the N64 without the keyboard
 
 The emulator's keyboard path (`n64trace.py --input`, `refshots.py`) does not reach the game in this
 setup: with `START@700`, `START@1500` and A taps the attract loop runs frame for frame as with no
@@ -2549,7 +2549,7 @@ The port side: `T2_START_WARP=ID@F` (the same four stores at frame F), `T2_PRIMA
 stage; on the N64 `--poke "N:u32=0x8012F988:0;..."`, eight words), `T2_RNG_SET=LEVEL:GF:HEX`
 (`gRandomValue` at one game frame of a level; on the N64 `--poke N:u32=0x800DD784:HEX`).
 
-### 27-e1.2 The Primagen's home waits on the N64: the same as the port
+### 27.2 The Primagen's home waits on the N64: the same as the port
 
 The N64 run: `--start-warp 7602@600`, the part health zeroed at 3,100 (stage 2), the player left
 standing at the lair spawn (1.4, 0, -1,789.6). The port run: `T2_WARP_TO=7602@7000` (the hop from
@@ -2573,7 +2573,7 @@ flight (21.1) or from the air (a jump over the front pits); `T2_LAIR_PEEK` stand
 in the default run. The scan's player position was poked without its region (the N64 side), but the
 positive control ends the wait the same way on both sides.
 
-### 27-e1.3 The Mother's phase 0: the player walks on both
+### 27.3 The Mother's phase 0: the player walks on both
 
 The N64 (`--start-warp=-4@600 --pad "900-1500:8;1500-2100:2"`) and the port (`T2_WARP_TO=-4@7000`,
 `CU@15000..17000 CL@17500..19000`, no weapons, no cheats), the player at (83.4, 0, -723.9) when her
@@ -2591,7 +2591,7 @@ So **the player is not immobile in phase 0, on the N64 or in the port**. d1's "c
 does not reproduce with these recipes; the shredder recipe stands for its own reasons (her blasts
 land wherever he is).
 
-### 27-e1.4 The camera shake's random numbers (a host bug, fixed)
+### 27.4 The camera shake's random numbers (a host bug, fixed)
 
 With the RNG set to the same value on both sides at the lair's first game frames (`T2_RNG_SET` /
 `--poke` above), the N64 took **12 numbers per game frame** and the port **6** (the LCG stepped
@@ -2623,7 +2623,7 @@ Still different after the fix (a lead, not chased): the props `lvl 10`-`17` of t
 next to the spawn) are at their spawn positions with animation 4 frame 0.5 on the N64 from the first
 game frame, and at a displaced position with animation 0 frame 1/3 in the port.
 
-### 27-e1.5 The particle-pool hash: not reproduced
+### 27.5 The particle-pool hash: not reproduced
 
 Round 15 saw two runs whose `ptcl` field differed in frames 72,749-82,523. On this tree (Linux
 Release), the same `ptcl` lines from 72,000 to 83,000 came out the same in: 2 full-det runs
@@ -2636,9 +2636,9 @@ fields from 72,000), so a stale pak is not the round-15 cause either. In the def
 gets a type-172 particle at 72,749 (falling from (103, -468, 5,841)) and is reused often after, so
 no single particle stays different for 10,000 frames.
 
-## 27-e2. The stick driver picks its own target and fires: the sisters by stick (Phase 7 round 16, part e2)
+## 28. The stick driver picks its own target and fires: the sisters by stick (Phase 7 round 16, part e2)
 
-### 27-e2.1 The mechanism
+### 28.1 The mechanism
 
 Round 15's driver (section 24) turned towards the one point the assist chose (the nearest), and the
 script's Z taps fired blind. This round the game reports every target the assist would accept, and the
@@ -2678,7 +2678,7 @@ driver chooses, leads and fires. It still sends input only.
   `pickup`, `hurt`, `death`, `bosstrace` and `lairpeek` lines are identical to 5d835e51's (md5
   `5ed5092b…`, END 2).
 
-### 27-e2.2 What was learned (Linux Release; `--stick-aim 2` or `4`, no `--assist-keep`)
+### 28.2 What was learned (Linux Release; `--stick-aim 2` or `4`, no `--assist-keep`)
 
 Level 2 by stick, damage per sister fight (lowest health), against the assisted run's 131 (69), 144
 (25) and 156 (44):
@@ -2710,7 +2710,7 @@ Level 2 by stick, damage per sister fight (lowest health), against the assisted 
     once per 300 frames; the fight outlasted the window and cost 1-2 lives (game over in s4b).
   - So `--assist-keep 1` is still needed for him.
 
-### 27-e2.3 Whole runs (Linux Release, the default command plus the options, 290,000 frames)
+### 28.3 Whole runs (Linux Release, the default command plus the options, 290,000 frames)
 
 | run | options | result |
 |---|---|---|
@@ -2730,7 +2730,7 @@ python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5
 # then the default command's game line, under aimdrive.py (--stats RUN/stats.txt optional)
 ```
 
-### 27-e2.4 Next
+### 28.4 Next
 
 - The Blind One: a flier passing at 40-150 units turns faster than the stick. A player waits for it
   to come back far (fire when its angular rate is low) or strafes. The driver could hold the aim at
@@ -2741,9 +2741,9 @@ python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5
   move to the stick.
 - Then `--stick-aim 5,6` (the Queen, the Mother, the Primagen) with the same driver.
 
-## 27-e5. Real weapons: `--real-weapons 1` to the good ending, sister 1 on picked-up weapons (Phase 7 round 16, part e5)
+## 29. Real weapons: `--real-weapons 1` to the good ending, sister 1 on picked-up weapons (Phase 7 round 16, part e5)
 
-### 27-e5.1 The game over at 124 was the Blind One
+### 29.1 The game over at 124 was the Blind One
 
 With `--real-weapons 1` the run left the Blind One with 25 health (the default run: 52) and 124's
 pylons then killed it (game over at 150,990). No health lies between the Cave Totem and 124: the
@@ -2783,7 +2783,7 @@ City Totem (as in the default run); the Blind One 32 damage (lowest 114), 124 30
 (lowest 84), the Mother 33, the Primagen 59 (lowest 108). Levels 2-6 still have `T2_GIVE_WEAPONS`
 and `T2_FILL_AMMO` (from the hub after level 1). Two runs (the second on the final binary) are identical: every `progress`, `death`, `hurt`, `pickup`, `event` and `bosstrace` line.
 
-### 27-e5.2 Level 2: sister 1 killed on picked-up weapons (`--real-weapons 1,2`)
+### 29.2 Level 2: sister 1 killed on picked-up weapons (`--real-weapons 1,2`)
 
 `T2_ACTOR_LOG=8` showed why round 15's level 2 spent everything and never hurt sister 1:
 
@@ -2829,7 +2829,7 @@ Sister 2 (134) is not won yet: 131's terrace gives bullets x40, shells x3 and ex
 4's key) and two lives go there. 130's bullets x40 and shells x10 by its exit were not reached by
 plain picks. So `--real-weapons 1,2` still ends in game over in 134.
 
-### 27-e5.3 Next
+### 29.3 Next
 
 1. **134**: more ammo before her (125 and 131 have many bullets x10/x40 and shells; 134's mag 60 by
    the start is taken only when the bullets are not full), and fewer shots at zombies 2 and 3 (they
@@ -2840,7 +2840,7 @@ plain picks. So `--real-weapons 1,2` still ends in game over in 134.
    (the Marsh Totem), plasma cells in 65 and 68 (PLAYTHROUGH 25.5), the shredder for level 5 and
    the Mother.
 
-## 27-e3. Walking instead of teleporting: the waypoint walker (Phase 7 round 16, part e3)
+## 30. Walking instead of teleporting: the waypoint walker (Phase 7 round 16, part e3)
 
 **The navigation mesh** (`tools/port/nav.py`, port-free: the ROM through tools/assets/levels.py). A
 sub-level's floor is its collision regions: triangles with their three edge neighbours (vertex y is the

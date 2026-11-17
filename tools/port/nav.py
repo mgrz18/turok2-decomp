@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Round 16 e3: a navigation mesh from a level's floor regions, A* between two points, a path the
-player can walk (docs/port/PLAYTHROUGH.md section 27-e3).
+player can walk (docs/port/PLAYTHROUGH.md section 30).
 
     python3 tools/port/nav.py ROM LEVEL X,Y,Z X,Y,Z      # the waypoints between two points
     python3 tools/port/nav.py ROM LEVEL --check RUNLOG   # every same-level teleport of a run's log
@@ -75,7 +75,7 @@ class Nav:
         self.cent = [self._centroid(i) for i in range(n)]
         self.water = [self._deep(i) for i in range(n)]
         # the static objects' boxes are opt-in (T2_NAV_BOXES=1): a box is only the broad phase, and going round
-        # one made walks fail that went straight through (135, PLAYTHROUGH.md 27-e3); the walker adds the
+        # one made walks fail that went straight through (135, PLAYTHROUGH.md 30); the walker adds the
         # places it got stuck at instead
         self.boxes = self._boxes(level) if os.environ.get("T2_NAV_BOXES") == "1" else []
         # the boxes do not close regions (a box is only a broad phase: a closed region was often open floor);

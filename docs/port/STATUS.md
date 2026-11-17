@@ -97,7 +97,7 @@ It runs under `tools/port/aimdrive.py` (the lair driver answers through the inpu
   `--stick-aim L,...` and `--assist-keep 1,110` (d3: those levels aimed with the stick through
   `aimdrive.py`; PLAYTHROUGH.md 24), `--walk 1,2` and `--walk-probe` (d5: open-floor teleports
   walked with the stick; PLAYTHROUGH.md 22). Round 16 e3: `--nav L,...` and `--nav-only L:I.J,...` (route teleports
-  walked by the closed-loop waypoint walker under `aimdrive.py`; PLAYTHROUGH.md 27-e3).
+  walked by the closed-loop waypoint walker under `aimdrive.py`; PLAYTHROUGH.md 30).
 
 **The level runs and the boss recipes**: round 12's table (below) with round 14's Primagen recipe
 (`T2_WARP_TO=7602 T2_BOSS_FRONT=450,3000,2.5,1`, boss env, `Z@14000..200000` and the lines of
@@ -199,7 +199,7 @@ command's `playthrough.txt` and `teleport.env` were byte-identical to 8b42da15's
 4. **Real weapons in levels 2-6**: health before 124 so that `--real-weapons 1` finishes, then
    the pickups of the later levels (PLAYTHROUGH.md 25.5). Round 16 e5: `--real-weapons 1` reaches
    END 2 (the shredder at the Blind One) and sister 1 dies on picked-up weapons; sister 2 (134) and
-   levels 3-6 remain (PLAYTHROUGH.md 27-e5).
+   levels 3-6 remain (PLAYTHROUGH.md 29).
 5. **The Mother's phase 0**: the player cannot move there in the port; check on the N64.
 6. **The particle-pool hash that changes between runs** (section 2): find the field (free slots
    keep their last values; an uninitialised or time-dependent value?).
@@ -211,7 +211,7 @@ command's `playthrough.txt` and `teleport.env` were byte-identical to 8b42da15's
 
 ## Round 16, part e1: the N64 lair and Mother checks, the camera shake's random numbers (branch names-R16_e1)
 
-Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 27-e1.
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 27.
 
 - **The N64 can now be driven** (`tools/port/n64trace.py`): its keyboard input never reached the
   game (the attract loop runs the same with or without `--input`). New: `--start-warp ID@N` (the
@@ -249,7 +249,7 @@ Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 27-e1.
 | bf31c30e | `n64trace.py --warp/--poke/--watch`, `T2_PRIMAGEN_STAGE` |
 | bce84bc2 | `n64trace.py --start-warp`, `--pad` |
 | 27617d70 | the camera shake radius (func_0042F9B0.c, func_00281C08.c), `T2_LEGACY_SHAKE` in fullrun.py/playthrough.py, `T2_START_WARP`, `T2_RNG_SET`, `--watch-write` |
-| c073c333 | PLAYTHROUGH.md 27-e1 |
+| c073c333 | PLAYTHROUGH.md 27 |
 
 **For the merge**: src/us/code/func_0042F9B0.c and func_00281C08.c (TARGET_PORT only);
 port/app/game.cpp (three hooks after `T2_LAIR_PEEK`: `T2_START_WARP`, `T2_RNG_SET`,
@@ -267,7 +267,7 @@ field-by-field lair comparison now that both sides can start the same way.
 
 ## Round 16, part e2: the stick driver picks its own target and fires (branch names-R16_e2)
 
-New in this branch (details in [PLAYTHROUGH.md](PLAYTHROUGH.md) section "27-e2"):
+New in this branch (details in [PLAYTHROUGH.md](PLAYTHROUGH.md) section "28"):
 
 - **Candidate targets on the `aim` line** (`port/game/t2debug.c` `T2Port_AimCand`, hooks in
   `T2Port_FaceNearest` and `t2bosslog.c` `T2Port_AimNode`; only inside `T2_AIM_STICK` windows). After
@@ -279,7 +279,7 @@ New in this branch (details in [PLAYTHROUGH.md](PLAYTHROUGH.md) section "27-e2")
 - **`aimdrive.py`**: `Picker` (the near, the weak and the one under the crosshair first; targets not
   hurt for 300 frames are left), a lead by the target's velocity over the shot's flight, `Trigger`
   (Z taps only on target). `T2_AIMD_PICK=0` / `T2_AIMD_FIRE=0` give round 15's behaviour; the
-  tunables are `T2_AIMD_*` (PLAYTHROUGH 27-e2.1). `--stats` logs the chosen id, Z and the candidates;
+  tunables are `T2_AIMD_*` (PLAYTHROUGH 28.1). `--stats` logs the chosen id, Z and the candidates;
   `aimstats.py --stick` counts shots and target switches.
 - **Results** (Linux Release):
   - **The Sisters of Despair by stick, no `--assist-keep`, no life lost**: 78, 116 and 122 damage
@@ -301,7 +301,7 @@ New in this branch (details in [PLAYTHROUGH.md](PLAYTHROUGH.md) section "27-e2")
 
 ## Round 16, part e5: real weapons, `--real-weapons 1` to END 2, sister 1 on picked-up weapons (branch names-R16_e5)
 
-Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) section 27-e5.
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) section 29.
 
 - **`--real-weapons 1` reaches the good ending** (the default `--all` options plus
   `--real-weapons 1`, Linux Release PIE, under `aimdrive.py`, `--frames 290000`): all five totems,
@@ -311,7 +311,7 @@ Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) section 27-e5.
   she dies; with the scorpion launcher that cost 121 health (25 left), with **the shredder (9),
   now scheduled for her arena in any `--real-weapons` run** (`BLIND_WEAPON_AFTER`), 32 (114 left,
   she dies 1,500 frames earlier). No health lies between the Cave Totem and 124 (124's objects 543
-  are life forces); the object -> pickup id map is cart entry 2 (27-e5.1 lists the health ids).
+  are life forces); the object -> pickup id map is cart entry 2 (29.1 lists the health ids).
 - **Sister 1 (133) dies on picked-up weapons** (`--real-weapons 1,2`): the aims had been shooting
   doors 27/28 and sleeping zombies. New DEBUG-ONLY switches (port only): `T2_AIM_SKIP_TYPES=6`
   (the aims never pick a door) and `T2_FIRE_GATE=L,...[@R]` (in these levels, inside an aim window,
@@ -335,7 +335,7 @@ block before level 2's `level_segments`), `port/game/t2bosslog.c` (`aimSkipType`
 ## Round 16, part e3: walking instead of teleports, the waypoint walker (branch names-R16_e3)
 
 **1. A navigation mesh from the level data** (`tools/port/nav.py`, [PLAYTHROUGH.md](PLAYTHROUGH.md)
-27-e3). The floor regions of a sub-level are its graph. Edges are crossed with
+30). The floor regions of a sub-level are its graph. Edges are crossed with
 `Sweep_CrossRegionEdge`'s rules: border edges and steep regions above the feet are walls, steep
 regions with flag 0x10 can be climbed, and deep water and drops cost more. A* runs over the regions
 and a funnel pulls the waypoints through the shared edges. Static objects' boxes are opt-in
@@ -365,7 +365,7 @@ each walk alone.
   Two runs identical: all 580,000 det lines, `ptcl` included.
 - **Teleports left: 288 of 289.** Of the default run's 289, the mesh joins the two ends of 170 under
   8,000 units and 43 further. It does not join 76: 64 go to another floor (ledges, jumps, climbs,
-  warps) and 12 stay on one floor (water, region-flag boundaries). Per level in PLAYTHROUGH 27-e3.
+  warps) and 12 stay on one floor (water, region-flag boundaries). Per level in PLAYTHROUGH 30.
 
 **Validated**: the default command (`playthrough.py RUN --all --talismans 2 --cheats-off
 1,2,3,4,5,6` under `aimdrive.py`) writes byte-identical `playthrough.txt`, `teleport.env` and

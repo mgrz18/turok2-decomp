@@ -1488,7 +1488,7 @@ int T2Port_AimPose(int frame, char *buf, int n) {
  * attract loop) write what CEngineApp__StartGameAtWarp(app, ID) writes (nextMode 13, fadeMode 2,
  * matchMode ID, warpFlags 1; the match clock cleared), so the game starts at that warp with a fresh
  * player and no menu: the port side of n64trace.py --start-warp, where the keyboard does not reach the
- * game. 7602: the Primagen's lair; -4: the Mother's level (PLAYTHROUGH.md 27-e1). */
+ * game. 7602: the Primagen's lair; -4: the Mother's level (PLAYTHROUGH.md 27). */
 void T2Port_StartWarp(int frame, const char *spec) {
     static int sDone;
     const char *at = strchr(spec, '@');
@@ -1514,7 +1514,7 @@ void T2Port_StartWarp(int frame, const char *spec) {
  * LEVEL with gFrameCountGameplay == GF, set gRandomValue to HEX. With n64trace.py --poke
  * "N:u32=<gRandomValue>:HEX" at the same game frame of the N64, both sides leave the same RNG state
  * into a level that T2_START_WARP / --start-warp started, so their traces can be compared field by
- * field (the attract loop before it does not draw the same numbers; PLAYTHROUGH.md 27-e1). */
+ * field (the attract loop before it does not draw the same numbers; PLAYTHROUGH.md 27). */
 extern u32 gRandomValue;
 void T2Port_RngSet(int frame, const char *spec) {
     static int sDone;

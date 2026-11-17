@@ -195,7 +195,7 @@ class Route:
         if self.give:
             env.append("T2_GIVE_ITEMS=\"%s\"" % ";".join("%s@%d" % (v, f) for f, v in sorted(self.give)))
         # round 16 e1: the camera shake as before round 16 (CCamera__Construct radius 0, no shake draws):
-        # the route was tuned on that RNG stream (PLAYTHROUGH.md 27-e1)
+        # the route was tuned on that RNG stream (PLAYTHROUGH.md 27)
         env.append("T2_LEGACY_SHAKE=1")
         env += list(env_extra) + list(self.extra_env)
         with open(os.path.join(out, "playthrough.txt"), "w") as fp:
@@ -305,7 +305,7 @@ NAV_WALKS = {
 NAV_SPEED = 0.85     # nav_frames: the walking speed reached on a path (the corners)
 NAV_SLACK = 40       # nav_frames: frames on top
 # Probed (--nav 1,2,3,4 --walk-probe: each walk from the default route's place, the teleport kept at the
-# window's end; Linux Release; PLAYTHROUGH.md 27-e3): the walks that do not arrive (arrival error in units),
+# window's end; Linux Release; PLAYTHROUGH.md 30): the walks that do not arrive (arrival error in units),
 # and the ones that arrive but break the full run (tried with --nav-only on the default command). Left:
 # 135's (12, 1) (--nav 2: END 2, all five totems)
 NAV_SKIP = {   # {level: {(i, j): why}}: candidates the walker does not take

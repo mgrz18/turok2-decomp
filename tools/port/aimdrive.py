@@ -388,7 +388,7 @@ def move_answer(line, drive):
     return frame, px, py, pz, drive.answer(frame, px, pz, ry)
 
 
-# --- the waypoint walker (round 16 e3, PLAYTHROUGH.md 27-e3): T2_WALK_PLAN windows -------------------
+# --- the waypoint walker (round 16 e3, PLAYTHROUGH.md 30): T2_WALK_PLAN windows -------------------
 # T2_WALK_PLAN="F1-F2@LEVEL:X,Y,Z,ROTY;..." (fullrun.py --nav): inside each window (also a T2_MOVE_DRIVE
 # window, so the game sends "move" lines) the player walks to (X, Z) of sub-level LEVEL and turns to ROTY.
 # At the window's first line the path is planned from where the player really stands (tools/port/nav.py:
