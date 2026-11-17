@@ -580,6 +580,10 @@ N64_SHAKE = False
 N64_FROM = None       # --n64-shake-from L (round 17 f2): the N64's stream only from level L's hub visit on
 
 
+N64_CAVE_WEAPON = "9"   # the Cave Totem: the shredder on the N64 stream (85-135 damage with the scorpion launcher, 18-64 with it; round 17 f2)
+N64_MOTHER_MOVE = 4600   # the strafing and steps back at the Mother from her arena + this (5,800 legacy)
+
+
 def n64(lv):
     """Round 17 f2: whether level lv (7: the Primagen's lair) is played on the N64's random numbers
     (--n64-shake, or --n64-shake-from L with lv >= L): the route changes for that stream apply."""
@@ -1111,7 +1115,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         # the switch is scheduled in 103, before the totem's level loads. The plasma rifle: the
         # totem 200 damage and a life lost, the Blind One never hurt (hp 12,800/12,800 at the end);
         # the scorpion launcher: the totem 88 damage, the Blind One dead in 5,200 frames
-        r.weapon.append((l4s + rel + a4 - TOTEM_WEAPON_BEFORE, "16"))
+        r.weapon.append((l4s + rel + a4 - TOTEM_WEAPON_BEFORE, N64_CAVE_WEAPON if n64(4) else "16"))
         r.weapon.append((hubs[4] - 200, "10"))
     r.face_levels.append(lv)
     if real or n64(4):
@@ -1238,8 +1242,11 @@ def level6(r, t):
         r.weapon.append((m - 100, "9"))
         r.weapon.append((m + MOTHER_SHREDDER_END, "10"))
         fire_end = m + MOTHER_SHREDDER_END
-    r.inputs += ["Z@%d..%d" % (m + 800, fire_end), "CL@%d..%d" % (m + 5800, m + 15000)]
-    r.inputs += ["CD@%d..%d" % (f, f + 250) for f in range(m + 5800, s + r56.L6_MOTHER_END + add, 600)]
+    # round 17 f2: on the N64's stream the strafing starts earlier (N64_MOTHER_MOVE): standing still at
+    # ~+5,400 (her mode 19-25 attack) cost up to four 20s there, one 20 on the legacy stream
+    move = N64_MOTHER_MOVE if n64(6) else 5800
+    r.inputs += ["Z@%d..%d" % (m + 800, fire_end), "CL@%d..%d" % (m + move, m + 15000)]
+    r.inputs += ["CD@%d..%d" % (f, f + 250) for f in range(m + move, s + r56.L6_MOTHER_END + add, 600)]
     back = m + L6_BACK_114
     if 3 in r.cheats_on:
         # round 14 c2: the Mother invincible in a --cheats-off 6 run (--cheats-on 3): she costs ~250-330
