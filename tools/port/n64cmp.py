@@ -410,7 +410,7 @@ def run_both(a):
                "--start-warp=%d@%d" % (a.warp, a.n64_at),
                "--raw", "%s:%d:%s" % (n64raw, a.level, gfs)] + (["--ticks", str(a.ticks)] if a.ticks else [])
         if rng:
-            cmd += ["--rng-set=" + (("-%d:0:%s" % (a.level, rng)) if a.rng_gf < 0 else "%d:%d:%s" % (a.level, a.rng_gf, rng))]
+            cmd += ["--rng-load", "%d:%s" % (a.level, rng), "--rng-set", "%d:%d:%s" % (a.level, a.rng_gf, rng)]
         if a.pad:
             cmd += ["--pad", a.pad]
         if a.n64_poke:
@@ -426,12 +426,14 @@ def run_both(a):
         env.update({"SDL_VIDEODRIVER": "offscreen", "T2_START_WARP": "%d@%d" % (a.warp, a.port_at),
                     "T2_RAW_DUMP": "%s:%d:%s" % (portraw, a.level, gfs)})
         if rng:
-            env["T2_RNG_SET"] = ("-%d:0:%s" % (a.level, rng)) if a.rng_gf < 0 else "%d:%d:%s" % (a.level, a.rng_gf, rng)
+            env["T2_RNG_LOAD"] = "%d:%s" % (a.level, rng)
+            env["T2_RNG_SET"] = "%d:%d:%s" % (a.level, a.rng_gf, rng)
         for kv in a.env:
             k, _, v = kv.partition("=")
             env[k] = v
         cmd = ["timeout", "-s", "KILL", str(a.timeout), os.path.abspath(a.port), "--archive",
-               os.path.abspath(a.archive), "--rom", os.path.abspath(a.rom), "--game", "--pak-blank",
+               os.path.abspath(a.archive), "--rom", os.path.abspath(a.rom), "--game", "--pak-blank"] + (
+                   [] if a.no_audio else ["--audio"]) + [
                "--frames", str(a.port_at + a.port_frames + 4 * last)]
         if a.input:
             cmd += ["--input", a.input]
@@ -462,10 +464,12 @@ def main():
             p.add_argument("--n64-frames", type=int, default=600, help="emulator frames allowed for the load")
             p.add_argument("--port-frames", type=int, default=1200, help="port frames allowed for the load")
             p.add_argument("--rng", default="12345678", help="gRandomValue set on both sides ('' keeps each)")
-            p.add_argument("--rng-gf", type=int, default=-1, help="the level's game frame at which both sides set it "
-                           "(-1: before the level's load)")
+            p.add_argument("--rng-gf", type=int, default=1, help="the level's game frame at which both sides set it "
+                           "again (it is also set at CScene__LoadLevel: the N64's audio thread draws during the load)")
             p.add_argument("--ticks", type=int, default=2, help="n64trace.py --ticks: the N64's frame length held at "
                            "the port's 2 retraces (0: the emulator's own timing)")
+            p.add_argument("--no-audio", action="store_true", help="the port without --audio: its sound requests "
+                           "then draw no random numbers (the N64's and a player's do)")
             p.add_argument("--pad", default="", help="n64trace.py --pad (the N64's controller 1)")
             p.add_argument("--input", default="", help="the port's --input (the same buttons)")
             p.add_argument("--n64-poke", default="")

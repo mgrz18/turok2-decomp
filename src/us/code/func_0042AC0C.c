@@ -82,7 +82,7 @@ void CScene__LoadLevel(CScene *w, s32 level, s32 announce) {
     s32 count;
     s32 sound;
 
-    T2Port_RngAtLoad(level); /* DEBUG-ONLY: T2_RNG_SET=-T:0:HEX (port/game/t2debug.c, round 17 f3) */
+    T2Port_RngAtLoad(level); /* DEBUG-ONLY: T2_RNG_LOAD=T:HEX (port/game/t2debug.c, round 17 f3) */
     if (w->m_nLevel != -1) {
         func_0042C96C(w);
     }
