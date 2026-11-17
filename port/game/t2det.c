@@ -220,7 +220,7 @@ void T2Port_RngTrace(void *ra) {
 
 /* T2_RAW_DUMP=FILE:LEVEL:GF[-GF2][,GF...] (DEBUG-ONLY, round 17 f3): the raw bytes of the game's
  * state structs at the given game frames (gFrameCountGameplay) of LEVEL, one record per object:
- * gScene, the first player (CPlayer: its character and weapon actors), its camera, every level actor
+ * gRandomValue, gScene, the first player (CPlayer: its character and weapon actors), its camera, every level actor
  * (gScene.m_pActors[i]) and every pooled instance (the active list, in order). tools/port/n64cmp.py
  * reads them with the host layout of include/ (libclang) and compares them member by member with
  * the N64's (n64trace.py --raw, the same records at the N64 layout), so a field that a host function
@@ -297,6 +297,7 @@ void T2Port_RawDump(const char *spec) {
     if (!T2Raw_Want(sList, (int) gFrameCountGameplay)) {
         return;
     }
+    T2Raw_Put(sOut, "RNG ", 0, &gRandomValue, 4);
     T2Raw_Put(sOut, "SCN ", 0, &gScene, sizeof(gScene));
     p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
     if (p != NULL) {

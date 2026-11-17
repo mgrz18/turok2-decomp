@@ -37,7 +37,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 LIBCLANG = os.environ.get("LIBCLANG", "/usr/lib/llvm-19/lib/libclang-19.so.1")
 HEADERS = ["common.h", "structs/particle.h", "structs/world.h", "structs/player.h", "structs/game.h",
            "structs/game_object.h", "structs/intelligence.h", "structs/collision.h", "structs/camera.h"]
-TYPES = {"SCN ": "CScene", "PLR ": "CPlayer", "CAM ": "CCamera", "LVL ": "CGameObjectInstance",
+TYPES = {"RNG ": None, "SCN ": "CScene", "PLR ": "CPlayer", "CAM ": "CCamera", "LVL ": "CGameObjectInstance",
          "DYN ": "CGameObjectInstance"}
 N64_ARGS = ["--target=mips-linux-gnu", "-std=gnu89", "-fsigned-char", "-DF3DEX_GBI_2", "-D_LANGUAGE_C",
             '-DGAME_VERSION="us"', "-w"]
@@ -272,7 +272,7 @@ class Side:
         if ptr == 0:
             return "null"
         for (a, z, k) in self.ranges:
-            if a <= ptr < z:
+            if a <= ptr < z and TYPES[k[0]] is not None:
                 lv, _ = self.lay[TYPES[k[0]]]
                 d = ptr - a
                 best = None
@@ -288,6 +288,8 @@ class Side:
 
     def fields(self, key):
         addr, buf, _ = self.recs[key]
+        if TYPES[key[0]] is None:  # gRandomValue
+            return collections.OrderedDict([("gRandomValue", "%08x" % struct.unpack(">I" if self.be else "<I", buf[:4])[0])])
         lv, _ = self.lay[TYPES[key[0]]]
         out = collections.OrderedDict()
         for leaf in lv:
@@ -406,9 +408,9 @@ def run_both(a):
                os.path.join(HERE, "n64trace.py"), "--rom", a.rom, "--out", os.path.join(a.work, "emu"),
                "--to", str(a.n64_at + a.n64_frames + 4 * last), "--from", str(a.n64_at),
                "--start-warp=%d@%d" % (a.warp, a.n64_at),
-               "--raw", "%s:%d:%s" % (n64raw, a.level, gfs)]
+               "--raw", "%s:%d:%s" % (n64raw, a.level, gfs)] + (["--ticks", str(a.ticks)] if a.ticks else [])
         if rng:
-            cmd += ["--rng-set", "%d:%d:%s" % (a.level, a.rng_gf, rng)]
+            cmd += ["--rng-set=" + (("-%d:0:%s" % (a.level, rng)) if a.rng_gf < 0 else "%d:%d:%s" % (a.level, a.rng_gf, rng))]
         if a.pad:
             cmd += ["--pad", a.pad]
         if a.n64_poke:
@@ -424,7 +426,7 @@ def run_both(a):
         env.update({"SDL_VIDEODRIVER": "offscreen", "T2_START_WARP": "%d@%d" % (a.warp, a.port_at),
                     "T2_RAW_DUMP": "%s:%d:%s" % (portraw, a.level, gfs)})
         if rng:
-            env["T2_RNG_SET"] = "%d:%d:%s" % (a.level, a.rng_gf, rng)
+            env["T2_RNG_SET"] = ("-%d:0:%s" % (a.level, rng)) if a.rng_gf < 0 else "%d:%d:%s" % (a.level, a.rng_gf, rng)
         for kv in a.env:
             k, _, v = kv.partition("=")
             env[k] = v
@@ -460,7 +462,10 @@ def main():
             p.add_argument("--n64-frames", type=int, default=600, help="emulator frames allowed for the load")
             p.add_argument("--port-frames", type=int, default=1200, help="port frames allowed for the load")
             p.add_argument("--rng", default="12345678", help="gRandomValue set on both sides ('' keeps each)")
-            p.add_argument("--rng-gf", type=int, default=1, help="the level's game frame at which both sides set it")
+            p.add_argument("--rng-gf", type=int, default=-1, help="the level's game frame at which both sides set it "
+                           "(-1: before the level's load)")
+            p.add_argument("--ticks", type=int, default=2, help="n64trace.py --ticks: the N64's frame length held at "
+                           "the port's 2 retraces (0: the emulator's own timing)")
             p.add_argument("--pad", default="", help="n64trace.py --pad (the N64's controller 1)")
             p.add_argument("--input", default="", help="the port's --input (the same buttons)")
             p.add_argument("--n64-poke", default="")
@@ -486,7 +491,7 @@ def main():
         n64raw, portraw = run_both(a)
     else:
         n64raw, portraw = a.n64, a.port
-    types = sorted(set(TYPES.values()))
+    types = sorted(set(t for t in TYPES.values() if t))
     a.lay_n64 = layouts(N64_ARGS, types, a.maxarr, a.all_union)
     a.lay_host = layouts(host_args(a.build), types, a.maxarr, a.all_union)
     for t in types:

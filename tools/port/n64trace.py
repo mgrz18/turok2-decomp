@@ -215,6 +215,7 @@ class Tracer:
         mode = r.sval(s["gEngineApp"] + o["app_mode"][0], o["app_mode"][1])
         if mode != 13 or level != self.raw_level or not any(a <= gf <= b for (a, b) in self.raw_gfs):
             return
+        self.raw_put("RNG ", 0, gf, level, s["gRandomValue"], 4)
         self.raw_put("SCN ", 0, gf, level, sc, o["sizeof_CScene"][0])
         p = r.u32(s["gEngineApp_m_Game"] + o["game_players"][0])
         if valid(p):
@@ -351,7 +352,12 @@ def main():
                          "the records of the port's T2_RAW_DUMP; tools/port/n64cmp.py compares them")
     ap.add_argument("--rng-set", default="",
                     help="LEVEL:GF:HEX (round 17 f3): set gRandomValue to HEX the first time the scene is LEVEL "
-                         "at game frame GF, at the --at breakpoint (the port's T2_RNG_SET twin)")
+                         "at game frame GF, at the --at breakpoint (the port's T2_RNG_SET twin); LEVEL -T: at the entry of "
+                         "CScene__LoadLevel(scene, T, ...), so the level's own load starts from HEX")
+    ap.add_argument("--ticks", type=int, default=0,
+                    help="N (round 17 f3): at every --at breakpoint set the four retrace counts CEngineApp__Update "
+                         "averages (gNumTicks0/2/3, D_800F6CA8) to N, so gNextTicks is N as in the port: the "
+                         "emulator's slow frames (3 retraces after a load) do not change gFrameIncrement")
     ap.add_argument("--at", default="CEngineApp__Update",
                     help="read the state when the CPU reaches this function (the core's debugger, a "
                          "consistent point of the game loop); 'vi' reads it from the frame callback instead "
@@ -367,7 +373,7 @@ def main():
         pads.append((int(f1), int(f2 or f1), int(parts[0], 16),
                      int(parts[1]) if len(parts) > 1 else None, int(parts[2]) if len(parts) > 2 else None))
     wwatch = [int(x, 16) for x in a.watch_write.split(",") if x]
-    use_bp = a.at != "vi" or bool(calls) or bool(pads) or bool(wwatch)
+    use_bp = a.at != "vi" or bool(calls) or bool(pads) or bool(wwatch) or a.rng_set.startswith("-")
     argspec = []
     for k, spec in enumerate(x for x in a.args.split(",") if x):
         reg, typ, mem = spec.split(":")[:3]
@@ -375,7 +381,7 @@ def main():
         where = 4 + "0123".index(reg[1]) if re.match(r"a[0-3]$", reg) else reg  # a register or a global
         argspec.append(("arg%d" % k, typ, mem, where, fmt, spec))
     offs = n64_offsets([(n, t, m) for (n, t, m, _, _, _) in argspec])
-    syms = symbols((["Controller_ProcessInput", "gControllers"] if pads else []) + ([a.at] if a.at != "vi" and not a.at.startswith("0x") else []) + [c for c in calls if not re.match(r"(0x|func_)[0-9A-Fa-f]+$", c)]
+    syms = symbols((["CScene__LoadLevel"] if a.rng_set.startswith("-") else []) + (["gNumTicks0", "gNumTicks2", "gNumTicks3"] if a.ticks else []) + (["Controller_ProcessInput", "gControllers"] if pads else []) + ([a.at] if a.at != "vi" and not a.at.startswith("0x") else []) + [c for c in calls if not re.match(r"(0x|func_)[0-9A-Fa-f]+$", c)]
                    + [r for (_, _, _, r, _, _) in argspec if isinstance(r, str)])
     bp_addr = (int(a.at, 16) if a.at.startswith("0x") else syms[a.at]) if a.at != "vi" else None
     # a symbol, or an address for a function with no name yet: 0x0021A500 or func_0021A500
@@ -471,7 +477,9 @@ def main():
         sc = syms["gScene"]
         mode = ram.sval(syms["gEngineApp"] + offs["app_mode"][0], offs["app_mode"][1])
         level = ram.sval(sc + offs["sc_level"][0], offs["sc_level"][1])
-        if rng_set is not None and not rng_set[3] and level == rng_set[0] and \
+        if rng_set is not None and rng_set[0] < 0:
+            pass  # at CScene__LoadLevel (dbg_update)
+        elif rng_set is not None and not rng_set[3] and level == rng_set[0] and \
                 ram.u32(syms["gFrameCountGameplay"]) == rng_set[1]:
             rng_set[3] = True
             sys.stderr.write("n64trace: frame %d: gRandomValue %08x -> %08x (level %d gf %d)\n" % (
@@ -560,11 +568,25 @@ def main():
 
     @PCCB
     def dbg_update(pc):
-        if wwatch and pc != bp_addr and pc not in call_at and not (pads and pc == syms["Controller_ProcessInput"]):
+        if wwatch and pc != bp_addr and pc not in call_at and not (pads and pc == syms["Controller_ProcessInput"]) \
+                and not (rng_set is not None and rng_set[0] < 0 and pc == syms["CScene__LoadLevel"]):
             ram = Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM))
             sys.stdout.write("write: frame %d gf %d pc %08x words %s\n" % (
                 state["n"], ram.u32(syms["gFrameCountGameplay"]), pc,
                 " ".join("%08x=%08x" % (w, ram.u32(w)) for w in wwatch)))
+            core.DebugSetRunState(2)
+            core.DebugStep()
+            return
+        if rng_set is not None and rng_set[0] < 0 and pc == syms["CScene__LoadLevel"]:
+            if "regs" not in state:
+                core.DebugGetCPUDataPtr.restype = C.c_void_p
+                state["regs"] = (C.c_int64 * 32).from_address(core.DebugGetCPUDataPtr(2))
+            if (state["regs"][5] & 0xFFFFFFFF) == -rng_set[0] and not rng_set[3]:
+                ram = Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM))
+                sys.stderr.write("n64trace: frame %d: CScene__LoadLevel(%d): gRandomValue %08x -> %08x\n" % (
+                    state["n"], -rng_set[0], ram.u32(syms["gRandomValue"]), rng_set[2]))
+                wr32(ram, syms["gRandomValue"], rng_set[2])
+                rng_set[3] = True
             core.DebugSetRunState(2)
             core.DebugStep()
             return
@@ -585,6 +607,10 @@ def main():
             core.DebugStep()
             return
         if pc == bp_addr:
+            if a.ticks:
+                ram = Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM))
+                for ad in (syms["gNumTicks0"], syms["gNumTicks2"], syms["gNumTicks3"], 0x800F6CA8):  # D_800F6CA8
+                    wr32(ram, ad, a.ticks)
             do_pokes()
             trace()
         elif pc in call_at and state["n"] >= a.start:
@@ -622,7 +648,8 @@ def main():
         assert core.DebugSetCallbacks(dbg_init, dbg_update, dbg_vi) == 0
         state["cbs"] = (dbg_init, dbg_update, dbg_vi)
         for addr in ([bp_addr] if bp_addr is not None else []) + list(call_at) + (
-                [syms["Controller_ProcessInput"]] if pads else []):
+                [syms["Controller_ProcessInput"]] if pads else []) + (
+                [syms["CScene__LoadLevel"]] if rng_set is not None and rng_set[0] < 0 else []):
             bk = Bkpt(addr, addr, 0x01 | 0x08)  # ENABLED | EXEC
             r = core.DebugBreakpointCommand(2, 0, C.byref(bk))  # ADD_STRUCT
             assert r >= 0, r

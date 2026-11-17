@@ -1520,8 +1520,11 @@ void T2Port_RngSet(int frame, const char *spec) {
     static int sDone;
     int level, gf;
     unsigned v;
-    if (sDone || sscanf(spec, "%d:%d:%x", &level, &gf, &v) != 3) {
+    if (sDone > 0 || sscanf(spec, "%d:%d:%x", &level, &gf, &v) != 3) {
         return;
+    }
+    if (level < 0) {
+        return; /* LEVEL -T: at CScene__LoadLevel (T2Port_RngAtLoad) */
     }
     if (gScene.m_nLevel == level && (int) gFrameCountGameplay == gf) {
         sDone = 1;
@@ -1556,4 +1559,22 @@ int T2Port_LegacyIntel9(void) {
         s = e != NULL && *e != '0';
     }
     return s;
+}
+
+/* T2_RNG_SET=-T:0:HEX (DEBUG-ONLY, round 17 f3; src/us/code/func_0042AC0C.c): at the entry of
+ * CScene__LoadLevel(scene, T, ...) set gRandomValue to HEX, once, so the level's own load (its actors'
+ * random set-up) starts from the same seed as the N64 with n64trace.py --rng-set=-T:0:HEX (a breakpoint
+ * on the same function); tools/port/n64cmp.py uses it. */
+void T2Port_RngAtLoad(int level) {
+    static int sDone;
+    int t, gf;
+    unsigned v;
+    const char *spec = getenv("T2_RNG_SET");
+    if (sDone || spec == NULL || sscanf(spec, "%d:%d:%x", &t, &gf, &v) != 3 || t >= 0 || level != -t) {
+        return;
+    }
+    sDone = 1;
+    printf("debug: CScene__LoadLevel(%d): T2_RNG_SET: gRandomValue %08x -> %08x\n", level, (unsigned) gRandomValue, v);
+    fflush(stdout);
+    gRandomValue = v;
 }
