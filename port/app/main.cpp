@@ -411,7 +411,17 @@ int main(int argc, char** argv) {
         if (!T2PadTest_Load(args.padTest)) {
             return 2;
         }
-        inputWindow = T2Controls_MakeHeadlessWindow(cvars);
+        inputWindow = T2Controls_MakeHeadlessWindow(cvars, config);
+        // a Context child, so that LUS saves its geometry at exit as it does a real window's
+        context->GetChildren().Add(inputWindow);
+    }
+    // the player's settings in the config (play mode, a window, --pad-test; not the scripted
+    // headless runs)
+    if (args.game && (args.play || args.window || !args.padTest.empty())) {
+        T2Controls_RegisterSettings(args.play || args.window);
+        printf("window: config %dx%d, fullscreen %d (Window.Width/Height, Window.Fullscreen.Enabled)\n",
+               config->GetInt("Window.Width", 640), config->GetInt("Window.Height", 480),
+               config->GetBool("Window.Fullscreen.Enabled", false) ? 1 : 0);
     }
     T2Controls_SetWindow(inputWindow);
     auto controlDeck = std::make_shared<LUS::ControlDeck>(
