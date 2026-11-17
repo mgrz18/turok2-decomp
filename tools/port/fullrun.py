@@ -26,6 +26,9 @@ import playthrough as pt  # noqa: E402
 import routes56 as r56  # noqa: E402
 
 
+STICK_AIM = set()   # round 15 d3: the levels aimed with the stick (--stick-aim)
+
+
 class Route:
     """Inputs, teleports and the frame-window debug switches of one run, in absolute frames."""
 
@@ -112,6 +115,13 @@ class Route:
                "T2_AIM_AT=\"%s\"" % ";".join(self.aim_at), "T2_AIM_ENEMY=\"%s\"" % ";".join(self.aim_enemy)]
         if self.aim_node:
             env.append("T2_AIM_NODE=%s" % self.aim_node)
+        if STICK_AIM:
+            # round 15 d3 (--stick-aim): in these levels the assists above only pick the target and
+            # tools/port/aimdrive.py aims with the stick (run the game under it: PLAYTHROUGH.md 22)
+            starts = sorted(self.level_start.items())
+            wins = ["%d-%d" % (f, ([g for l, g in starts if l == lv + 1] or [10 ** 7])[0] - 1)
+                    for lv, f in starts if lv in STICK_AIM]
+            env.append("T2_AIM_STICK=\"%s\"" % ";".join(wins))
         if self.anchors:
             env.append("T2_ANCHOR=\"%s\"" % ";".join("%s@%d" % (l, f) for f, l in sorted(self.anchors, key=lambda a: a[0])))
         if self.saves:
@@ -799,7 +809,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE
+    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, STICK_AIM
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -816,10 +826,13 @@ def cli(argv=None):
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
     ap.add_argument("--late-keys", action="store_true",
                     help="Primagen keys 2 and 3 in after level 5, round 13's walks after levels 2 and 3 (round 14 c3)")
+    ap.add_argument("--stick-aim", default="", help="L1,L2,...: these levels aim with the stick only, closed-loop "
+                    "(run under tools/port/aimdrive.py; round 15 d3)")
     ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
     a = ap.parse_args(argv)
     L6_SLOT_AFTER = a.slot
     HOP = a.hop
+    STICK_AIM = {int(x) for x in a.stick_aim.split(",") if x}
     if a.late_keys:
         PRIMAGEN_LATE = (2, 3)
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},

@@ -578,6 +578,12 @@ int T2Port_AimNode(int frame, const char *spec) {
     if (best == NULL) {
         return 0;
     }
+    {
+        extern int T2Port_AimReport(int frame, f32 x, f32 y, f32 z);
+        if (T2Port_AimReport(frame, bestAim.x, bestAim.y, bestAim.z)) {
+            return 1; /* T2_AIM_STICK (round 15 d3): the stick driver turns */
+        }
+    }
     pl->m_RotY += AI_AngleToPoint(pl, bestAim);
     dx = bestAim.x - eye.x;
     dy = bestAim.y - eye.y;
