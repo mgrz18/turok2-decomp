@@ -15,7 +15,7 @@ same input a player's thumb gives. Deterministic: the same lines give the same a
 T2_MOVE_DRIVE windows (round 15 C30): "move F px py pz rotY bx by bz" lines get C buttons back
 from LairDrive (the Primagen's lair: keep moving over the floor, never off it).
 
-Round 16 e2: the "aim" line also carries the candidate targets ("n", then "id x y z hp" each,
+Round 16 e2: the "aim" line also carries the candidate targets ("n", then "id x y z hp kind" each,
 nearest first: every target the assist would accept, a boss's damaging node boxes) and the player's
 health. The driver picks its own target among them (Picker: the one nearest the crosshair, distance
 and the current target weighed in), leads a moving one (its velocity from the candidates' ids) and

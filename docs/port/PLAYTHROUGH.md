@@ -2519,3 +2519,106 @@ level 5's 164. **`--stick-aim 3`**: END 2, one peek. **`--real-weapons 1`**: gam
   code against the N64 geometry (21.1), unless the N64 hovers elsewhere. Checking that needs an N64
   trace of a lair wait (his two hover points, mupen64plus) against the port's.
 - `--real-weapons 1` needs health before 124 (25.5).
+
+## 27-e2. The stick driver picks its own target and fires: the sisters by stick (Phase 7 round 16, part e2)
+
+### 27-e2.1 The mechanism
+
+Round 15's driver (section 24) turned towards the one point the assist chose (the nearest), and the
+script's Z taps fired blind. This round the game reports every target the assist would accept, and the
+driver chooses, leads and fires. It still sends input only.
+
+- **Candidates** (`port/game/t2debug.c` `T2Port_AimCand`, hooks in `T2Port_FaceNearest` and
+  `t2bosslog.c` `T2Port_AimNode`). Inside a `T2_AIM_STICK` window, the assists report each target that
+  passes their filters: live, in range, and for a boss the phase's node box nearest the eye. The
+  nearest 12 go on the `aim` line after the 13 fixed fields:
+  `n` then `id x y z hp kind` each (`%a` floats), then `hp H` (the player's health). `id` is the level
+  actor's index, or 10000 + the instance-pool slot. `kind 1` is the assist's own choice set. `kind 0` is
+  a live enemy outside that set within 600 units: a boss phase's set or the `actor:A` of a sister fight
+  leave out the enemy that is biting the player, and a player would shoot that one first.
+- **Fire** (`port/app/game.cpp`). The answer to an `aim` line may be `SX SY Z`. `Z` 1 holds the Z
+  button and 0 releases it, over the script's, on that frame. The script's Z taps still fire on frames
+  with no target reported.
+- **The driver** (`tools/port/aimdrive.py`):
+  - `Picker` chooses the target. Its cost is (distance / 1,000 + 0.1) x (1 + 0.5 x the crosshair's
+    angle to it) x (1 + 2 x health / 100). A `kind 0` costs 1.5 times more, and the current target
+    0.75 times less. So the near and the weak go first, and among equals the one under the crosshair.
+    A target whose health has not dropped for 300 frames costs 4 times more for 900 frames (`kind 0`:
+    50 times more for 3,000 frames). This drops the targets the weapon does not reach.
+  - The lead: each candidate's velocity comes from its last position (same id, no jump, smoothed). The
+    aim point moves by velocity x distance / 150 (the shot's flight). The stick's own lag stays with
+    the controller (`Aim`, the bearing rate).
+  - `Trigger` fires a tap of 6 frames every 15 frames (as the script), only when the crosshair is
+    within 40 units of the led point at its distance (at least 0.03 rad) in yaw, and 1.5 times that in
+    pitch.
+  - Tunables: `T2_AIMD_PICK=0` (the assist's target, round 15), `T2_AIMD_FIRE=0` (the script's Z),
+    `T2_AIMD_WANG`, `T2_AIMD_WHP`, `T2_AIMD_WKEEP`, `T2_AIMD_THREAT`, `T2_AIMD_IMMUNE*`, `T2_AIMD_PSPEED`,
+    `T2_AIMD_LEAD`, `T2_AIMD_HITR`, `T2_AIMD_FIRE_EVERY`, `T2_AIMD_FIRE_HOLD`. `fullrun.py --env K=V`
+    puts one into `teleport.env`.
+  - `--stats`: two more columns (the chosen id and Z), and every 50 frames a `# F hp H id:dist:hp[t]`
+    line with the candidates (`t`: kind 0). `aimstats.py --stick` adds the shots and the target
+    switches per window.
+- The default command is unchanged: no `T2_AIM_STICK`, no candidates. Its `progress`, `event`,
+  `pickup`, `hurt`, `death`, `bosstrace` and `lairpeek` lines are identical to 5d835e51's (md5
+  `5ed5092b…`, END 2).
+
+### 27-e2.2 What was learned (Linux Release; `--stick-aim 2` or `4`, no `--assist-keep`)
+
+Level 2 by stick, damage per sister fight (lowest health), against the assisted run's 131 (69), 144
+(25) and 156 (44):
+
+| run | driver | sister 1 (133) | sister 2 (134) | sister 3 (135) |
+|---|---|---|---|---|
+| s24a | nearest-crosshair cost, lead over lag + flight at 60 | died | | |
+| s24b | the same, lead smoothed | 175 (25) | died | |
+| s24c | no lead | died | 97 (103) | 195 (5) |
+| s24f | + health weight (the weak first) | 120 (80) | 120 (60) | |
+| s2b | + kind-0 threats | **78 (122)** | **100 (100)** | **149 (51)** |
+| s2c | + strong "not hurt" (50 x, 3,000) for all | died | 148 (52) | 157 (43) |
+| **s2d** | strong "not hurt" for kind 0 only (the default) | **78 (122)** | **116 (84)** | **122 (78)** |
+
+- **The sisters are won by the stick with less damage than the assist**, no life lost. s2d is the
+  default. Level 2 then ends in the same state as the assisted run (progress at 79,854: level 73,
+  pkeys `10 11`).
+- **The fight is a knife edge.** One life lost in level 2 shifts the whole route (the run respawns
+  elsewhere, later steps miss their frames) and ends in game over in 125 or later. Small changes of
+  the cost flipped sister 1 between 78 damage and a death (s2c).
+- Why the assist's nearest target lost: in 133 the nearest is often zombie 28, standing still at 385
+  units and never hurt, while the weak fliers (health 5) bite from 100-180 units. The health weight
+  shoots those first; the "not hurt" rule drops 28.
+- **The Blind One (level 4) is not won by stick yet.** In s4a-s4d phases 1-4 go through, but:
+  - phase 6 (s4b, s4c): the last group-3 actor is 900-1,300 units away, while out-of-play actors (his
+    own body, the actors of other phases: 22, 2, 20, 18, never hurt) stand within 600. With the weak
+    "not hurt" rule the driver held actor 22 for 4,600 frames. The strong rule for kind 0 fixes that.
+  - phase 5 (s4d): the last group-2 flier (17) swoops between 38 and 1,190 units. It was hit about
+    once per 300 frames; the fight outlasted the window and cost 1-2 lives (game over in s4b).
+  - So `--assist-keep 1` is still needed for him.
+
+### 27-e2.3 Whole runs (Linux Release, the default command plus the options, 290,000 frames)
+
+| run | options | result |
+|---|---|---|
+| F2k | `--stick-aim 2 --assist-keep 110` | **END 2**: all 5 totems, the 4 bosses (the Primagen dead at 246,996), cinema 130, the hub; exit 0. Lives lost 2 (City Totem 1, level 5's 124 1). Two lair peeks |
+| F2 | `--stick-aim 2` | the City Totem by stick is **lost** (kills 11/8, the totem's health 0), 1 life lost there; the run still kills the Primagen and ends with cinema 130, but 4 totems: not the good ending |
+| F1234k | `--stick-aim 1,2,3,4 --assist-keep 1` | **every fight of levels 1-4 cheaper than assisted and no life lost through level 4** (Harbor 115, sisters 111/68/94, City Totem 75 with no death, Marsh 20, Cave 63, the Blind One 82 assisted). Then 2 lives lost in level 5's 117 and the run stops in 116 at 290,000 |
+
+- F1234k reached each level about 2,000-9,000 schedule frames earlier (the anchors re-synchronise
+  the schedule). Level 5's 117 is a knife edge in the assisted run too: its lowest health there is 3.
+  It arrived with less health and died, and the later steps missed their frames.
+- The command validated for END 2 with the sisters by stick:
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --stick-aim 2 --assist-keep 110
+# then the default command's game line, under aimdrive.py (--stats RUN/stats.txt optional)
+```
+
+### 27-e2.4 Next
+
+- The Blind One: a flier passing at 40-150 units turns faster than the stick. A player waits for it
+  to come back far (fire when its angular rate is low) or strafes. The driver could hold the aim at
+  the far end of its swoop, and fire there only.
+- The City Totem by stick: won without a death in F1234k, lost in F2 (different upstream state).
+  The totem's own health is not on the `aim` line: an attacker near the totem should cost less.
+- Level 5's 117 (assisted, lowest health 3) needs health or a safer route before more levels can
+  move to the stick.
+- Then `--stick-aim 5,6` (the Queen, the Mother, the Primagen) with the same driver.
