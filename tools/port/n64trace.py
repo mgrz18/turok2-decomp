@@ -81,6 +81,10 @@ FIELDS = [
     ("c_ampy", "CCamera", "m_Shake.m_YAxis.m_Amp"),
     ("c_ampz", "CCamera", "m_Shake.m_ZAxis.m_Amp"),
     ("c_pos", "CCamera", "m_vPos"),
+    ("app_next", "CEngineApp", "m_Settings.nextMode"),
+    ("app_fade", "CEngineApp", "m_Settings.fadeMode"),
+    ("app_match", "CEngineApp", "m_Settings.matchMode"),
+    ("app_wflags", "CEngineApp", "m_Settings.warpFlags"),
     ("sc_wfade", "CScene", "m_WarpFade"),
     ("sc_wstate", "CScene", "m_WarpState"),
     ("sc_wid", "CScene", "m_WarpID"),
@@ -280,6 +284,17 @@ def main():
                          "N (default: 60 game frames into gameplay: mode 13, a level > 0, a player, no warp "
                          "running) write what CScene__RequestWarp(&gScene, ID, 2) writes: m_WarpState 1, "
                          "m_WarpFade 2, m_WarpID ID (CPlayer__Warp's hub/key redirects are skipped)")
+    ap.add_argument("--start-warp", default="",
+                    help="ID@N (round 16 e1): at emulator frame N (the title or the attract loop: keyboard "
+                         "input does not reach the game in this setup) write what CEngineApp__StartGameAtWarp"
+                         "(app, ID) writes: nextMode 13, fadeMode 2, matchMode ID, warpFlags 1, so the game "
+                         "starts at that warp (the credits' way back to the hub)")
+    ap.add_argument("--pad", default="",
+                    help="F1-F2:BUTTONS[:SX:SY][;...] (round 16 e1): controller 1 as the game reads it, at "
+                         "emulator frames F1..F2: a breakpoint on Controller_ProcessInput(&gControllers[0], x, "
+                         "y, buttons) ORs BUTTONS (hex, N64 bits: A 8000 B 4000 Z 2000 START 1000 DU 800 DD 400 "
+                         "DL 200 DR 100 L 20 R 10 CU 8 CD 4 CL 2 CR 1) into its button argument and sets the "
+                         "stick; the keyboard path (--input) does not reach the game in this setup")
     ap.add_argument("--poke", default="",
                     help="N:SPEC[;N:SPEC...] (round 16 e1): at emulator frame N (at the --at breakpoint, in "
                          "gameplay) write into RDRAM. SPEC: 'player=x,y,z' (the player's position, velocity "
@@ -291,7 +306,14 @@ def main():
     a = ap.parse_args()
 
     calls = [c for c in a.calls.split(",") if c]
-    use_bp = a.at != "vi" or bool(calls)
+    pads = []
+    for item in filter(None, a.pad.split(";")):
+        rng, _, rest = item.partition(":")
+        f1, _, f2 = rng.partition("-")
+        parts = rest.split(":")
+        pads.append((int(f1), int(f2 or f1), int(parts[0], 16),
+                     int(parts[1]) if len(parts) > 1 else None, int(parts[2]) if len(parts) > 2 else None))
+    use_bp = a.at != "vi" or bool(calls) or bool(pads)
     argspec = []
     for k, spec in enumerate(x for x in a.args.split(",") if x):
         reg, typ, mem = spec.split(":")[:3]
@@ -299,7 +321,7 @@ def main():
         where = 4 + "0123".index(reg[1]) if re.match(r"a[0-3]$", reg) else reg  # a register or a global
         argspec.append(("arg%d" % k, typ, mem, where, fmt, spec))
     offs = n64_offsets([(n, t, m) for (n, t, m, _, _, _) in argspec])
-    syms = symbols(([a.at] if a.at != "vi" and not a.at.startswith("0x") else []) + [c for c in calls if not re.match(r"(0x|func_)[0-9A-Fa-f]+$", c)]
+    syms = symbols((["Controller_ProcessInput", "gControllers"] if pads else []) + ([a.at] if a.at != "vi" and not a.at.startswith("0x") else []) + [c for c in calls if not re.match(r"(0x|func_)[0-9A-Fa-f]+$", c)]
                    + [r for (_, _, _, r, _, _) in argspec if isinstance(r, str)])
     bp_addr = (int(a.at, 16) if a.at.startswith("0x") else syms[a.at]) if a.at != "vi" else None
     # a symbol, or an address for a function with no name yet: 0x0021A500 or func_0021A500
@@ -362,6 +384,10 @@ def main():
     for item in filter(None, a.poke.split(";")):
         n, spec = item.split(":", 1)
         pokes.append([int(n), spec, False])
+    start_warp = None
+    if a.start_warp:
+        sid, _, sat = a.start_warp.partition("@")
+        start_warp = [int(sid, 0), int(sat or 0), False]
     warp = None
     if a.warp:
         wid, _, wat = a.warp.partition("@")
@@ -371,6 +397,16 @@ def main():
         struct.pack_into("<I", ram.m, addr & 0x7FFFFF, v & 0xFFFFFFFF)
 
     def do_pokes():
+        if start_warp is not None and not start_warp[2] and state["n"] >= start_warp[1]:
+            ram = Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM))
+            app = syms["gEngineApp"]
+            wr32(ram, app + offs["app_match"][0], start_warp[0])
+            wr32(ram, app + offs["app_wflags"][0], 1)
+            o = (app + offs["app_fade"][0]) & 0x7FFFFF
+            ram.m[o ^ 3] = 2
+            wr32(ram, app + offs["app_next"][0], 13)
+            start_warp[2] = True
+            sys.stderr.write("n64trace: frame %d: start at warp %d poked\n" % (state["n"], start_warp[0]))
         if not pokes and (warp is None or warp["done"]):
             return
         ram = Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM))
@@ -451,6 +487,22 @@ def main():
 
     @PCCB
     def dbg_update(pc):
+        if pads and pc == syms["Controller_ProcessInput"]:
+            if "regs" not in state:
+                core.DebugGetCPUDataPtr.restype = C.c_void_p
+                state["regs"] = (C.c_int64 * 32).from_address(core.DebugGetCPUDataPtr(2))
+            regs = state["regs"]
+            if regs[4] & 0xFFFFFFFF == syms["gControllers"]:
+                for (f1, f2, b, sx, sy) in pads:
+                    if f1 <= state["n"] <= f2:
+                        regs[7] = (regs[7] | b) & 0xFFFF
+                        if sx is not None:
+                            regs[5] = sx
+                        if sy is not None:
+                            regs[6] = sy
+            core.DebugSetRunState(2)
+            core.DebugStep()
+            return
         if pc == bp_addr:
             do_pokes()
             trace()
@@ -488,7 +540,8 @@ def main():
             _fields_ = [("address", C.c_uint32), ("endaddr", C.c_uint32), ("flags", C.c_uint)]
         assert core.DebugSetCallbacks(dbg_init, dbg_update, dbg_vi) == 0
         state["cbs"] = (dbg_init, dbg_update, dbg_vi)
-        for addr in ([bp_addr] if bp_addr is not None else []) + list(call_at):
+        for addr in ([bp_addr] if bp_addr is not None else []) + list(call_at) + (
+                [syms["Controller_ProcessInput"]] if pads else []):
             bk = Bkpt(addr, addr, 0x01 | 0x08)  # ENABLED | EXEC
             r = core.DebugBreakpointCommand(2, 0, C.byref(bk))  # ADD_STRUCT
             assert r >= 0, r
