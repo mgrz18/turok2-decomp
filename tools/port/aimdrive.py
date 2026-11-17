@@ -140,6 +140,10 @@ THREAT_X = envf("T2_AIMD_THREAT", 1.5)     # a kind-0 candidate's cost factor
 IMMUNE = int(envf("T2_AIMD_IMMUNE", 300))  # frames without a health drop: the target is not being hurt
 IMMUNE_FOR = int(envf("T2_AIMD_IMMUNE_FOR", 900))
 IMMUNE_X = envf("T2_AIMD_IMMUNE_X", 4.0)
+# a threat outside the assist's set that is not hurt (the Blind One's own body and the actors of
+# other phases: out of play) is left for much longer (round 16 e2, s4c: one held the aim 4,600 frames)
+IMMUNE_FOR0 = int(envf("T2_AIMD_IMMUNE_FOR0", 3000))
+IMMUNE_X0 = envf("T2_AIMD_IMMUNE_X0", 50.0)
 PSPEED = envf("T2_AIMD_PSPEED", 150.0)      # the shot's speed for the lead (units per host frame)
 LEAD = envf("T2_AIMD_LEAD", 1.0)           # the share of the lead applied
 HIT_R = envf("T2_AIMD_HITR", 40.0)         # the radius counted as on target (units)
@@ -180,7 +184,7 @@ class Picker:
         self.seen = {}          # id -> (frame, (x, y, z), (vx, vy, vz))
         self.switches = 0
         self.hp = None          # the current target's (health, the frame it last dropped or was taken)
-        self.immune = {}        # id -> until frame
+        self.immune = {}        # id -> (until frame, cost factor)
         self.immunes = 0
 
     def vel(self, frame, cid, pos):
@@ -208,7 +212,7 @@ class Picker:
                 if self.hp is None or hp < self.hp[0]:
                     self.hp = (hp, frame)
                 elif frame - self.hp[1] > IMMUNE and len(cands) > 1:
-                    self.immune[cid] = frame + IMMUNE_FOR
+                    self.immune[cid] = (frame + (IMMUNE_FOR if kind else IMMUNE_FOR0), IMMUNE_X if kind else IMMUNE_X0)
                     self.immunes += 1
                     self.hp = (hp, frame)
             eyaw = wrap(face_yaw(px, pz, lx, lz) - ry)
@@ -219,8 +223,8 @@ class Picker:
             cost *= 1.0 + W_HP * min(hp, 25600) / 25600.0   # the weak ones first: fewer attackers sooner
             if cid == self.cur:
                 cost *= W_KEEP
-            if self.immune.get(cid, -1) > frame:
-                cost *= IMMUNE_X
+            if self.immune.get(cid, (-1, 1.0))[0] > frame:
+                cost *= self.immune[cid][1]
             if bcost is None or cost < bcost:
                 best, bcost = cid, cost
         if best != self.cur:
