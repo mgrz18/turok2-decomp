@@ -3114,30 +3114,31 @@ it (the kill rate decides: the nearest and weakest first is already the fastest)
 **The result** (c3w0: `--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0`): **END 2 at
 250,402**, all five totems (`totems 11111`), the four bosses, the six Primagen keys, **no life lost**
 (the `death` line at 264,500 is the new game after the credits: health 100, every flag cleared; sA3
-has the same one). Level 1 on its own weapons and by stick, level 2 by stick (given weapons from
+has the same one); a second run gave identical gameplay lines (md5 `41eee61e…`) and an identical `--stats` file. Level 1 on its own weapons and by stick, level 2 by stick (given weapons from
 the hub on), the Blind One by stick on the shredder. Per fight, health at the start / hits / lowest
 (`hurt` lines), against the default run and sA4 (`--stick-aim 1,2,4`, no real weapons):
 
-| fight | default | sA4 stick 1,2,4 | c3w0 stick 1,2,4 + real 1 |
-|---|---|---|---|
-| Harbor Totem (109) | 200/51/68 | 200/46/85 | 200/41/118 |
-| sister 1 (133) | 200/69/69 | 200/42/89 | 200/47/59 |
-| sister 2 (134) | 169/55/25 | 189/28/121 | 159/40/16 |
-| 135 (crypts, sister 3) | 200/59/44 | 200/31/106 | 200/48/18, healed to 99 |
-| City Totem (110) | 44/71/**0, 2 lives** | 106/33/31 | 100/28/11 |
-| Marsh Totem (111) | 200/58/89 | 200/1/194 | 200/69/5 |
-| Cave Totem (112) | 200/8/146 | 200/15/110 | 200/7/147 |
-| the Blind One (1) | 146/60/52 | 110/17/63 | 147/19/87 |
-| 124 | 52/13/16 | 63/14/26 | 87/14/49 |
-| Hive Totem (113) | 116/24/72 | 126/7/113 | 149/4/143 |
-| the Queen (2) | 72/17/23 | 113/10/88 | 143/13/113 |
-| 117 | 23/15/3 | 88/20/67 | 113/15/94 |
-| the Mother (3) | 200/5/147 | 200/7/137 | 200/9/110 |
-| the Primagen (4) | 147/21/23 | 137/33/**0, 1 life** | 110/22/37 |
+| fight | default | sA4 stick 1,2,4 | c3w0 stick 1,2,4 + real 1 | c4 stick 1,2,3,4 + real 1 |
+|---|---|---|---|---|
+| Harbor Totem (109) | 200/51/68 | 200/46/85 | 200/41/118 | 200/41/118 |
+| sister 1 (133) | 200/69/69 | 200/42/89 | 200/47/59 | 200/47/59 |
+| sister 2 (134) | 169/55/25 | 189/28/121 | 159/40/16 | 159/40/16 |
+| 135 (crypts, sister 3) | 200/59/44 | 200/31/106 | 200/48/18, healed to 99 | 200/48/18, healed |
+| City Totem (110) | 44/71/**0, 2 lives** | 106/33/31 | 100/28/11 | 100/28/11 |
+| Marsh Totem (111) | 200/58/89 | 200/1/194 | 200/69/5 | 200/3/187 |
+| Cave Totem (112) | 200/8/146 | 200/15/110 | 200/7/147 | 200/9/139 |
+| the Blind One (1) | 146/60/52 | 110/17/63 | 147/19/87 | 139/16/97 |
+| 124 | 52/13/16 | 63/14/26 | 87/14/49 | 97/14/58 |
+| Hive Totem (113) | 116/24/72 | 126/7/113 | 149/4/143 | 158/22/115 |
+| the Queen (2) | 72/17/23 | 113/10/88 | 143/13/113 | 115/12/102 |
+| 117 | 23/15/3 | 88/20/67 | 113/15/94 | 102/20/81 |
+| the Mother (3) | 200/5/147 | 200/7/137 | 200/9/110 | 200/6/162 |
+| the Primagen (4) | 147/21/23 | 137/33/**0, 1 life** | 110/22/37 | 162/27/66 |
+
+c4 (`--real-weapons 1 --stick-aim 1,2,3,4 --l2-heal --hub-wait 0`): **END 2 at 248,808**, 5 totems, no life lost: level 3 by stick too, the Marsh Totem now its easiest totem (lowest 187, the assisted one 5).
 
 sA4 reaches END 2 at 252,332 (5 totems) with one life lost in the Primagen's lair. The knife edges
-left: sister 2 (16) and the City Totem (11) in c3w0, and the Marsh Totem (5: level 3 is still
-assisted). Round 16's `--stick-aim 1,2,4`-style runs died in level 6's 117 (sB: 20 health on
+left: sister 2 (16) and the City Totem (11) in c3w0, and the Marsh Totem in c3w0 (5: level 3 assisted; by stick in c4: 187). Round 16's `--stick-aim 1,2,4`-style runs died in level 6's 117 (sB: 20 health on
 arrival); the stick-run Blind One now costs less, so level 5 and 117 start with more.
 
 ### 32-f5.6 Determinism: run each game in its own directory

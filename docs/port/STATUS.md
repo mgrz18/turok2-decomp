@@ -260,9 +260,10 @@ Validated (Linux Release, PIE, under `aimdrive.py`, 290,000 frames, default comm
 
 | options | result |
 |---|---|
-| (none) | END 2 at 252,194, 5 totems, 2 lives lost (the City Totem): round 16's numbers on this branch |
+| (none) | END 2 at 252,194, 5 totems, 2 lives lost (the City Totem): its progress/death/hurt/pickup/event/bosstrace/lairpeek lines identical to the b744bd39 build (md5 `4f7999c3…`) |
 | `--stick-aim 1,2,4` | END 2 at 252,332, 5 totems, 1 life lost (the Primagen's lair); City Totem and the Blind One by stick |
-| `--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` | **END 2 at 250,402, 5 totems, no life lost**; RESULT2 |
+| `--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` | **END 2 at 250,402, 5 totems, no life lost**; a second run identical (gameplay lines md5 `41eee61e…`, the `--stats` file too) |
+| `--real-weapons 1 --stick-aim 1,2,3,4 --l2-heal --hub-wait 0` | **END 2 at 248,808, 5 totems, no life lost**; levels 1-4 by stick (the Marsh Totem too: lowest 187), only levels 5-6 assisted |
 | `--real-weapons 1 --stick-aim 1,2,4` (no heal, hub wait 50) | game over in level 2 (sister 2, 134) |
 | `--real-weapons 1,2` | game over: 134 (ammo) |
 
@@ -272,8 +273,8 @@ Files touched (merge): `tools/port/aimdrive.py` (Picker, the `aim` line's new fi
 `T2Port_AimPose`, `T2Port_TotemLive`, the `totem:` line), `port/game/t2bosslog.c` (the gate's ranges).
 No `src/` or `include/` change.
 
-Next: sister 2 on real weapons (the jump to 132's plasma rifle, or only zombie 4 fought); level 3
-by stick (the Marsh Totem is the closest call left: 5 health); levels 5-6 by stick.
+Next: sister 2 on real weapons (the jump to 132's plasma rifle, or only zombie 4 fought); levels 5-6
+by stick (`--stick-aim 1,2,3,4,5,6`); the knife edges left: sister 2 (16) and the City Totem (11).
 
 ## Round 16, part e1: the N64 lair and Mother checks, the camera shake's random numbers (branch names-R16_e1)
 
