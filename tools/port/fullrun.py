@@ -587,6 +587,7 @@ L2_ARMS = {
     4: [(3844.0, 0.0, 2764.2, 1.5708), (4403.2, 0.0, 2662.4, 0.0)],        # 129: the grenade launcher +5, plasma cells x150
     # 130's armory row (y 204.8, z 4736): the mag 60 (5); the tek bow (3), the tranquilizer gun (6), the shotgun
     5: [(-2764.8, 204.8, 4736.0, -1.5708), (-2918.4, 204.8, 4736.0, 1.5708, 78, 60)],
+    6: [(-153.6, -4761.6, -1075.2, 0.0), (-1996.5, -4454.4, 447.7, 0.0)],   # 133: the shotgun +10 shells, the mag 60 +bullets
     # not taken: 131's plasma rifle (-1996.8, -1126.4, 5785.6): a death there
 }
 L3_ARMS = {}
@@ -596,6 +597,10 @@ ARMS_SWITCH = {1: [], 2: [], 3: []}
 # the hub arrivals of a --real-weapons run (the first "level 60" T2_STATE_LOG=50 line after the totem)
 REAL_HUB_AT = {1: 23750}
 ARMS_FIRE_END = 50      # a totem's fire taps end this long before the hub arrival
+# frames idled in the hub after level 1 (--hub-wait): the level-2 fights depend on the state they
+# start from; with --real-weapons 1, waits of 40, 50, 120 frames keep sisters 1 and 2 (133, 134)
+# without a death, 0, 20, 30, 60, 90, 200 do not; 40 then loses the City Totem, 50 and 120 win it
+ARMS_HUB_WAIT = 50
 
 
 # The weapon wheels (the default control style, CBarrel__RunStick): holding A (0x8000) opens
@@ -617,7 +622,8 @@ def wheel(weapon, f):
 
 
 # a weapon chosen on the wheel before a route step: {(segment index, step index): weapon}
-L2_TAPS = {(4, 0): 8}       # 129's soul gate: the shotgun (the grenade launcher's grenades fly over the gate)
+L2_TAPS = {(4, 0): 8,       # 129's soul gate: the shotgun (the grenade launcher's grenades fly over the gate)
+           (6, 1): 15}      # 133's sister 1: the grenade launcher
 
 
 def with_taps(segs, taps):
@@ -685,7 +691,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     if real == {1}:
         r.real_until = hubs[1]
     r.note(hubs[1], "60 the hub (after level 1)")
-    r.anchors.append((hubs[1], 60))
+    # round 15 d2: a --real-weapons run may idle ARMS_HUB_WAIT frames in the hub (the anchor is earlier, the
+    # steps are not): the level-2 fights depend on the game state they start from
+    r.anchors.append((hubs[1] - (ARMS_HUB_WAIT if 1 in real else 0), 60))
     if upto < 2:
         hub(r, hubs[1], grant=GRANT[1], primagen=(1,))
         return r.write(out)
@@ -917,7 +925,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE
+    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, ARMS_HUB_WAIT
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -937,8 +945,11 @@ def cli(argv=None):
     ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
     ap.add_argument("--real-weapons", default="", help="1 / 1,2 / 1,2,3: these levels on the weapons and ammo "
                     "picked up on the way, no T2_GIVE_WEAPONS / T2_FILL_AMMO before the hub after them (round 15 d2)")
+    ap.add_argument("--hub-wait", type=int, default=ARMS_HUB_WAIT,
+                    help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
     L6_SLOT_AFTER = a.slot
+    ARMS_HUB_WAIT = a.hub_wait
     HOP = a.hop
     if a.late_keys:
         PRIMAGEN_LATE = (2, 3)
