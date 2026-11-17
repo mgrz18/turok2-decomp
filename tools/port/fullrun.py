@@ -54,6 +54,9 @@ class Route:
         self.extra_env = []
         self.cheat_windows = []
         self.cheats_on = set()   # sub-levels (the totems: 109 110 111 112) kept invincible (--cheats-on)
+        # round 15 d2 (--real-weapons): no T2_GIVE_WEAPONS / T2_FILL_AMMO before this frame (the
+        # weapons and ammo picked up on the way, the weapon changes in the input stream)
+        self.real_until = None
 
     def note(self, frame, text):
         self.inputs.append("# %d: %s" % (frame, text))
@@ -80,6 +83,8 @@ class Route:
                 self.tp(f, x, y, z, ry, walk, o.get("trig"))
                 if o.get("stick"):   # round 14 c5: aim with the stick only (playthrough.stick_aim)
                     self.inputs += pt.stick_aim(x, z, ry, o["stick"], f + 2)
+                if o.get("weapon") is not None:   # round 15 d2: a weapon chosen on the wheel before the step
+                    self.inputs += wheel(o["weapon"], f - WHEEL_BEFORE)
                 if o.get("fire"):
                     a, b = f + 10, f + 10 + o["fire"]
                     self.fire.append((a, b))
@@ -105,8 +110,12 @@ class Route:
             back = [v for f, v in cheats if f <= b][-1] if any(f <= b for f, v in cheats) else "1"
             cheats = [(f, v) for f, v in cheats if not a <= f < b] + [(a, "1"), (b, back)]
             cheats.sort()
-        env = ["T2_GIVE_WEAPONS=1", "T2_WEAPON=\"%s\"" % sched(self.weapon), "T2_CHEATS=\"%s\"" % sched(cheats),
-               "T2_FILL_AMMO=\"%s\"" % sched(self.fill),
+        give, fill = "1", self.fill
+        if self.real_until is not None:   # round 15 d2: --real-weapons
+            give = "\"0;1@%d\"" % self.real_until
+            fill = [(0, "0")] + [(f if f > 0 else self.real_until, v) for f, v in self.fill if f == 0 or f >= self.real_until]
+        env = ["T2_GIVE_WEAPONS=%s" % give, "T2_WEAPON=\"%s\"" % sched(self.weapon), "T2_CHEATS=\"%s\"" % sched(cheats),
+               "T2_FILL_AMMO=\"%s\"" % sched(fill),
                "T2_FACE_NEAREST=4000@%s" % ",".join(str(l) for l in self.face_levels),
                "T2_FACE_PITCH=1", "T2_FACE_STICKY=1", "T2_BOSS_LOG=1",
                "T2_AIM_AT=\"%s\"" % ";".join(self.aim_at), "T2_AIM_ENEMY=\"%s\"" % ";".join(self.aim_enemy)]
@@ -189,16 +198,17 @@ def merged(*dicts):
     return out
 
 
-def level1(r, start_shift=0, keys=True, health=True):
-    """Level 1 from the new game: (the frame level 109 is reached, the extra frames added)."""
+def level1(r, start_shift=0, keys=True, health=True, arms=False):
+    """Level 1 from the new game: (the frame level 109 is reached, the extra frames added).
+    arms (round 15 d2, --real-weapons 1): L1_ARMS's weapons and ammo picked up too."""
     added = 0
     for i, (name, base, steps) in enumerate(pt.SEGMENTS):
         f0 = base + start_shift + added
         r.note(f0, name)
-        picks = merged(L1_KEYS, L1_HEALTH if health else {}) if keys else {}
+        picks = merged(L1_KEYS, L1_HEALTH if health else {}, L1_ARMS if arms else {}) if keys else {}
         if i in picks:
-            for x, y, z, ang in picks[i]:
-                r.pick(f0, x, y, z, ang)
+            for k in picks[i]:   # (x, y, z, ang[, d, walk]): round 15 d2's ARMS give d and walk too
+                r.pick(f0, *k)
                 f0 += KEY_STEP
                 added += KEY_STEP
         for dt, x, y, z, ry, walk in steps:
@@ -385,8 +395,8 @@ def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back
         out.append((name, rel + added, steps))
         starts[i] = rel + added
         added += more
-        for f, (x, y, z, ang) in pre:
-            r.pick(start + f, x, y, z, ang)
+        for f, k in pre:
+            r.pick(start + f, *k)
     for f, lv in trips:
         talisman(r, start + f, lv)
     r.steps(out, start)
@@ -550,17 +560,112 @@ def hub(r, arrival, grant=(), primagen=(), save=True, go=None, bump=None):
     return t + CINEMA_AFTER[go]
 
 
+# ---- round 15 d2: levels 1-3 on the weapons and ammo picked up on the way (--real-weapons 1[,2[,3]]) ----
+# Without T2_GIVE_WEAPONS the player starts with the talon (weapon 0) and the bow. The weapons and the
+# ammo lie as level actors (tools/assets/levels.py's grid sections; cart entry 2 maps the object to the
+# pickup id: 2001-2122 weapons, sWeaponPickups {weapon, ammo type, amount}; 2200-3027 ammo, sAmmoPickups
+# {type, amount}). Pickup_GiveWeapon selects a new weapon when its index is higher than the current
+# one's; the others are chosen on the weapon wheels with the input stream (WHEEL below; T2_WEAPON only
+# acts with T2_GIVE_WEAPONS). When a weapon runs dry the game falls back to another one with ammo.
+# Picked up like the keys: (x, y floor, z, approach
+# angle) at a segment's start, KEY_STEP frames each; T2_GIVE_WEAPONS / T2_FILL_AMMO start in the hub
+# after the last such level.
+# (x, y, z, ang[, d, walk]): a pick d units out (default 90) and a walk of `walk` frames (default 50,
+# ~6 units a frame) through a row of pickups
+L1_ARMS = {
+    2: [(-3987.8, 79.4, 230.0, 1.5708, 50, 40)],      # 53: on the platform: bullets x10, the pistol (4), bullets x10
+    4: [(1075.2, 0.0, -921.6, 0.0), (1075.2, 0.0, -614.4, 3.1416)],          # 55: explosive shells x3, x3
+    5: [(-3368.8, 0.0, -1843.0, 1.5708), (-2867.2, 0.0, -1843.2, 1.5708)],   # 54: shells x3, the shotgun (8) +10 shells
+    6: [(-585.0, 164.1, 2108.9, 0.0)],                                       # 56: explosive shells x3
+    # 59 by the level exit 7100: shells x10, bullets x40, explosive shells x3, tek arrows x5 in a row
+    9: [(-9851.8, -307.2, 5427.2, 1.5708, 60, 90)],
+}
+L2_ARMS = {
+    0: [(3408.8, 614.4, -521.9, 0.0), (3406.2, 614.4, -1324.7, -1.5708),   # 125: shells x10, explosive shells x3,
+        (2816.0, 614.4, 9984.0, 0.0)],                                      #      shells x10
+    # not taken: 128's grenade launcher (-153.6, -1382.4, -5273.6) floats over a deadly floor (-1536)
+    4: [(3844.0, 0.0, 2764.2, 1.5708), (4403.2, 0.0, 2662.4, 0.0)],        # 129: the grenade launcher +5, plasma cells x150
+    # 130's armory row (y 204.8, z 4736): the mag 60 (5); the tek bow (3), the tranquilizer gun (6), the shotgun
+    5: [(-2764.8, 204.8, 4736.0, -1.5708), (-2918.4, 204.8, 4736.0, 1.5708, 78, 60)],
+    # not taken: 131's plasma rifle (-1996.8, -1126.4, 5785.6): a death there
+}
+L3_ARMS = {}
+ARMS = {1: L1_ARMS, 2: L2_ARMS, 3: L3_ARMS}
+# the weapons chosen on the wheel per level: [(frames after the totem's arrival, weapon), ...]
+ARMS_SWITCH = {1: [], 2: [], 3: []}
+# the hub arrivals of a --real-weapons run (the first "level 60" T2_STATE_LOG=50 line after the totem)
+REAL_HUB_AT = {1: 23750}
+ARMS_FIRE_END = 50      # a totem's fire taps end this long before the hub arrival
+
+
+# The weapon wheels (the default control style, CBarrel__RunStick): holding A (0x8000) opens
+# sBarrelLayoutGroup1, B (0x4000) sBarrelLayoutGroup0; the analog stick's direction picks one of 8
+# slots (CBarrel__GetStickDirection: 0 up, then clockwise; diagonals when ||x| - |y|| < 46), and the
+# slot's weapon becomes the requested one (if it has ammo). {weapon: (button, slot)}:
+WHEEL = {0: ("A", 0), 23: ("A", 1), 2: ("A", 2), 4: ("A", 3), 6: ("A", 4), 8: ("A", 5), 10: ("A", 6), 11: ("A", 7),
+         12: ("B", 0), 13: ("B", 1), 14: ("B", 2), 15: ("B", 3), 16: ("B", 4), 20: ("B", 5), 21: ("B", 6), 22: ("B", 7)}
+WHEEL_STICK = [(0, 100), (90, 90), (100, 0), (90, -90), (0, -100), (-90, -90), (-100, 0), (-90, 90)]
+WHEEL_BEFORE = 50       # the wheel is worked this long before a route step's teleport (which sets the yaw again)
+
+
+def wheel(weapon, f):
+    """The inputs that choose `weapon` on its wheel from frame f (30 frames: the button held, the
+    stick pushed towards the slot from its 10th frame)."""
+    b, slot = WHEEL[weapon]
+    x, y = WHEEL_STICK[slot]
+    return ["%s@%d..%d" % (b, f, f + 30), "SX=%d@%d..%d" % (x, f + 10, f + 25), "SY=%d@%d..%d" % (y, f + 10, f + 25)]
+
+
+# a weapon chosen on the wheel before a route step: {(segment index, step index): weapon}
+L2_TAPS = {(4, 0): 8}       # 129's soul gate: the shotgun (the grenade launcher's grenades fly over the gate)
+
+
+def with_taps(segs, taps):
+    out = []
+    for i, (name, rel, steps) in enumerate(segs):
+        steps = list(steps)
+        for (si, sj), t in taps.items():
+            if si == i:
+                st = list(steps[sj]) + [{}] * (7 - len(steps[sj]))
+                st[6] = dict(st[6], weapon=t)
+                steps[sj] = tuple(st)
+        out.append((name, rel, steps))
+    return out
+
+
+def arms_frames(lv):
+    return sum(len(v) for v in ARMS[lv].values()) * KEY_STEP
+
+
+def arms_switch(r, lv, t, real):
+    """The wheel choices of level lv (ARMS_SWITCH), from frame t."""
+    if lv not in real:
+        return
+    for dt, w in ARMS_SWITCH[lv]:
+        r.inputs += wheel(w, t + dt)
+
+
 def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(), health=True, cheats_on=(),
-             talismans=()):
+             talismans=(), real_weapons=()):
     """hubs: the measured hub arrivals {after level: frame} (HUB_AT). no_cheats: the levels played
     without T2_CHEATS invincibility (each from its hub visit before it); extra_env: more env lines.
     talismans: the levels whose chamber trip is made (TALISMAN: 2, 3; each moves the later hub
-    arrivals by TALISMAN_TRIP)."""
+    arrivals by TALISMAN_TRIP). real_weapons (round 15 d2): the levels (1, 2, 3, from 1 on) played on
+    the weapons and ammo picked up on the way (ARMS; each pick moves the later hub arrivals by KEY_STEP)."""
     hubs = dict(HUB_AT)
     for lv in talismans:
         for k in hubs:
             if k >= lv:
                 hubs[k] += TALISMAN_TRIP
+    real = set(real_weapons)
+    assert real == set(range(1, len(real) + 1)) and len(real) <= 3, "--real-weapons: 1 / 1,2 / 1,2,3"
+    for lv in sorted(real):
+        # the hub arrival after a level played on its own weapons (its totem won later or earlier than
+        # with the plasma rifle): REAL_HUB_AT, measured; else the default moved by the picks
+        d = REAL_HUB_AT[lv] - hubs[lv] if lv in REAL_HUB_AT else arms_frames(lv)
+        for k in hubs:
+            if k >= lv:
+                hubs[k] += d
     hubs.update(hubs_in or {})
     det = {lv: {TALISMAN[lv][0]: lv} for lv in talismans}
     r = Route()
@@ -573,7 +678,12 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.health = health
     # the health pickups only in the levels played without invincibility (with it the route stays
     # round 12's: the picks move every later step, and the Primagen's lair wait depends on the timing)
-    arrival, added = level1(r, health=health and 1 in r.no_cheats)
+    arrival, added = level1(r, health=health and 1 in r.no_cheats, arms=1 in real)
+    arms_switch(r, 1, arrival, real)
+    if 1 in real:   # no fire taps in the hub (the ammo kept for level 2)
+        r.fire[-1] = (r.fire[-1][0], min(r.fire[-1][1], hubs[1] - ARMS_FIRE_END))
+    if real == {1}:
+        r.real_until = hubs[1]
     r.note(hubs[1], "60 the hub (after level 1)")
     r.anchors.append((hubs[1], 60))
     if upto < 2:
@@ -586,11 +696,16 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     l2s = pt.L2_START + shift
     h2 = health and 2 in r.no_cheats
     l2segs, l2stretch = l2_segments(2 in r.no_cheats)
-    a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}) if extras else {},
+    if 2 in real:
+        l2segs = with_taps(l2segs, L2_TAPS)
+    a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {}) if extras else {},
                         L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else []), l2stretch,
                         back=L2_RETURN_LATE if h2 else (), detours=det.get(2))
     t_arr = pt.L2_TOTEM_ARRIVAL + shift + a2
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
+    arms_switch(r, 2, t_arr, real)
+    if real == {1, 2}:
+        r.real_until = hubs[2]
     if 110 in r.cheats_on:
         r.cheat_windows.append((t_arr - 600, hubs[2]))
     r.fire.append((t_arr, t_arr + 7200))
@@ -611,7 +726,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     l3s = pt.L3_START + shift
     h3 = health and 3 in r.no_cheats
     a3 = level_segments(r, l3_segments(3 in r.no_cheats), l3s,
-                        merged(L3_KEYS, L3_HEALTH if h3 else {}) if extras else {}, anchor=L3_ANCHOR, detours=det.get(3))
+                        merged(L3_KEYS, L3_HEALTH if h3 else {}, L3_ARMS if 3 in real else {}) if extras else {}, anchor=L3_ANCHOR, detours=det.get(3))
     a3x = sum(len(v) for v in L3_HEALTH.values()) * KEY_STEP if h3 and extras else 0
     for k in hubs:   # round 14 c1: the hub anchors after level 3 move with its health picks
         if k >= 3:
@@ -619,6 +734,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
             if k + 1 in r.level_start:
                 r.level_start[k + 1] = hubs[k]
     rel, length, lv = pt.L3_TOTEM
+    arms_switch(r, 3, l3s + rel + a3, real)
+    if real == {1, 2, 3}:
+        r.real_until = hubs[3]
     r.note(l3s + rel + a3, "111 the Marsh Totem: fire taps")
     r.fire.append((l3s + rel + a3, l3s + rel + a3 + length))
     if 3 in r.no_cheats:
@@ -817,6 +935,8 @@ def cli(argv=None):
     ap.add_argument("--late-keys", action="store_true",
                     help="Primagen keys 2 and 3 in after level 5, round 13's walks after levels 2 and 3 (round 14 c3)")
     ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
+    ap.add_argument("--real-weapons", default="", help="1 / 1,2 / 1,2,3: these levels on the weapons and ammo "
+                    "picked up on the way, no T2_GIVE_WEAPONS / T2_FILL_AMMO before the hub after them (round 15 d2)")
     a = ap.parse_args(argv)
     L6_SLOT_AFTER = a.slot
     HOP = a.hop
@@ -824,7 +944,8 @@ def cli(argv=None):
         PRIMAGEN_LATE = (2, 3)
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},
              [int(x) for x in a.cheats_off.split(",") if x], a.env, not a.no_health,
-             [int(x) for x in a.cheats_on.split(",") if x], [int(v) for v in a.talismans.split(",") if v])
+             [int(x) for x in a.cheats_on.split(",") if x], [int(v) for v in a.talismans.split(",") if v],
+             [int(v) for v in a.real_weapons.split(",") if v])
 
 
 if __name__ == "__main__":
