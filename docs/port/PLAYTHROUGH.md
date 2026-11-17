@@ -2426,3 +2426,96 @@ Next:
 4. The other control style (`m_WeaponSelect` != 1, `CBarrel__RunButtons`: A/B taps cycle) would
    make weapon changes one tap each. It is an options-menu setting, which a route could set
    through the menu.
+
+## 26. The whole game with no invincibility at all: the lair driver and the lair peek (Phase 7 round 15, the merge C30)
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6
+mkdir -p RUN/pak && cd OUT && . ../RUN/teleport.env && SDL_VIDEODRIVER=offscreen T2_HURT_LOG=1 \
+  python3 ../tools/port/aimdrive.py -- build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
+  --game --pak-dir ../RUN/pak --frames 290000 --input @../RUN/playthrough.txt
+```
+
+No `--cheats-on`: no `T2_CHEATS` invincibility anywhere. The run goes under `tools/port/aimdrive.py`
+(the lair driver below answers through d3's fifo). The round-14 command (`--cheats-on 3,4`) still
+writes the same `playthrough.txt` and `teleport.env` as at 8b42da15 and needs no driver.
+
+### 26.1 The lair, measured
+
+- **The floor** (`tools/assets/levels.py baserom.us.z64 --out DIR --level 4 --map 4`): a
+  twelve-sided floor at y 0, corners at radius ~2,325 at 15 + 30k degrees from +z, edges 2,246 from
+  the middle; pits all round, the front edge in front of his home too; the entrance ramp behind
+  z -2,150. d1's fall at (1,621.9, -930, -1,726) is just past the corner at 135 degrees.
+- **Where his search sees the player.** A search run from inside `Primagen_UpdateMode19` (temporary
+  instrumentation, not committed: the player moved to each spot of a 100-unit grid over the whole
+  floor for one `AI_FindBestTarget`, at the search's own time, so with the grid sections loaded):
+  - while he flies home he is seen from large parts of the floor; the wait condition needs him
+    within 50 of home, and from that point (him at z 2,876 and nearer) **no floor spot sees him**;
+  - at home he steps between two points 15.5 apart (his step per game tick) round (0, 937, 2,918):
+    (-1.8, 2,923.0)/(4.3, 2,907.5) in one run, (6, 2,926)/(-4, 2,913) and (1, 2,933)/(0, 2,916) in
+    others. For these pairs **no solid floor spot sees him** (also with the eye raised 120 and 250,
+    a jump), only spots over the front pits (z 2,200, x -800 and 800-1,000);
+  - which pair he gets depends on where he took off; d1's run had (-0.1, 2,918.0), seen from about
+    (1,240, 560). So whether a wait ends is decided before the player can do anything.
+- **Moving does not help when the pair hides him.** Three drivers, each one whole run (Release):
+  an ellipse round the floor with strafing; a tour of 17 spots (the ones where waits ended in earlier
+  runs first) with 600 frames of strafing at each, 2.5 laps; arcs round his home from radius 1,000
+  to 4,900, 300 apart, clipped to the floor (269 waypoints, 43,100 units, an arc being a strafe that
+  crosses every sight wedge reaching the floor). The stage-2 wait never ended in any (30,000
+  frames). Turning away from him (stick-driven yaw, a test) made even the stage-1 wait endless.
+- **d1's timed strafe (period 90) with only the fall removed** still stops in the stage-2 wait: the
+  driver turned him back from the edge 2 frames earlier, and his hover pair came out different.
+
+### 26.2 The mechanism
+
+- **`T2_MOVE_DRIVE=F1-F2[;...]`** (port/game/t2bosslog.c `T2Port_MovePose`, port/app/game.cpp over
+  d3's `T2_AIM_FIFO` pipe): every frame in the window, one line "move F px py pz rotY bx by bz"
+  (the player's position and yaw, the boss's position, exact hex floats) goes out, and the answer
+  "SX SY C" gives the next frame's C buttons (hex mask, U 8, D 4, L 2, R 1, replacing the
+  script's; "- -" keeps the script's). Input only.
+- **`tools/port/aimdrive.py` `LairDrive`** (`T2_LAIR_DRIVE`): **guard** (the default) answers
+  "keep the script" while the player is inside the floor less 150 and walks him back towards the
+  middle (C buttons from his yaw: forward (-sin, -cos), right (-cos, sin), the strafe direction
+  calibrated from the game's own response) from there until he is 250 further in; **arcs** walks the
+  arcs of 26.1 all the time.
+- **`T2_LAIR_PEEK=W[@F]`** (DEBUG-ONLY, port/game/t2bosslog.c `T2Port_LairPeek`): after W frames of
+  one home wait (mode 25, him within 60 of home), the player is put at the next spot of a list over
+  the front pits for 4 frames (one search), then back where he stood (velocity cleared both times),
+  until the wait ends. It replaces `T2_BOSS_FRONT`'s relocation in the lair (a move to the floor
+  beside the lair for good, which cannot work for these pairs). Each peek is logged (`lairpeek:`).
+- **`fullrun.py`**: without `--cheats-on 4`, the lair gets the guard driver, the strafing with
+  period 90 (d1's), `T2_LAIR_PEEK=2400`, the shredder (d1) and no `T2_BOSS_FRONT`. Options:
+  `--lair-drive guard|arcs|none` (none: the round-14 strafing and `T2_BOSS_FRONT`), `--lair-peek W`,
+  `--lair-strafe P[,S]`. With `--cheats-on 4` nothing changes.
+
+### 26.3 The run (Linux, PIE, Release and Debug)
+
+Two runs identical (every `progress`, `event`, `pickup`, `hurt`, `death`, `bosstrace` and
+`lairpeek` line, and all 580,000 `T2_DET_LOG` lines). A Release build with
+`-DT2_AUTO_VAR_INIT=none` gives the same 580,000 det lines (d5's fixes hold after the merge).
+
+| | frame | |
+|---|---|---|
+| the City Totem (110) | 88,716 | the only lives lost in the run: 2 (as in round 14) |
+| the Mother (3), shredder | dead by ~204,800 | 5 hits, 53 damage, lowest health 147, 0 lives |
+| the lair (4) | 223,647 | the stage-1 wait ends by the strafing (227,824) |
+| stage-2 wait | 231,956 | ended by peek 0 from (800, 2,200) after 2,400 frames (234,860) |
+| stage-3 wait | 238,654 | ended by peek 1 from (-800, 2,200) (241,614) |
+| the Primagen dead (mode 29) | 245,402 | lair: 21 hits, 124 damage, lowest health 23, 0 lives; the guard drove 224 frames |
+| END 2 (`ending 0/1`, cinema 130) | 252,194 | then the credits |
+| the hub | 266,292 | exit 0 |
+
+Screenshots (640x480, `--draw` with `T2_DRAW_FROM` windows of the no-invincibility run under the driver, same gameplay lines as the undrawn run; checked by eye, not committed): **the Mother fought without invincibility**, a shredder disc on her with the HUD at 180 health (199,251), and her wounded phase cinemas (198,500, 202,050); **the Primagen in his lair** up close with a disc on him, HUD 124 (230,101); **a lair peek**: the view from over the front pit towards his home in the back structure, HUD 104 (234,861, the frame his stage-2 wait ends); the good ending: Adon (248,553), Turok before the portal (251,053); the credits' "TUROK 2 TEAM" over the Lightship (252,503).
+
+Robustness (the same command plus an option, one run each): **`--walk 2`**: END 2, the Primagen
+dead at 241,138, one peek (the guard drove 768 frames), lives lost: the City Totem 1 and one in
+level 5's 164. **`--stick-aim 3`**: END 2, one peek. **`--real-weapons 1`**: game over in 124 at
+150,990 before the lair, as in d2's run (25.5).
+
+### 26.4 What remains, and next
+
+- The aids in the lair now: the aim assist on his node, the shredder from the schedule and
+  `T2_FILL_AMMO`, and the peeks. The peeks stand for a sight line the floor does not give: the N64
+  code against the N64 geometry (21.1), unless the N64 hovers elsewhere. Checking that needs an N64
+  trace of a lair wait (his two hover points, mupen64plus) against the port's.
+- `--real-weapons 1` needs health before 124 (25.5).
