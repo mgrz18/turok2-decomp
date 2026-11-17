@@ -495,6 +495,78 @@ f32 T2Port_Atan2f(f32 y, f32 x) {
     return T2Aim_Atan2f(y, x);
 }
 
+/* T2_AIM_SKIP_TYPES=T[,T...] (DEBUG-ONLY, round 16 e5): the aims never pick an actor of these
+ * intelligence types. Doors (type 6) are "live" actors too (health, flag 0x100): in level 2's 133 the
+ * nearest-actor aim of a --real-weapons run spent the shotgun's shells and the grenades on doors 27
+ * and 28 beside the player, while the zombies (5 health) that open them walked up untouched. */
+static int aimSkipType(s32 type) {
+    static int sInit, sN;
+    static s32 sTypes[8];
+    int k;
+    if (!sInit) {
+        const char *e = getenv("T2_AIM_SKIP_TYPES");
+        sInit = 1;
+        while (e != NULL && *e != '\0' && sN < 8) {
+            sTypes[sN++] = (s32) atoi(e);
+            e = strchr(e, ',');
+            if (e != NULL) {
+                e++;
+            }
+        }
+    }
+    for (k = 0; k < sN; k++) {
+        if (sTypes[k] == type) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/* T2_FIRE_GATE=L[,L...][@R] (DEBUG-ONLY, round 16 e5): in these levels, while an aim window is open
+ * (T2_AIM_ENEMY / T2_AIM_NODE pick a target), the input's fire button (Z) is held back unless the
+ * aimed actor is awake (AI mode != 0) and within R (default 1,500): a --real-weapons run's fire taps
+ * no longer spend the ammo on sleeping or far actors (level 2's sisters). Outside the aim windows
+ * and the levels the input is untouched. */
+static int sAimCallFrame = -1000, sAimOkFrame = -1000;
+
+static f32 T2Port_FireGateRange(void) {
+    static f32 sR = -1.0f;
+    if (sR < 0.0f) {
+        const char *e = getenv("T2_FIRE_GATE");
+        e = e != NULL ? strchr(e, '@') : NULL;
+        sR = e != NULL ? (f32) atof(e + 1) : 1500.0f;
+    }
+    return sR;
+}
+
+static int T2Port_FireGateLevel(void) {
+    static int sInit, sN;
+    static s32 sLevels[8];
+    int k, in = 0;
+    if (!sInit) {
+        const char *e = getenv("T2_FIRE_GATE");
+        sInit = 1;
+        while (e != NULL && *e != '\0' && *e != '@' && sN < 8) {
+            sLevels[sN++] = (s32) atoi(e);
+            e = strpbrk(e, ",@");
+            if (e != NULL && *e == ',') {
+                e++;
+            }
+        }
+    }
+    for (k = 0; k < sN; k++) {
+        in |= sLevels[k] == (s32) gScene.m_nLevel;
+    }
+    return in;
+}
+
+int T2Port_FireGate(int frame) {
+    if (!T2Port_FireGateLevel() || frame - sAimCallFrame > 3) {
+        return 1;
+    }
+    return frame - sAimOkFrame <= 3;
+}
+
 int T2Port_AimNode(int frame, const char *spec) {
     static s32 sLastMask = -1;
     static int sLastFrame;
@@ -544,6 +616,12 @@ int T2Port_AimNode(int frame, const char *spec) {
         if (o == pl || o == sAimSkip || o->header.m_pIntelligence == NULL || o->m_AI.m_Health <= 0 || !(o->m_dwFlags & 0x100)) {
             continue;
         }
+        if (aimSkipType((s32) o->header.m_pIntelligence->m_Type)) {
+            continue;
+        }
+        if (o->m_AI.m_Mode == 0 && T2Port_FireGateLevel()) {
+            continue; /* T2_FIRE_GATE: a sleeping actor is never the target (its fire would be held back) */
+        }
         if (sAimPoolOnly && i < gScene.m_nActors) {
             continue;
         }
@@ -575,8 +653,16 @@ int T2Port_AimNode(int frame, const char *spec) {
             bestNode = nodeMask;
         }
     }
+    sAimCallFrame = frame;
     if (best == NULL) {
         return 0;
+    }
+    if (best->m_AI.m_Mode != 0) {
+        dx = best->header.m_vPos.x - pl->header.m_vPos.x;
+        dz = best->header.m_vPos.z - pl->header.m_vPos.z;
+        if (dx * dx + dz * dz < T2Port_FireGateRange() * T2Port_FireGateRange()) {
+            sAimOkFrame = frame;
+        }
     }
     {
         extern int T2Port_AimReport(int frame, f32 x, f32 y, f32 z);
