@@ -173,7 +173,7 @@ class Tracer:
         self.r, self.o, self.s, self.actors, self.out = ram, offs, syms, actors, out
         self.last_gf = None
         self.watch = set()
-        self.raw, self.raw_level, self.raw_gfs = None, None, []
+        self.raw, self.raw_level, self.raw_gfs, self.raw_done = None, None, [], False
 
     def actor(self, h, a, kind, i, verbose):
         r, o = self.r, self.o
@@ -233,6 +233,8 @@ class Tracer:
             li = r.u32(li + o["li_next"][0])
             k += 1
         self.raw.flush()
+        if gf >= max(b for (_, b) in self.raw_gfs):
+            self.raw_done = True  # the last frame asked for: main() stops the emulator
 
     def frame(self, n):
         r, o, s = self.r, self.o, self.s
@@ -543,7 +545,7 @@ def main():
         if not use_bp:
             do_pokes()  # --warp/--poke from the frame callback (--at vi: no debugger, fast)
             trace()
-        if n >= a.to:
+        if n >= a.to or ("t" in state and state["t"].raw_done):
             core.CoreDoCommand(R.M64CMD_STOP, 0, None)
 
     # the debugger: the core pauses on the breakpoint and calls dbg_update(pc) from its own thread;

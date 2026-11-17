@@ -361,7 +361,7 @@ def run_both(a):
     if not a.skip_n64:
         cmd = ["xvfb-run", "-a", "-s", "-screen 0 1024x768x24", sys.executable,
                os.path.join(HERE, "n64trace.py"), "--rom", a.rom, "--out", os.path.join(a.work, "emu"),
-               "--to", str(a.n64_at + a.n64_frames + 4 * last), "--from", str(a.n64_at),
+               "--to", str(a.n64_at + a.n64_frames + 2 * last), "--from", str(a.n64_at),
                "--start-warp=%d@%d" % (a.warp, a.n64_at),
                "--raw", "%s:%d:%s" % (n64raw, a.level, gfs)]
         if rng:
@@ -406,15 +406,15 @@ def main():
             p.add_argument("n64")
             p.add_argument("port")
         else:
-            p.add_argument("--warp", type=int, required=True, help="the warp id (7602 the lair, -4 the Mother)")
-            p.add_argument("--level", type=int, required=True, help="the level the warp leads to")
+            p.add_argument("--warp", type=int, required=True, help="the warp id (7602 the lair; -(L+1) level L at its default spawn: -61 the hub)")
+            p.add_argument("--level", type=int, required=True, help="the level the warp leads to (gScene.m_nLevel: 4 the lair, 60 the hub)")
             p.add_argument("--work", required=True, help="a scratch dir for the dumps and logs")
             p.add_argument("--port", default=os.path.join(ROOT, "OUT/build/app/turok2"))
             p.add_argument("--archive", default=os.path.join(ROOT, "OUT/turok2.o2r"))
             p.add_argument("--rom", default=os.path.join(ROOT, "baserom.us.z64"))
             p.add_argument("--n64-at", type=int, default=600, help="emulator frame of --start-warp")
             p.add_argument("--port-at", type=int, default=1200, help="port frame of T2_START_WARP")
-            p.add_argument("--n64-frames", type=int, default=600, help="emulator frames allowed for the load")
+            p.add_argument("--n64-frames", type=int, default=1500, help="emulator frames allowed for the load (it stops at the last dump)")
             p.add_argument("--port-frames", type=int, default=1200, help="port frames allowed for the load")
             p.add_argument("--rng", default="12345678", help="gRandomValue set on both sides ('' keeps each)")
             p.add_argument("--rng-gf", type=int, default=1, help="the level's game frame at which both sides set it")
