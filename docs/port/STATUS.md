@@ -180,7 +180,9 @@ command's `playthrough.txt` and `teleport.env` were byte-identical to 8b42da15's
    pipe) for the 18 same-floor teleports of levels 1-2 that a plain walk cannot replace, then the
    other levels.
 4. **Real weapons in levels 2-6**: health before 124 so that `--real-weapons 1` finishes, then
-   the pickups of the later levels (PLAYTHROUGH.md 25.5).
+   the pickups of the later levels (PLAYTHROUGH.md 25.5). Round 16 e5: `--real-weapons 1` reaches
+   END 2 (the shredder at the Blind One) and sister 1 dies on picked-up weapons; sister 2 (134) and
+   levels 3-6 remain (PLAYTHROUGH.md 27-e5).
 5. **The Mother's phase 0**: the player cannot move there in the port; check on the N64.
 6. **The particle-pool hash that changes between runs** (section 2): find the field (free slots
    keep their last values; an uninitialised or time-dependent value?).
@@ -189,6 +191,39 @@ command's `playthrough.txt` and `teleport.env` were byte-identical to 8b42da15's
    capture, F11, vsync with `--pace`, the feel of the mouse and the sticks).
 8. Still open from round 14: the obj-230 double fire and the Blind One's margin (c1), 119's moving
    platforms (c2), `t2audio_test`'s game-path mode, soak.py on macOS.
+
+## Round 16, part e5: real weapons, `--real-weapons 1` to END 2, sister 1 on picked-up weapons (branch names-R16_e5)
+
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) section 27-e5.
+
+- **`--real-weapons 1` reaches the good ending** (the default `--all` options plus
+  `--real-weapons 1`, Linux Release PIE, under `aimdrive.py`, `--frames 290000`): all five totems,
+  the four bosses, END 2 (`ending 0/1`, cinema 130) at 252,980, the credits, the hub at 267,078; 2
+  lives lost, both at the City Totem, as in the default run. Two runs identical. The game over at
+  124 came from the Blind One: her minions (intelligence 7401) bite the player on the ledge until
+  she dies; with the scorpion launcher that cost 121 health (25 left), with **the shredder (9),
+  now scheduled for her arena in any `--real-weapons` run** (`BLIND_WEAPON_AFTER`), 32 (114 left,
+  she dies 1,500 frames earlier). No health lies between the Cave Totem and 124 (124's objects 543
+  are life forces); the object -> pickup id map is cart entry 2 (27-e5.1 lists the health ids).
+- **Sister 1 (133) dies on picked-up weapons** (`--real-weapons 1,2`): the aims had been shooting
+  doors 27/28 and sleeping zombies. New DEBUG-ONLY switches (port only): `T2_AIM_SKIP_TYPES=6`
+  (the aims never pick a door) and `T2_FIRE_GATE=L,...[@R]` (in these levels, inside an aim window,
+  the input's Z is held back unless the aimed actor is awake and within R; sleeping actors are not
+  targets). With them, 133 as `L2_133_REAL` (zombies 22-24 with the mag 60, the shotgun and the
+  mag 60 picked up between the fights, the grenade launcher on her): 133 with no death (lowest 16),
+  sister 1 dead at 43,500. **Sister 2 (134) is not won yet** (the zombies take 131's ammo before
+  gate 8 opens): `--real-weapons 1,2` still ends in game over in 134.
+- **The default command is unchanged**: `playthrough.txt`, `teleport.env` and `fullrun.txt` are
+  byte-identical to 5d835e51's (`cmp`), and the new switches are inert without their env lines.
+- Not started: levels 3-6 on picked-up weapons (task 3).
+
+Files for the merge: `tools/port/fullrun.py` (`BLIND_WEAPON_AFTER` and its line in `main_all`'s
+level-4 part; `L2_TAPS`, `L2_133_REAL`, `L2_STRETCH_REAL`, `L2_ARMS[6]`/`[8]`, the `2 in real`
+block before level 2's `level_segments`), `port/game/t2bosslog.c` (`aimSkipType`,
+`T2Port_FireGate*` before `T2Port_AimNode`, two checks in its actor loop, `sAimCallFrame`/
+`sAimOkFrame` after it), `port/app/game.cpp` (`ContRead`: the script's Z through
+`T2Port_FireGate`; one declaration). e2 touches the same aim code (`t2bosslog.c`) and the fire:
+`T2_FIRE_GATE` should give way to e2's driver-controlled fire when both are in.
 
 ## Round 15, part d5: the -O2 uninitialised read found, clean errors, teleports counted (branch names-R15_d5)
 
