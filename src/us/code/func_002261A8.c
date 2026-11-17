@@ -70,6 +70,9 @@ typedef struct {
     /* 0x54 */ f32 z2;
 } Element;
 
+#ifdef TARGET_PORT
+int T2Port_LegacyIntel9(void); /* port/game/t2debug.c */
+#endif
 void CScene__DecompressIntelligence(sptr unused, void ***resource) __attribute__((section(".text_vm")));
 
 void CScene__DecompressIntelligence(sptr unused, void ***resource) {
@@ -109,6 +112,20 @@ void CScene__DecompressIntelligence(sptr unused, void ***resource) {
                 case 10:
                     break;
             }
+#ifdef TARGET_PORT
+            /* The port (round 17 f3, tools/port/n64cmp.py): the archive's swap plan has no struct for
+             * the type-9 (interactive anim) body (tools/assets/swap_spec.json, "no struct yet"), so its
+             * three words (the type flags, the start animation id, 0) stayed big-endian: on a
+             * little-endian host InteractiveAnim_Advance took 0xFD530000 for animation 0x53FD and the
+             * flag tests (m_dwTypeFlags & 1, ...) read the wrong bits. Swapped here, once per load.
+             * T2_LEGACY_INTEL9=1 (DEBUG-ONLY) keeps the old bytes. */
+            if (e->type == 9 && !T2Port_LegacyIntel9()) {
+                u32 *w = (u32 *) ((u8 *) e + 0x14);
+                w[0] = __builtin_bswap32(w[0]);
+                w[1] = __builtin_bswap32(w[1]);
+                w[2] = __builtin_bswap32(w[2]);
+            }
+#endif
         }
     }
 }

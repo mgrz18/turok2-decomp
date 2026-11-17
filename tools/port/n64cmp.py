@@ -71,7 +71,7 @@ class Leaf:
         self.path, self.off, self.size, self.kind, self.bit, self.width = path, off, size, kind, bit, width
 
 
-def layouts(args, types, maxarr):
+def layouts(args, types, maxarr, all_union=False):
     """{type: [Leaf]} for one target: every scalar member path (arrays of scalars element by
     element up to maxarr, records and arrays of records recursively, union members all)."""
     import clang.cindex as ci
@@ -109,8 +109,37 @@ def layouts(args, types, maxarr):
             return "i"
         return None
 
+    def anon_base(rec, anon):
+        """The offset of an anonymous struct/union member of rec (libclang lists it as a
+        STRUCT_DECL/UNION_DECL child, with no FIELD_DECL): through its first named field."""
+        for g in anon.get_children():
+            if g.kind == ci.CursorKind.FIELD_DECL and g.spelling:
+                return (rec.type.get_offset(g.spelling) - anon.type.get_offset(g.spelling)) // 8
+            if g.kind in (ci.CursorKind.STRUCT_DECL, ci.CursorKind.UNION_DECL) and g.is_anonymous():
+                b = anon_base(anon, g)
+                if b is not None:
+                    inner = anon_base(rec, g)
+                    return inner - b if inner is not None else None
+        return None
+
     def walk(rec, prefix, base, out, depth):
+        seen = False
         for f in rec.get_children():
+            if rec.kind == ci.CursorKind.UNION_DECL and not all_union:
+                # a union: only its first member (the other views read the same bytes in another
+                # width, which differs between the byte orders by design)
+                if f.kind not in (ci.CursorKind.FIELD_DECL, ci.CursorKind.STRUCT_DECL, ci.CursorKind.UNION_DECL):
+                    continue
+                if f.kind != ci.CursorKind.FIELD_DECL and not f.is_anonymous():
+                    continue
+                if seen:
+                    continue
+                seen = True
+            if f.kind in (ci.CursorKind.STRUCT_DECL, ci.CursorKind.UNION_DECL) and f.is_anonymous():
+                b = anon_base(rec, f)
+                if b is not None and b >= 0:
+                    walk(f, prefix, base + b, out, depth + 1)
+                continue
             if f.kind != ci.CursorKind.FIELD_DECL:
                 continue
             boff = f.get_field_offsetof()
@@ -399,21 +428,22 @@ def main():
         p.add_argument("--build", default=os.path.join(ROOT, "OUT/build"), help="for the host compile flags")
         p.add_argument("--gf", default="", help="game frames: GF[-GF2][,...]")
         p.add_argument("--only", default="", help="record kinds: SCN,PLR,CAM,LVL,DYN")
-        p.add_argument("--skip", default="", help="member path prefixes to ignore, comma-separated")
+        p.add_argument("--skip", default="_pad", help="member names or path prefixes to ignore, comma-separated (default: the padding)")
         p.add_argument("--tol", type=float, default=0.0, help="relative float tolerance (0: exact)")
         p.add_argument("--per-object", type=int, default=6, help="members shown per object")
         p.add_argument("--all-fields", action="store_true")
         p.add_argument("--max-lines", type=int, default=400)
         p.add_argument("--summary", type=int, default=40)
         p.add_argument("--maxarr", type=int, default=64, help="scalar array elements compared")
+        p.add_argument("--all-union", action="store_true", help="every member of a union, not only the first")
     a = ap.parse_args()
     if a.cmd == "run":
         n64raw, portraw = run_both(a)
     else:
         n64raw, portraw = a.n64, a.port
     types = sorted(set(TYPES.values()))
-    a.lay_n64 = layouts(N64_ARGS, types, a.maxarr)
-    a.lay_host = layouts(host_args(a.build), types, a.maxarr)
+    a.lay_n64 = layouts(N64_ARGS, types, a.maxarr, a.all_union)
+    a.lay_host = layouts(host_args(a.build), types, a.maxarr, a.all_union)
     for t in types:
         print("n64cmp: %-20s N64 %6d members, 0x%x bytes; host %6d members, 0x%x bytes" % (
             t, len(a.lay_n64[t][0]), a.lay_n64[t][1], len(a.lay_host[t][0]), a.lay_host[t][1]), file=sys.stderr)

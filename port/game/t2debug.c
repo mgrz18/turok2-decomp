@@ -1544,3 +1544,16 @@ int T2Port_LegacyShake(void) {
     }
     return s;
 }
+
+/* T2_LEGACY_INTEL9=1 (DEBUG-ONLY, round 17 f3): the type-9 (interactive anim) intelligence bodies left
+ * big-endian as before round 17 (CScene__DecompressIntelligence, func_002261A8.c / func_00465B04.c):
+ * the props then start on animation 0 instead of their own, and their type-flag tests read the wrong
+ * bits. A player gets the swapped (N64) values. */
+int T2Port_LegacyIntel9(void) {
+    static int s = -1;
+    if (s < 0) {
+        const char *e = getenv("T2_LEGACY_INTEL9");
+        s = e != NULL && *e != '0';
+    }
+    return s;
+}
