@@ -2931,3 +2931,85 @@ and `aimdrive.py` answers it exactly as before (no `T2_WALK_PLAN`: the lair driv
 the player would jump; the fifo answer carries only the C buttons and the stick, not R) and warps;
 "no path, same floor" are floors split by water or by a region-flag boundary. A path in the mesh is
 not a walk: doors, gates, cages, crypts and graves are static objects or actors.
+
+## 31. The round-16 merge: one input protocol, the option runs, the route on the N64's RNG (Phase 7 round 16, the merge C31)
+
+The merge of e1 (section 27), e4 (MACOS.md 18), e2 (28), e5 (29) and e3 (30). The default
+command (STATUS.md section 1) is round 15's plus `T2_LEGACY_SHAKE=1` and gives round 15's run
+frame for frame (580,000 det lines, md5 `ecb9f9f2…`, three runs).
+
+### 31.1 One answer protocol for the input pipe
+
+Three drivers answer the game's `aim` and `move` lines: AimDrive (round 15 d3, e2), LairDrive
+(C30) and WalkDrive (e3). Before the merge each line kind had its own third field: an `aim` answer
+`SX SY Z` (0/1, e2), a `move` answer `SX SY C` (a hex C mask, C30 and e3), and e5's fire gate
+worked on the script's Z beside them. Now every answer is
+
+```
+SX SY [cH] [z0|z1] [r0|r1]
+```
+
+the stick (or `- -`), then tokens that each set one button group over the script's for the next
+frame: `cH` the C buttons (U 8, D 4, L 2, R 1), `z` the Z trigger (fire), `r` the R trigger
+(jump). A group no token names stays the script's; when an `aim` and a `move` line go out in one
+frame their tokens add up. In `game.cpp`, `AimFifoButtons` parses the tokens into a mask and
+values and `AimFifoApply` puts them over the pad in both pad paths (`ContRead`,
+`ContReadHeadless`); `ScriptedButtonsGated` applies e5's `T2_FIRE_GATE` to the script's Z unless
+the driver sets Z itself. AimDrive answers `SX SY [zN]`, LairDrive `- - cH`, WalkDrive
+`SX 0 cH [r1]`. The default run and `--stick-aim 2 --assist-keep 110` give the same det lines
+before and after the change.
+
+### 31.2 Checks
+
+- `n64viewcheck.py` has a **cast** kind for e1's bug (`f2 = (Floats *) &view->m_Shake;
+  f2->unk14 = one;`): an `include/` struct pointer cast to a view struct of the file, the view's
+  fields used through the cast judged at their N64 offsets. It reports 1 site (e1's legacy store)
+  and found `GameObject_IsSolid`'s `{pad[0x1C]; u32 flags}` view of a `CAIModeInfo` row (host
+  `unk_1C` at 0x30): fixed, behaviour of the default run unchanged.
+- `CShake__Set` / `CShake__Advance`: no caller in the ELF (`jal`, data words, `%hi/%lo`): left.
+- asm_diff 0 after each merge and at the end; a clean N64 build verifies; the archive is
+  unchanged; `mklayout.py --check` is up to date; gendata from the json and from the ELF give the
+  same sources.
+
+### 31.3 The validated runs (Linux Release, under `aimdrive.py`, 290,000 frames)
+
+Each is `playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6` plus the options, then
+STATUS.md section 1's game line (`T2_DET_LOG=1 T2_PROGRESS_LOG=1 T2_HURT_LOG=1`):
+
+| options | END 2 (cinema 130) | totems | lives lost | det md5 |
+|---|---|---|---|---|
+| (none) | 252,194 | 11111 | 2 (City Totem) | `ecb9f9f2…` x3 |
+| `--real-weapons 1` | 252,980 | 11111 | 2 (City Totem) | `3cb702ff…` x2 (one drawn) |
+| `--stick-aim 2 --assist-keep 110` | 253,788 | 11111 | 2 (City Totem, level 5) | `9432c11d…` x3 |
+| `--nav 1,2,3,4` | 250,970 | 11111 | 3 (City Totem, the lair 2) | `8702568d…` |
+| `--real-weapons 1 --stick-aim 2 --assist-keep 110` | cinema 130 at 254,756 | **10111** | 2 (City Totem) | `42420c22…` |
+
+The combination plays both sisters by stick and level 1 on its own weapons, but the City Totem
+is lost (2 lives there), so it ends without all five totems: not the good ending.
+
+### 31.4 The route on the N64's random numbers (`--n64-shake`)
+
+`fullrun.py --n64-shake` leaves `T2_LEGACY_SHAKE` out (the N64's camera shake and random
+stream). The default route on it:
+
+- the schedule drifts by ~500 frames by level 2 (132 at 61,649 instead of 61,163);
+- level 2's graveyard (135) costs more: the two crypt-zombie fights (zombie 45, steps 3,200-5,700;
+  zombie 44, 6,100-8,600) take ~15 more health than on the old stream, and the player enters the
+  crypt-key steps (8,700-9,300) with ~40 health; the zombies there kill him at 72,371 (a life
+  lost; the old stream left 59 health at the end of 135);
+- the route then falls out of step (the City Totem is never reached), and two more lives go in
+  125 (109,940 and 154,972: game over).
+
+Two `N64_L2_STRETCH` attempts (longer fire windows on the crypt zombies, as `L2_STRETCH`): +800
+frames on zombie 44 moved the first death to 73,313; +1,000 on zombies 45 and 44 lost two lives in
+135. `N64_L2_STRETCH` is left empty. The boss recipes on this stream: the Mother dies at 32,557
+(28,775 on the old one), the Blind One at 23,103 (the same frame), the Queen at 26,583 (28,143);
+the Primagen recipe does not kill him in 62,000 frames (his home waits). The default stays on
+`T2_LEGACY_SHAKE=1`; play mode has the N64's shake.
+
+### 31.5 Integrated runs
+
+STATUS.md section 2: the level runs and the boss recipes (with `T2_LEGACY_SHAKE=1`) are round
+15's det line for det line; the boot with the variable is too, without it only `rng` and the
+particles change; demos 1 and 3 still match the N64's RAM in every field but `rng`; save, title,
+load; the audio boot; padtest; the clean errors; soak (0 crashes in 62 runs).
