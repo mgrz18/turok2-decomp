@@ -629,6 +629,7 @@ void T2Port_WakeEnemies(int frame, const char *spec) {
  * aim at a moving enemy from a script. Not a game option. */
 extern f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);
 int T2Port_AimReport(int frame, f32 x, f32 y, f32 z);
+void T2Port_AimCand(int frame, CGameObjectInstance *o, f32 x, f32 y, f32 z, f32 d2, int kind);
 void T2Port_FaceNearest(int frame, const char *spec) {
     static CGameObjectInstance *sLast;
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
@@ -676,6 +677,9 @@ void T2Port_FaceNearest(int frame, const char *spec) {
         dx = o->header.m_vPos.x - pl->header.m_vPos.x;
         dz = o->header.m_vPos.z - pl->header.m_vPos.z;
         d = dx * dx + dz * dz;
+        if (d < r * r) {
+            T2Port_AimCand(frame, o, o->header.m_vPos.x, o->header.m_vPos.y + 50.0f, o->header.m_vPos.z, d, 1);
+        }
         if (o == sLast) {
             lastD = d;
         }
@@ -697,6 +701,9 @@ void T2Port_FaceNearest(int frame, const char *spec) {
             dx = o->header.m_vPos.x - pl->header.m_vPos.x;
             dz = o->header.m_vPos.z - pl->header.m_vPos.z;
             d = dx * dx + dz * dz;
+            if (d < r * r) {
+                T2Port_AimCand(frame, o, o->header.m_vPos.x, o->header.m_vPos.y + 50.0f, o->header.m_vPos.z, d, 1);
+            }
             if (o == sLast) {
                 lastD = d;
             }
@@ -1349,6 +1356,67 @@ void T2Port_AnimEventLog(void *obj, void *anim, int i, int frame, float from, fl
 static int sAimHave;
 static CVector3 sAimPt;
 
+/* Round 16 e2: the candidate targets. While T2_AIM_STICK is on, the assists also hand every target
+ * they would accept (their own filters: live, in range, the boss phase's node boxes) to
+ * T2Port_AimCand; the nearest AIM_CAND_MAX go out after the chosen target on the "aim" line, so the
+ * driver can pick its own (the one nearest the crosshair, the one that threatens) and see each one's
+ * health. id: the level actor's index, or 10000 + the instance pool slot (a spawned enemy). */
+#define AIM_CAND_MAX 12
+typedef struct {
+    int id;
+    f32 x, y, z, d2;
+    s32 hp;
+    int kind; /* 1: the assist's own choice set; 0: a threat outside it (t2bosslog.c) */
+} T2AimCand;
+static T2AimCand sCand[AIM_CAND_MAX];
+static int sCandN, sCandFrame = -1;
+int T2Port_AimStickOn(int frame);
+
+void T2Port_AimCand(int frame, CGameObjectInstance *o, f32 x, f32 y, f32 z, f32 d2, int kind) {
+    int id = -1, k, at;
+
+    if (!T2Port_AimStickOn(frame)) {
+        return;
+    }
+    if (frame != sCandFrame) {
+        sCandFrame = frame;
+        sCandN = 0;
+    }
+    if (gScene.m_pActors != NULL && o >= gScene.m_pActors && o < gScene.m_pActors + gScene.m_nActors) {
+        id = (int) (o - gScene.m_pActors);
+    } else {
+        for (k = 0; k < 32; k++) {
+            if (o == &gScene.m_InstancePool.m_Instances[k].m_Instance) {
+                id = 10000 + k;
+                break;
+            }
+        }
+    }
+    for (k = 0; k < sCandN; k++) {
+        if (sCand[k].id == id) {
+            return; /* reported by two assists in one frame: the first */
+        }
+    }
+    for (at = sCandN; at > 0 && sCand[at - 1].d2 > d2; at--) {
+    }
+    if (at >= AIM_CAND_MAX) {
+        return;
+    }
+    for (k = (sCandN < AIM_CAND_MAX ? sCandN : AIM_CAND_MAX - 1); k > at; k--) {
+        sCand[k] = sCand[k - 1];
+    }
+    sCand[at].id = id;
+    sCand[at].x = x;
+    sCand[at].y = y;
+    sCand[at].z = z;
+    sCand[at].d2 = d2;
+    sCand[at].hp = o->m_AI.m_Health;
+    sCand[at].kind = kind;
+    if (sCandN < AIM_CAND_MAX) {
+        sCandN++;
+    }
+}
+
 int T2Port_AimStickOn(int frame) {
     static const char *spec;
     static int init;
@@ -1397,9 +1465,22 @@ int T2Port_AimPose(int frame, char *buf, int n) {
         return 0;
     }
     pl = &p->m_CharacterActor;
-    snprintf(buf, n, "aim %d %a %a %a %a %a %a %a %a %a %a %a\n", frame, pl->header.m_vPos.x, pl->header.m_vPos.y,
-             pl->header.m_vPos.z, pl->m_RotY, p->m_pCamera->m_vPos.x, p->m_pCamera->m_vPos.y, p->m_pCamera->m_vPos.z,
-             p->m_pCamera->m_ViewParams.m_vRotOffset.x, sAimPt.x, sAimPt.y, sAimPt.z);
+    {
+        /* round 16 e2: then "n" and the candidates, "id x y z hp kind" each (nearest first), and the
+         * player's health */
+        int len = snprintf(buf, n, "aim %d %a %a %a %a %a %a %a %a %a %a %a", frame, pl->header.m_vPos.x,
+                           pl->header.m_vPos.y, pl->header.m_vPos.z, pl->m_RotY, p->m_pCamera->m_vPos.x,
+                           p->m_pCamera->m_vPos.y, p->m_pCamera->m_vPos.z, p->m_pCamera->m_ViewParams.m_vRotOffset.x,
+                           sAimPt.x, sAimPt.y, sAimPt.z);
+        int k, cn = sCandFrame == frame ? sCandN : 0;
+        len += snprintf(buf + len, n - len, " %d", cn);
+        for (k = 0; k < cn && len < n - 80; k++) {
+            len += snprintf(buf + len, n - len, " %d %a %a %a %d %d", sCand[k].id, sCand[k].x, sCand[k].y,
+                            sCand[k].z, (int) sCand[k].hp, sCand[k].kind);
+        }
+        snprintf(buf + len, n - len, " hp %d\n", (int) (p->m_Data.m_Health >> 8));
+        sCandN = 0;
+    }
     return 1;
 }
 

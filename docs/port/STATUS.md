@@ -262,6 +262,40 @@ branch that writes `teleport.env` another way, or runs the boss recipes by hand,
 animation 0, displaced) with `T2_START_WARP` + `T2_RNG_SET` against `--start-warp` + `--poke`, a
 field-by-field lair comparison now that both sides can start the same way.
 
+## Round 16, part e2: the stick driver picks its own target and fires (branch names-R16_e2)
+
+New in this branch (details in [PLAYTHROUGH.md](PLAYTHROUGH.md) section "27-e2"):
+
+- **Candidate targets on the `aim` line** (`port/game/t2debug.c` `T2Port_AimCand`, hooks in
+  `T2Port_FaceNearest` and `t2bosslog.c` `T2Port_AimNode`; only inside `T2_AIM_STICK` windows). After
+  the 13 fixed fields: `n`, then `id x y z hp kind` for the nearest 12 targets the assist would
+  accept (`kind 1`), or live enemies outside a boss phase's or a sister fight's set within 600 units
+  (`kind 0`, threats), then `hp H`.
+- **Driver-controlled fire** (`port/app/game.cpp`): the answer `SX SY Z` sets the Z button on that
+  frame (input only). The fifo line buffer grew to 2,048 bytes.
+- **`aimdrive.py`**: `Picker` (the near, the weak and the one under the crosshair first; targets not
+  hurt for 300 frames are left), a lead by the target's velocity over the shot's flight, `Trigger`
+  (Z taps only on target). `T2_AIMD_PICK=0` / `T2_AIMD_FIRE=0` give round 15's behaviour; the
+  tunables are `T2_AIMD_*` (PLAYTHROUGH 27-e2.1). `--stats` logs the chosen id, Z and the candidates;
+  `aimstats.py --stick` counts shots and target switches.
+- **Results** (Linux Release):
+  - **The Sisters of Despair by stick, no `--assist-keep`, no life lost**: 78, 116 and 122 damage
+    (assisted: 131, 144, 156; round 15's stick: 199, 170 + a death, 200 + a death).
+  - **The Blind One by stick still fails** (a flier of phase 5 swoops between 38 and 1,190 units and is
+    hit about once per 300 frames; 1-2 lives lost). `--assist-keep 1` stays.
+  - **`--stick-aim 2 --assist-keep 110` reaches END 2** (F2k): all 5 totems, the 4 bosses, cinema
+    130, the hub, exit 0, 2 lives lost (City Totem, level 5's 124). The sisters cost 78/116/122.
+  - `--stick-aim 2` alone: the City Totem by stick was lost (4 totems, not the good ending).
+  - `--stick-aim 1,2,3,4 --assist-keep 1`: every fight of levels 1-4 cheaper than assisted, no life lost
+    through level 4 (the City Totem won with no death); then 2 lives in level 5's 117 (a knife edge
+    in the assisted run too: lowest health 3) and the run stopped in 116.
+- The default command: identical gameplay lines to 5d835e51 (md5 `5ed5092b…`), END 2.
+- Files others may touch: `port/app/game.cpp` (`AimStick.zValid/z`, `AimFifoExchange`, `ContRead`,
+  `ContReadHeadless`), `port/game/t2debug.c` (`T2Port_AimCand`, `T2Port_AimPose`, the FaceNearest
+  hooks), `port/game/t2bosslog.c` (`T2Port_AimNode`'s set check), `tools/port/aimdrive.py`,
+  `tools/port/aimstats.py`. No `src/`/`include/` change; `fullrun.py` unchanged (`--env T2_AIMD_*=..`
+  tunes the driver).
+
 ## Round 15, part d5: the -O2 uninitialised read found, clean errors, teleports counted (branch names-R15_d5)
 
 **1. The -O2 uninitialised read (round 14's section 4 item 3) is fixed** ([STABILITY.md](STABILITY.md) 11).

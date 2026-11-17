@@ -373,11 +373,15 @@ bool ScriptedStick(int8_t* x, int8_t* y) {
 // frame, "move F px py pz rotY bx by bz" (t2bosslog.c, T2Port_MovePose: the player and the level
 // boss), and the answer "SX SY C" gives the next frame's C buttons (hex mask of U 8, D 4, L 2, R 1),
 // which replace the script's (aimdrive.py's lair driver; "-" for SX SY keeps the stick).
+// Round 16 e2: an "aim" answer "SX SY Z" also sets the Z button (1 held, 0 released) over the
+// script's, and the aim line carries the candidate targets after the chosen one (T2Port_AimPose).
 struct AimStick {
     bool valid;
     int8_t x, y;
     bool cValid;
     uint16_t c;
+    bool zValid; // round 16 e2: the aim driver's fire button (an "aim" answer's third field, 0 or 1)
+    bool z;
 };
 AimStick sAimStick;
 
@@ -387,6 +391,7 @@ void AimFifoExchange(int frame, const char* dir) {
     static bool broken = false;
     sAimStick.valid = false;
     sAimStick.cValid = false;
+    sAimStick.zValid = false;
     if (broken) {
         return;
     }
@@ -400,7 +405,7 @@ void AimFifoExchange(int frame, const char* dir) {
             return;
         }
     }
-    char line[512];
+    char line[2048]; // round 16 e2: the aim line carries up to 8 candidates
     for (int kind = 0; kind < 2; kind++) {
         if (!(kind == 0 ? T2Port_AimPose(frame, line, sizeof line) : T2Port_MovePose(frame, line, sizeof line))) {
             continue;
@@ -417,6 +422,10 @@ void AimFifoExchange(int frame, const char* dir) {
             sAimStick.valid = true;
             sAimStick.x = (int8_t)sx;
             sAimStick.y = (int8_t)sy;
+        }
+        if (kind == 0 && sscanf(reply, "%*s %*s %x", &c) == 1) { // round 16 e2: Z held (1) or not (0)
+            sAimStick.zValid = true;
+            sAimStick.z = c != 0;
         }
         if (kind == 1 && sscanf(reply, "%*s %*s %x", &c) == 1) {
             sAimStick.cValid = true;
@@ -468,6 +477,10 @@ void ContRead(void* pads) {
                 b = (uint16_t)((b & ~0xFu) | sAimStick.c);
                 memcpy(out, &b, 2);
             }
+            if (sAimStick.zValid) { // round 16 e2: the aim driver's Z
+                b = (uint16_t)((b & ~0x2000u) | (sAimStick.z ? 0x2000u : 0u));
+                memcpy(out, &b, 2);
+            }
             PadLog(b, sx, sy);
         }
         out[i * 6 + 2] = (uint8_t)sx;
@@ -495,6 +508,9 @@ void ContReadHeadless(void* pads) {
     }
     if (sAimStick.cValid) { // T2_MOVE_DRIVE: the driver's C buttons
         b = (uint16_t)((b & ~0xFu) | sAimStick.c);
+    }
+    if (sAimStick.zValid) { // round 16 e2: the aim driver's Z
+        b = (uint16_t)((b & ~0x2000u) | (sAimStick.z ? 0x2000u : 0u));
     }
     PadLog(b, sx, sy);
     memcpy(out, &b, 2);
