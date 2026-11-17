@@ -682,6 +682,10 @@ L2_ARMS = {
     # 130's armory row (y 204.8, z 4736): the mag 60 (5); the tek bow (3), the tranquilizer gun (6), the shotgun
     5: [(-2764.8, 204.8, 4736.0, -1.5708), (-2918.4, 204.8, 4736.0, 1.5708, 78, 60)],
     # 133: the shotgun +10 shells and the mag 60 +bullets: steps of L2_133_REAL (round 16 e5)
+    # round 16 e5: ammo for sister 2 (134) after sister 1 has taken it all: 131's terrace (y 102.4),
+    # bullets x40, shells x3 and explosive shells x3 (130's bullets x40 and shells x10 by its exit,
+    # (6529.9, -3379.2, 478.5) and (6516.3, -3379.2, 2080.0), were not reached by such picks)
+    8: [(2581.0, 102.4, 1159.2, 0.0), (1420.5, 102.4, 1161.3, 0.0), (1971.6, 102.4, 1772.7, 0.0)],
     # not taken: 131's plasma rifle (-1996.8, -1126.4, 5785.6): a death there
 }
 L3_ARMS = {}
@@ -719,7 +723,9 @@ def wheel(weapon, f):
 # a weapon chosen on the wheel before a route step: {(segment index, step index): weapon}
 L2_TAPS = {(4, 0): 8,       # 129's soul gate: the shotgun (the grenade launcher's grenades fly over the gate)
            (6, 2): 4,       # 133's zombies 22-24 (L2_133_REAL): the mag 60 (the pistol's slot)
-           (6, 6): 15}      # 133's sister 1: the grenade launcher
+           (6, 6): 15,      # 133's sister 1: the grenade launcher
+           (9, 0): 4,       # 134's zombies: the mag 60 (the pistol's slot)
+           (9, 3): 8}       # 134's sister 2: the shotgun
 # round 16 e5: 133 in a --real-weapons 1,2 run: the zombies of the second room (22, 23, 24: 80 health
 # each, they open door 28; the nearest awake actor, T2_FIRE_GATE), then sister 1 (20, 50 health). The round-12 steps
 # (the sister aimed from the start, the nearest actor else) spent all the ammo on doors 27 and 28.
