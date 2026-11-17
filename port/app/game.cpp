@@ -44,6 +44,7 @@ void T2Port_ScribbleStack(unsigned value);
 int T2Port_AimNode(int frame, const char *spec);
 void T2Port_BossFront(int frame, const char *spec);
 void T2Port_LairPeek(int frame, const char *spec);
+void T2Port_PrimagenStage(int frame, const char *spec);
 void T2Port_TraceBoss(int frame);
 void T2Port_AimAt(int frame, const char *spec);
 void T2Port_AimEnemy(int frame, const char *spec);
@@ -775,6 +776,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         static const char* lairPeek = getenv("T2_LAIR_PEEK");
         if (lairPeek != nullptr) {
             T2Port_LairPeek(sFrame + 1, lairPeek); // DEBUG-ONLY: T2_LAIR_PEEK=W (round 15 C30)
+        }
+        static const char* primagenStage = getenv("T2_PRIMAGEN_STAGE");
+        if (primagenStage != nullptr) {
+            T2Port_PrimagenStage(sFrame + 1, primagenStage); // DEBUG-ONLY: T2_PRIMAGEN_STAGE=F[,F] (round 16 e1)
         }
         static const char* aimAt = getenv("T2_AIM_AT");
         if (aimAt != nullptr) {

@@ -81,6 +81,9 @@ FIELDS = [
     ("c_ampy", "CCamera", "m_Shake.m_YAxis.m_Amp"),
     ("c_ampz", "CCamera", "m_Shake.m_ZAxis.m_Amp"),
     ("c_pos", "CCamera", "m_vPos"),
+    ("sc_wfade", "CScene", "m_WarpFade"),
+    ("sc_wstate", "CScene", "m_WarpState"),
+    ("sc_wid", "CScene", "m_WarpID"),
 ]
 SIZEOF = ["CGameObjectInstance"]
 HEADERS = ["common.h", "structs/particle.h", "structs/world.h", "structs/player.h", "structs/game.h",
@@ -165,6 +168,7 @@ class Tracer:
     def __init__(self, ram, offs, syms, actors, out):
         self.r, self.o, self.s, self.actors, self.out = ram, offs, syms, actors, out
         self.last_gf = None
+        self.watch = set()
 
     def actor(self, h, a, kind, i, verbose):
         r, o = self.r, self.o
@@ -225,7 +229,8 @@ class Tracer:
         if valid(base):
             for i in range(max(first, 0), min(na, 4096)):
                 a = base + i * stride
-                h = self.actor(h, a, "lvl", i, self.actors and r.u32(a + o["o_intel"][0]) != 0)
+                h = self.actor(h, a, "lvl", i, (self.actors and r.u32(a + o["o_intel"][0]) != 0)
+                               or i in self.watch)
                 cnt += 1
         li = r.u32(sc + o["sc_pool"][0])
         k = 0
@@ -267,6 +272,18 @@ def main():
     ap.add_argument("--calls", default="",
                     help="SYM[,SYM...]: also print 'call: gf G SYM ra RA' each time the CPU enters these "
                          "functions in the traced range (e.g. Random_Next,Random_NextB: who draws a number)")
+    ap.add_argument("--watch", default="",
+                    help="I[,I...] (round 16 e1): the 'det:  lvl I' line of these level actors every game "
+                         "frame, without --actors (e.g. the Primagen: 2 in his lair)")
+    ap.add_argument("--warp", default="",
+                    help="ID[@N] (round 16 e1, the N64 side of T2_WARP_TO): a RAM-poke warp. At emulator frame "
+                         "N (default: 60 game frames into gameplay: mode 13, a level > 0, a player, no warp "
+                         "running) write what CScene__RequestWarp(&gScene, ID, 2) writes: m_WarpState 1, "
+                         "m_WarpFade 2, m_WarpID ID (CPlayer__Warp's hub/key redirects are skipped)")
+    ap.add_argument("--poke", default="",
+                    help="N:SPEC[;N:SPEC...] (round 16 e1): at emulator frame N (at the --at breakpoint, in "
+                         "gameplay) write into RDRAM. SPEC: 'player=x,y,z' (the player's position, velocity "
+                         "cleared), 'lvl=I:hp=V' (level actor I's m_AI.m_Health), 'u32=ADDR:V' or 'f32=ADDR:V'")
     ap.add_argument("--at", default="CEngineApp__Update",
                     help="read the state when the CPU reaches this function (the core's debugger, a "
                          "consistent point of the game loop); 'vi' reads it from the frame callback instead "
@@ -341,11 +358,72 @@ def main():
 
     state = {"n": 0}
 
+    pokes = []
+    for item in filter(None, a.poke.split(";")):
+        n, spec = item.split(":", 1)
+        pokes.append([int(n), spec, False])
+    warp = None
+    if a.warp:
+        wid, _, wat = a.warp.partition("@")
+        warp = {"id": int(wid, 0), "at": int(wat) if wat else None, "gp": None, "done": False}
+
+    def wr32(ram, addr, v):
+        struct.pack_into("<I", ram.m, addr & 0x7FFFFF, v & 0xFFFFFFFF)
+
+    def do_pokes():
+        if not pokes and (warp is None or warp["done"]):
+            return
+        ram = Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM))
+        sc = syms["gScene"]
+        mode = ram.sval(syms["gEngineApp"] + offs["app_mode"][0], offs["app_mode"][1])
+        level = ram.sval(sc + offs["sc_level"][0], offs["sc_level"][1])
+        p = ram.u32(syms["gEngineApp_m_Game"] + offs["game_players"][0])
+        wstate = ram.sval(sc + offs["sc_wstate"][0], 4)
+        gf = ram.u32(syms["gFrameCountGameplay"])
+        play = mode == 13 and level > 0 and valid(p) and wstate == 0
+        if warp is not None and not warp["done"]:
+            if not play:
+                warp["gp"] = None
+            elif warp["gp"] is None:
+                warp["gp"] = gf
+            if play and (state["n"] >= warp["at"] if warp["at"] is not None else gf >= warp["gp"] + 60):
+                wr32(ram, sc + offs["sc_wfade"][0], 2)
+                wr32(ram, sc + offs["sc_wid"][0], warp["id"])
+                wr32(ram, sc + offs["sc_wstate"][0], 1)
+                warp["done"] = True
+                sys.stderr.write("n64trace: frame %d gf %d: warp %d poked in level %d\n" % (
+                    state["n"], gf, warp["id"], level))
+        for pk in pokes:
+            if pk[2] or state["n"] < pk[0] or not (mode == 13 and valid(p)):
+                continue
+            pk[2] = True
+            what, _, val = pk[1].partition("=")
+            if what == "player":
+                act = p + offs["pl_actor"][0]
+                for k, v in enumerate(val.split(",")):
+                    wr32(ram, act + offs["o_pos"][0] + 4 * k, struct.unpack("<I", struct.pack("<f", float(v)))[0])
+                    wr32(ram, act + offs["o_vel"][0] + 4 * k, 0)
+            elif what == "lvl":
+                i, _, hv = val.partition(":hp=")
+                base = ram.u32(sc + offs["sc_actors"][0])
+                ad = base + int(i) * offs["sizeof_CGameObjectInstance"][0] + offs["o_hp"][0]
+                if offs["o_hp"][1] == 2:
+                    o = (ad & 0x7FFFFF) ^ 2
+                    ram.m[o:o + 2] = struct.pack("<h", int(hv))
+                else:
+                    wr32(ram, ad, int(hv))
+            elif what in ("u32", "f32"):
+                ad, _, v = val.partition(":")
+                w = int(v, 0) if what == "u32" else struct.unpack("<I", struct.pack("<f", float(v)))[0]
+                wr32(ram, int(ad, 0), w)
+            sys.stderr.write("n64trace: frame %d gf %d: poke %s\n" % (state["n"], gf, pk[1]))
+
     def trace():
         if state["n"] >= a.start:
             if "t" not in state:
                 state["t"] = Tracer(Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM)), offs, syms,
                                     a.actors, sys.stdout)
+                state["t"].watch = set(int(x) for x in a.watch.split(",") if x)
             state["t"].frame(state["n"])
 
     @FRAMECB
@@ -356,6 +434,7 @@ def main():
         for down, k in events.get(n, ()):
             core.CoreDoCommand(R.M64CMD_SEND_SDL_KEYDOWN if down else R.M64CMD_SEND_SDL_KEYUP, k, None)
         if not use_bp:
+            do_pokes()  # --warp/--poke from the frame callback (--at vi: no debugger, fast)
             trace()
         if n >= a.to:
             core.CoreDoCommand(R.M64CMD_STOP, 0, None)
@@ -373,6 +452,7 @@ def main():
     @PCCB
     def dbg_update(pc):
         if pc == bp_addr:
+            do_pokes()
             trace()
         elif pc in call_at and state["n"] >= a.start:
             if "regs" not in state:
