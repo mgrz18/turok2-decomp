@@ -80,7 +80,8 @@ It runs under `tools/port/aimdrive.py` (the lair driver answers through the inpu
   the weapons and ammo picked up, the wheel through the input; PLAYTHROUGH.md 25),
   `--stick-aim L,...` and `--assist-keep 1,110` (d3: those levels aimed with the stick through
   `aimdrive.py`; PLAYTHROUGH.md 24), `--walk 1,2` and `--walk-probe` (d5: open-floor teleports
-  walked with the stick; PLAYTHROUGH.md 22).
+  walked with the stick; PLAYTHROUGH.md 22). Round 16 e3: `--nav L,...` and `--nav-only L:I.J,...` (route teleports
+  walked by the closed-loop waypoint walker under `aimdrive.py`; PLAYTHROUGH.md 27-e3).
 
 **The level runs and the boss recipes**: round 12's table (below) with round 14's Primagen recipe
 (`T2_WARP_TO=7602 T2_BOSS_FRONT=450,3000,2.5,1`, boss env, `Z@14000..200000` and the lines of
@@ -227,8 +228,10 @@ each walk alone.
 
 **Validated**: the default command (`playthrough.py RUN --all --talismans 2 --cheats-off
 1,2,3,4,5,6` under `aimdrive.py`) writes byte-identical `playthrough.txt`, `teleport.env` and
-`fullrun.txt` to 5d835e51's. Its run on this branch's tools (the 5d835e51 Release binary) reaches
-END 2 (252,194) and the hub (266,292) as in round 15. `--nav 1,2,3,4`: above.
+`fullrun.txt` to 5d835e51's. Run under this branch's `aimdrive.py` (the 5d835e51 Release binary,
+`T2_DET_LOG=1`), it reaches END 2 (252,194) and the hub (266,292) as in round 15. Its 580,000 det lines
+are those of the same run under round 15's `aimdrive.py`, apart from the `ptcl` field (the known
+particle-pool hash, e1's task). `--nav 1,2,3,4`: above.
 
 **For the merge**: tools only, no src/include/port change (no asm_diff needed).
 
