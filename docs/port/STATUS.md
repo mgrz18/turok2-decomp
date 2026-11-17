@@ -330,6 +330,48 @@ python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5
   on part d3's input fifo, which would remove the fall; confirm on the N64 that the player is held
   still in the Mother's phase 0.
 
+## Round 15, part d3: aim assist off, closed-loop stick aiming in levels 1-4 (branch names-R15_d3)
+
+New in this branch (details in [PLAYTHROUGH.md](PLAYTHROUGH.md) section 22):
+
+- **`T2_AIM_STICK=F1-F2[;...]`** (`port/game/t2debug.c`, `t2bosslog.c`). Inside a window,
+  `T2_FACE_NEAREST`, `T2_AIM_AT`, `T2_AIM_ENEMY` and `T2_AIM_NODE` only pick their target and
+  report it. They write no yaw or pitch.
+- **`T2_AIM_FIFO=DIR`** (`port/app/game.cpp`). After each such frame the game writes
+  `aim F px py pz rotY ex ey ez pitch tx ty tz` (exact hex floats) to `DIR/out`. It reads the
+  next frame's stick, `SX SY`, from `DIR/in`. This is input only.
+- **`tools/port/aimdrive.py`** runs the game under the driver:
+  `python3 tools/port/aimdrive.py [--simple] [--stats F] -- turok2 ...`.
+  - The controller is a Smith predictor over the measured stick.
+  - Stick X turns at the cube-law rate (17.1, re-measured exact).
+  - **Stick Y sets a look angle** of -(reading / 80) * pi/2, and the camera pitch eases to it
+    by 5.41 % per tick. It springs back when the stick is released.
+  - The pad is read every second host frame, and a change shows 4 frames later.
+  - It is deterministic: two runs give identical logs.
+- **`fullrun.py --stick-aim L,... [--assist-keep 1,110]`** puts levels 1-4 on the stick. Every fight of
+  another level, and the kept fights, keeps the assist. **`tools/port/aimstats.py`** compares
+  runs fight by fight (`--stick STATS`: the tracking).
+- **Results** (Linux Release; 14 whole-game runs, about 6 minutes each):
+  - Every stick-aimed totem fight of levels 1-4 was won but one: a City Totem at 6/8 with 1 s
+    left. The stick often took less damage than the assist: Harbor 93 against 132, City 58
+    against 150, Marsh 21-72 against 111.
+  - The Sisters of Despair cost 170-200 each against 131-156.
+  - The Blind One by stick was a game over (yaw error 0.63 rad, on target 47 %), so
+    `--assist-keep 1` keeps his assist.
+  - **No `--stick-aim` run reached END 2.** The extra lives (level 2, the Blind One) or the
+    shifted lair timing (the Primagen's stage-3 line-of-sight wait; `--stick-aim 3` stopped there
+    with the lives of the assisted run) end it downstream.
+  - The default command is unchanged: det log identical to 8b42da15, END 2.
+- Files others may touch:
+  - `port/app/game.cpp`: the `AimFifoExchange` block, and the stick override in `ContRead` and
+    `ContReadHeadless`.
+  - `port/game/t2debug.c`: `T2Port_AimReport` hooks in `T2Port_FaceNearest`/`T2Port_AimAt`, and a new
+    block at the end of the file.
+  - `port/game/t2bosslog.c`: one hook in `T2Port_AimNode`.
+  - `tools/port/fullrun.py`: `Route.fights`/`fight_level`, `STICK_AIM`/`ASSIST_KEEP`, two cli
+    options.
+  - New: `tools/port/aimdrive.py`, `tools/port/aimstats.py`.
+
 ## Round 14, part c5: locals read before they are written, a Linux -O2 build, fewer aids in levels 1-2 (branch names-R14_c5)
 
 Details: [STABILITY.md](STABILITY.md) section 10, [PLAYTHROUGH.md](PLAYTHROUGH.md) section 17.

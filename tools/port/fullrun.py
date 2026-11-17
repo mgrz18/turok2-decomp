@@ -26,6 +26,10 @@ import playthrough as pt  # noqa: E402
 import routes56 as r56  # noqa: E402
 
 
+STICK_AIM = set()   # round 15 d3: the levels aimed with the stick (--stick-aim)
+ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
+
+
 class Route:
     """Inputs, teleports and the frame-window debug switches of one run, in absolute frames."""
 
@@ -53,6 +57,8 @@ class Route:
         self.no_cheats = set()
         self.extra_env = []
         self.cheat_windows = []
+        self.fights = {}         # round 15 d3: name -> (first, last frame) (--assist-keep)
+        self.fight_level = {}    # name -> its level (1-4)
         self.cheats_on = set()   # sub-levels (the totems: 109 110 111 112) kept invincible (--cheats-on)
         self.walked = 0
         self.walk_probe = False
@@ -131,6 +137,21 @@ class Route:
                "T2_AIM_AT=\"%s\"" % ";".join(self.aim_at), "T2_AIM_ENEMY=\"%s\"" % ";".join(self.aim_enemy)]
         if self.aim_node:
             env.append("T2_AIM_NODE=%s" % self.aim_node)
+        if STICK_AIM:
+            # round 15 d3 (--stick-aim): in these levels the assists above only pick the target and
+            # tools/port/aimdrive.py aims with the stick (run the game under it: PLAYTHROUGH.md 22)
+            starts = sorted(self.level_start.items())
+            wins = [(f, ([g for l, g in starts if l == lv + 1] or [10 ** 7])[0] - 1)
+                    for lv, f in starts if lv in STICK_AIM]
+            # --assist-keep: these fights keep the assists' yaw and pitch; so do the fights of the
+            # levels not in --stick-aim (a fight can outlast its level's window: the City Totem's
+            # fire window runs past the hub frame the next level's window starts from)
+            keep = ASSIST_KEEP + [k for k, lv in self.fight_level.items() if lv not in STICK_AIM]
+            for k in keep:
+                a, b = self.fights[k]
+                wins = [w for w in wins if w[1] < a or w[0] > b] + \
+                       [(w[0], a - 1) for w in wins if w[0] < a <= w[1]] + [(b + 1, w[1]) for w in wins if w[0] <= b < w[1]]
+            env.append("T2_AIM_STICK=\"%s\"" % ";".join("%d-%d" % w for w in sorted(wins)))
         if self.anchors:
             env.append("T2_ANCHOR=\"%s\"" % ";".join("%s@%d" % (l, f) for f, l in sorted(self.anchors, key=lambda a: a[0])))
         if self.saves:
@@ -252,6 +273,8 @@ def level1(r, start_shift=0, keys=True, health=True):
     arrival = pt.TOTEM_ARRIVAL + start_shift + added
     r.note(arrival, "109 the Harbor Totem: fire taps (T2_FACE_NEAREST aims)")
     r.fire.append((arrival, arrival + 7150))
+    r.fights["109"] = (arrival, arrival + 7150)
+    r.fight_level["109"] = 1
     r.face_levels.append(109)
     return arrival, added
 
@@ -661,6 +684,8 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     if 110 in r.cheats_on:
         r.cheat_windows.append((t_arr - 600, hubs[2]))
     r.fire.append((t_arr, t_arr + 7200))
+    r.fights["110"] = (t_arr - CITY_TOTEM_TP_AFTER, t_arr + 7200)
+    r.fight_level["110"] = 2
     r.anchors.append((t_arr, 110))   # the fire window starts when 110 is reached
     # Round 13 b2: down from the arrival ledge (642 units from the totem, the attackers 450-1,150
     # away: 4-5 kills of 8 in 120 s) to the south side of the totem, where they come to the player
@@ -688,6 +713,8 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     rel, length, lv = pt.L3_TOTEM
     r.note(l3s + rel + a3, "111 the Marsh Totem: fire taps")
     r.fire.append((l3s + rel + a3, l3s + rel + a3 + length))
+    r.fights["111"] = (l3s + rel + a3, l3s + rel + a3 + length)
+    r.fight_level["111"] = 3
     if 3 in r.no_cheats:
         # round 14 c1: the scorpion launcher (16) for the Marsh Totem (scheduled in 68, before the
         # totem's level loads; see level 4): 15 damage instead of 62-272 and a life
@@ -716,6 +743,8 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     rel, length, lv = pt.L4_TOTEM
     r.note(l4s + rel + a4, "112 the Cave Totem: fire taps")
     r.fire.append((l4s + rel + a4, l4s + rel + a4 + length))
+    r.fights["112"] = (l4s + rel + a4, l4s + rel + a4 + length)
+    r.fight_level["112"] = 4
     if 4 in r.no_cheats:
         # round 14 c1: the scorpion launcher (16) for the Cave Totem and the Blind One, the plasma
         # rifle again from the hub. T2_WEAPON is applied when a level loads (T2_GIVE_WEAPONS), so
@@ -728,6 +757,8 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     rel, length, (x, y, z, ry), lv = pt.L4_BOSS
     f = l4s + rel + a4
     r.note(f, "1 the Blind One: fire held, T2_AIM_NODE=boss@1")
+    r.fights["1"] = (f, hubs[4])
+    r.fight_level["1"] = 4
     r.inputs.append("Z@%d..%d" % (f + 10, f + length))
     r.tp(f, x, y, z, ry)
     r.aim_node = "boss@1/2/3/4"   # the Blind One 1, the Mantid Queen 2, the Mother 3, the Primagen 4
@@ -882,7 +913,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT
+    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, STICK_AIM, ASSIST_KEEP
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -903,6 +934,10 @@ def cli(argv=None):
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
     ap.add_argument("--late-keys", action="store_true",
                     help="Primagen keys 2 and 3 in after level 5, round 13's walks after levels 2 and 3 (round 14 c3)")
+    ap.add_argument("--stick-aim", default="", help="L1,L2,...: these levels aim with the stick only, closed-loop "
+                    "(run under tools/port/aimdrive.py; round 15 d3)")
+    ap.add_argument("--assist-keep", default="", help="with --stick-aim: these fights keep the aim assists "
+                    "(1: the Blind One, 110: the City Totem; round 15 d3)")
     ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
     ap.add_argument("--lair-strafe", default="80,0", help="P[,S]: the lair strafing's period (C-left/C-right) and an "
                     "optional z sweep of S frames (C-down then C-up; round 15 d1)")
@@ -912,6 +947,8 @@ def cli(argv=None):
     LAIR_STRAFE = tuple(int(v) for v in (a.lair_strafe + ",0").split(",")[:2])
     L6_SLOT_AFTER = a.slot
     HOP = a.hop
+    STICK_AIM = {int(x) for x in a.stick_aim.split(",") if x}
+    ASSIST_KEEP = [x for x in a.assist_keep.split(",") if x]
     if a.late_keys:
         PRIMAGEN_LATE = (2, 3)
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},

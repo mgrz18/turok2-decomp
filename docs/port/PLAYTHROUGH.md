@@ -2085,3 +2085,149 @@ cinema 130) at 251,638, the credits, the hub at 265,736.
   would remove it; the same driver could walk until his home wait ends.
 - Phase 0 of the Mother: check on the N64 that the player cannot move there (mupen64plus, a RAM
   poke warp to -4).
+
+## 22. Aim assist off: closed-loop stick aiming in levels 1-4 (Phase 7 round 15, part d3)
+
+### 22.1 The mechanism (`T2_AIM_STICK`, `T2_AIM_FIFO`, `tools/port/aimdrive.py`)
+
+The aim assists (`T2_FACE_NEAREST`, `T2_AIM_AT`, `T2_AIM_ENEMY`, `T2_AIM_NODE`) write the
+player's yaw and the camera pitch every frame. Round 14's `stick_aim` (17.1) only turns towards
+a fixed point, open loop. This round adds a closed loop:
+
+- `T2_AIM_STICK=F1-F2[;...]` (schedule frames, `port/game/t2debug.c`). Inside a window the assists
+  write nothing. They still pick their target with the same rules: nearest, sticky, level actor
+  first, the boss phase's node. Then they report its point (`T2Port_AimReport`). `T2_BOSS_FRONT`
+  is not changed: it is not used in levels 1-4.
+- `T2_AIM_FIFO=DIR` (`port/app/game.cpp`). After each frame in which a target was reported, the
+  game writes one line to the fifo `DIR/out`:
+  `aim F px py pz rotY ex ey ez pitch tx ty tz`. These are the player position and yaw, the
+  camera eye and pitch, and the target point, as exact `%a` hex floats. The game then blocks on
+  one line from `DIR/in`: `SX SY`, the stick of port 1 for the next frame (over the script's).
+  It is input only: nothing in the game state is written. Outside the windows nothing is
+  exchanged, and the build without these variables is unchanged: the default `--all` run's det
+  log is byte-identical to 8b42da15's (580 lines).
+- `tools/port/aimdrive.py [--simple] [--stats FILE] -- turok2 ...` makes the two fifos, starts
+  the game with `T2_AIM_FIFO`, and answers each line from that line alone. It is deterministic:
+  two runs give identical logs.
+- `playthrough.py OUT --all ... --stick-aim 1,2,3,4 [--assist-keep 1,110]` (`fullrun.py`) writes
+  `T2_AIM_STICK` with the frame ranges of those levels, minus the fights in `--assist-keep`
+  (`1`: the Blind One, `110`: the City Totem). Run the game under the driver:
+  `runfull.sh`-style `python3 tools/port/aimdrive.py --stats RUN/stats.txt -- build/app/turok2 ...`
+  with the usual `teleport.env`.
+- `tools/port/aimstats.py LOG [LOG2 ...]` compares runs: damage, hits, lowest health and deaths per
+  fight level, the totems' kills and time left, and the frame each totem and boss bit was set.
+  `aimstats.py --stick STATS` shows the tracking per aim window: mean yaw and pitch error, and the
+  share of frames within 0.05 rad of the target.
+
+### 22.2 The stick, measured (`aimdrive.py --probe SX,SY[,N]`, level 51, Linux Release)
+
+- The game reads the pad once per tick: every second host frame. A stick change shows up in the
+  pose 4 host frames later.
+- **Stick X turns at a rate.** Re-measured, the cube law of 17.1 is exact: SX=8, 13, 20, 30 and 45
+  turn 0.000017, 0.000134, 0.000660, 0.002641 and 0.009944 rad per host frame. The model
+  0.0685 * ((SX - 3) / 80)^3 gives 0.000017, 0.000134, 0.000657, 0.002633 and 0.009912.
+- **Stick Y does not turn the pitch at a rate.** It sets a look angle,
+  -(reading / 80) * (pi / 2), where + SY looks down. The camera pitch eases towards that angle
+  by 5.41 % of the difference per tick, and back towards 0 when the stick is released. Examples:
+  SY=127 gives -pi/2, SY=40 gives -0.726 and SY=-60 gives +1.118. The pitch first changes by
+  0.0848, 0.0392 and 0.0604 on a tick. Releasing at -0.67 brings it back to -0.14 in 56 frames.
+- The controller turns by GAIN (0.8) of the predicted error per tick. It is a Smith predictor:
+  the answers still in flight (the last 3) are applied to the pose first. It adds the target's
+  own bearing and elevation rate while the target stays the same. Stick X is the inverse of the
+  cube law; stick Y is the look angle that moves the pitch by that share. `--simple` is the
+  first version: GAIN 0.35 of the observed error, no prediction. On a still point it turns
+  1.2 rad and holds within 0.001 rad in about 30 frames.
+
+### 22.3 Running it
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --cheats-on 3,4 \
+    --stick-aim 3                 # or 1,2,3,4 --assist-keep 1 (the Blind One keeps the assist)
+mkdir -p RUN/pak && cd OUT && . ../RUN/teleport.env && SDL_VIDEODRIVER=offscreen \
+  T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=500 T2_PROGRESS_LOG=1 T2_HURT_LOG=1 T2_BOSS_LOG=1 \
+  python3 ../tools/port/aimdrive.py --stats ../RUN/stats.txt -- \
+  build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 --game \
+  --pak-dir ../RUN/pak --frames 290000 --input @../RUN/playthrough.txt
+python3 ../tools/port/aimstats.py run.log            # the fights; --stick ../RUN/stats.txt: the tracking
+```
+
+A Linux Release build plays the whole game, with the driver, in about 6 minutes. Two runs of the
+same configuration give identical det logs. s1 and sC are two separate driver runs that share
+their levels 1-4 windows. Their det logs are identical through the stick fights of levels 1-4,
+262 lines up to frame 131,000, where sC's `--assist-keep 1` starts.
+
+### 22.4 Results (Linux Release, PIE, the round-14 command plus `--stick-aim`)
+
+The fights compared with the assisted run (`aimstats.py`). Each cell gives the damage taken,
+the lowest health and the deaths in that level. For a totem it also gives the kills and the seconds
+left when it fell. `v2` is the default controller and `v1` is `--simple`.
+
+| fight | assisted | v1, levels 1-4 (s1) | v2, levels 3-4 (sL) | v1, levels 3-4 (sK) |
+|---|---|---|---|---|
+| Harbor Totem (109) | 132, min 68, 11/8 | **93**, min 107, 8/8 2 s | (assisted) | (assisted) |
+| sister 1 (133) | 131, min 69 | 199, min 1 | | |
+| sister 2 (134) | 144, min 25 | 170, min 1, 1 death | | |
+| sister 3 (135) | 156, min 44 | 200, min 8, 1 death | | |
+| City Totem (110) | 150, min 1, 2 deaths, won | **58**, min 42, won | (assisted) | (assisted) |
+| Marsh Totem (111) | 111, min 89, 8/8 2 s | **64**, min 136, won | **72**, min 128, won | **21**, min 179, won |
+| Cave Totem (112) | 54, min 146, 8/8 3 s | 60, min 140, won | 114, min 86, won | 117, min 83, won |
+| the Blind One (1) | 94, min 52 | 240, 2 deaths: game over | (assisted) 75, min 11 | (assisted) 83, 1 death |
+
+- **The totems of levels 1-4 are won with the stick only.** These are the Harbor,
+  City, Marsh and Cave totems. In 14 whole-game runs every stick-aimed totem fight was won but
+  one: a City Totem at 6/8 kills with 1 s left (s4). In the `--simple` controller's run the Harbor,
+  City and Marsh totems cost less damage than the assisted run. The stick turns smoothly and
+  keeps its target, where the assist snapped to each new nearest target.
+- **The Sisters of Despair (level 2) cost more** with the stick: 170-200 damage each against
+  131-156, and 1-2 lives over the three. They fly fast and close, so the target's bearing moves
+  faster than the stick's turn rate (4.1 rad/s at full stick).
+- **The Blind One is not winnable with the stick in this route.** He has 8 minions in phase 3 and
+  three actor groups in phases 4-6, all around the player, with a target switch every few
+  seconds and many turns of half a turn or more. The yaw error averaged 0.63 rad and the player
+  was on target only 47 % of the time: 240 damage, 2 deaths, game over (s1, s3). With
+  `--assist-keep 1` his fight keeps `T2_AIM_NODE=boss`.
+- **The whole game still depends on the lives carried into the lair.** Every lair visit costs a
+  life (the Primagen's 200-damage hit, `--cheats-on 4`). The assisted run reaches it with 2 lives.
+  - In sL, levels 3-4 by stick took 60 more damage at the Cave Totem. The player then left the
+    Blind One with 11 health and lost a life at level 5's first fight (124). The lair's hit was
+    then a game over.
+  - In sK the extra life went at the Blind One itself.
+  - With levels 1-2 by stick (s1, sC), the level-2 lives run out by the Blind One or level 5.
+  - The validated default command is unaffected (det log identical). See 22.5 for the runs that
+    reached END 2.
+- Tracking, `aimstats.py --stick`, frames within 0.05 rad of the target:
+  - Harbor Totem: 74-82 %. Sisters: 48-95 % per window. City Totem: 75-81 %.
+  - Marsh Totem: 84 %. Cave Totem: 70-78 %. The Blind One: 47 %.
+
+### 22.5 Which commands were validated
+
+- **The default command** (section 21, no `--stick-aim`) with this branch's binary gives the same
+  580-line det log as 8b42da15. It plays the same: all 5 totems, the 4 bosses (the Primagen at
+  250,290) and the credits (cinema 130). Without `T2_AIM_STICK`/`T2_AIM_FIFO` nothing changes.
+- **`--stick-aim 3`** (sM: the Death Marshes by stick, v2):
+  - The Marsh Totem fell with 72 damage, against 111 assisted.
+  - Levels 4 and 5 and the Mother then played as in the assisted run: lives lost 2 by then, as
+    before, and the Mother dead at 215,862.
+  - **But the Primagen stopped at stage 3, state 3** (parts 2/0) until frame 290,000. The assisted
+    run's stage 3 goes on through states 1, 5, 0, 2 and 6. This is the line-of-sight home wait of
+    PLAYTHROUGH 21 (static object 1911): the lair route's strafing timing does not give him sight
+    at the shifted frames. It is not an aim problem, so END 2 is not reached with any
+    `--stick-aim` yet.
+  - sE2 (`--stick-aim 3,4 --assist-keep 1`, 340,000 frames) stopped the same way, at stage 2
+    (parts 5/6).
+- No `--stick-aim` configuration reached END 2 in this round. The levels-1-4 stick fights are
+  playable. The whole-game chain breaks downstream: at the lair wait, or at the lives that level
+  2's sisters and the Blind One cost.
+
+### 22.6 Next
+
+- **The sisters and the Blind One need better targets, not a better controller.** The yaw loop
+  is already as fast as the stick allows. The game could report several candidates
+  (`T2Port_AimPose` with up to N live enemies), and the driver would pick the one closest to
+  the crosshair among those close enough to threaten, as a player does. That means fewer
+  half-turns.
+- **Fire through the driver.** The `SX SY` answer could carry the Z button, to fire only on
+  target. The scripted Z taps fire blind now, and `T2_FILL_AMMO` hides the waste.
+- **Make the lair wait robust first (d1).** Each perturbation upstream changes the lair timing, and
+  the Primagen's home wait then fails. A lair route that strafes until he has line of sight,
+  instead of at fixed frames, would let any stick-aimed run finish.
