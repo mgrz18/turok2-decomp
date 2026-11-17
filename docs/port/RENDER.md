@@ -270,7 +270,8 @@ moves. Five places used the N64 offsets:
 Each is a `TARGET_PORT` body by member (the callers pass `&gEngineApp_m_OnScreen`);
 `tools/asm_diff.py --base b744bd39` = 0 for the six files. The bars are render-only: the default
 run's det log is unchanged (580,000 lines, md5 `ecb9f9f2…`). With the fix the default run shows
-the totem defence's two bars (green "Enemies", red "Time", as on the N64), the Blind One's, the
-Queen's and the Primagen's bars going down with their health, and no bar between fights
+the totem defence's two bars (green "Enemies", red "Time"; their percents went 78, 74, 57, 55,
+4 over the run), the Blind One's, the Queen's and the Primagen's bars (his seen down to about
+two thirds at 240,991), and no bar between fights
 (checked: `TMPBOSS` instrumentation, not committed, every change of `m_pBoss`/`m_pBoss2` over the
 whole run: set by the totems, Blind, Queen, Primagen; cleared after each).
