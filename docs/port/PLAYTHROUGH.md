@@ -3013,3 +3013,77 @@ STATUS.md section 2: the level runs and the boss recipes (with `T2_LEGACY_SHAKE=
 15's det line for det line; the boot with the variable is too, without it only `rng` and the
 particles change; demos 1 and 3 still match the N64's RAM in every field but `rng`; save, title,
 load; the audio boot; padtest; the clean errors; soak (0 crashes in 62 runs).
+
+## 32-f1. The route on the N64's random numbers, levels 1-3 (Phase 7 round 17, part f1)
+
+`fullrun.py --n64-shake` (no `T2_LEGACY_SHAKE`: the N64's camera shake and random stream) now
+plays the whole game: **`--all --talismans 2 --cheats-off 1,2,3,4,5,6 --n64-shake` reaches END 2
+at 247,626 with all 5 totems and one life lost** (the City Totem), against round 16's game over in
+125 at 154,972. Two runs gave the same log (every line but the `totem hp` field of the `totem:`
+lines, which differs by one in two lines: a value the run never uses). The default command (with
+`T2_LEGACY_SHAKE=1`) is unchanged: `playthrough.py --all` writes byte-identical `teleport.env` and
+`playthrough.txt` with and without this part's change (also with `--real-weapons 1,2` and
+`--nav 1,2,3,4`), and its run still ends with END 2 at 252,194.
+
+### 32-f1.1 Why the graveyard (135) cost ~15 more health
+
+Damage per route step in 135 (`hurt:` lines bucketed by the route's teleports, schedule frames):
+
+| step (135) | legacy stream: damage, health after | N64 stream: damage, health after |
+|---|---|---|
+| door 59, "graveyard located." fire window | 28, 172 | 27, 173 |
+| zombie 45 (info 19), 2,500 frames of fire | 39 (ty 0x320 x11, 0x323 x3), 133 | 51 (0x320 x13), 122 |
+| into crypt 75 for its key (+ the retry) | 45, 88 | 44, 78 |
+| zombie 44 (info 20), 2,500 frames of fire | 32 (0x320 x18, 0x323 x3), 56 | 53 (0x320 x12, 0x323 x10), 25 |
+| into crypt 76 for its key | 2, 54 | 25 (0x323 x5), **0: a life lost at 72,371** |
+
+The fights are the same until the crypt zombies; on the N64 stream the graveyard's roaming zombies
+(type 0x323) reach the player during zombie 44's fight (10 hits instead of 3) and again in crypt
+76, and the aim spends more of the window on actor 33 (35 aim lines instead of 14). The player
+enters crypt 76 with 25 health instead of 56, and the walk-in there kills him. Longer fire
+windows (round 16) only move the problem; the cure is health.
+
+### 32-f1.2 The fix: seven health +10 between the crypts
+
+135 has 23 health +10 pickups (object 542, item 1702, "+10 up to 100": `pickup: ... not taken` at
+100 or more) that the route never took (`levels.py` lists them in the grid sections). The new
+table `N64_L2_PICKS` (`--n64-shake` only) inserts pick steps (`insert_picks`: a 150-frame stand
+and walk-in each, the later steps and the segment's in-segment retries move with them; the
+stretch entries' step indices are remapped; a `stretch()` entry `(seg, step, frames, False)` now
+only moves the later steps, without a fire window) **after zombie 44's fight, before crypt 76's
+key**: (1554, 590), (1556, 77), (2554, 93), (868, 1146), (-545, 1148), (-1269, 1146), (-1346,
+457). The approach angle matters: from +z (the default angle 0) three of them stand the player
+in no region (`teleport: ... region (nil)`, the teleport is skipped). A probe (`pktest`, scratch
+only: `T2_START_WARP=2501@600`, each pickup approached from 8 angles, the `pickup:` lines say
+which reached it) picked the angles. All 7 are collected: 25 -> 84 health; crypt 76 then costs 12
+and the player leaves 135 with 62 (legacy 44).
+
+### 32-f1.3 Health per fight, legacy stream vs N64 stream (the whole run)
+
+`hurtsum:` per level visit (damage, minimum health, lives lost); Linux Release, `aimdrive.py`,
+290,000 frames:
+
+| level visit | legacy (default) | `--n64-shake` (this part) |
+|---|---|---|
+| 109 the Harbor Totem | 132, min 68 | 114, min 86 |
+| 133 zombies + sister 1 | 131, min 69 | 146, min 54 |
+| 134 graveyard + sister 2 | 144, min 25 | 119, min 35 |
+| 135 crypts + sister 3 | 156, min 44 | 208, min 25 (7 picks: +70) |
+| 110 the City Totem | 150, min 1, **2 lives** | 98, min 1, **1 life** |
+| 111 the Marsh Totem | 111, min 89 | 56, min 144 |
+| 112 the Cave Totem | 54, min 146 | 60, min 140 |
+| 1 (the Blind One) | 94, min 52 | 75, min 65 |
+| 124 | 36, min 16 | 38, min 27 |
+| 113 the Hive Totem | 44, min 72 | 38, min 89 |
+| 2 (the Queen) | 49, min 23 | 52, min 37 |
+| 117 | 20, min 3 | 21, min 16 |
+| 3 (the Mother) | 53, min 147 | 36, min 164 |
+| 4 (the Primagen's level) | 124, min 23 | 105, min 59 |
+| END 2 | 252,194 | 247,626 |
+
+Level 3 (61-69, the Marsh Totem, the armories) needs nothing on the N64 stream: no life lost,
+the totem at 110,671 (legacy 110,383). The City Totem still costs a life (it entered with 62
+health and died within ~1,700 frames; a variant that took 4 more health +10 after sister 3
+entered it with ~100 and still lost one there, and then lost 3 more lives in levels 4 and 6:
+dropped). Each change upstream moves every later fight: the run is chaotic past the first
+changed frame, so a level-4-6 change (part f2) has to be re-checked on the whole run.
