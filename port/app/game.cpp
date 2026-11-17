@@ -50,6 +50,7 @@ void T2Port_RngSet(int frame, const char *spec);
 void T2Port_TraceBoss(int frame);
 void T2Port_AimAt(int frame, const char *spec);
 void T2Port_AimEnemy(int frame, const char *spec);
+int T2Port_FireGate(int frame);
 int T2Port_AimPose(int frame, char *buf, int n);
 int T2Port_MovePose(int frame, char *buf, int n);
 void T2Port_Cheats(int frame, const char *spec, const char *fill);
@@ -458,7 +459,12 @@ void ContRead(void* pads) {
     for (int i = 0; i < 4 && i < MAXCONTROLLERS; i++) {
         uint16_t b = (uint16_t)lus[i].button;
         if (i == 0) {
-            b |= ScriptedButtons();
+            uint16_t sb = ScriptedButtons();
+            static const bool fireGate = getenv("T2_FIRE_GATE") != nullptr;
+            if (fireGate && (sb & 0x2000) && !T2Port_FireGate(sFrame + 1)) {
+                sb &= (uint16_t)~0x2000u; // DEBUG-ONLY: T2_FIRE_GATE (round 16 e5), the script's Z held back
+            }
+            b |= sb;
         }
         // N64 byte order is not an issue here: OSContPad.button is read as a u16 by the game
         memcpy(out + i * 6, &b, 2);

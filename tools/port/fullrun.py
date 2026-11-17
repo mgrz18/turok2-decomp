@@ -685,7 +685,11 @@ L2_ARMS = {
     4: [(3844.0, 0.0, 2764.2, 1.5708), (4403.2, 0.0, 2662.4, 0.0)],        # 129: the grenade launcher +5, plasma cells x150
     # 130's armory row (y 204.8, z 4736): the mag 60 (5); the tek bow (3), the tranquilizer gun (6), the shotgun
     5: [(-2764.8, 204.8, 4736.0, -1.5708), (-2918.4, 204.8, 4736.0, 1.5708, 78, 60)],
-    6: [(-153.6, -4761.6, -1075.2, 0.0), (-1996.5, -4454.4, 447.7, 0.0)],   # 133: the shotgun +10 shells, the mag 60 +bullets
+    # 133: the shotgun +10 shells and the mag 60 +bullets: steps of L2_133_REAL (round 16 e5)
+    # round 16 e5: ammo for sister 2 (134) after sister 1 has taken it all: 131's terrace (y 102.4),
+    # bullets x40, shells x3 and explosive shells x3 (130's bullets x40 and shells x10 by its exit,
+    # (6529.9, -3379.2, 478.5) and (6516.3, -3379.2, 2080.0), were not reached by such picks)
+    8: [(2581.0, 102.4, 1159.2, 0.0), (1420.5, 102.4, 1161.3, 0.0), (1971.6, 102.4, 1772.7, 0.0)],
     # not taken: 131's plasma rifle (-1996.8, -1126.4, 5785.6): a death there
 }
 L3_ARMS = {}
@@ -694,6 +698,7 @@ ARMS = {1: L1_ARMS, 2: L2_ARMS, 3: L3_ARMS}
 ARMS_SWITCH = {1: [], 2: [], 3: []}
 # the hub arrivals of a --real-weapons run (the first "level 60" T2_STATE_LOG=50 line after the totem)
 REAL_HUB_AT = {1: 23750}
+BLIND_WEAPON_AFTER = 2336   # round 16 e5: the shredder for the Blind One, this long after the Cave Totem's fire starts
 ARMS_FIRE_END = 50      # a totem's fire taps end this long before the hub arrival
 # frames idled in the hub after level 1 (--hub-wait): the level-2 fights depend on the state they
 # start from; with --real-weapons 1, waits of 40, 50, 120 frames keep sisters 1 and 2 (133, 134)
@@ -721,7 +726,28 @@ def wheel(weapon, f):
 
 # a weapon chosen on the wheel before a route step: {(segment index, step index): weapon}
 L2_TAPS = {(4, 0): 8,       # 129's soul gate: the shotgun (the grenade launcher's grenades fly over the gate)
-           (6, 1): 15}      # 133's sister 1: the grenade launcher
+           (6, 2): 4,       # 133's zombies 22-24 (L2_133_REAL): the mag 60 (the pistol's slot)
+           (6, 6): 15,      # 133's sister 1: the grenade launcher
+           (9, 0): 4,       # 134's zombies: the mag 60 (the pistol's slot)
+           (9, 3): 8}       # 134's sister 2: the shotgun
+# round 16 e5: 133 in a --real-weapons 1,2 run: the zombies of the second room (22, 23, 24: 80 health
+# each, they open door 28; the nearest awake actor, T2_FIRE_GATE), then sister 1 (20, 50 health). The round-12 steps
+# (the sister aimed from the start, the nearest actor else) spent all the ammo on doors 27 and 28.
+L2_133_REAL = [
+    # zombies 9, 16, 17 (5 health) wake here (region info 4) and are left behind door 27: no fire
+    (0, -1504.0, -4761.6, -972.0, -1.5708, 0, {"trig": 1}),
+    # the shotgun (+10 shells) at (-153.6, -4761.6, -1075.2) after the first shells are spent (at the
+    # segment's start the shells are full and it is not taken)
+    (1200, -213.6, -4761.6, -1075.2, -1.5708, 40, {}),
+    (1400, -847.0, -4761.6, 1574.0, 3.1416, 0, {"trig": 1, "fire": 1500, "aim": "enemy"}),
+    (2950, -847.0, -4761.6, 1574.0, 3.1416, 0, {"fire": 1500, "aim": "enemy"}),
+    (4500, -847.0, -4761.6, 1574.0, 3.1416, 0, {"fire": 1500, "aim": "enemy"}),
+    # the mag 60 (+bullets) on its ledge (-1996.5, -4454.4, 447.7), the bullets spent by now
+    (5850, -1996.5, -4454.4, 537.7, 0.0, 50, {}),
+    (6050, -847.0, -4761.6, 1574.0, 3.1416, 0, {"fire": 1900, "aim": "enemy:20"}),
+    (8000, 827.5, -4761.6, -1627.5, -2.8692, 150, {}),    # warp 2615 -> 130
+]
+L2_STRETCH_REAL = [(6, 6, 3000), (9, 3, 2000), (12, 15, 2000)]
 
 
 def with_taps(segs, taps):
@@ -805,7 +831,15 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     h2 = health and 2 in r.no_cheats
     l2segs, l2stretch = l2_segments(2 in r.no_cheats)
     if 2 in real:
+        # round 16 e5: 133 as round 13 b2's zombies-one-by-one steps (pt.L2_SEGMENTS), the wheel per
+        # step (L2_TAPS), and the aims never on a door (T2_AIM_SKIP_TYPES=6)
+        name, rel, steps = l2segs[6]
+        l2segs = list(l2segs)
+        l2segs[6] = (name, rel, L2_133_REAL)
+        l2stretch = L2_STRETCH_REAL
         l2segs = with_taps(l2segs, L2_TAPS)
+        r.extra_env.append("T2_AIM_SKIP_TYPES=6")
+        r.extra_env.append("T2_FIRE_GATE=133,134,135")
     a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {}) if extras else {},
                         L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else []), l2stretch,
                         back=L2_RETURN_LATE if h2 else (), detours=det.get(2),
@@ -891,6 +925,14 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         r.weapon.append((l4s + rel + a4 - TOTEM_WEAPON_BEFORE, "16"))
         r.weapon.append((hubs[4] - 200, "10"))
     r.face_levels.append(lv)
+    if real:
+        # round 16 e5: the shredder (9) at the Blind One in a --real-weapons run. T2_WEAPON is applied when
+        # a level loads: scheduled inside the Cave Totem's fire window (after 112 has loaded), it is
+        # applied when her arena (level 1) loads. With the scorpion launcher her minions (intelligence
+        # 7401, type 0x1ff) bite the player on the ledge ~1 every 40 frames until she dies: 121 damage,
+        # 25 health left, and 124's pylons then kill him (game over at 150,990). The shredder's discs
+        # bounce into the minions too: 32 damage, she dies ~1,500 frames earlier, 114 health left.
+        r.weapon.append((l4s + pt.L4_TOTEM[0] + a4 + BLIND_WEAPON_AFTER, "9"))
     rel, length, (x, y, z, ry), lv = pt.L4_BOSS
     f = l4s + rel + a4
     r.note(f, "1 the Blind One: fire held, T2_AIM_NODE=boss@1")
