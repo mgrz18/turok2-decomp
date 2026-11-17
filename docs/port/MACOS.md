@@ -1239,7 +1239,7 @@ The round-15 default route (`playthrough.py RUN --all --talismans 2 --cheats-off
 | Mac Release 8b42da15 (`build_rel15`, deployment target 27.2) | 580,000 | `229dd7b2…` |
 | **Mac Release this branch** (`build_rel15m`, 27.0) | 580,000 | `229dd7b2…` |
 | **the bundled executable** (`Turok2.app/Contents/MacOS/turok2`) | 580,000 | `229dd7b2…` |
-| Linux Release this branch (box copy, `OUT/rel` rebuilt with this diff) | see 17.4 | |
+| **Linux Release this branch** (box copy, `OUT/rel` rebuilt with this diff, 17.4) | 580,000 | `229dd7b2…` |
 
 All exit 0: new game, levels 1-6 (3 deaths over the run, as on Linux), all 5 totems, the
 Primagen dies at 250,290, "END 2" from 253,282, the credits, the hub at 271,180. **38.9 s wall**
@@ -1273,7 +1273,7 @@ Checked headless (`padtest.py`, `--only config`: three launches in one directory
    -> -85 (inverted).
 
 `padtest.py` all: **map 103 checks pass** (the mouse rows now 23 per 10 px, 5 for 1 px),
-newgame with the pad and with the keyboard (mode 11 at 4,855), config 15 checks pass. The
+newgame with the pad and with the keyboard (mode 11 at 4,855), config 14 checks pass. The
 whole-game det log above is unchanged by these changes (the scripted headless runs do not
 register the settings and never read a mouse).
 
@@ -1281,7 +1281,9 @@ register the settings and never read a mouse).
 
 The same diff applied to the box copy `/root/R15_d4mac/repo` (8b42da15) and its `OUT/rel`
 (the coordinator's Release, rebuilt in a private mount namespace so that its absolute paths
-point to the copy): it compiles and links (3 files rebuilt).
+point to the copy): it compiles and links (the 3 changed files rebuilt), the whole-game route
+gives the same 580,000 det lines (`229dd7b2…`), and `padtest.py` passes there too (map 103,
+newgame x2, config 14).
 
 ### 17.5 Open on the Mac
 

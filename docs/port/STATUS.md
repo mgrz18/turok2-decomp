@@ -208,7 +208,7 @@ Mac only, headless; no change to `src/` or `include/`. Detail: [MACOS.md](MACOS.
 - **The release** (`-O2`, PIE, deployment target 27.0; ThinLTO does not link: `__asm__`-label
   aliases in `func_00413230.c`): the default whole-game command (`--all --talismans 2
   --cheats-off 1,2,3,4,5,6 --cheats-on 3,4`, 290,000 frames) gives **580,000 det lines identical
-  to the coordinator's Linux Release** (md5 `229dd7b2…`), from the build dir and from inside the
+  to the coordinator's Linux Release** (md5 `229dd7b2…`) and to this branch on Linux, from the build dir and from inside the
   bundle: END 2, the hub at 271,180, 3 deaths. 38.9 s on the M5. Startup: 0.12 s to the first
   frame; the title comes at VI 4,212 (70 s of the N64's own logos and cinemas at real time).
 - **Play-mode settings** (port/app/t2controls.cpp, main.cpp, game.cpp's `ContRead`): the look
