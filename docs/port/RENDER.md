@@ -252,6 +252,8 @@ last row at the 4/3 scale (MACOS.md 19.2).
 | demo 1, the first enemy | 2370 (`s_d` 041) / 6253 (the best match of 50 port frames) | same view, HUD and lighting: mean (12.6, 19.0, 18.2) against (12.5, 18.7, 17.9); the enemy's pose differs (demo 1's known divergence, FIDELITY 11.3) |
 | the Primagen's lair from `--start-warp 7602@600` / `T2_START_WARP=7602@1400`, gf 75 | 700 / 1601 | **the boss health bar (green, top centre) was missing on the port: fixed (7.2)**; the blue items on the floor near the spawn are drawn on the N64 and not on the port (f3's lead: the 8 static props near the lair spawn, wrong animation); the centre screen's lighting differs a little |
 | hub portal 5000 (level 5's cinema) | 700 / 1745 | not comparable by gf: a cinema camera path advances by `osGetTime` (`gFrameIncrement = elapsed`), not by game frames |
+| Adon's save room (warp 999, level 97), gf 175 | 800 / 2145 | **match**: Adon, the SAVE / HEALTH / AMMO / GO BACK menu with its highlight, the floor; only the drifting stars differ |
+| the hub pad's cut-scene (warp 7601, level 3), gf 75 and 175 | 700 / 1745, 800 / 2145 | **open**: the cameras differ (a cinema), but the colours do not follow: the N64's mist around the creature is brown-grey and its light beam white-yellow, the port's mist is cyan and the beam multicoloured (blue, green, magenta), and the whole scene greener (mean (35.8, 33.1, 23.7) against (34.2, 35.2, 9.6)). The display list (`T2_DLDUMP_AT=2145`) has prim colours 0096FF, 00FFCB, FF00D6, 5100FF from the particle sprites (`CParticle__DrawSprite`); with R and B exchanged they would be the oranges and pinks the N64 shows. Suspects: the spawn colours (`Color_ShiftHue`/`Color_Saturate`/`Color_Darken` on `CROMParticleColors` with the template's hue range), `Particle_ColorMode`'s channel swizzle, or a palette (35 `G_LOADTLUT`s) |
 
 ### 7.2 The boss bars (fixed)
 
@@ -275,3 +277,12 @@ the totem defence's two bars (green "Enemies", red "Time"; their percents went 7
 two thirds at 240,991), and no bar between fights
 (checked: `TMPBOSS` instrumentation, not committed, every change of `m_pBoss`/`m_pBoss2` over the
 whole run: set by the totems, Blind, Queen, Primagen; cleared after each).
+
+### 7.3 Next
+
+- The hub pad cut-scene's particle colours (7.1, warp 7601): compare one particle's
+  `m_PrimColor`/`m_EnvColor` and its template's colour record with the N64 RAM (`n64trace.py
+  --start-warp 7601@600`, f3's `n64cmp.py`) from the same spawn.
+- More warps with `refshots.py --start-warp` (every level start the route uses) against
+  `T2_START_WARP`: gameplay views are deterministic from the warp for the first frames.
+- The Mac window's Metal renderer and the retina scale (MACOS.md 19.3) need a window.
