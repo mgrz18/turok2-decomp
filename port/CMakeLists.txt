@@ -19,6 +19,17 @@ set(T2_REPO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 # set before any target exists (the property is taken at target creation).
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# ThinLTO (round 16 e4, MACOS.md 18): links on macOS since hostify keeps the label targets
+# (`__attribute__((used))`); the whole-game det log is identical, but the run is not faster on
+# an M5 (42.5-43.5 s vs 40.0-43.3 s), so it is off by default.
+option(T2_LTO "ThinLTO (-flto=thin) for every target" OFF)
+if(T2_LTO)
+    string(APPEND CMAKE_C_FLAGS " -flto=thin")
+    string(APPEND CMAKE_CXX_FLAGS " -flto=thin")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -flto=thin")
+    message(STATUS "turok2: ThinLTO on")
+endif()
+
 option(T2_BUILD_GAME_LIB "Build turok2_game (the game C, host static library)" ON)
 if(T2_BUILD_GAME_LIB)
     include(cmake/game.cmake)
