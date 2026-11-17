@@ -82,7 +82,7 @@ class Route:
         sub (round 16 e3, --nav): the sub-level; the walk is then aimdrive.py's waypoint walker, closed
         loop from where the player really is, in a window of nav_frames() frames."""
         if sub is not None:
-            n = nav_frames(sub, frm, (x, y, z))
+            n = nav_frames(sub, frm, (x, y, z), ry)
             self.walk_plan.append((f, f + n - 1, sub, x, y, z, ry))
             self.move_drive.append((f, f + n - 1))
             self.note(f, "%d: walk to (%.0f, %.0f) [%d frames]" % (sub, x, z, n))
@@ -298,39 +298,64 @@ NAV_WALKS = {
         (7, 0): (629.8, -2867.2, -2.0720, -2457.4),   # 122994 in 107: 3068 straight, 3614 by the path
     },
 }
-NAV_SLACK = 150      # frames on top of the path's length at 0.8 of the walking speed: the turns, the stops
+NAV_SPEED = 0.85     # nav_frames: the walking speed reached on a path (the corners)
+NAV_SLACK = 40       # nav_frames: frames on top
 # Probed (--nav 1,2,3,4 --walk-probe: each walk from the default route's place, the teleport kept at the
-# window's end; Linux Release; PLAYTHROUGH.md 27-e3): the walks that do not arrive (arrival error in units)
+# window's end; Linux Release; PLAYTHROUGH.md 27-e3): the walks that do not arrive (arrival error in units),
+# and the ones that arrive but break the full run (tried with --nav-only on the default command). Left:
+# 135's (12, 1) (--nav 2: END 2, all five totems)
 NAV_SKIP = {   # {level: {(i, j): why}}: candidates the walker does not take
-    1: {(2, 2): "53: a closed door across the power cell's alcove (z 7,120), 1,422",
+    1: {(7, 1): "57: arrives (error 48), but a death in 133's zombie fight follows (level 2 starts from another state)",
+        (2, 2): "53: a closed door across the power cell's alcove (z 7,120), 1,422",
         (2, 5): "53: the cage's bars, 237",
         (4, 0): "55: a ledge and a climb on the way, 3,830",
         (5, 0): "54: the way down from the ledge, 2,971",
         (5, 1): "54: the cage's bars, 961",
         (8, 0): "58: a drop the walker does not find, 218-3,286"},
-    2: {(6, 1): "133: a closed door between the zombies' rooms (x -1,547), 2,639",
+    2: {(6, 0): "133: arrives (error 25); not run in the full run (133's fights)",
+        (9, 0): "134: in place; a 40-frame window: deaths at the gate (53,513)",
+        (9, 1): "134: in place; as (9, 0)", (9, 2): "134: arrives (error 50); death at the gate (53,755)",
+        (9, 3): "134: after the gate fight, 256-609 short", (9, 4): "134: arrives (error 43); with (9, 2) only",
+        (12, 10): "135: arrives (error 44); a death in sister 3's fight (72,097)",
+        (12, 12): "135: arrives (error 49); in sister 3's fight", (12, 15): "135: arrives (error 49); in sister 3's fight",
+        (6, 1): "133: a closed door between the zombies' rooms (x -1,547), 2,639",
         (6, 2): "133: doors, 3,365",
         (12, 2): "135: the gate posts at z -3,350, 2,715",
         (12, 3): "135: the crypts, 1,803", (12, 4): "135: the crypts, 4,939", (12, 5): "135: the crypts, 3,339",
         (12, 6): "135: the crypts, 4,843", (12, 7): "135: the crypts, 1,912", (12, 8): "135: the crypts, 4,680",
         (12, 9): "135: the crypts, 3,112", (12, 11): "135: the graves, 1,984", (12, 13): "135: the graves, 2,028",
         (12, 14): "135: stops 127 short (the fight there needs the spot)"},
-    3: {k: "level 3: the walks start while the player is elsewhere (warps and cinemas move under the anchors)"
-        for k in ((0, 0), (1, 1), (5, 0), (6, 1), (6, 2), (8, 1), (9, 3), (11, 1), (11, 2), (13, 0))},
+    3: {**{k: "level 3: the walks start while the player is elsewhere (warps and cinemas move under the anchors)"
+           for k in ((0, 0), (1, 1), (5, 0), (6, 1), (6, 2), (8, 1), (9, 3), (11, 1), (11, 2), (13, 0))},
+        (1, 2): "69: in place; with (9, 1) a death in 61 (122,021), game over",
+        (9, 1): "66: arrives (error 41); as (1, 2)"},
     4: {(7, 0): "107: 2,286 (stuck 5 times)"},
 }
 
 
-def nav_frames(sub, frm, to):
-    """The waypoint walker's window for a walk from frm (x, z, rotY[, y]) to `to` (x, y, z) in sub-level sub."""
+def nav_frames(sub, frm, to, ry_end=None):
+    """The waypoint walker's window for a walk from frm (x, z, rotY[, y]) to `to` (x, y, z) in sub-level sub,
+    facing ry_end at the end: the path at NAV_SPEED of the walking speed, the two turns at the stick's full
+    rate, NAV_SLACK more (the route's fights go on round a walk: the window is kept short)."""
     import nav
     y0 = frm[3] if len(frm) > 3 else to[1]
     try:
         res = nav.load(NAV_ROM, sub).path((frm[0], y0, frm[1]), tuple(to))
     except Exception:
         res = None
+    pts = res[0] if res else [(frm[0], frm[1]), (to[0], to[2])]
     ln = res[2] if res else math.hypot(to[0] - frm[0], to[2] - frm[1])
-    return int(ln / (0.8 * pt.WALK_SPEED)) + NAV_SLACK
+    turns = 0.0
+    yaw = frm[2]
+    if ln > 1.0:
+        first = pt.face_yaw(pts[0][0], pts[0][1], pts[1][0], pts[1][1])
+        last = pt.face_yaw(pts[-2][0], pts[-2][1], pts[-1][0], pts[-1][1])
+        turns += abs(pt.wrap(first - yaw))
+        yaw = last
+    if ry_end is not None:
+        turns += abs(pt.wrap(ry_end - yaw))
+    walk = int(ln / (NAV_SPEED * pt.WALK_SPEED)) + pt.WALK_LAG if ln > 1.0 else 0
+    return walk + int(turns / pt.TURN_FULL) + NAV_SLACK
 
 
 # Probed and failed (arrival error in units): 133 (6, 0) 2,143, (6, 1) 2,151, (6, 2) 5,191 (the
@@ -592,7 +617,7 @@ def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back
                 o["walkfrom"] = frm
                 if nav_walks:   # round 16 e3: the waypoint walker's window
                     o["walksub"] = int(name.split()[0])
-                    o["walkframes"] = nav_frames(o["walksub"], frm, (st[1], st[2], st[3]))
+                    o["walkframes"] = nav_frames(o["walksub"], frm, (st[1], st[2], st[3]), st[4])
                 else:
                     o["walkframes"] = pt.stick_walk(0, frm[:2], frm[2], (st[1], st[3]), st[4])[1]
                 st = st[:6] + [o]

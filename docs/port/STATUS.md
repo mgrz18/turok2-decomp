@@ -190,6 +190,70 @@ command's `playthrough.txt` and `teleport.env` were byte-identical to 8b42da15's
 8. Still open from round 14: the obj-230 double fire and the Blind One's margin (c1), 119's moving
    platforms (c2), `t2audio_test`'s game-path mode, soak.py on macOS.
 
+## Round 16, part e3: walking instead of teleports, the waypoint walker (branch names-R16_e3)
+
+**1. A navigation mesh from the level data** (`tools/port/nav.py`, [PLAYTHROUGH.md](PLAYTHROUGH.md)
+27-e3). The floor regions of a sub-level are its graph. Edges are crossed with
+`Sweep_CrossRegionEdge`'s rules: border edges and steep regions above the feet are walls, steep
+regions with flag 0x10 can be climbed, and deep water and drops cost more. A* runs over the regions
+and a funnel pulls the waypoints through the shared edges. Static objects' boxes are opt-in
+(`T2_NAV_BOXES=1`). `navcands.py RUNLOG` classifies every teleport of a run; `navplot.py` draws one
+walk (the mesh, the plan and the track).
+
+**2. A closed-loop walker** (`aimdrive.py` `WalkDrive`, input only): `T2_WALK_PLAN` windows, each also
+a `T2_MOVE_DRIVE` window. It plans from the player's real position at the window's start, steers the
+stick to the next waypoint and walks with C-up. When stuck it backs off, sidesteps and plans again
+round the stuck point. At the goal it turns to the step's facing. `fullrun.py --nav L,...` replaces
+`NAV_WALKS` teleports less `NAV_SKIP`; `--nav-only L:I.J,...` picks walks; `--walk-probe` measures
+each walk alone.
+
+**3. Results** (Linux Release, PIE, the binary of 5d835e51):
+
+- The probe (43 route steps of levels 1-4 with a floor path): **13 arrive** within 60 units, among
+  them a 5,816-unit, 23-waypoint walk in 57, 133's 3,690-unit one, all five of 134's (the start-to-gate
+  walk 52 short, d5's open loop ~200) and four of 135's. The others stop at doors, gates, cages,
+  crypts and graves (static objects and actors, not in the mesh), at ledges (no jump: the fifo
+  answer carries only the stick and the C buttons), or start while level 3's warps and cinemas run.
+- **In the full run every arriving walk but one breaks a later fight** (levels 1-4 have no
+  invincibility). A walk changes the state the next fight starts from: 57's walk leads to a death in
+  133, 134's to deaths at the gate, 135's later ones to deaths in sister 3's fight, level 3's to a
+  game over in 61. What stays is **135's (12, 1)**: `--nav 1,2,3,4` = the default command with that
+  one walk: END 2 at 250,970, all five totems and four bosses, the hub at 265,068; one life lost at the City
+  Totem (the default run: 2) and 2 in the Primagen's lair (242,424, 244,098), so 3 in all against 2.
+  Two runs identical: all 580,000 det lines, `ptcl` included.
+- **Teleports left: 288 of 289.** Of the default run's 289, the mesh joins the two ends of 170 under
+  8,000 units and 43 further. It does not join 76: 64 go to another floor (ledges, jumps, climbs,
+  warps) and 12 stay on one floor (water, region-flag boundaries). Per level in PLAYTHROUGH 27-e3.
+
+**Validated**: the default command (`playthrough.py RUN --all --talismans 2 --cheats-off
+1,2,3,4,5,6` under `aimdrive.py`) writes byte-identical `playthrough.txt`, `teleport.env` and
+`fullrun.txt` to 5d835e51's. Its run on this branch's tools (the 5d835e51 Release binary) reaches
+END 2 (252,194) and the hub (266,292) as in round 15. `--nav 1,2,3,4`: above.
+
+**For the merge**: tools only, no src/include/port change (no asm_diff needed).
+
+- tools/port/aimdrive.py: `WalkDrive`, `walk_plan`, the `WALK_*` constants, and a branch in `main()`
+  before the lair driver's `move` branch (e2 edits the aim part of this file).
+- tools/port/fullrun.py:
+  - `NAV`, `NAV_ROM`, `NAV_ONLY`, `NAV_WALKS`, `NAV_SKIP`, `nav_frames`, `nav_table`;
+  - `Route.walk_to(sub=)`, `Route.walk_plan`, the `T2_WALK_PLAN` line in `write()`;
+  - `level1()`'s step loop, `level_segments(nav_walks=)`, the `walks=` arguments of the
+    level 2/3/4 calls;
+  - cli `--nav`/`--nav-only`.
+  e2 and e5 edit fullrun.py too.
+- New: tools/port/nav.py, navcands.py, navplot.py.
+
+**Next**:
+
+- Doors and gates as data: the static objects whose box spans a portal of the path, with the actor or
+  key that opens them.
+- A jump bit in the fifo answer (game.cpp masks the answer to the C buttons; R is 0x10) for the
+  ledges: about 30 "another floor" teleports in levels 1-2 are ledges.
+- The walks that arrive but break a fight: a run with invincibility kept for the level of the walk
+  only (`--cheats-on`), or the fight's own step re-timed to the arrival.
+- Map NAV_WALKS for levels 5-6 (routes56), level 4's route and the picks (keys, health, the hub's
+  key-slot legs): navcands.py matches only levels 1-3's route steps.
+
 ## Round 15, part d5: the -O2 uninitialised read found, clean errors, teleports counted (branch names-R15_d5)
 
 **1. The -O2 uninitialised read (round 14's section 4 item 3) is fixed** ([STABILITY.md](STABILITY.md) 11).
