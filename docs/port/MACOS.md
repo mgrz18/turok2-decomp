@@ -1422,3 +1422,35 @@ Texture filtering (three-point on both), gamma, depth, fog and alpha: no Mac-onl
   2x display the game renders at half the pixel resolution and is scaled up. `gInternalResolution`
   (a float CVar, default 1; `Interpreter::SetResolutionMultiplier`) = 2 would give full
   resolution; not changed (untested without a window).
+
+### 19.4 Frame pacing (play mode's path: `--draw --offscreen-gl`, real rendering)
+
+The default `--all` route under aimdrive.py, Release, every frame drawn on the CGL context with a
+`glFinish` per frame, `--bench 0` + `T2_BENCH_CSV` (`benchcsv.py --det`):
+
+| run | VIs | host ms per VI: mean / p99 / max | split per VI (game / audio / draw) | over 16.7 ms |
+|---|---|---|---|---|
+| unpaced, audio off, the whole game | 290,000 | 0.330 / 1.27 / 56.5 | 0.034 / 0 / 0.201 | 8 VIs (3 drawn frames over 33.3 ms) |
+| `--pace --audio`, VIs 0-60,000 (other runs and the desktop busy) | 60,000 | 1.29 / 9.5 / 114 | 0.282 / 0.096 / 0.676 | 133; 263 late VIs, worst 100.6 ms (VI 31,559, outside the game: the process descheduled); 2 underruns of the simulated device |
+| `--pace --audio`, VIs 0-20,000 (no other run) | 20,000 | 1.07 / 7.0 / 38.5 | 0.163 / 0.090 / 0.679 | 29; **60 late, 44 by 1 ms or more, worst 35.9 ms** (level 50's load); **0 underruns**; 333.72 s for 333.33 |
+
+- **The game's cadence** (VIs between drawn frames, the whole game): 2 VIs (30 fps) for 85.0% of
+  the frames, 4 VIs (15 fps) for 15.0%, 3 VIs for 55 frames. The 15 fps frames are the in-engine
+  cinemas: `CEngineApp__Update` asks for 4 retraces while `Cinema_PathPlaying()` (modes 5, 11,
+  12, 15 and the cut-scenes inside levels, e.g. 18,370 VIs of level 10 and 8,090 of level 97),
+  as the N64 does in high resolution. Not a host effect: the same on Linux (same det log).
+- **The worst VIs**: level loads (synchronous decompression, game CPU 15-45 ms: levels 97, 60, 73,
+  125, 44, 36, the N64 stalls there too) and the first use of a combiner (draw 56 ms once in level
+  111, 10-19 ms elsewhere: LUS compiles a GL shader the first time a combiner is seen; there is no
+  persistent shader cache). A paced VI costs 3-4x an unpaced one (low clocks while the process
+  sleeps 67-72% of the time), still ~1 ms of the 16.7 ms period.
+- **By level** (unpaced p99 per VI): the busiest are 55, 10 (the lair), 111-113 and 0 at 1.5-1.9 ms;
+  particle-heavy fights (the hub 60 and level 4's: p99 1.1 ms) stay far below the budget.
+- **Tried, not kept**: the user-interactive QoS class for `--pace` (to keep the paced threads on the
+  performance cores): the paced 20,000-VI run got worse (mean 2.15 ms, 411 late VIs, stalls of
+  0.4-0.9 s, 36 underruns), with the desktop in use at the same time; not conclusive, and nothing
+  to gain at ~1 ms of 16.7. Nothing else here is cheap: the late VIs are loads and first shader
+  compiles.
+- Measurements on a Mac in use (browsers, WindowServer at ~50% CPU sharing the GPU) are noisy; the
+  unpaced numbers repeat (round 16: 38-43 s for the whole game, here 35-39 s without drawing and
+  97 s drawn).
