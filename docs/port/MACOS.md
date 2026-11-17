@@ -1179,3 +1179,118 @@ gives the same 40,000 det lines as the coordinator's c8414758 build, and padtest
 - The no-ROM crash itself (play mode avoids it; the test tool still crashes without `--rom`).
 - `gamecontrollerdb.txt` is not shipped (LUS logs an error at every start; SDL3's built-in
   mappings cover the common pads).
+
+## 17. Round 15 (part d4): a self-contained app, a release, the settings a player keeps
+
+Branch `names-R15_d4` (from 8b42da15), built and run on the Mac only, everything headless
+(`--no-window` / `--offscreen-gl` / `--pad-test`; no window was opened). Release build
+`OUT/build_rel15m` (`OUT/r15/build_lto.sh` with `LTO=" "`: `-O2`, PIE,
+`-DCMAKE_OSX_DEPLOYMENT_TARGET=27.0`, the coordinator's LUS checkout c6ecfdb4 via the round-14
+`_deps`), the box's archive (`OUT/turok2_a9d.o2r`, sha1 `a9d14a47…`). Scripts and run
+directories in `OUT/r15/`. No change to `src/` or `include/`: the N64 build is untouched.
+
+### 17.1 The app needs nothing from Homebrew (`tools/port/mkapp.sh`, `tools/port/apptest.sh`)
+
+`mkapp.sh BUILD [APP]` now copies the executable's non-system dylib closure into
+`Contents/Frameworks` (dylibbundler-style, in plain sh: `otool -L` recursively,
+`install_name_tool -id @rpath/NAME` and `-change`), drops the build rpaths
+(`/opt/homebrew/lib`) for one `@executable_path/../Frameworks`, **fails if any Mach-O in the
+bundle still links or searches outside macOS**, sets `LSMinimumSystemVersion` to the highest
+`minos` in the bundle, signs each dylib and then the bundle ad hoc (`codesign --force --deep -s
+-`) and runs `codesign --verify --deep --strict`. `T2_APP_ZIP=1` also writes
+`Turok2-0.15-macos-arm64.zip` (ditto; the unzipped copy verifies).
+
+| | |
+|---|---|
+| bundled | libSDL3.0 (2.5 MB), libGLEW.2.3, libzip.5, libtinyxml2.11, and libzip's liblzma.5 and libzstd.1. libpng is not linked; libz and libbz2 are macOS's |
+| size | 9.3 MB app, 3.6 MB zip |
+| `otool -L` | 0 references to `/opt/homebrew` or `/usr/local` in the executable and the 6 dylibs |
+| Info.plist | `io.github.turok2-port`, 0.15 (15), `LSMinimumSystemVersion` **27.0** (Homebrew builds its bottles for the running macOS: the dylibs' `minos` is 27.0, so the executable is built for 27.0 too; a default build says 27.2), `NSHighResolutionCapable`, `LSArchitecturePriority` arm64, `GCSupportsControllerUserInteraction` + `GCSupportedGameControllers` (ExtendedGamepad), the games category. No usage key is needed: SDL's gamepad access asks for no permission |
+| Gatekeeper | `spctl -a` says `rejected` (ad hoc, not notarized), as expected: QUICKSTART section 0 has the first-launch steps |
+
+`apptest.sh APP ARCHIVE ROM WORK` (the check): the bundle copied to `WORK/My Games/Turok 2.app`,
+**`/opt/homebrew` and `/usr/local` hidden by a `sandbox-exec` profile** (denying file reads
+there), `env -i` (no `DYLD_*`, no `PATH` beyond `/usr/bin:/bin`), a scratch `HOME` with the
+archive and the ROM in its Application Support folder:
+
+- `DYLD_PRINT_LIBRARIES`: the only images loaded from outside `/System` and `/usr/lib` are the
+  executable and the 6 bundle dylibs, all from the path with spaces;
+- the build-dir executable under the same profile stops at once (`Library not loaded:
+  /opt/homebrew/opt/glew/lib/libGLEW.2.3.dylib ... (blocked by sandbox)`): the profile does hide
+  Homebrew;
+- play mode (`--play --offscreen-gl --no-pace --frames 6000 --pad-test`, Start + A x3 on the
+  virtual gamepad): exit 0, 0 bytes on stdout, new game reached (engine mode 11 at 4,855), the
+  config and the logs in the scratch Application Support folder.
+
+### 17.2 The release build: the whole game, Mac = Linux
+
+ThinLTO (`-flto=thin`) **does not link**: 9 symbols that `func_00413230.c` defines and also
+declares under `__asm__("...")` labels (`MenuItem_DrawString`, `Menu_Construct`, ...) are
+"defined in LTO objects but missing in compiled objects". Not pursued (LTO would only shorten
+a run that is already 170x real time); the release is plain `-O2`, PIE.
+
+The round-15 default route (`playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6
+--cheats-on 3,4`, 290,000 frames, empty `--pak-dir`, `T2_DET_LOG=1`; `OUT/r15/detall.sh` here,
+`/root/R15_d4mac/det/run.sh` on the box):
+
+| run | det lines | md5 of the det lines |
+|---|---|---|
+| Linux, the coordinator's Release `OUT/rel` (8b42da15) | 580,000 | `229dd7b2…` |
+| Mac Release 8b42da15 (`build_rel15`, deployment target 27.2) | 580,000 | `229dd7b2…` |
+| **Mac Release this branch** (`build_rel15m`, 27.0) | 580,000 | `229dd7b2…` |
+| **the bundled executable** (`Turok2.app/Contents/MacOS/turok2`) | 580,000 | `229dd7b2…` |
+| Linux Release this branch (box copy, `OUT/rel` rebuilt with this diff) | see 17.4 | |
+
+All exit 0: new game, levels 1-6 (3 deaths over the run, as on Linux), all 5 totems, the
+Primagen dies at 250,290, "END 2" from 253,282, the credits, the hub at 271,180. **38.9 s wall**
+on the M5 (7,450 VI/s, 124x real time; max RSS 111 MB) with the progress and hurt logs on.
+
+**Startup** (the app, play mode, `--offscreen-gl --no-pace`, 3 runs each): process start to
+the first frame **0.12 s**; to the title screen (VI 4,212) 0.94 s unpaced. In real time the title
+comes 4,212 VIs = **70.2 s** after the start: the N64's own legal screens, logos and intro
+cinemas (engine modes 0, 1, 3, 4, 5, then 7 = the title), not a load.
+
+### 17.3 The settings a player keeps (port/app/t2controls.cpp, main.cpp)
+
+| # | what was missing | now |
+|---|---|---|
+| d4-1 | the mouse settings existed (round 14) but were not in the config file, so a player could not find them; a 1-2 pixel motion gave stick 2-4, eaten by the game's dead zone (`Controller_ProcessInput` subtracts 3 from \|stick\|): slow aiming did nothing | the look settings are registered at the first launch, so `turok2.cfg.json` lists them with their defaults: `gT2MouseSensitivity` 2.0 (out of range (0, 40] -> back to 2 with a message), `gT2MouseInvertY` 0, **`gT2MouseDeadZone` 3** (added to any motion: 1 px -> 5, 10 px -> 23, clamp 80), `gT2StickInvertY` 0 (the pad's right stick / the arrow keys inverted, in a level only: menus stay up = up), `gT2ShowControlsAtStart` 1 |
+| d4-2 | no way to see the controls in the game | the controls table goes to `logs/turok2-stdout.log` at every start (play mode, a window) and **F1** shows it again (log + an SDL message box; the box frees the mouse; `--pace` moves its clock instead of catching up) |
+| d4-3 | the window state was saved by LUS's Context at exit, but nothing checked it | unchanged code path for the real window; the `--pad-test` headless window now takes its size, position and fullscreen state from the config and is a Context child, so **LUS's own `Window::SaveWindowToConfig` + `Config::Save`** run at exit as for a real window |
+
+Checked headless (`padtest.py`, `--only config`: three launches in one directory, no
+`SDL_VIDEODRIVER` override):
+
+1. fresh config; the script resizes/moves the window to 1024x768 at (40, 50) and presses F1:
+   the config has `Window.Width/Height/PositionX/Y` = 1024, 768, 40, 50, fullscreen false, the 5
+   CVars with their defaults; the controls table twice in the log (start + F1);
+2. the test edits the file (sensitivity 1.0, both inverts 1, table off); the launch prints
+   `window: config 1024x768, fullscreen 0` and `controls: mouse sensitivity 1, mouse invert Y
+   1, mouse dead zone 3, stick invert Y 1`, no table; F11 (fullscreen on); the config then has
+   fullscreen true and still 1024x768 as the windowed size;
+3. `window: config 1024x768, fullscreen 1`; the captured mouse 10 px right -> stick 13, 10 px up
+   -> -13 (inverted); the pad's right stick up at the title -> +85, in level 51 after a new game
+   -> -85 (inverted).
+
+`padtest.py` all: **map 103 checks pass** (the mouse rows now 23 per 10 px, 5 for 1 px),
+newgame with the pad and with the keyboard (mode 11 at 4,855), config 15 checks pass. The
+whole-game det log above is unchanged by these changes (the scripted headless runs do not
+register the settings and never read a mouse).
+
+### 17.4 Linux
+
+The same diff applied to the box copy `/root/R15_d4mac/repo` (8b42da15) and its `OUT/rel`
+(the coordinator's Release, rebuilt in a private mount namespace so that its absolute paths
+point to the copy): it compiles and links (3 files rebuilt).
+
+### 17.5 Open on the Mac
+
+- A person at the Mac: the Finder first launch through Gatekeeper, the F1 box, the mouse feel
+  with the dead-zone offset, F11 and the saved size with a real window (the code paths are the
+  ones checked headless above).
+- ThinLTO (17.2): the `__asm__`-label aliases in `func_00413230.c` would need `-u` exports or
+  `__attribute__((used))` under `TARGET_PORT`.
+- A Developer ID signature and notarization would remove the Gatekeeper step; an Intel or
+  universal build would need Homebrew's x86-64 dylibs (or SDL3 built from source as a universal
+  static library).
+- The no-ROM crash of the test tool and the SDL dummy-driver crash are part d5's.
