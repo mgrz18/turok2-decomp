@@ -256,6 +256,7 @@ def build(rom_bytes, jobs=1, log=print):
 
 def write_zip(entries, path, store=False, level=6):
     tmp = path + ".tmp"
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     comp = zipfile.ZIP_STORED if store else zipfile.ZIP_DEFLATED
     with zipfile.ZipFile(tmp, "w", comp, allowZip64=True) as z:
         for name, data in entries:
