@@ -560,6 +560,22 @@ void WriteShot(const std::shared_ptr<Fast::Fast3dWindow>& window, const char* sh
         return;
     }
     const uint32_t w = interp->mCurDimensions.width, h = interp->mCurDimensions.height;
+    // 8 bits per channel (round 17 f4: T2Gl_ReadRGB8); T2_SHOT_RGB16=1 (debug) keeps the old
+    // RGBA5551 readback (the low 3 bits of each channel dropped, as in shots before round 17)
+    static const bool rgb16 = getenv("T2_SHOT_RGB16") != nullptr;
+    std::vector<uint8_t> rgb8((size_t)w * h * 3);
+    if (!rgb16 && T2Gl_ReadRGB8(interp, window ? 0 : T2Offscreen_ShotFramebuffer(), w, h, rgb8.data())) {
+        if (FILE* fp = fopen(shot, "wb")) {
+            fprintf(fp, "P6\n%u %u\n255\n", w, h);
+            for (uint32_t y = 0; y < h; y++) {
+                // the same row order as below: framebuffer 0 bottom-up, the game framebuffer flipped
+                fwrite(&rgb8[(size_t)(window ? h - 1 - y : y) * w * 3], 1, (size_t)w * 3, fp);
+            }
+            fclose(fp);
+            printf("game: wrote %s (%ux%u)\n", shot, w, h);
+        }
+        return;
+    }
     std::vector<uint16_t> fb((size_t)w * h);
     interp->mRapi->ReadFramebufferToCPU(window ? 0 : T2Offscreen_ShotFramebuffer(), w, h, fb.data());
     if (FILE* fp = fopen(shot, "wb")) {

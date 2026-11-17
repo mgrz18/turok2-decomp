@@ -219,3 +219,46 @@ void T2Offscreen_Finish() {
 }
 
 #endif
+
+// ---- T2_SHOT at 8 bits per channel (both platforms; offscreen_gl.h) ----
+#ifdef ENABLE_OPENGL
+#include "fast/backends/gfx_opengl.h"
+#include "fast/interpreter.h"
+#include <vector>
+
+bool T2Gl_ReadRGB8(const std::shared_ptr<Fast::Interpreter>& interp, int fbId, uint32_t w, uint32_t h, uint8_t* rgb) {
+    if (!interp || !interp->mRapi || dynamic_cast<Fast::GfxRenderingAPIOGL*>(interp->mRapi) == nullptr) {
+        return false;
+    }
+    GLint prevRead = 0;
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &prevRead);
+    static GLuint sReadFbo = 0; // a framebuffer of our own around the game framebuffer's colour texture
+    if (fbId == 0) {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    } else {
+        const GLuint tex = (GLuint)(uintptr_t)interp->mRapi->GetFramebufferTextureId(fbId);
+        if (sReadFbo == 0) {
+            glGenFramebuffers(1, &sReadFbo);
+        }
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, sReadFbo);
+        glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+        if (glCheckFramebufferStatus(GL_READ_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLuint)prevRead);
+            return false;
+        }
+    }
+    std::vector<uint8_t> rgba((size_t)w * h * 4);
+    glReadPixels(0, 0, (GLsizei)w, (GLsizei)h, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data());
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLuint)prevRead);
+    for (size_t i = 0; i < (size_t)w * h; i++) {
+        rgb[i * 3 + 0] = rgba[i * 4 + 0];
+        rgb[i * 3 + 1] = rgba[i * 4 + 1];
+        rgb[i * 3 + 2] = rgba[i * 4 + 2];
+    }
+    return true;
+}
+#else
+bool T2Gl_ReadRGB8(const std::shared_ptr<Fast::Interpreter>&, int, uint32_t, uint32_t, uint8_t*) {
+    return false;
+}
+#endif
