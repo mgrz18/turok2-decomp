@@ -96,7 +96,8 @@ It runs under `tools/port/aimdrive.py` (the lair driver answers through the inpu
   the weapons and ammo picked up, the wheel through the input; PLAYTHROUGH.md 25),
   `--stick-aim L,...` and `--assist-keep 1,110` (d3: those levels aimed with the stick through
   `aimdrive.py`; PLAYTHROUGH.md 24), `--walk 1,2` and `--walk-probe` (d5: open-floor teleports
-  walked with the stick; PLAYTHROUGH.md 22).
+  walked with the stick; PLAYTHROUGH.md 22). Round 16 e3: `--nav L,...` and `--nav-only L:I.J,...` (route teleports
+  walked by the closed-loop waypoint walker under `aimdrive.py`; PLAYTHROUGH.md 27-e3).
 
 **The level runs and the boss recipes**: round 12's table (below) with round 14's Primagen recipe
 (`T2_WARP_TO=7602 T2_BOSS_FRONT=450,3000,2.5,1`, boss env, `Z@14000..200000` and the lines of
@@ -330,6 +331,72 @@ block before level 2's `level_segments`), `port/game/t2bosslog.c` (`aimSkipType`
 `sAimOkFrame` after it), `port/app/game.cpp` (`ContRead`: the script's Z through
 `T2Port_FireGate`; one declaration). e2 touches the same aim code (`t2bosslog.c`) and the fire:
 `T2_FIRE_GATE` should give way to e2's driver-controlled fire when both are in.
+
+## Round 16, part e3: walking instead of teleports, the waypoint walker (branch names-R16_e3)
+
+**1. A navigation mesh from the level data** (`tools/port/nav.py`, [PLAYTHROUGH.md](PLAYTHROUGH.md)
+27-e3). The floor regions of a sub-level are its graph. Edges are crossed with
+`Sweep_CrossRegionEdge`'s rules: border edges and steep regions above the feet are walls, steep
+regions with flag 0x10 can be climbed, and deep water and drops cost more. A* runs over the regions
+and a funnel pulls the waypoints through the shared edges. Static objects' boxes are opt-in
+(`T2_NAV_BOXES=1`). `navcands.py RUNLOG` classifies every teleport of a run; `navplot.py` draws one
+walk (the mesh, the plan and the track).
+
+**2. A closed-loop walker** (`aimdrive.py` `WalkDrive`, input only): `T2_WALK_PLAN` windows, each also
+a `T2_MOVE_DRIVE` window. It plans from the player's real position at the window's start, steers the
+stick to the next waypoint and walks with C-up. When stuck it backs off, sidesteps and plans again
+round the stuck point. At the goal it turns to the step's facing. `fullrun.py --nav L,...` replaces
+`NAV_WALKS` teleports less `NAV_SKIP`; `--nav-only L:I.J,...` picks walks; `--walk-probe` measures
+each walk alone.
+
+**3. Results** (Linux Release, PIE, the binary of 5d835e51):
+
+- The probe (43 route steps of levels 1-4 with a floor path): **13 arrive** within 60 units, among
+  them a 5,816-unit, 23-waypoint walk in 57, 133's 3,690-unit one, all five of 134's (the start-to-gate
+  walk 52 short, d5's open loop ~200) and four of 135's. The others stop at doors, gates, cages,
+  crypts and graves (static objects and actors, not in the mesh), at ledges (no jump: the fifo
+  answer carries only the stick and the C buttons), or start while level 3's warps and cinemas run.
+- **In the full run every arriving walk but one breaks a later fight** (levels 1-4 have no
+  invincibility). A walk changes the state the next fight starts from: 57's walk leads to a death in
+  133, 134's to deaths at the gate, 135's later ones to deaths in sister 3's fight, level 3's to a
+  game over in 61. What stays is **135's (12, 1)**: `--nav 1,2,3,4` = the default command with that
+  one walk: END 2 at 250,970, all five totems and four bosses, the hub at 265,068; one life lost at the City
+  Totem (the default run: 2) and 2 in the Primagen's lair (242,424, 244,098), so 3 in all against 2.
+  Two runs identical: all 580,000 det lines, `ptcl` included.
+- **Teleports left: 288 of 289.** Of the default run's 289, the mesh joins the two ends of 170 under
+  8,000 units and 43 further. It does not join 76: 64 go to another floor (ledges, jumps, climbs,
+  warps) and 12 stay on one floor (water, region-flag boundaries). Per level in PLAYTHROUGH 27-e3.
+
+**Validated**: the default command (`playthrough.py RUN --all --talismans 2 --cheats-off
+1,2,3,4,5,6` under `aimdrive.py`) writes byte-identical `playthrough.txt`, `teleport.env` and
+`fullrun.txt` to 5d835e51's. Run under this branch's `aimdrive.py` (the 5d835e51 Release binary,
+`T2_DET_LOG=1`), it reaches END 2 (252,194) and the hub (266,292) as in round 15. Its 580,000 det lines
+are those of the same run under round 15's `aimdrive.py`, apart from the `ptcl` field (the known
+particle-pool hash, e1's task). `--nav 1,2,3,4`: above.
+
+**For the merge**: tools only, no src/include/port change (no asm_diff needed).
+
+- tools/port/aimdrive.py: `WalkDrive`, `walk_plan`, the `WALK_*` constants, and a branch in `main()`
+  before the lair driver's `move` branch (e2 edits the aim part of this file).
+- tools/port/fullrun.py:
+  - `NAV`, `NAV_ROM`, `NAV_ONLY`, `NAV_WALKS`, `NAV_SKIP`, `nav_frames`, `nav_table`;
+  - `Route.walk_to(sub=)`, `Route.walk_plan`, the `T2_WALK_PLAN` line in `write()`;
+  - `level1()`'s step loop, `level_segments(nav_walks=)`, the `walks=` arguments of the
+    level 2/3/4 calls;
+  - cli `--nav`/`--nav-only`.
+  e2 and e5 edit fullrun.py too.
+- New: tools/port/nav.py, navcands.py, navplot.py.
+
+**Next**:
+
+- Doors and gates as data: the static objects whose box spans a portal of the path, with the actor or
+  key that opens them.
+- A jump bit in the fifo answer (game.cpp masks the answer to the C buttons; R is 0x10) for the
+  ledges: about 30 "another floor" teleports in levels 1-2 are ledges.
+- The walks that arrive but break a fight: a run with invincibility kept for the level of the walk
+  only (`--cheats-on`), or the fight's own step re-timed to the arrival.
+- Map NAV_WALKS for levels 5-6 (routes56), level 4's route and the picks (keys, health, the hub's
+  key-slot legs): navcands.py matches only levels 1-3's route steps.
 
 ## Round 15, part d5: the -O2 uninitialised read found, clean errors, teleports counted (branch names-R15_d5)
 

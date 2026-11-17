@@ -2839,3 +2839,95 @@ plain picks. So `--real-weapons 1,2` still ends in game over in 134.
 3. **Levels 3-6** (not started): the plasma rifle in 64 and 124, the scorpion launcher in 66
    (the Marsh Totem), plasma cells in 65 and 68 (PLAYTHROUGH 25.5), the shredder for level 5 and
    the Mother.
+
+## 27-e3. Walking instead of teleporting: the waypoint walker (Phase 7 round 16, part e3)
+
+**The navigation mesh** (`tools/port/nav.py`, port-free: the ROM through tools/assets/levels.py). A
+sub-level's floor is its collision regions: triangles with their three edge neighbours (vertex y is the
+floor, w the ceiling). The player crosses an edge the way `Sweep_CrossRegionEdge` (func_0023B664.c)
+lets him:
+
+- a border edge (no neighbour) is a wall;
+- a steep region (region flag 8, or its normal when flag 0x2000 is set: `CGameRegion__IsSteep`) is a
+  wall when its highest corner is above his feet. So walls are regions too, and a steep region lower
+  than the feet is a slide down. Steep regions with flag 0x10 are climbable (`PlayerClimb_Enter`);
+- the region-flag 0x80, info 0x400000 and flags52 0x80 boundaries depend on the mover's collision flags
+  and stay closed (conservative);
+- deep water costs 4 times its length, a drop of more than 120 is one-way and costs 400.
+
+A* runs over the regions (centroid to edge midpoint to centroid). The simple stupid funnel then pulls
+the path through the shared edges, shrunk by 40 units at their ends: the waypoints. Static objects
+are not in the mesh. Their world boxes (`CStaticObject__Construct`: bfloat16 offsets from the
+position) can be routed round (`T2_NAV_BOXES=1`). They are off by default: a box is only the broad
+phase. Hollow buildings, corridor pieces and floor mounds have boxes too, and going round boxes made
+135's walk (12, 1) fail. That walk goes straight through when the boxes are ignored.
+
+```sh
+python3 tools/port/nav.py baserom.us.z64 134 78.7,1024,-870.5 1650,1024,-870   # the waypoints
+python3 tools/port/navcands.py baserom.us.z64 RUN/run.log [--table]   # every teleport of a run, classified
+python3 tools/port/navplot.py baserom.us.z64 135 STATS F1 F2 out.png [A B]   # one walk drawn (matplotlib)
+```
+
+**The walker** (`aimdrive.py`'s `WalkDrive`, input only, deterministic). It drives
+`T2_WALK_PLAN="F1-F2@SUB:X,Y,Z,ROTY;..."` (each window is also a `T2_MOVE_DRIVE` window, so the
+game sends its "move" line every frame). At a window's first line it plans from where the player
+really stands. Then, every frame:
+
+- the stick turns him to the next waypoint, with the answers still in flight predicted as in d3's `Aim`;
+- C-up walks while the yaw error is under 0.6 rad;
+- a waypoint counts as passed within 60 units; within 30 of the goal he stops and turns to ROTY;
+- stuck (under 25 units in 36 frames of C-up): back off 10 frames, sidestep 24 (the side alternates),
+  and plan again, with a 100-unit box where he stopped as an obstacle.
+
+The answer is "SX 0 C" (stick X, C buttons) on the existing fifo; nothing in the game changed.
+`fullrun.py --nav L,...` replaces the route teleports of `NAV_WALKS[L]` (less `NAV_SKIP`) by walk
+windows of `nav_frames()` frames: the path at 0.85 of the walking speed, the two turns at the stick's
+full rate, 40 more. Like d5's `--walk`, the step and the later steps of its level move by the window.
+`--nav-only L:I.J,...` takes just those walks. `--walk-probe` also teleports at each window's end, so
+each walk is measured from the default route's place.
+
+**The probe** (`--nav 1,2,3,4 --walk-probe`, Linux Release, 43 candidates: every route step of levels
+1-4 whose two ends the mesh joins):
+
+| where | walks | arrived (error under 60) | why the others do not |
+|---|---|---|---|
+| level 1 | 7 | 1: 57's 5,816-unit walk (23 waypoints, error 48) | 53: a closed door across the power cell's alcove (z 7,120) and the cage bars; 54: the ledge and the cage; 55: a ledge and a climb; 58: a drop |
+| level 2, 133 | 3 | 1 (3,690 units, error 25) | doors between the zombies' rooms (x -1,547) |
+| level 2, 134 | 5 | 5 (the start-to-gate walk: 1,716 units, error 52, d5's open loop: ~200) | |
+| level 2, 135 | 15 | 4 ((12, 1) 719, (12, 10), (12, 12), (12, 15)) | the gate posts at z -3,350, the crypts, the graves: things the mesh does not have |
+| level 3 | 12 | 2 (69 in place, 66: error 44) | the walks start while the player is elsewhere: warps and cinemas move under level 3's anchors |
+| level 4 | 1 | 0 | 107: stuck 5 times |
+
+**The full run is the limit, not the walking.** A walk that arrives still changes the game state the
+next fights start from, and levels 1-4 are played without invincibility:
+
+| `--nav-only` (with the default command) | result |
+|---|---|
+| `1:7.1` (57) | arrives; then a death in 133's zombie fight (43,743): level 2's fights depend on level 1's state |
+| `2:9.0,2:9.1,2:9.2,2:9.4` (134) | the walks arrive; death at the gate (53,755): zombie 4 meets the player at a new time |
+| `2:12.1,2:12.10` (135) | arrive; a death in sister 3's fight (72,097) |
+| `2:12.1,3:1.2,3:9.1` | arrive; the City Totem as in the default run, then a death in level 3 (61, 122,021): game over |
+| `2:9.0,2:9.1,2:12.1` (134's two in-place steps in 40-frame windows) | deaths at the gate (53,513, 57,995) and in 135: game over |
+| `2:12.1` (135: from the start to the first crypt step, 719 units) | **END 2** at 250,970, all five totems and four bosses, the hub at 265,068; one life lost at the City Totem (the default run: 2) and 2 in the Primagen's lair (242,424 and 244,098); two runs identical (all 580,000 det lines, `ptcl` included) |
+
+So `NAV_SKIP` holds the walks that do not arrive and the ones that arrive but break the run, and
+**`--nav 1,2,3,4` is one walk** (135's (12, 1)): 288 teleports instead of 289. The default command
+(no `--nav`) writes byte-identical `playthrough.txt`, `teleport.env` and `fullrun.txt` to 5d835e51's,
+and `aimdrive.py` answers it exactly as before (no `T2_WALK_PLAN`: the lair driver alone).
+
+**Where the 289 teleports stand** (`navcands.py` over the default run's log, by level):
+
+| level | teleports | path under 8,000 | no path, another floor (dy > 100) | no path, same floor | path over 8,000 |
+|---|---|---|---|---|---|
+| the hub and the rest (unmapped sub-levels) | 59 | 48 | 2 | 1 | 8 |
+| 1 | 33 | 9 | 15 | 3 | 6 |
+| 2 | 53 | 32 | 15 | 0 | 6 |
+| 3 | 35 | 21 | 11 | 0 | 3 |
+| 4 | 31 | 13 | 6 | 3 | 9 |
+| 5 | 33 | 17 | 10 | 3 | 3 |
+| 6 and the lair | 45 | 30 | 5 | 2 | 8 |
+
+"No path, another floor" are ledges, jumps and climbs the mesh closes (a steep region above the feet:
+the player would jump; the fifo answer carries only the C buttons and the stick, not R) and warps;
+"no path, same floor" are floors split by water or by a region-flag boundary. A path in the mesh is
+not a walk: doors, gates, cages, crypts and graves are static objects or actors.

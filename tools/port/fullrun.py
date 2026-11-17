@@ -28,6 +28,8 @@ import routes56 as r56  # noqa: E402
 
 STICK_AIM = set()   # round 15 d3: the levels aimed with the stick (--stick-aim)
 ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
+NAV = set()         # round 16 e3: the levels whose NAV_WALKS teleports the waypoint walker replaces (--nav)
+NAV_ROM = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "baserom.us.z64")
 
 
 class Route:
@@ -67,17 +69,32 @@ class Route:
         # weapons and ammo picked up on the way, the weapon changes in the input stream)
         self.real_until = None
         self.move_drive = []     # round 15 C30 (--lair-drive): T2_MOVE_DRIVE windows
+        self.walk_plan = []      # round 16 e3 (--nav): T2_WALK_PLAN windows (f1, f2, sub-level, x, y, z, rotY)
 
     def note(self, frame, text):
         self.inputs.append("# %d: %s" % (frame, text))
         self.timeline.append((frame, text))
 
-    def walk_to(self, f, frm, x, y, z, ry, walk=0):
+    def walk_to(self, f, frm, x, y, z, ry, walk=0, sub=None):
         """Instead of a teleport to (x, z, ry) at the end: walk there from frm (x, z, rotY) with the
         stick (playthrough.stick_walk) from frame f, then the step's own C-up walk. Returns the
-        frames the walk takes (the step happens that much later)."""
-        ins, n = pt.stick_walk(f, frm[:2], frm[2], (x, z), ry)
-        self.inputs += ins
+        frames the walk takes (the step happens that much later).
+        sub (round 16 e3, --nav): the sub-level; the walk is then aimdrive.py's waypoint walker, closed
+        loop from where the player really is, in a window of nav_frames() frames."""
+        if sub is not None:
+            n = nav_frames(sub, frm, (x, y, z), ry)
+            self.walk_plan.append((f, f + n - 1, sub, x, y, z, ry))
+            self.move_drive.append((f, f + n - 1))
+            self.note(f, "%d: walk to (%.0f, %.0f) [%d frames]" % (sub, x, z, n))
+            self.walked += 1
+            if self.walk_probe:   # --walk-probe: the teleport too, at the window's end (each walk measured alone)
+                self.tps.append("%d:%.1f,%.1f,%.1f,%.4f" % (f + n, x, y, z, ry))
+            if walk:
+                self.inputs.append("CU@%d..%d" % (f + n + 10, f + n + 10 + walk))
+            return n
+        else:
+            ins, n = pt.stick_walk(f, frm[:2], frm[2], (x, z), ry)
+            self.inputs += ins
         self.walked += 1
         if self.walk_probe:   # --walk-probe: the teleport too, at the walk's end (its log line: the arrival)
             self.tps.append("%d:%.1f,%.1f,%.1f,%.4f" % (f + n, x, y, z, ry))
@@ -104,7 +121,7 @@ class Route:
                 o = st[6] if len(st) > 6 else {}
                 f = start + rel + dt
                 if o.get("walkfrom"):   # round 15 d5: walked (the step was moved by the walk's frames)
-                    self.walk_to(f - o["walkframes"], o["walkfrom"], x, y, z, ry, walk)
+                    self.walk_to(f - o["walkframes"], o["walkfrom"], x, y, z, ry, walk, o.get("walksub"))
                 else:
                     self.tp(f, x, y, z, ry, walk, o.get("trig"))
                 if o.get("stick"):   # round 14 c5: aim with the stick only (playthrough.stick_aim)
@@ -164,7 +181,9 @@ class Route:
                        [(w[0], a - 1) for w in wins if w[0] < a <= w[1]] + [(b + 1, w[1]) for w in wins if w[0] <= b < w[1]]
             env.append("T2_AIM_STICK=\"%s\"" % ";".join("%d-%d" % w for w in sorted(wins)))
         if self.move_drive:
-            env.append("T2_MOVE_DRIVE=\"%s\"" % ";".join("%d-%d" % w for w in self.move_drive))
+            env.append("T2_MOVE_DRIVE=\"%s\"" % ";".join("%d-%d" % w for w in sorted(self.move_drive)))
+        if self.walk_plan:   # round 16 e3: aimdrive.py's waypoint walker (WalkDrive)
+            env.append("T2_WALK_PLAN=\"%s\"" % ";".join("%d-%d@%d:%.1f,%.1f,%.1f,%.4f" % w for w in self.walk_plan))
         if self.anchors:
             env.append("T2_ANCHOR=\"%s\"" % ";".join("%s@%d" % (l, f) for f, l in sorted(self.anchors, key=lambda a: a[0])))
         if self.saves:
@@ -190,7 +209,8 @@ class Route:
             for f, t in sorted(self.timeline):
                 fp.write("%7d  %s\n" % (f, t))
         last = max([int(t.split(":")[0]) for t in self.tps] + [getattr(self, "end", 0)])
-        print("%d inputs, %d teleports, %d walks; last frame %d" % (len(self.inputs), len(self.tps), self.walked, last))
+        print("%d inputs, %d teleports, %d walks (%d by the waypoint walker); last frame %d" % (
+            len(self.inputs), len(self.tps), self.walked, len(self.walk_plan), last))
         return last
 
 
@@ -224,6 +244,124 @@ L2_WALKS = {
                                            # ~200 short; the zombie-4 fight there opens gate 8 and
                                            # the next step teleports back to the gate spot)
 }
+# ---- round 16 e3 (--nav L,...): teleports replaced by the closed-loop waypoint walker ----
+# {level: {(segment index, step index): (x, z, rotY, y) where the player stands when the step's teleport
+# fires in the default run}} (tools/port/navcands.py RUNLOG --table: the route steps of levels 1-4 whose
+# two ends tools/port/nav.py joins on the floor). The walk starts at the step's frame from wherever the
+# player really is; the step (and every later one of the level) moves by the window (nav_frames).
+NAV_WALKS = {
+    1: {
+        (2, 2): (1498.6, 6950.4, -0.0126, 0.0),   # 14900 in 53: 1601 straight, 1824 by the path
+        (2, 5): (460.8, -47.8, 0.0000, 0.0),   # 15290 in 53: 304 straight, 304 by the path
+        (4, 0): (2664.2, 1557.9, 0.0000, 921.6),   # 16400 in 55: 5475 straight, 6878 by the path
+        (5, 0): (768.0, -3225.6, 1.5707, 614.4),   # 16850 in 54: 5053 straight, 6681 by the path
+        (5, 1): (-3961.7, -1737.9, -1.5708, 0.0),   # 17000 in 54: 1219 straight, 1932 by the path
+        (7, 1): (-2321.3, -1021.3, -1.5708, -614.4),   # 18050 in 57: 1184 straight, 5816 by the path
+        (8, 0): (1201.3, -1544.1, 0.0000, 307.2),   # 18800 in 58: 1469 straight, 1710 by the path
+    },
+    2: {
+        (6, 0): (920.5, -1335.8, 0.0000, -4761.5),   # 36680 in 133: 2452 straight, 3690 by the path
+        (6, 1): (-1504.0, -972.0, -4.8374, -4761.6),   # 38080 in 133: 2629 straight, 3723 by the path
+        (6, 2): (-452.9, 1304.6, 0.4067, -4761.6),   # 47680 in 133: 3199 straight, 7298 by the path
+        (9, 0): (78.7, -870.5, -1.5707, 1024.0),   # 49280 in 134: 0 straight, 0 by the path
+        (9, 1): (78.7, -870.5, -1.9397, 1024.0),   # 50480 in 134: 0 straight, 0 by the path
+        (9, 2): (78.7, -870.5, -1.5306, 1024.0),   # 51780 in 134: 1571 straight, 1716 by the path
+        (9, 3): (997.3, -933.3, 1.1943, 1024.0),   # 54880 in 134: 656 straight, 778 by the path
+        (9, 4): (1650.0, -870.0, -2.3920, 1024.1),   # 59880 in 134: 632 straight, 632 by the path
+        (12, 1): (141.7, -5650.5, 0.0000, 0.0),   # 63080 in 135: 719 straight, 719 by the path
+        (12, 2): (-37.6, -4953.9, 3.6074, 0.0),   # 64680 in 135: 4222 straight, 4381 by the path
+        (12, 3): (894.3, -669.5, 3.0697, 0.2),   # 64880 in 135: 2435 straight, 3089 by the path
+        (12, 4): (2822.9, -2353.8, -0.3950, 0.2),   # 65080 in 135: 5750 straight, 6576 by the path
+        (12, 5): (-2921.4, -1332.8, 2.7377, 0.2),   # 65280 in 135: 5826 straight, 6678 by the path
+        (12, 6): (2809.4, 60.0, -0.8506, 0.2),   # 65480 in 135: 5656 straight, 7065 by the path
+        (12, 7): (-2922.0, 202.2, 2.6991, 0.2),   # 65680 in 135: 1385 straight, 2569 by the path
+        (12, 8): (-2924.3, 1640.3, 1.5749, 0.2),   # 65880 in 135: 5520 straight, 5520 by the path
+        (12, 9): (2824.0, 1417.2, -1.5329, 0.2),   # 66080 in 135: 3898 straight, 3967 by the path
+        (12, 10): (-1043.0, 926.0, 5.3412, 0.2),   # 68680 in 135: 451 straight, 451 by the path
+        (12, 11): (-781.7, 465.2, -0.7420, 0.2),   # 68980 in 135: 2136 straight, 2197 by the path
+        (12, 12): (1336.0, 743.0, 1.4499, 0.2),   # 71580 in 135: 392 straight, 392 by the path
+        (12, 13): (-673.8, 264.6, 0.7710, 0.1),   # 71880 in 135: 2021 straight, 3278 by the path
+        (12, 14): (-1109.6, 2171.3, 0.6540, 0.0),   # 72180 in 135: 2361 straight, 2363 by the path
+        (12, 15): (1314.6, 2173.7, -0.6800, 0.0),   # 72580 in 135: 1872 straight, 2423 by the path
+    },
+    3: {
+        (0, 0): (4616.5, -3914.2, -3.1416, -431.0),   # 97644 in 61: 366 straight, 366 by the path
+        (1, 1): (640.3, -2464.5, -1.5707, 308.4),   # 98924 in 69: 2371 straight, 4823 by the path
+        (1, 2): (-1492.1, -1428.2, 3.1416, -305.2),   # 99074 in 69: 0 straight, 0 by the path
+        (5, 0): (-1280.0, 4475.4, -1.5707, 2.8),   # 101444 in 64: 186 straight, 186 by the path
+        (6, 1): (1231.1, -1283.0, 0.0000, -921.4),   # 102274 in 70: 3341 straight, 4772 by the path
+        (6, 2): (-887.1, 1300.7, -0.0187, -614.2),   # 102404 in 70: 0 straight, 0 by the path
+        (8, 1): (-1068.2, -5287.7, -1.5707, 18.3),   # 103444 in 65: 3740 straight, 5620 by the path
+        (9, 1): (-368.1, -1084.5, 0.0000, -252.7),   # 104194 in 66: 387 straight, 655 by the path
+        (9, 3): (524.4, 2697.8, 2.5131, -903.3),   # 104594 in 66: 2353 straight, 2740 by the path
+        (11, 1): (710.2, -899.5, 0.0000, -1533.8),   # 105724 in 71: 1864 straight, 5215 by the path
+        (11, 2): (-800.8, 191.7, 1.1009, -919.4),   # 105874 in 71: 0 straight, 0 by the path
+        (13, 0): (-2211.6, -1543.4, 0.0000, 0.0),   # 106894 in 68: 3353 straight, 3353 by the path
+    },
+    4: {
+        (7, 0): (629.8, -2867.2, -2.0720, -2457.4),   # 122994 in 107: 3068 straight, 3614 by the path
+    },
+}
+NAV_SPEED = 0.85     # nav_frames: the walking speed reached on a path (the corners)
+NAV_SLACK = 40       # nav_frames: frames on top
+# Probed (--nav 1,2,3,4 --walk-probe: each walk from the default route's place, the teleport kept at the
+# window's end; Linux Release; PLAYTHROUGH.md 27-e3): the walks that do not arrive (arrival error in units),
+# and the ones that arrive but break the full run (tried with --nav-only on the default command). Left:
+# 135's (12, 1) (--nav 2: END 2, all five totems)
+NAV_SKIP = {   # {level: {(i, j): why}}: candidates the walker does not take
+    1: {(7, 1): "57: arrives (error 48), but a death in 133's zombie fight follows (level 2 starts from another state)",
+        (2, 2): "53: a closed door across the power cell's alcove (z 7,120), 1,422",
+        (2, 5): "53: the cage's bars, 237",
+        (4, 0): "55: a ledge and a climb on the way, 3,830",
+        (5, 0): "54: the way down from the ledge, 2,971",
+        (5, 1): "54: the cage's bars, 961",
+        (8, 0): "58: a drop the walker does not find, 218-3,286"},
+    2: {(6, 0): "133: arrives (error 25); not run in the full run (133's fights)",
+        (9, 0): "134: in place; a 40-frame window: deaths at the gate (53,513)",
+        (9, 1): "134: in place; as (9, 0)", (9, 2): "134: arrives (error 50); death at the gate (53,755)",
+        (9, 3): "134: after the gate fight, 256-609 short", (9, 4): "134: arrives (error 43); with (9, 2) only",
+        (12, 10): "135: arrives (error 44); a death in sister 3's fight (72,097)",
+        (12, 12): "135: arrives (error 49); in sister 3's fight", (12, 15): "135: arrives (error 49); in sister 3's fight",
+        (6, 1): "133: a closed door between the zombies' rooms (x -1,547), 2,639",
+        (6, 2): "133: doors, 3,365",
+        (12, 2): "135: the gate posts at z -3,350, 2,715",
+        (12, 3): "135: the crypts, 1,803", (12, 4): "135: the crypts, 4,939", (12, 5): "135: the crypts, 3,339",
+        (12, 6): "135: the crypts, 4,843", (12, 7): "135: the crypts, 1,912", (12, 8): "135: the crypts, 4,680",
+        (12, 9): "135: the crypts, 3,112", (12, 11): "135: the graves, 1,984", (12, 13): "135: the graves, 2,028",
+        (12, 14): "135: stops 127 short (the fight there needs the spot)"},
+    3: {**{k: "level 3: the walks start while the player is elsewhere (warps and cinemas move under the anchors)"
+           for k in ((0, 0), (1, 1), (5, 0), (6, 1), (6, 2), (8, 1), (9, 3), (11, 1), (11, 2), (13, 0))},
+        (1, 2): "69: in place; with (9, 1) a death in 61 (122,021), game over",
+        (9, 1): "66: arrives (error 41); as (1, 2)"},
+    4: {(7, 0): "107: 2,286 (stuck 5 times)"},
+}
+
+
+def nav_frames(sub, frm, to, ry_end=None):
+    """The waypoint walker's window for a walk from frm (x, z, rotY[, y]) to `to` (x, y, z) in sub-level sub,
+    facing ry_end at the end: the path at NAV_SPEED of the walking speed, the two turns at the stick's full
+    rate, NAV_SLACK more (the route's fights go on round a walk: the window is kept short)."""
+    import nav
+    y0 = frm[3] if len(frm) > 3 else to[1]
+    try:
+        res = nav.load(NAV_ROM, sub).path((frm[0], y0, frm[1]), tuple(to))
+    except Exception:
+        res = None
+    pts = res[0] if res else [(frm[0], frm[1]), (to[0], to[2])]
+    ln = res[2] if res else math.hypot(to[0] - frm[0], to[2] - frm[1])
+    turns = 0.0
+    yaw = frm[2]
+    if ln > 1.0:
+        first = pt.face_yaw(pts[0][0], pts[0][1], pts[1][0], pts[1][1])
+        last = pt.face_yaw(pts[-2][0], pts[-2][1], pts[-1][0], pts[-1][1])
+        turns += abs(pt.wrap(first - yaw))
+        yaw = last
+    if ry_end is not None:
+        turns += abs(pt.wrap(ry_end - yaw))
+    walk = int(ln / (NAV_SPEED * pt.WALK_SPEED)) + pt.WALK_LAG if ln > 1.0 else 0
+    return walk + int(turns / pt.TURN_FULL) + NAV_SLACK
+
+
 # Probed and failed (arrival error in units): 133 (6, 0) 2,143, (6, 1) 2,151, (6, 2) 5,191 (the
 # zombies' rooms: doors); 134 (9, 3) 867, (9, 4) 1,669 (after the aim-assisted fights: the yaw is
 # not the default run's); 135 (12, 1) 1,479, (12, 3) 1,674, (12, 7) 971, (12, 9) 3,383, (12, 10)
@@ -259,6 +397,16 @@ L2_RETURN_LATE = []
 L2_RETRY_B5 = [(12, 8850, -714.0, 0.0, 488.0, 0.0)]
 
 
+NAV_ONLY = None      # --nav-only L:I.J,...: just these walks (testing one at a time)
+
+
+def nav_table(level):
+    """NAV_WALKS[level] less NAV_SKIP[level] (or just --nav-only's)."""
+    if NAV_ONLY is not None:
+        return {k: v for k, v in NAV_WALKS.get(level, {}).items() if (level,) + k in NAV_ONLY}
+    return {k: v for k, v in NAV_WALKS.get(level, {}).items() if k not in NAV_SKIP.get(level, {})}
+
+
 def merged(*dicts):
     out = {}
     for d in dicts:
@@ -281,7 +429,11 @@ def level1(r, start_shift=0, keys=True, health=True, arms=False):
                 f0 += KEY_STEP
                 added += KEY_STEP
         for j, (dt, x, y, z, ry, walk) in enumerate(steps):
-            if 1 in r.walk and (i, j) in L1_WALKS:
+            if 1 in NAV and (i, j) in nav_table(1):   # round 16 e3: the waypoint walker
+                n = r.walk_to(f0 + dt, nav_table(1)[(i, j)], x, y, z, ry, walk, int(name.split()[0]))
+                f0 += n
+                added += n
+            elif 1 in r.walk and (i, j) in L1_WALKS:
                 n = r.walk_to(f0 + dt, L1_WALKS[(i, j)], x, y, z, ry, walk)
                 f0 += n
                 added += n
@@ -443,7 +595,8 @@ def stretch(segments, extra):
     return segs
 
 
-def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back=(), detours=None, walks=None):
+def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back=(), detours=None, walks=None,
+                   nav_walks=False):
     """A 7-tuple segment list from `start` with keys inserted; returns the frames added.
     anchor: the segment indices whose key picks re-anchor the schedule clock when the segment's level
     is reached (T2_ANCHOR) and wait KEY_WAIT frames, so that a pick-up waits for the level when its
@@ -466,7 +619,11 @@ def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back
                 o = dict(st[6] if len(st) > 6 else {})
                 frm = walks[(i, j)]
                 o["walkfrom"] = frm
-                o["walkframes"] = pt.stick_walk(0, frm[:2], frm[2], (st[1], st[3]), st[4])[1]
+                if nav_walks:   # round 16 e3: the waypoint walker's window
+                    o["walksub"] = int(name.split()[0])
+                    o["walkframes"] = nav_frames(o["walksub"], frm, (st[1], st[2], st[3]), st[4])
+                else:
+                    o["walkframes"] = pt.stick_walk(0, frm[:2], frm[2], (st[1], st[3]), st[4])[1]
                 st = st[:6] + [o]
                 steps[j] = st
                 for k in range(j, len(steps)):
@@ -843,7 +1000,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {}) if extras else {},
                         L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else []), l2stretch,
                         back=L2_RETURN_LATE if h2 else (), detours=det.get(2),
-                        walks=L2_WALKS if 2 in walk else None)
+                        walks=nav_table(2) if 2 in NAV else L2_WALKS if 2 in walk else None, nav_walks=2 in NAV)
     t_arr = pt.L2_TOTEM_ARRIVAL + shift + a2
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
     arms_switch(r, 2, t_arr, real)
@@ -871,7 +1028,8 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     l3s = pt.L3_START + shift
     h3 = health and 3 in r.no_cheats
     a3 = level_segments(r, l3_segments(3 in r.no_cheats), l3s,
-                        merged(L3_KEYS, L3_HEALTH if h3 else {}, L3_ARMS if 3 in real else {}) if extras else {}, anchor=L3_ANCHOR, detours=det.get(3))
+                        merged(L3_KEYS, L3_HEALTH if h3 else {}, L3_ARMS if 3 in real else {}) if extras else {}, anchor=L3_ANCHOR, detours=det.get(3),
+                        walks=nav_table(3) if 3 in NAV else None, nav_walks=3 in NAV)
     a3x = sum(len(v) for v in L3_HEALTH.values()) * KEY_STEP if h3 and extras else 0
     for k in hubs:   # round 14 c1: the hub anchors after level 3 move with its health picks
         if k >= 3:
@@ -904,7 +1062,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     l4s = pt.L4_START + shift
     h4 = health and 4 in r.no_cheats
     a4 = level_segments(r, pt.L4_SEGMENTS, l4s, merged(L4_KEYS, L4_HEALTH if h4 else {}) if extras else {},
-                        anchor=L4_ANCHOR)
+                        anchor=L4_ANCHOR, walks=nav_table(4) if 4 in NAV else None, nav_walks=4 in NAV)
     a4x = sum(len(v) for v in L4_HEALTH.values()) * KEY_STEP if h4 and extras else 0
     for k in hubs:   # round 14 c1: the hub anchors after level 4 move with its health picks
         if k >= 4:
@@ -1106,7 +1264,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT
+    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1122,6 +1280,10 @@ def cli(argv=None):
                     "of L1_WALKS/L2_WALKS (levels 1, 2; round 15 d5)")
     ap.add_argument("--walk-probe", action="store_true", help="with --walk: teleport too at each walk's end "
                     "(the teleport log line gives the arrival; every walk starts from the default route's place)")
+    ap.add_argument("--nav", default="", help="L1,L2,...: the route teleports of NAV_WALKS in these levels (1-4) "
+                    "walked by the closed-loop waypoint walker (run under tools/port/aimdrive.py; round 16 e3)")
+    ap.add_argument("--nav-only", default=None, help="L:I.J,...: with --nav, only these walks (level, segment, "
+                    "step), NAV_SKIP's included")
     ap.add_argument("--talismans", nargs="?", const="2,3", default="",
                     help="the talisman chambers of these levels (default 2,3; round 13 b3)")
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
@@ -1155,6 +1317,9 @@ def cli(argv=None):
     ARMS_HUB_WAIT = a.hub_wait
     HOP = a.hop
     STICK_AIM = {int(x) for x in a.stick_aim.split(",") if x}
+    NAV = {int(x) for x in a.nav.split(",") if x}
+    if a.nav_only is not None:
+        NAV_ONLY = {tuple(int(v) for v in k.replace(":", ".").split(".")) for k in a.nav_only.split(",") if k}
     ASSIST_KEEP = [x for x in a.assist_keep.split(",") if x]
     if a.late_keys:
         PRIMAGEN_LATE = (2, 3)

@@ -388,6 +388,157 @@ def move_answer(line, drive):
     return frame, px, py, pz, drive.answer(frame, px, pz, ry)
 
 
+# --- the waypoint walker (round 16 e3, PLAYTHROUGH.md 27-e3): T2_WALK_PLAN windows -------------------
+# T2_WALK_PLAN="F1-F2@LEVEL:X,Y,Z,ROTY;..." (fullrun.py --nav): inside each window (also a T2_MOVE_DRIVE
+# window, so the game sends "move" lines) the player walks to (X, Z) of sub-level LEVEL and turns to ROTY.
+# At the window's first line the path is planned from where the player really stands (tools/port/nav.py:
+# the level's floor regions, A*, the funnel); every frame the stick turns him towards the next waypoint
+# (the yaw through the measured stick turn rate, with the answers still in flight predicted as in Aim) and
+# C-up walks while he faces it. Stuck (no progress for WALK_STUCK frames): back off, sidestep (the side
+# alternates), plan again from there. Input only, deterministic.
+WALK_NEAR = 60.0        # a waypoint is passed this close
+WALK_ARRIVE = 30.0      # the goal: stop pressing C-up (the coast, ~20 units, takes him the rest)
+WALK_FACE = 0.03        # the closing turn's tolerance (rad)
+WALK_GO = 0.6           # C-up only while the yaw error is below this (rad)
+WALK_STUCK = 36         # frames of C-up with under WALK_STUCK_D units moved: stuck
+WALK_STUCK_D = 25.0
+WALK_BACK, WALK_SIDE = 10, 24   # the recovery: C-down frames, then sidestep frames
+WALK_BLOCK = 50.0       # a stuck point becomes a box this half-wide, this far ahead of him
+
+
+def walk_plan(spec):
+    out = []
+    for part in (spec or "").split(";"):
+        if not part.strip():
+            continue
+        win, rest = part.split("@")
+        lvl, pt_ = rest.split(":")
+        a, b = (int(v) for v in win.split("-"))
+        out.append((a, b, int(lvl), tuple(float(v) for v in pt_.split(","))))
+    return out
+
+
+class WalkDrive:
+    def __init__(self, plan, rom):
+        self.plan = plan
+        self.rom = rom
+        self.cur = None          # the plan entry being walked
+        self.pts = []
+        self.wi = 0
+        self.sent = []
+        self.state = "go"
+        self.hist = []           # (frame, x, z) while C-up is held
+        self.rec = 0             # recovery frames left
+        self.side = C_L
+        self.stucks = 0
+        self.done = None         # the frame the goal was reached
+        self.report = []
+        self.extra = []
+
+    def active(self, frame):
+        for e in self.plan:
+            if e[0] <= frame <= e[1]:
+                return e
+        return None
+
+    def replan(self, px, py, pz):
+        g = self.cur[3]
+        try:
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            import nav
+            n = nav.load(self.rom, self.cur[2])
+            base = n.boxes
+            n.boxes = base + self.extra    # the places he got stuck at, as obstacles
+            try:
+                res = n.path((px, py, pz), g[:3])
+            finally:
+                n.boxes = base
+        except Exception as e:   # no level data: walk straight
+            print("walkdrive: no plan (%s)" % e, file=sys.stderr)
+            res = None
+        self.pts = res[0][1:] if res else [(g[0], g[2])]
+        self.plen = res[2] if res else math.hypot(g[0] - px, g[2] - pz)
+        self.wi = 0
+        self.hist = []
+
+    def finish(self, frame, px, pz):
+        if self.cur is None:
+            return
+        g = self.cur[3]
+        err = math.hypot(g[0] - px, g[2] - pz)
+        self.report.append("walkdrive: %d-%d level %d -> (%.0f, %.0f): %s, %d stuck, %d waypoints %.0f units; "
+                           "error %.0f at the window's end" % (
+                               self.cur[0], self.cur[1], self.cur[2], g[0], g[2],
+                               "arrived at %d" % self.done if self.done else "NOT ARRIVED",
+                               self.stucks, self.npts, self.plen0, err))
+        print(self.report[-1], file=sys.stderr)
+        self.cur = None
+
+    def turn(self, ry, want):
+        yaw_p = ry
+        for sx in self.sent:
+            yaw_p += turn_of(sx)
+        e = wrap(want - yaw_p)
+        sx = axis(e, TURN_FULL, GAIN / TICK)
+        self.sent = (self.sent + [sx])[-(LAG - 1):]
+        return sx, wrap(want - ry)
+
+    def answer(self, frame, px, py, pz, ry):
+        """(sx, buttons) for this frame, or None outside the plan's windows."""
+        self.py = py
+        if self.cur is not None and frame > self.cur[1]:
+            self.finish(frame, px, pz)   # its last frame sent no line (a warp, a cinema)
+        e = self.active(frame)
+        if e is None:
+            return None
+        if e is not self.cur:
+            self.finish(frame, px, pz)
+            self.cur, self.state, self.stucks, self.done, self.sent, self.rec = e, "go", 0, None, [], 0
+            self.extra = []
+            self.replan(px, py, pz)
+            self.npts, self.plen0 = len(self.pts), self.plen
+        ans = self._step(frame, px, pz, ry)
+        if e[1] == frame:
+            self.finish(frame, px, pz)
+        return ans
+
+    def _step(self, frame, px, pz, ry):
+        g = self.cur[3]
+        if self.state == "face" or math.hypot(g[0] - px, g[2] - pz) < WALK_ARRIVE:
+            if self.state != "face":
+                self.state, self.done = "face", frame
+            sx, err = self.turn(ry, g[3])
+            return (sx if abs(err) > WALK_FACE else 0), 0
+        if self.rec > 0:   # stuck: back off, then sidestep
+            self.rec -= 1
+            return 0, (C_D if self.rec >= WALK_SIDE else self.side)
+        while self.wi < len(self.pts) - 1 and math.hypot(self.pts[self.wi][0] - px, self.pts[self.wi][1] - pz) < WALK_NEAR:
+            self.wi += 1
+        tx, tz = self.pts[self.wi]
+        sx, err = self.turn(ry, face_yaw(px, pz, tx, tz))
+        go = abs(err) < WALK_GO
+        if go:
+            self.hist.append((frame, px, pz))
+            old = [h for h in self.hist if frame - h[0] >= WALK_STUCK]
+            if old and math.hypot(px - old[-1][1], pz - old[-1][2]) < WALK_STUCK_D:
+                self.stucks += 1
+                self.rec = WALK_BACK + WALK_SIDE
+                # what stopped him: an obstacle WALK_BLOCK wide just ahead (the next plan goes round it)
+                fx, fz = px - math.sin(ry) * WALK_BLOCK, pz - math.cos(ry) * WALK_BLOCK
+                self.extra.append((fx - WALK_BLOCK, fx + WALK_BLOCK, fz - WALK_BLOCK, fz + WALK_BLOCK, -1e9, 1e9))
+                self.side = C_R if self.side == C_L else C_L
+                self.hist = []
+                self.pending = True
+                return 0, C_D
+            self.hist = [h for h in self.hist if frame - h[0] <= WALK_STUCK + 4]
+        else:
+            self.hist = []
+        if getattr(self, "pending", False) and self.rec == 0:
+            self.pending = False
+            self.replan(px, self.py, pz)
+        return sx, (C_U if go else 0)
+
+
 def main():
     args = sys.argv[1:]
     probe = None
@@ -416,10 +567,25 @@ def main():
     picker = Picker() if PICK and not probe else None
     trig = Trigger() if FIRE and not probe else None
     drive = LairDrive()
+    rom = cmd[cmd.index("--rom") + 1] if "--rom" in cmd else "baserom.us.z64"
+    walk = WalkDrive(walk_plan(os.environ.get("T2_WALK_PLAN")), rom)
     moves = 0
     try:
         with open(os.path.join(d, "out")) as fin, open(os.path.join(d, "in"), "w") as fout:
             for line in fin:
+                if line.startswith("move ") and walk.plan:   # T2_WALK_PLAN: the waypoint walker
+                    fl = line.split()
+                    frame = int(fl[1])
+                    wpx, wpy, wpz, wry = (float.fromhex(v) for v in fl[2:6])
+                    wa = walk.answer(frame, wpx, wpy, wpz, wry)
+                    if wa is not None:
+                        fout.write("%d 0 c%x%s\n" % (wa[0], wa[1], " r1" if len(wa) > 2 and wa[2] else ""))  # (sx, C[, jump])
+                        fout.flush()
+                        moves += 1
+                        if stats and frame % STATS_EVERY == 0:
+                            stats.write("walk %d %.1f %.1f %.1f ry %.2f sx %d c %x wp %d/%d %s\n" % (
+                                frame, wpx, wpy, wpz, wry, wa[0], wa[1], walk.wi, len(walk.pts), walk.state))
+                        continue
                 if line.startswith("move "):   # T2_MOVE_DRIVE: the lair driver's C buttons
                     frame, px, py, pz, b = move_answer(line, drive)
                     fout.write("- -\n" if b is None else "- - c%x\n" % b)
@@ -450,6 +616,11 @@ def main():
                             for c in cs)))
     finally:
         rc = proc.wait()
+        if walk.cur is not None:
+            walk.finish(walk.cur[1], 0.0, 0.0)
+        if walk.plan:
+            print("aimdrive: %d walks, %d arrived" % (len(walk.report), sum("arrived at" in r for r in walk.report)),
+                  file=sys.stderr)
         for name in ("out", "in"):
             os.unlink(os.path.join(d, name))
         os.rmdir(d)
