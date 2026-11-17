@@ -295,6 +295,9 @@ def main():
                          "y, buttons) ORs BUTTONS (hex, N64 bits: A 8000 B 4000 Z 2000 START 1000 DU 800 DD 400 "
                          "DL 200 DR 100 L 20 R 10 CU 8 CD 4 CL 2 CR 1) into its button argument and sets the "
                          "stick; the keyboard path (--input) does not reach the game in this setup")
+    ap.add_argument("--watch-write", default="",
+                    help="ADDR[,ADDR...] (round 16 e1): print 'write: frame N gf G pc PC addr ADDR' each time "
+                         "the CPU writes these RDRAM words (a write breakpoint; who sets a field)")
     ap.add_argument("--poke", default="",
                     help="N:SPEC[;N:SPEC...] (round 16 e1): at emulator frame N (at the --at breakpoint, in "
                          "gameplay) write into RDRAM. SPEC: 'player=x,y,z' (the player's position, velocity "
@@ -313,7 +316,8 @@ def main():
         parts = rest.split(":")
         pads.append((int(f1), int(f2 or f1), int(parts[0], 16),
                      int(parts[1]) if len(parts) > 1 else None, int(parts[2]) if len(parts) > 2 else None))
-    use_bp = a.at != "vi" or bool(calls) or bool(pads)
+    wwatch = [int(x, 16) for x in a.watch_write.split(",") if x]
+    use_bp = a.at != "vi" or bool(calls) or bool(pads) or bool(wwatch)
     argspec = []
     for k, spec in enumerate(x for x in a.args.split(",") if x):
         reg, typ, mem = spec.split(":")[:3]
@@ -487,6 +491,14 @@ def main():
 
     @PCCB
     def dbg_update(pc):
+        if wwatch and pc != bp_addr and pc not in call_at and not (pads and pc == syms["Controller_ProcessInput"]):
+            ram = Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM))
+            sys.stdout.write("write: frame %d gf %d pc %08x words %s\n" % (
+                state["n"], ram.u32(syms["gFrameCountGameplay"]), pc,
+                " ".join("%08x=%08x" % (w, ram.u32(w)) for w in wwatch)))
+            core.DebugSetRunState(2)
+            core.DebugStep()
+            return
         if pads and pc == syms["Controller_ProcessInput"]:
             if "regs" not in state:
                 core.DebugGetCPUDataPtr.restype = C.c_void_p
@@ -544,6 +556,10 @@ def main():
                 [syms["Controller_ProcessInput"]] if pads else []):
             bk = Bkpt(addr, addr, 0x01 | 0x08)  # ENABLED | EXEC
             r = core.DebugBreakpointCommand(2, 0, C.byref(bk))  # ADD_STRUCT
+            assert r >= 0, r
+        for addr in wwatch:
+            bk = Bkpt(addr, addr + 3, 0x01 | 0x04)  # ENABLED | WRITE
+            r = core.DebugBreakpointCommand(2, 0, C.byref(bk))
             assert r >= 0, r
 
     core.CoreDoCommand(R.M64CMD_SET_FRAME_CALLBACK, 0, C.cast(on_frame, C.c_void_p))

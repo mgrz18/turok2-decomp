@@ -1402,3 +1402,64 @@ int T2Port_AimPose(int frame, char *buf, int n) {
              p->m_pCamera->m_ViewParams.m_vRotOffset.x, sAimPt.x, sAimPt.y, sAimPt.z);
     return 1;
 }
+
+/* T2_START_WARP=ID@F (DEBUG-ONLY, round 16 e1; game.cpp, every frame): at frame F (the title or the
+ * attract loop) write what CEngineApp__StartGameAtWarp(app, ID) writes (nextMode 13, fadeMode 2,
+ * matchMode ID, warpFlags 1; the match clock cleared), so the game starts at that warp with a fresh
+ * player and no menu: the port side of n64trace.py --start-warp, where the keyboard does not reach the
+ * game. 7602: the Primagen's lair; -4: the Mother's level (PLAYTHROUGH.md 27-e1). */
+void T2Port_StartWarp(int frame, const char *spec) {
+    static int sDone;
+    const char *at = strchr(spec, '@');
+    if (sDone || at == NULL || frame != atoi(at + 1)) {
+        return;
+    }
+    sDone = 1;
+    gEngineApp_m_Settings.match.frames = 0;
+    gEngineApp_m_Settings.match.seconds = 0;
+    gEngineApp_m_Settings.match.minutes = 0;
+    gEngineApp_m_Settings.match.hours = 0;
+    gEngineApp_m_Settings.match.unk44 = 0;
+    gEngineApp.m_Settings.fadeMode = 2;
+    gEngineApp.m_Settings.matchMode = (u32) atoi(spec);
+    gEngineApp.m_Settings.warpFlags = 1;
+    gEngineApp.m_Settings.nextMode = 0xD;
+    printf("debug: frame %d: T2_START_WARP: start at warp %d (mode %d)\n", frame, atoi(spec),
+           (int) gEngineApp.m_Settings.mode);
+    fflush(stdout);
+}
+
+/* T2_RNG_SET=LEVEL:GF:HEX (DEBUG-ONLY, round 16 e1; game.cpp, every frame): the first time the scene is
+ * LEVEL with gFrameCountGameplay == GF, set gRandomValue to HEX. With n64trace.py --poke
+ * "N:u32=<gRandomValue>:HEX" at the same game frame of the N64, both sides leave the same RNG state
+ * into a level that T2_START_WARP / --start-warp started, so their traces can be compared field by
+ * field (the attract loop before it does not draw the same numbers; PLAYTHROUGH.md 27-e1). */
+extern u32 gRandomValue;
+void T2Port_RngSet(int frame, const char *spec) {
+    static int sDone;
+    int level, gf;
+    unsigned v;
+    if (sDone || sscanf(spec, "%d:%d:%x", &level, &gf, &v) != 3) {
+        return;
+    }
+    if (gScene.m_nLevel == level && (int) gFrameCountGameplay == gf) {
+        sDone = 1;
+        printf("debug: frame %d: T2_RNG_SET: gRandomValue %08x -> %08x (level %d gf %d)\n", frame,
+               (unsigned) gRandomValue, v, level, gf);
+        fflush(stdout);
+        gRandomValue = v;
+    }
+}
+
+/* T2_LEGACY_SHAKE=1 (DEBUG-ONLY, round 16 e1): CCamera__Construct (src/us/code/func_0042F9B0.c) as
+ * before round 16, its camera shake radius 0 (an N64-offset view): CShake__ApplyOffset then draws no
+ * random numbers, 6 a game frame fewer than the N64. The scripted whole-game route was tuned on that
+ * RNG stream, so tools/port/fullrun.py sets it; a player gets the N64's behaviour. */
+int T2Port_LegacyShake(void) {
+    static int s = -1;
+    if (s < 0) {
+        const char *e = getenv("T2_LEGACY_SHAKE");
+        s = e != NULL && *e != '0';
+    }
+    return s;
+}
