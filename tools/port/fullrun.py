@@ -697,6 +697,7 @@ L5_QUEEN_AT = 15900     # level 2 (the Queen) reached
 # a wait, the anchor fires from 3,000 before), then "60" (in the hub straight, it fires at once and
 # skips the 114 teleport).
 L6_BACK_114 = 26000
+MOTHER_SHREDDER_END = 16000   # round 15 d1: the shredder's fire window at the Mother (her death ~+7,500 standalone)
 L6_EXIT_AFTER = 500     # the exit teleport, after 114 is reached again
 L6_HUB_AFTER = 800      # the hub (6999's place: the level-6 corridor)
 L6_WALK_AFTER = 200     # the walk back down the corridor to the plaza, after the hub
@@ -751,7 +752,17 @@ def level6(r, t):
     m = s + r56.L6_MOTHER + add
     r.anchors.append((m, 3))
     r.note(m, "3 the Mother: fire held, T2_AIM_NODE=boss@3, strafing with steps back")
-    r.inputs += ["Z@%d..%d" % (m + 800, m + L6_BACK_114), "CL@%d..%d" % (m + 5800, m + 15000)]
+    fire_end = m + L6_BACK_114
+    if 3 not in r.cheats_on:
+        # round 15 d1: the Mother without invincibility: the shredder (9, level 5's weapon). In her
+        # phase 0 the player cannot move and she hits him (10) every ~80 frames until her six parts are
+        # down: the plasma rifle takes ~3,500 frames (16-20 hits), the shredder ~2,000 (3 hits); her
+        # whole fight ~7,500 frames, 38 damage (standalone level 6; PLAYTHROUGH.md 22). The fire stops
+        # after her death (the shredder's discs bounce) and the plasma rifle comes back for the hub.
+        r.weapon.append((m - 100, "9"))
+        r.weapon.append((m + MOTHER_SHREDDER_END, "10"))
+        fire_end = m + MOTHER_SHREDDER_END
+    r.inputs += ["Z@%d..%d" % (m + 800, fire_end), "CL@%d..%d" % (m + 5800, m + 15000)]
     r.inputs += ["CD@%d..%d" % (f, f + 250) for f in range(m + 5800, s + r56.L6_MOTHER_END + add, 600)]
     back = m + L6_BACK_114
     if 3 in r.cheats_on:
