@@ -237,32 +237,64 @@ SKIP_SECTIONS = {'.virtual_1', '.audio_ctl', '.audio_wavetable', '.sound_data',
 # walks from one N64 object into the next: the level-50 trace changed, then the gfx watchdog).
 ALIGN16 = {"gControllers", "sBatchInstances", "sBatchResources"}
 
+def elf_tables(path):
+    """(sections, symbols) of the matching ELF, in the layout file's shape (mklayout.py)."""
+    from elftools.elf.elffile import ELFFile
+    with open(path, 'rb') as f:
+        e = ELFFile(f)
+        secs = [(s.name, s['sh_type'], s['sh_flags'], s['sh_addr'], s['sh_size'], s.data()
+                 if s['sh_type'] == 'SHT_PROGBITS' and s['sh_flags'] & 2 else None)
+                for s in e.iter_sections()]
+        syms = [(s.name, s['st_value'], s['st_size'], s['st_shndx'], s['st_info']['type'])
+                for s in e.get_section_by_name('.symtab').iter_symbols()]
+    return secs, syms
+
+
+def layout_tables(path, rom_path):
+    """The same tables from versions/port_layout.us.json and the ROM (no N64 build needed)."""
+    import hashlib
+    with open(path) as f:
+        lay = json.load(f)
+    with open(rom_path, 'rb') as f:
+        rom = f.read()
+    secs = []
+    for s in lay['sections']:
+        d = None
+        if 'rom' in s:
+            d = rom[s['rom']:s['rom'] + s['size']]
+            if hashlib.sha1(d).hexdigest() != s['sha1']:
+                sys.exit('gendata: section %s differs from %s: not the US ROM (sha1 '
+                         'fb0400f2...) or a stale layout (tools/port/mklayout.py)'
+                         % (s['name'], rom_path))
+        secs.append((s['name'], s['type'], s['flags'], s['addr'], s['size'], d))
+    syms = [(n, v, sz, sh if isinstance(sh, int) or not sh.isdigit() else int(sh), t)
+            for n, v, sz, sh, t in lay['symbols']]
+    return secs, syms
+
+
 class Elf:
-    def __init__(self, path):
-        from elftools.elf.elffile import ELFFile
-        self.f = open(path, 'rb')
-        e = ELFFile(self.f)
-        self.secs = list(e.iter_sections())
+    def __init__(self, tables):
+        secs, syms = tables
+        self.secs = secs
         self.regions = []  # (phys_lo, phys_hi, data, name)
-        for s in self.secs:
-            if s['sh_type'] != 'SHT_PROGBITS' or not s['sh_flags'] & 2:
+        for name, typ, flags, addr, size, data in secs:
+            if typ != 'SHT_PROGBITS' or not flags & 2:
                 continue
-            if s.name in SKIP_SECTIONS or s['sh_size'] == 0:
+            if name in SKIP_SECTIONS or size == 0:
                 continue
-            lo = phys(s['sh_addr'])
-            self.regions.append((lo, lo + s['sh_size'], s.data(), s.name))
+            lo = phys(addr)
+            self.regions.append((lo, lo + size, data, name))
         self.regions.sort()
         self.syms = {}       # name -> (addr, size, section, type)
         by_key = collections.defaultdict(list)
-        for s in e.get_section_by_name('.symtab').iter_symbols():
-            if not s.name or s['st_info']['type'] in ('STT_FILE', 'STT_SECTION'):
+        for sname, value, size, sh, typ in syms:
+            if not sname or typ in ('STT_FILE', 'STT_SECTION'):
                 continue
-            sh = s['st_shndx']
-            sec = self.secs[sh].name if isinstance(sh, int) else sh
-            v = (s['st_value'], s['st_size'], sec, s['st_info']['type'])
-            if s.name in self.syms and self.syms[s.name][2] != '.virtual_1':
+            sec = secs[sh][0] if isinstance(sh, int) else sh
+            v = (value, size, sec, typ)
+            if sname in self.syms and self.syms[sname][2] != '.virtual_1':
                 continue
-            self.syms[s.name] = v
+            self.syms[sname] = v
         for name, (a, sz, sec, typ) in self.syms.items():
             if sec == '.virtual_1' or name.endswith('_2') and sec == 'SHN_ABS':
                 continue
@@ -494,7 +526,11 @@ def c_ident_ok(n):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('--build', required=True, help='port build dir (compile_commands.json, libturok2_game.a)')
-    ap.add_argument('--elf', default=os.path.join(ROOT, 'build/turok2.us.elf'))
+    ap.add_argument('--elf', default=os.path.join(ROOT, 'build/turok2.us.elf'),
+                    help='the matching link; when it is missing, --layout + --rom are used')
+    ap.add_argument('--layout', default=os.path.join(ROOT, 'versions/port_layout.us.json'),
+                    help='symbol table of the matching link (tools/port/mklayout.py)')
+    ap.add_argument('--rom', default=os.path.join(ROOT, 'baserom.us.z64'))
     ap.add_argument('--out', default=os.path.join(ROOT, 'port/gen'))
     ap.add_argument('--libclang', default=os.environ.get('LIBCLANG', DEFAULT_LIBCLANG))
     ap.add_argument('--host-target', default=DEFAULT_HOST_TARGET,
@@ -503,7 +539,19 @@ def main():
     ap.add_argument('--cache', help='json cache of the declared types (skip libclang)')
     a = ap.parse_args()
 
-    elf = Elf(a.elf)
+    if os.path.exists(a.elf):
+        tables = elf_tables(a.elf)
+        elf = Elf(tables)
+        if os.path.exists(a.layout):
+            with open(a.layout) as f:
+                lay = json.load(f)['symbols']
+            if lay != [[n, v, sz, sh if isinstance(sh, int) else str(sh), t]
+                       for n, v, sz, sh, t in tables[1]]:
+                print('gendata: WARNING: %s is stale against %s: run tools/port/mklayout.py and '
+                      'commit it (a build without the ELF reads it)' % (a.layout, a.elf))
+    else:
+        print('gendata: no %s: using %s and %s' % (a.elf, a.layout, a.rom))
+        elf = Elf(layout_tables(a.layout, a.rom))
     lib = os.path.join(a.build, 'libturok2_game.a')
     nm = subprocess.run(['nm', '-A', lib], capture_output=True, text=True, check=True).stdout
 
