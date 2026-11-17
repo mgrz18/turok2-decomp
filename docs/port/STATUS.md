@@ -193,6 +193,41 @@ Fixes and additions on the merged tree (asm_diff 0; tools only):
    the ROM).
 9. `t2audio_test`'s game-path mode (open the archive before the boot); soak.py on macOS (lldb).
 
+## Round 15, part d4: a self-contained Mac app, the release run, the player's settings (branch names-R15_d4)
+
+Mac only, headless; no change to `src/` or `include/`. Detail: [MACOS.md](MACOS.md) section 17,
+[QUICKSTART.md](QUICKSTART.md) section 0.
+
+- **`tools/port/mkapp.sh` makes a self-contained bundle**: the dylib closure (SDL3, GLEW, libzip,
+  tinyxml2, liblzma, libzstd) in `Contents/Frameworks`, relinked to `@rpath`, build rpaths
+  dropped, a hard failure if anything still points outside macOS, `LSMinimumSystemVersion` from
+  the bundle's `minos` (27.0), ad-hoc `codesign --deep` + verify; `T2_APP_ZIP=1` zips it (9.3 MB
+  app, 3.6 MB zip). **`tools/port/apptest.sh`** runs a copy under a path with spaces with
+  `/opt/homebrew` and `/usr/local` hidden by a sandbox profile and the environment cleared: only
+  bundle dylibs load, and play mode starts a new game (mode 11 at 4,855).
+- **The release** (`-O2`, PIE, deployment target 27.0; ThinLTO does not link: `__asm__`-label
+  aliases in `func_00413230.c`): the default whole-game command (`--all --talismans 2
+  --cheats-off 1,2,3,4,5,6 --cheats-on 3,4`, 290,000 frames) gives **580,000 det lines identical
+  to the coordinator's Linux Release** (md5 `229dd7b2…`), from the build dir and from inside the
+  bundle: END 2, the hub at 271,180, 3 deaths. 38.9 s on the M5. Startup: 0.12 s to the first
+  frame; the title comes at VI 4,212 (70 s of the N64's own logos and cinemas at real time).
+- **Play-mode settings** (port/app/t2controls.cpp, main.cpp, game.cpp's `ContRead`): the look
+  CVars are written to `turok2.cfg.json` at the first launch (`gT2MouseSensitivity` 2.0,
+  `gT2MouseInvertY`, new `gT2MouseDeadZone` 3 so that a 1-pixel mouse motion passes the game's
+  stick dead zone of 3, new `gT2StickInvertY` (in a level only), `gT2ShowControlsAtStart`); the
+  controls table in the log at start and on **F1** (plus a message box with a window); the
+  `--pad-test` headless window reads/writes its geometry through LUS's own save at exit.
+  `padtest.py --only config` checks the round-trip over three launches (size, position,
+  fullscreen, edited settings taking effect); `padtest.py` all passes (map 103, newgame x2,
+  config 14).
+- **For the merge**: files touched `port/app/t2controls.cpp/.h`, `port/app/main.cpp` (the
+  `--pad-test` window block: `T2Controls_MakeHeadlessWindow(cvars, config)` + settings),
+  `port/app/game.cpp` (`ContRead`: 2 lines before `T2Controls_Mouse`), `tools/port/mkapp.sh`,
+  `tools/port/apptest.sh` (new), `tools/port/padtest.py` (mouse rows changed: 23 per 10 px),
+  `docs/port/QUICKSTART.md`, `docs/port/MACOS.md`. d5 also touches `port/app` error paths
+  (main.cpp): expect a small textual merge there. Scripted headless runs are unaffected (they
+  never register the settings or read a mouse).
+
 ## Round 14, part c5: locals read before they are written, a Linux -O2 build, fewer aids in levels 1-2 (branch names-R14_c5)
 
 Details: [STABILITY.md](STABILITY.md) section 10, [PLAYTHROUGH.md](PLAYTHROUGH.md) section 17.
