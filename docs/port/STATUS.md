@@ -193,6 +193,35 @@ Fixes and additions on the merged tree (asm_diff 0; tools only):
    the ROM).
 9. `t2audio_test`'s game-path mode (open the archive before the boot); soak.py on macOS (lldb).
 
+## Round 15, part d1: the Mother and the Primagen without invincibility (branch names-R15_d1)
+
+Tools only: `tools/port/fullrun.py` (`level6()`: the Mother's and the lair's weapon, `MOTHER_SHREDDER_END`,
+`LAIR_FRONT`, `LAIR_STRAFE`, `--lair-strafe`, `--lair-front`) and `tools/port/routes56.py`
+(`lair_strafe(..., sweep=0)`). The default command (`--cheats-on 3,4`) writes the same input and env
+files as at 8b42da15. PLAYTHROUGH.md 22.
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --lair-strafe 90
+# run as in section 1 (Linux, headless, PIE, Release, --frames 290000)
+```
+
+- **No invincibility anywhere, the good ending**: all five totems, the Mother, the Primagen dead at
+  244,846, END 2 at 251,638, the credits, the hub at 265,736. Two runs identical. **One life lost in
+  the lair** (a fall off its right edge at 228,464), besides the City Totem's two.
+- **The Mother's 10-damage hit at ~1,240 is the N64 code** (`MotherBoss_AnimEvent`: a blast centred
+  on the player, events 1/3/4), and in her phase 0 the player cannot move. The cure is the weapon:
+  **the shredder** ends phase 0 in ~2,000 frames (3 hits) where the plasma rifle needed ~3,500
+  (16-20 hits). In the whole run: 5 hits, 53 damage, lowest health 147.
+- **The Primagen with the shredder**: his recipe kills him at 27,856 instead of 43,586, with 2 melee
+  hits instead of 28. But the shredder changes the lair's timing, and his home waits are the knife
+  edge of PLAYTHROUGH.md 21.1: with the default strafing the stage-2 wait never ends. Of the
+  variants tried, `--lair-strafe 90` and `76` reach END 2, each with one fall; 120, 100, 70, a
+  forward/back sweep, `--slot 1150/1050` and no relocation (`--lair-front 450,999999`) either stall
+  in a wait or fall more.
+- Next: a closed-loop lair driver (keep inside x +-900, z -1,950..1,900; walk until the wait ends)
+  on part d3's input fifo, which would remove the fall; confirm on the N64 that the player is held
+  still in the Mother's phase 0.
+
 ## Round 14, part c5: locals read before they are written, a Linux -O2 build, fewer aids in levels 1-2 (branch names-R14_c5)
 
 Details: [STABILITY.md](STABILITY.md) section 10, [PLAYTHROUGH.md](PLAYTHROUGH.md) section 17.
