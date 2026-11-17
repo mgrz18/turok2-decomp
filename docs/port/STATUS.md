@@ -193,6 +193,79 @@ Fixes and additions on the merged tree (asm_diff 0; tools only):
    the ROM).
 9. `t2audio_test`'s game-path mode (open the archive before the boot); soak.py on macOS (lldb).
 
+## Round 15, part d5: the -O2 uninitialised read found, clean errors, teleports counted (branch names-R15_d5)
+
+**1. The -O2 uninitialised read (section 4 item 3) is fixed** ([STABILITY.md](STABILITY.md) 11).
+It was in the game library, not t2audio. `tools/port/objbisect.py` (c5's lost `bis.py`, now a
+tool) mixes the objects of a `-DT2_AUTO_VAR_INIT=none` and a `zero` Release tree and bisects on the
+det log. Two functions:
+
+- `AI_FindClearHeading` (src/us/code/func_00244E84.c): `GameObject_TestMove` stores a
+  `CollisionInfo *` into its `s32 out`, so 8 bytes went into a 4-byte local. Without zero-init this
+  clobbered a saved register: SIGSEGV at frame 15,347 (level 53, `AI_GetPathTargetInfo`). Fix:
+  `sptr out` (asm_diff 0). `tools/port/outptr.py` scans for this class (a `T **` out-parameter
+  declared elsewhere with a 32-bit pointee and passed `&` of a 32-bit local). The tree now has none
+  left; the old file is flagged `BAD`.
+- `CCache__HeapAlloc` (func_002063B4.c): `if (value)` on an unset local, with the same call in both
+  branches (a matching idiom). That is undefined behaviour in C: clang -O2 without zero-init took
+  the bottom-of-heap path as unreachable and always allocated from the top. The run diverged at
+  frame 138,436 (the Blind One). Fix: `#ifdef TARGET_PORT`, just the call (asm_diff 0).
+
+On Linux x86-64 PIE Release `-O2`, the default `--all` run (290,000 frames, `T2_DET_LOG=1`) gives
+the same det log for `none` with both fixes, zero-init, and the round-14 Release build:
+**580,000 lines, 0 differ**. The Primagen dies at 250,290, the ending, the hub at 271,180.
+`zero` stays the default.
+
+**2. Clean errors** (port/app/main.cpp, port/runtime/t2boot.c):
+
+- A window that cannot be created (SDL `dummy` driver: no OpenGL; or no display) used to let the
+  game run on and crash at its first frame (SIGSEGV). Now the window count is checked after
+  `window->Init()`. The game reports "The window could not be created (video driver dummy: ...).
+  Turok 2 needs OpenGL and a display. Headless runs: SDL_VIDEODRIVER=offscreen, or --no-window." and
+  exits with 1. The message goes to stderr (in play mode: logs/turok2-stderr.log), to the terminal
+  that started play mode (if any), and to a message box (if the system can show one).
+- `--audio` without `--rom` (the test harness: `turok2 --game --audio`) used to SIGSEGV at boot
+  after "t2audio: no ROM image". Now: "t2: --audio needs the ROM (--rom baserom.us.z64): audio
+  off", and the run goes on (3,000 frames, swoosh OK, exit 0).
+
+**3. Teleports** ([PLAYTHROUGH.md](PLAYTHROUGH.md) 22): the default run has 289. Level 1: 33,
+level 2: 52, level 3: 38, level 4: 34, level 5: 41, level 6 and the lair: 69, the hub visits: 22.
+
+- `playthrough.stick_walk` is the walker: turn with the stick, C-up for the distance, turn to the
+  step's facing. Input only.
+- `fullrun --walk 1,2` replaces listed teleports with walks and moves the later steps.
+- `--walk-probe` measures every candidate in one run.
+- `walkcands.py` lists the candidates from a default run's log.
+
+Of the 19 route teleports in levels 1-2 that stay on one floor, only **134's start-to-gate**
+(1,571 units) is a plain walk; it arrives about 200 units short, which the route absorbs. The
+others stop at walls, cage bars, doors, graves and crypt walls (150-5,200 units short), or start
+after an aim-assisted fight with a yaw the open-loop walker cannot know. They need waypoints or
+d3's closed-loop input. The default command's `playthrough.txt` and `teleport.env` are
+byte-identical to round 14's.
+
+`--walk 2` (that one walk, the default command otherwise): all five totems, the six keys in their
+slots, cinema 43 and the lair, but the Primagen is never engaged: 420,000 frames, his hp still 25,600/25,600 in mode 1. This is the lair's home wait (PLAYTHROUGH.md 21: it needs a line of sight past object 1911). The earlier walk moved the run's timing, and the route's strafing window passed without a sight line. This is the known knife edge, not the walk.
+
+**Validated**: `playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --cheats-on 3,4` on
+the Release `-O2` builds (zero and none, both fixes), det identical to `/root/turok2_decomp/OUT/rel`
+(the 8b42da15 Release build) over 290,000 frames; and the Debug build (zero-init, this branch) gives the same 580,000 det lines, 0 differ.
+
+**For the merge**:
+
+- `src/us/code/func_00244E84.c` and `func_002063B4.c` (asm_diff 0 against 8b42da15).
+- port/app/main.cpp (`ReportFatal`, the window check; d3 may add an input pipe in this file) and
+  port/runtime/t2boot.c.
+- tools/port/fullrun.py: `Route.walk_to`, `walk`, `walk_probe`, `L1_WALKS`/`L2_WALKS`,
+  `level1()`'s step loop, `level_segments(walks=)`, `main_all(walk=, walk_probe=)`, cli `--walk`.
+  d2 and d3 edit levels 1-4 here too.
+- tools/port/playthrough.py: `stick_walk` and the `WALK_*` constants, after c5's `stick_turn`.
+- New files: tools/port/objbisect.py, outptr.py, walkcands.py.
+
+**Next**: a walker that reads the player's position (d3's pipe) and waypoints from the region mesh
+(tools/assets/levels.py) for the 18 teleports that failed. objbisect for any future split between
+builds or hosts (Mac -O2 vs Linux).
+
 ## Round 14, part c5: locals read before they are written, a Linux -O2 build, fewer aids in levels 1-2 (branch names-R14_c5)
 
 Details: [STABILITY.md](STABILITY.md) section 10, [PLAYTHROUGH.md](PLAYTHROUGH.md) section 17.
