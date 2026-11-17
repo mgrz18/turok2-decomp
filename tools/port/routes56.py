@@ -218,6 +218,9 @@ L6_ITEMS = {
          (0.0, -50.8, 0.0, 0.0, 90, 50)],
 }
 ITEM_STEP = 150
+# round 17 f2 (fullrun.py on the N64's stream): one of 114's other two ultra healths (object 548, item
+# 1704; on the raised floor at y 155.6 by the west wing), at the level's start, before 115-117
+L6_N64_HEALTH = [(1826.1, 155.6, 1412.1, 0.0, 90, 50)]
 
 
 def _item_steps(it, dt):

@@ -294,6 +294,7 @@ LAIR_MARGIN = 300.0         # the clipped floor: every edge LAIR_MARGIN in
 LAIR_SAFE_MARGIN = 150.0    # beyond this: back to the middle first
 LAIR_NEAR = 110.0
 LAIR_GUARD_BACK = 250.0     # "guard": back to the script this far inside the safe margin
+LAIR_KEEP_PROBE = 200.0     # T2_LAIR_KEEP: the step ahead that must be floor for the walk away from him
 C_U, C_D, C_L, C_R = 8, 4, 2, 1
 STATS_EVERY = int(os.environ.get("T2_MOVE_STATS_EVERY", "50"))
 
@@ -338,8 +339,14 @@ class LairDrive:
         self.i = None          # the waypoint
         self.dir = 1           # through the list (+1) or back (-1)
         self.mode = ""
+        # T2_LAIR_KEEP=D (round 17 f2, fullrun.py on the N64's stream): in "guard", while he is within D
+        # (horizontally) of the player, walk away from him (or along the floor's tangent when the step
+        # away leaves the safe floor): his melee (two 10s within 409.6 / 716.8) was half to two thirds of
+        # the lair's damage on that stream and one run lost a life there
+        self.keep = float(os.environ.get("T2_LAIR_KEEP", "0") or 0)
+        self.keeps = 0         # frames answered by the keep-away rule
 
-    def answer(self, frame, px, pz, ry):
+    def answer(self, frame, px, pz, ry, boss=None):
         fwd = (-math.sin(ry), -math.cos(ry))
         if self.prev and frame - self.prev[0] <= 2 and self.cal_n < 40:
             b = self.prev[4]
@@ -358,9 +365,14 @@ class LairDrive:
             elif lair_floor(px, pz, LAIR_SAFE_MARGIN + LAIR_GUARD_BACK):
                 self.guard = False
             if not self.guard:
-                self.mode = "script"
-                self.prev = (frame, px, pz, ry, None)
-                return None
+                want = self.keep_away(px, pz, boss)
+                if want is None:
+                    self.mode = "script"
+                    self.prev = (frame, px, pz, ry, None)
+                    return None
+                self.keeps += 1
+                self.mode = "keep"
+                return self.press(frame, px, pz, ry, want, fwd, right)
             self.overrides += 1
         if self.i is None:   # start from the nearest waypoint
             self.i = min(range(len(self.pts)), key=lambda k: math.dist(self.pts[k], (px, pz)))
@@ -374,6 +386,23 @@ class LairDrive:
                 self.i += self.dir
                 tx, tz = self.pts[self.i]
             want, self.mode = (tx - px, tz - pz), "arc"
+        return self.press(frame, px, pz, ry, want, fwd, right)
+
+    def keep_away(self, px, pz, boss):
+        """T2_LAIR_KEEP: the direction away from him, or None (no rule, he is far, no boss)."""
+        if not self.keep or boss is None or any(v != v for v in boss):
+            return None
+        dx, dz = px - boss[0], pz - boss[2]
+        d = math.hypot(dx, dz)
+        if d >= self.keep or d < 1e-3:
+            return None
+        ux, uz = dx / d, dz / d
+        for cand in ((ux, uz), (-uz, ux), (uz, -ux)):
+            if lair_floor(px + cand[0] * LAIR_KEEP_PROBE, pz + cand[1] * LAIR_KEEP_PROBE, LAIR_SAFE_MARGIN):
+                return cand
+        return None
+
+    def press(self, frame, px, pz, ry, want, fwd, right):
         n = math.hypot(*want) or 1.0
         a = (want[0] * fwd[0] + want[1] * fwd[1]) / n
         c = (want[0] * right[0] + want[1] * right[1]) / n
@@ -385,7 +414,8 @@ def move_answer(line, drive):
     f = line.split()
     frame = int(f[1])
     px, py, pz, ry = (float.fromhex(v) for v in f[2:6])
-    return frame, px, py, pz, drive.answer(frame, px, pz, ry)
+    boss = tuple(float.fromhex(v) if v != "nan" else float("nan") for v in f[6:9]) if len(f) >= 9 else None
+    return frame, px, py, pz, drive.answer(frame, px, pz, ry, boss)
 
 
 # --- the waypoint walker (round 16 e3, PLAYTHROUGH.md 30): T2_WALK_PLAN windows -------------------
@@ -628,8 +658,9 @@ def main():
             print("aimdrive: %d target switches, %d left as not hurt, %d shots" % (
                 picker.switches if picker else 0, picker.immunes if picker else 0, trig.shots if trig else 0),
                 file=sys.stderr)
-        print("aimdrive: %d stick answers, %d move answers (%d with the lair driver's own C buttons); the game "
-              "exited %d" % (n, moves, drive.overrides if drive.kind == "guard" else moves, rc), file=sys.stderr)
+        print("aimdrive: %d stick answers, %d move answers (%d with the lair driver's own C buttons, %d keeping "
+              "away); the game exited %d" % (n, moves, drive.overrides + drive.keeps if drive.kind == "guard" else moves,
+                                             drive.keeps, rc), file=sys.stderr)
     sys.exit(rc)
 
 

@@ -779,6 +779,7 @@ HOP = False                     # --hop: round 13's fallback warp 7602 (DEBUG-ON
 LAIR_FRONT = "450,3000,2.5,1"   # --lair-front: T2_BOSS_FRONT in the lair (round 15 d1)
 LAIR_STRAFE = None              # --lair-strafe P[,S]: routes56.lair_strafe's period and z sweep (round 15 d1);
                                 # None: 90 with the Primagen not invincible, 80 with --cheats-on 4 (C30)
+LAIR_KEEP = 800                 # --lair-keep D: T2_LAIR_KEEP on the N64's stream (round 17 f2; 0: off)
 LAIR_PEEK = 2400                # --lair-peek W: T2_LAIR_PEEK with the lair driver (round 15 C30)
 LAIR_DRIVE = None               # --lair-drive guard|arcs|none: the closed-loop lair driver (aimdrive.LairDrive;
                                 # round 15 C30); None: "guard" with the Primagen not invincible, else none
@@ -1212,7 +1213,13 @@ def level5(r, t):
 def level6(r, t):
     """t: the frame the hub portal 6000 warps (hub(..., go=6))."""
     s = t + WARP_TO_START[6]
-    segs, add = r56.with_items(r56.L6_SEGMENTS, r56.L6_ITEMS)
+    items = r56.L6_ITEMS
+    if n64(6):
+        # round 17 f2: on the N64's stream the Queen leaves 13-87 health and 117's fights cost up to ~100
+        # (a life lost in the --n64-shake-from 5 run): one of 114's two other ultra healths at the start
+        items = dict(items)
+        items[0] = r56.L6_N64_HEALTH + items.get(0, [])
+    segs, add = r56.with_items(r56.L6_SEGMENTS, items)
     r.anchors.append((s - LOAD_EARLY, 114))
     r.note(s - LOAD_EARLY, "114.. the Lightship (level 6 route from %d, its items picked up: +%d)" % (s, add))
     r.weapon.append((t, "10"))
@@ -1281,6 +1288,9 @@ def level6(r, t):
         # edge (d1's fall off the right edge at 228,464); "arcs": it walks arcs round his home instead
         r.move_drive.append((lair + 200, lair + L6_HUB_END - 18000))
         r.extra_env.append("T2_LAIR_DRIVE=%s" % drive)
+        if drive == "guard" and n64(7) and LAIR_KEEP:
+            # round 17 f2: on the N64's stream, walk away from him while he is within LAIR_KEEP (his melee)
+            r.extra_env.append("T2_LAIR_KEEP=%d" % LAIR_KEEP)
         # DEBUG-ONLY (port/game/t2bosslog.c): a home wait not ended after LAIR_PEEK frames (his hover hides
         # him from the whole floor) is ended by peeks from over the front pits, the player put back each time
         r.extra_env.append("T2_LAIR_PEEK=\"%d@%d\"" % (LAIR_PEEK, lair - 100))
@@ -1299,7 +1309,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_FROM
+    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_FROM, LAIR_KEEP
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1346,11 +1356,14 @@ def cli(argv=None):
     ap.add_argument("--n64-shake-from", type=int, default=None, choices=(4, 5, 6, 7),
                     help="DEBUG-ONLY (round 17 f2): the old stream (T2_LEGACY_SHAKE) up to the hub visit before "
                     "level L (7: the Primagen's lair), the N64's from there; with --n64-shake's level 4-6 changes")
+    ap.add_argument("--lair-keep", type=int, default=LAIR_KEEP, help="on the N64's stream (--n64-shake, "
+                    "--n64-shake-from): the lair driver walks away from him within this distance (0: off; round 17 f2)")
     ap.add_argument("--hub-wait", type=int, default=ARMS_HUB_WAIT,
                     help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
     N64_SHAKE = a.n64_shake
     N64_FROM = a.n64_shake_from
+    LAIR_KEEP = a.lair_keep
     LAIR_FRONT = a.lair_front
     LAIR_DRIVE = a.lair_drive
     LAIR_PEEK = a.lair_peek
