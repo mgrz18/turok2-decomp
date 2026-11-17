@@ -2231,3 +2231,198 @@ left when it fell. `v2` is the default controller and `v1` is `--simple`.
 - **Make the lair wait robust first (d1).** Each perturbation upstream changes the lair timing, and
   the Primagen's home wait then fails. A lair route that strafes until he has line of sight,
   instead of at fixed frames, would let any stick-aimed run finish.
+
+## 22. Levels 1-3 on picked-up weapons and ammo (Phase 7 round 15, part d2)
+
+`fullrun.py --real-weapons 1[,2[,3]]` plays those levels without `T2_GIVE_WEAPONS` and
+`T2_FILL_AMMO`. Both start in the hub after the last such level (`"0;1@F"`, `"0;300@F"`). The
+weapons and the ammo are picked up on the way, and the weapon is changed through the input stream.
+Without the option the generated `playthrough.txt` and `teleport.env` are byte-identical to
+8b42da15's (checked with `diff -r`), so the default `--all` command is unchanged.
+
+### 22.1 Where the pickups are
+
+Weapons and ammo are level actors in the grid sections (`tools/assets/levels.py`). Cart entry 2
+maps an actor's object to its pickup id: `ids[object + 4]`, where the first 8 bytes are a header.
+The pickup tables are in the ELF:
+
+- `sWeaponPickups`: rows of 0x18 bytes, `{m_Id, weapon, ammo type, amount}`. The ids run from 2001
+  to 2122.
+- `sAmmoPickups`: rows of 0x14 bytes, `{m_Id, type, amount}`. The ids run from 2200 to 3027.
+
+The `m_Id` is the actor's pickup id (`CPlayer__CollectPickup`). Useful ids for levels 1-3:
+
+| id | gives |
+|---|---|
+| 2004 | the pistol (4) +20 bullets |
+| 2005 | the mag 60 (5) |
+| 2008 | the shotgun (8) +10 shells |
+| 2010 | the plasma rifle (10) +100 |
+| 2016 | the grenade launcher (15) +5 |
+| 2017 | the scorpion launcher (16) +3 |
+| 2500 / 2504 | bullets x10 / x40 (type 2, at most 50) |
+| 2501 / 2502 | shells x3 / x10 (type 6, at most 20) |
+| 2503 | explosive shells x3 (type 7, at most 10) |
+| 2200 / 2201 | arrows x5 / x10 |
+| 2202 / 2203 | tek arrows x3 / x5 |
+| 2601 | plasma cells x150 |
+
+Ammo is taken without its weapon. A full type is not taken. A new game starts with the talon (0)
+and the bow (2). `Pickup_GiveWeapon` selects a new weapon when its index is higher than the
+current one's. When a weapon runs dry the game falls back to another one with ammo, down to the
+talon.
+
+### 22.2 Changing weapons through the input stream
+
+The default control style is the stick wheel (`CBarrel__RunStick`). `CBarrel__RunButtons`, the
+A/B cycling, is used only with the other `m_WeaponSelect`, so a tap of A or B does nothing here
+(tried: the weapon stays). The stick wheel works like this:
+
+- Holding A (0x8000) opens `sBarrelLayoutGroup1`: talon, flare, bow, pistol, tranquilizer,
+  shotgun, plasma rifle, firestorm.
+- Holding B (0x4000) opens `sBarrelLayoutGroup0`: sunfire pod, cerebral bore, PFM layer, grenade
+  launcher, scorpion launcher, flame thrower, razor wind, nuke.
+- The analog stick picks one of the 8 slots (`CBarrel__GetStickDirection`: 0 up, then clockwise).
+  The slot's weapon is requested if it has ammo.
+
+`fullrun.wheel(weapon, f)` writes these inputs: the button held for 30 frames, and the stick
+pushed towards the slot from frame 10 to frame 25. A route step can say `{"weapon": W}`. The wheel
+then runs `WHEEL_BEFORE` = 50 frames before the step's teleport, which sets the yaw again.
+Checked in level 129: `A` held with `SX=-90 SY=-90` changes the grenade launcher (15) to the
+shotgun (8) (`state:` `reqw 8 wheel 2/0/5`).
+
+### 22.3 Level 1 (`--real-weapons 1`)
+
+`L1_ARMS` lists the picks. Each one is taken like a key, at a segment's start, 150 frames each,
+seven picks in all:
+
+| level | what | where |
+|---|---|---|
+| 53 | bullets x10, the pistol, bullets x10 | in a row on the platform (-4088..-3988, 79.4, 220..255): one walk |
+| 55 | explosive shells x3, x3 | (1075.2, 0, -921.6), (1075.2, 0, -614.4) |
+| 54 | shells x3, the shotgun | on the switch's line (-3368.8 / -2867.2, 0, -1843) |
+| 56 | explosive shells x3 | (-585, 164.1, 2108.9) |
+| 59 | shells x10, bullets x40, explosive shells x3, tek arrows x5 | a row at z 5427 by the level exit 7100: one walk |
+
+At the Harbor Totem the player has the shotgun (20 shells, 10 explosive shells), the pistol
+(50), the bow (20) and tek arrows. The aim is still `T2_FACE_NEAREST` (part d3's subject).
+
+The totem's 8 kills, by weapon, over 3 runs while the picks were added:
+
+| run | shotgun ammo | kills | result |
+|---|---|---|---|
+| l1a (shotgun only, 13 shells) | shells | 2 by the shotgun and the bow, then the talon | lost (7/8 only with the plasma rifle given late) |
+| l1b (+ pistol, + the 59 row) | shells + 3 explosive | 5 by the shotgun, 1 by the pistol, 0 by the bow | lost, 6/8 at 120 s |
+| l1c (+ 55's and 56's explosive shells) | shells + 10 explosive | **8 by 23,000 (10 by the end)** | **won**, health 200 -> 154 |
+
+The shotgun does nearly all the killing (~3.5 shells a kill). The pistol's 50 bullets give one
+kill, the bow none, and the talon cannot hit the attackers at 500-900 units. The totem is won with
+less damage than the plasma rifle's run takes (46 against 132; minimum health 154 against 68). The
+hub is reached at 23,556 (the default run: 23,824).
+
+Two things change in the schedule for this option:
+
+- The fire taps stop `ARMS_FIRE_END` = 50 frames before the hub arrival. They used to run 7,150
+  frames from the arrival, which emptied the pistol and the bow in the hub.
+- The hub after level 1 is at `REAL_HUB_AT[1]` = 23,750, measured, instead of `HUB_AT` moved by
+  the picks (25,130). A later anchor would have been reached only after the totem's whole 120 s.
+  When a totem is won early, the anchor fires on arrival and the later steps follow. When it is
+  lost the run is over anyway. In l1a the hub's teleports ran inside level 109.
+
+### 22.4 Level 2
+
+**Levels 1 and 2 on their own pickups (`--real-weapons 1,2`) do not get through level 2.** The
+picks in `L2_ARMS` are:
+
+- 125: 10 shells and 3 explosive shells by its exit, then 10 shells more.
+- 129: the grenade launcher with 5 grenades, and 150 plasma cells.
+- 130: the armory row (y 204.8, z 4736). The mag 60 is one pick; the tek bow, the tranquilizer gun
+  and the shotgun are taken in one walk.
+- 133: the shotgun (+10 shells) and the mag 60.
+
+Three spots were left out:
+
+- 128's grenade launcher floats 154 units over a deadly floor (two deaths there).
+- 131's plasma rifle (-1996.8, -1126.4, 5785.6, intelligence 3): a death there.
+- 132's plasma rifle sits 307 units over its floor.
+
+Results:
+
+- **Soul gate 1 (129) is destroyed with the shotgun**, chosen on the wheel (`L2_TAPS`) because the
+  grenades fly over the gate. The gate has 500 hp (`T2_ACTOR_LOG` with `T2_ACTOR_TYPES=7`, actor 76).
+  It took 5 grenades with no damage, then about 60 per shotgun shell. "soul gate destroyed." comes
+  at 36,120; the plasma rifle's run has it at 35,404.
+- **Sister 1 (133) is never hurt.** The window's `T2_AIM_ENEMY` aims at the nearest live actor, so
+  the zombies of the two rooms take all the ammo. Their health is 5 and 80 (the shotgun barely
+  scratches them). The ammo runs out in order: shotgun, grenades, mag 60, tek bow, then the talon
+  at 42,500. The sister keeps 50/50, and the player dies at 43,781. Sister 2 (134) then costs the
+  last two lives: game over at 60,097.
+
+So level 2 needs a different fight, not more pickups:
+
+- fire only at the sister (the zombies can be left alone once door 28 is open);
+- take the ammo lying in 133 and 134 between the windows;
+- use the grenades and explosive shells on her.
+
+The aiming part belongs with part d3's closed-loop aim. Level 3 (`--real-weapons 1,2,3`) waits on
+level 2: its picks would be the shotgun and shells in 61, the plasma rifle in 64 and plasma cells
+x150 in 65 and 68, and the scorpion launcher in 66 just before the Marsh Totem (where c1's route
+uses it).
+
+### 22.5 The whole game with `--real-weapons 1`, and next
+
+**The whole game with `--real-weapons 1`** (Linux Release, PIE; the default `--all`
+options plus `--real-weapons 1`): level 1 is played on its own pickups, and `T2_GIVE_WEAPONS` and
+`T2_FILL_AMMO` start in the hub after it.
+
+| what | `--real-weapons 1` | the default run |
+|---|---|---|
+| the Harbor Totem | won at 22,890 | won |
+| the hub | 23,556 | 23,824 |
+| the City Totem | won at 88,724, 2 lives lost (as in the default run) | won, 2 lives lost |
+| the Marsh Totem | won at 109,081 | won |
+| the Cave Totem | won at 129,770 | won |
+| the Blind One | dead at 140,147; 121 damage, minimum health 25 | 94 damage, minimum 52 |
+| level 5's first sub-level, 124 | health 25 -> 2, then a death at 149,146 | 52 -> 16, no death |
+| the end | the respawned route is out of step: game over at 150,990 | END 2 |
+
+Damage per level, as `hurtsum` (hits / damage / minimum health):
+
+| level | hits | damage | minimum |
+|---|---|---|---|
+| 109 | 23 | 46 | 154 |
+| 133 | 57 | 169 | 31 |
+| 134 | 51 | 117 | 14 |
+| 135 | 57 | 170 | 30 |
+| 110 | 88 | 184 | 1, 2 deaths |
+| 111 | 13 | 13 | 187 |
+| 112 | 9 | 54 | 146 |
+| 1, the Blind One | 81 | 121 | 25 |
+
+The level-2 fights depend on the state they start from, and level 1's totem changes that state.
+`--hub-wait` idles in the hub after level 1. With waits of 0, 20, 30, 60, 90 and 200 frames,
+sister 1 or 2 costs lives. With 40, 50 and 120, neither costs a life. 40 then loses the City
+Totem; 50 and 120 win it, so 50 is the default. Waits of 50 and 120 give the same game from the
+City Totem on, so the level-4/5 loss does not depend on the wait. Part of a second identical run
+with the defaults: every `progress`, `event`, `pickup`, `hurt`, `death` and `bosstrace` line to frame 160,000 is identical (2,435 lines, pointers masked).
+
+**The default `--all` command is unchanged** (byte-identical inputs). On this branch's Release
+build it reaches cinema 43 at 222,839, the lair at 223,647 and the hub at 271,180, the frames of
+STATUS section 2.
+
+Next:
+
+1. **Level 5's start after the Blind One**: the route enters 124 with whatever the Blind One
+   left. The default run has 52 health there, `--real-weapons 1` has 25. 124's hits (36 and 25
+   damage) need a health pickup before 124, or 124's hits avoided. With that, `--real-weapons 1`
+   should play to the end, since every totem is won.
+2. **Level 2 on its own weapons**: aim only at the sisters, take the ammo in 133 and 134 between
+   the windows, and use the grenades and explosive shells on the sisters (22.4). This goes together
+   with part d3's closed-loop aim, because `T2_AIM_ENEMY`'s nearest-actor aim spends everything on
+   zombies.
+3. **Level 3**: the scorpion launcher lies in 66, just before the Marsh Totem, so c1's weapon 16
+   for that totem can be picked up instead of scheduled. 64 has the plasma rifle, and 65 and 68
+   have plasma cells.
+4. The other control style (`m_WeaponSelect` != 1, `CBarrel__RunButtons`: A/B taps cycle) would
+   make weapon changes one tap each. It is an options-menu setting, which a route could set
+   through the menu.

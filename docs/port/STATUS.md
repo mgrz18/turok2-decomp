@@ -372,6 +372,49 @@ New in this branch (details in [PLAYTHROUGH.md](PLAYTHROUGH.md) section 22):
     options.
   - New: `tools/port/aimdrive.py`, `tools/port/aimstats.py`.
 
+## Round 15, part d2: levels 1-3 on picked-up weapons and ammo (branch names-R15_d2)
+
+The new option is `fullrun.py` (or `playthrough.py RUN --all`) `--real-weapons 1[,2[,3]]`, with
+`--hub-wait N`. The detail is in PLAYTHROUGH.md 22. Only `tools/port/fullrun.py` and the docs
+change; there are no src/, include/ or port/ changes. Without the option, the generated
+`playthrough.txt` and `teleport.env` are byte-identical to 8b42da15's. The reference `--all` run
+on this branch's Release build reaches the same frames as STATUS section 2: cinema 43 at
+222,839, the lair at 223,647 and the hub at 271,180.
+
+- **Pickups**: weapons and ammo are level actors. Cart entry 2 maps an object to its pickup id
+  (`ids[object + 4]`). The ids are in `sWeaponPickups` (2001-2122) and `sAmmoPickups`
+  (2200-3027). The table and the level 1-3 positions are in PLAYTHROUGH.md 22.1.
+- **Weapon changes in the input stream**: the default control style is the stick wheel. A held
+  (`sBarrelLayoutGroup1`) or B held (`sBarrelLayoutGroup0`), with the analog stick on one of 8
+  slots, requests that weapon. `fullrun.wheel()` writes these inputs, and a route step can say
+  `{"weapon": W}`. A/B taps do nothing in this control style. `T2_WEAPON` acts only with
+  `T2_GIVE_WEAPONS`.
+- **Level 1 with no given weapons or ammo** (`--real-weapons 1`): seven picks. They give the
+  pistol and 50 bullets (53), the shotgun with 20 shells and 10 explosive shells (54, 55, 56, 59),
+  and tek arrows (59). **The Harbor Totem is won**: 8 kills by 23,000, nearly all by the
+  shotgun, and the health goes 200 -> 154. The default run, with the plasma rifle, goes
+  200 -> 68. There are no deaths, and the hub is reached at 23,556.
+- **The whole game with `--real-weapons 1`** (the default `--hub-wait 50`): **all four totems of
+  levels 1-4 and the Blind One, without invincibility**. The City Totem costs 2 lives, as in the
+  default run. Then the Blind One leaves 25 health instead of 52, level 5's first sub-level (124)
+  kills the player, and the run ends in game over at 150,990. PLAYTHROUGH.md 22.5 has the table.
+  The level-2 fights depend on the state they start from: a 50-frame idle in the hub after level
+  1 is what lets sisters 1 and 2 and the City Totem through.
+- **Level 2 on its own pickups** (`--real-weapons 1,2`): **soul gate 1 is destroyed with the shotgun**, chosen on the wheel.
+  **Sister 1 is never hurt**: the nearest-actor aim spends all the ammo on zombies, and it is game
+  over in 134. Level 3 waits on level 2.
+- **Validated**: the default command `playthrough.py RUN --all --talismans 2 --cheats-off
+  1,2,3,4,5,6 --cheats-on 3,4` generates the same files as before and plays the same frames.
+- **For the merge**: only `tools/port/fullrun.py` changes, in these places: `Route` (`real_until`,
+  the `weapon` step option), `write()` (the `T2_GIVE_WEAPONS` and `T2_FILL_AMMO` schedules),
+  `level1(arms=)`, the `level_segments` pick tuples (now 4 or 6 values), `main_all` (levels 1-3)
+  and `cli`, plus the new block before `main_all` (`L1_ARMS`, `L2_ARMS`, `L3_ARMS`, `WHEEL`,
+  `wheel()`, `REAL_HUB_AT`, `ARMS_HUB_WAIT`). d3 changes the aiming steps of levels 1-4 and d5 the
+  walking of levels 1-2: their teleports are where my picks are inserted (segment starts).
+- **Next**: PLAYTHROUGH.md 22.5. In short: a health pickup before 124, the sisters with aim only
+  at them, level 3's scorpion launcher from 66.
+
+
 ## Round 14, part c5: locals read before they are written, a Linux -O2 build, fewer aids in levels 1-2 (branch names-R14_c5)
 
 Details: [STABILITY.md](STABILITY.md) section 10, [PLAYTHROUGH.md](PLAYTHROUGH.md) section 17.
