@@ -66,6 +66,7 @@ class Route:
         # round 15 d2 (--real-weapons): no T2_GIVE_WEAPONS / T2_FILL_AMMO before this frame (the
         # weapons and ammo picked up on the way, the weapon changes in the input stream)
         self.real_until = None
+        self.move_drive = []     # round 15 C30 (--lair-drive): T2_MOVE_DRIVE windows
 
     def note(self, frame, text):
         self.inputs.append("# %d: %s" % (frame, text))
@@ -148,7 +149,7 @@ class Route:
             env.append("T2_AIM_NODE=%s" % self.aim_node)
         if STICK_AIM:
             # round 15 d3 (--stick-aim): in these levels the assists above only pick the target and
-            # tools/port/aimdrive.py aims with the stick (run the game under it: PLAYTHROUGH.md 22)
+            # tools/port/aimdrive.py aims with the stick (run the game under it: PLAYTHROUGH.md 24)
             starts = sorted(self.level_start.items())
             wins = [(f, ([g for l, g in starts if l == lv + 1] or [10 ** 7])[0] - 1)
                     for lv, f in starts if lv in STICK_AIM]
@@ -161,6 +162,8 @@ class Route:
                 wins = [w for w in wins if w[1] < a or w[0] > b] + \
                        [(w[0], a - 1) for w in wins if w[0] < a <= w[1]] + [(b + 1, w[1]) for w in wins if w[0] <= b < w[1]]
             env.append("T2_AIM_STICK=\"%s\"" % ";".join("%d-%d" % w for w in sorted(wins)))
+        if self.move_drive:
+            env.append("T2_MOVE_DRIVE=\"%s\"" % ";".join("%d-%d" % w for w in self.move_drive))
         if self.anchors:
             env.append("T2_ANCHOR=\"%s\"" % ";".join("%s@%d" % (l, f) for f, l in sorted(self.anchors, key=lambda a: a[0])))
         if self.saves:
@@ -586,7 +589,11 @@ def key_visit(k):
     return {"primagen": (k,)}
 HOP = False                     # --hop: round 13's fallback warp 7602 (DEBUG-ONLY)
 LAIR_FRONT = "450,3000,2.5,1"   # --lair-front: T2_BOSS_FRONT in the lair (round 15 d1)
-LAIR_STRAFE = (80, 0)           # --lair-strafe P[,S]: routes56.lair_strafe's period and z sweep (round 15 d1)
+LAIR_STRAFE = None              # --lair-strafe P[,S]: routes56.lair_strafe's period and z sweep (round 15 d1);
+                                # None: 90 with the Primagen not invincible, 80 with --cheats-on 4 (C30)
+LAIR_PEEK = 2400                # --lair-peek W: T2_LAIR_PEEK with the lair driver (round 15 C30)
+LAIR_DRIVE = None               # --lair-drive guard|arcs|none: the closed-loop lair driver (aimdrive.LairDrive;
+                                # round 15 C30); None: "guard" with the Primagen not invincible, else none
 
 
 def primagen_slot(r, t, k):
@@ -981,7 +988,7 @@ def level6(r, t):
         # round 15 d1: the Mother without invincibility: the shredder (9, level 5's weapon). In her
         # phase 0 the player cannot move and she hits him (10) every ~80 frames until her six parts are
         # down: the plasma rifle takes ~3,500 frames (16-20 hits), the shredder ~2,000 (3 hits); her
-        # whole fight ~7,500 frames, 38 damage (standalone level 6; PLAYTHROUGH.md 22). The fire stops
+        # whole fight ~7,500 frames, 38 damage (standalone level 6; PLAYTHROUGH.md 23). The fire stops
         # after her death (the shredder's discs bounce) and the plasma rifle comes back for the hub.
         r.weapon.append((m - 100, "9"))
         r.weapon.append((m + MOTHER_SHREDDER_END, "10"))
@@ -1023,10 +1030,24 @@ def level6(r, t):
         r.weapon.append((lair - 100, "9"))
     # the spot cycles (",K,1": another one each 3,000 frames of a lair wait that does not end; round 14 C29:
     # 600 -> 3,000: the strafing by the lair start (lair_strafe) ends his home waits, the front spots do not)
-    r.boss_front.append((lair - 100, LAIR_FRONT))
+    drive = LAIR_DRIVE or ("guard" if 4 not in r.cheats_on else "none")
+    strafe = LAIR_STRAFE or ((90, 0) if 4 not in r.cheats_on else (80, 0))
+    # with the lair driver: no relocation at all (an empty spec ends the Queen's, which would act in the lair)
+    r.boss_front.append((lair - 100, "" if drive != "none" else LAIR_FRONT))
     r.inputs.append("Z@%d..%d" % (lair + 200, lair + L6_HUB_END))
-    # round 14 C29: strafing until his death (his home waits need a sight line: routes56.lair_strafe)
-    r.inputs += r56.lair_strafe(lair + 200, lair + L6_HUB_END - 18000, *LAIR_STRAFE)
+    if drive != "none":
+        # round 15 C30 (--lair-drive): tools/port/aimdrive.py's LairDrive answers the C buttons from the
+        # player's position (closed loop; run the game under aimdrive.py, PLAYTHROUGH.md 26) until about
+        # his death. "guard": the strafing below plays, and the driver takes over only near the floor's
+        # edge (d1's fall off the right edge at 228,464); "arcs": it walks arcs round his home instead
+        r.move_drive.append((lair + 200, lair + L6_HUB_END - 18000))
+        r.extra_env.append("T2_LAIR_DRIVE=%s" % drive)
+        # DEBUG-ONLY (port/game/t2bosslog.c): a home wait not ended after LAIR_PEEK frames (his hover hides
+        # him from the whole floor) is ended by peeks from over the front pits, the player put back each time
+        r.extra_env.append("T2_LAIR_PEEK=\"%d@%d\"" % (LAIR_PEEK, lair - 100))
+    if drive in ("none", "guard"):
+        # round 14 C29: strafing until his death (his home waits need a sight line: routes56.lair_strafe)
+        r.inputs += r56.lair_strafe(lair + 200, lair + L6_HUB_END - 18000, *strafe)
     end = lair + L6_HUB_END
     r.note(end - 21000, "the Primagen dead (~30,000 after his lair): the ending cinema, then the credits")
     r.note(end, "60 the hub (after the credits)")
@@ -1039,7 +1060,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT
+    global L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1065,8 +1086,15 @@ def cli(argv=None):
     ap.add_argument("--assist-keep", default="", help="with --stick-aim: these fights keep the aim assists "
                     "(1: the Blind One, 110: the City Totem; round 15 d3)")
     ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
-    ap.add_argument("--lair-strafe", default="80,0", help="P[,S]: the lair strafing's period (C-left/C-right) and an "
-                    "optional z sweep of S frames (C-down then C-up; round 15 d1)")
+    ap.add_argument("--lair-strafe", default=None, help="P[,S]: the lair strafing's period (C-left/C-right) and an "
+                    "optional z sweep of S frames (C-down then C-up; round 15 d1); default 90 with the Primagen "
+                    "not invincible, else 80")
+    ap.add_argument("--lair-drive", default=None, choices=("guard", "arcs", "none"),
+                    help="the closed-loop lair driver (run under tools/port/aimdrive.py; round 15 C30): guard (the "
+                    "default without --cheats-on 4: the strafing, kept off the floor's edge), arcs, none (the "
+                    "default with --cheats-on 4: the timed strafing and T2_BOSS_FRONT)")
+    ap.add_argument("--lair-peek", type=int, default=LAIR_PEEK, help="with the lair driver: T2_LAIR_PEEK, the "
+                    "frames of one home wait before the peeks from over the front pits (round 15 C30)")
     ap.add_argument("--lair-front", default=LAIR_FRONT, help="T2_BOSS_FRONT in the Primagen lair (round 15 d1)")
     ap.add_argument("--real-weapons", default="", help="1 / 1,2 / 1,2,3: these levels on the weapons and ammo "
                     "picked up on the way, no T2_GIVE_WEAPONS / T2_FILL_AMMO before the hub after them (round 15 d2)")
@@ -1074,7 +1102,9 @@ def cli(argv=None):
                     help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
     LAIR_FRONT = a.lair_front
-    LAIR_STRAFE = tuple(int(v) for v in (a.lair_strafe + ",0").split(",")[:2])
+    LAIR_DRIVE = a.lair_drive
+    LAIR_PEEK = a.lair_peek
+    LAIR_STRAFE = tuple(int(v) for v in (a.lair_strafe + ",0").split(",")[:2]) if a.lair_strafe else None
     L6_SLOT_AFTER = a.slot
     ARMS_HUB_WAIT = a.hub_wait
     HOP = a.hop
