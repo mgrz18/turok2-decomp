@@ -114,6 +114,12 @@ def main():
     ap.add_argument("--gfx", default="rice")
     ap.add_argument("--frames", type=int, default=0, help="stop at this frame (default: the last shot/dump)")
     ap.add_argument("--keep-pak", action="store_true", help="keep the emulator's pak between runs")
+    ap.add_argument("--start-warp", default="",
+                    help="ID@N (round 17 f4, n64trace.py's): at emulator frame N (the title or the attract "
+                         "loop) poke what CEngineApp__StartGameAtWarp(app, ID) writes, so the game starts at "
+                         "that warp; the port's twin is T2_START_WARP=ID@F. Every shot's game frame "
+                         "(gFrameCountGameplay), mode and level go to OUT/shots.txt, to pair the shots with "
+                         "the port's by gf (T2_DET_LOG=1 T2_DET_GF=1)")
     a = ap.parse_args()
 
     out = os.path.abspath(a.out)
@@ -170,6 +176,37 @@ def main():
     core.DebugMemGetPointer.restype = C.c_void_p
     pending = {}
 
+    # --start-warp (round 17 f4): the addresses and N64 offsets from n64trace.py
+    start_warp, shotlog = None, None
+    if a.start_warp:
+        import struct
+        import n64trace as T
+        sid, _, sat = a.start_warp.partition("@")
+        start_warp = [int(sid, 0), int(sat or 0), False]
+        toffs, tsyms = T.n64_offsets(), T.symbols()
+        shotlog = open(os.path.join(out, "shots.txt"), "w")
+
+        def ramw():
+            return T.Ram(core.DebugMemGetPointer(M64P_DBG_PTR_RDRAM))
+
+        def poke_start(n):
+            if start_warp[2] or n < start_warp[1]:
+                return
+            ram, app = ramw(), tsyms["gEngineApp"]
+            for key, v in (("app_match", start_warp[0]), ("app_wflags", 1), ("app_next", 13)):
+                struct.pack_into("<I", ram.m, (app + toffs[key][0]) & 0x7FFFFF, v)
+            ram.m[((app + toffs["app_fade"][0]) & 0x7FFFFF) ^ 3] = 2
+            start_warp[2] = True
+            sys.stderr.write("refshots: frame %d: start at warp %d poked\n" % (n, start_warp[0]))
+
+        def log_shot(n):
+            ram = ramw()
+            shotlog.write("shot %d gf %d mode %d level %d\n" % (
+                n, ram.u32(tsyms["gFrameCountGameplay"]),
+                ram.sval(tsyms["gEngineApp"] + toffs["app_mode"][0], toffs["app_mode"][1]),
+                ram.sval(tsyms["gScene"] + toffs["sc_level"][0], toffs["sc_level"][1])))
+            shotlog.flush()
+
     @FRAMECB
     def on_frame(n):
         # the screenshot asked for at frame n-1 lands as the core's next file: rename it
@@ -184,7 +221,11 @@ def main():
                 raw = bytearray(C.string_at(p, 8 << 20))
                 raw[0::4], raw[1::4], raw[2::4], raw[3::4] = raw[3::4], raw[2::4], raw[1::4], raw[0::4]
                 f.write(raw)
+        if start_warp is not None:
+            poke_start(n)
         if n in shots:
+            if shotlog is not None:
+                log_shot(n)
             pending["shot"] = n
             core.CoreDoCommand(M64CMD_TAKE_NEXT_SCREENSHOT, 0, None)
         if n >= last:
