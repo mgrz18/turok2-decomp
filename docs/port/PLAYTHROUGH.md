@@ -2519,3 +2519,119 @@ level 5's 164. **`--stick-aim 3`**: END 2, one peek. **`--real-weapons 1`**: gam
   code against the N64 geometry (21.1), unless the N64 hovers elsewhere. Checking that needs an N64
   trace of a lair wait (his two hover points, mupen64plus) against the port's.
 - `--real-weapons 1` needs health before 124 (25.5).
+
+## 27-e1. The N64 lair and Mother checks, the camera shake's random numbers (Phase 7 round 16, part e1)
+
+### 27-e1.1 Driving the N64 without the keyboard
+
+The emulator's keyboard path (`n64trace.py --input`, `refshots.py`) does not reach the game in this
+setup: with `START@700`, `START@1500` and A taps the attract loop runs frame for frame as with no
+input (mode 8 at 1,528 is the loop's own menu screen, then demo 81). Earlier N64 traces only
+followed the demos, so this went unnoticed. `tools/port/n64trace.py` got four switches
+(one emulator frame = one game frame of Turok 2 here; the port's frames are two per game frame):
+
+- `--start-warp ID@N`: at emulator frame N (the attract loop) write what
+  `CEngineApp__StartGameAtWarp(app, ID)` writes (`m_Settings.nextMode` 13, `fadeMode` 2,
+  `matchMode` ID, `warpFlags` 1). The game starts at that warp with a new player: `7602@600` gives
+  the Primagen's lair at frame 627, `--start-warp=-4@600` the Mother's level 3 (the `=` because of
+  the minus sign).
+- `--warp ID@N`: the in-game warp (`CScene__RequestWarp`'s three stores). An attract demo is
+  mode 13 too: without `@N` it fires in the demo.
+- `--pad F1-F2:BUTTONS[:SX:SY];...`: controller 1 through a breakpoint on
+  `Controller_ProcessInput(&gControllers[0], x, y, buttons)` (its argument registers are set).
+  This works: `CU` (8) walks the player.
+- `--poke N:SPEC;...` (`player=x,y,z` with velocity cleared, `lvl=I:hp=V`, `u32=ADDR:V`,
+  `f32=ADDR:V`), `--watch I` (the `lvl I` line every game frame), `--watch-write ADDR` (a write
+  breakpoint; it caught nothing here).
+
+The port side: `T2_START_WARP=ID@F` (the same four stores at frame F), `T2_PRIMAGEN_STAGE=F[,F]`
+(his part health `gLevelScript.values[0][0..7]` zeroed: `Primagen_UpdateHealth` starts the next
+stage; on the N64 `--poke "N:u32=0x8012F988:0;..."`, eight words), `T2_RNG_SET=LEVEL:GF:HEX`
+(`gRandomValue` at one game frame of a level; on the N64 `--poke N:u32=0x800DD784:HEX`).
+
+### 27-e1.2 The Primagen's home waits on the N64: the same as the port
+
+The N64 run: `--start-warp 7602@600`, the part health zeroed at 3,100 (stage 2), the player left
+standing at the lair spawn (1.4, 0, -1,789.6). The port run: `T2_WARP_TO=7602@7000` (the hop from
+level 51 at 12,895), `T2_PRIMAGEN_STAGE=15400,25400`, no input.
+
+| | N64 | port |
+|---|---|---|
+| stage 1 | modes 1/5 (his attack script), as in the port | modes 1/5 |
+| stage 2 starts | mode 18 at 3,102, mode 25 (the home wait) at 3,188 (86 game frames) | mode 18 at 15,402, mode 25 at 15,566 (82 game frames) |
+| his hover at home | (-2.2, 926.9, 2,922.7) / (5.3, 926.9, 2,907.8) | (2, 927, 2,906) / (-1, 927, 2,922); stage 3 (6, 2,904) / (-1, 2,920) |
+| with the player at the spawn | the wait does not end (2,800 game frames) | does not end (10,000 frames; stage 3 the same) |
+| 8 floor spots, 300 frames each (450,1800), (-450,1800), (0,1800), (+-900,1200), (+-1240,560), (800,2200) | none ends it | none ends it |
+| 349 floor spots, a 200-unit grid within 2,100 of the middle | none ends it (10 game frames each) | none ends it (20 frames each) |
+| positive control: the player put at (0, 800, 2,650), in front of him | mode 26 two game frames later | mode 26 two frames later |
+
+The hover pair on the N64 is the same kind as the port's: 15.5 apart (one step a game tick) round
+(0, 927, 2,918), and this N64 pair is round 15's pair (-1.8, 2,923.0)/(4.3, 2,907.5) to a few
+units. So **the home wait that the floor cannot end is the N64's own behaviour**, not a host bug: no
+floor spot sees him on the N64 either. A real player gets past it by keeping the target from the
+flight (21.1) or from the air (a jump over the front pits); `T2_LAIR_PEEK` stands for that and stays
+in the default run. The scan's player position was poked without its region (the N64 side), but the
+positive control ends the wait the same way on both sides.
+
+### 27-e1.3 The Mother's phase 0: the player walks on both
+
+The N64 (`--start-warp=-4@600 --pad "900-1500:8;1500-2100:2"`) and the port (`T2_WARP_TO=-4@7000`,
+`CU@15000..17000 CL@17500..19000`, no weapons, no cheats), the player at (83.4, 0, -723.9) when her
+attacks start:
+
+- N64: C-up walks him to (441, 0, 1,301) after 200 game frames and to (455, 0, 2,837), where he
+  stops at z 3,155.8 (her wall); C-left then takes him to (-2,642, 0, 1,597); he dies at 2,000
+  (her mode-4 blasts) and the death levels 164, 157-161 follow.
+- Port: the same path at the same speed: (436, 0, 702) after 250 frames (125 game frames),
+  (453, 0, 2,622), stopped at z 3,155.8; dead at 16,000, then 164, 157, 158, 155, 156, 159-161.
+  With d1's env (`T2_GIVE_WEAPONS=1 T2_WEAPON=10 T2_AIM_NODE=boss T2_CHEATS=1 T2_FILL_AMMO=600`) he
+  walks too (from (83, -724) to (426, 428) and on, circling under the aim assist).
+
+So **the player is not immobile in phase 0, on the N64 or in the port**. d1's "cannot move" (23)
+does not reproduce with these recipes; the shredder recipe stands for its own reasons (her blasts
+land wherever he is).
+
+### 27-e1.4 The camera shake's random numbers (a host bug, fixed)
+
+With the RNG set to the same value on both sides at the lair's first game frames (`T2_RNG_SET` /
+`--poke` above), the N64 took **12 numbers per game frame** and the port **6** (the LCG stepped
+back to the poked value). `n64trace.py --calls Random_Blend` names the callers: per camera (two:
+0x801198F0 and 0x806FF120) three from `CCamera__UpdateTremor` and three from
+`CShake__ApplyOffset`; the port's `T2_RNG_TRACE` shows only `CCamera__UpdateTremor`.
+`CShake__ApplyOffset(&cam->m_Shake, cam->m_Shake.m_vPos, ...)` draws when the distance (0) is under
+`m_Radius`: 1 on the N64 (`--args a0:CShake:m_Radius:f`), 0 in the port (gdb), and the port's
+`m_vPos.y` was 1.0. A gdb watchpoint found the writer: `CCamera__Construct`
+(src/us/code/func_0042F9B0.c) views `&view->m_Shake` as six floats at the N64 offsets (two 4-byte
+list pointers, then `m_vPos` at 0x08, `m_Radius` at 0x14); on the host the pointers are 8 bytes, so
+the stores hit `m_pNext` and `m_vPos.x/y`. The fix stores the members (TARGET_PORT; asm_diff 0);
+`CShake__Construct` (func_00281C08.c, the same view, no C caller) is fixed the same way. After it the
+port takes 12 numbers per game frame like the N64.
+
+**It changes every random number after the first camera is built**, so the scripted whole-game route
+(tuned on the old stream) no longer works: with the fix the default command wins the Harbor Totem
+and ends in game over in 125 at ~155,000. **`T2_LEGACY_SHAKE=1`** (port/game/t2debug.c) makes
+`CCamera__Construct` store as before; `fullrun.py` and `playthrough.py` now write it into
+`teleport.env`, so their runs are unchanged. A player (no env) gets the N64's numbers. Re-tuning the
+route on the N64 stream is future work.
+
+Not fixed, for the coordinator: `CShake__Set` (func_00281C60.c, `RecordRecAt18` with `pad[8]`) and
+`CShake__Advance` (func_00281CC0.c, `s32 arg0 + 0x18/0x2C/0x40`) are the same N64 layout and have no
+C callers; `n64viewcheck.py` flags none of the three (a cast of `&obj->member` to a local struct
+type is not one of its site kinds).
+
+Still different after the fix (a lead, not chased): the props `lvl 10`-`17` of the lair (mode 0,
+next to the spawn) are at their spawn positions with animation 4 frame 0.5 on the N64 from the first
+game frame, and at a displaced position with animation 0 frame 1/3 in the port.
+
+### 27-e1.5 The particle-pool hash: not reproduced
+
+Round 15 saw two runs whose `ptcl` field differed in frames 72,749-82,523. On this tree (Linux
+Release), the same `ptcl` lines from 72,000 to 83,000 came out the same in: 2 full-det runs
+(`T2_DET_ACTORS`, `T2_DET_PARTICLES`), 10 runs of the default command, 4 of round 14's
+`--cheats-on 3,4` command without `aimdrive.py`, 1 with `--draw` from 72,000 (5,100 frames drawn),
+1 with ASLR off (`setarch -R`). e4's two Linux default runs (all 580,000 det lines,
+md5 `ecb9f9f2…`) and the Mac Release, plain and ThinLTO, agree; this branch's default run (with
+`T2_LEGACY_SHAKE=1`) gives the same `ecb9f9f2…`. A non-empty `--pak-dir` changes the whole run (all
+fields from 72,000), so a stale pak is not the round-15 cause either. In the default run slot 115
+gets a type-172 particle at 72,749 (falling from (103, -468, 5,841)) and is reused often after, so
+no single particle stays different for 10,000 frames.

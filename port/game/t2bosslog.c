@@ -877,3 +877,27 @@ void T2Port_LairPeek(int frame, const char *spec0) {
         fflush(stdout);
     }
 }
+
+/* T2_PRIMAGEN_STAGE=F[,F...] (DEBUG-ONLY, round 16 e1; game.cpp, every frame): at each frame F, in the
+ * Primagen's lair, zero his part health (gLevelScript.values[0][0..7]), so that Primagen_UpdateHealth
+ * moves him to the next stage at its next call, with no shot fired. The N64 side is n64trace.py
+ * --poke "N:u32=0x8012F988:0;..." (values[0] at 0x8012F608 + 0x380), so that both run the same stage
+ * change with the player standing still (PLAYTHROUGH.md 27-e1: the N64 lair check). */
+void T2Port_PrimagenStage(int frame, const char *spec) {
+    const char *s = spec;
+    while (s != NULL && *s != '\0') {
+        if (atoi(s) == frame) {
+            int i;
+            for (i = 0; i < 8; i++) {
+                gLevelScript.values[0][i] = 0;
+            }
+            printf("primagenstage: frame %d stage %d parts done %x: part health zeroed\n", frame,
+                   (int) gLevelScript.stage, (unsigned) gLevelScript.partsDone);
+            fflush(stdout);
+        }
+        s = strchr(s, ',');
+        if (s != NULL) {
+            s++;
+        }
+    }
+}

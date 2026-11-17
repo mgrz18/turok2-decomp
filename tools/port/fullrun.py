@@ -174,6 +174,9 @@ class Route:
             env.append("T2_WARP_TO=%s" % ",".join("%d@%d" % (w, f) for f, w in sorted(self.warps)))
         if self.give:
             env.append("T2_GIVE_ITEMS=\"%s\"" % ";".join("%s@%d" % (v, f) for f, v in sorted(self.give)))
+        # round 16 e1: the camera shake as before round 16 (CCamera__Construct radius 0, no shake draws):
+        # the route was tuned on that RNG stream (PLAYTHROUGH.md 27-e1)
+        env.append("T2_LEGACY_SHAKE=1")
         env += list(env_extra) + list(self.extra_env)
         with open(os.path.join(out, "playthrough.txt"), "w") as fp:
             fp.write("\n".join(self.inputs) + "\n")

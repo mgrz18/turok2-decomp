@@ -550,6 +550,7 @@ def main():
         env += ["T2_GIVE_WEAPONS=1", "T2_WEAPON=%d" % a.fight, "T2_FACE_NEAREST=4000@109", "T2_FILL_AMMO=600"]
     with open(os.path.join(a.out, "playthrough.txt"), "w") as fp:
         fp.write("\n".join(inputs) + "\n")
+    env.append("T2_LEGACY_SHAKE=1")  # round 16 e1: the RNG stream the level routes were tuned on
     with open(os.path.join(a.out, "teleport.env"), "w") as fp:
         fp.write("T2_TELEPORT=\"%s\"\n" % ";".join(tps))
         for e in env:
