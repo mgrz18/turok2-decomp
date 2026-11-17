@@ -18,6 +18,22 @@ The matching build is unchanged: `tools/asm_diff.py --base 8b42da15 -j 8` report
 over all 3,938 files after every merge and at the end, and a clean `make clean && make setup &&
 make build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
+## Round 16 part e4 (branch names-R16_e4, Mac; MACOS.md 18)
+
+- **Building needs no N64 build any more**: gendata reads `versions/port_layout.us.json` (the
+  matching ELF's symbol/section tables, `tools/port/mklayout.py`) + the ROM when
+  `build/turok2.us.elf` is missing; identical `port/gen`. **After a merge that renames, adds or
+  moves a data symbol, run `python3 tools/port/mklayout.py` on the box (ELF + ROM) and commit
+  the json** (`--check` exits 1 when stale; gendata warns when the ELF and the json disagree).
+- QUICKSTART section 1 run literally from a GitHub clone: fixed (mkarchive makes `OUT/`, the
+  ELF step gone, `-DCMAKE_OSX_DEPLOYMENT_TARGET=27.0`, Xcode-only libclang, real times: first
+  configure 7.5 min of downloads); the app is produced and `apptest.sh` passes.
+- ThinLTO links (`port/tools/hostify.py`: `__attribute__((used))` on a file's own label
+  targets; object code unchanged without LTO); `-DT2_LTO=ON`, off by default (same det log, not
+  faster: ~40-43 s either way on the M5).
+- The default round-16 run under aimdrive.py: 580,000 det lines, md5 `ecb9f9f2…` (ptcl lines
+  included) on Linux twice, Mac plain, Mac LTO and the fresh-user build + archive.
+
 ## 1. Build and run
 
 **To play** (Mac or Linux, a Release build, a window, a gamepad or the keyboard and mouse):

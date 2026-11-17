@@ -23,6 +23,12 @@ Function labels (`extern void f(void) __asm__("Name");`, a second local name
 for a global symbol) are kept, but Mach-O prefixes C symbols with `_` and an
 asm label is taken verbatim, so the host copy writes them as
 `__asm__(T2_LABEL_PREFIX "Name")` (port_shim.h: "_" on Apple, "" elsewhere).
+A function the same file both defines and calls through a label (func_00413230.c:
+`MenuItem_DrawString` and 8 more) gets `__attribute__((used))` on its definition:
+under ThinLTO the label's reference is another IR global than the definition, so
+the LTO code generator dropped the definition and ld64 stopped with "defined in LTO
+objects are referenced but missing in compiled objects". `used` keeps it (no
+change without LTO: the function is external either way).
 
 Usage: hostify.py <in.c> <out.c>
 """
@@ -35,12 +41,23 @@ LABEL = re.compile(r'(?<=[\w)\]])(\s*)\b(?:asm|__asm__)\s*\(\s*"([A-Za-z_][A-Za-
 BARRIER = re.compile(r'\b(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;')
 
 
+def keep_labelled(text):
+    """__attribute__((used)) on the column-0 definitions of the file's own label targets."""
+    names = set(m.group(2) for m in LABEL.finditer(text))
+    for name in sorted(names):
+        defn = re.compile(r'^(?=[A-Za-z_][^;{}()#\n]*\b' + re.escape(name) + r'\s*\([^;{]*\{)',
+                          re.M)
+        text = defn.sub('__attribute__((used)) ', text)
+    return text
+
+
 def main():
     src, dst = sys.argv[1], sys.argv[2]
     text = open(src, encoding="utf-8", errors="surrogateescape").read()
     text = PIN.sub("", text)
     text = BARRIER.sub(";", text)
     text = SECTION.sub("", text)
+    text = keep_labelled(text)
     text = LABEL.sub(r'\1__asm__(T2_LABEL_PREFIX "\2")', text)
     with open(dst, "w", encoding="utf-8", errors="surrogateescape") as fh:
         fh.write(f'#line 1 "{src}"\n')
