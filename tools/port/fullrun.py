@@ -918,6 +918,7 @@ L2_133_REAL = [
     (6050, -847.0, -4761.6, 1574.0, 3.1416, 0, {"fire": 1900, "aim": "enemy:20"}),
     (8000, 827.5, -4761.6, -1627.5, -2.8692, 150, {}),    # warp 2615 -> 130
 ]
+L2_134_FIRE_R = 450     # round 17 f5: 134's fire range in a --real-weapons 2 run (T2_FIRE_GATE, T2_AIMD_FIRE_MAX)
 L2_STRETCH_REAL = [(6, 6, 3000), (9, 3, 2000), (12, 15, 2000)]
 
 
@@ -1012,7 +1013,10 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         l2stretch = L2_STRETCH_REAL
         l2segs = with_taps(l2segs, L2_TAPS)
         r.extra_env.append("T2_AIM_SKIP_TYPES=6")
-        r.extra_env.append("T2_FIRE_GATE=133,134,135")
+        # round 17 f5: in 134 the zombies walk up from 1,700 units: no fire beyond 450 (the mag 60 emptied
+        # on zombie 2 from afar); the stick driver's own fire likewise (T2_AIMD_FIRE_MAX)
+        r.extra_env.append("T2_FIRE_GATE=133,134:%d,135" % L2_134_FIRE_R)
+        r.extra_env.append("T2_AIMD_FIRE_MAX=134:%d" % L2_134_FIRE_R)
     a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {}) if extras else {},
                         L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else []), l2stretch,
                         back=L2_RETURN_LATE if h2 else (), detours=det.get(2),

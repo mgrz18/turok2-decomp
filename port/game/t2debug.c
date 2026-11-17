@@ -1411,6 +1411,15 @@ void T2Port_AimCand(int frame, CGameObjectInstance *o, f32 x, f32 y, f32 z, f32 
     sCand[at].z = z;
     sCand[at].d2 = d2;
     sCand[at].hp = o->m_AI.m_Health;
+    {
+        /* round 17 f5: kind 2 = an attacker of the totem (a totem defense: its sight target is the
+         * totem; a player sees it run at the totem). Truthy like 1 for older drivers. */
+        extern TotemDefenseState gTotemDefense;
+        if (kind == 1 && gTotemDefense.obj != NULL && gTotemDefense.state == 0 &&
+            (void *) o->m_AI.m_pSightTarget == (void *) gTotemDefense.obj) {
+            kind = 2;
+        }
+    }
     sCand[at].kind = kind;
     if (sCandN < AIM_CAND_MAX) {
         sCandN++;
@@ -1478,7 +1487,22 @@ int T2Port_AimPose(int frame, char *buf, int n) {
             len += snprintf(buf + len, n - len, " %d %a %a %a %d %d", sCand[k].id, sCand[k].x, sCand[k].y,
                             sCand[k].z, (int) sCand[k].hp, sCand[k].kind);
         }
-        snprintf(buf + len, n - len, " hp %d\n", (int) (p->m_Data.m_Health >> 8));
+        len += snprintf(buf + len, n - len, " hp %d", (int) (p->m_Data.m_Health >> 8));
+        {
+            /* round 17 f5: a totem defense running: "tot HP TIME KILLS NEED" (the totem's health,
+             * the seconds left, the kills so far and the kills needed: the HUD's two bars) */
+            extern TotemDefenseState gTotemDefense;
+            if (gTotemDefense.obj != NULL && gTotemDefense.state == 0 && gScene.m_nLevel > 0 && len < n - 48) {
+                CDestructibleIntelligence *d = (CDestructibleIntelligence *) gTotemDefense.def;
+                len += snprintf(buf + len, n - len, " tot %d %d %d %d", (int) (gTotemDefense.obj->m_AI.m_Health >> 8),
+                                (int) (gTotemDefense.timer / 15.0f), (int) gTotemDefense.kills,
+                                d != NULL ? (int) d->m_EnemiesToKillToSaveTotem : -1);
+            }
+        }
+        if (len < n - 16) {
+            len += snprintf(buf + len, n - len, " lv %d", (int) gScene.m_nLevel); /* round 17 f5: the level */
+        }
+        snprintf(buf + len, n - len, "\n");
         sCandN = 0;
     }
     return 1;
