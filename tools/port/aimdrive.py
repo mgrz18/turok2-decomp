@@ -19,9 +19,14 @@ Round 16 e2: the "aim" line also carries the candidate targets ("n", then "id x 
 nearest first: every target the assist would accept, a boss's damaging node boxes) and the player's
 health. The driver picks its own target among them (Picker: the one nearest the crosshair, distance
 and the current target weighed in), leads a moving one (its velocity from the candidates' ids) and
-fires: its answer "SX SY Z" holds Z only on target (the script's Z taps are overridden on every aim
-frame). T2_AIMD_PICK=0 aims at the assist's own target as round 15 did; T2_AIMD_FIRE=0 leaves the
-script's Z alone (round 15's answers: "SX SY").
+fires: its answer "SX SY z1" holds Z only on target ("z0" otherwise: the script's Z taps are
+overridden on every aim frame). T2_AIMD_PICK=0 aims at the assist's own target as round 15 did;
+T2_AIMD_FIRE=0 leaves the script's Z alone (round 15's answers: "SX SY").
+
+The answer protocol (round 16 merge; game.cpp, AimFifoExchange): "SX SY [TOKEN ...]", SX SY the
+stick or "- -" (keep the script's); each token sets one button group over the script's for the next
+frame: "cH" the C buttons (hex U 8, D 4, L 2, R 1), "z0"/"z1" fire, "r0"/"r1" jump. AimDrive answers
+"SX SY [zN]", LairDrive "- - cH", WalkDrive "SX 0 cH [r1]".
 
 --simple: the first controller (the observed error only, no prediction; round 15 d3's s1 run).
 --probe SX,SY: answer a constant stick instead (calibration: the pitch/yaw change per frame).
@@ -417,7 +422,7 @@ def main():
             for line in fin:
                 if line.startswith("move "):   # T2_MOVE_DRIVE: the lair driver's C buttons
                     frame, px, py, pz, b = move_answer(line, drive)
-                    fout.write("- -\n" if b is None else "- - %x\n" % b)
+                    fout.write("- -\n" if b is None else "- - c%x\n" % b)
                     fout.flush()
                     moves += 1
                     if stats and frame % STATS_EVERY == 0:
@@ -430,7 +435,7 @@ def main():
                 if not line.startswith("aim "):
                     continue
                 frame, sx, sy, ey, ep, pitch, ry, cid, z = answer(line, aim, probe, picker, trig)
-                fout.write("%d %d\n" % (sx, sy) if z is None else "%d %d %d\n" % (sx, sy, z))
+                fout.write("%d %d\n" % (sx, sy) if z is None else "%d %d z%d\n" % (sx, sy, z))
                 fout.flush()
                 n += 1
                 if stats:

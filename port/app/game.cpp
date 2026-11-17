@@ -368,31 +368,63 @@ bool ScriptedStick(int8_t* x, int8_t* y) {
 // T2_AIM_FIFO=DIR (debug, round 15 d3): the stick driver of T2_AIM_STICK (tools/port/aimdrive.py).
 // After each frame in which an aim assist reported a target (t2debug.c, T2Port_AimPose), one line
 // goes to the fifo DIR/out ("aim F px py pz rotY ex ey ez pitch tx ty tz") and one line comes back
-// from DIR/in ("SX SY": the next frame's stick on port 1, over the script's; "-" keeps the script).
+// from DIR/in: the next frame's input on port 1, over the script's.
 // Input only: the driver sees what the game drew and answers with a stick, as a player would.
-// T2_MOVE_DRIVE=F1-F2[;...] (debug, round 15 C30): inside these windows a second line goes out every
-// frame, "move F px py pz rotY bx by bz" (t2bosslog.c, T2Port_MovePose: the player and the level
-// boss), and the answer "SX SY C" gives the next frame's C buttons (hex mask of U 8, D 4, L 2, R 1),
-// which replace the script's (aimdrive.py's lair driver; "-" for SX SY keeps the stick).
-// Round 16 e2: an "aim" answer "SX SY Z" also sets the Z button (1 held, 0 released) over the
-// script's, and the aim line carries the candidate targets after the chosen one (T2Port_AimPose).
+// T2_MOVE_DRIVE=F1-F2[;...] (debug, round 15 C30; also T2_WALK_PLAN's windows, round 16 e3): inside
+// these windows a second line goes out every frame, "move F px py pz rotY bx by bz" (t2bosslog.c,
+// T2Port_MovePose: the player and the level boss). Round 16 e2: the aim line also carries the
+// candidate targets after the chosen one and the player's health (t2debug.c, T2Port_AimPose).
+//
+// The answer, one protocol for every line kind and every driver (round 16 merge, PLAYTHROUGH.md 31):
+//   "SX SY [TOKEN ...]"
+// SX SY: the stick (-128..127), or "- -" to keep the script's stick. Each optional token sets one
+// button group over the script's for the next frame; a group no token names stays the script's:
+//   cH       the C buttons, hex mask U 8, D 4, L 2, R 1 (c0 releases all four): lair and walk drivers
+//   z0 / z1  the Z trigger (fire) released / held: the aim driver's fire (T2_FIRE_GATE defers to it)
+//   r0 / r1  the R trigger (jump) released / held
+// When an aim and a move line both go out in one frame, their tokens add up (the move answer last).
 struct AimStick {
     bool valid;
     int8_t x, y;
-    bool cValid;
-    uint16_t c;
-    bool zValid; // round 16 e2: the aim driver's fire button (an "aim" answer's third field, 0 or 1)
-    bool z;
+    uint16_t mask;    // the N64 button bits the driver sets this frame (C 0x000F, R 0x0010, Z 0x2000)
+    uint16_t buttons; // their values
 };
 AimStick sAimStick;
+
+// The tokens after "SX SY" of a driver answer (above).
+void AimFifoButtons(const char* reply, int frame) {
+    char tok[3][16];
+    int n = sscanf(reply, "%*s %*s %15s %15s %15s", tok[0], tok[1], tok[2]);
+    for (int k = 0; k < n; k++) {
+        unsigned v;
+        uint16_t bits = tok[k][0] == 'c' ? 0x000F : tok[k][0] == 'z' ? 0x2000 : tok[k][0] == 'r' ? 0x0010 : 0;
+        if (bits == 0 || sscanf(tok[k] + 1, "%x", &v) != 1) {
+            static bool warned = false;
+            if (!warned) {
+                fprintf(stderr, "T2_AIM_FIFO: frame %d: unknown answer token \"%s\" (cH, z0/z1, r0/r1)\n", frame,
+                        tok[k]);
+                warned = true;
+            }
+            continue;
+        }
+        sAimStick.mask |= bits;
+        sAimStick.buttons =
+            (uint16_t)((sAimStick.buttons & ~bits) | (bits == 0x000F ? (v & 0xF) : (v != 0 ? bits : 0)));
+    }
+}
+
+// The driver's buttons over the pad's (T2_AIM_FIFO).
+uint16_t AimFifoApply(uint16_t b) {
+    return (uint16_t)((b & ~sAimStick.mask) | (sAimStick.buttons & sAimStick.mask));
+}
 
 void AimFifoExchange(int frame, const char* dir) {
     static FILE* out = nullptr;
     static FILE* in = nullptr;
     static bool broken = false;
     sAimStick.valid = false;
-    sAimStick.cValid = false;
-    sAimStick.zValid = false;
+    sAimStick.mask = 0;
+    sAimStick.buttons = 0;
     if (broken) {
         return;
     }
@@ -418,21 +450,25 @@ void AimFifoExchange(int frame, const char* dir) {
             return;
         }
         int sx, sy;
-        unsigned c;
         if (sscanf(reply, "%d %d", &sx, &sy) == 2 && sx >= -128 && sx <= 127 && sy >= -128 && sy <= 127) {
             sAimStick.valid = true;
             sAimStick.x = (int8_t)sx;
             sAimStick.y = (int8_t)sy;
         }
-        if (kind == 0 && sscanf(reply, "%*s %*s %x", &c) == 1) { // round 16 e2: Z held (1) or not (0)
-            sAimStick.zValid = true;
-            sAimStick.z = c != 0;
-        }
-        if (kind == 1 && sscanf(reply, "%*s %*s %x", &c) == 1) {
-            sAimStick.cValid = true;
-            sAimStick.c = (uint16_t)(c & 0xF);
-        }
+        AimFifoButtons(reply, frame);
     }
+}
+
+// The script's buttons. T2_FIRE_GATE=... (DEBUG-ONLY, round 16 e5): the script's Z is held back
+// while the aimed actor is asleep or far (t2bosslog.c, T2Port_FireGate), unless the stick driver
+// sets Z itself this frame (a "z" token: the driver's fire wins, round 16 merge).
+uint16_t ScriptedButtonsGated() {
+    uint16_t sb = ScriptedButtons();
+    static const bool fireGate = getenv("T2_FIRE_GATE") != nullptr;
+    if (fireGate && (sb & 0x2000) && !(sAimStick.mask & 0x2000) && !T2Port_FireGate(sFrame + 1)) {
+        sb &= (uint16_t)~0x2000u;
+    }
+    return sb;
 }
 
 // T2_PAD_LOG=1 (debug, round 14 c4): port 1's pad as the game receives it, one line per change
@@ -459,12 +495,7 @@ void ContRead(void* pads) {
     for (int i = 0; i < 4 && i < MAXCONTROLLERS; i++) {
         uint16_t b = (uint16_t)lus[i].button;
         if (i == 0) {
-            uint16_t sb = ScriptedButtons();
-            static const bool fireGate = getenv("T2_FIRE_GATE") != nullptr;
-            if (fireGate && (sb & 0x2000) && !T2Port_FireGate(sFrame + 1)) {
-                sb &= (uint16_t)~0x2000u; // DEBUG-ONLY: T2_FIRE_GATE (round 16 e5), the script's Z held back
-            }
-            b |= sb;
+            b |= ScriptedButtonsGated();
         }
         // N64 byte order is not an issue here: OSContPad.button is read as a u16 by the game
         memcpy(out + i * 6, &b, 2);
@@ -479,12 +510,8 @@ void ContRead(void* pads) {
                 sx = sAimStick.x;
                 sy = sAimStick.y;
             }
-            if (sAimStick.cValid) { // T2_MOVE_DRIVE: the driver's C buttons
-                b = (uint16_t)((b & ~0xFu) | sAimStick.c);
-                memcpy(out, &b, 2);
-            }
-            if (sAimStick.zValid) { // round 16 e2: the aim driver's Z
-                b = (uint16_t)((b & ~0x2000u) | (sAimStick.z ? 0x2000u : 0u));
+            if (sAimStick.mask != 0) { // T2_AIM_FIFO: the driver's C / Z / R buttons
+                b = AimFifoApply(b);
                 memcpy(out, &b, 2);
             }
             PadLog(b, sx, sy);
@@ -505,19 +532,14 @@ int ContInitHeadless(uint8_t* bits) {
 
 void ContReadHeadless(void* pads) {
     auto* out = static_cast<uint8_t*>(pads);
-    uint16_t b = ScriptedButtons();
+    uint16_t b = ScriptedButtonsGated();
     int8_t sx = 0, sy = 0;
     ScriptedStick(&sx, &sy);
     if (sAimStick.valid) { // T2_AIM_FIFO
         sx = sAimStick.x;
         sy = sAimStick.y;
     }
-    if (sAimStick.cValid) { // T2_MOVE_DRIVE: the driver's C buttons
-        b = (uint16_t)((b & ~0xFu) | sAimStick.c);
-    }
-    if (sAimStick.zValid) { // round 16 e2: the aim driver's Z
-        b = (uint16_t)((b & ~0x2000u) | (sAimStick.z ? 0x2000u : 0u));
-    }
+    b = AimFifoApply(b); // T2_AIM_FIFO: the driver's C / Z / R buttons
     PadLog(b, sx, sy);
     memcpy(out, &b, 2);
     out[2] = (uint8_t)sx;
