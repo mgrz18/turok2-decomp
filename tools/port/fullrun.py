@@ -849,6 +849,11 @@ L1_ARMS = {
     # 59 by the level exit 7100: shells x10, bullets x40, explosive shells x3, tek arrows x5 in a row
     9: [(-9851.8, -307.2, 5427.2, 1.5708, 60, 90)],
 }
+# round 17 f5: 131's plasma rifle (-1996.8, -1126.4, 5785.6) lies at the bottom of a pool (floor -1,126, water
+# -532; round 15 d2: "a death there"); with the 150 plasma cells of 129 it is the weapon for 134 (zombies 2-4 and
+# sister 2: the mag 60's 50 bullets do not kill zombies 2 and 3). L2_PLASMA = False: round 16's picks.
+L2_PLASMA = False   # tried: the pool is deadly (10 health every 2 frames: 116 -> 0 in 22 frames)
+L2_131_PLASMA = [(-1996.8, -1126.4, 5785.6, 0.0, 60, 40)] if L2_PLASMA else []
 L2_ARMS = {
     0: [(3408.8, 614.4, -521.9, 0.0), (3406.2, 614.4, -1324.7, -1.5708),   # 125: shells x10, explosive shells x3,
         (2816.0, 614.4, 9984.0, 0.0)],                                      #      shells x10
@@ -860,8 +865,7 @@ L2_ARMS = {
     # round 16 e5: ammo for sister 2 (134) after sister 1 has taken it all: 131's terrace (y 102.4),
     # bullets x40, shells x3 and explosive shells x3 (130's bullets x40 and shells x10 by its exit,
     # (6529.9, -3379.2, 478.5) and (6516.3, -3379.2, 2080.0), were not reached by such picks)
-    8: [(2581.0, 102.4, 1159.2, 0.0), (1420.5, 102.4, 1161.3, 0.0), (1971.6, 102.4, 1772.7, 0.0)],
-    # not taken: 131's plasma rifle (-1996.8, -1126.4, 5785.6): a death there
+    8: [(2581.0, 102.4, 1159.2, 0.0), (1420.5, 102.4, 1161.3, 0.0), (1971.6, 102.4, 1772.7, 0.0)] + L2_131_PLASMA,
 }
 L3_ARMS = {}
 ARMS = {1: L1_ARMS, 2: L2_ARMS, 3: L3_ARMS}
@@ -899,8 +903,8 @@ def wheel(weapon, f):
 L2_TAPS = {(4, 0): 8,       # 129's soul gate: the shotgun (the grenade launcher's grenades fly over the gate)
            (6, 2): 4,       # 133's zombies 22-24 (L2_133_REAL): the mag 60 (the pistol's slot)
            (6, 6): 15,      # 133's sister 1: the grenade launcher
-           (9, 0): 4,       # 134's zombies: the mag 60 (the pistol's slot)
-           (9, 3): 8}       # 134's sister 2: the shotgun
+           (9, 0): 10 if L2_PLASMA else 4,   # 134's zombies: the plasma rifle (round 17 f5) / the mag 60
+           (9, 3): 10 if L2_PLASMA else 8}   # 134's sister 2: the plasma rifle / the shotgun
 # round 16 e5: 133 in a --real-weapons 1,2 run: the zombies of the second room (22, 23, 24: 80 health
 # each, they open door 28; the nearest awake actor, T2_FIRE_GATE), then sister 1 (20, 50 health). The round-12 steps
 # (the sister aimed from the start, the nearest actor else) spent all the ammo on doors 27 and 28.
