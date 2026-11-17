@@ -26,6 +26,9 @@ namespace {
 using Ship::KbScancode;
 
 std::shared_ptr<Ship::Window> sWindow;
+class HeadlessWindow;
+HeadlessWindow* sHeadless = nullptr; // --pad-test's window
+bool sHotkeyF1 = false;              // --pad-test: "hotkey F1"
 
 // ---- the headless window (--pad-test) ----
 // Every method a no-op, except the mouse, which the test script sets.
@@ -36,9 +39,30 @@ struct MouseFeed {
 
 class HeadlessWindow : public Ship::Window {
   public:
-    explicit HeadlessWindow(std::shared_ptr<Ship::ConsoleVariable>) : Ship::Window(std::shared_ptr<Ship::Config>()) {
+    // The window geometry starts from the config, as Fast3dWindow's does (Window.Width/Height,
+    // PositionX/Y, Fullscreen.Enabled and Fullscreen.Width/Height), and LUS's own
+    // Window::SaveWindowToConfig writes it back at exit when main.cpp adds this window to the
+    // Context (--pad-test): the headless check of the config round-trip (MACOS.md section 17).
+    HeadlessWindow(std::shared_ptr<Ship::ConsoleVariable>, std::shared_ptr<Ship::Config> config)
+        : Ship::Window(config) {
+        if (config != nullptr) {
+            mFullscreen = config->GetBool("Window.Fullscreen.Enabled", false);
+            mW = config->GetInt(mFullscreen ? "Window.Fullscreen.Width" : "Window.Width", 640);
+            mH = config->GetInt(mFullscreen ? "Window.Fullscreen.Height" : "Window.Height", 480);
+            mX = config->GetInt("Window.PositionX", 100);
+            mY = config->GetInt("Window.PositionY", 100);
+        }
         MarkInitialized(); // nothing to open; the ControlDeck checks it
     }
+    // what a player does to a real window: resize / move it, toggle fullscreen (F11)
+    void Resize(int w, int h, int x, int y) {
+        mW = w;
+        mH = h;
+        mX = x;
+        mY = y;
+    }
+    int32_t mW = 640, mH = 480, mX = 100, mY = 100;
+    bool mFullscreen = false;
     void Close() override {
     }
     void RunGuiOnly() override {
@@ -55,19 +79,19 @@ class HeadlessWindow : public Ship::Window {
     void SetCursorVisibility(bool) override {
     }
     uint32_t GetWidth() override {
-        return 640;
+        return (uint32_t)mW;
     }
     uint32_t GetHeight() override {
-        return 480;
+        return (uint32_t)mH;
     }
     float GetAspectRatio() override {
-        return 4.0f / 3.0f;
+        return mH > 0 ? (float)mW / (float)mH : 4.0f / 3.0f;
     }
     int32_t GetPosX() override {
-        return 0;
+        return mX;
     }
     int32_t GetPosY() override {
-        return 0;
+        return mY;
     }
     void SetMousePos(Ship::Coords) override {
     }
@@ -103,10 +127,17 @@ class HeadlessWindow : public Ship::Window {
     }
     void SetMsaaLevel(uint32_t) override {
     }
-    void SetFullscreen(bool) override {
+    void SetFullscreen(bool on) override {
+        if (on != mFullscreen) {
+            SaveWindowToConfig(); // as Fast3dWindow::SetFullscreen: the windowed size first
+            mFullscreen = on;
+            const auto c = GetConfig();
+            mW = c ? c->GetInt(on ? "Window.Fullscreen.Width" : "Window.Width", on ? 1920 : 640) : mW;
+            mH = c ? c->GetInt(on ? "Window.Fullscreen.Height" : "Window.Height", on ? 1080 : 480) : mH;
+        }
     }
     bool IsFullscreen() override {
-        return false;
+        return mFullscreen;
     }
     bool IsRunning() override {
         return true;
@@ -133,9 +164,11 @@ class HeadlessWindow : public Ship::Window {
 // ---- --pad-test ----
 struct PadEvent {
     int frame;
-    int kind; // 0 key, 1 gamepad button, 2 gamepad axis, 3 mouse move, 4 mouse button, 5 capture, 6 plug, 7 unplug
+    int kind; // 0 key, 1 gamepad button, 2 gamepad axis, 3 mouse move, 4 mouse button, 5 capture, 6 plug, 7 unplug,
+              // 8 window W H X Y, 9 fullscreen 0|1, 10 hotkey F1
     int code;
     int value;
+    int x, y;
 };
 std::vector<PadEvent> sPadEvents;
 bool sPadTest = false;
@@ -280,12 +313,14 @@ std::shared_ptr<Ship::ControllerDefaultMappings> T2Controls_DefaultMappings() {
                                                             padAxisButtons, padAxisStick);
 }
 
-std::shared_ptr<Ship::Window> T2Controls_MakeHeadlessWindow(std::shared_ptr<Ship::ConsoleVariable> cvars) {
+std::shared_ptr<Ship::Window> T2Controls_MakeHeadlessWindow(std::shared_ptr<Ship::ConsoleVariable> cvars,
+                                                            std::shared_ptr<Ship::Config> config) {
     // KeyboardGameInputBlocked() reads ImGui's context: give it an empty one
     if (ImGui::GetCurrentContext() == nullptr) {
         ImGui::CreateContext();
     }
-    auto w = std::make_shared<HeadlessWindow>(std::move(cvars));
+    auto w = std::make_shared<HeadlessWindow>(std::move(cvars), std::move(config));
+    sHeadless = w.get();
     // never destroyed: ~Window shuts ImGui down through a GUI that was never started
     new std::shared_ptr<Ship::Window>(w);
     return w;
@@ -334,6 +369,89 @@ void T2Controls_PollHotplug() {
     }
 }
 
+// ---- the player's settings (round 15 d4) ----
+namespace {
+const char* const kSens = "gT2MouseSensitivity";
+const float kSensDefault = 2.0f;
+const char* const kMouseInvert = "gT2MouseInvertY";
+const char* const kMouseDeadZone = "gT2MouseDeadZone";
+const int kMouseDeadZoneDefault = 3;
+const char* const kStickInvert = "gT2StickInvertY";
+const char* const kShowControls = "gT2ShowControlsAtStart";
+
+const char* const kControlsText =
+    "Turok 2 controls (F1 shows this again; turok2.cfg.json in this folder keeps the settings)\n"
+    "                 keyboard + mouse            gamepad\n"
+    "  walk/strafe    W A S D                     left stick\n"
+    "  turn/look      mouse (click to capture),   right stick\n"
+    "                 arrow keys\n"
+    "  fire           left click, Ctrl            right trigger\n"
+    "  jump           right click, Space          left trigger, right shoulder\n"
+    "  weapon wheels  hold Q (A) or E (B) and     hold South (A) or East (B) and\n"
+    "                 pick with the mouse/arrows  pick with the right stick\n"
+    "  map            Tab                         left shoulder, Back\n"
+    "  pause, menus   Esc, Enter (= A in menus)   Start, South\n"
+    "  D-pad          T F G H                     D-pad\n"
+    "  F2 frees/captures the mouse, F11 fullscreen (saved), close the window to quit\n"
+    "  settings (CVars): gT2MouseSensitivity, gT2MouseInvertY, gT2MouseDeadZone, gT2StickInvertY,\n"
+    "  gT2ShowControlsAtStart; window: Window.Width/Height/Fullscreen.Enabled\n";
+} // namespace
+
+void T2Controls_RegisterSettings(bool save) {
+    // registered = written to turok2.cfg.json with their defaults, where a player finds them
+    CVarRegisterFloat(kSens, kSensDefault);
+    CVarRegisterInteger(kMouseInvert, 0);
+    CVarRegisterInteger(kMouseDeadZone, kMouseDeadZoneDefault);
+    CVarRegisterInteger(kStickInvert, 0);
+    CVarRegisterInteger(kShowControls, 1);
+    const float sens = CVarGetFloat(kSens, kSensDefault);
+    if (!(sens > 0.0f && sens <= 40.0f)) { // a broken value would make the mouse useless
+        fprintf(stderr, "controls: %s = %g out of range (0, 40]: using %g\n", kSens, sens, kSensDefault);
+        CVarSetFloat(kSens, kSensDefault);
+    }
+    if (save) {
+        CVarSave();
+    }
+    printf("controls: mouse sensitivity %g, mouse invert Y %d, mouse dead zone %d, stick invert Y %d\n",
+           CVarGetFloat(kSens, kSensDefault), CVarGetInteger(kMouseInvert, 0),
+           CVarGetInteger(kMouseDeadZone, kMouseDeadZoneDefault), CVarGetInteger(kStickInvert, 0));
+    if (CVarGetInteger(kShowControls, 1)) {
+        fputs(kControlsText, stdout);
+    }
+    fflush(stdout);
+}
+
+void T2Controls_Look(int8_t* sy, bool inLevel) {
+    // gT2StickInvertY: the gamepad's right stick / the arrow keys look inverted, in a level only
+    // (the menus keep up = up)
+    if (inLevel && *sy != 0 && CVarGetInteger(kStickInvert, 0)) {
+        *sy = (int8_t)(*sy == -128 ? 127 : -*sy);
+    }
+}
+
+void T2Controls_Hotkeys() {
+    // F1: the controls, in the log and (with a window) in a message box. The game waits while
+    // the box is open; --pace then moves its clock instead of catching up.
+    bool f1 = sHotkeyF1;
+    sHotkeyF1 = false;
+    static bool wasDown = false;
+    if (sWindow != nullptr && !sPadTest) {
+        const bool* keys = SDL_GetKeyboardState(nullptr);
+        const bool down = keys != nullptr && keys[SDL_SCANCODE_F1];
+        f1 = f1 || (down && !wasDown);
+        wasDown = down;
+    }
+    if (!f1) {
+        return;
+    }
+    fputs(kControlsText, stdout);
+    fflush(stdout);
+    if (sWindow != nullptr && !sPadTest) {
+        sWindow->SetMouseCapture(false); // the box needs the pointer; a click captures it again
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Turok 2 controls", kControlsText, nullptr);
+    }
+}
+
 void T2Controls_Mouse(uint16_t* buttons, int8_t* sx, int8_t* sy) {
     static bool swallow = false; // the click that captured the mouse does not fire
     if (sWindow == nullptr) {
@@ -349,20 +467,23 @@ void T2Controls_Mouse(uint16_t* buttons, int8_t* sx, int8_t* sy) {
         return;
     }
     swallow = swallow && left;
-    // look: the mouse's motion this frame as a stick deflection. CVars (turok2.cfg.json):
-    // gT2MouseSensitivity (stick units per pixel, default 2), gT2MouseInvertY (0).
+    // look: the mouse's motion this frame as a stick deflection. CVars (turok2.cfg.json, section
+    // "CVars"): gT2MouseSensitivity (stick units per pixel, default 2), gT2MouseInvertY (0), and
+    // gT2MouseDeadZone (3: added to any motion, the game's own stick dead zone, so that a 1-pixel
+    // motion still turns; Controller_ProcessInput subtracts 3 from |stick|).
     const Ship::Coords d = sWindow->GetMouseDelta();
-    const float sens = CVarGetFloat("gT2MouseSensitivity", 2.0f);
-    const int invert = CVarGetInteger("gT2MouseInvertY", 0);
-    if (d.x != 0 || d.y != 0) {
-        const float x = std::clamp(d.x * sens, -80.0f, 80.0f);
-        const float y = std::clamp((invert ? d.y : -d.y) * sens, -80.0f, 80.0f);
-        if (d.x != 0) {
-            *sx = (int8_t)std::lround(x);
-        }
-        if (d.y != 0) {
-            *sy = (int8_t)std::lround(y);
-        }
+    const float sens = CVarGetFloat(kSens, kSensDefault);
+    const int invert = CVarGetInteger(kMouseInvert, 0);
+    const float dz = (float)std::clamp(CVarGetInteger(kMouseDeadZone, kMouseDeadZoneDefault), 0, 20);
+    auto axis = [&](int v) {
+        const float m = std::min(dz + std::fabs((float)v) * sens, 80.0f);
+        return (int8_t)std::lround(v < 0 ? -m : m);
+    };
+    if (d.x != 0) {
+        *sx = axis(d.x);
+    }
+    if (d.y != 0) {
+        *sy = axis(invert ? d.y : -d.y);
     }
     if (left && !swallow) {
         *buttons |= BTN_Z;
@@ -380,6 +501,7 @@ bool T2PadTest_Load(const std::string& path) {
     }
     // FRAME key NAME down|up / FRAME btn NAME down|up / FRAME axis NAME VALUE (-32768..32767)
     // FRAME mouse DX DY / FRAME mbtn LEFT|RIGHT down|up / FRAME capture 0|1 / FRAME unplug / FRAME plug
+    // FRAME window W H X Y / FRAME fullscreen 0|1 / FRAME hotkey F1
     std::string line;
     int lineNo = 0;
     while (std::getline(in, line)) {
@@ -415,6 +537,16 @@ bool T2PadTest_Load(const std::string& path) {
             e.value = atoi(a.c_str());
         } else if (kind == "plug" || kind == "unplug") {
             e.kind = kind == "plug" ? 6 : 7;
+        } else if (kind == "window") {
+            e.kind = 8;
+            e.code = atoi(a.c_str());
+            e.value = atoi(b.c_str());
+            ss >> e.x >> e.y;
+        } else if (kind == "fullscreen") {
+            e.kind = 9;
+            e.value = atoi(a.c_str());
+        } else if (kind == "hotkey" && a == "F1") {
+            e.kind = 10;
         } else {
             e.kind = -1;
             e.code = -1;
@@ -483,6 +615,19 @@ void T2PadTest_Apply(int frame) {
                     sVirtual = nullptr;
                     printf("pad-test: virtual gamepad detached\n");
                 }
+                break;
+            case 8:
+                if (sHeadless) {
+                    sHeadless->Resize(e.code, e.value, e.x, e.y);
+                }
+                break;
+            case 9:
+                if (sHeadless) {
+                    sHeadless->SetFullscreen(e.value != 0);
+                }
+                break;
+            case 10:
+                sHotkeyF1 = true;
                 break;
         }
     }

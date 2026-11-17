@@ -388,6 +388,8 @@ void ContRead(void* pads) {
         memcpy(out + i * 6, &b, 2);
         int8_t sx = (int8_t)lus[i].stick_x, sy = (int8_t)lus[i].stick_y;
         if (i == 0) {
+            T2Controls_Hotkeys();                             // F1: the controls
+            T2Controls_Look(&sy, T2Port_EngineMode() == 11); // gT2StickInvertY
             T2Controls_Mouse(&b, &sx, &sy); // captured mouse: look, fire, jump
             memcpy(out, &b, 2);
             ScriptedStick(&sx, &sy);

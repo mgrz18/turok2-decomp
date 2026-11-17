@@ -1,5 +1,8 @@
 # Quick start: play Turok 2 on the native port
 
+**Have a ready-made `Turok2.app` (or its zip)?** Skip the build: section 0. Otherwise build it
+yourself (sections 1-3).
+
 What you need: **your own** Turok 2: Seeds of Evil ROM (N64, USA, `baserom.us.z64`, sha1
 `fb0400f21e3f043939ab56500c7b12a3231006f1`) and this repository. The port reads the game data from
 the ROM at build time (the archive) and at run time. Nothing from the ROM is in the repository.
@@ -7,6 +10,39 @@ the ROM at build time (the archive) and at run time. Nothing from the ROM is in 
 Machines checked: macOS 27 on Apple silicon (rounds 13-14, MACOS.md sections 15-16) and Linux x86-64
 (STATUS.md). The commands below are for the Mac; on Linux, drop `brew` and use your distribution's
 packages.
+
+## 0. Install the app (no build, no Homebrew)
+
+The app from `tools/port/mkapp.sh` (round 15) carries every library it needs (SDL3, GLEW,
+libzip, tinyxml2, liblzma, libzstd in `Contents/Frameworks`): it runs on an Apple silicon Mac
+with macOS 27 or later and nothing else installed. It holds no game data.
+
+1. **Unzip** `Turok2-<version>-macos-arm64.zip` (double-click) and **drag `Turok2.app` to
+   `/Applications`** (any folder works, paths with spaces too).
+2. **Your game files**: make the folder and copy the ROM and the archive into it:
+
+   ```sh
+   D=~/Library/Application\ Support/turok2
+   mkdir -p "$D" && cp baserom.us.z64 turok2.o2r "$D"/
+   ```
+
+   `turok2.o2r` is made once from your ROM with `tools/assets/mkarchive.py` (section 1, the
+   archive line; it needs only Python). Finder: Go > Go to Folder... >
+   `~/Library/Application Support`, make a folder `turok2`, drop the two files in. (They may
+   also go in the app's `Contents/Resources`, but a new copy of the app would lose them.)
+3. **The first launch (Gatekeeper)**: the app is signed ad hoc, not notarized by Apple, so a
+   double-click on a downloaded copy says it cannot be checked. Either **right-click (or
+   Control-click) the app > Open > Open**, or try once, then **System Settings > Privacy &
+   Security > "Turok2" was blocked... > Open Anyway**. In a terminal instead:
+   `xattr -dr com.apple.quarantine /Applications/Turok2.app`. Only the first launch asks.
+   A copy you built yourself is not quarantined and opens directly.
+4. **Play**: the logos, the intro and the title come up in a 640x480 window with sound (the
+   N64's own boot: about 70 s of logos and intro cinemas before the title). The controls are printed in `logs/turok2-stdout.log` and **F1** shows them
+   (section 4). If the ROM or the archive is missing the app says which file and where it looked.
+
+Where things go: the config `turok2.cfg.json`, the logs (`logs/`) and the saves
+(`turok2_pak1.mpk`) are all in `~/Library/Application Support/turok2`. To remove the game, drag
+the app to the Bin and delete that folder.
 
 ## 1. Build once
 
@@ -48,11 +84,15 @@ Optional, a macOS app (Finder, Dock, Launchpad):
 
 ```sh
 tools/port/mkapp.sh OUT/rel                       # -> OUT/Turok2.app; move it to /Applications if you like
+T2_APP_ZIP=1 tools/port/mkapp.sh OUT/rel          # also OUT/Turok2-0.15-macos-arm64.zip, to give away
+tools/port/apptest.sh OUT/Turok2.app OUT/turok2.o2r baserom.us.z64 /tmp/apptest   # the check below
 ```
 
-The bundle holds the executable and `t2port.o2r` only. It uses Homebrew's SDL3, libzip, GLEW,
-libpng and tinyxml2, so it runs on a Mac that has them (step 1). It is signed ad hoc, not
-notarized: the first launch may need right-click > Open.
+The bundle is self-contained (round 15): the executable, `t2port.o2r`, and Homebrew's dylibs
+copied into `Contents/Frameworks` and relinked to `@rpath`; the script stops if anything still
+points to `/opt/homebrew`. It is signed ad hoc (`codesign --deep -s -`), not notarized: see
+section 0 for the first launch. `apptest.sh` runs a copy under a path with spaces with
+`/opt/homebrew` hidden and starts a new game headless.
 
 ## 3. Play
 
@@ -70,9 +110,19 @@ real time (the N64's 60 fields a second, 30 drawn frames) until you close the wi
 - **Settings** go to `turok2.cfg.json` in the same folder: the window size (`Window.Width`,
   `Window.Height`; default 640x480), fullscreen (`Window.Fullscreen.Enabled`, default off; **F11**
   toggles it), vsync (`CVars.gVsyncEnabled`, default on), the sound backend
-  (`Window.AudioBackend`: `coreaudio`, the macOS default, `sdl` or `null`), the mouse
-  (`CVars.gT2MouseSensitivity`, default 2.0, `CVars.gT2MouseInvertY`, default 0) and the
-  controller mappings (`CVars.gControllers`). Delete the file to get the defaults back.
+  (`Window.AudioBackend`: `coreaudio`, the macOS default, `sdl` or `null`), the mouse and the
+  look (below) and the controller mappings (`CVars.gControllers`). The window's size, position
+  and fullscreen state are saved when you quit and come back at the next launch. Delete the
+  file to get the defaults back. The look settings (written with their defaults at the first
+  launch; edit them while the game is closed):
+
+  | key (`CVars.`) | default | what |
+  |---|---|---|
+  | `gT2MouseSensitivity` | 2.0 | stick units per pixel of mouse motion (0-40; 1 = slower, 4 = faster) |
+  | `gT2MouseDeadZone` | 3 | added to any mouse motion: the game ignores the first 3 stick units, so a 1-pixel motion still turns |
+  | `gT2MouseInvertY` | 0 | 1: mouse up looks down |
+  | `gT2StickInvertY` | 0 | 1: the gamepad's right stick / the arrow keys look inverted (in a level; menus are not inverted) |
+  | `gT2ShowControlsAtStart` | 1 | 0: no controls table in the log at start |
 - **Logs** go to `logs/` in the same folder: `turok2-stdout.log`, `turok2-stderr.log` (the
   port's messages) and `turok2.log` (libultraship's). Nothing is printed in the terminal except
   where the logs are.
@@ -99,7 +149,8 @@ becomes a twin-stick layout:
 
 - **The mouse**: click in the window to capture it (the cursor hides and the mouse turns and
   looks); **F2** releases and captures it again. The click that captures does not fire.
-- **Fullscreen**: F11.
+- **Fullscreen**: F11 (remembered at the next launch).
+- **F1** shows the controls (a message box; they are also in `logs/turok2-stdout.log` at start).
 - Any binding can be changed in `turok2.cfg.json` (`CVars.gControllers`). A config written by an
   older build keeps its old mappings (left stick = look): delete the file to get these.
 - There is no rumble.
