@@ -54,10 +54,26 @@ class Route:
         self.extra_env = []
         self.cheat_windows = []
         self.cheats_on = set()   # sub-levels (the totems: 109 110 111 112) kept invincible (--cheats-on)
+        self.walked = 0
+        self.walk_probe = False
+        self.walk = set()        # round 15 d5 (--walk): the levels whose open-floor teleports are walked
 
     def note(self, frame, text):
         self.inputs.append("# %d: %s" % (frame, text))
         self.timeline.append((frame, text))
+
+    def walk_to(self, f, frm, x, y, z, ry, walk=0):
+        """Instead of a teleport to (x, z, ry) at the end: walk there from frm (x, z, rotY) with the
+        stick (playthrough.stick_walk) from frame f, then the step's own C-up walk. Returns the
+        frames the walk takes (the step happens that much later)."""
+        ins, n = pt.stick_walk(f, frm[:2], frm[2], (x, z), ry)
+        self.inputs += ins
+        self.walked += 1
+        if self.walk_probe:   # --walk-probe: the teleport too, at the walk's end (its log line: the arrival)
+            self.tps.append("%d:%.1f,%.1f,%.1f,%.4f" % (f + n, x, y, z, ry))
+        if walk:
+            self.inputs.append("CU@%d..%d" % (f + n + 10, f + n + 10 + walk))
+        return n
 
     def tp(self, f, x, y, z, ry, walk=0, trig=False):
         self.tps.append("%d:%.1f,%.1f,%.1f,%.4f%s" % (f, x, y, z, ry, "!" if trig else ""))
@@ -77,7 +93,10 @@ class Route:
                 dt, x, y, z, ry, walk = st[:6]
                 o = st[6] if len(st) > 6 else {}
                 f = start + rel + dt
-                self.tp(f, x, y, z, ry, walk, o.get("trig"))
+                if o.get("walkfrom"):   # round 15 d5: walked (the step was moved by the walk's frames)
+                    self.walk_to(f - o["walkframes"], o["walkfrom"], x, y, z, ry, walk)
+                else:
+                    self.tp(f, x, y, z, ry, walk, o.get("trig"))
                 if o.get("stick"):   # round 14 c5: aim with the stick only (playthrough.stick_aim)
                     self.inputs += pt.stick_aim(x, z, ry, o["stick"], f + 2)
                 if o.get("fire"):
@@ -134,7 +153,7 @@ class Route:
             for f, t in sorted(self.timeline):
                 fp.write("%7d  %s\n" % (f, t))
         last = max([int(t.split(":")[0]) for t in self.tps] + [getattr(self, "end", 0)])
-        print("%d inputs, %d teleports; last frame %d" % (len(self.inputs), len(self.tps), last))
+        print("%d inputs, %d teleports, %d walks; last frame %d" % (len(self.inputs), len(self.tps), self.walked, last))
         return last
 
 
@@ -151,6 +170,28 @@ L1_KEYS = {
     9: [(-613.6, 307.2, 639.4, 0.0), (-5682.8, 614.4, 6556.4, 0.0)],    # 59: level 3 keys
 }
 KEY_STEP = 150
+
+# ---- round 15 d5 (--walk 1,2): teleports replaced by stick walking on open floor ----
+# (segment index, step index): where the player stands, and faces, when the step's teleport fires in
+# the default run (its teleport log and det log: x, z, rotY; tools/port/walkcands.py lists them). The
+# walk starts there at the step's frame and the step (and every later one) moves by the walk's frames.
+# Probed (--walk 1,2 --walk-probe, Linux Release; PLAYTHROUGH.md 22): of the 19 teleports of levels
+# 1-2 that stay on one floor, only two arrive within 200 units; the others stop against walls, cages,
+# graves and crypt doors 150-3,400 units short (they are not plain walks), or follow an aim-assisted
+# fight whose end yaw the open-loop walk cannot know. Kept: the one that arrives and resyncs.
+L1_WALKS = {}
+# 53: the beacon-2 walk stops at a wall (z 7,121, 1,422 units short), the two cage walks against
+#     the cages' bars (233 and 955 short).
+L2_WALKS = {
+    (9, 2): (78.7, -870.5, -1.5306),       # 134: from the start to the gate (1,571 units; arrives
+                                           # ~200 short; the zombie-4 fight there opens gate 8 and
+                                           # the next step teleports back to the gate spot)
+}
+# Probed and failed (arrival error in units): 133 (6, 0) 2,143, (6, 1) 2,151, (6, 2) 5,191 (the
+# zombies' rooms: doors); 134 (9, 3) 867, (9, 4) 1,669 (after the aim-assisted fights: the yaw is
+# not the default run's); 135 (12, 1) 1,479, (12, 3) 1,674, (12, 7) 971, (12, 9) 3,383, (12, 10)
+# 156, (12, 11) 1,978, (12, 12) 1,611, (12, 13) 2,171, (12, 14) 1,030, (12, 15) 813 (graves,
+# crypts, the water hall's walls). A closed-loop walker (the d3 input pipe) is what they need.
 
 # ---- health on the way (round 13 b5: the run without T2_CHEATS invincibility) ----
 # The health pickups the routes pass near (tools/assets/levels.py; the item id is the object's id
@@ -201,8 +242,13 @@ def level1(r, start_shift=0, keys=True, health=True):
                 r.pick(f0, x, y, z, ang)
                 f0 += KEY_STEP
                 added += KEY_STEP
-        for dt, x, y, z, ry, walk in steps:
-            r.tp(f0 + dt, x, y, z, ry, walk)
+        for j, (dt, x, y, z, ry, walk) in enumerate(steps):
+            if 1 in r.walk and (i, j) in L1_WALKS:
+                n = r.walk_to(f0 + dt, L1_WALKS[(i, j)], x, y, z, ry, walk)
+                f0 += n
+                added += n
+            else:
+                r.tp(f0 + dt, x, y, z, ry, walk)
     arrival = pt.TOTEM_ARRIVAL + start_shift + added
     r.note(arrival, "109 the Harbor Totem: fire taps (T2_FACE_NEAREST aims)")
     r.fire.append((arrival, arrival + 7150))
@@ -357,7 +403,7 @@ def stretch(segments, extra):
     return segs
 
 
-def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back=(), detours=None):
+def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back=(), detours=None, walks=None):
     """A 7-tuple segment list from `start` with keys inserted; returns the frames added.
     anchor: the segment indices whose key picks re-anchor the schedule clock when the segment's level
     is reached (T2_ANCHOR) and wait KEY_WAIT frames, so that a pick-up waits for the level when its
@@ -371,6 +417,22 @@ def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back
     out = []
     trips = []
     for i, (name, rel, steps, more) in enumerate(stretch(segments, extra)):
+        if walks:   # round 15 d5: walked steps move this and the later steps by the walk's frames
+            steps = [list(st) for st in steps]
+            for j in range(len(steps)):
+                if (i, j) not in walks:
+                    continue
+                st = steps[j]
+                o = dict(st[6] if len(st) > 6 else {})
+                frm = walks[(i, j)]
+                o["walkfrom"] = frm
+                o["walkframes"] = pt.stick_walk(0, frm[:2], frm[2], (st[1], st[3]), st[4])[1]
+                st = st[:6] + [o]
+                steps[j] = st
+                for k in range(j, len(steps)):
+                    steps[k][0] += o["walkframes"]
+                more += o["walkframes"]
+            steps = [tuple(st) for st in steps]
         pre = []
         if i in keys:
             if i in anchor:
@@ -551,7 +613,7 @@ def hub(r, arrival, grant=(), primagen=(), save=True, go=None, bump=None):
 
 
 def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(), health=True, cheats_on=(),
-             talismans=()):
+             talismans=(), walk=(), walk_probe=False):
     """hubs: the measured hub arrivals {after level: frame} (HUB_AT). no_cheats: the levels played
     without T2_CHEATS invincibility (each from its hub visit before it); extra_env: more env lines.
     talismans: the levels whose chamber trip is made (TALISMAN: 2, 3; each moves the later hub
@@ -566,6 +628,8 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r = Route()
     r.no_cheats = set(no_cheats)
     r.cheats_on = set(cheats_on)
+    r.walk = set(walk)
+    r.walk_probe = walk_probe
     r.extra_env = list(extra_env)
     for lv in (2, 3, 4, 5):
         r.level_start[lv] = hubs[lv - 1]
@@ -588,7 +652,8 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     l2segs, l2stretch = l2_segments(2 in r.no_cheats)
     a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}) if extras else {},
                         L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else []), l2stretch,
-                        back=L2_RETURN_LATE if h2 else (), detours=det.get(2))
+                        back=L2_RETURN_LATE if h2 else (), detours=det.get(2),
+                        walks=L2_WALKS if 2 in walk else None)
     t_arr = pt.L2_TOTEM_ARRIVAL + shift + a2
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
     if 110 in r.cheats_on:
@@ -811,6 +876,10 @@ def cli(argv=None):
     ap.add_argument("--cheats-on", default="", help="110: the City Totem invincible even in a --cheats-off level (round 13 b5); "
                     "3 / 4: the Mother / the Primagen in a --cheats-off 6 run (round 14 c2)")
     ap.add_argument("--no-health", action="store_true", help="skip the health pickups (round 13 b5)")
+    ap.add_argument("--walk", default="", help="L1,L2: walk with the stick instead of the open-floor teleports "
+                    "of L1_WALKS/L2_WALKS (levels 1, 2; round 15 d5)")
+    ap.add_argument("--walk-probe", action="store_true", help="with --walk: teleport too at each walk's end "
+                    "(the teleport log line gives the arrival; every walk starts from the default route's place)")
     ap.add_argument("--talismans", nargs="?", const="2,3", default="",
                     help="the talisman chambers of these levels (default 2,3; round 13 b3)")
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
@@ -824,7 +893,8 @@ def cli(argv=None):
         PRIMAGEN_LATE = (2, 3)
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},
              [int(x) for x in a.cheats_off.split(",") if x], a.env, not a.no_health,
-             [int(x) for x in a.cheats_on.split(",") if x], [int(v) for v in a.talismans.split(",") if v])
+             [int(x) for x in a.cheats_on.split(",") if x], [int(v) for v in a.talismans.split(",") if v],
+             [int(v) for v in a.walk.split(",") if v], a.walk_probe)
 
 
 if __name__ == "__main__":
