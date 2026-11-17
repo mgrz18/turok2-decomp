@@ -195,8 +195,10 @@ class Route:
         if self.give:
             env.append("T2_GIVE_ITEMS=\"%s\"" % ";".join("%s@%d" % (v, f) for f, v in sorted(self.give)))
         # round 16 e1: the camera shake as before round 16 (CCamera__Construct radius 0, no shake draws):
-        # the route was tuned on that RNG stream (PLAYTHROUGH.md 27)
-        env.append("T2_LEGACY_SHAKE=1")
+        # the route was tuned on that RNG stream (PLAYTHROUGH.md 27); --n64-shake (round 16 merge,
+        # PLAYTHROUGH.md 31) leaves it out: the N64's camera shake and RNG, with N64_TUNE's changes
+        if not N64_SHAKE:
+            env.append("T2_LEGACY_SHAKE=1")
         env += list(env_extra) + list(self.extra_env)
         with open(os.path.join(out, "playthrough.txt"), "w") as fp:
             fp.write("\n".join(self.inputs) + "\n")
@@ -566,6 +568,10 @@ L2_133_NOCHEATS = [
     (8000, 827.5, -4761.6, -1627.5, -2.8692, 150, {}),
 ]
 L2_STRETCH_NOCHEATS = [(6, 1, 3000), (9, 3, 2000), (12, 15, 2000)]
+# --n64-shake (round 16 merge, PLAYTHROUGH.md 31): the route on the N64's RNG stream (no T2_LEGACY_SHAKE).
+# The extra fire windows it needs, as L2_STRETCH entries (segment, step, frames)
+N64_SHAKE = False
+N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
 
 
 def l2_segments(nocheats):
@@ -577,6 +583,14 @@ def l2_segments(nocheats):
     assert name.startswith("133 ")
     segs[6] = (name, rel, L2_133_NOCHEATS)
     return segs, L2_STRETCH_NOCHEATS
+
+
+def merge_stretch(a, b):
+    """Two L2_STRETCH lists as one (the same step's frames added)."""
+    d = {}
+    for si, sj, m in list(a) + list(b):
+        d[(si, sj)] = d.get((si, sj), 0) + m
+    return [(si, sj, m) for (si, sj), m in sorted(d.items())]
 
 
 def stretch(segments, extra):
@@ -987,6 +1001,8 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     l2s = pt.L2_START + shift
     h2 = health and 2 in r.no_cheats
     l2segs, l2stretch = l2_segments(2 in r.no_cheats)
+    if N64_SHAKE:
+        l2stretch = merge_stretch(l2stretch, N64_L2_STRETCH)
     if 2 in real:
         # round 16 e5: 133 as round 13 b2's zombies-one-by-one steps (pt.L2_SEGMENTS), the wheel per
         # step (L2_TAPS), and the aims never on a door (T2_AIM_SKIP_TYPES=6)
@@ -1264,7 +1280,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT
+    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1306,9 +1322,12 @@ def cli(argv=None):
     ap.add_argument("--lair-front", default=LAIR_FRONT, help="T2_BOSS_FRONT in the Primagen lair (round 15 d1)")
     ap.add_argument("--real-weapons", default="", help="1 / 1,2 / 1,2,3: these levels on the weapons and ammo "
                     "picked up on the way, no T2_GIVE_WEAPONS / T2_FILL_AMMO before the hub after them (round 15 d2)")
+    ap.add_argument("--n64-shake", action="store_true", help="the N64's camera shake (no T2_LEGACY_SHAKE) and "
+                    "the route changes it needs (N64_L2_STRETCH; round 16 merge, PLAYTHROUGH.md 31)")
     ap.add_argument("--hub-wait", type=int, default=ARMS_HUB_WAIT,
                     help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
+    N64_SHAKE = a.n64_shake
     LAIR_FRONT = a.lair_front
     LAIR_DRIVE = a.lair_drive
     LAIR_PEEK = a.lair_peek
