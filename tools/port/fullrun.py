@@ -58,6 +58,7 @@ class Route:
         self.extra_env = []
         self.cheat_windows = []
         self.fights = {}         # round 15 d3: name -> (first, last frame) (--assist-keep)
+        self.fight_level = {}    # name -> its level (1-4)
         self.cheats_on = set()   # sub-levels (the totems: 109 110 111 112) kept invincible (--cheats-on)
 
     def note(self, frame, text):
@@ -123,7 +124,11 @@ class Route:
             starts = sorted(self.level_start.items())
             wins = [(f, ([g for l, g in starts if l == lv + 1] or [10 ** 7])[0] - 1)
                     for lv, f in starts if lv in STICK_AIM]
-            for k in ASSIST_KEEP:   # --assist-keep: these fights keep the assists' yaw and pitch
+            # --assist-keep: these fights keep the assists' yaw and pitch; so do the fights of the
+            # levels not in --stick-aim (a fight can outlast its level's window: the City Totem's
+            # fire window runs past the hub frame the next level's window starts from)
+            keep = ASSIST_KEEP + [k for k, lv in self.fight_level.items() if lv not in STICK_AIM]
+            for k in keep:
                 a, b = self.fights[k]
                 wins = [w for w in wins if w[1] < a or w[0] > b] + \
                        [(w[0], a - 1) for w in wins if w[0] < a <= w[1]] + [(b + 1, w[1]) for w in wins if w[0] <= b < w[1]]
@@ -222,6 +227,8 @@ def level1(r, start_shift=0, keys=True, health=True):
     arrival = pt.TOTEM_ARRIVAL + start_shift + added
     r.note(arrival, "109 the Harbor Totem: fire taps (T2_FACE_NEAREST aims)")
     r.fire.append((arrival, arrival + 7150))
+    r.fights["109"] = (arrival, arrival + 7150)
+    r.fight_level["109"] = 1
     r.face_levels.append(109)
     return arrival, added
 
@@ -611,6 +618,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         r.cheat_windows.append((t_arr - 600, hubs[2]))
     r.fire.append((t_arr, t_arr + 7200))
     r.fights["110"] = (t_arr - CITY_TOTEM_TP_AFTER, t_arr + 7200)
+    r.fight_level["110"] = 2
     r.anchors.append((t_arr, 110))   # the fire window starts when 110 is reached
     # Round 13 b2: down from the arrival ledge (642 units from the totem, the attackers 450-1,150
     # away: 4-5 kills of 8 in 120 s) to the south side of the totem, where they come to the player
@@ -638,6 +646,8 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     rel, length, lv = pt.L3_TOTEM
     r.note(l3s + rel + a3, "111 the Marsh Totem: fire taps")
     r.fire.append((l3s + rel + a3, l3s + rel + a3 + length))
+    r.fights["111"] = (l3s + rel + a3, l3s + rel + a3 + length)
+    r.fight_level["111"] = 3
     if 3 in r.no_cheats:
         # round 14 c1: the scorpion launcher (16) for the Marsh Totem (scheduled in 68, before the
         # totem's level loads; see level 4): 15 damage instead of 62-272 and a life
@@ -666,6 +676,8 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     rel, length, lv = pt.L4_TOTEM
     r.note(l4s + rel + a4, "112 the Cave Totem: fire taps")
     r.fire.append((l4s + rel + a4, l4s + rel + a4 + length))
+    r.fights["112"] = (l4s + rel + a4, l4s + rel + a4 + length)
+    r.fight_level["112"] = 4
     if 4 in r.no_cheats:
         # round 14 c1: the scorpion launcher (16) for the Cave Totem and the Blind One, the plasma
         # rifle again from the hub. T2_WEAPON is applied when a level loads (T2_GIVE_WEAPONS), so
@@ -679,6 +691,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     f = l4s + rel + a4
     r.note(f, "1 the Blind One: fire held, T2_AIM_NODE=boss@1")
     r.fights["1"] = (f, hubs[4])
+    r.fight_level["1"] = 4
     r.inputs.append("Z@%d..%d" % (f + 10, f + length))
     r.tp(f, x, y, z, ry)
     r.aim_node = "boss@1/2/3/4"   # the Blind One 1, the Mantid Queen 2, the Mother 3, the Primagen 4
