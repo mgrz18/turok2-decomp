@@ -495,6 +495,81 @@ f32 T2Port_Atan2f(f32 y, f32 x) {
     return T2Aim_Atan2f(y, x);
 }
 
+extern int T2Port_AimStickOn(int frame);
+extern void T2Port_AimCand(int frame, CGameObjectInstance *o, f32 x, f32 y, f32 z, f32 d2, int kind);
+
+/* T2_AIM_SKIP_TYPES=T[,T...] (DEBUG-ONLY, round 16 e5): the aims never pick an actor of these
+ * intelligence types. Doors (type 6) are "live" actors too (health, flag 0x100): in level 2's 133 the
+ * nearest-actor aim of a --real-weapons run spent the shotgun's shells and the grenades on doors 27
+ * and 28 beside the player, while the zombies (5 health) that open them walked up untouched. */
+static int aimSkipType(s32 type) {
+    static int sInit, sN;
+    static s32 sTypes[8];
+    int k;
+    if (!sInit) {
+        const char *e = getenv("T2_AIM_SKIP_TYPES");
+        sInit = 1;
+        while (e != NULL && *e != '\0' && sN < 8) {
+            sTypes[sN++] = (s32) atoi(e);
+            e = strchr(e, ',');
+            if (e != NULL) {
+                e++;
+            }
+        }
+    }
+    for (k = 0; k < sN; k++) {
+        if (sTypes[k] == type) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/* T2_FIRE_GATE=L[,L...][@R] (DEBUG-ONLY, round 16 e5): in these levels, while an aim window is open
+ * (T2_AIM_ENEMY / T2_AIM_NODE pick a target), the input's fire button (Z) is held back unless the
+ * aimed actor is awake (AI mode != 0) and within R (default 1,500): a --real-weapons run's fire taps
+ * no longer spend the ammo on sleeping or far actors (level 2's sisters). Outside the aim windows
+ * and the levels the input is untouched. */
+static int sAimCallFrame = -1000, sAimOkFrame = -1000;
+
+static f32 T2Port_FireGateRange(void) {
+    static f32 sR = -1.0f;
+    if (sR < 0.0f) {
+        const char *e = getenv("T2_FIRE_GATE");
+        e = e != NULL ? strchr(e, '@') : NULL;
+        sR = e != NULL ? (f32) atof(e + 1) : 1500.0f;
+    }
+    return sR;
+}
+
+static int T2Port_FireGateLevel(void) {
+    static int sInit, sN;
+    static s32 sLevels[8];
+    int k, in = 0;
+    if (!sInit) {
+        const char *e = getenv("T2_FIRE_GATE");
+        sInit = 1;
+        while (e != NULL && *e != '\0' && *e != '@' && sN < 8) {
+            sLevels[sN++] = (s32) atoi(e);
+            e = strpbrk(e, ",@");
+            if (e != NULL && *e == ',') {
+                e++;
+            }
+        }
+    }
+    for (k = 0; k < sN; k++) {
+        in |= sLevels[k] == (s32) gScene.m_nLevel;
+    }
+    return in;
+}
+
+int T2Port_FireGate(int frame) {
+    if (!T2Port_FireGateLevel() || frame - sAimCallFrame > 3) {
+        return 1;
+    }
+    return frame - sAimOkFrame <= 3;
+}
+
 int T2Port_AimNode(int frame, const char *spec) {
     static s32 sLastMask = -1;
     static int sLastFrame;
@@ -544,21 +619,49 @@ int T2Port_AimNode(int frame, const char *spec) {
         if (o == pl || o == sAimSkip || o->header.m_pIntelligence == NULL || o->m_AI.m_Health <= 0 || !(o->m_dwFlags & 0x100)) {
             continue;
         }
-        if (sAimPoolOnly && i < gScene.m_nActors) {
+        if (aimSkipType((s32) o->header.m_pIntelligence->m_Type)) {
             continue;
         }
-        if (sAimSetN > 0) {
-            int k, in = 0;
-            for (k = 0; k < sAimSetN; k++) {
-                in |= sAimSet[k] == o;
+        if (o->m_AI.m_Mode == 0 && T2Port_FireGateLevel()) {
+            continue; /* T2_FIRE_GATE: a sleeping actor is never the target (its fire would be held back) */
+        }
+        {
+            /* round 16 e2: a live enemy outside this phase's set (a boss phase's pool or actor
+             * group, "actor:A") within 600 units still goes to the stick driver, as a threat
+             * (kind 0): the one biting the player is shot first, as a player would */
+            int in = !(sAimPoolOnly && i < gScene.m_nActors), k;
+            if (in && sAimSetN > 0) {
+                in = 0;
+                for (k = 0; k < sAimSetN; k++) {
+                    in |= sAimSet[k] == o;
+                }
             }
             if (!in) {
+                if (T2Port_AimStickOn(frame)) {
+                    dx = o->header.m_vPos.x - eye.x;
+                    dz = o->header.m_vPos.z - eye.z;
+                    if (dx * dx + dz * dz < 600.0f * 600.0f) {
+                        T2Port_AimCand(frame, o, o->header.m_vPos.x, o->header.m_vPos.y + 50.0f, o->header.m_vPos.z,
+                                       dx * dx + dz * dz, 0);
+                    }
+                }
                 continue;
             }
         }
         dx = o->header.m_vPos.x - eye.x;
         dz = o->header.m_vPos.z - eye.z;
         d = dx * dx + dz * dz;
+        if (d < r * r && T2Port_AimStickOn(frame)) {
+            /* round 16 e2: every target this search accepts goes to the stick driver as a candidate
+             * (the phase's node box nearest the eye, else the actor 50 units up) */
+            CVector3 ca;
+            s32 cm;
+            if (aimBoxCentre(o, mask, &eye, &ca, &cm)) {
+                T2Port_AimCand(frame, o, ca.x, ca.y, ca.z, d, 1);
+            } else if (mask == -1) {
+                T2Port_AimCand(frame, o, o->header.m_vPos.x, o->header.m_vPos.y + 50.0f, o->header.m_vPos.z, d, 1);
+            }
+        }
         if (d < bestD && mask == -1 && !aimBoxCentre(o, mask, &eye, &aim, &nodeMask)) {
             /* any target, no hit boxes drawn (yet): its position, 50 units up */
             aim = o->header.m_vPos;
@@ -575,8 +678,16 @@ int T2Port_AimNode(int frame, const char *spec) {
             bestNode = nodeMask;
         }
     }
+    sAimCallFrame = frame;
     if (best == NULL) {
         return 0;
+    }
+    if (best->m_AI.m_Mode != 0) {
+        dx = best->header.m_vPos.x - pl->header.m_vPos.x;
+        dz = best->header.m_vPos.z - pl->header.m_vPos.z;
+        if (dx * dx + dz * dz < T2Port_FireGateRange() * T2Port_FireGateRange()) {
+            sAimOkFrame = frame;
+        }
     }
     {
         extern int T2Port_AimReport(int frame, f32 x, f32 y, f32 z);
@@ -875,5 +986,29 @@ void T2Port_LairPeek(int frame, const char *spec0) {
         printf("lairpeek: frame %d wait %d peek %d at (%.0f 0 %.0f), him at (%.1f %.1f %.1f)\n", frame, sWait, k, pos.x,
                pos.z, b->header.m_vPos.x, b->header.m_vPos.y, b->header.m_vPos.z);
         fflush(stdout);
+    }
+}
+
+/* T2_PRIMAGEN_STAGE=F[,F...] (DEBUG-ONLY, round 16 e1; game.cpp, every frame): at each frame F, in the
+ * Primagen's lair, zero his part health (gLevelScript.values[0][0..7]), so that Primagen_UpdateHealth
+ * moves him to the next stage at its next call, with no shot fired. The N64 side is n64trace.py
+ * --poke "N:u32=0x8012F988:0;..." (values[0] at 0x8012F608 + 0x380), so that both run the same stage
+ * change with the player standing still (PLAYTHROUGH.md 27: the N64 lair check). */
+void T2Port_PrimagenStage(int frame, const char *spec) {
+    const char *s = spec;
+    while (s != NULL && *s != '\0') {
+        if (atoi(s) == frame) {
+            int i;
+            for (i = 0; i < 8; i++) {
+                gLevelScript.values[0][i] = 0;
+            }
+            printf("primagenstage: frame %d stage %d parts done %x: part health zeroed\n", frame,
+                   (int) gLevelScript.stage, (unsigned) gLevelScript.partsDone);
+            fflush(stdout);
+        }
+        s = strchr(s, ',');
+        if (s != NULL) {
+            s++;
+        }
     }
 }

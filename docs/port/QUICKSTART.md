@@ -7,9 +7,10 @@ What you need: **your own** Turok 2: Seeds of Evil ROM (N64, USA, `baserom.us.z6
 `fb0400f21e3f043939ab56500c7b12a3231006f1`) and this repository. The port reads the game data from
 the ROM at build time (the archive) and at run time. Nothing from the ROM is in the repository.
 
-Machines checked: macOS 27 on Apple silicon (rounds 13-14, MACOS.md sections 15-16) and Linux x86-64
+Machines checked: macOS 27 on Apple silicon (rounds 13-16, MACOS.md sections 15-18) and Linux x86-64
 (STATUS.md). The commands below are for the Mac; on Linux, drop `brew` and use your distribution's
-packages.
+packages, with LLVM 19's libclang (`/usr/lib/llvm-19/lib/libclang-19.so.1`, or `--libclang`)
+and `pip install clang==19.1.7`, and leave out `-DCMAKE_OSX_DEPLOYMENT_TARGET`.
 
 ## 0. Install the app (no build, no Homebrew)
 
@@ -46,27 +47,45 @@ the app to the Bin and delete that folder.
 
 ## 1. Build once
 
+Checked from zero on a fresh clone of the GitHub repository in round 16 (MACOS.md 18): these
+commands, in this order, in the clone's directory, with only the ROM added. You need
+**Homebrew** (https://brew.sh; its installer also installs Apple's Command Line Tools: `clang`,
+`git`) and about 2 GB of disk. The N64 toolchain is **not** needed.
+
 ```sh
+git clone https://github.com/mgrz18/turok2-decomp && cd turok2-decomp
 brew install cmake ninja sdl3 libzip glew libpng nlohmann-json tinyxml2 python@3.13
 python3.13 -m venv .venv && .venv/bin/pip install pyelftools 'clang==21.*'
-cp /path/to/your/rom.z64 baserom.us.z64
+cp /path/to/your/rom.z64 baserom.us.z64          # sha1 fb0400f2... (above)
 
-# the game data archive from the ROM (~10 s; any zlib gives the same units)
+# the game data archive from the ROM (~5 s; any zlib gives the same units)
 .venv/bin/python tools/assets/mkarchive.py baserom.us.z64 -o OUT/turok2.o2r -j 4
 
-# the matching N64 build's ELF: gendata reads the game's data layout from it. Build it with
-# `make setup && make build` on a Linux box with the N64 toolchain (BUILD.md) and copy
-# build/turok2.us.elf here. It does not need to be rebuilt unless src/ changes.
-cp /path/to/turok2.us.elf build/
-
-# a Release build (-O2): the game library, the generated data, the executable (~1 min on an M5)
+# a Release build (-O2): the game library, the generated data, the executable
 cmake -S port -B OUT/rel -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
       -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG" \
-      -DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG"
+      -DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG" -DCMAKE_OSX_DEPLOYMENT_TARGET=27.0
 ninja -C OUT/rel turok2_game t2runtime t2audio
 .venv/bin/python -I tools/port/gendata.py --build OUT/rel --cache OUT/decls_rel.json -j 8
 cmake OUT/rel && ninja -C OUT/rel turok2
 ```
+
+Times on an M5 (round 16): the clone 35 s; `brew install` depends on what is missing; the
+first `cmake` **7.5 min** (it downloads libultraship, ImGui and the other dependencies from
+GitHub: network time, only once per build directory); the game library 27 s; gendata 27 s;
+the last line (libultraship and the link) 65 s.
+
+- `brew install` also **upgrades** any of these that is already installed and outdated
+  (`HOMEBREW_NO_INSTALL_UPGRADE=1` in front keeps what you have; the versions used are in
+  MACOS.md 18).
+- gendata reads the game's data layout from `versions/port_layout.us.json` (the matching N64
+  build's symbol table, committed) and the bytes from your ROM; a ROM other than the US one
+  stops it with a message. A developer with the N64 build (`build/turok2.us.elf`, BUILD.md)
+  gets the same files from the ELF; `tools/port/mklayout.py` refreshes the json after a change
+  to `src/`.
+- `-DCMAKE_OSX_DEPLOYMENT_TARGET=27.0` matches Homebrew's libraries (built for 27.0): without
+  it the executable, and so the app, asks for the macOS you build on (27.2 here).
+- Optional: `-DT2_LTO=ON` builds with ThinLTO (same game, not faster: MACOS.md 18).
 
 ## 2. Put your files where the game finds them (once)
 

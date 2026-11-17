@@ -4,6 +4,9 @@
 #include "globals/render.h"
 #include "protos/list.h"
 
+#ifdef TARGET_PORT
+int T2Port_LegacyShake(void); /* port/game/t2debug.c: T2_LEGACY_SHAKE */
+#endif
 typedef struct Floats {
     f32 unk0, unk4, unk8, unkC, unk10, unk14;
 } Floats;
@@ -72,10 +75,30 @@ void CCamera__Construct(CCamera *view) {
     f2 = (Floats *)&view->m_Shake;
     view->m_TremorAngle = zero;
     view->m_TremorHeight = zero;
+#ifdef TARGET_PORT
+    /* Round 16 e1: f2 is CShake at the N64 offsets (m_vPos at 0x08, m_Radius at 0x14). On the host
+     * the two list pointers are 8 bytes each: these four stores hit m_pNext and m_vPos.x/y, and
+     * m_Radius stayed 0, so CShake__ApplyOffset never drew its three Random_Blend for each camera
+     * each frame (the N64 does: its m_Radius is 1). The same stores at the members. */
+    if (T2Port_LegacyShake()) {
+        /* DEBUG-ONLY (T2_LEGACY_SHAKE=1): the stores as rounds 1-15 made them, so that the scripted
+         * whole-game route (tools/port/fullrun.py, tuned on that RNG stream) replays unchanged */
+        f2->unk8 = zero;
+        f2->unkC = zero;
+        f2->unk10 = zero;
+        f2->unk14 = one;
+    } else {
+        view->m_Shake.m_vPos.x = zero;
+        view->m_Shake.m_vPos.y = zero;
+        view->m_Shake.m_vPos.z = zero;
+        view->m_Shake.m_Radius = one;
+    }
+#else
     f2->unk8 = zero;
     f2->unkC = zero;
     f2->unk10 = zero;
     f2->unk14 = one;
+#endif
     f3 = (Floats *)&view->m_Shake.m_XAxis;
     f3->unk4 = zero;
     f3->unk8 = zero;

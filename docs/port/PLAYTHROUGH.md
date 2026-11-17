@@ -2519,3 +2519,497 @@ level 5's 164. **`--stick-aim 3`**: END 2, one peek. **`--real-weapons 1`**: gam
   code against the N64 geometry (21.1), unless the N64 hovers elsewhere. Checking that needs an N64
   trace of a lair wait (his two hover points, mupen64plus) against the port's.
 - `--real-weapons 1` needs health before 124 (25.5).
+
+## 27. The N64 lair and Mother checks, the camera shake's random numbers (Phase 7 round 16, part e1)
+
+### 27.1 Driving the N64 without the keyboard
+
+The emulator's keyboard path (`n64trace.py --input`, `refshots.py`) does not reach the game in this
+setup: with `START@700`, `START@1500` and A taps the attract loop runs frame for frame as with no
+input (mode 8 at 1,528 is the loop's own menu screen, then demo 81). Earlier N64 traces only
+followed the demos, so this went unnoticed. `tools/port/n64trace.py` got four switches
+(one emulator frame = one game frame of Turok 2 here; the port's frames are two per game frame):
+
+- `--start-warp ID@N`: at emulator frame N (the attract loop) write what
+  `CEngineApp__StartGameAtWarp(app, ID)` writes (`m_Settings.nextMode` 13, `fadeMode` 2,
+  `matchMode` ID, `warpFlags` 1). The game starts at that warp with a new player: `7602@600` gives
+  the Primagen's lair at frame 627, `--start-warp=-4@600` the Mother's level 3 (the `=` because of
+  the minus sign).
+- `--warp ID@N`: the in-game warp (`CScene__RequestWarp`'s three stores). An attract demo is
+  mode 13 too: without `@N` it fires in the demo.
+- `--pad F1-F2:BUTTONS[:SX:SY];...`: controller 1 through a breakpoint on
+  `Controller_ProcessInput(&gControllers[0], x, y, buttons)` (its argument registers are set).
+  This works: `CU` (8) walks the player.
+- `--poke N:SPEC;...` (`player=x,y,z` with velocity cleared, `lvl=I:hp=V`, `u32=ADDR:V`,
+  `f32=ADDR:V`), `--watch I` (the `lvl I` line every game frame), `--watch-write ADDR` (a write
+  breakpoint; it caught nothing here).
+
+The port side: `T2_START_WARP=ID@F` (the same four stores at frame F), `T2_PRIMAGEN_STAGE=F[,F]`
+(his part health `gLevelScript.values[0][0..7]` zeroed: `Primagen_UpdateHealth` starts the next
+stage; on the N64 `--poke "N:u32=0x8012F988:0;..."`, eight words), `T2_RNG_SET=LEVEL:GF:HEX`
+(`gRandomValue` at one game frame of a level; on the N64 `--poke N:u32=0x800DD784:HEX`).
+
+### 27.2 The Primagen's home waits on the N64: the same as the port
+
+The N64 run: `--start-warp 7602@600`, the part health zeroed at 3,100 (stage 2), the player left
+standing at the lair spawn (1.4, 0, -1,789.6). The port run: `T2_WARP_TO=7602@7000` (the hop from
+level 51 at 12,895), `T2_PRIMAGEN_STAGE=15400,25400`, no input.
+
+| | N64 | port |
+|---|---|---|
+| stage 1 | modes 1/5 (his attack script), as in the port | modes 1/5 |
+| stage 2 starts | mode 18 at 3,102, mode 25 (the home wait) at 3,188 (86 game frames) | mode 18 at 15,402, mode 25 at 15,566 (82 game frames) |
+| his hover at home | (-2.2, 926.9, 2,922.7) / (5.3, 926.9, 2,907.8) | (2, 927, 2,906) / (-1, 927, 2,922); stage 3 (6, 2,904) / (-1, 2,920) |
+| with the player at the spawn | the wait does not end (2,800 game frames) | does not end (10,000 frames; stage 3 the same) |
+| 8 floor spots, 300 frames each (450,1800), (-450,1800), (0,1800), (+-900,1200), (+-1240,560), (800,2200) | none ends it | none ends it |
+| 349 floor spots, a 200-unit grid within 2,100 of the middle | none ends it (10 game frames each) | none ends it (20 frames each) |
+| positive control: the player put at (0, 800, 2,650), in front of him | mode 26 two game frames later | mode 26 two frames later |
+
+The hover pair on the N64 is the same kind as the port's: 15.5 apart (one step a game tick) round
+(0, 927, 2,918), and this N64 pair is round 15's pair (-1.8, 2,923.0)/(4.3, 2,907.5) to a few
+units. So **the home wait that the floor cannot end is the N64's own behaviour**, not a host bug: no
+floor spot sees him on the N64 either. A real player gets past it by keeping the target from the
+flight (21.1) or from the air (a jump over the front pits); `T2_LAIR_PEEK` stands for that and stays
+in the default run. The scan's player position was poked without its region (the N64 side), but the
+positive control ends the wait the same way on both sides.
+
+### 27.3 The Mother's phase 0: the player walks on both
+
+The N64 (`--start-warp=-4@600 --pad "900-1500:8;1500-2100:2"`) and the port (`T2_WARP_TO=-4@7000`,
+`CU@15000..17000 CL@17500..19000`, no weapons, no cheats), the player at (83.4, 0, -723.9) when her
+attacks start:
+
+- N64: C-up walks him to (441, 0, 1,301) after 200 game frames and to (455, 0, 2,837), where he
+  stops at z 3,155.8 (her wall); C-left then takes him to (-2,642, 0, 1,597); he dies at 2,000
+  (her mode-4 blasts) and the death levels 164, 157-161 follow.
+- Port: the same path at the same speed: (436, 0, 702) after 250 frames (125 game frames),
+  (453, 0, 2,622), stopped at z 3,155.8; dead at 16,000, then 164, 157, 158, 155, 156, 159-161.
+  With d1's env (`T2_GIVE_WEAPONS=1 T2_WEAPON=10 T2_AIM_NODE=boss T2_CHEATS=1 T2_FILL_AMMO=600`) he
+  walks too (from (83, -724) to (426, 428) and on, circling under the aim assist).
+
+So **the player is not immobile in phase 0, on the N64 or in the port**. d1's "cannot move" (23)
+does not reproduce with these recipes; the shredder recipe stands for its own reasons (her blasts
+land wherever he is).
+
+### 27.4 The camera shake's random numbers (a host bug, fixed)
+
+With the RNG set to the same value on both sides at the lair's first game frames (`T2_RNG_SET` /
+`--poke` above), the N64 took **12 numbers per game frame** and the port **6** (the LCG stepped
+back to the poked value). `n64trace.py --calls Random_Blend` names the callers: per camera (two:
+0x801198F0 and 0x806FF120) three from `CCamera__UpdateTremor` and three from
+`CShake__ApplyOffset`; the port's `T2_RNG_TRACE` shows only `CCamera__UpdateTremor`.
+`CShake__ApplyOffset(&cam->m_Shake, cam->m_Shake.m_vPos, ...)` draws when the distance (0) is under
+`m_Radius`: 1 on the N64 (`--args a0:CShake:m_Radius:f`), 0 in the port (gdb), and the port's
+`m_vPos.y` was 1.0. A gdb watchpoint found the writer: `CCamera__Construct`
+(src/us/code/func_0042F9B0.c) views `&view->m_Shake` as six floats at the N64 offsets (two 4-byte
+list pointers, then `m_vPos` at 0x08, `m_Radius` at 0x14); on the host the pointers are 8 bytes, so
+the stores hit `m_pNext` and `m_vPos.x/y`. The fix stores the members (TARGET_PORT; asm_diff 0);
+`CShake__Construct` (func_00281C08.c, the same view, no C caller) is fixed the same way. After it the
+port takes 12 numbers per game frame like the N64.
+
+**It changes every random number after the first camera is built**, so the scripted whole-game route
+(tuned on the old stream) no longer works: with the fix the default command wins the Harbor Totem
+and ends in game over in 125 at ~155,000. **`T2_LEGACY_SHAKE=1`** (port/game/t2debug.c) makes
+`CCamera__Construct` store as before; `fullrun.py` and `playthrough.py` now write it into
+`teleport.env`, so their runs are unchanged. A player (no env) gets the N64's numbers. Re-tuning the
+route on the N64 stream is future work.
+
+Not fixed, for the coordinator: `CShake__Set` (func_00281C60.c, `RecordRecAt18` with `pad[8]`) and
+`CShake__Advance` (func_00281CC0.c, `s32 arg0 + 0x18/0x2C/0x40`) are the same N64 layout and have no
+C callers; `n64viewcheck.py` flags none of the three (a cast of `&obj->member` to a local struct
+type is not one of its site kinds).
+
+Still different after the fix (a lead, not chased): the props `lvl 10`-`17` of the lair (mode 0,
+next to the spawn) are at their spawn positions with animation 4 frame 0.5 on the N64 from the first
+game frame, and at a displaced position with animation 0 frame 1/3 in the port.
+
+### 27.5 The particle-pool hash: not reproduced
+
+Round 15 saw two runs whose `ptcl` field differed in frames 72,749-82,523. On this tree (Linux
+Release), the same `ptcl` lines from 72,000 to 83,000 came out the same in: 2 full-det runs
+(`T2_DET_ACTORS`, `T2_DET_PARTICLES`), 10 runs of the default command, 4 of round 14's
+`--cheats-on 3,4` command without `aimdrive.py`, 1 with `--draw` from 72,000 (5,100 frames drawn),
+1 with ASLR off (`setarch -R`). e4's two Linux default runs (all 580,000 det lines,
+md5 `ecb9f9f2…`) and the Mac Release, plain and ThinLTO, agree; this branch's default run (with
+`T2_LEGACY_SHAKE=1`) gives the same `ecb9f9f2…`. A non-empty `--pak-dir` changes the whole run (all
+fields from 72,000), so a stale pak is not the round-15 cause either. In the default run slot 115
+gets a type-172 particle at 72,749 (falling from (103, -468, 5,841)) and is reused often after, so
+no single particle stays different for 10,000 frames.
+
+## 28. The stick driver picks its own target and fires: the sisters by stick (Phase 7 round 16, part e2)
+
+### 28.1 The mechanism
+
+Round 15's driver (section 24) turned towards the one point the assist chose (the nearest), and the
+script's Z taps fired blind. This round the game reports every target the assist would accept, and the
+driver chooses, leads and fires. It still sends input only.
+
+- **Candidates** (`port/game/t2debug.c` `T2Port_AimCand`, hooks in `T2Port_FaceNearest` and
+  `t2bosslog.c` `T2Port_AimNode`). Inside a `T2_AIM_STICK` window, the assists report each target that
+  passes their filters: live, in range, and for a boss the phase's node box nearest the eye. The
+  nearest 12 go on the `aim` line after the 13 fixed fields:
+  `n` then `id x y z hp kind` each (`%a` floats), then `hp H` (the player's health). `id` is the level
+  actor's index, or 10000 + the instance-pool slot. `kind 1` is the assist's own choice set. `kind 0` is
+  a live enemy outside that set within 600 units: a boss phase's set or the `actor:A` of a sister fight
+  leave out the enemy that is biting the player, and a player would shoot that one first.
+- **Fire** (`port/app/game.cpp`). The answer to an `aim` line may be `SX SY Z`. `Z` 1 holds the Z
+  button and 0 releases it, over the script's, on that frame. The script's Z taps still fire on frames
+  with no target reported.
+- **The driver** (`tools/port/aimdrive.py`):
+  - `Picker` chooses the target. Its cost is (distance / 1,000 + 0.1) x (1 + 0.5 x the crosshair's
+    angle to it) x (1 + 2 x health / 100). A `kind 0` costs 1.5 times more, and the current target
+    0.75 times less. So the near and the weak go first, and among equals the one under the crosshair.
+    A target whose health has not dropped for 300 frames costs 4 times more for 900 frames (`kind 0`:
+    50 times more for 3,000 frames). This drops the targets the weapon does not reach.
+  - The lead: each candidate's velocity comes from its last position (same id, no jump, smoothed). The
+    aim point moves by velocity x distance / 150 (the shot's flight). The stick's own lag stays with
+    the controller (`Aim`, the bearing rate).
+  - `Trigger` fires a tap of 6 frames every 15 frames (as the script), only when the crosshair is
+    within 40 units of the led point at its distance (at least 0.03 rad) in yaw, and 1.5 times that in
+    pitch.
+  - Tunables: `T2_AIMD_PICK=0` (the assist's target, round 15), `T2_AIMD_FIRE=0` (the script's Z),
+    `T2_AIMD_WANG`, `T2_AIMD_WHP`, `T2_AIMD_WKEEP`, `T2_AIMD_THREAT`, `T2_AIMD_IMMUNE*`, `T2_AIMD_PSPEED`,
+    `T2_AIMD_LEAD`, `T2_AIMD_HITR`, `T2_AIMD_FIRE_EVERY`, `T2_AIMD_FIRE_HOLD`. `fullrun.py --env K=V`
+    puts one into `teleport.env`.
+  - `--stats`: two more columns (the chosen id and Z), and every 50 frames a `# F hp H id:dist:hp[t]`
+    line with the candidates (`t`: kind 0). `aimstats.py --stick` adds the shots and the target
+    switches per window.
+- The default command is unchanged: no `T2_AIM_STICK`, no candidates. Its `progress`, `event`,
+  `pickup`, `hurt`, `death`, `bosstrace` and `lairpeek` lines are identical to 5d835e51's (md5
+  `5ed5092b…`, END 2).
+
+### 28.2 What was learned (Linux Release; `--stick-aim 2` or `4`, no `--assist-keep`)
+
+Level 2 by stick, damage per sister fight (lowest health), against the assisted run's 131 (69), 144
+(25) and 156 (44):
+
+| run | driver | sister 1 (133) | sister 2 (134) | sister 3 (135) |
+|---|---|---|---|---|
+| s24a | nearest-crosshair cost, lead over lag + flight at 60 | died | | |
+| s24b | the same, lead smoothed | 175 (25) | died | |
+| s24c | no lead | died | 97 (103) | 195 (5) |
+| s24f | + health weight (the weak first) | 120 (80) | 120 (60) | |
+| s2b | + kind-0 threats | **78 (122)** | **100 (100)** | **149 (51)** |
+| s2c | + strong "not hurt" (50 x, 3,000) for all | died | 148 (52) | 157 (43) |
+| **s2d** | strong "not hurt" for kind 0 only (the default) | **78 (122)** | **116 (84)** | **122 (78)** |
+
+- **The sisters are won by the stick with less damage than the assist**, no life lost. s2d is the
+  default. Level 2 then ends in the same state as the assisted run (progress at 79,854: level 73,
+  pkeys `10 11`).
+- **The fight is a knife edge.** One life lost in level 2 shifts the whole route (the run respawns
+  elsewhere, later steps miss their frames) and ends in game over in 125 or later. Small changes of
+  the cost flipped sister 1 between 78 damage and a death (s2c).
+- Why the assist's nearest target lost: in 133 the nearest is often zombie 28, standing still at 385
+  units and never hurt, while the weak fliers (health 5) bite from 100-180 units. The health weight
+  shoots those first; the "not hurt" rule drops 28.
+- **The Blind One (level 4) is not won by stick yet.** In s4a-s4d phases 1-4 go through, but:
+  - phase 6 (s4b, s4c): the last group-3 actor is 900-1,300 units away, while out-of-play actors (his
+    own body, the actors of other phases: 22, 2, 20, 18, never hurt) stand within 600. With the weak
+    "not hurt" rule the driver held actor 22 for 4,600 frames. The strong rule for kind 0 fixes that.
+  - phase 5 (s4d): the last group-2 flier (17) swoops between 38 and 1,190 units. It was hit about
+    once per 300 frames; the fight outlasted the window and cost 1-2 lives (game over in s4b).
+  - So `--assist-keep 1` is still needed for him.
+
+### 28.3 Whole runs (Linux Release, the default command plus the options, 290,000 frames)
+
+| run | options | result |
+|---|---|---|
+| F2k | `--stick-aim 2 --assist-keep 110` | **END 2**: all 5 totems, the 4 bosses (the Primagen dead at 246,996), cinema 130, the hub; exit 0. Lives lost 2 (City Totem 1, level 5's 124 1). Two lair peeks |
+| F2 | `--stick-aim 2` | the City Totem by stick is **lost** (kills 11/8, the totem's health 0), 1 life lost there; the run still kills the Primagen and ends with cinema 130, but 4 totems: not the good ending |
+| F1234k | `--stick-aim 1,2,3,4 --assist-keep 1` | **every fight of levels 1-4 cheaper than assisted and no life lost through level 4** (Harbor 115, sisters 111/68/94, City Totem 75 with no death, Marsh 20, Cave 63, the Blind One 82 assisted). Then 2 lives lost in level 5's 117 and the run stops in 116 at 290,000 |
+
+- F1234k reached each level about 2,000-9,000 schedule frames earlier (the anchors re-synchronise
+  the schedule). Level 5's 117 is a knife edge in the assisted run too: its lowest health there is 3.
+  It arrived with less health and died, and the later steps missed their frames.
+- F2k is deterministic: a second run gave identical gameplay lines (md5 `4a92e60a…`) and an identical
+  `--stats` file. The default command with this branch's final binary: md5 `5ed5092b…`, as at 5d835e51.
+- The command validated for END 2 with the sisters by stick:
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --stick-aim 2 --assist-keep 110
+# then the default command's game line, under aimdrive.py (--stats RUN/stats.txt optional)
+```
+
+### 28.4 Next
+
+- The Blind One: a flier passing at 40-150 units turns faster than the stick. A player waits for it
+  to come back far (fire when its angular rate is low) or strafes. The driver could hold the aim at
+  the far end of its swoop, and fire there only.
+- The City Totem by stick: won without a death in F1234k, lost in F2 (different upstream state).
+  The totem's own health is not on the `aim` line: an attacker near the totem should cost less.
+- Level 5's 117 (assisted, lowest health 3) needs health or a safer route before more levels can
+  move to the stick.
+- Then `--stick-aim 5,6` (the Queen, the Mother, the Primagen) with the same driver.
+
+## 29. Real weapons: `--real-weapons 1` to the good ending, sister 1 on picked-up weapons (Phase 7 round 16, part e5)
+
+### 29.1 The game over at 124 was the Blind One
+
+With `--real-weapons 1` the run left the Blind One with 25 health (the default run: 52) and 124's
+pylons then killed it (game over at 150,990). No health lies between the Cave Totem and 124: the
+hub, the Blind One's arena (level 1) and 124 have none (124's four objects 543 by the hive's centre
+are life forces, id 1706). The object to pickup map is cart entry 2 (`ids[object + 4]`, u16): 541
+1705 and 543 1706 (life force), 544 1701 (+2, to 200), 542 1702 (+10, to 100), 545 1703 (full
+health, 100), 548 1704 (ultra health, +100 to 200), 546/547 1722. Level 4's health is already
+taken before the boss (the player enters her arena with 146).
+
+The difference was the fight itself. `T2_HURT_LOG` names the biter: an actor with intelligence id
+7401 (type flag 0x1ff), 96 units away on the ledge: her minions, 1-3 damage every ~40 frames until
+she dies. With the scorpion launcher (round 14 c1's weapon 16) the default run took 56 of these
+bites (94 damage), the `--real-weapons 1` run 80 (121 damage) because she died 700 frames later.
+
+| the weapon at the Blind One (`--real-weapons 1`) | damage | lowest health | her death | 124 |
+|---|---|---|---|---|
+| the scorpion launcher (16) | 121 | 25 | 139,667 | game over at 150,990 |
+| the grenade launcher (15) | 56 | 90 | 139,635 | 32 damage, no death |
+| **the shredder (9)** | **32** | **114** | **138,183** | **30 damage, lowest 84, no death** |
+
+The shredder's discs bounce into the minions too. `fullrun.py` now schedules weapon 9
+`BLIND_WEAPON_AFTER` = 2,336 frames after the Cave Totem's fire window starts in any
+`--real-weapons` run: `T2_WEAPON` is applied when a level loads, so it takes effect when her arena
+loads (after 112, before her). The default run keeps the scorpion launcher (its inputs are
+byte-identical to 5d835e51's).
+
+**The whole game with `--real-weapons 1`** (Linux Release, PIE):
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --real-weapons 1
+# then STATUS.md section 1's run command (aimdrive.py), --frames 290000
+```
+
+All five totems (`totems 11111`), the four bosses (`bosses 1111`), the six Primagen keys, **END 2
+(`ending 0/1`, cinema 130) at 252,980**, the credits and the hub at 267,078; 2 lives lost, both at the
+City Totem (as in the default run); the Blind One 32 damage (lowest 114), 124 30 damage
+(lowest 84), the Mother 33, the Primagen 59 (lowest 108). Levels 2-6 still have `T2_GIVE_WEAPONS`
+and `T2_FILL_AMMO` (from the hub after level 1). Two runs (the second on the final binary) are identical: every `progress`, `death`, `hurt`, `pickup`, `event` and `bosstrace` line.
+
+### 29.2 Level 2: sister 1 killed on picked-up weapons (`--real-weapons 1,2`)
+
+`T2_ACTOR_LOG=8` showed why round 15's level 2 spent everything and never hurt sister 1:
+
+- **The aims picked doors.** Doors (intelligence type 6) are "live" actors (health, flag 0x100).
+  The nearest-actor aim of 133's first step chose door 27 (50 units from the player) and the
+  sister step, whose sister is asleep behind it, door 28: the shotgun's shells and the grenades
+  went into them while the zombies with 5 health walked up untouched.
+- **Sleeping actors.** Once the doors were skipped, the aims chose zombies still in AI mode 0 (in
+  the ground, not hittable), and `enemy:22` aimed at zombie 22 asleep for 1,500 frames while
+  zombie 24 bit the player.
+- **Fire taps with no target** (every 15 frames) spent a weapon's ammo in a few hundred frames.
+
+Two DEBUG-ONLY switches (port only, `port/game/t2bosslog.c`, `port/app/game.cpp`) fix the aim,
+not the game:
+
+- `T2_AIM_SKIP_TYPES=T[,T...]`: the aims (`T2_AIM_NODE`, `T2_AIM_ENEMY`) never pick an actor of
+  these intelligence types (6: doors).
+- `T2_FIRE_GATE=L[,L...][@R]`: in these levels, while an aim window is open, the input's Z is held
+  back unless the aimed actor is awake (AI mode != 0) and within R (default 1,500); sleeping actors
+  are never the target there. Outside the aim windows and the levels the input is untouched. It
+  stands in for a player who does not shoot at nothing; e2's driver-controlled fire (the stick
+  driver deciding Z) would replace it.
+
+With `--real-weapons 2` `fullrun.py` sets both (`T2_AIM_SKIP_TYPES=6`, `T2_FIRE_GATE=133,134,135`)
+and plays 133 as `L2_133_REAL`: no fire at the first room's zombies (left behind door 27), the
+shotgun (+10 shells) picked up as a step after the first shells are spent, the second room's
+zombies 22-24 (80 health each; they open door 28) with the mag 60 (`L2_TAPS`: the pistol's slot on
+the wheel), the mag 60 on its ledge (-1996.5, -4454.4, 447.7) picked up as a step when the bullets
+are spent, then the sister with the grenade launcher.
+
+| run (`--real-weapons 1,2`) | 133 | sister 1 |
+|---|---|---|
+| round 15 (d2) | 200 damage, a death, ammo gone at 42,500 | 50/50 |
+| doors skipped | 200 damage, a death | 50/50 (zombies 22, 23 dead) |
+| + zombies one by one, the shotgun picked up | 200 damage, a death | 50/50, awake at 42,500 |
+| + no fire in room 1, the mag 60 on 22-24 | 175 damage, no death | 36/50 (the talon) |
+| + `T2_FIRE_GATE`, nearest awake | 200 damage, a death | 11/50 |
+| **+ the mag 60 picked up before her** | **184 damage, no death (lowest 16)** | **dead at 43,500** |
+
+Sister 2 (134) is not won yet: 131's terrace gives bullets x40, shells x3 and explosive shells x3
+(picked up, `L2_ARMS[8]`), the ultra health of 130 brings the player back to 116, but the zombies
+2-4 at the start and at gate 8 take that ammo by 52,500 while she sleeps (gate 8 opens with zombie
+4's key) and two lives go there. 130's bullets x40 and shells x10 by its exit were not reached by
+plain picks. So `--real-weapons 1,2` still ends in game over in 134.
+
+### 29.3 Next
+
+1. **134**: more ammo before her (125 and 131 have many bullets x10/x40 and shells; 134's mag 60 by
+   the start is taken only when the bullets are not full), and fewer shots at zombies 2 and 3 (they
+   are not needed for gate 8: only zombie 4's key is). Then sister 3 (135) and the City Totem.
+2. **e2's driver-controlled fire** in place of `T2_FIRE_GATE` when it is merged (the gate is an
+   env switch; the route only sets it with `--real-weapons 2`).
+3. **Levels 3-6** (not started): the plasma rifle in 64 and 124, the scorpion launcher in 66
+   (the Marsh Totem), plasma cells in 65 and 68 (PLAYTHROUGH 25.5), the shredder for level 5 and
+   the Mother.
+
+## 30. Walking instead of teleporting: the waypoint walker (Phase 7 round 16, part e3)
+
+**The navigation mesh** (`tools/port/nav.py`, port-free: the ROM through tools/assets/levels.py). A
+sub-level's floor is its collision regions: triangles with their three edge neighbours (vertex y is the
+floor, w the ceiling). The player crosses an edge the way `Sweep_CrossRegionEdge` (func_0023B664.c)
+lets him:
+
+- a border edge (no neighbour) is a wall;
+- a steep region (region flag 8, or its normal when flag 0x2000 is set: `CGameRegion__IsSteep`) is a
+  wall when its highest corner is above his feet. So walls are regions too, and a steep region lower
+  than the feet is a slide down. Steep regions with flag 0x10 are climbable (`PlayerClimb_Enter`);
+- the region-flag 0x80, info 0x400000 and flags52 0x80 boundaries depend on the mover's collision flags
+  and stay closed (conservative);
+- deep water costs 4 times its length, a drop of more than 120 is one-way and costs 400.
+
+A* runs over the regions (centroid to edge midpoint to centroid). The simple stupid funnel then pulls
+the path through the shared edges, shrunk by 40 units at their ends: the waypoints. Static objects
+are not in the mesh. Their world boxes (`CStaticObject__Construct`: bfloat16 offsets from the
+position) can be routed round (`T2_NAV_BOXES=1`). They are off by default: a box is only the broad
+phase. Hollow buildings, corridor pieces and floor mounds have boxes too, and going round boxes made
+135's walk (12, 1) fail. That walk goes straight through when the boxes are ignored.
+
+```sh
+python3 tools/port/nav.py baserom.us.z64 134 78.7,1024,-870.5 1650,1024,-870   # the waypoints
+python3 tools/port/navcands.py baserom.us.z64 RUN/run.log [--table]   # every teleport of a run, classified
+python3 tools/port/navplot.py baserom.us.z64 135 STATS F1 F2 out.png [A B]   # one walk drawn (matplotlib)
+```
+
+**The walker** (`aimdrive.py`'s `WalkDrive`, input only, deterministic). It drives
+`T2_WALK_PLAN="F1-F2@SUB:X,Y,Z,ROTY;..."` (each window is also a `T2_MOVE_DRIVE` window, so the
+game sends its "move" line every frame). At a window's first line it plans from where the player
+really stands. Then, every frame:
+
+- the stick turns him to the next waypoint, with the answers still in flight predicted as in d3's `Aim`;
+- C-up walks while the yaw error is under 0.6 rad;
+- a waypoint counts as passed within 60 units; within 30 of the goal he stops and turns to ROTY;
+- stuck (under 25 units in 36 frames of C-up): back off 10 frames, sidestep 24 (the side alternates),
+  and plan again, with a 100-unit box where he stopped as an obstacle.
+
+The answer is "SX 0 C" (stick X, C buttons) on the existing fifo; nothing in the game changed.
+`fullrun.py --nav L,...` replaces the route teleports of `NAV_WALKS[L]` (less `NAV_SKIP`) by walk
+windows of `nav_frames()` frames: the path at 0.85 of the walking speed, the two turns at the stick's
+full rate, 40 more. Like d5's `--walk`, the step and the later steps of its level move by the window.
+`--nav-only L:I.J,...` takes just those walks. `--walk-probe` also teleports at each window's end, so
+each walk is measured from the default route's place.
+
+**The probe** (`--nav 1,2,3,4 --walk-probe`, Linux Release, 43 candidates: every route step of levels
+1-4 whose two ends the mesh joins):
+
+| where | walks | arrived (error under 60) | why the others do not |
+|---|---|---|---|
+| level 1 | 7 | 1: 57's 5,816-unit walk (23 waypoints, error 48) | 53: a closed door across the power cell's alcove (z 7,120) and the cage bars; 54: the ledge and the cage; 55: a ledge and a climb; 58: a drop |
+| level 2, 133 | 3 | 1 (3,690 units, error 25) | doors between the zombies' rooms (x -1,547) |
+| level 2, 134 | 5 | 5 (the start-to-gate walk: 1,716 units, error 52, d5's open loop: ~200) | |
+| level 2, 135 | 15 | 4 ((12, 1) 719, (12, 10), (12, 12), (12, 15)) | the gate posts at z -3,350, the crypts, the graves: things the mesh does not have |
+| level 3 | 12 | 2 (69 in place, 66: error 44) | the walks start while the player is elsewhere: warps and cinemas move under level 3's anchors |
+| level 4 | 1 | 0 | 107: stuck 5 times |
+
+**The full run is the limit, not the walking.** A walk that arrives still changes the game state the
+next fights start from, and levels 1-4 are played without invincibility:
+
+| `--nav-only` (with the default command) | result |
+|---|---|
+| `1:7.1` (57) | arrives; then a death in 133's zombie fight (43,743): level 2's fights depend on level 1's state |
+| `2:9.0,2:9.1,2:9.2,2:9.4` (134) | the walks arrive; death at the gate (53,755): zombie 4 meets the player at a new time |
+| `2:12.1,2:12.10` (135) | arrive; a death in sister 3's fight (72,097) |
+| `2:12.1,3:1.2,3:9.1` | arrive; the City Totem as in the default run, then a death in level 3 (61, 122,021): game over |
+| `2:9.0,2:9.1,2:12.1` (134's two in-place steps in 40-frame windows) | deaths at the gate (53,513, 57,995) and in 135: game over |
+| `2:12.1` (135: from the start to the first crypt step, 719 units) | **END 2** at 250,970, all five totems and four bosses, the hub at 265,068; one life lost at the City Totem (the default run: 2) and 2 in the Primagen's lair (242,424 and 244,098); two runs identical (all 580,000 det lines, `ptcl` included) |
+
+So `NAV_SKIP` holds the walks that do not arrive and the ones that arrive but break the run, and
+**`--nav 1,2,3,4` is one walk** (135's (12, 1)): 288 teleports instead of 289. The default command
+(no `--nav`) writes byte-identical `playthrough.txt`, `teleport.env` and `fullrun.txt` to 5d835e51's,
+and `aimdrive.py` answers it exactly as before (no `T2_WALK_PLAN`: the lair driver alone).
+
+**Where the 289 teleports stand** (`navcands.py` over the default run's log, by level):
+
+| level | teleports | path under 8,000 | no path, another floor (dy > 100) | no path, same floor | path over 8,000 |
+|---|---|---|---|---|---|
+| the hub and the rest (unmapped sub-levels) | 59 | 48 | 2 | 1 | 8 |
+| 1 | 33 | 9 | 15 | 3 | 6 |
+| 2 | 53 | 32 | 15 | 0 | 6 |
+| 3 | 35 | 21 | 11 | 0 | 3 |
+| 4 | 31 | 13 | 6 | 3 | 9 |
+| 5 | 33 | 17 | 10 | 3 | 3 |
+| 6 and the lair | 45 | 30 | 5 | 2 | 8 |
+
+"No path, another floor" are ledges, jumps and climbs the mesh closes (a steep region above the feet:
+the player would jump; the fifo answer carries only the C buttons and the stick, not R) and warps;
+"no path, same floor" are floors split by water or by a region-flag boundary. A path in the mesh is
+not a walk: doors, gates, cages, crypts and graves are static objects or actors.
+
+## 31. The round-16 merge: one input protocol, the option runs, the route on the N64's RNG (Phase 7 round 16, the merge C31)
+
+The merge of e1 (section 27), e4 (MACOS.md 18), e2 (28), e5 (29) and e3 (30). The default
+command (STATUS.md section 1) is round 15's plus `T2_LEGACY_SHAKE=1` and gives round 15's run
+frame for frame (580,000 det lines, md5 `ecb9f9f2…`, three runs).
+
+### 31.1 One answer protocol for the input pipe
+
+Three drivers answer the game's `aim` and `move` lines: AimDrive (round 15 d3, e2), LairDrive
+(C30) and WalkDrive (e3). Before the merge each line kind had its own third field: an `aim` answer
+`SX SY Z` (0/1, e2), a `move` answer `SX SY C` (a hex C mask, C30 and e3), and e5's fire gate
+worked on the script's Z beside them. Now every answer is
+
+```
+SX SY [cH] [z0|z1] [r0|r1]
+```
+
+the stick (or `- -`), then tokens that each set one button group over the script's for the next
+frame: `cH` the C buttons (U 8, D 4, L 2, R 1), `z` the Z trigger (fire), `r` the R trigger
+(jump). A group no token names stays the script's; when an `aim` and a `move` line go out in one
+frame their tokens add up. In `game.cpp`, `AimFifoButtons` parses the tokens into a mask and
+values and `AimFifoApply` puts them over the pad in both pad paths (`ContRead`,
+`ContReadHeadless`); `ScriptedButtonsGated` applies e5's `T2_FIRE_GATE` to the script's Z unless
+the driver sets Z itself. AimDrive answers `SX SY [zN]`, LairDrive `- - cH`, WalkDrive
+`SX 0 cH [r1]`. The default run and `--stick-aim 2 --assist-keep 110` give the same det lines
+before and after the change.
+
+### 31.2 Checks
+
+- `n64viewcheck.py` has a **cast** kind for e1's bug (`f2 = (Floats *) &view->m_Shake;
+  f2->unk14 = one;`): an `include/` struct pointer cast to a view struct of the file, the view's
+  fields used through the cast judged at their N64 offsets. It reports 1 site (e1's legacy store)
+  and found `GameObject_IsSolid`'s `{pad[0x1C]; u32 flags}` view of a `CAIModeInfo` row (host
+  `unk_1C` at 0x30): fixed, behaviour of the default run unchanged.
+- `CShake__Set` / `CShake__Advance`: no caller in the ELF (`jal`, data words, `%hi/%lo`): left.
+- asm_diff 0 after each merge and at the end; a clean N64 build verifies; the archive is
+  unchanged; `mklayout.py --check` is up to date; gendata from the json and from the ELF give the
+  same sources.
+
+### 31.3 The validated runs (Linux Release, under `aimdrive.py`, 290,000 frames)
+
+Each is `playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6` plus the options, then
+STATUS.md section 1's game line (`T2_DET_LOG=1 T2_PROGRESS_LOG=1 T2_HURT_LOG=1`):
+
+| options | END 2 (cinema 130) | totems | lives lost | det md5 |
+|---|---|---|---|---|
+| (none) | 252,194 | 11111 | 2 (City Totem) | `ecb9f9f2…` x3 |
+| `--real-weapons 1` | 252,980 | 11111 | 2 (City Totem) | `3cb702ff…` x2 (one drawn) |
+| `--stick-aim 2 --assist-keep 110` | 253,788 | 11111 | 2 (City Totem, level 5) | `9432c11d…` x3 |
+| `--nav 1,2,3,4` | 250,970 | 11111 | 3 (City Totem, the lair 2) | `8702568d…` |
+| `--real-weapons 1 --stick-aim 2 --assist-keep 110` | cinema 130 at 254,756 | **10111** | 2 (City Totem) | `42420c22…` |
+
+The combination plays both sisters by stick and level 1 on its own weapons, but the City Totem
+is lost (2 lives there), so it ends without all five totems: not the good ending.
+
+### 31.4 The route on the N64's random numbers (`--n64-shake`)
+
+`fullrun.py --n64-shake` leaves `T2_LEGACY_SHAKE` out (the N64's camera shake and random
+stream). The default route on it:
+
+- the schedule drifts by ~500 frames by level 2 (132 at 61,649 instead of 61,163);
+- level 2's graveyard (135) costs more: the two crypt-zombie fights (zombie 45, steps 3,200-5,700;
+  zombie 44, 6,100-8,600) take ~15 more health than on the old stream, and the player enters the
+  crypt-key steps (8,700-9,300) with ~40 health; the zombies there kill him at 72,371 (a life
+  lost; the old stream left 59 health at the end of 135);
+- the route then falls out of step (the City Totem is never reached), and two more lives go in
+  125 (109,940 and 154,972: game over).
+
+Two `N64_L2_STRETCH` attempts (longer fire windows on the crypt zombies, as `L2_STRETCH`): +800
+frames on zombie 44 moved the first death to 73,313; +1,000 on zombies 45 and 44 lost two lives in
+135. `N64_L2_STRETCH` is left empty. The boss recipes on this stream: the Mother dies at 32,557
+(28,775 on the old one), the Blind One at 23,103 (the same frame), the Queen at 26,583 (28,143);
+the Primagen recipe does not kill him in 62,000 frames (his home waits). The default stays on
+`T2_LEGACY_SHAKE=1`; play mode has the N64's shake.
+
+### 31.5 Integrated runs
+
+STATUS.md section 2: the level runs and the boss recipes (with `T2_LEGACY_SHAKE=1`) are round
+15's det line for det line; the boot with the variable is too, without it only `rng` and the
+particles change; demos 1 and 3 still match the N64's RAM in every field but `rng`; save, title,
+load; the audio boot; padtest; the clean errors; soak (0 crashes in 62 runs).

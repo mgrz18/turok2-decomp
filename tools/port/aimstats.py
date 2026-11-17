@@ -58,7 +58,7 @@ def stick(path):
     """aimdrive.py --stats lines (frame sx sy yaw-error pitch-error pitch rotY): one row per aim
     window (a gap of more than 30 frames starts a new one): its frames, the mean yaw and pitch
     errors and the share of frames within 0.05 rad of the target in both."""
-    rows = [l.split() for l in open(path)]
+    rows = [l.split() for l in open(path) if l[:1].isdigit()]   # not the lair driver's "move" lines
     wins, cur = [], []
     for r in rows:
         if cur and int(r[0]) - int(cur[-1][0]) > 30:
@@ -67,13 +67,20 @@ def stick(path):
         cur.append(r)
     if cur:
         wins.append(cur)
-    print("%8s %8s %6s %9s %9s %7s" % ("from", "to", "frames", "yaw err", "pitch err", "on"))
+    print("%8s %8s %6s %9s %9s %7s %6s %8s" % ("from", "to", "frames", "yaw err", "pitch err", "on", "shots",
+                                             "switches"))
     for w in wins:
         ey = [abs(float(r[3])) for r in w]
         ep = [abs(float(r[4])) for r in w]
         on = sum(1 for a, b in zip(ey, ep) if a < 0.05 and b < 0.05)
-        print("%8s %8s %6d %9.3f %9.3f %6.0f%%" % (w[0][0], w[-1][0], len(w), sum(ey) / len(ey), sum(ep) / len(ep),
-                                                 100.0 * on / len(w)))
+        # round 16 e2: the driver's Z taps (a 0 -> 1 edge) and target switches (the chosen id changed)
+        z = [r[8] if len(r) > 8 else "-" for r in w]
+        shots = sum(1 for k in range(len(z)) if z[k] == "1" and (k == 0 or z[k - 1] != "1"))
+        ids = [r[7] for r in w if len(r) > 7 and r[7] != "-"]
+        sw = sum(1 for k in range(1, len(ids)) if ids[k] != ids[k - 1])
+        print("%8s %8s %6d %9.3f %9.3f %6.0f%% %6s %8s" % (w[0][0], w[-1][0], len(w), sum(ey) / len(ey),
+                                                         sum(ep) / len(ep), 100.0 * on / len(w),
+                                                         shots if "1" in z else "-", sw if ids else "-"))
 
 
 def main():

@@ -13,6 +13,10 @@ candidate, again for mips (the N64 layout). Three kinds of site:
   stride  the same with an `i * K` / `i << n` term: an N64 array stride (CGameRegion 32, ...)
   view    a member read through a struct defined in the .c file itself whose fields are placed by
           pads (`u8 pad0[0xD4]; u32 flags;`): an m2c/Rage Wars view of an engine struct
+  cast    a pointer to an include/ struct S (`&obj->member`, `p`) cast to a struct V defined in the
+          .c file itself (round 16 e1: `(Floats *) &view->m_Shake` in CCamera__Construct wrote
+          CShake at its N64 offsets): the fields of V used through that cast (directly, or
+          through the variable it is assigned to) are judged as S's members at their N64 offsets
 
 Each site is classed by the base it is applied to:
 
@@ -79,6 +83,16 @@ def strip(c):
     """The expression under parens and casts, and whether a cast was crossed."""
     while c.kind in CAST_KINDS:
         kids = [k for k in c.get_children() if k.kind != K.TYPE_REF and k.kind.is_expression()]
+        if not kids:
+            break
+        c = kids[-1]
+    return c
+
+
+def peel(c):
+    """The expression under parens and implicit (unexposed) casts, but not explicit casts."""
+    while c is not None and c.kind in (K.PAREN_EXPR, K.UNEXPOSED_EXPR):
+        kids = [k for k in c.get_children() if k.kind.is_expression()]
         if not kids:
             break
         c = kids[-1]
@@ -287,6 +301,9 @@ def analyse(job):
     main = os.path.abspath(path)
     raw = []    # (cursor-ish info)
     views = []
+    casts = []    # (function, cast, local view record V, include record S)
+    acc = {}      # (function, 'v:VAR' or 'c:CASTHASH') -> the view's field names used through it
+    castvar = {}  # (function, cast hash) -> the variable the cast is assigned to
     def walk():
         for top in th.cursor.get_children():
             if top.kind != K.FUNCTION_DECL or not top.is_definition() or top.location.file is None \
@@ -303,6 +320,12 @@ def analyse(job):
             inner = kids[-1]
             while inner.kind == K.PAREN_EXPR:
                 inner = expr_kids(inner)[0]
+            vd, sd = record_of(c.type), record_of(strip(inner).type)
+            if vd is not None and sd is not None and vd.is_definition() and vd.location.file is not None \
+                    and os.path.abspath(vd.location.file.name) == main:
+                sdd = sd.type.get_canonical().get_declaration()
+                if sdd.is_definition() and in_include(sdd) and rec_name(sdd) != rec_name(vd):
+                    casts.append((fname, c, vd, rec_name(sdd)))
             if inner.kind != K.BINARY_OPERATOR or inner.binary_operator not in (ci.BinaryOperator.Add, ci.BinaryOperator.Sub):
                 continue
             terms = []
@@ -336,6 +359,20 @@ def analyse(job):
                 under = strip(kids[0])
                 if under.type.get_canonical().kind == ci.TypeKind.POINTER and record_of(under.type) is not None:
                     raw.append((fname, c, under, v, [], 1))
+        elif c.kind in (K.BINARY_OPERATOR, K.VAR_DECL):
+            # `v = (V *) ...;` / `V *v = (V *) ...;`: the cast kind judges the fields used through v
+            kids = expr_kids(c)
+            if c.kind == K.BINARY_OPERATOR:
+                if c.binary_operator != ci.BinaryOperator.Assign or len(kids) != 2:
+                    continue
+                lhs, rhs = peel(kids[0]), kids[1]
+                var = lhs.spelling if lhs.kind == K.DECL_REF_EXPR else None
+            else:
+                rhs = kids[-1] if kids else None
+                var = c.spelling
+            rhs = peel(rhs)
+            if var and rhs is not None and rhs.kind == K.CSTYLE_CAST_EXPR:
+                castvar[(fname, rhs.hash)] = var
         elif c.kind == K.MEMBER_REF_EXPR:
             f = c.referenced
             if f is None or f.kind != K.FIELD_DECL:
@@ -347,6 +384,12 @@ def analyse(job):
                 rec = rec.semantic_parent
             if rec is None or rec.location.file is None or os.path.abspath(rec.location.file.name) != main:
                 continue
+            mk = expr_kids(c)
+            mb = peel(mk[0]) if mk else None
+            if mb is not None and mb.kind == K.DECL_REF_EXPR:  # the cast kind's used fields
+                acc.setdefault((fname, 'v:' + mb.spelling), set()).add(f.spelling)
+            elif mb is not None and mb.kind == K.CSTYLE_CAST_EXPR:
+                acc.setdefault((fname, 'c:%d' % mb.hash), set()).add(f.spelling)
             names = [x.spelling for x in rec.type.get_canonical().get_fields()]
             if not any(re.match(r'_?pad|unk_?pad|_hp_', n or '') for n in names):
                 continue
@@ -355,7 +398,7 @@ def analyse(job):
             kids = expr_kids(c)
             base = strip(kids[0]) if kids else None
             views.append((fname, c, rec, f, base))
-    if not raw and not views:
+    if not raw and not views and not casts:
         return {'file': path, 'sites': []}
     tm = idx.parse(path, args=args + ['-target', 'mips-linux-gnu'])
     LH, LM = Layouts(), Layouts()
@@ -526,6 +569,36 @@ def analyse(job):
         else:
             site.update(cls='local', what='fits %s (%d/%d)' % (best[0], best[1], len(flds)) if fit else '')
         sites.append(site)
+    # casts of an include/ struct pointer to a view defined here: V's fields over S at the N64 offsets
+    for (fn, c, vd, sname) in casts:
+        rm = locm.get((vd.location.line, vd.location.column))
+        if rm is None or moved(sname) is None:
+            continue
+        var = castvar.get((fn, c.hash))
+        used = acc.get((fn, 'v:' + var) if var else (fn, 'c:%d' % c.hash))
+        if not used:
+            continue
+        lvh = {pp: o for (pp, o, s2, r) in LH.leaves(vd)}
+        lv, hm = moved(sname)
+        bad, n = [], 0
+        for (fname, o, s2, r) in LM.leaves(rm):
+            if r or fname not in used:
+                continue
+            n += 1
+            j = judge(sname, o, s2)
+            if j is None or j[0] != 'BAD':
+                continue
+            if 'past the N64 struct' in j[1] and lvh.get(fname) == o and                     recm[sname].type.get_size() == rech[sname].type.get_size():
+                continue  # an array of records seen through its first member's type (CVector3 vertices)
+            x, delta = locate(lv, o, s2)
+            if x is not None and hm.get(x[0], (None,))[0] == lvh.get(fname) and not delta:
+                continue  # the view's host offset is the member's
+            bad.append('%s->%s' % (fname, j[1]))
+        if not n:
+            continue
+        sites.append({'kind': 'cast', 'cls': 'BAD' if bad else 'same', 'file': path, 'line': c.location.line,
+                      'func': fn, 'view': rec_name(vd), 'field': sname, 'off': 0, 'size': 0,
+                      'what': '%s%s' % (('via %s: ' % var) if var else '', '; '.join(bad[:4]))})
     return {'file': path, 'sites': sites}
 
 
@@ -575,6 +648,8 @@ def main():
                 extra = 'strides %s on %s %s' % (s['strides'], s['base'], s.get('what', ''))
             if s['kind'] == 'view':
                 head = '%s {%s}' % (s['view'], s['field'][:80])
+            elif s['kind'] == 'cast':
+                head = '(%s *) on %s' % (s['view'], s['field'])
             else:
                 head = '%s +0x%X' % (s['base'], s['off']) if s['off'] >= 0 else '%s -0x%X' % (s['base'], -s['off'])
             out.append('%-7s %-6s %s:%d %s: %s  %s' % (s['cls'], s['kind'], rel, s['line'], s['func'], head, extra))
