@@ -190,6 +190,62 @@ command's `playthrough.txt` and `teleport.env` were byte-identical to 8b42da15's
 8. Still open from round 14: the obj-230 double fire and the Blind One's margin (c1), 119's moving
    platforms (c2), `t2audio_test`'s game-path mode, soak.py on macOS.
 
+## Round 16, part e1: the N64 lair and Mother checks, the camera shake's random numbers (branch names-R16_e1)
+
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 27-e1.
+
+- **The N64 can now be driven** (`tools/port/n64trace.py`): its keyboard input never reached the
+  game (the attract loop runs the same with or without `--input`). New: `--start-warp ID@N` (the
+  game started at a warp from the attract loop, as `CEngineApp__StartGameAtWarp` does: `7602@600`
+  the lair, `--start-warp=-4@600` the Mother), `--pad F1-F2:BUTTONS[:SX:SY]` (controller 1 through a
+  `Controller_ProcessInput` breakpoint), `--warp`, `--poke` (player position, actor health, RDRAM
+  words), `--watch I`, `--watch-write`. Port twins (DEBUG-ONLY): `T2_START_WARP=ID@F`,
+  `T2_PRIMAGEN_STAGE=F[,F]` (his part health zeroed: the next stage), `T2_RNG_SET=LEVEL:GF:HEX`.
+- **The Primagen's home waits are the N64's own**: on the N64 he hovers at (-2.2, 926.9, 2,922.7) /
+  (5.3, 926.9, 2,907.8) (the port's pairs, to a few units), and **no floor spot ends the wait on the
+  N64 either**: the spawn, 8 chosen spots and a 349-spot grid (200 apart, within 2,100 of the middle)
+  all fail on both sides; a spot in front of him ends it within two game frames on both. Not a host
+  bug, so `T2_LAIR_PEEK` stays in the default run (it stands for the jump or the kept target).
+- **The Mother's phase 0: the player walks** on the N64 (`--pad`) and in the port, the same path and
+  speed, stopped by the same wall at z 3,155.8. d1's "cannot move" does not reproduce.
+- **A host bug fixed: the camera shake radius.** With the RNG set equal on both sides in the lair,
+  the N64 drew 12 numbers per game frame and the port 6. `CCamera__Construct` (func_0042F9B0.c)
+  stored `m_Shake`'s position and radius through an N64-offset view, so `m_Radius` stayed 0 and
+  `CShake__ApplyOffset` never drew its three `Random_Blend` per camera (`CShake__Construct`,
+  func_00281C08.c, the same; asm_diff 0 on both). Now 12 per game frame as on the N64.
+  **This moves every random number of the game**: the default route, tuned on the old stream, ends in
+  game over in 125 (~155,000) with the fix. `T2_LEGACY_SHAKE=1` restores the old stores;
+  `fullrun.py` and `playthrough.py` write it into `teleport.env`. A player without env gets the
+  N64's numbers.
+- **The default run, validated** (Linux, Release, PIE, this branch): the round-16 default command
+  (`playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6`, now with
+  `T2_LEGACY_SHAKE=1`) under `aimdrive.py`, `T2_DET_LOG=1`, 290,000 frames: END 2 at 252,194 with
+  all 5 totems, the hub at 266,292, exit 0, 4 `lairpeek` lines; all 580,000 det lines md5
+  `ecb9f9f2c127d91cdf889e5b926f3d33`, the same as e4's two runs of 5d835e51.
+- **The `ptcl` hash: not reproduced** in 18 runs (frames 72,000-83,000: the default command, round
+  14's command without the driver, with `--draw`, with ASLR off), nor by e4 (Linux and Mac). No fix.
+
+| commit | what |
+|---|---|
+| bf31c30e | `n64trace.py --warp/--poke/--watch`, `T2_PRIMAGEN_STAGE` |
+| bce84bc2 | `n64trace.py --start-warp`, `--pad` |
+| 27617d70 | the camera shake radius (func_0042F9B0.c, func_00281C08.c), `T2_LEGACY_SHAKE` in fullrun.py/playthrough.py, `T2_START_WARP`, `T2_RNG_SET`, `--watch-write` |
+| c073c333 | PLAYTHROUGH.md 27-e1 |
+
+**For the merge**: src/us/code/func_0042F9B0.c and func_00281C08.c (TARGET_PORT only);
+port/app/game.cpp (three hooks after `T2_LAIR_PEEK`: `T2_START_WARP`, `T2_RNG_SET`,
+`T2_PRIMAGEN_STAGE`); port/game/t2debug.c and t2bosslog.c (functions appended at the end);
+tools/port/fullrun.py (`env.append("T2_LEGACY_SHAKE=1")` before `env += list(env_extra)` in the
+`teleport.env` writer) and playthrough.py (the same before its `teleport.env`); n64trace.py. Any
+branch that writes `teleport.env` another way, or runs the boss recipes by hand, needs
+`T2_LEGACY_SHAKE=1` to replay round 15's numbers.
+
+**Next**: re-tune the route on the N64's random stream (no `T2_LEGACY_SHAKE`); `CShake__Set` and
+`CShake__Advance` (the same N64 layout, no C callers) and teaching `n64viewcheck.py` the
+`(View *) &obj->member` cast; the lair props `lvl 10`-`17` (N64: animation 4 at spawn; port:
+animation 0, displaced) with `T2_START_WARP` + `T2_RNG_SET` against `--start-warp` + `--poke`, a
+field-by-field lair comparison now that both sides can start the same way.
+
 ## Round 15, part d5: the -O2 uninitialised read found, clean errors, teleports counted (branch names-R15_d5)
 
 **1. The -O2 uninitialised read (round 14's section 4 item 3) is fixed** ([STABILITY.md](STABILITY.md) 11).
