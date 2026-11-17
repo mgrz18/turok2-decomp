@@ -224,10 +224,18 @@ void T2Offscreen_Finish() {
 #ifdef ENABLE_OPENGL
 #include "fast/backends/gfx_opengl.h"
 #include "fast/interpreter.h"
+#include <cstring>
 #include <vector>
 
 bool T2Gl_ReadRGB8(const std::shared_ptr<Fast::Interpreter>& interp, int fbId, uint32_t w, uint32_t h, uint8_t* rgb) {
-    if (!interp || !interp->mRapi || dynamic_cast<Fast::GfxRenderingAPIOGL*>(interp->mRapi) == nullptr) {
+    // the OpenGL renderer only (a Mac window may run LUS's Metal one: no GL context then)
+    if (!interp || !interp->mRapi || strcmp(interp->mRapi->GetName(), "OpenGL") != 0) {
+        static bool told = false;
+        if (!told) {
+            told = true;
+            fprintf(stderr, "T2_SHOT: renderer %s, the RGBA5551 readback\n",
+                    interp && interp->mRapi ? interp->mRapi->GetName() : "(none)");
+        }
         return false;
     }
     GLint prevRead = 0;
@@ -246,6 +254,16 @@ bool T2Gl_ReadRGB8(const std::shared_ptr<Fast::Interpreter>& interp, int fbId, u
             glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLuint)prevRead);
             return false;
         }
+    }
+    static bool toldBits = false;
+    if (!toldBits) { // once: the colour depth the frame was drawn at (Linux's offscreen EGL: 5-6-5)
+        toldBits = true;
+        GLint r = 0, g = 0, b = 0;
+        const GLenum att = fbId == 0 ? GL_BACK_LEFT : GL_COLOR_ATTACHMENT0;
+        glGetFramebufferAttachmentParameteriv(GL_READ_FRAMEBUFFER, att, GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE, &r);
+        glGetFramebufferAttachmentParameteriv(GL_READ_FRAMEBUFFER, att, GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE, &g);
+        glGetFramebufferAttachmentParameteriv(GL_READ_FRAMEBUFFER, att, GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE, &b);
+        printf("game: T2_SHOT reads framebuffer %d: colour bits %d-%d-%d\n", fbId, r, g, b);
     }
     std::vector<uint8_t> rgba((size_t)w * h * 4);
     glReadPixels(0, 0, (GLsizei)w, (GLsizei)h, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data());

@@ -14,10 +14,14 @@ set_target_properties(turok2 PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON
 # Must match libultraship's GBI_UCODE so macros encode what the interpreter decodes.
 target_compile_definitions(turok2 PRIVATE ${GBI_UCODE})
 target_link_libraries(turok2 PRIVATE libultraship t2asset)
+# offscreen_gl.cpp sees LUS's OpenGL renderer on every OpenGL host: --offscreen-gl (macOS) and
+# T2_SHOT's 8-bit readback (T2Gl_ReadRGB8, macOS and Linux)
+if(NOT WIN32)
+    set_source_files_properties(offscreen_gl.cpp PROPERTIES COMPILE_DEFINITIONS "ENABLE_OPENGL")
+endif()
 if(APPLE)
     # --offscreen-gl (offscreen_gl.cpp): LUS's OpenGL renderer on a CGL context with no window
-    set_source_files_properties(offscreen_gl.cpp PROPERTIES COMPILE_DEFINITIONS "ENABLE_OPENGL"
-                                COMPILE_OPTIONS "-Wno-deprecated-declarations")
+    set_source_files_properties(offscreen_gl.cpp PROPERTIES COMPILE_OPTIONS "-Wno-deprecated-declarations")
     find_package(GLEW REQUIRED)
     target_link_libraries(turok2 PRIVATE GLEW::GLEW "-framework OpenGL")
 endif()
