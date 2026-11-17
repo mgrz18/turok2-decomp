@@ -306,7 +306,7 @@ Mac only, headless; no change to `src/` or `include/`. Detail: [MACOS.md](MACOS.
 Tools only: `tools/port/fullrun.py` (`level6()`: the Mother's and the lair's weapon, `MOTHER_SHREDDER_END`,
 `LAIR_FRONT`, `LAIR_STRAFE`, `--lair-strafe`, `--lair-front`) and `tools/port/routes56.py`
 (`lair_strafe(..., sweep=0)`). The default command (`--cheats-on 3,4`) writes the same input and env
-files as at 8b42da15. PLAYTHROUGH.md 22.
+files as at 8b42da15. PLAYTHROUGH.md 23.
 
 ```sh
 python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --lair-strafe 90
@@ -332,7 +332,7 @@ python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5
 
 ## Round 15, part d3: aim assist off, closed-loop stick aiming in levels 1-4 (branch names-R15_d3)
 
-New in this branch (details in [PLAYTHROUGH.md](PLAYTHROUGH.md) section 22):
+New in this branch (details in [PLAYTHROUGH.md](PLAYTHROUGH.md) section 24):
 
 - **`T2_AIM_STICK=F1-F2[;...]`** (`port/game/t2debug.c`, `t2bosslog.c`). Inside a window,
   `T2_FACE_NEAREST`, `T2_AIM_AT`, `T2_AIM_ENEMY` and `T2_AIM_NODE` only pick their target and
@@ -375,7 +375,7 @@ New in this branch (details in [PLAYTHROUGH.md](PLAYTHROUGH.md) section 22):
 ## Round 15, part d2: levels 1-3 on picked-up weapons and ammo (branch names-R15_d2)
 
 The new option is `fullrun.py` (or `playthrough.py RUN --all`) `--real-weapons 1[,2[,3]]`, with
-`--hub-wait N`. The detail is in PLAYTHROUGH.md 22. Only `tools/port/fullrun.py` and the docs
+`--hub-wait N`. The detail is in PLAYTHROUGH.md 25. Only `tools/port/fullrun.py` and the docs
 change; there are no src/, include/ or port/ changes. Without the option, the generated
 `playthrough.txt` and `teleport.env` are byte-identical to 8b42da15's. The reference `--all` run
 on this branch's Release build reaches the same frames as STATUS section 2: cinema 43 at
@@ -383,7 +383,7 @@ on this branch's Release build reaches the same frames as STATUS section 2: cine
 
 - **Pickups**: weapons and ammo are level actors. Cart entry 2 maps an object to its pickup id
   (`ids[object + 4]`). The ids are in `sWeaponPickups` (2001-2122) and `sAmmoPickups`
-  (2200-3027). The table and the level 1-3 positions are in PLAYTHROUGH.md 22.1.
+  (2200-3027). The table and the level 1-3 positions are in PLAYTHROUGH.md 25.1.
 - **Weapon changes in the input stream**: the default control style is the stick wheel. A held
   (`sBarrelLayoutGroup1`) or B held (`sBarrelLayoutGroup0`), with the analog stick on one of 8
   slots, requests that weapon. `fullrun.wheel()` writes these inputs, and a route step can say
@@ -397,7 +397,7 @@ on this branch's Release build reaches the same frames as STATUS section 2: cine
 - **The whole game with `--real-weapons 1`** (the default `--hub-wait 50`): **all four totems of
   levels 1-4 and the Blind One, without invincibility**. The City Totem costs 2 lives, as in the
   default run. Then the Blind One leaves 25 health instead of 52, level 5's first sub-level (124)
-  kills the player, and the run ends in game over at 150,990. PLAYTHROUGH.md 22.5 has the table.
+  kills the player, and the run ends in game over at 150,990. PLAYTHROUGH.md 25.5 has the table.
   The level-2 fights depend on the state they start from: a 50-frame idle in the hub after level
   1 is what lets sisters 1 and 2 and the City Totem through.
 - **Level 2 on its own pickups** (`--real-weapons 1,2`): **soul gate 1 is destroyed with the shotgun**, chosen on the wheel.
@@ -411,7 +411,7 @@ on this branch's Release build reaches the same frames as STATUS section 2: cine
   and `cli`, plus the new block before `main_all` (`L1_ARMS`, `L2_ARMS`, `L3_ARMS`, `WHEEL`,
   `wheel()`, `REAL_HUB_AT`, `ARMS_HUB_WAIT`). d3 changes the aiming steps of levels 1-4 and d5 the
   walking of levels 1-2: their teleports are where my picks are inserted (segment starts).
-- **Next**: PLAYTHROUGH.md 22.5. In short: a health pickup before 124, the sisters with aim only
+- **Next**: PLAYTHROUGH.md 25.5. In short: a health pickup before 124, the sisters with aim only
   at them, level 3's scorpion launcher from 66.
 
 

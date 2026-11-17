@@ -2007,7 +2007,7 @@ totems, the six keys in their slots, cinema 43, the lair reached at 221,747), bu
 default command (no `--walk`) writes the same `playthrough.txt` and `teleport.env` as before
 (byte-identical) and its det log is the base build's over 290,000 frames.
 
-## 22. The Mother and the Primagen without invincibility (Phase 7 round 15, part d1)
+## 23. The Mother and the Primagen without invincibility (Phase 7 round 15, part d1)
 
 ```sh
 python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --lair-strafe 90
@@ -2020,7 +2020,7 @@ strafing's period, default 80, and an optional forward/back sweep of S frames) a
 (`--cheats-on 3,4`) writes the same `playthrough.txt` and `teleport.env` as before (checked with
 `diff -r`).
 
-### 22.1 The Mother: her hit is the N64's; the weapon was the problem
+### 23.1 The Mother: her hit is the N64's; the weapon was the problem
 
 - **Her ~10-damage hit at ~1,240 units is matching code, not a host bug.** `MotherBoss_AnimEvent`
   (func_00409A64) sends `ImpactEvent_Send(obj, obj, 3, -1, player position, {0xA00, 0x500/0xA00})`
@@ -2044,7 +2044,7 @@ strafing's period, default 80, and an optional forward/back sweep of S frames) a
   bounce), then the plasma rifle again. **5 hits, 53 damage, lowest health 147** (she was 238-300
   damage with the plasma rifle).
 
-### 22.2 The Primagen: the shredder too, and the lair is still a knife edge
+### 23.2 The Primagen: the shredder too, and the lair is still a knife edge
 
 - His damage is mostly his melee: `Primagen_HandleAnimEvent` sends the same centred blast (10) on
   event 2 within 409.6 (sight distance) and event 1 within 716.8, two hits 16 frames apart, when he
@@ -2065,7 +2065,7 @@ strafing's period, default 80, and an optional forward/back sweep of S frames) a
   player, pushed right by the strafing's drift, falls off the arena's right edge (x 1,622).
   Period 76 also kills him and reaches END 2, also with one fall (235,462, 122 health to 0).
 
-### 22.3 The run (`--lair-strafe 90`, no `--cheats-on`; two runs identical)
+### 23.3 The run (`--lair-strafe 90`, no `--cheats-on`; two runs identical)
 
 Two runs, md5 of every `progress`/`event`/`pickup`/`hurt`/`death`/`bosstrace` line equal. All five
 totems, the four bosses, the Primagen dead (mode 29) at 244,846, cinema 370, END 2 (`ending 0/1`,
@@ -2077,7 +2077,7 @@ cinema 130) at 251,638, the credits, the hub at 265,736.
 | the Mother (3), shredder | 5 | 53 | 147 | 0 |
 | the Primagen's lair (4), shredder, strafing period 90 | 17 | 229 (143 of it the fall) | 18 after the fall | 1 (a fall off the right edge at 228,464) |
 
-### 22.4 Next
+### 23.4 Next
 
 - The lair fall: the strafing drifts sideways (period 90: +x, about 1,200 units in 2,500 frames)
   and the pushes of his attacks add to it. A strafe whose halves are tuned to cancel the drift, or a
@@ -2086,9 +2086,9 @@ cinema 130) at 251,638, the credits, the hub at 265,736.
 - Phase 0 of the Mother: check on the N64 that the player cannot move there (mupen64plus, a RAM
   poke warp to -4).
 
-## 22. Aim assist off: closed-loop stick aiming in levels 1-4 (Phase 7 round 15, part d3)
+## 24. Aim assist off: closed-loop stick aiming in levels 1-4 (Phase 7 round 15, part d3)
 
-### 22.1 The mechanism (`T2_AIM_STICK`, `T2_AIM_FIFO`, `tools/port/aimdrive.py`)
+### 24.1 The mechanism (`T2_AIM_STICK`, `T2_AIM_FIFO`, `tools/port/aimdrive.py`)
 
 The aim assists (`T2_FACE_NEAREST`, `T2_AIM_AT`, `T2_AIM_ENEMY`, `T2_AIM_NODE`) write the
 player's yaw and the camera pitch every frame. Round 14's `stick_aim` (17.1) only turns towards
@@ -2119,7 +2119,7 @@ a fixed point, open loop. This round adds a closed loop:
   `aimstats.py --stick STATS` shows the tracking per aim window: mean yaw and pitch error, and the
   share of frames within 0.05 rad of the target.
 
-### 22.2 The stick, measured (`aimdrive.py --probe SX,SY[,N]`, level 51, Linux Release)
+### 24.2 The stick, measured (`aimdrive.py --probe SX,SY[,N]`, level 51, Linux Release)
 
 - The game reads the pad once per tick: every second host frame. A stick change shows up in the
   pose 4 host frames later.
@@ -2138,7 +2138,7 @@ a fixed point, open loop. This round adds a closed loop:
   first version: GAIN 0.35 of the observed error, no prediction. On a still point it turns
   1.2 rad and holds within 0.001 rad in about 30 frames.
 
-### 22.3 Running it
+### 24.3 Running it
 
 ```sh
 python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --cheats-on 3,4 \
@@ -2156,7 +2156,7 @@ same configuration give identical det logs. s1 and sC are two separate driver ru
 their levels 1-4 windows. Their det logs are identical through the stick fights of levels 1-4,
 262 lines up to frame 131,000, where sC's `--assist-keep 1` starts.
 
-### 22.4 Results (Linux Release, PIE, the round-14 command plus `--stick-aim`)
+### 24.4 Results (Linux Release, PIE, the round-14 command plus `--stick-aim`)
 
 The fights compared with the assisted run (`aimstats.py`). Each cell gives the damage taken,
 the lowest health and the deaths in that level. For a totem it also gives the kills and the seconds
@@ -2193,13 +2193,13 @@ left when it fell. `v2` is the default controller and `v1` is `--simple`.
     then a game over.
   - In sK the extra life went at the Blind One itself.
   - With levels 1-2 by stick (s1, sC), the level-2 lives run out by the Blind One or level 5.
-  - The validated default command is unaffected (det log identical). See 22.5 for the runs that
+  - The validated default command is unaffected (det log identical). See 24.5 for the runs that
     reached END 2.
 - Tracking, `aimstats.py --stick`, frames within 0.05 rad of the target:
   - Harbor Totem: 74-82 %. Sisters: 48-95 % per window. City Totem: 75-81 %.
   - Marsh Totem: 84 %. Cave Totem: 70-78 %. The Blind One: 47 %.
 
-### 22.5 Which commands were validated
+### 24.5 Which commands were validated
 
 - **The default command** (section 21, no `--stick-aim`) with this branch's binary gives the same
   580-line det log as 8b42da15. It plays the same: all 5 totems, the 4 bosses (the Primagen at
@@ -2219,7 +2219,7 @@ left when it fell. `v2` is the default controller and `v1` is `--simple`.
   playable. The whole-game chain breaks downstream: at the lair wait, or at the lives that level
   2's sisters and the Blind One cost.
 
-### 22.6 Next
+### 24.6 Next
 
 - **The sisters and the Blind One need better targets, not a better controller.** The yaw loop
   is already as fast as the stick allows. The game could report several candidates
@@ -2232,7 +2232,7 @@ left when it fell. `v2` is the default controller and `v1` is `--simple`.
   the Primagen's home wait then fails. A lair route that strafes until he has line of sight,
   instead of at fixed frames, would let any stick-aimed run finish.
 
-## 22. Levels 1-3 on picked-up weapons and ammo (Phase 7 round 15, part d2)
+## 25. Levels 1-3 on picked-up weapons and ammo (Phase 7 round 15, part d2)
 
 `fullrun.py --real-weapons 1[,2[,3]]` plays those levels without `T2_GIVE_WEAPONS` and
 `T2_FILL_AMMO`. Both start in the hub after the last such level (`"0;1@F"`, `"0;300@F"`). The
@@ -2240,7 +2240,7 @@ weapons and the ammo are picked up on the way, and the weapon is changed through
 Without the option the generated `playthrough.txt` and `teleport.env` are byte-identical to
 8b42da15's (checked with `diff -r`), so the default `--all` command is unchanged.
 
-### 22.1 Where the pickups are
+### 25.1 Where the pickups are
 
 Weapons and ammo are level actors in the grid sections (`tools/assets/levels.py`). Cart entry 2
 maps an actor's object to its pickup id: `ids[object + 4]`, where the first 8 bytes are a header.
@@ -2272,7 +2272,7 @@ and the bow (2). `Pickup_GiveWeapon` selects a new weapon when its index is high
 current one's. When a weapon runs dry the game falls back to another one with ammo, down to the
 talon.
 
-### 22.2 Changing weapons through the input stream
+### 25.2 Changing weapons through the input stream
 
 The default control style is the stick wheel (`CBarrel__RunStick`). `CBarrel__RunButtons`, the
 A/B cycling, is used only with the other `m_WeaponSelect`, so a tap of A or B does nothing here
@@ -2291,7 +2291,7 @@ then runs `WHEEL_BEFORE` = 50 frames before the step's teleport, which sets the 
 Checked in level 129: `A` held with `SX=-90 SY=-90` changes the grenade launcher (15) to the
 shotgun (8) (`state:` `reqw 8 wheel 2/0/5`).
 
-### 22.3 Level 1 (`--real-weapons 1`)
+### 25.3 Level 1 (`--real-weapons 1`)
 
 `L1_ARMS` lists the picks. Each one is taken like a key, at a segment's start, 150 frames each,
 seven picks in all:
@@ -2329,7 +2329,7 @@ Two things change in the schedule for this option:
   When a totem is won early, the anchor fires on arrival and the later steps follow. When it is
   lost the run is over anyway. In l1a the hub's teleports ran inside level 109.
 
-### 22.4 Level 2
+### 25.4 Level 2
 
 **Levels 1 and 2 on their own pickups (`--real-weapons 1,2`) do not get through level 2.** The
 picks in `L2_ARMS` are:
@@ -2369,7 +2369,7 @@ level 2: its picks would be the shotgun and shells in 61, the plasma rifle in 64
 x150 in 65 and 68, and the scorpion launcher in 66 just before the Marsh Totem (where c1's route
 uses it).
 
-### 22.5 The whole game with `--real-weapons 1`, and next
+### 25.5 The whole game with `--real-weapons 1`, and next
 
 **The whole game with `--real-weapons 1`** (Linux Release, PIE; the default `--all`
 options plus `--real-weapons 1`): level 1 is played on its own pickups, and `T2_GIVE_WEAPONS` and
@@ -2417,7 +2417,7 @@ Next:
    damage) need a health pickup before 124, or 124's hits avoided. With that, `--real-weapons 1`
    should play to the end, since every totem is won.
 2. **Level 2 on its own weapons**: aim only at the sisters, take the ammo in 133 and 134 between
-   the windows, and use the grenades and explosive shells on the sisters (22.4). This goes together
+   the windows, and use the grenades and explosive shells on the sisters (25.4). This goes together
    with part d3's closed-loop aim, because `T2_AIM_ENEMY`'s nearest-actor aim spends everything on
    zombies.
 3. **Level 3**: the scorpion launcher lies in 66, just before the Marsh Totem, so c1's weapon 16
