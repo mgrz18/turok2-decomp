@@ -396,3 +396,56 @@ operands) never showed it.
 When a new object faults the same way, add it to `ALIGN16`. To find it: take the faulting
 `movaps`/`movdqa`/`orps mem` address from the crash handler's registers and look it up with
 `nm -n` (`sBatchInstances` was rbx = base + 0x56ec58). Rerun gendata and rebuild.
+
+## 11. Round 15 (part d5): the -O2 uninitialised read found (two game functions)
+
+c5's split (section 10: Release `-O2` with `-DT2_AUTO_VAR_INIT=none` differs from zero-init at
+frame 15,348) is **in the game library**, not in t2audio. On 8b42da15 the same `none` build no
+longer differs there: it **crashes** at frame 15,347 (level 53, SIGSEGV in
+`AI_GetPathTargetInfo` <- `AI_UpdateTargets` <- `EnemyMode_Move_Update`: its `out` pointer, kept
+in a callee-saved register, came back as `0x000078A100005D9C`, two halves of two pointers).
+
+**The bisection** (`tools/port/objbisect.py`, c5's lost `bis.py` rewritten; usage below): two
+Release trees, `none` and `zero`; a mixed binary takes the objects of a subset of t2audio (8) and
+turok2_game (3,056) from `none` and the rest from `zero`, linked with ninja's own link line; it is
+bad when its det log differs from the zero build's in the first N frames, or stops early (a crash).
+12-13 steps of ~1 minute each.
+
+| # | object found | what | fix |
+|---|---|---|---|
+| 1 | `func_00244E84.c` (`AI_FindClearHeading`), frame 15,347 | `GameObject_TestMove(self, pos, &out)` stores a `CollisionInfo *` (8 bytes on the host) into `s32 out`: the 4 bytes after the local are overwritten. In the zero-init layout they held nothing live (the run is unchanged by the fix); without zero-init, half of a saved register | `out` and the prototype's parameter are `sptr` (= `s32` on the N64: asm_diff 0) |
+| 2 | `func_002063B4.c` (`CCache__HeapAlloc`), frame 138,436 (the Blind One) | `if (value)` on the unset `value`, both branches the same `CHeap__Alloc` (a matching idiom). A branch on an unset local is undefined behaviour: clang `-O2` without zero-init treated the `arg2 == 0` path as unreachable and **always allocated from the top of the heap** | `#ifdef TARGET_PORT`: the plain `else` call |
+
+Neither the 32-bit truncation checks (`abicheck`, `n64viewcheck`) nor c5's warning pass could see
+#1 (the call is ABI-correct; the store's width is in another file). **`tools/port/outptr.py`**
+looks for the class: a function defined with a `T **` parameter, declared in another file with a
+32-bit pointee (`s32 *`, `u32 *`, `int *`), and called there with `&local` of a 32-bit type. On the
+tree: 17 such declarations, all `ok` (the locals are `sptr`, or a pointer is passed through: the
+`GameObject_TraceMove` callers were fixed in rounds 11-13); the old `func_00244E84.c` is reported
+`BAD ... locals: out`. c5's other "is uninitialized" idioms (`func_0023640C`, `func_00268080`,
+`GameObject_GetLeashRadius`, `osPiGetCmdQueue`) compile to the same code with and without
+zero-init (checked in the disassembly of the `none` objects), so they stay as they are.
+
+**Result** (Linux x86-64, PIE, Release `-O2 -DNDEBUG`, the default `--all` run, 290,000 frames,
+`T2_DET_LOG=1`):
+
+| build | det lines vs the 8b42da15 Release zero-init build (`OUT/rel`) | the run |
+|---|---|---|
+| zero-init, with both fixes | 580,000, **0 differ** | the Primagen dies at 250,290, the ending, the hub at 271,180 |
+| **`none`, with both fixes** | 580,000, **0 differ** | the same |
+| `none`, fix 1 only | differs from frame 138,436 (the player's yaw in the Blind One's fight; the heap layout) | the Primagen alive at 290,000 |
+| `none`, no fix (8b42da15) | SIGSEGV at frame 15,347 | - |
+
+So the zero-init build was right by construction, and `-O2` without it now plays the same game.
+
+The zero-init flag stays the default (it costs nothing and is a safety net for the next one).
+
+**`tools/port/objbisect.py`** is the bisection as a tool (any two builds that play differently):
+
+```sh
+# two Release trees of the same commit (-DT2_AUTO_VAR_INIT=none and zero), the route, the
+# reference det log (the good build, T2_DET_LOG=1, the same route), then
+python3 tools/port/objbisect.py --bad OUT/none --good OUT/zero --ref zero_det.log \
+    --route RUN --frames 16000 --work /tmp/bis --archive OUT/turok2.o2r --rom baserom.us.z64 bisect
+# list: index, archive, object; test NAME I0:I1 ...: one mix (objects [I0, I1) from --bad)
+```
