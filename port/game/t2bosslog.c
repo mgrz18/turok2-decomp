@@ -495,6 +495,8 @@ f32 T2Port_Atan2f(f32 y, f32 x) {
     return T2Aim_Atan2f(y, x);
 }
 
+extern int T2Port_AimStickOn(int frame);
+extern void T2Port_AimCand(int frame, CGameObjectInstance *o, f32 x, f32 y, f32 z, f32 d2);
 int T2Port_AimNode(int frame, const char *spec) {
     static s32 sLastMask = -1;
     static int sLastFrame;
@@ -559,6 +561,17 @@ int T2Port_AimNode(int frame, const char *spec) {
         dx = o->header.m_vPos.x - eye.x;
         dz = o->header.m_vPos.z - eye.z;
         d = dx * dx + dz * dz;
+        if (d < r * r && T2Port_AimStickOn(frame)) {
+            /* round 16 e2: every target this search accepts goes to the stick driver as a candidate
+             * (the phase's node box nearest the eye, else the actor 50 units up) */
+            CVector3 ca;
+            s32 cm;
+            if (aimBoxCentre(o, mask, &eye, &ca, &cm)) {
+                T2Port_AimCand(frame, o, ca.x, ca.y, ca.z, d);
+            } else if (mask == -1) {
+                T2Port_AimCand(frame, o, o->header.m_vPos.x, o->header.m_vPos.y + 50.0f, o->header.m_vPos.z, d);
+            }
+        }
         if (d < bestD && mask == -1 && !aimBoxCentre(o, mask, &eye, &aim, &nodeMask)) {
             /* any target, no hit boxes drawn (yet): its position, 50 units up */
             aim = o->header.m_vPos;
