@@ -279,7 +279,7 @@ the host's typed `t2audio_world.c` writes it by name (`padFC`).
 
 ## Round 19, part h1: determinism under ASLR, the level-135 two paths fixed (branch names-R19_h1)
 
-STABILITY.md 13-h1. **The level-135 ASLR divergence is found and fixed**: the ground tilt that
+STABILITY.md 13. **The level-135 ASLR divergence is found and fixed**: the ground tilt that
 `CGameObjectInstance__Construct` builds for each level actor tests `m_AI.m_dwFlags & 0xC0000`
 before `CAI__Setup` writes it (the original game's uninitialised read, FIDELITY.md 9.2); the
 actors' block comes from `CCache__AllocateMemoryForDecompression`, not cleared, and on the host
@@ -310,7 +310,7 @@ from run to run. In 135 actor 41 (lying on a slope) got other bone matrices at i
 - `--legacy` (290,000 frames, `setarch -R`): END 2 (cinema 370 at 245,402), 5 totems, 2 lives lost in the City Totem as in round 18; md5 `281904eb…` (was `ecb9f9f2…`).
 
 Files: src/us/code/func_00205D7C.c, src/us/code/func_0021B95C.c, port/runtime/t2boot.c,
-port/game/t2det.c, docs/port/STABILITY.md (13-h1, 12.3 title). Next: re-tune the City Totem on
+port/game/t2det.c, docs/port/STABILITY.md (13, 12.3 title). Next: re-tune the City Totem on
 the new stream (lowest health 3); the round-18 g2 "third path" (before 38,997) did not show in
 this round's ASLR runs.
 

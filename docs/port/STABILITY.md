@@ -498,7 +498,7 @@ the driver's open returns, its read sees EOF and it exits with the game's code.
 `T2_AIM_OPEN_TIMEOUT=SECONDS` also SIGKILLs a game that has not opened the fifos after that long.
 Checked with `/bin/false` (exits 1 at once) and `sleep 30` with a 2 s timeout (killed, exit -9).
 
-### 12.3 The level-135 two paths (found in round 19: section 13-h1): what was known in round 18
+### 12.3 The level-135 two paths (found in round 19: section 13): what was known in round 18
 
 Method: `g2loop`-style batches of the default command to 84,000 frames (`T2_DET_LOG=1
 T2_DET_ACTORS=1 T2_DET_FROM=72000`), ASLR on, compared with a `setarch -R` reference (det md5
@@ -540,9 +540,9 @@ now gives the same stream).
   `0..maxSounds-1` as stopped; no det line changed. soak.py on the merged tree: 62 runs, 0
   crashes.
 
-## 13-h1. Round 19 (part h1): the level-135 two paths found and fixed (determinism under ASLR)
+## 13. Round 19 (part h1): the level-135 two paths found and fixed (determinism under ASLR)
 
-### 13-h1.1 The cause: the ground tilt reads uninitialised heap bytes
+### 13.1 The cause: the ground tilt reads uninitialised heap bytes
 
 `CGameObjectInstance__Construct` (func_00219BC0.c) sets `m_qGround =
 GameObject_GetGroundRotation(obj)` **before** `CAI__Setup`, and `GameObject_GetGroundRotation`
@@ -576,7 +576,7 @@ How it was found (switches used, the per-bone one not kept):
   `a6`, `a8`, `a9`), every one from the same matrix line at 75,663; the odds moved with the
   build (0 of 5 with one instrumented binary), which is why gdb runs never showed it.
 
-### 13-h1.2 The fix (asm_diff 0)
+### 13.2 The fix (asm_diff 0)
 
 - `CCache__AllocDecompressFlags` (the host form of `CCache__AllocateMemoryForDecompression`,
   func_00205D7C.c, `TARGET_PORT` only) **zeroes the block** it allocates. Every reader of
@@ -596,7 +596,7 @@ How it was found (switches used, the per-bone one not kept):
   (`BitAddr_FromPointer` keeps a base, func_00217B04.c); `EnemyAI_HeadNodeCallback` reads the host
   pose context correctly.
 
-### 13-h1.3 Proof
+### 13.3 Proof
 
 All runs Linux Release, PIE, `aimdrive.py`, each in its own directory (`T2_DET_LOG=1`; the
 scenario adds `T2_DET_ACTORS=1 T2_DET_FROM=72000`).
