@@ -3621,3 +3621,80 @@ start that had passed (`2a3eeaae…` to 212,100), and `--legacy` `ecb9f9f2…` (
 - **ASLR** (STABILITY.md 12.3): 10 runs of the new default to 84,000 with ASLR on: 7 give the
   `setarch -R` lines, 3 diverge in 135 (from 75,665 twice, from 75,739 once; the particle hash
   first). Not chased.
+
+## 39-h3. The Queen and the Primagen's lair by stick on the N64 stream, sister 2 on real weapons (Phase 7 round 19, part h3)
+
+The N64 stream (the default: no `T2_LEGACY_*`), Linux Release, PIE, under `aimdrive.py`, 300,000
+frames, each run in its own directory, the default command plus the options shown.
+
+### 39-h3.1 What the stick did wrong in the two boss arenas
+
+Round 18's combo `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` (no `--assist-keep`),
+measured again (run A, `setarch -R`): END 2 at 269,088, **3 lives lost**: one to the Mantid Queen
+(108 damage, 36 hits, lowest 7), two in the Primagen's lair (239 damage, 39 hits).
+
+- **The Queen** (`lv 2`, actor 4): the picker aimed at her for 5,136 of 12,191 aim frames; the rest
+  went to her mantids (ids 10000+, 20,480 health, -1 bites), to sleeping actors at full health (6, 1,
+  19, 24, 7) and to the cocoon-like candidates around the arena. Her own volleys (4 x -3/-4 within
+  ~90 frames, from ~450 units) did the damage; the fight lasted 11,500 frames (the assisted default:
+  ~6,000, its state 4 1,164 frames).
+- **The lair** (`lv 4`): the picker aimed at his spawns for 11,676 of 18,613 aim frames, at him
+  (actor 2) for 5,760. The damage is his melee (10s within ~400 units), his own shots (object 330)
+  and, for the second life, a fall (81 at once).
+- The fire was the driver's tap rhythm (6 of every 15 frames) where the assisted fights hold Z.
+
+### 39-h3.2 The fix: `T2_AIMD_BOSS` (aimdrive.py) and `--stick-boss` (fullrun.py)
+
+`T2_AIMD_BOSS=L[:R],...`: in sub-level L the stick aims only at the assist's point (the boss's
+damage node, `T2_AIM_NODE`), **led** by the point's own velocity over the shot's flight (PSPEED,
+`T2_AIMD_BOSS_LEAD`), unless a live candidate more than 300 units from the node comes within R of the
+player (default `T2_AIMD_BOSS_THREAT` 350, kind 0 `T2_AIMD_BOSS_THREAT0` 250): then the nearest such
+one, led, first. In those levels **Z is held while on target** (1.5 x the yaw tolerance, 2 x the pitch;
+`T2_AIMD_BOSS_HOLD=0`: the old taps). The exit line counts the frames given to a threat.
+
+`fullrun.py` writes `T2_AIMD_BOSS=2:150,4:350` (the Queen: only a mantid at 150 is shot first; the
+lair: a spawn within 350) for the `--stick-aim` levels 5 and 6 **on the N64 stream only**;
+`--legacy` writes nothing (every legacy combination's route files unchanged), `--stick-boss L,..`
+chooses the levels explicitly (`--stick-boss ""`: none). Test hooks `T2H3_QR`, `T2H3_LR` (the radii).
+
+| fight (run A -> A2) | aim frames on the boss | damage | lowest | lives |
+|---|---|---|---|---|
+| the Mantid Queen | 5,136 / 12,191 -> 9,943 / 11,864 (Z held 7,661) | 108 -> **43** | 7 -> 56 | 1 -> **0** |
+| the Primagen's lair | 5,760 / 18,613 -> 14,861 / 17,671 (spawns 11,676 -> 96) | 239 -> **120** | 1 -> 17 | 2 -> **0** |
+
+The Queen's fight is still long (10,700 frames): in her state 4 (4,180 frames, the assisted run
+1,164) she circles the player and the stick turns at its full rate with a 0.1-0.3 rad lag. A larger
+`T2_BOSS_FRONT` distance (a lower angular rate) is the next thing to try.
+
+### 39-h3.3 Runs
+
+| run | options added | result |
+|---|---|---|
+| D0 | (none: the default), `setarch -R` | END 2 at 250,566, 5 totems, 0 lives (the `death` at 264,664 is the new game after the credits): this part's binary = the merge's |
+| A | `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` before the fix | END 2 at 269,088, 3 lives (Queen 1, lair 2) |
+| **A2** | **`--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0`** | **END 2 at 269,088, 5 totems, 4 bosses, 0 lives lost** (the `death` at 283,186 is the new game after the credits); no `--assist-keep`, no `--legacy` |
+| A3 | A2 + `--lair-push both` | identical to A2 (132 frames answered against the push) |
+| A2r | A2 with ASLR on | identical to A2: every `hurt`, `death` and `progress` line (md5s `715381a1…`, `49be70a0…`, `02f1beb4…`) |
+
+Per fight in A2 (damage / lowest): the Harbor Totem 82/118, sister 1 154/46, sister 2 20/180, 135
+155/61, the City Totem 70/30, the Marsh Totem 74/126, the Cave Totem 73/127, the Blind One 42/85, the
+Hive Totem 47/99, **the Queen 43/56**, the Mother 63/137, **the lair 120/17** (the thinnest spot of the
+run). Against the assisted default (section 38.2): the Queen 6 -> 43, the lair 68 -> 120.
+
+### 39-h3.4 Sister 2 (and level 2) on real weapons: not yet
+
+`--real-weapons 1,2 --stick-aim 1,2,3,4,5,6 --hub-wait 0` (run B) on the N64 stream loses a life
+already in **133** (sister 1: 200 damage, 63 hits, the 10s from object 141 of owner type 102 while
+the player stands at the zombie spot, plus the 1s of object 265) and another in **134** (200 damage,
+128 hits: the 1s of object 265 from owner type 99 at up to ~1,000 units, at the start spot and at
+the gate). On the legacy stream e5 had 133 at 184 damage, no death (29.2); the N64 stream costs the
+last 16. **Only zombie 4, from the gate spot** (test hook `T2H3_134=gate`, `fullrun.py`: 134's two
+start steps moved to the gate, zombie 4 the assist's target and the stick's primary, `--upto 2`, run
+G1): worse. 200 damage by 56,563 (B: 63,683) and game over in 134: at the gate the zombie of type 102
+bites (35 melee hits, 10 of its 10s) while the type-99 shooters keep firing; zombies 2 and 3 come
+anyway. Not used by any route (the hook is off unless set).
+
+What is left for `--real-weapons 1,2` (all on the N64 stream): 133 needs ~20 more health or a
+shorter fight (N64_FULL_L2_PICKS are placed for the assisted route's steps, not `L2_133_REAL`'s);
+134 needs fewer frames in the open (the shooters of type 99) and ammo for zombie 4 (80 health); then
+135 and the City Totem on picked-up ammo (never tried on either stream).
