@@ -3621,3 +3621,119 @@ start that had passed (`2a3eeaae…` to 212,100), and `--legacy` `ecb9f9f2…` (
 - **ASLR** (STABILITY.md 12.3): 10 runs of the new default to 84,000 with ASLR on: 7 give the
   `setarch -R` lines, 3 diverge in 135 (from 75,665 twice, from 75,739 once; the particle hash
   first). Not chased.
+
+## 39-h5. Jumps and doors for the walker, the walks on the N64 stream (Phase 7 round 19, part h5)
+
+Tools only (`tools/port/nav.py`, `aimdrive.py`'s `WalkDrive`, `fullrun.py`'s walk parts,
+`navcands.py`); no `src/`/`include/`/`port/` change. **The default command and `--legacy --nav
+1,2,3,4` write byte-identical `playthrough.txt`, `teleport.env` and `fullrun.txt`** to 65ec98ec's
+(every new behaviour is opt-in), and the default run on this part's Release binary gives det md5
+`6213496b…` (600,000 lines, `setarch -R`), END 2 with no life lost.
+
+**1. Jump edges** (`nav.load(rom, sub, jumps=True)`, `nav.py ROM SUB A B --jumps`). Without
+`jumps` the mesh and every path are those of round 16 (checked on the 43 `NAV_WALKS` pairs: the
+same waypoints and regions). With it, two more kinds of link:
+
+- **jump**: a steep face whose top, or a non-steep neighbour whose floor, is between `STEP_UP` (30)
+  and `JUMP_UP` (90) over the feet at the shared edge (`Sweep_CrossRegionEdge` closes both);
+- **gap**: from a walkable region's border edge (no neighbour) to another walkable region's border
+  edge on its outer side, at most `GAP_MAX` (150) away in XZ, its floor at most `GAP_UP` (40) higher
+  and `GAP_DROP` (300) lower (`_gap_links`, a 256-unit grid over the border edges).
+
+Each costs `JUMP_COST` (300) on top of its length, so a path jumps only where the floor is much
+longer. A jump portal is the middle third of its edge (he takes off square to it); `path()` now
+returns a fourth element, the jumps `[(x, z, kind, edge)]` where the waypoint line crosses them.
+
+**The jump, measured** (the 57 walk below, det lines): R held gives `vy` = 319.1 (389.12 x the
+jump scale 0.82) as long as it is held (`PlayerJump_Update`: until R is released or
+`m_ModeTime` reaches 3.0), then gravity; with the walker's 8-frame press the feet rose **71
+units** (-1,536.0 to -1,464.8) and came down 32 frames later, ~230 units on at walking speed. So
+`JUMP_UP` 90 is optimistic for an 8-frame press: ledges of 70-90 need a longer press or are
+missed (the walker then recovers as when stuck); measure the longest hold next.
+
+**2. The walker jumps** (`T2_WALK_PLAN` entry `F1-F2@SUBj:X,Y,Z,ROTY`: the `j` plans with jump
+edges; `fullrun.py --nav-jumps` writes it). `WalkDrive` presses R (`r1`, with C-up and the stick
+still steering) for `WALK_JUMP_HOLD` (8) frames when a planned jump point is within
+`WALK_JUMP_AT` (70) and ahead; a jump point he walked past is dropped. Stuck with jumps on, every
+other recovery is a jump forward instead of the back-off and sidestep (small static objects and
+kerbs the mesh does not have). The report line counts "jumps planned, pressed".
+
+**3. Doors as nav data** (`nav.doors(rom, sub)`, `nav.py ROM SUB --doors`, `navcands.py`). A door
+is a level actor of instance type 0x641 (intelligence type 6). Its openers are the links records
+whose actor is the door (`levels.py parse_links`): a first-table record fires when its owning
+actor fires its triggers (head mask 1 its death, 0x4000 a door opening, 0x80000 an action's
+"go"; section 7), a second-table record when the player enters a region of that info; the key
+byte is the link group counted down. A door with no record opens as he comes. Examples (they
+match the doors earlier rounds found by hand):
+
+| sub | door | opens on |
+|---|---|---|
+| 53 | 85 (z 7,168: "a closed door across the power cell's alcove", e3) | actor 43's go (an action, type 0x648) |
+| 133 | 27 (x -1,546: "between the zombies' rooms", e3) | the deaths of zombies 9, 16, 17 (link group 14) |
+| 135 | 75 / 76 (the crypts) | the deaths of zombies 45 / 44 |
+| 135 | 60 (before sister 3) | actor 1's trigger 0x10000 (the platform, type 0x642) |
+| 135 | 62 / 63 (the graveyard gates) | the crypt switches 53-55 / the actions 48-50, 56 |
+
+`nav.doors_on(rom, sub, pts, y)` lists the doors within 110 units of a path: **47 of the default
+run's 196 paths under 8,000 units pass a door, 44 of them a door with an opener**. `WalkDrive`,
+stuck within 160 units of a door, now waits 30 frames facing it and walks on, instead of backing
+off and planning round it (a door is not an obstacle to go round: it opens); the report line
+names the doors waited at.
+
+**4. Measured on the N64 stream** (the default; `navcands.py` over the default run's log, by game
+level; "path" = the mesh joins the two ends in under 8,000 units):
+
+| level | teleports | path (round 16 mesh) | path with jumps | no path, mesh | no path, with jumps |
+|---|---|---|---|---|---|
+| the hub and the rest | 86 | 69 | 69 | 2 | 0 |
+| 1 | 33 | 9 | 11 | 18 | 13 |
+| 2 | 75 | 46 | 48 | 20 | 16 |
+| 3 | 38 | 20 | 22 | 8 | 4 |
+| 4 | 24 | 17 | 17 | 2 | 2 |
+| 5 | 27 | 10 | 10 | 9 | 9 |
+| 6 and the lair | 31 | 17 | 19 | 8 | 7 |
+| all | **314** | 188 | **196** | 67 | **51** |
+
+(The default route has 314 teleports on the N64 stream; round 16's 289 were the legacy route's.)
+
+**The probe** (`--nav 1,2,3,4 --nav-only` all 42 walks of `NAV_WALKS` `--nav-jumps --walk-probe`,
+the default stream, to frame 126,000): **10 arrive** (57's walk on a 2,199-unit path with one
+jump instead of round 16's 5,816 units; 133 (6, 0); 134's two in-place steps and (9, 3); 135
+(12, 1) and one later crypt walk; 70 (6, 1) and (6, 2); 66 (9, 3)). The others stop where round 16
+found: the crypts' and graves' walls in 135 (static objects: the mesh has no walls there; jumps
+do not help), the cages and the alcove door in 53/54 (doors with openers that have not fired at
+that time), and level 3's walks that start while a warp or cinema moves him.
+
+**5. The walks in the full default run.** Every walk changes the state the next fights start
+from (positions, the footstep sounds' random draws), and the N64 route's thinnest spot is 135's
+crypt and sister 3 (lowest health 14):
+
+| walks (`--nav L --nav-only ... --nav-jumps`) | result |
+|---|---|
+| `2:12.1` (135, 719 units: round 16's one kept walk) | arrives (error 49); **a life lost in 135 at ~74,500** |
+| `2:12.1` with `--nav-pad` 15, 30, 45, 60, 90 (idle frames after the walk) | the same: a life lost in 135 (74,500-77,700) |
+| `1:7.1` (57, one jump) with `--nav-pad` 0, 50 | arrives (error 64); lives lost in 51/135 (79,500, 91,500; 84,000) |
+| `3:6.1,3:6.2` (70) | the walk starts elsewhere (level 3's warps: 4,779 units planned, not 834 as in the probe), does not arrive; a life lost in 70 at 103,500 |
+| `3:9.3` (66) | does not arrive (it waited 90 frames at door 50); a life lost in 61 at 123,000 |
+
+`--nav-pad F` (new) adds F idle frames after each walk window (the later steps move by them too):
+the knob `--hub-wait` is for level 2. Each try ran until its first life lost (a loop over the
+`state:` lines that SIGKILLs that game), so a failed try cost 2-3 minutes.
+
+**Teleports per level, before and after** (the default command): **314 before, 314 after**: no walk survives
+the fights that follow it on the N64 stream, so the default keeps every teleport (all the new
+behaviour is behind `--nav-jumps`, `--nav-pad` and the `j` plan suffix). `--nav 1,2,3,4` with
+`--legacy` keeps round 16's one walk (288 of 289), its route files unchanged.
+
+**Why the rest remain**: no path even with jumps (51: climbs, warps, water and region-flag splits);
+walls that are static objects (135's crypts and graves, the cages); doors whose opener fires later
+than the walk (the route teleports past them while the fight that opens them is still on); level
+3's anchors (a walk must start after the warp's cinema); and above all **the fights after each
+walk** (levels 1-4 without invincibility): a walk that arrives still has to be paid for by
+re-tuning every fight that follows it, and 135's crypt does not survive any change before it on
+the N64 stream.
+
+**Next**: the longest jump press and `JUMP_UP` from it; static-object walls in the mesh (the
+crypts) instead of `T2_NAV_BOXES`' broad-phase boxes; walks after 135 (hub legs, levels 4-6) with
+a fight re-tune per walk; the route waiting at a door until its opener has fired (the doors table
+gives the actor).

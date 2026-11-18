@@ -277,6 +277,53 @@ the host's typed `t2audio_world.c` writes it by name (`padFC`).
    sound player's array: the host now treats it as stopped, section 3; `n64trace.py --calls
    alSndpGetState` would show the value it reads).
 
+## Round 19, part h5: jumps and doors for the walker, the walks on the N64 stream (branch names-R19_h5)
+
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 39-h5. Tools only (no `src/`, `include/` or `port/`
+change, no asm_diff needed). **The default command and `--legacy` write byte-identical
+`playthrough.txt`, `teleport.env` and `fullrun.txt` to 65ec98ec's tools** (so do `--legacy --nav
+1,2,3,4`); every new behaviour is opt-in.
+
+- **Jump edges in the mesh** (`nav.load(rom, sub, jumps=True)`, `nav.py ... --jumps`): ledges (a
+  steep face or a higher floor 30-90 over the feet) and gaps (a border edge to another floor's
+  border edge across at most 150 units, 40 up to 300 down), each costing 300. Without `jumps` every
+  path is round 16's (checked on all 43 `NAV_WALKS` pairs). On the default run's 314 teleports, the
+  pairs the mesh joins in under 8,000 units go from 188 to **196**, "no path" from 67 to **51**.
+- **The walker jumps**: a `T2_WALK_PLAN` entry `F1-F2@SUBj:...` (`fullrun.py --nav-jumps`) plans
+  with jumps; `WalkDrive` presses R (`r1`) 8 frames at each planned jump and tries a jump forward
+  on every other stuck recovery. Measured: an 8-frame press lifts the feet **71 units** (vy 319.1 =
+  389.12 x jump scale 0.82, held while R is held, up to `m_ModeTime` 3.0); `JUMP_UP` 90 is
+  optimistic for that press (next: the longest press).
+- **Doors as nav data** (`nav.doors`, `nav.py ROM SUB --doors`): the type-0x641 actors and what
+  opens each (its links records: an actor's death / door opening / action "go", or a region info;
+  the link group counted down); they match the doors earlier rounds found by hand (53's alcove door
+  85: action 43; 133's door 27: zombies 9/16/17; 135's crypts 75/76: zombies 45/44). 44 of the
+  default run's paths pass a door with an opener (`navcands.py` names them). `WalkDrive` waits at a
+  door (30 frames, then on) instead of going round it.
+- **`fullrun.py --nav-pad F`**: F idle frames after each walk window (a re-tuning knob).
+- **The walks on the N64 stream**: the probe (`--nav 1,2,3,4 --nav-only` all `--nav-jumps
+  --walk-probe`, to 126,000) has **10 of 42 arriving** (57's on a 2,199-unit path with a jump
+  instead of 5,816). In the full default run **none survives the fights after it**: 135's (12, 1)
+  (round 16's kept walk) arrives but a life is lost in 135 at ~74,500 with pads 0, 15, 30, 45, 60,
+  90; 57's (7, 1) arrives, lives lost after; level 3's start elsewhere and do not arrive. **Teleports:
+  314 before, 314 after** (PLAYTHROUGH.md 39-h5 has the table per level and the reasons).
+
+**Validated** (Linux Release, PIE, this branch's binary, `aimdrive.py`, `setarch -R`): the
+default command: END 2, no life lost, det md5 `6213496b…` (600,000 lines) VALIDATION
+
+**For the merge**: tools/port/nav.py (`links()` now returns `(j, edge, extra, kind)`; `astar()`
+returns `[(region, link)]`; `path()` returns a 4th element, the jumps; `load(rom, level,
+jumps=False)`; new `doors`, `opener_text`, `doors_on`, `seg_cross`), tools/port/aimdrive.py
+(`WalkDrive` and the `WALK_*` constants only; `walk_plan` entries carry a 5th element, the jumps
+flag), tools/port/fullrun.py (`NAV_JUMPS`, `NAV_PAD`, `walk_to`'s sub string, the `T2_WALK_PLAN`
+format `%s`, cli `--nav-jumps`, `--nav-pad`), tools/port/navcands.py (`--jumps`, `--level`, the
+doors). h3 edits aimdrive.py's Picker/AimDrive and fullrun.py's weapons/aim parts: no overlap
+expected beyond the global `cli()` line.
+
+**Next**: the longest jump press (then `JUMP_UP`); static-object walls in the mesh (135's crypts
+and graves); a route that waits at a door until its opener has fired; walks only after 135 (the
+N64 route's thinnest spot), each with a re-tune of the fights after it.
+
 ## Round 18, part g2: address-layout determinism, the gptr checker, the fifo watchdog (branch names-R18_g2)
 
 - **A layout-dependent branch found and fixed** (STABILITY.md 12.1): the three N64 stack-depth
