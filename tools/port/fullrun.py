@@ -1091,6 +1091,7 @@ L2_133_REAL = [
     (6050, -847.0, -4761.6, 1574.0, 3.1416, 0, {"fire": 1900, "aim": "enemy:20"}),
     (8000, 827.5, -4761.6, -1627.5, -2.8692, 150, {}),    # warp 2615 -> 130
 ]
+L2_134_GATE = os.environ.get("T2H3_134") == "gate"   # round 19 h3: DEBUG-ONLY test hook (see main_all)
 L2_134_FIRE_R = 450     # round 17 f5: 134's fire range in a --real-weapons 2 run (T2_FIRE_GATE, T2_AIMD_FIRE_MAX)
 L2_STRETCH_REAL = [(6, 6, 3000), (9, 3, 2000), (12, 15, 2000)]
 
@@ -1185,6 +1186,15 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         l2segs[6] = (name, rel, L2_133_REAL)
         l2stretch = L2_STRETCH_REAL
         l2segs = with_taps(l2segs, L2_TAPS)
+        if L2_134_GATE:
+            # round 19 h3 (--l2-134 gate): only zombie 4 (it holds gate 8's key 7) is fought: from the segment's
+            # start at the gate spot, zombie 4 the assist's (and the stick's primary) target; zombies 2 and 3 are
+            # shot only when they come within the fire range. Then sister 2 and the exit as before.
+            name, rel, steps = l2segs[9]
+            gate = steps[2]
+            l2segs[9] = (name, rel, [st[:1] + tuple(gate[1:6]) + (dict(st[6], aim="enemy:4"),) for st in steps[:2]] +
+                         list(steps[2:]))   # the step count kept (L2_STRETCH_REAL, the retries index them)
+            STICK_PRIMARY[2] = tuple(STICK_PRIMARY.get(2, ())) + (134,)
         r.extra_env.append("T2_AIM_SKIP_TYPES=6")
         # round 17 f5: in 134 the zombies walk up from 1,700 units: no fire beyond 450 (the mag 60 emptied
         # on zombie 2 from afar); the stick driver's own fire likewise (T2_AIMD_FIRE_MAX)
