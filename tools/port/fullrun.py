@@ -1111,6 +1111,15 @@ L2_134_FIRE_R = 450     # round 17 f5: 134's fire range in a --real-weapons 2 ru
 L2_STRETCH_REAL = [(6, 6, 3000), (9, 3, 2000), (12, 15, 2000)]
 
 
+# Round 20 i2 (--real-weapons 2 on the N64 stream): sisters 1 and 2 now pass without a death (133: 165 damage, lowest
+# 35; 134: 174, 26) but 135 is entered with no ammo left (weapon 0, the talons: 270 damage, a life). 132's ammo cache on
+# its east floor (y 409.6; tools/assets/levels.py objects 519 bullets, 521 shells, 534) at the start of 132's first visit
+# (segment 11, before soul gate 2), approach angles by itemreach.py; 135's graveyard zombies on the shotgun
+N64_L2_ARMS = {11: [(4117.3, 409.6, -3879.0, 2.3562), (3930.6, 409.6, -4099.4, 1.1781), (4226.8, 409.6, -3518.3, 1.5708)]}
+N64_L2_TAPS = {(12, 1): 8}
+N64_L2_135_HOLD = os.environ.get("T2I2_135HOLD", "1") != "0"
+
+
 def with_taps(segs, taps):
     out = []
     for i, (name, rel, steps) in enumerate(segs):
@@ -1200,7 +1209,14 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         l2segs = list(l2segs)
         l2segs[6] = (name, rel, L2_133_REAL)
         l2stretch = L2_STRETCH_REAL
-        l2segs = with_taps(l2segs, L2_TAPS)
+        l2segs = with_taps(l2segs, {**L2_TAPS, **(N64_L2_TAPS if n64_full() else {})})
+        if n64_full() and N64_L2_135_HOLD:
+            # round 20 i2: 135's graveyard zombies (step 1) are not shot: the shells are kept for the crypt zombies
+            # 45 and 44 (the keys) and sister 3 (DEBUG-ONLY test hook T2I2_135HOLD=0: fire as before)
+            name, rel, steps = l2segs[12]
+            st = list(steps[1])
+            st[6] = {k: v for k, v in st[6].items() if k not in ("fire", "aim")}
+            l2segs[12] = (name, rel, list(steps[:1]) + [tuple(st)] + list(steps[2:]))
         if L2_134_GATE:
             # round 19 h3 (--l2-134 gate): only zombie 4 (it holds gate 8's key 7) is fought: from the segment's
             # start at the gate spot, zombie 4 the assist's (and the stick's primary) target; zombies 2 and 3 are
@@ -1223,7 +1239,8 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     heal = 0
     if L2_HEAL:   # round 17 f5 (after f1's picks: these go before 135's exit step)
         l2segs, heal = l2_heal(l2segs)
-    a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, N64_FULL_L2_HEALTH if h2 and n64_full() else {}, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {}) if extras else {},
+    a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, N64_FULL_L2_HEALTH if h2 and n64_full() else {}, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {},
+                                                       N64_L2_ARMS if 2 in real and n64_full() else {}) if extras else {},
                         l2retry, l2stretch,
                         back=l2back, detours=det.get(2),
                         walks=nav_table(2) if 2 in NAV else L2_WALKS if 2 in walk else None, nav_walks=2 in NAV)
@@ -1400,9 +1417,10 @@ PRIMAGEN_KEY = "4@%d"   # the anchor on his lair
 
 
 # Round 20 i2 (the N64 stream, --stick-aim 5): 91's ultra health (object 548, level actor at (-3123.2, 577.2, 460.8),
-# floor 614.4: itemreach.py's approach angles -2.75..-0.39) on 91's last visit, before the exit 7500 (segment 17 of
+# floor 614.4, on a ledge tip: -921 within 10-30 units past it in every direction, so no walk: the stand point 45 units
+# out is inside its radius (71); a 90-unit stand and a 50-frame walk fell into the pit) on 91's last visit, before the exit 7500 (segment 17 of
 # l5_with_primagen_key()): the Hive Totem and the Mantid Queen with up to 200. T2I2_L5H=0 leaves it out (DEBUG-ONLY)
-L5_STICK_HEALTH = (17, (-3123.2, 614.4, 460.8, -1.5708, 90, 50)) if os.environ.get("T2I2_L5H", "1") != "0" else None
+L5_STICK_HEALTH = (17, (-3123.2, 614.4, 460.8, -1.5708, 60, 6)) if os.environ.get("T2I2_L5H", "1") != "0" else None
 
 
 def level5(r, t):
@@ -1434,7 +1452,9 @@ def level5(r, t):
     r.anchors.append((s + L5_QUEEN_AT + add, 2))
     r.note(s + rel + add, "2 the Mantid Queen: fire held, T2_AIM_NODE=boss@2, T2_BOSS_FRONT=450,200")
     r.inputs.append("Z@%d..%d" % (s + rel + add, s + rel + add + length))
-    r.boss_front.append((s + rel + add - 100, N64_QUEEN_FRONT if n64_full() else "450,200"))
+    # (a --stick-aim 5 run keeps 450: the stick misses her small spot box from farther, state 4 1,272 frames at 450,
+    # 7,458 at 600)
+    r.boss_front.append((s + rel + add - 100, N64_QUEEN_FRONT if n64_full() and 5 not in STICK_AIM else "450,200"))
     hub_at = s + L5_HUB_AFTER + add
     r.level_start[6] = hub_at
     r.shake_switch[6] = hub_at
