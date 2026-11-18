@@ -683,6 +683,8 @@ class Generator:
         self.func_refs = set()
         self.ext_funcs = set()
         self.int_addr = collections.Counter()  # integer leaves that hold an address
+        self.int_targets = set()  # the addresses they hold (add_int_targets)
+        self.int_target_syms = []  # the symbols add_int_targets made for them
         self.bss_slack = []   # .bss byte views given twice their N64 size
         self.bss_tails = []   # typed .bss structs that data points past (grow_bss_tails)
         self.ptr_offs = []    # (target, N64 offset) of every relocated pointer with an offset
@@ -731,8 +733,49 @@ class Generator:
         while i < len(self.queue):
             self.layout(self.queue[i])
             i += 1
+        self.add_int_targets()
+        while i < len(self.queue):
+            self.layout(self.queue[i])
+            i += 1
         self.resolve_aliases()
         self.grow_bss_tails()
+
+    def add_int_targets(self):
+        """(round 20 i1) The ROM data an integer slot holds the address of (a menu item's s32
+        data: its text) is reached on the host only through t2_n64_to_host (relocs.c), which
+        knows the generated symbols. Rodata with no label of its own (the strings at 0x800B5EB0:
+        "single", "new game", "load", "multi", ...; the cheat keyboard's letters at 0x800C134C)
+        was never generated, so those menu items drew no text. Each such address that no
+        generated symbol covers gets one: D_<address>, raw bytes up to the next label."""
+        covered = sorted((t.key, t.key + max(t.nsize, 1)) for t in self.syms.values()
+                         if not t.bss and t.alias_of is None)
+        los = [c[0] for c in covered]
+
+        def is_covered(k):
+            j = bisect.bisect_right(los, k) - 1
+            return j >= 0 and k < covered[j][1]
+
+        for v in sorted(self.int_targets):
+            k = phys(v)
+            if is_covered(k):
+                continue
+            r = self.elf.section_of(k)
+            if r is None or r[3] not in ABS_DATA_SECTIONS:
+                continue
+            names = [n for n in self.elf.at.get(k, []) if c_ident_ok(n) and self.elf.syms[n][3] != 'STT_FUNC']
+            if names:
+                name = names[0]
+            else:
+                name = 'D_%08X' % v
+                self.elf.syms[name] = (v, 0, r[3], 'STT_OBJECT')
+                bisect.insort(self.elf.keys, k)
+                self.elf.at[k].append(name)
+            t = self.add(name, None, 'int target')
+            self.int_target_syms.append(name)
+            hi = k + self.elf.extent(k)
+            j = bisect.bisect_right(los, k)
+            los.insert(j, k)
+            covered.insert(j, (k, hi))
 
     def grow_bss_tails(self):
         """A typed .bss struct that data points PAST (gCinemaPlayerP = gBlindOne + 0x560: the
@@ -950,6 +993,7 @@ class Generator:
                             ptrs.append((hoff, iv, None))
                             continue
                         self.int_addr[s.name] += 1
+                        self.int_targets.add(iv)
                 if extra == 'f' or ns == hs:
                     img[hoff:hoff + hs] = v[::-1] if ns > 1 else v
                 else:  # int widened (long): sign/zero extend
@@ -1307,6 +1351,8 @@ class Generator:
             P("  %s: 0x%X -> 0x%X" % (nm, a, b))
         P('aliases inside another symbol: %d' % sum(1 for s in ss if s.alias_of))
         np = sum(1 for s in ss for it in s.items if it[1] == 'P')
+        P('unlabelled ROM data an integer slot holds the address of (add_int_targets): %d: %s' % (
+            len(self.int_target_syms), ' '.join(self.int_target_syms)))
         P('pointer slots: %d (relocated %d, null %d, unresolved %d)' % (
             np, sum(1 for s in ss for it in s.items if it[1] == 'P' and it[2]),
             sum(1 for s in ss for it in s.items if it[1] == 'P' and not it[2]) - sum(self.unresolved.values()),
