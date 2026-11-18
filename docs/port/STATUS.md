@@ -332,6 +332,32 @@ every run). `mpk_saves.py` on the default run's pak: note 1, checksum OK.
 | 80c77b42 | RENDER.md 8-i3, BYTEORDER.md |
 | 8f78322a | FIDELITY.md 13-i3 |
 | (last) | this section |
+## Round 20, part i5: the sound against the N64, the resampler (branch names-R20_i5; AUDIO.md 12, FIDELITY.md 13-i5)
+
+- **The N64's audio, recorded**: `refshots.py --audio-dump OUT.raw` (any run: power-on, `--input`,
+  `--start-warp`) attaches `tools/port/n64audiodump.c` as mupen64plus's audio plugin: OUT.raw is
+  the AI stream (stereo s16 LE, 22,048 Hz), OUT.raw.txt the samples/mode/level/gf per emulator
+  frame. The port's `--wav W` now also writes `W.txt` (samples/mode/gf per frame).
+  `tools/port/audiocmp.py N64.raw PORT.wav --n64-from S --port-from S --len S --windows S` lines
+  them up and compares; `tools/port/sndpcmp.py` compares sound player events (`T2_SNDP_LOG=2`, new:
+  every play/stop/pan/vol/pitch/fx with its target, vs `n64trace.py --calls alSndp...`).
+- **Host bug fixed**: `A_RESAMPLE` (port/audio/t2asp.c) used a Catmull-Rom spline; the microcode's
+  64-phase, 4-tap table is in the ROM (0xC0C10, aspMain data + 0xC0) and now drives it: the port
+  was 2 dB too bright at 2.7-5.5 kHz and 4 dB at 5.5-11 kHz. `audio_compare.py` filters its
+  reference the same way (sounds 0 and 40: max difference 0).
+- **Compared** (AUDIO.md 12.3): the title music (-0.03 dB, waveform corr 0.96), the boot cinemas,
+  demo 1, the level-53 start (0.99; +1 dB = a random ambient volume), the hub (+0.07 dB, bands
+  within 0.1 dB), the lair (+0.42 dB), the title menu's cursor sounds. No sound kind missing or
+  extra at the level-53 start (62 / 64 plays in 520 game frames, same slots).
+- **Runs**: the default command on this branch's Release binary: END 2 at 255,080, 0 lives lost,
+  det md5 **`0959aac5…`** (600,000 lines), unchanged (audio runs only with `--audio`; the full run
+  has none, so nothing in this branch can move a det line). **`--legacy`**: END 2, 2 lives lost (as
+  documented), its first 580,000 det lines md5 `281904eb…` (= round 19's).
+- Open: the title menu's cursor sound has no N64 reference (the emulator's input did not move the
+  cursor); see AUDIO.md 12.3, 12.6.
+- Files: `port/audio/t2asp.c`, `port/audio/t2audio_sndp.c`, `port/app/game.cpp` (the `--wav`
+  sidecar), `tools/port/{refshots.py,n64audiodump.c,audiocmp.py,sndpcmp.py,audio_compare.py}`,
+  docs. No src/ or include/ change.
 
 ## Round 19, part h1: determinism under ASLR, the level-135 two paths fixed (branch names-R19_h1)
 

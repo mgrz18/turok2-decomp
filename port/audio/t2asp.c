@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "t2audio.h"
+#include "t2port.h" /* t2_rom: the microcode's resample table */
 
 enum {
     A_SPNOOP = 0,
@@ -245,6 +246,30 @@ static void cmd_envmixer(uint32_t w0, uint32_t w1) {
     memcpy(ram(w1), &s, sizeof s);
 }
 
+/* A_RESAMPLE's filter (round 20 i5): the microcode's own 64-phase, 4-tap table, in the ROM in
+ * aspMain's data (aspMainDataStart 0x800BFF50 = ROM 0xC0B50, + 0xC0; big-endian Q15, phase 0 =
+ * 0x0C39 0x66AD 0x0D46 0xFFDF). Before, a Catmull-Rom spline stood in for it: the same timing,
+ * but 2-4 dB more energy above 2.7 kHz than the N64 (AUDIO.md 12). Catmull-Rom stays the
+ * fallback when the ROM image has no such table. */
+#define ASP_RESAMPLE_LUT_ROM 0xC0C10u
+static int16_t sLut[64 * 4];
+static int sLutState; /* 0 unread, 1 the ROM's, -1 none (Catmull-Rom) */
+
+static void load_lut(void) {
+    size_t n = 0;
+    const uint8_t *rom = t2_rom(&n);
+    int i;
+    sLutState = -1;
+    if (rom == NULL || n < ASP_RESAMPLE_LUT_ROM + sizeof sLut)
+        return;
+    for (i = 0; i < 64 * 4; i++)
+        sLut[i] = (int16_t)((rom[ASP_RESAMPLE_LUT_ROM + 2 * i] << 8) | rom[ASP_RESAMPLE_LUT_ROM + 2 * i + 1]);
+    if (sLut[0] == 0x0C39 && sLut[1] == 0x66AD && sLut[2] == 0x0D46 && sLut[3] == (int16_t)0xFFDF)
+        sLutState = 1;
+    else
+        fprintf(stderr, "t2asp: no resample table at ROM %X: Catmull-Rom instead\n", ASP_RESAMPLE_LUT_ROM);
+}
+
 /* A_RESAMPLE: state = the last 4 input samples + the 16-bit fraction (own layout) */
 static void cmd_resample(uint32_t w0, uint32_t w1) {
     unsigned flags = (w0 >> 16) & 0xFF;
@@ -255,6 +280,8 @@ static void cmd_resample(uint32_t w0, uint32_t w1) {
     uint32_t pos, consumed, need;
     const int16_t *in = D16(sIn);
     int16_t *out = D16(sOut);
+    if (sLutState == 0)
+        load_lut();
     if (flags & A_INIT)
         memset(st, 0, sizeof st);
     else
@@ -273,14 +300,20 @@ static void cmd_resample(uint32_t w0, uint32_t w1) {
         if (idx + 3 >= 4 + need)
             idx = 4 + need - 4;
         s0 = tmp[idx], s1 = tmp[idx + 1], s2 = tmp[idx + 2], s3 = tmp[idx + 3];
-        /* Catmull-Rom between s1 and s2 */
-        a = -s0 + 3 * s1 - 3 * s2 + s3;
-        b = 2 * s0 - 5 * s1 + 4 * s2 - s3;
-        cc = -s0 + s2;
-        v = (int64_t)a * f >> 16;
-        v = (v + b) * f >> 16;
-        v = (v + cc) * f >> 16;
-        out[i] = sat16((int32_t)((v >> 1) + s1));
+        if (sLutState > 0) {
+            /* the RSP: the phase is the fraction's top 6 bits, the taps' Q15 sum >> 15, clamped */
+            const int16_t *l = sLut + ((f & 0xFC00) >> 8);
+            out[i] = sat16((s0 * l[0] + s1 * l[1] + s2 * l[2] + s3 * l[3]) >> 15);
+        } else {
+            /* Catmull-Rom between s1 and s2 */
+            a = -s0 + 3 * s1 - 3 * s2 + s3;
+            b = 2 * s0 - 5 * s1 + 4 * s2 - s3;
+            cc = -s0 + s2;
+            v = (int64_t)a * f >> 16;
+            v = (v + b) * f >> 16;
+            v = (v + cc) * f >> 16;
+            out[i] = sat16((int32_t)((v >> 1) + s1));
+        }
         pos += inc;
     }
     consumed = pos >> 16;
