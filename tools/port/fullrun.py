@@ -201,6 +201,8 @@ class Route:
             prim = sorted(set(l for lv in STICK_AIM for l in STICK_PRIMARY.get(lv, ())))
             if prim:
                 env.append("T2_AIMD_PRIMARY=%s" % ",".join(str(l) for l in prim))
+            if 6 in STICK_AIM:   # round 18 g5: the Mother's parts: always the assist's node (aimdrive.py)
+                env.append("T2_AIMD_PRIMARY_ONLY=3")
         if self.move_drive:
             env.append("T2_MOVE_DRIVE=\"%s\"" % ";".join("%d-%d" % w for w in sorted(self.move_drive)))
         if self.walk_plan:   # round 16 e3: aimdrive.py's waypoint walker (WalkDrive)

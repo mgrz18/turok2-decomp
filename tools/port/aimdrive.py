@@ -184,6 +184,10 @@ PRIMARY_X = envf("T2_AIMD_PRIMARY_X", 0.2)
 PRIMARY_R = envf("T2_AIMD_PRIMARY_R", 600.0)
 # ... and when that candidate is chosen, the aim point is the assist's own point (T2_AIM_NODE's node: the Queen's
 # body origin is never hurt, her node is; s6c: 11,100 frames and a life at the Queen aiming at the origin)
+# round 18 g5: T2_AIMD_PRIMARY_ONLY=L[,L...]: in level L the stick aims at the assist's point whenever there is one (the
+# Mother: her parts are nodes 900-1,500 units from both candidate origins; aimed at the origins her six parts took
+# 5,400 frames instead of 2,000 while she hit the pinned player every ~80: 307 damage, 2 lives in s6d)
+PRIMARY_ONLY = {int(v) for v in os.environ.get("T2_AIMD_PRIMARY_ONLY", "").split(",") if v.strip()}
 CAND_EVERY = int(envf("T2_AIMD_CAND_EVERY", 50))   # --stats: the candidates every this many frames
 
 
@@ -250,6 +254,8 @@ class Picker:
 
     def pick(self, frame, px, pz, ry, ex, ey, ez, pitch, cands, primary, lv=None, totem=None):
         acc = lv in IMMUNE_ACC
+        if lv in PRIMARY_ONLY and primary is not None:
+            return primary, None
         if not cands:
             self.cur = None
             return primary, None
@@ -428,8 +434,10 @@ class LairDrive:
         # "toward": C-up/strafe towards him while he pushes; "jump": the jump (r1) held from PUSH_JUMP_AT
         # frames into the mode (in the air the push is a quarter); "both".
         self.push = os.environ.get("T2_LAIR_PUSH", "")
-        self.push_at = int(os.environ.get("T2_LAIR_PUSH_JUMP_AT", "8"))
-        self.push_len = int(os.environ.get("T2_LAIR_PUSH_LEN", "40"))
+        # (measured, f37: the velocity jumps to ~1,000 64 frames after the mode starts, and the player leaves
+        # the floor ~90 frames later; the keep-away rule had walked him away from him, towards the edge)
+        self.push_at = int(os.environ.get("T2_LAIR_PUSH_JUMP_AT", "55"))
+        self.push_len = int(os.environ.get("T2_LAIR_PUSH_LEN", "110"))
         self.pushes = 0        # frames answered by the push rule
         self.bm = None         # (his mode, the frame it started)
         self.jump = False      # this answer's r1
