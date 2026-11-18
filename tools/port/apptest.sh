@@ -6,13 +6,16 @@
 # folder, and play mode starts a new game from the title with the virtual gamepad (--pad-test,
 # --offscreen-gl). Prints the dylibs loaded from outside macOS (all must be the bundle's) and the
 # last engine modes (11 = in level 51).
+# Round 20 (i4): ARCHIVE and ROM "-" = the bundle carries them (mkapp.sh T2_APP_ARCHIVE/T2_APP_ROM):
+# nothing is put in the Application Support folder, play mode must find them in Contents/Resources.
 set -u
 APP=${1:?usage: apptest.sh APP ARCHIVE ROM WORK}; ARC=${2:?}; ROM=${3:?}; W=${4:?}
 mkdir -p "$W" && W=$(cd "$W" && pwd)
 T="$W/My Games"; H="$W/home"; S="$H/Library/Application Support/turok2"
 rm -rf "$T" "$H"; mkdir -p "$T" "$S"
 cp -R "$APP" "$T/Turok 2.app"
-cp "$ARC" "$S/turok2.o2r"; cp "$ROM" "$S/baserom.us.z64"
+[ "$ARC" = - ] || cp "$ARC" "$S/turok2.o2r"
+[ "$ROM" = - ] || cp "$ROM" "$S/baserom.us.z64"
 printf '%s\n' "4400 btn START down" "4404 btn START up" "4500 btn SOUTH down" "4504 btn SOUTH up" \
     "4700 btn SOUTH down" "4704 btn SOUTH up" "4800 btn SOUTH down" "4804 btn SOUTH up" > "$H/pad.txt"
 EXE="$T/Turok 2.app/Contents/MacOS/turok2"
@@ -27,5 +30,6 @@ env -i HOME="$H" PATH=/usr/bin:/bin sandbox-exec -p "$SB" "$EXE" --play --offscr
     --pad-test "$H/pad.txt" > "$H/out.txt" 2> "$H/err.txt"
 rc=$?
 echo "play mode: exit $rc, $(($(date +%s) - start)) s, stdout $(wc -c < "$H/out.txt") bytes"
+grep -h "^files: " "$S/logs/turok2-stdout.log"
 grep -h "engine mode" "$S/logs/turok2-stdout.log" | tail -2
 exit $rc

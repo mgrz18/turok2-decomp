@@ -38,9 +38,10 @@ void T2Controls_PollHotplug();
 
 // The player's settings (round 15 d4), CVars in turok2.cfg.json: gT2MouseSensitivity (2.0 stick
 // units per pixel), gT2MouseInvertY (0), gT2MouseDeadZone (3), gT2StickInvertY (0: the pad's
-// look in a level), gT2ShowControlsAtStart (1: the controls table in the log at start).
-// Registers them (save: and writes the config) and prints them.
-void T2Controls_RegisterSettings(bool save);
+// look in a level), gT2ShowControlsAtStart (1: the controls table in the log at start; and, with
+// firstLaunchBox (play mode, a real window), the F1 box once at the first launch, remembered as
+// gT2ControlsShown 1). Registers them (save: and writes the config) and prints them.
+void T2Controls_RegisterSettings(bool save, bool firstLaunchBox = false);
 
 // Every controller read, port 1, before the mouse: gT2StickInvertY (inLevel: engine mode 11).
 void T2Controls_Look(int8_t* sy, bool inLevel);

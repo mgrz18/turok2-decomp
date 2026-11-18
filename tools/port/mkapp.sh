@@ -17,14 +17,18 @@
 # has no arguments: the game starts in play mode (a window, sound, real time); the config, the
 # logs and the Controller Pak are in ~/Library/Application Support/turok2.
 #
-# Env: T2_APP_VERSION (CFBundleShortVersionString, default 0.15), T2_APP_BUILD (CFBundleVersion,
-# default 15), T2_APP_ZIP=1 (also Turok2-VERSION-macos-arm64.zip next to the app, made with
+# Env: T2_APP_VERSION (CFBundleShortVersionString, default 0.20), T2_APP_BUILD (CFBundleVersion,
+# default 20), T2_APP_ZIP=1 (also Turok2-VERSION-macos-arm64.zip next to the app, made with
 # ditto so the signature survives).
+# Round 20 (i4), a ready-to-play copy for your own Mac: T2_APP_ARCHIVE=turok2.o2r and
+# T2_APP_ROM=baserom.us.z64 copy your game files into Contents/Resources before the signature (so
+# it stays valid); play mode then uses the bundle's files first. Such a bundle holds your ROM:
+# never zip it to give away (T2_APP_ZIP is refused with them).
 set -e
 B=${1:?usage: mkapp.sh BUILD_DIR [APP]}
 APP=${2:-$(dirname "$B")/Turok2.app}
-VER=${T2_APP_VERSION:-0.15}
-BUILD=${T2_APP_BUILD:-15}
+VER=${T2_APP_VERSION:-0.20}
+BUILD=${T2_APP_BUILD:-20}
 [ -x "$B/app/turok2" ] || { echo "mkapp.sh: $B/app/turok2 not built" >&2; exit 1; }
 [ -f "$B/t2port.o2r" ] || { echo "mkapp.sh: $B/t2port.o2r not built" >&2; exit 1; }
 rm -rf "$APP"
@@ -33,6 +37,13 @@ EXE="$APP/Contents/MacOS/turok2"
 FW="$APP/Contents/Frameworks"
 cp "$B/app/turok2" "$EXE"
 cp "$B/t2port.o2r" "$APP/Contents/Resources/t2port.o2r"
+if [ -n "${T2_APP_ARCHIVE:-}${T2_APP_ROM:-}" ]; then
+    [ "${T2_APP_ZIP:-0}" = 1 ] && { echo "mkapp.sh: T2_APP_ZIP with game files in the bundle: refused" >&2; exit 1; }
+    [ -f "${T2_APP_ARCHIVE:-}" ] && [ -f "${T2_APP_ROM:-}" ] ||
+        { echo "mkapp.sh: T2_APP_ARCHIVE and T2_APP_ROM must both name files" >&2; exit 1; }
+    cp "$T2_APP_ARCHIVE" "$APP/Contents/Resources/turok2.o2r"
+    cp "$T2_APP_ROM" "$APP/Contents/Resources/baserom.us.z64"
+fi
 chmod u+w "$EXE"
 
 # system = shipped with macOS (or the bundle's own references)

@@ -30,6 +30,7 @@ class HeadlessWindow;
 HeadlessWindow* sHeadless = nullptr; // --pad-test's window
 bool sHotkeyF1 = false;              // --pad-test: "hotkey F1"
 bool sFocusFeed = true;              // --pad-test: "focus 0|1" (the window's keyboard focus)
+bool sControlsBoxAtStart = false;    // round 20: the controls box once, at a player's first launch
 
 // ---- the headless window (--pad-test) ----
 // Every method a no-op, except the mouse, which the test script sets.
@@ -379,6 +380,7 @@ const char* const kMouseDeadZone = "gT2MouseDeadZone";
 const int kMouseDeadZoneDefault = 3;
 const char* const kStickInvert = "gT2StickInvertY";
 const char* const kShowControls = "gT2ShowControlsAtStart";
+const char* const kControlsShown = "gT2ControlsShown"; // 1 once the first launch showed the box
 
 const char* const kControlsText =
     "Turok 2 controls (F1 shows this again; turok2.cfg.json in this folder keeps the settings)\n"
@@ -398,7 +400,7 @@ const char* const kControlsText =
     "  gT2ShowControlsAtStart; window: Window.Width/Height/Fullscreen.Enabled\n";
 } // namespace
 
-void T2Controls_RegisterSettings(bool save) {
+void T2Controls_RegisterSettings(bool save, bool firstLaunchBox) {
     // registered = written to turok2.cfg.json with their defaults, where a player finds them
     CVarRegisterFloat(kSens, kSensDefault);
     CVarRegisterInteger(kMouseInvert, 0);
@@ -418,6 +420,10 @@ void T2Controls_RegisterSettings(bool save) {
            CVarGetInteger(kMouseDeadZone, kMouseDeadZoneDefault), CVarGetInteger(kStickInvert, 0));
     if (CVarGetInteger(kShowControls, 1)) {
         fputs(kControlsText, stdout);
+        // Round 20 (i4): a player who double-clicks the app has no log open: the first launch
+        // (no gT2ControlsShown in the config) also shows the controls in the F1 box, once, when
+        // the window is up (T2Controls_Hotkeys). gT2ShowControlsAtStart 0 turns both off.
+        sControlsBoxAtStart = firstLaunchBox && CVarGetInteger(kControlsShown, 0) == 0;
     }
     fflush(stdout);
 }
@@ -471,6 +477,13 @@ void T2Controls_Hotkeys() {
     // the box is open; --pace then moves its clock instead of catching up.
     bool f1 = sHotkeyF1;
     sHotkeyF1 = false;
+    if (sControlsBoxAtStart && sWindow != nullptr && !sPadTest) {
+        sControlsBoxAtStart = false;
+        CVarSetInteger(kControlsShown, 1);
+        CVarSave();
+        printf("controls: first launch: the controls box (F1 shows it again)\n");
+        f1 = true;
+    }
     static bool wasDown = false;
     if (sWindow != nullptr && !sPadTest) {
         const bool* keys = SDL_GetKeyboardState(nullptr);
