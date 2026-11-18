@@ -132,6 +132,8 @@ void alSndpPlay(ALSndPlayer *sndp) {
     ALSndpEvent e;
     if (target_ok(sndp) && target_state(sndp)->state == 0)
         post(sndp, 0, &e);
+    else if (sndp_log() >= 2) /* the N64's call trace sees these too */
+        fprintf(stderr, "sndp: gf %u play target %d (not stopped)\n", gFrameCountGameplay, (int)sndp->target);
 }
 
 /* func_00293EC0 */
