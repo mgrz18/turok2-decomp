@@ -1602,3 +1602,6 @@ no system setting changed). No change to `src/` or `include/`. Release build (`-
 - `T2_APP_VERSION=0.19 T2_APP_BUILD=19 tools/port/mkapp.sh OUT/build_r19 OUT/r19/Turok2.app`, then
   `apptest.sh`: codesign ok, 0 references to `/opt/homebrew` or `/usr/local`, every dylib from the
   bundle, play mode (a path with spaces, Homebrew hidden) to engine mode 11 at VI 4,855, exit 0.
+- The default command (`OUT/r19/det.sh def`, the round-19 300,000 frames, `T2_DET_LOG=1`, ASLR on):
+  600,000 det lines, md5 `6213496b…` (= Linux, STATUS), END 2 at 250,566, 0 deaths in the run's
+  hurt summary, exit 0, 94.7 s. The port-side changes of this round do not touch a headless run.
