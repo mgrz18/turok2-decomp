@@ -1475,6 +1475,8 @@ def cli(argv=None):
     ap.add_argument("--n64-sound", action="store_true", help="the sound world in the headless run (no "
                     "T2_LEGACY_NOSOUND: the sound requests draw their random numbers as with --audio and on the "
                     "N64; round 17 merge): not tuned yet")
+    ap.add_argument("--n64", action="store_true", help="no legacy switch at all: --n64-shake --n64-props "
+                    "--n64-sound together, the stream a human player gets (round 18 g1)")
     ap.add_argument("--n64-shake-from", type=int, default=None, choices=(4, 5, 6, 7),
                     help="DEBUG-ONLY (round 17 f2): the old stream (T2_LEGACY_SHAKE) up to the hub visit before "
                     "level L (7: the Primagen's lair), the N64's from there; with --n64-shake's level 4-6 changes")
@@ -1485,9 +1487,9 @@ def cli(argv=None):
     ap.add_argument("--hub-wait", type=int, default=ARMS_HUB_WAIT,
                     help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
-    N64_SHAKE = a.n64_shake
-    N64_PROPS = a.n64_props
-    N64_SOUND = a.n64_sound
+    N64_SHAKE = a.n64_shake or a.n64
+    N64_PROPS = a.n64_props or a.n64
+    N64_SOUND = a.n64_sound or a.n64
     N64_FROM = a.n64_shake_from
     LAIR_KEEP = a.lair_keep
     LAIR_FRONT = a.lair_front
