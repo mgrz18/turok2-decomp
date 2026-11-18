@@ -1545,7 +1545,11 @@ def cli(argv=None):
                     "T2_LEGACY_NOSOUND: the sound requests draw their random numbers as with --audio and on the "
                     "N64; round 17 merge): not tuned yet")
     ap.add_argument("--n64", action="store_true", help="no legacy switch at all: --n64-shake --n64-props "
-                    "--n64-sound together, the stream a human player gets (round 18 g1)")
+                    "--n64-sound together, the stream a human player gets (round 18 g1; the default since the "
+                    "round 18 merge: kept as an explicit spelling)")
+    ap.add_argument("--legacy", action="store_true", help="the old stream the routes before round 18 were tuned on "
+                    "(round 18 merge): T2_LEGACY_SHAKE, T2_LEGACY_INTEL9 and T2_LEGACY_NOSOUND; --n64-shake, "
+                    "--n64-props, --n64-sound then lift one each (the validated combinations of rounds 13-18)")
     ap.add_argument("--n64-shake-from", type=int, default=None, choices=(4, 5, 6, 7),
                     help="DEBUG-ONLY (round 17 f2): the old stream (T2_LEGACY_SHAKE) up to the hub visit before "
                     "level L (7: the Primagen's lair), the N64's from there; with --n64-shake's level 4-6 changes")
@@ -1556,9 +1560,14 @@ def cli(argv=None):
     ap.add_argument("--hub-wait", type=int, default=ARMS_HUB_WAIT,
                     help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
-    N64_SHAKE = a.n64_shake or a.n64
-    N64_PROPS = a.n64_props or a.n64
-    N64_SOUND = a.n64_sound or a.n64
+    # round 18 merge: the N64's stream (no T2_LEGACY_* line, g1's --n64) is the default; --legacy is the old one
+    if a.legacy and a.n64:
+        ap.error("--legacy and --n64 exclude each other")
+    if a.n64_shake_from is not None and not a.legacy:
+        ap.error("--n64-shake-from needs --legacy (the old stream up to level L)")
+    N64_SHAKE = a.n64_shake or not a.legacy
+    N64_PROPS = a.n64_props or not a.legacy
+    N64_SOUND = a.n64_sound or not a.legacy
     N64_FROM = a.n64_shake_from
     LAIR_KEEP = a.lair_keep
     LAIR_FRONT = a.lair_front

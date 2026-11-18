@@ -517,10 +517,17 @@ def main():
     ap.add_argument("--n64-shake", action="store_true", help="a level run on the N64's camera shake and random "
                     "numbers (no T2_LEGACY_SHAKE; round 17 f2); with --all it goes to fullrun.py")
     ap.add_argument("--n64", action="store_true", help="no legacy switch at all (round 18 g1): --n64-shake "
-                    "--n64-props --n64-sound together, for --all and --level")
+                    "--n64-props --n64-sound together, for --all and --level; the default since the round 18 merge")
+    ap.add_argument("--legacy", action="store_true", help="the old stream (round 18 merge): T2_LEGACY_SHAKE, "
+                    "T2_LEGACY_INTEL9, T2_LEGACY_NOSOUND, as every route before round 18 was tuned; --n64-shake, "
+                    "--n64-props, --n64-sound then lift one each")
     a, rest = ap.parse_known_args()
-    if a.n64:
+    if a.legacy and a.n64:
+        ap.error("--legacy and --n64 exclude each other")
+    if not a.legacy:   # round 18 merge: the N64's stream by default (a human player's, g1's --n64)
         a.n64_shake = a.n64_props = a.n64_sound = True
+    if a.all and a.legacy:
+        rest = rest + ["--legacy"]
     if a.all and a.n64_shake:
         rest = rest + ["--n64-shake"]
     if rest and not a.all:
