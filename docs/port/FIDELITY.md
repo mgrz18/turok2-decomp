@@ -621,3 +621,64 @@ shielded attacker on the stairs), the cut-scene into the Mother's arena (204,602
 shafts pale white-yellow, as on the N64 since h2), the Mother on the shredder (205,001), the
 arena after her (212,001), the Primagen's end and END 2 (252,251-255,503: the warp ring, Adon).
 The arena's walls and floor stay olive-green (12.3).
+
+## 13-i3. Levels 4-6, the bosses, the endings: the shot sweep and the trails (Phase 7 round 20, part i3)
+
+### 13-i3.1 Method
+
+Both sides start the same warp from the attract loop and stand still; the shots are paired by the
+game frame (RENDER.md 8-i3 has the scene table):
+
+```sh
+# the N64 (Rice under Xvfb; ~45 s a warp): shots at emulator frames 650..1100, gf 25..475
+xvfb-run -a -s "-screen 0 1024x768x24" python3 tools/port/refshots.py --rom baserom.us.z64 \
+    --out N64DIR --start-warp=-101@600 --shots 650:1100:25          # N64DIR/shots.txt: shot -> gf
+# the port (Release, headless, drawn): every second frame from 1440, then keep one shot per gf
+SDL_VIDEODRIVER=offscreen T2_START_WARP=-101@1400 T2_DET_LOG=1 T2_DET_GF=1 \
+    T2_SHOT=DIR/s T2_SHOT_EVERY=2 T2_SHOT_FROM=1440 OUT/rel/app/turok2 --archive turok2.o2r \
+    --rom baserom.us.z64 --game --draw --pak-blank --frames 2400
+```
+
+A shot named `s.N.ppm` is the frame drawn after the det line of frame N-1 (two VIs a game frame;
+four in the heavy arenas 2 and 3, where the shot's gf is the last det line before it). Note the
+`=` in `--start-warp=-101@600` (argparse takes `-101` for an option otherwise). Warps: -101, -104
+(level 4), -125, -88, -92, -93 (level 5), -115, -118, -121, -124 (level 6), -2, -3, -4, -5, 7602
+(the bosses), -77, -78 (talismans), -83, -84 (flesh eaters), -11, -12 (the ending levels).
+
+### 13-i3.2 What differs
+
+- **The hive's light shafts** (levels 87, 91): on the N64 tall pale beams come and go every few
+  seconds; never on the port. `n64cmp.py run --warp=-93 --level 92 --gf 150,250,300`: no actor
+  differs, only the particle pool (the drips 226/227, as many on both sides, spawned on another
+  random stream from gf 2: 11.1's load-timing class), and the drips carry swooshes on both sides
+  (`m_ActiveSwooshes`). The shafts are the drips' trails; the port drew none of the game's trails:
+  three host bugs (RENDER.md 8-i3.2): the swoosh records' fade time and node life left
+  big-endian (`swap_spec.json`, a new archive), the trail point tables untyped (gendata), four
+  Swoosh views at N64 offsets (func_0023353C.c, func_00233868.c, func_00234C88.c,
+  func_00234348.c, func_0023417C.c). After the fix the shafts appear as on the N64.
+- **Weapon trails** (port only: `T2_GIVE_WEAPONS=1 T2_FILL_AMMO=1 T2_WEAPON=16`, warp -101, Z
+  from frame 1680): the scorpion launcher's rocket leaves a white smoke ribbon from the barrel
+  with the fix; before it, only the fire puffs. Every projectile, energy and explosion trail is in
+  the same class.
+- **The Lightship doorways** (117, 120, 123): bright green lines in the doorway on the N64, a dark
+  doorway with a ring on the port; open, probably Rice (RENDER.md 8-i3.3).
+- Everything else in the table matches up to the round-17 rounding (the port 1-2 % darker).
+
+### 13-i3.3 Gameplay and the runs
+
+The record's floats are read by game logic too (a node's life, a swoosh's fade, the emitter
+spacing in `Trail_PlaceNodes`), so the particle pool changes: on the default run the first det
+line that differs is frame 21,132 (level 1: one particle slot keeps the "matrix built" flag
+0x100000 clear instead of set), and only in the particle-pool hash: **with the `ptcl` hash taken
+out, all 600,000 det lines equal the round-19 run's** (and the 580,000 of `--legacy`). The RNG,
+the player and every actor are the same, so no route moved:
+
+| run (this branch, Release, `aimdrive.py`, ASLR on, `T2_DET_LOG=1`) | result | det md5 |
+|---|---|---|
+| the default command, 300,000 frames | END 2 (level 10 from frame 254,608, as with 70f3333c), 5 totems, 367 hits, **0 lives lost**; lowest health 14 (135), 18 (133, 130, the lair) | `08540b5d…` (600,000 lines); 70f3333c's binary and archive with the same script: `0959aac5…` |
+| `--legacy`, 290,000 frames | END 2 (level 10 from frame 247,922, as with 70f3333c), 553 hits, 2 lives lost (the City Totem, as before) | `ac08c89b…` (580,000); 70f3333c: `281904eb…` |
+| the default command drawn (`--draw`) | see STATUS.md (round 20, part i3) | |
+
+The archive changes (sha1 `8eb5b23b…`, was `a9d14a47…`): rebuild `OUT/turok2.o2r` with
+`mkarchive.py` after the merge, or the trails stay invisible (the binary alone gets the struct
+fixes, not the records).
