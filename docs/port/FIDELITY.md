@@ -677,7 +677,7 @@ the player and every actor are the same, so no route moved:
 |---|---|---|
 | the default command, 300,000 frames | END 2 (level 10 from frame 254,608, as with 70f3333c), 5 totems, 367 hits, **0 lives lost**; lowest health 14 (135), 18 (133, 130, the lair) | `08540b5d…` (600,000 lines); 70f3333c's binary and archive with the same script: `0959aac5…` |
 | `--legacy`, 290,000 frames | END 2 (level 10 from frame 247,922, as with 70f3333c), 553 hits, 2 lives lost (the City Totem, as before) | `ac08c89b…` (580,000); 70f3333c: `281904eb…` |
-| the default command drawn (`--draw`) | see STATUS.md (round 20, part i3) | |
+| the default command drawn (`--draw`, the trails drawn all game long) | the same END 2, 0 lives lost, 367 hits; **every det line equals the undrawn run's** | `08540b5d…` |
 
 The archive changes (sha1 `8eb5b23b…`, was `a9d14a47…`): rebuild `OUT/turok2.o2r` with
 `mkarchive.py` after the merge, or the trails stay invisible (the binary alone gets the struct
