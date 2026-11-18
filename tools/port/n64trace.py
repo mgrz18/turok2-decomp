@@ -325,6 +325,12 @@ def main():
                          "target (ALSndPlayer 0x3C) is outside 0..maxSounds-1 (0x44): the target, sndState "
                          "(0x40), the address of the ALSoundState it reads (sndState + target * 0x30) and its "
                          "state word (+0x28): what the N64 reads for the sound world\x27s voice 16")
+    ap.add_argument("--peek", default="",
+                    help="(round 19 h2) LEVEL:GF:EXPR:N[;...]: print N words of RDRAM at EXPR the first time "
+                         "the scene is LEVEL at game frame GF (at the --at breakpoint). EXPR is a hex address "
+                         "followed by any number of '.OFF' steps, each reading the u32 at (address + OFF) as "
+                         "the next address, e.g. 801e6f78.4 = the word at the address held at 0x801e6f7c "
+                         "(a region's first vertex)")
     ap.add_argument("--watch", default="",
                     help="I[,I...] (round 16 e1): the 'det:  lvl I' line of these level actors every game "
                          "frame, without --actors (e.g. the Primagen: 2 in his lair)")
@@ -473,7 +479,32 @@ def main():
     def wr32(ram, addr, v):
         struct.pack_into("<I", ram.m, addr & 0x7FFFFF, v & 0xFFFFFFFF)
 
+    peeks = []
+    for it in (x for x in a.peek.split(";") if x):
+        lv, g, ex, cnt = it.split(":")
+        peeks.append([int(lv), int(g), ex, int(cnt), False])
+
+    def do_peeks():
+        if not peeks:
+            return
+        ram = Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM))
+        level = ram.sval(syms["gScene"] + offs["sc_level"][0], offs["sc_level"][1])
+        gf = ram.u32(syms["gFrameCountGameplay"])
+        for pk in peeks:
+            if pk[4] or level != pk[0] or gf != pk[1]:
+                continue
+            pk[4] = True
+            parts = pk[2].split(".")
+            ad = int(parts[0], 16)
+            for o in parts[1:]:
+                ad = ram.u32((ad + int(o, 16)) & 0xFFFFFFFF)
+            words = [ram.u32(ad + 4 * k) for k in range(pk[3])] if valid(ad) else []
+            sys.stdout.write("peek: frame %d level %d gf %d %s = %08x: %s %s\n" % (
+                state["n"], level, gf, pk[2], ad, " ".join("%08x" % w for w in words),
+                " ".join("%g" % struct.unpack(">f", struct.pack(">I", w))[0] for w in words)))
+
     def do_pokes():
+        do_peeks()
         if start_warp is not None and not start_warp[2] and state["n"] >= start_warp[1]:
             ram = Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM))
             app = syms["gEngineApp"]
