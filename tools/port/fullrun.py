@@ -31,6 +31,11 @@ STICK_FREE_WALK = {5, 6}   # round 18 g5: --stick-aim levels whose route walks k
 # round 18 g5: per route level, the sub-levels where the stick driver prefers the assist's target (T2_AIMD_PRIMARY):
 # level 5's pylons (124), the cocoons and embryos (94, 95, 96) and the Queen's node (2); level 6's Mother (3) and the Primagen (4)
 STICK_PRIMARY = {5: (124, 94, 95, 96, 2), 6: (3, 4)}
+# round 19 h3: on the N64 stream (n64_full()), the boss arenas of the --stick-aim levels where the stick aims only
+# at the boss's damage node, led, with Z held on target, unless a candidate comes within the radius
+# (aimdrive.py T2_AIMD_BOSS=L:R): the Mantid Queen (2) and the Primagen's lair (4). --stick-boss "" turns it off.
+STICK_BOSS = {5: "2:%s" % os.environ.get("T2H3_QR", "150"), 6: "4:%s" % os.environ.get("T2H3_LR", "350")}
+STICK_BOSS_ON = None   # None: on the N64 stream only; else the set of route levels (--stick-boss)
 LAIR_PUSH = ""       # round 18 g5: --lair-push toward|jump|both (T2_LAIR_PUSH; "" = off: the routes unchanged)
 ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
 NAV = set()         # round 16 e3: the levels whose NAV_WALKS teleports the waypoint walker replaces (--nav)
@@ -204,6 +209,9 @@ class Route:
                 env.append("T2_AIMD_PRIMARY=%s" % ",".join(str(l) for l in prim))
             if 6 in STICK_AIM:   # round 18 g5: the Mother's parts: always the assist's node (aimdrive.py)
                 env.append("T2_AIMD_PRIMARY_ONLY=3")
+            bl = (STICK_BOSS_ON if STICK_BOSS_ON is not None else set(STICK_BOSS) if n64_full() else set()) & STICK_AIM
+            if bl:   # round 19 h3: the boss's node only, led, fire held on target (T2_AIMD_BOSS)
+                env.append("T2_AIMD_BOSS=%s" % ",".join(STICK_BOSS[lv] for lv in sorted(bl) if lv in STICK_BOSS))
         if self.move_drive:
             env.append("T2_MOVE_DRIVE=\"%s\"" % ";".join("%d-%d" % w for w in sorted(self.move_drive)))
         if self.walk_plan:   # round 16 e3: aimdrive.py's waypoint walker (WalkDrive)
@@ -1083,6 +1091,7 @@ L2_133_REAL = [
     (6050, -847.0, -4761.6, 1574.0, 3.1416, 0, {"fire": 1900, "aim": "enemy:20"}),
     (8000, 827.5, -4761.6, -1627.5, -2.8692, 150, {}),    # warp 2615 -> 130
 ]
+L2_134_GATE = os.environ.get("T2H3_134") == "gate"   # round 19 h3: DEBUG-ONLY test hook (see main_all)
 L2_134_FIRE_R = 450     # round 17 f5: 134's fire range in a --real-weapons 2 run (T2_FIRE_GATE, T2_AIMD_FIRE_MAX)
 L2_STRETCH_REAL = [(6, 6, 3000), (9, 3, 2000), (12, 15, 2000)]
 
@@ -1177,6 +1186,15 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         l2segs[6] = (name, rel, L2_133_REAL)
         l2stretch = L2_STRETCH_REAL
         l2segs = with_taps(l2segs, L2_TAPS)
+        if L2_134_GATE:
+            # round 19 h3 (--l2-134 gate): only zombie 4 (it holds gate 8's key 7) is fought: from the segment's
+            # start at the gate spot, zombie 4 the assist's (and the stick's primary) target; zombies 2 and 3 are
+            # shot only when they come within the fire range. Then sister 2 and the exit as before.
+            name, rel, steps = l2segs[9]
+            gate = steps[2]
+            l2segs[9] = (name, rel, [st[:1] + tuple(gate[1:6]) + (dict(st[6], aim="enemy:4"),) for st in steps[:2]] +
+                         list(steps[2:]))   # the step count kept (L2_STRETCH_REAL, the retries index them)
+            STICK_PRIMARY[2] = tuple(STICK_PRIMARY.get(2, ())) + (134,)
         r.extra_env.append("T2_AIM_SKIP_TYPES=6")
         # round 17 f5: in 134 the zombies walk up from 1,700 units: no fire beyond 450 (the mag 60 emptied
         # on zombie 2 from afar); the stick driver's own fire likewise (T2_AIMD_FIRE_MAX)
@@ -1522,6 +1540,9 @@ def cli(argv=None):
                     "(his mode 20) by walking towards him and/or jumping (round 18 g5; needs the lair driver)")
     ap.add_argument("--stick-aim", default="", help="L1,L2,...: these levels aim with the stick only, closed-loop "
                     "(run under tools/port/aimdrive.py; round 15 d3)")
+    ap.add_argument("--stick-boss", default=None, help="L,...: with --stick-aim, the boss arenas of these levels (5: "
+                    "the Mantid Queen, 6: the Primagen's lair) aim only at the boss's node unless a candidate comes "
+                    "near (round 19 h3); default 5,6 on the N64 stream, none with --legacy; \"\" = none")
     ap.add_argument("--assist-keep", default="", help="with --stick-aim: these fights keep the aim assists "
                     "(1: the Blind One, 110: the City Totem; round 15 d3)")
     ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
@@ -1584,6 +1605,8 @@ def cli(argv=None):
     if a.nav_only is not None:
         NAV_ONLY = {tuple(int(v) for v in k.replace(":", ".").split(".")) for k in a.nav_only.split(",") if k}
     ASSIST_KEEP = [x for x in a.assist_keep.split(",") if x]
+    global STICK_BOSS_ON
+    STICK_BOSS_ON = None if a.stick_boss is None else {int(x) for x in a.stick_boss.split(",") if x}
     if a.late_keys:
         PRIMAGEN_LATE = (2, 3)
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},

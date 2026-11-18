@@ -386,6 +386,31 @@ this round's ASLR runs.
   `src/`/`include/` change. Others touching `game.cpp` `ContRead` or the audio block: a 3-line
   overlap at most.
 
+## Round 19, part h3: the Queen and the lair by stick on the N64 stream (branch names-R19_h3; PLAYTHROUGH.md 39)
+
+- **`--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` (no `--assist-keep`, no `--legacy`)
+  reaches END 2 at 269,088 with all 5 totems, the 4 bosses and no life lost** (A2, `setarch -R`; A2r
+  with ASLR on gives identical `hurt`/`death`/`progress` lines). Before: 3 lives (the Queen 1, the lair
+  2). The Queen 108 -> 43 damage (lowest 56), the lair 239 -> 120 (lowest 17: the thinnest spot).
+- **How**: `aimdrive.py` `T2_AIMD_BOSS=L[:R]` (the boss's damage node as the only target, led by
+  its own motion, Z held while on target; a candidate within R of the player first), written by
+  `fullrun.py` as `T2_AIMD_BOSS=2:150,4:350` for `--stick-aim` 5/6 **on the N64 stream only**
+  (`--stick-boss L,..` to choose; `--legacy` writes nothing). The lair's aim frames on his spawns:
+  11,676 -> 96.
+- **Not done: `--real-weapons 1,2`.** On the N64 stream it loses a life in 133 (sister 1, 200 damage;
+  e5's 184 on the legacy stream) and in 134 (200). "Only zombie 4 from the gate" (`T2H3_134=gate`,
+  a DEBUG-ONLY test hook) is worse: game over in 134. The 132 plasma-rifle jump was not tried.
+  So goal (4) stands at `--real-weapons 1`.
+- Unchanged: the default command (route files byte-identical, D0: END 2 at 250,566, 0 lives on this
+  part's binary, which is the merge's: no port/src change); every `--legacy` combination's route
+  files (no `T2_AIMD_BOSS` line). The N64-stream combos with `--stick-aim 5` or `6` change (the
+  merge's `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --hub-wait 0`
+  now aims the Queen by `T2_AIMD_BOSS`; not re-run).
+- Files: `tools/port/aimdrive.py` (Picker.boss, Trigger hold), `tools/port/fullrun.py`
+  (`STICK_BOSS`, `--stick-boss`, `L2_134_GATE` hook); docs. No `src/`/`include/`/`port/` change.
+- Next: the Queen's state 4 (she circles: try a larger `T2_BOSS_FRONT` distance for the stick), the
+  lair's margin (17), then level 2 on real weapons (133's health on the N64 stream first).
+
 ## Round 18, part g2: address-layout determinism, the gptr checker, the fifo watchdog (branch names-R18_g2)
 
 - **A layout-dependent branch found and fixed** (STABILITY.md 12.1): the three N64 stack-depth
