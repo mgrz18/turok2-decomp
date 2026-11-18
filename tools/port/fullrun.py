@@ -622,6 +622,8 @@ N64_FULL_L2_HEALTH = {7: [(-2405.3, -4761.6, 5545.7, 0.0), (-2135.0, 204.8, 3506
                           (-512.0, -11.3, -2560.0, 0.0), (-512.0, -10.7, -2764.8, 0.0), (2246.1, -2150.4, 2102.3, 0.0),
                           (5581.0, -3993.6, 1285.7, 0.0), (5580.1, -3379.2, 1275.8, 0.0), (6451.2, 307.2, 3527.7, 0.0),
                           (6448.8, 307.2, 4057.7, 0.0)]}
+# Round 18 g1 (--n64): the weapon for the Mantid Queen (None: the shredder of level 5); T2G1_QW overrides (tests)
+N64_QUEEN_WEAPON = os.environ.get("T2G1_QW") or None
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
 # Round 17 f1: pick steps put before a step of a segment (segment, before step, [(x, y, z, approach
 # angle)]): each pick is a KEY_STEP-frame step (pick()'s stand and walk-in); the step and the later
@@ -1341,6 +1343,8 @@ def level5(r, t):
     r.fire.append((s + rel + add, s + rel + add + length))
     r.face_levels.append(lv)
     rel, length = r56.L5_BOSS
+    if n64_full() and N64_QUEEN_WEAPON:   # round 18 g1: requested in 113, taken when her level loads
+        r.weapon.append((s + L5_QUEEN_AT + add - 800, N64_QUEEN_WEAPON))
     r.anchors.append((s + L5_QUEEN_AT + add, 2))
     r.note(s + rel + add, "2 the Mantid Queen: fire held, T2_AIM_NODE=boss@2, T2_BOSS_FRONT=450,200")
     r.inputs.append("Z@%d..%d" % (s + rel + add, s + rel + add + length))
