@@ -50,7 +50,7 @@ The swap plan of the whole ROM is 228,911 runs of `(offset, width, count)` plus 
 | particle effects | 1 | 122,256 | 82.17 % | `unk`: CROMParticleDistance/Motion `unk_00`, the oscillation records |
 | Cinema | 197 | 88,272 | 97.50 % | `unk`: clip block 4 (8 bytes) |
 | level paths | 165 | 68,152 | 95.66 % | `unk`: group block 0 (8 bytes) |
-| particle swooshes | 1 | 8,128 | 13.58 % | only the TrailInfo fields the C names |
+| particle swooshes | 1 | 8,128 | 92.16 % | round 20 i3: the whole TrailInfo head (fade time, node life, colours, counts) and the blends (u16 point indices); `unk`: bytes 0x0C..0x0F and 0x13..0x15 (zero in every record) |
 | level info | 165 | 3,960 | 58.33 % | `unk`: CLevelHeader `unk_04[6]`, bytes 0x14..0x17 |
 | curves | 1 | 272 | 96.32 % | `unk`: type-1 curve bytes 0x0A..0x13 |
 
@@ -135,7 +135,6 @@ The other layouts come from the area docs and the struct.unpack formats of the a
 | CRegionInfo `unk_00[0x20]`, `unk_24`, `unk_30`, `unk_40`, `unk_48[8]`, `unk_58..5F` (collision table 0) | ~150 KB | read by region code still unnamed; widths needed before levels work on LE |
 | collision table 3 (0x14 records) | small | copied unchanged by CScene__DecompressCollision; reader unknown |
 | particle: `CROMParticleDistance.unk_00[0x1C]`, `CROMParticleMotion.unk_00[0x10]`, oscillation records | ~22 KB | some words look like **pairs of half floats** (`3ecc3fcc`), others like f32: must be read in the C (HalfToFloat users) |
-| particle swooshes (TrailInfo past 0x21) | 7 KB | only `unk0`, `sound`, `tex0/1` are named |
 | intelligence: bytes after some bodies, type 9 (interactive anim) body | 4 KB | |
 | level info `unk_04[6]` and bytes 0x14..0x17; cinema clip block 4; path group block 0; geometry block 1 and 5; animation chunk 3 block 1; type-1 curve bytes | < 4 KB | |
 

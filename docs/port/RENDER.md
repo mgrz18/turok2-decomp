@@ -286,3 +286,114 @@ whole run: set by the totems, Blind, Queen, Primagen; cleared after each).
 - More warps with `refshots.py --start-warp` (every level start the route uses) against
   `T2_START_WARP`: gameplay views are deterministic from the warp for the first frames.
 - The Mac window's Metal renderer and the retina scale (MACOS.md 19.3) need a window.
+
+## 8. Round 20 (part i1): the sweep of the hub, levels 1-3 and the menus
+
+Method: N64 `refshots.py --start-warp=W@600 --shots 680:900:20` (shots.txt gives each shot's gf),
+port `T2_START_WARP=W@1400 T2_SHOT_EVERY=25 T2_DET_LOG=1 T2_DET_GF=1 --draw` (8-bit shots), paired
+by gf and compared with `shotcmp.py --mean --diff`; the attract demo 1 by gf (N64 emulator frame
+E = gf E - 1985; the port frames from a run without `--draw`, then drawn only there with
+`T2_DRAW_FROM`); the menus and the pause screen with `--input` on the port and `n64trace.py --pad
+... --shots` on the N64. Classes: **host bug** (fixed), **timing** (the scene advances by
+elapsed time or a shot lands on another frame of a flashing effect), **Rice** (the emulator).
+
+| scene | N64 / port | result | class |
+|---|---|---|---|
+| title | 1450-1500 / 4362-4500 | same | - |
+| main menu | 1600 / 4800 | **SINGLE and MULTI missing on the port** (FIDELITY 13.2); fixed | host bug |
+| single-player menu, Enter Cheat keyboard, options | port only (refshots `--input` does not reach the N64 game) | NEW GAME / LOAD missing, the keyboard's A-Z missing; fixed; options as expected | host bug |
+| pause menu (START in the hub) | n64trace `--pad` 820 / port 2025 | same layout and highlight | - |
+| automap (L in the hub) | n64trace `--pad` 760 / port 1800 | **never drawn on the port** (no G_LINE3D, the index array overran the ortho matrix, black flicker frames); fixed; Rice draws no lines | host bug / Rice |
+| the Mother's arena (-4), gf 75 | 700 / 1753 | **olive walls fixed** (packed vertex colour offsets big-endian, FIDELITY 13.1): mean (35.8, 33.1, 23.7) / (35.4, 32.6, 23.2); Turok's pose differs (a cinema on `osGetTime`) | host bug / timing |
+| hub (-61), gf 55-275 | 680-900 / 1575-2025 | PSNR 28-31, means within 0.5; the HUD (lives, keys, health) the same | - |
+| level 53 (-54) | same | the sky, the water ring, the arches equal; a fire sprite on the right is up on the port at gf 135-175 where the N64 shows a spark (particle 0 spawns a game frame apart: FIDELITY 11.1); the cyan warp ring is a flashing effect: at a gf one side can show it and the other not | timing |
+| level 55 (-56), 58 (-59), 59 (-60) | same | the same rooms, light and HUD; the means differ only by the cyan ring's flashes | timing |
+| level 125 (-126), 128 (-129), 131 (-132), 133 (-134), 135 (-136) | same | PSNR 26-36, means within 1 | - |
+| level 61 (-62), 64 (-65), 67 (-68), 71 (-72) | same | PSNR 25-32 outside the ring's flashes. The ring checked frame by frame in 67 (N64 every 2 emulator frames gf 135-175, port every 10 VIs): it is lit about 3 game frames in every ~22 on both | timing |
+| attract demo 1, gf 135-1095 (14 pairs) | 2120-3080 / 5736-8061 | the HUD (health, ammo and its icon), the weapon wheel, the enemies, the corridors and lights match (PSNR 20-31); gf 935: the hurt flash is redder on the port (fades by elapsed time); gf 1015: the enemy's pose (demo 1's known divergence) | timing |
+
+Next: refshots `--input` reaching the N64 game (the menus are port-only shots); the hurt flash's
+fade against the N64 frame by frame; the ring's phase (both flash, at different gfs).
+## 9. Round 20 (part i3): levels 4-6, the bosses, the endings against the N64; the trails
+
+Method (FIDELITY.md 14 has the commands): for each warp, `refshots.py --start-warp=W@600
+--shots 650:1100:25` on the N64 (Rice, 8-bit PNG, `shots.txt` gives each shot's gf) and
+`T2_START_WARP=W@1400 T2_DET_LOG=1 T2_DET_GF=1 T2_SHOT_EVERY=2` on the port (Release, `--draw`),
+the port's shot kept for each gf that is a multiple of 25; pairs compared by eye and by their
+mean RGB. The player stands at the warp's spawn in every scene (no input), so the views are the
+same on both sides; enemies move by the random stream, which parts from the N64's within the
+first game frames of a level (the particle spawn frame, FIDELITY.md 11.1).
+
+### 9.1 The scenes
+
+| warp (level) | what | result |
+|---|---|---|
+| -101 (100) | level 4's start, the cave tunnel | **match**; mean (20.7, 30.4, 23.5) N64, (20.4, 30.0, 23.1) port at every gf |
+| -104 (103) | the cave with the mushrooms and the totem rock | match; the enemies stand elsewhere (the random stream) |
+| -125 (124) | level 5's start (HIVE TOP), the rifle pickup | match (the pickup's spin phase differs) |
+| -88 (87), -92 (91), -93 (92) | the hive's tunnels and its hub | **the hive's light shafts (tall pale blue beams that come and go) were missing on the port: a host bug, fixed (9.2)**; the liquid surface that rises and falls matches |
+| -115 (114) | level 6's start (the Lightship's hub) | match |
+| -118 (117), -121 (120), -124 (123) | the Lightship's green corridors | match but for the side doorway: the N64 shows thin bright green lines there (the room behind), the port a dark doorway with a ring; the port's green is ~4 % brighter (fog). classified Rice, not proven: the lines look like the edges of the geometry behind the door, as Rice draws coverage/fog modes it does not emulate; open lead (9.3) |
+| -77 (76), -78 (77) | the talisman chambers of levels 5 and 6 | match |
+| -83 (82), -84 (83) | the flesh-eater portals of levels 5 and 6 | match |
+| -2 (1) | the Blind One's arena (her spawn) | match |
+| -3 (2), -4 (3) | the Mantid Queen's and the Mother's arenas | their intros are cut-scenes on elapsed time (FIDELITY.md 11.1): the cameras part from gf 2, not comparable by gf; the Mother's olive walls are i1's lead |
+| -5 (4), 7602 (4) | the Primagen's lair from the level start and from the hub pad | **match**, the boss bar and the blue screens included (round 17's blue items near the spawn are there since round 17 f3's intelligence fix) |
+| -11 (10), -12 (11) | the ending levels (END 1/END 2's ship deck, the nebula sky) | match (the sky, the stars, the deck lights) |
+
+The port reads 1-2 % darker than Rice on every non-fogged scene (the round-17 rounding, 7.1).
+
+The two arenas after their intros (N64 `--shots 1200:2600:100`, gf 575-1675; the port to frame
+9,500; the player stands still and takes hits):
+
+| warp (level) | result |
+|---|---|
+| -3 (2), the Mantid Queen | **match**: the arena, her legs, the boss bar, the red damage flash (at other gfs: the hits follow the random stream), the HUD |
+| -4 (3), the Mother | the Mother herself, her pose aside (the random stream), matches; **the whole arena is yellow-olive on the port** (floor cream on the N64, yellow on the port; mean RGB at gf 575 N64 (66.9, 58.7, 48.9), port (61.8, 54.5, 30.2): blue 40 % low). **the same cause as i1's walls: fixed on names-R20_i1 (cb236902: `Model_ApplyPackedOffsets` read the big-endian vertex colour offsets with a host load); i1 measured that build against this N64 shot: (59.6, 52.6, 43.5), B/R 0.73 on both** |
+
+### 9.2 The trails (swooshes) were never drawn: three host bugs
+
+The hive's light shafts are the trails of its drip particles (types 226/227, falling at up to 1,024
+units/s): `CParticleSystem__Draw` hands each particle with swooshes to `Swoosh_AddParticleNode`,
+and `Trail_DrawAll`/`Trail_DrawTextured` draw a ribbon through the points. On the port the
+ribbons came out empty (`T2_DLDUMP_AT`: the trail's combiner, colours and texture, then no
+vertex):
+
+1. **The swoosh records were left big-endian.** The "particle swooshes" unit (91 records, ROM
+   0x1F8249C) had only `unk0`, `sound`, `tex0/1` in `tools/assets/swap_spec.json`; the node life
+   (0x08) and the fade time (0x04) stayed N64 bytes, so a new point's life read as 4e-41 and every
+   point died the frame it was born (lives 0, -1, -2, -3 in a print), and the blends' u16 point
+   indices read as 256 times theirs. The whole record is now typed (f32 unk0/fadeTime/nodeLife,
+   s16 layer, the colour and count bytes, then count + 1 blends of u8[4] u8[4] u16 u16):
+   coverage 13.6 % to 92.2 %, **a new archive** (sha1 `8eb5b23b…`, `archive_check` OK).
+2. **The trail points were untyped data.** `sTrailTextures` points at four tables of points (x, y,
+   z and two more f32; `D_800ACE70`, `D_800ACE98`, `D_800ACEC0`, `D_800ACF38`); no C used them by
+   name, so gendata emitted their N64 bytes and every point was about 0: a ribbon with no width.
+   A `TARGET_PORT` reference in func_002350EC.c types them (gendata's rule, as for
+   `gAIBaseModeTable_port`).
+3. **Four views of a Swoosh at N64 offsets** (the code reaches the rest of the struct by name):
+   `Morph_BlendVertices` and `Morph_BlendVerticesTex` read the fade's `remaining` (Swoosh.time) at
+   host 0x30, the owner pointer, so a fading trail took a random alpha; `Trail_GetAnimFrame` read
+   the texture frame from `texture[1]`/`id` and **wrote the end frame over `texture[1]`** (the
+   trail's second texture handle); `Trail_DrawTextured` and `Trail_PlaceNodes`' emitter kept the
+   length in the padding after the host `SwooshLinks`. Each is now a `TARGET_PORT` layout with
+   `_Static_assert`s against `structs/swoosh.h`.
+
+With the three, level 91's shafts show as on the N64 (positions follow the random stream, so they
+are not at the same place on both sides, but their look, size, colour and frequency match). Every
+other trail in the game is affected the same way: weapon and projectile trails, the particle
+ribbons of explosions and energy effects all draw now.
+
+**Gameplay**: none. The trails' lifetimes change what a free particle slot keeps (a "matrix built"
+flag, 0x100000, left on one slot of level 1 at frame 21,132), so the det lines' particle-pool hash
+moves; the RNG, the player and every actor are identical over the whole default run (600,000
+lines with the hash taken out) and the `--legacy` run (580,000). New md5s in FIDELITY.md 14.
+
+### 9.3 Next
+
+- The Lightship doorway (117/120/123): dump the N64 display list at that frame (or try
+  glide64mk2/angrylion under Xvfb) to tell Rice from a missing pass; the ~4 % greener fog there.
+- Weapon fire against the N64: the warps start with the talon only; a scripted weapon change on
+  both sides (`--input` / `refshots.py --input`) would compare muzzle flashes and projectile trails.
+- The cut-scenes (hub portals, totems, the Queen's and Mother's intros, the ending): both sides
+  advance them by elapsed time, so pair them by the cinema's own clock, not by gf.

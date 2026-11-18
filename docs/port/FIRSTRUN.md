@@ -5,12 +5,49 @@ the things only a window can show, what each step should look like, and what to 
 does not. About 30-40 minutes. Background: [QUICKSTART.md](QUICKSTART.md) (install, controls,
 settings), [MACOS.md](MACOS.md) 20-21 (what was checked headless and how).
 
+## The 10-minute test (round 20: the ready-to-play app)
+
+The app to play is staged at **`/Users/miguel_garcia/Documents/Proyectos/turok2_macport/OUT/play/Turok2.app`**
+(a Release build of the round-20 tree, branch `names-R20_i4`; your ROM and `turok2.o2r` are inside
+its `Contents/Resources`, so nothing has to be copied anywhere; never zip or share this copy). It
+was checked with `tools/port/apptest.sh OUT/play/Turok2.app - - /tmp/apptest-play` (a new game
+reached, engine mode 11, the files taken from the bundle). The config, logs and saves go to
+`~/Library/Application Support/turok2` (empty before the first launch).
+
+1. **(0:00)** In a terminal: `tail -F ~/Library/Application\ Support/turok2/logs/turok2-stdout.log`.
+   Then double-click `OUT/play/Turok2.app` in Finder (or
+   `open ~/Documents/Proyectos/turok2_macport/OUT/play/Turok2.app`).
+2. **(0:10)** A 4:3 window opens **centred** on the display (960x720 points on a 14" MacBook) and
+   takes the focus; a **"Turok 2 controls"** box shows the controls (first launch only). Read it,
+   OK. The log has `files: .../Contents/Resources/turok2.o2r, .../Contents/Resources/baserom.us.z64`,
+   `window: first launch: 960x720 centred ...` and `controls: first launch: the controls box`.
+3. **(0:15-1:30)** Legal screen, logos, intro cinemas with sound, then the title. Watch: sharp
+   picture (retina), no stretching, no crackle.
+4. **(1:30)** Title: Enter (or the gamepad's Start), then Enter / A through New Game and the
+   difficulty. The hub (Port of Adia) loads.
+5. **(2:30-6:00)** Click in the window (the mouse is captured; the click does not fire). Walk
+   (W A S D), look (mouse), jump (Space), fire (left click), Q / E for the wheels, Tab for the map.
+   Is the mouse speed right? (`CVars.gT2MouseSensitivity`, 2.0; change it with the game closed.)
+   Try the gamepad too if you have one.
+6. **(6:00)** Esc: the pause menu; Enter; back to the game (click to capture again).
+7. **(6:30)** Cmd-Tab away and back (no movement while away), drag the window wider (black bars
+   at the sides, the picture stays 4:3), F11 fullscreen and F11 back.
+8. **(8:00)** Plug in or pick other headphones (Control Center > Sound): the sound follows.
+9. **(9:00)** Quit with Cmd-Q. Relaunch: the window comes back where you left it, no controls box.
+10. **(10:00)** Send `~/Library/Application Support/turok2/logs/*.log` with what looked or sounded
+    wrong (step number, screenshot with Cmd-Shift-4). The longer checklist below covers each step in
+    detail.
+
+To start again from a first launch: quit, then
+`mv ~/Library/Application\ Support/turok2 ~/Library/Application\ Support/turok2.old`.
+
 ## 0. Before you start
 
-1. **The app**: a Release build of the round-19 tree, `tools/port/mkapp.sh OUT/rel` (or the one in
-   `OUT/r19/Turok2.app`), then `tools/port/apptest.sh OUT/Turok2.app OUT/turok2.o2r baserom.us.z64
-   /tmp/apptest` (must end with engine mode 11).
-2. **Your files**: `turok2.o2r` and `baserom.us.z64` in `~/Library/Application Support/turok2`.
+1. **The app**: the staged `OUT/play/Turok2.app` (above), or a Release build,
+   `tools/port/mkapp.sh OUT/rel`, then `tools/port/apptest.sh OUT/Turok2.app OUT/turok2.o2r
+   baserom.us.z64 /tmp/apptest` (must end with engine mode 11).
+2. **Your files**: inside the staged app already; for another build, `turok2.o2r` and
+   `baserom.us.z64` in `~/Library/Application Support/turok2`.
 3. **A fresh config**: if that folder has a `turok2.cfg.json` from an earlier build, rename it
    (`turok2.cfg.json.old`): this session should see the defaults. Keep any `turok2_pak1.mpk` you care
    about somewhere else too.
@@ -20,10 +57,12 @@ settings), [MACOS.md](MACOS.md) 20-21 (what was checked headless and how).
 
 ## 1. Launch, logos, title
 
-- `open OUT/Turok2.app` (or double-click it). A **640x480-point window** opens; the legal screen,
+- `open OUT/Turok2.app` (or double-click it). A **4:3 window centred on the display** opens (round 20:
+  the largest multiple of 320x240 points that fits in 90% of the display, 960x720 on a 14" MacBook;
+  before, 640x480 at the top left), with the controls box at the first launch; the legal screen,
   the pak check, the Acclaim and Iguana logos and the intro cinemas play with sound (about 70 s to
   the title).
-- In the log, near the top: `window: renderer OpenGL`, `window: backend OpenGL ... 640x480`,
+- In the log, near the top: `window: renderer OpenGL`, `window: backend OpenGL ... 960x720` (the first launch's size),
   `window: pixel density 2.00, render scale 1.00` (a retina display: the game draws at the window's
   pixels), `audio: playing on "<your output>"; following changes of the default output device`,
   `audio: coreaudio device, open (22,050 Hz stereo)`, and the controls table.
@@ -128,3 +167,6 @@ settings), [MACOS.md](MACOS.md) 20-21 (what was checked headless and how).
 - Esc and F1 free the mouse (LUS); a click captures it again.
 - The game keeps running while the window has no focus (no input reaches it).
 - A ~50 ms hitch when the output device changes (the new device is opened on the game thread).
+- `logs/turok2.log` has `[error] Failed add SDL game controller mappings from "./gamecontrollerdb.txt"`:
+  libultraship looks for SDL's optional community mapping file (QUICKSTART 5); without it SDL's
+  built-in mappings are used (every current Xbox, PlayStation and Switch pad).

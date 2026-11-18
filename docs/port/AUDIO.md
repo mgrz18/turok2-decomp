@@ -243,3 +243,96 @@ T2_TEST_SPEECH=311 turok2 ... --game --pak-blank --audio --wav sp.wav --frames 4
    ("no backend open": the test opens no archive); `turok2 --game --audio` covers that path.
 4. macOS: rerun with `--audio` once the merged tree runs there (the handle table and the
    pointer-wide heap code are in; the AI/AudioPlayer output path is untested there).
+
+## 12. Round 20 (i5): the port's sound against the N64's
+
+The first comparison with the N64's own output. The N64 side is what the game hands the AI (the
+DAC input) on mupen64plus (HLE RSP, which runs the game's ABI1 audio lists), recorded sample for
+sample; the port side is `--audio --wav`. Both start from the same point (power-on, or
+`--start-warp`/`T2_START_WARP` from the logo screen) and are lined up by the mode/game-frame
+sidecars, then to the sample by cross-correlation.
+
+### 12.1 Tools
+
+```sh
+# the N64: refshots.py --audio-dump attaches tools/port/n64audiodump.c (built with cc on the fly) as
+# mupen64plus's audio plugin: OUT.raw = stereo s16 LE at the AI rate (dacrate 2207: 48,681,812 / 2208
+# = 22,048 Hz); OUT.raw.txt = "frame N samples S dacrate D mode M level L gf G" per emulator frame
+xvfb-run -a -s "-screen 0 1024x768x24" python3 tools/port/refshots.py --rom baserom.us.z64 \
+    --out n64/w54 --frames 1900 --start-warp=-54@600 --audio-dump n64/w54.raw
+# the port: --wav now also writes WAV.txt = "frame F samples S mode M gf G" per frame
+T2_START_WARP=-54@1399 turok2 ... --game --no-window --pak-blank --audio --wav w54.wav --frames 4400
+# the comparison (N64 start = the first mode-13 line's samples / 22048.37, port's / 22050)
+python3 tools/port/audiocmp.py n64/w54.raw w54.wav --n64-from 23.45 --port-from 24.23 \
+    --len 40 --maxlag 1.5 --windows 5
+#   align (envelope, then waveform), rms/peak per channel, port/N64 in dB, L-R balance, DC, the
+#   waveform and 10 ms envelope correlations, spectral centroid, octave band energies from 86 Hz,
+#   the pitch offset (log-spectrum shift, cents)
+# the sound player's events per game frame (which sounds start/stop, vol/pan/pitch/fx values)
+T2_SNDP_LOG=2 ...                      # port: "sndp: gf G play|stop|pan|vol|pitch|fx target T [V]"
+python3 tools/port/n64trace.py ... --calls alSndpSetSound,alSndpPlay,alSndpStop,alSndpSetVol,\
+alSndpSetPan,alSndpSetPitch,alSndpSetFXMix > n64.txt
+python3 tools/port/sndpcmp.py port.log n64.txt --from 1 --to 520
+```
+
+### 12.2 The host bug found: the resampler
+
+`A_RESAMPLE` (t2asp.c) interpolated with a Catmull-Rom spline. The microcode uses its own 64-phase,
+4-tap filter table, which is in the ROM (aspMain's data, `aspMainDataStart` 0x800BFF50 = ROM
+0xC0B50, + 0xC0 = ROM **0xC0C10**; phase 0 = 0x0C39 0x66AD 0x0D46 0xFFDF, so even at pitch 1.0 the
+N64 smooths). Every voice goes through the resampler, so **the port was 2 dB too bright from 2.7
+to 5.5 kHz and 4 dB from 5.5 to 11 kHz** (the title music, octave bands from 86 Hz):
+
+| bands (dB of the total) | 86 | 172 | 345 | 690 | 1.4k | 2.7k | 5.5k |
+|---|---|---|---|---|---|---|---|
+| N64 | -4.4 | -9.4 | -9.5 | -5.4 | -9.6 | -20.7 | -32.0 |
+| port before | -4.7 | -9.6 | -9.4 | -5.4 | -8.9 | -18.6 | -28.2 |
+| port now | -4.5 | -9.4 | -9.3 | -5.4 | -9.4 | -20.6 | -32.3 |
+
+t2asp.c now reads the table from the ROM image at the first `A_RESAMPLE` (Catmull-Rom stays as
+the fallback, with a message, when the ROM has no such table): the phase is the fraction's top 6
+bits, the output `(s0*t0 + s1*t1 + s2*t2 + s3*t3) >> 15`, clamped. `audio_compare.py` filters its
+reference the same way: sounds 0 and 40 through the interpreter, max difference 0.
+
+### 12.3 The scenes compared (after the fix)
+
+| scene | how | level port vs N64 | L-R N64 / port | spectrum | waveform corr | notes |
+|---|---|---|---|---|---|---|
+| title music (song 16) | power-on, mode 7, 20 s | -0.03 dB | -0.39 / -0.39 dB | bands within 0.3 dB, centroid 156 / 156 Hz | 0.91-0.96 per 4 s | same notes; the port's song starts 0.16 s later after the mode switch; tempo drift 1.8 ms in 15 s = the AI rate (22,048 vs 22,050 Hz, 91 ppm, 0.16 cents) |
+| boot cinemas (intro, songs 22 etc.) | power-on, 0-66 s | within +-1 dB per 8 s | same | same | - | the N64's cinemas start up to 4 s earlier (load times), so only levels and spectra compare |
+| demo 1 | mode 13 after the title, 40 s | +0.29 dB | +0.66 / +0.55 | centroid 257 / 259 Hz | - | the attract demo diverges in play (known: different random numbers), the sounds with it |
+| level 53 start | warp -54, 40 s, no input | +0.97 dB | +7.4 / +7.6 | bands within 0.5 dB | **0.97-0.99** | the ambient loop's volume is a random draw at the level start (`SndVoice_InitVolume`: cue bytes a..b percent): 19,635 here, 18,500 on the N64 (sound 2: 7,209 on both); pan 28/82 and pitch 0.5/0.3124 identical |
+| hub (level 60) | warp -61, 40 s | +0.07 dB | -3.56 / -3.46 | bands within 0.1 dB | 0.5-0.74 | the first second: the logo screen's sound still plays on the port (instant load), the N64 lets it decay through its ~1 s load |
+| the Primagen's lair (boss) | warp 7602, 40 s, no input | +0.42 dB | +0.57 / +1.42 | bands within 0.6 dB | - | the fight's sounds follow the AI's random choices (different numbers) |
+| title menu SFX | START, then cursor moves | - | - | - | - | open: the port plays the cursor sound (slot 1, vol 12,607, pan 64) on each move, +6 dB over the music; on the N64 `--input` reaches the menu (START works) but neither the D-pad nor the stick moved the cursor in three runs (shots at 1455-1535 keep SINGLE), and `n64trace --calls alSndp*` saw no call there: no N64 reference yet |
+
+### 12.4 Sound events
+
+Level 53 from a common random seed at the load (`T2_RNG_LOAD=53:12345678` / `--rng-load`), game
+frames 1-520: the port plays 62 sounds, the N64 64; by sound player slot 3/4/5/6/7/8: port
+23/18/9/6/3/1, N64 25/12/14/6/4/3 (slots 1 and 2, the two ambient loops, start before the N64
+trace's first frame). The same slots, the same rates; the times and the volumes differ because the
+two sides still draw different random numbers inside the level (the N64 updates the sound world on
+its own frame cadence: 4-5 volume updates per game frame at the start). No sound kind is missing
+or extra. Pan values and the per-sound pitches (0.5000, 0.6661) agree where both play the same
+sound; the random pitch spreads (0.3139 / 0.3124) are draws.
+
+### 12.5 What was checked and is not a host bug
+
+- Sample rate: the N64's AI runs at 22,048 Hz (dacrate 2207), the port at 22,050; 368 samples
+  per retrace on both. The LUS player opens at 22,050 (main.cpp), the pacer follows its buffer.
+- Volume settings: the N64's option bytes at `gEngineApp_m_Settings + 0x13` are 01 80 FA FF
+  (n64trace --peek), the defaults the port sets (`gWarmBoot`).
+- Music: the notes were already identical (section 9); the title now also matches in level,
+  pan, spectrum and waveform (0.96).
+- Reverb tails and DC: the N64 has the same small negative DC (-30 to -100) as the port.
+- The envelope mixer: steps every 8 samples (the HLE interpolates inside the 8); no measurable
+  level difference (the title and the hub within 0.1 dB).
+
+### 12.6 Next
+
+1. A fully synced sound-event comparison needs the same random numbers inside the level on both
+   sides (the N64 draws on its own cadence); `sndpcmp.py` is ready for it.
+2. The ENVMIXER's ramp inside each group of 8 samples (linear on the RSP) for very fast
+   envelopes (clicks at note starts are not audible in the recordings).
+3. The speech streams (adec) were not part of these scenes; section 10's correlation stands.

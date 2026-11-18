@@ -3,6 +3,9 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "globals/engine.h"
+#ifdef TARGET_PORT
+#include "structs/swoosh.h"
+#endif
 
 typedef struct Mtx44 { s32 w[16]; } Mtx44;
 
@@ -42,8 +45,16 @@ typedef struct Emitter {
     /* 0x40 */ EmitNode *nodes;
     /* 0x44 */ EmitNode *tail;
     /* 0x48 */ s32 count;
+#ifdef TARGET_PORT
+    /* round 20 i3: Swoosh.length, after the host SwooshLinks' padding (Trail_DrawTextured reads it there) */
+    u8 pad4C[__builtin_offsetof(Swoosh, length) - __builtin_offsetof(Swoosh, nodes.count) - sizeof(s32)];
+#endif
     /* 0x4C */ f32 totalLength;
 } Emitter;
+#ifdef TARGET_PORT
+_Static_assert(__builtin_offsetof(Emitter, count) == __builtin_offsetof(Swoosh, nodes.count), "Emitter.count");
+_Static_assert(__builtin_offsetof(Emitter, totalLength) == __builtin_offsetof(Swoosh, length), "Emitter.totalLength");
+#endif
 
 void CMtxF__ToMtxAffine(void *, void *);
 void CMtxF__FromMtxAffine(void *, void *);

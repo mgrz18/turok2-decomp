@@ -621,3 +621,173 @@ shielded attacker on the stairs), the cut-scene into the Mother's arena (204,602
 shafts pale white-yellow, as on the N64 since h2), the Mother on the shredder (205,001), the
 arena after her (212,001), the Primagen's end and END 2 (252,251-255,503: the warp ring, Adon).
 The arena's walls and floor stay olive-green (12.3).
+
+## 13. The render sweep, part 1: the Mother's arena walls, the menu texts, the automap (Phase 7 round 20, part i1)
+
+### 13.1 The Mother's arena walls: the packed vertex colour offsets (fixed)
+
+- **The recolour lead is closed**: `n64trace.py --start-warp 7601@600 --calls
+  Texture_DecompressCallback --args a1:CCacheEntry:requestId:x` (n64trace now knows
+  `structs/cache.h`): the N64's 54 texture loads of the scene all have the top two bits clear, as
+  the port's. No texture of the arena is recoloured on either machine.
+- **The colours come from the vertices**: the port's display list at the arena (`T2_DLDUMP_AT`,
+  `--start-warp=-4@600` / `T2_START_WARP=-4@1400`, N64 emulator frame 700 = port 1753) draws the
+  walls with `TEX0 * SHADE`; the same vertex found in the N64's RDRAM dump (`refshots.py --rdram
+  700`, searched by its position bytes) has the colour C9 CA CB where the port has C9 CA 79, 2C 2D
+  2C on both: red and green equal, **blue lost**. The light volumes the vertices are lit by
+  (`LightVolume_Construct`, instrumented, not committed) are the same on both (mostly white).
+- **Cause**: `Lighting_BuildLitVertices` adds per-vertex colour offsets from the model's geometry
+  block 1 (`Model_ApplyPackedOffsets`, func_00213684.c: one word per vertex, signed bytes x:16-23,
+  y:8-15, z:0-7, times 2). That block is `op: unk` in `tools/assets/swap_spec.json` ("reader
+  unknown"), so the archive keeps it big-endian, and the host's word load took the green offset
+  for red, red for green and the zero top byte for blue. **Fix** (TARGET_PORT, asm_diff 0): the
+  word is read big-endian. Every lit model with packed offsets in every level got this; the arena
+  is where the offsets are blue.
+- **Result**: the arena (N64 700 / port 1753) mean (35.8, 33.1, 23.7) on the N64, (35.4, 32.6,
+  23.2) on the port (before: (34.5, 33.3, 8.3)); the walls are brown-grey with the blue tint on the
+  left as on the N64. Render only: the default run's det lines are unchanged (`0959aac5…`).
+
+### 13.2 Menu texts the port never generated (fixed)
+
+The main menu showed ENTER CHEAT, CHEATS, OPTIONS, SOUND OPTIONS but **not SINGLE and MULTI**
+(the cursor's red bar was a sliver at the top); the single-player menu had no NEW GAME / LOAD, the
+deathmatch menus no labels. A menu item's text is an `s32` in its `MenuItemDesc`; `Menu_Construct`
+turns it into a host pointer with `t2_n64_to_host` (port/gen/relocs.c), which only knows the data
+symbols gendata generated. The strings at 0x800B5EB0..0x800B5F3C ("single", "new game", "load",
+"multi", "deathmatch", "blood lust", ...) have no label in the ELF and no C file names them, so
+nothing generated them and the items got NULL.
+
+- **Fix** (`tools/port/gendata.py`, `add_int_targets`): an address an integer slot holds that no
+  generated symbol covers, inside `.code_rodata`/`.code_rodata_tail`, gets a symbol of its own
+  (`D_<address>`, the ROM bytes up to the next label). 8 such symbols this build (data_report.txt:
+  "unlabelled ROM data ..."); a check over every menu item desc in the ELF (each `MenuItem_Draw*`
+  item whose data is an RDRAM address) now finds **0 uncovered of 54** (it found 54 before).
+- **The Enter Cheat keyboard drew no letters** (only the two arrow keys): `D_800C1144` (" ", "Z",
+  "Y", ... one-character strings a word apart) was declared `extern s32` in
+  `EnterCheatMenu_ResultLabel` and `u8[]` elsewhere; gendata took the word shape and swapped them.
+  Declared as bytes (func_0041AEB0.c, asm_diff 0): the keyboard shows A-Z.
+
+### 13.3 The automap (fixed: it was never visible)
+
+Three host bugs, found by pressing L (the map) after `T2_START_WARP=-61@1400`:
+
+1. **Fast3D has no line microcode**: `Automap_Draw` (func_004004D8.c) draws the map with
+   `G_LINE3D` (L3DEX2). libultraship logs 0x08 as unhandled and draws nothing. On the port each
+   line is now a quad of two triangles (`T2Automap_Line`: half a pixel of the N64 frame each side,
+   5 units under the world matrix's 0.1 scale, 1 unit for the compass), with the same vertex
+   colours, 8 quads to a `gSPVertex` (TARGET_PORT; asm_diff 0 over the whole tree).
+2. **The indices overwrote the projection**: `sAutomapLineIndices` (0x80129200..0x80129A00) was
+   declared `u16 []`; a splat label 2 bytes in (`D_80129202`) made gendata give it 2 bytes, and the
+   index pairs ran over the next host globals, `sAutomapOrthoMtx` first (its words read 2, 3, 4,
+   5, ...: nothing on screen). `include/globals/automap.h` now sizes it `[0x400]` (0x800 bytes).
+3. **The map's own task made every other frame black**: with the map on, the frame is two gfx
+   tasks (`CEngineApp__SubmitGfxTask`: the main list with flags 3, the line list with 0x23, the
+   same framebuffer). The app drew each as a frame of its own: the map's frame had no scene
+   (black) and the scene's had no map. `game.cpp` now keeps a task that is not the last of its
+   frame (`T2Sched_TaskEndsFrame`, port/game/t2sched.c: OS_SC_LAST_TASK) and draws it with the
+   next one through a 3-command list (G_DL main, G_DL lines, G_ENDDL).
+
+The map now shows the region outlines (white), the player's arrow (yellow) and the compass
+(magenta N) over the scene, every frame. The N64 reference cannot show it: Rice does not draw
+L3DEX2 lines (n64trace `--pad` pressed L at the same frame, the pause menu that followed was shot
+fine, no line appeared): an emulator limitation, so the map's look is checked by reading the code.
+
+### 13.4 Tools
+
+- `n64trace.py --shots A,B:C:STEP`: screenshots from the debugger run, so that `--pad` input can
+  be shot (refshots.py's `--input` keys do not reach the game: the menu, map and pause shots need
+  `--pad`).
+- `n64trace.py --args` can name `CCacheEntry` members.
+## 14. Levels 4-6, the bosses, the endings: the shot sweep and the trails (Phase 7 round 20, part i3)
+
+### 14.1 Method
+
+Both sides start the same warp from the attract loop and stand still; the shots are paired by the
+game frame (RENDER.md 9 has the scene table):
+
+```sh
+# the N64 (Rice under Xvfb; ~45 s a warp): shots at emulator frames 650..1100, gf 25..475
+xvfb-run -a -s "-screen 0 1024x768x24" python3 tools/port/refshots.py --rom baserom.us.z64 \
+    --out N64DIR --start-warp=-101@600 --shots 650:1100:25          # N64DIR/shots.txt: shot -> gf
+# the port (Release, headless, drawn): every second frame from 1440, then keep one shot per gf
+SDL_VIDEODRIVER=offscreen T2_START_WARP=-101@1400 T2_DET_LOG=1 T2_DET_GF=1 \
+    T2_SHOT=DIR/s T2_SHOT_EVERY=2 T2_SHOT_FROM=1440 OUT/rel/app/turok2 --archive turok2.o2r \
+    --rom baserom.us.z64 --game --draw --pak-blank --frames 2400
+```
+
+A shot named `s.N.ppm` is the frame drawn after the det line of frame N-1 (two VIs a game frame;
+four in the heavy arenas 2 and 3, where the shot's gf is the last det line before it). Note the
+`=` in `--start-warp=-101@600` (argparse takes `-101` for an option otherwise). Warps: -101, -104
+(level 4), -125, -88, -92, -93 (level 5), -115, -118, -121, -124 (level 6), -2, -3, -4, -5, 7602
+(the bosses), -77, -78 (talismans), -83, -84 (flesh eaters), -11, -12 (the ending levels).
+
+### 14.2 What differs
+
+- **The hive's light shafts** (levels 87, 91): on the N64 tall pale beams come and go every few
+  seconds; never on the port. `n64cmp.py run --warp=-93 --level 92 --gf 150,250,300`: no actor
+  differs, only the particle pool (the drips 226/227, as many on both sides, spawned on another
+  random stream from gf 2: 11.1's load-timing class), and the drips carry swooshes on both sides
+  (`m_ActiveSwooshes`). The shafts are the drips' trails; the port drew none of the game's trails:
+  three host bugs (RENDER.md 9.2): the swoosh records' fade time and node life left
+  big-endian (`swap_spec.json`, a new archive), the trail point tables untyped (gendata), four
+  Swoosh views at N64 offsets (func_0023353C.c, func_00233868.c, func_00234C88.c,
+  func_00234348.c, func_0023417C.c). After the fix the shafts appear as on the N64.
+- **Weapon trails** (port only: `T2_GIVE_WEAPONS=1 T2_FILL_AMMO=1 T2_WEAPON=16`, warp -101, Z
+  from frame 1680): the scorpion launcher's rocket leaves a white smoke ribbon from the barrel
+  with the fix; before it, only the fire puffs. Every projectile, energy and explosion trail is in
+  the same class.
+- **The Lightship doorways** (117, 120, 123): bright green lines in the doorway on the N64, a dark
+  doorway with a ring on the port; open, probably Rice (RENDER.md 9.3).
+- Everything else in the table matches up to the round-17 rounding (the port 1-2 % darker).
+
+### 14.3 Gameplay and the runs
+
+The record's floats are read by game logic too (a node's life, a swoosh's fade, the emitter
+spacing in `Trail_PlaceNodes`), so the particle pool changes: on the default run the first det
+line that differs is frame 21,132 (level 1: one particle slot keeps the "matrix built" flag
+0x100000 clear instead of set), and only in the particle-pool hash: **with the `ptcl` hash taken
+out, all 600,000 det lines equal the round-19 run's** (and the 580,000 of `--legacy`). The RNG,
+the player and every actor are the same, so no route moved:
+
+| run (this branch, Release, `aimdrive.py`, ASLR on, `T2_DET_LOG=1`) | result | det md5 |
+|---|---|---|
+| the default command, 300,000 frames | END 2 (level 10 from frame 254,608, as with 70f3333c), 5 totems, 367 hits, **0 lives lost**; lowest health 14 (135), 18 (133, 130, the lair) | `08540b5d…` (600,000 lines); 70f3333c's binary and archive with the same script: `0959aac5…` |
+| `--legacy`, 290,000 frames | END 2 (level 10 from frame 247,922, as with 70f3333c), 553 hits, 2 lives lost (the City Totem, as before) | `ac08c89b…` (580,000); 70f3333c: `281904eb…` |
+| the default command drawn (`--draw`, the trails drawn all game long) | the same END 2, 0 lives lost, 367 hits; **every det line equals the undrawn run's** | `08540b5d…` |
+
+The archive changes (sha1 `8eb5b23b…`, was `a9d14a47…`): rebuild `OUT/turok2.o2r` with
+`mkarchive.py` after the merge, or the trails stay invisible (the binary alone gets the struct
+fixes, not the records).
+## 15. The sound against the N64 (Phase 7 round 20, part i5)
+
+The audio side of the fidelity oracle: `refshots.py --audio-dump` records what the N64 hands its
+AI (a mupen64plus audio plugin, `tools/port/n64audiodump.c`), `--wav` + its new `.txt` sidecar
+on the port, `audiocmp.py` lines them up and compares level, balance, spectrum, waveform and
+pitch, `sndpcmp.py` compares the sound player's events (`T2_SNDP_LOG=2` against `n64trace.py
+--calls alSndp*`). One host bug: **the ABI1 resampler interpolated with Catmull-Rom instead of the
+microcode's 64-phase table** (in the ROM at 0xC0C10), so every sound was 2-4 dB too bright above
+2.7 kHz; fixed in `port/audio/t2asp.c`. After it the title music matches within 0.03 dB, the same
+balance and octave bands within 0.3 dB, waveform correlation 0.96; the level-53 start 0.99 (its
++1 dB is the ambient loop's random volume); the hub, the lair and demo 1 within 0.5 dB with the
+same spectra. Table and method: [AUDIO.md](AUDIO.md) 12. The demo's sounds diverge with the
+random numbers (demo 1's play is identical, 12.1, but `detdiff` skips the rng): the sound world
+draws volumes, pitches and ambient picks from them.
+
+## 16. The round-20 merge: what the five branches do together (Phase 7 round 20)
+
+The fixes of 13 (i1), 14 (i3) and 15 (i5) were checked together on the merged tree, with the new
+archive (sha1 `8eb5b23b…`):
+
+- **Gameplay is untouched by the render and sound fixes.** The default run's det lines without the
+  `ptcl` field are those of i2's run on the old tree (`d822dee7…`); with it, `dc8126d3…`. The boot,
+  the three demos, levels 3, 5 and 6 and three boss recipes are identical to round 19 in every
+  field; levels 1, 2 and 4 and the Mother differ in `ptcl` only (the trails now exist).
+- **Against the N64's RAM** (fresh `n64trace.py` + `detdiff.py`): demos 1 and 3 no difference, demo
+  2 the known `player.hp` read of uninitialised heap.
+- **Drawn**: the whole default run with `--draw` gives the undrawn md5 and no crash, through every
+  new swoosh path; the automap opens by L in the hub and in level 53.
+- **Seen in shots of the merged binary**: the main menu with SINGLE, MULTI, ENTER CHEAT, CHEATS,
+  OPTIONS and SOUND OPTIONS; NEW GAME / LOAD; the automap in two levels; the Mother's arena in its
+  brown and cream; a light shaft in level 91; END 2.
+- **The title music** against i5's N64 dump (`audiocmp.py`, 8 s): -0.04 dB, envelope correlation
+  0.90, the bands as in AUDIO.md 12.3, the port 0.16 s late.

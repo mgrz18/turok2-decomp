@@ -23,6 +23,7 @@
 // frame and task, [--low-memory] (Linux debug) puts the game memory below 2 GB.
 #include <libultraship/libultraship.h>
 
+#include <algorithm>
 #include <chrono>
 #include <cinttypes>
 #include <climits>
@@ -322,7 +323,13 @@ int main(int argc, char** argv) {
         }
         std::vector<std::string> dirs = { data };
         if (const char* base = SDL_GetBasePath(); base != nullptr) { // the executable's dir; .app: Contents/Resources
-            dirs.emplace_back(base);
+            // Round 20 (i4): an app bundle that carries the game files (mkapp.sh with
+            // T2_APP_ARCHIVE / T2_APP_ROM, a ready-to-play copy) uses its own first, so that an older
+            // turok2.o2r left in the user data dir cannot shadow the archive built with it.
+            const std::string b = base;
+            const std::string res = "/Contents/Resources/";
+            const bool bundle = b.size() >= res.size() && b.compare(b.size() - res.size(), res.size(), res) == 0;
+            dirs.insert(bundle ? dirs.begin() : dirs.end(), b);
         }
         dirs.emplace_back(std::filesystem::current_path(ec).string());
         if (!args.archiveGiven) {
@@ -361,6 +368,8 @@ int main(int argc, char** argv) {
             fprintf(stderr, "turok2: cannot write %s\n", out.c_str());
         }
         setvbuf(stdout, nullptr, _IOLBF, 0);
+        printf("files: %s, %s\n", std::filesystem::absolute(args.archive).string().c_str(),
+               std::filesystem::absolute(args.rom).string().c_str()); // round 20: which copies
         // the runtime's diagnostics (t2:, t2audio:) go to stderr: into logs/ as well
         if (isatty(fileno(stderr))) {
             fprintf(stderr, "turok2: playing; logs in %s/logs\n", data.c_str());
@@ -392,13 +401,35 @@ int main(int argc, char** argv) {
     // windowed.
     {
         bool changed = false;
-        if (!config->Contains("Window.Width") || !config->Contains("Window.Height")) {
-            config->SetInt("Window.Width", 640);
-            config->SetInt("Window.Height", 480);
-            changed = true;
-        }
         const char* driver = getenv("SDL_VIDEODRIVER");
         const bool headless = driver != nullptr && strcmp(driver, "offscreen") == 0;
+        if (!config->Contains("Window.Width") || !config->Contains("Window.Height")) {
+            // Round 20 (i4): a player's first launch (play mode, a real window) gets a 4:3 window
+            // of N x 320x240 points, the largest N (2-6) that fits with its title bar in 90% of the
+            // main display's usable area (below the menu bar, above the Dock), centred in it (a 14"
+            // MacBook: 960x720; before: 640x480 at (100, 100), small, in a corner). Headless and
+            // scripted runs keep 640x480 (the screenshots' size).
+            int w = 640, h = 480;
+            if (args.play && args.window && !headless && SDL_InitSubSystem(SDL_INIT_VIDEO)) {
+                SDL_Rect b;
+                if (SDL_GetDisplayUsableBounds(SDL_GetPrimaryDisplay(), &b) && b.w > 0 && b.h > 0) {
+                    const int title = 28; // the title bar above the content (points)
+                    int n = 2;
+                    while (n < 6 && 240 * (n + 1) + title <= b.h * 9 / 10 && 320 * (n + 1) <= b.w * 9 / 10) {
+                        n++;
+                    }
+                    w = 320 * n;
+                    h = 240 * n;
+                    config->SetInt("Window.PositionX", b.x + std::max(0, (b.w - w) / 2));
+                    config->SetInt("Window.PositionY", b.y + std::max(title, (b.h - h + title) / 2));
+                    printf("window: first launch: %dx%d centred on a %dx%d display area\n", w, h, b.w, b.h);
+                }
+                SDL_QuitSubSystem(SDL_INIT_VIDEO);
+            }
+            config->SetInt("Window.Width", w);
+            config->SetInt("Window.Height", h);
+            changed = true;
+        }
         if (!config->Contains("Window.Fullscreen.Enabled") ||
             (headless && config->GetBool("Window.Fullscreen.Enabled", false))) {
             config->SetBool("Window.Fullscreen.Enabled", false);
@@ -445,7 +476,9 @@ int main(int argc, char** argv) {
     // the player's settings in the config (play mode, a window, --pad-test; not the scripted
     // headless runs)
     if (args.game && (args.play || args.window || !args.padTest.empty())) {
-        T2Controls_RegisterSettings(args.play || args.window);
+        const char* vd = getenv("SDL_VIDEODRIVER");
+        const bool realWindow = args.play && args.window && !(vd != nullptr && strcmp(vd, "offscreen") == 0);
+        T2Controls_RegisterSettings(args.play || args.window, realWindow);
         T2Display_RegisterSettings(args.play || args.window); // gT2Renderer, gT2RenderScale (t2display.cpp)
         printf("window: config %dx%d, fullscreen %d (Window.Width/Height, Window.Fullscreen.Enabled)\n",
                config->GetInt("Window.Width", 640), config->GetInt("Window.Height", 480),

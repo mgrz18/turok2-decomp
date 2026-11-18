@@ -1,5 +1,19 @@
 #include "common.h"
 
+#ifdef TARGET_PORT
+/* Round 20 i3: a Swoosh (structs/swoosh.h) at its host offsets. The N64 pad read the frame from
+ * texture[1] and id, and wrote the end frame over texture[1] (the trail's texture handle). */
+#include "structs/swoosh.h"
+typedef struct FrameAnim {
+    u8 pad0[__builtin_offsetof(Swoosh, unk2C)];
+    f32 endFrame;               /* unk2C */
+    f32 frame;                  /* unk30 */
+    u8 pad34[0x4];              /* layer */
+    s32 randomFrame;            /* unk38 */
+} FrameAnim;
+_Static_assert(__builtin_offsetof(FrameAnim, frame) == __builtin_offsetof(Swoosh, unk30), "FrameAnim.frame");
+_Static_assert(__builtin_offsetof(FrameAnim, randomFrame) == __builtin_offsetof(Swoosh, unk38), "FrameAnim.randomFrame");
+#else
 typedef struct FrameAnim {
     /* 0x00 */ u8 pad0[0x2C];
     /* 0x2C */ f32 endFrame;
@@ -7,6 +21,7 @@ typedef struct FrameAnim {
     /* 0x34 */ u8 pad34[0x4];
     /* 0x38 */ s32 randomFrame;
 } FrameAnim;
+#endif
 
 typedef struct FrameAnimDef {
     /* 0x00 */ u8 pad0[0x1E];

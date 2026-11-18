@@ -1605,3 +1605,66 @@ no system setting changed). No change to `src/` or `include/`. Release build (`-
 - The default command (`OUT/r19/det.sh def`, the round-19 300,000 frames, `T2_DET_LOG=1`, ASLR on):
   600,000 det lines, md5 `6213496b…` (= Linux, STATUS), END 2 at 250,566, 0 deaths in the run's
   hurt summary, exit 0, 94.7 s. The port-side changes of this round do not touch a headless run.
+
+## 22. Round 20 (part i4): the ready-to-play app, the first launch a player sees
+
+Branch `names-R20_i4` (from 70f3333c), Mac (M5, macOS 27.2) only, headless (no window was opened,
+no system setting changed). No change to `src/` or `include/`. Release build (`-O2`, no LTO) in
+`OUT/build_r20` (`OUT/r20/build.sh`, = `OUT/r19/build.sh`).
+
+### 22.1 The fresh user's path (QUICKSTART 1-2) on the round-19 tree
+
+- A scratch clone of 70f3333c (`git clone` of the Mac repository, the ROM copied in, deleted at
+  the end) and QUICKSTART 1's commands in order: `HOMEBREW_NO_INSTALL_UPGRADE=1 brew install ...`
+  (all present: brew prints `Error: <name> is already installed` for the four outdated ones,
+  cmake 4.4.4, sdl3 3.4.18, libzip 1.12_1, python@3.13 3.13.16, and exits 1: harmless, now in
+  QUICKSTART), the venv with `pyelftools` and `clang==21.*`, `mkarchive.py` (4.5 s, sha1
+  `83710b56…`, the Mac zlib's archive of section 15), the first `cmake` 1 min 42 s (the downloads),
+  the game library, gendata 23 s, the executable: **3 min 20 s** in all. `--bogus` prints the
+  usage; `mkapp.sh OUT/rel`; `apptest.sh` (Application Support layout): codesign ok, 0 references
+  to Homebrew, engine mode 11 at VI 4,855, exit 0. No other drift in QUICKSTART, MACOS or
+  FIRSTRUN than the ones fixed below (the window size, the timings, the brew message).
+
+### 22.2 What a player sees at the first launch (port/app/main.cpp, t2controls.cpp)
+
+The static review of the play-mode path a human hits first:
+
+| item | before | now |
+|---|---|---|
+| first launch, no config | defaults written (window, look settings, 4:3 bars) | the same |
+| window size and place | 640x480 points at (100, 100): small, top left on a 1512x982 MacBook | **4:3, N x 320x240 points, the largest N (2-6) that fits with its title bar in 90% of the main display's usable area, centred** (`SDL_GetDisplayUsableBounds` of the primary display; video subsystem initialised and quit again before LUS's own init, so its hints apply). This M5 14": usable 1512x875 at (0, 33) -> 960x720 at (276, 124). Headless and scripted runs (`--no-window`, `--offscreen-gl`, `SDL_VIDEODRIVER=offscreen`) keep 640x480 at (100, 100); a saved size or place is kept |
+| the controls | printed in `logs/turok2-stdout.log` only (a double-click has no log open); F1 shows the box | **the F1 box once at the first launch**, when the window is up (`gT2ControlsShown` 1 is then saved); `gT2ShowControlsAtStart` 0 turns off both the log table and the box; never with `--pad-test` or offscreen |
+| the game files | Application Support, then the executable's folder (`Contents/Resources`), then the current folder | **a bundle uses its own `Contents/Resources` first** (only when the base path ends in `/Contents/Resources/`): a stale `turok2.o2r` in Application Support cannot shadow the archive built with the app (checked: a junk `turok2.o2r` there, the bundle's used); a bundle without files falls through to Application Support as before. The log's new first line `files: ARCHIVE, ROM` says which copies |
+| mouse sensitivity | `gT2MouseSensitivity` 2.0 (range-checked), dead zone 3 | kept (FIRSTRUN asks the player) |
+| audio volume | no host gain: the game's own music/effects volumes (its options menu) and LUS's mixer at unity | kept |
+| renderer | OpenGL (`gT2Renderer` 0) | kept |
+| debug switches | every `getenv` in `port/` and `src/` (105 sites: `T2_*`, `SHIP_HOME`, `HOME`, `XDG_DATA_HOME`, `SDL_VIDEODRIVER`) read: each `T2_*` changes nothing unless set (the `T2_LEGACY_*` ones are off unless set and not `0`; `T2_DLCHECK` is on only without a window) | ok, no change |
+| logs | `~/Library/Application Support/turok2/logs/` (stdout, stderr, LUS's `turok2.log`); a terminal launch prints where | ok; LUS logs `[error] Failed add SDL game controller mappings from "./gamecontrollerdb.txt"` when the optional file is absent: in FIRSTRUN's "known, not bugs" |
+
+The display-size path cannot run headless (it needs a window): its SDL calls were checked in a
+small program with `SDL_HINT_MAC_BACKGROUND_APP` (no Dock icon, no window): Cocoa's video
+initialised, quit and initialised again, the usable bounds both times 1512x875 at (0, 33).
+
+### 22.3 The ready-to-play app (tools/port/mkapp.sh, apptest.sh)
+
+- `mkapp.sh`: `T2_APP_ARCHIVE` and `T2_APP_ROM` copy the player's two files into
+  `Contents/Resources` **before** the signature (adding them after it broke `codesign --verify`);
+  refused together with `T2_APP_ZIP` (such a bundle holds the ROM). Default version 0.20 (build 20).
+- `apptest.sh APP - - WORK`: `-` = the bundle carries the file, nothing in Application Support; it
+  prints the log's `files:` line.
+- **Staged**: `OUT/play/Turok2.app` (`T2_APP_ARCHIVE=OUT/turok2_r20.o2r` (the 22.1 archive)
+  `T2_APP_ROM=baserom.us.z64 tools/port/mkapp.sh OUT/build_r20 OUT/play/Turok2.app`), 75 MB.
+  `apptest.sh OUT/play/Turok2.app - - ...`: codesign ok, 0 Homebrew references, every dylib from
+  the bundle, `files:` both in the copy's `Contents/Resources`, engine mode 11 at VI 4,855, exit 0.
+  `OUT/` is ignored by git: the ROM stays out of it. The user's own Application Support folder was
+  empty and was not touched.
+
+### 22.4 The whole game (the changes touch no headless run)
+
+`OUT/r20/det.sh` (= round 19's, `FR` sets the frames), `T2_DET_LOG=1`, ASLR on, `--no-window`:
+
+| binary, command | result |
+|---|---|
+| `OUT/build_r20` (this branch), the default (`--all --talismans 2 --cheats-off 1,2,3,4,5,6`, 300,000) | 600,000 lines, md5 **`0959aac5…`** (= the box), END reached (level 10 from 258,880), run hurt summary 0 deaths, exit 0, 63.8 s |
+| the scratch clone's `OUT/rel` (70f3333c as a fresh user builds it), the same | md5 `0959aac5…`, exit 0, 58.1 s |
+| `OUT/build_r20`, `--legacy` (290,000) | 580,000 lines, md5 **`281904eb…`** (= STATUS), level 10 from 252,194, 2 deaths (the City Totem, as documented), exit 0, 41.8 s |

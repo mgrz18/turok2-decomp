@@ -515,7 +515,7 @@ ROM has floats there (15 distinct records):
 Typed as `f32` in `include/structs/intelligence.h` (asm_diff over the whole tree: 0 of 3,938),
 the three readers use the members. **The archive changes**: sha1
 `a9d14a47dba3f75ab30a0e4cdfdb1cee56977d22` (26,124 units, `archive_check.py`: OK, format 2.0;
-round 11: `b6b9d484...`). A new binary with the old archive reads the scales byte-swapped
+round 11: `b6b9d484...`; round 20's swoosh records made it `8eb5b23b...`, STATUS.md 1). A new binary with the old archive reads the scales byte-swapped
 (4.6e-41: no jump); rebuild the archive and rerun gendata (`rm decls.json`) with this tree.
 
 ## Part 7 (Phase 7 round 13, b5): a union in ROM data, the a5 leftovers

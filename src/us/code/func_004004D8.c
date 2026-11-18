@@ -86,6 +86,69 @@ static __inline__ s32 EdgeVisible(CVector3 *corners, CVector3 *p0, CVector3 *p1)
     return 1;
 }
 
+#ifdef TARGET_PORT
+/* Round 20 i1: Fast3D has no G_LINE3D (the N64 draws the automap with the L3DEX2 line microcode:
+ * libultraship logs the 0x08 commands as unhandled and draws nothing, so the map was never seen
+ * on the port). Each line becomes a quad, two triangles `half` model units to each side of it
+ * (half a screen pixel of the N64's frame under the line's modelview), drawn with the same
+ * vertex colours and modes; quads go out 8 to a gSPVertex (32 vertices). The quads live until
+ * the frame is drawn: one buffer per gEvenOdd, as the line vertices. */
+#define T2_MAP_QUADS 1536
+static Vtx_t sT2MapQuadVtx[2][T2_MAP_QUADS * 4];
+static s32 sT2MapQuadCount;  /* quads in this frame's buffer */
+static s32 sT2MapQuadFirst;  /* the first one not yet sent */
+
+static void T2Automap_Flush(void) {
+    Vtx_t *buf = sT2MapQuadVtx[gEvenOdd];
+    s32 n;
+    s32 q;
+
+    while (sT2MapQuadFirst < sT2MapQuadCount) {
+        n = GBI_MIN(sT2MapQuadCount - sT2MapQuadFirst, 8);
+        GFX_CMD(VTX_W0(n * 4), GBI_ADDR(&buf[sT2MapQuadFirst * 4]));
+        for (q = 0; q < n; q++) {
+            s32 v = q * 4 * 2;
+            GFX_CMD(0x06000000 | ((v + 0) << 16) | ((v + 2) << 8) | (v + 4),
+                    ((v + 0) << 16) | ((v + 4) << 8) | (v + 6)); /* gSP2Triangles */
+        }
+        sT2MapQuadFirst += n;
+    }
+}
+
+static void T2Automap_Line(Vtx_t *a, Vtx_t *b, f32 half) {
+    Vtx_t *q;
+    f32 dx = (f32) (b->ob[0] - a->ob[0]);
+    f32 dy = (f32) (b->ob[1] - a->ob[1]);
+    f32 len = __builtin_sqrtf(dx * dx + dy * dy);
+    s32 nx;
+    s32 ny;
+    s32 k;
+
+    if (sT2MapQuadCount >= T2_MAP_QUADS) {
+        return;
+    }
+    if (len < 0.001f) {
+        dx = 1.0f, dy = 0.0f, len = 1.0f;
+    }
+    nx = (s32) (-dy / len * half + (dy <= 0.0f ? 0.5f : -0.5f));
+    ny = (s32) (dx / len * half + (dx >= 0.0f ? 0.5f : -0.5f));
+    if (nx == 0 && ny == 0) {
+        nx = 1;
+    }
+    q = &sT2MapQuadVtx[gEvenOdd][sT2MapQuadCount * 4];
+    q[0] = *a, q[1] = *a, q[2] = *b, q[3] = *b;
+    q[0].ob[0] += nx, q[0].ob[1] += ny;
+    q[1].ob[0] -= nx, q[1].ob[1] -= ny;
+    q[2].ob[0] -= nx, q[2].ob[1] -= ny;
+    q[3].ob[0] += nx, q[3].ob[1] += ny;
+    for (k = 0; k < 4; k++) {
+        q[k].flag = 0;
+    }
+    sT2MapQuadCount++;
+}
+#define T2_MAP_LINE(vtxs, i0, i1, half) T2Automap_Line(&(vtxs)[i0], &(vtxs)[i1], half)
+#endif
+
 void Automap_Draw(MapView *view) {
     s32 codes[3];
     f32 world[16];
@@ -147,6 +210,10 @@ void Automap_Draw(MapView *view) {
     if (view->visible == 0 || gPersistentDataLoaded == 0) {
         return;
     }
+#ifdef TARGET_PORT
+    sT2MapQuadCount = 0;
+    sT2MapQuadFirst = 0;
+#endif
     GFX_CMD(0xDB060000, 0);                                 /* gSPSegment(0, 0) */
     GFX_CMD(0xDE000000, GBI_ADDR(gRspInitDL));                  /* gSPDisplayList */
     GFX_CMD(0xDE000000, GBI_ADDR(gRdpInitDL));
@@ -464,6 +531,13 @@ void Automap_Draw(MapView *view) {
 draw:
     /* Draw the lines in batches of up to 32 vertices; nVtx now counts the
      * batch's first vertex. */
+#ifdef TARGET_PORT
+    /* the same lines (every index pair), as quads: the world matrix scales by 0.1, so half a
+     * pixel is 5 units */
+    for (i = 0; i < nIdx - 1 && nVtx >= 2; i += 2) {
+        T2_MAP_LINE(vtx, sAutomapLineIndices[i], sAutomapLineIndices[i + 1], 5.0f);
+    }
+#else
     remaining = nVtx;
     nVtx = 0;
     i = 0;
@@ -480,6 +554,7 @@ draw:
         remaining -= count;
         nVtx += count;
     }
+#endif
 
     /* The player's arrow. */
     vtx = sAutomapYellowVtx[gEvenOdd];
@@ -495,9 +570,15 @@ draw:
     vtx[0].cn[3] = alpha;
     vtx[1].cn[3] = alpha;
     vtx[2].cn[3] = alpha;
+#ifdef TARGET_PORT
+    T2_MAP_LINE(vtx, 0, 1, 5.0f);
+    T2_MAP_LINE(vtx, 0, 2, 5.0f);
+    T2Automap_Flush(); /* before the compass's matrix */
+#else
     GFX_CMD(VTX_W0(3), GBI_ADDR(vtx));
     GFX_CMD(LINE_W0(0, 1), 0);
     GFX_CMD(LINE_W0(0, 2), 0);
+#endif
 
     /* The compass. */
     vtx = sAutomapMagentaVtx[gEvenOdd];
@@ -533,6 +614,15 @@ draw:
     vtx[5].cn[3] = alpha;
     vtx[6].cn[3] = alpha;
     vtx[7].cn[3] = alpha;
+#ifdef TARGET_PORT
+    T2_MAP_LINE(vtx, 0, 1, 1.0f);
+    T2_MAP_LINE(vtx, 1, 2, 1.0f);
+    T2_MAP_LINE(vtx, 1, 3, 1.0f);
+    T2_MAP_LINE(vtx, 4, 5, 1.0f);
+    T2_MAP_LINE(vtx, 5, 6, 1.0f);
+    T2_MAP_LINE(vtx, 6, 7, 1.0f);
+    T2Automap_Flush();
+#else
     GFX_CMD(VTX_W0(8), GBI_ADDR(vtx));
     GFX_CMD(LINE_W0(0, 1), 0);
     GFX_CMD(LINE_W0(1, 2), 0);
@@ -540,4 +630,5 @@ draw:
     GFX_CMD(LINE_W0(4, 5), 0);
     GFX_CMD(LINE_W0(5, 6), 0);
     GFX_CMD(LINE_W0(6, 7), 0);
+#endif
 }
