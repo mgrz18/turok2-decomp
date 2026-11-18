@@ -291,6 +291,47 @@ every run). `mpk_saves.py` on the default run's pak: note 1, checksum OK.
 | 0dd2981e | a frame's two gfx tasks drawn as one (the map); `n64trace.py --shots` |
 | (last) | docs |
 
+## Round 20, part i3: the render sweep of levels 4-6, the bosses and the endings; the trails (branch names-R20_i3)
+
+- **The sweep** (RENDER.md 8-i3, FIDELITY.md 13-i3): 21 warps shot on the N64 (Rice,
+  `refshots.py --start-warp=W@600`) and on the port (`T2_START_WARP=W@1400`, 8-bit `T2_SHOT`),
+  paired by gf: level 4 (100, 103), level 5 (124, 87, 91, 92), level 6 (114, 117, 120, 123), the
+  talisman (76, 77) and flesh-eater (82, 83) rooms, the Blind One's arena, the lair (from its
+  start and from the hub pad), the ending levels 10 and 11. **Match** but for: the hive's light
+  shafts (fixed, below); the Lightship's doorways (thin green lines on the N64, a dark doorway on
+  the port: open, probably Rice); the Queen's and the Mother's intros (cut-scenes on elapsed
+  time: not comparable by gf).
+- **No trail was ever drawn on the port: three host bugs, fixed.** The hive's shafts are its drip
+  particles' trails; every swoosh (projectile smoke, energy ribbons, the drips) came out empty:
+  (1) the "particle swooshes" records kept their fade time and node life big-endian (a point
+  lived 4e-41: born dead), and the blends' u16 point indices too: now typed in
+  `tools/assets/swap_spec.json` (**a new archive, sha1 `8eb5b23b…`**); (2) the trail point tables
+  behind `sTrailTextures` were untyped N64 bytes (gendata): typed by a `TARGET_PORT` reference in
+  func_002350EC.c; (3) four views of a `Swoosh` used N64 offsets on the host: the fade read the
+  owner pointer as the time (func_0023353C.c, func_00233868.c), `Trail_GetAnimFrame` wrote the end
+  frame over the trail's texture handle (func_00234C88.c), the length sat in padding
+  (func_00234348.c, func_0023417C.c). asm_diff 0. The hive shafts now come and go as on the N64,
+  and the scorpion launcher's rocket leaves its white smoke ribbon (port only, `T2_WEAPON=16`).
+- **Det lines**: the records' floats are game logic too (node lives, the fade), so the particle
+  pool's hash moves from frame 21,132 on; with the `ptcl` hash taken out every det line equals
+  70f3333c's (the default run, 600,000 lines; `--legacy`, 580,000). **Default command: END 2,
+  0 lives lost, 367 hits, md5 `08540b5d…`** (70f3333c with the same script `0959aac5…`);
+  **`--legacy`: END 2, 2 lives lost (the City Totem, as before), md5 `ac08c89b…`** (`281904eb…`); **the default command drawn (`--draw`): `08540b5d…`, equal to the undrawn run**.
+- **To merge**: rebuild the archive (`mkarchive.py`, `archive_check` OK) and gendata (the four
+  trail tables become f32); `versions/port_layout.us.json` unchanged (`mklayout.py --check`).
+  Files others may touch: `tools/assets/swap_spec.json` (one record type), five swoosh files in
+  `src/us/code/` (TARGET_PORT blocks), docs (RENDER.md 8-i3, FIDELITY.md 13-i3, BYTEORDER.md).
+- **Next**: the Lightship doorways with another N64 renderer or the N64's display list; weapons
+  against the N64 (both sides need the same weapon: an RDRAM poke on the N64); the cut-scenes paired
+  by their own clock.
+
+| commit | what |
+|---|---|
+| 70dc7394 | the swoosh draw structs at host offsets (fade time, anim frame, length) |
+| e28be71b | the swoosh records and the trail points in host order (swap_spec.json, func_002350EC.c) |
+| 80c77b42 | RENDER.md 8-i3, BYTEORDER.md |
+| 8f78322a | FIDELITY.md 13-i3 |
+| (last) | this section |
 
 ## Round 19, part h1: determinism under ASLR, the level-135 two paths fixed (branch names-R19_h1)
 
