@@ -207,7 +207,7 @@ class Route:
                 env.append("T2_LEGACY_SHAKE=1")
         # round 17 f3: the type-9 (interactive anim) props as before round 17 (their intelligence body left
         # big-endian: they start on animation 0); every route so far was tuned on that, the --n64-shake
-        # one included. --n64-props leaves it out (the N64's props, FIDELITY.md 32-f3)
+        # one included. --n64-props leaves it out (the N64's props, FIDELITY.md 7)
         if not N64_PROPS:
             env.append("T2_LEGACY_INTEL9=1")
         # round 17 merge: headless runs as before round 17, with no sound world (no sound random draws);
@@ -1469,9 +1469,9 @@ def cli(argv=None):
     ap.add_argument("--real-weapons", default="", help="1 / 1,2 / 1,2,3: these levels on the weapons and ammo "
                     "picked up on the way, no T2_GIVE_WEAPONS / T2_FILL_AMMO before the hub after them (round 15 d2)")
     ap.add_argument("--n64-shake", action="store_true", help="the N64's camera shake (no T2_LEGACY_SHAKE) and "
-                    "the route changes it needs (N64_L2_STRETCH, N64_L2_PICKS; PLAYTHROUGH.md 31, 32-f1)")
+                    "the route changes it needs (N64_L2_STRETCH, N64_L2_PICKS; PLAYTHROUGH.md 31, 32)")
     ap.add_argument("--n64-props", action="store_true", help="the type-9 props as on the N64 (no "
-                    "T2_LEGACY_INTEL9; round 17 f3, FIDELITY.md 32-f3): not tuned yet")
+                    "T2_LEGACY_INTEL9; round 17 f3, FIDELITY.md 7): not tuned yet")
     ap.add_argument("--n64-sound", action="store_true", help="the sound world in the headless run (no "
                     "T2_LEGACY_NOSOUND: the sound requests draw their random numbers as with --audio and on the "
                     "N64; round 17 merge): not tuned yet")

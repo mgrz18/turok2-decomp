@@ -231,7 +231,7 @@ Fixes and checks of the merge:
 
 ## Round 17, part f3: the port against the N64 member by member (branch names-R17_f3)
 
-Detail: [FIDELITY.md](FIDELITY.md) 32-f3.
+Detail: [FIDELITY.md](FIDELITY.md) 7.
 
 - **`tools/port/n64cmp.py`** (`run`: both sides from one warp, same seed; `cmp`: two dumps): every
   scalar member of gScene, the player, its camera, the level actors and pooled instances, by name,
@@ -306,7 +306,7 @@ n64trace.py. f1/f2's route branches need `T2_LEGACY_INTEL9=1` in their runs (ful
 **`--all --talismans 2 --cheats-off 1,2,3,4,5,6 --n64-shake` reaches END 2 at 247,626 with all 5
 totems and one life lost** (the City Totem; the default legacy run loses 2 there), no
 invincibility, deterministic (two runs, the same log but for the `totem hp` field of two `totem:`
-lines). Round 16 had a game over in 125 at 154,972. PLAYTHROUGH.md 32-f1.
+lines). Round 16 had a game over in 125 at 154,972. PLAYTHROUGH.md 32.
 
 - **Why 135 killed the player**: on the N64 stream the graveyard's roaming zombies (hurt type
   0x323) reach the player during zombie 44's fight (10 hits instead of 3: 53 damage instead of
@@ -319,7 +319,7 @@ lines). Round 16 had a game over in 125 at 154,972. PLAYTHROUGH.md 32-f1.
   probed: from angle 0 three pickups stand the player in no region (`teleport: ... region (nil)`,
   the teleport is skipped).
 - **Levels 1 and 3, the sisters, the hub visits** need nothing on the N64 stream (no life lost;
-  the Marsh Totem at 110,671). Health per fight, both streams: PLAYTHROUGH.md 32-f1.3.
+  the Marsh Totem at 110,671). Health per fight, both streams: PLAYTHROUGH.md 32.3.
 - **Not fixed**: the City Totem's life (entering with ~100 health instead of 62 did not save it,
   and moved later fights: 3 more lives lost in levels 4 and 6; dropped).
 - **Validated**: the default command's generated `teleport.env` and `playthrough.txt` are
@@ -332,7 +332,7 @@ lines). Round 16 had a game over in 125 at 154,972. PLAYTHROUGH.md 32-f1.
 
 ## Round 17, part f2: levels 4-6 and the bosses on the N64's random numbers (branch names-R17_f2)
 
-Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 32-f2. No `src/` or `include/` change (no asm_diff
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 33. No `src/` or `include/` change (no asm_diff
 needed); port/ and tools/ only. **The default command is unchanged** (END 2 at 252,194; its 3,450
 progress/event/pickup/hurt/death/bosstrace/lairpeek lines identical to the build before this part;
 `playthrough.txt` and `teleport.env` byte for byte).
@@ -353,8 +353,8 @@ progress/event/pickup/hurt/death/bosstrace/lairpeek lines identical to the build
 - **`--n64-shake-from 4`: END 2 at 252,620, 5 totems, no life lost in levels 4-6**; on three
   other random histories (the switch frame moved by 37, 101, 211) two reach END 2 with no life
   lost, one ends in a game over in the lair (a costly Mother, then twice a throw off the floor:
-  his mode 20 -> 7 -> 1 with bossState 10, PLAYTHROUGH 32-f2.2). `-from 5` 253,046, `-from 6`
-  250,726, `-from 7` 251,438, each with no life lost after the switch (PLAYTHROUGH 32-f2.4).
+  his mode 20 -> 7 -> 1 with bossState 10, PLAYTHROUGH 33.2). `-from 5` 253,046, `-from 6`
+  250,726, `-from 7` 251,438, each with no life lost after the switch (PLAYTHROUGH 33.4).
 - **Why the Primagen recipe never kills him on the N64 stream**: his stage-3 home wait (33,070)
   hovers at (-1.9, 937, 2,907.7), which no `T2_BOSS_FRONT` floor spot sees, and the strafing stops
   at 45,000 (section 26.1's hover pair, picked by his random flight in). **Add
@@ -372,7 +372,7 @@ call next to `T2_RNG_SET`).
 
 ## Round 17, part f5: the stick and real weapons together, the Blind One and the City Totem by stick (branch names-R17_f5)
 
-Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 32-f5. Legacy shake throughout (the default route's stream).
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 34. Legacy shake throughout (the default route's stream).
 
 - **The Blind One by stick** (`--stick-aim 4` with no `--assist-keep 1`): the stick driver's "not
   hurt" count restarted at every target switch, so it alternated forever between her phase-5

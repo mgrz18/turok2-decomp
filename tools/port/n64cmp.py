@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The port against the N64, member by member (round 17 f3; docs/port/FIDELITY.md section 32-f3).
+"""The port against the N64, member by member (round 17 f3; docs/port/FIDELITY.md section 7).
 
 Both sides start the same warp from the attract loop with the same random seed and dump the same
 state structs at the same game frames: the N64 with `n64trace.py --start-warp ID@N --poke

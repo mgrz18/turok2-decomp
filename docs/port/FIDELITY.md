@@ -278,9 +278,9 @@ messages) gets the same colour fix.
 3. A new-game route on the N64 (levels 51/52) with `--input`, compared like the demos.
 4. The rest of section 3's table (HUD, menus) against the reference with the colour fix.
 
-## 32-f3. The port against the N64 member by member (Phase 7 round 17, part f3)
+## 7. The port against the N64 member by member (Phase 7 round 17, part f3)
 
-### 32-f3.1 The tool: `tools/port/n64cmp.py`
+### 7.1 The tool: `tools/port/n64cmp.py`
 
 Both sides start the same warp from the attract loop and dump the same structs at the same game
 frames; libclang computes each struct's layout twice (mips-linux-gnu for the N64, the port's own
@@ -304,7 +304,7 @@ python3 tools/port/n64cmp.py cmp N64.raw PORT.raw --build OUT/build [--gf 5] [--
   (a breakpoint on CScene__LoadLevel), `--rng-set LEVEL:GF:HEX` (the port's `T2_RNG_SET` twin),
   `--ticks 2` (the four retrace counts CEngineApp__Update averages held at 2: the emulator's slow
   frames no longer change gFrameIncrement).
-- `run` sets the seed at the load AND at gf 1 (see 32-f3.3), holds the N64's ticks at 2, and runs the
+- `run` sets the seed at the load AND at gf 1 (see 7.3), holds the N64's ticks at 2, and runs the
   port with `--audio --draw` (a player's port draws and plays sound; both draw random numbers).
 - Pointers compare by what they point at (null, a dumped record and its member, or "elsewhere");
   a union compares its first member only (the other views read the same bytes in another width);
@@ -317,7 +317,7 @@ python3 tools/port/n64cmp.py cmp N64.raw PORT.raw --build OUT/build [--gf 5] [--
   pointer (the host words shift by one; the values agree: use `--skip m_VarBuffer`), u8 arrays that
   hold a word (`unk_18E54`, particle `unk_100`, `m_Geom[].m_Data[5]`: the same bytes in host order).
 
-### 32-f3.2 The lair props (e1's lead): a host bug, fixed
+### 7.2 The lair props (e1's lead): a host bug, fixed
 
 N64 `lvl 10-17` (type 80, interactive anims) start on animation 4 frame 0.5 at their spawn; the port
 had animation 0, frame 1/3, and drifted ~1.7 units. n64cmp named `m_AI.m_AnimType` (N64 21501 =
@@ -339,7 +339,7 @@ into every `teleport.env` (the `--n64-shake` route too, which f1/f2 tune on b744
 `--n64-props` leaves it out. With it the default run gives all 580,000 det lines md5
 `ecb9f9f2c127d91cdf889e5b926f3d33` (round 16's), exit 0. A player gets the N64's props.
 
-### 32-f3.3 Random numbers: the sound requests and the load time
+### 7.3 Random numbers: the sound requests and the load time
 
 With the seed set at the load the port drew 142 numbers by gf 1 of level 53, the N64 170.
 `--calls` on the four random functions (`n64trace.py`) against the port's `T2_RNG_TRACE`:
@@ -356,16 +356,16 @@ With the seed set at the load the port drew 142 numbers by gf 1 of level 53, the
   host bug; n64cmp sets the seed again at gf 1. Its consequence: what the game draws between the load
   and gf 1 differs (the Primagen's six tossed objects at gf 0 pick other types: pool slots 3-5).
 
-### 32-f3.4 Results (gf 1-10/30, seed at load and gf 1, ticks 2, port `--audio --draw`)
+### 7.4 Results (gf 1-10/30, seed at load and gf 1, ticks 2, port `--audio --draw`)
 
 | level | result |
 |---|---|
-| 4 (lair, 7602) | RNG equal every frame; LVL/DYN/PLR/CAM identical (after 32-f3.2); left: the actor pool's tossed objects (32-f3.3), `m_Resource` 0 in the port's pool actors vs a ROM key on the N64 (not chased) |
+| 4 (lair, 7602) | RNG equal every frame; LVL/DYN/PLR/CAM identical (after 7.2); left: the actor pool's tossed objects (7.3), `m_Resource` 0 in the port's pool actors vs a ROM key on the N64 (not chased) |
 | 60 (hub) | LVL all equal at gf 1 and 30; `m_SkyAngle` offset (accumulated since boot, same rate 0.0436/gf), the static-event timer `unk_18EB8` phase (load timing), `CCamera.m_MenuPool` bytes |
-| 53 | before the --audio/load fixes: particle type 226 spawn times differ (the static-event timer phase, 32-f3.3), the rest equal apart from `m_VarBuffer` view shifts; not rerun with the final settings |
+| 53 | before the --audio/load fixes: particle type 226 spawn times differ (the static-event timer phase, 7.3), the rest equal apart from `m_VarBuffer` view shifts; not rerun with the final settings |
 | 125, 135, 61, 100, 124, 114 | not run this round (the sweep script `run` per level is ready; ~3 min each) |
 
-### 32-f3.5 Next
+### 7.5 Next
 
 1. Run the remaining levels (`n64cmp.py run` per level) with the final settings.
 2. The pooled level actors' `m_Resource` (0 in the port).

@@ -561,7 +561,7 @@ def main():
         fp.write("\n".join(inputs) + "\n")
     if not a.n64_shake:
         env.append("T2_LEGACY_SHAKE=1")  # round 16 e1: the RNG stream the level routes were tuned on
-    if not a.n64_props:  # round 17 f3: the type-9 props as the routes were tuned (FIDELITY.md 32-f3)
+    if not a.n64_props:  # round 17 f3: the type-9 props as the routes were tuned (FIDELITY.md 7)
         env.append("T2_LEGACY_INTEL9=1")
     if not a.n64_sound:  # round 17 merge: the silent stream the routes were tuned on (no sound world)
         env.append("T2_LEGACY_NOSOUND=1")
