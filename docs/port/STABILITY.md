@@ -497,3 +497,33 @@ child: when it exits before both fifos are open it opens the other end of each (
 the driver's open returns, its read sees EOF and it exits with the game's code.
 `T2_AIM_OPEN_TIMEOUT=SECONDS` also SIGKILLs a game that has not opened the fifos after that long.
 Checked with `/bin/false` (exits 1 at once) and `sleep 30` with a 2 s timeout (killed, exit -9).
+
+### 12.3 The level-135 two paths (not yet found): what is known now
+
+Method: `g2loop`-style batches of the default command to 84,000 frames (`T2_DET_LOG=1
+T2_DET_ACTORS=1 T2_DET_FROM=72000`), ASLR on, compared with a `setarch -R` reference (det md5
+`27b63784…`). On the fixed build (12.1) 6 of 22 runs took the second path, always the same one
+(md5 `41a247c7…`), so 12.1 was not its cause (the usual layout never took that branch).
+
+- With `T2_DET_MTX=1` the **first difference is at frame 72,746**, a frame where every actor's
+  state (position, rotation, mode, animation frame: the actor hash) is still identical: the draw
+  matrices of actor 41 (blocks 1-3 and 6 of its `m_pmtDrawMtxs`, block 0 the same), actor 74
+  (blocks 1 and 3) and actor 31 (its first draw: it comes into view at 72,746) differ. The particle
+  hash follows at 72,749 (a type-172 particle placed from actor 31's node, 0.6 units apart), then the
+  `rng` and the route; the runs meet again by ~82,500.
+- So the bone matrices are built from something that depends on the address layout while the
+  animation state does not: the candidates left are in `CGameObjectInstance__BuildBoneMatrices`
+  (`func_0021CDAC.c`) and its animation reads (the blend channel, the cache handles of the
+  animation data, the MtxPool blocks of bones not written this frame).
+- The process maps of 8 runs (2 on the second path) show no simple rule (PIE base bit 31, heap -
+  PIE distance).
+- One run in 22 took a third path (`d7dcbe92…`, diverging before 38,997, the aim line of actor 13
+  missing, as in the `ld.so` layout before 12.1): a second, rarer layout-dependent read, not
+  pinned down.
+- Under gdb with ASLR kept on (`G2RAND=1`) 4 of 4 runs to 72,750 took the first path: gdb's own mappings
+  change the odds; the watch/trace on actor 31's matrices (`T2_DET_WATCH=72745:31:2
+  G2TRACE='^CAnimationState__\|^CGameObjectInstance__BuildBoneMatrices\|^CCache__Request'`) needs a
+  second-path run to compare with.
+
+Until it is found: compare det md5s under `setarch -R` (or through `ld.so` under `setarch -R`, which
+now gives the same stream).

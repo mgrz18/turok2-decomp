@@ -206,6 +206,40 @@ by the new legacy lines. ABI (`abicheck.py` on a fresh PIE build: 3,077 TUs, 11,
    `gEngineApp_m_SwooshSystem - 0x1C8` (f4's pattern; its callee has no C body); `aimdrive.py` waits
    forever when the game exits before it opens the pipe (kill both).
 
+## Round 18, part g2: address-layout determinism, the gptr checker, the fifo watchdog (branch names-R18_g2)
+
+- **A layout-dependent branch found and fixed** (STABILITY.md 12.1): the three N64 stack-depth
+  guards (`(uptr) &local < (uptr) &D_800C894C`, D_800C894C = `gThreadStackMain + 0xCCC`) in
+  `Collision_SweepRegionWalls`, `Path_ExpandNode` and `Automap_RevealRegion` compared a host stack
+  address with a host `.bss` address. With the executable mapped above the thread stacks (run
+  through `ld.so` under `setarch -R`) the wall sweep stopped at its first region (level 53, frame
+  15,368, actor 16 through a wall edge) and the route went its own way. Now `t2os_stack_low()`
+  (port/runtime/t2os.c: 64 KB from the host thread's own stack bottom; asm_diff 0). The `ld.so`
+  layout now gives the reference stream; the usual layout never took the branch (stream unchanged).
+- **The level-135 two paths are not found yet** (STABILITY.md 12.3): 6 of 22 ASLR runs still take
+  the second path (`41a247c7…` to 84,000); the first difference is at 72,746 in the draw matrices of
+  actors 41, 74 and 31 while every actor's state is identical: the bone-matrix build
+  (`func_0021CDAC.c`) reads something layout-dependent. One run in 22 took a third, earlier path
+  (`d7dcbe92…`). Keep comparing md5s under `setarch -R`.
+- **New tooling**: `T2_DET_MTX=1` (per-actor matrix block indices and block hashes),
+  `T2_DET_WATCH=FRAME:ACTOR[:LEN]` + `tools/port/gdbwatch.py` (a hardware watchpoint on an actor's
+  position between two det lines, with backtraces, and a call trace by regex; `G2RAND`, `G2LD` for
+  an `ld.so` start).
+- **`n64viewcheck.py` kind `gptr`** (64BIT.md part 8): `<global> +/- C` base-pointer arithmetic,
+  cast or not. The VM twin `func_00463B2C.c` now passes `&gEngineApp_m_OnScreen` (f4's COnScreen
+  fix); `CScene__BuildGeometryDisplayList` (multiplayer) read the camera pool head 0x1210 bytes
+  before the difficulty (0x1358 on the host): by name now; `CPlayer__ToggleLowerAmmo` (not linked)
+  by name. Sweep: gptr BAD 25 / untyped 29, the rest judged in the table (N64 pager, VM twins,
+  reviewed scalar runs).
+- **`aimdrive.py`**: a watchdog thread unblocks the fifo opens when the game exits first (it used to
+  hang forever); `T2_AIM_OPEN_TIMEOUT=SECONDS` kills a game that never opens them (STABILITY.md
+  12.2).
+- Files: src/us/code/func_00240800.c, func_002393D0.c, func_00400000.c, func_00221D3C.c,
+  func_0025739C.c, func_00463B2C.c; port/runtime/t2os.c/.h; port/game/t2det.c;
+  tools/port/aimdrive.py (process handling only), n64viewcheck.py, gdbwatch.py; docs STABILITY.md
+  12, 64BIT.md part 8. asm_diff vs ab0bc24c: 0 on every touched src file.
+- Validated: the default command (`--all --talismans 2 --cheats-off 1,2,3,4,5,6`, legacy switches on, Linux Release PIE, 290,000 frames) reaches END 2 at 252,194 with det md5 `ecb9f9f2…` (580,000 lines) both under `setarch -R` and under `setarch -R` through `ld.so` (the layout that took the other path before the fix); 84,000-frame runs: `27b63784…` in both layouts.
+
 ## Round 17, part f3: the port against the N64 member by member (branch names-R17_f3)
 
 Detail: [FIDELITY.md](FIDELITY.md) 7.
