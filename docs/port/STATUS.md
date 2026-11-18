@@ -309,7 +309,7 @@ change, no asm_diff needed). **The default command and `--legacy` write byte-ide
   314 before, 314 after** (PLAYTHROUGH.md 39-h5 has the table per level and the reasons).
 
 **Validated** (Linux Release, PIE, this branch's binary, `aimdrive.py`, `setarch -R`): the
-default command: END 2, no life lost, det md5 `6213496b…` (600,000 lines) VALIDATION
+default command: END 2, no life lost, det md5 `6213496b…` (600,000 lines), END 2 at 250,566, twice (before and after the doors/pad commits); `--legacy`: END 2 at 252,194, det md5 `ecb9f9f2…` (580,000 lines, round 16/17's), 2 lives lost at the City Totem as before.
 
 **For the merge**: tools/port/nav.py (`links()` now returns `(j, edge, extra, kind)`; `astar()`
 returns `[(region, link)]`; `path()` returns a 4th element, the jumps; `load(rom, level,
