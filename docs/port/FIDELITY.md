@@ -621,3 +621,18 @@ shielded attacker on the stairs), the cut-scene into the Mother's arena (204,602
 shafts pale white-yellow, as on the N64 since h2), the Mother on the shredder (205,001), the
 arena after her (212,001), the Primagen's end and END 2 (252,251-255,503: the warp ring, Adon).
 The arena's walls and floor stay olive-green (12.3).
+
+## 13-i5. The sound against the N64 (Phase 7 round 20, part i5)
+
+The audio side of the fidelity oracle: `refshots.py --audio-dump` records what the N64 hands its
+AI (a mupen64plus audio plugin, `tools/port/n64audiodump.c`), `--wav` + its new `.txt` sidecar
+on the port, `audiocmp.py` lines them up and compares level, balance, spectrum, waveform and
+pitch, `sndpcmp.py` compares the sound player's events (`T2_SNDP_LOG=2` against `n64trace.py
+--calls alSndp*`). One host bug: **the ABI1 resampler interpolated with Catmull-Rom instead of the
+microcode's 64-phase table** (in the ROM at 0xC0C10), so every sound was 2-4 dB too bright above
+2.7 kHz; fixed in `port/audio/t2asp.c`. After it the title music matches within 0.03 dB, the same
+balance and octave bands within 0.3 dB, waveform correlation 0.96; the level-53 start 0.99 (its
++1 dB is the ambient loop's random volume); the hub, the lair and demo 1 within 0.5 dB with the
+same spectra. Table and method: [AUDIO.md](AUDIO.md) 12. The demo's sounds diverge with the
+random numbers (demo 1's play is identical, 12.1, but `detdiff` skips the rng): the sound world
+draws volumes, pitches and ambient picks from them.
