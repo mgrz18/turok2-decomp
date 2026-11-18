@@ -138,7 +138,13 @@ void SndQueue_Update(Cache *cache) {
         if (slot == -1 || slot == 16) {
             break;
         }
+#ifdef TARGET_PORT
+        /* round 19: the N64 adds the byte offset to the pointer as a u32; on the host that
+         * truncated the 64-bit pointer (h1 found it) */
+        cursor = (s16 *)((__UINTPTR_TYPE__)(slot << 1) + (__UINTPTR_TYPE__)slots);
+#else
         cursor = (s16 *)((slot << 1) + (u32)slots);
+#endif
         free = *cursor;
         if (free != -1) {
             break;
