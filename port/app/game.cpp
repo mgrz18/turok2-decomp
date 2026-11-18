@@ -796,10 +796,6 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         if (detPeriod > 0 && (f + 1) % detPeriod == 0) {
             T2Port_LogDet(f + 1); // DEBUG-ONLY: T2_DET_LOG=N
         }
-        static const char* rawDump = getenv("T2_RAW_DUMP");
-        if (rawDump != nullptr) {
-            T2Port_RawDump(rawDump); // DEBUG-ONLY: T2_RAW_DUMP=FILE:LEVEL:GF[-GF2][,...] (round 17 f3)
-        }
         static const char* teleport = getenv("T2_TELEPORT");
         if (teleport != nullptr) {
             T2Port_Teleport(sFrame + 1, teleport); // DEBUG-ONLY: T2_TELEPORT=F:x,y,z[;F:x,y,z...]
@@ -835,6 +831,11 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         static const char* rngSet = getenv("T2_RNG_SET");
         if (rngSet != nullptr) {
             T2Port_RngSet(sFrame + 1, rngSet); // DEBUG-ONLY: T2_RNG_SET=LEVEL:GF:HEX (round 16 e1)
+        }
+        // after T2_RNG_SET: the dump shows the seed the next frame starts from, as n64trace.py --raw does
+        static const char* rawDump = getenv("T2_RAW_DUMP");
+        if (rawDump != nullptr) {
+            T2Port_RawDump(rawDump); // DEBUG-ONLY: T2_RAW_DUMP=FILE:LEVEL:GF[-GF2][,...] (round 17 f3)
         }
         static const char* primagenStage = getenv("T2_PRIMAGEN_STAGE");
         if (primagenStage != nullptr) {

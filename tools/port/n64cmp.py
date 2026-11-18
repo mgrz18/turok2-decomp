@@ -433,7 +433,7 @@ def run_both(a):
             env[k] = v
         cmd = ["timeout", "-s", "KILL", str(a.timeout), os.path.abspath(a.port), "--archive",
                os.path.abspath(a.archive), "--rom", os.path.abspath(a.rom), "--game", "--pak-blank"] + (
-                   [] if a.no_audio else ["--audio"]) + [
+                   [] if a.no_audio else ["--audio"]) + ([] if a.no_draw else ["--draw"]) + [
                "--frames", str(a.port_at + a.port_frames + 4 * last)]
         if a.input:
             cmd += ["--input", a.input]
@@ -468,6 +468,8 @@ def main():
                            "again (it is also set at CScene__LoadLevel: the N64's audio thread draws during the load)")
             p.add_argument("--ticks", type=int, default=2, help="n64trace.py --ticks: the N64's frame length held at "
                            "the port's 2 retraces (0: the emulator's own timing)")
+            p.add_argument("--no-draw", action="store_true", help="the port without --draw: the draw state (the "
+                           "draw lists, the actor pool's resources and matrices) then stays unset")
             p.add_argument("--no-audio", action="store_true", help="the port without --audio: its sound requests "
                            "then draw no random numbers (the N64's and a player's do)")
             p.add_argument("--pad", default="", help="n64trace.py --pad (the N64's controller 1)")
