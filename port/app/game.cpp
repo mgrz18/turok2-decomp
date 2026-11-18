@@ -561,6 +561,22 @@ void WriteShot(const std::shared_ptr<Fast::Fast3dWindow>& window, const char* sh
         return;
     }
     const uint32_t w = interp->mCurDimensions.width, h = interp->mCurDimensions.height;
+    // 8 bits per channel (round 17 f4: T2Gl_ReadRGB8); T2_SHOT_RGB16=1 (debug) keeps the old
+    // RGBA5551 readback (the low 3 bits of each channel dropped, as in shots before round 17)
+    static const bool rgb16 = getenv("T2_SHOT_RGB16") != nullptr;
+    std::vector<uint8_t> rgb8((size_t)w * h * 3);
+    if (!rgb16 && T2Gl_ReadRGB8(interp, window ? 0 : T2Offscreen_ShotFramebuffer(), w, h, rgb8.data())) {
+        if (FILE* fp = fopen(shot, "wb")) {
+            fprintf(fp, "P6\n%u %u\n255\n", w, h);
+            for (uint32_t y = 0; y < h; y++) {
+                // the same row order as below: framebuffer 0 bottom-up, the game framebuffer flipped
+                fwrite(&rgb8[(size_t)(window ? h - 1 - y : y) * w * 3], 1, (size_t)w * 3, fp);
+            }
+            fclose(fp);
+            printf("game: wrote %s (%ux%u)\n", shot, w, h);
+        }
+        return;
+    }
     std::vector<uint16_t> fb((size_t)w * h);
     interp->mRapi->ReadFramebufferToCPU(window ? 0 : T2Offscreen_ShotFramebuffer(), w, h, fb.data());
     if (FILE* fp = fopen(shot, "wb")) {
@@ -716,6 +732,19 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     std::vector<double> bGame, bAudio, bDraw, bTotal, bGameFrame, bSwitches;
     double bSumSynth = 0.0, bSumAsp = 0.0;
     auto bLastDrawn = BenchClock::time_point{};
+    // round 17 f4: the game's cadence (VIs from one drawn frame to the next: 2 = 30 fps), the
+    // worst VIs by host time, and T2_BENCH_CSV=<file> (per VI: VI, game, audio, draw, total ms,
+    // drawn) for offline histograms
+    int bLastDrawnVI = -1;
+    std::vector<int> bCadence(8, 0); // [1..6] VIs, [7] 7 or more
+    std::vector<std::pair<double, int>> bWorst; // (total ms, VI)
+    FILE* bCsv = nullptr;
+    if (const char* csv = getenv("T2_BENCH_CSV"); bench && csv != nullptr) {
+        bCsv = fopen(csv, "w");
+        if (bCsv) {
+            fprintf(bCsv, "vi,game_ms,audio_ms,draw_ms,total_ms,drawn\n");
+        }
+    }
     // --pace: one VI every 1/60 s of real time (absolute deadlines, no catch-up: a late VI moves
     // the schedule)
     const auto viPeriod = std::chrono::duration_cast<BenchClock::duration>(std::chrono::duration<double>(1.0 / 60.0));
@@ -1017,11 +1046,25 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             bDraw.push_back(Ms(bt3 - bt2));
             bTotal.push_back(Ms(bt3 - bt0));
             bSwitches.push_back((double)(bS1.switches - bS0.switches));
-            if (drewThis || (hadTask && !(got && (window || T2Offscreen_Interpreter())))) {
+            const bool drawnVI = drewThis || (hadTask && !(got && (window || T2Offscreen_Interpreter())));
+            if (drawnVI) {
                 if (bLastDrawn != BenchClock::time_point{}) {
                     bGameFrame.push_back(Ms(bt3 - bLastDrawn));
                 }
                 bLastDrawn = bt3;
+                if (bLastDrawnVI >= 0) {
+                    bCadence[std::min(f - bLastDrawnVI, 7)]++;
+                }
+                bLastDrawnVI = f;
+            }
+            bWorst.emplace_back(bTotal.back(), f + 1);
+            if (bWorst.size() >= 4096) { // keep the 16 worst
+                std::partial_sort(bWorst.begin(), bWorst.begin() + 16, bWorst.end(), std::greater<>());
+                bWorst.resize(16);
+            }
+            if (bCsv) {
+                fprintf(bCsv, "%d,%.4f,%.4f,%.4f,%.4f,%d\n", f + 1, bGame.back(), bAudio.back(), bDraw.back(),
+                        bTotal.back(), drawnVI ? 1 : 0);
             }
         }
         if (args.verbose || (f + 1) % 60 == 0) {
@@ -1112,6 +1155,39 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
         BenchLine("total (per VI)", bTotal);
         BenchLine("game frame (drawn)", bGameFrame);
         BenchLine("t2os switches/VI", bSwitches, "");
+        int cadN = 0;
+        for (int c : bCadence) {
+            cadN += c;
+        }
+        if (cadN > 0) {
+            printf("bench: cadence (VIs between drawn frames, %d frames):", cadN);
+            for (int k = 1; k < 8; k++) {
+                printf(" %s%d: %d (%.2f%%)", k == 7 ? ">=" : "", k, bCadence[k], 100.0 * bCadence[k] / cadN);
+            }
+            printf("\n");
+        }
+        {
+            static const double edges[] = { 0.5, 1.0, 2.0, 4.0, 8.0, 16.667, 33.333 };
+            int hist[8] = {};
+            for (double x : bTotal) {
+                int k = 0;
+                while (k < 7 && x >= edges[k]) {
+                    k++;
+                }
+                hist[k]++;
+            }
+            printf("bench: host ms per VI histogram: <0.5 %d, 0.5-1 %d, 1-2 %d, 2-4 %d, 4-8 %d, 8-16.7 %d, 16.7-33.3 %d, >=33.3 %d\n",
+                   hist[0], hist[1], hist[2], hist[3], hist[4], hist[5], hist[6], hist[7]);
+            std::sort(bWorst.begin(), bWorst.end(), std::greater<>());
+            printf("bench: the worst VIs (VI:ms):");
+            for (size_t i = 0; i < bWorst.size() && i < 12; i++) {
+                printf(" %d:%.2f", bWorst[i].second, bWorst[i].first);
+            }
+            printf("\n");
+        }
+        if (bCsv) {
+            fclose(bCsv);
+        }
         double sum = 0.0, sumF = 0.0;
         for (double x : bTotal) {
             sum += x;

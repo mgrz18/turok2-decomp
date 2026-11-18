@@ -29,3 +29,9 @@ int T2Offscreen_ShotFramebuffer();
 // --bench: wait until the GL commands of the frame have finished on the GPU (glFinish), so the
 // draw time includes the GPU work (no-op without a context).
 void T2Offscreen_Finish();
+// T2_SHOT at 8 bits per channel (round 17, f4): reads framebuffer `fbId` of the interpreter's
+// OpenGL renderer (0 = the default framebuffer: the window's) as RGB8 into `rgb` (w * h * 3
+// bytes, GL row order: bottom row first). LUS's ReadFramebufferToCPU returns RGBA5551, which
+// drops the 3 low bits of every channel (shots ~3 levels darker than the N64 reference's 8-bit
+// PNGs). Leaves the GL framebuffer bindings as it found them. False without a GL renderer.
+bool T2Gl_ReadRGB8(const std::shared_ptr<Fast::Interpreter>& interp, int fbId, uint32_t w, uint32_t h, uint8_t* rgb);

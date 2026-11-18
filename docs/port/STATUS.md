@@ -265,6 +265,42 @@ n64trace.py. f1/f2's route branches need `T2_LEGACY_INTEL9=1` in their runs (ful
 **Next**: the levels 125, 135, 61, 100, 124, 114 with `n64cmp.py run`; the pool actors'
 `m_Resource`; tune the N64-stream route with `--audio` and `--n64-props`.
 
+## Round 17, part f4: render parity (Mac, Linux, N64), the boss bars, frame pacing (branch names-R17_f4, Mac; MACOS.md 19, RENDER.md 7)
+
+- **Boss health bars now draw** (a host bug found by comparing the lair with the N64 from the
+  same warp): `COnScreen` read/written at N64 offsets in five places (`DrawBossBars`,
+  `SetBoss2`, `ClearBoss`, `SetBossPercent`, the reset `func_0042EBBC` and its two callers in
+  func_0042AC0C.c). `TARGET_PORT` bodies by member, asm_diff 0; render-only: **the default run's
+  det log is unchanged** (580,000 lines, `ecb9f9f2…`, Mac). The totems' two bars, the Blind One,
+  the Queen and the Primagen now show their bars as on the N64.
+- **`T2_SHOT` is 8-bit** (both hosts; it was RGBA5551, 2-3 levels darker than the N64's PNGs);
+  `T2_SHOT_RGB16=1` for the old one. **`tools/port/shotcmp.py`** compares shots (PSNR, diff
+  images). **`refshots.py --start-warp ID@N`** takes N64 reference shots of a level from its
+  warp (`shots.txt`: gf per shot) to pair with `T2_START_WARP` on the port.
+- **Mac = Linux** pixel for pixel up to GPU rounding (boot + 3 demos, 86 frames: at most 85 pixels
+  over 8/255 per frame, median PSNR 62 dB) except one row: at the 480x360 -> 640x480 scale LUS
+  truncates the scissor per framebuffer orientation (Mac rows 0..477, Linux 1..478; LUS code).
+  The Mac player's window uses **LUS's Metal renderer** by default, which no round has checked
+  (`Window.Backend.Id` = 2 selects OpenGL), and renders at **point resolution on retina**.
+- **Frame pacing** (`--bench` cadence/histogram/worst VIs, `T2_BENCH_CSV`, `tools/port/benchcsv.py`):
+  the whole default run drawn, unpaced: 0.33 ms per VI (draw 0.20, game 0.03), 8 VIs of 290,000
+  over 16.7 ms (level loads and first shader compiles); the game's own cadence is 30 fps (85%)
+  and 15 fps (15%: its in-engine cinemas, `Cinema_PathPlaying`, as on the N64). Paced
+  (`--pace --audio`, 20,000 VIs): 60 late VIs (44 by 1 ms or more, worst 35.9 ms at a level
+  load), 0 underruns, ~1 ms of each 16.7 ms VI. Nothing cheap left to tune (a QoS-class try made
+  it worse: not kept). MACOS.md 19.4.
+- Validated: the default command on the Mac Release build after every change: END 2, det md5
+  `ecb9f9f2…` (580,000 lines), drawn and undrawn. src/ changes: asm_diff 0 (six files). Linux:
+  game.cpp and offscreen_gl.cpp compiled with the box's flags and linked against the coordinator's
+  objects (`/root/R17_f4mac/turok2_f4`, the 8-bit shots checked); no full Linux build of the src
+  fixes (render-only, Mac det unchanged).
+- **Open (found against the N64)**: the hub pad's cut-scene (warp 7601, level 3) draws its mist
+  cyan and its light beam multicoloured where the N64 has brown and white: the particle sprites'
+  prim colours look R/B-exchanged (RENDER.md 7.1); Adon's room (warp 999) and the lair match.
+- Files others may touch: `tools/port/refshots.py` (a new option), `port/app/game.cpp` (WriteShot,
+  the --bench block), `port/app/offscreen_gl.cpp/.h`, `port/app/CMakeLists.txt`, the six src files
+  above (HUD only).
+
 ## Round 16, part e1: the N64 lair and Mother checks, the camera shake's random numbers (branch names-R16_e1)
 
 Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 27.

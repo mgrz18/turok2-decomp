@@ -219,3 +219,64 @@ void T2Offscreen_Finish() {
 }
 
 #endif
+
+// ---- T2_SHOT at 8 bits per channel (both platforms; offscreen_gl.h) ----
+#ifdef ENABLE_OPENGL
+#include "fast/backends/gfx_opengl.h"
+#include "fast/interpreter.h"
+#include <cstring>
+#include <vector>
+
+bool T2Gl_ReadRGB8(const std::shared_ptr<Fast::Interpreter>& interp, int fbId, uint32_t w, uint32_t h, uint8_t* rgb) {
+    // the OpenGL renderer only (a Mac window may run LUS's Metal one: no GL context then)
+    if (!interp || !interp->mRapi || strcmp(interp->mRapi->GetName(), "OpenGL") != 0) {
+        static bool told = false;
+        if (!told) {
+            told = true;
+            fprintf(stderr, "T2_SHOT: renderer %s, the RGBA5551 readback\n",
+                    interp && interp->mRapi ? interp->mRapi->GetName() : "(none)");
+        }
+        return false;
+    }
+    GLint prevRead = 0;
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &prevRead);
+    static GLuint sReadFbo = 0; // a framebuffer of our own around the game framebuffer's colour texture
+    if (fbId == 0) {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    } else {
+        const GLuint tex = (GLuint)(uintptr_t)interp->mRapi->GetFramebufferTextureId(fbId);
+        if (sReadFbo == 0) {
+            glGenFramebuffers(1, &sReadFbo);
+        }
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, sReadFbo);
+        glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+        if (glCheckFramebufferStatus(GL_READ_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLuint)prevRead);
+            return false;
+        }
+    }
+    static bool toldBits = false;
+    if (!toldBits) { // once: the colour depth the frame was drawn at (Linux's offscreen EGL: 5-6-5)
+        toldBits = true;
+        GLint r = 0, g = 0, b = 0;
+        const GLenum att = fbId == 0 ? GL_BACK_LEFT : GL_COLOR_ATTACHMENT0;
+        glGetFramebufferAttachmentParameteriv(GL_READ_FRAMEBUFFER, att, GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE, &r);
+        glGetFramebufferAttachmentParameteriv(GL_READ_FRAMEBUFFER, att, GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE, &g);
+        glGetFramebufferAttachmentParameteriv(GL_READ_FRAMEBUFFER, att, GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE, &b);
+        printf("game: T2_SHOT reads framebuffer %d: colour bits %d-%d-%d\n", fbId, r, g, b);
+    }
+    std::vector<uint8_t> rgba((size_t)w * h * 4);
+    glReadPixels(0, 0, (GLsizei)w, (GLsizei)h, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data());
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLuint)prevRead);
+    for (size_t i = 0; i < (size_t)w * h; i++) {
+        rgb[i * 3 + 0] = rgba[i * 4 + 0];
+        rgb[i * 3 + 1] = rgba[i * 4 + 1];
+        rgb[i * 3 + 2] = rgba[i * 4 + 2];
+    }
+    return true;
+}
+#else
+bool T2Gl_ReadRGB8(const std::shared_ptr<Fast::Interpreter>&, int, uint32_t, uint32_t, uint8_t*) {
+    return false;
+}
+#endif

@@ -15,6 +15,9 @@
 #include "protos/scene.h"
 #include "protos/player.h"
 #include "protos/game.h"
+#ifdef TARGET_PORT
+#include "globals/onscreen.h"
+#endif
 
 
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
@@ -147,7 +150,13 @@ loaded:
     CCollisionInfo__Reset();
     func_0042D120(&w->m_DLightSet);
     LoopSounds_Construct(&gLoopSounds, gLoopSoundEntries, 0xF);
+#ifdef TARGET_PORT
+    /* the ROM finds COnScreen 0x1C8 bytes before the swoosh system (its N64 size); on the host
+     * the two are not that far apart: the boss-bar reset ran on the middle of COnScreen (f4) */
+    func_0042EBBC(&gEngineApp_m_OnScreen);
+#else
     func_0042EBBC(gEngineApp_m_SwooshSystem - 0x1C8);
+#endif
     if (*w->m_pLevels < level) {
         level = *w->m_pLevels - 1;
         announce = 0;
@@ -325,11 +334,7 @@ loaded:
     gFrameCountGameplay = 0;
     CCache__SetFrameDelay(8);
     CScene__ClearListCounts(w);
-#ifdef TARGET_PORT
-    CParticleSystem__Construct(&w->m_ParticleSystem, *(sptr *) w->m_pParticleEffects);
-#else
     CParticleSystem__Construct(&w->m_ParticleSystem, *w->m_pParticleEffects);
-#endif
     SceneActorPool_Construct(&w->m_ActorPool);
     CInstancePool__Construct(&w->m_InstancePool);
     func_0042D410(gEngineApp_m_SwooshSystem);
