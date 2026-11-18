@@ -206,6 +206,26 @@ by the new legacy lines. ABI (`abicheck.py` on a fresh PIE build: 3,077 TUs, 11,
    `gEngineApp_m_SwooshSystem - 0x1C8` (f4's pattern; its callee has no C body); `aimdrive.py` waits
    forever when the game exits before it opens the pipe (kill both).
 
+## Round 18, part g4: the Mac player's window defaults (branch names-R18_g4, Mac; MACOS.md 20)
+
+- **Metal was broken for a player**: LUS's Metal shader no longer compiles (`thread const
+  texture2d<float>` parameters, "parameter may not be qualified with an address space"); the app's
+  default window (Metal) aborted at its first draw. `port/cmake/t2_shaders.cmake` stages the shaders
+  for `t2port.o2r` with the qualifier dropped (OpenGL shader byte-identical).
+- **`--offscreen-metal`**: LUS's Metal renderer on a `CAMetalLayer` in no window (offscreen_gl.cpp;
+  the executable defines `SDL_GetRenderMetalLayer` / `SDL_GetCurrentRenderOutputSize`, forwarding
+  every real renderer to SDL). Boot to 3,000 VIs: Metal = OpenGL, 0 differing pixels.
+- **Defaults** (port/app/t2display.cpp, QUICKSTART 3): `gT2Renderer` 0 = OpenGL (default, written to
+  `Window.Backend.Id` each launch), 1 = Metal; `gT2RenderScale` (1) x the window's pixel density =
+  LUS's resolution multiplier: a retina window draws at pixel resolution. `--render-scale S` for
+  runs; `--offscreen-gl --render-scale 2` = 1280x960, same layout and HUD as 1x.
+- **CoreAudio**: opens headless (`T2_AUDIO_DEVICE=1`); LUS's AUHAL unit does not follow a change of
+  the default output device (sound stays on the old one): not fixed (MACOS.md 20.3).
+- **Mac Release = Linux**: default command md5 `ecb9f9f2…` (END 2), zero-death combo md5
+  `15d3d74f…` (END 2, 0 deaths), ASLR on.
+- Merge: files `port/app/{main,game,offscreen_gl,t2display}.cpp`, `game.h`, `offscreen_gl.h`,
+  `port/app/CMakeLists.txt`, `port/cmake/t2_shaders.cmake`; no `src/`/`include/` change.
+
 ## Round 17, part f3: the port against the N64 member by member (branch names-R17_f3)
 
 Detail: [FIDELITY.md](FIDELITY.md) 7.
