@@ -577,7 +577,11 @@ int main(int argc, char** argv) {
     std::string err;
     if (T2Asset_OpenLus(archives, &err) != 0) {
         fprintf(stderr, "FAIL: T2Asset_OpenLus: %s\n", err.c_str());
-        return 1;
+        // (round 18 merge) not `return 1`: tearing down the half-opened LUS context crashed (SIGSEGV
+        // after this message, e.g. an --archive that does not exist); leave without the destructors
+        fflush(stdout);
+        fflush(stderr);
+        std::_Exit(1);
     }
     printf("T2Asset over ArchiveManager: %u units in t2/units, byte swap %s\n", T2Asset_UnitCount(),
            T2Asset_SwapActive() ? "on (t2/swap plans, little-endian host)" : "off");
