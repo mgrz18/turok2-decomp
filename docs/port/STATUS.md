@@ -359,6 +359,33 @@ this round's ASLR runs.
 | b3bd6e0c | `Texture_Load` kind 3 as IA16 (`port/game/t2tex.c`) |
 | (last) | `refshots.py`: a negative `--start-warp`; this section's runs |
 
+## Round 19, part h4: Mac audio follows the output device, the checks before the first window (branch names-R19_h4, Mac; MACOS.md 21, FIRSTRUN.md)
+
+- **The sound follows the default output device** (port/app/t2audiodev.cpp): a CoreAudio listener
+  on `kAudioHardwarePropertyDefaultOutputDevice` counts changes; the game thread re-creates LUS's
+  CoreAudio player on the new default (keeping `Window.AudioBackend`, prefilling the latency with
+  silence). Headless: `--audio-device-change-test VI` calls the listener (re-created in 46.5 ms, 0
+  underruns, buffer back at 2,558-2,929 frames). No LUS change.
+- **Focus loss** (Cmd-Tab): the mouse is released and the game gets no input until the focus is
+  back (`T2Controls_InputFocus`; always focused without a window: no det change). `padtest.py`
+  gains `focus` (9 checks) and `hotplug` (gamepad out and back at the title menu, then a new game);
+  the whole padtest OK.
+- **Non-4:3 windows were wrong**: headless `T2_OFFSCREEN_SIZE=1280x720` showed stale frames and 3D
+  past the game's edges in the side bars (the game clears only its 4:3 part). The port now defaults
+  LUS's advanced resolution to 4:3 (pillarbox/letterbox, `gAdvancedResolution.Enabled` 1); window
+  minimum 320x240. Not yet seen in a real window (FIRSTRUN 5).
+- **Static review** of what the first window touches (MACOS.md 21.4): F11 = native macOS fullscreen,
+  Esc/F1 free the mouse (LUS), hot-plug handled by LUS and the port, vsync + `--pace` no double
+  pacing, quit paths = the `--frames` exit (config saved, pak written per block).
+- **`docs/port/FIRSTRUN.md`**: the ordered checklist for the user's first windowed session.
+- **App**: `mkapp.sh OUT/build_r19` + `apptest.sh`: self-contained, play mode to engine mode 11.
+- **The default command on the Mac Release** (aimdrive.py, ASLR on, `OUT/r19/det.sh`): 600,000 det lines, md5 `6213496b…` (= the Linux default), END 2 at 250,566, run deaths 0, 94.7 s.
+- Merge: files `port/app/{main,game,t2controls,t2display}.cpp`, `t2controls.h`, `game.h`, new
+  `port/app/t2audiodev.{h,cpp}`, `port/app/CMakeLists.txt` (CoreAudio framework),
+  `tools/port/padtest.py`, docs `MACOS.md` 21, `QUICKSTART.md`, new `FIRSTRUN.md`; no
+  `src/`/`include/` change. Others touching `game.cpp` `ContRead` or the audio block: a 3-line
+  overlap at most.
+
 ## Round 18, part g2: address-layout determinism, the gptr checker, the fifo watchdog (branch names-R18_g2)
 
 - **A layout-dependent branch found and fixed** (STABILITY.md 12.1): the three N64 stack-depth

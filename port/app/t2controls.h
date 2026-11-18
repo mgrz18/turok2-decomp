@@ -44,6 +44,9 @@ void T2Controls_RegisterSettings(bool save);
 
 // Every controller read, port 1, before the mouse: gT2StickInvertY (inLevel: engine mode 11).
 void T2Controls_Look(int8_t* sy, bool inLevel);
+// The window has the keyboard focus (always true without a window; --pad-test: "focus 0|1").
+// On a loss the mouse is released; the caller gives the game no input while it returns false.
+bool T2Controls_InputFocus();
 
 // Every controller read: F1 prints the controls (and shows them in a message box with a window).
 void T2Controls_Hotkeys();

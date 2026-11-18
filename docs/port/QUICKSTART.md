@@ -144,10 +144,12 @@ real time (the N64's 60 fields a second, 30 drawn frames) until you close the wi
   | `gT2ShowControlsAtStart` | 1 | 0: no controls table in the log at start |
   | `gT2Renderer` | 0 | 0: OpenGL (the renderer every check used); 1: Metal (macOS, opt-in). Sets `Window.Backend.Id` at each launch |
   | `gT2RenderScale` | 1.0 | the game frame's resolution as a multiple of the window's pixels (0.25-4): 1 = full pixel resolution on a retina display, 0.5 = half (faster), 2 = supersampled |
+  | `gAdvancedResolution.Enabled` | 1 | (round 19) the game frame stays 4:3 with black bars in a window of any shape and in fullscreen; 0 fills the window (the sides then show stale pictures: not recommended) |
 - **Logs** go to `logs/` in the same folder: `turok2-stdout.log`, `turok2-stderr.log` (the
   port's messages) and `turok2.log` (libultraship's). Nothing is printed in the terminal except
   where the logs are.
-- **Sound**: CoreAudio on macOS. If it cannot open, the game tries SDL's audio, then plays
+- **Sound**: CoreAudio on macOS; it follows the system's output device (headphones, AirPods)
+  while the game runs (round 19). If it cannot open, the game tries SDL's audio, then plays
   without sound (and says so in `turok2-stderr.log`); the next launch tries your choice again.
 
 ## 4. Controls
@@ -171,6 +173,9 @@ becomes a twin-stick layout:
 - **The mouse**: click in the window to capture it (the cursor hides and the mouse turns and
   looks); **F2** releases and captures it again. The click that captures does not fire.
 - **Fullscreen**: F11 (remembered at the next launch).
+- **Another app** (Cmd-Tab): the mouse is freed and the game gets no input until you come back;
+  click in the window to capture the mouse again. Esc (pause) also frees it.
+- **The first session with a window**: [FIRSTRUN.md](FIRSTRUN.md), what to try and in what order.
 - **F1** shows the controls (a message box; they are also in `logs/turok2-stdout.log` at start).
 - Any binding can be changed in `turok2.cfg.json` (`CVars.gControllers`). A config written by an
   older build keeps its old mappings (left stick = look): delete the file to get these.

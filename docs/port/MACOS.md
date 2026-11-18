@@ -1519,3 +1519,89 @@ No change to `src/` or `include/`. Release build in `OUT/build_r18`.
 
 Both with ASLR on (macOS has no `setarch -R`); the round-17 level-135 ASLR divergence did not show. The
 default run's wall time (1,467 s) includes the Mac asleep; the zero-death run took 40.8 s.
+
+## 21. Round 19 (part h4): the sound follows the output device, the checks before the first window
+
+Branch `names-R19_h4` (from 65ec98ec), Mac (M5, macOS 27.2) only, headless (no window was opened,
+no system setting changed). No change to `src/` or `include/`. Release build (`-O2`, no LTO) in
+`OUT/build_r19` (`OUT/r19/build.sh`). The player's checklist for the first windowed session:
+[FIRSTRUN.md](FIRSTRUN.md).
+
+### 21.1 The sound follows the default output device (port/app/t2audiodev.cpp)
+
+- LUS's CoreAudio player (20.3) opens an AUHAL unit on the default device of the launch and never
+  looks again. `T2AudioDev_Install` (main.cpp, after the player opened, CoreAudio only) registers an
+  `AudioObjectAddPropertyListener` on `kAudioHardwarePropertyDefaultOutputDevice`. The listener runs
+  on a CoreAudio thread and only counts; the game thread, which feeds the player, calls
+  `T2AudioDev_Poll` before each sound frame (game.cpp) and re-creates the player with
+  `Audio::SetCurrentAudioBackend(COREAUDIO)` (a new AUHAL on the default of now; the old unit stops
+  and is disposed when its last reference goes). It then puts back the config's
+  `Window.AudioBackend` (LUS writes `coreaudio` there) and prefills the new device with the desired
+  latency of silence (2,205 frames), so `--pace`'s clock, which follows the device's buffer, sees no
+  underrun. A change to no device at all leaves the game silent until the next change (the log says
+  so). No LUS change. SDL's player (Linux, or the Mac's fallback) follows the default device itself.
+- **`--audio-device-change-test VI`** calls the same listener with the same property address at VI
+  N, without touching the system's device. `T2_AUDIO_DEVICE=1 T2_AUDIO_SILENT=1 --audio --pace
+  --no-window --frames 900 --audio-device-change-test 450`: exit 0, `audio: the default output changed
+  ("Altavoces del MacBook Pro" -> "Altavoces del MacBook Pro"): sound player re-created, open`; the
+  re-creation took 46.5 ms (VI 450 late, the only late VI over 1.0 ms besides the boot's); after it
+  the device buffer stayed at 2,558-2,929 frames (desired 2,205), 0 underruns of the simulated
+  device; the config's `Window.AudioBackend` unchanged (`""`). The same run without the switch:
+  1,643-2,075 frames. The log names the device at start and at each change.
+
+### 21.2 Focus loss (Cmd-Tab): the mouse released, no input (port/app/t2controls.cpp)
+
+- SDL3 releases held keys when the window loses the keyboard focus, but it grabs the mouse again by
+  itself when the focus comes back (relative mode stays requested), and a gamepad button or a mouse
+  button held across the switch stayed down for the game. `T2Controls_InputFocus` (each pad read,
+  game.cpp `ContRead`): on a loss the mouse capture is turned off (a click captures it again, as at
+  start; that click does not fire) and the game gets no buttons and centred sticks until the focus
+  is back (the pads stay connected; the game keeps running). Without a window (the scripted headless
+  runs) it is always focused: no det line changes.
+- `--pad-test` has `FRAME focus 0|1`; **`padtest.py` `focus`** (9 checks: a held key, a gamepad
+  button, the mouse motion and button all give nothing while unfocused, the button works again with
+  the focus, the mouse is not captured again until asked, then looks and fires) and **`hotplug`**
+  (the gamepad unplugged and plugged back in at the title menu, then a new game with it to engine
+  mode 11). The whole `padtest.py` (map, newgame, config, focus, hotplug): OK.
+
+### 21.3 A window that is not 4:3 (port/app/t2display.cpp)
+
+- **Found headless**: `T2_OFFSCREEN_SIZE=WxH` (debug, main.cpp) draws `--offscreen-gl` frames of any
+  shape. At 1280x720 the game's own 4:3 part was right (LUS centres the fill rectangles, scissors
+  and the 2D) but the bars at the sides showed **stale frames and 3D drawn past the game's edges**
+  (the title's red tint and the cinema letterbox only inside the 4:3 part): the game clears only its
+  own 4:3 area. A player's resized window or fullscreen on a 16:10 MacBook display would have shown
+  that.
+- **Fix**: `T2Display_RegisterSettings` registers LUS's "advanced resolution" with a 4:3 aspect as
+  the default (`gAdvancedResolution.Enabled` 1, `AspectRatioX/Y` 4/3, the vertical resolution from
+  the window): `Fast3dGui::ApplyResolutionChanges` makes the game frame 4:3 at the window's pixel
+  height (the retina multiplier kept) and `DrawGame` centres it (black bars; the window's framebuffer
+  is cleared each frame). A player may set `gAdvancedResolution.Enabled` 0. Not seen in a window yet
+  (FIRSTRUN 5). The offscreen path has no `Fast3dGui`, so `T2_OFFSCREEN_SIZE` still shows the raw
+  behaviour.
+- `SDL_SetWindowMinimumSize(320, 240)` (LUS set none; a window dragged to a few points made a frame
+  of a few pixels).
+
+### 21.4 The rest of the static review (what the first window touches)
+
+| item | what the code does | verdict |
+|---|---|---|
+| window flags | `RESIZABLE` + `HIGH_PIXEL_DENSITY` + `OPENGL` (gfx_sdl.cpp), 640x480 points or the saved size/position | ok; min size added (21.3) |
+| F11 / green button | `Window::ToggleFullscreen` -> on macOS LUS calls Cocoa's `toggleFullScreen:` (a native fullscreen Space) whatever `gSdlWindowedFullscreen` says; the exclusive mode it sets first is the desktop's own mode and is not applied by that path; `HandleEvents` re-syncs the state each frame, so the green button is followed; `Window.Fullscreen.Enabled` saved at exit | ok (desktop fullscreen only on the Mac) |
+| F2, click capture | `MouseStateManager::ToggleMouseCaptureOverride` / the port's click capture (relative mouse mode) | ok |
+| Esc, F1 | LUS's Gui calls `UpdateMouseCapture` on Esc or F1 even with no menu: the mouse is freed (auto-capture off). Esc is START (pause) | kept: a click captures again; in FIRSTRUN |
+| Ctrl-R | LUS's Gui dispatches the console command `reset`; nothing registers it: a console message only | harmless |
+| gamepad hot-plug | with a window LUS's `SDLAddRemoveDeviceEventHandler` (always updated) takes the add/remove events at each drawn frame, the port's `T2Controls_PollHotplug` at each pad read; both refresh the deck; background gamepad input is off (SDL default, `gAllowBackgroundInputs` 0) | ok (`padtest.py hotplug`) |
+| ImGui on retina | the only ImGui content is the game image (no menu; the console and stats windows are unreachable); fonts would be 1x upscaled | no change |
+| vsync + `--pace` | play mode paces each VI (60 Hz, the game draws every 2nd: 30 fps); LUS's `SyncFramerateWithTime` (target 60) never sleeps at 33 ms per drawn frame; the swap with vsync on can block up to one refresh in a VI of ~1 ms work, under the 16.7 ms period; a late VI restarts the pace clock (no catch-up burst). No double pacing; the `pace:` lines at exit report it | watch in FIRSTRUN 7 |
+| quit (Cmd-Q, close, Dock) | SDL's QUIT / CLOSE_REQUESTED -> `Close()` -> the VI loop ends at `IsRunning()` false: the same exit as `--frames` (every headless run), then LUS saves the window geometry and the config; the pak is written block by block as the game saves (`t2pif.c pak_flush`), nothing to flush | ok |
+| the config | `Window.AudioBackend` kept across a fallback (round 14) and across a device change (21.1) | ok |
+
+### 21.5 The app and the whole game
+
+- `T2_APP_VERSION=0.19 T2_APP_BUILD=19 tools/port/mkapp.sh OUT/build_r19 OUT/r19/Turok2.app`, then
+  `apptest.sh`: codesign ok, 0 references to `/opt/homebrew` or `/usr/local`, every dylib from the
+  bundle, play mode (a path with spaces, Homebrew hidden) to engine mode 11 at VI 4,855, exit 0.
+- The default command (`OUT/r19/det.sh def`, the round-19 300,000 frames, `T2_DET_LOG=1`, ASLR on):
+  600,000 det lines, md5 `6213496b…` (= Linux, STATUS), END 2 at 250,566, 0 deaths in the run's
+  hurt summary, exit 0, 94.7 s. The port-side changes of this round do not touch a headless run.
