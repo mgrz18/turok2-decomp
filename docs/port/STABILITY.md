@@ -527,3 +527,15 @@ T2_DET_ACTORS=1 T2_DET_FROM=72000`), ASLR on, compared with a `setarch -R` refer
 
 Until it is found: compare det md5s under `setarch -R` (or through `ld.so` under `setarch -R`, which
 now gives the same stream).
+
+### 12.4 The round-18 merge: the count on the new default, a sound-player crash
+
+- **ASLR** on the new default (the N64 stream, PLAYTHROUGH.md 38), 10 runs to frame 84,000 with
+  ASLR on: 7 give the `setarch -R` lines (`92eed05f…`), 3 diverge in 135 (2 x from 75,665, 1 x
+  from 75,739; the particle hash first). Two runs under `setarch -R` and the full runs agree.
+- **A crash in the sound player** (PLAYTHROUGH.md 38.3): stopping the sound world's voice 16
+  selected `handles[16]` (the allocation counter after the 16-entry array), and `alSndpGetState`
+  read 1.4 MB past the state array (SIGSEGV at ~201,878 in 2 of 3 drawn starts of a stick run, the
+  same det lines as the undrawn run). The host's sound player now treats a target outside
+  `0..maxSounds-1` as stopped; no det line changed. soak.py on the merged tree: 62 runs, 0
+  crashes.

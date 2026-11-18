@@ -455,3 +455,20 @@ func_0022D2FC.c matches the struct (hue/sat/val ranges at 0x0C-0x0E), and `Color
 takes the hue as `u8` and reads it as `(s8)`; next step: dump one cinema particle's
 `rgb0/rgb1` on both sides with `n64cmp.py run --warp 7601` (level 3) and compare the spawn
 colour against the template's before the hue shift.
+
+## 10. The round-18 merge: the default route on the N64 stream, the demos again (Phase 7 round 18, the merge C33)
+
+- **The default whole-game route now runs with no legacy switch** (PLAYTHROUGH.md 38): the camera
+  shake (round 16 e1), the type-9 props (round 17 f3) and the headless sound world (round 17 merge)
+  as on the N64, the stream a human player gets. `--legacy` keeps the old one for the routes tuned
+  on it.
+- **The boot and the demos** (26,000 frames, `--pak-blank`, Release): the 52,000 det lines are
+  round 17's build's on both streams (no switch: `197b2dd6…`; the three legacy switches:
+  `3df81cf3…`). Against fresh N64 traces of this round (`n64trace.py` + `detdiff.py`, no switch):
+  **demo 1 (gf 1-1,128) and demo 3 (gf 1-344) no difference in any field but `rng`** (from gf 8 of
+  demo 1: the N64's audio thread draws during the load, 7.3); demo 2 the known `player.hp` (and the
+  weapon actor's mirror of it) from gf 608, the N64's uninitialised read. As in round 17.
+- g2's fixes are layout fixes: the stack-depth guards never fired in the usual layout and the
+  multiplayer camera head is not read in a single-player game, so no N64-facing number moved.
+- Not done this round (FIDELITY.md 9.3): the rest of the n64cmp sweep (135, 124, 114, 53, the hub
+  with `--pad`, a boss arena) and the 7601 particle colours.

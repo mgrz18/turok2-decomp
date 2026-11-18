@@ -3548,3 +3548,76 @@ Not attempted this round (time). What f5 found stands (34.4); the two leads: fig
 (gate 8's key) by going to the gate first (zombies 2 and 3 follow from 1,700 units: their 80 health
 each would still need shells), or the plasma rifle of 132 by a jump (`r1`) before 134 (the route
 reaches 132 after 134 today).
+
+## 38. The round-18 merge: the N64 stream is the default, `--legacy` (Phase 7 round 18, the merge C33)
+
+### 38.1 The flip
+
+g1 (section 36) proposed making its `--n64` route the default. The merge did it in
+`tools/port/playthrough.py` and `tools/port/fullrun.py`:
+
+- **No option**: the N64 stream (`--n64-shake --n64-props --n64-sound` together, no `T2_LEGACY_*`
+  line in `teleport.env`), for `--all` and for `--level`. `--n64` is kept as the explicit spelling.
+- **`--legacy`**: the three switches written again (the stream every route before round 18 was
+  tuned on); with it, `--n64-shake`, `--n64-props` and `--n64-sound` lift one each as before.
+  `--n64-shake-from L` needs `--legacy`; `--legacy --n64` is an error.
+
+Route files (`playthrough.txt`, `teleport.env`; generated only): the plain command is
+byte-identical to g1's `--n64`; `--legacy` alone and `--legacy` + each validated combination
+(`--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0`, `--n64-shake`, `--real-weapons 1`,
+`--stick-aim 2 --assist-keep 110`, `--nav 1,2,3,4`, `--n64-shake --n64-props`, g5's combo) are
+byte-identical to ab0bc24c's (or g5's) without `--legacy`; `--level 1..6` (`--fight 10` for 1) with
+`--legacy` = ab0bc24c's `--level N`, without = ab0bc24c's `--level N --n64-shake --n64-props
+--n64-sound`.
+
+### 38.2 Runs (Linux Release, PIE, `aimdrive.py`, each in its own directory)
+
+| command (added to `--all --talismans 2 --cheats-off 1,2,3,4,5,6`) | frames | result | det md5 |
+|---|---|---|---|
+| (none: the new default), twice, `setarch -R` | 300,000 | **END 2 at 250,566, 5 totems, 0 lives lost** | `6213496b…` (600,000 lines; = g1) |
+| `--lair-push both` | 300,000 | END 2 at 250,516, 5 totems, 0 lives | `7262aa60…` |
+| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0` | 300,000 | END 2 at 259,046, 5 totems, 1 life (the lair: 194 damage, lowest 4) | |
+| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0 --lair-push both` | 300,000 | the same END 2 at 259,046, 1 life in the lair: no push came (no `bm 20`), the life goes to his spawns | `1cef897b…` |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --hub-wait 0` | 300,000 | END 2 at 263,620, 5 totems, 1 life (the Queen by stick: 36 hits, 108 damage, lowest 7) | `7e1c8370…` |
+| `--legacy` | 290,000 | END 2 at 252,194, 5 totems, 2 lives (the City Totem) | `ecb9f9f2…` (round 16/17) |
+| `--legacy --real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --l2-heal --hub-wait 0`, twice, `setarch -R` | 290,000 | **END 2 at 248,500, 5 totems, 0 lives** (g5's s6f, now repeated without ASLR) | `47614863…` both |
+| `--legacy --real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` | 290,000 | END 2 at 250,402, 5 totems, **0 lives** | `15d3d74f…` (round 17) |
+
+`--l2-heal` is left out on the N64 stream (g1: its picks were placed for the old one).
+
+The new default's timeline: the Harbor Totem 23,190, the City Totem 88,394, the Marsh Totem
+109,547, the Cave Totem 128,792, the Blind One 138,455, the Hive Totem 164,758, the Mantid Queen
+172,831, the Mother 205,182, the Primagen 243,774, END 2 250,566, the credits back to the hub
+264,664. Damage per fight (`hurtsum`, damage / lowest health): 135 199 / 14, 133 182 / 18, the
+Harbor Totem 96 / 104, the City Totem 83 / 17, the lair 68 / 98, the Blind One 51 / 107, the Marsh
+Totem 48 / 152, the Hive Totem 43 / 132, the Cave Totem 42 / 158, the Mother 34 / 166.
+
+### 38.3 A crash on the N64 stream, found by a drawn run
+
+The stick 1-6 combo on the N64 stream, drawn from 207,001 for a picture of the Mother, died at
+~201,878 in 2 of 3 starts under `setarch -R` (the det lines identical to the undrawn run up to
+there): SIGSEGV in `alSndpGetState` <- `SndVoicePool_StopByOwner` <- `CAudioWorld__StopSoundsByOwner`
+<- `AI_StopSound` <- `CAI__SetMode`. The sound world's voice 16 is the one voice with no player
+sound (`SndVoicePool_AllocVoice`: `idx == 0x10` takes no `alSndpAllocate`), but stopping it selects
+`handles[16]`: the array has 16 entries and the 17th is the u16 at 0xFC that every allocation
+increments (`core + 0x80`: ~20,000 late in a game). `alSndpGetState` then read the state of sound
+20,100, 1.4 MB past the 17-entry state array. Where that lands depends on the host heap:
+the undrawn runs read mapped bytes and went on, a drawn start sometimes did not. The original game does the same read on the N64
+(RAM there, and perhaps a stop posted for it). The host's typed sound player
+(`port/audio/t2audio_sndp.c`) now treats a target outside `0..maxSounds-1` (also the -1 that
+`alSndpDeallocate` leaves) as stopped and posts nothing for it. After the fix: 3 of 3 drawn
+starts pass, the new default gives `6213496b…` twice, the drawn combo the same lines as the drawn
+start that had passed (`2a3eeaae…` to 212,100), and `--legacy` `ecb9f9f2…` (no sound world there).
+
+### 38.4 Integrated runs
+
+- **The level runs** (`--fight 10`, `--level 2..6`, Release, `--pak-blank`) on both streams and
+  **the four boss recipes** (legacy switches): every det line identical to round 17's build.
+- **Boot and the demos** (26,000): both streams identical to round 17's build; against fresh N64
+  traces demos 1 and 3 differ in `rng` only, demo 2 in `player.hp` from gf 608 (FIDELITY.md 10).
+- **Save, title, load**, **`--audio --wav`**, **padtest**, the clean errors (one new: a bad
+  `--archive` now exits 1), **g2's watchdog** (a game that exits before the fifos), **soak** (62
+  runs, 0 crashes): STATUS.md section 2.
+- **ASLR** (STABILITY.md 12.3): 10 runs of the new default to 84,000 with ASLR on: 7 give the
+  `setarch -R` lines, 3 diverge in 135 (from 75,665 twice, from 75,739 once; the particle hash
+  first). Not chased.
