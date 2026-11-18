@@ -10,6 +10,10 @@
  * typing reaches these files (64BIT.md). */
 #include "common.h"
 #include "structs/libaudio.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+extern u32 gFrameCountGameplay;
 
 void alEvtqPostEvent(ALEventQueue *evtq, ALEvent *evt, ALMicroTime delta);
 
@@ -69,6 +73,12 @@ void alSndpDeallocate(ALSndPlayer *sndp, ALSndId id) {
 
 /* func_00293580 */
 s32 alSndpGetState(ALSndPlayer *sndp) {
+    static int sLog = -1;
+    if (sLog < 0)
+        sLog = getenv("T2_SNDP_LOG") != NULL;
+    if (sLog && !target_ok(sndp))
+        fprintf(stderr, "sndp: gf %u target %d max %d (out of range: read as stopped)\n",
+                gFrameCountGameplay, (int)sndp->target, (int)sndp->maxSounds);
     return target_ok(sndp) ? target_state(sndp)->state : 0; /* AL_STOPPED */
 }
 

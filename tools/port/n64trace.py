@@ -320,6 +320,11 @@ def main():
     ap.add_argument("--calls", default="",
                     help="SYM[,SYM...]: also print 'call: gf G SYM ra RA' each time the CPU enters these "
                          "functions in the traced range (e.g. Random_Next,Random_NextB: who draws a number)")
+    ap.add_argument("--sndp", action="store_true",
+                    help="(round 19 h2) break on alSndpGetState/alSndpStop and print only the calls whose "
+                         "target (ALSndPlayer 0x3C) is outside 0..maxSounds-1 (0x44): the target, sndState "
+                         "(0x40), the address of the ALSoundState it reads (sndState + target * 0x30) and its "
+                         "state word (+0x28): what the N64 reads for the sound world\x27s voice 16")
     ap.add_argument("--watch", default="",
                     help="I[,I...] (round 16 e1): the 'det:  lvl I' line of these level actors every game "
                          "frame, without --actors (e.g. the Primagen: 2 in his lair)")
@@ -367,6 +372,8 @@ def main():
     a = ap.parse_args()
 
     calls = [c for c in a.calls.split(",") if c]
+    if a.sndp:
+        calls += [c for c in ("alSndpGetState", "alSndpStop") if c not in calls]
     pads = []
     for item in filter(None, a.pad.split(";")):
         rng, _, rest = item.partition(":")
@@ -623,6 +630,24 @@ def main():
                 state["regs"] = (C.c_int64 * 32).from_address(core.DebugGetCPUDataPtr(2))  # M64P_CPU_REG_REG
             ram = Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM))
             regs = state["regs"]
+            if a.sndp and call_at[pc] in ("alSndpGetState", "alSndpStop"):
+                sp = regs[4] & 0xFFFFFFFF
+                tg = ram.sval(sp + 0x3C, 4)
+                mx = ram.sval(sp + 0x44, 4)
+                if valid(sp) and 0 <= tg < mx:
+                    core.DebugSetRunState(2)
+                    core.DebugStep()
+                    return
+                st = ram.u32(sp + 0x40)
+                ad = (st + tg * 0x30) & 0xFFFFFFFF
+                sys.stdout.write("sndp: frame %d gf %d %s ra %08x sndp %08x target %d max %d sndState %08x "
+                                 "reads %08x state %s words %s\n" % (
+                    state["n"], ram.u32(syms["gFrameCountGameplay"]), call_at[pc], regs[31] & 0xFFFFFFFF, sp,
+                    tg, mx, st, ad, ("%d" % ram.sval(ad + 0x28, 4)) if valid(ad) else "unmapped",
+                    " ".join("%08x" % ram.u32(ad + 4 * k) for k in range(12)) if valid(ad) else "-"))
+                core.DebugSetRunState(2)
+                core.DebugStep()
+                return
             sys.stdout.write("call: frame %d gf %d %s ra %08x a0-a3 %08x %08x %08x %08x" % (
                 state["n"], ram.u32(syms["gFrameCountGameplay"]), call_at[pc], regs[31] & 0xFFFFFFFF,
                 regs[4] & 0xFFFFFFFF, regs[5] & 0xFFFFFFFF, regs[6] & 0xFFFFFFFF, regs[7] & 0xFFFFFFFF))
