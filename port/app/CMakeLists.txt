@@ -8,7 +8,7 @@ target_include_directories(t2asset PUBLIC ${T2_PORT_DIR}/assets)
 target_compile_definitions(t2asset PRIVATE MINIZ_NO_ZLIB_COMPATIBLE_NAMES _LARGEFILE64_SOURCE)
 set_source_files_properties(${T2_PORT_DIR}/third_party/miniz/miniz.c PROPERTIES COMPILE_OPTIONS "-w")
 
-add_executable(turok2 main.cpp t2asset_lus.cpp testdl.c offscreen_gl.cpp)
+add_executable(turok2 main.cpp t2asset_lus.cpp testdl.c offscreen_gl.cpp t2display.cpp)
 set_target_properties(turok2 PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON C_STANDARD 11)
 # The game's GBI family: F3DEX2 (F3DEX.NoN fifo 2.05 + L3DEX 2.05, include/globals/ucode.h).
 # Must match libultraship's GBI_UCODE so macros encode what the interpreter decodes.
@@ -24,6 +24,14 @@ if(APPLE)
     set_source_files_properties(offscreen_gl.cpp PROPERTIES COMPILE_OPTIONS "-Wno-deprecated-declarations")
     find_package(GLEW REQUIRED)
     target_link_libraries(turok2 PRIVATE GLEW::GLEW "-framework OpenGL")
+    # --offscreen-metal (offscreen_gl.cpp, round 18 g4): LUS's Metal renderer on a CAMetalLayer in no
+    # window, through metal-cpp (LUS's copy; its implementation is compiled in gfx_metal.cpp)
+    include(FetchContent)
+    FetchContent_GetProperties(metalcpp SOURCE_DIR _t2_metalcpp_dir)
+    if(_t2_metalcpp_dir)
+        target_include_directories(turok2 PRIVATE ${_t2_metalcpp_dir})
+    endif()
+    target_link_libraries(turok2 PRIVATE "-framework Metal" "-framework QuartzCore")
 endif()
 
 # The game linked into turok2 (docs/port/LINK.md): turok2_game (engine + module 1, minus the

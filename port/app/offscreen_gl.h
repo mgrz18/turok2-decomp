@@ -29,6 +29,12 @@ int T2Offscreen_ShotFramebuffer();
 // --bench: wait until the GL commands of the frame have finished on the GPU (glFinish), so the
 // draw time includes the GPU work (no-op without a context).
 void T2Offscreen_Finish();
+// --offscreen-metal (macOS, round 18 g4): the same with LUS's Metal renderer (a CAMetalLayer in no
+// window); T2Offscreen_Draw/Interpreter/Finish then use it. T2Offscreen_MetalRGB8: the last
+// frame at 8 bits per channel, top row first (false when not running Metal).
+bool T2Offscreen_InitMetal(const std::shared_ptr<Ship::ConsoleVariable>& cvars,
+                           const std::shared_ptr<Ship::ResourceManager>& resources, uint32_t width, uint32_t height);
+bool T2Offscreen_MetalRGB8(uint32_t w, uint32_t h, uint8_t* rgb);
 // T2_SHOT at 8 bits per channel (round 17, f4): reads framebuffer `fbId` of the interpreter's
 // OpenGL renderer (0 = the default framebuffer: the window's) as RGB8 into `rgb` (w * h * 3
 // bytes, GL row order: bottom row first). LUS's ReadFramebufferToCPU returns RGBA5551, which
