@@ -498,7 +498,7 @@ the driver's open returns, its read sees EOF and it exits with the game's code.
 `T2_AIM_OPEN_TIMEOUT=SECONDS` also SIGKILLs a game that has not opened the fifos after that long.
 Checked with `/bin/false` (exits 1 at once) and `sleep 30` with a 2 s timeout (killed, exit -9).
 
-### 12.3 The level-135 two paths (not yet found): what is known now
+### 12.3 The level-135 two paths (found in round 19: section 13): what was known in round 18
 
 Method: `g2loop`-style batches of the default command to 84,000 frames (`T2_DET_LOG=1
 T2_DET_ACTORS=1 T2_DET_FROM=72000`), ASLR on, compared with a `setarch -R` reference (det md5
@@ -539,3 +539,111 @@ now gives the same stream).
   same det lines as the undrawn run). The host's sound player now treats a target outside
   `0..maxSounds-1` as stopped; no det line changed. soak.py on the merged tree: 62 runs, 0
   crashes.
+
+## 13. Round 19 (part h1): the level-135 two paths found and fixed (determinism under ASLR)
+
+### 13.1 The cause: the ground tilt reads uninitialised heap bytes
+
+`CGameObjectInstance__Construct` (func_00219BC0.c) sets `m_qGround =
+GameObject_GetGroundRotation(obj)` **before** `CAI__Setup`, and `GameObject_GetGroundRotation`
+(func_00267944.c) tests `obj->m_AI.m_dwFlags & 0xC0000` (identity) before it builds the floor tilt
+from the region's normal. The level actors' block comes from
+`CCache__AllocateMemoryForDecompression` (`CScene__DecompressAnimatedInstances`) and is not
+cleared, so that read sees whatever the heap held there before (FIDELITY.md 9.2 found it as a
+fidelity difference in 125). On the host those old bytes include **host pointers** (their halves
+`0x00007fff`, `0x00005555`...), which change with ASLR: whether bits 0xC0000 are set in the
+garbage, and so whether an actor stands upright or leans with its floor, changed from run to run.
+
+In 135 (the default route, ~75,662) actor 41 (lying on a sloped floor, `m_mfOrient` scale 0.5,
+tilted 90 degrees, with the floor's few 1e-5 components) comes into view: its first
+`CGameObjectInstance__BuildBoneMatrices` gave other matrices for **every bone** when its
+orientation came from the other tilt; a type-172 particle placed from one of its nodes moved
+0.6 units, then the particle hash, the `rng` and the route followed (the "second path").
+
+How it was found (switches used, the per-bone one not kept):
+
+- `T2_DET_POSE=1` (with `T2_DET_ACTORS`, kept): a `pose` line per actor (head turn/tilt, blend,
+  both animation channels with an FNV hash of the animation data, the sight target) and a
+  `pose2` line (the ground quaternion and a hash of `m_mfOrient`). It showed `m_Blend` /
+  `m_BlendLength` and the blend channel's start frame of many level actors holding host pointer
+  halves (the same uninitialised block), and the animation data's hash differing in every ASLR
+  run (the unused fourth float of each position key, never written by `Anim_DecodeTracks`, kept
+  the old heap bytes: harmless, but the same class).
+- A temporary hook after `CGameObjectInstance__PoseBone` (one FNV per bone, the key offsets, the
+  orientation and the animation data, dumped for one actor): in a diverging run actor 41's 47
+  bones all differed at its first pose, with the same keys and animation (bar the padding).
+- Runs: 9 ASLR runs to 76,500 of the default before the fix: 5 took the second path (`a2`, `a3`,
+  `a6`, `a8`, `a9`), every one from the same matrix line at 75,663; the odds moved with the
+  build (0 of 5 with one instrumented binary), which is why gdb runs never showed it.
+
+### 13.2 The fix (asm_diff 0)
+
+- `CCache__AllocDecompressFlags` (the host form of `CCache__AllocateMemoryForDecompression`,
+  func_00205D7C.c, `TARGET_PORT` only) **zeroes the block** it allocates. Every reader of
+  not-yet-written bytes there (the AI flags above, the blend fields, the key padding) now reads 0
+  in every run. It also matches the N64 where it was checked: in 125 the N64's bits were clear
+  (FIDELITY.md 9.2), which zero gives, so placed objects on sloped floors lean with the floor as on
+  the console.
+- `CGameObjectInstance__PoseBone` (func_0021B95C.c) passes the object itself to
+  `func_0021B59C` (the bone wobble of objects with `m_dwFlags & 0x800000`), which uses the low 16
+  bits of its address as the wobble's phase: on the host an ASLR-dependent number. On
+  `TARGET_PORT` it now passes `T2Port_N64Address(obj)` (port/runtime/t2boot.c): the address the
+  object would have in the console's heap (`0x8014A000` + its offset in the host arena), the same
+  in every run. No such object was posed in 135's window; it was found by reading the pose path.
+- Checked and not a cause: `CCache__Request` / `find()` keys are ROM addresses everywhere
+  (`CISet__GetROMAddressAndSize`, `m_rpObject`, `m_rpGeometryHeader`, `prop->owner`: all ROM
+  offsets, no host pointer reaches a key); `Anim_DecodeTracks`' bit stream is already host-safe
+  (`BitAddr_FromPointer` keeps a base, func_00217B04.c); `EnemyAI_HeadNodeCallback` reads the host
+  pose context correctly.
+
+### 13.3 Proof
+
+All runs Linux Release, PIE, `aimdrive.py`, each in its own directory (`T2_DET_LOG=1`; the
+scenario adds `T2_DET_ACTORS=1 T2_DET_FROM=72000`).
+
+| run | ASLR | result | det md5 |
+|---|---|---|---|
+| the scenario: the default to 84,000, before the fix | on, 9 runs (to 76,500) | 5 took the second path (from 75,663) | |
+| the scenario after the fix, `setarch -R` | off | | `4d392c08…` |
+| the scenario after the fix, two different binaries (with and without the pose instrumentation) | on, 18 runs | all identical | `4d392c08…` |
+| the default (`playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6`), 300,000 frames | off | END 2 (cinema 370 at 253,310), 5 totems, hurtsum `deaths 0` (422 hits) | `a9f9584e…` (600,000 lines) |
+| the same | on, 4 runs | the same | `a9f9584e…` all 4 |
+| the default on the round-18 binary (the method check) | off | END 2 (cinema 370 at 243,774), 0 deaths, 399 hits | `6213496b…` (as round 18) |
+| `--legacy`, 290,000 frames | off | END 2 (cinema 370 at 245,402), 5 totems, 2 lives (the City Totem, as round 18) | `281904eb…` (was `ecb9f9f2…`) |
+
+(Each whole run also has the `death:` line of the return to the hub after the credits, frame
+274,200 now, 264,664 on the round-18 binary: not a life lost in the game.)
+
+**The default's det md5 changes from `6213496b…` to `a9f9584e…`**: with the zeroed blocks some
+level actors lean with their floors where the round-18 `setarch -R` layout's garbage stood them
+upright, so the stream is a new one (the first difference in the scenario is 135's 75,665, the
+same particle as the old second path). It is now the same with ASLR on and off. The route still
+wins every fight without losing a life; per fight (damage / lowest health): the City Totem
+**97 / 3** (was 83 / 17: the thinnest spot now), 135 199 / 14, 133 182 / 18, the lair 138 / 36,
+the Harbor Totem 96 / 104, the Marsh Totem 52 / 148, the Cave Totem 60 / 140, the Hive (2) 61 / 81.
+Timeline: the Harbor Totem 23,190, the City Totem 88,574, the Marsh Totem 109,647, the Cave Totem
+129,390, the Blind One 138,849, the Hive Totem 164,560, the Mantid Queen 180,185, the Mother
+213,078, the Primagen with cinema 370 at 253,310, level 10 (END 2) 256,302.
+
+The round-18 "third path" (before 38,997, one run in 22) did not show: every scenario run's lines
+from 72,000 are the same, which they would not be after an earlier divergence.
+
+**Compare det md5s with ASLR on again** (the `setarch -R` advice of 12.3 is no longer needed for
+this route); a new divergence between ASLR runs is a bug of this class: look for reads of heap or
+stack bytes not written first (`T2_DET_POSE`), and for host addresses used as numbers.
+
+### 13.4 The round-19 merge: ASLR on, and a data-alignment fault
+
+On the merged tree (h1-h5, the `SndQueue_Update` pointer fix, the City Totem on the shredder:
+PLAYTHROUGH.md 41) the default command gives det md5 `0959aac5…` in four whole-game runs with
+ASLR on, and **10 of 10 runs to frame 84,000 with ASLR on give the same 168,000 lines**
+(`2361fb91…`; round 18: 7 of 10). `setarch -R` is no longer needed to compare det md5s.
+
+The save/load check found a layout-dependent fault of another kind: the Release build crashed
+loading a save (`GameNoteMenu_SelectYes`: a `movaps` into `gLoadSavePersistentData`, defined
+`T2_ALIGN(4)` by `gendata.py` and placed at 8 mod 16 once the data layout shifted; clang assumes
+the ABI's 16-byte alignment for a typed extern array of 16 bytes or more). The symbol joined
+`gendata.py`'s `ALIGN16` (round 14 c5's list); `tools/port/aligncheck.py BIN` lists aligned SSE
+accesses to globals that are not 16-aligned in a built binary (0 on the fixed build). Run it
+after a merge that adds or moves data symbols.
+

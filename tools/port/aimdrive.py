@@ -188,6 +188,23 @@ PRIMARY_R = envf("T2_AIMD_PRIMARY_R", 600.0)
 # Mother: her parts are nodes 900-1,500 units from both candidate origins; aimed at the origins her six parts took
 # 5,400 frames instead of 2,000 while she hit the pinned player every ~80: 307 damage, 2 lives in s6d)
 PRIMARY_ONLY = {int(v) for v in os.environ.get("T2_AIMD_PRIMARY_ONLY", "").split(",") if v.strip()}
+# round 19 h3: T2_AIMD_BOSS=L[,L...]: in level L the assist's point (the boss's damage node) is the only target
+# unless a candidate threatens: within BOSS_THREAT units of the player (a kind-0 one: BOSS_THREAT0), the nearest
+# such one is shot first. The Primagen's lair by stick (g5, s6e): the picker spent ~7,900 of ~16,000 aim frames on
+# his spawns (ids 10000+) wherever they were, him ~6,500: 295 damage, 3 lives. The point is led by its own motion
+# over the shot's flight (BOSS_LEAD of it; PSPEED).
+# "L:R" sets level L's threat radius (both kinds). In the boss levels the fire is held while on target
+# (BOSS_HOLD: the assisted fights hold Z; the tap rhythm of FIRE_EVERY gave the launchers a third of their rate).
+BOSS_THREAT = envf("T2_AIMD_BOSS_THREAT", 350.0)
+BOSS_THREAT0 = envf("T2_AIMD_BOSS_THREAT0", 250.0)
+BOSS, BOSS_R = set(), {}
+for _v in os.environ.get("T2_AIMD_BOSS", "").split(","):
+    if _v.strip():
+        BOSS.add(int(_v.split(":")[0]))
+        if ":" in _v:
+            BOSS_R[int(_v.split(":")[0])] = float(_v.split(":")[1])
+BOSS_HOLD = envf("T2_AIMD_BOSS_HOLD", 1.0) != 0
+BOSS_LEAD = envf("T2_AIMD_BOSS_LEAD", 1.0)
 CAND_EVERY = int(envf("T2_AIMD_CAND_EVERY", 50))   # --stats: the candidates every this many frames
 
 
@@ -241,6 +258,8 @@ class Picker:
         self.immunes = 0
         self.aimed = {}         # IMMUNE_ACC: id -> [health at its last drop, frames aimed at since]
         self.last = None        # the last aim frame
+        self.bpt = None         # BOSS: (frame, the assist's point, its velocity)
+        self.threats = 0        # BOSS: aim frames given to a threat instead of the boss
 
     def vel(self, frame, cid, pos):
         old = self.seen.get(cid)
@@ -256,6 +275,8 @@ class Picker:
         acc = lv in IMMUNE_ACC
         if lv in PRIMARY_ONLY and primary is not None:
             return primary, None
+        if lv in BOSS and primary is not None:
+            return self.boss(frame, px, pz, ex, ez, cands, primary, lv)
         if not cands:
             self.cur = None
             return primary, None
@@ -318,6 +339,38 @@ class Picker:
         return pts[best], best
 
 
+    def boss(self, frame, px, pz, ex, ez, cands, primary, lv=None):
+        """T2_AIMD_BOSS (round 19 h3): the boss's node, led; a threat near the player first."""
+        near = []
+        for cid, x, y, z, hp, kind in cands:
+            d = math.hypot(x - px, z - pz)
+            r = BOSS_R.get(lv, BOSS_THREAT if kind else BOSS_THREAT0)
+            if hp > 0 and math.dist((x, y, z), primary) > 300.0 and d < r:
+                near.append((d, cid, (x, y, z)))
+        if near:
+            d, cid, pos = min(near)
+            v = self.vel(frame, cid, pos)
+            t = math.hypot(pos[0] - ex, pos[2] - ez) / PSPEED
+            if cid != self.cur:
+                self.switches += 1
+                self.cur = cid
+            self.threats += 1
+            self.last = frame
+            return tuple(a + LEAD * b * t for a, b in zip(pos, v)), cid
+        v = (0.0, 0.0, 0.0)
+        if self.bpt and 0 < frame - self.bpt[0] <= 4 and math.dist(self.bpt[1], primary) < 60.0 * (frame - self.bpt[0]):
+            dt = frame - self.bpt[0]
+            raw = tuple((a - b) / dt for a, b in zip(primary, self.bpt[1]))
+            v = tuple(0.3 * a + 0.7 * b for a, b in zip(raw, self.bpt[2]))
+        self.bpt = (frame, primary, v)
+        t = math.hypot(primary[0] - ex, primary[2] - ez) / PSPEED
+        if self.cur != -1:
+            self.switches += 1
+            self.cur = -1
+        self.last = frame
+        return tuple(a + BOSS_LEAD * b * t for a, b in zip(primary, v)), None
+
+
 class Trigger:
     """Z only on target: the crosshair within HIT_R of the (led) aim point at its distance, in yaw
     and pitch (pitch with half again the margin: the camera eases), then a tap as the script's."""
@@ -327,8 +380,15 @@ class Trigger:
         self.next = -1
         self.shots = 0
 
-    def z(self, frame, eyaw, epitch, dist):
+    def z(self, frame, eyaw, epitch, dist, hold=False):
         tol = max(0.03, math.atan2(HIT_R, max(dist, 1.0)))
+        if hold:   # round 19 h3 (BOSS_HOLD): Z held while on target, as the assisted boss fights hold it
+            on = abs(eyaw) < 1.5 * tol and abs(epitch) < 2.0 * tol
+            if on and frame >= self.until:
+                self.shots += 1
+            if on:
+                self.until = frame + FIRE_HOLD
+            return 1 if frame < self.until else 0
         if frame < self.until:
             return 1
         if abs(eyaw) < tol and abs(epitch) < 1.5 * tol and frame >= self.next:
@@ -352,7 +412,8 @@ def answer(line, aim, probe=None, picker=None, trig=None):
         (tx, ty, tz), cid = picker.pick(frame, px, pz, ry, ex, ey, ez, pitch, cands, (tx, ty, tz), line_level(f), line_totem(f))
     sx, sy, eyaw, epitch = aim.answer(frame, px, pz, ry, ex, ey, ez, pitch, tx, ty, tz)
     dist = math.hypot(tx - ex, tz - ez)
-    z = trig.z(frame, eyaw, epitch, dist) if trig is not None else None
+    lv = line_level(f)
+    z = trig.z(frame, eyaw, epitch, dist, BOSS_HOLD and lv in BOSS) if trig is not None else None
     if z is not None and dist > FIRE_MAX.get(line_level(f), 1e9):
         z = 0   # too far for this level's weapon (round 17 f5): no fire
     return frame, sx, sy, eyaw, epitch, pitch, ry, cid, z
@@ -545,6 +606,17 @@ WALK_STUCK = 36         # frames of C-up with under WALK_STUCK_D units moved: st
 WALK_STUCK_D = 25.0
 WALK_BACK, WALK_SIDE = 10, 24   # the recovery: C-down frames, then sidestep frames
 WALK_BLOCK = 50.0       # a stuck point becomes a box this half-wide, this far ahead of him
+# round 19 h5: the jumps (a plan entry "F1-F2@SUBj:..." plans with nav.py's jump edges): R is pressed
+# WALK_JUMP_AT units before a jump or gap edge while he faces it (C-up held), for WALK_JUMP_HOLD frames;
+# stuck with jumps on, every other recovery is a jump forward instead of the back-off
+WALK_JUMP_AT = 70.0
+WALK_JUMP_FACE = 0.35
+WALK_JUMP_HOLD = 8
+# round 19 h5: doors (nav.doors: level actors of type 0x641 and their openers): stuck within WALK_DOOR_R of a
+# door, the walker waits WALK_DOOR_WAIT frames facing it and walks on, instead of backing off and planning
+# round it (a door is not an obstacle to go round: it opens, on its own or when its opener fires)
+WALK_DOOR_R = 160.0
+WALK_DOOR_WAIT = 30
 
 
 def walk_plan(spec):
@@ -555,7 +627,8 @@ def walk_plan(spec):
         win, rest = part.split("@")
         lvl, pt_ = rest.split(":")
         a, b = (int(v) for v in win.split("-"))
-        out.append((a, b, int(lvl), tuple(float(v) for v in pt_.split(","))))
+        jumps = lvl.endswith("j")   # round 19 h5: plan with the jump edges, press R at them
+        out.append((a, b, int(lvl.rstrip("j")), tuple(float(v) for v in pt_.split(",")), jumps))
     return out
 
 
@@ -575,6 +648,11 @@ class WalkDrive:
         self.done = None         # the frame the goal was reached
         self.report = []
         self.extra = []
+        self.jpts = []
+        self.jhold = 0           # round 19 h5: frames of R left
+        self.njumps = 0
+        self.dwait = 0           # round 19 h5: frames left waiting at a door
+        self.dseen = {}          # door actor -> frames waited
 
     def active(self, frame):
         for e in self.plan:
@@ -587,7 +665,7 @@ class WalkDrive:
         try:
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
             import nav
-            n = nav.load(self.rom, self.cur[2])
+            n = nav.load(self.rom, self.cur[2], len(self.cur) > 4 and self.cur[4])
             base = n.boxes
             n.boxes = base + self.extra    # the places he got stuck at, as obstacles
             try:
@@ -599,19 +677,39 @@ class WalkDrive:
             res = None
         self.pts = res[0][1:] if res else [(g[0], g[2])]
         self.plen = res[2] if res else math.hypot(g[0] - px, g[2] - pz)
+        self.jpts = list(res[3]) if res and len(res) > 3 else []   # round 19 h5: (x, z, kind, edge)
         self.wi = 0
         self.hist = []
+
+    def door_near(self, px, pz):
+        """Round 19 h5: the nearest door (nav.doors) within WALK_DOOR_R of the player, or None."""
+        try:
+            import nav
+            ds = nav.doors(self.rom, self.cur[2])
+        except Exception:
+            return None
+        best = None
+        for d in ds:
+            if abs(d["pos"][1] - self.py) > nav.DOOR_DY:
+                continue
+            dd = math.hypot(d["pos"][0] - px, d["pos"][2] - pz)
+            if dd < WALK_DOOR_R and (best is None or dd < best[0]):
+                best = (dd, d["actor"])
+        return best[1] if best else None
 
     def finish(self, frame, px, pz):
         if self.cur is None:
             return
         g = self.cur[3]
         err = math.hypot(g[0] - px, g[2] - pz)
-        self.report.append("walkdrive: %d-%d level %d -> (%.0f, %.0f): %s, %d stuck, %d waypoints %.0f units; "
+        self.report.append("walkdrive: %d-%d level %d -> (%.0f, %.0f): %s, %d stuck, %d waypoints %.0f units%s; "
                            "error %.0f at the window's end" % (
                                self.cur[0], self.cur[1], self.cur[2], g[0], g[2],
                                "arrived at %d" % self.done if self.done else "NOT ARRIVED",
-                               self.stucks, self.npts, self.plen0, err))
+                               self.stucks, self.npts, self.plen0,
+                               (", %d jumps planned, %d pressed" % (self.njp0, self.njumps) if len(self.cur) > 4 and self.cur[4] else "") +
+                               "".join(", waited %d at door %d" % (w, k) for k, w in sorted(self.dseen.items())),
+                               err))
         print(self.report[-1], file=sys.stderr)
         self.cur = None
 
@@ -636,8 +734,9 @@ class WalkDrive:
             self.finish(frame, px, pz)
             self.cur, self.state, self.stucks, self.done, self.sent, self.rec = e, "go", 0, None, [], 0
             self.extra = []
+            self.jhold, self.njumps, self.dwait, self.dseen = 0, 0, 0, {}
             self.replan(px, py, pz)
-            self.npts, self.plen0 = len(self.pts), self.plen
+            self.npts, self.plen0, self.njp0 = len(self.pts), self.plen, len(self.jpts)
         ans = self._step(frame, px, pz, ry)
         if e[1] == frame:
             self.finish(frame, px, pz)
@@ -645,11 +744,20 @@ class WalkDrive:
 
     def _step(self, frame, px, pz, ry):
         g = self.cur[3]
+        jumps = len(self.cur) > 4 and self.cur[4]
+        if self.jhold > 0:   # round 19 h5: a jump in the air: R and C-up held, the stick still steering
+            self.jhold -= 1
+            tx, tz = self.pts[self.wi] if self.pts else (g[0], g[2])
+            sx, _ = self.turn(ry, face_yaw(px, pz, tx, tz))
+            return sx, C_U, 1
         if self.state == "face" or math.hypot(g[0] - px, g[2] - pz) < WALK_ARRIVE:
             if self.state != "face":
                 self.state, self.done = "face", frame
             sx, err = self.turn(ry, g[3])
             return (sx if abs(err) > WALK_FACE else 0), 0
+        if self.dwait > 0:   # round 19 h5: at a closed door: stand, then walk on
+            self.dwait -= 1
+            return 0, 0
         if self.rec > 0:   # stuck: back off, then sidestep
             self.rec -= 1
             return 0, (C_D if self.rec >= WALK_SIDE else self.side)
@@ -658,17 +766,38 @@ class WalkDrive:
         tx, tz = self.pts[self.wi]
         sx, err = self.turn(ry, face_yaw(px, pz, tx, tz))
         go = abs(err) < WALK_GO
+        if jumps and self.jpts and go:
+            jx, jz = self.jpts[0][:2]
+            dj = math.hypot(jx - px, jz - pz)
+            # a jump edge just ahead (or one he walked past: drop it)
+            if len(self.jpts) > 1 and math.hypot(self.jpts[1][0] - px, self.jpts[1][1] - pz) < dj:
+                self.jpts.pop(0)
+            elif dj < WALK_JUMP_AT and abs(wrap(face_yaw(px, pz, jx, jz) - ry)) < WALK_JUMP_FACE + math.pi / 2:
+                self.jpts.pop(0)
+                self.jhold = WALK_JUMP_HOLD - 1
+                self.njumps += 1
+                self.hist = []
+                return sx, C_U, 1
         if go:
             self.hist.append((frame, px, pz))
             old = [h for h in self.hist if frame - h[0] >= WALK_STUCK]
             if old and math.hypot(px - old[-1][1], pz - old[-1][2]) < WALK_STUCK_D:
                 self.stucks += 1
+                self.hist = []
+                door = self.door_near(px, pz)
+                if door is not None:   # round 19 h5: a door: wait for it, do not go round it
+                    self.dwait = WALK_DOOR_WAIT
+                    self.dseen[door] = self.dseen.get(door, 0) + WALK_DOOR_WAIT
+                    return 0, 0
+                if jumps and self.stucks % 2 == 1:   # round 19 h5: try a jump forward first
+                    self.jhold = WALK_JUMP_HOLD - 1
+                    self.njumps += 1
+                    return sx, C_U, 1
                 self.rec = WALK_BACK + WALK_SIDE
                 # what stopped him: an obstacle WALK_BLOCK wide just ahead (the next plan goes round it)
                 fx, fz = px - math.sin(ry) * WALK_BLOCK, pz - math.cos(ry) * WALK_BLOCK
                 self.extra.append((fx - WALK_BLOCK, fx + WALK_BLOCK, fz - WALK_BLOCK, fz + WALK_BLOCK, -1e9, 1e9))
                 self.side = C_R if self.side == C_L else C_L
-                self.hist = []
                 self.pending = True
                 return 0, C_D
             self.hist = [h for h in self.hist if frame - h[0] <= WALK_STUCK + 4]
@@ -816,9 +945,9 @@ def main():
                   file=sys.stderr)
         shutil.rmtree(d, ignore_errors=True)
         if picker or trig:
-            print("aimdrive: %d target switches, %d left as not hurt, %d shots" % (
-                picker.switches if picker else 0, picker.immunes if picker else 0, trig.shots if trig else 0),
-                file=sys.stderr)
+            print("aimdrive: %d target switches, %d left as not hurt, %d shots, %d boss-threat frames" % (
+                picker.switches if picker else 0, picker.immunes if picker else 0, trig.shots if trig else 0,
+                picker.threats if picker else 0), file=sys.stderr)
         print("aimdrive: %d stick answers, %d move answers (%d with the lair driver's own C buttons, %d keeping "
               "away); the game exited %d" % (n, moves, drive.overrides + drive.keeps if drive.kind == "guard" else moves,
                                              drive.keeps, rc), file=sys.stderr)

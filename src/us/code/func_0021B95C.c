@@ -140,7 +140,15 @@ void CMtxF__SetAxisAngle(f32 (*m)[4], f32 angle, f32 x, f32 y, f32 z);
 void CMtxF__Copy(f32 (*dst)[4], f32 (*src)[4]);
 void CMtxF__Translate(f32 (*m)[4], f32 x, f32 y, f32 z);
 void CMtxF__ScaleAxes(f32 (*m)[4], f32 x, f32 y, f32 z);
+#ifdef TARGET_PORT
+/* The N64 passes the object itself as the wobble's phase (func_0021B59C reads the low 16 bits of
+ * its address); on the host that is an ASLR-dependent host address: pass the address the object
+ * would have in the N64 heap (port/runtime/t2boot.c), the same in every run. */
+void func_0021B59C(s32 time, s32 flags, f32 (*m)[4]);
+u32 T2Port_N64Address(const void *p);
+#else
 void func_0021B59C(PoseObject *obj, s32 flags, f32 (*m)[4]);
+#endif
 f32 GameObject_GetCollisionHeight(PoseObject *obj);
 f32 CGameRegion__GetCeilingHeight(CGameRegion *region, f32 x, f32 z); /* the ceiling height */
 
@@ -396,7 +404,11 @@ void CGameObjectInstance__PoseBone(PoseObject *obj, PoseContext *ctx, s32 bone, 
         }
     }
     if (obj->flags & 0x800000) {
+#ifdef TARGET_PORT
+        func_0021B59C((s32) T2Port_N64Address(obj), sPoseFlags, cur);
+#else
         func_0021B59C(obj, sPoseFlags, cur);
+#endif
     }
 
     if (ctx->f78 && (sPoseFlags & 0xC7) == 0xC3) {

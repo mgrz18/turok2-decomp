@@ -98,6 +98,13 @@ CMemEntry *CCache__AllocDecompressFlags(u32 flags, u32 size) {
         node->flags |= 0x100;
         node->data = (void *)CCache__HeapAlloc(0, size, (flags >> 5) & 1, flags);
         if (node->data != NULL) {
+            /* round 19 h1: the block starts zeroed. The game reads some of it before writing it
+             * (CGameObjectInstance__Construct's ground tilt tests m_AI.m_dwFlags & 0xC0000 before
+             * CAI__Setup; FIDELITY.md 9.2): on the host the old heap bytes there hold host
+             * pointers, so the tilt (and the bone matrices built from it) changed with ASLR
+             * (the level-135 two paths, STABILITY.md 13). The console's heap starts zeroed
+             * too (InitializeSystemResources). */
+            __builtin_memset(node->data, 0, size);
             node->size = size;
             node->flags |= flags;
             CCache__AddToAddressList(0, node);

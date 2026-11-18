@@ -31,9 +31,17 @@ STICK_FREE_WALK = {5, 6}   # round 18 g5: --stick-aim levels whose route walks k
 # round 18 g5: per route level, the sub-levels where the stick driver prefers the assist's target (T2_AIMD_PRIMARY):
 # level 5's pylons (124), the cocoons and embryos (94, 95, 96) and the Queen's node (2); level 6's Mother (3) and the Primagen (4)
 STICK_PRIMARY = {5: (124, 94, 95, 96, 2), 6: (3, 4)}
+# round 19 h3: on the N64 stream (n64_full()), the boss arenas of the --stick-aim levels where the stick aims only
+# at the boss's damage node, led, with Z held on target, unless a candidate comes within the radius
+# (aimdrive.py T2_AIMD_BOSS=L:R): the Mantid Queen (2) and the Primagen's lair (4). --stick-boss "" turns it off.
+STICK_BOSS = {5: "2:%s" % os.environ.get("T2H3_QR", "150"), 6: "4:%s" % os.environ.get("T2H3_LR", "350")}
+STICK_BOSS_ON = None   # None: on the N64 stream only; else the set of route levels (--stick-boss)
 LAIR_PUSH = ""       # round 18 g5: --lair-push toward|jump|both (T2_LAIR_PUSH; "" = off: the routes unchanged)
 ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
 NAV = set()         # round 16 e3: the levels whose NAV_WALKS teleports the waypoint walker replaces (--nav)
+NAV_PAD = 0         # round 19 h5 (--nav-pad F): F idle frames after each walk window (the later steps move by
+                    # them too): the re-tuning knob for the fights a walk disturbs (as --hub-wait for level 2)
+NAV_JUMPS = False   # round 19 h5 (--nav-jumps): the walks plan with nav.py's jump edges and press R at them
 NAV_ROM = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "baserom.us.z64")
 
 
@@ -89,8 +97,8 @@ class Route:
         sub (round 16 e3, --nav): the sub-level; the walk is then aimdrive.py's waypoint walker, closed
         loop from where the player really is, in a window of nav_frames() frames."""
         if sub is not None:
-            n = nav_frames(sub, frm, (x, y, z), ry)
-            self.walk_plan.append((f, f + n - 1, sub, x, y, z, ry))
+            n = nav_frames(sub, frm, (x, y, z), ry) + NAV_PAD
+            self.walk_plan.append((f, f + n - 1, "%d%s" % (sub, "j" if NAV_JUMPS else ""), x, y, z, ry))
             self.move_drive.append((f, f + n - 1))
             self.note(f, "%d: walk to (%.0f, %.0f) [%d frames]" % (sub, x, z, n))
             self.walked += 1
@@ -204,10 +212,13 @@ class Route:
                 env.append("T2_AIMD_PRIMARY=%s" % ",".join(str(l) for l in prim))
             if 6 in STICK_AIM:   # round 18 g5: the Mother's parts: always the assist's node (aimdrive.py)
                 env.append("T2_AIMD_PRIMARY_ONLY=3")
+            bl = (STICK_BOSS_ON if STICK_BOSS_ON is not None else set(STICK_BOSS) if n64_full() else set()) & STICK_AIM
+            if bl:   # round 19 h3: the boss's node only, led, fire held on target (T2_AIMD_BOSS)
+                env.append("T2_AIMD_BOSS=%s" % ",".join(STICK_BOSS[lv] for lv in sorted(bl) if lv in STICK_BOSS))
         if self.move_drive:
             env.append("T2_MOVE_DRIVE=\"%s\"" % ";".join("%d-%d" % w for w in sorted(self.move_drive)))
         if self.walk_plan:   # round 16 e3: aimdrive.py's waypoint walker (WalkDrive)
-            env.append("T2_WALK_PLAN=\"%s\"" % ";".join("%d-%d@%d:%.1f,%.1f,%.1f,%.4f" % w for w in self.walk_plan))
+            env.append("T2_WALK_PLAN=\"%s\"" % ";".join("%d-%d@%s:%.1f,%.1f,%.1f,%.4f" % w for w in self.walk_plan))
         if self.anchors:
             env.append("T2_ANCHOR=\"%s\"" % ";".join("%s@%d" % (l, f) for f, l in sorted(self.anchors, key=lambda a: a[0])))
         if self.saves:
@@ -385,7 +396,7 @@ def nav_frames(sub, frm, to, ry_end=None):
     import nav
     y0 = frm[3] if len(frm) > 3 else to[1]
     try:
-        res = nav.load(NAV_ROM, sub).path((frm[0], y0, frm[1]), tuple(to))
+        res = nav.load(NAV_ROM, sub, NAV_JUMPS).path((frm[0], y0, frm[1]), tuple(to))
     except Exception:
         res = None
     pts = res[0] if res else [(frm[0], frm[1]), (to[0], to[2])]
@@ -629,6 +640,11 @@ N64_L2_WEAPON = {9: ("9", -400)}   # 134: the shredder (21 damage instead of 118
 if os.environ.get("T2G1_L2W") is not None:
     N64_L2_WEAPON = {int(e.split(":")[0]): (e.split(":")[1], int(e.split(":")[2]))
                      for e in os.environ["T2G1_L2W"].split(",") if e}
+
+
+# Round 19 merge: the weapon for the City Totem (110) on the N64 stream: the shredder (9; 34 damage, lowest health 66,
+# instead of 97 and 3 with the plasma rifle after h1 zero-filled the actor blocks); T2C34_CW overrides ("": the plasma rifle)
+N64_CITY_WEAPON = os.environ.get("T2C34_CW", "9") or None
 
 
 def n64_full():
@@ -1083,6 +1099,7 @@ L2_133_REAL = [
     (6050, -847.0, -4761.6, 1574.0, 3.1416, 0, {"fire": 1900, "aim": "enemy:20"}),
     (8000, 827.5, -4761.6, -1627.5, -2.8692, 150, {}),    # warp 2615 -> 130
 ]
+L2_134_GATE = os.environ.get("T2H3_134") == "gate"   # round 19 h3: DEBUG-ONLY test hook (see main_all)
 L2_134_FIRE_R = 450     # round 17 f5: 134's fire range in a --real-weapons 2 run (T2_FIRE_GATE, T2_AIMD_FIRE_MAX)
 L2_STRETCH_REAL = [(6, 6, 3000), (9, 3, 2000), (12, 15, 2000)]
 
@@ -1177,6 +1194,15 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         l2segs[6] = (name, rel, L2_133_REAL)
         l2stretch = L2_STRETCH_REAL
         l2segs = with_taps(l2segs, L2_TAPS)
+        if L2_134_GATE:
+            # round 19 h3 (--l2-134 gate): only zombie 4 (it holds gate 8's key 7) is fought: from the segment's
+            # start at the gate spot, zombie 4 the assist's (and the stick's primary) target; zombies 2 and 3 are
+            # shot only when they come within the fire range. Then sister 2 and the exit as before.
+            name, rel, steps = l2segs[9]
+            gate = steps[2]
+            l2segs[9] = (name, rel, [st[:1] + tuple(gate[1:6]) + (dict(st[6], aim="enemy:4"),) for st in steps[:2]] +
+                         list(steps[2:]))   # the step count kept (L2_STRETCH_REAL, the retries index them)
+            STICK_PRIMARY[2] = tuple(STICK_PRIMARY.get(2, ())) + (134,)
         r.extra_env.append("T2_AIM_SKIP_TYPES=6")
         # round 17 f5: in 134 the zombies walk up from 1,700 units: no fire beyond 450 (the mag 60 emptied
         # on zombie 2 from afar); the stick driver's own fire likewise (T2_AIMD_FIRE_MAX)
@@ -1207,6 +1233,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     t_arr = pt.L2_TOTEM_ARRIVAL + shift + a2
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
     arms_switch(r, 2, t_arr, real)
+    if n64_full() and N64_CITY_WEAPON and 2 not in real:   # round 19 merge: the City Totem's weapon (N64 stream)
+        r.weapon.append((t_arr - 600, N64_CITY_WEAPON))   # taken when 110 loads (T2_GIVE_WEAPONS)
+        r.weapon.append((hubs[2] - 200, "10"))
     if real == {1, 2}:
         r.real_until = hubs[2]
     if 110 in r.cheats_on:
@@ -1493,7 +1522,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
     global LAIR_PUSH
-    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_SOUND, N64_FROM, LAIR_KEEP, L2_HEAL
+    global NAV, NAV_ONLY, NAV_JUMPS, NAV_PAD, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_SOUND, N64_FROM, LAIR_KEEP, L2_HEAL
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1513,6 +1542,9 @@ def cli(argv=None):
                     "walked by the closed-loop waypoint walker (run under tools/port/aimdrive.py; round 16 e3)")
     ap.add_argument("--nav-only", default=None, help="L:I.J,...: with --nav, only these walks (level, segment, "
                     "step), NAV_SKIP's included")
+    ap.add_argument("--nav-pad", type=int, default=0, help="with --nav: idle frames after each walk window (round 19 h5)")
+    ap.add_argument("--nav-jumps", action="store_true", help="with --nav: plan with nav.py's jump edges (ledges, "
+                    "gaps) and let the walker press R at them (round 19 h5)")
     ap.add_argument("--talismans", nargs="?", const="2,3", default="",
                     help="the talisman chambers of these levels (default 2,3; round 13 b3)")
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
@@ -1522,6 +1554,9 @@ def cli(argv=None):
                     "(his mode 20) by walking towards him and/or jumping (round 18 g5; needs the lair driver)")
     ap.add_argument("--stick-aim", default="", help="L1,L2,...: these levels aim with the stick only, closed-loop "
                     "(run under tools/port/aimdrive.py; round 15 d3)")
+    ap.add_argument("--stick-boss", default=None, help="L,...: with --stick-aim, the boss arenas of these levels (5: "
+                    "the Mantid Queen, 6: the Primagen's lair) aim only at the boss's node unless a candidate comes "
+                    "near (round 19 h3); default 5,6 on the N64 stream, none with --legacy; \"\" = none")
     ap.add_argument("--assist-keep", default="", help="with --stick-aim: these fights keep the aim assists "
                     "(1: the Blind One, 110: the City Totem; round 15 d3)")
     ap.add_argument("--hop", action="store_true", help="DEBUG-ONLY: round 13's warp 7602 after the slot (no cinema 43)")
@@ -1581,9 +1616,13 @@ def cli(argv=None):
     STICK_AIM = {int(x) for x in a.stick_aim.split(",") if x}
     LAIR_PUSH = a.lair_push
     NAV = {int(x) for x in a.nav.split(",") if x}
+    NAV_JUMPS = a.nav_jumps
+    NAV_PAD = a.nav_pad
     if a.nav_only is not None:
         NAV_ONLY = {tuple(int(v) for v in k.replace(":", ".").split(".")) for k in a.nav_only.split(",") if k}
     ASSIST_KEEP = [x for x in a.assist_keep.split(",") if x]
+    global STICK_BOSS_ON
+    STICK_BOSS_ON = None if a.stick_boss is None else {int(x) for x in a.stick_boss.split(",") if x}
     if a.late_keys:
         PRIMAGEN_LATE = (2, 3)
     main_all(a.out, a.upto, not a.no_extras, {int(h.split("=")[0]): int(h.split("=")[1]) for h in a.hub},

@@ -10,6 +10,10 @@
  * typing reaches these files (64BIT.md). */
 #include "common.h"
 #include "structs/libaudio.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+extern u32 gFrameCountGameplay;
 
 void alEvtqPostEvent(ALEventQueue *evtq, ALEvent *evt, ALMicroTime delta);
 
@@ -23,7 +27,22 @@ static ALSoundState *target_state(ALSndPlayer *sndp) {
  * array (0xFC: the number of sounds allocated so far, ~20,000 late in a game), and
  * alSndpDeallocate leaves the target at -1. The N64 then reads (and may post a stop to) a state
  * far outside sndState; on the host that read crashed (SIGSEGV in alSndpGetState, a whole-game run
- * at ~201,900). Here a target outside 0..maxSounds-1 reads as stopped and posts nothing. */
+ * at ~201,900). Here a target outside 0..maxSounds-1 reads as stopped and posts nothing.
+ *
+ * (round 19 h2, n64trace.py --sndp) What the N64 reads: sndState[target].state, the word at
+ * sndState + target * 0x30 + 0x28 (func_00293580; the target an s32 sign-extended from the s16
+ * handle). sndState is 0x807740D0 on the N64 (in the audio heap, a cache block allocated at boot).
+ * - target -1 (a voice of the stopped group whose handle was already freed; 140 calls in a
+ *   whole default run, at level loads through StopSoundsByFlags): the word 8 bytes before the
+ *   array, the end of the audio heap block allocated before it. It held 0 on every call traced
+ *   (emulator frames 600-1,500: a level, its sounds and a load): AL_STOPPED, no stop posted.
+ * - voice 16 (handles[16] = the u16 count of sounds allocated): a count of 11,942..32,767 puts
+ *   the address past the end of the 8 MB of RDRAM (0x80800000), where the read gives 0 (the
+ *   emulator; no memory there), so again stopped. The default run's four cases had counts
+ *   18,400-21,728. Only a count below 11,942 (early in a game) or above 32,767 (negative) would
+ *   read game memory on the N64 (and post a stop to it when that word is not 0); the host cannot
+ *   model that memory and reads it as stopped as well.
+ * So the guard gives the N64's result in every case a whole game reaches. */
 static int target_ok(ALSndPlayer *sndp) {
     return sndp->target >= 0 && sndp->target < sndp->maxSounds;
 }
@@ -69,6 +88,12 @@ void alSndpDeallocate(ALSndPlayer *sndp, ALSndId id) {
 
 /* func_00293580 */
 s32 alSndpGetState(ALSndPlayer *sndp) {
+    static int sLog = -1;
+    if (sLog < 0)
+        sLog = getenv("T2_SNDP_LOG") != NULL;
+    if (sLog && !target_ok(sndp))
+        fprintf(stderr, "sndp: gf %u target %d max %d (out of range: read as stopped)\n",
+                gFrameCountGameplay, (int)sndp->target, (int)sndp->maxSounds);
     return target_ok(sndp) ? target_state(sndp)->state : 0; /* AL_STOPPED */
 }
 

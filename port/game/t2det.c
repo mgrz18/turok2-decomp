@@ -10,6 +10,7 @@
 #include "structs/intelligence.h"
 #include "structs/particle.h"
 #include "structs/camera.h"
+#include "structs/cache.h"
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
@@ -77,6 +78,50 @@ static u64 T2Det_Actor(u64 h, CGameObjectInstance *o, const char *kind, int i, i
                d != NULL ? (long) ((d - (u8 *) mp->base) / 0x40) : -1L,
                l != NULL ? (long) ((l - (u8 *) mp->base) / 0x40) : -1L, bh[0], bh[1], bh[2], bh[3], bh[4], bh[5],
                bh[6], bh[7]);
+    }
+    if (verbose && getenv("T2_DET_POSE") != NULL) {
+        /* round 19 h1 (T2_DET_POSE=1, with T2_DET_ACTORS): what the bone matrices are built from
+         * besides the actor hash: the head turn/tilt, the blend, both animation channels (an FNV
+         * hash of the animation data), the sight target, the ground tilt and the orientation */
+        CAnimationState *c[2];
+        u32 dh[2];
+        int ci;
+        c[0] = &o->m_CurrentAnimation;
+        c[1] = &o->m_BlendAnimation;
+        for (ci = 0; ci < 2; ci++) {
+            CMemEntry *me = c[ci]->pmeAnimData;
+            u32 x = 0x811C9DC5u;
+            int b;
+            if (me != NULL && me->data != NULL) {
+                for (b = 0; b < me->size; b++) {
+                    x = (x ^ ((u8 *) me->data)[b]) * 0x01000193u;
+                }
+                x ^= (u32) me->size;
+            } else {
+                x = 0;
+            }
+            dh[ci] = x;
+        }
+        printf("det:  pose %s %d ht %08x %08x bl %08x %08x len %d st %d %d c %08x %d %d %d %d %d %x %08x b %08x %d %d %d %d %d %x %08x tgt %ld\n",
+               kind, i, T2Det_Bits(o->m_AI.m_HeadTurn), T2Det_Bits(o->m_AI.m_HeadTilt), T2Det_Bits(o->m_Blend),
+               T2Det_Bits(o->m_BlendPercent), o->m_BlendLength, o->m_BlendStart, o->m_BlendFinish,
+               T2Det_Bits(c[0]->m_AnimationFrame), c[0]->m_nAnimIndex, c[0]->m_nRequestedAnimIndex, c[0]->m_nFrames,
+               c[0]->m_bCycleCompleted, c[0]->m_bAnimActive, c[0]->m_nAnimStartFrame, dh[0],
+               T2Det_Bits(c[1]->m_AnimationFrame), c[1]->m_nAnimIndex, c[1]->m_nRequestedAnimIndex, c[1]->m_nFrames,
+               c[1]->m_bCycleCompleted, c[1]->m_bAnimActive, c[1]->m_nAnimStartFrame, dh[1],
+               o->m_AI.m_pSightTarget != NULL && gScene.m_pActors != NULL
+                   ? (long) (o->m_AI.m_pSightTarget - gScene.m_pActors) : -1L);
+        {
+            /* the ground tilt and the orientation matrix the bones are posed from (the round-19
+             * level-135 cause: m_qGround built from uninitialised heap bytes) */
+            u32 x = 0x811C9DC5u;
+            int b;
+            for (b = 0; b < (int) sizeof(o->m_mfOrient); b++) {
+                x = (x ^ ((u8 *) &o->m_mfOrient)[b]) * 0x01000193u;
+            }
+            printf("det:  pose2 %s %d qg %08x %08x %08x %08x om %08x\n", kind, i, T2Det_Bits(o->m_qGround.x),
+                   T2Det_Bits(o->m_qGround.y), T2Det_Bits(o->m_qGround.z), T2Det_Bits(o->m_qGround.w), x);
+        }
     }
     if (verbose) {
         printf("det:  %s %d pos %08x %08x %08x (%.3f %.3f %.3f) rot %08x hp %d mode %d act %d anim %d %08x fl %x\n", kind, i,

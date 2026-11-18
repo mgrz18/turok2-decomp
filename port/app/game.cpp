@@ -69,6 +69,7 @@ void T2Port_DebugSwitches(int skipPak, int startMode);
 #include "game.h"
 #include "offscreen_gl.h"
 #include "t2display.h"
+#include "t2audiodev.h"
 
 // the game's screen size (render.h; Video_SetMode writes it)
 extern "C" int32_t gScreenWidth, gScreenHeight;
@@ -495,6 +496,15 @@ void ContRead(void* pads) {
     T2Controls_PollHotplug();     // gamepads plugged in or out
     osContStartReadData(&sContQueue);
     osContGetReadData(lus);
+    // round 19 (h4): no input while the window does not have the focus (the pads stay connected)
+    const bool focus = T2Controls_InputFocus();
+    if (!focus) {
+        for (int i = 0; i < MAXCONTROLLERS; i++) {
+            lus[i].button = 0;
+            lus[i].stick_x = 0;
+            lus[i].stick_y = 0;
+        }
+    }
     auto* out = static_cast<uint8_t*>(pads);
     for (int i = 0; i < 4 && i < MAXCONTROLLERS; i++) {
         uint16_t b = (uint16_t)lus[i].button;
@@ -507,7 +517,9 @@ void ContRead(void* pads) {
         if (i == 0) {
             T2Controls_Hotkeys();                             // F1: the controls
             T2Controls_Look(&sy, T2Port_EngineMode() == 11); // gT2StickInvertY
-            T2Controls_Mouse(&b, &sx, &sy); // captured mouse: look, fire, jump
+            if (focus) {
+                T2Controls_Mouse(&b, &sx, &sy); // captured mouse: look, fire, jump
+            }
             memcpy(out, &b, 2);
             ScriptedStick(&sx, &sy);
             if (sAimStick.valid) { // T2_AIM_FIFO
@@ -942,6 +954,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             // the frames the audio manager produced this retrace (22050 Hz stereo s16) to LUS's
             // AudioPlayer (a no-op when it has no audio backend, e.g. headless)
             static int16_t pcm[4096 * 2];
+            if (args.audioDeviceChangeTest > 0 && f + 1 == args.audioDeviceChangeTest) {
+                T2AudioDev_SimulateChange(); // --audio-device-change-test (round 19 h4)
+            }
+            T2AudioDev_Poll(); // the default output device changed: a new player on it (macOS)
             size_t n = T2Audio_TakeSamples(pcm, 4096);
             if (n > 0) {
                 // T2_AUDIO_SILENT=1 (debug, round 14 c4): the device gets silence (tests of the

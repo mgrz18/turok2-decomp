@@ -75,6 +75,18 @@ uintptr_t T2Port_RdramTop(void) {
     return (uintptr_t)sArena + sArenaSize + 0x80000;
 }
 
+/* round 19 h1: the address an object in the heap would have on the console (the heap starts at
+ * the end of the image, D_8014A000), for game code that uses an object's address as a number
+ * (a phase, a seed): the host address changes with ASLR, this does not. Other pointers (static
+ * data) keep their low 32 bits. */
+uint32_t T2Port_N64Address(const void *p) {
+    uintptr_t a = (uintptr_t)p;
+    if (sArena != NULL && a >= (uintptr_t)sArena && a < (uintptr_t)sArena + sArenaSize) {
+        return 0x8014A000u + (uint32_t)(a - (uintptr_t)sArena);
+    }
+    return (uint32_t)a;
+}
+
 /* func_00275520: CAudioWorld__Initialize only with --audio (docs/port/AUDIO.md): the sound bank
  * comes converted from port/audio/t2audio_bank.c (T2Audio_LoadCtl), the sound data file is
  * swapped by VM_Alloc's hook, the audio manager is port/audio/t2audio_mgr.c. Without --audio

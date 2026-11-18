@@ -19,6 +19,20 @@ const char* kRenderScale = "gT2RenderScale";
 void T2Display_RegisterSettings(bool save) {
     CVarRegisterInteger(kRenderer, 0);
     CVarRegisterFloat(kRenderScale, 1.0f);
+    // Round 19 (h4): the game frame stays 4:3 in a window of any shape (pillarbox / letterbox,
+    // black bars). Without it LUS sizes the game frame to the whole window: the game clears and
+    // letterboxes only its own 4:3 part (the fill rectangles and the scissor are centred), so in a
+    // 16:9 or 16:10 window (a resized window, fullscreen on a MacBook) the bars at the sides showed
+    // stale frames and 3D drawn past the game's edges (seen headless with T2_OFFSCREEN_SIZE=1280x720,
+    // MACOS.md 21). LUS's "advanced resolution" with a 4:3 aspect keeps the frame's height at the
+    // window's pixels and centres it. A player who wants the old behaviour sets
+    // gAdvancedResolution.Enabled = 0 in turok2.cfg.json.
+    CVarRegisterInteger("gAdvancedResolution.Enabled", 1);
+    CVarRegisterFloat("gAdvancedResolution.AspectRatioX", 4.0f);
+    CVarRegisterFloat("gAdvancedResolution.AspectRatioY", 3.0f);
+    CVarRegisterInteger("gAdvancedResolution.VerticalResolutionToggle", 0);
+    CVarRegisterInteger("gAdvancedResolution.PixelPerfectMode", 0);
+    CVarRegisterInteger("gAdvancedResolution.IgnoreAspectCorrection", 0);
     if (save) {
         CVarSave();
     }
@@ -56,6 +70,9 @@ void T2Display_UpdateWindow(const std::shared_ptr<Fast::Fast3dWindow>& window, f
         SDL_Window** windows = SDL_GetWindows(&n);
         if (windows != nullptr && n > 0) {
             sdlWindow = windows[0];
+            // round 19 (h4): LUS sets no minimum size; a window dragged down to a few points made a
+            // game frame of a few pixels (ApplyResolutionChanges clamps to 320x240 anyway)
+            SDL_SetWindowMinimumSize(sdlWindow, 320, 240);
         }
         SDL_free(windows);
     }

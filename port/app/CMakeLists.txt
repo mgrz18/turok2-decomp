@@ -32,6 +32,8 @@ if(APPLE)
         target_include_directories(turok2 PRIVATE ${_t2_metalcpp_dir})
     endif()
     target_link_libraries(turok2 PRIVATE "-framework Metal" "-framework QuartzCore")
+    # t2audiodev.cpp (round 19 h4): the default output device listener
+    target_link_libraries(turok2 PRIVATE "-framework CoreAudio" "-framework CoreFoundation")
 endif()
 
 # The game linked into turok2 (docs/port/LINK.md): turok2_game (engine + module 1, minus the
@@ -87,7 +89,7 @@ if(T2_LINK_GAME AND TARGET turok2_game)
                         "every game data symbol falls to a zero placeholder")
     endif()
 
-    target_sources(turok2 PRIVATE game.cpp t2controls.cpp)
+    target_sources(turok2 PRIVATE game.cpp t2controls.cpp t2audiodev.cpp)
     target_compile_definitions(turok2 PRIVATE T2_HAVE_GAME=1)
     if(APPLE)
         # ld64 resolves archive members in any order

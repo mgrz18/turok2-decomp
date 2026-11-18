@@ -3621,3 +3621,298 @@ start that had passed (`2a3eeaae…` to 212,100), and `--legacy` `ecb9f9f2…` (
 - **ASLR** (STABILITY.md 12.3): 10 runs of the new default to 84,000 with ASLR on: 7 give the
   `setarch -R` lines, 3 diverge in 135 (from 75,665 twice, from 75,739 once; the particle hash
   first). Not chased.
+
+## 39. The Queen and the Primagen's lair by stick on the N64 stream, sister 2 on real weapons (Phase 7 round 19, part h3)
+
+The N64 stream (the default: no `T2_LEGACY_*`), Linux Release, PIE, under `aimdrive.py`, 300,000
+frames, each run in its own directory, the default command plus the options shown.
+
+### 39.1 What the stick did wrong in the two boss arenas
+
+Round 18's combo `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` (no `--assist-keep`),
+measured again (run A, `setarch -R`): END 2 at 269,088, **3 lives lost**: one to the Mantid Queen
+(108 damage, 36 hits, lowest 7), two in the Primagen's lair (239 damage, 39 hits).
+
+- **The Queen** (`lv 2`, actor 4): the picker aimed at her for 5,136 of 12,191 aim frames; the rest
+  went to her mantids (ids 10000+, 20,480 health, -1 bites), to sleeping actors at full health (6, 1,
+  19, 24, 7) and to the cocoon-like candidates around the arena. Her own volleys (4 x -3/-4 within
+  ~90 frames, from ~450 units) did the damage; the fight lasted 11,500 frames (the assisted default:
+  ~6,000, its state 4 1,164 frames).
+- **The lair** (`lv 4`): the picker aimed at his spawns for 11,676 of 18,613 aim frames, at him
+  (actor 2) for 5,760. The damage is his melee (10s within ~400 units), his own shots (object 330)
+  and, for the second life, a fall (81 at once).
+- The fire was the driver's tap rhythm (6 of every 15 frames) where the assisted fights hold Z.
+
+### 39.2 The fix: `T2_AIMD_BOSS` (aimdrive.py) and `--stick-boss` (fullrun.py)
+
+`T2_AIMD_BOSS=L[:R],...`: in sub-level L the stick aims only at the assist's point (the boss's
+damage node, `T2_AIM_NODE`), **led** by the point's own velocity over the shot's flight (PSPEED,
+`T2_AIMD_BOSS_LEAD`), unless a live candidate more than 300 units from the node comes within R of the
+player (default `T2_AIMD_BOSS_THREAT` 350, kind 0 `T2_AIMD_BOSS_THREAT0` 250): then the nearest such
+one, led, first. In those levels **Z is held while on target** (1.5 x the yaw tolerance, 2 x the pitch;
+`T2_AIMD_BOSS_HOLD=0`: the old taps). The exit line counts the frames given to a threat.
+
+`fullrun.py` writes `T2_AIMD_BOSS=2:150,4:350` (the Queen: only a mantid at 150 is shot first; the
+lair: a spawn within 350) for the `--stick-aim` levels 5 and 6 **on the N64 stream only**;
+`--legacy` writes nothing (every legacy combination's route files unchanged), `--stick-boss L,..`
+chooses the levels explicitly (`--stick-boss ""`: none). Test hooks `T2H3_QR`, `T2H3_LR` (the radii).
+
+| fight (run A -> A2) | aim frames on the boss | damage | lowest | lives |
+|---|---|---|---|---|
+| the Mantid Queen | 5,136 / 12,191 -> 9,943 / 11,864 (Z held 7,661) | 108 -> **43** | 7 -> 56 | 1 -> **0** |
+| the Primagen's lair | 5,760 / 18,613 -> 14,861 / 17,671 (spawns 11,676 -> 96) | 239 -> **120** | 1 -> 17 | 2 -> **0** |
+
+The Queen's fight is still long (10,700 frames): in her state 4 (4,180 frames, the assisted run
+1,164) she circles the player and the stick turns at its full rate with a 0.1-0.3 rad lag. A larger
+`T2_BOSS_FRONT` distance (a lower angular rate) is the next thing to try.
+
+### 39.3 Runs
+
+| run | options added | result |
+|---|---|---|
+| D0 | (none: the default), `setarch -R` | END 2 at 250,566, 5 totems, 0 lives (the `death` at 264,664 is the new game after the credits): this part's binary = the merge's |
+| A | `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` before the fix | END 2 at 269,088, 3 lives (Queen 1, lair 2) |
+| **A2** | **`--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0`** | **END 2 at 269,088, 5 totems, 4 bosses, 0 lives lost** (the `death` at 283,186 is the new game after the credits); no `--assist-keep`, no `--legacy` |
+| A3 | A2 + `--lair-push both` | identical to A2 (132 frames answered against the push) |
+| A2r | A2 with ASLR on | identical to A2: every `hurt`, `death` and `progress` line (md5s `715381a1…`, `49be70a0…`, `02f1beb4…`) |
+
+Per fight in A2 (damage / lowest): the Harbor Totem 82/118, sister 1 154/46, sister 2 20/180, 135
+155/61, the City Totem 70/30, the Marsh Totem 74/126, the Cave Totem 73/127, the Blind One 42/85, the
+Hive Totem 47/99, **the Queen 43/56**, the Mother 63/137, **the lair 120/17** (the thinnest spot of the
+run). Against the assisted default (section 38.2): the Queen 6 -> 43, the lair 68 -> 120.
+
+### 39.4 Sister 2 (and level 2) on real weapons: not yet
+
+`--real-weapons 1,2 --stick-aim 1,2,3,4,5,6 --hub-wait 0` (run B) on the N64 stream loses a life
+already in **133** (sister 1: 200 damage, 63 hits, the 10s from object 141 of owner type 102 while
+the player stands at the zombie spot, plus the 1s of object 265) and another in **134** (200 damage,
+128 hits: the 1s of object 265 from owner type 99 at up to ~1,000 units, at the start spot and at
+the gate). On the legacy stream e5 had 133 at 184 damage, no death (29.2); the N64 stream costs the
+last 16. **Only zombie 4, from the gate spot** (test hook `T2H3_134=gate`, `fullrun.py`: 134's two
+start steps moved to the gate, zombie 4 the assist's target and the stick's primary, `--upto 2`, run
+G1): worse. 200 damage by 56,563 (B: 63,683) and game over in 134: at the gate the zombie of type 102
+bites (35 melee hits, 10 of its 10s) while the type-99 shooters keep firing; zombies 2 and 3 come
+anyway. Not used by any route (the hook is off unless set).
+
+What is left for `--real-weapons 1,2` (all on the N64 stream): 133 needs ~20 more health or a
+shorter fight (N64_FULL_L2_PICKS are placed for the assisted route's steps, not `L2_133_REAL`'s);
+134 needs fewer frames in the open (the shooters of type 99) and ammo for zombie 4 (80 health); then
+135 and the City Totem on picked-up ammo (never tried on either stream).
+
+## 40. Jumps and doors for the walker, the walks on the N64 stream (Phase 7 round 19, part h5)
+
+Tools only (`tools/port/nav.py`, `aimdrive.py`'s `WalkDrive`, `fullrun.py`'s walk parts,
+`navcands.py`); no `src/`/`include/`/`port/` change. **The default command and `--legacy --nav
+1,2,3,4` write byte-identical `playthrough.txt`, `teleport.env` and `fullrun.txt`** to 65ec98ec's
+(every new behaviour is opt-in), and the default run on this part's Release binary gives det md5
+`6213496b…` (600,000 lines, `setarch -R`), END 2 with no life lost.
+
+**1. Jump edges** (`nav.load(rom, sub, jumps=True)`, `nav.py ROM SUB A B --jumps`). Without
+`jumps` the mesh and every path are those of round 16 (checked on the 43 `NAV_WALKS` pairs: the
+same waypoints and regions). With it, two more kinds of link:
+
+- **jump**: a steep face whose top, or a non-steep neighbour whose floor, is between `STEP_UP` (30)
+  and `JUMP_UP` (90) over the feet at the shared edge (`Sweep_CrossRegionEdge` closes both);
+- **gap**: from a walkable region's border edge (no neighbour) to another walkable region's border
+  edge on its outer side, at most `GAP_MAX` (150) away in XZ, its floor at most `GAP_UP` (40) higher
+  and `GAP_DROP` (300) lower (`_gap_links`, a 256-unit grid over the border edges).
+
+Each costs `JUMP_COST` (300) on top of its length, so a path jumps only where the floor is much
+longer. A jump portal is the middle third of its edge (he takes off square to it); `path()` now
+returns a fourth element, the jumps `[(x, z, kind, edge)]` where the waypoint line crosses them.
+
+**The jump, measured** (the 57 walk below, det lines): R held gives `vy` = 319.1 (389.12 x the
+jump scale 0.82) as long as it is held (`PlayerJump_Update`: until R is released or
+`m_ModeTime` reaches 3.0), then gravity; with the walker's 8-frame press the feet rose **71
+units** (-1,536.0 to -1,464.8) and came down 32 frames later, ~230 units on at walking speed. So
+`JUMP_UP` 90 is optimistic for an 8-frame press: ledges of 70-90 need a longer press or are
+missed (the walker then recovers as when stuck); measure the longest hold next.
+
+**2. The walker jumps** (`T2_WALK_PLAN` entry `F1-F2@SUBj:X,Y,Z,ROTY`: the `j` plans with jump
+edges; `fullrun.py --nav-jumps` writes it). `WalkDrive` presses R (`r1`, with C-up and the stick
+still steering) for `WALK_JUMP_HOLD` (8) frames when a planned jump point is within
+`WALK_JUMP_AT` (70) and ahead; a jump point he walked past is dropped. Stuck with jumps on, every
+other recovery is a jump forward instead of the back-off and sidestep (small static objects and
+kerbs the mesh does not have). The report line counts "jumps planned, pressed".
+
+**3. Doors as nav data** (`nav.doors(rom, sub)`, `nav.py ROM SUB --doors`, `navcands.py`). A door
+is a level actor of instance type 0x641 (intelligence type 6). Its openers are the links records
+whose actor is the door (`levels.py parse_links`): a first-table record fires when its owning
+actor fires its triggers (head mask 1 its death, 0x4000 a door opening, 0x80000 an action's
+"go"; section 7), a second-table record when the player enters a region of that info; the key
+byte is the link group counted down. A door with no record opens as he comes. Examples (they
+match the doors earlier rounds found by hand):
+
+| sub | door | opens on |
+|---|---|---|
+| 53 | 85 (z 7,168: "a closed door across the power cell's alcove", e3) | actor 43's go (an action, type 0x648) |
+| 133 | 27 (x -1,546: "between the zombies' rooms", e3) | the deaths of zombies 9, 16, 17 (link group 14) |
+| 135 | 75 / 76 (the crypts) | the deaths of zombies 45 / 44 |
+| 135 | 60 (before sister 3) | actor 1's trigger 0x10000 (the platform, type 0x642) |
+| 135 | 62 / 63 (the graveyard gates) | the crypt switches 53-55 / the actions 48-50, 56 |
+
+`nav.doors_on(rom, sub, pts, y)` lists the doors within 110 units of a path: **47 of the default
+run's 196 paths under 8,000 units pass a door, 44 of them a door with an opener**. `WalkDrive`,
+stuck within 160 units of a door, now waits 30 frames facing it and walks on, instead of backing
+off and planning round it (a door is not an obstacle to go round: it opens); the report line
+names the doors waited at.
+
+**4. Measured on the N64 stream** (the default; `navcands.py` over the default run's log, by game
+level; "path" = the mesh joins the two ends in under 8,000 units):
+
+| level | teleports | path (round 16 mesh) | path with jumps | no path, mesh | no path, with jumps |
+|---|---|---|---|---|---|
+| the hub and the rest | 86 | 69 | 69 | 2 | 0 |
+| 1 | 33 | 9 | 11 | 18 | 13 |
+| 2 | 75 | 46 | 48 | 20 | 16 |
+| 3 | 38 | 20 | 22 | 8 | 4 |
+| 4 | 24 | 17 | 17 | 2 | 2 |
+| 5 | 27 | 10 | 10 | 9 | 9 |
+| 6 and the lair | 31 | 17 | 19 | 8 | 7 |
+| all | **314** | 188 | **196** | 67 | **51** |
+
+(The default route has 314 teleports on the N64 stream; round 16's 289 were the legacy route's.)
+
+**The probe** (`--nav 1,2,3,4 --nav-only` all 42 walks of `NAV_WALKS` `--nav-jumps --walk-probe`,
+the default stream, to frame 126,000): **10 arrive** (57's walk on a 2,199-unit path with one
+jump instead of round 16's 5,816 units; 133 (6, 0); 134's two in-place steps and (9, 3); 135
+(12, 1) and one later crypt walk; 70 (6, 1) and (6, 2); 66 (9, 3)). The others stop where round 16
+found: the crypts' and graves' walls in 135 (static objects: the mesh has no walls there; jumps
+do not help), the cages and the alcove door in 53/54 (doors with openers that have not fired at
+that time), and level 3's walks that start while a warp or cinema moves him.
+
+**5. The walks in the full default run.** Every walk changes the state the next fights start
+from (positions, the footstep sounds' random draws), and the N64 route's thinnest spot is 135's
+crypt and sister 3 (lowest health 14):
+
+| walks (`--nav L --nav-only ... --nav-jumps`) | result |
+|---|---|
+| `2:12.1` (135, 719 units: round 16's one kept walk) | arrives (error 49); **a life lost in 135 at ~74,500** |
+| `2:12.1` with `--nav-pad` 15, 30, 45, 60, 90 (idle frames after the walk) | the same: a life lost in 135 (74,500-77,700) |
+| `1:7.1` (57, one jump) with `--nav-pad` 0, 50 | arrives (error 64); lives lost in 51/135 (79,500, 91,500; 84,000) |
+| `3:6.1,3:6.2` (70) | the walk starts elsewhere (level 3's warps: 4,779 units planned, not 834 as in the probe), does not arrive; a life lost in 70 at 103,500 |
+| `3:9.3` (66) | does not arrive (it waited 90 frames at door 50); a life lost in 61 at 123,000 |
+
+`--nav-pad F` (new) adds F idle frames after each walk window (the later steps move by them too):
+the knob `--hub-wait` is for level 2. Each try ran until its first life lost (a loop over the
+`state:` lines that SIGKILLs that game), so a failed try cost 2-3 minutes.
+
+**Teleports per level, before and after** (the default command): **314 before, 314 after**: no walk survives
+the fights that follow it on the N64 stream, so the default keeps every teleport (all the new
+behaviour is behind `--nav-jumps`, `--nav-pad` and the `j` plan suffix). `--nav 1,2,3,4` with
+`--legacy` keeps round 16's one walk (288 of 289), its route files unchanged.
+
+**Why the rest remain**: no path even with jumps (51: climbs, warps, water and region-flag splits);
+walls that are static objects (135's crypts and graves, the cages); doors whose opener fires later
+than the walk (the route teleports past them while the fight that opens them is still on); level
+3's anchors (a walk must start after the warp's cinema); and above all **the fights after each
+walk** (levels 1-4 without invincibility): a walk that arrives still has to be paid for by
+re-tuning every fight that follows it, and 135's crypt does not survive any change before it on
+the N64 stream.
+
+**Next**: the longest jump press and `JUMP_UP` from it; static-object walls in the mesh (the
+crypts) instead of `T2_NAV_BOXES`' broad-phase boxes; walks after 135 (hub legs, levels 4-6) with
+a fight re-tune per walk; the route waiting at a door until its opener has fired (the doors table
+gives the actor).
+
+## 41. The round-19 merge: the default on the new stream, the City Totem on the shredder (Phase 7 round 19, the merge C34)
+
+Round 19 merged h1 (the level-135 ASLR divergence fixed: the actor blocks start zeroed, the bone
+wobble's phase is an N64 address), h2 (IA16 palettes, the recolour mode), h4 (macOS), h3 (39) and
+h5 (40). h1's zero-fill changes what the original game's uninitialised reads see, so the default
+route plays a new stream: STABILITY.md 13 measured END 2 with no life lost but **the City Totem
+at 97 damage, lowest health 3**. h3, h4 and h5 change no route file of the default command (its
+`playthrough.txt` and `teleport.env` at the merge were byte-identical to 65ec98ec's); the level
+runs' route files (`--fight 10`, `--level 2..6`, both streams) too.
+
+### 41.1 The default on the merged tree (before the re-tune)
+
+Two runs of the default command (Release, `aimdrive.py`, **ASLR on**: `setarch -R` is no longer
+needed): det md5 **`a9f9584e…`** in both (600,000 lines), = h1's; END 2, all five totems, 0 lives
+lost, 422 hits; the City Totem 52 hits, 97 damage, lowest health 3 (it enters 110 with 100: 132's
+five health +10 lift the 71 that 135 leaves). The merge's `SndQueue_Update` fix (a host pointer
+truncated to 32 bits, STATUS.md 3) and h2's texture fixes change no det line.
+
+### 41.2 The City Totem on the shredder (`N64_CITY_WEAPON`)
+
+The fight is the plasma rifle's (weapon 10, the route's default) with `T2_FACE_NEAREST` aims from
+`CITY_TOTEM_SPOT`. No health is reachable above 100 before it (132's ultra health lies in a damage
+region; 135's only one is taken at its start), so the margin has to come from the fight. The
+weapon is requested through `T2_WEAPON` and taken when 110 loads (`T2_GIVE_WEAPONS` applies the
+request to a new player only), so the request goes in 600 schedule frames before the totem's
+arrival, after 132's last load. Runs to 92,000 on the new stream:
+
+| City Totem weapon | hits | damage | lowest health | the fight ends |
+|---|---|---|---|---|
+| 10, the plasma rifle (h1) | 52 | 97 | 3 | 89,260 |
+| **9, the shredder** | **11** | **34** | **66** | **88,038** |
+| 15, the grenade launcher | 16 | 34 | 66 | 88,710 |
+
+`fullrun.py` now requests **the shredder for the City Totem on the N64 stream** (`n64_full()`,
+not with `--real-weapons 2`) and the plasma rifle again 200 frames before the hub
+(`N64_CITY_WEAPON`; `T2C34_CW=W` tries another, `T2C34_CW=` the plasma rifle). `--legacy` and the
+level runs are unchanged.
+
+### 41.3 The new default
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6
+```
+
+300,000 frames, four runs with ASLR on (two after 41.6's fix): det md5 **`0959aac5…`** in all
+(600,000 lines). **END 2,
+all five totems, 0 lives lost, 367 hits.** Timeline: the Harbor Totem 23,190, the City Totem
+87,348, the Marsh Totem 107,627, the Cave Totem 128,150, the Blind One 137,555, the Hive Totem
+163,374, the Mantid Queen 179,073, the Mother 212,950, the Primagen (cinema 370) 252,088, level 10
+(END 2) 255,080, the credits back to the hub 272,978. The thin spots now: 135's crypts 199 damage
+/ lowest 14, 133 (sister 1) 182 / 18, the lair 81 / 18; **the City Totem 34 / 66** (was 97 / 3),
+the Queen 54 / 78. 314 teleports, as before.
+
+**10 runs of the default to frame 84,000 with ASLR on: all 10 give `2361fb91…`** (168,000 lines,
+= the first 168,000 of the full run). Round 18 had 3 of 10 diverging in 135.
+
+### 41.4 The combinations on the new stream
+
+| options | result |
+|---|---|
+| (none) | **END 2 (level 10 at 255,080), 5 totems, no life lost**; md5 `0959aac5…` four times, ASLR on |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` (h3) | **4 lives at the Mantid Queen, game over** (no END); md5 `97ba9a2c…`, the same with h3's own tools (the merge did not change it: the stream did). h3's run, before h1, won the Queen with 43 damage |
+| the same with `T2H3_QR=250` (the Queen's threat radius) | 2 lives at the Queen, 1 in the lair |
+| the same with `--stick-boss 6` (the Queen by g5's aim, the lair by h3's) | END 2 (level 10 at 254,008), 5 totems, 1 life lost (the lair at 250,326); the Queen 100 damage, lowest 24; md5 `9d30dfe9…` |
+| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0` | END 2 (level 10 at 258,960), 5 totems, 1 life lost (the Blind One at 137,281); md5 `156a1cfd…` |
+| `--lair-push both` | END 2 (level 10 at 255,078), 5 totems, **no life lost**; md5 `71f75b30…` |
+
+So h3's boss aiming no longer carries the Queen on the zero-filled stream (with any threat radius
+tried); g5's aim there (`--stick-boss 6`) does, and the lair then costs a life by h3's aim. A
+re-tune of the Queen by stick is left (STATUS.md 4).
+
+The default run drawn (`--draw`, shots every 250 frames in four windows) gives the undrawn det
+lines exactly (`ee5ecb1f…` over its 512,200 lines = the default's first 512,200).
+
+### 41.6 A fault found by the save/load check
+
+Loading the default run's save from the title crashed the merged Release build in
+`GameNoteMenu_SelectYes`: clang copies the level flags into `gLoadSavePersistentData` with
+`movaps`, trusting the x86-64 ABI's 16-byte alignment of a typed extern array of 16 bytes or more,
+and `gendata.py` defines it `T2_ALIGN(4)`; the merged data layout put it at 8 mod 16 (round 18's
+at 0 by chance). It joins `gendata.py`'s `ALIGN16` (round 14 c5's list: `gControllers`, the batch
+pools); the new `tools/port/aligncheck.py BIN` lists aligned SSE accesses to globals that are not
+16-aligned in a built binary (here 1 real site before, 0 after; 0 in round 18's binary). The
+default's det lines are unchanged by the fix (two more runs: `0959aac5…`).
+
+On the old stream (`--legacy`, 290,000):
+
+| options | result |
+|---|---|
+| `--legacy` | END 2 (cinema 370 at 245,402, level 10 248,394), 5 totems, 2 lives lost (the City Totem); md5 **`281904eb…`** (= h1's) |
+| `--legacy --real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` (round 17 f5) | END 2 (cinema 370 at 243,610, level 10 246,602), 5 totems, **no life lost**; md5 `1cb91f3a…` (was `15d3d74f…`) |
+| `--legacy --real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --l2-heal --hub-wait 0` (g5) | END 2 (cinema 370 at 241,708, level 10 244,700), 5 totems, **no life lost**; md5 `8f1d5839…` (was `47614863…`) |
+
+### 41.5 The level runs and the boss recipes
+
+The level runs (`--fight 10`, `--level 2..6`, Release, `--pak-blank`, both streams) give round
+18's det lines exactly in levels 1, 2, 3, 4 and 6; level 5 (both streams) differs from frame
+18,916 in 124's particle hash only and ends on the same state (113, the Queen's door, the same
+actor hash at 33,000). The four boss recipes (legacy switches) give round 18's det lines exactly
+(so round 18's kills: the Mother at 28,775, the Blind One 23,103, the Queen 28,143, the Primagen
+43,586).
