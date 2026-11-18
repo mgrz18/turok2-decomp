@@ -59,6 +59,25 @@ static u64 T2Det_Actor(u64 h, CGameObjectInstance *o, const char *kind, int i, i
     for (k = 0; k < 10; k++) {
         h = T2Det_Mix(h, v[k]);
     }
+    if (verbose && getenv("T2_DET_MTX") != NULL) {
+        /* round 18 g2: the draw matrices (m_pmtDrawMtxs, else the last frame's) as block indices in
+         * gScene.m_Heap and an FNV hash of the first 8 blocks */
+        MtxPool *mp = &gScene.m_Heap[0];
+        u8 *d = (u8 *) o->m_pmtDrawMtxs, *l = (u8 *) o->m_pmtLastFrameDrawMtxs, *m = d != NULL ? d : l;
+        u32 bh[8];
+        int b, k2;
+        for (k2 = 0; k2 < 8; k2++) {
+            u32 x = 0x811C9DC5u;
+            for (b = 0; m != NULL && b < 0x40; b++) {
+                x = (x ^ m[k2 * 0x40 + b]) * 0x01000193u;
+            }
+            bh[k2] = x;
+        }
+        printf("det:  mtx %s %d D %ld L %ld h %08x %08x %08x %08x %08x %08x %08x %08x\n", kind, i,
+               d != NULL ? (long) ((d - (u8 *) mp->base) / 0x40) : -1L,
+               l != NULL ? (long) ((l - (u8 *) mp->base) / 0x40) : -1L, bh[0], bh[1], bh[2], bh[3], bh[4], bh[5],
+               bh[6], bh[7]);
+    }
     if (verbose) {
         printf("det:  %s %d pos %08x %08x %08x (%.3f %.3f %.3f) rot %08x hp %d mode %d act %d anim %d %08x fl %x\n", kind, i,
                v[0], v[1], v[2], o->header.m_vPos.x, o->header.m_vPos.y, o->header.m_vPos.z, v[3], (int) v[4],
@@ -67,8 +86,35 @@ static u64 T2Det_Actor(u64 h, CGameObjectInstance *o, const char *kind, int i, i
     return h;
 }
 
+/* round 18 g2: T2_DET_WATCH=FRAME:ACTOR calls these two (never inlined) so that gdb can put a
+ * hardware watchpoint on a level actor's position from FRAME's det line to the next one:
+ * `break T2Det_WatchBegin` -> `watch -l *(float *) $rdi`, `break T2Det_WatchEnd` -> stop. */
+__attribute__((noinline)) void T2Det_WatchBegin(void *addr) {
+    __asm__ volatile("" : : "r"(addr) : "memory");
+}
+__attribute__((noinline)) void T2Det_WatchEnd(void *addr) {
+    __asm__ volatile("" : : "r"(addr) : "memory");
+}
+
 void T2Port_LogDet(int frame) {
-    static int sFrom = -1, sVerbose, sParticles, sGameFrames;
+    static int sFrom = -1, sVerbose, sParticles, sGameFrames, sWatchFrame = -1, sWatchActor;
+    if (sWatchFrame == -1) {
+        const char *w = getenv("T2_DET_WATCH");
+        sWatchFrame = -2;
+        if (w != NULL && sscanf(w, "%d:%d", &sWatchFrame, &sWatchActor) != 2) {
+            sWatchFrame = -2;
+        }
+    }
+    if (sWatchFrame >= 0 && (frame == sWatchFrame || frame == sWatchFrame + 1) && gScene.m_pActors != NULL) {
+        void *a = &gScene.m_pActors[sWatchActor].header.m_vPos.x;
+        printf("det: watch frame %d actor %d at %p\n", frame, sWatchActor, a);
+        fflush(stdout);
+        if (frame == sWatchFrame) {
+            T2Det_WatchBegin(a);
+        } else {
+            T2Det_WatchEnd(a);
+        }
+    }
     static u32 sLastGf = 0xFFFFFFFF;
     CPlayer *p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
     u64 h = 0xCBF29CE484222325ull;

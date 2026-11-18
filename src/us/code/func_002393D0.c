@@ -5,6 +5,14 @@
 #include "globals/path.h"
 
 extern u8 D_800C894C;                   /* bottom of the stack */
+#ifdef TARGET_PORT
+/* the N64 compares the stack pointer with its main stack's bottom; the host asks its own thread's
+ * stack (t2os_stack_low, port/runtime/t2os.c: the address comparison depended on the layout) */
+int t2os_stack_low(const void *local);
+#define T2_STACK_LOW(local, bottom) t2os_stack_low(local)
+#else
+#define T2_STACK_LOW(local, bottom) ((uptr) (local) < (uptr) (bottom))
+#endif
 
 f32 CGameRegion__GetCentreDistance(CGameRegion *from, CGameRegion *to);
 void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
@@ -21,7 +29,7 @@ void Path_ExpandNode(PathNode *parent, CGameRegion *region) {
     s8 next[3];
     PathNode *node;
 
-    if ((uptr) &parent < (uptr) &D_800C894C) {
+    if (T2_STACK_LOW(&parent, &D_800C894C)) {
         return;
     }
     if (sPathSearch->nodeCount >= 150) {

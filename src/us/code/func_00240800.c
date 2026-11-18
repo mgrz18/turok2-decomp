@@ -5,6 +5,14 @@
 #include "globals/collision.h"
 
 extern u8 D_800C894C;                   /* bottom of the stack */
+#ifdef TARGET_PORT
+/* the N64 compares the stack pointer with its main stack's bottom; the host asks its own thread's
+ * stack (t2os_stack_low, port/runtime/t2os.c: the address comparison depended on the layout) */
+int t2os_stack_low(const void *local);
+#define T2_STACK_LOW(local, bottom) t2os_stack_low(local)
+#else
+#define T2_STACK_LOW(local, bottom) ((uptr) (local) < (uptr) (bottom))
+#endif
 
 f32 func_00298470(f32 x);               /* sqrtf */
 s32 Sweep_HitPlane(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
@@ -18,7 +26,7 @@ void Collision_SweepRegionWalls(CGameRegion *region) {
     u8 cornerDone[3];
     s32 i;
 
-    if ((uptr) &region < (uptr) &D_800C894C) {
+    if (T2_STACK_LOW(&region, &D_800C894C)) {
         return;
     }
     i = 0;
