@@ -30,16 +30,21 @@ with macOS 27 or later and nothing else installed. It holds no game data.
    `turok2.o2r` is made once from your ROM with `tools/assets/mkarchive.py` (section 1, the
    archive line; it needs only Python). Finder: Go > Go to Folder... >
    `~/Library/Application Support`, make a folder `turok2`, drop the two files in. (They may
-   also go in the app's `Contents/Resources`, but a new copy of the app would lose them.)
+   also go in the app's `Contents/Resources`, but a new copy of the app would lose them. A
+   bundle that carries them uses its own first (round 20): `mkapp.sh` with `T2_APP_ARCHIVE` and
+   `T2_APP_ROM`, section 2.)
 3. **The first launch (Gatekeeper)**: the app is signed ad hoc, not notarized by Apple, so a
    double-click on a downloaded copy says it cannot be checked. Either **right-click (or
    Control-click) the app > Open > Open**, or try once, then **System Settings > Privacy &
    Security > "Turok2" was blocked... > Open Anyway**. In a terminal instead:
    `xattr -dr com.apple.quarantine /Applications/Turok2.app`. Only the first launch asks.
    A copy you built yourself is not quarantined and opens directly.
-4. **Play**: the logos, the intro and the title come up in a 640x480 window with sound (the
-   N64's own boot: about 70 s of logos and intro cinemas before the title). The controls are printed in `logs/turok2-stdout.log` and **F1** shows them
-   (section 4). If the ROM or the archive is missing the app says which file and where it looked.
+4. **Play**: the logos, the intro and the title come up with sound in a 4:3 window centred on
+   the display (round 20: the largest multiple of 320x240 points that fits, 960x720 on a 14"
+   MacBook; the N64's own boot: about 70 s of logos and intro cinemas before the title). At the
+   first launch a box shows the controls (section 4; **F1** shows it again, and they are in
+   `logs/turok2-stdout.log`). If the ROM or the archive is missing the app says which file and
+   where it looked.
 
 Where things go: the config `turok2.cfg.json`, the logs (`logs/`) and the saves
 (`turok2_pak1.mpk`) are all in `~/Library/Application Support/turok2`. To remove the game, drag
@@ -47,8 +52,9 @@ the app to the Bin and delete that folder.
 
 ## 1. Build once
 
-Checked from zero on a fresh clone of the GitHub repository in round 16 (MACOS.md 18): these
-commands, in this order, in the clone's directory, with only the ROM added. You need
+Checked from zero on a fresh clone of the GitHub repository in round 16 (MACOS.md 18), and again
+on a fresh clone of the round-19 tree in round 20 (MACOS.md 22): these commands, in this order, in
+the clone's directory, with only the ROM added. You need
 **Homebrew** (https://brew.sh; its installer also installs Apple's Command Line Tools: `clang`,
 `git`) and about 2 GB of disk. The N64 toolchain is **not** needed.
 
@@ -73,11 +79,14 @@ cmake OUT/rel && ninja -C OUT/rel turok2
 Times on an M5 (round 16): the clone 35 s; `brew install` depends on what is missing; the
 first `cmake` **7.5 min** (it downloads libultraship, ImGui and the other dependencies from
 GitHub: network time, only once per build directory); the game library 27 s; gendata 27 s;
-the last line (libultraship and the link) 65 s.
+the last line (libultraship and the link) 65 s. Round 20, the same M5 with everything from
+Homebrew already there: the archive 5 s, the first `cmake` 1 min 42 s, the rest 1.5 min:
+**3 min 20 s** from the clone to the executable.
 
 - `brew install` also **upgrades** any of these that is already installed and outdated
   (`HOMEBREW_NO_INSTALL_UPGRADE=1` in front keeps what you have; the versions used are in
-  MACOS.md 18).
+  MACOS.md 18 and 22). With it, brew prints `Error: <name> <version> is already installed` for
+  each outdated one and exits with 1: harmless, go on with the next line.
 - gendata reads the game's data layout from `versions/port_layout.us.json` (the matching N64
   build's symbol table, committed) and the bytes from your ROM; a ROM other than the US one
   stops it with a message. A developer with the N64 build (`build/turok2.us.elf`, BUILD.md)
@@ -103,9 +112,16 @@ Optional, a macOS app (Finder, Dock, Launchpad):
 
 ```sh
 tools/port/mkapp.sh OUT/rel                       # -> OUT/Turok2.app; move it to /Applications if you like
-T2_APP_ZIP=1 tools/port/mkapp.sh OUT/rel          # also OUT/Turok2-0.15-macos-arm64.zip, to give away
+T2_APP_ZIP=1 tools/port/mkapp.sh OUT/rel          # also OUT/Turok2-0.20-macos-arm64.zip, to give away
 tools/port/apptest.sh OUT/Turok2.app OUT/turok2.o2r baserom.us.z64 /tmp/apptest   # the check below
+# round 20: a ready-to-play app for YOUR Mac, the game files inside (never give this one away)
+T2_APP_ARCHIVE=OUT/turok2.o2r T2_APP_ROM=baserom.us.z64 tools/port/mkapp.sh OUT/rel OUT/play/Turok2.app
+tools/port/apptest.sh OUT/play/Turok2.app - - /tmp/apptest-play             # "-": the bundle's files
 ```
+
+With `T2_APP_ARCHIVE` / `T2_APP_ROM` the two files go into `Contents/Resources` before the
+signature (it stays valid) and play mode uses them before the Application Support folder's, so a
+double-click is all it takes (the config, logs and saves still go to Application Support).
 
 The bundle is self-contained (round 15): the executable, `t2port.o2r`, and Homebrew's dylibs
 copied into `Contents/Frameworks` and relinked to `@rpath`; the script stops if anything still
@@ -119,15 +135,16 @@ section 0 for the first launch. `apptest.sh` runs a copy under a path with space
 OUT/rel/app/turok2                               # or open OUT/Turok2.app
 ```
 
-With no arguments (or `--play`) the game opens a 640x480 window, plays the sound and runs in
-real time (the N64's 60 fields a second, 30 drawn frames) until you close the window.
+With no arguments (or `--play`) the game opens a window (the first launch: 4:3, sized to the
+display and centred; then the size and place you left), plays the sound and runs in real time (the N64's 60 fields a second, 30 drawn frames) until you close the window.
 `--play --no-audio` plays without sound.
 
 - **Saves**: Turok 2 saves to its Controller Pak, the file `turok2_pak1.mpk` in the folder of
   step 2. Save at a save portal in the game, quit, start again and load from the title menu.
   `--pak-dir DIR` keeps the pak elsewhere.
 - **Settings** go to `turok2.cfg.json` in the same folder: the window size (`Window.Width`,
-  `Window.Height`; default 640x480), fullscreen (`Window.Fullscreen.Enabled`, default off; **F11**
+  `Window.Height`; the first launch writes N x 320x240 points, the largest N that fits in 90% of
+  the display, centred: 960x720 on a 14" MacBook; headless runs 640x480), fullscreen (`Window.Fullscreen.Enabled`, default off; **F11**
   toggles it), vsync (`CVars.gVsyncEnabled`, default on), the sound backend
   (`Window.AudioBackend`: `coreaudio`, the macOS default, `sdl` or `null`), the mouse and the
   look (below) and the controller mappings (`CVars.gControllers`). The window's size, position
@@ -141,7 +158,7 @@ real time (the N64's 60 fields a second, 30 drawn frames) until you close the wi
   | `gT2MouseDeadZone` | 3 | added to any mouse motion: the game ignores the first 3 stick units, so a 1-pixel motion still turns |
   | `gT2MouseInvertY` | 0 | 1: mouse up looks down |
   | `gT2StickInvertY` | 0 | 1: the gamepad's right stick / the arrow keys look inverted (in a level; menus are not inverted) |
-  | `gT2ShowControlsAtStart` | 1 | 0: no controls table in the log at start |
+  | `gT2ShowControlsAtStart` | 1 | the controls table in the log at each start, and the controls box once at the first launch (round 20; then `gT2ControlsShown` 1); 0: neither |
   | `gT2Renderer` | 0 | 0: OpenGL (the renderer every check used); 1: Metal (macOS, opt-in). Sets `Window.Backend.Id` at each launch |
   | `gT2RenderScale` | 1.0 | the game frame's resolution as a multiple of the window's pixels (0.25-4): 1 = full pixel resolution on a retina display, 0.5 = half (faster), 2 = supersampled |
   | `gAdvancedResolution.Enabled` | 1 | (round 19) the game frame stays 4:3 with black bars in a window of any shape and in fullscreen; 0 fills the window (the sides then show stale pictures: not recommended) |
