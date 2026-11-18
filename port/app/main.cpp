@@ -66,6 +66,7 @@
 #include "ship/audio/Audio.h"
 #include "offscreen_gl.h"
 #include "t2display.h"
+#include "t2audiodev.h"
 #endif
 extern "C" {
 #include "t2asset.h"
@@ -153,6 +154,7 @@ struct Args {
     float renderScale = 0.0f;  // --render-scale S (0: the gT2RenderScale setting; t2display.cpp)
     int benchFrom = -1;        // --bench [FROM] (debug, PERF.md)
     bool pace = false;         // --pace (debug, PERF.md)
+    int audioDeviceChangeTest = 0; // --audio-device-change-test VI (round 19 h4: t2audiodev.cpp)
     // Round 9 (x5, STABILITY.md): the game memory above 4 GB is the default everywhere; the
     // soak runs (tools/port/soak.py) pass with it. --low-memory (Linux, debug) brings back the
     // bring-up aid: the arena and the game thread stacks below 2 GB (MAP_32BIT), which hides
@@ -209,6 +211,8 @@ Args ParseArgs(int argc, char** argv) {
             a.draw = true;
         } else if (s == "--audio") {
             a.audio = true;
+        } else if (s == "--audio-device-change-test" && i + 1 < argc) {
+            a.audioDeviceChangeTest = atoi(argv[++i]); // at VI N: as if the default output changed
         } else if (s == "--wav" && i + 1 < argc) {
             a.wav = argv[++i];
             a.audio = true;
@@ -258,6 +262,7 @@ Args ParseArgs(int argc, char** argv) {
                             "          [--offscreen-gl | --offscreen-metal]   (macOS: Fast3D on a CGL context / a CAMetalLayer with no window; T2_SHOT works)\n"
                             "          [--render-scale S]   (the game frame at S x the window's pixels, offscreen S x 640x480; default the gT2RenderScale setting, 1)\n"
                             "          [--bench [FROM]] [--pace]   (debug: frame times from VI FROM; real-time 60 Hz VI pacing)\n"
+                            "          [--audio-device-change-test VI]   (test: at VI, what a change of the default output device does)\n"
                             "       %s [--play [--archive F] [--rom F] [--pak-dir D] [--no-audio] [--no-pace]]\n"
                             "          (no arguments = --play: the game in a window with sound, files from the user data dir)\n"
                             "          [--pad-test FILE]   (debug, headless --game: scripted virtual gamepad/keyboard/mouse)\n",
@@ -520,6 +525,9 @@ int main(int argc, char** argv) {
             config->Save();
         }
         AudioSetAudioComponent(audio);
+        if (audioDevice) {
+            T2AudioDev_Install(audio, config); // the player follows the default output device (macOS)
+        }
         static const char* kNames[] = { "wasapi", "sdl", "coreaudio", "null" }; // AudioBackend order
         const int be = (int)audio->GetCurrentAudioBackend();
         printf("audio: %s device, %s\n", be >= 0 && be < 4 ? kNames[be] : "?",
@@ -730,6 +738,7 @@ int main(int argc, char** argv) {
         g.pace = args.pace;
         g.audioDevice = audioDevice;
         g.renderScale = args.renderScale;
+        g.audioDeviceChangeTest = args.audioDeviceChangeTest;
         CHECK(T2Game_Run(window, g) == 0, "game run");
         CHECK(T2Swoosh_SelfTest() == 0, "swoosh system self test");   // port/game/t2swoosh.c
     }
@@ -806,6 +815,7 @@ int main(int argc, char** argv) {
     EventSystemSetEvents(nullptr);
     CrashHandlerSetComponent(nullptr);
 #ifdef T2_HAVE_GAME
+    T2AudioDev_Uninstall();
     AudioSetAudioComponent(nullptr);
     T2Controls_SetWindow(nullptr);
 #endif

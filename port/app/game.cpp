@@ -69,6 +69,7 @@ void T2Port_DebugSwitches(int skipPak, int startMode);
 #include "game.h"
 #include "offscreen_gl.h"
 #include "t2display.h"
+#include "t2audiodev.h"
 
 // the game's screen size (render.h; Video_SetMode writes it)
 extern "C" int32_t gScreenWidth, gScreenHeight;
@@ -942,6 +943,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             // the frames the audio manager produced this retrace (22050 Hz stereo s16) to LUS's
             // AudioPlayer (a no-op when it has no audio backend, e.g. headless)
             static int16_t pcm[4096 * 2];
+            if (args.audioDeviceChangeTest > 0 && f + 1 == args.audioDeviceChangeTest) {
+                T2AudioDev_SimulateChange(); // --audio-device-change-test (round 19 h4)
+            }
+            T2AudioDev_Poll(); // the default output device changed: a new player on it (macOS)
             size_t n = T2Audio_TakeSamples(pcm, 4096);
             if (n > 0) {
                 // T2_AUDIO_SILENT=1 (debug, round 14 c4): the device gets silence (tests of the
