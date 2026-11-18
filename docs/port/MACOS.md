@@ -1483,3 +1483,35 @@ No change to `src/` or `include/`. Release build in `OUT/build_r18`.
   was never run on Metal): CVar **`gT2Renderer`** (0 OpenGL, 1 Metal) is written into
   `Window.Backend.Id` before `Fast3dWindow::Init` at each launch (t2display.cpp), so a config
   saved with Metal (3) by an earlier launch goes back to OpenGL (2). Metal is opt-in.
+
+### 20.2 Retina: the game frame at pixel resolution, a render-scale setting
+
+- LUS sizes the game framebuffer from the ImGui content region, which is in **points** on macOS,
+  times the interpreter's `internal_mul` (1): a 2x display drew at half its pixel resolution.
+- `T2Display_UpdateWindow` (t2display.cpp, before each drawn frame with a window): `internal_mul` =
+  `SDL_GetWindowPixelDensity` (2 on retina, 1 elsewhere; re-read every frame, so a move to another
+  display follows) x **`gT2RenderScale`** (default 1, clamped 0.25..4); `--render-scale S`
+  overrides it for a run. The window already has `SDL_WINDOW_HIGH_PIXEL_DENSITY` (LUS's gfx_sdl.cpp).
+- Headless check: `--offscreen-gl --render-scale 2` draws 1280x960 (the frame a 640x480-point
+  window on a 2x display now draws). Against 1x (boot, 3 shots, 2x fitted down): the same
+  layout and HUD/text position and size; the differences are glyph and polygon edges only (PSNR
+  22-40 dB: the 2x frame is sharper). At 2x the game's 480x360 scissor scales by exactly 8/3 to
+  960 rows (no half-row rounding, unlike 1x's row 478, 19.2).
+- Not checked: a real window (the ImGui viewport, a non-4:3 window's aspect, fullscreen).
+
+### 20.3 Sound on the Mac (LUS's CoreAudio player, read and run headless)
+
+- `T2_AUDIO_DEVICE=1 --audio --pace --no-window`: CoreAudio opens (22,050 Hz stereo), 600 VIs, exit 0.
+- LUS's player: an AUHAL (`kAudioUnitSubType_HALOutput`) unit, a 6,000-frame ring buffer (272 ms),
+  the port asks for 2,205 frames buffered (100 ms latency, main.cpp). It sets no device and
+  registers **no listener for the default output**: the unit stays on the device that was the
+  default at launch. Switching the output (headphones, AirPods) while playing leaves the sound on
+  the old device; if it disappears, sound stops until the next launch. Fix (not done: needs a
+  window to check, or a LUS change): `kAudioUnitSubType_DefaultOutput`, or a
+  `kAudioHardwarePropertyDefaultOutputDevice` listener that re-creates the player.
+
+### 20.4 The whole game on the Mac Release (aimdrive.py, `OUT/r18/det.sh`, `T2_DET_LOG=1`)
+
+| command | det lines | md5 | result |
+|---|---|---|---|
+| default `--all --talismans 2 --cheats-off 1,2,3,4,5,6` | 580,000 | `ecb9f9f2…` (= Linux, STATUS) | exit 0, END 2 |
