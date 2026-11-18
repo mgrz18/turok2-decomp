@@ -31,7 +31,7 @@ frame: "cH" the C buttons (hex U 8, D 4, L 2, R 1), "z0"/"z1" fire, "r0"/"r1" ju
 --simple: the first controller (the observed error only, no prediction; round 15 d3's s1 run).
 --probe SX,SY: answer a constant stick instead (calibration: the pitch/yaw change per frame).
 """
-import math, os, subprocess, sys, tempfile
+import math, os, shutil, subprocess, sys, tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from playthrough import TURN_FULL, STICK_DEAD, wrap, face_yaw  # noqa: E402
@@ -648,6 +648,17 @@ def main():
     os.mkfifo(os.path.join(d, "out"))
     os.mkfifo(os.path.join(d, "in"))
     env = dict(os.environ, T2_AIM_FIFO=d)
+    if "SHIP_HOME" not in env:
+        # round 17 merge: each game process its own settings folder (LUS writes turok2.cfg.json,
+        # imgui.ini and logs/ into SHIP_HOME, else the current directory: two runs from one OUT/
+        # raced on turok2.cfg.json, round 17 f5). The current directory's turok2.cfg.json is copied
+        # in, so the run sees the same settings; T2_KEEP_CWD_CFG=1 keeps the old behaviour.
+        if os.environ.get("T2_KEEP_CWD_CFG") != "1":
+            home = os.path.join(d, "home")
+            os.mkdir(home)
+            if os.path.exists("turok2.cfg.json"):
+                shutil.copy("turok2.cfg.json", home)
+            env["SHIP_HOME"] = home
     proc = subprocess.Popen(cmd, env=env)
     n = 0
     aim = SimpleAim() if simple else Aim()
@@ -709,9 +720,7 @@ def main():
         if walk.plan:
             print("aimdrive: %d walks, %d arrived" % (len(walk.report), sum("arrived at" in r for r in walk.report)),
                   file=sys.stderr)
-        for name in ("out", "in"):
-            os.unlink(os.path.join(d, name))
-        os.rmdir(d)
+        shutil.rmtree(d, ignore_errors=True)
         if picker or trig:
             print("aimdrive: %d target switches, %d left as not hurt, %d shots" % (
                 picker.switches if picker else 0, picker.immunes if picker else 0, trig.shots if trig else 0),
