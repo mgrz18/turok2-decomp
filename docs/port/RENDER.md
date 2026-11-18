@@ -316,6 +316,14 @@ first game frames of a level (the particle spawn frame, FIDELITY.md 11.1).
 
 The port reads 1-2 % darker than Rice on every non-fogged scene (the round-17 rounding, 7.1).
 
+The two arenas after their intros (N64 `--shots 1200:2600:100`, gf 575-1675; the port to frame
+9,500; the player stands still and takes hits):
+
+| warp (level) | result |
+|---|---|
+| -3 (2), the Mantid Queen | **match**: the arena, her legs, the boss bar, the red damage flash (at other gfs: the hits follow the random stream), the HUD |
+| -4 (3), the Mother | the Mother herself, her pose aside (the random stream), matches; **the whole arena is yellow-olive on the port** (floor cream on the N64, yellow on the port; mean RGB at gf 575 N64 (66.9, 58.7, 48.9), port (61.8, 54.5, 30.2): blue 40 % low). i1's lead (the walls): sent to i1 with the shots |
+
 ### 8-i3.2 The trails (swooshes) were never drawn: three host bugs
 
 The hive's light shafts are the trails of its drip particles (types 226/227, falling at up to 1,024
