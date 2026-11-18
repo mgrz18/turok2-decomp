@@ -631,3 +631,19 @@ from 72,000 are the same, which they would not be after an earlier divergence.
 **Compare det md5s with ASLR on again** (the `setarch -R` advice of 12.3 is no longer needed for
 this route); a new divergence between ASLR runs is a bug of this class: look for reads of heap or
 stack bytes not written first (`T2_DET_POSE`), and for host addresses used as numbers.
+
+### 13.4 The round-19 merge: ASLR on, and a data-alignment fault
+
+On the merged tree (h1-h5, the `SndQueue_Update` pointer fix, the City Totem on the shredder:
+PLAYTHROUGH.md 41) the default command gives det md5 `0959aac5…` in four whole-game runs with
+ASLR on, and **10 of 10 runs to frame 84,000 with ASLR on give the same 168,000 lines**
+(`2361fb91…`; round 18: 7 of 10). `setarch -R` is no longer needed to compare det md5s.
+
+The save/load check found a layout-dependent fault of another kind: the Release build crashed
+loading a save (`GameNoteMenu_SelectYes`: a `movaps` into `gLoadSavePersistentData`, defined
+`T2_ALIGN(4)` by `gendata.py` and placed at 8 mod 16 once the data layout shifted; clang assumes
+the ABI's 16-byte alignment for a typed extern array of 16 bytes or more). The symbol joined
+`gendata.py`'s `ALIGN16` (round 14 c5's list); `tools/port/aligncheck.py BIN` lists aligned SSE
+accesses to globals that are not 16-aligned in a built binary (0 on the fixed build). Run it
+after a merge that adds or moves data symbols.
+

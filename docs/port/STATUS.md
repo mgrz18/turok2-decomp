@@ -1,61 +1,57 @@
-# Port status after Phase 7 round 18 (merged state)
+# Port status after Phase 7 round 19 (merged state)
 
-Round 18 merged five branches, in this order: g2 (address-layout determinism: **the three
-stack-depth guards ask the host thread's own stack**, the OnScreen VM twin, `n64viewcheck.py` kind
-`gptr` and two base-pointer reads fixed by name, `aimdrive.py`'s fifo watchdog, `gdbwatch.py`,
-`T2_DET_MTX` / `T2_DET_WATCH`), g4 (macOS: **the Mac app's Metal window no longer aborts at its
-first frame**, OpenGL the default renderer, retina at pixel resolution, `--render-scale`,
-`--offscreen-metal`), g3 (the round-17 n64cmp leads: the lights double buffer is not a bug, actor
-51's tilt is an uninitialised read of the original game), g1 (**the whole game with no legacy
-switch: the good ending with no life lost**, `--n64`) and g5 (levels 5-6 by stick, the Primagen's
-push and `--lair-push`; the stick in all six levels to the good ending with no life lost). **The
-merge made g1's route the default**: the plain `playthrough.py RUN --all --talismans 2 --cheats-off
-1,2,3,4,5,6` now writes no `T2_LEGACY_*` line (the random stream a human player gets) and plays the
-whole game to the GOOD ending **without losing a life** (600,000 det lines, md5 `6213496b…`, the
-same as g1's five runs); `--legacy` restores the old stream for the combinations tuned on it, each
-of which still gives its round-17 route files and det md5. Detail pages:
-[PLAYTHROUGH.md](PLAYTHROUGH.md) 36 (g1), 37 (g5) and 38 (this merge), [FIDELITY.md](FIDELITY.md)
-9 (g3) and 10 (this merge), [STABILITY.md](STABILITY.md) 12 and [64BIT.md](64BIT.md) part 8 (g2),
-[MACOS.md](MACOS.md) 20 (g4). The branch sections follow section 4; round 17's merged state and
-earlier rounds follow as history.
+Round 19 merged five branches, in this order: h1 (**the level-135 ASLR divergence found and
+fixed**: `CGameObjectInstance__Construct` tested uninitialised AI flags in a cache block that held
+host pointers, so the host `CCache__AllocDecompressFlags` zero-fills its blocks; the bone wobble's
+phase is the object's N64-heap address, `T2Port_N64Address`; `T2_DET_POSE`), h2 (render: **texture
+kind 3 is CI4 with an IA16 palette**, which libultraship decoded as RGBA5551, now expanded to IA16
+in `port/game/t2tex.c`; **`Texture_DecompressCallback` read the recolour mode at an N64 offset**, so
+no texture was ever recoloured; the n64cmp sweep; `n64trace.py --sndp/--peek`), h4 (macOS: **the
+sound follows the default output device**, focus loss frees the mouse and stops input, **a non-4:3
+window is pillarboxed** (the side bars showed stale frames), `FIRSTRUN.md`), h3 (the Mantid Queen
+and the lair by stick on the N64 stream: `T2_AIMD_BOSS`, `--stick-boss`) and h5 (jumps and doors
+for the waypoint walker: `--nav-jumps`, `--doors`, `--nav-pad`). The merge fixed a host pointer
+truncation in `SndQueue_Update` and **re-tuned the City Totem on the new stream** (h1's zero-fill
+changes what the original game's uninitialised reads see: the default kept 0 lives but the City
+Totem left 3 health; with the shredder there it leaves 66). **The default command plays the whole
+game to the good ending without losing a life, and now gives the same det lines with ASLR on**
+(`setarch -R` no longer needed). Detail pages: [PLAYTHROUGH.md](PLAYTHROUGH.md) 39 (h3), 40 (h5)
+and 41 (this merge), [FIDELITY.md](FIDELITY.md) 11 (h2) and 12 (this merge),
+[STABILITY.md](STABILITY.md) 13 (h1), [MACOS.md](MACOS.md) 21 and [FIRSTRUN.md](FIRSTRUN.md) (h4).
+The branch sections follow section 4; round 18's merged state and earlier rounds follow as history.
 
-The matching build is unchanged: `tools/asm_diff.py --base ab0bc24c -j 8` reports 0 differences
+The matching build is unchanged: `tools/asm_diff.py --base 65ec98ec -j 8` reports 0 differences
 over all 3,938 files after every merge and at the end, and a clean `make clean && make setup &&
 make -j8 build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
 ## 1. Build and run
 
 **To play** (Mac or Linux, a Release build, a window, a gamepad or the keyboard and mouse):
-[QUICKSTART.md](QUICKSTART.md). A fresh clone needs only the ROM (`gendata.py` reads
-`versions/port_layout.us.json` plus the ROM when `build/turok2.us.elf` is absent). **After a
-merge that adds, renames or moves a data symbol, run `python3 tools/port/mklayout.py` on the box
-(ELF + ROM) and commit the json** (`--check` exits 1 when stale; up to date at the end of this
-round).
+[QUICKSTART.md](QUICKSTART.md); **the first windowed session on the Mac: [FIRSTRUN.md](FIRSTRUN.md)**
+(the ordered checklist: logos, menus, a new game, focus, resize, fullscreen, pacing, sound, a change
+of the output device, save and quit, where the logs are). A fresh clone needs only the ROM
+(`gendata.py` reads `versions/port_layout.us.json` plus the ROM when `build/turok2.us.elf` is
+absent; `mklayout.py --check`: up to date at the end of this round).
 
-- **The Mac app** (MACOS.md 17-20): `tools/port/mkapp.sh BUILD [APP]` makes the self-contained
+- **The Mac app** (MACOS.md 17-21): `tools/port/mkapp.sh BUILD [APP]` makes the self-contained
   ad-hoc signed `Turok2.app` (`T2_APP_ZIP=1` zips it); not yet Developer ID signed or notarised.
-  **Round 18 (g4)**: LUS's Metal shader no longer compiled with the current Metal compiler
-  (`thread const texture2d<float>` parameters), so the app's default window aborted at its first
-  draw; `port/cmake/t2_shaders.cmake` drops the qualifier when it packs `t2port.o2r` (the OpenGL
-  shader byte-identical; `t2port.o2r` sha1 `638a7a5e…` on Linux). The player settings (QUICKSTART
-  3): **`gT2Renderer`** 0 = OpenGL (the default, written to `Window.Backend.Id` at each launch), 1 =
-  Metal (macOS, opt-in; headless `--offscreen-metal` draws the same frames as OpenGL); **HiDPI**:
-  LUS's resolution multiplier = the window's pixel density x **`gT2RenderScale`** (1; 0.25-4;
-  `--render-scale S` for one run), so a retina window draws at pixel resolution. CoreAudio opens
-  (100 ms latency) but does not follow a change of the output device (MACOS.md 20.3).
-  `-DT2_LTO=ON` stays off by default.
+  OpenGL is the default renderer (`gT2Renderer` 0; Metal 1, opt-in), a retina window draws at
+  pixel resolution (`gT2RenderScale`, `--render-scale`). **Round 19 (h4)**: the sound **follows a
+  change of the default output device** (`port/app/t2audiodev.cpp`: a CoreAudio listener, the LUS
+  player re-created on the game thread; headless `--audio-device-change-test VI`); **focus loss**
+  (Cmd-Tab) releases the mouse and gives the game no input until the focus is back (a click
+  captures the mouse again); **a window that is not 4:3 keeps the game frame 4:3** with black bars
+  (`gAdvancedResolution.Enabled` 1 by default: before, the side bars showed stale frames and 3D
+  past the game's edges; `T2_OFFSCREEN_SIZE=WxH` is the headless test), minimum window 320x240.
+  The CoreAudio and CoreFoundation frameworks are linked on Apple only (the merged tree builds on
+  Linux). Not yet seen in a real window: FIRSTRUN.md.
 - The development build (Linux box, headless) is round 13's recipe ("Round 13: build and run"
   below). **Use a Release (`-O2`) build for long runs**; Linux screenshots:
-  `SDL_VIDEODRIVER=offscreen` without `--no-window` (`--offscreen-gl` / `--offscreen-metal` are
-  macOS only). The merge fixed one Linux build break of g4's (ninja does not create a custom
-  command's working directory: `t2port_shaders/` is now made at configure time). **`port/gen/` is shared by every build directory and
-  `gendata.py` writes it for the one it is given**: after building OUT/rel, a fresh OUT/pie failed
-  to link (`sRegionNormal_y`, `sRegionNormal_z`, `gEngineApp_m_Settings_unk180` missing: the
-  Release objects do not reference them); rerun `gendata.py --build DIR` and `cmake DIR` before
-  `ninja -C DIR` when switching build directories.
+  `SDL_VIDEODRIVER=offscreen` without `--no-window`. **`port/gen/` is shared by every build
+  directory**: rerun `gendata.py --build DIR` and `cmake DIR` before `ninja -C DIR` when switching.
 
-**The whole game to the good ending, no invincibility, no life lost** (the new default;
-PLAYTHROUGH.md 36 and 38):
+**The whole game to the good ending, no invincibility, no life lost** (the default; PLAYTHROUGH.md
+41):
 
 ```sh
 python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6
@@ -67,26 +63,28 @@ mkdir -p RUN/pak && cd RUN && ln -s ../OUT/turok2.o2r . && cp ../OUT/turok2.cfg.
 python3 ../tools/port/mpk_saves.py pak/turok2_pak1.mpk      # the saves after levels 1-5
 ```
 
-**300,000 frames** (the last input is at 288,480). The timeline: the Harbor Totem 23,190, the City
-Totem 88,394, the Marsh Totem 109,547, the Cave Totem 128,792, the Blind One 138,455, the Hive
-Totem 164,758, the Mantid Queen 172,831, the Mother 205,182, the Primagen 243,774, **END 2 at
-250,566**, the credits back to the hub 264,664; 399 hits taken, **0 lives lost** (the thinnest
-spots: 135's crypt, lowest health 14; the City Totem 17; sister 1 in 133, 18). det md5 `6213496b…`
-(600,000 lines) in both merged-tree runs under `setarch -R`, as in g1's five.
+**300,000 frames** (the last input is at 287,880). The timeline: the Harbor Totem 23,190, the City
+Totem 87,348, the Marsh Totem 107,627, the Cave Totem 128,150, the Blind One 137,555, the Hive
+Totem 163,374, the Mantid Queen 179,073, the Mother 212,950, the Primagen (cinema 370) 252,088,
+**level 10 (END 2) at 255,080**, the credits back to the hub 272,978; 367 hits taken, **0 lives
+lost**. The thinnest spots: 135's crypts (199 damage, lowest health 14), sister 1 in 133 (182,
+18), the lair (81, 18); **the City Totem 34 damage, lowest 66** (97 and 3 before the shredder).
+det md5 **`0959aac5…`** (600,000 lines) in four runs **with ASLR on**; 10 runs to frame 84,000 with
+ASLR on all give `2361fb91…` (the full run's first 168,000 lines).
 
 **Run each game in its own directory** (`turok2.cfg.json` is read at start and written at exit).
-`aimdrive.py` gives each game it starts its own `SHIP_HOME` (`T2_KEEP_CWD_CFG=1`: the old
-behaviour). Use an EMPTY `--pak-dir`; **kill a stuck run with SIGKILL** (the game ignores
-SIGTERM). A game that exits before it opens the driver's fifos no longer leaves `aimdrive.py`
-waiting (g2's watchdog; `T2_AIM_OPEN_TIMEOUT=SECONDS` also kills a game that never opens them).
-**Compare det md5s under `setarch -R`** (section 4, the level-135 ASLR divergence).
+`aimdrive.py` gives each game it starts its own `SHIP_HOME`. Use an EMPTY `--pak-dir`; **kill a
+stuck run with SIGKILL** (the game ignores SIGTERM). A game that exits before it opens the
+driver's fifos does not leave `aimdrive.py` waiting (`T2_AIM_OPEN_TIMEOUT=SECONDS` also kills a
+game that never opens them). **ASLR no longer changes the det lines** (h1, STABILITY.md 13): det
+md5s compare with or without `setarch -R`.
 
-**The N64 stream and the legacy switches** (DEBUG-ONLY, port/game/t2debug.c). A human player
-(`--play`), any run without the variables, and now the default route get the N64's behaviour.
-`--legacy` (playthrough.py `--all` and `--level`, fullrun.py) writes all three switches again,
+**The N64 stream and the legacy switches** (DEBUG-ONLY, port/game/t2debug.c), as in round 18: a
+human player (`--play`), any run without the variables and the default route get the N64's
+behaviour; `--legacy` (playthrough.py `--all` and `--level`, fullrun.py) writes all three switches,
 the stream every route before round 18 was tuned on; with `--legacy`, `--n64-shake`,
-`--n64-props` and `--n64-sound` lift one switch each as before (`--n64-shake-from L` needs
-`--legacy`; `--n64` is accepted as the explicit spelling of the default and excludes `--legacy`).
+`--n64-props` and `--n64-sound` lift one switch each (`--n64-shake-from L` needs `--legacy`;
+`--n64` is the explicit spelling of the default and excludes `--legacy`).
 
 | switch | restores | the fix it undoes | with `--legacy`, the option that leaves it out |
 |---|---|---|---|
@@ -94,188 +92,157 @@ the stream every route before round 18 was tuned on; with `--legacy`, `--n64-sha
 | `T2_LEGACY_INTEL9=1` | the type-9 (interactive anim) intelligence bodies left big-endian: the props start on animation 0 | round 17 f3, `CScene__DecompressIntelligence` and its VM twin | `--n64-props` |
 | `T2_LEGACY_NOSOUND=1` | no sound world without `--audio`: the sound requests draw no random numbers | round 17 merge, `game.cpp` (`cfg.audio`) | `--n64-sound` |
 
+h1's zero-fill is not behind a switch (it changes both streams: every md5 below is new).
+
 **Validated option combinations** (each added to the default command; Release, `aimdrive.py`,
-each in its own directory, `setarch -R` unless marked; PLAYTHROUGH.md 38). On the N64 stream (no
-`--legacy`, 300,000 frames):
+each in its own directory, ASLR on; PLAYTHROUGH.md 41). On the N64 stream (no `--legacy`, 300,000
+frames):
 
 | options | result |
 |---|---|
-| (none) | **END 2 at 250,566, all 5 totems, no life lost**; md5 `6213496b…` (twice here, 5 runs in g1, ASLR on and off) |
-| `--lair-push both` (g5's push rule) | END 2 at 250,516, 5 totems, **no life lost**; md5 `7262aa60…` (the same run up to the lair) |
-| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0` | END 2 at 259,046, 5 totems, 1 life lost (the Primagen's lair) |
-| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0 --lair-push both` | the same END 2 at 259,046, 1 life lost in the lair (no push came: the life goes to his spawns, 19 hits, 194 damage) |
-| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --hub-wait 0` | END 2 at 263,620, 5 totems, 1 life lost (the Mantid Queen by stick, 108 damage) |
+| (none) | **END 2 (level 10 at 255,080), all 5 totems, no life lost**; md5 `0959aac5…` (4 runs with ASLR on, 2 before and 2 after the alignment fix below; 10 of 10 to 84,000) |
+| `--lair-push both` (g5's push rule) | END 2 (level 10 at 255,078), 5 totems, **no life lost**; md5 `71f75b30…` |
+| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0` | END 2 (level 10 at 258,960), 5 totems, 1 life lost (the Blind One); md5 `156a1cfd…` |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --stick-boss 6` | END 2 (level 10 at 254,008), 5 totems, 1 life lost (the lair, by h3's boss aim); the Queen by g5's aim (no `T2_AIMD_BOSS` there) 100 damage, lowest 24; md5 `9d30dfe9…` |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` (h3) | **no END: 4 lives at the Mantid Queen, game over** (md5 `97ba9a2c…` on the merged tree before the City Totem change, the same with h3's own tools: the stream, not the merge); with `T2H3_QR=250` 2 lives at the Queen and 1 in the lair. h3's run before h1 won the Queen with 43 damage |
 
-On the old stream (`--legacy`, 290,000 frames; the route files byte-identical to ab0bc24c's
-without `--legacy`):
+On the old stream (`--legacy`, 290,000 frames; the route files byte-identical to round 18's):
 
 | options | result |
 |---|---|
-| `--legacy` | END 2 at 252,194, all 5 totems, 2 lives lost (the City Totem); md5 `ecb9f9f2…` (round 16's) |
-| `--legacy --real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --l2-heal --hub-wait 0` (g5) | **END 2 at 248,500, 5 totems, no life lost**; md5 `47614863…` twice |
-| `--legacy --real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` (round 17 f5) | END 2 at 250,402, 5 totems, **no life lost**; md5 `15d3d74f…` (round 17's) |
-| `--legacy --n64-shake` (round 17 f1 + f2) | END 2 at 252,060, 5 totems, 1 life lost (round 17; route files identical) |
-| `--legacy --real-weapons 1` | END 2 at 252,980, 2 lives lost; md5 `3cb702ff…` (round 16; route files identical) |
-| `--legacy --stick-aim 2 --assist-keep 110` | END 2 at 253,788, 2 lives lost; md5 `9432c11d…` (round 16; route files identical) |
-| `--legacy --nav 1,2,3,4` | END 2 at 250,970, 3 lives lost; md5 `8702568d…` (round 16; route files identical) |
-| `--legacy --n64-shake --n64-props` (stretch) | END 2 at 260,790, 2 lives lost (round 17; route files identical) |
+| `--legacy` | END 2 (level 10 at 248,394), all 5 totems, 2 lives lost (the City Totem); md5 `281904eb…` (round 18: `ecb9f9f2…`) |
+| `--legacy --real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --l2-heal --hub-wait 0` (g5) | **END 2 (level 10 at 244,700), 5 totems, no life lost**; md5 `8f1d5839…` (round 18: `47614863…`) |
+| `--legacy --real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` (round 17 f5) | END 2 (level 10 at 246,602), 5 totems, **no life lost**; md5 `1cb91f3a…` (round 18: `15d3d74f…`) |
+| `--legacy --n64-shake`, `--legacy --real-weapons 1`, `--legacy --stick-aim 2 --assist-keep 110`, `--legacy --nav 1,2,3,4`, `--legacy --n64-shake --n64-props` | not re-run this round (round 18's results, on the pre-h1 stream: the history below) |
 
 Do not combine the default (or `--n64`) with `--l2-heal` (g1: its picks were placed for the old
 stream).
-
-**The ASLR caveat** (STABILITY.md 12.3): **10 runs of the new default to frame 84,000 with ASLR
-on: 7 give the `setarch -R` lines (`92eed05f…`, = the first 168,000 lines of the full run), 3
-diverge** (2 x `9a54b897…` from frame 75,665, 1 x `b76a2230…` from 75,739; both in 135, first in
-the particle hash). g2 found and fixed one layout-dependent branch (the
-stack-depth guards compared a host stack address with a host `.bss` address), but the level-135
-second path remains: the first difference is at frame 72,746 in the bone matrices of actors 41, 74
-and 31 while every actor's state is identical (the bone-matrix build in `func_0021CDAC.c` reads
-something layout-dependent; `CCache__Request` keys are a suspect: truncated host pointers?). Keep
-comparing det md5s under `setarch -R`.
 
 **Switches and debug aids** (the remaining ones; DEBUG-ONLY env of the port and the tools):
 
 | what | switch | where |
 |---|---|---|
 | the old random stream | `T2_LEGACY_SHAKE`, `T2_LEGACY_INTEL9`, `T2_LEGACY_NOSOUND` (`--legacy`) | t2debug.c, game.cpp |
-| weapons and ammo | `T2_GIVE_WEAPONS`, `T2_WEAPON` (the schedule), `T2_FILL_AMMO` (`--real-weapons 1`: level 1 without) | t2debug.c |
+| weapons and ammo | `T2_GIVE_WEAPONS`, `T2_WEAPON` (the schedule; a request is taken when a level loads), `T2_FILL_AMMO` (`--real-weapons 1`: level 1 without); **`T2C34_CW`** (fullrun.py: the City Totem's weapon on the N64 stream, default 9) | t2debug.c, fullrun.py |
 | aim assists | `T2_FACE_NEAREST`, `T2_AIM_ENEMY`, `T2_AIM_AT`, `T2_AIM_NODE`, `T2_BOSS_FRONT` (`--stick-aim L,..`: the stick instead, under `aimdrive.py`) | t2debug.c, aimdrive.py |
-| the stick driver | `T2_AIM_STICK`, `T2_AIMD_*` (`T2_AIMD_PRIMARY`, `T2_AIMD_PRIMARY_ONLY` g5; `T2_AIMD_IMMUNE_ACC`, `T2_AIMD_THREAT_NEAR`, `T2_AIMD_FIRE_MAX` f5) | aimdrive.py |
-| the lair | `T2_MOVE_DRIVE`, `T2_LAIR_DRIVE`, `T2_LAIR_KEEP`, `T2_LAIR_PUSH` (`--lair-push`, g5), `T2_LAIR_PEEK` (2 a run; an N64 property) | aimdrive.py, t2debug.c |
-| moving the player | 314 teleports on the default route (289 with `--legacy`: g1's health picks are teleport steps) (`T2_TELEPORT`; `--nav 1,2,3,4` walks some), `T2_ANCHOR`, `T2_WALK_PLAN` | t2debug.c, aimdrive.py |
-| logs | `T2_DET_LOG`, `T2_DET_GF`, `T2_DET_ACTORS`, **`T2_DET_MTX`** (g2: per-actor matrix block hashes), **`T2_DET_WATCH=FRAME:ACTOR[:LEN]`** (g2, with `tools/port/gdbwatch.py`), `T2_STATE_LOG`, `T2_EVENT_LOG`, `T2_HURT_LOG`, `T2_BOSS_LOG`, `T2_PUSH_LOG` (g5), `T2_PROGRESS_LOG`, `T2_PICKUP_LOG` | t2det.c, t2debug.c, t2bosslog.c |
-| fidelity | `T2_RAW_DUMP`, `T2_RNG_SET`, `T2_RNG_LOAD` (n64cmp.py) | t2debug.c |
+| the stick driver | `T2_AIM_STICK`, `T2_AIMD_*` (**`T2_AIMD_BOSS=L:R`**, `T2_AIMD_BOSS_THREAT`, `_THREAT0`, `_HOLD`, `_LEAD` h3, `--stick-boss`; `T2_AIMD_PRIMARY`, `T2_AIMD_PRIMARY_ONLY` g5; `T2_AIMD_IMMUNE_ACC`, `T2_AIMD_THREAT_NEAR`, `T2_AIMD_FIRE_MAX` f5) | aimdrive.py, fullrun.py |
+| the lair | `T2_MOVE_DRIVE`, `T2_LAIR_DRIVE`, `T2_LAIR_KEEP`, `T2_LAIR_PUSH` (`--lair-push`), `T2_LAIR_PEEK` (2 a run; an N64 property) | aimdrive.py, t2debug.c |
+| moving the player | 314 teleports on the default route (`T2_TELEPORT`; `--nav 1,2,3,4` walks some, **`--nav-jumps`, `--doors`, `--nav-pad F`** h5: jump edges and door waits; no walk survives in the default run), `T2_ANCHOR`, `T2_WALK_PLAN` (h5: `SUBj` plans with jumps) | t2debug.c, aimdrive.py, nav.py |
+| logs | `T2_DET_LOG`, `T2_DET_GF`, `T2_DET_ACTORS`, `T2_DET_MTX`, `T2_DET_WATCH`, **`T2_DET_POSE=1`** (h1: per actor the head turn, blend, animation channels, sight target, ground tilt, orientation hash), **`T2_SNDP_LOG=1`** (h2: out-of-range sound player targets), `T2_STATE_LOG`, `T2_EVENT_LOG`, `T2_HURT_LOG`, `T2_BOSS_LOG`, `T2_PICKUP_LOG`, `T2_PROGRESS_LOG` | t2det.c, t2debug.c, t2audio_sndp.c |
+| fidelity | `T2_RAW_DUMP`, `T2_RNG_SET`, `T2_RNG_LOAD` (n64cmp.py), `T2_START_WARP` | t2debug.c |
+| the Mac window | `T2_OFFSCREEN_SIZE=WxH` (h4: a non-4:3 offscreen frame), `--audio-device-change-test VI` (h4) | main.cpp, game.cpp |
 
-**Tools**: `tools/port/gdbwatch.py` (g2: a hardware watchpoint on an actor's position between two
-det lines, with backtraces, and a call trace by regex); `n64viewcheck.py` kinds **raw**, **stride**,
-**view**, **cast** (round 16) and **gptr** (g2: `<global> +/- C` base-pointer arithmetic, cast or
-not); `n64cmp.py` (now pairs the `m_Lights` double buffers by `gEvenOdd` parity, g3); the rest as
-in round 17 (history below).
+**Tools**: `n64trace.py --sndp` (the N64 sound player's out-of-range reads) and **`--peek
+LEVEL:GF:EXPR:N`** (RDRAM words at a game frame, following pointers) (h2); `refshots.py` takes a
+negative `--start-warp` (h2); `padtest.py` gains `focus` and `hotplug` (h4); `nav.py` jump edges,
+`navcands.py --jumps/--level` (h5); the rest as in round 18 (`gdbwatch.py`, `n64viewcheck.py` kinds
+raw/stride/view/cast/gptr, `n64cmp.py`).
 
 ## 2. What the game does now (Linux, headless, PIE)
 
 - **The whole game to the good ending with no invincibility and no life lost, on the N64's own
-  random stream**, by default (section 1): all five totems, the four bosses (the Mantid Queen with
-  the scorpion launcher, sister 2 with the shredder: g1), the six keys in their slots, the
-  Primagen, END 2 and the credits. The old stream (`--legacy`) plays as in rounds 16-17, and the
-  stick in all six levels with real weapons in level 1 reaches END 2 with no life lost on it (g5).
-- **The Mac app opens its window** (OpenGL by default; Metal fixed and opt-in), draws at the
-  retina pixel resolution, and plays the whole game with the same det md5 as Linux (g4: the
-  round-17 default and zero-death combo, ASLR on).
-- **The debug aids that remain** (the default run): `T2_GIVE_WEAPONS`, the weapon schedule and
-  `T2_FILL_AMMO`; the aim assists (`T2_FACE_NEAREST` at the totems, `T2_AIM_ENEMY`, `T2_AIM_AT`,
-  `T2_AIM_NODE` at the four bosses, `T2_BOSS_FRONT` for the Queen); the lair driver and the two lair
-  peeks; 314 teleports between route steps (289 with `--legacy`) and the anchors. **No legacy switch.**
-- **The level runs** (`playthrough.py DIR --fight 10 | --level 2..6`, Release, `--pak-blank`; the
-  default N64 stream and `--legacy`): on both streams every det line identical to round 17's
-  build, and the same end points (levels 1, 3 and 4 back in the hub, level 2 in 125 at 64,000,
-  level 5 at the Queen's door 113, level 6 at the Mother).
-- **The boss recipes** (legacy switches on): every det line identical to round 17's build (the
+  random stream**, by default (section 1), **the same with ASLR on or off**: all five totems (the
+  City Totem now on the shredder), the four bosses, the six keys in their slots, the Primagen, END 2
+  and the credits. The old stream (`--legacy`) still reaches END 2 (2 lives at the City Totem), and
+  its two zero-death combinations (round 17 f5's and g5's) keep 0 lives on the new zero-filled
+  stream.
+- **Determinism**: 10 of 10 default runs to frame 84,000 with ASLR on give the same det lines
+  (round 18: 7 of 10; the 135 divergence was the uninitialised ground flags, STABILITY.md 13).
+- **Render**: the hub pad cut-scene (7601) and the Mother's arena draw their light shaft and mist
+  in the N64's pale white-yellow and grey (texture kind 3 as IA16, h2); the arena's walls are
+  still olive where the N64 is brown (FIDELITY.md 12.3: not a TLUT decode). A 16:9 window gets
+  black bars instead of stale frames (h4).
+- **The level runs** (`playthrough.py DIR --fight 10 | --level 2..6`, Release, `--pak-blank`;
+  both streams): levels 1, 2, 3, 4 and 6 every det line identical to round 18's build; level 5
+  (both streams) differs from frame 18,916 in 124's particle hash only and ends on the same state
+  (113, the Queen's door). The route files of all twelve are byte-identical to round 18's.
+- **The boss recipes** (legacy switches on): every det line identical to round 18's build (the
   Mother at 28,775, the Blind One 23,103, the Queen 28,143, the Primagen 43,586).
-- **The boot and the demos** (26,000, `--pak-blank`): the 52,000 det lines identical to round 17's
-  build with no switch (`197b2dd6…`) and with the three legacy switches (`3df81cf3…`). Against
-  fresh N64 traces (`n64trace.py` + `detdiff.py`, no switch): demo 1 (gf 1-1,128) and demo 3 (gf
-  1-344) no difference in any field but `rng` (from gf 8: the N64's load-time audio draws); demo 2
-  the known `player.hp` from gf 608 (the N64's uninitialised read). FIDELITY.md 10.
-- **Save, title, load**: the default run's pak holds note 1 (NT2E 51, checksum OK, health 126,
-  lives 4, 0:46:21, `mpk_saves.py`); a new boot loads it from the title into the hub (level 60,
-  health 126). The round-12 save recipe (`T2_SAVE_PORTAL`) saves and loads back into level 51.
-- **`--audio --wav` boot** (9,000): 3,311,264 stereo frames, byte-identical to round 17's build.
-- **padtest.py** (Release): OK. Clean errors: the `dummy` driver exits 1 with "The window could not
-  be created ..."; `--audio` without `--rom` says "--audio needs the ROM" and plays on (exit 0);
-  **an `--archive` that is not a Turok 2 archive now exits 1** after its FAIL message (it crashed
-  in the teardown, SIGSEGV, in round 17 too). `aimdrive.py` over a game that exits before it opens
-  the fifos reports it and returns (g2's watchdog; it used to wait forever).
-- **soak.py** (a fresh PIE Debug build): attract 100,000, newgame seeds 0-19 x 36,000, levels seeds
-  0-40 x 17,000: **0 crashes, 0 hangs** (62 runs, 1.52 M frames).
-- **A crash found by this merge's drawn runs, fixed** (section 3): the stick 1-6 combo on the N64
-  stream, drawn from 207,001, died at ~201,878 in 2 of 3 starts (SIGSEGV in `alSndpGetState` from
-  `SndVoicePool_StopByOwner`): stopping the sound world's voice 16, which has no player sound,
-  selects `handles[16]`, the allocation counter after the array (~20,000), and the player read a
-  state 1.4 MB past its array. With the guard: 3 of 3 drawn starts pass, and the default (twice),
-  `--legacy` and the combo give the same det md5s as before.
+- **The boot and the demos** (26,000, `--pak-blank`): `6ab97584…` (no switch) and `a08eb418…`
+  (the three legacy switches), different from round 18's from demo 2's gf 585 only. Against the
+  N64 traces (`detdiff.py --skip rng`): **demo 1 (gf 1-1,128) and demo 3 (gf 1-344) no
+  difference**; demo 2 the known `player.hp` read (the original game's uninitialised heap bytes),
+  now from gf 585 instead of 608 (the zero-fill: FIDELITY.md 12.1).
+- **Save, title, load**: the default run's pak holds note 1 (NT2E 51, checksum OK, health 78,
+  lives 4, `mpk_saves.py`); a new boot loads it from the title into the hub (level 60, health 78).
+  The round-12 save recipe (`T2_SAVE_PORTAL`) saves and loads back into level 51. **This needed a
+  merge fix**: the merged Release build faulted in `GameNoteMenu_SelectYes` (a `movaps` copying
+  the level flags into `gLoadSavePersistentData`, which the shifted data layout had put at 8 mod
+  16: `T2_ALIGN(4)` where clang assumes the ABI's 16 for a typed extern array); `gendata.py`'s
+  `ALIGN16` now includes it, and the new `tools/port/aligncheck.py BIN` lists such accesses (0 on
+  the fixed build, 0 on round 18's).
+- **`--audio --wav` boot** (9,000): 13,245,100 bytes, byte-identical to round 18's build.
+  `--audio-device-change-test` on Linux: a no-op (exit 0).
+- **padtest.py** (Release): OK, with h4's `focus` (9 checks) and `hotplug` (out and back at the
+  title menu, then a new game to engine mode 11). Clean errors: the `dummy` driver exits 1 with
+  "The window could not be created ..."; `--audio` without `--rom` says "--audio needs the ROM"
+  and plays on (exit 0); `aimdrive.py` returns when the game exits before the fifos ("the game
+  exited (1)").
+- **soak.py** (PIE Debug): attract 100,000 frames, newgame seeds 0-19 (36,000 each), levels seeds
+  0-40 (17,000 each): 0 crashes.
 
-Screenshots (640x480, `--draw` in `T2_DRAW_FROM` windows, checked by eye, not committed; the drawn
-default run gives the undrawn det lines): **the Mantid Queen on the N64 stream** (168,000: her
-health bar at the top, the scorpion launcher's blast on her, health 133, 12 rounds), **the Mother
-with the stick** (211,500, `--stick-aim 1,2,3,4,5,6`: her body over the arena's grid, health 158)
-and **the good ending on the new default** (250,001: the END 2 cinema, Adon; 251,003 the credits,
-"TUROK 2 TEAM").
-
-Port tests: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (26,124 units, 0 mismatches,
-the archive and the ROM backend), `t2asset_typed_test` (1,585 checks, 0 errors), `gbi_test` (0
-mismatches), `t2os_test` (trace hash `2b2775877e0d226b` on 3 runs: g2's `t2os_stack_low` added),
-`t2audio_test --direct 0` and `--direct 40` (audio_compare: max difference 0), `t2audio_test
---adec 0xC29AB4 7464` (27,136 samples), the swoosh self test (OK in every run) and the backend
-self test (LUS, miniz and ROM: 26,124 units, fnv1a64 `b26a3b2a8b834fa4`). The game archive is
-unchanged: `mkarchive.py` into a new directory gives sha1 `a9d14a47…`, `archive_check` OK (format
-2.0); `t2port.o2r` (the shaders) changed with g4's Metal patch (sha1 `638a7a5e…`). `mpk_saves.py`
-on the default run's pak: note 1, checksum OK.
-
-## 3. Merge resolutions and fixes (round 18)
+## 3. Merge resolutions and fixes (round 19)
 
 | where | branches | resolution |
 |---|---|---|
 | `docs/port/STATUS.md` | all | each branch's section kept, in merge order (the same insertion point each time) |
-| `docs/port/PLAYTHROUGH.md` | g1, g5 | both appended a section 36: renumbered 36 (g1) and 37 (g5), references fixed; this merge is 38 |
-| `docs/port/FIDELITY.md` | g3 | `9-g3` renumbered 9; this merge is 10 |
-| `tools/port/fullrun.py` | g1, g5 | merged on their own: g1's `N64_*` tables, `n64_full()`, `r.seg_starts`, the level-2 weapon block and the Queen weapon beside g5's `STICK_PRIMARY`, `STICK_FREE_WALK`, `Route.walks`, `LAIR_PUSH` and the `lair` fight key; route files checked against each branch (below) |
-| `tools/port/aimdrive.py` | g2, g5 | merged on their own: g2's `fifo_watchdog` thread around the fifo opens, g5's Picker primary target and LairDrive push (`bm` on the move line, `r1` in the answer) |
-| `port/app/CMakeLists.txt` | g4 (merge fix) | `file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/t2port_shaders)`: a fresh Linux (ninja) build failed packing `t2port.o2r` |
-| `tools/port/playthrough.py`, `fullrun.py` | this merge | **the N64 stream is the default; `--legacy`** (section 1) |
+| `docs/port/STABILITY.md` | h1 | `13-h1` renumbered 13 (also in STATUS.md and the comment in func_00205D7C.c) |
+| `docs/port/FIDELITY.md` | h2 | `11-h2` renumbered 11 (also in STATUS.md, RENDER.md and port/game/t2tex.c); this merge is 12 |
+| `docs/port/PLAYTHROUGH.md` | h3, h5 | both appended a section 39: renumbered 39 (h3) and 40 (h5) (also in STATUS.md and nav.py); this merge is 41 |
+| `tools/port/aimdrive.py`, `fullrun.py` | h3, h5 | merged on their own: h3's `T2_AIMD_BOSS` picker, `Trigger` hold mode and `STICK_BOSS` beside h5's `WalkDrive` jumps and door waits, `NAV_JUMPS`, `NAV_PAD` and the `T2_WALK_PLAN` format; the default command's route files byte-identical to 65ec98ec's, and h3's combination's identical between the merged tools and h3's own |
+| `port/app/game.cpp`, `main.cpp` | h4 | h4 only (no other branch touched them); built on Linux (the CoreAudio code and frameworks behind `__APPLE__`/`APPLE`) |
 
 The fixes merged this round:
 
 | fix | where | found by | effect |
 |---|---|---|---|
-| **the stack-depth guards on the host stack** | `Collision_SweepRegionWalls`, `Path_ExpandNode`, `Automap_RevealRegion` -> `t2os_stack_low()` (port/runtime/t2os.c) | g2 (an `ld.so` start under `setarch -R`) | the N64 compared `&local` with its stack bottom (`D_800C894C`); the host compared a stack address with `.bss`: with the executable above the thread stacks the wall sweep stopped at its first region and the route went its own way |
-| **the OnScreen VM twin** | `func_00463B2C.c` (`CScene__LoadLevel_2`) passes `&gEngineApp_m_OnScreen` | g2 (f4's pattern) | no longer `gEngineApp_m_SwooshSystem - 0x1C8` on the host |
-| **the multiplayer camera pool head** | `CScene__BuildGeometryDisplayList` | g2, `n64viewcheck.py` gptr | read by name (the N64 reads it 0x1210 bytes before the difficulty; 0x1358 on the host) |
-| `CPlayer__ToggleLowerAmmo` | by name (`gEngineApp_m_Game_m_DebugLines`) | g2, gptr | not linked; fixed for when it is |
-| **the Metal shader** | `port/cmake/t2_shaders.cmake` (t2port.o2r) | g4 | the Mac app's default Metal window aborted at its first draw; OpenGL is now the default renderer anyway |
-| **the sound player's target bound** | `port/audio/t2audio_sndp.c` (`alSndpGetState`, `alSndpPlay`, the event post) | this merge (a drawn stick run on the N64 stream) | a target outside `0..maxSounds-1` (voice 16's `handles[16]`, the counter after the array; -1 after a deallocate) reads as stopped and posts nothing: it read 1.4 MB past the state array and crashed. An original-game out-of-range read (the N64 reads RAM there); no det line changed |
-| a clean exit on a bad archive | `port/app/main.cpp` | this merge (the clean-error checks) | `std::_Exit(1)` after "FAIL: T2Asset_OpenLus": the teardown of the half-opened LUS context crashed |
+| **the ground flags read uninitialised** | the host `CCache__AllocDecompressFlags` (func_00205D7C.c) zero-fills its blocks | h1 | `CGameObjectInstance__Construct`'s ground tilt tested old heap bytes (host pointers) as AI flags: the level-135 ASLR divergence; a behaviour change (new md5s on both streams) |
+| **the bone wobble's phase** | `CGameObjectInstance__PoseBone` (func_0021B95C.c) passes `T2Port_N64Address(obj)` (t2boot.c) | h1 | the N64 used the object's address as a phase; the host address changed with ASLR |
+| **IA16 palettes** | `Texture_Load` kind 3 (func_00206B30.c) -> `port/game/t2tex.c` | h2 | CI4 with an IA16 TLUT, decoded by Fast3D as RGBA5551 (cyan/magenta/green shaft and mist in 7601): now the N64's colours |
+| **the recolour mode** | `Texture_DecompressCallback` (func_00206990.c) reads `requestId` at its host offset, recolours big-endian | h2 | no texture was ever recoloured on the port |
+| **`SndQueue_Update`'s slot pointer** | func_00276180.c: `(u32)slots` -> a pointer-sized add under `TARGET_PORT` | h1 (found), this merge (fixed) | a 64-bit pointer truncated to 32 bits; no det line changes (the default and `--legacy` md5s are h1's) |
+| **non-4:3 windows** | `T2Display_RegisterSettings` (t2display.cpp): LUS advanced resolution 4:3 by default; window minimum 320x240 | h4 | the side bars showed stale frames and 3D past the game's edges |
+| **the output device** | `port/app/t2audiodev.{h,cpp}`, `game.cpp` (`T2AudioDev_Poll`), `main.cpp` (install) | h4 | the sound follows a change of the default output device (macOS) |
+| **focus** | `T2Controls_InputFocus` (t2controls.cpp), `ContRead` | h4 | Cmd-Tab frees the mouse and gives the game no input until the focus is back |
+| **the City Totem's weapon** | `fullrun.py` `N64_CITY_WEAPON` (the shredder, N64 stream) | this merge | 34 damage / lowest 66 instead of 97 / 3 on the new stream |
+| **a misaligned data object** | `gendata.py` `ALIGN16` += `gLoadSavePersistentData`; new `tools/port/aligncheck.py` | this merge (the save/load check) | loading a save crashed the Release build (`movaps` at 8 mod 16 after the data layout shifted); no det line changes |
 
-Checks of the merge: after every merge step `asm_diff --base ab0bc24c` 0, the nested `TARGET_PORT`
-scan unchanged (no second host body: the 12 nested tests are the old import-ref boilerplate), the
-port built (Linux Release; g4's Mac code behind `__APPLE__`), and the default command's
-`playthrough.txt`/`teleport.env` byte-identical to ab0bc24c's (until the flip; then the plain
-command = g1's `--n64` and every `--legacy` combination = ab0bc24c's without `--legacy`, the
-level runs too). Route files against the branches: g1's `--n64` and g5's two combos (with and
-without `--lair-push`) byte-identical. ABI (`abicheck.py --build OUT/pie -j 4` on a fresh PIE
-build: 3,077 TUs, 11,781 calls, 11,130 checked): harmful direct sites **0**, indirect 1 (the
-known `Destructible_Hurt` store). `ptrdecls.py`: the strlen returns as before (5 lines, with
-the stray untracked `include/functions.h` moved away while it runs); `ptrargs.py` on the fresh
-build's log: 0 to retype; `outptr.py`: 0; `f2ucheck.py`: 79; `n64viewcheck.py` (linked files):
-raw BAD 10, stride BAD 3, view suspect 42, cast BAD 1 (the kept `CCamera__Construct` store), cast
-same 43, as in round 17, and gptr BAD 6 / untyped 15 / same 4 (g2's kind; the `--unlinked` sweep
-is 64BIT.md part 8's 25 BAD, judged there). `mklayout.py --check`: up to date. The N64 sound
-world's raw `core + 0x80` counter (`SndVoicePool_AllocVoice`, `func_00273504.c`) is not linked:
-the host's typed `t2audio_world.c` writes it by name (`padFC`).
+Checks of the merge: after every merge step `asm_diff --base 65ec98ec` 0, the nested
+`TARGET_PORT` scan of the files each branch changed (no second host body), the port built (Linux
+Release), and the default command's route files byte-identical to 65ec98ec's (until the City
+Totem change; the twelve level runs' route files stay round 18's). ABI (`abicheck.py --build
+OUT/pie -j 4` on a fresh PIE build: 3,078 TUs, 11,805 calls, 11,148 checked): harmful direct
+sites **0**, indirect 1 (the known `Destructible_Hurt` store). `ptrdecls.py`: the strlen returns
+as before (the stray untracked `include/functions.h` adds the VM-twin lines: move it away);
+`ptrargs.py` on the fresh build's log: 0 to retype; `outptr.py`: as round 18; `f2ucheck.py`: 79;
+`n64viewcheck.py` (linked files): raw BAD 10, stride BAD 3, view suspect 42, cast BAD 1, cast same
+43, gptr BAD 6 / untyped 15 / same 4, all as in round 18 (`--unlinked`: 64BIT.md part 8's set).
+`mklayout.py --check`: up to date. The game archive is unchanged: `mkarchive.py` into a new
+directory gives sha1 `a9d14a47…`, `archive_check` OK (format 2.0). Port tests: `rnc_test` (14,426
+streams, 0 failed), `t2asset_test` (26,124 units, 0 mismatches, the archive and the ROM backend),
+`t2asset_typed_test` (1,585 checks, 0 errors), `gbi_test` (0 mismatches), `t2os_test` (trace hash
+`2b2775877e0d226b` on 3 runs), `t2audio_test --direct 0` and `--direct 40` (audio_compare: max
+difference 0), `t2audio_test --adec 0xC29AB4 7464` (27,136 samples), the swoosh self test (OK in
+every run). `mpk_saves.py` on the default run's pak: note 1, checksum OK.
 
 ## 4. Next
 
-1. **The ASLR divergence** (STABILITY.md 12.3): the bone matrices of actors 41/74/31 in 135 from
-   frame 72,746 (`func_0021CDAC.c`'s animation reads; `CCache__Request` keys perhaps truncated host
-   pointers); a third path before 38,997 in 1 of 22. `T2_DET_MTX`, `T2_DET_WATCH` and
-   `gdbwatch.py` are the tools.
-2. **The lair by stick** (g5: the stick shoots the Primagen's spawns half the time; his node as the
-   only target, his spawns last), and **the Mantid Queen by stick on the N64 stream** (1 life in the
-   combo above).
-3. **Sister 2 on real weapons** (`--real-weapons 1,2`: 134's ammo), then levels 3-6.
-4. **The rest of the n64cmp sweep** (FIDELITY.md 9.3: 135, 124, 114, 53, the hub with `--pad`, a
-   boss arena) and **the hub pad cut-scene's particle colours** (cinema 7601, RENDER.md 7.1).
-5. **macOS**: CoreAudio does not follow a change of the output device (MACOS.md 20.3); Developer
-   ID signing and notarisation; and **the first windowed session with a human and a real
-   gamepad** (OpenGL default, retina, `gT2RenderScale`).
-6. Doors and jumps as nav data (the walker stops at doors, gates, cages, crypts; ledges need a jump
-   edge and an `r1` answer).
-7. Still open: the obj-230 double fire and the Blind One's margin (round 14 c1), 119's moving
+1. **The render fidelity sweep**: the Mother's arena walls (olive on the port, brown on the N64:
+   not a TLUT; check the recolour bits of the arena's texture requests on the N64 with
+   `n64trace.py --peek`, then the materials' combiner and fog), and `refshots.py --start-warp`
+   against `T2_START_WARP` at every level start the route uses.
+2. **The stick in the boss arenas on the new stream**: h3's `--real-weapons 1 --stick-aim
+   1,2,3,4,5,6 --hub-wait 0` loses 4 lives at the Mantid Queen after the zero-fill (its run before
+   h1 won with 43 damage); then sister 2 (134) with real weapons (`--real-weapons 1,2`).
+3. **Walks in the default run** (h5: the walker jumps and waits at doors, but the 314 teleports
+   stay; the candidates per level in PLAYTHROUGH.md 40).
+4. **The user's first windowed session on the Mac** ([FIRSTRUN.md](FIRSTRUN.md)): OpenGL default,
+   retina, the 4:3 bars, focus, the output device change, a real gamepad; then Developer ID signing
+   and notarisation.
+5. Still open: the obj-230 double fire and the Blind One's margin (round 14 c1), 119's moving
    platforms (c2), `t2audio_test`'s game-path mode, soak.py on macOS, the lair peek (an N64
-   property), 125's actor 51 tilt (an uninitialised read in the original game: left as is); what
-   the N64 does when it stops voice 16 (it reads, and may post a stop for, a state far past the
-   sound player's array: the host now treats it as stopped, section 3; `n64trace.py --calls
-   alSndpGetState` would show the value it reads).
+   property), the original game's uninitialised reads that the zero-fill now answers with zeros
+   (demo 2's health from gf 585, 135/114's ground tilt: FIDELITY.md 12).
 
 ## Round 19, part h1: determinism under ASLR, the level-135 two paths fixed (branch names-R19_h1)
 
@@ -457,6 +424,285 @@ expected beyond the global `cli()` line.
 **Next**: the longest jump press (then `JUMP_UP`); static-object walls in the mesh (135's crypts
 and graves); a route that waits at a door until its opener has fired; walks only after 135 (the
 N64 route's thinnest spot), each with a re-tune of the fights after it.
+
+## Round 18 merged state (history)
+
+Round 18 merged five branches, in this order: g2 (address-layout determinism: **the three
+stack-depth guards ask the host thread's own stack**, the OnScreen VM twin, `n64viewcheck.py` kind
+`gptr` and two base-pointer reads fixed by name, `aimdrive.py`'s fifo watchdog, `gdbwatch.py`,
+`T2_DET_MTX` / `T2_DET_WATCH`), g4 (macOS: **the Mac app's Metal window no longer aborts at its
+first frame**, OpenGL the default renderer, retina at pixel resolution, `--render-scale`,
+`--offscreen-metal`), g3 (the round-17 n64cmp leads: the lights double buffer is not a bug, actor
+51's tilt is an uninitialised read of the original game), g1 (**the whole game with no legacy
+switch: the good ending with no life lost**, `--n64`) and g5 (levels 5-6 by stick, the Primagen's
+push and `--lair-push`; the stick in all six levels to the good ending with no life lost). **The
+merge made g1's route the default**: the plain `playthrough.py RUN --all --talismans 2 --cheats-off
+1,2,3,4,5,6` now writes no `T2_LEGACY_*` line (the random stream a human player gets) and plays the
+whole game to the GOOD ending **without losing a life** (600,000 det lines, md5 `6213496b…`, the
+same as g1's five runs); `--legacy` restores the old stream for the combinations tuned on it, each
+of which still gives its round-17 route files and det md5. Detail pages:
+[PLAYTHROUGH.md](PLAYTHROUGH.md) 36 (g1), 37 (g5) and 38 (this merge), [FIDELITY.md](FIDELITY.md)
+9 (g3) and 10 (this merge), [STABILITY.md](STABILITY.md) 12 and [64BIT.md](64BIT.md) part 8 (g2),
+[MACOS.md](MACOS.md) 20 (g4). The branch sections follow section 4; round 17's merged state and
+earlier rounds follow as history.
+
+The matching build is unchanged: `tools/asm_diff.py --base ab0bc24c -j 8` reports 0 differences
+over all 3,938 files after every merge and at the end, and a clean `make clean && make setup &&
+make -j8 build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
+
+### Round 18, 1. Build and run
+
+**To play** (Mac or Linux, a Release build, a window, a gamepad or the keyboard and mouse):
+[QUICKSTART.md](QUICKSTART.md). A fresh clone needs only the ROM (`gendata.py` reads
+`versions/port_layout.us.json` plus the ROM when `build/turok2.us.elf` is absent). **After a
+merge that adds, renames or moves a data symbol, run `python3 tools/port/mklayout.py` on the box
+(ELF + ROM) and commit the json** (`--check` exits 1 when stale; up to date at the end of this
+round).
+
+- **The Mac app** (MACOS.md 17-20): `tools/port/mkapp.sh BUILD [APP]` makes the self-contained
+  ad-hoc signed `Turok2.app` (`T2_APP_ZIP=1` zips it); not yet Developer ID signed or notarised.
+  **Round 18 (g4)**: LUS's Metal shader no longer compiled with the current Metal compiler
+  (`thread const texture2d<float>` parameters), so the app's default window aborted at its first
+  draw; `port/cmake/t2_shaders.cmake` drops the qualifier when it packs `t2port.o2r` (the OpenGL
+  shader byte-identical; `t2port.o2r` sha1 `638a7a5e…` on Linux). The player settings (QUICKSTART
+  3): **`gT2Renderer`** 0 = OpenGL (the default, written to `Window.Backend.Id` at each launch), 1 =
+  Metal (macOS, opt-in; headless `--offscreen-metal` draws the same frames as OpenGL); **HiDPI**:
+  LUS's resolution multiplier = the window's pixel density x **`gT2RenderScale`** (1; 0.25-4;
+  `--render-scale S` for one run), so a retina window draws at pixel resolution. CoreAudio opens
+  (100 ms latency) but does not follow a change of the output device (MACOS.md 20.3).
+  `-DT2_LTO=ON` stays off by default.
+- The development build (Linux box, headless) is round 13's recipe ("Round 13: build and run"
+  below). **Use a Release (`-O2`) build for long runs**; Linux screenshots:
+  `SDL_VIDEODRIVER=offscreen` without `--no-window` (`--offscreen-gl` / `--offscreen-metal` are
+  macOS only). The merge fixed one Linux build break of g4's (ninja does not create a custom
+  command's working directory: `t2port_shaders/` is now made at configure time). **`port/gen/` is shared by every build directory and
+  `gendata.py` writes it for the one it is given**: after building OUT/rel, a fresh OUT/pie failed
+  to link (`sRegionNormal_y`, `sRegionNormal_z`, `gEngineApp_m_Settings_unk180` missing: the
+  Release objects do not reference them); rerun `gendata.py --build DIR` and `cmake DIR` before
+  `ninja -C DIR` when switching build directories.
+
+**The whole game to the good ending, no invincibility, no life lost** (the new default;
+PLAYTHROUGH.md 36 and 38):
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6
+mkdir -p RUN/pak && cd RUN && ln -s ../OUT/turok2.o2r . && cp ../OUT/turok2.cfg.json . && \
+  . ./teleport.env && SDL_VIDEODRIVER=offscreen \
+  T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=500 T2_PROGRESS_LOG=1 T2_HURT_LOG=1 T2_BOSS_LOG=1 \
+  python3 ../tools/port/aimdrive.py -- ../OUT/rel/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
+  --game --no-window --pak-dir pak --frames 300000 --input @playthrough.txt
+python3 ../tools/port/mpk_saves.py pak/turok2_pak1.mpk      # the saves after levels 1-5
+```
+
+**300,000 frames** (the last input is at 288,480). The timeline: the Harbor Totem 23,190, the City
+Totem 88,394, the Marsh Totem 109,547, the Cave Totem 128,792, the Blind One 138,455, the Hive
+Totem 164,758, the Mantid Queen 172,831, the Mother 205,182, the Primagen 243,774, **END 2 at
+250,566**, the credits back to the hub 264,664; 399 hits taken, **0 lives lost** (the thinnest
+spots: 135's crypt, lowest health 14; the City Totem 17; sister 1 in 133, 18). det md5 `6213496b…`
+(600,000 lines) in both merged-tree runs under `setarch -R`, as in g1's five.
+
+**Run each game in its own directory** (`turok2.cfg.json` is read at start and written at exit).
+`aimdrive.py` gives each game it starts its own `SHIP_HOME` (`T2_KEEP_CWD_CFG=1`: the old
+behaviour). Use an EMPTY `--pak-dir`; **kill a stuck run with SIGKILL** (the game ignores
+SIGTERM). A game that exits before it opens the driver's fifos no longer leaves `aimdrive.py`
+waiting (g2's watchdog; `T2_AIM_OPEN_TIMEOUT=SECONDS` also kills a game that never opens them).
+**Compare det md5s under `setarch -R`** (section 4, the level-135 ASLR divergence).
+
+**The N64 stream and the legacy switches** (DEBUG-ONLY, port/game/t2debug.c). A human player
+(`--play`), any run without the variables, and now the default route get the N64's behaviour.
+`--legacy` (playthrough.py `--all` and `--level`, fullrun.py) writes all three switches again,
+the stream every route before round 18 was tuned on; with `--legacy`, `--n64-shake`,
+`--n64-props` and `--n64-sound` lift one switch each as before (`--n64-shake-from L` needs
+`--legacy`; `--n64` is accepted as the explicit spelling of the default and excludes `--legacy`).
+
+| switch | restores | the fix it undoes | with `--legacy`, the option that leaves it out |
+|---|---|---|---|
+| `T2_LEGACY_SHAKE=1` (`=1,F`: until schedule frame F) | the camera shake radius 0: no shake random draws (6 a game frame fewer than the N64) | round 16 e1, `CCamera__Construct` | `--n64-shake` (`--n64-shake-from L`: levels L.. only) |
+| `T2_LEGACY_INTEL9=1` | the type-9 (interactive anim) intelligence bodies left big-endian: the props start on animation 0 | round 17 f3, `CScene__DecompressIntelligence` and its VM twin | `--n64-props` |
+| `T2_LEGACY_NOSOUND=1` | no sound world without `--audio`: the sound requests draw no random numbers | round 17 merge, `game.cpp` (`cfg.audio`) | `--n64-sound` |
+
+**Validated option combinations** (each added to the default command; Release, `aimdrive.py`,
+each in its own directory, `setarch -R` unless marked; PLAYTHROUGH.md 38). On the N64 stream (no
+`--legacy`, 300,000 frames):
+
+| options | result |
+|---|---|
+| (none) | **END 2 at 250,566, all 5 totems, no life lost**; md5 `6213496b…` (twice here, 5 runs in g1, ASLR on and off) |
+| `--lair-push both` (g5's push rule) | END 2 at 250,516, 5 totems, **no life lost**; md5 `7262aa60…` (the same run up to the lair) |
+| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0` | END 2 at 259,046, 5 totems, 1 life lost (the Primagen's lair) |
+| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0 --lair-push both` | the same END 2 at 259,046, 1 life lost in the lair (no push came: the life goes to his spawns, 19 hits, 194 damage) |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --hub-wait 0` | END 2 at 263,620, 5 totems, 1 life lost (the Mantid Queen by stick, 108 damage) |
+
+On the old stream (`--legacy`, 290,000 frames; the route files byte-identical to ab0bc24c's
+without `--legacy`):
+
+| options | result |
+|---|---|
+| `--legacy` | END 2 at 252,194, all 5 totems, 2 lives lost (the City Totem); md5 `ecb9f9f2…` (round 16's) |
+| `--legacy --real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --l2-heal --hub-wait 0` (g5) | **END 2 at 248,500, 5 totems, no life lost**; md5 `47614863…` twice |
+| `--legacy --real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` (round 17 f5) | END 2 at 250,402, 5 totems, **no life lost**; md5 `15d3d74f…` (round 17's) |
+| `--legacy --n64-shake` (round 17 f1 + f2) | END 2 at 252,060, 5 totems, 1 life lost (round 17; route files identical) |
+| `--legacy --real-weapons 1` | END 2 at 252,980, 2 lives lost; md5 `3cb702ff…` (round 16; route files identical) |
+| `--legacy --stick-aim 2 --assist-keep 110` | END 2 at 253,788, 2 lives lost; md5 `9432c11d…` (round 16; route files identical) |
+| `--legacy --nav 1,2,3,4` | END 2 at 250,970, 3 lives lost; md5 `8702568d…` (round 16; route files identical) |
+| `--legacy --n64-shake --n64-props` (stretch) | END 2 at 260,790, 2 lives lost (round 17; route files identical) |
+
+Do not combine the default (or `--n64`) with `--l2-heal` (g1: its picks were placed for the old
+stream).
+
+**The ASLR caveat** (STABILITY.md 12.3): **10 runs of the new default to frame 84,000 with ASLR
+on: 7 give the `setarch -R` lines (`92eed05f…`, = the first 168,000 lines of the full run), 3
+diverge** (2 x `9a54b897…` from frame 75,665, 1 x `b76a2230…` from 75,739; both in 135, first in
+the particle hash). g2 found and fixed one layout-dependent branch (the
+stack-depth guards compared a host stack address with a host `.bss` address), but the level-135
+second path remains: the first difference is at frame 72,746 in the bone matrices of actors 41, 74
+and 31 while every actor's state is identical (the bone-matrix build in `func_0021CDAC.c` reads
+something layout-dependent; `CCache__Request` keys are a suspect: truncated host pointers?). Keep
+comparing det md5s under `setarch -R`.
+
+**Switches and debug aids** (the remaining ones; DEBUG-ONLY env of the port and the tools):
+
+| what | switch | where |
+|---|---|---|
+| the old random stream | `T2_LEGACY_SHAKE`, `T2_LEGACY_INTEL9`, `T2_LEGACY_NOSOUND` (`--legacy`) | t2debug.c, game.cpp |
+| weapons and ammo | `T2_GIVE_WEAPONS`, `T2_WEAPON` (the schedule), `T2_FILL_AMMO` (`--real-weapons 1`: level 1 without) | t2debug.c |
+| aim assists | `T2_FACE_NEAREST`, `T2_AIM_ENEMY`, `T2_AIM_AT`, `T2_AIM_NODE`, `T2_BOSS_FRONT` (`--stick-aim L,..`: the stick instead, under `aimdrive.py`) | t2debug.c, aimdrive.py |
+| the stick driver | `T2_AIM_STICK`, `T2_AIMD_*` (`T2_AIMD_PRIMARY`, `T2_AIMD_PRIMARY_ONLY` g5; `T2_AIMD_IMMUNE_ACC`, `T2_AIMD_THREAT_NEAR`, `T2_AIMD_FIRE_MAX` f5) | aimdrive.py |
+| the lair | `T2_MOVE_DRIVE`, `T2_LAIR_DRIVE`, `T2_LAIR_KEEP`, `T2_LAIR_PUSH` (`--lair-push`, g5), `T2_LAIR_PEEK` (2 a run; an N64 property) | aimdrive.py, t2debug.c |
+| moving the player | 314 teleports on the default route (289 with `--legacy`: g1's health picks are teleport steps) (`T2_TELEPORT`; `--nav 1,2,3,4` walks some), `T2_ANCHOR`, `T2_WALK_PLAN` | t2debug.c, aimdrive.py |
+| logs | `T2_DET_LOG`, `T2_DET_GF`, `T2_DET_ACTORS`, **`T2_DET_MTX`** (g2: per-actor matrix block hashes), **`T2_DET_WATCH=FRAME:ACTOR[:LEN]`** (g2, with `tools/port/gdbwatch.py`), `T2_STATE_LOG`, `T2_EVENT_LOG`, `T2_HURT_LOG`, `T2_BOSS_LOG`, `T2_PUSH_LOG` (g5), `T2_PROGRESS_LOG`, `T2_PICKUP_LOG` | t2det.c, t2debug.c, t2bosslog.c |
+| fidelity | `T2_RAW_DUMP`, `T2_RNG_SET`, `T2_RNG_LOAD` (n64cmp.py) | t2debug.c |
+
+**Tools**: `tools/port/gdbwatch.py` (g2: a hardware watchpoint on an actor's position between two
+det lines, with backtraces, and a call trace by regex); `n64viewcheck.py` kinds **raw**, **stride**,
+**view**, **cast** (round 16) and **gptr** (g2: `<global> +/- C` base-pointer arithmetic, cast or
+not); `n64cmp.py` (now pairs the `m_Lights` double buffers by `gEvenOdd` parity, g3); the rest as
+in round 17 (history below).
+
+### Round 18, 2. What the game does now (Linux, headless, PIE)
+
+- **The whole game to the good ending with no invincibility and no life lost, on the N64's own
+  random stream**, by default (section 1): all five totems, the four bosses (the Mantid Queen with
+  the scorpion launcher, sister 2 with the shredder: g1), the six keys in their slots, the
+  Primagen, END 2 and the credits. The old stream (`--legacy`) plays as in rounds 16-17, and the
+  stick in all six levels with real weapons in level 1 reaches END 2 with no life lost on it (g5).
+- **The Mac app opens its window** (OpenGL by default; Metal fixed and opt-in), draws at the
+  retina pixel resolution, and plays the whole game with the same det md5 as Linux (g4: the
+  round-17 default and zero-death combo, ASLR on).
+- **The debug aids that remain** (the default run): `T2_GIVE_WEAPONS`, the weapon schedule and
+  `T2_FILL_AMMO`; the aim assists (`T2_FACE_NEAREST` at the totems, `T2_AIM_ENEMY`, `T2_AIM_AT`,
+  `T2_AIM_NODE` at the four bosses, `T2_BOSS_FRONT` for the Queen); the lair driver and the two lair
+  peeks; 314 teleports between route steps (289 with `--legacy`) and the anchors. **No legacy switch.**
+- **The level runs** (`playthrough.py DIR --fight 10 | --level 2..6`, Release, `--pak-blank`; the
+  default N64 stream and `--legacy`): on both streams every det line identical to round 17's
+  build, and the same end points (levels 1, 3 and 4 back in the hub, level 2 in 125 at 64,000,
+  level 5 at the Queen's door 113, level 6 at the Mother).
+- **The boss recipes** (legacy switches on): every det line identical to round 17's build (the
+  Mother at 28,775, the Blind One 23,103, the Queen 28,143, the Primagen 43,586).
+- **The boot and the demos** (26,000, `--pak-blank`): the 52,000 det lines identical to round 17's
+  build with no switch (`197b2dd6…`) and with the three legacy switches (`3df81cf3…`). Against
+  fresh N64 traces (`n64trace.py` + `detdiff.py`, no switch): demo 1 (gf 1-1,128) and demo 3 (gf
+  1-344) no difference in any field but `rng` (from gf 8: the N64's load-time audio draws); demo 2
+  the known `player.hp` from gf 608 (the N64's uninitialised read). FIDELITY.md 10.
+- **Save, title, load**: the default run's pak holds note 1 (NT2E 51, checksum OK, health 126,
+  lives 4, 0:46:21, `mpk_saves.py`); a new boot loads it from the title into the hub (level 60,
+  health 126). The round-12 save recipe (`T2_SAVE_PORTAL`) saves and loads back into level 51.
+- **`--audio --wav` boot** (9,000): 3,311,264 stereo frames, byte-identical to round 17's build.
+- **padtest.py** (Release): OK. Clean errors: the `dummy` driver exits 1 with "The window could not
+  be created ..."; `--audio` without `--rom` says "--audio needs the ROM" and plays on (exit 0);
+  **an `--archive` that is not a Turok 2 archive now exits 1** after its FAIL message (it crashed
+  in the teardown, SIGSEGV, in round 17 too). `aimdrive.py` over a game that exits before it opens
+  the fifos reports it and returns (g2's watchdog; it used to wait forever).
+- **soak.py** (a fresh PIE Debug build): attract 100,000, newgame seeds 0-19 x 36,000, levels seeds
+  0-40 x 17,000: **0 crashes, 0 hangs** (62 runs, 1.52 M frames).
+- **A crash found by this merge's drawn runs, fixed** (section 3): the stick 1-6 combo on the N64
+  stream, drawn from 207,001, died at ~201,878 in 2 of 3 starts (SIGSEGV in `alSndpGetState` from
+  `SndVoicePool_StopByOwner`): stopping the sound world's voice 16, which has no player sound,
+  selects `handles[16]`, the allocation counter after the array (~20,000), and the player read a
+  state 1.4 MB past its array. With the guard: 3 of 3 drawn starts pass, and the default (twice),
+  `--legacy` and the combo give the same det md5s as before.
+
+Screenshots (640x480, `--draw` in `T2_DRAW_FROM` windows, checked by eye, not committed; the drawn
+default run gives the undrawn det lines): **the Mantid Queen on the N64 stream** (168,000: her
+health bar at the top, the scorpion launcher's blast on her, health 133, 12 rounds), **the Mother
+with the stick** (211,500, `--stick-aim 1,2,3,4,5,6`: her body over the arena's grid, health 158)
+and **the good ending on the new default** (250,001: the END 2 cinema, Adon; 251,003 the credits,
+"TUROK 2 TEAM").
+
+Port tests: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (26,124 units, 0 mismatches,
+the archive and the ROM backend), `t2asset_typed_test` (1,585 checks, 0 errors), `gbi_test` (0
+mismatches), `t2os_test` (trace hash `2b2775877e0d226b` on 3 runs: g2's `t2os_stack_low` added),
+`t2audio_test --direct 0` and `--direct 40` (audio_compare: max difference 0), `t2audio_test
+--adec 0xC29AB4 7464` (27,136 samples), the swoosh self test (OK in every run) and the backend
+self test (LUS, miniz and ROM: 26,124 units, fnv1a64 `b26a3b2a8b834fa4`). The game archive is
+unchanged: `mkarchive.py` into a new directory gives sha1 `a9d14a47…`, `archive_check` OK (format
+2.0); `t2port.o2r` (the shaders) changed with g4's Metal patch (sha1 `638a7a5e…`). `mpk_saves.py`
+on the default run's pak: note 1, checksum OK.
+
+### Round 18, 3. Merge resolutions and fixes (round 18)
+
+| where | branches | resolution |
+|---|---|---|
+| `docs/port/STATUS.md` | all | each branch's section kept, in merge order (the same insertion point each time) |
+| `docs/port/PLAYTHROUGH.md` | g1, g5 | both appended a section 36: renumbered 36 (g1) and 37 (g5), references fixed; this merge is 38 |
+| `docs/port/FIDELITY.md` | g3 | `9-g3` renumbered 9; this merge is 10 |
+| `tools/port/fullrun.py` | g1, g5 | merged on their own: g1's `N64_*` tables, `n64_full()`, `r.seg_starts`, the level-2 weapon block and the Queen weapon beside g5's `STICK_PRIMARY`, `STICK_FREE_WALK`, `Route.walks`, `LAIR_PUSH` and the `lair` fight key; route files checked against each branch (below) |
+| `tools/port/aimdrive.py` | g2, g5 | merged on their own: g2's `fifo_watchdog` thread around the fifo opens, g5's Picker primary target and LairDrive push (`bm` on the move line, `r1` in the answer) |
+| `port/app/CMakeLists.txt` | g4 (merge fix) | `file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/t2port_shaders)`: a fresh Linux (ninja) build failed packing `t2port.o2r` |
+| `tools/port/playthrough.py`, `fullrun.py` | this merge | **the N64 stream is the default; `--legacy`** (section 1) |
+
+The fixes merged this round:
+
+| fix | where | found by | effect |
+|---|---|---|---|
+| **the stack-depth guards on the host stack** | `Collision_SweepRegionWalls`, `Path_ExpandNode`, `Automap_RevealRegion` -> `t2os_stack_low()` (port/runtime/t2os.c) | g2 (an `ld.so` start under `setarch -R`) | the N64 compared `&local` with its stack bottom (`D_800C894C`); the host compared a stack address with `.bss`: with the executable above the thread stacks the wall sweep stopped at its first region and the route went its own way |
+| **the OnScreen VM twin** | `func_00463B2C.c` (`CScene__LoadLevel_2`) passes `&gEngineApp_m_OnScreen` | g2 (f4's pattern) | no longer `gEngineApp_m_SwooshSystem - 0x1C8` on the host |
+| **the multiplayer camera pool head** | `CScene__BuildGeometryDisplayList` | g2, `n64viewcheck.py` gptr | read by name (the N64 reads it 0x1210 bytes before the difficulty; 0x1358 on the host) |
+| `CPlayer__ToggleLowerAmmo` | by name (`gEngineApp_m_Game_m_DebugLines`) | g2, gptr | not linked; fixed for when it is |
+| **the Metal shader** | `port/cmake/t2_shaders.cmake` (t2port.o2r) | g4 | the Mac app's default Metal window aborted at its first draw; OpenGL is now the default renderer anyway |
+| **the sound player's target bound** | `port/audio/t2audio_sndp.c` (`alSndpGetState`, `alSndpPlay`, the event post) | this merge (a drawn stick run on the N64 stream) | a target outside `0..maxSounds-1` (voice 16's `handles[16]`, the counter after the array; -1 after a deallocate) reads as stopped and posts nothing: it read 1.4 MB past the state array and crashed. An original-game out-of-range read (the N64 reads RAM there); no det line changed |
+| a clean exit on a bad archive | `port/app/main.cpp` | this merge (the clean-error checks) | `std::_Exit(1)` after "FAIL: T2Asset_OpenLus": the teardown of the half-opened LUS context crashed |
+
+Checks of the merge: after every merge step `asm_diff --base ab0bc24c` 0, the nested `TARGET_PORT`
+scan unchanged (no second host body: the 12 nested tests are the old import-ref boilerplate), the
+port built (Linux Release; g4's Mac code behind `__APPLE__`), and the default command's
+`playthrough.txt`/`teleport.env` byte-identical to ab0bc24c's (until the flip; then the plain
+command = g1's `--n64` and every `--legacy` combination = ab0bc24c's without `--legacy`, the
+level runs too). Route files against the branches: g1's `--n64` and g5's two combos (with and
+without `--lair-push`) byte-identical. ABI (`abicheck.py --build OUT/pie -j 4` on a fresh PIE
+build: 3,077 TUs, 11,781 calls, 11,130 checked): harmful direct sites **0**, indirect 1 (the
+known `Destructible_Hurt` store). `ptrdecls.py`: the strlen returns as before (5 lines, with
+the stray untracked `include/functions.h` moved away while it runs); `ptrargs.py` on the fresh
+build's log: 0 to retype; `outptr.py`: 0; `f2ucheck.py`: 79; `n64viewcheck.py` (linked files):
+raw BAD 10, stride BAD 3, view suspect 42, cast BAD 1 (the kept `CCamera__Construct` store), cast
+same 43, as in round 17, and gptr BAD 6 / untyped 15 / same 4 (g2's kind; the `--unlinked` sweep
+is 64BIT.md part 8's 25 BAD, judged there). `mklayout.py --check`: up to date. The N64 sound
+world's raw `core + 0x80` counter (`SndVoicePool_AllocVoice`, `func_00273504.c`) is not linked:
+the host's typed `t2audio_world.c` writes it by name (`padFC`).
+
+### Round 18, 4. Next
+
+1. **The ASLR divergence** (STABILITY.md 12.3): the bone matrices of actors 41/74/31 in 135 from
+   frame 72,746 (`func_0021CDAC.c`'s animation reads; `CCache__Request` keys perhaps truncated host
+   pointers); a third path before 38,997 in 1 of 22. `T2_DET_MTX`, `T2_DET_WATCH` and
+   `gdbwatch.py` are the tools.
+2. **The lair by stick** (g5: the stick shoots the Primagen's spawns half the time; his node as the
+   only target, his spawns last), and **the Mantid Queen by stick on the N64 stream** (1 life in the
+   combo above).
+3. **Sister 2 on real weapons** (`--real-weapons 1,2`: 134's ammo), then levels 3-6.
+4. **The rest of the n64cmp sweep** (FIDELITY.md 9.3: 135, 124, 114, 53, the hub with `--pad`, a
+   boss arena) and **the hub pad cut-scene's particle colours** (cinema 7601, RENDER.md 7.1).
+5. **macOS**: CoreAudio does not follow a change of the output device (MACOS.md 20.3); Developer
+   ID signing and notarisation; and **the first windowed session with a human and a real
+   gamepad** (OpenGL default, retina, `gT2RenderScale`).
+6. Doors and jumps as nav data (the walker stops at doors, gates, cages, crypts; ledges need a jump
+   edge and an `r1` answer).
+7. Still open: the obj-230 double fire and the Blind One's margin (round 14 c1), 119's moving
+   platforms (c2), `t2audio_test`'s game-path mode, soak.py on macOS, the lair peek (an N64
+   property), 125's actor 51 tilt (an uninitialised read in the original game: left as is); what
+   the N64 does when it stops voice 16 (it reads, and may post a stop for, a state far past the
+   sound player's array: the host now treats it as stopped, section 3; `n64trace.py --calls
+   alSndpGetState` would show the value it reads).
 
 ## Round 18, part g2: address-layout determinism, the gptr checker, the fifo watchdog (branch names-R18_g2)
 

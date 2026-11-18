@@ -568,3 +568,56 @@ so an intensity/alpha pair came out as a random saturated colour.
   EXPR is a hex address followed by `.OFF` steps, each following the pointer at (address + OFF),
   e.g. `801ee630.10.4` = the first vertex of the region of the actor at 0x801ee630.
 - `T2_SNDP_LOG=1` (port/audio/t2audio_sndp.c): the port's out-of-range sound player targets.
+
+## 12. The round-19 merge: the demos after the zero-fill, the ground tilt, the IA16 search (Phase 7 round 19, the merge C34)
+
+### 12.1 The demos against the N64's RAM
+
+Boot + attract with the merged Release build (26,000 frames, `--pak-blank`, no switch, `T2_DET_GF=1
+T2_DET_ACTORS=1`) against round 18's N64 traces (`n64trace.py`, `detdiff.py --shift 0 --skip
+rng`): **demo 1 (gf 1-1,128) and demo 3 (gf 1-344): no difference over the common game frames**,
+as in round 18. **Demo 2** (131): the player's health now differs from **gf 585** (the N64 and
+round 18's port 25,235, the merged port 25,165), 23 game frames before round 18's gf 608. Both are
+the same class (FIDELITY 6.3: the player's damage reads uninitialised heap bytes): h1's
+`CCache__AllocDecompressFlags` now gives zeros where the console has stale bytes, so this read
+moved. The boot's det lines differ from round 18's only there (`6ab97584…` no switch,
+`a08eb418…` with the three legacy switches; round 18 `197b2dd6…` / `3df81cf3…`).
+
+### 12.2 The ground tilt of 135 and 114 after the zero-fill
+
+`n64cmp.py run --warp -136 --level 135` and `--warp -115 --level 114` (`--gf 1-20 --brief --skip
+m_VarBuffer`, the merged PIE build): **the tilt still differs**, 135's LVL31 and 114's LVL5
+`m_qGround.x/.z` and `m_mfOrient` from gf 1 (4,438 and 1,138 differing members over gf 1-20; h2
+had 3,858 and 898). As 11.2 found, the N64's stale bytes there have a bit of 0xC0000 set (the
+identity branch) where the port, now reading zeros, computes the floor tilt: the zero-fill makes
+the port independent of the address layout, it cannot give the console's stale bytes. 125's
+actor 51 (9.2, the other way round: the N64 computed the tilt) is the case zeros should match;
+not re-measured.
+
+### 12.3 Other IA16 palettes (the Mother's arena walls)
+
+h2 left the arena's walls and floor olive on the port where the N64 draws them brown, with "an
+IA16 TLUT set by the arena's own display lists" as one lead. Searched:
+
+- **The game's C code**: the only `G_TT_IA16` is `Texture_Load`'s kind 3 (func_00206B30.c), which
+  h2's `t2tex.c` already expands.
+- **The ROM's data**: every unit of `turok2.o2r` (26,124, unpacked) scanned for F3DEX2
+  `G_SETOTHERMODE_H` commands that set the TLUT field: 3, all `G_TT_NONE`. Words shaped like
+  `G_RDPSETOTHERMODE` with the IA16 bits occur 313 times, 213 of them in the unit at ROM 0x20F194
+  (the code area: not a display list); none was confirmed as a display-list command.
+- The level geometry is not a ROM display list: the engine builds its display lists at run time
+  and loads every texture through `Texture_Load` (kinds 0, 1 and 3 in this arena, h2).
+
+So no second IA16 TLUT path exists for the walls; the olive is not a TLUT decode. The remaining
+leads are the recolour (whether the N64's requests for this arena's textures carry the top two
+bits that h2's fixed `Texture_DecompressCallback` now honours: an `n64trace.py --peek` of the
+`CCacheEntry.requestId` values at the arena's load) and the combiner/fog of the arena's materials.
+
+### 12.4 Shots
+
+The merged default run drawn (`--draw`, `T2_SHOT_EVERY=250` in four windows; its det lines equal
+the undrawn run's): the City Totem on the shredder (86,501-87,751: health 92 to 66 by the totem, a
+shielded attacker on the stairs), the cut-scene into the Mother's arena (204,602: the light
+shafts pale white-yellow, as on the N64 since h2), the Mother on the shredder (205,001), the
+arena after her (212,001), the Primagen's end and END 2 (252,251-255,503: the warp ring, Adon).
+The arena's walls and floor stay olive-green (12.3).

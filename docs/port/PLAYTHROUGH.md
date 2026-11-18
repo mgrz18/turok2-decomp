@@ -3814,3 +3814,105 @@ the N64 stream.
 crypts) instead of `T2_NAV_BOXES`' broad-phase boxes; walks after 135 (hub legs, levels 4-6) with
 a fight re-tune per walk; the route waiting at a door until its opener has fired (the doors table
 gives the actor).
+
+## 41. The round-19 merge: the default on the new stream, the City Totem on the shredder (Phase 7 round 19, the merge C34)
+
+Round 19 merged h1 (the level-135 ASLR divergence fixed: the actor blocks start zeroed, the bone
+wobble's phase is an N64 address), h2 (IA16 palettes, the recolour mode), h4 (macOS), h3 (39) and
+h5 (40). h1's zero-fill changes what the original game's uninitialised reads see, so the default
+route plays a new stream: STABILITY.md 13 measured END 2 with no life lost but **the City Totem
+at 97 damage, lowest health 3**. h3, h4 and h5 change no route file of the default command (its
+`playthrough.txt` and `teleport.env` at the merge were byte-identical to 65ec98ec's); the level
+runs' route files (`--fight 10`, `--level 2..6`, both streams) too.
+
+### 41.1 The default on the merged tree (before the re-tune)
+
+Two runs of the default command (Release, `aimdrive.py`, **ASLR on**: `setarch -R` is no longer
+needed): det md5 **`a9f9584e…`** in both (600,000 lines), = h1's; END 2, all five totems, 0 lives
+lost, 422 hits; the City Totem 52 hits, 97 damage, lowest health 3 (it enters 110 with 100: 132's
+five health +10 lift the 71 that 135 leaves). The merge's `SndQueue_Update` fix (a host pointer
+truncated to 32 bits, STATUS.md 3) and h2's texture fixes change no det line.
+
+### 41.2 The City Totem on the shredder (`N64_CITY_WEAPON`)
+
+The fight is the plasma rifle's (weapon 10, the route's default) with `T2_FACE_NEAREST` aims from
+`CITY_TOTEM_SPOT`. No health is reachable above 100 before it (132's ultra health lies in a damage
+region; 135's only one is taken at its start), so the margin has to come from the fight. The
+weapon is requested through `T2_WEAPON` and taken when 110 loads (`T2_GIVE_WEAPONS` applies the
+request to a new player only), so the request goes in 600 schedule frames before the totem's
+arrival, after 132's last load. Runs to 92,000 on the new stream:
+
+| City Totem weapon | hits | damage | lowest health | the fight ends |
+|---|---|---|---|---|
+| 10, the plasma rifle (h1) | 52 | 97 | 3 | 89,260 |
+| **9, the shredder** | **11** | **34** | **66** | **88,038** |
+| 15, the grenade launcher | 16 | 34 | 66 | 88,710 |
+
+`fullrun.py` now requests **the shredder for the City Totem on the N64 stream** (`n64_full()`,
+not with `--real-weapons 2`) and the plasma rifle again 200 frames before the hub
+(`N64_CITY_WEAPON`; `T2C34_CW=W` tries another, `T2C34_CW=` the plasma rifle). `--legacy` and the
+level runs are unchanged.
+
+### 41.3 The new default
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6
+```
+
+300,000 frames, four runs with ASLR on (two after 41.6's fix): det md5 **`0959aac5…`** in all
+(600,000 lines). **END 2,
+all five totems, 0 lives lost, 367 hits.** Timeline: the Harbor Totem 23,190, the City Totem
+87,348, the Marsh Totem 107,627, the Cave Totem 128,150, the Blind One 137,555, the Hive Totem
+163,374, the Mantid Queen 179,073, the Mother 212,950, the Primagen (cinema 370) 252,088, level 10
+(END 2) 255,080, the credits back to the hub 272,978. The thin spots now: 135's crypts 199 damage
+/ lowest 14, 133 (sister 1) 182 / 18, the lair 81 / 18; **the City Totem 34 / 66** (was 97 / 3),
+the Queen 54 / 78. 314 teleports, as before.
+
+**10 runs of the default to frame 84,000 with ASLR on: all 10 give `2361fb91…`** (168,000 lines,
+= the first 168,000 of the full run). Round 18 had 3 of 10 diverging in 135.
+
+### 41.4 The combinations on the new stream
+
+| options | result |
+|---|---|
+| (none) | **END 2 (level 10 at 255,080), 5 totems, no life lost**; md5 `0959aac5…` four times, ASLR on |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` (h3) | **4 lives at the Mantid Queen, game over** (no END); md5 `97ba9a2c…`, the same with h3's own tools (the merge did not change it: the stream did). h3's run, before h1, won the Queen with 43 damage |
+| the same with `T2H3_QR=250` (the Queen's threat radius) | 2 lives at the Queen, 1 in the lair |
+| the same with `--stick-boss 6` (the Queen by g5's aim, the lair by h3's) | END 2 (level 10 at 254,008), 5 totems, 1 life lost (the lair at 250,326); the Queen 100 damage, lowest 24; md5 `9d30dfe9…` |
+| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0` | END 2 (level 10 at 258,960), 5 totems, 1 life lost (the Blind One at 137,281); md5 `156a1cfd…` |
+| `--lair-push both` | END 2 (level 10 at 255,078), 5 totems, **no life lost**; md5 `71f75b30…` |
+
+So h3's boss aiming no longer carries the Queen on the zero-filled stream (with any threat radius
+tried); g5's aim there (`--stick-boss 6`) does, and the lair then costs a life by h3's aim. A
+re-tune of the Queen by stick is left (STATUS.md 4).
+
+The default run drawn (`--draw`, shots every 250 frames in four windows) gives the undrawn det
+lines exactly (`ee5ecb1f…` over its 512,200 lines = the default's first 512,200).
+
+### 41.6 A fault found by the save/load check
+
+Loading the default run's save from the title crashed the merged Release build in
+`GameNoteMenu_SelectYes`: clang copies the level flags into `gLoadSavePersistentData` with
+`movaps`, trusting the x86-64 ABI's 16-byte alignment of a typed extern array of 16 bytes or more,
+and `gendata.py` defines it `T2_ALIGN(4)`; the merged data layout put it at 8 mod 16 (round 18's
+at 0 by chance). It joins `gendata.py`'s `ALIGN16` (round 14 c5's list: `gControllers`, the batch
+pools); the new `tools/port/aligncheck.py BIN` lists aligned SSE accesses to globals that are not
+16-aligned in a built binary (here 1 real site before, 0 after; 0 in round 18's binary). The
+default's det lines are unchanged by the fix (two more runs: `0959aac5…`).
+
+On the old stream (`--legacy`, 290,000):
+
+| options | result |
+|---|---|
+| `--legacy` | END 2 (cinema 370 at 245,402, level 10 248,394), 5 totems, 2 lives lost (the City Totem); md5 **`281904eb…`** (= h1's) |
+| `--legacy --real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` (round 17 f5) | END 2 (cinema 370 at 243,610, level 10 246,602), 5 totems, **no life lost**; md5 `1cb91f3a…` (was `15d3d74f…`) |
+| `--legacy --real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --l2-heal --hub-wait 0` (g5) | END 2 (cinema 370 at 241,708, level 10 244,700), 5 totems, **no life lost**; md5 `8f1d5839…` (was `47614863…`) |
+
+### 41.5 The level runs and the boss recipes
+
+The level runs (`--fight 10`, `--level 2..6`, Release, `--pak-blank`, both streams) give round
+18's det lines exactly in levels 1, 2, 3, 4 and 6; level 5 (both streams) differs from frame
+18,916 in 124's particle hash only and ends on the same state (113, the Queen's door, the same
+actor hash at 33,000). The four boss recipes (legacy switches) give round 18's det lines exactly
+(so round 18's kills: the Mother at 28,775, the Blind One 23,103, the Queen 28,143, the Primagen
+43,586).
