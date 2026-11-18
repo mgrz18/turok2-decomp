@@ -36,6 +36,10 @@ STICK_PRIMARY = {5: (124, 94, 95, 96, 2), 6: (3, 4)}
 # (aimdrive.py T2_AIMD_BOSS=L:R): the Mantid Queen (2) and the Primagen's lair (4). --stick-boss "" turns it off.
 STICK_BOSS = {5: "2:%s" % os.environ.get("T2H3_QR", "150"), 6: "4:%s" % os.environ.get("T2H3_LR", "350")}
 STICK_BOSS_ON = None   # None: on the N64 stream only; else the set of route levels (--stick-boss)
+# Round 20 i2: the default on the N64 stream: the lair only. At the Queen the node rule never ended her step-5 wave
+# on the zero-filled stream (T2_AIM_NODE=boss gives the nearest live actor during a wave, here actor 20 eight units
+# from the player, never hurt; the rule has no IMMUNE switch): 4 lives, game over. g5's picker clears it
+STICK_BOSS_N64 = {6}
 LAIR_PUSH = ""       # round 18 g5: --lair-push toward|jump|both (T2_LAIR_PUSH; "" = off: the routes unchanged)
 ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
 NAV = set()         # round 16 e3: the levels whose NAV_WALKS teleports the waypoint walker replaces (--nav)
@@ -212,7 +216,7 @@ class Route:
                 env.append("T2_AIMD_PRIMARY=%s" % ",".join(str(l) for l in prim))
             if 6 in STICK_AIM:   # round 18 g5: the Mother's parts: always the assist's node (aimdrive.py)
                 env.append("T2_AIMD_PRIMARY_ONLY=3")
-            bl = (STICK_BOSS_ON if STICK_BOSS_ON is not None else set(STICK_BOSS) if n64_full() else set()) & STICK_AIM
+            bl = (STICK_BOSS_ON if STICK_BOSS_ON is not None else STICK_BOSS_N64 if n64_full() else set()) & STICK_AIM
             if bl:   # round 19 h3: the boss's node only, led, fire held on target (T2_AIMD_BOSS)
                 env.append("T2_AIMD_BOSS=%s" % ",".join(STICK_BOSS[lv] for lv in sorted(bl) if lv in STICK_BOSS))
         if self.move_drive:
@@ -1115,7 +1119,8 @@ L2_STRETCH_REAL = [(6, 6, 3000), (9, 3, 2000), (12, 15, 2000)]
 # 35; 134: 174, 26) but 135 is entered with no ammo left (weapon 0, the talons: 270 damage, a life). 132's ammo cache on
 # its east floor (y 409.6; tools/assets/levels.py objects 519 bullets, 521 shells, 534) at the start of 132's first visit
 # (segment 11, before soul gate 2), approach angles by itemreach.py; 135's graveyard zombies on the shotgun
-N64_L2_ARMS = {11: [(4117.3, 409.6, -3879.0, 2.3562), (3930.6, 409.6, -4099.4, 1.1781), (4226.8, 409.6, -3518.3, 1.5708)]}
+N64_L2_ARMS = {11: [(4117.3, 409.6, -3879.0, 2.3562), (3930.6, 409.6, -4099.4, 1.1781), (4226.8, 409.6, -3518.3, 1.5708)],
+               12: [(0.0, 0.0, -4864.0, -3.1416)]}   # 135: its shotgun (object 571, item 2008: shells), past door 59
 N64_L2_TAPS = {(12, 1): 8}
 N64_L2_135_HOLD = os.environ.get("T2I2_135HOLD", "1") != "0"
 
