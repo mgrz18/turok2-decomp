@@ -555,3 +555,13 @@ void Sched_HandleCmdMsg(T2Sched *sc) {
 
 /* gRefreshRate (globals/framebuffer.h): 50.0 or 60.0, set by CEngineApp__Main. */
 f32 t2_gRefreshRate;
+
+/* Round 20 i1: whether the OSTask the scheduler started (T2PortTask.task: &T2ScTask.list) is the
+ * last task of its frame (OS_SC_LAST_TASK 0x20, the swap). CEngineApp__SubmitGfxTask gives the
+ * frame's main task flags 3 when the automap's line list follows as a second task (0x23, the
+ * L3DEX2 microcode) into the same framebuffer: the app draws the two as one frame. */
+int T2Sched_TaskEndsFrame(const void *ostask) {
+    const T2ScTask *t = (const T2ScTask *) ((const u8 *) ostask - __builtin_offsetof(T2ScTask, list));
+
+    return ostask == NULL || (t->flags & 0x20) != 0;
+}
