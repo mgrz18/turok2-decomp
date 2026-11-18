@@ -544,3 +544,32 @@ context's bone index), `RumbleMenu_Play`/`_2` fixed (the window's player and con
 `Generator_SpawnObject` unreachable (no call and no pointer to it in the ROM), and
 `CStaticObject__Draw`/`RequestLitVertices` already right (every field they read is pinned to a
 `CStaticObject` member by `_Static_assert`).
+
+## Part 8 (Phase 7 round 18, g2): base-pointer arithmetic on data symbols (`n64viewcheck.py` gptr)
+
+f4 (round 17) found `func_0042EBBC(gEngineApp_m_SwooshSystem - 0x1C8)` in `CScene__LoadLevel`: the
+ROM reaches COnScreen as "0x1C8 bytes before the swoosh system", its N64 size; on the host the
+two symbols are not that far apart, and the boss-bar reset ran on the middle of COnScreen. None of
+the four existing kinds saw it: there is no cast, the base is an array that decays.
+
+- **The VM twin** `CScene__LoadLevel_2` (`func_00463B2C.c`, compile-only module 2) had the same
+  argument to `func_00467ADC`: now `&gEngineApp_m_OnScreen` under `TARGET_PORT` (asm_diff 0).
+- **The new kind `gptr`**: every `+`/`-` of a pointer type whose base is a file-scope variable
+  (`g` decayed, `&g`, `&g.m`, `&g[i]`, through casts) and whose other terms are constants, cast or
+  not. `BAD`: the byte offset leaves the symbol's host extent (negative, or past its end; one past
+  the end of a byte array is `same`: a stack top). `untyped`: inside the symbol (or its size is
+  unknown, `extern u8 g[]`) on a byte-wise base. `same`: a typed element offset inside an array.
+  Pointer *values* (`gPtr + C` on a pointer variable) are skipped. The offset is scaled by the
+  element type after the casts.
+- **The sweep** (`--unlinked`, 3,885 files): gptr BAD 25, untyped 29, same 1. Judged by hand:
+
+| Site | Linked? | Verdict |
+|---|---|---|
+| `CScene__BuildGeometryDisplayList` (`func_00221D3C.c`): `*(CCamera **)(&gEngineApp_m_Settings_difficulty - 0x1210)` | yes (multiplayer only) | **host bug**: the N64 reads `gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead`; on the host the two are 0x1358 apart. Fixed: the head by name |
+| `CPlayer__ToggleLowerAmmo` (`func_0025739C.c`): `*(s32 *)(&...multiplayer - 0x51)` | no (not referenced) | the N64 reads the automap's first word (`gEngineApp_m_Game_m_DebugLines.unk0`). Fixed by name |
+| `Primagen_EnterMode18` (`func_004075F8.c`): `gLevelScript_bossMode - 0xA`, `+8`, `+0xC` | yes | reviewed before (a run of scalars, same deltas on the host): fine |
+| `VM_Age` (`D_801206BC - 0xC..-4`), `VM_ManagerThread` (`gPager_readerStack - 0x230`) | no | the N64 pager (not run on the host) |
+| the `_2` VM twins (`Primagen_EnterMode7_2`, `Primagen_UpdateMode28_2`, `Primagen_EnterMode18_2`, `FinalScoreMenu_Poll_2`) | no | compile-only module 2 |
+| the menus' `gEngineApp_m_Settings + 0x1C..0x2D`, `gPakQueueState + 8`, the name strings `D_800A57B8 + 4` | some | untyped: offsets inside the symbol, or a string's second word |
+
+Run: `python3 tools/port/n64viewcheck.py --build BUILD -j 3 --unlinked | grep gptr`.
