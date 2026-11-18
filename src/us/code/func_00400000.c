@@ -4,6 +4,14 @@
 #include "protos/scene.h"
 
 extern u8 D_800C894C; /* bottom of the stack */
+#ifdef TARGET_PORT
+/* the N64 compares the stack pointer with its main stack's bottom; the host asks its own thread's
+ * stack (t2os_stack_low, port/runtime/t2os.c: the address comparison depended on the layout) */
+int t2os_stack_low(const void *local);
+#define T2_STACK_LOW(local, bottom) t2os_stack_low(local)
+#else
+#define T2_STACK_LOW(local, bottom) ((uptr) (local) < (uptr) (bottom))
+#endif
 extern CVector3 D_8011AAB4;
 
 #define NEAR(p) (((p)->x - D_8011AAB4.x) * ((p)->x - D_8011AAB4.x) + ((p)->z - D_8011AAB4.z) * ((p)->z - D_8011AAB4.z) < 167772.14f)
@@ -11,7 +19,7 @@ extern CVector3 D_8011AAB4;
 /* Marks the regions around the camera, recursing into neighbours that have
  * a corner within ~410 units of it. */
 void Automap_RevealRegion(CGameRegion *region) {
-    if (region == NULL || (uptr) &region < (uptr) &D_800C894C) {
+    if (region == NULL || T2_STACK_LOW(&region, &D_800C894C)) {
         return;
     }
     if (!(region->m_wFlags & 0x400)) {

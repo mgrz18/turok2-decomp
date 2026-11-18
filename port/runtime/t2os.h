@@ -121,6 +121,9 @@ int t2os_run_until_idle(void);
 /* Where game thread stacks come from (default: pthread's own). The port's low-memory bring-up
  * mode puts them below 2 GB (docs/port/LINK.md). Call before the first osCreateThread. */
 void t2os_set_stack_allocator(void *(*alloc)(size_t size));
+/* Nonzero when LOCAL (the address of a local) is within 64 KB of the current host thread's
+ * stack bottom: the host side of the game's stack-depth guards (round 18 g2). */
+int t2os_stack_low(const void *local);
 /* Diagnostics */
 typedef void (*t2os_trace_fn)(int event, OSId from, OSId to);
 void t2os_set_trace(t2os_trace_fn fn);

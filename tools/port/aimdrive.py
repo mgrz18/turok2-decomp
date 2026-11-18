@@ -31,7 +31,7 @@ frame: "cH" the C buttons (hex U 8, D 4, L 2, R 1), "z0"/"z1" fire, "r0"/"r1" ju
 --simple: the first controller (the observed error only, no prediction; round 15 d3's s1 run).
 --probe SX,SY: answer a constant stick instead (calibration: the pitch/yaw change per frame).
 """
-import math, os, shutil, subprocess, sys, tempfile
+import math, os, shutil, subprocess, sys, tempfile, threading, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from playthrough import TURN_FULL, STICK_DEAD, wrap, face_yaw  # noqa: E402
@@ -626,6 +626,39 @@ class WalkDrive:
         return sx, (C_U if go else 0)
 
 
+def fifo_watchdog(proc, d, opened):
+    """Round 18 g2: the driver opens the two fifos with blocking opens; a game that exits (or is
+    killed) before it opens them used to leave the driver waiting forever. This thread waits on the
+    child; if it exits before both fifos are open, it opens the other end of each (non-blocking) so
+    the driver's open returns and its read sees EOF. T2_AIM_OPEN_TIMEOUT=SECONDS also kills (SIGKILL:
+    the game ignores SIGTERM) a game that has not opened the fifos after that long."""
+    limit = float(os.environ.get("T2_AIM_OPEN_TIMEOUT", "0") or 0)
+    t0 = time.monotonic()
+    while not opened.is_set():
+        try:
+            proc.wait(timeout=0.2)
+            break
+        except subprocess.TimeoutExpired:
+            if limit > 0 and time.monotonic() - t0 > limit:
+                print("aimdrive: the game did not open the fifos in %.0f s: killing it" % limit, file=sys.stderr)
+                proc.kill()
+                proc.wait()
+                break
+    if opened.is_set():
+        return
+    print("aimdrive: the game exited (%s) before it opened the fifos" % proc.returncode, file=sys.stderr)
+    fds = []
+    while not opened.is_set():
+        for name, flags in (("out", os.O_WRONLY), ("in", os.O_RDONLY)):
+            try:
+                fds.append(os.open(os.path.join(d, name), flags | os.O_NONBLOCK))
+            except OSError:   # ENXIO: nobody is waiting on the read side yet
+                pass
+        opened.wait(0.05)
+    for fd in fds:
+        os.close(fd)
+
+
 def main():
     args = sys.argv[1:]
     probe = None
@@ -660,6 +693,8 @@ def main():
                 shutil.copy("turok2.cfg.json", home)
             env["SHIP_HOME"] = home
     proc = subprocess.Popen(cmd, env=env)
+    opened = threading.Event()
+    threading.Thread(target=fifo_watchdog, args=(proc, d, opened), daemon=True).start()
     n = 0
     aim = SimpleAim() if simple else Aim()
     picker = Picker() if PICK and not probe else None
@@ -670,6 +705,7 @@ def main():
     moves = 0
     try:
         with open(os.path.join(d, "out")) as fin, open(os.path.join(d, "in"), "w") as fout:
+            opened.set()
             for line in fin:
                 if line.startswith("move ") and walk.plan:   # T2_WALK_PLAN: the waypoint walker
                     fl = line.split()
@@ -714,6 +750,7 @@ def main():
                             "%d:%.0f:%d%s" % (c[0], math.hypot(c[1] - ex_, c[3] - ez_), c[4], {0: "t", 2: "a"}.get(c[5], ""))
                             for c in cs), "" if tot is None else " tot %d %ds %d/%d" % tot))
     finally:
+        opened.set()
         rc = proc.wait()
         if walk.cur is not None:
             walk.finish(walk.cur[1], 0.0, 0.0)
