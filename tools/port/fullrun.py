@@ -39,6 +39,9 @@ STICK_BOSS_ON = None   # None: on the N64 stream only; else the set of route lev
 LAIR_PUSH = ""       # round 18 g5: --lair-push toward|jump|both (T2_LAIR_PUSH; "" = off: the routes unchanged)
 ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
 NAV = set()         # round 16 e3: the levels whose NAV_WALKS teleports the waypoint walker replaces (--nav)
+NAV_PAD = 0         # round 19 h5 (--nav-pad F): F idle frames after each walk window (the later steps move by
+                    # them too): the re-tuning knob for the fights a walk disturbs (as --hub-wait for level 2)
+NAV_JUMPS = False   # round 19 h5 (--nav-jumps): the walks plan with nav.py's jump edges and press R at them
 NAV_ROM = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "baserom.us.z64")
 
 
@@ -94,8 +97,8 @@ class Route:
         sub (round 16 e3, --nav): the sub-level; the walk is then aimdrive.py's waypoint walker, closed
         loop from where the player really is, in a window of nav_frames() frames."""
         if sub is not None:
-            n = nav_frames(sub, frm, (x, y, z), ry)
-            self.walk_plan.append((f, f + n - 1, sub, x, y, z, ry))
+            n = nav_frames(sub, frm, (x, y, z), ry) + NAV_PAD
+            self.walk_plan.append((f, f + n - 1, "%d%s" % (sub, "j" if NAV_JUMPS else ""), x, y, z, ry))
             self.move_drive.append((f, f + n - 1))
             self.note(f, "%d: walk to (%.0f, %.0f) [%d frames]" % (sub, x, z, n))
             self.walked += 1
@@ -215,7 +218,7 @@ class Route:
         if self.move_drive:
             env.append("T2_MOVE_DRIVE=\"%s\"" % ";".join("%d-%d" % w for w in sorted(self.move_drive)))
         if self.walk_plan:   # round 16 e3: aimdrive.py's waypoint walker (WalkDrive)
-            env.append("T2_WALK_PLAN=\"%s\"" % ";".join("%d-%d@%d:%.1f,%.1f,%.1f,%.4f" % w for w in self.walk_plan))
+            env.append("T2_WALK_PLAN=\"%s\"" % ";".join("%d-%d@%s:%.1f,%.1f,%.1f,%.4f" % w for w in self.walk_plan))
         if self.anchors:
             env.append("T2_ANCHOR=\"%s\"" % ";".join("%s@%d" % (l, f) for f, l in sorted(self.anchors, key=lambda a: a[0])))
         if self.saves:
@@ -393,7 +396,7 @@ def nav_frames(sub, frm, to, ry_end=None):
     import nav
     y0 = frm[3] if len(frm) > 3 else to[1]
     try:
-        res = nav.load(NAV_ROM, sub).path((frm[0], y0, frm[1]), tuple(to))
+        res = nav.load(NAV_ROM, sub, NAV_JUMPS).path((frm[0], y0, frm[1]), tuple(to))
     except Exception:
         res = None
     pts = res[0] if res else [(frm[0], frm[1]), (to[0], to[2])]
@@ -1511,7 +1514,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
     global LAIR_PUSH
-    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_SOUND, N64_FROM, LAIR_KEEP, L2_HEAL
+    global NAV, NAV_ONLY, NAV_JUMPS, NAV_PAD, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_SOUND, N64_FROM, LAIR_KEEP, L2_HEAL
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1531,6 +1534,9 @@ def cli(argv=None):
                     "walked by the closed-loop waypoint walker (run under tools/port/aimdrive.py; round 16 e3)")
     ap.add_argument("--nav-only", default=None, help="L:I.J,...: with --nav, only these walks (level, segment, "
                     "step), NAV_SKIP's included")
+    ap.add_argument("--nav-pad", type=int, default=0, help="with --nav: idle frames after each walk window (round 19 h5)")
+    ap.add_argument("--nav-jumps", action="store_true", help="with --nav: plan with nav.py's jump edges (ledges, "
+                    "gaps) and let the walker press R at them (round 19 h5)")
     ap.add_argument("--talismans", nargs="?", const="2,3", default="",
                     help="the talisman chambers of these levels (default 2,3; round 13 b3)")
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
@@ -1602,6 +1608,8 @@ def cli(argv=None):
     STICK_AIM = {int(x) for x in a.stick_aim.split(",") if x}
     LAIR_PUSH = a.lair_push
     NAV = {int(x) for x in a.nav.split(",") if x}
+    NAV_JUMPS = a.nav_jumps
+    NAV_PAD = a.nav_pad
     if a.nav_only is not None:
         NAV_ONLY = {tuple(int(v) for v in k.replace(":", ".").split(".")) for k in a.nav_only.split(",") if k}
     ASSIST_KEEP = [x for x in a.assist_keep.split(",") if x]

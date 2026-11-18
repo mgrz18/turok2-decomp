@@ -606,6 +606,17 @@ WALK_STUCK = 36         # frames of C-up with under WALK_STUCK_D units moved: st
 WALK_STUCK_D = 25.0
 WALK_BACK, WALK_SIDE = 10, 24   # the recovery: C-down frames, then sidestep frames
 WALK_BLOCK = 50.0       # a stuck point becomes a box this half-wide, this far ahead of him
+# round 19 h5: the jumps (a plan entry "F1-F2@SUBj:..." plans with nav.py's jump edges): R is pressed
+# WALK_JUMP_AT units before a jump or gap edge while he faces it (C-up held), for WALK_JUMP_HOLD frames;
+# stuck with jumps on, every other recovery is a jump forward instead of the back-off
+WALK_JUMP_AT = 70.0
+WALK_JUMP_FACE = 0.35
+WALK_JUMP_HOLD = 8
+# round 19 h5: doors (nav.doors: level actors of type 0x641 and their openers): stuck within WALK_DOOR_R of a
+# door, the walker waits WALK_DOOR_WAIT frames facing it and walks on, instead of backing off and planning
+# round it (a door is not an obstacle to go round: it opens, on its own or when its opener fires)
+WALK_DOOR_R = 160.0
+WALK_DOOR_WAIT = 30
 
 
 def walk_plan(spec):
@@ -616,7 +627,8 @@ def walk_plan(spec):
         win, rest = part.split("@")
         lvl, pt_ = rest.split(":")
         a, b = (int(v) for v in win.split("-"))
-        out.append((a, b, int(lvl), tuple(float(v) for v in pt_.split(","))))
+        jumps = lvl.endswith("j")   # round 19 h5: plan with the jump edges, press R at them
+        out.append((a, b, int(lvl.rstrip("j")), tuple(float(v) for v in pt_.split(",")), jumps))
     return out
 
 
@@ -636,6 +648,11 @@ class WalkDrive:
         self.done = None         # the frame the goal was reached
         self.report = []
         self.extra = []
+        self.jpts = []
+        self.jhold = 0           # round 19 h5: frames of R left
+        self.njumps = 0
+        self.dwait = 0           # round 19 h5: frames left waiting at a door
+        self.dseen = {}          # door actor -> frames waited
 
     def active(self, frame):
         for e in self.plan:
@@ -648,7 +665,7 @@ class WalkDrive:
         try:
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
             import nav
-            n = nav.load(self.rom, self.cur[2])
+            n = nav.load(self.rom, self.cur[2], len(self.cur) > 4 and self.cur[4])
             base = n.boxes
             n.boxes = base + self.extra    # the places he got stuck at, as obstacles
             try:
@@ -660,19 +677,39 @@ class WalkDrive:
             res = None
         self.pts = res[0][1:] if res else [(g[0], g[2])]
         self.plen = res[2] if res else math.hypot(g[0] - px, g[2] - pz)
+        self.jpts = list(res[3]) if res and len(res) > 3 else []   # round 19 h5: (x, z, kind, edge)
         self.wi = 0
         self.hist = []
+
+    def door_near(self, px, pz):
+        """Round 19 h5: the nearest door (nav.doors) within WALK_DOOR_R of the player, or None."""
+        try:
+            import nav
+            ds = nav.doors(self.rom, self.cur[2])
+        except Exception:
+            return None
+        best = None
+        for d in ds:
+            if abs(d["pos"][1] - self.py) > nav.DOOR_DY:
+                continue
+            dd = math.hypot(d["pos"][0] - px, d["pos"][2] - pz)
+            if dd < WALK_DOOR_R and (best is None or dd < best[0]):
+                best = (dd, d["actor"])
+        return best[1] if best else None
 
     def finish(self, frame, px, pz):
         if self.cur is None:
             return
         g = self.cur[3]
         err = math.hypot(g[0] - px, g[2] - pz)
-        self.report.append("walkdrive: %d-%d level %d -> (%.0f, %.0f): %s, %d stuck, %d waypoints %.0f units; "
+        self.report.append("walkdrive: %d-%d level %d -> (%.0f, %.0f): %s, %d stuck, %d waypoints %.0f units%s; "
                            "error %.0f at the window's end" % (
                                self.cur[0], self.cur[1], self.cur[2], g[0], g[2],
                                "arrived at %d" % self.done if self.done else "NOT ARRIVED",
-                               self.stucks, self.npts, self.plen0, err))
+                               self.stucks, self.npts, self.plen0,
+                               (", %d jumps planned, %d pressed" % (self.njp0, self.njumps) if len(self.cur) > 4 and self.cur[4] else "") +
+                               "".join(", waited %d at door %d" % (w, k) for k, w in sorted(self.dseen.items())),
+                               err))
         print(self.report[-1], file=sys.stderr)
         self.cur = None
 
@@ -697,8 +734,9 @@ class WalkDrive:
             self.finish(frame, px, pz)
             self.cur, self.state, self.stucks, self.done, self.sent, self.rec = e, "go", 0, None, [], 0
             self.extra = []
+            self.jhold, self.njumps, self.dwait, self.dseen = 0, 0, 0, {}
             self.replan(px, py, pz)
-            self.npts, self.plen0 = len(self.pts), self.plen
+            self.npts, self.plen0, self.njp0 = len(self.pts), self.plen, len(self.jpts)
         ans = self._step(frame, px, pz, ry)
         if e[1] == frame:
             self.finish(frame, px, pz)
@@ -706,11 +744,20 @@ class WalkDrive:
 
     def _step(self, frame, px, pz, ry):
         g = self.cur[3]
+        jumps = len(self.cur) > 4 and self.cur[4]
+        if self.jhold > 0:   # round 19 h5: a jump in the air: R and C-up held, the stick still steering
+            self.jhold -= 1
+            tx, tz = self.pts[self.wi] if self.pts else (g[0], g[2])
+            sx, _ = self.turn(ry, face_yaw(px, pz, tx, tz))
+            return sx, C_U, 1
         if self.state == "face" or math.hypot(g[0] - px, g[2] - pz) < WALK_ARRIVE:
             if self.state != "face":
                 self.state, self.done = "face", frame
             sx, err = self.turn(ry, g[3])
             return (sx if abs(err) > WALK_FACE else 0), 0
+        if self.dwait > 0:   # round 19 h5: at a closed door: stand, then walk on
+            self.dwait -= 1
+            return 0, 0
         if self.rec > 0:   # stuck: back off, then sidestep
             self.rec -= 1
             return 0, (C_D if self.rec >= WALK_SIDE else self.side)
@@ -719,17 +766,38 @@ class WalkDrive:
         tx, tz = self.pts[self.wi]
         sx, err = self.turn(ry, face_yaw(px, pz, tx, tz))
         go = abs(err) < WALK_GO
+        if jumps and self.jpts and go:
+            jx, jz = self.jpts[0][:2]
+            dj = math.hypot(jx - px, jz - pz)
+            # a jump edge just ahead (or one he walked past: drop it)
+            if len(self.jpts) > 1 and math.hypot(self.jpts[1][0] - px, self.jpts[1][1] - pz) < dj:
+                self.jpts.pop(0)
+            elif dj < WALK_JUMP_AT and abs(wrap(face_yaw(px, pz, jx, jz) - ry)) < WALK_JUMP_FACE + math.pi / 2:
+                self.jpts.pop(0)
+                self.jhold = WALK_JUMP_HOLD - 1
+                self.njumps += 1
+                self.hist = []
+                return sx, C_U, 1
         if go:
             self.hist.append((frame, px, pz))
             old = [h for h in self.hist if frame - h[0] >= WALK_STUCK]
             if old and math.hypot(px - old[-1][1], pz - old[-1][2]) < WALK_STUCK_D:
                 self.stucks += 1
+                self.hist = []
+                door = self.door_near(px, pz)
+                if door is not None:   # round 19 h5: a door: wait for it, do not go round it
+                    self.dwait = WALK_DOOR_WAIT
+                    self.dseen[door] = self.dseen.get(door, 0) + WALK_DOOR_WAIT
+                    return 0, 0
+                if jumps and self.stucks % 2 == 1:   # round 19 h5: try a jump forward first
+                    self.jhold = WALK_JUMP_HOLD - 1
+                    self.njumps += 1
+                    return sx, C_U, 1
                 self.rec = WALK_BACK + WALK_SIDE
                 # what stopped him: an obstacle WALK_BLOCK wide just ahead (the next plan goes round it)
                 fx, fz = px - math.sin(ry) * WALK_BLOCK, pz - math.cos(ry) * WALK_BLOCK
                 self.extra.append((fx - WALK_BLOCK, fx + WALK_BLOCK, fz - WALK_BLOCK, fz + WALK_BLOCK, -1e9, 1e9))
                 self.side = C_R if self.side == C_L else C_L
-                self.hist = []
                 self.pending = True
                 return 0, C_D
             self.hist = [h for h in self.hist if frame - h[0] <= WALK_STUCK + 4]

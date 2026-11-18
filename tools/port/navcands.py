@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """Round 16 e3: every teleport of a default --all run, classified for the waypoint walker.
 
-    navcands.py ROM RUNLOG [--table]   # RUNLOG: a default --all run's log with T2_DET_LOG=1
+    navcands.py ROM RUNLOG [--table] [--jumps]   # RUNLOG: a default --all run's log with T2_DET_LOG=1
 
 For each "teleport:" line, the sub-level it fired in (the det line before it), where the player stood and
 faced (the det line) and where it put him; then the walk the navigation mesh finds between the two
 (tools/port/nav.py) and the route step it belongs to (levels 1-4: the segment lists fullrun.py plays;
 a teleport matching no step is a pick: a key, health, a weapon, a hub key slot).
---table prints fullrun.NAV_WALKS's entries (the route steps with a path) instead."""
+--table prints fullrun.NAV_WALKS's entries (the route steps with a path) instead. --jumps (round 19 h5):
+the mesh with nav.py's jump edges (ledges, gaps); a path then counts its jumps. Round 19 h5 also names
+the doors (nav.doors: level actors of type 0x641 and what opens them) within DOOR_NEAR of each path.
+--level L: only the teleports of game level L (0 = the hub and the rest)."""
 import collections, math, os, re, struct, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -34,6 +37,8 @@ def game_level(sub):
 def main():
     rom, log = sys.argv[1], sys.argv[2]
     table = "--table" in sys.argv
+    jumps = "--jumps" in sys.argv
+    only = int(sys.argv[sys.argv.index("--level") + 1]) if "--level" in sys.argv else None
     tps = []
     for l in open(log, errors="replace"):
         m = re.match(r"teleport: frame (\d+) player \(([-\d. ]+)\) -> \(([-\d. ]+)\)", l)
@@ -54,6 +59,8 @@ def main():
     for f, a, b in tps:
         sub, ry = det.get(f, (0, 0.0))
         glv = game_level(sub)
+        if only is not None and glv != only:
+            continue
         count[glv] += 1
         d = math.hypot(a[0] - b[0], a[2] - b[2])
         hit = None
@@ -64,10 +71,14 @@ def main():
         if hit:
             used.add(hit)
         try:
-            res = nav.load(rom, sub).path(tuple(a), tuple(b)) if sub else None
+            res = nav.load(rom, sub, jumps).path(tuple(a), tuple(b)) if sub else None
         except Exception:
             res = None
-        kind = "path %.0f (%d wp)" % (res[2], len(res[0])) if res else "no path"
+        kind = "path %.0f (%d wp%s)" % (res[2], len(res[0]), ", %d jumps" % len(res[3]) if res[3] else "") if res else "no path"
+        if res and hasattr(nav, "doors_on"):
+            ds = nav.doors_on(rom, sub, res[0], a[1])
+            if ds:
+                kind += "; doors " + ", ".join("%d (%s)" % (d["actor"], nav.opener_text(d)) for d in ds)
         if res and res[2] < 8000:
             walkable[glv] += 1
         if table:
