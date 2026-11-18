@@ -472,3 +472,93 @@ colour against the template's before the hue shift.
   multiplayer camera head is not read in a single-player game, so no N64-facing number moved.
 - Not done this round (FIDELITY.md 9.3): the rest of the n64cmp sweep (135, 124, 114, 53, the hub
   with `--pad`, a boss arena) and the 7601 particle colours.
+
+## 11-h2. The n64cmp sweep, the 7601 colours, the sound player's voice 16 (Phase 7 round 19, part h2)
+
+Release build at 65ec98ec plus this part's commits; `n64cmp.py run --warp -(L+1) --level L --gf
+1-20 --brief --skip m_VarBuffer` (seed at the load and at gf 1, ticks 2, port `--audio --draw`), as
+in sections 7-9.
+
+### 11-h2.1 The sweep
+
+| level | differing members (gf 1-20) | what differs | verdict |
+|---|---|---|---|
+| 135 | 3,858 | **LVL31 (type 101) and LVL33 (type 102)**: `m_qGround`, `m_mfOrient`, the bounds (the port's tilt 16 times the N64's); particle slot 1 (type 226) one frame early on the port; the known representation members (`unk_100`, `unk_1A4`, `unk_18E54`, `m_Data[5]`, `m_MenuPool`) | 9.2's class, not a host bug (11-h2.2) |
+| 124 | 7,085 | particle type 226 spawned one game frame earlier on the port (gf 1 against gf 2), so the particle slots and lists shift from there; the representation members | load timing (7.4's static-event timer phase), not a host bug |
+| 114 | 898 | **LVL5**: the same ground tilt as 135; the representation members | 9.2's class |
+| 53 | 4,282 | particle 0's spawn (position, velocity, attach point) from gf 1; slot lists | load timing, as in 7.4 |
+| 60, the hub after walking | 34 at gf 250 and 300 | both sides walk forward (N64 `--pad 700-900:8`, the port `--input CU@1404..1804`: C-up, the stick only looks) to the same spot (x -44.6486, z -123.6992 on both at gf 250); only LVL25's `m_AI.m_ModeTime` / `m_AnimRepeatedCount` (an idle timer started at another frame) and the representation members. A first try with the stick (which only looks) left the players at the spawn with different views: then 24 actors' drawn flags and draw matrices differed, which is the view, not a bug | equal |
+| 2, the Mantid Queen's arena | gf 1 equal; 4,251 over gf 1-20 | from gf 2 the N64's player and actors advance 12.87 time units in one frame (`m_FrameIncrementScaled`), the port 0.25: the arena's intro steps by elapsed time on the N64 (a long emulated frame), as a cinema does (RENDER.md 7.1) | timing, not a host bug |
+| 3 from 7601 (the Mother's arena) | 12,147 over gf 1-60 | the cut-scene runs on `osGetTime`, so cameras and animation times part from gf 2; no particle is live on either side at gf 1-175 | see 11-h2.3 for the colours |
+
+The representation members are the same bytes in another order (u8 arrays that hold a word or an
+f32: `unk_1A4` is `Render.unk14`, an f32: N64 bytes 3D CC 00 00, host 00 00 CC 3D), as 7.1 says.
+
+### 11-h2.2 The ground tilt of 135's LVL31/33 and 114's LVL5: the uninitialised AI flags again
+
+`n64trace.py --calls GameObject_GetGroundRotation,CGameRegion__GetNormal,CVector3__Normalize`
+around the load of 135 shows what 9.2 found for 125's actor 51, the other way round: the first
+call (from `CGameObjectInstance__Construct`, before the AI is set up) takes the identity branch on
+the N64 (its stale `m_AI.m_dwFlags` have a bit of 0xC0000 set) and computes the floor tilt on the
+port; the second call (`func_0021A500`, the same on both: same region, same three vertices,
+checked with the new `--peek`, same normal y 0.99996269) slerps `m_qGround` toward the tilt by
+`gFrameIncrement * 0.125` = 1/16. So the N64 ends at 1/16 of the tilt, the port at the whole tilt.
+An original-game read of uninitialised cache memory, left as is (as 9.2): placed objects on a
+slightly sloped floor lean by up to 0.1 degree more on the port.
+
+### 11-h2.3 The 7601 cut-scene's colours: two host bugs, one fixed visibly
+
+RENDER.md 7.1 put the multicoloured light shaft and the cyan mist of the hub pad's cut-scene
+(warp 7601, the Mother's arena) on the particle sprites. The dumps show no live particle on either
+side at those frames; the shaft and the mist are textures of **kind 3**, CI4 texels with an IA16
+palette (`Texture_Load`, func_00206B30.c: `gDPSetTextureLUT(G_TT_IA16)`; 4 such textures load in
+this scene). libultraship's Fast3D decodes every CI palette as RGBA5551 and ignores the TLUT type,
+so an intensity/alpha pair came out as a random saturated colour.
+
+- **Fix** (`port/game/t2tex.c`, `func_00206B30.c` under `TARGET_PORT`, asm_diff 0): kind 3 loads
+  its texels expanded to an IA16 image (each CI4 index replaced by its palette entry: the same
+  intensity and the full 8-bit alpha) as `G_IM_FMT_IA` 16b, `G_TT_NONE`. Fast3D caches textures
+  by address, so each (texels, palette) pair keeps its own buffer, and new bytes at the same
+  addresses get a new buffer (never an old address with new contents). Shots (port frame 1701 /
+  N64 emulator frame 690, gf 64/65; port 1925 / N64 779): the shaft is now the pale white-yellow
+  cone the N64 draws and the mist dark grey, where they were cyan, green, magenta and blue.
+- **Still different**: the arena's walls and floor are olive-green on the port and brown on the
+  N64 (Rice). The scene light is the same on both (`gSceneLights` ambient 56,56,56, colour 255,
+  white, direction -80,57,-68: `--peek` against a port print), so the lead is the walls' palettes
+  (kinds 0/1, RGBA16) or the combiner/fog, not the game state.
+- **A second host bug found on the way** (`Texture_DecompressCallback`, func_00206990.c, asm_diff
+  0): the callback gets the `CCacheEntry` being completed and read the recolour mode (the top two
+  bits of the ROM address, `requestId`) at N64 offset 8, on the host the high half of
+  `referencedMemEntry` (0): **the port never recoloured a texture**. It now reads `requestId` at
+  its host offset, and recolours the TLUT entries big-endian (they stay in RDP byte order, swap
+  spec "rdp"; a host u16 access would have taken the green/blue byte for red). No texture loaded
+  in the scenes checked here asks for a recolour (all 68 requests of the 7601 run have the top bits
+  clear), so no shot changed; whatever does will now get the N64's colours.
+
+### 11-h2.4 The sound player's out-of-range targets (what the N64 reads)
+
+`alSndpGetState` (func_00293580) returns `sndState[target].state`, the word at sndState + target *
+0x30 + 0x28, with the target an s32 sign-extended from the s16 sound id. `n64trace.py --sndp`
+(new) breaks on `alSndpGetState`/`alSndpStop`, prints the calls whose target is outside
+0..maxSounds-1 and the word a target of -1 would read; `T2_SNDP_LOG=1` prints the port's.
+
+- **The port** (the default run, 300,000 frames): 140 calls with target -1 (`StopSoundsByFlags`
+  at level loads, through `Cinema_Start`/`CScene__LoadLevel`, stopping a voice of the group whose
+  handle was already freed) and 4 with voice 16's `handles[16]`, the u16 sound count after the
+  handle array: 18,400, 18,441, 20,873 and 21,728 (the crash of the round-18 merge).
+- **The N64**: sndState is 0x807740D0 (in the audio heap, a cache block allocated at boot). The word
+  a target of -1 reads (sndState - 8, the end of the block allocated before it) is 0 on every call
+  of a level 53 run with its sounds, gunfire and a load (emulator frames 600-1,500): AL_STOPPED, no
+  stop posted. A count of 11,942..32,767 puts the address past the end of the 8 MB of RDRAM, where
+  the read gives 0 (the emulator: no memory there), so voice 16 late in a game is stopped too; only
+  a count below 11,942 or above 32,767 would read game memory on the N64.
+- So the port's guard (round-18 merge: a target outside the array reads as stopped and posts
+  nothing) gives the N64's result in every case the default run reaches; the comment in
+  `port/audio/t2audio_sndp.c` now says so. No code change.
+
+### 11-h2.5 Tools
+
+- `n64trace.py --sndp` (above) and `--peek LEVEL:GF:EXPR:N[;...]`: N words of RDRAM at a game frame;
+  EXPR is a hex address followed by `.OFF` steps, each following the pointer at (address + OFF),
+  e.g. `801ee630.10.4` = the first vertex of the region of the actor at 0x801ee630.
+- `T2_SNDP_LOG=1` (port/audio/t2audio_sndp.c): the port's out-of-range sound player targets.

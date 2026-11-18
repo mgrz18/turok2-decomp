@@ -277,6 +277,42 @@ the host's typed `t2audio_world.c` writes it by name (`padFC`).
    sound player's array: the host now treats it as stopped, section 3; `n64trace.py --calls
    alSndpGetState` would show the value it reads).
 
+## Round 19, part h2: the n64cmp sweep, the 7601 colours, voice 16 (branch names-R19_h2)
+
+- **The sweep** (FIDELITY.md 11-h2.1): 135, 124, 114, 53, the hub after walking (C-up on both
+  sides to the same spot) and the Mantid Queen's arena (level 2) against the N64 with `n64cmp.py
+  run`. **No new host bug in the game state**: the hub after walking is equal but for one idle
+  timer; 124/53 differ by the particle spawn frame (load timing, as in round 17); 135's LVL31/33
+  and 114's LVL5 lean 16x more on the port: the round-18 class (the first ground-tilt call reads
+  uninitialised AI flags; the N64 then slerps 1/16 of the way, the port starts at the whole tilt;
+  FIDELITY.md 11-h2.2); the arena's intro steps by elapsed time on the N64 from gf 2.
+- **The 7601 cut-scene colours: a render host bug fixed** (11-h2.3): the light shaft and the mist
+  are kind-3 textures (CI4 with an IA16 palette); libultraship decodes every CI palette as
+  RGBA5551, hence cyan/green/magenta. `Texture_Load` (func_00206B30.c, TARGET_PORT) now loads them
+  expanded to IA16 (`port/game/t2tex.c`, new): the shaft is white-yellow and the mist dark grey as
+  on the N64. The arena's olive walls (brown on the N64) stay open (the scene light is equal).
+- **A second host bug fixed** (11-h2.3): `Texture_DecompressCallback` (func_00206990.c) read the
+  recolour mode through an N64-offset view of the `CCacheEntry`, so the port never recoloured a
+  texture; it now reads `requestId` at its host offset and recolours the TLUT big-endian. No
+  texture in the scenes checked asks for a recolour (no shot changed).
+- **Voice 16 / target -1** (11-h2.4): what the N64 reads is 0 in every case the default run reaches
+  (sndState[-1].state is a zero word before the array; counts 11,942-32,767 read past the end of
+  RDRAM), so the round-18 guard matches it; comment updated, no code change.
+- **Tools**: `n64trace.py --sndp`, `--peek LEVEL:GF:EXPR:N` (with pointer steps), `T2_SNDP_LOG=1`.
+- **Runs** (this branch, Release, `setarch -R`, `T2_DET_LOG=1`): see the table below. The fixes are
+  render-only (a texture's upload and a callback that never ran), so no det line can change.
+- Files: `src/us/code/func_00206B30.c`, `src/us/code/func_00206990.c` (asm_diff 0 against
+  65ec98ec), `port/game/t2tex.c` (new), `port/audio/t2audio_sndp.c` (log + comment),
+  `tools/port/n64trace.py`, docs (FIDELITY.md 11-h2, RENDER.md 7.1 row, this section).
+
+| commit | what |
+|---|---|
+| 12e2317f | `n64trace.py --sndp`, `T2_SNDP_LOG` |
+| 3665cb98 | the sound player guard: what the N64 reads (comment) |
+| 596c09b7 | `n64trace.py --peek` |
+| 86c9f8dd | `Texture_DecompressCallback`: the recolour mode at the host offset, the TLUT recoloured big-endian |
+| b3bd6e0c | `Texture_Load` kind 3 as IA16 (`port/game/t2tex.c`) |
+
 ## Round 18, part g2: address-layout determinism, the gptr checker, the fifo watchdog (branch names-R18_g2)
 
 - **A layout-dependent branch found and fixed** (STABILITY.md 12.1): the three N64 stack-depth
