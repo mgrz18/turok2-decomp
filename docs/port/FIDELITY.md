@@ -621,3 +621,80 @@ shielded attacker on the stairs), the cut-scene into the Mother's arena (204,602
 shafts pale white-yellow, as on the N64 since h2), the Mother on the shredder (205,001), the
 arena after her (212,001), the Primagen's end and END 2 (252,251-255,503: the warp ring, Adon).
 The arena's walls and floor stay olive-green (12.3).
+
+## 13-i1. The render sweep, part 1: the Mother's arena walls, the menu texts, the automap (Phase 7 round 20, part i1)
+
+### 13-i1.1 The Mother's arena walls: the packed vertex colour offsets (fixed)
+
+- **The recolour lead is closed**: `n64trace.py --start-warp 7601@600 --calls
+  Texture_DecompressCallback --args a1:CCacheEntry:requestId:x` (n64trace now knows
+  `structs/cache.h`): the N64's 54 texture loads of the scene all have the top two bits clear, as
+  the port's. No texture of the arena is recoloured on either machine.
+- **The colours come from the vertices**: the port's display list at the arena (`T2_DLDUMP_AT`,
+  `--start-warp=-4@600` / `T2_START_WARP=-4@1400`, N64 emulator frame 700 = port 1753) draws the
+  walls with `TEX0 * SHADE`; the same vertex found in the N64's RDRAM dump (`refshots.py --rdram
+  700`, searched by its position bytes) has the colour C9 CA CB where the port has C9 CA 79, 2C 2D
+  2C on both: red and green equal, **blue lost**. The light volumes the vertices are lit by
+  (`LightVolume_Construct`, instrumented, not committed) are the same on both (mostly white).
+- **Cause**: `Lighting_BuildLitVertices` adds per-vertex colour offsets from the model's geometry
+  block 1 (`Model_ApplyPackedOffsets`, func_00213684.c: one word per vertex, signed bytes x:16-23,
+  y:8-15, z:0-7, times 2). That block is `op: unk` in `tools/assets/swap_spec.json` ("reader
+  unknown"), so the archive keeps it big-endian, and the host's word load took the green offset
+  for red, red for green and the zero top byte for blue. **Fix** (TARGET_PORT, asm_diff 0): the
+  word is read big-endian. Every lit model with packed offsets in every level got this; the arena
+  is where the offsets are blue.
+- **Result**: the arena (N64 700 / port 1753) mean (35.8, 33.1, 23.7) on the N64, (35.4, 32.6,
+  23.2) on the port (before: (34.5, 33.3, 8.3)); the walls are brown-grey with the blue tint on the
+  left as on the N64. Render only: the default run's det lines are unchanged (`0959aac5…`).
+
+### 13-i1.2 Menu texts the port never generated (fixed)
+
+The main menu showed ENTER CHEAT, CHEATS, OPTIONS, SOUND OPTIONS but **not SINGLE and MULTI**
+(the cursor's red bar was a sliver at the top); the single-player menu had no NEW GAME / LOAD, the
+deathmatch menus no labels. A menu item's text is an `s32` in its `MenuItemDesc`; `Menu_Construct`
+turns it into a host pointer with `t2_n64_to_host` (port/gen/relocs.c), which only knows the data
+symbols gendata generated. The strings at 0x800B5EB0..0x800B5F3C ("single", "new game", "load",
+"multi", "deathmatch", "blood lust", ...) have no label in the ELF and no C file names them, so
+nothing generated them and the items got NULL.
+
+- **Fix** (`tools/port/gendata.py`, `add_int_targets`): an address an integer slot holds that no
+  generated symbol covers, inside `.code_rodata`/`.code_rodata_tail`, gets a symbol of its own
+  (`D_<address>`, the ROM bytes up to the next label). 8 such symbols this build (data_report.txt:
+  "unlabelled ROM data ..."); a check over every menu item desc in the ELF (each `MenuItem_Draw*`
+  item whose data is an RDRAM address) now finds **0 uncovered of 54** (it found 54 before).
+- **The Enter Cheat keyboard drew no letters** (only the two arrow keys): `D_800C1144` (" ", "Z",
+  "Y", ... one-character strings a word apart) was declared `extern s32` in
+  `EnterCheatMenu_ResultLabel` and `u8[]` elsewhere; gendata took the word shape and swapped them.
+  Declared as bytes (func_0041AEB0.c, asm_diff 0): the keyboard shows A-Z.
+
+### 13-i1.3 The automap (fixed: it was never visible)
+
+Three host bugs, found by pressing L (the map) after `T2_START_WARP=-61@1400`:
+
+1. **Fast3D has no line microcode**: `Automap_Draw` (func_004004D8.c) draws the map with
+   `G_LINE3D` (L3DEX2). libultraship logs 0x08 as unhandled and draws nothing. On the port each
+   line is now a quad of two triangles (`T2Automap_Line`: half a pixel of the N64 frame each side,
+   5 units under the world matrix's 0.1 scale, 1 unit for the compass), with the same vertex
+   colours, 8 quads to a `gSPVertex` (TARGET_PORT; asm_diff 0 over the whole tree).
+2. **The indices overwrote the projection**: `sAutomapLineIndices` (0x80129200..0x80129A00) was
+   declared `u16 []`; a splat label 2 bytes in (`D_80129202`) made gendata give it 2 bytes, and the
+   index pairs ran over the next host globals, `sAutomapOrthoMtx` first (its words read 2, 3, 4,
+   5, ...: nothing on screen). `include/globals/automap.h` now sizes it `[0x400]` (0x800 bytes).
+3. **The map's own task made every other frame black**: with the map on, the frame is two gfx
+   tasks (`CEngineApp__SubmitGfxTask`: the main list with flags 3, the line list with 0x23, the
+   same framebuffer). The app drew each as a frame of its own: the map's frame had no scene
+   (black) and the scene's had no map. `game.cpp` now keeps a task that is not the last of its
+   frame (`T2Sched_TaskEndsFrame`, port/game/t2sched.c: OS_SC_LAST_TASK) and draws it with the
+   next one through a 3-command list (G_DL main, G_DL lines, G_ENDDL).
+
+The map now shows the region outlines (white), the player's arrow (yellow) and the compass
+(magenta N) over the scene, every frame. The N64 reference cannot show it: Rice does not draw
+L3DEX2 lines (n64trace `--pad` pressed L at the same frame, the pause menu that followed was shot
+fine, no line appeared): an emulator limitation, so the map's look is checked by reading the code.
+
+### 13-i1.4 Tools
+
+- `n64trace.py --shots A,B:C:STEP`: screenshots from the debugger run, so that `--pad` input can
+  be shot (refshots.py's `--input` keys do not reach the game: the menu, map and pause shots need
+  `--pad`).
+- `n64trace.py --args` can name `CCacheEntry` members.

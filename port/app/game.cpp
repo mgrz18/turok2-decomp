@@ -679,6 +679,7 @@ static double BenchSwitchNs(int n) {
 } // namespace
 
 extern "C" {
+int T2Sched_TaskEndsFrame(const void* ostask); // port/game/t2sched.c
 int Sound__Play2D(int id);
 void Music_SetTrack(int track);
 void Sound__PlaySpeech(int group);
@@ -1016,6 +1017,26 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
                 DumpDL((const uintptr_t*)lastDL, 0, &budget);
             }
         }
+        // Round 20 i1: a gfx task that is not the last of its frame (the automap is on: its line
+        // list follows as a second task into the same framebuffer, CEngineApp__SubmitGfxTask) is
+        // kept and drawn with the next one as a single frame. Drawn alone, each was a frame of its
+        // own: the map's frame black with nothing but the map, every other frame (flicker).
+        static const void* sHeldDL = nullptr;
+        static uintptr_t sJoinDL[6];
+        const void* drawDL = got ? task.dataPtr : nullptr;
+        if (got && task.type == 1 && !T2Sched_TaskEndsFrame(task.task)) {
+            sHeldDL = task.dataPtr;
+            drawDL = nullptr;
+        } else if (got && sHeldDL != nullptr) {
+            sJoinDL[0] = 0xDE000000u; // gSPDisplayList: the frame's main list
+            sJoinDL[1] = (uintptr_t)sHeldDL;
+            sJoinDL[2] = 0xDE000000u; // then the line list (it sets its own modes and matrices)
+            sJoinDL[3] = (uintptr_t)task.dataPtr;
+            sJoinDL[4] = 0xDF000000u; // gSPEndDisplayList
+            sJoinDL[5] = 0;
+            drawDL = sJoinDL;
+            sHeldDL = nullptr;
+        }
         // T2_DRAW_FROM=F or A-B[;A-B...] (DEBUG-ONLY, round 12 C27): with --draw, draw (and shoot) from
         // frame F on, or in those frame ranges, only: pictures of a long scripted run without drawing
         // all of it (offscreen drawing is ~40 frames a second on the box; the game runs the same)
@@ -1029,7 +1050,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             drawNow = range ? (f + 1 >= a && f + 1 <= atoi(dash + 1)) : f + 1 >= a;
             d = semi != nullptr ? semi + 1 : nullptr;
         }
-        if (got && drawNow && (window || T2Offscreen_Interpreter())) {
+        if (drawDL != nullptr && drawNow && (window || T2Offscreen_Interpreter())) {
             // Only with --draw: the game's display lists are not host-correct yet (GBI words
             // hold 32-bit addresses; docs/port/BUILD.md "GBI").
             // Fast3D maps RDP coordinates from its native size (320x240 by default) to the
@@ -1045,7 +1066,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
             int badWords = 0;
             if (dlCheck) {
                 int budget = 200000;
-                badWords = CheckDL((const uintptr_t*)task.dataPtr, 0, &budget, f + 1);
+                badWords = CheckDL((const uintptr_t*)drawDL, 0, &budget, f + 1);
                 if (badWords > 0) {
                     skippedBad++; // Fast3D would dereference a truncated pointer: not drawn
                 }
@@ -1054,7 +1075,7 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
                 T2Display_UpdateWindow(window, args.renderScale); // retina: the frame at pixel resolution
             }
             if (badWords == 0 &&
-                (window ? window->DrawAndRunGraphicsCommands((Gfx*)task.dataPtr, {}) : T2Offscreen_Draw(const_cast<void*>(task.dataPtr)))) {
+                (window ? window->DrawAndRunGraphicsCommands((Gfx*)drawDL, {}) : T2Offscreen_Draw(const_cast<void*>(drawDL)))) {
                 drawn++;
                 drewThis = true;
                 if (bench && !window) {

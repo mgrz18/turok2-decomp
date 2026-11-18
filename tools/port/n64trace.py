@@ -21,6 +21,7 @@ gFrameCountGameplay and print the first differing field. Never commit the traces
 import argparse
 import ctypes as C
 import json
+import glob
 import os
 import re
 import shlex
@@ -91,7 +92,7 @@ FIELDS = [
 ]
 SIZEOF = ["CGameObjectInstance", "CScene", "CPlayer", "CCamera"]
 HEADERS = ["common.h", "structs/particle.h", "structs/world.h", "structs/player.h", "structs/game.h",
-           "structs/game_object.h", "structs/intelligence.h", "structs/collision.h", "structs/camera.h"]
+           "structs/game_object.h", "structs/intelligence.h", "structs/collision.h", "structs/camera.h", "structs/cache.h"]
 SYMS = ["gRandomValue", "gRandomValueB", "gFrameCountGameplay", "gNextTicks", "gEngineApp",
         "gEngineApp_m_Game", "gScene", "gDemoPlayer"]
 
@@ -371,6 +372,8 @@ def main():
                     help="N (round 17 f3): at every --at breakpoint set the four retrace counts CEngineApp__Update "
                          "averages (gNumTicks0/2/3, D_800F6CA8) to N, so gNextTicks is N as in the port: the "
                          "emulator's slow frames (3 retraces after a load) do not change gFrameIncrement")
+    ap.add_argument("--shots", default="",
+                    help="(round 20 i1) emulator frames to screenshot (refshots.py syntax: A,B:C:STEP), written to OUT/shot_<frame>.png; with --pad the menus, the map and the pause screen can be shot, which refshots.py --input cannot reach")
     ap.add_argument("--at", default="CEngineApp__Update",
                     help="read the state when the CPU reaches this function (the core's debugger, a "
                          "consistent point of the game loop); 'vi' reads it from the frame callback instead "
@@ -585,9 +588,15 @@ def main():
                         t.raw_gfs.append((int(lo), int(hi or lo)))
             state["t"].frame(state["n"])
 
+    shot_frames = set(R.frames(a.shots)) if a.shots else set()
+    shot_order = []
+
     @FRAMECB
     def on_frame(n):
         state["n"] = n
+        if n in shot_frames:
+            shot_order.append(n)
+            core.CoreDoCommand(R.M64CMD_TAKE_NEXT_SCREENSHOT, 0, None)
         if n % 250 == 0:
             sys.stderr.write("n64trace: emulator frame %d\n" % n)
         for down, k in events.get(n, ()):
@@ -728,6 +737,12 @@ def main():
 
     core.CoreDoCommand(R.M64CMD_SET_FRAME_CALLBACK, 0, C.cast(on_frame, C.c_void_p))
     core.CoreDoCommand(R.M64CMD_EXECUTE, 0, None)
+    if shot_frames:
+        # the core names its screenshots after the ROM with a running number: in shot order
+        made = sorted(glob.glob(os.path.join(out, "*.png")), key=os.path.getmtime)
+        made = [f for f in made if not os.path.basename(f).startswith("shot_")]
+        for f, n in zip(made, shot_order):
+            os.replace(f, os.path.join(out, "shot_%d.png" % n))
     core.CoreDoCommand(R.M64CMD_ROM_CLOSE, 0, None)
     for lib in plugins:
         lib.PluginShutdown()
