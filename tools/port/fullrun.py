@@ -636,7 +636,9 @@ def n64(lv):
     return N64_SHAKE or (N64_FROM is not None and lv >= N64_FROM)
 # Round 18 g1 (--n64): the weapon of a level-2 segment on the N64's stream {segment: (weapon, frames after its
 # start)}; the plasma rifle (10) again 50 frames before the next segment. T2G1_L2W="9:9:0,6:8:0" overrides (tests)
-N64_L2_WEAPON = {9: ("9", -400)}   # 134: the shredder (21 damage instead of 118 and a life with the plasma rifle)
+# 134: the shredder (21 damage instead of 118 and a life with the plasma rifle); round 20 i2: 133 and 135 too (sister 1:
+# 54 damage, lowest health 146 instead of 182 and 18; 135: 66 and 134 instead of 199 and 14; PLAYTHROUGH.md 42-i2)
+N64_L2_WEAPON = {6: ("9", -400), 9: ("9", -400), 12: ("9", -400)}
 if os.environ.get("T2G1_L2W") is not None:
     N64_L2_WEAPON = {int(e.split(":")[0]): (e.split(":")[1], int(e.split(":")[2]))
                      for e in os.environ["T2G1_L2W"].split(",") if e}
@@ -666,6 +668,11 @@ N64_FULL_L2_HEALTH = {7: [(-2405.3, -4761.6, 5545.7, 0.0), (-2135.0, 204.8, 3506
                       13: [(941.4, 716.8, -1907.8, 0.0), (512.4, 716.8, -1904.1, 0.0), (-1382.4, 179.4, -1792.0, 0.0),
                            (-1382.4, 179.4, -1331.2, 0.0), (4410.7, 409.6, -4062.9, 0.0)]}
 # Round 18 g1 (--n64): the weapon for the Mantid Queen (None: level 5 s shredder); T2G1_QW overrides ("": none)
+# Round 20 i2 (the N64 stream): T2_BOSS_FRONT at the Mantid Queen, the player put 600 units in front of her open spot
+# (was 450): her state 4 spends most of the fight with the spot-1 box behind her body boxes, and from 450 her volleys
+# hit the player at ~430-490 units (the 133/135 shredder stream: 266 damage and 2 lives at 450; 27 at 600, 61 at 700,
+# 97 at 900; PLAYTHROUGH.md 42-i2). T2I2_QF overrides (DEBUG-ONLY test hook)
+N64_QUEEN_FRONT = os.environ.get("T2I2_QF", "600,200")
 N64_QUEEN_WEAPON = os.environ.get("T2G1_QW", "16") or None   # the scorpion launcher: 6-95 damage, 43-138 (a life) with the shredder
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
 # Round 17 f1: pick steps put before a step of a segment (segment, before step, [(x, y, z, approach
@@ -1234,6 +1241,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
     arms_switch(r, 2, t_arr, real)
     if n64_full() and N64_CITY_WEAPON and 2 not in real:   # round 19 merge: the City Totem's weapon (N64 stream)
+        # round 20 i2: a segment weapon's return to the plasma rifle (N64_L2_WEAPON: 135's, 50 frames before 132's
+        # last segment) would land after this request and replace it when 110 loads: dropped
+        r.weapon = [(f, w) for f, w in r.weapon if not (w == "10" and t_arr - 600 <= f < t_arr)]
         r.weapon.append((t_arr - 600, N64_CITY_WEAPON))   # taken when 110 loads (T2_GIVE_WEAPONS)
         r.weapon.append((hubs[2] - 200, "10"))
     if real == {1, 2}:
@@ -1371,6 +1381,15 @@ L6_BACK_114 = 26000
 MOTHER_SHREDDER_END = 16000   # round 15 d1: the shredder's fire window at the Mother (her death ~+7,500 standalone)
 L6_EXIT_AFTER = 500     # the exit teleport, after 114 is reached again
 L6_HUB_AFTER = 800      # the hub (6999's place: the level-6 corridor)
+# Round 20 i2 (the N64 stream): 114's fourth ultra health (object 548, item 1704: +100 to 200; level actor of grid
+# section 42 at (-1840.9, 155.6, 1397.3), the mirror of L6_N64_HEALTH's), picked after the Mother by a warp back
+# from the hub (her death warps there; the hub idles ~14,000 frames before the Primagen key 6 slot anyway): the lair
+# is entered with her leftover + 100 (54 health and a life lost in the lair without it in one of this round's runs).
+# (x, y, z, approach angle, distance, walk); T2I2_L6H=0 leaves it out (DEBUG-ONLY test hook)
+L6_LATE_HEALTH = (-1840.9, 155.6, 1397.3, 0.0, 90, 50) if os.environ.get("T2I2_L6H", "1") != "0" else None
+L6_LATE_STEP = 150      # the pick's frames (r56.ITEM_STEP)
+L6_LATE_WARP = 300      # the warp back into 114, after the hub's anchor
+L6_LATE_LOAD = 400      # 114's anchor, after the warp
 L6_WALK_AFTER = 200     # the walk back down the corridor to the plaza, after the hub
 L6_SLOT_AFTER = 1100    # Primagen key 6 into its slot, after the hub (round 13 C28: 650 -> 1100; with b2's door fix and
                         # the Leap of Faith trip the Primagen rested at z 2,923 after a 650 hop, the known no-end spot of
@@ -1380,13 +1399,24 @@ L6_HUB_END = 49500      # the hub after the credits, from the Primagen's lair (t
 PRIMAGEN_KEY = "4@%d"   # the anchor on his lair
 
 
+# Round 20 i2 (the N64 stream, --stick-aim 5): 91's ultra health (object 548, level actor at (-3123.2, 577.2, 460.8),
+# floor 614.4: itemreach.py's approach angles -2.75..-0.39) on 91's last visit, before the exit 7500 (segment 17 of
+# l5_with_primagen_key()): the Hive Totem and the Mantid Queen with up to 200. T2I2_L5H=0 leaves it out (DEBUG-ONLY)
+L5_STICK_HEALTH = (17, (-3123.2, 614.4, 460.8, -1.5708, 90, 50)) if os.environ.get("T2I2_L5H", "1") != "0" else None
+
+
 def level5(r, t):
     """t: the frame the hub portal 5000 warps (hub(..., go=5))."""
     s = t + WARP_TO_START[5]
     segs, add = r56.l5_with_primagen_key()
     if 5 in r.no_cheats and getattr(r, "health", True):
         # round 14 c2: the ultra healths of 92 and 95 (every later step moves by the time added)
-        segs, more = r56.with_items(segs, r56.L5_HEALTH)
+        h5 = r56.L5_HEALTH
+        if n64_full() and 5 in STICK_AIM and L5_STICK_HEALTH:
+            # round 20 i2: a stick run enters level 5 with ~36 health (124 left 1): 91's ultra health too
+            h5 = dict(h5)
+            h5[L5_STICK_HEALTH[0]] = [L5_STICK_HEALTH[1]] + h5.get(L5_STICK_HEALTH[0], [])
+        segs, more = r56.with_items(segs, h5)
         add += more
     r.anchors.append((s - LOAD_EARLY, 124))
     r.note(s - LOAD_EARLY, "124.. the Hive of the Mantids (level 5 route from %d, + the 92 detour)" % s)
@@ -1404,7 +1434,7 @@ def level5(r, t):
     r.anchors.append((s + L5_QUEEN_AT + add, 2))
     r.note(s + rel + add, "2 the Mantid Queen: fire held, T2_AIM_NODE=boss@2, T2_BOSS_FRONT=450,200")
     r.inputs.append("Z@%d..%d" % (s + rel + add, s + rel + add + length))
-    r.boss_front.append((s + rel + add - 100, "450,200"))
+    r.boss_front.append((s + rel + add - 100, N64_QUEEN_FRONT if n64_full() else "450,200"))
     hub_at = s + L5_HUB_AFTER + add
     r.level_start[6] = hub_at
     r.shake_switch[6] = hub_at
@@ -1461,6 +1491,20 @@ def level6(r, t):
     h = back + L6_HUB_AFTER
     r.note(h, "60 the hub (after level 6: 6999's place in the level-6 corridor)")
     r.anchors.append((h, 60))
+    if n64_full() and L6_LATE_HEALTH:
+        # round 20 i2: her death warps to the hub (the anchor above waits there: the schedule jumps over the exit
+        # teleport), so back to 114 by its portal's warp, its fourth ultra health, its pad 7601 to the hub again
+        w = h + L6_LATE_WARP
+        r.note(w, "60 -> 114 again (T2_WARP_TO 6000): its fourth ultra health (+100), then the pad 7601 back")
+        r.warps.append((w, 6000))
+        a = w + L6_LATE_LOAD
+        r.anchors.append((a, 114))
+        r.pick(a + 100, *L6_LATE_HEALTH)
+        r.tp(a + 100 + L6_LATE_STEP, x, y, z, ry)
+        r.inputs.append("CU@%d..%d" % (a + 110 + L6_LATE_STEP, a + 230 + L6_LATE_STEP))
+        h = a + 100 + L6_LATE_STEP + L6_HUB_AFTER - L6_EXIT_AFTER
+        r.note(h, "60 the hub again (the pad 7601: the level-6 corridor)")
+        r.anchors.append((h, 60))
     r.note(h + L6_WALK_AFTER, "60 the hub: back down the corridor through the level-6 door to the plaza")
     r.inputs.append("CU@%d..%d" % (h + L6_WALK_AFTER, h + L6_SLOT_AFTER - 50))
     f = h + L6_SLOT_AFTER
