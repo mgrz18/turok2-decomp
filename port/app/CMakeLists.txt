@@ -132,6 +132,8 @@ endif()
 set(T2_PORT_O2R ${CMAKE_BINARY_DIR}/t2port.o2r)
 file(GLOB_RECURSE _t2_shaders CONFIGURE_DEPENDS ${T2_LUS_DIR}/src/fast/shaders/*)
 # (staged by port/cmake/t2_shaders.cmake: the Metal shader gets a compile fix, MACOS.md 20.1)
+# (the staging folder is the working directory: ninja does not create it, so make it here)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/t2port_shaders)
 add_custom_command(OUTPUT ${T2_PORT_O2R}
     COMMAND ${CMAKE_COMMAND} -DSRC=${T2_LUS_DIR}/src/fast/shaders -DDST=${CMAKE_BINARY_DIR}/t2port_shaders/shaders
             -P ${T2_PORT_DIR}/cmake/t2_shaders.cmake
