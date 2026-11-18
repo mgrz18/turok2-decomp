@@ -29,8 +29,8 @@ import routes56 as r56  # noqa: E402
 STICK_AIM = set()   # round 15 d3: the levels aimed with the stick (--stick-aim)
 STICK_FREE_WALK = {5, 6}   # round 18 g5: --stick-aim levels whose route walks keep the script's yaw
 # round 18 g5: per route level, the sub-levels where the stick driver prefers the assist's target (T2_AIMD_PRIMARY):
-# level 5's pylons (124) and the cocoons and embryos (94, 95, 96)
-STICK_PRIMARY = {5: (124, 94, 95, 96)}
+# level 5's pylons (124), the cocoons and embryos (94, 95, 96) and the Queen's node (2); level 6's Mother (3) and the Primagen (4)
+STICK_PRIMARY = {5: (124, 94, 95, 96, 2), 6: (3, 4)}
 ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
 NAV = set()         # round 16 e3: the levels whose NAV_WALKS teleports the waypoint walker replaces (--nav)
 NAV_ROM = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "baserom.us.z64")

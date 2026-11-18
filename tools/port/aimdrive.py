@@ -181,7 +181,9 @@ FIRE_MAX = {int(a): float(b) for a, b in (v.split(":") for v in os.environ.get("
 # Hive Totem. The assist's target is the nearest candidate within PRIMARY_R of the aim line's target point.
 PRIMARY = {int(v) for v in os.environ.get("T2_AIMD_PRIMARY", "").split(",") if v.strip()}
 PRIMARY_X = envf("T2_AIMD_PRIMARY_X", 0.2)
-PRIMARY_R = envf("T2_AIMD_PRIMARY_R", 200.0)
+PRIMARY_R = envf("T2_AIMD_PRIMARY_R", 600.0)
+# ... and when that candidate is chosen, the aim point is the assist's own point (T2_AIM_NODE's node: the Queen's
+# body origin is never hurt, her node is; s6c: 11,100 frames and a life at the Queen aiming at the origin)
 CAND_EVERY = int(envf("T2_AIMD_CAND_EVERY", 50))   # --stats: the candidates every this many frames
 
 
@@ -305,6 +307,8 @@ class Picker:
                 self.immunes += 1
                 rec[1] = 0
         self.last = frame
+        if best == prim:
+            return primary, best   # round 18 g5: the assist's point (a boss node)
         return pts[best], best
 
 
