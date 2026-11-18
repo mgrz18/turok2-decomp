@@ -174,6 +174,14 @@ THREAT_NEAR = {int(a): float(b) for a, b in (v.split(":") for v in os.environ.ge
                                              if ":" in v)}
 THREAT_FAR = envf("T2_AIMD_THREAT_FAR", 6.0)
 FIRE_MAX = {int(a): float(b) for a, b in (v.split(":") for v in os.environ.get("T2_AIMD_FIRE_MAX", "").split(",") if ":" in v)}
+# round 18 g5: T2_AIMD_PRIMARY=L[,L...]: in level L the candidate at the assist's own target (the step's objective:
+# level 5's cocoons and embryos, the pylons, the Queen's node; level 6's Mother parts) costs PRIMARY_X times as much.
+# In 95 the picker spent ~150 of embryo 2's 600 frames on actor 104 (179 units, full health, never hurt) and the
+# embryo lived (8,412 of 65,280 left at the window's end): the hive's exit 7500 then leads back to 124, not the
+# Hive Totem. The assist's target is the nearest candidate within PRIMARY_R of the aim line's target point.
+PRIMARY = {int(v) for v in os.environ.get("T2_AIMD_PRIMARY", "").split(",") if v.strip()}
+PRIMARY_X = envf("T2_AIMD_PRIMARY_X", 0.2)
+PRIMARY_R = envf("T2_AIMD_PRIMARY_R", 200.0)
 CAND_EVERY = int(envf("T2_AIMD_CAND_EVERY", 50))   # --stats: the candidates every this many frames
 
 
@@ -244,6 +252,11 @@ class Picker:
             self.cur = None
             return primary, None
         best, bcost, pts = None, None, {}
+        prim = None
+        if lv in PRIMARY and primary is not None:
+            near = [(math.dist((x, y, z), primary), cid) for cid, x, y, z, hp, kind in cands]
+            near = [c for c in near if c[0] < PRIMARY_R]
+            prim = min(near)[1] if near else None
         for cid, x, y, z, hp, kind in cands:
             v = self.vel(frame, cid, (x, y, z))
             d = math.hypot(x - ex, z - ez)
@@ -273,6 +286,8 @@ class Picker:
             cost *= 1.0 + W_HP * min(hp, 25600) / 25600.0   # the weak ones first: fewer attackers sooner
             if cid == self.cur:
                 cost *= W_KEEP
+            if cid == prim:
+                cost *= PRIMARY_X   # round 18 g5: the assist's target (T2_AIMD_PRIMARY)
             if self.immune.get(cid, (-1, 1.0))[0] > frame:
                 cost *= self.immune[cid][1]
             if bcost is None or cost < bcost:
@@ -402,9 +417,24 @@ class LairDrive:
         # the lair's damage on that stream and one run lost a life there
         self.keep = float(os.environ.get("T2_LAIR_KEEP", "0") or 0)
         self.keeps = 0         # frames answered by the keep-away rule
+        # T2_LAIR_PUSH=toward|jump|both (round 18 g5; "" = off, the default: the routes' streams unchanged):
+        # the Primagen's push (his mode 20, the move line's "bm": Primagen_UpdateMode20) adds 716.8 (on the
+        # ground) or 179.2 (in the air) to the player's velocity away from him for ~11 frames after a
+        # 15-frame wind-up; from 1,550-1,750 away it threw the player off the floor (PLAYTHROUGH.md 33.2).
+        # "toward": C-up/strafe towards him while he pushes; "jump": the jump (r1) held from PUSH_JUMP_AT
+        # frames into the mode (in the air the push is a quarter); "both".
+        self.push = os.environ.get("T2_LAIR_PUSH", "")
+        self.push_at = int(os.environ.get("T2_LAIR_PUSH_JUMP_AT", "8"))
+        self.push_len = int(os.environ.get("T2_LAIR_PUSH_LEN", "40"))
+        self.pushes = 0        # frames answered by the push rule
+        self.bm = None         # (his mode, the frame it started)
+        self.jump = False      # this answer's r1
 
-    def answer(self, frame, px, pz, ry, boss=None):
+    def answer(self, frame, px, pz, ry, boss=None, bm=None):
         fwd = (-math.sin(ry), -math.cos(ry))
+        self.jump = False
+        if bm is not None and (self.bm is None or self.bm[0] != bm):
+            self.bm = (bm, frame)
         if self.prev and frame - self.prev[0] <= 2 and self.cal_n < 40:
             b = self.prev[4]
             if b in (C_L, C_R):
@@ -416,6 +446,17 @@ class LairDrive:
                     if self.cal_n == 40:
                         self.side = 1.0 if self.cal >= 0 else -1.0
         right = (-math.cos(ry) * self.side, math.sin(ry) * self.side)
+        if self.push and self.bm and self.bm[0] == 20 and frame - self.bm[1] < self.push_len and boss is not None \
+                and not any(v != v for v in boss):
+            k = frame - self.bm[1]
+            self.pushes += 1
+            self.mode = "push"
+            if self.push in ("jump", "both") and k >= self.push_at:
+                self.jump = True
+            if self.push in ("toward", "both"):
+                return self.press(frame, px, pz, ry, (boss[0] - px, boss[2] - pz), fwd, right)
+            self.prev = (frame, px, pz, ry, None)
+            return None
         if self.kind == "guard":
             if not lair_floor(px, pz, LAIR_SAFE_MARGIN):
                 self.guard = True
@@ -472,7 +513,8 @@ def move_answer(line, drive):
     frame = int(f[1])
     px, py, pz, ry = (float.fromhex(v) for v in f[2:6])
     boss = tuple(float.fromhex(v) if v != "nan" else float("nan") for v in f[6:9]) if len(f) >= 9 else None
-    return frame, px, py, pz, drive.answer(frame, px, pz, ry, boss)
+    bm = int(f[f.index("bm") + 1]) if "bm" in f[9:] else None   # round 18 g5: the boss's AI mode
+    return frame, px, py, pz, drive.answer(frame, px, pz, ry, boss, bm)
 
 
 # --- the waypoint walker (round 16 e3, PLAYTHROUGH.md 30): T2_WALK_PLAN windows -------------------
@@ -686,7 +728,10 @@ def main():
                         continue
                 if line.startswith("move "):   # T2_MOVE_DRIVE: the lair driver's C buttons
                     frame, px, py, pz, b = move_answer(line, drive)
-                    fout.write("- -\n" if b is None else "- - c%x\n" % b)
+                    if drive.jump:   # round 18 g5 (T2_LAIR_PUSH): the jump against the Primagen's push
+                        fout.write("- - r1\n" if b is None else "- - c%x r1\n" % b)
+                    else:
+                        fout.write("- -\n" if b is None else "- - c%x\n" % b)
                     fout.flush()
                     moves += 1
                     if stats and frame % STATS_EVERY == 0:
@@ -728,6 +773,9 @@ def main():
         print("aimdrive: %d stick answers, %d move answers (%d with the lair driver's own C buttons, %d keeping "
               "away); the game exited %d" % (n, moves, drive.overrides + drive.keeps if drive.kind == "guard" else moves,
                                              drive.keeps, rc), file=sys.stderr)
+        if drive.push:
+            print("aimdrive: %d frames answered against the Primagen's push (%s)" % (drive.pushes, drive.push),
+                  file=sys.stderr)
     sys.exit(rc)
 
 

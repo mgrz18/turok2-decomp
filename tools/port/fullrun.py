@@ -27,6 +27,10 @@ import routes56 as r56  # noqa: E402
 
 
 STICK_AIM = set()   # round 15 d3: the levels aimed with the stick (--stick-aim)
+STICK_FREE_WALK = {5, 6}   # round 18 g5: --stick-aim levels whose route walks keep the script's yaw
+# round 18 g5: per route level, the sub-levels where the stick driver prefers the assist's target (T2_AIMD_PRIMARY):
+# level 5's pylons (124) and the cocoons and embryos (94, 95, 96)
+STICK_PRIMARY = {5: (124, 94, 95, 96)}
 ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
 NAV = set()         # round 16 e3: the levels whose NAV_WALKS teleports the waypoint walker replaces (--nav)
 NAV_ROM = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "baserom.us.z64")
@@ -64,6 +68,7 @@ class Route:
         self.fight_level = {}    # name -> its level (1-4)
         self.cheats_on = set()   # sub-levels (the totems: 109 110 111 112) kept invincible (--cheats-on)
         self.walked = 0
+        self.walks = []          # round 18 g5: (first, last frame) of each teleport's C-up walk
         self.walk_probe = False
         self.walk = set()        # round 15 d5 (--walk): the levels whose open-floor teleports are walked
         # round 15 d2 (--real-weapons): no T2_GIVE_WEAPONS / T2_FILL_AMMO before this frame (the
@@ -107,6 +112,7 @@ class Route:
         self.tps.append("%d:%.1f,%.1f,%.1f,%.4f%s" % (f, x, y, z, ry, "!" if trig else ""))
         if walk:
             self.inputs.append("CU@%d..%d" % (f + 10, f + 10 + walk))
+            self.walks.append((f, f + 20 + walk))   # round 18 g5: no stick turn during the walk (STICK_FREE_WALK)
 
     def pick(self, f, x, y, z, ang=0.0, d=90.0, walk=50):
         """Stand d units from a pickup (or an action) at (x, y, z), facing it, and walk into it."""
@@ -180,7 +186,21 @@ class Route:
                 a, b = self.fights[k]
                 wins = [w for w in wins if w[1] < a or w[0] > b] + \
                        [(w[0], a - 1) for w in wins if w[0] < a <= w[1]] + [(b + 1, w[1]) for w in wins if w[0] <= b < w[1]]
+            # round 18 g5: in the levels of STICK_FREE_WALK the stick leaves the teleports' walks alone (level 5's
+            # embryo window ran on into 91's walk to the exit 7500: the stick turned to a new target and the
+            # walk went back to 124). Levels 1-4 keep round 17's windows (their validated runs).
+            def lv_of(fr):
+                return max([l for l, g in starts if g <= fr] or [1])
+            for a, b in self.walks:
+                if lv_of(a) in STICK_FREE_WALK & STICK_AIM:
+                    wins = [w for w in wins if w[1] < a or w[0] > b] + \
+                           [(w[0], a - 1) for w in wins if w[0] < a <= w[1]] + [(b + 1, w[1]) for w in wins if w[0] <= b < w[1]]
             env.append("T2_AIM_STICK=\"%s\"" % ";".join("%d-%d" % w for w in sorted(wins)))
+            # round 18 g5: the stick driver takes the assist's own target first in these sub-levels (aimdrive.py
+            # T2_AIMD_PRIMARY: the objectives, not the sleeping or out-of-play actors near them)
+            prim = sorted(set(l for lv in STICK_AIM for l in STICK_PRIMARY.get(lv, ())))
+            if prim:
+                env.append("T2_AIMD_PRIMARY=%s" % ",".join(str(l) for l in prim))
         if self.move_drive:
             env.append("T2_MOVE_DRIVE=\"%s\"" % ";".join("%d-%d" % w for w in sorted(self.move_drive)))
         if self.walk_plan:   # round 16 e3: aimdrive.py's waypoint walker (WalkDrive)
