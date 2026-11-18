@@ -183,8 +183,11 @@
   "load/save persistent bit sections": {"op": "iset", "entries": [{"op": "iset", "each": "@LevelBits"}, "@BitSection"]},
   "game persistent bit sections": {"op": "iset", "entries": [{"op": "iset", "each": "@LevelBits"}]},
   "warp dests": {"op": "iset", "entries": ["@s32set", {"op": "uset", "elem": "f32[3]:pos f32:rotY s16:level s16:spawn"}]},
-  "particle swooshes": {"op": "iset", "each": {"op": "struct", "fields": "f32:unk0 unk[12] s16:sound unk[13] u8:tex0 u8:tex1",
-                                                "tail": {"op": "unk", "note": "TrailInfo beyond 0x21"}}},
+  "particle swooshes": {"op": "iset", "each": {"op": "struct",
+                                                "fields": "f32:unk0 f32:fadeTime f32:nodeLife unk[4]:unkC s16:layer u8:closed unk[3]:unk13 u8[3]:prim u8[3]:env u8:kind u8:textureScale u8:mode u8:tex0 u8:tex1 u8:scaleS u8:scaleT u8:count",
+                                                "note": "round 20 i3: fadeTime and nodeLife (Swoosh_NewNode, Morph_BlendVertices, Swoosh_DetachOwner) and the blends' point indices were left big-endian: every trail point was born dead (life 4e-41), no trail was drawn",
+                                                "tail": {"op": "struct", "repeat": true, "fields": "u8[4]:colorA u8[4]:colorB u16:pointA u16:pointB",
+                                                         "note": "the blends (Morph items, 12 bytes): count + 1 of them in every record"}}},
   "dynamic lights": {"op": "uset", "elem": "u16?:mask u16?:step u8[4]:color"},
   "curves": {"op": "uset", "elem": {"op": "switch", "on": {"at": 0, "type": "s32"}, "cases": {
        "0": "s32:type u8[16]:samples f32:length",
