@@ -634,6 +634,14 @@ def main():
                 sp = regs[4] & 0xFFFFFFFF
                 tg = ram.sval(sp + 0x3C, 4)
                 mx = ram.sval(sp + 0x44, 4)
+                if valid(sp) and valid(ram.u32(sp + 0x40)):
+                    # what a target of -1 would read: sndState[-1].state, the word 8 bytes before
+                    # the array (the end of the audio heap block allocated before it)
+                    w = ram.u32((ram.u32(sp + 0x40) - 8) & 0xFFFFFFFF)
+                    if state.get("sndp_w") != w:
+                        state["sndp_w"] = w
+                        sys.stdout.write("sndp: frame %d gf %d sndState %08x state[-1] word %08x\n" % (
+                            state["n"], ram.u32(syms["gFrameCountGameplay"]), ram.u32(sp + 0x40), w))
                 if valid(sp) and 0 <= tg < mx:
                     core.DebugSetRunState(2)
                     core.DebugStep()
