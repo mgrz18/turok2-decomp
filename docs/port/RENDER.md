@@ -286,3 +286,79 @@ whole run: set by the totems, Blind, Queen, Primagen; cleared after each).
 - More warps with `refshots.py --start-warp` (every level start the route uses) against
   `T2_START_WARP`: gameplay views are deterministic from the warp for the first frames.
 - The Mac window's Metal renderer and the retina scale (MACOS.md 19.3) need a window.
+
+## 8-i3. Round 20 (part i3): levels 4-6, the bosses, the endings against the N64; the trails
+
+Method (FIDELITY.md 13-i3 has the commands): for each warp, `refshots.py --start-warp=W@600
+--shots 650:1100:25` on the N64 (Rice, 8-bit PNG, `shots.txt` gives each shot's gf) and
+`T2_START_WARP=W@1400 T2_DET_LOG=1 T2_DET_GF=1 T2_SHOT_EVERY=2` on the port (Release, `--draw`),
+the port's shot kept for each gf that is a multiple of 25; pairs compared by eye and by their
+mean RGB. The player stands at the warp's spawn in every scene (no input), so the views are the
+same on both sides; enemies move by the random stream, which parts from the N64's within the
+first game frames of a level (the particle spawn frame, FIDELITY.md 11.1).
+
+### 8-i3.1 The scenes
+
+| warp (level) | what | result |
+|---|---|---|
+| -101 (100) | level 4's start, the cave tunnel | **match**; mean (20.7, 30.4, 23.5) N64, (20.4, 30.0, 23.1) port at every gf |
+| -104 (103) | the cave with the mushrooms and the totem rock | match; the enemies stand elsewhere (the random stream) |
+| -125 (124) | level 5's start (HIVE TOP), the rifle pickup | match (the pickup's spin phase differs) |
+| -88 (87), -92 (91), -93 (92) | the hive's tunnels and its hub | **the hive's light shafts (tall pale blue beams that come and go) were missing on the port: a host bug, fixed (8-i3.2)**; the liquid surface that rises and falls matches |
+| -115 (114) | level 6's start (the Lightship's hub) | match |
+| -118 (117), -121 (120), -124 (123) | the Lightship's green corridors | match but for the side doorway: the N64 shows thin bright green lines there (the room behind), the port a dark doorway with a ring; the port's green is ~4 % brighter (fog). classified Rice, not proven: the lines look like the edges of the geometry behind the door, as Rice draws coverage/fog modes it does not emulate; open lead (8-i3.3) |
+| -77 (76), -78 (77) | the talisman chambers of levels 5 and 6 | match |
+| -83 (82), -84 (83) | the flesh-eater portals of levels 5 and 6 | match |
+| -2 (1) | the Blind One's arena (her spawn) | match |
+| -3 (2), -4 (3) | the Mantid Queen's and the Mother's arenas | their intros are cut-scenes on elapsed time (FIDELITY.md 11.1): the cameras part from gf 2, not comparable by gf; the Mother's olive walls are i1's lead |
+| -5 (4), 7602 (4) | the Primagen's lair from the level start and from the hub pad | **match**, the boss bar and the blue screens included (round 17's blue items near the spawn are there since round 17 f3's intelligence fix) |
+| -11 (10), -12 (11) | the ending levels (END 1/END 2's ship deck, the nebula sky) | match (the sky, the stars, the deck lights) |
+
+The port reads 1-2 % darker than Rice on every non-fogged scene (the round-17 rounding, 7.1).
+
+### 8-i3.2 The trails (swooshes) were never drawn: three host bugs
+
+The hive's light shafts are the trails of its drip particles (types 226/227, falling at up to 1,024
+units/s): `CParticleSystem__Draw` hands each particle with swooshes to `Swoosh_AddParticleNode`,
+and `Trail_DrawAll`/`Trail_DrawTextured` draw a ribbon through the points. On the port the
+ribbons came out empty (`T2_DLDUMP_AT`: the trail's combiner, colours and texture, then no
+vertex):
+
+1. **The swoosh records were left big-endian.** The "particle swooshes" unit (91 records, ROM
+   0x1F8249C) had only `unk0`, `sound`, `tex0/1` in `tools/assets/swap_spec.json`; the node life
+   (0x08) and the fade time (0x04) stayed N64 bytes, so a new point's life read as 4e-41 and every
+   point died the frame it was born (lives 0, -1, -2, -3 in a print), and the blends' u16 point
+   indices read as 256 times theirs. The whole record is now typed (f32 unk0/fadeTime/nodeLife,
+   s16 layer, the colour and count bytes, then count + 1 blends of u8[4] u8[4] u16 u16):
+   coverage 13.6 % to 92.2 %, **a new archive** (sha1 `8eb5b23b…`, `archive_check` OK).
+2. **The trail points were untyped data.** `sTrailTextures` points at four tables of points (x, y,
+   z and two more f32; `D_800ACE70`, `D_800ACE98`, `D_800ACEC0`, `D_800ACF38`); no C used them by
+   name, so gendata emitted their N64 bytes and every point was about 0: a ribbon with no width.
+   A `TARGET_PORT` reference in func_002350EC.c types them (gendata's rule, as for
+   `gAIBaseModeTable_port`).
+3. **Four views of a Swoosh at N64 offsets** (the code reaches the rest of the struct by name):
+   `Morph_BlendVertices` and `Morph_BlendVerticesTex` read the fade's `remaining` (Swoosh.time) at
+   host 0x30, the owner pointer, so a fading trail took a random alpha; `Trail_GetAnimFrame` read
+   the texture frame from `texture[1]`/`id` and **wrote the end frame over `texture[1]`** (the
+   trail's second texture handle); `Trail_DrawTextured` and `Trail_PlaceNodes`' emitter kept the
+   length in the padding after the host `SwooshLinks`. Each is now a `TARGET_PORT` layout with
+   `_Static_assert`s against `structs/swoosh.h`.
+
+With the three, level 91's shafts show as on the N64 (positions follow the random stream, so they
+are not at the same place on both sides, but their look, size, colour and frequency match). Every
+other trail in the game is affected the same way: weapon and projectile trails, the particle
+ribbons of explosions and energy effects all draw now.
+
+**Gameplay**: none. The trails' lifetimes change what a free particle slot keeps (a "matrix built"
+flag, 0x100000, left on one slot of level 1 at frame 21,132), so the det lines' particle-pool hash
+moves; the RNG, the player and every actor are identical over the whole default run (600,000
+lines with the hash taken out) and the `--legacy` run (580,000). New md5s in FIDELITY.md 13-i3.
+
+### 8-i3.3 Next
+
+- The Lightship doorway (117/120/123): dump the N64 display list at that frame (or try
+  glide64mk2/angrylion under Xvfb) to tell Rice from a missing pass; the ~4 % greener fog there.
+- Weapon fire against the N64: the warps start with the talon only; a scripted weapon change on
+  both sides (`--input` / `refshots.py --input`) would compare muzzle flashes and projectile trails.
+- The cut-scenes (hub portals, totems, the Queen's and Mother's intros, the ending): both sides
+  advance them by elapsed time, so pair them by the cinema's own clock, not by gf.
