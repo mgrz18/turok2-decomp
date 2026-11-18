@@ -3916,3 +3916,132 @@ The level runs (`--fight 10`, `--level 2..6`, Release, `--pak-blank`, both strea
 actor hash at 33,000). The four boss recipes (legacy switches) give round 18's det lines exactly
 (so round 18's kills: the Mother at 28,775, the Blind One 23,103, the Queen 28,143, the Primagen
 43,586).
+
+## 42-i2. The last route gaps on the N64 stream: the default's margins, the Queen by stick, level 2 on real weapons (Phase 7 round 20, part i2)
+
+The N64 stream (the default: no `T2_LEGACY_*`), Linux Release, PIE, ASLR on, under `aimdrive.py`,
+300,000 frames, each run in its own directory, the default command plus the options shown. Only
+`tools/port/fullrun.py` changed; **`--legacy` and the level runs write byte-identical route files**
+(`playthrough.txt`, `teleport.env` = C34's `leg` run), so their det lines are unchanged.
+
+### 42-i2.1 The default: four changes, the thin spots gone
+
+| change (`fullrun.py`) | why |
+|---|---|
+| **133 and 135 on the shredder** (`N64_L2_WEAPON` segments 6 and 12, as 134's) | sister 1 cost 182 (lowest 18), 135's crypts 199 (lowest 14) on the plasma rifle; on the shredder 54 / 146 and 66 / 134 (runs to 92,000) |
+| **the City Totem's request kept** | a segment weapon's return to the plasma rifle (`seg_starts[13] - 50`, 135's) landed 150 frames after the City Totem's request (`t_arr - 600`) and replaced it when 110 loaded: the totem on the plasma rifle again (114 damage, lowest 20). The returns inside that window are dropped. A latent fault: no segment-12 weapon existed before |
+| **the Queen's `T2_BOSS_FRONT` 600** (`N64_QUEEN_FRONT`, was 450; not for `--stick-aim 5`) | see below |
+| **114's fourth ultra health after the Mother** (`L6_LATE_HEALTH`) | see below |
+
+**The Queen.** With the first two changes the Queen took **266 damage and 2 lives** (the stream moved:
+any earlier change re-rolls her fight). Her state 4 (spot 1 open, 65,280) lasted 32,000 frames:
+`MantidQueen_Hurt` counts a hit only when its node mask has the spot's bit (`1 << weakSpot`, 2), and
+of 338 hits on her (`bosshurt` lines, `nodes` = the mask, in hex) only 7 had it (masks 3 and 0x17), 12,800
+each against the spot's 65,280; the rest struck her body boxes (masks 1, 4, 9, 0x10, 0x11) in front of it. `T2_BOSS_FRONT=D,200` puts the player D units in
+front of the open spot every 200 frames; her volleys reach him at ~430-490. The distance, one run each
+on that stream (to frame 185,000): **450 266 damage, 2 lives; 600 27, lowest 80; 700 61, 46; 900 97,
+10.** 600 it is (`T2I2_QF=D,EVERY` overrides it, a test hook). A `--stick-aim 5` run keeps 450 (its
+state 4 took 1,272 frames at 450 and 7,458 at 600: the stick misses the small box from farther).
+
+**The lair.** With 700 at the Queen the run lost a life in the lair (entered with the Mother's
+leftover, 54 health, 139 damage: melee 10s at ~650). There is no pickup in the Mother's or the
+Primagen's arenas (`tools/assets/levels.py`), but 114 has four ultra healths (object 548) and the
+route took three; the fourth is at (-1840.9, 155.6, 1397.3) (grid section 42, the mirror of
+`L6_N64_HEALTH`'s). The Mother's death warps to the hub, and the route's anchor `114/60` fires there
+only ~14,000 frames later (an anchor waits until the schedule is within 3,000 frames of it), so the
+schedule jumps over the old exit teleport into 114 (it never ran in any run). The pickup is a trip
+back instead: `T2_WARP_TO=6000` 300 frames after the hub's anchor, an anchor on 114, the pick (stand 90
+out, walk 50), the pad 7601 to the hub, an anchor on 60, then the Primagen key 6 slot as before (+850
+schedule frames: the hub idles anyway). `T2I2_L6H=0` leaves it out. Run: 54 -> 154 into the lair, 103
+damage, lowest 51, no life lost.
+
+**The new default** (det md5 **`8659d7df…`** in two runs, ASLR on, 600,000 lines): **END 2, all five
+totems, 0 lives lost, 290 hits** (round 19: 367). Timeline: the Harbor Totem 23,190, the City Totem
+87,266, the Marsh Totem 108,079, the Cave Totem 128,988, the Blind One 137,555, the Hive Totem 163,588,
+the Mantid Queen 171,767, the Mother 204,658, the Primagen (cinema 370) 242,688, **level 10 (END 2)
+245,680**, the credits back to the hub 263,578 (the `death` there is the new game, as before).
+
+| fight | round 19 (`0959aac5…`): damage / lowest | **now (`8659d7df…`)** |
+|---|---|---|
+| 109 the Harbor Totem | 96 / 104 | 96 / 104 |
+| 133 sister 1 | 182 / **18** | **54 / 146** |
+| 134 sister 2 | 21 / 177 | 33 / 167 |
+| 135 the crypts, sister 3 | 199 / **14** | **66 / 134** |
+| 110 the City Totem | 34 / 66 | 27 / 107 |
+| 111 the Marsh Totem | 17 / 183 | 22 / 178 |
+| 112 the Cave Totem | 53 / 147 | 68 / 132 |
+| 1 the Blind One | 52 / 95 | 61 / 71 |
+| 124 the hive top | 38 / 57 | 33 / **38** |
+| 113 the Hive Totem | 25 / 132 | 31 / 107 |
+| 2 the Mantid Queen | 54 / 78 | 27 / 80 |
+| 3 the Mother | 101 / 99 | 103 / 97 |
+| 4 the Primagen's lair | 81 / **18** | **34 / 163** |
+
+The lowest health of the whole run is now 38 (124, the force-field pylons, after the Blind One left
+71), was 14.
+
+### 42-i2.2 The Mantid Queen by stick
+
+h3's combo `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` on this round's tree (before any
+change): game over at the Queen, as C34 found. With `aimdrive.py --stats` (the aim file) and the
+`boss: mantid queen` lines:
+
+- **Her state 4** (spot 1 open) took 6,366 frames on h3's node rule (`T2_AIMD_BOSS=2:150`; g5's picker:
+  3,100 in C34's `--stick-boss 6` run); the stick was on her node all along (Z held 85-90% of the
+  frames, mean yaw error 0.12-0.2 rad at 270-800 units), most hits on her body boxes (42-i2.1).
+- **Her step-5 wave never ended**: `MantidQueen_Hurt` ignores every hit while `waveActive`, which
+  ends only when her spawned mantids are dead. During a wave `T2_AIM_NODE=boss` gives the nearest live
+  actor with the boss skipped; here that was **actor 20, eight units from the player, at full health
+  and never hurt**, and h3's rule aims at the assist's point with no IMMUNE switch (the picker has one):
+  the stick stayed on it for 50,000 frames while her volleys took four lives.
+
+A rule that hands the waves to the picker (`T2_AIMD_BOSS_WAVE`, tried and dropped) cleared step 5 but
+state 4 then never ended (3 lives). So **on the N64 stream the stick runs now leave the Queen to g5's
+picker** (`STICK_BOSS_N64 = {6}`: h3's rule in the lair only; `--stick-boss 5,6` brings it back), keep
+`T2_BOSS_FRONT` at 450 there (600 costs the stick: state 4 7,458 frames), and take **91's ultra
+health** on its last visit before the Hive Totem (`L5_STICK_HEALTH`, `--stick-aim 5` on the N64 stream
+only: the stick runs enter level 5 with ~36 health and leave 124 with 1). It lies on a ledge tip
+(floor 614.4, -921 within 10-30 units past it in every direction): a 90-unit stand with a 50-frame
+walk fell into the pit (a life), a stand inside its radius with no walk does not collect it; 60 units
+and a 6-frame walk do. The plasma rifle at the Queen instead of the scorpion launcher (`T2G1_QW=10`):
+worse (304 damage, 2 lives).
+
+**The lair by stick is the remaining gap.** h3's rule there (`T2_AIMD_BOSS=4:350`) lost 4 lives, the
+picker 2: the deaths are single hits of the whole health (151, 100, 90, 92) at 900-4,000 units from
+him, falls (the floor has pits inside its twelve-sided edge, which `lair_floor` and the edge guard do
+not know; with the stick's yaw the script's strafes walk somewhere else than with the assists').
+`--lair-push both` changes nothing (no push came). With **`--assist-keep lair`** (the lair on the
+assists' yaw, as g5's validated legacy combo) the run has no death:
+
+| run | options added to the default | result |
+|---|---|---|
+| base | `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` (round 19's code) | 3 lives at the Queen by 190,567 (stopped there; her step-5 wave never ended) |
+| cmbF | the same on this part's code (the Queen by the picker, 450, 91's health) | the Queen 122 damage, lowest 39, no life; **the lair 4 lives** (falls), no END |
+| cmbI | + `--stick-boss ""` (the picker in the lair too) | END 2 (level 10 at 273,930), 2 lives in the lair |
+| **cmbH** | **`--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair`** | **END 2 (level 10 at 254,496), 5 totems, 0 lives lost**, md5 `9a76b29f…` (600,000 lines) |
+
+Per fight in cmbH (damage / lowest): the Harbor Totem 82/118, 133 21/179, 134 28/172, 135 29/171, the
+City Totem 32/139, the Marsh Totem 18/182, the Cave Totem 99/101, the Blind One 65/36, **124 35/1** (the thinnest spot), the
+Hive Totem 39/161, the Queen 122/39, the Mother 53/147, the lair (assisted) 44/156.
+
+### 42-i2.3 Level 2 on real weapons (`--real-weapons 1,2 --hub-wait 0`)
+
+On this round's tree the two sisters no longer cost a life (run rw12, before any change below): 133
+(sister 1) 165 damage, lowest 35; 134 (sister 2) 174, lowest 26 (h3's run B, round 19, with the stick:
+a life in each). **135 is the gap: the player arrives with no ammo left** (weapon 0, the talons, from
+the graveyard on), loses a life there (270 damage), and after the respawn the route falls out of step
+(stuck in 125 to the end). Three changes, all only with `--real-weapons 2` on the N64 stream:
+
+- **132's ammo cache** on its east floor (y 409.6: `tools/assets/levels.py` objects 519 bullets (item
+  2504), 521 shells (2502), 534 (2203)), picked at the start of 132's first visit (segment 11, before
+  soul gate 2; approach angles by `itemreach.py`): `N64_L2_ARMS`. All three are taken.
+- **135's own shotgun** (object 571, item 2008, at (0, 0, -4864) past door 59: +10 shells), picked at
+  135's start (`N64_L2_ARMS` segment 12).
+- **135's graveyard zombies are not shot** (`N64_L2_135_HOLD`; `T2I2_135HOLD=0` lifts it); the step
+  keeps its shotgun tap (`N64_L2_TAPS` (12, 1)).
+
+Run rw12d: 20 shells reach the crypts (rw12: none) and are spent by ~76,300 (crypt zombie 45), the
+game switches to the mag 60, whose 40 bullets are gone by ~77,000, then the talons; **still a life in
+135** (270 damage, lowest 9). What is left: more ammo for zombie 44 and sister 3 (130's
+bullets x40 and shells x10 by its exit, 131's remaining 519/522/525/534 objects), sister 3 on the
+grenade launcher; then the City Totem on picked-up ammo (never tried on either stream).
