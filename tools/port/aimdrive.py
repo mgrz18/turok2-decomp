@@ -188,6 +188,23 @@ PRIMARY_R = envf("T2_AIMD_PRIMARY_R", 600.0)
 # Mother: her parts are nodes 900-1,500 units from both candidate origins; aimed at the origins her six parts took
 # 5,400 frames instead of 2,000 while she hit the pinned player every ~80: 307 damage, 2 lives in s6d)
 PRIMARY_ONLY = {int(v) for v in os.environ.get("T2_AIMD_PRIMARY_ONLY", "").split(",") if v.strip()}
+# round 19 h3: T2_AIMD_BOSS=L[,L...]: in level L the assist's point (the boss's damage node) is the only target
+# unless a candidate threatens: within BOSS_THREAT units of the player (a kind-0 one: BOSS_THREAT0), the nearest
+# such one is shot first. The Primagen's lair by stick (g5, s6e): the picker spent ~7,900 of ~16,000 aim frames on
+# his spawns (ids 10000+) wherever they were, him ~6,500: 295 damage, 3 lives. The point is led by its own motion
+# over the shot's flight (BOSS_LEAD of it; PSPEED).
+# "L:R" sets level L's threat radius (both kinds). In the boss levels the fire is held while on target
+# (BOSS_HOLD: the assisted fights hold Z; the tap rhythm of FIRE_EVERY gave the launchers a third of their rate).
+BOSS_THREAT = envf("T2_AIMD_BOSS_THREAT", 350.0)
+BOSS_THREAT0 = envf("T2_AIMD_BOSS_THREAT0", 250.0)
+BOSS, BOSS_R = set(), {}
+for _v in os.environ.get("T2_AIMD_BOSS", "").split(","):
+    if _v.strip():
+        BOSS.add(int(_v.split(":")[0]))
+        if ":" in _v:
+            BOSS_R[int(_v.split(":")[0])] = float(_v.split(":")[1])
+BOSS_HOLD = envf("T2_AIMD_BOSS_HOLD", 1.0) != 0
+BOSS_LEAD = envf("T2_AIMD_BOSS_LEAD", 1.0)
 CAND_EVERY = int(envf("T2_AIMD_CAND_EVERY", 50))   # --stats: the candidates every this many frames
 
 
@@ -241,6 +258,8 @@ class Picker:
         self.immunes = 0
         self.aimed = {}         # IMMUNE_ACC: id -> [health at its last drop, frames aimed at since]
         self.last = None        # the last aim frame
+        self.bpt = None         # BOSS: (frame, the assist's point, its velocity)
+        self.threats = 0        # BOSS: aim frames given to a threat instead of the boss
 
     def vel(self, frame, cid, pos):
         old = self.seen.get(cid)
@@ -256,6 +275,8 @@ class Picker:
         acc = lv in IMMUNE_ACC
         if lv in PRIMARY_ONLY and primary is not None:
             return primary, None
+        if lv in BOSS and primary is not None:
+            return self.boss(frame, px, pz, ex, ez, cands, primary, lv)
         if not cands:
             self.cur = None
             return primary, None
@@ -318,6 +339,38 @@ class Picker:
         return pts[best], best
 
 
+    def boss(self, frame, px, pz, ex, ez, cands, primary, lv=None):
+        """T2_AIMD_BOSS (round 19 h3): the boss's node, led; a threat near the player first."""
+        near = []
+        for cid, x, y, z, hp, kind in cands:
+            d = math.hypot(x - px, z - pz)
+            r = BOSS_R.get(lv, BOSS_THREAT if kind else BOSS_THREAT0)
+            if hp > 0 and math.dist((x, y, z), primary) > 300.0 and d < r:
+                near.append((d, cid, (x, y, z)))
+        if near:
+            d, cid, pos = min(near)
+            v = self.vel(frame, cid, pos)
+            t = math.hypot(pos[0] - ex, pos[2] - ez) / PSPEED
+            if cid != self.cur:
+                self.switches += 1
+                self.cur = cid
+            self.threats += 1
+            self.last = frame
+            return tuple(a + LEAD * b * t for a, b in zip(pos, v)), cid
+        v = (0.0, 0.0, 0.0)
+        if self.bpt and 0 < frame - self.bpt[0] <= 4 and math.dist(self.bpt[1], primary) < 60.0 * (frame - self.bpt[0]):
+            dt = frame - self.bpt[0]
+            raw = tuple((a - b) / dt for a, b in zip(primary, self.bpt[1]))
+            v = tuple(0.3 * a + 0.7 * b for a, b in zip(raw, self.bpt[2]))
+        self.bpt = (frame, primary, v)
+        t = math.hypot(primary[0] - ex, primary[2] - ez) / PSPEED
+        if self.cur != -1:
+            self.switches += 1
+            self.cur = -1
+        self.last = frame
+        return tuple(a + BOSS_LEAD * b * t for a, b in zip(primary, v)), None
+
+
 class Trigger:
     """Z only on target: the crosshair within HIT_R of the (led) aim point at its distance, in yaw
     and pitch (pitch with half again the margin: the camera eases), then a tap as the script's."""
@@ -327,8 +380,15 @@ class Trigger:
         self.next = -1
         self.shots = 0
 
-    def z(self, frame, eyaw, epitch, dist):
+    def z(self, frame, eyaw, epitch, dist, hold=False):
         tol = max(0.03, math.atan2(HIT_R, max(dist, 1.0)))
+        if hold:   # round 19 h3 (BOSS_HOLD): Z held while on target, as the assisted boss fights hold it
+            on = abs(eyaw) < 1.5 * tol and abs(epitch) < 2.0 * tol
+            if on and frame >= self.until:
+                self.shots += 1
+            if on:
+                self.until = frame + FIRE_HOLD
+            return 1 if frame < self.until else 0
         if frame < self.until:
             return 1
         if abs(eyaw) < tol and abs(epitch) < 1.5 * tol and frame >= self.next:
@@ -352,7 +412,8 @@ def answer(line, aim, probe=None, picker=None, trig=None):
         (tx, ty, tz), cid = picker.pick(frame, px, pz, ry, ex, ey, ez, pitch, cands, (tx, ty, tz), line_level(f), line_totem(f))
     sx, sy, eyaw, epitch = aim.answer(frame, px, pz, ry, ex, ey, ez, pitch, tx, ty, tz)
     dist = math.hypot(tx - ex, tz - ez)
-    z = trig.z(frame, eyaw, epitch, dist) if trig is not None else None
+    lv = line_level(f)
+    z = trig.z(frame, eyaw, epitch, dist, BOSS_HOLD and lv in BOSS) if trig is not None else None
     if z is not None and dist > FIRE_MAX.get(line_level(f), 1e9):
         z = 0   # too far for this level's weapon (round 17 f5): no fire
     return frame, sx, sy, eyaw, epitch, pitch, ry, cid, z
@@ -816,9 +877,9 @@ def main():
                   file=sys.stderr)
         shutil.rmtree(d, ignore_errors=True)
         if picker or trig:
-            print("aimdrive: %d target switches, %d left as not hurt, %d shots" % (
-                picker.switches if picker else 0, picker.immunes if picker else 0, trig.shots if trig else 0),
-                file=sys.stderr)
+            print("aimdrive: %d target switches, %d left as not hurt, %d shots, %d boss-threat frames" % (
+                picker.switches if picker else 0, picker.immunes if picker else 0, trig.shots if trig else 0,
+                picker.threats if picker else 0), file=sys.stderr)
         print("aimdrive: %d stick answers, %d move answers (%d with the lair driver's own C buttons, %d keeping "
               "away); the game exited %d" % (n, moves, drive.overrides + drive.keeps if drive.kind == "guard" else moves,
                                              drive.keeps, rc), file=sys.stderr)
