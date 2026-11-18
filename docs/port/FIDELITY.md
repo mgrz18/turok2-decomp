@@ -373,3 +373,30 @@ With the seed set at the load the port drew 142 numbers by gf 1 of level 53, the
    `--n64-props`; T2_LEGACY_INTEL9 can then go from `--n64-shake`.
 4. `n64trace --watch-write` catches nothing (physical or virtual address): mupen's write
    breakpoints need another look.
+
+## 8. The round-17 merge: the sound world headless, the n64cmp sweep of 125, 61 and 100 (Phase 7 round 17, the merge C32)
+
+**7.3's first finding is acted on**: every game run with the ROM now runs the sound world (the
+samples are dropped without `--audio`/`--wav`), so a scripted run draws the sound requests' random
+numbers as a player with sound and the N64 do; `T2_LEGACY_NOSOUND=1` keeps the old silent stream
+for the tuned routes (PLAYTHROUGH.md 35.1). A headless boot and an `--audio` boot give the same
+16,000 det lines over 8,000 frames. Against the N64's RAM the demos are as before (demos 1 and 3:
+no field but `rng`; the `rng` from gf 8, 7.3's load-time draws).
+
+**The sweep** (`n64cmp.py run --warp -(L+1) --level L --gf 1-30 --brief`, the merged Release build,
+`--audio --draw` on the port side as in 7.4):
+
+| level | differing members (30 gf) | what differs |
+|---|---|---|
+| 125 | 9,115 | the `m_AI.m_VarBuffer` views (as in 7.4); the level actors' blend fields (`m_BlendAnimation.m_nAnimStartFrame`, `m_BlendLength`, `m_Blend`, `m_BlendPercent`: garbage on the N64, stale heap like 7.4's `m_Resource`); the camera's `m_mProjection` (the `Mtx` integer/fraction halves: representation) and `m_MenuPool`; `SCN unk_18E54[0-5]` and `m_Geom[0,1,4].m_Data[5]`; **actor 51 (type 135)**: `m_qGround` (0.014, 0, 0.19, 0.98) on the N64, identity on the port, so its `m_mfOrient` and bounds differ every frame; actors 52-53 (type 135): `m_Lights` colours and `m_ShadowAlpha`; the weapon actor's ambient light (5 vs 0) at gf 1 only; `gRandomValue` at gf 2, 5, 7, 9, 10 but equal at gf 3, 4, 6, 8 (draws between the game frames fall on the other side of the dump: the audio thread's timing, not a different count) |
+| 61 | 11,407 | the `m_VarBuffer` views; particle 0 (position, velocity, attach point); **45-65 level actors' `m_Lights` (colours, directions) and `m_ShadowAlpha`** |
+| 100 | 2,470 at gf 5 | the same: **57-83 actors' `m_Lights` and `m_ShadowAlpha`**, `_pad2` |
+
+No host bug was confirmed in the time left. Two leads: **(1) the per-actor lights** (`m_Lights`,
+`m_ShadowAlpha`) differ for most actors of 61 and 100 and some of 125, while the lair matched
+(7.4): either the lighting code reads a light or the level's ambient through an N64-offset view, or
+the port computes them at another point of the frame (the dump follows the drawn frame); start with
+`n64trace.py --calls` on the function that fills `m_Lights` for one actor of 61. **(2) actor 51 of
+125** keeps an identity ground quaternion: the ground alignment for type 135 (the `m_qGround`
+writers: `func_00219BC0.c`, `func_0024C47C.c`, `func_0025C018.c`, ...) does not run or reads the
+floor normal differently on the host.

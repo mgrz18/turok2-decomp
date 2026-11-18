@@ -1,233 +1,210 @@
-# Port status after Phase 7 round 16 (merged state)
+# Port status after Phase 7 round 17 (merged state)
 
-Round 16 merged five branches, in this order: e1 (the N64 lair and Mother checks, **the camera
-shake's host-offset bug fixed**), e4 (macOS: **a fresh clone builds with only the ROM**, ThinLTO),
-e2 (the stick driver picks its own target and fires: **the sisters by stick**), e5 (**real weapons
-in level 1 to the good ending**, the fire gate) and e3 (**the waypoint walker** on the region mesh).
-The merge made the input pipe one protocol for every driver (stick, C buttons, fire, jump), taught
-`n64viewcheck.py` e1's bug class (and fixed the one other site it found), and added `--n64-shake`.
-On the merged tree **the default command plays the whole game to the GOOD ending with no
-invincibility, exactly as round 15 did** (580,000 det lines, md5 `ecb9f9f2…`, three runs), and
-each new option combination validated below reaches the good ending too. Detail pages:
-[PLAYTHROUGH.md](PLAYTHROUGH.md) sections 27 (e1), 28 (e2), 29 (e5), 30 (e3) and 31 (this merge),
-[MACOS.md](MACOS.md) 18 and [QUICKSTART.md](QUICKSTART.md) 1 (e4). The branch sections follow
-section 4; round 15's merged state and earlier rounds follow as history.
+Round 17 merged five branches, in this order: f3 (the port against the N64 member by member,
+`n64cmp.py`; **the type-9 intelligence host bug fixed**: the props with interactive animations
+start on their own animation), f4 (macOS: **the boss and totem health bars drawn**, 8-bit
+screenshots, `shotcmp.py`, frame pacing), f1 (**the whole game on the N64's camera-shake stream to
+the good ending**: health pickups in the graveyard), f2 (levels 4-6 and the bosses on that stream)
+and f5 (**the stick and real weapons together: the good ending with no life lost**). The merge
+gave every scripted game its own settings folder (the `turok2.cfg.json` race), and made **the sound
+world run in every headless run** (f3's finding: without `--audio` the sound requests drew no
+random numbers, a third stream), with `T2_LEGACY_NOSOUND` keeping the old stream for the routes.
+On the merged tree **the default command plays the whole game to the GOOD ending exactly as in
+round 16** (580,000 det lines, md5 `ecb9f9f2…`), and each combination validated below reaches the
+good ending too. Detail pages: [PLAYTHROUGH.md](PLAYTHROUGH.md) 32 (f1), 33 (f2), 34 (f5) and 35
+(this merge), [FIDELITY.md](FIDELITY.md) 7 (f3) and 8 (this merge), [MACOS.md](MACOS.md) 19 and
+[RENDER.md](RENDER.md) 7 (f4). The branch sections follow section 4; round 16's merged state and
+earlier rounds follow as history.
 
-The matching build is unchanged: `tools/asm_diff.py --base 5d835e51 -j 8` reports 0 differences
+The matching build is unchanged: `tools/asm_diff.py --base b744bd39 -j 8` reports 0 differences
 over all 3,938 files after every merge and at the end, and a clean `make clean && make setup &&
 make -j8 build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
 ## 1. Build and run
 
 **To play** (Mac or Linux, a Release build, a window, a gamepad or the keyboard and mouse):
-[QUICKSTART.md](QUICKSTART.md). **A fresh clone needs only the ROM** (e4): `gendata.py` reads
-`versions/port_layout.us.json` (the matching ELF's symbol and section tables, no game data) plus
-the ROM when `build/turok2.us.elf` is absent; `mkarchive.py` creates `OUT/`; on macOS Xcode's
-libclang serves when the Command Line Tools are missing, deployment target 27.0; QUICKSTART 1
-gives the steps with their real times. **After a merge that adds, renames or moves a data symbol,
-run `python3 tools/port/mklayout.py` on the box (ELF + ROM) and commit the json** (`--check`
-exits 1 when it is stale; up to date at the end of this round). On the box the json and the ELF
-give the same `port/gen` sources (only `data_report.txt` lists one type's two shapes in the other
-order).
+[QUICKSTART.md](QUICKSTART.md). A fresh clone needs only the ROM (round 16 e4: `gendata.py`
+reads `versions/port_layout.us.json` plus the ROM when `build/turok2.us.elf` is absent).
+**After a merge that adds, renames or moves a data symbol, run `python3 tools/port/mklayout.py`
+on the box (ELF + ROM) and commit the json** (`--check` exits 1 when stale; up to date at the end
+of this round).
 
-- **The Mac app** (round 15 d4, MACOS.md 17): `tools/port/mkapp.sh BUILD [APP]` makes the
-  self-contained ad-hoc signed `Turok2.app` (`T2_APP_ZIP=1` zips it); not yet Developer ID signed
-  or notarised. `-DT2_LTO=ON` (e4) links with ThinLTO (`hostify.py` marks a file's own label
-  targets `used`); off by default: the same det log and not faster.
-- The player's settings, F1 for the controls and the clean startup errors are round 15's.
+- **The Mac app** (MACOS.md 17-19): `tools/port/mkapp.sh BUILD [APP]` makes the self-contained
+  ad-hoc signed `Turok2.app` (`T2_APP_ZIP=1` zips it); not yet Developer ID signed or notarised.
+  f4 (MACOS.md 19): the Mac renders the same frames as Linux up to GPU rounding; **open**: the
+  player window defaults to LUS's Metal backend and, on a retina screen, renders at point
+  resolution (not checked without a window). `-DT2_LTO=ON` stays off by default.
+- The development build (Linux box, headless) is round 13's recipe ("Round 13: build and run"
+  below); `port/app/CMakeLists.txt` now builds `offscreen_gl.cpp` with `ENABLE_OPENGL` on every
+  non-Windows host (f4). **Use a Release (`-O2`) build for long runs**; Linux screenshots:
+  `SDL_VIDEODRIVER=offscreen` without `--no-window` (`--offscreen-gl` is macOS only).
 
-The development build (Linux box, headless) is round 13's recipe ("Round 13: build and run"
-below) with round 14's changes; **use a Release (`-O2`) build for long runs** (the whole game in
-~140 s on the box).
-
-**The whole game to the good ending, no invincibility** (PLAYTHROUGH.md 26 and 31):
+**The whole game to the good ending, no invincibility** (PLAYTHROUGH.md 26, 31 and 35):
 
 ```sh
 python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6
-mkdir -p RUN/pak && cd OUT && . ../RUN/teleport.env && SDL_VIDEODRIVER=offscreen \
+mkdir -p RUN/pak && cd RUN && ln -s ../OUT/turok2.o2r . && cp ../OUT/turok2.cfg.json . && \
+  . ./teleport.env && SDL_VIDEODRIVER=offscreen \
   T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=500 T2_PROGRESS_LOG=1 T2_HURT_LOG=1 T2_BOSS_LOG=1 \
-  python3 ../tools/port/aimdrive.py -- build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
-  --game --pak-dir ../RUN/pak --frames 290000 --input @../RUN/playthrough.txt
-python3 ../tools/port/mpk_saves.py ../RUN/pak/turok2_pak1.mpk      # the saves after levels 1-5
+  python3 ../tools/port/aimdrive.py -- ../OUT/rel/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
+  --game --no-window --pak-dir pak --frames 290000 --input @playthrough.txt
+python3 ../tools/port/mpk_saves.py pak/turok2_pak1.mpk      # the saves after levels 1-5
 ```
 
-`playthrough.py` now creates `RUN/`. Its `teleport.env` and `playthrough.txt` are round 15's plus
-one line, **`T2_LEGACY_SHAKE=1`**: e1 found that `CCamera__Construct` (and `CShake__Construct`)
-wrote the camera shake's fields at their N64 offsets, so on the host the shake radius stayed 0 and
-`CShake__ApplyOffset` never drew its three random numbers per camera per frame (6 random numbers a
-game frame where the N64 takes 12). The fix makes the port's random stream the N64's; the
-scripted route was tuned on the old stream, so `fullrun.py` and `playthrough.py` write
-`T2_LEGACY_SHAKE=1` (DEBUG-ONLY: the old stores, rounds 1-15's stream) into every route they
-generate. **Play mode and any run without the variable have the N64's shake and RNG.**
-`--n64-shake` leaves the line out (the route on the N64 stream: not yet tuned, section 2). Use an
-EMPTY `--pak-dir`; **kill a stuck run with SIGKILL** (the game ignores SIGTERM).
+**Run each game in its own directory** (f5, PLAYTHROUGH.md 34.6: `turok2.cfg.json` is read at
+start and written at exit; two runs from one `OUT/` once diverged). `aimdrive.py` now also gives
+each game it starts its own `SHIP_HOME` (a temp folder with a copy of the current directory's
+`turok2.cfg.json`; LUS writes the config, `imgui.ini` and `logs/` there), so two runs from one
+directory no longer race (`T2_KEEP_CWD_CFG=1`: the old behaviour). Use an EMPTY `--pak-dir`;
+**kill a stuck run with SIGKILL** (the game ignores SIGTERM) and kill its `aimdrive.py` too: a
+game that exits before it opens the pipe leaves the driver waiting on it.
+
+**The legacy switches** (DEBUG-ONLY, port/game/t2debug.c). Each restores an old behaviour the
+scripted routes were tuned on; `fullrun.py` and `playthrough.py` write all three into every
+`teleport.env`. **A human player (`--play`) and any run without the variable get the N64's
+behaviour.**
+
+| switch | restores | the fix it undoes | route option that leaves it out |
+|---|---|---|---|
+| `T2_LEGACY_SHAKE=1` (`=1,F`: until schedule frame F) | the camera shake radius 0: no shake random draws (6 a game frame fewer than the N64) | round 16 e1, `CCamera__Construct` | `--n64-shake` (`--n64-shake-from L`: levels L.. only) |
+| `T2_LEGACY_INTEL9=1` | the type-9 (interactive anim) intelligence bodies left big-endian: the props start on animation 0 | round 17 f3, `CScene__DecompressIntelligence` and its VM twin | `--n64-props` |
+| `T2_LEGACY_NOSOUND=1` | no sound world without `--audio`: the sound requests draw no random numbers | round 17 merge, `game.cpp` (`cfg.audio`) | `--n64-sound` |
 
 **Validated option combinations** (each added to the default command; Release, under
-`aimdrive.py`, 290,000 frames; PLAYTHROUGH.md 31.3):
+`aimdrive.py`, 290,000 frames, each in its own directory; PLAYTHROUGH.md 35.2):
 
 | options | result |
 |---|---|
-| (none) | END 2 at 252,194, all 5 totems, 2 lives lost (the City Totem); md5 `ecb9f9f2…` on 3 runs |
-| `--real-weapons 1` | END 2 at 252,980, 5 totems, 2 lives lost (the City Totem) |
-| `--stick-aim 2 --assist-keep 110` | END 2 at 253,788, 5 totems, 2 lives lost (the City Totem, level 5); the same md5 twice |
-| `--nav 1,2,3,4` | END 2 at 250,970, 5 totems, 3 lives lost (the City Totem, 2 in the Primagen's lair) |
-| `--real-weapons 1 --stick-aim 2 --assist-keep 110` | the ending (cinema 130) at 254,756 but **4 totems**: the City Totem lost (2 lives there), so not the good ending |
+| (none) | END 2 at 252,194, all 5 totems, 2 lives lost (the City Totem); md5 `ecb9f9f2…` (round 16's) |
+| `--n64-shake` (f1 + f2) | END 2 at 252,060, 5 totems, **1 life lost** (the City Totem) |
+| `--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` (f5) | END 2 at 250,402, 5 totems, **no life lost** ; md5 `15d3d74f…` twice (ASLR on and off) |
+| `--real-weapons 1` | END 2 at 252,980, 5 totems, 2 lives lost (the City Totem); md5 `3cb702ff…` (round 16's) |
+| `--stick-aim 2 --assist-keep 110` | END 2 at 253,788, 5 totems, 2 lives lost (the City Totem, level 5) ; md5 `9432c11d…` (round 16's) under `setarch -R` |
+| `--nav 1,2,3,4` | END 2 at 250,970, 5 totems, 3 lives lost (the City Totem, 2 in the Primagen's lair) ; md5 `8702568d…` (round 16's) under `setarch -R` |
+| `--n64-shake --n64-props` (stretch) | END 2 at 260,790, 5 totems, 2 lives lost (the City Totem, the Blind One) |
+| `--n64-shake --n64-props --n64-sound` (no legacy switch at all) | **not yet**: 2 lives lost at sister 2 (134), game over in 125 at 108,496 |
 
-The other `--all` options are round 15's (section "Round 15, 1" below) plus e2's `T2_AIMD_*`
-driver settings, e5's `T2_AIM_SKIP_TYPES` / `T2_FIRE_GATE` (written by `--real-weapons 1,2`) and
-e3's `--nav L,...`, `--nav-only L:I.J,...` and `--walk-probe`.
+**A determinism caveat found this round** (PLAYTHROUGH.md 35.3): with ASLR on, about one run in
+three of the default command (also on the b744bd39 build) takes a second path in level 2's 135
+around frame 72,500: actor 31's hit-box matrices put its node 0.6 units off (`aim` line 5807.3
+instead of 5806.7), the particle hash follows, then the `rng`; the run comes back to the same
+state by ~82,500 and reaches END 2 at the same frame with the same lives. With `setarch -R` (no
+ASLR) every run took the first path (md5 `ecb9f9f2…`). Compare det md5s on runs under `setarch -R`
+until the pointer-dependent read is found.
 
-**The input pipe** (`T2_AIM_FIFO`, `aimdrive.py`; game.cpp `AimFifoExchange`). After each frame
-with an `aim` line (inside `T2_AIM_STICK` windows: the pose, the target, e2's candidate targets
-and the player's health) or a `move` line (`T2_MOVE_DRIVE` and `T2_WALK_PLAN` windows: the player
-and the boss), the driver answers one line, the same format for every line kind and every driver:
-
-```
-SX SY [cH] [z0|z1] [r0|r1]
-```
-
-SX SY is the stick (-128..127) or `- -` (keep the script's stick); each token sets one button
-group over the script's for the next frame and a group no token names stays the script's: `cH`
-the C buttons (hex mask U 8, D 4, L 2, R 1), `z0`/`z1` the Z trigger (fire), `r0`/`r1` the R
-trigger (jump). AimDrive answers `SX SY [zN]`, LairDrive `- - cH`, WalkDrive `SX 0 cH` (`r1` when
-a walk wants a jump: the nav graph has no jump edges yet). e5's `T2_FIRE_GATE` (the script's Z
-held back while the aimed actor sleeps or is far) applies in both pad paths and defers to a `z`
-token. A bad token is reported once on stderr.
-
-**Tools** (new this round): `tools/port/nav.py` (e3: the region mesh of a sub-level as a nav
-graph, A*, the funnel; walls are steep regions, drops one-way), `navcands.py` (the route
-teleports a walk could replace) and `navplot.py` (a PNG of the mesh and a path);
-`tools/port/mklayout.py` (e4: `versions/port_layout.us.json`, `--check`); `n64trace.py` (e1:
-`--start-warp ID@N` starts the N64 at a warp from the attract loop, `--pad F1-F2:BUTTONS` drives
-controller 1, `--warp`, `--poke`, `--watch`, `--watch-write`); `n64viewcheck.py`'s **cast** kind
-(this merge: an `include/` struct pointer, `&obj->member` or a plain pointer, cast to a view
-struct defined in the file; the view's fields used through that cast, directly or through the
-variable it is assigned to, are judged as the struct's members at their N64 offsets);
-`aimstats.py --stick` (e2). The port-side hooks for the N64 comparisons: `T2_START_WARP=ID@F`,
-`T2_RNG_SET=LEVEL:GF:HEX`, `T2_PRIMAGEN_STAGE=F[,F]` (e1).
+**Tools** (new this round): `tools/port/n64cmp.py` (f3: both sides from the same warp and seed,
+the state structs dumped and compared member by member by name with libclang layouts;
+`run`/`cmp`, `--brief`, `--no-noise`), the port's `T2_RAW_DUMP=FILE:LEVEL:GF[-GF2]` and
+`T2_RNG_LOAD=T:HEX`, `n64trace.py --raw/--rng-set/--rng-load/--ticks`; `shotcmp.py` (f4:
+pixel-by-pixel screenshot comparison, PSNR, diff images), `refshots.py --start-warp ID@N` (N64
+reference shots of a level from its warp), `--bench` cadence and histograms, `T2_BENCH_CSV` +
+`benchcsv.py`; `T2_SHOT` writes 8-bit RGB now (`T2_SHOT_RGB16=1`: the old 5-bit readback).
+Route options: `--n64-props`, `--n64-sound`, `--n64-shake-from L`, `--lair-keep D` (f2),
+`--l2-heal` (f5); `aimdrive.py`'s `T2_AIMD_IMMUNE_ACC`, `T2_AIMD_THREAT_NEAR`, `T2_AIMD_FIRE_MAX`
+(f5) and `T2_LAIR_KEEP` (f2).
 
 ## 2. What the game does now (Linux, headless, PIE)
 
-- **The whole game to the good ending with no invincibility**, as in round 15, frame for frame:
-  the default command gives the same 580,000 det lines (md5 `ecb9f9f2…`, `ptcl` included) on three
-  runs of the merged Release build (one drawn), and so do e4's two Linux runs and the Mac builds
-  (plain, ThinLTO, the fresh-user build and archive: MACOS.md 18). Round 15's particle-hash
-  difference did not come back (e1: 18 runs). The table in section 1 has the option runs.
-- **The sisters with the stick** (e2): the stick driver picks among the candidate targets, leads
-  a moving one and fires only on target; with `--stick-aim 2 --assist-keep 110` level 2's three
-  Sisters of Despair die to the stick with no life lost. `--stick-aim 1,2,3,4 --assist-keep 1`
-  plays levels 1-4 by stick with no life lost but then loses 2 lives in level 5's 117 and stops in
-  116; the Blind One still needs its assist.
-- **Real weapons** (e5): `--real-weapons 1` reaches END 2 (level 1 on picked-up weapons, the
-  Blind One killed with the shredder after `BLIND_WEAPON_AFTER`); level 2's sister 1 (133) dies on
-  picked-up weapons (`--real-weapons 1,2`: doors never aimed at, `T2_FIRE_GATE`); sister 2 (134)
-  is still a game over (the ammo goes on zombies before gate 8).
-- **Walking** (e3): `--nav 1,2,3,4` replaces the route teleports of `NAV_WALKS` by closed-loop
-  walks over the pipe and still reaches END 2; 13 of 43 segments arrive alone, 1 survives in the
-  whole run (each arriving walk changes the next fight).
-- **On the N64's RNG** (`--n64-shake`, the stretch goal; PLAYTHROUGH.md 31.4): the route does not
-  finish. It loses its first life in level 2's graveyard (135) at 72,371 (the crypt-key steps after
-  the two crypt-zombie fights, which cost ~15 more health than on the old stream), falls out of
-  step with the schedule, never reaches the City Totem and ends in game over in 125 at 154,972.
-  Longer fire windows on the crypt zombies (+800, +1,000 frames) moved the death but did not
-  prevent it. The boss recipes on the N64 stream: the Mother (32,557), the Blind One (23,103, the
-  same frame) and the Queen (26,583) die; the Primagen recipe does not kill him in 62,000 frames.
+- **The whole game to the good ending with no invincibility**, as in rounds 15 and 16, frame for
+  frame (the table above).
+- **On the N64's camera-shake stream** (`--n64-shake`, f1 + f2): END 2 with one life lost. f1's
+  seven health +10 pickups in the graveyard (135, `N64_L2_PICKS`) carry the run through level 2;
+  f2's changes for levels 4-6 (the shredder for the Cave Totem, the Mother strafe from +4,600, the
+  lair driver's keep-away) through the rest. With the N64's props as well (`--n64-props`) it still
+  reaches END 2 (2 lives lost). On the fully N64-accurate stream (all three switches off) it does
+  not finish yet (sister 2 and 125).
+- **No life lost with real weapons and the stick** (f5): level 1 on its own picked-up weapons,
+  the Blind One and the City Totem by stick (per-target "not hurt" accounting), ten health +10
+  pickups before the City Totem.
+- **The boss and totem health bars draw** (f4): the Blind One's bar, the City Totem's two bars
+  (screenshots below).
+- **The type-9 props** (f3): the lair's interactive-animation props start on their own animation;
+  the lair's level actors, pooled instances and player are identical to the N64's at gf 1-10.
 - **The debug aids that remain** (the default run): `T2_GIVE_WEAPONS`, the weapon schedule and
   `T2_FILL_AMMO` (level 1 can do without: `--real-weapons 1`); the aim assists (`T2_FACE_NEAREST`
   at the totems, `T2_AIM_ENEMY`, `T2_AIM_AT`, `T2_AIM_NODE` at the four bosses, `T2_BOSS_FRONT`
-  for the Queen; level 2 can do without: `--stick-aim 2 --assist-keep 110`); **the lair peeks**
-  (`T2_LAIR_PEEK`, 2 per run); **289 teleports** between route steps (`--nav 1,2,3,4` walks some
-  of them); the anchors (`T2_ANCHOR`); **`T2_LEGACY_SHAKE`** (the route's random stream). **The
-  lair peek is an N64 property** (e1, PLAYTHROUGH.md 27.2): with `--start-warp`/`--warp` the N64
-  puts the Primagen at the same hover point and its stage-2 home wait never ends from any floor
-  point either; it is the one aid that cannot go away without another strategy (the pits).
-- **The level runs** (`playthrough.py DIR --fight 10 | --level 2..6`, Release, `--pak-blank`):
-  every det line and gameplay line identical to round 15's build (5d835e51).
-- **The boss recipes** with `T2_LEGACY_SHAKE=1`: every det and gameplay line identical to round
-  15's build (the Mother at 28,775, the Blind One 23,103, the Queen 28,143, the Primagen 43,586).
-- **The boot and the demos** (26,000, `--pak-blank`): with `T2_LEGACY_SHAKE=1` the 52,000 det lines
-  are round 15's; without it the `rng` field and the particles differ, the gameplay lines do not.
-  Against the N64's RAM (`n64trace.py` + `detdiff.py`, both modes): demos 1 and 3 have no
-  difference in any field but `rng`, demo 2 the known `player.hp` difference (the N64's
-  uninitialised read); the `rng` field differs from the N64's from game frame 16 of demo 1 in
-  both modes, so the fix neither costs nor gains a demo field.
-- **Save, title, load**: the save portal writes note 1 (checksum OK, `mpk_saves.py`); the load
-  from the title puts the player in level 51. **`--audio --wav` boot** (9,000): 3,311,264 stereo
-  frames, RMS 3,396.8 (with `T2_LEGACY_SHAKE=1` the WAV is round 15's byte for byte).
-- **padtest.py** (Release): OK. Clean errors: the `dummy` driver exits 1 with "The window could
-  not be created ..."; `--audio` without `--rom` says "--audio needs the ROM" and runs with the
-  audio off (exit 0).
-- **soak.py** (the fresh PIE Debug build): attract 100,000 frames, newgame seeds 0-19 x 36,000,
-  levels seeds 0-40 x 17,000: **0 crashes** (62 runs).
+  for the Queen; level 2, the Blind One and the City Totem can do without: `--stick-aim 1,2,4`);
+  the lair peeks (`T2_LAIR_PEEK`, 2 per run; an N64 property); **289 teleports** between route
+  steps (`--nav 1,2,3,4` walks some); the anchors (`T2_ANCHOR`); and the three legacy switches
+  (section 1).
+- **The level runs** (`playthrough.py DIR --level 1..6`, Release, `--pak-blank`): every det line
+  identical to the b744bd39 build's (with the legacy switches the tools write).
+- **The boss recipes** (legacy switches on): every det line identical to b744bd39's (the Mother at
+  28,775, the Blind One 23,103, the Queen 28,143, the Primagen 43,586). The Primagen on the N64
+  shake stream with `T2_LAIR_PEEK=2400@14000`: dead at 40,728 (f2's number; 40,486 with no legacy
+  switch at all).
+- **The boot and the demos** (26,000, `--pak-blank`): with the three legacy switches the 52,000 det
+  lines are b744bd39's. Against the N64's RAM (`n64trace.py` + `detdiff.py`, the default build, no
+  legacy switch): demo 1 (gf 1-1,128) and demo 3 (gf 1-344) no difference in any field but `rng`;
+  demo 2 the known `player.hp` difference from gf 608 (the N64's uninitialised read). The `rng`
+  field differs from gf 8 of demo 1 (the N64's audio thread draws during the load: FIDELITY.md 7.3).
+- **Save, title, load**: the default run's pak holds note 1 (NT2E 51, checksum OK, health 23,
+  lives 2, 0:46:27, `mpk_saves.py`); a new boot loads it from the title into the hub (level 60,
+  totems 11111, bosses 1100, health 23). **`--audio --wav` boot** (9,000): 3,311,264 stereo frames;
+  with `T2_LEGACY_SHAKE=1 T2_LEGACY_INTEL9=1` the WAV is b744bd39's byte for byte (RMS 3,399.5).
+- **A headless run equals an `--audio` run**: 16,000 det lines over 8,000 boot frames identical
+  (the sound world costs ~0.1 ms a frame: 1.49 s instead of 0.67 s for those frames).
+- **padtest.py** (Release): OK. **soak.py** (a fresh PIE Debug build): attract 100,000, newgame
+  seeds 0-19 x 36,000, levels seeds 0-40 x 17,000: **0 crashes, 0 hangs** (62 runs, 1.52 M frames).
 
-Screenshots (640x480, `--draw` in `T2_DRAW_FROM` windows; the drawn runs give the same det md5
-as the undrawn ones; checked by eye, not committed): **sister 2 (134) fought with the stick**, the
-plasma rifle on her, HUD 105 health (54,400 of `--stick-aim 2 --assist-keep 110`); **the Blind
-One's arena with the shredder** in `--real-weapons 1` (its discs in flight, HUD 125, 137,000); the
-good ending of the default run: Adon (248,501), Turok before the portal (251,001) and the credits'
-"TUROK 2 TEAM" over the Lightship (252,503).
+Screenshots (640x480, `--draw` in `T2_DRAW_FROM` windows of the default run, checked by eye, not
+committed): **the Blind One's health bar** at the top of the screen in her arena (137,000; the
+shredder's disc in front, HUD 91); **the City Totem's two bars** (green and red) with "DEFEND THE
+TOTEM" (82,001, HUD 45); and the good ending, Turok before the portal (251,001).
 
-Port tests: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (OK), `t2asset_typed_test`
-(1,585 checks, 0 errors), `gbi_test` (0 mismatches), `t2os_test` (trace hash `2b2775877e0d226b`
-on 3 runs), `t2audio_test --direct 0` and `--direct 40` (audio_compare: max difference 0),
-`t2audio_test --adec 0xC29AB4 7464` (27,136 samples), the swoosh self test (OK). The archive is
-unchanged (sha1 `a9d14a47...`, rebuilt by `mkarchive.py` into a new directory; `archive_check`
-OK). ABI (`abicheck.py` on a fresh PIE build: 3,077 TUs, 11,716 calls, 11,106 checked): harmful
-direct sites **0**, indirect 1 (the known `Destructible_Hurt` store). `ptrdecls.py`: the four
-strlen returns as before; `ptrargs.py` on the fresh build's log: 0 to retype; `outptr.py`: 0;
-`f2ucheck.py`: 79; `n64viewcheck.py`: raw BAD 10, stride BAD 3, suspect 42 (as in round 15),
-**cast BAD 1** (e1's `CCamera__Construct` store kept for `T2_LEGACY_SHAKE`; the host path writes
-the members), cast same 43. `mklayout.py --check`: up to date. The nested `TARGET_PORT` scan
-finds the same 13 nested blocks as at 5d835e51 (none a second host body).
+Port tests: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (26,124 units, 0 mismatches, the archive and the ROM backend), `t2asset_typed_test` (1,585 checks, 0 errors), `gbi_test` (0 mismatches), `t2os_test` (trace hash `2b2775877e0d226b`, the same on 3 runs), `t2audio_test --direct 0` and `--direct 40` (audio_compare: max difference 0), `t2audio_test --adec 0xC29AB4 7464` (27,136 samples), the swoosh self test (OK) and the backend self test (LUS, miniz and ROM: the same 26,124 units, fnv1a64 `b26a3b2a8b834fa4`). The archive is unchanged (sha1 `a9d14a47...`, `archive_check` OK; f3's type-9 swap is code, `tools/assets/swap_spec.json` is untouched). `mpk_saves.py` on the default run's pak: note 1, checksum OK.
 
-## 3. Merge resolutions and fixes (round 16)
+## 3. Merge resolutions and fixes (round 17)
 
 | where | branches | resolution |
 |---|---|---|
-| `port/app/game.cpp` | e1, e2, e5 | e1's three hooks after `T2_LAIR_PEEK`; e2's aim Z and e5's fire gate rewritten as **one answer protocol** (`AimFifoButtons`, `AimFifoApply`: a mask of the button bits the driver sets, C 0x000F, R 0x0010, Z 0x2000); `ScriptedButtonsGated` holds the script's Z per `T2_FIRE_GATE` in both `ContRead` and `ContReadHeadless` (e5 had the windowed path only) unless the driver sets Z itself |
-| `port/game/t2bosslog.c` | e2, e5 | in `T2Port_AimNode`, e5's skips (`T2_AIM_SKIP_TYPES`, sleeping actors under `T2_FIRE_GATE`) before e2's candidate reporting: a door or a sleeping actor is neither the target nor a candidate |
-| `tools/port/aimdrive.py` | e2, e3 | AimDrive answers `zN`, LairDrive `cH`, WalkDrive `cH [r1]` |
-| `tools/port/fullrun.py`, `playthrough.py` | e1, e3, e5 | merged as they were; `os.makedirs(RUN)` (e4's finding); `--n64-shake` |
-| `t2debug.c` | e1, e2 | both appended (no overlap) |
-| docs | all | PLAYTHROUGH sections renumbered 27 (e1), 28 (e2), 29 (e5), 30 (e3), 31 (this merge); e4 has none (MACOS.md 18) |
+| `src/us/code/func_0042AC0C.c` | f3, f4 | f3's `T2Port_RngAtLoad` and f4's boss-bar reset on `&gEngineApp_m_OnScreen` both in the host body of `CScene__LoadLevel`; f4's second edit sat in the N64-only copy (`#else`) inside a nested `#ifdef TARGET_PORT`: dead code, removed with an older dead particle cast there; the host body's own nested blocks flattened (their `#else` branches were dead) |
+| `tools/port/fullrun.py` | f1, f2, f3, f5 | f2's `T2_LEGACY_SHAKE=1,F` switch and f3's `T2_LEGACY_INTEL9` line both written; f1's pick table and `insert_picks()` beside f2's `n64(lv)`; f1's picks before f5's `--l2-heal` picks (both in 135: f1's between the crypt steps, f5's before the exit step); every option kept (`--n64-props`, `--n64-shake-from`, `--lair-keep`, `--l2-heal`) |
+| `tools/port/playthrough.py` | f2, f3 | `--n64-shake` drops `T2_LEGACY_SHAKE` for the level runs too, `--n64-props` drops `T2_LEGACY_INTEL9` |
+| `port/app/game.cpp`, `port/game/t2debug.c`, `tools/port/aimdrive.py` | f2, f3, f4, f5 | merged as they were: f2's `T2Port_LegacyShakeTick` before `T2_RNG_SET`, f3's `T2_RAW_DUMP` after it; f4's bench block |
+| docs | all | PLAYTHROUGH sections renumbered 32 (f1), 33 (f2), 34 (f5), 35 (this merge); FIDELITY 7 (f3); f4's are MACOS.md 19 and RENDER.md 7 |
 
-Fixes and checks of the merge:
+The fixes merged this round:
 
-- **`n64viewcheck.py` learned e1's pattern** (the cast kind above). Over the linked tree it finds
-  12 casts before the refinements, 1 after: the vertex arrays seen through `CVector3`
-  (`triNormal`, the ceiling normals, `Collision_SweepRegions`: same layout on both hosts, no
-  pointer) are not reported, and only the fields used through each cast are judged. Its other
-  find was real: **`GameObject_IsSolid`** (`func_00267090.c`) read flag 0x10000 of the current AI
-  mode row through a `{pad[0x1C]; u32 flags}` view; the row is a `CAIModeInfo` whose `sptr` words
-  are 8 bytes on the host, so the view read the high half of `m_pData` (0: such an actor was
-  always solid). The host reads `unk_1C` now (asm_diff 0; the default run is unchanged).
-- **`CShake__Set` and `CShake__Advance`** (`func_00281C60.c`, `func_00281CC0.c`) keep their N64
-  views: no `jal` reaches them in the ELF, no data word or `%hi/%lo` pair holds their addresses
-  (and `CShake__Construct`, which e1 fixed, is not called either): dead code on the N64 too.
-- **R (jump) in the answer**: the protocol carries `r1`; no driver sends it yet, so every default
-  run is unchanged (e3's ~30 ledge segments need jump edges in the nav graph first).
+| fix | where | found by | effect |
+|---|---|---|---|
+| the camera shake at host offsets (round 16) | `CCamera__Construct` | e1 | the N64's shake draws (`T2_LEGACY_SHAKE` keeps the old) |
+| **the type-9 intelligence body byte-swapped on load** | `func_002261A8.c`, `func_00465B04.c` (VM twin) | f3, `n64cmp.py` on the lair | the interactive-anim props start on their own animation, their type-flag tests read the right bits (`T2_LEGACY_INTEL9` keeps the old) |
+| **the boss bars by member** | `COnScreen__DrawBossBars`, `SetBoss2`, `ClearBoss`, `SetBossPercent`, `func_0042EBBC` and its caller | f4, the lair against the N64 | the boss and totem bars draw and go down; `m_pBoss` no longer left non-NULL from level 1 on |
+| **the totem log pointer** | `T2Port_TotemLive` (t2debug.c) | f5 (f1's unstable `totem hp`) | the `totem:` line only while the totem is a live actor of the loaded level (debug output only) |
+| **headless sound world** | `game.cpp` `cfg.audio` | f3's finding, this merge | a scripted run draws the sound random numbers as a player with sound (`T2_LEGACY_NOSOUND` keeps the old) |
+| per-run settings folder | `aimdrive.py` (`SHIP_HOME`) | f5's finding, this merge | parallel runs from one directory no longer race on `turok2.cfg.json` |
+
+Checks of the merge: after every merge step `asm_diff --base b744bd39` 0, the port built, and the
+default command's `playthrough.txt` byte-identical to b744bd39's with `teleport.env` differing only
+by the new legacy lines. ABI (`abicheck.py` on a fresh PIE build: 3,077 TUs, 11,762 calls, 11,124 checked): harmful direct sites **0**, indirect 1 (the known `Destructible_Hurt` store). `ptrdecls.py`: the four strlen returns as before (an untracked, gitignored `include/functions.h` of Nov 10 on the box, read by no build, adds 940 VM-twin parameters when present: move it away before running the tool); `ptrargs.py` on the fresh build's log: 0 to retype; `outptr.py`: 0; `f2ucheck.py`: 79; `n64viewcheck.py`: raw BAD 10, stride BAD 3, suspect 42, cast BAD 1 (e1's kept `CCamera__Construct` store), cast same 43, as in round 16. `mklayout.py --check`: up to date. The nested `TARGET_PORT` scan of the files the branches changed: no second host body; the dead blocks in `func_0042AC0C.c` were removed (above). The same `gEngineApp_m_SwooshSystem - 0x1C8` argument is in the VM twin `CScene__LoadLevel_2` (`func_00463B2C.c`, to `func_00467ADC`, which has no C body): left as is (section 4).
 
 ## 4. Next
 
-1. **The route on the N64's RNG** (`--n64-shake`, section 2): level 2's graveyard first (135: the
-   crypt zombies and the key steps), then wherever it dies next; when the whole run reaches END 2,
-   make it the default and keep `T2_LEGACY_SHAKE` as an option.
-2. **The Blind One, the City Totem and levels 5-6 with the stick** (`--assist-keep 1,110` still
-   needed; `--stick-aim 1,2,3,4 --assist-keep 1` dies in level 5's 117).
-3. **Real weapons from sister 2 on** (134: ammo for gate 8), then levels 3-6; and the combination
-   with the stick (the City Totem lost: section 1).
-4. **Doors and gates as nav data, and jumps**: the walker stops at doors, gates, cages, crypts
-   and graves (static objects and actors the mesh does not have); ledges need a jump edge and an
-   `r1` answer.
-5. **The lair peek**: an N64 property (section 2); the only route aid that cannot go away
-   without a different strategy (e.g. drawing him out from the pits).
-6. **The lair's static props** (`lvl 10`-`17`: the N64 spawns them in animation 4, the port in
-   animation 0, displaced): compare with `T2_START_WARP` + `T2_RNG_SET` against `--start-warp` +
-   `--poke`, field by field.
-7. **macOS**: Developer ID signing and notarisation, and **the first windowed session with a human
-   and a real gamepad** (focus, mouse capture, F11, vsync with `--pace`, the feel of the sticks).
+1. **The route on the fully N64-accurate stream** (no legacy switch: `--n64-shake --n64-props
+   --n64-sound`): sister 2 (134) first, then 125; when it reaches END 2, make it the default and
+   drop the three switches from the tools.
+2. **The ASLR-dependent read** (section 1's caveat): actor 31's hit-box matrices in 135 at ~72,500
+   take one of two values by address layout; find the pointer-dependent code (a hash, an order or a
+   32-bit truncation of a pointer) on the draw-matrix path.
+3. **The rest of the n64cmp sweep** (FIDELITY.md 7.5): 125, 61 and 100 were run (FIDELITY.md 8):
+   the per-actor lights (`m_Lights`, `m_ShadowAlpha`) differ for most actors of 61 and 100, and
+   125's actor 51 keeps an identity ground quaternion: both leads, not yet host bugs; then 135,
+   124, 114; the pooled actors' `m_Resource`.
+4. **The hub pad cut-scene's particle colours** (cinema 7601, RENDER.md 7.1: the prim colours look
+   R/B-exchanged).
+5. **Sister 2 on real weapons** (`--real-weapons 1,2`: 134's ammo), then levels 3-6;
+   **`--stick-aim 5,6`** (levels 5-6 by stick); the Primagen's knock-off hit.
+6. **Doors and jumps as nav data** (the walker stops at doors, gates, cages, crypts; ledges need a
+   jump edge and an `r1` answer).
+7. **macOS**: the player window's default backend (Metal) and the retina scale (MACOS.md 19),
+   Developer ID signing and notarisation, and **the first windowed session with a human and a real
+   gamepad**.
 8. Still open: the obj-230 double fire and the Blind One's margin (round 14 c1), 119's moving
-   platforms (c2), `t2audio_test`'s game-path mode, soak.py on macOS.
+   platforms (c2), `t2audio_test`'s game-path mode, soak.py on macOS, the lair peek (an N64
+   property); the VM twin `CScene__LoadLevel_2` (`func_00463B2C.c`) still passes
+   `gEngineApp_m_SwooshSystem - 0x1C8` (f4's pattern; its callee has no C body); `aimdrive.py` waits
+   forever when the game exits before it opens the pipe (kill both).
 
 ## Round 17, part f3: the port against the N64 member by member (branch names-R17_f3)
 
@@ -416,6 +393,237 @@ No `src/` or `include/` change.
 
 Next: sister 2 on real weapons (the jump to 132's plasma rifle, or only zombie 4 fought); levels 5-6
 by stick (`--stick-aim 1,2,3,4,5,6`); the knife edges left: sister 2 (16) and the City Totem (11).
+
+## Round 16 merged state (history)
+
+Round 16 merged five branches, in this order: e1 (the N64 lair and Mother checks, **the camera
+shake's host-offset bug fixed**), e4 (macOS: **a fresh clone builds with only the ROM**, ThinLTO),
+e2 (the stick driver picks its own target and fires: **the sisters by stick**), e5 (**real weapons
+in level 1 to the good ending**, the fire gate) and e3 (**the waypoint walker** on the region mesh).
+The merge made the input pipe one protocol for every driver (stick, C buttons, fire, jump), taught
+`n64viewcheck.py` e1's bug class (and fixed the one other site it found), and added `--n64-shake`.
+On the merged tree **the default command plays the whole game to the GOOD ending with no
+invincibility, exactly as round 15 did** (580,000 det lines, md5 `ecb9f9f2…`, three runs), and
+each new option combination validated below reaches the good ending too. Detail pages:
+[PLAYTHROUGH.md](PLAYTHROUGH.md) sections 27 (e1), 28 (e2), 29 (e5), 30 (e3) and 31 (this merge),
+[MACOS.md](MACOS.md) 18 and [QUICKSTART.md](QUICKSTART.md) 1 (e4). The branch sections follow
+section 4; round 15's merged state and earlier rounds follow as history.
+
+The matching build is unchanged: `tools/asm_diff.py --base 5d835e51 -j 8` reports 0 differences
+over all 3,938 files after every merge and at the end, and a clean `make clean && make setup &&
+make -j8 build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
+
+### Round 16, 1. Build and run
+
+**To play** (Mac or Linux, a Release build, a window, a gamepad or the keyboard and mouse):
+[QUICKSTART.md](QUICKSTART.md). **A fresh clone needs only the ROM** (e4): `gendata.py` reads
+`versions/port_layout.us.json` (the matching ELF's symbol and section tables, no game data) plus
+the ROM when `build/turok2.us.elf` is absent; `mkarchive.py` creates `OUT/`; on macOS Xcode's
+libclang serves when the Command Line Tools are missing, deployment target 27.0; QUICKSTART 1
+gives the steps with their real times. **After a merge that adds, renames or moves a data symbol,
+run `python3 tools/port/mklayout.py` on the box (ELF + ROM) and commit the json** (`--check`
+exits 1 when it is stale; up to date at the end of this round). On the box the json and the ELF
+give the same `port/gen` sources (only `data_report.txt` lists one type's two shapes in the other
+order).
+
+- **The Mac app** (round 15 d4, MACOS.md 17): `tools/port/mkapp.sh BUILD [APP]` makes the
+  self-contained ad-hoc signed `Turok2.app` (`T2_APP_ZIP=1` zips it); not yet Developer ID signed
+  or notarised. `-DT2_LTO=ON` (e4) links with ThinLTO (`hostify.py` marks a file's own label
+  targets `used`); off by default: the same det log and not faster.
+- The player's settings, F1 for the controls and the clean startup errors are round 15's.
+
+The development build (Linux box, headless) is round 13's recipe ("Round 13: build and run"
+below) with round 14's changes; **use a Release (`-O2`) build for long runs** (the whole game in
+~140 s on the box).
+
+**The whole game to the good ending, no invincibility** (PLAYTHROUGH.md 26 and 31):
+
+```sh
+python3 tools/port/playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6
+mkdir -p RUN/pak && cd OUT && . ../RUN/teleport.env && SDL_VIDEODRIVER=offscreen \
+  T2_EVENT_LOG=1 T2_PICKUP_LOG=1 T2_STATE_LOG=500 T2_PROGRESS_LOG=1 T2_HURT_LOG=1 T2_BOSS_LOG=1 \
+  python3 ../tools/port/aimdrive.py -- build/app/turok2 --archive turok2.o2r --rom ../baserom.us.z64 \
+  --game --pak-dir ../RUN/pak --frames 290000 --input @../RUN/playthrough.txt
+python3 ../tools/port/mpk_saves.py ../RUN/pak/turok2_pak1.mpk      # the saves after levels 1-5
+```
+
+`playthrough.py` now creates `RUN/`. Its `teleport.env` and `playthrough.txt` are round 15's plus
+one line, **`T2_LEGACY_SHAKE=1`**: e1 found that `CCamera__Construct` (and `CShake__Construct`)
+wrote the camera shake's fields at their N64 offsets, so on the host the shake radius stayed 0 and
+`CShake__ApplyOffset` never drew its three random numbers per camera per frame (6 random numbers a
+game frame where the N64 takes 12). The fix makes the port's random stream the N64's; the
+scripted route was tuned on the old stream, so `fullrun.py` and `playthrough.py` write
+`T2_LEGACY_SHAKE=1` (DEBUG-ONLY: the old stores, rounds 1-15's stream) into every route they
+generate. **Play mode and any run without the variable have the N64's shake and RNG.**
+`--n64-shake` leaves the line out (the route on the N64 stream: not yet tuned, section 2). Use an
+EMPTY `--pak-dir`; **kill a stuck run with SIGKILL** (the game ignores SIGTERM).
+
+**Validated option combinations** (each added to the default command; Release, under
+`aimdrive.py`, 290,000 frames; PLAYTHROUGH.md 31.3):
+
+| options | result |
+|---|---|
+| (none) | END 2 at 252,194, all 5 totems, 2 lives lost (the City Totem); md5 `ecb9f9f2…` on 3 runs |
+| `--real-weapons 1` | END 2 at 252,980, 5 totems, 2 lives lost (the City Totem) |
+| `--stick-aim 2 --assist-keep 110` | END 2 at 253,788, 5 totems, 2 lives lost (the City Totem, level 5); the same md5 twice |
+| `--nav 1,2,3,4` | END 2 at 250,970, 5 totems, 3 lives lost (the City Totem, 2 in the Primagen's lair) |
+| `--real-weapons 1 --stick-aim 2 --assist-keep 110` | the ending (cinema 130) at 254,756 but **4 totems**: the City Totem lost (2 lives there), so not the good ending |
+
+The other `--all` options are round 15's (section "Round 15, 1" below) plus e2's `T2_AIMD_*`
+driver settings, e5's `T2_AIM_SKIP_TYPES` / `T2_FIRE_GATE` (written by `--real-weapons 1,2`) and
+e3's `--nav L,...`, `--nav-only L:I.J,...` and `--walk-probe`.
+
+**The input pipe** (`T2_AIM_FIFO`, `aimdrive.py`; game.cpp `AimFifoExchange`). After each frame
+with an `aim` line (inside `T2_AIM_STICK` windows: the pose, the target, e2's candidate targets
+and the player's health) or a `move` line (`T2_MOVE_DRIVE` and `T2_WALK_PLAN` windows: the player
+and the boss), the driver answers one line, the same format for every line kind and every driver:
+
+```
+SX SY [cH] [z0|z1] [r0|r1]
+```
+
+SX SY is the stick (-128..127) or `- -` (keep the script's stick); each token sets one button
+group over the script's for the next frame and a group no token names stays the script's: `cH`
+the C buttons (hex mask U 8, D 4, L 2, R 1), `z0`/`z1` the Z trigger (fire), `r0`/`r1` the R
+trigger (jump). AimDrive answers `SX SY [zN]`, LairDrive `- - cH`, WalkDrive `SX 0 cH` (`r1` when
+a walk wants a jump: the nav graph has no jump edges yet). e5's `T2_FIRE_GATE` (the script's Z
+held back while the aimed actor sleeps or is far) applies in both pad paths and defers to a `z`
+token. A bad token is reported once on stderr.
+
+**Tools** (new this round): `tools/port/nav.py` (e3: the region mesh of a sub-level as a nav
+graph, A*, the funnel; walls are steep regions, drops one-way), `navcands.py` (the route
+teleports a walk could replace) and `navplot.py` (a PNG of the mesh and a path);
+`tools/port/mklayout.py` (e4: `versions/port_layout.us.json`, `--check`); `n64trace.py` (e1:
+`--start-warp ID@N` starts the N64 at a warp from the attract loop, `--pad F1-F2:BUTTONS` drives
+controller 1, `--warp`, `--poke`, `--watch`, `--watch-write`); `n64viewcheck.py`'s **cast** kind
+(this merge: an `include/` struct pointer, `&obj->member` or a plain pointer, cast to a view
+struct defined in the file; the view's fields used through that cast, directly or through the
+variable it is assigned to, are judged as the struct's members at their N64 offsets);
+`aimstats.py --stick` (e2). The port-side hooks for the N64 comparisons: `T2_START_WARP=ID@F`,
+`T2_RNG_SET=LEVEL:GF:HEX`, `T2_PRIMAGEN_STAGE=F[,F]` (e1).
+
+### Round 16, 2. What the game does now (Linux, headless, PIE)
+
+- **The whole game to the good ending with no invincibility**, as in round 15, frame for frame:
+  the default command gives the same 580,000 det lines (md5 `ecb9f9f2…`, `ptcl` included) on three
+  runs of the merged Release build (one drawn), and so do e4's two Linux runs and the Mac builds
+  (plain, ThinLTO, the fresh-user build and archive: MACOS.md 18). Round 15's particle-hash
+  difference did not come back (e1: 18 runs). The table in section 1 has the option runs.
+- **The sisters with the stick** (e2): the stick driver picks among the candidate targets, leads
+  a moving one and fires only on target; with `--stick-aim 2 --assist-keep 110` level 2's three
+  Sisters of Despair die to the stick with no life lost. `--stick-aim 1,2,3,4 --assist-keep 1`
+  plays levels 1-4 by stick with no life lost but then loses 2 lives in level 5's 117 and stops in
+  116; the Blind One still needs its assist.
+- **Real weapons** (e5): `--real-weapons 1` reaches END 2 (level 1 on picked-up weapons, the
+  Blind One killed with the shredder after `BLIND_WEAPON_AFTER`); level 2's sister 1 (133) dies on
+  picked-up weapons (`--real-weapons 1,2`: doors never aimed at, `T2_FIRE_GATE`); sister 2 (134)
+  is still a game over (the ammo goes on zombies before gate 8).
+- **Walking** (e3): `--nav 1,2,3,4` replaces the route teleports of `NAV_WALKS` by closed-loop
+  walks over the pipe and still reaches END 2; 13 of 43 segments arrive alone, 1 survives in the
+  whole run (each arriving walk changes the next fight).
+- **On the N64's RNG** (`--n64-shake`, the stretch goal; PLAYTHROUGH.md 31.4): the route does not
+  finish. It loses its first life in level 2's graveyard (135) at 72,371 (the crypt-key steps after
+  the two crypt-zombie fights, which cost ~15 more health than on the old stream), falls out of
+  step with the schedule, never reaches the City Totem and ends in game over in 125 at 154,972.
+  Longer fire windows on the crypt zombies (+800, +1,000 frames) moved the death but did not
+  prevent it. The boss recipes on the N64 stream: the Mother (32,557), the Blind One (23,103, the
+  same frame) and the Queen (26,583) die; the Primagen recipe does not kill him in 62,000 frames.
+- **The debug aids that remain** (the default run): `T2_GIVE_WEAPONS`, the weapon schedule and
+  `T2_FILL_AMMO` (level 1 can do without: `--real-weapons 1`); the aim assists (`T2_FACE_NEAREST`
+  at the totems, `T2_AIM_ENEMY`, `T2_AIM_AT`, `T2_AIM_NODE` at the four bosses, `T2_BOSS_FRONT`
+  for the Queen; level 2 can do without: `--stick-aim 2 --assist-keep 110`); **the lair peeks**
+  (`T2_LAIR_PEEK`, 2 per run); **289 teleports** between route steps (`--nav 1,2,3,4` walks some
+  of them); the anchors (`T2_ANCHOR`); **`T2_LEGACY_SHAKE`** (the route's random stream). **The
+  lair peek is an N64 property** (e1, PLAYTHROUGH.md 27.2): with `--start-warp`/`--warp` the N64
+  puts the Primagen at the same hover point and its stage-2 home wait never ends from any floor
+  point either; it is the one aid that cannot go away without another strategy (the pits).
+- **The level runs** (`playthrough.py DIR --fight 10 | --level 2..6`, Release, `--pak-blank`):
+  every det line and gameplay line identical to round 15's build (5d835e51).
+- **The boss recipes** with `T2_LEGACY_SHAKE=1`: every det and gameplay line identical to round
+  15's build (the Mother at 28,775, the Blind One 23,103, the Queen 28,143, the Primagen 43,586).
+- **The boot and the demos** (26,000, `--pak-blank`): with `T2_LEGACY_SHAKE=1` the 52,000 det lines
+  are round 15's; without it the `rng` field and the particles differ, the gameplay lines do not.
+  Against the N64's RAM (`n64trace.py` + `detdiff.py`, both modes): demos 1 and 3 have no
+  difference in any field but `rng`, demo 2 the known `player.hp` difference (the N64's
+  uninitialised read); the `rng` field differs from the N64's from game frame 16 of demo 1 in
+  both modes, so the fix neither costs nor gains a demo field.
+- **Save, title, load**: the save portal writes note 1 (checksum OK, `mpk_saves.py`); the load
+  from the title puts the player in level 51. **`--audio --wav` boot** (9,000): 3,311,264 stereo
+  frames, RMS 3,396.8 (with `T2_LEGACY_SHAKE=1` the WAV is round 15's byte for byte).
+- **padtest.py** (Release): OK. Clean errors: the `dummy` driver exits 1 with "The window could
+  not be created ..."; `--audio` without `--rom` says "--audio needs the ROM" and runs with the
+  audio off (exit 0).
+- **soak.py** (the fresh PIE Debug build): attract 100,000 frames, newgame seeds 0-19 x 36,000,
+  levels seeds 0-40 x 17,000: **0 crashes** (62 runs).
+
+Screenshots (640x480, `--draw` in `T2_DRAW_FROM` windows; the drawn runs give the same det md5
+as the undrawn ones; checked by eye, not committed): **sister 2 (134) fought with the stick**, the
+plasma rifle on her, HUD 105 health (54,400 of `--stick-aim 2 --assist-keep 110`); **the Blind
+One's arena with the shredder** in `--real-weapons 1` (its discs in flight, HUD 125, 137,000); the
+good ending of the default run: Adon (248,501), Turok before the portal (251,001) and the credits'
+"TUROK 2 TEAM" over the Lightship (252,503).
+
+Port tests: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (OK), `t2asset_typed_test`
+(1,585 checks, 0 errors), `gbi_test` (0 mismatches), `t2os_test` (trace hash `2b2775877e0d226b`
+on 3 runs), `t2audio_test --direct 0` and `--direct 40` (audio_compare: max difference 0),
+`t2audio_test --adec 0xC29AB4 7464` (27,136 samples), the swoosh self test (OK). The archive is
+unchanged (sha1 `a9d14a47...`, rebuilt by `mkarchive.py` into a new directory; `archive_check`
+OK). ABI (`abicheck.py` on a fresh PIE build: 3,077 TUs, 11,716 calls, 11,106 checked): harmful
+direct sites **0**, indirect 1 (the known `Destructible_Hurt` store). `ptrdecls.py`: the four
+strlen returns as before; `ptrargs.py` on the fresh build's log: 0 to retype; `outptr.py`: 0;
+`f2ucheck.py`: 79; `n64viewcheck.py`: raw BAD 10, stride BAD 3, suspect 42 (as in round 15),
+**cast BAD 1** (e1's `CCamera__Construct` store kept for `T2_LEGACY_SHAKE`; the host path writes
+the members), cast same 43. `mklayout.py --check`: up to date. The nested `TARGET_PORT` scan
+finds the same 13 nested blocks as at 5d835e51 (none a second host body).
+
+### Round 16, 3. Merge resolutions and fixes (round 16)
+
+| where | branches | resolution |
+|---|---|---|
+| `port/app/game.cpp` | e1, e2, e5 | e1's three hooks after `T2_LAIR_PEEK`; e2's aim Z and e5's fire gate rewritten as **one answer protocol** (`AimFifoButtons`, `AimFifoApply`: a mask of the button bits the driver sets, C 0x000F, R 0x0010, Z 0x2000); `ScriptedButtonsGated` holds the script's Z per `T2_FIRE_GATE` in both `ContRead` and `ContReadHeadless` (e5 had the windowed path only) unless the driver sets Z itself |
+| `port/game/t2bosslog.c` | e2, e5 | in `T2Port_AimNode`, e5's skips (`T2_AIM_SKIP_TYPES`, sleeping actors under `T2_FIRE_GATE`) before e2's candidate reporting: a door or a sleeping actor is neither the target nor a candidate |
+| `tools/port/aimdrive.py` | e2, e3 | AimDrive answers `zN`, LairDrive `cH`, WalkDrive `cH [r1]` |
+| `tools/port/fullrun.py`, `playthrough.py` | e1, e3, e5 | merged as they were; `os.makedirs(RUN)` (e4's finding); `--n64-shake` |
+| `t2debug.c` | e1, e2 | both appended (no overlap) |
+| docs | all | PLAYTHROUGH sections renumbered 27 (e1), 28 (e2), 29 (e5), 30 (e3), 31 (this merge); e4 has none (MACOS.md 18) |
+
+Fixes and checks of the merge:
+
+- **`n64viewcheck.py` learned e1's pattern** (the cast kind above). Over the linked tree it finds
+  12 casts before the refinements, 1 after: the vertex arrays seen through `CVector3`
+  (`triNormal`, the ceiling normals, `Collision_SweepRegions`: same layout on both hosts, no
+  pointer) are not reported, and only the fields used through each cast are judged. Its other
+  find was real: **`GameObject_IsSolid`** (`func_00267090.c`) read flag 0x10000 of the current AI
+  mode row through a `{pad[0x1C]; u32 flags}` view; the row is a `CAIModeInfo` whose `sptr` words
+  are 8 bytes on the host, so the view read the high half of `m_pData` (0: such an actor was
+  always solid). The host reads `unk_1C` now (asm_diff 0; the default run is unchanged).
+- **`CShake__Set` and `CShake__Advance`** (`func_00281C60.c`, `func_00281CC0.c`) keep their N64
+  views: no `jal` reaches them in the ELF, no data word or `%hi/%lo` pair holds their addresses
+  (and `CShake__Construct`, which e1 fixed, is not called either): dead code on the N64 too.
+- **R (jump) in the answer**: the protocol carries `r1`; no driver sends it yet, so every default
+  run is unchanged (e3's ~30 ledge segments need jump edges in the nav graph first).
+
+### Round 16, 4. Next
+
+1. **The route on the N64's RNG** (`--n64-shake`, section 2): level 2's graveyard first (135: the
+   crypt zombies and the key steps), then wherever it dies next; when the whole run reaches END 2,
+   make it the default and keep `T2_LEGACY_SHAKE` as an option.
+2. **The Blind One, the City Totem and levels 5-6 with the stick** (`--assist-keep 1,110` still
+   needed; `--stick-aim 1,2,3,4 --assist-keep 1` dies in level 5's 117).
+3. **Real weapons from sister 2 on** (134: ammo for gate 8), then levels 3-6; and the combination
+   with the stick (the City Totem lost: section 1).
+4. **Doors and gates as nav data, and jumps**: the walker stops at doors, gates, cages, crypts
+   and graves (static objects and actors the mesh does not have); ledges need a jump edge and an
+   `r1` answer.
+5. **The lair peek**: an N64 property (section 2); the only route aid that cannot go away
+   without a different strategy (e.g. drawing him out from the pits).
+6. **The lair's static props** (`lvl 10`-`17`: the N64 spawns them in animation 4, the port in
+   animation 0, displaced): compare with `T2_START_WARP` + `T2_RNG_SET` against `--start-warp` +
+   `--poke`, field by field.
+7. **macOS**: Developer ID signing and notarisation, and **the first windowed session with a human
+   and a real gamepad** (focus, mouse capture, F11, vsync with `--pace`, the feel of the sticks).
+8. Still open: the obj-230 double fire and the Blind One's margin (round 14 c1), 119's moving
+   platforms (c2), `t2audio_test`'s game-path mode, soak.py on macOS.
 
 ## Round 16, part e1: the N64 lair and Mother checks, the camera shake's random numbers (branch names-R16_e1)
 

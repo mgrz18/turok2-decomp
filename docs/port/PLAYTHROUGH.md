@@ -3334,3 +3334,71 @@ at start and written back at exit from the current directory; one run read it wh
 wrote it ("Failed to parse config file ... empty input" in r12's log). With a private directory
 per run (a symlink to the archive and a copy of the config) the same command gave the same lines
 six times (`hurt` md5 `11fa947b` to 23,000, with and without ASLR, 23,000 and 290,000 frames).
+
+## 35. The round-17 merge: the legacy switches, the sound world headless, the option runs (Phase 7 round 17, the merge C32)
+
+The merge took f3, f4, f1, f2 and f5 in that order (STATUS.md section 3 has the resolutions). Every
+route the tools write now carries three legacy switches (`T2_LEGACY_SHAKE=1`, `T2_LEGACY_INTEL9=1`,
+`T2_LEGACY_NOSOUND=1`); `--n64-shake`, `--n64-props` and `--n64-sound` leave them out one by one.
+
+### 35.1 The sound world in headless runs (`T2_LEGACY_NOSOUND`)
+
+f3 found (FIDELITY.md 7.3) that a run without `--audio` has no sound world: `Sound__Initialize`
+returns and every sound request stops before `CAudioWorld__PlaySound`, which draws random numbers
+(pitch, volume, the ambient picks). A player with sound and the N64 draw them, so every scripted
+run was on a third random stream. `game.cpp` now enables the runtime's audio (`cfg.audio`) in every
+game run that has the ROM: the sound world and the audio manager run as with `--audio`, and the
+samples are dropped when there is no `--audio`/`--wav` (the AI queue keeps its last 16,384 frames).
+`T2_LEGACY_NOSOUND=1` (DEBUG-ONLY, t2debug.c) restores the old silent stream; `fullrun.py` and
+`playthrough.py` write it (the routes were tuned on that stream), `--n64-sound` leaves it out.
+
+- A headless boot (8,000 frames, no input) and the same boot with `--audio`: the same 16,000 det
+  lines (md5 `d725bb9a…`); with `T2_LEGACY_NOSOUND=1` the `rng` field differs (md5 `70e8f1f6…`).
+- Cost: 1.49 s instead of 0.67 s for those 8,000 frames (the synthesizer and the ABI interpreter
+  every retrace).
+- The default command with the new line: md5 `ecb9f9f2…` (round 16's).
+
+### 35.2 The validated runs (Linux Release, under `aimdrive.py`, 290,000 frames, each in its own directory)
+
+Each is `playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6` plus the options, then
+the game line of STATUS.md section 1 with `T2_DET_LOG=1 T2_PROGRESS_LOG=1 T2_HURT_LOG=1`:
+
+| options | END 2 (cinema 130) | totems | lives lost (level) | det md5 |
+|---|---|---|---|---|
+| (none) | 252,194 | 11111 | 2 (110) | `ecb9f9f2…` (3 runs; see 35.3) |
+| `--n64-shake` | 252,060 | 11111 | 1 (110) | `2af2939f…` (twice) |
+| `--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` | 250,402 | 11111 | **0** | `15d3d74f…` (twice) |
+| `--real-weapons 1` | 252,980 | 11111 | 2 (110) | `3cb702ff…` (= b744bd39's build and round 16) |
+| `--stick-aim 2 --assist-keep 110` | 253,788 | 11111 | 2 (110, 164) | `9432c11d…` (= round 16, `setarch -R`; a run with ASLR took 35.3's second path) |
+| `--nav 1,2,3,4` | 250,970 | 11111 | 3 (110, 4, 4) | `8702568d…` (= round 16, `setarch -R`; idem) |
+| `--n64-shake --n64-props` | 260,790 | 11111 | 2 (110, 1) | `dbb19f63…` |
+| `--n64-shake --n64-props --n64-sound` | none: game over in 125 at 108,496 | 00000 | 134 at 53,547 and 59,093, 125 at 108,496 | `eff96f4c…` |
+
+The stretch runs: **`--n64-shake --n64-props`** (the N64's shake and props, the old silent sound
+stream) needs no change: END 2 with the City Totem's life and one at the Blind One (level 1,
+139,967). **The fully N64-accurate stream** (`--n64-sound` as well) dies at sister 2 (134) twice and
+then in 125 (game over); the run starts a new game after it. Tuning that stream is the next step
+(STATUS.md section 4).
+
+### 35.3 A determinism caveat: two paths in 135 by address layout
+
+The first of three default runs started together gave md5 `725b6c88…` instead of `ecb9f9f2…`; so
+did the first `--real-weapons 1` run (`ab5690f2…`, the second `3cb702ff…`). Both differ from frame
+~72,500 (level 2's 135) to ~82,500 and nowhere else: the `aim` line names actor 31's node 1 at
+z 5807.3 instead of 5806.7 (its hit-box matrices, `m_pmtDrawMtxs`/`m_pmtLastFrameDrawMtxs`), the
+particle hash differs from 72,749 (72,529 in the `--real-weapons 1` route), then the `rng`; the
+game is back in the same state by ~82,500 and every later line, the END 2 frame and the lives are
+the same. The b744bd39 build does it too (2 of 3 runs to 76,000). With `setarch -R` (no ASLR) three
+runs took the 5806.7 path; the arena addresses of the runs show no simple bit pattern. So a read
+on that path depends on the address layout (a pointer value hashed, compared or truncated, or a
+read of memory whose contents depend on it). Until it is found, compare md5s on runs under
+`setarch -R`; the runs in 35.2 with ASLR on are marked.
+
+### 35.4 Integrated runs
+
+- **Boot and the demos** (26,000 frames, `--pak-blank`, legacy switches on): 52,000 det lines
+  identical to the b744bd39 build. Against the N64's RAM (default build, no switch): demo 1
+  (gf 1-1,128) and demo 3 (gf 1-344) no difference but `rng` (from gf 8: the N64's load-time
+  draws), demo 2 `player.hp` from gf 608 (the N64's uninitialised read).
+- **The level runs** (`--level 1..6`) and **the four boss recipes**: det identical to b744bd39's.
+- **Save, title, load**, **`--audio --wav`**, **padtest**, **soak**: STATUS.md section 2.
