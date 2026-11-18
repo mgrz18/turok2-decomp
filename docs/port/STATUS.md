@@ -206,6 +206,35 @@ by the new legacy lines. ABI (`abicheck.py` on a fresh PIE build: 3,077 TUs, 11,
    `gEngineApp_m_SwooshSystem - 0x1C8` (f4's pattern; its callee has no C body); `aimdrive.py` waits
    forever when the game exits before it opens the pipe (kill both).
 
+## Round 18, part g5: levels 5-6 by stick, the Primagen's push (branch names-R18_g5)
+
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 36-g5. Legacy switches on throughout. Tools and port debug
+code only (no `src/`/`include/` change, no asm_diff needed); **the default command's
+`playthrough.txt` and `teleport.env` are byte-identical to ab0bc24c's**, and round 17's combo
+(`--real-weapons 1 --stick-aim 1,2,3,4 --l2-heal --hub-wait 0`) gives the same `teleport.env` and,
+on this part's binary and driver, the same gameplay lines (END 2 at 248,808, no life lost).
+
+- **`--stick-aim 1,2,3,4,5,6` reaches END 2** (264,480, 5 totems, 4 bosses) with three driver fixes
+  (aimdrive.py `T2_AIMD_PRIMARY`, `T2_AIMD_PRIMARY_ONLY`; fullrun.py `STICK_PRIMARY`,
+  `STICK_FREE_WALK`): the hive's objectives first (embryo 2 survived and the hive exit led back to
+  124), the boss's node instead of its never-hurt origin (the Queen, the Mother), the route's walks
+  in levels 5-6 left to the script. Level 5 and the Mother lose no life; **the Primagen's lair by
+  stick loses 3** (295 damage: the stick shoots his spawns half the time). Not yet 0 lives.
+- **The Primagen's "throw" is his mode-20 push** (`Primagen_UpdateMode20`: 716.8 on the ground /
+  179.2 in the air added to the player's velocity away from him for ~11 frames after a 15-frame
+  wind-up; bossState 10 is only "lost sight of the player" afterwards). In the measured case the
+  keep-away rule had walked the player away from him towards the edge. **`--lair-push both`**
+  (walk towards him + jump during mode 20; off by default) turned f2's F+37 game over into END 2.
+- New debug output: the `move` line ends in `bm M` (the boss's AI mode); `T2_PUSH_LOG=1` prints a
+  `lairpush` line each frame of mode 20 (t2bosslog.c).
+- **Not done**: sister 2 on real weapons (PLAYTHROUGH 36-g5.5).
+
+Files: `tools/port/aimdrive.py` (Picker primary, LairDrive push), `tools/port/fullrun.py`
+(`STICK_PRIMARY`, `STICK_FREE_WALK`, `Route.walks`, `--lair-push`, the `lair` fight key),
+`port/game/t2bosslog.c` (`T2Port_MovePose`). Next: the lair by stick (the Primagen's node as the
+only target, or `--assist-keep lair`: run s6f below), `--lair-push` on the N64 stream (g1's route),
+sister 2 with real weapons.
+
 ## Round 17, part f3: the port against the N64 member by member (branch names-R17_f3)
 
 Detail: [FIDELITY.md](FIDELITY.md) 7.
