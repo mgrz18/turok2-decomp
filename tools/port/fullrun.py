@@ -642,6 +642,11 @@ if os.environ.get("T2G1_L2W") is not None:
                      for e in os.environ["T2G1_L2W"].split(",") if e}
 
 
+# Round 19 merge: the weapon for the City Totem (110) on the N64 stream: the shredder (9; 34 damage, lowest health 66,
+# instead of 97 and 3 with the plasma rifle after h1 zero-filled the actor blocks); T2C34_CW overrides ("": the plasma rifle)
+N64_CITY_WEAPON = os.environ.get("T2C34_CW", "9") or None
+
+
 def n64_full():
     """Round 18 g1: no legacy switch at all (--n64): the stream a human player gets."""
     return N64_SHAKE and N64_PROPS and N64_SOUND
@@ -1228,6 +1233,9 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     t_arr = pt.L2_TOTEM_ARRIVAL + shift + a2
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
     arms_switch(r, 2, t_arr, real)
+    if n64_full() and N64_CITY_WEAPON and 2 not in real:   # round 19 merge: the City Totem's weapon (N64 stream)
+        r.weapon.append((t_arr - 600, N64_CITY_WEAPON))   # taken when 110 loads (T2_GIVE_WEAPONS)
+        r.weapon.append((hubs[2] - 200, "10"))
     if real == {1, 2}:
         r.real_until = hubs[2]
     if 110 in r.cheats_on:
