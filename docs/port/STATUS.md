@@ -301,6 +301,35 @@ n64trace.py. f1/f2's route branches need `T2_LEGACY_INTEL9=1` in their runs (ful
   the --bench block), `port/app/offscreen_gl.cpp/.h`, `port/app/CMakeLists.txt`, the six src files
   above (HUD only).
 
+## Round 17, part f1: the route on the N64's random numbers, levels 1-3 (branch names-R17_f1)
+
+**`--all --talismans 2 --cheats-off 1,2,3,4,5,6 --n64-shake` reaches END 2 at 247,626 with all 5
+totems and one life lost** (the City Totem; the default legacy run loses 2 there), no
+invincibility, deterministic (two runs, the same log but for the `totem hp` field of two `totem:`
+lines). Round 16 had a game over in 125 at 154,972. PLAYTHROUGH.md 32-f1.
+
+- **Why 135 killed the player**: on the N64 stream the graveyard's roaming zombies (hurt type
+  0x323) reach the player during zombie 44's fight (10 hits instead of 3: 53 damage instead of
+  32) and in crypt 76, so he walked into crypt 76 with 25 health instead of 56 and died there.
+- **The fix** (`fullrun.py`, `--n64-shake` only): `N64_L2_PICKS`, seven health +10 pickups
+  around the crypts taken after zombie 44's fight (25 -> 84 health; he leaves 135 with 62).
+  `insert_picks()` puts pick steps into a segment: the later steps, the segment's in-segment
+  retries and the stretch indices move with them; a `stretch()` entry may now be
+  `(seg, step, frames, False)` (move the later steps, no fire window). The approach angles were
+  probed: from angle 0 three pickups stand the player in no region (`teleport: ... region (nil)`,
+  the teleport is skipped).
+- **Levels 1 and 3, the sisters, the hub visits** need nothing on the N64 stream (no life lost;
+  the Marsh Totem at 110,671). Health per fight, both streams: PLAYTHROUGH.md 32-f1.3.
+- **Not fixed**: the City Totem's life (entering with ~100 health instead of 62 did not save it,
+  and moved later fights: 3 more lives lost in levels 4 and 6; dropped).
+- **Validated**: the default command's generated `teleport.env` and `playthrough.txt` are
+  byte-identical before and after (also with `--real-weapons 1,2` and `--nav 1,2,3,4`), and its
+  run ends with END 2 at 252,194 as before. Release build of b744bd39 (no src/include change).
+- **For the merge**: only `tools/port/fullrun.py` (the N64 tables after `N64_L2_STRETCH`,
+  `stretch()`, `main_all`'s level-2 call) and docs. Part f2's level 4-6 changes behind
+  `--n64-shake` must be checked on the whole `--n64-shake` run with these picks: the run is
+  chaotic past any changed frame, and it already reaches END 2 without any level 4-6 change.
+
 ## Round 16, part e1: the N64 lair and Mother checks, the camera shake's random numbers (branch names-R16_e1)
 
 Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 27.
