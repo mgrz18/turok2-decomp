@@ -64,7 +64,8 @@ brew install cmake ninja sdl3 libzip glew libpng nlohmann-json tinyxml2 python@3
 python3.13 -m venv .venv && .venv/bin/pip install pyelftools 'clang==21.*'
 cp /path/to/your/rom.z64 baserom.us.z64          # sha1 fb0400f2... (above)
 
-# the game data archive from the ROM (~5 s; any zlib gives the same units)
+# the game data archive from the ROM (~5 s; any zlib gives the same units; Linux box sha1 8eb5b23b...).
+# Rebuild it whenever you update this tree: round 20 changed it
 .venv/bin/python tools/assets/mkarchive.py baserom.us.z64 -o OUT/turok2.o2r -j 4
 
 # a Release build (-O2): the game library, the generated data, the executable

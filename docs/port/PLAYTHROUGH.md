@@ -4065,3 +4065,34 @@ grenade launcher; then the City Totem on picked-up ammo (never tried on either s
 Not re-run on this code: the other combinations of STATUS.md section 1; any of them that plays the
 N64 stream has moved. Test hooks (DEBUG-ONLY, off unless set): `T2I2_QF=D,EVERY`, `T2I2_L6H=0`,
 `T2I2_L5H=0`, `T2I2_135HOLD=0`.
+
+## 43. The round-20 merge: the default on the new archive, the combinations
+
+Linux Release, PIE, ASLR on, `aimdrive.py`, this tree. The route files are i2's: the level runs'
+twelve are byte-identical to round 19's. **The default: `dc8126d3…`, twice, and once more drawn**;
+without `ptcl` `d822dee7…`, i2's run line for line, so the timeline and margins are 42's: END 2 at
+245,680, 5 totems, 0 lives, 290 hits, lowest health 38 (124). 10 runs to 84,000: `2b340aea…`.
+
+| options | result | md5 |
+|---|---|---|
+| (none) | END 2 (245,680), 5 totems, 0 lives | `dc8126d3…` |
+| `--lair-push both` | END 2 (245,680), 5 totems, 0 lives | `fc809162…` |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair` | END 2 (254,496), 5 totems, 0 lives | `a93429ab…` |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` (`--stick-boss 6`: the same run) | END 2 (264,222), 5 totems, 1 life (the lair) | `7159a36b…` |
+| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0` | no END: 4 lives in 124, 1 in 114; four totems | `6aceed00…` |
+| the same `--assist-keep 1` | **END 2 (256,078), 5 totems, 1 life (124)** | `1cf91943…` |
+| the same `--assist-keep 112,1` | END 2 (250,756), 5 totems, 2 lives (the Queen, the lair) | `b8f522b5…` |
+| the same `--assist-keep 112` | no END: 3 lives, frame 300,000 in level 44 | `b5a06557…` |
+| `--real-weapons 1,2 --hub-wait 0` | no END: lives in 135, 125 and 114 | `cf4afe05…` |
+| `--legacy` (290,000) | END 2 (248,394), 5 totems, 2 lives | `ac08c89b…` |
+| `--legacy --real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` | END 2 (246,602), 5 totems, 0 lives | `b7408618…` |
+| `--legacy --real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --l2-heal --hub-wait 0` | END 2 (244,700), 5 totems, 0 lives | `67748e47…` |
+
+**`--stick-aim 1,2,4` at 124: not repaired.** The plain combination enters 124 with 30 health
+after the Cave Totem (143 damage, lowest 57) and the Blind One (27, lowest 30) and loses four lives
+there. `--assist-keep 1` (the Blind One on the assists) reaches END 2, but not by a better margin:
+that fight costs 50 and leaves **7** health, the first life goes after 3 hits at 124's start
+(146,526-146,908), and the respawn at 100 happens to carry the level with no further hit. Treat it
+as a working combination with no margin. Keeping the Cave Totem on the assists as well moves the
+losses to the Queen and the lair; keeping the totem alone does not reach the end. A real fix needs
+health before 124 or a safer start of 124 on this stream.

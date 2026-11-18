@@ -772,3 +772,22 @@ balance and octave bands within 0.3 dB, waveform correlation 0.96; the level-53 
 same spectra. Table and method: [AUDIO.md](AUDIO.md) 12. The demo's sounds diverge with the
 random numbers (demo 1's play is identical, 12.1, but `detdiff` skips the rng): the sound world
 draws volumes, pitches and ambient picks from them.
+
+## 16. The round-20 merge: what the five branches do together (Phase 7 round 20)
+
+The fixes of 13 (i1), 14 (i3) and 15 (i5) were checked together on the merged tree, with the new
+archive (sha1 `8eb5b23b…`):
+
+- **Gameplay is untouched by the render and sound fixes.** The default run's det lines without the
+  `ptcl` field are those of i2's run on the old tree (`d822dee7…`); with it, `dc8126d3…`. The boot,
+  the three demos, levels 3, 5 and 6 and three boss recipes are identical to round 19 in every
+  field; levels 1, 2 and 4 and the Mother differ in `ptcl` only (the trails now exist).
+- **Against the N64's RAM** (fresh `n64trace.py` + `detdiff.py`): demos 1 and 3 no difference, demo
+  2 the known `player.hp` read of uninitialised heap.
+- **Drawn**: the whole default run with `--draw` gives the undrawn md5 and no crash, through every
+  new swoosh path; the automap opens by L in the hub and in level 53.
+- **Seen in shots of the merged binary**: the main menu with SINGLE, MULTI, ENTER CHEAT, CHEATS,
+  OPTIONS and SOUND OPTIONS; NEW GAME / LOAD; the automap in two levels; the Mother's arena in its
+  brown and cream; a light shaft in level 91; END 2.
+- **The title music** against i5's N64 dump (`audiocmp.py`, 8 s): -0.04 dB, envelope correlation
+  0.90, the bands as in AUDIO.md 12.3, the port 0.16 s late.
