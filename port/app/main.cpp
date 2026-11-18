@@ -713,7 +713,16 @@ int main(int argc, char** argv) {
     if (args.offscreenGl) {
         // --render-scale (or the setting) sizes the offscreen frame: 2 = what a 2x (retina) window draws
         const float scale = T2Display_RenderScale(args.renderScale);
-        const uint32_t w = (uint32_t)(640 * scale + 0.5f), h = (uint32_t)(480 * scale + 0.5f);
+        uint32_t w = (uint32_t)(640 * scale + 0.5f), h = (uint32_t)(480 * scale + 0.5f);
+        // T2_OFFSCREEN_SIZE=WxH (debug, round 19 h4): a window's frame of any shape (a 16:9 or a
+        // tall window: the aspect handling a player's resized window gets), times the scale
+        if (const char* size = getenv("T2_OFFSCREEN_SIZE"); size != nullptr) {
+            unsigned sw = 0, sh = 0;
+            if (sscanf(size, "%ux%u", &sw, &sh) == 2 && sw >= 64 && sh >= 48 && sw <= 8192 && sh <= 8192) {
+                w = (uint32_t)(sw * scale + 0.5f);
+                h = (uint32_t)(sh * scale + 0.5f);
+            }
+        }
         if (!(args.offscreenMetal ? T2Offscreen_InitMetal(cvars, resourceManager, w, h)
                                   : T2Offscreen_Init(cvars, resourceManager, w, h))) {
             return 1;
