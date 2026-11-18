@@ -239,7 +239,8 @@ SKIP_SECTIONS = {'.virtual_1', '.audio_ctl', '.audio_wavetable', '.sound_data',
 # (Controller_ReadAll: orps 0xb0(%rbx) on gControllers[i] faulted at frame 2 with T2_ALIGN(8)).
 # Not for every object: 16 everywhere moved the data apart and broke the game (code that still
 # walks from one N64 object into the next: the level-50 trace changed, then the gfx watchdog).
-ALIGN16 = {"gControllers", "sBatchInstances", "sBatchResources"}
+ALIGN16 = {"gControllers", "sBatchInstances", "sBatchResources",
+           "gLoadSavePersistentData"}   # round 19 merge: GameNoteMenu_SelectYes copies the level flags with movaps
 
 def elf_tables(path):
     """(sections, symbols) of the matching ELF, in the layout file's shape (mklayout.py)."""
