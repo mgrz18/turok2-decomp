@@ -299,8 +299,16 @@ the host's typed `t2audio_world.c` writes it by name (`padFC`).
   (sndState[-1].state is a zero word before the array; counts 11,942-32,767 read past the end of
   RDRAM), so the round-18 guard matches it; comment updated, no code change.
 - **Tools**: `n64trace.py --sndp`, `--peek LEVEL:GF:EXPR:N` (with pointer steps), `T2_SNDP_LOG=1`.
-- **Runs** (this branch, Release, `setarch -R`, `T2_DET_LOG=1`): see the table below. The fixes are
-  render-only (a texture's upload and a callback that never ran), so no det line can change.
+- **Runs** (this branch at b3bd6e0c, Release, PIE, `setarch -R`, `T2_DET_LOG=1`, `aimdrive.py`, each
+  in its own directory): **the default command** (`--all --talismans 2 --cheats-off 1,2,3,4,5,6`,
+  300,000 frames): END 2 at 250,566, 5 totems, 399 hits, **0 lives lost**, det md5 `6213496b…`
+  (600,000 lines); **`--legacy`**: END 2 at 252,194, 2 lives lost (as before), the first 580,000
+  det lines md5 `ecb9f9f2…` (round 16/17's). The fixes are render-only (a texture upload, and a
+  recolour no texture asks for), so no det line moved. Screenshots (not committed): 7601 at port
+  frame 1701 / N64 690 (the shaft pale white-yellow after the fix, multicoloured before) and
+  1925 / 779 (the mist dark grey, cyan before); the hub at gf 74/75 (`--start-warp=-61@600` / port
+  1399): the same picture on both, so the olive tint is the Mother's arena's own.
+- `refshots.py --start-warp` now takes a level start (a negative warp id failed to pack).
 - Files: `src/us/code/func_00206B30.c`, `src/us/code/func_00206990.c` (asm_diff 0 against
   65ec98ec), `port/game/t2tex.c` (new), `port/audio/t2audio_sndp.c` (log + comment),
   `tools/port/n64trace.py`, docs (FIDELITY.md 11-h2, RENDER.md 7.1 row, this section).
@@ -312,6 +320,7 @@ the host's typed `t2audio_world.c` writes it by name (`padFC`).
 | 596c09b7 | `n64trace.py --peek` |
 | 86c9f8dd | `Texture_DecompressCallback`: the recolour mode at the host offset, the TLUT recoloured big-endian |
 | b3bd6e0c | `Texture_Load` kind 3 as IA16 (`port/game/t2tex.c`) |
+| (last) | `refshots.py`: a negative `--start-warp`; this section's runs |
 
 ## Round 18, part g2: address-layout determinism, the gptr checker, the fifo watchdog (branch names-R18_g2)
 
