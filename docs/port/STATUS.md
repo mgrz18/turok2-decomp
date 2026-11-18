@@ -263,7 +263,7 @@ by the new legacy lines. ABI (`abicheck.py` on a fresh PIE build: 3,077 TUs, 11,
 
 ## Round 18, part g3: the round-17 n64cmp leads (branch names-R18_g3)
 
-Detail: [FIDELITY.md](FIDELITY.md) 9-g3.
+Detail: [FIDELITY.md](FIDELITY.md) 9.
 
 - **The per-actor lights of 61/100/125 are not a host bug**: the N64 and the port dump on frames
   of opposite `gEvenOdd`, so `m_Lights[0]` of one side is `m_Lights[1]` of the other, and the
@@ -275,7 +275,7 @@ Detail: [FIDELITY.md](FIDELITY.md) 9-g3.
   floor tilt, reproduced exactly from the port's floor normal). An original-code uninitialised
   read, not a host view bug; left as is (no src/ change, no route change).
 - Not done (time lost to dropped connections): 135/124/114/53, the hub with `--pad`, a boss arena,
-  the 7601 particle colours (notes in FIDELITY.md 9-g3.3).
+  the 7601 particle colours (notes in FIDELITY.md 9.3).
 - Files touched: `tools/port/n64cmp.py`, docs only. No src/include change (asm_diff not needed).
 
 | commit | what |

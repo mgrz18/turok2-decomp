@@ -401,12 +401,12 @@ the port computes them at another point of the frame (the dump follows the drawn
 writers: `func_00219BC0.c`, `func_0024C47C.c`, `func_0025C018.c`, ...) does not run or reads the
 floor normal differently on the host.
 
-## 9-g3. The two round-17 leads (Phase 7 round 18, part g3)
+## 9. The two round-17 leads (Phase 7 round 18, part g3)
 
 Run with the round-17 settings (`n64cmp.py run --warp -(L+1) --level L`, seed at the load and at
 gf 1, ticks 2, port `--audio --draw`, Release build at ab0bc24c): 61 (gf 1-5) and 125 (gf 1-10).
 
-### 9-g3.1 The per-actor lights (`m_Lights`, `m_ShadowAlpha`): not a host bug
+### 9.1 The per-actor lights (`m_Lights`, `m_ShadowAlpha`): not a host bug
 
 `CGameObjectInstance.m_Lights[2]` is a double buffer written at `[gEvenOdd]` when the object is
 drawn (`CScene__GetLightsAt`, `CScene__ComputeLights`, `gDefaultLights`). Two things made 8's
@@ -421,11 +421,11 @@ drawn (`CScene__GetLightsAt`, `CScene__ComputeLights`, `gDefaultLights`). Two th
 
 `n64cmp.py` now pairs the two buffers the way that matches more members (`pair_buffers`) and drops
 a buffer that is unwritten on either side (`written`). On 61 at gf 1-5 the remaining LVL/DYN/PLR
-differences are `m_ShadowAlpha` (an uninitialised byte, NOISE) and actor 25's ground tilt (9-g3.2);
+differences are `m_ShadowAlpha` (an uninitialised byte, NOISE) and actor 25's ground tilt (9.2);
 by an independent check at gf 1, 32 of the 34 buffers written on both sides at the same index
 are equal, and the other two are the parity swap (actor 54) and the 0xFF fill (actor 26). `m_ShadowAlpha` stays in NOISE.
 
-### 9-g3.2 125's actor 51 (and 61's actor 25): the ground tilt reads uninitialised AI flags
+### 9.2 125's actor 51 (and 61's actor 25): the ground tilt reads uninitialised AI flags
 
 Only `m_qGround`, `m_mfOrient` and the bounds of LVL51 differ in 125 (every other level actor is
 equal at gf 1-2; the whole run differs in 3,035 members over gf 1-10, mostly the camera's menu pool and the m_VarBuffer views). N64 (0.0144, -0, 0.1907, 0.9815), port identity. Instrumented
@@ -445,7 +445,7 @@ mean modelling its heap contents (or clearing the block on load, which the N64 d
 left as is. Visible effect: a few placed objects on sloped floors stand upright on the port
 instead of leaning with the floor (125's actor 51 at (3328, 1229, -4147), type 135).
 
-### 9-g3.3 Not done this round
+### 9.3 Not done this round
 
 The sweep of 135, 124, 114, 53, the hub after walking (`--pad`) and a boss arena, and the hub pad
 cut-scene's particle colours (RENDER.md 7.1): the session lost most of its time to dropped
