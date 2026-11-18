@@ -1455,3 +1455,67 @@ The default `--all` route under aimdrive.py, Release, every frame drawn on the C
 - Measurements on a Mac in use (browsers, WindowServer at ~50% CPU sharing the GPU) are noisy; the
   unpaced numbers repeat (round 16: 38-43 s for the whole game, here 35-39 s without drawing and
   97 s drawn).
+
+## 20. Round 18 (part g4): the player's window defaults
+
+Branch `names-R18_g4` (from ab0bc24c), Mac (M5, macOS 27.2) only, headless (no window was opened).
+No change to `src/` or `include/`. Release build in `OUT/build_r18`.
+
+### 20.1 Metal: broken for the player, now fixed and checked headless; OpenGL stays the default
+
+- **`--offscreen-metal`** (port/app/offscreen_gl.cpp): LUS's `GfxRenderingAPIMetal` with no window.
+  It takes its `CAMetalLayer` and drawable size from an `SDL_Renderer` through two calls only
+  (`SDL_GetRenderMetalLayer`, `SDL_GetCurrentRenderOutputSize`); the executable defines both (its
+  definition wins over libSDL3's for LUS's static library): for a stand-in renderer they answer
+  with a `CAMetalLayer` in no window and the fixed size, for any other renderer they call SDL's
+  (`dlsym(RTLD_NEXT)`), so a Metal window is untouched. The game framebuffer is read back each
+  frame (LUS's compute readback commits and waits), then copied at 8 bits (`T2_SHOT`).
+- **The first run aborted**: LUS's Metal shader (`shaders/metal/default.shader.metal`) declares
+  `thread const texture2d<float> tex`, `thread const sampler`, `thread const int` parameters, which
+  this Metal compiler rejects ("parameter may not be qualified with an address space"). The
+  library does not compile and the first draw dies in pipeline validation. **A player who
+  launched the app with the default (Metal) got this.** Fix (no LUS change):
+  `port/cmake/t2_shaders.cmake` stages the shaders for `t2port.o2r` and drops the qualifier (by
+  value; same meaning). The OpenGL shader is byte-identical (md5 checked).
+- **Metal = OpenGL, pixel for pixel**: the boot to 3,000 VIs (legal, pak, Acclaim, Iguana),
+  `T2_SHOT_EVERY=600`, 8-bit: all 5 pairs identical (0 differing pixels).
+- **Default: OpenGL** anyway (every check of the port since round 5 used it, and the drawn route
+  was never run on Metal): CVar **`gT2Renderer`** (0 OpenGL, 1 Metal) is written into
+  `Window.Backend.Id` before `Fast3dWindow::Init` at each launch (t2display.cpp), so a config
+  saved with Metal (3) by an earlier launch goes back to OpenGL (2). Metal is opt-in.
+
+### 20.2 Retina: the game frame at pixel resolution, a render-scale setting
+
+- LUS sizes the game framebuffer from the ImGui content region, which is in **points** on macOS,
+  times the interpreter's `internal_mul` (1): a 2x display drew at half its pixel resolution.
+- `T2Display_UpdateWindow` (t2display.cpp, before each drawn frame with a window): `internal_mul` =
+  `SDL_GetWindowPixelDensity` (2 on retina, 1 elsewhere; re-read every frame, so a move to another
+  display follows) x **`gT2RenderScale`** (default 1, clamped 0.25..4); `--render-scale S`
+  overrides it for a run. The window already has `SDL_WINDOW_HIGH_PIXEL_DENSITY` (LUS's gfx_sdl.cpp).
+- Headless check: `--offscreen-gl --render-scale 2` draws 1280x960 (the frame a 640x480-point
+  window on a 2x display now draws). Against 1x (boot, 3 shots, 2x fitted down): the same
+  layout and HUD/text position and size; the differences are glyph and polygon edges only (PSNR
+  22-40 dB: the 2x frame is sharper). At 2x the game's 480x360 scissor scales by exactly 8/3 to
+  960 rows (no half-row rounding, unlike 1x's row 478, 19.2).
+- Not checked: a real window (the ImGui viewport, a non-4:3 window's aspect, fullscreen).
+
+### 20.3 Sound on the Mac (LUS's CoreAudio player, read and run headless)
+
+- `T2_AUDIO_DEVICE=1 --audio --pace --no-window`: CoreAudio opens (22,050 Hz stereo), 600 VIs, exit 0.
+- LUS's player: an AUHAL (`kAudioUnitSubType_HALOutput`) unit, a 6,000-frame ring buffer (272 ms),
+  the port asks for 2,205 frames buffered (100 ms latency, main.cpp). It sets no device and
+  registers **no listener for the default output**: the unit stays on the device that was the
+  default at launch. Switching the output (headphones, AirPods) while playing leaves the sound on
+  the old device; if it disappears, sound stops until the next launch. Fix (not done: needs a
+  window to check, or a LUS change): `kAudioUnitSubType_DefaultOutput`, or a
+  `kAudioHardwarePropertyDefaultOutputDevice` listener that re-creates the player.
+
+### 20.4 The whole game on the Mac Release (aimdrive.py, `OUT/r18/det.sh`, `T2_DET_LOG=1`)
+
+| command | det lines | md5 | result |
+|---|---|---|---|
+| default `--all --talismans 2 --cheats-off 1,2,3,4,5,6` | 580,000 | `ecb9f9f2…` (= Linux, STATUS) | exit 0, END 2, 2 deaths |
+| + `--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` | 580,000 | `15d3d74f…` (= Linux) | exit 0, END 2, **0 deaths**, 40.8 s |
+
+Both with ASLR on (macOS has no `setarch -R`); the round-17 level-135 ASLR divergence did not show. The
+default run's wall time (1,467 s) includes the Mac asleep; the zero-death run took 40.8 s.

@@ -142,6 +142,8 @@ real time (the N64's 60 fields a second, 30 drawn frames) until you close the wi
   | `gT2MouseInvertY` | 0 | 1: mouse up looks down |
   | `gT2StickInvertY` | 0 | 1: the gamepad's right stick / the arrow keys look inverted (in a level; menus are not inverted) |
   | `gT2ShowControlsAtStart` | 1 | 0: no controls table in the log at start |
+  | `gT2Renderer` | 0 | 0: OpenGL (the renderer every check used); 1: Metal (macOS, opt-in). Sets `Window.Backend.Id` at each launch |
+  | `gT2RenderScale` | 1.0 | the game frame's resolution as a multiple of the window's pixels (0.25-4): 1 = full pixel resolution on a retina display, 0.5 = half (faster), 2 = supersampled |
 - **Logs** go to `logs/` in the same folder: `turok2-stdout.log`, `turok2-stderr.log` (the
   port's messages) and `turok2.log` (libultraship's). Nothing is printed in the terminal except
   where the logs are.
