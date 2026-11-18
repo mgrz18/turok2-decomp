@@ -262,6 +262,8 @@ def main():
 
     core.CoreDoCommand(M64CMD_SET_FRAME_CALLBACK, 0, C.cast(on_frame, C.c_void_p))
     core.CoreDoCommand(M64CMD_EXECUTE, 0, None)
+    if adlog is not None:
+        adlog.close()
     for f in glob.glob(shotdir + "/*.png"):
         os.replace(f, os.path.join(out, "shot_%d.png" % pending.pop("shot", last)))
     core.CoreDoCommand(M64CMD_ROM_CLOSE, 0, None)

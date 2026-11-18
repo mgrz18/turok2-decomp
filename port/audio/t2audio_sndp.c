@@ -47,7 +47,32 @@ static int target_ok(ALSndPlayer *sndp) {
     return sndp->target >= 0 && sndp->target < sndp->maxSounds;
 }
 
+/* T2_SNDP_LOG=2 (DEBUG-ONLY, round 20 i5): every play/stop/pan/vol/pitch/fx event with its target,
+ * to pair with n64trace.py --calls alSndpSetSound,alSndpPlay,alSndpSetVol,... (AUDIO.md 12) */
+static int sndp_log(void) {
+    static int sLog = -1;
+    if (sLog < 0) {
+        const char *e = getenv("T2_SNDP_LOG");
+        sLog = e != NULL ? atoi(e) : 0;
+    }
+    return sLog;
+}
+
 static void post(ALSndPlayer *sndp, s16 type, ALSndpEvent *e) {
+    if (sndp_log() >= 2) {
+        static const char *const kName[9] = {"play", "stop", "pan", "vol", "pitch", "?5", "?6", "?7", "fx"};
+        fprintf(stderr, "sndp: gf %u %s target %d", gFrameCountGameplay, type >= 0 && type <= 8 ? kName[type] : "?",
+                (int)sndp->target);
+        if (type == 2)
+            fprintf(stderr, " %d", (int)e->pan.pan);
+        else if (type == 3)
+            fprintf(stderr, " %d", (int)e->vol.vol);
+        else if (type == 4)
+            fprintf(stderr, " %.4f", (double)e->pitch.pitch);
+        else if (type == 8)
+            fprintf(stderr, " %d", (int)e->fx.mix);
+        fprintf(stderr, "\n");
+    }
     if (!target_ok(sndp)) {
         return;
     }
