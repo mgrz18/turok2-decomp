@@ -33,6 +33,17 @@ Each site is classed by the base it is applied to:
   same     S known and the member at that offset has the same offset and size on both hosts
   global   `&symbol +/- C`: a view across a data symbol (gendata places the N64 .data/.bss in
            order but at host sizes: check that every symbol in between keeps its N64 size)
+
+A fourth kind of site needs no cast (round 18 g2, after f4's COnScreen fix):
+
+  gptr    base-pointer arithmetic on a data symbol, cast or not: `gArray - C`, `gArray + C`,
+          `&gSym + C`, `(u8 *) &gSym.m + C` (passed as an argument, assigned, ...), C a constant.
+          BAD: C reaches outside the symbol's host size (a negative C, or past its end): the N64
+          neighbour at that distance is somewhere else on the host (`gEngineApp_m_SwooshSystem -
+          0x1C8` was COnScreen on the N64, the middle of COnScreen on the host). untyped: C stays
+          inside the symbol (or its size is unknown: `extern u8 g[]`) on a byte-wise base: an N64
+          offset into a struct seen as bytes, check it by hand. same: a typed (non byte) element
+          offset inside an array of known size (`gTable + 3`).
   untyped  a raw offset on void * / sptr / an integer: the struct is not known statically. The
            report lists the key structs whose N64 layout has a member of that size there and
            moves on the host (`guess`)
@@ -289,6 +300,83 @@ def find_records(tu, names):
     return out
 
 
+def global_of(c):
+    """The file-scope variable a pointer expression starts from: `g` (an array, decayed), `&g`,
+    `&g.m`, `&g[i]`, through casts and parens; None otherwise."""
+    c = peel(c)
+    while c is not None:
+        if c.kind == K.DECL_REF_EXPR:
+            d = c.referenced
+            if d is not None and d.kind == K.VAR_DECL and d.semantic_parent is not None \
+                    and d.semantic_parent.kind == K.TRANSLATION_UNIT:
+                return d
+            return None
+        if c.kind in CAST_KINDS:
+            k = expr_kids(c)
+            c = k[-1] if k else None
+            continue
+        if c.kind == K.UNARY_OPERATOR:
+            toks = [t.spelling for t in c.get_tokens()]
+            if not toks or toks[0] != '&':
+                return None
+            k = expr_kids(c)
+            c = k[0] if k else None
+            while c is not None and c.kind in (K.MEMBER_REF_EXPR, K.ARRAY_SUBSCRIPT_EXPR, K.PAREN_EXPR):
+                k = expr_kids(c)
+                c = k[0] if k else None
+            continue
+        return None
+    return None
+
+
+def gptr_site(c):
+    """`<global> +/- C` (round 18 g2): (name, class, byte offset, what) or None."""
+    terms = []
+    flatten_add(c, 1, terms)
+    base, off, other = None, 0, 0
+    for (sg, t) in terms:
+        v = const_value(t)
+        if v is not None:
+            off += sg * v
+            continue
+        if base is None and t.type.get_canonical().kind in (ci.TypeKind.POINTER, ci.TypeKind.CONSTANTARRAY,
+                                                             ci.TypeKind.INCOMPLETEARRAY):
+            base = (sg, t)
+        else:
+            other += 1
+    if base is None or other or base[0] < 0 or off == 0:
+        return None
+    d = global_of(base[1])
+    if d is None:
+        return None
+    if d.type.get_canonical().kind == ci.TypeKind.POINTER and peel(base[1]).kind != K.UNARY_OPERATOR \
+            and strip(base[1]).kind == K.DECL_REF_EXPR:
+        return None   # `gPtr + C`: arithmetic on the pointer's value, not on the symbol's address
+    bt = base[1].type.get_canonical()   # the element the constant scales by: after the casts
+    pt = bt.get_pointee() if bt.kind == ci.TypeKind.POINTER else bt.element_type
+    esz = pt.get_canonical().get_size() if pt is not None else 1
+    if esz is None or esz <= 0:
+        esz = 1
+    boff = off * esz
+    dt = d.type.get_canonical()
+    size = dt.get_size()
+    inner = 0
+    if not (peel(base[1]).kind == K.DECL_REF_EXPR or (strip(base[1]).kind == K.DECL_REF_EXPR)):
+        inner = None   # `&g.m + C`: the member's own offset is not computed here
+    if size is not None and size > 0 and inner is not None and boff == size and esz == 1:
+        cls = 'same'   # one past the end (a stack top: `gStack + sizeof gStack`)
+    elif size is not None and size > 0 and inner is not None and (boff < 0 or boff > size):
+        cls = 'BAD'
+    elif boff < 0:
+        cls = 'BAD'
+    elif esz == 1 or is_bytewise(base[1].type):
+        cls = 'untyped'
+    else:
+        cls = 'same'
+    what = '(%s, host size %s, element %d)' % (dt.spelling, size if size and size > 0 else '?', esz)
+    return d.spelling, cls, boff, what
+
+
 def analyse(job):
     path, args = job
     if not ci.Config.loaded:
@@ -304,6 +392,7 @@ def analyse(job):
     casts = []    # (function, cast, local view record V, include record S)
     acc = {}      # (function, 'v:VAR' or 'c:CASTHASH') -> the view's field names used through it
     castvar = {}  # (function, cast hash) -> the variable the cast is assigned to
+    gptrs = {}    # (line, col) of the outermost +/- -> gptr site (round 18 g2)
     def walk():
         for top in th.cursor.get_children():
             if top.kind != K.FUNCTION_DECL or not top.is_definition() or top.location.file is None \
@@ -313,6 +402,14 @@ def analyse(job):
                 yield top.spelling, c
 
     for fname, c in walk():
+        if c.kind == K.BINARY_OPERATOR and c.binary_operator in (ci.BinaryOperator.Add, ci.BinaryOperator.Sub) \
+                and c.type.get_canonical().kind == ci.TypeKind.POINTER:
+            g = gptr_site(c)
+            if g is not None:
+                key = (c.extent.start.line, g[0])
+                prev = gptrs.get(key)
+                if prev is None or abs(g[2]) > abs(prev[2][2]):   # the outermost sum of one base wins
+                    gptrs[key] = (fname, c, g)
         if c.kind == K.CSTYLE_CAST_EXPR and c.type.get_canonical().kind == ci.TypeKind.POINTER:
             kids = expr_kids(c)
             if not kids:
@@ -398,8 +495,12 @@ def analyse(job):
             kids = expr_kids(c)
             base = strip(kids[0]) if kids else None
             views.append((fname, c, rec, f, base))
+    gsites = []
+    for (line, _), (fname, c, (name, cls, off, what)) in sorted(gptrs.items()):
+        gsites.append({'kind': 'gptr', 'cls': cls, 'file': path, 'line': line, 'func': fname, 'off': off,
+                       'base': name, 'what': what})
     if not raw and not views and not casts:
-        return {'file': path, 'sites': []}
+        return {'file': path, 'sites': gsites}
     tm = idx.parse(path, args=args + ['-target', 'mips-linux-gnu'])
     LH, LM = Layouts(), Layouts()
     # every include/ record, both targets, that differs between them
@@ -599,7 +700,7 @@ def analyse(job):
         sites.append({'kind': 'cast', 'cls': 'BAD' if bad else 'same', 'file': path, 'line': c.location.line,
                       'func': fn, 'view': rec_name(vd), 'field': sname, 'off': 0, 'size': 0,
                       'what': '%s%s' % (('via %s: ' % var) if var else '', '; '.join(bad[:4]))})
-    return {'file': path, 'sites': sites}
+    return {'file': path, 'sites': sites + gsites}
 
 
 def main():
