@@ -621,9 +621,13 @@ N64_FULL_L2_PICKS = [(6, 2, [(644.9, -4761.6, -1156.9, 0.0), (1190.2, -4761.6, -
 N64_FULL_L2_HEALTH = {7: [(-2405.3, -4761.6, 5545.7, 0.0), (-2135.0, 204.8, 3506.0, 0.0), (-581.3, -5.2, 3644.5, 0.0),
                           (-512.0, -11.3, -2560.0, 0.0), (-512.0, -10.7, -2764.8, 0.0), (2246.1, -2150.4, 2102.3, 0.0),
                           (5581.0, -3993.6, 1285.7, 0.0), (5580.1, -3379.2, 1275.8, 0.0), (6451.2, 307.2, 3527.7, 0.0),
-                          (6448.8, 307.2, 4057.7, 0.0)]}
-# Round 18 g1 (--n64): the weapon for the Mantid Queen (None: the shredder of level 5); T2G1_QW overrides (tests)
-N64_QUEEN_WEAPON = os.environ.get("T2G1_QW") or None
+                          (6448.8, 307.2, 4057.7, 0.0)],
+                      # 132's last visit (after sister 3: 135 leaves ~70 health and the City Totem is next)
+                      # (the two on 1,331 and the two on 1,106 stand the player over a lower floor with a damage region: dropped)
+                      13: [(941.4, 716.8, -1907.8, 0.0), (512.4, 716.8, -1904.1, 0.0), (-1382.4, 179.4, -1792.0, 0.0),
+                           (-1382.4, 179.4, -1331.2, 0.0), (4410.7, 409.6, -4062.9, 0.0)]}
+# Round 18 g1 (--n64): the weapon for the Mantid Queen (None: level 5 s shredder); T2G1_QW overrides ("": none)
+N64_QUEEN_WEAPON = os.environ.get("T2G1_QW", "16") or None   # the scorpion launcher: 6-95 damage, 43-138 (a life) with the shredder
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
 # Round 17 f1: pick steps put before a step of a segment (segment, before step, [(x, y, z, approach
 # angle)]): each pick is a KEY_STEP-frame step (pick()'s stand and walk-in); the step and the later
