@@ -244,6 +244,54 @@ every run). `mpk_saves.py` on the default run's pak: note 1, checksum OK.
    property), the original game's uninitialised reads that the zero-fill now answers with zeros
    (demo 2's health from gf 585, 135/114's ground tilt: FIDELITY.md 12).
 
+## Round 20, part i1: the render sweep (hub, levels 1-3, menus): the arena walls, the menu texts, the automap (branch names-R20_i1; FIDELITY.md 13-i1, RENDER.md 8-i1)
+
+- **The Mother's arena olive walls: fixed.** Not the recolour (the N64's 54 texture requests at
+  7601 have the top bits clear too). The N64's RDRAM vertex colours have the blue the port lost:
+  `Model_ApplyPackedOffsets` (func_00213684.c) read the per-vertex colour offsets of geometry block
+  1, which the archive keeps big-endian (swap spec `op: unk`), with a host word load (green for red,
+  red for green, 0 for blue). Read big-endian on the port: the arena's mean colour (35.4, 32.6,
+  23.2) against the N64's (35.8, 33.1, 23.7) (before (34.5, 33.3, 8.3)). Every lit model with
+  packed offsets in the game is affected.
+- **Menu texts: fixed.** SINGLE and MULTI were missing from the main menu, NEW GAME / LOAD from
+  the single-player menu, the labels from the deathmatch menus: their strings had no ELF label, so
+  gendata never generated them and `t2_n64_to_host` gave NULL. gendata now generates unlabelled
+  rodata that an integer slot points at (`add_int_targets`; 0 of 54 menu item texts uncovered, 54
+  before). The Enter Cheat keyboard drew no letters (`D_800C1144` declared `s32` in one file:
+  generated word-swapped); declared as bytes.
+- **The automap: fixed (it was never visible).** Lines as quads (Fast3D has no `G_LINE3D`);
+  `sAutomapLineIndices` sized to its 0x800 bytes (gendata gave it 2, the indices overwrote the ortho
+  matrix and the next globals); the map's second gfx task is drawn with the frame's main task
+  (`game.cpp` + `T2Sched_TaskEndsFrame`: before, every other frame was black with the map on).
+- **The sweep** (RENDER.md 8-i1): the title, the pause menu, the hub, levels 53/55/58/59,
+  125/128/131/133/135, 61/64/67/71 at their starts and 14 frames of attract demo 1 match the N64
+  (Rice) apart from timing (the warp ring flashes, a cinema on `osGetTime`, a fire sprite's spawn
+  frame) and Rice (no automap lines).
+- **Tools**: `n64trace.py --shots` (screenshots with `--pad` input: menus, pause, map), `--args`
+  with `CCacheEntry`.
+- **Runs** (Release, PIE, ASLR on, this branch's final build): **the default command**: END 2, 0
+  lives lost, the credits back to the hub at 272,978, det md5 **`0959aac5…`** (600,000 lines,
+  unchanged: the merged state's timeline); **`--legacy`** (290,000 frames): END 2,
+  det md5 **`281904eb…`** (580,000 lines, unchanged). All fixes are render
+  or menu text only. `mklayout.py --check`: up to date; `aligncheck.py`: 0 sites.
+- **asm_diff**: `tools/asm_diff.py --base 70f3333c -j 8` over the whole tree (include/ changed):
+  0 of 3,938 differ.
+- **Files others may touch**: `tools/port/gendata.py` (new pass: rerun gendata and DROP the decl
+  cache: a declaration changed), `port/app/game.cpp` (the task join around the draw call:
+  `drawDL`), `port/game/t2sched.c` (new function at the end), `tools/port/n64trace.py`,
+  `include/globals/automap.h`, `src/us/code/func_004004D8.c`, `func_00213684.c`,
+  `func_0041AEB0.c`; docs FIDELITY 13-i1, RENDER 8-i1.
+
+| commit | what |
+|---|---|
+| cb236902 | `Model_ApplyPackedOffsets` big-endian (the arena walls); n64trace `--args` knows `CCacheEntry` |
+| 6a561cd1 | gendata: unlabelled rodata held by integer slots (the menu texts) |
+| 9b24aa34 | `D_800C1144` as bytes (the Enter Cheat keyboard) |
+| a7252c06 | the automap's lines as quads; `sAutomapLineIndices[0x400]` |
+| 0dd2981e | a frame's two gfx tasks drawn as one (the map); `n64trace.py --shots` |
+| (last) | docs |
+
+
 ## Round 19, part h1: determinism under ASLR, the level-135 two paths fixed (branch names-R19_h1)
 
 STABILITY.md 13. **The level-135 ASLR divergence is found and fixed**: the ground tilt that

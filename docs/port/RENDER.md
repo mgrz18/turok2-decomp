@@ -286,3 +286,31 @@ whole run: set by the totems, Blind, Queen, Primagen; cleared after each).
 - More warps with `refshots.py --start-warp` (every level start the route uses) against
   `T2_START_WARP`: gameplay views are deterministic from the warp for the first frames.
 - The Mac window's Metal renderer and the retina scale (MACOS.md 19.3) need a window.
+
+## 8-i1. Round 20 (part i1): the sweep of the hub, levels 1-3 and the menus
+
+Method: N64 `refshots.py --start-warp=W@600 --shots 680:900:20` (shots.txt gives each shot's gf),
+port `T2_START_WARP=W@1400 T2_SHOT_EVERY=25 T2_DET_LOG=1 T2_DET_GF=1 --draw` (8-bit shots), paired
+by gf and compared with `shotcmp.py --mean --diff`; the attract demo 1 by gf (N64 emulator frame
+E = gf E - 1985; the port frames from a run without `--draw`, then drawn only there with
+`T2_DRAW_FROM`); the menus and the pause screen with `--input` on the port and `n64trace.py --pad
+... --shots` on the N64. Classes: **host bug** (fixed), **timing** (the scene advances by
+elapsed time or a shot lands on another frame of a flashing effect), **Rice** (the emulator).
+
+| scene | N64 / port | result | class |
+|---|---|---|---|
+| title | 1450-1500 / 4362-4500 | same | - |
+| main menu | 1600 / 4800 | **SINGLE and MULTI missing on the port** (FIDELITY 13-i1.2); fixed | host bug |
+| single-player menu, Enter Cheat keyboard, options | port only (refshots `--input` does not reach the N64 game) | NEW GAME / LOAD missing, the keyboard's A-Z missing; fixed; options as expected | host bug |
+| pause menu (START in the hub) | n64trace `--pad` 820 / port 2025 | same layout and highlight | - |
+| automap (L in the hub) | n64trace `--pad` 760 / port 1800 | **never drawn on the port** (no G_LINE3D, the index array overran the ortho matrix, black flicker frames); fixed; Rice draws no lines | host bug / Rice |
+| the Mother's arena (-4), gf 75 | 700 / 1753 | **olive walls fixed** (packed vertex colour offsets big-endian, FIDELITY 13-i1.1): mean (35.8, 33.1, 23.7) / (35.4, 32.6, 23.2); Turok's pose differs (a cinema on `osGetTime`) | host bug / timing |
+| hub (-61), gf 55-275 | 680-900 / 1575-2025 | PSNR 28-31, means within 0.5; the HUD (lives, keys, health) the same | - |
+| level 53 (-54) | same | the sky, the water ring, the arches equal; a fire sprite on the right is up on the port at gf 135-175 where the N64 shows a spark (particle 0 spawns a game frame apart: FIDELITY 11.1); the cyan warp ring is a flashing effect: at a gf one side can show it and the other not | timing |
+| level 55 (-56), 58 (-59), 59 (-60) | same | the same rooms, light and HUD; the means differ only by the cyan ring's flashes | timing |
+| level 125 (-126), 128 (-129), 131 (-132), 133 (-134), 135 (-136) | same | PSNR 26-36, means within 1 | - |
+| level 61 (-62), 64 (-65), 67 (-68), 71 (-72) | same | PSNR 25-32 outside the ring's flashes. The ring checked frame by frame in 67 (N64 every 2 emulator frames gf 135-175, port every 10 VIs): it is lit about 3 game frames in every ~22 on both | timing |
+| attract demo 1, gf 135-1095 (14 pairs) | 2120-3080 / 5736-8061 | the HUD (health, ammo and its icon), the weapon wheel, the enemies, the corridors and lights match (PSNR 20-31); gf 935: the hurt flash is redder on the port (fades by elapsed time); gf 1015: the enemy's pose (demo 1's known divergence) | timing |
+
+Next: refshots `--input` reaching the N64 game (the menus are port-only shots); the hurt flash's
+fade against the N64 frame by frame; the ring's phase (both flash, at different gfs).
