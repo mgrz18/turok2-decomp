@@ -36,9 +36,8 @@ STICK_PRIMARY = {5: (124, 94, 95, 96, 2), 6: (3, 4)}
 # (aimdrive.py T2_AIMD_BOSS=L:R): the Mantid Queen (2) and the Primagen's lair (4). --stick-boss "" turns it off.
 STICK_BOSS = {5: "2:%s" % os.environ.get("T2H3_QR", "150"), 6: "4:%s" % os.environ.get("T2H3_LR", "350")}
 STICK_BOSS_ON = None   # None: on the N64 stream only; else the set of route levels (--stick-boss)
-# Round 20 i2: the default on the N64 stream: the lair only. At the Queen the node rule never ended her step-5 wave
-# on the zero-filled stream (T2_AIM_NODE=boss gives the nearest live actor during a wave, here actor 20 eight units
-# from the player, never hurt; the rule has no IMMUNE switch): 4 lives, game over. g5's picker clears it
+# Round 20 i2: the default on the N64 stream: the lair only. At the Queen the node rule cost 3 lives (her step-5 wave
+# 10,212 frames; g5's picker, which leaves a target that is not hurt, 678: PLAYTHROUGH.md 42-i2.2)
 STICK_BOSS_N64 = {6}
 LAIR_PUSH = ""       # round 18 g5: --lair-push toward|jump|both (T2_LAIR_PUSH; "" = off: the routes unchanged)
 ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
@@ -216,6 +215,10 @@ class Route:
                 env.append("T2_AIMD_PRIMARY=%s" % ",".join(str(l) for l in prim))
             if 6 in STICK_AIM:   # round 18 g5: the Mother's parts: always the assist's node (aimdrive.py)
                 env.append("T2_AIMD_PRIMARY_ONLY=3")
+            if 6 in STICK_AIM and n64_full() and "lair" not in ASSIST_KEEP:
+                # round 20 i2: the lair by stick: no stick turn while the edge guard (or the push answer) walks the
+                # player back in (aimdrive.py T2_AIMD_LAIR_STEADY: four falls off the edge -> one push, PLAYTHROUGH.md 42-i2)
+                env.append("T2_AIMD_LAIR_STEADY=1")
             bl = (STICK_BOSS_ON if STICK_BOSS_ON is not None else STICK_BOSS_N64 if n64_full() else set()) & STICK_AIM
             if bl:   # round 19 h3: the boss's node only, led, fire held on target (T2_AIMD_BOSS)
                 env.append("T2_AIMD_BOSS=%s" % ",".join(STICK_BOSS[lv] for lv in sorted(bl) if lv in STICK_BOSS))
@@ -673,9 +676,8 @@ N64_FULL_L2_HEALTH = {7: [(-2405.3, -4761.6, 5545.7, 0.0), (-2135.0, 204.8, 3506
                            (-1382.4, 179.4, -1331.2, 0.0), (4410.7, 409.6, -4062.9, 0.0)]}
 # Round 18 g1 (--n64): the weapon for the Mantid Queen (None: level 5 s shredder); T2G1_QW overrides ("": none)
 # Round 20 i2 (the N64 stream): T2_BOSS_FRONT at the Mantid Queen, the player put 600 units in front of her open spot
-# (was 450): her state 4 spends most of the fight with the spot-1 box behind her body boxes, and from 450 her volleys
-# hit the player at ~430-490 units (the 133/135 shredder stream: 266 damage and 2 lives at 450; 27 at 600, 61 at 700,
-# 97 at 900; PLAYTHROUGH.md 42-i2). T2I2_QF overrides (DEBUG-ONLY test hook)
+# (was 450). One run per distance on the 133/135 shredder stream: 266 damage and 2 lives at 450, 27 at 600, 61 at 700,
+# 97 at 900 (PLAYTHROUGH.md 42-i2.1). T2I2_QF overrides (DEBUG-ONLY test hook)
 N64_QUEEN_FRONT = os.environ.get("T2I2_QF", "600,200")
 N64_QUEEN_WEAPON = os.environ.get("T2G1_QW", "16") or None   # the scorpion launcher: 6-95 damage, 43-138 (a life) with the shredder
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
@@ -1120,7 +1122,7 @@ L2_STRETCH_REAL = [(6, 6, 3000), (9, 3, 2000), (12, 15, 2000)]
 # its east floor (y 409.6; tools/assets/levels.py objects 519 bullets, 521 shells, 534) at the start of 132's first visit
 # (segment 11, before soul gate 2), approach angles by itemreach.py; 135's graveyard zombies on the shotgun
 N64_L2_ARMS = {11: [(4117.3, 409.6, -3879.0, 2.3562), (3930.6, 409.6, -4099.4, 1.1781), (4226.8, 409.6, -3518.3, 1.5708)],
-               12: [(0.0, 0.0, -4864.0, -3.1416)]}   # 135: its shotgun (object 571, item 2008: shells), past door 59
+               12: [(0.0, 0.0, -4864.0, -3.1416)]}   # 135: its shotgun (object 571, item 2008: +10 shells)
 N64_L2_TAPS = {(12, 1): 8}
 N64_L2_135_HOLD = os.environ.get("T2I2_135HOLD", "1") != "0"
 
@@ -1457,8 +1459,7 @@ def level5(r, t):
     r.anchors.append((s + L5_QUEEN_AT + add, 2))
     r.note(s + rel + add, "2 the Mantid Queen: fire held, T2_AIM_NODE=boss@2, T2_BOSS_FRONT=450,200")
     r.inputs.append("Z@%d..%d" % (s + rel + add, s + rel + add + length))
-    # (a --stick-aim 5 run keeps 450: the stick misses her small spot box from farther, state 4 1,272 frames at 450,
-    # 7,458 at 600)
+    # (a --stick-aim 5 run keeps 450: one run each, 122 damage and no life at 450, 205 and a life at 600)
     r.boss_front.append((s + rel + add - 100, N64_QUEEN_FRONT if n64_full() and 5 not in STICK_AIM else "450,200"))
     hub_at = s + L5_HUB_AFTER + add
     r.level_start[6] = hub_at

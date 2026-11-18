@@ -435,6 +435,10 @@ LAIR_R0, LAIR_R1, LAIR_DR = 1000.0, 4900.0, 300.0
 LAIR_STEP = 150.0           # waypoint spacing along an arc
 LAIR_MARGIN = 300.0         # the clipped floor: every edge LAIR_MARGIN in
 LAIR_SAFE_MARGIN = 150.0    # beyond this: back to the middle first
+# round 20 i2: T2_AIMD_LAIR_STEADY=1: the stick does not turn the player while the "guard" walks him back from the
+# floor's edge (the C buttons are pressed for the yaw of the move line; with the stick turning at its full rate the
+# walk went elsewhere: four falls off the edge in a --stick-aim 6 run on the N64 stream, PLAYTHROUGH.md 42-i2)
+LAIR_STEADY = os.environ.get("T2_AIMD_LAIR_STEADY", "") not in ("", "0")
 LAIR_NEAR = 110.0
 LAIR_GUARD_BACK = 250.0     # "guard": back to the script this far inside the safe margin
 LAIR_KEEP_PROBE = 200.0     # T2_LAIR_KEEP: the step ahead that must be floor for the walk away from him
@@ -474,6 +478,7 @@ class LairDrive:
         self.kind = kind or os.environ.get("T2_LAIR_DRIVE", "guard")
         self.guard = False
         self.overrides = 0     # frames answered with the driver's own buttons in "guard"
+        self.steady = 0        # aim frames whose stick turn was held back (T2_AIMD_LAIR_STEADY)
         self.pts = lair_arcs()
         self.side = 1.0        # +1: C-right moves along (-cos rotY, sin rotY)
         self.cal = 0.0         # the calibration sum
@@ -921,6 +926,9 @@ def main():
                 if not line.startswith("aim "):
                     continue
                 frame, sx, sy, ey, ep, pitch, ry, cid, z = answer(line, aim, probe, picker, trig)
+                if LAIR_STEADY and (drive.guard or drive.mode == "push"):
+                    sx = 0   # round 20 i2 (T2_AIMD_LAIR_STEADY): no stick turn while the edge guard or the push answer walks
+                    drive.steady += 1
                 fout.write("%d %d\n" % (sx, sy) if z is None else "%d %d z%d\n" % (sx, sy, z))
                 fout.flush()
                 n += 1
