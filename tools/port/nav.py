@@ -2,7 +2,7 @@
 """Round 16 e3: a navigation mesh from a level's floor regions, A* between two points, a path the
 player can walk (docs/port/PLAYTHROUGH.md section 30).
 
-    python3 tools/port/nav.py ROM LEVEL X,Y,Z X,Y,Z      # the waypoints between two points
+    python3 tools/port/nav.py ROM LEVEL X,Y,Z X,Y,Z [--jumps]   # the waypoints between two points
     python3 tools/port/nav.py ROM LEVEL --check RUNLOG   # every same-level teleport of a run's log
 
 The floor is the level's collision regions (tools/assets/levels.py: triangles, each with its three edge
@@ -40,6 +40,14 @@ DETOUR_OUT = 12.0   # a detour corner this much outside the grown box     # the 
 BODY_LO, BODY_HI = 56.0, 90.0   # a box in the way: over the feet + BODY_LO and under the feet + BODY_HI
 CLIMB_COST = 600.0  # a steep region (a slide down) on the way
 FLOOR_TOL = 60.0    # locate(): the floor at most this above the point
+# round 19 h5: jump edges (load(..., jumps=True)): the player's jump (PlayerJump_Enter: vy 389.12 x the
+# jump scale; measured, PLAYTHROUGH.md 39-h5) lifts his feet JUMP_UP over a ledge he walks into, and a
+# running jump carries him GAP_MAX over a void between two floors
+JUMP_UP = 90.0      # a ledge (a higher floor or a steep face whose top is) at most this over the feet
+GAP_MAX = 150.0     # a void between two floors' border edges at most this wide (XZ)
+GAP_UP = 40.0       # the far floor at most this higher across a gap
+GAP_DROP = 300.0    # and at most this lower
+JUMP_COST = 300.0   # a jump on the way costs this (the walker prefers the floor)
 
 _FS = {}
 _NAV = {}
@@ -51,11 +59,11 @@ def fs_of(rom):
     return _FS[rom]
 
 
-def load(rom, level):
-    """The Nav of a level (cached)."""
-    key = (rom, level)
+def load(rom, level, jumps=False):
+    """The Nav of a level (cached). jumps (round 19 h5): with the jump edges (ledges and gaps)."""
+    key = (rom, level, bool(jumps))
     if key not in _NAV:
-        _NAV[key] = Nav(lv.parse_level(fs_of(rom), level, with_sections=True))
+        _NAV[key] = Nav(lv.parse_level(fs_of(rom), level, with_sections=True), jumps=jumps)
     return _NAV[key]
 
 
@@ -63,9 +71,22 @@ def cross2(o, a, b):
     return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
 
 
+def seg_cross(p, q, a, b):
+    """The XZ point where segment p-q crosses segment a-b, or None."""
+    d = (q[0] - p[0]) * (b[1] - a[1]) - (q[1] - p[1]) * (b[0] - a[0])
+    if abs(d) < 1e-9:
+        return None
+    t = ((a[0] - p[0]) * (b[1] - a[1]) - (a[1] - p[1]) * (b[0] - a[0])) / d
+    u = ((a[0] - p[0]) * (q[1] - p[1]) - (a[1] - p[1]) * (q[0] - p[0])) / d
+    if -1e-6 <= t <= 1 + 1e-6 and -1e-6 <= u <= 1 + 1e-6:
+        return (p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t)
+    return None
+
+
 class Nav:
-    def __init__(self, level):
+    def __init__(self, level, jumps=False):
         self.level = level["index"]
+        self.jumps = jumps
         col = level["collision"]
         self.v = [tuple(p) for p in col["vertices"]]     # x, floor y, z, ceiling y
         self.infos = col["region_infos"]
@@ -81,6 +102,7 @@ class Nav:
         # the boxes do not close regions (a box is only a broad phase: a closed region was often open floor);
         # the legs of a path go round them (detour)
         self.blocked = [False] * n
+        self.gaps = self._gap_links() if jumps else {}
 
     # --- static objects: their world boxes (CStaticObject__Construct, func_00214564.c) ---
     def _boxes(self, level):
@@ -209,11 +231,14 @@ class Nav:
         return self.v[vs[k]], self.v[vs[(k + 1) % 3]]
 
     def links(self, i):
-        """(neighbour, edge index, extra cost) of the edges the player can cross out of region i.
+        """(neighbour, (a, b) the edge crossed, extra cost, kind) of the edges the player can cross out of
+        region i; kind "walk", "jump" (a ledge) or "gap" (round 19 h5: only with jumps=True).
         Sweep_CrossRegionEdge: into a steep region (a wall or a slide) only when its highest corner is
         below the feet (here: the floor at the shared edge); out of a steep region anywhere (here: not up a
         steep one); a non-steep floor that does not join at the edge (a step up of more than STEP_UP)
-        stays closed too (the engine lets it be crossed; the floor follow then fails)."""
+        stays closed too (the engine lets it be crossed; the floor follow then fails). With jumps, a
+        steep face or a higher floor at most JUMP_UP over the feet is a "jump" edge, and the gaps of
+        _gap_links() are "gap" links."""
         out = []
         ri = self.r[i]
         info_i = self.infos[ri["info"]]
@@ -235,24 +260,90 @@ class Nav:
             top_j = max(self.v[q][1] for q in rj["v"])
             sj = not self.walk[j]
             climb = sj and rj["flags"] & 0x10    # a climbable wall (PlayerClimb_Enter, facing it)
+            kind = "walk"
             if sj and not si and not climb and top_j >= hi - 0.1 + STEEP_TOL:
-                continue                       # a wall
+                if not (self.jumps and top_j <= hi + JUMP_UP):
+                    continue                   # a wall
+                kind = "jump"                  # a low face: jump onto what is above it
             if sj and si and not climb and top_j > max(self.v[q][1] for q in ri["v"]) + STEEP_TOL:
                 continue                       # up a slide
             if not sj and hj > hi + STEP_UP:
-                continue
+                if not (self.jumps and hj <= hi + JUMP_UP):
+                    continue
+                kind = "jump"
             extra = 0.0
             if hi - hj > DROP_MAX:
                 extra += DROP_COST
-            if sj or si:
+            if (sj or si) and kind != "jump":
                 extra += SLIDE_COST
             if climb:
                 extra += CLIMB_COST
+            if kind == "jump":
+                extra += JUMP_COST
             if (rj["flags"] & 0x40) and not (ri["flags"] & 0x40):   # a ceiling below the feet
                 cj = self.ceiling(j, mx, mz)
                 if cj < hi:
                     continue
-            out.append((j, k, extra))
+            out.append((j, (a, b), extra, kind))
+        for j, a, b in self.gaps.get(i, ()):
+            if not self.blocked[j]:
+                out.append((j, (a, b), JUMP_COST, "gap"))
+        return out
+
+    def _gap_links(self):
+        """{region: [(far region, a, b)]}: the running jumps over a void (round 19 h5). From a walkable
+        region's border edge (no neighbour) to another walkable region's border edge that faces it across
+        at most GAP_MAX (XZ), with its floor at most GAP_UP higher and GAP_DROP lower; (a, b) is the take-off
+        edge (the portal the funnel passes)."""
+        border = []
+        for i in range(len(self.r)):
+            if not self.walk[i] or self.water[i]:
+                continue
+            for k, j in enumerate(self.r[i]["neighbours"]):
+                if j is None:
+                    a, b = self.edge(i, k)
+                    border.append((i, a, b))
+        cell = 256.0
+        grid = {}
+        for n, (i, a, b) in enumerate(border):
+            key = (int(math.floor((a[0] + b[0]) / 2 / cell)), int(math.floor((a[2] + b[2]) / 2 / cell)))
+            grid.setdefault(key, []).append(n)
+        out = {}
+        for n, (i, a, b) in enumerate(border):
+            mx, mz = (a[0] + b[0]) / 2, (a[2] + b[2]) / 2
+            ln = math.hypot(b[0] - a[0], b[2] - a[2])
+            if ln < 2 * RADIUS:
+                continue
+            ci = self.cent[i]
+            out_side = cross2((a[0], a[2]), (b[0], b[2]), (ci[0], ci[2]))
+            hi = self.height(i, mx, mz)
+            gx, gz = int(math.floor(mx / cell)), int(math.floor(mz / cell))
+            best = {}
+            for dx in (-1, 0, 1):
+                for dz in (-1, 0, 1):
+                    for m in grid.get((gx + dx, gz + dz), ()):
+                        j, c, d = border[m]
+                        if j == i or j in self.r[i]["neighbours"]:
+                            continue
+                        nx, nz = (c[0] + d[0]) / 2, (c[2] + d[2]) / 2
+                        # the far edge on the outer side of the take-off edge
+                        if out_side * cross2((a[0], a[2]), (b[0], b[2]), (nx, nz)) >= 0:
+                            continue
+                        # the gap: the far edge's nearest point to the take-off edge's midpoint
+                        ex, ez = d[0] - c[0], d[2] - c[2]
+                        el = ex * ex + ez * ez or 1.0
+                        t = max(0.0, min(1.0, ((mx - c[0]) * ex + (mz - c[2]) * ez) / el))
+                        px, pz = c[0] + ex * t, c[2] + ez * t
+                        gap = math.hypot(px - mx, pz - mz)
+                        if gap < 4.0 or gap > GAP_MAX:
+                            continue
+                        hj = self.height(j, px, pz)
+                        if hj > hi + GAP_UP or hj < hi - GAP_DROP:
+                            continue
+                        if j not in best or gap < best[j][0]:
+                            best[j] = (gap, a, b)
+            for j, (gap, a2, b2) in best.items():
+                out.setdefault(i, []).append((j, a2, b2))
         return out
 
     def ceiling(self, i, x, z):
@@ -266,7 +357,7 @@ class Nav:
 
     # --- search ---
     def astar(self, s, g):
-        """Regions from s to g (A* over region centroids), or None."""
+        """[(region, the link into it or None)] from s to g (A* over region centroids), or None."""
         def hdist(i):
             c, d = self.cent[i], self.cent[g]
             return math.hypot(c[0] - d[0], c[2] - d[2])
@@ -278,13 +369,12 @@ class Nav:
             if i == g:
                 path = []
                 while i is not None:
-                    path.append(i)
-                    i = came[i]
+                    path.append((i, came[i][1] if came[i] else None))
+                    i = came[i][0] if came[i] else None
                 return path[::-1]
             if c > cost.get(i, 1e18):
                 continue
-            for j, k, extra in self.links(i):
-                a, b = self.edge(i, k)
+            for j, (a, b), extra, kind in self.links(i):
                 ci, cj = self.cent[i], self.cent[j]
                 m = ((a[0] + b[0]) / 2, (a[2] + b[2]) / 2)
                 d = math.hypot(m[0] - ci[0], m[1] - ci[2]) + math.hypot(cj[0] - m[0], cj[2] - m[1])
@@ -293,16 +383,16 @@ class Nav:
                 nc = c + d + extra
                 if nc < cost.get(j, 1e18):
                     cost[j] = nc
-                    came[j] = i
+                    came[j] = (i, ((a, b), kind))
                     heapq.heappush(openq, (nc + hdist(j), nc, j))
         return None
 
     def portals(self, path, start, goal):
-        """The shared edges along a region path as (left, right) XZ points, shrunk by RADIUS."""
+        """The edges crossed along a region path [(region, link)] as (left, right) XZ points, shrunk by
+        RADIUS; a jump's portal (round 19 h5) is its edge's middle third (he takes off square to it)."""
         out = [((start[0], start[2]), (start[0], start[2]))]
-        for i, j in zip(path, path[1:]):
-            k = self.r[i]["neighbours"].index(j)
-            a, b = self.edge(i, k)
+        for (i, _), (j, link) in zip(path, path[1:]):
+            (a, b), kind = link
             pa, pb = (a[0], a[2]), (b[0], b[2])
             ci = self.cent[i]
             mid = ((pa[0] + pb[0]) / 2, (pa[1] + pb[1]) / 2)
@@ -311,7 +401,11 @@ class Nav:
             else:
                 left, right = pb, pa
             ln = math.dist(left, right)
-            if ln <= 2 * RADIUS:
+            if kind != "walk":
+                t = 1.0 / 3.0 if ln > 3 * RADIUS else 0.5
+                left, right = (left[0] + (right[0] - left[0]) * t, left[1] + (right[1] - left[1]) * t), \
+                              (right[0] + (left[0] - right[0]) * t, right[1] + (left[1] - right[1]) * t)
+            elif ln <= 2 * RADIUS:
                 left = right = mid
             else:
                 t = RADIUS / ln
@@ -357,7 +451,8 @@ class Nav:
         return pts
 
     def path(self, start, goal):
-        """(waypoints [(x, z), ...] from start to goal, region path, length) or None."""
+        """(waypoints [(x, z), ...] from start to goal, region path, length, jumps) or None. jumps (round 19
+        h5): [(x, z, kind, (ax, az, bx, bz))] where the waypoint line crosses each jump or gap edge, in order."""
         s = self.locate(*start)
         g = self.locate(*goal)
         if s is None or g is None:
@@ -366,9 +461,24 @@ class Nav:
         if rp is None:
             return None
         pts = self.funnel(self.portals(rp, start, goal))
-        pts = self.detour(pts, rp, start[1], goal[1])
+        pts = self.detour(pts, [r for r, _ in rp], start[1], goal[1])
         ln = sum(math.dist(a, b) for a, b in zip(pts, pts[1:]))
-        return pts, rp, ln
+        jumps = []
+        for r, link in rp[1:]:
+            (a, b), kind = link
+            if kind == "walk":
+                continue
+            e0, e1 = (a[0], a[2]), (b[0], b[2])
+            hit = None
+            for p, q in zip(pts, pts[1:]):
+                x = seg_cross(p, q, e0, e1)
+                if x is not None:
+                    hit = x
+                    break
+            if hit is None:   # the line passes by an end: the edge's middle
+                hit = ((e0[0] + e1[0]) / 2, (e0[1] + e1[1]) / 2)
+            jumps.append((hit[0], hit[1], kind, (e0[0], e0[1], e1[0], e1[1])))
+        return pts, [r for r, _ in rp], ln, jumps
 
     def detour(self, pts, rp, y0, y1):
         """Round the static objects' boxes a straight leg crosses: by one or two of the box's corners
@@ -427,19 +537,24 @@ class Nav:
 
 
 def main():
+    jumps = "--jumps" in sys.argv
+    if jumps:
+        sys.argv.remove("--jumps")
     rom, level = sys.argv[1], int(sys.argv[2])
-    nav = load(rom, level)
+    nav = load(rom, level, jumps)
     a = tuple(float(v) for v in sys.argv[3].split(","))
     b = tuple(float(v) for v in sys.argv[4].split(","))
     res = nav.path(a, b)
     if res is None:
         print("no path (regions %s -> %s)" % (nav.locate(*a), nav.locate(*b)))
         return 1
-    pts, rp, ln = res
-    print("%d regions, %d waypoints, %.0f units (straight %.0f)" % (len(rp), len(pts), ln,
-                                                                   math.hypot(a[0] - b[0], a[2] - b[2])))
+    pts, rp, ln, jumps = res
+    print("%d regions, %d waypoints, %.0f units (straight %.0f), %d jumps" % (
+        len(rp), len(pts), ln, math.hypot(a[0] - b[0], a[2] - b[2]), len(jumps)))
     for p in pts:
         print("  %.1f %.1f" % p)
+    for x, z, kind, _ in jumps:
+        print("  %s at %.1f %.1f" % (kind, x, z))
     return 0
 
 
