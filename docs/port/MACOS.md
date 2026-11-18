@@ -1514,4 +1514,8 @@ No change to `src/` or `include/`. Release build in `OUT/build_r18`.
 
 | command | det lines | md5 | result |
 |---|---|---|---|
-| default `--all --talismans 2 --cheats-off 1,2,3,4,5,6` | 580,000 | `ecb9f9f2…` (= Linux, STATUS) | exit 0, END 2 |
+| default `--all --talismans 2 --cheats-off 1,2,3,4,5,6` | 580,000 | `ecb9f9f2…` (= Linux, STATUS) | exit 0, END 2, 2 deaths |
+| + `--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` | 580,000 | `15d3d74f…` (= Linux) | exit 0, END 2, **0 deaths**, 40.8 s |
+
+Both with ASLR on (macOS has no `setarch -R`); the round-17 level-135 ASLR divergence did not show. The
+default run's wall time (1,467 s) includes the Mac asleep; the zero-death run took 40.8 s.
