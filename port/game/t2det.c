@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dlfcn.h>
+#include <stdint.h>
 
 /* T2_DET_LOG=N (round 9 x4, DEBUG-ONLY): a determinism trace to diff between hosts. Every N frames
  * (from T2_DET_FROM, default 0) one line with the exact bits of the RNG seeds, the first player
@@ -215,4 +216,104 @@ void T2Port_RngTrace(void *ra) {
     } else {
         printf("rng: frame %d seed %08x ra %p\n", gT2HostFrame, (unsigned) gRandomValue, ra);
     }
+}
+
+/* T2_RAW_DUMP=FILE:LEVEL:GF[-GF2][,GF...] (DEBUG-ONLY, round 17 f3): the raw bytes of the game's
+ * state structs at the given game frames (gFrameCountGameplay) of LEVEL, one record per object:
+ * gRandomValue, gScene, the first player (CPlayer: its character and weapon actors), its camera, every level actor
+ * (gScene.m_pActors[i]) and every pooled instance (the active list, in order). tools/port/n64cmp.py
+ * reads them with the host layout of include/ (libclang) and compares them member by member with
+ * the N64's (n64trace.py --raw, the same records at the N64 layout), so a field that a host function
+ * wrote at its N64 offset, or a conversion that went wrong, shows up by its member name. The file
+ * starts with "T2RW"; a record is tag[4] idx s32, gf u32, level s32, addr u64, size u32, bytes. */
+static void T2Raw_Put(FILE *f, const char *tag, int idx, const void *p, unsigned size) {
+    u32 gf = gFrameCountGameplay;
+    s32 lv = gScene.m_nLevel, i = idx;
+    u64 a = (u64) (uintptr_t) p;
+    fwrite(tag, 1, 4, f);
+    fwrite(&i, 4, 1, f);
+    fwrite(&gf, 4, 1, f);
+    fwrite(&lv, 4, 1, f);
+    fwrite(&a, 8, 1, f);
+    fwrite(&size, 4, 1, f);
+    fwrite(p, 1, size, f);
+}
+
+static int T2Raw_Want(const char *s, int gf) {
+    while (*s) {
+        char *e;
+        long a = strtol(s, &e, 10), b = a;
+        if (e == s) {
+            return 0;
+        }
+        if (*e == '-') {
+            b = strtol(e + 1, &e, 10);
+        }
+        if (gf >= a && gf <= b) {
+            return 1;
+        }
+        if (*e != ',') {
+            break;
+        }
+        s = e + 1;
+    }
+    return 0;
+}
+
+void T2Port_RawDump(const char *spec) {
+    static FILE *sOut;
+    static int sLevel = -99999, sBad;
+    static u32 sLastGf = 0xFFFFFFFF;
+    static const char *sList;
+    CPlayer *p;
+    int i;
+    if (sBad) {
+        return;
+    }
+    if (sOut == NULL) {
+        char path[512];
+        const char *c1 = strchr(spec, ':'), *c2 = c1 ? strchr(c1 + 1, ':') : NULL;
+        if (c2 == NULL || (size_t) (c1 - spec) >= sizeof(path)) {
+            sBad = 1;
+            fprintf(stderr, "T2_RAW_DUMP: bad spec '%s' (FILE:LEVEL:GF[-GF2][,...])\n", spec);
+            return;
+        }
+        memcpy(path, spec, c1 - spec);
+        path[c1 - spec] = 0;
+        sOut = fopen(path, "wb");
+        if (sOut == NULL) {
+            sBad = 1;
+            perror("T2_RAW_DUMP");
+            return;
+        }
+        fwrite("T2RW", 1, 4, sOut);
+        sLevel = atoi(c1 + 1);
+        sList = c2 + 1;
+    }
+    if (gEngineApp.m_Settings.mode != 13 || gScene.m_nLevel != sLevel || gFrameCountGameplay == sLastGf) {
+        return;
+    }
+    sLastGf = gFrameCountGameplay;
+    if (!T2Raw_Want(sList, (int) gFrameCountGameplay)) {
+        return;
+    }
+    T2Raw_Put(sOut, "RNG ", 0, &gRandomValue, 4);
+    T2Raw_Put(sOut, "SCN ", 0, &gScene, sizeof(gScene));
+    p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
+    if (p != NULL) {
+        T2Raw_Put(sOut, "PLR ", 0, p, sizeof(*p));
+        if (p->m_pCamera != NULL) {
+            T2Raw_Put(sOut, "CAM ", 0, p->m_pCamera, sizeof(*p->m_pCamera));
+        }
+    }
+    for (i = 0; gScene.m_pActors != NULL && i < gScene.m_nActors; i++) {
+        T2Raw_Put(sOut, "LVL ", i, &gScene.m_pActors[i], sizeof(CGameObjectInstance));
+    }
+    {
+        CListedInstance *li = (CListedInstance *) gScene.m_InstancePool.m_ActiveList.m_pHead;
+        for (i = 0; li != NULL && i < 256; i++, li = li->m_pNext) {
+            T2Raw_Put(sOut, "DYN ", i, &li->m_Instance, sizeof(CGameObjectInstance));
+        }
+    }
+    fflush(sOut);
 }

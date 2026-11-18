@@ -3013,3 +3013,392 @@ STATUS.md section 2: the level runs and the boss recipes (with `T2_LEGACY_SHAKE=
 15's det line for det line; the boot with the variable is too, without it only `rng` and the
 particles change; demos 1 and 3 still match the N64's RAM in every field but `rng`; save, title,
 load; the audio boot; padtest; the clean errors; soak (0 crashes in 62 runs).
+
+## 32. The route on the N64's random numbers, levels 1-3 (Phase 7 round 17, part f1)
+
+`fullrun.py --n64-shake` (no `T2_LEGACY_SHAKE`: the N64's camera shake and random stream) now
+plays the whole game: **`--all --talismans 2 --cheats-off 1,2,3,4,5,6 --n64-shake` reaches END 2
+at 247,626 with all 5 totems and one life lost** (the City Totem), against round 16's game over in
+125 at 154,972. Two runs gave the same log (every line but the `totem hp` field of the `totem:`
+lines, which differs by one in two lines: a value the run never uses). The default command (with
+`T2_LEGACY_SHAKE=1`) is unchanged: `playthrough.py --all` writes byte-identical `teleport.env` and
+`playthrough.txt` with and without this part's change (also with `--real-weapons 1,2` and
+`--nav 1,2,3,4`), and its run still ends with END 2 at 252,194.
+
+### 32.1 Why the graveyard (135) cost ~15 more health
+
+Damage per route step in 135 (`hurt:` lines bucketed by the route's teleports, schedule frames):
+
+| step (135) | legacy stream: damage, health after | N64 stream: damage, health after |
+|---|---|---|
+| door 59, "graveyard located." fire window | 28, 172 | 27, 173 |
+| zombie 45 (info 19), 2,500 frames of fire | 39 (ty 0x320 x11, 0x323 x3), 133 | 51 (0x320 x13), 122 |
+| into crypt 75 for its key (+ the retry) | 45, 88 | 44, 78 |
+| zombie 44 (info 20), 2,500 frames of fire | 32 (0x320 x18, 0x323 x3), 56 | 53 (0x320 x12, 0x323 x10), 25 |
+| into crypt 76 for its key | 2, 54 | 25 (0x323 x5), **0: a life lost at 72,371** |
+
+The fights are the same until the crypt zombies; on the N64 stream the graveyard's roaming zombies
+(type 0x323) reach the player during zombie 44's fight (10 hits instead of 3) and again in crypt
+76, and the aim spends more of the window on actor 33 (35 aim lines instead of 14). The player
+enters crypt 76 with 25 health instead of 56, and the walk-in there kills him. Longer fire
+windows (round 16) only move the problem; the cure is health.
+
+### 32.2 The fix: seven health +10 between the crypts
+
+135 has 23 health +10 pickups (object 542, item 1702, "+10 up to 100": `pickup: ... not taken` at
+100 or more) that the route never took (`levels.py` lists them in the grid sections). The new
+table `N64_L2_PICKS` (`--n64-shake` only) inserts pick steps (`insert_picks`: a 150-frame stand
+and walk-in each, the later steps and the segment's in-segment retries move with them; the
+stretch entries' step indices are remapped; a `stretch()` entry `(seg, step, frames, False)` now
+only moves the later steps, without a fire window) **after zombie 44's fight, before crypt 76's
+key**: (1554, 590), (1556, 77), (2554, 93), (868, 1146), (-545, 1148), (-1269, 1146), (-1346,
+457). The approach angle matters: from +z (the default angle 0) three of them stand the player
+in no region (`teleport: ... region (nil)`, the teleport is skipped). A probe (`pktest`, scratch
+only: `T2_START_WARP=2501@600`, each pickup approached from 8 angles, the `pickup:` lines say
+which reached it) picked the angles. All 7 are collected: 25 -> 84 health; crypt 76 then costs 12
+and the player leaves 135 with 62 (legacy 44).
+
+### 32.3 Health per fight, legacy stream vs N64 stream (the whole run)
+
+`hurtsum:` per level visit (damage, minimum health, lives lost); Linux Release, `aimdrive.py`,
+290,000 frames:
+
+| level visit | legacy (default) | `--n64-shake` (this part) |
+|---|---|---|
+| 109 the Harbor Totem | 132, min 68 | 114, min 86 |
+| 133 zombies + sister 1 | 131, min 69 | 146, min 54 |
+| 134 graveyard + sister 2 | 144, min 25 | 119, min 35 |
+| 135 crypts + sister 3 | 156, min 44 | 208, min 25 (7 picks: +70) |
+| 110 the City Totem | 150, min 1, **2 lives** | 98, min 1, **1 life** |
+| 111 the Marsh Totem | 111, min 89 | 56, min 144 |
+| 112 the Cave Totem | 54, min 146 | 60, min 140 |
+| 1 (the Blind One) | 94, min 52 | 75, min 65 |
+| 124 | 36, min 16 | 38, min 27 |
+| 113 the Hive Totem | 44, min 72 | 38, min 89 |
+| 2 (the Queen) | 49, min 23 | 52, min 37 |
+| 117 | 20, min 3 | 21, min 16 |
+| 3 (the Mother) | 53, min 147 | 36, min 164 |
+| 4 (the Primagen's level) | 124, min 23 | 105, min 59 |
+| END 2 | 252,194 | 247,626 |
+
+Level 3 (61-69, the Marsh Totem, the armories) needs nothing on the N64 stream: no life lost,
+the totem at 110,671 (legacy 110,383). The City Totem still costs a life (it entered with 62
+health and died within ~1,700 frames; a variant that took 4 more health +10 after sister 3
+entered it with ~100 and still lost one there, and then lost 3 more lives in levels 4 and 6:
+dropped). Each change upstream moves every later fight: the run is chaotic past the first
+changed frame, so a level-4-6 change (part f2) has to be re-checked on the whole run.
+
+## 33. Levels 4-6 and the bosses on the N64's random numbers (Phase 7 round 17, part f2)
+
+### 33.1 Trying a level on the N64's stream before the levels before it work
+
+The `--n64-shake` route dies in level 2 (section 31.4), so its levels 4-6 cannot be reached yet.
+Two ways in, both new:
+
+- **`fullrun.py --n64-shake-from L`** (`playthrough.py RUN --all ... --n64-shake-from L`; L 4, 5, 6
+  or 7 = the Primagen's lair; DEBUG-ONLY): the default route with `T2_LEGACY_SHAKE` up to the hub
+  visit before level L, the N64's shake and random stream from there. It writes
+  **`T2_LEGACY_SHAKE=1,F`**: the old stores up to schedule frame F, then
+  (`port/game/t2debug.c T2Port_LegacyShakeTick`, called from game.cpp every frame) the main camera
+  and the pool's cameras get the shake radius the N64's `CCamera__Construct` gives them (1) and the
+  later constructs take the host path (`legacyshake: off at frame F (N cameras)`). Level L starts in
+  the state the default route reaches it in (health, lives, items) and is played on the N64's
+  numbers. `T2_LEGACY_SHAKE=1` alone is unchanged. Every route change below applies when
+  `fullrun.n64(L)` holds: `--n64-shake`, or `--n64-shake-from` at or before L. A run on another
+  random history: edit F in `teleport.env` (`T2_LEGACY_SHAKE=1,F+37`): the same route, other fights.
+- **`playthrough.py DIR --level 4|5|6 --n64-shake`**: the level runs (still invincible, as before)
+  without `T2_LEGACY_SHAKE`.
+
+### 33.2 What the N64's stream changes, and the fixes
+
+Measured with `--n64-shake-from 4` and its variants (Release, under `aimdrive.py`, 290,000
+frames; health is the lowest in each fight, `hurtsum`):
+
+| fight | legacy (default run) | N64 stream, before | fix (only on the N64 stream) |
+|---|---|---|---|
+| the Cave Totem (112), scorpion launcher | 54 damage | 85-135 | **the shredder** (`N64_CAVE_WEAPON`): 18-64 |
+| the Blind One (1), scorpion launcher | 94 damage, 52 left | 35-89, **11-30 left** | **the shredder** from `BLIND_WEAPON_AFTER` (e5's switch): 23-54, 73-140 left |
+| 124's pylons (level 5's start) | 36, 16 left | **a life lost** (3 runs) | the two above: 33-41 damage, 32-107 left |
+| the Queen (2) | 49, 23 left | 27-79 (13-130 left) | none |
+| 117 (level 6) | 20, 3 left | **a life lost** (`-from 5`: the Queen left 13) | **an ultra health in 114 at level 6's start** (`routes56.L6_N64_HEALTH`, the raised floor at (1,826, 156, 1,412); 114 has four, the route took two before the Mother) |
+| the Mother (3), shredder | 53, 147 left | 41-164 | **the strafing from her arena +4,600** (`N64_MOTHER_MOVE`, 5,800 legacy): standing still at ~+5,400 (her modes 19-25) cost up to four 20s |
+| the Primagen's lair (4) | 124, 23 left | 72-144, **a life lost** in one run | **`T2_LAIR_KEEP=800`**: the lair driver walks away from him |
+
+At 124's arrival the player takes 18 (six 3s in 42 frames, `ty 40b`, in every run on both
+streams) before the route's first step; that is why the health left by the Blind One decides 124.
+
+**The lair.** His melee (two 10s within 409.6 / 716.8, `Primagen_HandleAnimEvent`) was half to
+two thirds of the lair's damage (hits with him nearer than 800: legacy 85 of 124, the N64 runs
+50-95). `aimdrive.py`'s `LairDrive` got a keep-away rule (`T2_LAIR_KEEP=D`, written by
+`fullrun.py` on the N64 stream with the guard driver; `--lair-keep D`, 0 = off): in guard mode,
+while he is within D horizontally (the boss position of the "move" line), the C buttons walk the
+player straight away from him, or along either tangent when 200 units that way leave the safe
+floor; the edge guard comes first. It answers 600-1,900 frames per lair. Lair damage with it:
+18-62 in eight runs (near hits 0-3), 101-187 in three (two of them the throw below).
+
+**What still kills in the lair**: twice (two random histories) a single hit took all the health
+left (82, 92) and the player was next seen ~2,000 units away below the floor (y -1,222 / -1,714):
+thrown off the floor. Both at the same sequence of his: mode 18 -> 23 -> 7 -> 20 -> 7 -> 1 with
+bossState 10 at the frame of the hit, stage 3, him ~1,550-1,750 away. Both runs had come in with
+36-87 health after a costly Mother and lost their last spare life (the legacy part loses 2 at
+the City Totem). Not studied further: the next step is to find what bossState 10 / mode 20 does
+(a grab or a blast with knockback) and keep out of its reach.
+
+**The home waits.** In one whole run on the N64 stream the strafing (period 90) ended both home
+waits by itself (~400 frames each, no peek); in the others one or two peeks ended them, as in the
+default run. The standalone recipe needs the peek (33.3).
+
+### 33.3 The Primagen recipe on the N64's stream: why it never kills him
+
+The recipe (STATUS.md "Round 15, 1": `T2_WARP_TO=7602 T2_BOSS_FRONT=450,3000,2.5,1`, boss env,
+`Z@14000..200000`, `routes56.lair_strafe(15000, 45000)`) without `T2_LEGACY_SHAKE`: stage 2 ends,
+**his stage-3 home wait starts at 33,070 and never ends**. He hovers at (-1.9, 937, 2,907.7), a
+point none of `T2_BOSS_FRONT`'s floor spots sees (10 relocations to 60,069, each logged with
+`sight (nil)`), and the strafing stops at 45,000. With `T2_LEGACY_SHAKE=1` his stage-3 wait
+(36,008) ends while the strafing still runs, and he dies at 43,586. This is section 26.1's
+hover-pair property: which pair he gets is decided by his flight in, so by the random numbers.
+**The recipe plus `T2_LAIR_PEEK=2400@14000` kills him at 40,728** on the N64 stream (one peek,
+the stage-2 wait; stage 3 ended by the strafing). `--level 6 --n64-shake` had the same stop (his
+stage-3 wait from 74,538 to the end of the 112,000 frames); `routes56.build_level56` now adds
+`T2_LAIR_PEEK="2400@hop"` there on the N64 stream (`LAIR_PEEK_N64`): the Mother dies at 52,203,
+the Primagen at 83,978 (two peeks), the ending (cinema 130) at 89,994, the hub at 104,092.
+
+The other level runs on the N64 stream (`--level N --n64-shake`, Release, `--pak-blank`,
+invincible): `--level 4` the Cave Totem and the Blind One dead (41,353); `--level 5` the Hive
+Totem and the Queen (41,665).
+
+### 33.4 Runs (Linux Release, PIE, under `aimdrive.py`, 290,000 frames)
+
+The default command plus the option. "lives" = lives lost after the switch (the legacy part loses
+2 at the City Totem, so one spare life remains):
+
+| options | result |
+|---|---|
+| (none) | END 2 at 252,194; its 3,450 progress/event/pickup/hurt/death/bosstrace/lairpeek lines identical to the build before this part; `playthrough.txt`/`teleport.env` byte for byte |
+| `--n64-shake-from 4`, before the fixes | END 2 at 246,904, 1 life (124's pylons) |
+| the same, the Blind One's shredder only | END 2 at 256,842, 1 life (the lair, 144 damage) |
+| the same + the keep-away, F+0 | END 2 at 250,272, 0 lives (lair 23 damage) |
+| **`--n64-shake-from 4`** (all fixes), F+0 | **END 2 at 252,620, 0 lives**; lowest health: Cave Totem 136, Blind One 82, 124 43, Queen 68, 117 138, Mother 159, lair 104 |
+| the same, F+101 | **END 2 at 251,210, 0 lives** (with the scorpion launcher at the totem this history lost 2 lives on 124 and ended in a game over) |
+| the same, F+211 | **END 2 at 249,924, 0 lives** |
+| the same, F+37 | game over in the lair (the Mother 164 damage, then the throw of 33.2, twice) |
+| `--n64-shake-from 5` | END 2 at 253,046, 0 lives (the Queen left 13; the 114 ultra health: 117 84 left; Mother 65, lair 87 damage) |
+| `--n64-shake-from 6` | END 2 at 250,726, 0 lives (Mother 33, lair 30 damage) |
+| `--n64-shake-from 7` (keep-away) | END 2 at 251,438, 0 lives (lair 28 damage; 82 before the keep-away rule) |
+
+`--n64-shake` itself is unchanged before level 4 (f1's part): it still ends in level 2/125.
+Once f1's levels 1-3 are merged, `--n64-shake` uses all of these changes from level 4 on.
+
+### 33.5 Next
+
+- The whole `--n64-shake` run once levels 1-3 hold (f1): level 4 will start in another state
+  (health, lives, the frame). The fixes here are weapons, health and tactics, not timings, so they
+  should carry over; the thin spots are the Queen (13-130 left) and the lair's throw.
+- The Primagen's throw (bossState 10 after mode 20): what it is and how far it reaches.
+- The keep-away rule would cut the default run's lair damage too, but changes the legacy route's
+  stream: kept for the N64 stream.
+- The Primagen recipe (STATUS.md) needs `T2_LAIR_PEEK=2400@14000` without `T2_LEGACY_SHAKE`.
+
+## 34. The stick and real weapons together: the Blind One and the City Totem by stick (Phase 7 round 17, part f5)
+
+Legacy shake (`T2_LEGACY_SHAKE=1`, the default route's stream) throughout. Linux Release, PIE, under
+`aimdrive.py`, 290,000 frames, the default command plus the options shown.
+
+### 34.1 What the driver sees now (the `aim` line)
+
+Two fields are appended after `hp H` (`port/game/t2debug.c` `T2Port_AimPose`); older parsers ignore them:
+
+- `tot HP TIME KILLS NEED` while a totem defense runs: the totem's health, the seconds left, the kills
+  and the kills needed (the HUD's two bars). **The totem itself is never hurt**:
+  `TotemDefense_OnEvent` is empty and `TotemDefense_UpdateFight` fails the defense on time alone
+  (8 kills in 120 s). Its health stays 1,280 (`5` after `>> 8`) for the whole fight.
+- `lv N`: the level (the driver's per-level rules below).
+- A candidate's `kind` is `2` when it is an attacker of the totem (its sight target is the totem:
+  `TotemDefense_UpdateFight` sends every helper past `maxHelpers` there). Truthy like 1.
+
+`aimdrive.py --stats` prints them in its `#` lines (`a` after an attacker, `tot 5 99s 2/8` at the end).
+
+**A logging bug fixed (`T2Port_TotemLive`).** `gTotemDefense.obj` and `.def` are never cleared:
+after the totem's level is left they point into the freed actor array and level data (the N64
+too; the game never reads them there, only its own step callback does). The `totem:` state line
+read them in every later level (state 1 with `totem hp 0`, `-798464` or `4236247`, different run
+to run: f1's report). Both the line and the aim-line fields now need the totem to be one of
+`gScene.m_pActors` still drawn by `TotemDefense_DrawTotem`; outside its level nothing is printed.
+Debug code only: no game state changes.
+
+### 34.2 The Blind One by stick (`--stick-aim 4`, no `--assist-keep 1`)
+
+e2's run lost 4 lives there (sA: stage 5 took 8,900 frames, stage 9 19,300). `--stats` showed why:
+the driver switched every ~80 frames between flier 17 (the phase's target, swooping 100-1,300
+units) and actor 22 (kind 0, 158 units away, full health, never hurt: an out-of-play actor).
+Round 16's "not hurt" rule counted the frames of the *current* target only and restarted at every
+switch, so neither was ever left.
+
+- **Per-target count** (`T2_AIMD_IMMUNE_ACC`, default `1` = level 1, the Blind One's arena): the
+  frames each candidate was aimed at since its health last dropped, summed over switches. After
+  300 (`T2_AIMD_IMMUNE`) it is left as before. Applied everywhere it moved the sisters (level 2)
+  and the route fell out of step (the run paused in 125 at 82,000): so per level.
+- **Far threats** (`T2_AIMD_THREAT_NEAR=1:250`, `T2_AIMD_THREAT_FAR=6`): in level 1 a kind-0
+  candidate farther than 250 units costs 6 times more. With the shredder (`--real-weapons 1`) her
+  minion bit from the ledge at 96 units (not hit by the discs: left as not hurt), and the driver
+  then took her body and the other phases' actors (kind 0, 400-500 units, never hurt) one by one,
+  300 frames each, while being bitten: 2 lives (c1w0 at 142,513). Kind 0 stands for the enemy that
+  bites; far ones are not that.
+
+| run | the Blind One | hits | health | lives |
+|---|---|---|---|---|
+| default (assist, scorpion launcher) | 130,138-138,945 | 61 | to 52 | 0 |
+| sA `--stick-aim 1,2,4` (round 16 driver) | 127,806-, not killed in the window | | | 4 (game over) |
+| sA3 (+ per-target count) | 127,806-138,675 | 21 | to 63 | 0 |
+| sA4 (+ far threats) | 127,806-137,081 | 17 | 110 to 63 | 0 |
+| c3w0 (`--real-weapons 1`: the shredder) | 131,782-140,597 | 19 | 147 to 87 | 0 |
+
+The fliers are hit when they are far (low angular rate); the Trigger only fires on target, so the
+near passes cost nothing but time. No change to `Aim` was needed.
+
+### 34.3 The City Totem by stick (`--stick-aim 2`, no `--assist-keep 110`)
+
+With `--stick-aim 1,2,4` the City Totem is won by stick **with no life lost** (sA4: 8 kills by
+~86,000, ~3,000 frames of the 120 s, health 106 to 31), where the assisted default loses 2 lives
+there. The candidates' `kind 2` (`a` in `--stats`) and `T2_AIMD_TOTEM_X` (the attackers' cost
+factor, default 1: off) are there for a defense that runs short of time; none of these runs needed
+it (the kill rate decides: the nearest and weakest first is already the fastest).
+
+### 34.4 Real weapons from sister 2 on (`--real-weapons 1,2`): not yet
+
+- **134's zombies come from 1,700 units.** With e5's route the mag 60's 50 bullets went on zombie 2
+  from afar (aimed from 50,760, empty by 51,500) and zombies 2-4 then killed the player with the
+  talon. `T2_FIRE_GATE` now takes a range per level (`L:R`; `--real-weapons 2` writes
+  `133,134:450,135`, `L2_134_FIRE_R`) and the stick driver honours the same range
+  (`T2_AIMD_FIRE_MAX=134:450`). The bullets now last until zombies 2 and 3 are close, but 50 bullets
+  do not kill them (80 health each): the first death moves from 52,769 to 55,277, then game over.
+- **131's plasma rifle** (with 129's 150 plasma cells the weapon for 134): it lies at the bottom of
+  a pool (floor -1,126, water -532) whose regions deal 10 health every 2 frames: 116 to 0 in 22
+  frames (`L2_PLASMA`, kept off). 132's plasma rifle is 307 units over its floor (a jump: the
+  `r1` answer exists, no route uses it yet).
+- Ammo caps (PLAYTHROUGH 25.1): bullets 50, shells 20, explosive shells 10: more pickups cannot
+  carry more. What remains: the jump to 132's plasma rifle (before 135? the route reaches 132 after
+  134) or fewer zombies (only zombie 4's key is needed for gate 8).
+
+### 34.5 Stick and real weapons together
+
+`--real-weapons 1,2 --stick-aim 1,2,4` stops at 134 (above). The combination that works is
+`--real-weapons 1 --stick-aim 1,2,4` with two route changes:
+
+- **`--hub-wait 0`** (e5's `ARMS_HUB_WAIT`, default 50): with level 1 by stick the run reaches the
+  hub ~1,800 frames later and the level-2 fights start from another state; sister 1 (133) cost
+  186 health with 50 (c1, c3) and 141 with 0 (c1w0, c3w0), and with 50 sister 2 (134) then took the
+  first life (c1: 114 health on arrival).
+- **`--l2-heal`** (`L2_HEAL_PICKS`): 135's graveyard costs 133-182 in these runs and the City Totem
+  follows with no health on the way (18-67 on arrival: a life lost there in every such run). Ten
+  health +10 pickups (object 542, +10 up to 100) on the graveyard floor, walked into after sister
+  3, before the exit 2608, 150 frames each (the City Totem and every later hub move by 1,500). The
+  first try lost four: their stand point (90 units out) was a grave (y 87) or outside every region;
+  each now has its own approach angle onto the floor. c3w0: 18 to 99.
+
+**The result** (c3w0: `--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0`): **END 2 at
+250,402**, all five totems (`totems 11111`), the four bosses, the six Primagen keys, **no life lost**
+(the `death` line at 264,500 is the new game after the credits: health 100, every flag cleared; sA3
+has the same one); a second run gave identical gameplay lines (md5 `41eee61e…`) and an identical `--stats` file. Level 1 on its own weapons and by stick, level 2 by stick (given weapons from
+the hub on), the Blind One by stick on the shredder. Per fight, health at the start / hits / lowest
+(`hurt` lines), against the default run and sA4 (`--stick-aim 1,2,4`, no real weapons):
+
+| fight | default | sA4 stick 1,2,4 | c3w0 stick 1,2,4 + real 1 | c4 stick 1,2,3,4 + real 1 |
+|---|---|---|---|---|
+| Harbor Totem (109) | 200/51/68 | 200/46/85 | 200/41/118 | 200/41/118 |
+| sister 1 (133) | 200/69/69 | 200/42/89 | 200/47/59 | 200/47/59 |
+| sister 2 (134) | 169/55/25 | 189/28/121 | 159/40/16 | 159/40/16 |
+| 135 (crypts, sister 3) | 200/59/44 | 200/31/106 | 200/48/18, healed to 99 | 200/48/18, healed |
+| City Totem (110) | 44/71/**0, 2 lives** | 106/33/31 | 100/28/11 | 100/28/11 |
+| Marsh Totem (111) | 200/58/89 | 200/1/194 | 200/69/5 | 200/3/187 |
+| Cave Totem (112) | 200/8/146 | 200/15/110 | 200/7/147 | 200/9/139 |
+| the Blind One (1) | 146/60/52 | 110/17/63 | 147/19/87 | 139/16/97 |
+| 124 | 52/13/16 | 63/14/26 | 87/14/49 | 97/14/58 |
+| Hive Totem (113) | 116/24/72 | 126/7/113 | 149/4/143 | 158/22/115 |
+| the Queen (2) | 72/17/23 | 113/10/88 | 143/13/113 | 115/12/102 |
+| 117 | 23/15/3 | 88/20/67 | 113/15/94 | 102/20/81 |
+| the Mother (3) | 200/5/147 | 200/7/137 | 200/9/110 | 200/6/162 |
+| the Primagen (4) | 147/21/23 | 137/33/**0, 1 life** | 110/22/37 | 162/27/66 |
+
+c4 (`--real-weapons 1 --stick-aim 1,2,3,4 --l2-heal --hub-wait 0`): **END 2 at 248,808**, 5 totems, no life lost: level 3 by stick too, the Marsh Totem now its easiest totem (lowest 187, the assisted one 5).
+
+sA4 reaches END 2 at 252,332 (5 totems) with one life lost in the Primagen's lair. The knife edges
+left: sister 2 (16) and the City Totem (11) in c3w0, and the Marsh Totem in c3w0 (5: level 3 assisted; by stick in c4: 187). Round 16's `--stick-aim 1,2,4`-style runs died in level 6's 117 (sB: 20 health on
+arrival); the stick-run Blind One now costs less, so level 5 and 117 start with more.
+
+### 34.6 Determinism: run each game in its own directory
+
+Two runs started at the same moment from the same `OUT/` gave different games once (r12b: a
+different hit at 21,973 in the Harbor Totem, every later line different). `turok2.cfg.json` is read
+at start and written back at exit from the current directory; one run read it while the other
+wrote it ("Failed to parse config file ... empty input" in r12's log). With a private directory
+per run (a symlink to the archive and a copy of the config) the same command gave the same lines
+six times (`hurt` md5 `11fa947b` to 23,000, with and without ASLR, 23,000 and 290,000 frames).
+
+## 35. The round-17 merge: the legacy switches, the sound world headless, the option runs (Phase 7 round 17, the merge C32)
+
+The merge took f3, f4, f1, f2 and f5 in that order (STATUS.md section 3 has the resolutions). Every
+route the tools write now carries three legacy switches (`T2_LEGACY_SHAKE=1`, `T2_LEGACY_INTEL9=1`,
+`T2_LEGACY_NOSOUND=1`); `--n64-shake`, `--n64-props` and `--n64-sound` leave them out one by one.
+
+### 35.1 The sound world in headless runs (`T2_LEGACY_NOSOUND`)
+
+f3 found (FIDELITY.md 7.3) that a run without `--audio` has no sound world: `Sound__Initialize`
+returns and every sound request stops before `CAudioWorld__PlaySound`, which draws random numbers
+(pitch, volume, the ambient picks). A player with sound and the N64 draw them, so every scripted
+run was on a third random stream. `game.cpp` now enables the runtime's audio (`cfg.audio`) in every
+game run that has the ROM: the sound world and the audio manager run as with `--audio`, and the
+samples are dropped when there is no `--audio`/`--wav` (the AI queue keeps its last 16,384 frames).
+`T2_LEGACY_NOSOUND=1` (DEBUG-ONLY, t2debug.c) restores the old silent stream; `fullrun.py` and
+`playthrough.py` write it (the routes were tuned on that stream), `--n64-sound` leaves it out.
+
+- A headless boot (8,000 frames, no input) and the same boot with `--audio`: the same 16,000 det
+  lines (md5 `d725bb9a…`); with `T2_LEGACY_NOSOUND=1` the `rng` field differs (md5 `70e8f1f6…`).
+- Cost: 1.49 s instead of 0.67 s for those 8,000 frames (the synthesizer and the ABI interpreter
+  every retrace).
+- The default command with the new line: md5 `ecb9f9f2…` (round 16's).
+
+### 35.2 The validated runs (Linux Release, under `aimdrive.py`, 290,000 frames, each in its own directory)
+
+Each is `playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6` plus the options, then
+the game line of STATUS.md section 1 with `T2_DET_LOG=1 T2_PROGRESS_LOG=1 T2_HURT_LOG=1`:
+
+| options | END 2 (cinema 130) | totems | lives lost (level) | det md5 |
+|---|---|---|---|---|
+| (none) | 252,194 | 11111 | 2 (110) | `ecb9f9f2…` (3 runs; see 35.3) |
+| `--n64-shake` | 252,060 | 11111 | 1 (110) | `2af2939f…` (twice) |
+| `--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` | 250,402 | 11111 | **0** | `15d3d74f…` (twice) |
+| `--real-weapons 1` | 252,980 | 11111 | 2 (110) | `3cb702ff…` (= b744bd39's build and round 16) |
+| `--stick-aim 2 --assist-keep 110` | 253,788 | 11111 | 2 (110, 164) | `9432c11d…` (= round 16, `setarch -R`; a run with ASLR took 35.3's second path) |
+| `--nav 1,2,3,4` | 250,970 | 11111 | 3 (110, 4, 4) | `8702568d…` (= round 16, `setarch -R`; idem) |
+| `--n64-shake --n64-props` | 260,790 | 11111 | 2 (110, 1) | `dbb19f63…` |
+| `--n64-shake --n64-props --n64-sound` | none: game over in 125 at 108,496 | 00000 | 134 at 53,547 and 59,093, 125 at 108,496 | `eff96f4c…` |
+
+The stretch runs: **`--n64-shake --n64-props`** (the N64's shake and props, the old silent sound
+stream) needs no change: END 2 with the City Totem's life and one at the Blind One (level 1,
+139,967). **The fully N64-accurate stream** (`--n64-sound` as well) dies at sister 2 (134) twice and
+then in 125 (game over); the run starts a new game after it. Tuning that stream is the next step
+(STATUS.md section 4).
+
+### 35.3 A determinism caveat: two paths in 135 by address layout
+
+The first of three default runs started together gave md5 `725b6c88…` instead of `ecb9f9f2…`; so
+did the first `--real-weapons 1` run (`ab5690f2…`, the second `3cb702ff…`). Both differ from frame
+~72,500 (level 2's 135) to ~82,500 and nowhere else: the `aim` line names actor 31's node 1 at
+z 5807.3 instead of 5806.7 (its hit-box matrices, `m_pmtDrawMtxs`/`m_pmtLastFrameDrawMtxs`), the
+particle hash differs from 72,749 (72,529 in the `--real-weapons 1` route), then the `rng`; the
+game is back in the same state by ~82,500 and every later line, the END 2 frame and the lives are
+the same. The b744bd39 build does it too (2 of 3 runs to 76,000). With `setarch -R` (no ASLR) three
+runs took the 5806.7 path; the arena addresses of the runs show no simple bit pattern. So a read
+on that path depends on the address layout (a pointer value hashed, compared or truncated, or a
+read of memory whose contents depend on it). Until it is found, compare md5s on runs under
+`setarch -R`; the runs in 35.2 with ASLR on are marked.
+
+### 35.4 Integrated runs
+
+- **Boot and the demos** (26,000 frames, `--pak-blank`, legacy switches on): 52,000 det lines
+  identical to the b744bd39 build. Against the N64's RAM (default build, no switch): demo 1
+  (gf 1-1,128) and demo 3 (gf 1-344) no difference but `rng` (from gf 8: the N64's load-time
+  draws), demo 2 `player.hp` from gf 608 (the N64's uninitialised read).
+- **The level runs** (`--level 1..6`) and **the four boss recipes**: det identical to b744bd39's.
+- **Save, title, load**, **`--audio --wav`**, **padtest**, **soak**: STATUS.md section 2.

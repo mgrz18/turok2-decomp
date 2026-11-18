@@ -31,7 +31,7 @@ frame: "cH" the C buttons (hex U 8, D 4, L 2, R 1), "z0"/"z1" fire, "r0"/"r1" ju
 --simple: the first controller (the observed error only, no prediction; round 15 d3's s1 run).
 --probe SX,SY: answer a constant stick instead (calibration: the pitch/yaw change per frame).
 """
-import math, os, subprocess, sys, tempfile
+import math, os, shutil, subprocess, sys, tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from playthrough import TURN_FULL, STICK_DEAD, wrap, face_yaw  # noqa: E402
@@ -149,11 +149,31 @@ IMMUNE_X = envf("T2_AIMD_IMMUNE_X", 4.0)
 # other phases: out of play) is left for much longer (round 16 e2, s4c: one held the aim 4,600 frames)
 IMMUNE_FOR0 = int(envf("T2_AIMD_IMMUNE_FOR0", 3000))
 IMMUNE_X0 = envf("T2_AIMD_IMMUNE_X0", 50.0)
+# round 17 f5: "not hurt" counted per target over the frames it was aimed at (summed across switches),
+# not only while it stays the current target: two targets taken in turn (the Blind One's flier 17 and
+# the out-of-play actor 22 at full health) each reset the other's count, and the one that never drops
+# was never left. The levels (the aim line's "lv") where it applies: default 1, the Blind One's arena
+# (in level 2 it moved the sister fights and the route fell out of step); "" = nowhere (round 16).
+IMMUNE_ACC = {int(v) for v in os.environ.get("T2_AIMD_IMMUNE_ACC", "1").split(",") if v.strip()}
 PSPEED = envf("T2_AIMD_PSPEED", 150.0)      # the shot's speed for the lead (units per host frame)
 LEAD = envf("T2_AIMD_LEAD", 1.0)           # the share of the lead applied
 HIT_R = envf("T2_AIMD_HITR", 40.0)         # the radius counted as on target (units)
 FIRE_EVERY = int(envf("T2_AIMD_FIRE_EVERY", 15))   # a Z tap of FIRE_HOLD frames every FIRE_EVERY, as the script
 FIRE_HOLD = int(envf("T2_AIMD_FIRE_HOLD", 6))
+# round 17 f5: T2_AIMD_FIRE_MAX=L:R[,L:R...]: in level L fire only at a target within R units (a --real-weapons
+# run's ammo: 134's zombies walk up from 1,700 units; the driver's Z overrides T2_FIRE_GATE's range)
+# round 17 f5: in a totem defense (the aim line's "tot"), a kind-2 candidate (running at the totem) costs this
+# much (1: as any other; < 1 shoots the totem's attackers first). The defense is lost on time alone (8 kills in
+# 120 s, TotemDefense_UpdateFight: the totem itself is never hurt), so the default keeps the nearest/weakest rule.
+TOTEM_X = envf("T2_AIMD_TOTEM_X", 1.0)
+# round 17 f5: T2_AIMD_THREAT_NEAR=L:R[,L:R...]: in level L a kind-0 candidate farther than R units costs
+# THREAT_FAR times more. Kind 0 stands for the enemy biting the player; in the Blind One's arena (level 1) the
+# kind-0 actors 400-500 units away (her body, the other phases' actors: never hurt) took 300 aimed frames each
+# before the not-hurt rule left them, while her minion bit from the ledge (a --real-weapons run: two lives).
+THREAT_NEAR = {int(a): float(b) for a, b in (v.split(":") for v in os.environ.get("T2_AIMD_THREAT_NEAR", "1:250").split(",")
+                                             if ":" in v)}
+THREAT_FAR = envf("T2_AIMD_THREAT_FAR", 6.0)
+FIRE_MAX = {int(a): float(b) for a, b in (v.split(":") for v in os.environ.get("T2_AIMD_FIRE_MAX", "").split(",") if ":" in v)}
 CAND_EVERY = int(envf("T2_AIMD_CAND_EVERY", 50))   # --stats: the candidates every this many frames
 
 
@@ -174,6 +194,20 @@ def parse_cands(f):
     return c, hp
 
 
+def line_level(f):
+    """The aim line's level ("lv N", round 17 f5), or None."""
+    return int(f[f.index("lv") + 1]) if "lv" in f[13:] else None
+
+
+def line_totem(f):
+    """A totem defense in progress ("tot HP TIME KILLS NEED", round 17 f5): (hp, seconds left, kills,
+    kills needed), or None."""
+    if "tot" not in f[13:]:
+        return None
+    i = f.index("tot")
+    return tuple(int(v) for v in f[i + 1:i + 5])
+
+
 class Picker:
     """Chooses the target among the candidates as a player would. Cost: (distance / 1,000 + 0.1)
     times (1 + W_ANG * the crosshair's angle to it): the near ones threaten, so they win even
@@ -191,6 +225,8 @@ class Picker:
         self.hp = None          # the current target's (health, the frame it last dropped or was taken)
         self.immune = {}        # id -> (until frame, cost factor)
         self.immunes = 0
+        self.aimed = {}         # IMMUNE_ACC: id -> [health at its last drop, frames aimed at since]
+        self.last = None        # the last aim frame
 
     def vel(self, frame, cid, pos):
         old = self.seen.get(cid)
@@ -202,7 +238,8 @@ class Picker:
         self.seen[cid] = (frame, pos, v)
         return v
 
-    def pick(self, frame, px, pz, ry, ex, ey, ez, pitch, cands, primary):
+    def pick(self, frame, px, pz, ry, ex, ey, ez, pitch, cands, primary, lv=None, totem=None):
+        acc = lv in IMMUNE_ACC
         if not cands:
             self.cur = None
             return primary, None
@@ -213,7 +250,11 @@ class Picker:
             t = d / PSPEED   # the stick lag is the controller's (Aim: the bearing rate)
             lx, ly, lz = x + LEAD * v[0] * t, y + LEAD * v[1] * t, z + LEAD * v[2] * t
             pts[cid] = (lx, ly, lz)
-            if cid == self.cur:
+            if acc:
+                rec = self.aimed.get(cid)
+                if rec is None or hp < rec[0]:
+                    self.aimed[cid] = [hp, 0]
+            elif cid == self.cur:
                 if self.hp is None or hp < self.hp[0]:
                     self.hp = (hp, frame)
                 elif frame - self.hp[1] > IMMUNE and len(cands) > 1:
@@ -223,8 +264,12 @@ class Picker:
             eyaw = wrap(face_yaw(px, pz, lx, lz) - ry)
             epit = math.atan2(ly - ey, math.hypot(lx - ex, lz - ez)) - pitch
             cost = (d / 1000.0 + 0.1) * (1.0 + W_ANG * (abs(eyaw) + 0.5 * abs(epit)))
+            if kind == 2 and totem is not None:
+                cost *= TOTEM_X   # round 17 f5: an attacker of the totem
             if not kind:
-                cost *= THREAT_X   # a threat outside the assist's set (a boss phase's group, the sister first)
+                cost *= THREAT_X
+                if d > THREAT_NEAR.get(lv, 1e9):
+                    cost *= THREAT_FAR   # a threat outside the assist's set (a boss phase's group, the sister first)
             cost *= 1.0 + W_HP * min(hp, 25600) / 25600.0   # the weak ones first: fewer attackers sooner
             if cid == self.cur:
                 cost *= W_KEEP
@@ -236,6 +281,15 @@ class Picker:
             self.switches += 1
             self.cur = best
             self.hp = None
+        if acc:
+            rec = self.aimed[best]
+            rec[1] += min(frame - self.last, 4) if self.last is not None and frame > self.last else 1
+            if rec[1] > IMMUNE and len(cands) > 1:
+                kind = [c[5] for c in cands if c[0] == best][0]
+                self.immune[best] = (frame + (IMMUNE_FOR if kind else IMMUNE_FOR0), IMMUNE_X if kind else IMMUNE_X0)
+                self.immunes += 1
+                rec[1] = 0
+        self.last = frame
         return pts[best], best
 
 
@@ -270,9 +324,12 @@ def answer(line, aim, probe=None, picker=None, trig=None):
     cid = None
     if picker is not None:
         cands, _ = parse_cands(f)
-        (tx, ty, tz), cid = picker.pick(frame, px, pz, ry, ex, ey, ez, pitch, cands, (tx, ty, tz))
+        (tx, ty, tz), cid = picker.pick(frame, px, pz, ry, ex, ey, ez, pitch, cands, (tx, ty, tz), line_level(f), line_totem(f))
     sx, sy, eyaw, epitch = aim.answer(frame, px, pz, ry, ex, ey, ez, pitch, tx, ty, tz)
-    z = trig.z(frame, eyaw, epitch, math.hypot(tx - ex, tz - ez)) if trig is not None else None
+    dist = math.hypot(tx - ex, tz - ez)
+    z = trig.z(frame, eyaw, epitch, dist) if trig is not None else None
+    if z is not None and dist > FIRE_MAX.get(line_level(f), 1e9):
+        z = 0   # too far for this level's weapon (round 17 f5): no fire
     return frame, sx, sy, eyaw, epitch, pitch, ry, cid, z
 
 
@@ -294,6 +351,7 @@ LAIR_MARGIN = 300.0         # the clipped floor: every edge LAIR_MARGIN in
 LAIR_SAFE_MARGIN = 150.0    # beyond this: back to the middle first
 LAIR_NEAR = 110.0
 LAIR_GUARD_BACK = 250.0     # "guard": back to the script this far inside the safe margin
+LAIR_KEEP_PROBE = 200.0     # T2_LAIR_KEEP: the step ahead that must be floor for the walk away from him
 C_U, C_D, C_L, C_R = 8, 4, 2, 1
 STATS_EVERY = int(os.environ.get("T2_MOVE_STATS_EVERY", "50"))
 
@@ -338,8 +396,14 @@ class LairDrive:
         self.i = None          # the waypoint
         self.dir = 1           # through the list (+1) or back (-1)
         self.mode = ""
+        # T2_LAIR_KEEP=D (round 17 f2, fullrun.py on the N64's stream): in "guard", while he is within D
+        # (horizontally) of the player, walk away from him (or along the floor's tangent when the step
+        # away leaves the safe floor): his melee (two 10s within 409.6 / 716.8) was half to two thirds of
+        # the lair's damage on that stream and one run lost a life there
+        self.keep = float(os.environ.get("T2_LAIR_KEEP", "0") or 0)
+        self.keeps = 0         # frames answered by the keep-away rule
 
-    def answer(self, frame, px, pz, ry):
+    def answer(self, frame, px, pz, ry, boss=None):
         fwd = (-math.sin(ry), -math.cos(ry))
         if self.prev and frame - self.prev[0] <= 2 and self.cal_n < 40:
             b = self.prev[4]
@@ -358,9 +422,14 @@ class LairDrive:
             elif lair_floor(px, pz, LAIR_SAFE_MARGIN + LAIR_GUARD_BACK):
                 self.guard = False
             if not self.guard:
-                self.mode = "script"
-                self.prev = (frame, px, pz, ry, None)
-                return None
+                want = self.keep_away(px, pz, boss)
+                if want is None:
+                    self.mode = "script"
+                    self.prev = (frame, px, pz, ry, None)
+                    return None
+                self.keeps += 1
+                self.mode = "keep"
+                return self.press(frame, px, pz, ry, want, fwd, right)
             self.overrides += 1
         if self.i is None:   # start from the nearest waypoint
             self.i = min(range(len(self.pts)), key=lambda k: math.dist(self.pts[k], (px, pz)))
@@ -374,6 +443,23 @@ class LairDrive:
                 self.i += self.dir
                 tx, tz = self.pts[self.i]
             want, self.mode = (tx - px, tz - pz), "arc"
+        return self.press(frame, px, pz, ry, want, fwd, right)
+
+    def keep_away(self, px, pz, boss):
+        """T2_LAIR_KEEP: the direction away from him, or None (no rule, he is far, no boss)."""
+        if not self.keep or boss is None or any(v != v for v in boss):
+            return None
+        dx, dz = px - boss[0], pz - boss[2]
+        d = math.hypot(dx, dz)
+        if d >= self.keep or d < 1e-3:
+            return None
+        ux, uz = dx / d, dz / d
+        for cand in ((ux, uz), (-uz, ux), (uz, -ux)):
+            if lair_floor(px + cand[0] * LAIR_KEEP_PROBE, pz + cand[1] * LAIR_KEEP_PROBE, LAIR_SAFE_MARGIN):
+                return cand
+        return None
+
+    def press(self, frame, px, pz, ry, want, fwd, right):
         n = math.hypot(*want) or 1.0
         a = (want[0] * fwd[0] + want[1] * fwd[1]) / n
         c = (want[0] * right[0] + want[1] * right[1]) / n
@@ -385,7 +471,8 @@ def move_answer(line, drive):
     f = line.split()
     frame = int(f[1])
     px, py, pz, ry = (float.fromhex(v) for v in f[2:6])
-    return frame, px, py, pz, drive.answer(frame, px, pz, ry)
+    boss = tuple(float.fromhex(v) if v != "nan" else float("nan") for v in f[6:9]) if len(f) >= 9 else None
+    return frame, px, py, pz, drive.answer(frame, px, pz, ry, boss)
 
 
 # --- the waypoint walker (round 16 e3, PLAYTHROUGH.md 30): T2_WALK_PLAN windows -------------------
@@ -561,6 +648,17 @@ def main():
     os.mkfifo(os.path.join(d, "out"))
     os.mkfifo(os.path.join(d, "in"))
     env = dict(os.environ, T2_AIM_FIFO=d)
+    if "SHIP_HOME" not in env:
+        # round 17 merge: each game process its own settings folder (LUS writes turok2.cfg.json,
+        # imgui.ini and logs/ into SHIP_HOME, else the current directory: two runs from one OUT/
+        # raced on turok2.cfg.json, round 17 f5). The current directory's turok2.cfg.json is copied
+        # in, so the run sees the same settings; T2_KEEP_CWD_CFG=1 keeps the old behaviour.
+        if os.environ.get("T2_KEEP_CWD_CFG") != "1":
+            home = os.path.join(d, "home")
+            os.mkdir(home)
+            if os.path.exists("turok2.cfg.json"):
+                shutil.copy("turok2.cfg.json", home)
+            env["SHIP_HOME"] = home
     proc = subprocess.Popen(cmd, env=env)
     n = 0
     aim = SimpleAim() if simple else Aim()
@@ -611,9 +709,10 @@ def main():
                         fl = line.split()
                         cs, php = parse_cands(fl)
                         ex_, ez_ = float.fromhex(fl[6]), float.fromhex(fl[8])
-                        stats.write("# %d hp %s %s\n" % (frame, php, " ".join(
-                            "%d:%.0f:%d%s" % (c[0], math.hypot(c[1] - ex_, c[3] - ez_), c[4], "" if c[5] else "t")
-                            for c in cs)))
+                        tot = line_totem(fl)   # round 17 f5: "a" = an attacker of the totem, then the totem
+                        stats.write("# %d hp %s %s%s\n" % (frame, php, " ".join(
+                            "%d:%.0f:%d%s" % (c[0], math.hypot(c[1] - ex_, c[3] - ez_), c[4], {0: "t", 2: "a"}.get(c[5], ""))
+                            for c in cs), "" if tot is None else " tot %d %ds %d/%d" % tot))
     finally:
         rc = proc.wait()
         if walk.cur is not None:
@@ -621,15 +720,14 @@ def main():
         if walk.plan:
             print("aimdrive: %d walks, %d arrived" % (len(walk.report), sum("arrived at" in r for r in walk.report)),
                   file=sys.stderr)
-        for name in ("out", "in"):
-            os.unlink(os.path.join(d, name))
-        os.rmdir(d)
+        shutil.rmtree(d, ignore_errors=True)
         if picker or trig:
             print("aimdrive: %d target switches, %d left as not hurt, %d shots" % (
                 picker.switches if picker else 0, picker.immunes if picker else 0, trig.shots if trig else 0),
                 file=sys.stderr)
-        print("aimdrive: %d stick answers, %d move answers (%d with the lair driver's own C buttons); the game "
-              "exited %d" % (n, moves, drive.overrides if drive.kind == "guard" else moves, rc), file=sys.stderr)
+        print("aimdrive: %d stick answers, %d move answers (%d with the lair driver's own C buttons, %d keeping "
+              "away); the game exited %d" % (n, moves, drive.overrides + drive.keeps if drive.kind == "guard" else moves,
+                                             drive.keeps, rc), file=sys.stderr)
     sys.exit(rc)
 
 

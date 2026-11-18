@@ -37,6 +37,7 @@ class Route:
 
     def __init__(self):
         self.inputs = [pt.NEW_GAME]
+        self.shake_switch = {}   # round 17 f2: {level: the schedule frame --n64-shake-from switches at}
         self.tps = []
         self.aim_at = []
         self.aim_enemy = []
@@ -196,9 +197,24 @@ class Route:
             env.append("T2_GIVE_ITEMS=\"%s\"" % ";".join("%s@%d" % (v, f) for f, v in sorted(self.give)))
         # round 16 e1: the camera shake as before round 16 (CCamera__Construct radius 0, no shake draws):
         # the route was tuned on that RNG stream (PLAYTHROUGH.md 27); --n64-shake (round 16 merge,
-        # PLAYTHROUGH.md 31) leaves it out: the N64's camera shake and RNG, with N64_TUNE's changes
+        # PLAYTHROUGH.md 31) leaves it out: the N64's camera shake and RNG, with the N64_* tables
         if not N64_SHAKE:
-            env.append("T2_LEGACY_SHAKE=1")
+            if N64_FROM is not None:
+                # round 17 f2 (--n64-shake-from L): the old stream up to the hub before level L (7: the
+                # Primagen's lair), the N64's from there (port/game/t2debug.c T2Port_LegacyShakeTick)
+                env.append("T2_LEGACY_SHAKE=1,%d" % self.shake_switch[N64_FROM])
+            else:
+                env.append("T2_LEGACY_SHAKE=1")
+        # round 17 f3: the type-9 (interactive anim) props as before round 17 (their intelligence body left
+        # big-endian: they start on animation 0); every route so far was tuned on that, the --n64-shake
+        # one included. --n64-props leaves it out (the N64's props, FIDELITY.md 7)
+        if not N64_PROPS:
+            env.append("T2_LEGACY_INTEL9=1")
+        # round 17 merge: headless runs as before round 17, with no sound world (no sound random draws);
+        # every route was tuned on that silent stream. --n64-sound leaves it out (the sound requests draw
+        # as with --audio, a player with sound and the N64)
+        if not N64_SOUND:
+            env.append("T2_LEGACY_NOSOUND=1")
         env += list(env_extra) + list(self.extra_env)
         with open(os.path.join(out, "playthrough.txt"), "w") as fp:
             fp.write("\n".join(self.inputs) + "\n")
@@ -570,8 +586,98 @@ L2_133_NOCHEATS = [
 L2_STRETCH_NOCHEATS = [(6, 1, 3000), (9, 3, 2000), (12, 15, 2000)]
 # --n64-shake (round 16 merge, PLAYTHROUGH.md 31): the route on the N64's RNG stream (no T2_LEGACY_SHAKE).
 # The extra fire windows it needs, as L2_STRETCH entries (segment, step, frames)
+N64_PROPS = False  # round 17 f3: --n64-props
+N64_SOUND = False  # round 17 merge: --n64-sound
 N64_SHAKE = False
+N64_FROM = None       # --n64-shake-from L (round 17 f2): the N64's stream only from level L's hub visit on
+
+
+N64_CAVE_WEAPON = "9"   # the Cave Totem: the shredder on the N64 stream (85-135 damage with the scorpion launcher, 18-64 with it; round 17 f2)
+N64_MOTHER_MOVE = 4600   # the strafing and steps back at the Mother from her arena + this (5,800 legacy)
+
+
+def n64(lv):
+    """Round 17 f2: whether level lv (7: the Primagen's lair) is played on the N64's random numbers
+    (--n64-shake, or --n64-shake-from L with lv >= L): the route changes for that stream apply."""
+    return N64_SHAKE or (N64_FROM is not None and lv >= N64_FROM)
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
+# Round 17 f1: pick steps put before a step of a segment (segment, before step, [(x, y, z, approach
+# angle)]): each pick is a KEY_STEP-frame step (pick()'s stand and walk-in); the step and the later
+# ones move, and so do the segment's retries and returns at or after that step's frame
+N64_L2_PICKS = [
+    # 135, after zombie 44's fight (the player leaves it with ~25 health), before crypt 76's key: 7 health
+    # +10 (only taken below 100) around the crypts; the approach angles were probed (some angles stand
+    # the player in a wall: no region, no teleport)
+    (12, 12, [(1554.3, 0.0, 589.6, 0.0), (1556.3, 0.0, 76.6, 0.0), (2554.0, 0.2, 92.6, 0.0), (867.5, 0.0, 1146.0, 3.1416),
+              (-545.3, 0.0, 1148.1, 3.1416), (-1269.4, 0.0, 1146.0, 3.1416), (-1345.9, 0.0, 457.2, 1.5708)]),
+]
+
+
+def insert_picks(segments, picks, extra=(), retry=(), back=()):
+    """segments with pick steps inserted (N64_L2_PICKS); returns (segments, stretch entries that only
+    move the later steps (no fire), retry, back) with the in-segment teleports moved as well."""
+    segs = [list(s) for s in segments]
+    shifts = []                       # (segment, original dt, frames)
+    for si, sj, items in sorted(picks, key=lambda p: (p[0], -p[1])):
+        name, rel, steps = segs[si]
+        steps = [list(st) for st in steps]
+        at = steps[sj][0]
+        new = []
+        for k, (x, y, z, ang) in enumerate(items):
+            new.append([at + k * KEY_STEP, x + math.sin(ang) * 90.0, y, z + math.cos(ang) * 90.0, ang, 50, {}])
+        more = len(items) * KEY_STEP
+        for st in steps[sj:]:
+            st[0] += more
+        steps[sj:sj] = new
+        segs[si] = (name, rel, [tuple(st) for st in steps])
+        shifts.append((si, at, more, sj + len(new)))
+    # the stretch entries: no fire window, only the later steps move (stretch() with fire=False); the
+    # steps already moved here, so the entry sits on the segment's last step
+    ext = [(si, len(segs[si][2]) - 1, more, False) for si, at, more, j in shifts]
+
+    def moved(entries):
+        out = []
+        for e in entries:
+            e = list(e)
+            e[1] += sum(m for si, at, m, j in shifts if si == e[0] and e[1] >= at)
+            out.append(tuple(e))
+        return out
+    # the stretch entries of a segment with picks: the step indices past an insertion move too
+    ext0 = []
+    for e in extra:
+        e = list(e)
+        e[1] += sum(len(items) for si, sj, items in picks if si == e[0] and e[1] >= sj)
+        ext0.append(tuple(e))
+    return [tuple(s) for s in segs], ext0 + ext, moved(retry), moved(back)
+
+
+# Round 17 f5 (--l2-heal): 135's health +10 pickups (object 542, item 1702: +10, up to 100; tools/assets/levels.py
+# level actors) on the graveyard floor, walked into after sister 3 and before the exit 2608, KEY_STEP frames each:
+# the City Totem's fight (110) comes next with no health on the way, and a stick or real-weapons run reached it
+# with 18-67 health (two lives lost there). Not the six beside sister 3's spot (the pit's damage region).
+L2_HEAL = False
+# (x, y, z, approach angle): the stand point 90 units out along the angle must be graveyard floor (y 0; the
+# graves are y 87; outside every region the teleport fails)
+L2_HEAL_PICKS = [(102.4, 0.0, -358.4, 0.0), (1556.3, 0.0, 76.6, 0.0), (1554.3, 0.0, 589.6, 0.0),
+                 (867.5, 0.0, 1146.0, math.pi), (-545.3, 0.0, 1148.1, math.pi), (-1269.4, 0.0, 1146.0, math.pi),
+                 (-1345.9, 0.0, 457.2, math.pi / 2), (2066.9, 0.2, 1323.4, 0.0), (2554.0, 0.2, 92.6, 0.0),
+                 (1235.9, 0.2, -839.6, 0.0)]
+
+
+def l2_heal(segs):
+    """--l2-heal: L2_HEAL_PICKS before 135's exit step; the later segments move by the frames added.
+    Returns (segments, frames added)."""
+    segs = list(segs)
+    i = [k for k, sg in enumerate(segs) if sg[0].startswith("135 ")][0]
+    name, rel, steps = segs[i]
+    warp = steps[-1]
+    picks = [(warp[0] + KEY_STEP * k, x + math.sin(a) * 90.0, y, z + math.cos(a) * 90.0, a, 50, {})
+             for k, (x, y, z, a) in enumerate(L2_HEAL_PICKS)]
+    d = KEY_STEP * len(picks)
+    segs[i] = (name, rel, list(steps[:-1]) + picks + [(warp[0] + d,) + tuple(warp[1:])])
+    for k in range(i + 1, len(segs)):
+        segs[k] = (segs[k][0], segs[k][1] + d, segs[k][2])
+    return segs, d
 
 
 def l2_segments(nocheats):
@@ -597,15 +703,17 @@ def stretch(segments, extra):
     segs = []
     for i, (name, rel, steps) in enumerate(segments):
         steps = [list(st) for st in steps]
-        for si, sj, more in extra:
+        for e in extra:
+            si, sj, more = e[:3]
             if si != i:
                 continue
-            o = dict(steps[sj][6])
-            o["fire"] = o.get("fire", 0) + more
-            steps[sj][6] = o
+            if len(e) < 4 or e[3]:   # round 17 f1: (si, sj, frames, False) only moves the later steps
+                o = dict(steps[sj][6])
+                o["fire"] = o.get("fire", 0) + more
+                steps[sj][6] = o
             for k in range(sj + 1, len(steps)):
                 steps[k][0] += more
-        segs.append((name, rel, [tuple(st) for st in steps], sum(m for si, sj, m in extra if si == i)))
+        segs.append((name, rel, [tuple(st) for st in steps], sum(e[2] for e in extra if e[0] == i)))
     return segs
 
 
@@ -766,6 +874,7 @@ HOP = False                     # --hop: round 13's fallback warp 7602 (DEBUG-ON
 LAIR_FRONT = "450,3000,2.5,1"   # --lair-front: T2_BOSS_FRONT in the lair (round 15 d1)
 LAIR_STRAFE = None              # --lair-strafe P[,S]: routes56.lair_strafe's period and z sweep (round 15 d1);
                                 # None: 90 with the Primagen not invincible, 80 with --cheats-on 4 (C30)
+LAIR_KEEP = 800                 # --lair-keep D: T2_LAIR_KEEP on the N64's stream (round 17 f2; 0: off)
 LAIR_PEEK = 2400                # --lair-peek W: T2_LAIR_PEEK with the lair driver (round 15 C30)
 LAIR_DRIVE = None               # --lair-drive guard|arcs|none: the closed-loop lair driver (aimdrive.LairDrive;
                                 # round 15 C30); None: "guard" with the Primagen not invincible, else none
@@ -849,6 +958,11 @@ L1_ARMS = {
     # 59 by the level exit 7100: shells x10, bullets x40, explosive shells x3, tek arrows x5 in a row
     9: [(-9851.8, -307.2, 5427.2, 1.5708, 60, 90)],
 }
+# round 17 f5: 131's plasma rifle (-1996.8, -1126.4, 5785.6) lies at the bottom of a pool (floor -1,126, water
+# -532; round 15 d2: "a death there"); with the 150 plasma cells of 129 it is the weapon for 134 (zombies 2-4 and
+# sister 2: the mag 60's 50 bullets do not kill zombies 2 and 3). L2_PLASMA = False: round 16's picks.
+L2_PLASMA = False   # tried: the pool is deadly (10 health every 2 frames: 116 -> 0 in 22 frames)
+L2_131_PLASMA = [(-1996.8, -1126.4, 5785.6, 0.0, 60, 40)] if L2_PLASMA else []
 L2_ARMS = {
     0: [(3408.8, 614.4, -521.9, 0.0), (3406.2, 614.4, -1324.7, -1.5708),   # 125: shells x10, explosive shells x3,
         (2816.0, 614.4, 9984.0, 0.0)],                                      #      shells x10
@@ -860,8 +974,7 @@ L2_ARMS = {
     # round 16 e5: ammo for sister 2 (134) after sister 1 has taken it all: 131's terrace (y 102.4),
     # bullets x40, shells x3 and explosive shells x3 (130's bullets x40 and shells x10 by its exit,
     # (6529.9, -3379.2, 478.5) and (6516.3, -3379.2, 2080.0), were not reached by such picks)
-    8: [(2581.0, 102.4, 1159.2, 0.0), (1420.5, 102.4, 1161.3, 0.0), (1971.6, 102.4, 1772.7, 0.0)],
-    # not taken: 131's plasma rifle (-1996.8, -1126.4, 5785.6): a death there
+    8: [(2581.0, 102.4, 1159.2, 0.0), (1420.5, 102.4, 1161.3, 0.0), (1971.6, 102.4, 1772.7, 0.0)] + L2_131_PLASMA,
 }
 L3_ARMS = {}
 ARMS = {1: L1_ARMS, 2: L2_ARMS, 3: L3_ARMS}
@@ -899,8 +1012,8 @@ def wheel(weapon, f):
 L2_TAPS = {(4, 0): 8,       # 129's soul gate: the shotgun (the grenade launcher's grenades fly over the gate)
            (6, 2): 4,       # 133's zombies 22-24 (L2_133_REAL): the mag 60 (the pistol's slot)
            (6, 6): 15,      # 133's sister 1: the grenade launcher
-           (9, 0): 4,       # 134's zombies: the mag 60 (the pistol's slot)
-           (9, 3): 8}       # 134's sister 2: the shotgun
+           (9, 0): 10 if L2_PLASMA else 4,   # 134's zombies: the plasma rifle (round 17 f5) / the mag 60
+           (9, 3): 10 if L2_PLASMA else 8}   # 134's sister 2: the plasma rifle / the shotgun
 # round 16 e5: 133 in a --real-weapons 1,2 run: the zombies of the second room (22, 23, 24: 80 health
 # each, they open door 28; the nearest awake actor, T2_FIRE_GATE), then sister 1 (20, 50 health). The round-12 steps
 # (the sister aimed from the start, the nearest actor else) spent all the ammo on doors 27 and 28.
@@ -918,6 +1031,7 @@ L2_133_REAL = [
     (6050, -847.0, -4761.6, 1574.0, 3.1416, 0, {"fire": 1900, "aim": "enemy:20"}),
     (8000, 827.5, -4761.6, -1627.5, -2.8692, 150, {}),    # warp 2615 -> 130
 ]
+L2_134_FIRE_R = 450     # round 17 f5: 134's fire range in a --real-weapons 2 run (T2_FIRE_GATE, T2_AIMD_FIRE_MAX)
 L2_STRETCH_REAL = [(6, 6, 3000), (9, 3, 2000), (12, 15, 2000)]
 
 
@@ -1012,11 +1126,25 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         l2stretch = L2_STRETCH_REAL
         l2segs = with_taps(l2segs, L2_TAPS)
         r.extra_env.append("T2_AIM_SKIP_TYPES=6")
-        r.extra_env.append("T2_FIRE_GATE=133,134,135")
+        # round 17 f5: in 134 the zombies walk up from 1,700 units: no fire beyond 450 (the mag 60 emptied
+        # on zombie 2 from afar); the stick driver's own fire likewise (T2_AIMD_FIRE_MAX)
+        r.extra_env.append("T2_FIRE_GATE=133,134:%d,135" % L2_134_FIRE_R)
+        r.extra_env.append("T2_AIMD_FIRE_MAX=134:%d" % L2_134_FIRE_R)
+    l2retry = L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else [])
+    l2back = L2_RETURN_LATE if h2 else ()
+    if N64_SHAKE and N64_L2_PICKS:   # round 17 f1: health picks between 135's crypt steps
+        l2segs, l2stretch, l2retry, l2back = insert_picks(l2segs, N64_L2_PICKS, l2stretch, l2retry, l2back)
+    heal = 0
+    if L2_HEAL:   # round 17 f5 (after f1's picks: these go before 135's exit step)
+        l2segs, heal = l2_heal(l2segs)
     a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {}) if extras else {},
-                        L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else []), l2stretch,
-                        back=L2_RETURN_LATE if h2 else (), detours=det.get(2),
+                        l2retry, l2stretch,
+                        back=l2back, detours=det.get(2),
                         walks=nav_table(2) if 2 in NAV else L2_WALKS if 2 in walk else None, nav_walks=2 in NAV)
+    a2 += heal
+    for k in hubs:   # round 17 f5: --l2-heal's picks move the City Totem and every later hub arrival
+        if k >= 2:
+            hubs[k] += heal
     t_arr = pt.L2_TOTEM_ARRIVAL + shift + a2
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
     arms_switch(r, 2, t_arr, real)
@@ -1071,6 +1199,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     if upto < 4:
         hub(r, hubs[3], grant=GRANT[3], **key_visit(3))
         return r.write(out)
+    r.shake_switch[4] = hubs[3]
     c = hub(r, hubs[3], grant=GRANT[3], go=4, **key_visit(3))
     shift = c - OLD_CINEMA[4]
     r.anchors.append((c, 18))
@@ -1096,10 +1225,12 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         # the switch is scheduled in 103, before the totem's level loads. The plasma rifle: the
         # totem 200 damage and a life lost, the Blind One never hurt (hp 12,800/12,800 at the end);
         # the scorpion launcher: the totem 88 damage, the Blind One dead in 5,200 frames
-        r.weapon.append((l4s + rel + a4 - TOTEM_WEAPON_BEFORE, "16"))
+        r.weapon.append((l4s + rel + a4 - TOTEM_WEAPON_BEFORE, N64_CAVE_WEAPON if n64(4) else "16"))
         r.weapon.append((hubs[4] - 200, "10"))
     r.face_levels.append(lv)
-    if real:
+    if real or n64(4):
+        # round 17 f2: on the N64's stream too (the Cave Totem costs ~100 health instead of ~55 there and
+        # the scorpion launcher leaves 11 health after the Blind One: a life lost on 124's pylons)
         # round 16 e5: the shredder (9) at the Blind One in a --real-weapons run. T2_WEAPON is applied when
         # a level loads: scheduled inside the Cave Totem's fire window (after 112 has loaded), it is
         # applied when her arena (level 1) loads. With the scorpion launcher her minions (intelligence
@@ -1117,6 +1248,7 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     r.aim_node = "boss@1/2/3/4"   # the Blind One 1, the Mantid Queen 2, the Mother 3, the Primagen 4
     r.note(hubs[4], "60 the hub (after level 4)")
     r.anchors.append((hubs[4], 60))
+    r.shake_switch[5] = hubs[4]
     end = hub(r, hubs[4], primagen=(4,), go=5 if upto >= 5 else None)
     for lvl, hook in sorted(LEVEL_HOOKS.items()):
         if lvl <= upto:
@@ -1185,6 +1317,7 @@ def level5(r, t):
     r.boss_front.append((s + rel + add - 100, "450,200"))
     hub_at = s + L5_HUB_AFTER + add
     r.level_start[6] = hub_at
+    r.shake_switch[6] = hub_at
     r.note(hub_at, "60 the hub (after level 5)")
     r.anchors.append((hub_at, 60))
     # round 14 c3: with --late-keys, Primagen keys 2 and 3 go in here, with key 5 (PRIMAGEN_LATE)
@@ -1194,7 +1327,13 @@ def level5(r, t):
 def level6(r, t):
     """t: the frame the hub portal 6000 warps (hub(..., go=6))."""
     s = t + WARP_TO_START[6]
-    segs, add = r56.with_items(r56.L6_SEGMENTS, r56.L6_ITEMS)
+    items = r56.L6_ITEMS
+    if n64(6):
+        # round 17 f2: on the N64's stream the Queen leaves 13-87 health and 117's fights cost up to ~100
+        # (a life lost in the --n64-shake-from 5 run): one of 114's two other ultra healths at the start
+        items = dict(items)
+        items[0] = r56.L6_N64_HEALTH + items.get(0, [])
+    segs, add = r56.with_items(r56.L6_SEGMENTS, items)
     r.anchors.append((s - LOAD_EARLY, 114))
     r.note(s - LOAD_EARLY, "114.. the Lightship (level 6 route from %d, its items picked up: +%d)" % (s, add))
     r.weapon.append((t, "10"))
@@ -1213,8 +1352,11 @@ def level6(r, t):
         r.weapon.append((m - 100, "9"))
         r.weapon.append((m + MOTHER_SHREDDER_END, "10"))
         fire_end = m + MOTHER_SHREDDER_END
-    r.inputs += ["Z@%d..%d" % (m + 800, fire_end), "CL@%d..%d" % (m + 5800, m + 15000)]
-    r.inputs += ["CD@%d..%d" % (f, f + 250) for f in range(m + 5800, s + r56.L6_MOTHER_END + add, 600)]
+    # round 17 f2: on the N64's stream the strafing starts earlier (N64_MOTHER_MOVE): standing still at
+    # ~+5,400 (her mode 19-25 attack) cost up to four 20s there, one 20 on the legacy stream
+    move = N64_MOTHER_MOVE if n64(6) else 5800
+    r.inputs += ["Z@%d..%d" % (m + 800, fire_end), "CL@%d..%d" % (m + move, m + 15000)]
+    r.inputs += ["CD@%d..%d" % (f, f + 250) for f in range(m + move, s + r56.L6_MOTHER_END + add, 600)]
     back = m + L6_BACK_114
     if 3 in r.cheats_on:
         # round 14 c2: the Mother invincible in a --cheats-off 6 run (--cheats-on 3): she costs ~250-330
@@ -1235,6 +1377,7 @@ def level6(r, t):
     r.note(f, "60 the hub: Primagen key 6 slot: the six keys in: the hub portal cinema (43) -> the Primagen")
     primagen_slot(r, f, 6)
     lair = f + L6_CINEMA
+    r.shake_switch[7] = lair - 300
     if HOP:   # DEBUG-ONLY (--hop): round 13's warp 7602, for a run whose six keys are not all in
         r.warps.append((lair + 150, 7602))
     r.anchors.append((lair, 4))
@@ -1262,6 +1405,9 @@ def level6(r, t):
         # edge (d1's fall off the right edge at 228,464); "arcs": it walks arcs round his home instead
         r.move_drive.append((lair + 200, lair + L6_HUB_END - 18000))
         r.extra_env.append("T2_LAIR_DRIVE=%s" % drive)
+        if drive == "guard" and n64(7) and LAIR_KEEP:
+            # round 17 f2: on the N64's stream, walk away from him while he is within LAIR_KEEP (his melee)
+            r.extra_env.append("T2_LAIR_KEEP=%d" % LAIR_KEEP)
         # DEBUG-ONLY (port/game/t2bosslog.c): a home wait not ended after LAIR_PEEK frames (his hover hides
         # him from the whole floor) is ended by peeks from over the front pits, the player put back each time
         r.extra_env.append("T2_LAIR_PEEK=\"%d@%d\"" % (LAIR_PEEK, lair - 100))
@@ -1280,7 +1426,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE
+    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_SOUND, N64_FROM, LAIR_KEEP, L2_HEAL
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1323,17 +1469,34 @@ def cli(argv=None):
     ap.add_argument("--real-weapons", default="", help="1 / 1,2 / 1,2,3: these levels on the weapons and ammo "
                     "picked up on the way, no T2_GIVE_WEAPONS / T2_FILL_AMMO before the hub after them (round 15 d2)")
     ap.add_argument("--n64-shake", action="store_true", help="the N64's camera shake (no T2_LEGACY_SHAKE) and "
-                    "the route changes it needs (N64_L2_STRETCH; round 16 merge, PLAYTHROUGH.md 31)")
+                    "the route changes it needs (N64_L2_STRETCH, N64_L2_PICKS; PLAYTHROUGH.md 31, 32)")
+    ap.add_argument("--n64-props", action="store_true", help="the type-9 props as on the N64 (no "
+                    "T2_LEGACY_INTEL9; round 17 f3, FIDELITY.md 7): not tuned yet")
+    ap.add_argument("--n64-sound", action="store_true", help="the sound world in the headless run (no "
+                    "T2_LEGACY_NOSOUND: the sound requests draw their random numbers as with --audio and on the "
+                    "N64; round 17 merge): not tuned yet")
+    ap.add_argument("--n64-shake-from", type=int, default=None, choices=(4, 5, 6, 7),
+                    help="DEBUG-ONLY (round 17 f2): the old stream (T2_LEGACY_SHAKE) up to the hub visit before "
+                    "level L (7: the Primagen's lair), the N64's from there; with --n64-shake's level 4-6 changes")
+    ap.add_argument("--lair-keep", type=int, default=LAIR_KEEP, help="on the N64's stream (--n64-shake, "
+                    "--n64-shake-from): the lair driver walks away from him within this distance (0: off; round 17 f2)")
+    ap.add_argument("--l2-heal", action="store_true", help="135: the health +10 pickups after sister 3, before "
+                    "the City Totem (round 17 f5, L2_HEAL_PICKS)")
     ap.add_argument("--hub-wait", type=int, default=ARMS_HUB_WAIT,
                     help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
     N64_SHAKE = a.n64_shake
+    N64_PROPS = a.n64_props
+    N64_SOUND = a.n64_sound
+    N64_FROM = a.n64_shake_from
+    LAIR_KEEP = a.lair_keep
     LAIR_FRONT = a.lair_front
     LAIR_DRIVE = a.lair_drive
     LAIR_PEEK = a.lair_peek
     LAIR_STRAFE = tuple(int(v) for v in (a.lair_strafe + ",0").split(",")[:2]) if a.lair_strafe else None
     L6_SLOT_AFTER = a.slot
     ARMS_HUB_WAIT = a.hub_wait
+    L2_HEAL = a.l2_heal
     HOP = a.hop
     STICK_AIM = {int(x) for x in a.stick_aim.split(",") if x}
     NAV = {int(x) for x in a.nav.split(",") if x}

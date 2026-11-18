@@ -63,6 +63,7 @@ typedef struct { const char *dli_fname; void *dli_fbase; const char *dli_sname; 
 extern int dladdr(const void *, T2DlInfo *);
 #include "structs/intelligence.h"
 #include "structs/boss.h"
+int T2Port_TotemLive(void); /* round 17 f5, below */
 
 /* T2_ACTOR_LOG=N (with T2_STATE_LOG, round 7 v3): the level's enemies and turrets (gScene's level
  * actors with intelligence type 1 or 4), nearest to the player first (N of them, default 8), and
@@ -294,9 +295,13 @@ void T2Port_LogState(int frame) {
     }
     {
         /* a totem defense (the energy totem levels, TotemDefense_*): state 0 fight, 1 saved,
-         * 2 failed; the time left, the kills against the definition's target (round 9 x1) */
+         * 2 failed; the time left, the kills against the definition's target (round 9 x1).
+         * Round 17 f5: only while the totem is an actor of the loaded level (T2Port_TotemLive):
+         * gTotemDefense.obj and .def keep pointing into the totem level's actors and data after
+         * it is left (the game never clears them, the N64 neither), and this line read the freed
+         * memory there ("totem hp" garbage such as 4236247 or -798464, run to run different). */
         extern TotemDefenseState gTotemDefense;
-        if (gTotemDefense.obj != NULL && gScene.m_nLevel > 0) {
+        if (gTotemDefense.obj != NULL && gScene.m_nLevel > 0 && T2Port_TotemLive()) {
             CDestructibleIntelligence *d = (CDestructibleIntelligence *) gTotemDefense.def;
             printf("totem: state %d time %.0f/%d s kills %d/%d attackers %d warned %d totem hp %d\n",
                    (int) gTotemDefense.state, gTotemDefense.timer / 15.0f, d != NULL ? (int) d->m_TotemMissionDuration : -1,
@@ -306,6 +311,19 @@ void T2Port_LogState(int frame) {
         }
     }
     fflush(stdout);
+}
+
+/* Round 17 f5: 1 when gTotemDefense.obj is the live totem of the loaded level: one of
+ * gScene.m_pActors, still drawn by TotemDefense_DrawTotem (TotemDefense_Init sets it, the update
+ * keeps it). Outside its level obj and def are stale pointers (freed level memory). */
+int T2Port_TotemLive(void) {
+    extern TotemDefenseState gTotemDefense;
+    extern void TotemDefense_DrawTotem();
+    CGameObjectInstance *o = (CGameObjectInstance *) gTotemDefense.obj;
+    if (o == NULL || gScene.m_pActors == NULL || o < gScene.m_pActors || o >= gScene.m_pActors + gScene.m_nActors) {
+        return 0;
+    }
+    return (void *) o->m_AI.m_pfDraw == (void *) TotemDefense_DrawTotem;
 }
 
 /* A frame-scheduled value (DEBUG-ONLY, round 12 C27): "V[@F][;V@F...]", the V of the last entry whose F
@@ -1411,6 +1429,15 @@ void T2Port_AimCand(int frame, CGameObjectInstance *o, f32 x, f32 y, f32 z, f32 
     sCand[at].z = z;
     sCand[at].d2 = d2;
     sCand[at].hp = o->m_AI.m_Health;
+    {
+        /* round 17 f5: kind 2 = an attacker of the totem (a totem defense: its sight target is the
+         * totem; a player sees it run at the totem). Truthy like 1 for older drivers. */
+        extern TotemDefenseState gTotemDefense;
+        if (kind == 1 && gTotemDefense.state == 0 && T2Port_TotemLive() &&
+            (void *) o->m_AI.m_pSightTarget == (void *) gTotemDefense.obj) {
+            kind = 2;
+        }
+    }
     sCand[at].kind = kind;
     if (sCandN < AIM_CAND_MAX) {
         sCandN++;
@@ -1478,7 +1505,22 @@ int T2Port_AimPose(int frame, char *buf, int n) {
             len += snprintf(buf + len, n - len, " %d %a %a %a %d %d", sCand[k].id, sCand[k].x, sCand[k].y,
                             sCand[k].z, (int) sCand[k].hp, sCand[k].kind);
         }
-        snprintf(buf + len, n - len, " hp %d\n", (int) (p->m_Data.m_Health >> 8));
+        len += snprintf(buf + len, n - len, " hp %d", (int) (p->m_Data.m_Health >> 8));
+        {
+            /* round 17 f5: a totem defense running: "tot HP TIME KILLS NEED" (the totem's health,
+             * the seconds left, the kills so far and the kills needed: the HUD's two bars) */
+            extern TotemDefenseState gTotemDefense;
+            if (gTotemDefense.state == 0 && gScene.m_nLevel > 0 && T2Port_TotemLive() && len < n - 48) {
+                CDestructibleIntelligence *d = (CDestructibleIntelligence *) gTotemDefense.def;
+                len += snprintf(buf + len, n - len, " tot %d %d %d %d", (int) (gTotemDefense.obj->m_AI.m_Health >> 8),
+                                (int) (gTotemDefense.timer / 15.0f), (int) gTotemDefense.kills,
+                                d != NULL ? (int) d->m_EnemiesToKillToSaveTotem : -1);
+            }
+        }
+        if (len < n - 16) {
+            len += snprintf(buf + len, n - len, " lv %d", (int) gScene.m_nLevel); /* round 17 f5: the level */
+        }
+        snprintf(buf + len, n - len, "\n");
         sCandN = 0;
     }
     return 1;
@@ -1536,11 +1578,83 @@ void T2Port_RngSet(int frame, const char *spec) {
  * before round 16, its camera shake radius 0 (an N64-offset view): CShake__ApplyOffset then draws no
  * random numbers, 6 a game frame fewer than the N64. The scripted whole-game route was tuned on that
  * RNG stream, so tools/port/fullrun.py sets it; a player gets the N64's behaviour. */
+static int sLegacyShake = -1;
+static int sLegacyShakeUntil = -1; /* T2_LEGACY_SHAKE=1,F: the N64's shake from schedule frame F on */
+
 int T2Port_LegacyShake(void) {
+    if (sLegacyShake < 0) {
+        const char *e = getenv("T2_LEGACY_SHAKE");
+        const char *c = e != NULL ? strchr(e, ',') : NULL;
+        sLegacyShake = e != NULL && *e != '0';
+        sLegacyShakeUntil = (sLegacyShake && c != NULL) ? atoi(c + 1) : -1;
+    }
+    return sLegacyShake;
+}
+
+/* T2_LEGACY_SHAKE=1,F (DEBUG-ONLY, round 17 f2; game.cpp, every frame): the old stream up to schedule
+ * frame F, then the N64's, so that a level of the scripted route can be tried on the N64's random
+ * numbers from the state the legacy route reaches it in (fullrun.py --n64-shake-from L). At F the
+ * cameras get the shake radius the N64's CCamera__Construct gives them (1; the legacy stores left it
+ * 0) and the later constructs take the host path. */
+void T2Port_LegacyShakeTick(int frame) {
+    if (T2Port_LegacyShake() && sLegacyShakeUntil >= 0 && frame >= sLegacyShakeUntil) {
+        CCameraPool *pool = gEngineApp.m_Game.m_CameraPool;
+        int i;
+        sLegacyShake = 0;
+        pool->m_MainCamera.m_Shake.m_Radius = 1.0f;
+        for (i = 0; pool->m_Cameras != NULL && i < pool->m_nCameras; i++) {
+            pool->m_Cameras[i].m_Shake.m_Radius = 1.0f;
+        }
+        printf("legacyshake: off at frame %d (%d cameras)\n", frame, (int) pool->m_nCameras);
+        fflush(stdout);
+    }
+}
+
+/* T2_LEGACY_INTEL9=1 (DEBUG-ONLY, round 17 f3): the type-9 (interactive anim) intelligence bodies left
+ * big-endian as before round 17 (CScene__DecompressIntelligence, func_002261A8.c / func_00465B04.c):
+ * the props then start on animation 0 instead of their own, and their type-flag tests read the wrong
+ * bits. A player gets the swapped (N64) values. */
+int T2Port_LegacyIntel9(void) {
     static int s = -1;
     if (s < 0) {
-        const char *e = getenv("T2_LEGACY_SHAKE");
+        const char *e = getenv("T2_LEGACY_INTEL9");
         s = e != NULL && *e != '0';
     }
     return s;
+}
+
+/* T2_LEGACY_NOSOUND=1 (DEBUG-ONLY, round 17 merge; port/app/game.cpp): headless runs without --audio
+ * as before round 17, with no sound world (Sound__Initialize returns, every sound request stops
+ * before CAudioWorld__PlaySound and its random draws: pitch, volume, the ambient picks). Without it
+ * the sound world and the audio manager run in every game run (the output is dropped when there is
+ * no --audio/--wav), so a scripted run draws the same random numbers as a player with sound and as
+ * the N64 (round 17 f3, FIDELITY.md). tools/port/fullrun.py and playthrough.py write it: the routes
+ * were tuned on the silent stream. */
+int T2Port_LegacyNoSound(void) {
+    static int s = -1;
+    if (s < 0) {
+        const char *e = getenv("T2_LEGACY_NOSOUND");
+        s = e != NULL && *e != '0';
+    }
+    return s;
+}
+
+/* T2_RNG_LOAD=T:HEX (DEBUG-ONLY, round 17 f3; src/us/code/func_0042AC0C.c): at the entry of
+ * CScene__LoadLevel(scene, T, ...) set gRandomValue to HEX, once, so the level's own load (its actors'
+ * random set-up) starts from the same seed as the N64 with n64trace.py --rng-load T:HEX (a breakpoint on
+ * the same function). The N64's audio thread keeps drawing during the load (an ambient sound every 4
+ * audio frames, one per retrace, as long as the load takes), so T2_RNG_SET at the level's first game
+ * frame evens the streams again; tools/port/n64cmp.py sets both. */
+void T2Port_RngAtLoad(int level) {
+    static int sDone;
+    int t;
+    unsigned v;
+    const char *spec = getenv("T2_RNG_LOAD");
+    if (sDone || spec == NULL || sscanf(spec, "%d:%x", &t, &v) != 2 || level != t) {
+        return;
+    }
+    sDone = 1;
+    printf("debug: CScene__LoadLevel(%d): T2_RNG_LOAD: gRandomValue %08x -> %08x\n", level, (unsigned) gRandomValue, v);
+    fflush(stdout);
+    gRandomValue = v;
 }

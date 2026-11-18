@@ -277,3 +277,126 @@ messages) gets the same colour fix.
    Needs an archive rebuild and a whole-tree asm_diff.
 3. A new-game route on the N64 (levels 51/52) with `--input`, compared like the demos.
 4. The rest of section 3's table (HUD, menus) against the reference with the colour fix.
+
+## 7. The port against the N64 member by member (Phase 7 round 17, part f3)
+
+### 7.1 The tool: `tools/port/n64cmp.py`
+
+Both sides start the same warp from the attract loop and dump the same structs at the same game
+frames; libclang computes each struct's layout twice (mips-linux-gnu for the N64, the port's own
+compile flags for the host) down to every scalar member, and the two dumps are compared by member
+path.
+
+```sh
+python3 tools/port/n64cmp.py run --warp 7602 --level 4 --gf 1-30 --work /tmp/cmp \
+    --port OUT/build/app/turok2 --archive OUT/turok2.o2r --build OUT/build [--skip m_VarBuffer]
+python3 tools/port/n64cmp.py cmp N64.raw PORT.raw --build OUT/build [--gf 5] [--only LVL,SCN] \
+    [--all-fields] [--brief] [--no-noise] [--all-union]
+```
+
+- `--level` is `gScene.m_nLevel` (4 the lair, 60 the hub); `--warp -(L+1)` starts level L at its
+  default spawn. Records: `RNG` (gRandomValue), `SCN` (gScene), `PLR` (the first CPlayer), `CAM`
+  (its camera), `LVL i` (gScene.m_pActors[i]), `DYN k` (the instance pool's active list).
+- Port side (DEBUG-ONLY): `T2_RAW_DUMP=FILE:LEVEL:GF[-GF2][,...]` (port/game/t2det.c, called after
+  `T2_RNG_SET`), `T2_RNG_LOAD=T:HEX` (gRandomValue set at the entry of `CScene__LoadLevel(scene, T)`,
+  a TARGET_PORT hook in func_0042AC0C.c).
+- N64 side: `n64trace.py --raw FILE:LEVEL:GFS` (stops after the last frame), `--rng-load T:HEX`
+  (a breakpoint on CScene__LoadLevel), `--rng-set LEVEL:GF:HEX` (the port's `T2_RNG_SET` twin),
+  `--ticks 2` (the four retrace counts CEngineApp__Update averages held at 2: the emulator's slow
+  frames no longer change gFrameIncrement).
+- `run` sets the seed at the load AND at gf 1 (see 7.3), holds the N64's ticks at 2, and runs the
+  port with `--audio --draw` (a player's port draws and plays sound; both draw random numbers).
+- Pointers compare by what they point at (null, a dumped record and its member, or "elsewhere");
+  a union compares its first member only (the other views read the same bytes in another width);
+  particle slots compare only when on an active list (free slots keep stale values).
+- `NOISE` (left out unless `--no-noise`): padding, memory the game never cleared before its first
+  write (blend state, shadow alpha, lights: zero on the fresh N64, old heap data in the port), the
+  unique ids and animation start times (counters since boot), the camera's double-buffered
+  viewport/projection/LookAt and the N64 Mtx fixed-point fields, the CList offsets (layout values).
+  Still reported but known layout effects: `m_AI.m_VarBuffer[k>=4]` of AI views with an 8-byte
+  pointer (the host words shift by one; the values agree: use `--skip m_VarBuffer`), u8 arrays that
+  hold a word (`unk_18E54`, particle `unk_100`, `m_Geom[].m_Data[5]`: the same bytes in host order).
+
+### 7.2 The lair props (e1's lead): a host bug, fixed
+
+N64 `lvl 10-17` (type 80, interactive anims) start on animation 4 frame 0.5 at their spawn; the port
+had animation 0, frame 1/3, and drifted ~1.7 units. n64cmp named `m_AI.m_AnimType` (N64 21501 =
+0x53FD, port -1) and `m_AI.m_VarBuffer[0]` (N64 0x000053FD, port 0xFD530000).
+`InteractiveAnim_Advance` copies the word after the intelligence's type flags; the archive's swap
+plan has no struct for the type-9 (interactive anim) body (tools/assets/swap_spec.json "no struct
+yet"), so its three words (type flags, start animation id, 0; 50 records, all 32 bytes) stayed
+big-endian. `CAI__UpdateModeAnim` then got animation id 0xFD530000 from `InteractiveAnim_GetAnim`
+and no animation; the type-flag tests (`m_dwTypeFlags & 1/2/0x20...`) read wrong bits too.
+
+Fix: `CScene__DecompressIntelligence` (func_002261A8.c) and its VM copy (func_00465B04.c) byte-swap
+the three body words of every type-9 record once per load (TARGET_PORT; asm_diff 0). After it the
+lair's level actors, pooled instances and the player are identical to the N64's at gf 1-10.
+(Fixing swap_spec.json instead would change the archive; if someone does, remove this swap.)
+
+**It changes the legacy route**: the default command without the old behaviour ends in game over in
+125 (~154,400). `T2_LEGACY_INTEL9=1` keeps the old bytes; `fullrun.py` and `playthrough.py` write it
+into every `teleport.env` (the `--n64-shake` route too, which f1/f2 tune on b744bd39);
+`--n64-props` leaves it out. With it the default run gives all 580,000 det lines md5
+`ecb9f9f2c127d91cdf889e5b926f3d33` (round 16's), exit 0. A player gets the N64's props.
+
+### 7.3 Random numbers: the sound requests and the load time
+
+With the seed set at the load the port drew 142 numbers by gf 1 of level 53, the N64 170.
+`--calls` on the four random functions (`n64trace.py`) against the port's `T2_RNG_TRACE`:
+
+- **headless runs have no sound**: `Sound__Initialize: audio off (run with --audio)`, and every
+  sound entry point returns before `CAudioWorld__PlaySound`, which draws random numbers (pitch,
+  volume). A player (`--play`, sound on) and the N64 draw them. So **every scripted run (no
+  `--audio`) is on a third RNG stream**, neither the N64's nor a player's. With `--audio` the port
+  drew 146.
+- the other 24 are the N64's audio thread during the load: `__amHandleFrameMsg` calls
+  `Sound__Update` every retrace, and `CAudioWorld__Update` requests the ambient track every 4 audio
+  frames, also while the game thread is loading (12 requests of sound 0xA in the lair/53 load frame).
+  The port's load takes no retraces. This is load-time dependent (real or emulated DMA speed), not a
+  host bug; n64cmp sets the seed again at gf 1. Its consequence: what the game draws between the load
+  and gf 1 differs (the Primagen's six tossed objects at gf 0 pick other types: pool slots 3-5).
+
+### 7.4 Results (gf 1-10/30, seed at load and gf 1, ticks 2, port `--audio --draw`)
+
+| level | result |
+|---|---|
+| 4 (lair, 7602) | RNG equal every frame; LVL/DYN/PLR/CAM identical (after 7.2); left: the actor pool's tossed objects (7.3), `m_Resource` 0 in the port's pool actors vs a ROM key on the N64 (not chased) |
+| 60 (hub) | LVL all equal at gf 1 and 30; `m_SkyAngle` offset (accumulated since boot, same rate 0.0436/gf), the static-event timer `unk_18EB8` phase (load timing), `CCamera.m_MenuPool` bytes |
+| 53 | before the --audio/load fixes: particle type 226 spawn times differ (the static-event timer phase, 7.3), the rest equal apart from `m_VarBuffer` view shifts; not rerun with the final settings |
+| 125, 135, 61, 100, 124, 114 | not run this round (the sweep script `run` per level is ready; ~3 min each) |
+
+### 7.5 Next
+
+1. Run the remaining levels (`n64cmp.py run` per level) with the final settings.
+2. The pooled level actors' `m_Resource` (0 in the port).
+3. The route on the N64 stream should be tuned with `--audio` (a player's stream), and with
+   `--n64-props`; T2_LEGACY_INTEL9 can then go from `--n64-shake`.
+4. `n64trace --watch-write` catches nothing (physical or virtual address): mupen's write
+   breakpoints need another look.
+
+## 8. The round-17 merge: the sound world headless, the n64cmp sweep of 125, 61 and 100 (Phase 7 round 17, the merge C32)
+
+**7.3's first finding is acted on**: every game run with the ROM now runs the sound world (the
+samples are dropped without `--audio`/`--wav`), so a scripted run draws the sound requests' random
+numbers as a player with sound and the N64 do; `T2_LEGACY_NOSOUND=1` keeps the old silent stream
+for the tuned routes (PLAYTHROUGH.md 35.1). A headless boot and an `--audio` boot give the same
+16,000 det lines over 8,000 frames. Against the N64's RAM the demos are as before (demos 1 and 3:
+no field but `rng`; the `rng` from gf 8, 7.3's load-time draws).
+
+**The sweep** (`n64cmp.py run --warp -(L+1) --level L --gf 1-30 --brief`, the merged Release build,
+`--audio --draw` on the port side as in 7.4):
+
+| level | differing members (30 gf) | what differs |
+|---|---|---|
+| 125 | 9,115 | the `m_AI.m_VarBuffer` views (as in 7.4); the level actors' blend fields (`m_BlendAnimation.m_nAnimStartFrame`, `m_BlendLength`, `m_Blend`, `m_BlendPercent`: garbage on the N64, stale heap like 7.4's `m_Resource`); the camera's `m_mProjection` (the `Mtx` integer/fraction halves: representation) and `m_MenuPool`; `SCN unk_18E54[0-5]` and `m_Geom[0,1,4].m_Data[5]`; **actor 51 (type 135)**: `m_qGround` (0.014, 0, 0.19, 0.98) on the N64, identity on the port, so its `m_mfOrient` and bounds differ every frame; actors 52-53 (type 135): `m_Lights` colours and `m_ShadowAlpha`; the weapon actor's ambient light (5 vs 0) at gf 1 only; `gRandomValue` at gf 2, 5, 7, 9, 10 but equal at gf 3, 4, 6, 8 (draws between the game frames fall on the other side of the dump: the audio thread's timing, not a different count) |
+| 61 | 11,407 | the `m_VarBuffer` views; particle 0 (position, velocity, attach point); **45-65 level actors' `m_Lights` (colours, directions) and `m_ShadowAlpha`** |
+| 100 | 2,470 at gf 5 | the same: **57-83 actors' `m_Lights` and `m_ShadowAlpha`**, `_pad2` |
+
+No host bug was confirmed in the time left. Two leads: **(1) the per-actor lights** (`m_Lights`,
+`m_ShadowAlpha`) differ for most actors of 61 and 100 and some of 125, while the lair matched
+(7.4): either the lighting code reads a light or the level's ambient through an N64-offset view, or
+the port computes them at another point of the frame (the dump follows the drawn frame); start with
+`n64trace.py --calls` on the function that fills `m_Lights` for one actor of 61. **(2) actor 51 of
+125** keeps an identity ground quaternion: the ground alignment for type 135 (the `m_qGround`
+writers: `func_00219BC0.c`, `func_0024C47C.c`, `func_0025C018.c`, ...) does not run or reads the
+floor normal differently on the host.

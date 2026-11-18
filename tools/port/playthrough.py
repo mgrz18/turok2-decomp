@@ -504,13 +504,21 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("out", nargs="?", default=".")
     ap.add_argument("--fight", type=int, metavar="WEAPON", help="fight the totem defense with this weapon")
+    ap.add_argument("--n64-props", action="store_true", help="--level: the type-9 props as on the N64 (no "
+                    "T2_LEGACY_INTEL9; round 17 f3); --all passes it to fullrun.py")
+    ap.add_argument("--n64-sound", action="store_true", help="--level: the sound world in the headless run (no "
+                    "T2_LEGACY_NOSOUND; round 17 merge); --all passes it to fullrun.py")
     ap.add_argument("--level", type=int, default=1, choices=(1, 2, 3, 4, 5, 6),
                     help="1: the Port of Adia, 2: the River of Souls, 3: the Death Marshes, 4: the Lair of the Blind, "
                          "5: the Hive of the Mantids, 6: the Lightship (tools/port/routes56.py)")
     ap.add_argument("--direct", action="store_true", help="level 3+: warp straight to the first sub-level (no hub)")
     ap.add_argument("--all", action="store_true", help="one continuous run from a new game: levels 1-6 (1-4 through the hub "
                     "portals), the keys, a save after each level, the Primagen, the ending (tools/port/fullrun.py, PLAYTHROUGH.md section 10)")
+    ap.add_argument("--n64-shake", action="store_true", help="a level run on the N64's camera shake and random "
+                    "numbers (no T2_LEGACY_SHAKE; round 17 f2); with --all it goes to fullrun.py")
     a, rest = ap.parse_known_args()
+    if a.all and a.n64_shake:
+        rest = rest + ["--n64-shake"]
     if rest and not a.all:
         ap.error("unrecognized arguments: %s" % " ".join(rest))
     if a.all:
@@ -519,7 +527,7 @@ def main():
         import fullrun  # round 12 a3
         # levels 1-6, the Primagen, the ending (round 12 C27); the other options go to fullrun.py
         # (--talismans, --cheats-off, --cheats-on, --no-health, --env, --slot, --upto, --hub; round 13 C28)
-        fullrun.cli([a.out] + rest)
+        fullrun.cli([a.out] + rest + (["--n64-props"] if a.n64_props else []) + (["--n64-sound"] if a.n64_sound else []))
         return
     if a.level == 4:
         if a.direct:
@@ -537,7 +545,7 @@ def main():
         import sys
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         import routes56  # round 11 z4: levels 5 and 6
-        inputs, tps, env = routes56.build_level56(a.level, NEW_GAME, FIRE_EVERY)
+        inputs, tps, env = routes56.build_level56(a.level, NEW_GAME, FIRE_EVERY, n64=a.n64_shake)
     else:
         inputs, tps = build(SEGMENTS)
         env = []
@@ -551,7 +559,12 @@ def main():
     os.makedirs(a.out, exist_ok=True)  # round 16 e4: RUN/ need not exist
     with open(os.path.join(a.out, "playthrough.txt"), "w") as fp:
         fp.write("\n".join(inputs) + "\n")
-    env.append("T2_LEGACY_SHAKE=1")  # round 16 e1: the RNG stream the level routes were tuned on
+    if not a.n64_shake:
+        env.append("T2_LEGACY_SHAKE=1")  # round 16 e1: the RNG stream the level routes were tuned on
+    if not a.n64_props:  # round 17 f3: the type-9 props as the routes were tuned (FIDELITY.md 7)
+        env.append("T2_LEGACY_INTEL9=1")
+    if not a.n64_sound:  # round 17 merge: the silent stream the routes were tuned on (no sound world)
+        env.append("T2_LEGACY_NOSOUND=1")
     with open(os.path.join(a.out, "teleport.env"), "w") as fp:
         fp.write("T2_TELEPORT=\"%s\"\n" % ";".join(tps))
         for e in env:
