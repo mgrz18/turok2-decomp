@@ -4,6 +4,9 @@
 #include "gbi_t2.h"
 #include "globals/engine.h"
 #include "protos/cache.h"
+#ifdef TARGET_PORT
+#include "structs/swoosh.h"
+#endif
 
 /* Draws a textured trail: spaces the texture along the tail by length, picks
  * the animation frame, sets the combiner and colours, then emits two vertex
@@ -51,9 +54,19 @@ typedef struct {
     /* 0x3C */ u32 flags;
     /* 0x40 */ TrailNode *tail;
     /* 0x44 */ TrailNode *clock;
+#ifdef TARGET_PORT
+    /* round 20 i3: the host SwooshLinks is 0x18 bytes (count and padding after the two links) */
+    u8 pad48[__builtin_offsetof(Swoosh, length) - __builtin_offsetof(Swoosh, nodes) - 2 * sizeof(void *)];
+#else
     /* 0x48 */ u8 pad48[0x4C - 0x48];
+#endif
     /* 0x4C */ f32 length;
 } Trail;
+#ifdef TARGET_PORT
+_Static_assert(__builtin_offsetof(Trail, flags) == __builtin_offsetof(Swoosh, flags), "Trail.flags");
+_Static_assert(__builtin_offsetof(Trail, clock) == __builtin_offsetof(Swoosh, nodes.tail), "Trail.clock");
+_Static_assert(__builtin_offsetof(Trail, length) == __builtin_offsetof(Swoosh, length), "Trail.length");
+#endif
 
 typedef struct {
     /* 0x00 */ u8 kind;
