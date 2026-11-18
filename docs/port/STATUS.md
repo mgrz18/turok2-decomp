@@ -206,6 +206,27 @@ by the new legacy lines. ABI (`abicheck.py` on a fresh PIE build: 3,077 TUs, 11,
    `gEngineApp_m_SwooshSystem - 0x1C8` (f4's pattern; its callee has no C body); `aimdrive.py` waits
    forever when the game exits before it opens the pipe (kill both).
 
+
+## Round 18, part g3: the round-17 n64cmp leads (branch names-R18_g3)
+
+Detail: [FIDELITY.md](FIDELITY.md) 9-g3.
+
+- **The per-actor lights of 61/100/125 are not a host bug**: the N64 and the port dump on frames
+  of opposite `gEvenOdd`, so `m_Lights[0]` of one side is `m_Lights[1]` of the other, and the
+  buffers of objects not drawn yet hold old heap bytes on both. `n64cmp.py` now pairs the double
+  buffers by parity and skips never-written ones; every buffer written on both sides matches.
+- **125's actor 51 (and 61's actor 25) upright instead of tilted**: `CGameObjectInstance__Construct`
+  calls `GameObject_GetGroundRotation` before the AI is set up and tests `m_AI.m_dwFlags & 0xC0000`
+  on uninitialised cache memory (port: 0xFFFFFFFF/0xC318C318 -> identity; N64: bits clear -> the
+  floor tilt, reproduced exactly from the port's floor normal). An original-code uninitialised
+  read, not a host view bug; left as is (no src/ change, no route change).
+- Not done (time lost to dropped connections): 135/124/114/53, the hub with `--pad`, a boss arena,
+  the 7601 particle colours (notes in FIDELITY.md 9-g3.3).
+- Files touched: `tools/port/n64cmp.py`, docs only. No src/include change (asm_diff not needed).
+
+| commit | what |
+|---|---|
+| f2af5137 | n64cmp: pair the m_Lights double buffers across gEvenOdd parity, skip never-written ones |
 ## Round 17, part f3: the port against the N64 member by member (branch names-R17_f3)
 
 Detail: [FIDELITY.md](FIDELITY.md) 7.
