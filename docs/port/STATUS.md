@@ -244,6 +244,31 @@ every run). `mpk_saves.py` on the default run's pak: note 1, checksum OK.
    property), the original game's uninitialised reads that the zero-fill now answers with zeros
    (demo 2's health from gf 585, 135/114's ground tilt: FIDELITY.md 12).
 
+## Round 20, part i4: the ready-to-play Mac app, the first launch (branch names-R20_i4, Mac; MACOS.md 22, FIRSTRUN.md)
+
+- **Staged app**: `/Users/miguel_garcia/Documents/Proyectos/turok2_macport/OUT/play/Turok2.app`
+  (Release, this branch; the ROM and `turok2.o2r` inside `Contents/Resources`, signed after they were
+  added; never zip it). `apptest.sh OUT/play/Turok2.app - - W`: codesign ok, every dylib from the
+  bundle, the files from the bundle, engine mode 11, exit 0. FIRSTRUN.md opens with a 10-minute test.
+- **The fresh user's path** (QUICKSTART 1-2 on a scratch clone of 70f3333c, deleted after): 3 min
+  20 s from the clone to the executable on the M5, apptest OK; drift fixed (brew's "already
+  installed" errors with `HOMEBREW_NO_INSTALL_UPGRADE`, the timings, the window size).
+- **First launch** (port/app/main.cpp, t2controls.cpp): the window is 4:3, N x 320x240 points
+  (largest N that fits in 90% of the display; 960x720 on a 14" MacBook), centred (was 640x480 at the
+  top left); the controls box shows once (`gT2ControlsShown`); a bundle's own game files come first
+  (a stale Application Support copy cannot shadow them); the log's `files:` line names them.
+  Headless, scripted and `--pad-test` runs unchanged (640x480, no box).
+- **Tools**: `mkapp.sh` `T2_APP_ARCHIVE` / `T2_APP_ROM` (refused with `T2_APP_ZIP`), version 0.20;
+  `apptest.sh` `-` for bundled files.
+- **Static review**: every `getenv` (105 sites) is inert unless set; mouse 2.0, OpenGL, no host
+  audio gain, logs in Application Support: kept (MACOS.md 22.2).
+- **Runs on the Mac** (ASLR on): the default command md5 `0959aac5…` (this branch and a fresh
+  70f3333c build), 0 deaths; `--legacy` (290,000) md5 `281904eb…`, 2 deaths as documented.
+- **Merge**: files `port/app/main.cpp` (data search order, first-launch window block, `files:` line),
+  `port/app/t2controls.cpp/.h` (`T2Controls_RegisterSettings(save, firstLaunchBox)`),
+  `tools/port/mkapp.sh`, `tools/port/apptest.sh`, docs QUICKSTART/FIRSTRUN/MACOS 22. No `src/`,
+  `include/`, data symbol or det change.
+
 ## Round 19, part h1: determinism under ASLR, the level-135 two paths fixed (branch names-R19_h1)
 
 STABILITY.md 13. **The level-135 ASLR divergence is found and fixed**: the ground tilt that
