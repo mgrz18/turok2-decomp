@@ -131,10 +131,13 @@ endif()
 # x.o2r`); a plain zip is enough here. Later: fonts, port UI assets, gamecontrollerdb.
 set(T2_PORT_O2R ${CMAKE_BINARY_DIR}/t2port.o2r)
 file(GLOB_RECURSE _t2_shaders CONFIGURE_DEPENDS ${T2_LUS_DIR}/src/fast/shaders/*)
+# (staged by port/cmake/t2_shaders.cmake: the Metal shader gets a compile fix, MACOS.md 20.1)
 add_custom_command(OUTPUT ${T2_PORT_O2R}
+    COMMAND ${CMAKE_COMMAND} -DSRC=${T2_LUS_DIR}/src/fast/shaders -DDST=${CMAKE_BINARY_DIR}/t2port_shaders/shaders
+            -P ${T2_PORT_DIR}/cmake/t2_shaders.cmake
     COMMAND ${CMAKE_COMMAND} -E tar cf ${T2_PORT_O2R} --format=zip --mtime=1980-01-01 shaders
-    WORKING_DIRECTORY ${T2_LUS_DIR}/src/fast
-    DEPENDS ${_t2_shaders}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/t2port_shaders
+    DEPENDS ${_t2_shaders} ${T2_PORT_DIR}/cmake/t2_shaders.cmake
     COMMENT "Packing t2port.o2r (Fast3D shaders)")
 add_custom_target(t2port_o2r ALL DEPENDS ${T2_PORT_O2R})
 add_dependencies(turok2 t2port_o2r)
