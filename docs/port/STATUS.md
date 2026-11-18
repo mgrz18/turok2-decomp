@@ -277,6 +277,43 @@ the host's typed `t2audio_world.c` writes it by name (`padFC`).
    sound player's array: the host now treats it as stopped, section 3; `n64trace.py --calls
    alSndpGetState` would show the value it reads).
 
+## Round 19, part h1: determinism under ASLR, the level-135 two paths fixed (branch names-R19_h1)
+
+STABILITY.md 13-h1. **The level-135 ASLR divergence is found and fixed**: the ground tilt that
+`CGameObjectInstance__Construct` builds for each level actor tests `m_AI.m_dwFlags & 0xC0000`
+before `CAI__Setup` writes it (the original game's uninitialised read, FIDELITY.md 9.2); the
+actors' block comes from `CCache__AllocateMemoryForDecompression`, not cleared, and on the host
+its old bytes hold host pointers, so with ASLR some actors stood upright or leaned with the floor
+from run to run. In 135 actor 41 (lying on a slope) got other bone matrices at its first pose
+(~75,662), a particle from one of its nodes moved, and the route took its second path.
+
+- **Fix** (asm_diff 0, `TARGET_PORT` only): the host `CCache__AllocDecompressFlags`
+  (func_00205D7C.c) zeroes the block it allocates (the N64's bits were clear where checked, so
+  this also matches the console there); `CGameObjectInstance__PoseBone` (func_0021B95C.c) gives
+  the bone wobble (`func_0021B59C`, objects with `m_dwFlags & 0x800000`) the object's N64-heap
+  address (`T2Port_N64Address`, port/runtime/t2boot.c) instead of the host pointer it used as a
+  phase. New det switch **`T2_DET_POSE=1`** (with `T2_DET_ACTORS`): per actor the head turn/tilt,
+  blend, both animation channels (and a hash of their data), sight target, ground quaternion and
+  orientation hash.
+- **CCache keys** (the round-18 suspect): every `CCache__Request` key is a ROM address; no host
+  pointer reaches `find()`.
+- **The default stream changes** (the zeroed blocks are a behaviour change, kept): the default
+  command now gives det md5 **`a9f9584e…`** (600,000 lines) under `setarch -R` AND with ASLR on
+  (4 of 4), END 2 (cinema 370 at 253,310), all five totems, no life lost in the game (hurtsum
+  `deaths 0`; 422 hits). Timeline: Harbor 23,190, City 88,574, Marsh 109,647, Cave 129,390,
+  the Blind One 138,849, Hive 164,560, the Queen 180,185, the Mother 213,078, the Primagen with cinema 370
+  253,310, level 10 (END 2) 256,302. **The thinnest spot is now the City Totem: 97 damage, lowest health 3** (was 83 / 17);
+  135 199 / 14, 133 182 / 18, the lair 138 / 36.
+- **The scenario** (the default to 84,000, `T2_DET_LOG=1 T2_DET_ACTORS=1 T2_DET_FROM=72000`):
+  `4d392c08…` in 18 runs with ASLR on (two different binaries; plus the 4 whole-game ASLR runs above) and under `setarch -R`. Before
+  the fix: 5 of 9 ASLR runs to 76,500 took the second path.
+- `--legacy` (290,000 frames, `setarch -R`): END 2 (cinema 370 at 245,402), 5 totems, 2 lives lost in the City Totem as in round 18; md5 `281904eb…` (was `ecb9f9f2…`).
+
+Files: src/us/code/func_00205D7C.c, src/us/code/func_0021B95C.c, port/runtime/t2boot.c,
+port/game/t2det.c, docs/port/STABILITY.md (13-h1, 12.3 title). Next: re-tune the City Totem on
+the new stream (lowest health 3); the round-18 g2 "third path" (before 38,997) did not show in
+this round's ASLR runs.
+
 ## Round 18, part g2: address-layout determinism, the gptr checker, the fifo watchdog (branch names-R18_g2)
 
 - **A layout-dependent branch found and fixed** (STABILITY.md 12.1): the three N64 stack-depth
