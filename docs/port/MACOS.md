@@ -1455,3 +1455,31 @@ The default `--all` route under aimdrive.py, Release, every frame drawn on the C
 - Measurements on a Mac in use (browsers, WindowServer at ~50% CPU sharing the GPU) are noisy; the
   unpaced numbers repeat (round 16: 38-43 s for the whole game, here 35-39 s without drawing and
   97 s drawn).
+
+## 20. Round 18 (part g4): the player's window defaults
+
+Branch `names-R18_g4` (from ab0bc24c), Mac (M5, macOS 27.2) only, headless (no window was opened).
+No change to `src/` or `include/`. Release build in `OUT/build_r18`.
+
+### 20.1 Metal: broken for the player, now fixed and checked headless; OpenGL stays the default
+
+- **`--offscreen-metal`** (port/app/offscreen_gl.cpp): LUS's `GfxRenderingAPIMetal` with no window.
+  It takes its `CAMetalLayer` and drawable size from an `SDL_Renderer` through two calls only
+  (`SDL_GetRenderMetalLayer`, `SDL_GetCurrentRenderOutputSize`); the executable defines both (its
+  definition wins over libSDL3's for LUS's static library): for a stand-in renderer they answer
+  with a `CAMetalLayer` in no window and the fixed size, for any other renderer they call SDL's
+  (`dlsym(RTLD_NEXT)`), so a Metal window is untouched. The game framebuffer is read back each
+  frame (LUS's compute readback commits and waits), then copied at 8 bits (`T2_SHOT`).
+- **The first run aborted**: LUS's Metal shader (`shaders/metal/default.shader.metal`) declares
+  `thread const texture2d<float> tex`, `thread const sampler`, `thread const int` parameters, which
+  this Metal compiler rejects ("parameter may not be qualified with an address space"). The
+  library does not compile and the first draw dies in pipeline validation. **A player who
+  launched the app with the default (Metal) got this.** Fix (no LUS change):
+  `port/cmake/t2_shaders.cmake` stages the shaders for `t2port.o2r` and drops the qualifier (by
+  value; same meaning). The OpenGL shader is byte-identical (md5 checked).
+- **Metal = OpenGL, pixel for pixel**: the boot to 3,000 VIs (legal, pak, Acclaim, Iguana),
+  `T2_SHOT_EVERY=600`, 8-bit: all 5 pairs identical (0 differing pixels).
+- **Default: OpenGL** anyway (every check of the port since round 5 used it, and the drawn route
+  was never run on Metal): CVar **`gT2Renderer`** (0 OpenGL, 1 Metal) is written into
+  `Window.Backend.Id` before `Fast3dWindow::Init` at each launch (t2display.cpp), so a config
+  saved with Metal (3) by an earlier launch goes back to OpenGL (2). Metal is opt-in.
