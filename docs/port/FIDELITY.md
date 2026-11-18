@@ -522,10 +522,16 @@ so an intensity/alpha pair came out as a random saturated colour.
   addresses get a new buffer (never an old address with new contents). Shots (port frame 1701 /
   N64 emulator frame 690, gf 64/65; port 1925 / N64 779): the shaft is now the pale white-yellow
   cone the N64 draws and the mist dark grey, where they were cyan, green, magenta and blue.
+- **The particle colours themselves are right**: in 124 at gf 20 every live particle has the
+  N64's spawn colours (type 122: prim 255,255,255, env 179,0,255; type 226: prim 255,255,0, env
+  255,115,0 on both sides), so `Color_ShiftHue`/`Color_Saturate`/`Color_Darken` and the template
+  copy (RENDER.md 7.1's suspects) are cleared.
 - **Still different**: the arena's walls and floor are olive-green on the port and brown on the
   N64 (Rice). The scene light is the same on both (`gSceneLights` ambient 56,56,56, colour 255,
-  white, direction -80,57,-68: `--peek` against a port print), so the lead is the walls' palettes
-  (kinds 0/1, RGBA16) or the combiner/fog, not the game state.
+  white, direction -80,57,-68: `--peek` against a port print), the textures of the scene are kinds
+  0, 1 and 3 only (no detail/mipmap kind 4), and the hub at gf 75 gives the same picture on both
+  sides; so the lead is this arena's own geometry display lists (their combiner, fog or a TLUT
+  type set there) rather than the game state.
 - **A second host bug found on the way** (`Texture_DecompressCallback`, func_00206990.c, asm_diff
   0): the callback gets the `CCacheEntry` being completed and read the recolour mode (the top two
   bits of the ROM address, `requestId`) at N64 offset 8, on the host the high half of
