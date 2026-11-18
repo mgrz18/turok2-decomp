@@ -300,6 +300,53 @@ class Side:
         return out
 
 
+# The per-frame double buffers (CGameObjectInstance.m_Lights[2], written at [gEvenOdd] when the
+# object is drawn): the N64 and the port can dump on frames of opposite gEvenOdd parity (the
+# frames counted since boot differ with the load time), so buffer i of one side is buffer i^1 of
+# the other. Pair them the way that matches more members (round 18 g3: the "m_Lights differ" of
+# 61 and 100 were this plus never-written buffers).
+DOUBLE_BUFFERED = ["m_Lights["]
+
+
+def pair_buffers(fn, fp):
+    for pre in DOUBLE_BUFFERED:
+        for base in set(p[:p.index(pre)] for p in fn if pre in p):
+            head = base + pre
+            keys = [p for p in fn if p.startswith(head) and p in fp]
+            if not keys:
+                continue
+
+            def other(p):
+                return head + str(int(p[len(head)]) ^ 1) + p[len(head) + 1:]
+            same_n = sum(fn[p] == fp[p] for p in keys)
+            swap_n = sum(other(p) in fp and fn[p] == fp[other(p)] for p in keys)
+            if swap_n > same_n:
+                old = dict((p, fp[p]) for p in keys)
+                for p in keys:
+                    if other(p) in old:
+                        fp[p] = old[other(p)]
+            # a buffer never written (the object not drawn since its memory was taken) holds old
+            # heap bytes on both sides: CScene__ComputeLights/CScene__GetLightsAt and the default
+            # lights always write each colour twice (Ambient/Light col == colc)
+            for i in (0, 1):
+                b = "%s%d]." % (head, i)
+                if not (written(fn, b) and written(fp, b)):
+                    for p in keys:
+                        if p.startswith(b):
+                            fn.pop(p, None)
+                            fp.pop(p, None)
+
+
+def written(f, b):
+    try:
+        if all(f[b + "m_Dir[%d]" % j] == -1 and f[b + "m_AmbCol[%d]" % j] == 255 for j in range(3)):
+            return False  # the pools' 0xFF fill (a direction (-1, -1, -1) is never written)
+        return all(f[b + "m_AmbCol[%d]" % j] == f[b + "m_AmbColCopy[%d]" % j] and
+                   f[b + "m_Col[%d]" % j] == f[b + "m_ColCopy[%d]" % j] for j in range(3))
+    except KeyError:
+        return True
+
+
 def same(a, b, tol):
     if isinstance(a, float) and isinstance(b, float):
         if a == b or (a != a and b != b):
@@ -344,6 +391,7 @@ def compare(n64, port, a):
                 lines.append("  %s%d: only on the %s" % (k[0].strip(), k[1], "N64" if k in sn.recs else "port"))
                 continue
             fn, fp = sn.fields(k), sp.fields(k)
+            pair_buffers(fn, fp)
             diffs = []
             live = None
             if k[0] == "SCN ":

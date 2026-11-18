@@ -65,6 +65,7 @@
 #include "t2controls.h"
 #include "ship/audio/Audio.h"
 #include "offscreen_gl.h"
+#include "t2display.h"
 #endif
 extern "C" {
 #include "t2asset.h"
@@ -148,6 +149,8 @@ struct Args {
     bool skipPakCheck = false; // DEBUG-ONLY (t2debug.c)
     int startMode = -1;        // DEBUG-ONLY (t2debug.c)
     bool offscreenGl = false;  // --offscreen-gl (macOS)
+    bool offscreenMetal = false; // --offscreen-metal (macOS, round 18 g4: LUS's Metal renderer, no window)
+    float renderScale = 0.0f;  // --render-scale S (0: the gT2RenderScale setting; t2display.cpp)
     int benchFrom = -1;        // --bench [FROM] (debug, PERF.md)
     bool pace = false;         // --pace (debug, PERF.md)
     // Round 9 (x5, STABILITY.md): the game memory above 4 GB is the default everywhere; the
@@ -241,12 +244,19 @@ Args ParseArgs(int argc, char** argv) {
         } else if (s == "--offscreen-gl") {
             a.offscreenGl = true; // macOS: draw with no window (offscreen_gl.cpp); implies --no-window
             a.window = false;
+        } else if (s == "--offscreen-metal") {
+            a.offscreenGl = true; // the same, with LUS's Metal renderer (offscreen_gl.cpp)
+            a.offscreenMetal = true;
+            a.window = false;
+        } else if (s == "--render-scale" && i + 1 < argc) {
+            a.renderScale = (float)atof(argv[++i]); // the game frame's resolution x S (t2display.cpp)
         } else {
             fprintf(stderr, "usage: %s [--archive turok2.o2r] [--port-archive t2port.o2r] [--rom baserom.us.z64] [--frames N] [--no-window]\n"
                             "          [--game [--draw] [--audio] [--wav out.wav] [--verbose] [--low-memory]\n"
                             "                  [--no-pak | --pak-blank | --pak-dir DIR]\n"
                             "                  [--input BUTTON@FRAME[..LAST],SX=V@F..L,...|@FILE] [--skip-pak-check] [--start-mode N]]   (the last three: debug only)\n"
-                            "          [--offscreen-gl]   (macOS: Fast3D on a CGL context with no window; T2_SHOT works)\n"
+                            "          [--offscreen-gl | --offscreen-metal]   (macOS: Fast3D on a CGL context / a CAMetalLayer with no window; T2_SHOT works)\n"
+                            "          [--render-scale S]   (the game frame at S x the window's pixels, offscreen S x 640x480; default the gT2RenderScale setting, 1)\n"
                             "          [--bench [FROM]] [--pace]   (debug: frame times from VI FROM; real-time 60 Hz VI pacing)\n"
                             "       %s [--play [--archive F] [--rom F] [--pak-dir D] [--no-audio] [--no-pace]]\n"
                             "          (no arguments = --play: the game in a window with sound, files from the user data dir)\n"
@@ -431,6 +441,7 @@ int main(int argc, char** argv) {
     // headless runs)
     if (args.game && (args.play || args.window || !args.padTest.empty())) {
         T2Controls_RegisterSettings(args.play || args.window);
+        T2Display_RegisterSettings(args.play || args.window); // gT2Renderer, gT2RenderScale (t2display.cpp)
         printf("window: config %dx%d, fullscreen %d (Window.Width/Height, Window.Fullscreen.Enabled)\n",
                config->GetInt("Window.Width", 640), config->GetInt("Window.Height", 480),
                config->GetBool("Window.Fullscreen.Enabled", false) ? 1 : 0);
@@ -566,7 +577,11 @@ int main(int argc, char** argv) {
     std::string err;
     if (T2Asset_OpenLus(archives, &err) != 0) {
         fprintf(stderr, "FAIL: T2Asset_OpenLus: %s\n", err.c_str());
-        return 1;
+        // (round 18 merge) not `return 1`: tearing down the half-opened LUS context crashed (SIGSEGV
+        // after this message, e.g. an --archive that does not exist); leave without the destructors
+        fflush(stdout);
+        fflush(stderr);
+        std::_Exit(1);
     }
     printf("T2Asset over ArchiveManager: %u units in t2/units, byte swap %s\n", T2Asset_UnitCount(),
            T2Asset_SwapActive() ? "on (t2/swap plans, little-endian host)" : "off");
@@ -662,6 +677,7 @@ int main(int argc, char** argv) {
         GfxSetFast3dWindow(window);
         auto fileDrop = std::make_shared<Ship::FileDrop>(window);
         context->GetChildren().Add(fileDrop);
+        T2Display_ChooseRenderer(config); // OpenGL unless gT2Renderer = 1 (Metal): Window.Backend.Id
         window->Init();
         fileDrop->Init();
         window->SetRendererUCode(ucode_f3dex2); // "F3DEX.NoN fifo 2.05" = F3DEX2 (include/globals/ucode.h)
@@ -686,8 +702,14 @@ int main(int argc, char** argv) {
                SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "?", window->GetWidth(),
                window->GetHeight());
     }
-    if (args.offscreenGl && !T2Offscreen_Init(cvars, resourceManager, 640, 480)) {
-        return 1;
+    if (args.offscreenGl) {
+        // --render-scale (or the setting) sizes the offscreen frame: 2 = what a 2x (retina) window draws
+        const float scale = T2Display_RenderScale(args.renderScale);
+        const uint32_t w = (uint32_t)(640 * scale + 0.5f), h = (uint32_t)(480 * scale + 0.5f);
+        if (!(args.offscreenMetal ? T2Offscreen_InitMetal(cvars, resourceManager, w, h)
+                                  : T2Offscreen_Init(cvars, resourceManager, w, h))) {
+            return 1;
+        }
     }
 #ifdef T2_HAVE_GAME
     if (args.game) {
@@ -707,6 +729,7 @@ int main(int argc, char** argv) {
         g.benchFrom = args.benchFrom;
         g.pace = args.pace;
         g.audioDevice = audioDevice;
+        g.renderScale = args.renderScale;
         CHECK(T2Game_Run(window, g) == 0, "game run");
         CHECK(T2Swoosh_SelfTest() == 0, "swoosh system self test");   // port/game/t2swoosh.c
     }

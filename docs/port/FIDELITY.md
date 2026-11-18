@@ -400,3 +400,75 @@ the port computes them at another point of the frame (the dump follows the drawn
 125** keeps an identity ground quaternion: the ground alignment for type 135 (the `m_qGround`
 writers: `func_00219BC0.c`, `func_0024C47C.c`, `func_0025C018.c`, ...) does not run or reads the
 floor normal differently on the host.
+
+## 9. The two round-17 leads (Phase 7 round 18, part g3)
+
+Run with the round-17 settings (`n64cmp.py run --warp -(L+1) --level L`, seed at the load and at
+gf 1, ticks 2, port `--audio --draw`, Release build at ab0bc24c): 61 (gf 1-5) and 125 (gf 1-10).
+
+### 9.1 The per-actor lights (`m_Lights`, `m_ShadowAlpha`): not a host bug
+
+`CGameObjectInstance.m_Lights[2]` is a double buffer written at `[gEvenOdd]` when the object is
+drawn (`CScene__GetLightsAt`, `CScene__ComputeLights`, `gDefaultLights`). Two things made 8's
+"lights differ for most actors":
+
+- **the buffer parity**: the N64 and the port dump on frames of opposite `gEvenOdd` (the frames
+  counted since boot differ with the load time), so the N64's `m_Lights[0]` is the port's
+  `m_Lights[1]`. 61's type-366 actors 51 and 54: the same colours and direction
+  ((56, 68, 69), (255, 255, 255), (-96, 82, -5)) in opposite slots.
+- **never-written buffers**: an object not drawn yet keeps the cache allocator's old bytes on both
+  sides (`AmbCol != AmbColCopy`, or the pools' 0xFF fill with a direction (-1, -1, -1)).
+
+`n64cmp.py` now pairs the two buffers the way that matches more members (`pair_buffers`) and drops
+a buffer that is unwritten on either side (`written`). On 61 at gf 1-5 the remaining LVL/DYN/PLR
+differences are `m_ShadowAlpha` (an uninitialised byte, NOISE) and actor 25's ground tilt (9.2);
+by an independent check at gf 1, 32 of the 34 buffers written on both sides at the same index
+are equal, and the other two are the parity swap (actor 54) and the 0xFF fill (actor 26). `m_ShadowAlpha` stays in NOISE.
+
+### 9.2 125's actor 51 (and 61's actor 25): the ground tilt reads uninitialised AI flags
+
+Only `m_qGround`, `m_mfOrient` and the bounds of LVL51 differ in 125 (every other level actor is
+equal at gf 1-2; the whole run differs in 3,035 members over gf 1-10, mostly the camera's menu pool and the m_VarBuffer views). N64 (0.0144, -0, 0.1907, 0.9815), port identity. Instrumented
+`GameObject_GetGroundRotation` (temporary, not committed): it runs twice per level actor, first from
+`CGameObjectInstance__Construct` (`m_qGround = GameObject_GetGroundRotation(obj)`, func_00219BC0.c)
+**before the AI is set up**, then later. In the first call `obj->m_AI.m_dwFlags` is whatever the
+cache memory held (port: 0xFFFFFFFF, 0xC318C318, 0xC5280529...; the actors' block comes from
+`CCache__AllocateMemoryForDecompression` in `CScene__DecompressAnimatedInstances`, not cleared),
+and `& 0xC0000` sends it to the identity. The region's floor normal on the port is
+(-0.374, 0.927, 0.028): its `floorTilt` gives exactly the N64's quaternion, so on the N64 those
+bits were clear. The later call (AI flags 0x8040) does not store into `m_qGround` for this actor
+(type 1, `m_dwFlags` 0x70000: no 0x300000, so `func_0021A500` does not slerp it).
+
+So this is the original code's read of uninitialised memory, not a host view bug: both machines
+read old heap bytes, and the N64's happened to have the bits clear. Matching the N64 here would
+mean modelling its heap contents (or clearing the block on load, which the N64 does not do); it is
+left as is. Visible effect: a few placed objects on sloped floors stand upright on the port
+instead of leaning with the floor (125's actor 51 at (3328, 1229, -4147), type 135).
+
+### 9.3 Not done this round
+
+The sweep of 135, 124, 114, 53, the hub after walking (`--pad`) and a boss arena, and the hub pad
+cut-scene's particle colours (RENDER.md 7.1): the session lost most of its time to dropped
+connections. Notes for the particle colours: the template colours are bytes (`CROMParticleColors`
+copied raw in `port/game/t2particles.c`, no swap needed), `EntryColor`'s view in
+func_0022D2FC.c matches the struct (hue/sat/val ranges at 0x0C-0x0E), and `Color_ShiftHue`
+takes the hue as `u8` and reads it as `(s8)`; next step: dump one cinema particle's
+`rgb0/rgb1` on both sides with `n64cmp.py run --warp 7601` (level 3) and compare the spawn
+colour against the template's before the hue shift.
+
+## 10. The round-18 merge: the default route on the N64 stream, the demos again (Phase 7 round 18, the merge C33)
+
+- **The default whole-game route now runs with no legacy switch** (PLAYTHROUGH.md 38): the camera
+  shake (round 16 e1), the type-9 props (round 17 f3) and the headless sound world (round 17 merge)
+  as on the N64, the stream a human player gets. `--legacy` keeps the old one for the routes tuned
+  on it.
+- **The boot and the demos** (26,000 frames, `--pak-blank`, Release): the 52,000 det lines are
+  round 17's build's on both streams (no switch: `197b2dd6…`; the three legacy switches:
+  `3df81cf3…`). Against fresh N64 traces of this round (`n64trace.py` + `detdiff.py`, no switch):
+  **demo 1 (gf 1-1,128) and demo 3 (gf 1-344) no difference in any field but `rng`** (from gf 8 of
+  demo 1: the N64's audio thread draws during the load, 7.3); demo 2 the known `player.hp` (and the
+  weapon actor's mirror of it) from gf 608, the N64's uninitialised read. As in round 17.
+- g2's fixes are layout fixes: the stack-depth guards never fired in the usual layout and the
+  multiplayer camera head is not read in a single-player game, so no N64-facing number moved.
+- Not done this round (FIDELITY.md 9.3): the rest of the n64cmp sweep (135, 124, 114, 53, the hub
+  with `--pad`, a boss arena) and the 7601 particle colours.

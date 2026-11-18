@@ -24,6 +24,14 @@
 #include "fast/interpreter.h"
 #include <OpenGL/OpenGL.h>
 #include <chrono>
+#include <cstring>
+#include <dlfcn.h>
+#include <vector>
+
+#include "fast/backends/gfx_metal.h"
+#include <Metal/Metal.hpp> // metal-cpp (LUS's; its implementation is in gfx_metal.cpp)
+#include <SDL3/SDL_render.h>
+#include <imgui.h>
 
 namespace Fast {
 void GfxSetInstance(std::shared_ptr<Interpreter> gfx); // interpreter.cpp (no header declares it)
@@ -33,7 +41,7 @@ namespace {
 
 class NoWindowBackend final : public Fast::GfxWindowBackend {
   public:
-    NoWindowBackend(uint32_t w, uint32_t h) : mWidth(w), mHeight(h) {
+    NoWindowBackend(uint32_t w, uint32_t h, bool gl) : mWidth(w), mHeight(h), mGl(gl) {
     }
     void Init(const char*, const char*, bool, uint32_t, uint32_t, int32_t, int32_t) override {
     }
@@ -90,7 +98,9 @@ class NoWindowBackend final : public Fast::GfxWindowBackend {
         return true;
     }
     void SwapBuffersBegin() override {
-        glFlush();
+        if (mGl) {
+            glFlush();
+        }
     }
     void SwapBuffersEnd() override {
     }
@@ -122,6 +132,7 @@ class NoWindowBackend final : public Fast::GfxWindowBackend {
 
   private:
     uint32_t mWidth, mHeight;
+    bool mGl; // false: --offscreen-metal (no GL context at all)
 };
 
 CGLContextObj sContext = nullptr;
@@ -160,7 +171,7 @@ bool T2Offscreen_Init(const std::shared_ptr<Ship::ConsoleVariable>& cvars,
     printf("offscreen-gl: CGL context without a drawable: %s, %s\n", (const char*)glGetString(GL_RENDERER),
            (const char*)glGetString(GL_VERSION));
 
-    sWapi = new NoWindowBackend(width, height);
+    sWapi = new NoWindowBackend(width, height, true);
     sRapi = new Fast::GfxRenderingAPIOGL(cvars, resources);
     sInterp = std::make_shared<Fast::Interpreter>();
     Fast::GfxSetInstance(sInterp);
@@ -175,6 +186,125 @@ bool T2Offscreen_Init(const std::shared_ptr<Ship::ConsoleVariable>& cvars,
     return true;
 }
 
+
+// ---- --offscreen-metal (round 18 g4): LUS's Metal renderer with no window ----
+// GfxRenderingAPIMetal takes its CAMetalLayer and the drawable size from an SDL_Renderer (the
+// window's), through two SDL calls only: SDL_GetRenderMetalLayer and SDL_GetCurrentRenderOutputSize.
+// This file defines both (the executable's definition wins over libSDL3's for the objects linked
+// into it: LUS's static library): for the stand-in renderer below they answer with a CAMetalLayer
+// that is in no window (Core Animation draws nothing, nextDrawable still hands out textures) and
+// the fixed size; for every other renderer they call SDL's own (a player's Metal window).
+// The game framebuffer is read back after each frame (the Metal renderer's own compute readback,
+// which commits the frame's command buffer and waits for it), then copied at 8 bits per channel.
+namespace {
+char sStandInRenderer; // its address is the stand-in SDL_Renderer*
+CA::MetalLayer* sMetalLayer = nullptr;
+Fast::GfxRenderingAPIMetal* sMetalRapi = nullptr;
+std::vector<uint8_t> sMetalRGB8; // the last frame, top row first
+uint32_t sMetalW = 0, sMetalH = 0;
+bool sMetalHave = false;
+} // namespace
+
+extern "C" {
+SDL_DECLSPEC void* SDLCALL SDL_GetRenderMetalLayer(SDL_Renderer* renderer) {
+    if (renderer == (SDL_Renderer*)&sStandInRenderer) {
+        return sMetalLayer;
+    }
+    static auto real = (void* (*)(SDL_Renderer*))dlsym(RTLD_NEXT, "SDL_GetRenderMetalLayer");
+    return real ? real(renderer) : nullptr;
+}
+SDL_DECLSPEC bool SDLCALL SDL_GetCurrentRenderOutputSize(SDL_Renderer* renderer, int* w, int* h) {
+    if (renderer == (SDL_Renderer*)&sStandInRenderer) {
+        *w = (int)sMetalW;
+        *h = (int)sMetalH;
+        return true;
+    }
+    static auto real = (bool (*)(SDL_Renderer*, int*, int*))dlsym(RTLD_NEXT, "SDL_GetCurrentRenderOutputSize");
+    return real ? real(renderer, w, h) : false;
+}
+}
+
+bool T2Offscreen_InitMetal(const std::shared_ptr<Ship::ConsoleVariable>& cvars,
+                           const std::shared_ptr<Ship::ResourceManager>& resources, uint32_t width, uint32_t height) {
+    if (!Metal_IsSupported()) {
+        fprintf(stderr, "offscreen-metal: no Metal device\n");
+        return false;
+    }
+    MTL::Device* device = MTL::CreateSystemDefaultDevice();
+    sMetalLayer = CA::MetalLayer::layer();
+    if (device == nullptr || sMetalLayer == nullptr) {
+        fprintf(stderr, "offscreen-metal: no device or CAMetalLayer\n");
+        return false;
+    }
+    sMetalLayer->retain();
+    sMetalLayer->setDevice(device);
+    sMetalLayer->setDrawableSize(CGSizeMake(width, height));
+    sMetalW = width;
+    sMetalH = height;
+    // ImGui_ImplMetal_Init (in MetalInit) needs an ImGui context; nothing is drawn with it
+    if (ImGui::GetCurrentContext() == nullptr) {
+        ImGui::CreateContext();
+    }
+    sWapi = new NoWindowBackend(width, height, false);
+    sMetalRapi = new Fast::GfxRenderingAPIMetal(cvars, resources);
+    if (!sMetalRapi->MetalInit((SDL_Renderer*)&sStandInRenderer)) {
+        fprintf(stderr, "offscreen-metal: MetalInit failed\n");
+        return false;
+    }
+    printf("offscreen-metal: Metal device %s, a CAMetalLayer in no window, %ux%u\n",
+           device->name()->utf8String(), width, height);
+    sInterp = std::make_shared<Fast::Interpreter>();
+    Fast::GfxSetInstance(sInterp);
+    auto debugger = std::make_shared<Fast::GfxDebugger>();
+    new std::shared_ptr<Fast::GfxDebugger>(debugger);
+    new std::shared_ptr<Fast::Interpreter>(sInterp);
+    sInterp->SetGfxDebugger(debugger);
+    sInterp->Init(sWapi, sMetalRapi, "Turok2", false, width, height, 0, 0, cvars, resources);
+    sMetalRapi->SetTextureFilter(Fast::FILTER_THREE_POINT);
+    return true;
+}
+
+static bool MetalDraw(void* gfx) {
+    sInterp->StartFrame();
+    sMetalRapi->NewFrame(); // framebuffer 0: the layer's next drawable (Fast3dGui's StartFrame does it in a window)
+    sInterp->Run(static_cast<Gfx*>(gfx), {});
+    const uint32_t w = sInterp->mCurDimensions.width, h = sInterp->mCurDimensions.height;
+    // commits the game framebuffer's commands and waits for them (from the second frame on)
+    static std::vector<uint16_t> rgba16;
+    rgba16.resize((size_t)w * h);
+    sMetalRapi->ReadFramebufferToCPU(sInterp->mGameFb, w, h, rgba16.data());
+    auto* tex = static_cast<MTL::Texture*>(sMetalRapi->GetFramebufferTextureId(sInterp->mGameFb));
+    sMetalHave = false;
+    if (tex != nullptr && tex->storageMode() != MTL::StorageModePrivate && tex->width() == w && tex->height() == h) {
+        std::vector<uint8_t> bgra((size_t)w * h * 4);
+        tex->getBytes(bgra.data(), w * 4, MTL::Region::Make2D(0, 0, w, h), 0);
+        sMetalRGB8.resize((size_t)w * h * 3);
+        for (size_t i = 0; i < (size_t)w * h; i++) {
+            sMetalRGB8[i * 3 + 0] = bgra[i * 4 + 2];
+            sMetalRGB8[i * 3 + 1] = bgra[i * 4 + 1];
+            sMetalRGB8[i * 3 + 2] = bgra[i * 4 + 0];
+        }
+        sMetalHave = true;
+    } else {
+        static bool told = false;
+        if (!told) {
+            told = true;
+            fprintf(stderr, "offscreen-metal: the game framebuffer cannot be read (storage %d)\n",
+                    tex ? (int)tex->storageMode() : -1);
+        }
+    }
+    sInterp->EndFrame();
+    return true;
+}
+
+bool T2Offscreen_MetalRGB8(uint32_t w, uint32_t h, uint8_t* rgb) {
+    if (sMetalRapi == nullptr || !sMetalHave || sMetalRGB8.size() != (size_t)w * h * 3) {
+        return false;
+    }
+    memcpy(rgb, sMetalRGB8.data(), sMetalRGB8.size());
+    return true;
+}
+
 std::shared_ptr<Fast::Interpreter> T2Offscreen_Interpreter() {
     return sInterp;
 }
@@ -182,6 +312,9 @@ std::shared_ptr<Fast::Interpreter> T2Offscreen_Interpreter() {
 bool T2Offscreen_Draw(void* gfx) {
     if (!sInterp) {
         return false;
+    }
+    if (sMetalRapi != nullptr) {
+        return MetalDraw(gfx);
     }
     sInterp->StartFrame();
     sInterp->Run(static_cast<Gfx*>(gfx), {});
@@ -194,7 +327,7 @@ int T2Offscreen_ShotFramebuffer() {
 }
 
 void T2Offscreen_Finish() {
-    if (sInterp) {
+    if (sInterp && sMetalRapi == nullptr) { // Metal: MetalDraw waited for the frame
         glFinish();
     }
 }
@@ -216,6 +349,14 @@ int T2Offscreen_ShotFramebuffer() {
     return 0;
 }
 void T2Offscreen_Finish() {
+}
+bool T2Offscreen_InitMetal(const std::shared_ptr<Ship::ConsoleVariable>&, const std::shared_ptr<Ship::ResourceManager>&,
+                           uint32_t, uint32_t) {
+    fprintf(stderr, "--offscreen-metal: macOS only\n");
+    return false;
+}
+bool T2Offscreen_MetalRGB8(uint32_t, uint32_t, uint8_t*) {
+    return false;
 }
 
 #endif

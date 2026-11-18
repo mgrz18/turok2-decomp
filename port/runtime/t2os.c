@@ -1,7 +1,11 @@
 /* t2os: libultra threads / message queues / events on host threads. See t2os.h. */
+#if defined(__linux__) && !defined(_GNU_SOURCE)
+#define _GNU_SOURCE /* pthread_getattr_np (t2os_stack_low) */
+#endif
 #include "t2os.h"
 
 #include <pthread.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -471,4 +475,35 @@ void t2os_dump(void) {
                 (void *)h->waitq, h->waitkind == WAIT_RECV ? "recv" : h->waitkind == WAIT_SEND ? "send" : "-");
     }
     pthread_mutex_unlock(&sLock);
+}
+
+/* Round 18 g2: the game's stack-depth guards (`(uptr) &local < (uptr) &D_800C894C`, D_800C894C =
+ * gThreadStackMain + 0xCCC: "less than 0xCCC bytes of the N64 main stack left") compared a host
+ * stack address with a host data address: the answer depended on the address layout (always "no"
+ * with the usual PIE layout, always "yes" with the executable mapped above the thread stacks, e.g.
+ * run through ld.so: the region walk of the wall sweep then stopped at its first region). The host
+ * answer is now "less than 64 KB of the current host thread's own stack left": layout-independent,
+ * and, with 8 MB game stacks, never true in play (the N64 stack is 32 KB and the guard is not hit in
+ * a normal game either). */
+int t2os_stack_low(const void *local) {
+    static __thread uintptr_t sLow;
+    if (sLow == 0) {
+        uintptr_t bottom = 0;
+#if defined(__APPLE__)
+        pthread_t self = pthread_self();
+        bottom = (uintptr_t) pthread_get_stackaddr_np(self) - (uintptr_t) pthread_get_stacksize_np(self);
+#elif defined(__linux__)
+        pthread_attr_t a;
+        void *addr = NULL;
+        size_t size = 0;
+        if (pthread_getattr_np(pthread_self(), &a) == 0) {
+            if (pthread_attr_getstack(&a, &addr, &size) == 0) {
+                bottom = (uintptr_t) addr;
+            }
+            pthread_attr_destroy(&a);
+        }
+#endif
+        sLow = bottom != 0 ? bottom + (64u << 10) : 1;
+    }
+    return (uintptr_t) local < sLow;
 }

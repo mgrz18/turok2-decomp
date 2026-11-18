@@ -68,6 +68,7 @@ void T2Port_DebugSwitches(int skipPak, int startMode);
 
 #include "game.h"
 #include "offscreen_gl.h"
+#include "t2display.h"
 
 // the game's screen size (render.h; Video_SetMode writes it)
 extern "C" int32_t gScreenWidth, gScreenHeight;
@@ -567,6 +568,15 @@ void WriteShot(const std::shared_ptr<Fast::Fast3dWindow>& window, const char* sh
     // RGBA5551 readback (the low 3 bits of each channel dropped, as in shots before round 17)
     static const bool rgb16 = getenv("T2_SHOT_RGB16") != nullptr;
     std::vector<uint8_t> rgb8((size_t)w * h * 3);
+    if (!rgb16 && !window && T2Offscreen_MetalRGB8(w, h, rgb8.data())) { // --offscreen-metal: top row first
+        if (FILE* fp = fopen(shot, "wb")) {
+            fprintf(fp, "P6\n%u %u\n255\n", w, h);
+            fwrite(rgb8.data(), 1, rgb8.size(), fp);
+            fclose(fp);
+            printf("game: wrote %s (%ux%u, Metal)\n", shot, w, h);
+        }
+        return;
+    }
     if (!rgb16 && T2Gl_ReadRGB8(interp, window ? 0 : T2Offscreen_ShotFramebuffer(), w, h, rgb8.data())) {
         if (FILE* fp = fopen(shot, "wb")) {
             fprintf(fp, "P6\n%u %u\n255\n", w, h);
@@ -1023,6 +1033,9 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
                 if (badWords > 0) {
                     skippedBad++; // Fast3D would dereference a truncated pointer: not drawn
                 }
+            }
+            if (badWords == 0 && window) {
+                T2Display_UpdateWindow(window, args.renderScale); // retina: the frame at pixel resolution
             }
             if (badWords == 0 &&
                 (window ? window->DrawAndRunGraphicsCommands((Gfx*)task.dataPtr, {}) : T2Offscreen_Draw(const_cast<void*>(task.dataPtr)))) {

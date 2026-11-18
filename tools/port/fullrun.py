@@ -27,6 +27,11 @@ import routes56 as r56  # noqa: E402
 
 
 STICK_AIM = set()   # round 15 d3: the levels aimed with the stick (--stick-aim)
+STICK_FREE_WALK = {5, 6}   # round 18 g5: --stick-aim levels whose route walks keep the script's yaw
+# round 18 g5: per route level, the sub-levels where the stick driver prefers the assist's target (T2_AIMD_PRIMARY):
+# level 5's pylons (124), the cocoons and embryos (94, 95, 96) and the Queen's node (2); level 6's Mother (3) and the Primagen (4)
+STICK_PRIMARY = {5: (124, 94, 95, 96, 2), 6: (3, 4)}
+LAIR_PUSH = ""       # round 18 g5: --lair-push toward|jump|both (T2_LAIR_PUSH; "" = off: the routes unchanged)
 ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
 NAV = set()         # round 16 e3: the levels whose NAV_WALKS teleports the waypoint walker replaces (--nav)
 NAV_ROM = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "baserom.us.z64")
@@ -64,6 +69,7 @@ class Route:
         self.fight_level = {}    # name -> its level (1-4)
         self.cheats_on = set()   # sub-levels (the totems: 109 110 111 112) kept invincible (--cheats-on)
         self.walked = 0
+        self.walks = []          # round 18 g5: (first, last frame) of each teleport's C-up walk
         self.walk_probe = False
         self.walk = set()        # round 15 d5 (--walk): the levels whose open-floor teleports are walked
         # round 15 d2 (--real-weapons): no T2_GIVE_WEAPONS / T2_FILL_AMMO before this frame (the
@@ -107,6 +113,7 @@ class Route:
         self.tps.append("%d:%.1f,%.1f,%.1f,%.4f%s" % (f, x, y, z, ry, "!" if trig else ""))
         if walk:
             self.inputs.append("CU@%d..%d" % (f + 10, f + 10 + walk))
+            self.walks.append((f, f + 20 + walk))   # round 18 g5: no stick turn during the walk (STICK_FREE_WALK)
 
     def pick(self, f, x, y, z, ang=0.0, d=90.0, walk=50):
         """Stand d units from a pickup (or an action) at (x, y, z), facing it, and walk into it."""
@@ -180,7 +187,23 @@ class Route:
                 a, b = self.fights[k]
                 wins = [w for w in wins if w[1] < a or w[0] > b] + \
                        [(w[0], a - 1) for w in wins if w[0] < a <= w[1]] + [(b + 1, w[1]) for w in wins if w[0] <= b < w[1]]
+            # round 18 g5: in the levels of STICK_FREE_WALK the stick leaves the teleports' walks alone (level 5's
+            # embryo window ran on into 91's walk to the exit 7500: the stick turned to a new target and the
+            # walk went back to 124). Levels 1-4 keep round 17's windows (their validated runs).
+            def lv_of(fr):
+                return max([l for l, g in starts if g <= fr] or [1])
+            for a, b in self.walks:
+                if lv_of(a) in STICK_FREE_WALK & STICK_AIM:
+                    wins = [w for w in wins if w[1] < a or w[0] > b] + \
+                           [(w[0], a - 1) for w in wins if w[0] < a <= w[1]] + [(b + 1, w[1]) for w in wins if w[0] <= b < w[1]]
             env.append("T2_AIM_STICK=\"%s\"" % ";".join("%d-%d" % w for w in sorted(wins)))
+            # round 18 g5: the stick driver takes the assist's own target first in these sub-levels (aimdrive.py
+            # T2_AIMD_PRIMARY: the objectives, not the sleeping or out-of-play actors near them)
+            prim = sorted(set(l for lv in STICK_AIM for l in STICK_PRIMARY.get(lv, ())))
+            if prim:
+                env.append("T2_AIMD_PRIMARY=%s" % ",".join(str(l) for l in prim))
+            if 6 in STICK_AIM:   # round 18 g5: the Mother's parts: always the assist's node (aimdrive.py)
+                env.append("T2_AIMD_PRIMARY_ONLY=3")
         if self.move_drive:
             env.append("T2_MOVE_DRIVE=\"%s\"" % ";".join("%d-%d" % w for w in sorted(self.move_drive)))
         if self.walk_plan:   # round 16 e3: aimdrive.py's waypoint walker (WalkDrive)
@@ -600,6 +623,34 @@ def n64(lv):
     """Round 17 f2: whether level lv (7: the Primagen's lair) is played on the N64's random numbers
     (--n64-shake, or --n64-shake-from L with lv >= L): the route changes for that stream apply."""
     return N64_SHAKE or (N64_FROM is not None and lv >= N64_FROM)
+# Round 18 g1 (--n64): the weapon of a level-2 segment on the N64's stream {segment: (weapon, frames after its
+# start)}; the plasma rifle (10) again 50 frames before the next segment. T2G1_L2W="9:9:0,6:8:0" overrides (tests)
+N64_L2_WEAPON = {9: ("9", -400)}   # 134: the shredder (21 damage instead of 118 and a life with the plasma rifle)
+if os.environ.get("T2G1_L2W") is not None:
+    N64_L2_WEAPON = {int(e.split(":")[0]): (e.split(":")[1], int(e.split(":")[2]))
+                     for e in os.environ["T2G1_L2W"].split(",") if e}
+
+
+def n64_full():
+    """Round 18 g1: no legacy switch at all (--n64): the stream a human player gets."""
+    return N64_SHAKE and N64_PROPS and N64_SOUND
+
+
+# Round 18 g1 (--n64): 133 (sister 1) leaves the player with ~18 health on this stream and 130's ultra health
+# (+100 to 200) comes next: the health +10 (object 542, +10 below 100) of 133 and 130 first, so the ultra health
+# lifts a full 100 (tools/assets/levels.py grid sections). 133's two by its exit (picks before the exit step),
+# 130's ten at the start of its second visit (before the ultra health of L2_HEALTH[7])
+N64_FULL_L2_PICKS = [(6, 2, [(644.9, -4761.6, -1156.9, 0.0), (1190.2, -4761.6, -1155.7, 0.0)])]
+N64_FULL_L2_HEALTH = {7: [(-2405.3, -4761.6, 5545.7, 0.0), (-2135.0, 204.8, 3506.0, 0.0), (-581.3, -5.2, 3644.5, 0.0),
+                          (-512.0, -11.3, -2560.0, 0.0), (-512.0, -10.7, -2764.8, 0.0), (2246.1, -2150.4, 2102.3, 0.0),
+                          (5581.0, -3993.6, 1285.7, 0.0), (5580.1, -3379.2, 1275.8, 0.0), (6451.2, 307.2, 3527.7, 0.0),
+                          (6448.8, 307.2, 4057.7, 0.0)],
+                      # 132's last visit (after sister 3: 135 leaves ~70 health and the City Totem is next)
+                      # (the two on 1,331 and the two on 1,106 stand the player over a lower floor with a damage region: dropped)
+                      13: [(941.4, 716.8, -1907.8, 0.0), (512.4, 716.8, -1904.1, 0.0), (-1382.4, 179.4, -1792.0, 0.0),
+                           (-1382.4, 179.4, -1331.2, 0.0), (4410.7, 409.6, -4062.9, 0.0)]}
+# Round 18 g1 (--n64): the weapon for the Mantid Queen (None: level 5 s shredder); T2G1_QW overrides ("": none)
+N64_QUEEN_WEAPON = os.environ.get("T2G1_QW", "16") or None   # the scorpion launcher: 6-95 damage, 43-138 (a life) with the shredder
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
 # Round 17 f1: pick steps put before a step of a segment (segment, before step, [(x, y, z, approach
 # angle)]): each pick is a KEY_STEP-frame step (pick()'s stand and walk-in); the step and the later
@@ -771,6 +822,7 @@ def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back
     for f, lv in trips:
         talisman(r, start + f, lv)
     r.steps(out, start)
+    r.seg_starts = {i: start + f for i, f in starts.items()}   # round 18 g1: the segments' schedule frames
     for i, dt, x, y, z, ang in retry:
         r.pick(start + starts[i] + dt, x, y, z, ang)
     for i, dt, x, y, z, ry in back:
@@ -1133,15 +1185,22 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     l2retry = L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else [])
     l2back = L2_RETURN_LATE if h2 else ()
     if N64_SHAKE and N64_L2_PICKS:   # round 17 f1: health picks between 135's crypt steps
-        l2segs, l2stretch, l2retry, l2back = insert_picks(l2segs, N64_L2_PICKS, l2stretch, l2retry, l2back)
+        picks = N64_L2_PICKS + (N64_FULL_L2_PICKS if n64_full() and h2 else [])   # round 18 g1: 133's too
+        l2segs, l2stretch, l2retry, l2back = insert_picks(l2segs, picks, l2stretch, l2retry, l2back)
     heal = 0
     if L2_HEAL:   # round 17 f5 (after f1's picks: these go before 135's exit step)
         l2segs, heal = l2_heal(l2segs)
-    a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {}) if extras else {},
+    a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, N64_FULL_L2_HEALTH if h2 and n64_full() else {}, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {}) if extras else {},
                         l2retry, l2stretch,
                         back=l2back, detours=det.get(2),
                         walks=nav_table(2) if 2 in NAV else L2_WALKS if 2 in walk else None, nav_walks=2 in NAV)
+    if n64_full():   # round 18 g1: weapons per level-2 segment on the N64's stream (N64_L2_WEAPON)
+        for si, (w, dt) in sorted(N64_L2_WEAPON.items()):
+            r.weapon.append((r.seg_starts[si] + dt, w))
+            r.weapon.append((r.seg_starts[si + 1] - 50, "10"))
     a2 += heal
+    if n64_full() and h2:   # round 18 g1: 133's and 130's health picks move the later hub arrivals as well
+        heal += KEY_STEP * (sum(len(it) for si, sj, it in N64_FULL_L2_PICKS) + sum(len(v) for v in N64_FULL_L2_HEALTH.values()))
     for k in hubs:   # round 17 f5: --l2-heal's picks move the City Totem and every later hub arrival
         if k >= 2:
             hubs[k] += heal
@@ -1311,6 +1370,8 @@ def level5(r, t):
     r.fire.append((s + rel + add, s + rel + add + length))
     r.face_levels.append(lv)
     rel, length = r56.L5_BOSS
+    if n64_full() and N64_QUEEN_WEAPON:   # round 18 g1: requested in 113, taken when her level loads
+        r.weapon.append((s + L5_QUEEN_AT + add - 800, N64_QUEEN_WEAPON))
     r.anchors.append((s + L5_QUEEN_AT + add, 2))
     r.note(s + rel + add, "2 the Mantid Queen: fire held, T2_AIM_NODE=boss@2, T2_BOSS_FRONT=450,200")
     r.inputs.append("Z@%d..%d" % (s + rel + add, s + rel + add + length))
@@ -1386,6 +1447,11 @@ def level6(r, t):
         # a life lost in a rescue run (the ending's own life loss at his death is not this)
         r.cheat_windows.append((lair - 200, lair + L6_HUB_END))
     r.note(lair, "4 the Primagen's lair: fire held, strafing, T2_BOSS_FRONT=450,3000,2.5,1")
+    # round 18 g5: the lair as a fight (--assist-keep lair: the assists' yaw in a --stick-aim 6 run)
+    r.fights["lair"] = (lair, lair + L6_HUB_END)
+    r.fight_level["lair"] = 6
+    if LAIR_PUSH:   # round 18 g5 (--lair-push): aimdrive.py's LairDrive against the Primagen's push (mode 20)
+        r.extra_env.append("T2_LAIR_PUSH=%s" % LAIR_PUSH)
     if 4 not in r.cheats_on:
         # round 15 d1: the Primagen without invincibility: the shredder (9) as at the Mother. The
         # Primagen recipe (T2_WARP_TO=7602): his death at 27,856 instead of 43,586 (plasma rifle), his
@@ -1426,6 +1492,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
+    global LAIR_PUSH
     global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_SOUND, N64_FROM, LAIR_KEEP, L2_HEAL
     import argparse
     ap = argparse.ArgumentParser()
@@ -1451,6 +1518,8 @@ def cli(argv=None):
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
     ap.add_argument("--late-keys", action="store_true",
                     help="Primagen keys 2 and 3 in after level 5, round 13's walks after levels 2 and 3 (round 14 c3)")
+    ap.add_argument("--lair-push", default="", help="toward|jump|both: the lair driver answers the Primagen's push "
+                    "(his mode 20) by walking towards him and/or jumping (round 18 g5; needs the lair driver)")
     ap.add_argument("--stick-aim", default="", help="L1,L2,...: these levels aim with the stick only, closed-loop "
                     "(run under tools/port/aimdrive.py; round 15 d3)")
     ap.add_argument("--assist-keep", default="", help="with --stick-aim: these fights keep the aim assists "
@@ -1475,6 +1544,12 @@ def cli(argv=None):
     ap.add_argument("--n64-sound", action="store_true", help="the sound world in the headless run (no "
                     "T2_LEGACY_NOSOUND: the sound requests draw their random numbers as with --audio and on the "
                     "N64; round 17 merge): not tuned yet")
+    ap.add_argument("--n64", action="store_true", help="no legacy switch at all: --n64-shake --n64-props "
+                    "--n64-sound together, the stream a human player gets (round 18 g1; the default since the "
+                    "round 18 merge: kept as an explicit spelling)")
+    ap.add_argument("--legacy", action="store_true", help="the old stream the routes before round 18 were tuned on "
+                    "(round 18 merge): T2_LEGACY_SHAKE, T2_LEGACY_INTEL9 and T2_LEGACY_NOSOUND; --n64-shake, "
+                    "--n64-props, --n64-sound then lift one each (the validated combinations of rounds 13-18)")
     ap.add_argument("--n64-shake-from", type=int, default=None, choices=(4, 5, 6, 7),
                     help="DEBUG-ONLY (round 17 f2): the old stream (T2_LEGACY_SHAKE) up to the hub visit before "
                     "level L (7: the Primagen's lair), the N64's from there; with --n64-shake's level 4-6 changes")
@@ -1485,9 +1560,14 @@ def cli(argv=None):
     ap.add_argument("--hub-wait", type=int, default=ARMS_HUB_WAIT,
                     help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
-    N64_SHAKE = a.n64_shake
-    N64_PROPS = a.n64_props
-    N64_SOUND = a.n64_sound
+    # round 18 merge: the N64's stream (no T2_LEGACY_* line, g1's --n64) is the default; --legacy is the old one
+    if a.legacy and a.n64:
+        ap.error("--legacy and --n64 exclude each other")
+    if a.n64_shake_from is not None and not a.legacy:
+        ap.error("--n64-shake-from needs --legacy (the old stream up to level L)")
+    N64_SHAKE = a.n64_shake or not a.legacy
+    N64_PROPS = a.n64_props or not a.legacy
+    N64_SOUND = a.n64_sound or not a.legacy
     N64_FROM = a.n64_shake_from
     LAIR_KEEP = a.lair_keep
     LAIR_FRONT = a.lair_front
@@ -1499,6 +1579,7 @@ def cli(argv=None):
     L2_HEAL = a.l2_heal
     HOP = a.hop
     STICK_AIM = {int(x) for x in a.stick_aim.split(",") if x}
+    LAIR_PUSH = a.lair_push
     NAV = {int(x) for x in a.nav.split(",") if x}
     if a.nav_only is not None:
         NAV_ONLY = {tuple(int(v) for v in k.replace(":", ".").split(".")) for k in a.nav_only.split(",") if k}

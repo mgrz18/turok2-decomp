@@ -878,6 +878,8 @@ void T2Port_TraceBoss(int frame) {
  * floats) and takes back the next frame's C buttons (tools/port/aimdrive.py's lair driver keeps the
  * player on the Primagen lair's floor while he strafes). What a player sees; nothing is written into
  * the game: the answer goes through the input stream only. */
+extern s32 GameObject_IsOnGround(CGameObjectInstance *obj);
+
 int T2Port_MovePose(int frame, char *buf, int n) {
     static const char *spec;
     static int init;
@@ -906,8 +908,19 @@ int T2Port_MovePose(int frame, char *buf, int n) {
     }
     pl = &p->m_CharacterActor;
     if (b != NULL) {
-        snprintf(buf, n, "move %d %a %a %a %a %a %a %a\n", frame, pl->header.m_vPos.x, pl->header.m_vPos.y,
-                 pl->header.m_vPos.z, pl->m_RotY, b->header.m_vPos.x, b->header.m_vPos.y, b->header.m_vPos.z);
+        /* round 18 g5: "bm M" appended: the boss's AI mode (the Primagen's push is mode 20, a 15-frame
+         * wind-up a player sees, then ~11 frames of 716.8 (on the ground) / 179.2 (in the air) added to
+         * the player's velocity away from him: Primagen_UpdateMode20). Older parsers ignore it. */
+        snprintf(buf, n, "move %d %a %a %a %a %a %a %a bm %d\n", frame, pl->header.m_vPos.x, pl->header.m_vPos.y,
+                 pl->header.m_vPos.z, pl->m_RotY, b->header.m_vPos.x, b->header.m_vPos.y, b->header.m_vPos.z,
+                 (int) b->m_AI.m_Mode);
+        if (b->m_AI.m_Mode == 20 && getenv("T2_PUSH_LOG") != NULL) {
+            /* T2_PUSH_LOG=1 (round 18 g5): the player while the Primagen pushes (debug output only) */
+            printf("lairpush: frame %d player (%.1f %.1f %.1f) vel (%.1f %.1f %.1f) ground %d boss (%.1f %.1f %.1f)\n",
+                   frame, pl->header.m_vPos.x, pl->header.m_vPos.y, pl->header.m_vPos.z,
+                   pl->m_vVelocity.x, pl->m_vVelocity.y, pl->m_vVelocity.z, (int) GameObject_IsOnGround(pl),
+                   b->header.m_vPos.x, b->header.m_vPos.y, b->header.m_vPos.z);
+        }
     } else {
         snprintf(buf, n, "move %d %a %a %a %a nan nan nan\n", frame, pl->header.m_vPos.x, pl->header.m_vPos.y,
                  pl->header.m_vPos.z, pl->m_RotY);

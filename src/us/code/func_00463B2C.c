@@ -14,6 +14,7 @@
 #include "protos/scene.h"
 #include "protos/player.h"
 #include "protos/game.h"
+#include "globals/onscreen.h"
 
 
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
@@ -143,7 +144,13 @@ loaded:
     CCollisionInfo__Reset();
     func_00466040(&w->m_DLightSet);
     LoopSounds_Construct(&gLoopSounds, gLoopSoundEntries, 0xF);
+#ifdef TARGET_PORT
+    /* the ROM finds COnScreen 0x1C8 bytes before the swoosh system (its N64 size); on the host the
+     * two are not that far apart (the same fix as CScene__LoadLevel's, func_0042AC0C.c) */
+    func_00467ADC(&gEngineApp_m_OnScreen);
+#else
     func_00467ADC(gEngineApp_m_SwooshSystem - 0x1C8);
+#endif
     if (*w->m_pLevels < level) {
         level = *w->m_pLevels - 1;
         announce = 0;

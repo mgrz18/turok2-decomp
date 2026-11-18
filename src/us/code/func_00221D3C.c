@@ -62,7 +62,13 @@ void CScene__BuildGeometryDisplayList(CScene *w) {
     mask = gEngineApp_m_Settings_difficulty.mask;
     vmask = gCameraVisBits;
     if (gSceneGeometryDL == NULL) {
+#ifdef TARGET_PORT
+        /* the N64 reads gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead 0x1210 bytes before
+         * the difficulty; on the host the two are 0x1358 apart (round 18 g2, n64viewcheck gptr) */
+        views = (CCamera *) gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
+#else
         views = *(CCamera **)((u8 *)&gEngineApp_m_Settings_difficulty - 0x1210);
+#endif
         if (views == NULL) {
             return;
         }

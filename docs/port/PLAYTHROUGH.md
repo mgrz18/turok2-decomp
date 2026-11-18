@@ -3402,3 +3402,222 @@ read of memory whose contents depend on it). Until it is found, compare md5s on 
   draws), demo 2 `player.hp` from gf 608 (the N64's uninitialised read).
 - **The level runs** (`--level 1..6`) and **the four boss recipes**: det identical to b744bd39's.
 - **Save, title, load**, **`--audio --wav`**, **padtest**, **soak**: STATUS.md section 2.
+
+## 36. The route with no legacy switch: `--n64` to the good ending with no life lost (Phase 7 round 18, part g1)
+
+`fullrun.py --n64` (also `playthrough.py RUN --all ... --n64`, and `playthrough.py --level N --n64`) is
+`--n64-shake --n64-props --n64-sound` together: `teleport.env` carries none of the three legacy
+switches, so the game runs on the stream a human player gets (the N64's camera shake, the N64's
+type-9 props, the sound world's random numbers). **`playthrough.py RUN --all --talismans 2
+--cheats-off 1,2,3,4,5,6 --n64` reaches END 2 at 250,566 with all 5 totems and no life lost**
+(Linux Release, PIE, under `aimdrive.py`, 300,000 frames; round 17: game over in 125 at 108,496).
+The legacy command is unchanged: its `playthrough.txt` and `teleport.env` are byte-identical to
+round 17's and its run gives det md5 `ecb9f9f2…` (580,000 lines, END 2 at 252,194).
+
+### 36.1 What the N64 stream changed, and the fixes (all only when `n64_full()`: the three switches off)
+
+| where | before (round 17's `--n64-shake --n64-props --n64-sound`) | fix |
+|---|---|---|
+| 133 (sister 1) | 182 damage, the player leaves with 18 | none; but the ultra health of 130 next lifted only to 118 |
+| 130 again | the ultra health (+100 to 200) taken at 18 health: 118 | **`N64_FULL_L2_HEALTH[7]`**: ten health +10 of 130 (object 542, +10 below 100) first, 8 reached (18 -> 98), then the ultra health: 198 |
+| 134 (zombies 2-4, sister 2) | the plasma rifle: zombie 3 stands 180 units off and hits for 1,300 frames (118 damage, a life; a second one in the retry) | **the shredder** (`N64_L2_WEAPON = {9: ("9", -400)}`: requested 400 frames before the segment, taken at the level load; the plasma rifle again 50 frames before 131): **21 damage**, 177 left |
+| 135 (crypts, sister 3) | (not reached) | none: 199 damage with f1's 7 picks, 14 left |
+| 132 again (after 135) | the City Totem next with ~70 health: 87 damage, **a life** | **`N64_FULL_L2_HEALTH[13]`**: five health +10 of 132 (71 -> 100) before the talisman trip; the totem then costs 83 (17 left), no life |
+| the Mantid Queen (level 5) | the shredder: 138 damage, **a life** (95-108 with other histories) | **the scorpion launcher** (`N64_QUEEN_WEAPON = "16"`, requested 800 frames before her level loads): **6 damage** (95 on another history), no life |
+
+133's two health +10 by its exit (`N64_FULL_L2_PICKS`) are in the table too but the walk-in does not
+reach them (the pickup log shows neither); two of 130's ten are missed the same way; four of 132's
+nine stand the player over a lower floor with a damage region (10 every 2 frames: a life in one
+test) and were dropped. Each pick is a 150-frame step; the picks move the City Totem and every
+later hub arrival (1,950 frames: `hubs[k]` as `--l2-heal`'s), so the run's last input is at 288,480
+(run 300,000 frames, not 290,000).
+
+The weapon changes go through `T2_WEAPON`, which `T2_GIVE_WEAPONS` applies when a level loads
+(t2debug.c): a request scheduled after the level load waits for the next load (the first test,
+at the segment's start, changed nothing). Test hooks (DEBUG-ONLY): `T2G1_L2W="seg:weapon:dt,..."`
+replaces `N64_L2_WEAPON`, `T2G1_QW=W` the Queen's weapon (`""`: none).
+
+### 36.2 Health per fight on the N64 stream (`hurtsum`, the final command; damage, lowest health)
+
+| visit | damage, min | visit | damage, min |
+|---|---|---|---|
+| 109 the Harbor Totem | 96, 104 | 112 the Cave Totem | 42, 158 |
+| 133 sister 1 | 182, **18** | 1 the Blind One | 51, 107 |
+| 134 sister 2 | 21, 177 | 124 | 32, 75 |
+| 135 sister 3 | 199, **14** | 113 the Hive Totem | 43, 132 |
+| 110 the City Totem | 83, **17** | 2 the Queen | 6, 126 |
+| 64 | 27, 78 | 117 | 21, 170 |
+| 111 the Marsh Totem | 48, 152 | 3 the Mother | 34, 166 |
+| | | 4 the Primagen's lair | 68, 98 |
+
+The thin spots are 133, 135 and the City Totem (14-18 left). With the shredder at the Queen instead
+(same route otherwise) the run also reached END 2 with no life lost (247,530; Queen 43 damage, lair
+85). Earlier variants on this stream: without the 132 picks a life at the City Totem and, with the
+shredder, one at the Queen (END 2 at 253,892, 2 lives); with the scorpion launcher but no 132 picks,
+the Queen held and a life went in the lair to the Primagen's throw (one hit of 118 at 2,177 units,
+the knock-off of 33.2: part g5's subject); `--l2-heal` on top (f5's 135 picks) dies in 135 (do not
+combine).
+
+### 36.3 Runs (Linux Release, PIE, `aimdrive.py`, `setarch -R`, each in its own directory)
+
+| command | result | det md5 |
+|---|---|---|
+| (default, legacy switches) | END 2 at 252,194, 2 lives (110) | `ecb9f9f2…` (= round 17) |
+| `--n64` (final) | **END 2 at 250,566, 0 lives**, totems 11111 | `6213496b…` (3 runs) |
+| `--n64`, Queen on the shredder (`T2G1_QW=`) | END 2 at 247,530, 0 lives | `dbddd148…` |
+| `--n64` before the 132 picks and the Queen weapon | END 2 at 253,892, 2 lives (110, Queen) | `32ad4b97…` (twice) |
+
+## 37. Levels 5-6 by stick, the Primagen's push (Phase 7 round 18, part g5)
+
+Legacy switches on (the default route's stream) unless said otherwise. Linux Release, PIE, under
+`aimdrive.py`, 290,000 frames, each run in its own directory, the default command plus
+`--real-weapons 1 --l2-heal --hub-wait 0` and the options shown.
+
+### 37.1 Level 5 by stick: three driver fixes
+
+`--stick-aim 1,2,3,4,5,6` with round 17's driver (s6) never reached the Hive Totem: after 93 the
+level exit 7500 led back to 124 (the anchor `113@...` then waited to the end of the run).
+
+- **The exit 7500 goes to the Hive Totem only when all three embryos are dead.** In 95 the picker
+  spent ~150 of embryo 2's 600 frames on actor 104 (179 units, full health, never hurt, kind 0)
+  and the embryo was left with 8,412 of 65,280 at the window's end ("embryo destroyed." twice).
+  **`T2_AIMD_PRIMARY=L,...`** (aimdrive.py, written by fullrun.py from `STICK_PRIMARY`): in those
+  sub-levels the candidate nearest the assist's own target point (within `T2_AIMD_PRIMARY_R`,
+  600) costs `T2_AIMD_PRIMARY_X` (0.2) times as much; when it is chosen the stick aims at the
+  assist's point itself (a boss node), not at the candidate's origin. Level 5: 124 (pylons), 94,
+  95, 96 (cocoons and embryos), 2 (the Queen); level 6: 3, 4.
+- **The Queen's origin is never hurt** (her health is hit through `T2_AIM_NODE`'s node): aimed at
+  the origin she took 11,100 frames and a life (s6c); at the node 8,744 frames, 70 damage, 63 left
+  (s6d).
+- **The route's walks** (a teleport plus `CU` for `walk` frames) keep the script's yaw in levels 5
+  and 6 (`STICK_FREE_WALK`): the stick windows leave out every such walk there (levels 1-4 keep
+  round 17's windows: c4's `teleport.env` is byte-identical).
+
+### 37.2 Level 6 by stick: the Mother
+
+**The Mother's parts are nodes 900-1,500 units from both of her candidates' origins.** Aimed at the
+origins (s6d) her six parts took 5,400 frames instead of ~2,000 while she hits the pinned player
+every ~80 frames: 307 damage, 2 lives. **`T2_AIMD_PRIMARY_ONLY=3`** (written with `--stick-aim 6`):
+in her arena the stick always aims at the assist's node. s6e: 114 damage, 86 left, no life lost.
+
+### 37.3 The Primagen's push (the "throw" of 33.2)
+
+`Primagen_UpdateMode20` (mode 20, `Primagen_EnterMode20`: `swayTimer` 15, `timer` 11.25): after the
+wind-up, while he sees the player, 716.8 (on the ground) or 179.2 (in the air) is added to the
+player's velocity away from him each frame until `timer` runs out; then mode 7, and when he has
+lost sight of the player mode 1 with **bossState 10** (`Primagen_UpdateMode7` -> `Primagen_EnterMode1`):
+bossState 10 is the after-effect (the player already gone), not the attack.
+
+Measured (`T2_PUSH_LOG=1`, new: a `lairpush` line every frame of mode 20 with the player's position,
+velocity and ground flag; on f2's F+37 history, `--n64-shake-from 4` with `T2_LEGACY_SHAKE=1,113861`):
+he stands on the floor 535 units away; **the keep-away rule (`T2_LAIR_KEEP=800`) walks the player
+away from him, towards the edge**; 64 frames into mode 20 the velocity jumps to ~1,000 units/s
+outward, and 90 frames later the player is below the floor (y -850 at schedule 254,450; the hit
+of 82 at d 1,557 is the fall). Game over (the second life lost there).
+
+**`--lair-push toward|jump|both`** (fullrun.py -> `T2_LAIR_PUSH`; aimdrive.py's `LairDrive`, before
+the edge guard and the keep-away): the move line now ends in `bm M` (the boss's AI mode,
+t2bosslog.c); for `T2_LAIR_PUSH_LEN` (110) frames from his entering mode 20, "toward" walks towards
+him, "jump" holds `r1` from `T2_LAIR_PUSH_JUMP_AT` (55) frames in, "both" does both. Off by default:
+the default route's inputs are byte-identical to ab0bc24c's. On the F+37 history with `both`: the
+player walks back in to ~1,014, is in the air when the push comes (y 80, velocity ~1,070 outward),
+**stays on the floor**; END 2 at 251,460 with one life lost in the lair (an earlier hit, before the
+push, as in the run without it) instead of the game over.
+
+### 37.4 Runs
+
+| run | options added | result |
+|---|---|---|
+| c4 / c4b | `--stick-aim 1,2,3,4` (round 17's combo; c4b on this part's binary and driver) | END 2 at 248,808, no life lost; the gameplay lines of c4 and c4b identical (md5 `92312c48…`) |
+| s6 | `--stick-aim 1,2,3,4,5,6`, round 17's driver | stuck in 124 (embryo 2 alive), 1 life |
+| s6c | + primary target, walks free | Hive Totem, the Queen 1 life, the Mother 181, the lair game over |
+| s6d | + the boss node | the Queen 70 damage (0 lives), the Mother 307 (2 lives), lair game over |
+| s6e | + `T2_AIMD_PRIMARY_ONLY=3` | **END 2 at 264,480**, 5 totems, 4 bosses; the Mother 114 (0 lives); **3 lives lost in the lair** (295 damage) |
+| s6g | `--stick-aim 1,2,3,4,5,6 --lair-push both` | as s6e (no push came: the same lair, 3 lives) |
+| **s6f** | `--stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both` | **END 2 at 248,500, 5 totems, 4 bosses, no life lost** (the `death` at 262,598 is the new game after the credits); the Mother 114 damage, the lair 64 (lowest 22), two pushes answered (192 frames) |
+| f37 / f37p | `--n64-shake-from 4`, F+37, `T2_PUSH_LOG=1`; f37p `T2_LAIR_PUSH=both` | f37 game over in the lair (the throw); f37p END 2 at 251,460, 1 life in the lair |
+
+Health per fight in s6e (start / damage / lowest): Hive Totem 166/33/133, the Queen 133/70/63, 117
+63/20/43, the Mother 200/114/86, the lair 91/295/5 (3 lives). In the lair the stick spent most of
+its frames on the Primagen's spawns (ids 10000+: ~7,900 of ~16,000 aim frames; him, actor 2: 6,500) and on actors 50-52;
+the assisted lair (c4) costs 27 hits and no life.
+
+### 37.5 Not done: sister 2 on real weapons
+
+Not attempted this round (time). What f5 found stands (34.4); the two leads: fight only zombie 4
+(gate 8's key) by going to the gate first (zombies 2 and 3 follow from 1,700 units: their 80 health
+each would still need shells), or the plasma rifle of 132 by a jump (`r1`) before 134 (the route
+reaches 132 after 134 today).
+
+## 38. The round-18 merge: the N64 stream is the default, `--legacy` (Phase 7 round 18, the merge C33)
+
+### 38.1 The flip
+
+g1 (section 36) proposed making its `--n64` route the default. The merge did it in
+`tools/port/playthrough.py` and `tools/port/fullrun.py`:
+
+- **No option**: the N64 stream (`--n64-shake --n64-props --n64-sound` together, no `T2_LEGACY_*`
+  line in `teleport.env`), for `--all` and for `--level`. `--n64` is kept as the explicit spelling.
+- **`--legacy`**: the three switches written again (the stream every route before round 18 was
+  tuned on); with it, `--n64-shake`, `--n64-props` and `--n64-sound` lift one each as before.
+  `--n64-shake-from L` needs `--legacy`; `--legacy --n64` is an error.
+
+Route files (`playthrough.txt`, `teleport.env`; generated only): the plain command is
+byte-identical to g1's `--n64`; `--legacy` alone and `--legacy` + each validated combination
+(`--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0`, `--n64-shake`, `--real-weapons 1`,
+`--stick-aim 2 --assist-keep 110`, `--nav 1,2,3,4`, `--n64-shake --n64-props`, g5's combo) are
+byte-identical to ab0bc24c's (or g5's) without `--legacy`; `--level 1..6` (`--fight 10` for 1) with
+`--legacy` = ab0bc24c's `--level N`, without = ab0bc24c's `--level N --n64-shake --n64-props
+--n64-sound`.
+
+### 38.2 Runs (Linux Release, PIE, `aimdrive.py`, each in its own directory)
+
+| command (added to `--all --talismans 2 --cheats-off 1,2,3,4,5,6`) | frames | result | det md5 |
+|---|---|---|---|
+| (none: the new default), twice, `setarch -R` | 300,000 | **END 2 at 250,566, 5 totems, 0 lives lost** | `6213496b…` (600,000 lines; = g1) |
+| `--lair-push both` | 300,000 | END 2 at 250,516, 5 totems, 0 lives | `7262aa60…` |
+| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0` | 300,000 | END 2 at 259,046, 5 totems, 1 life (the lair: 194 damage, lowest 4) | |
+| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0 --lair-push both` | 300,000 | the same END 2 at 259,046, 1 life in the lair: no push came (no `bm 20`), the life goes to his spawns | `1cef897b…` |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --hub-wait 0` | 300,000 | END 2 at 263,620, 5 totems, 1 life (the Queen by stick: 36 hits, 108 damage, lowest 7) | `7e1c8370…` |
+| `--legacy` | 290,000 | END 2 at 252,194, 5 totems, 2 lives (the City Totem) | `ecb9f9f2…` (round 16/17) |
+| `--legacy --real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --l2-heal --hub-wait 0`, twice, `setarch -R` | 290,000 | **END 2 at 248,500, 5 totems, 0 lives** (g5's s6f, now repeated without ASLR) | `47614863…` both |
+| `--legacy --real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0` | 290,000 | END 2 at 250,402, 5 totems, **0 lives** | `15d3d74f…` (round 17) |
+
+`--l2-heal` is left out on the N64 stream (g1: its picks were placed for the old one).
+
+The new default's timeline: the Harbor Totem 23,190, the City Totem 88,394, the Marsh Totem
+109,547, the Cave Totem 128,792, the Blind One 138,455, the Hive Totem 164,758, the Mantid Queen
+172,831, the Mother 205,182, the Primagen 243,774, END 2 250,566, the credits back to the hub
+264,664. Damage per fight (`hurtsum`, damage / lowest health): 135 199 / 14, 133 182 / 18, the
+Harbor Totem 96 / 104, the City Totem 83 / 17, the lair 68 / 98, the Blind One 51 / 107, the Marsh
+Totem 48 / 152, the Hive Totem 43 / 132, the Cave Totem 42 / 158, the Mother 34 / 166.
+
+### 38.3 A crash on the N64 stream, found by a drawn run
+
+The stick 1-6 combo on the N64 stream, drawn from 207,001 for a picture of the Mother, died at
+~201,878 in 2 of 3 starts under `setarch -R` (the det lines identical to the undrawn run up to
+there): SIGSEGV in `alSndpGetState` <- `SndVoicePool_StopByOwner` <- `CAudioWorld__StopSoundsByOwner`
+<- `AI_StopSound` <- `CAI__SetMode`. The sound world's voice 16 is the one voice with no player
+sound (`SndVoicePool_AllocVoice`: `idx == 0x10` takes no `alSndpAllocate`), but stopping it selects
+`handles[16]`: the array has 16 entries and the 17th is the u16 at 0xFC that every allocation
+increments (`core + 0x80`: ~20,000 late in a game). `alSndpGetState` then read the state of sound
+20,100, 1.4 MB past the 17-entry state array. Where that lands depends on the host heap:
+the undrawn runs read mapped bytes and went on, a drawn start sometimes did not. The original game does the same read on the N64
+(RAM there, and perhaps a stop posted for it). The host's typed sound player
+(`port/audio/t2audio_sndp.c`) now treats a target outside `0..maxSounds-1` (also the -1 that
+`alSndpDeallocate` leaves) as stopped and posts nothing for it. After the fix: 3 of 3 drawn
+starts pass, the new default gives `6213496b…` twice, the drawn combo the same lines as the drawn
+start that had passed (`2a3eeaae…` to 212,100), and `--legacy` `ecb9f9f2…` (no sound world there).
+
+### 38.4 Integrated runs
+
+- **The level runs** (`--fight 10`, `--level 2..6`, Release, `--pak-blank`) on both streams and
+  **the four boss recipes** (legacy switches): every det line identical to round 17's build.
+- **Boot and the demos** (26,000): both streams identical to round 17's build; against fresh N64
+  traces demos 1 and 3 differ in `rng` only, demo 2 in `player.hp` from gf 608 (FIDELITY.md 10).
+- **Save, title, load**, **`--audio --wav`**, **padtest**, the clean errors (one new: a bad
+  `--archive` now exits 1), **g2's watchdog** (a game that exits before the fifos), **soak** (62
+  runs, 0 crashes): STATUS.md section 2.
+- **ASLR** (STABILITY.md 12.3): 10 runs of the new default to 84,000 with ASLR on: 7 give the
+  `setarch -R` lines, 3 diverge in 135 (from 75,665 twice, from 75,739 once; the particle hash
+  first). Not chased.

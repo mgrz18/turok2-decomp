@@ -17,7 +17,21 @@ static ALSoundState *target_state(ALSndPlayer *sndp) {
     return &((ALSoundState *)sndp->sndState)[sndp->target];
 }
 
+/* (round 18 merge) The game selects sounds the player never allocated: voice 16 of the sound world
+ * has no player sound (SndVoicePool_AllocVoice), yet stopping it (SndVoicePool_StopByOwner,
+ * voice_stop in t2audio_world.c) selects handles[16], which is the u16 counter after the handle
+ * array (0xFC: the number of sounds allocated so far, ~20,000 late in a game), and
+ * alSndpDeallocate leaves the target at -1. The N64 then reads (and may post a stop to) a state
+ * far outside sndState; on the host that read crashed (SIGSEGV in alSndpGetState, a whole-game run
+ * at ~201,900). Here a target outside 0..maxSounds-1 reads as stopped and posts nothing. */
+static int target_ok(ALSndPlayer *sndp) {
+    return sndp->target >= 0 && sndp->target < sndp->maxSounds;
+}
+
 static void post(ALSndPlayer *sndp, s16 type, ALSndpEvent *e) {
+    if (!target_ok(sndp)) {
+        return;
+    }
     e->common.type = type;
     e->common.state = target_state(sndp);
     alEvtqPostEvent(&sndp->evtq, &e->msg, 0);
@@ -55,7 +69,7 @@ void alSndpDeallocate(ALSndPlayer *sndp, ALSndId id) {
 
 /* func_00293580 */
 s32 alSndpGetState(ALSndPlayer *sndp) {
-    return target_state(sndp)->state;
+    return target_ok(sndp) ? target_state(sndp)->state : 0; /* AL_STOPPED */
 }
 
 /* func_00293E60 */
@@ -66,7 +80,7 @@ void alSndpSetSound(ALSndPlayer *sndp, ALSndId id) {
 /* func_00293CE0 */
 void alSndpPlay(ALSndPlayer *sndp) {
     ALSndpEvent e;
-    if (target_state(sndp)->state == 0)
+    if (target_ok(sndp) && target_state(sndp)->state == 0)
         post(sndp, 0, &e);
 }
 
