@@ -3469,6 +3469,8 @@ push, as in the run without it) instead of the game over.
 | s6c | + primary target, walks free | Hive Totem, the Queen 1 life, the Mother 181, the lair game over |
 | s6d | + the boss node | the Queen 70 damage (0 lives), the Mother 307 (2 lives), lair game over |
 | s6e | + `T2_AIMD_PRIMARY_ONLY=3` | **END 2 at 264,480**, 5 totems, 4 bosses; the Mother 114 (0 lives); **3 lives lost in the lair** (295 damage) |
+| s6g | `--stick-aim 1,2,3,4,5,6 --lair-push both` | as s6e (no push came: the same lair, 3 lives) |
+| **s6f** | `--stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both` | **END 2 at 248,500, 5 totems, 4 bosses, no life lost** (the `death` at 262,598 is the new game after the credits); the Mother 114 damage, the lair 64 (lowest 22), two pushes answered (192 frames) |
 | f37 / f37p | `--n64-shake-from 4`, F+37, `T2_PUSH_LOG=1`; f37p `T2_LAIR_PUSH=both` | f37 game over in the lair (the throw); f37p END 2 at 251,460, 1 life in the lair |
 
 Health per fight in s6e (start / damage / lowest): Hive Totem 166/33/133, the Queen 133/70/63, 117
