@@ -437,7 +437,7 @@ LAIR_MARGIN = 300.0         # the clipped floor: every edge LAIR_MARGIN in
 LAIR_SAFE_MARGIN = 150.0    # beyond this: back to the middle first
 # round 20 i2: T2_AIMD_LAIR_STEADY=1: the stick does not turn the player while the "guard" walks him back from the
 # floor's edge (the C buttons are pressed for the yaw of the move line; with the stick turning at its full rate the
-# walk went elsewhere: four falls off the edge in a --stick-aim 6 run on the N64 stream, PLAYTHROUGH.md 42-i2)
+# walk went elsewhere: four falls off the edge in a --stick-aim 6 run on the N64 stream, PLAYTHROUGH.md 42)
 LAIR_STEADY = os.environ.get("T2_AIMD_LAIR_STEADY", "") not in ("", "0")
 LAIR_NEAR = 110.0
 LAIR_GUARD_BACK = 250.0     # "guard": back to the script this far inside the safe margin

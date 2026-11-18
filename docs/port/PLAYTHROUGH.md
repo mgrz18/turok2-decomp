@@ -3917,14 +3917,14 @@ actor hash at 33,000). The four boss recipes (legacy switches) give round 18's d
 (so round 18's kills: the Mother at 28,775, the Blind One 23,103, the Queen 28,143, the Primagen
 43,586).
 
-## 42-i2. The last route gaps on the N64 stream: the default's margins, the Queen by stick, level 2 on real weapons (Phase 7 round 20, part i2)
+## 42. The last route gaps on the N64 stream: the default's margins, the Queen by stick, level 2 on real weapons (Phase 7 round 20, part i2)
 
 The N64 stream (the default: no `T2_LEGACY_*`), Linux Release, PIE, ASLR on, under `aimdrive.py`,
 300,000 frames, each run in its own directory, the default command plus the options shown. Only
 `tools/port/fullrun.py` changed; **`--legacy` and the level runs write byte-identical route files**
 (`playthrough.txt`, `teleport.env` = C34's `leg` run), so their det lines are unchanged.
 
-### 42-i2.1 The default: four changes, the thin spots gone
+### 42.1 The default: four changes, the thin spots gone
 
 | change (`fullrun.py`) | why |
 |---|---|
@@ -3941,7 +3941,7 @@ each against the spot's 65,280; the rest struck her body boxes (masks 1, 4, 9, 0
 front of the open spot every 200 frames; her volleys reach him at ~430-490. The distance, one run each
 on that stream (to frame 185,000): **450 266 damage, 2 lives; 600 27, lowest 80; 700 61, 46; 900 97,
 10.** One sample per distance on a chaotic fight: 600 is the best seen, not a proven optimum
-(`T2I2_QF=D,EVERY` overrides it, a test hook). A `--stick-aim 5` run keeps 450 (42-i2.2).
+(`T2I2_QF=D,EVERY` overrides it, a test hook). A `--stick-aim 5` run keeps 450 (42.2).
 
 **The lair.** With 700 at the Queen the run lost a life in the lair (entered with the Mother's
 leftover, 54 health, 139 damage: melee 10s at ~650). There is no pickup in the Mother's or the
@@ -3980,7 +3980,7 @@ the Mantid Queen 171,767, the Mother 204,658, the Primagen (cinema 370) 242,688,
 The lowest health of the whole run is now 38 (124, the force-field pylons, after the Blind One left
 71), was 14.
 
-### 42-i2.2 The Mantid Queen and the lair by stick
+### 42.2 The Mantid Queen and the lair by stick
 
 h3's combo `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` on the round-19 code and this
 tree's stream (run st_h3, `aimdrive.py --stats`, to 200,000): **3 lives at the Queen**, her death
@@ -4028,7 +4028,7 @@ City Totem 32/139, the Marsh Totem 18/182, the Cave Totem 99/101, the Blind One 
 thinnest spot: one more hit is a life), the Hive Totem 39/161, the Queen 122/39, the Mother 53/147, the
 lair (assisted) 44/156.
 
-### 42-i2.3 Level 2 on real weapons (`--real-weapons 1,2 --hub-wait 0`)
+### 42.3 Level 2 on real weapons (`--real-weapons 1,2 --hub-wait 0`)
 
 On this round's tree the two sisters no longer cost a life (run rw12, before any change below): 133
 (sister 1) 165 damage, lowest 35; 134 (sister 2) 174, lowest 26 (h3's run B, round 19, with the stick:
@@ -4050,7 +4050,7 @@ game switches to the mag 60, whose 40 bullets are gone by ~77,000, then the talo
 bullets x40 and shells x10 by its exit, 131's remaining 519/522/525/534 objects), sister 3 on the
 grenade launcher; then the City Totem on picked-up ammo (never tried on either stream).
 
-### 42-i2.4 Runs (N64 stream unless said, 300,000 frames, ASLR on)
+### 42.4 Runs (N64 stream unless said, 300,000 frames, ASLR on)
 
 | options added to the default | result |
 |---|---|

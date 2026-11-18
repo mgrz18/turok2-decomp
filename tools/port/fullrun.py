@@ -37,7 +37,7 @@ STICK_PRIMARY = {5: (124, 94, 95, 96, 2), 6: (3, 4)}
 STICK_BOSS = {5: "2:%s" % os.environ.get("T2H3_QR", "150"), 6: "4:%s" % os.environ.get("T2H3_LR", "350")}
 STICK_BOSS_ON = None   # None: on the N64 stream only; else the set of route levels (--stick-boss)
 # Round 20 i2: the default on the N64 stream: the lair only. At the Queen the node rule cost 3 lives (her step-5 wave
-# 10,212 frames; g5's picker, which leaves a target that is not hurt, 678: PLAYTHROUGH.md 42-i2.2)
+# 10,212 frames; g5's picker, which leaves a target that is not hurt, 678: PLAYTHROUGH.md 42.2)
 STICK_BOSS_N64 = {6}
 LAIR_PUSH = ""       # round 18 g5: --lair-push toward|jump|both (T2_LAIR_PUSH; "" = off: the routes unchanged)
 ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
@@ -217,7 +217,7 @@ class Route:
                 env.append("T2_AIMD_PRIMARY_ONLY=3")
             if 6 in STICK_AIM and n64_full() and "lair" not in ASSIST_KEEP:
                 # round 20 i2: the lair by stick: no stick turn while the edge guard (or the push answer) walks the
-                # player back in (aimdrive.py T2_AIMD_LAIR_STEADY: four falls off the edge -> one push, PLAYTHROUGH.md 42-i2)
+                # player back in (aimdrive.py T2_AIMD_LAIR_STEADY: four falls off the edge -> one push, PLAYTHROUGH.md 42)
                 env.append("T2_AIMD_LAIR_STEADY=1")
             bl = (STICK_BOSS_ON if STICK_BOSS_ON is not None else STICK_BOSS_N64 if n64_full() else set()) & STICK_AIM
             if bl:   # round 19 h3: the boss's node only, led, fire held on target (T2_AIMD_BOSS)
@@ -644,7 +644,7 @@ def n64(lv):
 # Round 18 g1 (--n64): the weapon of a level-2 segment on the N64's stream {segment: (weapon, frames after its
 # start)}; the plasma rifle (10) again 50 frames before the next segment. T2G1_L2W="9:9:0,6:8:0" overrides (tests)
 # 134: the shredder (21 damage instead of 118 and a life with the plasma rifle); round 20 i2: 133 and 135 too (sister 1:
-# 54 damage, lowest health 146 instead of 182 and 18; 135: 66 and 134 instead of 199 and 14; PLAYTHROUGH.md 42-i2)
+# 54 damage, lowest health 146 instead of 182 and 18; 135: 66 and 134 instead of 199 and 14; PLAYTHROUGH.md 42)
 N64_L2_WEAPON = {6: ("9", -400), 9: ("9", -400), 12: ("9", -400)}
 if os.environ.get("T2G1_L2W") is not None:
     N64_L2_WEAPON = {int(e.split(":")[0]): (e.split(":")[1], int(e.split(":")[2]))
@@ -677,7 +677,7 @@ N64_FULL_L2_HEALTH = {7: [(-2405.3, -4761.6, 5545.7, 0.0), (-2135.0, 204.8, 3506
 # Round 18 g1 (--n64): the weapon for the Mantid Queen (None: level 5 s shredder); T2G1_QW overrides ("": none)
 # Round 20 i2 (the N64 stream): T2_BOSS_FRONT at the Mantid Queen, the player put 600 units in front of her open spot
 # (was 450). One run per distance on the 133/135 shredder stream: 266 damage and 2 lives at 450, 27 at 600, 61 at 700,
-# 97 at 900 (PLAYTHROUGH.md 42-i2.1). T2I2_QF overrides (DEBUG-ONLY test hook)
+# 97 at 900 (PLAYTHROUGH.md 42.1). T2I2_QF overrides (DEBUG-ONLY test hook)
 N64_QUEEN_FRONT = os.environ.get("T2I2_QF", "600,200")
 N64_QUEEN_WEAPON = os.environ.get("T2G1_QW", "16") or None   # the scorpion launcher: 6-95 damage, 43-138 (a life) with the shredder
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps

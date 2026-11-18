@@ -287,7 +287,7 @@ whole run: set by the totems, Blind, Queen, Primagen; cleared after each).
   `T2_START_WARP`: gameplay views are deterministic from the warp for the first frames.
 - The Mac window's Metal renderer and the retina scale (MACOS.md 19.3) need a window.
 
-## 8-i1. Round 20 (part i1): the sweep of the hub, levels 1-3 and the menus
+## 8. Round 20 (part i1): the sweep of the hub, levels 1-3 and the menus
 
 Method: N64 `refshots.py --start-warp=W@600 --shots 680:900:20` (shots.txt gives each shot's gf),
 port `T2_START_WARP=W@1400 T2_SHOT_EVERY=25 T2_DET_LOG=1 T2_DET_GF=1 --draw` (8-bit shots), paired
@@ -300,11 +300,11 @@ elapsed time or a shot lands on another frame of a flashing effect), **Rice** (t
 | scene | N64 / port | result | class |
 |---|---|---|---|
 | title | 1450-1500 / 4362-4500 | same | - |
-| main menu | 1600 / 4800 | **SINGLE and MULTI missing on the port** (FIDELITY 13-i1.2); fixed | host bug |
+| main menu | 1600 / 4800 | **SINGLE and MULTI missing on the port** (FIDELITY 13.2); fixed | host bug |
 | single-player menu, Enter Cheat keyboard, options | port only (refshots `--input` does not reach the N64 game) | NEW GAME / LOAD missing, the keyboard's A-Z missing; fixed; options as expected | host bug |
 | pause menu (START in the hub) | n64trace `--pad` 820 / port 2025 | same layout and highlight | - |
 | automap (L in the hub) | n64trace `--pad` 760 / port 1800 | **never drawn on the port** (no G_LINE3D, the index array overran the ortho matrix, black flicker frames); fixed; Rice draws no lines | host bug / Rice |
-| the Mother's arena (-4), gf 75 | 700 / 1753 | **olive walls fixed** (packed vertex colour offsets big-endian, FIDELITY 13-i1.1): mean (35.8, 33.1, 23.7) / (35.4, 32.6, 23.2); Turok's pose differs (a cinema on `osGetTime`) | host bug / timing |
+| the Mother's arena (-4), gf 75 | 700 / 1753 | **olive walls fixed** (packed vertex colour offsets big-endian, FIDELITY 13.1): mean (35.8, 33.1, 23.7) / (35.4, 32.6, 23.2); Turok's pose differs (a cinema on `osGetTime`) | host bug / timing |
 | hub (-61), gf 55-275 | 680-900 / 1575-2025 | PSNR 28-31, means within 0.5; the HUD (lives, keys, health) the same | - |
 | level 53 (-54) | same | the sky, the water ring, the arches equal; a fire sprite on the right is up on the port at gf 135-175 where the N64 shows a spark (particle 0 spawns a game frame apart: FIDELITY 11.1); the cyan warp ring is a flashing effect: at a gf one side can show it and the other not | timing |
 | level 55 (-56), 58 (-59), 59 (-60) | same | the same rooms, light and HUD; the means differ only by the cyan ring's flashes | timing |
@@ -314,9 +314,9 @@ elapsed time or a shot lands on another frame of a flashing effect), **Rice** (t
 
 Next: refshots `--input` reaching the N64 game (the menus are port-only shots); the hurt flash's
 fade against the N64 frame by frame; the ring's phase (both flash, at different gfs).
-## 8-i3. Round 20 (part i3): levels 4-6, the bosses, the endings against the N64; the trails
+## 9. Round 20 (part i3): levels 4-6, the bosses, the endings against the N64; the trails
 
-Method (FIDELITY.md 13-i3 has the commands): for each warp, `refshots.py --start-warp=W@600
+Method (FIDELITY.md 14 has the commands): for each warp, `refshots.py --start-warp=W@600
 --shots 650:1100:25` on the N64 (Rice, 8-bit PNG, `shots.txt` gives each shot's gf) and
 `T2_START_WARP=W@1400 T2_DET_LOG=1 T2_DET_GF=1 T2_SHOT_EVERY=2` on the port (Release, `--draw`),
 the port's shot kept for each gf that is a multiple of 25; pairs compared by eye and by their
@@ -324,16 +324,16 @@ mean RGB. The player stands at the warp's spawn in every scene (no input), so th
 same on both sides; enemies move by the random stream, which parts from the N64's within the
 first game frames of a level (the particle spawn frame, FIDELITY.md 11.1).
 
-### 8-i3.1 The scenes
+### 9.1 The scenes
 
 | warp (level) | what | result |
 |---|---|---|
 | -101 (100) | level 4's start, the cave tunnel | **match**; mean (20.7, 30.4, 23.5) N64, (20.4, 30.0, 23.1) port at every gf |
 | -104 (103) | the cave with the mushrooms and the totem rock | match; the enemies stand elsewhere (the random stream) |
 | -125 (124) | level 5's start (HIVE TOP), the rifle pickup | match (the pickup's spin phase differs) |
-| -88 (87), -92 (91), -93 (92) | the hive's tunnels and its hub | **the hive's light shafts (tall pale blue beams that come and go) were missing on the port: a host bug, fixed (8-i3.2)**; the liquid surface that rises and falls matches |
+| -88 (87), -92 (91), -93 (92) | the hive's tunnels and its hub | **the hive's light shafts (tall pale blue beams that come and go) were missing on the port: a host bug, fixed (9.2)**; the liquid surface that rises and falls matches |
 | -115 (114) | level 6's start (the Lightship's hub) | match |
-| -118 (117), -121 (120), -124 (123) | the Lightship's green corridors | match but for the side doorway: the N64 shows thin bright green lines there (the room behind), the port a dark doorway with a ring; the port's green is ~4 % brighter (fog). classified Rice, not proven: the lines look like the edges of the geometry behind the door, as Rice draws coverage/fog modes it does not emulate; open lead (8-i3.3) |
+| -118 (117), -121 (120), -124 (123) | the Lightship's green corridors | match but for the side doorway: the N64 shows thin bright green lines there (the room behind), the port a dark doorway with a ring; the port's green is ~4 % brighter (fog). classified Rice, not proven: the lines look like the edges of the geometry behind the door, as Rice draws coverage/fog modes it does not emulate; open lead (9.3) |
 | -77 (76), -78 (77) | the talisman chambers of levels 5 and 6 | match |
 | -83 (82), -84 (83) | the flesh-eater portals of levels 5 and 6 | match |
 | -2 (1) | the Blind One's arena (her spawn) | match |
@@ -351,7 +351,7 @@ The two arenas after their intros (N64 `--shots 1200:2600:100`, gf 575-1675; the
 | -3 (2), the Mantid Queen | **match**: the arena, her legs, the boss bar, the red damage flash (at other gfs: the hits follow the random stream), the HUD |
 | -4 (3), the Mother | the Mother herself, her pose aside (the random stream), matches; **the whole arena is yellow-olive on the port** (floor cream on the N64, yellow on the port; mean RGB at gf 575 N64 (66.9, 58.7, 48.9), port (61.8, 54.5, 30.2): blue 40 % low). **the same cause as i1's walls: fixed on names-R20_i1 (cb236902: `Model_ApplyPackedOffsets` read the big-endian vertex colour offsets with a host load); i1 measured that build against this N64 shot: (59.6, 52.6, 43.5), B/R 0.73 on both** |
 
-### 8-i3.2 The trails (swooshes) were never drawn: three host bugs
+### 9.2 The trails (swooshes) were never drawn: three host bugs
 
 The hive's light shafts are the trails of its drip particles (types 226/227, falling at up to 1,024
 units/s): `CParticleSystem__Draw` hands each particle with swooshes to `Swoosh_AddParticleNode`,
@@ -387,9 +387,9 @@ ribbons of explosions and energy effects all draw now.
 **Gameplay**: none. The trails' lifetimes change what a free particle slot keeps (a "matrix built"
 flag, 0x100000, left on one slot of level 1 at frame 21,132), so the det lines' particle-pool hash
 moves; the RNG, the player and every actor are identical over the whole default run (600,000
-lines with the hash taken out) and the `--legacy` run (580,000). New md5s in FIDELITY.md 13-i3.
+lines with the hash taken out) and the `--legacy` run (580,000). New md5s in FIDELITY.md 14.
 
-### 8-i3.3 Next
+### 9.3 Next
 
 - The Lightship doorway (117/120/123): dump the N64 display list at that frame (or try
   glide64mk2/angrylion under Xvfb) to tell Rice from a missing pass; the ~4 % greener fog there.
