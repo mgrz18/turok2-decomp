@@ -600,6 +600,34 @@ def n64(lv):
     """Round 17 f2: whether level lv (7: the Primagen's lair) is played on the N64's random numbers
     (--n64-shake, or --n64-shake-from L with lv >= L): the route changes for that stream apply."""
     return N64_SHAKE or (N64_FROM is not None and lv >= N64_FROM)
+# Round 18 g1 (--n64): the weapon of a level-2 segment on the N64's stream {segment: (weapon, frames after its
+# start)}; the plasma rifle (10) again 50 frames before the next segment. T2G1_L2W="9:9:0,6:8:0" overrides (tests)
+N64_L2_WEAPON = {9: ("9", -400)}   # 134: the shredder (21 damage instead of 118 and a life with the plasma rifle)
+if os.environ.get("T2G1_L2W") is not None:
+    N64_L2_WEAPON = {int(e.split(":")[0]): (e.split(":")[1], int(e.split(":")[2]))
+                     for e in os.environ["T2G1_L2W"].split(",") if e}
+
+
+def n64_full():
+    """Round 18 g1: no legacy switch at all (--n64): the stream a human player gets."""
+    return N64_SHAKE and N64_PROPS and N64_SOUND
+
+
+# Round 18 g1 (--n64): 133 (sister 1) leaves the player with ~18 health on this stream and 130's ultra health
+# (+100 to 200) comes next: the health +10 (object 542, +10 below 100) of 133 and 130 first, so the ultra health
+# lifts a full 100 (tools/assets/levels.py grid sections). 133's two by its exit (picks before the exit step),
+# 130's ten at the start of its second visit (before the ultra health of L2_HEALTH[7])
+N64_FULL_L2_PICKS = [(6, 2, [(644.9, -4761.6, -1156.9, 0.0), (1190.2, -4761.6, -1155.7, 0.0)])]
+N64_FULL_L2_HEALTH = {7: [(-2405.3, -4761.6, 5545.7, 0.0), (-2135.0, 204.8, 3506.0, 0.0), (-581.3, -5.2, 3644.5, 0.0),
+                          (-512.0, -11.3, -2560.0, 0.0), (-512.0, -10.7, -2764.8, 0.0), (2246.1, -2150.4, 2102.3, 0.0),
+                          (5581.0, -3993.6, 1285.7, 0.0), (5580.1, -3379.2, 1275.8, 0.0), (6451.2, 307.2, 3527.7, 0.0),
+                          (6448.8, 307.2, 4057.7, 0.0)],
+                      # 132's last visit (after sister 3: 135 leaves ~70 health and the City Totem is next)
+                      # (the two on 1,331 and the two on 1,106 stand the player over a lower floor with a damage region: dropped)
+                      13: [(941.4, 716.8, -1907.8, 0.0), (512.4, 716.8, -1904.1, 0.0), (-1382.4, 179.4, -1792.0, 0.0),
+                           (-1382.4, 179.4, -1331.2, 0.0), (4410.7, 409.6, -4062.9, 0.0)]}
+# Round 18 g1 (--n64): the weapon for the Mantid Queen (None: level 5 s shredder); T2G1_QW overrides ("": none)
+N64_QUEEN_WEAPON = os.environ.get("T2G1_QW", "16") or None   # the scorpion launcher: 6-95 damage, 43-138 (a life) with the shredder
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
 # Round 17 f1: pick steps put before a step of a segment (segment, before step, [(x, y, z, approach
 # angle)]): each pick is a KEY_STEP-frame step (pick()'s stand and walk-in); the step and the later
@@ -771,6 +799,7 @@ def level_segments(r, segments, start, keys, retry=(), extra=(), anchor=(), back
     for f, lv in trips:
         talisman(r, start + f, lv)
     r.steps(out, start)
+    r.seg_starts = {i: start + f for i, f in starts.items()}   # round 18 g1: the segments' schedule frames
     for i, dt, x, y, z, ang in retry:
         r.pick(start + starts[i] + dt, x, y, z, ang)
     for i, dt, x, y, z, ry in back:
@@ -1133,15 +1162,22 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
     l2retry = L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else [])
     l2back = L2_RETURN_LATE if h2 else ()
     if N64_SHAKE and N64_L2_PICKS:   # round 17 f1: health picks between 135's crypt steps
-        l2segs, l2stretch, l2retry, l2back = insert_picks(l2segs, N64_L2_PICKS, l2stretch, l2retry, l2back)
+        picks = N64_L2_PICKS + (N64_FULL_L2_PICKS if n64_full() and h2 else [])   # round 18 g1: 133's too
+        l2segs, l2stretch, l2retry, l2back = insert_picks(l2segs, picks, l2stretch, l2retry, l2back)
     heal = 0
     if L2_HEAL:   # round 17 f5 (after f1's picks: these go before 135's exit step)
         l2segs, heal = l2_heal(l2segs)
-    a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {}) if extras else {},
+    a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, N64_FULL_L2_HEALTH if h2 and n64_full() else {}, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {}) if extras else {},
                         l2retry, l2stretch,
                         back=l2back, detours=det.get(2),
                         walks=nav_table(2) if 2 in NAV else L2_WALKS if 2 in walk else None, nav_walks=2 in NAV)
+    if n64_full():   # round 18 g1: weapons per level-2 segment on the N64's stream (N64_L2_WEAPON)
+        for si, (w, dt) in sorted(N64_L2_WEAPON.items()):
+            r.weapon.append((r.seg_starts[si] + dt, w))
+            r.weapon.append((r.seg_starts[si + 1] - 50, "10"))
     a2 += heal
+    if n64_full() and h2:   # round 18 g1: 133's and 130's health picks move the later hub arrivals as well
+        heal += KEY_STEP * (sum(len(it) for si, sj, it in N64_FULL_L2_PICKS) + sum(len(v) for v in N64_FULL_L2_HEALTH.values()))
     for k in hubs:   # round 17 f5: --l2-heal's picks move the City Totem and every later hub arrival
         if k >= 2:
             hubs[k] += heal
@@ -1311,6 +1347,8 @@ def level5(r, t):
     r.fire.append((s + rel + add, s + rel + add + length))
     r.face_levels.append(lv)
     rel, length = r56.L5_BOSS
+    if n64_full() and N64_QUEEN_WEAPON:   # round 18 g1: requested in 113, taken when her level loads
+        r.weapon.append((s + L5_QUEEN_AT + add - 800, N64_QUEEN_WEAPON))
     r.anchors.append((s + L5_QUEEN_AT + add, 2))
     r.note(s + rel + add, "2 the Mantid Queen: fire held, T2_AIM_NODE=boss@2, T2_BOSS_FRONT=450,200")
     r.inputs.append("Z@%d..%d" % (s + rel + add, s + rel + add + length))
@@ -1475,6 +1513,8 @@ def cli(argv=None):
     ap.add_argument("--n64-sound", action="store_true", help="the sound world in the headless run (no "
                     "T2_LEGACY_NOSOUND: the sound requests draw their random numbers as with --audio and on the "
                     "N64; round 17 merge): not tuned yet")
+    ap.add_argument("--n64", action="store_true", help="no legacy switch at all: --n64-shake --n64-props "
+                    "--n64-sound together, the stream a human player gets (round 18 g1)")
     ap.add_argument("--n64-shake-from", type=int, default=None, choices=(4, 5, 6, 7),
                     help="DEBUG-ONLY (round 17 f2): the old stream (T2_LEGACY_SHAKE) up to the hub visit before "
                     "level L (7: the Primagen's lair), the N64's from there; with --n64-shake's level 4-6 changes")
@@ -1485,9 +1525,9 @@ def cli(argv=None):
     ap.add_argument("--hub-wait", type=int, default=ARMS_HUB_WAIT,
                     help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
-    N64_SHAKE = a.n64_shake
-    N64_PROPS = a.n64_props
-    N64_SOUND = a.n64_sound
+    N64_SHAKE = a.n64_shake or a.n64
+    N64_PROPS = a.n64_props or a.n64
+    N64_SOUND = a.n64_sound or a.n64
     N64_FROM = a.n64_shake_from
     LAIR_KEEP = a.lair_keep
     LAIR_FRONT = a.lair_front

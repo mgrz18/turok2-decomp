@@ -516,7 +516,11 @@ def main():
                     "portals), the keys, a save after each level, the Primagen, the ending (tools/port/fullrun.py, PLAYTHROUGH.md section 10)")
     ap.add_argument("--n64-shake", action="store_true", help="a level run on the N64's camera shake and random "
                     "numbers (no T2_LEGACY_SHAKE; round 17 f2); with --all it goes to fullrun.py")
+    ap.add_argument("--n64", action="store_true", help="no legacy switch at all (round 18 g1): --n64-shake "
+                    "--n64-props --n64-sound together, for --all and --level")
     a, rest = ap.parse_known_args()
+    if a.n64:
+        a.n64_shake = a.n64_props = a.n64_sound = True
     if a.all and a.n64_shake:
         rest = rest + ["--n64-shake"]
     if rest and not a.all:

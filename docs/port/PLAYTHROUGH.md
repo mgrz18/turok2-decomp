@@ -3402,3 +3402,67 @@ read of memory whose contents depend on it). Until it is found, compare md5s on 
   draws), demo 2 `player.hp` from gf 608 (the N64's uninitialised read).
 - **The level runs** (`--level 1..6`) and **the four boss recipes**: det identical to b744bd39's.
 - **Save, title, load**, **`--audio --wav`**, **padtest**, **soak**: STATUS.md section 2.
+
+## 36-g1. The route with no legacy switch: `--n64` to the good ending with no life lost (Phase 7 round 18, part g1)
+
+`fullrun.py --n64` (also `playthrough.py RUN --all ... --n64`, and `playthrough.py --level N --n64`) is
+`--n64-shake --n64-props --n64-sound` together: `teleport.env` carries none of the three legacy
+switches, so the game runs on the stream a human player gets (the N64's camera shake, the N64's
+type-9 props, the sound world's random numbers). **`playthrough.py RUN --all --talismans 2
+--cheats-off 1,2,3,4,5,6 --n64` reaches END 2 at 250,566 with all 5 totems and no life lost**
+(Linux Release, PIE, under `aimdrive.py`, 300,000 frames; round 17: game over in 125 at 108,496).
+The legacy command is unchanged: its `playthrough.txt` and `teleport.env` are byte-identical to
+round 17's and its run gives det md5 `ecb9f9f2…` (580,000 lines, END 2 at 252,194).
+
+### 36.1 What the N64 stream changed, and the fixes (all only when `n64_full()`: the three switches off)
+
+| where | before (round 17's `--n64-shake --n64-props --n64-sound`) | fix |
+|---|---|---|
+| 133 (sister 1) | 182 damage, the player leaves with 18 | none; but the ultra health of 130 next lifted only to 118 |
+| 130 again | the ultra health (+100 to 200) taken at 18 health: 118 | **`N64_FULL_L2_HEALTH[7]`**: ten health +10 of 130 (object 542, +10 below 100) first, 8 reached (18 -> 98), then the ultra health: 198 |
+| 134 (zombies 2-4, sister 2) | the plasma rifle: zombie 3 stands 180 units off and hits for 1,300 frames (118 damage, a life; a second one in the retry) | **the shredder** (`N64_L2_WEAPON = {9: ("9", -400)}`: requested 400 frames before the segment, taken at the level load; the plasma rifle again 50 frames before 131): **21 damage**, 177 left |
+| 135 (crypts, sister 3) | (not reached) | none: 199 damage with f1's 7 picks, 14 left |
+| 132 again (after 135) | the City Totem next with ~70 health: 87 damage, **a life** | **`N64_FULL_L2_HEALTH[13]`**: five health +10 of 132 (71 -> 100) before the talisman trip; the totem then costs 83 (17 left), no life |
+| the Mantid Queen (level 5) | the shredder: 138 damage, **a life** (95-108 with other histories) | **the scorpion launcher** (`N64_QUEEN_WEAPON = "16"`, requested 800 frames before her level loads): **6 damage** (95 on another history), no life |
+
+133's two health +10 by its exit (`N64_FULL_L2_PICKS`) are in the table too but the walk-in does not
+reach them (the pickup log shows neither); two of 130's ten are missed the same way; four of 132's
+nine stand the player over a lower floor with a damage region (10 every 2 frames: a life in one
+test) and were dropped. Each pick is a 150-frame step; the picks move the City Totem and every
+later hub arrival (1,950 frames: `hubs[k]` as `--l2-heal`'s), so the run's last input is at 288,480
+(run 300,000 frames, not 290,000).
+
+The weapon changes go through `T2_WEAPON`, which `T2_GIVE_WEAPONS` applies when a level loads
+(t2debug.c): a request scheduled after the level load waits for the next load (the first test,
+at the segment's start, changed nothing). Test hooks (DEBUG-ONLY): `T2G1_L2W="seg:weapon:dt,..."`
+replaces `N64_L2_WEAPON`, `T2G1_QW=W` the Queen's weapon (`""`: none).
+
+### 36.2 Health per fight on the N64 stream (`hurtsum`, the final command; damage, lowest health)
+
+| visit | damage, min | visit | damage, min |
+|---|---|---|---|
+| 109 the Harbor Totem | 96, 104 | 112 the Cave Totem | 42, 158 |
+| 133 sister 1 | 182, **18** | 1 the Blind One | 51, 107 |
+| 134 sister 2 | 21, 177 | 124 | 32, 75 |
+| 135 sister 3 | 199, **14** | 113 the Hive Totem | 43, 132 |
+| 110 the City Totem | 83, **17** | 2 the Queen | 6, 126 |
+| 64 | 27, 78 | 117 | 21, 170 |
+| 111 the Marsh Totem | 48, 152 | 3 the Mother | 34, 166 |
+| | | 4 the Primagen's lair | 68, 98 |
+
+The thin spots are 133, 135 and the City Totem (14-18 left). With the shredder at the Queen instead
+(same route otherwise) the run also reached END 2 with no life lost (247,530; Queen 43 damage, lair
+85). Earlier variants on this stream: without the 132 picks a life at the City Totem and, with the
+shredder, one at the Queen (END 2 at 253,892, 2 lives); with the scorpion launcher but no 132 picks,
+the Queen held and a life went in the lair to the Primagen's throw (one hit of 118 at 2,177 units,
+the knock-off of 33.2: part g5's subject); `--l2-heal` on top (f5's 135 picks) dies in 135 (do not
+combine).
+
+### 36.3 Runs (Linux Release, PIE, `aimdrive.py`, `setarch -R`, each in its own directory)
+
+| command | result | det md5 |
+|---|---|---|
+| (default, legacy switches) | END 2 at 252,194, 2 lives (110) | `ecb9f9f2…` (= round 17) |
+| `--n64` (final) | **END 2 at 250,566, 0 lives**, totems 11111 | `6213496b…` (3 runs) |
+| `--n64`, Queen on the shredder (`T2G1_QW=`) | END 2 at 247,530, 0 lives | `dbddd148…` |
+| `--n64` before the 132 picks and the Queen weapon | END 2 at 253,892, 2 lives (110, Queen) | `32ad4b97…` (twice) |

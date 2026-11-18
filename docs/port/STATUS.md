@@ -82,7 +82,7 @@ behaviour.**
 | `--stick-aim 2 --assist-keep 110` | END 2 at 253,788, 5 totems, 2 lives lost (the City Totem, level 5) ; md5 `9432c11d…` (round 16's) under `setarch -R` |
 | `--nav 1,2,3,4` | END 2 at 250,970, 5 totems, 3 lives lost (the City Totem, 2 in the Primagen's lair) ; md5 `8702568d…` (round 16's) under `setarch -R` |
 | `--n64-shake --n64-props` (stretch) | END 2 at 260,790, 5 totems, 2 lives lost (the City Totem, the Blind One) |
-| `--n64-shake --n64-props --n64-sound` (no legacy switch at all) | **not yet**: 2 lives lost at sister 2 (134), game over in 125 at 108,496 |
+| `--n64` (= `--n64-shake --n64-props --n64-sound`, no legacy switch at all; round 18 g1, 300,000 frames) | **END 2 at 250,566, 5 totems, no life lost**; md5 `6213496b…` (5 runs, ASLR on and off) |
 
 **A determinism caveat found this round** (PLAYTHROUGH.md 35.3): with ASLR on, about one run in
 three of the default command (also on the b744bd39 build) takes a second path in level 2's 135
@@ -281,6 +281,43 @@ Detail: [FIDELITY.md](FIDELITY.md) 9.
 | commit | what |
 |---|---|
 | f2af5137 | n64cmp: pair the m_Lights double buffers across gEvenOdd parity, skip never-written ones |
+
+## Round 18, part g1: the route with no legacy switch (branch names-R18_g1; PLAYTHROUGH.md 36-g1)
+
+- **`--n64`** (`fullrun.py`, `playthrough.py --all` and `--level`): `--n64-shake --n64-props
+  --n64-sound` together, no `T2_LEGACY_*` line in `teleport.env`: the stream a human player gets.
+- **`playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6 --n64` reaches END 2 at 250,566,
+  all 5 totems, no life lost** (Linux Release, PIE, `aimdrive.py`, **300,000 frames**: the last input
+  is at 288,480). det md5 `6213496b…` (600,000 lines) in **5 runs: 3 under `setarch -R`, 2 with ASLR
+  on** (the 135 second path of round 17 did not show up in these two).
+- The route changes (only when all three switches are off, `fullrun.n64_full()`): ten health +10 in
+  130 before its ultra health (`N64_FULL_L2_HEALTH[7]`: 133 leaves 18 health), **the shredder in 134**
+  (`N64_L2_WEAPON`: 21 damage instead of 118 and a life with the plasma rifle), five health +10 in
+  132 before the City Totem (`N64_FULL_L2_HEALTH[13]`), **the scorpion launcher for the Mantid Queen**
+  (`N64_QUEEN_WEAPON`: 6 damage instead of 138 and a life). Weapon requests go through `T2_WEAPON`,
+  applied at the next level load. Test hooks: `T2G1_L2W`, `T2G1_QW` (DEBUG-ONLY env of fullrun.py).
+- **Unchanged**: the default command (`playthrough.txt`/`teleport.env` byte-identical, det `ecb9f9f2…`,
+  END 2 at 252,194), `--n64-shake` and `--real-weapons 1 --stick-aim 1,2,4 --l2-heal --hub-wait 0`
+  (route files byte-identical to ab0bc24c's). `--n64-shake --n64-props --n64-sound` spelled out is
+  now `--n64` (the new tables apply).
+- **Proposal**: make `--n64` the default (the three legacy switches off) and keep the legacy route
+  behind an option (e.g. `--legacy`); not flipped here because every other validated combination and
+  part g5's work are on the legacy stream. Thin spots on the N64 stream: 133 (18 left), 135 (14),
+  the City Totem (17); the Primagen's throw (g5) killed once in a variant.
+
+| commit | what |
+|---|---|
+| cc36001b | `--n64` |
+| 56836761 | the shredder in 134, the 130 picks |
+| 0ae43535, 894bb9da | `N64_QUEEN_WEAPON`; the 132 picks and the scorpion launcher: no life lost |
+| 83caa47b | PLAYTHROUGH.md 36-g1 |
+
+**For the merge**: only tools/port/fullrun.py (new tables after `N64_L2_PICKS`, `n64_full()`,
+`r.seg_starts` in `level_segments`, the weapon block and the hub shift after `l2_heal` in
+`main_all`, the Queen weapon in `level5`, the `--n64` flag in `cli`), tools/port/playthrough.py
+(`--n64`), PLAYTHROUGH.md 36-g1. g5 also edits fullrun.py (weapons/aim parts, levels 5-6):
+`level5` and `main_all` are the likely conflict spots.
+
 ## Round 17, part f3: the port against the N64 member by member (branch names-R17_f3)
 
 Detail: [FIDELITY.md](FIDELITY.md) 7.
