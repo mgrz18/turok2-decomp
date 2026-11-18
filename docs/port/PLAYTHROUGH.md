@@ -3403,7 +3403,7 @@ read of memory whose contents depend on it). Until it is found, compare md5s on 
 - **The level runs** (`--level 1..6`) and **the four boss recipes**: det identical to b744bd39's.
 - **Save, title, load**, **`--audio --wav`**, **padtest**, **soak**: STATUS.md section 2.
 
-## 36-g1. The route with no legacy switch: `--n64` to the good ending with no life lost (Phase 7 round 18, part g1)
+## 36. The route with no legacy switch: `--n64` to the good ending with no life lost (Phase 7 round 18, part g1)
 
 `fullrun.py --n64` (also `playthrough.py RUN --all ... --n64`, and `playthrough.py --level N --n64`) is
 `--n64-shake --n64-props --n64-sound` together: `teleport.env` carries none of the three legacy
@@ -3466,3 +3466,85 @@ combine).
 | `--n64` (final) | **END 2 at 250,566, 0 lives**, totems 11111 | `6213496b…` (3 runs) |
 | `--n64`, Queen on the shredder (`T2G1_QW=`) | END 2 at 247,530, 0 lives | `dbddd148…` |
 | `--n64` before the 132 picks and the Queen weapon | END 2 at 253,892, 2 lives (110, Queen) | `32ad4b97…` (twice) |
+
+## 37. Levels 5-6 by stick, the Primagen's push (Phase 7 round 18, part g5)
+
+Legacy switches on (the default route's stream) unless said otherwise. Linux Release, PIE, under
+`aimdrive.py`, 290,000 frames, each run in its own directory, the default command plus
+`--real-weapons 1 --l2-heal --hub-wait 0` and the options shown.
+
+### 37.1 Level 5 by stick: three driver fixes
+
+`--stick-aim 1,2,3,4,5,6` with round 17's driver (s6) never reached the Hive Totem: after 93 the
+level exit 7500 led back to 124 (the anchor `113@...` then waited to the end of the run).
+
+- **The exit 7500 goes to the Hive Totem only when all three embryos are dead.** In 95 the picker
+  spent ~150 of embryo 2's 600 frames on actor 104 (179 units, full health, never hurt, kind 0)
+  and the embryo was left with 8,412 of 65,280 at the window's end ("embryo destroyed." twice).
+  **`T2_AIMD_PRIMARY=L,...`** (aimdrive.py, written by fullrun.py from `STICK_PRIMARY`): in those
+  sub-levels the candidate nearest the assist's own target point (within `T2_AIMD_PRIMARY_R`,
+  600) costs `T2_AIMD_PRIMARY_X` (0.2) times as much; when it is chosen the stick aims at the
+  assist's point itself (a boss node), not at the candidate's origin. Level 5: 124 (pylons), 94,
+  95, 96 (cocoons and embryos), 2 (the Queen); level 6: 3, 4.
+- **The Queen's origin is never hurt** (her health is hit through `T2_AIM_NODE`'s node): aimed at
+  the origin she took 11,100 frames and a life (s6c); at the node 8,744 frames, 70 damage, 63 left
+  (s6d).
+- **The route's walks** (a teleport plus `CU` for `walk` frames) keep the script's yaw in levels 5
+  and 6 (`STICK_FREE_WALK`): the stick windows leave out every such walk there (levels 1-4 keep
+  round 17's windows: c4's `teleport.env` is byte-identical).
+
+### 37.2 Level 6 by stick: the Mother
+
+**The Mother's parts are nodes 900-1,500 units from both of her candidates' origins.** Aimed at the
+origins (s6d) her six parts took 5,400 frames instead of ~2,000 while she hits the pinned player
+every ~80 frames: 307 damage, 2 lives. **`T2_AIMD_PRIMARY_ONLY=3`** (written with `--stick-aim 6`):
+in her arena the stick always aims at the assist's node. s6e: 114 damage, 86 left, no life lost.
+
+### 37.3 The Primagen's push (the "throw" of 33.2)
+
+`Primagen_UpdateMode20` (mode 20, `Primagen_EnterMode20`: `swayTimer` 15, `timer` 11.25): after the
+wind-up, while he sees the player, 716.8 (on the ground) or 179.2 (in the air) is added to the
+player's velocity away from him each frame until `timer` runs out; then mode 7, and when he has
+lost sight of the player mode 1 with **bossState 10** (`Primagen_UpdateMode7` -> `Primagen_EnterMode1`):
+bossState 10 is the after-effect (the player already gone), not the attack.
+
+Measured (`T2_PUSH_LOG=1`, new: a `lairpush` line every frame of mode 20 with the player's position,
+velocity and ground flag; on f2's F+37 history, `--n64-shake-from 4` with `T2_LEGACY_SHAKE=1,113861`):
+he stands on the floor 535 units away; **the keep-away rule (`T2_LAIR_KEEP=800`) walks the player
+away from him, towards the edge**; 64 frames into mode 20 the velocity jumps to ~1,000 units/s
+outward, and 90 frames later the player is below the floor (y -850 at schedule 254,450; the hit
+of 82 at d 1,557 is the fall). Game over (the second life lost there).
+
+**`--lair-push toward|jump|both`** (fullrun.py -> `T2_LAIR_PUSH`; aimdrive.py's `LairDrive`, before
+the edge guard and the keep-away): the move line now ends in `bm M` (the boss's AI mode,
+t2bosslog.c); for `T2_LAIR_PUSH_LEN` (110) frames from his entering mode 20, "toward" walks towards
+him, "jump" holds `r1` from `T2_LAIR_PUSH_JUMP_AT` (55) frames in, "both" does both. Off by default:
+the default route's inputs are byte-identical to ab0bc24c's. On the F+37 history with `both`: the
+player walks back in to ~1,014, is in the air when the push comes (y 80, velocity ~1,070 outward),
+**stays on the floor**; END 2 at 251,460 with one life lost in the lair (an earlier hit, before the
+push, as in the run without it) instead of the game over.
+
+### 37.4 Runs
+
+| run | options added | result |
+|---|---|---|
+| c4 / c4b | `--stick-aim 1,2,3,4` (round 17's combo; c4b on this part's binary and driver) | END 2 at 248,808, no life lost; the gameplay lines of c4 and c4b identical (md5 `92312c48…`) |
+| s6 | `--stick-aim 1,2,3,4,5,6`, round 17's driver | stuck in 124 (embryo 2 alive), 1 life |
+| s6c | + primary target, walks free | Hive Totem, the Queen 1 life, the Mother 181, the lair game over |
+| s6d | + the boss node | the Queen 70 damage (0 lives), the Mother 307 (2 lives), lair game over |
+| s6e | + `T2_AIMD_PRIMARY_ONLY=3` | **END 2 at 264,480**, 5 totems, 4 bosses; the Mother 114 (0 lives); **3 lives lost in the lair** (295 damage) |
+| s6g | `--stick-aim 1,2,3,4,5,6 --lair-push both` | as s6e (no push came: the same lair, 3 lives) |
+| **s6f** | `--stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both` | **END 2 at 248,500, 5 totems, 4 bosses, no life lost** (the `death` at 262,598 is the new game after the credits); the Mother 114 damage, the lair 64 (lowest 22), two pushes answered (192 frames) |
+| f37 / f37p | `--n64-shake-from 4`, F+37, `T2_PUSH_LOG=1`; f37p `T2_LAIR_PUSH=both` | f37 game over in the lair (the throw); f37p END 2 at 251,460, 1 life in the lair |
+
+Health per fight in s6e (start / damage / lowest): Hive Totem 166/33/133, the Queen 133/70/63, 117
+63/20/43, the Mother 200/114/86, the lair 91/295/5 (3 lives). In the lair the stick spent most of
+its frames on the Primagen's spawns (ids 10000+: ~7,900 of ~16,000 aim frames; him, actor 2: 6,500) and on actors 50-52;
+the assisted lair (c4) costs 27 hits and no life.
+
+### 37.5 Not done: sister 2 on real weapons
+
+Not attempted this round (time). What f5 found stands (34.4); the two leads: fight only zombie 4
+(gate 8's key) by going to the gate first (zombies 2 and 3 follow from 1,700 units: their 80 health
+each would still need shells), or the plasma rifle of 132 by a jump (`r1`) before 134 (the route
+reaches 132 after 134 today).

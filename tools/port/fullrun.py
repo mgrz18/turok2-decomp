@@ -27,6 +27,11 @@ import routes56 as r56  # noqa: E402
 
 
 STICK_AIM = set()   # round 15 d3: the levels aimed with the stick (--stick-aim)
+STICK_FREE_WALK = {5, 6}   # round 18 g5: --stick-aim levels whose route walks keep the script's yaw
+# round 18 g5: per route level, the sub-levels where the stick driver prefers the assist's target (T2_AIMD_PRIMARY):
+# level 5's pylons (124), the cocoons and embryos (94, 95, 96) and the Queen's node (2); level 6's Mother (3) and the Primagen (4)
+STICK_PRIMARY = {5: (124, 94, 95, 96, 2), 6: (3, 4)}
+LAIR_PUSH = ""       # round 18 g5: --lair-push toward|jump|both (T2_LAIR_PUSH; "" = off: the routes unchanged)
 ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
 NAV = set()         # round 16 e3: the levels whose NAV_WALKS teleports the waypoint walker replaces (--nav)
 NAV_ROM = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "baserom.us.z64")
@@ -64,6 +69,7 @@ class Route:
         self.fight_level = {}    # name -> its level (1-4)
         self.cheats_on = set()   # sub-levels (the totems: 109 110 111 112) kept invincible (--cheats-on)
         self.walked = 0
+        self.walks = []          # round 18 g5: (first, last frame) of each teleport's C-up walk
         self.walk_probe = False
         self.walk = set()        # round 15 d5 (--walk): the levels whose open-floor teleports are walked
         # round 15 d2 (--real-weapons): no T2_GIVE_WEAPONS / T2_FILL_AMMO before this frame (the
@@ -107,6 +113,7 @@ class Route:
         self.tps.append("%d:%.1f,%.1f,%.1f,%.4f%s" % (f, x, y, z, ry, "!" if trig else ""))
         if walk:
             self.inputs.append("CU@%d..%d" % (f + 10, f + 10 + walk))
+            self.walks.append((f, f + 20 + walk))   # round 18 g5: no stick turn during the walk (STICK_FREE_WALK)
 
     def pick(self, f, x, y, z, ang=0.0, d=90.0, walk=50):
         """Stand d units from a pickup (or an action) at (x, y, z), facing it, and walk into it."""
@@ -180,7 +187,23 @@ class Route:
                 a, b = self.fights[k]
                 wins = [w for w in wins if w[1] < a or w[0] > b] + \
                        [(w[0], a - 1) for w in wins if w[0] < a <= w[1]] + [(b + 1, w[1]) for w in wins if w[0] <= b < w[1]]
+            # round 18 g5: in the levels of STICK_FREE_WALK the stick leaves the teleports' walks alone (level 5's
+            # embryo window ran on into 91's walk to the exit 7500: the stick turned to a new target and the
+            # walk went back to 124). Levels 1-4 keep round 17's windows (their validated runs).
+            def lv_of(fr):
+                return max([l for l, g in starts if g <= fr] or [1])
+            for a, b in self.walks:
+                if lv_of(a) in STICK_FREE_WALK & STICK_AIM:
+                    wins = [w for w in wins if w[1] < a or w[0] > b] + \
+                           [(w[0], a - 1) for w in wins if w[0] < a <= w[1]] + [(b + 1, w[1]) for w in wins if w[0] <= b < w[1]]
             env.append("T2_AIM_STICK=\"%s\"" % ";".join("%d-%d" % w for w in sorted(wins)))
+            # round 18 g5: the stick driver takes the assist's own target first in these sub-levels (aimdrive.py
+            # T2_AIMD_PRIMARY: the objectives, not the sleeping or out-of-play actors near them)
+            prim = sorted(set(l for lv in STICK_AIM for l in STICK_PRIMARY.get(lv, ())))
+            if prim:
+                env.append("T2_AIMD_PRIMARY=%s" % ",".join(str(l) for l in prim))
+            if 6 in STICK_AIM:   # round 18 g5: the Mother's parts: always the assist's node (aimdrive.py)
+                env.append("T2_AIMD_PRIMARY_ONLY=3")
         if self.move_drive:
             env.append("T2_MOVE_DRIVE=\"%s\"" % ";".join("%d-%d" % w for w in sorted(self.move_drive)))
         if self.walk_plan:   # round 16 e3: aimdrive.py's waypoint walker (WalkDrive)
@@ -1424,6 +1447,11 @@ def level6(r, t):
         # a life lost in a rescue run (the ending's own life loss at his death is not this)
         r.cheat_windows.append((lair - 200, lair + L6_HUB_END))
     r.note(lair, "4 the Primagen's lair: fire held, strafing, T2_BOSS_FRONT=450,3000,2.5,1")
+    # round 18 g5: the lair as a fight (--assist-keep lair: the assists' yaw in a --stick-aim 6 run)
+    r.fights["lair"] = (lair, lair + L6_HUB_END)
+    r.fight_level["lair"] = 6
+    if LAIR_PUSH:   # round 18 g5 (--lair-push): aimdrive.py's LairDrive against the Primagen's push (mode 20)
+        r.extra_env.append("T2_LAIR_PUSH=%s" % LAIR_PUSH)
     if 4 not in r.cheats_on:
         # round 15 d1: the Primagen without invincibility: the shredder (9) as at the Mother. The
         # Primagen recipe (T2_WARP_TO=7602): his death at 27,856 instead of 43,586 (plasma rifle), his
@@ -1464,6 +1492,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
+    global LAIR_PUSH
     global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_SOUND, N64_FROM, LAIR_KEEP, L2_HEAL
     import argparse
     ap = argparse.ArgumentParser()
@@ -1489,6 +1518,8 @@ def cli(argv=None):
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
     ap.add_argument("--late-keys", action="store_true",
                     help="Primagen keys 2 and 3 in after level 5, round 13's walks after levels 2 and 3 (round 14 c3)")
+    ap.add_argument("--lair-push", default="", help="toward|jump|both: the lair driver answers the Primagen's push "
+                    "(his mode 20) by walking towards him and/or jumping (round 18 g5; needs the lair driver)")
     ap.add_argument("--stick-aim", default="", help="L1,L2,...: these levels aim with the stick only, closed-loop "
                     "(run under tools/port/aimdrive.py; round 15 d3)")
     ap.add_argument("--assist-keep", default="", help="with --stick-aim: these fights keep the aim assists "
@@ -1539,6 +1570,7 @@ def cli(argv=None):
     L2_HEAL = a.l2_heal
     HOP = a.hop
     STICK_AIM = {int(x) for x in a.stick_aim.split(",") if x}
+    LAIR_PUSH = a.lair_push
     NAV = {int(x) for x in a.nav.split(",") if x}
     if a.nav_only is not None:
         NAV_ONLY = {tuple(int(v) for v in k.replace(":", ".").split(".")) for k in a.nav_only.split(",") if k}

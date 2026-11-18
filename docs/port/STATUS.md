@@ -282,7 +282,7 @@ Detail: [FIDELITY.md](FIDELITY.md) 9.
 |---|---|
 | f2af5137 | n64cmp: pair the m_Lights double buffers across gEvenOdd parity, skip never-written ones |
 
-## Round 18, part g1: the route with no legacy switch (branch names-R18_g1; PLAYTHROUGH.md 36-g1)
+## Round 18, part g1: the route with no legacy switch (branch names-R18_g1; PLAYTHROUGH.md 36)
 
 - **`--n64`** (`fullrun.py`, `playthrough.py --all` and `--level`): `--n64-shake --n64-props
   --n64-sound` together, no `T2_LEGACY_*` line in `teleport.env`: the stream a human player gets.
@@ -310,13 +310,42 @@ Detail: [FIDELITY.md](FIDELITY.md) 9.
 | cc36001b | `--n64` |
 | 56836761 | the shredder in 134, the 130 picks |
 | 0ae43535, 894bb9da | `N64_QUEEN_WEAPON`; the 132 picks and the scorpion launcher: no life lost |
-| 83caa47b | PLAYTHROUGH.md 36-g1 |
+| 83caa47b | PLAYTHROUGH.md 36 |
 
 **For the merge**: only tools/port/fullrun.py (new tables after `N64_L2_PICKS`, `n64_full()`,
 `r.seg_starts` in `level_segments`, the weapon block and the hub shift after `l2_heal` in
 `main_all`, the Queen weapon in `level5`, the `--n64` flag in `cli`), tools/port/playthrough.py
-(`--n64`), PLAYTHROUGH.md 36-g1. g5 also edits fullrun.py (weapons/aim parts, levels 5-6):
+(`--n64`), PLAYTHROUGH.md 36. g5 also edits fullrun.py (weapons/aim parts, levels 5-6):
 `level5` and `main_all` are the likely conflict spots.
+
+## Round 18, part g5: levels 5-6 by stick, the Primagen's push (branch names-R18_g5)
+
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 37. Legacy switches on throughout. Tools and port debug
+code only (no `src/`/`include/` change, no asm_diff needed); **the default command's
+`playthrough.txt` and `teleport.env` are byte-identical to ab0bc24c's**, and round 17's combo
+(`--real-weapons 1 --stick-aim 1,2,3,4 --l2-heal --hub-wait 0`) gives the same `teleport.env` and,
+on this part's binary and driver, the same gameplay lines (END 2 at 248,808, no life lost).
+
+- **`--stick-aim 1,2,3,4,5,6` reaches END 2** (264,480, 5 totems, 4 bosses) with three driver fixes
+  (aimdrive.py `T2_AIMD_PRIMARY`, `T2_AIMD_PRIMARY_ONLY`; fullrun.py `STICK_PRIMARY`,
+  `STICK_FREE_WALK`): the hive's objectives first (embryo 2 survived and the hive exit led back to
+  124), the boss's node instead of its never-hurt origin (the Queen, the Mother), the route's walks
+  in levels 5-6 left to the script. Level 5 and the Mother lose no life; **the Primagen's lair by
+  stick loses 3** (295 damage: the stick shoots his spawns half the time). **With the lair assisted and the push rule, `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --assist-keep lair --lair-push both --l2-heal --hub-wait 0` reaches END 2 at 248,500 with no life lost** (one run, ASLR on; not yet repeated under `setarch -R`).
+- **The Primagen's "throw" is his mode-20 push** (`Primagen_UpdateMode20`: 716.8 on the ground /
+  179.2 in the air added to the player's velocity away from him for ~11 frames after a 15-frame
+  wind-up; bossState 10 is only "lost sight of the player" afterwards). In the measured case the
+  keep-away rule had walked the player away from him towards the edge. **`--lair-push both`**
+  (walk towards him + jump during mode 20; off by default) turned f2's F+37 game over into END 2.
+- New debug output: the `move` line ends in `bm M` (the boss's AI mode); `T2_PUSH_LOG=1` prints a
+  `lairpush` line each frame of mode 20 (t2bosslog.c).
+- **Not done**: sister 2 on real weapons (PLAYTHROUGH 37.5).
+
+Files: `tools/port/aimdrive.py` (Picker primary, LairDrive push), `tools/port/fullrun.py`
+(`STICK_PRIMARY`, `STICK_FREE_WALK`, `Route.walks`, `--lair-push`, the `lair` fight key),
+`port/game/t2bosslog.c` (`T2Port_MovePose`). Next: the lair by stick (the Primagen's node as the
+only target, his spawns last; s6f keeps the assist there), `--lair-push` on the N64 stream (g1's route),
+sister 2 with real weapons.
 
 ## Round 17, part f3: the port against the N64 member by member (branch names-R17_f3)
 
