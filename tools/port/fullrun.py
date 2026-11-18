@@ -645,6 +645,35 @@ def insert_picks(segments, picks, extra=(), retry=(), back=()):
     return [tuple(s) for s in segs], ext0 + ext, moved(retry), moved(back)
 
 
+# Round 17 f5 (--l2-heal): 135's health +10 pickups (object 542, item 1702: +10, up to 100; tools/assets/levels.py
+# level actors) on the graveyard floor, walked into after sister 3 and before the exit 2608, KEY_STEP frames each:
+# the City Totem's fight (110) comes next with no health on the way, and a stick or real-weapons run reached it
+# with 18-67 health (two lives lost there). Not the six beside sister 3's spot (the pit's damage region).
+L2_HEAL = False
+# (x, y, z, approach angle): the stand point 90 units out along the angle must be graveyard floor (y 0; the
+# graves are y 87; outside every region the teleport fails)
+L2_HEAL_PICKS = [(102.4, 0.0, -358.4, 0.0), (1556.3, 0.0, 76.6, 0.0), (1554.3, 0.0, 589.6, 0.0),
+                 (867.5, 0.0, 1146.0, math.pi), (-545.3, 0.0, 1148.1, math.pi), (-1269.4, 0.0, 1146.0, math.pi),
+                 (-1345.9, 0.0, 457.2, math.pi / 2), (2066.9, 0.2, 1323.4, 0.0), (2554.0, 0.2, 92.6, 0.0),
+                 (1235.9, 0.2, -839.6, 0.0)]
+
+
+def l2_heal(segs):
+    """--l2-heal: L2_HEAL_PICKS before 135's exit step; the later segments move by the frames added.
+    Returns (segments, frames added)."""
+    segs = list(segs)
+    i = [k for k, sg in enumerate(segs) if sg[0].startswith("135 ")][0]
+    name, rel, steps = segs[i]
+    warp = steps[-1]
+    picks = [(warp[0] + KEY_STEP * k, x + math.sin(a) * 90.0, y, z + math.cos(a) * 90.0, a, 50, {})
+             for k, (x, y, z, a) in enumerate(L2_HEAL_PICKS)]
+    d = KEY_STEP * len(picks)
+    segs[i] = (name, rel, list(steps[:-1]) + picks + [(warp[0] + d,) + tuple(warp[1:])])
+    for k in range(i + 1, len(segs)):
+        segs[k] = (segs[k][0], segs[k][1] + d, segs[k][2])
+    return segs, d
+
+
 def l2_segments(nocheats):
     """playthrough.L2_SEGMENTS, with round 12's sister-1 steps when level 2 has no invincibility."""
     if not nocheats:
@@ -923,6 +952,11 @@ L1_ARMS = {
     # 59 by the level exit 7100: shells x10, bullets x40, explosive shells x3, tek arrows x5 in a row
     9: [(-9851.8, -307.2, 5427.2, 1.5708, 60, 90)],
 }
+# round 17 f5: 131's plasma rifle (-1996.8, -1126.4, 5785.6) lies at the bottom of a pool (floor -1,126, water
+# -532; round 15 d2: "a death there"); with the 150 plasma cells of 129 it is the weapon for 134 (zombies 2-4 and
+# sister 2: the mag 60's 50 bullets do not kill zombies 2 and 3). L2_PLASMA = False: round 16's picks.
+L2_PLASMA = False   # tried: the pool is deadly (10 health every 2 frames: 116 -> 0 in 22 frames)
+L2_131_PLASMA = [(-1996.8, -1126.4, 5785.6, 0.0, 60, 40)] if L2_PLASMA else []
 L2_ARMS = {
     0: [(3408.8, 614.4, -521.9, 0.0), (3406.2, 614.4, -1324.7, -1.5708),   # 125: shells x10, explosive shells x3,
         (2816.0, 614.4, 9984.0, 0.0)],                                      #      shells x10
@@ -934,8 +968,7 @@ L2_ARMS = {
     # round 16 e5: ammo for sister 2 (134) after sister 1 has taken it all: 131's terrace (y 102.4),
     # bullets x40, shells x3 and explosive shells x3 (130's bullets x40 and shells x10 by its exit,
     # (6529.9, -3379.2, 478.5) and (6516.3, -3379.2, 2080.0), were not reached by such picks)
-    8: [(2581.0, 102.4, 1159.2, 0.0), (1420.5, 102.4, 1161.3, 0.0), (1971.6, 102.4, 1772.7, 0.0)],
-    # not taken: 131's plasma rifle (-1996.8, -1126.4, 5785.6): a death there
+    8: [(2581.0, 102.4, 1159.2, 0.0), (1420.5, 102.4, 1161.3, 0.0), (1971.6, 102.4, 1772.7, 0.0)] + L2_131_PLASMA,
 }
 L3_ARMS = {}
 ARMS = {1: L1_ARMS, 2: L2_ARMS, 3: L3_ARMS}
@@ -973,8 +1006,8 @@ def wheel(weapon, f):
 L2_TAPS = {(4, 0): 8,       # 129's soul gate: the shotgun (the grenade launcher's grenades fly over the gate)
            (6, 2): 4,       # 133's zombies 22-24 (L2_133_REAL): the mag 60 (the pistol's slot)
            (6, 6): 15,      # 133's sister 1: the grenade launcher
-           (9, 0): 4,       # 134's zombies: the mag 60 (the pistol's slot)
-           (9, 3): 8}       # 134's sister 2: the shotgun
+           (9, 0): 10 if L2_PLASMA else 4,   # 134's zombies: the plasma rifle (round 17 f5) / the mag 60
+           (9, 3): 10 if L2_PLASMA else 8}   # 134's sister 2: the plasma rifle / the shotgun
 # round 16 e5: 133 in a --real-weapons 1,2 run: the zombies of the second room (22, 23, 24: 80 health
 # each, they open door 28; the nearest awake actor, T2_FIRE_GATE), then sister 1 (20, 50 health). The round-12 steps
 # (the sister aimed from the start, the nearest actor else) spent all the ammo on doors 27 and 28.
@@ -992,6 +1025,7 @@ L2_133_REAL = [
     (6050, -847.0, -4761.6, 1574.0, 3.1416, 0, {"fire": 1900, "aim": "enemy:20"}),
     (8000, 827.5, -4761.6, -1627.5, -2.8692, 150, {}),    # warp 2615 -> 130
 ]
+L2_134_FIRE_R = 450     # round 17 f5: 134's fire range in a --real-weapons 2 run (T2_FIRE_GATE, T2_AIMD_FIRE_MAX)
 L2_STRETCH_REAL = [(6, 6, 3000), (9, 3, 2000), (12, 15, 2000)]
 
 
@@ -1086,15 +1120,25 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         l2stretch = L2_STRETCH_REAL
         l2segs = with_taps(l2segs, L2_TAPS)
         r.extra_env.append("T2_AIM_SKIP_TYPES=6")
-        r.extra_env.append("T2_FIRE_GATE=133,134,135")
+        # round 17 f5: in 134 the zombies walk up from 1,700 units: no fire beyond 450 (the mag 60 emptied
+        # on zombie 2 from afar); the stick driver's own fire likewise (T2_AIMD_FIRE_MAX)
+        r.extra_env.append("T2_FIRE_GATE=133,134:%d,135" % L2_134_FIRE_R)
+        r.extra_env.append("T2_AIMD_FIRE_MAX=134:%d" % L2_134_FIRE_R)
     l2retry = L2_RETRY + L2_RETRY_B5 + (L2_HEALTH_LATE if h2 else [])
     l2back = L2_RETURN_LATE if h2 else ()
     if N64_SHAKE and N64_L2_PICKS:   # round 17 f1: health picks between 135's crypt steps
         l2segs, l2stretch, l2retry, l2back = insert_picks(l2segs, N64_L2_PICKS, l2stretch, l2retry, l2back)
+    heal = 0
+    if L2_HEAL:   # round 17 f5 (after f1's picks: these go before 135's exit step)
+        l2segs, heal = l2_heal(l2segs)
     a2 = level_segments(r, l2segs, l2s, merged(L2_KEYS, L2_HEALTH if h2 else {}, L2_ARMS if 2 in real else {}) if extras else {},
                         l2retry, l2stretch,
                         back=l2back, detours=det.get(2),
                         walks=nav_table(2) if 2 in NAV else L2_WALKS if 2 in walk else None, nav_walks=2 in NAV)
+    a2 += heal
+    for k in hubs:   # round 17 f5: --l2-heal's picks move the City Totem and every later hub arrival
+        if k >= 2:
+            hubs[k] += heal
     t_arr = pt.L2_TOTEM_ARRIVAL + shift + a2
     r.note(t_arr, "110 the City Totem: fire taps (T2_FACE_NEAREST aims)")
     arms_switch(r, 2, t_arr, real)
@@ -1376,7 +1420,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_FROM, LAIR_KEEP
+    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_FROM, LAIR_KEEP, L2_HEAL
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1427,6 +1471,8 @@ def cli(argv=None):
                     "level L (7: the Primagen's lair), the N64's from there; with --n64-shake's level 4-6 changes")
     ap.add_argument("--lair-keep", type=int, default=LAIR_KEEP, help="on the N64's stream (--n64-shake, "
                     "--n64-shake-from): the lair driver walks away from him within this distance (0: off; round 17 f2)")
+    ap.add_argument("--l2-heal", action="store_true", help="135: the health +10 pickups after sister 3, before "
+                    "the City Totem (round 17 f5, L2_HEAL_PICKS)")
     ap.add_argument("--hub-wait", type=int, default=ARMS_HUB_WAIT,
                     help="--real-weapons 1: frames idled in the hub after level 1 (default %d)" % ARMS_HUB_WAIT)
     a = ap.parse_args(argv)
@@ -1440,6 +1486,7 @@ def cli(argv=None):
     LAIR_STRAFE = tuple(int(v) for v in (a.lair_strafe + ",0").split(",")[:2]) if a.lair_strafe else None
     L6_SLOT_AFTER = a.slot
     ARMS_HUB_WAIT = a.hub_wait
+    L2_HEAL = a.l2_heal
     HOP = a.hop
     STICK_AIM = {int(x) for x in a.stick_aim.split(",") if x}
     NAV = {int(x) for x in a.nav.split(",") if x}

@@ -525,40 +525,60 @@ static int aimSkipType(s32 type) {
     return 0;
 }
 
-/* T2_FIRE_GATE=L[,L...][@R] (DEBUG-ONLY, round 16 e5): in these levels, while an aim window is open
- * (T2_AIM_ENEMY / T2_AIM_NODE pick a target), the input's fire button (Z) is held back unless the
+/* T2_FIRE_GATE=L[:R][,L[:R]...][@R] (DEBUG-ONLY, round 16 e5): in these levels, while an aim window is
+ * open (T2_AIM_ENEMY / T2_AIM_NODE pick a target), the input's fire button (Z) is held back unless the
  * aimed actor is awake (AI mode != 0) and within R (default 1,500): a --real-weapons run's fire taps
  * no longer spend the ammo on sleeping or far actors (level 2's sisters). Outside the aim windows
- * and the levels the input is untouched. */
+ * and the levels the input is untouched. Round 17 f5: L:R gives one level its own range (134's
+ * zombies walk 1,700 units up to the player: the mag 60 fired at them from afar emptied the clip). */
 static int sAimCallFrame = -1000, sAimOkFrame = -1000;
+static int sGateInit, sGateN;
+static s32 sGateLevels[8];
+static f32 sGateRange[8], sGateR = 1500.0f;
+
+static void T2Port_FireGateInit(void) {
+    const char *e = getenv("T2_FIRE_GATE");
+    const char *at;
+    sGateInit = 1;
+    at = e != NULL ? strchr(e, '@') : NULL;
+    if (at != NULL) {
+        sGateR = (f32) atof(at + 1);
+    }
+    while (e != NULL && *e != '\0' && *e != '@' && sGateN < 8) {
+        sGateLevels[sGateN] = (s32) atoi(e);
+        sGateRange[sGateN] = -1.0f;
+        e = strpbrk(e, ",:@");
+        if (e != NULL && *e == ':') {
+            sGateRange[sGateN] = (f32) atof(e + 1);
+            e = strpbrk(e, ",@");
+        }
+        sGateN++;
+        if (e != NULL && *e == ',') {
+            e++;
+        }
+    }
+}
 
 static f32 T2Port_FireGateRange(void) {
-    static f32 sR = -1.0f;
-    if (sR < 0.0f) {
-        const char *e = getenv("T2_FIRE_GATE");
-        e = e != NULL ? strchr(e, '@') : NULL;
-        sR = e != NULL ? (f32) atof(e + 1) : 1500.0f;
+    int k;
+    if (!sGateInit) {
+        T2Port_FireGateInit();
     }
-    return sR;
+    for (k = 0; k < sGateN; k++) {
+        if (sGateLevels[k] == (s32) gScene.m_nLevel && sGateRange[k] >= 0.0f) {
+            return sGateRange[k];
+        }
+    }
+    return sGateR;
 }
 
 static int T2Port_FireGateLevel(void) {
-    static int sInit, sN;
-    static s32 sLevels[8];
     int k, in = 0;
-    if (!sInit) {
-        const char *e = getenv("T2_FIRE_GATE");
-        sInit = 1;
-        while (e != NULL && *e != '\0' && *e != '@' && sN < 8) {
-            sLevels[sN++] = (s32) atoi(e);
-            e = strpbrk(e, ",@");
-            if (e != NULL && *e == ',') {
-                e++;
-            }
-        }
+    if (!sGateInit) {
+        T2Port_FireGateInit();
     }
-    for (k = 0; k < sN; k++) {
-        in |= sLevels[k] == (s32) gScene.m_nLevel;
+    for (k = 0; k < sGateN; k++) {
+        in |= sGateLevels[k] == (s32) gScene.m_nLevel;
     }
     return in;
 }

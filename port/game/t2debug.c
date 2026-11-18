@@ -63,6 +63,7 @@ typedef struct { const char *dli_fname; void *dli_fbase; const char *dli_sname; 
 extern int dladdr(const void *, T2DlInfo *);
 #include "structs/intelligence.h"
 #include "structs/boss.h"
+int T2Port_TotemLive(void); /* round 17 f5, below */
 
 /* T2_ACTOR_LOG=N (with T2_STATE_LOG, round 7 v3): the level's enemies and turrets (gScene's level
  * actors with intelligence type 1 or 4), nearest to the player first (N of them, default 8), and
@@ -294,9 +295,13 @@ void T2Port_LogState(int frame) {
     }
     {
         /* a totem defense (the energy totem levels, TotemDefense_*): state 0 fight, 1 saved,
-         * 2 failed; the time left, the kills against the definition's target (round 9 x1) */
+         * 2 failed; the time left, the kills against the definition's target (round 9 x1).
+         * Round 17 f5: only while the totem is an actor of the loaded level (T2Port_TotemLive):
+         * gTotemDefense.obj and .def keep pointing into the totem level's actors and data after
+         * it is left (the game never clears them, the N64 neither), and this line read the freed
+         * memory there ("totem hp" garbage such as 4236247 or -798464, run to run different). */
         extern TotemDefenseState gTotemDefense;
-        if (gTotemDefense.obj != NULL && gScene.m_nLevel > 0) {
+        if (gTotemDefense.obj != NULL && gScene.m_nLevel > 0 && T2Port_TotemLive()) {
             CDestructibleIntelligence *d = (CDestructibleIntelligence *) gTotemDefense.def;
             printf("totem: state %d time %.0f/%d s kills %d/%d attackers %d warned %d totem hp %d\n",
                    (int) gTotemDefense.state, gTotemDefense.timer / 15.0f, d != NULL ? (int) d->m_TotemMissionDuration : -1,
@@ -306,6 +311,19 @@ void T2Port_LogState(int frame) {
         }
     }
     fflush(stdout);
+}
+
+/* Round 17 f5: 1 when gTotemDefense.obj is the live totem of the loaded level: one of
+ * gScene.m_pActors, still drawn by TotemDefense_DrawTotem (TotemDefense_Init sets it, the update
+ * keeps it). Outside its level obj and def are stale pointers (freed level memory). */
+int T2Port_TotemLive(void) {
+    extern TotemDefenseState gTotemDefense;
+    extern void TotemDefense_DrawTotem();
+    CGameObjectInstance *o = (CGameObjectInstance *) gTotemDefense.obj;
+    if (o == NULL || gScene.m_pActors == NULL || o < gScene.m_pActors || o >= gScene.m_pActors + gScene.m_nActors) {
+        return 0;
+    }
+    return (void *) o->m_AI.m_pfDraw == (void *) TotemDefense_DrawTotem;
 }
 
 /* A frame-scheduled value (DEBUG-ONLY, round 12 C27): "V[@F][;V@F...]", the V of the last entry whose F
@@ -1411,6 +1429,15 @@ void T2Port_AimCand(int frame, CGameObjectInstance *o, f32 x, f32 y, f32 z, f32 
     sCand[at].z = z;
     sCand[at].d2 = d2;
     sCand[at].hp = o->m_AI.m_Health;
+    {
+        /* round 17 f5: kind 2 = an attacker of the totem (a totem defense: its sight target is the
+         * totem; a player sees it run at the totem). Truthy like 1 for older drivers. */
+        extern TotemDefenseState gTotemDefense;
+        if (kind == 1 && gTotemDefense.state == 0 && T2Port_TotemLive() &&
+            (void *) o->m_AI.m_pSightTarget == (void *) gTotemDefense.obj) {
+            kind = 2;
+        }
+    }
     sCand[at].kind = kind;
     if (sCandN < AIM_CAND_MAX) {
         sCandN++;
@@ -1478,7 +1505,22 @@ int T2Port_AimPose(int frame, char *buf, int n) {
             len += snprintf(buf + len, n - len, " %d %a %a %a %d %d", sCand[k].id, sCand[k].x, sCand[k].y,
                             sCand[k].z, (int) sCand[k].hp, sCand[k].kind);
         }
-        snprintf(buf + len, n - len, " hp %d\n", (int) (p->m_Data.m_Health >> 8));
+        len += snprintf(buf + len, n - len, " hp %d", (int) (p->m_Data.m_Health >> 8));
+        {
+            /* round 17 f5: a totem defense running: "tot HP TIME KILLS NEED" (the totem's health,
+             * the seconds left, the kills so far and the kills needed: the HUD's two bars) */
+            extern TotemDefenseState gTotemDefense;
+            if (gTotemDefense.state == 0 && gScene.m_nLevel > 0 && T2Port_TotemLive() && len < n - 48) {
+                CDestructibleIntelligence *d = (CDestructibleIntelligence *) gTotemDefense.def;
+                len += snprintf(buf + len, n - len, " tot %d %d %d %d", (int) (gTotemDefense.obj->m_AI.m_Health >> 8),
+                                (int) (gTotemDefense.timer / 15.0f), (int) gTotemDefense.kills,
+                                d != NULL ? (int) d->m_EnemiesToKillToSaveTotem : -1);
+            }
+        }
+        if (len < n - 16) {
+            len += snprintf(buf + len, n - len, " lv %d", (int) gScene.m_nLevel); /* round 17 f5: the level */
+        }
+        snprintf(buf + len, n - len, "\n");
         sCandN = 0;
     }
     return 1;

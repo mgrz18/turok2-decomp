@@ -149,11 +149,31 @@ IMMUNE_X = envf("T2_AIMD_IMMUNE_X", 4.0)
 # other phases: out of play) is left for much longer (round 16 e2, s4c: one held the aim 4,600 frames)
 IMMUNE_FOR0 = int(envf("T2_AIMD_IMMUNE_FOR0", 3000))
 IMMUNE_X0 = envf("T2_AIMD_IMMUNE_X0", 50.0)
+# round 17 f5: "not hurt" counted per target over the frames it was aimed at (summed across switches),
+# not only while it stays the current target: two targets taken in turn (the Blind One's flier 17 and
+# the out-of-play actor 22 at full health) each reset the other's count, and the one that never drops
+# was never left. The levels (the aim line's "lv") where it applies: default 1, the Blind One's arena
+# (in level 2 it moved the sister fights and the route fell out of step); "" = nowhere (round 16).
+IMMUNE_ACC = {int(v) for v in os.environ.get("T2_AIMD_IMMUNE_ACC", "1").split(",") if v.strip()}
 PSPEED = envf("T2_AIMD_PSPEED", 150.0)      # the shot's speed for the lead (units per host frame)
 LEAD = envf("T2_AIMD_LEAD", 1.0)           # the share of the lead applied
 HIT_R = envf("T2_AIMD_HITR", 40.0)         # the radius counted as on target (units)
 FIRE_EVERY = int(envf("T2_AIMD_FIRE_EVERY", 15))   # a Z tap of FIRE_HOLD frames every FIRE_EVERY, as the script
 FIRE_HOLD = int(envf("T2_AIMD_FIRE_HOLD", 6))
+# round 17 f5: T2_AIMD_FIRE_MAX=L:R[,L:R...]: in level L fire only at a target within R units (a --real-weapons
+# run's ammo: 134's zombies walk up from 1,700 units; the driver's Z overrides T2_FIRE_GATE's range)
+# round 17 f5: in a totem defense (the aim line's "tot"), a kind-2 candidate (running at the totem) costs this
+# much (1: as any other; < 1 shoots the totem's attackers first). The defense is lost on time alone (8 kills in
+# 120 s, TotemDefense_UpdateFight: the totem itself is never hurt), so the default keeps the nearest/weakest rule.
+TOTEM_X = envf("T2_AIMD_TOTEM_X", 1.0)
+# round 17 f5: T2_AIMD_THREAT_NEAR=L:R[,L:R...]: in level L a kind-0 candidate farther than R units costs
+# THREAT_FAR times more. Kind 0 stands for the enemy biting the player; in the Blind One's arena (level 1) the
+# kind-0 actors 400-500 units away (her body, the other phases' actors: never hurt) took 300 aimed frames each
+# before the not-hurt rule left them, while her minion bit from the ledge (a --real-weapons run: two lives).
+THREAT_NEAR = {int(a): float(b) for a, b in (v.split(":") for v in os.environ.get("T2_AIMD_THREAT_NEAR", "1:250").split(",")
+                                             if ":" in v)}
+THREAT_FAR = envf("T2_AIMD_THREAT_FAR", 6.0)
+FIRE_MAX = {int(a): float(b) for a, b in (v.split(":") for v in os.environ.get("T2_AIMD_FIRE_MAX", "").split(",") if ":" in v)}
 CAND_EVERY = int(envf("T2_AIMD_CAND_EVERY", 50))   # --stats: the candidates every this many frames
 
 
@@ -174,6 +194,20 @@ def parse_cands(f):
     return c, hp
 
 
+def line_level(f):
+    """The aim line's level ("lv N", round 17 f5), or None."""
+    return int(f[f.index("lv") + 1]) if "lv" in f[13:] else None
+
+
+def line_totem(f):
+    """A totem defense in progress ("tot HP TIME KILLS NEED", round 17 f5): (hp, seconds left, kills,
+    kills needed), or None."""
+    if "tot" not in f[13:]:
+        return None
+    i = f.index("tot")
+    return tuple(int(v) for v in f[i + 1:i + 5])
+
+
 class Picker:
     """Chooses the target among the candidates as a player would. Cost: (distance / 1,000 + 0.1)
     times (1 + W_ANG * the crosshair's angle to it): the near ones threaten, so they win even
@@ -191,6 +225,8 @@ class Picker:
         self.hp = None          # the current target's (health, the frame it last dropped or was taken)
         self.immune = {}        # id -> (until frame, cost factor)
         self.immunes = 0
+        self.aimed = {}         # IMMUNE_ACC: id -> [health at its last drop, frames aimed at since]
+        self.last = None        # the last aim frame
 
     def vel(self, frame, cid, pos):
         old = self.seen.get(cid)
@@ -202,7 +238,8 @@ class Picker:
         self.seen[cid] = (frame, pos, v)
         return v
 
-    def pick(self, frame, px, pz, ry, ex, ey, ez, pitch, cands, primary):
+    def pick(self, frame, px, pz, ry, ex, ey, ez, pitch, cands, primary, lv=None, totem=None):
+        acc = lv in IMMUNE_ACC
         if not cands:
             self.cur = None
             return primary, None
@@ -213,7 +250,11 @@ class Picker:
             t = d / PSPEED   # the stick lag is the controller's (Aim: the bearing rate)
             lx, ly, lz = x + LEAD * v[0] * t, y + LEAD * v[1] * t, z + LEAD * v[2] * t
             pts[cid] = (lx, ly, lz)
-            if cid == self.cur:
+            if acc:
+                rec = self.aimed.get(cid)
+                if rec is None or hp < rec[0]:
+                    self.aimed[cid] = [hp, 0]
+            elif cid == self.cur:
                 if self.hp is None or hp < self.hp[0]:
                     self.hp = (hp, frame)
                 elif frame - self.hp[1] > IMMUNE and len(cands) > 1:
@@ -223,8 +264,12 @@ class Picker:
             eyaw = wrap(face_yaw(px, pz, lx, lz) - ry)
             epit = math.atan2(ly - ey, math.hypot(lx - ex, lz - ez)) - pitch
             cost = (d / 1000.0 + 0.1) * (1.0 + W_ANG * (abs(eyaw) + 0.5 * abs(epit)))
+            if kind == 2 and totem is not None:
+                cost *= TOTEM_X   # round 17 f5: an attacker of the totem
             if not kind:
-                cost *= THREAT_X   # a threat outside the assist's set (a boss phase's group, the sister first)
+                cost *= THREAT_X
+                if d > THREAT_NEAR.get(lv, 1e9):
+                    cost *= THREAT_FAR   # a threat outside the assist's set (a boss phase's group, the sister first)
             cost *= 1.0 + W_HP * min(hp, 25600) / 25600.0   # the weak ones first: fewer attackers sooner
             if cid == self.cur:
                 cost *= W_KEEP
@@ -236,6 +281,15 @@ class Picker:
             self.switches += 1
             self.cur = best
             self.hp = None
+        if acc:
+            rec = self.aimed[best]
+            rec[1] += min(frame - self.last, 4) if self.last is not None and frame > self.last else 1
+            if rec[1] > IMMUNE and len(cands) > 1:
+                kind = [c[5] for c in cands if c[0] == best][0]
+                self.immune[best] = (frame + (IMMUNE_FOR if kind else IMMUNE_FOR0), IMMUNE_X if kind else IMMUNE_X0)
+                self.immunes += 1
+                rec[1] = 0
+        self.last = frame
         return pts[best], best
 
 
@@ -270,9 +324,12 @@ def answer(line, aim, probe=None, picker=None, trig=None):
     cid = None
     if picker is not None:
         cands, _ = parse_cands(f)
-        (tx, ty, tz), cid = picker.pick(frame, px, pz, ry, ex, ey, ez, pitch, cands, (tx, ty, tz))
+        (tx, ty, tz), cid = picker.pick(frame, px, pz, ry, ex, ey, ez, pitch, cands, (tx, ty, tz), line_level(f), line_totem(f))
     sx, sy, eyaw, epitch = aim.answer(frame, px, pz, ry, ex, ey, ez, pitch, tx, ty, tz)
-    z = trig.z(frame, eyaw, epitch, math.hypot(tx - ex, tz - ez)) if trig is not None else None
+    dist = math.hypot(tx - ex, tz - ez)
+    z = trig.z(frame, eyaw, epitch, dist) if trig is not None else None
+    if z is not None and dist > FIRE_MAX.get(line_level(f), 1e9):
+        z = 0   # too far for this level's weapon (round 17 f5): no fire
     return frame, sx, sy, eyaw, epitch, pitch, ry, cid, z
 
 
@@ -641,9 +698,10 @@ def main():
                         fl = line.split()
                         cs, php = parse_cands(fl)
                         ex_, ez_ = float.fromhex(fl[6]), float.fromhex(fl[8])
-                        stats.write("# %d hp %s %s\n" % (frame, php, " ".join(
-                            "%d:%.0f:%d%s" % (c[0], math.hypot(c[1] - ex_, c[3] - ez_), c[4], "" if c[5] else "t")
-                            for c in cs)))
+                        tot = line_totem(fl)   # round 17 f5: "a" = an attacker of the totem, then the totem
+                        stats.write("# %d hp %s %s%s\n" % (frame, php, " ".join(
+                            "%d:%.0f:%d%s" % (c[0], math.hypot(c[1] - ex_, c[3] - ez_), c[4], {0: "t", 2: "a"}.get(c[5], ""))
+                            for c in cs), "" if tot is None else " tot %d %ds %d/%d" % tot))
     finally:
         rc = proc.wait()
         if walk.cur is not None:
