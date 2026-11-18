@@ -91,7 +91,7 @@ FIELDS = [
 ]
 SIZEOF = ["CGameObjectInstance", "CScene", "CPlayer", "CCamera"]
 HEADERS = ["common.h", "structs/particle.h", "structs/world.h", "structs/player.h", "structs/game.h",
-           "structs/game_object.h", "structs/intelligence.h", "structs/collision.h", "structs/camera.h"]
+           "structs/game_object.h", "structs/intelligence.h", "structs/collision.h", "structs/camera.h", "structs/cache.h"]
 SYMS = ["gRandomValue", "gRandomValueB", "gFrameCountGameplay", "gNextTicks", "gEngineApp",
         "gEngineApp_m_Game", "gScene", "gDemoPlayer"]
 
