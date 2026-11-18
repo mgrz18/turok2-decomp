@@ -229,6 +229,42 @@ Fixes and checks of the merge:
 8. Still open: the obj-230 double fire and the Blind One's margin (round 14 c1), 119's moving
    platforms (c2), `t2audio_test`'s game-path mode, soak.py on macOS.
 
+## Round 17, part f3: the port against the N64 member by member (branch names-R17_f3)
+
+Detail: [FIDELITY.md](FIDELITY.md) 32-f3.
+
+- **`tools/port/n64cmp.py`** (`run`: both sides from one warp, same seed; `cmp`: two dumps): every
+  scalar member of gScene, the player, its camera, the level actors and pooled instances, by name,
+  with both layouts from libclang. Hooks: `T2_RAW_DUMP`, `T2_RNG_LOAD` (port), `n64trace.py --raw`,
+  `--rng-load`, `--rng-set`, `--ticks` (N64).
+- **Host bug fixed: the type-9 (interactive anim) intelligence body stayed big-endian** (no struct in
+  swap_spec.json): the lair props (e1's `lvl 10-17`) started on animation 0, and every type-9
+  flag test read wrong bits. Swapped in `CScene__DecompressIntelligence` (+ VM copy); asm_diff 0.
+  The lair now matches the N64 (actors, player, camera, RNG) at gf 1-10.
+- **It breaks the legacy route** (game over in 125 at ~154,400), so **`T2_LEGACY_INTEL9=1`** is
+  written by fullrun.py/playthrough.py into every teleport.env (`--n64-shake` too); `--n64-props`
+  leaves it out. Validated: the default command with it, 580,000 det lines md5 `ecb9f9f2…`, exit 0.
+- **Headless runs draw no sound random numbers** (`--game` without `--audio`: the sound entry points
+  return early; `CAudioWorld__PlaySound` draws): scripted routes are on a different RNG stream from a
+  player's (sound on) and the N64's. The N64's audio thread also draws during level loads (ambient
+  track every 4 retraces), which the port's instant load cannot reproduce.
+
+| commit | what |
+|---|---|
+| b1987988 | n64cmp.py, `T2_RAW_DUMP`, `n64trace --raw/--rng-set` |
+| 6d5b004f | the type-9 body swap, `T2_LEGACY_INTEL9` |
+| b01abeef | fullrun.py/playthrough.py: `T2_LEGACY_INTEL9=1`, `--n64-props` |
+| 79048270, 692cac9a, 75b9d18c | seed at CScene__LoadLevel (`T2_RNG_LOAD`, `--rng-load`), `--ticks`, `--audio --draw` |
+
+**For the merge**: src/us/code/func_002261A8.c, func_00465B04.c, func_0042AC0C.c (TARGET_PORT
+only); port/game/t2debug.c (`T2Port_LegacyIntel9`, `T2Port_RngAtLoad` appended), port/game/t2det.c
+(`T2Port_RawDump` appended), port/app/game.cpp (the `T2_RAW_DUMP` hook after `T2_RNG_SET`);
+fullrun.py (the `T2_LEGACY_INTEL9` line after `T2_LEGACY_SHAKE`, `N64_PROPS`), playthrough.py;
+n64trace.py. f1/f2's route branches need `T2_LEGACY_INTEL9=1` in their runs (fullrun writes it).
+
+**Next**: the levels 125, 135, 61, 100, 124, 114 with `n64cmp.py run`; the pool actors'
+`m_Resource`; tune the N64-stream route with `--audio` and `--n64-props`.
+
 ## Round 16, part e1: the N64 lair and Mother checks, the camera shake's random numbers (branch names-R16_e1)
 
 Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 27.

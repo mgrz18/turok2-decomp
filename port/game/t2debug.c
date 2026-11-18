@@ -1544,3 +1544,36 @@ int T2Port_LegacyShake(void) {
     }
     return s;
 }
+
+/* T2_LEGACY_INTEL9=1 (DEBUG-ONLY, round 17 f3): the type-9 (interactive anim) intelligence bodies left
+ * big-endian as before round 17 (CScene__DecompressIntelligence, func_002261A8.c / func_00465B04.c):
+ * the props then start on animation 0 instead of their own, and their type-flag tests read the wrong
+ * bits. A player gets the swapped (N64) values. */
+int T2Port_LegacyIntel9(void) {
+    static int s = -1;
+    if (s < 0) {
+        const char *e = getenv("T2_LEGACY_INTEL9");
+        s = e != NULL && *e != '0';
+    }
+    return s;
+}
+
+/* T2_RNG_LOAD=T:HEX (DEBUG-ONLY, round 17 f3; src/us/code/func_0042AC0C.c): at the entry of
+ * CScene__LoadLevel(scene, T, ...) set gRandomValue to HEX, once, so the level's own load (its actors'
+ * random set-up) starts from the same seed as the N64 with n64trace.py --rng-load T:HEX (a breakpoint on
+ * the same function). The N64's audio thread keeps drawing during the load (an ambient sound every 4
+ * audio frames, one per retrace, as long as the load takes), so T2_RNG_SET at the level's first game
+ * frame evens the streams again; tools/port/n64cmp.py sets both. */
+void T2Port_RngAtLoad(int level) {
+    static int sDone;
+    int t;
+    unsigned v;
+    const char *spec = getenv("T2_RNG_LOAD");
+    if (sDone || spec == NULL || sscanf(spec, "%d:%x", &t, &v) != 2 || level != t) {
+        return;
+    }
+    sDone = 1;
+    printf("debug: CScene__LoadLevel(%d): T2_RNG_LOAD: gRandomValue %08x -> %08x\n", level, (unsigned) gRandomValue, v);
+    fflush(stdout);
+    gRandomValue = v;
+}

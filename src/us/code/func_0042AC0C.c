@@ -66,6 +66,7 @@ extern void func_0042EBBC(void *);
 extern void CCameraPool__ResetEmitterPools(void *);
 
 #ifdef TARGET_PORT
+void T2Port_RngAtLoad(int level);
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS func_0042C96C receives CScene__LoadLevel's own argument
  * registers (pass-through); the host passes them. */
 void CScene__LoadLevel(CScene *w, s32 level, s32 announce) {
@@ -81,6 +82,7 @@ void CScene__LoadLevel(CScene *w, s32 level, s32 announce) {
     s32 count;
     s32 sound;
 
+    T2Port_RngAtLoad(level); /* DEBUG-ONLY: T2_RNG_LOAD=T:HEX (port/game/t2debug.c, round 17 f3) */
     if (w->m_nLevel != -1) {
         func_0042C96C(w);
     }
