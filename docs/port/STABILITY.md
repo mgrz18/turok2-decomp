@@ -605,7 +605,7 @@ scenario adds `T2_DET_ACTORS=1 T2_DET_FROM=72000`).
 |---|---|---|---|
 | the scenario: the default to 84,000, before the fix | on, 9 runs (to 76,500) | 5 took the second path (from 75,663) | |
 | the scenario after the fix, `setarch -R` | off | | `4d392c08…` |
-| the scenario after the fix, two different binaries (with and without the pose instrumentation) | on, 10 runs so far | all identical | `4d392c08…` |
+| the scenario after the fix, two different binaries (with and without the pose instrumentation) | on, 18 runs | all identical | `4d392c08…` |
 | the default (`playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6`), 300,000 frames | off | END 2 (cinema 370 at 253,310), 5 totems, hurtsum `deaths 0` (422 hits) | `a9f9584e…` (600,000 lines) |
 | the same | on, 4 runs | the same | `a9f9584e…` all 4 |
 | the default on the round-18 binary (the method check) | off | END 2 (cinema 370 at 243,774), 0 deaths, 399 hits | `6213496b…` (as round 18) |

@@ -305,7 +305,7 @@ from run to run. In 135 actor 41 (lying on a slope) got other bone matrices at i
   253,310, level 10 (END 2) 256,302. **The thinnest spot is now the City Totem: 97 damage, lowest health 3** (was 83 / 17);
   135 199 / 14, 133 182 / 18, the lair 138 / 36.
 - **The scenario** (the default to 84,000, `T2_DET_LOG=1 T2_DET_ACTORS=1 T2_DET_FROM=72000`):
-  `4d392c08…` in 10 runs so far (ASLR on, two different binaries) and under `setarch -R`. Before
+  `4d392c08…` in 18 runs with ASLR on (two different binaries; plus the 4 whole-game ASLR runs above) and under `setarch -R`. Before
   the fix: 5 of 9 ASLR runs to 76,500 took the second path.
 - `--legacy` (290,000 frames, `setarch -R`): END 2 (cinema 370 at 245,402), 5 totems, 2 lives lost in the City Totem as in round 18; md5 `281904eb…` (was `ecb9f9f2…`).
 
