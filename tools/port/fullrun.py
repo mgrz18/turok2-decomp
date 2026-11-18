@@ -31,6 +31,7 @@ STICK_FREE_WALK = {5, 6}   # round 18 g5: --stick-aim levels whose route walks k
 # round 18 g5: per route level, the sub-levels where the stick driver prefers the assist's target (T2_AIMD_PRIMARY):
 # level 5's pylons (124), the cocoons and embryos (94, 95, 96) and the Queen's node (2); level 6's Mother (3) and the Primagen (4)
 STICK_PRIMARY = {5: (124, 94, 95, 96, 2), 6: (3, 4)}
+LAIR_PUSH = ""       # round 18 g5: --lair-push toward|jump|both (T2_LAIR_PUSH; "" = off: the routes unchanged)
 ASSIST_KEEP = []    # ... except these fights (--assist-keep: Route.fights keys)
 NAV = set()         # round 16 e3: the levels whose NAV_WALKS teleports the waypoint walker replaces (--nav)
 NAV_ROM = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "baserom.us.z64")
@@ -1408,6 +1409,11 @@ def level6(r, t):
         # a life lost in a rescue run (the ending's own life loss at his death is not this)
         r.cheat_windows.append((lair - 200, lair + L6_HUB_END))
     r.note(lair, "4 the Primagen's lair: fire held, strafing, T2_BOSS_FRONT=450,3000,2.5,1")
+    # round 18 g5: the lair as a fight (--assist-keep lair: the assists' yaw in a --stick-aim 6 run)
+    r.fights["lair"] = (lair, lair + L6_HUB_END)
+    r.fight_level["lair"] = 6
+    if LAIR_PUSH:   # round 18 g5 (--lair-push): aimdrive.py's LairDrive against the Primagen's push (mode 20)
+        r.extra_env.append("T2_LAIR_PUSH=%s" % LAIR_PUSH)
     if 4 not in r.cheats_on:
         # round 15 d1: the Primagen without invincibility: the shredder (9) as at the Mother. The
         # Primagen recipe (T2_WARP_TO=7602): his death at 27,856 instead of 43,586 (plasma rifle), his
@@ -1448,6 +1454,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
+    global LAIR_PUSH
     global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_SOUND, N64_FROM, LAIR_KEEP, L2_HEAL
     import argparse
     ap = argparse.ArgumentParser()
@@ -1473,6 +1480,8 @@ def cli(argv=None):
     ap.add_argument("--slot", type=int, default=L6_SLOT_AFTER, help="Primagen key 6 into its slot, frames after the hub (level 6)")
     ap.add_argument("--late-keys", action="store_true",
                     help="Primagen keys 2 and 3 in after level 5, round 13's walks after levels 2 and 3 (round 14 c3)")
+    ap.add_argument("--lair-push", default="", help="toward|jump|both: the lair driver answers the Primagen's push "
+                    "(his mode 20) by walking towards him and/or jumping (round 18 g5; needs the lair driver)")
     ap.add_argument("--stick-aim", default="", help="L1,L2,...: these levels aim with the stick only, closed-loop "
                     "(run under tools/port/aimdrive.py; round 15 d3)")
     ap.add_argument("--assist-keep", default="", help="with --stick-aim: these fights keep the aim assists "
@@ -1521,6 +1530,7 @@ def cli(argv=None):
     L2_HEAL = a.l2_heal
     HOP = a.hop
     STICK_AIM = {int(x) for x in a.stick_aim.split(",") if x}
+    LAIR_PUSH = a.lair_push
     NAV = {int(x) for x in a.nav.split(",") if x}
     if a.nav_only is not None:
         NAV_ONLY = {tuple(int(v) for v in k.replace(":", ".").split(".")) for k in a.nav_only.split(",") if k}
