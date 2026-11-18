@@ -73,6 +73,7 @@ void T2Port_DebugSwitches(int skipPak, int startMode);
 
 // the game's screen size (render.h; Video_SetMode writes it)
 extern "C" int32_t gScreenWidth, gScreenHeight;
+extern "C" uint32_t gFrameCountGameplay; // the game clock (the --wav sidecar, round 20 i5)
 extern "C" const void* T2Game_TopMenu(int* cursor); // port/game/t2modelog.c
 
 namespace {
@@ -998,6 +999,15 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
                     wavNonZero += pcm[k] != 0;
                 }
                 wavFrames += n;
+            }
+            if (wav != nullptr) {
+                // the sample count at every frame (round 20 i5): tools/port/audiocmp.py pairs the
+                // port's WAV with refshots.py --audio-dump's by frame, mode and game frame
+                static FILE* wavLog = fopen((args.wav + ".txt").c_str(), "w");
+                if (wavLog != nullptr) {
+                    fprintf(wavLog, "frame %d samples %llu mode %d gf %u\n", f + 1,
+                            (unsigned long long)wavFrames, mode, (unsigned)gFrameCountGameplay);
+                }
             }
         }
         T2PortTask task;

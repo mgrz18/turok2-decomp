@@ -120,6 +120,10 @@ def main():
                          "that warp; the port's twin is T2_START_WARP=ID@F. Every shot's game frame "
                          "(gFrameCountGameplay), mode and level go to OUT/shots.txt, to pair the shots with "
                          "the port's by gf (T2_DET_LOG=1 T2_DET_GF=1)")
+    ap.add_argument("--audio-dump", default="",
+                    help="OUT.raw (round 20 i5): attach tools/port/n64audiodump.c (built here with cc) as the "
+                         "audio plugin: every AI buffer the game hands the DAC goes to OUT.raw (stereo s16 LE "
+                         "at the AI rate), OUT.raw.txt gets 'frame N samples S dacrate D' per emulator frame")
     a = ap.parse_args()
 
     out = os.path.abspath(a.out)
@@ -163,10 +167,28 @@ def main():
     assert rc == 0, rc
 
     plugins = []
-    for ptype, name in ((M64PLUGIN_GFX, "mupen64plus-video-%s.so" % a.gfx),
-                        (M64PLUGIN_INPUT, "mupen64plus-input-sdl.so"),
-                        (M64PLUGIN_RSP, "mupen64plus-rsp-hle.so")):
+    plist = [(M64PLUGIN_GFX, "mupen64plus-video-%s.so" % a.gfx),
+             (M64PLUGIN_INPUT, "mupen64plus-input-sdl.so"),
+             (M64PLUGIN_RSP, "mupen64plus-rsp-hle.so")]
+    adump, adlog = None, None
+    if a.audio_dump:
+        import subprocess
+        so = os.path.join(out, "n64audiodump.so")
+        subprocess.check_call(["cc", "-O2", "-shared", "-fPIC", "-o", so,
+                               os.path.join(os.path.dirname(os.path.abspath(__file__)), "n64audiodump.c")])
+        os.environ["T2_N64_AUDIO_DUMP"] = os.path.abspath(a.audio_dump)
+        plist.insert(1, (M64PLUGIN_AUDIO, so))
+        adlog = open(os.path.abspath(a.audio_dump) + ".txt", "w")
+        import n64trace as T
+        adoffs, adsyms = T.n64_offsets(), T.symbols()
+
+        def adram():
+            return T.Ram(core.DebugMemGetPointer(M64P_DBG_PTR_RDRAM))
+    for ptype, name in plist:
         lib = C.CDLL(os.path.join(PLUGDIR, name))
+        if ptype == M64PLUGIN_AUDIO:
+            adump = lib
+            adump.n64ad_samples.restype = C.c_longlong
         rc = lib.PluginStartup(C.c_void_p(core._handle), None, dbg)
         assert rc == 0, (name, rc)
         rc = core.CoreAttachPlugin(ptype, C.c_void_p(lib._handle))
@@ -209,6 +231,13 @@ def main():
 
     @FRAMECB
     def on_frame(n):
+        if adump is not None:
+            ram = adram()
+            adlog.write("frame %d samples %d dacrate %d mode %d level %d gf %d\n" % (
+                n, adump.n64ad_samples(), adump.n64ad_dacrate(),
+                ram.sval(adsyms["gEngineApp"] + adoffs["app_mode"][0], adoffs["app_mode"][1]),
+                ram.sval(adsyms["gScene"] + adoffs["sc_level"][0], adoffs["sc_level"][1]),
+                ram.u32(adsyms["gFrameCountGameplay"])))
         # the screenshot asked for at frame n-1 lands as the core's next file: rename it
         for f in glob.glob(shotdir + "/*.png"):
             os.replace(f, os.path.join(out, "shot_%d.png" % pending.pop("shot", n)))
