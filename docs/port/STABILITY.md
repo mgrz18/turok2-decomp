@@ -449,3 +449,51 @@ python3 tools/port/objbisect.py --bad OUT/none --good OUT/zero --ref zero_det.lo
     --route RUN --frames 16000 --work /tmp/bis --archive OUT/turok2.o2r --rom baserom.us.z64 bisect
 # list: index, archive, object; test NAME I0:I1 ...: one mix (objects [I0, I1) from --bad)
 ```
+
+## 12. Round 18 (part g2): address-layout determinism, the driver's fifo watchdog
+
+### 12.1 The stack-depth guards (a layout-dependent branch, fixed)
+
+Three recursive region walks start with an N64 stack check: `if ((uptr) &local < (uptr)
+&D_800C894C) return;` (`Collision_SweepRegionWalls`, `func_00240800.c`; `Path_ExpandNode`,
+`func_002393D0.c`; `Automap_RevealRegion`, `func_00400000.c`). `D_800C894C` is `gThreadStackMain +
+0xCCC`: "less than 0xCCC bytes of the 32 KB N64 main stack left". On the host the game threads run on
+their own 8 MB pthread stacks, so the test compared a host stack address with a host `.bss` address:
+
+- the usual PIE layout (executable at 0x55..., thread stacks mmap'd at 0x7f...): always false;
+- the executable mapped above the thread stacks (run through `ld.so`, `setarch -R
+  /lib64/ld-linux-x86-64.so.2 turok2 ...`): always true. The wall sweep stopped at its first
+  region; in level 53 at frame 15,368 actor 16 walked through a wall edge (x 1318.763 instead of
+  the slide to 1318.526), and the run went its own way from there (level 109 reached 360 frames
+  later).
+
+Found with two new det switches and gdb: `T2_DET_WATCH=FRAME:ACTOR[:LEN]` calls
+`T2Det_WatchBegin(&actor->m_vPos.x)` at FRAME's det line and `T2Det_WatchEnd` LEN frames later;
+`tools/port/gdbwatch.py` (run as `gdb -q -batch -x tools/port/gdbwatch.py --args turok2 ...`, under
+`aimdrive.py`) puts a hardware watchpoint there and logs every write with its backtrace
+(`G2W=NAME` -> `$G2WDIR` or `$TMPDIR`/`watch_NAME.log`), and with `G2TRACE=REGEX` (gdb basic regex: `^Collision_\|^Sweep`) a call trace of the
+functions matching it; `G2RAND=1` keeps ASLR on; `G2LD=EXE` handles an executable started through
+`ld.so` (gdb does not see it as an objfile: the script waits for `_dl_debug_state`, reads the base
+from `/proc/PID/maps` and `add-symbol-file -o`). The two traces differed at the first call inside
+`Collision_SweepRegionWalls`.
+
+The fix (asm_diff 0): on `TARGET_PORT` the guard asks `t2os_stack_low(&local)`
+(port/runtime/t2os.c): "within 64 KB of the current host thread's stack bottom"
+(`pthread_getattr_np` on Linux, `pthread_get_stackaddr_np`/`_stacksize_np` on macOS), never true in
+play; the N64 guard is not hit in a normal game either (the walks are bounded by the visited flags
+and 150 path nodes). After it, the `ld.so` layout gives the reference det trace to 84,000
+(md5 `27b63784…`, as `setarch -R`). The default route's stream is unchanged (the usual layout never
+took the early return).
+
+`T2_DET_MTX=1` (with `T2_DET_ACTORS`) adds a `mtx` line per actor: the block indices of
+`m_pmtDrawMtxs` / `m_pmtLastFrameDrawMtxs` in `gScene.m_Heap` and an FNV hash of each of the first
+8 blocks (blocks past the actor's bones belong to the next allocation).
+
+### 12.2 `aimdrive.py` and a game that exits before the fifos
+
+The driver opens the two fifos with blocking opens; a game that exits (a bad option, a crash at
+boot) before it opens them left the driver waiting forever. A watchdog thread now waits on the
+child: when it exits before both fifos are open it opens the other end of each (non-blocking), so
+the driver's open returns, its read sees EOF and it exits with the game's code.
+`T2_AIM_OPEN_TIMEOUT=SECONDS` also SIGKILLs a game that has not opened the fifos after that long.
+Checked with `/bin/false` (exits 1 at once) and `sleep 30` with a 2 s timeout (killed, exit -9).

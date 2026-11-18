@@ -97,15 +97,15 @@ __attribute__((noinline)) void T2Det_WatchEnd(void *addr) {
 }
 
 void T2Port_LogDet(int frame) {
-    static int sFrom = -1, sVerbose, sParticles, sGameFrames, sWatchFrame = -1, sWatchActor;
+    static int sFrom = -1, sVerbose, sParticles, sGameFrames, sWatchFrame = -1, sWatchActor, sWatchLen = 1;
     if (sWatchFrame == -1) {
         const char *w = getenv("T2_DET_WATCH");
         sWatchFrame = -2;
-        if (w != NULL && sscanf(w, "%d:%d", &sWatchFrame, &sWatchActor) != 2) {
+        if (w != NULL && sscanf(w, "%d:%d:%d", &sWatchFrame, &sWatchActor, &sWatchLen) < 2) {
             sWatchFrame = -2;
         }
     }
-    if (sWatchFrame >= 0 && (frame == sWatchFrame || frame == sWatchFrame + 1) && gScene.m_pActors != NULL) {
+    if (sWatchFrame >= 0 && (frame == sWatchFrame || frame == sWatchFrame + sWatchLen) && gScene.m_pActors != NULL) {
         void *a = &gScene.m_pActors[sWatchActor].header.m_vPos.x;
         printf("det: watch frame %d actor %d at %p\n", frame, sWatchActor, a);
         fflush(stdout);
