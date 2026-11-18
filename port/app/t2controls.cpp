@@ -29,6 +29,7 @@ std::shared_ptr<Ship::Window> sWindow;
 class HeadlessWindow;
 HeadlessWindow* sHeadless = nullptr; // --pad-test's window
 bool sHotkeyF1 = false;              // --pad-test: "hotkey F1"
+bool sFocusFeed = true;              // --pad-test: "focus 0|1" (the window's keyboard focus)
 
 // ---- the headless window (--pad-test) ----
 // Every method a no-op, except the mouse, which the test script sets.
@@ -165,7 +166,7 @@ class HeadlessWindow : public Ship::Window {
 struct PadEvent {
     int frame;
     int kind; // 0 key, 1 gamepad button, 2 gamepad axis, 3 mouse move, 4 mouse button, 5 capture, 6 plug, 7 unplug,
-              // 8 window W H X Y, 9 fullscreen 0|1, 10 hotkey F1
+              // 8 window W H X Y, 9 fullscreen 0|1, 10 hotkey F1, 11 focus 0|1
     int code;
     int value;
     int x, y;
@@ -421,6 +422,42 @@ void T2Controls_RegisterSettings(bool save) {
     fflush(stdout);
 }
 
+bool T2Controls_InputFocus() {
+    // Round 19 (h4): the window lost the keyboard focus (Cmd-Tab, a click on another app, a
+    // notification taking focus): free the mouse (SDL3 would grab it again by itself when the
+    // window comes back, hiding the pointer the player was using elsewhere: a click in the window
+    // captures it again, T2Controls_Mouse) and give the game no input until the focus is back
+    // (SDL already releases held keys; a gamepad's buttons or a mouse button held while switching
+    // would otherwise stay down for the game). Headless runs without --pad-test have no window: always
+    // focused.
+    static bool focused = true;
+    bool now = true;
+    if (sPadTest) {
+        now = sFocusFeed;
+    } else if (sWindow != nullptr) {
+        static SDL_Window* sdlWindow = nullptr;
+        if (sdlWindow == nullptr) {
+            int n = 0;
+            SDL_Window** windows = SDL_GetWindows(&n);
+            if (windows != nullptr && n > 0) {
+                sdlWindow = windows[0];
+            }
+            SDL_free(windows);
+        }
+        now = sdlWindow == nullptr || (SDL_GetWindowFlags(sdlWindow) & SDL_WINDOW_INPUT_FOCUS) != 0;
+    }
+    if (now != focused) {
+        focused = now;
+        if (!now && sWindow != nullptr) {
+            sWindow->SetMouseCapture(false);
+        }
+        printf("controls: %s\n", now ? "the window has the focus again: input on (a click captures the mouse)"
+                                     : "the window lost the focus: the mouse released, no input to the game");
+        fflush(stdout);
+    }
+    return focused;
+}
+
 void T2Controls_Look(int8_t* sy, bool inLevel) {
     // gT2StickInvertY: the gamepad's right stick / the arrow keys look inverted, in a level only
     // (the menus keep up = up)
@@ -501,7 +538,7 @@ bool T2PadTest_Load(const std::string& path) {
     }
     // FRAME key NAME down|up / FRAME btn NAME down|up / FRAME axis NAME VALUE (-32768..32767)
     // FRAME mouse DX DY / FRAME mbtn LEFT|RIGHT down|up / FRAME capture 0|1 / FRAME unplug / FRAME plug
-    // FRAME window W H X Y / FRAME fullscreen 0|1 / FRAME hotkey F1
+    // FRAME window W H X Y / FRAME fullscreen 0|1 / FRAME hotkey F1 / FRAME focus 0|1 (Cmd-Tab away / back)
     std::string line;
     int lineNo = 0;
     while (std::getline(in, line)) {
@@ -547,6 +584,9 @@ bool T2PadTest_Load(const std::string& path) {
             e.value = atoi(a.c_str());
         } else if (kind == "hotkey" && a == "F1") {
             e.kind = 10;
+        } else if (kind == "focus") {
+            e.kind = 11;
+            e.value = atoi(a.c_str());
         } else {
             e.kind = -1;
             e.code = -1;
@@ -628,6 +668,9 @@ void T2PadTest_Apply(int frame) {
                 break;
             case 10:
                 sHotkeyF1 = true;
+                break;
+            case 11:
+                sFocusFeed = e.value != 0;
                 break;
         }
     }

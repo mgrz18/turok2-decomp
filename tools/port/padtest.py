@@ -13,6 +13,11 @@ controller read, and T2_PAD_LOG=1 logs the N64 pad the game receives. Checks:
            window size/position and fullscreen (LUS's own save at exit, through the headless
            window), the CVars written with their defaults, edited sensitivity / invert-Y values
            taking effect, the pad's invert-Y only in a level, F1 printing the controls
+  focus    (round 19 h4) the window losing the keyboard focus (Cmd-Tab): the mouse released, no
+           input to the game while unfocused (a held key, a gamepad button, the mouse), input back
+           with the focus, the mouse captured again only by a click (that click does not fire)
+  hotplug  (round 19 h4) the gamepad unplugged and plugged back in at the title menu, then the
+           new game with it (engine mode 11)
 
   padtest.py --bin OUT/rel/app/turok2 --archive OUT/turok2.o2r [--rom baserom.us.z64] [--work DIR]
 
@@ -166,6 +171,61 @@ def check_newgame(args):
     return bad
 
 
+def build_focus_script():
+    lines, checks, f = ["100 capture 1"], [], 200
+    lines += [f"{f} key W down", f"{f + 30} key W up"]
+    checks.append(("key W held, focused", f + 5, 0x0008, (0, 0)))
+    lines.append(f"{f + 10} focus 0")
+    checks.append(("key W held, focus lost", f + 15, 0, (0, 0)))
+    f += 40
+    lines += [f"{f} btn SOUTH down", f"{f + 20} btn SOUTH up", f"{f + 5} mouse 20 0", f"{f + 8} mbtn LEFT down",
+              f"{f + 12} mbtn LEFT up"]
+    checks += [("pad SOUTH, unfocused", f + 3, 0, (0, 0)), ("mouse move, unfocused", f + 5, 0, (0, 0)),
+               ("mouse LEFT, unfocused", f + 10, 0, (0, 0))]
+    f += 40
+    lines += [f"{f} focus 1", f"{f + 10} btn SOUTH down", f"{f + 30} btn SOUTH up", f"{f + 15} mouse 20 0"]
+    checks += [("pad SOUTH, focus back", f + 12, 0x8000, (0, 0)),
+               ("mouse move, focus back, not captured", f + 15, 0x8000, (0, 0))]
+    f += 40
+    # a click captures in a real window (--pad-test captures with "capture 1" instead)
+    lines += [f"{f} capture 1", f"{f + 20} mouse 20 0", f"{f + 30} mbtn LEFT down", f"{f + 35} mbtn LEFT up"]
+    checks += [("captured again: mouse look", f + 20, 0, (43, 0)), ("captured again: mouse fires", f + 32, 0x2000, (0, 0))]
+    return lines, checks, f + 60
+
+
+def check_focus(args):
+    lines, checks, frames = build_focus_script()
+    rc, log = run(args, "focus", frames, lines)
+    changes = pad_states(log)
+    bad = 0
+    print(f"focus: exit {rc}, {len(checks)} checks")
+    for label, frame, buttons, stick in checks:
+        got_b, got_st = state_at(changes, frame)
+        ok = got_b == buttons and got_st == stick
+        bad += not ok
+        if not ok or args.verbose:
+            print(f"  {'ok  ' if ok else 'FAIL'} {label:38s} frame {frame:5d}: buttons {got_b:04X} stick "
+                  f"{got_st[0]:4d} {got_st[1]:4d} (want {buttons:04X} {stick[0]:4d} {stick[1]:4d})")
+    for what in ("controls: the window lost the focus", "controls: the window has the focus again"):
+        if what not in log:
+            print(f"  FAIL no '{what}' line")
+            bad += 1
+    return bad + (rc != 0)
+
+
+def check_hotplug(args):
+    # the title menu is up from ~4,000: unplug, plug back in, then the new game with the gamepad
+    lines = ["4300 unplug", "4350 plug"]
+    for f, k in ((4400, "START"), (4500, "SOUTH"), (4700, "SOUTH"), (4800, "SOUTH")):
+        lines += [f"{f} btn {k} down", f"{f + 4} btn {k} up"]
+    rc, log = run(args, "hotplug", 6000, lines)
+    modes = [int(m) for m in re.findall(r"engine mode -?\d+ -> (-?\d+)", log)]
+    ok = (rc == 0 and modes and modes[-1] == 11 and "controls: gamepad disconnected" in log
+          and log.count("controls: gamepad connected") >= 1)
+    print(f"hotplug: exit {rc}, engine modes {' '.join(map(str, modes))}: {'ok' if ok else 'FAIL'}")
+    return 0 if ok else 1
+
+
 def check_config(args):
     import json
     bad = 0
@@ -246,7 +306,7 @@ def main():
     ap.add_argument("--archive", required=True)
     ap.add_argument("--rom")
     ap.add_argument("--work", default="padtest_out")
-    ap.add_argument("--only", choices=("map", "newgame", "config"))
+    ap.add_argument("--only", choices=("map", "newgame", "config", "focus", "hotplug"))
     ap.add_argument("-v", "--verbose", action="store_true")
     args = ap.parse_args()
     args.bin, args.archive = os.path.abspath(args.bin), os.path.abspath(args.archive)
@@ -259,6 +319,10 @@ def main():
         bad += check_newgame(args)
     if args.only in (None, "config"):
         bad += check_config(args)
+    if args.only in (None, "focus"):
+        bad += check_focus(args)
+    if args.only in (None, "hotplug"):
+        bad += check_hotplug(args)
     print("padtest:", "OK" if bad == 0 else f"{bad} FAILED")
     return 0 if bad == 0 else 1
 

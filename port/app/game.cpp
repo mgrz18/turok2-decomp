@@ -496,6 +496,15 @@ void ContRead(void* pads) {
     T2Controls_PollHotplug();     // gamepads plugged in or out
     osContStartReadData(&sContQueue);
     osContGetReadData(lus);
+    // round 19 (h4): no input while the window does not have the focus (the pads stay connected)
+    const bool focus = T2Controls_InputFocus();
+    if (!focus) {
+        for (int i = 0; i < MAXCONTROLLERS; i++) {
+            lus[i].button = 0;
+            lus[i].stick_x = 0;
+            lus[i].stick_y = 0;
+        }
+    }
     auto* out = static_cast<uint8_t*>(pads);
     for (int i = 0; i < 4 && i < MAXCONTROLLERS; i++) {
         uint16_t b = (uint16_t)lus[i].button;
@@ -508,7 +517,9 @@ void ContRead(void* pads) {
         if (i == 0) {
             T2Controls_Hotkeys();                             // F1: the controls
             T2Controls_Look(&sy, T2Port_EngineMode() == 11); // gT2StickInvertY
-            T2Controls_Mouse(&b, &sx, &sy); // captured mouse: look, fire, jump
+            if (focus) {
+                T2Controls_Mouse(&b, &sx, &sy); // captured mouse: look, fire, jump
+            }
             memcpy(out, &b, 2);
             ScriptedStick(&sx, &sy);
             if (sAimStick.valid) { // T2_AIM_FIFO
