@@ -1623,6 +1623,22 @@ int T2Port_LegacyIntel9(void) {
     return s;
 }
 
+/* T2_LEGACY_NOSOUND=1 (DEBUG-ONLY, round 17 merge; port/app/game.cpp): headless runs without --audio
+ * as before round 17, with no sound world (Sound__Initialize returns, every sound request stops
+ * before CAudioWorld__PlaySound and its random draws: pitch, volume, the ambient picks). Without it
+ * the sound world and the audio manager run in every game run (the output is dropped when there is
+ * no --audio/--wav), so a scripted run draws the same random numbers as a player with sound and as
+ * the N64 (round 17 f3, FIDELITY.md). tools/port/fullrun.py and playthrough.py write it: the routes
+ * were tuned on the silent stream. */
+int T2Port_LegacyNoSound(void) {
+    static int s = -1;
+    if (s < 0) {
+        const char *e = getenv("T2_LEGACY_NOSOUND");
+        s = e != NULL && *e != '0';
+    }
+    return s;
+}
+
 /* T2_RNG_LOAD=T:HEX (DEBUG-ONLY, round 17 f3; src/us/code/func_0042AC0C.c): at the entry of
  * CScene__LoadLevel(scene, T, ...) set gRandomValue to HEX, once, so the level's own load (its actors'
  * random set-up) starts from the same seed as the N64 with n64trace.py --rng-load T:HEX (a breakpoint on

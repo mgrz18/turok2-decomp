@@ -210,6 +210,11 @@ class Route:
         # one included. --n64-props leaves it out (the N64's props, FIDELITY.md 32-f3)
         if not N64_PROPS:
             env.append("T2_LEGACY_INTEL9=1")
+        # round 17 merge: headless runs as before round 17, with no sound world (no sound random draws);
+        # every route was tuned on that silent stream. --n64-sound leaves it out (the sound requests draw
+        # as with --audio, a player with sound and the N64)
+        if not N64_SOUND:
+            env.append("T2_LEGACY_NOSOUND=1")
         env += list(env_extra) + list(self.extra_env)
         with open(os.path.join(out, "playthrough.txt"), "w") as fp:
             fp.write("\n".join(self.inputs) + "\n")
@@ -582,6 +587,7 @@ L2_STRETCH_NOCHEATS = [(6, 1, 3000), (9, 3, 2000), (12, 15, 2000)]
 # --n64-shake (round 16 merge, PLAYTHROUGH.md 31): the route on the N64's RNG stream (no T2_LEGACY_SHAKE).
 # The extra fire windows it needs, as L2_STRETCH entries (segment, step, frames)
 N64_PROPS = False  # round 17 f3: --n64-props
+N64_SOUND = False  # round 17 merge: --n64-sound
 N64_SHAKE = False
 N64_FROM = None       # --n64-shake-from L (round 17 f2): the N64's stream only from level L's hub visit on
 
@@ -1420,7 +1426,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
-    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_FROM, LAIR_KEEP, L2_HEAL
+    global NAV, NAV_ONLY, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_SOUND, N64_FROM, LAIR_KEEP, L2_HEAL
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1466,6 +1472,9 @@ def cli(argv=None):
                     "the route changes it needs (N64_L2_STRETCH, N64_L2_PICKS; PLAYTHROUGH.md 31, 32-f1)")
     ap.add_argument("--n64-props", action="store_true", help="the type-9 props as on the N64 (no "
                     "T2_LEGACY_INTEL9; round 17 f3, FIDELITY.md 32-f3): not tuned yet")
+    ap.add_argument("--n64-sound", action="store_true", help="the sound world in the headless run (no "
+                    "T2_LEGACY_NOSOUND: the sound requests draw their random numbers as with --audio and on the "
+                    "N64; round 17 merge): not tuned yet")
     ap.add_argument("--n64-shake-from", type=int, default=None, choices=(4, 5, 6, 7),
                     help="DEBUG-ONLY (round 17 f2): the old stream (T2_LEGACY_SHAKE) up to the hub visit before "
                     "level L (7: the Primagen's lair), the N64's from there; with --n64-shake's level 4-6 changes")
@@ -1478,6 +1487,7 @@ def cli(argv=None):
     a = ap.parse_args(argv)
     N64_SHAKE = a.n64_shake
     N64_PROPS = a.n64_props
+    N64_SOUND = a.n64_sound
     N64_FROM = a.n64_shake_from
     LAIR_KEEP = a.lair_keep
     LAIR_FRONT = a.lair_front

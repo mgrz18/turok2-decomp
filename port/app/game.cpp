@@ -49,6 +49,7 @@ void T2Port_PrimagenStage(int frame, const char *spec);
 void T2Port_StartWarp(int frame, const char *spec);
 void T2Port_RngSet(int frame, const char *spec);
 void T2Port_LegacyShakeTick(int frame);
+int T2Port_LegacyNoSound(void);
 void T2Port_TraceBoss(int frame);
 void T2Port_AimAt(int frame, const char *spec);
 void T2Port_AimEnemy(int frame, const char *spec);
@@ -681,7 +682,10 @@ int T2Game_Run(const std::shared_ptr<Fast::Fast3dWindow>& window, const T2GameAr
     cfg.romPath = args.rom.empty() ? nullptr : args.rom.c_str();
     cfg.lowMemory = args.lowMemory;
     cfg.verbose = args.verbose;
-    cfg.audio = args.audio;
+    // round 17 merge: the sound world runs in every game run with the ROM (its requests draw random
+    // numbers as on the N64; the samples are dropped without --audio/--wav), unless T2_LEGACY_NOSOUND=1
+    // (DEBUG-ONLY: the silent stream of rounds 1-16, port/game/t2debug.c)
+    cfg.audio = args.audio || (!args.rom.empty() && !T2Port_LegacyNoSound());
     cfg.pakMode = args.pakMode;
     cfg.pakDir = args.pakDir.empty() ? nullptr : args.pakDir.c_str();
     if (!args.input.empty() && !ParseInputScript(args.input)) {
