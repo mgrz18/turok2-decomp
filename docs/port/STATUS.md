@@ -244,6 +244,57 @@ every run). `mpk_saves.py` on the default run's pak: note 1, checksum OK.
    property), the original game's uninitialised reads that the zero-fill now answers with zeros
    (demo 2's health from gf 585, 135/114's ground tilt: FIDELITY.md 12).
 
+## Round 20, part i2: the last route gaps on the N64 stream (branch names-R20_i2; PLAYTHROUGH.md 42-i2)
+
+Only `tools/port/fullrun.py` (and the docs) changed: no `src/`/`include/`/`port/` change, the binary
+is round 19's (Release, PIE, archive a9d14a47...). **`--legacy` writes byte-identical route files**
+(its det md5 `281904eb…`, END 2 at 248,394, as C34), and so do the level runs.
+
+- **The default's margins** (PLAYTHROUGH.md 42-i2.1): 133 and 135 on the shredder (`N64_L2_WEAPON`);
+  **a fault fixed**: a segment weapon's return to the plasma rifle landed after the City Totem's
+  request and replaced it (it bit as soon as 135 had a weapon); the Queen's `T2_BOSS_FRONT` 600
+  (`N64_QUEEN_FRONT`: of 338 hits on her at 450 only 7 struck the open spot's node, 266 damage and 2
+  lives on that stream); **114's fourth ultra health after the Mother** by a warp back from the hub
+  (`L6_LATE_HEALTH`: the Mother's death warps to the hub and the `114/60` anchor fires ~14,000 frames
+  later, so the old exit teleport into 114 never ran). **New default det md5 `8659d7df…`** (600,000
+  lines, three runs, ASLR on; route files `playthrough.txt`/`teleport.env` regenerate byte-identical): END 2 (level 10 at 245,680), 5 totems, **0 lives lost, 290 hits**; the
+  thin spots are gone: **133 54 damage / lowest 146 (was 182 / 18), 135 66 / 134 (199 / 14), the lair
+  34 / 163 (81 / 18)**; the run's lowest health is 38 (124), was 14. Timeline: the Harbor Totem 23,190,
+  the City Totem 87,266, the Marsh Totem 108,079, the Cave Totem 128,988, the Blind One 137,555, the
+  Hive Totem 163,588, the Queen 171,767, the Mother 204,658, the Primagen (cinema 370) 242,688, the
+  credits back to the hub 263,578.
+- **The Queen by stick** (42-i2.2): h3's node rule never ended her step-5 wave on the zero-filled
+  stream (the assist's wave target was actor 20, eight units away, never hurt; the rule has no IMMUNE
+  switch): on the N64 stream the stick runs now leave the Queen to g5's picker (`STICK_BOSS_N64 =
+  {6}`), keep 450 there, and take 91's ultra health (`L5_STICK_HEALTH`, a ledge tip: stand 60, walk 6).
+  **`--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair`: END 2 (level 10 at
+  254,496), 5 totems, 0 lives lost** (md5 `9a76b29f…`; the Queen by stick 122 damage, lowest 39; 124
+  leaves 1 health). Without `--assist-keep lair` the lair by stick loses 4 lives (h3's rule) or 2 (the
+  picker): falls into the pits inside the floor, which the edge guard does not know.
+- **Level 2 on real weapons** (42-i2.3): sisters 1 and 2 no longer cost a life on this tree
+  (`--real-weapons 1,2 --hub-wait 0`: 133 165 / 35, 134 174 / 26); 135 is entered with no ammo. 132's
+  ammo cache, 135's shotgun and holding fire at 135's graveyard give 20 shells at the crypts, still a
+  life in 135 (N64 stream with `--real-weapons 2` only: `N64_L2_ARMS`, `N64_L2_135_HOLD`).
+
+| options (N64 stream, 300,000 frames, ASLR on) | result |
+|---|---|
+| (none) | **END 2 (245,680), 5 totems, 0 lives**; md5 `8659d7df…` (3 runs) |
+| `--lair-push both` | END 2 (245,680), 5 totems, 0 lives; md5 `f672b8b8…` |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair` | **END 2 (254,496), 5 totems, 0 lives**; md5 `9a76b29f…` |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` | the Queen passes (122 / 39); the lair 4 lives, no END |
+| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0` | **game over in 124** (md5 `bb4f8b2c…`): the Cave Totem by stick 143 damage, the Blind One leaves 30, 124's pylons take the rest and the respawns run out of step; C34 had END 2 with 1 life: the level-2 change re-rolled the later stream. Not fixed (no health between the Blind One and 124; 104's ultra health is off the route) |
+| `--real-weapons 1,2 --hub-wait 0` | a life in 135 (ammo), then stuck in 125 |
+| `--legacy` (290,000) | END 2 (248,394), 5 totems, 2 lives (the City Totem); md5 `281904eb…` = C34's |
+
+**To merge**: `tools/port/fullrun.py` only (others touching it: the level-5/6 and level-2 blocks, the
+`N64_*` tables near `n64_full()`); STATUS.md section 1's default-command paragraph (md5, timeline,
+thin spots) and its validated-combinations table take the values above. Test hooks (DEBUG-ONLY, off
+unless set): `T2I2_QF`, `T2I2_L6H`, `T2I2_L5H`, `T2I2_135HOLD`. **Next**: the lair by stick (the
+inner pits: a pit map for `lair_floor`, or the strafes from the boss's bearing instead of the yaw);
+124 in the stick runs (1 health left: the Blind One leaves 36); 135 on real weapons (ammo for zombie
+44 and sister 3), then the City Totem on picked-up ammo; the `--stick-aim 1,2,4` combo (game over in 124 on
+the new stream).
+
 ## Round 19, part h1: determinism under ASLR, the level-135 two paths fixed (branch names-R19_h1)
 
 STABILITY.md 13. **The level-135 ASLR divergence is found and fixed**: the ground tilt that

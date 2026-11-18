@@ -4045,3 +4045,18 @@ game switches to the mag 60, whose 40 bullets are gone by ~77,000, then the talo
 135** (270 damage, lowest 9). What is left: more ammo for zombie 44 and sister 3 (130's
 bullets x40 and shells x10 by its exit, 131's remaining 519/522/525/534 objects), sister 3 on the
 grenade launcher; then the City Totem on picked-up ammo (never tried on either stream).
+
+### 42-i2.4 Runs (the final code; N64 stream unless said, 300,000 frames, ASLR on)
+
+| options added to the default | result |
+|---|---|
+| (none) | **END 2 (level 10 at 245,680), 5 totems, 0 lives, 290 hits**; md5 `8659d7df…` in three runs |
+| `--lair-push both` | END 2 (245,680), 5 totems, 0 lives; md5 `f672b8b8…` |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair` | **END 2 (254,496), 5 totems, 0 lives**; md5 `9a76b29f…` |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0` | the Queen by stick 122 damage, lowest 39; the lair by stick 4 lives (falls), no END |
+| `--real-weapons 1 --stick-aim 1,2,4 --hub-wait 0` | game over in 124 (md5 `bb4f8b2c…`): the Blind One leaves 30 and 124's pylons kill; C34: END 2, 1 life (the stream re-rolled by the level-2 shredder) |
+| `--real-weapons 1,2 --hub-wait 0` | sisters 1 and 2 without a death; a life in 135 (no ammo left), then out of step in 125 |
+| `--legacy` (290,000) | END 2 (level 10 at 248,394), 2 lives (the City Totem); md5 `281904eb…` = C34's (the route files are byte-identical) |
+
+The test hooks (DEBUG-ONLY, off unless set): `T2I2_QF=D,EVERY` (the Queen's front), `T2I2_L6H=0`
+(no 114 health after the Mother), `T2I2_L5H=0` (no 91 health in stick runs), `T2I2_135HOLD=0`.
