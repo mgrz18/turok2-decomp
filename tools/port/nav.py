@@ -3,6 +3,7 @@
 player can walk (docs/port/PLAYTHROUGH.md section 30).
 
     python3 tools/port/nav.py ROM LEVEL X,Y,Z X,Y,Z [--jumps]   # the waypoints between two points
+    python3 tools/port/nav.py ROM LEVEL --doors                  # the doors and what opens them
     python3 tools/port/nav.py ROM LEVEL --check RUNLOG   # every same-level teleport of a run's log
 
 The floor is the level's collision regions (tools/assets/levels.py: triangles, each with its three edge
@@ -49,8 +50,79 @@ GAP_UP = 40.0       # the far floor at most this higher across a gap
 GAP_DROP = 300.0    # and at most this lower
 JUMP_COST = 300.0   # a jump on the way costs this (the walker prefers the floor)
 
+DOOR_TYPE = 0x641   # round 19 h5: a door's level actor (instance type; intelligence type 6)
+DOOR_NEAR = 110.0   # a door this close (XZ) to a path's line stands in its way
+DOOR_DY = 250.0
+
 _FS = {}
 _NAV = {}
+_DOORS = {}
+
+
+def doors(rom, level):
+    """Round 19 h5: the doors of a sub-level as nav data: [{actor, pos, rot, openers: [...]}]. A door is a
+    level actor of instance type 0x641. Its openers are the links records (levels.py parse_links) whose
+    actor is the door: the first table's records fire when their owning actor (id) fires its triggers
+    (head mask 1: its death, 0x4000: a door opening, 0x80000: an action's "go"; PLAYTHROUGH.md 7), the
+    second table's when the player enters a region of that info. key = the link group they count down
+    (a door that opens after N deaths). A door with no record opens on its own (it opens as he comes)."""
+    key = (rom, level)
+    if key in _DOORS:
+        return _DOORS[key]
+    L = lv.parse_level(fs_of(rom), level, with_sections=False)
+    inst = L["instances"]
+    out = []
+    for k, i in enumerate(inst):
+        if i["type"] != DOOR_TYPE:
+            continue
+        ops = []
+        for table, recs in L.get("links", {}).items():
+            for r in recs:
+                if r["actor"] != k:
+                    continue
+                if table == "records":
+                    o = r["id"]
+                    ot = inst[o]["type"] if o is not None and o < len(inst) else None
+                    ops.append({"by": "actor", "owner": o, "owner_type": ot, "mask": r["head"], "group": r["group"],
+                                "key": r["key"]})
+                else:
+                    ops.append({"by": "region", "info": r["id"], "mask": r["head"], "group": r["group"], "key": r["key"]})
+        out.append({"actor": k, "pos": tuple(i["pos"]), "rot": i["rot_y"], "openers": ops})
+    _DOORS[key] = out
+    return out
+
+
+def opener_text(d):
+    """What opens door d (doors()), in words."""
+    if not d["openers"]:
+        return "no record: opens as he comes"
+    parts = []
+    for o in d["openers"]:
+        if o["by"] == "region":
+            parts.append("entering region info %s" % o["info"])
+            continue
+        m = o["mask"]
+        what = ("death" if m & 1 else "door opening" if m & 0x4000 else "go" if m & 0x80000 else "trigger 0x%x" % m)
+        parts.append("actor %s's %s%s%s" % (o["owner"], what, " (type 0x%x)" % o["owner_type"] if o["owner_type"] is not None else "",
+                                           ", counting down link group %d" % o["key"] if o["key"] else ""))
+    return "; ".join(parts)
+
+
+def doors_on(rom, level, pts, y):
+    """The doors within DOOR_NEAR (XZ) of the polyline pts [(x, z)] and DOOR_DY of the feet y."""
+    out = []
+    for d in doors(rom, level):
+        px, py, pz = d["pos"]
+        if abs(py - y) > DOOR_DY:
+            continue
+        for a, b in zip(pts, pts[1:]):
+            ex, ez = b[0] - a[0], b[1] - a[1]
+            el = ex * ex + ez * ez
+            t = 0.0 if el < 1e-9 else max(0.0, min(1.0, ((px - a[0]) * ex + (pz - a[1]) * ez) / el))
+            if math.hypot(a[0] + ex * t - px, a[1] + ez * t - pz) < DOOR_NEAR:
+                out.append(d)
+                break
+    return out
 
 
 def fs_of(rom):
@@ -541,6 +613,10 @@ def main():
     if jumps:
         sys.argv.remove("--jumps")
     rom, level = sys.argv[1], int(sys.argv[2])
+    if sys.argv[3:4] == ["--doors"]:
+        for d in doors(rom, level):
+            print("door %d at (%.0f, %.0f, %.0f): %s" % (d["actor"], d["pos"][0], d["pos"][1], d["pos"][2], opener_text(d)))
+        return 0
     nav = load(rom, level, jumps)
     a = tuple(float(v) for v in sys.argv[3].split(","))
     b = tuple(float(v) for v in sys.argv[4].split(","))
@@ -555,6 +631,8 @@ def main():
         print("  %.1f %.1f" % p)
     for x, z, kind, _ in jumps:
         print("  %s at %.1f %.1f" % (kind, x, z))
+    for d in doors_on(rom, level, pts, a[1]):
+        print("  door %d at (%.0f, %.0f, %.0f): %s" % (d["actor"], d["pos"][0], d["pos"][1], d["pos"][2], opener_text(d)))
     return 0
 
 

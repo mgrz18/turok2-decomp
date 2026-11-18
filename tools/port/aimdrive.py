@@ -551,6 +551,11 @@ WALK_BLOCK = 50.0       # a stuck point becomes a box this half-wide, this far a
 WALK_JUMP_AT = 70.0
 WALK_JUMP_FACE = 0.35
 WALK_JUMP_HOLD = 8
+# round 19 h5: doors (nav.doors: level actors of type 0x641 and their openers): stuck within WALK_DOOR_R of a
+# door, the walker waits WALK_DOOR_WAIT frames facing it and walks on, instead of backing off and planning
+# round it (a door is not an obstacle to go round: it opens, on its own or when its opener fires)
+WALK_DOOR_R = 160.0
+WALK_DOOR_WAIT = 30
 
 
 def walk_plan(spec):
@@ -585,6 +590,8 @@ class WalkDrive:
         self.jpts = []
         self.jhold = 0           # round 19 h5: frames of R left
         self.njumps = 0
+        self.dwait = 0           # round 19 h5: frames left waiting at a door
+        self.dseen = {}          # door actor -> frames waited
 
     def active(self, frame):
         for e in self.plan:
@@ -613,6 +620,22 @@ class WalkDrive:
         self.wi = 0
         self.hist = []
 
+    def door_near(self, px, pz):
+        """Round 19 h5: the nearest door (nav.doors) within WALK_DOOR_R of the player, or None."""
+        try:
+            import nav
+            ds = nav.doors(self.rom, self.cur[2])
+        except Exception:
+            return None
+        best = None
+        for d in ds:
+            if abs(d["pos"][1] - self.py) > nav.DOOR_DY:
+                continue
+            dd = math.hypot(d["pos"][0] - px, d["pos"][2] - pz)
+            if dd < WALK_DOOR_R and (best is None or dd < best[0]):
+                best = (dd, d["actor"])
+        return best[1] if best else None
+
     def finish(self, frame, px, pz):
         if self.cur is None:
             return
@@ -623,7 +646,8 @@ class WalkDrive:
                                self.cur[0], self.cur[1], self.cur[2], g[0], g[2],
                                "arrived at %d" % self.done if self.done else "NOT ARRIVED",
                                self.stucks, self.npts, self.plen0,
-                               ", %d jumps planned, %d pressed" % (self.njp0, self.njumps) if len(self.cur) > 4 and self.cur[4] else "",
+                               (", %d jumps planned, %d pressed" % (self.njp0, self.njumps) if len(self.cur) > 4 and self.cur[4] else "") +
+                               "".join(", waited %d at door %d" % (w, k) for k, w in sorted(self.dseen.items())),
                                err))
         print(self.report[-1], file=sys.stderr)
         self.cur = None
@@ -649,7 +673,7 @@ class WalkDrive:
             self.finish(frame, px, pz)
             self.cur, self.state, self.stucks, self.done, self.sent, self.rec = e, "go", 0, None, [], 0
             self.extra = []
-            self.jhold, self.njumps = 0, 0
+            self.jhold, self.njumps, self.dwait, self.dseen = 0, 0, 0, {}
             self.replan(px, py, pz)
             self.npts, self.plen0, self.njp0 = len(self.pts), self.plen, len(self.jpts)
         ans = self._step(frame, px, pz, ry)
@@ -670,6 +694,9 @@ class WalkDrive:
                 self.state, self.done = "face", frame
             sx, err = self.turn(ry, g[3])
             return (sx if abs(err) > WALK_FACE else 0), 0
+        if self.dwait > 0:   # round 19 h5: at a closed door: stand, then walk on
+            self.dwait -= 1
+            return 0, 0
         if self.rec > 0:   # stuck: back off, then sidestep
             self.rec -= 1
             return 0, (C_D if self.rec >= WALK_SIDE else self.side)
@@ -696,6 +723,11 @@ class WalkDrive:
             if old and math.hypot(px - old[-1][1], pz - old[-1][2]) < WALK_STUCK_D:
                 self.stucks += 1
                 self.hist = []
+                door = self.door_near(px, pz)
+                if door is not None:   # round 19 h5: a door: wait for it, do not go round it
+                    self.dwait = WALK_DOOR_WAIT
+                    self.dseen[door] = self.dseen.get(door, 0) + WALK_DOOR_WAIT
+                    return 0, 0
                 if jumps and self.stucks % 2 == 1:   # round 19 h5: try a jump forward first
                     self.jhold = WALK_JUMP_HOLD - 1
                     self.njumps += 1
