@@ -3087,3 +3087,114 @@ health and died within ~1,700 frames; a variant that took 4 more health +10 afte
 entered it with ~100 and still lost one there, and then lost 3 more lives in levels 4 and 6:
 dropped). Each change upstream moves every later fight: the run is chaotic past the first
 changed frame, so a level-4-6 change (part f2) has to be re-checked on the whole run.
+
+## 32-f2. Levels 4-6 and the bosses on the N64's random numbers (Phase 7 round 17, part f2)
+
+### 32-f2.1 Trying a level on the N64's stream before the levels before it work
+
+The `--n64-shake` route dies in level 2 (section 31.4), so its levels 4-6 cannot be reached yet.
+Two ways in, both new:
+
+- **`fullrun.py --n64-shake-from L`** (`playthrough.py RUN --all ... --n64-shake-from L`; L 4, 5, 6
+  or 7 = the Primagen's lair; DEBUG-ONLY): the default route with `T2_LEGACY_SHAKE` up to the hub
+  visit before level L, the N64's shake and random stream from there. It writes
+  **`T2_LEGACY_SHAKE=1,F`**: the old stores up to schedule frame F, then
+  (`port/game/t2debug.c T2Port_LegacyShakeTick`, called from game.cpp every frame) the main camera
+  and the pool's cameras get the shake radius the N64's `CCamera__Construct` gives them (1) and the
+  later constructs take the host path (`legacyshake: off at frame F (N cameras)`). Level L starts in
+  the state the default route reaches it in (health, lives, items) and is played on the N64's
+  numbers. `T2_LEGACY_SHAKE=1` alone is unchanged. Every route change below applies when
+  `fullrun.n64(L)` holds: `--n64-shake`, or `--n64-shake-from` at or before L. A run on another
+  random history: edit F in `teleport.env` (`T2_LEGACY_SHAKE=1,F+37`): the same route, other fights.
+- **`playthrough.py DIR --level 4|5|6 --n64-shake`**: the level runs (still invincible, as before)
+  without `T2_LEGACY_SHAKE`.
+
+### 32-f2.2 What the N64's stream changes, and the fixes
+
+Measured with `--n64-shake-from 4` and its variants (Release, under `aimdrive.py`, 290,000
+frames; health is the lowest in each fight, `hurtsum`):
+
+| fight | legacy (default run) | N64 stream, before | fix (only on the N64 stream) |
+|---|---|---|---|
+| the Cave Totem (112), scorpion launcher | 54 damage | 85-135 | **the shredder** (`N64_CAVE_WEAPON`): 18-64 |
+| the Blind One (1), scorpion launcher | 94 damage, 52 left | 35-89, **11-30 left** | **the shredder** from `BLIND_WEAPON_AFTER` (e5's switch): 23-54, 73-140 left |
+| 124's pylons (level 5's start) | 36, 16 left | **a life lost** (3 runs) | the two above: 33-41 damage, 32-107 left |
+| the Queen (2) | 49, 23 left | 27-79 (13-130 left) | none |
+| 117 (level 6) | 20, 3 left | **a life lost** (`-from 5`: the Queen left 13) | **an ultra health in 114 at level 6's start** (`routes56.L6_N64_HEALTH`, the raised floor at (1,826, 156, 1,412); 114 has four, the route took two before the Mother) |
+| the Mother (3), shredder | 53, 147 left | 41-164 | **the strafing from her arena +4,600** (`N64_MOTHER_MOVE`, 5,800 legacy): standing still at ~+5,400 (her modes 19-25) cost up to four 20s |
+| the Primagen's lair (4) | 124, 23 left | 72-144, **a life lost** in one run | **`T2_LAIR_KEEP=800`**: the lair driver walks away from him |
+
+At 124's arrival the player takes 18 (six 3s in 42 frames, `ty 40b`, in every run on both
+streams) before the route's first step; that is why the health left by the Blind One decides 124.
+
+**The lair.** His melee (two 10s within 409.6 / 716.8, `Primagen_HandleAnimEvent`) was half to
+two thirds of the lair's damage (hits with him nearer than 800: legacy 85 of 124, the N64 runs
+50-95). `aimdrive.py`'s `LairDrive` got a keep-away rule (`T2_LAIR_KEEP=D`, written by
+`fullrun.py` on the N64 stream with the guard driver; `--lair-keep D`, 0 = off): in guard mode,
+while he is within D horizontally (the boss position of the "move" line), the C buttons walk the
+player straight away from him, or along either tangent when 200 units that way leave the safe
+floor; the edge guard comes first. It answers 600-1,900 frames per lair. Lair damage with it:
+18-62 in eight runs (near hits 0-3), 101-187 in three (two of them the throw below).
+
+**What still kills in the lair**: twice (two random histories) a single hit took all the health
+left (82, 92) and the player was next seen ~2,000 units away below the floor (y -1,222 / -1,714):
+thrown off the floor. Both at the same sequence of his: mode 18 -> 23 -> 7 -> 20 -> 7 -> 1 with
+bossState 10 at the frame of the hit, stage 3, him ~1,550-1,750 away. Both runs had come in with
+36-87 health after a costly Mother and lost their last spare life (the legacy part loses 2 at
+the City Totem). Not studied further: the next step is to find what bossState 10 / mode 20 does
+(a grab or a blast with knockback) and keep out of its reach.
+
+**The home waits.** In one whole run on the N64 stream the strafing (period 90) ended both home
+waits by itself (~400 frames each, no peek); in the others one or two peeks ended them, as in the
+default run. The standalone recipe needs the peek (32-f2.3).
+
+### 32-f2.3 The Primagen recipe on the N64's stream: why it never kills him
+
+The recipe (STATUS.md "Round 15, 1": `T2_WARP_TO=7602 T2_BOSS_FRONT=450,3000,2.5,1`, boss env,
+`Z@14000..200000`, `routes56.lair_strafe(15000, 45000)`) without `T2_LEGACY_SHAKE`: stage 2 ends,
+**his stage-3 home wait starts at 33,070 and never ends**. He hovers at (-1.9, 937, 2,907.7), a
+point none of `T2_BOSS_FRONT`'s floor spots sees (10 relocations to 60,069, each logged with
+`sight (nil)`), and the strafing stops at 45,000. With `T2_LEGACY_SHAKE=1` his stage-3 wait
+(36,008) ends while the strafing still runs, and he dies at 43,586. This is section 26.1's
+hover-pair property: which pair he gets is decided by his flight in, so by the random numbers.
+**The recipe plus `T2_LAIR_PEEK=2400@14000` kills him at 40,728** on the N64 stream (one peek,
+the stage-2 wait; stage 3 ended by the strafing). `--level 6 --n64-shake` had the same stop (his
+stage-3 wait from 74,538 to the end of the 112,000 frames); `routes56.build_level56` now adds
+`T2_LAIR_PEEK="2400@hop"` there on the N64 stream (`LAIR_PEEK_N64`): the Mother dies at 52,203,
+the Primagen at 83,978 (two peeks), the ending (cinema 130) at 89,994, the hub at 104,092.
+
+The other level runs on the N64 stream (`--level N --n64-shake`, Release, `--pak-blank`,
+invincible): `--level 4` the Cave Totem and the Blind One dead (41,353); `--level 5` the Hive
+Totem and the Queen (41,665).
+
+### 32-f2.4 Runs (Linux Release, PIE, under `aimdrive.py`, 290,000 frames)
+
+The default command plus the option. "lives" = lives lost after the switch (the legacy part loses
+2 at the City Totem, so one spare life remains):
+
+| options | result |
+|---|---|
+| (none) | END 2 at 252,194; its 3,450 progress/event/pickup/hurt/death/bosstrace/lairpeek lines identical to the build before this part; `playthrough.txt`/`teleport.env` byte for byte |
+| `--n64-shake-from 4`, before the fixes | END 2 at 246,904, 1 life (124's pylons) |
+| the same, the Blind One's shredder only | END 2 at 256,842, 1 life (the lair, 144 damage) |
+| the same + the keep-away, F+0 | END 2 at 250,272, 0 lives (lair 23 damage) |
+| **`--n64-shake-from 4`** (all fixes), F+0 | **END 2 at 252,620, 0 lives**; lowest health: Cave Totem 136, Blind One 82, 124 43, Queen 68, 117 138, Mother 159, lair 104 |
+| the same, F+101 | **END 2 at 251,210, 0 lives** (with the scorpion launcher at the totem this history lost 2 lives on 124 and ended in a game over) |
+| the same, F+211 | **END 2 at 249,924, 0 lives** |
+| the same, F+37 | game over in the lair (the Mother 164 damage, then the throw of 32-f2.2, twice) |
+| `--n64-shake-from 5` | END 2 at 253,046, 0 lives (the Queen left 13; the 114 ultra health: 117 84 left; Mother 65, lair 87 damage) |
+| `--n64-shake-from 6` | END 2 at 250,726, 0 lives (Mother 33, lair 30 damage) |
+| `--n64-shake-from 7` (keep-away) | END 2 at 251,438, 0 lives (lair 28 damage; 82 before the keep-away rule) |
+
+`--n64-shake` itself is unchanged before level 4 (f1's part): it still ends in level 2/125.
+Once f1's levels 1-3 are merged, `--n64-shake` uses all of these changes from level 4 on.
+
+### 32-f2.5 Next
+
+- The whole `--n64-shake` run once levels 1-3 hold (f1): level 4 will start in another state
+  (health, lives, the frame). The fixes here are weapons, health and tactics, not timings, so they
+  should carry over; the thin spots are the Queen (13-130 left) and the lair's throw.
+- The Primagen's throw (bossState 10 after mode 20): what it is and how far it reaches.
+- The keep-away rule would cut the default run's lair damage too, but changes the legacy route's
+  stream: kept for the N64 stream.
+- The Primagen recipe (STATUS.md) needs `T2_LAIR_PEEK=2400@14000` without `T2_LEGACY_SHAKE`.

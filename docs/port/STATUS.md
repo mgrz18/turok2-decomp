@@ -330,6 +330,46 @@ lines). Round 16 had a game over in 125 at 154,972. PLAYTHROUGH.md 32-f1.
   `--n64-shake` must be checked on the whole `--n64-shake` run with these picks: the run is
   chaotic past any changed frame, and it already reaches END 2 without any level 4-6 change.
 
+## Round 17, part f2: levels 4-6 and the bosses on the N64's random numbers (branch names-R17_f2)
+
+Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 32-f2. No `src/` or `include/` change (no asm_diff
+needed); port/ and tools/ only. **The default command is unchanged** (END 2 at 252,194; its 3,450
+progress/event/pickup/hurt/death/bosstrace/lairpeek lines identical to the build before this part;
+`playthrough.txt` and `teleport.env` byte for byte).
+
+- **`--n64-shake-from L`** (`fullrun.py`, DEBUG-ONLY; L 4, 5, 6, 7 = the lair) and
+  **`T2_LEGACY_SHAKE=1,F`** (`t2debug.c T2Port_LegacyShakeTick`): the legacy stream up to the hub
+  visit before level L, the N64's from there (the cameras get the N64's shake radius 1 at F). Lets
+  levels 4-6 be played on the N64's numbers from the state the default route reaches them in,
+  before levels 1-3 work on it (f1).
+- **The route changes on the N64 stream** (`fullrun.n64(L)`: `--n64-shake`, or `--n64-shake-from`
+  at or before L): the shredder at the Cave Totem and the Blind One (18-64 and 23-54 damage
+  instead of 85-135 and 35-89, so 124's pylons no longer take a life); the Mother's strafing from
+  her arena +4,600 (standing still at +5,400 cost up to four 20s); one of 114's other ultra healths at level 6's start
+  (`routes56.L6_N64_HEALTH`: 117 took a life after a costly Queen); **`T2_LAIR_KEEP=800`**, a
+  keep-away rule in `aimdrive.py LairDrive` (walk away from the Primagen within 800: his melee was
+  half to two thirds of the lair's damage; `--lair-keep D`, 0 = off): lair damage 18-62 in eight
+  runs instead of 72-144.
+- **`--n64-shake-from 4`: END 2 at 252,620, 5 totems, no life lost in levels 4-6**; on three
+  other random histories (the switch frame moved by 37, 101, 211) two reach END 2 with no life
+  lost, one ends in a game over in the lair (a costly Mother, then twice a throw off the floor:
+  his mode 20 -> 7 -> 1 with bossState 10, PLAYTHROUGH 32-f2.2). `-from 5` 253,046, `-from 6`
+  250,726, `-from 7` 251,438, each with no life lost after the switch (PLAYTHROUGH 32-f2.4).
+- **Why the Primagen recipe never kills him on the N64 stream**: his stage-3 home wait (33,070)
+  hovers at (-1.9, 937, 2,907.7), which no `T2_BOSS_FRONT` floor spot sees, and the strafing stops
+  at 45,000 (section 26.1's hover pair, picked by his random flight in). **Add
+  `T2_LAIR_PEEK=2400@14000`: he dies at 40,728.** `--level 6 --n64-shake` (new: the level runs
+  without `T2_LEGACY_SHAKE`) adds the peek itself: the Primagen at 83,978, the ending 89,994.
+  `--level 4 --n64-shake` and `--level 5 --n64-shake` kill the Blind One (41,353) and the Queen
+  (41,665).
+
+Files others may touch: `tools/port/fullrun.py` (the `n64()` helper and `N64_FROM`/`N64_CAVE_WEAPON`/`N64_MOTHER_MOVE`
+/`LAIR_KEEP` next to f1's `N64_SHAKE`/`N64_L2_STRETCH`; level 4's weapon lines; `level6()`'s items;
+the lair env; `cli()`), `tools/port/playthrough.py` (`--n64-shake` for the level runs),
+`tools/port/routes56.py` (`build_level56(..., n64)`, `L6_N64_HEALTH`, `LAIR_PEEK_N64`),
+`tools/port/aimdrive.py` (`LairDrive` only), `port/game/t2debug.c` and `port/app/game.cpp` (one
+call next to `T2_RNG_SET`).
+
 ## Round 16, part e1: the N64 lair and Mother checks, the camera shake's random numbers (branch names-R16_e1)
 
 Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 27.
