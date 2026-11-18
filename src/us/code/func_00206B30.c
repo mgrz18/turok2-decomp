@@ -35,6 +35,10 @@
     }
 
 
+#ifdef TARGET_PORT
+const void *T2Port_TextureCI4IA16(const void *texels, const void *palette, int w, int h);
+#endif
+
 /* Loads frame `frame` of the texture `resource` (and its palette `secondary`)
  * into TMEM, skipping what the last call already loaded, then turns texturing on. */
 void Texture_Load(s32 *output, void **resource, s32 frame, s32 secondary, s32 scaleS, s32 scaleT, s32 wrapS, s32 wrapT,
@@ -103,6 +107,28 @@ void Texture_Load(s32 *output, void **resource, s32 frame, s32 secondary, s32 sc
             }
             break;
         case 3:
+#ifdef TARGET_PORT
+            /* round 19 h2: CI4 with an IA16 palette, which Fast3D decodes as RGBA5551 (random
+             * colours): load the texels expanded to IA16 instead (port/game/t2tex.c) */
+            {
+                const void *ia = T2Port_TextureCI4IA16(texture, palette, WIDTH, HEIGHT);
+                if (ia != NULL) {
+                    if (changed || paletteChanged) {
+                        gDPSetTextureImage(gDList++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, ia);
+                        gDPSetTile(gDList++, G_IM_FMT_IA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, wrapT, maskT, mode,
+                                   wrapS, maskS, mode);
+                        gDPLoadSync(gDList++);
+                        gDPLoadBlock(gDList++, G_TX_LOADTILE, 0, 0, WIDTH * HEIGHT - 1, LOAD_DXT(2));
+                        gDPPipeSync(gDList++);
+                        gDPSetTile(gDList++, G_IM_FMT_IA, G_IM_SIZ_16b, ((WIDTH * 2) + 7) >> 3, 0, G_TX_RENDERTILE, 0,
+                                   wrapT, maskT, mode, wrapS, maskS, mode);
+                        gDPSetTileSize(gDList++, G_TX_RENDERTILE, 0, 0, (WIDTH - 1) << 2, (HEIGHT - 1) << 2);
+                        gDPSetTextureLUT(gDList++, G_TT_NONE);
+                    }
+                    break;
+                }
+            }
+#endif
             if (changed) {
                 LOAD_TEXTURE_BLOCK(G_IM_FMT_CI, G_IM_SIZ_16b, 3, 2, 0, G_IM_SIZ_4b, ((WIDTH >> 1) + 7) >> 3);
                 gDPSetTextureLUT(gDList++, G_TT_IA16);

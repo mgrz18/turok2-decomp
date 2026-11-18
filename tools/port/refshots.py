@@ -194,7 +194,7 @@ def main():
                 return
             ram, app = ramw(), tsyms["gEngineApp"]
             for key, v in (("app_match", start_warp[0]), ("app_wflags", 1), ("app_next", 13)):
-                struct.pack_into("<I", ram.m, (app + toffs[key][0]) & 0x7FFFFF, v)
+                struct.pack_into("<I", ram.m, (app + toffs[key][0]) & 0x7FFFFF, v & 0xFFFFFFFF)  # a level start (-(L+1)) is negative
             ram.m[((app + toffs["app_fade"][0]) & 0x7FFFFF) ^ 3] = 2
             start_warp[2] = True
             sys.stderr.write("refshots: frame %d: start at warp %d poked\n" % (n, start_warp[0]))

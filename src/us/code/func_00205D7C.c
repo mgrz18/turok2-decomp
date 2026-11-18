@@ -102,7 +102,7 @@ CMemEntry *CCache__AllocDecompressFlags(u32 flags, u32 size) {
              * (CGameObjectInstance__Construct's ground tilt tests m_AI.m_dwFlags & 0xC0000 before
              * CAI__Setup; FIDELITY.md 9.2): on the host the old heap bytes there hold host
              * pointers, so the tilt (and the bone matrices built from it) changed with ASLR
-             * (the level-135 two paths, STABILITY.md 13-h1). The console's heap starts zeroed
+             * (the level-135 two paths, STABILITY.md 13). The console's heap starts zeroed
              * too (InitializeSystemResources). */
             __builtin_memset(node->data, 0, size);
             node->size = size;
