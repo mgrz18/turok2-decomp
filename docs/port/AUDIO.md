@@ -304,7 +304,7 @@ reference the same way: sounds 0 and 40 through the interpreter, max difference 
 | level 53 start | warp -54, 40 s, no input | +0.97 dB | +7.4 / +7.6 | bands within 0.5 dB | **0.97-0.99** | the ambient loop's volume is a random draw at the level start (`SndVoice_InitVolume`: cue bytes a..b percent): 19,635 here, 18,500 on the N64 (sound 2: 7,209 on both); pan 28/82 and pitch 0.5/0.3124 identical |
 | hub (level 60) | warp -61, 40 s | +0.07 dB | -3.56 / -3.46 | bands within 0.1 dB | 0.5-0.74 | the first second: the logo screen's sound still plays on the port (instant load), the N64 lets it decay through its ~1 s load |
 | the Primagen's lair (boss) | warp 7602, 40 s, no input | +0.42 dB | +0.57 / +1.42 | bands within 0.6 dB | - | the fight's sounds follow the AI's random choices (different numbers) |
-| title menu SFX | START, cursor moves, B | see 12.4 | | | | |
+| title menu SFX | START, then cursor moves | - | - | - | - | open: the port plays the cursor sound (slot 1, vol 12,607, pan 64) on each move, +6 dB over the music; on the N64 `--input` reaches the menu (START works) but neither the D-pad nor the stick moved the cursor in three runs (shots at 1455-1535 keep SINGLE), and `n64trace --calls alSndp*` saw no call there: no N64 reference yet |
 
 ### 12.4 Sound events
 

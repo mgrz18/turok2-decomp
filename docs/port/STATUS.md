@@ -263,7 +263,10 @@ every run). `mpk_saves.py` on the default run's pak: note 1, checksum OK.
   extra at the level-53 start (62 / 64 plays in 520 game frames, same slots).
 - **Runs**: the default command on this branch's Release binary: END 2 at 255,080, 0 lives lost,
   det md5 **`0959aac5…`** (600,000 lines), unchanged (audio runs only with `--audio`; the full run
-  has none, so nothing in this branch can move a det line).
+  has none, so nothing in this branch can move a det line). **`--legacy`**: END 2, 2 lives lost (as
+  documented), its first 580,000 det lines md5 `281904eb…` (= round 19's).
+- Open: the title menu's cursor sound has no N64 reference (the emulator's input did not move the
+  cursor); see AUDIO.md 12.3, 12.6.
 - Files: `port/audio/t2asp.c`, `port/audio/t2audio_sndp.c`, `port/app/game.cpp` (the `--wav`
   sidecar), `tools/port/{refshots.py,n64audiodump.c,audiocmp.py,sndpcmp.py,audio_compare.py}`,
   docs. No src/ or include/ change.
