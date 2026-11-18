@@ -1586,7 +1586,7 @@ no system setting changed). No change to `src/` or `include/`. Release build (`-
 
 | item | what the code does | verdict |
 |---|---|---|
-| window flags | `RESIZABLE | HIGH_PIXEL_DENSITY | OPENGL` (gfx_sdl.cpp), 640x480 points or the saved size/position | ok; min size added (21.3) |
+| window flags | `RESIZABLE` + `HIGH_PIXEL_DENSITY` + `OPENGL` (gfx_sdl.cpp), 640x480 points or the saved size/position | ok; min size added (21.3) |
 | F11 / green button | `Window::ToggleFullscreen` -> on macOS LUS calls Cocoa's `toggleFullScreen:` (a native fullscreen Space) whatever `gSdlWindowedFullscreen` says; the exclusive mode it sets first is the desktop's own mode and is not applied by that path; `HandleEvents` re-syncs the state each frame, so the green button is followed; `Window.Fullscreen.Enabled` saved at exit | ok (desktop fullscreen only on the Mac) |
 | F2, click capture | `MouseStateManager::ToggleMouseCaptureOverride` / the port's click capture (relative mouse mode) | ok |
 | Esc, F1 | LUS's Gui calls `UpdateMouseCapture` on Esc or F1 even with no menu: the mouse is freed (auto-capture off). Esc is START (pause) | kept: a click captures again; in FIRSTRUN |
