@@ -9,20 +9,11 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-typedef struct LevelRecord {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ u8 pad10[0x10];
-    /* 0x20 */ u16 spawnId;
-    /* 0x22 */ u16 defId;
-    /* 0x24 */ s16 angle;
-    /* 0x26 */ u8 pad26[2];
-} LevelRecord; /* 0x28 */
 
 typedef struct LevelNode {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 count;
-    /* 0x08 */ LevelRecord records[1];
+    /* 0x08 */ CObjectRecord records[1];
 } LevelNode;
 
 typedef struct ActorBlock {
@@ -42,10 +33,10 @@ extern sptr CScene__GetRegion(CScene *world, s32);
 extern s32 CScene__FindNearestWarpDest(CScene *world, CVector3 *pos, s32 group, void *info);
 extern s32 CScene__FindWarpDests(CScene *world, s32 group, s32 key, CWarpPoint *out, s32 max);
 extern s32 *CScene__GetIntelligence(CScene *world, u16 id);
-extern void CGameObjectInstance__ConstructFromRecord(CGameObjectInstance *obj, LevelRecord *rec, s32 mode, s32 index);
+extern void CGameObjectInstance__ConstructFromRecord(CGameObjectInstance *obj, CObjectRecord *rec, s32 mode, s32 index);
 extern sptr CScene__FindRegionAt(CScene *world, CVector3 *pos);
 extern void Angle_Wrap(f32 *angle);
-extern void CPlayer__SetupActors(CPlayer *player, LevelRecord *rec, s32 mode, s32 index);
+extern void CPlayer__SetupActors(CPlayer *player, CObjectRecord *rec, s32 mode, s32 index);
 extern s32 GameObject_IsFollower(CGameObjectInstance *obj);
 extern s32 GameObject_IsLeader(CGameObjectInstance *obj);
 extern f32 AI_DistSqToPointAtHeight(CGameObjectInstance *obj, CVector3 pos);
@@ -62,15 +53,15 @@ void CScene__DecompressAnimatedInstances(CScene *world, Handle **handle) {
     Handle *block;
     s32 nspawns;
     LevelNode *node;
-    LevelRecord *records;
+    CObjectRecord *records;
     ActorBlock *hdr;
     s32 n;
     s32 i;
     s32 j;
     s32 playerIndex;
     s32 spawnIndex;
-    LevelRecord *rec;
-    LevelRecord *recWalk;
+    CObjectRecord *rec;
+    CObjectRecord *recWalk;
     CGameObjectInstance *objWalk;
     CPlayer *player;
     CGameObjectInstance *obj;
@@ -93,7 +84,7 @@ void CScene__DecompressAnimatedInstances(CScene *world, Handle **handle) {
             records = node->records;
             objects = hdr->objects;
             if (world->m_bWarpSpawn == 0) {
-                world->m_LevelID = CScene__FindNearestWarpDest(world, &node->records[0].pos, world->m_nLevel, &world->m_WarpSpawn);
+                world->m_LevelID = CScene__FindNearestWarpDest(world, &node->records[0].m_vPos, world->m_nLevel, &world->m_WarpSpawn);
                 if (world->m_LevelID != 0) {
                     world->m_bWarpSpawn = 1;
                 }
@@ -113,7 +104,7 @@ void CScene__DecompressAnimatedInstances(CScene *world, Handle **handle) {
                     rec = recWalk;
                     obj = objWalk;
                     i++;
-                    obj->header.m_pIntelligence = CScene__GetIntelligence(world, rec->defId);
+                    obj->header.m_pIntelligence = CScene__GetIntelligence(world, rec->m_nIntelligence);
                     objWalk = obj + 1;
                     recWalk = rec + 1;
                 }
@@ -123,17 +114,17 @@ void CScene__DecompressAnimatedInstances(CScene *world, Handle **handle) {
                 rec = &records[i];
                 obj = &objects[i];
                 CGameObjectInstance__ConstructFromRecord(obj, rec, mode, i);
-                if (*CScene__GetIntelligence(world, rec->defId) != 0xB && i != 0) {
+                if (*CScene__GetIntelligence(world, rec->m_nIntelligence) != 0xB && i != 0) {
                     continue;
                 }
                 world->m_nFirstActor++;
-                memcpy(&gEngineApp_m_Game_m_CameraPool.m_MainCamera.m_ViewParams.m_vPos, &rec->pos, sizeof(CVector3));
+                memcpy(&gEngineApp_m_Game_m_CameraPool.m_MainCamera.m_ViewParams.m_vPos, &rec->m_vPos, sizeof(CVector3));
                 gEngineApp_m_Game_m_CameraPool.m_MainCamera.m_ViewParams.m_vPos.y += 204.79999f;
-                gEngineApp_m_Game_m_CameraPool.m_MainCamera.m_ViewParams.m_pCurrentRegion = CScene__FindRegionAt(world, &rec->pos);
+                gEngineApp_m_Game_m_CameraPool.m_MainCamera.m_ViewParams.m_pCurrentRegion = CScene__FindRegionAt(world, &rec->m_vPos);
                 for (playerIndex = 0; playerIndex < gEngineApp_m_Game.m_PlayerList.m_nPlayers; playerIndex++) {
                     player = &gEngineApp_m_Game.m_PlayerList.m_Players[playerIndex];
                     if (nspawns != 0) {
-                        rec->spawnId = spawns[spawnIndex].m_nID;
+                        rec->m_nRegion = spawns[spawnIndex].m_nID;
                         Angle_Wrap(&spawns[spawnIndex].m_RotY);
                         angle = spawns[spawnIndex].m_RotY;
                         if (!(angle > 3.1415927f)) {
@@ -149,8 +140,8 @@ void CScene__DecompressAnimatedInstances(CScene *world, Handle **handle) {
                         } else {
                             value = 0x7FFF;
                         }
-                        rec->angle = value;
-                        memcpy(&rec->pos, &spawns[spawnIndex].m_vPos, sizeof(CVector3));
+                        rec->m_Angle = value;
+                        memcpy(&rec->m_vPos, &spawns[spawnIndex].m_vPos, sizeof(CVector3));
                         spawnIndex++;
                         if (spawnIndex >= nspawns) {
                             spawnIndex = 0;
