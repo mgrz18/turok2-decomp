@@ -4,12 +4,13 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 #include "globals/scene.h"
+#include "protos/scene.h"
+
+void RumbleCurve_Init(void *slot, void *curve);
 
 extern void Rumble_Init(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2, f32 arg5, f32 arg6, void **arg7);
 void Rumble_Init(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2,
                    f32 arg5, f32 arg6, void **arg7) {
-    extern void *CScene__GetCurve(void *object, int index);
-    extern void RumbleCurve_Init(unsigned int *record, uptr value);
     arg0->key = arg1;
     arg0->position = arg2;
     arg0->value0 = arg5;
@@ -19,7 +20,7 @@ void Rumble_Init(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2,
         *arg7 = arg0;
     }
     RumbleCurve_Init(&arg0->amplitudeHandle,
-                  (uptr)CScene__GetCurve(&gScene, arg1->mode));
+                  CScene__GetCurve(&gScene, arg1->mode));
     RumbleCurve_Init(&arg0->lifetimeHandle,
-                  (uptr)CScene__GetCurve(&gScene, arg1->frames));
+                  CScene__GetCurve(&gScene, arg1->frames));
 }
