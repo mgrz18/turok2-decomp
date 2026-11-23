@@ -5,29 +5,6 @@
 
 /* Picks an actor's death animation from what killed it (weapon, projectile, hit direction). */
 
-#ifdef TARGET_PORT
-typedef struct Source {
-/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Source(m) __builtin_offsetof(CGameObjectInstance, m)
-    union {
-        struct { u8 _hp_kind[T2_HOFF_Source(header.m_Type)]; u8 kind; }; /* N64 0x0 */
-        struct { u8 _hp_type[T2_HOFF_Source(header.m_nObjType)]; u16 type; }; /* N64 0x2 */
-        struct { u8 _hp_flags[T2_HOFF_Source(m_dwFlags)]; s32 flags; }; /* N64 0xD4 */
-        struct { u8 _hp_owner[T2_HOFF_Source(m_AI.m_pParent)]; CPlayer *owner; }; /* N64 0x1A8 */
-    };
-} Source;
-#else
-typedef struct {
-    /* 0x000 */ u8 kind;
-    /* 0x001 */ u8 pad1;
-    /* 0x002 */ u16 type;
-    /* 0x004 */ u8 pad4[0xD4 - 0x4];
-    /* 0x0D4 */ s32 flags;
-    /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
-    /* 0x1A8 */ CPlayer *owner;
-} Source;
-#endif
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x65];
@@ -35,7 +12,7 @@ typedef struct {
 } HitPoint;
 
 typedef struct {
-    /* 0x00 */ Source *source;
+    /* 0x00 */ CGameObjectInstance *source;
     /* 0x04 */ u8 pad4[0xC - 0x4];
     /* 0x0C */ s32 flags;
     /* 0x10 */ HitPoint *point;
@@ -48,7 +25,7 @@ extern sptr CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, sptr
 
 s32 EnemyAI_PickDeathMode(CGameObjectInstance *actor, sptr unused, HitInfo *hit) {
     CEnemyIntelligence *anims;
-    Source *src;
+    CGameObjectInstance *src;
     s32 front = 0;
     s32 side = 0;
     s32 back = 0;
@@ -56,9 +33,9 @@ s32 EnemyAI_PickDeathMode(CGameObjectInstance *actor, sptr unused, HitInfo *hit)
 
     anims = &actor->header.m_pIntelligence->m_Enemy;
     if (gEngineApp_m_Settings.unk17 != 0 && (src = hit->source) != NULL) {
-        switch (src->kind) {
+        switch (src->header.m_Type) {
             case 2:
-                switch (src->type) {
+                switch (src->header.m_nObjType) {
                     case 0xC:
                     case 0x22:
                     case 0x23:
@@ -80,7 +57,7 @@ s32 EnemyAI_PickDeathMode(CGameObjectInstance *actor, sptr unused, HitInfo *hit)
                 }
                 break;
             case 1:
-                if ((src->flags & 0x300000) && src->owner->m_Data.m_CurrentWeapon == 1) {
+                if ((src->m_dwFlags & 0x300000) && ((CPlayer *)src->m_AI.m_pParent)->m_Data.m_CurrentWeapon == 1) {
                     back = side = front = 1;
                 }
                 break;
