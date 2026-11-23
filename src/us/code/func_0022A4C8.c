@@ -2,31 +2,11 @@
 /* A projectile's per-frame steering: by type, then homing, thrust and movement. */
 
 #include "common.h"
+#include "structs/player.h"
 #include "structs/vector.h"
 #include "globals/game.h"
 #include "protos/game.h"
 
-#ifdef TARGET_PORT
-typedef struct ProjNode {
-/* the view at the host offsets of CPlayer (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_ProjNode(m) __builtin_offsetof(CPlayer, m)
-    union {
-        struct { u8 _hp_pos[T2_HOFF_ProjNode(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_height[T2_HOFF_ProjNode(m_CharacterActor.m_CollisionYOffset)]; f32 height; }; /* N64 0x54 */
-        struct { u8 _hp_next[T2_HOFF_ProjNode(m_pNext)]; struct ProjNode *next; }; /* N64 0x1320 */
-    };
-} ProjNode;
-#else
-typedef struct ProjNode {
-    /* 0x0000 */ u8 pad0[4];
-    /* 0x0004 */ CVector3 pos;
-    /* 0x0010 */ u8 pad10[0x54 - 0x10];
-    /* 0x0054 */ f32 height;
-    /* 0x0058 */ u8 pad58[0x1320 - 0x58];
-    /* 0x1320 */ struct ProjNode *next;
-} ProjNode;
-#endif
 
 typedef struct ProjLimits {
     /* 0x00 */ u8 pad0[0x10];
@@ -87,7 +67,7 @@ typedef struct Projectile {
         struct { u8 _hp_velocity[T2_HOFF_Projectile(m_vVelocity)]; CVector3 velocity; }; /* N64 0x18 */
         struct { u8 _hp_flags[T2_HOFF_Projectile(m_dwFlags)]; u32 flags; }; /* N64 0x40 */
         struct { u8 _hp_def[T2_HOFF_Projectile(m_pEffect)]; ProjDef *def; }; /* N64 0xF8 */
-        struct { u8 _hp_target[T2_HOFF_Projectile(m_pTarget)]; ProjNode *target; }; /* N64 0x114 */
+        struct { u8 _hp_target[T2_HOFF_Projectile(m_pTarget)]; CPlayer *target; }; /* N64 0x114 */
         struct { u8 _hp_heading[T2_HOFF_Projectile(m_vDirection)]; CVector3 heading; }; /* N64 0x150 */
         struct { u8 _hp_sound[T2_HOFF_Projectile(m_pLoopSound)]; ProjSound *sound; }; /* N64 0x1B8 */
     };
@@ -104,7 +84,7 @@ typedef struct Projectile {
     /* 0x044 */ u8 pad44[0xF8 - 0x44];
     /* 0x0F8 */ ProjDef *def;
     /* 0x0FC */ u8 padFC[0x114 - 0xFC];
-    /* 0x114 */ ProjNode *target;
+    /* 0x114 */ CPlayer *target;
     /* 0x118 */ u8 pad118[0x150 - 0x118];
     /* 0x150 */ CVector3 heading;
     /* 0x15C */ u8 pad15C[0x1B8 - 0x15C];
@@ -115,8 +95,8 @@ typedef struct Projectile {
 
 extern f32 HalfToFloat(s32 halfFloat);
 extern f32 func_00298470(f32);             /* sqrtf */
-extern f32 GameObject_GetCollisionHeight(ProjNode *node);
-extern f32 func_0026841C(ProjNode *node);
+extern f32 GameObject_GetCollisionHeight(CPlayer *node);
+extern f32 func_0026841C(CPlayer *node);
 extern f32 Random_Blend(f32 lo, f32 hi);   /* random in range */
 extern f32 Math_AcosLookup(f32);             /* acosf */
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -174,11 +154,11 @@ void CParticle__Steer(Projectile *o) {
     CVector3 ax;
     CQuaternion q0, q1, q2;
     CMtxF mt;
-    ProjNode *p;
-    ProjNode *p2;
+    CPlayer *p;
+    CPlayer *p2;
     CVector3 *tpp;
     CVector3 *velp;
-    ProjNode *t;
+    CPlayer *t;
     ProjDef *def;
     f32 h, fa, fb, fc, fd, k, speed, ang, w, tt;
 
@@ -193,8 +173,8 @@ void CParticle__Steer(Projectile *o) {
                 __asm__ __volatile__("");
                 p = p2;
                 do {
-                    h = p->height;
-                    tp = p->pos;
+                    h = p->m_CharacterActor.m_CollisionYOffset;
+                    tp = p->m_CharacterActor.header.m_vPos;
                     tp.y += h;
                     tp.y += GameObject_GetCollisionHeight(p2) * fa;
                     CVector3__Subtract(&d, tpp, &o->pos);
@@ -206,13 +186,13 @@ void CParticle__Steer(Projectile *o) {
                         d.z *= k * Random_Blend(fa, fb);
                         CVector3__Subtract(velp, velp, &d);
                     }
-                    p2 = p->next;
+                    p2 = p->m_pNext;
                     p = p2;
                 } while (p2 != NULL);
             }
             t = o->target;
             tt = func_0026841C(t);
-            tp = t->pos;
+            tp = t->m_CharacterActor.header.m_vPos;
             tp.y += tt;
             CVector3__Subtract(&d, &tp, &o->pos);
             fc = 0.3f;
@@ -245,7 +225,7 @@ void CParticle__Steer(Projectile *o) {
         if (def->flags & 0x40000) {
             if (def->turnRate != 0) {
                 tt = func_0026841C(t);
-                tp = t->pos;
+                tp = t->m_CharacterActor.header.m_vPos;
                 tp.y += tt;
                 tp.y += GameObject_GetCollisionHeight(t) * 0.5f;
                 CVector3__Subtract(&dir, &tp, &o->pos);

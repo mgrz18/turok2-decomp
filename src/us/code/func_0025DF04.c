@@ -13,26 +13,6 @@
  * said. */
 
 
-#ifdef TARGET_PORT
-typedef struct AttackState {
-/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_AttackState(m) __builtin_offsetof(CAI, m)
-    union {
-        struct { u8 _hp_flags[T2_HOFF_AttackState(m_dwFlags)]; s32 flags; }; /* N64 0x0 */
-        struct { u8 _hp_anim[T2_HOFF_AttackState(m_AnimType)]; s16 anim; }; /* N64 0xC4 */
-        struct { u8 _hp_index[T2_HOFF_AttackState(m_Enemy.m_BehaviorIndex)]; s8 index; }; /* N64 0x133 (round 8 w2: by hand, inside the m_VarBuffer union) */
-    };
-} AttackState;
-#else
-typedef struct {
-    /* 0x00 */ s32 flags;
-    /* 0x04 */ u8 pad04[0xC0];
-    /* 0xC4 */ s16 anim;
-    /* 0xC6 */ u8 padC6[0x6D];
-    /* 0x133 */ s8 index;
-} AttackState;
-#endif
 
 typedef struct {
     /* 0x00 */ u8 pad00[0x44];
@@ -56,11 +36,11 @@ s32 EnemyAnim_ExplosiveDeath_B0300(void *, void *);
 s32 EnemyAnim_ExplosiveDeath_B0330(void *, void *);
 s32 EnemyAnim_NormalDeath_B0360(void *, void *);
 
-s32 EnemyAnim_PickDeath(CGameObjectInstance *actor, AttackState *state) {
+s32 EnemyAnim_PickDeath(CGameObjectInstance *actor, CAI *state) {
     s32 result = -1;
-    s32 flags = state->flags;
+    s32 flags = state->m_dwFlags;
     s32 *def = actor->header.m_pIntelligence;
-    s32 index = state->index;
+    s32 index = state->m_Enemy.m_BehaviorIndex;
     s32 mode = flags & 0x03F00000;
     sptr target = actor->header.m_pCurrentRegion;
     u16 *masks = (u16 *)((u8 *)def + 0x14); /* [0x3C] close, [0x3D] mid, [0x3E] far */
@@ -105,25 +85,25 @@ s32 EnemyAnim_PickDeath(CGameObjectInstance *actor, AttackState *state) {
     }
     if (result == -1) {
         if (index == 0) {
-            if ((masks[0x3C] & 0x1F) && state->anim >= 2000 && state->anim < 2025) {
+            if ((masks[0x3C] & 0x1F) && state->m_AnimType >= 2000 && state->m_AnimType < 2025) {
                 result = EnemyAnim_MovingDeath_B01B0(actor, state);
             } else {
                 result = EnemyAnim_NormalDeath_B0120(actor, state);
             }
         } else if (index == 1) {
-            if ((masks[0x3C] & 0x3E0) && state->anim >= 2100 && state->anim < 2125) {
+            if ((masks[0x3C] & 0x3E0) && state->m_AnimType >= 2100 && state->m_AnimType < 2125) {
                 result = EnemyAnim_MovingDeath_B01E0(actor, state);
             } else {
                 result = EnemyAnim_NormalDeath_B0150(actor, state);
             }
         } else if (index == 2) {
-            if ((masks[0x3C] & 0x7C00) && state->anim >= 2200 && state->anim < 2225) {
+            if ((masks[0x3C] & 0x7C00) && state->m_AnimType >= 2200 && state->m_AnimType < 2225) {
                 result = EnemyAnim_MovingDeath_B0210(actor, state);
             } else {
                 result = EnemyAnim_NormalDeath_B0180(actor, state);
             }
         }
     }
-    state->flags = rest | mode;
+    state->m_dwFlags = rest | mode;
     return result;
 }
