@@ -1,15 +1,9 @@
 #include "common.h"
+#include "ultra_types.h"
+#include "protos/ultra.h"
 
-/* A mutex: a one-message queue (0x18 bytes) plus its message slot. */
-typedef struct {
-    /* 0x00 */ u8 queue[0x18];
-    /* 0x18 */ s32 msg;
-    /* 0x1C */ s32 owner;
-} CMutex;
-
-extern void osCreateMesgQueue(void *, void *, s32);     /* osCreateMesgQueue */
 
 void CMutex__Construct(CMutex *arg0) {
-    arg0->owner = 0;
-    osCreateMesgQueue(arg0, &arg0->msg, 1);
+    arg0->count = 0;
+    osCreateMesgQueue(&arg0->queue, &arg0->msg, 1);
 }

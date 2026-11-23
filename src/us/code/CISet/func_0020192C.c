@@ -1,11 +1,6 @@
 #include "common.h"
-
-/* A byte bitmap: width x height bytes after an 8-byte header. */
-typedef struct {
-    /* 0x0 */ s32 width;
-    /* 0x4 */ s32 height;
-    /* 0x8 */ u8 data[1];
-} ByteImage;
+#include "structs/table.h"
+#include "protos/iset.h"
 
 extern void *func_0029E460(void *dst, void *src, s32 size); /* memcpy */
 
