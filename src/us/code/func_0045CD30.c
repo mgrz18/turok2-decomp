@@ -11,7 +11,7 @@ typedef struct {
     /* 0x04 */ s32 v[4];
 } ScreenExtra; /* 0x14 */
 
-extern s32 D_800C2044;
+extern s32 gVideoDitherFilter;
 extern ScreenExtra gVideoModeFlags[];
 
 s32 GetMemSize(void); /* osGetMemSize */
@@ -41,7 +41,7 @@ void Video_ApplyResolution_2(void) {
     }
     if (mode != NULL) {
         extra = gVideoModeFlags[gResolution];
-        D_800C2044 = extra.antialias;
+        gVideoDitherFilter = extra.antialias;
         gRenderAntiAlias = extra.v[0];
         gViAntiAlias = extra.v[1];
         gRenderZModeInter = extra.v[2];
@@ -49,7 +49,7 @@ void Video_ApplyResolution_2(void) {
         gScreenWidth = mode[0];
         gScreenHeight = mode[1];
         Video_SetMode_2(mode[0], mode[1], mode[2], mode[3], mode[4], mode[5]);
-        osViSetSpecialFeatures(D_800C2044 ? 0x40 : 0x80);
+        osViSetSpecialFeatures(gVideoDitherFilter ? 0x40 : 0x80);
         osViSetSpecialFeatures(0x20);
         osViSetSpecialFeatures(2);
     }

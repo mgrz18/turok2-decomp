@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/frame.h"
 
-extern u8 D_800AA0F0[];           /* "\n" */
+extern u8 sCrashText_Newline[];           /* "\n" */
 
 void Crash_PutChar(s32 c);          /* debug console: draws one character */
 void Crash_PrintHex8(s32 byte);       /* debug console: draws a byte in hex */
@@ -39,7 +39,7 @@ void Crash_PrintStack(u8 *stack, s32 size, Thread *thread, u8 fill) {
     while (*low == fill) {
         low++;
     }
-    putString(D_800AA0F0);
+    putString(sCrashText_Newline);
     putString("Call stack ");
     putString("(top:");
     putHex32((uptr)(stack + size));
@@ -52,7 +52,7 @@ void Crash_PrintStack(u8 *stack, s32 size, Thread *thread, u8 fill) {
     for (sp = thread->sp, count = 1; sp < top && count < 6; sp++) {
         if (IsCodePointer(*sp)) {
             putHex32(*sp);
-            putString(D_800AA0F0);
+            putString(sCrashText_Newline);
             count++;
         }
     }

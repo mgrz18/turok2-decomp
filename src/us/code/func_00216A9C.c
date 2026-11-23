@@ -31,8 +31,8 @@ typedef struct Resource {
 } Resource;
 
 extern f32 D_800E6790;
-extern s32 D_800E6794;
-extern s32 D_800E6798;
+extern s32 sAnimDecodeRotation;
+extern s32 sAnimRawRange;
 
 s32 ProPackDecompress(Resource **res, s32 arg1);
 s32 Anim_DecodeTracks(void *source, Pack *table, s32 tracks, s32 channels, s32 radius, s32 encoding);
@@ -83,16 +83,16 @@ static __inline__ s32 decodeAnim(void *src, void *dst) {
     Pack *posDst = CISet__GetBlock(dst, 1);
     Pack *rotDst = CISet__GetBlock(dst, 2);
 
-    D_800E6798 = 1;
-    D_800E6794 = 0;
+    sAnimRawRange = 1;
+    sAnimDecodeRotation = 0;
     sAnimRemapMin = -2000.0f;
     sAnimRemapMax = 2000.0f;
     D_800E6790 = h->fC;
     if (Anim_DecodeTracks(posSrc, posDst, h->posTracks, 3, h->radius, h->encoding) == 0) {
         ok = 0;
     } else {
-        D_800E6798 = 0;
-        D_800E6794 = 1;
+        sAnimRawRange = 0;
+        sAnimDecodeRotation = 1;
         sAnimRemapMin = -1.0f;
         sAnimRemapMax = 1.0f;
         D_800E6790 = h->fC;

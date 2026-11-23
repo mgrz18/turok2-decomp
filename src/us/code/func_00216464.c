@@ -6,8 +6,8 @@
 
 extern void Anim_DecodeQuantizedChannel(u32 *stream, Output8025EF54 *out, s32 count);
 extern float Bits_Normalize(float value, int bits);
-extern s32 D_800E6798;
-extern s32 D_800E6798;
+extern s32 sAnimRawRange;
+extern s32 sAnimRawRange;
 extern u32 Bits_Read(u32 *, u32);
 extern f32 Math_Remap(f32 value, f32 lower, f32 upper);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
@@ -21,7 +21,7 @@ void Anim_DecodeQuantizedChannel(u32 *stream, Output8025EF54 *out, s32 count) {
     s32 i;
     f64 converted;
     decode.stream = *stream;
-    if (D_800E6798 != 0) {
+    if (sAnimRawRange != 0) {
         decode.first_bits = Bits_Read(&decode.stream, 0x20);
         decode.second_bits = Bits_Read(&decode.stream, 0x20);
         first = *(f32 *)&decode.first_bits;

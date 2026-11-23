@@ -2,7 +2,7 @@
 
 extern u8 sCrashText_ColonSpace[];           /* ": " */
 extern u8 sCrashText_Spaces3[];           /* "   " */
-extern u8 D_800AA0F0[];           /* "\n" */
+extern u8 sCrashText_Newline[];           /* "\n" */
 
 void Crash_PutChar(s32 c);          /* debug console: draws one character */
 void Crash_PrintHex8(s32 byte);       /* debug console: draws a byte in hex */
@@ -39,5 +39,5 @@ void Crash_PrintRegs4(u8 *name0, u32 value0, u8 *name1, u32 value1, u8 *name2, u
     putString(name3);
     putString(sCrashText_ColonSpace);
     putHex32(value3);
-    putString(D_800AA0F0);
+    putString(sCrashText_Newline);
 }
