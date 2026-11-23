@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "structs/cache.h"
 #include "structs/pak.h"
@@ -13,9 +14,6 @@
 
 void *memset(void *s, int c, uptr n);
 extern s32 D_800F70A8;
-extern u8 sPakMenuText_OtherGame[];
-extern u8 sCharNoteMenuText_Empty[];
-extern u8 sPakMenuText_SingleSaveBlock[];
 s32 PakMenu_CheckPak();
 s32 Str_Length();
 s32 Str_Compare();

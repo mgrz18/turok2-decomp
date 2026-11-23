@@ -1,11 +1,8 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player_options.h"
 
 
-extern u8 sPlayerNameText_Player1[12];
-extern u8 sPlayerNameText_Player2[12];
-extern u8 sPlayerNameText_Player3[12];
-extern u8 sPlayerNameText_Player4[12];
 
 void PlayerOptions_SetDefaultName(CPlayerOptions *w) {
     s32 i;

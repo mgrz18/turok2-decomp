@@ -2,10 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 extern u8 D_800C1144[];
-extern u8 sCheatMenuText_WarpPortOfAdia[], sCheatMenuText_WarpRiverOfSouls[], sCheatMenuText_WarpDeathMarshes[], sCheatMenuText_WarpLairOfTheBlindOnes[], sCheatMenuText_WarpHiveOfTheMantids[], sCheatMenuText_WarpPrimagensLightship[], sCheatMenuText_WarpQueenBoss[], sCheatMenuText_WarpBlindOneBoss[], sCheatMenuText_WarpMotherBoss[], sCheatMenuText_WarpPrimagenBoss[], sCheatMenuText_WarpCredits[];
 s32 CheatMenu_WarpText_2(MenuItem *o) {
     switch (sCheatsMenuSelection) {
     default: o->text = (char *)D_800C1144; break;

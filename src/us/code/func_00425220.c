@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004058B0.c, func_004058B0, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "gfx.h"
 #include "globals/frame.h"
 #include "globals/render.h"
@@ -25,7 +26,6 @@ extern void memset(void *dst, s32 value, uptr size);                  /* memset 
 extern uptr T2Port_RdramTop(void);
 #endif
 
-extern char sGfxPoolText_AudioHeap[]; /* "audio heap": the byte after it is the linker's fill (0x0B), not a zero the C could give */
 
 void GfxPool_Alloc(CGfxPool *pool) {
     u32 mb = 0x100000;

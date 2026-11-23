@@ -2,11 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 
-extern u8 sPlayerSetupMenuText_ControlExpert[];
-extern u8 sPlayerSetupMenuText_ControlArcade[];
 s32 PlayerSetupMenu_ControlTypeLabel_2(MenuItem *a, Menu *m) {
     switch (m->player->m_pOptions->m_ControlType) {
     case 0:
