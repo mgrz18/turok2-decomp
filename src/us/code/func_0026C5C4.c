@@ -4,34 +4,11 @@
 #include "protos/scene.h"
 
 /* Resource entry: a key, its flags and three child entries. */
-#ifdef TARGET_PORT
-typedef struct Entry0026C5C4 {
-/* the view at the host offsets of CGameRegion (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Entry0026C5C4(m) __builtin_offsetof(CGameRegion, m)
-    union {
-        struct { u8 _hp_key[T2_HOFF_Entry0026C5C4(m_nInfo)]; u16 key; }; /* N64 0x0 */
-        struct { u8 _hp_flags[T2_HOFF_Entry0026C5C4(m_wFlags)]; u16 flags; }; /* N64 0x2 */
-        struct { u8 _hp_child0[T2_HOFF_Entry0026C5C4(m_pNeighbours)]; struct Entry0026C5C4 *child0; }; /* N64 0x10 */
-        struct { u8 _hp_child1[T2_HOFF_Entry0026C5C4(m_pNeighbours[1])]; struct Entry0026C5C4 *child1; }; /* N64 0x14 */
-        struct { u8 _hp_child2[T2_HOFF_Entry0026C5C4(m_pNeighbours[2])]; struct Entry0026C5C4 *child2; }; /* N64 0x18 */
-    };
-} Entry0026C5C4;
-#else
-typedef struct Entry0026C5C4 {
-    /* 0x00 */ u16 key;
-    /* 0x02 */ u16 flags;
-    /* 0x04 */ u8 pad4[0x10 - 0x4];
-    /* 0x10 */ struct Entry0026C5C4 *child0;
-    /* 0x14 */ struct Entry0026C5C4 *child1;
-    /* 0x18 */ struct Entry0026C5C4 *child2;
-} Entry0026C5C4;
-#endif
 
 
 s32 CGameRegion__FloodSetWaterSame(sptr, s32);                    /* extern */
 
-void CGameRegion__FloodSetWater(Entry0026C5C4 *arg0) {
+void CGameRegion__FloodSetWater(CGameRegion *arg0) {
     sptr temp_a0;
     sptr temp_a0_2;
     sptr temp_a0_3;
@@ -40,19 +17,19 @@ void CGameRegion__FloodSetWater(Entry0026C5C4 *arg0) {
     u16 temp_v1;
 
     if (arg0 != NULL) {
-        temp_v1 = arg0->flags;
+        temp_v1 = arg0->m_wFlags;
         if (!(temp_v1 & 1)) {
-            temp_a0 = (sptr) arg0->child0;
-            temp_s0 = arg0->key;
-            arg0->flags = (u16) (temp_v1 | 1);
+            temp_a0 = (sptr) arg0->m_pNeighbours[0];
+            temp_s0 = arg0->m_nInfo;
+            arg0->m_wFlags = (u16) (temp_v1 | 1);
             if (temp_a0 != 0) {
                 CGameRegion__FloodSetWaterSame(temp_a0, temp_s0);
             }
-            temp_a0_2 = (sptr) arg0->child1;
+            temp_a0_2 = (sptr) arg0->m_pNeighbours[1];
             if (temp_a0_2 != 0) {
                 CGameRegion__FloodSetWaterSame(temp_a0_2, temp_s0);
             }
-            temp_a0_3 = (sptr) arg0->child2;
+            temp_a0_3 = (sptr) arg0->m_pNeighbours[2];
             if (temp_a0_3 != 0) {
                 CGameRegion__FloodSetWaterSame(temp_a0_3, temp_s0);
             }
