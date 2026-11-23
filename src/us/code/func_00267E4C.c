@@ -1,48 +1,17 @@
-#ifdef TARGET_PORT
-/* The port: the instance's definition by member (CInstanceHeader.m_pIntelligence, 0x14 on the
- * N64, 0x18 on the host); the enemy definition's words are at the same offsets. */
 #include "common.h"
+#include "structs/intelligence.h"
 #include "structs/game_object.h"
-s32 func_00267E4C(void *arg0) {
-    CIntelligence *def = ((CGameObjectInstance *) arg0)->header.m_pIntelligence;
 
-    if (def->m_Type != 1) {
-        return 0;
-    }
-    return *(s32 *) ((u8 *) def + 0x14) & 0x200;
-}
-#else
+/* De-faked in round 21 (j4): the matched draft wrapped the return in an if/else with two
+ * identical arms; testing for the case that returns the field first gives the ROM's layout
+ * (the field's path after the branch, the beq's delay slot empty). */
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
-typedef float f32;
-typedef double f64;
-s32 func_00267E4C(void *arg0)
-{
-  void *temp_a0;
-  temp_a0 = *((void **) (arg0 + 0x14));
-  if ((*((s32 *) (((s8 *) temp_a0) - -0))) != 1)
-  {
-    if (temp_a0)
-    {
-      return 0;
+/* An enemy definition's type flag 0x200 (0 for other definitions). */
+s32 func_00267E4C(CGameObjectInstance *actor) {
+    CIntelligence *def = actor->header.m_pIntelligence;
+
+    if (def->m_Type == INTELLIGENCE_ENEMY) {
+        return def->m_dwTypeFlags & 0x200;
     }
-    else
-      if (temp_a0)
-    {
-      return 0;
-    }
-    else
-    {
-      return 0;
-    }
-  }
-  return (*((s32 *) (((s8 *) temp_a0) + 0x14))) & 0x200;
+    return 0;
 }
-#endif

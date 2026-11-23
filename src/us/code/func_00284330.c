@@ -1,19 +1,15 @@
-
 #include "common.h"
 #include "structs/cinema.h"
 #include "globals/cinema.h"
-s32 Cinema_OverridesMusic2(void)
-{
-  if (0 != gCinemaPlayerP->active)
-  {
-    if (gCinemaPlayerP)
-    {
-      return gCinemaPlayerP->spec.unk44;
+
+/* De-faked in round 21 (j4): the matched draft wrapped the return in an if/else with two
+ * identical arms; testing for the case that returns the field first gives the ROM's layout
+ * (the field's path after the branch, the beq's delay slot empty). */
+
+/* The playing cinema's second music override (0 when none plays). */
+s32 Cinema_OverridesMusic2(void) {
+    if (gCinemaPlayerP->active == 0) {
+        return 0;
     }
-    else
-    {
-      return gCinemaPlayerP->spec.unk44;
-    }
-  }
-  return 0;
+    return gCinemaPlayerP->spec.unk44;
 }
