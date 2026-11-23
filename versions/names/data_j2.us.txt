@@ -463,3 +463,17 @@ sDebugMenuText_DebugVis = 0x800C1F10; // string 'debug         :   vis': Menu_De
 sDebugMenuText_DebugAis = 0x800C1F28; // string 'debug         :   ais': Menu_DebugModeLabel, Menu_DebugModeLabel_2
 sDebugMenuText_DebugSnd = 0x800C1F40; // string 'debug         :   snd': Menu_DebugModeLabel, Menu_DebugModeLabel_2
 sDebugMenuText_DebugLinks = 0x800C1F58; // string 'debug         : links': Menu_DebugModeLabel, Menu_DebugModeLabel_2
+
+// Other data and BSS (round 21 j2): what the code does with them
+sCCacheDesc_Header = 0x800A51E0; // string "header" (linker fill after it) in the tail of .code: CCache__LoadPersistantIndex's CCache__Request description
+sTextureCacheDesc_Texture = 0x800A51F0; // string "texture": Texture_Request / Texture_RequestSync pass it to CCache__Request as the description
+sCrashText_Newline = 0x800AA0F0; // string "\n", the first of the crash screen's strings ("Call stack (top:" ...): Crash_PrintRegPair, Crash_PrintRegs4, Crash_ShowScreen
+sHashDebugLongestChain = 0x800AB0B8; // after gHashTableSize: CHashTable__GetLongestChain clears it after counting the longest chain (the debug print is compiled out)
+sCameraTextEmpty = 0x800B2CD0; // string "" (the word before "none"): CCameraPool__AddText/AddTextEx/AddTimedText/AddMultiLineText use it for a NULL text
+gVideoDitherFilter = 0x800C2044; // Video_ApplyResolution: = the mode's antialias flag, osViSetSpecialFeatures(it ? OS_VI_DITHER_FILTER_ON : OS_VI_DITHER_FILTER_OFF)
+gAssertLine = 0x800F1FF0; // Crash_ShowScreen prints it after "Line: " (gAssertFile's line)
+gAssertExpr = 0x800F1FF4; // char *: Crash_ShowScreen prints "(" it ") = 0" when set (the failed assertion)
+gNumTicks1 = 0x800F6CA8; // Turok 3 tengine.c gNumTicks1 ("n_l_fields"), between gNumTicks0 and gNumTicks2: CEngineApp__Main clears it, __scHandleRDP, frameRetraces sums the four
+sOnScreenFontTextureBuffer = 0x800F5618; // u8[0x90]: COnScreen__LoadFontTexture points sOnScreenFontTexture at it
+sAnimDecodeRotation = 0x800E6794; // Anim_DecodeAnimation: 0 while it decodes the 3-component tracks (h->f14), 1 for the 4-component ones (h->f10); read by Anim_Decompress
+sAnimRawRange = 0x800E6798; // AnimCurve_Init sets it, Anim_DecodeAnimation clears it: when set, Anim_DecodeQuantizedChannel/Anim_Decompress read the channel range as two raw f32 words
