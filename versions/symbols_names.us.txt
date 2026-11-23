@@ -5432,6 +5432,7 @@ gPakQueueState = 0x800F6750;
 gPakAccessQueue = 0x800F6758;
 gSiMesgBuf = 0x800F6770;
 gContStatus = 0x800F6778;
+gContStatus_errno = 0x800F677B;
 gPakChanged = 0x800F6788;
 gSiMessageQueue = 0x800F6798;
 gPakRemoved = 0x800F67B0;

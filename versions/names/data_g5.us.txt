@@ -296,6 +296,7 @@ gPakQueueState = 0x800F6750; // s8, the pak rescan request / queue state (Pak_* 
 gPakAccessQueue = 0x800F6758; // OSMesgQueue, the pak access lock (Controller_Lock/Unlock, Controller_Service)
 gSiMesgBuf = 0x800F6770; // OSMesg, the buffer of gSiMessageQueue
 gContStatus = 0x800F6778; // OSContStatus[4] (osContInit, Pak_Mount, Controller_ReadAll)
+gContStatus_errno = 0x800F677B; // gContStatus[0].errno (+3): Controller_CountConnected walks the four errno bytes through it as a u8 [] (the member form gContStatus[n].errno lets clang vectorize the loop with an aligned 16-byte load of gContStatus, which the host layout does not align: it crashed; was D_800F677B, round 24 m2)
 gPakChanged = 0x800F6788; // s32[4]: Controller_PakChanged/TakePakChanged; set by Controller_UpdatePakInsertion
 gSiMessageQueue = 0x800F6798; // OSMesgQueue of the serial interface events (osContInit, osContStartQuery, osMotorInit)
 gPakRemoved = 0x800F67B0; // s32[4]: a pak went out of a watched port; the next insertion sets gPakChanged (Controller_UpdatePakInsertion)
