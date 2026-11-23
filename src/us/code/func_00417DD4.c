@@ -1,7 +1,7 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 
-extern char D_800B42D8[];
 extern s32 gEngineApp_m_Settings_match_teamScore; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 MenuItem_TextLength(MenuItem *a);
 #ifdef TARGET_PORT
@@ -13,7 +13,7 @@ extern void sprintf(char *dst, char *fmt, s32 value);
 
 /* Prints gEngineApp_m_Settings_match_teamScore over the last four characters of the label. */
 s32 FinalScoreMenu_BlueScoreLabel(MenuItem *a) {
-    a->text = D_800B42D8;
+    a->text = sFinalScoreMenuText_BlueBloodScore;
     sprintf(a->text + (MenuItem_TextLength(a) - 4), "%04d", gEngineApp_m_Settings_match_teamScore);
     return 0;
 }

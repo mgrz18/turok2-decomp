@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "globals/game.h"
@@ -7,8 +8,6 @@
 /* Menu text item: print one u16 stat of the current player's record (64-byte
  * records, field at 0x8011AB5E) at the end of the item's text. */
 
-extern u16 D_8011AB5E[];
-extern char D_800C1330[];
 
 s32 MenuItem_TextLength_2(MenuItem *item);
 #ifdef TARGET_PORT
@@ -19,8 +18,8 @@ void sprintf(char *dst, char *fmt, s32 value);
 #endif
 
 s32 StatsMenu_TagsText_2(MenuItem *item, Menu *event) {
-    s32 value = D_8011AB5E[CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, event->player) * 32];
+    s32 value = gEngineApp_m_Settings.slots[CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, event->player)].m_Tags;
 
-    sprintf(item->text + (MenuItem_TextLength_2(item) - 4), D_800C1330, value);
+    sprintf(item->text + (MenuItem_TextLength_2(item) - 4), sStatsMenuFmt_04d, value);
     return 0;
 }

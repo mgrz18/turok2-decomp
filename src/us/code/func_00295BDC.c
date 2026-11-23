@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/strings.h"
 #include "globals/libaudio.h"
 #include "protos/ultra.h"
 
 extern s16 _getRate(f64 vol, f64 tgt, s32 count, u16 *ratel);
-extern char D_800AA540[];
-extern char D_800AA544[];
 extern void __assert(const char *, const char *, s32);
 Acmd *_pullSubFrame(void *filter, s16 *inp, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
 {
@@ -16,7 +15,7 @@ Acmd *_pullSubFrame(void *filter, s16 *inp, s16 *outp, s32 outCount, s32 sampleO
     ALFilter *source = e->filter.source;
     if (e->motion != 1 || !outCount)
         return ptr;
-    ((source) ? ((void)0) : __assert(D_800AA540, D_800AA544, 366));
+    ((source) ? ((void)0) : __assert(sEnvAssertExpr, sEnvAssertFile, 366));
     ptr = (*source->handler)(source, inp, outCount, sampleOffset, p);
     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(8) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0x00) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(*inp) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(1088 + *outp) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(outCount << 1) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(8) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0x08) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(1408 + *outp) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(1728 + *outp) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(2048 + *outp) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };

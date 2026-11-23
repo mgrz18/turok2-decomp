@@ -1,13 +1,12 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_4/8026AC38_3.CPP, func_8026C484_de, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/model.h"
 #include "globals/batch.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-extern char D_800A53D8[];
-extern char D_800A53EC[];
 
 void Render_FlushModelBatch(void);
 void Model_DecompressCallbackTerminated();
@@ -24,12 +23,12 @@ void Render_QueueModelByKey(s32 key, void *matrix, void *lights, s32 lod, s32 pa
     CModelInstance *inst;
     s32 n;
 
-    header = CCache__Request(0, key, 0x18, 0, 0, 0, D_800A53D8, 1);
+    header = CCache__Request(0, key, 0x18, 0, 0, 0, sRenderCacheDesc_SimpObjectIndex, 1);
     if (header == 0) {
         return;
     }
     dataKey = CISet__GetROMAddressAndSize(*header, key, 1, &size);
-    resource = CCache__Request(0, dataKey, size, 0, 0, Model_DecompressCallbackTerminated, D_800A53EC, 1);
+    resource = CCache__Request(0, dataKey, size, 0, 0, Model_DecompressCallbackTerminated, sRenderCacheDesc_Geometry, 1);
     if (resource != 0) {
         parts = CISet__GetBlock(*resource, 2);
         if (lod >= 0 && lod < *parts) {

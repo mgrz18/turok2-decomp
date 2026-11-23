@@ -12,14 +12,13 @@ typedef struct {
     s32 a, b, c, d, e;
 } VideoFlags;
 
-extern s32 D_800C2044;
 extern VideoFlags gVideoModeFlags[];
 extern s32 GetMemSize(void); /* osGetMemSize */
 extern void Video_SetMode(s32 width, s32 height, s32 a2, s32 a3, s32 a4, s32 a5);
 extern void osViSetSpecialFeatures(s32 flags);
 
 static __inline__ void SetConfig(s32 a, s32 b, s32 c, s32 d, s32 e) {
-    D_800C2044 = a;
+    gVideoDitherFilter = a;
     gRenderAntiAlias = b;
     gViAntiAlias = c;
     gRenderZModeInter = d;
@@ -59,7 +58,7 @@ void Video_ApplyResolution(void) {
         SetConfig(flags.a, flags.b, flags.c, flags.d, flags.e);
         SetMode((s32 *)mode);
         flag = 0x80;
-        if (D_800C2044 != 0) {
+        if (gVideoDitherFilter != 0) {
             flag = 0x40;
         }
         osViSetSpecialFeatures(flag);

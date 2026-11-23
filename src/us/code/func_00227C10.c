@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SYSTEM/802624A0_10.CPP, func_80262CE0_de, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/vector.h"
 #include "structs/world.h"
 #include "structs/list.h"
@@ -20,8 +21,6 @@ typedef struct AnimInfo {
     /* 0x1E */ u16 angle;
 } AnimInfo;
 
-extern char D_800A6070[];               /* "anim object index" */
-extern char D_800A6084[];               /* "anim object info" */
 
 f32 HalfToFloat(s32 angle);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 angle);
@@ -84,9 +83,9 @@ CListedInstance *CInstancePool__SpawnAnimInstance(CInstancePool *scene, s32 vari
     id = CScene__FindObjectType(&gScene, variant);
     if (id != -1) {
         src = CISet__GetROMAddress(gScene.m_pObjects, gScene.m_ObjectsKey, id);
-        index = CCache__Request(0, src, 0x18, 0, 0, 0, D_800A6070, 1);
+        index = CCache__Request(0, src, 0x18, 0, 0, 0, sCInstancePoolCacheDesc_AnimObjectIndex, 1);
         if (index != NULL) {
-            block = CCache__Request(0, CISet__GetROMAddressAndSize(*index, src, 0, &size), size, 0, 0, 0, D_800A6084, 1);
+            block = CCache__Request(0, CISet__GetROMAddressAndSize(*index, src, 0, &size), size, 0, 0, 0, sCInstancePoolCacheDesc_AnimObjectInfo, 1);
             if (block != NULL) {
                 info = CISet__GetBlock(*block, 0);
                 count = CScene__GetIntelligence(&gScene, info->intelligence);

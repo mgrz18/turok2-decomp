@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/menu_text.h"
 #include "globals/game.h"
 struct MenuItemRecAt14;
 struct MenuItemRecAt14 {
@@ -12,9 +13,6 @@ struct MenuItemRecAt14 {
 };
 struct MenuItemRecAt14;
 typedef struct MenuItemRecAt14 MenuItemRecAt14;
-extern u8 D_800B3E88[];
-extern u8 D_800B3EA0[];
-extern u8 D_800B3E70[];
 extern u32 gEngineApp_m_Settings_difficulty[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 s32 OptionsMenu_DifficultyText_2(MenuItemRecAt14 *item) {
     if (gEngineApp_m_Settings.mode == 8) {
@@ -24,13 +22,13 @@ s32 OptionsMenu_DifficultyText_2(MenuItemRecAt14 *item) {
     }
     switch (gEngineApp_m_Settings_difficulty[0]) {
     case 8:
-        item->table = D_800B3E70;
+        item->table = sOptionsMenuText_DifficultyEasy;
         break;
     case 0x10:
-        item->table = D_800B3E88;
+        item->table = sOptionsMenuText_DifficultyNormal;
         break;
     case 0x20:
-        item->table = D_800B3EA0;
+        item->table = sOptionsMenuText_DifficultyHard;
         break;
     }
     return 0;

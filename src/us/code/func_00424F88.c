@@ -1,15 +1,14 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 
-extern s32 D_800B436C;
-extern s32 D_800B437C;
 
 s32 MissionMenu_UpdateTitle(MenuItem *arg0) {
     if (sMissionFailed != 0) {
-        arg0->table = &D_800B437C;
+        arg0->table = &sMissionMenuText_MissionFailed;
     } else {
-        arg0->table = &D_800B436C;
+        arg0->table = &sMissionMenuText_MissionStatus;
     }
     return 1;
 }

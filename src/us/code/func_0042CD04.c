@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/scene.h"
 #include "protos/iset.h"
 #include "structs/world.h"
 
@@ -65,7 +66,6 @@ void CScene__DecompressPaths(CScene *level, s32 ***handle) {
 
 #ifdef TARGET_PORT
 #include "structs/region.h"
-extern CScene gScene;
 /* The port: a path point's region. The item keeps the ROM's region index (-1: none) in its 4-byte
  * slot, which cannot hold a host pointer (--high-memory, macOS), and the region table holds host
  * CGameRegions (0x40 bytes, not the N64's 0x20): the readers (AI_GetPathTargetInfo,

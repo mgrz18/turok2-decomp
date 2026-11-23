@@ -15,7 +15,8 @@ Renaming a global, moving its declaration to a header, giving it its real type
 or reaching it as `gScene.m_Field` instead of `gScene_m_Field` all compile to
 the same addresses, so they compare equal; anything that moves an access, a
 load order or a register shows as a diff. Symbols the ELF does not know
-(a new alias, defined in versions/symbols_manual.us.txt) are looked up there
+(a new alias, defined in versions/symbols_manual.us.txt, or a name
+tools/apply_names.py just wrote to symbols_names*.us.txt) are looked up there
 too; anything else stays a name, so rebuild the ELF once after adding names.
 
 Usage:
@@ -47,6 +48,7 @@ CPP_FLAGS = ["-P", "-undef", "-Wall", "-lang-c", "-D_LANGUAGE_C", "-DF3DEX_GBI_2
 CC_FLAGS = "-quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64"
 FLAGS_LINE = re.compile(r"^/\* cc1-flags: (.*) \*/$", re.M)
 OPERAND = re.compile(r"\b([A-Za-z_][A-Za-z0-9_.]*)((?:\s*[+-]\s*(?:0x[0-9a-fA-F]+|\d+))*)")
+ADDR_NAME = re.compile(r"D_[0-9A-F]{8}")
 MANUAL = re.compile(r"^\s*(\w+)\s*=\s*0x([0-9A-Fa-f]+)\s*;", re.M)
 
 
@@ -56,8 +58,12 @@ def symbols(elf_path):
         for sym in ELFFile(fh).get_section_by_name(".symtab").iter_symbols():
             if sym.name and sym.name not in out:
                 out[sym.name] = sym["st_value"]
-    for m in MANUAL.finditer((ROOT / "versions" / "symbols_manual.us.txt").read_text()):
-        out.setdefault(m.group(1), int(m.group(2), 16))
+    # Aliases the ELF does not know yet: manual symbols, and names just added to
+    # the names tables (tools/apply_names.py writes them here; ld's file holds the
+    # module-2 data at its link address).
+    for f in ("symbols_manual.us.txt", "symbols_names_ld.us.txt", "symbols_names.us.txt"):
+        for m in MANUAL.finditer((ROOT / "versions" / f).read_text()):
+            out.setdefault(m.group(1), int(m.group(2), 16))
     return out
 
 
@@ -91,10 +97,15 @@ def normalize(path, syms):
 
         def resolve(m):
             name = m.group(1)
-            if name not in syms:
+            if name in syms:
+                base = syms[name]
+            elif ADDR_NAME.fullmatch(name):
+                # D_<address>: a base tree's name the rebuilt ELF has renamed
+                base = int(name[2:], 16)
+            else:
                 return m.group(0)
             off = sum(int(t.replace(" ", ""), 0) for t in re.findall(r"[+-]\s*(?:0x[0-9a-fA-F]+|\d+)", m.group(2)))
-            return "@%08X" % ((syms[name] + off) & 0xFFFFFFFF)
+            return "@%08X" % ((base + off) & 0xFFFFFFFF)
         lines.append(OPERAND.sub(resolve, s))
     return lines
 

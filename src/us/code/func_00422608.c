@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
@@ -9,29 +10,23 @@
 #endif
 
 #ifdef TARGET_PORT
-extern char D_800B4B84[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 D_800B4B84;
 #endif
 #ifdef TARGET_PORT
-extern char D_800B4B8C[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 D_800B4B8C;
 #endif
 #ifdef TARGET_PORT
-extern char D_800B4B94[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 D_800B4B94;
 #endif
 extern s32 D_801309A8;
 
 s32 CharNoteMenu_UpdatePrompt(MenuItem *arg0) {
     if (sCharNoteLoad != 0) {
-        arg0->table = T2_TEXT(D_800B4B84);
+        arg0->table = T2_TEXT(sCharNoteMenuText_Load);
     } else if (D_801309A8 != 0) {
-        arg0->table = T2_TEXT(D_800B4B94);
+        arg0->table = T2_TEXT(sCharNoteMenuText_Delete_B4B94);
     } else {
-        arg0->table = T2_TEXT(D_800B4B8C);
+        arg0->table = T2_TEXT(sCharNoteMenuText_Delete_B4B8C);
     }
     return 0;
 }

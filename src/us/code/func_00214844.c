@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD_2/8024E914_14.CPP, func_802504B0_de (with func_8027892C_de of src/GAMECORE/CODE_80278900.CPP inlined), with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/engine.h"
@@ -59,7 +60,6 @@ typedef struct {
 
 /* What this reads around gEngineApp_m_Settings_match. */
 
-extern char D_800A57F8[];
 
 #ifdef TARGET_PORT /* unprototyped: the host passes the pass-through arguments */
 s32 Actor_GetTypeClass();
@@ -176,7 +176,7 @@ void CStaticObject__Draw(PlacedProp *prop) {
     if (instance == NULL) {
         return;
     }
-    resource = CCache__RequestDecompression(0, prop->colorKey | gLitVerticesKey, instance, prop->cache, 8, prop, CStaticObject__BuildLitVerticesCallback, D_800A57F8, 0);
+    resource = CCache__RequestDecompression(0, prop->colorKey | gLitVerticesKey, instance, prop->cache, 8, prop, CStaticObject__BuildLitVerticesCallback, sCStaticObjectCacheDesc_LitVertices, 0);
     if (resource != NULL) {
         CCache__LockForDisplayList(0, resource);
         header = *resource;
@@ -243,7 +243,7 @@ void CStaticObject__Draw(PlacedProp *prop) {
     if (instance == NULL) {
         return;
     }
-    resource = CCache__RequestDecompression(0, prop->colorKey | gLitVerticesKey, instance, prop->cache, 8, prop, CStaticObject__BuildLitVerticesCallback, D_800A57F8, 0);
+    resource = CCache__RequestDecompression(0, prop->colorKey | gLitVerticesKey, instance, prop->cache, 8, prop, CStaticObject__BuildLitVerticesCallback, sCStaticObjectCacheDesc_LitVertices, 0);
     if (resource != NULL) {
         CCache__LockForDisplayList(0, resource);
         header = *resource;

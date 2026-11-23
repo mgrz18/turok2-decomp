@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "globals/camera.h"
 #include "globals/scene.h"
 #include "globals/pickup.h"
@@ -28,27 +29,6 @@ typedef struct Picker {
 } Picker;
 #endif
 
-extern u8 D_800B37BC[];
-extern u8 D_800B37CC[];
-extern u8 D_800B37D8[];
-extern u8 D_800B37DC[];
-extern u8 D_800B3800[];
-extern u8 D_800B3810[];
-extern u8 D_800B3820[];
-extern u8 D_800B3830[];
-extern u8 D_800B383C[];
-extern u8 D_800B384C[];
-extern u8 D_800B3858[];
-extern u8 D_800B3864[];
-extern u8 D_800B3870[];
-extern u8 D_800B387C[];
-extern u8 D_800B3888[];
-extern u8 D_800B3894[];
-extern u8 D_800B38A4[];
-extern u8 D_800B38B4[];
-extern u8 D_800B38C4[];
-extern u8 D_800B38D4[];
-extern u8 D_800B38E4[];
 
 s32 CPlayer__IsSpecialPickup(Picker *picker, s32 id);
 void CPlayer__CollectKeyPiece(Picker *picker, s32 id);
@@ -190,58 +170,58 @@ s32 CPlayer__CollectPickup(Picker *picker, void *pickup, s32 id) {
         if ((u32) (id - 0xFA0) < 0x20) {
             switch (id) {
                 case 0xFB4:
-                    msg = D_800B37DC;
+                    msg = sPickupNameText_CaveDoorKey;
                     break;
                 case 0xFB9:
-                    msg = D_800B383C;
+                    msg = sPickupNameText_GraveyardKey;
                     break;
                 case 0xFBE:
-                    msg = D_800B3830;
+                    msg = sPickupNameText_GateKey;
                     break;
                 default:
-                    msg = D_800B37D8;
+                    msg = sPickupNameText_Key;
                     break;
             }
         } else if ((u32) (id - 0x1004) < 0x20) {
-            msg = D_800B37BC;
+            msg = sPickupNameText_SatchelCharge;
         } else if ((u32) (id - 0x1068) < 0x20) {
             switch (id) {
                 case 0x1084:
                     msg = NULL;
                     break;
                 case 0x1085:
-                    msg = D_800B3810;
+                    msg = sPickupNameText_RedLaserCell;
                     break;
                 case 0x1086:
-                    msg = D_800B3820;
+                    msg = sPickupNameText_BlueLaserCell;
                     break;
                 case 0x1087:
-                    msg = D_800B3800;
+                    msg = sPickupNameText_IonCapacitor;
                     effect = 0x17D;
                     break;
                 default:
-                    msg = D_800B37CC;
+                    msg = sPickupNameText_PowerCell;
                     break;
             }
         } else if ((u32) (id - 0x10CC) < 51) {
             switch (id) {
                 case 0x10CC:
-                    msg = D_800B384C;
+                    msg = sPickupNameText_Level1Key;
                     break;
                 case 0x10D6:
-                    msg = D_800B3858;
+                    msg = sPickupNameText_Level2Key;
                     break;
                 case 0x10E0:
-                    msg = D_800B3864;
+                    msg = sPickupNameText_Level3Key;
                     break;
                 case 0x10EA:
-                    msg = D_800B3870;
+                    msg = sPickupNameText_Level4Key;
                     break;
                 case 0x10F4:
-                    msg = D_800B387C;
+                    msg = sPickupNameText_Level5Key;
                     break;
                 case 0x10FE:
-                    msg = D_800B3888;
+                    msg = sPickupNameText_Level6Key;
                     key = Level_GetHub(gScene_m_LevelID) - 1;
                     if (key < 6) {
                         picker->keys[key]++;
@@ -256,22 +236,22 @@ s32 CPlayer__CollectPickup(Picker *picker, void *pickup, s32 id) {
             effect = 0x180;
             switch (id) {
                 case 0x1108:
-                    msg = D_800B3894;
+                    msg = sPickupNameText_PrimagenKey1;
                     break;
                 case 0x1109:
-                    msg = D_800B38A4;
+                    msg = sPickupNameText_PrimagenKey2;
                     break;
                 case 0x110A:
-                    msg = D_800B38B4;
+                    msg = sPickupNameText_PrimagenKey3;
                     break;
                 case 0x110B:
-                    msg = D_800B38C4;
+                    msg = sPickupNameText_PrimagenKey4;
                     break;
                 case 0x110C:
-                    msg = D_800B38D4;
+                    msg = sPickupNameText_PrimagenKey5;
                     break;
                 case 0x110D:
-                    msg = D_800B38E4;
+                    msg = sPickupNameText_PrimagenKey6;
                     break;
             }
         } else {

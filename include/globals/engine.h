@@ -65,6 +65,8 @@ extern char gEngineTimestamp[];     /* the build string mainproc prints, shown b
 
 /* Crash screen: file of the failed assertion */
 extern char *gAssertFile;
+extern s32 gAssertLine;                  /* the failed assertion's line (Crash_ShowScreen) */
+extern char *gAssertExpr;                /* and its expression, NULL if none */
 
 /* Engine mode screens: text line tables (NULL entries are blank lines) */
 extern char *sPakCheckText[4];

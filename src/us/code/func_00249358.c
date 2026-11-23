@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/vector.h"
 #include "structs/region.h"
 #include "structs/player.h"
@@ -15,7 +16,6 @@ typedef struct {
  * (+0x1228): the ROM reads them through this symbol, and through gEngineApp_m_Settings
  * the code no longer matches. */
 extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
-extern char D_800B66D0[];
 
 s32 Cinema_IsActive(void);
 s32 CPlayer__IsInMatchEndState(CPlayer *p);
@@ -105,7 +105,7 @@ void CPlayer__Hurt(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
         alpha = (MIN(alpha, 0xFF) < 0x80) ? 0x80 : MIN(alpha, 0xFF);
         time = 0x1E;
         if (old > 0xF00 && p->m_Data.m_Health <= 0xF00 && !gEngineApp_m_Game_m_CameraPool.m_Settings.multiplayer) {
-            CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, ((void *)p->m_pCamera), D_800B66D0);
+            CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, ((void *)p->m_pCamera), sPlayerHurtText_LowHealth);
             Sound__PlaySpeech(0x156);
         }
         amount = damage >> 8;

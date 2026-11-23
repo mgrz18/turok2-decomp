@@ -1,12 +1,11 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/model.h"
 #include "globals/batch.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
 
 void Render_FlushModelBatch(void);
-extern u8 D_800A53D8[];
-extern u8 D_800A53EC[];
 extern void Model_DecompressCallbackTerminated();
 
 void func_0020B9F4(sptr res, sptr arg1, sptr arg2, s32 index, s32 arg4) {
@@ -17,17 +16,17 @@ void func_0020B9F4(sptr res, sptr arg1, sptr arg2, s32 index, s32 arg4) {
     s32 *count;
     s32 n;
 
-    file = CCache__Request(0, res, 0x18, 0, 0, 0, D_800A53D8, 0);
+    file = CCache__Request(0, res, 0x18, 0, 0, 0, sRenderCacheDesc_SimpObjectIndex, 0);
     if (file != 0) {
 #ifdef TARGET_PORT
         /* the cache entries hold host pointers: read them pointer-wide (--high-memory) */
         handle = CCache__Request(0, CISet__GetROMAddressAndSize(*(s32 **) file, res, 1, &size), size, 0, 0,
-                               Model_DecompressCallbackTerminated, D_800A53EC, 0);
+                               Model_DecompressCallbackTerminated, sRenderCacheDesc_Geometry, 0);
         if (handle != 0) {
             count = CISet__GetBlock(*(void **) handle, 2);
 #else
         handle = CCache__Request(0, CISet__GetROMAddressAndSize(*(s32 *) file, res, 1, &size), size, 0, 0,
-                               Model_DecompressCallbackTerminated, D_800A53EC, 0);
+                               Model_DecompressCallbackTerminated, sRenderCacheDesc_Geometry, 0);
         if (handle != 0) {
             count = CISet__GetBlock(*(s32 *) handle, 2);
 #endif

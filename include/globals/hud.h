@@ -6,6 +6,7 @@
 
 /* COnScreen (HUD text) */
 extern u8 *sOnScreenFontTexture;          /* NULL until COnScreen__LoadFontTexture */
+extern u8 sOnScreenFontTextureBuffer[0x90]; /* what COnScreen__LoadFontTexture points it at */
 extern u8 sCharacterLookUpPairs[0xB4];    /* {char, glyph} pairs ending 0xFF */
 extern u8 sCharacterSmallLookUpPairs[0xB8];
 extern s32 sBossBarOverlayScript[5];      /* COverlay scripts */

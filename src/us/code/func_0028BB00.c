@@ -1,8 +1,6 @@
 #include "common.h"
+#include "globals/strings.h"
 
-extern u8 D_800AA0DC[];           /* ": " */
-extern u8 D_800AA0EC[];           /* "   " */
-extern u8 D_800AA0F0[];           /* "\n" */
 
 void Crash_PutChar(s32 c);          /* debug console: draws one character */
 void Crash_PrintHex8(s32 byte);       /* debug console: draws a byte in hex */
@@ -25,19 +23,19 @@ static __inline__ void putHex32(u32 value) {
 void Crash_PrintRegs4(u8 *name0, u32 value0, u8 *name1, u32 value1, u8 *name2, u32 value2,
                    u8 *name3, u32 value3) {
     putString(name0);
-    putString(D_800AA0DC);
+    putString(sCrashText_ColonSpace);
     putHex32(value0);
-    putString(D_800AA0EC);
+    putString(sCrashText_Spaces3);
     putString(name1);
-    putString(D_800AA0DC);
+    putString(sCrashText_ColonSpace);
     putHex32(value1);
-    putString(D_800AA0EC);
+    putString(sCrashText_Spaces3);
     putString(name2);
-    putString(D_800AA0DC);
+    putString(sCrashText_ColonSpace);
     putHex32(value2);
-    putString(D_800AA0EC);
+    putString(sCrashText_Spaces3);
     putString(name3);
-    putString(D_800AA0DC);
+    putString(sCrashText_ColonSpace);
     putHex32(value3);
-    putString(D_800AA0F0);
+    putString(sCrashText_Newline);
 }

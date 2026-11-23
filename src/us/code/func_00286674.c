@@ -16,7 +16,6 @@
 #include "protos/ultra.h"
 
 extern u8 gPoolBuffers[];
-extern s32 D_800F6CA8;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
 
@@ -65,7 +64,7 @@ void CEngineApp__Main(CEngineApp *e) {
     gDisplayListCount = 2;
     gCurrentTick = 0;
     gNumTicks0 = 0;
-    D_800F6CA8 = 0;
+    gNumTicks1 = 0;
     gNumTicks2 = 0;
     gNumTicks3 = 0;
     gNumTicksPending = 0;

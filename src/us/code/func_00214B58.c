@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD_2/8024E914_14.CPP, func_80250624_de, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/vector.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
@@ -47,7 +48,6 @@ void CMtxF__FromMtxAffine(f32 *, f32 *);
 void CMtxF__TransformPoint(f32 *, CVector3 *, CVector3 *);
 void ImpactEvent_Send(void *, void *, s32, s32, CVector3, AttachmentParams);
 
-extern u8 D_800A5808[];
 
 void CStaticObject__SpawnEvents(PlacedProp *prop, s32 all) {
     sptr *model;
@@ -64,7 +64,7 @@ void CStaticObject__SpawnEvents(PlacedProp *prop, s32 all) {
     s32 first;
     f32 *transform;
 
-    model = CCache__Request(0, prop->owner, 0x18, 4, 0, 0, D_800A5808, 0);
+    model = CCache__Request(0, prop->owner, 0x18, 4, 0, 0, sCStaticObjectCacheDesc_StatObjectIndex, 0);
     if (model == NULL) {
         return;
     }

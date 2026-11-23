@@ -1,6 +1,7 @@
 /* WRONG CUT: REAL CScene__FindNearestWarpDest size 0x1A0 (splat cut it into CScene__FindNearestWarpDest + func_0042C620 + func_0042C6BC). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_29.CPP, func_8044D3E8_de, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/game.h"
 #include "protos/iset.h"
 
@@ -23,8 +24,6 @@ typedef struct SearchPoints {
     SearchPoint points[1];
 } SearchPoints;
 
-extern char D_800A5D8C[];
-extern char D_800A5FC4[];
 
 extern void CCache__LoadPersistantIndex(s32, sptr *, sptr, char *);
 extern void **CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, void *, sptr, char *);
@@ -48,10 +47,10 @@ s32 CScene__FindNearestWarpDest(void *world, void *position, s32 type, SearchPoi
     void *table;
 
     pool = gEngineApp.m_CartridgeIndex;
-    CCache__LoadPersistantIndex(0, &resource, pool, D_800A5D8C);
+    CCache__LoadPersistantIndex(0, &resource, pool, sCSceneCacheDesc_CartridgeIndex);
     i = 0;
     best = 0;
-    handle = CCache__LoadPersistantSubBlock(0, resource, 8, pool, world, 0, D_800A5FC4);
+    handle = CCache__LoadPersistantSubBlock(0, resource, 8, pool, world, 0, sCSceneCacheDesc_WarpDests);
     table = *handle;
     values = CISet__GetBlock(table, 0);
     count = values->count;

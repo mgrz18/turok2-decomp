@@ -13,7 +13,6 @@ typedef struct TeamGame {
     /* 0x00 */ s32 active;
 } TeamGame;
 
-extern s32 D_8011ACE0;      /* team 1 score */
 
 s32 Cinema_PathPlaying(void);
 s32 Cinema_IsActive(void);
@@ -128,7 +127,7 @@ void Player_OnMultiplayerKill(CGameObjectInstance *actor, sptr arg1, DamageEvent
                     teamScore = &gEngineApp_m_Settings.match.teamScore;
                     break;
                 case 1:
-                    teamScore = &D_8011ACE0;
+                    teamScore = &gEngineApp_m_Settings.match.teamScore[1];
                     break;
                 default:
                     return;
@@ -145,7 +144,7 @@ void Player_OnMultiplayerKill(CGameObjectInstance *actor, sptr arg1, DamageEvent
                         score = &gEngineApp_m_Settings.match.teamScore;
                         break;
                     case 1:
-                        score = &D_8011ACE0;
+                        score = &gEngineApp_m_Settings.match.teamScore[1];
                         break;
                     default:
                         return;
@@ -162,7 +161,7 @@ void Player_OnMultiplayerKill(CGameObjectInstance *actor, sptr arg1, DamageEvent
                         score = &gEngineApp_m_Settings.match.teamScore;
                         break;
                     case 1:
-                        score = &D_8011ACE0;
+                        score = &gEngineApp_m_Settings.match.teamScore[1];
                         break;
                     default:
                         return;

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/world.h"
 #include "structs/collision.h"
 #include "structs/rect.h"
@@ -26,7 +27,6 @@ typedef struct Viewer {
     f32 max[3];                 /* 0x35C */
 } Viewer;
 
-extern char D_800A5F6C[];       /* "grid section" */
 
 #ifdef TARGET_PORT /* the viewers are cameras: next = m_pNext, min/max = m_AnimMin/m_AnimMax (host layout) */
 #include "structs/camera.h"
@@ -116,7 +116,7 @@ void CScene__LoadVisibleGridSections(CScene *world) {
                 continue;
             }
             handle = CCache__Request(0, CISet__GetROMAddressAndSize(world->m_pLevelInfo, world->m_LevelInfoKey, idx, &size), size, 8, world,
-                                   CScene__DecompressGridSection, D_800A5F6C, 0);
+                                   CScene__DecompressGridSection, sCSceneCacheDesc_GridSection, 0);
             if (handle == NULL) {
                 continue;
             }

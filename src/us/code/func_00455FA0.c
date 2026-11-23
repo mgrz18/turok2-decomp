@@ -10,7 +10,6 @@
 
 #define ENTRY_SELECTED 0x01800000
 
-extern u8 D_8011AB8B[];
 
 
 static __inline__ s32 nameEquals(u8 *a, u8 *b, s32 count) {
@@ -62,7 +61,7 @@ void NameEntryMenu_Init_2(Menu *event) {
 
     gNameEntries[i].timer = 0.0f;
     dst = gNameEntries[i].name;
-    src = &D_8011AB8B[i * 64];
+    src = gEngineApp_m_Settings.slots[i].m_Name;
     for (n = 8, trailing = 0; n > 0; trailing++) {
         if (src[--n] != ' ') {
             break;

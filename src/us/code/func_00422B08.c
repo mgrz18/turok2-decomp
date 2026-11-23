@@ -2,24 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu_text.h"
 #include "globals/pak.h"
 
-extern char D_800B503C[];
-extern char D_800B4FF8[];
-extern char D_800B4F84[];
-extern char D_800B4C18[];
-extern char D_800B4FBC[];
-extern char D_800B4DB0[];
-extern char D_800B4CE4[];
-extern char D_800B4E58[];
-extern char D_800B4EBC[];
-extern char D_800B4F10[];
-extern char D_800B4F48[];
-extern char D_800B4D4C[];
-extern char D_800B4E14[];
-extern char D_800B4BE8[];
-extern char D_800B4E78[];
-extern char D_800B4C78[];
 s32 PakMessage_UpdateLine3(struct FieldRecAt14 *field) {
     u32 state = gPakMessageKind;
     if (state >= 16) {
@@ -44,52 +29,52 @@ s32 PakMessage_UpdateLine3(struct FieldRecAt14 *field) {
         case 15: goto case_15;
         }
 state_other:
-    field->text = D_800B4BE8;
+    field->text = sPakMessageText_UpSpace;
     goto done;
 case_1:
-    field->text = D_800B4C18;
+    field->text = sPakMessageText_PleaseInsertA;
     goto done;
 case_2:
-    field->text = D_800B4C78;
+    field->text = sPakMessageText_InsertYourController_B4C78;
     goto done;
 case_3:
-    field->text = D_800B4D4C;
+    field->text = sPakMessageText_InsertYourController_B4D4C;
     goto done;
 case_4:
-    field->text = D_800B4CE4;
+    field->text = sPakMessageText_InsertYourController_B4CE4;
     goto done;
 case_5:
-    field->text = D_800B4DB0;
+    field->text = sPakMessageText_InsertYourRumblePak_B4DB0;
     goto done;
 case_6:
-    field->text = D_800B4E14;
+    field->text = sPakMessageText_BeAbleToSaveYour;
     goto done;
 case_7:
-    field->text = D_800B4E58;
+    field->text = sPakMessageText_PleaseTry;
     goto done;
 case_8:
-    field->text = D_800B4E78;
+    field->text = sPakMessageText_NoController;
     goto done;
 case_9:
-    field->text = D_800B4EBC;
+    field->text = sPakMessageText_InsertYourRumblePak_B4EBC;
     goto done;
 case_10:
-    field->text = D_800B4F10;
+    field->text = sPakMessageText_Empty_B4F10;
     goto done;
 case_11:
-    field->text = D_800B4F48;
+    field->text = sPakMessageText_YouMayDeleteThis;
     goto done;
 case_12:
-    field->text = D_800B4F84;
+    field->text = sPakMessageText_Deleted;
     goto done;
 case_13:
-    field->text = D_800B4FBC;
+    field->text = sPakMessageText_SaveANote;
     goto done;
 case_14:
-    field->text = D_800B4FF8;
+    field->text = sPakMessageText_DeleteANote;
     goto done;
 case_15:
-    field->text = D_800B503C;
+    field->text = sPakMessageText_PleaseRememberThat;
 done:
     return 0;
 }

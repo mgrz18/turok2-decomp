@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/802ABDBC_11.CPP, func_802ACB18_de, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/pickup.h"
@@ -26,7 +27,6 @@ static __inline__ void pickup_feedback(CPlayer *player, void *resource, s32 soun
     }
 }
 
-extern char D_800B3C30[];
 
 s32 func_0023F21C(CPlayer *player, CPickupEntry *entry) {
     s32 sound;
@@ -35,7 +35,7 @@ s32 func_0023F21C(CPlayer *player, CPickupEntry *entry) {
     if (CPlayer__AddAmmo(player, 2, entry->m_Params.m_Amount) != 0) {
         sound = entry->m_Sound;
         callback = entry->m_Callback;
-        pickup_feedback(player, D_800B3C30, sound, callback);
+        pickup_feedback(player, sPickupMessageText_10PistolBulletsClip, sound, callback);
         return 1;
     }
     return 0;

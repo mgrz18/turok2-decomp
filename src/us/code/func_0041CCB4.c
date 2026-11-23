@@ -1,10 +1,10 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/player_options.h"
 #include "globals/game.h"
 
-extern char D_800C1338[];      /* number format */
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 
@@ -27,6 +27,6 @@ s32 StatsMenu_PlayerRowText(MenuItem *a, Menu *c) {
     for (i = 0; i < 8; i++) {
         *dst++ = *src++;
     }
-    sprintf(a->text + (MenuItem_TextLength(a) - 2), D_800C1338, n);
+    sprintf(a->text + (MenuItem_TextLength(a) - 2), sStatsMenuFmt_02d, n);
     return 0;
 }

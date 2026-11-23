@@ -254,6 +254,25 @@ Widescreen (the game frame is 4:3 with bars today); 60 fps with interpolation; a
 resolution; enhancements (texture packs, a settings menu, mouse-look refinements, Windows and Linux
 packages, Armorines on the same base).
 
+## Round 21, part j2 (globals: names and declarations)
+
+Renames only (docs/NAMES.md and GLOBALS.md "Round 21, part j2"), but the port saw three things:
+
+- `port/game/t2sched.c` and `tools/port/n64trace.py` spelled `D_800F6CA8`: it is `gNumTicks1`
+  now (t2sched.c takes it from `globals/frame.h`); `gendata.py`'s `RUNTIME_BSS` lists `gAssertExpr`
+  (was `D_800F1FF4`).
+- **`sSortNodes` joins `gendata.py` `ALIGN16`.** The new names changed the generated data before
+  it by 12 bytes, which put it at 8 mod 16, and Release crashed at frame 1069 of the boot
+  (`Render_FlushModelBatch` clears a node with `movaps`). `aligncheck.py` found it; the 2 sites it
+  still lists (`gPakMsgDelete{Done,Failed}Desc` in `GameNoteMenu_SelectYes`) are its heuristic
+  seeing `%rsi` reloaded with `gLoadSavePersistentData` (already in `ALIGN16`).
+- `CCameraViewParams__Construct`'s port branch reads `gDefaultVisBits` as the header's scalar.
+
+`versions/port_layout.us.json` regenerated (`mklayout.py --check`: up to date). Linux Release,
+this tree: boot + 3 demos `T2_DET_LOG` identical to the coordinator's binary (52,000 lines, md5
+`6ab97584…`); the default whole-game run (300,000 frames, `aimdrive.py`): det md5 **`dc8126d3…`**
+(600,000 lines), the same as the coordinator's binary run here, level 10 (END 2) at the same frame, 0 lives lost.
+
 ## Round 20, part i1: the render sweep (hub, levels 1-3, menus): the arena walls, the menu texts, the automap (branch names-R20_i1; FIDELITY.md 13, RENDER.md 8)
 
 - **The Mother's arena olive walls: fixed.** Not the recolour (the N64's 54 texture requests at

@@ -1,12 +1,12 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCENE/802508E0_11.CPP, func_80254284_de, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/strings.h"
 #include "ultra_types.h"
 #include "globals/cache.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
 
-extern char D_800A51E0[];
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
@@ -22,7 +22,7 @@ void **CCache__LoadPersistantIndex(s32 arg0, void **arg1, sptr arg2, void *arg3)
     u32 token2;
     s32 one = 1;
 
-    resource = CCache__Request(0, arg2, 4, 0x1B, 0, 0, D_800A51E0, one);
+    resource = CCache__Request(0, arg2, 4, 0x1B, 0, 0, sCCacheDesc_Header, one);
     size = **(s32 **)resource;
     token = __osDisableInt();
     counter = gCache_mutex_count + one;

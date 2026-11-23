@@ -1,13 +1,8 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 
-extern char D_800B41B0[];
-extern char D_800B41C0[];
-extern char D_800B41D0[];
-extern char D_800B41E0[];
-extern char D_800B41F0[];
-extern char D_800B4200[];
 extern s32 MenuItem_TextLength(MenuItem *a);
 #ifdef TARGET_PORT
 /* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
@@ -21,23 +16,23 @@ s32 PlayerSetupMenu_HandicapLabel(MenuItem *a, Menu *c) {
     s32 handicap = c->player->m_pOptions->m_Handicap;
 
     if (handicap == 0) {
-        a->text = D_800B41F0;
+        a->text = sPlayerSetupMenuText_HandicapNone;
     } else if (handicap == 10) {
-        a->text = D_800B4200;
+        a->text = sPlayerSetupMenuText_HandicapMax;
     } else {
         switch (c->controller->port) {
         case 0:
         default:
-            a->text = D_800B41B0;
+            a->text = sPlayerSetupMenuText_Handicap_B41B0;
             break;
         case 1:
-            a->text = D_800B41C0;
+            a->text = sPlayerSetupMenuText_Handicap_B41C0;
             break;
         case 2:
-            a->text = D_800B41D0;
+            a->text = sPlayerSetupMenuText_Handicap_B41D0;
             break;
         case 3:
-            a->text = D_800B41E0;
+            a->text = sPlayerSetupMenuText_Handicap_B41E0;
             break;
         }
         sprintf(a->text + (MenuItem_TextLength(a) - 2), "%02d", handicap);

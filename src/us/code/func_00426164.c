@@ -1,10 +1,10 @@
 /* WRONG CUT: REAL Pak_SaveNoteVerified size 0x278 (splat cut it into Pak_SaveNoteVerified + func_004263A0). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC_6.CPP, func_80404958_de, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/pak.h"
 #include "globals/pak.h"
 
-extern u8 D_800C18E0[];
 
 extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void CCache__Flush(s32);
@@ -75,7 +75,7 @@ s32 Pak_SaveNoteVerified(s32 ch, s32 size, void *data, u8 *name, u8 *ext, u8 *co
     handle = CCache__Allocate(0, blocks, 0x23, "Mempak write temp data");
     buf = *handle;
     for (tries = 0; tries < 4; tries++) {
-        result = Pak_WriteNote(ch, size, data, name, &file_no, ext, D_800C18E0, code);
+        result = Pak_WriteNote(ch, size, data, name, &file_no, ext, sPakCompanyCode, code);
         if (result != 0) {
             break;
         }

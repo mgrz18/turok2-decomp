@@ -2,6 +2,7 @@
  * at 0x2972E0 (D_002972E0). */
 /* From decompals/ultralib (libultra 2.0I): src/audio/save.c, alSavePull. */
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/libaudio.h"
 
 #define _SHIFTL(v, s, w) ((u32)(((u32)(v) & ((0x01 << (w)) - 1)) << (s)))
@@ -28,11 +29,9 @@
     _a->words.w1 = (unsigned int)(s); \
 }
 
-extern char D_800AA730[]; /* "EX" (expression text) */
-extern char D_800AA734[]; /* "audio/save.c" */
 void __assert(char *, char *, s32); /* __assert */
 
-#define assert(e, line) ((e) ? (void)0 : __assert(D_800AA730, D_800AA734, line))
+#define assert(e, line) ((e) ? (void)0 : __assert(sSaveAssertExpr, sSaveAssertFile, line))
 
 Acmd *alSavePull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p) {
     Acmd *ptr = p;
