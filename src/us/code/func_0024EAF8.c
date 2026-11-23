@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/controller.h"
@@ -9,38 +10,12 @@
 #include "protos/player.h"
 
 /* The creature to mount (an AI actor). */
-#ifdef TARGET_PORT
-typedef struct Mount {
-/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Mount(m) __builtin_offsetof(CGameObjectInstance, m)
-    union {
-        struct { u8 _hp_kind[T2_HOFF_Mount(header.m_Type)]; u8 kind; }; /* N64 0x0 */
-        struct { u8 _hp_pos[T2_HOFF_Mount(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_yaw[T2_HOFF_Mount(m_RotY)]; f32 yaw; }; /* N64 0x50 */
-        struct { u8 _hp_type[T2_HOFF_Mount(m_nTypeFlag)]; u16 type; }; /* N64 0xB8 */
-        struct { u8 _hp_ai[T2_HOFF_Mount(m_AI.m_dwFlags)]; u8 ai[4]; }; /* N64 0x140 */
-    };
-} Mount;
-#else
-typedef struct {
-    /* 0x000 */ u8 kind;
-    /* 0x001 */ u8 pad1[3];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x50 - 0x10];
-    /* 0x050 */ f32 yaw;
-    /* 0x054 */ u8 pad54[0xB8 - 0x54];
-    /* 0x0B8 */ u16 type;
-    /* 0x0BA */ u8 padBA[0x140 - 0xBA];
-    /* 0x140 */ u8 ai[4];
-} Mount;
-#endif
 
 f32 AI_AngleToPoint(CGameObjectInstance *body, CVector3 point);   /* angle to a point */
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);
 void CPlayerContState__Init(void *controls, void *settings);
 f32 Actor_GetEyeHeight(CPlayer *player);
-void EnemyAI_Mount(Mount *mount, void *ai, CPlayer *player);
+void EnemyAI_Mount(CGameObjectInstance *mount, void *ai, CPlayer *player);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
@@ -54,17 +29,17 @@ static __inline__ void setVec3(CVector3 *v, f32 x, f32 y, f32 z) {
  * heading and the player is not holding 0x8000: the player takes its seat
  * and heading, and the movement state is reset. */
 s32 CPlayer__TryMount(CPlayer *p, CGameObjectInstance *body) {
-    Mount *mount;
+    CGameObjectInstance *mount;
 
     if (p->m_pOnEnemy == NULL && !(p->m_ModeBeforeFlags & 0x8000)) {
         if (gCollisionResults.m_pInstance != NULL && gCollisionResults.m_pInstance->header.m_Type == 1) {
-            mount = (Mount *)gCollisionResults.m_pInstance;
-            if (mount->type == 0x136 && ABS(AI_AngleToPoint(body, mount->pos)) < 0.785398245f) {
+            mount = (CGameObjectInstance *)gCollisionResults.m_pInstance;
+            if (mount->m_nTypeFlag == 0x136 && ABS(AI_AngleToPoint(body, mount->header.m_vPos)) < 0.785398245f) {
                 p->m_pOnEnemy = mount;
                 p->m_OnEnemyObjectType = 0x136;
                 p->m_vOnEnemyScale = gRidingScale;
                 CVector3__Scale(&p->m_vOnEnemyScale, &p->m_vOnEnemyScale, 0.03f);
-                body->m_RotY = mount->yaw;
+                body->m_RotY = mount->m_RotY;
                 CPlayerContState__Init(&p->m_ContState, &gControllers[p->m_nController]);
                 p->m_Speed = 0;
                 p->m_SideSpeed = 0;
@@ -97,7 +72,7 @@ s32 CPlayer__TryMount(CPlayer *p, CGameObjectInstance *body) {
                 p->m_CameraMovementScaler = 1.0f;
                 p->m_vDesiredPos = p->m_CharacterActor.header.m_vPos;
                 CCache__SetFrameDelay(8);
-                EnemyAI_Mount(mount, mount->ai, p);
+                EnemyAI_Mount(mount, &mount->m_AI, p);
                 return CPlayer__SetState(p, body, 0x21);
             }
         }
