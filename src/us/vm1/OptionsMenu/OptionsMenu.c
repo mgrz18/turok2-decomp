@@ -181,13 +181,13 @@ DEFERRED s32 OptionsMenu_CycleDifficulty(void) {
 }
 
 DEFERRED s32 OptionsMenu_DifficultyText(MenuItemRecAt14 *item) {
-    extern u32 gEngineApp_m_Settings_difficulty; /* local type: the field's real type (or the member path) changes the ROM's code here */
+    extern u32 gEngineApp_m_Settings_difficulty[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
     if (gEngineApp_m_Settings.mode == 8) {
         item->flags |= 0x01000000;
     } else {
         item->flags &= ~0x01000000;
     }
-    switch (gEngineApp_m_Settings_difficulty) {
+    switch (gEngineApp_m_Settings_difficulty[0]) {
     case 8:
         item->table = sOptionsMenuText_DifficultyEasy;
         break;
