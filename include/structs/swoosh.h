@@ -91,10 +91,10 @@ typedef struct Swoosh {
     /* 0x20 */ s32 id;
     /* 0x24 */ f32 time;
     /* 0x28 */ f32 unk28;
-    /* 0x2C */ f32 unk2C;
-    /* 0x30 */ f32 unk30;
+    /* 0x2C */ f32 endFrame;            /* the texture animation's (Trail_GetAnimFrame) */
+    /* 0x30 */ f32 frame;
     /* 0x34 */ s32 layer;               /* the record's id; < 0 drawn first, untextured */
-    /* 0x38 */ s32 unk38;
+    /* 0x38 */ s32 randomFrame;         /* -1: not picked yet */
     /* 0x3C */ u32 flags;
     /* 0x40 */ SwooshLinks nodes;       /* SwooshNode */
     /* 0x4C */ f32 length;

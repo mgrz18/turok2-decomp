@@ -27,8 +27,8 @@ s32 Swoosh_Update(sptr a0, Swoosh *s) {
             s->owner = 0;
         }
     }
-    if (s->unk2C >= 0.0f) {
-        s->unk30 = s->unk30 + gFrameIncrement;
+    if (s->endFrame >= 0.0f) {
+        s->frame = s->frame + gFrameIncrement;
     }
     s->time = s->time - gFrameIncrement;
     if (s->time < 0.0f) {

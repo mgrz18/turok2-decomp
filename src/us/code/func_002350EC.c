@@ -107,9 +107,9 @@ void Trail_AddNode(TrailMgr *mgr, TrailActor *a, s32 type) {
         s->layer = t->sound;
         *(s32 *) &s->length = 0;
         s->unk50 = 0;
-        *(s32 *) &s->unk2C = 0;
-        *(s32 *) &s->unk30 = 0;
-        s->unk38 = -1;
+        *(s32 *) &s->endFrame = 0;
+        *(s32 *) &s->frame = 0;
+        s->randomFrame = -1;
         if (s->layer != -1) {
             Material_GetTextureSet(s->texture, s->layer);
             if (a != NULL) {
