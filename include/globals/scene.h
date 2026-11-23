@@ -13,7 +13,18 @@
 extern f32 gScene_m_WarpTime;            /* gScene.m_WarpTime */
 extern s32 gScene_m_bWarpSpawn;          /* gScene.m_bWarpSpawn */
 extern CWarpPoint gScene_m_WarpSpawn;    /* gScene.m_WarpSpawn */
+/* gScene_m_LevelID and gScene_m_nLevel: a module whose code reads them as arrays
+ * (GCC 2 then bases repeated reads on one register and keeps them after stores
+ * through pointers, as the ROM does in Cinema_Start) defines SCENE_LEVEL_ARRAYS
+ * before including this header; the scalar view keeps the other modules' code
+ * (SavedPlayers_Arm changes with the array view). */
+#ifdef SCENE_LEVEL_ARRAYS
+extern s32 gScene_m_LevelID[];
+extern s32 gScene_m_nLevel[];
+#else
 extern s32 gScene_m_LevelID;             /* gScene.m_LevelID: the warp id of the loaded level */
+extern s32 gScene_m_nLevel;              /* gScene.m_nLevel */
+#endif
 extern s32 gScene_m_WarpID;              /* gScene.m_WarpID */
 extern s32 gScene_m_PendingWarpID;       /* gScene.m_PendingWarpID */
 extern s32 gScene_m_PreviewState;        /* gScene.m_PreviewState */
@@ -38,7 +49,6 @@ extern struct CPooledLevelActor *gScene_m_ActorPool_m_pHead; /* gScene.m_ActorPo
 extern struct CPooledLevelActor *gScene_m_ActorPool_m_pTail; /* gScene.m_ActorPool.m_pTail */
 extern u8 *gScene_m_pSections;
 extern s32 gScene_m_nSections;
-extern s32 gScene_m_nLevel;
 extern s32 gScene_m_WarpFade;
 extern s32 gScene_m_WarpState;
 

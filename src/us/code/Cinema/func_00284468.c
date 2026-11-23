@@ -3,7 +3,7 @@
 #include "globals/cinema.h"
 
 s32 Cinema_RestorePlayer(void);
-s32 Sound__StopAllExcept(s32);
+void Sound__StopAllExcept(s32);
 
 /* De-faked in round 21 (j4): the draft cleared the callback in two identical arms under a test of
  * gCinemaPlayerP; reading the cinema into a local first gives the ROM order (found by the permuter). */

@@ -3,7 +3,7 @@
 #include "structs/player.h"
 #include "structs/cinema.h"
 #include "globals/game.h"
-#include "globals/scene.h"
+#include "cinema_scene.h"
 #include "globals/cinema.h"
 #include "protos/scene.h"
 
@@ -38,14 +38,14 @@ void Cinema_RestorePlayer(void) {
         pos = gCinemaPlayerP->startPos;
         rotY = gCinemaPlayerP->startRotY;
         region = gCinemaPlayerP->startRegion;
-        if (gScene_m_nLevel != warp) {
+        if (gScene_m_nLevel[0] != warp) {
             CScene__LoadLevel(world, warp, 1);
         }
         player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
         gScene_m_WarpFade = 0;
         gScene_m_WarpState = 0;
         gScene_m_WarpTime = 0;
-        gScene_m_LevelID = level;
+        gScene_m_LevelID[0] = level;
         gScene_m_WarpID = level;
         if (player != NULL) {
             player->m_CharacterActor.header.m_vPos = pos;
