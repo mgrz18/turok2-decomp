@@ -424,9 +424,19 @@ def main():
             if (code / f"{stem}.c").exists():
                 return f"{stem}.c"
         return f"?{um[v][3]}"
+    # files deleted since (neither build links them): keep what the list said
+    before = {}
+    if LIST.exists():
+        for line in LIST.read_text().splitlines():
+            if not line.startswith("//") and " = " in line:
+                before[line.split(" = ")[0]] = line
     for name, rel, _, _, funcs in taken:
         src = f"lib/ultralib_vm2/{rel}.c" if name.endswith("_2") else f"lib/ultralib/src/{rel}.c"
-        out.append(f"{name} = {src}: " + " ".join(game_file(v) for v in funcs))
+        files = [game_file(v) for v in funcs]
+        if any(f.startswith("?") for f in files) and name in before:
+            out.append(before[name])
+            continue
+        out.append(f"{name} = {src}: " + " ".join(files))
     LIST.write_text("\n".join(out) + "\n")
     print(f"wrote {YAML.relative_to(ROOT)} and {LIST.relative_to(ROOT)}")
 

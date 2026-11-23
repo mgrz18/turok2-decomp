@@ -4,7 +4,7 @@ Turok 2 links Nintendo's **libultra 2.0I, `libgultra_rom`** (the GCC build of
 the library, the ROM flavour), with libaudio and libc from the same archive.
 This page gives the evidence, the per-function map against
 [decompals/ultralib](https://github.com/decompals/ultralib), and how the build
-compiles 117 of its modules from ultralib's own sources (round 22). (The older
+compiles 120 of its modules from ultralib's own sources (round 22). (The older
 [LIBULTRA-MATCHING.md](LIBULTRA-MATCHING.md) is the log of the first matching
 rounds; its addresses predate the current layout.)
 
@@ -111,16 +111,16 @@ The game's own `load.c` (`alAdpcmPull`, `alRaw16Pull`, `alAdecPull`,
 `alLoadParam`, `_decodeChunk`, at 0x0029F190 after libc) is Acclaim's: it adds
 the ADEC decoder and is linked apart from libaudio.
 
-## The build: 117 modules from lib/ultralib (round 22)
+## The build: 120 modules from lib/ultralib (round 22)
 
 ultralib is a **git submodule**, `lib/ultralib`, pinned at e24c836 (it has no
 license file, so none of its sources are copied into this repository). A fresh
 checkout needs `git clone --recursive` or `git submodule update --init`; the
 N64 build needs nothing else from the network. The port does not use it.
 
-**117 of the library's 173 modules** (320 game functions, 201 game files) are
+**120 of the library's 173 modules** (209 game files, one function each) are
 compiled from ultralib's own files and linked in place of the game's C:
-93 in `.code` (libaudio, gu, io, os, libc), the 12 Controller Pak files of the
+96 in `.code` (libaudio, gu, io, os, libc), the 12 Controller Pak files of the
 first paged VM module and their 12 copies in the second.
 `versions/ultralib_objects.us.txt` lists them, each with the game files it
 replaces. `make verify` is byte-exact.
@@ -143,11 +143,22 @@ How it is built:
   `lib/ultralib_vm2/io/<file>_2.c` is a two-line wrapper (ours): it includes
   `vm2_names.h`, which `#define`s every ultralib global with a `_2` twin in the
   game to that name, then ultralib's file. Same code, the second copy's names.
-- **Names**: `versions/ultralib_aliases.us.txt` (an ld script) gives three
+- **Data**: the game keeps libultra's `.data` in the KSEG0 data that lies in
+  `code_rodata`'s range, so `sl.c`, `motor.c` and `thread.c` have their
+  `.data` renamed to `.rodata` on the built object and placed there, where
+  their symbols are (`alGlobals`, `__osMotorinitialized`, `__osThreadTail`).
+- **Names**: `versions/ultralib_aliases.us.txt` (an ld script) gives the
   ultralib names the game spells otherwise: `__osContPifRam` (the game's
   `__osContBuffer`, Rage Wars' name), `__osMaxControllers`
-  (`__osContNumControllers`) and `func_0029E460` (the game's callers of
-  `memcpy`, which keeps an address name in the game C). Linking
+  (`__osContNumControllers`), motor.c's four tentative buffers
+  (`__osMotorStartData` ...) and `func_0029E460` (the game's callers of
+  `memcpy`, which keeps an address name in the game C).
+  `versions/ultralib_renames.us.txt` is applied to the built objects
+  (`objcopy`, Makefile): the game's names for two static functions
+  (`__CSPSetUsptFromTempo` is csplayer.c's `__setUsptFromTempo`,
+  `__osClearPage_2`), so the ELF types them as functions for
+  `tools/port/gendata.py` (an untyped address became port data), and the
+  `.data=.rodata` renames above. Linking
   `synsetvol.c` showed that `_timeToSamples` and `_timeToSamplesNoRound` had
   their names swapped in the game (0x00294C30 cuts to 16 samples: ultralib's
   `_timeToSamples`); they are renamed.
@@ -169,18 +180,19 @@ relocations masked, `.rodata` found where it covers the game C's own, no
 | 41 (38 functions differ, + the files they share) | not identical: float code (KMC GCC 2.7.2 vs SN's 2.8.1), Acclaim's changes, a revision ultralib does not have, libc (above) |
 | `controller.c`, `timerintr.c` | every function identical, but in another order than ultralib's file (the game has `__osPackRequestData` before `__osContGetInitData`, `__osTimerServicesInit` after `__osTimerInterrupt`): 2.0I's file had another order |
 | `save.c`, `sirawdma.c`, `sprawdma.c`, `pirawread.c`, `sirawread.c` | their `.rodata` (assert's strings) ends inside a word, and the ROM has stale linker bytes in that word's padding: an object section is padded with zeros, and the next piece cannot start inside a word (`subalign: 4`) |
-| `sl.c` (`.data` 4), `aisetnextbuf.c` (1), `motor.c` (0x10), `thread.c` (0x18), `siacs.c`, `piacs.c` (+ 4 of `.bss`), `vimgr.c` (0x1C + 0x1220), `pimgr.c` (0x28 + 0x11CC) | data of their own: splat auto-links a `c` file's `.data`/`.bss` after `.code`'s text, while the game has them in the KSEG0 data (inside `code_rodata`'s range) and its BSS; linking them needs those sections placed by hand (renamed into the rodata stream, or post-edited linker script) |
+| `siacs.c`, `piacs.c` (`.data` 4 + `.bss` 4), `vimgr.c` (0x1C + 0x1220), `pimgr.c` (0x28 + 0x11CC) | `.bss` of their own: the game's BSS has no segment in the yaml (its symbols are addresses), and splat would auto-link the object's `.bss` after `.code`'s; it needs a placed NOLOAD section first |
+| `aisetnextbuf.c` | its one byte of `.data` is a function-local static (`hdwrBugFlag`) no game symbol places, and it would end mid-word |
 | the 23 asm functions | ultralib's `.s` need its `asm.h`/`regdef.h` through the C preprocessor; the game's hand-written asm stays |
 
 Single functions out of a file that differs cannot come from ultralib: an
 object brings the whole file, and SN's cc1 here has no `-ffunction-sections`
 path the linker script could pick from.
 
-**The port** keeps the game's C for the 113 of these files it links
+**The port** keeps the game's C for the files of these modules it links
 (libaudio, gu, libc, the first VM module's pfs). It is 64-bit: the game's C
 is typed for the host (`sptr`, the port's views), ultralib's assumes 32-bit
 pointers, and port/runtime replaces the kernel parts anyway. Those files are
 still in `src/us/code`, compile to the same code as before and are not linked
-by the N64 build (the list says which). The other 118 game files, which
+by the N64 build (the list says which). 118 game files, which
 neither build linked any more (the kernel/VI/PI/SI/AI files port/runtime
 replaces, the second VM module's copies, `sprintf`), are deleted.
