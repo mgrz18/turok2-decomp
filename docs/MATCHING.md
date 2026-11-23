@@ -603,7 +603,7 @@ always-true test, a dead store) say so in a `/* FAKEMATCH: ... */` comment,
 on the first line or at the trick. 16 files in `src/` had one
 (`grep -rl FAKEMATCH src`), after the Z pass de-faked seven (below); the
 round 21 audit found 58 more that relied on a trick without saying so, de-faked
-some and marked the rest: see "The FAKEMATCH audit (round 21)" for today's
+25 functions and marked the rest: see "The FAKEMATCH audit (round 21)" for today's
 list. The
 engine's nine: func_00204778 (a dead store in the highlight),
 func_0022AFB4 (an always-true test), func_002429BC (the shared -1 pinned
@@ -741,6 +741,9 @@ real types and names; three files lost their local struct views on the way
 | Sound_DistanceFalloff, Plane_SegmentFraction | the early return first |
 | func_0023640C, Math_StepClampedInt | the plain clamp |
 | Cinema_RunEnd | `cinema = gCinemaPlayerP; onEnd = cinema->onEnd; if (onEnd) { cinema->onEnd = NULL; onEnd(); }` (the permuter) |
+| CCache__AllocateAt, CCache__AllocateMemoryForDecompression(Top), CAudioWorld__CountHandleVoices | the mutex unlock as the plain `if (--count != 0) { restore; send; } else { restore; } return x;` |
+| Menu_StepValueLR, Menu_StepValueLR_2 | written as its sibling Menu_StepValue is (`value = minimum; if (wrap) value = maximum;`) |
+| Sort_Insertion | the plain selection-sort loops |
 
 **The pattern behind most of them: write the test the ROM's layout shows.**
 GCC 2.8 puts the `then` arm right after the branch and jumps to the `else`.
@@ -760,21 +763,23 @@ EnemyAI_TurnToTarget, func_00267D60 and PakMenu_InitLoadGame_2 every zero
 was another trick (identical arms again, `do { return ...; } while (0)`, a
 reused constant variable), and Turret_Setup (60,000 iterations) found none.
 
-**Redundant N64 alternatives.** 442 `#ifdef TARGET_PORT ... #else ...
+**Redundant N64 alternatives.** 451 `#ifdef TARGET_PORT ... #else ...
 #endif` pairs in 349 files kept an N64 version (m2c casts, offsets, a few
 FAKEMATCH drafts) next to a host version that compiles to the same N64
 code; `tools/unify_host_bodies.py --write` replaced each pair by its host
 branch (the port reads the same text as before; the N64 assembly is checked
 equal, symbols resolved, by `asm_diff.py`'s normalisation). It is re-runnable
-after merges. `asm_diff.py` now numbers local labels by first appearance, so
+after merges (run it until it reports 0; the 340 host branches that do not
+compile for the N64, host-only names, are left). `asm_diff.py` now numbers local labels by first appearance, so
 a de-faked branch that only renumbers `.L` labels compares equal.
 
-**Still fake (56 files, `grep -rl FAKEMATCH src/us`).** The 16 of the list
+**Still fake (51 files, `grep -rl FAKEMATCH src/us`).** The 16 of the list
 above (each retried this round: the permuter from the natural draft against
 the fake's object, and for CAI__Setup the flags read at each of 25 points:
-all 9 words off) and the 40 marked in this audit (18 of the 58 found were de-faked), each with what it misses
+all 9 words off) and the 35 marked in this audit (25 functions of the 58 files found were de-faked), each with what it misses
 by without its trick in its first comment. The near ones for a next pass:
 RumbleMenu_Play (2 of 23 words with the typed Menu and no arms),
+CCache__HeapAlloc (11 of 57, whatever the shape of the two allocations),
 PakMenu_InitLoadGame_2 (4 of 103 unpinned), Trail_DetachOwner (5-6 of 169),
 CParticle__Steer (5 of 390 without its barrier), _getRate (1 of 148;
 libaudio, which j5's ultralib work may replace).

@@ -249,7 +249,7 @@ packages, Armorines on the same base).
 
 The port is affected only through shared C, and runs as before:
 
-- **442 N64-only alternatives dropped** in 349 files by `tools/unify_host_bodies.py --write`: an
+- **451 N64-only alternatives dropped** in 349 files by `tools/unify_host_bodies.py --write`: an
   `#ifdef TARGET_PORT A #else B #endif` whose host branch A compiles to the same N64 code as B
   becomes A alone. The port reads the same text as before (line numbers aside). Re-runnable after
   merges; rerun it last.
