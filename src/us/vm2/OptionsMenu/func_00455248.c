@@ -1,11 +1,11 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "globals/game.h"
 
 s32 Menu_StepValue_2(s32, s32, s32, s32, s32, s32);
 
-extern u8 gEngineApp_m_Settings_unk1B[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
-
 s32 OptionsMenu_StepTwoPlayerLayout_2(s32 arg0, s32 arg1) {
-    gEngineApp_m_Settings_unk1B[0] = Menu_StepValue_2(arg1, (s32) gEngineApp_m_Settings_unk1B[0], 1, 0, 1, 1);
+    u8 *value = &gEngineApp_m_Settings_unk1B; /* through a pointer: the ROM builds the address once */
+
+    *value = Menu_StepValue_2(arg1, *value, 1, 0, 1, 1);
     return 0;
 }
