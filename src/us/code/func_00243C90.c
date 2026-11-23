@@ -33,15 +33,15 @@ s32 EnemyAI_GetBehaviorIndex(CPlayer *self, CAI *plan);
 void AI_HearNoise(CPlayer *self, CAI *plan, CVector3 *pos, s32 arg3);
 s32 Cinema_PathPlaying(void);
 s32 Cinema_GetScriptId(void);
-CPlayer *func_00225848(u8 *scene, CPlayer *self);
-CPlayer *func_0022594C(u8 *scene, CPlayer *self);
-CPlayer *func_002259D0(u8 *scene, CPlayer *self);
+CPlayer *CScene__FindNearestIdleThrowable(u8 *scene, CPlayer *self);
+CPlayer *CScene__FindNearestCover(u8 *scene, CPlayer *self);
+CPlayer *CScene__FindNearestIdleThrowableB(u8 *scene, CPlayer *self);
 CPlayer *CPlayerPool__FindNearest(CPlayerPool *players, CVector3 pos);
 CPlayer *CPlayerPool__FindNearestOther(CPlayerPool *players, CVector3 pos, void *owner);
 CameraInfo *GameObject_GetRegionInfo(CPlayer *player);
 f32 AI_DistSqToPointAtHeight(CPlayer *a, CVector3 pos);
 f32 AI_FlatDistSqToPoint(CPlayer *a, CVector3 pos);
-s32 func_00267E74(CPlayer *a);
+s32 GameObject_IsLeashed(CPlayer *a);
 f32 GameObject_GetLeashRadius(CPlayer *a);
 f32 GameObject_GetCollisionHeight(CPlayer *a);                           /* height */
 s32 Collision_MoveInstance(CPlayer *a, CVector3 from, u8 *result);
@@ -102,20 +102,20 @@ CPlayer *AI_FindBestTarget(CPlayer *self, CAI *plan, s32 checkSight, s32 flag) {
                 if ((side == 0 && (self->m_CharacterActor.header.m_pIntelligence->m_Enemy.m_dwEnemyFlags & 0x40))
                     || (side == 1 && (self->m_CharacterActor.header.m_pIntelligence->m_Enemy.m_dwEnemyFlags & 0x80))
                     || (side == 2 && (self->m_CharacterActor.header.m_pIntelligence->m_Enemy.m_dwEnemyFlags & 0x100))) {
-                    t = func_00225848(&gScene, self);
+                    t = CScene__FindNearestIdleThrowable(&gScene, self);
                     ADD(t);
                 }
                 if (plan->m_pSightTarget != NULL
                     && ((side == 0 && (self->m_CharacterActor.header.m_pIntelligence->m_Enemy.m_wTakeCoverAnimFlags & 0x1F))
                         || (side == 1 && (self->m_CharacterActor.header.m_pIntelligence->m_Enemy.m_wTakeCoverAnimFlags & 0x3E0))
                         || (side == 2 && (self->m_CharacterActor.header.m_pIntelligence->m_Enemy.m_wTakeCoverAnimFlags & 0x7C00)))) {
-                    t = func_0022594C(&gScene, self);
+                    t = CScene__FindNearestCover(&gScene, self);
                     ADD(t);
                 }
             }
             t = plan->m_pParent;
             ADD(t);
-            t = func_002259D0(&gScene, self);
+            t = CScene__FindNearestIdleThrowableB(&gScene, self);
             ADD(t);
         }
         if (self->m_CharacterActor.m_dwFlags & 0x300000) {
@@ -147,7 +147,7 @@ CPlayer *AI_FindBestTarget(CPlayer *self, CAI *plan, s32 checkSight, s32 flag) {
                         if (self->m_CharacterActor.header.m_pIntelligence->m_Type == 1 && plan->m_Action == 0) {
                             goto next;
                         }
-                        if (func_00267E74(self)) {
+                        if (GameObject_IsLeashed(self)) {
                             dist = AI_FlatDistSqToPoint(t, plan->m_vLeashPos);
                             limit = GameObject_GetLeashRadius(self);
                             if (limit * GameObject_GetLeashRadius(self) <= dist) {

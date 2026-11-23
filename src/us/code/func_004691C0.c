@@ -9,7 +9,7 @@
 
 extern Vtx_t D_8011AD48[4];
 
-void func_004691C0(void) {
+void Render_InitUnitQuad_2(void) {
     Vtx_t *v;
     s32 i;
 

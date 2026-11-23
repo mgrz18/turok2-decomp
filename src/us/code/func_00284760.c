@@ -9,13 +9,13 @@ typedef struct {
 
 #ifdef TARGET_PORT
 struct CVector3;
-s16 func_002261A8(void *scene, s32 index, struct CVector3 *pt);
+s16 CScene__FindNearestPathPoint(void *scene, s32 index, struct CVector3 *pt);
 #else
-s16 func_002261A8(s32 *);                       /* extern */
+s16 CScene__FindNearestPathPoint(s32 *);                       /* extern */
 #endif
 
 #ifdef TARGET_PORT
-/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS func_002261A8 gets this function's
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CScene__FindNearestPathPoint gets this function's
  * $a1 (the path index) and $a2 (the position, from the caller CGameObjectInstance__Construct) untouched; the
  * host takes and passes them. */
 void CPathTrack__StartAtNearestPoint(Arg0 *arg0, s8 arg1, struct CVector3 *pt) {
@@ -25,8 +25,8 @@ void CPathTrack__StartAtNearestPoint(Arg0 *arg0, s8 arg1) {
     arg0->kind = 2;
     arg0->value = arg1;
 #ifdef TARGET_PORT
-    arg0->id = func_002261A8(&gScene, arg1, pt);
+    arg0->id = CScene__FindNearestPathPoint(&gScene, arg1, pt);
 #else
-    arg0->id = func_002261A8(&gScene);
+    arg0->id = CScene__FindNearestPathPoint(&gScene);
 #endif
 }
