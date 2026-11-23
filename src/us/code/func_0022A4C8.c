@@ -22,7 +22,7 @@ typedef struct ProjDef {
 #define T2_HOFF_ProjDef(m) __builtin_offsetof(CROMParticleEffect, m)
     union {
         struct { u8 _hp_flags[T2_HOFF_ProjDef(m_dwFlags)]; u32 flags; }; /* N64 0x0 */
-        struct { u8 _hp_turnRate[T2_HOFF_ProjDef(unk_0E)]; s16 turnRate; }; /* N64 0xE */
+        struct { u8 _hp_turnRate[T2_HOFF_ProjDef(m_TurnRate)]; s16 turnRate; }; /* N64 0xE */
         struct { u8 _hp_limits[T2_HOFF_ProjDef(m_pMotion)]; ProjLimits *limits; }; /* N64 0x30 */
     };
 } ProjDef;

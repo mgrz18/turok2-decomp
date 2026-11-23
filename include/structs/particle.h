@@ -151,7 +151,7 @@ typedef struct CROMParticleEffect {
     /* 0x0A */ s8 m_bClampToGround;
     /* 0x0B */ u8 unk_0B;
     /* 0x0C */ s16 m_nSound;
-    /* 0x0E */ u8 unk_0E[2];
+    /* 0x0E */ s16 m_TurnRate;          /* a homing projectile: degrees per frame (CParticle__Steer) */
     /* 0x10 */ u8 m_PlayerMask;
     /* 0x11 */ u8 unk_11[3];
     /* 0x14 */ void *m_pModel;          /* drawn as this model, not as a sprite */
