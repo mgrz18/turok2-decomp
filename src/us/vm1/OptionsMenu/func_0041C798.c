@@ -2,6 +2,9 @@
 #include "m2c_macros.h"
 #include "globals/engine.h"
 #include "globals/menu.h"
+#ifdef TARGET_PORT
+#include "structs/menu.h"
+#endif
 
 sptr Video_GetResolutionText(void);
 
@@ -30,7 +33,12 @@ s32 OptionsMenu_ResolutionText(void *arg0)
   }
   new_var2 = var_v0;
   *((s32 *) (((s8 *) arg0) + 8)) = new_var2;
+#ifdef TARGET_PORT
+  /* Round 23: the item's text by the member (host 0x18; the N64 store below is an s32 at 0x14) */
+  ((MenuItem *) arg0)->text = (char *) Video_GetResolutionText();
+#else
   new_var = ((s8 *) arg0) + 0x14;
   *((s32 *) new_var) = Video_GetResolutionText();
+#endif
   return 0;
 }

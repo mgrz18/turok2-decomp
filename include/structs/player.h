@@ -243,7 +243,7 @@ typedef struct CPlayer {
     /* 0x11CC */ COverlay m_BossOverlay;
     /* 0x1208 */ COverlay m_TotalKillsOverlay;
     /* 0x1244 */ COverlay m_TotalTagsOverlay;
-    /* 0x1280 */ struct CGameRumble *m_pRumble;
+    /* 0x1280 */ struct RumbleEffect *m_pRumble; /* never set: Rumble_Start is only called with owner 0 */
     /* 0x1284 */ s32 m_bHeadMovementDisabled;
     /* 0x1288 */ struct CLoopingSoundData *m_pLoopingSound_WeaponBackground;
     /* 0x128C */ struct CLoopingSoundData *m_pLoopingSound_WeaponFiring;

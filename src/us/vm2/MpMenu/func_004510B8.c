@@ -1,9 +1,12 @@
 #include "common.h"
 #include "globals/game.h"
+#include "structs/menu.h"
+#include "structs/controller.h"
 
-
-s32 PlayerSetupMenu_NameLabel_2(void *arg0, void *arg1)
-{
-  *((void **) (((s8 *) arg0) + 0x14)) = (void *) (((*((s8 *) (((s8 *) (*((void **) (((s8 *) arg1) + 0x20)))) + 4))) << 6) + ((s8 *) gEngineApp_m_Settings.slots[0].m_Name));
-  return 0;
+/* The module-2 copy of PlayerSetupMenu_NameLabel (func_00418108.c): the name line of the player
+ * setup window shows the name in the settings slot of the window's controller. Round 23: through
+ * the members (the m2c body used the N64 offsets MenuItem +0x14 and Menu +0x20). */
+s32 PlayerSetupMenu_NameLabel_2(MenuItem *item, Menu *menu) {
+    item->text = (char *) gEngineApp_m_Settings.slots[menu->controller->port].m_Name;
+    return 0;
 }

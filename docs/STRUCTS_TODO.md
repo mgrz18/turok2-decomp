@@ -751,9 +751,8 @@ Families:
   CScene__* (func_00226390) CScene; Plane (3 files) is collision.h's
   CollisionQuad (a point at its corner 0, its normal at 0x30);
   CollisionInfo (5 files) is CCollisionInfo. Left local and why: the other
-  Arg0s are one-off objects (Rumble_SetLink writes an `s32` over
-  RumbleEffect.owner, a pointer: the real type changes the host's store, see
-  below; alSndpSetSound and the libaudio `Msg` events are libultra, k1's);
+  Arg0s are one-off objects (Rumble_SetLink takes a `RumbleEffect *` since
+  round 23, see below; alSndpSetSound and the libaudio `Msg` events are libultra, k1's);
   `S` (4 setters of `{s32, CVector3, s32}` with no caller in C) and the AI
   cycle `S` are their only users' records; func_0026F080 / func_0026F400's
   Plane is a real plane (normal, d), not the quad.
@@ -779,6 +778,7 @@ ImpactEvent_ApplyBlast compares the blast's source with `(u8 *)owner + 0x288`,
 CPlayer.m_WeaponActor on the N64 but not on the host (kept as it was, with a
 comment); Rumble_SetLink writes `s32` at 0x38 of a RumbleEffect (the owner
 pointer on the N64, another place on the host). Both were there at f980f639.
+**Fixed in round 23 (part l2)**: both by the member, asm_diff 0 (docs/port/STATUS.md, Round 23).
 
 Left (twins, 63 in 38 files): the FAKEMATCH files (func_0022D2FC's particle views,
 func_0022A4C8's ProjDef / Projectile): k2's, run tools/unview.py on them after

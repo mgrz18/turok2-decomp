@@ -40,7 +40,7 @@ s32 GameObject_GetFloorKind(u8 *obj) {
             result = 1;
         }
         if (objFlags & 0x40000) {
-            other = *(u8 **) (obj + 0x30);
+            other = (u8 *) ((CGameObjectInstance *) obj)->m_pInstanceBelow; /* N64 +0x30, host +0x38 (round 23) */
             if (other != NULL && other[0] == obj[0]) {
                 result = CGameObjectInstance__GetGeometryKind(other);
             }

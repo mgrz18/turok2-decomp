@@ -1,10 +1,8 @@
 #include "common.h"
+#include "structs/rumble.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x38];
-    /* 0x38 */ s32 unk38;
-} Arg0;
-
-void Rumble_SetLink(Arg0 *arg0, s32 arg1) {
-    arg0->unk38 = arg1;
+/* Sets the pointer an effect clears when it ends (Rumble_Start's owner). Round 23: the member;
+ * the old N64 view wrote an s32 at 0x38, amplitude.unk4 on the host. */
+void Rumble_SetLink(RumbleEffect *effect, RumbleEffect **owner) {
+    effect->owner = owner;
 }
