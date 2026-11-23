@@ -218,9 +218,6 @@ void Cinema_SplineBuild(s32 count, CVector3 *points, f32 *weights, Spline *splin
 }
 
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU_2/80400000_4.CPP, func_8040067C_de. */
-typedef struct SplineSource { s32 stride,count; union { char data[0]; CVector3 points[0]; f32 weights[0]; }; } SplineSource;
-typedef struct SplineTable { s32 count; } SplineTable;
-typedef union SplineSourceCursor { SplineSource *header; CVector3 *points; f32 *weights; } SplineSourceCursor;
 extern void Pack_Init(void *,s32);
 extern char *Pack_Add(Pack *,sptr,s32);
 extern s32 ProPackDecompress(void **, s32);
