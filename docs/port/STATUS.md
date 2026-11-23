@@ -6,6 +6,34 @@ new game to the good ending with no invincibility and no life lost, on the N64's
 stream. The Mac app is packaged and ready for its first session in a real window
 ([FIRSTRUN.md](FIRSTRUN.md)); that session has not happened yet.
 
+## Round 24 merge (Phase 5): headers, globals, 44 modules merged; the reference md5s unchanged
+
+Merged into `feat/46-hand-matching` (no conflicts): m2 (BSS interiors as members, `D_` tokens
+142 -> 93, data names 1,704; `apply_names.py` + `make setup`, `port_layout` as m2 left it), m1
+(struct hoisting, repeated local names 141/697 -> 115/669), m3 (`tools/merge_module.py`
+fixes, `tools/merge_check.py`, the stick-aim combination back to 0 lives). Then the module
+merges ([MODULES.md](../MODULES.md#merged-in-round-24)): the 28 directories `merge_check.py`
+passed, and 16 more after unifying their declarations: **44 directories, 370 files -> 44; 58
+modules are one C file**, 75 directories left (30 harder header work, 25 `.rodata` layout, 9
+vm2 asm, 5 vm2 shared pools, 4 cc1 flags, 2 name clashes). The port and a merged module: the
+functions `port/` replaces are under `#ifndef TARGET_PORT` in the merged file, or the merged
+file is in `port/cmake/link.cmake` when all are (`vimgr.c`, `sptask.c`). After the merges the
+struct census is 112 of 665 (same-module copies folded). ptrargs found one new site from m1
+(`CPlayerOverlay.m_rpObject` is a pointer passed as `Render_QueueModelByKey`'s key): the key
+is `sptr` now.
+
+Checks: `make verify` OK after every merge step and on a clean `make setup` + build (shared
+`.rodata` 123 objects); `tools/asm_diff.py --base d2d07205 -j 8` 0 differ over 3,433 files (the
+44 merged files new to it); a fresh `git clone --recursive` (ultralib `e24c836`) builds and
+verifies. Port: `gendata` from scratch, `mklayout.py --check` up to date, `aligncheck.py` the 2
+known sites; boot + 3 demos `6ab97584…`; **default whole game `cd2d68ce…`** (END 2, 0 lives); the
+stick combination (`--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair`)
+**`cadfe170…`**, END 2, 0 lives; `make -C port test`, `gbi_test` 0 mismatches, t2os
+deterministic (`2b277587…` three times), `t2audio_test --direct 0/40` max difference 0, `--adec`
+27,136 samples, the swoosh self-test OK. abicheck 0 harmful, ptrargs 0 retyped (after the fix),
+outptr 0 BAD, f2ucheck 112 (unchanged); n64viewcheck raw/BAD 10 and cast/BAD 1 unchanged,
+gptr/BAD 6 -> 3, raw/untyped 99 -> 97 (unlinked: gptr/BAD 23 -> 20, raw/untyped 146 -> 140).
+
 ## Round 23 merge (Phase 5 closes): the reference md5s now
 
 **The default whole-game run's det md5 is `cd2d68ce…`** (600,000 lines; END 2, 5 totems, 0 lives,
