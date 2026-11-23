@@ -13,8 +13,8 @@
 /* Picks the next attack anim from a weighted table: close to the target 4 (then 3 after a 4), otherwise 5
  * when fewer than 3 actors are in the gScene_m_InstancePool_m_ActiveList list, else 6. */
 
-extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern s16 WeightedTable_PickStatic(Pick *table);
+extern void AI_UpdateTargets(void *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
+extern s16 WeightedTable_PickStatic(void *table); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
 
 /* MotherBoss_GetTargetDist_2 */
 static __inline__ f32 getTargetDist(CGameObjectInstance *obj, CListedInstance **found) {

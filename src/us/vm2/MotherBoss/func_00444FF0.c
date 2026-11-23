@@ -14,7 +14,8 @@ extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a +
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern void CVector3__Normalize(CVector3 *v); /* normalise */
 extern void DamageEvent_Set(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, void *shield);
-extern void CAI__CallHurt(CGameObjectInstance *target, CAI *ai, DamageEvent *event);
+typedef void (*CAIHurtFn)(CGameObjectInstance *target, CAI *ai, DamageEvent *event);
+#include "protos/ai.h" /* CAI__CallHurt(s32, void *): called here with the three arguments it takes */
 
 void MotherBoss_Collision_2(CGameObjectInstance *obj, CAI *ai) {
     DamageEvent event;
@@ -32,6 +33,6 @@ void MotherBoss_Collision_2(CGameObjectInstance *obj, CAI *ai) {
         dir.y = 409.59998f;
         CVector3__Add(&player->m_vVelocity, &player->m_vVelocity, &dir);
         DamageEvent_Set(&event, obj, 0x500, 102.399994f, 0x100000, NULL);
-        CAI__CallHurt(player, &player->m_AI, &event);
+        ((CAIHurtFn) CAI__CallHurt)(player, &player->m_AI, &event);
     }
 }

@@ -6,7 +6,7 @@
 /* Returns the distance to the AI's second target when it is an actor with flag 0x300000 (and stores that
  * actor in *found), else -1 (and NULL). */
 
-extern void AI_UpdateTargets(CGameObjectInstance *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
+extern void AI_UpdateTargets(void *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
 
 f32 MotherBoss_GetTargetDist_2(CGameObjectInstance *obj, CGameObjectInstance **found) {
     CAITargets t;

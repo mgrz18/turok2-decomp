@@ -10,7 +10,7 @@
  * the anim is done. */
 
 
-extern void AI_UpdateTargets(void *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+extern void AI_UpdateTargets(void *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
 extern void MotherBoss_TeleportTarget_2(void *obj, s32 first);
 
 void MotherBoss_Mode28_TeleportTarget_2(void *obj, CAI *ai) {

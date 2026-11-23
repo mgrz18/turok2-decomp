@@ -9,11 +9,11 @@
  * closer than 460.8 to the target of the module object. */
 
 extern f32 MotherBoss_GetTargetDist_2(void *obj, CGameObjectInstance **found);
-extern s16 WeightedTable_PickStatic(void *a); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+extern s16 WeightedTable_PickStatic(void *table); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
 extern f32 Random_Blend(f32 min, f32 max);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern f32 func_00298470(f32 x); /* sqrt */
-extern void *CLevelActorPool__Spawn(CLevelActorPool *pool, sptr a1, s16 type, CVector3 vel, CVector3 pos, sptr region, f32 arg);
+extern void *CLevelActorPool__Spawn(CLevelActorPool *pool, void *refCount, s32 id, CVector3 vel, CVector3 pos, sptr region, f32 lifetime);
 extern void Actor_SpawnParticle(void *actor, s32 id, CVector3 pos, s32 a5);
 
 static __inline__ void SpawnAt(s32 arg0, s16 type, CVector3 pos, f32 speed) {

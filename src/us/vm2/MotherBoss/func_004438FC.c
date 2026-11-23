@@ -15,8 +15,8 @@
  * 100 steps) 0x1A/0x1B; otherwise 0x18 after a long 0x17, and from afar 0x19 (when fewer than 2 actors are
  * in the gScene_m_InstancePool_m_ActiveList list), 0x1D and 0x17 weighted by the module's timer ratio. */
 
-extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern s16 WeightedTable_PickStatic(Pick *table);
+extern void AI_UpdateTargets(void *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
+extern s16 WeightedTable_PickStatic(void *table); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
 
 /* MotherBoss_GetTargetDist_2 */
 static __inline__ f32 getTargetDist(CGameObjectInstance *obj, CListedInstance **found) {

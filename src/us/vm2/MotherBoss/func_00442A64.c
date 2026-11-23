@@ -29,13 +29,13 @@ typedef struct {
     u8 c[4];
 } __attribute__((aligned(4))) Part;
 
-extern void AI_UpdateTargets(CListedInstance *actor, void *ai, CAITargets *t, s32 f1, s32 f2);
+extern void AI_UpdateTargets(void *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
 extern f32 Random_Blend(f32 min, f32 max);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern f32 func_00298470(f32 x); /* sqrt */
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
-extern void Actor_SpawnParticle(CListedInstance *actor, s32 id, CVector3 pos, s32 a5);
+extern void Actor_SpawnParticle(void *actor, s32 id, CVector3 pos, s32 a5);
 
 static __inline__ void FindTarget(CListedInstance *obj, CListedInstance **target) {
     CAITargets targets;

@@ -12,12 +12,12 @@
 /* Spawns a pickup picked from a weighted table at a random point around the origin (MotherBoss_RandomArenaPoint_2 and
  * MotherBoss_SpawnPickup_2 inlined). */
 
-extern s16 WeightedTable_PickStatic(Pick *table);
+extern s16 WeightedTable_PickStatic(void *table); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
 extern f32 Random_Blend(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
-extern CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, sptr region, f32 lifetime);
-extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
+extern void *CLevelActorPool__Spawn(CLevelActorPool *pool, void *refCount, s32 id, CVector3 vel, CVector3 pos, sptr region, f32 lifetime);
+extern void Actor_SpawnParticle(void *actor, s32 id, CVector3 pos, s32 a5);
 
 /* MotherBoss_RandomArenaPoint_2 */
 static __inline__ void randomGroundPoint(CVector3 *out) {

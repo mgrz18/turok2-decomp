@@ -7,7 +7,7 @@
 
 /* Picks the module object's idle anim for the current phase (0, 1; none in phase 2) from the AI's flags. */
 
-extern s16 WeightedTable_PickStatic(Pick *table);
+extern s16 WeightedTable_PickStatic(void *table); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
 
 s16 MotherBoss_PickPhaseAnim_2(void *obj, CAI *ai) {
     Pick picks[8];
