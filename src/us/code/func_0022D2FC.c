@@ -14,6 +14,7 @@
  * CParticle__BuildMatrix, CParticle__DrawSprite and CParticleSystem__Spawn are after Rage Wars
  * (Particle_BuildMatrix, Particle_DrawSprite and func_802800C0_de). */
 #include "common.h"
+#include "structs/list.h"
 #include "gfx.h"
 #include "gbi_t2.h"
 #include "structs/game_object.h"
@@ -1449,46 +1450,7 @@ typedef struct Effect {
 } Effect;
 #endif
 
-#ifdef TARGET_PORT
-typedef struct EffectList {
-/* the view at the host offsets of CList (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_EffectList(m) __builtin_offsetof(CList, m)
-    union {
-        struct { u8 _hp_head[T2_HOFF_EffectList(m_pHead)]; Effect *head; }; /* N64 0x0 */
-        struct { u8 _hp_tail[T2_HOFF_EffectList(m_pTail)]; Effect *tail; }; /* N64 0x4 */
-        u8 _hp_size[sizeof(CList)];
-    };
-} EffectList;
-#else
-typedef struct {
-    /* 0x00 */ Effect *head;
-    /* 0x04 */ Effect *tail;
-    /* 0x08 */ u8 pad8[0xC];
-} EffectList;
-#endif
 
-#ifdef TARGET_PORT
-typedef struct EffectSystem {
-/* the view at the host offsets of CParticleSystem (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_EffectSystem(m) __builtin_offsetof(CParticleSystem, m)
-    union {
-        struct { u8 _hp_free[T2_HOFF_EffectSystem(m_FreeList)]; EffectList free; }; /* N64 0xEC00 */
-        struct { u8 _hp_groups[T2_HOFF_EffectSystem(m_DrawList)]; EffectList groups; }; /* N64 0xEC14 */
-        struct { u8 _hp_lists[T2_HOFF_EffectSystem(m_ActiveList)]; EffectList lists[3]; }; /* N64 0xEC28 */
-        struct { u8 _hp_resource[T2_HOFF_EffectSystem(m_pParticleData)]; void *resource; }; /* N64 0xEC64 */
-    };
-} EffectSystem;
-#else
-typedef struct {
-    /* 0x0000 */ u8 pad0[0xEC00];
-    /* 0xEC00 */ EffectList free;
-    /* 0xEC14 */ EffectList groups;
-    /* 0xEC28 */ EffectList lists[3];
-    /* 0xEC64 */ s32 resource;
-} EffectSystem;
-#endif
 
 #ifdef TARGET_PORT
 typedef struct Camera {
@@ -1564,10 +1526,10 @@ static __inline__ s32 randomCount(s32 range) {
     return range != 0 ? Random_Next() % (range + 1) : 0;
 }
 
-static __inline__ Effect *findOwned(EffectList *list, void *ownerId, Entry *entry) {
+static __inline__ Effect *findOwned(CList *list, void *ownerId, Entry *entry) {
     Effect *effect;
 
-    effect = list->head;
+    effect = list->m_pHead;
     if (entry != 0) {
         for (; effect != 0; effect = effect->next) {
             if (effect->ownerId == ownerId && effect->entry == entry) {
@@ -1584,25 +1546,25 @@ static __inline__ Effect *findOwned(EffectList *list, void *ownerId, Entry *entr
     return 0;
 }
 
-static __inline__ Effect *allocateEffect(EffectSystem *sys, u8 index) {
+static __inline__ Effect *allocateEffect(CParticleSystem *sys, u8 index) {
     Effect *effect;
-    EffectList *list;
+    CList *list;
     s32 i;
 
-    if (sys->free.head == 0) {
+    if (sys->m_FreeList.m_pHead == 0) {
         for (i = 0; i <= index; i++) {
-            if ((&sys->lists[i])->tail != 0) {
-                CParticleSystem__Free(sys, (&sys->lists[i])->tail);
+            if ((&sys->m_ActiveList[i])->m_pTail != 0) {
+                CParticleSystem__Free(sys, (&sys->m_ActiveList[i])->m_pTail);
                 break;
             }
         }
     }
-    effect = sys->free.head;
+    effect = sys->m_FreeList.m_pHead;
     if (effect == 0) {
         return 0;
     }
-    CList__Remove(&sys->free, effect);
-    list = &sys->lists[index];
+    CList__Remove(&sys->m_FreeList, effect);
+    list = &sys->m_ActiveList[index];
     CList__AddHead(list, effect);
     effect->list = list;
     effect->groupNext = 0;
@@ -1684,7 +1646,7 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
 }
 #endif
 
-s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount, sptr arg4, s32 kind,
+s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s32 *refCount, sptr arg4, s32 kind,
                   CVector3 arg6, CQuaternion rotation, CVector3 pos, void *region, s32 arg10, s32 arg11) {
     CMtxF mtx;
     CVector3 dir;
@@ -1742,7 +1704,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
         return 0;
     }
     count = 0;
-    resource = sys->resource;
+    resource = sys->m_pParticleData;
     gCollisionResultsP = &target;
     block = CISet__GetBlock(resource, 1);
     numEntries = block->count;
@@ -1798,7 +1760,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
             entry = &entries[i];
             ok = (entry->playerMask & mask) != 0;
             if ((entry->flags & 0x80) && ownerId != 0) {
-                if (findOwned(&sys->lists[(s8) entry->params->listIndex], ownerId, entry) != 0) {
+                if (findOwned(&sys->m_ActiveList[(s8) entry->params->listIndex], ownerId, entry) != 0) {
                     ok = 0;
                 }
             }
@@ -2102,17 +2064,17 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                 if (entry->params->group != 3) {
                     Effect *other;
 
-                    for (other = sys->groups.head; other != 0; other = other->groupNext) {
+                    for (other = sys->m_DrawList.m_pHead; other != 0; other = other->groupNext) {
                         if (other->entry == effect->entry) {
                             break;
                         }
                     }
                     if (other != 0) {
-                        CList__InsertBefore(&sys->groups, other, effect);
+                        CList__InsertBefore(&sys->m_DrawList, other, effect);
                     } else if (effect->entry->flags & 0x2000) {
-                        CList__AddHead(&sys->groups, effect);
+                        CList__AddHead(&sys->m_DrawList, effect);
                     } else {
-                        CList__AddTail(&sys->groups, effect);
+                        CList__AddTail(&sys->m_DrawList, effect);
                     }
                     effect->flags |= 0x1000000;
                 }

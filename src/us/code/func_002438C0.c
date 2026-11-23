@@ -13,21 +13,6 @@ typedef struct {
     /* 0x0C */ s32 region;
 } Location;
 
-#ifdef TARGET_PORT
-typedef struct PlanInfo {
-/* the view at the host offsets of CAIModeInfo (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_PlanInfo(m) __builtin_offsetof(CAIModeInfo, m)
-    union {
-        struct { u8 _hp_unkC[T2_HOFF_PlanInfo(m_pData)]; sptr unkC; }; /* N64 0xC */
-    };
-} PlanInfo;
-#else
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s32 unkC;
-} PlanInfo;
-#endif
 
 #ifdef TARGET_PORT
 typedef struct Plan {
@@ -36,7 +21,7 @@ typedef struct Plan {
 #define T2_HOFF_Plan(m) __builtin_offsetof(CAI, m)
     union {
         struct { u8 _hp_active[T2_HOFF_Plan(m_Health)]; s32 active; }; /* N64 0x4 */
-        struct { u8 _hp_info[T2_HOFF_Plan(m_pModeCurrent)]; PlanInfo *info; }; /* N64 0x30 */
+        struct { u8 _hp_info[T2_HOFF_Plan(m_pModeCurrent)]; CAIModeInfo *info; }; /* N64 0x30 */
         struct { u8 _hp_ignore[T2_HOFF_Plan(m_pParent)]; CGameObjectInstance *ignore; }; /* N64 0x68 */
         struct { u8 _hp_approachFrom[T2_HOFF_Plan(m_pSightTarget)]; CGameObjectInstance *approachFrom; }; /* N64 0x80 */
         struct { u8 _hp_unk84[T2_HOFF_Plan(m_pPathAvoidRegion)]; sptr unk84; }; /* N64 0x84 */
@@ -52,7 +37,7 @@ typedef struct {
     /* 0x00 */ u8 pad0[4];
     /* 0x04 */ s32 active;
     /* 0x08 */ u8 pad8[0x30 - 8];
-    /* 0x30 */ PlanInfo *info;
+    /* 0x30 */ CAIModeInfo *info;
     /* 0x34 */ u8 pad34[0x68 - 0x34];
     /* 0x68 */ CGameObjectInstance *ignore;
     /* 0x6C */ u8 pad6C[0x80 - 0x6C];
@@ -162,7 +147,7 @@ s32 AI_UpdatePathHeading(CGameObjectInstance *self, Plan *plan, CGameObjectInsta
         Approach(self, target, plan->approachFrom, &pos, &region);
         break;
     case 1:
-        region = Path_FindFleeRegion(self, plan->unk84, target->header.m_vPos, ((sptr)target->header.m_pCurrentRegion), plan->info->unkC, &pos);
+        region = Path_FindFleeRegion(self, plan->unk84, target->header.m_vPos, ((sptr)target->header.m_pCurrentRegion), plan->info->m_pData, &pos);
         if (region == 0) {
             do {
     default:
@@ -172,7 +157,7 @@ s32 AI_UpdatePathHeading(CGameObjectInstance *self, Plan *plan, CGameObjectInsta
         }
         break;
     }
-    if (Path_FindRegionPath(self, pos, region, plan->info->unkC, &hit) != 0) {
+    if (Path_FindRegionPath(self, pos, region, plan->info->m_pData, &hit) != 0) {
         if (CGameRegion__ContainsXZ(((sptr)self->header.m_pCurrentRegion), hit.x, hit.z) != 0) {
             plan->height = hit.y;
         } else {

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/camera.h"
 #include "gfx.h"
 #include "structs/vector.h"
 #include "structs/game.h"
@@ -25,27 +26,6 @@ typedef struct HudModel {
     /* 0xB8 */ f32 time;
 } HudModel;
 
-#ifdef TARGET_PORT
-typedef struct HudView {
-/* the view at the host offsets of CCamera (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_HudView(m) __builtin_offsetof(CCamera, m)
-    union {
-        struct { u8 _hp_width[T2_HOFF_HudView(m_Viewport.m_Width)]; f32 width; }; /* N64 0x288 */
-        struct { u8 _hp_height[T2_HOFF_HudView(m_Viewport.m_Height)]; f32 height; }; /* N64 0x28C */
-        struct { u8 _hp_left[T2_HOFF_HudView(m_Viewport.m_ScreenPosX)]; f32 left; }; /* N64 0x290 */
-        struct { u8 _hp_top[T2_HOFF_HudView(m_Viewport.m_ScreenPosY)]; f32 top; }; /* N64 0x294 */
-    };
-} HudView;
-#else
-typedef struct {
-    /* 0x000 */ u8 pad0[0x288];
-    /* 0x288 */ f32 width;
-    /* 0x28C */ f32 height;
-    /* 0x290 */ f32 left;
-    /* 0x294 */ f32 top;
-} HudView;
-#endif
 
 extern f32 D_800ADDB8;
 
@@ -64,7 +44,7 @@ void CMtxF__ToMtxAffine(f32 *src, Mtx64 *dst);
 void CMtxF__TransformPoint(f32 *mtx, CVector3 *in, CVector3 *out);
 void Render_QueueModelByKey(s32 key, void *matrix, void *lights, s32 lod, s32 pass);
 
-void CPlayer__DrawScope(HudModel *m, HudView *view) {
+void CPlayer__DrawScope(HudModel *m, CCamera *view) {
     f32 mf[4][4];
     f32 mfDraw[4][4];
     CVector3 out;
@@ -91,7 +71,7 @@ void CPlayer__DrawScope(HudModel *m, HudView *view) {
         g->w1 = 0x2000;
     }
     Render_ResetBatches();
-    CEngineApp__ClearDepthRect(&gEngineApp, view->left, view->width + view->left, view->top, view->height + view->top);
+    CEngineApp__ClearDepthRect(&gEngineApp, view->m_Viewport.m_ScreenPosX, view->m_Viewport.m_Width + view->m_Viewport.m_ScreenPosX, view->m_Viewport.m_ScreenPosY, view->m_Viewport.m_Height + view->m_Viewport.m_ScreenPosY);
     CMtxF__SetScale(&mf[0][0], m->scaleX, m->scaleY, m->scaleZ);
     CMtxF__RotateY(&mf[0][0], m->rotY);
     CMtxF__RotateX(&mf[0][0], m->rotX);

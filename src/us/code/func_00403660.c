@@ -17,27 +17,6 @@ typedef struct {
 #endif
 } Slot00403660;
 
-#ifdef TARGET_PORT
-typedef struct Boss00403660 {
-/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Boss00403660(m) __builtin_offsetof(CGameObjectInstance, m)
-    union {
-        struct { u8 _hp_unk54[T2_HOFF_Boss00403660(m_CollisionYOffset)]; s32 unk54; }; /* N64 0x54 */
-        struct { u8 _hp_slotMask[T2_HOFF_Boss00403660(m_AI.m_VisBits)]; s32 slotMask; }; /* N64 0x14C */
-        struct { u8 _hp_unk174[T2_HOFF_Boss00403660(m_AI.m_Mode)]; s8 unk174; }; /* N64 0x174 */
-    };
-} Boss00403660;
-#else
-typedef struct {
-    /* 0x000 */ u8 pad0[0x54];
-    /* 0x054 */ s32 unk54;
-    /* 0x058 */ u8 pad1[0x14C - 0x58];
-    /* 0x14C */ s32 slotMask;
-    /* 0x150 */ u8 pad2[0x174 - 0x150];
-    /* 0x174 */ s8 unk174;
-} Boss00403660;
-#endif
 
 void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
 void ScriptAnimator_Apply(Slot00403660 *slot);
@@ -49,7 +28,7 @@ static __inline__ s32 hasBit(s32 mask, s32 bit) {
 
 void MantidQueen_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
     WaveBossState *s;
-    Boss00403660 *boss;
+    CGameObjectInstance *boss;
     s32 mask;
     Slot00403660 *slot;
     s32 i;
@@ -58,8 +37,8 @@ void MantidQueen_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
     i = 0;
     bit = 1;
     s = &gMantidQueen;
-    boss = (Boss00403660 *) s->actor;
-    mask = boss->slotMask;
+    boss = (CGameObjectInstance *) s->actor;
+    mask = boss->m_AI.m_VisBits;
     slot = (Slot00403660 *) &s->spots[0].anim;
     do {
         if (hasBit(mask, bit << i)) {
@@ -82,7 +61,7 @@ void MantidQueen_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
         i++;
         slot++;
     } while (i < 5);
-    if (boss->unk174 != 2) {
-        boss->unk54 = 0;
+    if (boss->m_AI.m_Mode != 2) {
+        boss->m_CollisionYOffset = 0;
     }
 }

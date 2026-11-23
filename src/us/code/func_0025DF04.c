@@ -12,23 +12,6 @@
  * death-flag words enables it. Not an attack picker, as this comment once
  * said. */
 
-#ifdef TARGET_PORT
-typedef struct AttackActor {
-/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_AttackActor(m) __builtin_offsetof(CGameObjectInstance, m)
-    union {
-        struct { u8 _hp_target[T2_HOFF_AttackActor(header.m_pCurrentRegion)]; sptr target; }; /* N64 0x10: the region pointer, pointer-wide */
-        struct { u8 _hp_def[T2_HOFF_AttackActor(header.m_pIntelligence)]; s32 *def; }; /* N64 0x14 */
-    };
-} AttackActor;
-#else
-typedef struct {
-    /* 0x00 */ u8 pad00[0x10];
-    /* 0x10 */ s32 target;
-    /* 0x14 */ s32 *def;
-} AttackActor;
-#endif
 
 #ifdef TARGET_PORT
 typedef struct AttackState {
@@ -73,13 +56,13 @@ s32 EnemyAnim_ExplosiveDeath_B0300(void *, void *);
 s32 EnemyAnim_ExplosiveDeath_B0330(void *, void *);
 s32 EnemyAnim_NormalDeath_B0360(void *, void *);
 
-s32 EnemyAnim_PickDeath(AttackActor *actor, AttackState *state) {
+s32 EnemyAnim_PickDeath(CGameObjectInstance *actor, AttackState *state) {
     s32 result = -1;
     s32 flags = state->flags;
-    s32 *def = actor->def;
+    s32 *def = actor->header.m_pIntelligence;
     s32 index = state->index;
     s32 mode = flags & 0x03F00000;
-    sptr target = actor->target;
+    sptr target = actor->header.m_pCurrentRegion;
     u16 *masks = (u16 *)((u8 *)def + 0x14); /* [0x3C] close, [0x3D] mid, [0x3E] far */
     s32 rest = flags & ~0x03F00000;
     TargetInfo *t;
