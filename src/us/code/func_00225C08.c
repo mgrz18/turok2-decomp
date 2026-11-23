@@ -8,7 +8,7 @@
 void AI_HearNoise(u8 *actor, CAI *ai, CVector3 *pos, s32 kind);
 
 /* Every kind-1 actor (CScene::m_pKind1, count m_nKind1) hears a noise of the given kind at pos. */
-void func_00225C08(CScene *scene, s32 kind, CVector3 *pos) {
+void CScene__BroadcastNoise(CScene *scene, s32 kind, CVector3 *pos) {
     s32 n = scene->m_nKind1;
     s32 i;
 

@@ -5,7 +5,7 @@
  * offset (a host offset under TARGET_PORT); typed, and testing the kind-1 case first, it matches. */
 
 /* Flag 1 of an instance of kind 1 (0 for other kinds). */
-s32 func_00268BE0(CGameObjectInstance *obj) {
+s32 GameObject_HasFlag1(CGameObjectInstance *obj) {
     if (obj->header.m_Type == 1) {
         return obj->m_dwFlags & 1;
     }

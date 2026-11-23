@@ -4,7 +4,7 @@
  * test; the plain clamp matches. */
 
 /* Clamps *value to 0..255. */
-void func_0023640C(f32 *value) {
+void Color_ClampByte(f32 *value) {
     f32 v = *value;
 
     if (v < 0.0f) {

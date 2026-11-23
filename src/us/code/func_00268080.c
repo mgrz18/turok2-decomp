@@ -7,7 +7,7 @@
  * (the field's path after the branch, the beq's delay slot empty). */
 
 /* An enemy definition's flag 0x20 (0 for other definitions). */
-s32 func_00268080(CGameObjectInstance *actor) {
+s32 GameObject_CanLeaveInfoFlag400000(CGameObjectInstance *actor) {
     CIntelligence *def = actor->header.m_pIntelligence;
 
     if (def->m_Type == INTELLIGENCE_ENEMY) {
