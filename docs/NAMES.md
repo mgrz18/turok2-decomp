@@ -369,6 +369,43 @@ The full list comes from scanning every `extern` of a named symbol (round G2
 coordinator's script; easy to redo: group the declarations by name, keep the
 names with more than one type).
 
+### Round 21, part j2: the `D_` left in the C
+
+`versions/names/data_j2.us.txt`, applied with `tools/apply_names.py`. Counted as
+distinct `D_<addr>` tokens in `src/**/*.c` (617 at `7340fcdd`; the method above,
+which skipped comments, gave 605): **617 -> 132** (140 with the headers).
+
+| | names | how |
+| --- | ---: | --- |
+| menu and pak text tables, menu formats | 390 | `s<Owner>Text_<words of the string>`, `s<Owner>Fmt_<spec>`; `_<addr>` where two strings would get the same name (the pak messages repeat lines) |
+| engine strings | 78 | `s<Class>CacheDesc_<words>` (`CCache__Request` descriptions), `s<File>Assert{Expr,File}` (libultra/libaudio `assert(EX)`: the literal `"EX"` and `__FILE__`), crash-screen texts, pickup names and messages, kill/cheat messages, `sPakCompanyCode` ("51") |
+| other data and BSS | 12 | `gAssertLine`/`gAssertExpr` (the crash screen's assertion), `gNumTicks1` (Turok 3), `gVideoDitherFilter`, `sAnimDecodeRotation`/`sAnimRawRange`, `sHashDebugLongestChain`, `sOnScreenFontTextureBuffer`, `sCameraDefaultText` (a NULL `u8 *`), `sCCacheDesc_Header`, `sTextureCacheDesc_Texture` |
+| interiors of `gEngineApp_m_Settings` | 14 `D_` | not names: the code reads them as members now (`weaponEnabled[n]`, `slots[n].m_Deaths/m_Kills/m_Tags/m_Name/m_nCharacter`, `match.teamScore[1]`) |
+
+`tools/asm_diff.py` now resolves names the names tables just added
+(`symbols_names*.us.txt`) and a base tree's `D_<addr>` that the rebuilt ELF has
+renamed, so a names round compares against the old tree without a rebuild.
+
+**The 140 left** (C files and headers), by kind:
+
+- 11 labels inside `.code` (`D_00200AE0`, `D_0028A020`, `D_002972E0`...): the
+  middle of a function another file jumps into or reads as data
+  (`ProPack__Decompress`, `__scMain`, `alSavePull`); and 10 in the VM module
+  (`D_0042B304`..., the `Primagen_RunSoundStep` pick lists `D_004315C8`-`D_00431618`,
+  two `MenuDesc` `D_004388E0`/`D_0043916C`, the module-2 page buffer `D_00469400`), named with the module's data in a later pass;
+- 52 pool words (float pools of one function such as `CParticle__GetDistanceScale`'s
+  nine, the trail tables `D_800ACE70`-`D_800ACF38`, `D_800C1144` the cheat table
+  the data also points at, `D_800C1BC4`/`C8` the cinema words): the MATCHING.md
+  ".rodata literals" reasons hold (a pool another file owns, linker fill, data
+  the code reads in the pool); they become literals or names when their files merge;
+- 67 interiors of BSS objects that already have a name: `gCollisionInfoTestMoveWater+0x20..`
+  (`D_800F1B60`-`D_800F1F50`, the collision info records), `gScene` (`D_8010AB90`...,
+  `D_8010FED4`, `D_8010FF34`), `gLevelScript` (`D_8012F604`...), `gContStatus`
+  (`D_800F677A`/`B`), `gPakWatched+3`, the camera boxes, the pager and host-I/O
+  buffers: each wants the member access of its struct (j3's structs), not a name;
+  the rest are BSS whose role is not certain yet (`D_8011B114`/`D_8011F144` pak boot
+  flags, `D_801309A8`/`AC` note-menu flags, `D_8011AD48` a quad's vertices).
+
 ## Declarations
 
 The named globals now have one declaration each, with the real type, in
