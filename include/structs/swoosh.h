@@ -36,6 +36,13 @@ typedef struct SwooshLinks {
     /* 0x8 */ s32 count;
 } SwooshLinks; /* size 0xC */
 
+/* The two links every element of a SwooshLinks list starts with (DList_*): its previous
+ * element in its first word, its next in its second (pointer-wide on the host). */
+typedef struct DListLink {
+    /* 0x0 */ struct DListLink *prev;
+    /* 0x4 */ struct DListLink *next;
+} DListLink;
+
 typedef struct SwooshPool {
     /* 0x00 */ SwooshLinks free;
     /* 0x0C */ SwooshLinks used;

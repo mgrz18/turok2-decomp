@@ -3,17 +3,10 @@
 #include "common.h"
 #include "structs/swoosh.h"
 
-/* The port: the list words at their host size (structs/swoosh.h: an element links to its
- * previous element in its first word, to its next in its second). */
-typedef struct T2ListNode {
-    struct T2ListNode *prev;
-    struct T2ListNode *next;
-} T2ListNode;
-
 /* Takes the free list's head into the used list's tail. */
 s32 *NodePool_Alloc(void *arg0) {
     SwooshPool *p = arg0;
-    T2ListNode *n = p->free.head;
+    DListLink *n = p->free.head;
 
     if (n != NULL) {
         if (n->next != NULL) n->next->prev = n->prev;
@@ -29,7 +22,7 @@ s32 *NodePool_Alloc(void *arg0) {
         } else {
             n->prev = p->used.tail;
             n->next = NULL;
-            ((T2ListNode *)p->used.tail)->next = n;
+            ((DListLink *)p->used.tail)->next = n;
             p->used.tail = n;
         }
         p->used.count++;
