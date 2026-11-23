@@ -432,7 +432,7 @@ The largest group still in the C is `D_8012F604` (65 uses): the word before `gLe
 certain" left the C. Each batch was checked with `tools/asm_diff.py` (0 differ), the whole tree
 against `d2d07205` too (0 of 3,759), and a clean `make setup` + build + `make verify` is OK.
 The count of distinct `D_` tokens in `src/` and `include/` (code and comments) went from **142 to
-93**; data names from 1,676 to **1,703**.
+93**; data names from 1,676 to **1,704**.
 
 - **Members of their owner** (the view is gone, the code reads the struct): `gLevelScriptBlock`
   (was `D_8012F604`: `LevelScriptBlock` is an N64 type now, and Primagen_UpdateMode19 and its twin
@@ -464,7 +464,7 @@ The count of distinct `D_` tokens in `src/` and `include/` (code and comments) w
   CPooledLevelActor__Release), `gScene_unk_30` (three of the 20 `D_800F70A8` files:
   PakMenu_InitSaveGame and its twin, and SaveGame_Build_2, where the member keeps the address in a
   register across the store into the save buffer), `gTotemDefense_warned` (TotemDefense_StartAnim's
-  one-element array view, like the other `gTotemDefense_*`). `values[0][2]` (`D_8012F990`) is read
+  one-element array view, like the other `gTotemDefense_*`), `gContStatus_errno` (Controller_CountConnected: the N64 code matches with `gContStatus[n].errno`, but on the host clang then vectorizes the loop into an aligned 16-byte load of `gContStatus`, whose host address is not 16-aligned: aligncheck found a third site and the whole-game run crashed in the title menu; the `u8 []` field symbol keeps it a byte loop). `values[0][2]` (`D_8012F990`) is read
   through the existing `gLevelScript_values` as a one-row `s32 []`: the real `s32 [2][8]` changes
   Primagen_HandleAnimEvent.
 - Two comments named Rage Wars addresses as `D_` (`D_8010C080`, `D_8010F328` in `structs/sound.h`,

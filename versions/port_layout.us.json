@@ -150,7 +150,7 @@
 {"addr": 2148274240, "flags": 2, "name": ".shared_rodata_func_0045302C", "size": 4, "type": "SHT_NOBITS"},
 {"addr": 2148274988, "flags": 2, "name": ".shared_rodata_func_00455788", "size": 4, "type": "SHT_NOBITS"},
 {"addr": 0, "flags": 0, "name": ".symtab", "size": 291088, "type": "SHT_SYMTAB"},
-{"addr": 0, "flags": 0, "name": ".strtab", "size": 344191, "type": "SHT_STRTAB"},
+{"addr": 0, "flags": 0, "name": ".strtab", "size": 344198, "type": "SHT_STRTAB"},
 {"addr": 0, "flags": 0, "name": ".shstrtab", "size": 3904, "type": "SHT_STRTAB"}
 ],
 "symbols": [
@@ -13692,7 +13692,6 @@
 ["func_296DD0", 2715088, 0, "SHN_ABS", "STT_NOTYPE"],
 ["CGameObjectInstance__LoadGeometry", 2224984, 76, 4, "STT_FUNC"],
 ["SaveGame_Build", 4315280, 408, 17, "STT_FUNC"],
-["D_800F677B", 2148493179, 0, "SHN_ABS", "STT_NOTYPE"],
 ["func_0029ECD0", 2747600, 0, "SHN_ABS", "STT_NOTYPE"],
 ["CPlayer__Hurt", 2397016, 980, 4, "STT_FUNC"],
 ["EnemyAnim_BodyHoleDeath", 2489864, 16, 4, "STT_FUNC"],
@@ -16054,6 +16053,7 @@
 ["VM_ManagerThread", 2680740, 256, 4, "STT_FUNC"],
 ["EnemyAnim_Combat_AFE58", 2467284, 44, 4, "STT_FUNC"],
 ["libultra_ROM_START", 798836, 0, "SHN_ABS", "STT_NOTYPE"],
+["gContStatus_errno", 2148493179, 0, "SHN_ABS", "STT_NOTYPE"],
 ["func_0029E460", 2745440, 0, 4, "STT_FUNC"],
 ["func_285FA8", 2645928, 0, "SHN_ABS", "STT_NOTYPE"],
 ["_timeToSamplesNoRound", 2706712, 60, 4, "STT_FUNC"],
