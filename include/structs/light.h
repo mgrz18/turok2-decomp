@@ -39,4 +39,25 @@ extern f32 gBlendState_m_Color[5];
 /* gBlendFade (0x800AB8C0) is &gBlendState_m_Color[3]: the C reaches it through
  * gBlendState_m_Color[3] / [4] (same code), so it has no declaration of its own. */
 
+/* A light volume of a sector (block 2 of the sector's data,
+ * CISet__GetBlock(hData, 2): a count at 4 and the 0xC0-byte records from 8).
+ * CScene__FindLightsAt returns the ones whose box holds a point,
+ * Lighting_CollectVolumesForModel / Lighting_BuildLitVertices the ones whose
+ * box meets a model's (they were Item / ItemList, WRec / WTab). */
+typedef struct CLightVolume {
+    /* 0x00 */ u8 unk0[0xA0];
+    /* 0xA0 */ CBox m_Bounds;
+    /* 0xB8 */ u8 unkB8[2];
+    /* 0xBA */ u8 unkBA;            /* any set: Lighting_CollectVolumesForModel returns 1 */
+    /* 0xBB */ u8 unkBB[2];
+    /* 0xBD */ u8 unkBD;
+    /* 0xBE */ u8 unkBE[2];
+} CLightVolume; /* size 0xC0 */
+
+typedef struct CLightVolumeTable {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 count;
+    /* 0x8 */ CLightVolume volumes[1];
+} CLightVolumeTable;
+
 #endif
