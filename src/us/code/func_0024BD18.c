@@ -8,7 +8,7 @@ s32 Cinema_IsActive(void);
 void CBarrel__Close(CBarrel *menu);
 void CBarrel__RunStick(CBarrel *menu, CPlayer *player, u32 *input);
 void CBarrel__RunButtons(CBarrel *menu, CPlayer *player, u32 *input);
-void Rumble_SetLink(void *, s32);
+void Rumble_SetLink(struct RumbleEffect *effect, struct RumbleEffect **owner);
 s32 CBarrel__ShouldClose(CBarrel *menu, CPlayer *player);
 
 /* Updates the player's weapon menu: runs it (by stick or by buttons, from
@@ -38,7 +38,7 @@ void CBarrel__Update(CBarrel *menu, CPlayer *player, u32 *input) {
         CBarrel__RunButtons(menu, player, input);
     }
     if (player->m_RequestedWeapon != player->m_Data.m_CurrentWeapon && player->m_pRumble != NULL) {
-        Rumble_SetLink(player->m_pRumble, 0);
+        Rumble_SetLink(player->m_pRumble, NULL);
         player->m_pRumble = NULL;
     }
     switch (menu->m_State) {

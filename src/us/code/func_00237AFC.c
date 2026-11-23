@@ -121,9 +121,10 @@ void ImpactEvent_ApplyBlast(CGameObjectInstance *victim, CGameObjectInstance *so
     hit = 0;
     if (source->header.m_Type == 1 && (source->m_dwFlags & 0x300000)) {
         owner = (CPlayer *)source->m_AI.m_pParent;
-        /* 0x288 is m_WeaponActor on the N64 only (the host keeps the raw offset: unchanged behaviour,
-         * see docs/STRUCTS_TODO.md); the weapon is read unsigned, then sign-extended for 0x22. */
-        if (source == (CGameObjectInstance *) ((u8 *) owner + 0x288) && ((u16)owner->m_Data.m_CurrentWeapon < 2 || (s16)(u16)owner->m_Data.m_CurrentWeapon == 0x22)) {
+        /* The blast comes from the player's own weapon actor (round 23: the member, not the N64
+         * offset 0x288, which on the host fell inside m_CharacterActor); the weapon is read
+         * unsigned, then sign-extended for 0x22. */
+        if (source == &owner->m_WeaponActor && ((u16)owner->m_Data.m_CurrentWeapon < 2 || (s16)(u16)owner->m_Data.m_CurrentWeapon == 0x22)) {
             CVector3 from;
             CVector3 to;
 
