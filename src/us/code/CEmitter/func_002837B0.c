@@ -1,14 +1,10 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x000 */ char pad[0x210];
-    /* 0x210 */ f32 key;
-} Sortable;
+#include "structs/emitter.h"
 
 /* qsort-style comparator: ascending by the float at 0x210. */
-s32 Emitter_CompareHeightAsc(Sortable **a, Sortable **b) {
+s32 Emitter_CompareHeightAsc(CEmitter **a, CEmitter **b) {
     s32 r = 1;
-    if ((*a)->key < (*b)->key) {
+    if ((*a)->m_Height < (*b)->m_Height) {
         r = -1;
     }
     return r;
