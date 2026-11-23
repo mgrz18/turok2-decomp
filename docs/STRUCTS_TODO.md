@@ -23,7 +23,7 @@ different scan, said 717 of 1,699); after the first pass, 612 of 1,557;
 after the second, 534 of 1,416; after the third, 431 of 1,192; after the
 fourth, 291 of 1,013; after round L, 229 of 889 (228 of 863 by the census at
 7340fcdd); after round 21 j3, 174 of 803; after round 22 k3, 148 of 723 (142 of 698 on the
-merged tree); after round 24 m1, 119 of 676. The vector,
+merged tree); after round 24 m1, 115 of 669. The vector,
 intelligence, libultra, Gfx, sound, libaudio, AI state (CAI and its
 var-buffer views), controller, game and engine, weapon, pak, list, cache,
 boss, particle, collision, save, demo, pager, menu, player / owner /
@@ -808,7 +808,7 @@ k2 also changed) had nothing left to do. The census below is regenerated
 ## Round 24, part m1 (done)
 
 Measured with tools/struct_census.py (and a per-name dump of every copy): **141 of 697** local
-typedef names in 2 or more files at d2d07205, **119 of 676** after. Host twins: the 17
+typedef names in 2 or more files at d2d07205, **115 of 669** after. Host twins: the 17
 `T2HostTriple` copies are one header, and the non-`T2_HOFF` twins of OwnedState (4),
 T2SortRecord (2), Blast (2) and the second COnScreen__Construct's Hud view are gone; the
 `#define T2_HOFF_` views are still **62** (tools/unview.py on all of them keeps the same 24 it
@@ -844,11 +844,19 @@ CParticleSystem copies) -> gbi.h `Vtx_t`; PackedRange (RandomInPackedRange) -> p
 DrawScope, raise / lower) -> player.h `CPlayerOverlay`; FontStyle (the two Hud text drawers) and
 Hud (both COnScreen__Construct copies) -> `COnScreen`; Box {min, max} -> vector.h `CBox`.
 
+CAI views by AI type (the Throwable way): Throwable_CalcOrientation (SpinObject / SpinState
+-> CGameObjectInstance / CAI::m_Throwable), WeaponBarrel_Spin_AF324 (SpinState -> CAI
+m_Mode / m_Weapon, the player's controller state for the rumble), TotemDefense's setAnim in
+func_00407F20 / func_0040813C (BossAI -> CAI m_AnimType / m_AnimIndex /
+m_AnimRepeatedCount), Platform_AtStartUpdate / Platform_AtEndUpdate (MotionState -> CAI,
+StateInfo -> CPlatformIntelligence m_dwPlatformFlags / m_GoDelayTime / m_ReturnDelayTime).
+Each had an `#ifdef TARGET_PORT` host body; the member body is now the only one.
+
 **Port note**: the second VM copy of COnScreen__Construct (func_00467A70) wrote the four font
 entries and the two character tables through an N64-offset view (on the host, the wrong words);
 it now has the first copy's body (members), so both copies behave the same on the host.
 
-### What the 119 names are
+### What the 115 names are
 
 Every name still defined in 2 or more files, by what it would take. "Same module" names become
 one definition when tools/merge_module.py merges their module (round 25, m3's table in
@@ -885,9 +893,8 @@ ModeState (Hud); AdecStream (adecHuffDecode); Unk00401C78 (Primagen).
 **Needs more work (one object, header work not done this round)**:
 
 - *CAI views by AI type* (offsets in CAI's range: m_Mode 0x34, m_ModeTime 0x40, m_AnimType
-  0xC4..0xC7, the var buffer 0x10C..): State (WeaponMode, Primagen), SpinState (Throwable,
-  WeaponMode), ActionState (Action, Door), BossAI (TotemDefense), MotionState / StateInfo
-  (Platform), Dest (AI, a CAI twin), B01Info / B01FH (Generator, Turret), B04O, TargetInfo. The way to do them is the
+  0xC4..0xC7, the var buffer 0x10C..): State (WeaponMode, Primagen), ActionState (Action, Door),
+  Dest (AI, a CAI twin), B01Info / B01FH (Generator, Turret), B04O, TargetInfo. The way to do them is the
   Throwable one: a `C<Type>AIVars` in ai_vars.h per AI type, the view replaced by CAI.
 - *Field-symbol views of gLevelScript* (BossCtl, BossWait, LevelScriptF604, LevelScriptF950,
   ModeState0040457C, Wave0040457C, Actor0040457C, Info0040457C: func_0040457C / func_0043D57C,
@@ -905,11 +912,12 @@ ModeState (Hud); AdecStream (adecHuffDecode); Unk00401C78 (Primagen).
   reads them (host twins today).
 - *HitInst* (Sweep, func_0023F880 / func_0023FDF0), *GameplayCamera* (CCamera's clip planes),
   *ObjDef* (the intelligence's flags), *Spawn* (0x38 pos), *Location* (a position and a region),
-  *ShadowActor* / *ShadowParams* / *AnimInfo* (CGameObjectInstance, CLevelActor, CParticle):
-  instance, camera and intelligence views not checked this round.
+  *ShadowActor* / *ShadowParams* / *AnimInfo* (CGameObjectInstance, CLevelActor, CParticle),
+  *Player* (CPlayer host twins in func_0024C47C and func_00271DB4): instance, camera, player
+  and intelligence views not checked this round.
 
 So the README item stays open: the genuinely local names (unrelated objects, libultra's,
-VM-copy pairs, and the same-module ones the merge folds) are most of the 119, but the CAI views,
+VM-copy pairs, and the same-module ones the merge folds) are most of the 119, but the remaining CAI views,
 the level-script views, ScreenRectangle and the animation twins are one object each and want
 header work.
 
@@ -997,7 +1005,7 @@ their own (top 0 of 0).
 
 ## Every local struct name defined in 2 or more files
 
-119 of the 676 local typedef names. "Fields" are the named offsets of the
+115 of the 669 local typedef names. "Fields" are the named offsets of the
 most common layout (pads left out); a body without offset comments is shown
 as written.
 
@@ -1025,7 +1033,6 @@ as written.
 | Attachment | 3 | 3 | 0x00 field0, 0x02 type, 0x04 field4, 0x08 offset, 0x14 params | func_00214B58, func_00267090, func_0026D710 |
 | B01Info | 3 | 2 | `u32 flags; s32 unk4; s16 unk8; s16 unkA; CWord unkC; B01FH unk10; s16 ...` | func_0026342C, func_00263640, func_002628B8 |
 | Bone | 3 | 2 | 0x00 *anim, 0x90 type | func_0022C488, func_00259A4C, func_00259A98 |
-| BossAI | 3 | 2 | 0xC4 animId, 0xC6 anim, 0xC7 unkC7 | func_00407F20, func_0040813C, func_004088B0 |
 | Dest | 3 | 3 | `#define T2_HOFF_Dest(m) __builtin_offsetof(CAI, m) union { struct { u8...` | func_002427E0, func_00242C00, func_00246918 |
 | Job | 3 | 2 | 0x00 result, 0x0C unkC, 0x1C 2 | func_0028A43C, func_0042F670, func_00468570 |
 | KeyLookup | 3 | 2 | 0x00 *posKeys, 0x04 *rotKeys, 0x08 *posTracks, 0x0C *rotTracks, 0x10 offset0, 0x14 offset1, 0x18 rootOffset0, 0x1C rootOffset1, ... | func_00218B10, func_0021B95C, func_0021CDAC |
@@ -1089,7 +1096,6 @@ as written.
 | MenuColorInit | 2 | 1 | `u16 a; u8 pad2[2]; u16 b; u8 pad6[2]; u16 c; u8 padA[3]; u8 d; u8 pad0...` | func_00413230, func_0044C230 |
 | MenuMatchGlobals | 2 | 2 | `u8 unobserved0[0x20]; GameplayCamera *cameras; u8 unobserved24[0x40 - ...` | func_002712E8, func_00271694 |
 | ModeState0040457C | 2 | 2 | `#define T2_HOFF_ModeState0040457C(m) __builtin_offsetof(LevelScriptSta...` | func_0040457C, func_0043D57C |
-| MotionState | 2 | 1 | `u32 flags; u8 pad4[0x3C]; f32 timer;` | func_00264478, func_00264644 |
 | ObjDef | 2 | 2 | `u16 pad0; u16 flags;` | func_0021E03C, func_00268210 |
 | Owner | 2 | 2 | 0xA8 unkA8 | func_00273EB8, func_0022D2FC |
 | PackedBitWords | 2 | 1 | `u32 low; u32 high;` | func_002177DC, func_00217EFC |
@@ -1111,8 +1117,6 @@ as written.
 | Sound | 2 | 2 | 0x0C id | func_0025C5F8, func_00277024 |
 | SoundEvent | 2 | 2 | `CGameObjectInstance *object; char pad4[0x14 - 0x4]; SoundRange *range;...` | func_00256738, func_0026E3A8 |
 | Spawn | 2 | 2 | 0x38 pos[3] | func_00254044, func_0044700C |
-| SpinState | 2 | 2 | `struct { u8 _h_tilt[__builtin_offsetof(CAI, m_VarF32[2])]; f32 tiltAng...` | func_002649A0, func_002591F4 |
-| StateInfo | 2 | 2 | `u8 pad0[0x24]; u32 flags; u8 pad28[0x24]; f32 delay;` | func_00264478, func_00264644 |
 | Target | 2 | 2 | 0x78 unk78, 0x7C unk7C | func_002460FC, func_00455CD0 |
 | Thread | 2 | 2 | 0xD4 *sp | func_0028BDFC, func_0028C0B0 |
 | TimedNode | 2 | 2 | 0x00 *prev, 0x04 *next, 0x08 *item, 0x0C timer | func_002253F8, func_00294C70 |
