@@ -686,7 +686,11 @@ Measured with tools/struct_census.py: **172 of 786** local typedef names in 2 or
 more files at f980f639, **148 of 723** after. Host-view twins (`#define
 T2_HOFF_...`): **99 in 62 files** before, **63 in 38 files** after. Every rewrite keeps
 the N64 code (`tools/asm_diff.py --base f980f639`, 0 differ) and is its own
-commit; the mechanical ones carry the command that re-runs them.
+commit; the mechanical ones carry the command that re-runs them. Checked at the end: clean
+`make verify` OK; the port (Release, gendata rerun with decls.json deleted; `mklayout.py --check` up
+to date; aligncheck only the 2 known GameNoteMenu_SelectYes sites) boots and plays the 3 demos with
+det `6ab97584...` (52,000 lines) and the default whole-game run gives det `dc8126d3...` (600,000
+lines, the one death: line at 263,578); the swoosh self test OK.
 
 Header fixes (each checked over the whole tree with asm_diff):
 
