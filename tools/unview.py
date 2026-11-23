@@ -84,6 +84,8 @@ def convert_from(src, twins, only, hdrs):
     for view in done:
         real, fmap = twins[view]
         inc = f'#include "{hdrs[real]}"\n'
+        # a header the file included only for its host twins is needed on the N64 too now
+        src = src.replace("#ifdef TARGET_PORT\n" + inc + "#endif\n", inc)
         if inc not in src:
             incs = [x.end() for x in re.finditer(r"^#include[^\n]*\n", src, re.M)]
             at = incs[0] if incs else 0
@@ -108,6 +110,8 @@ def convert(src, only, hdrs):
         src = src[:m.start()] + src[m.end():]
     for m, view, real, fmap in done:
         inc = f'#include "{hdrs[real]}"\n'
+        # a header the file included only for its host twins is needed on the N64 too now
+        src = src.replace("#ifdef TARGET_PORT\n" + inc + "#endif\n", inc)
         if inc not in src:
             incs = [x.end() for x in re.finditer(r"^#include[^\n]*\n", src, re.M)]
             at = incs[0] if incs else 0

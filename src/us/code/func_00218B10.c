@@ -15,9 +15,7 @@
  * CAnimationState__GetRootMotion and CAnimationState__FindKeys are Rage Wars imports. */
 #include "common.h"
 #include "structs/vector.h"
-#ifdef TARGET_PORT
 #include "structs/game_object.h"
-#endif
 #include "globals/engine.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
@@ -146,24 +144,9 @@ typedef struct RootClip {
     /* 0x8 */ f32 rate;
 } RootClip;
 
-#ifdef TARGET_PORT
-typedef struct RootActor {
-/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_RootActor(m) __builtin_offsetof(CGameObjectInstance, m)
-    union {
-        struct { u8 _hp_flags[T2_HOFF_RootActor(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
-    };
-} RootActor;
-#else
-typedef struct RootActor {
-    /* 0x00 */ u8 pad0[0xD4];
-    /* 0xD4 */ u32 flags;
-} RootActor;
-#endif
 
 
-void CGameObjectInstance__FireAnimEvents(RootActor *actor, AnimPlayer *anim, f32 from, f32 to);
+void CGameObjectInstance__FireAnimEvents(CGameObjectInstance *actor, AnimPlayer *anim, f32 from, f32 to);
 void CAnimationState__GetBonePosition(AnimPlayer *anim, s32 bone, f32 time, CVector3 *out);
 f32 Angle_Lerp(f32 frac, f32 a, f32 b);
 f32 Angle_Difference(f32 a, f32 b);
@@ -171,7 +154,7 @@ void CVector3__Add(CVector3 *d, CVector3 *a, CVector3 *b);
 void CVector3__Subtract(CVector3 *d, CVector3 *a, CVector3 *b);
 s32 CAnimationState__GetEventCount(AnimPlayer *anim);
 
-void CAnimationState__GetRootMotion(AnimPlayer *anim, CVector3 *delta, f32 *turn, RootActor *actor) {
+void CAnimationState__GetRootMotion(AnimPlayer *anim, CVector3 *delta, f32 *turn, CGameObjectInstance *actor) {
     void *header;
     register RootClip *clip asm("$18");
     CVector3 from;
@@ -190,17 +173,17 @@ void CAnimationState__GetRootMotion(AnimPlayer *anim, CVector3 *delta, f32 *turn
     delta->y = 0;
     delta->z = 0;
     *turn = 0;
-    if (actor->flags & 0x8000000) {
+    if (actor->m_dwFlags & 0x8000000) {
         anim->time = (f32) (anim->frames - 1);
         CGameObjectInstance__FireAnimEvents(actor, anim, 0.0f, anim->time);
-        actor->flags = actor->flags & ~0x8000000;
+        actor->m_dwFlags = actor->m_dwFlags & ~0x8000000;
     }
     clip = CISet__GetBlock(CISet__GetBlock(header, 3), 0);
     CAnimationState__GetBonePosition(anim, 0, anim->time, &from);
     t = anim->time;
     prevAngle = CAnimationState__GetRootYaw(anim, t);
     t1 = anim->time;
-    if (!(actor->flags & 0x8000000)) {
+    if (!(actor->m_dwFlags & 0x8000000)) {
         anim->time = t1 + gFrameIncrement * clip->rate * (1.0f / 15);
     }
     CGameObjectInstance__FireAnimEvents(actor, anim, t1, anim->time);

@@ -6,37 +6,12 @@
 #include "globals/collision.h"
 #include "globals/ai.h"
 #include "protos/ai.h"
-#ifdef TARGET_PORT
 #include "structs/particle.h"
-#endif
 
 /* AI hit callback: a projectile (or its owner) close enough lengthens the
  * wait and becomes the last-heard position; then the projectile type picks a
  * reaction animation (flinch, burn, freeze, shock...) the definition allows. */
 
-#ifdef TARGET_PORT
-typedef struct Projectile {
-/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Projectile(m) __builtin_offsetof(CParticle, m)
-    union {
-        struct { u8 _hp_type[T2_HOFF_Projectile(header.m_nObjType)]; u16 type; }; /* N64 0x2 */
-        struct { u8 _hp_pos[T2_HOFF_Projectile(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_owner[T2_HOFF_Projectile(m_pOwner)]; struct Projectile *owner; }; /* N64 0x10C */
-        struct { u8 _hp_charge[T2_HOFF_Projectile(m_Scale)]; f32 charge; }; /* N64 0x1BC */
-    };
-} Projectile;
-#else
-typedef struct Projectile {
-    /* 0x000 */ u8 pad0[0x2];
-    /* 0x002 */ u16 type;
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x10C - 0x10];
-    /* 0x10C */ struct Projectile *owner;
-    /* 0x110 */ u8 pad110[0x1BC - 0x110];
-    /* 0x1BC */ f32 charge;
-} Projectile;
-#endif
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
@@ -69,9 +44,9 @@ static __inline__ void hearNoise(CGameObjectInstance *actor, CAI *ai, CVector3 *
 
 /* level and delay are function-wide variables shared by the three reactions
  * (their register choices depend on it). */
-void EnemyAI_OnHit(CGameObjectInstance *actor, CAI *ai, Projectile *proj) {
+void EnemyAI_OnHit(CGameObjectInstance *actor, CAI *ai, CParticle *proj) {
     CEnemyIntelligence *info;
-    Projectile *owner;
+    CParticle *owner;
     s32 v;
     f32 t;
     f32 level;
@@ -81,13 +56,13 @@ void EnemyAI_OnHit(CGameObjectInstance *actor, CAI *ai, Projectile *proj) {
     if (ai->m_Health == 0) {
         return;
     }
-    owner = proj->owner;
+    owner = proj->m_pOwner;
     if (owner != NULL) {
-        hearNoise(actor, ai, &owner->pos);
+        hearNoise(actor, ai, &owner->header.m_vPos);
     } else {
-        hearNoise(actor, ai, &proj->pos);
+        hearNoise(actor, ai, &proj->header.m_vPos);
     }
-    switch (proj->type) {
+    switch (proj->header.m_nObjType) {
     case 3:
         if ((info->m_dwFlags & 0x200) && ai->m_Mode != 0x3D) {
             if (--ai->m_TranqHealth == 0) {
@@ -110,7 +85,7 @@ void EnemyAI_OnHit(CGameObjectInstance *actor, CAI *ai, Projectile *proj) {
         }
         break;
     case 0x128:
-        proj->charge = 0.0f;
+        proj->m_Scale = 0.0f;
     case 4:
     case 0x1CC:
     case 0x1CD:
@@ -130,7 +105,7 @@ void EnemyAI_OnHit(CGameObjectInstance *actor, CAI *ai, Projectile *proj) {
                 ai->m_ConditionTimer = MIN(ai->m_ConditionTimer += 15.0f, 300.0f);
             } else {
                 CAI__SetMode(actor, ai, 0x20);
-                ai->m_ConditionTimer = proj->charge * 300.0f + 15.0f;
+                ai->m_ConditionTimer = proj->m_Scale * 300.0f + 15.0f;
             }
         }
         break;
