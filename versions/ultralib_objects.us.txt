@@ -1,7 +1,8 @@
 // libultra modules linked from lib/ultralib (decompals/ultralib, 2.0I libgultra_rom)
 // instead of the game's C; written by tools/ultralib_build.py --write (docs/LIBULTRA.md).
-// module = ultralib file: the game files it replaces in the N64 build
+// module = ultralib file: the game files the N64 build no longer links
 libultra/audio/cspgetstate.c = src/audio/cspgetstate.c: func_0028FA00.c
+libultra/audio/csplayer.c = src/audio/csplayer.c: func_0028FA10.c func_0028FB80.c func_002900B0.c func_00290240.c func_00290ACC.c func_00290C60.c func_00290CCC.c func_00290D5C.c
 libultra/audio/cents2ratio.c = src/audio/cents2ratio.c: func_00290D90.c
 libultra/audio/cspplay.c = src/audio/cspplay.c: func_00290DE0.c
 libultra/audio/cspsetbank.c = src/audio/cspsetbank.c: func_00290E10.c
@@ -13,6 +14,7 @@ libultra/audio/event.c = src/audio/event.c: func_00290F20.c func_00290F9C.c func
 libultra/audio/copy.c = src/audio/copy.c: func_00291270.c
 libultra/audio/heapalloc.c = src/audio/heapalloc.c: func_002912A0.c
 libultra/audio/heapinit.c = src/audio/heapinit.c: func_002912F0.c
+libultra/audio/seqplayer.c = src/audio/seqplayer.c: func_00291330.c func_002914B4.c func_002919F0.c func_00291BF4.c func_0029247C.c func_002924CC.c func_00292530.c func_002925E0.c func_00292640.c func_00292774.c func_002927E8.c func_00292804.c func_00292844.c func_002928F0.c func_002929A0.c func_00292A20.c func_00292A74.c func_00292B94.c func_00292C84.c func_00292D4C.c func_00292DB0.c
 libultra/audio/sndpallocate.c = src/audio/sndpallocate.c: func_00293470.c
 libultra/audio/sndpdeallocate.c = src/audio/sndpdeallocate.c: func_00293530.c
 libultra/audio/sndpgetstate.c = src/audio/sndpgetstate.c: func_00293580.c
@@ -73,6 +75,7 @@ libultra/os/createmesgqueue.c = src/os/createmesgqueue.c: func_0029B030.c
 libultra/os/getcurrfaultthread.c = src/os/getcurrfaultthread.c: func_0029B140.c
 libultra/os/getthreadpri.c = src/os/getthreadpri.c: func_0029B150.c
 libultra/os/gettime.c = src/os/gettime.c: func_0029B170.c
+libultra/io/sirawwrite.c = src/io/sirawwrite.c: func_0029B540.c
 libultra/os/jammesg.c = src/os/jammesg.c: func_0029B5B0.c
 libultra/os/recvmesg.c = src/os/recvmesg.c: func_0029B6F0.c
 libultra/os/sendmesg.c = src/os/sendmesg.c: func_0029B820.c
@@ -84,6 +87,7 @@ libultra/os/virtualtophysical.c = src/os/virtualtophysical.c: func_0029BF80.c
 libultra/io/leointerrupt.c = src/io/leointerrupt.c: func_0029CAF0.c func_0029D000.c func_0029D0D4.c
 libultra/io/epirawdma.c = src/io/epirawdma.c: func_0029D190.c
 libultra/io/devmgr.c = src/io/devmgr.c: func_0029D690.c
+libultra/io/epirawread.c = src/io/epirawread.c: func_0029DA30.c
 libultra/io/epirawwrite.c = src/io/epirawwrite.c: func_0029DBD0.c
 libultra/os/resetglobalintmask.c = src/os/resetglobalintmask.c: func_0029DEE0.c
 libultra/os/setglobalintmask.c = src/os/setglobalintmask.c: func_0029DF30.c

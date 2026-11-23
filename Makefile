@@ -274,16 +274,20 @@ endif
 UL_CPP_FLAGS = -P -undef -Wall -lang-c -nostdinc -D_LANGUAGE_C -DF3DEX_GBI_2 -D__GNUC__=2 \
 	-D_MIPS_SZLONG=32 -D__USE_ISOC99 -DF3DEX_GBI -DBUILD_VERSION=VERSION_I \
 	-DBUILD_VERSION_STRING=\"2.0I\" -D_FINALROM \
-	-I$(UL_DIR) -I$(UL_DIR)/include -I$(UL_DIR)/include/compiler/gcc -I$(UL_DIR)/include/PR
+	-I$(CURDIR)/$(UL_DIR) -I$(CURDIR)/$(UL_DIR)/include \
+	-I$(CURDIR)/$(UL_DIR)/include/compiler/gcc -I$(CURDIR)/$(UL_DIR)/include/PR
 UL_CC_FLAGS  = -quiet -G0 -mips3 -mgas -meb -mno-fix4300 -mhard-float -mcpu=VR4300 \
 	-fforce-addr -fno-builtin -O3 -mfp64 -funsigned-char
 
 $(UL_DIR)/src/%.c:
 	@echo "$@ is missing: run git submodule update --init (docs/BUILD.md)"; exit 1
 
+# From lib/ultralib/src, as ultralib's own build: assert() passes __FILE__, and the ROM has
+# the file names as "audio/csplayer.c", "io/sirawdma.c" ...
 $(BUILD_DIR)/$(UL_DIR)/%.i: $(UL_DIR)/%.c
 	@mkdir -p $(dir $@)
-	$(CPP) -MMD -MP -MT $@ -MF $@.d $(UL_CPP_FLAGS) -o $@ $<
+	cd $(UL_DIR)/src && $(CPP) -MMD -MP -MT $(CURDIR)/$@ -MF $(CURDIR)/$@.d $(UL_CPP_FLAGS) \
+		-o $(CURDIR)/$@ $(patsubst $(UL_DIR)/src/%,%,$<)
 
 $(BUILD_DIR)/$(UL_DIR)/%.s_c: $(BUILD_DIR)/$(UL_DIR)/%.i
 	unix2dos $<
