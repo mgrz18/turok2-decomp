@@ -9,11 +9,10 @@ struct FieldRecAt14 {
     char pad[0x14];
     char *text;
 };
-extern s32 D_801309A8;
 s32 CharNoteMenu_UpdatePrompt_2(struct FieldRecAt14 *field) {
     if (sCharNoteLoad != 0) {
         field->text = sCharNoteMenuText_Load;
-    } else if (D_801309A8 != 0) {
+    } else if (gCharNoteMenuSaving != 0) {
         field->text = sCharNoteMenuText_Delete_B4B94;
     } else {
         field->text = sCharNoteMenuText_Delete_B4B8C;

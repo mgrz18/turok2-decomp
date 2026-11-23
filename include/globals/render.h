@@ -89,4 +89,6 @@ extern f32 sExpansionPakMtx[2][16];   /* per-frame matrices (Mtx) */
 /* The VI mode: the selected mode index */
 extern s16 sViModeIndex;            /* the selected VI mode (osViModeTable index) */
 
+/* Round 24 (m2): BSS words named (versions/names/data_g6.us.txt) */
+
 #endif

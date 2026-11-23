@@ -16,8 +16,6 @@
 #include "protos/ultra.h"
 
 extern u8 gPoolBuffers[];
-extern s32 D_8011F144;
-extern s32 D_8011B114;
 
 extern void InitializeSystemResources(void);
 extern void osCreateViManager(s32 pri);
@@ -92,8 +90,8 @@ void CEngineApp__Main(CEngineApp *e) {
     gPakCheckHasPak = 0;
     gPakCheckDone = 0;
     gPakMenuStartPressed = 0;
-    D_8011F144 = 1;
-    D_8011B114 = 0;
+    gPakBootPending = 1;
+    gPakMenuConfirmed = 0;
     gPakCheckTimer = 120.0f;
     Controller_WatchAllPaks();
     if (SavedPlayers_IsActive()) {

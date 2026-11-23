@@ -6,7 +6,6 @@
 
 extern void adecDecodeFrame(void *arg0);
 extern void adecImdctFrame(void *arg0, void *arg1);
-extern char D_80125EF0;
 void *adecNextFrame(void) {
     struct DecodeState *base = &sAdecState;
     unsigned short *counter;
@@ -22,7 +21,7 @@ void *adecNextFrame(void) {
     if ((unsigned int)(temp & 0xFFFF) >= 6) {
         *counter = 0;
     }
-    slots = &D_80125EF0;
+    slots = (char *) sAdecOutputFrames;
     adecImdctFrame(slots + (*counter << 9), base);
     base->count = base->count - 1;
     return slots + (*counter << 9);

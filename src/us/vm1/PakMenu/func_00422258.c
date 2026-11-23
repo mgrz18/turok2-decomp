@@ -3,7 +3,6 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern s32 D_801309A8;
 
 s32 CharNoteMenu_UpdateName(MenuItem *item) {
     s32 len = 8;
@@ -13,7 +12,7 @@ s32 CharNoteMenu_UpdateName(MenuItem *item) {
     s32 i;
     char c;
 
-    if (D_801309A8 != 0) {
+    if (gCharNoteMenuSaving != 0) {
         item->text = sCharNoteMenuText_NameExt;
     } else {
         item->text = sCharNoteMenuText_Name;

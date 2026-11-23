@@ -41,4 +41,7 @@ extern FftTables *sMdctFft;               /* mdctFftInit(0x80) (adecImdctFrame) 
 extern DecodeState sAdecState;            /* adecStreamOpen, adecNextFrame */
 extern s32 sAdecStopFlag;                 /* sAdecState.count as a symbol of its own (adecGetStopFlag) */
 
+/* Round 24 (m2): BSS words named (versions/names/data_g6.us.txt) */
+extern u8 sAdecOutputFrames[6][0x200]; /* the decoded frames adecHuffDecode returns */
+
 #endif

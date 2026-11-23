@@ -4,7 +4,6 @@
 #include "common.h"
 #include "globals/hostio.h"
 
-extern u32 D_801286D8;
 extern u32 HostIo_ReadWord(u32 address);
 extern void HostIo_WriteWord(u32 address, u32 value);
 extern void HostIo_Delay(u32 n);
@@ -42,7 +41,7 @@ void HostIo_CommandLoop(void) {
                     cont = 0;
                     break;
                 case 0x12:
-                    D_801286D8 &= ~1;
+                    sHostIoSavedSR &= ~1;
                     sHostIoStopped = 0;
                     sHostIoResumeAllowed = 0;
                     HostIo_SetSR(HostIo_GetSR() & ~1);

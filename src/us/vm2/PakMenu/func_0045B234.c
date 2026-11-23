@@ -2,16 +2,16 @@
 #include "common.h"
 #include "globals/menu_text.h"
 #include "structs/menu.h"
+extern s32 gCharNoteMenuSaving; /* local: globals/pak.h declares it; this file views gPakProfileRead_character, which the header types otherwise */
 
 extern s8 gPakProfileRead_character[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern s32 D_801309A8;
 
 s32 CharNoteMenu_UpdateType_2(MenuItem *item) {
     char *src;
     char *dst;
     s32 i;
 
-    if (D_801309A8 != 0) {
+    if (gCharNoteMenuSaving != 0) {
         item->text = sCharNoteMenuText_Empty;
     } else {
         item->text = sCharNoteMenuText_Type;

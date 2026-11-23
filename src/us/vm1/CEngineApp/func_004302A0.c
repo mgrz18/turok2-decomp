@@ -3,12 +3,12 @@
 #include "structs/gbi.h"
 
 
-extern Vtx_t D_8011AD48[4];
+extern Vtx_t gUnitQuadVtx[4]; /* local: no header declares it (globals/render.h has no Vtx_t) */
 
 /* Builds a unit quad in the XZ plane, white, textured 32x32 (S10.5 texture coordinates). */
 void Render_InitUnitQuad(void) {
     s32 i;
-    Vtx_t *v = D_8011AD48;
+    Vtx_t *v = gUnitQuadVtx;
 
     v[0].ob[0] = -1;
     v[0].ob[2] = 1;

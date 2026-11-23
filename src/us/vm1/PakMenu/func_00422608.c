@@ -14,12 +14,11 @@
 #ifdef TARGET_PORT
 #else
 #endif
-extern s32 D_801309A8;
 
 s32 CharNoteMenu_UpdatePrompt(MenuItem *arg0) {
     if (sCharNoteLoad != 0) {
         arg0->table = T2_TEXT(sCharNoteMenuText_Load);
-    } else if (D_801309A8 != 0) {
+    } else if (gCharNoteMenuSaving != 0) {
         arg0->table = T2_TEXT(sCharNoteMenuText_Delete_B4B94);
     } else {
         arg0->table = T2_TEXT(sCharNoteMenuText_Delete_B4B8C);

@@ -5,11 +5,10 @@
 #include "globals/menu_text.h"
 #include "globals/pak.h"
 
-extern s32 D_801309A8;
 s32 CharNoteMenu_UpdateTitle(struct FieldRecAt14 *field) {
     if (sCharNoteLoad != 0) {
         field->text = sCharNoteMenuText_NoteInfo;
-    } else if (D_801309A8 != 0) {
+    } else if (gCharNoteMenuSaving != 0) {
         field->text = sCharNoteMenuText_DeleteNote_B4AF8;
     } else {
         field->text = sCharNoteMenuText_DeleteNote_B4AEC;

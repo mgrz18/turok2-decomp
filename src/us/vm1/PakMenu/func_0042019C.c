@@ -15,8 +15,6 @@
 
 /* Controller pak menu: stops the pak sounds and shows the message for the pak's state. */
 
-extern s32 D_8011F144;
-extern s32 D_8011B114;
 void CCache__Flush(s32 a);
 void CCache__Deallocate(sptr a, sptr b);
 CPlayer *CPlayerPool__FindByController(void *a, void *b);
@@ -53,8 +51,8 @@ s32 PakMenu_SelectCancel(s32 a0, Menu *arg) {
     if (gPakMenuAnyPak != 0) {
         gPakCheckDone = 0;
         gPakMenuStartPressed = 0;
-        D_8011F144 = 1;
-        D_8011B114 = 0;
+        gPakBootPending = 1;
+        gPakMenuConfirmed = 0;
         MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakSaveGameAnyPakMenuDesc, 0, (sptr)arg->controller, 0);
         return 1;
     }

@@ -5,10 +5,9 @@
 #include "globals/pak.h"
 
 extern void CharNoteMenu_InitSave(struct RecordRecAtCV1 *record);
-extern s32 D_801309A8;
 void CharNoteMenu_InitSave(struct RecordRecAtCV1 *record) {
     record->target->first &= ~0x01800000;
     sCharNoteLoad = 0;
-    D_801309A8 = 1;
+    gCharNoteMenuSaving = 1;
     record->target->second &= ~0x01800000;
 }

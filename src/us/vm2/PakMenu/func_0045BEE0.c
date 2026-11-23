@@ -5,7 +5,6 @@
 
 void Controller_WatchPak(s32 port);
 
-extern s32 D_801309AC;
 
 static __inline__ void GetPort(Menu *event, s32 *port) {
     if (gPakMenuAnyPak != 0) {
@@ -18,7 +17,7 @@ static __inline__ void GetPort(Menu *event, s32 *port) {
 void SavePortalMenu_InitB_2(Menu *event) {
     s32 port;
 
-    D_801309AC = 0;
+    sSavePortalDone = 0;
     gSavePortalActive = 1;
     gPakMenuIsSave = 1;
     gPakMenuIsProfile = 0;
