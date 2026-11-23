@@ -157,8 +157,11 @@ How it is built:
   (`objcopy`, Makefile): the game's names for two static functions
   (`__CSPSetUsptFromTempo` is csplayer.c's `__setUsptFromTempo`,
   `__osClearPage_2`), so the ELF types them as functions for
-  `tools/port/gendata.py` (an untyped address became port data), and the
-  `.data=.rodata` renames above. Linking
+  `tools/port/gendata.py` (an untyped address became port data); the
+  `.data=.rodata` renames above; and the two names the game C uses inside
+  seqplayer.c's `.rodata` (`sSeqPlayerAssertExpr`, `sSeqPlayerAssertFile`,
+  `objcopy --add-symbol`). Every named symbol of `build/ref.elf` is in the
+  new ELF at the same address, the swapped pair excepted. Linking
   `synsetvol.c` showed that `_timeToSamples` and `_timeToSamplesNoRound` had
   their names swapped in the game (0x00294C30 cuts to 16 samples: ultralib's
   `_timeToSamples`); they are renamed.
@@ -193,6 +196,6 @@ path the linker script could pick from.
 is typed for the host (`sptr`, the port's views), ultralib's assumes 32-bit
 pointers, and port/runtime replaces the kernel parts anyway. Those files are
 still in `src/us/code`, compile to the same code as before and are not linked
-by the N64 build (the list says which). 118 game files, which
+by the N64 build (the list says which). 121 game files, which
 neither build linked any more (the kernel/VI/PI/SI/AI files port/runtime
-replaces, the second VM module's copies, `sprintf`), are deleted.
+replaces, motor.c's three, the second VM module's copies, `sprintf`), are deleted.
