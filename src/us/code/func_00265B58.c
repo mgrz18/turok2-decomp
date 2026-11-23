@@ -2,12 +2,11 @@
 #include "globals/scene.h"
 #include "protos/scene.h"
 #include "protos/game.h"
+#include "structs/word.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00205324.c, func_00205324.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef union M1IF { s32 i; f32 f; } M1IF;
-typedef union M1W4 { s32 i; f32 f; s16 h[2]; u16 hu[2]; u8 b[4]; u32 u; } M1W4;
 typedef struct M1Info M1Info;
 typedef struct M1Def M1Def;
 typedef struct M1Actor M1Actor;
@@ -15,25 +14,25 @@ typedef struct M1State M1State;
 typedef struct M1Ref M1Ref;
 struct M1Info {
                 u32 flags;
-                M1W4 unk4;
+                CWord unk4;
                 s8 b8;
                 u8 pad9[0x3];
                 s32 unkC;
                 u8 pad10[0x8];
                 s32 unk18;
                 s32 unk1C;
-                M1W4 unk20;
-                M1W4 unk24;
-                M1W4 unk28;
+                CWord unk20;
+                CWord unk24;
+                CWord unk28;
                 f32 f2C;
                 f32 f30;
                 f32 f34;
                 u8 pad38[0x4];
                 f32 f3C;
-                M1W4 unk40;
+                CWord unk40;
                 f32 f44;
-                M1W4 unk48;
-                M1W4 unk4C;
+                CWord unk48;
+                CWord unk4C;
                 u8 b50[4];
                 f32 f54;
                 f32 f58;
@@ -107,9 +106,9 @@ struct M1State {
                 u8 pad100[0x8];
                 void (*fn108)();
                 u8 pad10C[0x18];
-                M1IF unk124;
-                M1IF unk128;
-                M1IF unk12C;
+                CWord unk124;
+                CWord unk128;
+                CWord unk12C;
                 CVector3 vec130;
                 f32 f13C;
 };

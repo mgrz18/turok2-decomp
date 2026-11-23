@@ -6,10 +6,8 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "protos/ai.h"
+#include "structs/vector.h"
 
-typedef struct {
-    f32 x, y, z;
-} Vec3_0040457C;
 
 typedef struct {
     /* 0x00 */ u8 flag;
@@ -100,27 +98,6 @@ typedef struct {
 } ModeState0040457C;
 #endif
 
-#ifdef TARGET_PORT
-typedef struct Entity0040457C {
-/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Entity0040457C(m) __builtin_offsetof(CGameObjectInstance, m)
-    union {
-        struct { u8 _hp_unk0[T2_HOFF_Entity0040457C(header)]; s32 unk0; }; /* N64 0x0 */
-        struct { u8 _hp_pos[T2_HOFF_Entity0040457C(header.m_vPos)]; Vec3_0040457C pos; }; /* N64 0x4 */
-        struct { u8 _hp_region[T2_HOFF_Entity0040457C(header.m_pCurrentRegion)]; sptr region; }; /* N64 0x10 */
-        struct { u8 _hp_rot[T2_HOFF_Entity0040457C(m_vVelocity)]; Vec3_0040457C rot; }; /* N64 0x18 */
-    };
-} Entity0040457C;
-#else
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ Vec3_0040457C pos;
-    /* 0x10 */ s32 region;
-    /* 0x14 */ u8 pad14[0x18 - 0x14];
-    /* 0x18 */ Vec3_0040457C rot;
-} Entity0040457C;
-#endif
 
 #ifdef TARGET_PORT
 typedef struct Info0040457C {
@@ -142,37 +119,37 @@ typedef struct {
 
 extern ModeState0040457C gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 D_800F1F50;
-Entity0040457C *CPlayerPool__FindNearest(void *game, Vec3_0040457C pos);
+CGameObjectInstance *CPlayerPool__FindNearest(void *game, CVector3 pos);
 f32 Random_Blend(f32 lo, f32 hi);
-sptr CInstancePool__Spawn(void *a0, s32 a1, s32 model, sptr handle, sptr region, Vec3_0040457C pos, f32 a6, Vec3_0040457C rot, Vec3_0040457C scale, sptr a9);
-void AI_UpdateTargets(Entity0040457C *actor, void *level, Info0040457C *info, s32 a3, s32 a4);
+sptr CInstancePool__Spawn(void *a0, s32 a1, s32 model, sptr handle, sptr region, CVector3 pos, f32 a6, CVector3 rot, CVector3 scale, sptr a9);
+void AI_UpdateTargets(CGameObjectInstance *actor, void *level, Info0040457C *info, s32 a3, s32 a4);
 void Primagen_NextSpawnStep(void);
-void Primagen_RunSpawnStep(Entity0040457C *actor, void *level, s32 a2);
+void Primagen_RunSpawnStep(CGameObjectInstance *actor, void *level, s32 a2);
 void Primagen_NextSoundStep(void);
-void Primagen_RunSoundStep(Entity0040457C *actor, void *level, s32 a2);
+void Primagen_RunSoundStep(CGameObjectInstance *actor, void *level, s32 a2);
 
 static __inline__ Wave0040457C *CurrentWave(void) {
     return (Wave0040457C *)(gLevelScript.wave * sizeof(Wave0040457C) + (sptr)gLevelScript.waves);
 }
 
-void Primagen_UpdateSpawner(Entity0040457C *actor, void *level) {
+void Primagen_UpdateSpawner(CGameObjectInstance *actor, void *level) {
     Info0040457C info;
-    Vec3_0040457C scale;
-    Vec3_0040457C pos;
+    CVector3 scale;
+    CVector3 pos;
     s32 nextWave = 0;
-    Entity0040457C *player;
+    CGameObjectInstance *player;
     CListedInstance *enemy;
     Wave0040457C *wave;
     s32 extra;
     f32 delay;
     s32 *flags;
 
-    player = CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, actor->pos);
+    player = CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, actor->header.m_vPos);
     if (player == NULL) {
         return;
     }
     if (gLevelScript.resetRegion != 0) {
-        gLevelScript.region = player->region;
+        gLevelScript.region = player->header.m_pCurrentRegion;
         gLevelScript.resetRegion = 0;
     }
     if (!gLevelScript.doorsOpen) {
@@ -211,7 +188,7 @@ void Primagen_UpdateSpawner(Entity0040457C *actor, void *level) {
         scale.x = 2.0f;
         scale.y = 2.0f;
         scale.z = 2.0f;
-        if (CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->rot,
+        if (CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->m_vVelocity,
                           scale, 0)) {
             gLevelScript.spawnsLeft--;
             if (gLevelScript.waves != NULL) {
@@ -232,7 +209,7 @@ void Primagen_UpdateSpawner(Entity0040457C *actor, void *level) {
         scale.x = 2.0f;
         scale.y = 2.0f;
         scale.z = 2.0f;
-        if (CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->rot,
+        if (CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->m_vVelocity,
                           scale, 0)) {
             gLevelScript.spawnsLeft--;
             if (gLevelScript.waves != NULL) {

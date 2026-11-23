@@ -23,4 +23,13 @@ typedef struct {
 
 typedef f32 CMtxF[4][4];
 
+/* An axis-aligned box. gCameraVisibleBox is the box of what the active cameras can
+ * see (widened for animation), gCameraViewBox their plain view boxes
+ * (CCameraPool__Advance builds both); an object is drawn or tested when its box
+ * (CGameObjectInstance m_vMin / m_vMax) meets it. */
+typedef struct CBox {
+    /* 0x00 */ CVector3 m_vMin;
+    /* 0x0C */ CVector3 m_vMax;
+} CBox; /* size 0x18 */
+
 #endif

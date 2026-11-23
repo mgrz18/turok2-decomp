@@ -7,26 +7,9 @@
 #include "common.h"
 #include "structs/world.h"
 #include "protos/iset.h"
-typedef struct Box3 {
-                CVector3 mn;
-                CVector3 mx;
-} Box3;
-typedef struct WRec {
-                u8 pad0[0xA0];
-                Box3 box;
-                u8 padB8[0x2];
-                u8 bBA;
-                u8 padBB[0x2];
-                u8 bBD;
-                u8 padBE[0x2];
-} WRec;
-typedef struct WTab {
-                u8 pad0[0x4];
-                s32 count;
-                WRec r[1];
-} WTab;
+#include "structs/light.h"
 typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
-s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
+s32 Lighting_CollectVolumes(CBox *q, CLightVolume **out, s32 *cnt)
 {
   s32 hashes[64];
   CSceneSector *list[64];
@@ -40,8 +23,8 @@ s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
   s32 sum;
   s32 dup;
   s32 m;
-  WTab *tab;
-  WRec *rec;
+  CLightVolumeTable *tab;
+  CLightVolume *rec;
   register M5Cell *c asm("$3");
   s32 *wp;
   s32 off;
@@ -63,7 +46,7 @@ s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
       e = (CSceneSector *) (((u8 *) g) + off);
 #endif
       c = e->m_pBounds;
-      if ((((c->x1 > q->mn.x) && (c->x0 < q->mx.x)) && (c->z1 > q->mn.z)) && (c->z0 < q->mx.z))
+      if ((((c->x1 > q->m_vMin.x) && (c->x0 < q->m_vMax.x)) && (c->z1 > q->m_vMin.z)) && (c->z0 < q->m_vMax.z))
       {
         list[ncell] = e;
         ncell++;
@@ -78,14 +61,14 @@ s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
     tab = CISet__GetBlock(*list[0]->m_hData, 2);
     j = tab->count;
     j--;
-    rec = tab->r;
+    rec = tab->volumes;
     for (; j != (-1); j--)
     {
-      if ((((((q->mx.x > rec->box.mn.x) && (q->mn.x < rec->box.mx.x)) && (q->mx.z > rec->box.mn.z)) && (q->mn.z < rec->box.mx.z)) && (q->mx.y > rec->box.mn.y)) && (q->mn.y < rec->box.mx.y))
+      if ((((((q->m_vMax.x > rec->m_Bounds.m_vMin.x) && (q->m_vMin.x < rec->m_Bounds.m_vMax.x)) && (q->m_vMax.z > rec->m_Bounds.m_vMin.z)) && (q->m_vMin.z < rec->m_Bounds.m_vMax.z)) && (q->m_vMax.y > rec->m_Bounds.m_vMin.y)) && (q->m_vMin.y < rec->m_Bounds.m_vMax.y))
       {
         out[n] = rec;
         n++;
-        if (rec->bBA != 0)
+        if (rec->unkBA != 0)
         {
           ret = 1;
         }
@@ -109,10 +92,10 @@ s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
       tab = CISet__GetBlock(*list[i]->m_hData, 2);
       j = tab->count;
       j--;
-      rec = tab->r;
+      rec = tab->volumes;
       for (; j != (-1); j--)
       {
-        if ((((((q->mx.x > rec->box.mn.x) && (q->mn.x < rec->box.mx.x)) && (q->mx.z > rec->box.mn.z)) && (q->mn.z < rec->box.mx.z)) && (q->mx.y > rec->box.mn.y)) && (q->mn.y < rec->box.mx.y))
+        if ((((((q->m_vMax.x > rec->m_Bounds.m_vMin.x) && (q->m_vMin.x < rec->m_Bounds.m_vMax.x)) && (q->m_vMax.z > rec->m_Bounds.m_vMin.z)) && (q->m_vMin.z < rec->m_Bounds.m_vMax.z)) && (q->m_vMax.y > rec->m_Bounds.m_vMin.y)) && (q->m_vMin.y < rec->m_Bounds.m_vMax.y))
         {
           sum = 0;
           {
@@ -140,7 +123,7 @@ s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
             out[n] = rec;
             hashes[n] = sum;
             n++;
-            if (rec->bBA != 0)
+            if (rec->unkBA != 0)
             {
               ret = 1;
             }

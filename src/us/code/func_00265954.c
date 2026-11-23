@@ -11,38 +11,12 @@
 #include "globals/ai.h"
 
 
-#ifdef TARGET_PORT
-typedef struct ActionState {
-/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_ActionState(m) __builtin_offsetof(CAI, m)
-    union {
-        struct { u8 _hp_table[T2_HOFF_ActionState(m_pModeTable)]; void *table; }; /* N64 0x2C */
-        struct { u8 _hp_anim[T2_HOFF_ActionState(m_AnimIndex)]; u8 anim; }; /* N64 0xC6 */
-        struct { u8 _hp_active[T2_HOFF_ActionState(m_AnimRepeatedCount)]; s8 active; }; /* N64 0xC7 */
-        struct { u8 _hp_update[T2_HOFF_ActionState(m_pfStep)]; void (*update)(CGameObjectInstance *, void *); }; /* N64 0xF0 */
-        struct { u8 _hp_onEvent[T2_HOFF_ActionState(m_pfHurt)]; void (*onEvent)(CGameObjectInstance *, void *); }; /* N64 0xF8 */
-    };
-} ActionState;
-#else
-typedef struct {
-    /* 0x00 */ u8 pad0[0x2C];
-    /* 0x2C */ void *table;
-    /* 0x30 */ u8 pad30[0x96];
-    /* 0xC6 */ u8 anim;
-    /* 0xC7 */ s8 active;
-    /* 0xC8 */ u8 padC8[0x28];
-    /* 0xF0 */ void (*update)(CGameObjectInstance *, void *);
-    /* 0xF4 */ u8 padF4[4];
-    /* 0xF8 */ void (*onEvent)(CGameObjectInstance *, void *);
-} ActionState;
-#endif
 
 /* Has the actor's animation for this state played up to `scale` of its length? */
-s32 AI_AnimReached(CGameObjectInstance *actor, ActionState *state, f32 scale) {
+s32 AI_AnimReached(CGameObjectInstance *actor, CAI *state, f32 scale) {
     if (actor->m_nAnims == 1) return 1;
-    if (actor->m_CurrentAnimation.m_nAnimIndex != (s8) state->anim || actor->m_CurrentAnimation.m_nRequestedAnimIndex != (s8) state->anim) return 0;
-    if (state->active != 0 && !(actor->m_dwFlags & 0x400)) return 1;
+    if (actor->m_CurrentAnimation.m_nAnimIndex != (s8) state->m_AnimIndex || actor->m_CurrentAnimation.m_nRequestedAnimIndex != (s8) state->m_AnimIndex) return 0;
+    if (state->m_AnimRepeatedCount != 0 && !(actor->m_dwFlags & 0x400)) return 1;
     if (actor->m_CurrentAnimation.m_nFrames < 3 && (actor->m_dwFlags & 0x400)) {
         return (f32) actor->m_BlendLength * scale <= actor->m_BlendPercent;
     } else {

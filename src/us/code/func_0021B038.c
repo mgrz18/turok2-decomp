@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "structs/game_object.h"
 #include "globals/scene.h"
 #include "globals/math.h"
 
@@ -12,37 +13,13 @@ typedef struct B10Mt {
     f32 m[16];
 } B10Mt;
 /* Turok 2 layout (Rage Wars: pos 0x8, f70 0x70, flags 0x100, f174 0x174). */
-#ifdef TARGET_PORT
-typedef struct B10Obj {
-/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_B10Obj(m) __builtin_offsetof(CGameObjectInstance, m)
-    union {
-        struct { u8 _hp_pos[T2_HOFF_B10Obj(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_f54[T2_HOFF_B10Obj(m_CollisionYOffset)]; f32 f54; }; /* N64 0x54 */
-        struct { u8 _hp_flags[T2_HOFF_B10Obj(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
-        struct { u8 _hp_f144[T2_HOFF_B10Obj(m_AI.m_Health)]; s32 f144; }; /* N64 0x144 */
-    };
-} B10Obj;
-#else
-typedef struct B10Obj {
-    u8 pad0[0x4];
-    CVector3 pos;              /* 0x004 */
-    u8 pad10[0x54 - 0x10];
-    f32 f54;                /* 0x054 */
-    u8 pad58[0xD4 - 0x58];
-    u32 flags;              /* 0x0D4 */
-    u8 padD8[0x144 - 0xD8];
-    s32 f144;               /* 0x144 */
-} B10Obj;
-#endif
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
 #define CGameObjectInstance__GetRotation CGameObjectInstance__GetRotation_sret
 #endif
-void CGameObjectInstance__GetRotation(B10Q4 *out, B10Obj *o);
-f32 GameObject_GetCollisionHeight(B10Obj *o);
+void CGameObjectInstance__GetRotation(B10Q4 *out, CGameObjectInstance *o);
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *o);
 void CVector3__Subtract(CVector3 *o, CVector3 *a, CVector3 *b);
 void CVector3__Cross(CVector3 *o, CVector3 *a, CVector3 *b);
 void CVector3__Normalize(CVector3 *v);
@@ -51,7 +28,7 @@ void CQuaternion__Multiply(B10Q4 *o, B10Q4 *a, B10Q4 *b);
 void CQuaternion__ToMatrix(B10Q4 *q, B10Mt *m);
 f32 Math_AcosLookup(f32 x);
 f32 func_00298470(f32 x); /* sqrtf */
-B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 angle) {
+B10Q4 *func_0021B038(B10Q4 *out, CGameObjectInstance *self, CVector3 dir, B10Q4 *outq, f32 angle) {
     CVector3 v10;
     CVector3 v20;
     CVector3 v30;
@@ -62,8 +39,8 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
     B10Q4 q80;
     B10Q4 q90;
     B10Mt mA0;
-    B10Obj *best;
-    B10Obj *obj;
+    CGameObjectInstance *best;
+    CGameObjectInstance *obj;
     s32 i;
     s32 n;
     f32 thr;
@@ -95,14 +72,14 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
         if (obj == self) {
             continue;
         }
-        if (obj->flags & 1) {
+        if (obj->m_dwFlags & 1) {
             continue;
         }
-        if (obj->f144 == 0) {
+        if (obj->m_AI.m_Health == 0) {
             continue;
         }
-        v60 = obj->pos;
-        v60.y = v60.y + obj->f54;
+        v60 = obj->header.m_vPos;
+        v60.y = v60.y + obj->m_CollisionYOffset;
         v60.y = v60.y + GameObject_GetCollisionHeight(obj) * 0.5f;
         CVector3__Subtract(&v10, &v60, &dir);
         CVector3__Normalize(&v10);

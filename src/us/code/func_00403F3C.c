@@ -10,22 +10,6 @@ typedef struct {
     f32 x, y, z;
 } Vec3_00403F3C;
 
-#ifdef TARGET_PORT
-typedef struct Actor00403F3C {
-/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Actor00403F3C(m) __builtin_offsetof(CGameObjectInstance, m)
-    union {
-        struct { u8 _hp_unk0[T2_HOFF_Actor00403F3C(header)]; s32 unk0; }; /* N64 0x0 */
-        struct { u8 _hp_pos[T2_HOFF_Actor00403F3C(header.m_vPos)]; Vec3_00403F3C pos; }; /* N64 0x4 */
-    };
-} Actor00403F3C;
-#else
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ Vec3_00403F3C pos;
-} Actor00403F3C;
-#endif
 
 #ifdef TARGET_PORT
 typedef struct Def00403F3C {
@@ -33,13 +17,13 @@ typedef struct Def00403F3C {
  * member of one union, placed by __builtin_offsetof of the member it reads */
 #define T2_HOFF_Def00403F3C(m) __builtin_offsetof(CAIModeInfo, m)
     union {
-        struct { u8 _hp_onReset[T2_HOFF_Def00403F3C(m_pfCallback)]; void (*onReset)(Actor00403F3C *actor, void *level); }; /* N64 0x8 */
+        struct { u8 _hp_onReset[T2_HOFF_Def00403F3C(m_pfCallback)]; void (*onReset)(CGameObjectInstance *actor, void *level); }; /* N64 0x8 */
     };
 } Def00403F3C;
 #else
 typedef struct {
     /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ void (*onReset)(Actor00403F3C *actor, void *level);
+    /* 0x08 */ void (*onReset)(CGameObjectInstance *actor, void *level);
 } Def00403F3C;
 #endif
 
@@ -65,12 +49,12 @@ typedef struct {
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define AI_TurnHeadToTarget AI_TurnHeadToTarget_i
 #endif
-void AI_TurnHeadToTarget(Actor00403F3C *actor, Level00403F3C *level, s32 a2);
+void AI_TurnHeadToTarget(CGameObjectInstance *actor, Level00403F3C *level, s32 a2);
 void Animator_Update(void *light);
 s16 WeightedTable_PickStatic(void *table);
 void Primagen_SpawnTossedObject(s16 type, s32 a1, Vec3_00403F3C offset);
-void Primagen_UpdateHealth(Actor00403F3C *actor, Level00403F3C *level);
-void Primagen_UpdateSpawner(Actor00403F3C *actor, Level00403F3C *level);
+void Primagen_UpdateHealth(CGameObjectInstance *actor, Level00403F3C *level);
+void Primagen_UpdateSpawner(CGameObjectInstance *actor, Level00403F3C *level);
 void COnScreen__SetBossPercent(void *a0, s32 percent);
 
 #define COUNT_DOWN(t)              \
@@ -78,7 +62,7 @@ void COnScreen__SetBossPercent(void *a0, s32 percent);
         (t) -= gFrameIncrement;         \
     }
 
-void Primagen_Step(Actor00403F3C *actor, Level00403F3C *level) {
+void Primagen_Step(CGameObjectInstance *actor, Level00403F3C *level) {
     Vec3_00403F3C offset;
     s32 type;
     s32 i;
@@ -159,7 +143,7 @@ void Primagen_Step(Actor00403F3C *actor, Level00403F3C *level) {
     Primagen_UpdateHealth(actor, level);
     Primagen_UpdateSpawner(actor, level);
     COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, gLevelScript.total * 100 / gLevelScript.bonus);
-    if (actor->pos.y < -204.79999f) {
+    if (actor->header.m_vPos.y < -204.79999f) {
         gLevelScript.bossMode = 11;
         gLevelScript.dest.x = 0.0f;
         gLevelScript.dest.y = 0.0f;

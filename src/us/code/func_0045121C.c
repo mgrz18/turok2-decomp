@@ -2,71 +2,30 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_0043E65C.c, func_0043E65C.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned int u32;
-typedef signed int s32;
-#ifndef COMMON_H
-#ifdef TARGET_PORT
-typedef __INTPTR_TYPE__ sptr;
-typedef __UINTPTR_TYPE__ uptr;
-#else
-typedef signed int sptr;
-typedef unsigned int uptr;
-#endif
-#endif
-typedef struct S10Ctrl {
-               s32 active;
-               s8 port;
-               u8 pad5[0x224 - 5];
-} S10Ctrl;
-typedef struct S10Sub {
-               u8 pad0[0x30];
-               s8 b30;        /* 0x30 (player options) */
-} S10Sub;
-typedef struct S10Ctx {
-                u8 pad0[0x518];
-                S10Sub *sub;    /* 0x518: player options */
-                u8 *f51C;
-                s32 f520;
-} S10Ctx;
-typedef struct S10Flags {
-               u8 pad0[0x58];
-               u32 flags;
-} S10Flags;
-typedef struct S10Menu {
-               s16 state;
-               u8 pad2[0xA];
-               S10Flags *fC;
-               u8 pad10[0xC];
-               S10Ctx *ctx;
-               S10Ctrl *ctrl;
-} S10Menu;
-typedef struct S10Pair {
-               s16 v;
-               s16 w;
-} S10Pair;
+#include "common.h"
+#include "structs/player.h"
+#include "structs/menu.h"
+
 extern s32 Controller_ConfirmPressed(void *p);
-extern s32 Menu_StepValueLR_2(S10Menu *a, s32 cur, s32 step, s32 lo, s32 hi, s32 wrap);
-extern void CPlayer__SetCharacter_2(S10Ctx *c, s32 v);
+extern s32 Menu_StepValueLR_2(Menu *a, s32 cur, s32 step, s32 lo, s32 hi, s32 wrap);
+extern void CPlayer__SetCharacter_2(CPlayer *player, s32 v);
 extern void MenuItem_SetModel_2(void *a, s32 b, s32 c);
 extern void Sound__Play2D(s32 a);
 extern void MenuPool_OpenChildMenu_2(sptr a, sptr b, void *c);
-extern S10Pair D_800C1E7A[];
-s32 CharacterMenu_SelectCharacter_2(void *x, S10Menu *m, void *y) {
-    S10Ctx *ctx = m->ctx;
-    S10Sub *sub = ctx->sub;
-    if (Controller_ConfirmPressed(m->ctrl)) {
-        CPlayer__SetCharacter_2(ctx, sub->b30);
-        Sound__Play2D(D_800C1E7A[ctx->f520].v);
-        MenuPool_OpenChildMenu_2((s32)y, (s32)m, &gPlayerSetupMenuDesc_2);
+extern s16 D_800C1E7A[][2];     /* 2 bytes into the module copy of gCharacterSelectSounds: [i][0] is the sound */
+s32 CharacterMenu_SelectCharacter_2(void *x, Menu *m, void *y) {
+    CPlayer *player = m->player;
+    CPlayerOptions *options = player->m_pOptions;
+    if (Controller_ConfirmPressed(m->controller)) {
+        CPlayer__SetCharacter_2(player, options->m_nCharacter);
+        Sound__Play2D(D_800C1E7A[player->m_Data.m_nDeathmatchCharacter][0]);
+        MenuPool_OpenChildMenu_2((sptr)y, (sptr)m, &gPlayerSetupMenuDesc_2);
         return 1;
     } else {
-        s8 v = Menu_StepValueLR_2(m, sub->b30, 1, 0, 0xA, 1);
-        sub->b30 = v;
-        CPlayer__SetCharacter_2(ctx, v);
-        MenuItem_SetModel_2(x, 0xB, sub->b30);
+        s8 v = Menu_StepValueLR_2(m, options->m_nCharacter, 1, 0, 0xA, 1);
+        options->m_nCharacter = v;
+        CPlayer__SetCharacter_2(player, v);
+        MenuItem_SetModel_2(x, 0xB, options->m_nCharacter);
         return 0;
     }
 }

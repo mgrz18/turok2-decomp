@@ -2,18 +2,18 @@
 #include "structs/game_object.h"
 #include "globals/game.h"
 #include "protos/ai.h"
+#include "structs/word.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00205F18.c, func_00205F18.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 typedef union B01FH { f32 f; s32 i; s16 h; } B01FH;
-typedef union B01W4 { s32 i; f32 f; s16 h[2]; u8 b[4]; } B01W4;
 typedef struct B01Info {
                 u32 flags;
                 s32 unk4;
                 s16 unk8;
                 s16 unkA;
-                B01W4 unkC;
+                CWord unkC;
                 B01FH unk10;
                 s16 unk14;
                 s16 unk16;
@@ -25,7 +25,7 @@ typedef struct B01Info {
                 u8 pad28[0x4];
                 s32 unk2C;
                 s32 unk30;
-                B01W4 unk34;
+                CWord unk34;
                 s32 unk38;
                 s32 unk3C;
                 B01FH unk40;

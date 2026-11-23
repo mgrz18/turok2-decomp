@@ -1,5 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002149C0.c, func_002149C0, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/game_object.h"
+#include "structs/player.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "structs/game.h"
@@ -9,111 +11,48 @@
 #include "globals/collision.h"
 #include "globals/player.h"
 
-#ifdef TARGET_PORT
-typedef struct Actor {
-/* the view at the host offsets of CPlayer (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Actor(m) __builtin_offsetof(CPlayer, m)
-    union {
-        struct { u8 _hp_pos[T2_HOFF_Actor(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_region[T2_HOFF_Actor(m_CharacterActor.header.m_pCurrentRegion)]; sptr region; }; /* N64 0x10 */
-        struct { u8 _hp_def[T2_HOFF_Actor(m_CharacterActor.header.m_pIntelligence)]; CIntelligence *def; }; /* N64 0x14 */
-        struct { u8 _hp_eye[T2_HOFF_Actor(m_CharacterActor.m_CollisionYOffset)]; f32 eye; }; /* N64 0x54 */
-        struct { u8 _hp_flags[T2_HOFF_Actor(m_CharacterActor.m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
-        struct { u8 _hp_owner[T2_HOFF_Actor(m_CharacterActor.m_AI.m_pParent)]; void *owner; }; /* N64 0x1A8 */
-        struct { u8 _hp_alive[T2_HOFF_Actor(m_Data.m_Lives)]; s16 alive; }; /* N64 0x52A */
-        struct { u8 _hp_character[T2_HOFF_Actor(m_Mode)]; s16 character; }; /* N64 0xA08 */
-    };
-} Actor;
-#else
-typedef struct Actor {
-    /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ s32 region;
-    /* 0x014 */ CIntelligence *def;
-    /* 0x018 */ u8 pad18[0x54 - 0x18];
-    /* 0x054 */ f32 eye;
-    /* 0x058 */ u8 pad58[0xD4 - 0x58];
-    /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
-    /* 0x1A8 */ void *owner;
-    /* 0x1AC */ u8 pad1AC[0x52A - 0x1AC];
-    /* 0x52A */ s16 alive;          /* players */
-    /* 0x52C */ u8 pad52C[0xA08 - 0x52C];
-    /* 0xA08 */ s16 character;      /* players */
-} Actor;
-#endif
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x10];
     /* 0x10 */ f32 height;
 } CameraInfo;
 
-#ifdef TARGET_PORT
-typedef struct Plan {
-/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Plan(m) __builtin_offsetof(CAI, m)
-    union {
-        struct { u8 _hp_unk37[T2_HOFF_Plan(m_Action)]; s8 unk37; }; /* N64 0x37 */
-        struct { u8 _hp_ignore[T2_HOFF_Plan(m_pParent)]; Actor *ignore; }; /* N64 0x68 */
-        struct { u8 _hp_forced[T2_HOFF_Plan(m_pTargetOverride)]; Actor *forced; }; /* N64 0x78 */
-        struct { u8 _hp_approachFrom[T2_HOFF_Plan(m_pSightTarget)]; Actor *approachFrom; }; /* N64 0x80 */
-        struct { u8 _hp_pos[T2_HOFF_Plan(m_vLeashPos)]; CVector3 pos; }; /* N64 0xAC */
-        struct { u8 _hp_region[T2_HOFF_Plan(m_pLeashRegion)]; sptr region; }; /* N64 0xB8 */
-    };
-} Plan;
-#else
-typedef struct {
-    /* 0x00 */ u8 pad0[0x37];
-    /* 0x37 */ s8 unk37;
-    /* 0x38 */ u8 pad38[0x68 - 0x38];
-    /* 0x68 */ Actor *ignore;
-    /* 0x6C */ u8 pad6C[0x78 - 0x6C];
-    /* 0x78 */ Actor *forced;
-    /* 0x7C */ u8 pad7C[4];
-    /* 0x80 */ Actor *approachFrom;
-    /* 0x84 */ u8 pad84[0xAC - 0x84];
-    /* 0xAC */ CVector3 pos;
-    /* 0xB8 */ s32 region;
-} Plan;
-#endif
 
-s32 AI_UpdatePathHeading(Actor *self, Plan *plan, Actor *target);
-s32 AI_IsInViewCone(Actor *viewer, Actor *target, f32 range, f32 across, f32 up);
+s32 AI_UpdatePathHeading(CPlayer *self, CAI *plan, CPlayer *target);
+s32 AI_IsInViewCone(CPlayer *viewer, CPlayer *target, f32 range, f32 across, f32 up);
 #ifdef TARGET_PORT
-s8 EnemyAI_GetCurrentBehavior(Actor *self, Plan *plan); /* ABI: returns s8 (the host leaves the upper bits of the return register undefined) */
+s8 EnemyAI_GetCurrentBehavior(CPlayer *self, CAI *plan); /* ABI: returns s8 (the host leaves the upper bits of the return register undefined) */
 #else
-s32 EnemyAI_GetCurrentBehavior(Actor *self, Plan *plan);
+s32 EnemyAI_GetCurrentBehavior(CPlayer *self, CAI *plan);
 #endif
 #ifdef TARGET_PORT
-s8 EnemyAI_GetBehaviorIndex(Actor *self, Plan *plan); /* ABI: returns s8 (the host leaves the upper bits of the return register undefined) */
+s8 EnemyAI_GetBehaviorIndex(CPlayer *self, CAI *plan); /* ABI: returns s8 (the host leaves the upper bits of the return register undefined) */
 #else
-s32 EnemyAI_GetBehaviorIndex(Actor *self, Plan *plan);
+s32 EnemyAI_GetBehaviorIndex(CPlayer *self, CAI *plan);
 #endif
-void AI_HearNoise(Actor *self, Plan *plan, CVector3 *pos, s32 arg3);
+void AI_HearNoise(CPlayer *self, CAI *plan, CVector3 *pos, s32 arg3);
 s32 Cinema_PathPlaying(void);
 s32 Cinema_GetScriptId(void);
-Actor *func_00225848(u8 *scene, Actor *self);
-Actor *func_0022594C(u8 *scene, Actor *self);
-Actor *func_002259D0(u8 *scene, Actor *self);
-Actor *CPlayerPool__FindNearest(CPlayerPool *players, CVector3 pos);
-Actor *CPlayerPool__FindNearestOther(CPlayerPool *players, CVector3 pos, void *owner);
-CameraInfo *GameObject_GetRegionInfo(Actor *player);
-f32 AI_DistSqToPointAtHeight(Actor *a, CVector3 pos);
-f32 AI_FlatDistSqToPoint(Actor *a, CVector3 pos);
-s32 func_00267E74(Actor *a);
-f32 GameObject_GetLeashRadius(Actor *a);
-f32 GameObject_GetCollisionHeight(Actor *a);                           /* height */
-s32 Collision_MoveInstance(Actor *a, CVector3 from, u8 *result);
+CPlayer *func_00225848(u8 *scene, CPlayer *self);
+CPlayer *func_0022594C(u8 *scene, CPlayer *self);
+CPlayer *func_002259D0(u8 *scene, CPlayer *self);
+CPlayer *CPlayerPool__FindNearest(CPlayerPool *players, CVector3 pos);
+CPlayer *CPlayerPool__FindNearestOther(CPlayerPool *players, CVector3 pos, void *owner);
+CameraInfo *GameObject_GetRegionInfo(CPlayer *player);
+f32 AI_DistSqToPointAtHeight(CPlayer *a, CVector3 pos);
+f32 AI_FlatDistSqToPoint(CPlayer *a, CVector3 pos);
+s32 func_00267E74(CPlayer *a);
+f32 GameObject_GetLeashRadius(CPlayer *a);
+f32 GameObject_GetCollisionHeight(CPlayer *a);                           /* height */
+s32 Collision_MoveInstance(CPlayer *a, CVector3 from, u8 *result);
 
 #define ADD(t) if ((t) != NULL) { list[n] = (t); n++; }
 
 /* The plan's best target: the nearest of its candidates (sides' leaders,
  * the actor it ignores, a nearby creature, the nearest player) that it may
  * attack and, with `checkSight`, can see. */
-Actor *AI_FindBestTarget(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
-    Actor *list[128];
+CPlayer *AI_FindBestTarget(CPlayer *self, CAI *plan, s32 checkSight, s32 flag) {
+    CPlayer *list[128];
     CObjectHead saved;
     CVector3 eye;
     f32 range;
@@ -123,8 +62,8 @@ Actor *AI_FindBestTarget(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
     f32 d;
     f32 limit;
     f32 dist;
-    Actor *bestA;
-    Actor *t;
+    CPlayer *bestA;
+    CPlayer *t;
     CameraInfo *cam;
     s32 n;
     s32 i;
@@ -132,13 +71,13 @@ Actor *AI_FindBestTarget(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
     s32 side;
     s32 r;
 
-    if (plan->forced != NULL) {
+    if (plan->m_pTargetOverride != NULL) {
         if (flag) {
-            AI_UpdatePathHeading(self, plan, plan->forced);
+            AI_UpdatePathHeading(self, plan, plan->m_pTargetOverride);
         }
-        return plan->forced;
+        return plan->m_pTargetOverride;
     }
-    if (self->def->m_Type == 1 && EnemyAI_GetCurrentBehavior(self, plan) != 2) {
+    if (self->m_CharacterActor.header.m_pIntelligence->m_Type == 1 && EnemyAI_GetCurrentBehavior(self, plan) != 2) {
         range = 2048.0f;
         across = 2.4434612f;
         up = 0.785398245f;
@@ -158,38 +97,38 @@ Actor *AI_FindBestTarget(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
     }
     if (ok) {
         if (flag) {
-            if (self->def->m_Type == 1 && plan->approachFrom != NULL) {
+            if (self->m_CharacterActor.header.m_pIntelligence->m_Type == 1 && plan->m_pSightTarget != NULL) {
                 side = EnemyAI_GetBehaviorIndex(self, plan);
-                if ((side == 0 && (self->def->m_Enemy.m_dwEnemyFlags & 0x40))
-                    || (side == 1 && (self->def->m_Enemy.m_dwEnemyFlags & 0x80))
-                    || (side == 2 && (self->def->m_Enemy.m_dwEnemyFlags & 0x100))) {
+                if ((side == 0 && (self->m_CharacterActor.header.m_pIntelligence->m_Enemy.m_dwEnemyFlags & 0x40))
+                    || (side == 1 && (self->m_CharacterActor.header.m_pIntelligence->m_Enemy.m_dwEnemyFlags & 0x80))
+                    || (side == 2 && (self->m_CharacterActor.header.m_pIntelligence->m_Enemy.m_dwEnemyFlags & 0x100))) {
                     t = func_00225848(&gScene, self);
                     ADD(t);
                 }
-                if (plan->approachFrom != NULL
-                    && ((side == 0 && (self->def->m_Enemy.m_wTakeCoverAnimFlags & 0x1F))
-                        || (side == 1 && (self->def->m_Enemy.m_wTakeCoverAnimFlags & 0x3E0))
-                        || (side == 2 && (self->def->m_Enemy.m_wTakeCoverAnimFlags & 0x7C00)))) {
+                if (plan->m_pSightTarget != NULL
+                    && ((side == 0 && (self->m_CharacterActor.header.m_pIntelligence->m_Enemy.m_wTakeCoverAnimFlags & 0x1F))
+                        || (side == 1 && (self->m_CharacterActor.header.m_pIntelligence->m_Enemy.m_wTakeCoverAnimFlags & 0x3E0))
+                        || (side == 2 && (self->m_CharacterActor.header.m_pIntelligence->m_Enemy.m_wTakeCoverAnimFlags & 0x7C00)))) {
                     t = func_0022594C(&gScene, self);
                     ADD(t);
                 }
             }
-            t = plan->ignore;
+            t = plan->m_pParent;
             ADD(t);
             t = func_002259D0(&gScene, self);
             ADD(t);
         }
-        if (self->flags & 0x300000) {
-            t = CPlayerPool__FindNearestOther(&gEngineApp_m_Game.m_PlayerList, self->pos, self->owner);
+        if (self->m_CharacterActor.m_dwFlags & 0x300000) {
+            t = CPlayerPool__FindNearestOther(&gEngineApp_m_Game.m_PlayerList, self->m_CharacterActor.header.m_vPos, self->m_CharacterActor.m_AI.m_pParent);
         } else {
-            t = CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, self->pos);
+            t = CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, self->m_CharacterActor.header.m_vPos);
         }
-        if (t != NULL && t->alive != 0 && t->character != 1) {
+        if (t != NULL && t->m_Data.m_Lives != 0 && t->m_Mode != 1) {
             cam = GameObject_GetRegionInfo(t);
             if (cam != NULL) {
                 range = cam->height - 102.399994f;
             }
-            if (self->def->m_Type == 1 && plan->unk37 == 0 && (gPlayerStateTable[t->character].physics->flags & 0x80)) {
+            if (self->m_CharacterActor.header.m_pIntelligence->m_Type == 1 && plan->m_Action == 0 && (gPlayerStateTable[t->m_Mode].physics->flags & 0x80)) {
                 across *= 0.75f;
                 up *= 0.75f;
                 range *= 0.5f;
@@ -202,14 +141,14 @@ Actor *AI_FindBestTarget(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
         if (n > 0) {
             do {
                 t = list[i];
-                d = AI_DistSqToPointAtHeight(t, self->pos);
+                d = AI_DistSqToPointAtHeight(t, self->m_CharacterActor.header.m_vPos);
                 if (d < best) {
                     if (flag) {
-                        if (self->def->m_Type == 1 && plan->unk37 == 0) {
+                        if (self->m_CharacterActor.header.m_pIntelligence->m_Type == 1 && plan->m_Action == 0) {
                             goto next;
                         }
                         if (func_00267E74(self)) {
-                            dist = AI_FlatDistSqToPoint(t, plan->pos);
+                            dist = AI_FlatDistSqToPoint(t, plan->m_vLeashPos);
                             limit = GameObject_GetLeashRadius(self);
                             if (limit * GameObject_GetLeashRadius(self) <= dist) {
                                 goto next;
@@ -221,26 +160,26 @@ Actor *AI_FindBestTarget(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
                     }
                     if (checkSight) {
                         saved = *(CObjectHead *)t;
-                        t->pos.y = t->pos.y + GameObject_GetCollisionHeight(t);
-                        t->pos.y = t->pos.y + t->eye;
-                        eye = self->pos;
+                        t->m_CharacterActor.header.m_vPos.y = t->m_CharacterActor.header.m_vPos.y + GameObject_GetCollisionHeight(t);
+                        t->m_CharacterActor.header.m_vPos.y = t->m_CharacterActor.header.m_vPos.y + t->m_CharacterActor.m_CollisionYOffset;
+                        eye = self->m_CharacterActor.header.m_vPos;
                         eye.y = eye.y + GameObject_GetCollisionHeight(self);
-                        eye.y = eye.y + self->eye;
+                        eye.y = eye.y + self->m_CharacterActor.m_CollisionYOffset;
                         r = Collision_MoveInstance(t, eye, &gCollisionInfoLineOfSight);
-                        if ((Actor *)gCollisionResults.m_pInstance == self) {
+                        if ((CPlayer *)gCollisionResults.m_pInstance == self) {
                             r = 0;
                         }
                         *(CObjectHead *)t = saved;
                         if (r) {
                             goto next;
                         }
-                        if (self->def->m_Type == 1) {
-                            if ((self->def->m_dwTypeFlags & 0x8000) && AI_IsInViewCone(self, t, range, across, up) == 0) {
-                                if (plan->unk37 == 0) {
+                        if (self->m_CharacterActor.header.m_pIntelligence->m_Type == 1) {
+                            if ((self->m_CharacterActor.header.m_pIntelligence->m_dwTypeFlags & 0x8000) && AI_IsInViewCone(self, t, range, across, up) == 0) {
+                                if (plan->m_Action == 0) {
                                     goto next;
                                 }
                             } else {
-                                AI_HearNoise(self, plan, &t->pos, 3);
+                                AI_HearNoise(self, plan, &t->m_CharacterActor.header.m_vPos, 3);
                             }
                         }
                     }
@@ -253,8 +192,8 @@ Actor *AI_FindBestTarget(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
         }
     }
     if (flag && bestA == NULL && AI_UpdatePathHeading(self, plan, NULL) == 0) {
-        plan->pos = self->pos;
-        plan->region = self->region;
+        plan->m_vLeashPos = self->m_CharacterActor.header.m_vPos;
+        plan->m_pLeashRegion = self->m_CharacterActor.header.m_pCurrentRegion;
     }
     return bestA;
 }

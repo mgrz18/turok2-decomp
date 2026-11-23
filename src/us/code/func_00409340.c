@@ -10,25 +10,10 @@
 /* Boss fight setup: finds the six level actors with id 0x1DB1 and the one
  * with 0x1DB2, installs the AI callbacks and resets the 15 attack slots. */
 
-#ifdef TARGET_PORT
-typedef struct Obj {
-/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Obj(m) __builtin_offsetof(CGameObjectInstance, m)
-    union {
-        struct { u8 _hp_flags[T2_HOFF_Obj(m_dwFlags)]; s32 flags; }; /* N64 0xD4 */
-    };
-} Obj;
-#else
-typedef struct {
-    /* 0x000 */ u8 pad0[0xD4];
-    /* 0x0D4 */ s32 flags;
-} Obj;
-#endif
 
 extern u32 D_800F1F10[];
 
-void ScriptAnimator_Start(void *, Obj *);
+void ScriptAnimator_Start(void *, CGameObjectInstance *);
 void MotherBoss_Step();
 void MotherBoss_Draw();
 void MotherBoss_Collision();
@@ -38,7 +23,7 @@ extern u8 func_00408FF8[];
 void MotherBoss_Hurt(void *obj, CAI *ai, void *hit); /* (.., DamageEvent *) */
 #endif
 
-void MotherBoss_Init(Obj *obj, CAI *ai) {
+void MotherBoss_Init(CGameObjectInstance *obj, CAI *ai) {
     MotherBossState *s = &gMotherBoss;
     s32 i;
 
@@ -68,7 +53,7 @@ void MotherBoss_Init(Obj *obj, CAI *ai) {
     CAI__SetMode(obj, ai, 0);
     gMotherBoss.obj = obj;
     D_800F1F10[0] &= ~0x300;
-    obj->flags |= 0x04000000;
+    obj->m_dwFlags |= 0x04000000;
     for (i = 0; i < 15; i++) {
         ScriptAnimator_Start(&gMotherBoss.slots[i].anim, obj);
     }

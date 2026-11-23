@@ -3,6 +3,7 @@
  * jump table at 0x800A6B28 is 8-aligned from there (from its own start,
  * 0x800A6B0C, it would not be). */
 #include "common.h"
+#include "structs/player_options.h"
 #include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/weapon.h"
@@ -18,21 +19,6 @@
  * within the weapon's cone and returns the rotation that turns the aim
  * toward it (identity when there is none). */
 
-#ifdef TARGET_PORT
-typedef struct AimOptions {
-/* the view at the host offsets of CPlayerOptions (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_AimOptions(m) __builtin_offsetof(CPlayerOptions, m)
-    union {
-        struct { u8 _hp_autoAim[T2_HOFF_AimOptions(m_bAutoAim)]; u8 autoAim; }; /* N64 0x2E */
-    };
-} AimOptions;
-#else
-typedef struct AimOptions {
-    /* 0x00 */ u8 pad0[0x2E];
-    /* 0x2E */ u8 autoAim;
-} AimOptions;
-#endif
 
 #ifdef TARGET_PORT
 typedef struct AimView {
@@ -60,7 +46,7 @@ struct AimActor {
         struct { u8 _hp_pos[T2_HOFF_AimActor(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
         struct { u8 _hp_height[T2_HOFF_AimActor(m_CharacterActor.m_CollisionYOffset)]; f32 height; }; /* N64 0x54 */
         struct { u8 _hp_aimPos[T2_HOFF_AimActor(m_CharacterActor.m_AI.m_vBoreTarget)]; CVector3 aimPos; }; /* N64 0x214 */
-        struct { u8 _hp_options[T2_HOFF_AimActor(m_pOptions)]; AimOptions *options; }; /* N64 0x518 */
+        struct { u8 _hp_options[T2_HOFF_AimActor(m_pOptions)]; CPlayerOptions *options; }; /* N64 0x518 */
         struct { u8 _hp_view[T2_HOFF_AimActor(m_pCamera)]; AimView *view; }; /* N64 0x51C */
         struct { u8 _hp_weapon[T2_HOFF_AimActor(m_Data.m_CurrentWeapon)]; s16 weapon; }; /* N64 0x996 */
         struct { u8 _hp_lockState[T2_HOFF_AimActor(m_CrossHairMode)]; s32 lockState; }; /* N64 0xB2C */
@@ -88,7 +74,7 @@ struct AimActor {
     /* 0x0058 */ u8 pad58[0x214 - 0x58];
     /* 0x0214 */ CVector3 aimPos;
     /* 0x0220 */ u8 pad220[0x518 - 0x220];
-    /* 0x0518 */ AimOptions *options;
+    /* 0x0518 */ CPlayerOptions *options;
     /* 0x051C */ AimView *view;
     /* 0x0520 */ u8 pad520[0x996 - 0x520];
     /* 0x0996 */ s16 weapon;
@@ -316,7 +302,7 @@ void Player_UpdateAim(AimActor *pl) {
     pl->aimRot = CGameObjectInstance__GetRotation(pl);
     if (target == NULL) {
         tpos = aimDir;
-        if (pl->options->autoAim && canLock) {
+        if (pl->options->m_bAutoAim && canLock) {
             CVector3 tpos2;
             CQuaternion rot2;
             AimActor *target2;

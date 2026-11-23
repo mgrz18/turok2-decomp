@@ -1,33 +1,18 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "protos/iset.h"
+#include "structs/light.h"
 
-typedef struct {
-    /* 0x0 */ CVector3 mn;
-    /* 0xC */ CVector3 mx;
-} Box3;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0xA0];
-    /* 0xA0 */ Box3 box;
-    /* 0xB8 */ u8 padB8[2];
-    /* 0xBA */ u8 bBA;
-    /* 0xBB */ u8 padBB[5];
-} WRec; /* size 0xC0 */
 
-typedef struct {
-    /* 0x0 */ u8 pad0[4];
-    /* 0x4 */ s32 count;
-    /* 0x8 */ WRec r[1];
-} WTab;
 
-s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt);
+s32 Lighting_CollectVolumes(CBox *q, CLightVolume **out, s32 *cnt);
 
 /* Collects up to 64 records of `model` (or of the world grid when there is
  * none) whose boxes overlap `q`; returns whether any of them has bBA set. */
-s32 Lighting_CollectVolumesForModel(Box3 *q, s32 model, WRec **out, s32 *cnt) {
-    WTab *tab;
-    WRec *rec;
+s32 Lighting_CollectVolumesForModel(CBox *q, s32 model, CLightVolume **out, s32 *cnt) {
+    CLightVolumeTable *tab;
+    CLightVolume *rec;
     s32 n;
     s32 ret;
     s32 j;
@@ -40,13 +25,13 @@ s32 Lighting_CollectVolumesForModel(Box3 *q, s32 model, WRec **out, s32 *cnt) {
     tab = CISet__GetBlock(model, 2);
     j = tab->count;
     j--;
-    rec = tab->r;
+    rec = tab->volumes;
     for (; j != -1; j--) {
-        if (q->mx.x > rec->box.mn.x && q->mn.x < rec->box.mx.x && q->mx.z > rec->box.mn.z &&
-            q->mn.z < rec->box.mx.z && q->mx.y > rec->box.mn.y && q->mn.y < rec->box.mx.y) {
+        if (q->m_vMax.x > rec->m_Bounds.m_vMin.x && q->m_vMin.x < rec->m_Bounds.m_vMax.x && q->m_vMax.z > rec->m_Bounds.m_vMin.z &&
+            q->m_vMin.z < rec->m_Bounds.m_vMax.z && q->m_vMax.y > rec->m_Bounds.m_vMin.y && q->m_vMin.y < rec->m_Bounds.m_vMax.y) {
             out[n] = rec;
             n++;
-            if (rec->bBA != 0) {
+            if (rec->unkBA != 0) {
                 ret = 1;
             }
             if (n == 64) {

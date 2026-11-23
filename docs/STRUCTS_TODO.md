@@ -21,7 +21,8 @@ Before the consolidation the census counted 720 local names defined in 2 or
 more files, out of 1,704 (the first version of this file, by a slightly
 different scan, said 717 of 1,699); after the first pass, 612 of 1,557;
 after the second, 534 of 1,416; after the third, 431 of 1,192; after the
-fourth, 291 of 1,013; after round L, 229 of 889. The vector,
+fourth, 291 of 1,013; after round L, 229 of 889 (228 of 863 by the census at
+7340fcdd); after round 21 j3, 174 of 803. The vector,
 intelligence, libultra, Gfx, sound, libaudio, AI state (CAI and its
 var-buffer views), controller, game and engine, weapon, pak, list, cache,
 boss, particle, collision, save, demo, pager, menu, player / owner /
@@ -608,6 +609,73 @@ Left, and why:
   copies of one source (O01*, K7*, Wave0040457C...), each to be hoisted
   with its module.
 
+## Round 21, part j3 (done)
+
+Measured with tools/struct_census.py: 228 of 863 local typedef names in 2 or
+more files at 7340fcdd, 174 of 803 after. The host-view twins the port needed
+(`#define T2_HOFF_...`, tools/port/hostview.py) went from 137 in 85 files to
+102 in 62. Every rewrite keeps the N64 code (tools/asm_diff.py, 0 differ) and
+is its own commit, with the command that re-runs it in the message.
+
+Two tools:
+
+- `tools/hoist_structs.py HEADER [OLD=NEW ...] -- FILES`: deletes the local
+  copies of the types HEADER defines (or OLD copies of NEW), renames OLD to
+  NEW, and includes HEADER after the file's last top-level #include. Field
+  renames are a sed in the same commit.
+- `tools/unview.py [--twin-from F.c] FILES`: a view with a host twin already
+  says which member of the real struct each of its fields is; this replaces
+  the view by the real struct (the twin, the N64 view, the type and its fields
+  through the variables declared with it, or everywhere as a second try) and
+  keeps the result only when asm_diff finds no difference. `--twin-from` takes
+  the twins of the first copy of a VM module for the second copy, which has
+  the views without twins. 35 views went (B10Obj, Pickup, Missile, BlastActor,
+  Dest, PlanInfo, Plan, B04B, HudView, AimOptions, Node002534E0 /
+  List002534E0, Thrown, AttackActor / AttackState, Projectile of
+  func_0025FEB0, ActionState of func_00265954, Screen of func_00280EE8,
+  ProjNode, PushTarget, Target / Missile of func_002298C4, Actor / Plan of
+  func_00243C90, the module views Actor00403CF8 / Level00403CF8 (both
+  copies), Entity0040457C (both), Actor00403F3C, Boss00403660,
+  Boss00407DC0, Obj of func_00409340, ModuleObj, Tracker, Actor40E00C /
+  Spawn40E00C). The rest stay views because a field is typed differently
+  from the real member (a float read as an int, a pointer kept as an s32, a
+  member the real struct has as bytes: CParticle.unk_180, m_cFrame read as
+  f32...): each of those is a header fix to make first.
+
+Real structs instead of views (by hand, each checked):
+
+- Menus: the player setup / character / pak note callbacks (S10Menu, S10Ctx,
+  S10Sub, S10Ctrl, S10Flags, S10Item, K7Obj, K7Sub) are Menu, MenuItem,
+  CPlayer, CPlayerOptions, ControllerProfile; the text callbacks' Q4Z /
+  MenuData are MenuItem (`text`); Widget is CPlayerOptions (m_nController,
+  m_Name); func_0041CDBC's CPlayer view is CPlayer (it no longer needs
+  rw/abu_protos.h). The pak menus' channel locals (O01Sel / PadSel, O01Pad)
+  are pak.h's PakChannel (new) and PakQuery.
+- Cache and frame: K7Mem / MemHandle are CMemEntry; GfxPool is frame.h's new
+  CGfxPool (gPoolBuffers).
+- Lighting: CBox moved from collision.h to vector.h; light.h has
+  CLightVolume / CLightVolumeTable (a sector's light volumes, data block 2),
+  which were Item / ItemList (CScene__FindLightsAt) and WRec / WTab / Box3
+  (Lighting_*). CScene has m_LightDirection (0x18E54, was bytes): the
+  MenuState / LevelLights views of CScene__LoadLightSettings,
+  CScene__SetupLighting, CScene__InitPersistentData and
+  CScene__LoadBitSections2 are CScene / CLevelHeader.
+- libaudio: __resetPerfChanState / __setInstChanState take ALSeqPlayer,
+  ALChanState, ALInstrument (BindTable / BindSlot / BindSource).
+- Vertices: QuadVtx, MorphVtx, Vertex are gbi.h's Vtx_t; the lit MorphVtx
+  is the new Vtx_tn.
+- Demo: DemoStream_Init / DemoStream_ReadBits take the DemoStream (Timer).
+- New headers: structs/morph.h (Morph, MorphItem, MorphPoint, MorphTiming
+  and the MorphOwner / MorphClock views with their host twin, from three
+  files) and structs/word.h (CWord, the parameter word: M1W4, M1IF, B01W4).
+- The module views' Vec3_0040457C / Vec3_00403CF8 / Vec3_0043CF3C are
+  CVector3.
+
+Left for the coordinator: func_0022D2FC.c is FAKEMATCH and j4's: it was put
+back as at 7340fcdd; run tools/unview.py on it after j4 merges (EffectList,
+EffectSystem and SourceModel convert). func_0041EA84 / func_004579A4 (also
+FAKEMATCH) only had their PadSel local renamed to PakChannel.
+
 ## The families to merge next
 
 - **The FAKEMATCH files** (16, listed in docs/MATCHING.md, "Where the
@@ -692,93 +760,75 @@ their own (top 0 of 0).
 
 ## Every local struct name defined in 2 or more files
 
-229 of the 889 local typedef names. "Fields" are the named offsets of the
+174 of the 803 local typedef names. "Fields" are the named offsets of the
 most common layout (pads left out); a body without offset comments is shown
 as written.
 
 | Name | Files | Layouts | Fields | Files |
 |---|---|---|---|---|
+| T2HostTriple | 17 | 1 | `float x, y, z;` | func_00238134, func_0023870C, func_0023876C, func_002387C4 +13 |
 | Arg0 | 15 | 15 | 0x8 refCount, 0xC flags | func_00204DB8, func_002242F8, func_00226390, func_0026E9EC +11 |
 | Entry | 9 | 9 | 0x00 unk0, 0x04 size | func_00214188, func_002188AC, func_0022D2FC, func_002571FC +5 |
 | State | 8 | 8 | 0x02C unk2C, 0x108 unk108, 0x10C unk10C, 0x110 unk110, 0x118 unk118, 0x128 unk128 | func_002596B4, func_00259794, func_00259878, func_00259AE0 +4 |
-| Slot | 7 | 6 | 0x00 a, 0x16 b, 0x17 c | func_00236444, func_00271DB4, func_00293530, func_0042D120 +3 |
-| S | 6 | 4 | `s32 a; CVector3 v; s32 d;` | func_00206920, func_0021810C, func_00218218, func_002182BC +2 |
+| Slot | 6 | 5 | 0x00 a, 0x16 b, 0x17 c | func_00271DB4, func_00293530, func_0042D120, func_0042F344 +2 |
 | CollisionInfo | 5 | 3 | 0x00 flags | func_00268C48, func_002694A8, func_0026961C, func_00269780 +1 |
-| Item | 5 | 5 | `u8 pad0[0xA0]; Bounds bounds; u8 padB8[0xC0 - 0xB8];` | func_002228E4, func_00420F34, func_00443D28, func_0045A7A0 +1 |
 | Msg | 5 | 3 | `s16 kind; s16 pad; s32 a; s32 b; s32 c;` | func_00290DE0, func_00290E10, func_00290E90, func_00290EC0 +1 |
 | Plane | 5 | 3 | `u8 pad0[0x30]; CVector3 normal;` | func_0023C2B0, func_0023C390, func_0023C478, func_0026F080 +1 |
-| Projectile | 5 | 5 | 0x018 vel, 0x0F8 *def, 0x11C speed, 0x150 dir, 0x178 phaseX, 0x17C phaseY, 0x180 freqX, 0x184 freqY, ... | func_00229618, func_0022A1A4, func_0022A4C8, func_0025CAC8 +1 |
-| ActionState | 4 | 3 | 0x2C *table, 0xC6 anim, 0xC7 active, 0xF0 d, 0xF8 d | func_00265200, func_00265954, func_00265A30, func_00266380 |
-| Actor | 4 | 4 | 0x000 type, 0x004 pos, 0x014 *def, 0x040 flags, 0x048 matrices[1], 0x098 *bones, 0x0F8 *model, 0x130 unk130, ... | func_0022D2FC, func_00243C90, func_002600E8, func_00260554 |
+| S | 5 | 3 | `s32 a; CVector3 v; s32 d;` | func_0021810C, func_00218218, func_002182BC, func_0021836C +1 |
 | Arg1 | 4 | 4 | 0x1C unk1C | func_00255840, func_00255C5C, func_002593A4, func_0045C050 |
 | Box | 4 | 2 | 0x00 min, 0x0C max | func_0021E374, func_0022AFB4, func_0023118C, func_002406D8 |
 | DIunion | 4 | 1 | `struct DIstruct s; DItype ll;` | func_002A3AE0, func_002A40D0, func_002A4650, func_002A4BE0 |
-| Dest | 4 | 4 | 0x04 maxHealth, 0x08 handle, 0x0C unk10, 0x10 level | func_002427E0, func_00242C00, func_00242E34, func_00246918 |
 | EventParams | 4 | 4 | 0x0 unk4 | func_0023801C, func_00238A7C, func_00238DF8, func_00239194 |
 | Handle | 4 | 3 | `void *data;` | func_0020BFB0, func_0026C590, func_0042BA40, func_00464960 |
-| HitInst | 4 | 4 | 0x00 type, 0x04 pos, 0x14 *def, 0x1C fallSpeed, 0x30 *standingOn | func_0023DF70, func_0023F880, func_0023FDF0, func_0024032C |
+| HitInst | 4 | 4 | `#define T2_HOFF_HitInst(m) __builtin_offsetof(CObjectHead, m) union { ...` | func_0023DF70, func_0023F880, func_0023FDF0, func_0024032C |
+| Item | 4 | 4 | 0x1C *owner, 0x20 *data, 0x24 *string | func_00420F34, func_00443D28, func_0045A7A0, func_0045AD1C |
 | Link | 4 | 3 | 0x0 *next, 0x4 *prev | func_00268A2C, func_0028E9E0, func_0028EA10, func_002933B0 |
 | Location | 4 | 3 | 0x00 pos, 0x0C region | func_002438C0, func_00244338, func_002449E0, func_0025D9E4 |
-| MenuState | 4 | 4 | 0x18E50 *lights, 0x18E54 dir[3] | func_0042AA80, func_0042C3BC, func_0042C46C, func_0042C758 |
 | Model | 4 | 3 | 0x00 index, 0xB0 header | func_0021ED04, func_0024C47C, func_00274798, func_002747EC |
 | Mtx | 4 | 2 | `long m[4][4];` | func_0022D2FC, func_002975D0, func_00297D50, func_00297FB0 |
 | Node | 4 | 4 | `u8 pad0[0x1C8]; struct Node *next;` | func_002316F4, func_002763D4, func_0028AFF0, func_0042C194 |
-| OwnedState | 4 | 3 | 0x10C *owner | func_00264B0C, func_00264DF0, func_00264F58, func_0026508C |
-| PadSel | 4 | 1 | `s32 v; s32 w;` | func_0041EA84, func_00422F14, func_004579A4, func_0045BE34 |
+| OwnedState | 4 | 1 | `struct { u8 _h_pos[__builtin_offsetof(CAI, m_vDesiredPos)]; f32 pos[3]...` | func_00264B0C, func_00264DF0, func_00264F58, func_0026508C |
 | PlacedProp | 4 | 4 | 0x00 state, 0x02 id, 0x04 pos, 0x10 *segment, 0x14 *model, 0x18 owner, 0x1C unk1C, 0x28 matrix[16], ... | func_002141F0, func_00214564, func_00214844, func_00214B58 |
-| Screen | 4 | 3 | 0xC *layer | func_00280EE8, func_004531B4, func_00453380, func_00453430 |
+| Projectile | 4 | 4 | `#define T2_HOFF_Projectile(m) __builtin_offsetof(CParticle, m) union {...` | func_00229618, func_0022A1A4, func_0022A4C8, func_0025CAC8 |
+| T2ListNode | 4 | 1 | `struct T2ListNode *prev; struct T2ListNode *next;` | func_0026D240, func_0026D288, func_0026D3BC, func_0026D474 |
 | VertexGroup | 4 | 2 | 0x0 unk0, 0x4 count, 0x8 verts[1] | func_00212DA4, func_00212F98, func_002130A8, func_00214F68 |
+| ActionState | 3 | 3 | 0x40 timer, 0x64 duration, 0xC6 anim, 0xC7 active | func_00265200, func_00265A30, func_00266380 |
+| Actor | 3 | 3 | `#define T2_HOFF_Actor(m) __builtin_offsetof(CParticle, m) union { stru...` | func_0022D2FC, func_002600E8, func_00260554 |
 | AdecStream | 3 | 3 | 0x00 hdr0, 0x04 hdr2, 0x08 *hdr, 0x0C nframes, 0x10 remaining, 0x14 *rd | func_0029FE70, func_002A0448, func_002A0B6C |
 | AnimChannel | 3 | 3 | 0x00 time, 0x04 current, 0x06 next, 0x08 frames, 0x0A active, 0x0B blending, 0x0C loopStart, 0x10 **resource | func_00218B10, func_0021CDAC, func_0021F428 |
 | AnimInfo | 3 | 3 | 0x1C intelligence, 0x1E angle | func_00227C10, func_0022D2FC, func_00234348 |
 | Attachment | 3 | 3 | 0x00 field0, 0x02 type, 0x04 field4, 0x08 offset, 0x14 params | func_00214B58, func_00267090, func_0026D710 |
-| B01Info | 3 | 2 | `u32 flags; s32 unk4; s16 unk8; s16 unkA; B01W4 unkC; B01FH unk10; s16 ...` | func_002628B8, func_0026342C, func_00263640 |
+| B01Info | 3 | 2 | `u32 flags; s32 unk4; s16 unk8; s16 unkA; CWord unkC; B01FH unk10; s16 ...` | func_002628B8, func_0026342C, func_00263640 |
 | B01Pair | 3 | 1 | `s32 a; s32 b;` | func_002653F8, func_002655F8, func_002656BC |
 | Bone | 3 | 2 | 0x00 *anim, 0x90 type | func_0022C488, func_00259A4C, func_00259A98 |
 | BossAI | 3 | 2 | 0xC4 animId, 0xC6 anim, 0xC7 unkC7 | func_00407F20, func_0040813C, func_004088B0 |
-| Box3 | 3 | 2 | `CVector3 mn; CVector3 mx;` | func_002132B8, func_00213A70, func_00213FA0 |
-| Emitter | 3 | 3 | 0x08 *info, 0x24 unk24, 0x3C flags, 0x40 *nodes, 0x4C totalLength | func_0023417C, func_00236C64, func_0026E760 |
+| Dest | 3 | 3 | `#define T2_HOFF_Dest(m) __builtin_offsetof(CAI, m) union { struct { u8...` | func_002427E0, func_00242C00, func_00246918 |
+| Emitter | 3 | 3 | 0x00 *prev, 0x04 *next, 0x08 *info, 0x0C *tex0, 0x10 *tex1, 0x14 texture[2], 0x1C *owner, 0x20 id, ... | func_0023417C, func_00236C64, func_0026E760 |
 | HudModel | 3 | 3 | 0x00 current, 0x04 requested, 0x08 *model, 0x90 scaleX, 0x94 scaleY, 0x98 scaleZ, 0x9C pitch, 0xA0 roll, ... | func_00247170, func_00247438, func_00247660 |
-| ItemList | 3 | 3 | 0x04 items[1] | func_002228E4, func_00429F20, func_0042CD04 |
 | Job | 3 | 2 | 0x00 result, 0x0C unkC, 0x1C 2 | func_0028A43C, func_0042F670, func_00468570 |
 | KeyLookup | 3 | 2 | 0x00 *posKeys, 0x04 *rotKeys, 0x08 *posTracks, 0x0C *rotTracks, 0x10 offset0, 0x14 offset1, 0x18 rootOffset0, 0x1C rootOffset1, ... | func_00218B10, func_0021B95C, func_0021CDAC |
 | Layer | 3 | 3 | 0x80 flagsA, 0xA8 flagsB | func_004531B4, func_00453380, func_00453430 |
 | List | 3 | 3 | 0x04 items[1] | func_00221A24, func_00290F20, func_00466040 |
 | Material | 3 | 3 | 0x00 flags, 0x04 unk4, 0x08 texture, 0x0C unkC, 0x10 prim[4], 0x14 env[4], 0x18 maskS, 0x1A maskT | func_00207FEC, func_00269050, func_0026D070 |
-| MemHandle | 3 | 2 | `s32 addr;` | func_00425220, func_004567B0, func_0045E140 |
 | ModeState | 3 | 2 | 0x00 unk0, 0x04 value, 0x08 mode, 0x40 unk40, 0x44 unk44 | func_0027AD00, func_0027AD88, func_0027AD98 |
 | ModelVertex | 3 | 3 | 0x0 x, 0x6 bone | func_00212DA4, func_00212F98, func_002130A8 |
-| Morph | 3 | 3 | 0x00 count, 0x04 *items, 0x08 *pointsA, 0x0C *pointsB, 0x10 scaleA, 0x14 scaleB | func_0023353C, func_00233868, func_00234348 |
-| MorphVtx | 3 | 2 | 0x00 ob[3], 0x06 flag, 0x08 tc[2], 0x0C cn[4] | func_002097AC, func_0023353C, func_00233868 |
 | Mtx64 | 3 | 2 | `f32 m[16];` | func_00236A34, func_00236D50, func_00247438 |
 | Owner | 3 | 3 | `u8 pad0[0x1C]; s32 unk1C; u8 pad20[0x48 - 0x20]; s32 unk48; u8 pad4C[0...` | func_00224DF4, func_0022D2FC, func_00273EB8 |
 | Placed | 3 | 3 | 0x4 *node | func_0026872C, func_00268838, func_0042C194 |
-| PlayerList | 3 | 2 | 0x00 **handle, 0x04 *players, 0x08 count, 0x0C list0[0x14], 0x20 list1[0x14] | func_00251FC4, func_0042E5AC, func_004674CC |
-| Pool | 3 | 3 | 0x3C cur, 0x40 *slots | func_00293530, func_00466040, func_00468E78 |
+| PlayerList | 3 | 3 | `void *pad0[2]; s32 nPlayers; PlayerCList idle; PlayerCList active; s32...` | func_00251FC4, func_0042E5AC, func_004674CC |
 | RenderCounters | 3 | 3 | `f32 ticks, seconds, minutes, hours; f32 countdown; f32 timeLimit; s32 ...` | func_00417D78, func_0041CA00, func_00455960 |
 | Resource | 3 | 3 | 0x0 *file, 0x4 size | func_00216A9C, func_00225E88, func_0027B40C |
-| S10Ctrl | 3 | 1 | `s32 active; s8 port; u8 pad5[0x224 - 5];` | func_00418158, func_00451108, func_0045121C |
-| S10Ctx | 3 | 3 | `u8 pad0[0x518]; S10Sub *sub;` | func_00418158, func_00451108, func_0045121C |
-| S10Flags | 3 | 1 | `u8 pad0[0x58]; u32 flags;` | func_00418158, func_00451108, func_0045121C |
-| S10Menu | 3 | 1 | `s16 state; u8 pad2[0xA]; S10Flags *fC; u8 pad10[0xC]; S10Ctx *ctx; S10...` | func_00418158, func_00451108, func_0045121C |
-| S10Sub | 3 | 3 | `u8 pad0[0x2B]; s8 b2B;` | func_00418158, func_00451108, func_0045121C |
-| ScreenRectangle | 3 | 2 | 0x288 x, 0x28C y, 0x290 width, 0x294 height | func_00254834, func_0040F240, func_00448240 |
+| Screen | 3 | 2 | 0xC *layer | func_004531B4, func_00453380, func_00453430 |
+| ScreenRectangle | 3 | 2 | `u8 pad0[__builtin_offsetof(CCamera, m_Viewport)]; f32 x; f32 y; f32 wi...` | func_00254834, func_0040F240, func_00448240 |
 | ShadowActor | 3 | 3 | 0x04 x, 0x08 y, 0x0C z, 0x10 region, 0xB8 shadowMatrices[4] | func_002154DC, func_0021E03C, func_0022D2FC |
 | Sortable | 3 | 3 | 0xC key | func_002571D8, func_00283784, func_002837B0 |
 | Sphere | 3 | 2 | 0x00 center, 0x0C radius, 0x10 radiusSq | func_00239DB0, func_0023CE94, func_0023CF04 |
 | Src | 3 | 2 | `u8 pad0[0x13]; u8 unk13;` | func_002248D4, func_00224A68, func_00224B58 |
-| Swoosh | 3 | 2 | 0x04 *next, 0x08 *point, 0x1C *owner, 0x24 top, 0x3C flags | func_0023624C, func_002366C8, func_002368B0 |
-| SwooshOwner | 3 | 1 | 0x10F activeSwooshes, 0x1B5 activeSwooshes2 | func_0023624C, func_002366C8, func_002368B0 |
-| Target | 3 | 3 | 0x214 pos | func_002298C4, func_002460FC, func_00455CD0 |
+| T2EventWords | 3 | 1 | `u32 w0, w1;` | func_00238888, func_00238958, func_002389EC |
 | TargetInfo | 3 | 3 | 0x44 flags, 0x52 flags2 | func_0025DF04, func_0025F068, func_00408C10 |
-| Timer | 3 | 3 | 0x00 value, 0x04 unk4, 0x08 reload, 0x0C count, 0x10 index, 0x14 d, 0x18 unk18, 0x1C unk1C | func_0042F600, func_0042F700, func_00468758 |
-| Trail | 3 | 3 | 0x08 *track, 0x0C *first, 0x10 *second, 0x14 model[0x28 - 0x14], 0x28 phase, 0x3C flags, 0x40 *tail, 0x44 *clock, ... | func_00234348, func_0023685C, func_00236BC4 |
 | Triple | 3 | 3 | 0x0 unk0, 0x4 unk4, 0x8 unk8 | func_0026D230, func_0026EE30, func_00401B30 |
-| WRec | 3 | 3 | `u8 pad0[0xA0]; Box3 box; u8 padB8[0x2]; u8 bBA; u8 padBB[0x2]; u8 bBD;...` | func_002132B8, func_00213A70, func_00213FA0 |
-| WTab | 3 | 3 | `u8 pad0[0x4]; s32 count; WRec r[1];` | func_002132B8, func_00213A70, func_00213FA0 |
 | AIModeParam | 2 | 1 | 0x6 value | func_002668D4, func_0026E40C |
-| Actor00403CF8 | 2 | 1 | 0x00 unk0, 0x04 pos | func_00403CF8, func_0043CCF8 |
-| Actor0040457C | 2 | 1 | 0x140 ai[1] | func_0040457C, func_0043D57C |
+| Actor0040457C | 2 | 2 | `#define T2_HOFF_Actor0040457C(m) __builtin_offsetof(CGameObjectInstanc...` | func_0040457C, func_0043D57C |
 | ActorBlock | 2 | 1 | 0x00 size, 0x04 count, 0x08 objects[1] | func_0042BA40, func_00464960 |
 | Anim | 2 | 1 | 0x24C angle | func_00259A4C, func_00259A98 |
 | AnimData | 2 | 2 | 0x14 unk14 | func_00232ECC, func_00290D5C |
@@ -787,22 +837,15 @@ as written.
 | AnimPlayer | 2 | 2 | 0x00 time, 0x04 current, 0x06 next, 0x08 frames, 0x0A active, 0x0B dirty, 0x0C keys, 0x10 *data | func_00218B10, func_00284660 |
 | Arg | 2 | 2 | 0x2C unk2C | func_0028FA00, func_00293028 |
 | Attached002534E0 | 2 | 1 | 0xD0 unkD0, 0x140 sub140[1] | func_002534E0, func_0025359C |
-| AttackActor | 2 | 2 | 0x10 target, 0x14 *def | func_0025DF04, func_0025E248 |
-| AttackState | 2 | 2 | 0x00 flags, 0xC4 anim, 0x133 index | func_0025DF04, func_0025E248 |
 | B01FH | 2 | 1 | `f32 f; s32 i; s16 h;` | func_002628B8, func_0026342C |
-| B01W4 | 2 | 1 | `s32 i; f32 f; s16 h[2]; u8 b[4];` | func_002628B8, func_0026342C |
 | B04O | 2 | 2 | `u8 pad0[4]; s32 x, y, z;` | func_0024646C, func_00246B24 |
-| B15Blk8 | 2 | 1 | `s16 a, b; s32 c;` | func_00239058, func_00239254 |
+| B15Blk8 | 2 | 2 | `s16 a, b; s32 c;` | func_00239058, func_00239254 |
 | B15Def | 2 | 1 | `s32 type; u8 pad4[0xA]; s8 unkE;` | func_0023726C, func_00239254 |
 | B15Src | 2 | 2 | `u8 type; u8 pad1[3]; CVector3 pos;` | func_00239058, func_00239254 |
 | BigState2BB0 | 2 | 2 | 0x2BB0 unk2BB0, 0x2BB4 unk2BB4 | func_002718D0, func_002718E0 |
-| BindSlot | 2 | 1 | 0x00 *source, 0x04 unk4, 0x06 unk6, 0x07 unk7, 0x08 unk8, 0x09 unk9, 0x0A unkA, 0x0B unkB, ... | func_002929A0, func_00292A20 |
-| BindSource | 2 | 1 | 0x00 unk0, 0x01 unk1, 0x02 unk2, 0x0C unkC | func_002929A0, func_00292A20 |
-| BindTable | 2 | 1 | 0x60 *slots | func_002929A0, func_00292A20 |
-| Blast | 2 | 1 | `u16 radius; u16 damage; s8 strength; s8 x; s8 y; s8 z;` | func_002374AC, func_00237AFC |
-| BlastActor | 2 | 2 | 0x000 kind, 0x004 pos, 0x054 height, 0x0D4 flags, 0x140 ai[0x1A8 - 0x140], 0x1A8 *owner | func_00237AFC, func_00238334 |
+| Blast | 2 | 1 | `u16 damage; u16 radius; s8 z; s8 y; s8 x; s8 strength;` | func_002374AC, func_00237AFC |
 | BobObject | 2 | 1 | 0x50 yaw | func_0024FC08, func_0024FE10 |
-| BossCtl | 2 | 1 | 0x00 unk0, 0x04 state, 0x5C dest | func_00406000, func_0043F000 |
+| BossCtl | 2 | 2 | `#define T2_HOFF_BossCtl(m) __builtin_offsetof(LevelScriptState, m) uni...` | func_00406000, func_0043F000 |
 | BossWait | 2 | 1 | 0x0 waitMin, 0x4 waitMax | func_00404C44, func_0043DC44 |
 | CKeyEvent | 2 | 1 | 0x06 param | func_0026E3EC, func_0026E46C |
 | Chars4 | 2 | 1 | `char c[4];` | func_0041FCF4, func_00458C14 |
@@ -815,38 +858,29 @@ as written.
 | Cylinder | 2 | 2 | 0x00 pos, 0x0C unkC, 0x10 radiusSq | func_0023CEC0, func_00242284 |
 | DLNode | 2 | 2 | 0x0 *next, 0x4 *prev | func_0026D2D0, func_002767F8 |
 | DirLight | 2 | 1 | 0x00 x, 0x02 y, 0x04 z, 0x06 w, 0x08 angle0, 0x0A angle1, 0x0C color[4] | func_0042D220, func_00466140 |
-| Drawable | 2 | 2 | 0x80 unk80, 0x88 flags, 0x8A frame | func_00214E88, func_0022077C |
+| Drawable | 2 | 2 | `u8 pad0[__builtin_offsetof(CStaticObject, m_LitKey)]; s32 unk80; u8 pa...` | func_00214E88, func_0022077C |
 | EffectParams | 2 | 2 | 0x0 type, 0x2 scale, 0x4 count, 0x5 r, 0x6 g, 0x7 b | func_0023F880, func_00406C4C |
 | Element | 2 | 1 | 0x00 type, 0x28 x, 0x2C y, 0x30 z30, 0x34 z34, 0x4C x2, 0x50 y2, 0x54 z2 | func_002261A8, func_00465B04 |
 | EmitDef | 2 | 1 | `u8 pad0[2]; u8 unk2; u8 unk3; u8 pad4[0x19]; u8 unk1D; u8 pad1E[3]; u8...` | func_00236A34, func_00236D50 |
 | EmitOwner | 2 | 2 | `u8 pad0[0xF8]; struct EmitOwnerInfo *info;` | func_00236A34, func_00236D50 |
 | EmitOwnerInfo | 2 | 1 | `u8 pad0[0x14]; s32 unk14;` | func_00236A34, func_00236D50 |
-| Entity0040457C | 2 | 1 | 0x00 unk0, 0x04 pos, 0x10 region, 0x18 rot | func_0040457C, func_0043D57C |
-| Entry0026C5C4 | 2 | 1 | 0x00 key, 0x02 flags, 0x10 *child0, 0x14 *child1, 0x18 *child2 | func_0026C5C4, func_0026C934 |
+| Entry0026C5C4 | 2 | 1 | `#define T2_HOFF_Entry0026C5C4(m) __builtin_offsetof(CGameRegion, m) un...` | func_0026C5C4, func_0026C934 |
 | Floats | 2 | 1 | `f32 unk0, unk4, unk8, unkC, unk10, unk14;` | func_0042F9B0, func_004688D0 |
 | Floor | 2 | 2 | `u8 data[0x20];` | func_00220A1C, func_0024EF70 |
 | FontStyle | 2 | 2 | 0xA0 envR, 0xA4 envG, 0xA8 envB, 0xAC primR, 0xB0 primG, 0xB4 primB, 0xB8 width, 0xBC height, ... | func_0027874C, func_00278CDC |
 | GameplayCamera | 2 | 2 | `char pad0[0x2D8]; char clipPlanes[0x60]; CVector3 clipBounds[2];` | func_0022782C, func_002745DC |
-| GfxPool | 2 | 1 | 0x00 *gfx, 0x04 *dynamic, 0x08 *fb[3], 0x0C *depth, 0x18 *vtx | func_00425220, func_0045E140 |
-| Globals | 2 | 1 | 0x000 *menus, 0xCC5 timed, 0xE78 paused, 0xE84 match | func_00251FC4, func_0025492C |
+| Globals | 2 | 2 | `u8 pad0[G_OFF(m_Settings.multiplayer) - G_OFF(m_MenuPool)]; u8 timed; ...` | func_00251FC4, func_0025492C |
 | HitDef | 2 | 2 | 0x66 kind | func_002376F8, func_0023DF70 |
 | Holder | 2 | 2 | 0x10 *unk10 | func_0021793C, func_00407CB0 |
 | Hud | 2 | 1 | 0x090 unk90, 0x094 unk94, 0x098 unk98, 0x09C unk9C, 0x0C8 unkC8[0x148 - 0xC8], 0x148 unk148[0x80] | func_0042EB50, func_00467A70 |
-| Info0040457C | 2 | 1 | 0x24 unk24 | func_0040457C, func_0043D57C |
+| Info0040457C | 2 | 2 | `#define T2_HOFF_Info0040457C(m) __builtin_offsetof(CAITargets, m) unio...` | func_0040457C, func_0043D57C |
 | IntPair | 2 | 1 | `s32 field_0; s32 field_4;` | func_0042F9B0, func_004688D0 |
-| K7Mem | 2 | 1 | `s32 addr;` | func_0041F32C, func_0045824C |
-| K7Obj | 2 | 1 | `s16 state; u8 pad2[0x12]; s32 f14; u8 pad18[4]; s32 f1C; K7Sub *f20;` | func_0041F32C, func_0045824C |
-| K7Sub | 2 | 1 | `u8 pad0[4]; s8 b4;` | func_0041F32C, func_0045824C |
-| Level00403CF8 | 2 | 1 | 0x00C unkC, 0x02C *data, 0x037 unk37, 0x0F0 *onReset, 0x0F4 *onEvent, 0x0F8 *onHit, 0x108 *onDraw | func_00403CF8, func_0043CCF8 |
-| LevelLights | 2 | 2 | 0x0A color[3], 0x0D ambient[3], 0x10 flags, 0x11 dir[3] | func_0042AA80, func_0042C758 |
 | LevelNode | 2 | 1 | 0x00 unk0, 0x04 count, 0x08 records[1] | func_0042BA40, func_00464960 |
 | LevelRecord | 2 | 1 | 0x00 unk0, 0x04 pos, 0x20 spawnId, 0x22 defId, 0x24 angle | func_0042BA40, func_00464960 |
-| LevelScriptF604 | 2 | 1 | 0x000 stage, 0x00C speed, 0x36C *partA, 0x370 *partB, 0x3CC unk3CC, 0x3D0 state, 0x3D4 mode, 0x3D9 scriptOn, ... | func_00406000, func_0043F000 |
-| LevelScriptF950 | 2 | 1 | 0x00 spawnsLeft, 0x04 wavesLeft, 0x08 enemiesAlive, 0xB8 script2, 0xC8 script2On | func_00404FE0, func_004050E0 |
-| LevelScriptF9D0 | 2 | 2 | 0x00 restart, 0x50 *script, 0x54 scriptPrev, 0x58 scriptIndex | func_00407BBC, func_00440BBC |
-| LevelState | 2 | 2 | 0x98 *handle98, 0x9C *handle9C, 0xA0 *handleA0, 0xA4 *handleA4, 0xA8 *handleA8, 0xAC *handleAC, 0xB0 *handleB0, 0xB4 *handleB4, ... | func_0042C9DC, func_0042CD04 |
+| LevelScriptF604 | 2 | 2 | `#define T2_HOFF_LevelScriptF604(m) __builtin_offsetof(LevelScriptBlock...` | func_00406000, func_0043F000 |
+| LevelScriptF950 | 2 | 1 | `#define T2_HOFF_LevelScriptF950(m) __builtin_offsetof(LevelScriptState...` | func_00404FE0, func_004050E0 |
+| LevelScriptF9D0 | 2 | 2 | `#define T2_HOFF_LevelScriptF9D0(m) __builtin_offsetof(LevelScriptState...` | func_00407BBC, func_00440BBC |
 | LinkList | 2 | 1 | 0x0 *head, 0x4 *tail | func_0028E9E0, func_0028EA10 |
-| List002534E0 | 2 | 1 | 0x20 *head | func_002534E0, func_0025359C |
 | ListNode | 2 | 2 | 0x16 unk16 | func_00228B4C, func_002933E0 |
 | ListOwner | 2 | 2 | 0x14 m_List | func_00228B4C, func_00281974 |
 | M04Ctx | 2 | 1 | `u8 pad0[0x84]; u8 player[0x58]; s16 snd[16]; u8 padFC[8]; s32 unk104; ...` | func_00272278, func_00272B54 |
@@ -855,57 +889,39 @@ as written.
 | M04Rec12 | 2 | 1 | `u16 w0, w1, w2; s16 w3; u16 w4, w5;` | func_00272278, func_00272B54 |
 | M04Tgt | 2 | 1 | `u8 pad0[0x114]; f32 x; f32 y; f32 z; u8 pad120[0x528 - 0x120]; f32 f52...` | func_00272278, func_00272B54 |
 | M04VP | 2 | 1 | `s32 w0; s32 w4; s32 vol; s32 wC; s16 s10; u8 pad12[2]; M04IF v14; s16 ...` | func_00272278, func_00272B54 |
-| M1IF | 2 | 1 | `s32 i; f32 f;` | func_00263DD8, func_00265B58 |
-| M1W4 | 2 | 1 | `s32 i; f32 f; s16 h[2]; u16 hu[2]; u8 b[4]; u32 u;` | func_00263DD8, func_00265B58 |
 | MatchState | 2 | 2 | 0x14 timeLeft, 0x18 fragLimit, 0x1C over | func_00251FC4, func_0025492C |
 | MatrixF | 2 | 1 | `f32 m[16];` | func_0021A7EC, func_0022A1A4 |
 | MenuColorInit | 2 | 1 | `u16 a; u8 pad2[2]; u16 b; u8 pad6[2]; u16 c; u8 padA[3]; u8 d; u8 pad0...` | func_00413230, func_0044C230 |
-| MenuData | 2 | 2 | 0x14 *data | func_0041CAB0, func_0041CDBC |
 | MenuMatchGlobals | 2 | 2 | `u8 unobserved0[0x20]; GameplayCamera *cameras; u8 unobserved24[0x40 - ...` | func_002712E8, func_00271694 |
-| Missile | 2 | 2 | 0x004 pos, 0x018 vel, 0x040 flags, 0x0F8 *parent, 0x114 *target, 0x11C speed, 0x150 dir, 0x1B8 *loop | func_002298C4, func_00229D10 |
-| ModeState0040457C | 2 | 1 | 0x000 mode, 0x344 handle, 0x348 spawnsLeft, 0x34C wavesLeft, 0x350 enemiesAlive, 0x354 spawnTimer, 0x358 region, 0x35C doorsOpen, ... | func_0040457C, func_0043D57C |
+| ModeState0040457C | 2 | 2 | `#define T2_HOFF_ModeState0040457C(m) __builtin_offsetof(LevelScriptSta...` | func_0040457C, func_0043D57C |
 | ModelRecord | 2 | 1 | 0x44 flags | func_00251698, func_0026C7A8 |
-| ModuleObj | 2 | 2 | 0x174 animState | func_0040A25C, func_0040BEE4 |
-| MorphClock | 2 | 1 | 0x08 time | func_0023353C, func_00233868 |
-| MorphItem | 2 | 1 | 0x00 colorA[4], 0x04 colorB[4], 0x08 pointA, 0x0A pointB | func_0023353C, func_00233868 |
-| MorphOwner | 2 | 1 | 0x08 *timing, 0x24 remaining | func_0023353C, func_00233868 |
-| MorphPoint | 2 | 1 | 0x00 pos | func_0023353C, func_00233868 |
-| MorphTiming | 2 | 1 | 0x04 fadeTime, 0x08 duration | func_0023353C, func_00233868 |
 | MotionState | 2 | 1 | `u32 flags; u8 pad4[0x3C]; f32 timer;` | func_00264478, func_00264644 |
-| Mount | 2 | 2 | 0x000 kind, 0x004 pos, 0x050 yaw, 0x0B8 type, 0x140 ai[4] | func_0024EAF8, func_00251A2C |
-| Node002534E0 | 2 | 1 | 0x0A50 *attached, 0x1320 *next | func_002534E0, func_0025359C |
-| O01Pad | 2 | 1 | `s32 v; s32 freeb; s32 cnt;` | func_0041EDE0, func_00457D00 |
-| O01Sel | 2 | 1 | `s32 v; s32 w;` | func_0041DF50, func_00456E70 |
+| Mount | 2 | 2 | `#define T2_HOFF_Mount(m) __builtin_offsetof(CGameObjectInstance, m) un...` | func_0024EAF8, func_00251A2C |
 | ObjDef | 2 | 2 | `u16 pad0; u16 flags;` | func_0021E03C, func_00268210 |
 | PackedBitWords | 2 | 1 | `u32 low; u32 high;` | func_002177DC, func_00217EFC |
 | PackedRange | 2 | 1 | 0x0 base, 0x2 range | func_0022D2FC, func_0026D128 |
 | Pair | 2 | 2 | 0x0 a, 0x4 b | func_00207908, func_0020793C |
 | Path | 2 | 2 | 0x40 *segments, 0x4C totalLength | func_00236B7C, func_00402658 |
-| Pickup | 2 | 2 | 0x004 pos, 0x014 *def, 0x018 vel, 0x14C boundsMin, 0x158 boundsMax, 0x19C timer | func_00227680, func_00265F90 |
 | PickupDef | 2 | 2 | `char pad0[0x14]; PickupParams params;` | func_0023F634, func_00265F90 |
 | PickupInfo | 2 | 2 | 0x0C ammoType | func_00253C14, func_00265F90 |
 | PlacedPropRecord | 2 | 2 | 0x00 value, 0x04 scale, 0x08 id, 0x0A segment, 0x0C flags, 0x0E model, 0x10 y, 0x12 extents[6], ... | func_002141F0, func_00214564 |
-| Plan | 2 | 2 | 0x04 active, 0x30 *info, 0x68 *ignore, 0x80 *approachFrom, 0x84 unk84, 0x8C rotY, 0x90 height, 0x94 location, ... | func_002438C0, func_00243C90 |
-| Player | 2 | 2 | 0x0004 pos, 0x0010 *model, 0x0014 *def, 0x001C velY, 0x0040 unk40, 0x0050 yaw, 0x00D4 flags, 0x00DC anim, ... | func_0024C47C, func_00271DB4 |
+| Player | 2 | 2 | `#define T2_HOFF_PL(m) __builtin_offsetof(CPlayer, m) union { struct { ...` | func_0024C47C, func_00271DB4 |
+| Pool | 2 | 2 | 0x3C cur, 0x40 *slots | func_00293530, func_00466040 |
 | PoolNode | 2 | 2 | 0x00 *next, 0x14 *self, 0x31 unk31, 0x32 unk32, 0x33 unk33 | func_0029247C, func_00466040 |
 | ProjVertex | 2 | 2 | 0x00 x, 0x04 y, 0x10 *pos | func_0023D4D4, func_0023D7CC |
-| ProjectileDef | 2 | 2 | 0x2C *wobble | func_00229618, func_0022A1A4 |
-| Q4Z | 2 | 1 | `u8 pad0[8]; u32 f8; u8 padC[8]; void *f14;` | func_0041B05C, func_00453FC4 |
+| ProjectileDef | 2 | 2 | `#define T2_HOFF_ProjectileDef(m) __builtin_offsetof(CROMParticleEffect...` | func_00229618, func_0022A1A4 |
 | Quad | 2 | 2 | `s32 x0; s32 x4; s32 x8; s32 xC;` | func_00238114, func_0024C47C |
-| QuadVtx | 2 | 2 | 0x0 ob[3], 0x6 flag, 0x8 tc[2], 0xC cn[4] | func_004302A0, func_004691C0 |
 | Reader | 2 | 2 | 0x8 *p | func_002932BC, func_004034E0 |
 | Record | 2 | 1 | 0x00 data[2], 0x08 valid, 0x0C rest[4] | func_0042CE10, func_00465D30 |
 | ResidentDataChunk | 2 | 1 | `s32 width; s32 count; u8 data[1];` | func_0042B3E4, func_00464304 |
-| S10Item | 2 | 1 | `u8 pad0[0x14]; void *f14;` | func_00418158, func_00451108 |
 | ScTask | 2 | 2 | 0x00 *next, 0x04 state, 0x08 flags, 0x0C *framebuffer, 0x10 list, 0x50 *msgQ, 0x54 *msg, 0x58 startTime, ... | func_00286B58, func_0028A17C |
 | Sched | 2 | 2 | 0x020 retraceMsg, 0x040 queue[0x18], 0x2E0 *clients | func_0028A020, func_0028A17C |
-| ShadowParams | 2 | 2 | `u8 pad0[0x10]; s32 blobType;` | func_0021DC84, func_0022D2FC |
+| ShadowParams | 2 | 2 | `u8 pad0[__builtin_offsetof(CDrawArgs, m_pOffset)]; sptr blobType;` | func_0021DC84, func_0022D2FC |
 | Shared_Game | 2 | 2 | `char pad0[0x5D8]; RenderCounters counters;` | func_0041CA00, func_00455960 |
 | SortEntry | 2 | 2 | 0x00 dist | func_0022077C, func_00226D0C |
-| SortItem | 2 | 1 | 0x4 key | func_00226D30, func_002407D8 |
+| SortItem | 2 | 2 | 0x4 key | func_00226D30, func_002407D8 |
 | Sound | 2 | 2 | 0x0C id | func_0025C5F8, func_00277024 |
 | SoundEvent | 2 | 2 | `CGameObjectInstance *object; char pad4[0x14 - 0x4]; SoundRange *range;...` | func_00256738, func_0026E3A8 |
-| Source | 2 | 2 | `u8 pad0[4]; CVector3 position; u8 pad10[4]; s32 *kind; u8 pad18[0x50 -...` | func_00245848, func_0025B078 |
 | Spawn | 2 | 2 | 0x38 pos[3] | func_00254044, func_0044700C |
 | SpinState | 2 | 2 | 0x034 mode, 0x10C angle, 0x110 spin | func_002591F4, func_002649A0 |
 | SplineSource | 2 | 1 | `s32 stride,count; union { char data[0]; CVector3 points[0]; f32 weight...` | func_0040F240, func_00448240 |
@@ -913,20 +929,17 @@ as written.
 | SplineTable | 2 | 1 | `s32 count;` | func_0040F240, func_00448240 |
 | StateInfo | 2 | 2 | `u8 pad0[0x24]; u32 flags; u8 pad28[0x24]; f32 delay;` | func_00264478, func_00264644 |
 | SwooshPoint | 2 | 1 | 0x04 y | func_002366C8, func_002368B0 |
+| T2SortRecord | 2 | 1 | `void *p; f32 key;` | func_0023DB5C, func_0024079C |
+| Target | 2 | 2 | 0x78 unk78, 0x7C unk7C | func_002460FC, func_00455CD0 |
 | TargetActor | 2 | 2 | 0x04 pos | func_0022A1A4, func_002623EC |
 | Thread | 2 | 2 | 0xD4 *sp | func_0028BDFC, func_0028C0B0 |
 | TimedNode | 2 | 2 | 0x00 *prev, 0x04 *next, 0x08 *item, 0x0C timer | func_002253F8, func_00294C70 |
-| Tracker | 2 | 2 | 0x00 unk0, 0x04 value, 0xB4 repeated | func_0025360C, func_0040E55C |
-| TrailMgr | 2 | 2 | 0x7514 freeList[0xC], 0x7520 *trails | func_002350EC, func_002352F8 |
+| Trail | 2 | 2 | 0x00 *prev, 0x04 *next, 0x08 *track, 0x0C *first, 0x10 *second, 0x14 model[2], 0x1C *owner, 0x20 id, ... | func_00234348, func_0023685C |
 | Tuning | 2 | 2 | 0x00 forwardAccel, 0x04 forwardMax, 0x08 forwardDecel, 0x0C strafeAccel, 0x10 strafeMax, 0x14 strafeDecel, 0x18 impulse, 0x1C impulseDecel, ... | func_0024F174, func_0024F658 |
 | Unk00401C78 | 2 | 1 | 0x4 state | func_00401C78, func_00401C88 |
-| Vec3_00403CF8 | 2 | 1 | `f32 x, y, z;` | func_00403CF8, func_0043CCF8 |
-| Vec3_0040457C | 2 | 1 | `f32 x, y, z;` | func_0040457C, func_0043D57C |
-| Vertex | 2 | 2 | 0x0 ob[3], 0x6 flag, 0x8 tc[2], 0xC cn[4] | func_00214F68, func_0026A798 |
 | ViewState | 2 | 2 | `s32 mask; u8 pad4[0xD]; u8 unk11;` | func_00221210, func_00221D3C |
 | Voice | 2 | 2 | 0x00 links[8], 0x08 def, 0x0C length | func_00225354, func_0024C47C |
 | Wave0040457C | 2 | 1 | 0x00 flag, 0x08 count, 0x0C delay, 0x14 type | func_0040457C, func_0043D57C |
-| Widget | 2 | 2 | `char pad0[0x2F]; s8 style; char pad30[0x33 - 0x30]; u8 colors[8];` | func_0041BC50, func_00454B64 |
 
 ## Files that are readable only on paper
 

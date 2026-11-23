@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 #include "globals/scene.h"
 
@@ -67,34 +68,6 @@ typedef struct PushSource {
 } PushSource;
 #endif
 
-#ifdef TARGET_PORT
-typedef struct PushTarget {
-/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_PushTarget(m) __builtin_offsetof(CGameObjectInstance, m)
-    union {
-        struct { u8 _hp_kind[T2_HOFF_PushTarget(header.m_Type)]; u8 kind; }; /* N64 0x0 */
-        struct { u8 _hp_type[T2_HOFF_PushTarget(header.m_nObjType)]; u16 type; }; /* N64 0x2 */
-        struct { u8 _hp_pos[T2_HOFF_PushTarget(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_dir[T2_HOFF_PushTarget(m_vVelocity)]; CVector3 dir; }; /* N64 0x18 */
-        struct { u8 _hp_angle[T2_HOFF_PushTarget(m_RotY)]; f32 angle; }; /* N64 0x50 */
-        struct { u8 _hp_playerFlags[T2_HOFF_PushTarget(m_AI.m_ModeFlags)]; u32 playerFlags; }; /* N64 0x17C */
-    };
-} PushTarget;
-#else
-typedef struct PushTarget {
-    /* 0x000 */ u8 kind;            /* 1: player, 2: object */
-    /* 0x001 */ u8 pad1;
-    /* 0x002 */ u16 type;
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x8];
-    /* 0x018 */ CVector3 dir;
-    /* 0x024 */ u8 pad24[0x50 - 0x24];
-    /* 0x050 */ f32 angle;
-    /* 0x054 */ u8 pad54[0x17C - 0x54];
-    /* 0x17C */ u32 playerFlags;
-} PushTarget;
-#endif
 
 
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
@@ -106,12 +79,12 @@ void CMtxF__SetRotateY(CMtxF *m, f32 angle);
 void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *m);
 
 /* The blast's push from `src` turned into a world vector, in the frame of `target`. */
-void Blast_GetPush(PushSource *src, PushTarget *target, Blast blast, CVector3 *out, u32 flags) {
+void Blast_GetPush(PushSource *src, CGameObjectInstance *target, Blast blast, CVector3 *out, u32 flags) {
     CVector3 v;
     CVector3 dir;
     CQuaternion q;
     CMtxF m;
-    PushTarget *obj;
+    CGameObjectInstance *obj;
 
     if (gScene.m_bStreamAll != 0) {
         out->x = 0.0f;
@@ -123,18 +96,18 @@ void Blast_GetPush(PushSource *src, PushTarget *target, Blast blast, CVector3 *o
     v.y = blast.y;
     v.z = blast.z;
     CVector3__Scale(&v, &v, blast.strength * 0.80629915f);
-    switch (target->kind) {
+    switch (target->header.m_Type) {
     case 1:
-        if (target->playerFlags & 0x2000) {
+        if (target->m_AI.m_ModeFlags & 0x2000) {
             v.x = 0.0f;
             v.z = 0.0f;
             v.y = 133.12f;
         }
-        CMtxF__SetRotateY(&m, target->angle + 3.1415927f);
+        CMtxF__SetRotateY(&m, target->m_RotY + 3.1415927f);
         break;
     case 2:
         obj = target;
-        switch (obj->type) {
+        switch (obj->header.m_nObjType) {
         case 0xE:
             dir.x = 0.0f;
             dir.z = 0.0f;
@@ -147,12 +120,12 @@ void Blast_GetPush(PushSource *src, PushTarget *target, Blast blast, CVector3 *o
             v.x = 0.0f;
             v.y = 0.0f;
             v.z = 409.59998f;
-            dir = obj->dir;
+            dir = obj->m_vVelocity;
             dir.y = 0.0f;
             break;
         default:
             if (flags & 0x400000) {
-                CVector3__Subtract(&dir, &src->pos, &obj->pos);
+                CVector3__Subtract(&dir, &src->pos, &obj->header.m_vPos);
                 dir.y = 7.68f;
             } else {
                 dir.x = 0.0f;

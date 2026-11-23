@@ -4,14 +4,12 @@
 #include "globals/onscreen.h"
 #include "globals/engine.h"
 #include "protos/ai.h"
+#include "structs/vector.h"
 
-typedef struct {
-    f32 x, y, z;
-} Vec3_0043CF3C;
 
 typedef struct {
     /* 0x00 */ s32 unk0;
-    /* 0x04 */ Vec3_0043CF3C pos;
+    /* 0x04 */ CVector3 pos;
 } Actor0043CF3C;
 
 typedef struct {
@@ -23,13 +21,13 @@ typedef struct {
     /* 0x00 */ u8 pad0[0x30];
     /* 0x30 */ Def0043CF3C *def;
     /* 0x34 */ u8 pad1[0x54 - 0x34];
-    /* 0x54 */ Vec3_0043CF3C spawn;
+    /* 0x54 */ CVector3 spawn;
 } Level0043CF3C;
 
 void AI_TurnHeadToTarget(Actor0043CF3C *actor, Level0043CF3C *level, s32 a2);
 void Animator_Update(void *light);
 s16 WeightedTable_PickStatic(void *table);
-void Primagen_SpawnTossedObject_2(s16 type, s32 a1, Vec3_0043CF3C offset);
+void Primagen_SpawnTossedObject_2(s16 type, s32 a1, CVector3 offset);
 void Primagen_UpdateHealth_2(Actor0043CF3C *actor, Level0043CF3C *level);
 void Primagen_UpdateSpawner_2(Actor0043CF3C *actor, Level0043CF3C *level);
 void COnScreen__SetBossPercent(void *a0, s32 percent);
@@ -40,7 +38,7 @@ void COnScreen__SetBossPercent(void *a0, s32 percent);
     }
 
 void Primagen_Step_2(Actor0043CF3C *actor, Level0043CF3C *level) {
-    Vec3_0043CF3C offset;
+    CVector3 offset;
     s32 type;
     s32 i;
 
