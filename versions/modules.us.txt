@@ -3011,8 +3011,8 @@ module libultra/libc/sprintf.c: 0x0029E3E0..0x0029E460, 2 functions; pad + ultra
   0x0029E438 proutSprintf
 
 module libultra/libc/string.c: 0x0029E460..0x0029E4E4, 3 functions; ultralib
-  // name runs (possible objects the padding cannot show): strchr 2, strlen 1
-  0x0029E460 func_0029E460
+  // name runs (possible objects the padding cannot show): memcpy 1, strchr 1, strlen 1
+  0x0029E460 memcpy
   0x0029E488 strchr
   0x0029E4C0 strlen
 
