@@ -9,7 +9,7 @@
 extern void Texture_InvalidateCache();
 extern char D_800AB680;
 extern s32 Render_SetRenderMode(s32);
-void func_00209658(void) {
+void Render_BeginDeferredAlpha(void) {
     Gfx *cmd;
     Texture_InvalidateCache();
     cmd = gDList++;

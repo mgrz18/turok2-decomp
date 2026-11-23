@@ -5,7 +5,7 @@
 #include "protos/scene.h"
 
 
-void func_004303AC(CEngineApp *arg0) {
+void CEngineApp__StartCinemaGame(CEngineApp *arg0) {
     u8 sp18[0x18];
     s32 var_s1;
 

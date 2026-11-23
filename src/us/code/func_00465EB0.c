@@ -5,8 +5,8 @@
 /* Reset the world's pool of run-time actors (all on the free list) and the two
  * pickup effect emitters (gLevelActorIntelligence, gLevelActorIntelligenceMP). */
 
-void func_0027BD10(CIntelligence *emitter);
-void func_00227664(CPooledLevelActor *actor);
+void CIntelligence__Init(CIntelligence *emitter);
+void SceneActor_Init(CPooledLevelActor *actor);
 
 void SceneActorPool_Construct_2(CLevelActorPool *pool) {
     s32 i;
@@ -21,12 +21,12 @@ void SceneActorPool_Construct_2(CLevelActorPool *pool) {
     pool->m_Actors[0].m_pPrev = NULL;
     pool->m_Actors[31].m_pNext = NULL;
 
-    func_0027BD10(&gLevelActorIntelligence);
+    CIntelligence__Init(&gLevelActorIntelligence);
     gLevelActorIntelligence.m_Type = 8;
     gLevelActorIntelligence.m_dwTypeFlags = 1;
     gLevelActorIntelligence.m_nTexture = 0;
     gLevelActorIntelligence.m_dwFlags |= 4;
-    func_0027BD10(&gLevelActorIntelligenceMP);
+    CIntelligence__Init(&gLevelActorIntelligenceMP);
     gLevelActorIntelligenceMP.m_Type = 8;
     gLevelActorIntelligenceMP.m_dwTypeFlags = 0;
     gLevelActorIntelligenceMP.m_nTexture = 0;
@@ -35,6 +35,6 @@ void SceneActorPool_Construct_2(CLevelActorPool *pool) {
     gLevelActorIntelligenceMP.m_Pickup.m_CollisionHeight = 122.88f;
 
     for (i = 0; i < 32; i++) {
-        func_00227664(&pool->m_Actors[i]);
+        SceneActor_Init(&pool->m_Actors[i]);
     }
 }

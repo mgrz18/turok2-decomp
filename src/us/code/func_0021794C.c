@@ -8,7 +8,7 @@
 #define CVector3__Lerp CVector3__Lerp_i
 #endif
 extern void CVector3__Lerp(CVector3 *arg0, s32 arg1, void *arg2, void *arg3);
-void func_0021794C(void *arg0, s32 arg1, void *arg2) {
+void Anim_GetBoneTranslation(void *arg0, s32 arg1, void *arg2) {
     extern void *CISet__GetBlock(void *arg0, s32 arg1);
     ObjectLinks24_2 *o = arg0;
     ObjRecAt2V1 *indices = (void *)o->unk_0;

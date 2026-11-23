@@ -16,7 +16,7 @@ void CMtxF__Translate(void *m, f32 x, f32 y, f32 z);
 void CMtxF__ScaleAxes(void *m, f32 a, f32 b, f32 c);
 void CMtxF__ToMtxAffine(void *a, void *b);
 /* Places a ground decal of kind idx at pos facing dir (a free one, else the oldest of its kind). */
-SwooshDecal *func_002364A4(CSwooshSystem *o, CVector3 pos, CVector3 dir, s32 idx, sptr val) {
+SwooshDecal *SwooshSystem_PlaceDecal(CSwooshSystem *o, CVector3 pos, CVector3 dir, s32 idx, sptr val) {
     u8 m10[0x40];
     u8 m50[0x10];
     SwooshDecal *n;

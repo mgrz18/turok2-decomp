@@ -13,7 +13,7 @@ typedef struct {
 } Ref002360A0;
 
 /* Adds a point to every live swoosh of object arg1, at the bone (record + 0xC) of matrices arg2. */
-void func_002360A0(CSwooshSystem *arg0, sptr arg1, sptr arg2) {
+void SwooshSystem_AddBonePoints(CSwooshSystem *arg0, sptr arg1, sptr arg2) {
     u8 sp10[0x40];
     Swoosh *var_s0;
 

@@ -20,13 +20,13 @@ extern void AI_StopSound(u8 *, u8 *);
  * the position and the value fill a3 and the stack words this definition names pair; on the host
  * the vector travels in SSE/FP registers and the value in one general register, so the host
  * definition takes them as they are passed: the value's first word is what MIPS read. */
-void func_00239398(void *unused, u8 *object, s32 third, CVector3 pos, s32 value) {
+void ImpactEvent_AIStopSound(void *unused, u8 *object, s32 third, CVector3 pos, s32 value) {
     if (object != 0 && object[0] == 1) {
         AI_StopSound(object, object + T2_OFFSETOF(CGameObjectInstance, m_AI));
     }
 }
 #else
-void func_00239398(void *unused, u8 *object, s32 third, struct IntPair pair) {
+void ImpactEvent_AIStopSound(void *unused, u8 *object, s32 third, struct IntPair pair) {
     if (object != 0 && object[0] == 1) {
         AI_StopSound(object, object + T2_OFFSETOF(CGameObjectInstance, m_AI));
     }

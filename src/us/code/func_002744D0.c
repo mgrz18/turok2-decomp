@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 
 extern f32 Random_Blend(f32 arg0, f32 arg1);
-extern s16 func_002744D0(s16 arg0, s16 arg1);
-s16 func_002744D0(s16 arg0, s16 arg1) {
+extern s16 Sound_RandomVary(s16 arg0, s16 arg1);
+s16 Sound_RandomVary(s16 arg0, s16 arg1) {
     f32 temp_f20;
     f32 temp_f21;
     temp_f21 = (f32)arg1;

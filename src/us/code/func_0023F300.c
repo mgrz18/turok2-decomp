@@ -26,7 +26,7 @@ static __inline__ void pickup_feedback(CPlayer *player, void *resource, s32 soun
     }
 }
 
-s32 func_0023F300(CPlayer *player, CPickupEntry *entry) {
+s32 Pickup_GivePistolAmmo(CPlayer *player, CPickupEntry *entry) {
     void *resource;
     s32 sound;
     s32 callback;

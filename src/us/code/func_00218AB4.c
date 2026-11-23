@@ -9,7 +9,7 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-u32 func_00218AB4(s32 arg0)
+u32 Bits_CeilLog2(s32 arg0)
 {
   s32 var_v0;
   u32 var_a1;

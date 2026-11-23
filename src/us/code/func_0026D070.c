@@ -23,7 +23,7 @@ typedef struct {
     /* 0x1A */ u16 maskT;
 } Material;
 
-s32 func_00207914(void *, s32);                 /* extern */
+s32 Material_GetTextureSet(void *, s32);                 /* extern */
 
 void Material_Unpack(Material *arg0, MaterialRec *arg1) {
     s32 temp_a1;
@@ -51,5 +51,5 @@ void Material_Unpack(Material *arg0, MaterialRec *arg1) {
         arg0->texture = 0;
         return;
     }
-    func_00207914(&arg0->texture, temp_a1);
+    Material_GetTextureSet(&arg0->texture, temp_a1);
 }

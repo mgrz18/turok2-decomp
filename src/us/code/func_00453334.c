@@ -6,8 +6,8 @@
 #include "structs/game.h"
 
 extern s32 gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern void func_00469250(void *a);
+extern void CEngineApp__QuitToLegal_2(void *a);
 s32 ContinueMenu_No_2(s32 a, Menu *b) {
-    if (gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount == 1) func_00469250(&gEngineApp); else b->player->m_bActive = 0;
+    if (gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount == 1) CEngineApp__QuitToLegal_2(&gEngineApp); else b->player->m_bActive = 0;
     return 1;
 }

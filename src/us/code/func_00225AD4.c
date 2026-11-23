@@ -15,7 +15,7 @@ typedef struct ActorList {
 
 /* Detaches the first actor linked to `id` and relinks every other actor
  * linked to `id` onto it; returns the detached actor. */
-ActorRec *func_00225AD4(ActorList *obj, ActorRec *id) {
+ActorRec *CScene__ReplaceLeader(ActorList *obj, ActorRec *id) {
     int i;
     ActorRec *found;
     int count;

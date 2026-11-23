@@ -4,8 +4,8 @@
 #include "structs/level_actor.h"
 #include "globals/scene.h"
 
-extern void func_0027BD10(CIntelligence *def);
-extern void func_00227664(CPooledLevelActor *actor);
+extern void CIntelligence__Init(CIntelligence *def);
+extern void SceneActor_Init(CPooledLevelActor *actor);
 
 /* Links the 32 actors of the pool into its free list and sets up the two default definitions. */
 void SceneActorPool_Construct(CLevelActorPool *pool) {
@@ -21,13 +21,13 @@ void SceneActorPool_Construct(CLevelActorPool *pool) {
     pool->m_Actors[0].m_pPrev = NULL;
     pool->m_Actors[31].m_pNext = NULL;
 
-    func_0027BD10(&gLevelActorIntelligence);
+    CIntelligence__Init(&gLevelActorIntelligence);
     gLevelActorIntelligence.m_Type = 8;
     gLevelActorIntelligence.m_dwTypeFlags = 1;
     gLevelActorIntelligence.m_nTexture = 0;
     gLevelActorIntelligence.m_dwFlags |= 4;
 
-    func_0027BD10(&gLevelActorIntelligenceMP);
+    CIntelligence__Init(&gLevelActorIntelligenceMP);
     gLevelActorIntelligenceMP.m_Type = 8;
     gLevelActorIntelligenceMP.m_dwTypeFlags = 0;
     gLevelActorIntelligenceMP.m_nTexture = 0;
@@ -35,6 +35,6 @@ void SceneActorPool_Construct(CLevelActorPool *pool) {
     gLevelActorIntelligenceMP.m_Pickup.m_CollisionHeight = gLevelActorIntelligenceMP.m_Pickup.m_CollisionRadius = 122.88f;
 
     for (i = 0; i < 32; i++) {
-        func_00227664(&pool->m_Actors[i]);
+        SceneActor_Init(&pool->m_Actors[i]);
     }
 }

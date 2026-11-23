@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/particle.h"
 
-f32 func_00232EAC(CParticle *arg0) {
+f32 CParticle__GetSpriteRotX(CParticle *arg0) {
     f32 var_f0;
 
     var_f0 = 0.0f;

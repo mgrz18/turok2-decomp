@@ -4,9 +4,9 @@
 #include "rw/abu_types.h"
 #include "globals/pak.h"
 
-extern void func_0045B0E4(struct RecordRecAtCV1 *record);
+extern void CharNoteMenu_InitSave_2(struct RecordRecAtCV1 *record);
 extern s32 D_801309A8;
-void func_0045B0E4(struct RecordRecAtCV1 *record) {
+void CharNoteMenu_InitSave_2(struct RecordRecAtCV1 *record) {
     record->target->first &= ~0x01800000;
     sCharNoteLoad = 0;
     D_801309A8 = 1;

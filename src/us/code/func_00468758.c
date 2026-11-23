@@ -8,7 +8,7 @@ typedef struct {
 } Timer;
 
 /* Counts down; calls the callback when it runs out. */
-void func_00468758(Timer *arg0) {
+void DemoStream_Tick_2(Timer *arg0) {
     s32 temp_v0;
 
     temp_v0 = arg0->counter - 1;

@@ -6,9 +6,9 @@
 #include "protos/game.h"
 
 #ifdef TARGET_PORT
-extern u8 func_0026C114(void *region); /* ABI: it returns u8 (as s32 the host read garbage upper bits) */
+extern u8 CGameRegion__GetWallSurface(void *region); /* ABI: it returns u8 (as s32 the host read garbage upper bits) */
 #else
-extern s32 func_0026C114(void *region);                     /* region's surface type */
+extern s32 CGameRegion__GetWallSurface(void *region);                     /* region's surface type */
 #endif
 extern void ImpactEvent_Send(CParticle *, CParticle *, s32 effect, s32, CVector3 pos, CEventValue params);
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
@@ -35,7 +35,7 @@ void CParticle__HitWall(CParticle *arg0) {
         }
     }
     {
-        surface = func_0026C114(arg0->header.m_pCurrentRegion);
+        surface = CGameRegion__GetWallSurface(arg0->header.m_pCurrentRegion);
         if (surface == 10) {
             surface = 0;
         }

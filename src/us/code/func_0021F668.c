@@ -11,7 +11,7 @@ void CAnimationState__GetBonePosition(f32 *p, s32 a, f32 t, f32 *out);
 void CMtxF__SetRotateY(f32 *m, s32 a);
 void CMtxF__TransformPoint(f32 *m, f32 *v, f32 *out);
 void GameObject_TraceMove(CGameObjectInstance *a, CVector3 v, CVector3 *out, B11Box **box, s32 e, s32 f);
-void func_0021F668(CGameObjectInstance *a, f32 *p) {
+void CGameObjectInstance__ApplyRootMotion(CGameObjectInstance *a, f32 *p) {
     f32 t0[3];
     f32 t1[3];
     f32 d[3];

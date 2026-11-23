@@ -4,7 +4,7 @@
 
 s32 Controller_WatchPak(s8);                          /* extern */
 
-void func_00419594(Menu *arg0) {
+void SingleMenu_InitAfterPak(Menu *arg0) {
     Controller_WatchPak(arg0->controller->port);
     gDamagedPakContinued = 0;
 }

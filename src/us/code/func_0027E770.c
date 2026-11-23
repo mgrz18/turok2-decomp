@@ -15,7 +15,7 @@ void func_002847D0(void);
 s32 Cinema_PathPlaying(void);
 void CPlayerPool__ReloadAnimInfo(CPlayerPool *list, CCamera *cam);
 void CPlayerPool__DrawCharacters(CPlayerPool *list, CCamera *cam);
-void func_00235C30(void *arg0, CCamera *cam);
+void SwooshSystem_DrawDecals(void *arg0, CCamera *cam);
 void CLevelActorPool__Draw(u8 *arg0, CCamera *cam);
 void CEmitterPool__Draw(u8 *sky, CCamera *cam);
 void Trail_DrawAll(void *arg0, CCamera *cam);
@@ -36,7 +36,7 @@ void CCamera__DrawScene(CCamera *cam, u8 *world) {
         CPlayerPool__DrawCharacters(&gEngineApp_m_Game.m_PlayerList, cam);
     }
     CScene__DrawRegisteredInstances(world, cam);
-    func_00235C30(gEngineApp_m_SwooshSystem, cam);
+    SwooshSystem_DrawDecals(gEngineApp_m_SwooshSystem, cam);
     if (Cinema_PathPlaying() == 0) {
 #ifdef TARGET_PORT
         CLevelActorPool__Draw((u8 *) &((CScene *) world)->m_ActorPool, cam);

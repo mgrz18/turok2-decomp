@@ -1,4 +1,4 @@
-/* WRONG CUT: the real function is func_004302A0, size 0x90 (splat split it at func_004302CC). */
+/* WRONG CUT: the real function is Render_InitUnitQuad, size 0x90 (splat split it at func_004302CC). */
 #include "common.h"
 
 typedef struct QuadVtx {
@@ -11,7 +11,7 @@ typedef struct QuadVtx {
 extern QuadVtx D_8011AD48[4];
 
 /* Builds a unit quad in the XZ plane, white, textured 32x32 (S10.5 texture coordinates). */
-void func_004302A0(void) {
+void Render_InitUnitQuad(void) {
     s32 i;
     QuadVtx *v = D_8011AD48;
 

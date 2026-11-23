@@ -52,7 +52,7 @@ typedef struct Filter Filter;
 extern void Actor_SpawnParticle(void *, s32, Triple, s32);
 struct Triple;
 struct Triple;
-void func_00238FD4(void *arg0, Filter *arg1, s32 arg2, Triple arg3, struct IntPair arg6) {
+void ImpactEvent_SpawnTeamParticle(void *arg0, Filter *arg1, s32 arg2, Triple arg3, struct IntPair arg6) {
     ObjRecAt1 *object = arg0;
     switch (arg1->type) {
     case 0:

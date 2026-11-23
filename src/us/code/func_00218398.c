@@ -7,7 +7,7 @@
 extern unsigned long gT2BitStreamBase;
 #endif
 
-f32 func_00218398(B14FieldRd *f) {
+f32 Bits_ReadRangedFloat(B14FieldRd *f) {
     B14Tmp t1;
     B14Tmp t2;
     u32 addr;

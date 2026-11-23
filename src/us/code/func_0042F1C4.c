@@ -3,7 +3,7 @@
 #include "structs/controller.h"
 #include "globals/engine.h"
 
-void func_00430330(void *);
+void CEngineApp__QuitToLegal(void *);
 void CEngineApp__SetupFadeTo(void *, s32);
 
 /* Demo_UpdateChecksum */
@@ -27,7 +27,7 @@ void Demo_Update(void) {
     if (s->done == 0) {
         if (--s->countdown <= 0 || gMergedController.buttonsSingle != 0) {
             s->done = 1;
-            func_00430330(&gEngineApp);
+            CEngineApp__QuitToLegal(&gEngineApp);
             if (gMergedController.buttonsSingle != 0) {
                 CEngineApp__SetupFadeTo(&gEngineApp, 8);
             }

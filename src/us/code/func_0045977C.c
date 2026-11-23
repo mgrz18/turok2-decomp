@@ -19,7 +19,7 @@ s32 Controller_TakePakChanged(s32 a);
 void Pak_ProbeSlot_2(s32 a);
 s32 Pak_GetStatus_2(s32 a);
 void CScene__RequestWarp_2(u8 *a, s32 b, s32 c);
-void func_004692CC(u8 *a);
+void CEngineApp__StartCinemaGame_2(u8 *a);
 void MenuPool_OpenMenu_2(u8 *a, void *b, CPlayer *c, ControllerProfile *d, sptr e);
 
 s32 PakMessage_SelectOk_2(s32 a0, Menu *o) {
@@ -47,7 +47,7 @@ s32 PakMessage_SelectOk_2(s32 a0, Menu *o) {
             CScene__RequestWarp_2(&gScene, o->player->m_Data.m_CheckPointWarpID, 2);
             return 1;
         }
-        func_004692CC(&gEngineApp);
+        CEngineApp__StartCinemaGame_2(&gEngineApp);
         return 1;
     }
     if (gPakMenuAnyPak != 0) {

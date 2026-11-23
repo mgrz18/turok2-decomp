@@ -8,11 +8,11 @@
 extern s32 CGameRegion__IsSteep(void *region);
 #ifdef TARGET_PORT
 /* ABI: both return u8 (func_0026C114.c, func_0026C0E0.c): as s32 the host read eax's garbage upper bits */
-extern u8 func_0026C114(void *region);
-extern u8 func_0026C0E0(void *region);
+extern u8 CGameRegion__GetWallSurface(void *region);
+extern u8 CGameRegion__GetFloorSurface(void *region);
 #else
-extern s32 func_0026C114(void *region);
-extern s32 func_0026C0E0(void *region);
+extern s32 CGameRegion__GetWallSurface(void *region);
+extern s32 CGameRegion__GetFloorSurface(void *region);
 #endif
 /* gCollisionResults_m_pFloorRegion / gCollisionResults_m_vFloorPos are CCollisionResults (gCollisionResults, structs/collision.h)
  * m_pFloorRegion and m_vFloorPos; kept as their own symbols: reading them
@@ -37,9 +37,9 @@ void CParticle__HitFloor(CParticle *arg0) {
     CROMParticleEffect *desc;
 
     if (CGameRegion__IsSteep(arg0->header.m_pCurrentRegion) != 0) {
-        surface = func_0026C114(arg0->header.m_pCurrentRegion);
+        surface = CGameRegion__GetWallSurface(arg0->header.m_pCurrentRegion);
     } else {
-        surface = func_0026C0E0(arg0->header.m_pCurrentRegion);
+        surface = CGameRegion__GetFloorSurface(arg0->header.m_pCurrentRegion);
     }
     if (surface == 10) {
         surface = 0;

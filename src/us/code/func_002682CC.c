@@ -3,7 +3,7 @@
 #include "structs/game_object.h"
 #endif
 
-s32 func_002682CC(void *arg0) {
+s32 GameObject_IsInanimate(void *arg0) {
 #ifdef TARGET_PORT
     /* the instance header's m_pIntelligence (N64 0x14) by member: its m_Type */
     switch (*(s32 *) ((CInstanceHeader *) arg0)->m_pIntelligence) {

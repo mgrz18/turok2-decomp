@@ -7,7 +7,7 @@ typedef struct {
     /* 0x14 */ s32 (*callback)();
 } Unk0042F838;
 
-void func_0042F838(Unk0042F838 *arg0) {
+void DemoStream_Tick(Unk0042F838 *arg0) {
     s32 temp_v0;
 
     temp_v0 = arg0->countdown - 1;

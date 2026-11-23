@@ -22,7 +22,7 @@ extern char D_800B605C[];
 extern char D_800B6074[];
 
 /* Names setting 0x2C. */
-s32 func_00452060(MenuItem *item) {
+s32 TeamBloodMenu_LevelLabel_2(MenuItem *item) {
     switch (gEngineApp_m_Settings.teamArena) {
     case 0:
         item->text = D_800B5F3C;

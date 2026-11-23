@@ -3,7 +3,7 @@
 
 #include "rw/junk_types.h"
 
-f32 func_0021813C(P3QArr *a, s32 idx) {
+f32 Bits_GetFloat(P3QArr *a, s32 idx) {
     P3QArr loc; u32 pos; u32 *w; u32 sh; u32 v;
     u32 hi; u32 bits; register f32 fa asm("$f0"); f32 fb; pos = a->pos + a->q.bits * idx; loc.q = a->q; bits = loc.q.bits; w = (u32 *)((pos & 0xF0000000) | ((pos & 0x0FFFFFE0) >> 3)); sh = pos & 0x1F; v = w[0]; hi = w[1]; if (sh != 0) { v >>= sh; hi <<= 32 - sh; v |= hi; } if (bits < 32) { v &= (1 << bits) - 1; } fa = (f32)v; fb = (f32)((1 << bits) - 1); return fa / fb * loc.q.range + loc.q.min;
 }

@@ -28,7 +28,7 @@ static __inline__ void pickup_feedback(CPlayer *player, void *resource, s32 soun
 
 extern char D_800B3C30[];
 
-s32 func_0023F21C(CPlayer *player, CPickupEntry *entry) {
+s32 Pickup_GivePistolClip(CPlayer *player, CPickupEntry *entry) {
     s32 sound;
     s32 callback;
 

@@ -10,7 +10,7 @@ extern char D_800B617C[];
 extern char D_800B6164[];
 
 /* Names setting 0x29. */
-s32 func_004517BC(MenuItem *item) {
+s32 FragTagMenu_CrosshairsLabel_2(MenuItem *item) {
     switch (gEngineApp_m_Settings.tagCrosshairs) {
     case 0:
         item->text = D_800B617C;

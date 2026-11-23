@@ -12,6 +12,6 @@ typedef struct { float x, y, z; } T2HostTriple;
 
 
 extern void Actor_SpawnParticle(void *, s32, Triple, s32);
-void func_00238134(void *actor,int unused1,int unused2,Triple input,int event) {
+void ImpactEvent_SpawnParticle(void *actor,int unused1,int unused2,Triple input,int event) {
  Actor_SpawnParticle(actor,event,input,0);
 }

@@ -22,7 +22,7 @@ typedef struct {
 
 /* The port: the object's collision y offset by member (N64: the type at 0, the definition at
  * 0x14, m_CollisionYOffset at 0x54); the definition (asset data) keeps its byte offset 0x20. */
-f32 func_0026841C(ItemCode *item_) {
+f32 GameObject_GetCollisionYOffset(ItemCode *item_) {
     CGameObjectInstance *item = (CGameObjectInstance *) item_;
     ItemSource *src;
 
@@ -36,7 +36,7 @@ f32 func_0026841C(ItemCode *item_) {
     return 0.0f;
 }
 #else
-f32 func_0026841C(ItemCode *item) {
+f32 GameObject_GetCollisionYOffset(ItemCode *item) {
     ItemSource *src;
 
     if (item->kind == 1) {

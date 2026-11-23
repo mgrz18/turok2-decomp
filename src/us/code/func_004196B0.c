@@ -19,7 +19,7 @@ extern void TitleMenu_Single(void *arg0, Menu *menu);
 extern void Music_RestoreVolume();
 extern s32 Controller_ConfirmPressed(char *);
 extern void Music_RestoreVolume(void);
-extern void func_00430454(char *, s32);
+extern void CEngineApp__StartGame(char *, s32);
 /* The window's controller by member (an m2c view wrote it at N64 offset 0x20: Menu.desc on the host). */
 void TitleMenu_Single(void *arg0, Menu *menu) {
     GameSettings *globals;
@@ -46,6 +46,6 @@ void TitleMenu_Single(void *arg0, Menu *menu) {
         profile++;
     }
     Music_RestoreVolume();
-    func_00430454(&gEngineApp, -1);
+    CEngineApp__StartGame(&gEngineApp, -1);
     gInSinglePlayerMenu = 1;
 }

@@ -15,14 +15,14 @@ typedef struct {
     /* 0x1C */ C960Player *player;
 } C960Arg;
 
-extern void func_00421250(void);
+extern void Pak_ClearDamagedContinued(void);
 
 s32 StatsMenu_SaveProfile(s32 arg0, C960Arg *arg1) {
     C960Player *player;
 
     player = arg1->player;
     CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, player);
-    func_00421250();
+    Pak_ClearDamagedContinued();
     MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, &gPakSaveProfileMenuDesc, player, player->controller, 0);
     return 1;
 }

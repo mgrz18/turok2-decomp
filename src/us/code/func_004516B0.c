@@ -17,7 +17,7 @@ extern char D_800B6134[];
 extern char D_800B614C[];
 
 /* Names setting 0x28. */
-s32 func_004516B0(MenuItem *item) {
+s32 FragTagMenu_TextureSetLabel_2(MenuItem *item) {
     switch (gEngineApp_m_Settings.tagTextureSet) {
     case 0:
         item->text = D_800B608C;

@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 
 extern float D_800A652C;
-extern void func_00236928(struct Image * image, struct Image * texture, Sprite * sprite);
-void func_00236928(Image *image, Image *texture, Sprite *sprite) {
+extern void Sprite_FromImage(struct Image * image, struct Image * texture, Sprite * sprite);
+void Sprite_FromImage(Image *image, Image *texture, Sprite *sprite) {
     f32 scale;
     s32 height;
     f32 *unit;

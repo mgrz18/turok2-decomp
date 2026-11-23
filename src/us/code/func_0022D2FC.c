@@ -1523,7 +1523,7 @@ extern u8 D_8010FF34[];
 #endif
 
 extern s32 BinaryRange(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
-extern void func_00225C08(void *, s32, CVector3 *);
+extern void CScene__BroadcastNoise(void *, s32, CVector3 *);
 extern s32 Random_Next(void);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -1542,7 +1542,7 @@ extern void CMtxF__Identity(CMtxF *m);
 #endif
 extern void GameObject_GetAimRotation(CQuaternion *q, Owner *owner, CVector3 pos);
 extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *m);
-extern void func_00207914(u32 *bits, s32 value);
+extern void Material_GetTextureSet(u32 *bits, s32 value);
 extern f32 RandomInPackedRange(PackedRange r);
 extern f32 HalfToFloat(u16 h);
 extern void GameObject_TraceMove(Effect *effect, CVector3 pos, CVector3 *outPos, void **outRegion, s32 a, s32 b);
@@ -1873,7 +1873,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                 continue;
             }
             if (entry->params->event != 0) {
-                func_00225C08(&gScene, entry->params->event, &pos);
+                CScene__BroadcastNoise(&gScene, entry->params->event, &pos);
             }
             extra = 0;
             if (entry->flags & 0x8000) {
@@ -1932,7 +1932,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     break;
                 }
                 count++;
-                func_00207914(&effect->bits, entry->unk4);
+                Material_GetTextureSet(&effect->bits, entry->unk4);
                 effect->velocity.x = 0;
                 effect->velocity.y = 0;
                 effect->velocity.z = 0;

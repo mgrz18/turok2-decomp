@@ -4,7 +4,7 @@
 #include "protos/menu.h"
 
 
-s32 func_00421250();                            /* extern */
+s32 Pak_ClearDamagedContinued();                            /* extern */
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x1C];
@@ -18,13 +18,13 @@ typedef struct {
  * desc pointer as its controller (its buttons garbage: the cursor ran up every frame, A never confirmed). */
 #include "structs/menu.h"
 s32 SingleMenu_Load(s32 arg0, Menu *arg1) {
-    func_00421250();
+    Pak_ClearDamagedContinued();
     MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakLoadGameMenuDesc, (sptr) arg1->player, (sptr) arg1->controller, 0);
     return 1;
 }
 #else
 s32 SingleMenu_Load(s32 arg0, Unk00419618 *arg1) {
-    func_00421250();
+    Pak_ClearDamagedContinued();
     MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakLoadGameMenuDesc, arg1->unk1C, arg1->unk20, 0);
     return 1;
 }

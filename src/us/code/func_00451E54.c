@@ -6,7 +6,7 @@
 
 s32 Menu_StepValue_2(s32, s32, s32, s32, s32, s32);
 
-s32 func_00451E54(s32 arg0, s32 arg1) {
+s32 TeamBloodMenu_StepTimeLimit_2(s32 arg0, s32 arg1) {
     GameSettings *settings = &gEngineApp_m_Settings;
 
     settings->teamTimeLimit = Menu_StepValue_2(arg1, settings->teamTimeLimit, 5, 0, 0x1E, 1);

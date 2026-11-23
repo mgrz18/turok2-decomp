@@ -8,7 +8,7 @@ typedef struct {
     /* 0x1C */ s32 (*func)();
 } Job;
 
-void func_0042F670(Job *arg0) {
+void DemoStream_RunHandler2(Job *arg0) {
     arg0->result = arg0->func();
     arg0->unkC = 0;
 }

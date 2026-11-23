@@ -14,7 +14,7 @@ typedef struct {
 
 extern QuadVtx D_8011AD48[4];
 
-void func_004691C0(void) {
+void Render_InitUnitQuad_2(void) {
     QuadVtx *v;
     s32 i;
 

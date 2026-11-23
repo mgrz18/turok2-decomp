@@ -3,7 +3,7 @@
 
 s32 GameObject_GetFloorKind(CGameObjectInstance *obj);
 void Sound__Play(s32 sound, CVector3 pos, sptr arg4, sptr arg5);
-void func_00225C08(void *table, s32 arg1, CVector3 *pos);
+void CScene__BroadcastNoise(void *table, s32 arg1, CVector3 *pos);
 
 void GameObject_PlayLandSound(CGameObjectInstance *obj) {
     s32 kind = GameObject_GetFloorKind(obj);
@@ -37,5 +37,5 @@ void GameObject_PlayLandSound(CGameObjectInstance *obj) {
             break;
     }
     Sound__Play(sound, obj->header.m_vPos, 0, -1);
-    func_00225C08(&gScene, 1, &obj->header.m_vPos);
+    CScene__BroadcastNoise(&gScene, 1, &obj->header.m_vPos);
 }

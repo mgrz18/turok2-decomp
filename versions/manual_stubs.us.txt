@@ -37,11 +37,11 @@ MenuItem_GetBindingValue_2
 MenuItem_SetBindingValue_2
 WeaponsMenu_ToggleLabel_2
 FragTagMenu_LevelLabel_2
-func_004516B0
-func_00451BA0
-func_00451D00
-func_00452060
-func_004521C0
+FragTagMenu_TextureSetLabel_2
+BloodLustMenu_LevelLabel_2
+BloodLustMenu_TextureSetLabel_2
+TeamBloodMenu_LevelLabel_2
+TeamBloodMenu_TextureSetLabel_2
 WeaponsMenu_Toggle_2
 Menu_DebugModeLabel_2
 CheatsMenu_WarpSelect_2

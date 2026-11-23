@@ -3,6 +3,6 @@
 #include "globals/pak.h"
 
 
-void func_0045A170(void) {
+void Pak_ClearDamagedContinued_2(void) {
     gDamagedPakContinued = 0;
 }

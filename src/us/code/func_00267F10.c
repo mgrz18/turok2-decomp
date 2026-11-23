@@ -2,7 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "structs/game_object.h"
-s32 func_00267F10(CGameObjectInstance *a) {
+s32 GameObject_CanDropDown(CGameObjectInstance *a) {
     CIntelligence *d = a->header.m_pIntelligence;
     s32 r;
     switch (d->m_Type) {

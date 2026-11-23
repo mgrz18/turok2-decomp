@@ -51,7 +51,7 @@ struct SSlot {
                s32 unk50;
 };
 void SwooshGroup_Remove(sptr a, SSlot *s, SEnt *e);
-void func_002368B0(SSlot *s);
+void Swoosh_ReleaseOwner(SSlot *s);
 s32 Swoosh_Update(sptr a0, SSlot *s) {
     f32 saved, k1, k2;
     SEnt *e, *next;
@@ -102,7 +102,7 @@ s32 Swoosh_Update(sptr a0, SSlot *s) {
     }
     ow = (CGameObjectInstance *)s->owner;
     if (ow != 0 && (s->flags & 1) && !(ow->m_dwFlags & 0x200)) {
-        func_002368B0(s);
+        Swoosh_ReleaseOwner(s);
     }
     gFrameIncrement = saved;
     if (s->unk48 != 0 || (s->unk24 != 0.0f && s->owner != 0)) {

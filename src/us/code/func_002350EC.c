@@ -24,9 +24,9 @@ typedef SwooshNode TrailNode;
 typedef CSwooshSystem TrailMgr;
 
 void CMtxF__Identity(void *m);
-void func_0026D230(void *p);
+void DList_Init(void *p);
 Trail *NodePool_Alloc(SwooshPool *list);
-void func_002316A0(void *a, void *b);
+void CParticle__AddDrawModeBits(void *a, void *b);
 TrailInfo *CScene__GetSwoosh(void *tbl, s32 arg);
 #ifdef TARGET_PORT
 /* Round 20 i3: gendata types a data symbol by the declarations of the C that uses it. The trail
@@ -39,7 +39,7 @@ extern f32 D_800ACEC0[30];
 extern f32 D_800ACF38[30];
 f32 *const gTrailPoints_port[4] = { D_800ACE70, D_800ACE98, D_800ACEC0, D_800ACF38 };
 #endif
-void func_00207914(s32 *p, s32 v);
+void Material_GetTextureSet(s32 *p, s32 v);
 TrailNode *Swoosh_NewNode(void *o, Trail *s, void *m);
 
 /* Adds a node to the actor's trail, starting the trail first when the actor has none. */
@@ -83,7 +83,7 @@ void Trail_AddNode(TrailMgr *mgr, TrailActor *a, s32 type) {
         t = CScene__GetSwoosh(&gScene, type);
         tex0 = sTrailTextures[t->tex0];
         tex1 = sTrailTextures[t->tex1];
-        func_0026D230(&s->nodes);
+        DList_Init(&s->nodes);
         s->flags = 2;
         if ((s32) a->m_pEffect->m_dwFlags < 0) {
             s->flags = 6;
@@ -109,9 +109,9 @@ void Trail_AddNode(TrailMgr *mgr, TrailActor *a, s32 type) {
         *(s32 *) &s->unk30 = 0;
         s->unk38 = -1;
         if (s->layer != -1) {
-            func_00207914(s->texture, s->layer);
+            Material_GetTextureSet(s->texture, s->layer);
             if (a != NULL) {
-                func_002316A0(a, s->texture);
+                CParticle__AddDrawModeBits(a, s->texture);
             }
         }
         if (s == NULL) {

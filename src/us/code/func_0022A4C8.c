@@ -116,7 +116,7 @@ typedef struct Projectile {
 extern f32 HalfToFloat(s32 halfFloat);
 extern f32 func_00298470(f32);             /* sqrtf */
 extern f32 GameObject_GetCollisionHeight(ProjNode *node);
-extern f32 func_0026841C(ProjNode *node);
+extern f32 GameObject_GetCollisionYOffset(ProjNode *node);
 extern f32 Random_Blend(f32 lo, f32 hi);   /* random in range */
 extern f32 Math_AcosLookup(f32);             /* acosf */
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -211,7 +211,7 @@ void CParticle__Steer(Projectile *o) {
                 } while (p2 != NULL);
             }
             t = o->target;
-            tt = func_0026841C(t);
+            tt = GameObject_GetCollisionYOffset(t);
             tp = t->pos;
             tp.y += tt;
             CVector3__Subtract(&d, &tp, &o->pos);
@@ -244,7 +244,7 @@ void CParticle__Steer(Projectile *o) {
         def = o->def;
         if (def->flags & 0x40000) {
             if (def->turnRate != 0) {
-                tt = func_0026841C(t);
+                tt = GameObject_GetCollisionYOffset(t);
                 tp = t->pos;
                 tp.y += tt;
                 tp.y += GameObject_GetCollisionHeight(t) * 0.5f;

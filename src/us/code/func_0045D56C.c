@@ -17,7 +17,7 @@ struct NodeRecAt294 {
 };
 extern unsigned short D_800C21AA[];
 extern NodeRecAt294 gEngineApp_m_Game_m_CameraPool_m_MainCamera; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
-extern void func_0045CF28(unsigned,int,int,int,int,int);
+extern void Video_ResizeViMode_2(unsigned,int,int,int,int,int);
 void Video_SetMode_2(unsigned width,int a1,int a2,int a3,int a4,int a5) {
  int flags=0,region=0; NodeRecAt294 *node; float h;
  switch(osTvType) {case 0:region=1;break;case 1:break;case 2:region=2;break;}
@@ -25,7 +25,7 @@ void Video_SetMode_2(unsigned width,int a1,int a2,int a3,int a4,int a5) {
  if(gViAntiAlias) flags|=2;
  if(width>320) flags|=1;
  sViModeIndex=*(unsigned short *)((char *)D_800C21AA+flags*4+region*32);
- func_0045CF28(width,a1,a2,a3,a4,a5);
+ Video_ResizeViMode_2(width,a1,a2,a3,a4,a5);
  node=&gEngineApp_m_Game_m_CameraPool_m_MainCamera;
  if(node) {node->width=gScreenWidth;h=gScreenHeight;node->x=0;node->y=0;node->height=h;}
  node=*(NodeRecAt294 **)((char *)node-32);

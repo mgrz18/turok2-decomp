@@ -75,7 +75,7 @@ struct Node438C {
 };
 struct Node438C;
 struct Node802A697C;
-void *func_00236D10(Owner802A6DF8 *arg0, sptr arg1, s32 arg2) {
+void *SwooshSystem_FindSwoosh(Owner802A6DF8 *arg0, sptr arg1, s32 arg2) {
     State802A6DF8 *node;
 #ifdef TARGET_PORT
     node = ((CSwooshSystem *)arg0)->m_SwooshPool.used.head;

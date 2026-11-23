@@ -59,7 +59,7 @@ struct Object {
     u8 reserved18[0x740 - 0x18];
     u8 effect740;
 };
-s32 func_00267E74(void *arg0)
+s32 GameObject_IsLeashed(void *arg0)
 {
     struct Object *object = arg0;
     struct Model *model;

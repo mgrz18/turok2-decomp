@@ -66,7 +66,7 @@ typedef struct {
 #endif
 
 extern f32 func_00298470(f32);                              /* sqrtf */
-extern f32 func_0026841C(TargetActor *actor);               /* its height */
+extern f32 GameObject_GetCollisionYOffset(TargetActor *actor);               /* its height */
 extern f32 GameObject_GetCollisionHeight(TargetActor *actor);
 extern f32 HalfToFloat(s32 value);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a - b */
@@ -126,7 +126,7 @@ void CParticle__UpdateHoming(Projectile *p) {
 
     target = p->target;
     if (target != NULL && p->speed > 1.0f) {
-        f32 height = func_0026841C(target);
+        f32 height = GameObject_GetCollisionYOffset(target);
 
         aim = target->pos;
         aim.y += height;

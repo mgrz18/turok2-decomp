@@ -8,7 +8,7 @@ typedef struct {
 } Entry;
 
 
-void func_0026C804(s32 arg0) {
+void CGameRegion__SetFlag40000(s32 arg0) {
     Entry *temp_v0;
 
     temp_v0 = CScene__GetRegionInfo(&gScene, arg0);

@@ -4,7 +4,7 @@
 
 void Controller_WatchPak(s8);                             /* extern */
 
-void func_004181C8(Menu *arg0) {
+void CharacterMenu_InitAfterPak(Menu *arg0) {
     Controller_WatchPak(arg0->controller->port);
     gDamagedPakContinued = 0;
 }

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_0023640C(f32 *arg0)
+void Color_ClampByte(f32 *arg0)
 {
   f32 temp_f0;
   f32 var_f1;

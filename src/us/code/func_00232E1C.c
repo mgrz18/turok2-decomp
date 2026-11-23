@@ -3,7 +3,7 @@
 
 s32 Random_Next(void);
 
-s32 func_00232E1C(s32 arg0) {
+s32 Random_UpTo(s32 arg0) {
     s32 temp_v0;
     s32 temp_v0_2;
     s32 temp_v1;

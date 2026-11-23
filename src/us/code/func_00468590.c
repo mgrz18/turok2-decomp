@@ -9,7 +9,7 @@ typedef struct {
     /* 0x1C */ s32 (*callback)();
 } Task;
 
-void func_00468590(Task *arg0) {
+void DemoStream_RunHandler2_2(Task *arg0) {
     arg0->result = arg0->callback();
     arg0->unkC = 0;
 }

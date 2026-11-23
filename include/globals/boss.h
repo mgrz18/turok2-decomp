@@ -62,8 +62,8 @@ extern f32 sPrimagenPartHitScript[];             /* ScriptAnimator scripts */
 extern f32 sPrimagenPartDestroyScript[];
 extern f32 sPrimagenMode7PartScript[];
 #ifdef TARGET_PORT
-/* Sized for gendata (tools/port/gendata.py): splat labels (D_00431CE4, D_00431CFC, D_00431D04,
- * D_00431D10) cut these tables before their -1 end, and the host data stopped at the label. */
+/* Sized for gendata (tools/port/gendata.py): splat labels (sMotherBossDropTablePhase1_2, sMotherBossPhase1SpawnDrops_2, sMotherBossPhaseVisBits_2,
+ * sMotherBossPhaseActiveMasks_2) cut these tables before their -1 end, and the host data stopped at the label. */
 extern s16 sPrimagenTossTable[14];               /* {type, weight} pairs, -1 ends (WeightedTable_PickStatic) */
 extern s16 sPrimagenTossTableStage3[14];
 extern s16 sPrimagenTossTable2[4];
@@ -86,7 +86,7 @@ extern s32 sMotherBossPhaseVisBits[3];           /* per phase */
 extern s32 sMotherBossPhaseActiveMasks[3];
 extern s32 sMotherBossPhaseLiveMasks[3];
 #ifdef TARGET_PORT
-extern f32 sMotherBossSpotResetScript[19];       /* ScriptAnimator scripts (sized: D_00431E20 cuts it) */
+extern f32 sMotherBossSpotResetScript[19];       /* ScriptAnimator scripts (sized: sMotherBossModeTable_2 cuts it) */
 #else
 extern f32 sMotherBossSpotResetScript[];         /* ScriptAnimator scripts */
 #endif

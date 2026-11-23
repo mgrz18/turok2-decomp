@@ -6,7 +6,7 @@
 #include "globals/scene.h"
 #include "protos/scene.h"
 
-extern void func_0026E294(Trigger *trigger);
+extern void LevelEvent_MarkFired(Trigger *trigger);
 extern s32 LevelEvent_CheckRequiredItem(Trigger *trigger, sptr arg);
 extern void LevelEvent_Trigger(Trigger *trigger);
 void LevelEvent_ProcessTriggers(Trigger *triggers, s32 count, s32 require, s32 enter, s32 exclude, s32 group, sptr arg) {
@@ -32,7 +32,7 @@ void LevelEvent_ProcessTriggers(Trigger *triggers, s32 count, s32 require, s32 e
                     CScene__FireEventsByKeyOnce(world, trigger->flags.bytes.id);
                 }
             } else {
-                func_0026E294(trigger);
+                LevelEvent_MarkFired(trigger);
             }
             active = 1;
         }

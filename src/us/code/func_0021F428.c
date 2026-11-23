@@ -139,7 +139,7 @@ struct LevelActor;
 extern void CMtxF__SetRotateY(void *matrix, f32 angle);
 extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
 extern void CAnimationState__GetBonePosition(AnimChannel *, s32, f32, f32 *);
-void *func_0021F428(Triple *arg0, void *arg1, AnimChannel *arg2) {
+void *CGameObjectInstance__GetRootOffset(Triple *arg0, void *arg1, AnimChannel *arg2) {
     char *o1 = (char *) arg1;
     char mtx[0x40];
     f32 spVec[3];

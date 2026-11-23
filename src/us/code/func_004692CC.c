@@ -7,14 +7,14 @@
 
 /* The fields this sets, far into this (large) state. */
 
-s32 func_004650B4(void *, s32, s32, void *, s32);   /* extern */
+s32 CScene__FindWarpDests_2(void *, s32, s32, void *, s32);   /* extern */
 
-void func_004692CC(CEngineApp *arg0) {
+void CEngineApp__StartCinemaGame_2(CEngineApp *arg0) {
     u8 sp18[0x18];
     s32 var_s1;
 
     var_s1 = -1;
-    if (func_004650B4(&gScene, -1, -1, sp18, 1) == 0) {
+    if (CScene__FindWarpDests_2(&gScene, -1, -1, sp18, 1) == 0) {
         var_s1 = 0;
     }
     gEngineApp_m_Settings.match.frames = 0;

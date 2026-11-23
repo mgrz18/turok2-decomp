@@ -22,7 +22,7 @@ extern s32 D_800C0568;
 /* The port: the same on TotemDefenseState / CGameObjectInstance (the N64 code reads both at raw
  * offsets: the definition 0x14, the AI's m_pfDraw 0x234, m_AnimType/m_AnimIndex/
  * m_AnimRepeatedCount 0x204/0x206/0x207, m_dwFlags 0x140; written after module 2's typed twin
- * TotemDefense_InitFight_2, func_00441B20). state->def is the definition's body pointer-wide. */
+ * TotemDefense_InitFight_2, TotemDefense_InitFight_2). state->def is the definition's body pointer-wide. */
 void TotemDefense_InitFight(void *arg0, void *arg1) {
     TotemDefenseState *state = (TotemDefenseState *) arg0;
     CGameObjectInstance *obj = (CGameObjectInstance *) arg1;

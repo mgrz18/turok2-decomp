@@ -5,6 +5,6 @@ typedef struct {
     /* 0x1C */ s32 (*callback)();
 } Unk0042F650;
 
-void func_0042F650(Unk0042F650 *arg0) {
+void DemoStream_CallHandler2(Unk0042F650 *arg0) {
     arg0->callback();
 }

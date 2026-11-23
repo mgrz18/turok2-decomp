@@ -2,9 +2,9 @@
 #include "structs/game_object.h"
 
 #ifdef TARGET_PORT /* unprototyped: the host passes the pass-through arguments */
-s32 func_00267E74();
+s32 GameObject_IsLeashed();
 #else
-s32 func_00267E74(void);
+s32 GameObject_IsLeashed(void);
 #endif
 f32 GameObject_GetLeashRadius(CGameObjectInstance *);
 f32 Random_Blend(f32, f32);
@@ -13,7 +13,7 @@ f32 func_002982F0(f32);
 void Collision_MoveInstance(CGameObjectInstance *, CVector3, sptr);
 
 #ifdef TARGET_PORT
-/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS func_00267E74 receives EnemyMode_TeleportIn_Enter's own argument
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS GameObject_IsLeashed receives EnemyMode_TeleportIn_Enter's own argument
  * registers (pass-through); the host passes them. */
 void EnemyMode_TeleportIn_Enter(CGameObjectInstance *self, CAI *ai) {
     f32 radius;
@@ -21,7 +21,7 @@ void EnemyMode_TeleportIn_Enter(CGameObjectInstance *self, CAI *ai) {
     f32 angle;
     CVector3 pos;
 
-    if (func_00267E74(self)) {
+    if (GameObject_IsLeashed(self)) {
         radius = GameObject_GetLeashRadius(self);
     } else {
         radius = 2048.0f;
@@ -41,7 +41,7 @@ void EnemyMode_TeleportIn_Enter(CGameObjectInstance *self, CAI *ai) {
     f32 angle;
     CVector3 pos;
 
-    if (func_00267E74()) {
+    if (GameObject_IsLeashed()) {
         radius = GameObject_GetLeashRadius(self);
     } else {
         radius = 2048.0f;

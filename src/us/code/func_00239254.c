@@ -39,7 +39,7 @@ typedef struct B15Src {
 } B15Src;
 void Sound__PlayPitched(s16 id, CVector3 pos, s32 a, void *src, f32 vol);
 s32 GameObject_GetFloorKind(void *a);
-void func_00239254(B15Src *act, B15Src *src, s32 c, CVector3 pos, B15Blk8 k) {
+void ImpactEvent_PlayFloorSound(B15Src *act, B15Src *src, s32 c, CVector3 pos, B15Blk8 k) {
     f32 vol = 1.0f;
     void *s = (void *)-1;
     if (gEngineApp_m_Settings.paused == 0 && GameObject_GetFloorKind(act) == k.c) {

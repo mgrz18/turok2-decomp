@@ -25,7 +25,7 @@ typedef struct {
 } Pool;
 
 
-void func_00466040(Pool *pool) {
+void CDLightSet__Construct_2(Pool *pool) {
     s32 i;
     PoolNode *node;
 

@@ -575,7 +575,7 @@ extern f32 func_002982F0(f32 angle);             /* sin */
 extern void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
 extern void CGameObjectInstance__Construct(CGameObjectInstance *fx, s32 a, s32 b, s32 c, void *d, s32 e, sptr f, f32 g, CVector3 h, s32 i, CVector3 j,
                           CVector3 k, s32 l);
-extern void func_0021E5D4(CGameObjectInstance *fx);
+extern void CGameObjectInstance__InitAIType(CGameObjectInstance *fx);
 extern void CGameObjectInstance__ClearDrawMatrices(CGameObjectInstance *fx);
 extern void CGameObjectInstance__UpdateAnimation(CGameObjectInstance *fx);
 extern void Render_ResetBatches(void);
@@ -650,7 +650,7 @@ void MenuItem_DrawModel(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused
             if (s3 != NULL && !(o->flags & 0x2000000)) {
                 CGameObjectInstance__Construct(fx, -1, p->objType, gDefaultVisBits, s3, -1, 0, w->camera->m_ViewParams.m_RotY + 3.141593f, v70, 0, p->scale, v50,
                               0);
-                func_0021E5D4(fx);
+                CGameObjectInstance__InitAIType(fx);
                 o->flags = o->flags | 0x2000000;
             }
             tt = func_002982F0((f32) (u32) (gFrameCountGameplay * 10) * 0.017453294f);
@@ -1355,8 +1355,8 @@ CIntelligence *MenuItem_SetModel(MenuItem *a, s32 id, s32 arg) {
     return &p->intel;
 }
 
-/* ---------------- func_004162E4 ---------------- */
-s32 func_004162E4(Menu *arg0) {
+/* ---------------- Menu_GetControllerInput ---------------- */
+s32 Menu_GetControllerInput(Menu *arg0) {
     ControllerProfile *temp_v1;
     sptr var_v0;
 

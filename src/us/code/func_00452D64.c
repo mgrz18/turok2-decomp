@@ -12,7 +12,7 @@ extern char D_800B64E0[];
 extern char D_800B6528[];
 
 /* Shows setting unk14 (0-255, centred on 0x80) in steps of 8 from -16 to 15. */
-s32 func_00452D64(MenuItem *item) {
+s32 SoundMenu_MusicVolumeLabel_2(MenuItem *item) {
     s32 value = (gEngineApp_m_Settings.unk14 - 0x80) / 8;
 
     if (value == 0) {

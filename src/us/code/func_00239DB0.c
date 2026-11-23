@@ -8,7 +8,7 @@ typedef struct Sphere {
     /* 0x10 */ f32 radiusSq;
 } Sphere;
 
-f32 func_00268460(sptr);
+f32 GameObject_GetSweepRadius(sptr);
 void Sphere_Set(Sphere *sphere, CVector3 *center, f32 radius);
 s32 Cylinder_ContainsPoint(Sphere *sphere, CVector3 *point);
 s32 Circle_SegmentIntersects(Sphere *sphere, CVector3 *a, CVector3 *b);
@@ -26,7 +26,7 @@ s32 Path_FitsInRegion(s32 *mover, CGameRegion *region, CVector3 *pos, CGameRegio
     if (region == prev || region == goal) {
         return 1;
     }
-    Sphere_Set(&sphere, pos, func_00268460(*mover) * 0.5f);
+    Sphere_Set(&sphere, pos, GameObject_GetSweepRadius(*mover) * 0.5f);
     for (i = 0; i < 3; i++) {
         if (region->m_pNeighbours[i] == prev) {
             continue;

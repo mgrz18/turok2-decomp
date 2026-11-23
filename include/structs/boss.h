@@ -25,7 +25,7 @@
 /* The 0x64-byte value/colour animator ScriptAnimator_Start sets up,
  * ScriptAnimator_SetScript starts on a script (fires) and Animator_Update steps;
  * ScriptAnimator_Apply applies it when the owner is drawn (rgb and alpha to the
- * draw colour gBlendState, alpha and value to gBlendFade) and func_00236390
+ * draw colour gBlendState, alpha and value to gBlendFade) and ScriptAnimator_AddToBlend
  * adds it to the fade. The script is a list of floats: an op (the mode),
  * then its operands; mode 0 ends it (and restarts it from loop when that
  * is set), 1 waits, 4 fades value, 6 fades rgb and alpha. The level

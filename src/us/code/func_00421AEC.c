@@ -2,7 +2,7 @@
 typedef signed int s32;
 
 
-char *func_00421AEC(s32 unused, s32 which) {
+char *PakMenu_GetStatsReturnMenu(s32 unused, s32 which) {
     switch (which) {
         case 0:
         default:

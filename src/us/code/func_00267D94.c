@@ -2,7 +2,7 @@
 #include "structs/intelligence.h"
 #include "structs/game_object.h"
 
-s32 func_00267D94(CInstanceHeader *arg0)
+s32 GameObject_IsLeader(CInstanceHeader *arg0)
 {
   int new_var;
   CIntelligence *temp_a0;

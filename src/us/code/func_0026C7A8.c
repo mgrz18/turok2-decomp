@@ -11,7 +11,7 @@ typedef struct {
 
 s32 CGameRegion__FloodSetFlag4000Same(u16 *, u16);                  /* extern */
 
-void func_0026C7A8(u16 *arg0) {
+void CGameRegion__SetFlag4000(u16 *arg0) {
     ModelRecord *temp_v0;
 
     temp_v0 = CScene__GetRegionInfo(&gScene, arg0);

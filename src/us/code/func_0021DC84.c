@@ -35,10 +35,10 @@ extern u8 D_8010FF34[];
 
 #ifdef TARGET_PORT
 /* on MIPS the instance reaches it in $a0 (the caller's first argument, untouched) */
-s32 func_00268160(CGameObjectInstance *);
-#define func_00268160() func_00268160(a)
+s32 GameObject_CastsShadow(CGameObjectInstance *);
+#define GameObject_CastsShadow() GameObject_CastsShadow(a)
 #else
-s32 func_00268160(void);
+s32 GameObject_CastsShadow(void);
 #endif
 void *MtxPool_Alloc(void *, s32);
 f32 func_00298470(f32);     /* sqrtf */
@@ -69,7 +69,7 @@ void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, sptr unused, Shadow
     CLights1 *light;
     register f32 py __asm__("$f1");
 
-    if (a->header.m_pCurrentRegion != 0 && func_00268160() != 0 && !(a->m_dwFlags & 0x200000)) {
+    if (a->header.m_pCurrentRegion != 0 && GameObject_CastsShadow() != 0 && !(a->m_dwFlags & 0x200000)) {
         if (a->m_dwFlags & 0x10000000) {
             if (a->m_pmfShadow == NULL) {
                 h = GameObject_GetRegionFloorHeight(a, 0);

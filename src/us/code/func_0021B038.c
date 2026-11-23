@@ -51,7 +51,7 @@ void CQuaternion__Multiply(B10Q4 *o, B10Q4 *a, B10Q4 *b);
 void CQuaternion__ToMatrix(B10Q4 *q, B10Mt *m);
 f32 Math_AcosLookup(f32 x);
 f32 func_00298470(f32 x); /* sqrtf */
-B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 angle) {
+B10Q4 *CGameObjectInstance__GetAutoAimRotation(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 angle) {
     CVector3 v10;
     CVector3 v20;
     CVector3 v30;

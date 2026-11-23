@@ -3,7 +3,7 @@
 #include "globals/game.h"
 
 
-s32 func_00267EA8(CGameObjectInstance *arg0) {
+s32 GameObject_CanClimbLedges(CGameObjectInstance *arg0) {
     CIntelligence *temp_a0;
 
     temp_a0 = arg0->header.m_pIntelligence;

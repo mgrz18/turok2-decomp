@@ -22,7 +22,7 @@ s32 CCameraPool__NewGame(sptr, s32);
 s32 CCameraPool__NewGame(sptr);
 #endif                         /* extern */
 
-void func_002888BC(sptr arg0, s32 arg1, s32 arg2) {
+void CEngineApp__NewGame(sptr arg0, s32 arg1, s32 arg2) {
 #ifdef TARGET_PORT
 /* ABI (docs/port/ABI.md, abicheck missing_args): a1 passes through to CCameraPool__NewGame on MIPS */
     CCameraPool__NewGame(arg0 + APP_CAMERAPOOL, arg1);

@@ -6,7 +6,7 @@ typedef struct {
     /* 0xB4 */ s32 state;
 } StateRecord;
 
-void func_00253624(StateRecord *arg0) {
+void CPlayerOverlay__Lower(StateRecord *arg0) {
     s32 temp_v0;
 
     temp_v0 = arg0->state;

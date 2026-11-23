@@ -13,7 +13,7 @@ sptr Swoosh_NewNode(sptr, sptr, sptr);
 s32 CMtxF__ScaleAxes(u8 *, f32, f32, f32);    /* extern */
 
 
-void func_00236C64(s32 arg0, Emitter *arg1, CParticle *arg2, s32 arg3) {
+void Swoosh_AddNodeFromMtx(s32 arg0, Emitter *arg1, CParticle *arg2, s32 arg3) {
     u8 sp10[0x40];
     f32 var_f0;
     CParticle *temp_s0;

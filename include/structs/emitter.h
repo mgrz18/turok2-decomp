@@ -57,7 +57,7 @@ typedef struct CEmitter {
     /* 0x00C */ CEmitterDef *m_pDef;
     /* 0x010 */ u16 m_Mask;                 /* its bit of the region's m_EmitterMask */
     /* 0x012 */ u8 _pad12[2];
-    /* 0x014 */ s32 m_Texture[2];           /* the texture handle (func_00207914) */
+    /* 0x014 */ s32 m_Texture[2];           /* the texture handle (Material_GetTextureSet) */
     /* 0x01C */ f32 m_ScrollS;              /* texture offsets, wrap at 20480 */
     /* 0x020 */ f32 m_ScrollT;
     /* 0x024 */ u8 _pad24[4];

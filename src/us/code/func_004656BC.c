@@ -19,7 +19,7 @@ void Cinema_Disable();
 /* The port (round 13 b2): the record tables by member of CScene (the N64 view reads them at
  * 0x1168-0x117C, other members of the host CScene, and keeps the table pointers in s32). */
 #include "structs/world.h"
-void func_004656BC(State_func_8044D5C4_de *arg0) {
+void CScene__RestoreFiredEvents_2(State_func_8044D5C4_de *arg0) {
     CScene *w = (CScene *) arg0;
     s32 i, n;
     Cinema_Disable();
@@ -30,7 +30,7 @@ void func_004656BC(State_func_8044D5C4_de *arg0) {
     Cinema_Enable();
 }
 #else
-void func_004656BC(State_func_8044D5C4_de *arg0) {
+void CScene__RestoreFiredEvents_2(State_func_8044D5C4_de *arg0) {
  s32 i,n;
  Cinema_Disable();
  n=arg0->unk1168;

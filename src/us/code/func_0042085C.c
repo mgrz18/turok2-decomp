@@ -23,7 +23,7 @@ void Controller_UnwatchPak(sptr a);
 s32 Controller_TakePakChanged(s32 a);
 void Pak_ProbeSlot(s32 a);
 s32 Pak_GetStatus(s32 a);
-void func_004303AC(u8 *a);
+void CEngineApp__StartCinemaGame(u8 *a);
 
 s32 PakMessage_SelectOk(s32 a0, Menu *o) {
     s32 s0, s1, v;
@@ -50,7 +50,7 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
             CScene__RequestWarp(&gScene, o->player->m_Data.m_CheckPointWarpID, 2);
             return 1;
         }
-        func_004303AC(&gEngineApp);
+        CEngineApp__StartCinemaGame(&gEngineApp);
         return 1;
     }
     if (gPakMenuAnyPak != 0) {

@@ -16,7 +16,7 @@ typedef struct {
     /* 0x934 */ s16 flags934[1];
 } Parent0023181C;
 
-void func_0023181C(CParticle *arg0) {
+void CParticle__Release(CParticle *arg0) {
     sptr temp_s0;
     u16 temp_v1;
     u8 temp_a0;

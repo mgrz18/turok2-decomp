@@ -13,7 +13,7 @@
 extern void CGameObjectInstance__Construct(CGameObjectInstance *obj, s32 model, s32 type, s32 unused, void *intelligence,
                           s32 sound, void *region, f32 rotY, CVector3 pos, s32 flags, CVector3 scale,
                           CVector3 velocity, s32 extra);
-extern void func_0021E5D4(CGameObjectInstance *obj);
+extern void CGameObjectInstance__InitAIType(CGameObjectInstance *obj);
 
 /* CInstancePool__Alloc without the owner counter. */
 static __inline__ CGameObjectInstance *take_free_instance(CInstancePool *world) {
@@ -67,6 +67,6 @@ CGameObjectInstance *CInstancePool__SpawnCopy(CInstancePool *world, CGameObjectI
     }
     CGameObjectInstance__Construct(obj, model, type, gDefaultVisBits, intelligence, -1, region, rotY, d.pos, 0x80000, d.scale,
                   d.velocity, 0);
-    func_0021E5D4(obj);
+    CGameObjectInstance__InitAIType(obj);
     return obj;
 }

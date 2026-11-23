@@ -14,7 +14,7 @@ typedef struct {
     /* 0x58 */ u8 kind;
 } KeyInfo;
 
-s32 func_0021F1F8(void *arg);
+s32 CGameObjectInstance__GetGeometryKind(void *arg);
 
 s32 GameObject_GetFloorKind(u8 *obj) {
     void *key = *(void **) (obj + 0x10);
@@ -46,7 +46,7 @@ s32 GameObject_GetFloorKind(u8 *obj) {
         if (objFlags & 0x40000) {
             other = *(u8 **) (obj + 0x30);
             if (other != NULL && other[0] == obj[0]) {
-                result = func_0021F1F8(other);
+                result = CGameObjectInstance__GetGeometryKind(other);
             }
         }
     }

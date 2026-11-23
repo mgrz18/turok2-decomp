@@ -54,7 +54,7 @@ extern s32 gViAntiAlias;            /* the AA VI mode (Video_SetMode) */
 extern s32 gRenderZModeInter;       /* ZMODE_INTER render modes */
 extern s32 gRenderImageRead;        /* IM_RD render modes */
 
-/* Fog (func_0020B554 derives the three masks from gFogEnabled). */
+/* Fog (Render_SetupFog derives the three masks from gFogEnabled). */
 extern s32 gFogEnabled;
 extern u32 gFogGeometryMode;        /* 0 or G_FOG */
 extern u32 gFogRenderModeFogA;      /* blender cycle 1 bits */

@@ -7,7 +7,7 @@ extern CCollisionInfo D_800F1C60;
 
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *inst);
 f32 GameObject_GetCollisionRadius(CGameObjectInstance *inst);
-f32 func_0026841C(CGameObjectInstance *inst);
+f32 GameObject_GetCollisionYOffset(CGameObjectInstance *inst);
 void Sweep_TestInstance(Sweep *sweep, SweepBox *box, CGameObjectInstance *other);
 
 #define MIN(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
@@ -35,7 +35,7 @@ void Collision_TestInstances(Sweep *sweep) {
     b = &box;
     box.radius = GameObject_GetCollisionRadius(inst);
     b->flag = def->m_dwFlags & 0x100000;
-    b->bottom = func_0026841C(inst);
+    b->bottom = GameObject_GetCollisionYOffset(inst);
     b->top = b->bottom + GameObject_GetCollisionHeight(inst);
     b->startBottom = inst->header.m_vPos.y + b->bottom;
     b->startTop = inst->header.m_vPos.y + b->top;

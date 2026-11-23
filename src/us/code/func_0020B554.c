@@ -3,7 +3,7 @@
 
 void Render_InvalidateModeCache(void);
 
-void func_0020B554(void) {
+void Render_SetupFog(void) {
     Render_InvalidateModeCache();
     if (gFogEnabled) {
         gFogGeometryMode = 0x10000;

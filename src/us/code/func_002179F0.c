@@ -8,7 +8,7 @@
 #define CQuaternion__Slerp CQuaternion__Slerp_i
 #endif
 extern void CQuaternion__Slerp(void *arg0, s32 arg1, void *arg2, void *arg3);
-void func_002179F0(ObjectLinks24_2 *arg0, s32 arg1, Vector4f *arg2) {
+void Anim_GetBoneRotation(ObjectLinks24_2 *arg0, s32 arg1, Vector4f *arg2) {
     ObjectLinks24_2 *o = arg0;
     ObjRecAt2V1 *indices;
     s16 idx;

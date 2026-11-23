@@ -1,5 +1,5 @@
 #ifdef TARGET_PORT
-/* The port (round 12 C27): the module-2 twin of Primagen_EnterMode24 (func_004077AC, round 12 a2):
+/* The port (round 12 C27): the module-2 twin of Primagen_EnterMode24 (Primagen_EnterMode24, round 12 a2):
  * the raw actor offsets 0x1FC (m_AI.m_AnimSpeed) and 0xD4 (m_dwFlags) and the N64 deltas of
  * LevelScriptState from bossState (timer +0xC, dest.y +0x5C, home.y +0x68) do not hold on the host
  * (pointer-wide members). Members instead. Only in the compile-only module-2 library. */

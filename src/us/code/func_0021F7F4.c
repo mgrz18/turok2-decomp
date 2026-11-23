@@ -19,7 +19,7 @@ void CMtxF__SetAxisAngle(f32 *mtx, f32 angle, f32 x, f32 y, f32 z);
 void CMtxF__MultiplyAffine(f32 *dst, f32 *a, f32 *b);
 
 /* Rotates the matrix about its own origin by the swing angle of this step. */
-void func_0021F7F4(s32 arg0, Swing *swing, f32 *matrix, s32 active, s32 dir) {
+void CGameObjectInstance__SwingBone(s32 arg0, Swing *swing, f32 *matrix, s32 active, s32 dir) {
     CVector3 origin;
     CVector3 axis;
     f32 rotation[16];

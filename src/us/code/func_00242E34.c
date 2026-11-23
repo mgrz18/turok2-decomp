@@ -30,7 +30,7 @@ typedef struct Dest {
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);
 f32 GameObject_GetWaterHeight(CGameObjectInstance *actor);
 s32 CGameRegion__IsSteep(CGameRegion *region);
-s32 func_0021F080(CGameObjectInstance *actor);
+s32 GameObject_IsFacingRegionNormal(CGameObjectInstance *actor);
 f32 CGameRegion__GetHeight(CGameRegion *region, f32 x, f32 z);
 s32 GameObject_IsOnGround(CGameObjectInstance *actor);
 void DamageEvent_Set(DamageEvent *damage, sptr arg1, s32 amount, f32 force, s32 kind, sptr arg5);
@@ -78,7 +78,7 @@ void AI_UpdateRegionFlags(CGameObjectInstance *actor, Dest *dst) {
             }
         }
     }
-    if (CGameRegion__IsSteep(region) && (region->m_wFlags & 0x10) && func_0021F080(actor)) {
+    if (CGameRegion__IsSteep(region) && (region->m_wFlags & 0x10) && GameObject_IsFacingRegionNormal(actor)) {
         dst->flags |= 0x1000;
     }
     if (CGameRegion__GetHeight(region, actor->header.m_vPos.x, actor->header.m_vPos.z) - actor->header.m_vPos.y < 15.36f) {

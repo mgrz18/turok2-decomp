@@ -46,8 +46,8 @@ extern void CGameObjectInstance__ConstructFromRecord(CGameObjectInstance *obj, L
 extern sptr CScene__FindRegionAt(CScene *world, CVector3 *pos);
 extern void Angle_Wrap(f32 *angle);
 extern void CPlayer__SetupActors(CPlayer *player, LevelRecord *rec, s32 mode, s32 index);
-extern s32 func_00267DBC(CGameObjectInstance *obj);
-extern s32 func_00267D94(CGameObjectInstance *obj);
+extern s32 GameObject_IsFollower(CGameObjectInstance *obj);
+extern s32 GameObject_IsLeader(CGameObjectInstance *obj);
 extern f32 AI_DistSqToPointAtHeight(CGameObjectInstance *obj, CVector3 pos);
 
 /* Builds the level's actor block from its records: places every player on the spawn points found for
@@ -163,12 +163,12 @@ void CScene__DecompressAnimatedInstances(CScene *world, Handle **handle) {
                 obj = &objects[i];
                 best = 3.4028235e38f;
                 obj->m_AI.m_pParent = NULL;
-                if (func_00267DBC(obj) == 0) {
+                if (GameObject_IsFollower(obj) == 0) {
                     continue;
                 }
                 for (j = world->m_nFirstActor; j < n; j++) {
                     other = &objects[j];
-                    if (obj->header.m_pIntelligence->m_Type == other->header.m_pIntelligence->m_Type && func_00267D94(other) != 0 && obj != other) {
+                    if (obj->header.m_pIntelligence->m_Type == other->header.m_pIntelligence->m_Type && GameObject_IsLeader(other) != 0 && obj != other) {
                         if (obj->m_AI.m_pParent != NULL) {
                             dist = AI_DistSqToPointAtHeight(obj, other->header.m_vPos);
                             if (dist < best) {
