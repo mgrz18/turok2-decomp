@@ -16,7 +16,8 @@ VRAM mapping (main + code): ROM 0x1000 = VRAM 0x80000400, delta `0x7FFFF400`.
 | 0x00000040 | bin     | boot      | IPL3 boot code (0xFC0 bytes). |
 | 0x00001000 | code    | main      | SN64 SNMAIN stub (0x100 bytes ending at `jr ra; nop`). |
 | 0x00001100 | code    | code      | Engine + libultra/libaudio + .rodata, plus the SN64 LNK debug block. |
-| 0x0013B5F0 | code    | virtual   | VM/virtual code segment (T3 calls this "virtual"). |
+| 0x0013B5F0 | bin     | pre_virtual | Stale bytes: an older link of the engine's .text (see "The virtual segment's real start"). |
+| 0x0014A000 | code    | virtual   | VM/virtual code segment (T3 calls this "virtual"), vaddr 0x400000. |
 | 0x001E0000 | bin     | audio_ctl | Audio control block (libaudio bank files). Asset region starts here. |
 | 0x0020F194 | bin     | audio_wavetable | VADPCM sample data (`gAudioRomBase`). |
 | 0x00BE1814 | bin     | sound_data | Sound tree file (effects, envelopes, songs). |
@@ -645,3 +646,41 @@ See `docs/VMASM.md` for the full investigation. Highlights:
   supports `--scan` / `--yaml-snippet`).
 - `docs/VMASM.md` (new).
 - `docs/SEGMENTS.md` (this section appended).
+
+## The virtual segment's real start (round 21)
+
+Settled by the code, not by statistics. `VM_Initialize` (func_0028D820,
+turok3 vhandler.c's VM_Initialize) builds the pager's only code region:
+
+```c
+gPager.regions.start = 0x400;            /* first page: vaddr 0x400000 */
+gPager.regions.pages = 0x80;             /* 0x400000-0x47FFFF */
+gPager.regions.source = (u8 *)((uptr)D_14A000 | 0xB0000000);   /* ROM 0x14A000 */
+if (GetMemSize() > 0x4FFFFF)             /* expansion pak: preload, no paging */
+    CLoader__LoadSync(&gLoader, D_14A000, D_3CAE0, extra);
+```
+
+and maps `extra` at 0x400000 with one TLB pair (`func_0028EE40`, 2 x 256 KB).
+`D_14A000` and `D_3CAE0` are absolute linker symbols
+(versions/undefined_syms_auto.us.txt). So:
+
+- **The `virtual` segment starts at ROM 0x14A000, vaddr 0x400000**, as the
+  yaml already had it from the jal-delta sweep (VRAM-LAYOUT.md). The
+  matched C of module 1 at that address agrees.
+- **Module 1 ends at ROM 0x186AE0** (vaddr 0x43CAE0): 0x3CAE0 is the size
+  the expansion-pak path copies. Its last real word is at 0x186AD4; from
+  0x186AD8 on the bytes equal ROM - 0x39000 word for word for the first
+  0x10000 (then drift): "module 2" (VMASM.md, port/RUNTIME.md 1.4: no jal
+  reaches it) starts there, not at 0x186C14 where splat names it. The yaml
+  keeps its subsegments (the bytes rebuild either way); its header map says so.
+- **0x13B5F0-0x14A000 (`pre_virtual`) is stale bytes**, not a module: it is
+  an older link of the engine's .text at ROM 0x15F0-0x10000 moved by
+  0x13A000. 68.6% of the 14,980 words are equal to the engine's at that
+  distance; the blocks 0x13C5F0-0x1405F0 differ because of 0x1C-0x20 bytes of
+  drift (the best per-block alignment is 0x139FE0-0x139FF8 there). Nothing
+  maps it (the region above starts at 0x14A000) or DMAs it. The same kind of
+  stale fill as module 2 and as libultra's copy A (VRAM-LAYOUT.md), both
+  0x39000 from what they copy: the ROM builder padded with an old image.
+
+Check (python, on baserom.us.z64): compare `d[0x13B5F0:0x14A000]` with
+`d[0x15F0:0x10000]` and `d[0x186AD8:]` with `d[0x14DAD8:]` word by word.

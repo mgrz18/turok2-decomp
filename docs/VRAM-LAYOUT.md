@@ -145,4 +145,6 @@ until each caller is traced to the copy it actually reaches (#29).
   (`"simp obj"`), but code resumes after them — `jr ra` at `0xA643C` and
   `0xA6968` with no prologues in between, so leaf functions interleaved with
   rodata. The segment needs splitting to cover them.
-- What `0x13B5F0`–`0x14A000` actually is.
+- ~~What `0x13B5F0`–`0x14A000` actually is.~~ Answered in round 21: a stale
+  copy of an older link of the engine's .text; the code confirms 0x14A000 as
+  the `virtual` start (SEGMENTS.md, "The virtual segment's real start").

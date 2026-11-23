@@ -136,7 +136,7 @@ one possible.
 - [x] Recover the memory map: code in useg (TLB-mapped), data and libultra in KSEG0
 - [x] 95.2% of the ROM decoded, 13,275 functions delimited
 - [x] ELF links and the ROM rebuilds byte-exact from asm: `make verify` passes the SHA1
-- [ ] Locate the `virtual` segment's real start ([#23](https://github.com/mgrz18/turok2-decomp/issues/23))
+- [x] Locate the `virtual` segment's real start: ROM 0x14A000 = vaddr 0x400000, from `VM_Initialize`'s page region ([SEGMENTS.md](docs/SEGMENTS.md#the-virtual-segments-real-start-round-21))
 
 ### Phase 4 — Matching decomp (complete)
 - [x] Compiler identified: SN64 GCC 2.8.1 `cc1 -O2`
