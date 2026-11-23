@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "globals/scene.h"
 #include "protos/cache.h"
 
@@ -30,7 +31,6 @@ typedef struct {
 
 s32 Model_RequestTextures(sptr);                         /* extern */
 sptr CStaticObject__LoadGeometry();                                /* extern */
-extern s32 sCStaticObjectCacheDesc_LitVertices;
 extern s32 CStaticObject__BuildLitVerticesCallback;
 
 #ifdef TARGET_PORT

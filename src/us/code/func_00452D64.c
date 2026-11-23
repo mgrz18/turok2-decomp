@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "globals/game.h"
@@ -6,10 +7,6 @@
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
-extern char sSoundMenuText_MusicVolumeNorm[];
-extern char sSoundMenuText_MusicVolumeMax[];
-extern char sSoundMenuText_MusicVolumeOff[];
-extern char sSoundMenuText_MusicVolume[];
 
 /* Shows setting unk14 (0-255, centred on 0x80) in steps of 8 from -16 to 15. */
 s32 func_00452D64(MenuItem *item) {

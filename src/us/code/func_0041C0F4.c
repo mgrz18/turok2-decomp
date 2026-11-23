@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sOptionsMenuText_LookSpringOff[];
-extern char sOptionsMenuText_LookSpringOn[];
 s32 OptionsMenu_LookSpringText(MenuItem *item, Menu *menu) {
     CPlayerOptions *settings = &gEngineApp_m_Settings.defaultSlot;
     if (menu->player != 0 && menu->player->m_pOptions != 0) {

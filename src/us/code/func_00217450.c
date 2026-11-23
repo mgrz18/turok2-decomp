@@ -5,7 +5,6 @@
 #include "globals/object.h"
 
 extern float Bits_Normalize(float value, int bits);
-extern s32 sAnimRawRange;
 extern u32 Bits_Read(u32 *arg0, s32 arg1);
 extern f32 Math_Remap(f32 value, f32 lower, f32 upper);
 extern void AnimCurve_LoadSegment(Curve *arg0);

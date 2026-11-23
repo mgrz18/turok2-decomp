@@ -5,9 +5,9 @@
 /* The port: the same stores through CCameraViewParams (structs/camera.h); the 4-byte slot
  * ObjInit has at 0x34 is the m_pCurrentRegion pointer, 8 bytes on the host. */
 #include "common.h"
+#include "globals/camera.h"
 #include "structs/camera.h"
 
-extern u32 gDefaultVisBits[];
 void CCameraViewParams__Construct(CCameraViewParams *o) {
     o->m_YPosOffset = 0.0f;
     o->m_nType = 1;

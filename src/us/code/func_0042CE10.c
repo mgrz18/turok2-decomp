@@ -1,5 +1,6 @@
 /* WRONG CUT: REAL CScene__ConstructMap size 0x174 (splat cut it into CScene__ConstructMap + func_0042CEB0; the word after it, a nop, is padding). */
 #include "common.h"
+#include "globals/strings.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
 
@@ -9,8 +10,6 @@ typedef struct Record {
     /* 0x0C */ s32 rest[4];
 } Record; /* 0x1C */
 
-extern char sCSceneCacheDesc_ObjectIndex[];
-extern char sCSceneCacheDesc_Geometry[];
 extern void Model_DecompressCallback(void);
 
 extern s32 CScene__FindObjectType(void *level, s32 key);

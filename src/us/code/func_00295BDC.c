@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/strings.h"
 #include "globals/libaudio.h"
 #include "protos/ultra.h"
 
 extern s16 _getRate(f64 vol, f64 tgt, s32 count, u16 *ratel);
-extern char sEnvAssertExpr[];
-extern char sEnvAssertFile[];
 extern void __assert(const char *, const char *, s32);
 Acmd *_pullSubFrame(void *filter, s16 *inp, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
 {

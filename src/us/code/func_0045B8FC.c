@@ -1,25 +1,10 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_0040AD20.c, func_0040AD20.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern char sPakMessageText_DeleteANoteToFree[];
-extern char sPakMessageText_Found[];
-extern char sPakMessageText_PakCompatiblePlease_B4C60[];
-extern char sPakMessageText_PakCompatiblePlease_B4D34[];
-extern char sPakMessageText_PakCompatiblePlease_B4CCC[];
-extern char sPakMessageText_CompatiblePlease_B4D9C[];
-extern char sPakMessageText_FoundYouWillNot[];
-extern char sPakMessageText_WasChanged[];
-extern char sPakMessageText_Empty_B4E74[];
-extern char sPakMessageText_CompatiblePlease_B4EA8[];
-extern char sPakMessageText_Successful[];
-extern char sPakMessageText_AndCannotBeUsed[];
-extern char sPakMessageText_Successfully[];
-extern char sPakMessageText_WhileTryingTo_B4FAC[];
-extern char sPakMessageText_WhileTryingTo_B4FE8[];
-extern char sPakMessageText_SuccessfullyRepaired[];
 s32 PakMessage_UpdateLine2_2(MenuItem *item) {
     switch (gPakMessageKind) {
     default:

@@ -1,9 +1,8 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sBloodLustMenuText_CrosshairsOn[];
-extern char sBloodLustMenuText_CrosshairsOff[];
 
 s32 BloodLustMenu_CrosshairsLabel(MenuItem *a) {
     switch (gEngineApp_m_Settings.dmCrosshairs) {

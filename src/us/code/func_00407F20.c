@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "structs/game.h"
@@ -17,7 +18,6 @@ typedef struct {
 } BossAI;
 
 
-extern u8 sTotemDefenseText_MissionComplete[];
 
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
 void Sound__PlaySpeech(s32 sound);

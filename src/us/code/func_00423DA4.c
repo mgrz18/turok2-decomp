@@ -2,10 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu_text.h"
 #include "globals/pak.h"
 
-extern char sPakConfirmMenuText_ContinueWithoutSaving[];
-extern char sPakConfirmMenuText_No[];
 s32 PakConfirmMenu_UpdateNo(struct FieldRecAt14 *field) {
     u32 state = gPakConfirmKind;
     if (state >= 5) {

@@ -1,14 +1,12 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00407F6C.c, func_00407F6C, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
 /* Controller pak note list item: prints a note's name (16 characters), extension (4) and size in blocks
  * into the item's text; an empty slot prints blanks. */
 
-extern char sPakMenuText_OtherGame[];
-extern char sPakMenuText_Empty[];
-extern u8 sPakMenuFmt_3d[];
 s32 Pak_FindNote_2(s32 pad, s32 idx, s32 *valid, u8 *name, u8 *ext, s32 *blocks, u8 *company, u8 *game);
 s32 Pak_TextHasInvalidChar_2(u8 *p, s32 n);
 char *Str_Copy_2(char *dst, char *src);

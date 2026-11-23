@@ -1,14 +1,9 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 
 extern char D_800C1768[];
-extern char sMissionMenuText_PortOfAdia[];
-extern char sMissionMenuText_RiverOfSouls[];
-extern char sMissionMenuText_DeathMarshes[];
-extern char sMissionMenuText_LairOfTheBlindOnes[];
-extern char sMissionMenuText_HiveOfTheMantids[];
-extern char sMissionMenuText_PrimagensLightship[];
 
 s32 MissionMenu_UpdateLevelName(MenuItem *item) {
     switch (sMissionHub) {

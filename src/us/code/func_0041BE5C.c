@@ -2,11 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu_text.h"
 #include "globals/game.h"
 
-extern u8 sOptionsMenuText_DifficultyNormal[];
-extern u8 sOptionsMenuText_DifficultyHard[];
-extern u8 sOptionsMenuText_DifficultyEasy[];
 s32 OptionsMenu_DifficultyText(MenuItemRecAt14 *item) {
     extern u32 gEngineApp_m_Settings_difficulty; /* local type: the field's real type (or the member path) changes the ROM's code here */
     if (gEngineApp_m_Settings.mode == 8) {

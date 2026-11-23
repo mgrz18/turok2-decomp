@@ -1,5 +1,6 @@
 /* Second VM module copy of CScene__ConstructMap (same source, linked 0xE0 lower). */
 #include "common.h"
+#include "globals/strings.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
 #include "protos/scene.h"
@@ -10,8 +11,6 @@ typedef struct Record {
     /* 0x0C */ s32 rest[4];
 } Record; /* 0x1C */
 
-extern char sCSceneCacheDesc_ObjectIndex[];
-extern char sCSceneCacheDesc_Geometry[];
 extern void Model_DecompressCallback(void);
 
 

@@ -2,6 +2,7 @@
  * 0x004567AC is junk between objects (src/us/asm/stray_004567AC.s).
  * Second-module twin of SaveGame_Build. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/game.h"
 #include "structs/save.h"
 #include "globals/game.h"
@@ -24,7 +25,6 @@ typedef struct {
     void *data;
 } MemHandle;
 
-extern char sPakMenuText_SingleSaveBlock[];
 
 void CCache__Flush(s32 heap);
 void CCache__Deallocate(sptr heap, MemHandle *handle);

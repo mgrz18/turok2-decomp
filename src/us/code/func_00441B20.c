@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/game_object.h"
 #include "globals/onscreen.h"
 
@@ -17,8 +18,6 @@ s32 COnScreen__SetBoss(sptr, sptr, sptr);
 s32 TotemDefense_DrawTotem_2(s32, s32, s32);
 
 void COnScreen__SetBoss2(void *, void *, void *);         /* extern */
-extern u8 sTotemDefenseText_Enemies[];
-extern u8 sTotemDefenseText_Time[];
 
 void TotemDefense_InitFight_2(ObjState *arg0, CGameObjectInstance *arg1)
 {

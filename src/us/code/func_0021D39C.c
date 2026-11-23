@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/vector.h"
 #include "structs/region.h"
 #include "structs/camera.h"
@@ -70,7 +71,6 @@ struct Actor {
 };
 #endif
 
-extern char sCGameObjectInstanceCacheDesc_AnimObjectInfo[];   /* "anim object info" */
 
 void CMtxF__TransformBox(void *, sptr, f32 *);
 s32 Frustum_TestBox(void *, f32 *);

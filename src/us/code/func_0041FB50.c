@@ -1,12 +1,11 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
 /* Save/load menu: fills a pak file line ("NAME.EXT" and its size) for the
  * note of the chosen pak; an empty or unreadable note shows blanks. */
 
-extern char sPakMenuText_OtherGame[];
-extern char sPakMenuText_Empty[];
 
 extern s32 Pak_FindNote(s32 slot, s32 note, s32 *used, char *name, char *ext, s32 *size, void *a6, void *a7);
 extern s32 Pak_TextHasInvalidChar(char *s, s32 n);

@@ -1,11 +1,10 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_0040ACD4.c, func_0040ACD4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern char sPakMessageText_Error[];
-extern char sPakMessageText_Important[];
 s32 PakMessage_UpdateHeading_2(MenuItem *item) {
     switch (gPakMessageKind) {
     default:

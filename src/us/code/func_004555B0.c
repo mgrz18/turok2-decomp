@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/game.h"
@@ -7,8 +8,6 @@
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
-extern char sOptionsMenuText_ControlStickVertNorm[];
-extern char sOptionsMenuText_ControlStickVert[];
 
 /* Shows the player's option unk2A (0-255, centred on 0x80) in steps of 8, falling back to the
  * default options when there is no player. */

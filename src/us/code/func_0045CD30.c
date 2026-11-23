@@ -11,7 +11,6 @@ typedef struct {
     /* 0x04 */ s32 v[4];
 } ScreenExtra; /* 0x14 */
 
-extern s32 gVideoDitherFilter;
 extern ScreenExtra gVideoModeFlags[];
 
 s32 GetMemSize(void); /* osGetMemSize */

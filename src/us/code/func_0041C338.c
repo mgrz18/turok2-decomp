@@ -1,10 +1,9 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sOptionsMenuText_2PlyrLayoutHorz[];
-extern char sOptionsMenuText_2PlyrLayoutVert[];
 
 s32 OptionsMenu_TwoPlayerLayoutText(MenuItem *a) {
     if (gEngineApp_m_Settings.mode == 13 && gEngineApp_m_Settings.multiplayer == 0) {

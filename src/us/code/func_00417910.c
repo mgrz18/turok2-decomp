@@ -1,23 +1,8 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sWeaponsMenuText_ChargeDartRifleOn[];
-extern char sWeaponsMenuText_ChargeDartRifleOff[];
-extern char sWeaponsMenuText_FirestormOn[];
-extern char sWeaponsMenuText_FirestormOff[];
-extern char sWeaponsMenuText_AssaultRifleOn[];
-extern char sWeaponsMenuText_AssaultRifleOff[];
-extern char sWeaponsMenuText_PlasmaRifleOn[];
-extern char sWeaponsMenuText_PlasmaRifleOff[];
-extern char sWeaponsMenuText_CerebralBoreOn[];
-extern char sWeaponsMenuText_CerebralBoreOff[];
-extern char sWeaponsMenuText_GrenadeLauncherOn[];
-extern char sWeaponsMenuText_GrenadeLauncherOff[];
-extern char sWeaponsMenuText_ScorpionLauncherOn[];
-extern char sWeaponsMenuText_ScorpionLauncherOff[];
-extern char sWeaponsMenuText_TorpedoLauncherOn[];
-extern char sWeaponsMenuText_TorpedoLauncherOff[];
 
 /* Label of a weapon toggle in the weapons menu: "<weapon> on/off". */
 s32 WeaponsMenu_ToggleLabel(MenuItem *a) {

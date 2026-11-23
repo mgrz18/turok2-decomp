@@ -2,24 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu_text.h"
 #include "globals/pak.h"
 
-extern char sPakMessageText_SavedNotesMayHave[];
-extern char sPakMessageText_Empty_B5008[];
-extern char sPakMessageText_Empty_B4F90[];
-extern char sPakMessageText_ControllerPakAnd[];
-extern char sPakMessageText_Empty_B4FCC[];
-extern char sPakMessageText_NowIfYouWishToPlay_B4DC8[];
-extern char sPakMessageText_PakNowIfYouWishTo_B4CFC[];
-extern char sPakMessageText_Again[];
-extern char sPakMessageText_NowIfYouWishToPlay_B4ED4[];
-extern char sPakMessageText_Empty_B4F14[];
-extern char sPakMessageText_Note[];
-extern char sPakMessageText_PakNowIfYouWishTo_B4D64[];
-extern char sPakMessageText_Game[];
-extern char sPakMessageText_Empty_B4BF4[];
-extern char sPakMessageText_Empty_B4E88[];
-extern char sPakMessageText_PakNowIfYouWishTo_B4C90[];
 s32 PakMessage_UpdateLine4(struct FieldRecAt14 *field) {
     u32 state = gPakMessageKind;
     if (state >= 16) {

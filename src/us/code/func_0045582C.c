@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/game.h"
@@ -8,8 +9,6 @@
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
-extern char sOptionsMenuText_BrightnessNorm[];
-extern char sOptionsMenuText_Brightness[];
 
 
 /* Shows setting 0x0C in sixteenths: a fixed line for 0, otherwise the number. */

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
@@ -9,9 +10,7 @@
 #endif
 
 #ifdef TARGET_PORT
-extern char sPakMenuText_Exit[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 sPakMenuText_Exit;
 #endif
 
 s32 PakMenu_UpdateCancel(MenuItem *arg0) {

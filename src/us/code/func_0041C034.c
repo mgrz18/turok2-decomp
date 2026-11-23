@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "structs/player.h"
 #include "globals/game.h"
@@ -10,14 +11,10 @@
 #endif
 
 #ifdef TARGET_PORT
-extern char sOptionsMenuText_ControlSideLeft[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 sOptionsMenuText_ControlSideLeft;
 #endif
 #ifdef TARGET_PORT
-extern char sOptionsMenuText_ControlSideRight[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 sOptionsMenuText_ControlSideRight;
 #endif
 
 

@@ -2,14 +2,10 @@
  * into func_00423CF4, func_00423D04, func_00423D14, func_00423D24 (jump table jtbl_800C16D0),
  * and whose shared `return 0` tail is the already-accepted func_00423D30 (8 bytes). */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern u8 sPakConfirmMenuText_ToAttemptRepair[];
-extern u8 sPakConfirmMenuText_Empty_B51CC[];
-extern u8 sPakConfirmMenuText_Empty_B5218[];
-extern u8 sPakConfirmMenuText_OverwriteThisNote[];
-extern u8 sPakConfirmMenuText_DeleteThisNote[];
 
 s32 PakConfirmMenu_UpdateLine5(MenuItem *item) {
     switch (gPakConfirmKind) {

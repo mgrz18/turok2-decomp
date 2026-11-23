@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/collision.h"
@@ -16,12 +17,6 @@ extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: global
 #endif
 
 /* The messages live in the data after .rodata ("head shot!" in the hit-region names), not in this file's pool. */
-extern char sKillMessageText_HeadShot[]; /* "head shot!" */
-extern char sKillMessageText_TaggedBy[]; /* "tagged by " */
-extern char sKillMessageText_YouTagged[]; /* "you tagged " */
-extern char sKillMessageText_KilledBy[]; /* "killed by " */
-extern char sKillMessageText_YouKilled[]; /* "you killed " */
-extern char sKillMessageText_YouKilledYourself[]; /* "you killed yourself" */
 
 char *Util_StrCpy(char *dst, char *src); /* strcpy */
 void CCameraPool__AddTimedText(CGameFromCameraPool *game, struct CCamera *camera, char *text, f32 time);

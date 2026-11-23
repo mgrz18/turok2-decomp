@@ -2,15 +2,13 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/menu_text.h"
 #include "globals/game.h"
 struct FieldRecAt14;
 struct FieldRecAt14 {
     char pad[0x14];
     char *text;
 };
-extern char sOptionsMenuText_BloodColorGreen[];
-extern char sOptionsMenuText_BloodColorRed[];
-extern char sOptionsMenuText_BloodColorOff[];
 s32 OptionsMenu_BloodColorText_2(struct FieldRecAt14 *field) {
     switch (gEngineApp_m_Settings.unk17) {
     case 0:

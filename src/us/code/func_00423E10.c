@@ -12,7 +12,6 @@ typedef struct {
     s32 a, b, c, d, e;
 } VideoFlags;
 
-extern s32 gVideoDitherFilter;
 extern VideoFlags gVideoModeFlags[];
 extern s32 GetMemSize(void); /* osGetMemSize */
 extern void Video_SetMode(s32 width, s32 height, s32 a2, s32 a3, s32 a4, s32 a5);

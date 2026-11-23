@@ -1,14 +1,10 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_0040B8E8.c, func_0040B8E8.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern char sPakConfirmMenuText_ToAttemptRepair[];
-extern char sPakConfirmMenuText_Empty_B51CC[];
-extern char sPakConfirmMenuText_Empty_B5218[];
-extern char sPakConfirmMenuText_OverwriteThisNote[];
-extern char sPakConfirmMenuText_DeleteThisNote[];
 s32 PakConfirmMenu_UpdateLine5_2(MenuItem *item) {
     switch (gPakConfirmKind) {
     default:

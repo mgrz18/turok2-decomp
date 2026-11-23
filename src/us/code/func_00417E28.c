@@ -1,9 +1,8 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sFinalScoreMenuText_RedBloodScore[];
-extern char sFinalScoreMenuFmt_04d[]; /* "%d"-style format */
 extern s32 MenuItem_TextLength(MenuItem *a);
 #ifdef TARGET_PORT
 /* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */

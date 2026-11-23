@@ -1,13 +1,8 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 
-extern char sPlayerSetupMenuText_Handicap_B41B0[];
-extern char sPlayerSetupMenuText_Handicap_B41C0[];
-extern char sPlayerSetupMenuText_Handicap_B41D0[];
-extern char sPlayerSetupMenuText_Handicap_B41E0[];
-extern char sPlayerSetupMenuText_HandicapNone[];
-extern char sPlayerSetupMenuText_HandicapMax[];
 extern s32 MenuItem_TextLength(MenuItem *a);
 #ifdef TARGET_PORT
 /* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */

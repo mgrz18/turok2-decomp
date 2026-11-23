@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/game_object.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
@@ -10,7 +11,6 @@ typedef struct {
 } ModelSection;
 
 f32 HalfToFloat(u16);                             /* extern */
-extern s32 sCGameObjectInstanceCacheDesc_AnimObjectInfo;
 
 f32 func_0021F2B0(CGameObjectInstance *arg0) {
     f32 var_f0;

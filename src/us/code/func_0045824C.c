@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/pak.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
@@ -20,9 +21,6 @@ typedef struct K7Obj {
 } K7Obj;
 typedef struct K7Mem { s32 addr; } K7Mem;
 extern s32 D_800F70A8;
-extern u8 sPakMenuText_OtherGame[];
-extern u8 sCharNoteMenuText_Empty[];
-extern u8 sPakMenuText_SingleSaveBlock[];
 s32 PakMenu_CheckPak_2();
 s32 Pak_FindNote_2();
 s32 Pak_ReadNote_2();

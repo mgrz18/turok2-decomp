@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "globals/game.h"
@@ -7,7 +8,6 @@
 /* Menu text item: print one u16 stat of the current player's record (64-byte
  * records, field at 0x8011AB5E) at the end of the item's text. */
 
-extern char sStatsMenuFmt_04d[];
 
 s32 MenuItem_TextLength_2(MenuItem *item);
 #ifdef TARGET_PORT

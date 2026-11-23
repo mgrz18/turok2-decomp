@@ -1,10 +1,9 @@
 /* WRONG CUT: real function 0x0041B954, size 0x6C: splat cut it into CheatMenu_BlackoutText and func_0041B9B0 at branch targets. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sCheatMenuText_BlackoutOn[];
-extern char sCheatMenuText_BlackoutOff[];
 
 /* On/off option item for bit 0x4000: shown only when unlocked. */
 s32 CheatMenu_BlackoutText(MenuItem *a) {

@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCENE/CODE_80289790.CPP, Scene_UpdateSelectionTransition, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/world.h"
 #include "structs/game.h"
 #include "globals/engine.h"
@@ -8,7 +9,6 @@
 #include "protos/scene.h"
 
 extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
-extern u8 sCheatMessageText_NewCheatEnabled[];
 
 void Cinema_Reset(CWarpFadeColor *entry);
 void Cinema_StopAtEnd(void);

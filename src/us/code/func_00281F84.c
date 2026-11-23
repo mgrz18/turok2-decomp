@@ -1,9 +1,9 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/camera.h"
 #include "protos/cache.h"
 
 void memset(sptr, s32, sptr);                  /* extern */
-extern u8 sCCameraPoolCacheDesc_Cameras[];
 
 /* Allocates the pool's arg1 cameras and clears them. */
 void CCameraPool__AllocCameras(CCameraPool *arg0, s32 arg1) {

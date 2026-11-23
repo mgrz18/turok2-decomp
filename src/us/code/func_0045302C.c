@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
@@ -6,8 +7,6 @@
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
-extern char sSoundMenuText_MusicNone[];
-extern char sSoundMenuText_Music[];
 
 /* Shows sSoundMenuTrack: a fixed line when 0, otherwise the number. */
 s32 SoundMenu_MusicTrackLabel_2(MenuItem *item) {

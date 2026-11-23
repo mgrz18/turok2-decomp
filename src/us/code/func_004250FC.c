@@ -1,13 +1,9 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 
 extern char D_800C1768[];
-extern char sMissionMenuText_Children[];
-extern char sMissionMenuText_SistersOfDespair[];
-extern char sMissionMenuText_AmmoStorageFacilities[];
-extern char sMissionMenuText_MasterComputers[];
-extern char sMissionMenuText_AssemblyPlants[];
 
 s32 MissionMenu_UpdateObjective2(MenuItem *item) {
     switch (sMissionHub) {

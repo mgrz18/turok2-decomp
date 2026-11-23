@@ -2,9 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/strings.h"
 
-extern char sSeqPlayerAssertExpr;
-extern char sSeqPlayerAssertFile;
 extern void __assert(void *arg0, void *arg1, s32 arg2);
 void *__lookupSoundQuick(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 high;

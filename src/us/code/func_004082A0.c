@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "structs/game.h"
@@ -23,7 +24,6 @@ typedef struct {
     /* 0x46 */ s16 kills;
 } BossDef;
 
-extern u8 sTotemDefenseText_DefendTheTotem[];
 
 void CCameraPool__AddTimedText(void *, sptr, void *, f32);
 void Sound__PlaySpeech(s32);

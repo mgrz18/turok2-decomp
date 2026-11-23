@@ -1,21 +1,8 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sBloodLustMenuText_LevelRandom[];
-extern char sBloodLustMenuText_LevelExperimentata[];
-extern char sBloodLustMenuText_LevelMoonlitMayhem[];
-extern char sBloodLustMenuText_LevelCloseQuartered[];
-extern char sBloodLustMenuText_LevelVulcansForge[];
-extern char sBloodLustMenuText_LevelTeleportastic[];
-extern char sBloodLustMenuText_LevelMirrororrim[];
-extern char sBloodLustMenuText_LevelFishInABarrel[];
-extern char sBloodLustMenuText_LevelH2Whoa[];
-extern char sBloodLustMenuText_LevelEscheria[];
-extern char sBloodLustMenuText_LevelMoshCrypt[];
-extern char sBloodLustMenuText_LevelSquaresCubed[];
-extern char sBloodLustMenuText_LevelCrazyEight[];
-extern char sBloodLustMenuText_LevelBullseye[];
 
 s32 TeamBloodMenu_LevelLabel(MenuItem *a) {
     switch (gEngineApp_m_Settings.teamArena) {

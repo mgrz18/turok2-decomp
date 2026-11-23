@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/menu.h"
@@ -6,12 +7,6 @@
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
-extern char sPlayerSetupMenuText_Handicap_B41B0[];
-extern char sPlayerSetupMenuText_Handicap_B41C0[];
-extern char sPlayerSetupMenuText_Handicap_B41D0[];
-extern char sPlayerSetupMenuText_Handicap_B41E0[];
-extern char sPlayerSetupMenuText_HandicapNone[];
-extern char sPlayerSetupMenuText_HandicapMax[];
 
 /* Shows the player's handicap: two special values, otherwise a per-port line with the number. */
 s32 PlayerSetupMenu_HandicapLabel_2(MenuItem *item, Menu *ctx) {

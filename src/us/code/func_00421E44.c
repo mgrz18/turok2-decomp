@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
@@ -9,14 +10,10 @@
 #endif
 
 #ifdef TARGET_PORT
-extern char sGameNoteMenuText_NoteInfo[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 sGameNoteMenuText_NoteInfo;
 #endif
 #ifdef TARGET_PORT
-extern char sGameNoteMenuText_DeleteNote[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 sGameNoteMenuText_DeleteNote;
 #endif
 
 s32 GameNoteMenu_UpdateTitle(MenuItem *arg0) {

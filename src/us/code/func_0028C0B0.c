@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/player.h"
 #include "globals/game.h"
 #include "globals/frame.h"
@@ -33,11 +34,8 @@ typedef struct Thread {
 } Thread;
 
 /* "\n": the string literal of the functions before this one in the same file (the ROM merges it), declared so this one does not emit its own copy. */
-extern u8 sCrashText_Newline[];
 extern u16 *gCFB;             /* local type: gCFB[0] (globals/framebuffer.h) read as a scalar; the array form shares a base register */
 extern char D_8010FED4[];
-extern s32 gAssertLine;              /* failed assertion: line */
-extern char *gAssertExpr;            /* failed assertion: expression */
 
 extern void Video_SetResolution(s32);
 extern void Crash_PutChar(u8 c);                /* draws one character */

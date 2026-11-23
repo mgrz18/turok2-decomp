@@ -1,6 +1,7 @@
 /* WRONG CUT: REAL CScene__FindWarpDests size 0x228 (splat cut it into CScene__FindWarpDests + func_0042C2DC + func_0042C338 + func_0042C38C). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_29.CPP, func_8044D220_de, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/game.h"
 #include "protos/list.h"
 #include "protos/iset.h"
@@ -28,7 +29,6 @@ typedef struct Placed {
     /* 0x12 */ s16 unk12;
 } Placed; /* 0x14 */
 
-extern char sCSceneCacheDesc_CartridgeIndex[];
 
 extern void CCache__LoadPersistantIndex(s32, sptr *, sptr, char *);
 extern void **CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, void *, sptr, char *);

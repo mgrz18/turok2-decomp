@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/strings.h"
 #include "globals/libultra.h"
 
 extern s32 osPiRawReadIo(s32 arg0, s32 *arg1);
 extern void __assert(void *arg0, void *arg1, s32 arg2);
-extern s32 sPiRawReadAssertExpr;
-extern s32 sPiRawReadAssertFile;
 s32 osPiRawReadIo(s32 arg0, s32 *arg1) {
     u32 status;
     if (arg1 == 0) {

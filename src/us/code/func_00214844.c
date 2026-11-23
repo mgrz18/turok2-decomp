@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD_2/8024E914_14.CPP, func_802504B0_de (with func_8027892C_de of src/GAMECORE/CODE_80278900.CPP inlined), with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/engine.h"
@@ -59,7 +60,6 @@ typedef struct {
 
 /* What this reads around gEngineApp_m_Settings_match. */
 
-extern char sCStaticObjectCacheDesc_LitVertices[];
 
 #ifdef TARGET_PORT /* unprototyped: the host passes the pass-through arguments */
 s32 Actor_GetTypeClass();

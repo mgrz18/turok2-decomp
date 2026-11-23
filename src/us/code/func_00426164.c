@@ -1,10 +1,10 @@
 /* WRONG CUT: REAL Pak_SaveNoteVerified size 0x278 (splat cut it into Pak_SaveNoteVerified + func_004263A0). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC_6.CPP, func_80404958_de, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/pak.h"
 #include "globals/pak.h"
 
-extern u8 sPakCompanyCode[];
 
 extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void CCache__Flush(s32);

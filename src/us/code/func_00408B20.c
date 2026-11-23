@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "globals/onscreen.h"
 
 sptr CGameObjectInstance__PickRandomAnim(sptr, sptr, sptr);
@@ -7,11 +8,8 @@ s32 TotemDefense_DrawTotem(sptr, s32, sptr);
 
 s32 COnScreen__SetBoss2(s32 *, void *, s32 *); /* extern */
 #ifdef TARGET_PORT
-extern char sTotemDefenseText_Enemies[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 sTotemDefenseText_Enemies;
 #endif
-extern s32 sTotemDefenseText_Time;
 
 #ifdef TARGET_PORT
 #include "structs/game_object.h"

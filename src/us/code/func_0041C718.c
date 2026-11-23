@@ -1,10 +1,9 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sOptionsMenuText_WeaponSelectQuick[];
-extern char sOptionsMenuText_WeaponSelectNorm[];
 
 /* The weapon select item's text: quick or normal. */
 s32 OptionsMenu_WeaponSelectText(MenuItem *item, Menu *menu)

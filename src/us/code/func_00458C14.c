@@ -11,10 +11,10 @@ typedef struct {
 } Chars4;
 
 extern s32 D_800F70A8;
-extern Chars4 sPakMenuText_Spaces3;
-extern u8 sPakMenuFmt_3d[];
-extern char sPakMenuText_FreePagesXxxNeededXxx_B48B4[];
-extern char sPakMenuText_FreePagesXxxNeededXxx_B4914[];
+extern Chars4 sPakMenuText_Spaces3; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
+extern u8 sPakMenuFmt_3d[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
+extern char sPakMenuText_FreePagesXxxNeededXxx_B48B4[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
+extern char sPakMenuText_FreePagesXxxNeededXxx_B4914[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
 extern char D_800C140C[];
 s32 Pak_GetFreePages_2(s32 pad, s32 *out);
 u32 Pak_BytesToPages_2(u32 n);

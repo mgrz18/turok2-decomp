@@ -1,11 +1,9 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 #include "globals/menu.h"
 
-extern char sMpMenuText_PlayerSpeed[];
-extern char sMpMenuText_PlayerSpeedDefault[];
-extern char sMpMenuFmt_3d[];  /* "%3d" */
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 

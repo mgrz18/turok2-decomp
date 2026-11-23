@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "globals/pak.h"
 
 typedef struct {
@@ -6,7 +7,6 @@ typedef struct {
     /* 0x14 */ s32 *data;
 } Item;
 
-extern s32 sPakMenuText_Exit;
 
 s32 PakMenu_UpdateCancel_2(Item *arg0) {
     if (gPakMenuAnyPak != 0) {

@@ -1,10 +1,9 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "m2c_macros.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-extern M2C_UNK sCStaticObjectCacheDesc_StatObjectIndex;
-extern M2C_UNK sCStaticObjectCacheDesc_StatGeometry;
 extern M2C_UNK Model_DecompressCallback;
 
 #ifdef TARGET_PORT /* the static object's members (structs/level_actor.h) */

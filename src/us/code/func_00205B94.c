@@ -1,12 +1,12 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCENE/802508E0_11.CPP, func_80254284_de, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/strings.h"
 #include "ultra_types.h"
 #include "globals/cache.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
 
-extern char sCCacheDesc_Header[];
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);

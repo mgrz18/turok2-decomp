@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "globals/camera.h"
 #include "globals/scene.h"
 #include "globals/pickup.h"
@@ -28,27 +29,6 @@ typedef struct Picker {
 } Picker;
 #endif
 
-extern u8 sPickupNameText_SatchelCharge[];
-extern u8 sPickupNameText_PowerCell[];
-extern u8 sPickupNameText_Key[];
-extern u8 sPickupNameText_CaveDoorKey[];
-extern u8 sPickupNameText_IonCapacitor[];
-extern u8 sPickupNameText_RedLaserCell[];
-extern u8 sPickupNameText_BlueLaserCell[];
-extern u8 sPickupNameText_GateKey[];
-extern u8 sPickupNameText_GraveyardKey[];
-extern u8 sPickupNameText_Level1Key[];
-extern u8 sPickupNameText_Level2Key[];
-extern u8 sPickupNameText_Level3Key[];
-extern u8 sPickupNameText_Level4Key[];
-extern u8 sPickupNameText_Level5Key[];
-extern u8 sPickupNameText_Level6Key[];
-extern u8 sPickupNameText_PrimagenKey1[];
-extern u8 sPickupNameText_PrimagenKey2[];
-extern u8 sPickupNameText_PrimagenKey3[];
-extern u8 sPickupNameText_PrimagenKey4[];
-extern u8 sPickupNameText_PrimagenKey5[];
-extern u8 sPickupNameText_PrimagenKey6[];
 
 s32 CPlayer__IsSpecialPickup(Picker *picker, s32 id);
 void CPlayer__CollectKeyPiece(Picker *picker, s32 id);

@@ -1,9 +1,9 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/game_object.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-extern char sCGameObjectInstanceCacheDesc_AnimObjectInfo[];
 
 void **CGameObjectInstance__LoadGeometry(void *obj);
 s32 CGameObjectInstance__BuildBoneMatrices(void *, void *, sptr);

@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SYSTEM/802624A0_10.CPP, func_80262CE0_de, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/vector.h"
 #include "structs/world.h"
 #include "structs/list.h"
@@ -20,8 +21,6 @@ typedef struct AnimInfo {
     /* 0x1E */ u16 angle;
 } AnimInfo;
 
-extern char sCInstancePoolCacheDesc_AnimObjectIndex[];               /* "anim object index" */
-extern char sCInstancePoolCacheDesc_AnimObjectInfo[];               /* "anim object info" */
 
 f32 HalfToFloat(s32 angle);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 angle);

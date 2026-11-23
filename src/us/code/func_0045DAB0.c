@@ -1,5 +1,6 @@
 /* Second-module copy of MissionMenu_UpdateObjective1Count (first module; this one at link address 0x00424AB0), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/scene.h"
@@ -7,13 +8,6 @@
 
 s32 MenuItem_TextLength_2(void *item);
 
-extern char sMissionMenuText_Unavailable[];
-extern char sMissionMenuText_ActivatedXOf3[];
-extern char sMissionMenuText_DestroyedXOf2[];
-extern char sMissionMenuText_RescuedXOf5[];
-extern char sMissionMenuText_SealedXOf3[];
-extern char sMissionMenuText_DestroyedXOf3_B44E8[];
-extern char sMissionMenuText_RecalibratedXOf4[];
 
 s32 MissionMenu_UpdateObjective1Count_2(MenuItem *item) {
     s32 rank = -1;

@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sOptionsMenuText_AutoAimOff[];
-extern char sOptionsMenuText_AutoAimOn[];
 s32 OptionsMenu_AutoAimText_2(MenuItem *item, Menu *menu) {
     CPlayerOptions *settings = &gEngineApp_m_Settings.defaultSlot;
     if (menu->player != 0 && menu->player->m_pOptions != 0) {

@@ -1,13 +1,12 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_4/8026AC38_3.CPP, func_8026C484_de, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/model.h"
 #include "globals/batch.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-extern char sRenderCacheDesc_SimpObjectIndex[];
-extern char sRenderCacheDesc_Geometry[];
 
 void Render_FlushModelBatch(void);
 void Model_DecompressCallbackTerminated();

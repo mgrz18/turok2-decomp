@@ -1,12 +1,11 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/model.h"
 #include "globals/batch.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
 
 void Render_FlushModelBatch(void);
-extern u8 sRenderCacheDesc_SimpObjectIndex[];
-extern u8 sRenderCacheDesc_Geometry[];
 extern void Model_DecompressCallbackTerminated();
 
 void func_0020B9F4(sptr res, sptr arg1, sptr arg2, s32 index, s32 arg4) {

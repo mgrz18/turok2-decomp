@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sOptionsMenuText_WeaponSelectQuick[];
-extern char sOptionsMenuText_WeaponSelectNorm[];
 s32 OptionsMenu_WeaponSelectText_2(MenuItem *a, Menu *b) {
  CPlayer *q = b->player;
  CPlayerOptions *p;

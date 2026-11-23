@@ -1,13 +1,10 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
 
-extern char sOptionsMenuText_ControlStickVertNorm[];
-extern char sOptionsMenuText_ControlStickVert[];
-extern char sOptionsMenuFmt_02d[]; /* "  %2d"-style */
-extern char sOptionsMenuFmt_03d[];
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 

@@ -1,19 +1,8 @@
 /* Second-module copy of CharNoteMenu_UpdateType (first module; this one at link address 0x00422234), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 
-extern char sCharNoteMenuText_Empty[];
-extern char sCharNoteMenuText_Type[];
-extern char sCharNoteMenuText_Turok[];
-extern char sCharNoteMenuText_Adon[];
-extern char sCharNoteMenuText_Gant[];
-extern char sCharNoteMenuText_FleshEater[];
-extern char sCharNoteMenuText_PurrLin[];
-extern char sCharNoteMenuText_EndTrail[];
-extern char sCharNoteMenuText_Fireborn[];
-extern char sCharNoteMenuText_Iggy[];
-extern char sCharNoteMenuText_Campaigner[];
-extern char sCharNoteMenuText_Telset[];
 extern s8 gPakProfileRead_character[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 D_801309A8;
 

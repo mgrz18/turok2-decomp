@@ -1,14 +1,8 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sBloodLustMenuText_LevelRandom[];
-extern char sFragTagMenuText_LevelMadhouse[];
-extern char sFragTagMenuText_LevelSnap[];
-extern char sFragTagMenuText_LevelSneaksNLadders[];
-extern char sFragTagMenuText_LevelPrimattica[];
-extern char sFragTagMenuText_LevelCrossfire[];
-extern char sFragTagMenuText_LevelYNGWTSF[];
 
 /* Label of the level item. */
 s32 FragTagMenu_LevelLabel(MenuItem *a) {

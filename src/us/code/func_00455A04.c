@@ -2,14 +2,13 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/menu_text.h"
 #include "globals/game.h"
 struct FieldRecAt14;
 struct FieldRecAt14 {
     char pad[0x14];
     char *text;
 };
-extern char sStatsMenuText_YouTagged[];
-extern char sStatsMenuText_YouFragged[];
 s32 StatsMenu_HeaderText_2(struct FieldRecAt14 *field) {
     if (gEngineApp_m_Settings.match.tag != 0) {
         field->text = sStatsMenuText_YouTagged;

@@ -1,21 +1,10 @@
 /* WRONG CUT: one function 0x00422484-0x00422608 (size 0x184); splat cut its tail (the last range
  * tests and the copy loop) into func_00422574. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern char sCharNoteMenuText_Pathetic[];
-extern char sCharNoteMenuText_Poor[];
-extern char sCharNoteMenuText_Harmless[];
-extern char sCharNoteMenuText_Nuisance[];
-extern char sCharNoteMenuText_Acceptable[];
-extern char sCharNoteMenuText_Average[];
-extern char sCharNoteMenuText_Good[];
-extern char sCharNoteMenuText_Excellent[];
-extern char sCharNoteMenuText_Dangerous[];
-extern char sCharNoteMenuText_Brutal[];
-extern char sCharNoteMenuText_Savage[];
-extern char sCharNoteMenuText_Elite[];
 
 s32 CharNoteMenu_UpdateRank(MenuItem *item) {
     s32 score = gPakProfileRead.kills;

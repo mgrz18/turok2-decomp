@@ -1,18 +1,10 @@
 /* WRONG CUT: real function 0x00418750, size 0xBC (through 0x0041880C): splat cut the last
  * case and the return off as func_004187FC. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sBloodLustMenuText_TextureSetCastle[];
-extern char sBloodLustMenuText_TextureSetSteelMill[];
-extern char sBloodLustMenuText_TextureSetOakFort[];
-extern char sBloodLustMenuText_TextureSetCatacombs[];
-extern char sBloodLustMenuText_TextureSetJailhouse[];
-extern char sBloodLustMenuText_TextureSetBigCity[];
-extern char sBloodLustMenuText_TextureSetRedDragon[];
-extern char sBloodLustMenuText_TextureSetPaintball[];
-extern char sBloodLustMenuText_TextureSetMrHappy[];
 
 s32 FragTagMenu_TextureSetLabel(MenuItem *a) {
     switch (gEngineApp_m_Settings.tagTextureSet) {

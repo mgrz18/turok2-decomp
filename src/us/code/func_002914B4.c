@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/sdk/libgultra_inferred/802B54A0_2.CPP, func_802B0554_de (libultra seqplayer.c __seqpVoiceHandler), with Turok 2's layouts. */
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/libaudio.h"
 
 extern s32 __voiceNeedsNoteKill(void *arg0, sptr arg1, s32 arg2);
@@ -27,8 +28,6 @@ struct List802B663C {
 extern void __unmapVoice(List802B663C *arg0, void *arg1);
 extern void __postNextSeqEvent(void *arg0);
 extern void __assert(const char *arg0, const char *arg1, s32 arg2);
-extern char sSeqPlayerAssertExpr[];
-extern char sSeqPlayerAssertFile[];
 extern void __handleNextSeqEvent(ALSeqPlayer *);
 extern void __handleMIDIMsg(ALSeqPlayer *, ALEvent *);
 extern void __handleMetaMsg(ALSeqPlayer *, ALEvent *);

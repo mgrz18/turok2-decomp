@@ -1,10 +1,10 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/player_options.h"
 #include "globals/game.h"
 
-extern char sStatsMenuFmt_02d[];      /* number format */
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 

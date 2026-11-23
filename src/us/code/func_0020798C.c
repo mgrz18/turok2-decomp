@@ -1,8 +1,8 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "protos/cache.h"
 
 extern s32 Texture_DecompressCallback;
-extern s32 sTextureCacheDesc_Texture;
 
 typedef struct {
     /* 0x0 */ s32 unk0;

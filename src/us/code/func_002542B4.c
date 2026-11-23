@@ -1,10 +1,10 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/player.h"
 #include "structs/camera.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-extern u8 sActorCacheDesc_PlayerAnimObjectInfo[];
 extern void CGameObjectInstance__UpdateBounds(CGameObjectInstance *, void *);
 extern void Shadow_DrawBlob(CGameObjectInstance *, CVector3 *, s32);
 

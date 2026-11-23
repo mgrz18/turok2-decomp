@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/vector.h"
 #ifdef TARGET_PORT
 #include "structs/game_object.h"
@@ -53,7 +54,6 @@ struct Actor {
 };
 #endif
 
-extern u8 sCGameObjectInstanceCacheDesc_AnimObjectInfo[];     /* "anim object info" */
 
 void CMtxF__TransformBox(void *, void *, void *);
 void CVector3__Add(CVector3 *, CVector3 *, void *);

@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu_text.h"
 #include "globals/game.h"
 
 #ifdef TARGET_PORT
@@ -11,14 +12,10 @@
 #endif
 
 #ifdef TARGET_PORT
-extern char sCheatMenuText_InfiniteLivesOn[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 sCheatMenuText_InfiniteLivesOn;
 #endif
 #ifdef TARGET_PORT
-extern char sCheatMenuText_InfiniteLivesOff[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 sCheatMenuText_InfiniteLivesOff;
 #endif
 s32 CheatMenu_InfiniteLivesText(struct Func8043D458Arg *arg0) {
     if (gEngineApp_m_Settings.unlockedCheats & 2) {

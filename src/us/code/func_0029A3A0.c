@@ -2,13 +2,12 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/strings.h"
 #include "protos/ultra.h"
 
 extern int __osSpDeviceBusy();
 extern s32 __osSpRawStartDma(s32 direction, s32 spAddress, sptr dramAddress, s32 size);
 extern void __assert(void *arg0, void *arg1, s32 arg2);
-extern s32 sSpRawDmaAssertExpr;
-extern s32 sSpRawDmaAssertFile;
 s32 __osSpRawStartDma(s32 arg0, s32 arg1, sptr arg2, s32 arg3) {
     if (arg1 & 7) {
         __assert(&sSpRawDmaAssertExpr, &sSpRawDmaAssertFile, 0x3A);

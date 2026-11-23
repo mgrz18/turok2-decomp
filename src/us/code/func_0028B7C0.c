@@ -1,8 +1,6 @@
 #include "common.h"
+#include "globals/strings.h"
 
-extern u8 sCrashText_ColonSpace[];   /* ": " */
-extern u8 sCrashText_Spaces3[];   /* "   " */
-extern u8 sCrashText_Newline[];   /* "\n" */
 
 extern void Crash_PutChar(s32 c);       /* print a character */
 extern void Crash_PrintHex8(s32 byte);    /* print a byte in hex */

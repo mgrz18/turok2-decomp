@@ -31,8 +31,6 @@ typedef struct Resource {
 } Resource;
 
 extern f32 D_800E6790;
-extern s32 sAnimDecodeRotation;
-extern s32 sAnimRawRange;
 
 s32 ProPackDecompress(Resource **res, s32 arg1);
 s32 Anim_DecodeTracks(void *source, Pack *table, s32 tracks, s32 channels, s32 radius, s32 encoding);

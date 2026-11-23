@@ -7,7 +7,6 @@
 #include "structs/memory.h"
 #include "globals/hostio.h"
 
-extern u32 sHostIoSavedTlb[32][4];     /* saved TLB entries: PageMask, EntryHi, EntryLo0, EntryLo1 */
 
 extern u32 func_002A31FC(void);   /* reads the TLB, returns EntryHi */
 

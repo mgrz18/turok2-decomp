@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "globals/game.h"
@@ -6,13 +7,6 @@
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
-extern char sBloodLustMenuText_LevelRandom[];
-extern char sFragTagMenuText_LevelMadhouse[];
-extern char sFragTagMenuText_LevelSnap[];
-extern char sFragTagMenuText_LevelSneaksNLadders[];
-extern char sFragTagMenuText_LevelPrimattica[];
-extern char sFragTagMenuText_LevelCrossfire[];
-extern char sFragTagMenuText_LevelYNGWTSF[];
 
 /* Names setting 0x27. */
 s32 FragTagMenu_LevelLabel_2(MenuItem *item) {

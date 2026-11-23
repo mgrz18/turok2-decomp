@@ -1,7 +1,7 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "globals/crash.h"
 
-extern u8 sCrashText_ColonSpace[];   /* ": " */
 
 extern void Crash_PutChar(s32 c);       /* print a character */
 extern void Crash_PrintHex8(s32 byte);    /* print a byte in hex */

@@ -1,9 +1,8 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sCheatMenuText_FrootyStripesOn[];
-extern char sCheatMenuText_FrootyStripesOff[];
 s32 CheatMenu_FrootyStripesText(MenuItem *item)
 {
   s32 var_v0;

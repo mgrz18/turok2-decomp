@@ -1,10 +1,10 @@
 /* Second-module copy of Pak_SaveNoteVerified (first module; this one at link address 0x00426084), calling this module's own functions at their link addresses. */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC_6.CPP, func_80404958_de, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/pak.h"
 #include "globals/pak.h"
 
-extern u8 sPakCompanyCode[];
 
 extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void CCache__Flush(s32);

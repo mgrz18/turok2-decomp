@@ -1,9 +1,6 @@
 #include "globals/render.h"
+#include "globals/menu_text.h"
 
-extern char sOptionsMenuText_ResolutionLoRez[];
-extern char sOptionsMenuText_ResolutionHiRez[];
-extern char sOptionsMenuText_ResolutionHiRezLb[];
-extern char sOptionsMenuText_ResolutionLoRezLb[];
 
 char *Video_GetResolutionText(void) {
     switch (gResolution) {

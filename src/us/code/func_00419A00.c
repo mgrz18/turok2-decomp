@@ -1,13 +1,8 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sDebugMenuText_DebugOff[];
-extern char sDebugMenuText_DebugOn[];
-extern char sDebugMenuText_DebugVis[];
-extern char sDebugMenuText_DebugAis[];
-extern char sDebugMenuText_DebugSnd[];
-extern char sDebugMenuText_DebugLinks[];
 
 s32 Menu_DebugModeLabel(MenuItem *a) {
     switch (gEngineApp_m_Settings.unk18) {

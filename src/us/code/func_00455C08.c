@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/game.h"
@@ -6,7 +7,6 @@
 /* Menu text item: copy a player's 8-character name into the item's text and
  * print one of the current player's u16 counters (per opponent) after it. */
 
-extern char sStatsMenuFmt_02d[];
 
 s32 MenuItem_TextLength_2(MenuItem *item);
 #ifdef TARGET_PORT

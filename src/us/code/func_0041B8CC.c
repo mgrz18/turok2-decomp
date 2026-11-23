@@ -1,10 +1,9 @@
 /* WRONG CUT: real function 0x0041B8CC, size 0x6C: splat cut it into CheatMenu_AllMapText, func_0041B8EC and func_0041B920 at branch targets. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sCheatMenuText_AllMapOn[];
-extern char sCheatMenuText_AllMapOff[];
 
 /* On/off option item for bit 0x2000: shown only when unlocked. */
 s32 CheatMenu_AllMapText(MenuItem *a) {

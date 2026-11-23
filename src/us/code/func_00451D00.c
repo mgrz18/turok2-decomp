@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "globals/game.h"
@@ -6,15 +7,6 @@
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
-extern char sBloodLustMenuText_TextureSetCastle[];
-extern char sBloodLustMenuText_TextureSetSteelMill[];
-extern char sBloodLustMenuText_TextureSetOakFort[];
-extern char sBloodLustMenuText_TextureSetCatacombs[];
-extern char sBloodLustMenuText_TextureSetJailhouse[];
-extern char sBloodLustMenuText_TextureSetBigCity[];
-extern char sBloodLustMenuText_TextureSetRedDragon[];
-extern char sBloodLustMenuText_TextureSetPaintball[];
-extern char sBloodLustMenuText_TextureSetMrHappy[];
 
 /* Names setting 0x23. */
 s32 func_00451D00(MenuItem *item) {

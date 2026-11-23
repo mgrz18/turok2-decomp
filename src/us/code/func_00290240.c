@@ -2,10 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/strings.h"
 #include "globals/audio.h"
 
 extern f32 alCents2Ratio(s32 arg0);
-extern char sCSeqPlayerAssertExpr[];
 void __CSPHandleMIDIMsg(void *object, ALEvent *message);
 extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, s32);
 extern void __assert(void *arg0, void *arg1, s32 arg2);

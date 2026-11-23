@@ -25,7 +25,6 @@ typedef struct {
     /* 0x04 */ u8 flag;
 } Chunk;
 
-extern u8 sOnScreenFontTextureBuffer[0x90];
 
 void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */
 

@@ -1,3 +1,4 @@
+#include "globals/menu_text.h"
 typedef signed char s8;
 typedef signed int s32;
 typedef unsigned char u8;
@@ -9,10 +10,6 @@ typedef struct {
     /* 0x33 */ u8 name[8];
 } NamedThing;
 
-extern u8 sPlayerNameText_Player1[];
-extern u8 sPlayerNameText_Player2[];
-extern u8 sPlayerNameText_Player3[];
-extern u8 sPlayerNameText_Player4[];
 
 void PlayerOptions_SetDefaultName_2(NamedThing *t) {
     s32 i;

@@ -1,15 +1,10 @@
 /* Second-module copy of MissionMenu_UpdateObjective1 (first module; this one at link address 0x00424F7C), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 
 extern char D_800C1768[];
-extern char sMissionMenuText_DistressBeacons[];
-extern char sMissionMenuText_SoulGates[];
-extern char sMissionMenuText_Prisoners[];
-extern char sMissionMenuText_ThermalVents[];
-extern char sMissionMenuText_QueenEmbryos[];
-extern char sMissionMenuText_PowerGenerators[];
 
 s32 MissionMenu_UpdateObjective1_2(MenuItem *item) {
     switch (sMissionHub) {

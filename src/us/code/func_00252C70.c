@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/player.h"
 #include "structs/game_object.h"
 #include "structs/camera.h"
@@ -8,7 +9,6 @@
 /* The weapon actor's owner, at 0x1A8 (inside m_AI). */
 #define OWNER(obj) ((*(CPlayer **)&((CGameObjectInstance *)(obj))->m_AI.m_pParent))
 
-extern char sActorCacheDesc_PlayerAnimObjectInfo[];       /* "player anim object info" */
 
 extern void CGameObjectInstance__UpdateBounds(CGameObjectInstance *obj, void *info);
 extern void Shadow_DrawBlob(CGameObjectInstance *obj, CVector3 *offset, s32 arg2);

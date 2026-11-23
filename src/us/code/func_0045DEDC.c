@@ -1,15 +1,10 @@
 /* Second-module copy of MissionMenu_UpdateLevelName (first module; this one at link address 0x00424EDC), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 
 extern char D_800C1768[];
-extern char sMissionMenuText_PortOfAdia[];
-extern char sMissionMenuText_RiverOfSouls[];
-extern char sMissionMenuText_DeathMarshes[];
-extern char sMissionMenuText_LairOfTheBlindOnes[];
-extern char sMissionMenuText_HiveOfTheMantids[];
-extern char sMissionMenuText_PrimagensLightship[];
 
 s32 MissionMenu_UpdateLevelName_2(MenuItem *item) {
     switch (sMissionHub) {

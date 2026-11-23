@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "m2c_macros.h"
 #include "structs/world.h"
 #include "structs/cache.h"
@@ -10,8 +11,6 @@ sptr CCache__LoadPersistantIndex(s32, sptr, sptr, sptr);
 sptr CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, sptr, sptr, sptr);
 
 void *func_0029E460(void *, void *, s32);           /* memcpy */
-extern M2C_UNK sCSceneCacheDesc_LevelIndex;
-extern M2C_UNK sCSceneCacheDesc_LevelName;
 
 /* Copies the level's name (sub-block 8 of its level file, a handle: data then size) into
  * arg2, at most arg3 bytes. The level file stays loaded when it is the current level. */

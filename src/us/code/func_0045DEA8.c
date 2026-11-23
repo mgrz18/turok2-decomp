@@ -2,14 +2,13 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/menu_text.h"
 #include "globals/menu.h"
 struct FieldRecAt14;
 struct FieldRecAt14 {
     char pad[0x14];
     char *text;
 };
-extern char sMissionMenuText_MissionFailed[];
-extern char sMissionMenuText_MissionStatus[];
 s32 MissionMenu_UpdateTitle_2(struct FieldRecAt14 *field) {
     if (sMissionFailed != 0) {
         field->text = sMissionMenuText_MissionFailed;

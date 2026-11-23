@@ -2,13 +2,12 @@
  * switch's case blocks were cut as func_0045CC90, func_0045CCA0 and
  * func_0045CCB0 (the last one already in src/, it must go). */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
 /* Set the menu item's text from the game mode gPakConfirmKind. */
 
-extern char sPakConfirmMenuText_Yes[];
-extern char sPakConfirmMenuText_ManageTheControllerPak[];
 
 s32 PakConfirmMenu_UpdateYes_2(MenuItem *item) {
     switch (gPakConfirmKind) {

@@ -7,8 +7,6 @@
 
 s32 Anim_DecodeTracks(void *a, void *b, s32 c, s32 d, s32 e, s32 f);
 extern f32 D_800E6790;
-extern s32 sAnimDecodeRotation;
-extern s32 sAnimRawRange;
 s32 Anim_DecodeAnimation(void *a, void *b) {
     s32 r;
     B14Hdr *h = CISet__GetBlock(a, 0);

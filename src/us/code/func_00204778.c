@@ -33,11 +33,11 @@ struct HeapSpan {
     /* 0x14 */ u32 free;
 };
 
-extern char gCache_mutex[]; /* OSMesgQueue, the heap lock */
-extern s32 gCache_mutex_count;    /* heap lock depth */
-extern u32 gCache_ageCount[];  /* frame stamp */
+extern char gCache_mutex[]; /* OSMesgQueue, the heap lock */ /* local: cache.h is not included here: the FAKEMATCH CCache__DrawDebug reads the gCache fields through its own views */
+extern s32 gCache_mutex_count;    /* heap lock depth */ /* local: cache.h is not included here: the FAKEMATCH CCache__DrawDebug reads the gCache fields through its own views */
+extern u32 gCache_ageCount[];  /* frame stamp */ /* local: cache.h is not included here: the FAKEMATCH CCache__DrawDebug reads the gCache fields through its own views */
 extern HeapSpan *gHeap_usedHead[];
-extern HeapNode *gCache_memLockedList[];
+extern HeapNode *gCache_memLockedList[]; /* local: cache.h is not included here: the FAKEMATCH CCache__DrawDebug reads the gCache fields through its own views */
 extern u32 __osDisableInt(void);   /* __osDisableInt */
 extern void __osRestoreInt(u32);   /* __osRestoreInt */
 extern void Render_SetCombineMode(s32);

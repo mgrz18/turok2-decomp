@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sOptionsMenuText_ControlSideRight[];
-extern char sOptionsMenuText_ControlSideLeft[];
 s32 OptionsMenu_ControlSideText_2(MenuItem *a, Menu *b) {
 CPlayerOptions *p = &gEngineApp_m_Settings.defaultSlot;
 if (b->player) { CPlayerOptions *q = b->player->m_pOptions; if (q) p = q; }

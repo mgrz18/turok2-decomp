@@ -1,9 +1,8 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern char sCharNoteMenuText_NameExt[];
-extern char sCharNoteMenuText_Name[];
 extern s32 D_801309A8;
 
 s32 CharNoteMenu_UpdateName(MenuItem *item) {

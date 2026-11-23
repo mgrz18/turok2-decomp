@@ -1,16 +1,11 @@
 /* WRONG CUT: one function 0x00421D20-0x00421DFC (size 0xDC); splat cut its second half into
  * func_00421D90 (it starts in the middle of an if chain, reading $v0 set here). */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
 extern char D_800C140C[];
-extern char sPakMenuText_LoadNote_B4870[];
-extern char sPakMenuText_SaveNote_B487C[];
-extern char sPakMenuText_LoadNote_B4888[];
-extern char sPakMenuText_SaveNote_B4894[];
-extern char sPakMenuText_DeleteNote[];
-extern char sPakMenuText_ControllerPakMenu[];
 
 s32 PakMenu_UpdateSubtitle(MenuItem *item, s16 *id) {
     s32 n = *id;

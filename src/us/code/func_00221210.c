@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00287EE8.c, func_00287EE8, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/game.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
@@ -7,7 +8,6 @@
 #include "protos/scene.h"
 #ifdef TARGET_PORT
 #include "structs/game.h"
-extern CGame gEngineApp_m_Game;
 #endif
 
 /* Builds the frame's actor lists: every live level actor (flag 0x100) whose

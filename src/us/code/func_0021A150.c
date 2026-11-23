@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
 
@@ -8,7 +9,6 @@
 #include "structs/game_object.h"
 #include "structs/cache.h"
 
-extern u8 sCGameObjectInstanceCacheDesc_AnimObjectInfo[];     /* "anim object info" */
 
 void CMtxF__TransformBox(void *, void *, void *);
 void CAnimationState__Reset(void *);
@@ -108,7 +108,6 @@ struct Actor {
     void (*init)(Actor *, void *);  /* 0x244 */
 };
 
-extern u8 sCGameObjectInstanceCacheDesc_AnimObjectInfo[];     /* "anim object info" */
 
 void CMtxF__TransformBox(void *, void *, void *);
 void CAnimationState__Reset(void *);

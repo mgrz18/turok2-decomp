@@ -1,21 +1,10 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
 /* Menu item: append the rank title earned for the number of kills (11 chars). */
 
-extern char sCharNoteMenuText_Pathetic[];
-extern char sCharNoteMenuText_Poor[];
-extern char sCharNoteMenuText_Harmless[];
-extern char sCharNoteMenuText_Nuisance[];
-extern char sCharNoteMenuText_Acceptable[];
-extern char sCharNoteMenuText_Average[];
-extern char sCharNoteMenuText_Good[];
-extern char sCharNoteMenuText_Excellent[];
-extern char sCharNoteMenuText_Dangerous[];
-extern char sCharNoteMenuText_Brutal[];
-extern char sCharNoteMenuText_Savage[];
-extern char sCharNoteMenuText_Elite[];
 
 s32 CharNoteMenu_UpdateRank_2(MenuItem *item) {
     s32 kills = gPakProfileRead.kills;

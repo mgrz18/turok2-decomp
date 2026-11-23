@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/vector.h"
 #include "structs/region.h"
 #include "structs/player.h"
@@ -15,7 +16,6 @@ typedef struct {
  * (+0x1228): the ROM reads them through this symbol, and through gEngineApp_m_Settings
  * the code no longer matches. */
 extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
-extern char sPlayerHurtText_LowHealth[];
 
 s32 Cinema_IsActive(void);
 s32 CPlayer__IsInMatchEndState(CPlayer *p);

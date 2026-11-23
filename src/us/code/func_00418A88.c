@@ -1,10 +1,9 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sLimitLabelFmt_02d[]; /* "  %02d" */
-extern char sLimitLabelText_None[]; /* "none" */
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 

@@ -12,7 +12,6 @@ extern s32 __scSchedule(struct Ctx_func_8028F544_de *, struct Node_func_8028F544
 extern void __scExec(struct View_func_8028FA60_de *, struct Scene_func_8028FA60_de *, struct Scene_func_8028FA60_de *);
 extern s32 __scTaskComplete(void *,void *);
 extern void func_00228BBC();
-extern u32 gNumTicks1;
 void __scHandleRDP(OSSched *sc)
 {
     sptr value1 = 0;

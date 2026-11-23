@@ -1,10 +1,10 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/game_object.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
 
 
-extern s32 sCGameObjectInstanceCacheDesc_AnimObjectInfo;
 
 s32 func_0021F5B8(CGameObjectInstance *obj, s32 arg1) {
     s32 temp_s0;

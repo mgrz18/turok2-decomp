@@ -1,3 +1,4 @@
+#include "globals/menu_text.h"
 typedef int s32;
 typedef signed char s8;
 typedef unsigned char u8;
@@ -9,10 +10,6 @@ typedef struct {
     u8 colors[8];               /* 0x33 */
 } Widget;
 
-extern u8 sPlayerNameText_Player1[12];
-extern u8 sPlayerNameText_Player2[12];
-extern u8 sPlayerNameText_Player3[12];
-extern u8 sPlayerNameText_Player4[12];
 
 void PlayerOptions_SetDefaultName(Widget *w) {
     s32 i;

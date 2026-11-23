@@ -1,12 +1,11 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
 s32 MenuItem_TextLength(void *item);
 s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 
-extern char sDamagedPakMenuText_BeSaved[];
-extern char sDamagedPakMenuText_ControllerX[];
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {

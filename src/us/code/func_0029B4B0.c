@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/strings.h"
 
-extern char sSiRawReadAssertExpr[];
 extern int __osSiRawReadIo(unsigned int devAddr, unsigned int * data);
 extern int __osSiDeviceBusy();
 extern void __assert(void *arg0, void *arg1, s32 arg2);
-extern s32 sSiRawReadAssertFile;
 int __osSiRawReadIo(u32 arg0, u32 *arg1) {
     if (arg0 & 3) {
         __assert(sSiRawReadAssertExpr, &sSiRawReadAssertFile, 0x33);

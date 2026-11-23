@@ -1,11 +1,8 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sSoundMenuText_SpeechVolumeNorm[];
-extern char sSoundMenuText_SpeechVolumeMax[];
-extern char sSoundMenuText_SpeechVolumeOff[];
-extern char sSoundMenuText_SpeechVolume[];
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 

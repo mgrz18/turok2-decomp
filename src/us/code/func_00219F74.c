@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/game_object.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
@@ -14,7 +15,6 @@ typedef struct {
     u8 pad[0x66];
 } RandList;         /* 0x68 */
 
-extern u8 sCGameObjectInstanceCacheDesc_AnimObjectInfo[];     /* "anim object info" */
 
 s32 BinarySearch(s32 *, s32, sptr);
 void WeightedTable_Clear(RandList *);

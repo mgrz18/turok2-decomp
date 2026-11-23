@@ -1,12 +1,10 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004449FC.c, func_004449FC, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sOptionsMenuText_OpacityClear[];
-extern char sOptionsMenuText_OpacityOpaque[];
-extern char sOptionsMenuText_Opacity[];
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 

@@ -2,15 +2,12 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/strings.h"
 
 extern f32 alCents2Ratio(s32 arg0);
-extern char sSeqPlayerAssertExpr[];
-extern char sSeqPlayerAssertFile[];
 extern void __handleMIDIMsg(ALSeqPlayer *, ALEvent *);
 extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, ALMicroTime);
 extern void __assert(char *, char *, s32);
-extern char sSeqPlayerAssertExpr[];
-extern char sSeqPlayerAssertFile[];
 extern ALSound *__lookupSoundQuick(ALSeqPlayer *, u8, u8, u8);
 extern ALVoiceState *__mapVoice(ALSeqPlayer *, u8, u8, u8);
 extern ALVoiceState *__lookupVoice(ALSeqPlayer *, u8, u8);

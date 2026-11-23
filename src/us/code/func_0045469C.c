@@ -1,11 +1,10 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_0043D9A8.c, func_0043D9A8.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char sCheatMenuText_GouraudModeOn[];
-extern char sCheatMenuText_GouraudModeOff[];
 s32 CheatMenu_GouraudModeText_2(MenuItem *a) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x400) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
     if (gEngineApp_m_Settings.cheatFlags & 0x400) a->text = sCheatMenuText_GouraudModeOn; else a->text = sCheatMenuText_GouraudModeOff;

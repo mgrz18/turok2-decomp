@@ -2,10 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/menu_text.h"
 #include "globals/game.h"
 struct TextBoundsText;
-extern s32 sCheatMenuText_InvincibilityOn;
-extern s32 sCheatMenuText_InvincibilityOff;
 struct TextBoundsDescriptor;
 typedef struct TextBoundsDescriptor TextBoundsDescriptor;
 struct TextBoundsMetrics;
@@ -48,8 +47,6 @@ struct TextBoundsText {
     s32 field20;
     struct TextBoundsDescriptor *descriptor;
 };
-extern s32 sCheatMenuText_InvincibilityOn;
-extern s32 sCheatMenuText_InvincibilityOff;
 s32 CheatMenu_InvincibilityText_2(TextBoundsText *arg0) {
     if (gEngineApp_m_Settings.unlockedCheats & 1) {
         arg0->flags |= 0x01000000;

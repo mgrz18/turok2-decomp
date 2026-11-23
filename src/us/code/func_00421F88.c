@@ -1,17 +1,10 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "structs/save.h"
 
 s32 Level_GetHub(s32 id);
 
-extern char sGameNoteMenuText_PortOfAdia[];
-extern char sGameNoteMenuText_RiverOfSouls[];
-extern char sGameNoteMenuText_DeathMarshes[];
-extern char sGameNoteMenuText_LairOfTheBlindOnes[];
-extern char sGameNoteMenuText_HiveOfTheMantids[];
-extern char sGameNoteMenuText_PrimagensLightship[];
-extern char sGameNoteMenuText_TheHub[];
-extern char sGameNoteMenuText_UnknownLevelId[];
 
 s32 GameNoteMenu_UpdateLevel(MenuItem *item) {
     switch (Level_GetHub(gLoadBuffer->player.m_CheckPointWarpID)) {

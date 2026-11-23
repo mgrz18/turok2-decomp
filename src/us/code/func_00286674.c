@@ -16,7 +16,6 @@
 #include "protos/ultra.h"
 
 extern u8 gPoolBuffers[];
-extern s32 gNumTicks1;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
 

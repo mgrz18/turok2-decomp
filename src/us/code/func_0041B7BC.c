@@ -2,10 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu_text.h"
 #include "globals/game.h"
 
-extern char sCheatMenuText_JuansCheatOn[];
-extern char sCheatMenuText_JuansCheatOff[];
 s32 CheatMenu_JuansCheatText(struct StateRecAt14 *item) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x800) {
         item->unk8 |= 0x1000000;

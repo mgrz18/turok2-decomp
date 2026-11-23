@@ -2,10 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu_text.h"
 #include "globals/pak.h"
 
-extern char sDamagedPakMenuText_DamagedController[];
-extern char sDamagedPakMenuText_ControllerPakIs[];
 s32 DamagedPakMenu_UpdateLine1(struct FieldRecAt14 *field) {
     if (sDamagedPakInGame != 0) {
         field->text = sDamagedPakMenuText_ControllerPakIs;
