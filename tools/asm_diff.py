@@ -47,6 +47,7 @@ CPP_FLAGS = ["-P", "-undef", "-Wall", "-lang-c", "-D_LANGUAGE_C", "-DF3DEX_GBI_2
 CC_FLAGS = "-quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64"
 FLAGS_LINE = re.compile(r"^/\* cc1-flags: (.*) \*/$", re.M)
 OPERAND = re.compile(r"\b([A-Za-z_][A-Za-z0-9_.]*)((?:\s*[+-]\s*(?:0x[0-9a-fA-F]+|\d+))*)")
+LOCAL_LABEL = re.compile(r"\.L\d+\b")
 MANUAL = re.compile(r"^\s*(\w+)\s*=\s*0x([0-9A-Fa-f]+)\s*;", re.M)
 
 
@@ -96,7 +97,14 @@ def normalize(path, syms):
             off = sum(int(t.replace(" ", ""), 0) for t in re.findall(r"[+-]\s*(?:0x[0-9a-fA-F]+|\d+)", m.group(2)))
             return "@%08X" % ((syms[name] + off) & 0xFFFFFFFF)
         lines.append(OPERAND.sub(resolve, s))
-    return lines
+    # Local labels (.L4) are numbered by cc1 in the order it makes them, so a
+    # rewrite that drops a dead branch (a de-faked FAKEMATCH) renumbers them
+    # without changing a byte: number them by first appearance instead.
+    labels = {}
+
+    def relabel(m):
+        return labels.setdefault(m.group(0), ".L@%d" % len(labels))
+    return [LOCAL_LABEL.sub(relabel, l) for l in lines]
 
 
 def main():
