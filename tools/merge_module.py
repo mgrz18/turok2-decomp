@@ -32,6 +32,7 @@ YAML = ROOT / "versions" / "turok2.us.yaml"
 SHARED = ROOT / "versions" / "shared_rodata.us.txt"
 FLAGS = re.compile(r"^/\* cc1-flags: .* \*/\n", re.M)
 ENTRY = re.compile(r"^\s+- \[(0x[0-9A-Fa-f]+),\s*(\w+|\.rodata),\s*([^\]\s]+)\s*\]")
+ANY_ENTRY = re.compile(r"^\s+- \[(0x[0-9A-Fa-f]+),\s*(\.?\w+)(?:,\s*([^\]\s]+))?\s*\]")
 
 
 def strip_comments(s):
@@ -251,15 +252,32 @@ def main():
     # the module's c entries must be adjacent; so must its .rodata entries, in the same order
     cs = [e for e in ents if e[1] == "c"]
     ro = [e for e in ents if e[1] == ".rodata"]
-    entry_lines = [n for n, l in enumerate(lines) if ENTRY.match(l)]
+    # every subsegment line, also the ones without a file (`- [0xAB194, rodata]`: splat's own asm/data)
+    entry_lines = [n for n, l in enumerate(lines) if ANY_ENTRY.match(l)]
     pos = {n: i for i, n in enumerate(entry_lines)}
-    def adjacent(es):
+    rom = (ROOT / "baserom.us.z64").read_bytes() if (ROOT / "baserom.us.z64").exists() else None
+    pads = set()
+
+    def is_pad(k):
+        """An unnamed `rodata` subsegment of zeros shorter than 16 bytes: the alignment between two of the
+        module's .rodata slices, which one translation unit pads the same way. Its line goes with the merge."""
+        m = ANY_ENTRY.match(lines[entry_lines[k]])
+        if m.group(2) != "rodata" or m.group(3) or rom is None or k + 1 >= len(entry_lines):
+            return False
+        lo, hi = int(m.group(1), 16), int(ANY_ENTRY.match(lines[entry_lines[k + 1]]).group(1), 16)
+        return hi - lo < 16 and not any(rom[lo:hi])
+
+    def adjacent(es, allow_pads=False):
         idx = [pos[e[0]] for e in es]
-        return idx == list(range(idx[0], idx[0] + len(idx))) if idx else True
+        between = [k for k in range(idx[0], idx[-1] + 1) if k not in idx] if idx else []
+        if allow_pads and all(is_pad(k) for k in between):
+            pads.update(entry_lines[k] for k in between)
+            return True
+        return not between
     if not adjacent(cs):
         sys.exit(f"{a.dir}: its .text subsegments are not adjacent")
     ro_order = [e[2].rsplit("/", 1)[-1] for e in ro]
-    if not adjacent(ro) or ro_order != [s for s in text_order if s in ro_order]:
+    if not adjacent(ro, allow_pads=True) or ro_order != [s for s in text_order if s in ro_order]:
         sys.exit(f"{a.dir}: its .rodata is not one block in .text order ({ro_order})")
     # a second-VM-module file whose .rodata is placed over the first module's pool (tools/shared_rodata.py) owns
     # that placement by its file name: one such file per module can hand it to the merged file, two cannot
@@ -395,7 +413,7 @@ def main():
         return 0
     target.write_text(merged)
     first = {"c": cs[0], ".rodata": ro[0] if ro else None}
-    drop = {e[0] for e in ents if e not in first.values()}
+    drop = {e[0] for e in ents if e not in first.values()} | pads
     for k, e in first.items():
         if e:
             lines[e[0]] = lines[e[0]].replace(e[2], f"{rel_dir}/{name}")
