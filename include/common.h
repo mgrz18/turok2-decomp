@@ -36,4 +36,14 @@ typedef u32 uptr;
 #define T2_OFFSETOF(type, member) ((s32)&((type *)0)->member)
 #endif
 
+/* A function the original object output after all its others: GCC 2.8 defers an `inline` function to the
+ * end of the file, in the order of first declaration, but writes its string literals into .rodata at its
+ * definition (docs/MODULES.md, ".rodata order"). A merged module that needs that order marks those
+ * functions DEFERRED; the port compiles them as ordinary functions (C99 `inline` emits no definition). */
+#ifdef TARGET_PORT
+#define DEFERRED
+#else
+#define DEFERRED inline
+#endif
+
 #endif

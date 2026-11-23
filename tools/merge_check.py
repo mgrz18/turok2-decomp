@@ -21,6 +21,7 @@ CPP = ["cpp", "-P", "-undef", "-Wall", "-lang-c", "-D_LANGUAGE_C", "-DF3DEX_GBI_
        "-I.", "-Iinclude", "-Ius/include", "-nostdinc"]
 CCF = "-quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64".split()
 FL = re.compile(r"^/\* cc1-flags: (.*) \*/$", re.M)
+EXTRA = []
 LAB = re.compile(r"\$?\.?L[C]?\d+\b|\$L\d+")
 
 
@@ -82,7 +83,7 @@ def one(d):
     src_dir = os.path.join(REPO, "src/us", d)
     files = sorted(f for f in os.listdir(src_dir) if f.endswith(".c"))
     res = {"dir": d, "files": len(files)}
-    r = subprocess.run(["python3", MERGE, "src/us/" + d.strip("/"), "--dry-run"], cwd=REPO, capture_output=True, text=True)
+    r = subprocess.run(["python3", MERGE, "src/us/" + d.strip("/"), "--dry-run"] + EXTRA, cwd=REPO, capture_output=True, text=True)
     if r.returncode:
         res["status"] = "REFUSED"
         res["msg"] = ((r.stderr or r.stdout).strip().splitlines() or ["?"])[-1]
@@ -137,7 +138,12 @@ def main():
     ap.add_argument("dirs", nargs="*")
     ap.add_argument("-j", type=int, default=3)
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--margs", default="", help="more merge_module.py arguments (one directory)")
+    ap.add_argument("--rodata-free", action="store_true", help="pass --rodata-free to merge_module (compile check only)")
     a = ap.parse_args()
+    if a.rodata_free:
+        EXTRA.append("--rodata-free")
+    EXTRA.extend(a.margs.split())
     dirs = [d.rstrip("/") + "/" for d in a.dirs] or all_dirs()
     n = {}
     with ThreadPoolExecutor(a.j) as ex:
