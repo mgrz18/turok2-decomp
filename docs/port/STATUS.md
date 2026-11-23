@@ -22,6 +22,15 @@ The matching build is unchanged: `tools/asm_diff.py --base 70f3333c -j 8` report
 over all 3,938 files after every merge and at the end, and a clean `make clean && make setup &&
 make -j8 build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
+## Round 21, part j3 (structs)
+
+35 host-view twins (`T2_HOFF_*`, hostview.py) are now the real structs they mirrored
+(tools/unview.py; 137 -> 102 twins in 85 -> 62 files), and a few N64-only views the port compiled
+at N64 offsets are real structs too (the module-2 pak and setup menus, GfxPool, the libaudio
+channel state). No behaviour change: `mklayout.py` output unchanged, boot + 3 demos `6ab97584...`
+(52,000 lines), the default whole-game run `dc8126d3...` (600,000 lines, the reference), both
+from this tree's Release build. Details: docs/STRUCTS_TODO.md, "Round 21, part j3".
+
 ## 1. Build and run
 
 **To play**: [QUICKSTART.md](QUICKSTART.md) (Mac or Linux, Release, a window, a gamepad or the
