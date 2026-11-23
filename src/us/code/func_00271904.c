@@ -1,3 +1,5 @@
+/* De-faked in round 21 (j4): the unlock returned through two identical arms; the plain if/else of
+ * the CMutex unlock matches. */
 #include "common.h"
 #include "structs/sound.h"
 #include "protos/ultra.h"
@@ -52,16 +54,10 @@ s32 CAudioWorld__CountHandleVoices(CAudioWorld *mgr, s32 sound)
   {
     __osRestoreInt(mask2);
     osSendMesg(lock2, 0, 1);
-    return n;
-  }
-  if (mgr)
-  {
-    __osRestoreInt(mask2);
-    return n;
   }
   else
   {
     __osRestoreInt(mask2);
-    return n;
   }
+  return n;
 }

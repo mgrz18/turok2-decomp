@@ -7,12 +7,8 @@
 #include "protos/iset.h"
 
 typedef struct ListRec {   /* a CList (structs/list.h) whose m_nCount is read as count */
-#ifdef TARGET_PORT
     /* 0x00 */ void *pad0[2];
     /* 0x08 */ s32 pad8[2];
-#else
-    /* 0x00 */ u8 pad0[0x10];
-#endif
     /* 0x10 */ s32 count;
     /* 0x14 */ u8 pad14[4];
 } ListRec;

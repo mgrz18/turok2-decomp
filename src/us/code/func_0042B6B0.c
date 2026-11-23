@@ -4,14 +4,9 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-#ifdef TARGET_PORT /* the CScene fields this view reaches at N64 offsets (structs/world.h) */
 #include "structs/world.h"
 #define WORLD_TREE(w) (((CScene *)(w))->m_pBitSections2)
 #define WORLD_GROUP(w) (((CScene *)(w))->m_nLevel)
-#else
-#define WORLD_TREE(w) ((w)->tree)
-#define WORLD_GROUP(w) ((w)->group)
-#endif
 
 typedef struct CollisionBuildVertex {
     f32 x;

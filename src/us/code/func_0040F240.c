@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 3 register pins (`register ... asm("$n")`); without them: Cinema_RequestOnce
+ * 16 of 29 words. */
 #include "common.h"
 #include "rw/abu_types.h"
 #include "gfx.h"
@@ -49,11 +51,7 @@ static __inline__ f32 *TempAlloc(s32 size) {
     handle = CCache__Allocate(0, size + 0x10, 0x13, "Cinema temp alloc");
     if (handle != NULL) {
         block = *handle;
-#ifdef TARGET_PORT /* the whole handle pointer in the 0x10-byte header */
         *(s32 ***) block = handle;
-#else
-        *block = (sptr) handle;
-#endif
         return (f32 *) (block + 4);
     }
     return NULL;
@@ -61,11 +59,7 @@ static __inline__ f32 *TempAlloc(s32 size) {
 
 static __inline__ void TempFree(f32 *data) {
     if (data != NULL) {
-#ifdef TARGET_PORT /* the handle TempAlloc keeps 0x10 bytes before the array */
         CCache__Deallocate(0, *(s32 ***) ((u8 *) data - 0x10));
-#else
-        CCache__Deallocate(0, ((s32 **) data)[-4]);
-#endif
     }
 }
 

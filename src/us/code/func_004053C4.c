@@ -4,11 +4,7 @@
 #include "globals/boss.h"
 
 extern f32 Random_Blend(f32 lo, f32 hi);
-#ifdef TARGET_PORT
 extern s16 WeightedTable_PickStatic(sptr id); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
-#else
-extern s32 WeightedTable_PickStatic(sptr id);
-#endif
 extern void Sound__Play(s16 sound, CVector3 pos, sptr arg2, CGameObjectInstance *source);
 #ifdef TARGET_PORT
 /* A step's arg is an N64 data address for steps 2 (a sound table) and 3 (the next script):

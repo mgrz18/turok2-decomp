@@ -2,13 +2,8 @@
 #include "common.h"
 #include "structs/camera.h"
 #include "protos/list.h"
-#ifdef TARGET_PORT /* the list links and the text block at their host sizes */
 #define LINKS(T) T2_OFFSETOF(T, m_pLast), T2_OFFSETOF(T, m_pNext)
 #define TEXTS_SIZE (16 * sizeof(CCameraText))
-#else
-#define LINKS(T) 0, 4
-#define TEXTS_SIZE 0x400
-#endif
 
 void CCamera__Construct(void *);
 void Sound__SetListener(void *);

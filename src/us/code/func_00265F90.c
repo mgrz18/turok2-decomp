@@ -40,7 +40,6 @@ extern void CCameraPool__AddMultiLineText(void *game, void *camera, char *text, 
 extern void Sound__PlaySpeech(s32 sound);
 
 /* A touch on a pickup: give the item, or show why it cannot be taken. */
-#ifdef TARGET_PORT
 #include "structs/game_object.h"
 #include "structs/camera.h"
 
@@ -78,32 +77,3 @@ s32 Action_CheckRequiredItem(Pickup *obj_, PickupState *state_, Toucher *toucher
     }
     return 0;
 }
-#else
-s32 Action_CheckRequiredItem(Pickup *obj, PickupState *state, Toucher *toucher) {
-    PickupInfo *info = &obj->def->info;
-    CPlayer *player;
-    void *camera;
-
-    if (info->item == 0 || state->taken != 0 || toucher->kind != 1 || !(toucher->flags & 0x300000)) {
-        return 1;
-    }
-    player = toucher->owner;
-    if (CPlayer__GetPickupCountLow(player, info->item)) {
-        CPlayer__UseSpecialPickup(player, info->item);
-        return 1;
-    }
-    if (info->message == 0) {
-        return 0;
-    }
-    camera = gEngineApp_m_Game_m_CameraPool_m_MainCamera;
-    if (player->m_pCamera != NULL) {
-        camera = player->m_pCamera;
-    }
-    CCameraPool__AddMultiLineText(gEngineApp_m_Game_m_CameraPool, camera,
-                  gLevelMessages[info->message].text, obj, 4.0f);
-    if (gLevelMessages[info->message].speech != 0) {
-        Sound__PlaySpeech(gLevelMessages[info->message].speech);
-    }
-    return 0;
-}
-#endif

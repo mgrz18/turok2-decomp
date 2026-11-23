@@ -16,7 +16,6 @@ typedef struct {
     /* 0x14 */ PoolNode00228AEC *freeHead;
 } Pool00228AEC;
 
-#ifdef TARGET_PORT
 /* The port: on CDLightSet/CDLight; the ROM light is a pointer (DLight_Spawn's CScene__GetLight). */
 #include "structs/particle.h"
 void *CDLightSet__Alloc(CDLightSet *arg0, void *arg1) {
@@ -31,17 +30,3 @@ void *CDLightSet__Alloc(CDLightSet *arg0, void *arg1) {
     }
     return temp_s0;
 }
-#else
-void *CDLightSet__Alloc(Pool00228AEC *arg0, sptr arg1) {
-    PoolNode00228AEC *temp_s0;
-
-    temp_s0 = arg0->freeHead;
-    if (temp_s0 != NULL) {
-        CList__Remove(&arg0->freeHead, temp_s0);
-        CList__AddHead(arg0, temp_s0);
-        temp_s0->owner = arg1;
-        temp_s0->unk16 = 0;
-    }
-    return temp_s0;
-}
-#endif

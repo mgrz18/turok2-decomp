@@ -28,11 +28,7 @@ void CCameraPool__ReleaseAllTexts(sptr arg0)
   {
     do
     {
-#ifdef TARGET_PORT
       temp_s0 = *(s32 **) var_s1; /* CCameraText.m_pLast, pointer-wide */
-#else
-      temp_s0 = *var_s1;
-#endif
       CList__Remove((sptr) (temp_s2 + TEXTS), var_s1);
       CList__AddHead(arg0 + FREE_TEXTS, var_s1);
       var_s1 = temp_s0;
@@ -51,11 +47,7 @@ void CCameraPool__ReleaseAllTexts(sptr arg0)
       {
         do
         {
-#ifdef TARGET_PORT
           temp_s0_2 = *(s32 **) var_s1_2;
-#else
-          temp_s0_2 = *var_s1_2;
-#endif
           CList__Remove(var_a0_2, var_s1_2);
           CList__AddHead(arg0 + FREE_TEXTS, var_s1_2);
           var_s1_2 = temp_s0_2;

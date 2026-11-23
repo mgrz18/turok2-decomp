@@ -41,6 +41,8 @@ Two refinements, so the numbers say what is left to do:
   - `readable` is the matched code whose C has none of m2c's offset macros
     (M2C_FIELD and the like): C that names its fields, as opposed to C that
     only compiles to the right bytes.
+  - `FAKEMATCH` is the matched code in files that say they rely on a trick
+    the original source did not have (docs/MATCHING.md, the FAKEMATCH audit).
 """
 
 import argparse
@@ -147,12 +149,17 @@ def main():
     done = {"engine": 0, "virtual": 0, "libultra": 0}
     count = {"engine": 0, "virtual": 0, "libultra": 0}
     readable = 0
+    fake = 0
+    fake_n = 0
+    fake_files = 0
     # A name counts once: a file may carry a static copy of a function another
     # file defines (func_00465B04.c's engine half), or the same out-of-line
     # helper as its neighbours (func_0027BC34).
     matched_names = set()
     for path in linked_c_files():
         src = path.read_text()
+        faked = "FAKEMATCH" in src
+        fake_files += faked
         src = re.sub(r"/\*.*?\*/", "", src, flags=re.S)
         plain = "M2C_" not in src.replace('#include "m2c_macros.h"', "")
         for name in DEF.findall(src):
@@ -162,6 +169,9 @@ def main():
                 done[reg] += size
                 count[reg] += 1
                 readable += size if plain else 0
+                if faked:
+                    fake += size
+                    fake_n += 1
 
     # Code that is not C by origin: out of the C totals, into its own row.
     asm = {"engine": 0, "virtual": 0, "libultra": 0}
@@ -199,6 +209,8 @@ def main():
           f"   (asm included, the old figure)")
     print(f"{'readable':16s} {readable:10,d} {all_c:10,d} {pct(readable, all_c)}"
           f"   ({100 * readable / (all_done or 1):.0f}% of what is matched)")
+    print(f"{'FAKEMATCH':16s} {fake:10,d} {all_c:10,d} {pct(fake, all_c)}"
+          f"   ({fake_n} functions in the {fake_files} files with a FAKEMATCH marker)")
     print(f"(not counted: {copy:,d} bytes of the VM modules' second copy)")
     return 0
 

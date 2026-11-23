@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 1 register pin (`register ... asm("$n")`); without them: CScene__DrawGeometry
+ * 54 of 385 words. */
 /* The do { } while (0) around the region-loop setup raises the region counter's priority (GCC weights refs by loop depth) so it gets fp and the object-table base is spilled, as in the ROM. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00289054.c, func_00289054, with Turok 2's layouts. */
 #include "common.h"

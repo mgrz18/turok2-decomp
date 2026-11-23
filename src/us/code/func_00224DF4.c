@@ -3,7 +3,6 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-#ifdef TARGET_PORT
 /* The port: the scene by its typed fields (the view below has N64 offsets: 0x1C =
  * m_GraphicSetsKey, 0x48 = m_pGraphicSets, 0x7C = m_pGraphicSetTypes); with the view the
  * font's graphic set (COnScreen__LoadFontTexture) was never found and no text was drawn. */
@@ -12,17 +11,6 @@ typedef CScene Owner;
 #define unk1C m_GraphicSetsKey
 #define unk48 m_pGraphicSets
 #define table_of(o) ((StrideTable *)(o)->m_pGraphicSetTypes)
-#else
-typedef struct Owner {
-    u8 pad0[0x1C];
-    s32 unk1C;      /* 0x1C */
-    u8 pad20[0x48 - 0x20];
-    s32 unk48;      /* 0x48 */
-    u8 pad4C[0x7C - 0x4C];
-    StrideTable *table;   /* 0x7C */
-} Owner;
-#define table_of(o) ((o)->table)
-#endif
 
 extern s32 BinarySearch(void *entries, s32 count, sptr id);
 extern u8 ProPack__Decompress[];

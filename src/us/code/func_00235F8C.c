@@ -24,11 +24,7 @@ struct RibbonVertexPool {
     s32 remaining;
     Vtx *next;
 };
-#ifdef TARGET_PORT
 typedef long t2_sptr;   /* the vertex pointer at host width (common.h sptr) */
-#else
-typedef s32 t2_sptr;
-#endif
 t2_sptr RibbonVtxPool_Alloc(void *arg0, s32 arg1)
 {
     struct RibbonVertexPool *pool = arg0;

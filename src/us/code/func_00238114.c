@@ -9,7 +9,6 @@ typedef struct {
 
 extern void Sound__PlaySpeech(s32);
 
-#ifdef TARGET_PORT
 #include "structs/vector.h"
 /* ABI (docs/port/ABI.md section 5, abicheck indirect struct_class/struct_scalar): the dispatcher
  * (ImpactEvent_Send/Call) passes (actor, actor, kind, CVector3 pos, 8-byte event value). On MIPS
@@ -19,8 +18,3 @@ extern void Sound__PlaySpeech(s32);
 void ImpactEvent_PlaySound(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, s32 value) {
     Sound__PlaySpeech(value);
 }
-#else
-void ImpactEvent_PlaySound(s32 arg0, s32 arg1, s32 arg2, Quad q) {
-    Sound__PlaySpeech(q.xC);
-}
-#endif

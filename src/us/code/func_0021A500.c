@@ -33,11 +33,7 @@ struct B10H {
                 u16 h2;
 };
 extern f32 D_800A5AF8;
-#ifdef TARGET_PORT
 s32 GameObject_IsOnGround(void *actor);
-#else
-s32 GameObject_IsOnGround();
-#endif
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
 #define GameObject_GetGroundRotation GameObject_GetGroundRotation_sret
 #endif
@@ -58,11 +54,7 @@ void CGameObjectInstance__AlignToGround(B10Obj *o) {
     if (fl & 1) {
         return;
     }
-#ifdef TARGET_PORT
     r = GameObject_IsOnGround(o); /* ABI: the object in $a0 untouched on MIPS */
-#else
-    r = GameObject_IsOnGround();
-#endif
     if (o->p14 == 0) {
         return;
     }

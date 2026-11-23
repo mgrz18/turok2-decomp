@@ -4,12 +4,8 @@
 #include "structs/menu.h"
 
 extern s32 MenuItem_TextLength(MenuItem *a);
-#ifdef TARGET_PORT
 /* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
 extern void sprintf(char *dst, const char *fmt, ...);
-#else
-extern void sprintf(char *dst, char *fmt, s32 value);
-#endif
 
 /* Label of the handicap item, with the handicap value printed into it. */
 s32 PlayerSetupMenu_HandicapLabel(MenuItem *a, Menu *c) {

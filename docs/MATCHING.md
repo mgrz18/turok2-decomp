@@ -600,8 +600,11 @@ the last matched in the G pass (below).
 **Where the FAKEMATCH functions are.** Matches that rely on something the
 original source surely did not have (a `register ... asm` pin, an
 always-true test, a dead store) say so in a `/* FAKEMATCH: ... */` comment,
-on the first line or at the trick. 16 files in `src/` have one
-(`grep -rl FAKEMATCH src`), after the Z pass de-faked seven (below). The
+on the first line or at the trick. 16 files in `src/` had one
+(`grep -rl FAKEMATCH src`), after the Z pass de-faked seven (below); the
+round 21 audit found 58 more that relied on a trick without saying so, de-faked
+25 functions and marked the rest: see "The FAKEMATCH audit (round 21)" for today's
+list. The
 engine's nine: func_00204778 (a dead store in the highlight),
 func_0022AFB4 (an always-true test), func_002429BC (the shared -1 pinned
 to `$v1`), func_00246BC0 (a dead per-mode switch and a `$s1` pin),
@@ -704,6 +707,83 @@ real types and names; three files lost their local struct views on the way
   file being retyped in the same round (k1); func_00246BC0's `$s1` for opt
   means the original read opt after Math_DecayToZero, which the ROM does not
   show.
+
+### The FAKEMATCH audit (round 21)
+
+**What a fake looks like when nobody marked it.** Three scans over `src/`
+(the scripts are in the round's commit messages; each is a grep and a
+`match_func.py` run):
+
+- **Register pins and empty asm barriers** (`register T x asm("$n")`,
+  `__asm__("" : "+r"(x))`, `__asm__ __volatile__("")`), the `__asm__("name")`
+  symbol aliases, the COP0/`break`/`multu` asm of libultra and libgcc and
+  `sqrt.s` left aside: 22 files had one with no marker, one of them
+  documented as a HACK (alEnvmixerPull, from the Rage Wars source).
+- **An if/else whose two arms are the same code**, mostly left by the bulk
+  matching (m2c names, `if (arg1)`, `if (new_var || temp_a0)`): 37 files
+  (two of them, Menu_StepValueLR and its module-2 copy, also have pins).
+  Arms that both stay in the ROM are real source, not a fake (the AA/non-AA
+  pairs of Render_SetRenderMode and the two Hud_DrawBevelBox calls of
+  Menu_Draw/Menu_Draw_2 give the same mode or box in both arms and are kept).
+- **A test of an unset local** (func_00225C08's `if (temp_s2)`, which clang
+  compiled to a trap on the host in round 7).
+
+**De-faked (natural C, `asm_diff.py` identical; no FAKEMATCH left):**
+
+| function | what the trick stood for |
+|---|---|
+| func_00225C08 | nothing: the plain loop over `CScene::m_pKind1` matches; the host body is now the only body |
+| LightVolume_Construct | the `$a0` pin of CMtxF__Identity's argument: `i = 0;` before CMtxF__InvertAffine (the permuter, below) |
+| CPlayer__IsSpecialPickup, CPlayer__GetPickupCountLow, CPlayer__GetPickupCountHigh | `if (cheat & 0x10) return 0/1;` first |
+| EnemyAnim_ExtremeDeath | `if (mode == 0x35) return gib + 1; return gib;` |
+| func_00268080, func_00267D94, func_00267E4C, GameObject_GetLeashRadius, func_00268BE0 | `if (def->m_Type == ENEMY) return field; return 0;` |
+| Cinema_OverridesMusic1, Cinema_OverridesMusic2 | `if (!active) return 0; return field;` |
+| Sound_DistanceFalloff, Plane_SegmentFraction | the early return first |
+| func_0023640C, Math_StepClampedInt | the plain clamp |
+| Cinema_RunEnd | `cinema = gCinemaPlayerP; onEnd = cinema->onEnd; if (onEnd) { cinema->onEnd = NULL; onEnd(); }` (the permuter) |
+| CCache__AllocateAt, CCache__AllocateMemoryForDecompression(Top), CAudioWorld__CountHandleVoices | the mutex unlock as the plain `if (--count != 0) { restore; send; } else { restore; } return x;` |
+| Menu_StepValueLR, Menu_StepValueLR_2 | written as its sibling Menu_StepValue is (`value = minimum; if (wrap) value = maximum;`) |
+| Sort_Insertion | the plain selection-sort loops |
+
+**The pattern behind most of them: write the test the ROM's layout shows.**
+GCC 2.8 puts the `then` arm right after the branch and jumps to the `else`.
+Ten of the getters have the early return (0, 1) out of line and the field's
+path after the branch, with the `beq`'s delay slot empty; the drafts had the
+other sense (`if (x != K) return 0;`) and needed two identical arms to get
+the layout back. Testing for the case that returns the field first (`if (x ==
+K) return field; return 0;`) gives the ROM as is.
+
+**The permuter can start from a FAKEMATCH.** Its target is normally the
+function's asm in `us/asm`, which is gone once the function is C. The fake's
+own object matches the ROM, so it can be the target: `tools/permuter/setup.py
+<natural draft.c> <func> <the FAKEMATCH file>` (new third argument). Score 0
+then means "another source of the same code". For LightVolume_Construct and
+Cinema_RunEnd the first zero was natural; for MotherBoss_FewerActorsThan,
+EnemyAI_TurnToTarget, func_00267D60 and PakMenu_InitLoadGame_2 every zero
+was another trick (identical arms again, `do { return ...; } while (0)`, a
+reused constant variable), and Turret_Setup (60,000 iterations) found none.
+
+**Redundant N64 alternatives.** 451 `#ifdef TARGET_PORT ... #else ...
+#endif` pairs in 349 files kept an N64 version (m2c casts, offsets, a few
+FAKEMATCH drafts) next to a host version that compiles to the same N64
+code; `tools/unify_host_bodies.py --write` replaced each pair by its host
+branch (the port reads the same text as before; the N64 assembly is checked
+equal, symbols resolved, by `asm_diff.py`'s normalisation). It is re-runnable
+after merges (run it until it reports 0; the 340 host branches that do not
+compile for the N64, host-only names, are left). `asm_diff.py` now numbers local labels by first appearance, so
+a de-faked branch that only renumbers `.L` labels compares equal.
+
+**Still fake (51 files, `grep -rl FAKEMATCH src/us`).** The 16 of the list
+above (each retried this round: the permuter from the natural draft against
+the fake's object, and for CAI__Setup the flags read at each of 25 points:
+all 9 words off) and the 35 marked in this audit (25 functions of the 58 files found were de-faked), each with what it misses
+by without its trick in its first comment. The near ones for a next pass:
+RumbleMenu_Play (2 of 23 words with the typed Menu and no arms),
+CCache__HeapAlloc (11 of 57, whatever the shape of the two allocations),
+PakMenu_InitLoadGame_2 (4 of 103 unpinned), Trail_DetachOwner (5-6 of 169),
+CParticle__Steer (5 of 390 without its barrier), _getRate (1 of 148;
+libaudio, which j5's ultralib work may replace).
+
 
 ### The G pass (the last drafts)
 

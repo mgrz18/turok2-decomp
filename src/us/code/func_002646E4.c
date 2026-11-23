@@ -21,7 +21,6 @@ typedef struct B2State {
     u32 flags;
 } B2State;
 
-#ifdef TARGET_PORT
 #include "structs/game_object.h"
 /* The port: the intelligence from CGameObjectInstance (the B2Actor view reads it at N64 0x14). */
 void Platform_BackEnter(B2Actor *actor, B2State *state) {
@@ -31,12 +30,3 @@ void Platform_BackEnter(B2Actor *actor, B2State *state) {
         state->flags &= ~0x10000000;
     }
 }
-#else
-void Platform_BackEnter(B2Actor *actor, B2State *state) {
-    B2Info *info = &actor->def->info;
-    GameObject_FireTriggers(actor, 0x20000, actor);
-    if ((info->flags24 & 0x80) == 0) {
-        state->flags &= ~0x10000000; /* Rage Wars clears 0x20000 */
-    }
-}
-#endif

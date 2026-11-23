@@ -135,20 +135,15 @@ void LightVolume_Construct(Volume *vol, VolumeRec *rec) {
         vol->unk8[2] = (f32)rec->unk3C[2] * 2.3748725652694702e-06f;
     }
     mtx = vol->mtx;
-    {
-        /* the ROM sets up the call's argument before these stores */
-        register f32 *arg asm("$4") = mtx;
-
-        vol->unkB8 = rec->unk37;
-        i = 0;
-        vol->unkBA = rec->unk3B;
-        CMtxF__Identity(arg);
-    }
+    vol->unkB8 = rec->unk37;
+    vol->unkBA = rec->unk3B;
+    CMtxF__Identity(mtx);
     CMtxF__ScaleColumns(mtx, scale.x, scale.y, scale.z);
     CMtxF__RotateZ(mtx, rot.z);
     CMtxF__RotateY(mtx, rot.y);
     CMtxF__RotateX(mtx, rot.x);
     CMtxF__Translate(mtx, pos.x, pos.y, pos.z);
+    i = 0;
     CMtxF__InvertAffine(vol->unk20, mtx);
     out = corners;
     do {

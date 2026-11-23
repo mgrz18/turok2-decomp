@@ -9,12 +9,8 @@
 #include "protos/scene.h"
 #include "protos/player.h"
 
-#ifdef TARGET_PORT /* host layout: CGame.m_Settings (structs/game.h) */
 #include "structs/game.h"
 #define GAME_SETTINGS_OFF T2_OFFSETOF(CGame, m_Settings)
-#else
-#define GAME_SETTINGS_OFF 0x1268
-#endif
 
 s32 Cinema_RequestById(s32);
 

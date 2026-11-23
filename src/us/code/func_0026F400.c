@@ -1,3 +1,4 @@
+#include "common.h"
 #include "structs/vector.h"
 
 typedef struct {
@@ -7,32 +8,16 @@ typedef struct {
     /* 0xC */ f32 d;
 } Plane;
 
+/* De-faked in round 21 (j4): the draft returned through identical if/else arms; returning
+ * the early case first gives the ROM's layout. */
 
-/* Where the segment a->b crosses the plane, as a fraction of the way. */
-f32 Plane_SegmentFraction(Plane *arg0, CVector3 *arg1, CVector3 *arg2)
-{
-  f32 temp_f1;
-  f32 new_var;
-  f32 temp_f1_2;
-  f32 temp_f3;
-  f32 temp_f4;
-  f32 temp_f5;
-  temp_f3 = arg0->nx;
-  temp_f4 = arg0->ny;
-  temp_f1_2 = arg0->nz;
-  temp_f5 = ((temp_f3 * arg1->x) + (temp_f4 * arg1->y)) + (temp_f1_2 * arg1->z);
-  new_var = arg2->y;
-  temp_f1 = ((temp_f3 * arg2->x) + (temp_f4 * new_var)) + (temp_f1_2 * arg2->z);
-  if (temp_f1 != temp_f5)
-  {
-    if (arg1)
-    {
-      return (arg0->d - temp_f5) / (temp_f1 - temp_f5);
+/* Where the segment a->b crosses the plane, as a fraction of the way (1 when parallel). */
+f32 Plane_SegmentFraction(Plane *plane, CVector3 *a, CVector3 *b) {
+    f32 da = plane->nx * a->x + plane->ny * a->y + plane->nz * a->z;
+    f32 db = plane->nx * b->x + plane->ny * b->y + plane->nz * b->z;
+
+    if (db == da) {
+        return 1.0f;
     }
-    else
-    {
-      return (arg0->d - temp_f5) / (temp_f1 - temp_f5);
-    }
-  }
-  return 1.0f;
+    return (plane->d - da) / (db - da);
 }

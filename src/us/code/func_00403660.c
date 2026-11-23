@@ -10,11 +10,7 @@
 /* A weak spot seen from its animator: walking BossWeakSpot pointers and
  * taking &slot->anim moves the +4 into the loop and breaks the match. */
 typedef struct {
-#ifdef TARGET_PORT
     u8 data[sizeof(BossWeakSpot)]; /* the host stride of the weak spots (pointers in ScriptAnimator) */
-#else
-    u8 data[0x68];
-#endif
 } Slot00403660;
 
 
@@ -47,15 +43,10 @@ void MantidQueen_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
             CGameObjectInstance__DrawShadow(actor, state, req);
             ScriptAnimator_Apply(slot);
             ScreenTint_UpdateMode();
-#ifdef TARGET_PORT
             /* the actor's draw matrices, lights and texture by member (N64 0x98, 0x110, 0x151) */
             Render_DrawModel(req->m_hModel, ((CGameObjectInstance *) actor)->m_pmtDrawMtxs, 1,
                              (char *) &((CGameObjectInstance *) actor)->m_Lights[gEvenOdd], 0, i,
                              ((CGameObjectInstance *) actor)->m_AI.m_nTexture);
-#else
-            Render_DrawModel(req->m_hModel, *(s32 *) (actor + 0x98), 1, &((CLights1 *) (actor + 0x110))[gEvenOdd], 0, i,
-                          *(s8 *) (actor + 0x151));
-#endif
             gBlendState = 0;
         }
         i++;

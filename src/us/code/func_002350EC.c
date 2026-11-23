@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 1 register pin (`register ... asm("$n")`); without them: Trail_AddNode 11 of
+ * 131 words. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002A5588.c, func_002A5588, with Turok 2's layouts. */
 
 #include "common.h"

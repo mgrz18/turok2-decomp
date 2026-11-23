@@ -77,13 +77,8 @@ void CAudioWorld__Initialize(CAudioWorld *m) {
     s32 i;
     s32 j;
     s32 n;
-#ifdef TARGET_PORT
     uptr a; /* soundArray holds pointers: the host compares them whole */
     uptr b;
-#else
-    u32 a;
-    u32 b;
-#endif
     u8 *e;
 
     CMutex__Construct(&m->lock);

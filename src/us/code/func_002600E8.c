@@ -57,13 +57,8 @@ void EnemyAI_NukedFrozenRemove(Actor *self, void *ai) {
         }
         GameObject_FireTriggers(self, 1, self);
     }
-#ifdef TARGET_PORT
     self->flags.word &= ~0x100;
     self->flags.word &= ~0x2000;
-#else
-    self->flags.bits.b100 = 0;
-    self->flags.bits.b2000 = 0;
-#endif
     AI_StopSound(self, ai);
     if (self->flags.word & 0x80000) {
         CListedInstance__Free(self);

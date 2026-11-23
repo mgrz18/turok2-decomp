@@ -12,7 +12,6 @@
 #include "protos/ai.h"
 #include "protos/menu.h"
 
-#ifdef TARGET_PORT
 /* The port: the player pool at its host layout (CPlayerPool, structs/player_list.h: the two
  * leading pointers and the list links are pointer-wide). */
 typedef struct {
@@ -31,21 +30,6 @@ typedef struct {
     s32 cinema;
     s32 cinemaStarted;
 } PlayerList;
-#else
-typedef struct {
-    /* 0x00 */ CPlayer *head;
-    /* 0x04 */ u8 pad4[0x10 - 4];
-    /* 0x10 */ u32 count;
-} PlayerCList;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ PlayerCList idle;        /* players not in the game */
-    /* 0x20 */ PlayerCList active;      /* players in the game */
-    /* 0x34 */ s32 cinema;
-    /* 0x38 */ s32 cinemaStarted;
-} PlayerList;
-#endif
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];

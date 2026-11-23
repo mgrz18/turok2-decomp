@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 2 register pins (`register ... asm("$n")`); without them:
+ * Lighting_CollectVolumes 76 of 243 words (size 0x3c8 vs 0x3cc). */
 #include "structs/vector.h"
 #include "globals/scene.h"
 
@@ -40,11 +42,7 @@ s32 Lighting_CollectVolumes(CBox *q, CLightVolume **out, s32 *cnt)
     off = 0x14AC;
     do
     {
-#ifdef TARGET_PORT
       e = &g->m_Sectors[i]; /* N64 0x14AC + 8 * i: the host CSceneSector is two pointers */
-#else
-      e = (CSceneSector *) (((u8 *) g) + off);
-#endif
       c = e->m_pBounds;
       if ((((c->x1 > q->m_vMin.x) && (c->x0 < q->m_vMax.x)) && (c->z1 > q->m_vMin.z)) && (c->z0 < q->m_vMax.z))
       {

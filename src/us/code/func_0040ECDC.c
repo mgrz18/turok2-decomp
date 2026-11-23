@@ -16,12 +16,8 @@ void BlindOne_UpdateFight(BlindOneState *arg0)
   temp_v0 = (void (*)(void)) sBlindOnePhases[arg0->phase].update;
   if (temp_v0 != 0)
   {
-#ifdef TARGET_PORT
     /* ABI (docs/port/ABI.md section 5): MIPS passes arg0 through to the phase update (a0) */
     ((void (*)(BlindOneState *))temp_v0)(arg0);
-#else
-    temp_v0();
-#endif
   }
   var_s0 = 0;
   if (arg0->faderCount > 0)

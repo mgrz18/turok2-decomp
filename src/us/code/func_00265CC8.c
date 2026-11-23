@@ -1,13 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80204E78_4.CPP, func_80205494_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#ifdef TARGET_PORT
 #include "common.h"
 #include "structs/game_object.h"
-#else
-typedef signed char s8;
-typedef signed int s32;
-#endif
 
 typedef struct Descriptor {
     char pad0[0x14];

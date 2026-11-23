@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 2 empty `__asm__` barriers; without them: PakMenu_SelectNote 60 of 521 words.
+ * */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00407748.c, func_00407748.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
@@ -24,11 +26,7 @@ s32 Pak_TextHasInvalidChar();
 void PakMenu_UpdateNoteRows();
 void Str_Copy();
 void CCache__Flush();
-#ifdef TARGET_PORT
 void CCache__Deallocate(sptr, sptr); /* prototyped: the 0 reaches the sptr as a full word (the handle is an sptr) */
-#else
-void CCache__Deallocate();
-#endif
 CMemEntry *CCache__Allocate();
 void *memset();
 /* Game code / company code check on the controller-pak note (inlined). */

@@ -3,15 +3,11 @@
 #include "structs/menu.h"
 #include "globals/menu.h"
 
-#ifdef TARGET_PORT
 /* The port (round 12 C27): the byte reads below are N64 offsets of CPlayer (m_Data at 0x520:
  * 0x9FC m_NukePartLevelFlags, 0xA05/0xA06 m_KeySet6LevelFlags[3]/[4]); CPlayerLoadSaveData holds
  * scalars only, so its own layout is the N64's and only m_Data's place in CPlayer moves. */
 #include "structs/player.h"
 #define PLAYER_BYTE(p, off) (((u8 *) &((CPlayer *) (p))->m_Data)[(off) - 0x520])
-#else
-#define PLAYER_BYTE(p, off) (p)[off]
-#endif
 
 
 s32 CPlayer__GetPickupCountHigh(u8 *player, s32 type);

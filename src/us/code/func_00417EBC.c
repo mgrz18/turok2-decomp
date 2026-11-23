@@ -1,3 +1,6 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: RumbleMenu_Play: 2 of 23 words with the typed
+ * Menu. */
 #include "common.h"
 #include "m2c_macros.h"
 #include "globals/game.h"

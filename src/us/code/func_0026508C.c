@@ -38,11 +38,7 @@ void Throwable_FlyingUpdate(CGameObjectInstance *obj, OwnedState *state) {
         distSq = AI_FlatDistSqToPoint(obj, owner->header.m_vPos);
         if ((GameObject_GetCollisionRadius(obj) + GameObject_GetCollisionRadius(owner)) * (GameObject_GetCollisionRadius(obj) + GameObject_GetCollisionRadius(owner)) < distSq) {
             state->owner = NULL;
-#ifdef TARGET_PORT
             EnemyAI_SetGrabbed(owner, &owner->m_AI, 0); /* the CAI at its host offset */
-#else
-            EnemyAI_SetGrabbed(owner, (u8 *) owner + 0x140, 0);
-#endif
         }
     } else {
         gThrowableCollisionInfo_m_InstanceBehavior[0] = 2;

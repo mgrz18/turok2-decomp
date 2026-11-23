@@ -20,13 +20,8 @@ extern u8 __osContDataCrc(void *arg0); /* ABI: returns u8 (the host leaves the u
 #else
 extern u32 __osContDataCrc(void *arg0);
 #endif
-#ifdef TARGET_PORT /* the queue is a pointer (s32 truncates it on LP64) */
 extern u32 __osPfsGetStatus(OSMesgQueue *arg0, s32 arg1);
 u32 __osContRamRead(OSMesgQueue * arg0, s32 arg1, u16 arg2, u8 *arg3) {
-#else
-extern u32 __osPfsGetStatus(s32 arg0, s32 arg1);
-u32 __osContRamRead(s32 arg0, s32 arg1, u16 arg2, u8 *arg3) {
-#endif
     Block40 saved;
     u8 *source;
     s32 i;

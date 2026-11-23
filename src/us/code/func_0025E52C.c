@@ -14,7 +14,6 @@ typedef struct {
 
 f32 CVector3__Distance(void *, void *);
 
-#ifdef TARGET_PORT
 #include "structs/game_object.h"
 
 /* The port: the same on CAI's members. AlertState is the N64 layout of CAI: the behaviour table
@@ -59,42 +58,3 @@ void AI_HearNoise(u8 *actor_, CAI *ai, CVector3 *pos, s32 kind) {
     }
     }
 }
-#else
-void AI_HearNoise(u8 *actor, AlertState *state, CVector3 *pos, s32 kind) {
-    s32 mode = state->modes[state->index];
-    f32 strength;
-    f32 dist;
-    f32 alert;
-
-    if (mode >= 0) {
-    if (mode < 3) {
-        switch (kind) {
-        case 1:
-            strength = 45.0f;
-            break;
-        case 2:
-            strength = 105.0f;
-            break;
-        case 3:
-            strength = 150.0f;
-            break;
-        case 0:
-        default:
-            return;
-        }
-        dist = CVector3__Distance(actor + 4, pos);
-        if (dist < 3072.0f) {
-            strength = strength * (1.0f / 3072.0f) * (3072.0f - dist);
-            alert = state->alert;
-            if (alert < strength) {
-                state->alert = alert + strength;
-                if (strength < alert + strength) {
-                    state->alert = strength;
-                }
-                gEnemyLastNoisePos = *pos;
-            }
-        }
-    }
-    }
-}
-#endif

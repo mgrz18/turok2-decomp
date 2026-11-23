@@ -126,11 +126,7 @@ typedef void *( *StateCallback)(struct Source110 *, struct Dest *);
 struct StateEntry {          /* CAIModeInfo (structs/game_object.h) */
     sptr id;
     void (*enter)(struct Source110 *, struct Dest *);
-#ifdef TARGET_PORT
     void *pad8[2];
-#else
-    char pad8[8];
-#endif
     StateCallback callback;
     f32 scale;
     s32 threshold;
@@ -138,11 +134,7 @@ struct StateEntry {          /* CAIModeInfo (structs/game_object.h) */
 };
 struct ActorStateTable {
     struct ActorStateTable *next;   /* the header row */
-#ifdef TARGET_PORT
     u8 pad4[sizeof(StateEntry) - sizeof(void *)];
-#else
-    u8 pad4[0x1C];
-#endif
     StateEntry entries[1];
 };
 extern void AI_StopSound(void *, void *);

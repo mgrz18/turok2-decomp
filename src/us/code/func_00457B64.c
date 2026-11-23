@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 2 register pins (`register ... asm("$n")`); without them:
+ * PakMenu_InitLoadGame_2 4 of 103 words. */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_004070F4.c, func_004070F4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
