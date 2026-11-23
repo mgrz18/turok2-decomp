@@ -3,7 +3,7 @@
 
 extern void *alMainBusPull(void *, s16 *, s32, s32, void *); /* alMainBusPull */
 extern s32 alMainBusParam(sptr, s32, sptr);
-extern void alFilterNew(void *, void *, void *, s32);
+void alFilterNew(void *f, void *handler, void *setParam, s32 type);
 
 /* alMainBusNew */
 typedef sptr BusSources; /* the source list is a host pointer (s32 truncated it above 4 GB) */

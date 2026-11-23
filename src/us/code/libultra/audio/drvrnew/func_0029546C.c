@@ -5,9 +5,9 @@
 
 extern Acmd *alResamplePull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p);
 extern s32 alResampleParam(void *filter, s32 paramID, void *param);
-void alFilterNew(void *arg0, void *a, void *b, s32 c);
+void alFilterNew(void *f, void *handler, void *setParam, s32 type);
 /* the heap and the state block are host pointers (64-bit: the s32 versions truncated them) */
-sptr alHeapDBAlloc(sptr a, s32 b, sptr c, s32 d, s32 e);
+void *alHeapDBAlloc(u8 *file, s32 line, void *hp, s32 num, s32 size);
 void alResampleNew(ALResampler *arg0, sptr arg1) {
     sptr result;
     f32 k;

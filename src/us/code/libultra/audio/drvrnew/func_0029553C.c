@@ -3,8 +3,8 @@
 
 #include "rw/junk_types.h"
 
-void alFilterNew(ALFilter *f, void *handler, void *setParam, s32 type);
-void *alHeapDBAlloc(u8 *file, s32 line, ALHeap *hp, s32 num, s32 size);
+void alFilterNew(void *f, void *handler, void *setParam, s32 type);
+void *alHeapDBAlloc(u8 *file, s32 line, void *hp, s32 num, s32 size);
 void *alEnvmixerPull(void);
 s32 alEnvmixerParam(void *filter, s32 paramID, void *param);
 void alEnvmixerNew(ALEnvMixer *e, ALHeap *hp) {

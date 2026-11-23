@@ -6,7 +6,7 @@ extern s32 func_00294D54(s32, s32, s32, s32, s32);
 extern Acmd *alAuxBusPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p);
 #endif
 extern s32 alAuxBusParam(s32, s32, s32);
-extern void alFilterNew(void *, void *, void *, s32);
+void alFilterNew(void *f, void *handler, void *setParam, s32 type);
 
 /* alAuxBusNew */
 typedef sptr BusSources; /* the source list is a host pointer (s32 truncated it above 4 GB) */

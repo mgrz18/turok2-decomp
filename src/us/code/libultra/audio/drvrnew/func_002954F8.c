@@ -2,7 +2,7 @@
 
 extern void *alSavePull(void *, s16 *, s32, s32, void *); /* alSavePull */
 extern s32 alSaveParam(sptr, s32, sptr);
-extern void alFilterNew(void *, void *, void *, s32);
+void alFilterNew(void *f, void *handler, void *setParam, s32 type);
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
