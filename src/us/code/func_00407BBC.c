@@ -25,11 +25,10 @@ typedef struct {
 } LevelScriptF9D0;
 #endif
 
-extern LevelScriptF9D0 gLevelScript_scriptCOn; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void Primagen_EnterMode16(void) {
-    gLevelScript_scriptCOn.restart = 1;
-    gLevelScript_scriptCOn.scriptPrev = -1;
-    gLevelScript_scriptCOn.scriptIndex = -1;
-    gLevelScript_scriptCOn.script = sPrimagenSoundScript4;
+    gLevelScript.scriptCOn = 1;
+    gLevelScript.script3.cursor = -1;
+    gLevelScript.script3.current = -1;
+    gLevelScript.script3.steps = sPrimagenSoundScript4;
 }

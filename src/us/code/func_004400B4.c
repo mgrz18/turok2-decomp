@@ -9,30 +9,28 @@ typedef struct {
     /* 0x08 */ s8 restart;
 } LevelScriptFA10;
 
-extern LevelScriptFA10 gLevelScript_script2_cursor; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
-#define SCRIPT(state) (((BossStep2 **) &(state))[-1])
 
 void Primagen_SetSpawnScript_2(s32 arg0) {
-    gLevelScript_script2_cursor.scriptPrev = -1;
-    gLevelScript_script2_cursor.restart = 1;
-    gLevelScript_script2_cursor.scriptIndex = -1;
+    gLevelScript.script2.cursor = -1;
+    gLevelScript.script2On = 1;
+    gLevelScript.script2.current = -1;
     if (arg0 == 0) {
-        SCRIPT(gLevelScript_script2_cursor) = NULL;
+        gLevelScript.script2.steps = NULL;
     }
     if (arg0 == 1) {
-        SCRIPT(gLevelScript_script2_cursor) = sPrimagenSpawnScript1_2;
+        gLevelScript.script2.steps = sPrimagenSpawnScript1_2;
     }
     if (arg0 == 2) {
-        SCRIPT(gLevelScript_script2_cursor) = sPrimagenSpawnScript2_2;
+        gLevelScript.script2.steps = sPrimagenSpawnScript2_2;
     }
     if (arg0 == 3) {
-        SCRIPT(gLevelScript_script2_cursor) = sPrimagenSpawnScript3_2;
+        gLevelScript.script2.steps = sPrimagenSpawnScript3_2;
     }
     if (arg0 == 4) {
-        SCRIPT(gLevelScript_script2_cursor) = sPrimagenSpawnScript4_2;
+        gLevelScript.script2.steps = sPrimagenSpawnScript4_2;
     }
     if (arg0 == 5) {
-        SCRIPT(gLevelScript_script2_cursor) = sPrimagenSpawnScript5_2;
+        gLevelScript.script2.steps = sPrimagenSpawnScript5_2;
     }
 }

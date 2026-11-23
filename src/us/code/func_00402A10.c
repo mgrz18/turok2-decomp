@@ -25,7 +25,6 @@ typedef struct {
     /* 0xB8 */ s32 prevAngle;
 } Obj00402A10;
 
-extern s32 gMantidQueen_waveActive[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define AI_TurnHeadToTarget AI_TurnHeadToTarget_i
 #endif
@@ -60,7 +59,7 @@ void MantidQueen_Step(sptr a0, Obj00402A10 *obj) {
 void MantidQueen_Step(sptr a0, Obj00402A10 *obj) {
     obj->prevPos = obj->pos;
     obj->prevAngle = obj->angle;
-    if (gMantidQueen_waveActive[0] != 0 || obj->kind == 15) {
+    if (gMantidQueen.waveActive != 0 || obj->kind == 15) {
         obj->unk88 = 0;
         obj->flags |= 0x20000000;
     } else {
