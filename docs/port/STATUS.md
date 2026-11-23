@@ -258,12 +258,17 @@ The port is affected only through shared C, and runs as before:
   `s32`, was `volatile unsigned int` on the host), func_00268BE0 (`obj->m_dwFlags`, no
   `T2_HOST_FLAGS_OFFSET`), func_00267E4C (`def->m_dwTypeFlags`); same results, typed access.
   Sound_DistanceFalloff (also called by `port/audio`) keeps its semantics, NaN included.
+- **One host fix on the way**: Menu_StepValueLR (module 1's menus) read the controller for the
+  right press at the N64 offset 0x20 of `Menu` (`*(s32 *)(menu + 0x20)`, the m2c draft that the
+  host also compiled); its natural form reads `menu->controller` for both presses. The default
+  runs do not reach it (their det is unchanged).
 - No rename, no header change: `versions/port_layout.us.json` is unchanged; gendata rerun
   (`decls.json` deleted) on the final tree.
 - **Checked** (Linux, Release, this tree): the boot and the demos (26,000 frames, `--pak-blank`)
   `6ab97584…`, as the coordinator's binary; the default whole-game run (300,000 frames,
   `aimdrive.py`) det md5 **`dc8126d3…`** (600,000 lines), the same run as before: level 10
-  (END 2), the credits back to the hub at 263,578, 3 lives at the end. `make verify` OK.
+  (END 2), the credits back to the hub at 263,578, 3 lives at the end. `make verify` OK. Both rerun on the
+  final tree (25 de-faked functions, 451 alternatives dropped): the same two md5s.
 
 ## Round 20, part i1: the render sweep (hub, levels 1-3, menus): the arena walls, the menu texts, the automap (branch names-R20_i1; FIDELITY.md 13, RENDER.md 8)
 
