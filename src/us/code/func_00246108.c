@@ -8,7 +8,7 @@
 typedef struct { u8 pad0[4]; CVector3 pos; } B04A; /* pos at 0x4 in Turok 2 (0x8 in Rage Wars) */
 typedef struct { CAITarget a; CAITarget b; } B04C;
 void AI_GetPathTargetInfo(B04A *, CAI *, sptr, CAITarget *);
-void AI_GetSightTargetInfo(B04A *, CAI *, s32, CAITarget *);
+void AI_GetSightTargetInfo(B04A *, CAI *, sptr, CAITarget *);
 /* A separate function in Rage Wars; inlined here in Turok 2. */
 static inline void fill(CAITarget *d, B04A *a) {
     CVector3 p = a->pos;

@@ -60,7 +60,7 @@ static __inline__ s32 Kind(CGameObjectInstance *self, CAI *plan, CGameObjectInst
 
 /* Picks the plan's target and fills `out` with its kind, the turn to face
  * it, its position, offset and distance, in 3D and flattened. */
-void AI_GetSightTargetInfo(CGameObjectInstance *self, CAI *plan, s32 unused, CAITarget *out) {
+void AI_GetSightTargetInfo(CGameObjectInstance *self, CAI *plan, sptr unused, CAITarget *out) {
     CVector3 pos;
     CVector3 delta;
     f32 angle;
