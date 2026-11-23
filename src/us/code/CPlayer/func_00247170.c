@@ -6,96 +6,79 @@
 #include "protos/scene.h"
 
 /* The scope model raised to the view. */
-typedef struct {
-    /* 0x00 */ s32 current;
-    /* 0x04 */ s32 requested;
-    /* 0x08 */ void *model;
-    /* 0x0C */ u8 padC[0x90 - 0xC];
-    /* 0x90 */ f32 scaleX;
-    /* 0x94 */ f32 scaleY;
-    /* 0x98 */ f32 scaleZ;
-    /* 0x9C */ f32 pitch;
-    /* 0xA0 */ f32 roll;
-    /* 0xA4 */ u8 padA4[4];
-    /* 0xA8 */ f32 x;
-    /* 0xAC */ f32 y;
-    /* 0xB0 */ f32 z;
-    /* 0xB4 */ s32 state;           /* 0 hidden, 1 raising, 2 up, 3 lowering */
-    /* 0xB8 */ f32 time;
-} HudModel; /* size 0xBC */
 
 
 /* Places the scope model and animates it up (state 1) or down (state 3)
  * over 3.75 frames: the sniper scope (0xC83) swings in from the side, the
  * others tip up from below. */
-void CPlayer__AnimateScope(HudModel *m, CPlayer *owner) {
+void CPlayer__AnimateScope(CPlayerOverlay *m, CPlayer *owner) {
     s32 index;
 
-    if (m->current == 0xC83) {
-        m->x = -550.0f;
-        m->y = 520.0f;
-        m->z = -1125.0f;
-        m->scaleX = 0.28f;
-        m->scaleY = 0.33f;
-        m->scaleZ = 0.25f;
+    if (m->m_ObjectType == 0xC83) {
+        m->m_vPos.x = -550.0f;
+        m->m_vPos.y = 520.0f;
+        m->m_vPos.z = -1125.0f;
+        m->m_vScale.x = 0.28f;
+        m->m_vScale.y = 0.33f;
+        m->m_vScale.z = 0.25f;
     } else {
-        m->x = 0.0f;
-        m->y = 451.0f;
-        m->z = -675.0f;
-        m->scaleX = 0.2f;
-        m->scaleY = 0.189f;
-        m->scaleZ = 0.25f;
-        m->roll = 3.141593f;
+        m->m_vPos.x = 0.0f;
+        m->m_vPos.y = 451.0f;
+        m->m_vPos.z = -675.0f;
+        m->m_vScale.x = 0.2f;
+        m->m_vScale.y = 0.189f;
+        m->m_vScale.z = 0.25f;
+        m->m_vRot.y = 3.141593f;
     }
-    if (m->requested != m->current && m->state == 0) {
-        index = CScene__FindObjectType(&gScene, m->requested);
+    if (m->m_DesiredObjectType != m->m_ObjectType && m->m_Mode == 0) {
+        index = CScene__FindObjectType(&gScene, m->m_DesiredObjectType);
         if (index != -1) {
-            m->model = CScene__GetObject(&gScene, index);
-            m->state = 1;
-            m->current = m->requested;
+            m->m_rpObject = CScene__GetObject(&gScene, index);
+            m->m_Mode = 1;
+            m->m_ObjectType = m->m_DesiredObjectType;
         } else {
-            m->model = NULL;
+            m->m_rpObject = NULL;
         }
     }
-    switch (m->state) {
+    switch (m->m_Mode) {
         case 0:
             break;
         case 1:
-            m->time += gFrameIncrement;
-            if (m->time >= 3.75f) {
-                m->state = 2;
-                m->time = 3.75f;
+            m->m_ModeTime += gFrameIncrement;
+            if (m->m_ModeTime >= 3.75f) {
+                m->m_Mode = 2;
+                m->m_ModeTime = 3.75f;
             }
-            if (m->current == 0xC83) {
+            if (m->m_ObjectType == 0xC83) {
                 if (gEngineApp_m_Settings.multiplayer) {
-                    m->roll = 0.0f;
-                    m->pitch = 0.0f;
+                    m->m_vRot.y = 0.0f;
+                    m->m_vRot.x = 0.0f;
                 } else {
-                    m->pitch = 0.0f;
-                    m->roll = (360.0f - m->time * 48.000004f) * 0.017453294f;
+                    m->m_vRot.x = 0.0f;
+                    m->m_vRot.y = (360.0f - m->m_ModeTime * 48.000004f) * 0.017453294f;
                 }
             } else {
-                m->pitch = (1.0f - m->time * 0.26666668f) * 1.5707965f;
+                m->m_vRot.x = (1.0f - m->m_ModeTime * 0.26666668f) * 1.5707965f;
             }
             break;
         case 2:
             break;
         case 3:
             if (owner->m_ZoomBlend == 0.0f) {
-                m->time -= gFrameIncrement;
-                if (m->time <= 0.0f) {
-                    m->state = 0;
-                    m->time = 0.0f;
+                m->m_ModeTime -= gFrameIncrement;
+                if (m->m_ModeTime <= 0.0f) {
+                    m->m_Mode = 0;
+                    m->m_ModeTime = 0.0f;
                 }
             }
-            if (m->current == 0xC83) {
+            if (m->m_ObjectType == 0xC83) {
                 if (gEngineApp_m_Settings.multiplayer) {
-                    m->roll = 0.0f;
+                    m->m_vRot.y = 0.0f;
                 } else {
-                    m->roll = ((1.0f - m->time * 0.26666668f) * 180.0f + 180.0f) * 0.017453294f;
+                    m->m_vRot.y = ((1.0f - m->m_ModeTime * 0.26666668f) * 180.0f + 180.0f) * 0.017453294f;
                 }
             } else {
-                m->pitch = (1.0f - m->time * 0.26666668f) * 1.5707965f;
+                m->m_vRot.x = (1.0f - m->m_ModeTime * 0.26666668f) * 1.5707965f;
             }
             break;
     }
