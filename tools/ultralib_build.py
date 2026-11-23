@@ -371,9 +371,19 @@ def main():
             w.write_text(vm2_wrapper(rel.removesuffix("_2")))
     out = ["// libultra modules linked from lib/ultralib (decompals/ultralib, 2.0I libgultra_rom)",
            "// instead of the game's C; written by tools/ultralib_build.py --write (docs/LIBULTRA.md).",
-           "// module = ultralib file: the game files the N64 build no longer links"]
+           "// module = the source the N64 build compiles: the game files (src/us/code) it no longer links"]
+    um, gn = ulmap(), game_names()
+    code = ROOT / "src" / "us" / "code"
+
+    def game_file(v):
+        # by address; a few by name; the second VM module's at the address splat names it
+        for stem in (f"func_{v:08X}", um[v][3], f"func_{gn.get(um[v][3], 0):08X}"):
+            if (code / f"{stem}.c").exists():
+                return f"{stem}.c"
+        return f"?{um[v][3]}"
     for name, rel, _, _, funcs in taken:
-        out.append(f"{name} = src/{rel}.c: " + " ".join(f"func_{v:08X}.c" for v in funcs))
+        src = f"lib/ultralib_vm2/{rel}.c" if name.endswith("_2") else f"lib/ultralib/src/{rel}.c"
+        out.append(f"{name} = {src}: " + " ".join(game_file(v) for v in funcs))
     LIST.write_text("\n".join(out) + "\n")
     print(f"wrote {YAML.relative_to(ROOT)} and {LIST.relative_to(ROOT)}")
 

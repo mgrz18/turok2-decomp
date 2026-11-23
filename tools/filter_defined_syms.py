@@ -29,7 +29,8 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ASM_DIRS = (ROOT / "us" / "asm", ROOT / "src" / "us" / "asm")
-C_OBJ_DIR = ROOT / "build" / "src"
+# build/lib: the libultra objects built from lib/ultralib (docs/LIBULTRA.md)
+C_OBJ_DIRS = (ROOT / "build" / "src", ROOT / "build" / "lib")
 NM = os.environ.get("NM", "mips-linux-gnu-nm")
 
 GLOBL_RE = re.compile(r"^\s*\.globl\s+(\S+)\s*$")
@@ -53,14 +54,16 @@ def defined_symbols():
 
 def c_defined_symbols():
     """Every global symbol the compiled C objects define."""
-    objs = sorted(str(p) for p in C_OBJ_DIR.rglob("*.c.o")) if C_OBJ_DIR.exists() else []
+    objs = sorted(str(p) for d in C_OBJ_DIRS if d.exists() for p in d.rglob("*.c.o"))
     names = set()
     for i in range(0, len(objs), 500):
         out = subprocess.run([NM, "-g", "--defined-only", *objs[i:i + 500]],
                              check=True, capture_output=True, text=True).stdout
         for line in out.splitlines():
             parts = line.split()
-            if len(parts) == 3:
+            # A tentative definition (COMMON, ultralib pfsisplug.c __osPfsPifRam) is not one:
+            # the linker script discards COMMON, the symbol files give its address.
+            if len(parts) == 3 and parts[1] != "C":
                 names.add(parts[2])
     return names
 
