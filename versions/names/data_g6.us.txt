@@ -232,6 +232,7 @@ gMantidQueen_boss = 0x8012F5C0; // +0x220; MantidQueen_EnterMode3-6
 gMantidQueen_waveActive = 0x8012F5F0; // +0x250; MantidQueen_Step, MantidQueen_UpdateMode2/5
 gMantidQueen_blink = 0x8012F5F4; // +0x254; MantidQueen_UpdateTurn, MantidQueen_ChooseAttack, MantidQueen_GetTurnSide
 sPrimagenPathPoint = 0x8012F600; // the index on the path gLevelScript_path (D_800C18F0[path][i]); Primagen_UpdateMode19, Primagen_EnterMode19, Primagen_InitAI
+gLevelScriptBlock = 0x8012F604; // LevelScriptBlock (structs/boss.h): the word before gLevelScript and gLevelScript; Primagen_UpdateMode19 and its module-2 twin address gLevelScript through it (was D_8012F604, round 24 m2)
 gLevelScript = 0x8012F608; // LevelScriptState, the Primagen fight / level script (n7: "Primagen state"); 560 uses, Primagen_*
 gLevelScript_swayPhase = 0x8012F618; // +0x010 (viewed as BossWait); Primagen_RunAttackStep
 gLevelScript_anims = 0x8012F62C; // +0x024 ScriptAnimator[8]; Primagen_Draw

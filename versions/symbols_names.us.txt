@@ -5661,6 +5661,7 @@ gMantidQueen_boss = 0x8012F5C0;
 gMantidQueen_waveActive = 0x8012F5F0;
 gMantidQueen_blink = 0x8012F5F4;
 sPrimagenPathPoint = 0x8012F600;
+gLevelScriptBlock = 0x8012F604;
 gLevelScript = 0x8012F608;
 gLevelScript_swayPhase = 0x8012F618;
 gLevelScript_anims = 0x8012F62C;

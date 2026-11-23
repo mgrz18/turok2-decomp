@@ -12,7 +12,7 @@
  *
  * Several fields also have symbols of their own, which some files still
  * use, and some files reach a block through a neighbouring symbol at a
- * negative offset (gLevelScript_bossMode - 0x3D4, D_8012F604, ...): those keep their
+ * negative offset (gLevelScript_bossMode - 0x3D4, gLevelScriptBlock, ...): those keep their
  * symbol, as the ROM addresses them that way. The extern declarations here
  * are the block-level symbols only.
  *
@@ -257,7 +257,7 @@ typedef struct TotemDefenseState {
  * BossState), gLevelScript_bossMode (bossMode...: BossMode), gLevelScript_armed (armed,
  * scriptOn), gLevelScript_script (script), gLevelScript_script_steps (script.steps), gLevelScript_script_cursor
  * (script.cursor), gLevelScript_script2_cursor (script2.cursor...), gLevelScript_script3 (script3),
- * gLevelScript_path (path). sPrimagenPathPoint and D_8012F604 come just before it. */
+ * gLevelScript_path (path). sPrimagenPathPoint and gLevelScriptBlock come just before it. */
 typedef struct LevelScriptState {
     /* 0x000 */ s32 stage;
     /* 0x004 */ s32 total;
@@ -319,18 +319,18 @@ typedef struct LevelScriptState {
     /* 0x560 */ u8 pad560[0x568 - 0x560];
 } LevelScriptState; /* size 0x568 */
 
-#ifdef TARGET_PORT
-/* D_8012F604 on the host: the word before gLevelScript and gLevelScript, one typed block, so
- * that gendata gives it the host size and places the symbols inside it (gLevelScript,
- * gLevelScript_values, gLevelScript_path, gTotemDefense...) at their host offsets. As bytes
- * (0x448, the splat label's extent) the host LevelScriptState (0x608) ran past its end: the
- * members from partsDone on overlapped gLevelScript_path, and Primagen_InitAI's
- * `gLevelScript_path = 0` cleared partsDone (Primagen_Step divided by zero). */
+/* gLevelScriptBlock (0x8012F604): the word before gLevelScript and gLevelScript, one block.
+ * The ROM addresses gLevelScript through it in Primagen_UpdateMode19 and its module-2 twin
+ * (every access there is 0x8012F604 + 4 + the member's offset). On the host it is also the
+ * typed block gendata places the symbols inside it at (gLevelScript, gLevelScript_values,
+ * gLevelScript_path, gTotemDefense...), at their host offsets. As bytes (0x448, the splat
+ * label's extent) the host LevelScriptState (0x608) ran past its end: the members from
+ * partsDone on overlapped gLevelScript_path, and Primagen_InitAI's `gLevelScript_path = 0`
+ * cleared partsDone (Primagen_Step divided by zero). */
 typedef struct LevelScriptBlock {
-    /* 0x000 */ s32 m_Word;
-    /* 0x004 */ LevelScriptState m_Script;
-} LevelScriptBlock;
-#endif
+    /* 0x000 */ s32 m_Word;                 /* nothing reads or writes it */
+    /* 0x004 */ LevelScriptState m_Script;  /* gLevelScript */
+} LevelScriptBlock; /* size 0x56C */
 
 /* LevelScriptState from bossState on (gLevelScript_bossState, +0x3D0). */
 typedef struct BossState {
