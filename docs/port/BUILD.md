@@ -150,7 +150,7 @@ referenced but not defined**. Classified against `build/turok2.us.elf`:
 | data in `.virtual` / `.virtual_1` | 126 | VM module data (menu descriptors `g*MenuDesc`, ...) |
 | absolute, KSEG0 (0x800xxxxx) | 814 | .bss/.data the linker defines by address (`D_800A51E0`, `CartRomHandle`, ...): need real storage |
 | absolute, VM addresses (0x0040xxxx) | 109 | module-2 references to module-1 labels by address (docs/VMASM.md): disappear if one module copy is linked |
-| absolute, ROM offsets/constants | 6 | `D_14A000`, `D_29E60`, ...: ROM offsets → archive keys (docs/assets/PORT.md) |
+| absolute, ROM offsets/constants | 6 | `gVirtualRomStart`, `D_29E60`, ...: ROM offsets → archive keys (docs/assets/PORT.md) |
 | functions in `.virtual_1` still asm | 26 | module-2 copies (`BlindOne_Draw_2`, `Primagen_*_2`, ...): not needed if only module 1 links |
 | functions, asm by origin / excluded | 32 | the list below |
 | `memcpy` | 1 | host libc |

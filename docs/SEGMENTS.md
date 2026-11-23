@@ -655,14 +655,14 @@ turok3 vhandler.c's VM_Initialize) builds the pager's only code region:
 ```c
 gPager.regions.start = 0x400;            /* first page: vaddr 0x400000 */
 gPager.regions.pages = 0x80;             /* 0x400000-0x47FFFF */
-gPager.regions.source = (u8 *)((uptr)D_14A000 | 0xB0000000);   /* ROM 0x14A000 */
+gPager.regions.source = (u8 *)((uptr)gVirtualRomStart | 0xB0000000);   /* ROM 0x14A000 */
 if (GetMemSize() > 0x4FFFFF)             /* expansion pak: preload, no paging */
-    CLoader__LoadSync(&gLoader, D_14A000, D_3CAE0, extra);
+    CLoader__LoadSync(&gLoader, gVirtualRomStart, gVirtualModule1Size, extra);
 ```
 
 and maps `extra` at 0x400000 with one TLB pair (`func_0028EE40`, 2 x 256 KB).
-`D_14A000` and `D_3CAE0` are absolute linker symbols
-(versions/undefined_syms_auto.us.txt). So:
+`gVirtualRomStart` and `gVirtualModule1Size` are absolute linker symbols
+(versions/symbols_manual.us.txt; they were D_14A000 / D_3CAE0). So:
 
 - **The `virtual` segment starts at ROM 0x14A000, vaddr 0x400000**, as the
   yaml already had it from the jal-delta sweep (VRAM-LAYOUT.md). The

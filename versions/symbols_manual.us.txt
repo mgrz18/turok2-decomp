@@ -142,3 +142,10 @@ D_800C1414 = 0x800C1414; /* "%2d", GameNoteMenu_UpdateLives (func_00421F30); rea
 D_800C1418 = 0x800C1418; /* "%3d.%02d.%02d", GameNoteMenu_UpdateTime (func_00422060); read by its asm copy func_0045AF80 */
 D_800C1428 = 0x800C1428; /* "%04d", CharNoteMenu_UpdateFrags (func_00422430); read by its asm copy func_0045B350 */
 sPakText_MempakReadTempData = 0x800C18B0; /* "Mempak read temp data", readNote in func_00426164; read by Pak_ReadNote (func_004265B0) and its copy func_0045F4D0 */
+
+/* The virtual segment (round 21, docs/SEGMENTS.md "The virtual segment's real start"):
+ * VM_Initialize (func_0028D820) pages vaddr 0x400000 from ROM gVirtualRomStart, and with the
+ * expansion pak copies gVirtualModule1Size bytes of it (VM module 1: ROM 0x14A000-0x186AE0).
+ * Absolute symbols (were D_14A000 / D_3CAE0 in undefined_syms_auto). */
+gVirtualRomStart = 0x0014A000;
+gVirtualModule1Size = 0x0003CAE0;

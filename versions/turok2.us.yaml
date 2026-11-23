@@ -4015,8 +4015,8 @@ segments:
     vram: 0x00400000     # useg, like Turok 3's `virtual`. Confirmed by the code:
                          # VM_Initialize (func_0028D820) makes one page region,
                          # first page 0x400 (vaddr 0x400000), 0x80 pages, source
-                         # D_14A000 | 0xB0000000; with the expansion pak it loads
-                         # D_3CAE0 bytes of ROM 0x14A000 and maps them at 0x400000.
+                         # gVirtualRomStart | 0xB0000000; with the expansion pak it loads
+                         # gVirtualModule1Size bytes of ROM 0x14A000 and maps them at 0x400000.
                          # (The jal-delta sweep found the same: 0x2B6000,
                          # 170/364 targets on a prologue.)
     subsegments:
