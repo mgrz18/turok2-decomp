@@ -14,7 +14,7 @@ void Model_DecompressCallbackTerminated();
 /* Loads the model resource for key through its 0x18-byte header, then queues an instance of one
  * level of detail of it with the model's own textures, as a loaded matrix (see Render_QueueModelInstance), and
  * releases both. */
-void Render_QueueModelByKey(s32 key, void *matrix, void *lights, s32 lod, s32 pass) {
+void Render_QueueModelByKey(sptr key, void *matrix, void *lights, s32 lod, s32 pass) {
     void **header;
     void **resource;
     s32 *parts;

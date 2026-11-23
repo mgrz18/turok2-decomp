@@ -27,7 +27,7 @@ void CMtxF__Copy(f32 *dst, f32 *src);
 void CMtxF__ScaleColumns(f32 *mtx, f32 x, f32 y, f32 z);
 void CMtxF__ToMtxAffine(f32 *src, Mtx64 *dst);
 void CMtxF__TransformPoint(f32 *mtx, CVector3 *in, CVector3 *out);
-void Render_QueueModelByKey(s32 key, void *matrix, void *lights, s32 lod, s32 pass);
+void Render_QueueModelByKey(sptr key, void *matrix, void *lights, s32 lod, s32 pass);
 
 void CPlayer__DrawScope(CPlayerOverlay *m, CCamera *view) {
     f32 mf[4][4];
