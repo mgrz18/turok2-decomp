@@ -44,10 +44,10 @@ s32 __nextSampleTime(ALSynth *drvr, ALPlayer **client) {
 }
 
 /* func_00294D18 / func_00294C30 */
-s32 _timeToSamples(ALSynth *drvr, s32 micros) {
+s32 _timeToSamplesNoRound(ALSynth *drvr, s32 micros) {
     return (s32)(((f32)micros * (f32)drvr->outputRate * 0.000001f) + 0.5f);
 }
-s32 _timeToSamplesNoRound(ALSynth *drvr, s32 micros) {
+s32 _timeToSamples(ALSynth *drvr, s32 micros) {
     return (s32)(((f32)micros * (f32)drvr->outputRate * 0.000001f) + 0.5f) & ~0xF;
 }
 
@@ -160,7 +160,7 @@ void alSynSetVol(ALSynth *drvr, ALVoice *v, s16 volume, ALMicroTime t) {
         ALParam *u = voice_param(drvr, v, AL_FILTER_SET_VOLUME);
         if (u != NULL) {
             u->data.i = volume;
-            u->moredata.i = _timeToSamplesNoRound(drvr, t);
+            u->moredata.i = _timeToSamples(drvr, t);
             voice_send(v, u);
         }
     }

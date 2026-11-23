@@ -64,7 +64,7 @@ struct ObjectState14_2 {
     s32 unk_10;
 };
 extern void *__allocParam(void);
-extern s32 _timeToSamplesNoRound(void *arg0, s32 arg3);
+extern s32 _timeToSamples(void *arg0, s32 arg3);
 void alSynSetVol(void *arg0, void *arg1, s16 arg2, s32 arg3) {
     s32 new_var;
     void *Shared_func_802B3480_de_v0;
@@ -77,7 +77,7 @@ void alSynSetVol(void *arg0, void *arg1, s16 arg2, s32 arg3) {
             ((ObjectState14_2 *)(Shared_func_802B3480_de_v0))->unk_8 = 0xB;
             ((ObjectState14_2 *)(Shared_func_802B3480_de_v0))->unk_C = (s32) arg2;
             ((ObjectState14_2 *)(Shared_func_802B3480_de_v0))->unk_4 = new_var;
-            ((ObjectState14_2 *)(Shared_func_802B3480_de_v0))->unk_10 = _timeToSamplesNoRound(arg0, arg3);
+            ((ObjectState14_2 *)(Shared_func_802B3480_de_v0))->unk_10 = _timeToSamples(arg0, arg3);
             ((ObjectState14_2 *)(Shared_func_802B3480_de_v0))->unk_0 = 0;
             temp_a0 = ((struct Draw *) ((ObjectStateC_2 *) arg1)->unk_8.v1)->model;
             fn = ((CallbackStateC_4 *)(temp_a0))->callback;
