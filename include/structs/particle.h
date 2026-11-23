@@ -198,7 +198,7 @@ typedef struct CParticle {
     /* 0x168 */ CVector3 m_vRotSpeed;
     /* 0x174 */ f32 m_Alpha;
     /* 0x178 */ f32 m_WobblePhase[2];
-    /* 0x180 */ u8 unk_180[0x188 - 0x180];
+    /* 0x180 */ f32 m_WobbleFreq[2];      /* phase step per frame (CParticle__Wobble) */
     /* 0x188 */ f32 m_WobbleAmplitude[2];
     /* 0x190 */ u32 m_dwHitFlags;         /* the collision test's flags (Collision_MoveInstance) */
     /* 0x194 */ s8 m_ObjectImpact;        /* 1: it dies when it hits an object */
