@@ -63,7 +63,11 @@ def symbols(elf_path):
     # module-2 data at its link address).
     for f in ("symbols_manual.us.txt", "symbols_names_ld.us.txt", "symbols_names.us.txt"):
         for m in MANUAL.finditer((ROOT / "versions" / f).read_text()):
-            out.setdefault(m.group(1), int(m.group(2), 16))
+            a = int(m.group(2), 16)
+            # a new name for an ELF func_/D_<a>: where that symbol links (a module-2
+            # copy links 0x39000 below its VM address)
+            a = out.get("func_%08X" % a, out.get("D_%08X" % a, a))
+            out.setdefault(m.group(1), a)
     return out
 
 
