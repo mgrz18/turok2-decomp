@@ -1,0 +1,247 @@
+// n9 (round 21, part j1): the C functions rounds N1-N3 left as func_. Evidence per line: callers,
+// the data table slot, Rage Wars/Turok 3 counterparts, and the code. Module-2 copies (_2) were paired
+// with the first module by code (masked words, ref.elf), at the link address or + 0xE0.
+Material_GetTextureSet = 0x00207914; // CScene__GetTextureSet(&gScene, set, &Material.texture, +4): fills a material's texture ROM address/size; callers Material_Unpack, Trail_AddNode, CEmitter__Start, CParticleSystem__Spawn
+Render_BeginDeferredAlpha = 0x00209658; // Render_DrawBatches calls it before the opaque nodes set aside (material flag 0x4000, drawn with their alpha as primitive colour): texture/tile/fog setup + render mode 0x1D; Rage Wars RENDER_4/8026AC38 func_8026AC38_de
+Render_SetupFog = 0x0020B554; // once a frame from CEngineApp__Draw: Render_InvalidateModeCache, then gFogGeometryMode/gFogRenderModeFogA/ShadeA by gFogEnabled
+Render_QueueModelByResource = 0x0020B9F4; // model.h: "Render_QueueModelByKey / func_0020B9F4 load the model": requests the model resource + LOD, adds an instance to the model batch (sBatchInstances); callers CParticleSystem__Draw, CParticle__DrawModel
+Render_DrawModelImmediate = 0x0020BBE4; // draws a model's group display lists at once (matrix, lights, render mode, segment 6) instead of batching; caller EnemyAI_DrawFaded
+Render_ClearSortTrees = 0x0020BFC0; // clears sOpaqueSortFirst/Root and sTranslucentSortFirst/Root; precedes Render_SortTreeFind/Insert
+Math_ModFloor = 0x00213F2C; // a - floor(a / b) * b (0 when b == 0); math block (CMtxF__/CQuaternion__ neighbours)
+Anim_CalcKeyCount = 0x00216964; // ceil(a / b * 30) (or * 15 when that is >= 90, else a): keys at 30/15 fps; between Anim_DecodeTracks and Anim_Decompress
+Anim_GetBoneTranslation = 0x0021794C; // bone arg1's translation: the raw key when the index is -1, else CVector3__Lerp between two keys of the CISet block; pairs with Anim_GetBoneRotation
+Anim_GetBoneRotation = 0x002179F0; // bone arg1's quaternion: the raw s16 key * 1/32767 when the index is -1, else CQuaternion__Slerp between two keys
+Bits_PokeFloat = 0x00217EFC; // writes a float quantized to {bits, start, delta} at a bit address without advancing: the writer of Bits_PeekFloat (0x00217E4C)
+Bits_GetFloat = 0x0021813C; // the float field idx of a packed array (base + bits * idx), dequantized; Rage Wars rw_junk func_00260CBC; Bits_ block
+Bits_GetField = 0x00218248; // unsigned field arg1 of width bits from a bit array (base + width * arg1); Bits_ block (Bits_Peek/Read neighbours)
+Bits_GetFieldNegative = 0x002182EC; // Bits_GetField with every bit above the width set (value | -1 << width): a negative field
+Bits_ReadRangedFloat = 0x00218398; // reads n bits at the cursor, maps them to [min, min + range], advances the cursor by n; Rage Wars rw_junk func_00260F18
+Bits_ReadAt = 0x002184AC; // reads width bits at *stream and advances *stream (Bits_Read on a bare bit address)
+AnimCurve_EvaluateAt = 0x0021852C; // Anim_DecodeCurveChannel's call: passes the track and time to AnimCurve_Evaluate
+Bits_ForPrecision = 0x002189EC; // smallest n with 2^n >= 1 + 1 / (2x): the bits a quantized value needs for precision x; Bits_ block
+BitAddr_GetShift = 0x00218AAC; // bit address & 0x1F: the shift inside the word (BitAddr_FromPointer/ToPointer neighbours)
+Bits_CeilLog2 = 0x00218AB4; // index of the highest set bit, + 1 when more than one bit is set: ceil(log2(x))
+CGameObjectInstance__AlignToGround = 0x0021A500; // turns the actor's ground quaternion (m_qGround) toward GameObject_GetGroundRotation (TurnToward or SlerpFast by gFrameIncrement); callers CGameObjectInstance__UpdateAnimation, CPlayer__Update; Rage Wars func_00246FF4
+CGameObjectInstance__GetAutoAimRotation = 0x0021B038; // the registered object (alive, gScene.m_pRegistered) closest to the actor's facing inside a cone of angle degrees, and the rotation toward it; Rage Wars func_00247BA4
+CGameObjectInstance__WobbleBone = 0x0021B59C; // rotates a bone matrix about its origin by sWobbleSineTable by time and flag mode; caller CGameObjectInstance__PoseBone
+CGameObjectInstance__InitAIType = 0x0021E5D4; // runs gIntelligenceTypeInfo[m_Type].init on the actor and its m_AI (players' weapon actors: gWeaponActorTypeInfo); callers CInstancePool__Spawn/SpawnCopy, CScene__LoadLevel, MenuItem_DrawModel
+CGameObjectInstance__EmitFlaggedHotPoints = 0x0021EE44; // GameObject_EmitHotPoints for each hot point whose bit is set in the actor's 0x14C mask
+CGameObjectInstance__TraceMoveLocal = 0x0021EF40; // GameObject_TraceMove to a point given in the actor's local frame (the camera's frame for a player)
+GameObject_IsFacingRegionNormal = 0x0021F080; // inside the region's height span and facing against the region normal (CGameRegion__GetNormalRaw . forward < 0); caller AI_UpdateRegionFlags; Rage Wars func_0024BCF8
+CGameObjectInstance__UpdateAI = 0x0021F1B4; // CAI__Update(actor, &actor->m_AI); callers drawActor, CPlayerPool__AnimateWeapons, CScene__LoadLevel, CPlayer__RebuildWeaponActor
+CGameObjectInstance__SetHotPointFlag2 = 0x0021F1D0; // sets or clears bit 2 of m_dwHotPointFlags
+CGameObjectInstance__GetGeometryKind = 0x0021F1F8; // byte 0x66 of the geometry's first part (block 3/0/1), -1 without geometry; callers GameObject_GetFloorKind, Actor_SpawnParticle
+CGameObjectInstance__GetObjectScale = 0x0021F2B0; // the half-float at 0x1E of the object's first section (1.0 when not loaded/flag 0x40000 clear); next to CGameObjectInstance__GetAverageScale; caller GameObject_EmitHotPoints
+CGameObjectInstance__GetRootOffset = 0x0021F428; // root bone position of the anim (GetBonePosition bone 0), rotated by the yaw and scaled: the root motion offset
+CGameObjectInstance__SendAnimImpactEvents = 0x0021F4E8; // anim events of type 6-7 sent with ImpactEvent_Send at the oriented event position; Rage Wars func_0024C1B4
+CGameObjectInstance__ApplyRootMotion = 0x0021F668; // moves the actor (GameObject_TraceMove) by the root bone's travel since time 0, rotated and scaled; Rage Wars func_0024C33C
+CGameObjectInstance__SwingBone = 0x0021F7F4; // rotates a bone matrix about its origin by gSwingAmplitudes[25 - step] and counts the swing step down
+Anim_LerpVector = 0x0021F974; // out = a + t (b - a) on 3 floats; next to Anim_GetBoneTranslationLerp (0x0021FA2C)
+Anim_LerpQuaternion = 0x0021F9C4; // out = a + t (b - a) on 4 floats; next to Anim_GetBoneRotationLerp
+CScene__FindNearestIdleThrowable = 0x00225848; // nearest actor of AI type 5 (throwable) in the scene's kind-5 list with Throwable_GetModeAnim 0; caller AI_FindBestTarget
+CScene__FindNearestCover = 0x0022594C; // nearest actor of the scene's list 6 (m_pList6, the cover targets of the port note); caller AI_FindBestTarget
+CScene__FindNearestIdleThrowableB = 0x002259D0; // CScene__FindNearestIdleThrowable over list 7 (m_pList7); caller AI_FindBestTarget
+CScene__ReplaceLeader = 0x00225AD4; // detaches the first actor linked (0x1A8) to a leader and relinks every other follower onto it; returns the new leader
+CScene__BroadcastNoise = 0x00225C08; // AI_HearNoise on every kind-1 actor (m_pKind1/m_nKind1); callers GameObject_PlayLandSound, CParticleSystem__Spawn
+CScene__GetPathHeader = 0x00226134; // block 0 of path arg1 (m_pPaths, unk_68); caller CPathTrack__Advance
+CScene__GetPathPoint = 0x00226160; // point arg2 of path arg1 (block 1: size word, points from +8); caller CPathTrack__GetCurrentPoint
+CScene__FindNearestPathPoint = 0x002261A8; // index of the path point nearest to pt; callers CPathTrack__StartAtNearestPoint, EnemyAI_AttackWait; Rage Wars func_0028D268
+SceneActor_Init = 0x00227664; // gLevelActorIntelligence, type 3; callers SceneActorPool_Construct(_2)
+Scheduler_RDPDoneHook = 0x00228BBC; // empty; called from __scHandleRDP
+CParticle__AddDrawModeBits = 0x002316A0; // ORs CParticle__GetDrawMode << 30 into a draw flags word; callers Trail_AddNode, 0x0023685C
+CParticle__GetDrawMode = 0x00231778; // 2 for a flagged (0x2) particle of an effect flagged 0x02000000, 1 when the setting unk17 is 2, else 0
+CParticle__InitHeader = 0x002317C0; // gParticleIntelligence, type 2, clears the targets: the particle's object header setup
+CParticle__Release = 0x0023181C; // a particle's end: marks the player's ammo for type 0x68, frees its source particle, stops the loop sounds
+CParticle__IsBelowWaterSurface = 0x00232684; // in a water region whose info is flagged 0x1000000 and at or below m_WaterHeight
+CParticleSystem__InsertDrawSorted = 0x00232D68; // inserts into m_DrawList after a particle of the same effect, else head/tail by effect flag 0x2000; sets flag 0x01000000
+Random_UpTo = 0x00232E1C; // Random_Next() % (n + 1), 0 for n == 0
+CParticle__GetSpriteRotX = 0x00232EAC; // m_vRot.x when the effect has no model, else 0
+CParticle__GetSpriteRotY = 0x00232ECC; // m_vRot.y when the effect has no model, else 0
+SwooshSystem_DrawDecals = 0x00235C30; // draws the CSwooshSystem's ground decals (m_DecalLists) inside gCameraVisibleBox, frees the others to m_FreeDecals; caller CCamera__DrawScene
+SwooshSystem_AddBonePoints = 0x002360A0; // adds a node (Swoosh_NewNode) at the bone matrix to every live swoosh owned by the object; caller CGameObjectInstance__BuildBoneMatrices
+ScriptAnimator_AddToBlend = 0x00236390; // adds the ScriptAnimator's rgb/alpha/value into gBlendState_m_Color; next to ScriptAnimator_Apply (unreferenced)
+Color_ClampByte = 0x0023640C; // clamps a float colour channel to 0..255 (unreferenced, among the ScriptAnimator functions)
+SwooshSystem_AddTimer = 0x00236444; // allocates a SwooshTimer from m_TimerPool: callback, arg, period, repeat count (unreferenced)
+SwooshSystem_PlaceDecal = 0x002364A4; // places a ground decal of a kind at pos facing dir (a free one, else the oldest of its list); caller CParticle__HitInstanceBody; Rage Wars func_002A6BD4
+Trail_LoadTexture = 0x0023685C; // a trail's texture (record + 0x34, -1 none) into its model via CScene__GetTextureSet (func_00207914) (unreferenced)
+Swoosh_ReleaseOwner = 0x002368B0; // drops the swoosh's owner (decrementing m_ActiveSwooshes of the game object / particle by flags 1/2) and lets it fade out; caller Swoosh_Update
+Sprite_FromImage = 0x00236928; // fills a Sprite (data, format, size x3.125, texture extents) from an Image header (unreferenced)
+Swoosh_UpdateNodeFromOwner = 0x00236A34; // a swoosh node follows its owner's bone matrix for this frame (gEvenOdd), or copies last frame's when the owner is gone; Rage Wars func_002A7164 (unreferenced)
+Swoosh_AddNodeFromMtx = 0x00236C64; // adds a node (Swoosh_NewNode) from a particle's matrix to a live swoosh it owns, scaled 0.01 (0.2926 with a model) (unreferenced)
+SwooshSystem_FindSwoosh = 0x00236D10; // the live swoosh with this owner object and context id, else NULL (unreferenced)
+SwooshSystem_DrawTrails = 0x00236D50; // places, frames and draws (Trail_DrawTextured/Untextured) every swoosh, the negative-layer ones first; Rage Wars func_002A7480 (unreferenced)
+ImpactEvent_FloodRegionFlag4 = 0x00237FAC; // traces to pos (GameObject_TraceMove) and sets/clears flag 4 over the region found (CGameRegion__FloodSetFlag4/ClearFlag4); callers the door impact events 6/7
+ImpactEvent_PlayPitchedSound = 0x0023801C; // gImpactEventHandlers[0]: Sound__PlayPitched of the event's id at pos, on the actor, pitch by the cheat flags 0x40/0x20
+ImpactEvent_SpawnParticle = 0x00238134; // gImpactEventHandlers[1] and [8]: Actor_SpawnParticle of the event's particle at pos
+ImpactEvent_FirePlayerShot = 0x00238500; // spawns particle 0xE9 from the player's view at pos and starts a rumble (unreferenced, impact-event signature, among the handlers)
+ImpactEvent_Null5 = 0x0023881C; // gImpactEventHandlers[5]: empty
+ImpactEvent_DoorOpen = 0x00238824; // gImpactEventHandlers[6] (a door opening): ImpactEvent_FloodRegionFlag4 set
+ImpactEvent_DoorClose = 0x00238858; // gImpactEventHandlers[7] (a door closing): ImpactEvent_FloodRegionFlag4 clear
+ImpactEvent_Null10 = 0x0023890C; // gImpactEventHandlers[10]: empty
+ImpactEvent_StartShakeType1 = 0x00238958; // gImpactEventHandlers[12]: CCameraPool__StartShake of the event's amplitudes and radius, type 1
+ImpactEvent_StartShake = 0x002389EC; // gImpactEventHandlers[13]: the same with shake type 0
+ImpactEvent_PlayTeamSound = 0x00238EE4; // gImpactEventHandlers kind after ImpactEvent_LevelSpecial: Sound__PlayPitched only for the event's team / vis-bit
+ImpactEvent_SpawnTeamParticle = 0x00238FD4; // next handler: Actor_SpawnParticle only for the event's team / vis-bit
+ImpactEvent_BlastSameHeight = 0x00239058; // next handler (flags 7): ImpactEvent_ApplyBlast (0x400000) when within 76.8 vertically; Rage Wars func_002683F0
+ImpactEvent_PlayFloorSound = 0x00239254; // handler after ImpactEvent_ClearHotPoint/SpawnAnimInstance: plays the sound when GameObject_GetFloorKind matches the event's kind (footsteps); Rage Wars func_00268768
+ImpactEvent_AIStartSound = 0x00239350; // handler after ImpactEvent_PlaySound: AI_StartSound of the event's value on an instance
+ImpactEvent_AIStopSound = 0x00239398; // last handler: AI_StopSound on an instance
+Pickup_FindLifeForceEntry = 0x0023EFCC; // sLifeForcePickups row by id (inlined as FindRowD in func_0023E820.c); between Pickup_FindHealthEntry and Pickup_FindItemEntry
+Pickup_GivePistolClip = 0x0023F21C; // CPlayer__AddAmmo(2, amount) with the fixed message "10 pistol bullets (clip)" (D_800B3C30) and the pickup feedback (unreferenced)
+Pickup_GivePistolAmmo = 0x0023F300; // CPlayer__AddAmmo(2, amount) with the entry's own message (unreferenced; next to Pickup_GiveAmmo)
+CPlayerPool__StopRumble = 0x0025359C; // every active player's controller profile: RumblePool_FreeAll and rumbleLevel 0; between CPlayerPool__EndMatch and __SetInvincibility
+CPlayerOverlay__Lower = 0x00253624; // sets the weapon model's m_Mode (0xB4) to 3 'lowering' unless hidden or already lowering (unreferenced)
+CPlayer__DrawSightIcon = 0x00254768; // HUD sprite 0x1FC frame m_SightIconFrame at the viewport's bottom-right; caller CPlayer__DrawHud
+CPlayer__DrawCenterIcon = 0x00254834; // HUD sprite 0x1FB at the viewport's centre (unreferenced, next to CPlayer__DrawSightIcon)
+EnemyAI_EventNull3 = 0x0025EF1C; // enemy event table D_800B06B8 (gLevelEventHandlers[1]) event 3 onActor: empty
+EnemyAI_EventNull4 = 0x0025EF24; // the same table, event 4 onActor: empty
+EnemyAI_EventPlayCinema = 0x0025EF2C; // Cinema_RequestForObject(actor, value) without Event_PlayCinema's play-mode check (unreferenced)
+EnemyAI_EventPlayCinemaRemote = 0x0025EF48; // Cinema_RequestForObject(0, value), the Event_PlayCinemaRemote pattern (unreferenced)
+GameObject_IsLeader = 0x00267D94; // enemy definition flag 1: CScene__DecompressAnimatedInstances links each follower to the nearest such instance (m_pParent)
+GameObject_IsFollower = 0x00267DBC; // enemy definition flag 2: CScene__DecompressAnimatedInstances gives it the nearest leader as m_pParent
+GameObject_IsLeashed = 0x00267E74; // enemy/turret definition flag 0x10: AI_FindBestTarget and EnemyMode_TeleportIn_Enter keep it within GameObject_GetLeashRadius
+GameObject_CanClimbLedges = 0x00267EA8; // players (in multiplayer m_Player flag 1): Sweep_CrossRegionEdge/Sweep_FollowGround let it climb onto special edges
+GameObject_CanClimbUp = 0x00267EE8; // enemy m_dwEnemyFlags 1: Sweep_CrossRegionEdge lets it step up to a higher region
+GameObject_CanDropDown = 0x00267F10; // players, dead enemies or m_dwEnemyFlags 2: Sweep_CrossRegionEdge lets it go down to a lower region
+GameObject_CanEnterInfoFlag52_80 = 0x00267FD0; // dead enemy or m_dwEnemyFlags 0x800: Sweep_CrossRegionEdge into a region whose CRegionInfo.m_wFlags52 has 0x80 (pairs with GameObject_CanEnterWater)
+GameObject_CanLeaveInfoFlag52_80 = 0x00268014; // m_dwEnemyFlags 0x1000: Sweep_CrossRegionEdge out of such a region
+GameObject_CanEnterInfoFlag400000 = 0x0026803C; // dead enemy or m_dwEnemyFlags 0x10: Sweep_CrossRegionEdge into a region whose CRegionInfo.m_dwFlags has 0x400000
+GameObject_CanLeaveInfoFlag400000 = 0x00268080; // m_dwEnemyFlags 0x20: Sweep_CrossRegionEdge out of such a region
+GameObject_CanEnterRegionFlag1000 = 0x002680A8; // m_dwEnemyFlags 0x200: Sweep_CrossRegionEdge into a region with m_wFlags 0x1000
+GameObject_CanLeaveRegionFlag1000 = 0x002680D0; // m_dwEnemyFlags 0x400: Sweep_CrossRegionEdge out of such a region
+GameObject_CanEnterRegionFlag80 = 0x002680F8; // m_dwEnemyFlags 0x2000: Sweep_CrossRegionEdge into a region with m_wFlags 0x80
+GameObject_CanLeaveRegionFlag80 = 0x00268120; // m_dwEnemyFlags 0x4000: Sweep_CrossRegionEdge out of such a region
+GameObject_CastsShadow = 0x00268160; // enemy/platform/throwable/pickup/interactive anim, or an instance with flags 0x300000; gate of CGameObjectInstance__DrawShadow
+GameObject_IsMover = 0x002681BC; // an instance with m_dwFlags 0x2000 whose current AI mode lacks 0x10000: CScene__FileInstance/__BuildActorLists put it in m_pMovers; Rage Wars func_0024E1A4
+GameObject_TiltsToGround = 0x002682A4; // definition m_dwFlags bit 2: func_0021A500 turns the body toward GameObject_GetGroundRotation only with it
+GameObject_IsInanimate = 0x002682CC; // 0 for enemy/turret/interactive anim/player, 1 otherwise; CParticle__HitTarget picks m_bDieOnImpact vs m_ObjectImpact with it, Sweep_TestBoxFaces
+GameObject_GetCollisionYOffset = 0x0026841C; // instance (type 1): m_CollisionYOffset (0x54); else its definition source 0x20 when inactive; between GetDeadCollisionHeight and GetAttackCombatRadius; callers sweeps/particles; RW SOUND/8024E130_3.CPP func_8024E610_de
+GameObject_GetSweepRadius = 0x00268460; // wall radius of a collision sweep: enemy/turret m_CollisionWallRadius (def 0x2C), throwable radius (0x18), a riding player uses its mount; callers Collision_SweepMapWalls, Path_FitsInRegion
+GameObject_HasFlag1 = 0x00268BE0; // instance (type 1) m_dwFlags & 1, else 0; GameObject_ accessor block (between GetHeightAboveRegionBottom and GetTypeId)
+CGameRegion__GetFloorSurface = 0x0026C0E0; // region info byte 0x58: the surface kind CParticle__HitFloor uses for a flat region
+CGameRegion__GetWallSurface = 0x0026C114; // region info byte 0x59: the surface kind CParticle__HitWall/HitCeiling/HitFloor use when CGameRegion__IsSteep
+CGameRegion__SetFlag80000 = 0x0026C724; // region info m_dwFlags |= 0x80000 (CScene__GetRegionInfo)
+CGameRegion__ClearFlag80000 = 0x0026C764; // region info m_dwFlags &= ~0x80000
+CGameRegion__SetFlag4000 = 0x0026C7A8; // region info m_dwFlags |= 0x4000, then CGameRegion__FloodSetFlag4000Same
+CGameRegion__SetFlag40000 = 0x0026C804; // region info m_dwFlags |= 0x40000
+CGameRegion__ClearFlag40000 = 0x0026C844; // region info m_dwFlags &= ~0x40000
+DList_Init = 0x0026D230; // head = tail = count = 0 of a DList (structs/swoosh.h SwooshLinks); just before DList_AddHead/AddTail/Remove
+LevelEvent_MarkFired = 0x0026E294; // sets the event fired bit (byte 0xE |= 0x20) and, for a once-type (0x11 == 1), fires a copy with mode 2 via LevelEvent_Fire; callers CScene__FireEventsByKeyOnce, LevelEvent_ProcessTriggers
+Event_SetAmbient = 0x0026E44C; // event table slot after Event_SetMusicRemote (ABCA8 rodata, 3 tables): onActor half, Sound__SetAmbientTrack(info)
+Event_SetAmbientRemote = 0x0026E46C; // the onEvent half next to Event_SetAmbient: Sound__SetAmbientTrack(event->param)
+Rumble_SetLink = 0x0026E9EC; // stores the link word at 0x38 (Rumble_ClearLink clears through it); CBarrel code calls it with 0 when the weapon changes
+Sound_RandomVary = 0x002744D0; // arg0 +- Random_Blend(arg1, arg0), as s16; Sound_ helper block (CentsToPitch, RandomVolume)
+SndQueue_LinkHead = 0x002767F8; // pushes a {next, prev} node at the head of *list; between SndQueue_CancelFlags and the SoundEffectInfo accessors
+SoundEffectInfo_GetField08 = 0x00276850; // return info->unk8 (s16 at 0x08); accessor block 0x276820..0x2768BC
+SoundEffectInfo_GetField0A = 0x0027685C; // return info->unkA (s16 at 0x0A)
+SoundEffectInfo_GetField0F = 0x00276880; // return info->unkF (s8 at 0x0F)
+SoundEffectInfo_GetField10 = 0x0027688C; // return info->unk10 (s16 at 0x10)
+Hud_LoadGraphicSet = 0x0027AE00; // CScene__LoadGraphicSet(id, 3, 1) when gPersistentDataLoaded; COnScreen/Hud block (after DrawBossBars, before Hud_GetImageFrame)
+CIntelligence__Init = 0x0027BD10; // clears a definition (m_Type 0, 4 = 1, 0xC/0xE 0, 0x12 = -1); SceneActorPool_Construct calls it on gLevelActorIntelligence(MP) then sets m_Type 8
+Cinema_SetHoldFade = 0x00284380; // sets D_800C1BC4, which keeps Cinema_DrawFade drawing while no cinema is active; Cinema_ block (OverridesMusic1, GetCameraFov)
+CEngineApp__NewGame = 0x002888BC; // CCameraPool__NewGame(app+m_CameraPool) and CPlayerPool__NewGame(app+m_Game); called by the EngineMode Init callbacks (MainMenu, PakCheck, Game, Legal, ExpansionPak)
+CEngineApp__CheckEndCinema = 0x00289F30; // no menu open, cinema script 0x78 playing: stops it at its end once; then 1 when Cinema_IsFinished; RW src/game/func_00294BB0.c
+CEngineApp__StopRumble = 0x00289FE4; // RumblePool_FreeAll(gRumblePool) and every player controller rumble pool (func_0025359C)
+Menu_GetControllerInput = 0x004162E4; // returns &menu->controller->buttonHistory[29] (0xA0), 0 without a controller; Menu_ helpers block (MenuItem_SetModel, Menu_CharWidth)
+Menu_SetPakWatch = 0x00417B74; // (menu, on): Controller_WatchPak / Controller_UnwatchPak of the menu widget port; RW abu_protos
+CharacterMenu_InitAfterPak = 0x004181C8; // init slot of gCharacterMenuAfterPakDesc: Controller_WatchPak(port), gDamagedPakContinued = 0 (like StatsMenu_InitAfterPak)
+SingleMenu_InitAfterPak = 0x00419594; // init slot of gSingleMenuAfterPakDesc: Controller_WatchPak(port), gDamagedPakContinued = 0
+PauseMenu_ResolutionText = 0x0041A1D8; // unreferenced pause-menu twin of OptionsMenu_ResolutionText: flag 0x800000 by GetMemSize, text Video_GetResolutionText
+PauseMenu_ToggleResolution = 0x0041A234; // unreferenced pause-menu twin of OptionsMenu_ToggleResolution: Video_StartResolutionChange
+Pak_ClearDamagedContinued = 0x00421250; // gDamagedPakContinued = 0; callers StatsMenu_SaveProfile, CharacterMenu_LoadSelect, SingleMenu_Load
+PakMenu_UnwatchAndWarp = 0x00421A20; // Controller_UnwatchPak(port), CScene__RequestWarp(gScene_m_PendingWarpID, 2); PakMenu_ block
+PakMenu_GetStatsReturnMenu = 0x00421AEC; // returns gStatsAfterPakMenuDesc1..4 by player (data_g7: StatsMenu_InitAfterPak descs)
+CharNoteMenu_InitSave = 0x004221C4; // init slot of gCharNoteMenuDesc3: clears flags 0x01800000, sCharNoteLoad = 0, D_801309A8 = 1 (after CharNoteMenu_InitLoad/InitDelete)
+SavePortalMenu_IsCinemaPlaying = 0x00422ED8; // Cinema_IsActive && !Cinema_IsFinished; SavePortalMenu_SelectSave inlines it (file comment); before SavePortalMenu_Init
+Video_StartResolutionChange = 0x0042452C; // gVideoClearFrames = 20 when 0 (Video_UpdateResolution applies the mode when it runs out); caller OptionsMenu_ToggleResolution; Video_ block
+CScene__RestoreFiredEvents = 0x0042C79C; // CScene__RestoreFiredEvent on both record tables, cinemas disabled; CScene__LoadLevel before the actors
+CScene__ReapplyFiredEvents = 0x0042C840; // the same over records of kind 1/2/4/10, after the actors are placed (CScene__LoadLevel); RW ovl_a/func_0044E2B8.c
+CScene__FlushDelayedEvents = 0x0042C96C; // fires every delayed event and moves it to the free list; CScene__LoadLevel when a level was loaded; RW func_0044E3E4
+CDLightSet__Construct = 0x0042D120; // CDLightSet: used/free lists, the 8 lights on the free list (no ROM light, fade 1, disabled); CScene__LoadLevel on w->m_DLightSet
+SwooshSystem_Construct = 0x0042D410; // swoosh/timer pools, free nodes, decal lists, then SwooshSystem_Update; CScene__LoadLevel on gEngineApp_m_SwooshSystem
+COnScreen__ResetBossBars = 0x0042EBBC; // m_pBoss/m_pBoss2 = NULL, the two boss overlays constructed and started; CScene__LoadLevel on gEngineApp_m_OnScreen
+DemoStream_CallHandler2 = 0x0042F650; // calls the timer function at 0x1C (DemoStream_Init's last argument); DemoStream_ block
+DemoStream_RunHandler2 = 0x0042F670; // result = timer->unk1C(), count = 0
+DemoStream_Tick = 0x0042F838; // --count; at 0 calls the timer callback (0x14)
+Render_InitUnitQuad = 0x004302A0; // builds the 4-vertex unit XZ quad D_8011AD48 (white, 32x32 texcoords); caller CEngineApp__Construct
+CEngineApp__QuitToLegal = 0x00430330; // stops rumble, clears the match, fadeMode 2, nextMode 1 (EngineMode01_Legal); callers QuitMenu_Yes, GameOverMenu_Poll, ContinueMenu_No, Demo_Update
+CEngineApp__StartCinemaGame = 0x004303AC; // clears the match time, matchMode = first warp (or 0), nextMode 11 (EngineMode11_Cinema); caller PakMessage_SelectOk
+CEngineApp__StartGame = 0x00430454; // clears the match time, matchMode = warp (0 if none), nextMode 13 (EngineMode13_Game); callers MpMenu_Start*, TitleMenu_Single
+Automap_ClearBuffers = 0x00430500; // clears CAutomap counts and the line/yellow/red/magenta vertex buffers (docs/NAMES.md open question); callers EngineMode13_Game_Init, CEngineApp__Construct
+Menu_GetControllerInput_2 = 0x0044F2E4; // module-2 copy of 0x004162E4 (same code at link address)
+Menu_SetPakWatch_2 = 0x00450B74; // module-2 copy of 0x00417B74 (same code at link address)
+PlayerSetupMenu_Play_2 = 0x004510DC; // module-2 copy of PlayerSetupMenu_Play 0x0041812C (+0x38FB0, as EditName_2): opens gRumbleNoticeMenuDesc_2
+CharacterMenu_InitAfterPak_2 = 0x00451178; // module-2 copy of 0x004181C8 (+0x38FB0, after CharacterMenu_Init_2)
+FragTagMenu_StepTimeLimit_2 = 0x004513B4; // module-2 copy of 0x00418454 (+0x38F60, the offset of FragTagMenu_LevelLabel_2): tagTimeLimit 0..30 by 5
+FragTagMenu_TimeLimitLabel_2 = 0x00451408; // copy of 0x004184A8 (+0x38F60): tagTimeLimit text
+FragTagMenu_StepTagLimit_2 = 0x00451490; // copy of 0x00418530 (+0x38F60): tagScoreLimit
+FragTagMenu_TagLimitLabel_2 = 0x004514E4; // copy of 0x00418584 (+0x38F60)
+FragTagMenu_StepLevel_2 = 0x0045156C; // copy of 0x0041860C (+0x38F60): tagArena 0..6
+FragTagMenu_StepTextureSet_2 = 0x0045165C; // copy of 0x004186FC (+0x38F60): tagTextureSet
+FragTagMenu_TextureSetLabel_2 = 0x004516B0; // copy of 0x00418750 (+0x38F60)
+FragTagMenu_StepCrosshairs_2 = 0x0045176C; // copy of 0x0041880C (+0x38F60): tagCrosshairs
+FragTagMenu_CrosshairsLabel_2 = 0x004517BC; // copy of 0x0041885C (+0x38F60)
+BloodLustMenu_StepTimeLimit_2 = 0x00451994; // copy of 0x00418A34 (+0x38F60): dmTimeLimit
+BloodLustMenu_TimeLimitLabel_2 = 0x004519E8; // copy of 0x00418A88 (+0x38F60)
+BloodLustMenu_StepFragLimit_2 = 0x00451A70; // copy of 0x00418B10 (+0x38F60): dmScoreLimit
+BloodLustMenu_FragLimitLabel_2 = 0x00451AC4; // copy of 0x00418B64 (+0x38F60)
+BloodLustMenu_StepLevel_2 = 0x00451B4C; // copy of 0x00418BEC (+0x38F60): dmArena
+BloodLustMenu_LevelLabel_2 = 0x00451BA0; // copy of 0x00418C40 (+0x38F60)
+BloodLustMenu_StepTextureSet_2 = 0x00451CAC; // copy of 0x00418D4C (+0x38F60): dmTextureSet
+BloodLustMenu_TextureSetLabel_2 = 0x00451D00; // copy of 0x00418DA0 (+0x38F60)
+BloodLustMenu_StepCrosshairs_2 = 0x00451DBC; // copy of 0x00418E5C (+0x38F60): dmCrosshairs
+BloodLustMenu_CrosshairsLabel_2 = 0x00451E0C; // copy of 0x00418EAC (+0x38F60)
+TeamBloodMenu_StepTimeLimit_2 = 0x00451E54; // copy of 0x00418EF4 (+0x38F60): teamTimeLimit
+TeamBloodMenu_TimeLimitLabel_2 = 0x00451EA8; // copy of 0x00418F48 (+0x38F60)
+TeamBloodMenu_StepFragLimit_2 = 0x00451F30; // copy of 0x00418FD0 (+0x38F60): teamScoreLimit
+TeamBloodMenu_FragLimitLabel_2 = 0x00451F84; // copy of 0x00419024 (+0x38F60)
+TeamBloodMenu_StepLevel_2 = 0x0045200C; // copy of 0x004190AC (+0x38F60): teamArena 0..13
+TeamBloodMenu_LevelLabel_2 = 0x00452060; // copy of 0x00419100 (+0x38F60)
+TeamBloodMenu_StepTextureSet_2 = 0x0045216C; // copy of 0x0041920C (+0x38F60): teamTextureSet
+TeamBloodMenu_TextureSetLabel_2 = 0x004521C0; // copy of 0x00419260 (+0x38F60)
+TeamBloodMenu_StepCrosshairs_2 = 0x0045227C; // copy of 0x0041931C (+0x38F60): teamCrosshairs
+TeamBloodMenu_CrosshairsLabel_2 = 0x004522CC; // copy of 0x0041936C (+0x38F60)
+DeathmatchMenu_OpenBloodLust_2 = 0x00452400; // copy of 0x004194A0 (+0x38F60, as DeathmatchMenu_OpenTeamBlood_2): opens gBloodLustMenuDesc_2
+DeathmatchMenu_OpenFragTag_2 = 0x0045242C; // copy of 0x004194CC (+0x38F60): opens gFragTagMenuDesc_2
+DeathmatchMenu_OpenWeapons_2 = 0x00452494; // copy of 0x00419534 (+0x38F60): opens gWeaponsMenuDesc_2
+SingleMenu_InitAfterPak_2 = 0x004524F4; // copy of 0x00419594 (+0x38F60)
+TitleMenu_Options_2 = 0x004527B8; // copy of 0x00419858 (+0x38F60): opens gOptionsMenuDesc_2
+TitleMenu_EnterCheat_2 = 0x004527E4; // copy of 0x00419884 (+0x38F60): opens gEnterCheatMenuDesc_2
+TitleMenu_Cheats_2 = 0x00452810; // copy of 0x004198B0 (+0x38F60): opens gCheatsMenuDesc_2
+PauseMenu_MissionStatus_2 = 0x00452A24; // copy of 0x00419AC4 (+0x38F60): opens gMissionStatusMenuDesc_2
+PauseMenu_Inventory_2 = 0x00452A50; // copy of 0x00419AF0 (+0x38F60): opens gInventoryMenuDesc_2
+PauseMenu_Options_2 = 0x00452A7C; // copy of 0x00419B1C (+0x38F60): opens gOptionsMenuDesc_2
+PauseMenu_EnterCheat_2 = 0x00452AA8; // copy of 0x00419B48 (+0x38F60): opens gEnterCheatMenuDesc_2
+PauseMenu_Cheats_2 = 0x00452AD4; // copy of 0x00419B74 (+0x38F60): opens gCheatsMenuDesc_2
+PauseMenu_Quit_2 = 0x00452B00; // copy of 0x00419BA0 (+0x38F60): opens gQuitMenuDesc_2
+SoundMenu_MusicVolumeLabel_2 = 0x00452D64; // copy of 0x00419E04 (+0x38F60): settings unk14 (-16..15 steps of 8)
+SoundMenu_SfxVolumeLabel_2 = 0x00452EA8; // copy of 0x00419F48 (+0x38F60): settings unk15
+PauseMenu_ResolutionText_2 = 0x00453138; // copy of 0x0041A1D8 (+0x38F60): Video_GetResolutionText_2
+PauseMenu_ToggleResolution_2 = 0x00453194; // copy of 0x0041A234 (+0x38F60): calls Video_StartResolutionChange_2 (0x0045D44C)
+Pak_ClearDamagedContinued_2 = 0x0045A170; // module-2 copy of 0x00421250 (same code at link address + 0xE0)
+PakMenu_UnwatchAndWarp_2 = 0x0045A940; // module-2 copy of 0x00421A20 (+0xE0)
+PakMenu_GetStatsReturnMenu_2 = 0x0045AA0C; // module-2 copy of 0x00421AEC (+0xE0)
+CharNoteMenu_InitSave_2 = 0x0045B0E4; // module-2 copy of 0x004221C4 (+0xE0)
+SavePortalMenu_IsCinemaPlaying_2 = 0x0045BDF8; // module-2 copy of 0x00422ED8 (+0xE0)
+Video_ResizeViMode_2 = 0x0045CF28; // module-2 copy of Video_ResizeViMode (+0xE0); caller Video_SetMode_2
+Video_StartResolutionChange_2 = 0x0045D44C; // module-2 copy of 0x0042452C (+0xE0); caller OptionsMenu_ToggleResolution_2
+Pak_DecodeText_2 = 0x0045FBA8; // module-2 copy of Pak_DecodeText (+0xE0)
+MatrixHeap_Construct_2 = 0x00462E40; // module-2 copy of MatrixHeap_Construct (+0xE0); caller CScene__LoadLevel_2
+CScene__DecompressCollision_2 = 0x004645D0; // module-2 copy of CScene__DecompressCollision (+0xE0)
+CScene__StreamAllSections_2 = 0x00464E68; // module-2 copy of CScene__StreamAllSections (+0xE0)
+CScene__FindWarpDests_2 = 0x004650B4; // module-2 copy of CScene__FindWarpDests (+0xE0)
+CScene__FindNearestWarpDest_2 = 0x00465480; // module-2 copy of CScene__FindNearestWarpDest (+0xE0)
+CScene__RestoreFiredEvents_2 = 0x004656BC; // module-2 copy of 0x0042C79C (+0xE0)
+CScene__ReapplyFiredEvents_2 = 0x00465760; // module-2 copy of 0x0042C840 (+0xE0)
+CScene__FlushDelayedEvents_2 = 0x0046588C; // module-2 copy of 0x0042C96C (+0xE0)
+CScene__DecompressPaths_2 = 0x00465C24; // module-2 copy of CScene__DecompressPaths (+0xE0)
+CDLightSet__Construct_2 = 0x00466040; // module-2 copy of 0x0042D120 (+0xE0)
+SwooshSystem_Construct_2 = 0x00466330; // module-2 copy of 0x0042D410 (+0xE0)
+COnScreen__ResetBossBars_2 = 0x00467ADC; // module-2 copy of 0x0042EBBC (+0xE0)
+DemoStream_CallHandler2_2 = 0x00468570; // module-2 copy of 0x0042F650 (+0xE0)
+DemoStream_RunHandler2_2 = 0x00468590; // module-2 copy of 0x0042F670 (+0xE0)
+DemoStream_Tick_2 = 0x00468758; // module-2 copy of 0x0042F838 (+0xE0)
+Render_InitUnitQuad_2 = 0x004691C0; // module-2 copy of 0x004302A0 (+0xE0)
+CEngineApp__QuitToLegal_2 = 0x00469250; // module-2 copy of 0x00430330 (+0xE0); callers QuitMenu_Yes_2...
+CEngineApp__StartCinemaGame_2 = 0x004692CC; // module-2 copy of 0x004303AC (+0xE0); caller PakMessage_SelectOk_2
+CEngineApp__StartGame_2 = 0x00469374; // module-2 copy of 0x00430454 (+0xE0); callers MpMenu_StartFragTag_2...
