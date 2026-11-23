@@ -41,7 +41,6 @@ typedef struct B05P14 {
 typedef struct B05Fx { u8 pad0[8]; void *unk8; f32 unkC; s16 unk10; s16 unk12; s16 unk14; s16 unk16; } B05Fx;
 #endif
 #include "globals/scene.h"
-#define D_8010FF34 ((u8 *) &gScene.m_DLightSet)
 void CDLightSet__Free(u8 *, void *);
 s32 Random_Next();
 B05Fx *CDLightSet__Alloc(u8 *, u8 *);
@@ -55,7 +54,7 @@ static inline void fxupd(B05P14 *p, void **slot, u8 *tab, f32 offz, f32 k1, f32 
     CVector3 off;
     CVector3 v;
     if (fx == ((void *)0)) {
-        fx = CDLightSet__Alloc(D_8010FF34, tab);
+        fx = CDLightSet__Alloc((u8 *) &gScene.m_DLightSet, tab);
         if (fx == ((void *)0)) {
             return;
         }
@@ -78,7 +77,7 @@ void CPlayer__UpdateFlashlight(B05P14 *p) {
         p->timer = 0.0f;
     } else {
         if (p->fx3 != ((void *)0)) {
-            CDLightSet__Free(D_8010FF34, p->fx3);
+            CDLightSet__Free((u8 *) &gScene.m_DLightSet, p->fx3);
             p->fx3 = ((void *)0);
         }
     }
@@ -101,11 +100,11 @@ void CPlayer__UpdateFlashlight(B05P14 *p) {
         }
     } else {
         if (p->fx1 != ((void *)0)) {
-            CDLightSet__Free(D_8010FF34, p->fx1);
+            CDLightSet__Free((u8 *) &gScene.m_DLightSet, p->fx1);
             p->fx1 = ((void *)0);
         }
         if (p->fx2 != ((void *)0)) {
-            CDLightSet__Free(D_8010FF34, p->fx2);
+            CDLightSet__Free((u8 *) &gScene.m_DLightSet, p->fx2);
             p->fx2 = ((void *)0);
         }
     }

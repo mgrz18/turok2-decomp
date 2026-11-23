@@ -1055,12 +1055,6 @@ typedef struct EffectActor {
 } EffectActor;
 #endif
 
-#ifdef TARGET_PORT
-#include "structs/particle.h"
-#define D_8010FF34 (&gScene.m_DLightSet)
-#else
-extern u8 D_8010FF34[];
-#endif
 s16 *CPlayer__GetFiringAmmo(u8 *, s32);
 void CParticle__StopLoopSound(EffectActor *);
 void CParticle__BuildCameraMatrix(EffectActor *);
@@ -1101,7 +1095,7 @@ void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
         }
         /* the light pointer-wide, in the host CParticle's member (the view has the N64 offset) */
         if (((CParticle *) actor)->m_pDLight != NULL) {
-            CDLightSet__Free(D_8010FF34, ((CParticle *) actor)->m_pDLight);
+            CDLightSet__Free(&gScene.m_DLightSet, ((CParticle *) actor)->m_pDLight);
             ((CParticle *) actor)->m_pDLight = NULL;
         }
         if (actor->liveCount != NULL) {
@@ -1410,9 +1404,6 @@ _Static_assert(sizeof(Entry) == sizeof(CROMParticleEffect), "Entry");
 _Static_assert(sizeof(ParticleHead) == sizeof(CObjectHead), "ParticleHead");
 #endif
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
-#ifndef TARGET_PORT
-extern u8 D_8010FF34[];
-#endif
 
 extern s32 BinaryRange(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
 extern void CScene__BroadcastNoise(void *, s32, CVector3 *);
@@ -1987,7 +1978,7 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
                     Trail_AddNode(&gEngineApp_m_SwooshSystem, effect, entry->unk6);
                 }
                 if (entry->unk7 != -1) {
-                    ((CParticle *) effect)->m_pDLight = DLight_Spawn(D_8010FF34, entry->unk7);
+                    ((CParticle *) effect)->m_pDLight = DLight_Spawn(&gScene.m_DLightSet, entry->unk7);
                 } else {
                     ((CParticle *) effect)->m_pDLight = NULL;
                 }

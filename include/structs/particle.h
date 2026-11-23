@@ -20,7 +20,7 @@
 #include "structs/game_object.h"
 #include "structs/list.h"
 
-/* A dynamic light (the set at D_8010FF34: DLight_Spawn takes one,
+/* A dynamic light (the set at gScene.m_DLightSet, 0x8010FF34: DLight_Spawn takes one,
  * CDLightSet__Free gives it back). A particle with a light moves it along. */
 typedef struct CDLight {
     /* 0x00 */ struct CDLight *m_pPrev;
@@ -33,7 +33,7 @@ typedef struct CDLight {
     /* 0x16 */ s16 m_bEnabled;
 } CDLight; /* size 0x18 */
 
-/* The scene's dynamic lights (CScene.m_DLightSet, the N64 alias D_8010FF34): eight CDLights
+/* The scene's dynamic lights (CScene.m_DLightSet, 0x8010FF34): eight CDLights
  * on a used and a free list (CDLightSet__Construct builds it; CDLightSet__Alloc/__Free move one
  * between them; DLights_Load walks the used list). */
 typedef struct CDLightSet {
