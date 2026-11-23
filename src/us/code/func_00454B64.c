@@ -1,33 +1,20 @@
 #include "common.h"
+#include "structs/player_options.h"
 
-typedef struct Widget {
-    /* 0x00 */ u8 pad0[0x28];
-    /* 0x28 */ u8 unk28;
-    /* 0x29 */ u8 unk29;
-    /* 0x2A */ u8 unk2A;
-    /* 0x2B */ u8 unk2B;
-    /* 0x2C */ u8 unk2C;
-    /* 0x2D */ u8 unk2D;
-    /* 0x2E */ u8 unk2E;
-    /* 0x2F */ u8 unk2F;
-    /* 0x30 */ u8 unk30;
-    /* 0x31 */ u8 unk31;
-    /* 0x32 */ u8 unk32;
-} Widget;
 
-void PlayerOptions_SetDefaultName_2(Widget *w);
+void PlayerOptions_SetDefaultName_2(CPlayerOptions *w);
 
-void PlayerOptions_SetDefaults_2(Widget *w, u8 arg1) {
-    w->unk29 = 0x80;
-    w->unk2A = 0x80;
-    w->unk28 = 0;
-    w->unk2C = 0;
-    w->unk2B = 0;
-    w->unk2D = 1;
-    w->unk2E = 0;
-    w->unk2F = arg1;
-    w->unk30 = 0;
-    w->unk31 = 1;
-    w->unk32 = 0;
+void PlayerOptions_SetDefaults_2(CPlayerOptions *w, u8 arg1) {
+    w->m_SettingX = 0x80;
+    w->m_SettingY = 0x80;
+    w->m_bActive = 0;
+    w->m_ControlSide = 0;
+    w->m_ControlType = 0;
+    w->m_bLookSpring = 1;
+    w->m_bAutoAim = 0;
+    w->m_nController = arg1;
+    w->m_nCharacter = 0;
+    w->m_WeaponSelect = 1;
+    w->m_Handicap = 0;
     PlayerOptions_SetDefaultName_2(w);
 }
