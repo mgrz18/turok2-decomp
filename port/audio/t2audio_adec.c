@@ -34,7 +34,7 @@
 #define ADEC_BANDENDS_VRAM 0x800B8A88u   /* gAdecBandEnds, u16[16] */
 #define ADEC_STEPS_VRAM 0x800B8AA8u      /* gAdecStepSizes, f32[64] */
 #define ADEC_MAX_SEGS 32
-#define ADEC_SLOTS 6 /* adecNextFrame's ring of decoded frames (D_80125EF0, 6 x 0x200) */
+#define ADEC_SLOTS 6 /* adecNextFrame's ring of decoded frames (sAdecOutputFrames, 6 x 0x200) */
 
 typedef struct {
     s32 kind, start, len;
