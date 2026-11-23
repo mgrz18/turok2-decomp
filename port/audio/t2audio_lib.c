@@ -7,7 +7,8 @@
  * (TimedNode.time at 0x10 = the low half of ALPlayer.handler on the host, Shape_typemap_71's
  * paramSamples at 0x1C, IntegerStateDC_2's offset at 0xD8, ...), so the game's audio frame
  * spun in alAudioFrame (__nextSampleTime never found the client that was due). Those files are
- * out of the link (port/cmake/link.cmake). */
+ * out of the link (port/cmake/link.cmake); in a merged module (save.c, resample.c, sndplayer.c)
+ * the replaced function is under #ifndef TARGET_PORT instead. */
 #include "common.h"
 #include "structs/libaudio.h"
 

@@ -1,11 +1,51 @@
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/sdk/libgultra/part_800C7F20/code_802B7520_5.c, func_802B2650_de.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+
+#include "rw/abu_types.h"
+#include "globals/libaudio.h"
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/sdk/libgultra/part_800C7F20/code_802B7520_5.c, func_802B2780_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/sdk/libgultra/part_800C7F20/code_802B7520_6.c, func_802B2BBC_de.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-s32 _DivS32ByF32(s32 val, f32 div);
-extern void _handleEvent(ALSndPlayer * arg0, ALSndpEvent * arg1);
+#include "rw/abu_types.h"
+#include "common.h"
+
+s32 _sndpVoiceHandler(void *node);
+extern void *alHeapDBAlloc(u8 *, s32, ALHeap *, s32, s32);
+extern void alEvtqNew(ALEventQueue *, ALEventListItem *, s32);
+extern void alSynAddPlayer(ALSynth *, ALPlayer *);
 extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, s32);
+extern s32 alEvtqNextEvent(ALEventQueue *, ALEvent *);
+
+void alSndpNew(ALSndPlayer *sndp, ALSndpConfig *c)
+{
+    u8 *ptr;
+    ALEvent evt;
+    ALSoundState *sState;
+    u32 i;
+    sndp->maxSounds = c->maxSounds;
+    sndp->target = -1;
+    sndp->frameTime = 16000;
+    sState = (ALSoundState *)alHeapDBAlloc(0, 0, c->heap, 1, c->maxSounds * sizeof(ALSoundState));
+    sndp->sndState = sState;
+    for (i = 0; i < c->maxSounds; i++)
+        sState[i].sound = 0;
+    ptr = alHeapDBAlloc(0, 0, c->heap, 1, c->maxEvents * sizeof(ALEventListItem));
+    alEvtqNew(&sndp->evtq, (ALEventListItem *)ptr, c->maxEvents);
+    sndp->drvr = &alGlobals->drvr;
+    sndp->node.next = 0;
+    sndp->node.handler = _sndpVoiceHandler;
+    sndp->node.clientData = sndp;
+    alSynAddPlayer(sndp->drvr, &sndp->node);
+    evt.type = 5;
+    alEvtqPostEvent(&sndp->evtq, (ALEvent *)&evt, sndp->frameTime);
+    sndp->nextDelta = alEvtqNextEvent(&sndp->evtq, &sndp->nextEvent);
+}
+s32 _DivS32ByF32(s32 arg0, f32 arg1);
+void _handleEvent(ALSndPlayer *sndp, ALSndpEvent *event);
 extern s32 alSynAllocVoice(ALSynth *, ALVoice *, ALVoiceConfig *);
 extern void alSynStartVoice(ALSynth *, ALVoice *, void *);
 extern void alSynSetPan(ALSynth *, ALVoice *, u8);
@@ -14,7 +54,8 @@ extern void alSynSetPitch(ALSynth *, ALVoice *, f32);
 extern void alSynSetFXMix(ALSynth *, ALVoice *, u8);
 extern void alSynStopVoice(ALSynth *, ALVoice *);
 extern void alSynFreeVoice(ALSynth *, ALVoice *);
-extern void _removeEvents(ALEventQueue *, ALSoundState *);
+void _removeEvents(void *arg0, sptr arg1);
+
 void _handleEvent(ALSndPlayer *sndp, ALSndpEvent *event)
 {
     ALVoiceConfig vc;
@@ -125,4 +166,90 @@ void _handleEvent(ALSndPlayer *sndp, ALSndpEvent *event)
         default:
             break;
     }
+}
+
+extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, ALMicroTime);
+
+s32 _sndpVoiceHandler(void *node)
+{
+    ALSndPlayer *sndp = (ALSndPlayer *)node;
+    ALSndpEvent evt;
+    ALSndpEvent *next = (ALSndpEvent *)&sndp->nextEvent;
+    do {
+        switch (sndp->nextEvent.type) {
+            case 5:
+                evt.common.type = 5;
+                alEvtqPostEvent(&sndp->evtq, (ALEvent *)&evt, sndp->frameTime);
+                break;
+            default:
+                _handleEvent(sndp, next);
+                break;
+        }
+        sndp->nextDelta = alEvtqNextEvent(&sndp->evtq, &sndp->nextEvent);
+    } while (sndp->nextDelta == 0);
+    sndp->curTime += sndp->nextDelta;
+    return sndp->nextDelta;
+}
+
+#ifndef COMMON_H
+#ifdef TARGET_PORT
+typedef __INTPTR_TYPE__ sptr;
+typedef __UINTPTR_TYPE__ uptr;
+#else
+typedef signed int sptr;
+typedef unsigned int uptr;
+#endif
+#endif
+
+s32 osSetIntMask(s32);
+s32 alUnlink(void *);
+s32 alLink(void *, void *);
+
+#ifndef TARGET_PORT /* the port defines _removeEvents in port/audio/t2audio_lib.c */
+void _removeEvents(void *arg0, sptr arg1)
+{
+  long long new_var;
+  s32 temp_s3;
+  void *temp_s1;
+  void *var_s0;
+  temp_s3 = osSetIntMask(1);
+  var_s0 = *((void **) (((s8 *) arg0) + 8));
+  if (var_s0 != 0)
+  {
+    do
+    {
+      temp_s1 = *((void **) (((s8 *) var_s0) + 0));
+      if ((*((s32 *) (((s8 *) var_s0) + 0x10))) == arg1)
+      {
+        new_var = 0;
+        if (temp_s1 != new_var)
+        {
+          *((s32 *) (((s8 *) temp_s1) + 8)) = (s32) ((*((s32 *) (((s8 *) temp_s1) + 8))) + (*((s32 *) (((s8 *) var_s0) + 8))));
+        }
+        alUnlink(var_s0);
+        alLink(var_s0, arg0);
+      }
+      var_s0 = temp_s1;
+    }
+    while (var_s0 != 0);
+  }
+  osSetIntMask(temp_s3);
+}
+#endif /* !TARGET_PORT */
+
+void __assert(void *, void *, s32); /* extern */
+
+s32 _DivS32ByF32(s32 arg0, f32 arg1) {
+    f64 temp_f0;
+    s32 var_v0;
+
+    if (arg1 == 0.0f) {
+        __assert("EX", "audio/sndplayer.c", 0x11D);
+    }
+    temp_f0 = (f64) ((f32) arg0 / arg1);
+    var_v0 = 0x7FFFFFFF;
+    if (!(2147483647.0 < temp_f0)) {
+        var_v0 = (s32) temp_f0;
+    }
+    return var_v0;
 }

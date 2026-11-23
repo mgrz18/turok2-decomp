@@ -22,7 +22,7 @@ set(T2_LINK_REPLACED
     func_0029DE00.c   # osDestroyThread
     # time (t2ultra.c: virtual clock)
     # VI
-    func_0029A720.c   # osCreateViManager
+    vimgr.c           # osCreateViManager, viMgrMain (the merged module)
     # SP / DP
     func_0029A248.c   # osSpTaskLoad
     func_0029A34C.c   # osSpTaskStartGo
@@ -147,10 +147,7 @@ set(T2_LINK_REPLACED
     func_00294BDC.c   # _collectPVoices
     func_00294B9C.c   # _freePVoice
     func_00294200.c   # alSynSetFXMix
-    func_00293BA8.c   # _removeEvents
     func_002954F8.c   # alSaveNew
-    func_002973E0.c   # alSaveParam
-    func_00296690.c   # alResampleParam
     func_0026FFA0.c   # AudioDMA_CacheBlock
     # libultra's compressed sequence player, cseq.c and the shared seqplayer.c helpers (Rage Wars
     # views at N64 offsets, s32 pointers): port/audio/t2audio_csp.c (docs/port/AUDIO.md §9)
@@ -172,7 +169,6 @@ set(T2_LINK_REPLACED
     func_002A122C.c   # adecNextFrame
     func_002A12CC.c   # adecGetStopFlag
     func_002A12DC.c   # adecClearStopFlag
-    func_0029F958.c   # alAdecPull
     # the scheduler, typed for the host (port/game/t2sched.c: its views overran on LP64)
     func_0028A020.c   # __scMain
     func_0028A17C.c   # __scHandleRetrace
