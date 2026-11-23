@@ -48,6 +48,7 @@ CPP_FLAGS = ["-P", "-undef", "-Wall", "-lang-c", "-D_LANGUAGE_C", "-DF3DEX_GBI_2
 CC_FLAGS = "-quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64"
 FLAGS_LINE = re.compile(r"^/\* cc1-flags: (.*) \*/$", re.M)
 OPERAND = re.compile(r"\b([A-Za-z_][A-Za-z0-9_.]*)((?:\s*[+-]\s*(?:0x[0-9a-fA-F]+|\d+))*)")
+ADDR_NAME = re.compile(r"D_[0-9A-F]{8}")
 MANUAL = re.compile(r"^\s*(\w+)\s*=\s*0x([0-9A-Fa-f]+)\s*;", re.M)
 
 
@@ -96,10 +97,15 @@ def normalize(path, syms):
 
         def resolve(m):
             name = m.group(1)
-            if name not in syms:
+            if name in syms:
+                base = syms[name]
+            elif ADDR_NAME.fullmatch(name):
+                # D_<address>: a base tree's name the rebuilt ELF has renamed
+                base = int(name[2:], 16)
+            else:
                 return m.group(0)
             off = sum(int(t.replace(" ", ""), 0) for t in re.findall(r"[+-]\s*(?:0x[0-9a-fA-F]+|\d+)", m.group(2)))
-            return "@%08X" % ((syms[name] + off) & 0xFFFFFFFF)
+            return "@%08X" % ((base + off) & 0xFFFFFFFF)
         lines.append(OPERAND.sub(resolve, s))
     return lines
 

@@ -12,8 +12,12 @@ The header's type replaces the local one, so run tools/asm_diff.py afterwards;
 a file whose code changes is reverted and listed with --keep (its view then
 gets a `local type` comment), and the run repeated.
 
+A file that cannot include the header (it reads one of the globals through a
+view of another type) keeps its lines; --mark WHY comments them instead.
+
 Usage:
     python3 tools/hoist_externs.py include/globals/menu_text.h [--keep F ...] [FILE ...]
+    python3 tools/hoist_externs.py include/globals/menu_text.h --mark "why" FILE ...
 """
 import argparse
 import re
@@ -39,6 +43,8 @@ def main():
     ap.add_argument("header")
     ap.add_argument("files", nargs="*")
     ap.add_argument("--keep", nargs="*", default=[])
+    ap.add_argument("--mark", metavar="WHY",
+                    help="do not drop: append /* local: WHY */ to the lines (files that cannot include the header)")
     args = ap.parse_args()
     hpath = (ROOT / args.header).resolve()
     names = header_names(hpath)
@@ -58,18 +64,20 @@ def main():
                 ns = NAMES.findall(decl)
                 if ns and all(x in names for x in ns):
                     n += 1
+                    if args.mark:
+                        out.append(line.rstrip() + " /* local: %s */" % args.mark)
                     continue
             out.append(line)
         if not n:
             continue
-        if inc not in out:
+        if inc not in out and not args.mark:
             # after the first #include (never inside a later #ifdef block)
             first = next((i for i, l in enumerate(out) if INCLUDE.match(l)), -1)
             out.insert(first + 1, inc)
         f.write_text("\n".join(out))
         changed += 1
         dropped += n
-    print(f"{hpath.name}: {dropped} local declarations dropped in {changed} files")
+    print(f"{hpath.name}: {dropped} local declarations {'marked' if args.mark else 'dropped'} in {changed} files")
 
 
 if __name__ == "__main__":
