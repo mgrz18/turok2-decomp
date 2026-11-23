@@ -137,9 +137,9 @@ T2Asset over ArchiveManager: 26124 units in t2/units
 t2: boot: arena 32 MB at 0x40200000 (low memory), ROM baserom.us.z64, mainproc started (pri 13)
 game: booted, 120 frames
 Thread 5 "turok2" received signal SIGSEGV, Segmentation fault.
-#0 CHashTable__Construct (capacity=...) at src/us/code/func_00202860.c:35   gHashTable[n].value = 0;
-#1 CCache__Construct (unused=..., id=5) at src/us/code/func_00202BB0.c:130
-#2 CEngineApp__Main (...) at src/us/code/func_00286674.c:52
+#0 CHashTable__Construct (capacity=...) at src/us/code/CHashTable/func_00202860.c:35   gHashTable[n].value = 0;
+#1 CCache__Construct (unused=..., id=5) at src/us/code/CCache/func_00202BB0.c:130
+#2 CEngineApp__Main (...) at src/us/code/CEngineApp/func_00286674.c:52
 #3 trampoline (...) at port/runtime/t2os.c:157
 other game threads: CLoader__Main blocked in t2_osRecvMesg(&gLoader.queue) (func_00201FBC.c:19),
 CDecompressor thread (pri 11) created, not run yet; platform thread in t2os_run_until_idle

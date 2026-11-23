@@ -14,9 +14,9 @@
 # compiled at all; their functions are the host compiler's (libgcc, libm) or port/runtime's.
 
 set(T2_LINK_REPLACED
-    # (The libultra files the N64 build now compiles from lib/ultralib are gone from
-    # src/us/code: versions/ultralib_objects.us.txt, docs/LIBULTRA.md. Only the ones
-    # that still exist are listed.)
+    # (The libultra modules the N64 build compiles from lib/ultralib keep only the copies the
+    # port still uses, in src/port_libultra: versions/ultralib_objects.us.txt, docs/LIBULTRA.md.
+    # Only the files that still exist are listed.)
     # threads, queues, events (t2os.c)
     func_0029B060.c   # osCreateThread
     func_0029DE00.c   # osDestroyThread
@@ -193,7 +193,7 @@ set(T2_LINK_REPLACED
     func_0028B3E8.c   # Sched_SubmitTask
 )
 
-# True if NAME (a src/us/code file name) is module 2 (.virtual_1).
+# True if NAME (a game C file name: src/us/vm2/<module>/func_*.c) is module 2 (.virtual_1).
 function(t2_is_module2 name out)
     set(r FALSE)
     if(name MATCHES "_2\\.c$")

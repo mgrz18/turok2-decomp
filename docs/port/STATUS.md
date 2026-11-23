@@ -6,6 +6,36 @@ new game to the good ending with no invincibility and no life lost, on the N64's
 stream. The Mac app is packaged and ready for its first session in a real window
 ([FIRSTRUN.md](FIRSTRUN.md)); that session has not happened yet.
 
+## Round 23 merge (Phase 5 closes): the reference md5s now
+
+**The default whole-game run's det md5 is `cd2d68ce…`** (600,000 lines; END 2, 5 totems, 0 lives,
+lowest health 28; the one `death:` at 268,360 is the hub after the credits). Boot + 3 demos stay
+`6ab97584…` (52,000 lines). Both on the merged round-23 tree, Linux Release, the default twice.
+
+Round 23 merged l1 (every game C file in its module's directory, `src/port_libultra/`, 14 modules
+merged into one C file each, gendata's declaration order) and then l2 (five host reads at N64
+offsets fixed: `ImpactEvent_ApplyBlast`, `Rumble_SetLink`, `GameObject_GetFloorKind`,
+`PlayerSetupMenu_NameLabel`(`_2`), `OptionsMenu_ResolutionText`). l1 only renamed l2's seven files,
+so git carried l2's edits to the new paths unchanged (each file equals l2's); none of them is in a
+merged module. Both sections follow.
+
+Checks of the merge: `tools/asm_diff.py --base bab902cd -j 8` 0 differ over 3,759 files (the 14
+merged files new); a clean `make setup && make -j8 build && make verify` OK; a fresh `git clone
+--recursive` (ultralib `e24c836`) builds the ROM and `make verify` passes; the nested
+`TARGET_PORT` scan finds the 2 known sites. Port: `gendata` regenerated from scratch, `mklayout.py
+--check` up to date, `aligncheck.py` the 2 known sites; `make -C port test` (rnc, t2asset, typed),
+`gbi_test` 0 mismatches, t2os deterministic (`2b277587…` three times), `t2audio_test --direct 0/40`
+max difference 0 and `--adec` OK, the swoosh self-test OK. abicheck 0 harmful, ptrargs 0 retyped,
+outptr 0 BAD, f2ucheck unchanged; n64viewcheck raw/BAD 11 -> 10, raw/untyped 103 -> 99,
+view/local 183 -> 182 (l2's fixes), the rest the same. The combinations (PLAYTHROUGH.md 45):
+`--lair-push both` END 2, 0 lives (`6e0821fa…`); `--real-weapons 1 --stick-aim 1,2,3,4,5,6
+--hub-wait 0 --assist-keep lair` END 2 but **1 life** in level 2 (`575f069e…`); `--legacy` END 2,
+2 lives, `ac08c89b…` as in round 20.
+
+Phase 5 (README) is complete except three items where work is still possible: the repeated local
+structs (142 names), the 64 BSS interiors that want their struct's members, and merging the other
+modules into one C file each. The rest is done or documented as bound to the ROM.
+
 Round 20 merged five branches, in this order: i1 (**the Mother's arena is brown at last**: the
 packed vertex colour offsets are read big-endian; the menu texts the port never generated; the
 Enter Cheat keyboard; **the automap is drawn**), i3 (**no trail had ever been drawn**: the swoosh
@@ -21,6 +51,78 @@ round 19's merged state and earlier rounds follow as history.
 The matching build is unchanged: `tools/asm_diff.py --base 70f3333c -j 8` reports 0 differences
 over all 3,938 files after every merge and at the end, and a clean `make clean && make setup &&
 make -j8 build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
+
+## Round 23 l1 (Phase 5, readable code, part 3): the files in their modules
+
+Every game C file moved (`git mv`, history follows) into its recovered module's directory:
+`src/us/code/<module>/`, `src/us/vm1/<module>/`, `src/us/vm2/<module>/` (docs/MODULES.md); the 88
+game files of ultralib-built modules that only the port compiles went to `src/port_libultra/`.
+`port/cmake/game.cmake` globs the four trees recursively and orders the list by file name, as the
+one-directory glob did (same archive order, same link order); `link.cmake`'s lists are by file
+name and unchanged. 14 small modules are one C file each (`tools/merge_module.py`; the N64 ROM
+byte-exact). `tools/port/gendata.py` now gathers the declarations in file-name order and keeps that
+order (`imap`): `pick()` breaks a tie between equally common declarations by order, and the new
+paths reordered `compile_commands.json`. One tie shows in `port/gen/relocs.c`: `D_8011AB98`
+(a 169-byte record in func_00417ACC.c, a 64-byte one in func_00417C0C.c) is sized 0xA9 now,
+0xC0 in the round-22 tree; everything else generated is identical.
+
+Linux Release: 3,797 C files (32 hostified), 3,057 linked, 752 compile-only, as round 22 (before
+the merges); `aligncheck.py` the 2 known `GameNoteMenu_SelectYes` sites; `mklayout.py --check` up
+to date (the layout changed only in `STT_FILE` paths and the merged objects' `gcc2_compiled.`
+markers). Boot + 3 demos det `6ab97584…` (52,000 lines) and the default whole-game run det
+`dc8126d3…` (600,000 lines, one `death:` at 263,578) on the moved tree; on the merged tree the
+demos `6ab97584…` and the whole game `dc8126d3…` again (the same `death:` line), with `relocs.c` as above. N64: a clean `make setup`, build and `make verify` OK; `tools/asm_diff.py --base bab902cd`: 0 differ over 3,759 files (the 14 merged files new to it).
+
+## Round 23, part l2: the two host bugs, and more of the same pattern
+
+Five functions read or wrote an engine struct at its N64 offset on the host. Each now uses the
+member; `tools/asm_diff.py --base bab902cd -j 8` gives 0 of 3,817 files, and a clean `make setup
+&& make -j8 build && make verify` gives the identical ROM. Only the third fix changes play.
+
+| function (file) | the N64 offset | on the host | in play |
+|---|---|---|---|
+| `ImpactEvent_ApplyBlast` (func_00237AFC.c) | `source == (u8 *) owner + 0x288`, `CPlayer.m_WeaponActor` | a place inside `m_CharacterActor` (the member is at 0x348): the test never held | a blast from the player's own weapon actor (melee weapon < 2, or 0x22) is now moved three quarters of the way back to the player, as on the N64. It does not fire in the demos or the default run (counted with a probe build) |
+| `Rumble_SetLink` (func_0026E9EC.c) and its caller `CBarrel__Update` (func_0024BD18.c) | an `s32` at 0x38, `RumbleEffect.owner` | `amplitude.unk4` (owner is at 0x50) | none: `CPlayer.m_pRumble` is never set (the only `Rumble_Start` call passes owner 0), so the call never runs. `m_pRumble` is typed `struct RumbleEffect *` now (it was an incomplete `CGameRumble`) |
+| `GameObject_GetFloorKind` (func_00268E60.c) | `obj + 0x30`, `m_pInstanceBelow` | `m_vWaterDisplacement.y/z` read as a pointer: almost always 0, so the floor kind of what the actor stands on was never asked | the landing sound (`GameObject_PlayLandSound`) and the impact floor sounds (`ImpactEvent_PlayFloorSound`) on an object now use that object's floor kind. **The det log changes** (below) |
+| `PlayerSetupMenu_NameLabel` (func_00418108.c; its module-2 copy func_004510B8.c too) | the text at `MenuItem` +0x14, `Menu.controller` at +0x20 | the text is at 0x18, `controller` at 0x30: the name line got a pointer built from the wrong word | the multiplayer player setup window's name line |
+| `OptionsMenu_ResolutionText` (func_0041C798.c) | the text stored as an `s32` at `MenuItem` +0x14 | half of it into the padding before the text (0x18) | the options window's resolution line |
+
+The first two are the bugs round 22 left open. The other three came from reading the 103
+`untyped` raw sites of `n64viewcheck.py` (round 13 left them unread). Each site was checked
+against its struct's host layout and its callers. The rest are fine: ROM records and ISet blocks
+(kept byte offsets), `GameSettings` / `GameMatch` (no pointers), the cinema's own temp blocks,
+`CAutomap.unk4`, `CAI.m_VisBits` (`MotherBoss_PickWarpAnim`). Or they are dead code: no caller in
+the C and no address in the generated data. These dead standalone functions have the same
+N64-offset reads, and their inlined copies are typed: `GameObject_GetInstanceBelow`,
+`GameObject_GetFloorHeightAt`, `CEmitter__Advance`, `CGameObjectInstance__EmitFlaggedHotPoints`,
+`CPlayer__TopUpHealth`, `CPlayer__UpdateCrouch`, `CPlayer__GetSelectableWeapons`,
+`CPlayerPool__FreePlayers`, `Actor_IsInRegionFlag40`, `CSun__SetSunDir`,
+`CScene__SetLevelBitInLevel`, `CScene__SetSavedBit`, `func_00226D54`, `Generator_SpawnPickup`,
+`Generator_SpawnEffect`, `PauseMenu_ResolutionText`, `PakMenu_GetPort`, `PakMenu_IsSavePortalMenu`.
+They are left as they are.
+
+**The default route on the fixed floor kind.** The level-135 sisters' fight (frame 75,675) is the
+first place where the player lands on an object with the "stands on an instance" flag. That
+landing now plays the object's floor sound, which draws from the random stream, and the run
+diverges from there. It still plays the whole game: END 2 at frame 249,990 (was 245,208), the
+same ending state (`ending 0/1`, cinema 130), and no life lost. The one `death:` line is at
+268,360 (was 263,578), the hub after the credits as before. The lowest health on the route is
+28 (was 38). No re-tuning and no legacy switch were needed. New md5s, Linux Release, this tree:
+
+- boot + 3 demos (26,000 frames, `--pak-blank`): **`6ab97584…`** (52,000 lines), unchanged.
+- the default whole-game run (`aimdrive.py`, 300,000 frames): **`cd2d68ce…`** (600,000 lines; was
+  `dc8126d3…`).
+
+Checks on the fixed tree: n64viewcheck raw/BAD 11 -> 10, the 10 known since round 12
+(STABILITY.md 8). `ImpactEvent_ApplyBlast` is gone, and view/local is 183 -> 182 (the
+`Rumble_SetLink` view). raw/untyped is 103 -> 99 and stride/untyped 19 -> 18 (the fixed
+sites). abicheck has 0 harmful sites, outptr 0 BAD, and aligncheck lists only the 2 known `GameNoteMenu_SelectYes` sites.
+`mklayout.py --check` is up to date.
+
+Functions touched (for the l1 file move): `ImpactEvent_ApplyBlast`, `Rumble_SetLink`,
+`CBarrel__Update` (prototype and call), `GameObject_GetFloorKind`, `PlayerSetupMenu_NameLabel`,
+`PlayerSetupMenu_NameLabel_2`, `OptionsMenu_ResolutionText`. Also `include/structs/player.h`
+(`m_pRumble`) and `tools/ghidra/turok2_types.h`.
 
 ## Round 22 (Phase 5, readable code, part 2): the merge
 
@@ -65,7 +167,7 @@ letterbox in func_0040F240.c and its copy func_00448240.c, lines unchanged since
 files k2 and k3 both retyped); one gone with a deleted libultra file.
 
 **Two host bugs, open for round 23** (k3 found them; both were there at f980f639, kept as they
-were, with a comment):
+were, with a comment; both fixed in round 23, part l2, above):
 
 - `ImpactEvent_ApplyBlast` (func_00237AFC.c) compares the blast's source with `(u8 *)owner +
   0x288`: `CPlayer.m_WeaponActor` on the N64, another field on the host (0x348 there). On the host the test reads
@@ -73,9 +175,8 @@ were, with a comment):
 - `Rumble_SetLink` writes an `s32` at 0x38 of a `RumbleEffect`: the owner pointer on the N64,
   another place on the host.
 
-**Round 23**: move the game files into the recovered modules (`versions/modules.us.txt`,
-docs/MODULES.md); move the port's own copies of libultra's C (the 88 game files of
-ultralib-built modules that only the port links) out of `src/us/code`; the two bugs above.
+**Round 23**: the game files moved into the recovered modules and the port's own copies of
+libultra's C into `src/port_libultra/` (l1, above); the two bugs above (l2).
 
 ## Round 21 (Phase 5, readable code, part 1): the merge
 
@@ -427,7 +528,7 @@ The port is affected only through shared C, and runs as before:
 - **Files others may touch**: `tools/port/gendata.py` (new pass: rerun gendata and DROP the decl
   cache: a declaration changed), `port/app/game.cpp` (the task join around the draw call:
   `drawDL`), `port/game/t2sched.c` (new function at the end), `tools/port/n64trace.py`,
-  `include/globals/automap.h`, `src/us/code/func_004004D8.c`, `func_00213684.c`,
+  `include/globals/automap.h`, `src/us/vm1/Primagen/func_004004D8.c`, `func_00213684.c`,
   `func_0041AEB0.c`; docs FIDELITY 13, RENDER 8.
 
 | commit | what |
@@ -859,7 +960,7 @@ from run to run. In 135 actor 41 (lying on a slope) got other bone matrices at i
   the fix: 5 of 9 ASLR runs to 76,500 took the second path.
 - `--legacy` (290,000 frames, `setarch -R`): END 2 (cinema 370 at 245,402), 5 totems, 2 lives lost in the City Totem as in round 18; md5 `281904eb…` (was `ecb9f9f2…`).
 
-Files: src/us/code/func_00205D7C.c, src/us/code/func_0021B95C.c, port/runtime/t2boot.c,
+Files: src/us/code/CCache/func_00205D7C.c, src/us/code/CGameObjectInstance/func_0021B95C.c, port/runtime/t2boot.c,
 port/game/t2det.c, docs/port/STABILITY.md (13, 12.3 title). Next: re-tune the City Totem on
 the new stream (lowest health 3); the round-18 g2 "third path" (before 38,997) did not show in
 this round's ASLR runs.
@@ -896,7 +997,7 @@ this round's ASLR runs.
   1925 / 779 (the mist dark grey, cyan before); the hub at gf 74/75 (`--start-warp=-61@600` / port
   1399): the same picture on both, so the olive tint is the Mother's arena's own.
 - `refshots.py --start-warp` now takes a level start (a negative warp id failed to pack).
-- Files: `src/us/code/func_00206B30.c`, `src/us/code/func_00206990.c` (asm_diff 0 against
+- Files: `src/us/code/Texture/func_00206B30.c`, `src/us/code/Texture/func_00206990.c` (asm_diff 0 against
   65ec98ec), `port/game/t2tex.c` (new), `port/audio/t2audio_sndp.c` (log + comment),
   `tools/port/n64trace.py`, docs (FIDELITY.md 11, RENDER.md 7.1 row, this section).
 
@@ -1315,7 +1416,7 @@ the host's typed `t2audio_world.c` writes it by name (`padFC`).
 - **`aimdrive.py`**: a watchdog thread unblocks the fifo opens when the game exits first (it used to
   hang forever); `T2_AIM_OPEN_TIMEOUT=SECONDS` kills a game that never opens them (STABILITY.md
   12.2).
-- Files: src/us/code/func_00240800.c, func_002393D0.c, func_00400000.c, func_00221D3C.c,
+- Files: src/us/code/Collision/func_00240800.c, func_002393D0.c, func_00400000.c, func_00221D3C.c,
   func_0025739C.c, func_00463B2C.c; port/runtime/t2os.c/.h; port/game/t2det.c;
   tools/port/aimdrive.py (process handling only), n64viewcheck.py, gdbwatch.py; docs STABILITY.md
   12, 64BIT.md part 8. asm_diff vs ab0bc24c: 0 on every touched src file.
@@ -1588,7 +1689,7 @@ Port tests: `rnc_test` (14,426 streams, 0 failed), `t2asset_test` (26,124 units,
 
 | where | branches | resolution |
 |---|---|---|
-| `src/us/code/func_0042AC0C.c` | f3, f4 | f3's `T2Port_RngAtLoad` and f4's boss-bar reset on `&gEngineApp_m_OnScreen` both in the host body of `CScene__LoadLevel`; f4's second edit sat in the N64-only copy (`#else`) inside a nested `#ifdef TARGET_PORT`: dead code, removed with an older dead particle cast there; the host body's own nested blocks flattened (their `#else` branches were dead) |
+| `src/us/vm1/SceneLoad/func_0042AC0C.c` | f3, f4 | f3's `T2Port_RngAtLoad` and f4's boss-bar reset on `&gEngineApp_m_OnScreen` both in the host body of `CScene__LoadLevel`; f4's second edit sat in the N64-only copy (`#else`) inside a nested `#ifdef TARGET_PORT`: dead code, removed with an older dead particle cast there; the host body's own nested blocks flattened (their `#else` branches were dead) |
 | `tools/port/fullrun.py` | f1, f2, f3, f5 | f2's `T2_LEGACY_SHAKE=1,F` switch and f3's `T2_LEGACY_INTEL9` line both written; f1's pick table and `insert_picks()` beside f2's `n64(lv)`; f1's picks before f5's `--l2-heal` picks (both in 135: f1's between the crypt steps, f5's before the exit step); every option kept (`--n64-props`, `--n64-shake-from`, `--lair-keep`, `--l2-heal`) |
 | `tools/port/playthrough.py` | f2, f3 | `--n64-shake` drops `T2_LEGACY_SHAKE` for the level runs too, `--n64-props` drops `T2_LEGACY_INTEL9` |
 | `port/app/game.cpp`, `port/game/t2debug.c`, `tools/port/aimdrive.py` | f2, f3, f4, f5 | merged as they were: f2's `T2Port_LegacyShakeTick` before `T2_RNG_SET`, f3's `T2_RAW_DUMP` after it; f4's bench block |
@@ -1663,7 +1764,7 @@ Detail: [FIDELITY.md](FIDELITY.md) 7.
 | b01abeef | fullrun.py/playthrough.py: `T2_LEGACY_INTEL9=1`, `--n64-props` |
 | 79048270, 692cac9a, 75b9d18c | seed at CScene__LoadLevel (`T2_RNG_LOAD`, `--rng-load`), `--ticks`, `--audio --draw` |
 
-**For the merge**: src/us/code/func_002261A8.c, func_00465B04.c, func_0042AC0C.c (TARGET_PORT
+**For the merge**: src/us/code/CScene/func_002261A8.c, func_00465B04.c, func_0042AC0C.c (TARGET_PORT
 only); port/game/t2debug.c (`T2Port_LegacyIntel9`, `T2Port_RngAtLoad` appended), port/game/t2det.c
 (`T2Port_RawDump` appended), port/app/game.cpp (the `T2_RAW_DUMP` hook after `T2_RNG_SET`);
 fullrun.py (the `T2_LEGACY_INTEL9` line after `T2_LEGACY_SHAKE`, `N64_PROPS`), playthrough.py;
@@ -2097,7 +2198,7 @@ Detail: [PLAYTHROUGH.md](PLAYTHROUGH.md) 27.
 | 27617d70 | the camera shake radius (func_0042F9B0.c, func_00281C08.c), `T2_LEGACY_SHAKE` in fullrun.py/playthrough.py, `T2_START_WARP`, `T2_RNG_SET`, `--watch-write` |
 | c073c333 | PLAYTHROUGH.md 27 |
 
-**For the merge**: src/us/code/func_0042F9B0.c and func_00281C08.c (TARGET_PORT only);
+**For the merge**: src/us/vm1/Demo/func_0042F9B0.c and func_00281C08.c (TARGET_PORT only);
 port/app/game.cpp (three hooks after `T2_LAIR_PEEK`: `T2_START_WARP`, `T2_RNG_SET`,
 `T2_PRIMAGEN_STAGE`); port/game/t2debug.c and t2bosslog.c (functions appended at the end);
 tools/port/fullrun.py (`env.append("T2_LEGACY_SHAKE=1")` before `env += list(env_extra)` in the
@@ -2462,7 +2563,7 @@ It was in the game library, not t2audio. `tools/port/objbisect.py` (c5's lost `b
 tool) mixes the objects of a `-DT2_AUTO_VAR_INIT=none` and a `zero` Release tree and bisects on the
 det log. Two functions:
 
-- `AI_FindClearHeading` (src/us/code/func_00244E84.c): `GameObject_TestMove` stores a
+- `AI_FindClearHeading` (src/us/code/AI/func_00244E84.c): `GameObject_TestMove` stores a
   `CollisionInfo *` into its `s32 out`, so 8 bytes went into a 4-byte local. Without zero-init this
   clobbered a saved register: SIGSEGV at frame 15,347 (level 53, `AI_GetPathTargetInfo`). Fix:
   `sptr out` (asm_diff 0). `tools/port/outptr.py` scans for this class (a `T **` out-parameter
@@ -2515,7 +2616,7 @@ the Release `-O2` builds (zero and none, both fixes), det identical to `/root/tu
 
 **For the merge**:
 
-- `src/us/code/func_00244E84.c` and `func_002063B4.c` (asm_diff 0 against 8b42da15).
+- `src/us/code/AI/func_00244E84.c` and `func_002063B4.c` (asm_diff 0 against 8b42da15).
 - port/app/main.cpp (`ReportFatal`, the window check; d3 may add an input pipe in this file) and
   port/runtime/t2boot.c.
 - tools/port/fullrun.py: `Route.walk_to`, `walk`, `walk_probe`, `L1_WALKS`/`L2_WALKS`,
@@ -3001,7 +3102,7 @@ plasma rifle at the Marsh Totem (e7ec5a5a) did: `--slot 300`, the Primagen dead 
   plasma rifle the Blind One was never hurt without invincibility, and each totem took a life in
   some runs.
 - New DEBUG-ONLY switch `T2_ANIM_LOG=OBJ[,OBJ]`: one `animev:` line per animation event an object
-  type fires (src/us/code/func_0021ABC8.c under TARGET_PORT, asm_diff 0).
+  type fires (src/us/code/CGameObjectInstance/func_0021ABC8.c under TARGET_PORT, asm_diff 0).
 - Unchanged: the default `--all` and the `--cheats-off 1,2[,5,6]` routes (their generated
   playthrough.txt and teleport.env are byte-identical to c8414758's).
 - Merge notes: tools/port/fullrun.py (new `L3_HEALTH`, `L3_*_NOCHEATS`, `l3_segments`,
@@ -3218,7 +3319,7 @@ b5 fixed `Turret_Effects` and `RumbleMenu_Play`).
 
 | where | branches | resolution |
 |---|---|---|
-| src/us/code/func_00262B58.c (`Turret_Effects`) | b4 (a31a6d48), b5 (fcdd8be3, 7b17ef9a) | the same function fixed twice (auto-merged into two host bodies): **b4's kept** (T2PoseContext, the float `CMtxF__RotateX`), b5's version of this file dropped; b5's `RumbleMenu_Play`/`_2` fixes (func_00417EBC, func_00450E94, same commit) kept |
+| src/us/code/Turret/func_00262B58.c (`Turret_Effects`) | b4 (a31a6d48), b5 (fcdd8be3, 7b17ef9a) | the same function fixed twice (auto-merged into two host bodies): **b4's kept** (T2PoseContext, the float `CMtxF__RotateX`), b5's version of this file dropped; b5's `RumbleMenu_Play`/`_2` fixes (func_00417EBC, func_00450E94, same commit) kept |
 | port/game/t2debug.c | b2 (`T2_BITS_LOG`, `T2_DUMP_ACTOR`), b5 (`T2_HURT_LOG`), b3 (`T2_PROGRESS_LOG`, `T2_TOTEMS`) | all appended, in merge order |
 | tools/port/fullrun.py | b2 (`GRANT`, `CITY_TOTEM_SPOT`, `L2_STRETCH`), b5 (`--cheats-off/--cheats-on/--env/--no-health`, health tables, `back=`), b1 (`anchor={...}`, `KEY_WAIT`, the level-5/6 doors, `PRIMAGEN_*`, `--slot`), b3 (`--talismans`, `detours=`) | every intent kept: `level_segments(..., anchor=(), back=(), detours=None)`, `main_all(..., no_cheats, extra_env, health, cheats_on, talismans)` (the talisman trips move the measured hub arrivals before b5's `level_start` reads them), b1's level 5 + b5's `level_start[6]` |
 | docs/port/STATUS.md, PLAYTHROUGH.md | all | every part section kept; PLAYTHROUGH's three "section 12"s and b2's unnumbered section renumbered 12 (b2), 13 (b5), 14 (b1), 15 (b3), references fixed |
@@ -3289,7 +3390,7 @@ Details: [MACOS.md](MACOS.md) section 15, [QUICKSTART.md](QUICKSTART.md) (new).
   - paced level 1 (27,000 VIs): 450.09 s, 5 late VIs in gameplay (max 1.9 ms), 1.58 ms of work per
     VI, 0 audio underruns;
   - max RSS 111 MB (no pixels), 185-200 MB (pixels, audio).
-- **For the coordinator:** this branch touches `src/us/code/func_00262B58.c` (also changed by b5),
+- **For the coordinator:** this branch touches `src/us/code/Turret/func_00262B58.c` (also changed by b5),
   `port/cmake/game.cmake`, `docs/port/MACOS.md`, `docs/port/QUICKSTART.md` and `docs/port/STATUS.md`
   (this section). After the merge, rebuild every build dir (a flag change: ninja recompiles the game).
 - **Open:**
@@ -4321,7 +4422,7 @@ Results (Linux, headless, PIE, high memory; every run exits 0):
 **Merge notes**: `port/game/t2debug.c` (`T2Port_AimEnemy`, `T2Port_FaceNearest`),
 `port/game/t2bosslog.c` (`T2Port_AimNode` now returns int; `T2Port_AimMask` `actor:N`;
 `T2Port_Atan2f`), `port/app/game.cpp` (one declaration), `tools/port/playthrough.py` (the level-2
-segments 133/134/135/132, the totem fire window and env), `src/us/code/func_0021E03C.c`. z2 (the
+segments 133/134/135/132, the totem fire window and env), `src/us/code/CGameObjectInstance/func_0021E03C.c`. z2 (the
 bosses) also uses `T2_AIM_NODE` in t2bosslog.c: keep both. z3 (9c791996) adds an early `return` for `SPEC@LEVEL` at the top of
 `T2Port_AimNode`: with the int return it must be `return 0;`.
 
@@ -6200,7 +6301,7 @@ Results ([MACOS.md](MACOS.md) section 9, [PERF.md](PERF.md)):
   N64 budget is 33.3 ms). Drawing (Fast3D + GL) is about 80% of that. Paced at 60 Hz VIs / 30
   fps, Release has no late VI in level 51; the late VIs are level loads only.
 
-To merge: `src/us/code/func_00257D48.c` (v2 may write the same function: keep one; mine runs
+To merge: `src/us/code/WeaponMode/func_00257D48.c` (v2 may write the same function: keep one; mine runs
 the current mode), `func_00226390.c` (identical to v1's), `func_00223F50.c` (one line; v1 fixed it too in 5e724e40: keep either),
 `func_0021B95C.c`/`func_0021285C.c`/`func_0027C4E4.c`/`func_0027F64C.c` (a `T2_F2U` macro at the
 top of each), `port/app/game.cpp`/`main.cpp`/`game.h`/`offscreen_gl.*`,
@@ -6420,7 +6521,7 @@ synchronously and got through), the preview-options field written at an N64 offs
 26,000 frames (158 s) and the new game to frame 15,000 (82 s) run without a crash. The player
 still stops at (-1266.6, -779.5, 260.0) (u3).
 
-Merge notes: `src/us/code/func_00203CA0.c`, `func_002034F4.c`, `func_00205A2C.c`,
+Merge notes: `src/us/code/CCache/func_00203CA0.c`, `func_002034F4.c`, `func_00205A2C.c`,
 `func_0027D160.c`, `func_0042C3BC.c`, `func_0027ACC4.c`, `func_0027AD00.c` (all `TARGET_PORT`
 blocks, asm_diff 0), `port/game/t2debug.c` (`T2_SCENE_LOG`). The archive and gendata are unchanged
 (no header edits).
@@ -7236,7 +7337,7 @@ EngineMode17_Switch_Retrace                  func_00289DFC.c:42
 ```
 
 For the merge: files others may touch: `include/ultra_types.h` (inode union),
-`include/rw/abu_types.h` (`MenuRecAt24` only), `src/us/code/func_00420F34.c`,
+`include/rw/abu_types.h` (`MenuRecAt24` only), `src/us/vm1/PakMenu/func_00420F34.c`,
 `port/app/game.cpp` / `main.cpp` / `game.h` (flags, mode log, scripted input),
 `port/runtime/t2ultra.c` (`__osSiRawStartDma` moved to t2pif.c), `port/runtime/t2port.h`
 (`T2PortConfig.pakMode/pakDir/pakPorts`), `port/app/CMakeLists.txt` (+t2pif.c),
@@ -7320,7 +7421,7 @@ away once s1's pak model is merged (keep them until the demo path runs, they sav
 
 - Files others may touch: `port/app/{game.cpp,main.cpp,game.h}` (s1 adds flags there too: keep
   both sets of options; the mode log and `WriteShot` are mine), `include/structs/world.h`
-  (`MtxPool`, `m_Heap`), `src/us/code/func_00413230.c` (menus: `MenuItem_DrawText` only),
+  (`MtxPool`, `m_Heap`), `src/us/vm1/MenuItem/func_00413230.c` (menus: `MenuItem_DrawText` only),
   `func_0044C230.c` (`MenuPool_GetCamera_2`), the cache files `func_002041E4.c`,
   `func_0020548C.c`, `func_00205574.c`, `func_0020565C.c`, cinema `func_0040F240.c`/
   `func_00448240.c`, `func_00218590.c` (`Pack_Add`), the AI files `func_00243414.c`,
@@ -7510,7 +7611,7 @@ rectangles, prim colours; no texture or vertex commands yet).
 
 ### For the merge
 
-- Files others touch: `src/us/code/func_00203068.c`, `func_002044A8.c` (identical to r2's; this
+- Files others touch: `src/us/code/CCache/func_00203068.c`, `func_002044A8.c` (identical to r2's; this
   branch takes r2's version), `func_00205D7C.c` (r2's typed allocation renamed
   `CCache__AllocDecompressFlags` + wrapper), CList literal offsets in `func_0042E5AC.c`,
   `func_0042E834.c`, `func_00201CC0.c`, `func_0042F9B0.c`, `func_0042FBA4.c`, `func_0042FFF0.c`,
@@ -7602,7 +7703,7 @@ checked on the box after every change.
 - New: `T2_DLDUMP_AT=<frame>` (game.cpp) dumps a frame's display list without a window. macOS
   has no headless Metal/GL, so the Mac compares display lists, not pixels.
 
-For the merge (files others may touch): `src/us/code/func_00413230.c` (menus: MenuPool_Open*,
+For the merge (files others may touch): `src/us/vm1/MenuItem/func_00413230.c` (menus: MenuPool_Open*,
 MenuItem_DrawText/Layout; s2), `func_0044C230.c`, `protos/menu.h`, the 19 `+ 0x53C` files
 (s5's offset sweep), `func_002718A0.c`/`func_00275A08.c` (audio, s4), `func_004263DC.c`
 (pak directory, s1), `structs/world.h` (MtxPool), `structs/frame.h`, `port/game/t2sched.c`,

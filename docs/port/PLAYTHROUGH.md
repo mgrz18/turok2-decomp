@@ -2601,7 +2601,7 @@ back to the poked value). `n64trace.py --calls Random_Blend` names the callers: 
 `CShake__ApplyOffset(&cam->m_Shake, cam->m_Shake.m_vPos, ...)` draws when the distance (0) is under
 `m_Radius`: 1 on the N64 (`--args a0:CShake:m_Radius:f`), 0 in the port (gdb), and the port's
 `m_vPos.y` was 1.0. A gdb watchpoint found the writer: `CCamera__Construct`
-(src/us/code/func_0042F9B0.c) views `&view->m_Shake` as six floats at the N64 offsets (two 4-byte
+(src/us/vm1/Demo/func_0042F9B0.c) views `&view->m_Shake` as six floats at the N64 offsets (two 4-byte
 list pointers, then `m_vPos` at 0x08, `m_Radius` at 0x14); on the host the pointers are 8 bytes, so
 the stores hit `m_pNext` and `m_vPos.x/y`. The fix stores the members (TARGET_PORT; asm_diff 0);
 `CShake__Construct` (func_00281C08.c, the same view, no C caller) is fixed the same way. After it the
@@ -4096,3 +4096,33 @@ that fight costs 50 and leaves **7** health, the first life goes after 3 hits at
 as a working combination with no margin. Keeping the Cave Totem on the assists as well moves the
 losses to the Queen and the lair; keeping the totem alone does not reach the end. A real fix needs
 health before 124 or a safer start of 124 on this stream.
+
+## 44. Round 23 (part l2): the default on the fixed floor kind
+
+`GameObject_GetFloorKind` now reads `m_pInstanceBelow` at its host offset (docs/port/STATUS.md,
+Round 23 part l2). A landing on an object plays that object's floor sound, and that sound draws
+from the random stream. The default command (`playthrough.py --all --talismans 2 --cheats-off
+1,2,3,4,5,6`, Release, 300,000 frames) diverges from `dc8126d3…` at frame 75,675 (level 135, the
+sisters). Its outcome is unchanged, with no re-tuning: END 2 at 249,990 (was 245,208), no life
+lost, lowest health 28 (was 38). The one `death:` line is at 268,360, the hub after the credits.
+The new reference det md5 is **`cd2d68ce…`** (600,000 lines). The combinations of section 43
+were not re-run.
+
+## 45. The round-23 merge: the combinations on the new stream
+
+Linux Release, PIE, ASLR on, `aimdrive.py`, the merged round-23 tree (l1's file move, l2's host
+fixes). The default gives **`cd2d68ce…`** twice (600,000 lines), boot + 3 demos `6ab97584…`. The
+combinations of section 43 that the docs recommend were re-run once each. The END frame here is
+the `progress:` line where level 10 shows `ending 0/1` (the measure of `summ.sh`; section 44's
+249,990 for the default is another measure of the same run).
+
+| options | result | md5 |
+|---|---|---|
+| (none) | END 2 (254,262), 5 totems, 0 lives; the one `death:` at 268,360 is the hub after the credits | `cd2d68ce…` |
+| `--lair-push both` | END 2 (254,262), 5 totems, 0 lives | `6e0821fa…` (was `fc809162…`) |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair` | END 2 (262,382), 5 totems, **1 life** (level 2, frame 176,289; it was 0 lives on the round-20 stream) | `575f069e…` (was `a93429ab…`) |
+| `--legacy` (290,000) | END 2, 5 totems, 2 lives (level 110, frames 83,388 and 87,658) | `ac08c89b…`, unchanged: the floor-kind fix does not touch this run |
+
+The stick-aim combination still reaches the end but no longer without a loss: on the new stream
+level 2 costs a life. Not re-tuned in this round. The other combinations of section 43 were not
+re-run.

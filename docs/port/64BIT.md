@@ -9,7 +9,7 @@ over the tree at 8fb13231. Nothing in `src/` or `include/` was changed.
 python3 tools/port/audit64.py [--out DIR]   # default port/build/audit64 (gitignored)
 ```
 
-It compiles every `src/us/code/*.c` with `clang -fsyntax-only -target x86_64-linux-gnu` and only
+It compiles every game C file (`src/us/{code,vm1,vm2}/<module>/*.c`, `src/port_libultra`) with `clang -fsyntax-only -target x86_64-linux-gnu` and only
 the pointer-width warnings on, maps each warning to its function and subsystem and a category,
 and compares every function definition with every other declaration of it. Output:
 `warnings.json` (one row per warning: file, line, function, subsystem, category, source line) and

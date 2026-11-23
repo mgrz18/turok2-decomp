@@ -23,8 +23,8 @@ and compares. No build is needed: functions are found in build/turok2.us.elf
 (or MATCH_ELF), which links byte-exact.
 
 Usage:
-    python3 tools/rodata_check.py src/us/code/func_004077AC.c [...]
-    python3 tools/rodata_check.py --at 0x800C0540 src/us/code/func_004077AC.c
+    python3 tools/rodata_check.py src/us/vm1/Primagen/func_004077AC.c [...]
+    python3 tools/rodata_check.py --at 0x800C0540 src/us/vm1/Primagen/func_004077AC.c
     python3 tools/rodata_check.py -v ...      print the differing words
 
 Exit status: 0 when every file matches.

@@ -61,7 +61,7 @@ object index"), then `CISet__GetROMAddressAndSize(index, key, n)` gives block n'
 
 ## Geometry (decompressed block 1)
 
-Parser: `Model_Decompress` (src/us/code/func_00209AF4.c), reached through
+Parser: `Model_Decompress` (src/us/code/Render/func_00209AF4.c), reached through
 `Model_DecompressCallback` (withExtra 0, withTerminator 0: "geometry", CStaticObject),
 `Model_DecompressCallbackTerminated` (0, 1: "simp geometry", `Render_QueueModelByKey`) and
 `Model_DecompressCallbackExtra` (1, 0: "anim geometry"). The same packed resource is valid for all

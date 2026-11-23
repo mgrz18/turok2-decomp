@@ -2,7 +2,7 @@
  *
  * The N64 loader DMAs ROM bytes in 0x2000-byte chunks (CLoader__Main, osPiRawStartDma) and the
  * decompressor unpacks RNC streams afterwards. On the host CLoader__LoadSync / CLoader__Main
- * (src/us/code/func_00201DBC.c / func_00201FBC.c under TARGET_PORT) call T2Port_ReadAsset with
+ * (src/us/code/CLoader/func_00201DBC.c / func_00201FBC.c under TARGET_PORT) call T2Port_ReadAsset with
  * the whole request: T2Asset_ReadInto serves it from the archive mounted by the app (whole units,
  * RNC already unpacked, swapped to host order by t2/swap), and CCache__Request sizes its blocks
  * with T2Port_AssetHostSize. A request that no unit serves is a bug in the unit manifest

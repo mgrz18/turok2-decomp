@@ -392,7 +392,8 @@ def main():
                     help='N rounds of the cross-file rule P (parameters / return types) + the file rules')
     ap.add_argument('--dry', action='store_true', help='no asm_diff / put-back (debugging)')
     a = ap.parse_args()
-    allc = sorted(os.path.join(CODE, f) for f in os.listdir(CODE) if f.endswith('.c'))
+    allc = sorted(f for d in ('src/us/code', 'src/us/vm1', 'src/us/vm2', 'src/port_libultra')
+                  for f in glob.glob(os.path.join(ROOT, d, '**', '*.c'), recursive=True))
     files = [os.path.abspath(f) for f in a.files] or allc
     tmp = tempfile.mkdtemp(prefix='retype')
     inc = prep_inc(tmp)

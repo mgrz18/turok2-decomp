@@ -33,6 +33,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
+import srcfiles  # noqa: E402
 from elftools.elf.elffile import ELFFile  # noqa: E402
 from elftools.elf.relocation import RelocationSection  # noqa: E402
 
@@ -178,9 +179,9 @@ class Yaml:
             if not m:
                 continue
             self.entries.append(n)
-            f = re.fullmatch(r"code/func_([0-9A-F]{8})", m.group(4) or "")
-            if m.group(3) == "c" and (m.group(4) or "").startswith("code/"):
-                self.c_named[m.group(4)[5:]] = n
+            f = re.fullmatch(r"(?:code|vm1|vm2)/(?:.*/)?func_([0-9A-F]{8})", m.group(4) or "")
+            if m.group(3) == "c" and (m.group(4) or "").startswith(("code/", "vm1/", "vm2/")):
+                self.c_named[m.group(4).rsplit("/", 1)[1]] = n
             if f and m.group(3) == "c":
                 self.text_at[int(f.group(1), 16)] = n
             elif f and m.group(3) == ".rodata":
@@ -270,7 +271,7 @@ def plan():
             if v not in y.text_at and named is not None and f"func_{named:08X}" in y.c_named:
                 y.text_at[v] = y.c_named[f"func_{named:08X}"]
         if any(v not in y.text_at for v in funcs):
-            report.append((name, "a function is not a `c, code/func_` subsegment"))
+            report.append((name, "a function is not a `c, code/<module>/func_` subsegment"))
             continue
         try:
             obj = compile_obj(UL / "src" / f"{rel}.c", cpp_flags, cc_flags)
@@ -314,7 +315,7 @@ def plan():
             report.append((name, f"has {', '.join(f'{k} {len(secs[k][0]):#x}' for k in extra)}"))
             continue
         between = [y.lines[i] for i in range(t0, t1 + 1) if ENTRY.match(y.lines[i])]
-        if any(", c, code/" not in b for b in between):
+        if any(not re.search(r", c, (?:code|vm1|vm2)/", b) for b in between):
             report.append((name, "something other than its own functions between them in the yaml"))
             continue
         ro, rrel, align = secs.get(".rodata", (b"", {}, 4))
@@ -421,7 +422,7 @@ def main():
     def game_file(v):
         # by address; a few by name; the second VM module's at the address splat names it
         for stem in (f"func_{v:08X}", um[v][3], f"func_{gn.get(um[v][3], 0):08X}"):
-            if (code / f"{stem}.c").exists():
+            if srcfiles.find(stem):
                 return f"{stem}.c"
         return f"?{um[v][3]}"
     # files deleted since (neither build links them): keep what the list said

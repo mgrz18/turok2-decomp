@@ -15,7 +15,10 @@ address given twice, writes `versions/symbols_names.us.txt` (splat's symbol
 file), drops the address scan's entry for each named function, and rewrites
 `func_VRAM` to the name in every C file and header, in
 `versions/function_sizes.us.txt` and in `versions/manual_stubs.us.txt`. File
-names stay `func_VRAM.c`, so a file can always be found by address. Then
+names stay `func_VRAM.c`, so a file can always be found by address, in its module's
+directory since round 23 (`src/us/code/<module>/`, `src/us/vm1|vm2/<module>/`; `python3
+tools/srcfiles.py func_VRAM` prints the path, and a function of a merged module is in
+`<module>.c`; module names are in [MODULES.md](MODULES.md)). Then
 `make setup` and `make verify`. `python3 tools/apply_names.py --check` runs every
 check and writes nothing.
 

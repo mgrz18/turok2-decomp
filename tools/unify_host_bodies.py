@@ -25,7 +25,7 @@ Conditionals with no `#else` (port-only additions) and `#elif` chains are left.
 Usage:
     python3 tools/unify_host_bodies.py                 every src/ file, report only
     python3 tools/unify_host_bodies.py --write         rewrite the files
-    python3 tools/unify_host_bodies.py --write src/us/code/func_00253720.c ...
+    python3 tools/unify_host_bodies.py --write src/us/code/CPlayer/func_00253720.c ...
     -j N   parallel files (default 3)
 
 Re-runnable: after a merge, run it again with --write; it only touches pairs

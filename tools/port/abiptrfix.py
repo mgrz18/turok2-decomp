@@ -21,7 +21,9 @@ INTS = {'s32': 'sptr', 'int': 'sptr', 'signed int': 'sptr', 'u32': 'uptr', 'unsi
 def src_path(p):
     p = os.path.normpath(os.path.join(ROOT, p))
     if '/hostified/' in p:
-        p = os.path.join(ROOT, 'src/us/code', os.path.basename(p))
+        sys.path.insert(0, os.path.join(ROOT, 'tools'))
+        import srcfiles
+        p = str(srcfiles.find(os.path.basename(p)) or os.path.join(ROOT, 'src/us/code', os.path.basename(p)))
     return p
 
 

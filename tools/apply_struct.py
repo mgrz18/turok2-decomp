@@ -30,6 +30,8 @@ sys.path.insert(0, str(ROOT / "tools"))
 import struct_scan as S  # noqa: E402
 
 SRC = ROOT / "src" / "us" / "code"
+sys.path.insert(0, str(ROOT / "tools"))
+import srcfiles  # noqa: E402
 PRIMS = set(S.PRIM)
 FIELD_USE = re.compile(r"M2C_FIELD\(arg0, ([\w ]+?\*), (0x[0-9A-Fa-f]+|\d+)\)")
 
@@ -160,7 +162,7 @@ def main():
     slots = load(args.header, args.typename)
     size = max(slots) + 4
     done = kept = 0
-    for path in sorted(SRC.glob("func_*.c")):
+    for path in (p for p in srcfiles.game_files() if p.name.startswith("func_")):
         if args.names and path.stem not in args.names:
             continue
         text = path.read_text()
