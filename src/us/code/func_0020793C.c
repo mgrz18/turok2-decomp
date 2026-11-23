@@ -2,7 +2,7 @@
 #include "globals/strings.h"
 #include "protos/cache.h"
 
-extern s32 Texture_DecompressCallback;
+void Texture_DecompressCallback(void);
 
 typedef struct {
     /* 0x00 */ s32 unk0;

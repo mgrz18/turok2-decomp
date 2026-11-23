@@ -31,7 +31,7 @@ typedef struct {
 
 s32 Model_RequestTextures(sptr);                         /* extern */
 sptr CStaticObject__LoadGeometry();                                /* extern */
-extern s32 CStaticObject__BuildLitVerticesCallback;
+void CStaticObject__BuildLitVerticesCallback(void);
 
 #ifdef TARGET_PORT
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CStaticObject__LoadGeometry receives CStaticObject__RequestLitVertices's own argument

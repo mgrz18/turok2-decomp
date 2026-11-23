@@ -19,7 +19,7 @@ void CCameraViewParams__Construct(CCameraViewParams *o) {
     o->m_pCurrentRegion = NULL;
     o->m_ZoomBlend = 0.0f;
     o->m_ZoomFov = 0.17453295f;
-    o->m_VisBits = gDefaultVisBits[0];
+    o->m_VisBits = gDefaultVisBits;
 }
 #else
 #include "rw/junk_types.h"

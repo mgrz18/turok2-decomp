@@ -4,7 +4,7 @@
 
 s32 BinarySearch(sptr, s32, sptr);
 
-extern s32 ProPack__Decompress;
+s32 ProPack__Decompress();
 
 typedef struct {
     /* 0x0 */ u8 pad0[4];

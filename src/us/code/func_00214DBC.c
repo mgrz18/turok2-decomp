@@ -4,7 +4,7 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-extern M2C_UNK Model_DecompressCallback;
+void Model_DecompressCallback(void);
 
 #ifdef TARGET_PORT /* the static object's members (structs/level_actor.h) */
 #include "structs/level_actor.h"

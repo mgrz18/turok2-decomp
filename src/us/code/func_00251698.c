@@ -24,7 +24,7 @@ typedef struct {
 
 
 s32 Cinema_SetNextCallbacks(s32, sptr, s32 *);     /* extern */
-extern s32 PlayerDeath_CinemaDone;
+void PlayerDeath_CinemaDone(void);
 
 void CPlayer__StartDeathCinema(CPlayer *arg0, s32 arg1, s32 arg2) {
     s32 temp_a0;
