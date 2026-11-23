@@ -4,7 +4,7 @@
 /* The sound manager and its voices.
  *
  * One CAudioWorld drives all sound effects (Rage Wars' audio context,
- * ContextRecAt2BC0 at D_8010C080 there). CAudioWorld__Initialize builds it: an audio
+ * ContextRecAt2BC0 at 0x8010C080 there). CAudioWorld__Initialize builds it: an audio
  * heap, the libaudio synthesizer and sound player, the sound bank, then the
  * voice queue, the music sequence, the 17-voice pool and the effects block.
  * Its CMutex is taken around every public call. A playing sound is a SndVoice

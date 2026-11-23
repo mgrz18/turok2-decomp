@@ -1,9 +1,6 @@
 #include "common.h"
 #include "structs/level_actor.h"
-
-extern CPooledLevelActor *D_8010AB90; /* free list */
-extern CPooledLevelActor *D_8010AB94; /* active head */
-extern CPooledLevelActor *D_8010AB98; /* active tail */
+#include "globals/scene.h"
 
 /* Unlinks an active node and pushes it on the free list. */
 void CPooledLevelActor__Release(CPooledLevelActor *arg0) {
@@ -28,15 +25,15 @@ void CPooledLevelActor__Release(CPooledLevelActor *arg0) {
         if (temp_v1_3 != NULL) {
             temp_v1_3->m_pPrev = arg0->m_pPrev;
         }
-        if (D_8010AB94 == arg0) {
-            D_8010AB94 = arg0->m_pNext;
+        if (gScene_m_ActorPool_m_pHead == arg0) {
+            gScene_m_ActorPool_m_pHead = arg0->m_pNext;
         }
-        if (D_8010AB98 == arg0) {
-            D_8010AB98 = arg0->m_pPrev;
+        if (gScene_m_ActorPool_m_pTail == arg0) {
+            gScene_m_ActorPool_m_pTail = arg0->m_pPrev;
         }
         nextp = &arg0->m_pNext;
-        *nextp = D_8010AB90;
+        *nextp = gScene_m_ActorPool_m_pFree;
         arg0->m_pPrev = NULL;
-        D_8010AB90 = arg0;
+        gScene_m_ActorPool_m_pFree = arg0;
     }
 }

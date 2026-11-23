@@ -33,6 +33,9 @@ extern s32 gScene_unk_30;           /* gScene.unk_30 (field symbol) */
 extern s32 *gScene_m_pCinemas;
 extern s32 gScene_m_nDrawActors;
 extern CList gScene_m_InstancePool_m_FreeList;
+extern struct CPooledLevelActor *gScene_m_ActorPool_m_pFree; /* gScene.m_ActorPool.m_pFree (field symbol) */
+extern struct CPooledLevelActor *gScene_m_ActorPool_m_pHead; /* gScene.m_ActorPool.m_pHead */
+extern struct CPooledLevelActor *gScene_m_ActorPool_m_pTail; /* gScene.m_ActorPool.m_pTail */
 extern u8 *gScene_m_pSections;
 extern s32 gScene_m_nSections;
 extern s32 gScene_m_nLevel;

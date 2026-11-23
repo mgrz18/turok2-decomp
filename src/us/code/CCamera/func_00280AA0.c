@@ -8,9 +8,9 @@
 #include "gfx.h"
 #include "globals/render.h"
 #include "structs/particle.h"
+#include "globals/scene.h"
 
 /* The glares are particles whose template flags have 0x80000; m_dwFlags is the camera mask. */
-extern CParticle *D_8010753C; /* the particle draw list head (gendata aliases it to the host member) */
 void Hud_SetupTextureMode(s32 a);
 void Render_SetRenderMode(s32 a);
 void CMtxF__TransformPointProjective(CMtxF *m, CVector3 *in, CVector3 *out);
@@ -55,7 +55,7 @@ void CCamera__DrawGlares(CCamera *cam) {
     __asm__("" : : : "memory");
     *pp = q0 + 2;
 #endif
-    for (e = D_8010753C; e != NULL; e = e->m_pDrawNext) {
+    for (e = gScene.m_ParticleSystem.m_DrawList.m_pHead; e != NULL; e = e->m_pDrawNext) {
         if ((e->m_dwFlags & mask) && (e->m_pEffect->m_dwFlags & 0x80000)) {
             ScreenPos(cam, &e->header.m_vPos, &sx, &sy);
             CCamera__DrawGlare(cam, sx, sy, e->m_Alpha * 0.003921569f, 0, 0);

@@ -35,7 +35,6 @@ typedef struct Thread {
 
 /* "\n": the string literal of the functions before this one in the same file (the ROM merges it), declared so this one does not emit its own copy. */
 extern u16 *gCFB;             /* local type: gCFB[0] (globals/framebuffer.h) read as a scalar; the array form shares a base register */
-extern char D_8010FED4[];
 
 extern void Video_SetResolution(s32);
 extern void Crash_PutChar(u8 c);                /* draws one character */
@@ -100,7 +99,7 @@ void Crash_ShowScreen(Thread *thread) {
     printString((u8 *)"TUROK2 BUILD ");
     printString((u8 *)gEngineTimestamp);
     printString(sCrashText_Newline);
-    printString((u8 *)D_8010FED4);
+    printString((u8 *)((char *) &gScene.unk_18E5C));
     printString((u8 *)" ");
     if (gScene_m_bWarpSpawn != 0) {
         printString((u8 *)"WARP ID   ");
