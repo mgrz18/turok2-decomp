@@ -5,15 +5,6 @@
 #include "common.h"
 #include "structs/swoosh.h"
 
-/* The swoosh record (CScene__GetSwoosh): a new point's life, and whether the texture runs
- * along the swoosh's length (0) or with time. */
-typedef struct SwooshInfo20 {
-    /* 0x00 */ u8 pad0[8];
-    /* 0x08 */ f32 nodeLife;
-    /* 0x0C */ u8 padC[0x10];
-    /* 0x1C */ u8 byTime;
-} SwooshInfo20;
-
 extern SwooshNode *Swoosh_TakeNode(CSwooshSystem *arg0, Swoosh *arg1);
 extern void CMtxF__GetTranslation(void *object, f32 *output);
 extern void CMtxF__GetScale(void *arg0, f32 *arg1);
@@ -34,7 +25,7 @@ SwooshNode *Swoosh_NewNode(CSwooshSystem *arg0, Swoosh *arg1, void *arg2) {
     var_s0 = temp_s2;
     if (temp_s2 != 0) {
         arg1->unk50 = 0;
-        var_s0->life = ((SwooshInfo20 *) arg1->info)->nodeLife;
+        var_s0->life = arg1->info->nodeLife;
         var_s0->owner = 0;
         CMtxF__GetTranslation(arg2, &var_s0->pos.x);
         if (arg1->flags & 4) {
@@ -52,7 +43,7 @@ SwooshNode *Swoosh_NewNode(CSwooshSystem *arg0, Swoosh *arg1, void *arg2) {
             temp_s1->length = temp_f0;
             arg1->length += temp_f0;
         }
-        if (((SwooshInfo20 *) arg1->info)->byTime == 0) {
+        if (arg1->info->texMode == 0) {
             if (arg1->length > 0.0f) {
                 var_f1 = 0.0f;
                 var_s0 = arg1->nodes.head;

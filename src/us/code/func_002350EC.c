@@ -12,15 +12,6 @@
  * keyed by the particle's owner and type), its type, owner and trail count. */
 typedef CParticle TrailActor;
 
-typedef struct TrailInfo {
-    /* 0x00 */ f32 unk0;
-    /* 0x04 */ u8 pad4[0xC];
-    /* 0x10 */ s16 sound;
-    /* 0x12 */ u8 pad12[0xD];
-    /* 0x1F */ u8 tex0;
-    /* 0x20 */ u8 tex1;
-} TrailInfo;
-
 typedef Swoosh Trail;
 typedef SwooshNode TrailNode;
 typedef CSwooshSystem TrailMgr;
@@ -29,7 +20,7 @@ void CMtxF__Identity(void *m);
 void DList_Init(void *p);
 Trail *NodePool_Alloc(SwooshPool *list);
 void CParticle__AddDrawModeBits(void *a, void *b);
-TrailInfo *CScene__GetSwoosh(void *tbl, s32 arg);
+SwooshInfo *CScene__GetSwoosh(void *tbl, s32 arg);
 #ifdef TARGET_PORT
 /* Round 20 i3: gendata types a data symbol by the declarations of the C that uses it. The trail
  * point records (Morph points: x, y, z and two more f32, 0x14 bytes each) are reached only
@@ -51,7 +42,7 @@ void Trail_AddNode(TrailMgr *mgr, TrailActor *a, s32 type) {
     register Trail *q asm("$5");
     s32 qid;
     f32 start;
-    TrailInfo *t;
+    SwooshInfo *t;
     TrailNode *node;
     void *tex0;
     void *tex1;
@@ -107,9 +98,9 @@ void Trail_AddNode(TrailMgr *mgr, TrailActor *a, s32 type) {
         s->layer = t->sound;
         *(s32 *) &s->length = 0;
         s->unk50 = 0;
-        *(s32 *) &s->unk2C = 0;
-        *(s32 *) &s->unk30 = 0;
-        s->unk38 = -1;
+        *(s32 *) &s->endFrame = 0;
+        *(s32 *) &s->frame = 0;
+        s->randomFrame = -1;
         if (s->layer != -1) {
             Material_GetTextureSet(s->texture, s->layer);
             if (a != NULL) {

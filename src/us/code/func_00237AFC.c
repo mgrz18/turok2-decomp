@@ -6,10 +6,8 @@
 #include "globals/game.h"
 #include "globals/collision.h"
 #include "globals/player.h"
-#ifdef TARGET_PORT
 #include "structs/game_object.h"
 #include "structs/player.h"
-#endif
 
 /* A blast: radius, damage, then the push (strength, x, y, z). */
 #ifdef TARGET_PORT
@@ -38,69 +36,23 @@ typedef struct Blast {
 } __attribute__((aligned(4))) Blast;
 #endif
 
-#ifdef TARGET_PORT
-typedef struct BlastOwner {
-/* the view at the host offsets of CPlayer (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_BlastOwner(m) __builtin_offsetof(CPlayer, m)
-    union {
-        struct { u8 _hp_pos[T2_HOFF_BlastOwner(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_weapon[T2_HOFF_BlastOwner(m_Data.m_CurrentWeapon)]; u16 weapon; }; /* N64 0x996 */
-    };
-} BlastOwner;
-#else
-typedef struct {
-    /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x996 - 0x10];
-    /* 0x996 */ u16 weapon;
-} BlastOwner;
-#endif
 
-#ifdef TARGET_PORT
-typedef struct BlastActor {
-/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_BlastActor(m) __builtin_offsetof(CGameObjectInstance, m)
-    union {
-        struct { u8 _hp_kind[T2_HOFF_BlastActor(header.m_Type)]; u8 kind; }; /* N64 0x0 */
-        struct { u8 _hp_pos[T2_HOFF_BlastActor(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_height[T2_HOFF_BlastActor(m_CollisionYOffset)]; f32 height; }; /* N64 0x54 */
-        struct { u8 _hp_flags[T2_HOFF_BlastActor(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
-        struct { u8 _hp_ai[T2_HOFF_BlastActor(m_AI)]; u8 ai[0x1A8 - 0x140]; }; /* N64 0x140 */
-        struct { u8 _hp_owner[T2_HOFF_BlastActor(m_AI.m_pParent)]; BlastOwner *owner; }; /* N64 0x1A8 */
-    };
-} BlastActor;
-#else
-typedef struct {
-    /* 0x000 */ u8 kind;            /* 1: player, 2: object */
-    /* 0x001 */ u8 pad1[3];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x54 - 0x10];
-    /* 0x054 */ f32 height;
-    /* 0x058 */ u8 pad58[0xD4 - 0x58];
-    /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ u8 padD8[0x140 - 0xD8];
-    /* 0x140 */ u8 ai[0x1A8 - 0x140];
-    /* 0x1A8 */ BlastOwner *owner;
-} BlastActor;
-#endif
 
-s32 Blast_CanHit(BlastActor *victim, BlastActor *source);
+s32 Blast_CanHit(CGameObjectInstance *victim, CGameObjectInstance *source);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 f32 GameObject_GetCollisionHeight(void *actor);
-f32 CGameObjectInstance__GetAverageScale(BlastActor *actor);
-s32 CGameObjectInstance__GetNearestBox(BlastActor *actor, CVector3 pos, HitFrame *out);
-f32 GameObject_GetCollisionRadius(BlastActor *actor);
+f32 CGameObjectInstance__GetAverageScale(CGameObjectInstance *actor);
+s32 CGameObjectInstance__GetNearestBox(CGameObjectInstance *actor, CVector3 pos, HitFrame *out);
+f32 GameObject_GetCollisionRadius(CGameObjectInstance *actor);
 f32 CVector3__Distance(CVector3 *a, CVector3 *b);
-void Blast_GetPush(BlastActor *victim, BlastActor *source, Blast blast, CVector3 *out, u32 flags);
+void Blast_GetPush(CGameObjectInstance *victim, CGameObjectInstance *source, Blast blast, CVector3 *out, u32 flags);
 void DamageEvent_Set(DamageEvent *out, void *source, s32 damage, f32 radius, u32 flags, HitFrame *shield);
-void CAI__CallHurt(BlastActor *victim, void *ai, DamageEvent *hit);
-void Blast_ApplyHit(BlastActor *victim, BlastActor *source, s32 hit, CVector3 pos, CVector3 dir, s32 push, HitFrame *shield, u32 flags);
+void CAI__CallHurt(CGameObjectInstance *victim, void *ai, DamageEvent *hit);
+void Blast_ApplyHit(CGameObjectInstance *victim, CGameObjectInstance *source, s32 hit, CVector3 pos, CVector3 dir, s32 push, HitFrame *shield, u32 flags);
 
 /* How strongly the blast reaches the victim: through its shield, and with
  * falloff over the radius plus its width from the nearest point of its body. */
-static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, CVector3 position, f32 radius, s32 falloff, u32 flags, HitFrame **found) {
+static __inline__ f32 blastScale(CGameObjectInstance *victim, CGameObjectInstance *source, CVector3 position, f32 radius, s32 falloff, u32 flags, HitFrame **found) {
     s32 shielded;
     s32 scaled;
     HitFrame *shield;
@@ -117,7 +69,7 @@ static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, CVector
     if (gEngineApp_m_Settings.multiplayer != 0 && (flags & 0x400000)) {
         shielded = 0;
     }
-    if (source->kind == 2 && (BlastActor *)gCollisionResults.m_pInstance == victim && gCollisionResults.m_nInstanceNode != -1) {
+    if (source->header.m_Type == 2 && (CGameObjectInstance *)gCollisionResults.m_pInstance == victim && gCollisionResults.m_nInstanceNode != -1) {
         shield = &gCollisionResults.m_Frame;
         falloff = 0;
     } else {
@@ -128,8 +80,8 @@ static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, CVector
         scale *= shield->damageFactor;
     }
     if (falloff != 0) {
-        body = victim->pos;
-        bottom = victim->pos.y + victim->height;
+        body = victim->header.m_vPos;
+        bottom = victim->header.m_vPos.y + victim->m_CollisionYOffset;
         top = bottom + GameObject_GetCollisionHeight(victim);
         if (top < position.y) {
             body.y = top;
@@ -153,10 +105,10 @@ static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, CVector
 /* Applies a blast from source to victim: a player's own close-range shot
  * (no weapon, or weapon 0x22) is moved most of the way back to the player;
  * then damage, push and the hit report, scaled by blastScale. */
-void ImpactEvent_ApplyBlast(BlastActor *victim, BlastActor *source, s32 hit, CVector3 pos, Blast blast, s32 falloff, s32 push, u32 flags) {
+void ImpactEvent_ApplyBlast(CGameObjectInstance *victim, CGameObjectInstance *source, s32 hit, CVector3 pos, Blast blast, s32 falloff, s32 push, u32 flags) {
     CVector3 dir;
     DamageEvent info;
-    BlastOwner *owner;
+    CPlayer *owner;
     HitFrame *shield;
     f32 mult;
     s32 close;
@@ -167,14 +119,16 @@ void ImpactEvent_ApplyBlast(BlastActor *victim, BlastActor *source, s32 hit, CVe
         return;
     }
     hit = 0;
-    if (source->kind == 1 && (source->flags & 0x300000)) {
-        owner = source->owner;
-        if (source == (BlastActor *) ((u8 *) owner + 0x288) && (owner->weapon < 2 || (s16) owner->weapon == 0x22)) {
+    if (source->header.m_Type == 1 && (source->m_dwFlags & 0x300000)) {
+        owner = (CPlayer *)source->m_AI.m_pParent;
+        /* 0x288 is m_WeaponActor on the N64 only (the host keeps the raw offset: unchanged behaviour,
+         * see docs/STRUCTS_TODO.md); the weapon is read unsigned, then sign-extended for 0x22. */
+        if (source == (CGameObjectInstance *) ((u8 *) owner + 0x288) && ((u16)owner->m_Data.m_CurrentWeapon < 2 || (s16)(u16)owner->m_Data.m_CurrentWeapon == 0x22)) {
             CVector3 from;
             CVector3 to;
 
             from = pos;
-            to = owner->pos;
+            to = owner->m_CharacterActor.header.m_vPos;
             CVector3__Lerp(&pos, 0.75f, &from, &to);
             pos.y += GameObject_GetCollisionHeight(owner) * 0.5f;
             hit = 1;
@@ -182,7 +136,7 @@ void ImpactEvent_ApplyBlast(BlastActor *victim, BlastActor *source, s32 hit, CVe
     }
     close = hit;
     radius = blast.radius * 0.04f;
-    if (source->kind == 1) {
+    if (source->header.m_Type == 1) {
         mult = CGameObjectInstance__GetAverageScale(source);
     } else {
         mult = 1.0f;
@@ -193,7 +147,7 @@ void ImpactEvent_ApplyBlast(BlastActor *victim, BlastActor *source, s32 hit, CVe
     if (damage != 0.0f) {
         Blast_GetPush(victim, source, blast, &dir, flags);
         DamageEvent_Set(&info, source, damage, radius, flags, shield);
-        CAI__CallHurt(victim, victim->ai, &info);
+        CAI__CallHurt(victim, &victim->m_AI, &info);
         Blast_ApplyHit(victim, source, close, pos, dir, push, shield, flags);
     }
 }

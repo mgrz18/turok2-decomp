@@ -22,7 +22,7 @@ typedef struct ProjDef {
 #define T2_HOFF_ProjDef(m) __builtin_offsetof(CROMParticleEffect, m)
     union {
         struct { u8 _hp_flags[T2_HOFF_ProjDef(m_dwFlags)]; u32 flags; }; /* N64 0x0 */
-        struct { u8 _hp_turnRate[T2_HOFF_ProjDef(unk_0E)]; s16 turnRate; }; /* N64 0xE */
+        struct { u8 _hp_turnRate[T2_HOFF_ProjDef(m_TurnRate)]; s16 turnRate; }; /* N64 0xE */
         struct { u8 _hp_limits[T2_HOFF_ProjDef(m_pMotion)]; ProjLimits *limits; }; /* N64 0x30 */
     };
 } ProjDef;
@@ -36,26 +36,7 @@ typedef struct ProjDef {
 } ProjDef;
 #endif
 
-#ifdef TARGET_PORT
 #include "structs/sound.h"
-#endif
-#ifdef TARGET_PORT
-typedef struct ProjSound {
-/* the view at the host offsets of SndSource (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_ProjSound(m) __builtin_offsetof(SndSource, m)
-    union {
-        struct { u8 _hp_state[T2_HOFF_ProjSound(handle)]; s32 state; }; /* N64 0x8 */
-        struct { u8 _hp_id[T2_HOFF_ProjSound(sound.w)]; s32 id; }; /* N64 0xC */
-    };
-} ProjSound;
-#else
-typedef struct ProjSound {
-    /* 0x00 */ u8 pad0[8];
-    /* 0x08 */ s32 state;
-    /* 0x0C */ s32 id;
-} ProjSound;
-#endif
 
 #ifdef TARGET_PORT
 typedef struct Projectile {
@@ -70,7 +51,7 @@ typedef struct Projectile {
         struct { u8 _hp_def[T2_HOFF_Projectile(m_pEffect)]; ProjDef *def; }; /* N64 0xF8 */
         struct { u8 _hp_target[T2_HOFF_Projectile(m_pTarget)]; CPlayer *target; }; /* N64 0x114 */
         struct { u8 _hp_heading[T2_HOFF_Projectile(m_vDirection)]; CVector3 heading; }; /* N64 0x150 */
-        struct { u8 _hp_sound[T2_HOFF_Projectile(m_pLoopSound)]; ProjSound *sound; }; /* N64 0x1B8 */
+        struct { u8 _hp_sound[T2_HOFF_Projectile(m_pLoopSound)]; SndSource *sound; }; /* N64 0x1B8 */
     };
 } Projectile;
 #else
@@ -89,7 +70,7 @@ typedef struct Projectile {
     /* 0x118 */ u8 pad118[0x150 - 0x118];
     /* 0x150 */ CVector3 heading;
     /* 0x15C */ u8 pad15C[0x1B8 - 0x15C];
-    /* 0x1B8 */ ProjSound *sound;
+    /* 0x1B8 */ SndSource *sound;
 } Projectile;
 #endif
 
@@ -109,7 +90,7 @@ extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 extern void CQuaternion__SlerpFast(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b);
 extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *out);
 extern void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
-extern ProjSound *LoopSounds_Start(void *pool, s32 id, CVector3 *pos, CVector3 *pos2, sptr arg4);
+extern SndSource *LoopSounds_Start(void *pool, s32 id, CVector3 *pos, CVector3 *pos2, sptr arg4);
 extern void CParticle__StopLoopSound(Projectile *p);
 extern void CParticle__Wobble(Projectile *p, f32 scale);
 extern void CParticle__UpdateHomingMissile(Projectile *p);
@@ -119,7 +100,7 @@ extern void CParticle__UpdateHoming(Projectile *p);
 /* CParticle__StartLoopSound, inlined: (re)start the projectile's looping sound unless it is already playing. */
 static __inline__ void PlayLoopingSound(Projectile *o, s32 id) {
     if (o->sound != NULL) {
-        if (o->sound->id == id && o->sound->state != -1) {
+        if (o->sound->sound.w == id && o->sound->handle != -1) {
             return;
         }
         CParticle__StopLoopSound(o);

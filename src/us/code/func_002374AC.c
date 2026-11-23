@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
+#include "structs/player.h"
 #include "globals/scene.h"
 
 /* A blast: radius, damage, then the push (strength, x, y, z). */
@@ -30,45 +31,6 @@ typedef struct Blast {
 } __attribute__((aligned(4))) Blast;
 #endif
 
-#ifdef TARGET_PORT
-/* The owner is a player (CPlayer starts with its actor): 0xBB0 is CPlayer.m_pOnEnemy, a pointer
- * (round 12 a5, tools/port/n64viewcheck.py). */
-#include "structs/player.h"
-typedef struct PushOwner {
-    union {
-        struct { u8 _hp_reduced[__builtin_offsetof(CPlayer, m_pOnEnemy)]; void *reduced; };
-    };
-} PushOwner;
-#else
-typedef struct PushOwner {
-    /* 0x000 */ u8 pad0[0xBB0];
-    /* 0xBB0 */ s32 reduced;
-} PushOwner;
-#endif
-
-#ifdef TARGET_PORT
-typedef struct PushSource {
-/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_PushSource(m) __builtin_offsetof(CGameObjectInstance, m)
-    union {
-        struct { u8 _hp_pos[T2_HOFF_PushSource(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_flags[T2_HOFF_PushSource(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
-        struct { u8 _hp_owner[T2_HOFF_PushSource(m_AI.m_pParent)]; PushOwner *owner; }; /* N64 0x1A8 */
-    };
-} PushSource;
-#else
-typedef struct PushSource {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0xD4 - 0x10];
-    /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
-    /* 0x1A8 */ PushOwner *owner;
-} PushSource;
-#endif
-
-
 
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -79,7 +41,7 @@ void CMtxF__SetRotateY(CMtxF *m, f32 angle);
 void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *m);
 
 /* The blast's push from `src` turned into a world vector, in the frame of `target`. */
-void Blast_GetPush(PushSource *src, CGameObjectInstance *target, Blast blast, CVector3 *out, u32 flags) {
+void Blast_GetPush(CGameObjectInstance *src, CGameObjectInstance *target, Blast blast, CVector3 *out, u32 flags) {
     CVector3 v;
     CVector3 dir;
     CQuaternion q;
@@ -125,7 +87,7 @@ void Blast_GetPush(PushSource *src, CGameObjectInstance *target, Blast blast, CV
             break;
         default:
             if (flags & 0x400000) {
-                CVector3__Subtract(&dir, &src->pos, &obj->header.m_vPos);
+                CVector3__Subtract(&dir, &src->header.m_vPos, &obj->header.m_vPos);
                 dir.y = 7.68f;
             } else {
                 dir.x = 0.0f;
@@ -141,8 +103,8 @@ void Blast_GetPush(PushSource *src, CGameObjectInstance *target, Blast blast, CV
         CMtxF__Identity(&m);
         break;
     }
-    if (src->flags & 0x300000) {
-        if (src->owner->reduced != 0) {
+    if (src->m_dwFlags & 0x300000) {
+        if (((CPlayer *)src->m_AI.m_pParent)->m_pOnEnemy != 0) {
             CVector3__Scale(&v, &v, 0.1f);
         }
     }

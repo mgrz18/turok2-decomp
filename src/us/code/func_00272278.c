@@ -1,112 +1,19 @@
 #include "structs/vector.h"
+#include "structs/sound.h"
+#include "structs/camera.h"
 #include "globals/audio.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00259F88.c, func_00259F88.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef union M04IF {
-    s32 i;
-    f32 f;
-} M04IF;
-typedef struct M04Rec12 {
-    u16 w0, w1, w2;
-    s16 w3;
-    u16 w4, w5;
-} M04Rec12;
-typedef struct M04Tgt {
-                u8 pad0[0x114];
-                f32 x;          /* Turok 2: 0x114 (Rage Wars: 0x128) */
-                f32 y;
-                f32 z;
-                u8 pad120[0x528 - 0x120];
-                f32 f528;
-} M04Tgt;
-typedef struct M04Ctx {
-                 u8 pad0[0x84];
-                 u8 player[0x58];
-                 s16 snd[16];
-                 u8 padFC[8];
-                 s32 unk104;
-                 u8 pad108[0x2B88 - 0x108];
-                 u8 *tab2B88;
-                 u8 pad2B8C[8];
-                 s8 defaultPan;
-                 u8 pad2B95[3];
-                 M04Tgt *tgt;
-                 u8 pad2B9C[4];
-                 f32 volA;
-                 f32 volB;
-                 f32 volC;
-                 u8 pad2BAC[0xC];
-                 s32 unk2BB8;
-} M04Ctx;
-typedef struct M04VP {
-               s32 w0;
-               s32 w4;
-               s32 vol;
-               s32 wC;
-               s16 s10;
-               u8 pad12[2];
-               M04IF v14;
-               s16 pan;
-               u8 pad1A[2];
-               f32 scale;
-               f32 f20;
-               f32 f24;
-               s16 s28;
-               s16 s2A;
-               s16 s2C;
-               u8 pad2E[6];
-               CVector3 pos;
-               s32 f40;
-               s8 mode;
-               u8 pad45[3];
-               f32 f48;
-               f32 f4C;
-} M04VP;
-typedef struct M04Emitter {
-               s32 w0;
-               s32 w4;
-               s32 w8;
-               s32 id;
-               M04VP vp;
-               M04Rec12 env;
-               f32 envA;
-               f32 envSlope0;
-               M04Rec12 env2;
-               f32 env2A;
-               f32 env2Slope;
-               s32 hasEnv;
-               M04Rec12 rec;
-               f32 env0;
-               f32 envSlope;
-               s32 unkA0;
-               u32 flags;
-               s32 kind;
-               s32 unkAC;
-               M04Ctx *ctx;
-               s32 unkB4;
-               f32 unkB8;
-               s32 unkBC;
-               s32 resetFlag;
-               s32 unkC4;
-               f32 unkC8;
-} M04Emitter;
-typedef struct M04Info {
-               u8 pad0[6];
-               u16 bits6;
-               s16 envId;
-               u8 padA[5];
-               s8 b0F;
-} M04Info;
 f32 HalfToFloat(u16 x);
 u16 FloatToHalf(f32 x);
 s32 Cinema_PathPlaying();
-M04Rec12 *CAudioWorld__GetVolumeEnvelope(M04Ctx *c, s16 id);
+SndEnv *CAudioWorld__GetVolumeEnvelope(CAudioWorld *c, s16 id);
 f32 Random_Float(f32 x);
-void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
-    M04VP *vp = &o->vp;
-    M04Rec12 *env;
+void SndVoice_InitVolume(SndVoice *o, SoundEffectInfo *rec) {
+    SndVoiceParams *vp = &o->vp;
+    SndEnv *env;
     u8 *pp;
     s32 i;
     s32 kind;
@@ -119,26 +26,26 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
     f32 fs;
     CVector3 *p;
     CVector3 *q;
-    pp = o->ctx->tab2B88;
-    o->unkC8 = 1.0f;
-    if (o->kind < 0x100) {
+    pp = o->mgr->cue;
+    o->volumeScale = 1.0f;
+    if (o->soundId < 0x100) {
         for (i = 0; i < 0x1F; i++) {
-            if (o->kind == (s32)sSoundKindVolumeTable[i].kind) {
-                o->unkC8 = sSoundKindVolumeTable[i].scale;
+            if (o->soundId == (s32)sSoundKindVolumeTable[i].kind) {
+                o->volumeScale = sSoundKindVolumeTable[i].scale;
                 break;
             }
         }
     }
     if (Cinema_PathPlaying() != 0) {
-        o->unkC8 = o->unkC8 * 0.8f;
+        o->volumeScale = o->volumeScale * 0.8f;
     }
     env = &o->env2;
-    if (rec->envId != -1) {
-        *env = *CAudioWorld__GetVolumeEnvelope(o->ctx, rec->envId);
+    if (rec->unk8 != -1) {
+        *env = *CAudioWorld__GetVolumeEnvelope(o->mgr, rec->unk8);
     } else {
-        env->w0 = FloatToHalf((f32)rec->b0F);
+        env->level = FloatToHalf((f32)rec->unkF);
     }
-    if (!(rec->bits6 & 0x800) && o->resetFlag != 1 && o->ctx->tgt != 0) {
+    if (!(rec->flags & 0x800) && o->reset != 1 && o->mgr->listener != 0) {
         a = (f32)pp[0] * 0.01f;
         b = (f32)pp[1] * 0.01f;
         if (a == 1.0f) {
@@ -149,7 +56,7 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
             vf = a + Random_Float(b - a);
         }
         p = &vp->pos;
-        q = (CVector3 *)&o->ctx->tgt->x;
+        q = &o->mgr->listener->m_vPos;
         {
             f32 d2 = (p->x - q->x) * (p->x - q->x) + (p->y - q->y) * (p->y - q->y) + (p->z - q->z) * (p->z - q->z);
             if (sSoundHearingRangeSq <= d2) {
@@ -158,7 +65,7 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
                 f = 1.0f - d2 / sSoundHearingRangeSq;
             }
         }
-        switch (vp->mode) {
+        switch (vp->distanceMode) {
         case 2:
             vp->scale = f;
             break;
@@ -180,33 +87,33 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
         vp->scale = vf;
         vp->f20 = vf;
     }
-    if (rec->bits6 & 4) {
-        vp->vol = (s32)HalfToFloat(env->w0);
-        fs = HalfToFloat(env->w1);
-        fs -= HalfToFloat(env->w2);
-        if (env->w3 == 0) {
-            o->env2Slope = 0.0f;
+    if (rec->flags & 4) {
+        vp->vol = (s32)HalfToFloat(env->level);
+        fs = HalfToFloat(env->unk2);
+        fs -= HalfToFloat(env->target);
+        if (env->frames == 0) {
+            o->env2Step = 0.0f;
         } else {
-            o->env2Slope = fs / (f32)env->w3;
+            o->env2Step = fs / (f32)env->frames;
         }
-        o->env2A = HalfToFloat(env->w1);
-        n = (s32)HalfToFloat(env->w0);
+        o->env2Value = HalfToFloat(env->unk2);
+        n = (s32)HalfToFloat(env->level);
         if ((f32)n < 0.0f) {
             t = -n * 2;
         } else {
             t = n * 2;
         }
-        vp->vol = (s32)((f32)(s32)((f32)*(s16 *)((u8 *)gSndVolumeCurve + t) * o->env2A) * vf);
+        vp->vol = (s32)((f32)(s32)((f32)*(s16 *)((u8 *)gSndVolumeCurve + t) * o->env2Value) * vf);
         if ((f32)n < 0.0f) {
             t = -n * 2;
         } else {
             t = n * 2;
         }
-        env->w0 = FloatToHalf((f32)*(s16 *)((u8 *)gSndVolumeCurve + t) * vf);
-        vp->wC = (s32)HalfToFloat(env->w0 & 0xFFFF);
+        env->level = FloatToHalf((f32)*(s16 *)((u8 *)gSndVolumeCurve + t) * vf);
+        vp->wC = (s32)HalfToFloat(env->level & 0xFFFF);
         return;
     }
-    n = (s32)HalfToFloat(env->w0);
+    n = (s32)HalfToFloat(env->level);
     if ((f32)n < 0.0f) {
         t = -n * 2;
     } else {

@@ -22,7 +22,7 @@ more files, out of 1,704 (the first version of this file, by a slightly
 different scan, said 717 of 1,699); after the first pass, 612 of 1,557;
 after the second, 534 of 1,416; after the third, 431 of 1,192; after the
 fourth, 291 of 1,013; after round L, 229 of 889 (228 of 863 by the census at
-7340fcdd); after round 21 j3, 174 of 803. The vector,
+7340fcdd); after round 21 j3, 174 of 803; after round 22 k3, 148 of 723. The vector,
 intelligence, libultra, Gfx, sound, libaudio, AI state (CAI and its
 var-buffer views), controller, game and engine, weapon, pak, list, cache,
 boss, particle, collision, save, demo, pager, menu, player / owner /
@@ -680,6 +680,118 @@ back as at 7340fcdd; run tools/unview.py on it after j4 merges (EffectList,
 EffectSystem and SourceModel convert). func_0041EA84 / func_004579A4 (also
 FAKEMATCH) only had their PadSel local renamed to PakChannel.
 
+## Round 22, part k3 (done)
+
+Measured with tools/struct_census.py: **172 of 786** local typedef names in 2 or
+more files at f980f639, **148 of 723** after. Host-view twins (`#define
+T2_HOFF_...`): **99 in 62 files** before, **63 in 38 files** after. Every rewrite keeps
+the N64 code (`tools/asm_diff.py --base f980f639`, 0 differ) and is its own
+commit; the mechanical ones carry the command that re-runs them. Checked at the end: clean
+`make verify` OK; the port (Release, gendata rerun with decls.json deleted; `mklayout.py --check` up
+to date; aligncheck only the 2 known GameNoteMenu_SelectYes sites) boots and plays the 3 demos with
+det `6ab97584...` (52,000 lines) and the default whole-game run gives det `dc8126d3...` (600,000
+lines, the one death: line at 263,578); the swoosh self test OK.
+
+Header fixes (each checked over the whole tree with asm_diff):
+
+- `CGameObjectInstance.m_dwFlags` is `u32` (every view read it unsigned; no
+  user's code changes); `m_vMin` / `m_vMax` also read as one `CBox m_Bounds`
+  (an anonymous struct in a union: GCC 2.8 takes it).
+- `CParticle.m_WobbleFreq[2]` (was `unk_180`, CParticle__Wobble's phase step);
+  `CROMParticleEffect.m_TurnRate` (was `unk_0E`, CParticle__Steer).
+- `CTurretIntelligence`: the turn arc, aim and fire ranges and fields of view,
+  the two hinge modes (Turret_Aim's TurretParams, at the body's 0x44..0x6D;
+  0x40 is m_RotSpeed, the turn rate).
+- `structs/swoosh.h`: `SwooshInfo`, the swoosh record (fade time, a point's
+  life, the bone an object swoosh follows, the sound, colours, texture mode,
+  animation mode, the two trail textures, the S/T scales and the ribbon's
+  cross-section); `Swoosh.info` is typed; `Swoosh.endFrame / frame /
+  randomFrame` (the texture animation, Trail_GetAnimFrame); `MorphItem` moved
+  in from morph.h (morph.h includes swoosh.h now); morph.h's MorphOwner /
+  MorphClock / MorphTiming are gone (they were Swoosh, SwooshNode, SwooshInfo).
+  **CSwooshSystem was already in swoosh.h at f980f639** (k4: use it for
+  gEngineApp_m_SwooshSystem).
+- `structs/world.h`: `CObjectRecord`, a placed object of the level file
+  (0x28 bytes: position, scale, region, intelligence, angle; Rage Wars'
+  InputRecAt27), was LevelRecord in both copies of
+  CScene__DecompressAnimatedInstances.
+- `structs/cinema.h`: SplineSource / SplineTable / SplineSourceCursor (both
+  module copies of Cinema_PrepareResource).
+
+Families:
+
+- **Swoosh / Trail / Emit** (15 files): Emitter / EmitNode / Emit / EmitDef /
+  EmitOwner / EmitMgr / SSlot / SEnt / SShape / Trail / TrailNode / TrailTrack /
+  FrameAnim / FrameAnimDef / SwooshInfo20 / SwooshDef / SwooshPoint / Ent41D8 /
+  Ref002360A0 / State802A6DF8 and its lists are Swoosh, SwooshNode, SwooshInfo,
+  CSwooshSystem. The trail's node links read "next" at 0 in Trail_DrawTextured:
+  they are SwooshNode's prev/next walked from nodes.tail. The emitters' owner
+  is a CParticle (Swoosh_UpdateNodeFromOwner). Left: func_00234E48
+  (Trail_DetachOwner, FAKEMATCH, k2's: R8Emit / R8Part are the same Swoosh /
+  SwooshNode) and func_002350EC's `typedef Swoosh Trail` aliases (FAKEMATCH;
+  its TrailInfo is SwooshInfo now); func_00235C30 (an imported Rage Wars file
+  on rw/ types); func_0026E760's Emitter is a sound emitter, not a swoosh.
+- **M04*** (func_00272278 / func_00272B54, SndVoice_InitVolume /
+  SndVoice_UpdatePan): sound.h's SndVoice, SndVoiceParams, SndEnv, SndIF32,
+  CAudioWorld, SoundEffectInfo, and the listener is a CCamera. The pan code
+  read the voice's position at a raw `+ 0x44`: it is `&o->vp.pos` now. Left:
+  func_00236EA0's M04WorldB (`(M04WorldB *)&gScene`, the registered list at
+  0xBF8): `gScene.m_pRegistered[i]` addresses through the symbol and changes
+  the loop's registers.
+- **Spline\***: in cinema.h (above). **LevelRecord**: CObjectRecord (above).
+- **The 0040457C / 0043D57C pair, the LevelScriptF950 / F604 / F9D0, BossCtl,
+  BossTimers views**: left. They are views of field symbols
+  (gLevelScript_spawnsLeft and friends, interiors of LevelScriptState) whose
+  member path changes the code; that is k4's item (field symbols as members
+  of their owner). Actor0040457C reads `m_AI.m_dwFlags` as bytes;
+  ModeState0040457C keeps a handle as `sptr` and the waves as its own step
+  type.
+- **Generic scratch views**: Arg0 of CPathTrack__StartAtNearestPoint /
+  CPathTrack__GetCurrentPoint is CPathTrack, of SndSeq_Unduck SndSeq, of
+  CScene__* (func_00226390) CScene; Plane (3 files) is collision.h's
+  CollisionQuad (a point at its corner 0, its normal at 0x30);
+  CollisionInfo (5 files) is CCollisionInfo. Left local and why: the other
+  Arg0s are one-off objects (Rumble_SetLink writes an `s32` over
+  RumbleEffect.owner, a pointer: the real type changes the host's store, see
+  below; alSndpSetSound and the libaudio `Msg` events are libultra, k1's);
+  `S` (4 setters of `{s32, CVector3, s32}` with no caller in C) and the AI
+  cycle `S` are their only users' records; func_0026F080 / func_0026F400's
+  Plane is a real plane (normal, d), not the quad.
+
+Twins replaced by hand (the views a field typed differently from the real
+member; unview.py does the rest): HitInst of Collision_SweepActors (its
+particle fields read through CParticle), Sweep_TestInstance's HitInst / HitDef
+(CObjectHead, CIntelligence m_Type / m_dwFlags), PushSource / PushOwner, Source,
+WeaponActor (its "render block" copied to the muzzle is m_Bounds), Turret,
+ActionState, Projectile / ProjectileDef of the homing code, AttackActor /
+AttackInfo (CEnemyIntelligence's drop masks), Mount (its AI is passed as
+`&m_AI`), BlastOwner / BlastActor, MenuView (CCameraViewport), SweepModel
+(CStaticObject; the variant is the intelligence's m_nModel), Func00215884Obj
+(CLevelActor), Entry0026C5C4 (both copies; CGameRegion.m_pNeighbours),
+AimView, CGlareSource (a particle: its template flags bit 0x80000).
+
+tools/unview.py: a header included only under `#ifdef TARGET_PORT` is included
+plainly when its view goes (that alone let 11 twins go), and function-pointer
+members of a twin are mapped too.
+
+**Port notes for the coordinator** (no behaviour change made here):
+ImpactEvent_ApplyBlast compares the blast's source with `(u8 *)owner + 0x288`,
+CPlayer.m_WeaponActor on the N64 but not on the host (kept as it was, with a
+comment); Rumble_SetLink writes `s32` at 0x38 of a RumbleEffect (the owner
+pointer on the N64, another place on the host). Both were there at f980f639.
+
+Left (twins, 63 in 38 files): the FAKEMATCH files (func_0022D2FC's particle views,
+func_0022A4C8's ProjDef / Projectile): k2's, run tools/unview.py on them after
+k2 merges (this round's unview runs already converted RootActor in
+func_00218B10 and MtxCamera / Camera in func_0022D2FC, both FAKEMATCH: if k2
+rewrote those files, re-run the tool on k2's version instead of merging); the animation views of
+func_0021A7EC / func_0021ABC8 / func_0021CDAC (AnimTrack / AnimChannel against
+CAnimationState: different field types and a bone matrix pointer read as an
+index); func_0023FDF0 (the joints are a libultra Mtx read as s16 halves,
+game_object.h has `struct Mtx` incomplete); AimActor of func_00249C20 (a
+`struct AimActor {` twin unview.py does not parse); the level-script field
+symbol views (k4, above).
+
 ## The families to merge next
 
 - **The FAKEMATCH files** (16, listed in docs/MATCHING.md, "Where the
@@ -764,26 +876,23 @@ their own (top 0 of 0).
 
 ## Every local struct name defined in 2 or more files
 
-172 of the 786 local typedef names. "Fields" are the named offsets of the
+148 of the 723 local typedef names. "Fields" are the named offsets of the
 most common layout (pads left out); a body without offset comments is shown
 as written.
 
 | Name | Files | Layouts | Fields | Files |
 |---|---|---|---|---|
 | T2HostTriple | 17 | 1 | `float x, y, z;` | func_00238134, func_0023870C, func_0023876C, func_002387C4 +13 |
-| Arg0 | 14 | 14 | 0x8 refCount, 0xC flags | func_00204DB8, func_002242F8, func_00226390, func_0026E9EC +10 |
+| Arg0 | 10 | 10 | 0x8 refCount, 0xC flags | func_00204DB8, func_002242F8, func_0026E9EC, func_00281B64 +6 |
 | Entry | 8 | 8 | 0x00 unk0, 0x04 size | func_00214188, func_002188AC, func_0022D2FC, func_0026C114 +4 |
 | Slot | 6 | 5 | 0x00 a, 0x16 b, 0x17 c | func_00271DB4, func_00293530, func_0042D120, func_0042F344 +2 |
-| CollisionInfo | 5 | 3 | 0x00 flags | func_00268C48, func_002694A8, func_0026961C, func_00269780 +1 |
 | Msg | 5 | 3 | `s16 kind; s16 pad; s32 a; s32 b; s32 c;` | func_00290DE0, func_00290E10, func_00290E90, func_00290EC0 +1 |
-| Plane | 5 | 3 | `u8 pad0[0x30]; CVector3 normal;` | func_0023C2B0, func_0023C390, func_0023C478, func_0026F080 +1 |
 | S | 5 | 3 | `s32 a; CVector3 v; s32 d;` | func_0021810C, func_00218218, func_002182BC, func_0021836C +1 |
 | Arg1 | 4 | 4 | 0x1C unk1C | func_00255840, func_00255C5C, func_002593A4, func_0045C050 |
 | Box | 4 | 2 | 0x00 min, 0x0C max | func_0021E374, func_0022AFB4, func_0023118C, func_002406D8 |
 | DIunion | 4 | 1 | `struct DIstruct s; DItype ll;` | func_002A3AE0, func_002A40D0, func_002A4650, func_002A4BE0 |
 | EventParams | 4 | 4 | 0x0 unk4 | func_0023801C, func_00238A7C, func_00238DF8, func_00239194 |
 | Handle | 4 | 3 | `void *data;` | func_0020BFB0, func_0026C590, func_0042BA40, func_00464960 |
-| HitInst | 4 | 4 | `#define T2_HOFF_HitInst(m) __builtin_offsetof(CObjectHead, m) union { ...` | func_0023DF70, func_0023F880, func_0023FDF0, func_0024032C |
 | Item | 4 | 4 | 0x1C *owner, 0x20 *data, 0x24 *string | func_00420F34, func_00443D28, func_0045A7A0, func_0045AD1C |
 | Link | 4 | 3 | 0x0 *next, 0x4 *prev | func_00268A2C, func_0028E9E0, func_0028EA10, func_002933B0 |
 | Location | 4 | 3 | 0x00 pos, 0x0C region | func_002438C0, func_00244338, func_002449E0, func_0025D9E4 |
@@ -792,10 +901,8 @@ as written.
 | Node | 4 | 4 | `u8 pad0[0x1C8]; struct Node *next;` | func_002316F4, func_002763D4, func_0028AFF0, func_0042C194 |
 | OwnedState | 4 | 1 | `struct { u8 _h_pos[__builtin_offsetof(CAI, m_vDesiredPos)]; f32 pos[3]...` | func_00264B0C, func_00264DF0, func_00264F58, func_0026508C |
 | PlacedProp | 4 | 4 | 0x00 state, 0x02 id, 0x04 pos, 0x10 *segment, 0x14 *model, 0x18 owner, 0x1C unk1C, 0x28 matrix[16], ... | func_002141F0, func_00214564, func_00214844, func_00214B58 |
-| Projectile | 4 | 4 | `#define T2_HOFF_Projectile(m) __builtin_offsetof(CParticle, m) union {...` | func_00229618, func_0022A1A4, func_0022A4C8, func_0025CAC8 |
 | T2ListNode | 4 | 1 | `struct T2ListNode *prev; struct T2ListNode *next;` | func_0026D240, func_0026D288, func_0026D3BC, func_0026D474 |
 | VertexGroup | 4 | 2 | 0x0 unk0, 0x4 count, 0x8 verts[1] | func_00212DA4, func_00212F98, func_002130A8, func_00214F68 |
-| ActionState | 3 | 3 | 0x40 timer, 0x64 duration, 0xC6 anim, 0xC7 active | func_00265200, func_00265A30, func_00266380 |
 | Actor | 3 | 3 | `#define T2_HOFF_Actor(m) __builtin_offsetof(CParticle, m) union { stru...` | func_0022D2FC, func_002600E8, func_00260554 |
 | AdecStream | 3 | 3 | 0x00 hdr0, 0x04 hdr2, 0x08 *hdr, 0x0C nframes, 0x10 remaining, 0x14 *rd | func_0029FE70, func_002A0448, func_002A0B6C |
 | AnimChannel | 3 | 3 | 0x00 time, 0x04 current, 0x06 next, 0x08 frames, 0x0A active, 0x0B blending, 0x0C loopStart, 0x10 **resource | func_00218B10, func_0021CDAC, func_0021F428 |
@@ -806,7 +913,6 @@ as written.
 | Bone | 3 | 2 | 0x00 *anim, 0x90 type | func_0022C488, func_00259A4C, func_00259A98 |
 | BossAI | 3 | 2 | 0xC4 animId, 0xC6 anim, 0xC7 unkC7 | func_00407F20, func_0040813C, func_004088B0 |
 | Dest | 3 | 3 | `#define T2_HOFF_Dest(m) __builtin_offsetof(CAI, m) union { struct { u8...` | func_002427E0, func_00242C00, func_00246918 |
-| Emitter | 3 | 3 | 0x00 *prev, 0x04 *next, 0x08 *info, 0x0C *tex0, 0x10 *tex1, 0x14 texture[2], 0x1C *owner, 0x20 id, ... | func_0023417C, func_00236C64, func_0026E760 |
 | HudModel | 3 | 3 | 0x00 current, 0x04 requested, 0x08 *model, 0x90 scaleX, 0x94 scaleY, 0x98 scaleZ, 0x9C pitch, 0xA0 roll, ... | func_00247170, func_00247438, func_00247660 |
 | Job | 3 | 2 | 0x00 result, 0x0C unkC, 0x1C 2 | func_0028A43C, func_0042F670, func_00468570 |
 | KeyLookup | 3 | 2 | 0x00 *posKeys, 0x04 *rotKeys, 0x08 *posTracks, 0x0C *rotTracks, 0x10 offset0, 0x14 offset1, 0x18 rootOffset0, 0x1C rootOffset1, ... | func_00218B10, func_0021B95C, func_0021CDAC |
@@ -814,7 +920,6 @@ as written.
 | Material | 3 | 3 | 0x00 flags, 0x04 unk4, 0x08 texture, 0x0C unkC, 0x10 prim[4], 0x14 env[4], 0x18 maskS, 0x1A maskT | func_00207FEC, func_00269050, func_0026D070 |
 | ModeState | 3 | 2 | 0x00 unk0, 0x04 value, 0x08 mode, 0x40 unk40, 0x44 unk44 | func_0027AD00, func_0027AD88, func_0027AD98 |
 | ModelVertex | 3 | 3 | 0x0 x, 0x6 bone | func_00212DA4, func_00212F98, func_002130A8 |
-| Mtx64 | 3 | 2 | `f32 m[16];` | func_00236A34, func_00236D50, func_00247438 |
 | Placed | 3 | 3 | 0x4 *node | func_0026872C, func_00268838, func_0042C194 |
 | PlayerList | 3 | 3 | `void *pad0[2]; s32 nPlayers; PlayerCList idle; PlayerCList active; s32...` | func_00251FC4, func_0042E5AC, func_004674CC |
 | RenderCounters | 3 | 3 | `f32 ticks, seconds, minutes, hours; f32 countdown; f32 timeLimit; s32 ...` | func_00417D78, func_0041CA00, func_00455960 |
@@ -829,6 +934,7 @@ as written.
 | T2EventWords | 3 | 1 | `u32 w0, w1;` | func_00238888, func_00238958, func_002389EC |
 | TargetInfo | 3 | 3 | 0x44 flags, 0x52 flags2 | func_0025DF04, func_0025F068, func_00408C10 |
 | AIModeParam | 2 | 1 | 0x6 value | func_002668D4, func_0026E40C |
+| ActionState | 2 | 2 | 0x40 timer, 0x64 duration, 0xC6 anim, 0xC7 active | func_00265200, func_00266380 |
 | Actor0040457C | 2 | 2 | `#define T2_HOFF_Actor0040457C(m) __builtin_offsetof(CGameObjectInstanc...` | func_0040457C, func_0043D57C |
 | ActorBlock | 2 | 1 | 0x00 size, 0x04 count, 0x08 objects[1] | func_0042BA40, func_00464960 |
 | Anim | 2 | 1 | 0x24C angle | func_00259A4C, func_00259A98 |
@@ -862,21 +968,16 @@ as written.
 | Drawable | 2 | 2 | `u8 pad0[__builtin_offsetof(CStaticObject, m_LitKey)]; s32 unk80; u8 pa...` | func_00214E88, func_0022077C |
 | EffectParams | 2 | 2 | 0x0 type, 0x2 scale, 0x4 count, 0x5 r, 0x6 g, 0x7 b | func_0023F880, func_00406C4C |
 | Element | 2 | 1 | 0x00 type, 0x28 x, 0x2C y, 0x30 z30, 0x34 z34, 0x4C x2, 0x50 y2, 0x54 z2 | func_002261A8, func_00465B04 |
-| EmitDef | 2 | 1 | `u8 pad0[2]; u8 unk2; u8 unk3; u8 pad4[0x19]; u8 unk1D; u8 pad1E[3]; u8...` | func_00236A34, func_00236D50 |
-| EmitOwner | 2 | 2 | `u8 pad0[0xF8]; struct EmitOwnerInfo *info;` | func_00236A34, func_00236D50 |
-| EmitOwnerInfo | 2 | 1 | `u8 pad0[0x14]; s32 unk14;` | func_00236A34, func_00236D50 |
-| Entry0026C5C4 | 2 | 1 | `#define T2_HOFF_Entry0026C5C4(m) __builtin_offsetof(CGameRegion, m) un...` | func_0026C5C4, func_0026C934 |
 | Floats | 2 | 1 | `f32 unk0, unk4, unk8, unkC, unk10, unk14;` | func_0042F9B0, func_004688D0 |
 | FontStyle | 2 | 2 | 0xA0 envR, 0xA4 envG, 0xA8 envB, 0xAC primR, 0xB0 primG, 0xB4 primB, 0xB8 width, 0xBC height, ... | func_0027874C, func_00278CDC |
 | GameplayCamera | 2 | 2 | `char pad0[0x2D8]; char clipPlanes[0x60]; CVector3 clipBounds[2];` | func_0022782C, func_002745DC |
 | Globals | 2 | 2 | `u8 pad0[G_OFF(m_Settings.multiplayer) - G_OFF(m_MenuPool)]; u8 timed; ...` | func_00251FC4, func_0025492C |
-| HitDef | 2 | 2 | 0x66 kind | func_002376F8, func_0023DF70 |
+| HitInst | 2 | 2 | `union { struct { u8 _hp_type[__builtin_offsetof(CParticle, header.m_Ty...` | func_0023F880, func_0023FDF0 |
 | Holder | 2 | 2 | 0x10 *unk10 | func_0021793C, func_00407CB0 |
 | Hud | 2 | 1 | 0x090 unk90, 0x094 unk94, 0x098 unk98, 0x09C unk9C, 0x0C8 unkC8[0x148 - 0xC8], 0x148 unk148[0x80] | func_0042EB50, func_00467A70 |
 | Info0040457C | 2 | 2 | `#define T2_HOFF_Info0040457C(m) __builtin_offsetof(CAITargets, m) unio...` | func_0040457C, func_0043D57C |
 | IntPair | 2 | 1 | `s32 field_0; s32 field_4;` | func_0042F9B0, func_004688D0 |
 | LevelNode | 2 | 1 | 0x00 unk0, 0x04 count, 0x08 records[1] | func_0042BA40, func_00464960 |
-| LevelRecord | 2 | 1 | 0x00 unk0, 0x04 pos, 0x20 spawnId, 0x22 defId, 0x24 angle | func_0042BA40, func_00464960 |
 | LevelScriptF604 | 2 | 2 | `#define T2_HOFF_LevelScriptF604(m) __builtin_offsetof(LevelScriptBlock...` | func_00406000, func_0043F000 |
 | LevelScriptF950 | 2 | 1 | `#define T2_HOFF_LevelScriptF950(m) __builtin_offsetof(LevelScriptState...` | func_00404FE0, func_004050E0 |
 | LevelScriptF9D0 | 2 | 2 | `#define T2_HOFF_LevelScriptF9D0(m) __builtin_offsetof(LevelScriptState...` | func_00407BBC, func_00440BBC |
@@ -884,12 +985,6 @@ as written.
 | List | 2 | 2 | 0x04 items[1] | func_00221A24, func_00466040 |
 | ListNode | 2 | 2 | 0x16 unk16 | func_00228B4C, func_002933E0 |
 | ListOwner | 2 | 2 | 0x14 m_List | func_00228B4C, func_00281974 |
-| M04Ctx | 2 | 1 | `u8 pad0[0x84]; u8 player[0x58]; s16 snd[16]; u8 padFC[8]; s32 unk104; ...` | func_00272278, func_00272B54 |
-| M04Emitter | 2 | 1 | `s32 w0; s32 w4; s32 w8; s32 id; M04VP vp; M04Rec12 env; f32 envA; f32 ...` | func_00272278, func_00272B54 |
-| M04IF | 2 | 1 | `s32 i; f32 f;` | func_00272278, func_00272B54 |
-| M04Rec12 | 2 | 1 | `u16 w0, w1, w2; s16 w3; u16 w4, w5;` | func_00272278, func_00272B54 |
-| M04Tgt | 2 | 1 | `u8 pad0[0x114]; f32 x; f32 y; f32 z; u8 pad120[0x528 - 0x120]; f32 f52...` | func_00272278, func_00272B54 |
-| M04VP | 2 | 1 | `s32 w0; s32 w4; s32 vol; s32 wC; s16 s10; u8 pad12[2]; M04IF v14; s16 ...` | func_00272278, func_00272B54 |
 | MatchState | 2 | 2 | 0x14 timeLeft, 0x18 fragLimit, 0x1C over | func_00251FC4, func_0025492C |
 | MatrixF | 2 | 1 | `f32 m[16];` | func_0021A7EC, func_0022A1A4 |
 | MenuColorInit | 2 | 1 | `u16 a; u8 pad2[2]; u16 b; u8 pad6[2]; u16 c; u8 padA[3]; u8 d; u8 pad0...` | func_00413230, func_0044C230 |
@@ -897,7 +992,6 @@ as written.
 | ModeState0040457C | 2 | 2 | `#define T2_HOFF_ModeState0040457C(m) __builtin_offsetof(LevelScriptSta...` | func_0040457C, func_0043D57C |
 | ModelRecord | 2 | 1 | 0x44 flags | func_00251698, func_0026C7A8 |
 | MotionState | 2 | 1 | `u32 flags; u8 pad4[0x3C]; f32 timer;` | func_00264478, func_00264644 |
-| Mount | 2 | 2 | `#define T2_HOFF_Mount(m) __builtin_offsetof(CGameObjectInstance, m) un...` | func_0024EAF8, func_00251A2C |
 | ObjDef | 2 | 2 | `u16 pad0; u16 flags;` | func_0021E03C, func_00268210 |
 | Owner | 2 | 2 | 0x00 type, 0x80 *ownerId | func_0022D2FC, func_00273EB8 |
 | PackedBitWords | 2 | 1 | `u32 low; u32 high;` | func_002177DC, func_00217EFC |
@@ -906,11 +1000,11 @@ as written.
 | Path | 2 | 2 | 0x40 *segments, 0x4C totalLength | func_00236B7C, func_00402658 |
 | PickupDef | 2 | 2 | `char pad0[0x14]; PickupParams params;` | func_0023F634, func_00265F90 |
 | PlacedPropRecord | 2 | 2 | 0x00 value, 0x04 scale, 0x08 id, 0x0A segment, 0x0C flags, 0x0E model, 0x10 y, 0x12 extents[6], ... | func_002141F0, func_00214564 |
+| Plane | 2 | 2 | 0x0 n, 0xC d | func_0026F080, func_0026F400 |
 | Player | 2 | 2 | `#define T2_HOFF_PL(m) __builtin_offsetof(CPlayer, m) union { struct { ...` | func_0024C47C, func_00271DB4 |
 | Pool | 2 | 2 | 0x3C cur, 0x40 *slots | func_00293530, func_00466040 |
 | PoolNode | 2 | 2 | 0x00 *next, 0x14 *self, 0x31 unk31, 0x32 unk32, 0x33 unk33 | func_0029247C, func_00466040 |
 | ProjVertex | 2 | 2 | 0x00 x, 0x04 y, 0x10 *pos | func_0023D4D4, func_0023D7CC |
-| ProjectileDef | 2 | 2 | `#define T2_HOFF_ProjectileDef(m) __builtin_offsetof(CROMParticleEffect...` | func_00229618, func_0022A1A4 |
 | Quad | 2 | 2 | `s32 x0; s32 x4; s32 x8; s32 xC;` | func_00238114, func_0024C47C |
 | Reader | 2 | 2 | 0x8 *p | func_002932BC, func_004034E0 |
 | Record | 2 | 1 | 0x00 data[2], 0x08 valid, 0x0C rest[4] | func_0042CE10, func_00465D30 |
@@ -925,17 +1019,11 @@ as written.
 | SoundEvent | 2 | 2 | `CGameObjectInstance *object; char pad4[0x14 - 0x4]; SoundRange *range;...` | func_00256738, func_0026E3A8 |
 | Spawn | 2 | 2 | 0x38 pos[3] | func_00254044, func_0044700C |
 | SpinState | 2 | 2 | 0x034 mode, 0x10C angle, 0x110 spin | func_002591F4, func_002649A0 |
-| SplineSource | 2 | 1 | `s32 stride,count; union { char data[0]; CVector3 points[0]; f32 weight...` | func_0040F240, func_00448240 |
-| SplineSourceCursor | 2 | 1 | `SplineSource *header; CVector3 *points; f32 *weights;` | func_0040F240, func_00448240 |
-| SplineTable | 2 | 1 | `s32 count;` | func_0040F240, func_00448240 |
 | StateInfo | 2 | 2 | `u8 pad0[0x24]; u32 flags; u8 pad28[0x24]; f32 delay;` | func_00264478, func_00264644 |
-| SwooshPoint | 2 | 1 | 0x04 y | func_002366C8, func_002368B0 |
 | T2SortRecord | 2 | 1 | `void *p; f32 key;` | func_0023DB5C, func_0024079C |
 | Target | 2 | 2 | 0x78 unk78, 0x7C unk7C | func_002460FC, func_00455CD0 |
-| TargetActor | 2 | 2 | 0x04 pos | func_0022A1A4, func_002623EC |
 | Thread | 2 | 2 | 0xD4 *sp | func_0028BDFC, func_0028C0B0 |
 | TimedNode | 2 | 2 | 0x00 *prev, 0x04 *next, 0x08 *item, 0x0C timer | func_002253F8, func_00294C70 |
-| Trail | 2 | 2 | 0x00 *prev, 0x04 *next, 0x08 *track, 0x0C *first, 0x10 *second, 0x14 model[2], 0x1C *owner, 0x20 id, ... | func_00234348, func_0023685C |
 | Triple | 2 | 2 | 0x0 unk0, 0x4 unk4, 0x8 unk8 | func_0026D230, func_00401B30 |
 | Tuning | 2 | 2 | 0x00 forwardAccel, 0x04 forwardMax, 0x08 forwardDecel, 0x0C strafeAccel, 0x10 strafeMax, 0x14 strafeDecel, 0x18 impulse, 0x1C impulseDecel, ... | func_0024F174, func_0024F658 |
 | Unk00401C78 | 2 | 1 | 0x4 state | func_00401C78, func_00401C88 |

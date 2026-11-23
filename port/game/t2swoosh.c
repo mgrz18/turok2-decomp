@@ -71,7 +71,7 @@ int T2Swoosh_SelfTest(void) {
     CSwooshSystem *sys = &sTestSystem;
     f32 savedIncrement = gFrameIncrement;
     s32 savedSpawned = sSwooshSpawned;
-    u8 info[0x24];
+    SwooshInfo info;
     f32 m[16];
     f32 life = 5.0f;
     Swoosh *s;
@@ -106,13 +106,13 @@ int T2Swoosh_SelfTest(void) {
     T2CHECK(sys->m_TimerPool.used.count == 0 && walk(&sys->m_TimerPool.free) == 3, "timer freed");
 
     /* a swoosh with three points 5 and 12 apart */
-    memset(info, 0, sizeof(info));
-    memcpy(info + 8, &life, sizeof(life));
+    memset(&info, 0, sizeof(info));
+    info.nodeLife = life;
     s = (Swoosh *) NodePool_Alloc(&sys->m_SwooshPool);
     T2CHECK(s == &sys->m_Swooshes[0] && walk(&sys->m_SwooshPool.used) == 1, "swoosh allocated");
     if (s != NULL) {
         DList_Init(&s->nodes);
-        s->info = info;
+        s->info = &info;
         s->flags = 0;
         s->owner = NULL;
         s->length = 0.0f;

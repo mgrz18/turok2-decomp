@@ -3,10 +3,8 @@
 #include "gfx.h"
 #include "structs/weapon.h"
 #include "globals/game.h"
-#ifdef TARGET_PORT
 #include "structs/player.h"
 #include "structs/camera.h"
-#endif
 
 /* Draws the weapon menu's icons: sorts the listed items, places each one in
  * the player's viewport (on the wheel, or in a vertical strip that fades out
@@ -17,42 +15,6 @@
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
 
-#ifdef TARGET_PORT
-typedef struct MenuView {
-/* the view at the host offsets of CCamera (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_MenuView(m) __builtin_offsetof(CCamera, m)
-    union {
-        struct { u8 _hp_viewport[T2_HOFF_MenuView(m_Viewport)]; f32 viewport[4]; }; /* N64 0x288 */
-    };
-} MenuView;
-#else
-typedef struct MenuView {
-    /* 0x000 */ u8 pad0[0x288];
-    /* 0x288 */ f32 viewport[4];
-} MenuView;
-#endif
-
-#ifdef TARGET_PORT
-typedef struct MenuPlayer {
-/* the view at the host offsets of CPlayer (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_MenuPlayer(m) __builtin_offsetof(CPlayer, m)
-    union {
-        struct { u8 _hp_view[T2_HOFF_MenuPlayer(m_pCamera)]; MenuView *view; }; /* N64 0x51C */
-        struct { u8 _hp_owned[T2_HOFF_MenuPlayer(m_Data.m_WeaponList)]; s8 owned[1]; }; /* N64 0x972 */
-    };
-} MenuPlayer;
-#else
-typedef struct MenuPlayer {
-    /* 0x000 */ u8 pad0[0x51C];
-    /* 0x51C */ MenuView *view;
-    /* 0x520 */ u8 pad520[0x972 - 0x520];
-    /* 0x972 */ s8 owned[1];
-} MenuPlayer;
-#endif
-
-
 void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
 s32 CBarrel__CompareIcons();
 s32 CBarrel__SwapIcons();
@@ -60,12 +22,12 @@ f32 func_002974C0(f32);
 void Hud_GetSpriteSize(s32 sprite, s32 frame, s32 *width, s32 *height);
 void Hud_DrawSprite(s32 sprite, s32 frame, s16 x, s16 y, f32 sx, f32 sy, s32 arg6);
 
-void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, MenuPlayer *player) {
+void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, CPlayer *player) {
     s32 width;
     s32 height;
     CBarrelIcon *item;
-    MenuView *view;
-    f32 *viewport;
+    CCamera *view;
+    CCameraViewport *viewport;
     f32 fade;
     f32 scaleX;
     f32 scaleY;
@@ -84,26 +46,26 @@ void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, MenuPlayer
     fade = menu->m_Open * (level < 0x100 ? level : 255.0f);
     item = items;
     while (--count != -1) {
-        view = player->view;
-        scaleX = view->viewport[0] * (1.0f / 320);
-        scaleY = view->viewport[1] * (1.0f / 240);
-        viewport = view->viewport;
+        view = player->m_pCamera;
+        scaleX = view->m_Viewport.m_Width * (1.0f / 320);
+        scaleY = view->m_Viewport.m_Height * (1.0f / 240);
+        viewport = &view->m_Viewport;
         if (menu->m_bStickWheel == 0) {
-            half = viewport[1] * 0.5f;
-            x = viewport[2] + viewport[0] * 0.2f * menu->m_Open;
-            y = viewport[3] + half;
-            y += item->m_vPos.y * 1.2f * viewport[1];
+            half = viewport->m_Height * 0.5f;
+            x = viewport->m_ScreenPosX + viewport->m_Width * 0.2f * menu->m_Open;
+            y = viewport->m_ScreenPosY + half;
+            y += item->m_vPos.y * 1.2f * viewport->m_Height;
             if (item->m_vPos.z < 0.0f) {
                 alpha = 0.0f;
             } else {
-                alpha = MAX(1.0f - ABS(y - (viewport[3] + half)) / half, 0.0f);
+                alpha = MAX(1.0f - ABS(y - (viewport->m_ScreenPosY + half)) / half, 0.0f);
             }
             scale = alpha * 0.4f + 0.6f;
             scaleX *= scale;
             scaleY *= scale;
         } else {
-            x = viewport[2] + viewport[0] * 0.5f + item->m_vPos.x * 0.5f * viewport[0];
-            y = viewport[3] + viewport[1] * 0.5f + item->m_vPos.y * 0.5f * viewport[1];
+            x = viewport->m_ScreenPosX + viewport->m_Width * 0.5f + item->m_vPos.x * 0.5f * viewport->m_Width;
+            y = viewport->m_ScreenPosY + viewport->m_Height * 0.5f + item->m_vPos.y * 0.5f * viewport->m_Height;
             alpha = item->m_Alpha;
         }
         Hud_GetSpriteSize(item->m_Icon, 0, &width, &height);
@@ -113,7 +75,7 @@ void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, MenuPlayer
                 alpha = 1.0f;
                 green = blue = red;
             } else {
-                if (player->owned[menu->m_Items[item->m_Item].m_Weapon] == 0) {
+                if (player->m_Data.m_WeaponList[menu->m_Items[item->m_Item].m_Weapon] == 0) {
                     blue = green = red = 8;
                     alpha *= 0.25f;
                 } else if (menu->m_Items[item->m_Item].m_bAvailable == 0) {

@@ -11,50 +11,17 @@ typedef struct {
 } Vec3_00403F3C;
 
 
-#ifdef TARGET_PORT
-typedef struct Def00403F3C {
-/* the view at the host offsets of CAIModeInfo (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Def00403F3C(m) __builtin_offsetof(CAIModeInfo, m)
-    union {
-        struct { u8 _hp_onReset[T2_HOFF_Def00403F3C(m_pfCallback)]; void (*onReset)(CGameObjectInstance *actor, void *level); }; /* N64 0x8 */
-    };
-} Def00403F3C;
-#else
-typedef struct {
-    /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ void (*onReset)(CGameObjectInstance *actor, void *level);
-} Def00403F3C;
-#endif
 
-#ifdef TARGET_PORT
-typedef struct Level00403F3C {
-/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Level00403F3C(m) __builtin_offsetof(CAI, m)
-    union {
-        struct { u8 _hp_def[T2_HOFF_Level00403F3C(m_pModeCurrent)]; Def00403F3C *def; }; /* N64 0x30 */
-        struct { u8 _hp_spawn[T2_HOFF_Level00403F3C(m_vDesiredPos)]; Vec3_00403F3C spawn; }; /* N64 0x54 */
-    };
-} Level00403F3C;
-#else
-typedef struct {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ Def00403F3C *def;
-    /* 0x34 */ u8 pad1[0x54 - 0x34];
-    /* 0x54 */ Vec3_00403F3C spawn;
-} Level00403F3C;
-#endif
 
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define AI_TurnHeadToTarget AI_TurnHeadToTarget_i
 #endif
-void AI_TurnHeadToTarget(CGameObjectInstance *actor, Level00403F3C *level, s32 a2);
+void AI_TurnHeadToTarget(CGameObjectInstance *actor, CAI *level, s32 a2);
 void Animator_Update(void *light);
 s16 WeightedTable_PickStatic(void *table);
 void Primagen_SpawnTossedObject(s16 type, s32 a1, Vec3_00403F3C offset);
-void Primagen_UpdateHealth(CGameObjectInstance *actor, Level00403F3C *level);
-void Primagen_UpdateSpawner(CGameObjectInstance *actor, Level00403F3C *level);
+void Primagen_UpdateHealth(CGameObjectInstance *actor, CAI *level);
+void Primagen_UpdateSpawner(CGameObjectInstance *actor, CAI *level);
 void COnScreen__SetBossPercent(void *a0, s32 percent);
 
 #define COUNT_DOWN(t)              \
@@ -62,22 +29,22 @@ void COnScreen__SetBossPercent(void *a0, s32 percent);
         (t) -= gFrameIncrement;         \
     }
 
-void Primagen_Step(CGameObjectInstance *actor, Level00403F3C *level) {
+void Primagen_Step(CGameObjectInstance *actor, CAI *level) {
     Vec3_00403F3C offset;
     s32 type;
     s32 i;
 
     AI_TurnHeadToTarget(actor, level, 0);
-    if (level->def != NULL && level->def->onReset != NULL) {
-        level->def->onReset(actor, level);
+    if (level->m_pModeCurrent != NULL && level->m_pModeCurrent->m_pfCallback != NULL) {
+        level->m_pModeCurrent->m_pfCallback(actor, level);
     }
     for (i = 0; i < 8; i++) {
         Animator_Update(&gLevelScript.anims[i]);
     }
     if (gLevelScript.bossState == 1) {
-        level->spawn.x = gLevelScript.home.x;
-        level->spawn.y = gLevelScript.home.y;
-        level->spawn.z = gLevelScript.home.z;
+        level->m_vDesiredPos.x = gLevelScript.home.x;
+        level->m_vDesiredPos.y = gLevelScript.home.y;
+        level->m_vDesiredPos.z = gLevelScript.home.z;
     }
     COUNT_DOWN(gLevelScript.waveTimer);
     COUNT_DOWN(gLevelScript.script.timer);

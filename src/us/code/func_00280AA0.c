@@ -4,40 +4,10 @@
 #include "structs/camera.h"
 #include "gfx.h"
 #include "globals/render.h"
-#ifdef TARGET_PORT
 #include "structs/particle.h"
-#endif
 
-/* An object that can shine a glare (only the fields read here). */
-#ifdef TARGET_PORT
-typedef struct CGlareSource {
-/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_CGlareSource(m) __builtin_offsetof(CParticle, m)
-    union {
-        struct { u8 _hp_m_vPos[T2_HOFF_CGlareSource(header.m_vPos)]; CVector3 m_vPos; }; /* N64 0x4 */
-        struct { u8 _hp_m_CameraMask[T2_HOFF_CGlareSource(m_dwFlags)]; u32 m_CameraMask; }; /* N64 0x40 */
-        struct { u8 _hp_m_pFlags[T2_HOFF_CGlareSource(m_pEffect)]; u32 *m_pFlags; }; /* N64 0xF8 */
-        struct { u8 _hp_m_GlareScale[T2_HOFF_CGlareSource(m_Alpha)]; f32 m_GlareScale; }; /* N64 0x174 */
-        struct { u8 _hp_m_pNext[T2_HOFF_CGlareSource(m_pDrawNext)]; struct CGlareSource *m_pNext; }; /* N64 0x1D0 */
-    };
-} CGlareSource;
-#else
-typedef struct CGlareSource {
-    /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ CVector3 m_vPos;
-    /* 0x010 */ u8 pad10[0x30];
-    /* 0x040 */ u32 m_CameraMask;           /* bit 3 + camera index: seen by it */
-    /* 0x044 */ u8 pad44[0xB4];
-    /* 0x0F8 */ u32 *m_pFlags;              /* 0x80000: shines */
-    /* 0x0FC */ u8 padFC[0x78];
-    /* 0x174 */ f32 m_GlareScale;
-    /* 0x178 */ u8 pad178[0x58];
-    /* 0x1D0 */ struct CGlareSource *m_pNext;
-} CGlareSource;
-#endif
-
-extern CGlareSource *D_8010753C; /* the particle draw list head (gendata aliases it to the host member) */
+/* The glares are particles whose template flags have 0x80000; m_dwFlags is the camera mask. */
+extern CParticle *D_8010753C; /* the particle draw list head (gendata aliases it to the host member) */
 void Hud_SetupTextureMode(s32 a);
 void Render_SetRenderMode(s32 a);
 void CMtxF__TransformPointProjective(CMtxF *m, CVector3 *in, CVector3 *out);
@@ -56,7 +26,7 @@ static inline void ScreenPos(CCamera *cam, CVector3 *point, f32 *x, f32 *y) {
 
 /* The glares (lens flares) of the objects this camera sees. */
 void CCamera__DrawGlares(CCamera *cam) {
-    CGlareSource *e;
+    CParticle *e;
     u32 *dl;
     u32 *q0;
     u32 **pp;
@@ -82,10 +52,10 @@ void CCamera__DrawGlares(CCamera *cam) {
     __asm__("" : : : "memory");
     *pp = q0 + 2;
 #endif
-    for (e = D_8010753C; e != NULL; e = e->m_pNext) {
-        if ((e->m_CameraMask & mask) && (*e->m_pFlags & 0x80000)) {
-            ScreenPos(cam, &e->m_vPos, &sx, &sy);
-            CCamera__DrawGlare(cam, sx, sy, e->m_GlareScale * 0.003921569f, 0, 0);
+    for (e = D_8010753C; e != NULL; e = e->m_pDrawNext) {
+        if ((e->m_dwFlags & mask) && (e->m_pEffect->m_dwFlags & 0x80000)) {
+            ScreenPos(cam, &e->header.m_vPos, &sx, &sy);
+            CCamera__DrawGlare(cam, sx, sy, e->m_Alpha * 0.003921569f, 0, 0);
         }
     }
 }

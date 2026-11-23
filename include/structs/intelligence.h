@@ -181,7 +181,15 @@ typedef struct CTurretIntelligence {
     /* 0x34 (0x48) */ u32 m_dwTurretFlags;
     /* 0x38 (0x4C) */ s32 m_GunNode;         /* event ids the turret's animation fires */
     /* 0x3C (0x50) */ s32 m_RotNode;
-    /* 0x40 (0x54) */ f32 m_RotSpeed;
+    /* 0x40 (0x54) */ f32 m_RotSpeed;         /* radians per frame (Turret_Aim) */
+    /* 0x44 (0x58) */ f32 m_TurnArc;          /* the yaw it can sweep; >= 2 pi: all round */
+    /* 0x48 (0x5C) */ f32 m_AimRange;         /* it aims at a sight target within these */
+    /* 0x4C (0x60) */ f32 m_AimFov;
+    /* 0x50 (0x64) */ f32 m_FireRange;        /* and fires within these */
+    /* 0x54 (0x68) */ f32 m_FireFov;
+    /* 0x58 (0x6C) */ u8 unk_58[0x6C - 0x58];
+    /* 0x6C (0x80) */ u8 m_AimMode;           /* Turret_UpdateHinge's mode while aiming */
+    /* 0x6D (0x81) */ u8 m_IdleMode;          /* and otherwise */
 } CTurretIntelligence;
 
 /* Type 5: objects that can be picked up and thrown. */
