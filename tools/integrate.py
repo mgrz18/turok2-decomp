@@ -106,15 +106,15 @@ def main():
             for s in undef - pool:
                 a = address(s)
                 o = owner(a, todo) if a else None
-                for m in re.finditer(r"code/(func_[0-9A-F]{8})\.i:\S* undefined reference to `" + re.escape(s), log):
+                for m in re.finditer(r"(?:code|vm1|vm2)/(?:[^\s:]*/)?(func_[0-9A-F]{8})\.i:\S* undefined reference to `" + re.escape(s), log):
                     bad[m.group(1)] = f"calls {s}, which nothing defines here"
                 if o:
                     bad[o] = f"holds {s}, which other code reaches"
-            for m in re.finditer(r"code/(func_[0-9A-F]{8})\.c\.o: defined in discarded section", log):
+            for m in re.finditer(r"(?:code|vm1|vm2)/(?:[^\s:]*/)?(func_[0-9A-F]{8})\.c\.o: defined in discarded section", log):
                 bad[m.group(1)] = "its .rodata has no place in the build (discarded)"
             if not bad:
                 diff = sh(f"{PY} tools/romdiff.py --max-runs 5000").stdout
-                for n in set(re.findall(r"^code/(func_[0-9A-F]{8})\s+c\s", diff, re.M)):
+                for n in set(re.findall(r"^(?:code|vm1|vm2)/(?:\S*/)?(func_[0-9A-F]{8})\s+c\s", diff, re.M)):
                     bad[n] = "links, but builds other bytes"
             break
         if "z64: OK" in link_errors():

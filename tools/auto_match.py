@@ -663,7 +663,7 @@ def accept(chosen, rodata=None):
     wired = 0
     for name in sorted(chosen):
         res = subprocess.run([sys.executable, str(ROOT / "tools" / "c_subsegment.py"),
-                              f"code/{name}", name, "--write"],
+                              str(srcfiles.new_path(name).relative_to(ROOT / "src" / "us"))[:-2], name, "--write"],
                              capture_output=True, text=True)
         if res.returncode:
             print(f"  skip {name}: {res.stderr.strip() or res.stdout.strip()}")

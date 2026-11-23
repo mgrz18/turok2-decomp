@@ -278,7 +278,7 @@ def main():
     owned = set(sizes) | drop
 
     # A C file wired for a function inside a fixed range (named by address,
-    # code/func_X) is a fragment too, even when no symbol file lists it.
+    # code/<module>/func_X) is a fragment too, even when no symbol file lists it.
     for l in lines:
         m = ENTRY.match(l)
         if m and m.group(3) == "c" and (f := re.match(r"(?:code|vm1|vm2)/(?:.*/)?func_([0-9A-F]{8})$", m.group(4) or "")):
@@ -296,8 +296,8 @@ def main():
             print(f"  stray_{s.group(1)}: off the list, back to asm (restore its symbols by hand)")
             l = f"{m.group(1)}- [{m.group(2)}, asm]"
             m = ENTRY.match(l)
-        if m and m.group(3) in ("c", ".rodata") and re.match(rf"code/(?:{'|'.join(sorted(drop)) or '-'})$", m.group(4) or ""):
-            print(f"  {m.group(4)[5:]}: its C goes back to asm (a fragment of a whole function)")
+        if m and m.group(3) in ("c", ".rodata") and re.match(rf"(?:code|vm1|vm2)/(?:.*/)?(?:{'|'.join(sorted(drop)) or '-'})$", m.group(4) or ""):
+            print(f"  {m.group(4).rsplit('/', 1)[-1]}: its C goes back to asm (a fragment of a whole function)")
             if args.write:
                 (SRC / f"{m.group(4)}.c").unlink(missing_ok=True)
             continue

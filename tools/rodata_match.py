@@ -22,9 +22,9 @@ it (which the regenerated asm will no longer define) is still named by other
 source: src/, include/, the hand-written asm or the other data asm.
 
 Usage:
-    python3 tools/rodata_match.py src/us/code/func_0027ECF0.c ...
-    python3 tools/rodata_match.py --write src/us/code/func_0027ECF0.c ...
-    python3 tools/rodata_match.py --slice 0x800A5A10 src/us/code/func_00218B10.c
+    python3 tools/rodata_match.py src/us/code/CCamera/func_0027ECF0.c ...
+    python3 tools/rodata_match.py --write src/us/code/CCamera/func_0027ECF0.c ...
+    python3 tools/rodata_match.py --slice 0x800A5A10 src/us/code/CAnimationState/func_00218B10.c
 
 Prints `OK <file> text <vram>+<size> rodata <vram>+<size> (ROM <off>)`
 per file; exit status 0 when every file matches.
@@ -44,6 +44,7 @@ from elftools.elf.relocation import RelocationSection
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
+import srcfiles  # noqa: E402
 from asm_diff import CPP_FLAGS, CC_FLAGS, FLAGS_LINE, symbols  # noqa: E402
 from match_func import sym_rom  # noqa: E402
 
@@ -218,7 +219,8 @@ def own_slice(name, start, end):
     ents = [(i, ENTRY.match(lines[i])) for i in range(seg, stop)]
     ents = [(i, int(m.group(2), 16), m.group(3), m.group(4), m.group(1)) for i, m in ents if m]
     indent = ents[0][4]
-    me = f"code/{name}"
+    p = srcfiles.find(name)
+    me = str(p.relative_to(ROOT / "src" / "us"))[:-2] if p else f"code/{name}"
     seg_end = RDATA[2] + RDATA[1] - RDATA[0]
     spans = [(a, ents[k + 1][1] if k + 1 < len(ents) else seg_end, typ, sub, i)
              for k, (i, a, typ, sub, _) in enumerate(ents)]
