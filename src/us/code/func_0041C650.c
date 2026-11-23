@@ -4,10 +4,10 @@
 #include "globals/game.h"
 
 
-extern char D_800B4080[];
-extern char D_800B4098[];
-extern char D_800C1318[]; /* "  %2d"-style */
-extern char D_800C1320[];
+extern char sOptionsMenuText_ControlStickVertNorm[];
+extern char sOptionsMenuText_ControlStickVert[];
+extern char sOptionsMenuFmt_02d[]; /* "  %2d"-style */
+extern char sOptionsMenuFmt_03d[];
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 
@@ -21,13 +21,13 @@ s32 OptionsMenu_StickVertText(MenuItem *a, Menu *c) {
     }
     v = (options->m_SettingY - 0x80) / 8;
     if (v == 0) {
-        a->text = D_800B4080;
+        a->text = sOptionsMenuText_ControlStickVertNorm;
     } else if (v > 0) {
-        a->text = D_800B4098;
-        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C1318, v);
+        a->text = sOptionsMenuText_ControlStickVert;
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), sOptionsMenuFmt_02d, v);
     } else {
-        a->text = D_800B4098;
-        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C1320, v);
+        a->text = sOptionsMenuText_ControlStickVert;
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), sOptionsMenuFmt_03d, v);
     }
     return 0;
 }

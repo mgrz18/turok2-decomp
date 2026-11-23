@@ -8,13 +8,13 @@ struct FieldRecAt14 {
     char pad[0x14];
     char *text;
 };
-extern char D_800B437C[];
-extern char D_800B436C[];
+extern char sMissionMenuText_MissionFailed[];
+extern char sMissionMenuText_MissionStatus[];
 s32 MissionMenu_UpdateTitle_2(struct FieldRecAt14 *field) {
     if (sMissionFailed != 0) {
-        field->text = D_800B437C;
+        field->text = sMissionMenuText_MissionFailed;
     } else {
-        field->text = D_800B436C;
+        field->text = sMissionMenuText_MissionStatus;
     }
     return 1;
 }

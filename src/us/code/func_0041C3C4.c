@@ -4,9 +4,9 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B4008[];
-extern char D_800B4020[];
-extern char D_800B4038[];
+extern char sOptionsMenuText_OpacityClear[];
+extern char sOptionsMenuText_OpacityOpaque[];
+extern char sOptionsMenuText_Opacity[];
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 
@@ -14,11 +14,11 @@ s32 OptionsMenu_OpacityText(MenuItem *a) {
     u32 h = gEngineApp_m_Settings.hudAlphaSetting.value >> 4;
 
     if (h == 0) {
-        a->text = D_800B4008;
+        a->text = sOptionsMenuText_OpacityClear;
     } else if (h == 0x10) {
-        a->text = D_800B4020;
+        a->text = sOptionsMenuText_OpacityOpaque;
     } else {
-        a->text = D_800B4038;
+        a->text = sOptionsMenuText_Opacity;
         sprintf(a->text + (MenuItem_TextLength(a) - 2), "%02d", h);
     }
     return 0;

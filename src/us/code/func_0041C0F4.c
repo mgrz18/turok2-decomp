@@ -6,8 +6,8 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B3F48[];
-extern char D_800B3F30[];
+extern char sOptionsMenuText_LookSpringOff[];
+extern char sOptionsMenuText_LookSpringOn[];
 s32 OptionsMenu_LookSpringText(MenuItem *item, Menu *menu) {
     CPlayerOptions *settings = &gEngineApp_m_Settings.defaultSlot;
     if (menu->player != 0 && menu->player->m_pOptions != 0) {
@@ -15,10 +15,10 @@ s32 OptionsMenu_LookSpringText(MenuItem *item, Menu *menu) {
     }
     switch (settings->m_bLookSpring) {
     case 0:
-        item->text = D_800B3F48;
+        item->text = sOptionsMenuText_LookSpringOff;
         break;
     case 1:
-        item->text = D_800B3F30;
+        item->text = sOptionsMenuText_LookSpringOn;
         break;
     }
     return 0;

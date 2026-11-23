@@ -11,14 +11,14 @@
 #endif
 
 #ifdef TARGET_PORT
-extern char D_800B57E4[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
+extern char sCheatMenuText_InfiniteLivesOn[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 D_800B57E4;
+extern s32 sCheatMenuText_InfiniteLivesOn;
 #endif
 #ifdef TARGET_PORT
-extern char D_800B5800[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
+extern char sCheatMenuText_InfiniteLivesOff[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 D_800B5800;
+extern s32 sCheatMenuText_InfiniteLivesOff;
 #endif
 s32 CheatMenu_InfiniteLivesText(struct Func8043D458Arg *arg0) {
     if (gEngineApp_m_Settings.unlockedCheats & 2) {
@@ -27,9 +27,9 @@ s32 CheatMenu_InfiniteLivesText(struct Func8043D458Arg *arg0) {
         arg0->flags &= 0xFEFFFFFF;
     }
     if (gEngineApp_m_Settings.cheatFlags & 2) {
-        arg0->text = T2_TEXT(D_800B57E4);
+        arg0->text = T2_TEXT(sCheatMenuText_InfiniteLivesOn);
     } else {
-        arg0->text = T2_TEXT(D_800B5800);
+        arg0->text = T2_TEXT(sCheatMenuText_InfiniteLivesOff);
     }
     return 0;
 }

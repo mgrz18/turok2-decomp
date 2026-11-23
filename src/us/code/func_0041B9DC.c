@@ -2,8 +2,8 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B5AF4[];
-extern char D_800B5B10[];
+extern char sCheatMenuText_FrootyStripesOn[];
+extern char sCheatMenuText_FrootyStripesOff[];
 s32 CheatMenu_FrootyStripesText(MenuItem *item)
 {
   s32 var_v0;
@@ -19,11 +19,11 @@ s32 CheatMenu_FrootyStripesText(MenuItem *item)
   *(s32 *)&item->flags = var_v0; /* not a member store: then it may alias gEngineApp_m_Settings and stays first, as in the ROM */
   if (gEngineApp_m_Settings.cheatFlags & 0x8000)
   {
-    item->text = D_800B5AF4;
+    item->text = sCheatMenuText_FrootyStripesOn;
   }
   else
   {
-    item->text = D_800B5B10;
+    item->text = sCheatMenuText_FrootyStripesOff;
   }
   return 0;
 }

@@ -16,7 +16,7 @@ s16 func_002261A8(s32 *);                       /* extern */
 
 #ifdef TARGET_PORT
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS func_002261A8 gets this function's
- * $a1 (the path index) and $a2 (the position, from the caller func_00219BC0) untouched; the
+ * $a1 (the path index) and $a2 (the position, from the caller CGameObjectInstance__Construct) untouched; the
  * host takes and passes them. */
 void CPathTrack__StartAtNearestPoint(Arg0 *arg0, s8 arg1, struct CVector3 *pt) {
 #else

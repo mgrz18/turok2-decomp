@@ -9,21 +9,21 @@
 #endif
 
 #ifdef TARGET_PORT
-extern char D_800B49C4[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
+extern char sGameNoteMenuText_NoteInfo[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 D_800B49C4;
+extern s32 sGameNoteMenuText_NoteInfo;
 #endif
 #ifdef TARGET_PORT
-extern char D_800B49D0[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
+extern char sGameNoteMenuText_DeleteNote[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 D_800B49D0;
+extern s32 sGameNoteMenuText_DeleteNote;
 #endif
 
 s32 GameNoteMenu_UpdateTitle(MenuItem *arg0) {
     if (sGameNoteLoad != 0) {
-        arg0->table = T2_TEXT(D_800B49C4);
+        arg0->table = T2_TEXT(sGameNoteMenuText_NoteInfo);
     } else {
-        arg0->table = T2_TEXT(D_800B49D0);
+        arg0->table = T2_TEXT(sGameNoteMenuText_DeleteNote);
     }
     return 0;
 }

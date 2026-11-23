@@ -4,10 +4,10 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B59DC[];
-extern char D_800B59F8[];
+extern char sCheatMenuText_GouraudModeOn[];
+extern char sCheatMenuText_GouraudModeOff[];
 s32 CheatMenu_GouraudModeText_2(MenuItem *a) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x400) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
-    if (gEngineApp_m_Settings.cheatFlags & 0x400) a->text = D_800B59DC; else a->text = D_800B59F8;
+    if (gEngineApp_m_Settings.cheatFlags & 0x400) a->text = sCheatMenuText_GouraudModeOn; else a->text = sCheatMenuText_GouraudModeOff;
     return 0;
 }

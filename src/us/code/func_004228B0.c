@@ -4,22 +4,22 @@
 #include "rw/abu_types.h"
 #include "globals/pak.h"
 
-extern char D_800B5010[];
-extern char D_800B4FD4[];
-extern char D_800B4F68[];
-extern char D_800B4BFC[];
-extern char D_800B4F98[];
-extern char D_800B4D84[];
-extern char D_800B4CB4[];
-extern char D_800B4E38[];
-extern char D_800B4E90[];
-extern char D_800B4EF8[];
-extern char D_800B4F1C[];
-extern char D_800B4D1C[];
-extern char D_800B4DEC[];
-extern char D_800B4BB8[];
-extern char D_800B4E70[];
-extern char D_800B4C48[];
+extern char sPakMessageText_ControllerPakWas[];
+extern char sPakMessageText_ProblemOccurred_B4FD4[];
+extern char sPakMessageText_NoteWas[];
+extern char sPakMessageText_ControllerPakNot_B4BFC[];
+extern char sPakMessageText_ProblemOccurred_B4F98[];
+extern char sPakMessageText_ThisGameIsRumblePak_B4D84[];
+extern char sPakMessageText_ThisGameIsController_B4CB4[];
+extern char sPakMessageText_ControllerPak[];
+extern char sPakMessageText_ThisGameIsRumblePak_B4E90[];
+extern char sPakMessageText_SaveWas[];
+extern char sPakMessageText_ThisNoteIsCorrupt[];
+extern char sPakMessageText_ThisGameIsController_B4D1C[];
+extern char sPakMessageText_ControllerPakNot_B4DEC[];
+extern char sPakMessageText_ControllerPakIsFull[];
+extern char sPakMessageText_Empty_B4E70[];
+extern char sPakMessageText_ThisGameIsController_B4C48[];
 s32 PakMessage_UpdateLine1(struct FieldRecAt14 *field) {
     u32 state = gPakMessageKind;
     if (state >= 16) {
@@ -44,52 +44,52 @@ s32 PakMessage_UpdateLine1(struct FieldRecAt14 *field) {
         case 15: goto case_15;
         }
 state_other:
-    field->text = D_800B4BB8;
+    field->text = sPakMessageText_ControllerPakIsFull;
     goto done;
 case_1:
-    field->text = D_800B4BFC;
+    field->text = sPakMessageText_ControllerPakNot_B4BFC;
     goto done;
 case_2:
-    field->text = D_800B4C48;
+    field->text = sPakMessageText_ThisGameIsController_B4C48;
     goto done;
 case_3:
-    field->text = D_800B4D1C;
+    field->text = sPakMessageText_ThisGameIsController_B4D1C;
     goto done;
 case_4:
-    field->text = D_800B4CB4;
+    field->text = sPakMessageText_ThisGameIsController_B4CB4;
     goto done;
 case_5:
-    field->text = D_800B4D84;
+    field->text = sPakMessageText_ThisGameIsRumblePak_B4D84;
     goto done;
 case_6:
-    field->text = D_800B4DEC;
+    field->text = sPakMessageText_ControllerPakNot_B4DEC;
     goto done;
 case_7:
-    field->text = D_800B4E38;
+    field->text = sPakMessageText_ControllerPak;
     goto done;
 case_8:
-    field->text = D_800B4E70;
+    field->text = sPakMessageText_Empty_B4E70;
     goto done;
 case_9:
-    field->text = D_800B4E90;
+    field->text = sPakMessageText_ThisGameIsRumblePak_B4E90;
     goto done;
 case_10:
-    field->text = D_800B4EF8;
+    field->text = sPakMessageText_SaveWas;
     goto done;
 case_11:
-    field->text = D_800B4F1C;
+    field->text = sPakMessageText_ThisNoteIsCorrupt;
     goto done;
 case_12:
-    field->text = D_800B4F68;
+    field->text = sPakMessageText_NoteWas;
     goto done;
 case_13:
-    field->text = D_800B4F98;
+    field->text = sPakMessageText_ProblemOccurred_B4F98;
     goto done;
 case_14:
-    field->text = D_800B4FD4;
+    field->text = sPakMessageText_ProblemOccurred_B4FD4;
     goto done;
 case_15:
-    field->text = D_800B5010;
+    field->text = sPakMessageText_ControllerPakWas;
 done:
     return 0;
 }

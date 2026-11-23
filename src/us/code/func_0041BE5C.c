@@ -4,9 +4,9 @@
 #include "rw/abu_types.h"
 #include "globals/game.h"
 
-extern u8 D_800B3E88[];
-extern u8 D_800B3EA0[];
-extern u8 D_800B3E70[];
+extern u8 sOptionsMenuText_DifficultyNormal[];
+extern u8 sOptionsMenuText_DifficultyHard[];
+extern u8 sOptionsMenuText_DifficultyEasy[];
 s32 OptionsMenu_DifficultyText(MenuItemRecAt14 *item) {
     extern u32 gEngineApp_m_Settings_difficulty; /* local type: the field's real type (or the member path) changes the ROM's code here */
     if (gEngineApp_m_Settings.mode == 8) {
@@ -16,13 +16,13 @@ s32 OptionsMenu_DifficultyText(MenuItemRecAt14 *item) {
     }
     switch (gEngineApp_m_Settings_difficulty) {
     case 8:
-        item->table = D_800B3E70;
+        item->table = sOptionsMenuText_DifficultyEasy;
         break;
     case 0x10:
-        item->table = D_800B3E88;
+        item->table = sOptionsMenuText_DifficultyNormal;
         break;
     case 0x20:
-        item->table = D_800B3EA0;
+        item->table = sOptionsMenuText_DifficultyHard;
         break;
     }
     return 0;

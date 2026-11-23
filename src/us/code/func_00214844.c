@@ -59,7 +59,7 @@ typedef struct {
 
 /* What this reads around gEngineApp_m_Settings_match. */
 
-extern char D_800A57F8[];
+extern char sCStaticObjectCacheDesc_LitVertices[];
 
 #ifdef TARGET_PORT /* unprototyped: the host passes the pass-through arguments */
 s32 Actor_GetTypeClass();
@@ -176,7 +176,7 @@ void CStaticObject__Draw(PlacedProp *prop) {
     if (instance == NULL) {
         return;
     }
-    resource = CCache__RequestDecompression(0, prop->colorKey | gLitVerticesKey, instance, prop->cache, 8, prop, CStaticObject__BuildLitVerticesCallback, D_800A57F8, 0);
+    resource = CCache__RequestDecompression(0, prop->colorKey | gLitVerticesKey, instance, prop->cache, 8, prop, CStaticObject__BuildLitVerticesCallback, sCStaticObjectCacheDesc_LitVertices, 0);
     if (resource != NULL) {
         CCache__LockForDisplayList(0, resource);
         header = *resource;
@@ -243,7 +243,7 @@ void CStaticObject__Draw(PlacedProp *prop) {
     if (instance == NULL) {
         return;
     }
-    resource = CCache__RequestDecompression(0, prop->colorKey | gLitVerticesKey, instance, prop->cache, 8, prop, CStaticObject__BuildLitVerticesCallback, D_800A57F8, 0);
+    resource = CCache__RequestDecompression(0, prop->colorKey | gLitVerticesKey, instance, prop->cache, 8, prop, CStaticObject__BuildLitVerticesCallback, sCStaticObjectCacheDesc_LitVertices, 0);
     if (resource != NULL) {
         CCache__LockForDisplayList(0, resource);
         header = *resource;

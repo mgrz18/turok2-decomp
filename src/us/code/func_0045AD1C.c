@@ -6,11 +6,11 @@ typedef struct {
     /* 0x14 */ s32 *data;
 } Item;
 
-extern s32 D_800B490C;
+extern s32 sPakMenuText_Exit;
 
 s32 PakMenu_UpdateCancel_2(Item *arg0) {
     if (gPakMenuAnyPak != 0) {
-        arg0->data = &D_800B490C;
+        arg0->data = &sPakMenuText_Exit;
     }
     return 0;
 }

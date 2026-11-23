@@ -7,7 +7,7 @@
  * print one of the current player's u16 counters (per opponent) after it. */
 
 extern char D_8011AB8B[];
-extern char D_800C1338[];
+extern char sStatsMenuFmt_02d[];
 
 s32 MenuItem_TextLength_2(MenuItem *item);
 #ifdef TARGET_PORT
@@ -35,6 +35,6 @@ s32 StatsMenu_PlayerRowText_2(MenuItem *item, Menu *event) {
     for (i = 0; i < 8; i++) {
         *dst++ = *src++;
     }
-    sprintf(item->text + (MenuItem_TextLength_2(item) - 2), D_800C1338, value);
+    sprintf(item->text + (MenuItem_TextLength_2(item) - 2), sStatsMenuFmt_02d, value);
     return 0;
 }

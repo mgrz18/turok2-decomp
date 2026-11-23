@@ -4,8 +4,8 @@
 #include "globals/game.h"
 
 
-extern char D_800B4050[];
-extern char D_800B4068[];
+extern char sOptionsMenuText_ControlStickHorzNorm[];
+extern char sOptionsMenuText_ControlStickHorz[];
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 
@@ -19,12 +19,12 @@ s32 OptionsMenu_StickHorzText(MenuItem *a, Menu *c) {
     }
     v = (options->m_SettingX - 0x80) / 8;
     if (v == 0) {
-        a->text = D_800B4050;
+        a->text = sOptionsMenuText_ControlStickHorzNorm;
     } else if (v > 0) {
-        a->text = D_800B4068;
+        a->text = sOptionsMenuText_ControlStickHorz;
         sprintf(a->text + (MenuItem_TextLength(a) - 4), "  %02d", v);
     } else {
-        a->text = D_800B4068;
+        a->text = sOptionsMenuText_ControlStickHorz;
         sprintf(a->text + (MenuItem_TextLength(a) - 4), " %03d", v);
     }
     return 0;

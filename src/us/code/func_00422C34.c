@@ -4,22 +4,22 @@
 #include "rw/abu_types.h"
 #include "globals/pak.h"
 
-extern char D_800B5054[];
-extern char D_800B5008[];
-extern char D_800B4F90[];
-extern char D_800B4C28[];
-extern char D_800B4FCC[];
-extern char D_800B4DC8[];
-extern char D_800B4CFC[];
-extern char D_800B4E64[];
-extern char D_800B4ED4[];
-extern char D_800B4F14[];
-extern char D_800B4F5C[];
-extern char D_800B4D64[];
-extern char D_800B4E2C[];
-extern char D_800B4BF4[];
-extern char D_800B4E88[];
-extern char D_800B4C90[];
+extern char sPakMessageText_SavedNotesMayHave[];
+extern char sPakMessageText_Empty_B5008[];
+extern char sPakMessageText_Empty_B4F90[];
+extern char sPakMessageText_ControllerPakAnd[];
+extern char sPakMessageText_Empty_B4FCC[];
+extern char sPakMessageText_NowIfYouWishToPlay_B4DC8[];
+extern char sPakMessageText_PakNowIfYouWishTo_B4CFC[];
+extern char sPakMessageText_Again[];
+extern char sPakMessageText_NowIfYouWishToPlay_B4ED4[];
+extern char sPakMessageText_Empty_B4F14[];
+extern char sPakMessageText_Note[];
+extern char sPakMessageText_PakNowIfYouWishTo_B4D64[];
+extern char sPakMessageText_Game[];
+extern char sPakMessageText_Empty_B4BF4[];
+extern char sPakMessageText_Empty_B4E88[];
+extern char sPakMessageText_PakNowIfYouWishTo_B4C90[];
 s32 PakMessage_UpdateLine4(struct FieldRecAt14 *field) {
     u32 state = gPakMessageKind;
     if (state >= 16) {
@@ -44,52 +44,52 @@ s32 PakMessage_UpdateLine4(struct FieldRecAt14 *field) {
         case 15: goto case_15;
         }
 state_other:
-    field->text = D_800B4BF4;
+    field->text = sPakMessageText_Empty_B4BF4;
     goto done;
 case_1:
-    field->text = D_800B4C28;
+    field->text = sPakMessageText_ControllerPakAnd;
     goto done;
 case_2:
-    field->text = D_800B4C90;
+    field->text = sPakMessageText_PakNowIfYouWishTo_B4C90;
     goto done;
 case_3:
-    field->text = D_800B4D64;
+    field->text = sPakMessageText_PakNowIfYouWishTo_B4D64;
     goto done;
 case_4:
-    field->text = D_800B4CFC;
+    field->text = sPakMessageText_PakNowIfYouWishTo_B4CFC;
     goto done;
 case_5:
-    field->text = D_800B4DC8;
+    field->text = sPakMessageText_NowIfYouWishToPlay_B4DC8;
     goto done;
 case_6:
-    field->text = D_800B4E2C;
+    field->text = sPakMessageText_Game;
     goto done;
 case_7:
-    field->text = D_800B4E64;
+    field->text = sPakMessageText_Again;
     goto done;
 case_8:
-    field->text = D_800B4E88;
+    field->text = sPakMessageText_Empty_B4E88;
     goto done;
 case_9:
-    field->text = D_800B4ED4;
+    field->text = sPakMessageText_NowIfYouWishToPlay_B4ED4;
     goto done;
 case_10:
-    field->text = D_800B4F14;
+    field->text = sPakMessageText_Empty_B4F14;
     goto done;
 case_11:
-    field->text = D_800B4F5C;
+    field->text = sPakMessageText_Note;
     goto done;
 case_12:
-    field->text = D_800B4F90;
+    field->text = sPakMessageText_Empty_B4F90;
     goto done;
 case_13:
-    field->text = D_800B4FCC;
+    field->text = sPakMessageText_Empty_B4FCC;
     goto done;
 case_14:
-    field->text = D_800B5008;
+    field->text = sPakMessageText_Empty_B5008;
     goto done;
 case_15:
-    field->text = D_800B5054;
+    field->text = sPakMessageText_SavedNotesMayHave;
 done:
     return 0;
 }

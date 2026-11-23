@@ -6,7 +6,7 @@
 
 extern void CVector3__Normalize(f32 *);
 #ifdef TARGET_PORT
-/* The port: the point as three floats, as func_00212680 and abu_protos.h pass it. The N64 body
+/* The port: the point as three floats, as Actors_EvaluateLightVolume and abu_protos.h pass it. The N64 body
  * below takes them as u32 words and reads them back as one CVector3 from the argument save
  * area (*(CVector3 *)&arg1), which only works with the MIPS o32 convention; on x86-64/arm64
  * three f32 arguments go in float registers, and CScene__ComputeLights passed a CVector3 by

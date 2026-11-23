@@ -4,28 +4,28 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern char D_800B5168[];
-extern char D_800B51C4[];
-extern char D_800B5200[];
-extern char D_800B5250[];
-extern char D_800B52B0[];
+extern char sPakConfirmMenuText_WouldYouStillLike[];
+extern char sPakConfirmMenuText_Save[];
+extern char sPakConfirmMenuText_SaveAllNoteTypes[];
+extern char sPakConfirmMenuText_WouldYouLikeTo_B5250[];
+extern char sPakConfirmMenuText_WouldYouLikeTo_B52B0[];
 s32 PakConfirmMenu_UpdateLine4_2(MenuItem *item) {
     switch (gPakConfirmKind) {
     default:
     case 0:
-        item->text = D_800B5168;
+        item->text = sPakConfirmMenuText_WouldYouStillLike;
         break;
     case 1:
-        item->text = D_800B51C4;
+        item->text = sPakConfirmMenuText_Save;
         break;
     case 2:
-        item->text = D_800B5200;
+        item->text = sPakConfirmMenuText_SaveAllNoteTypes;
         break;
     case 3:
-        item->text = D_800B5250;
+        item->text = sPakConfirmMenuText_WouldYouLikeTo_B5250;
         break;
     case 4:
-        item->text = D_800B52B0;
+        item->text = sPakConfirmMenuText_WouldYouLikeTo_B52B0;
         break;
     }
     return 0;

@@ -3,12 +3,12 @@
 #include "globals/menu.h"
 
 extern char D_800C1768[];
-extern char D_800B43BC[];
-extern char D_800B4410[];
-extern char D_800B4464[];
-extern char D_800B44C4[];
-extern char D_800B44FC[];
-extern char D_800B4560[];
+extern char sMissionMenuText_DistressBeacons[];
+extern char sMissionMenuText_SoulGates[];
+extern char sMissionMenuText_Prisoners[];
+extern char sMissionMenuText_ThermalVents[];
+extern char sMissionMenuText_QueenEmbryos[];
+extern char sMissionMenuText_PowerGenerators[];
 
 s32 MissionMenu_UpdateObjective1(MenuItem *item) {
     switch (sMissionHub) {
@@ -18,22 +18,22 @@ s32 MissionMenu_UpdateObjective1(MenuItem *item) {
             item->text = D_800C1768;
             break;
         case 1:
-            item->text = D_800B43BC;
+            item->text = sMissionMenuText_DistressBeacons;
             break;
         case 2:
-            item->text = D_800B4410;
+            item->text = sMissionMenuText_SoulGates;
             break;
         case 3:
-            item->text = D_800B4464;
+            item->text = sMissionMenuText_Prisoners;
             break;
         case 4:
-            item->text = D_800B44C4;
+            item->text = sMissionMenuText_ThermalVents;
             break;
         case 5:
-            item->text = D_800B44FC;
+            item->text = sMissionMenuText_QueenEmbryos;
             break;
         case 6:
-            item->text = D_800B4560;
+            item->text = sMissionMenuText_PowerGenerators;
             break;
     }
     return 0;

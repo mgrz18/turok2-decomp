@@ -4,10 +4,10 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B59A4[];
-extern char D_800B59C0[];
+extern char sCheatMenuText_PenAndInkModeOn[];
+extern char sCheatMenuText_PenAndInkModeOff[];
 s32 CheatMenu_PenAndInkModeText_2(MenuItem *a) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x200) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
-    if (gEngineApp_m_Settings.cheatFlags & 0x200) a->text = D_800B59A4; else a->text = D_800B59C0;
+    if (gEngineApp_m_Settings.cheatFlags & 0x200) a->text = sCheatMenuText_PenAndInkModeOn; else a->text = sCheatMenuText_PenAndInkModeOff;
     return 0;
 }

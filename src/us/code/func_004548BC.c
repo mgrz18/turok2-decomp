@@ -4,10 +4,10 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B5ABC[];
-extern char D_800B5AD8[];
+extern char sCheatMenuText_BlackoutOn[];
+extern char sCheatMenuText_BlackoutOff[];
 s32 CheatMenu_BlackoutText_2(MenuItem *a) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x4000) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
-    if (gEngineApp_m_Settings.cheatFlags & 0x4000) a->text = D_800B5ABC; else a->text = D_800B5AD8;
+    if (gEngineApp_m_Settings.cheatFlags & 0x4000) a->text = sCheatMenuText_BlackoutOn; else a->text = sCheatMenuText_BlackoutOff;
     return 0;
 }

@@ -1,18 +1,18 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern char D_800B4B1C[];
-extern char D_800B4B48[];
-extern char D_800B5340[];
-extern char D_800B534C[];
-extern char D_800B5358[];
-extern char D_800B5364[];
-extern char D_800B5370[];
-extern char D_800B537C[];
-extern char D_800B5388[];
-extern char D_800B5394[];
-extern char D_800B53A0[];
-extern char D_800B53AC[];
+extern char sCharNoteMenuText_Empty[];
+extern char sCharNoteMenuText_Type[];
+extern char sCharNoteMenuText_Turok[];
+extern char sCharNoteMenuText_Adon[];
+extern char sCharNoteMenuText_Gant[];
+extern char sCharNoteMenuText_FleshEater[];
+extern char sCharNoteMenuText_PurrLin[];
+extern char sCharNoteMenuText_EndTrail[];
+extern char sCharNoteMenuText_Fireborn[];
+extern char sCharNoteMenuText_Iggy[];
+extern char sCharNoteMenuText_Campaigner[];
+extern char sCharNoteMenuText_Telset[];
 extern s8 gPakProfileRead_character[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 D_801309A8;
 
@@ -22,40 +22,40 @@ s32 CharNoteMenu_UpdateType(MenuItem *item) {
     s32 i;
 
     if (D_801309A8 != 0) {
-        item->text = D_800B4B1C;
+        item->text = sCharNoteMenuText_Empty;
     } else {
-        item->text = D_800B4B48;
+        item->text = sCharNoteMenuText_Type;
         switch (gPakProfileRead_character[0]) {
             case 0:
             default:
-                src = D_800B5340;
+                src = sCharNoteMenuText_Turok;
                 break;
             case 1:
-                src = D_800B534C;
+                src = sCharNoteMenuText_Adon;
                 break;
             case 2:
-                src = D_800B5358;
+                src = sCharNoteMenuText_Gant;
                 break;
             case 3:
-                src = D_800B5364;
+                src = sCharNoteMenuText_FleshEater;
                 break;
             case 4:
-                src = D_800B5370;
+                src = sCharNoteMenuText_PurrLin;
                 break;
             case 5:
-                src = D_800B537C;
+                src = sCharNoteMenuText_EndTrail;
                 break;
             case 6:
-                src = D_800B5388;
+                src = sCharNoteMenuText_Fireborn;
                 break;
             case 7:
-                src = D_800B5394;
+                src = sCharNoteMenuText_Iggy;
                 break;
             case 8:
-                src = D_800B53A0;
+                src = sCharNoteMenuText_Campaigner;
                 break;
             case 9:
-                src = D_800B53AC;
+                src = sCharNoteMenuText_Telset;
                 break;
         }
         dst = item->text;

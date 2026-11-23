@@ -5,7 +5,7 @@
 #include "globals/audio.h"
 
 extern f32 alCents2Ratio(s32 arg0);
-extern char D_800AA290[];
+extern char sCSeqPlayerAssertExpr[];
 void __CSPHandleMIDIMsg(void *object, ALEvent *message);
 extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, s32);
 extern void __assert(void *arg0, void *arg1, s32 arg2);
@@ -226,7 +226,7 @@ void __CSPHandleMIDIMsg(void *object, ALEvent *message)
         break;
     case 0xC0:
         if (seqp->bank == 0)
-            __assert(D_800AA290, sCSPlayerFile, 711);
+            __assert(sCSeqPlayerAssertExpr, sCSPlayerFile, 711);
         if (key < seqp->bank->instCount) {
             ALInstrument *inst = seqp->bank->instArray[key];
             __setInstChanState(seqp, inst, chan);

@@ -4,11 +4,11 @@
 #include "rw/abu_types.h"
 #include "globals/pak.h"
 
-extern char D_800B5140[];
-extern char D_800B519C[];
-extern char D_800B51D8[];
-extern char D_800B5228[];
-extern char D_800B5284[];
+extern char sPakConfirmMenuText_PreviouslySaved[];
+extern char sPakConfirmMenuText_NotEnoughNotesOr_B519C[];
+extern char sPakConfirmMenuText_NotEnoughNotesOr_B51D8[];
+extern char sPakConfirmMenuText_YouWillBeDeleting[];
+extern char sPakConfirmMenuText_ThisNoteIsCorrupt[];
 s32 PakConfirmMenu_UpdateLine2(struct FieldRecAt14 *field) {
     u32 state = gPakConfirmKind;
     if (state >= 5) {
@@ -22,19 +22,19 @@ s32 PakConfirmMenu_UpdateLine2(struct FieldRecAt14 *field) {
         case 4: goto state_4;
         }
 state_other:
-    field->text = D_800B5140;
+    field->text = sPakConfirmMenuText_PreviouslySaved;
     goto done;
 state_1:
-    field->text = D_800B519C;
+    field->text = sPakConfirmMenuText_NotEnoughNotesOr_B519C;
     goto done;
 state_2:
-    field->text = D_800B51D8;
+    field->text = sPakConfirmMenuText_NotEnoughNotesOr_B51D8;
     goto done;
 state_3:
-    field->text = D_800B5228;
+    field->text = sPakConfirmMenuText_YouWillBeDeleting;
     goto done;
 state_4:
-    field->text = D_800B5284;
+    field->text = sPakConfirmMenuText_ThisNoteIsCorrupt;
 done:
     return 0;
 }

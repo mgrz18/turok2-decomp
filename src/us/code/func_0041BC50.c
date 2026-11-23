@@ -9,10 +9,10 @@ typedef struct {
     u8 colors[8];               /* 0x33 */
 } Widget;
 
-extern u8 D_800B5E80[12];
-extern u8 D_800B5E8C[12];
-extern u8 D_800B5E98[12];
-extern u8 D_800B5EA4[12];
+extern u8 sPlayerNameText_Player1[12];
+extern u8 sPlayerNameText_Player2[12];
+extern u8 sPlayerNameText_Player3[12];
+extern u8 sPlayerNameText_Player4[12];
 
 void PlayerOptions_SetDefaultName(Widget *w) {
     s32 i;
@@ -21,22 +21,22 @@ void PlayerOptions_SetDefaultName(Widget *w) {
     case 0:
     default:
         for (i = 0; i < 8; i++) {
-            w->colors[i] = D_800B5E80[i];
+            w->colors[i] = sPlayerNameText_Player1[i];
         }
         break;
     case 1:
         for (i = 0; i < 8; i++) {
-            w->colors[i] = D_800B5E8C[i];
+            w->colors[i] = sPlayerNameText_Player2[i];
         }
         break;
     case 2:
         for (i = 0; i < 8; i++) {
-            w->colors[i] = D_800B5E98[i];
+            w->colors[i] = sPlayerNameText_Player3[i];
         }
         break;
     case 3:
         for (i = 0; i < 8; i++) {
-            w->colors[i] = D_800B5EA4[i];
+            w->colors[i] = sPlayerNameText_Player4[i];
         }
         break;
     }

@@ -30,7 +30,7 @@ typedef struct {
 
 s32 Model_RequestTextures(sptr);                         /* extern */
 sptr CStaticObject__LoadGeometry();                                /* extern */
-extern s32 D_800A57F8;
+extern s32 sCStaticObjectCacheDesc_LitVertices;
 extern s32 CStaticObject__BuildLitVerticesCallback;
 
 #ifdef TARGET_PORT
@@ -44,7 +44,7 @@ void CStaticObject__RequestLitVertices(SpawnSource *arg0) {
         temp_v0 = CStaticObject__LoadGeometry(arg0);
         if (temp_v0 != 0) {
             Model_RequestTextures(temp_v0);
-            temp_v0_2 = CCache__RequestDecompression(0, arg0->spawnFlags | gLitVerticesKey, temp_v0, arg0->id, 8, arg0, &CStaticObject__BuildLitVerticesCallback, &D_800A57F8, 0);
+            temp_v0_2 = CCache__RequestDecompression(0, arg0->spawnFlags | gLitVerticesKey, temp_v0, arg0->id, 8, arg0, &CStaticObject__BuildLitVerticesCallback, &sCStaticObjectCacheDesc_LitVertices, 0);
             if (temp_v0_2 != 0) {
                 CCache__Unlock(0, temp_v0_2);
             }
@@ -65,7 +65,7 @@ void CStaticObject__RequestLitVertices(SpawnSource *arg0) {
 #endif
         if (temp_v0 != 0) {
             Model_RequestTextures(temp_v0);
-            temp_v0_2 = CCache__RequestDecompression(0, arg0->spawnFlags | gLitVerticesKey, temp_v0, arg0->id, 8, arg0, &CStaticObject__BuildLitVerticesCallback, &D_800A57F8, 0);
+            temp_v0_2 = CCache__RequestDecompression(0, arg0->spawnFlags | gLitVerticesKey, temp_v0, arg0->id, 8, arg0, &CStaticObject__BuildLitVerticesCallback, &sCStaticObjectCacheDesc_LitVertices, 0);
             if (temp_v0_2 != 0) {
                 CCache__Unlock(0, temp_v0_2);
             }

@@ -4,22 +4,22 @@
 #include "rw/abu_types.h"
 #include "globals/pak.h"
 
-extern char D_800B5024[];
-extern char D_800B4FE8[];
-extern char D_800B4F74[];
-extern char D_800B4C10[];
-extern char D_800B4FAC[];
-extern char D_800B4D9C[];
-extern char D_800B4CCC[];
-extern char D_800B4E48[];
-extern char D_800B4EA8[];
-extern char D_800B4F04[];
-extern char D_800B4F34[];
-extern char D_800B4D34[];
-extern char D_800B4E00[];
-extern char D_800B4BD0[];
-extern char D_800B4E74[];
-extern char D_800B4C60[];
+extern char sPakMessageText_SuccessfullyRepaired[];
+extern char sPakMessageText_WhileTryingTo_B4FE8[];
+extern char sPakMessageText_Successfully[];
+extern char sPakMessageText_Found[];
+extern char sPakMessageText_WhileTryingTo_B4FAC[];
+extern char sPakMessageText_CompatiblePlease_B4D9C[];
+extern char sPakMessageText_PakCompatiblePlease_B4CCC[];
+extern char sPakMessageText_WasChanged[];
+extern char sPakMessageText_CompatiblePlease_B4EA8[];
+extern char sPakMessageText_Successful[];
+extern char sPakMessageText_AndCannotBeUsed[];
+extern char sPakMessageText_PakCompatiblePlease_B4D34[];
+extern char sPakMessageText_FoundYouWillNot[];
+extern char sPakMessageText_DeleteANoteToFree[];
+extern char sPakMessageText_Empty_B4E74[];
+extern char sPakMessageText_PakCompatiblePlease_B4C60[];
 s32 PakMessage_UpdateLine2(struct FieldRecAt14 *field) {
     u32 state = gPakMessageKind;
     if (state >= 16) {
@@ -44,52 +44,52 @@ s32 PakMessage_UpdateLine2(struct FieldRecAt14 *field) {
         case 15: goto case_15;
         }
 state_other:
-    field->text = D_800B4BD0;
+    field->text = sPakMessageText_DeleteANoteToFree;
     goto done;
 case_1:
-    field->text = D_800B4C10;
+    field->text = sPakMessageText_Found;
     goto done;
 case_2:
-    field->text = D_800B4C60;
+    field->text = sPakMessageText_PakCompatiblePlease_B4C60;
     goto done;
 case_3:
-    field->text = D_800B4D34;
+    field->text = sPakMessageText_PakCompatiblePlease_B4D34;
     goto done;
 case_4:
-    field->text = D_800B4CCC;
+    field->text = sPakMessageText_PakCompatiblePlease_B4CCC;
     goto done;
 case_5:
-    field->text = D_800B4D9C;
+    field->text = sPakMessageText_CompatiblePlease_B4D9C;
     goto done;
 case_6:
-    field->text = D_800B4E00;
+    field->text = sPakMessageText_FoundYouWillNot;
     goto done;
 case_7:
-    field->text = D_800B4E48;
+    field->text = sPakMessageText_WasChanged;
     goto done;
 case_8:
-    field->text = D_800B4E74;
+    field->text = sPakMessageText_Empty_B4E74;
     goto done;
 case_9:
-    field->text = D_800B4EA8;
+    field->text = sPakMessageText_CompatiblePlease_B4EA8;
     goto done;
 case_10:
-    field->text = D_800B4F04;
+    field->text = sPakMessageText_Successful;
     goto done;
 case_11:
-    field->text = D_800B4F34;
+    field->text = sPakMessageText_AndCannotBeUsed;
     goto done;
 case_12:
-    field->text = D_800B4F74;
+    field->text = sPakMessageText_Successfully;
     goto done;
 case_13:
-    field->text = D_800B4FAC;
+    field->text = sPakMessageText_WhileTryingTo_B4FAC;
     goto done;
 case_14:
-    field->text = D_800B4FE8;
+    field->text = sPakMessageText_WhileTryingTo_B4FE8;
     goto done;
 case_15:
-    field->text = D_800B5024;
+    field->text = sPakMessageText_SuccessfullyRepaired;
 done:
     return 0;
 }

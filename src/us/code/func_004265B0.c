@@ -15,7 +15,7 @@ extern void *func_0029E460(void *dst, const void *src, s32 size);
 extern s32 Pak_Mount(s32 ch);
 extern s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
 
-extern char D_800C18B0[];
+extern char sPakText_MempakReadTempData[];
 #ifdef TARGET_PORT
 void T2Save_FromPak(void *dst, s32 size);
 #endif
@@ -31,7 +31,7 @@ s32 Pak_ReadNote(s32 ch, s32 file_no, void *dst, s32 size) {
     if (gPakState[ch] != 3) {
         return -2;
     }
-    handle = CCache__Allocate(0, blocks, 0x23, D_800C18B0);
+    handle = CCache__Allocate(0, blocks, 0x23, sPakText_MempakReadTempData);
     buf = *handle;
     Controller_Lock(1);
     Controller_ReadAll();

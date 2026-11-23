@@ -5,29 +5,29 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern u8 D_800B5180[];
-extern u8 D_800B51CC[];
-extern u8 D_800B5218[];
-extern u8 D_800B5264[];
-extern u8 D_800B52C4[];
+extern u8 sPakConfirmMenuText_ToAttemptRepair[];
+extern u8 sPakConfirmMenuText_Empty_B51CC[];
+extern u8 sPakConfirmMenuText_Empty_B5218[];
+extern u8 sPakConfirmMenuText_OverwriteThisNote[];
+extern u8 sPakConfirmMenuText_DeleteThisNote[];
 
 s32 PakConfirmMenu_UpdateLine5(MenuItem *item) {
     switch (gPakConfirmKind) {
         case 0:
         default:
-            item->text = D_800B5180;
+            item->text = sPakConfirmMenuText_ToAttemptRepair;
             break;
         case 1:
-            item->text = D_800B51CC;
+            item->text = sPakConfirmMenuText_Empty_B51CC;
             break;
         case 2:
-            item->text = D_800B5218;
+            item->text = sPakConfirmMenuText_Empty_B5218;
             break;
         case 3:
-            item->text = D_800B5264;
+            item->text = sPakConfirmMenuText_OverwriteThisNote;
             break;
         case 4:
-            item->text = D_800B52C4;
+            item->text = sPakConfirmMenuText_DeleteThisNote;
             break;
     }
     return 0;

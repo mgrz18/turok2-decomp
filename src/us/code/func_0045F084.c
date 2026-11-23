@@ -4,7 +4,7 @@
 #include "structs/pak.h"
 #include "globals/pak.h"
 
-extern u8 D_800C18E0[];
+extern u8 sPakCompanyCode[];
 
 extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void CCache__Flush(s32);
@@ -68,7 +68,7 @@ s32 Pak_SaveNoteVerified_2(s32 ch, s32 size, void *data, u8 *name, u8 *ext, u8 *
     handle = CCache__Allocate(0, blocks, 0x23, "Mempak write temp data");
     buf = *handle;
     for (tries = 0; tries < 4; tries++) {
-        result = Pak_WriteNote_2(ch, size, data, name, &file_no, ext, D_800C18E0, code);
+        result = Pak_WriteNote_2(ch, size, data, name, &file_no, ext, sPakCompanyCode, code);
         if (result != 0) {
             break;
         }

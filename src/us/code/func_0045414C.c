@@ -4,8 +4,8 @@
 #include "common.h"
 #include "globals/game.h"
 struct TextBoundsText;
-extern s32 D_800B57AC;
-extern s32 D_800B57C8;
+extern s32 sCheatMenuText_InvincibilityOn;
+extern s32 sCheatMenuText_InvincibilityOff;
 struct TextBoundsDescriptor;
 typedef struct TextBoundsDescriptor TextBoundsDescriptor;
 struct TextBoundsMetrics;
@@ -48,8 +48,8 @@ struct TextBoundsText {
     s32 field20;
     struct TextBoundsDescriptor *descriptor;
 };
-extern s32 D_800B57AC;
-extern s32 D_800B57C8;
+extern s32 sCheatMenuText_InvincibilityOn;
+extern s32 sCheatMenuText_InvincibilityOff;
 s32 CheatMenu_InvincibilityText_2(TextBoundsText *arg0) {
     if (gEngineApp_m_Settings.unlockedCheats & 1) {
         arg0->flags |= 0x01000000;
@@ -57,9 +57,9 @@ s32 CheatMenu_InvincibilityText_2(TextBoundsText *arg0) {
         arg0->flags &= 0xFEFFFFFF;
     }
     if (gEngineApp_m_Settings.cheatFlags & 1) {
-        arg0->text = &D_800B57AC;
+        arg0->text = &sCheatMenuText_InvincibilityOn;
     } else {
-        arg0->text = &D_800B57C8;
+        arg0->text = &sCheatMenuText_InvincibilityOff;
     }
     return 0;
 }

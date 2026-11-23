@@ -3,12 +3,12 @@
 #include "globals/menu.h"
 
 extern char D_800C1768[];
-extern char D_800B4398[];
-extern char D_800B43EC[];
-extern char D_800B4444[];
-extern char D_800B449C[];
-extern char D_800B44D4[];
-extern char D_800B4534[];
+extern char sMissionMenuText_PortOfAdia[];
+extern char sMissionMenuText_RiverOfSouls[];
+extern char sMissionMenuText_DeathMarshes[];
+extern char sMissionMenuText_LairOfTheBlindOnes[];
+extern char sMissionMenuText_HiveOfTheMantids[];
+extern char sMissionMenuText_PrimagensLightship[];
 
 s32 MissionMenu_UpdateLevelName(MenuItem *item) {
     switch (sMissionHub) {
@@ -18,22 +18,22 @@ s32 MissionMenu_UpdateLevelName(MenuItem *item) {
             item->text = D_800C1768;
             break;
         case 1:
-            item->text = D_800B4398;
+            item->text = sMissionMenuText_PortOfAdia;
             break;
         case 2:
-            item->text = D_800B43EC;
+            item->text = sMissionMenuText_RiverOfSouls;
             break;
         case 3:
-            item->text = D_800B4444;
+            item->text = sMissionMenuText_DeathMarshes;
             break;
         case 4:
-            item->text = D_800B449C;
+            item->text = sMissionMenuText_LairOfTheBlindOnes;
             break;
         case 5:
-            item->text = D_800B44D4;
+            item->text = sMissionMenuText_HiveOfTheMantids;
             break;
         case 6:
-            item->text = D_800B4534;
+            item->text = sMissionMenuText_PrimagensLightship;
             break;
     }
     return 0;

@@ -6,10 +6,10 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B3EB8[];
-extern char D_800B3ED0[];
+extern char sOptionsMenuText_ControlTypeExpert[];
+extern char sOptionsMenuText_ControlTypeArcade[];
 s32 OptionsMenu_ControlTypeText_2(MenuItem *a, Menu *b) {
 CPlayerOptions *p = &gEngineApp_m_Settings.defaultSlot;
 if (b->player) { CPlayerOptions *q = b->player->m_pOptions; if (q) p = q; }
- switch (p->m_ControlType) { case 0: a->text = D_800B3EB8; break; case 1: a->text = D_800B3ED0; break; }
+ switch (p->m_ControlType) { case 0: a->text = sOptionsMenuText_ControlTypeExpert; break; case 1: a->text = sOptionsMenuText_ControlTypeArcade; break; }
  return 0; }

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/crash.h"
 
-extern u8 D_800AA0DC[];   /* ": " */
+extern u8 sCrashText_ColonSpace[];   /* ": " */
 
 extern void Crash_PutChar(s32 c);       /* print a character */
 extern void Crash_PrintHex8(s32 byte);    /* print a byte in hex */
@@ -28,7 +28,7 @@ void Crash_PrintFlags(u32 value, u8 *name, FlagDesc *desc) {
 
     first = 1;
     PrintString(name);
-    PrintString(D_800AA0DC);
+    PrintString(sCrashText_ColonSpace);
     PrintHex32(value);
     PrintString("<");
     while (desc->mask != 0) {

@@ -5,21 +5,21 @@
 #include "globals/menu.h"
 typedef struct { u8 pad0[8]; u32 f8; u8 padC[8]; void *f14; } Q4Z;
 extern u8 D_800C1144[];
-extern u8 D_800B5B2C[], D_800B5B48[], D_800B5B64[], D_800B5B80[], D_800B5B9C[], D_800B5BB8[], D_800B5BD4[], D_800B5BF0[], D_800B5C0C[], D_800B5C28[], D_800B5C44[];
+extern u8 sCheatMenuText_WarpPortOfAdia[], sCheatMenuText_WarpRiverOfSouls[], sCheatMenuText_WarpDeathMarshes[], sCheatMenuText_WarpLairOfTheBlindOnes[], sCheatMenuText_WarpHiveOfTheMantids[], sCheatMenuText_WarpPrimagensLightship[], sCheatMenuText_WarpQueenBoss[], sCheatMenuText_WarpBlindOneBoss[], sCheatMenuText_WarpMotherBoss[], sCheatMenuText_WarpPrimagenBoss[], sCheatMenuText_WarpCredits[];
 s32 CheatMenu_WarpText(Q4Z *o) {
     switch (sCheatsMenuSelection) {
     default: o->f14 = D_800C1144; break;
-    case 0: o->f14 = D_800B5B2C; break;
-    case 1: o->f14 = D_800B5B48; break;
-    case 2: o->f14 = D_800B5B64; break;
-    case 3: o->f14 = D_800B5B80; break;
-    case 4: o->f14 = D_800B5B9C; break;
-    case 5: o->f14 = D_800B5BB8; break;
-    case 6: o->f14 = D_800B5BF0; break;
-    case 7: o->f14 = D_800B5BD4; break;
-    case 8: o->f14 = D_800B5C0C; break;
-    case 9: o->f14 = D_800B5C28; break;
-    case 10: o->f14 = D_800B5C44; break;
+    case 0: o->f14 = sCheatMenuText_WarpPortOfAdia; break;
+    case 1: o->f14 = sCheatMenuText_WarpRiverOfSouls; break;
+    case 2: o->f14 = sCheatMenuText_WarpDeathMarshes; break;
+    case 3: o->f14 = sCheatMenuText_WarpLairOfTheBlindOnes; break;
+    case 4: o->f14 = sCheatMenuText_WarpHiveOfTheMantids; break;
+    case 5: o->f14 = sCheatMenuText_WarpPrimagensLightship; break;
+    case 6: o->f14 = sCheatMenuText_WarpBlindOneBoss; break;
+    case 7: o->f14 = sCheatMenuText_WarpQueenBoss; break;
+    case 8: o->f14 = sCheatMenuText_WarpMotherBoss; break;
+    case 9: o->f14 = sCheatMenuText_WarpPrimagenBoss; break;
+    case 10: o->f14 = sCheatMenuText_WarpCredits; break;
     }
     return 0;
 }

@@ -2,16 +2,16 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B6164[];
-extern char D_800B617C[];
+extern char sBloodLustMenuText_CrosshairsOn[];
+extern char sBloodLustMenuText_CrosshairsOff[];
 
 s32 BloodLustMenu_CrosshairsLabel(MenuItem *a) {
     switch (gEngineApp_m_Settings.dmCrosshairs) {
     case 0:
-        a->text = D_800B617C;
+        a->text = sBloodLustMenuText_CrosshairsOff;
         break;
     case 1:
-        a->text = D_800B6164;
+        a->text = sBloodLustMenuText_CrosshairsOn;
         break;
     }
     return 0;

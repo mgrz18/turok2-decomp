@@ -10,12 +10,12 @@ struct Field {
     char pad18[0x4];
     signed int value;
 };
-extern char *D_800B48E4[];
-extern char *D_800B4888[];
-extern char *D_800B48A8[];
-extern char *D_800B4870[];
-extern char *D_800B487C[];
-extern char *D_800B4894[];
+extern char *sPakMenuText_ControllerPakMenu[];
+extern char *sPakMenuText_LoadNote_B4888[];
+extern char *sPakMenuText_DeleteNote[];
+extern char *sPakMenuText_LoadNote_B4870[];
+extern char *sPakMenuText_SaveNote_B487C[];
+extern char *sPakMenuText_SaveNote_B4894[];
 extern char *D_800C140C[];
 s32 PakMenu_UpdateSubtitle_2(struct Field *field, s16 *arg1) {
     s32 option;
@@ -24,28 +24,28 @@ s32 PakMenu_UpdateSubtitle_2(struct Field *field, s16 *arg1) {
     rel = option - 3;
     if (gPakMenuIsLoad != 0) {
         if (gPakMenuIsProfile != 0) {
-            field->text = D_800B4870;
+            field->text = sPakMenuText_LoadNote_B4870;
         } else {
-            field->text = D_800B4888;
+            field->text = sPakMenuText_LoadNote_B4888;
         }
         goto done;
     }
     if (gPakMenuIsSave != 0) {
         if (rel < 16) {
-            field->text = D_800B48A8;
+            field->text = sPakMenuText_DeleteNote;
             return 0;
         }
         if (option == 0x15) {
             field->text = D_800C140C;
         } else if (gPakMenuIsProfile != 0) {
-            field->text = D_800B487C;
+            field->text = sPakMenuText_SaveNote_B487C;
         } else {
-            field->text = D_800B4894;
+            field->text = sPakMenuText_SaveNote_B4894;
         }
         goto done;
     }
     if (gPakMenuAnyPak != 0) {
-        field->text = D_800B48E4;
+        field->text = sPakMenuText_ControllerPakMenu;
     }
 done:
     return 0;

@@ -4,17 +4,17 @@
 #include "rw/abu_types.h"
 #include "globals/pak.h"
 
-extern char D_800B4AF8[];
-extern char D_800B4AE0[];
-extern char D_800B4AEC[];
+extern char sCharNoteMenuText_DeleteNote_B4AF8[];
+extern char sCharNoteMenuText_NoteInfo[];
+extern char sCharNoteMenuText_DeleteNote_B4AEC[];
 extern s32 D_801309A8;
 s32 CharNoteMenu_UpdateTitle(struct FieldRecAt14 *field) {
     if (sCharNoteLoad != 0) {
-        field->text = D_800B4AE0;
+        field->text = sCharNoteMenuText_NoteInfo;
     } else if (D_801309A8 != 0) {
-        field->text = D_800B4AF8;
+        field->text = sCharNoteMenuText_DeleteNote_B4AF8;
     } else {
-        field->text = D_800B4AEC;
+        field->text = sCharNoteMenuText_DeleteNote_B4AEC;
     }
     return 0;
 }

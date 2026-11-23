@@ -3,8 +3,8 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B3FD8[];
-extern char D_800B3FF0[];
+extern char sOptionsMenuText_2PlyrLayoutHorz[];
+extern char sOptionsMenuText_2PlyrLayoutVert[];
 
 s32 OptionsMenu_TwoPlayerLayoutText(MenuItem *a) {
     if (gEngineApp_m_Settings.mode == 13 && gEngineApp_m_Settings.multiplayer == 0) {
@@ -14,10 +14,10 @@ s32 OptionsMenu_TwoPlayerLayoutText(MenuItem *a) {
     }
     switch (gEngineApp_m_Settings.unk1B) {
     case 0:
-        a->text = D_800B3FD8;
+        a->text = sOptionsMenuText_2PlyrLayoutHorz;
         break;
     case 1:
-        a->text = D_800B3FF0;
+        a->text = sOptionsMenuText_2PlyrLayoutVert;
         break;
     }
     return 0;

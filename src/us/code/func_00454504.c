@@ -4,10 +4,10 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B5934[];
-extern char D_800B5950[];
+extern char sCheatMenuText_StickModeOn[];
+extern char sCheatMenuText_StickModeOff[];
 s32 CheatMenu_StickModeText_2(MenuItem *a) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x80) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
-    if (gEngineApp_m_Settings.cheatFlags & 0x80) a->text = D_800B5934; else a->text = D_800B5950;
+    if (gEngineApp_m_Settings.cheatFlags & 0x80) a->text = sCheatMenuText_StickModeOn; else a->text = sCheatMenuText_StickModeOff;
     return 0;
 }

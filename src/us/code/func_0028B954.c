@@ -1,8 +1,8 @@
 #include "common.h"
 #include "globals/frame.h"
 
-extern u8 D_800AA0DC[];   /* ": " */
-extern u8 D_800AA0EC[];   /* "   " */
+extern u8 sCrashText_ColonSpace[];   /* ": " */
+extern u8 sCrashText_Spaces3[];   /* "   " */
 extern u8 D_800AA0F0[];   /* "\n" */
 
 
@@ -28,12 +28,12 @@ static __inline__ void PrintHex32(u32 value) {
 /* Fault screen: like Crash_PrintRegPair, but prints the second register in another colour. */
 void Crash_PrintRegPairHighlight(u8 *name1, u32 value1, u8 *name2, u32 value2) {
     PrintString(name1);
-    PrintString(D_800AA0DC);
+    PrintString(sCrashText_ColonSpace);
     PrintHex32(value1);
-    PrintString(D_800AA0EC);
+    PrintString(sCrashText_Spaces3);
     sCrashTextColor = 0xF7A9;
     PrintString(name2);
-    PrintString(D_800AA0DC);
+    PrintString(sCrashText_ColonSpace);
     PrintHex32(value2);
     sCrashTextColor = 0xA529;
     PrintString(D_800AA0F0);

@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 #include "globals/game.h"
 
-extern char D_800B5A4C[];
-extern char D_800B5A68[];
+extern char sCheatMenuText_ZachAttackCheatOn[];
+extern char sCheatMenuText_ZachAttackCheatOff[];
 s32 CheatMenu_ZachAttackText(struct StateRecAt14 *item) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x1000) {
         item->unk8 |= 0x1000000;
@@ -13,9 +13,9 @@ s32 CheatMenu_ZachAttackText(struct StateRecAt14 *item) {
         item->unk8 &= ~0x1000000;
     }
     if (gEngineApp_m_Settings.cheatFlags & 0x1000) {
-        item->unk14 = D_800B5A4C;
+        item->unk14 = sCheatMenuText_ZachAttackCheatOn;
     } else {
-        item->unk14 = D_800B5A68;
+        item->unk14 = sCheatMenuText_ZachAttackCheatOff;
     }
     return 0;
 }

@@ -4,10 +4,10 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B581C[];
-extern char D_800B5838[];
+extern char sCheatMenuText_AllWeaponsOn[];
+extern char sCheatMenuText_AllWeaponsOff[];
 s32 CheatMenu_AllWeaponsText_2(MenuItem *a) {
     if (gEngineApp_m_Settings.unlockedCheats & 4) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
-    if (gEngineApp_m_Settings.cheatFlags & 4) a->text = D_800B581C; else a->text = D_800B5838;
+    if (gEngineApp_m_Settings.cheatFlags & 4) a->text = sCheatMenuText_AllWeaponsOn; else a->text = sCheatMenuText_AllWeaponsOff;
     return 0;
 }

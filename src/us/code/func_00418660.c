@@ -2,37 +2,37 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B5F3C[];
-extern char D_800B61D8[];
-extern char D_800B61F0[];
-extern char D_800B6208[];
-extern char D_800B6220[];
-extern char D_800B6238[];
-extern char D_800B6250[];
+extern char sBloodLustMenuText_LevelRandom[];
+extern char sFragTagMenuText_LevelMadhouse[];
+extern char sFragTagMenuText_LevelSnap[];
+extern char sFragTagMenuText_LevelSneaksNLadders[];
+extern char sFragTagMenuText_LevelPrimattica[];
+extern char sFragTagMenuText_LevelCrossfire[];
+extern char sFragTagMenuText_LevelYNGWTSF[];
 
 /* Label of the level item. */
 s32 FragTagMenu_LevelLabel(MenuItem *a) {
     switch (gEngineApp_m_Settings.tagArena) {
     case 0:
-        a->text = D_800B5F3C;
+        a->text = sBloodLustMenuText_LevelRandom;
         break;
     case 1:
-        a->text = D_800B61D8;
+        a->text = sFragTagMenuText_LevelMadhouse;
         break;
     case 2:
-        a->text = D_800B61F0;
+        a->text = sFragTagMenuText_LevelSnap;
         break;
     case 3:
-        a->text = D_800B6208;
+        a->text = sFragTagMenuText_LevelSneaksNLadders;
         break;
     case 4:
-        a->text = D_800B6220;
+        a->text = sFragTagMenuText_LevelPrimattica;
         break;
     case 5:
-        a->text = D_800B6238;
+        a->text = sFragTagMenuText_LevelCrossfire;
         break;
     case 6:
-        a->text = D_800B6250;
+        a->text = sFragTagMenuText_LevelYNGWTSF;
         break;
     }
     return 0;

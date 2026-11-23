@@ -7,24 +7,24 @@
 
 /* Set the menu item's text from the game mode gPakConfirmKind. */
 
-extern char D_800B5310[];
-extern char D_800B52DC[];
+extern char sPakConfirmMenuText_Yes[];
+extern char sPakConfirmMenuText_ManageTheControllerPak[];
 
 s32 PakConfirmMenu_UpdateYes_2(MenuItem *item) {
     switch (gPakConfirmKind) {
     case 0:
     default:
-        item->text = D_800B5310;
+        item->text = sPakConfirmMenuText_Yes;
         break;
     case 3:
-        item->text = D_800B5310;
+        item->text = sPakConfirmMenuText_Yes;
         break;
     case 4:
-        item->text = D_800B5310;
+        item->text = sPakConfirmMenuText_Yes;
         break;
     case 1:
     case 2:
-        item->text = D_800B52DC;
+        item->text = sPakConfirmMenuText_ManageTheControllerPak;
         break;
     }
     return 0;

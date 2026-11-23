@@ -13,7 +13,7 @@ typedef u32 uptr;
 extern void Pak_AllocBuffer(void ***handle, void **data, s32 units);
 extern void * memset(void *arg0, int arg1, uptr arg2);
 extern char *D_800F70A8;
-extern char D_800C13F0[];
+extern char sPakMenuText_SingleSaveBlock[];
 extern void CCache__Flush(s32 a);
 extern void CCache__Deallocate(void *arg0, void *arg1);
 extern void **CCache__Allocate(s32, s32, s32, char *);
@@ -31,7 +31,7 @@ void Pak_AllocBuffer(void ***handle, void **data, s32 units) {
     } else {
         units = (s32)(D_800F70A8 + 0x688);
     }
-    block = CCache__Allocate(0, units, 0x33, D_800C13F0);
+    block = CCache__Allocate(0, units, 0x33, sPakMenuText_SingleSaveBlock);
     *handle = block;
     first = *block;
     *data = first;

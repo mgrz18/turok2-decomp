@@ -4,72 +4,72 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern char D_800B4BE8[];
-extern char D_800B4C18[];
-extern char D_800B4C78[];
-extern char D_800B4D4C[];
-extern char D_800B4CE4[];
-extern char D_800B4DB0[];
-extern char D_800B4E14[];
-extern char D_800B4E58[];
-extern char D_800B4E78[];
-extern char D_800B4EBC[];
-extern char D_800B4F10[];
-extern char D_800B4F48[];
-extern char D_800B4F84[];
-extern char D_800B4FBC[];
-extern char D_800B4FF8[];
-extern char D_800B503C[];
+extern char sPakMessageText_UpSpace[];
+extern char sPakMessageText_PleaseInsertA[];
+extern char sPakMessageText_InsertYourController_B4C78[];
+extern char sPakMessageText_InsertYourController_B4D4C[];
+extern char sPakMessageText_InsertYourController_B4CE4[];
+extern char sPakMessageText_InsertYourRumblePak_B4DB0[];
+extern char sPakMessageText_BeAbleToSaveYour[];
+extern char sPakMessageText_PleaseTry[];
+extern char sPakMessageText_NoController[];
+extern char sPakMessageText_InsertYourRumblePak_B4EBC[];
+extern char sPakMessageText_Empty_B4F10[];
+extern char sPakMessageText_YouMayDeleteThis[];
+extern char sPakMessageText_Deleted[];
+extern char sPakMessageText_SaveANote[];
+extern char sPakMessageText_DeleteANote[];
+extern char sPakMessageText_PleaseRememberThat[];
 s32 PakMessage_UpdateLine3_2(MenuItem *item) {
     switch (gPakMessageKind) {
     default:
     case 0:
-        item->text = D_800B4BE8;
+        item->text = sPakMessageText_UpSpace;
         break;
     case 1:
-        item->text = D_800B4C18;
+        item->text = sPakMessageText_PleaseInsertA;
         break;
     case 2:
-        item->text = D_800B4C78;
+        item->text = sPakMessageText_InsertYourController_B4C78;
         break;
     case 3:
-        item->text = D_800B4D4C;
+        item->text = sPakMessageText_InsertYourController_B4D4C;
         break;
     case 4:
-        item->text = D_800B4CE4;
+        item->text = sPakMessageText_InsertYourController_B4CE4;
         break;
     case 5:
-        item->text = D_800B4DB0;
+        item->text = sPakMessageText_InsertYourRumblePak_B4DB0;
         break;
     case 6:
-        item->text = D_800B4E14;
+        item->text = sPakMessageText_BeAbleToSaveYour;
         break;
     case 7:
-        item->text = D_800B4E58;
+        item->text = sPakMessageText_PleaseTry;
         break;
     case 8:
-        item->text = D_800B4E78;
+        item->text = sPakMessageText_NoController;
         break;
     case 9:
-        item->text = D_800B4EBC;
+        item->text = sPakMessageText_InsertYourRumblePak_B4EBC;
         break;
     case 10:
-        item->text = D_800B4F10;
+        item->text = sPakMessageText_Empty_B4F10;
         break;
     case 11:
-        item->text = D_800B4F48;
+        item->text = sPakMessageText_YouMayDeleteThis;
         break;
     case 12:
-        item->text = D_800B4F84;
+        item->text = sPakMessageText_Deleted;
         break;
     case 13:
-        item->text = D_800B4FBC;
+        item->text = sPakMessageText_SaveANote;
         break;
     case 14:
-        item->text = D_800B4FF8;
+        item->text = sPakMessageText_DeleteANote;
         break;
     case 15:
-        item->text = D_800B503C;
+        item->text = sPakMessageText_PleaseRememberThat;
         break;
     }
     return 0;

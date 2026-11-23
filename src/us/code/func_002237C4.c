@@ -8,7 +8,7 @@
 #include "protos/scene.h"
 
 extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
-extern u8 D_800B54E0[];
+extern u8 sCheatMessageText_NewCheatEnabled[];
 
 void Cinema_Reset(CWarpFadeColor *entry);
 void Cinema_StopAtEnd(void);
@@ -58,9 +58,9 @@ void CScene__UpdateWarp(CScene *scene) {
                     settings = &gEngineApp_m_Game_m_CameraPool.m_Settings;
                     if (scene->m_PreviewOptions != settings->unlockedCheats && !Demo_GetPlayerCount()) {
 #ifdef TARGET_PORT
-                        CCameraPool__AddTimedText(&gEngineApp_m_Game_m_CameraPool, &gEngineApp_m_Game_m_CameraPool.m_CameraPool[0].m_MainCamera, D_800B54E0, 4.0f);
+                        CCameraPool__AddTimedText(&gEngineApp_m_Game_m_CameraPool, &gEngineApp_m_Game_m_CameraPool.m_CameraPool[0].m_MainCamera, sCheatMessageText_NewCheatEnabled, 4.0f);
 #else
-                        CCameraPool__AddTimedText(&gEngineApp_m_Game_m_CameraPool, gEngineApp_m_Game_m_CameraPool.m_CameraPool + 0x40, D_800B54E0, 4.0f);
+                        CCameraPool__AddTimedText(&gEngineApp_m_Game_m_CameraPool, gEngineApp_m_Game_m_CameraPool.m_CameraPool + 0x40, sCheatMessageText_NewCheatEnabled, 4.0f);
 #endif
                         scene->m_PreviewOptions = settings->unlockedCheats;
                     }

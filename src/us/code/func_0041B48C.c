@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 #include "globals/game.h"
 
-extern char D_800B58E0[];
-extern char D_800B58C4[];
+extern char sCheatMenuText_BigHeadModeOff[];
+extern char sCheatMenuText_BigHeadModeOn[];
 s32 CheatMenu_BigHeadModeText(struct StateRecAt14 *item) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x20) {
         item->unk8 |= 0x1000000;
@@ -13,9 +13,9 @@ s32 CheatMenu_BigHeadModeText(struct StateRecAt14 *item) {
         item->unk8 &= ~0x1000000;
     }
     if (gEngineApp_m_Settings.cheatFlags & 0x20) {
-        item->unk14 = D_800B58C4;
+        item->unk14 = sCheatMenuText_BigHeadModeOn;
     } else {
-        item->unk14 = D_800B58E0;
+        item->unk14 = sCheatMenuText_BigHeadModeOff;
     }
     return 0;
 }

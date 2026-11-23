@@ -7,11 +7,11 @@ s32 TotemDefense_DrawTotem(sptr, s32, sptr);
 
 s32 COnScreen__SetBoss2(s32 *, void *, s32 *); /* extern */
 #ifdef TARGET_PORT
-extern char D_800C0560[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
+extern char sTotemDefenseText_Enemies[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 D_800C0560;
+extern s32 sTotemDefenseText_Enemies;
 #endif
-extern s32 D_800C0568;
+extern s32 sTotemDefenseText_Time;
 
 #ifdef TARGET_PORT
 #include "structs/game_object.h"
@@ -22,7 +22,7 @@ extern s32 D_800C0568;
 /* The port: the same on TotemDefenseState / CGameObjectInstance (the N64 code reads both at raw
  * offsets: the definition 0x14, the AI's m_pfDraw 0x234, m_AnimType/m_AnimIndex/
  * m_AnimRepeatedCount 0x204/0x206/0x207, m_dwFlags 0x140; written after module 2's typed twin
- * TotemDefense_InitFight_2, func_00441B20). state->def is the definition's body pointer-wide. */
+ * TotemDefense_InitFight_2, TotemDefense_InitFight_2). state->def is the definition's body pointer-wide. */
 void TotemDefense_InitFight(void *arg0, void *arg1) {
     TotemDefenseState *state = (TotemDefenseState *) arg0;
     CGameObjectInstance *obj = (CGameObjectInstance *) arg1;
@@ -42,8 +42,8 @@ void TotemDefense_InitFight(void *arg0, void *arg1) {
     ai->m_AnimType = 0x5334;
     totem->m_AI.m_dwFlags &= ~1;
     ai->m_AnimRepeatedCount = 0;
-    COnScreen__SetBoss((sptr) (&gEngineApp_m_OnScreen), (sptr) arg1, (sptr) T2_TEXT(D_800C0560));
-    COnScreen__SetBoss2((s32 *) &gEngineApp_m_OnScreen, arg1, &D_800C0568);
+    COnScreen__SetBoss((sptr) (&gEngineApp_m_OnScreen), (sptr) arg1, (sptr) T2_TEXT(sTotemDefenseText_Enemies));
+    COnScreen__SetBoss2((s32 *) &gEngineApp_m_OnScreen, arg1, &sTotemDefenseText_Time);
 }
 #else
 void TotemDefense_InitFight(void *arg0, void *arg1)
@@ -65,7 +65,7 @@ void TotemDefense_InitFight(void *arg0, void *arg1)
   *((s16 *) (((s8 *) temp_a3) + 0xC4)) = 0x5334;
   *((s32 *) (((s8 *) temp_s0) + 0x140)) = (s32) ((*((s32 *) (((s8 *) temp_s0) + 0x140))) & (~1));
   *((s8 *) (((s8 *) temp_a3) + 0xC7)) = 0;
-  COnScreen__SetBoss((sptr) (&gEngineApp_m_OnScreen), (sptr) arg1, (sptr) (&D_800C0560));
-  COnScreen__SetBoss2(&gEngineApp_m_OnScreen, arg1, &D_800C0568);
+  COnScreen__SetBoss((sptr) (&gEngineApp_m_OnScreen), (sptr) arg1, (sptr) (&sTotemDefenseText_Enemies));
+  COnScreen__SetBoss2(&gEngineApp_m_OnScreen, arg1, &sTotemDefenseText_Time);
 }
 #endif

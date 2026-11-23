@@ -4,8 +4,8 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern char D_800B4BB0[];
-extern char D_800B4BB4[];
+extern char sPakMessageText_Ok[];
+extern char sPakMessageText_Empty_B4BB4[];
 s32 PakMessage_UpdateOk_2(MenuItem *item) {
     /* Rage Wars sends 5, 6, 9, 10, 12 and 15 to the second text; Turok 2's
      * jump table (jtbl_800C1630, 0-15) sends only 8 there. The other case
@@ -19,10 +19,10 @@ s32 PakMessage_UpdateOk_2(MenuItem *item) {
     case 10:
     case 12:
     case 15:
-        item->text = D_800B4BB0;
+        item->text = sPakMessageText_Ok;
         break;
     case 8:
-        item->text = D_800B4BB4;
+        item->text = sPakMessageText_Empty_B4BB4;
         break;
     }
     return 0;

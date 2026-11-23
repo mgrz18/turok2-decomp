@@ -3,8 +3,8 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B5ABC[];
-extern char D_800B5AD8[];
+extern char sCheatMenuText_BlackoutOn[];
+extern char sCheatMenuText_BlackoutOff[];
 
 /* On/off option item for bit 0x4000: shown only when unlocked. */
 s32 CheatMenu_BlackoutText(MenuItem *a) {
@@ -14,9 +14,9 @@ s32 CheatMenu_BlackoutText(MenuItem *a) {
         a->flags &= ~0x1000000;
     }
     if (gEngineApp_m_Settings.cheatFlags & 0x4000) {
-        a->text = D_800B5ABC;
+        a->text = sCheatMenuText_BlackoutOn;
     } else {
-        a->text = D_800B5AD8;
+        a->text = sCheatMenuText_BlackoutOff;
     }
     return 0;
 }

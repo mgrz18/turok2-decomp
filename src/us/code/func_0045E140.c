@@ -28,7 +28,7 @@ extern void CCache__Deallocate(sptr heap, MemHandle *handle);                   
 extern u32 GetMemSize(void);                                             /* osGetMemSize */
 extern void memset(void *dst, s32 value, uptr size);                  /* memset */
 
-extern char D_800C1864[]; /* "audio heap": the byte after it is the linker's fill (0x0B), not a zero the C could give */
+extern char sGfxPoolText_AudioHeap[]; /* "audio heap": the byte after it is the linker's fill (0x0B), not a zero the C could give */
 
 void GfxPool_Alloc_2(GfxPool *pool) {
     u32 mb = 0x100000;
@@ -97,7 +97,7 @@ void GfxPool_Alloc_2(GfxPool *pool) {
     memset((void *) gDepthBuffer, 0, size);
     pool->gfx = CCache__Allocate(0, (gDisplayListSize + gLineListSize) * (2 * GFX_SIZE), 0x23, "display lists");
     pool->dynamic = CCache__Allocate(0, 0x8000, 0x23, "fifo");
-    pool->vtx = CCache__Allocate(0, 0x22000, 0x23, D_800C1864);
+    pool->vtx = CCache__Allocate(0, 0x22000, 0x23, sGfxPoolText_AudioHeap);
     gDisplayList1 = pool->gfx->addr;
     gLineList0 = gDisplayList1 + gDisplayListSize * GFX_SIZE;
     gDisplayList0 = gLineList0 + gLineListSize * GFX_SIZE;

@@ -3,8 +3,8 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B5A84[];
-extern char D_800B5AA0[];
+extern char sCheatMenuText_AllMapOn[];
+extern char sCheatMenuText_AllMapOff[];
 
 /* On/off option item for bit 0x2000: shown only when unlocked. */
 s32 CheatMenu_AllMapText(MenuItem *a) {
@@ -14,9 +14,9 @@ s32 CheatMenu_AllMapText(MenuItem *a) {
         a->flags &= ~0x1000000;
     }
     if (gEngineApp_m_Settings.cheatFlags & 0x2000) {
-        a->text = D_800B5A84;
+        a->text = sCheatMenuText_AllMapOn;
     } else {
-        a->text = D_800B5AA0;
+        a->text = sCheatMenuText_AllMapOff;
     }
     return 0;
 }

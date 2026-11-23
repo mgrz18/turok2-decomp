@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 #include "globals/pak.h"
 
-extern char D_800B52F8[];
-extern char D_800B5314[];
+extern char sPakConfirmMenuText_ContinueWithoutSaving[];
+extern char sPakConfirmMenuText_No[];
 s32 PakConfirmMenu_UpdateNo(struct FieldRecAt14 *field) {
     u32 state = gPakConfirmKind;
     if (state >= 5) {
@@ -19,16 +19,16 @@ s32 PakConfirmMenu_UpdateNo(struct FieldRecAt14 *field) {
         case 4: goto case_2;
         }
 state_other:
-    field->text = D_800B5314;
+    field->text = sPakConfirmMenuText_No;
     goto done;
 case_1:
-    field->text = D_800B5314;
+    field->text = sPakConfirmMenuText_No;
     goto done;
 case_2:
-    field->text = D_800B5314;
+    field->text = sPakConfirmMenuText_No;
     goto done;
 case_3:
-    field->text = D_800B52F8;
+    field->text = sPakConfirmMenuText_ContinueWithoutSaving;
 done:
     return 0;
 }

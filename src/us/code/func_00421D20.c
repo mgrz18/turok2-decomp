@@ -5,12 +5,12 @@
 #include "globals/pak.h"
 
 extern char D_800C140C[];
-extern char D_800B4870[];
-extern char D_800B487C[];
-extern char D_800B4888[];
-extern char D_800B4894[];
-extern char D_800B48A8[];
-extern char D_800B48E4[];
+extern char sPakMenuText_LoadNote_B4870[];
+extern char sPakMenuText_SaveNote_B487C[];
+extern char sPakMenuText_LoadNote_B4888[];
+extern char sPakMenuText_SaveNote_B4894[];
+extern char sPakMenuText_DeleteNote[];
+extern char sPakMenuText_ControllerPakMenu[];
 
 s32 PakMenu_UpdateSubtitle(MenuItem *item, s16 *id) {
     s32 n = *id;
@@ -18,24 +18,24 @@ s32 PakMenu_UpdateSubtitle(MenuItem *item, s16 *id) {
 
     if (gPakMenuIsLoad != 0) {
         if (gPakMenuIsProfile != 0) {
-            item->text = D_800B4870;
+            item->text = sPakMenuText_LoadNote_B4870;
         } else {
-            item->text = D_800B4888;
+            item->text = sPakMenuText_LoadNote_B4888;
         }
     } else if (gPakMenuIsSave != 0) {
         if (k < 16) {
-            item->text = D_800B48A8;
+            item->text = sPakMenuText_DeleteNote;
             return 0;
         }
         if (n == 21) {
             item->text = D_800C140C;
         } else if (gPakMenuIsProfile != 0) {
-            item->text = D_800B487C;
+            item->text = sPakMenuText_SaveNote_B487C;
         } else {
-            item->text = D_800B4894;
+            item->text = sPakMenuText_SaveNote_B4894;
         }
     } else if (gPakMenuAnyPak != 0) {
-        item->text = D_800B48E4;
+        item->text = sPakMenuText_ControllerPakMenu;
     }
     return 0;
 }

@@ -6,8 +6,8 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B3F78[];
-extern char D_800B3F60[];
+extern char sOptionsMenuText_AutoAimOff[];
+extern char sOptionsMenuText_AutoAimOn[];
 s32 OptionsMenu_AutoAimText(MenuItem *item, Menu *menu) {
     CPlayerOptions *settings = &gEngineApp_m_Settings.defaultSlot;
     if (menu->player != 0 && menu->player->m_pOptions != 0) {
@@ -15,10 +15,10 @@ s32 OptionsMenu_AutoAimText(MenuItem *item, Menu *menu) {
     }
     switch (settings->m_bAutoAim) {
     case 0:
-        item->text = D_800B3F78;
+        item->text = sOptionsMenuText_AutoAimOff;
         break;
     case 1:
-        item->text = D_800B3F60;
+        item->text = sOptionsMenuText_AutoAimOn;
         break;
     }
     return 0;

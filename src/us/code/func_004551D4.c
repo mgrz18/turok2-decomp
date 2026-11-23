@@ -8,19 +8,19 @@ struct FieldRecAt14 {
     char pad[0x14];
     char *text;
 };
-extern char D_800B3FC0[];
-extern char D_800B3FA8[];
-extern char D_800B3F90[];
+extern char sOptionsMenuText_BloodColorGreen[];
+extern char sOptionsMenuText_BloodColorRed[];
+extern char sOptionsMenuText_BloodColorOff[];
 s32 OptionsMenu_BloodColorText_2(struct FieldRecAt14 *field) {
     switch (gEngineApp_m_Settings.unk17) {
     case 0:
-        field->text = D_800B3F90;
+        field->text = sOptionsMenuText_BloodColorOff;
         break;
     case 1:
-        field->text = D_800B3FA8;
+        field->text = sOptionsMenuText_BloodColorRed;
         break;
     case 2:
-        field->text = D_800B3FC0;
+        field->text = sOptionsMenuText_BloodColorGreen;
         break;
     default:
         return 0;

@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 #include "globals/game.h"
 
-extern char D_800B59DC[];
-extern char D_800B59F8[];
+extern char sCheatMenuText_GouraudModeOn[];
+extern char sCheatMenuText_GouraudModeOff[];
 s32 CheatMenu_GouraudModeText(struct StateRecAt14 *item) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x400) {
         item->unk8 |= 0x1000000;
@@ -13,9 +13,9 @@ s32 CheatMenu_GouraudModeText(struct StateRecAt14 *item) {
         item->unk8 &= ~0x1000000;
     }
     if (gEngineApp_m_Settings.cheatFlags & 0x400) {
-        item->unk14 = D_800B59DC;
+        item->unk14 = sCheatMenuText_GouraudModeOn;
     } else {
-        item->unk14 = D_800B59F8;
+        item->unk14 = sCheatMenuText_GouraudModeOff;
     }
     return 0;
 }

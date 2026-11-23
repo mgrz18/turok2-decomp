@@ -23,7 +23,7 @@ typedef struct {
     /* 0x46 */ s16 kills;
 } BossDef;
 
-extern u8 D_800B6684[];
+extern u8 sTotemDefenseText_DefendTheTotem[];
 
 void CCameraPool__AddTimedText(void *, sptr, void *, f32);
 void Sound__PlaySpeech(s32);
@@ -62,12 +62,12 @@ void TotemDefense_UpdateFight(TotemDefenseState *fight) {
      * definition, 0x51C of CPlayer: as an s32 the camera pointer was cut) */
     if ((f32) (fight->obj->header.m_pIntelligence->m_Destructible.m_TotemMissionDuration * 15) <= fight->timer) {
         CCameraPool__AddTimedText(gEngineApp_m_Game.m_CameraPool,
-                                  (sptr) ((CPlayer *) CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList))->m_pCamera, D_800B6684, 4.0f);
+                                  (sptr) ((CPlayer *) CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList))->m_pCamera, sTotemDefenseText_DefendTheTotem, 4.0f);
         Sound__PlaySpeech(0x182);
     }
 #else
     if ((f32) (*(s32 *) (((BossObj *) fight->obj)->def + 0x54) * 15) <= fight->timer) {
-        CCameraPool__AddTimedText(gEngineApp_m_Game.m_CameraPool, *(s32 *) ((u8 *) CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList) + 0x51C), D_800B6684, 4.0f);
+        CCameraPool__AddTimedText(gEngineApp_m_Game.m_CameraPool, *(s32 *) ((u8 *) CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList) + 0x51C), sTotemDefenseText_DefendTheTotem, 4.0f);
         Sound__PlaySpeech(0x182);
     }
 #endif

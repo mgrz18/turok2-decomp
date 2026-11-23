@@ -3,17 +3,17 @@
 
 #include "rw/abu_types.h"
 
-extern char D_800AA900[];
+extern char sSiRawReadAssertExpr[];
 extern int __osSiRawReadIo(unsigned int devAddr, unsigned int * data);
 extern int __osSiDeviceBusy();
 extern void __assert(void *arg0, void *arg1, s32 arg2);
-extern s32 D_800AA904;
+extern s32 sSiRawReadAssertFile;
 int __osSiRawReadIo(u32 arg0, u32 *arg1) {
     if (arg0 & 3) {
-        __assert(D_800AA900, &D_800AA904, 0x33);
+        __assert(sSiRawReadAssertExpr, &sSiRawReadAssertFile, 0x33);
     }
     if (arg1 == 0) {
-        __assert(D_800AA900, &D_800AA904, 0x34);
+        __assert(sSiRawReadAssertExpr, &sSiRawReadAssertFile, 0x34);
     }
     if (__osSiDeviceBusy() != 0) {
         return -1;

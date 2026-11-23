@@ -4,22 +4,22 @@
 #include "rw/abu_types.h"
 #include "globals/pak.h"
 
-extern char D_800B506C[];
-extern char D_800B500C[];
-extern char D_800B4F94[];
-extern char D_800B4C3C[];
-extern char D_800B4FD0[];
-extern char D_800B4DE0[];
-extern char D_800B4D14[];
-extern char D_800B4E6C[];
-extern char D_800B4EEC[];
-extern char D_800B4F18[];
-extern char D_800B4F64[];
-extern char D_800B4D7C[];
-extern char D_800B4E34[];
-extern char D_800B4BF8[];
-extern char D_800B4E8C[];
-extern char D_800B4CA8[];
+extern char sPakMessageText_BeenDeleted[];
+extern char sPakMessageText_Empty_B500C[];
+extern char sPakMessageText_Empty_B4F94[];
+extern char sPakMessageText_TryAgain[];
+extern char sPakMessageText_Empty_B4FD0[];
+extern char sPakMessageText_WithIt_B4DE0[];
+extern char sPakMessageText_Load[];
+extern char sPakMessageText_Empty_B4E6C[];
+extern char sPakMessageText_WithIt_B4EEC[];
+extern char sPakMessageText_Empty_B4F18[];
+extern char sPakMessageText_Empty_B4F64[];
+extern char sPakMessageText_Save[];
+extern char sPakMessageText_Empty_B4E34[];
+extern char sPakMessageText_Empty_B4BF8[];
+extern char sPakMessageText_Empty_B4E8C[];
+extern char sPakMessageText_ManageIt[];
 s32 PakMessage_UpdateLine5(struct FieldRecAt14 *field) {
     u32 state = gPakMessageKind;
     if (state >= 16) {
@@ -44,52 +44,52 @@ s32 PakMessage_UpdateLine5(struct FieldRecAt14 *field) {
         case 15: goto case_15;
         }
 state_other:
-    field->text = D_800B4BF8;
+    field->text = sPakMessageText_Empty_B4BF8;
     goto done;
 case_1:
-    field->text = D_800B4C3C;
+    field->text = sPakMessageText_TryAgain;
     goto done;
 case_2:
-    field->text = D_800B4CA8;
+    field->text = sPakMessageText_ManageIt;
     goto done;
 case_3:
-    field->text = D_800B4D7C;
+    field->text = sPakMessageText_Save;
     goto done;
 case_4:
-    field->text = D_800B4D14;
+    field->text = sPakMessageText_Load;
     goto done;
 case_5:
-    field->text = D_800B4DE0;
+    field->text = sPakMessageText_WithIt_B4DE0;
     goto done;
 case_6:
-    field->text = D_800B4E34;
+    field->text = sPakMessageText_Empty_B4E34;
     goto done;
 case_7:
-    field->text = D_800B4E6C;
+    field->text = sPakMessageText_Empty_B4E6C;
     goto done;
 case_8:
-    field->text = D_800B4E8C;
+    field->text = sPakMessageText_Empty_B4E8C;
     goto done;
 case_9:
-    field->text = D_800B4EEC;
+    field->text = sPakMessageText_WithIt_B4EEC;
     goto done;
 case_10:
-    field->text = D_800B4F18;
+    field->text = sPakMessageText_Empty_B4F18;
     goto done;
 case_11:
-    field->text = D_800B4F64;
+    field->text = sPakMessageText_Empty_B4F64;
     goto done;
 case_12:
-    field->text = D_800B4F94;
+    field->text = sPakMessageText_Empty_B4F94;
     goto done;
 case_13:
-    field->text = D_800B4FD0;
+    field->text = sPakMessageText_Empty_B4FD0;
     goto done;
 case_14:
-    field->text = D_800B500C;
+    field->text = sPakMessageText_Empty_B500C;
     goto done;
 case_15:
-    field->text = D_800B506C;
+    field->text = sPakMessageText_BeenDeleted;
 done:
     return 0;
 }

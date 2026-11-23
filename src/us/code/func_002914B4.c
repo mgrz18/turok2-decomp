@@ -27,8 +27,8 @@ struct List802B663C {
 extern void __unmapVoice(List802B663C *arg0, void *arg1);
 extern void __postNextSeqEvent(void *arg0);
 extern void __assert(const char *arg0, const char *arg1, s32 arg2);
-extern char D_800AA380[];
-extern char D_800AA384[];
+extern char sSeqPlayerAssertExpr[];
+extern char sSeqPlayerAssertFile[];
 extern void __handleNextSeqEvent(ALSeqPlayer *);
 extern void __handleMIDIMsg(ALSeqPlayer *, ALEvent *);
 extern void __handleMetaMsg(ALSeqPlayer *, ALEvent *);
@@ -168,7 +168,7 @@ ALMicroTime __seqpVoiceHandler(void *node)
             break;
         case 13:
             if (seqp->state == 1)
-                __assert(D_800AA380, D_800AA384, 296);
+                __assert(sSeqPlayerAssertExpr, sSeqPlayerAssertFile, 296);
             seqp->target = seqp->nextEvent.msg.spseq.seq;
             __setUsptFromTempo(seqp, 500000.0f);
             if (seqp->bank)
@@ -176,14 +176,14 @@ ALMicroTime __seqpVoiceHandler(void *node)
             break;
         case 14:
             if (seqp->state != 0)
-                __assert(D_800AA380, D_800AA384, 305);
+                __assert(sSeqPlayerAssertExpr, sSeqPlayerAssertFile, 305);
             seqp->bank = seqp->nextEvent.msg.spbank.bank;
             __initFromBank(seqp, seqp->bank);
             break;
         case 4:
         case 3:
         case 1:
-            __assert(D_800AA380, D_800AA384, 315);
+            __assert(sSeqPlayerAssertExpr, sSeqPlayerAssertFile, 315);
             break;
         }
         seqp->nextDelta = alEvtqNextEvent(&seqp->evtq, &seqp->nextEvent);

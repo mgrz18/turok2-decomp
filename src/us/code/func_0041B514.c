@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 #include "globals/game.h"
 
-extern char D_800B58FC[];
-extern char D_800B5918[];
+extern char sCheatMenuText_TinyModeOn[];
+extern char sCheatMenuText_TinyModeOff[];
 s32 CheatMenu_TinyModeText(struct StateRecAt14 *item) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x40) {
         item->unk8 |= 0x1000000;
@@ -13,9 +13,9 @@ s32 CheatMenu_TinyModeText(struct StateRecAt14 *item) {
         item->unk8 &= ~0x1000000;
     }
     if (gEngineApp_m_Settings.cheatFlags & 0x40) {
-        item->unk14 = D_800B58FC;
+        item->unk14 = sCheatMenuText_TinyModeOn;
     } else {
-        item->unk14 = D_800B5918;
+        item->unk14 = sCheatMenuText_TinyModeOff;
     }
     return 0;
 }

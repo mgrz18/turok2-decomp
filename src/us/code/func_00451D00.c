@@ -6,45 +6,45 @@
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
-extern char D_800B608C[];
-extern char D_800B60A4[];
-extern char D_800B60BC[];
-extern char D_800B60D4[];
-extern char D_800B60EC[];
-extern char D_800B6104[];
-extern char D_800B611C[];
-extern char D_800B6134[];
-extern char D_800B614C[];
+extern char sBloodLustMenuText_TextureSetCastle[];
+extern char sBloodLustMenuText_TextureSetSteelMill[];
+extern char sBloodLustMenuText_TextureSetOakFort[];
+extern char sBloodLustMenuText_TextureSetCatacombs[];
+extern char sBloodLustMenuText_TextureSetJailhouse[];
+extern char sBloodLustMenuText_TextureSetBigCity[];
+extern char sBloodLustMenuText_TextureSetRedDragon[];
+extern char sBloodLustMenuText_TextureSetPaintball[];
+extern char sBloodLustMenuText_TextureSetMrHappy[];
 
 /* Names setting 0x23. */
 s32 func_00451D00(MenuItem *item) {
     switch (gEngineApp_m_Settings.dmTextureSet) {
     case 0:
-        item->text = D_800B608C;
+        item->text = sBloodLustMenuText_TextureSetCastle;
         break;
     case 1:
-        item->text = D_800B60A4;
+        item->text = sBloodLustMenuText_TextureSetSteelMill;
         break;
     case 2:
-        item->text = D_800B60BC;
+        item->text = sBloodLustMenuText_TextureSetOakFort;
         break;
     case 3:
-        item->text = D_800B60D4;
+        item->text = sBloodLustMenuText_TextureSetCatacombs;
         break;
     case 4:
-        item->text = D_800B60EC;
+        item->text = sBloodLustMenuText_TextureSetJailhouse;
         break;
     case 5:
-        item->text = D_800B6104;
+        item->text = sBloodLustMenuText_TextureSetBigCity;
         break;
     case 6:
-        item->text = D_800B611C;
+        item->text = sBloodLustMenuText_TextureSetRedDragon;
         break;
     case 7:
-        item->text = D_800B6134;
+        item->text = sBloodLustMenuText_TextureSetPaintball;
         break;
     case 8:
-        item->text = D_800B614C;
+        item->text = sBloodLustMenuText_TextureSetMrHappy;
         break;
     }
     return 0;

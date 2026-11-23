@@ -2,22 +2,22 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B6288[];
-extern char D_800B62A0[];
-extern char D_800B62B8[];
-extern char D_800B62D0[];
-extern char D_800B62E8[];
-extern char D_800B6300[];
-extern char D_800B6318[];
-extern char D_800B6330[];
-extern char D_800B6348[];
-extern char D_800B6360[];
-extern char D_800B6378[];
-extern char D_800B6390[];
-extern char D_800B63A8[];
-extern char D_800B63C0[];
-extern char D_800B63D8[];
-extern char D_800B63F0[];
+extern char sWeaponsMenuText_ChargeDartRifleOn[];
+extern char sWeaponsMenuText_ChargeDartRifleOff[];
+extern char sWeaponsMenuText_FirestormOn[];
+extern char sWeaponsMenuText_FirestormOff[];
+extern char sWeaponsMenuText_AssaultRifleOn[];
+extern char sWeaponsMenuText_AssaultRifleOff[];
+extern char sWeaponsMenuText_PlasmaRifleOn[];
+extern char sWeaponsMenuText_PlasmaRifleOff[];
+extern char sWeaponsMenuText_CerebralBoreOn[];
+extern char sWeaponsMenuText_CerebralBoreOff[];
+extern char sWeaponsMenuText_GrenadeLauncherOn[];
+extern char sWeaponsMenuText_GrenadeLauncherOff[];
+extern char sWeaponsMenuText_ScorpionLauncherOn[];
+extern char sWeaponsMenuText_ScorpionLauncherOff[];
+extern char sWeaponsMenuText_TorpedoLauncherOn[];
+extern char sWeaponsMenuText_TorpedoLauncherOff[];
 
 /* Label of a weapon toggle in the weapons menu: "<weapon> on/off". */
 s32 WeaponsMenu_ToggleLabel(MenuItem *a) {
@@ -27,58 +27,58 @@ s32 WeaponsMenu_ToggleLabel(MenuItem *a) {
         break;
     case 0:
         if (gEngineApp_m_Settings.weaponEnabled[1]) {
-            a->text = D_800B6288;
+            a->text = sWeaponsMenuText_ChargeDartRifleOn;
         } else {
-            a->text = D_800B62A0;
+            a->text = sWeaponsMenuText_ChargeDartRifleOff;
         }
         break;
     case 1:
         if (gEngineApp_m_Settings.weaponEnabled[2]) {
-            a->text = D_800B62B8;
+            a->text = sWeaponsMenuText_FirestormOn;
         } else {
-            a->text = D_800B62D0;
+            a->text = sWeaponsMenuText_FirestormOff;
         }
         break;
     case 2:
         if (gEngineApp_m_Settings.weaponEnabled[3]) {
-            a->text = D_800B62E8;
+            a->text = sWeaponsMenuText_AssaultRifleOn;
         } else {
-            a->text = D_800B6300;
+            a->text = sWeaponsMenuText_AssaultRifleOff;
         }
         break;
     case 3:
         if (gEngineApp_m_Settings.weaponEnabled[4]) {
-            a->text = D_800B6318;
+            a->text = sWeaponsMenuText_PlasmaRifleOn;
         } else {
-            a->text = D_800B6330;
+            a->text = sWeaponsMenuText_PlasmaRifleOff;
         }
         break;
     case 4:
         if (gEngineApp_m_Settings.weaponEnabled[5]) {
-            a->text = D_800B6348;
+            a->text = sWeaponsMenuText_CerebralBoreOn;
         } else {
-            a->text = D_800B6360;
+            a->text = sWeaponsMenuText_CerebralBoreOff;
         }
         break;
     case 5:
         if (gEngineApp_m_Settings.weaponEnabled[6]) {
-            a->text = D_800B6378;
+            a->text = sWeaponsMenuText_GrenadeLauncherOn;
         } else {
-            a->text = D_800B6390;
+            a->text = sWeaponsMenuText_GrenadeLauncherOff;
         }
         break;
     case 6:
         if (gEngineApp_m_Settings.weaponEnabled[7]) {
-            a->text = D_800B63A8;
+            a->text = sWeaponsMenuText_ScorpionLauncherOn;
         } else {
-            a->text = D_800B63C0;
+            a->text = sWeaponsMenuText_ScorpionLauncherOff;
         }
         break;
     case 7:
         if (gEngineApp_m_Settings.weaponEnabled[9]) {
-            a->text = D_800B63D8;
+            a->text = sWeaponsMenuText_TorpedoLauncherOn;
         } else {
-            a->text = D_800B63F0;
+            a->text = sWeaponsMenuText_TorpedoLauncherOff;
         }
         break;
     }

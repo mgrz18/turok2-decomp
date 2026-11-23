@@ -17,7 +17,7 @@ typedef struct {
 } BossAI;
 
 
-extern u8 D_800B6660[];
+extern u8 sTotemDefenseText_MissionComplete[];
 
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
 void Sound__PlaySpeech(s32 sound);
@@ -59,7 +59,7 @@ void TotemDefense_Complete(TotemDefenseState *fight) {
 
     fight->state = 1;
     player = CPlayerPool__GetFirstActive(&game->m_PlayerList);
-    CCameraPool__AddText(game->m_CameraPool, player->m_pCamera, D_800B6660);
+    CCameraPool__AddText(game->m_CameraPool, player->m_pCamera, sTotemDefenseText_MissionComplete);
     Sound__PlaySpeech(0x168);
     CPlayerPool__SetInvincibility(&game->m_PlayerList, 900.0f);
     setAnim((CListedInstance *) fight->obj, 0x5337);

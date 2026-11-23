@@ -12,10 +12,10 @@ typedef struct {
 } Chars4;
 
 extern s32 D_800F70A8;
-extern Chars4 D_800C1408;
-extern u8 D_800C1404[];
-extern char D_800B48B4[];
-extern char D_800B4914[];
+extern Chars4 sPakMenuText_Spaces3;
+extern u8 sPakMenuFmt_3d[];
+extern char sPakMenuText_FreePagesXxxNeededXxx_B48B4[];
+extern char sPakMenuText_FreePagesXxxNeededXxx_B4914[];
 extern char D_800C140C[];
 s32 Pak_GetFreePages(s32 pad, s32 *out);
 u32 Pak_BytesToPages(uptr n);
@@ -42,10 +42,10 @@ s32 PakMenu_FreePagesText(MenuItem *item, Menu *own) {
     } else {
         pad = own->controller->port;
     }
-    buf = D_800C1408;
+    buf = sPakMenuText_Spaces3;
     bp = buf.c;
     if (gPakMenuIsSave != 0) {
-        item->text = D_800B48B4;
+        item->text = sPakMenuText_FreePagesXxxNeededXxx_B48B4;
         if (Pak_GetFreePages(pad, &freeb) == 0) {
             if (gPakMenuIsProfile != 0) {
                 need = Pak_BytesToPages(0x18);
@@ -54,13 +54,13 @@ s32 PakMenu_FreePagesText(MenuItem *item, Menu *own) {
             }
             dst = item->text;
             dst += 0xC;
-            sprintf(buf.c, D_800C1404, freeb);
+            sprintf(buf.c, sPakMenuFmt_3d, freeb);
             *dst = buf.c[0];
             dst++;
             *dst = buf.c[1];
             dst++;
             *dst = buf.c[2];
-            sprintf(buf.c, D_800C1404, need);
+            sprintf(buf.c, sPakMenuFmt_3d, need);
             dst += 0xC;
             *dst = buf.c[0];
             dst++;
@@ -70,9 +70,9 @@ s32 PakMenu_FreePagesText(MenuItem *item, Menu *own) {
         }
     } else {
         if (gPakMenuAnyPak != 0) {
-            t = D_800B4914;
+            t = sPakMenuText_FreePagesXxxNeededXxx_B4914;
         } else if (gPakMenuIsLoad != 0) {
-            t = D_800B48B4;
+            t = sPakMenuText_FreePagesXxxNeededXxx_B48B4;
         } else {
             goto none;
         }
@@ -82,14 +82,14 @@ s32 PakMenu_FreePagesText(MenuItem *item, Menu *own) {
         dst = item->text;
         if (r == 0) {
             dst += 0xC;
-            fmt = D_800C1404;
+            fmt = sPakMenuFmt_3d;
             sprintf(bp, fmt, freeb);
             *dst = buf.c[0];
             dst++;
             *dst = buf.c[1];
             dst++;
             *dst = buf.c[2];
-            sprintf(bp, D_800C1404, need);
+            sprintf(bp, sPakMenuFmt_3d, need);
             dst += 0xC;
             *dst = buf.c[0];
             dst++;

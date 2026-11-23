@@ -7,17 +7,17 @@
 extern int __osSpDeviceBusy();
 extern s32 __osSpRawStartDma(s32 direction, s32 spAddress, sptr dramAddress, s32 size);
 extern void __assert(void *arg0, void *arg1, s32 arg2);
-extern s32 D_800AA8B0;
-extern s32 D_800AA8B4;
+extern s32 sSpRawDmaAssertExpr;
+extern s32 sSpRawDmaAssertFile;
 s32 __osSpRawStartDma(s32 arg0, s32 arg1, sptr arg2, s32 arg3) {
     if (arg1 & 7) {
-        __assert(&D_800AA8B0, &D_800AA8B4, 0x3A);
+        __assert(&sSpRawDmaAssertExpr, &sSpRawDmaAssertFile, 0x3A);
     }
     if (arg2 & 7) {
-        __assert(&D_800AA8B0, &D_800AA8B4, 0x3B);
+        __assert(&sSpRawDmaAssertExpr, &sSpRawDmaAssertFile, 0x3B);
     }
     if (arg3 & 7) {
-        __assert(&D_800AA8B0, &D_800AA8B4, 0x3C);
+        __assert(&sSpRawDmaAssertExpr, &sSpRawDmaAssertFile, 0x3C);
     }
     if (__osSpDeviceBusy() != 0) {
         return -1;

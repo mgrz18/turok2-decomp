@@ -6,12 +6,12 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B40B0[];
-extern char D_800B40C8[];
+extern char sOptionsMenuText_WeaponSelectQuick[];
+extern char sOptionsMenuText_WeaponSelectNorm[];
 s32 OptionsMenu_WeaponSelectText_2(MenuItem *a, Menu *b) {
  CPlayer *q = b->player;
  CPlayerOptions *p;
  if (q) p = q->m_pOptions; else p = &gEngineApp_m_Settings.defaultSlot;
- if (p->m_WeaponSelect == 1) a->text = D_800B40B0; else a->text = D_800B40C8;
+ if (p->m_WeaponSelect == 1) a->text = sOptionsMenuText_WeaponSelectQuick; else a->text = sOptionsMenuText_WeaponSelectNorm;
  return 0;
 }

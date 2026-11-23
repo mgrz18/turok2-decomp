@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern char D_800B42F0[];
-extern char D_800C0E70[]; /* "%d"-style format */
+extern char sFinalScoreMenuText_RedBloodScore[];
+extern char sFinalScoreMenuFmt_04d[]; /* "%d"-style format */
 extern s32 D_8011ACE0;
 extern s32 MenuItem_TextLength(MenuItem *a);
 #ifdef TARGET_PORT
@@ -14,7 +14,7 @@ extern void sprintf(char *dst, char *fmt, s32 value);
 
 /* Prints D_8011ACE0 over the last four characters of the label. */
 s32 FinalScoreMenu_RedScoreLabel(MenuItem *a) {
-    a->text = D_800B42F0;
-    sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C0E70, D_8011ACE0);
+    a->text = sFinalScoreMenuText_RedBloodScore;
+    sprintf(a->text + (MenuItem_TextLength(a) - 4), sFinalScoreMenuFmt_04d, D_8011ACE0);
     return 0;
 }

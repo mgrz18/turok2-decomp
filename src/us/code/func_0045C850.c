@@ -8,13 +8,13 @@ struct FieldRecAt14 {
     char pad[0x14];
     char *text;
 };
-extern char D_800B510C[];
-extern char D_800B5118[];
+extern char sDamagedPakMenuText_Continue[];
+extern char sDamagedPakMenuText_ContinueWithoutSaving[];
 s32 DamagedPakMenu_UpdateContinue_2(struct FieldRecAt14 *field) {
     if (gPakMenuIsLoad != 0) {
-        field->text = D_800B510C;
+        field->text = sDamagedPakMenuText_Continue;
     } else {
-        field->text = D_800B5118;
+        field->text = sDamagedPakMenuText_ContinueWithoutSaving;
     }
     return 0;
 }

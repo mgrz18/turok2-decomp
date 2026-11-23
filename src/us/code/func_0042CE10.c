@@ -9,8 +9,8 @@ typedef struct Record {
     /* 0x0C */ s32 rest[4];
 } Record; /* 0x1C */
 
-extern char D_800A5D70[];
-extern char D_800A5D80[];
+extern char sCSceneCacheDesc_ObjectIndex[];
+extern char sCSceneCacheDesc_Geometry[];
 extern void Model_DecompressCallback(void);
 
 extern s32 CScene__FindObjectType(void *level, s32 key);
@@ -30,9 +30,9 @@ void CScene__ConstructMap(void *level, Record *out, s32 key) {
         return;
     }
     res = CScene__GetObject(level, id);
-    h1 = CCache__Request(0, res, 0x18, 0, 0, 0, D_800A5D70, 1);
+    h1 = CCache__Request(0, res, 0x18, 0, 0, 0, sCSceneCacheDesc_ObjectIndex, 1);
     if (h1 != NULL) {
-        h2 = CCache__Request(0, CISet__GetROMAddressAndSize(*h1, res, 1, &size), size, 0, 0, Model_DecompressCallback, D_800A5D80, 1);
+        h2 = CCache__Request(0, CISet__GetROMAddressAndSize(*h1, res, 1, &size), size, 0, 0, Model_DecompressCallback, sCSceneCacheDesc_Geometry, 1);
         if (h2 != NULL) {
             *out = *(Record *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(*h2, 2), 0), 0), 0);
             CCache__Deallocate(0, h2);

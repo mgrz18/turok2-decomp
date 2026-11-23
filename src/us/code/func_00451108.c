@@ -35,15 +35,15 @@ typedef struct S10Item {
                u8 pad0[0x14];
                void *f14;
 } S10Item;
-extern u8 D_800B4210[];
-extern u8 D_800B4220[];
+extern u8 sPlayerSetupMenuText_ControlExpert[];
+extern u8 sPlayerSetupMenuText_ControlArcade[];
 s32 PlayerSetupMenu_ControlTypeLabel_2(S10Item *a, S10Menu *m) {
     switch (m->ctx->sub->b2B) {
     case 0:
-        a->f14 = D_800B4210;
+        a->f14 = sPlayerSetupMenuText_ControlExpert;
         break;
     case 1:
-        a->f14 = D_800B4220;
+        a->f14 = sPlayerSetupMenuText_ControlArcade;
         break;
     }
     return 0;

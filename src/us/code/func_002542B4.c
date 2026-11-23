@@ -4,7 +4,7 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-extern u8 D_800A7094[];
+extern u8 sActorCacheDesc_PlayerAnimObjectInfo[];
 extern void CGameObjectInstance__UpdateBounds(CGameObjectInstance *, void *);
 extern void Shadow_DrawBlob(CGameObjectInstance *, CVector3 *, s32);
 
@@ -15,7 +15,7 @@ void Actor_ReloadAnimInfo(CGameObjectInstance *actor, s32 arg1) {
 
     if (actor->m_dwFlags & 0x40000) {
         res = CCache__Request(0, actor->m_rpObject, actor->m_rpObjectHeader, 4, 0, 0,
-                            D_800A7094, 1);
+                            sActorCacheDesc_PlayerAnimObjectInfo, 1);
         if (res != NULL) {
             owner = (CPlayer *)actor->m_AI.m_pParent;
             CGameObjectInstance__UpdateBounds(actor, CISet__GetBlock(*res, 0));

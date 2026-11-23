@@ -4,13 +4,13 @@
 #include "rw/abu_types.h"
 #include "globals/pak.h"
 
-extern char D_800B50C0[];
-extern char D_800B5088[];
+extern char sDamagedPakMenuText_DamagedController[];
+extern char sDamagedPakMenuText_ControllerPakIs[];
 s32 DamagedPakMenu_UpdateLine1(struct FieldRecAt14 *field) {
     if (sDamagedPakInGame != 0) {
-        field->text = D_800B5088;
+        field->text = sDamagedPakMenuText_ControllerPakIs;
     } else {
-        field->text = D_800B50C0;
+        field->text = sDamagedPakMenuText_DamagedController;
     }
     return 0;
 }

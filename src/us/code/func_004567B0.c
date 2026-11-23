@@ -24,7 +24,7 @@ typedef struct {
     void *data;
 } MemHandle;
 
-extern char D_800C13F0[];
+extern char sPakMenuText_SingleSaveBlock[];
 
 void CCache__Flush(s32 heap);
 void CCache__Deallocate(sptr heap, MemHandle *handle);
@@ -42,7 +42,7 @@ void SaveGame_Build_2(CPlayer *player) {
         CCache__Deallocate(0, gSaveBufferHandle);
     }
     allocSize = D_800F70A8 + 0x688;
-    gSaveBufferHandle = CCache__Allocate(0, allocSize, 0x33, D_800C13F0);
+    gSaveBufferHandle = CCache__Allocate(0, allocSize, 0x33, sPakMenuText_SingleSaveBlock);
     gSaveBuffer = gSaveBufferHandle->data;
     memset(gSaveBuffer, 0, allocSize);
     gSaveBuffer->player = player->m_Data;

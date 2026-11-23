@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 #include "globals/pak.h"
 
-extern char D_800B4B9C[];
-extern char D_800B4BA4[];
+extern char sPakMessageText_Error[];
+extern char sPakMessageText_Important[];
 s32 PakMessage_UpdateHeading(struct FieldRecAt14 *field) {
     u32 state = gPakMessageKind;
     if (state >= 16) {
@@ -30,10 +30,10 @@ s32 PakMessage_UpdateHeading(struct FieldRecAt14 *field) {
         case 15: goto case_1;
         }
 state_other:
-    field->text = D_800B4B9C;
+    field->text = sPakMessageText_Error;
     goto done;
 case_1:
-    field->text = D_800B4BA4;
+    field->text = sPakMessageText_Important;
 done:
     return 0;
 }

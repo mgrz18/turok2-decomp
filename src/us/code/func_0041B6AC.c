@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 #include "globals/game.h"
 
-extern char D_800B59A4[];
-extern char D_800B59C0[];
+extern char sCheatMenuText_PenAndInkModeOn[];
+extern char sCheatMenuText_PenAndInkModeOff[];
 s32 CheatMenu_PenAndInkModeText(struct StateRecAt14 *item) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x200) {
         item->unk8 |= 0x1000000;
@@ -13,9 +13,9 @@ s32 CheatMenu_PenAndInkModeText(struct StateRecAt14 *item) {
         item->unk8 &= ~0x1000000;
     }
     if (gEngineApp_m_Settings.cheatFlags & 0x200) {
-        item->unk14 = D_800B59A4;
+        item->unk14 = sCheatMenuText_PenAndInkModeOn;
     } else {
-        item->unk14 = D_800B59C0;
+        item->unk14 = sCheatMenuText_PenAndInkModeOff;
     }
     return 0;
 }

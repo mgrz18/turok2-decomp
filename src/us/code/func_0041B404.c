@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 #include "globals/game.h"
 
-extern char D_800B588C[];
-extern char D_800B58A8[];
+extern char sCheatMenuText_AllSpecialObjectsOn[];
+extern char sCheatMenuText_AllSpecialObjectsOff[];
 s32 CheatMenu_AllSpecialObjectsText(struct StateRecAt14 *item) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x10) {
         item->unk8 |= 0x1000000;
@@ -13,9 +13,9 @@ s32 CheatMenu_AllSpecialObjectsText(struct StateRecAt14 *item) {
         item->unk8 &= ~0x1000000;
     }
     if (gEngineApp_m_Settings.cheatFlags & 0x10) {
-        item->unk14 = D_800B588C;
+        item->unk14 = sCheatMenuText_AllSpecialObjectsOn;
     } else {
-        item->unk14 = D_800B58A8;
+        item->unk14 = sCheatMenuText_AllSpecialObjectsOff;
     }
     return 0;
 }

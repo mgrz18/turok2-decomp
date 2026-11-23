@@ -4,23 +4,23 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern char D_800B5314[];
-extern char D_800B52F8[];
+extern char sPakConfirmMenuText_No[];
+extern char sPakConfirmMenuText_ContinueWithoutSaving[];
 s32 PakConfirmMenu_UpdateNo_2(MenuItem *item) {
     switch (gPakConfirmKind) {
     default:
     case 0:
-        item->text = D_800B5314;
+        item->text = sPakConfirmMenuText_No;
         break;
     case 3:
-        item->text = D_800B5314;
+        item->text = sPakConfirmMenuText_No;
         break;
     case 4:
-        item->text = D_800B5314;
+        item->text = sPakConfirmMenuText_No;
         break;
     case 1:
     case 2:
-        item->text = D_800B52F8;
+        item->text = sPakConfirmMenuText_ContinueWithoutSaving;
         break;
     }
     return 0;

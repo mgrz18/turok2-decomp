@@ -10,14 +10,14 @@
 #endif
 
 #ifdef TARGET_PORT
-extern char D_800B3F00[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
+extern char sOptionsMenuText_ControlSideLeft[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 D_800B3F00;
+extern s32 sOptionsMenuText_ControlSideLeft;
 #endif
 #ifdef TARGET_PORT
-extern char D_800B3F18[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
+extern char sOptionsMenuText_ControlSideRight[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 #else
-extern s32 D_800B3F18;
+extern s32 sOptionsMenuText_ControlSideRight;
 #endif
 
 
@@ -38,10 +38,10 @@ s32 OptionsMenu_ControlSideText(MenuItem *arg0, Menu *arg1) {
     temp_v1 = var_v1->m_ControlSide;
     if (temp_v1 != 0) {
         if (temp_v1 == 1) {
-            arg0->table = T2_TEXT(D_800B3F00);
+            arg0->table = T2_TEXT(sOptionsMenuText_ControlSideLeft);
         }
     } else {
-        arg0->table = T2_TEXT(D_800B3F18);
+        arg0->table = T2_TEXT(sOptionsMenuText_ControlSideRight);
     }
     return 0;
 }

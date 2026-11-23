@@ -1,7 +1,7 @@
 #include "common.h"
 
-extern u8 D_800AA0DC[];   /* ": " */
-extern u8 D_800AA0EC[];   /* "   " */
+extern u8 sCrashText_ColonSpace[];   /* ": " */
+extern u8 sCrashText_Spaces3[];   /* "   " */
 extern u8 D_800AA0F0[];   /* "\n" */
 
 extern void Crash_PutChar(s32 c);       /* print a character */
@@ -26,11 +26,11 @@ static __inline__ void PrintHex32(u32 value) {
 /* Fault screen: prints two registers on one line, "name1: XXXXXXXX   name2: XXXXXXXX". */
 void Crash_PrintRegPair(u8 *name1, u32 value1, u8 *name2, u32 value2) {
     PrintString(name1);
-    PrintString(D_800AA0DC);
+    PrintString(sCrashText_ColonSpace);
     PrintHex32(value1);
-    PrintString(D_800AA0EC);
+    PrintString(sCrashText_Spaces3);
     PrintString(name2);
-    PrintString(D_800AA0DC);
+    PrintString(sCrashText_ColonSpace);
     PrintHex32(value2);
     PrintString(D_800AA0F0);
 }

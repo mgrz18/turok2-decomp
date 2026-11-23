@@ -10,8 +10,8 @@ struct Func8043D458Arg {
     s8 padC[8];
     s32 *text;
 };
-extern s32 D_800B57E4;
-extern s32 D_800B5800;
+extern s32 sCheatMenuText_InfiniteLivesOn;
+extern s32 sCheatMenuText_InfiniteLivesOff;
 s32 CheatMenu_InfiniteLivesText_2(struct Func8043D458Arg *arg0) {
     if (gEngineApp_m_Settings.unlockedCheats & 2) {
         arg0->flags |= 0x01000000;
@@ -19,9 +19,9 @@ s32 CheatMenu_InfiniteLivesText_2(struct Func8043D458Arg *arg0) {
         arg0->flags &= 0xFEFFFFFF;
     }
     if (gEngineApp_m_Settings.cheatFlags & 2) {
-        arg0->text = &D_800B57E4;
+        arg0->text = &sCheatMenuText_InfiniteLivesOn;
     } else {
-        arg0->text = &D_800B5800;
+        arg0->text = &sCheatMenuText_InfiniteLivesOff;
     }
     return 0;
 }

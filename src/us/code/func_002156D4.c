@@ -5,7 +5,7 @@
 
 /* Host body (docs/port/ABI.md, abicheck struct_scalar): a struct-returning wrapper. On MIPS a0 is
  * the hidden result pointer (returned in v0) and a1 the object, both passed straight through
- * to GameObject_GetGroundRotation; the caller (func_00246690) declares it CQuaternion f(obj). */
+ * to GameObject_GetGroundRotation; the caller (Actor_SpawnParticle) declares it CQuaternion f(obj). */
 extern CQuaternion GameObject_GetGroundRotation(void *obj);
 CQuaternion func_002156D4(void *obj) {
     return GameObject_GetGroundRotation(obj);

@@ -4,9 +4,9 @@
 #include "globals/game.h"
 #include "protos/cache.h"
 
-extern char D_800B4158[];
-extern char D_800B4170[];
-extern char D_800C1318[];
+extern char sOptionsMenuText_BrightnessNorm[];
+extern char sOptionsMenuText_Brightness[];
+extern char sOptionsMenuFmt_02d[];
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 
@@ -15,10 +15,10 @@ s32 OptionsMenu_BrightnessText(MenuItem *a) {
 
     CCache__SetFrameDelay(CCache__GetFrameDelay() + 2);
     if (h == 0) {
-        a->text = D_800B4158;
+        a->text = sOptionsMenuText_BrightnessNorm;
     } else {
-        a->text = D_800B4170;
-        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C1318, h);
+        a->text = sOptionsMenuText_Brightness;
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), sOptionsMenuFmt_02d, h);
     }
     return 0;
 }

@@ -8,13 +8,13 @@ struct FieldRecAt14 {
     char pad[0x14];
     char *text;
 };
-extern char D_800B49C4[];
-extern char D_800B49D0[];
+extern char sGameNoteMenuText_NoteInfo[];
+extern char sGameNoteMenuText_DeleteNote[];
 s32 GameNoteMenu_UpdateTitle_2(struct FieldRecAt14 *field) {
     if (sGameNoteLoad != 0) {
-        field->text = D_800B49C4;
+        field->text = sGameNoteMenuText_NoteInfo;
     } else {
-        field->text = D_800B49D0;
+        field->text = sGameNoteMenuText_DeleteNote;
     }
     return 0;
 }

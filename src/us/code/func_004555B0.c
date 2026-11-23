@@ -7,8 +7,8 @@
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
-extern char D_800B4080[];
-extern char D_800B4098[];
+extern char sOptionsMenuText_ControlStickVertNorm[];
+extern char sOptionsMenuText_ControlStickVert[];
 
 /* Shows the player's option unk2A (0-255, centred on 0x80) in steps of 8, falling back to the
  * default options when there is no player. */
@@ -21,12 +21,12 @@ s32 OptionsMenu_StickVertText_2(MenuItem *item, Menu *menu) {
     }
     value = (options->m_SettingY - 0x80) / 8;
     if (value == 0) {
-        item->text = D_800B4080;
+        item->text = sOptionsMenuText_ControlStickVertNorm;
     } else if (value > 0) {
-        item->text = D_800B4098;
+        item->text = sOptionsMenuText_ControlStickVert;
         sprintf(&item->text[MenuItem_TextLength_2(item) - 4], "  %02d", value);
     } else {
-        item->text = D_800B4098;
+        item->text = sOptionsMenuText_ControlStickVert;
         sprintf(&item->text[MenuItem_TextLength_2(item) - 4], " %03d", value);
     }
     return 0;

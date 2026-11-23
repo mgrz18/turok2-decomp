@@ -7,12 +7,12 @@
 s32 MenuItem_TextLength(void *item);
 
 extern char D_800C1768[];
-extern char D_800B43D0[];
-extern char D_800B441C[];
-extern char D_800B4470[];
-extern char D_800B450C[];
-extern char D_800B4574[];
-extern char D_800B4588[];
+extern char sMissionMenuText_RescuedXOf4[];
+extern char sMissionMenuText_DestroyedXOf3_B441C[];
+extern char sMissionMenuText_DestroyedXOf3_B4470[];
+extern char sMissionMenuText_DestroyedXOf1[];
+extern char sMissionMenuText_DestroyedXOf3_B4574[];
+extern char sMissionMenuText_DestroyedXOf[];
 
 s32 MissionMenu_UpdateObjective2Count(MenuItem *item) {
     s32 rank = -1;
@@ -24,21 +24,21 @@ s32 MissionMenu_UpdateObjective2Count(MenuItem *item) {
             item->text = D_800C1768;
             break;
         case 1:
-            item->text = D_800B43D0;
+            item->text = sMissionMenuText_RescuedXOf4;
             rank = CScene__GetLinkGroupCount(&gScene, 3);
             if (rank != -1) {
                 rank = 4 - rank;
             }
             break;
         case 2:
-            item->text = D_800B441C;
+            item->text = sMissionMenuText_DestroyedXOf3_B441C;
             rank = CScene__GetLinkGroupCount(&gScene, 5);
             if (rank != -1) {
                 rank = 3 - rank;
             }
             break;
         case 3:
-            item->text = D_800B4470;
+            item->text = sMissionMenuText_DestroyedXOf3_B4470;
             rank = CScene__GetLinkGroupCount(&gScene, 7);
             if (rank != -1) {
                 rank = 3 - rank;
@@ -48,19 +48,19 @@ s32 MissionMenu_UpdateObjective2Count(MenuItem *item) {
             item->text = D_800C1768;
             break;
         case 5:
-            item->text = D_800B450C;
+            item->text = sMissionMenuText_DestroyedXOf1;
             rank = CScene__GetLinkGroupCount(&gScene, 10);
             if (rank != -1) {
                 rank = 1 - rank;
             }
             break;
         case 6:
-            item->text = D_800B4588;
+            item->text = sMissionMenuText_DestroyedXOf;
             rank = CScene__GetLinkGroupCount(&gScene, 12);
             if (rank != -1) {
                 rank = 3 - rank;
                 if (rank == 3) {
-                    item->text = D_800B4574;
+                    item->text = sMissionMenuText_DestroyedXOf3_B4574;
                 }
             }
             break;

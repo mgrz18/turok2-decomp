@@ -4,20 +4,20 @@
 #include "structs/menu.h"
 #include "structs/save.h"
 
-extern char D_800B49DC[];
-extern char D_800B49F0[];
-extern char D_800B4A04[];
+extern char sGameNoteMenuText_DifficultyEasy[];
+extern char sGameNoteMenuText_DifficultyNormal[];
+extern char sGameNoteMenuText_DifficultyHard[];
 s32 GameNoteMenu_UpdateDifficulty(MenuItem *item) {
     switch (gLoadBuffer->settings.difficulty) {
     default:
     case 0:
-        item->text = D_800B49DC;
+        item->text = sGameNoteMenuText_DifficultyEasy;
         break;
     case 16:
-        item->text = D_800B49F0;
+        item->text = sGameNoteMenuText_DifficultyNormal;
         break;
     case 32:
-        item->text = D_800B4A04;
+        item->text = sGameNoteMenuText_DifficultyHard;
         break;
     }
     return 0;

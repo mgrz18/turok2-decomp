@@ -4,10 +4,10 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B58FC[];
-extern char D_800B5918[];
+extern char sCheatMenuText_TinyModeOn[];
+extern char sCheatMenuText_TinyModeOff[];
 s32 CheatMenu_TinyModeText_2(MenuItem *a) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x40) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
-    if (gEngineApp_m_Settings.cheatFlags & 0x40) a->text = D_800B58FC; else a->text = D_800B5918;
+    if (gEngineApp_m_Settings.cheatFlags & 0x40) a->text = sCheatMenuText_TinyModeOn; else a->text = sCheatMenuText_TinyModeOff;
     return 0;
 }

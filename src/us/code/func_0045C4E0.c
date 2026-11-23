@@ -8,13 +8,13 @@ struct FieldRecAt14 {
     char pad[0x14];
     char *text;
 };
-extern char D_800B509C[];
-extern char D_800B50D4[];
+extern char sDamagedPakMenuText_DamagedGameCannot[];
+extern char sDamagedPakMenuText_PakFoundIn[];
 s32 DamagedPakMenu_UpdateLine2_2(struct FieldRecAt14 *field) {
     if (sDamagedPakInGame != 0) {
-        field->text = D_800B509C;
+        field->text = sDamagedPakMenuText_DamagedGameCannot;
     } else {
-        field->text = D_800B50D4;
+        field->text = sDamagedPakMenuText_PakFoundIn;
     }
     return 0;
 }

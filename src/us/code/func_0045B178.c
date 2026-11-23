@@ -3,8 +3,8 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern char D_800B4B04[];
-extern char D_800B4B34[];
+extern char sCharNoteMenuText_NameExt[];
+extern char sCharNoteMenuText_Name[];
 extern s32 D_801309A8;
 
 s32 CharNoteMenu_UpdateName_2(MenuItem *item) {
@@ -17,9 +17,9 @@ s32 CharNoteMenu_UpdateName_2(MenuItem *item) {
     s32 space;
 
     if (D_801309A8 != 0) {
-        item->text = D_800B4B04;
+        item->text = sCharNoteMenuText_NameExt;
     } else {
-        item->text = D_800B4B34;
+        item->text = sCharNoteMenuText_Name;
         src = &gPakProfileRead.name[7];
         while (*src-- == ' ' && len != 0) {
             len--;
