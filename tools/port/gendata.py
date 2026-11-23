@@ -351,7 +351,7 @@ ABS_DATA_SECTIONS = ('.code_rodata', '.code_rodata_tail')
 RUNTIME_BSS = frozenset("""
     gDemoPlayer_match_decode gAudioWorld gRumbleEntries gDemoPlayer sPathSearch
     gAudioFrameMsgBuf gAudioReplyMsgBuf gLoopSoundEntries gAudioThread gLoopSounds
-    gRumblePool sMapSweep sPathNeighbour D_800F1FF4 gAudioDmaBuffers sCinema50Player
+    gRumblePool sMapSweep sPathNeighbour gAssertExpr gAudioDmaBuffers sCinema50Player
     sPathSorted sPoseChildren D_800F55F0 D_800F55F4 gAudioReplyMsgQ sDeathCinemaPlayer
     gAudioGlobals gCollisionResultsP gPakMesgBuf sPathSwap sPoseRegion
     gMergedController gControllers gPakWatched gPakInserted gFirstControllerPort
