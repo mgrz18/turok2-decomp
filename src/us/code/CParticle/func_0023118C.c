@@ -10,6 +10,7 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "protos/scene.h"
+#include "structs/vector.h"
 
 /* Draws the particle render list: culls each sprite particle by its bounds
  * against the view, builds its matrix once per frame, draws it as a model or
@@ -18,14 +19,7 @@
  * The list walk is a goto loop and the built flag a local, as in the ROM: the
  * flag stays in a saved register and nothing else is hoisted out of the walk. */
 
-
-typedef struct {
-    /* 0x00 */ CVector3 min;
-    /* 0x0C */ CVector3 max;
-} Box;
-
-
-extern s32 Frustum_TestBox(void *planes, Box *box);
+extern s32 Frustum_TestBox(void *planes, CBox *box);
 extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
 extern void CParticle__BuildMatrix(CParticle *particle, void *mtx, CCamera *camera, f32 depth);
 extern void Render_QueueModelByResource(void *model, void *mtx, void *mtx2, s32 a, s32 b);
@@ -34,7 +28,7 @@ extern void CParticle__DrawShadow(CParticle *particle, CCamera *view);
 extern void Swoosh_AddParticleNode(void *list, CParticle *particle, void *mtx);
 
 void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
-    Box box;
+    CBox box;
     CVector3 transformed;
     CParticle *node;
     CCamera *camera;
@@ -69,17 +63,17 @@ void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
                     height = maximum * 1.4142135f;
                     radius = height * 0.5f;
                     minX = node->header.m_vPos.x - radius;
-                    box.min.x = minX;
+                    box.m_vMin.x = minX;
                     maxX = node->header.m_vPos.x + radius;
-                    box.max.x = maxX;
+                    box.m_vMax.x = maxX;
                     minY = node->header.m_vPos.y - radius;
-                    box.min.y = minY;
+                    box.m_vMin.y = minY;
                     maxY = node->header.m_vPos.y + height;
-                    box.max.y = maxY;
+                    box.m_vMax.y = maxY;
                     minZ = node->header.m_vPos.z - radius;
-                    box.min.z = minZ;
+                    box.m_vMin.z = minZ;
                     maxZ = node->header.m_vPos.z + radius;
-                    box.max.z = maxZ;
+                    box.m_vMax.z = maxZ;
                     if (minX < view->m_ViewMax.x && view->m_ViewMin.x < maxX &&
                         minZ < view->m_ViewMax.z && view->m_ViewMin.z < maxZ &&
                         minY < view->m_ViewMax.y && view->m_ViewMin.y < maxY &&

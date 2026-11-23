@@ -8,35 +8,7 @@
 #include "globals/player.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
-
-/* A blast: radius, damage, then the push (strength, x, y, z). */
-#ifdef TARGET_PORT
-/* The host (round 10 y3, docs/port/FIDELITY.md 5): an impact event's 8-byte value arrives as two
- * host-order words (the event values' convention: CEventValue in structs/particle.h, the
- * animation events' s32[2] from the archive), word 0 the N64's first big-endian word. On the
- * little-endian hosts the halves and bytes of each word sit in reverse order, so the fields
- * that read them by position are declared reversed. (With the N64 order, every particle hit
- * swapped radius and damage: demo 1's first enemy shot took 1 health instead of 8.) */
-typedef struct Blast {
-    u16 damage;
-    u16 radius;
-    s8 z;
-    s8 y;
-    s8 x;
-    s8 strength;
-} __attribute__((aligned(4))) Blast;
-#else
-typedef struct Blast {
-    u16 radius;
-    u16 damage;
-    s8 strength;
-    s8 x;
-    s8 y;
-    s8 z;
-} __attribute__((aligned(4))) Blast;
-#endif
-
-
+#include "structs/particle_event.h"
 
 s32 Blast_CanHit(CGameObjectInstance *victim, CGameObjectInstance *source);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
@@ -45,7 +17,7 @@ f32 CGameObjectInstance__GetAverageScale(CGameObjectInstance *actor);
 s32 CGameObjectInstance__GetNearestBox(CGameObjectInstance *actor, CVector3 pos, HitFrame *out);
 f32 GameObject_GetCollisionRadius(CGameObjectInstance *actor);
 f32 CVector3__Distance(CVector3 *a, CVector3 *b);
-void Blast_GetPush(CGameObjectInstance *victim, CGameObjectInstance *source, Blast blast, CVector3 *out, u32 flags);
+void Blast_GetPush(CGameObjectInstance *victim, CGameObjectInstance *source, CImpactBlast blast, CVector3 *out, u32 flags);
 void DamageEvent_Set(DamageEvent *out, void *source, s32 damage, f32 radius, u32 flags, HitFrame *shield);
 void CAI__CallHurt(CGameObjectInstance *victim, void *ai, DamageEvent *hit);
 void Blast_ApplyHit(CGameObjectInstance *victim, CGameObjectInstance *source, s32 hit, CVector3 pos, CVector3 dir, s32 push, HitFrame *shield, u32 flags);
@@ -105,7 +77,7 @@ static __inline__ f32 blastScale(CGameObjectInstance *victim, CGameObjectInstanc
 /* Applies a blast from source to victim: a player's own close-range shot
  * (no weapon, or weapon 0x22) is moved most of the way back to the player;
  * then damage, push and the hit report, scaled by blastScale. */
-void ImpactEvent_ApplyBlast(CGameObjectInstance *victim, CGameObjectInstance *source, s32 hit, CVector3 pos, Blast blast, s32 falloff, s32 push, u32 flags) {
+void ImpactEvent_ApplyBlast(CGameObjectInstance *victim, CGameObjectInstance *source, s32 hit, CVector3 pos, CImpactBlast blast, s32 falloff, s32 push, u32 flags) {
     CVector3 dir;
     DamageEvent info;
     CPlayer *owner;

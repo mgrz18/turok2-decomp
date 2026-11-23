@@ -10,24 +10,9 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-
-typedef struct LevelNode {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 count;
-    /* 0x08 */ CObjectRecord records[1];
-} LevelNode;
-
-typedef struct ActorBlock {
-    /* 0x00 */ s32 size;
-    /* 0x04 */ s32 count;
-    /* 0x08 */ CGameObjectInstance objects[1];
-} ActorBlock;
-
 typedef struct Handle {
     void *data;
 } Handle;
-
-
 
 extern s32 ProPackDecompress(Handle **handle, s32);
 extern sptr CScene__GetRegion(CScene *world, s32);
@@ -53,9 +38,9 @@ void CScene__DecompressAnimatedInstances_2(CScene *world, Handle **handle) {
     sptr mode;
     Handle *block;
     s32 nspawns;
-    LevelNode *node;
+    CObjectRecordBlock *node;
     CObjectRecord *records;
-    ActorBlock *hdr;
+    CInstanceBlock *hdr;
     s32 n;
     s32 i;
     s32 j;

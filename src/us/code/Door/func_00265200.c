@@ -9,11 +9,7 @@
 #include "globals/scene.h"
 #include "protos/scene.h"
 #include "protos/ai.h"
-
-typedef struct {
-    s32 a;
-    s32 b;
-} EventArg;
+#include "structs/particle_event.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x40];
@@ -25,7 +21,7 @@ typedef struct {
     /* 0xC7 */ s8 active;
 } ActionState;
 
-extern void ImpactEvent_Call(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, EventArg extra);
+extern void ImpactEvent_Call(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, CImpactEventArg extra);
 
 static __inline__ s32 animReached(CGameObjectInstance *actor, ActionState *state, f32 scale) {
     if (actor->m_nAnims == 1) return 1;
@@ -56,7 +52,7 @@ static __inline__ s32 animReachedHost(CGameObjectInstance *actor, CAI *ai, f32 s
 
 void Door_OpenUpdate(CGameObjectInstance *actor, CAI *ai) {
     CDoorIntelligence *info = &actor->header.m_pIntelligence->m_Door;
-    EventArg extra;
+    CImpactEventArg extra;
     f32 t;
 
     if (info->m_OpenDoorEvent != -1) {

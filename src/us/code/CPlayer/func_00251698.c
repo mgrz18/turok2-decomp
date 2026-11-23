@@ -6,13 +6,9 @@
 #include "globals/player.h"
 #include "protos/scene.h"
 #include "protos/player.h"
+#include "structs/region.h"
 
 /* A 0x64-byte record of the world model sections (CScene__GetRegionInfo finds it from an id). */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x44];
-    /* 0x44 */ s32 flags;
-    /* 0x48 */ u8 pad48[0x64 - 0x48];
-} ModelRecord; /* size 0x64 */
 
 /* What CScene__FindIntelligence finds (id 0xC45): three floats at 0x38. */
 typedef struct {
@@ -22,14 +18,13 @@ typedef struct {
     /* 0x40 */ f32 unk40;
 } Found0xC45;
 
-
 s32 Cinema_SetNextCallbacks(s32, sptr, s32 *);     /* extern */
 void PlayerDeath_CinemaDone(void);
 
 void CPlayer__StartDeathCinema(CPlayer *arg0, s32 arg1, s32 arg2) {
     s32 temp_a0;
     sptr temp_a1;
-    ModelRecord *temp_v0;
+    CRegionInfo *temp_v0;
     Found0xC45 *temp_v0_2;
     s32 var_s0;
     s32 var_s1;
@@ -41,7 +36,7 @@ void CPlayer__StartDeathCinema(CPlayer *arg0, s32 arg1, s32 arg2) {
     if (temp_a1 != 0) {
         temp_v0 = CScene__GetRegionInfo(&gScene, temp_a1);
         if (temp_v0 != 0) {
-            var_s1 = temp_v0->flags;
+            var_s1 = temp_v0->m_dwFlags;
         }
     }
     if (gScene.m_bStreamAll != 0) {

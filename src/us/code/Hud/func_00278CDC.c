@@ -9,25 +9,15 @@
 #include "globals/onscreen.h"
 #include "globals/render.h"
 #include "globals/menu.h"
+#include "structs/player.h"
 
-typedef struct FontStyle {
-    u8 pad0[T2_OFFSETOF(COnScreen, m_TopR)];
-    /* 0xA0 */ s32 envR;
-    /* 0xA4 */ s32 envG;
-    /* 0xA8 */ s32 envB;
-    /* 0xAC */ s32 primR;
-    /* 0xB0 */ s32 primG;
-    /* 0xB4 */ s32 primB;
-    /* 0xB8 */ f32 width;
-    /* 0xBC */ f32 height;
-} FontStyle;
 
 
 extern f32 Menu_TextWidth(u8 *text, f32 size, f32 spacing);   /* the string's width */
 extern void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shadow, s32 alpha, s32 language);
 
 void COnScreen__DrawString(u8 *text, s32 x, s32 y, s32 alpha, s32 centred, s32 shadow, f32 scaleX, f32 scaleY) {
-    FontStyle *style;
+    COnScreen *style;
     f32 sizeFactor;
     f32 spacing;
     f32 size;
@@ -62,7 +52,7 @@ void COnScreen__DrawString(u8 *text, s32 x, s32 y, s32 alpha, s32 centred, s32 s
             sizeFactor = 1.0f;
             break;
         }
-        size = style->width * scaleX * sizeFactor;
+        size = style->m_FontXScale * scaleX * sizeFactor;
         switch (gLoadedFont) {
         case 5:
             spacing = 6.0f;
@@ -99,10 +89,10 @@ void COnScreen__DrawString(u8 *text, s32 x, s32 y, s32 alpha, s32 centred, s32 s
         g->w1 = 0;
         g = gDList++;
         g->w0 = 0xFB000000;     /* gDPSetEnvColor */
-        g->w1 = ((u8) style->envR << 24) | ((u8) style->envG << 16) | ((u8) style->envB << 8) | (u8) alpha;
+        g->w1 = ((u8) style->m_TopR << 24) | ((u8) style->m_TopG << 16) | ((u8) style->m_TopB << 8) | (u8) alpha;
         g = gDList++;
         g->w0 = 0xFA000000;     /* gDPSetPrimColor(0, 0, ...) */
-        g->w1 = ((u8) style->primR << 24) | ((u8) style->primG << 16) | ((u8) style->primB << 8) | 0xFF;
+        g->w1 = ((u8) style->m_BottomR << 24) | ((u8) style->m_BottomG << 16) | ((u8) style->m_BottomB << 8) | 0xFF;
     }
     switch (gLoadedFont) {
     case 3:
@@ -111,8 +101,8 @@ void COnScreen__DrawString(u8 *text, s32 x, s32 y, s32 alpha, s32 centred, s32 s
     case 1:
     case 4:
         fx = x;
-        w = style->width * scaleX;
-        h = style->height * scaleY;
+        w = style->m_FontXScale * scaleX;
+        h = style->m_FontYScale * scaleY;
         language = gLoadedFont;
         fy = y;
         if (shadow) {

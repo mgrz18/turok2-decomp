@@ -2,35 +2,8 @@
 #include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/particle_event.h"
 #include "globals/scene.h"
-
-/* A blast: radius, damage, then the push (strength, x, y, z). */
-#ifdef TARGET_PORT
-/* The host (round 10 y3, docs/port/FIDELITY.md 5): an impact event's 8-byte value arrives as two
- * host-order words (the event values' convention: CEventValue in structs/particle.h, the
- * animation events' s32[2] from the archive), word 0 the N64's first big-endian word. On the
- * little-endian hosts the halves and bytes of each word sit in reverse order, so the fields
- * that read them by position are declared reversed. (With the N64 order, every particle hit
- * swapped radius and damage: demo 1's first enemy shot took 1 health instead of 8.) */
-typedef struct Blast {
-    u16 damage;
-    u16 radius;
-    s8 z;
-    s8 y;
-    s8 x;
-    s8 strength;
-} __attribute__((aligned(4))) Blast;
-#else
-typedef struct Blast {
-    u16 radius;
-    u16 damage;
-    s8 strength;
-    s8 x;
-    s8 y;
-    s8 z;
-} __attribute__((aligned(4))) Blast;
-#endif
-
 
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -41,7 +14,7 @@ void CMtxF__SetRotateY(CMtxF *m, f32 angle);
 void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *m);
 
 /* The blast's push from `src` turned into a world vector, in the frame of `target`. */
-void Blast_GetPush(CGameObjectInstance *src, CGameObjectInstance *target, Blast blast, CVector3 *out, u32 flags) {
+void Blast_GetPush(CGameObjectInstance *src, CGameObjectInstance *target, CImpactBlast blast, CVector3 *out, u32 flags) {
     CVector3 v;
     CVector3 dir;
     CQuaternion q;

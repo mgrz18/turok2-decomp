@@ -23,6 +23,7 @@
 #include "structs/table.h"
 #include "structs/level_actor.h"
 #include "structs/particle.h"
+#include "structs/level_file.h"
 
 /* Where a warp puts the player: a spawn point of a level. */
 typedef struct CWarpPoint {
@@ -46,6 +47,30 @@ typedef struct CObjectRecord {
     /* 0x26 */ u8 unk_26;
     /* 0x27 */ u8 unk_27;
 } CObjectRecord; /* size 0x28 */
+
+/* A block of placed objects in the level file (CScene__DecompressAnimatedInstances): a
+ * header word, the count, then the records. */
+typedef struct CObjectRecordBlock {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 count;
+    /* 0x08 */ CObjectRecord records[1];
+} CObjectRecordBlock;
+
+/* The instance block CScene__DecompressAnimatedInstances fills: its size, the count, then
+ * the instances. */
+typedef struct CInstanceBlock {
+    /* 0x00 */ s32 size;
+    /* 0x04 */ s32 count;
+    /* 0x08 */ CGameObjectInstance objects[1];
+} CInstanceBlock;
+
+/* The 0x1C-byte record CScene__ConstructMap copies out of the level's map block
+ * (block 2 / 0 / 0 / 0 of the level file). */
+typedef struct CSceneMapRecord {
+    /* 0x00 */ s32 data[2];
+    /* 0x08 */ s32 valid;
+    /* 0x0C */ s32 rest[4];
+} CSceneMapRecord; /* size 0x1C */
 
 /* A streamed sector of the level: its data block and its extent on the ground plane. */
 typedef struct CSceneSector {

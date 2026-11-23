@@ -159,9 +159,9 @@ void Sprite_FromImage(struct Image * image, struct Image * texture, Sprite * spr
 void ImpactEvent_Call(void *actor, void *source, s32 event, CVector3 position, struct ResourceManagerState state);
 void ImpactEvent_Call2(void *actor, void *source, s32 event, CVector3 position, struct ResourceManagerState state);
 void ImpactEvent_FlashScreens(s32 arg0, s32 arg1, s32 arg2, Triple arg3, SevenBytes arg6);
-void Collision_SortSwap(RenderSortRecord *left, RenderSortRecord *right);
+void Collision_SortSwap(HitSortRecord *left, HitSortRecord *right);
 void Collision_LookAtF(float mf[4][4], float xEye, float yEye, float zEye, float xAt, float yAt, float zAt, float xUp, float yUp, float zUp);
-void Collision_SwapInstanceHits(RenderSortRecord *left, RenderSortRecord *right);
+void Collision_SwapInstanceHits(HitSortRecord *left, HitSortRecord *right);
 void Actor_TurnBy(void *arg0, f32 arg1);
 void Actor_SpawnParticle(void *, s32, Triple, s32);
 sptr CPlayerPool__GetIndex(char *, sptr);

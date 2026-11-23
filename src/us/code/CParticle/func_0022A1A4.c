@@ -4,11 +4,6 @@
 #include "structs/particle.h"
 #include "structs/game_object.h"
 typedef struct { f32 x, y, z, w; } Vector4f;
-typedef struct { f32 m[16]; } MatrixF;
-
-
-
-
 
 extern f32 func_00298470(f32);                              /* sqrtf */
 extern f32 GameObject_GetCollisionYOffset(CGameObjectInstance *actor);               /* its height */
@@ -23,8 +18,8 @@ extern void CVector3__Normalize(CVector3 *v);                        /* normaliz
 #endif
 extern Vector4f CQuaternion__FromDirection(CVector3 *dir);                  /* quaternion facing dir */
 extern void CQuaternion__SlerpFast(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b);
-extern void CQuaternion__ToMatrix(Vector4f *q, MatrixF *m);
-extern void CMtxF__TransformPoint(MatrixF *m, CVector3 *in, CVector3 *out);
+extern void CQuaternion__ToMatrix(Vector4f *q, CMtxF *m);
+extern void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
 extern void CParticle__Wobble(CParticle *p, f32 scale);
 
 /* Speeds up along the heading, stopping at the definition's limit. */
@@ -62,7 +57,7 @@ void CParticle__UpdateHoming(CParticle *p) {
     Vector4f from;
     Vector4f to;
     Vector4f turn;
-    MatrixF matrix;
+    CMtxF matrix;
     struct CGameObjectInstance *target;
     f32 dist;
     f32 speed;

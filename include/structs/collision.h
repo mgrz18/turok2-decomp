@@ -19,6 +19,7 @@
 
 #include "structs/game_object.h"
 #include "structs/region.h"
+#include "structs/level_file.h"
 
 /* The behaviours (m_InstanceBehavior, m_WallBehavior, m_GroundBehavior, and
  * the kind Sweep_HitPlane takes) */

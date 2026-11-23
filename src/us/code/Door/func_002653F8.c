@@ -2,17 +2,12 @@
 #include "structs/game_object.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
+#include "structs/particle_event.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00204A68.c, func_00204A68.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-
-typedef struct B01Pair {
-    s32 a;
-    s32 b;
-} B01Pair;
-
-void ImpactEvent_Call(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, B01Pair extra);
+void ImpactEvent_Call(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, CImpactEventArg extra);
 
 static __inline__ s32 r01_check(CGameObjectInstance *actor, CAI *state, f32 scale) {
     if (actor->m_nAnims == 1) return 1;
@@ -27,7 +22,7 @@ static __inline__ s32 r01_check(CGameObjectInstance *actor, CAI *state, f32 scal
 
 void Door_CloseUpdate(CGameObjectInstance *actor, CAI *state) {
     s32 idx = *(s8 *)((u8 *) actor->header.m_pIntelligence + 0x1D);
-    B01Pair extra;
+    CImpactEventArg extra;
     if (idx != -1) {
         if (r01_check(actor, state, (f32)idx * 0.007874016f)) {
             extra.a = 0;

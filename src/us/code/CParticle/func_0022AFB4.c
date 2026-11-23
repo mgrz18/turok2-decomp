@@ -9,11 +9,7 @@
 #include "globals/collision.h"
 #include "globals/engine.h"
 #include "globals/pickup.h"
-
-typedef struct Box {
-    /* 0x00 */ CVector3 min;
-    /* 0x0C */ CVector3 max;
-} Box;
+#include "structs/vector.h"
 
 s32 Random_Next(void);
 s32 Collision_MoveInstance(CParticle *p, CVector3 pos, u32 *flags);
@@ -44,7 +40,7 @@ void CParticle__SpawnAlongPath(CParticle *p);
  * ground, orients itself to the surface it hit and runs the collision responses its
  * descriptor allows. */
 void CParticle__Update(CParticle *p) {
-    Box bounds;
+    CBox bounds;
     CGameObjectInstance *target;
     CPlayer *player;
     CPickupRow14 *handler;
@@ -81,12 +77,12 @@ void CParticle__Update(CParticle *p) {
     }
     scaled = extent * 1.4142135f;
     half = scaled * 0.5f;
-    bounds.min.x = p->header.m_vPos.x - half;
-    bounds.max.x = p->header.m_vPos.x + half;
-    bounds.min.y = p->header.m_vPos.y - half;
-    bounds.max.y = p->header.m_vPos.y + scaled;
-    bounds.min.z = p->header.m_vPos.z - half;
-    bounds.max.z = p->header.m_vPos.z + half;
+    bounds.m_vMin.x = p->header.m_vPos.x - half;
+    bounds.m_vMax.x = p->header.m_vPos.x + half;
+    bounds.m_vMin.y = p->header.m_vPos.y - half;
+    bounds.m_vMax.y = p->header.m_vPos.y + scaled;
+    bounds.m_vMin.z = p->header.m_vPos.z - half;
+    bounds.m_vMax.z = p->header.m_vPos.z + half;
     if (p->m_dwFlags & 0x20000) {
         p->m_cFrame = 0.0f;
         p->m_nFrames = p->m_AnimSpeed * 32.0f;

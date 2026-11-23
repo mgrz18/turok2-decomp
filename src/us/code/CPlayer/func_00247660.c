@@ -3,32 +3,25 @@
 #include "structs/weapon.h"
 
 /* The scope model raised to the view (see CPlayer__AnimateScope). */
-typedef struct {
-    /* 0x00 */ s32 current;
-    /* 0x04 */ s32 requested;
-    /* 0x08 */ u8 pad8[0xB4 - 8];
-    /* 0xB4 */ s32 state;           /* 0 hidden, 1 raising, 2 up, 3 lowering */
-    /* 0xB8 */ f32 time;
-} HudModel; /* size 0xBC */
 
 extern s32 gEngineApp_m_Game_m_DebugLines; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
 
-void CPlayer__AnimateScope(HudModel *m, CPlayer *owner);
+void CPlayer__AnimateScope(CPlayerOverlay *m, CPlayer *owner);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 
 /* Starts lowering the scope model if it is up or being raised. */
-static __inline__ void LowerScope(HudModel *m) {
-    if (m->state != 0 && m->state != 3) {
-        m->state = 3;
+static __inline__ void LowerScope(CPlayerOverlay *m) {
+    if (m->m_Mode != 0 && m->m_Mode != 3) {
+        m->m_Mode = 3;
     }
 }
 
 /* Shows `model` as the scope, raising it again if it is already that one. */
-static __inline__ void RaiseScope(HudModel *m, s32 model) {
-    if (m->requested == model) {
-        m->state = 1;
+static __inline__ void RaiseScope(CPlayerOverlay *m, s32 model) {
+    if (m->m_DesiredObjectType == model) {
+        m->m_Mode = 1;
     }
-    m->requested = model;
+    m->m_DesiredObjectType = model;
 }
 
 /* Sniper zoom: toggled by button 0x100 on a weapon with a scope, then
