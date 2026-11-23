@@ -1,5 +1,5 @@
-/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
- * for the ROM's register allocation or layout; with one arm: CCache__AllocateAt: 9 of 80 words. */
+/* De-faked in round 21 (j4): the N64 body's unlock sent the message in two identical arms under a
+ * meaningless test; the plain if/else of the cache mutex (as the lock above it) matches. */
 #ifdef TARGET_PORT
 /* The port: the same through CMemEntry (structs/cache.h). B12Node is the N64 layout (key = data,
  * unk4 = size, flags at 0xC); on the host `data` is 8 bytes, so its flags slot is lockCount. The
@@ -98,20 +98,13 @@ B12Node *CCache__AllocateAt(s32 arg0, sptr arg1, s32 arg2)
   gCache_mutex_count = temp_v1_2;
   if (temp_v1_2 != 0)
   {
-    if (gCache_mutex_count || var_s0)
-    {
-      __osRestoreInt(temp_v0_2);
-      osSendMesg((&gCache_mutex), 0, 1);
-      return var_s0;
-    }
-    else
-    {
-      __osRestoreInt(temp_v0_2);
-      osSendMesg((&gCache_mutex), 0, 1);
-      return var_s0;
-    }
+    __osRestoreInt(temp_v0_2);
+    osSendMesg((&gCache_mutex), 0, 1);
   }
-  __osRestoreInt(temp_v0_2);
+  else
+  {
+    __osRestoreInt(temp_v0_2);
+  }
   return var_s0;
 }
 #endif
