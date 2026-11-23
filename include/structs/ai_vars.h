@@ -69,4 +69,15 @@ typedef struct {
     /* 0x04 */ s32 m_nRemaining;     /* one less per spawn */
 } CGeneratorAIVars;
 
+/* A throwable object (Throwable_*): the actor carrying it and its tilt while
+ * carried and in flight. Throwable_PickedUpUpdate also eases CAI::m_vDesiredPos
+ * (the carry point) with CAI::m_ConditionTimer as the blend. On the host the
+ * owner is pointer-wide, so the tilt lands at m_VarF32[2] / [3] (the N64's
+ * 0x110 / 0x114 are [1] / [2]; docs/port/STABILITY.md S14). */
+typedef struct {
+    /* 0x00 */ struct CGameObjectInstance *m_pOwner;
+    /* 0x04 */ f32 m_TiltAngle;
+    /* 0x08 */ f32 m_TiltHeading;
+} CThrowableAIVars;
+
 #endif /* STRUCTS_AI_VARS_H */

@@ -149,6 +149,7 @@ typedef struct {
         /* 0x10C */ CTurretAIVars m_Turret;
         /* 0x10C */ CPlatformAIVars m_Platform;
         /* 0x10C */ CGeneratorAIVars m_Generator;
+        /* 0x10C */ CThrowableAIVars m_Throwable;
     };
 } CAI; /* size 0x13C */
 
