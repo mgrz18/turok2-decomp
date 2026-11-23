@@ -4126,3 +4126,31 @@ the `progress:` line where level 10 shows `ending 0/1` (the measure of `summ.sh`
 The stick-aim combination still reaches the end but no longer without a loss: on the new stream
 level 2 costs a life. Not re-tuned in this round. The other combinations of section 43 were not
 re-run.
+
+## 46. Round 24 (part m3): the stick-aim combination back to 0 lives
+
+Section 45's life was the Mantid Queen (level 2), not the lair: the player came in with 177 health,
+took 211 damage there (frames 165,800-181,276, 67 hits, nearly all from her volleys at ~430-490
+units) and died at 176,289. A `--stick-aim 5` run puts the player `T2_BOSS_FRONT` units in front of
+her open spot every 200 frames; round 20 kept 450 for it (42.2). One run per distance on the
+round-23 stream (`T2R24_SQF=D,200`, to 185,000):
+
+| distance | the Queen |
+|---|---|
+| 450 (round 20) | 211 damage, a life |
+| 350, 700, 900 | still fighting her at 185,000 |
+| 600 | 169 damage, lowest 8, done at 177,940 |
+| **525** | **21 damage, lowest 156, done at 175,222** |
+
+`fullrun.py` now uses **525 with `--stick-aim 5` on the N64 stream** (`STICK_QUEEN_FRONT`; the default
+keeps `N64_QUEEN_FRONT` 600, `--legacy` keeps 450). One sample per distance on a chaotic fight, as in
+42.1: 525 is the best seen, not a proven optimum. The default and `--legacy` write byte-identical
+route files (`playthrough.txt`, `teleport.env`), so their det lines cannot move.
+
+`--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair` (Linux Release, the
+round-23 binary, 300,000 frames): **END 2 (level 10 at 253,788), 5 totems, 0 lives, 225 hits**, det
+md5 **`cadfe170…`** (600,000 lines; the one `death:` at 267,886 is the hub after the credits, as in
+the default). Per fight (damage / lowest): the Harbor Totem 82/118, 133 21/179, 134 28/172, 135
+29/171, the City Totem 42/129, the Marsh Totem 8/192, the Cave Totem 108/92, the Blind One 35/57,
+**124 29/28** (the thinnest spot, as in round 20), the Hive Totem 23/177, **the Queen 21/156**, the
+Mother 90/110, the lair (assisted) 157/43. The default still gives `cd2d68ce…`.

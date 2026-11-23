@@ -120,10 +120,10 @@ def header_typedefs(includes, src_dir):
     """name -> canonical type of every simple typedef the module's #includes give (one cpp run)."""
     if not includes:
         return {}
-    with tempfile.NamedTemporaryFile("w", suffix=".c", dir=src_dir, delete=False) as f:
+    with tempfile.NamedTemporaryFile("w", suffix=".c", delete=False) as f:   # not in src/ (globbed)
         f.write("".join(includes))
     try:
-        r = subprocess.run(CPP + [f.name], cwd=ROOT, capture_output=True, text=True)
+        r = subprocess.run(CPP + [f"-I{src_dir}", f.name], cwd=ROOT, capture_output=True, text=True)
     finally:
         os.unlink(f.name)
     return {m.group(2): canon_type(m.group(1)) for m in SIMPLE_TYPEDEF.finditer(r.stdout)}
@@ -136,10 +136,10 @@ def include_types(item, src_dir):
     """Type names (typedef names, struct tags) an #include line brings (cached; one cpp run each)."""
     key = re.sub(r"\s+", " ", strip_comments(item)).strip()
     if key not in _INC:
-        with tempfile.NamedTemporaryFile("w", suffix=".c", dir=src_dir, delete=False) as f:
+        with tempfile.NamedTemporaryFile("w", suffix=".c", delete=False) as f:   # not in src/ (globbed)
             f.write(item if item.endswith("\n") else item + "\n")
         try:
-            t = subprocess.run(CPP + [f.name], cwd=ROOT, capture_output=True, text=True).stdout
+            t = subprocess.run(CPP + [f"-I{src_dir}", f.name], cwd=ROOT, capture_output=True, text=True).stdout
         finally:
             os.unlink(f.name)
         _INC[key] = ({m.group(2) for m in SIMPLE_TYPEDEF.finditer(t)} | set(re.findall(r"}\s*(\w+)\s*;", t))
