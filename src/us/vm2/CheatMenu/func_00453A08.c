@@ -12,14 +12,7 @@
 
 extern int Controller_MenuLeft(ControllerProfile *object);
 extern int Controller_MenuRight(ControllerProfile *object);
-struct MenuRecAt20V4;
-struct MenuRecAt20V4 {
-    s16 state;
-    char pad2[0x1E];
-    s32 input;
-};
-struct MenuRecAt20V4;
-typedef struct MenuRecAt20V4 MenuRecAt20V4;
+#include "rw/abu_types.h"
 /* the menu by its host layout (round 10 y4): the view's s32 input at N64 0x20 is
  * Menu.controller, a pointer at another host offset, and the call cast it to s32 (macOS, statics
  * above 4 GB: Controller_MenuLeft crashed when a soak run opened the cheat entry; Linux non-PIE

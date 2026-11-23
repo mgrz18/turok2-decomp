@@ -15,8 +15,8 @@
 #define PROGRESS (&gEngineApp_m_Game.m_Settings)
 
 extern s32 Controller_ConfirmPressed(sptr pad);
-extern s32 Controller_MenuLeft(sptr pad);
-extern s32 Controller_MenuRight(sptr pad);
+extern int Controller_MenuLeft(struct ControllerProfile *object);
+extern int Controller_MenuRight(struct ControllerProfile *object);
 extern void Menu_ClaimPressingController_2(Menu *c);
 extern void CEngineApp__SetupFadeTo(void *game, s32 mode);
 extern void CEngineApp__StartGameAtWarp(void *game, s32 level);

@@ -4,13 +4,7 @@
 #include "common.h"
 #include "globals/menu_text.h"
 #include "globals/game.h"
-struct Func8043D458Arg;
-struct Func8043D458Arg {
-    s8 pad0[8];
-    s32 flags;
-    s8 padC[8];
-    s32 *text;
-};
+#include "rw/abu_types.h"
 s32 CheatMenu_InfiniteLivesText_2(struct Func8043D458Arg *arg0) {
     if (gEngineApp_m_Settings.unlockedCheats & 2) {
         arg0->flags |= 0x01000000;
