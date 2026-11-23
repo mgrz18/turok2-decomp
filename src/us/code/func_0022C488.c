@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_3.CPP, Particle_HitTarget, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/swoosh.h"
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "structs/particle_event.h"
@@ -54,7 +55,6 @@ struct Target {
 };
 #endif
 
-extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 
 s32 GameObject_IsInanimate(Target *target);
@@ -175,7 +175,7 @@ void CParticle__HitTarget(CParticle *p) {
                     attachParticle(p, boneMatrix, action);
                     if (p->m_ActiveSwooshes) {
                         CParticle__BuildCameraMatrix(p);
-                        Trail_DetachOwner(gEngineApp_m_SwooshSystem, p);
+                        Trail_DetachOwner(&gEngineApp_m_SwooshSystem, p);
                     }
                     if (p->m_pDLight) {
                         CDLightSet__Free(D_8010FF34, p->m_pDLight);

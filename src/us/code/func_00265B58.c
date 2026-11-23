@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/swoosh.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
 #include "protos/game.h"
@@ -116,7 +117,6 @@ struct M1Ref {
                 u8 pad0[0xC];
                 s32 unkC;
 };
-extern u8 gEngineApp_m_SwooshSystem[];
 void Sound__Play(s16 id, CVector3 pos, sptr a, sptr b);
 void Actor_SpawnParticle(M1Actor *a, s32 id, CVector3 pos, s32 n);
 void AI_DropPickupsOnce(M1Actor *a, M1State *s, s32 n, s32 x, s32 y);
@@ -142,7 +142,7 @@ void Destructible_GoEnter(M1Actor *actor, M1State *state) {
             Actor_SpawnParticle(actor, info->unk1C, actor->pos, 0);
         }
         AI_DropPickupsOnce(actor, state, 4, info->unk24.i, info->unk28.i);
-        SwooshSet_FreeOwner(gEngineApp_m_SwooshSystem, actor);
+        SwooshSet_FreeOwner(&gEngineApp_m_SwooshSystem, actor);
         if (gScene.m_Mode != mode) goto L;
     } else {
 L:

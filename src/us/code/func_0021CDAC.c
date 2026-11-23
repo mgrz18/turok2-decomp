@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/swoosh.h"
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
@@ -126,7 +127,6 @@ typedef struct Profile {
 extern char D_800A5AF8[];
 extern Profile sBoneMatrixProfile;
 extern s32 sBoneMatrixCount[]; /* &sBoneMatrixProfile.calls */
-extern u8 gEngineApp_m_SwooshSystem[];
 
 s32 Cinema_PathPlaying(void);
 sptr MtxPool_Alloc(void *table, s32 id);
@@ -297,7 +297,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2
                 }
             }
             if (obj->hasEffects) {
-                SwooshSystem_AddBonePoints(gEngineApp_m_SwooshSystem, obj, bones);
+                SwooshSystem_AddBonePoints(&gEngineApp_m_SwooshSystem, obj, bones);
             }
             if (ctx.blend) {
                 CAnimationState__Release(blendChannel);

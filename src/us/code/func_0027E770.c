@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/swoosh.h"
 #include "gfx.h"
 #include "gbi_t2.h"
 #include "structs/camera.h"
@@ -10,7 +11,6 @@
 #endif
 
 
-extern u8 gEngineApp_m_SwooshSystem[];
 void func_002847D0(void);
 s32 Cinema_PathPlaying(void);
 void CPlayerPool__ReloadAnimInfo(CPlayerPool *list, CCamera *cam);
@@ -36,7 +36,7 @@ void CCamera__DrawScene(CCamera *cam, u8 *world) {
         CPlayerPool__DrawCharacters(&gEngineApp_m_Game.m_PlayerList, cam);
     }
     CScene__DrawRegisteredInstances(world, cam);
-    SwooshSystem_DrawDecals(gEngineApp_m_SwooshSystem, cam);
+    SwooshSystem_DrawDecals(&gEngineApp_m_SwooshSystem, cam);
     if (Cinema_PathPlaying() == 0) {
 #ifdef TARGET_PORT
         CLevelActorPool__Draw((u8 *) &((CScene *) world)->m_ActorPool, cam);
@@ -47,7 +47,7 @@ void CCamera__DrawScene(CCamera *cam, u8 *world) {
     CScene__DrawSortedList(world, cam);
     CEmitterPool__Draw(cam->m_SkySystem, cam);
     CScene__DrawParticles(world, cam);
-    Trail_DrawAll(gEngineApp_m_SwooshSystem, cam);
+    Trail_DrawAll(&gEngineApp_m_SwooshSystem, cam);
     CCamera__DrawGlares(cam);
     if (Cinema_PathPlaying() == 0 && gEngineApp_m_Game.m_Settings.mode == 13) {
         CPlayerPool__DrawWeaponOverlays(&gEngineApp_m_Game.m_PlayerList, cam);

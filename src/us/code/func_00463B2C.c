@@ -2,6 +2,7 @@
  * addresses (func_0042B304/func_0042B5D0/func_0042B960/func_0042CC24 are the callbacks the asm calls D_0042B304,
  * D_0042B5D0, .L0042B960 and CScene__DecompressIntelligence + 0x40). */
 #include "common.h"
+#include "globals/swoosh.h"
 #include "structs/world.h"
 #include "structs/game.h"
 #include "structs/player.h"
@@ -20,7 +21,6 @@
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
  * level's data blocks and spawns its actors. */
 
-extern u8 gEngineApp_m_SwooshSystem[];
 
 extern s32 ProPack__Decompress(s32, sptr);
 extern void CCollisionInfo__Reset(void);
@@ -132,7 +132,7 @@ loaded:
     CParticleSystem__Construct_2(&w->m_ParticleSystem, *(sptr *) w->m_pParticleEffects);
     SceneActorPool_Construct_2(&w->m_ActorPool);
     CInstancePool__Construct_2(&w->m_InstancePool);
-    SwooshSystem_Construct_2(gEngineApp_m_SwooshSystem);
+    SwooshSystem_Construct_2(&gEngineApp_m_SwooshSystem);
     CCollisionInfo__Reset();
     CDLightSet__Construct_2(&w->m_DLightSet);
     LoopSounds_Construct(&gLoopSounds, gLoopSoundEntries, 0xF);
@@ -141,7 +141,7 @@ loaded:
      * two are not that far apart (the same fix as CScene__LoadLevel's, func_0042AC0C.c) */
     COnScreen__ResetBossBars_2(&gEngineApp_m_OnScreen);
 #else
-    COnScreen__ResetBossBars_2(gEngineApp_m_SwooshSystem - 0x1C8);
+    COnScreen__ResetBossBars_2((u8 *) &gEngineApp_m_SwooshSystem - 0x1C8);
 #endif
     if (*w->m_pLevels < level) {
         level = *w->m_pLevels - 1;

@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_3.CPP, func_8027D4A8_de, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/swoosh.h"
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "structs/particle_event.h"
@@ -11,7 +12,6 @@
 
 typedef struct Target Target;
 
-extern u8 gEngineApp_m_SwooshSystem[];
 #define D_8010FF34 (&gScene.m_DLightSet)
 
 s32 Actor_GetTypeClass(Target *target);
@@ -91,7 +91,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
         case 2:
         case 3:
             if (definition->m_dwFlags & 0x800000) {
-                SwooshSystem_PlaceDecal(gEngineApp_m_SwooshSystem, gCollisionResults.m_vInstancePos, gCollisionResults.m_vNormal, kind, 0);
+                SwooshSystem_PlaceDecal(&gEngineApp_m_SwooshSystem, gCollisionResults.m_vInstancePos, gCollisionResults.m_vNormal, kind, 0);
             }
             break;
     }
@@ -104,7 +104,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
         }
         if (p->m_ActiveSwooshes) {
             CParticle__BuildCameraMatrix(p);
-            Trail_DetachOwner(gEngineApp_m_SwooshSystem, p);
+            Trail_DetachOwner(&gEngineApp_m_SwooshSystem, p);
         }
         if (p->m_pDLight) {
             CDLightSet__Free(D_8010FF34, p->m_pDLight);
