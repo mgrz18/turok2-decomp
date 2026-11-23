@@ -10,11 +10,10 @@ typedef struct {
     /* 0x58 */ s32 unk58;
 } LevelScriptF9D0;
 
-extern LevelScriptF9D0 gLevelScript_scriptCOn; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void Primagen_EnterMode16_2(void) {
-    gLevelScript_scriptCOn.active = 1;
-    gLevelScript_scriptCOn.unk54 = -1;
-    gLevelScript_scriptCOn.unk58 = -1;
-    gLevelScript_scriptCOn.data = sPrimagenSoundScript4_2;
+    gLevelScript.scriptCOn = 1;
+    gLevelScript.script3.cursor = -1;
+    gLevelScript.script3.current = -1;
+    gLevelScript.script3.steps = sPrimagenSoundScript4_2;
 }

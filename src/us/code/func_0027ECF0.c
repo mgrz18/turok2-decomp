@@ -7,10 +7,10 @@
 #include "protos/list.h"
 
 /* local types: this file cannot include globals/camera.h (gDefaultVisBits below) */
-extern f32 gSplitScreenMarginBottom;          /* split screen margins: bottom, */
-extern f32 gSplitScreenMarginTop;          /* top, */
-extern f32 gSplitScreenMarginLeft;          /* left (not yet a symbol of its own: gSplitScreenMarginTop + 4 in the asm) */
-extern f32 gSplitScreenMarginRight;          /* right */
+extern f32 gSplitScreenMarginBottom; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */          /* split screen margins: bottom, */
+extern f32 gSplitScreenMarginTop; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */          /* top, */
+extern f32 gSplitScreenMarginLeft; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */          /* left (not yet a symbol of its own: gSplitScreenMarginTop + 4 in the asm) */
+extern f32 gSplitScreenMarginRight; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */          /* right */
 extern CCameraPool gEngineApp_m_Game_m_CameraPool; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */ /* the camera pool */
 extern CBox gCameraViewBox; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */ /* the view boxes of all the active cameras together */
 extern CBox gCameraVisibleBox; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */ /* and their widened (animation) boxes */

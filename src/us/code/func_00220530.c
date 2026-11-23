@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/swoosh.h"
 #include "structs/world.h"
 #include "structs/game.h"
 #include "globals/game.h"
@@ -9,7 +10,6 @@
 
 /* The input state the controller reader fills (gEngineApp_m_Settings, 0x184 bytes). */
 
-extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 gEngineApp_m_Game_m_CameraPool[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 
 void CCache__SetFrameDelay(s32, s32);
@@ -50,7 +50,7 @@ void CScene__Update(CScene *world) {
     CScene__ClearListCounts(world);
     MtxPool_Reset(world->m_Heap);
     CCache__LockForDisplayList(0, world->m_hHeap);
-    RibbonVtxPool_Reset(gEngineApp_m_SwooshSystem);
+    RibbonVtxPool_Reset(&gEngineApp_m_SwooshSystem);
     CPlayerPool__PreUpdate(&gEngineApp_m_Game.m_PlayerList);
     CScene__BuildActorLists(world);
     CScene__LoadVisibleGridSections(world);
@@ -68,7 +68,7 @@ void CScene__Update(CScene *world) {
 #else
     if (world->m_WarpState == 0 && *(s32 *)(gEngineApp_m_Game_m_CameraPool + 0x13F4) == 0) {
 #endif
-        SwooshSystem_Update(gEngineApp_m_SwooshSystem);
+        SwooshSystem_Update(&gEngineApp_m_SwooshSystem);
         CScene__AdvanceInstances(world);
         CScene__AdvanceListedInstances(world);
         CLevelActorPool__Update(&world->m_ActorPool);

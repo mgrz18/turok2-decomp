@@ -7,24 +7,23 @@ typedef struct {
     /* 0x04 */ s32 unk4;
 } State8012FA24;
 
-extern State8012FA24 gLevelScript_script3_cursor; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void Primagen_SetSoundScript_2(s32 arg0) {
-    gLevelScript_script3_cursor.unk0 = -1;
-    gLevelScript_script3_cursor.unk4 = -1;
+    gLevelScript.script3.cursor = -1;
+    gLevelScript.script3.current = -1;
     if (arg0 == 0) {
-        ((BossStep3 **) &gLevelScript_script3_cursor)[-1] = NULL;
+        gLevelScript.script3.steps = NULL;
     }
     if (arg0 == 1) {
-        ((BossStep3 **) &gLevelScript_script3_cursor)[-1] = sPrimagenSoundScript1_2;
+        gLevelScript.script3.steps = sPrimagenSoundScript1_2;
     }
     if (arg0 == 4) {
-        ((BossStep3 **) &gLevelScript_script3_cursor)[-1] = sPrimagenSoundScript4_2;
+        gLevelScript.script3.steps = sPrimagenSoundScript4_2;
     }
     if (arg0 == 2) {
-        ((BossStep3 **) &gLevelScript_script3_cursor)[-1] = sPrimagenSoundScript2_2;
+        gLevelScript.script3.steps = sPrimagenSoundScript2_2;
     }
     if (arg0 == 3) {
-        ((BossStep3 **) &gLevelScript_script3_cursor)[-1] = sPrimagenSoundScript3_2;
+        gLevelScript.script3.steps = sPrimagenSoundScript3_2;
     }
 }

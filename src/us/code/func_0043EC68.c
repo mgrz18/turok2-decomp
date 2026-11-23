@@ -5,7 +5,7 @@
 M2C_UNK ScriptAnimator_SetScript(void *, M2C_UNK *);           /* extern */
 extern M2C_UNK sPrimagenMode7PartScript_2; /* local type: f32[] in globals/boss.h, whose structs/boss.h clashes with this file's M2C_UNK gLevelScript */
 extern M2C_UNK gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
-extern M2C_UNK gLevelScript_bossMode;
+extern M2C_UNK gLevelScript_bossMode; /* local type: BossMode in globals/boss.h, whose structs/boss.h clashes with this file's M2C_UNK gLevelScript */
 
 void Primagen_EnterMode7_2(CGameObjectInstance *arg0) {
     void *temp_s2;

@@ -159,34 +159,6 @@ typedef struct B12AiCfg {
     u32 unk4;
     s32 unk8;
 } B12AiCfg;
-typedef struct B12AiTask {
-               s32 *cmd;
-               u8 pad4[0x14];
-               s32 f18;
-               s32 f1C;
-               u8 *f20;
-               s32 f24;
-               u8 *f28;
-               s32 f2C;
-               u8 *f30;
-               s32 f34;
-               s32 f38;
-               s32 f3C;
-               s32 f40;
-               s32 f44;
-               u8 pad48[8];
-               s32 f50;
-               s32 f54;
-               OSMesgQueue *f58;
-               struct B12AiTask *f5C;
-               u8 pad60[0x10];
-} B12AiTask;
-typedef struct B12DbEnt2 {
-    ALLink link;
-    s32 f8;
-    s32 fC;
-    void *data;
-} B12DbEnt2;
 typedef struct M04SortTab {
                u8 pad0[0xE];
                s16 n;

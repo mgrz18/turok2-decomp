@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/swoosh.h"
 #include "structs/particle.h"
 
 s32 CDLightSet__Free(s32 *, CDLight *);              /* extern */
@@ -6,7 +7,6 @@ s32 CParticle__BuildCameraMatrix();                            /* extern */
 s32 Trail_DetachOwner(s32 *, void *);           /* extern */
 
 extern s32 D_8010FF34;
-extern s32 gEngineApp_m_SwooshSystem;
 
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CParticle__BuildCameraMatrix receives CParticle__StopEffects's own argument
  * registers (pass-through); the host passes them. */

@@ -9,7 +9,6 @@
 #include "globals/framebuffer.h"
 #include "protos/ultra.h"
 
-extern u32 gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 gInSinglePlayerMenu; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gCameraPoolHideViews; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 extern u8 gEngineApp_m_Game_m_MenuPool[]; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
@@ -64,7 +63,7 @@ void CEngineApp__Update(CEngineApp *level) {
         break;
     default:
         gNextTicks = frameRetraces(2);
-        if (gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount >= 3) {
+        if ((u32) gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount >= 3) {
             gNextTicks = frameRetraces(3);
         }
         if (Cinema_PathPlaying() != 0) {

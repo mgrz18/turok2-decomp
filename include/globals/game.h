@@ -40,6 +40,7 @@ extern u8 gEngineApp_m_Settings_unk18;            /* .unk18 */
 extern u8 gEngineApp_m_Settings_unk1B;            /* .unk1B */
 extern s32 gEngineApp_m_Settings_unk1C8;          /* .unk1C8 */
 extern f32 gEngineApp_m_Settings_match_countdown; /* .match.countdown */
+extern s32 gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount; /* .m_PlayerList.m_ActiveList.m_nCount */
 extern s32 gEngineApp_m_Settings_match_teamScore[2]; /* .match.teamScore */
 
 #endif

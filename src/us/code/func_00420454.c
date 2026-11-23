@@ -11,9 +11,9 @@
 #include "protos/menu.h"
 
 /* local: globals/game.h declares these, but its gEngineApp_m_Settings_unk180 (u8) clashes with the array view below, which the ROM needs here */
-extern GameSettings gEngineApp_m_Settings;
+extern GameSettings gEngineApp_m_Settings; /* local: globals/game.h is not included here (its field symbols clash with this file's views of unlockedCheats/unk180) */
 extern GameMatch gEngineApp_m_Settings_match; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
-extern CGame gEngineApp_m_Game;
+extern CGame gEngineApp_m_Game; /* local: as above */
 
 /* Load game menu "select" handler: with the pak checked, either restores the
  * loaded save (player block, game progress, level times, the level's key

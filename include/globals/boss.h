@@ -156,6 +156,18 @@ extern s32 gLevelScript_unk3CC;          /* gLevelScript.unk3CC */
 extern struct CGameObjectInstance *gMantidQueen_boss; /* gMantidQueen.boss */
 extern s32 gMantidQueen_blink;           /* gMantidQueen.blink */
 extern s32 gMotherBoss_maxRadius;        /* gMotherBoss.maxRadius */
+/* Field symbols every user reads through its own view (array, struct one level down): declared
+ * here with the field's type; each user's line says why it keeps its view (local type). */
+extern s32 gMotherBoss_phase;            /* gMotherBoss.phase */
+extern s32 gMotherBoss_activeMask;       /* gMotherBoss.activeMask */
+extern s32 gMotherBoss_liveMask;         /* gMotherBoss.liveMask */
+extern s32 gMotherBoss_counter;          /* gMotherBoss.counter */
+extern s32 gMantidQueen_waveActive;      /* gMantidQueen.waveActive */
+extern s32 gLevelScript_values[2][8];    /* gLevelScript.values */
+extern u8 gLevelScript_scriptCOn;        /* gLevelScript.scriptCOn */
+extern BossScript gLevelScript_script;   /* gLevelScript.script */
+extern s32 gLevelScript_script2_cursor;  /* gLevelScript.script2.cursor */
+extern s32 gLevelScript_script3_cursor;  /* gLevelScript.script3.cursor */
 extern f32 sMotherBossFadeTimer;         /* the Mother's defeat fade */
 extern s32 sMotherBossCinemaStarted;     /* its defeat cinema has started */
 extern CVector3 *gPrimagenPaths[];         /* the Primagen's paths, each ended by a point with y < 0 */

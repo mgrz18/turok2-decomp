@@ -51,6 +51,7 @@ the struct headers its types need, so any file that uses `common.h` can include 
 | `audio.h` | sound world and audio manager | `gAudioWorld` (`CAudioWorld`), SDK audio-manager statics, voice and sequence state, `sPitchRatioTable`, `sSoundKindVolumeTable` (`SoundKindVolume`), `sSpeechSound` (`ALSound`), `sCSPlayerFile` (36) |
 | `boss.h` | boss fights | `gMantidQueen` (`WaveBossState`), `gLevelScript` (`LevelScriptState`) and their kept field symbols; the VM modules' boss scripts and tables (`BossStep*`, `BossAttack`, `WaveBossMinion`, `gMotherSpawnPoints`) (95) |
 | `boss_ai.h` | boss AI | the bosses' AI mode tables (5) |
+| `audiomgr.h` | SDK audio manager (round 22) | `gAudioDmaBuffers` (`AMDMABuffer[0x3C]`), `gAudioDmaState` (`AMDMAState`) and its `_firstUsed`/`_firstFree`, `gAudioDmaCache` (`AMCacheEntry *`), `gAudioCmdLists` (`Acmd *[2]`), `gAudioInfo` (`AMAudioInfo *[3]`); types in `structs/audiomgr.h` (7) |
 | `automap.h` | automap | the automap matrices, line indices and double-buffered line vertices (`Vtx_t`, `structs/gbi.h`) (8) |
 | `batch.h` | render batcher | `sBatch*`, `sDrawItems`, `sSortNodes`, the opaque and translucent sort trees (`Material`, `DrawItem`, `SortNode`, `structs/batch.h`) (14) |
 | `cache.h` | resource cache (`CCache`) | `gCache` (`CCache`, `structs/cache.h`), the kept field symbols (`gCache_*`), `gHashTable` (`HashEntry *`), hash sizes, entry counts (24) |
@@ -65,7 +66,7 @@ the struct headers its types need, so any file that uses `common.h` can include 
 | `engine.h` | engine loop | frame timing (`gFrameIncrement`, `gFrameCount`...), `gEngineModeTable` (`EngineMode`), engine state flags, scheduler statics, thread priorities, `gBootSignature`, `gEngineTimestamp`, `gAssertFile`, the pak check timer, mode text tables (43) |
 | `event.h` | level events | `gLevelEventHandlers` (`LevelEventHandler *[14]`) (1) |
 | `framebuffer.h` | frame buffers | `gCFB` (`u16 *[]`), `gCurrentFB` (`u16 *`) and the `gRefreshRate` macro for the word after it (2) |
-| `frame.h` | frame loop and scheduler | `gFrameData`, frame and scheduler timing (`gCurrentTick`, `gNumTicks*`, `gWaitingFrames` as `CFrameData *[3]`), the engine queue `gGfxFrameMessageQueue`, `gGfxClient` (`OSScClient`, `structs/sched.h`), `gGfxMsg`, the thread stacks and threads, the RDP fifo, `gIdentityMtx` (`Mtx`), pool buffers (41) |
+| `frame.h` | frame loop and scheduler | `gFrameData`, frame and scheduler timing (`gCurrentTick`, `gNumTicks*`, `gWaitingFrames` as `CFrameData *[3]`), the engine queue `gGfxFrameMessageQueue`, `gScheduler` (`OSSched`) and `gGfxClient` (`OSScClient`, `structs/sched.h`), `gGfxMsg`, the thread stacks and threads, the RDP fifo, `gIdentityMtx` (`Mtx`), pool buffers (41) |
 | `game.h` | game state | `gEngineApp_m_Game` (`CGame`), `gEngineApp_m_Settings` (`GameSettings`), their kept field symbols, `gEngineApp_m_Settings_cheatFlags` (15) |
 | `hostio.h` | SN host I/O | the I/O thread and its queues, `gHostIoMemoryBounds` (`MemoryBoundaryInit`), PI and state flags, TLB page masks, the DMA message (`OSIoMesg`) and the queue buffers (18) |
 | `hud.h` | `COnScreen` | font, lookup, boss-bar and glyph display-list data, `sCinemaTextFadeOut` (7) |
@@ -89,6 +90,7 @@ the struct headers its types need, so any file that uses `common.h` can include 
 | `rumble.h` | rumble | `gRumblePool` (`RumblePool`, `structs/rumble.h`), `gRumbleEntries` (2) |
 | `save.h` | saves | `gSavedPlayers` (`CSavedPlayers`) (1) |
 | `scene.h` | the level | `gScene` (`CScene`) and its kept field symbols, the bit-section buffers, the `CIntelligence` objects for level actors and particles (36) |
+| `swoosh.h` | swoosh/trail system (round 22) | `gEngineApp_m_SwooshSystem` (`CSwooshSystem`, `structs/swoosh.h`) (1) |
 | `sysrc.h` | system resources | `gHeap` (`CHeap`), `gLoader` (`CLoader`), `gDecompressor` (`CDecompressor`) (3) |
 | `text.h` | text | `gCreditsLines`, `gLevelMessages` (`LevelMessage`) (2) |
 | `ucode.h` | RSP microcode | the text and data starts of rspboot, F3DEX, L3DEX and aspMain (`u64[]`), `rspbootTextEnd` (8) |
@@ -360,37 +362,77 @@ After the round-21 merge (j3's retyped menu files took the j2 rewrites again):
 lines (48 names) without a header, 10 redeclaring a header global without a
 `local` comment (same counting script).
 
+## Round 22, part k4
+
+The globals round 21 left without a header, and the redeclarations without a comment.
+
+- **`gEngineApp_m_SwooshSystem`** is `CSwooshSystem` (`structs/swoosh.h`), declared in the new
+  `globals/swoosh.h` (not `globals/game.h`: the N64 `structs/game.h` does not include
+  `structs/swoosh.h`, whose names clash with local views elsewhere). The 17 local `u8 []`/`s32`
+  lines in 16 files are gone; callers pass `&gEngineApp_m_SwooshSystem`. The two N64 COnScreen
+  bases stay `(u8 *) &gEngineApp_m_SwooshSystem - 0x1C8`: the ROM reuses the swoosh address
+  register, and `&gEngineApp_m_OnScreen` makes GCC load a new one.
+- **`gScheduler`** is `OSSched` (`globals/frame.h`). `structs/sched.h` now defines PR/sched.h's
+  `OSScTask` (tag `OSScTask_s`) and `OSSched` (with Acclaim's 0x80 bytes before the client list)
+  for both targets; they were the port-only `T2ScTask`/`T2Sched`. `rw/abu_types.h` dropped its
+  `OSSched`/`OSScTask_s`/`OSScClientWork` views for them (`task->list.type` is
+  `task->list.t.type`). `port/game/t2sched.c` uses the header; gendata generates `gScheduler`
+  typed, not as a 2 x 0x304-byte view.
+- **The audio manager** (`structs/audiomgr.h`, `globals/audiomgr.h`): the SDK `AMDMABuffer`,
+  `AMDMAState`, `AMAudioInfo` (with `OSScTask`) and Turok's `AMCacheEntry`. `gAudioDmaBuffers`,
+  `gAudioDmaState` and its two field symbols, `gAudioDmaCache`, `gAudioCmdLists`, `gAudioInfo`
+  had 15 local views in 7 files; all seven use the header now (`amCreateAudioMgr`, `__amMain`,
+  `__amHandleFrameMsg`, `__amDmaNew`, `__amDMA`, `__clearAudioDMA`, `AudioDMA_CacheBlock`).
+  `globals/audiomgr.h` is separate from `globals/audio.h` because files that include the latter
+  still view some of these.
+- **Field symbols read through views.** A struct member keeps an array view's code: GCC 2 marks
+  both as in-struct memory, so the alias order is the same, while a scalar is not. So
+  `gMotherBoss_phase[0]` became `gMotherBoss.phase` (also `_activeMask`, `_liveMask`,
+  `_counter`, `gMantidQueen.waveActive`, `gLevelScript.values[0][i]`). Block views became the
+  owner's members: `gLevelScript_script2_cursor.unk0/unk4/unk8` and `[-1]` are
+  `gLevelScript.script2.cursor/current`, `gLevelScript.script2On`, `.script2.steps`; the
+  script3 and scriptCOn blocks likewise. The f32 cooldown view is
+  `gLevelScript_script.timer`. Where the view only changed the signedness, the use takes a
+  cast: `(u32) gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount`, `(s8)
+  gPakProfileRead_character`. The headers now declare these field symbols with the field's
+  type (`globals/boss.h`, `globals/game.h`, `globals/pak.h`); users that do not include the
+  header keep their `local type` lines.
+- **The 10 redeclarations without a comment:** `Primagen_EnterMode6`/`_2` include
+  `globals/boss.h` and store `gLevelScript_bossState.state`; the others cannot include their
+  header (a clashing view in the same file) and say so with `local:`.
+
+Counts (the round-21 script: `extern` data lines in `src/**/*.c`, named globals only):
+
+| | at `f980f639` | after k4 |
+|---|---:|---:|
+| local `extern` lines of named globals | 337 | 278 |
+| ... with a `local` comment | 261 | 248 |
+| ... of names no header declares | 123 (48 names) | 51 (27 names) |
+| ... redeclaring a header global without a `local` comment | 10 | 0 |
+
 ## Left
 
-- **Globals without a header (119 lines, 51 names).**
-  - `gEngineApp_m_SwooshSystem` (16 files): needs a `CSwooshSystem` layout.
-  - `gScheduler` (4 files): its `OSSched`, with Acclaim's 0x80 extra bytes,
-    and `OSScTask` are still local views in the scheduler files.
-  - Field symbols whose files read them as arrays or through a struct view
-    and also include the header, so a header type would clash:
-    `gMotherBoss_activeMask` (8 files), `_phase`, `_liveMask`, `_counter`,
-    `gEngineApp_m_Settings_difficulty` (6), `_match_seconds/_minutes/_hours`,
-    `gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount` (5), `_m_bCinema`,
-    `gLevelScript_script`, `_script2_cursor`, `_script3_cursor`,
-    `_scriptCOn`, `_swayPhase`, `_values`, `gMantidQueen_waveActive`,
-    `gPakProfileRead_character`.
-  - The audio manager's DMA state (`gAudioDmaState`, `_firstUsed`,
-    `_firstFree`, `gAudioDmaBuffers`, `gAudioDmaCache`, `gAudioCmdLists`,
-    `gAudioInfo`): the SDK `AMDMAState`/`AMDMABuffer`, read through four
-    different local views.
-  - Struct views local to one or two files: `gVideoModeFlags`,
-    `gParticleSpriteVtx`, `gDLightBuffer`, `sResizedViMode`,
-    `gScreenViewport`, `gPoolBuffers`, `sBoneMatrixProfile`/`sBoneMatrixCount`,
-    `gHeap_usedHead`, `sBootMarker`.
-  - Functions declared as data to take their address: prototypes since
-    round 21 j2, except `CList__Construct`/`Automap_RevealRegion` in
-    `IsCodePointer` (code-range bounds, `local`).
-- **Header globals redeclared without a `local` comment (15 lines):** the
-  `gCache_*` fields in `func_00204778` (FAKEMATCH); the split-screen margins in
-  `func_0027ECF0`; `sHostIoSavedTlb` in `func_002A13F0`;
-  `gLevelScript_bossState/_bossMode` in `func_00407410`, `func_0043EC68`,
-  `func_00440410`, `func_004407AC`; `gEngineApp_m_Game`/`_m_Settings` in
-  `func_00420454`.
+- **Globals without a header (51 lines, 27 names, after round 22 k4).**
+  - Field symbols one of whose users includes the owner's header and needs a view that
+    shares a base register across fields, so the header cannot declare the field's type:
+    `gEngineApp_m_Settings_difficulty` (6 lines; `CScene__BuildActorLists` reads `CGame` and
+    the camera pool at negative offsets from it), `gEngineApp_m_Game_m_PlayerList_m_bCinema`
+    (4; `Cinema_Update` reads `match.unk44` 0x1450 bytes on from it),
+    `gEngineApp_m_Settings_match_seconds/_minutes/_hours` (6; `GameNoteMenu_SelectYes`: with
+    `gEngineApp_m_Settings.match.seconds` or `gEngineApp_m_Settings_match.seconds` the
+    registers move), `gLevelScript_swayPhase` (2; its files view `gLevelScript` as `s32`).
+  - Struct views local to one or two files: `gParticleSpriteVtx` (3), `gVideoModeFlags`,
+    `gScreenViewport` (2 each), `gPoolBuffers`, `gDLightBuffer`, `sResizedViMode`,
+    `gHeap_usedHead`, `sBootMarker`, `sBoneMatrixProfile`/`sBoneMatrixCount`.
+  - Not globals of the game: `gT2BitStreamBase` (9, port-only code), `__executable_start`/`etext`
+    (the host linker's), `gVirtualRomStart`/`gVirtualModule1Size` (absolute symbols),
+    `CList__Construct`/`Automap_RevealRegion` (code bounds in `IsCodePointer`),
+    `ProPack__Decompress` (a function read as `u8 []` in `func_00224DF4`), `CartRomHandle`
+    (osCartRomInit's `OSPiHandle`, a `PiHandle` view in `func_0029D5D0`),
+    `sBlindOnePhases_update_2` (declared in `globals/boss.h` as a function pointer; the counting
+    script misses that form) and a `value` the script takes for a name (`func_0025BC70`'s
+    anonymous `struct { u8 value; }` view of `gEngineApp_m_Settings_multiplayer`).
+- **Header globals redeclared without a `local` comment:** none (round 22 k4).
 - **The 223 `local type` lines** are the list to revisit when a struct gets a
   better layout or a function is rewritten. Most are GCC 2 alias-order cases:
   an array view keeps a load after a store, where a scalar would let GCC hoist it.

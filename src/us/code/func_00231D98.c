@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/swoosh.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002838F4.c, func_002838F4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -38,7 +39,6 @@ struct B19Obj {
     s32 unk118;      /* 0x118 */
 };
 #endif
-extern u8 gEngineApp_m_SwooshSystem[];
 #include "structs/particle.h"
 #include "globals/scene.h"
 #define D_8010FF34 (&gScene.m_DLightSet)
@@ -53,7 +53,7 @@ void Sound__Play(s16, f32, f32, f32, s32, s32);
 void CParticle__StartEffects(B19Obj *o, B19Def *def) {
     s32 t;
     CParticle__Attach(o, 0, 0);
-    if (def->b6 != -1) Trail_AddNode(gEngineApp_m_SwooshSystem, o, def->b6);
+    if (def->b6 != -1) Trail_AddNode(&gEngineApp_m_SwooshSystem, o, def->b6);
     /* the light pointer-wide, in the host CParticle's member (the view has the N64 offset) */
     if (def->b7 != -1) ((CParticle *) o)->m_pDLight = DLight_Spawn(D_8010FF34, def->b7);
     else ((CParticle *) o)->m_pDLight = NULL;

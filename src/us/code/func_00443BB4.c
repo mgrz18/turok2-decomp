@@ -10,10 +10,6 @@
  * slot values), resets its active slots unless ai->m_Mode is 0x13, and queues MotherBoss_OnPhase2CinemaDone. */
 
 
-extern s32 gMotherBoss_phase[]; /* local type: the field's real type (or the member path) changes the ROM's code here */ /* gMotherBoss.phase */
-extern s32 gMotherBoss_activeMask[]; /* local type: the field's real type (or the member path) changes the ROM's code here */ /* gMotherBoss.activeMask */
-extern s32 gMotherBoss_liveMask[]; /* local type: the field's real type (or the member path) changes the ROM's code here */ /* gMotherBoss.liveMask */
-extern s32 gMotherBoss_counter[]; /* local type: the field's real type (or the member path) changes the ROM's code here */ /* gMotherBoss.counter */
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 extern void MotherBoss_OnPhase2CinemaDone_2(void);
 extern s32 Cinema_SetNextCallbacks(s32 id, void *arg1, void *arg2);
@@ -35,16 +31,16 @@ static __inline__ void enterPhase2(MotherBossState *s, CAI *ai) {
     s->minRadius = 0x200;
     s->phase = 2;
     s->maxRadius = 0x600;
-    gMotherBoss_counter[0] = 0;
-    ai->m_VisBits = sMotherBossPhaseVisBits_2[gMotherBoss_phase[0]];
-    gMotherBoss_liveMask[0] = sMotherBossPhaseLiveMasks_2[gMotherBoss_phase[0]];
-    mask = sMotherBossPhaseActiveMasks_2[gMotherBoss_phase[0]];
+    gMotherBoss.counter = 0;
+    ai->m_VisBits = sMotherBossPhaseVisBits_2[gMotherBoss.phase];
+    gMotherBoss.liveMask = sMotherBossPhaseLiveMasks_2[gMotherBoss.phase];
+    mask = sMotherBossPhaseActiveMasks_2[gMotherBoss.phase];
     sMotherBossFadeTimer = 0.0f;
     sMotherBossCinemaStarted = 0;
     s->totalHealth = s->health = s->slots[13].health = 0x1F400;
-    gMotherBoss_activeMask[0] = mask;
+    gMotherBoss.activeMask = mask;
     if (ai->m_Mode != 0x13) {
-        resetSlots(gMotherBoss_activeMask[0], sMotherBossSpotResetScript_2);
+        resetSlots(gMotherBoss.activeMask, sMotherBossSpotResetScript_2);
     }
 }
 

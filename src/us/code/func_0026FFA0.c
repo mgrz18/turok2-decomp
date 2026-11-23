@@ -3,15 +3,15 @@
 
 #include "rw/abu_types.h"
 #include "globals/audio.h"
+#include "globals/audiomgr.h"
 #include "protos/ultra.h"
 
-extern CacheEntry *gAudioDmaCache;
 extern void *func_0029E460(void *destination, const void *source, int count);
 extern sptr alHeapDBAlloc(sptr, s32, void *, s32, s32);
 u32 AudioDMA_CacheBlock(void *block, s32 size) {
     extern u32 osVirtualToPhysical(void *);
-    CacheEntry *entry;
-    CacheEntry *unused;
+    AMCacheEntry *entry;
+    AMCacheEntry *unused;
     unused = 0;
     for (entry = gAudioDmaCache; entry != 0; entry = entry->next) {
         if (entry->key == block) {
@@ -28,7 +28,7 @@ u32 AudioDMA_CacheBlock(void *block, s32 size) {
         }
     }
     if (unused == 0) {
-        unused = (CacheEntry *)alHeapDBAlloc(0, 0, gAudioHeap, 1, 0x90);
+        unused = (AMCacheEntry *)alHeapDBAlloc(0, 0, gAudioHeap, 1, 0x90);
         unused->next = gAudioDmaCache;
         gAudioDmaCache = unused;
         sAudioDMACacheBlocks++;

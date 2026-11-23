@@ -4,13 +4,12 @@
  * OSSched and its OSScTasks through local views at the N64 offsets: on the host the message
  * queues, the thread and the pointers are larger, so those views overrun each other (the
  * scheduler thread started with its argument overwritten). This file is the same code over
- * T2Sched / T2ScTask (structs/sched.h), function by function, and port/cmake/link.cmake leaves
+ * OSSched / OSScTask (structs/sched.h), function by function, and port/cmake/link.cmake leaves
  * the original files out of the link. Behaviour is unchanged: tasks still go through
  * osSpTaskLoad/StartGo (t2ultra.c posts their SP/DP completions), frames are swapped by
  * osViSwapBuffer, and the clients get the retrace message.
  *
- * gScheduler stays the generated .bss (a byte view, twice its 0x304 N64 bytes: T2Sched is
- * smaller than that on LP64, checked in osCreateScheduler). */
+ * gScheduler is globals/frame.h's OSSched, generated at the host's size. */
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/sched.h"
@@ -30,7 +29,6 @@
 #define SC_PRE_NMI_MSG 0x29D
 #define SC_CMD_MSG 6
 
-extern u8 gScheduler[];
 extern s32 D_800B6E60;
 extern s32 D_800B6E64;
 
@@ -46,25 +44,22 @@ extern s32 osSpTaskYield(void);
 extern s32 osSetIntMask(s32 mask);
 extern void osViBlack(u8 black);
 
-void __scMain(T2Sched *sc);
-void __scHandleRetrace(T2Sched *sc);
-void __scHandleRSP(T2Sched *sc);
-void __scHandleRDP(T2Sched *sc);
-s32 __scSchedule(T2Sched *sc, T2ScTask **sp, T2ScTask **dp, s32 availRCP);
-void __scExec(T2Sched *sc, T2ScTask *sp, T2ScTask *dp);
-void __scYield(T2Sched *sc);
-void __scAppendList(T2Sched *sc, T2ScTask *t);
-s32 __scTaskComplete(T2Sched *sc, T2ScTask *t);
-void Sched_HandleCmdMsg(T2Sched *sc);
+void __scMain(OSSched *sc);
+void __scHandleRetrace(OSSched *sc);
+void __scHandleRSP(OSSched *sc);
+void __scHandleRDP(OSSched *sc);
+s32 __scSchedule(OSSched *sc, OSScTask **sp, OSScTask **dp, s32 availRCP);
+void __scExec(OSSched *sc, OSScTask *sp, OSScTask *dp);
+void __scYield(OSSched *sc);
+void __scAppendList(OSSched *sc, OSScTask *t);
+s32 __scTaskComplete(OSSched *sc, OSScTask *t);
+void Sched_HandleCmdMsg(OSSched *sc);
 
 /* The time conversions of the original: OSTime ticks to seconds as f32. */
 #define TICKS_TO_SEC(t) ((f32)((((t)) * 64) / 3) * 0.000001f)
 
 /* func_0028ADF0 */
-void osCreateScheduler(T2Sched *sc, void *stack, s32 priority, s32 arg3, u8 numFields) {
-    if (sizeof(T2Sched) > 2 * 0x304) {
-        *(volatile u8 *)0 = 0; /* gScheduler is generated as 2 x 0x304 bytes (gendata) */
-    }
+void osCreateScheduler(OSSched *sc, void *stack, s32 priority, s32 arg3, u8 numFields) {
     sc->retraceMsg.type = 1;
     sc->audioListHead = NULL;
     sc->gfxListHead = NULL;
@@ -87,7 +82,7 @@ void osCreateScheduler(T2Sched *sc, void *stack, s32 priority, s32 arg3, u8 numF
 }
 
 /* func_0028AF00 */
-void osScAddClient(T2Sched *sc, OSScClient *c, OSMesgQueue *msgQ) {
+void osScAddClient(OSSched *sc, OSScClient *c, OSMesgQueue *msgQ) {
     s32 mask = osSetIntMask(1);
     c->msgQ = msgQ;
     c->next = sc->clientList;
@@ -96,7 +91,7 @@ void osScAddClient(T2Sched *sc, OSScClient *c, OSMesgQueue *msgQ) {
 }
 
 /* func_0028AF58 */
-void osScRemoveClient(T2Sched *sc, OSScClient *c) {
+void osScRemoveClient(OSSched *sc, OSScClient *c) {
     OSScClient *cur = sc->clientList;
     OSScClient *prev = NULL;
     s32 mask = osSetIntMask(1);
@@ -116,23 +111,23 @@ void osScRemoveClient(T2Sched *sc, OSScClient *c) {
 }
 
 /* func_0028AFE8 */
-OSMesgQueue *osScGetCmdQ(T2Sched *sc) {
+OSMesgQueue *osScGetCmdQ(OSSched *sc) {
     return &sc->cmdQ;
 }
 
 /* func_0028B3E0 */
-OSMesgQueue *Sched_GetInterruptQ(T2Sched *sc) {
+OSMesgQueue *Sched_GetInterruptQ(OSSched *sc) {
     return &sc->interruptQ;
 }
 
 /* func_0028B3E8 */
-void Sched_SubmitTask(T2Sched *sc, T2ScTask *t) {
+void Sched_SubmitTask(OSSched *sc, OSScTask *t) {
     osSendMesg(&sc->cmdQ, t, 1);
     osSendMesg(&sc->interruptQ, (OSMesg)SC_CMD_MSG, 1);
 }
 
 /* func_0028A020 */
-void __scMain(T2Sched *sc) {
+void __scMain(OSSched *sc) {
     OSMesg msg;
     OSScClient *client;
 
@@ -177,12 +172,12 @@ void __scMain(T2Sched *sc) {
 }
 
 /* func_0028A17C */
-void __scHandleRetrace(T2Sched *sc) {
-    T2ScTask *rspTask = NULL;
-    T2ScTask *sp = NULL;
-    T2ScTask *dp = NULL;
-    T2ScTask *task;
-    T2ScTask *next;
+void __scHandleRetrace(OSSched *sc) {
+    OSScTask *rspTask = NULL;
+    OSScTask *sp = NULL;
+    OSScTask *dp = NULL;
+    OSScTask *task;
+    OSScTask *next;
     OSScClient *client;
     CFrameData *frame;
     s32 state;
@@ -268,10 +263,10 @@ static CFrameData *frameOf(void *fb) {
 }
 
 /* func_0028A43C */
-void __scHandleRSP(T2Sched *sc) {
-    T2ScTask *t = sc->curRSPTask;
-    T2ScTask *sp = NULL;
-    T2ScTask *dp = NULL;
+void __scHandleRSP(OSSched *sc) {
+    OSScTask *t = sc->curRSPTask;
+    OSScTask *sp = NULL;
+    OSScTask *dp = NULL;
     CFrameData *frame;
     s32 state;
 
@@ -317,10 +312,10 @@ void __scHandleRSP(T2Sched *sc) {
 }
 
 /* func_0028A914 */
-void __scHandleRDP(T2Sched *sc) {
-    T2ScTask *sp = NULL;
-    T2ScTask *dp = NULL;
-    T2ScTask *t = sc->curRDPTask;
+void __scHandleRDP(OSSched *sc) {
+    OSScTask *sp = NULL;
+    OSScTask *dp = NULL;
+    OSScTask *t = sc->curRDPTask;
     CFrameData *frame;
     s32 state;
 
@@ -359,7 +354,7 @@ void __scHandleRDP(T2Sched *sc) {
 }
 
 /* A gfx task may run unless its frame buffer is on screen or about to be (func_0028B048). */
-T2ScTask *__scTaskReady(T2ScTask *t) {
+OSScTask *__scTaskReady(OSScTask *t) {
     if (t == NULL) {
         return NULL;
     }
@@ -376,9 +371,9 @@ T2ScTask *__scTaskReady(T2ScTask *t) {
 }
 
 /* func_0028ABE0: picks the tasks for the free RSP (2) and RDP (1). */
-s32 __scSchedule(T2Sched *sc, T2ScTask **sp, T2ScTask **dp, s32 availRCP) {
-    T2ScTask *gfx = sc->gfxListHead;
-    T2ScTask *audio = sc->audioListHead;
+s32 __scSchedule(OSSched *sc, OSScTask **sp, OSScTask **dp, s32 availRCP) {
+    OSScTask *gfx = sc->gfxListHead;
+    OSScTask *audio = sc->audioListHead;
     s32 avail = availRCP;
 
     if (sc->doAudio != 0 && (avail & 2)) {
@@ -448,7 +443,7 @@ s32 __scSchedule(T2Sched *sc, T2ScTask **sp, T2ScTask **dp, s32 availRCP) {
 }
 
 /* func_0028AFF0 */
-void __scAppendList(T2Sched *sc, T2ScTask *t) {
+void __scAppendList(OSSched *sc, OSScTask *t) {
     if (t->list.t.type == 2) {
         if (sc->audioListTail != NULL) {
             sc->audioListTail->next = t;
@@ -470,7 +465,7 @@ void __scAppendList(T2Sched *sc, T2ScTask *t) {
 }
 
 /* func_0028B0A8 */
-s32 __scTaskComplete(T2Sched *sc, T2ScTask *t) {
+s32 __scTaskComplete(OSSched *sc, OSScTask *t) {
     if (t->state & 3) {
         return 0;
     }
@@ -485,7 +480,7 @@ s32 __scTaskComplete(T2Sched *sc, T2ScTask *t) {
 }
 
 /* func_0028B0FC */
-void __scExec(T2Sched *sc, T2ScTask *sp, T2ScTask *dp) {
+void __scExec(OSSched *sc, OSScTask *sp, OSScTask *dp) {
     s64 now;
 
     if (dp != NULL && (dp->flags & 0x20) && !(dp->state & 0x10)) {
@@ -520,8 +515,8 @@ void __scExec(T2Sched *sc, T2ScTask *sp, T2ScTask *dp) {
 }
 
 /* func_0028B274 */
-void __scYield(T2Sched *sc) {
-    T2ScTask *t = sc->curRSPTask;
+void __scYield(OSSched *sc) {
+    OSScTask *t = sc->curRSPTask;
     if (t->list.t.type == 1) {
         t->state |= 0x10;
         osSpTaskYield();
@@ -529,10 +524,10 @@ void __scYield(T2Sched *sc) {
 }
 
 /* func_0028B2AC */
-void Sched_HandleCmdMsg(T2Sched *sc) {
-    T2ScTask *t = NULL;
-    T2ScTask *sp = NULL;
-    T2ScTask *dp = NULL;
+void Sched_HandleCmdMsg(OSSched *sc) {
+    OSScTask *t = NULL;
+    OSScTask *sp = NULL;
+    OSScTask *dp = NULL;
     s32 state;
 
     while (osRecvMesg(&sc->cmdQ, (OSMesg *)&t, 0) != -1) {
@@ -555,12 +550,12 @@ void Sched_HandleCmdMsg(T2Sched *sc) {
 /* gRefreshRate (globals/framebuffer.h): 50.0 or 60.0, set by CEngineApp__Main. */
 f32 t2_gRefreshRate;
 
-/* Round 20 i1: whether the OSTask the scheduler started (T2PortTask.task: &T2ScTask.list) is the
+/* Round 20 i1: whether the OSTask the scheduler started (T2PortTask.task: &OSScTask.list) is the
  * last task of its frame (OS_SC_LAST_TASK 0x20, the swap). CEngineApp__SubmitGfxTask gives the
  * frame's main task flags 3 when the automap's line list follows as a second task (0x23, the
  * L3DEX2 microcode) into the same framebuffer: the app draws the two as one frame. */
 int T2Sched_TaskEndsFrame(const void *ostask) {
-    const T2ScTask *t = (const T2ScTask *) ((const u8 *) ostask - __builtin_offsetof(T2ScTask, list));
+    const OSScTask *t = (const OSScTask *) ((const u8 *) ostask - __builtin_offsetof(OSScTask, list));
 
     return ostask == NULL || (t->flags & 0x20) != 0;
 }

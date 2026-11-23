@@ -35,6 +35,7 @@ extern s64 sGfxTaskStartTime;
 /* The engine thread's message queue ("gfxFrameMsgQ", "gfxFrameMsgBuf"). */
 extern OSMesgQueue gGfxFrameMessageQueue;
 extern OSMesg gGfxFrameMessageBuffer[0x1000];
+extern OSSched gScheduler;                /* the SDK scheduler (structs/sched.h), osCreateScheduler'd at boot */
 extern OSScClient gGfxClient;             /* the engine thread, osScAddClient'ed at boot ("gfxClient") */
 extern OSScMsg *gGfxMsg;                 /* the message CEngineApp__Main received ("pMsg") */
 

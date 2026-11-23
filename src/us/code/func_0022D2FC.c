@@ -14,6 +14,7 @@
  * CParticle__BuildMatrix, CParticle__DrawSprite and CParticleSystem__Spawn are after Rage Wars
  * (Particle_BuildMatrix, Particle_DrawSprite and func_802800C0_de). */
 #include "common.h"
+#include "globals/swoosh.h"
 #include "structs/list.h"
 #include "gfx.h"
 #include "gbi_t2.h"
@@ -1072,7 +1073,6 @@ typedef struct EffectActor {
 } EffectActor;
 #endif
 
-extern u8 gEngineApp_m_SwooshSystem[];
 #ifdef TARGET_PORT
 #include "structs/particle.h"
 #define D_8010FF34 (&gScene.m_DLightSet)
@@ -1115,7 +1115,7 @@ void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
         CParticle__StopLoopSound(actor);
         if (actor->registered) {
             CParticle__BuildCameraMatrix(actor);
-            Trail_DetachOwner(gEngineApp_m_SwooshSystem, actor);
+            Trail_DetachOwner(&gEngineApp_m_SwooshSystem, actor);
         }
         /* the light pointer-wide, in the host CParticle's member (the view has the N64 offset) */
         if (((CParticle *) actor)->m_pDLight != NULL) {
@@ -1444,7 +1444,6 @@ _Static_assert(sizeof(Entry) == sizeof(CROMParticleEffect), "Entry");
 _Static_assert(sizeof(ParticleHead) == sizeof(CObjectHead), "ParticleHead");
 #endif
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
-extern u8 gEngineApp_m_SwooshSystem[];
 #ifndef TARGET_PORT
 extern u8 D_8010FF34[];
 #endif
@@ -2019,7 +2018,7 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
                 effect->unk1BC = gProjectilePower;
                 CParticle__Attach(effect, 0, 0);
                 if (entry->unk6 != -1) {
-                    Trail_AddNode(gEngineApp_m_SwooshSystem, effect, entry->unk6);
+                    Trail_AddNode(&gEngineApp_m_SwooshSystem, effect, entry->unk6);
                 }
                 if (entry->unk7 != -1) {
                     ((CParticle *) effect)->m_pDLight = DLight_Spawn(D_8010FF34, entry->unk7);
