@@ -47,6 +47,7 @@ import match_func  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 WORK = ROOT / "build" / "auto"
 SRC = ROOT / "src" / "us" / "code"
+import srcfiles  # noqa: E402
 ASM_GLOB = "us/asm/*.s"
 IMAGE = match_func.IMAGE
 
@@ -678,7 +679,9 @@ def accept(chosen, rodata=None):
             start, size = rodata[name]
             v0 = rdata_vram(start)
             src = rename_swallowed(src, v0, v0 + size)
-        (SRC / f"{name}.c").write_text(src)
+        dest = srcfiles.new_path(name)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(src)
         wired += 1
     print(f"wired into the build: {wired}  (now run make setup && make verify)")
     return 0

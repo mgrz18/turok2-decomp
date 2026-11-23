@@ -19,6 +19,19 @@ import argparse, collections, glob, json, os, re, shutil, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CODE = os.path.join(ROOT, 'src/us/code')
+
+
+def game_c():
+    """every game C file: one directory per module (tools/srcfiles.py)"""
+    return [f for d in ('src/us/code', 'src/us/vm1', 'src/us/vm2', 'src/port_libultra')
+            for f in glob.glob(os.path.join(ROOT, d, '**', '*.c'), recursive=True)]
+
+
+def code_path(fn):
+    """a file name (func_X.c) -> its path"""
+    if not hasattr(code_path, 'idx'):
+        code_path.idx = {os.path.basename(f): f for f in game_c()}
+    return code_path.idx.get(os.path.basename(fn), os.path.join(CODE, fn))
 WFLAGS = ['-DTARGET_PORT=1', '-Wno-everything', '-Wno-error=int-conversion', '-Wint-conversion', '-Wpointer-to-int-cast',
           '-Wint-to-pointer-cast', '-Wvoid-pointer-to-int-cast', '-Wint-to-void-pointer-cast',
           '-Wshorten-64-to-32', '-fno-caret-diagnostics', '-ferror-limit=0']
@@ -31,16 +44,16 @@ def sweep(out, jobs):
     p = os.path.join(inc, 'rw/abu_types.h')
     t = open(p).read()
     open(p, 'w').write(re.sub(r'sizeof\(([A-Za-z_ ]+)\*\)', '4', t))
-    files = sorted(f for f in os.listdir(CODE) if f.endswith('.c'))
+    files = sorted(os.path.relpath(f, ROOT) for f in game_c())
     wdir = os.path.join(out, 'w')
     os.makedirs(wdir, exist_ok=True)
     cmd = ('cd %s && printf "%%s\n" "$@" | xargs -P%d -I{} sh -c '
-           '\x27clang -fsyntax-only -target x86_64-linux-gnu %s -I%s -I%s {} > %s/{}.txt 2>&1; echo "$?" >> %s/{}.txt\x27')
-    subprocess.run(['sh', '-c', cmd % (CODE, jobs, ' '.join(WFLAGS), ROOT, inc, wdir, wdir), 'sh'] + files, check=True)
+           '\x27clang -fsyntax-only -target x86_64-linux-gnu %s -I%s -I%s {} > %s/$(basename {}).txt 2>&1; echo "$?" >> %s/$(basename {}).txt\x27')
+    subprocess.run(['sh', '-c', cmd % (ROOT, jobs, ' '.join(WFLAGS), ROOT, inc, wdir, wdir), 'sh'] + files, check=True)
     lines = []
     for f in files:
-        t = open(os.path.join(wdir, f + '.txt'), errors='replace').read().rstrip('\n').split('\n')
-        lines += t[:-1] + ['@@RC %s %s' % (t[-1], f)]
+        t = open(os.path.join(wdir, os.path.basename(f) + '.txt'), errors='replace').read().rstrip('\n').split('\n')
+        lines += t[:-1] + ['@@RC %s %s' % (t[-1], os.path.basename(f))]
     return lines
 
 
@@ -50,7 +63,7 @@ _cache = {}
 
 def enclosing(fn, line):
     if fn not in _cache:
-        lines = open(os.path.join(CODE, fn), errors='replace').read().split('\n')
+        lines = open(code_path(fn), errors='replace').read().split('\n')
         cur, name = [], None
         for l in lines:
             m = FDEF.match(l)
@@ -142,7 +155,7 @@ SIG = re.compile(r'(?:^|[;}\n])\s*((?:extern\s+|static\s+)?[A-Za-z_][\w\s\*]*?)\
 
 
 def prototypes():
-    files = sorted(glob.glob(CODE + '/*.c') + glob.glob(ROOT + '/src/us/libultra/*.c'))
+    files = sorted(game_c() + glob.glob(ROOT + '/src/us/libultra/*.c'))
     files += glob.glob(ROOT + '/include/**/*.h', recursive=True)
     # include/functions.h is generated (gitignored) and included by no C file
     files = [f for f in files if not f.endswith('include/functions.h')]

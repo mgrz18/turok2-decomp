@@ -14,9 +14,12 @@ Usage:
 import argparse
 import collections
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "tools"))
+import srcfiles  # noqa: E402
 HEAD = re.compile(r"^typedef\s+(?:struct|union)\b[^;{]*\{", re.M)
 FIELD = re.compile(r"/\*\s*(0x[0-9A-Fa-f]+)\s*\*/\s*(?:(?:struct|union|const|unsigned|signed)\s+)*\w+\s*(\**)\s*(\w+)\s*(\[[^\]]*\])?")
 PAD = re.compile(r"^(?:_?pad|unk_?pad|padding|_)", re.I)
@@ -46,13 +49,15 @@ def fields(body):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("dir", nargs="?", default=str(ROOT / "src" / "us" / "code"))
+    ap.add_argument("dir", nargs="?", default=str(ROOT / "src" / "us" / "code"),
+                    help="a directory (default: every game C file, tools/srcfiles.py)")
     ap.add_argument("--top", type=int, default=40)
     args = ap.parse_args()
 
     files = collections.defaultdict(list)     # name -> [(file, body)]
     globals_ = collections.defaultdict(lambda: collections.defaultdict(set))
-    for path in sorted(Path(args.dir).glob("*.c")):
+    for path in sorted(Path(args.dir).rglob("*.c")) if args.dir != str(ROOT / "src" / "us" / "code") \
+            else srcfiles.game_files():
         src = path.read_text(errors="replace")
         local = {}
         for name, body in typedefs(src):

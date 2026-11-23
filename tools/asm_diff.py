@@ -147,7 +147,13 @@ def main():
         archive = subprocess.run(["git", "-C", str(ROOT), "archive", args.base, "src", "include"],
                                  capture_output=True, check=True).stdout
         subprocess.run(["tar", "-x", "-C", str(base)], input=archive, check=True)
-        jobs = [(base, f, work / "a") for f in files if (base / f).exists()] + \
+        # Files moved since the base (round 23 put every file in its module's directory)
+        # are compared with the base file of the same name.
+        moved = {}
+        for p in (base / "src").rglob("*.c"):
+            moved.setdefault(p.name, str(p.relative_to(base)))
+        at_base = {f: f if (base / f).exists() else moved.get(Path(f).name) for f in files}
+        jobs = [(base, at_base[f], work / "a") for f in files if at_base[f]] + \
                [(ROOT, f, work / "b") for f in files]
         with ThreadPoolExecutor(args.j) as pool:
             errs = list(pool.map(lambda j: compile_one(*j), jobs))
@@ -158,9 +164,9 @@ def main():
                 print(f"FAIL {f}\n    " + failed[(str(ROOT), f)].replace("\n", "\n    "))
                 bad += 1
                 continue
-            a, b = work / "a" / (f + ".s"), work / "b" / (f + ".s")
+            a, b = work / "a" / ((at_base[f] or f) + ".s"), work / "b" / (f + ".s")
             if not a.exists():
-                print(f"NEW  {f}" + (" (does not compile at the base)" if (base / f).exists() else ""))
+                print(f"NEW  {f}" + (" (does not compile at the base)" if at_base[f] else ""))
                 continue
             na, nb = normalize(a, syms), normalize(b, syms)
             if na != nb:

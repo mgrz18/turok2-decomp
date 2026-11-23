@@ -1,4 +1,4 @@
-# turok2_game: every C-origin file of the game (src/us/code/*.c) compiled for
+# turok2_game: every C-origin file of the game (src/us/code, vm1, vm2, port_libultra) compiled for
 # the 64-bit little-endian host as a static library (no link, no main yet).
 # docs/port/BUILD.md explains the flags, the shim and what is left.
 #
@@ -14,7 +14,24 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter)
 option(T2_WARN_64BIT "Report the 64-bit hazard warnings (pointer<->int)" ON)
 option(T2_WARN_ALL "Report every clang warning, not just the 64-bit ones" OFF)
 
-file(GLOB T2_GAME_ALL CONFIGURE_DEPENDS ${T2_ROOT}/src/us/code/*.c)
+# One directory per recovered module (docs/MODULES.md, tools/srcfiles.py): src/us/code/<module>,
+# src/us/vm1/<module>, src/us/vm2/<module>, and src/port_libultra (the libultra C the N64 build
+# takes from lib/ultralib, docs/LIBULTRA.md). Ordered by file name, as when they were one
+# directory: the archive and the link keep the same order.
+file(GLOB_RECURSE t2_game_found CONFIGURE_DEPENDS
+    ${T2_ROOT}/src/us/code/*.c ${T2_ROOT}/src/us/vm1/*.c ${T2_ROOT}/src/us/vm2/*.c
+    ${T2_ROOT}/src/port_libultra/*.c)
+set(t2_game_keyed)
+foreach(f ${t2_game_found})
+    get_filename_component(name ${f} NAME)
+    list(APPEND t2_game_keyed "${name}|${f}")
+endforeach()
+list(SORT t2_game_keyed)
+set(T2_GAME_ALL)
+foreach(k ${t2_game_keyed})
+    string(REGEX REPLACE "^[^|]*[|]" "" f "${k}")
+    list(APPEND T2_GAME_ALL ${f})
+endforeach()
 
 # Files whose code is the N64 itself, not the game: the native build supplies
 # host versions instead (docs/port/BUILD.md, "Host replacements").

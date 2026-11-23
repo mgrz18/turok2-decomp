@@ -52,7 +52,7 @@ def rodata_string(rom, vram):
 
 def scan(rom, srcdir):
     rows = []
-    for f in sorted(glob.glob(os.path.join(srcdir, "*.c"))):
+    for f in sorted(glob.glob(os.path.join(srcdir, "**", "*.c"), recursive=True)):
         src = open(f, encoding="latin1").read()
         funcs = [(m.start(), m.group(1)) for m in FUNC.finditer(src)]
         for m in PAT.finditer(src):
@@ -89,7 +89,7 @@ def main(argv=None):
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("rom")
-    ap.add_argument("--src", default="src/us/code")
+    ap.add_argument("--src", default="src/us")
     ap.add_argument("--markdown", action="store_true")
     a = ap.parse_args(argv)
     rom = open(a.rom, "rb").read()

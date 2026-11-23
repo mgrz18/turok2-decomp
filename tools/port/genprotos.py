@@ -29,6 +29,12 @@ import argparse, collections, glob, os, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CODE = os.path.join(ROOT, 'src/us/code')
+
+
+def game_c():
+    """every game C file: one directory per module (tools/srcfiles.py)"""
+    return [f for d in ('src/us/code', 'src/us/vm1', 'src/us/vm2', 'src/port_libultra')
+            for f in glob.glob(os.path.join(ROOT, d, '**', '*.c'), recursive=True)]
 OUT = os.path.join(ROOT, 'include/protos')
 
 # group -> (name regex, comment)
@@ -104,7 +110,7 @@ DEF = re.compile(r'^([A-Za-z_][\w \t\*]*?)\b([A-Za-z_]\w*)\s*\(([^;{}()]*(?:\([^
 
 def definitions():
     defs = {}
-    for f in sorted(glob.glob(CODE + '/*.c')):
+    for f in sorted(game_c()):
         s = strip_comments(open(f, errors='replace').read())
         for m in DEF.finditer(s):
             ret, name, params = m.groups()
@@ -266,7 +272,7 @@ def apply(groups, base):
         call = re.compile(r'\b(?:%s)\s*\(' % '|'.join(names))
         static = re.compile(r'\bstatic\b[^;{]*\b(?:%s)\s*\(' % '|'.join(names))
         orig = {}
-        for f in sorted(glob.glob(CODE + '/*.c')):
+        for f in sorted(game_c()):
             s = open(f, errors='replace').read()
             if not call.search(strip_comments(s)) or static.search(s):
                 continue

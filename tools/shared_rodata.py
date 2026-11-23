@@ -28,6 +28,8 @@ import struct
 import sys
 from pathlib import Path
 
+import srcfiles
+
 ROOT = Path(__file__).resolve().parent.parent
 LIST = ROOT / "versions" / "shared_rodata.us.txt"
 LD = ROOT / "us" / "turok2.ld"
@@ -47,7 +49,7 @@ def entries():
 
 
 def obj(stem):
-    return f"build/src/us/code/{stem}.c.o"
+    return srcfiles.obj(stem) or f"build/src/us/code/{stem}.c.o"
 
 
 def write_ld():
