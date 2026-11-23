@@ -1,8 +1,6 @@
 #include "structs/vector.h"
-#ifdef TARGET_PORT
 #include "structs/player.h"
 #include "structs/player_list.h"
-#endif
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0022A470.c, func_0022A470.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -27,27 +25,12 @@ struct Plr {
     Plr *next;          /* 0x1320 */
 };
 #endif
-#ifdef TARGET_PORT
-typedef struct PlrGroup {
-/* the view at the host offsets of CPlayerPool (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_PlrGroup(m) __builtin_offsetof(CPlayerPool, m)
-    union {
-        struct { u8 _hp_head[T2_HOFF_PlrGroup(m_ActiveList.m_pHead)]; Plr *head; }; /* N64 0x20 */
-    };
-} PlrGroup;
-#else
-typedef struct PlrGroup {
-    u8 pad0[0x20];
-    Plr *head;          /* 0x20 */
-} PlrGroup;
-#endif
-Plr *CPlayerPool__FindNearest(PlrGroup *g, CVector3 p) {
+Plr *CPlayerPool__FindNearest(CPlayerPool *g, CVector3 p) {
     Plr *a;
     Plr *best = ((void *)0);
     f32 min = 3.4028235e38f;
     f32 dx, dy, dz, d;
-    for (a = g->head; a != ((void *)0); a = a->next) {
+    for (a = g->m_ActiveList.m_pHead; a != ((void *)0); a = a->next) {
         dx = a->pos.x - p.x;
         dy = a->pos.y - p.y;
         dz = a->pos.z - p.z;
