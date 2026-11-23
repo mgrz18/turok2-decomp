@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/game_object.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
@@ -10,16 +11,15 @@ typedef struct {
 } ModelSection;
 
 f32 HalfToFloat(u16);                             /* extern */
-extern s32 D_800A5AC4;
 
-f32 func_0021F2B0(CGameObjectInstance *arg0) {
+f32 CGameObjectInstance__GetObjectScale(CGameObjectInstance *arg0) {
     f32 var_f0;
     f32 var_f20;
     sptr *temp_v0;
 
     var_f20 = 1.0f;
     if (arg0->m_dwFlags & 0x40000) {
-        temp_v0 = CCache__Request(0, (sptr) arg0->m_rpObject, arg0->m_rpObjectHeader, 4, 0, 0, &D_800A5AC4, 1);
+        temp_v0 = CCache__Request(0, (sptr) arg0->m_rpObject, arg0->m_rpObjectHeader, 4, 0, 0, &sCGameObjectInstanceCacheDesc_AnimObjectInfo, 1);
         var_f0 = var_f20;
         if (temp_v0 != NULL) {
             var_f20 = HalfToFloat(((ModelSection *) CISet__GetBlock(*temp_v0, 0))->angle);

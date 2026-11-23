@@ -5,7 +5,7 @@
 #include "m2c_macros.h"
 #include "protos/scene.h"
 
-s32 func_0026E294(sptr);
+s32 LevelEvent_MarkFired(sptr);
 
 void CScene__FireEventsByKeyOnce(void *arg0, s32 arg1)
 {
@@ -35,7 +35,7 @@ void CScene__FireEventsByKeyOnce(void *arg0, s32 arg1)
     {
       if ((*((u8 *) (((s8 *) var_s1) + 0xF))) == var_s3)
       {
-        func_0026E294((sptr) var_s1);
+        LevelEvent_MarkFired((sptr) var_s1);
       }
       var_s0 -= 1;
       var_s1 += 0x14;
@@ -61,7 +61,7 @@ void CScene__FireEventsByKeyOnce(void *arg0, s32 arg1)
     {
       if ((*((u8 *) (((s8 *) var_s1) + 0xF))) == var_s3)
       {
-        func_0026E294((sptr) var_s1);
+        LevelEvent_MarkFired((sptr) var_s1);
       }
       var_s0 -= 1;
       var_s1 += 0x14;

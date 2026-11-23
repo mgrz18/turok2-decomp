@@ -8,7 +8,7 @@ typedef struct {
     /* 0x8 */ s32 *data;
 } Unk800F2790;
 extern Unk800F2790 gAudioDmaState;
-extern s32 __amDMA;
+u32 __amDMA(s32 offset, s32 length);
 
 s32 *__amDmaNew(Unk800F2790 **arg0) {
     if (gAudioDmaState.initialized == 0) {

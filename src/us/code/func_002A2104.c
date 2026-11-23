@@ -7,7 +7,7 @@
 
 #define osMemSize (*(u32 *) 0x80000318) /* a constant address, not the symbol: extern u32 osMemSize schedules differently (round G2) */
 extern s32 HostIo_DisableInt(void);
-extern void func_002A3100(void);
+extern void HostIo_InstallVectors(void);
 extern void HostIo_WriteWord(u32 address, u32 value);
 extern void HostIo_RestoreInt(s32 saved);
 
@@ -19,7 +19,7 @@ void HostIo_Init(void) {
     u32 first;
 
     saved = HostIo_DisableInt();
-    func_002A3100();
+    HostIo_InstallVectors();
     HostIo_WriteWord(0xB1FFFFF0, 0);
     HostIo_WriteWord(0xB1FFFFFC, 0);
     sHostIoStopped = 1;

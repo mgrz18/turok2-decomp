@@ -1,15 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SOUND/8022C894_4.CPP, func_8022DB04_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#ifdef TARGET_PORT
 #include "common.h"
 #include "structs/player.h"
-#else
-typedef unsigned char u8;
-typedef signed short s16;
-typedef signed int s32;
-typedef float f32;
-#endif
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 struct Object126;

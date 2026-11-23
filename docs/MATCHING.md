@@ -600,8 +600,11 @@ the last matched in the G pass (below).
 **Where the FAKEMATCH functions are.** Matches that rely on something the
 original source surely did not have (a `register ... asm` pin, an
 always-true test, a dead store) say so in a `/* FAKEMATCH: ... */` comment,
-on the first line or at the trick. 16 files in `src/` have one
-(`grep -rl FAKEMATCH src`), after the Z pass de-faked seven (below). The
+on the first line or at the trick. 16 files in `src/` had one
+(`grep -rl FAKEMATCH src`), after the Z pass de-faked seven (below); the
+round 21 audit found 58 more that relied on a trick without saying so, de-faked
+25 functions and marked the rest: see "The FAKEMATCH audit (round 21)" for today's
+list. The
 engine's nine: func_00204778 (a dead store in the highlight),
 func_0022AFB4 (an always-true test), func_002429BC (the shared -1 pinned
 to `$v1`), func_00246BC0 (a dead per-mode switch and a `$s1` pin),
@@ -704,6 +707,84 @@ real types and names; three files lost their local struct views on the way
   file being retyped in the same round (k1); func_00246BC0's `$s1` for opt
   means the original read opt after Math_DecayToZero, which the ROM does not
   show.
+
+### The FAKEMATCH audit (round 21)
+
+**What a fake looks like when nobody marked it.** Three scans over `src/`
+(the scripts are in the round's commit messages; each is a grep and a
+`match_func.py` run):
+
+- **Register pins and empty asm barriers** (`register T x asm("$n")`,
+  `__asm__("" : "+r"(x))`, `__asm__ __volatile__("")`), the `__asm__("name")`
+  symbol aliases, the COP0/`break`/`multu` asm of libultra and libgcc and
+  `sqrt.s` left aside: 22 files had one with no marker, one of them
+  documented as a HACK (alEnvmixerPull, from the Rage Wars source).
+- **An if/else whose two arms are the same code**, mostly left by the bulk
+  matching (m2c names, `if (arg1)`, `if (new_var || temp_a0)`): 37 files
+  (two of them, Menu_StepValueLR and its module-2 copy, also have pins).
+  Arms that both stay in the ROM are real source, not a fake (the AA/non-AA
+  pairs of Render_SetRenderMode and the two Hud_DrawBevelBox calls of
+  Menu_Draw/Menu_Draw_2 give the same mode or box in both arms and are kept).
+- **A test of an unset local** (func_00225C08's `if (temp_s2)`, which clang
+  compiled to a trap on the host in round 7).
+
+**De-faked (natural C, `asm_diff.py` identical; no FAKEMATCH left):**
+
+| function | what the trick stood for |
+|---|---|
+| func_00225C08 | nothing: the plain loop over `CScene::m_pKind1` matches; the host body is now the only body |
+| LightVolume_Construct | the `$a0` pin of CMtxF__Identity's argument: `i = 0;` before CMtxF__InvertAffine (the permuter, below) |
+| CPlayer__IsSpecialPickup, CPlayer__GetPickupCountLow, CPlayer__GetPickupCountHigh | `if (cheat & 0x10) return 0/1;` first |
+| EnemyAnim_ExtremeDeath | `if (mode == 0x35) return gib + 1; return gib;` |
+| func_00268080, func_00267D94, func_00267E4C, GameObject_GetLeashRadius, func_00268BE0 | `if (def->m_Type == ENEMY) return field; return 0;` |
+| Cinema_OverridesMusic1, Cinema_OverridesMusic2 | `if (!active) return 0; return field;` |
+| Sound_DistanceFalloff, Plane_SegmentFraction | the early return first |
+| func_0023640C, Math_StepClampedInt | the plain clamp |
+| Cinema_RunEnd | `cinema = gCinemaPlayerP; onEnd = cinema->onEnd; if (onEnd) { cinema->onEnd = NULL; onEnd(); }` (the permuter) |
+| CCache__AllocateAt, CCache__AllocateMemoryForDecompression(Top), CAudioWorld__CountHandleVoices | the mutex unlock as the plain `if (--count != 0) { restore; send; } else { restore; } return x;` |
+| Menu_StepValueLR, Menu_StepValueLR_2 | written as its sibling Menu_StepValue is (`value = minimum; if (wrap) value = maximum;`) |
+| Sort_Insertion | the plain selection-sort loops |
+
+**The pattern behind most of them: write the test the ROM's layout shows.**
+GCC 2.8 puts the `then` arm right after the branch and jumps to the `else`.
+Ten of the getters have the early return (0, 1) out of line and the field's
+path after the branch, with the `beq`'s delay slot empty; the drafts had the
+other sense (`if (x != K) return 0;`) and needed two identical arms to get
+the layout back. Testing for the case that returns the field first (`if (x ==
+K) return field; return 0;`) gives the ROM as is.
+
+**The permuter can start from a FAKEMATCH.** Its target is normally the
+function's asm in `us/asm`, which is gone once the function is C. The fake's
+own object matches the ROM, so it can be the target: `tools/permuter/setup.py
+<natural draft.c> <func> <the FAKEMATCH file>` (new third argument). Score 0
+then means "another source of the same code". For LightVolume_Construct and
+Cinema_RunEnd the first zero was natural; for MotherBoss_FewerActorsThan,
+EnemyAI_TurnToTarget, func_00267D60 and PakMenu_InitLoadGame_2 every zero
+was another trick (identical arms again, `do { return ...; } while (0)`, a
+reused constant variable), and Turret_Setup (60,000 iterations) found none.
+
+**Redundant N64 alternatives.** 451 `#ifdef TARGET_PORT ... #else ...
+#endif` pairs in 349 files kept an N64 version (m2c casts, offsets, a few
+FAKEMATCH drafts) next to a host version that compiles to the same N64
+code; `tools/unify_host_bodies.py --write` replaced each pair by its host
+branch (the port reads the same text as before; the N64 assembly is checked
+equal, symbols resolved, by `asm_diff.py`'s normalisation). It is re-runnable
+after merges (run it until it reports 0; on the merged round-21 tree it
+dropped 45 more, 496 in all; the 296 host branches that do not
+compile for the N64, host-only names, are left). `asm_diff.py` now numbers local labels by first appearance, so
+a de-faked branch that only renumbers `.L` labels compares equal.
+
+**Still fake (51 files, `grep -rl FAKEMATCH src/us`).** The 16 of the list
+above (each retried this round: the permuter from the natural draft against
+the fake's object, and for CAI__Setup the flags read at each of 25 points:
+all 9 words off) and the 35 marked in this audit (25 functions of the 58 files found were de-faked), each with what it misses
+by without its trick in its first comment. The near ones for a next pass:
+RumbleMenu_Play (2 of 23 words with the typed Menu and no arms),
+CCache__HeapAlloc (11 of 57, whatever the shape of the two allocations),
+PakMenu_InitLoadGame_2 (4 of 103 unpinned), Trail_DetachOwner (5-6 of 169),
+CParticle__Steer (5 of 390 without its barrier), _getRate (1 of 148;
+libaudio, which j5's ultralib work may replace).
+
 
 ### The G pass (the last drafts)
 
@@ -922,7 +1003,7 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 
 | Header | Holds |
 |---|---|
-| `structs/vector.h` | CVector3, CQuaternion, CMtxF: the engine math types (included by game_object.h) |
+| `structs/vector.h` | CVector3, CQuaternion, CMtxF: the engine math types, and CBox (an axis-aligned box: D_800F5A10, the light volumes; moved from collision.h in round 21) (included by game_object.h) |
 | `structs/game_object.h` | CGameObjectInstance (0x288, an "actor") and its parts: CInstanceHeader, CAnimationState, CPathTrack, CAI (the AI state at 0x140; its per-type m_VarBuffer is a union of typed arrays and the views of ai_vars.h / ai_vars_boss.h), CAIModeInfo (a mode-table row), CAITarget / CAITargets (what the AI aims at), CListedInstance (an instance with its world-list links and owner counter, 0x298), CInstancePool (D_8010ABA0: 32 of them with the free list D_8010FEA0 and the active list D_8010FEB4; CScene.m_InstancePool), CObjectHead (the leading 0x34 bytes the collision probes save and restore), CAIFrameMotion (the AI's motion since the last frame, func_0024599C) |
 | `structs/level_actor.h` | the level's objects that are not instances: CStaticObject (0x90, scenery), CLevelActor (0x198: placed by func_002150C0, drawn by func_002152AC; bounds, flags, killed bit, lights at 0x178), CPooledLevelActor (0x1B0, a pool slot with its links) and CLevelActorPool (CScene.m_ActorPool, 32 slots) |
 | `structs/ai_vars.h` | the views of CAI::m_VarBuffer for the enemy AI and the simple types: CEnemyAIVars (`m_Enemy`: behaviours, pitch / roll, the grabbed actor, turn rate, timers), m_Turret, m_Platform, m_Generator (included by game_object.h) |
@@ -932,7 +1013,7 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | `structs/player_list.h` | CPlayerPool / CPlayerCList: the player list at the start of CGame (D_80119870; its active list is D_80119890) |
 | `structs/player_options.h` | CPlayerOptions (0x40): a player's options and per-opponent counts, `CPlayer::m_pOptions`; GameSettings holds five (included by player.h and game.h) |
 | `structs/game.h` | GameSettings (D_8011AAD8, the game settings and the multiplayer setup: the HUD alpha, CSun m_Sun at 0x184, the engine's mode block at 0x1A8) and GameSettingsBlock (its first 0x184 bytes, the block the save and the demo player copy), GameMatch (D_8011ACB0, the play clock and the running match's rules); CGame (D_80119870: the player list, the camera pool D_801198B0 and its menu pool D_80119E2C, CAutomap, the settings) and CGameFromCameraPool (CGame seen from D_801198B0); CEngineApp (D_800F6CB0, Turok 3's names: CFrameData m_FrameData[3], m_pCurrentFrameData D_800F7070, the world D_800F7078 as bytes, CGame m_Game at 0x22BC0 with its settings also as m_Settings); includes frame.h |
-| `structs/frame.h` | CFrameData (0x140, a frame in flight: its tasks, CFrameMsg for the task queue, frame buffer, display and line lists, the ring links; D_800F7070 is the one being built, D_8011F140 the one being finished) and VideoMode (the screen modes D_800C2054[2][5], D_800C20E0) (included by game.h) |
+| `structs/frame.h` | CFrameData (0x140, a frame in flight: its tasks, CFrameMsg for the task queue, frame buffer, display and line lists, the ring links; D_800F7070 is the one being built, D_8011F140 the one being finished), VideoMode (the screen modes D_800C2054[2][5], D_800C20E0) and CGfxPool (gPoolBuffers: the display list, FIFO, frame, depth and audio heap blocks, GfxPool_Alloc) (included by game.h) |
 | `structs/heap.h`, `loader.h`, `decompressor.h`, `hash.h` | the system resources (Turok 3's heap.h / loader.h / decompressor.h / hash.h with Turok 2's offsets): CHeap and CHeapBlock (a 0x20-byte block header), CLoader and CLoaderEntry, CDecompressor, HashEntry; gHeap/gLoader/gDecompressor are in `globals/sysrc.h`, gHashTable in `globals/cache.h` |
 | `structs/rumble.h` | RumblePool (two CLists and the base level), RumbleEffect (0x3C) and RumbleCurve; gRumblePool / gRumbleEntries are in `globals/rumble.h` |
 | `structs/emitter.h` | the region emitters (the textured layers a region turns on by CRegionInfo.m_EmitterMask): UnitVtx (an RSP vertex), CEmitterDef (the definition table D_8010FF14), CEmitter, CEmitterPool (a camera's four, CCamera.m_SkySystem) |
@@ -940,13 +1021,13 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | `structs/table.h` | the resource and level table headers: StrideTable (a record size and count, then the records: the level file's tables), OffsetTable (a sectioned block, func_002017D4), ArrayTable (count and element size, func_002018F0) |
 | `structs/rect.h` | CRect: a rectangle on the ground plane (a sector's, a floor triangle's or a sweep's bounds) |
 | `structs/region.h` | CGameRegion (the floor triangles an object's `m_pCurrentRegion` points to, linked to their neighbours) and CRegionInfo (the attributes they share by index) |
-| `structs/collision.h` | the collision code: CCollisionInfo (an object's collision response, Rage Wars' CCollisionInfo2_t), CCollisionResults (D_800F1CE0, what the last test hit; D_800F1ADC points at the one being filled) and its HitFrame node record, Sweep / SweepHit (a move as func_00239F00 tests it) with ModelSweep, MapSweep, SweepBox, CollisionQuad (a box face), DamageEvent (func_00245828), CBox (D_800F5A10) |
+| `structs/collision.h` | the collision code: CCollisionInfo (an object's collision response, Rage Wars' CCollisionInfo2_t), CCollisionResults (D_800F1CE0, what the last test hit; D_800F1ADC points at the one being filled) and its HitFrame node record, Sweep / SweepHit (a move as func_00239F00 tests it) with ModelSweep, MapSweep, SweepBox, CollisionQuad (a box face), DamageEvent (func_00245828); its CBox is in vector.h |
 | `structs/camera.h` | CCamera and CCameraPool, with CCameraViewParams, CCameraViewport, CShake, CCameraText, CPlane; CCamera.m_MenuPool (0x53C) is a union with menu.h's MenuPool `m_Menus`, so camera.h includes menu.h |
 | `structs/model.h` | drawing models: CDrawArgs (what an actor's draw callback gets from func_0021D39C: draw / shadow flags, the camera, the model handle and the model numbers) and CModelInstance (D_800DD578, the model batch) |
-| `structs/light.h` | CLights1 (libultra's Lights1, the light block of an actor's m_Lights), the scene light D_800AB0D0, CBlendState (D_800AB8B0, the draw colour override) and D_800AB8C0[2] (the fade and alpha) |
+| `structs/light.h` | CLights1 (libultra's Lights1, the light block of an actor's m_Lights), the scene light D_800AB0D0, CBlendState (D_800AB8B0, the draw colour override) and D_800AB8C0[2] (the fade and alpha); CLightVolume / CLightVolumeTable (a sector's light volumes, block 2 of its data: CScene__FindLightsAt, Lighting_CollectVolumesForModel) |
 | `structs/list.h` | CList, Acclaim's intrusive list (the IntrusiveList of the Rage Wars decomp; included by camera.h) |
 | `structs/cache.h` | the resource cache: CMemEntry (a loaded block: data, size, lock count, flags, age) and CCacheEntry (a load request), Turok 3's names |
-| `structs/pak.h` | the Controller Pak menus: PakDirectory (D_800C2224, the cached note directory per channel), RumblePak (D_80130AA0), PakProfile (the 0x18-byte "T2 MULTI" note, D_80130968), PakQuery; the OSPfs per channel is D_80130C80 |
+| `structs/pak.h` | the Controller Pak menus: PakDirectory (D_800C2224, the cached note directory per channel), RumblePak (D_80130AA0), PakProfile (the 0x18-byte "T2 MULTI" note, D_80130968), PakQuery and PakChannel (the pak menus' channel locals); the OSPfs per channel is D_80130C80 |
 | `structs/menu.h` | the menu system: Menu (a window), MenuItem, MenuItemDesc, MenuDesc, MenuItemLayout, MenuColor, MenuPool (a window's controller is a ControllerProfile), MenuBinding (a slider's variable), MenuTextStyle (D_800C1BD4); the text entry of the name and cheat screens, TextEntry (D_800C1F80) and NameEntry (D_800C1FB0) |
 | `structs/menu_model.h` | a menu's 3D model item: MenuModelPart (its data) and MenuModel (its 0x330-byte extra: a CIntelligence copy and the CGameObjectInstance drawn) |
 | `structs/controller.h` | ControllerProfile (D_800F5EC0[4], 0x224, and the merged fifth D_800F5C78): a controller's buttons (held, single, double, repeat...), stick and Rumble Pak state, `CPlayer::m_ContState.m_pContState`; D_800F6778, the OSContStatus of the four ports; rw/abu_types.h includes it |
@@ -964,7 +1045,9 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | `structs/demo.h` | the attract-mode demo player DemoPlayer (D_800F56B0, with the saved GameSettingsBlock), DemoStream (an input's bit stream), DemoHeader |
 | `structs/pager.h` | the resource pager (D_801206A0, Pager: code and data mapped through 24 TLB slots): PageMapping, PageChain (D_80121290 / D_80121294), PageRegion (D_80121378), PageJob |
 | `structs/memory.h` | CMemoryRange: the debugger's memory map D_80128130 (16 RAM ranges, then the 32 mapped TLB ranges) |
-| `structs/gbi.h` | libultra graphics types at the size the structs embed them (Mtx, Vp) |
+| `structs/gbi.h` | libultra graphics types at the size the structs embed them (Mtx, Vp, Vtx_t, Vtx_tn) |
+| `structs/morph.h` | the trail morph (Morph_BlendVertices / Morph_BlendVerticesTex, func_00234348): Morph, MorphItem, MorphPoint, MorphTiming, and the Swoosh / SwooshNode views MorphOwner / MorphClock (round 21) |
+| `structs/word.h` | CWord: the 4-byte parameter word of the imported AI and level code (s32 / f32 / halves / bytes) (round 21) |
 | `ultra_types.h` | libultra's OSThread, OSMesgQueue, OSTimer, OSContPad, OSPfs, OSPfsState and the Controller Pak internals, the VI context (__OSViContext: __osViCurr / __osViNext are D_800B7AC0 / D_800B7AC4, OSViMode, __OSViScale), plus the engine's CMutex |
 | `gfx.h` | Gfx (w0/w1) and the display-list pointer the engine appends to |
 

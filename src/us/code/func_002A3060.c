@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: osPiGetCmdQueue: 4 of 10 words. */
 #include "common.h"
 #include "globals/libultra.h"
 

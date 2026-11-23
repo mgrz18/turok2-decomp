@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_0026E294(Record14 *arg0) {
+void LevelEvent_MarkFired(Record14 *arg0) {
     extern void LevelEvent_Fire(void *);
     Record14 copy;
     u8 *bytes = (u8 *)arg0;

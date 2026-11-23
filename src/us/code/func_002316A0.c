@@ -2,7 +2,7 @@
 #include "globals/game.h"
 
 
-void func_002316A0(CParticle *arg0, s32 *arg1) {
+void CParticle__AddDrawModeBits(CParticle *arg0, s32 *arg1) {
     s32 var_a2;
 
     var_a2 = 0;

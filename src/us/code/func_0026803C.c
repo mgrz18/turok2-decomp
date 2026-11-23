@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_0026803C(CGameObjectInstance *obj) {
+s32 GameObject_CanEnterInfoFlag400000(CGameObjectInstance *obj) {
     s32 var_v1;
     CIntelligence *temp_a1;
 

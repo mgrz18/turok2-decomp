@@ -22,6 +22,44 @@ The matching build is unchanged: `tools/asm_diff.py --base 70f3333c -j 8` report
 over all 3,938 files after every merge and at the end, and a clean `make clean && make setup &&
 make -j8 build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
+## Round 21 (Phase 5, readable code, part 1): the merge
+
+Five branches merged, in this order: j5 (libultra is 2.0I `libgultra_rom`; the module map,
+docs/MODULES.md), j3 (structs hoisted, host-view twins replaced), j2 (481 data names, the
+`menu_text.h` / `strings.h` headers), j1 (255 function names) and j4 (the FAKEMATCH audit, one
+body for the N64 and the host). The rewrites that met in the same files were re-run on the merged
+tree, each as its own commit (`apply_names.py`, `hoist_externs.py`, `unview.py` on
+func_0022D2FC.c, then `unify_host_bodies.py --write` until it dropped 0: 45 more alternatives, 496
+in all). `D_14A000` / `D_3CAE0` are `gVirtualRomStart` / `gVirtualModule1Size`.
+
+The port reads renamed and retyped C only: no behaviour change. Linux, this tree:
+`versions/port_layout.us.json` regenerated; gendata rerun with `decls.json` deleted;
+`aligncheck.py` (Release) lists only the 2 known `GameNoteMenu_SelectYes` false positives;
+boot + 3 demos (26,000 frames, `--pak-blank`) det `6ab97584…` (52,000 lines); the default
+whole-game run (Release, `aimdrive.py`, 300,000 frames) det **`dc8126d3…`** (600,000 lines, END 2,
+the one `death:` line at 263,578 is the return to the hub after the credits). Matching build:
+`tools/asm_diff.py --base 7340fcdd -j 8` 0 of 3,938 after every merge (asm_diff now resolves a
+new name through the names tables both ways, the module-2 `_2` copies at their link address),
+clean `make setup && make -j8 build && make verify` OK.
+
+One host fix from the checks: j3 typed `AI_GetSightTargetInfo`'s caller on `CAI`, so the sight
+target pointer reached an `s32` parameter (`ptrargs.py`); the parameter (unused) is `sptr` now.
+Port tests: `make -C port test` (rnc_test, t2asset_test, t2asset_typed_test) OK, gbi_test 0
+mismatches, t2os deterministic on 3 runs, `t2audio_test --direct 0/40` max difference 0, `--adec`
+27,136 samples, the swoosh self test OK. abicheck: 0 harmful direct calls; one indirect
+`missing_args` is newly visible (`level->def->onReset` in `Primagen_Step` now typed, matched to
+`Destructible_Hurt` by type alone; the call is unchanged). n64viewcheck: fewer sites (view/local
+211 -> 198, view/moves 82 -> 75), no new BAD.
+
+## Round 21, part j3 (structs)
+
+35 host-view twins (`T2_HOFF_*`, hostview.py) are now the real structs they mirrored
+(tools/unview.py; 137 -> 102 twins in 85 -> 62 files), and a few N64-only views the port compiled
+at N64 offsets are real structs too (the module-2 pak and setup menus, GfxPool, the libaudio
+channel state). No behaviour change: `mklayout.py` output unchanged, boot + 3 demos `6ab97584...`
+(52,000 lines), the default whole-game run `dc8126d3...` (600,000 lines, the reference), both
+from this tree's Release build. Details: docs/STRUCTS_TODO.md, "Round 21, part j3".
+
 ## 1. Build and run
 
 **To play**: [QUICKSTART.md](QUICKSTART.md) (Mac or Linux, Release, a window, a gamepad or the
@@ -244,6 +282,60 @@ test three times, `t2audio_test --direct` sounds 0 and 40 max difference 0 again
 Widescreen (the game frame is 4:3 with bars today); 60 fps with interpolation; a higher internal
 resolution; enhancements (texture packs, a settings menu, mouse-look refinements, Windows and Linux
 packages, Armorines on the same base).
+
+## Round 21, part j2 (globals: names and declarations)
+
+Renames only (docs/NAMES.md and GLOBALS.md "Round 21, part j2"), but the port saw three things:
+
+- `port/game/t2sched.c` and `tools/port/n64trace.py` spelled `D_800F6CA8`: it is `gNumTicks1`
+  now (t2sched.c takes it from `globals/frame.h`); `gendata.py`'s `RUNTIME_BSS` lists `gAssertExpr`
+  (was `D_800F1FF4`).
+- **`sSortNodes` joins `gendata.py` `ALIGN16`.** The new names changed the generated data before
+  it by 12 bytes, which put it at 8 mod 16, and Release crashed at frame 1069 of the boot
+  (`Render_FlushModelBatch` clears a node with `movaps`). `aligncheck.py` found it; the 2 sites it
+  still lists (`gPakMsgDelete{Done,Failed}Desc` in `GameNoteMenu_SelectYes`) are its heuristic
+  seeing `%rsi` reloaded with `gLoadSavePersistentData` (already in `ALIGN16`).
+- `CCameraViewParams__Construct`'s port branch reads `gDefaultVisBits` as the header's scalar.
+
+`versions/port_layout.us.json` regenerated (`mklayout.py --check`: up to date). Linux Release,
+this tree: boot + 3 demos `T2_DET_LOG` identical to the coordinator's binary (52,000 lines, md5
+`6ab97584…`); the default whole-game run (300,000 frames, `aimdrive.py`): det md5 **`dc8126d3…`**
+(600,000 lines), the same as the coordinator's binary run here, level 10 (END 2) at the same frame, 0 lives lost.
+
+## Round 21, part j1: function names only (branch names-R21_j1; NAMES.md)
+
+255 more function names (`versions/names/n9.us.txt`); the port's sources that call them by name
+follow (`port/game/t2sched.c`: `Scheduler_RDPDoneHook`; `port/game/t2swoosh.c`:
+`SwooshSystem_Construct`, `SwooshSystem_AddTimer`, `DList_Init`, `SwooshSystem_PlaceDecal`), as do
+`turok2.us.toml`, `tools/ghidra/annotations.json` and `versions/port_layout.us.json`. No behaviour
+change: boot and demos (26,000, `--pak-blank`) det `6ab97584…`, and the default whole-game run
+(Release, `aimdrive.py`, 300,000 frames) det **`dc8126d3…`**, both identical to the coordinator's
+binary at 7340fcdd.
+
+## Round 21, part j4: one body for the N64 and the host, de-faked getters (branch names-R21_j4; MATCHING.md "The FAKEMATCH audit")
+
+The port is affected only through shared C, and runs as before:
+
+- **451 N64-only alternatives dropped** in 349 files by `tools/unify_host_bodies.py --write`: an
+  `#ifdef TARGET_PORT A #else B #endif` whose host branch A compiles to the same N64 code as B
+  becomes A alone. The port reads the same text as before (line numbers aside). Re-runnable after
+  merges; rerun it last.
+- **De-faked functions now share one body with the host**: func_00225C08 (the old host body, the
+  N64's uninitialised test gone), CPlayer__GetPickupCountLow/High, EnemyAnim_ExtremeDeath (returns
+  `s32`, was `volatile unsigned int` on the host), func_00268BE0 (`obj->m_dwFlags`, no
+  `T2_HOST_FLAGS_OFFSET`), func_00267E4C (`def->m_dwTypeFlags`); same results, typed access.
+  Sound_DistanceFalloff (also called by `port/audio`) keeps its semantics, NaN included.
+- **One host fix on the way**: Menu_StepValueLR (module 1's menus) read the controller for the
+  right press at the N64 offset 0x20 of `Menu` (`*(s32 *)(menu + 0x20)`, the m2c draft that the
+  host also compiled); its natural form reads `menu->controller` for both presses. The default
+  runs do not reach it (their det is unchanged).
+- No rename, no header change: `versions/port_layout.us.json` is unchanged; gendata rerun
+  (`decls.json` deleted) on the final tree.
+- **Checked** (Linux, Release, this tree): the boot and the demos (26,000 frames, `--pak-blank`)
+  `6ab97584…`, as the coordinator's binary; the default whole-game run (300,000 frames,
+  `aimdrive.py`) det md5 **`dc8126d3…`** (600,000 lines), the same run as before: level 10
+  (END 2), the credits back to the hub at 263,578, 3 lives at the end. `make verify` OK. Both rerun on the
+  final tree (25 de-faked functions, 451 alternatives dropped): the same two md5s.
 
 ## Round 20, part i1: the render sweep (hub, levels 1-3, menus): the arena walls, the menu texts, the automap (branch names-R20_i1; FIDELITY.md 13, RENDER.md 8)
 

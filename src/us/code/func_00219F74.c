@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/game_object.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
@@ -14,16 +15,11 @@ typedef struct {
     u8 pad[0x66];
 } RandList;         /* 0x68 */
 
-extern u8 D_800A5AC4[];     /* "anim object info" */
 
 s32 BinarySearch(s32 *, s32, sptr);
 void WeightedTable_Clear(RandList *);
 void WeightedTable_Add(RandList *, s16, s32);
-#ifdef TARGET_PORT
 s16 WeightedTable_Pick(RandList *); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
-#else
-s32 WeightedTable_Pick(RandList *);
-#endif
 
 sptr CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, sptr action, sptr skip) {
     RandList list;
@@ -35,7 +31,7 @@ sptr CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, sptr action
     sptr found;
 
     if (actor->m_dwFlags & 0x40000) {
-        res = CCache__Request(0, ((sptr)actor->m_rpObject), actor->m_rpObjectHeader, 0, 0, 0, D_800A5AC4, 1);
+        res = CCache__Request(0, ((sptr)actor->m_rpObject), actor->m_rpObjectHeader, 0, 0, 0, sCGameObjectInstanceCacheDesc_AnimObjectInfo, 1);
         if (res != NULL) {
             data = CISet__GetBlock(res->data, 1);
             entries = data + 2;

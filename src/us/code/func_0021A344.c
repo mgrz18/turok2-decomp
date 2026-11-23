@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/vector.h"
 #ifdef TARGET_PORT
 #include "structs/game_object.h"
@@ -53,12 +54,11 @@ struct Actor {
 };
 #endif
 
-extern u8 D_800A5AC4[];     /* "anim object info" */
 
 void CMtxF__TransformBox(void *, void *, void *);
 void CVector3__Add(CVector3 *, CVector3 *, void *);
 void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
-void func_0021A500(Actor *);
+void CGameObjectInstance__AlignToGround(Actor *);
 void CGameObjectInstance__MoveWithCollision(Actor *, CVector3 *);
 void CGameObjectInstance__AdvanceAnimation(Actor *);
 
@@ -90,8 +90,8 @@ void CGameObjectInstance__UpdateAnimation(Actor *actor) {
                 CScene__CheckAutoActivation(game, actor, &oldPos, &actor->pos);
             }
         }
-        func_0021A500(actor);
-        set = CCache__Request(0, actor->unkA4, actor->unkB0, 0, 0, 0, D_800A5AC4, 1);
+        CGameObjectInstance__AlignToGround(actor);
+        set = CCache__Request(0, actor->unkA4, actor->unkB0, 0, 0, 0, sCGameObjectInstanceCacheDesc_AnimObjectInfo, 1);
         if (set != NULL) {
             data = CISet__GetBlock(*set, 0);
             actor->init(actor, actor->ai);

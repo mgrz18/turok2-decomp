@@ -6,7 +6,7 @@ s32 Controller_WatchPak(s8);                          /* extern */
 
 /* A menu window callback: the window (structs/menu.h) and the controller it reads. */
 
-void func_00451178(Menu *arg0) {
+void CharacterMenu_InitAfterPak_2(Menu *arg0) {
     Controller_WatchPak(arg0->controller->port);
     gDamagedPakContinued = 0;
 }

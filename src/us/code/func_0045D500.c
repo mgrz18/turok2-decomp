@@ -1,20 +1,17 @@
 #include "globals/render.h"
+#include "globals/menu_text.h"
 
-extern char D_800B40E0[];
-extern char D_800B40F8[];
-extern char D_800B4110[];
-extern char D_800B4140[];
 
 char *Video_GetResolutionText_2(void) {
     switch (gResolution) {
         case 0:
         default:
-            return D_800B40E0;
+            return sOptionsMenuText_ResolutionLoRez;
         case 1:
-            return D_800B40F8;
+            return sOptionsMenuText_ResolutionHiRez;
         case 2:
-            return D_800B4110;
+            return sOptionsMenuText_ResolutionHiRezLb;
         case 3:
-            return D_800B4140;
+            return sOptionsMenuText_ResolutionLoRezLb;
     }
 }

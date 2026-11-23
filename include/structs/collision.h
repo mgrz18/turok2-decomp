@@ -217,13 +217,6 @@ typedef struct DamageEvent {
     /* 0x14 */ u8 pad14[4];
 } DamageEvent; /* size 0x18 */
 
-/* An axis-aligned box. gCameraVisibleBox is the box of what the active cameras can
- * see (widened for animation), gCameraViewBox their plain view boxes
- * (CCameraPool__Advance builds both); an object is drawn or tested when its box
- * (CGameObjectInstance m_vMin / m_vMax) meets it. */
-typedef struct CBox {
-    /* 0x00 */ CVector3 m_vMin;
-    /* 0x0C */ CVector3 m_vMax;
-} CBox; /* size 0x18 */
+/* CBox (an axis-aligned box: gCameraVisibleBox, gCameraViewBox) is in structs/vector.h. */
 
 #endif

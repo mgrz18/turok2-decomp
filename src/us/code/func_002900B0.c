@@ -3,6 +3,7 @@
  * with __CSPPostNextSeqEvent inlined. */
 
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/libaudio.h"
 #include "globals/audio.h"
 
@@ -19,7 +20,6 @@
 
 /* An ALCSPlayer, as this reads it. */
 
-extern char D_800AA290[];
 
 void alCSeqNextEvent(void *seq, ALEvent *evt);            /* alCSeqNextEvent */
 s32 __alCSeqNextDelta(void *seq, s32 *deltaTicks);          /* __alCSeqNextDelta */
@@ -69,7 +69,7 @@ void __CSPHandleNextSeqEvent(ALCSPlayer *seqp) {
             postNextSeqEvent(seqp);
             break;
         default:
-            __assert(D_800AA290, sCSPlayerFile, 400);
+            __assert(sCSeqPlayerAssertExpr, sCSPlayerFile, 400);
             break;
     }
 }

@@ -1,3 +1,5 @@
+/* De-faked in round 21 (j4): the N64 body's unlock sent the message in two identical arms under a
+ * meaningless test; the plain if/else of the cache mutex (as the lock above it) matches. */
 #include "globals/cache.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
@@ -58,20 +60,13 @@ sptr CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
   gCache_mutex_count = temp_v1_2;
   if (temp_v1_2 != 0)
   {
-    if (temp_v1 || gCache_mutex_count)
-    {
-      __osRestoreInt(temp_v0_3);
-      osSendMesg((&gCache_mutex), 0, 1);
-      return var_s0;
-    }
-    else
-    {
-      __osRestoreInt(temp_v0_3);
-      osSendMesg((&gCache_mutex), 0, 1);
-      return var_s0;
-    }
+    __osRestoreInt(temp_v0_3);
+    osSendMesg((&gCache_mutex), 0, 1);
   }
-  __osRestoreInt(temp_v0_3);
+  else
+  {
+    __osRestoreInt(temp_v0_3);
+  }
   return var_s0;
 }
 #endif

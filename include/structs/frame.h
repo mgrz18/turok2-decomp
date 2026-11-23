@@ -71,4 +71,16 @@ typedef struct VideoMode {
 extern VideoMode gVideoModes[2][5];
 extern VideoMode gVideoModesPAL[5];
 
+/* The graphics pool gPoolBuffers (GfxPool_Alloc / GfxPool_Clear / GfxPool_Free): the
+ * cache blocks of the display lists, the RSP FIFO, the three colour frame buffers,
+ * the depth buffer and the audio heap (structs/cache.h CMemEntry; was GfxPool). */
+typedef struct CGfxPool {
+    /* 0x00 */ s32 ready;
+    /* 0x04 */ struct CMemEntry *gfx;       /* gDisplayList1 */
+    /* 0x08 */ struct CMemEntry *dynamic;   /* gRspFifoBuffer */
+    /* 0x0C */ struct CMemEntry *fb[3];     /* gCFB */
+    /* 0x18 */ struct CMemEntry *depth;     /* gDepthBuffer */
+    /* 0x1C */ struct CMemEntry *vtx;       /* gAudioHeapBase */
+} CGfxPool; /* size 0x20 */
+
 #endif

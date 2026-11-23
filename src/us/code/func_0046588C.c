@@ -17,7 +17,7 @@ typedef struct {
     /* 0x1194 */ u8 freeList[0x14];
 } Unk0046588C;
 
-void func_0046588C(Unk0046588C *arg0) {
+void CScene__FlushDelayedEvents_2(Unk0046588C *arg0) {
     ListNode0046588C *temp_s0;
     ListNode0046588C *var_s1;
 

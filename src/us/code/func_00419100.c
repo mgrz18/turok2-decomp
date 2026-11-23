@@ -1,65 +1,52 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B5F3C[];
-extern char D_800B5F54[];
-extern char D_800B5F6C[];
-extern char D_800B5F84[];
-extern char D_800B5F9C[];
-extern char D_800B5FB4[];
-extern char D_800B5FCC[];
-extern char D_800B5FE4[];
-extern char D_800B5FFC[];
-extern char D_800B6014[];
-extern char D_800B602C[];
-extern char D_800B6044[];
-extern char D_800B605C[];
-extern char D_800B6074[];
 
 s32 TeamBloodMenu_LevelLabel(MenuItem *a) {
     switch (gEngineApp_m_Settings.teamArena) {
     case 0:
-        a->text = D_800B5F3C;
+        a->text = sBloodLustMenuText_LevelRandom;
         break;
     case 1:
-        a->text = D_800B5F54;
+        a->text = sBloodLustMenuText_LevelExperimentata;
         break;
     case 2:
-        a->text = D_800B5F6C;
+        a->text = sBloodLustMenuText_LevelMoonlitMayhem;
         break;
     case 3:
-        a->text = D_800B5F84;
+        a->text = sBloodLustMenuText_LevelCloseQuartered;
         break;
     case 4:
-        a->text = D_800B5F9C;
+        a->text = sBloodLustMenuText_LevelVulcansForge;
         break;
     case 5:
-        a->text = D_800B5FB4;
+        a->text = sBloodLustMenuText_LevelTeleportastic;
         break;
     case 6:
-        a->text = D_800B5FCC;
+        a->text = sBloodLustMenuText_LevelMirrororrim;
         break;
     case 7:
-        a->text = D_800B5FE4;
+        a->text = sBloodLustMenuText_LevelFishInABarrel;
         break;
     case 8:
-        a->text = D_800B5FFC;
+        a->text = sBloodLustMenuText_LevelH2Whoa;
         break;
     case 9:
-        a->text = D_800B6014;
+        a->text = sBloodLustMenuText_LevelEscheria;
         break;
     case 10:
-        a->text = D_800B602C;
+        a->text = sBloodLustMenuText_LevelMoshCrypt;
         break;
     case 11:
-        a->text = D_800B6044;
+        a->text = sBloodLustMenuText_LevelSquaresCubed;
         break;
     case 12:
-        a->text = D_800B605C;
+        a->text = sBloodLustMenuText_LevelCrazyEight;
         break;
     case 13:
-        a->text = D_800B6074;
+        a->text = sBloodLustMenuText_LevelBullseye;
         break;
     }
     return 0;

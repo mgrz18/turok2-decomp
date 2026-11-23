@@ -28,48 +28,12 @@ extern void CParticle__Wobble(void *obj, f32 scale);
 extern void CPlayer__TransformByView(CPlayer *player, CVector3 *pos);      /* player-relative point to world */
 extern f32 GameObject_GetCollisionHeight(CGameObjectInstance *owner);                     /* height */
 
-#ifdef TARGET_PORT
-typedef struct Missile {
-/* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Missile(m) __builtin_offsetof(CParticle, m)
-    union {
-        struct { u8 _hp_pos[T2_HOFF_Missile(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_vel[T2_HOFF_Missile(m_vVelocity)]; CVector3 vel; }; /* N64 0x18 */
-        struct { u8 _hp_parent[T2_HOFF_Missile(m_pEffect)]; CROMParticleEffect *parent; }; /* N64 0xF8 */
-        struct { u8 _hp_owner[T2_HOFF_Missile(m_pOwner)]; CGameObjectInstance *owner; }; /* N64 0x10C */
-        struct { u8 _hp_speed[T2_HOFF_Missile(m_cFrame)]; f32 speed; }; /* N64 0x11C */
-        struct { u8 _hp_caught[T2_HOFF_Missile(m_nFrames)]; s16 caught; }; /* N64 0x128 */
-        struct { u8 _hp_dir[T2_HOFF_Missile(m_vDirection)]; CVector3 dir; }; /* N64 0x150 */
-        struct { u8 _hp_loop[T2_HOFF_Missile(m_pLoopSound)]; SndSource *loop; }; /* N64 0x1B8 */
-    };
-} Missile;
-#else
-typedef struct {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x18 - 0x10];
-    /* 0x018 */ CVector3 vel;
-    /* 0x024 */ u8 pad24[0xF8 - 0x24];
-    /* 0x0F8 */ CROMParticleEffect *parent;
-    /* 0x0FC */ u8 padFC[0x10C - 0xFC];
-    /* 0x10C */ CGameObjectInstance *owner;
-    /* 0x110 */ u8 pad110[0x11C - 0x110];
-    /* 0x11C */ f32 speed;
-    /* 0x120 */ u8 pad120[0x128 - 0x120];
-    /* 0x128 */ s16 caught;
-    /* 0x12A */ u8 pad12A[0x150 - 0x12A];
-    /* 0x150 */ CVector3 dir;
-    /* 0x15C */ u8 pad15C[0x1B8 - 0x15C];
-    /* 0x1B8 */ SndSource *loop;
-} Missile;
-#endif
 
 extern f32 D_800ACE68; /* speed above which it flies home (15) */
 extern f32 D_800ACE6C; /* catch radius (512) */
 
 /* Same as CParticle__Accelerate: accelerate along dir, clamp to the max speed. */
-static __inline__ void Missile_Accelerate(Missile *obj) {
+static __inline__ void Missile_Accelerate(CParticle *obj) {
     CVector3 delta;
     CVector3 dir;
     CVector3 *vel;
@@ -77,14 +41,14 @@ static __inline__ void Missile_Accelerate(Missile *obj) {
     f32 speed;
     f32 maxSpeed;
 
-    accel = HalfToFloat(obj->parent->m_pMotion->m_Accel);
+    accel = HalfToFloat(obj->m_pEffect->m_pMotion->m_Accel);
     if (accel != 0.0f) {
-        dir = obj->dir;
+        dir = obj->m_vDirection;
         CVector3__Scale(&delta, &dir, accel);
-        vel = &obj->vel;
+        vel = &obj->m_vVelocity;
         CVector3__Add(vel, vel, &delta);
-        speed = func_00298470(obj->vel.x * obj->vel.x + obj->vel.y * obj->vel.y + obj->vel.z * obj->vel.z);
-        maxSpeed = HalfToFloat(obj->parent->m_pMotion->m_MaxSpeed);
+        speed = func_00298470(obj->m_vVelocity.x * obj->m_vVelocity.x + obj->m_vVelocity.y * obj->m_vVelocity.y + obj->m_vVelocity.z * obj->m_vVelocity.z);
+        maxSpeed = HalfToFloat(obj->m_pEffect->m_pMotion->m_MaxSpeed);
         if (accel > 0.0f) {
             if (maxSpeed < speed) {
                 CVector3__Scale(vel, &dir, maxSpeed);
@@ -97,7 +61,7 @@ static __inline__ void Missile_Accelerate(Missile *obj) {
     }
 }
 
-void CParticle__UpdateReturning(Missile *obj) {
+void CParticle__UpdateReturning(CParticle *obj) {
     CVector3 aim;
     CVector3 toHome;
     CVector3 facing;
@@ -116,20 +80,20 @@ void CParticle__UpdateReturning(Missile *obj) {
     f32 angle;
     s32 sound;
 
-    if (obj->speed > D_800ACE68) {
-        CQuaternion__FromDirection(&cur, &obj->dir);
-        speed = func_00298470(obj->vel.x * obj->vel.x + obj->vel.y * obj->vel.y + obj->vel.z * obj->vel.z);
-        player = (CPlayer *) obj->owner->m_AI.m_pParent;
+    if (obj->m_cFrame > D_800ACE68) {
+        CQuaternion__FromDirection(&cur, &obj->m_vDirection);
+        speed = func_00298470(obj->m_vVelocity.x * obj->m_vVelocity.x + obj->m_vVelocity.y * obj->m_vVelocity.y + obj->m_vVelocity.z * obj->m_vVelocity.z);
+        player = (CPlayer *) obj->m_pOwner->m_AI.m_pParent;
         home.x = -26.623999f;
         home.y = -20.48f;
         home.z = -143.36f;
         CPlayer__TransformByView(player, &home);
-        CVector3__Subtract(&toCatch, &home, &obj->pos);
+        CVector3__Subtract(&toCatch, &home, &obj->header.m_vPos);
         dist = func_00298470(toCatch.x * toCatch.x + toCatch.y * toCatch.y + toCatch.z * toCatch.z);
         if (dist <= D_800ACE6C + 30.72f) {
-            if (dist < D_800ACE6C * (1.0f / 3) || obj->speed >= 65.0f) {
-                obj->pos = home;
-                obj->caught = 1;
+            if (dist < D_800ACE6C * (1.0f / 3) || obj->m_cFrame >= 65.0f) {
+                obj->header.m_vPos = home;
+                obj->m_nFrames = 1;
                 if (player->m_Data.m_CurrentWeapon == 0x15) {
                     player->m_WeaponActor.m_AI.m_Weapon.m_BarrelSpeed = 0.73303837f;
                 }
@@ -138,10 +102,10 @@ void CParticle__UpdateReturning(Missile *obj) {
             toHome = toCatch;
         } else {
             aim.x = -102.399994f;
-            aim.y = GameObject_GetCollisionHeight(obj->owner) * 0.5f;
+            aim.y = GameObject_GetCollisionHeight(obj->m_pOwner) * 0.5f;
             aim.z = -D_800ACE6C;
             CPlayer__TransformByView(player, &aim);
-            CVector3__Subtract(&toHome, &aim, &obj->pos);
+            CVector3__Subtract(&toHome, &aim, &obj->header.m_vPos);
             func_00298470(toHome.x * toHome.x + toHome.y * toHome.y + toHome.z * toHome.z);
         }
         CVector3__Normalize(&toHome);
@@ -149,7 +113,7 @@ void CParticle__UpdateReturning(Missile *obj) {
         CQuaternion__Normalize(&want);
         CQuaternion__Normalize(&cur);
         CVector3__Normalize(&toHome);
-        facing = obj->dir;
+        facing = obj->m_vDirection;
         CVector3__Normalize(&facing);
         angle = Math_AcosLookup(toHome.x * facing.x + toHome.y * facing.y + toHome.z * facing.z);
         t = (angle < 0.26179942f) ? 1.0f : 0.5f;
@@ -158,10 +122,10 @@ void CParticle__UpdateReturning(Missile *obj) {
         forward.x = 0.0f;
         forward.y = 0.0f;
         forward.z = 1.0f;
-        CMtxF__TransformPoint(mtx, &forward, &obj->dir);
-        CVector3__Scale(&obj->vel, &obj->dir, speed);
+        CMtxF__TransformPoint(mtx, &forward, &obj->m_vDirection);
+        CVector3__Scale(&obj->m_vVelocity, &obj->m_vDirection, speed);
     } else {
-        loop = obj->loop;
+        loop = obj->m_pLoopSound;
         sound = 0x1B3;
         if (loop != NULL) {
             if (loop->sound.w == sound && loop->handle != -1) {
@@ -169,7 +133,7 @@ void CParticle__UpdateReturning(Missile *obj) {
             }
             CParticle__StopLoopSound(obj);
         }
-        obj->loop = LoopSounds_Start(LoopSounds_Get(), 0x1B3, &obj->pos, &obj->pos, -1);
+        obj->m_pLoopSound = LoopSounds_Start(LoopSounds_Get(), 0x1B3, &obj->header.m_vPos, &obj->header.m_vPos, -1);
     }
 playing:
     Missile_Accelerate(obj);

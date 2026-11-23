@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: Render_SortTreeFind: 12 of 18 words. */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8026E1F8_de.c, func_8026E4F8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 

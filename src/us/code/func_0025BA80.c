@@ -11,21 +11,17 @@ extern u8 D_801100D4[];
 extern void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params);
 extern void CGameObjectInstance__DrawModel(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params);
 extern void Render_DrawModelShared(sptr model, sptr matrix, s32 segment, void *lights, sptr textures, s32 lod, s32 pass);
-extern void func_0020BBE4(void *arg0, s32 renderMode, sptr model, sptr matrix, s32 projected, void *lights, sptr segment, s32 group, s32 arg8);
+extern void Render_DrawModelImmediate(void *arg0, s32 renderMode, sptr model, sptr matrix, s32 projected, void *lights, sptr segment, s32 group, s32 arg8);
 
 void EnemyAI_DrawFaded(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params) {
     u8 alpha;
 
     if (ai->m_Mode == 0x20) {
         CGameObjectInstance__DrawModelImmediate(actor, ai, params);
-#ifdef TARGET_PORT
         /* the port (round 9 x1): N64 byte 0x1B is the low byte of the big-endian m_nModel; on the
          * host that byte is in m_nModel's neighbour (the totem defense's teleporting enemies crashed
          * drawing with a model index read from the wrong byte) */
         Render_DrawModelShared(params->m_hModel, actor->m_pmtDrawMtxs, 1, &actor->m_Lights[gEvenOdd], 0, (s8) params->m_nModel, -1);
-#else
-        Render_DrawModelShared(params->m_hModel, actor->m_pmtDrawMtxs, 1, &actor->m_Lights[gEvenOdd], 0, ((s8 *)params)[0x1B], -1);
-#endif
         return;
     }
     if (ai->m_Enemy.m_Timer > 0.0f) {
@@ -45,7 +41,7 @@ void EnemyAI_DrawFaded(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params) {
         if (alpha != 0) {
             gBlendState_m_Color[3] = alpha;
             gBlendState = 1;
-            func_0020BBE4(D_801100D4, -1, params->m_hModel, actor->m_pmtDrawMtxs, 1, &actor->m_Lights[gEvenOdd], 0,
+            Render_DrawModelImmediate(D_801100D4, -1, params->m_hModel, actor->m_pmtDrawMtxs, 1, &actor->m_Lights[gEvenOdd], 0,
                           params->m_nModel, actor->m_AI.m_nTexture);
         }
         gBlendState = 0;

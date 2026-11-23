@@ -36,7 +36,7 @@ extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 extern void Actor_SpawnParticle(CGameObjectInstance *obj, s32 sound, CVector3 pos, s32 flags);
 extern void GameObject_TraceMove(CGameObjectInstance *obj, CVector3 pos, CVector3 *out, s32 *region, s32 a, s32 b);
-extern f32 func_0021F2B0(CGameObjectInstance *obj);
+extern f32 CGameObjectInstance__GetObjectScale(CGameObjectInstance *obj);
 extern void ImpactEvent_Send(CGameObjectInstance *obj, CGameObjectInstance *owner, s32 type, s32 id, CVector3 pos, PuffArgs args);
 
 void GameObject_EmitHotPoints(Attachment *ents, s32 n, CMtxF *mtxs, CGameObjectInstance *obj, void *bones) {
@@ -166,7 +166,7 @@ void GameObject_EmitHotPoints(Attachment *ents, s32 n, CMtxF *mtxs, CGameObjectI
                 break;
             }
             if (size != 0) {
-                len = func_0021F2B0(obj);
+                len = CGameObjectInstance__GetObjectScale(obj);
                 puff.lifeRange = size << 8;
                 puff.chance = puff.modifier = puff.countBase = puff.countRange = 0;
                 {

@@ -30,9 +30,9 @@ int IsCodePointer(uptr arg0) {
 }
 #endif
 #else
-extern char CList__Construct;
+extern char CList__Construct;      /* local: a code address, the start of a range (a function, not data) */
 extern char D_A4694;
-extern char Automap_RevealRegion;
+extern char Automap_RevealRegion;  /* local: a code address, the start of a range (a function, not data) */
 extern char D_29E60;
 int IsCodePointer(u32 arg0) {
     if (arg0 >= (uptr)&CList__Construct &&

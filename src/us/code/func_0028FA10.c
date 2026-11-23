@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 #include "globals/libaudio.h"
 
-extern char __CSPVoiceHandler;
+ALMicroTime __CSPVoiceHandler(void *node);
 extern void __initChanState(void *);
 extern sptr alHeapDBAlloc(sptr, s32, void *, s32, s32);
 extern void alEvtqNew(void *, void *, s32);

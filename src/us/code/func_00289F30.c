@@ -22,7 +22,7 @@ s32 Cinema_PathPlaying();
 s32 Cinema_GetScriptId();
 s32 Cinema_IsFinished();
 void Cinema_StopAtEnd();
-s32 func_00289F30(CEngineApp *g) {
+s32 CEngineApp__CheckEndCinema(CEngineApp *g) {
     B21GameBlk *b;
     s32 r;
     if (MenuPool_CountOpen(D_80119850.sub5DC) == 0) {

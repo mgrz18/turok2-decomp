@@ -2,7 +2,7 @@
 typedef signed int s32;
 
 
-char *func_0045AA0C(void *arg0, s32 kind) {
+char *PakMenu_GetStatsReturnMenu_2(void *arg0, s32 kind) {
     switch (kind) {
         case 0:
         default:

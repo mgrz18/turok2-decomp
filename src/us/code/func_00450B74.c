@@ -36,10 +36,10 @@ struct MenuRecAt20V2 {
     struct OwnerCode8043DF84 *owner;
     PakMenuSlot *widget;
 };
-extern void func_00450B74(void *arg0, s32 arg1);
+extern void Menu_SetPakWatch_2(void *arg0, s32 arg1);
 extern void Controller_WatchPak(s32 arg);
 extern void Controller_UnwatchPak(sptr arg);
-void func_00450B74(void *arg0, s32 arg1) {
+void Menu_SetPakWatch_2(void *arg0, s32 arg1) {
     s32 val;
     MenuRecAt20V2 *menu = arg0;
     val = menu->widget->unk4;

@@ -14,6 +14,7 @@ extern s32 gScreenHeight;           /* Turok 3's screen_height */
 extern s32 gResolution;             /* the resolution set, index in gVideoModes */
 extern s32 gAppliedResolution;      /* the resolution last applied */
 extern s32 gVideoClearFrames;       /* frames left to clear the screen around a mode change */
+extern s32 gVideoDitherFilter;      /* the mode's antialias flag: OS_VI_DITHER_FILTER_ON/OFF (Video_ApplyResolution) */
 extern s32 gVideoModeCounts[2];     /* resolutions per TV region */
 extern u32 gTotalFramebuffers;      /* 3 */
 extern u32 gDisplayListSize;        /* in commands */
@@ -54,7 +55,7 @@ extern s32 gViAntiAlias;            /* the AA VI mode (Video_SetMode) */
 extern s32 gRenderZModeInter;       /* ZMODE_INTER render modes */
 extern s32 gRenderImageRead;        /* IM_RD render modes */
 
-/* Fog (func_0020B554 derives the three masks from gFogEnabled). */
+/* Fog (Render_SetupFog derives the three masks from gFogEnabled). */
 extern s32 gFogEnabled;
 extern u32 gFogGeometryMode;        /* 0 or G_FOG */
 extern u32 gFogRenderModeFogA;      /* blender cycle 1 bits */

@@ -2,8 +2,8 @@
 #include "structs/intelligence.h"
 #include "structs/game_object.h"
 
-/* The instance's intelligence is type 1 with type flag 2 (func_00267D94: flag 1). */
-s32 func_00267DBC(CInstanceHeader *arg0)
+/* The instance's intelligence is type 1 with type flag 2 (GameObject_IsLeader: flag 1). */
+s32 GameObject_IsFollower(CInstanceHeader *arg0)
 {
   CIntelligence *temp_a0;
   unsigned char new_var;

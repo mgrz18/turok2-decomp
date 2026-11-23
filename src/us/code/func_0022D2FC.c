@@ -14,6 +14,7 @@
  * CParticle__BuildMatrix, CParticle__DrawSprite and CParticleSystem__Spawn are after Rage Wars
  * (Particle_BuildMatrix, Particle_DrawSprite and func_802800C0_de). */
 #include "common.h"
+#include "structs/list.h"
 #include "gfx.h"
 #include "gbi_t2.h"
 #include "structs/game_object.h"
@@ -1082,11 +1083,7 @@ s16 *CPlayer__GetFiringAmmo(u8 *, s32);
 void CParticle__StopLoopSound(EffectActor *);
 void CParticle__BuildCameraMatrix(EffectActor *);
 void Trail_DetachOwner(void *, EffectActor *);
-#ifdef TARGET_PORT
 void CDLightSet__Free(void *, CDLight *);
-#else
-void CDLightSet__Free(void *, s32);
-#endif
 
 void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
     EffectActor *child;
@@ -1120,35 +1117,21 @@ void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
             CParticle__BuildCameraMatrix(actor);
             Trail_DetachOwner(gEngineApp_m_SwooshSystem, actor);
         }
-#ifdef TARGET_PORT
         /* the light pointer-wide, in the host CParticle's member (the view has the N64 offset) */
         if (((CParticle *) actor)->m_pDLight != NULL) {
             CDLightSet__Free(D_8010FF34, ((CParticle *) actor)->m_pDLight);
             ((CParticle *) actor)->m_pDLight = NULL;
         }
-#else
-        if (actor->sound != 0) {
-            CDLightSet__Free(D_8010FF34, actor->sound);
-            actor->sound = 0;
-        }
-#endif
         if (actor->liveCount != NULL) {
             (*actor->liveCount)--;
         }
         actor->flags &= ~0x02000100;
         CList__Remove(actor->list, actor);
         actor->list = NULL;
-#ifdef TARGET_PORT
         CList__AddHead(&((CParticleSystem *) mgr)->m_FreeList, actor);
         if (actor->flags & 0x01000000) {
             CList__Remove(&((CParticleSystem *) mgr)->m_DrawList, actor);
         }
-#else
-        CList__AddHead(mgr + 0xEC00, actor);
-        if (actor->flags & 0x01000000) {
-            CList__Remove(mgr + 0xEC14, actor);
-        }
-#endif
     }
 }
 
@@ -1281,23 +1264,6 @@ typedef struct {
     /* 0x18 */ f32 unk18;
 } Render;
 
-#ifdef TARGET_PORT
-typedef struct SourceModel {
-/* the view at the host offsets of CROMParticleEffect (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_SourceModel(m) __builtin_offsetof(CROMParticleEffect, m)
-    union {
-        struct { u8 _hp_flags[T2_HOFF_SourceModel(m_dwFlags)]; u32 flags; }; /* N64 0x0 */
-        struct { u8 _hp_large[T2_HOFF_SourceModel(m_pModel)]; s32 large; }; /* N64 0x14 */
-    };
-} SourceModel;
-#else
-typedef struct {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ u8 pad4[0x10];
-    /* 0x14 */ s32 large;
-} SourceModel;
-#endif
 
 #ifdef TARGET_PORT
 typedef struct Actor {
@@ -1311,7 +1277,7 @@ typedef struct Actor {
         struct { u8 _hp_flags[T2_HOFF_Actor(m_dwFlags)]; u32 flags; }; /* N64 0x40 */
         struct { u8 _hp_matrices[T2_HOFF_Actor(m_mtxDraw)]; CMtxF matrices[1]; }; /* N64 0x48 */
         struct { u8 _hp_bones[T2_HOFF_Actor(m_mtxDraw) + 80]; CMtxF *bones; }; /* N64 0x98 */
-        struct { u8 _hp_model[T2_HOFF_Actor(m_pEffect)]; SourceModel *model; }; /* N64 0xF8 */
+        struct { u8 _hp_model[T2_HOFF_Actor(m_pEffect)]; CROMParticleEffect *model; }; /* N64 0xF8 */
         struct { u8 _hp_unk130[T2_HOFF_Actor(m_vSize.y)]; f32 unk130; }; /* N64 0x130 */
         struct { u8 _hp_unk134[T2_HOFF_Actor(m_vSize.z)]; f32 unk134; }; /* N64 0x134 */
         struct { u8 _hp_ai[T2_HOFF_Actor(m_vGrowth.z)]; s32 ai; }; /* N64 0x140 */
@@ -1331,7 +1297,7 @@ typedef struct Actor {
     /* 0x088 */ u8 pad88[0x98 - 0x88];
     /* 0x098 */ CMtxF *bones;
     /* 0x09C */ u8 pad9C[0xF8 - 0x9C];
-    /* 0x0F8 */ SourceModel *model;
+    /* 0x0F8 */ CROMParticleEffect *model;
     /* 0x0FC */ u8 padFC[0x130 - 0xFC];
     /* 0x130 */ f32 unk130;
     /* 0x134 */ f32 unk134;
@@ -1449,46 +1415,7 @@ typedef struct Effect {
 } Effect;
 #endif
 
-#ifdef TARGET_PORT
-typedef struct EffectList {
-/* the view at the host offsets of CList (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_EffectList(m) __builtin_offsetof(CList, m)
-    union {
-        struct { u8 _hp_head[T2_HOFF_EffectList(m_pHead)]; Effect *head; }; /* N64 0x0 */
-        struct { u8 _hp_tail[T2_HOFF_EffectList(m_pTail)]; Effect *tail; }; /* N64 0x4 */
-        u8 _hp_size[sizeof(CList)];
-    };
-} EffectList;
-#else
-typedef struct {
-    /* 0x00 */ Effect *head;
-    /* 0x04 */ Effect *tail;
-    /* 0x08 */ u8 pad8[0xC];
-} EffectList;
-#endif
 
-#ifdef TARGET_PORT
-typedef struct EffectSystem {
-/* the view at the host offsets of CParticleSystem (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_EffectSystem(m) __builtin_offsetof(CParticleSystem, m)
-    union {
-        struct { u8 _hp_free[T2_HOFF_EffectSystem(m_FreeList)]; EffectList free; }; /* N64 0xEC00 */
-        struct { u8 _hp_groups[T2_HOFF_EffectSystem(m_DrawList)]; EffectList groups; }; /* N64 0xEC14 */
-        struct { u8 _hp_lists[T2_HOFF_EffectSystem(m_ActiveList)]; EffectList lists[3]; }; /* N64 0xEC28 */
-        struct { u8 _hp_resource[T2_HOFF_EffectSystem(m_pParticleData)]; void *resource; }; /* N64 0xEC64 */
-    };
-} EffectSystem;
-#else
-typedef struct {
-    /* 0x0000 */ u8 pad0[0xEC00];
-    /* 0xEC00 */ EffectList free;
-    /* 0xEC14 */ EffectList groups;
-    /* 0xEC28 */ EffectList lists[3];
-    /* 0xEC64 */ s32 resource;
-} EffectSystem;
-#endif
 
 #ifdef TARGET_PORT
 typedef struct Camera {
@@ -1523,7 +1450,7 @@ extern u8 D_8010FF34[];
 #endif
 
 extern s32 BinaryRange(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
-extern void func_00225C08(void *, s32, CVector3 *);
+extern void CScene__BroadcastNoise(void *, s32, CVector3 *);
 extern s32 Random_Next(void);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -1542,7 +1469,7 @@ extern void CMtxF__Identity(CMtxF *m);
 #endif
 extern void GameObject_GetAimRotation(CQuaternion *q, Owner *owner, CVector3 pos);
 extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *m);
-extern void func_00207914(u32 *bits, s32 value);
+extern void Material_GetTextureSet(u32 *bits, s32 value);
 extern f32 RandomInPackedRange(PackedRange r);
 extern f32 HalfToFloat(u16 h);
 extern void GameObject_TraceMove(Effect *effect, CVector3 pos, CVector3 *outPos, void **outRegion, s32 a, s32 b);
@@ -1552,11 +1479,7 @@ extern void Color_Darken(u8, u8, u8, u8, u8 *, u8 *, u8 *);
 extern void AI_HearNoise(Actor *actor, s32 *ai, CVector3 *from, s32 arg3);
 extern void CParticle__Attach(Effect *effect, sptr, sptr);
 extern void Trail_AddNode(void *, Effect *, s32);
-#ifdef TARGET_PORT
 extern void *DLight_Spawn(void *, s32);
-#else
-extern sptr DLight_Spawn(void *, s32);
-#endif
 extern void CParticle__StartLoopSound(Effect *effect, s32 sound);
 extern void Sound__Play(s16 sound, CVector3 pos, sptr a, sptr b);
 
@@ -1564,10 +1487,10 @@ static __inline__ s32 randomCount(s32 range) {
     return range != 0 ? Random_Next() % (range + 1) : 0;
 }
 
-static __inline__ Effect *findOwned(EffectList *list, void *ownerId, Entry *entry) {
+static __inline__ Effect *findOwned(CList *list, void *ownerId, Entry *entry) {
     Effect *effect;
 
-    effect = list->head;
+    effect = list->m_pHead;
     if (entry != 0) {
         for (; effect != 0; effect = effect->next) {
             if (effect->ownerId == ownerId && effect->entry == entry) {
@@ -1584,25 +1507,25 @@ static __inline__ Effect *findOwned(EffectList *list, void *ownerId, Entry *entr
     return 0;
 }
 
-static __inline__ Effect *allocateEffect(EffectSystem *sys, u8 index) {
+static __inline__ Effect *allocateEffect(CParticleSystem *sys, u8 index) {
     Effect *effect;
-    EffectList *list;
+    CList *list;
     s32 i;
 
-    if (sys->free.head == 0) {
+    if (sys->m_FreeList.m_pHead == 0) {
         for (i = 0; i <= index; i++) {
-            if ((&sys->lists[i])->tail != 0) {
-                CParticleSystem__Free(sys, (&sys->lists[i])->tail);
+            if ((&sys->m_ActiveList[i])->m_pTail != 0) {
+                CParticleSystem__Free(sys, (&sys->m_ActiveList[i])->m_pTail);
                 break;
             }
         }
     }
-    effect = sys->free.head;
+    effect = sys->m_FreeList.m_pHead;
     if (effect == 0) {
         return 0;
     }
-    CList__Remove(&sys->free, effect);
-    list = &sys->lists[index];
+    CList__Remove(&sys->m_FreeList, effect);
+    list = &sys->m_ActiveList[index];
     CList__AddHead(list, effect);
     effect->list = list;
     effect->groupNext = 0;
@@ -1611,7 +1534,6 @@ static __inline__ Effect *allocateEffect(EffectSystem *sys, u8 index) {
     return effect;
 }
 
-#ifdef TARGET_PORT
 /* The host aimEffect: the hit target is a CGameObjectInstance (bones, intelligence, AI by member). */
 static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
     CMtxF targetMtx;
@@ -1647,44 +1569,8 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
         }
     }
 }
-#else
-static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
-    CMtxF targetMtx;
-    CMtxF targetInv;
-    CVector3 up;
-    Actor *targetActor;
-    s32 targetTeam;
-    CCollisionResults *scene;
 
-    if (gCollisionResults.m_nInstanceNode != -1) {
-        effect->mode = -4;
-        targetActor = (Actor *)gCollisionResults.m_pInstance;
-        targetTeam = gCollisionResults.m_Frame.action;
-        CMtxF__FromMtxAffine(&targetMtx, &targetActor->bones[gCollisionResults.m_nInstanceNode]);
-        CMtxF__InvertAffine(&targetInv, &targetMtx);
-        scene = &gCollisionResults;
-        CMtxF__TransformPoint(&targetInv, &scene->m_vInstancePos, &effect->attachPos);
-        up = gCollisionResults.m_vVelocity;
-        CVector3__Normalize(&up);
-        CMtxF__RotateVector(&targetInv, &up, vel);
-        effect->target = (sptr) targetActor;
-        effect->flags |= 0x10000;
-        effect->shake = gCollisionResults.m_nInstanceNode;
-        if (targetActor->def->m_Type == 1) {
-            if (effect->owner != 0) {
-                AI_HearNoise(targetActor, &targetActor->ai, &effect->owner->pos, 3);
-            } else {
-                AI_HearNoise(targetActor, &targetActor->ai, &scene->m_vInstancePos, 3);
-            }
-        }
-        if (effect->kind == 0x56 && targetTeam == 2) {
-            effect->flags |= 0x4000000;
-        }
-    }
-}
-#endif
-
-s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount, sptr arg4, s32 kind,
+s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s32 *refCount, sptr arg4, s32 kind,
                   CVector3 arg6, CQuaternion rotation, CVector3 pos, void *region, s32 arg10, s32 arg11) {
     CMtxF mtx;
     CVector3 dir;
@@ -1718,11 +1604,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
     s32 spread;
     u32 *bits;
     u8 mask;
-#ifdef TARGET_PORT
     void *resource;
-#else
-    sptr resource;
-#endif
     EntryBlock *block;
     s32 numEntries;
     Entry *templates;
@@ -1742,7 +1624,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
         return 0;
     }
     count = 0;
-    resource = sys->resource;
+    resource = sys->m_pParticleData;
     gCollisionResultsP = &target;
     block = CISet__GetBlock(resource, 1);
     numEntries = block->count;
@@ -1780,12 +1662,8 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     ownerId = owner;
                     break;
                 case 0:
-#ifdef TARGET_PORT
                     /* type 0 (a static object): its id word at N64 0x80 */
                     ownerId = (void *) (sptr) ((CStaticObject *) owner)->m_LitKey;
-#else
-                    ownerId = owner->ownerId;
-#endif
                     owner = 0;
                     break;
             }
@@ -1798,7 +1676,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
             entry = &entries[i];
             ok = (entry->playerMask & mask) != 0;
             if ((entry->flags & 0x80) && ownerId != 0) {
-                if (findOwned(&sys->lists[(s8) entry->params->listIndex], ownerId, entry) != 0) {
+                if (findOwned(&sys->m_ActiveList[(s8) entry->params->listIndex], ownerId, entry) != 0) {
                     ok = 0;
                 }
             }
@@ -1873,7 +1751,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                 continue;
             }
             if (entry->params->event != 0) {
-                func_00225C08(&gScene, entry->params->event, &pos);
+                CScene__BroadcastNoise(&gScene, entry->params->event, &pos);
             }
             extra = 0;
             if (entry->flags & 0x8000) {
@@ -1895,11 +1773,11 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                         }
                         CMtxF__FromMtxAffine(&mtx, &source->matrices[gEvenOdd]);
                         scale = 0.09765625f;
-                        if (source->model->large != 0) {
+                        if (source->model->m_pModel != 0) {
                             scale = 2.857143f;
                         }
                         CMtxF__ScaleAxes(&mtx, scale, scale, scale);
-                        if (source->model->flags & 8) {
+                        if (source->model->m_dwFlags & 8) {
                             CMtxF__Translate(&mtx, 0.0f, -source->unk130 * source->unk134, 0.0f);
                         }
                         break;
@@ -1932,7 +1810,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     break;
                 }
                 count++;
-                func_00207914(&effect->bits, entry->unk4);
+                Material_GetTextureSet(&effect->bits, entry->unk4);
                 effect->velocity.x = 0;
                 effect->velocity.y = 0;
                 effect->velocity.z = 0;
@@ -2102,17 +1980,17 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                 if (entry->params->group != 3) {
                     Effect *other;
 
-                    for (other = sys->groups.head; other != 0; other = other->groupNext) {
+                    for (other = sys->m_DrawList.m_pHead; other != 0; other = other->groupNext) {
                         if (other->entry == effect->entry) {
                             break;
                         }
                     }
                     if (other != 0) {
-                        CList__InsertBefore(&sys->groups, other, effect);
+                        CList__InsertBefore(&sys->m_DrawList, other, effect);
                     } else if (effect->entry->flags & 0x2000) {
-                        CList__AddHead(&sys->groups, effect);
+                        CList__AddHead(&sys->m_DrawList, effect);
                     } else {
-                        CList__AddTail(&sys->groups, effect);
+                        CList__AddTail(&sys->m_DrawList, effect);
                     }
                     effect->flags |= 0x1000000;
                 }
@@ -2144,17 +2022,10 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     Trail_AddNode(gEngineApp_m_SwooshSystem, effect, entry->unk6);
                 }
                 if (entry->unk7 != -1) {
-#ifdef TARGET_PORT
                     ((CParticle *) effect)->m_pDLight = DLight_Spawn(D_8010FF34, entry->unk7);
                 } else {
                     ((CParticle *) effect)->m_pDLight = NULL;
                 }
-#else
-                    effect->sound = DLight_Spawn(D_8010FF34, entry->unk7);
-                } else {
-                    effect->sound = 0;
-                }
-#endif
                 if (!(effect->flags & 0x200000) && (sound = entry->sound) != 0) {
                     switch (effect->kind) {
                         case 0x22:

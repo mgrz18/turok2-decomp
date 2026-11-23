@@ -37,11 +37,7 @@ void CGameObjectInstance__DrawModel(CGameObjectInstance *actor, sptr arg1, void 
 void Render_DrawModelShared(s32 *arg0, sptr arg1, s32 arg2, void *arg3, sptr arg4, s32 arg5, s32 arg6);
 void Render_QueueModelInstance(s32 *arg0, sptr arg1, s32 arg2, void *arg3, sptr arg4, s32 arg5, s32 arg6);
 
-#ifdef TARGET_PORT
 #define HIT_LIMIT(hit) (*CISet__GetBlock(*(sptr *) (hit)->unkC, 2)) /* the handle holds a pointer */
-#else
-#define HIT_LIMIT(hit) (*CISet__GetBlock(*(hit)->unkC, 2))
-#endif
 #define WEAPON_INDEX(player) (gWeaponInfoTable[(player)->m_Data.m_CurrentWeapon]->model - 0x5E0)
 
 void Player_DrawNodeCallback(CGameObjectInstance *actor, sptr arg1, Hit *hit) {

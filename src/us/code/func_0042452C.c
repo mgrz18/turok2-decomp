@@ -3,7 +3,7 @@
 #include "globals/render.h"
 
 
-void func_0042452C(void) {
+void Video_StartResolutionChange(void) {
     if (gVideoClearFrames == 0) {
         gVideoClearFrames = 0x14;
     }

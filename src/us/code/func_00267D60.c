@@ -1,3 +1,6 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: 5 of 13 words (the permuter finds only other
+ * fakes: a do { return } while (0)). */
 #include "structs/vector.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/8024D018_4.CPP, func_8024DD58_de.

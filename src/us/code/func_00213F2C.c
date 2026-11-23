@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-f32 func_00213F2C(f32 arg0, f32 arg1)
+f32 Math_ModFloor(f32 arg0, f32 arg1)
 {
   f32 temp_f12;
   f32 var_f0;

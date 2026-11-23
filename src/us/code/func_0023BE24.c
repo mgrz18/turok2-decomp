@@ -8,8 +8,8 @@
 
 void CGameRegion__GetNormalRaw(CVector3 *normal, CGameRegion *region);
 s32 CGameRegion__IsSteep(CGameRegion *region);
-s32 func_00267EA8(CGameObjectInstance *obj);
-s32 func_00267EE8(CGameObjectInstance *obj);
+s32 GameObject_CanClimbLedges(CGameObjectInstance *obj);
+s32 GameObject_CanClimbUp(CGameObjectInstance *obj);
 f32 CGameRegion__GetHeight(CGameRegion *region, f32 x, f32 z);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 func_002982F0(f32);   /* sinf */
@@ -61,7 +61,7 @@ void Sweep_FollowGround(Sweep *sweep) {
     }
     CGameRegion__GetNormalRaw(&normal, (CGameRegion *)obj->header.m_pCurrentRegion);
     if (CGameRegion__IsSteep((CGameRegion *)obj->header.m_pCurrentRegion)) {
-        if (func_00267EA8(obj)) {
+        if (GameObject_CanClimbLedges(obj)) {
             if (!(((CGameRegion *)obj->header.m_pCurrentRegion)->m_wFlags & 0x10)) {
                 sweep->onGround = 0;
                 return;
@@ -73,7 +73,7 @@ void Sweep_FollowGround(Sweep *sweep) {
             }
         } else {
             allowed = 0;
-            if ((sweep->def->m_dwFlags & 0x10000) || func_00267EE8(obj)) {
+            if ((sweep->def->m_dwFlags & 0x10000) || GameObject_CanClimbUp(obj)) {
                 allowed = 1;
             }
             if (allowed == 0) {

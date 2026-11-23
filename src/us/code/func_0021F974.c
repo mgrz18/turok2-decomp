@@ -9,7 +9,7 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-void func_0021F974(void *arg0, f32 arg1, void *arg2, void *arg3)
+void Anim_LerpVector(void *arg0, f32 arg1, void *arg2, void *arg3)
 {
   f32 temp_f1;
   f32 temp_f1_2;

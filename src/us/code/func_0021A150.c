@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
 
@@ -8,7 +9,6 @@
 #include "structs/game_object.h"
 #include "structs/cache.h"
 
-extern u8 D_800A5AC4[];     /* "anim object info" */
 
 void CMtxF__TransformBox(void *, void *, void *);
 void CAnimationState__Reset(void *);
@@ -33,7 +33,7 @@ void CGameObjectInstance__SetupAnimation(CGameObjectInstance *actor, s32 *a1, s3
         actor->m_rpObject = (void *)(sptr)CISet__GetROMAddressAndSize(tree, id, 0, &size);
         actor->m_rpObjectHeader = size;
         actor->m_rpAnims = (void *)(sptr)CISet__GetROMAddress((sptr)tree, id, 2);
-        set = CCache__Request(0, (s32)(sptr)actor->m_rpObject, actor->m_rpObjectHeader, 0, 0, 0, (char *)D_800A5AC4, 1);
+        set = CCache__Request(0, (s32)(sptr)actor->m_rpObject, actor->m_rpObjectHeader, 0, 0, 0, (char *)sCGameObjectInstanceCacheDesc_AnimObjectInfo, 1);
         if (set != NULL) {
             setTree = set->data;
             data = CISet__GetBlock(setTree, 0);
@@ -41,14 +41,10 @@ void CGameObjectInstance__SetupAnimation(CGameObjectInstance *actor, s32 *a1, s3
             CMtxF__TransformBox(&actor->m_mfOrient, data, &actor->m_vMin);
             CAnimationState__Reset(&actor->m_CurrentAnimation);
             CAnimationState__Reset(&actor->m_BlendAnimation);
-#ifdef TARGET_PORT
             /* block 1 is a CUSet (s32 element size, s32 count): the u16 at +6 is the
              * count's low half on the N64; the archive swaps the words, so on a
              * little-endian host it is the word at +4 */
             actor->m_nAnims = (u16) ((u32 *) CISet__GetBlock((void *)(sptr)setTree, 1))[1];
-#else
-            actor->m_nAnims = ((u16 *) CISet__GetBlock((void *)(sptr)setTree, 1))[3];
-#endif
             actor->m_dwFlags |= 0x40000;
             if (anim > 0) {
                 anim = CGameObjectInstance__PickRandomAnim(actor, anim, -1);
@@ -108,7 +104,6 @@ struct Actor {
     void (*init)(Actor *, void *);  /* 0x244 */
 };
 
-extern u8 D_800A5AC4[];     /* "anim object info" */
 
 void CMtxF__TransformBox(void *, void *, void *);
 void CAnimationState__Reset(void *);
@@ -130,7 +125,7 @@ void CGameObjectInstance__SetupAnimation(Actor *actor, sptr a1, s32 a2, sptr ani
         actor->unkAC = CISet__GetROMAddressAndSize(tree, id, 1, &actor->unkB4);
         actor->unkA4 = CISet__GetROMAddressAndSize(tree, id, 0, &actor->unkB0);
         actor->unkA8 = CISet__GetROMAddress(tree, id, 2);
-        set = CCache__Request(0, actor->unkA4, actor->unkB0, 0, 0, 0, D_800A5AC4, 1);
+        set = CCache__Request(0, actor->unkA4, actor->unkB0, 0, 0, 0, sCGameObjectInstanceCacheDesc_AnimObjectInfo, 1);
         if (set != NULL) {
             setTree = *set;
             data = CISet__GetBlock(setTree, 0);

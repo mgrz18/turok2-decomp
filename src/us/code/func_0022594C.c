@@ -7,7 +7,7 @@
 #include "structs/game_object.h"
 #include "structs/world.h"
 
-void *func_0022594C(void *arg0, void *arg1) {
+void *CScene__FindNearestCover(void *arg0, void *arg1) {
     CScene *scene = arg0;
     CGameObjectInstance *self = arg1;
     CGameObjectInstance *best = NULL;
@@ -32,7 +32,7 @@ void *func_0022594C(void *arg0, void *arg1) {
 typedef signed char s8;
 typedef signed int s32;
 typedef float f32;
-void *func_0022594C(void *arg0, void *arg1)
+void *CScene__FindNearestCover(void *arg0, void *arg1)
 {
   f32 temp_f0;
   f32 temp_f0_2;

@@ -26,7 +26,7 @@ from its own matching ELF, `build/turok2.us.elf`.
 | `port/gen/data_virtual.c` | module-1 VM data (`.virtual`): menu descriptors, mode tables |
 | `port/gen/data_misc.c` | the rest (`.code` data, `.lnk_debug`, `.pre_virtual`, microcode sections) |
 | `port/gen/data_bss.c` | .bss: zero arrays, plus the aliases into them |
-| `port/gen/data_abs.c` | 6 ROM offsets that the C takes the address of (`(u32)&D_14A000`), as absolute symbols |
+| `port/gen/data_abs.c` | 6 ROM offsets that the C takes the address of (`(u32)&gVirtualRomStart`), as absolute symbols |
 | `port/gen/relocs.c` | `t2_data_syms[]` and `t2_n64_to_host(u32)`: N64 address to host address |
 | `port/gen/data_report.txt` | counts, declaration conflicts, unresolved pointer slots |
 
@@ -152,7 +152,7 @@ That is exactly the "function-side remainder" (docs/port/BUILD.md). No data symb
 - **Module 2** is skipped entirely, as the task asked: no `.virtual_1` data and no objects.
 - The `void *` slots are host pointers, so the data cannot be written back as N64 bytes. Nothing
   needs to (saves go through their own code).
-- `data_abs.c` (`D_14A000` and 5 others) uses absolute symbols. These need `-no-pie` on ELF, or
+- `data_abs.c` (`gVirtualRomStart` and 5 others) uses absolute symbols. These need `-no-pie` on ELF, or
   the code using them should switch to archive keys (docs/assets/PORT.md).
 
 ## What the next round needs

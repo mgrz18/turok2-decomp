@@ -32,7 +32,6 @@ void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), void (*swap)());
 s32 MantidQueen_SortCompare();
 void MantidQueen_SortSwap();
 
-#ifdef TARGET_PORT
 #include "structs/player.h"
 /* Host body (round 9 x2): the minions by member. The N64 view (Member00401FCC) put the CAI at
  * 0x140, the mode word at 0x174 (tested big-endian: mode 0, last mode 1), the anim speed at 0x1FC
@@ -72,38 +71,3 @@ void MantidQueen_SendMinions(WaveBossState *s, s32 *active) {
         }
     }
 }
-#else
-void MantidQueen_SendMinions(WaveBossState *s, s32 *active) {
-    WaveBossStep *cfg = gMantidQueen.step;
-    Entity00401FCC *player;
-    CVector3 pos;
-    Member00401FCC *member;
-    s32 i;
-
-    player = CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, s->actor->header.m_vPos);
-    if (player != NULL) {
-        pos = player->pos;
-    } else {
-        pos.x = 0.0f;
-        pos.y = 0.0f;
-        pos.z = 0.0f;
-    }
-    for (i = 0; i < s->memberCount; i++) {
-        member = (Member00401FCC *) s->members[i];
-        member->distance = AI_DistSqToPointAtHeight(member, pos);
-        member->unk250 = 1;
-        if ((member->u174.word & 0xFFFF0000) == 0x10000) {
-            member->delay = Random_Blend(0.75f, 1.25f);
-        }
-    }
-    Sort_Quick(s->members, s->memberCount, 4, MantidQueen_SortCompare, MantidQueen_SortSwap);
-    for (i = 0; i < s->memberCount && s->toSpawn != 0 && *active < cfg->maxActive; i++) {
-        member = (Member00401FCC *) s->members[i];
-        if (member->u174.state == 0 && CAI__SetMode(member, member->ai, 1)) {
-            member->delay = Random_Blend(1.5f, 2.0f);
-            s->toSpawn--;
-            (*active)++;
-        }
-    }
-}
-#endif

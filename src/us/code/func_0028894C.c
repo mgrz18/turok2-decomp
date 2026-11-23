@@ -1,3 +1,6 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: CEngineApp__UpdateFade (two sites): 101-103 of
+ * 116 words. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002935A4.c, func_002935A4, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game.h"

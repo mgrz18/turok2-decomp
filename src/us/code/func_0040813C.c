@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "structs/player.h"
@@ -17,7 +18,6 @@ typedef struct {
 } BossAI;
 
 
-extern u8 D_800B6674[];
 
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
 void Sound__PlaySpeech(s32 sound);
@@ -59,7 +59,7 @@ void TotemDefense_Fail(TotemDefenseState *fight) {
     CPlayer *current;
 
     player = CPlayerPool__GetFirstActive(&game->m_PlayerList);
-    CCameraPool__AddText(game->m_CameraPool, player->m_pCamera, D_800B6674);
+    CCameraPool__AddText(game->m_CameraPool, player->m_pCamera, sTotemDefenseText_MissionFailed);
     player->m_InvincibilityTime = 900.0f;
     fight->state = 2;
     fight->warned = 2;

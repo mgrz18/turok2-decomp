@@ -24,7 +24,7 @@ typedef struct EventParams {
 
 extern s32 Sound__PlayPitched(s32 id, CVector3 pos, s32 arg4, sptr selected, f32 scale);
 
-void func_0023801C(s32 arg0, Object *obj, s32 arg2, CVector3 pos, EventParams params) {
+void ImpactEvent_PlayPitchedSound(s32 arg0, Object *obj, s32 arg2, CVector3 pos, EventParams params) {
     s32 *global = &gEngineApp_m_Settings.paused;
     sptr selected;
     f32 scale;

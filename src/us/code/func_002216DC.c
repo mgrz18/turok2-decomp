@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/world.h"
 #include "structs/collision.h"
 #include "structs/rect.h"
@@ -26,18 +27,11 @@ typedef struct Viewer {
     f32 max[3];                 /* 0x35C */
 } Viewer;
 
-extern char D_800A5F6C[];       /* "grid section" */
 
-#ifdef TARGET_PORT /* the viewers are cameras: next = m_pNext, min/max = m_AnimMin/m_AnimMax (host layout) */
 #include "structs/camera.h"
 #define V_NEXT(v) ((Viewer *) ((CCamera *) (v))->m_pNext)
 #define V_MIN(v) (&((CCamera *) (v))->m_AnimMin.x)
 #define V_MAX(v) (&((CCamera *) (v))->m_AnimMax.x)
-#else
-#define V_NEXT(v) ((v)->next)
-#define V_MIN(v) ((v)->min)
-#define V_MAX(v) ((v)->max)
-#endif
 
 
 /* Loads the grid sections inside the visible bounds that some viewer overlaps. */
@@ -116,7 +110,7 @@ void CScene__LoadVisibleGridSections(CScene *world) {
                 continue;
             }
             handle = CCache__Request(0, CISet__GetROMAddressAndSize(world->m_pLevelInfo, world->m_LevelInfoKey, idx, &size), size, 8, world,
-                                   CScene__DecompressGridSection, D_800A5F6C, 0);
+                                   CScene__DecompressGridSection, sCSceneCacheDesc_GridSection, 0);
             if (handle == NULL) {
                 continue;
             }

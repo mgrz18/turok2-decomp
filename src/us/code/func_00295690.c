@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 1 register pin (`register ... asm("$n")`); without them: alEnvmixerPull 6 of
+ * 339 words. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/libultra/alEnvmixerPull.c, alEnvmixerPull (libaudio env.c), with Turok 2's layouts.
  * Kept from that source: `one`/`eq` set at the top of the loop for the ROM's hoisting order, and the
  * HACK `register ALParam *pp asm("$2")` in the type 11 arm (ROM keeps the pointer in v0). */

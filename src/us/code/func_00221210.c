@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00287EE8.c, func_00287EE8, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/game.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
@@ -7,7 +8,6 @@
 #include "protos/scene.h"
 #ifdef TARGET_PORT
 #include "structs/game.h"
-extern CGame gEngineApp_m_Game;
 #endif
 
 /* Builds the frame's actor lists: every live level actor (flag 0x100) whose
@@ -33,7 +33,7 @@ extern f32 D_800F5A18[];    /* active box: max at +4 (min at +1) */
 void CPlayerPool__RegisterActors(void *, CScene *);
 s32 Cinema_PathPlaying(void);
 s32 GameObject_IsSolid(CGameObjectInstance *);
-s32 func_002681BC(CGameObjectInstance *);
+s32 GameObject_IsMover(CGameObjectInstance *);
 s32 Frustum_TestBox(void *, f32 *);
 void CGameObjectInstance__ClearDrawMatrices(CGameObjectInstance *);
 void CInstancePool__UpdateVisibility(void *, CScene *);
@@ -122,7 +122,7 @@ void CScene__BuildActorLists(CScene *w) {
                             w->m_nDrawActors = t0 + 1;
                         }
                     }
-                    if (func_002681BC(o) != 0) {
+                    if (GameObject_IsMover(o) != 0) {
                         t1 = w->m_nMovers;
                         if (t1 != 0x80) {
                             w->m_pMovers[t1] = (CGameObjectInstance *)o;

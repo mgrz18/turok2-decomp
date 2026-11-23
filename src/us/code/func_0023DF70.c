@@ -39,7 +39,7 @@ typedef struct HitInst {
 
 f32 GameObject_GetCollisionHeight(HitInst *inst);
 f32 GameObject_GetCollisionRadius(HitInst *inst);
-f32 func_0026841C(HitInst *inst);
+f32 GameObject_GetCollisionYOffset(HitInst *inst);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 s32 Sweep_HitPlane(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
 s32 Sweep_HitCylinder(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f32 maxY, f32 minY,
@@ -102,7 +102,7 @@ void Sweep_TestInstance(Sweep *sweep, SweepBox *box, HitInst *other) {
         }
         special = 1;
     }
-    bottom = other->pos.y + func_0026841C(other);
+    bottom = other->pos.y + GameObject_GetCollisionYOffset(other);
     top = GameObject_GetCollisionHeight(other) + bottom;
     if (box->flag) {
         normal.x = normal.z = 0.0f;

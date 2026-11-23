@@ -2,20 +2,15 @@
 /* WRONG CUT: the real function starts at 0x004691C0 (size 0x90 = 144); the two
  * words at 0x004691B8 (sw v0,0(t3); move a1,zero) are junk between objects. */
 #include "common.h"
+#include "structs/gbi.h"
 
 /* Initialise a unit quad (4 vertices in the XZ plane, 32x32 texels, white). */
 
-typedef struct {
-    s16 ob[3];  /* 0x00 */
-    u16 flag;   /* 0x06 */
-    s16 tc[2];  /* 0x08 */
-    u8 cn[4];   /* 0x0C */
-} QuadVtx; /* 0x10 bytes */
 
-extern QuadVtx D_8011AD48[4];
+extern Vtx_t D_8011AD48[4];
 
-void func_004691C0(void) {
-    QuadVtx *v;
+void Render_InitUnitQuad_2(void) {
+    Vtx_t *v;
     s32 i;
 
     i = 0;

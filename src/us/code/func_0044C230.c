@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 6 register pins (`register ... asm("$n")`); without them: Menu_DrawBar_2 26
+ * of 180 words. */
 /* The second VM module's copy of src/us/code/MenuItem_FormatBinding.c, byte for byte,
  * at the same link address (named 0x44C230-0x450484, linked 0x413230-0x417484):
  * the same source, with the functions under their second-module names. Its
@@ -558,7 +560,7 @@ extern f32 func_002982F0(f32 angle);             /* sin */
 extern void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
 extern void CGameObjectInstance__Construct(CGameObjectInstance *fx, s32 a, s32 b, s32 c, void *d, s32 e, s32 f, f32 g, CVector3 h, s32 i, CVector3 j,
                           CVector3 k, s32 l);
-extern void func_0021E5D4(CGameObjectInstance *fx);
+extern void CGameObjectInstance__InitAIType(CGameObjectInstance *fx);
 extern void CGameObjectInstance__ClearDrawMatrices(CGameObjectInstance *fx);
 extern void CGameObjectInstance__UpdateAnimation(CGameObjectInstance *fx);
 extern void Render_ResetBatches(void);
@@ -633,7 +635,7 @@ void MenuItem_DrawModel_2(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unus
             if (s3 != NULL && !(o->flags & 0x2000000)) {
                 CGameObjectInstance__Construct(fx, -1, p->objType, gDefaultVisBits, s3, -1, 0, w->camera->m_ViewParams.m_RotY + 3.141593f, v70, 0, p->scale, v50,
                               0);
-                func_0021E5D4(fx);
+                CGameObjectInstance__InitAIType(fx);
                 o->flags = o->flags | 0x2000000;
             }
             tt = func_002982F0((f32) (u32) (gFrameCountGameplay * 10) * 0.017453294f);
@@ -1286,8 +1288,8 @@ CIntelligence *MenuItem_SetModel_2(MenuItem *a, s32 id, s32 arg) {
     return &p->intel;
 }
 
-/* ---------------- func_0044F2E4 ---------------- */
-s32 func_0044F2E4(Menu *arg0) {
+/* ---------------- Menu_GetControllerInput_2 ---------------- */
+s32 Menu_GetControllerInput_2(Menu *arg0) {
     ControllerProfile *temp_v1;
     s32 var_v0;
 
@@ -1403,55 +1405,24 @@ s32 Menu_StepValue_2(Menu *menu,s32 value,s32 step,s32 minimum,s32 maximum,s32 w
 s32 func_00285628_416558(s32) __asm__("Controller_MenuLeft");
 s32 func_00285670_416558(s32) __asm__("Controller_MenuRight");
 /* Menu_StepValue_2 with its own left/right reading (Menu controller). */
-s32 Menu_StepValueLR_2(Menu *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
-{
-  s32 var_s0;
-  s32 var_s1;
-  s32 var_s2;
-  s32 var_s4;
-  s32 var_s5;
-  s32 var_v0;
-  int new_var;
-  void *var_s3;
-  ;
-  var_s0 = arg1;
-  var_s4 = arg2;
-  var_s1 = arg4;
-  var_s5 = arg5;
-  var_s2 = arg3;
-  if (func_00285628_416558((sptr) arg0->controller) != 0)
-  {
-    var_s0 -= var_s4;
-    if (var_s0 < var_s2)
-    {
-      var_s0 = var_s2;
-      if (var_s5 != 0)
-      {
-        if (var_s2 || arg0)
-        {
-          var_s0 = var_s1;
+s32 Menu_StepValueLR_2(Menu *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap) {
+    /* De-faked in round 21 (j4): written as Menu_StepValue is, it matches (the draft had two
+     * identical arms and read the controller at its offset). */
+    if (func_00285628_416558((sptr) menu->controller)) {
+        value -= step;
+        if (value < minimum) {
+            value = minimum;
+            if (wrap) value = maximum;
         }
-        else
-        {
-          var_s0 = var_s1;
+    }
+    if (func_00285670_416558((sptr) menu->controller)) {
+        value += step;
+        if (value > maximum) {
+            value = maximum;
+            if (wrap) value = minimum;
         }
-      }
     }
-  }
-  var_v0 = var_s0;
- new_var = 0x20; /* the controller, read at its offset to match */ if (func_00285670_416558(*((s32 *) (((s8 *) arg0) + new_var))) != 0) { var_s0 += var_s4;
-    var_v0 = var_s0;
-    if (var_s1 < var_s0)
-    {
-      var_s0 = var_s1;
-      if (var_s5 != 0)
-      {
-        var_s0 = var_s2;
-      }
-      var_v0 = var_s0;
-    }
-  }
-  return var_v0;
+    return value;
 }
 
 /* ---------------- MenuPool_Construct_2 ---------------- */
@@ -1644,16 +1615,10 @@ s32 MenuPool_CountOpen_2(MenuPool *arg0) {
 }
 
 /* ---------------- MenuPool_GetCamera_2 ---------------- */
-#ifdef TARGET_PORT
 /* as MenuPool_GetCamera: the pool's camera at the host offset of CCamera.m_MenuPool */
 sptr MenuPool_GetCamera_2(sptr arg0) {
     return arg0 - T2_OFFSETOF(CCamera, m_MenuPool);
 }
-#else
-s32 MenuPool_GetCamera_2(s32 arg0) {
-    return arg0 - 0x53C;
-}
-#endif
 
 /* ---------------- MenuPool_CloseAll_2 ---------------- */
 /* WRONG CUT: real function 0x00416B30, size 0x7C (through 0x00416BAC): splat cut the loop

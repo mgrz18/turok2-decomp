@@ -8,7 +8,7 @@
  * offsets: 0x14 the intelligence, 0xD4 the flags, 0x1A8 the AI parent, CPlayer 0xBB0 the
  * mounted enemy). The wall radius of a collision sweep: the enemy/turret/player definition's
  * m_CollisionWallRadius (0x2C), the throwable's radius (0x18); a riding player uses its mount's. */
-f32 func_00268460(u8 *actor) {
+f32 GameObject_GetSweepRadius(u8 *actor) {
     CGameObjectInstance *obj = (CGameObjectInstance *) actor;
     CIntelligence *def = obj->header.m_pIntelligence;
     CGameObjectInstance *mount;
@@ -18,7 +18,7 @@ f32 func_00268460(u8 *actor) {
             if (obj->header.m_Type == 1 && (obj->m_dwFlags & 0x300000)) {
                 mount = ((CPlayer *) obj->m_AI.m_pParent)->m_pOnEnemy;
                 if (mount != NULL) {
-                    return func_00268460((u8 *) mount);
+                    return GameObject_GetSweepRadius((u8 *) mount);
                 }
             }
             return *(f32 *) ((u8 *) def + 0x2C);
@@ -32,7 +32,7 @@ f32 func_00268460(u8 *actor) {
 }
 #else
 
-f32 func_00268460(u8 *actor) {
+f32 GameObject_GetSweepRadius(u8 *actor) {
     u8 *def = *(u8 **) (actor + 0x14);
     u8 *weapon;
 
@@ -41,7 +41,7 @@ f32 func_00268460(u8 *actor) {
             if (actor[0] == 1 && (*(s32 *) (actor + 0xD4) & 0x300000)) {
                 weapon = *(u8 **) (*(u8 **) (actor + 0x1A8) + 0xBB0);
                 if (weapon != NULL) {
-                    return func_00268460(weapon);
+                    return GameObject_GetSweepRadius(weapon);
                 }
             }
             return *(f32 *) (*(u8 **) (actor + 0x14) + 0x2C);

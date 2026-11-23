@@ -25,11 +25,10 @@ typedef struct {
     /* 0x04 */ u8 flag;
 } Chunk;
 
-extern u8 D_800F5618[0x90];
 
 void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */
 
-/* Loads the 0x90-byte block of chunk 42 of resource 2 into D_800F5618 and
+/* Loads the 0x90-byte block of chunk 42 of resource 2 into sOnScreenFontTextureBuffer and
  * points sOnScreenFontTexture at it (NULL until it is loaded). */
 void COnScreen__LoadFontTexture(void) {
     Resource *res;
@@ -52,8 +51,8 @@ void COnScreen__LoadFontTexture(void) {
         if (chunk.data != NULL) {
             chunk.data += 0x10;
         }
-        func_0029E460(D_800F5618, chunk.data, 0x90);
+        func_0029E460(sOnScreenFontTextureBuffer, chunk.data, 0x90);
         CCache__Unlock(0, res);
-        sOnScreenFontTexture = D_800F5618;
+        sOnScreenFontTexture = sOnScreenFontTextureBuffer;
     }
 }

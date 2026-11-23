@@ -33,7 +33,6 @@
 extern u8 gScheduler[];
 extern s32 D_800B6E60;
 extern s32 D_800B6E64;
-extern u32 D_800F6CA8;
 
 extern void Video_UpdateResolution(void);
 extern void Music_FadeOut(void);
@@ -41,7 +40,7 @@ extern void Sound__StopAllExcept(s32);
 extern void LoopSounds_StopAll(sptr);
 extern s32 LoopSounds_Get(void);
 extern void Controller_Service(void);
-extern void func_00228BBC(CFrameData *frame);
+extern void Scheduler_RDPDoneHook(CFrameData *frame);
 extern s32 osSpTaskYielded(OSTask *task);
 extern s32 osSpTaskYield(void);
 extern s32 osSetIntMask(s32 mask);
@@ -334,8 +333,8 @@ void __scHandleRDP(T2Sched *sc) {
         if (t->flags & 0x20) {
             frame = frameOf(t->framebuffer);
             gNumTicks3 = gNumTicks2;
-            gNumTicks2 = D_800F6CA8;
-            D_800F6CA8 = gNumTicks0;
+            gNumTicks2 = gNumTicks1;
+            gNumTicks1 = gNumTicks0;
             gNumTicks0 = gCurrentTick + 1;
             if (gNumTicks0 >= frame->m_nPredictTicks && gNumTicksWaiting == 0 && gNumTicksPending == 0) {
                 gPendingFB = (u16 *)(uptr)frame->m_pFrameBuffer;
@@ -349,7 +348,7 @@ void __scHandleRDP(T2Sched *sc) {
                     gCurrentTickWaiting = 0;
                 }
             }
-            func_00228BBC(frame);
+            Scheduler_RDPDoneHook(frame);
         }
     }
     __scTaskComplete(sc, t);

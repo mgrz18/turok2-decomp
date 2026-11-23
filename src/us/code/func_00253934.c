@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 2 register pins (`register ... asm("$n")`) and 1 empty `__asm__` barrier;
+ * without them: func_00253934 14 of 22 words (size 0x54 vs 0x58). */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0022AA34.c, func_0022AA34.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 

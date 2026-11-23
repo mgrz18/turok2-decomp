@@ -1,5 +1,8 @@
 # libultra matching — progress log
 
+> History of the first libultra rounds. The current state (which libultra the game links, the
+> per-function map against ultralib, the replacement plan) is [LIBULTRA.md](LIBULTRA.md).
+
 Living document for the libultra/libaudio/glu segment (ROM 0xC3074 - 0xDEDE0).
 
 ## TL;DR — current state

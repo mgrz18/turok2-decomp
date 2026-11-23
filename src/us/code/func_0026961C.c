@@ -10,7 +10,7 @@ typedef struct CollisionInfo {
 extern CollisionInfo D_800F1B60;
 extern CollisionInfo D_800F1BE0;
 
-s32 func_00267EE8(CGameObjectInstance *actor);
+s32 GameObject_CanClimbUp(CGameObjectInstance *actor);
 s32 GameObject_CanEnterWater(CGameObjectInstance *actor);
 s32 GameObject_CanLeaveWater(CGameObjectInstance *actor);
 s32 Collision_MoveInstance(CGameObjectInstance *actor, CVector3 pos, CollisionInfo *info);
@@ -25,7 +25,7 @@ s32 GameObject_TestMove(CGameObjectInstance *actor, CVector3 pos, CollisionInfo 
     if (actor->header.m_Type == 1 && (actor->m_dwFlags & 0x300000)) {
         info = &D_800F1BE0;
     } else {
-        alt = func_00267EE8(actor);
+        alt = GameObject_CanClimbUp(actor);
         if (!GameObject_CanEnterWater(actor)) {
             info = alt ? &D_800F1B60 : &D_800F1BE0;
         } else {

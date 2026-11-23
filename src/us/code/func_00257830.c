@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "protos/cache.h"
 
 typedef struct {
@@ -8,7 +9,6 @@ typedef struct {
 } PlayerPool;
 
 s32 memset(sptr, s32, sptr);           /* extern */
-extern s32 D_800A7080;
 
 /* Allocates and clears count player records (0x1328 bytes each). */
 void CPlayerPool__AllocPlayers(PlayerPool *arg0, s32 arg1) {
@@ -18,7 +18,7 @@ void CPlayerPool__AllocPlayers(PlayerPool *arg0, s32 arg1) {
 
     temp_s0 = arg1 * 0x1328;
     arg0->count = arg1;
-    temp_v0 = CCache__Allocate(0, temp_s0, 0x23, &D_800A7080);
+    temp_v0 = CCache__Allocate(0, temp_s0, 0x23, &sCPlayerPoolCacheDesc_Players);
     arg0->block = temp_v0;
     temp_a0 = *temp_v0;
     arg0->players = temp_a0;

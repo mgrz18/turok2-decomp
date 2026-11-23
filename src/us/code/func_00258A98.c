@@ -3,20 +3,12 @@
 #include "structs/weapon.h"
 #include "protos/ai.h"
 
-#ifdef TARGET_PORT
 /* the CPlayer words by member on the host (N64 0xB2C m_CrossHairMode, 0xB30 m_CrossHairTimer,
  * 0xB38 m_pCrossHairTarget, cleared as a pointer, 0xA64 m_ContState.m_dwButtons) */
 #define PL_CROSSHAIR_MODE(p) ((p)->m_CrossHairMode)
 #define PL_CROSSHAIR_TARGET(p) (*(sptr *) &(p)->m_pCrossHairTarget)
 #define PL_CROSSHAIR_TIMER(p) ((p)->m_CrossHairTimer)
 #define PL_BUTTONS(p) ((p)->m_ContState.m_dwButtons)
-#else
-#define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
-#define PL_CROSSHAIR_MODE(p) P_S32(p, 0xB2C)
-#define PL_CROSSHAIR_TARGET(p) P_S32(p, 0xB38)
-#define PL_CROSSHAIR_TIMER(p) P_S32(p, 0xB30)
-#define PL_BUTTONS(p) P_S32(p, 0xA64)
-#endif
 
 extern s32 WeaponActor_CheckFire(CGameObjectInstance *weapon, CAI *state);
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);

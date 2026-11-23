@@ -1,75 +1,60 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_0040AD20.c, func_0040AD20.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern char D_800B4BF4[];
-extern char D_800B4C28[];
-extern char D_800B4C90[];
-extern char D_800B4D64[];
-extern char D_800B4CFC[];
-extern char D_800B4DC8[];
-extern char D_800B4E2C[];
-extern char D_800B4E64[];
-extern char D_800B4E88[];
-extern char D_800B4ED4[];
-extern char D_800B4F14[];
-extern char D_800B4F5C[];
-extern char D_800B4F90[];
-extern char D_800B4FCC[];
-extern char D_800B5008[];
-extern char D_800B5054[];
 s32 PakMessage_UpdateLine4_2(MenuItem *item) {
     switch (gPakMessageKind) {
     default:
     case 0:
-        item->text = D_800B4BF4;
+        item->text = sPakMessageText_Empty_B4BF4;
         break;
     case 1:
-        item->text = D_800B4C28;
+        item->text = sPakMessageText_ControllerPakAnd;
         break;
     case 2:
-        item->text = D_800B4C90;
+        item->text = sPakMessageText_PakNowIfYouWishTo_B4C90;
         break;
     case 3:
-        item->text = D_800B4D64;
+        item->text = sPakMessageText_PakNowIfYouWishTo_B4D64;
         break;
     case 4:
-        item->text = D_800B4CFC;
+        item->text = sPakMessageText_PakNowIfYouWishTo_B4CFC;
         break;
     case 5:
-        item->text = D_800B4DC8;
+        item->text = sPakMessageText_NowIfYouWishToPlay_B4DC8;
         break;
     case 6:
-        item->text = D_800B4E2C;
+        item->text = sPakMessageText_Game;
         break;
     case 7:
-        item->text = D_800B4E64;
+        item->text = sPakMessageText_Again;
         break;
     case 8:
-        item->text = D_800B4E88;
+        item->text = sPakMessageText_Empty_B4E88;
         break;
     case 9:
-        item->text = D_800B4ED4;
+        item->text = sPakMessageText_NowIfYouWishToPlay_B4ED4;
         break;
     case 10:
-        item->text = D_800B4F14;
+        item->text = sPakMessageText_Empty_B4F14;
         break;
     case 11:
-        item->text = D_800B4F5C;
+        item->text = sPakMessageText_Note;
         break;
     case 12:
-        item->text = D_800B4F90;
+        item->text = sPakMessageText_Empty_B4F90;
         break;
     case 13:
-        item->text = D_800B4FCC;
+        item->text = sPakMessageText_Empty_B4FCC;
         break;
     case 14:
-        item->text = D_800B5008;
+        item->text = sPakMessageText_Empty_B5008;
         break;
     case 15:
-        item->text = D_800B5054;
+        item->text = sPakMessageText_SavedNotesMayHave;
         break;
     }
     return 0;

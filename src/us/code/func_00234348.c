@@ -4,6 +4,7 @@
 #include "gbi_t2.h"
 #include "globals/engine.h"
 #include "protos/cache.h"
+#include "structs/morph.h"
 #ifdef TARGET_PORT
 #include "structs/swoosh.h"
 #endif
@@ -82,17 +83,6 @@ typedef struct {
     /* 0x0C */ s32 unkC;
 } AnimInfo;
 
-typedef struct {
-    /* 0x00 */ s32 count;
-    /* 0x04 */ void *items;
-    /* 0x08 */ void *pointsA;
-    /* 0x0C */ void *pointsB;
-    /* 0x10 */ f32 scaleA;
-    /* 0x14 */ f32 scaleB;
-    /* 0x18 */ f32 texScaleS;
-    /* 0x1C */ f32 texScaleT;
-    /* 0x20 */ f32 texStepT;
-} Morph;
 
 
 extern void *Texture_Request(void *model);

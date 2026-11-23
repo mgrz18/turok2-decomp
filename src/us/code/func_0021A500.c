@@ -33,19 +33,15 @@ struct B10H {
                 u16 h2;
 };
 extern f32 D_800A5AF8;
-#ifdef TARGET_PORT
 s32 GameObject_IsOnGround(void *actor);
-#else
-s32 GameObject_IsOnGround();
-#endif
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
 #define GameObject_GetGroundRotation GameObject_GetGroundRotation_sret
 #endif
 void GameObject_GetGroundRotation(f32 *loc, B10Obj *o);
-s32 func_002682A4(B10Obj *o);
+s32 GameObject_TiltsToGround(B10Obj *o);
 void CQuaternion__TurnToward(f32 *a, f32 *loc);
 void CQuaternion__SlerpFast(f32 *a, f32 t, f32 *b, f32 *loc);
-void func_0021A500(B10Obj *o) {
+void CGameObjectInstance__AlignToGround(B10Obj *o) {
     f32 loc[4];
     u32 fl;
     u32 mask;
@@ -58,17 +54,13 @@ void func_0021A500(B10Obj *o) {
     if (fl & 1) {
         return;
     }
-#ifdef TARGET_PORT
     r = GameObject_IsOnGround(o); /* ABI: the object in $a0 untouched on MIPS */
-#else
-    r = GameObject_IsOnGround();
-#endif
     if (o->p14 == 0) {
         return;
     }
     GameObject_GetGroundRotation(loc, o);
     s = o->p14->h2 & 1;
-    if (func_002682A4(o) == 0) {
+    if (GameObject_TiltsToGround(o) == 0) {
         return;
     }
     if (s) {

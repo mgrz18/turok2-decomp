@@ -20,7 +20,6 @@ struct MenuRecAt20V4 {
 };
 struct MenuRecAt20V4;
 typedef struct MenuRecAt20V4 MenuRecAt20V4;
-#ifdef TARGET_PORT
 /* the menu by its host layout (round 10 y4): the view's s32 input at N64 0x20 is
  * Menu.controller, a pointer at another host offset, and the call cast it to s32 (macOS, statics
  * above 4 GB: Controller_MenuLeft crashed when a soak run opened the cheat entry; Linux non-PIE
@@ -28,10 +27,6 @@ typedef struct MenuRecAt20V4 MenuRecAt20V4;
 #define T2_MENU_INPUT(m) (((Menu *) (m))->controller)
 #define T2_MENU_LEFT(m) Controller_MenuLeft(T2_MENU_INPUT(m))
 #define T2_MENU_RIGHT(m) Controller_MenuRight(T2_MENU_INPUT(m))
-#else
-#define T2_MENU_LEFT(m) ((s32 (*)(s32))Controller_MenuLeft)((m)->input)
-#define T2_MENU_RIGHT(m) ((s32 (*)(s32))Controller_MenuRight)((m)->input)
-#endif
 s32 EnterCheatMenu_UpdateTextField_2(void *unused, MenuRecAt20V4 *menu) {
     f32 t;
     t = gCheatEntry.timer + gFrameIncrement;

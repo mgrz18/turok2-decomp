@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 1 register pin (`register ... asm("$n")`) and 1 empty `__asm__` barrier;
+ * without them: CScene__CheckAutoActivation 14 of 263 words. */
 #include "structs/vector.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0028A258.c, func_0028A258.
@@ -9,12 +11,8 @@
 #include "structs/game_object.h"
 #include "protos/ai.h"
 
-#ifdef TARGET_PORT
 #define T2_AI(e) ((u8 *) &(e)->m_AI) /* the AI by member (N64 0x140) */
-#else
-#define T2_AI(e) ((u8 *)(e) + 0x140)
-#endif
-f32 func_0026841C(CGameObjectInstance *e);
+f32 GameObject_GetCollisionYOffset(CGameObjectInstance *e);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *e);
 s32 Action_CheckRequiredItem(CGameObjectInstance *e, u8 *p, CGameObjectInstance *me);
 void CScene__CheckAutoActivation(CScene *lv, CGameObjectInstance *me, CVector3 *p0, CVector3 *p1) {
@@ -51,14 +49,14 @@ void CScene__CheckAutoActivation(CScene *lv, CGameObjectInstance *me, CVector3 *
         kind = me->header.m_pIntelligence->m_Type;
         isB = kind == 0xB;
         is1 = kind == 1;
-        myBot = me->header.m_vPos.y + func_0026841C(me);
+        myBot = me->header.m_vPos.y + GameObject_GetCollisionYOffset(me);
         myTop = myBot + GameObject_GetCollisionHeight(me);
         for (i = 0; i < lv->m_nFlagged; i++) {
             e = (CGameObjectInstance *)lv->m_pFlagged[i];
             if (e != me) {
                 s4 = 0;
                 s1 = 0;
-                eBot = e->header.m_vPos.y + func_0026841C(e);
+                eBot = e->header.m_vPos.y + GameObject_GetCollisionYOffset(e);
                 eTop = eBot + GameObject_GetCollisionHeight(e);
                 switch (e->header.m_pIntelligence->m_Type) {
                 case 6:

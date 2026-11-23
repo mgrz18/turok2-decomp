@@ -3,7 +3,7 @@
  * N64, 0x18 on the host); the enemy definition's words are at the same offsets. */
 #include "common.h"
 #include "structs/game_object.h"
-s32 func_00268120(void *arg0) {
+s32 GameObject_CanLeaveRegionFlag80(void *arg0) {
     CIntelligence *def = ((CGameObjectInstance *) arg0)->header.m_pIntelligence;
 
     if (def->m_Type != 1) {
@@ -23,7 +23,7 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-s32 func_00268120(void *arg0)
+s32 GameObject_CanLeaveRegionFlag80(void *arg0)
 {
   void *new_var;
   void *temp_a0;

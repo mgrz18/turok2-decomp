@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: __alSeqNextDelta: 8 of 26 words. */
 #include "rw/junk_types.h" /* ALSeq */
 
 s32 __alSeqReadVarLen();

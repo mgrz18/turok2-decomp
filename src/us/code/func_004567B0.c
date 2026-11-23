@@ -2,11 +2,13 @@
  * 0x004567AC is junk between objects (src/us/asm/stray_004567AC.s).
  * Second-module twin of SaveGame_Build. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/game.h"
 #include "structs/save.h"
 #include "globals/game.h"
 #include "globals/pak.h"
 #include "globals/scene.h"
+#include "structs/cache.h"
 
 /* Build the save block: the player's profile, the multiplayer settings and the
  * player's options are copied into a freshly allocated buffer. */
@@ -20,15 +22,11 @@ typedef struct {
 extern s32 D_800F70A8; /* size of the extra data */
 
 /* Struct pointee: the load of ->data is scheduled before the gSaveBufferHandle store. */
-typedef struct {
-    void *data;
-} MemHandle;
 
-extern char D_800C13F0[];
 
 void CCache__Flush(s32 heap);
-void CCache__Deallocate(sptr heap, MemHandle *handle);
-MemHandle *CCache__Allocate(s32 heap, s32 size, s32 tag, char *name);
+void CCache__Deallocate(sptr heap, CMemEntry *handle);
+CMemEntry *CCache__Allocate(s32 heap, s32 size, s32 tag, char *name);
 void memset(void *dst, s32 value, sptr size);
 void func_0029E460(void *dst, void *src, s32 size);
 
@@ -42,7 +40,7 @@ void SaveGame_Build_2(CPlayer *player) {
         CCache__Deallocate(0, gSaveBufferHandle);
     }
     allocSize = D_800F70A8 + 0x688;
-    gSaveBufferHandle = CCache__Allocate(0, allocSize, 0x33, D_800C13F0);
+    gSaveBufferHandle = CCache__Allocate(0, allocSize, 0x33, sPakMenuText_SingleSaveBlock);
     gSaveBuffer = gSaveBufferHandle->data;
     memset(gSaveBuffer, 0, allocSize);
     gSaveBuffer->player = player->m_Data;

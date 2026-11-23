@@ -30,13 +30,8 @@ void AI_StopSound(Actor *self, void *ai);
 void CListedInstance__Free(Actor *self);
 
 void EnemyAI_StopSoundAndFree(Actor *self, void *ai) {
-#ifdef TARGET_PORT
     self->flags.word &= ~0x100;
     self->flags.word &= ~0x2000;
-#else
-    self->flags.bits.b100 = 0;
-    self->flags.bits.b2000 = 0;
-#endif
     AI_StopSound(self, ai);
     if (self->flags.word & 0x80000) {
         CListedInstance__Free(self);

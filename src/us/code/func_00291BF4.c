@@ -2,15 +2,12 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/strings.h"
 
 extern f32 alCents2Ratio(s32 arg0);
-extern char D_800AA380[];
-extern char D_800AA384[];
 extern void __handleMIDIMsg(ALSeqPlayer *, ALEvent *);
 extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, ALMicroTime);
 extern void __assert(char *, char *, s32);
-extern char D_800AA380[];
-extern char D_800AA384[];
 extern ALSound *__lookupSoundQuick(ALSeqPlayer *, u8, u8, u8);
 extern ALVoiceState *__mapVoice(ALSeqPlayer *, u8, u8, u8);
 extern ALVoiceState *__lookupVoice(ALSeqPlayer *, u8, u8);
@@ -44,7 +41,7 @@ void __handleMIDIMsg(ALSeqPlayer *seqp, ALEvent *event)
     ALVoiceState *vstate;
     u8 pan;
     if (!(event->type == 1 || event->type == 2))
-        __assert(D_800AA380, D_800AA384, 436);
+        __assert(sSeqPlayerAssertExpr, sSeqPlayerAssertFile, 436);
     status = event->msg.midi.status & 0xF0;
     chan = event->msg.midi.status & 0x0F;
     byte1 = key = event->msg.midi.byte1;
@@ -229,7 +226,7 @@ void __handleMIDIMsg(ALSeqPlayer *seqp, ALEvent *event)
         break;
     case 0xC0:
         if (seqp->bank == 0)
-            __assert(D_800AA380, D_800AA384, 714);
+            __assert(sSeqPlayerAssertExpr, sSeqPlayerAssertFile, 714);
         if (key < seqp->bank->instCount) {
             ALInstrument *inst = seqp->bank->instArray[key];
             __setInstChanState(seqp, inst, chan);

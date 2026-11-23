@@ -6,11 +6,7 @@
 #include "structs/cache.h"
 #endif
 
-#ifdef TARGET_PORT /* host: the model, regions and box are pointers */
 sptr Lighting_BuildLitVertices(sptr, sptr, sptr, sptr, s32);
-#else
-sptr Lighting_BuildLitVertices(s32, s32, s32, sptr, s32);
-#endif
 
 void CStaticObject__BuildLitVerticesCallback(void *arg0, s32 **arg1)
 {

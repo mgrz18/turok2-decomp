@@ -9,7 +9,6 @@
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 extern B12Mgr D_800D7BE0;
-#ifdef TARGET_PORT
 #include "structs/cache.h"
 #include "globals/cache.h"
 /* The port: typed on gCache (structs/cache.h) and CMemEntry/CCacheEntry. The ROM reaches the
@@ -37,25 +36,3 @@ void CCache__BeginDisplayList(s32 unused, s32 idx) {
         __osRestoreInt(m2);
     }
 }
-#else
-void CCache__BeginDisplayList(s32 unused, s32 idx) {
-    u32 mask;
-    u32 m2;
-    mask = __osDisableInt();
-    if (++gCache_mutex_count != 1) {
-        __osRestoreInt(mask);
-        osRecvMesg(&D_800D7BE0.lock.queue, 0, 1);
-    } else {
-        __osRestoreInt(mask);
-    }
-    D_800D7BE0.f638 = idx;
-    D_800D7BE0.tbl628[idx] = 1;
-    m2 = __osDisableInt();
-    if (--gCache_mutex_count != 0) {
-        __osRestoreInt(m2);
-        osSendMesg(&D_800D7BE0.lock.queue, 0, 1);
-    } else {
-        __osRestoreInt(m2);
-    }
-}
-#endif

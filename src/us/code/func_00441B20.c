@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/game_object.h"
 #include "globals/onscreen.h"
 
@@ -17,8 +18,6 @@ s32 COnScreen__SetBoss(sptr, sptr, sptr);
 s32 TotemDefense_DrawTotem_2(s32, s32, s32);
 
 void COnScreen__SetBoss2(void *, void *, void *);         /* extern */
-extern u8 D_800C0560[];
-extern u8 D_800C0568[];
 
 void TotemDefense_InitFight_2(ObjState *arg0, CGameObjectInstance *arg1)
 {
@@ -39,6 +38,6 @@ void TotemDefense_InitFight_2(ObjState *arg0, CGameObjectInstance *arg1)
   temp_a3->m_AnimType = 0x5334;
   temp_s0->m_AI.m_dwFlags = temp_s0->m_AI.m_dwFlags & (~1);
   temp_a3->m_AnimRepeatedCount = 0;
-  COnScreen__SetBoss((sptr) &gEngineApp_m_OnScreen, (sptr) arg1, (sptr) D_800C0560);
-  COnScreen__SetBoss2(&gEngineApp_m_OnScreen, arg1, D_800C0568);
+  COnScreen__SetBoss((sptr) &gEngineApp_m_OnScreen, (sptr) arg1, (sptr) sTotemDefenseText_Enemies);
+  COnScreen__SetBoss2(&gEngineApp_m_OnScreen, arg1, sTotemDefenseText_Time);
 }

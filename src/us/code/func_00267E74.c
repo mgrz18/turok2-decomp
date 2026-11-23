@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: 5 of 13 words (as func_00267D60). */
 #include "structs/vector.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/8024D018_4.CPP, func_8024DE6C_de.
@@ -59,7 +61,7 @@ struct Object {
     u8 reserved18[0x740 - 0x18];
     u8 effect740;
 };
-s32 func_00267E74(void *arg0)
+s32 GameObject_IsLeashed(void *arg0)
 {
     struct Object *object = arg0;
     struct Model *model;

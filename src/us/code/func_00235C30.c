@@ -21,7 +21,7 @@ extern f32 gCameraVisibleBox[6]; /* local type: the CBox read as six floats by i
 void Render_InvalidateModeCache(void);
 void Texture_InvalidateCache(void);
 /* Draws the ground decals inside the camera's box; frees those outside it. */
-void func_00235C30(CSwooshSystem *c) {
+void SwooshSystem_DrawDecals(CSwooshSystem *c) {
     s32 i;
     CList *l;
     SwooshDecal *n, *next;

@@ -24,6 +24,12 @@ Round N2 (eight parallel parts, then a merge) brought the count from 90 to
 are module-2 copies), the rest asm. 323 C functions are still `func_`
 (643 `func_` text symbols in the ELF, asm included).
 
+Round 21 (part j1) named **245 more** C functions (`versions/names/n9.us.txt`, one line of
+evidence each): 168 engine and first-module functions and 77 module-2 copies,
+plus 10 asm-origin ones. The C files now define **88** `func_` functions (333 before, counted as the
+definitions in `src/`), and the ELF has 128 sized `func_` text symbols (372
+before), asm included. What is left and why is under "Left as `func_`" below.
+
 ## Conventions
 
 - **`CClass__Method`**, Acclaim's own style, for methods of a class Acclaim
@@ -369,6 +375,43 @@ The full list comes from scanning every `extern` of a named symbol (round G2
 coordinator's script; easy to redo: group the declarations by name, keep the
 names with more than one type).
 
+### Round 21, part j2: the `D_` left in the C
+
+`versions/names/data_j2.us.txt`, applied with `tools/apply_names.py`. Counted as
+distinct `D_<addr>` tokens in `src/**/*.c` (617 at `7340fcdd`; the method above,
+which skipped comments, gave 605): **617 -> 132** (140 with the headers).
+
+| | names | how |
+| --- | ---: | --- |
+| menu and pak text tables, menu formats | 390 | `s<Owner>Text_<words of the string>`, `s<Owner>Fmt_<spec>`; `_<addr>` where two strings would get the same name (the pak messages repeat lines) |
+| engine strings | 78 | `s<Class>CacheDesc_<words>` (`CCache__Request` descriptions), `s<File>Assert{Expr,File}` (libultra/libaudio `assert(EX)`: the literal `"EX"` and `__FILE__`), crash-screen texts, pickup names and messages, kill/cheat messages, `sPakCompanyCode` ("51") |
+| other data and BSS | 12 | `gAssertLine`/`gAssertExpr` (the crash screen's assertion), `gNumTicks1` (Turok 3), `gVideoDitherFilter`, `sAnimDecodeRotation`/`sAnimRawRange`, `sHashDebugLongestChain`, `sOnScreenFontTextureBuffer`, `sCameraDefaultText` (a NULL `u8 *`), `sCCacheDesc_Header`, `sTextureCacheDesc_Texture` |
+| interiors of `gEngineApp_m_Settings` | 14 `D_` | not names: the code reads them as members now (`weaponEnabled[n]`, `slots[n].m_Deaths/m_Kills/m_Tags/m_Name/m_nCharacter`, `match.teamScore[1]`) |
+
+`tools/asm_diff.py` now resolves names the names tables just added
+(`symbols_names*.us.txt`) and a base tree's `D_<addr>` that the rebuilt ELF has
+renamed, so a names round compares against the old tree without a rebuild.
+
+**The 140 left** (C files and headers), by kind:
+
+- 11 labels inside `.code` (`D_00200AE0`, `D_0028A020`, `D_002972E0`...): the
+  middle of a function another file jumps into or reads as data
+  (`ProPack__Decompress`, `__scMain`, `alSavePull`); and 10 in the VM module
+  (`D_0042B304`..., the `Primagen_RunSoundStep` pick lists `D_004315C8`-`D_00431618`,
+  two `MenuDesc` `D_004388E0`/`D_0043916C`, the module-2 page buffer `D_00469400`), named with the module's data in a later pass;
+- 52 pool words (float pools of one function such as `CParticle__GetDistanceScale`'s
+  nine, the trail tables `D_800ACE70`-`D_800ACF38`, `D_800C1144` the cheat table
+  the data also points at, `D_800C1BC4`/`C8` the cinema words): the MATCHING.md
+  ".rodata literals" reasons hold (a pool another file owns, linker fill, data
+  the code reads in the pool); they become literals or names when their files merge;
+- 67 interiors of BSS objects that already have a name: `gCollisionInfoTestMoveWater+0x20..`
+  (`D_800F1B60`-`D_800F1F50`, the collision info records), `gScene` (`D_8010AB90`...,
+  `D_8010FED4`, `D_8010FF34`), `gLevelScript` (`D_8012F604`...), `gContStatus`
+  (`D_800F677A`/`B`), `gPakWatched+3`, the camera boxes, the pager and host-I/O
+  buffers: each wants the member access of its struct (j3's structs), not a name;
+  the rest are BSS whose role is not certain yet (`D_8011B114`/`D_8011F144` pak boot
+  flags, `D_801309A8`/`AC` note-menu flags, `D_8011AD48` a quad's vertices).
+
 ## Declarations
 
 The named globals now have one declaration each, with the real type, in
@@ -395,4 +438,55 @@ blind spot of `match_func.py`) and what is left are in
   data labels (0x00438728, 0x00438800, 0x0043908C).
 - `func_00430500` clears the automap's counts and vertex buffers, but is not
   named.
-- 323 C functions are still `func_`.
+- 88 C functions are still `func_`: see "Left as `func_`" below.
+
+## Absolute symbols named (round 21 merge)
+
+`D_14A000` and `D_3CAE0`, the two absolute symbols `VM_Initialize`
+(func_0028D820) reads, are `gVirtualRomStart` (ROM 0x14A000, where the virtual
+segment starts) and `gVirtualModule1Size` (0x3CAE0, the bytes of VM module 1
+the expansion pak path copies), defined in `versions/symbols_manual.us.txt`
+([SEGMENTS.md](SEGMENTS.md#the-virtual-segments-real-start-round-21)). Four
+absolute ROM offsets keep their `D_` (`D_94F`, `D_11059`, `D_29E60`, `D_A4694`).
+
+## Left as `func_` (round 21)
+
+The 88 C functions round 21 did not name, by reason:
+
+- **Empty or constant stubs with no telling caller or table slot** (about 45):
+  `void f(void) {}`, `return 0;`, `return 1.0f;`, the empty loop
+  `func_0020FF68`, and their module-2 copies (0x00407F0C, 0x0040B308,
+  0x0040ED8C, 0x00416474, 0x0042EBB4 and their copies at + 0x39000; 0x0045A240
+  and 0x0045DE14 are copies of 0x00421320 and 0x00424EF4, whose results nothing
+  reads). Naming them needs a caller or a table that says what they stand in for.
+- **Unreferenced setters and getters of unknown structs** (`func_00207908`,
+  `func_0020BFB0`, `func_0021810C`, `func_00218218`, `func_002182BC`,
+  `func_0021836C`, `func_00218490`, `func_0021851C`, `func_002188AC`,
+  `func_0021F5B8`, `func_002267A0`): the code says what they store, not what.
+- **Object-type tests with unknown type sets** (`func_00232EEC`,
+  `func_00232F38`, `func_00232FBC`, `func_00232018`, `func_002322C0`) and
+  **flag tests of unknown flags** (`func_00267D2C`..`func_00267E4C`).
+- **Sums over the scene's sectors** (`func_00214108`, `func_00214188`,
+  `func_00226D54`): the sector block they add up (CISet block 2, word 4) has no
+  name yet.
+- **Rage Wars imports whose Rage Wars name is also `func_`** and whose use in
+  Turok 2 is unclear: `func_0021B39C`, `func_002322D8`, `func_00238258`,
+  `func_00253934`, `func_002551B8`, `func_00268210`.
+- **Library functions whose real name changes the code**: `func_002974C0`
+  (`cosf`), `func_002982F0` (`sinf`), `func_00298470` (`sqrtf`) and
+  `func_0029E460` (`memcpy`). GCC knows these names as builtins and would
+  inline or fold the calls, so the build would no longer match
+  (`versions/names.us.txt` notes it for `sqrtf`).
+- **`func_0028D380` is `main`**: SN64's `boot_main` (`src/us/asm/boot.s`,
+  Turok 3's SNMAIN.s) jumps to `main`, and `versions/symbols_manual.us.txt`
+  already gives the address that name. The C keeps `func_0028D380` because GCC
+  treats a function called `main` specially and the port links the game's C
+  into a host program that has its own `main`.
+
+Asm by origin: round 21 named the SN host-I/O exception code in
+`us/asm/A3C88.s` (`HostIo_VectorStubs` .. `HostIo_SaveContext`, 10 functions).
+Left: the RNC unpacker's inner routines (0x00200CB0-0x00200F20: hand-written
+asm with their own register conventions, in a cut file), the STVM TLB routines
+in the engine copy (0x0028EE40-0x0028EEFC: `STVM_MapTLB` is boot.s's name for
+the boot copy, and the engine copy starts one word before its cut), and the
+watch-register helpers 0x00201074/0x00425710.

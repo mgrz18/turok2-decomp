@@ -57,7 +57,7 @@ struct Target {
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 
-s32 func_002682CC(Target *target);
+s32 GameObject_IsInanimate(Target *target);
 s32 Actor_GetTypeClass(Target *target);
 void CMtxF__FromMtxAffine(f32 *out, Bone *bone);
 void func_0021B39C(Target *target, s32 *ai, f32 *matrix, CVector3 origin, CVector3 direction, s32 frame);
@@ -140,7 +140,7 @@ void CParticle__HitTarget(CParticle *p) {
     enabled = 1;
     special = 0;
     def = p->m_pEffect;
-    if (func_002682CC(source)) {
+    if (GameObject_IsInanimate(source)) {
         mode = p->m_bDieOnImpact;
     } else {
         mode = p->m_ObjectImpact;

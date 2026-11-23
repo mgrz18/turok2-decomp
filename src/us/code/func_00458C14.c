@@ -11,19 +11,15 @@ typedef struct {
 } Chars4;
 
 extern s32 D_800F70A8;
-extern Chars4 D_800C1408;
-extern u8 D_800C1404[];
-extern char D_800B48B4[];
-extern char D_800B4914[];
+extern Chars4 sPakMenuText_Spaces3; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
+extern u8 sPakMenuFmt_3d[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
+extern char sPakMenuText_FreePagesXxxNeededXxx_B48B4[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
+extern char sPakMenuText_FreePagesXxxNeededXxx_B4914[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
 extern char D_800C140C[];
 s32 Pak_GetFreePages_2(s32 pad, s32 *out);
 u32 Pak_BytesToPages_2(u32 n);
-#ifdef TARGET_PORT
 /* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
 void sprintf(char *dst, const char *fmt, ...);
-#else
-void sprintf(char *dst, u8 *fmt, s32 a);
-#endif
 
 s32 PakMenu_FreePagesText_2(MenuItem *item, Menu *own) {
     Chars4 buf;
@@ -41,10 +37,10 @@ s32 PakMenu_FreePagesText_2(MenuItem *item, Menu *own) {
     } else {
         pad = own->controller->port;
     }
-    buf = D_800C1408;
+    buf = sPakMenuText_Spaces3;
     bp = buf.c;
     if (gPakMenuIsSave != 0) {
-        item->text = D_800B48B4;
+        item->text = sPakMenuText_FreePagesXxxNeededXxx_B48B4;
         if (Pak_GetFreePages_2(pad, &freeb) == 0) {
             if (gPakMenuIsProfile != 0) {
                 need = Pak_BytesToPages_2(0x18);
@@ -53,13 +49,13 @@ s32 PakMenu_FreePagesText_2(MenuItem *item, Menu *own) {
             }
             dst = item->text;
             dst += 0xC;
-            sprintf(buf.c, D_800C1404, freeb);
+            sprintf(buf.c, sPakMenuFmt_3d, freeb);
             *dst = buf.c[0];
             dst++;
             *dst = buf.c[1];
             dst++;
             *dst = buf.c[2];
-            sprintf(buf.c, D_800C1404, need);
+            sprintf(buf.c, sPakMenuFmt_3d, need);
             dst += 0xC;
             *dst = buf.c[0];
             dst++;
@@ -69,9 +65,9 @@ s32 PakMenu_FreePagesText_2(MenuItem *item, Menu *own) {
         }
     } else {
         if (gPakMenuAnyPak != 0) {
-            t = D_800B4914;
+            t = sPakMenuText_FreePagesXxxNeededXxx_B4914;
         } else if (gPakMenuIsLoad != 0) {
-            t = D_800B48B4;
+            t = sPakMenuText_FreePagesXxxNeededXxx_B48B4;
         } else {
             goto none;
         }
@@ -81,14 +77,14 @@ s32 PakMenu_FreePagesText_2(MenuItem *item, Menu *own) {
         dst = item->text;
         if (r == 0) {
             dst += 0xC;
-            fmt = D_800C1404;
+            fmt = sPakMenuFmt_3d;
             sprintf(bp, fmt, freeb);
             *dst = buf.c[0];
             dst++;
             *dst = buf.c[1];
             dst++;
             *dst = buf.c[2];
-            sprintf(bp, D_800C1404, need);
+            sprintf(bp, sPakMenuFmt_3d, need);
             dst += 0xC;
             *dst = buf.c[0];
             dst++;

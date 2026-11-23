@@ -36,6 +36,7 @@ extern u32 gCache_ageCount;                 /* the frame stamp CMemEntry.age is 
 
 extern s32 gHashSize;           /* RoundToPowerOfTwo(entries) (CHashTable__Construct) */
 extern u32 gHashTableSize;      /* gHashSize * 2 */
+extern s32 sHashDebugLongestChain; /* cleared by CHashTable__GetLongestChain (debug print compiled out) */
 extern u32 gCacheEntryCount;    /* 0x400, doubled with the expansion pak */
 
 #endif

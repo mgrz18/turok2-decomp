@@ -12,7 +12,6 @@
 #include "protos/menu.h"
 #include "structs/camera.h"
 
-typedef struct O01Sel { s32 v; s32 w; } O01Sel;
 void Pak_ProbeSlot(s32 ch);
 s32 Pak_GetStatus(s32 ch);
 s32 Pak_IsRumblePak(s32 ch);
@@ -20,9 +19,9 @@ s32 Pak_NeedsRepair(s32 ch);
 void PakMenu_UpdateNoteRows(Menu *o);
 u32 Crc32_Compute(u8 *data, s32 len, u32 crc);
 /* O01Pick and O01Capture are separate functions in Rage Wars; inlined here in Turok 2. */
-static inline u8 *O01Pick(O01Sel *sel) {
+static inline u8 *O01Pick(PakChannel *sel) {
     u8 *msg;
-    switch (sel->v) {
+    switch (sel->channel) {
     case 0:
     default:
         msg = (u8 *)&gStatsAfterPakMenuDesc1;
@@ -56,7 +55,7 @@ static inline void O01Capture(CPlayer *a) {
 }
 void PakMenu_InitSaveProfile(Menu *own) {
     CPlayer *plr;
-    O01Sel sel;
+    PakChannel sel;
     u8 *msg;
     s32 pad;
     CPlayer *pp;
@@ -70,7 +69,7 @@ void PakMenu_InitSaveProfile(Menu *own) {
     gPakMenuAnyPak = 0;
     pv = own->controller->port;
     pp = own->player;
-    sel.v = pv;
+    sel.channel = pv;
     plr = pp;
     msg = O01Pick(&sel);
     if (gDamagedPakContinued != 0) {
@@ -83,15 +82,15 @@ void PakMenu_InitSaveProfile(Menu *own) {
             pad = own->controller->port;
         }
         Pak_ProbeSlot(pad);
-        if (Pak_GetStatus(sel.v) == 0) {
+        if (Pak_GetStatus(sel.channel) == 0) {
             O01Capture(plr);
             gPakProfile.checksum = Crc32_Compute((u8 *)&gPakProfile, 0x14, 4);
             PakMenu_UpdateNoteRows(own);
         } else {
             gPakMenuLeaving = 1;
-            if (Pak_IsRumblePak(sel.v) != 0) {
+            if (Pak_IsRumblePak(sel.channel) != 0) {
                 MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgInsertToSaveDesc, plr, plr->m_ContState.m_pContState, msg);
-            } else if (Pak_NeedsRepair(sel.v) != 0) {
+            } else if (Pak_NeedsRepair(sel.channel) != 0) {
                 MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gDamagedPakAtBootMenuDesc, plr, plr->m_ContState.m_pContState, (u8 *)&gPakSaveProfileMenuDesc);
             } else {
                 MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgPakNotFoundDesc, plr, plr->m_ContState.m_pContState, msg);

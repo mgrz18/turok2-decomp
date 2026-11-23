@@ -21,11 +21,7 @@ typedef struct AnimChannel {
     /* 0x0A */ s8 active;
     /* 0x0B */ s8 blending;
     /* 0x0C */ u32 loopStart;
-#ifdef TARGET_PORT
     /* 0x10 */ void *resource; /* CAnimationState.pmeAnimData */
-#else
-    /* 0x10 */ s32 resource;
-#endif
 } AnimChannel;
 
 typedef struct KeyLookup {
@@ -89,20 +85,12 @@ typedef struct AnimObject {
 /* What CGameObjectInstance__PoseBone reads to pose the skeleton. */
 typedef struct PoseContext {
     /* 0x00 */ AnimObject *obj;
-#ifdef TARGET_PORT
     /* the bone matrices (PoseBone's `out`): pointer-wide on the host */
     /* 0x04 */ sptr animIndex;
-#else
-    /* 0x04 */ s32 animIndex;
-#endif
     /* 0x08 */ void *bones;
     /* 0x0C */ s32 *anims;
     /* 0x10 */ s32 *file;
-#ifdef TARGET_PORT
     /* 0x14 */ sptr arg2;
-#else
-    /* 0x14 */ s32 arg2;
-#endif
     /* 0x18 */ AnimChannel *channel;
     /* 0x1C */ AnimChannel *blendChannel;
     /* 0x20 */ KeyLookup keys;
@@ -116,14 +104,10 @@ typedef struct PoseContext {
     /* 0x80 */ s32 f80;
     /* 0x84 */ s32 f84;
     /* 0x88 */ s32 f88;
-#ifdef TARGET_PORT
     /* as CGameObjectInstance__PoseBone's view (func_0021B95C.c) */
     /* 0x8C */ u8 *boneData;
     /* 0x90 */ s32 bone;
     /* 0x94 */ u8 pad94[4];
-#else
-    /* 0x8C */ u8 pad8C[0xC];
-#endif
 } PoseContext;
 
 /* A profile slot (osGetCount timings). */
@@ -151,7 +135,7 @@ void CAnimationState__FindKeys(AnimChannel *channel, KeyLookup *keys);
 void CAnimationState__Release(AnimChannel *channel);
 s32 CAnimationState__IsLoaded(AnimChannel *channel);
 void CGameObjectInstance__PoseBone(AnimObject *obj, PoseContext *ctx, s32, f32 mtx[4][4]);
-void func_002360A0(void *effects, AnimObject *obj, void *bones);
+void SwooshSystem_AddBonePoints(void *effects, AnimObject *obj, void *bones);
 void GameObject_EmitHotPoints(void *list, s32 count, void *bones, AnimObject *obj, void *anims);
 
 /* OS_CYCLES_TO_USEC */
@@ -165,11 +149,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2
     u8 bones[0x2000];
     f32 mtx[4][4];
     s32 *anims;
-#ifdef TARGET_PORT
     sptr *handle; /* *handle: the animation table's data, a pointer */
-#else
-    s32 *handle;
-#endif
     s32 ok;
     s32 hidden;
     s32 isType9;
@@ -317,7 +297,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2
                 }
             }
             if (obj->hasEffects) {
-                func_002360A0(gEngineApp_m_SwooshSystem, obj, bones);
+                SwooshSystem_AddBonePoints(gEngineApp_m_SwooshSystem, obj, bones);
             }
             if (ctx.blend) {
                 CAnimationState__Release(blendChannel);

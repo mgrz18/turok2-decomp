@@ -2,10 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu_text.h"
 #include "globals/game.h"
 
-extern char D_800B5870[];
-extern char D_800B5854[];
 s32 CheatMenu_UnlimitedAmmoText(struct StateRecAt14 *item) {
     if (gEngineApp_m_Settings.unlockedCheats & 0x8) {
         item->unk8 |= 0x1000000;
@@ -13,9 +12,9 @@ s32 CheatMenu_UnlimitedAmmoText(struct StateRecAt14 *item) {
         item->unk8 &= ~0x1000000;
     }
     if (gEngineApp_m_Settings.cheatFlags & 0x8) {
-        item->unk14 = D_800B5854;
+        item->unk14 = sCheatMenuText_UnlimitedAmmoOn;
     } else {
-        item->unk14 = D_800B5870;
+        item->unk14 = sCheatMenuText_UnlimitedAmmoOff;
     }
     return 0;
 }

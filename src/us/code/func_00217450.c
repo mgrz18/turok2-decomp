@@ -5,7 +5,6 @@
 #include "globals/object.h"
 
 extern float Bits_Normalize(float value, int bits);
-extern s32 D_800E6798;
 extern u32 Bits_Read(u32 *arg0, s32 arg1);
 extern f32 Math_Remap(f32 value, f32 lower, f32 upper);
 extern void AnimCurve_LoadSegment(Curve *arg0);
@@ -17,7 +16,7 @@ void AnimCurve_Init(Segment8025FFD0 *arg0, u32 *arg1) {
     f32 hi;
     bits = *arg1;
     arg0->unk2C = Bits_Read(&bits, 6);
-    if (D_800E6798 != 0) {
+    if (sAnimRawRange != 0) {
         first = Bits_Read(&bits, 0x20);
         second = Bits_Read(&bits, 0x20);
         lo = *(f32 *)&first;

@@ -7,9 +7,8 @@
 #include "structs/memory.h"
 #include "globals/hostio.h"
 
-extern u32 sHostIoSavedTlb[32][4];     /* saved TLB entries: PageMask, EntryHi, EntryLo0, EntryLo1 */
 
-extern u32 func_002A31FC(void);   /* reads the TLB, returns EntryHi */
+extern u32 HostIo_ReadTlb(void);   /* reads the TLB, returns EntryHi */
 
 /* Rebuilds the table of virtual ranges the 32 TLB entries map. An entry whose EntryLo pages are valid
    (bit 1) maps 4K << 2n bytes per page; a non-global page of another ASID does not count. */
@@ -26,7 +25,7 @@ void HostIo_ScanTlb(void) {
     u32 m;
     u32 i;
 
-    asid = func_002A31FC() & 0xFF;
+    asid = HostIo_ReadTlb() & 0xFF;
     e = sHostIoSavedTlb[0];
     for (i = 16; i < 48; i++) {
         sHostIoMemoryRanges[i].m_First = -1;

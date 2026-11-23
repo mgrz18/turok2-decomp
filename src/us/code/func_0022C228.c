@@ -6,9 +6,9 @@
 #include "protos/game.h"
 
 #ifdef TARGET_PORT
-extern u8 func_0026C114(void *region); /* ABI: it returns u8 (as s32 the host read garbage upper bits) */
+extern u8 CGameRegion__GetWallSurface(void *region); /* ABI: it returns u8 (as s32 the host read garbage upper bits) */
 #else
-extern s32 func_0026C114(void *region);
+extern s32 CGameRegion__GetWallSurface(void *region);
 #endif
 /* gCollisionResults_m_pFloorRegion / gCollisionResults_m_vFloorPos are CCollisionResults (gCollisionResults, structs/collision.h)
  * m_pFloorRegion and m_vFloorPos; kept as their own symbols: reading them
@@ -32,7 +32,7 @@ void CParticle__HitCeiling(CParticle *arg0) {
     s32 sound;
     CROMParticleEffect *desc;
 
-    surface = func_0026C114(arg0->header.m_pCurrentRegion);
+    surface = CGameRegion__GetWallSurface(arg0->header.m_pCurrentRegion);
     if (surface == 10) {
         surface = 0;
     }

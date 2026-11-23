@@ -8,6 +8,6 @@ typedef struct {
     /* 0x1C */ s32 (*func)();
 } Job;
 
-void func_00468570(Job *arg0) {
+void DemoStream_CallHandler2_2(Job *arg0) {
     arg0->func();
 }

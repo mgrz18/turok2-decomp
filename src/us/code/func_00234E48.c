@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 2 register pins (`register ... asm("$n")`) and 1 empty `__asm__` barrier;
+ * without them: Trail_DetachOwner 6 of 169 words. */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002A52E4.c, func_002A52E4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"

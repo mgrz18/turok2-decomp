@@ -5,6 +5,6 @@ typedef struct {
     /* 0x38 */ s32 unk38;
 } Arg0;
 
-void func_0026E9EC(Arg0 *arg0, s32 arg1) {
+void Rumble_SetLink(Arg0 *arg0, s32 arg1) {
     arg0->unk38 = arg1;
 }

@@ -1,14 +1,10 @@
 /* Second-module copy of MissionMenu_UpdateObjective2 (first module; this one at link address 0x0042501C), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 
 extern char D_800C1768[];
-extern char D_800B43E0[];
-extern char D_800B4430[];
-extern char D_800B4484[];
-extern char D_800B4520[];
-extern char D_800B459C[];
 
 s32 MissionMenu_UpdateObjective2_2(MenuItem *item) {
     switch (sMissionHub) {
@@ -18,22 +14,22 @@ s32 MissionMenu_UpdateObjective2_2(MenuItem *item) {
             item->text = D_800C1768;
             break;
         case 1:
-            item->text = D_800B43E0;
+            item->text = sMissionMenuText_Children;
             break;
         case 2:
-            item->text = D_800B4430;
+            item->text = sMissionMenuText_SistersOfDespair;
             break;
         case 3:
-            item->text = D_800B4484;
+            item->text = sMissionMenuText_AmmoStorageFacilities;
             break;
         case 4:
             item->text = D_800C1768;
             break;
         case 5:
-            item->text = D_800B4520;
+            item->text = sMissionMenuText_MasterComputers;
             break;
         case 6:
-            item->text = D_800B459C;
+            item->text = sMissionMenuText_AssemblyPlants;
             break;
     }
     return 0;

@@ -15,6 +15,7 @@ extern s32 gNextTicks;
 extern s32 gDisplayListCount;
 extern s32 gCurrentTick;                 /* retraces since the last swap ("c_field") */
 extern s32 gNumTicks0;                   /* the retraces of the last four frames ("n_fields" ...) */
+extern s32 gNumTicks1;                   /* "n_l_fields" */
 extern s32 gNumTicks2;                   /* "n_ll_fields" */
 extern s32 gNumTicks3;                   /* "n_lll_fields" */
 extern s32 gNumTicksPending;

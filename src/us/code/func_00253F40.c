@@ -3,7 +3,6 @@
 #include "protos/game.h"
 
 /* A looping sound: only its sound handle here. */
-#ifdef TARGET_PORT
 /* LoopSounds' node (SoundSourceNode, rw/abu_types.h): the sound id at N64 0xC follows a
  * pointer, so on the host it is at 0x14 */
 struct CLoopingSoundData {
@@ -12,12 +11,6 @@ struct CLoopingSoundData {
     s32 value;
     s32 m_nHandle;
 };
-#else
-struct CLoopingSoundData {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s32 m_nHandle;
-};
-#endif
 
 void Sound__StopSoundId(s32);                            /* extern */
 void LoopSounds_Stop(sptr, struct CLoopingSoundData *); /* extern */

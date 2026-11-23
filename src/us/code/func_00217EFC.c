@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: Bits_PokeFloat: 14 of 73 words. */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SYSTEM/802609CC.CPP, func_80260A5C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
@@ -13,7 +15,7 @@ struct Func802608ECResult {
     f32 delta;
 };
 typedef struct { u32 low; u32 high; } PackedBitWords;
-extern void func_00217EFC(s32 arg0, Func802608ECResult range, f32 arg4);
+extern void Bits_PokeFloat(s32 arg0, Func802608ECResult range, f32 arg4);
 static __inline__ void write_bits(u32 arg2, u32 arg0, u32 arg1) {
   u32 temp_a0;
   s32 temp_v0;
@@ -49,7 +51,7 @@ static __inline__ void write_bits(u32 arg2, u32 arg0, u32 arg1) {
   words->low = (words->low & (~var_v1)) | var_a3;
   words->high = (words->high & (~temp_a1)) | var_a2;
 }
-void func_00217EFC(s32 arg0, Func802608ECResult range, f32 arg4)
+void Bits_PokeFloat(s32 arg0, Func802608ECResult range, f32 arg4)
 {
   f32 arg4_2;
   f32 temp_f1;

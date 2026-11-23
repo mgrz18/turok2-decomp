@@ -2,7 +2,7 @@
 #include "structs/intelligence.h"
 #include "structs/game_object.h"
 
-s32 func_002680A8(CInstanceHeader *arg0)
+s32 GameObject_CanEnterRegionFlag1000(CInstanceHeader *arg0)
 {
   CIntelligence *new_var2;
   unsigned int new_var3;

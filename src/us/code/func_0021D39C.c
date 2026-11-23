@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/vector.h"
 #include "structs/region.h"
 #include "structs/camera.h"
@@ -70,7 +71,6 @@ struct Actor {
 };
 #endif
 
-extern char D_800A5AC4[];   /* "anim object info" */
 
 void CMtxF__TransformBox(void *, sptr, f32 *);
 s32 Frustum_TestBox(void *, f32 *);
@@ -100,7 +100,7 @@ void CGameObjectInstance__Draw(Actor *actor, CCamera *view) {
         return;
     }
     do {
-        anim = CCache__Request(0, actor->animFile, actor->animIndex, 0, 0, 0, D_800A5AC4, 1);
+        anim = CCache__Request(0, actor->animFile, actor->animIndex, 0, 0, 0, sCGameObjectInstanceCacheDesc_AnimObjectInfo, 1);
         if (anim == NULL) {
             return;
         }

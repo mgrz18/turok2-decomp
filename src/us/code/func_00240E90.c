@@ -2,7 +2,7 @@
 #include "structs/collision.h"
 #include "globals/collision.h"
 
-f32 func_00268460(CGameObjectInstance *inst);
+f32 GameObject_GetSweepRadius(CGameObjectInstance *inst);
 void Collision_SweepRegionWalls(void *region);
 void CGameRegion__ClearVisited(void *region);
 
@@ -16,7 +16,7 @@ void Collision_SweepMapWalls(Sweep *sweep) {
     f32 hi;
 
     def = sweep->def;
-    if (!(def->m_dwFlags & 2) || def->m_WallBehavior == 0 || func_00268460(sweep->obj) == 0.0f) {
+    if (!(def->m_dwFlags & 2) || def->m_WallBehavior == 0 || GameObject_GetSweepRadius(sweep->obj) == 0.0f) {
         return;
     }
     inst = sweep->obj;
@@ -28,7 +28,7 @@ void Collision_SweepMapWalls(Sweep *sweep) {
         return;
     }
     sMapSweep = &ms;
-    sMapSweep->radius = func_00268460(inst);
+    sMapSweep->radius = GameObject_GetSweepRadius(inst);
     sMapSweep->sweep = sweep;
     sMapSweep->normal.y = 0.0f;
     sMapSweep->wallPoint.y = 0.0f;

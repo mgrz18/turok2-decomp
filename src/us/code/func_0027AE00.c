@@ -5,7 +5,7 @@
 #include "protos/scene.h"
 
 
-sptr func_0027AE00(s32 arg0) {
+sptr Hud_LoadGraphicSet(s32 arg0) {
     sptr r;
 
     if (gPersistentDataLoaded != 0) {

@@ -23,4 +23,13 @@ typedef struct {
     /* 0xC */ u8 cn[4];         /* colour and alpha */
 } Vtx_t; /* size 0x10 */
 
+/* A lit vertex (PR/gbi.h Vtx_tn): a normal instead of the colour. */
+typedef struct {
+    /* 0x0 */ s16 ob[3];
+    /* 0x6 */ u16 flag;
+    /* 0x8 */ s16 tc[2];
+    /* 0xC */ s8 n[3];          /* normal */
+    /* 0xF */ u8 a;             /* alpha */
+} Vtx_tn; /* size 0x10 */
+
 #endif

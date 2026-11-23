@@ -16,13 +16,13 @@ typedef struct AnimDef {
     s16 frameCount; /* 0x2: its points */
 } AnimDef;
 
-extern AnimDef *func_00226134(void *table, u8 id);
+extern AnimDef *CScene__GetPathHeader(void *table, u8 id);
 
 void CPathTrack__Advance(AnimPlayer *player) {
     AnimDef *anim;
     s32 count;
 
-    anim = func_00226134(&gScene, player->animId);
+    anim = CScene__GetPathHeader(&gScene, player->animId);
     count = anim->frameCount;
     switch (player->state) {
     case 1:

@@ -19,7 +19,7 @@ void ImpactEvent_ApplyBlast(B15Src *a, sptr b, s32 c, CVector3 pos, B15Blk8 blk,
 static inline void w(B15Src *a, sptr b, s32 c, CVector3 pos, B15Blk8 blk) {
     ImpactEvent_ApplyBlast(a, b, c, pos, blk, 1, 0, 0x400000);
 }
-void func_00239058(B15Src *a, sptr b, s32 c, CVector3 pos, B15Blk8 blk) {
+void ImpactEvent_BlastSameHeight(B15Src *a, sptr b, s32 c, CVector3 pos, B15Blk8 blk) {
     f32 d;
     d = a->pos.y - pos.y;
     if (d < 0.0f ? -d <= 76.799995f : d <= 76.799995f) {

@@ -50,6 +50,14 @@ typedef struct PakQuery {
     /* 0x08 */ s32 freeNotes;       /* Pak_CountEmptyNotes */
 } PakQuery; /* size 0xC */
 
+/* The channel a pak menu works on, kept in an 8-byte local (Rage Wars' pak
+ * menu code passes its address to helpers that Turok 2 inlines; it was
+ * O01Sel / PadSel). */
+typedef struct PakChannel {
+    /* 0x0 */ s32 channel;          /* the controller port */
+    /* 0x4 */ s32 unk4;
+} PakChannel; /* size 0x8 */
+
 extern PakDirectory *gPakDirectories;    /* per channel: its cached directory */
 
 #endif

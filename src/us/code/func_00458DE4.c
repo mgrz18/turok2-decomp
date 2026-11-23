@@ -12,7 +12,7 @@ s32 Str_Compare_2(u8 *a, char *b);
 void Pak_ProbeSlot_2(s32 a);
 s32 Pak_GetStatus_2(s32 a);
 void Pak_GetNoteGameName_2(s32 a, s32 b, sptr *c);
-void func_0045FBA8(sptr a, u8 *b, s32 c);
+void Pak_DecodeText_2(sptr a, u8 *b, s32 c);
 void PakMenu_UpdateNoteRows_2(Menu *o);
 s32 PakMenu_CheckPak_2(Menu *o, s32 a, s32 b);
 void PakMenu_WriteProfile_2(s32 a, Menu *o, s32 c);
@@ -57,7 +57,7 @@ s32 PakMenu_SelectPak_2(s32 a0, Menu *o, s32 a2) {
         s0 = 0;
         do {
             Pak_GetNoteGameName_2(s1, s0, &L.v);
-            func_0045FBA8(L.v, buf, 0x10);
+            Pak_DecodeText_2(L.v, buf, 0x10);
             if (Str_Compare_2(buf, gPakGameNoteName) == 0) {
                 found = 1;
                 if (index != NULL) {

@@ -4,7 +4,6 @@
 #include "rw/abu_types.h"
 #include "globals/cache.h"
 
-extern s32 D_800AB0B8;
 void CHashTable__GetLongestChain(void) {
     s32 var_a1;
     s32 var_v1;
@@ -41,7 +40,7 @@ void CHashTable__GetLongestChain(void) {
             var_a1 = var_v1;
         } while (var_a0_2 < gHashSize);
     }
-    if (D_800AB0B8 != 0) {
-        D_800AB0B8 = 0;
+    if (sHashDebugLongestChain != 0) {
+        sHashDebugLongestChain = 0;
     }
 }

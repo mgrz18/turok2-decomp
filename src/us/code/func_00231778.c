@@ -2,7 +2,7 @@
 #include "globals/game.h"
 
 
-s32 func_00231778(CParticle *arg0) {
+s32 CParticle__GetDrawMode(CParticle *arg0) {
     s32 var_a1;
 
     var_a1 = 0;

@@ -53,14 +53,10 @@ s32 GameObject_IsSolid(CGameObjectInstance *actor) {
         case 1:
             if (actor->header.m_Type == 1 && (actor->m_dwFlags & 0x2000) && (attachment = ((Attachment *)actor->m_AI.m_pModeCurrent)) != NULL) {
                 mask = 0x10000;
-#ifdef TARGET_PORT
                 /* Round 16 merge (n64viewcheck.py's cast kind): m_pModeCurrent is a CAIModeInfo row
                  * (host layout: its sptr words are 8 bytes, unk_1C at 0x30); Attachment's 0x1C read
                  * the high half of m_pData on the host (0: always solid). The member instead. */
                 return (((CAIModeInfo *) attachment)->unk_1C & mask) == 0;
-#else
-                return (attachment->flags & mask) == 0;
-#endif
             }
             return 0;
         case 4:

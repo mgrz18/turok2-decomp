@@ -131,7 +131,7 @@ typedef struct GameSettings {
     /* 0x1C4 */ s32 unk1C4;
     /* 0x1C8 */ s32 unk1C8;            /* set at a retrace while switching (CEngineApp__Main) */
     /* 0x1CC */ s32 paused;
-    /* 0x1D0 */ u32 matchMode;         /* gEngineApp_m_Settings_matchMode; also the warp the mode switch goes to (func_00430454) */
+    /* 0x1D0 */ u32 matchMode;         /* gEngineApp_m_Settings_matchMode; also the warp the mode switch goes to (CEngineApp__StartGame) */
     /* 0x1D4 */ s32 warpFlags;
     /* 0x1D8 */ GameMatch match;       /* gEngineApp_m_Settings_match */
 } GameSettings; /* size 0x228 */
@@ -142,7 +142,7 @@ typedef struct GameSettings {
 
 /* The automap's state at CGame+0x1230 (Automap_Update, Automap_Draw and
  * Automap_IsShown take &m_Automap): mode, state, blend, then the yaw and
- * pitch words from 0x20. func_00430500 clears the counts and fills the
+ * pitch words from 0x20. Automap_ClearBuffers clears the counts and fills the
  * coloured vertex buffers sAutomapLineVtx, sAutomapMagentaVtx, sAutomapRedVtx, sAutomapYellowVtx.
  * Named CAutomap / m_Automap (Turok 3 and Rage Wars give no name); it was
  * CDebugLines / m_DebugLines before the naming rounds showed what it is. */
@@ -196,7 +196,7 @@ typedef struct CGame {
     /* 0x05BC */ u8 m_MenuPool[0x18];      /* its m_MainCamera.m_MenuPool (MenuPool, structs/menu.h), gEngineApp_m_Game_m_MenuPool */
     /* 0x05D4 */ u8 m_CameraPoolEnd[0x1230 - 0x5D4];
 #endif
-    /* 0x1230 */ CAutomap m_Automap;   /* the automap (gEngineApp_m_Game_m_DebugLines); reset by func_00430500 */
+    /* 0x1230 */ CAutomap m_Automap;   /* the automap (gEngineApp_m_Game_m_DebugLines); reset by Automap_ClearBuffers */
     /* 0x1268 */ GameSettings m_Settings;  /* gEngineApp_m_Settings */
 } CGame; /* size 0x1490 */
 

@@ -1,9 +1,9 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_0042452C(void);
+s32 Video_StartResolutionChange(void);
 
-s32 func_0041A234(void) {
-    func_0042452C();
+s32 PauseMenu_ToggleResolution(void) {
+    Video_StartResolutionChange();
     return 0;
 }

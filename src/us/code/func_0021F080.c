@@ -17,7 +17,7 @@ typedef struct B11Box {
     B11Pt *pC;
 } B11Box;
 void CGameRegion__GetNormalRaw(f32 *out, B11Box *box);
-s32 func_0021F080(CGameObjectInstance *a) {
+s32 GameObject_IsFacingRegionNormal(CGameObjectInstance *a) {
     B11Box *b = (B11Box *)a->header.m_pCurrentRegion;
     f32 t;
     f32 hi;

@@ -7,12 +7,8 @@
 #include "structs/world.h"
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, u8 *b);
-#ifdef TARGET_PORT
 void *CISet__GetBlock(s32 *table, s32 index);
-#else
-void *CISet__GetBlock();
-#endif
-s32 func_002261A8(CScene *lv, s32 unused, CVector3 *pt) {
+s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) {
     CVector3 d;
     f32 bestIdx = -1.0f;
     f32 bestD = 0.0f;
@@ -20,14 +16,10 @@ s32 func_002261A8(CScene *lv, s32 unused, CVector3 *pt) {
     s32 *t;
     s32 n;
     u8 *p;
-#ifdef TARGET_PORT
     /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS the inner CISet__GetBlock gets this
      * function's second argument in $a1 untouched (the path index, passed down the same way by
      * CPathTrack__StartAtNearestPoint); the host passes it. */
     t = CISet__GetBlock(CISet__GetBlock((s32 *) lv->unk_68, unused), 1);
-#else
-    t = CISet__GetBlock(CISet__GetBlock(lv->unk_68), 1);
-#endif
     n = t[1];
     p = (u8 *)(t + 2);
     if (n > 0) {
@@ -47,7 +39,7 @@ s32 func_002261A8(CScene *lv, s32 unused, CVector3 *pt) {
 }
 
 /* CScene__DecompressIntelligence is VM code (the `virtual` segment) from this same source file:
- * its 1.0f and jump table follow func_002261A8's -1.0f in one .rodata
+ * its 1.0f and jump table follow CScene__FindNearestPathPoint's -1.0f in one .rodata
  * (0x800A6010: -1.0f, 1.0f, then the table at 0x800A6018, 8-aligned in the
  * section), which only one object can give. Its .text goes to a section of its
  * own, .text_vm, which the yaml links into `virtual` (linker_section), while

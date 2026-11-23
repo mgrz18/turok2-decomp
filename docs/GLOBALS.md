@@ -308,6 +308,58 @@ were dropped because the header type compiles the same.
 What part B left (field symbols read through views, the audio DMA state, struct
 views local to one or two files) is listed under "Left" below.
 
+## Round 21, part j2
+
+The 468 strings named this round (docs/NAMES.md "Round 21, part j2") have their
+declarations in two new headers, as `char []`, with the string in a comment:
+
+| header | declares |
+|---|---|
+| `menu_text.h` | the menu and controller pak texts: option lines, mission, note, pak-message and cheat-menu lines, multiplayer level and texture-set labels, the menus' printf formats (390) |
+| `strings.h` | the engine's strings read by address: `CCache__Request` descriptions, libultra/libaudio `assert(EX)` literals and file names, crash-screen texts, pickup names and messages, kill and cheat messages, `sPakCompanyCode` (78) |
+
+The other new names went to the headers of their subsystem: `gNumTicks1`
+(`frame.h`), `gAssertLine`/`gAssertExpr` (`engine.h`), `gVideoDitherFilter`
+(`render.h`), `sOnScreenFontTextureBuffer` (`hud.h`), `sAnimDecodeRotation`/
+`sAnimRawRange` (`object.h`), `sHashDebugLongestChain` (`cache.h`),
+`sCameraDefaultText` (`camera.h`, a NULL `u8 *`).
+
+**`tools/hoist_externs.py HEADER`** drops every local declaration of a global
+the header declares (lines without a `local` comment) and includes the header;
+`--mark WHY` comments the lines instead, for a file that cannot include it. It
+was run over every `include/globals/*.h`; `tools/asm_diff.py --base 7340fcdd`
+then failed 12 files (views of a header global: the 11 lines listed under "Left"
+below, the two `PakMenu_FreePagesText` that copy `sPakMenuText_Spaces3` as a
+`Chars4`, the FAKEMATCH `CCache__DrawDebug`'s `gCache` fields); those files were
+restored and redone with the headers they can take or with `--mark`. Functions
+declared as data to take their address (`Texture_DecompressCallback`, `__amDMA`,
+`__CSPVoiceHandler`, `PlayerDeath_CinemaDone`, `PlayerCinema50_Done`,
+`ProPack__Decompress`, `Model_DecompressCallback`,
+`CStaticObject__BuildLitVerticesCallback`, `EnemyAI_HeadNodeCallback`) are
+prototypes now. One port branch changed with a header (`CCameraViewParams__Construct`
+reads `gDefaultVisBits` as the header's scalar).
+
+Counts (a script that counts every name of a multi-name `extern` line, so the
+numbers are a little above the method of the table above):
+
+| | at `7340fcdd` | after j2 |
+|---|---:|---:|
+| local `extern` lines of named globals | 348 (169 files) | 341 (163 files) |
+| ... of them with a `local` comment | 251 | 265 |
+| ... of names no header declares | 132 (54 names) | 122 (46 names) |
+| ... redeclaring a header global without a `local` comment | 20 | 11 |
+| local lines of the round's new names (strings and data) | (970 as `D_` externs) | 8, all `local` (the two `PakMenu_FreePagesText`) |
+
+The 970 `D_` extern lines the strings had (856 of the menu texts, 114 of the
+engine strings) went to the two headers. Left without a header: the same names
+as below minus the callbacks, plus `gT2BitStreamBase` (9 lines, a port-only
+symbol in `#ifdef TARGET_PORT` code).
+
+After the round-21 merge (j3's retyped menu files took the j2 rewrites again):
+337 local `extern` lines of named globals (261 with a `local` comment), 123
+lines (48 names) without a header, 10 redeclaring a header global without a
+`local` comment (same counting script).
+
 ## Left
 
 - **Globals without a header (119 lines, 51 names).**
@@ -330,9 +382,9 @@ views local to one or two files) is listed under "Left" below.
     `gParticleSpriteVtx`, `gDLightBuffer`, `sResizedViMode`,
     `gScreenViewport`, `gPoolBuffers`, `sBoneMatrixProfile`/`sBoneMatrixCount`,
     `gHeap_usedHead`, `sBootMarker`.
-  - Functions declared as data to take their address (callbacks such as
-    `Texture_DecompressCallback`, `ProPack__Decompress`, `__amDMA`,
-    `__CSPVoiceHandler`): these want prototypes, not header data.
+  - Functions declared as data to take their address: prototypes since
+    round 21 j2, except `CList__Construct`/`Automap_RevealRegion` in
+    `IsCodePointer` (code-range bounds, `local`).
 - **Header globals redeclared without a `local` comment (15 lines):** the
   `gCache_*` fields in `func_00204778` (FAKEMATCH); the split-screen margins in
   `func_0027ECF0`; `sHostIoSavedTlb` in `func_002A13F0`;

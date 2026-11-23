@@ -10,7 +10,7 @@
 
 extern void CCache__BeginDisplayList(s32, s32, CFrameData *);
 extern void Texture_InvalidateCache(void);
-extern void func_0020B554(void);
+extern void Render_SetupFog(void);
 extern void CEngineApp__BeginDisplayList(CEngineApp *);
 extern void DLights_SwapBuffers(void);
 extern void Controller_UpdatePakInsertion(void);
@@ -114,7 +114,7 @@ void CEngineApp__Draw(CEngineApp *level) {
     start = osGetTime();
     CCache__BeginDisplayList(0, gEvenOdd, gFrameData = gEngineApp.m_pCurrentFrameData);
     Texture_InvalidateCache();
-    func_0020B554();
+    Render_SetupFog();
     CEngineApp__BeginDisplayList(level);
     DLights_SwapBuffers();
     Controller_UpdatePakInsertion();

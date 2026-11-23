@@ -2,13 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu_text.h"
 #include "globals/pak.h"
 
-extern char D_800B5130[];
-extern char D_800B5194[];
-extern char D_800B51D0[];
-extern char D_800B521C[];
-extern char D_800B527C[];
 s32 PakConfirmMenu_UpdateLine1(struct FieldRecAt14 *field) {
     u32 state = gPakConfirmKind;
     if (state >= 5) {
@@ -22,19 +18,19 @@ s32 PakConfirmMenu_UpdateLine1(struct FieldRecAt14 *field) {
         case 4: goto state_4;
         }
 state_other:
-    field->text = D_800B5130;
+    field->text = sPakConfirmMenuText_AttemptRepair;
     goto done;
 state_1:
-    field->text = D_800B5194;
+    field->text = sPakConfirmMenuText_Error_B5194;
     goto done;
 state_2:
-    field->text = D_800B51D0;
+    field->text = sPakConfirmMenuText_Error_B51D0;
     goto done;
 state_3:
-    field->text = D_800B521C;
+    field->text = sPakConfirmMenuText_Overwrite;
     goto done;
 state_4:
-    field->text = D_800B527C;
+    field->text = sPakConfirmMenuText_Error_B527C;
 done:
     return 0;
 }

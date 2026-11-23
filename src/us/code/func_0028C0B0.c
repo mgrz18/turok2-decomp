@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/strings.h"
 #include "structs/player.h"
 #include "globals/game.h"
 #include "globals/frame.h"
@@ -33,11 +34,8 @@ typedef struct Thread {
 } Thread;
 
 /* "\n": the string literal of the functions before this one in the same file (the ROM merges it), declared so this one does not emit its own copy. */
-extern u8 D_800AA0F0[];
 extern u16 *gCFB;             /* local type: gCFB[0] (globals/framebuffer.h) read as a scalar; the array form shares a base register */
 extern char D_8010FED4[];
-extern s32 D_800F1FF0;              /* failed assertion: line */
-extern char *D_800F1FF4;            /* failed assertion: expression */
 
 extern void Video_SetResolution(s32);
 extern void Crash_PutChar(u8 c);                /* draws one character */
@@ -101,7 +99,7 @@ void Crash_ShowScreen(Thread *thread) {
     sCrashTextColor = 0xF7A9;
     printString((u8 *)"TUROK2 BUILD ");
     printString((u8 *)gEngineTimestamp);
-    printString(D_800AA0F0);
+    printString(sCrashText_Newline);
     printString((u8 *)D_8010FED4);
     printString((u8 *)" ");
     if (gScene_m_bWarpSpawn != 0) {
@@ -110,7 +108,7 @@ void Crash_ShowScreen(Thread *thread) {
     } else {
         printString((u8 *)"NO WARP ID");
     }
-    printString(D_800AA0F0);
+    printString(sCrashText_Newline);
     for (player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead, i = 0; player != NULL; player = player->m_pNext, i++) {
         printString((u8 *)"PLAYER");
         printInt(i);
@@ -121,30 +119,30 @@ void Crash_ShowScreen(Thread *thread) {
         printInt(player->m_CharacterActor.header.m_vPos.y * 0.09765625f);
         printString((u8 *)" ");
         printInt(player->m_CharacterActor.header.m_vPos.z * 0.09765625f);
-        printString(D_800AA0F0);
+        printString(sCrashText_Newline);
     }
-    printString(D_800AA0F0);
+    printString(sCrashText_Newline);
     if (gAssertFile != NULL) {
         printString((u8 *)"ASSERTION FAILED!! in thread ");
         printInt(thread->id);
         printString((u8 *)"\nFile: ");
         printString((u8 *)gAssertFile);
         printString((u8 *)"  Line: ");
-        printInt(D_800F1FF0);
-        printString(D_800AA0F0);
-        if (D_800F1FF4 != NULL) {
+        printInt(gAssertLine);
+        printString(sCrashText_Newline);
+        if (gAssertExpr != NULL) {
             printString((u8 *)"(");
-            printString((u8 *)D_800F1FF4);
+            printString((u8 *)gAssertExpr);
             printString((u8 *)") = 0");
         }
-        printString(D_800AA0F0);
+        printString(sCrashText_Newline);
     } else {
         printString((u8 *)"Fault in thread ");
         printInt(thread->id);
-        printString(D_800AA0F0);
+        printString(sCrashText_Newline);
         Crash_PrintFlags(context->cause, "cause", gCrashCauseDesc);
     }
-    printString(D_800AA0F0);
+    printString(sCrashText_Newline);
     Crash_PrintRegPair("pc", context->pc, "sp", context->sp);
     Crash_PrintRegPair("ra", context->ra, "badvaddr", context->badvaddr);
     Crash_PrintRegPair("a0", context->a0, "a1", context->a1);

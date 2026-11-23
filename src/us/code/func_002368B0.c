@@ -10,7 +10,7 @@ typedef struct {
 
 /* Detaches swoosh arg0 from its owner (flags & 1: counted in a game object's m_ActiveSwooshes,
  * & 2: in a particle's) and lets it fade out. */
-void func_002368B0(Swoosh *arg0) {
+void Swoosh_ReleaseOwner(Swoosh *arg0) {
     f32 temp_f1;
     u8 temp_v0;
     u8 temp_v0_2;

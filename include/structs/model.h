@@ -3,7 +3,7 @@
 
 /* Drawing models: what an actor's draw callback gets (CDrawArgs, filled by
  * CGameObjectInstance__Draw) and the model batch (Render_QueueModelInstance queues one instance of a
- * model's level of detail, Render_QueueModelByKey / func_0020B9F4 load the model
+ * model's level of detail, Render_QueueModelByKey / Render_QueueModelByResource load the model
  * first, Render_FlushModelBatch flushes the batch through its material sort tree).
  * Rage Wars has the batch in src/RENDER_4 (Render_QueueModelInstance).
  * tools/check_structs.py checks every offset below with the game's compiler. */

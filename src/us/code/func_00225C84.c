@@ -5,7 +5,7 @@
 
 /* Host body (the Blind One fight reaches it): the actor table and its count at the N64 scene
  * offsets 0xE0/0xE8, the definition at actor + 0x14 and the N64 stride 0x288; the same walk
- * as CScene__UnmarkGeneratorsSaved (func_00225D0C) on host members: every type-3 actor
+ * as CScene__UnmarkGeneratorsSaved (CScene__UnmarkGeneratorsSaved) on host members: every type-3 actor
  * (a generator) gets its saved bit. */
 void CScene__MarkGeneratorsSaved(void *arg0)
 {

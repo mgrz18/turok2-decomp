@@ -31,6 +31,7 @@ typedef struct CameraMode {
     /* 0x4 */ void (*update)(struct CCamera *cam);
 } CameraMode; /* size 0x8 */
 extern CameraMode gCameraModeTable[1]; /* the ROM has the one mode, 0 */
+extern u8 *sCameraDefaultText;          /* NULL: the CCameraPool__AddText* functions start with it as the text */
 
 /* The camera player's AI flags, kept three frames (CCamera__DrawTints). */
 extern u32 sTintFlags;

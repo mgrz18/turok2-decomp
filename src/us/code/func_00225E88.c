@@ -9,11 +9,7 @@ typedef struct {
 typedef struct {
     /* 0x00 */ u8 pad0[0x64];
 #endif
-#ifdef TARGET_PORT
     void *file;
-#else
-    /* 0x64 */ s32 file;
-#endif
 } Resource;
 
 

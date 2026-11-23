@@ -484,7 +484,7 @@ default); only the executable's link was `-no-pie` (`T2_LOW_MEMORY`). With
 `-DT2_LOW_MEMORY=OFF` the executable is an ELF PIE: code and statics at 0x5555_5555_4000 under
 gdb, 0x5xxx_xxxx_xxxx with ASLR, i.e. above 4 GB like the heap and the game thread stacks; any
 static address still passed through an `s32` truncates. `port/gen/data_abs.c` (the absolute
-symbols that DATA.md said needed `-no-pie`) is empty today: `D_14A000` is read only by the VM
+symbols that DATA.md said needed `-no-pie`) is empty today: `gVirtualRomStart` is read only by the VM
 pager, which is not built. Results: boot + 3 demos identical to the non-PIE build (`T2_DET_LOG`, 52,000 lines); one PIE-only class (S23, the cheat/name entry fields calling through an `(s32)` cast); after it 123 soak runs (attract, newgame, warp, levels), 0 crashes. PIE is the default now (`T2_LOW_MEMORY` OFF).
 
 The fixes of this round that were pointer width (S14 the throwable owner, S18 the spawn's region

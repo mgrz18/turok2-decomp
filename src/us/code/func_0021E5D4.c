@@ -51,7 +51,7 @@ struct LevelActor;
  * strides are the N64 layouts): runs the type's init on the actor and its AI, and counts the
  * update for actors with flag 0x08000000. A player's own actor has no type block, its weapon
  * actor gets gWeaponActorTypeInfo. */
-void func_0021E5D4(char *arg0)
+void CGameObjectInstance__InitAIType(char *arg0)
 {
     CGameObjectInstance *obj = (CGameObjectInstance *) arg0;
     CIntelligenceTypeInfo *entry;
@@ -83,7 +83,7 @@ void func_0021E5D4(char *arg0)
     }
 }
 #else
-void func_0021E5D4(char *arg0)
+void CGameObjectInstance__InitAIType(char *arg0)
 {
     s32 type;
     s32 i;

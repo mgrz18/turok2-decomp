@@ -14,7 +14,7 @@
  * world has no such warp point). */
 /* The two do/while(0) blocks (macro-like groups in the original?) give the ROM's register choice
  * and store order. */
-void func_00430454(CEngineApp *session, s32 warp) {
+void CEngineApp__StartGame(CEngineApp *session, s32 warp) {
     CWarpPoint point;
 
     if (CScene__FindWarpDests(&gScene, -1, warp, &point, 1) == 0) {

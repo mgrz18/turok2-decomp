@@ -11,12 +11,8 @@
 #include "protos/player.h"
 #include "protos/game.h"
 
-#ifdef TARGET_PORT /* host layout: CGame.m_Settings (structs/game.h) */
 #include "structs/game.h"
 #define GAME_SETTINGS_OFF T2_OFFSETOF(CGame, m_Settings)
-#else
-#define GAME_SETTINGS_OFF 0x1268
-#endif
 
 /* Drops an actor's loot at its feet (raised to the ground height): kind 0
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup

@@ -9,7 +9,7 @@
 
 typedef struct CIntelligenceTypeInfo {
     /* 0x00 */ void (*setup)(void *obj, void *ai);      /* EnemyAI_Init, WeaponActor_InitAI... */
-    /* 0x04 */ void (*init)(void *obj, void *ai);       /* EnemyAI_InitDispatch... (func_0021E5D4) */
+    /* 0x04 */ void (*init)(void *obj, void *ai);       /* EnemyAI_InitDispatch... (CGameObjectInstance__InitAIType) */
 } CIntelligenceTypeInfo;
 
 #endif

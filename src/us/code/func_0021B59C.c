@@ -11,7 +11,7 @@ extern void CVector3__Scale(CVector3 *, CVector3 *, f32);
 extern void CMtxF__Translate(f32 *, f32, f32, f32);
 extern void CMtxF__SetAxisAngle(f32 *, f32, f32, f32, f32);
 extern void CMtxF__MultiplyAffine(f32 *, f32 *, f32 *);
-void func_0021B59C(s32 time, s32 flags, f32 *matrix) {
+void CGameObjectInstance__WobbleBone(s32 time, s32 flags, f32 *matrix) {
     f32 rotation[16];
     f32 inverse[16];
     CVector3 origin;

@@ -10,7 +10,7 @@ s32 Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
  * the camera's viewport and 0xB60 of CPlayer.m_SightIconFrame. */
 #include "structs/player.h"
 #include "structs/camera.h"
-void func_00254768(void *arg0, void *arg1)
+void CPlayer__DrawSightIcon(void *arg0, void *arg1)
 {
   CPlayer *player = arg0;
   CCamera *view = arg1;
@@ -28,7 +28,7 @@ void func_00254768(void *arg0, void *arg1)
                  (s16) ((s32) ((view->m_Viewport.m_ScreenPosY + h) + (sy * -5.0e1f))), sx, sy, 1);
 }
 #else
-void func_00254768(void *arg0, void *arg1)
+void CPlayer__DrawSightIcon(void *arg0, void *arg1)
 {
   f32 temp_f0;
   f32 temp_f2;

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
+#include "structs/pak.h"
 
 void Controller_WatchPak(s32 port);
 void Pak_ProbeSlot(s32 port);
@@ -16,14 +17,10 @@ static __inline__ s32 GetPort(Menu *event) {
 
 /* The pak selection (as in PakMenu_InitSaveGame): a two-word struct, so GCC keeps it in a stack slot; the store of
  * the port and the frame's extra 8 bytes come from it, while the call reads the register. */
-typedef struct {
-    s32 v;
-    s32 w;
-} PadSel;
 
 void SavePortalMenu_Init(Menu *event) {
     ControllerProfile *controller = event->controller;
-    PadSel sel;
+    PakChannel sel;
 
     gPakMenuAnyPak = 0;
     gDamagedPakContinued = 0;
@@ -34,7 +31,7 @@ void SavePortalMenu_Init(Menu *event) {
     gPakMenuIsLoad = 0;
     gPakMenuIsProfile = 0;
     sSavePortalChosen = 0;
-    sel.v = controller->port;
-    Controller_WatchPak(sel.v);
+    sel.channel = controller->port;
+    Controller_WatchPak(sel.channel);
     Pak_ProbeSlot(GetPort(event));
 }

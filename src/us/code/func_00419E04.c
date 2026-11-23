@@ -1,13 +1,8 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B6510[];
-extern char D_800B64F8[];
-extern char D_800B64E0[];
-extern char D_800B6528[];
-extern char D_800C1030[]; /* "  %2d" */
-extern char D_800C1038[]; /* " %3d" */
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 
@@ -16,17 +11,17 @@ s32 SoundMenu_MusicVolumeLabel(MenuItem *a) {
     s32 v = (gEngineApp_m_Settings.unk14 - 0x80) / 8;
 
     if (v == 0) {
-        a->text = D_800B6510;
+        a->text = sSoundMenuText_MusicVolumeNorm;
     } else if (v == 15) {
-        a->text = D_800B64F8;
+        a->text = sSoundMenuText_MusicVolumeMax;
     } else if (v == -16) {
-        a->text = D_800B64E0;
+        a->text = sSoundMenuText_MusicVolumeOff;
     } else if (v > 0) {
-        a->text = D_800B6528;
-        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C1030, v);
+        a->text = sSoundMenuText_MusicVolume;
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), sSoundMenuFmt_2d, v);
     } else {
-        a->text = D_800B6528;
-        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C1038, v);
+        a->text = sSoundMenuText_MusicVolume;
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), sSoundMenuFmt_3d, v);
     }
     return 0;
 }

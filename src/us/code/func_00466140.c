@@ -18,14 +18,10 @@ typedef struct DirLight {
 
 extern DirLight gParticleSpriteVtx[4];
 
-extern void func_0027BD10(void *def);
+extern void CIntelligence__Init(void *def);
 extern void CMtxF__SetRotateX(void *, f32);
 
-#ifdef TARGET_PORT
 void CParticleSystem__Construct_2(CParticleSystem *sys, sptr arg1) { /* the particle data pointer-wide */
-#else
-void CParticleSystem__Construct_2(CParticleSystem *sys, s32 arg1) {
-#endif
     s32 i;
     s32 j;
     DirLight *light;
@@ -45,7 +41,7 @@ void CParticleSystem__Construct_2(CParticleSystem *sys, s32 arg1) {
     for (i = 0; i < 3; i++) {
         CList__Construct(&sys->m_ActiveList[i], T2_OFFSETOF(CParticle, m_pLast), T2_OFFSETOF(CParticle, m_pNext));
     }
-    func_0027BD10(&gParticleIntelligence);
+    CIntelligence__Init(&gParticleIntelligence);
     for (j = 0; j < 4; j++) {
         light = &gParticleSpriteVtx[j];
         switch (j) {

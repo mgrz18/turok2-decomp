@@ -8,7 +8,7 @@ s32 MantidQueen_Hurt(s32, s32, s32);
 s32 MantidQueen_Step(sptr, sptr);
 s32 MantidQueen_Draw(sptr, sptr, sptr);
 
-extern s32 EnemyAI_HeadNodeCallback;
+void EnemyAI_HeadNodeCallback(void);
 
 void MantidQueen_InitAI(sptr arg0, CAI *arg1) {
     gScene_m_LevelID = 0x1D4D;

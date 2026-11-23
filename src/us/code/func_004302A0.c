@@ -1,19 +1,14 @@
-/* WRONG CUT: the real function is func_004302A0, size 0x90 (splat split it at func_004302CC). */
+/* WRONG CUT: the real function is Render_InitUnitQuad, size 0x90 (splat split it at func_004302CC). */
 #include "common.h"
+#include "structs/gbi.h"
 
-typedef struct QuadVtx {
-    /* 0x0 */ s16 ob[3];
-    /* 0x6 */ u16 flag;
-    /* 0x8 */ s16 tc[2];
-    /* 0xC */ u8 cn[4];
-} QuadVtx;
 
-extern QuadVtx D_8011AD48[4];
+extern Vtx_t D_8011AD48[4];
 
 /* Builds a unit quad in the XZ plane, white, textured 32x32 (S10.5 texture coordinates). */
-void func_004302A0(void) {
+void Render_InitUnitQuad(void) {
     s32 i;
-    QuadVtx *v = D_8011AD48;
+    Vtx_t *v = D_8011AD48;
 
     v[0].ob[0] = -1;
     v[0].ob[2] = 1;

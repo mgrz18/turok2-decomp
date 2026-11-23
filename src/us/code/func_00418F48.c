@@ -1,10 +1,9 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800C0E84[]; /* "  %02d" */
-extern char D_800C0E8C[]; /* "none" */
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 
@@ -13,9 +12,9 @@ s32 TeamBloodMenu_TimeLimitLabel(MenuItem *a) {
     GameSettings *setup = &gEngineApp_m_Settings;
 
     if (setup->teamTimeLimit != 0) {
-        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C0E84, setup->teamTimeLimit);
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), sLimitLabelFmt_02d, setup->teamTimeLimit);
     } else {
-        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C0E8C);
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), sLimitLabelText_None);
     }
     return 0;
 }

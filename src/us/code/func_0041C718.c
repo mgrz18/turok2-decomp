@@ -1,10 +1,9 @@
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800B40B0[];
-extern char D_800B40C8[];
 
 /* The weapon select item's text: quick or normal. */
 s32 OptionsMenu_WeaponSelectText(MenuItem *item, Menu *menu)
@@ -14,7 +13,7 @@ s32 OptionsMenu_WeaponSelectText(MenuItem *item, Menu *menu)
   u8 *select;
   CPlayer *player;
   player = menu->player;
-  quick = D_800B40B0;
+  quick = sOptionsMenuText_WeaponSelectQuick;
   settings = &gEngineApp_m_Settings.defaultSlot;
   if (player != 0)
   {
@@ -27,7 +26,7 @@ s32 OptionsMenu_WeaponSelectText(MenuItem *item, Menu *menu)
   }
   else
   {
-    item->text = D_800B40C8;
+    item->text = sOptionsMenuText_WeaponSelectNorm;
   }
   return 0;
 }

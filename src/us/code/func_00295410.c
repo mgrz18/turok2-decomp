@@ -9,15 +9,11 @@ extern s32 alAuxBusParam(s32, s32, s32);
 extern void alFilterNew(void *, void *, void *, s32);
 
 /* alAuxBusNew */
-#ifdef TARGET_PORT
 typedef sptr BusSources; /* the source list is a host pointer (s32 truncated it above 4 GB) */
-#else
-typedef s32 BusSources;
-#endif
 
 void alAuxBusNew(ALAuxBus *arg0, BusSources arg1, s32 arg2) {
 #ifdef TARGET_PORT
-    /* func_00294D54 + 0xC is alAuxBusPull (func_00294D60): the ROM points into a stray word */
+    /* func_00294D54 + 0xC is alAuxBusPull (alAuxBusPull): the ROM points into a stray word */
     alFilterNew(arg0, alAuxBusPull, alAuxBusParam, 6);
 #else
     alFilterNew(arg0, (s8 *)func_00294D54 + 0xC, alAuxBusParam, 6);

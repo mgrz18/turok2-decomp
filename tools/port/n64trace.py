@@ -370,7 +370,7 @@ def main():
                          "so the level's own load starts from HEX (the port's T2_RNG_LOAD twin)")
     ap.add_argument("--ticks", type=int, default=0,
                     help="N (round 17 f3): at every --at breakpoint set the four retrace counts CEngineApp__Update "
-                         "averages (gNumTicks0/2/3, D_800F6CA8) to N, so gNextTicks is N as in the port: the "
+                         "averages (gNumTicks0/2/3, gNumTicks1) to N, so gNextTicks is N as in the port: the "
                          "emulator's slow frames (3 retraces after a load) do not change gFrameIncrement")
     ap.add_argument("--shots", default="",
                     help="(round 20 i1) emulator frames to screenshot (refshots.py syntax: A,B:C:STEP), written to OUT/shot_<frame>.png; with --pad the menus, the map and the pause screen can be shot, which refshots.py --input cannot reach")
@@ -660,7 +660,7 @@ def main():
         if pc == bp_addr:
             if a.ticks:
                 ram = Ram(core.DebugMemGetPointer(R.M64P_DBG_PTR_RDRAM))
-                for ad in (syms["gNumTicks0"], syms["gNumTicks2"], syms["gNumTicks3"], 0x800F6CA8):  # D_800F6CA8
+                for ad in (syms["gNumTicks0"], syms["gNumTicks2"], syms["gNumTicks3"], 0x800F6CA8):  # gNumTicks1
                     wr32(ram, ad, a.ticks)
             do_pokes()
             trace()

@@ -1,4 +1,3 @@
-
 typedef signed char s8;
 typedef unsigned char u8;
 typedef signed short s16;
@@ -15,44 +14,23 @@ typedef __UINTPTR_TYPE__ t2_uptr;
 #else
 typedef u32 t2_uptr;
 #endif
-void Sort_Insertion(t2_uptr arg0, t2_uptr arg1, s32 arg2, s32 (*arg3)(t2_uptr, t2_uptr), s32 (*arg4)(t2_uptr, t2_uptr))
+/* De-faked in round 21 (j4): the draft copied first into best through two identical arms; the plain
+ * loops match. */
+/* Sorts the elements first..last (size bytes apart) in place, largest last: picks the largest with
+ * compare and swaps it to the end, then shortens the range. (A selection sort, despite the name.) */
+void Sort_Insertion(t2_uptr first, t2_uptr last, s32 size, s32 (*compare)(t2_uptr, t2_uptr), s32 (*swap)(t2_uptr, t2_uptr))
 {
-  t2_uptr var_a0;
-  t2_uptr var_s0;
-  t2_uptr var_s1;
-  t2_uptr var_s2;
-  var_s2 = arg1;
-  if (arg0 < var_s2)
-  {
-    var_s0 = arg0 + arg2;
-    do
-    {
-      if (arg0)
-      {
-        var_s1 = arg0;
-      }
-      else
-      {
-        var_s1 = arg0;
-      }
-      if (var_s2 >= var_s0)
-      {
-        var_a0 = var_s0;
-        do
-        {
-          if (arg3(var_a0, var_s1) > 0)
-          {
-            var_s1 = var_s0;
-          }
-          var_s0 += arg2;
-          var_a0 = var_s0;
+    t2_uptr p;
+    t2_uptr best;
+
+    while (first < last) {
+        best = first;
+        for (p = first + size; p <= last; p += size) {
+            if (compare(p, best) > 0) {
+                best = p;
+            }
         }
-        while (var_s2 >= var_s0);
-      }
-      arg4(var_s1, var_s2);
-      var_s2 -= arg2;
-      var_s0 = arg0 + arg2;
+        swap(best, last);
+        last -= size;
     }
-    while (arg0 < var_s2);
-  }
 }

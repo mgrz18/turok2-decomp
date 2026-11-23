@@ -9,8 +9,8 @@
 #include "protos/ultra.h"
 
 
-extern u8 D_14A000[];               /* the paged data in the ROM */
-extern u8 D_3CAE0[];                /* its size */
+extern u8 gVirtualRomStart[];       /* ROM 0x14A000: the virtual segment (VM module 1 first) */
+extern u8 gVirtualModule1Size[];    /* 0x3CAE0: VM module 1's size, an absolute symbol */
 
 u32 GetMemSize(void);            /* osGetMemSize */
 void __osUnmapTLBAll(void);           /* osUnmapTLBAll */
@@ -62,10 +62,10 @@ void VM_Initialize(void) {
     gPager.regions.pages = 0x80;
     gPager.regions.map = gPager.lookup;
     gPager.regions.next = NULL;
-    gPager.regions.source = (u8 *)((uptr)D_14A000 | 0xB0000000);
+    gPager.regions.source = (u8 *)((uptr)gVirtualRomStart | 0xB0000000);
     gPager.mapped = 0;
     if (GetMemSize() > 0x4FFFFF) {
-        CLoader__LoadSync(&gLoader, D_14A000, D_3CAE0, extra);
+        CLoader__LoadSync(&gLoader, gVirtualRomStart, gVirtualModule1Size, extra);
     }
     if (extra != 0) {
         func_0028EE40(0, 0x7E000, 0x400000, extra + 0x80000000, extra + 0x80040000, 7);

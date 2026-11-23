@@ -5,7 +5,7 @@
 
 
 /* Whether the particle is at or below the water height of its region's info flagged 0x1000000. */
-s32 func_00232684(CParticle *obj) {
+s32 CParticle__IsBelowWaterSurface(CParticle *obj) {
     CRegionInfo *target;
 
     if (obj->header.m_pCurrentRegion == NULL) {

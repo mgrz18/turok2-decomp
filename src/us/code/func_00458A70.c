@@ -1,23 +1,17 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00407F6C.c, func_00407F6C, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
 /* Controller pak note list item: prints a note's name (16 characters), extension (4) and size in blocks
  * into the item's text; an empty slot prints blanks. */
 
-extern char D_800B48D4[];
-extern char D_800B48E0[];
-extern u8 D_800C1404[];
 s32 Pak_FindNote_2(s32 pad, s32 idx, s32 *valid, u8 *name, u8 *ext, s32 *blocks, u8 *company, u8 *game);
 s32 Pak_TextHasInvalidChar_2(u8 *p, s32 n);
 char *Str_Copy_2(char *dst, char *src);
-#ifdef TARGET_PORT
 /* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
 void sprintf(char *dst, const char *fmt, ...);
-#else
-void sprintf(char *dst, u8 *fmt, s32 a);
-#endif
 
 s32 PakMenu_NoteText_2(MenuItem *item, Menu *own) {
     u8 name[16];
@@ -47,11 +41,11 @@ s32 PakMenu_NoteText_2(MenuItem *item, Menu *own) {
     r = Pak_FindNote_2(pad, idx, &valid, name, ext, &blocks, company, game);
     if (valid != 0 && r == 0) {
         if (Pak_TextHasInvalidChar_2(name, 16) != 0) {
-            Str_Copy_2((char *)name, D_800B48D4);
+            Str_Copy_2((char *)name, sPakMenuText_OtherGame);
         }
     } else {
-        Str_Copy_2((char *)name, D_800B48E0);
-        Str_Copy_2((char *)ext, D_800B48E0);
+        Str_Copy_2((char *)name, sPakMenuText_Empty);
+        Str_Copy_2((char *)ext, sPakMenuText_Empty);
         blocks = 0;
     }
     dst = (u8 *)item->text;
@@ -86,6 +80,6 @@ s32 PakMenu_NoteText_2(MenuItem *item, Menu *own) {
         dst++;
     }
     *dst = *dst + 2;
-    sprintf((char *)dst, D_800C1404, blocks);
+    sprintf((char *)dst, sPakMenuFmt_3d, blocks);
     return 0;
 }

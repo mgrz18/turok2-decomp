@@ -1,5 +1,6 @@
 /* Player code: CPlayer__NewGame, 0x0042DC18-0x0042DE74 (splat had it inside the data D_0042D50C). */
 #include "common.h"
+#include "globals/menu_desc.h"
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/camera.h"
@@ -14,21 +15,14 @@ extern u8 *CCameraPool__AllocCamera(void *);
 extern void CBarrel__Reset(void *strokes);
 extern void CPlayer__GiveStartingWeapons(CPlayer *p);
 extern void CPlayer__ResetHealth(CPlayer *p);
-#ifdef TARGET_PORT
 /* The port: the three window descs are data (MenuDesc), not functions: declared as such so
  * tools/port/gendata.py lays them out (as func_* they were zero .bss placeholders). */
 #include "structs/menu.h"
-extern MenuDesc gCharacterMenuDesc;
 extern MenuDesc D_004388E0;
 extern MenuDesc D_0043916C;
 #define func_00438808 (&gCharacterMenuDesc)
 #define func_004388E0 (&D_004388E0)
 #define func_0043916C (&D_0043916C)
-#else
-extern void func_004388E0();
-extern void func_00438808();
-extern void func_0043916C();
-#endif
 
 void CPlayer__NewGame(CPlayer *p, s32 character, s32 arg2) {
     GameSettings *flags;

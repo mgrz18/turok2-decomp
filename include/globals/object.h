@@ -17,6 +17,8 @@ extern s32 sAnimFrameCount;
 extern s32 sAnimTrackCount;
 extern f32 sAnimRemapMin;
 extern f32 sAnimRemapMax;
+extern s32 sAnimDecodeRotation;     /* 1 while Anim_DecodeAnimation decodes the 4-component tracks */
+extern s32 sAnimRawRange;           /* the channel range is two raw f32 words (AnimCurve_Init) */
 
 /* The skeleton poser's scratch, shared by every level of its recursion (one bone per call) */
 extern struct BoneList *sPoseChildren;   /* the bone's children */

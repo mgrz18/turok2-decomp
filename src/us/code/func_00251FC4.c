@@ -12,7 +12,6 @@
 #include "protos/ai.h"
 #include "protos/menu.h"
 
-#ifdef TARGET_PORT
 /* The port: the player pool at its host layout (CPlayerPool, structs/player_list.h: the two
  * leading pointers and the list links are pointer-wide). */
 typedef struct {
@@ -31,21 +30,6 @@ typedef struct {
     s32 cinema;
     s32 cinemaStarted;
 } PlayerList;
-#else
-typedef struct {
-    /* 0x00 */ CPlayer *head;
-    /* 0x04 */ u8 pad4[0x10 - 4];
-    /* 0x10 */ u32 count;
-} PlayerCList;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ PlayerCList idle;        /* players not in the game */
-    /* 0x20 */ PlayerCList active;      /* players in the game */
-    /* 0x34 */ s32 cinema;
-    /* 0x38 */ s32 cinemaStarted;
-} PlayerList;
-#endif
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -85,7 +69,6 @@ typedef struct {
 } PortSetup;
 
 extern Globals gEngineApp_m_Game_m_MenuPool; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
-extern PortSetup D_8011AB88[];
 
 void CPlayer__Update(CPlayer *p);
 void CPlayer__UpdateOrbitCamera(CPlayer *p, CPlayer *other);
@@ -198,7 +181,7 @@ void CPlayerPool__Update(PlayerList *list) {
         if (p != NULL && !match->over && (match->timeLeft >= 900.0f || match->timeLeft < 0.0f || !gEngineApp_m_Game_m_MenuPool.timed)
             && ((p->m_ContState.m_pContState->buttonsSingle & 0x1000) || p->m_bActive)) {
             p->m_bActive = 1;
-            character = D_8011AB88[p->m_nController].character;
+            character = gEngineApp_m_Settings.slots[p->m_nController].m_nCharacter;
             p->m_pOptions->m_bActive = 1;
             CPlayer__NewGame(p, character, 1);
             CAI__SetMode(&p->m_WeaponActor, &p->m_WeaponActor.m_AI, 2);

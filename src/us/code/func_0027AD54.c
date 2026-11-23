@@ -11,7 +11,6 @@ typedef struct {
     /* 0x8C */ s32 unk8C;
 } Unk0027AD54;
 
-#ifdef TARGET_PORT
 #include "structs/player.h"
 
 /* Host body: the view above writes the second boss bar at N64 offsets (0x48 the overlay, 0x84 the
@@ -25,11 +24,3 @@ void COnScreen__SetBoss2(void *arg0, sptr arg1, sptr arg2) {
     os->m_BossPercent2 = 0x64;
     COverlay__StartScript(&os->m_BossOverlay2, sBossBar2OverlayScript);
 }
-#else
-void COnScreen__SetBoss2(Unk0027AD54 *arg0, sptr arg1, sptr arg2) {
-    arg0->unk88 = arg1;
-    arg0->unk84 = arg2;
-    arg0->unk8C = 0x64;
-    COverlay__StartScript(arg0->sub48, sBossBar2OverlayScript);
-}
-#endif

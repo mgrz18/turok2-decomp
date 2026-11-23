@@ -32,8 +32,8 @@ extern void **CCache__LoadPersistantIndex(s32 unused, void **out, sptr key, char
 extern void **CCache__LoadPersistantSubBlock(s32 unused, void *file, s32 index, s32 key, CScene *owner, void *callback, char *name);
 extern void CCache__SetFrameDelay(s32);
 extern void CGameObjectInstance__UpdateAnimation(u8 *actor);
-extern void func_0021E5D4(u8 *actor);
-extern void func_0021F1B4(u8 *actor);
+extern void CGameObjectInstance__InitAIType(u8 *actor);
+extern void CGameObjectInstance__UpdateAI(u8 *actor);
 extern void Sound__StopFlags(s32);
 extern void Sound__DetachAll(void);
 extern void LoopSounds_Construct(void *, void *, s32);
@@ -42,29 +42,25 @@ extern s32 Demo_GetPlayerCount(void);
 extern void CCameraPool__Advance(void *);
 extern s32 Cinema_IsActive(void);
 extern void Cinema_RequestOnce_2(s32 sound);
-extern void func_00462E40(void *heap, void *data, s32 size);
+extern void MatrixHeap_Construct_2(void *heap, void *data, s32 size);
 extern void CScene__LoadLightSettings_2(CScene *w);
 extern s32 CScene__DecompressLinks_2(sptr, sptr);
-extern s32 func_004645D0(s32, s32);
+extern s32 CScene__DecompressCollision_2(s32, s32);
 extern s32 CScene__DecompressAnimatedInstances_2(sptr, sptr);
-extern void func_00464E68(CScene *w);
-extern void func_004656BC(CScene *w);
-extern void func_00465760(CScene *w);
-extern void func_0046588C(void);
-extern s32 func_00465C24(s32, s32);
+extern void CScene__StreamAllSections_2(CScene *w);
+extern void CScene__RestoreFiredEvents_2(CScene *w);
+extern void CScene__ReapplyFiredEvents_2(CScene *w);
+extern void CScene__FlushDelayedEvents_2(void);
+extern s32 CScene__DecompressPaths_2(s32, s32);
 extern void SceneActorPool_Construct_2(CLevelActorPool *);
 extern void CInstancePool__Construct_2(void *);
-extern void func_00466040(void *);
-#ifdef TARGET_PORT
+extern void CDLightSet__Construct_2(void *);
 /* the particle data is a pointer: m_pParticleEffects is the cache handle (read pointer-wide) */
 extern void CParticleSystem__Construct_2(CParticleSystem *, sptr);
-#else
-extern void CParticleSystem__Construct_2(CParticleSystem *, s32);
-#endif
-extern void func_00466330(void *);
+extern void SwooshSystem_Construct_2(void *);
 extern void CPlayerPool__LevelStart_2(void *);
 extern void CPlayer__StopLoopingSounds_2(void *);
-extern void func_00467ADC(void *);
+extern void COnScreen__ResetBossBars_2(void *);
 extern void CCameraPool__ResetEmitterPools_2(void *);
 
 void CScene__LoadLevel_2(CScene *w, s32 level, s32 announce) {
@@ -81,7 +77,7 @@ void CScene__LoadLevel_2(CScene *w, s32 level, s32 announce) {
     s32 sound;
 
     if (w->m_nLevel != -1) {
-        func_0046588C();
+        CScene__FlushDelayedEvents_2();
     }
     if (Cinema_IsActive() == 0 && Demo_GetPlayerCount() == 0 && announce != 0 && w->m_bWarpSpawn != 0) {
         switch (w->m_LevelID) {
@@ -133,23 +129,19 @@ loaded:
     gFrameCountGameplay = 0;
     CCache__SetFrameDelay(8);
     CScene__ClearListCounts(w);
-#ifdef TARGET_PORT
     CParticleSystem__Construct_2(&w->m_ParticleSystem, *(sptr *) w->m_pParticleEffects);
-#else
-    CParticleSystem__Construct_2(&w->m_ParticleSystem, *w->m_pParticleEffects);
-#endif
     SceneActorPool_Construct_2(&w->m_ActorPool);
     CInstancePool__Construct_2(&w->m_InstancePool);
-    func_00466330(gEngineApp_m_SwooshSystem);
+    SwooshSystem_Construct_2(gEngineApp_m_SwooshSystem);
     CCollisionInfo__Reset();
-    func_00466040(&w->m_DLightSet);
+    CDLightSet__Construct_2(&w->m_DLightSet);
     LoopSounds_Construct(&gLoopSounds, gLoopSoundEntries, 0xF);
 #ifdef TARGET_PORT
     /* the ROM finds COnScreen 0x1C8 bytes before the swoosh system (its N64 size); on the host the
      * two are not that far apart (the same fix as CScene__LoadLevel's, func_0042AC0C.c) */
-    func_00467ADC(&gEngineApp_m_OnScreen);
+    COnScreen__ResetBossBars_2(&gEngineApp_m_OnScreen);
 #else
-    func_00467ADC(gEngineApp_m_SwooshSystem - 0x1C8);
+    COnScreen__ResetBossBars_2(gEngineApp_m_SwooshSystem - 0x1C8);
 #endif
     if (*w->m_pLevels < level) {
         level = *w->m_pLevels - 1;
@@ -201,10 +193,10 @@ loaded:
     }
     block = CCache__Allocate(0, size << 6, 3, "Matrices");
     w->m_hHeap = block;
-    func_00462E40(w->m_Heap, *block, size);
+    MatrixHeap_Construct_2(w->m_Heap, *block, size);
     key = CISet__GetROMAddress(w->m_pLevels, w->m_LevelsKey, level);
     w->m_hLevelIndex = CCache__LoadPersistantIndex(0, (void **)&w->m_pLevelFile, key, "level index");
-    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 1, key, w, func_004645D0, "collision");
+    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 1, key, w, CScene__DecompressCollision_2, "collision");
     w->m_hRegionData = block;
     w->m_pRegionData = *block;
     block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 4, key, w, ProPack__Decompress, "grid bounds");
@@ -213,7 +205,7 @@ loaded:
     w->m_LevelInfoKey = CISet__GetROMAddress(w->m_pLevelFile, key, 5);
     w->m_hLevelInfo = CCache__LoadPersistantIndex(0, (void **)&w->m_pLevelInfo, w->m_LevelInfoKey, "grid sections index");
     w->m_hLinks = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 7, key, w, CScene__DecompressLinks_2, "links");
-    w->m_hPaths = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 2, key, w, func_00465C24, "level paths");
+    w->m_hPaths = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 2, key, w, CScene__DecompressPaths_2, "level paths");
     block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 0, key, w, NULL, "level info");
     w->m_hLevelHeader = block;
     w->m_pLevelHeader = *block;
@@ -229,28 +221,28 @@ loaded:
     w->m_nActors = 0;
     w->m_hActors = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 3, key, w, CScene__DecompressAnimatedInstances_2, "animated instances");
     w->m_Mode = 2;
-    func_004656BC(w);
+    CScene__RestoreFiredEvents_2(w);
     count = w->m_nActors;
     i = w->m_nFirstActor;
     w->m_Mode = 3;
     for (; i < count; i++) {
-        func_0021E5D4((u8 *)w->m_pActors + i * (s32) sizeof(CGameObjectInstance));
+        CGameObjectInstance__InitAIType((u8 *)w->m_pActors + i * (s32) sizeof(CGameObjectInstance));
     }
     player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
     actor = player;
     while (player != NULL) {
-        func_0021E5D4(actor);
+        CGameObjectInstance__InitAIType(actor);
         actor += T2_OFFSETOF(CPlayer, m_WeaponActor);
-        func_0021E5D4(actor);
+        CGameObjectInstance__InitAIType(actor);
         player = *(u8 **)(player + T2_OFFSETOF(CPlayer, m_pNext));
         actor = player;
     }
-    func_00465760(w);
+    CScene__ReapplyFiredEvents_2(w);
     count = w->m_nActors;
     for (i = w->m_nFirstActor; i < count; i++) {
         ptr = (u8 *)w->m_pActors;
         p = ptr + i * (s32) sizeof(CGameObjectInstance);
-        func_0021F1B4(p);
+        CGameObjectInstance__UpdateAI(p);
         CGameObjectInstance__UpdateAnimation(p);
     }
     w->m_Mode = 4;
@@ -258,6 +250,6 @@ loaded:
     CCameraPool__ResetEmitterPools_2(gEngineApp_m_Game.m_CameraPool);
     CCameraPool__Advance(gEngineApp_m_Game.m_CameraPool);
     if (gEngineApp_m_Game.m_Settings.multiplayer != 0 || w->m_bStreamAll != 0) {
-        func_00464E68(w);
+        CScene__StreamAllSections_2(w);
     }
 }

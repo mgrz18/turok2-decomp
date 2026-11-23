@@ -180,7 +180,8 @@ typedef struct CScene {
     /* 0x13B24 */ u8 unk_13B24[0x4];
     /* 0x13B28 */ CInstancePool m_InstancePool;     /* gScene_m_InstancePool (structs/game_object.h) */
     /* 0x18E50 */ CLevelHeader *m_pLevelHeader;
-    /* 0x18E54 */ u8 unk_18E54[0x8];
+    /* 0x18E54 */ s16 m_LightDirection[3];        /* the level header's m_LightDir scaled to 127 (CScene__LoadLightSettings) */
+    /* 0x18E5A */ u8 unk_18E5A[0x2];
     /* 0x18E5C */ u8 unk_18E5C[0x40];
     /* 0x18E9C */ u8 *m_pSections;
     /* 0x18EA0 */ s32 m_nSections;

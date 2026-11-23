@@ -15,7 +15,6 @@ extern s32 D_800F1C40[];
 extern s32 D_800F1F50[];
 extern LevelScriptF978 D_8012F978;
 
-#ifdef TARGET_PORT
 #include "structs/boss.h"
 #include "globals/boss.h"
 /* host body (round 10 y2): gLevelScript by member. The view anchored at found[1] reached bossMode
@@ -32,15 +31,3 @@ void Primagen_UpdateMode6(sptr arg0, CAI *ai) {
         CAI__SetMode(arg0, ai, 0x12);
     }
 }
-#else
-void Primagen_UpdateMode6(sptr arg0, CAI *ai) {
-    if (ai->m_AnimRepeatedCount != 0) {
-        CAI__SetMode(D_8012F978.actor, &D_8012F978.actor->m_AI, 1);
-        CAI__SetMode((sptr) (&D_8012F978.actor)[-1], (sptr) &(&D_8012F978.actor)[-1]->m_AI, 1);
-        D_8012F978.mode = 8;
-        D_800F1C40[0] |= 0x300;
-        D_800F1F50[0] |= 0x300;
-        CAI__SetMode(arg0, ai, 0x12);
-    }
-}
-#endif

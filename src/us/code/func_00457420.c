@@ -21,7 +21,7 @@ s32 Pak_CountEmptyNotes_2(s32 a, s32 *b);
 s32 Pak_GetFreePages_2(s32 a, s32 *b);
 void Pak_GetNoteGameName_2(s32 a, s32 b, sptr *c);
 s32 Pak_NeedsRepair_2(s32 a);
-void func_0045FBA8(sptr a, u8 *b, s32 c);
+void Pak_DecodeText_2(sptr a, u8 *b, s32 c);
 s32 Pak_BytesToPages_2(s32 a);
 void PakMenu_UpdateNoteRows_2(Menu *o);
 s32 PakMenu_CheckSlotForSave_2(Menu *o, s32 a, s32 *b, s32 *c);
@@ -145,7 +145,7 @@ found:
     s0 = 0;
     do {
         Pak_GetNoteGameName_2(s1, s0, &sp30);
-        func_0045FBA8(sp30, buf, 0x10);
+        Pak_DecodeText_2(sp30, buf, 0x10);
         if (Str_Compare_2(buf, gPakCharacterNoteName) == 0) {
             f1 = 1;
             goto L2;
@@ -158,7 +158,7 @@ L2:
     s0 = 0;
     do {
         Pak_GetNoteGameName_2(s1, s0, &sp34);
-        func_0045FBA8(sp34, buf, 0x10);
+        Pak_DecodeText_2(sp34, buf, 0x10);
         if (Str_Compare_2(buf, gPakGameNoteName) == 0) {
             v0 = 1;
             goto L3;

@@ -103,7 +103,7 @@ static inline void upd(EmitMgr *m, Emit *e, s32 c) {
         }
     }
 }
-void func_00236D50(EmitMgr *m, s32 c) {
+void SwooshSystem_DrawTrails(EmitMgr *m, s32 c) {
     Emit *e;
 #ifdef TARGET_PORT
     for (e = ((CSwooshSystem *)m)->m_SwooshPool.used.head; e != ((void *)0); e = e->next) {

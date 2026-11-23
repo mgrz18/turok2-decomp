@@ -1,21 +1,17 @@
+#include "common.h"
+#include "structs/intelligence.h"
 #include "structs/game_object.h"
 
-s32 func_00268080(CGameObjectInstance *actor)
-{
-  u32 *flags;
-  CIntelligence *def;
-  def = actor->header.m_pIntelligence;
-  if (def->m_Type != INTELLIGENCE_ENEMY)
-  {
-    if (def || flags)
-    {
-      return 0;
+/* De-faked in round 21 (j4): the matched draft wrapped the return in an if/else with two
+ * identical arms; testing for the case that returns the field first gives the ROM's layout
+ * (the field's path after the branch, the beq's delay slot empty). */
+
+/* An enemy definition's flag 0x20 (0 for other definitions). */
+s32 GameObject_CanLeaveInfoFlag400000(CGameObjectInstance *actor) {
+    CIntelligence *def = actor->header.m_pIntelligence;
+
+    if (def->m_Type == INTELLIGENCE_ENEMY) {
+        return def->m_Enemy.m_dwEnemyFlags & 0x20;
     }
-    else
-    {
-      return 0;
-    }
-  }
-  flags = &def->m_Enemy.m_dwEnemyFlags;
-  return *flags & 0x20;
+    return 0;
 }
