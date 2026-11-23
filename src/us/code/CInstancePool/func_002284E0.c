@@ -40,7 +40,6 @@ extern UnitLight gDLightBuffer[0x40];
 #include "structs/particle.h"
 #include "structs/camera.h"
 #include "globals/scene.h"
-#define D_8010FF34 (*(char *) &gScene.m_DLightSet)
 extern LightNode *CDLightSet__GetFirst(void *);
 extern LightNode *CDLightSet__GetNext(void *, LightNode *);
 void DLights_Load(char *view) {
@@ -50,7 +49,7 @@ void DLights_Load(char *view) {
     f32 out[4];
     s32 i;
     s32 x;
-    node = CDLightSet__GetFirst(&D_8010FF34);
+    node = CDLightSet__GetFirst((char *) &gScene.m_DLightSet);
     if (node == 0) {
         Gfx *g = gDList++;
         { Gfx *_gbi = (Gfx *)(g); _gbi->w0 = ((((unsigned int)(0xD9) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(~(0x80)) & (0xFFFFFFFFU >> (32 - (24)))) << (0))); _gbi->w1 = ((unsigned int)(0)); };
@@ -81,7 +80,7 @@ void DLights_Load(char *view) {
             gDLightBuffer[i + gDLightBufferIndex].falloff = -0x8000;
         }
         if (node != 0) {
-            node = CDLightSet__GetNext(&D_8010FF34, node);
+            node = CDLightSet__GetNext((char *) &gScene.m_DLightSet, node);
         }
         {
             Gfx *g = gDList++;

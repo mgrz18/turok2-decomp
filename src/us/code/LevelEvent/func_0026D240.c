@@ -5,16 +5,9 @@
 
 #include "structs/swoosh.h"
 
-/* The port: the list words at their host size (structs/swoosh.h: an element links to its
- * previous element in its first word, to its next in its second). */
-typedef struct T2ListNode {
-    struct T2ListNode *prev;
-    struct T2ListNode *next;
-} T2ListNode;
-
 void DList_AddHead(void *arg0, void *arg1) {
     SwooshLinks *l = arg0;
-    T2ListNode *n = arg1;
+    DListLink *n = arg1;
 
     if (l->count == 0) {
         l->head = n;
@@ -24,7 +17,7 @@ void DList_AddHead(void *arg0, void *arg1) {
     } else {
         n->next = l->head;
         n->prev = NULL;
-        ((T2ListNode *)l->head)->prev = n;
+        ((DListLink *)l->head)->prev = n;
         l->head = n;
     }
     l->count++;

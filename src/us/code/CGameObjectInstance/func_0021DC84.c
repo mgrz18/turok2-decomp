@@ -34,7 +34,6 @@ typedef struct {
 } ShadowParams;
 #endif
 
-extern u8 D_8010FF34[];
 
 /* on MIPS the instance reaches it in $a0 (the caller's first argument, untouched) */
 s32 GameObject_CastsShadow(CGameObjectInstance *);
@@ -93,7 +92,7 @@ void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, sptr unused, Shadow
                 u2 = (f32) light->m_Col[1] * (f32) light->m_Col[1];
                 t = t + u2;
                 r = func_00298470(t + u2) * -0.00090497744f;
-                DLights_GetAtPoint(D_8010FF34, a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z, &dir, &r);
+                DLights_GetAtPoint((u8 *) &gScene.m_DLightSet, a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z, &dir, &r);
                 if (r < -1.0f) {
                     r = -1.0f;
                 }

@@ -7,13 +7,11 @@
 #include "structs/game.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
+#include "globals/scene.h"
 
 /* Controller pak menu, load: finds a pad with a controller pak (trying each pad in turn), checks it for the
  * game's notes and free space and opens the load menu, or shows why the pak cannot be used. */
 
-extern s32 D_8011F144;
-extern s32 D_8011B114;
-extern s32 D_800F70A8;
 s32 Controller_AnyConnected(void);
 void CEngineApp__UpdateControllers(u8 *a);
 s32 Str_Compare(u8 *a, char *b);
@@ -30,7 +28,7 @@ s32 PakMenu_CheckSlotForSave(Menu *o, s32 a, s32 *b, s32 *c);
 
 #define PAK_ERROR()                                                        \
     gPakMenuLeaving = 1;                                                        \
-    D_8011F144 = 0;                                                        \
+    gPakBootPending = 0;                                                        \
     MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgCannotSaveDesc, arg0->player, arg0->controller, NULL); \
     gPakCheckHasPak = 0;                                                        \
     sPakMenuStartLatched = 1;
@@ -51,7 +49,7 @@ void PakMenu_InitSaveGameAnyPak(Menu *arg0) {
     gPakMenuAnyPak = 1;
     if (Controller_AnyConnected() == 0) {
         gPakMenuLeaving = 1;
-        D_8011F144 = 0;
+        gPakBootPending = 0;
         MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgNoControllerDesc, arg0->player, arg0->controller, NULL);
         sPakMenuStartLatched = 1;
         gPakCheckHasPak = 0;
@@ -89,7 +87,7 @@ void PakMenu_InitSaveGameAnyPak(Menu *arg0) {
         sPakMenuStartLatched = 1;
     }
     sPakMenuStartLatched = 1;
-    if (D_8011B114 != 0 || gPakMenuStartPressed != 0) {
+    if (gPakMenuConfirmed != 0 || gPakMenuStartPressed != 0) {
         Pak_ProbeSlot(gPakMenuPort);
         if (Pak_GetStatus(gPakMenuPort) != -2) {
             goto fin;
@@ -181,7 +179,7 @@ L3:
     if (s0 != 0) {
         goto blk59;
     }
-    m1 = Pak_BytesToPages(D_800F70A8 + 0x688);
+    m1 = Pak_BytesToPages(gScene.unk_30 + 0x688);
     r2 = Pak_BytesToPages(0x18);
     if (sp3C == 0 || sp38 < r2) {
         goto L56;

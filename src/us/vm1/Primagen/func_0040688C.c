@@ -3,6 +3,7 @@
 #include "structs/game_object.h"
 #include "globals/engine.h"
 #include "protos/ai.h"
+#include "globals/collision.h"
 
 /* Boss module state from 0x8012F9E4. */
 #ifdef TARGET_PORT
@@ -33,7 +34,6 @@ extern s32 GameObject_IsOnGround(CGameObjectInstance *obj);
 extern f32 func_002982F0(f32 angle);                                      /* sin */
 extern f32 func_002974C0(f32 angle);                                      /* cos */
 
-extern s32 D_800F1F50[];
 extern BossTimers gLevelScript_timer; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 /* Pushes the target away from the boss while the push timer has run out. */
@@ -45,9 +45,9 @@ void Primagen_UpdateMode20(CGameObjectInstance *obj, CAI *ai) {
     f32 heading;
     f32 push;
 
-    D_800F1F50[0] |= 0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags |= 0x8000;
     AI_UpdateTargets(obj, ai, &t, 0, 1);
-    D_800F1F50[0] &= ~0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags &= ~0x8000;
     if (t.m_Sight.m_pTarget != NULL) {
         AI_TurnClamped(obj, ai, 0.261799425f, t.m_Sight.m_Angle);
         gLevelScript.targetAngle = t.m_Sight.m_Angle;

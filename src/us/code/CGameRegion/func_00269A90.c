@@ -1,5 +1,6 @@
 #include "structs/vector.h"
 #include "globals/region.h"
+#include "structs/collision.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/AI/NAV/8027451C.CPP, func_802750B0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -15,12 +16,6 @@ struct Node75 {
     CVector3 *next;
     u8 reserved10[0x10];
 };
-typedef struct CollisionBuildVertex {
-    f32 x;
-    f32 y;
-    f32 z;
-    f32 ceiling;
-} CollisionBuildVertex;
 extern void CVector3__Normalize(f32 *arg0);
 struct Node75;
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);

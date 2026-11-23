@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
+#include "globals/scene.h"
 
 /* Controller pak menu item: picks the item's text for the pak state and prints the pak's free blocks and
  * the blocks a save needs into it ("%3d"-style, three characters each). */
@@ -11,7 +12,6 @@ typedef struct {
     char c[4];
 } Chars4;
 
-extern s32 D_800F70A8;
 extern Chars4 sPakMenuText_Spaces3; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
 extern u8 sPakMenuFmt_3d[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
 extern char sPakMenuText_FreePagesXxxNeededXxx_B48B4[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
@@ -46,7 +46,7 @@ s32 PakMenu_FreePagesText(MenuItem *item, Menu *own) {
             if (gPakMenuIsProfile != 0) {
                 need = Pak_BytesToPages(0x18);
             } else {
-                need = Pak_BytesToPages(D_800F70A8 + 0x688);
+                need = Pak_BytesToPages(gScene.unk_30 + 0x688);
             }
             dst = item->text;
             dst += 0xC;
@@ -74,7 +74,7 @@ s32 PakMenu_FreePagesText(MenuItem *item, Menu *own) {
         }
         item->text = t;
         r = Pak_GetFreePages(pad, &freeb);
-        need = Pak_BytesToPages(D_800F70A8 + 0x688);
+        need = Pak_BytesToPages(gScene.unk_30 + 0x688);
         dst = item->text;
         if (r == 0) {
             dst += 0xC;

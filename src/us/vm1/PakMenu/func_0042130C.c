@@ -1,12 +1,12 @@
 #include "common.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x684];
     /* 0x684 */ s32 unk684;
 } Entry;
 
-extern s32 D_800F70A8;          /* base address; arg0 is a byte offset into it */
 
 void Pak_SetBufferSize(s32 arg0, s32 arg1) {
-    ((Entry *) (D_800F70A8 + arg0))->unk684 = arg1;
+    ((Entry *) (gScene.unk_30 + arg0))->unk684 = arg1;
 }

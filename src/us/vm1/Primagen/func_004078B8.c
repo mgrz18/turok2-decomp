@@ -3,17 +3,17 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "protos/ai.h"
+#include "globals/collision.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 
-extern s32 D_800F1F50[];
 
 void Primagen_UpdateMode9(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
 
-    D_800F1F50[0] |= 0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags |= 0x8000;
     AI_UpdateTargets(obj, ai, &t, 1, 1);
-    D_800F1F50[0] &= ~0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags &= ~0x8000;
     AI_TurnClamped(obj, ai, 0.261799425f, t.m_Sight.m_Angle);
     if (ai->m_AnimRepeatedCount == 0) {
         return;

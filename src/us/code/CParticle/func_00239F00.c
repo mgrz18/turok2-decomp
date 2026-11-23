@@ -10,9 +10,6 @@
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-extern CCollisionInfo D_800F1E10;
-extern CCollisionInfo D_800F1CC0;
-extern CCollisionInfo D_800F1C60;
 
 void CCollisionResults__Clear(CCollisionInfo *def);
 void Sweep_FollowGround(Sweep *sweep);
@@ -44,7 +41,7 @@ s32 Collision_MoveInstance(CGameObjectInstance *obj, CVector3 pos, CCollisionInf
     f32 dy;
 
     info = CScene__GetRegionInfo(&gScene, obj->header.m_pCurrentRegion);
-    if (def != &D_800F1E10 && def != &D_800F1CC0 && def != &gCollisionInfoSight && def != &D_800F1C60) {
+    if (def != &gCollisionInfoPlatformRider && def != &gCollisionInfoTrace && def != &gCollisionInfoSight && def != &gCollisionInfoNoInstances) {
         obj->m_pInstanceBelow = 0;
         if (obj->header.m_Type == 1) {
             obj->m_AI.m_dwFlags &= ~0x30000;

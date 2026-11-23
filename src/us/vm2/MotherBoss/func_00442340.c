@@ -6,11 +6,11 @@
 #include "globals/boss_ai.h"
 #include "protos/scene.h"
 #include "protos/ai.h"
+#include "globals/collision.h"
 
 /* Module init: find the module actors (0x1DB1) and the controller (0x1DB2), set up the AI (mode table and callbacks),
  * then attach every slot to the object. */
 
-extern s32 D_800F1F10[];
 extern void ScriptAnimator_Start(void *slot, void *obj);
 extern void EnemyAI_HeadNodeCallback();
 extern void func_00441FF8();
@@ -41,7 +41,7 @@ void MotherBoss_Init_2(CGameObjectInstance *obj, CAI *ai) {
     ai->m_pfDraw = MotherBoss_Draw_2;
     CAI__SetMode(obj, ai, 0);
     gMotherBoss.obj = obj;
-    D_800F1F10[0] &= ~0x300;
+    gCollisionInfoGravity.m_dwFlags &= ~0x300;
     obj->m_dwFlags |= 0x04000000;
     for (i = 0; i < 15; i++) {
         ScriptAnimator_Start(&gMotherBoss.slots[i].anim, obj);

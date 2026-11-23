@@ -3,7 +3,7 @@
 
 /* A controller's state, gControllers[4] (one per port, 0x224 bytes each;
  * gMergedController is a fifth one that merges the four). Rage Wars has the same
- * object (its D_8010F328[], named ControllerProfile in rw_abu's
+ * object (its array at 0x8010F328, named ControllerProfile in rw_abu's
  * include/COMMON/ITEMRECAT20V1.H); CPlayer::m_ContState.m_pContState
  * (CPlayer + 0xA50) points to the player's, and a menu window reads one
  * (Menu::controller, structs/menu.h).

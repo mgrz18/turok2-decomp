@@ -6,12 +6,12 @@
 #include "globals/boss_ai.h"
 #include "protos/scene.h"
 #include "protos/ai.h"
+#include "globals/collision.h"
 
 /* Boss fight setup: finds the six level actors with id 0x1DB1 and the one
  * with 0x1DB2, installs the AI callbacks and resets the 15 attack slots. */
 
 
-extern u32 D_800F1F10[];
 
 void ScriptAnimator_Start(void *, CGameObjectInstance *);
 void MotherBoss_Step();
@@ -52,7 +52,7 @@ void MotherBoss_Init(CGameObjectInstance *obj, CAI *ai) {
     ai->m_pfDraw = MotherBoss_Draw;
     CAI__SetMode(obj, ai, 0);
     gMotherBoss.obj = obj;
-    D_800F1F10[0] &= ~0x300;
+    gCollisionInfoGravity.m_dwFlags &= ~0x300;
     obj->m_dwFlags |= 0x04000000;
     for (i = 0; i < 15; i++) {
         ScriptAnimator_Start(&gMotherBoss.slots[i].anim, obj);

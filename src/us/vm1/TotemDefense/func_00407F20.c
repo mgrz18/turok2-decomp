@@ -10,15 +10,6 @@
 #include "protos/scene.h"
 #include "protos/player.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC4];
-    /* 0xC4 */ s16 animId;
-    /* 0xC6 */ s8 anim;
-    /* 0xC7 */ s8 unkC7;
-} BossAI;
-
-
-
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
 void Sound__PlaySpeech(s32 sound);
 void CPlayerPool__SetInvincibility(CPlayerPool *list, f32 value);
@@ -26,29 +17,16 @@ s8 CGameObjectInstance__PickRandomAnim(CListedInstance *actor, sptr id, sptr);
 void COnScreen__ClearBoss(void *);
 void COnScreen__ClearBoss2(void *);
 
-#ifdef TARGET_PORT
-/* the port (round 9 x1): the totem's CAI by member (the N64 view put m_AnimType/m_AnimIndex/
- * m_AnimRepeatedCount at 0xC4/0xC6/0xC7 from m_dwFlags) */
 static __inline__ void setAnim(CListedInstance *actor, s32 id) {
+    CAI *ai;
     s8 anim = CGameObjectInstance__PickRandomAnim(actor, id, -1);
 
-    actor->m_Instance.m_AI.m_AnimIndex = anim;
-    actor->m_Instance.m_AI.m_AnimType = id;
+    ai = &actor->m_Instance.m_AI;
+    ai->m_AnimIndex = anim;
+    ai->m_AnimType = id;
     actor->m_Instance.m_AI.m_dwFlags &= ~1;
-    actor->m_Instance.m_AI.m_AnimRepeatedCount = 0;
+    ai->m_AnimRepeatedCount = 0;
 }
-#else
-static __inline__ void setAnim(CListedInstance *actor, s32 id) {
-    BossAI *ai;
-    s8 anim = CGameObjectInstance__PickRandomAnim(actor, id, -1);
-
-    ai = (BossAI *) &actor->m_Instance.m_AI.m_dwFlags;
-    ai->anim = anim;
-    ai->animId = id;
-    actor->m_Instance.m_AI.m_dwFlags &= ~1;
-    ai->unkC7 = 0;
-}
-#endif
 
 /* The boss is beaten: message, sound, its death animation, the helpers stop. */
 void TotemDefense_Complete(TotemDefenseState *fight) {

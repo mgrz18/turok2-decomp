@@ -76,4 +76,10 @@ extern u16 gPakProfile_tags;            /* gPakProfile.tags */
 extern u8 gPakProfile_character;        /* gPakProfile.character */
 extern u8 gPakProfile_name[8];          /* gPakProfile.name */
 
+/* Round 24 (m2): BSS words named (versions/names/data_g6.us.txt) */
+extern s32 gPakMenuConfirmed; /* a pak confirm menu was answered yes (PakConfirmMenu_SelectYes) */
+extern s32 gPakBootPending; /* the boot pak check is pending (PakMenu_PollBootPak) */
+extern s32 gCharNoteMenuSaving; /* the character-note menu is saving (CharNoteMenu_InitSave) */
+extern s32 sSavePortalDone; /* the save-portal menu is done (SavePortalMenu_Poll) */
+
 #endif

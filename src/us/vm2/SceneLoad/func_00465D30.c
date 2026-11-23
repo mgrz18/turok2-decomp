@@ -4,18 +4,12 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 #include "protos/scene.h"
-
-typedef struct Record {
-    /* 0x00 */ s32 data[2];
-    /* 0x08 */ s32 valid;
-    /* 0x0C */ s32 rest[4];
-} Record; /* 0x1C */
+#include "structs/world.h"
 
 extern void Model_DecompressCallback(void);
 
-
 /* Looks key up in the level and loads its record into out (out->valid = 0 when there is none). */
-void CScene__ConstructMap_2(void *level, Record *out, s32 key) {
+void CScene__ConstructMap_2(void *level, CSceneMapRecord *out, s32 key) {
     s32 id;
     s32 **h1;
     s32 **h2;
@@ -32,7 +26,7 @@ void CScene__ConstructMap_2(void *level, Record *out, s32 key) {
     if (h1 != NULL) {
         h2 = CCache__Request(0, CISet__GetROMAddressAndSize(*h1, res, 1, &size), size, 0, 0, Model_DecompressCallback, sCSceneCacheDesc_Geometry, 1);
         if (h2 != NULL) {
-            *out = *(Record *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(*h2, 2), 0), 0), 0);
+            *out = *(CSceneMapRecord *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(*h2, 2), 0), 0), 0);
             CCache__Deallocate(0, h2);
         }
         CCache__Deallocate(0, h1);

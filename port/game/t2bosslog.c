@@ -282,10 +282,10 @@ void T2Port_BossFront(int frame, const char *spec0) {
                 /* DEBUG-ONLY (round 12 a2): the sight search the wait needs, two frames after the move */
                 extern void *AI_FindBestTarget(void *self, void *plan, s32 checkSight, s32 flag);
                 extern CCollisionResults gCollisionResults;
-                extern s32 D_800F1F50[];   /* the Primagen's searches run with 0x8000 set (Primagen_UpdateMode19) */
+                extern CCollisionInfo gCollisionInfoFlyingEnemy; /* the Primagen's searches run with 0x8000 set (Primagen_UpdateMode19) */
                 void *t;
                 CGameObjectInstance *a = &p->m_CharacterActor;
-                D_800F1F50[0] |= 0x8000;
+                gCollisionInfoFlyingEnemy.m_dwFlags |= 0x8000;
                 t = AI_FindBestTarget(b, &b->m_AI, 1, 0);
                 printf("bossfront: probe frame %d sight %p hit %p wall %p edge %d player (%.1f %.1f %.1f) yoff %.1f h %.1f\n",
                        frame, t, (void *) gCollisionResults.m_pInstance, (void *) gCollisionResults.m_pWallRegion,
@@ -317,7 +317,7 @@ void T2Port_BossFront(int frame, const char *spec0) {
                     a->header.m_vPos = keep;
                     a->header.m_pCurrentRegion = keepR;
                 }
-                D_800F1F50[0] &= ~0x8000;
+                gCollisionInfoFlyingEnemy.m_dwFlags &= ~0x8000;
                 if (gLevelScript.found[0] != NULL) {
                     CGameObjectInstance *d = gLevelScript.found[0];
                     printf("bossfront:   found[0] ty %x fl %x mode %d anim %d %.2f pos (%.1f %.1f %.1f)\n",

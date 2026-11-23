@@ -5,7 +5,7 @@
  * its actor lists, the particle and actor pools, and the level-warp state.
  * One object of 0x19078 bytes and more (gEngineApp_m_SwooshSystem, world + 0x19240, is
  * passed on as an object of its own). Other symbols point inside it and must
- * keep being used where the code uses them: gScene_m_CinemasKey (+0x24), D_800F70A8
+ * keep being used where the code uses them: gScene_m_CinemasKey (+0x24), gScene_unk_30
  * (+0x30), gScene_m_pCinemas (+0x60), gScene_m_pBitSections (+0x6C), gScene_m_Heap (+0xD0),
  * gScene_m_pActors (+0xE0), gScene_m_nDrawActors (+0x8EC).
  *
@@ -23,6 +23,7 @@
 #include "structs/table.h"
 #include "structs/level_actor.h"
 #include "structs/particle.h"
+#include "structs/level_file.h"
 
 /* Where a warp puts the player: a spawn point of a level. */
 typedef struct CWarpPoint {
@@ -46,6 +47,30 @@ typedef struct CObjectRecord {
     /* 0x26 */ u8 unk_26;
     /* 0x27 */ u8 unk_27;
 } CObjectRecord; /* size 0x28 */
+
+/* A block of placed objects in the level file (CScene__DecompressAnimatedInstances): a
+ * header word, the count, then the records. */
+typedef struct CObjectRecordBlock {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 count;
+    /* 0x08 */ CObjectRecord records[1];
+} CObjectRecordBlock;
+
+/* The instance block CScene__DecompressAnimatedInstances fills: its size, the count, then
+ * the instances. */
+typedef struct CInstanceBlock {
+    /* 0x00 */ s32 size;
+    /* 0x04 */ s32 count;
+    /* 0x08 */ CGameObjectInstance objects[1];
+} CInstanceBlock;
+
+/* The 0x1C-byte record CScene__ConstructMap copies out of the level's map block
+ * (block 2 / 0 / 0 / 0 of the level file). */
+typedef struct CSceneMapRecord {
+    /* 0x00 */ s32 data[2];
+    /* 0x08 */ s32 valid;
+    /* 0x0C */ s32 rest[4];
+} CSceneMapRecord; /* size 0x1C */
 
 /* A streamed sector of the level: its data block and its extent on the ground plane. */
 typedef struct CSceneSector {
@@ -110,7 +135,7 @@ typedef struct CScene {
     /* 0x00024 */ s32 m_CinemasKey;                 /* gScene_m_CinemasKey */
     /* 0x00028 */ s32 unk_28;
     /* 0x0002C */ s32 unk_2C;
-    /* 0x00030 */ s32 unk_30;                       /* D_800F70A8: the count of unk_28 */
+    /* 0x00030 */ s32 unk_30;                       /* gScene_unk_30: the count of unk_28 */
     /* 0x00034 */ s32 unk_34;                       /* the count of unk_2C */
     /* 0x00038 */ s32 *m_pLevels;                   /* the level table: count first */
     /* 0x0003C */ s32 *m_pTextureSets;
@@ -203,7 +228,7 @@ typedef struct CScene {
     /* 0x18EA4 */ f32 m_SkyAngle;
     /* 0x18EA8 */ CQuaternion m_qSky;               /* about Y */
     /* 0x18EB8 */ s32 unk_18EB8;
-    /* 0x18EBC */ CDLightSet m_DLightSet;           /* D_8010FF34 (structs/particle.h) */
+    /* 0x18EBC */ CDLightSet m_DLightSet;           /* 0x8010FF34 (structs/particle.h) */
     /* 0x18FA4 */ s32 m_bStreamAll;
     /* 0x18FA8 */ s32 m_nLevel;                     /* index in m_pLevels, -1 for none */
     /* 0x18FAC */ s32 m_WarpFade;                   /* index in the fade table gWarpFadeColors */

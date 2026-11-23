@@ -150,7 +150,14 @@ typedef struct CAutomap {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 unk4;
     /* 0x08 */ s32 unk8;
-    /* 0x0C */ s32 m_Counts[11];
+    union {
+        /* 0x0C */ s32 m_Counts[11];         /* Automap_ClearBuffers zeroes them */
+        struct {
+            /* 0x0C */ s32 m_bHasRegion;     /* Automap_SetPlayer: the player has a region */
+            /* 0x10 */ f32 m_PlayerYaw;
+            /* 0x14 */ CVector3 m_vPlayerPos; /* Automap_RevealRegion reveals the regions near it */
+        };
+    };
 #if defined(TARGET_PORT) && !defined(__mips__)
     /* The port: the player's region pointer-wide (Automap_SetPlayer; on the N64 the word at 0xC,
      * between fields that leave no room for a host pointer). */

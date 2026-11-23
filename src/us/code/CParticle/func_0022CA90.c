@@ -12,7 +12,6 @@
 
 typedef struct Target Target;
 
-#define D_8010FF34 (&gScene.m_DLightSet)
 
 s32 Actor_GetTypeClass(Target *target);
 s32 CParticle__IsUnderWater(CParticle *p);
@@ -107,7 +106,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
             Trail_DetachOwner(&gEngineApp_m_SwooshSystem, p);
         }
         if (p->m_pDLight) {
-            CDLightSet__Free(D_8010FF34, p->m_pDLight);
+            CDLightSet__Free(&gScene.m_DLightSet, p->m_pDLight);
             p->m_pDLight = NULL;
         }
     }

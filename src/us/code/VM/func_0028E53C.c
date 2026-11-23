@@ -2,9 +2,6 @@
 #include "structs/pager.h"
 #include "globals/pager.h"
 
-/* Four words of memory stats ending at D_801206BC. */
-extern s32 D_801206BC;
-extern u32 D_80120FCC;
 
 /* Byte-offset field access: a struct member reference here reorders the
  * stores below. */
@@ -23,7 +20,7 @@ void VM_Age(void) {
     var_a2 = 0;
     var_a3 = 0x80000000;
     var_a1 = 0;
-    var_a0 = &D_80120FCC;
+    var_a0 = (u32 *) &gPager.slots[0].age;
     do {
         temp_v1 = *var_a0;
         if (var_a2 < temp_v1) {
@@ -45,8 +42,8 @@ void VM_Age(void) {
             var_a0_2 += temp_v0 << 0xC;
         } while (var_v1 != NULL);
     }
-    *(s32 *)((s8 *)&D_801206BC + 0) = var_a0_2;     /* total pages << 12 */
-    *(s32 *)((s8 *)&D_801206BC - 0xC) = var_a2;   /* largest counter */
-    *(s32 *)((s8 *)&D_801206BC - 0x8) = var_a3;   /* smallest counter */
-    *(s32 *)((s8 *)&D_801206BC - 0x4) = FIELD_AT(gPager_chain_head, s32, PageMapping, age);
+    gPager.statRegionBytes = var_a0_2;     /* total pages << 12 */
+    gPager.statMaxAge = var_a2;
+    gPager.statMinAge = var_a3;
+    gPager.statChainAge = FIELD_AT(gPager_chain_head, s32, PageMapping, age);
 }

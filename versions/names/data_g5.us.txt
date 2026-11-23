@@ -207,6 +207,23 @@ gCollisionResults_m_vVelocity = 0x800F1DB8; // + 0xD8, the mover's velocity (CPa
 gThrowableCollisionInfo_m_InstanceBehavior = 0x800F1F94; // CCollisionInfo at 0x800F1F90 + 4: the Throwable_* updates set 0 / 2
 gThrowableCollisionInfo_m_GravityAcceleration = 0x800F1F98; // + 8, the gravity Throwable_FlyingEnter divides by
 
+// ---- The other CCollisionInfo globals (round 24 m2; were D_): gCollisionSetupTable
+// (src/us/asm/data_0042D50C.s) fills them; each is its own 0x20-byte slot, not an interior of
+// the named info before it. Values in the comments: flags, instance/wall/ground behaviour, gravity.
+gCollisionInfoTestMoveClimb = 0x800F1B60; // GameObject_TestMove, an actor that cannot enter water but can climb up (GameObject_CanClimbUp); 0x000B0C00, 0/1/0
+gCollisionInfoParticle = 0x800F1BA0; // the template CParticle__ copies into each new particle effect's collision response (func_0022D2FC); 0x5E0F7F08, 1/3/3, gravity -4941.9
+gCollisionInfoTestMoveLand = 0x800F1BE0; // GameObject_TestMove, an actor that cannot enter water (and the player with flags 0x300000); GameObject_CanDropDown toggles its flags 0x40000/0x30000; 0x1E080C00, 0/1/0
+gCollisionInfoEnemy = 0x800F1C20; // the enemy mode tables' m_pData (structs/game_object.h); 0x0040CC0B, 5/6/2, gravity -2304
+gCollisionInfoEnemyB = 0x800F1C40; // the same values as gCollisionInfoEnemy; the Primagen modes set and clear its flags 0x300 (Primagen_UpdateMode6...)
+gCollisionInfoNoInstances = 0x800F1C60; // 0x1E230F40, 0/2/0: Collision_TestInstances and Collision_MoveInstance never test instances with it
+gCollisionInfoTrace = 0x800F1CC0; // GameObject_TraceMove and GameObject_DropPickupAt set its instance/ground behaviour around Collision_MoveInstance; 0x1E0F3F10, 0/1/0
+gCollisionInfoPlatformRider = 0x800F1E10; // AI_RideMovingPlatform moves the rider with it; Platform_Collide and Collision_MoveInstance skip it; 0x1E5F7329, 5/2/2
+gCollisionInfoNoGravity = 0x800F1E30; // CPlayer__Update in state 14 moving backwards (velX < 0); 0x1E5E4329, 5/2/2, no gravity
+gCollisionInfoModeDefault = 0x800F1EB0; // CGameObjectInstance__MoveWithCollision when the current mode has no m_pData; 0x1E5F7F08, 2/2/0
+gCollisionInfoPooledActor = 0x800F1EF0; // CPooledLevelActor__Update; 0x1E4F7F09, 0/3/3, gravity -1536
+gCollisionInfoGravity = 0x800F1F10; // CPlayer__Update in state 14 moving forwards; MotherBoss_Init clears its flags 0x300; 0x1E5EC329, 5/2/2, gravity -2304
+gCollisionInfoFlyingEnemy = 0x800F1F50; // the Primagen's (and flying enemies') modes: 0x00424C0A, 5/2/2, no gravity; the Primagen sets/clears flags 0x300, 0x8000 around AI_UpdateTargets
+
 // ---- Player cinemas (0x800F1FD0-0x800F1FEF) ----
 sDeathCinemaPlayer = 0x800F1FD0; // CPlayer *, set by CPlayer__StartDeathCinema, read by PlayerDeath_CinemaDone
 sCinema50Player = 0x800F1FD8; // CPlayer *, set by PlayerCinema50_Enter, read by PlayerCinema50_Done
@@ -279,6 +296,7 @@ gPakQueueState = 0x800F6750; // s8, the pak rescan request / queue state (Pak_* 
 gPakAccessQueue = 0x800F6758; // OSMesgQueue, the pak access lock (Controller_Lock/Unlock, Controller_Service)
 gSiMesgBuf = 0x800F6770; // OSMesg, the buffer of gSiMessageQueue
 gContStatus = 0x800F6778; // OSContStatus[4] (osContInit, Pak_Mount, Controller_ReadAll)
+gContStatus_errno = 0x800F677B; // gContStatus[0].errno (+3): Controller_CountConnected walks the four errno bytes through it as a u8 [] (the member form gContStatus[n].errno lets clang vectorize the loop with an aligned 16-byte load of gContStatus, which the host layout does not align: it crashed; was D_800F677B, round 24 m2)
 gPakChanged = 0x800F6788; // s32[4]: Controller_PakChanged/TakePakChanged; set by Controller_UpdatePakInsertion
 gSiMessageQueue = 0x800F6798; // OSMesgQueue of the serial interface events (osContInit, osContStartQuery, osMotorInit)
 gPakRemoved = 0x800F67B0; // s32[4]: a pak went out of a watched port; the next insertion sets gPakChanged (Controller_UpdatePakInsertion)
@@ -296,6 +314,7 @@ gEngineApp_m_CartridgeIndex = 0x800F7074; // +0x3C4, the ROM address of the cart
 // ---- The scene (gEngineApp.m_Scene, CWorld in structs/world.h, 0x800F7078-0x801100EF) ----
 gScene = 0x800F7078; // CScene (our CWorld): Turok 3's CScene, gEngineApp.m_Scene; name seeded by the tooling agent (614 uses)
 gScene_m_CinemasKey = 0x800F709C; // +0x24 (Cinema_*)
+gScene_unk_30 = 0x800F70A8; // +0x30 (CScene.unk_30, the size of the level flags: the save code reads it as gScene.unk_30; three save-menu functions keep this symbol, their member access moves the ROM's registers; was D_800F70A8, round 24 m2)
 gScene_m_pCinemas = 0x800F70D8; // +0x60
 gScene_m_pBitSections = 0x800F70E4; // +0x6C (CScene__RestoreFiredEvent)
 gScene_m_Heap = 0x800F7148; // +0xD0, the matrix pool (MtxPool_Alloc in the shadow and bone code)
@@ -307,6 +326,9 @@ gScene_m_Kind1Cursor = 0x800F7F78; // +0xF00 (AI_GetPathTargetInfo, AI_GetSightT
 gScene_m_nSectors = 0x800F8520; // +0x14A8, read with the sectors as {count, cells} by Collision_TestModels
 gScene_m_ParticleSystem = 0x800F8928; // +0x18B0, the CParticleSystem (CParticleSystem__Spawn/Free; 52 uses)
 gScene_m_ActorPool = 0x80107590; // +0x10518, the CLevelActorPool (CLevelActorPool__Spawn: pickups)
+gScene_m_ActorPool_m_pFree = 0x8010AB90; // m_ActorPool.m_pFree (+0x3600), the free list; CPooledLevelActor__Release (its member path shares one base register for the three; was D_8010AB90, round 24 m2)
+gScene_m_ActorPool_m_pHead = 0x8010AB94; // m_ActorPool.m_pHead, the active list head (CPooledLevelActor__Release; was D_8010AB94)
+gScene_m_ActorPool_m_pTail = 0x8010AB98; // m_ActorPool.m_pTail, the active list tail (CPooledLevelActor__Release; was D_8010AB98)
 gScene_m_InstancePool = 0x8010ABA0; // +0x13B28, CInstancePool (structs/game_object.h): CInstancePool__Spawn (n2)
 gScene_m_InstancePool_m_FreeList = 0x8010FEA0; // m_InstancePool.m_FreeList (CListedInstance__Free)
 gScene_m_InstancePool_m_ActiveList = 0x8010FEB4; // m_InstancePool.m_ActiveList: the live dynamic objects (boss and totem code walk it; 58 uses)
@@ -337,3 +359,5 @@ gScene_m_WarpState = 0x80110028; // +0x18FB0, nonzero during a warp fade (CPlaye
 //   PlayerState17_Enter), D_800C2044, D_800C894C (stack-limit address), D_800E6790-D_800E6798,
 //   D_800F1BA0, D_800F5618, D_800F6CA8, D_800F1FF0/D_800F1FF4 (crash screen), the other
 //   CCollisionInfo globals 0x800F1B60-0x800F1F50 (D_800F1C40 / D_800F1F50 used by the Primagen).
+//   Round 24 (m2): the CCollisionInfo globals are named above (gCollisionInfo*), D_800F1CC6, D_800F5A18/A34,
+//   D_800F677A/B, D_8010C080/D_8010F328 and D_800F70A8 are members now (docs/NAMES.md, round 24 part m2).

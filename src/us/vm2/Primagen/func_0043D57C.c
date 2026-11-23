@@ -7,6 +7,7 @@
 #include "globals/scene.h"
 #include "protos/ai.h"
 #include "structs/vector.h"
+#include "globals/collision.h"
 
 
 typedef struct {
@@ -65,7 +66,6 @@ typedef struct {
 } Info0040457C;
 
 extern ModeState0040457C gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 D_800F1F50;
 CGameObjectInstance *CPlayerPool__FindNearest(void *game, CVector3 pos);
 f32 Random_Blend(f32 lo, f32 hi);
 sptr CInstancePool__Spawn(void *a0, s32 a1, s32 model, sptr handle, sptr region, CVector3 pos, f32 a6, CVector3 rot, CVector3 scale, sptr a9);
@@ -191,7 +191,7 @@ void Primagen_UpdateSpawner_2(CGameObjectInstance *actor, void *level) {
             gLevelScript.enemiesAlive++;
         }
     }
-    flags = &D_800F1F50;
+    flags = &gCollisionInfoFlyingEnemy.m_dwFlags;
     *flags |= 0x8000;
     AI_UpdateTargets(actor, level, &info, 0, 1);
     *flags &= ~0x8000;

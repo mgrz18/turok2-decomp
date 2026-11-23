@@ -9,11 +9,11 @@
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
+#include "globals/scene.h"
 
 /* Controller pak save: when the pak has room and an existing note can be replaced, writes the save note;
  * stops the pak sounds and shows the result (or the "not enough space" message). */
 
-extern s32 D_800F70A8;
 u32 Pak_BytesToPages(uptr n);
 s32 Pak_GetFreePages(s32 pad, s32 *out);
 s32 Pak_CountEmptyNotes(s32 pad, s32 *out);
@@ -65,7 +65,7 @@ s32 PakMenu_WriteSaveGame(s32 unused, Menu *own) {
         pad.channel = pv;
     } while (0);
     plr = pp;
-    size = D_800F70A8 + 0x688;
+    size = gScene.unk_30 + 0x688;
     if (gPakMenuIsSave != 0) {
         need = Pak_BytesToPages(size);
         r = Pak_GetFreePages(pad.channel, &pad.freeBytes);

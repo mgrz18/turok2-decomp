@@ -5,52 +5,7 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "protos/ai.h"
-
-/* LevelScriptState (structs/boss.h) seen from 0x8012F604, one word before it
- * (offsets below are from 0x8012F608): the ROM addresses it through D_8012F604. */
-#ifdef TARGET_PORT
-typedef struct LevelScriptF604 {
-/* the view at the host offsets of LevelScriptBlock (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_LevelScriptF604(m) __builtin_offsetof(LevelScriptBlock, m)
-    union {
-        struct { u8 _hp_stage[T2_HOFF_LevelScriptF604(m_Script.stage)]; s32 stage; }; /* N64 0x4 */
-        struct { u8 _hp_speed[T2_HOFF_LevelScriptF604(m_Script.speed)]; f32 speed; }; /* N64 0x10 */
-        struct { u8 _hp_partA[T2_HOFF_LevelScriptF604(m_Script.found)]; CGameObjectInstance *partA; }; /* N64 0x370 */
-        struct { u8 _hp_partB[T2_HOFF_LevelScriptF604(m_Script.found[1])]; CGameObjectInstance *partB; }; /* N64 0x374 */
-        struct { u8 _hp_unk3CC[T2_HOFF_LevelScriptF604(m_Script.unk3CC)]; s32 unk3CC; }; /* N64 0x3D0 */
-        struct { u8 _hp_state[T2_HOFF_LevelScriptF604(m_Script.bossState)]; s32 state; }; /* N64 0x3D4 */
-        struct { u8 _hp_mode[T2_HOFF_LevelScriptF604(m_Script.bossMode)]; s32 mode; }; /* N64 0x3D8 */
-        struct { u8 _hp_scriptOn[T2_HOFF_LevelScriptF604(m_Script.scriptOn)]; u8 scriptOn; }; /* N64 0x3DD */
-        struct { u8 _hp_script[T2_HOFF_LevelScriptF604(m_Script.script.steps)]; BossStep *script; }; /* N64 0x3F8 */
-        struct { u8 _hp_cursor[T2_HOFF_LevelScriptF604(m_Script.script.cursor)]; s32 cursor; }; /* N64 0x3FC */
-        struct { u8 _hp_index[T2_HOFF_LevelScriptF604(m_Script.script.current)]; s32 index; }; /* N64 0x400 */
-        struct { u8 _hp_dest[T2_HOFF_LevelScriptF604(m_Script.dest)]; CVector3 dest; }; /* N64 0x42C */
-    };
-} LevelScriptF604;
-#else
-typedef struct {
-    /* -0x04 */ s32 padF604;
-    /* 0x000 */ s32 stage;
-    /* 0x004 */ u8 pad004[0x8];
-    /* 0x00C */ f32 speed;                  /* 0x8012F614 */
-    /* 0x010 */ u8 pad010[0x35C];
-    /* 0x36C */ CGameObjectInstance *partA; /* 0x8012F974 */
-    /* 0x370 */ CGameObjectInstance *partB; /* 0x8012F978 */
-    /* 0x374 */ u8 pad374[0x58];
-    /* 0x3CC */ s32 unk3CC;                 /* 0x8012F9D4 */
-    /* 0x3D0 */ s32 state;                  /* 0x8012F9D8 */
-    /* 0x3D4 */ s32 mode;
-    /* 0x3D8 */ u8 pad3D8;
-    /* 0x3D9 */ u8 scriptOn;                /* 0x8012F9E1 */
-    /* 0x3DA */ u8 pad3DA[0x1A];
-    /* 0x3F4 */ BossStep *script;           /* 0x8012F9FC */
-    /* 0x3F8 */ s32 cursor;                 /* 0x8012FA00 */
-    /* 0x3FC */ s32 index;                  /* 0x8012FA04 */
-    /* 0x400 */ u8 pad400[0x28];
-    /* 0x428 */ CVector3 dest;              /* 0x8012FA30 */
-} LevelScriptF604;
-#endif
+#include "globals/collision.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern f32 AI_AngleToPoint(CGameObjectInstance *obj, CVector3 point);       /* angle to a point */
@@ -63,12 +18,6 @@ extern f32 func_002974C0(f32 angle);                                      /* cos
 extern f32 Random_Blend(f32 lo, f32 hi);
 extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
-extern s32 D_800F1F50[];
-#ifdef TARGET_PORT
-#define D_8012F604 (*(LevelScriptF604 *) &D_8012F604) /* the view over the typed block (globals/boss.h), at host offsets (hostview) */
-#else
-extern LevelScriptF604 D_8012F604;
-#endif
 #ifdef TARGET_PORT
 typedef struct BossCtl {
 /* the view at the host offsets of LevelScriptState (tools/port/hostview.py): each field in its own
@@ -100,10 +49,10 @@ void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
     f32 heading;
     BossCtl *ctl = (BossCtl *) &gLevelScript_unk3CC;  /* unk3CC on */
 
-    D_800F1F50[0] |= 0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags |= 0x8000;
     AI_UpdateTargets(obj, ai, &t, 0, 1);
     ctl->unk0 = 3;
-    D_800F1F50[0] &= ~0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags &= ~0x8000;
     do {
         target = t.m_Sight.m_pTarget;
         angle = 0.0f;
@@ -119,59 +68,59 @@ void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
         }
         CVector3__Subtract(&d, &obj->header.m_vPos, &dest);
         if (func_00298470(d.x * d.x + d.z * d.z) <= 50.0f) {
-            if (D_8012F604.state == 3) {
+            if (gLevelScriptBlock.m_Script.bossState == 3) {
                 if (gLevelScript == 1) {
-                    D_8012F604.script = sPrimagenAttackScriptStage1;
+                    gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage1;
                 }
                 if (gLevelScript == 2) {
-                    D_8012F604.script = sPrimagenAttackScriptStage2;
+                    gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage2;
                 }
                 if (gLevelScript == 3) {
-                    D_8012F604.script = sPrimagenAttackScriptStage3;
+                    gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage3;
                 }
-                D_8012F604.cursor = -1;
-                D_8012F604.index = -1;
-                CAI__SetMode(D_8012F604.partB, &D_8012F604.partB->m_AI, 0);
-                CAI__SetMode(D_8012F604.partA, &D_8012F604.partA->m_AI, 0);
+                gLevelScriptBlock.m_Script.script.cursor = -1;
+                gLevelScriptBlock.m_Script.script.current = -1;
+                CAI__SetMode(gLevelScriptBlock.m_Script.found[1], &gLevelScriptBlock.m_Script.found[1]->m_AI, 0);
+                CAI__SetMode(gLevelScriptBlock.m_Script.found[0], &gLevelScriptBlock.m_Script.found[0]->m_AI, 0);
                 CAI__SetMode(obj, ai, 0x1A);
                 return;
             }
-            if (D_8012F604.state == 11) {
+            if (gLevelScriptBlock.m_Script.bossState == 11) {
                 if (gLevelScript == 1) {
-                    D_8012F604.script = sPrimagenAttackScriptStage1;
+                    gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage1;
                 }
                 if (gLevelScript == 2) {
-                    D_8012F604.script = sPrimagenAttackScriptStage2;
+                    gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage2;
                 }
                 if (gLevelScript == 3) {
-                    D_8012F604.script = sPrimagenAttackScriptStage3;
+                    gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage3;
                 }
-                D_8012F604.cursor = -1;
-                D_8012F604.index = -1;
+                gLevelScriptBlock.m_Script.script.cursor = -1;
+                gLevelScriptBlock.m_Script.script.current = -1;
                 CAI__SetMode(obj, ai, 0x17);
                 return;
             }
-            if (D_8012F604.state == 4) {
+            if (gLevelScriptBlock.m_Script.bossState == 4) {
                 sPrimagenPathPoint++;
                 if (gPrimagenPaths[gLevelScript_path][sPrimagenPathPoint].y < 0.0f) {
                     sPrimagenPathPoint = 0;
-                    if (D_8012F604.stage != 1) {
+                    if (gLevelScriptBlock.m_Script.stage != 1) {
                         gLevelScript_path++;
                         if (gLevelScript_path >= 3) {
                             gLevelScript_path = 0;
                         }
                     }
                 }
-                D_8012F604.dest = gPrimagenPaths[gLevelScript_path][sPrimagenPathPoint];
+                gLevelScriptBlock.m_Script.dest = gPrimagenPaths[gLevelScript_path][sPrimagenPathPoint];
             }
         }
     }
     speed = 0.0f;
     AI_TurnClamped(obj, ai, 0.261799425f, angle);
-    dest = D_8012F604.dest;
+    dest = gLevelScriptBlock.m_Script.dest;
     CVector3__Subtract(&d, &obj->header.m_vPos, &dest);
     heading = CVector3__GetYaw(&d);
-    if (D_8012F604.state == 3 || D_8012F604.state == 11) {
+    if (gLevelScriptBlock.m_Script.bossState == 3 || gLevelScriptBlock.m_Script.bossState == 11) {
         if (obj->header.m_vPos.y < 921.6f) {
             obj->m_vVelocity.y = 460.8f;
         } else {
@@ -181,13 +130,13 @@ void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
         obj->m_vVelocity.x = func_002982F0(heading) * speed;
         obj->m_vVelocity.z = func_002974C0(heading) * speed;
     } else {
-        speed = Math_StepClamped(speed, D_8012F604.speed, 5120.0f);
+        speed = Math_StepClamped(speed, gLevelScriptBlock.m_Script.speed, 5120.0f);
         obj->m_vVelocity.x += speed * func_002982F0(heading);
         obj->m_vVelocity.z += speed * func_002974C0(heading);
         obj->m_vVelocity.y = 0.001f;
     }
-    if (D_8012F604.scriptOn && D_8012F604.state != 3 && D_8012F604.state != 11) {
-        if (D_8012F604.index == -1) {
+    if (gLevelScriptBlock.m_Script.scriptOn && gLevelScriptBlock.m_Script.bossState != 3 && gLevelScriptBlock.m_Script.bossState != 11) {
+        if (gLevelScriptBlock.m_Script.script.current == -1) {
             if (gLevelScript_script_cursor != -1) {
                 gLevelScript_script.timer = gLevelScript_script_steps[gLevelScript_script_cursor].delay;
             } else {
@@ -198,7 +147,7 @@ void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
                 if (gLevelScript_script_steps[gLevelScript_script_cursor].type == 5) {
                     gLevelScript_script_cursor = 0;
                 }
-                D_8012F604.index = gLevelScript_script_cursor;
+                gLevelScriptBlock.m_Script.script.current = gLevelScript_script_cursor;
             } while ((f32) gLevelScript_script_steps[gLevelScript_script_cursor].chance <= Random_Blend(0.0f, 100.0f));
         }
         Primagen_RunAttackStep(obj, ai, t.m_Sight.m_Dist);

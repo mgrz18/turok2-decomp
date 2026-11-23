@@ -5,15 +5,9 @@
 #include "protos/cache.h"
 
 #include "structs/world.h"
+#include "structs/collision.h"
 #define WORLD_TREE(w) (((CScene *)(w))->m_pBitSections2)
 #define WORLD_GROUP(w) (((CScene *)(w))->m_nLevel)
-
-typedef struct CollisionBuildVertex {
-    f32 x;
-    f32 y;
-    f32 z;
-    f32 ceiling;
-} CollisionBuildVertex;
 
 typedef struct CollisionBuildTriangle {
     /* 0x00 */ u16 kind;
@@ -58,7 +52,6 @@ typedef struct CollisionBuildWorld {
     /* 0x00074 */ char pad74[0x18FA8 - 0x74];
     /* 0x18FA8 */ s32 group;
 } CollisionBuildWorld;
-
 
 extern s32 ProPackDecompress(CollisionBuildMeshHandle **handle, s32);
 extern void UnpackScaledVec4(CollisionBuildVertex *v);

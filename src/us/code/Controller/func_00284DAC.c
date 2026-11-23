@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "structs/controller.h"
 
 extern void Controller_UpdateConnection(ControllerProfile *arg0);
-extern u8 D_800F677B[];
 extern s32 RumblePool_Init(void *arg0, void *arg1, s32 arg2);
 void Controller_UpdateConnection(ControllerProfile *arg0) {
     ControllerProfile *c = arg0;
@@ -13,7 +13,7 @@ void Controller_UpdateConnection(ControllerProfile *arg0) {
     s32 bit2;
     s32 i;
     type = c->port;
-    bit = ((D_800F677B[type * 4] >> 3) ^ 1) & 1;
+    bit = ((gContStatus[type].errno >> 3) ^ 1) & 1;
     if (bit != 0 && c->connected == 0) {
         i = 0;
         c->port = type;
@@ -41,7 +41,7 @@ void Controller_UpdateConnection(ControllerProfile *arg0) {
             c->buttonHistory[i].held = 0;
             i += 1;
         } while (i < 0x20);
-        bit2 = ((D_800F677B[type * 4] >> 3) ^ 1) & 1;
+        bit2 = ((gContStatus[type].errno >> 3) ^ 1) & 1;
         c->rumbleLevel = 0;
         c->rumbleTimer = 0;
         c->connected = bit2;

@@ -18,9 +18,7 @@ extern s32 sPrimagenPathPoint;              /* the Primagen's path point (just b
 #ifndef BOSS_STAGE_AS_WORD
 extern LevelScriptState gLevelScript;       /* the level script (the Primagen fight) */
 #endif
-#ifdef TARGET_PORT
-extern LevelScriptBlock D_8012F604;         /* the block gLevelScript lies in (structs/boss.h) */
-#endif
+extern LevelScriptBlock gLevelScriptBlock; /* the block gLevelScript lies in (structs/boss.h) */
 
 /* Fields with symbols of their own (kept where the ROM bases the access on them). */
 extern WaveBossStep *gMantidQueen_step;     /* gMantidQueen.step */
@@ -177,5 +175,6 @@ extern void *gTotemDefense_def;           /* gTotemDefense.def */
 extern s32 gTotemDefense_state;          /* gTotemDefense.state */
 extern f32 gTotemDefense_timer;          /* gTotemDefense.timer */
 extern s32 gTotemDefense_kills;          /* gTotemDefense.kills */
+extern s32 gTotemDefense_warned;         /* gTotemDefense.warned */
 
 #endif
