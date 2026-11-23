@@ -80,11 +80,9 @@ extern char sPlayerHurtText_LowHealth[];                 /* "low health" */
 extern char sCCacheDesc_Header[];                        /* "header" */
 extern char sTextureCacheDesc_Texture[];                 /* "texture" */
 extern char sCrashText_Newline[];                        /* "\n" */
-extern char sCameraTextEmpty[];                          /* "" */
 extern char sCCacheDesc_Header[];                        /* "header" */
 extern char sTextureCacheDesc_Texture[];                 /* "texture" */
 extern char sCrashText_Newline[];                        /* "\n" */
-extern char sCameraTextEmpty[];                          /* "" */
 extern char sPakCompanyCode[];                           /* "51": Pak_WriteNote company code */
 
 #endif
