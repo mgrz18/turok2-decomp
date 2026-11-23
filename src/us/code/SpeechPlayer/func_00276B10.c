@@ -23,11 +23,11 @@ typedef struct MusicPlayer {
 
 extern s32 BinaryRange(sptr table, s32 count, s32 group, s32 *first, s32 *last);
 extern s32 Random_Next(void);                     /* random */
-extern void *CAudioWorld__GetSndPlayer(MusicBank *bank);        /* the bank's sound player */
-extern void CAudioWorld__Lock(MusicBank *bank);
-extern void CAudioWorld__Unlock(MusicBank *bank);
-extern void alSndpSetSound(void *player, s32 id);    /* alSndpSetSound */
-extern void alSndpStop(void *player);            /* alSndpStop */
+void *CAudioWorld__GetSndPlayer(void *aw);
+void CAudioWorld__Lock(void *aw);
+void CAudioWorld__Unlock(void *aw);
+void alSndpSetSound(void *sndp, s16 id);
+void alSndpStop(void *sndp);
 
 /* One song of the group, each with the same weight. */
 static __inline__ s32 pick(MusicBank *bank, s32 group) {
