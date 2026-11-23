@@ -1,3 +1,6 @@
+/* FAKEMATCH (round 22): the `if (state)` with two arms that differ only in statement order (state is never
+ * NULL) and the goto into the else; without them (one arm, the plain if/else on the typed definition)
+ * Generator_Advance keeps m_pIntelligence and the body pointer in two $s registers: 64-66 of 66 words. */
 #include "structs/vector.h"
 #include "structs/game_object.h"
 #include "globals/game.h"
