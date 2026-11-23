@@ -5,3 +5,8 @@
 __osContPifRam = __osContBuffer;
 __osMaxControllers = __osContNumControllers;
 func_0029E460 = memcpy;
+/* motor.c: its tentative (COMMON) buffers, under the game names */
+_MotorStartData = __osMotorStartData;
+_motorstartbuf = __osMotorStartBuf;
+_MotorStopData = __osMotorStopData;
+_motorstopbuf = __osMotorStopBuf;

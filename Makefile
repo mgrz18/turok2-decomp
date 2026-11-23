@@ -305,7 +305,8 @@ UL_RENAMES   = $(VERSIONS_DIR)/ultralib_renames.$(VERSION).txt
 $(BUILD_DIR)/lib/%.c.o: $(BUILD_DIR)/lib/%.s_c $(UL_RENAMES)
 	INC_DIR=$(INCLUDE_DIR) $(TOOLS_DIR)/sn_as.sh $< $@
 	r=$$(sed -n 's|^lib/$*\.c: ||p' $(UL_RENAMES)); \
-	if [ -n "$$r" ]; then $(OBJCOPY) $$(printf -- '--redefine-sym %s ' $$r) $@; fi
+	if [ -n "$$r" ]; then $(OBJCOPY) $$(for t in $$r; do case $$t in \
+		.*) echo --rename-section $$t;; *) echo --redefine-sym $$t;; esac; done) $@; fi
 
 # make print-VAR: a variable as make expands it (tools/ultralib_build.py reads the flags).
 print-%:

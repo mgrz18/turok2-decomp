@@ -200,13 +200,16 @@ class Yaml:
         return lo
 
 
-def check_rodata(y, rom, ro, rrel, align, funcs):
+def check_rodata(y, rom, ro, rrel, align, funcs, at=None):
     """-> (start rom, end rom, first entry index, last entry index) or an error string."""
     own = {y.ro_at[v] for v in funcs if v in y.ro_at}
     size = len(ro)
-    cands = [a for a in range(RODATA_ROM[0], RODATA_ROM[1] - size, max(align, 4))
-             if rom[a:a + 4] == ro[:4] or 0 in rrel]
-    cands = [a for a in cands if same(ro, rom[a:a + size], rrel) is None]
+    if at is not None:              # .data: where its symbols are
+        cands = [at] if at % max(align, 4) == 0 and same(ro, rom[at:at + size], rrel) is None else []
+    else:
+        cands = [a for a in range(RODATA_ROM[0], RODATA_ROM[1] - size, max(align, 4))
+                 if rom[a:a + 4] == ro[:4] or 0 in rrel]
+        cands = [a for a in cands if same(ro, rom[a:a + size], rrel) is None]
     if own:
         lo, hi = min(y.rom(n) for n in own), max(y.rom(n) for n in own)
         cands = [a for a in cands if a <= lo and hi < a + size]
@@ -239,7 +242,7 @@ def plan():
     um = ulmap()
     taken, report = [], []
     gn = game_names()
-    vm2_defs = set()
+    vm2_defs, data_objs = set(), set()
     for name, start, end, funcs in modules():
         st = [um.get(v) for v in funcs]
         files = {s[1] for s in st if s}
@@ -297,6 +300,16 @@ def plan():
             report.append((name, f".text differs at +{bad:#x}"))
             continue
         extra = [k for k in (".data", ".bss", ".sdata", ".sbss") if secs.get(k, (b"",))[0]]
+        data_at = None
+        if extra == [".data"] and not secs.get(".rodata", (b"",))[0]:
+            # The game's libultra .data is in the KSEG0 data inside code_rodata's range: the
+            # object's .data goes there as .rodata (objcopy --rename-section, Makefile).
+            data_at = data_rom(obj, gn)
+            if isinstance(data_at, str):
+                report.append((name, data_at))
+                continue
+            secs[".rodata"] = secs[".data"]
+            extra = []
         if extra:
             report.append((name, f"has {', '.join(f'{k} {len(secs[k][0]):#x}' for k in extra)}"))
             continue
@@ -307,7 +320,7 @@ def plan():
         ro, rrel, align = secs.get(".rodata", (b"", {}, 4))
         ro_span = None
         if ro:
-            r = check_rodata(y, rom, ro, rrel, align, funcs)
+            r = check_rodata(y, rom, ro, rrel, align, funcs, data_at)
             if isinstance(r, str):
                 report.append((name, r))
                 continue
@@ -316,15 +329,34 @@ def plan():
             report.append((name, "the game's C has .rodata, ultralib's none"))
             continue
         taken.append((name, rel, (t0, t1), ro_span, funcs))
-        report.append((name, "taken"))
-    return taken, report, y, vm2_defs
+        if data_at is not None:
+            data_objs.add(rel)
+        report.append((name, "taken" + (" (its .data as .rodata)" if data_at is not None else "")))
+    return taken, report, y, vm2_defs, data_objs
+
+
+KSEG0_DATA = (0x800A51F8, 0x800BD32C)       # code_rodata's vram range (ROM 0xA5DF8)
+
+
+def data_rom(obj, gn):
+    """ROM offset of an object's .data, from a symbol in it that the game places."""
+    with open(obj, "rb") as fh:
+        elf = ELFFile(fh)
+        idx = [n for n, sec in enumerate(elf.iter_sections()) if sec.name == ".data"][0]
+        at = set()
+        for x in elf.get_section_by_name(".symtab").iter_symbols():
+            if x["st_shndx"] == idx and x.name in gn and KSEG0_DATA[0] <= gn[x.name] < KSEG0_DATA[1]:
+                at.add(gn[x.name] - KSEG0_DATA[0] + RODATA_ROM[0] - x["st_value"])
+    if len(at) != 1:
+        return f".data placed by {len(at)} game symbols"
+    return at.pop()
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--write", action="store_true")
     args = ap.parse_args()
-    taken, report, y, vm2_defs = plan()
+    taken, report, y, vm2_defs, data_objs = plan()
     for name, why in report:
         print(f"{name:40s} {why}")
     print(f"{sum(t[2] is not None for t in taken)} modules taken now, "
@@ -355,6 +387,17 @@ def main():
     for a, b, rep in sorted(edits, reverse=True):
         lines[a:b + 1] = rep
     YAML.write_text("".join(lines))
+    if data_objs:
+        ren = ROOT / "versions" / "ultralib_renames.us.txt"
+        rl = ren.read_text().splitlines()
+        for rel in sorted(data_objs):
+            key = f"lib/ultralib/src/{rel}.c:"
+            hit = [i for i, l in enumerate(rl) if l.startswith(key + " ")]
+            if hit and ".data=.rodata" not in rl[hit[0]]:
+                rl[hit[0]] += " .data=.rodata"
+            elif not hit:
+                rl.append(f"{key} .data=.rodata")
+        ren.write_text("\n".join(rl) + "\n")
     vm2 = [t for t in taken if t[0].endswith("_2")]
     if vm2:
         hdr = VM2 / "vm2_names.h"
