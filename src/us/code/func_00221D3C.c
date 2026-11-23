@@ -111,10 +111,8 @@ void CScene__BuildGeometryDisplayList(CScene *w) {
             g->w1 = 0xFFFE;
         }
         r = 0;
-        do {
-            n = w->m_nSectors;
-            regions = w->m_Sectors;
-        } while (0);
+        n = w->m_nSectors;
+        regions = w->m_Sectors;
         if (n > 0) {
             do {
                 region = regions + r;
