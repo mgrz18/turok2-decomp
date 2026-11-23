@@ -1,7 +1,7 @@
 #include "common.h"
+#include "structs/controller.h"
 
-extern u8 D_800F677A[];
 
 s32 Controller_PakInserted(s32 arg0) {
-    return D_800F677A[arg0 * 4] & 1;
+    return gContStatus[arg0].status & 1;
 }

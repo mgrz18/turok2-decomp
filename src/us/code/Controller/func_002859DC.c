@@ -1,7 +1,7 @@
 #include "common.h"
+#include "structs/controller.h"
 #include "m2c_macros.h"
 
-extern u8 D_800F677B[];
 
 s32 Controller_CountConnected(void)
 {
@@ -14,7 +14,7 @@ s32 Controller_CountConnected(void)
   do
   {
     var_v0 = var_v1 * 4;
-    if (((((u8) (*((u8 *) (D_800F677B + var_v0)))) >> 3) ^ 1) & 1)
+    if (((((u8) (*((u8 *) ((u8 *) &gContStatus[0].errno + var_v0)))) >> 3) ^ 1) & 1)
     {
       var_a0 += 1;
     }

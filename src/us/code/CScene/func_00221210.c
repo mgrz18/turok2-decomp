@@ -6,8 +6,10 @@
 #include "structs/world.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
+#include "globals/camera.h"
 #ifdef TARGET_PORT
 #include "structs/game.h"
+#include "globals/camera.h"
 #endif
 
 /* Builds the frame's actor lists: every live level actor (flag 0x100) whose
@@ -27,8 +29,6 @@ typedef struct {
 } ViewState;
 
 extern ViewState gEngineApp_m_Settings_difficulty; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern f32 D_800F5A34[];    /* view box max (min at -3) */
-extern f32 D_800F5A18[];    /* active box: max at +4 (min at +1) */
 
 void CPlayerPool__RegisterActors(void *, CScene *);
 s32 Cinema_PathPlaying(void);
@@ -74,8 +74,8 @@ void CScene__BuildActorLists(CScene *w) {
     lim = w->m_nActors;
     actors = (CGameObjectInstance *)w->m_pActors;
     if (i < lim) {
-        bB = D_800F5A34;
-        bA = D_800F5A18 + 1;
+        bB = &gCameraViewBox.m_vMax.x;
+        bA = &gCameraVisibleBox.m_vMax.x;
         do {
             o = &actors[i];
             fl = o->m_dwFlags;

@@ -6,9 +6,9 @@
 #include "structs/pak.h"
 #include "globals/pak.h"
 #include "globals/controller.h"
+#include "structs/controller.h"
 
 extern s32 Controller_Lock(s32 arg0);
-extern u8 D_800F677B[];
 extern void Controller_Unlock();
 extern void Controller_ReadAll(void);
 s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);
@@ -25,7 +25,7 @@ void Pak_ProbeAll(void) {
     gPakQueueState = 2;
     for (channel = 0; channel < 4; channel++) {
         record = &gRumblePaks[channel];
-        if (D_800F677B[channel * 4] != 0) {
+        if (gContStatus[channel].errno != 0) {
             present = 0;
             record->present = 0;
         } else {
