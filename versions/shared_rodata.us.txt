@@ -29,8 +29,8 @@ OptionsMenu_2:OptionsMenu_StickVertText_2 0x800C1318  # strings (menu)
 OptionsMenu_2:OptionsMenu_BrightnessText_2 0x800C1318  # string (menu)
 func_00450D78 0x800C0EE8  # floats
 func_00452EA8 0x800C1030  # "  %2d", " %3d" (menu)
-func_00453430 0x800C11B0  # jtbl of func_0041A4D0
-func_00453FC4 0x800C12B0  # jtbl of func_0041B05C
+CheatMenu_2:CheatsMenu_Init_2 0x800C11B0  # jtbl of func_0041A4D0
+CheatMenu_2:CheatMenu_WarpText_2 0x800C12B0  # jtbl of func_0041B05C
 func_00459B50 0x800C1438  # jtbl
 func_0045AEA8 0x800C1468  # jtbl
 func_0045B784 0x800C14B0  # jtbl
@@ -48,7 +48,7 @@ func_0045CBDC 0x800C16D0  # jtbl
 func_0045CCC4 0x800C1700  # jtbl
 SceneActorPool_2 0x800A6050  # copy of func_0042CF90: its literal, in the engine .rodata
 func_00466040 0x800A60B8  # copy of func_0042D120: its literal, in the engine .rodata
-func_004540B0 0x800C12E0  # jtbl of func_0041B148
+CheatMenu_2:CheatMenu_GetWarpLevel_2 0x800C12E0  # jtbl of func_0041B148
 func_0045CC58 0x800C16E8  # jtbl
 func_00448240 0x800C0950  # copy of the cinema file (func_0040F240 to func_004131B0)
 func_0043CCF8 0x800C038C  # W batch
@@ -66,7 +66,7 @@ func_0044772C 0x800C0934  # W batch
 func_004478BC 0x800C0938  # W batch
 func_00450490 0x800C0E94  # W batch: copy of func_00417490
 func_0045078C 0x800C0EA8  # W batch: copy of func_0041778C
-func_0045386C 0x800C126C  # W batch: copy of func_0041A904
+CheatMenu_2:EnterCheatMenu_DrawTextField_2 0x800C126C  # W batch: copy of func_0041A904
 func_00459E54 0x800C1450  # W batch, jtbl
 func_0045B234 0x800C1488  # W batch, jtbl
 MissionMenu_2:Mission_LevelObjectivesDone_2 0x800C1750  # W batch, jtbl
@@ -79,7 +79,7 @@ NameEntryMenu_2:NameEntryMenu_DrawName_2 0x800C13E0  # copy of func_0041D51C (W)
 func_004688D0 0x800A97F0  # copy of func_0042F9B0 (W), in the engine .rodata
 func_0044C230 0x800C0AF0  # copy of the file from func_00413230 (to 0x417484)
 func_00452314 0x800C1008  # X batch: jtbl of func_004193B4
-func_00453E58 0x800C1280  # X batch: jtbl of func_0041AEF0
+CheatMenu_2:Cheat_FindWarpLevel_2 0x800C1280  # X batch: jtbl of func_0041AEF0
 func_0045E808 0x800C1870  # X batch: jtbl of func_004258E8
 func_00468AC4 0x800A9A00  # copy of func_0042FBA4: its strings and 1.0f, in the engine .rodata
 func_0043F000 0x800C04A4  # twin of func_00406000 (X), which now owns the pool
@@ -88,7 +88,7 @@ func_0045D6A0 0x800C1720  # copy of func_00424780 (X), which now owns the pool
 func_0043CF3C 0x800C0398  # X batch
 func_00442000 0x800C05C0  # X batch
 func_00443BB4 0x800C0878  # X batch, twin of func_0040ABB4
-func_0045353C 0x800C11E0  # X batch: the warp menu of func_0041A5DC
+CheatMenu_2:CheatsMenu_WarpSelect_2 0x800C11E0  # X batch: the warp menu of func_0041A5DC
 OptionsMenu_2:GameSettings_SetDefaults_2 0x800C1328  # X batch: copy of func_0041BA50
 func_00462EC0 0x800A5D70  # copy of func_00429FA0: its strings and 1.0f, in the engine .rodata
 func_00442500 0x800C05D4  # copy of func_00409500 (X), which now owns the pool
@@ -113,7 +113,7 @@ func_00447B68 0x800C093C  # copy of func_0040EB68, which now owns the pool
 func_00440C20 0x800C046C  # copy of func_00407C20, which now owns the pool
 func_0044068C 0x800C0534  # copy of func_0040768C, which now owns the pool
 func_0044065C 0x800C052C  # copy of func_0040765C
-func_00453A08 0x800C1278  # copy of func_0041AAA0 (menu block), which now owns the pool
+CheatMenu_2:EnterCheatMenu_UpdateTextField_2 0x800C1278  # copy of func_0041AAA0 (menu block), which now owns the pool
 NameEntryMenu_2:NameEntryMenu_Init_2 0x800C1340  # copy of func_0041D050 (menu block), which now owns the pool
 MissionMenu_2:GfxPool_Alloc_2 0x800C1810  # copy of func_00425220, which now owns the pool
 CPlayer_2:CPlayer__SetupActors_2 0x800A6A98  # copy of func_0042DA60, which now owns the pool
