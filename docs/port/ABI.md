@@ -104,7 +104,7 @@ reports 0 differences over all 3,938 files.
   func_00238134, func_00238888, func_00238958, func_002389EC, func_00238D3C, func_002638A0,
   func_00265D14): the dispatcher passes a `CVector3`, the handlers take a `Triple` and forward it
   to `CVector3` definitions. Under `TARGET_PORT` these files `#define Triple T2HostTriple` (three
-  floats) after their own struct definition, so both the handler's parameter and the forwarded
+  floats; one definition in `include/structs/triple.h` since round 24) after their own struct definition, so both the handler's parameter and the forwarded
   argument are float structs. `Automap_SetPlayer` and `CGameObjectInstance__LocalToWorld` (whose
   MIPS view took the vector as an `IntPair` and left the actor in a1) and `func_002156D4` (a
   struct-returning wrapper) have host bodies.
