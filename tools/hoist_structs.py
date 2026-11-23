@@ -53,7 +53,12 @@ def hoist(path, header, names, renames):
     first = cut[0][0]
     inc = f'#include "{header}"\n'
     # after the last #include above the first copy, else where the copy was
-    incs = [m.end() for m in re.finditer(r"^#include[^\n]*\n", src[:first], re.M)]
+    incs, depth = [], 0
+    for m in re.finditer(r"^#\s*(if|ifdef|ifndef|endif|include)\b[^\n]*\n", src[:first], re.M):
+        k = m.group(1)
+        depth += 1 if k.startswith("if") else -1 if k == "endif" else 0
+        if k == "include" and depth == 0:
+            incs.append(m.end())  # outside any #if
     at = incs[-1] if incs else first
     out, pos = [], 0
     if inc not in src and at < first:
