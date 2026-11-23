@@ -90,7 +90,7 @@ void Throwable_SetModeAnim(sptr arg0, CAI *arg1, sptr arg2) {
 
 s32 func_00264994(s32, s32);
 #ifdef TARGET_PORT
-void Throwable_CalcOrientation(void *obj, void *ai);
+void Throwable_CalcOrientation(CGameObjectInstance *obj, CAI *state);
 #endif
 
 void Throwable_Collision(u8 *actor, u8 *state);
