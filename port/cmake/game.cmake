@@ -42,7 +42,7 @@ set(T2_GAME_EXCLUDE
     func_002A4BE0.c   # libgcc __umoddi3
     func_0029DFC0.c   # osGetCount          (mfc0 Count)
     func_0029E210.c   # __osSetCompare      (mtc0 Compare)
-    func_002A259C.c   # HostIo_Call         (SN debug host I/O, break 1)
+    # (HostIo_Call, SN debug host I/O with break 1: under #ifndef TARGET_PORT in the merged HostIo.c)
     func_00298470.c   # sqrtf               (sqrt.s; host libm)
 )
 

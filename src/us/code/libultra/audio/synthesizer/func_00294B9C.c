@@ -1,9 +1,0 @@
-#include "common.h"
-
-void alUnlink(s32);                     /* extern */
-void alLink(sptr, sptr);                /* extern */
-
-void _freePVoice(sptr arg0, sptr arg1) {
-    alUnlink(arg1);
-    alLink(arg1, arg0 + 0x14);
-}

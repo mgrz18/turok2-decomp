@@ -134,11 +134,8 @@ set(T2_LINK_REPLACED
     func_00277024.c   # SpeechPlayer_StopUnlocked
     # libaudio's synthesizer driver, voice calls and event helpers (views at N64 offsets):
     # port/audio/t2audio_lib.c
-    func_00294C70.c   # __nextSampleTime
-    func_00294D18.c   # _timeToSamples
-    func_00294C30.c   # _timeToSamplesNoRound
-    func_00294BDC.c   # _collectPVoices
-    func_00294B9C.c   # _freePVoice
+    # (_freePVoice, _collectPVoices, _timeToSamples, __nextSampleTime, _timeToSamplesNoRound: under
+    # #ifndef TARGET_PORT in the merged synthesizer.c)
     func_00294200.c   # alSynSetFXMix
     func_002954F8.c   # alSaveNew
     func_0026FFA0.c   # AudioDMA_CacheBlock
