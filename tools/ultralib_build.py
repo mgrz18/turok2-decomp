@@ -50,6 +50,32 @@ VM_PFS = (0x00427000, 0x0042A000)
 RODATA_ROM = (0xA5DF8, 0xC3074)
 R_MIPS_32, R_MIPS_26, R_MIPS_HI16, R_MIPS_LO16 = 2, 4, 5, 6
 UL_PREFIX = "../../lib/ultralib/src/"
+# The second paged VM module's copies: a wrapper per file that includes ultralib's and renames
+# its globals to the game's _2 names (vm2_names.h), both written by --write.
+VM2 = ROOT / "lib" / "ultralib_vm2"
+VM2_PREFIX = "../../lib/ultralib_vm2/"
+NAMES = ROOT / "versions" / "symbols_names.us.txt"
+
+
+def game_names():
+    out = {}
+    for line in NAMES.read_text().splitlines():
+        m = re.match(r"(\w+) = 0x([0-9A-Fa-f]+);", line)
+        if m:
+            out[m.group(1)] = int(m.group(2), 16)
+    return out
+
+
+def object_globals(obj):
+    with open(obj, "rb") as fh:
+        st = ELFFile(fh).get_section_by_name(".symtab")
+        return {x.name for x in st.iter_symbols() if x["st_info"]["bind"] == "STB_GLOBAL" and x.name}
+
+
+def vm2_wrapper(rel):
+    return (f"/* The second paged VM module's copy of ultralib's {rel}.c (docs/LIBULTRA.md): the same\n"
+            f" * code under the game's _2 names. Written by tools/ultralib_build.py --write. */\n"
+            f"#include \"vm2_names.h\"\n#include \"{rel}.c\"\n")
 
 
 def make_var(name):
@@ -71,7 +97,7 @@ def modules():
         m = re.match(r"  0x([0-9A-F]{8}) (\w+)", line)
         if m and cur:
             cur[3].append(int(m.group(1), 16))
-    return [m for m in out if m[0].startswith("libultra/") and not m[0].endswith("_2") and (LIB_VRAM[0] <= m[1] < LIB_VRAM[1] or VM_PFS[0] <= m[1] < VM_PFS[1])]
+    return [m for m in out if m[0].startswith("libultra/") and (LIB_VRAM[0] <= m[1] < LIB_VRAM[1] or VM_PFS[0] <= m[1] < VM_PFS[1])]
 
 
 def ulmap():
@@ -87,12 +113,14 @@ def ulmap():
 ENTRY = re.compile(r"^(\s*)- \[0x([0-9A-F]+), (\.?\w+)(?:, (\S+?))?\]")
 
 
-def compile_obj(src, cpp_flags, cc_flags):
+def compile_obj(src, cpp_flags, cc_flags, inc=None):
     o = OUT / src.relative_to(ROOT).with_suffix(".c.o")
     o.parent.mkdir(parents=True, exist_ok=True)
     i, s = o.with_suffix(".i"), o.with_suffix(".s_c")
     # from lib/ultralib/src, like the Makefile: __FILE__ is "audio/csplayer.c" in the ROM
-    subprocess.run(["cpp", *shlex.split(cpp_flags), "-o", str(i), str(src.relative_to(UL / "src"))],
+    arg = str(src.relative_to(UL / "src")) if src.is_relative_to(UL) else str(src)
+    extra = [f"-I{inc}"] if inc else []
+    subprocess.run(["cpp", *shlex.split(cpp_flags), *extra, f"-I{UL / 'src'}", "-o", str(i), arg],
                    check=True, cwd=UL / "src")
     subprocess.run(["unix2dos", "-q", str(i)], check=True)
     subprocess.run(["tools/sn64/cc1", *shlex.split(cc_flags), "-o", str(s), str(i)], check=True,
@@ -210,11 +238,18 @@ def plan():
     yaml_text = "".join(y.lines)
     um = ulmap()
     taken, report = [], []
+    gn = game_names()
+    vm2_defs = set()
     for name, start, end, funcs in modules():
         st = [um.get(v) for v in funcs]
         files = {s[1] for s in st if s}
         rel = next(iter(files)).removeprefix("src/").removesuffix(".c") if len(files) == 1 else None
-        if rel and f"c, {UL_PREFIX}{rel}]" in yaml_text:
+        vm2 = name.endswith("_2")
+        if rel and vm2 and f"c, {VM2_PREFIX}{rel}_2]" in yaml_text:
+            taken.append((name, rel + "_2", None, None, funcs))
+            report.append((name, "linked from lib/ultralib (the _2 copy)"))
+            continue
+        if rel and not vm2 and f"c, {UL_PREFIX}{rel}]" in yaml_text:
             taken.append((name, rel, None, None, funcs))
             report.append((name, "linked from lib/ultralib"))
             continue
@@ -227,11 +262,25 @@ def plan():
         for v in funcs:          # a few game files carry the function's name, not its address
             if v not in y.text_at and um[v][3] in y.c_named:
                 y.text_at[v] = y.c_named[um[v][3]]
+            # the second VM module's files are named at the address splat gives it
+            named = gn.get(um[v][3])
+            if v not in y.text_at and named is not None and f"func_{named:08X}" in y.c_named:
+                y.text_at[v] = y.c_named[f"func_{named:08X}"]
         if any(v not in y.text_at for v in funcs):
             report.append((name, "a function is not a `c, code/func_` subsegment"))
             continue
         try:
             obj = compile_obj(UL / "src" / f"{rel}.c", cpp_flags, cc_flags)
+            if vm2:
+                ren = sorted(g for g in object_globals(obj) if g + "_2" in gn)
+                vm2_defs.update(ren)
+                w = OUT / "vm2" / f"{rel}_2.c"
+                w.parent.mkdir(parents=True, exist_ok=True)
+                w.write_text(vm2_wrapper(rel))
+                hdr = OUT / "vm2" / "vm2_names.h"
+                hdr.write_text("".join(f"#define {g} {g}_2\n" for g in ren))
+                obj = compile_obj(w, cpp_flags, cc_flags, OUT / "vm2")
+                rel = rel + "_2"
         except subprocess.CalledProcessError as e:
             report.append((name, f"does not compile: {e}"))
             continue
@@ -268,14 +317,14 @@ def plan():
             continue
         taken.append((name, rel, (t0, t1), ro_span, funcs))
         report.append((name, "taken"))
-    return taken, report, y
+    return taken, report, y, vm2_defs
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--write", action="store_true")
     args = ap.parse_args()
-    taken, report, y = plan()
+    taken, report, y, vm2_defs = plan()
     for name, why in report:
         print(f"{name:40s} {why}")
     print(f"{sum(t[2] is not None for t in taken)} modules taken now, "
@@ -289,7 +338,8 @@ def main():
             continue
         t0, t1 = tspan
         ind = ENTRY.match(lines[t0]).group(1)
-        edits.append((t0, t1, [f"{ind}- [0x{y.rom(t0):X}, c, {UL_PREFIX}{rel}]\n"]))
+        prefix = VM2_PREFIX if name.endswith("_2") else UL_PREFIX
+        edits.append((t0, t1, [f"{ind}- [0x{y.rom(t0):X}, c, {prefix}{rel}]\n"]))
         if ro_span:
             start, end, k0, k1 = ro_span
             n0, n1 = y.entries[k0], y.entries[k1]
@@ -297,7 +347,7 @@ def main():
             rep = []
             if y.rom(n0) < start:                  # keep the head of a split piece
                 rep.append(lines[n0])
-            rep.append(f"{ind}- [0x{start:X}, .rodata, {UL_PREFIX}{rel}]\n")
+            rep.append(f"{ind}- [0x{start:X}, .rodata, {prefix}{rel}]\n")
             nxt = y.entries[k1 + 1]
             if y.rom(nxt) > end:                   # the tail of a split piece
                 rep.append(f"{ind}- [0x{end:X}, rodata]\n")
@@ -305,6 +355,20 @@ def main():
     for a, b, rep in sorted(edits, reverse=True):
         lines[a:b + 1] = rep
     YAML.write_text("".join(lines))
+    vm2 = [t for t in taken if t[0].endswith("_2")]
+    if vm2:
+        hdr = VM2 / "vm2_names.h"
+        old = set(re.findall(r"#define (\w+) ", hdr.read_text())) if hdr.exists() else set()
+        names = sorted(old | vm2_defs)
+        hdr.parent.mkdir(parents=True, exist_ok=True)
+        hdr.write_text("/* The globals of ultralib's Controller Pak files under the names the game gives their\n"
+                       " * copies in the second paged VM module (docs/LIBULTRA.md). Written by\n"
+                       " * tools/ultralib_build.py --write. */\n"
+                       + "".join(f"#define {g} {g}_2\n" for g in names))
+        for name, rel, *_ in vm2:
+            w = VM2 / f"{rel}.c"
+            w.parent.mkdir(parents=True, exist_ok=True)
+            w.write_text(vm2_wrapper(rel.removesuffix("_2")))
     out = ["// libultra modules linked from lib/ultralib (decompals/ultralib, 2.0I libgultra_rom)",
            "// instead of the game's C; written by tools/ultralib_build.py --write (docs/LIBULTRA.md).",
            "// module = ultralib file: the game files the N64 build no longer links"]

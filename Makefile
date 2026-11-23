@@ -129,7 +129,8 @@ S_OBJS   = $(patsubst $(SPLAT_DIR)/%.s,$(BUILD_DIR)/%.s.o,$(filter $(ASM_DIR)/%,
 # libultra objects built from lib/ultralib (decompals/ultralib, a pinned submodule) in place of
 # the game's own per-function C (versions/ultralib_objects.us.txt, docs/LIBULTRA.md).
 UL_DIR    = lib/ultralib
-UL_FILES  = $(patsubst $(BUILD_DIR)/%.c.o,%.c,$(sort $(shell grep -o '$(BUILD_DIR)/$(UL_DIR)/[^ ()]*\.c\.o' $(LD_SCRIPT) 2>/dev/null)))
+UL_VM2    = lib/ultralib_vm2
+UL_FILES  = $(patsubst $(BUILD_DIR)/%.c.o,%.c,$(sort $(shell grep -o '$(BUILD_DIR)/lib/[^ ()]*\.c\.o' $(LD_SCRIPT) 2>/dev/null)))
 C_OBJS   = $(patsubst %.c,$(BUILD_DIR)/%.c.o,$(C_FILES) $(UL_FILES))
 BIN_OBJS = $(patsubst $(SPLAT_DIR)/%.bin,$(BUILD_DIR)/%.bin.o,$(BIN_FILES))
 
@@ -289,11 +290,18 @@ $(BUILD_DIR)/$(UL_DIR)/%.i: $(UL_DIR)/%.c
 	cd $(UL_DIR)/src && $(CPP) -MMD -MP -MT $(CURDIR)/$@ -MF $(CURDIR)/$@.d $(UL_CPP_FLAGS) \
 		-o $(CURDIR)/$@ $(patsubst $(UL_DIR)/src/%,%,$<)
 
-$(BUILD_DIR)/$(UL_DIR)/%.s_c: $(BUILD_DIR)/$(UL_DIR)/%.i
+# lib/ultralib_vm2: the second paged VM module's Controller Pak copies, ultralib's files under
+# the game's _2 names (a wrapper per file and vm2_names.h, written by tools/ultralib_build.py).
+$(BUILD_DIR)/$(UL_VM2)/%.i: $(UL_VM2)/%.c $(UL_VM2)/vm2_names.h
+	@mkdir -p $(dir $@)
+	cd $(UL_DIR)/src && $(CPP) -MMD -MP -MT $(CURDIR)/$@ -MF $(CURDIR)/$@.d $(UL_CPP_FLAGS) \
+		-I$(CURDIR)/$(UL_VM2) -I$(CURDIR)/$(UL_DIR)/src -o $(CURDIR)/$@ $(CURDIR)/$<
+
+$(BUILD_DIR)/lib/%.s_c: $(BUILD_DIR)/lib/%.i
 	unix2dos $<
 	$(CC) $(UL_CC_FLAGS) -o $@ $<
 
-$(BUILD_DIR)/$(UL_DIR)/%.c.o: $(BUILD_DIR)/$(UL_DIR)/%.s_c
+$(BUILD_DIR)/lib/%.c.o: $(BUILD_DIR)/lib/%.s_c
 	INC_DIR=$(INCLUDE_DIR) $(TOOLS_DIR)/sn_as.sh $< $@
 
 # make print-VAR: a variable as make expands it (tools/ultralib_build.py reads the flags).
