@@ -199,3 +199,11 @@ still in `src/us/code`, compile to the same code as before and are not linked
 by the N64 build (the list says which). 121 game files, which
 neither build linked any more (the kernel/VI/PI/SI/AI files port/runtime
 replaces, motor.c's three, the second VM module's copies, `sprintf`), are deleted.
+
+Checked in round 22 (Linux, Release at the coordinator's `-O2`): `gendata.py` rerun with
+`decls.json` deleted, `mklayout.py` (layout committed), `aligncheck.py` the 2 known
+`GameNoteMenu_SelectYes` sites; the boot and the 3 demos det `6ab97584…` (52,000 lines); the
+default whole-game run (300,000 frames, `aimdrive.py`) det `dc8126d3…` (600,000 lines, the one
+`death:` at 263,578). `port/gen` changed only where the ELF is now exact: `alGlobals` and
+`__osFaultedThread` are sized by their objects (4 bytes each, where gendata had read up to the
+next label: three and two garbage pointer slots fewer).
