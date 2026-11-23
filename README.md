@@ -6,7 +6,7 @@
 [![total matched](https://img.shields.io/badge/total%20matched-100%25-brightgreen)](tools/progress.py)
 [![engine matched](https://img.shields.io/badge/engine%20matched-100%25-brightgreen)](tools/progress.py)
 [![VM modules matched](https://img.shields.io/badge/VM%20modules%20matched-100%25-brightgreen)](tools/progress.py)
-[![readable](https://img.shields.io/badge/readable%20C-99.83%25-blue)](tools/progress.py)
+[![readable](https://img.shields.io/badge/readable%20C-99.91%25-blue)](tools/progress.py)
 [![asm decoded](https://img.shields.io/badge/asm%20decoded-95.2%25-brightgreen)](docs/VRAM-LAYOUT.md)
 [![functions](https://img.shields.io/badge/functions-13%2C275-brightgreen)](docs/VRAM-LAYOUT.md)
 [![functions named](https://img.shields.io/badge/C%20functions%20named-92%25-blue)](docs/NAMES.md)
