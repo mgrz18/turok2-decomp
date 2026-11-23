@@ -224,7 +224,7 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
             Hud_DrawSprite(0x1FA, 0, x, y + sy * 8.0f, sx, sy, 1);
             Hud_DrawNumber(player->m_pOptions->m_Kills, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
         }
-        if (gEngineApp_m_Settings_match_tag) {
+        if (gEngineApp_m_Settings_match_tag[0]) {
             value = player->m_pOptions->m_Tags;
             if (player->m_TotalTagsOverlay.m_Value != value) {
                 COverlay__StartScript(&player->m_TotalTagsOverlay, gTotalTagsOverlayChangeScript);
@@ -1008,7 +1008,7 @@ void CPlayer__Update(Player *p) {
     if (human) {
         modelId = 102;
         if (gEngineApp_m_Settings.multiplayer != 0) {
-            if (gEngineApp_m_Settings_match_tag != 0 && p->options->m_TagMode != 0) {
+            if (gEngineApp_m_Settings_match_tag[0] != 0 && p->options->m_TagMode != 0) {
                 modelId = gTagModeModel;
             } else {
                 modelId = gCharacterModels[p->def->m_Id];

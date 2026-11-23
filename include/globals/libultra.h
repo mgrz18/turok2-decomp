@@ -65,7 +65,7 @@ extern u8 osAppNMIBuffer[64];
 /* The controllers (controller.c, contreaddata.c, pfsisplug.c, motor.c, siacs.c). */
 extern OSMesgQueue __osContMesgQueue;     /* osContInit */
 extern OSMesg __osContMesgBuff;
-extern u8 __osContNumControllers;         /* __osMaxControllers */
+extern u8 __osContNumControllers[];       /* __osMaxControllers; an array: in the loops GCC 2 keeps its address in a register, as the ROM does */
 extern OSPifRam __osContBuffer;           /* __osContPifRam */
 extern u8 __osContLastCmd;
 extern OSPifRam __osMotorStartData[4];    /* motor.c's _MotorStartData */

@@ -9,10 +9,8 @@
 #include "globals/engine.h"
 #include "globals/player.h"
 #include "protos/ai.h"
+#include "globals/game.h"
 
-extern struct {
-    s32 enabled;
-} gEngineApp_m_Settings_match_tag;
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 extern s32 CPlayer__GetNextUsableWeapon(CPlayer *player);
 extern void Sound__Play(s32 sound, CVector3 pos, CVector3 *source, sptr arg);
@@ -52,7 +50,7 @@ void WeaponMode_Idle_Update(CGameObjectInstance *obj, CAI *ai) {
     }
     player->m_ContState.m_pContState->rumbleBase = 0;
     ai->m_Weapon.m_SpinTime = 0;
-    if (gEngineApp_m_Settings_match_tag.enabled && player->m_pOptions->m_TagMode) {
+    if (gEngineApp_m_Settings_match_tag[0] && player->m_pOptions->m_TagMode) {
         if (player->m_ContState.m_dwButtonsSingle & 0x2000) {
             Sound__Play(0x27D8, player->m_CharacterActor.header.m_vPos, &player->m_CharacterActor.header.m_vPos, -1);
         }

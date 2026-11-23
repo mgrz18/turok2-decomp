@@ -17,7 +17,7 @@ void CPlayer__DrawCharacter(CPlayer *player, sptr arg1) {
 
     if (gEngineApp_m_Settings.multiplayer == 0) {
         model = 0x66;
-    } else if (gEngineApp_m_Settings_match_tag != 0 && player->m_pOptions->m_TagMode != 0) {
+    } else if (gEngineApp_m_Settings_match_tag[0] != 0 && player->m_pOptions->m_TagMode != 0) {
         model = gTagModeModel;
     } else {
         model = gCharacterModels[player->m_CharacterActor.header.m_pIntelligence->m_Id];

@@ -7,7 +7,7 @@
 
 
 /* Byte-offset field access: member references here would let the
- * scheduler move the gEngineApp_m_Settings_match_tag load and change the register choice. */
+ * scheduler move the gEngineApp_m_Settings_match_tag[0] load and change the register choice. */
 #define FIELD_AT(ptr, type, T, field) (*(type *)((s8 *)(ptr) + (s32) &((T *)0)->field))
 
 void StatsMenu_InitContinue(Menu *arg0) {

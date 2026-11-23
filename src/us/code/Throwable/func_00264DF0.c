@@ -13,7 +13,7 @@ void Throwable_PickedUpUpdate(CGameObjectInstance *obj, CAI *state) {
     sptr anim;
     CGameObjectInstance *owner = state->m_Throwable.m_pOwner;
 
-    gThrowableCollisionInfo_m_InstanceBehavior = 0;
+    gThrowableCollisionInfo_m_InstanceBehavior[0] = 0;
     if (owner == NULL) {
         return;
     }

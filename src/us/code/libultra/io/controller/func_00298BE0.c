@@ -24,7 +24,7 @@ void __osPackRequestData(u8 cmd) {
     requestformat.typel = 0xFF;
     requestformat.status = 0xFF;
     requestformat.dummy1 = 0xFF;
-    count = &__osContNumControllers;
+    count = __osContNumControllers;
     for (i = 0; i < *count; i++) {
         *(__OSContRequesFormat *)ptr = requestformat;
         ptr += sizeof(requestformat);

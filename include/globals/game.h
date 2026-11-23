@@ -20,7 +20,7 @@ extern s32 gEngineApp_m_Settings_mode;            /* .mode */
 extern s32 gEngineApp_m_Settings_nextMode;        /* .nextMode */
 extern GameMatch gEngineApp_m_Settings_match;     /* .match */
 extern s32 gEngineApp_m_Settings_match_teams;     /* .match.teams */
-extern s32 gEngineApp_m_Settings_match_tag;       /* .match.tag */
+extern s32 gEngineApp_m_Settings_match_tag[];       /* .match.tag */
 extern s32 gEngineApp_m_Settings_match_unk44;     /* .match.unk44 */
 
 /* Members of gEngineApp_m_Game with symbols of their own (kept where the ROM
@@ -38,7 +38,7 @@ extern u8 gEngineApp_m_Settings_unk16;            /* .unk16 */
 extern u8 gEngineApp_m_Settings_unk17;            /* .unk17 */
 extern u8 gEngineApp_m_Settings_unk18;            /* .unk18 */
 extern u8 gEngineApp_m_Settings_unk1B;            /* .unk1B */
-extern s32 gEngineApp_m_Settings_unk1C8;          /* .unk1C8 */
+extern s32 gEngineApp_m_Settings_unk1C8[];          /* .unk1C8 */
 extern f32 gEngineApp_m_Settings_match_countdown; /* .match.countdown */
 extern s32 gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount; /* .m_PlayerList.m_ActiveList.m_nCount */
 extern s32 gEngineApp_m_Settings_match_teamScore[2]; /* .match.teamScore */

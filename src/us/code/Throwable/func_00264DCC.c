@@ -3,5 +3,5 @@
 #include "globals/collision.h"
 
 void Throwable_IdleUpdate(void) {
-    gThrowableCollisionInfo_m_InstanceBehavior = 2;
+    gThrowableCollisionInfo_m_InstanceBehavior[0] = 2;
 }

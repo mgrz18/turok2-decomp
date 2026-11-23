@@ -3,7 +3,7 @@
 #include "globals/game.h"
 
 
-/* Sets or clears flag 0x01000000 of the item from gEngineApp_m_Settings_match_tag. */
+/* Sets or clears flag 0x01000000 of the item from gEngineApp_m_Settings_match_tag[0]. */
 void StatsMenu_ShowTagsRow(Menu *arg0) {
     MenuItem *temp_a0;
     MenuItem *temp_v0;

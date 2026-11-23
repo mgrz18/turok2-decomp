@@ -30,7 +30,7 @@ s32 osContInit(s32 arg0, s32 *arg1, s32 arg2) {
         osSetTimer(sp20, 0x0165A0BCULL - value, 0, sp40, sp58);
         osRecvMesg(sp40, sp58, 1);
     }
-    __osContNumControllers = 4;
+    __osContNumControllers[0] = 4;
     __osPackRequestData(0);
     __osSiRawStartDma(1, &__osContBuffer);
     osRecvMesg(arg0, sp58, 1);
