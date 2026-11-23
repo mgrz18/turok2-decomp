@@ -7,42 +7,27 @@
 #include "globals/render.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
+#include "structs/light.h"
 
-typedef struct Box3 {
-    CVector3 mn;
-    CVector3 mx;
-} Box3;
 
 /* A world region record (0xC0 bytes). */
-typedef struct WRec {
-    /* 0x00 */ u8 pad0[0xA0];
-    /* 0xA0 */ Box3 box;
-    /* 0xB8 */ u8 padB8[0x2];
-    /* 0xBA */ u8 bBA;
-    /* 0xBB */ u8 padBB[0x5];
-} WRec;
 
-typedef struct WTab {
-    /* 0x0 */ u8 pad0[0x4];
-    /* 0x4 */ s32 count;
-    /* 0x8 */ WRec r[1];
-} WTab;
 
 extern char D_800A57B8[];
 
-void Actors_AccumulateVertexLighting(WRec **recs, s32 count, void *verts, sptr arg3, CVector3 *points, s32 arg5);
+void Actors_AccumulateVertexLighting(CLightVolume **recs, s32 count, void *verts, sptr arg3, CVector3 *points, s32 arg5);
 void Lighting_DebugHueColors(void *verts, sptr arg3, CVector3 *points, s32 arg5);
 void Lighting_CopyVertexColors(void *verts, void *colors);
 void Lighting_ApplyDirectional(void *verts, sptr arg3, CVector3 *points, s32 arg5);
-s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt);
+s32 Lighting_CollectVolumes(CBox *q, CLightVolume **out, s32 *cnt);
 void Model_ApplyPackedOffsets(sptr file, s32 count, CVector3 *points);
 void Lighting_WriteVertexColors(void *verts, CVector3 *points);
 void func_0029E460(void *dst, void *src, s32 size);
 
 /* Collects the region records whose box overlaps q (at most 64); returns whether one is flagged. */
-static __inline__ s32 findRecords(Box3 *q, s32 *regions, WRec **out, s32 *cnt) {
-    WTab *tab;
-    WRec *rec;
+static __inline__ s32 findRecords(CBox *q, s32 *regions, CLightVolume **out, s32 *cnt) {
+    CLightVolumeTable *tab;
+    CLightVolume *rec;
     s32 n;
     s32 ret;
     s32 i;
@@ -56,14 +41,14 @@ static __inline__ s32 findRecords(Box3 *q, s32 *regions, WRec **out, s32 *cnt) {
     i = tab->count;
     i--;
     if (i != -1) {
-        rec = tab->r;
+        rec = tab->volumes;
         do {
-            if (q->mx.x > rec->box.mn.x && q->mn.x < rec->box.mx.x
-                && q->mx.z > rec->box.mn.z && q->mn.z < rec->box.mx.z
-                && q->mx.y > rec->box.mn.y && q->mn.y < rec->box.mx.y) {
+            if (q->m_vMax.x > rec->m_Bounds.m_vMin.x && q->m_vMin.x < rec->m_Bounds.m_vMax.x
+                && q->m_vMax.z > rec->m_Bounds.m_vMin.z && q->m_vMin.z < rec->m_Bounds.m_vMax.z
+                && q->m_vMax.y > rec->m_Bounds.m_vMin.y && q->m_vMin.y < rec->m_Bounds.m_vMax.y) {
                 out[n] = rec;
                 n++;
-                if (rec->bBA != 0) {
+                if (rec->unkBA != 0) {
                     ret = 1;
                 }
                 if (n == 0x40) {
@@ -92,8 +77,8 @@ static __inline__ s32 countVerts(s32 *src) {
 /* The do { } while (0) blocks around the clearing loop and the copy weight
  * total's references (GCC counts refs by loop depth), so total gets $s4
  * before blk, as in the ROM. */
-s32 **Lighting_BuildLitVertices(sptr model, s32 *regions, Box3 *box, sptr arg3, s32 arg4) {
-    WRec *recs[64];
+s32 **Lighting_BuildLitVertices(sptr model, s32 *regions, CBox *box, sptr arg3, s32 arg4) {
+    CLightVolume *recs[64];
     s32 count;
     s32 size;
     u8 *colors;
