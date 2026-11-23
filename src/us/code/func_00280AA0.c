@@ -6,8 +6,7 @@
 #include "globals/render.h"
 #include "structs/particle.h"
 
-/* An object that can shine a glare (only the fields read here). */
-
+/* The glares are particles whose template flags have 0x80000; m_dwFlags is the camera mask. */
 extern CParticle *D_8010753C; /* the particle draw list head (gendata aliases it to the host member) */
 void Hud_SetupTextureMode(s32 a);
 void Render_SetRenderMode(s32 a);
