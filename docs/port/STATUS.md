@@ -6,6 +6,36 @@ new game to the good ending with no invincibility and no life lost, on the N64's
 stream. The Mac app is packaged and ready for its first session in a real window
 ([FIRSTRUN.md](FIRSTRUN.md)); that session has not happened yet.
 
+## Round 23 merge (Phase 5 closes): the reference md5s now
+
+**The default whole-game run's det md5 is `cd2d68ce…`** (600,000 lines; END 2, 5 totems, 0 lives,
+lowest health 28; the one `death:` at 268,360 is the hub after the credits). Boot + 3 demos stay
+`6ab97584…` (52,000 lines). Both on the merged round-23 tree, Linux Release, the default twice.
+
+Round 23 merged l1 (every game C file in its module's directory, `src/port_libultra/`, 14 modules
+merged into one C file each, gendata's declaration order) and then l2 (five host reads at N64
+offsets fixed: `ImpactEvent_ApplyBlast`, `Rumble_SetLink`, `GameObject_GetFloorKind`,
+`PlayerSetupMenu_NameLabel`(`_2`), `OptionsMenu_ResolutionText`). l1 only renamed l2's seven files,
+so git carried l2's edits to the new paths unchanged (each file equals l2's); none of them is in a
+merged module. Both sections follow.
+
+Checks of the merge: `tools/asm_diff.py --base bab902cd -j 8` 0 differ over 3,759 files (the 14
+merged files new); a clean `make setup && make -j8 build && make verify` OK; a fresh `git clone
+--recursive` (ultralib `e24c836`) builds the ROM and `make verify` passes; the nested
+`TARGET_PORT` scan finds the 2 known sites. Port: `gendata` regenerated from scratch, `mklayout.py
+--check` up to date, `aligncheck.py` the 2 known sites; `make -C port test` (rnc, t2asset, typed),
+`gbi_test` 0 mismatches, t2os deterministic (`2b277587…` three times), `t2audio_test --direct 0/40`
+max difference 0 and `--adec` OK, the swoosh self-test OK. abicheck 0 harmful, ptrargs 0 retyped,
+outptr 0 BAD, f2ucheck unchanged; n64viewcheck raw/BAD 11 -> 10, raw/untyped 103 -> 99,
+view/local 183 -> 182 (l2's fixes), the rest the same. The combinations (PLAYTHROUGH.md 45):
+`--lair-push both` END 2, 0 lives (`6e0821fa…`); `--real-weapons 1 --stick-aim 1,2,3,4,5,6
+--hub-wait 0 --assist-keep lair` END 2 but **1 life** in level 2 (`575f069e…`); `--legacy` END 2,
+2 lives, `ac08c89b…` as in round 20.
+
+Phase 5 (README) is complete except three items where work is still possible: the repeated local
+structs (142 names), the 64 BSS interiors that want their struct's members, and merging the other
+modules into one C file each. The rest is done or documented as bound to the ROM.
+
 Round 20 merged five branches, in this order: i1 (**the Mother's arena is brown at last**: the
 packed vertex colour offsets are read big-endian; the menu texts the port never generated; the
 Enter Cheat keyboard; **the automap is drawn**), i3 (**no trail had ever been drawn**: the swoosh

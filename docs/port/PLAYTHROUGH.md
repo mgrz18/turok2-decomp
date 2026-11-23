@@ -4107,3 +4107,22 @@ sisters). Its outcome is unchanged, with no re-tuning: END 2 at 249,990 (was 245
 lost, lowest health 28 (was 38). The one `death:` line is at 268,360, the hub after the credits.
 The new reference det md5 is **`cd2d68ce…`** (600,000 lines). The combinations of section 43
 were not re-run.
+
+## 45. The round-23 merge: the combinations on the new stream
+
+Linux Release, PIE, ASLR on, `aimdrive.py`, the merged round-23 tree (l1's file move, l2's host
+fixes). The default gives **`cd2d68ce…`** twice (600,000 lines), boot + 3 demos `6ab97584…`. The
+combinations of section 43 that the docs recommend were re-run once each. The END frame here is
+the `progress:` line where level 10 shows `ending 0/1` (the measure of `summ.sh`; section 44's
+249,990 for the default is another measure of the same run).
+
+| options | result | md5 |
+|---|---|---|
+| (none) | END 2 (254,262), 5 totems, 0 lives; the one `death:` at 268,360 is the hub after the credits | `cd2d68ce…` |
+| `--lair-push both` | END 2 (254,262), 5 totems, 0 lives | `6e0821fa…` (was `fc809162…`) |
+| `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair` | END 2 (262,382), 5 totems, **1 life** (level 2, frame 176,289; it was 0 lives on the round-20 stream) | `575f069e…` (was `a93429ab…`) |
+| `--legacy` (290,000) | END 2, 5 totems, 2 lives (level 110, frames 83,388 and 87,658) | `ac08c89b…`, unchanged: the floor-kind fix does not touch this run |
+
+The stick-aim combination still reaches the end but no longer without a loss: on the new stream
+level 2 costs a life. Not re-tuned in this round. The other combinations of section 43 were not
+re-run.
