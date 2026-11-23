@@ -21,7 +21,7 @@ F3DEX2-family GBI, RNC ProPack, SN64 TLB-mapped code, Controller Pak saves).
 **Resolution of the RNC item (Phase 7 round 2, part q1).** `port/third_party/rnc/` and
 `tools/assets/propack.py` are deleted. Their replacements, `port/assets/rnc.c/.h` and
 `tools/assets/rnc.py`, are original code under the repo's licence (CC0), written clean-room:
-the sources were Turok 2's own `ProPackDecompress` (`src/us/code/func_00200B00.c`), the asm of
+the sources were Turok 2's own `ProPackDecompress` (`src/us/code/ProPackDecompress/func_00200B00.c`), the asm of
 `RNC_UnpackMethod1` (0x200C40, with func_00200CB0/E1C/EC0/EE8/F20) and `RNC_UnpackMethod2`
 (0x2010C0) in `us/asm/1840.s`, Turok 3's `ppdecom.c` stubs, and the public RNC header layout and
 CRC-16; neither the old files, rw_junk's RNC code nor any other RNC implementation was read.

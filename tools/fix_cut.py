@@ -48,6 +48,8 @@ YAML = ROOT / "versions" / "turok2.us.yaml"
 ROM = ROOT / "baserom.us.z64"
 STUBS = ROOT / "src" / "us" / "asm"
 SRC = ROOT / "src" / "us"
+sys.path.insert(0, str(ROOT / "tools"))
+import srcfiles  # noqa: E402
 BEGIN = "// --- true extents from versions/cuts.us.txt (tools/fix_cut.py) ---"
 END = "// --- end cuts ---"
 ENTRY = re.compile(r"^(\s+)- \[(0x[0-9A-Fa-f]+),\s*([.\w]+)(?:,\s*([^\]\s]+))?\s*\](.*)$")
@@ -276,10 +278,10 @@ def main():
     owned = set(sizes) | drop
 
     # A C file wired for a function inside a fixed range (named by address,
-    # code/func_X) is a fragment too, even when no symbol file lists it.
+    # code/<module>/func_X) is a fragment too, even when no symbol file lists it.
     for l in lines:
         m = ENTRY.match(l)
-        if m and m.group(3) == "c" and (f := re.match(r"code/func_([0-9A-F]{8})$", m.group(4) or "")):
+        if m and m.group(3) == "c" and (f := re.match(r"(?:code|vm1|vm2)/(?:.*/)?func_([0-9A-F]{8})$", m.group(4) or "")):
             v = int(f.group(1), 16)
             if any(s < v < e for s, e in ranges) and f"func_{v:08X}" not in sizes:
                 drop.add(f"func_{v:08X}")
@@ -294,10 +296,10 @@ def main():
             print(f"  stray_{s.group(1)}: off the list, back to asm (restore its symbols by hand)")
             l = f"{m.group(1)}- [{m.group(2)}, asm]"
             m = ENTRY.match(l)
-        if m and m.group(3) in ("c", ".rodata") and re.match(rf"code/(?:{'|'.join(sorted(drop)) or '-'})$", m.group(4) or ""):
-            print(f"  {m.group(4)[5:]}: its C goes back to asm (a fragment of a whole function)")
+        if m and m.group(3) in ("c", ".rodata") and re.match(rf"(?:code|vm1|vm2)/(?:.*/)?(?:{'|'.join(sorted(drop)) or '-'})$", m.group(4) or ""):
+            print(f"  {m.group(4).rsplit('/', 1)[-1]}: its C goes back to asm (a fragment of a whole function)")
             if args.write:
-                (SRC / "code" / f"{m.group(4)[5:]}.c").unlink(missing_ok=True)
+                (SRC / f"{m.group(4)}.c").unlink(missing_ok=True)
             continue
         if m and m.group(3) == "asm" and prev == "asm":
             continue
@@ -312,7 +314,7 @@ def main():
             print(f"  {n}: its C goes back to asm (a fragment of a whole function)")
             yaml_text = re.sub(pat, "", yaml_text, flags=re.M)
             if args.write:
-                (SRC / "code" / f"{n}.c").unlink(missing_ok=True)
+                (srcfiles.find(n) or SRC / "code" / f"{n}.c").unlink(missing_ok=True)
     block = [BEGIN,
              "// Generated from versions/cuts.us.txt by tools/fix_cut.py; edit that."]
     for n, (v, sz) in sorted(sizes.items(), key=lambda x: x[1][0]):

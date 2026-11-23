@@ -1,12 +1,27 @@
 # Modules: the original object files
 
-The C is one function per file (`src/us/code/func_XXXXXXXX.c`). The game was
-built from a few hundred source files (Acclaim's `.CPP`/`.C`, libultra's,
-libgcc's), linked in one order. This page recovers those boundaries from the
-ROM and gives each run of functions a module name. Files are **not moved
-yet**: round 22 landed the renames, the structs and libultra from ultralib (120 of its
-modules are built from `lib/ultralib`, docs/LIBULTRA.md); round 23 moves the files, from
-`versions/modules.us.txt` (regenerated on the round-22 tree).
+The game was built from a few hundred source files (Acclaim's `.CPP`/`.C`,
+libultra's, libgcc's), linked in one order. This page recovers those
+boundaries from the ROM, gives each run of functions a module name, and the
+source tree follows it (round 23): every C file sits in its module's
+directory, still one function per file (`func_<vram>.c`) except in the few
+modules merged into one file (below).
+
+| Directory | What |
+|---|---|
+| `src/us/code/<module>/` | `.code`: the engine, the libultra/libaudio/libc modules ultralib does not build (`code/libultra/io/pfsisplug/` ...), libgcc (`code/libgcc/_divdi3/`) |
+| `src/us/vm1/<module>/` | the paged VM module |
+| `src/us/vm2/<module>/` | its stale second copy, under the first copy's module names (`vm2/Primagen/` holds `Primagen_2` .. ) |
+| `src/port_libultra/<file>/` | the 88 game files of libultra modules the N64 build takes from `lib/ultralib` (docs/LIBULTRA.md): only the port compiles them (`audio/csplayer/`, `vm1/io/pfsinitpak/` ...) |
+| `src/us/libultra/`, `src/us/boot.c`, `src/us/asm/` | unchanged: 11 libultra files kept in their own directory (`__osDisableInt.c` ...), the boot code, the hand-written asm |
+
+`versions/modules.us.txt` gives each module's directory (`// dir`), and
+`tools/srcfiles.py` finds a file by name (`python3 tools/srcfiles.py
+func_0027ECF0`; file names are unique across the tree, so tools that take
+a file name or a stem still work). The yaml names each file by its path
+(`[0x1100, c, code/CList/func_00200500]`), and the objects follow
+(`build/src/us/code/CList/func_00200500.c.o`). `tools/asm_diff.py --base`
+compares a moved file with the base file of the same name.
 
 ```
 tools/modules.py            # check the map, print a summary (and the .rodata order check)
@@ -17,6 +32,47 @@ tools/modules.py --md       # print the table below
 It reads `build/ref.elf` (functions, sizes, ROM offsets), the ROM,
 `versions/ultralib.us.txt` (tools/ultralib_version.py --map,
 [LIBULTRA.md](LIBULTRA.md)) and, when there is one, `build/turok2.us.map`.
+
+## Merged modules (round 23, a proof of concept)
+
+The matching build compiles each file as its own object, so a module can be
+one file only where the merged translation unit compiles to the same bytes.
+`tools/merge_module.py src/us/code/<module>` writes `<module>.c` from the
+files in `.text` order (each file's declarations before its functions, a
+declaration an earlier file gave dropped, a prototype of a function the
+module defines replaced by the definition's signature, a `static` helper
+repeated identically kept once) and points the yaml's first `c` and `.rodata`
+subsegments at it; `make setup`, a clean build and `make verify` decide.
+It refuses a module whose `.rodata` subsegments are not one block in `.text`
+order (a literal another object owns, or the files' pools in another order).
+
+**Merged, byte-exact (14 modules, 72 files -> 14):** `CList` (13 files),
+`SoundEffectInfo` (14), `CHeap` (7), `CSun` (7), `CLoader` (6),
+`CDecompressor` (5), `CHashTable` (5), `CPathTrack` (3), `MtxPool`,
+`HalfToFloat`, `Level`, `RandomInPackedRange`, `ProPackDecompress`,
+`Collision` (2 each). Two of them own `.rodata` (`RandomInPackedRange`,
+`Collision`: one slice each). `make verify` OK, shared
+.rodata 123 objects OK, `tools/asm_diff.py --base bab902cd`: 0 differ (the 14
+merged files are new to it: it compares files, and a merged file has no
+base file).
+
+**Tried, not merged without hand work:**
+
+| Module | Why it does not compile merged |
+|---|---|
+| `Sort`, `Color` | a file brings its own `typedef s32/u32/f32` (a file without `common.h`): a redefinition next to `common.h`'s; `Sort_Insertion`'s hoisted prototype also names `t2_uptr`, which its own file defines later |
+| `DLights` | two different `ListNode` views |
+| `GameObjectMove` | two files declare `Collision_MoveInstance` with different types |
+| `CCollisionSetup` | the prototype the tool hoists for `CCollisionSetup__Construct` names `EntryRecAt24`, a view its own file declares later |
+| `Boot` | two declarations of `gSavedPlayers` with different types |
+| `Demo` | `Demo_GetPlayerCount` is a real function *and* a `static __inline__` copy in two callers: the original was one inline definition the compiler both inlined and emitted; the merged file needs it once, before its first caller |
+| `CLevelActor` | its `.rodata` subsegments are not in `.text` order (refused before compiling) |
+
+The other modules were not tried (budget). What a merge needs is what the
+table shows: one declaration per name across the module's files (the
+`include/structs`/`include/globals` work of Phase 5 removes most of these),
+and `.rodata` owned in `.text` order. Every function of a merged module is
+still found by name: `tools/srcfiles.py` falls back to the module's file.
 
 ## Evidence
 
@@ -56,17 +112,27 @@ as its `.text`. `tools/modules.py` checks that no module's `.rodata` (from
 `build/turok2.us.map`) starts below the previous module's: **0 exceptions**.
 Inside a module the per-function files put a literal shared by two functions
 with either one, so the order there is not checked. One curiosity: the VM
-module's level-load module (`CScene#2`, `MatrixHeap_Construct`..) keeps its
+module's level-load module (`SceneLoad`, `MatrixHeap_Construct`..) keeps its
 `.rodata` in the engine's `.code_rodata` (0x800A5D70), not with the rest of
 the VM module's (0x800C17xx).
 
 **Names (soft).** Inside a hard run, runs of one class or module prefix
 (`CHeap__*`, `Pak_*`) are listed as candidate objects ("name runs" in
-`versions/modules.us.txt`); 98 modules hold more than one. They are not
+`versions/modules.us.txt`); 100 modules hold more than one. They are not
 boundaries: one `.CPP` often holds several classes (`CPlayer` with
 `CPlayerPool`, `CBarrel`, the `Player*` state handlers). Module names are the
 dominant prefix (by bytes), not original file names, except the libultra
-ones and the few the ROM names.
+ones and the few the ROM names, and four renamed where the prefix was taken
+or said less than the functions (`tools/modules.py` RENAMES): `CollisionRegions`
+(`Collision_SweepRegions`, was `Collision#2`), `GameObjectMove` (`ApplyCurrent`,
+`SlideTo`, `TestMove`, `CanSee`, `CanMoveTo`, `PlayLandSound`; was `GameObject#2`),
+`LevelEvent` (the DList/NodePool/WeightedTable helpers, then the level events
+and triggers, 17 of its 31 functions; was `GameObject#3`) and `SceneLoad` (the
+VM module's level loader, `CScene__Construct`/`LoadLevel`/`Decompress*`; was
+`CScene#2`, its copy `SceneLoad_2`). A VM module's directory drops the `#2`
+(`vm1/Cinema/`, `vm1/CPlayer/`, `vm1/Demo/`, `vm1/CEngineApp/`: the VM's own
+tree), and the second copy's `unk_0042D0E0_2` (an unnamed function) goes to
+`vm2/Light/`, its first-copy twin, by position.
 
 **Original file names in the ROM.** Only three survive: the LNK records of
 `engine/PTIMER.CPP` (profiling timers, compiled out of this build: none of its
@@ -127,7 +193,7 @@ module). "Start evidence" is why the module starts there.
 | CParticle | engine | CParticle__SpawnChild | Pickup_Feedback | 0x00229340 | 216 | 91452 | pad |
 | Sweep | engine | Sweep_TestBoxFaces | Collision_CompareInstanceHits | 0x0023F880 | 6 | 3964 | pad |
 | Collision | engine | Collision_SweepRegionWalls | Collision_SweepMapWalls | 0x00240800 | 2 | 2052 | pad |
-| Collision#2 | engine | Collision_SweepRegions | Collision_SweepRegions | 0x00241010 | 1 | 2116 | pad |
+| CollisionRegions | engine | Collision_SweepRegions | Collision_SweepRegions | 0x00241010 | 1 | 2116 | pad |
 | CCollisionSetup | engine | CCollisionInfo__Reset | CCollisionSetup__Construct | 0x00241860 | 3 | 252 | pad |
 | AI | engine | Platform_GetCollisionBox | AI_DropPickupsByMask | 0x00241960 | 48 | 21084 | pad |
 | CPlayer | engine | CPlayer__ReadInput | String_CountTrailingSpaces | 0x00246BC0 | 250 | 69244 | pad |
@@ -146,11 +212,11 @@ module). "Start evidence" is why the module starts there.
 | InteractiveAnim | engine | AI_PlayAnim | InteractiveAnim_DrawAllModels | 0x002666B0 | 15 | 1228 | pad |
 | BinaryRange | engine | GetMemSize | IsCodePointer | 0x00266B80 | 13 | 1288 | pad |
 | GameObject | engine | GameObject_IsSolid | GameObject_GetFloorTilt | 0x00267090 | 62 | 8120 | pad |
-| GameObject#2 | engine | GameObject_ApplyCurrent | GameObject_PlayLandSound | 0x00269050 | 6 | 2620 | pad |
+| GameObjectMove | engine | GameObject_ApplyCurrent | GameObject_PlayLandSound | 0x00269050 | 6 | 2620 | pad |
 | CGameRegion | engine | CGameRegion__GetCeilingNormal | CGameRegion__GetMaxHeight | 0x00269A90 | 53 | 13784 | pad |
 | RandomInPackedRange | engine | Material_Unpack | RandomInPackedRange | 0x0026D070 | 2 | 392 | pad |
 | HalfToFloat | engine | FloatToHalf | HalfToFloat | 0x0026D200 | 2 | 40 | pad |
-| GameObject#3 | engine | DList_Init | LevelEvent_CheckRequiredItem | 0x0026D230 | 31 | 5416 | pad |
+| LevelEvent | engine | DList_Init | LevelEvent_CheckRequiredItem | 0x0026D230 | 31 | 5416 | pad |
 | Rumble | engine | Rumble_GetLevelAt | RumblePool_FreeAll | 0x0026E760 | 10 | 1732 | pad |
 | RumbleCurve | engine | RumbleCurve_Init | RumbleCurve_GetValue | 0x0026EE30 | 3 | 380 | pad |
 | Level | engine | func_0026EFB0 | Level_GetHub | 0x0026EFB0 | 2 | 200 | pad |
@@ -368,7 +434,7 @@ module). "Start evidence" is why the module starts there.
 | libultra/io/pfsrepairid.c | vm1 | osPfsRepairId | osPfsRepairId | 0x00429130 | 1 | 432 | pad, ultralib |
 | libultra/io/pfssearchfile.c | vm1 | osPfsFindFile | osPfsFindFile | 0x004292E0 | 1 | 372 | ultralib |
 | libultra/io/contpfs.c | vm1 | __osRepairPackId | __osPfsSelectBank | 0x00429460 | 8 | 2744 | pad, ultralib |
-| CScene#2 | vm1 | MatrixHeap_Construct | CScene__ConstructMap | 0x00429F20 | 25 | 12388 | pad, ultralib |
+| SceneLoad | vm1 | MatrixHeap_Construct | CScene__ConstructMap | 0x00429F20 | 25 | 12388 | pad, ultralib |
 | SceneActorPool | vm1 | SceneActorPool_Construct | CInstancePool__Construct | 0x0042CF90 | 2 | 388 | pad |
 | CDLightSet | vm1 | CDLightSet__Construct | CDLightSet__Construct | 0x0042D120 | 1 | 152 | pad |
 | Light | vm1 | Light_SetDefaultDirection | Light_SetDefaultDirection | 0x0042D1C0 | 1 | 84 | pad |

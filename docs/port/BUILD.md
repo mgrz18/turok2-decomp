@@ -12,7 +12,7 @@ Result: **3917 of 3917 compiled files build, 0 errors**, on three targets:
 | arm64-apple-macos13 (clang 19 cross, `-target`) | 3917/3917 | 0 | |
 | x86_64-pc-windows-msvc (clang 19 cross, LLP64) | 3917/3917 | 0 | |
 
-`src/us/code/` holds 3926 `.c` files: 3917 build, 9 are left out on purpose
+The game C (`src/us/code`, `src/us/vm1`, `src/us/vm2` by module, and `src/port_libultra`: docs/MODULES.md) was 3926 `.c` files: 3917 build, 9 are left out on purpose
 because their code is the N64 itself (libgcc, CP0, SN64 varargs; see "Host
 replacements" below). The macOS and Windows targets are cross-compiled on the
 Linux box (the game C includes no system header, so no SDK is needed); a

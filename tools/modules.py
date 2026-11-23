@@ -16,6 +16,13 @@ strongest first (docs/MODULES.md):
             cannot show (an object that ends on a 16-byte boundary).
   known     a few blocks named by outside evidence (KNOWN below).
 
+Each module's C lives in its own directory (round 23): src/us/code/<module>/ for
+.code, src/us/vm1/<module>/ and src/us/vm2/<module>/ for the two copies of the
+paged VM module (the second copy under its first-copy twin's name), and the
+host-only libultra C the N64 build takes from lib/ultralib in
+src/port_libultra/<file>/ (src_dir below; versions/modules.us.txt lists each
+module's directory).
+
 The paged VM module is in the ROM twice; the second copy (.virtual_1) is
 mapped onto the first (same module, `_2`), not analysed on its own.
 
@@ -61,6 +68,51 @@ KNOWN = {
     0x002A4650: ("libgcc/_udivdi3", "known: GCC 2.8.1 libgcc2.c L_udivdi3"),
     0x002A4BE0: ("libgcc/_umoddi3", "known: GCC 2.8.1 libgcc2.c L_umoddi3"),
 }
+
+
+# Readable names where the dominant prefix is taken or says less than the functions do:
+# (region, first vram) -> name. Everything else keeps the dominant prefix.
+RENAMES = {
+    # Collision_SweepRegions alone, padded off Collision's region/map wall sweeps
+    ("engine", 0x00241010): "CollisionRegions",
+    # GameObject_ApplyCurrent, SlideTo, TestMove, CanSee, CanMoveTo, PlayLandSound: moving an object
+    ("engine", 0x00269050): "GameObjectMove",
+    # DList/NodePool/WeightedTable helpers, then the level events and their triggers (Event_*,
+    # LevelEvent_*: 17 of the 31 functions; GameObject_EmitHotPoints is the biggest one)
+    ("engine", 0x0026D230): "LevelEvent",
+    # CScene__Construct, LoadLevel, the Decompress* sections, warps, UnloadLevel: the level loader
+    # the engine pages in (MatrixHeap_Construct first)
+    ("vm1", 0x00429F20): "SceneLoad",
+}
+
+
+def src_dirs(mods):
+    """id(module) -> its directory under the repo root, for every module that has C.
+
+    .code: src/us/code/<name>; the paged VM module: src/us/vm1/<name> (a `#n` dropped: the
+    VM's own tree) and src/us/vm2/<its first-copy twin's directory name>, paired in order
+    (both copies link the same objects in the same order). A libultra module keeps its
+    ultralib path without the `.c` (code/libultra/io/pfsisplug)."""
+    def clean(n):
+        n = re.sub(r"#\d+$", "", n)
+        n = re.sub(r"_2$", "", n)
+        return re.sub(r"\.[cs]$", "", n)
+    vm1 = [m for m in mods if m["region"] == "vm1"]
+    vm2 = [m for m in mods if m["region"] == "vm2"]
+    out = {}
+    for m in mods:
+        if m["region"] == "engine":
+            out[id(m)] = f"src/us/code/{clean(m['name'])}"
+        elif m["region"] == "vm1":
+            out[id(m)] = f"src/us/vm1/{clean(m['name'])}"
+    for a, b in zip(vm1, vm2):
+        twin = clean(a["name"])
+        if clean(b["name"]) != twin and not b["name"].startswith("unk_"):
+            raise SystemExit(f"module 2 out of step with module 1: {b['name']} against {a['name']}")
+        out[id(b)] = f"src/us/vm2/{twin}"
+    if len(vm2) > len(vm1):
+        raise SystemExit("module 2 has more modules than module 1")
+    return out
 
 
 def functions():
@@ -169,6 +221,8 @@ def build(rom):
             name = c.most_common(1)[0][0] if c else f"unk_{run[0][0]:08X}"
         mods.append({"region": region(run[0]), "funcs": run, "name": name, "evidence": ev,
                      "parts": [(p or "?", len(fl)) for p, fl in parts]})
+    for m in mods:
+        m["name"] = RENAMES.get((m["region"], m["funcs"][0][0]), m["name"])
     # module 2: named as the module-1 module its functions' twins (same name less _2) are in
     by_name = {f[2]: m for m in mods if m["region"] == "vm1" for f in m["funcs"]}
     for m in mods:
@@ -259,11 +313,15 @@ def main():
     if args.write:
         lines = ["// Turok 2's functions by original module (object file); written by tools/modules.py --write.",
                  "// module: first..last vram, functions, evidence for its start; then one function per line.",
-                 "// docs/MODULES.md explains the evidence; module names are inferred, not original file names."]
+                 "// docs/MODULES.md explains the evidence; module names are inferred, not original file names.",
+                 "// `dir`: where the module's C files are (tools/srcfiles.py; libultra modules built from",
+                 "// lib/ultralib keep only their host-only copies, under src/port_libultra)."]
+        dirs = src_dirs(mods)
         for m in mods:
             f0, f1 = m["funcs"][0], m["funcs"][-1]
             lines.append(f"\nmodule {m['name']}: 0x{f0[0]:08X}..0x{f1[0] + f1[1]:08X}, "
                          f"{len(m['funcs'])} functions; {' + '.join(m['evidence'])}")
+            lines.append(f"  // dir {dirs[id(m)]}")
             if len(m["parts"]) > 1:
                 lines.append("  // name runs (possible objects the padding cannot show): "
                              + ", ".join(f"{p} {n}" for p, n in m["parts"]))

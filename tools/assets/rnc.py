@@ -4,7 +4,7 @@
 Original code for this repository (same license as the repo). It was written from Turok 2's
 own routines, not from any other RNC implementation:
 
-    ProPackDecompress     src/us/code/func_00200B00.c   header test, picks the method
+    ProPackDecompress     src/us/code/ProPackDecompress/func_00200B00.c   header test, picks the method
     RNC_UnpackMethod1     us/asm/1840.s (0x200C40)      + func_00200CB0 (main loop),
                           func_00200E1C (Huffman symbol), func_00200EC0/EE8 (bit reader),
                           func_00200F20 (table build)

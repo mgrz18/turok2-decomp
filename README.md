@@ -102,6 +102,11 @@ docker run --platform=linux/amd64 --rm -v "$PWD":/work turok2-build \
 
 ```
 
+The game C is in one directory per recovered object file: `src/us/code/<module>/` (`.code`),
+`src/us/vm1/<module>/` and `src/us/vm2/<module>/` (the paged VM module and its stale copy), and
+`src/port_libultra/` (libultra C only the port compiles); `python3 tools/srcfiles.py func_0027ECF0`
+prints a file's path ([docs/MODULES.md](docs/MODULES.md)).
+
 Progress is measured with `./.venv/bin/python tools/metrics.py`, which reports decode
 and symbol coverage rather than matched-function counts.
 
@@ -160,7 +165,7 @@ What a source port needs: code a person can read and change without breaking it.
 - [ ] One declaration with the real type for every global: 48 headers in `include/globals/`; local `extern`s of named globals 5,269 -> 911 -> 337 -> 269 lines (239 with a `local` comment; 51 lines, 27 names, without a header: field symbols whose header a base-sharing view clashes with, one-file struct views, non-game symbols; 0 redeclare a header global without a comment). `gScheduler` (`OSSched`), `gEngineApp_m_SwooshSystem` (`CSwooshSystem`) and the audio manager's DMA state (SDK types) have their headers (`tools/hoist_externs.py`, `tools/asm_diff.py`; [docs/GLOBALS.md](docs/GLOBALS.md))
 - [ ] De-fake the FAKEMATCH functions: 52 files marked (round 21: 51 after its audit, 25 de-faked; round 22: 5 de-faked by the callees' real types and ultralib's source, 9 unmarked fakes rewritten as plain getters, 6 more marked, 16 `do { } while (0)` (15, and 1 more on the merged tree) and 3 `if (1)` dropped; what is left needs the permuter or changes the ROM, about 60 `do { } while (0)` left unmarked); each says why the fake works and what it misses by without it ([docs/MATCHING.md](docs/MATCHING.md#the-fakematch-second-pass-round-22))
 - [x] One body for the N64 and the host where the host's compiles to the same N64 code: 496 `TARGET_PORT` alternatives dropped (`tools/unify_host_bodies.py`, re-runnable)
-- [ ] Recover the original source-file boundaries: the module map is done (320 modules from the linker's object padding, ultralib's files and the two VM copies; `tools/modules.py`, [docs/MODULES.md](docs/MODULES.md)); the files are not moved yet: round 23 moves them into the recovered modules, and moves the port's own copies of libultra's C (the 88 game files of ultralib-built modules the port still links, docs/LIBULTRA.md) out of `src/us/code`
+- [x] Recover the original source-file boundaries: the module map (320 modules from the linker's object padding, ultralib's files and the two VM copies; `tools/modules.py`, [docs/MODULES.md](docs/MODULES.md)) and the tree follows it: every game C file is in its module's directory (`src/us/code/<module>/`, `src/us/vm1/<module>/`, `src/us/vm2/<module>/`; round 23, `git mv`, `tools/srcfiles.py` finds a file by name), the port's own copies of libultra's C (88 files of ultralib-built modules) are in `src/port_libultra/`, four `#n` modules got readable names, and 14 small modules are one C file each, byte-exact (`tools/merge_module.py`; the others are still one function per file: merging needs one declaration per name across a module and its `.rodata` in `.text` order)
 - [x] libultra from [decompals/ultralib](https://github.com/decompals/ultralib): the game links **2.0I `libgultra_rom`**; ultralib is a pinned submodule (`lib/ultralib`, no files copied) and **120 of the library's 173 modules are built from its own sources** (209 game files no longer linked, 121 of them deleted; `tools/ultralib_build.py`, `versions/ultralib_objects.us.txt`). The other 53 stay the game's C, each with its reason: 41 differ, 2 have another function order, 5 end their `.rodata` in stale linker bytes, 5 have `.bss` or an unplaced static of their own ([docs/LIBULTRA.md](docs/LIBULTRA.md)). The port keeps the game's C for what it links
 
 ### Phase 6 — Assets

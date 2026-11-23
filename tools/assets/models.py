@@ -8,7 +8,7 @@ Everything here is read off the C (docs/assets/MODELS.md has the format and the 
   * locating   : CEngineApp__Main puts the cartridge index at ROM 0xFCBFB4; CScene__Construct reads
                  its block 0 as the "objects index"; every object is a 4-block set (block 1 is the
                  RNC-packed geometry: CLevelActor__LoadGeometry, Render_QueueModelByKey).
-  * geometry   : Model_DecompressCallback* -> Model_Decompress (src/us/code/func_00209AF4.c).
+  * geometry   : Model_DecompressCallback* -> Model_Decompress (src/us/code/Render/func_00209AF4.c).
   * materials  : Material_Unpack (func_0026D070.c), Render_SetupMaterial (func_00207FEC.c).
 The locator part (Rom, on top of tools/assets/romfs.py; RNC through rnc.py) is separate from
 the parser (parse_geometry()). Texture previews use tools/assets/textures.py's decoder and the

@@ -1574,7 +1574,7 @@ void T2Port_RngSet(int frame, const char *spec) {
     }
 }
 
-/* T2_LEGACY_SHAKE=1 (DEBUG-ONLY, round 16 e1): CCamera__Construct (src/us/code/func_0042F9B0.c) as
+/* T2_LEGACY_SHAKE=1 (DEBUG-ONLY, round 16 e1): CCamera__Construct (src/us/vm1/Demo/func_0042F9B0.c) as
  * before round 16, its camera shake radius 0 (an N64-offset view): CShake__ApplyOffset then draws no
  * random numbers, 6 a game frame fewer than the N64. The scripted whole-game route was tuned on that
  * RNG stream, so tools/port/fullrun.py sets it; a player gets the N64's behaviour. */
@@ -1639,7 +1639,7 @@ int T2Port_LegacyNoSound(void) {
     return s;
 }
 
-/* T2_RNG_LOAD=T:HEX (DEBUG-ONLY, round 17 f3; src/us/code/func_0042AC0C.c): at the entry of
+/* T2_RNG_LOAD=T:HEX (DEBUG-ONLY, round 17 f3; src/us/vm1/SceneLoad/func_0042AC0C.c): at the entry of
  * CScene__LoadLevel(scene, T, ...) set gRandomValue to HEX, once, so the level's own load (its actors'
  * random set-up) starts from the same seed as the N64 with n64trace.py --rng-load T:HEX (a breakpoint on
  * the same function). The N64's audio thread keeps drawing during the load (an ambient sound every 4

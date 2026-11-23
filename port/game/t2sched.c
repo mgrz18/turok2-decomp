@@ -1,6 +1,6 @@
 /* t2sched.c: the game's scheduler (Acclaim's PR/sched.c), typed for the host.
  *
- * On the N64 the scheduler files (src/us/code/func_0028A020.c .. func_0028B3E8.c) reach the
+ * On the N64 the scheduler files (src/us/code/__scHandleRSP/func_0028A020.c .. func_0028B3E8.c) reach the
  * OSSched and its OSScTasks through local views at the N64 offsets: on the host the message
  * queues, the thread and the pointers are larger, so those views overrun each other (the
  * scheduler thread started with its argument overwritten). This file is the same code over

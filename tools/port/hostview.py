@@ -2,7 +2,7 @@
 """Rebuild an m2c/Rage Wars "view" struct (a local struct that reads a real engine struct
 at its N64 offsets through pads) at the HOST offsets of the real struct.
 
-    python3 tools/port/hostview.py --build OUT/build src/us/code/func_0024C47C.c Player CPlayer
+    python3 tools/port/hostview.py --build OUT/build src/us/code/CPlayer/func_0024C47C.c Player CPlayer
 
 Parses the .c twice with libclang (mips-linux-gnu: the N64 layout the view was written for;
 x86_64: the host), maps every named field of the view (fields named pad*/_pad* are padding)

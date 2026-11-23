@@ -2,7 +2,7 @@
  * rnc.h - RNC ProPack decompressor (methods 1 and 2) for the Turok 2 port.
  *
  * Original code for this repository (same license as the repo), written from Turok 2's own
- * routines (ProPackDecompress, src/us/code/func_00200B00.c; RNC_UnpackMethod1 at 0x200C40
+ * routines (ProPackDecompress, src/us/code/ProPackDecompress/func_00200B00.c; RNC_UnpackMethod1 at 0x200C40
  * and RNC_UnpackMethod2 at 0x2010C0, us/asm/1840.s) and the public RNC header layout. The
  * Python twin is tools/assets/rnc.py; both are checked against every RNC stream of the ROM
  * (docs/assets/ARCHIVE.md). Unlike the game's routines these never read or write outside

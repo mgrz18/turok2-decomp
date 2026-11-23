@@ -40,7 +40,7 @@ def function_ranges(names):
     """name -> (rom start, rom end) from the linked ELF."""
     want = set(names)
     # A function with a real name (versions/names.us.txt) is in the ELF under
-    # it; its file is still code/func_<vram>.
+    # it; its file is still code/<module>/func_<vram>.
     alias = {n: f"func_{int(a, 16):08X}" for n, a in re.findall(
         r"^(\w+)\s*=\s*0x([0-9A-Fa-f]+);", (ROOT / "versions" / "names.us.txt").read_text(), re.M)}
     out = {}

@@ -38,7 +38,7 @@ def count(text):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("paths", nargs="*", default=["src/us/code"])
+    ap.add_argument("paths", nargs="*", default=["src/us/code", "src/us/vm1", "src/us/vm2", "src/port_libultra"])
     ap.add_argument("--git", help="count the files at this revision")
     ap.add_argument("--top", type=int, default=0, help="list the N files with most sites")
     args = ap.parse_args()

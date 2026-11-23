@@ -2601,7 +2601,7 @@ back to the poked value). `n64trace.py --calls Random_Blend` names the callers: 
 `CShake__ApplyOffset(&cam->m_Shake, cam->m_Shake.m_vPos, ...)` draws when the distance (0) is under
 `m_Radius`: 1 on the N64 (`--args a0:CShake:m_Radius:f`), 0 in the port (gdb), and the port's
 `m_vPos.y` was 1.0. A gdb watchpoint found the writer: `CCamera__Construct`
-(src/us/code/func_0042F9B0.c) views `&view->m_Shake` as six floats at the N64 offsets (two 4-byte
+(src/us/vm1/Demo/func_0042F9B0.c) views `&view->m_Shake` as six floats at the N64 offsets (two 4-byte
 list pointers, then `m_vPos` at 0x08, `m_Radius` at 0x14); on the host the pointers are 8 bytes, so
 the stores hit `m_pNext` and `m_vPos.x/y`. The fix stores the members (TARGET_PORT; asm_diff 0);
 `CShake__Construct` (func_00281C08.c, the same view, no C caller) is fixed the same way. After it the

@@ -138,7 +138,7 @@ holds once. The build models it so:
   give Turok 2's table.
 - Where the copy is the original file byte for byte, the copy is one C file
   made from the original's source with the second-module names
-  (src/us/code/func_00448240.c from func_0040F240.c, func_0044C230.c from
+  (src/us/vm2/Cinema/func_00448240.c from func_0040F240.c, func_0044C230.c from
   func_00413230.c); its .rodata alignment then works as the original's did.
 - A string the original file emits in an earlier function stays an extern
   (func_0045190C's " %3d", as func_004189AC has it).
@@ -166,7 +166,7 @@ functions went to two segments, the engine's .text and the VM's. That is how
 it is built now, and it is the first evidence that some engine and VM
 functions share a source file:
 
-- src/us/code/func_002261A8.c holds both. func_0042CBE4 is declared
+- src/us/code/CScene/func_002261A8.c holds both. func_0042CBE4 is declared
   `__attribute__((section(".text_vm")))`, so cc1 puts its code in a section
   of its own and nothing else changes (each function compiles to the bytes
   it has alone). The object's .rodata is the ROM's 0x38 bytes from
@@ -177,7 +177,7 @@ functions share a source file:
   `{start: 0x176BE4, type: c, name: code/func_002261A8, linker_section:
   .text_vm}`. splat writes `func_002261A8.c.o(.text_vm)` there; the .data and
   .bss lines it repeats for it are empty.
-- The second module's copy, src/us/code/func_00465B04.c, is the same source
+- The second module's copy, src/us/vm2/SceneLoad/func_00465B04.c, is the same source
   with the engine half thrown away: func_002261A8 is a static copy in
   `.text_engine`, which no output section names, so /DISCARD/ drops it. Its
   -1.0f still opens the file's .rodata, and versions/shared_rodata.us.txt
@@ -207,7 +207,7 @@ the end of the file). By the same rule the file holding func_004143DC opens
 at 0x413230 (.rodata 0x800C0AF0) and runs to 0x417484 (.rodata to
 0x800C0E64): the string "menu" at 0x800C0C54 is read by func_00415FB8,
 func_00416644, func_00416760, func_00416894 and func_004172F8. That file is
-now one C file, src/us/code/func_00413230.c: 46 parts each matched alone
+now one C file, src/us/vm1/MenuItem/func_00413230.c: 46 parts each matched alone
 first, put together with their own types (a name two parts both define gets
 the part's address as a suffix) and their own prototypes (where two parts
 declare one symbol differently, the later one names it through an alias,
