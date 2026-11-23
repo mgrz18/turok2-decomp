@@ -1,39 +1,38 @@
 #include "structs/vector.h"
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/word.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00206DD4.c, func_00206DD4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-typedef union M1IF { s32 i; f32 f; } M1IF;
-typedef union M1W4 { s32 i; f32 f; s16 h[2]; u16 hu[2]; u8 b[4]; u32 u; } M1W4;
 typedef struct M1Info M1Info;
 typedef struct M1Def M1Def;
 typedef struct M1Actor M1Actor;
 typedef struct M1State M1State;
 struct M1Info {
                 u32 flags;
-                M1W4 unk4;
+                CWord unk4;
                 s8 b8;
                 u8 pad9[0x3];
                 s32 unkC;
                 u8 pad10[0x8];
                 s32 unk18;
                 s32 unk1C;
-                M1W4 unk20;
-                M1W4 unk24;
-                M1W4 unk28;
+                CWord unk20;
+                CWord unk24;
+                CWord unk28;
                 f32 f2C;
                 f32 f30;
                 f32 f34;
                 u8 pad38[0x4];
                 f32 f3C;
-                M1W4 unk40;
+                CWord unk40;
                 f32 f44;
-                M1W4 unk48;
-                M1W4 unk4C;
+                CWord unk48;
+                CWord unk4C;
                 u8 b50[4];
                 f32 f54;
                 f32 f58;
@@ -87,8 +86,8 @@ struct M1State {
         struct { u8 _hp_f98[T2_HOFF_M1State(m_InitialRotY)]; f32 f98; }; /* N64 0x98 */
         struct { u8 _hp_v9C[T2_HOFF_M1State(m_vInitialPos)]; CVector3 v9C; }; /* N64 0x9C */
         /* m_VarBuffer (by hand: hostview does not map into the union) */
-        struct { u8 _hp_unk110[T2_HOFF_M1State(m_VarS32[1])]; M1IF unk110; }; /* N64 0x110 */
-        struct { u8 _hp_unk114[T2_HOFF_M1State(m_VarS32[2])]; M1IF unk114; }; /* N64 0x114 */
+        struct { u8 _hp_unk110[T2_HOFF_M1State(m_VarS32[1])]; CWord unk110; }; /* N64 0x110 */
+        struct { u8 _hp_unk114[T2_HOFF_M1State(m_VarS32[2])]; CWord unk114; }; /* N64 0x114 */
         struct { u8 _hp_vec118[T2_HOFF_M1State(m_VarF32[3])]; CVector3 vec118; }; /* N64 0x118 */
         struct { u8 _hp_f124[T2_HOFF_M1State(m_VarF32[6])]; f32 f124; }; /* N64 0x124 */
     };
@@ -105,8 +104,8 @@ struct M1State {
     f32 f98;        /* 0x98 */
     CVector3 v9C;      /* 0x9C */
     u8 padA8[0x68];
-    M1IF unk110;    /* 0x110 */
-    M1IF unk114;
+    CWord unk110;    /* 0x110 */
+    CWord unk114;
     CVector3 vec118;
     f32 f124;       /* 0x124 */
 };
