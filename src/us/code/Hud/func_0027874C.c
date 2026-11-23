@@ -28,7 +28,6 @@ typedef struct FontStyle {
     /* 0xC4 */ s32 shadowY;
 } FontStyle;
 
-extern u8 D_80110238[];         /* glyph lookup, language 0 */
 
 extern f32 Menu_CharWidth(s32 ch, s32 next, f32 a, f32 b);    /* kerned advance */
 extern void Hud_DrawImageFrame(void *font, s32 glyph, s16 x, s16 y, f32 sx, f32 sy, s32 flag);
@@ -127,7 +126,7 @@ void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shad
                 advance = fontGlyphWidth();
                 break;
             case 0:
-                glyph = D_80110238[ch];
+                glyph = gEngineApp_m_OnScreen.m_CharacterSmallLookUpPos[0x80 + ch];
                 a = fontGlyphWidth();
                 b = fontGlyphWidth();
                 advance = Menu_CharWidth(ch, next, a, b);

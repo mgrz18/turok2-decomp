@@ -23,7 +23,6 @@ struct StatusStep {
     char pad[0x40];
 };
 extern void Mp_JoinPressingController_2(void);
-extern StatusStep D_8011AB98[];
 extern s32 Controller_ConfirmPressed(ControllerProfile *);
 extern s32 Controller_ConfirmPressed(ControllerProfile *slot);
 void Mp_JoinPressingController_2(void) {
@@ -32,7 +31,7 @@ void Mp_JoinPressingController_2(void) {
     s32 i;
     s32 active;
     i = 3; /* 4 entries in Turok 2 (8 in Rage Wars) */
-    status = D_8011AB98;
+    status = ((StatusStep *) &gEngineApp_m_Settings.slots[1]);
     for (; i >= 0; i--) {
         ((StatusView *)status)->active = 0;
         status--;

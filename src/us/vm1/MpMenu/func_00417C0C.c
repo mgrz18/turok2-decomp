@@ -16,7 +16,6 @@ typedef struct StatusStep {
     char pad[0x40];
 } StatusStep;
 
-extern StatusStep D_8011AB98[];
 extern s32 Controller_ConfirmPressed(ControllerProfile *slot);
 
 void Mp_JoinPressingController(void) {
@@ -25,7 +24,7 @@ void Mp_JoinPressingController(void) {
     s32 i;
     s32 active;
     i = 3;
-    status = D_8011AB98;
+    status = ((StatusStep *) &gEngineApp_m_Settings.slots[1]);
     for (; i >= 0; i--) {
         ((StatusView *)status)->active = 0;
         status--;
