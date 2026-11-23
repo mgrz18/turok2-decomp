@@ -6,8 +6,8 @@
 #include "structs/save.h"
 #include "globals/menu.h"
 #include "globals/menu_desc.h"
+#include "structs/pak.h"
 
-typedef struct O01Pad { s32 v; s32 freeb; s32 cnt; } O01Pad;
 extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gPakMenuPort; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
 extern s32 gPakMenuIsSave; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
@@ -25,8 +25,8 @@ void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, void *d, void *e);
 void CCache__Flush(s32 a);
 void CCache__Deallocate(sptr a, void *p);
 /* Controller-pak name for the selected pad (inlined). */
-static __inline__ char *O01Pick(O01Pad *sel) {
-    switch (sel->v) {
+static __inline__ char *O01Pick(PakQuery *sel) {
+    switch (sel->channel) {
     case 0:
     default:
         return (char *)&gStatsAfterPakMenuDesc1_2;
@@ -59,7 +59,7 @@ s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
     CPlayer *pp;
     s32 pv;
     u8 ext[8];
-    O01Pad pad;
+    PakQuery pad;
     s32 r = 0;
     s32 ok = 1;
     s32 flag = 0;
@@ -72,20 +72,20 @@ s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
         pv = own->controller->port;
         pp = own->player;
     }
-    pad.v = pv;
+    pad.channel = pv;
     plr = pp;
     if (gPakMenuIsSave != 0) {
         need = Pak_BytesToPages_2(0x18);
-        r = Pak_GetFreePages_2(pad.v, &pad.freeb);
+        r = Pak_GetFreePages_2(pad.channel, &pad.freeBytes);
         if (r == 0) {
-            if (pad.freeb >= need) {
-                r = Pak_CountEmptyNotes_2(pad.v, &pad.cnt);
-                if (r == 0 && pad.cnt != 0) {
+            if (pad.freeBytes >= need) {
+                r = Pak_CountEmptyNotes_2(pad.channel, &pad.freeNotes);
+                if (r == 0 && pad.freeNotes != 0) {
                     ok = 0;
-                    r = Pak_FindFreeExtLetter_2(pad.v, ext);
+                    r = Pak_FindFreeExtLetter_2(pad.channel, ext);
                     if (r == 0) {
                         flag = 1;
-                        nv = pad.v;
+                        nv = pad.channel;
                         r = Pak_SaveNoteVerified_2(nv, 0x18, gPakProfile, gPakCharacterNoteName, ext, gPakGameCode);
                     }
                 }
