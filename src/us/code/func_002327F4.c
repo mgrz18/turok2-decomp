@@ -30,7 +30,7 @@ extern void CParticle__BuildMatrix(void *, sptr, sptr, f32);
 #ifdef TARGET_PORT
 #include "structs/particle.h"
 #include "structs/camera.h"
-extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
+extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* local: globals/camera.h is not included here (its _m_nCount would clash with the s32[] view above) */
 /* the host CParticle and CCamera by member (the camera list head by name: state[-4] is N64 layout) */
 void CParticle__BuildCameraMatrix(void *arg0) {
     CParticle *p = (CParticle *) arg0;
