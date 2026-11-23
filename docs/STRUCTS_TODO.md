@@ -792,6 +792,18 @@ game_object.h has `struct Mtx` incomplete); AimActor of func_00249C20 (a
 `struct AimActor {` twin unview.py does not parse); the level-script field
 symbol views (k4, above).
 
+### After the merge (round 22 coordinator)
+
+On the merged tree (k1, k4, k3, k2): **142 of 698** local typedef names in 2 or more files
+(k1's 121 deleted libultra files took 5 of the repeated names); host-view twins **62 in 37
+files**: `tools/unview.py --base f980f639 $(grep -l "define T2_HOFF_" src/us/code/*.c)` re-run
+on the merged tree replaced one more, `LevelScriptF9D0` in func_00407BBC.c (k4 made the
+gLevelScript interiors members), and kept every other view as before (func_0022D2FC.c on k2's
+version included). `hoist_structs.py` (cinema.h on func_0040F240.c / func_00448240.c, which
+k2 also changed) had nothing left to do. The census below is regenerated
+(`tools/struct_census.py`). The two port bugs above are open for round 23 (docs/port/STATUS.md,
+"Round 22").
+
 ## The families to merge next
 
 - **The FAKEMATCH files** (16, listed in docs/MATCHING.md, "Where the
@@ -876,18 +888,17 @@ their own (top 0 of 0).
 
 ## Every local struct name defined in 2 or more files
 
-148 of the 723 local typedef names. "Fields" are the named offsets of the
+142 of the 698 local typedef names. "Fields" are the named offsets of the
 most common layout (pads left out); a body without offset comments is shown
 as written.
 
 | Name | Files | Layouts | Fields | Files |
 |---|---|---|---|---|
 | T2HostTriple | 17 | 1 | `float x, y, z;` | func_00238134, func_0023870C, func_0023876C, func_002387C4 +13 |
-| Arg0 | 10 | 10 | 0x8 refCount, 0xC flags | func_00204DB8, func_002242F8, func_0026E9EC, func_00281B64 +6 |
+| Arg0 | 9 | 9 | 0x8 refCount, 0xC flags | func_00204DB8, func_002242F8, func_0026E9EC, func_00281B64 +5 |
 | Entry | 8 | 8 | 0x00 unk0, 0x04 size | func_00214188, func_002188AC, func_0022D2FC, func_0026C114 +4 |
-| Slot | 6 | 5 | 0x00 a, 0x16 b, 0x17 c | func_00271DB4, func_00293530, func_0042D120, func_0042F344 +2 |
-| Msg | 5 | 3 | `s16 kind; s16 pad; s32 a; s32 b; s32 c;` | func_00290DE0, func_00290E10, func_00290E90, func_00290EC0 +1 |
 | S | 5 | 3 | `s32 a; CVector3 v; s32 d;` | func_0021810C, func_00218218, func_002182BC, func_0021836C +1 |
+| Slot | 5 | 4 | 0x00 a, 0x16 b, 0x17 c | func_00271DB4, func_0042D120, func_0042F344, func_0045A22C +1 |
 | Arg1 | 4 | 4 | 0x1C unk1C | func_00255840, func_00255C5C, func_002593A4, func_0045C050 |
 | Box | 4 | 2 | 0x00 min, 0x0C max | func_0021E374, func_0022AFB4, func_0023118C, func_002406D8 |
 | DIunion | 4 | 1 | `struct DIstruct s; DItype ll;` | func_002A3AE0, func_002A40D0, func_002A4650, func_002A4BE0 |
@@ -938,11 +949,9 @@ as written.
 | Actor0040457C | 2 | 2 | `#define T2_HOFF_Actor0040457C(m) __builtin_offsetof(CGameObjectInstanc...` | func_0040457C, func_0043D57C |
 | ActorBlock | 2 | 1 | 0x00 size, 0x04 count, 0x08 objects[1] | func_0042BA40, func_00464960 |
 | Anim | 2 | 1 | 0x24C angle | func_00259A4C, func_00259A98 |
-| AnimData | 2 | 2 | 0x14 unk14 | func_00232ECC, func_00290D5C |
 | AnimFrame | 2 | 2 | 0x0 kind, 0x2 shiftS, 0x3 shiftT | func_0022D2FC, func_00234348 |
 | AnimHeader | 2 | 2 | 0x00 radius, 0x04 frames, 0x08 encoding, 0x0C fC, 0x10 rotTracks, 0x14 posTracks, 0x18 frameCount, 0x1C frameStep | func_00216A9C, func_00218B10 |
 | AnimPlayer | 2 | 2 | 0x00 time, 0x04 current, 0x06 next, 0x08 frames, 0x0A active, 0x0B dirty, 0x0C keys, 0x10 *data | func_00218B10, func_00284660 |
-| Arg | 2 | 2 | 0x2C unk2C | func_0028FA00, func_00293028 |
 | Attached002534E0 | 2 | 1 | 0xD0 unkD0, 0x140 sub140[1] | func_002534E0, func_0025359C |
 | B01FH | 2 | 1 | `f32 f; s32 i; s16 h;` | func_002628B8, func_0026342C |
 | B04O | 2 | 2 | `u8 pad0[4]; s32 x, y, z;` | func_0024646C, func_00246B24 |
@@ -980,7 +989,6 @@ as written.
 | LevelNode | 2 | 1 | 0x00 unk0, 0x04 count, 0x08 records[1] | func_0042BA40, func_00464960 |
 | LevelScriptF604 | 2 | 2 | `#define T2_HOFF_LevelScriptF604(m) __builtin_offsetof(LevelScriptBlock...` | func_00406000, func_0043F000 |
 | LevelScriptF950 | 2 | 1 | `#define T2_HOFF_LevelScriptF950(m) __builtin_offsetof(LevelScriptState...` | func_00404FE0, func_004050E0 |
-| LevelScriptF9D0 | 2 | 2 | `#define T2_HOFF_LevelScriptF9D0(m) __builtin_offsetof(LevelScriptState...` | func_00407BBC, func_00440BBC |
 | LinkList | 2 | 1 | 0x0 *head, 0x4 *tail | func_0028E9E0, func_0028EA10 |
 | List | 2 | 2 | 0x04 items[1] | func_00221A24, func_00466040 |
 | ListNode | 2 | 2 | 0x16 unk16 | func_00228B4C, func_002933E0 |
@@ -1002,8 +1010,6 @@ as written.
 | PlacedPropRecord | 2 | 2 | 0x00 value, 0x04 scale, 0x08 id, 0x0A segment, 0x0C flags, 0x0E model, 0x10 y, 0x12 extents[6], ... | func_002141F0, func_00214564 |
 | Plane | 2 | 2 | 0x0 n, 0xC d | func_0026F080, func_0026F400 |
 | Player | 2 | 2 | `#define T2_HOFF_PL(m) __builtin_offsetof(CPlayer, m) union { struct { ...` | func_0024C47C, func_00271DB4 |
-| Pool | 2 | 2 | 0x3C cur, 0x40 *slots | func_00293530, func_00466040 |
-| PoolNode | 2 | 2 | 0x00 *next, 0x14 *self, 0x31 unk31, 0x32 unk32, 0x33 unk33 | func_0029247C, func_00466040 |
 | ProjVertex | 2 | 2 | 0x00 x, 0x04 y, 0x10 *pos | func_0023D4D4, func_0023D7CC |
 | Quad | 2 | 2 | `s32 x0; s32 x4; s32 x8; s32 xC;` | func_00238114, func_0024C47C |
 | Reader | 2 | 2 | 0x8 *p | func_002932BC, func_004034E0 |

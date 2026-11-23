@@ -410,6 +410,13 @@ Counts (the round-21 script: `extern` data lines in `src/**/*.c`, named globals 
 | ... of names no header declares | 123 (48 names) | 51 (27 names) |
 | ... redeclaring a header global without a `local` comment | 10 | 0 |
 
+### After the merge (round 22 coordinator)
+
+Counted again on the merged tree (`count_ext.py`, the method above): **269** local `extern`
+lines of named globals in 157 files (k4 left 278: k1 deleted 121 libultra files, and 9 of
+their lines with them), 239 with a `local` comment, 51 lines / 27 names without a header, 0
+header globals redeclared without a comment.
+
 ## Left
 
 - **Globals without a header (51 lines, 27 names, after round 22 k4).**

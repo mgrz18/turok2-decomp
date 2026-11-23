@@ -868,6 +868,14 @@ lines), the default whole-game run det `dc8126d3` (600,000 lines, END 2, the one
 263,578); `aligncheck.py` the 2 known sites; `mklayout.py --check` up to date.
 
 
+**After the merge (round 22 coordinator).** `tools/undowhile.py` re-run over the 65 files
+of the merged tree that still have a `while (0)`: one more wrapper goes
+(`CScene__BuildGeometryDisplayList`, func_00221D3C.c, its bare block unwrapped; asm_diff 0),
+the rest are still needed. `tools/unify_host_bodies.py` reports 0 redundant N64 alternatives
+(470 files). 52 files carry the FAKEMATCH marker; `tools/progress.py`: 117 functions, 67,876
+bytes (7.07% of the C-origin code; it now also finds `Menu_Construct`, whose two `TARGET_PORT`
+prototypes stand before one body).
+
 ### The G pass (the last drafts)
 
 Two of the three drafts left in `nonmatching/` matched:

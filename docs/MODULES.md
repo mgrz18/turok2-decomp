@@ -4,8 +4,9 @@ The C is one function per file (`src/us/code/func_XXXXXXXX.c`). The game was
 built from a few hundred source files (Acclaim's `.CPP`/`.C`, libultra's,
 libgcc's), linked in one order. This page recovers those boundaries from the
 ROM and gives each run of functions a module name. Files are **not moved
-yet**: round 22 does that after the renames land, from
-`versions/modules.us.txt`.
+yet**: round 22 landed the renames, the structs and libultra from ultralib (120 of its
+modules are built from `lib/ultralib`, docs/LIBULTRA.md); round 23 moves the files, from
+`versions/modules.us.txt` (regenerated on the round-22 tree).
 
 ```
 tools/modules.py            # check the map, print a summary (and the .rodata order check)
@@ -216,7 +217,7 @@ module). "Start evidence" is why the module starts there.
 | libultra/audio/synstartvoice.c | engine | alSynStartVoice | alSynStartVoice | 0x002944A0 | 1 | 148 | pad, ultralib |
 | libultra/audio/synstartvoiceparam.c | engine | alSynStartVoiceParams | alSynStartVoiceParams | 0x00294540 | 1 | 260 | pad, ultralib |
 | libultra/audio/synstopvoice.c | engine | alSynStopVoice | alSynStopVoice | 0x00294650 | 1 | 124 | pad, ultralib |
-| libultra/audio/synthesizer.c | engine | alSynNew | _timeToSamples | 0x002946D0 | 9 | 1668 | pad, ultralib |
+| libultra/audio/synthesizer.c | engine | alSynNew | _timeToSamplesNoRound | 0x002946D0 | 9 | 1668 | pad, ultralib |
 | libultra/audio/auxbus.c | engine | alAuxBusPull | alAuxBusParam | 0x00294D60 | 2 | 268 | pad, ultralib |
 | libultra/audio/drvrnew.c | engine | alFxNew | init_lpfilter | 0x00294E70 | 8 | 2072 | pad, ultralib |
 | libultra/audio/env.c | engine | alEnvmixerPull | _ldexpf | 0x00295690 | 7 | 3236 | pad, ultralib |
@@ -319,7 +320,7 @@ module). "Start evidence" is why the module starts there.
 | libultra/os/writebackdcache.s | engine | osWritebackDCache | osWritebackDCache | 0x0029E340 | 1 | 104 | pad, ultralib |
 | libultra/os/writebackdcacheall.s | engine | osWritebackDCacheAll | osWritebackDCacheAll | 0x0029E3B0 | 1 | 40 | pad, ultralib |
 | libultra/libc/sprintf.c | engine | sprintf | proutSprintf | 0x0029E3E0 | 2 | 128 | pad, ultralib |
-| libultra/libc/string.c | engine | func_0029E460 | strlen | 0x0029E460 | 3 | 132 | ultralib |
+| libultra/libc/string.c | engine | memcpy | strlen | 0x0029E460 | 3 | 132 | ultralib |
 | libultra/libc/xprintf.c | engine | _Printf | _Putfld | 0x0029E4F0 | 2 | 2480 | pad, ultralib |
 | libultra/libc/xlitob.c | engine | _Litob | _Litob | 0x0029EEA0 | 1 | 592 | ultralib |
 | libultra/libc/ldiv.c | engine | lldiv | lldiv | 0x0029F0F0 | 1 | 136 | ultralib |

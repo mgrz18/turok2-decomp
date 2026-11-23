@@ -460,6 +460,16 @@ the expansion pak path copies), defined in `versions/symbols_manual.us.txt`
 ([SEGMENTS.md](SEGMENTS.md#the-virtual-segments-real-start-round-21)). Four
 absolute ROM offsets keep their `D_` (`D_94F`, `D_11059`, `D_29E60`, `D_A4694`).
 
+## Function counts after round 22
+
+k1 deleted 121 libultra game files (one function each, all named): their functions come from
+`lib/ultralib` now (docs/LIBULTRA.md). The game C defines **4,025** functions, 3,937 named and
+**88** `func_` (unchanged: none of the deleted files was a `func_`); 4,187 function names in all
+(asm and ultralib ones included). `_timeToSamples` / `_timeToSamplesNoRound` were swapped and
+are fixed (k1); 0x0029E460 is `memcpy` in the ELF (ultralib's alias; the game C still calls it
+by its address name, see below). `tools/apply_names.py --check`: 0 errors, 0 warnings on the
+merged tree, and a re-run renames nothing.
+
 ## Left as `func_` (round 21)
 
 The 88 C functions round 21 did not name, by reason:

@@ -207,3 +207,18 @@ default whole-game run (300,000 frames, `aimdrive.py`) det `dc8126d3…` (600,00
 `death:` at 263,578). `port/gen` changed only where the ELF is now exact: `alGlobals` and
 `__osFaultedThread` are sized by their objects (4 bytes each, where gendata had read up to the
 next label: three and two garbage pointer slots fewer).
+
+**After the merge (round 22 coordinator).** Merged first, then k4, k3, k2 on top: every
+`tools/asm_diff.py --base f980f639` run shows the same 4 files and nothing else
+(func_00294540/_002949A4/_00294C30/_00294D18.c: only the `jal` targets of the swapped pair, the
+old source's name now resolving to the other address), and the ROM is identical (`make
+verify`). `tools/ultralib_build.py` (check) still takes 0 more modules (120 of 173);
+`tools/ultralib_version.py --versions I --map` and `tools/modules.py --write` were re-run
+(`versions/ultralib.us.txt`, `modules.us.txt`: the swapped pair, `memcpy`). `tools/progress.py`
+counts the ultralib objects' functions as linked C now (it read 94.76% engine without them) and
+resolves asm_origin's address names through the ELF's new names: engine and total 100%. A fresh
+`git clone --recursive` builds the ROM (`make setup && make verify`).
+
+**Round 23**: the 88 game files of ultralib-built modules that only the port links still sit in
+`src/us/code` beside the game's own C; they move out (a port libultra directory), and the
+game files move into the recovered modules (docs/MODULES.md).
