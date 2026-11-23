@@ -355,6 +355,11 @@ engine strings) went to the two headers. Left without a header: the same names
 as below minus the callbacks, plus `gT2BitStreamBase` (9 lines, a port-only
 symbol in `#ifdef TARGET_PORT` code).
 
+After the round-21 merge (j3's retyped menu files took the j2 rewrites again):
+337 local `extern` lines of named globals (261 with a `local` comment), 123
+lines (48 names) without a header, 10 redeclaring a header global without a
+`local` comment (same counting script).
+
 ## Left
 
 - **Globals without a header (119 lines, 51 names).**

@@ -440,6 +440,15 @@ blind spot of `match_func.py`) and what is left are in
   named.
 - 88 C functions are still `func_`: see "Left as `func_`" below.
 
+## Absolute symbols named (round 21 merge)
+
+`D_14A000` and `D_3CAE0`, the two absolute symbols `VM_Initialize`
+(func_0028D820) reads, are `gVirtualRomStart` (ROM 0x14A000, where the virtual
+segment starts) and `gVirtualModule1Size` (0x3CAE0, the bytes of VM module 1
+the expansion pak path copies), defined in `versions/symbols_manual.us.txt`
+([SEGMENTS.md](SEGMENTS.md#the-virtual-segments-real-start-round-21)). Four
+absolute ROM offsets keep their `D_` (`D_94F`, `D_11059`, `D_29E60`, `D_A4694`).
+
 ## Left as `func_` (round 21)
 
 The 88 C functions round 21 did not name, by reason:

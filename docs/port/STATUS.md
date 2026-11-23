@@ -22,6 +22,35 @@ The matching build is unchanged: `tools/asm_diff.py --base 70f3333c -j 8` report
 over all 3,938 files after every merge and at the end, and a clean `make clean && make setup &&
 make -j8 build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
+## Round 21 (Phase 5, readable code, part 1): the merge
+
+Five branches merged, in this order: j5 (libultra is 2.0I `libgultra_rom`; the module map,
+docs/MODULES.md), j3 (structs hoisted, host-view twins replaced), j2 (481 data names, the
+`menu_text.h` / `strings.h` headers), j1 (255 function names) and j4 (the FAKEMATCH audit, one
+body for the N64 and the host). The rewrites that met in the same files were re-run on the merged
+tree, each as its own commit (`apply_names.py`, `hoist_externs.py`, `unview.py` on
+func_0022D2FC.c, then `unify_host_bodies.py --write` until it dropped 0: 45 more alternatives, 496
+in all). `D_14A000` / `D_3CAE0` are `gVirtualRomStart` / `gVirtualModule1Size`.
+
+The port reads renamed and retyped C only: no behaviour change. Linux, this tree:
+`versions/port_layout.us.json` regenerated; gendata rerun with `decls.json` deleted;
+`aligncheck.py` (Release) lists only the 2 known `GameNoteMenu_SelectYes` false positives;
+boot + 3 demos (26,000 frames, `--pak-blank`) det `6ab97584…` (52,000 lines); the default
+whole-game run (Release, `aimdrive.py`, 300,000 frames) det **`dc8126d3…`** (600,000 lines, END 2,
+the one `death:` line at 263,578 is the return to the hub after the credits). Matching build:
+`tools/asm_diff.py --base 7340fcdd -j 8` 0 of 3,938 after every merge (asm_diff now resolves a
+new name through the names tables both ways, the module-2 `_2` copies at their link address),
+clean `make setup && make -j8 build && make verify` OK.
+
+One host fix from the checks: j3 typed `AI_GetSightTargetInfo`'s caller on `CAI`, so the sight
+target pointer reached an `s32` parameter (`ptrargs.py`); the parameter (unused) is `sptr` now.
+Port tests: `make -C port test` (rnc_test, t2asset_test, t2asset_typed_test) OK, gbi_test 0
+mismatches, t2os deterministic on 3 runs, `t2audio_test --direct 0/40` max difference 0, `--adec`
+27,136 samples, the swoosh self test OK. abicheck: 0 harmful direct calls; one indirect
+`missing_args` is newly visible (`level->def->onReset` in `Primagen_Step` now typed, matched to
+`Destructible_Hurt` by type alone; the call is unchanged). n64viewcheck: fewer sites (view/local
+211 -> 198, view/moves 82 -> 75), no new BAD.
+
 ## Round 21, part j3 (structs)
 
 35 host-view twins (`T2_HOFF_*`, hostview.py) are now the real structs they mirrored

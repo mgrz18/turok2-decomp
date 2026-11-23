@@ -769,7 +769,8 @@ FAKEMATCH drafts) next to a host version that compiles to the same N64
 code; `tools/unify_host_bodies.py --write` replaced each pair by its host
 branch (the port reads the same text as before; the N64 assembly is checked
 equal, symbols resolved, by `asm_diff.py`'s normalisation). It is re-runnable
-after merges (run it until it reports 0; the 340 host branches that do not
+after merges (run it until it reports 0; on the merged round-21 tree it
+dropped 45 more, 496 in all; the 296 host branches that do not
 compile for the N64, host-only names, are left). `asm_diff.py` now numbers local labels by first appearance, so
 a de-faked branch that only renumbers `.L` labels compares equal.
 
