@@ -9,10 +9,6 @@
 #include "globals/engine.h"
 #include "protos/cache.h"
 
-typedef struct {
-    f32 m[16];
-} MatrixF;
-
 /* An animation track (0x14 bytes). */
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -91,8 +87,8 @@ void CAnimationState__GetRootMotion(AnimTrack *track, CVector3 *delta, f32 *turn
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 f32 Angle_Lerp(f32 t, f32 a, f32 b);
 void Angle_Wrap(f32 *angle);
-void CMtxF__SetRotateY(MatrixF *m, f32 angle);
-void CMtxF__TransformPoint(MatrixF *m, CVector3 *in, CVector3 *out);
+void CMtxF__SetRotateY(CMtxF *m, f32 angle);
+void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
 
 /* Advances an actor's animation and applies its root motion: the turn and,
  * with flag 0x20000, the move, blended over the transition from the previous
@@ -102,7 +98,7 @@ void CGameObjectInstance__AdvanceAnimation(AnimActor *actor) {
     CVector3 second;
     CVector3 saved;
     CVector3 moved;
-    MatrixF matrix;
+    CMtxF matrix;
     s32 active;
     f32 first_value;
     f32 second_value;

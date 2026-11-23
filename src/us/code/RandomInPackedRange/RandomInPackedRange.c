@@ -54,26 +54,23 @@ void Material_Unpack(Material *arg0, MaterialRec *arg1) {
 
 #include "globals/math.h"
 #include "globals/engine.h"
+#include "structs/particle.h"
 
 /* Two floats packed as their upper 16 bits (see FloatToHalf / HalfToFloat). */
-typedef struct {
-    /* 0x0 */ u16 base;
-    /* 0x2 */ u16 range;
-} PackedRange;
 s32 Demo_GetPlayerCount(void);
 #ifdef TARGET_PORT
 void T2Port_RngTrace(void *ra); /* DEBUG-ONLY: T2_RNG_TRACE (port/game/t2det.c) */
 #endif
 
 /* base + random(0..1) * range, both unpacked from half-floats. */
-f32 RandomInPackedRange(PackedRange r) {
-    u32 base = r.base << 16;
+f32 RandomInPackedRange(CPackedRange r) {
+    u32 base = r.m_Base << 16;
     u32 range;
 
-    if (r.range == 0) {
+    if (r.m_Range == 0) {
         return *(f32 *) &base;
     }
-    range = r.range << 16;
+    range = r.m_Range << 16;
 #ifdef TARGET_PORT
     T2Port_RngTrace(__builtin_return_address(0));
 #endif
