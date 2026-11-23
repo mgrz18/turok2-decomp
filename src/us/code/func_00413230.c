@@ -1,6 +1,5 @@
 /* FAKEMATCH (round 21 audit): 6 register pins (`register ... asm("$n")`); without them: Menu_DrawBar 26 of
- * 180 words; an if/else whose two arms are the same code, kept for the ROM's
- * register allocation or layout; with one arm: Menu_StepValueLR: 12 of 47 words. */
+ * 180 words. */
 /* One file, 0x413230-0x417484, .rodata 0x800C0AF0-0x800C0E64: the menu
  * code from MenuItem_FormatBinding to MenuPool_CloseMenu. Objects start 16-aligned in
  * .text and in .rodata, with junk words before: stray_00413228 opens it,
@@ -1467,55 +1466,24 @@ s32 Menu_StepValue(Menu *menu,s32 value,s32 step,s32 minimum,s32 maximum,s32 wra
 s32 func_00285628_416558(sptr) __asm__("Controller_MenuLeft");
 s32 func_00285670_416558(sptr) __asm__("Controller_MenuRight");
 /* Menu_StepValue with its own left/right reading (Menu controller). */
-s32 Menu_StepValueLR(Menu *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
-{
-  s32 var_s0;
-  s32 var_s1;
-  s32 var_s2;
-  s32 var_s4;
-  s32 var_s5;
-  s32 var_v0;
-  int new_var;
-  void *var_s3;
-  ;
-  var_s0 = arg1;
-  var_s4 = arg2;
-  var_s1 = arg4;
-  var_s5 = arg5;
-  var_s2 = arg3;
-  if (func_00285628_416558((sptr) arg0->controller) != 0)
-  {
-    var_s0 -= var_s4;
-    if (var_s0 < var_s2)
-    {
-      var_s0 = var_s2;
-      if (var_s5 != 0)
-      {
-        if (var_s2 || arg0)
-        {
-          var_s0 = var_s1;
+s32 Menu_StepValueLR(Menu *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap) {
+    /* De-faked in round 21 (j4): written as Menu_StepValue is, it matches (the draft had two
+     * identical arms and read the controller at its offset). */
+    if (func_00285628_416558((sptr) menu->controller)) {
+        value -= step;
+        if (value < minimum) {
+            value = minimum;
+            if (wrap) value = maximum;
         }
-        else
-        {
-          var_s0 = var_s1;
+    }
+    if (func_00285670_416558((sptr) menu->controller)) {
+        value += step;
+        if (value > maximum) {
+            value = maximum;
+            if (wrap) value = minimum;
         }
-      }
     }
-  }
-  var_v0 = var_s0;
- new_var = 0x20; /* the controller, read at its offset to match */ if (func_00285670_416558(*((s32 *) (((s8 *) arg0) + new_var))) != 0) { var_s0 += var_s4;
-    var_v0 = var_s0;
-    if (var_s1 < var_s0)
-    {
-      var_s0 = var_s1;
-      if (var_s5 != 0)
-      {
-        var_s0 = var_s2;
-      }
-      var_v0 = var_s0;
-    }
-  }
-  return var_v0;
+    return value;
 }
 
 /* ---------------- MenuPool_Construct ---------------- */
