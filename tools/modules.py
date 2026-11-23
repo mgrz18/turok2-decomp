@@ -202,11 +202,12 @@ def rodata_order(mods):
         rs = [ro_at[f[0]] for f in m["funcs"] if f[0] in ro_at]
         if not rs:
             continue
-        if last and min(rs) < last[1] and m["region"] == last[2]:
+        sect = 0 if min(rs) < 0x800BFD50 else 1      # .code_rodata or .code_rodata_tail
+        if last and min(rs) < last[1] and (m["region"], sect) == last[2]:
             bad.append(f"{last[0]} -> {m['name']}")
         # (inside one module the order is not checked: the per-function files put a literal
         # shared by two functions with either, so even ultralib's synthesizer.c is "out of order")
-        last = (m["name"], max(rs), m["region"])
+        last = (m["name"], max(rs), (m["region"], sect))
     return bad
 
 
