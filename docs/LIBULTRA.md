@@ -194,8 +194,9 @@ path the linker script could pick from.
 **The port** keeps the game's C for the files of these modules it links
 (libaudio, gu, libc, the first VM module's pfs). It is 64-bit: the game's C
 is typed for the host (`sptr`, the port's views), ultralib's assumes 32-bit
-pointers, and port/runtime replaces the kernel parts anyway. Those files are
-still in `src/us/code`, compile to the same code as before and are not linked
+pointers, and port/runtime replaces the kernel parts anyway. Those files (88)
+are in `src/port_libultra/<ultralib file>/` since round 23 (`audio/csplayer/`,
+`vm1/io/pfsinitpak/` ...), compile to the same code as before and are not linked
 by the N64 build (the list says which). 121 game files, which
 neither build linked any more (the kernel/VI/PI/SI/AI files port/runtime
 replaces, motor.c's three, the second VM module's copies, `sprintf`), are deleted.
@@ -219,6 +220,9 @@ counts the ultralib objects' functions as linked C now (it read 94.76% engine wi
 resolves asm_origin's address names through the ELF's new names: engine and total 100%. A fresh
 `git clone --recursive` builds the ROM (`make setup && make verify`).
 
-**Round 23**: the 88 game files of ultralib-built modules that only the port links still sit in
-`src/us/code` beside the game's own C; they move out (a port libultra directory), and the
-game files move into the recovered modules (docs/MODULES.md).
+**Round 23**: the 88 game files of ultralib-built modules that only the port links moved out of
+`src/us/code` into `src/port_libultra/` (by ultralib file; the port's CMake globs it, in the same
+file-name order as before), and the game files moved into the recovered modules
+(docs/MODULES.md). The 53 libultra modules the game still builds from its own C are
+`src/us/code/libultra/<dir>/<file>/` (`code/libultra/io/pfsisplug/`); `tools/ultralib_build.py`
+reads the yaml's `c, code/<module>/func_` entries.

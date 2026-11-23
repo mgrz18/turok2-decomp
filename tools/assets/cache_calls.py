@@ -9,7 +9,7 @@ CCache__LoadPersistantSubBlock(0, set, index, setKey, owner, callback, descripti
 Descriptions given as D_800Axxxx symbols are resolved from the engine .rodata
 in the ROM (ROM = VRAM - 0x80000000 + 0xC00 for the engine's .rodata).
 
-CLI: python tools/assets/cache_calls.py baserom.us.z64 [--src src/us/code] [--markdown]
+CLI: python tools/assets/cache_calls.py baserom.us.z64 [--src src/us] [--markdown]
 """
 import glob
 import os

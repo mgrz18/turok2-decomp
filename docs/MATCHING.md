@@ -50,7 +50,7 @@ leftover LNK record, so it cannot be the first target the plan assumed.
 
 A matched function gets its own `c` subsegment in `versions/turok2.us.yaml`:
 
-    python3 tools/c_subsegment.py code/func_0025FA54 func_0025FA54 --write
+    python3 tools/c_subsegment.py code/EnemyAI/func_0025FA54 func_0025FA54 --write
     make setup      # splat writes src/us/code/EnemyAI/func_0025FA54.c with INCLUDE_ASM
 
 then the INCLUDE_ASM line is replaced by the C, and `make verify` must still

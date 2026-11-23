@@ -3,7 +3,7 @@
 
   python3 tools/port/audit64.py [--out DIR] [--jobs N]
 
-1. Compiles every src/us/code/*.c with clang -fsyntax-only for x86_64 and only the
+1. Compiles every game C file (src/us/{code,vm1,vm2}/<module>, src/port_libultra) with clang -fsyntax-only for x86_64 and only the
    pointer-width warnings enabled (-Wpointer-to-int-cast, -Wint-to-pointer-cast,
    -Wvoid-pointer-to-int-cast, -Wint-to-void-pointer-cast, -Wint-conversion,
    -Wshorten-64-to-32). The include tree is copied to OUT/inc first and the
