@@ -114,7 +114,7 @@ module). "Start evidence" is why the module starts there.
 | Render | engine | Render_SetCombineMode | Render_SortTreeInsert | 0x00207A70 | 30 | 18012 | pad |
 | CMtxF | engine | CMtxF__TransformBox | Model_PulseVertexColors | 0x0020C0D0 | 124 | 36840 | pad |
 | CLevelActor | engine | CLevelActor__Construct | CLevelActor__TouchGeometry | 0x002150C0 | 10 | 2588 | pad |
-| Anim | engine | CAnimationState__GetBonePosition | func_00218AB4 | 0x00215AE0 | 49 | 12328 | pad |
+| Anim | engine | CAnimationState__GetBonePosition | Bits_CeilLog2 | 0x00215AE0 | 49 | 12328 | pad |
 | CAnimationState | engine | CAnimationState__SwitchToQueued | CAnimationState__Load | 0x00218B10 | 11 | 4268 | pad |
 | CGameObjectInstance | engine | CGameObjectInstance__Construct | CGameObjectInstance__ConstructLitVertices | 0x00219BC0 | 65 | 26268 | pad |
 | CScene | engine | CScene__SetInstanceSavedBit | Blast_GetStrength | 0x00220260 | 96 | 27948 | pad |
@@ -149,7 +149,7 @@ module). "Start evidence" is why the module starts there.
 | CGameRegion | engine | CGameRegion__GetCeilingNormal | CGameRegion__GetMaxHeight | 0x00269A90 | 53 | 13784 | pad |
 | RandomInPackedRange | engine | Material_Unpack | RandomInPackedRange | 0x0026D070 | 2 | 392 | pad |
 | HalfToFloat | engine | FloatToHalf | HalfToFloat | 0x0026D200 | 2 | 40 | pad |
-| GameObject#3 | engine | func_0026D230 | LevelEvent_CheckRequiredItem | 0x0026D230 | 31 | 5416 | pad |
+| GameObject#3 | engine | DList_Init | LevelEvent_CheckRequiredItem | 0x0026D230 | 31 | 5416 | pad |
 | Rumble | engine | Rumble_GetLevelAt | RumblePool_FreeAll | 0x0026E760 | 10 | 1732 | pad |
 | RumbleCurve | engine | RumbleCurve_Init | RumbleCurve_GetValue | 0x0026EE30 | 3 | 380 | pad |
 | Level | engine | func_0026EFB0 | Level_GetHub | 0x0026EFB0 | 2 | 200 | pad |
@@ -157,18 +157,18 @@ module). "Start evidence" is why the module starts there.
 | SndSeq | engine | SndSeq_Update | SndSeq_Load | 0x00274B40 | 12 | 2524 | pad |
 | Sound | engine | Sound__Initialize | Sound__Unlock | 0x00275520 | 31 | 1700 | pad |
 | LoopSounds | engine | func_00275BE0 | func_00275F8C | 0x00275BE0 | 10 | 948 | pad |
-| SndQueue | engine | SndQueue_Add | func_002767F8 | 0x00275FA0 | 12 | 2164 | pad |
+| SndQueue | engine | SndQueue_Add | SndQueue_LinkHead | 0x00275FA0 | 12 | 2164 | pad |
 | SoundEffectInfo | engine | SoundEffectInfo_GetGroup | SoundEffectInfo_GetPanEnvelope | 0x00276820 | 14 | 168 | pad |
 | SpeechPlayer | engine | SpeechPlayer_Update | SpeechPlayer_StopUnlocked | 0x002768D0 | 7 | 1976 | pad |
 | Hud | engine | COnScreen__DrawBossBar | func_0027BB74 | 0x00277090 | 50 | 19180 | pad |
 | Demo | engine | Demo_UpdateInput | Demo_AdvanceMatchStream | 0x0027BB80 | 3 | 396 | pad |
-| CCamera | engine | func_0027BD10 | CCameraPool__AddTextEx | 0x0027BD10 | 67 | 26156 | pad |
+| CCamera | engine | CIntelligence__Init | CCameraPool__AddTextEx | 0x0027BD10 | 67 | 26156 | pad |
 | CEmitter | engine | CEmitter__Draw | Emitter_CompareHeightAsc | 0x00282340 | 10 | 5276 | pad |
 | Cinema | engine | Cinema__Initialize | Cinema_GetActive | 0x002837E0 | 34 | 3700 | pad |
 | CPathTrack | engine | CPathTrack__Advance | CPathTrack__GetCurrentPoint | 0x00284660 | 3 | 360 | pad |
 | unk_002847D0 | engine | func_002847D0 | func_002847D0 | 0x002847D0 | 1 | 8 | pad |
 | Controller | engine | Controller_ReadAll | Controller_EnableMenuSounds | 0x002847E0 | 37 | 5384 | pad |
-| CEngineApp | engine | EngineMode03_ExpansionPak_Draw | func_00289FE4 | 0x00285CF0 | 90 | 17192 | pad |
+| CEngineApp | engine | EngineMode03_ExpansionPak_Draw | CEngineApp__StopRumble | 0x00285CF0 | 90 | 17192 | pad |
 | __scHandleRSP | engine | __scMain | Sched_SubmitTask | 0x0028A020 | 17 | 5124 | pad |
 | Crash | engine | Crash_PutChar | Crash_PrintString | 0x0028B430 | 16 | 6988 | pad |
 | SavedPlayers | engine | SavedPlayers_Arm | SavedPlayers_Save | 0x0028CF80 | 8 | 1012 | pad |
@@ -329,8 +329,8 @@ module). "Start evidence" is why the module starts there.
 | HostIo | engine | HostIo_DisableInt | PClseek | 0x002A12F0 | 34 | 7352 | pad |
 | osPiStartDma | engine | osPiStartDma | osPiStartDma | 0x002A2FB0 | 1 | 172 | pad |
 | osPiGetCmdQueue | engine | osPiGetCmdQueue | osPiGetCmdQueue | 0x002A3060 | 1 | 40 | pad |
-| exception_stubs | engine | func_002A3088 | func_002A31FC | 0x002A3088 | 7 | 504 | known, known: exception-vector stubs, asm (docs/ASM_ORIGIN.md) |
-| exception_context | engine | func_002A3708 | func_002A37CC | 0x002A3708 | 3 | 972 | gap, known, known: exception context save/return, asm (docs/ASM_ORIGIN.md) |
+| exception_stubs | engine | HostIo_VectorStubs | HostIo_ReadTlb | 0x002A3088 | 7 | 504 | known, known: exception-vector stubs, asm (docs/ASM_ORIGIN.md) |
+| exception_context | engine | HostIo_RestoreVectors | HostIo_SaveContext | 0x002A3708 | 3 | 972 | gap, known, known: exception context save/return, asm (docs/ASM_ORIGIN.md) |
 | libgcc/_divdi3 | engine | __divdi3 | __divdi3 | 0x002A3AE0 | 1 | 1516 | known, pad, known: GCC 2.8.1 libgcc2.c L_divdi3 (file header) |
 | libgcc/_moddi3 | engine | __moddi3 | __moddi3 | 0x002A40D0 | 1 | 1400 | known, pad, known: GCC 2.8.1 libgcc2.c L_moddi3 |
 | libgcc/_udivdi3 | engine | __udivdi3 | __udivdi3 | 0x002A4650 | 1 | 1412 | known, pad, known: GCC 2.8.1 libgcc2.c L_udivdi3 |
@@ -369,13 +369,13 @@ module). "Start evidence" is why the module starts there.
 | libultra/io/contpfs.c | vm1 | __osRepairPackId | __osPfsSelectBank | 0x00429460 | 8 | 2744 | pad, ultralib |
 | CScene#2 | vm1 | MatrixHeap_Construct | CScene__ConstructMap | 0x00429F20 | 25 | 12388 | pad, ultralib |
 | SceneActorPool | vm1 | SceneActorPool_Construct | CInstancePool__Construct | 0x0042CF90 | 2 | 388 | pad |
-| unk_0042D120 | vm1 | func_0042D120 | func_0042D120 | 0x0042D120 | 1 | 152 | pad |
+| CDLightSet | vm1 | CDLightSet__Construct | CDLightSet__Construct | 0x0042D120 | 1 | 152 | pad |
 | Light | vm1 | Light_SetDefaultDirection | Light_SetDefaultDirection | 0x0042D1C0 | 1 | 84 | pad |
 | CParticleSystem | vm1 | CParticleSystem__Construct | CParticleSystem__Construct | 0x0042D220 | 1 | 488 | pad |
-| unk_0042D410 | vm1 | func_0042D410 | func_0042D410 | 0x0042D410 | 1 | 252 | pad |
+| SwooshSystem | vm1 | SwooshSystem_Construct | SwooshSystem_Construct | 0x0042D410 | 1 | 252 | pad |
 | CPlayer#2 | vm1 | CPlayer__SetupActors | CPlayer__StopLoopingSounds | 0x0042DA60 | 13 | 4332 | pad |
-| COnScreen | vm1 | COnScreen__Construct | func_0042EBBC | 0x0042EB50 | 3 | 220 | pad |
+| COnScreen | vm1 | COnScreen__Construct | COnScreen__ResetBossBars | 0x0042EB50 | 3 | 220 | pad |
 | Demo#2 | vm1 | Demo_ReadRunLength | CEmitterPool__Construct | 0x0042EC30 | 28 | 5176 | pad |
 | Cont | vm1 | Cont_InitAll | Cont_ResetSlot | 0x00430070 | 2 | 552 | pad |
-| unk_004302A0 | vm1 | func_004302A0 | func_00430454 | 0x004302A0 | 4 | 604 | pad |
-| unk_00430500 | vm1 | func_00430500 | func_00430500 | 0x00430500 | 1 | 680 | pad |
+| CEngineApp#2 | vm1 | Render_InitUnitQuad | CEngineApp__StartGame | 0x004302A0 | 4 | 604 | pad |
+| Automap | vm1 | Automap_ClearBuffers | Automap_ClearBuffers | 0x00430500 | 1 | 680 | pad |

@@ -150,22 +150,23 @@ module MtxPool: 0x00206920..0x00206984, 2 functions; pad
   0x00206950 MtxPool_Alloc
 
 module Texture: 0x00206990..0x00207A64, 8 functions; pad
+  // name runs (possible objects the padding cannot show): Texture 3, Material 1, Texture 4
   0x00206990 Texture_DecompressCallback
   0x00206B30 Texture_Load
   0x00207908 func_00207908
-  0x00207914 func_00207914
+  0x00207914 Material_GetTextureSet
   0x0020793C Texture_RequestSync
   0x0020798C Texture_Request
   0x002079D8 Texture_GetInfo
   0x00207A54 Texture_InvalidateCache
 
 module Render: 0x00207A70..0x0020C0CC, 30 functions; pad
-  // name runs (possible objects the padding cannot show): Render 5, Model 2, Render 5, Model 5, Render 7, Model 4, Render 2
+  // name runs (possible objects the padding cannot show): Render 5, Model 2, Render 5, Model 4, Render 8, Model 3, Render 3
   0x00207A70 Render_SetCombineMode
   0x00207FEC Render_SetRenderMode
   0x002086BC Render_DrawShadowQuad
   0x00208810 Render_SetupMaterial
-  0x00209658 func_00209658
+  0x00209658 Render_BeginDeferredAlpha
   0x002097AC Model_BlendMorphFrames
   0x00209AF4 Model_Decompress
   0x0020A33C Render_DrawModel
@@ -177,23 +178,23 @@ module Render: 0x00207A70..0x0020C0CC, 30 functions; pad
   0x0020B4B0 Model_DecompressCallbackTerminated
   0x0020B4D0 Model_DecompressCallbackExtra
   0x0020B4F0 Model_AdvanceMorph
-  0x0020B554 func_0020B554
+  0x0020B554 Render_SetupFog
   0x0020B5B8 Render_InvalidateModeCache
   0x0020B5D4 Render_ResetBatches
   0x0020B624 Render_FlushBatches
   0x0020B6A0 Render_QueueModelInstance
   0x0020B7F8 Render_QueueModelByKey
-  0x0020B9F4 func_0020B9F4
-  0x0020BBE4 func_0020BBE4
+  0x0020B9F4 Render_QueueModelByResource
+  0x0020BBE4 Render_DrawModelImmediate
   0x0020BE08 Model_RequestTextures
   0x0020BEE8 Model_TouchTextures
   0x0020BFB0 func_0020BFB0
-  0x0020BFC0 func_0020BFC0
+  0x0020BFC0 Render_ClearSortTrees
   0x0020BFE8 Render_SortTreeFind
   0x0020C030 Render_SortTreeInsert
 
 module CMtxF: 0x0020C0D0..0x002150B8, 124 functions; pad
-  // name runs (possible objects the padding cannot show): CMtxF 8, CQuaternion 2, CVector3 4, CQuaternion 1, CVector3 1, Angle 1, CVector3 17, CMtxF 35, Angle 3, CQuaternion 6, Random 4, Math 6, Angle 2, Random 1, Timer 1, Edge 5, Color 1, LightVolume 1, Actors 3, Lighting 4, Model 1, Lighting 2, LightVolume 2, Lighting 3, CStaticObject 7, Instance 1, CStaticObject 1, Model 1
+  // name runs (possible objects the padding cannot show): CMtxF 8, CQuaternion 2, CVector3 4, CQuaternion 1, CVector3 1, Angle 1, CVector3 17, CMtxF 35, Angle 3, CQuaternion 6, Random 4, Math 6, Angle 2, Random 1, Timer 1, Edge 5, Color 1, LightVolume 1, Actors 3, Lighting 4, Model 1, Lighting 2, LightVolume 1, Math 1, Lighting 3, CStaticObject 7, Instance 1, CStaticObject 1, Model 1
   0x0020C0D0 CMtxF__TransformBox
   0x0020C208 CMtxF__InvertAffine
   0x0020C618 CMtxF__MultiplyAffine
@@ -304,7 +305,7 @@ module CMtxF: 0x0020C0D0..0x002150B8, 124 functions; pad
   0x0021375C Lighting_WriteVertexColors
   0x00213A70 Lighting_BuildLitVertices
   0x00213E90 LightVolume_GetFlicker
-  0x00213F2C func_00213F2C
+  0x00213F2C Math_ModFloor
   0x00213FA0 Lighting_CollectVolumesForModel
   0x00214108 func_00214108
   0x00214188 func_00214188
@@ -324,7 +325,7 @@ module CLevelActor: 0x002150C0..0x00215ADC, 10 functions; pad
   0x002150C0 CLevelActor__Construct
   0x002152AC CLevelActor__Draw
   0x002154DC Actor_DrawGroundShadow
-  0x002156D4 func_002156D4
+  0x002156D4 Actor_GetGroundRotation
   0x002156FC CLevelActor__Update
   0x002157F0 CLevelActor__UpdateGrowIn
   0x00215868 CLevelActor__UpdateAnimSpeed
@@ -333,20 +334,20 @@ module CLevelActor: 0x002150C0..0x00215ADC, 10 functions; pad
   0x00215A00 CLevelActor__TouchGeometry
 
 module Anim: 0x00215AE0..0x00218B08, 49 functions; pad
-  // name runs (possible objects the padding cannot show): CAnimationState 2, Anim 4, AnimCurve 3, Bits 1, CAnimationState 3, Bits 1, Math 1, BitAddr 3, Bits 20, Pack 2, Anim 4, AnimCurve 2, Curve 3
+  // name runs (possible objects the padding cannot show): CAnimationState 2, Anim 4, AnimCurve 3, Bits 1, CAnimationState 1, Anim 2, Bits 1, Math 1, BitAddr 3, Bits 19, AnimCurve 1, Pack 2, Anim 4, AnimCurve 1, Bits 1, Curve 1, BitAddr 1, Bits 1
   0x00215AE0 CAnimationState__GetBonePosition
   0x00215F4C CAnimationState__GetBoneRotation
   0x00216464 Anim_DecodeQuantizedChannel
   0x00216604 Anim_DecodeTracks
-  0x00216964 func_00216964
+  0x00216964 Anim_CalcKeyCount
   0x00216A9C Anim_Decompress
   0x00217214 AnimCurve_LoadSegment
   0x00217450 AnimCurve_Init
   0x002175D8 AnimCurve_Evaluate
   0x002177DC Bits_WriteFloat
   0x0021793C CAnimationState__GetData
-  0x0021794C func_0021794C
-  0x002179F0 func_002179F0
+  0x0021794C Anim_GetBoneTranslation
+  0x002179F0 Anim_GetBoneRotation
   0x00217AD4 Bits_Normalize
   0x00217AF0 Math_Remap
   0x00217B04 BitAddr_FromPointer
@@ -358,20 +359,20 @@ module Anim: 0x00215AE0..0x00218B08, 49 functions; pad
   0x00217CC8 Bits_Write
   0x00217D6C Bits_QuantizeRange
   0x00217E4C Bits_PeekFloat
-  0x00217EFC func_00217EFC
+  0x00217EFC Bits_PokeFloat
   0x00218020 Bits_ReadFloat
   0x0021810C func_0021810C
-  0x0021813C func_0021813C
+  0x0021813C Bits_GetFloat
   0x00218218 func_00218218
-  0x00218248 func_00218248
+  0x00218248 Bits_GetField
   0x002182BC func_002182BC
-  0x002182EC func_002182EC
+  0x002182EC Bits_GetFieldNegative
   0x0021836C func_0021836C
-  0x00218398 func_00218398
+  0x00218398 Bits_ReadRangedFloat
   0x00218490 func_00218490
-  0x002184AC func_002184AC
+  0x002184AC Bits_ReadAt
   0x0021851C func_0021851C
-  0x0021852C func_0021852C
+  0x0021852C AnimCurve_EvaluateAt
   0x00218548 Pack_Init
   0x00218590 Pack_Add
   0x00218620 Anim_DecodeCurveChannel
@@ -379,10 +380,10 @@ module Anim: 0x00215AE0..0x00218B08, 49 functions; pad
   0x00218748 Anim_DecodeAnimation
   0x002188AC func_002188AC
   0x002188B8 AnimCurve_Seek
-  0x002189EC func_002189EC
+  0x002189EC Bits_ForPrecision
   0x00218A54 Curve_EvaluateCubic
-  0x00218AAC func_00218AAC
-  0x00218AB4 func_00218AB4
+  0x00218AAC BitAddr_GetShift
+  0x00218AB4 Bits_CeilLog2
 
 module CAnimationState: 0x00218B10..0x00219BBC, 11 functions; pad
   0x00218B10 CAnimationState__SwitchToQueued
@@ -398,19 +399,19 @@ module CAnimationState: 0x00218B10..0x00219BBC, 11 functions; pad
   0x00219ACC CAnimationState__Load
 
 module CGameObjectInstance: 0x00219BC0..0x0022025C, 65 functions; pad
-  // name runs (possible objects the padding cannot show): CGameObjectInstance 19, Shadow 1, CGameObjectInstance 39, Anim 3, CMtxF 1, Quaternion 1, CGameObjectInstance 1
+  // name runs (possible objects the padding cannot show): CGameObjectInstance 19, Shadow 1, CGameObjectInstance 19, GameObject 2, CGameObjectInstance 16, Anim 5, CMtxF 1, Quaternion 1, CGameObjectInstance 1
   0x00219BC0 CGameObjectInstance__Construct
   0x00219F74 CGameObjectInstance__PickRandomAnim
   0x0021A150 CGameObjectInstance__SetupAnimation
   0x0021A344 CGameObjectInstance__UpdateAnimation
-  0x0021A500 func_0021A500
+  0x0021A500 CGameObjectInstance__AlignToGround
   0x0021A658 CGameObjectInstance__MoveWithCollision
   0x0021A7EC CGameObjectInstance__AdvanceAnimation
   0x0021ABC8 CGameObjectInstance__FireAnimEvents
   0x0021AE6C CGameObjectInstance__GetRotation
-  0x0021B038 func_0021B038
+  0x0021B038 CGameObjectInstance__GetAutoAimRotation
   0x0021B39C func_0021B39C
-  0x0021B59C func_0021B59C
+  0x0021B59C CGameObjectInstance__WobbleBone
   0x0021B95C CGameObjectInstance__PoseBone
   0x0021CDAC CGameObjectInstance__BuildBoneMatrices
   0x0021D39C CGameObjectInstance__Draw
@@ -420,7 +421,7 @@ module CGameObjectInstance: 0x00219BC0..0x0022025C, 65 functions; pad
   0x0021DC84 CGameObjectInstance__DrawShadow
   0x0021E03C Shadow_DrawBlob
   0x0021E374 CGameObjectInstance__GetNearestBox
-  0x0021E5D4 func_0021E5D4
+  0x0021E5D4 CGameObjectInstance__InitAIType
   0x0021E6AC CGameObjectInstance__ConstructFromRecord
   0x0021E7F8 CGameObjectInstance__UpdateBounds
   0x0021E840 CGameObjectInstance__CalculateOrientationMatrix
@@ -435,29 +436,29 @@ module CGameObjectInstance: 0x00219BC0..0x0022025C, 65 functions; pad
   0x0021EBE4 CGameObjectInstance__GetDeathModels
   0x0021ECA0 CGameObjectInstance__DrawModelWithLights
   0x0021ED04 CGameObjectInstance__SubmitShadowModel
-  0x0021EE44 func_0021EE44
-  0x0021EF40 func_0021EF40
+  0x0021EE44 CGameObjectInstance__EmitFlaggedHotPoints
+  0x0021EF40 CGameObjectInstance__TraceMoveLocal
   0x0021F00C CGameObjectInstance__LocalToWorld
-  0x0021F080 func_0021F080
+  0x0021F080 GameObject_IsFacingRegionNormal
   0x0021F1A4 func_0021F1A4
-  0x0021F1B4 func_0021F1B4
-  0x0021F1D0 func_0021F1D0
-  0x0021F1F8 func_0021F1F8
+  0x0021F1B4 CGameObjectInstance__UpdateAI
+  0x0021F1D0 CGameObjectInstance__SetHotPointFlag2
+  0x0021F1F8 CGameObjectInstance__GetGeometryKind
   0x0021F268 CGameObjectInstance__GetAverageScale
-  0x0021F2B0 func_0021F2B0
+  0x0021F2B0 CGameObjectInstance__GetObjectScale
   0x0021F358 CGameObjectInstance__LoadGeometry
   0x0021F3A4 CGameObjectInstance__TouchGeometry
   0x0021F418 func_0021F418
   0x0021F420 func_0021F420
-  0x0021F428 func_0021F428
-  0x0021F4E8 func_0021F4E8
+  0x0021F428 CGameObjectInstance__GetRootOffset
+  0x0021F4E8 CGameObjectInstance__SendAnimImpactEvents
   0x0021F5B8 func_0021F5B8
   0x0021F660 func_0021F660
-  0x0021F668 func_0021F668
+  0x0021F668 CGameObjectInstance__ApplyRootMotion
   0x0021F770 CGameObjectInstance__GetBodySetup
-  0x0021F7F4 func_0021F7F4
-  0x0021F974 func_0021F974
-  0x0021F9C4 func_0021F9C4
+  0x0021F7F4 CGameObjectInstance__SwingBone
+  0x0021F974 Anim_LerpVector
+  0x0021F9C4 Anim_LerpQuaternion
   0x0021FA2C Anim_GetBoneTranslationLerp
   0x0021FB10 Anim_GetBoneRotationLerp
   0x0021FC4C Anim_GetBoneRotationSlerp
@@ -523,13 +524,13 @@ module CScene: 0x00220260..0x00226F8C, 96 functions; pad
   0x002254C0 CScene__GetLightsAt
   0x002255CC CScene__FileInstance
   0x00225778 CScene__FindNearestActor
-  0x00225848 func_00225848
-  0x0022594C func_0022594C
-  0x002259D0 func_002259D0
-  0x00225AD4 func_00225AD4
+  0x00225848 CScene__FindNearestIdleThrowable
+  0x0022594C CScene__FindNearestCover
+  0x002259D0 CScene__FindNearestIdleThrowableB
+  0x00225AD4 CScene__ReplaceLeader
   0x00225B44 CScene__DetachChildren
   0x00225B7C CScene__DamageAllEnemies
-  0x00225C08 func_00225C08
+  0x00225C08 CScene__BroadcastNoise
   0x00225C84 CScene__MarkGeneratorsSaved
   0x00225D0C CScene__UnmarkGeneratorsSaved
   0x00225D94 CScene__GetCurve
@@ -538,9 +539,9 @@ module CScene: 0x00220260..0x00226F8C, 96 functions; pad
   0x00225EBC CScene__FindIntelligence
   0x00225F6C CScene__FindInstances
   0x00226024 CScene__DrawWarpFade
-  0x00226134 func_00226134
-  0x00226160 func_00226160
-  0x002261A8 func_002261A8
+  0x00226134 CScene__GetPathHeader
+  0x00226160 CScene__GetPathPoint
+  0x002261A8 CScene__FindNearestPathPoint
   0x0022629C CScene__GetLevelName
   0x00226390 CScene__ClearListCounts
   0x002263C0 CScene__AdvanceListedInstances
@@ -569,10 +570,10 @@ module Sort: 0x00226F90..0x0022723C, 2 functions; pad
   0x00227184 Sort_Insertion
 
 module CInstancePool: 0x00227240..0x00228908, 18 functions; pad
-  // name runs (possible objects the padding cannot show): CLevelActorPool 3, CPooledLevelActor 2, CLevelActorPool 4, CInstancePool 2, CListedInstance 1, CInstancePool 4, DLights 2
+  // name runs (possible objects the padding cannot show): CLevelActorPool 2, SceneActor 1, CPooledLevelActor 2, CLevelActorPool 4, CInstancePool 2, CListedInstance 1, CInstancePool 4, DLights 2
   0x00227240 CLevelActorPool__Spawn
   0x002274A4 CLevelActorPool__Update
-  0x00227664 func_00227664
+  0x00227664 SceneActor_Init
   0x00227680 CPooledLevelActor__Update
   0x00227780 CPooledLevelActor__Release
   0x0022782C CLevelActorPool__Draw
@@ -599,9 +600,9 @@ module DLights: 0x00228910..0x00228BA4, 6 functions; pad
   0x00228B98 CDLightSet__GetNext
 
 module CSun: 0x00228BB0..0x00228C38, 7 functions; pad
-  // name runs (possible objects the padding cannot show): CSunFrameData 2, CSun 5
+  // name runs (possible objects the padding cannot show): CSunFrameData 1, Scheduler 1, CSun 5
   0x00228BB0 CSunFrameData__Construct
-  0x00228BBC func_00228BBC
+  0x00228BBC Scheduler_RDPDoneHook
   0x00228BC4 CSun__SetSunDir
   0x00228BF8 CSun__GetSunData
   0x00228C20 func_00228C20
@@ -614,7 +615,7 @@ module Color: 0x00228C40..0x00229334, 3 functions; pad
   0x002291D4 Color_Darken
 
 module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
-  // name runs (possible objects the padding cannot show): CParticle 19, CParticleSystem 2, CParticle 1, CParticleSystem 6, CParticle 24, CParticleSystem 11, CCamera 1, CParticle 1, CParticleSystem 1, Swoosh 1, Morph 2, Swoosh 1, Trail 9, Animator 1, ScreenTint 1, Quat 2, SwooshSystem 1, RibbonVtxPool 2, Swoosh 1, SwooshGroup 3, Swoosh 2, ScriptAnimator 7, SwooshSet 1, SwooshSystem 6, Path 1, Trail 4, ImpactEvent 1, Blast 3, ImpactEvent 7, Blast 5, ImpactEvent 29, Path 4, Collision 1, Sweep 6, SweepHit 2, Sweep 1, Quad 1, Plane 4, Quad 12, Sphere 1, Cylinder 1, Circle 1, Collision 1, ModelSweep 2, Collision 2, ModelSweep 1, Collision 1, Sweep 1, Collision 1, Sweep 1, CPlayer 1, Pickup 6, Sweep 1, CPlayer 1, Pickup 7
+  // name runs (possible objects the padding cannot show): CParticle 19, CParticleSystem 2, CParticle 1, CParticleSystem 2, CParticle 1, CParticleSystem 1, CParticle 26, CParticleSystem 4, Random 2, CParticle 5, CCamera 1, CParticle 1, CParticleSystem 1, Swoosh 1, Morph 2, Swoosh 1, Trail 9, Animator 1, ScreenTint 1, Quat 1, SwooshSystem 2, RibbonVtxPool 2, Swoosh 1, SwooshGroup 2, SwooshSystem 1, Swoosh 2, ScriptAnimator 4, Color 1, SwooshSystem 2, SwooshSet 1, SwooshSystem 2, Trail 1, Swoosh 1, Sprite 1, Swoosh 1, Path 1, Trail 1, Swoosh 1, SwooshSystem 2, ImpactEvent 1, Blast 3, ImpactEvent 7, Blast 4, ImpactEvent 30, Path 4, Collision 1, Sweep 6, SweepHit 2, Sweep 1, Quad 1, Plane 4, Quad 12, Sphere 1, Cylinder 1, Circle 1, Collision 1, ModelSweep 2, Collision 2, ModelSweep 1, Collision 1, Sweep 1, Collision 1, Sweep 1, CPlayer 1, Pickup 6, Sweep 1, CPlayer 1, Pickup 7
   0x00229340 CParticle__SpawnChild
   0x00229618 CParticle__Wobble
   0x002298C4 CParticle__UpdateHomingMissile
@@ -639,12 +640,12 @@ module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
   0x00230AB0 CParticle__CheckProximity
   0x00230CB4 CParticleSystem__Update
   0x0023118C CParticleSystem__Draw
-  0x002316A0 func_002316A0
+  0x002316A0 CParticle__AddDrawModeBits
   0x002316F4 CParticleSystem__FreeAll
-  0x00231778 func_00231778
-  0x002317C0 func_002317C0
+  0x00231778 CParticle__GetDrawMode
+  0x002317C0 CParticle__InitHeader
   0x002317E4 CParticle__Kill
-  0x0023181C func_0023181C
+  0x0023181C CParticle__Release
   0x002318D4 CParticle__SpawnAtWallHit
   0x00231A00 CParticle__SpawnAtFloorHit
   0x00231B2C CParticle__SpawnAtCeilingHit
@@ -660,7 +661,7 @@ module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
   0x002323E0 CParticle__FireUpdateEvent
   0x002324E8 CParticle__FireExpireEvent
   0x002325F0 CParticle__IsUnderWater
-  0x00232684 func_00232684
+  0x00232684 CParticle__IsBelowWaterSurface
   0x0023270C CParticle__GetDistanceScale
   0x002327F4 CParticle__BuildCameraMatrix
   0x002328A8 CParticle__DrawModel
@@ -670,11 +671,11 @@ module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
   0x00232B84 CParticleSystem__AllocNode
   0x00232C7C CParticleSystem__FreeOldest
   0x00232CD8 CParticleSystem__FindOwned
-  0x00232D68 func_00232D68
-  0x00232E1C func_00232E1C
+  0x00232D68 CParticleSystem__InsertDrawSorted
+  0x00232E1C Random_UpTo
   0x00232E80 func_00232E80
-  0x00232EAC func_00232EAC
-  0x00232ECC func_00232ECC
+  0x00232EAC CParticle__GetSpriteRotX
+  0x00232ECC CParticle__GetSpriteRotY
   0x00232EEC func_00232EEC
   0x00232F38 func_00232F38
   0x00232FBC func_00232FBC
@@ -697,35 +698,35 @@ module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
   0x00235510 Animator_Update
   0x00235898 ScreenTint_UpdateMode
   0x00235AD0 Quat_AlignYTo
-  0x00235C30 func_00235C30
+  0x00235C30 SwooshSystem_DrawDecals
   0x00235F48 SwooshSystem_Update
   0x00235F8C RibbonVtxPool_Alloc
   0x00235FC4 RibbonVtxPool_Reset
   0x00235FF4 Swoosh_TakeNode
   0x00236040 SwooshGroup_Remove
   0x00236098 func_00236098
-  0x002360A0 func_002360A0
+  0x002360A0 SwooshSystem_AddBonePoints
   0x00236170 Swoosh_AddParticleNode
   0x0023624C Swoosh_DetachOwner
   0x002362E4 ScriptAnimator_Start
   0x00236314 ScriptAnimator_SetScript
   0x00236324 ScriptAnimator_Apply
-  0x00236390 func_00236390
-  0x0023640C func_0023640C
-  0x00236444 func_00236444
-  0x002364A4 func_002364A4
+  0x00236390 ScriptAnimator_AddToBlend
+  0x0023640C Color_ClampByte
+  0x00236444 SwooshSystem_AddTimer
+  0x002364A4 SwooshSystem_PlaceDecal
   0x002365F8 SwooshSet_FreeOwner
   0x002366C8 SwooshSystem_UpdateSwooshes
   0x002367A0 SwooshSystem_UpdateTimers
-  0x0023685C func_0023685C
-  0x002368B0 func_002368B0
-  0x00236928 func_00236928
-  0x00236A34 func_00236A34
+  0x0023685C Trail_LoadTexture
+  0x002368B0 Swoosh_ReleaseOwner
+  0x00236928 Sprite_FromImage
+  0x00236A34 Swoosh_UpdateNodeFromOwner
   0x00236B7C Path_StoreSegmentFractions
   0x00236BC4 Trail_Draw
-  0x00236C64 func_00236C64
-  0x00236D10 func_00236D10
-  0x00236D50 func_00236D50
+  0x00236C64 Swoosh_AddNodeFromMtx
+  0x00236D10 SwooshSystem_FindSwoosh
+  0x00236D50 SwooshSystem_DrawTrails
   0x00236EA0 ImpactEvent_Send
   0x0023726C Blast_CanHit
   0x002374AC Blast_GetPush
@@ -733,26 +734,26 @@ module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
   0x00237AFC ImpactEvent_ApplyBlast
   0x00237EE4 ImpactEvent_Call
   0x00237F48 ImpactEvent_Call2
-  0x00237FAC func_00237FAC
-  0x0023801C func_0023801C
+  0x00237FAC ImpactEvent_FloodRegionFlag4
+  0x0023801C ImpactEvent_PlayPitchedSound
   0x00238114 ImpactEvent_PlaySound
-  0x00238134 func_00238134
+  0x00238134 ImpactEvent_SpawnParticle
   0x0023816C Blast_GetSourcePos
   0x00238258 func_00238258
   0x002382F8 Blast_GetSourceScale
   0x00238334 Blast_GetReach
-  0x00238500 func_00238500
+  0x00238500 ImpactEvent_FirePlayerShot
   0x0023870C ImpactEvent_DirectDamage
   0x0023876C ImpactEvent_AreaDamage
   0x002387C4 ImpactEvent_AreaDamagePush
-  0x0023881C func_0023881C
-  0x00238824 func_00238824
-  0x00238858 func_00238858
+  0x0023881C ImpactEvent_Null5
+  0x00238824 ImpactEvent_DoorOpen
+  0x00238858 ImpactEvent_DoorClose
   0x00238888 ImpactEvent_FlashScreens
-  0x0023890C func_0023890C
+  0x0023890C ImpactEvent_Null10
   0x00238914 ImpactEvent_SetWeaponFirePos
-  0x00238958 func_00238958
-  0x002389EC func_002389EC
+  0x00238958 ImpactEvent_StartShakeType1
+  0x002389EC ImpactEvent_StartShake
   0x00238A7C ImpactEvent_PlaySoundAndEffect
   0x00238B2C ImpactEvent_AreaDamage200000
   0x00238B84 ImpactEvent_AreaDamagePush200000
@@ -762,15 +763,15 @@ module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
   0x00238CE4 ImpactEvent_AreaDamagePush800000
   0x00238D3C ImpactEvent_Rumble
   0x00238DF8 ImpactEvent_LevelSpecial
-  0x00238EE4 func_00238EE4
-  0x00238FD4 func_00238FD4
-  0x00239058 func_00239058
+  0x00238EE4 ImpactEvent_PlayTeamSound
+  0x00238FD4 ImpactEvent_SpawnTeamParticle
+  0x00239058 ImpactEvent_BlastSameHeight
   0x00239130 ImpactEvent_SetHotPoint
   0x00239160 ImpactEvent_ClearHotPoint
   0x00239194 ImpactEvent_SpawnAnimInstance
-  0x00239254 func_00239254
-  0x00239350 func_00239350
-  0x00239398 func_00239398
+  0x00239254 ImpactEvent_PlayFloorSound
+  0x00239350 ImpactEvent_AIStartSound
+  0x00239398 ImpactEvent_AIStopSound
   0x002393D0 Path_ExpandNode
   0x002399F8 Path_FindRegionPath
   0x00239C28 Path_FindFleeRegion
@@ -820,13 +821,13 @@ module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
   0x0023EF30 Pickup_FindWeaponEntry
   0x0023EF64 Pickup_FindAmmoEntry
   0x0023EF98 Pickup_FindHealthEntry
-  0x0023EFCC func_0023EFCC
+  0x0023EFCC Pickup_FindLifeForceEntry
   0x0023F000 Pickup_FindItemEntry
   0x0023F034 Sweep_IsSpecialObject
   0x0023F05C CPlayer__TouchPickup
   0x0023F120 Pickup_GiveAmmo
-  0x0023F21C func_0023F21C
-  0x0023F300 func_0023F300
+  0x0023F21C Pickup_GivePistolClip
+  0x0023F300 Pickup_GivePistolAmmo
   0x0023F3E4 Pickup_GiveHealth
   0x0023F524 Pickup_GiveLifeForce
   0x0023F634 Pickup_GiveItem
@@ -906,7 +907,7 @@ module AI: 0x00241960..0x00246BBC, 48 functions; pad
   0x00246B24 AI_DropPickupsByMask
 
 module CPlayer: 0x00246BC0..0x00257A3C, 250 functions; pad
-  // name runs (possible objects the padding cannot show): CPlayer 1, CPlayerContState 1, Player 1, CPlayer 4, Player 2, CPlayer 11, Player 2, Hud 1, CPlayer 2, CBarrel 10, CPlayer 17, PlayerStand 1, PlayerWalk 1, PlayerWade 1, PlayerSwim 1, PlayerClimb 1, CPlayer 1, PlayerJumpPad 1, CPlayer 1, PlayerShock 1, CPlayerPool 1, CPlayer 1, CPlayerPool 5, Hud 1, CPlayerPool 16, ValueTracker 2, CPlayer 15, Actor 2, CPlayer 6, PlayerPool 1, CPlayer 6, Actor 1, CPlayer 11, CPlayerPool 6, CBarrel 5, CPlayer 1, CBarrel 3, CPlayer 5, Player 1, PlayerStand 1, PlayerWalk 1, PlayerJump 2, PlayerFall 1, PlayerDodge 2, PlayerDodgeFall 1, PlayerWade 1, PlayerSwim 1, PlayerState12 2, PlayerClimb 1, PlayerState15 2, PlayerState16 2, PlayerState17 2, PlayerDeathWait 2, PlayerCinema50 1, CPlayer 1, PlayerDeath0A 2, PlayerDeath32 2, PlayerDeath1E 2, PlayerDeath28 2, PlayerDeath0B 2, PlayerDeath0C 2, PlayerDeath0D 2, PlayerDeath0E 2, PlayerDeath0F 2, PlayerDeath14 2, PlayerDeath46 2, PlayerDeath3C 2, PlayerJumpPad 1, PlayerRideIdle 2, PlayerRideMove 2, PlayerShock 1, Ease 1, CPlayer 5, Actor 2, CPlayerPool 1, CPlayer 4, PickupCounter 3, Weapon 1, Actor 1, CPlayerPool 1, CPlayer 3, Hud 1, Particle 2, Angle 1, CBarrel 3, CPlayer 1, Weapon 1, CPlayer 3, Sound 2, CPlayer 2, PlayerWade 1, PlayerDeath 1, PlayerCinema50 1, CPlayer 1, CPlayerPool 2, CPlayer 1, Cinema 1, String 1
+  // name runs (possible objects the padding cannot show): CPlayer 1, CPlayerContState 1, Player 1, CPlayer 4, Player 2, CPlayer 11, Player 2, Hud 1, CPlayer 2, CBarrel 10, CPlayer 17, PlayerStand 1, PlayerWalk 1, PlayerWade 1, PlayerSwim 1, PlayerClimb 1, CPlayer 1, PlayerJumpPad 1, CPlayer 1, PlayerShock 1, CPlayerPool 1, CPlayer 1, CPlayerPool 5, Hud 1, CPlayerPool 16, ValueTracker 1, CPlayerOverlay 1, CPlayer 15, Actor 2, CPlayer 6, PlayerPool 1, CPlayer 6, Actor 1, CPlayer 11, CPlayerPool 6, CBarrel 5, CPlayer 1, CBarrel 3, CPlayer 5, Player 1, PlayerStand 1, PlayerWalk 1, PlayerJump 2, PlayerFall 1, PlayerDodge 2, PlayerDodgeFall 1, PlayerWade 1, PlayerSwim 1, PlayerState12 2, PlayerClimb 1, PlayerState15 2, PlayerState16 2, PlayerState17 2, PlayerDeathWait 2, PlayerCinema50 1, CPlayer 1, PlayerDeath0A 2, PlayerDeath32 2, PlayerDeath1E 2, PlayerDeath28 2, PlayerDeath0B 2, PlayerDeath0C 2, PlayerDeath0D 2, PlayerDeath0E 2, PlayerDeath0F 2, PlayerDeath14 2, PlayerDeath46 2, PlayerDeath3C 2, PlayerJumpPad 1, PlayerRideIdle 2, PlayerRideMove 2, PlayerShock 1, Ease 1, CPlayer 5, Actor 2, CPlayerPool 1, CPlayer 4, PickupCounter 3, Weapon 1, Actor 1, CPlayerPool 1, CPlayer 3, Hud 1, Particle 2, Angle 1, CBarrel 3, CPlayer 1, Weapon 1, CPlayer 3, Sound 2, CPlayer 2, PlayerWade 1, PlayerDeath 1, PlayerCinema50 1, CPlayer 1, CPlayerPool 2, CPlayer 1, Cinema 1, String 1
   0x00246BC0 CPlayer__ReadInput
   0x002470E8 CPlayerContState__Init
   0x00247124 Player_SwapStrafeTurnBits
@@ -990,10 +991,10 @@ module CPlayer: 0x00246BC0..0x00257A3C, 250 functions; pad
   0x0025342C CPlayerPool__FindByController
   0x00253460 CPlayerPool__CheckAllReady
   0x002534E0 CPlayerPool__EndMatch
-  0x0025359C func_0025359C
+  0x0025359C CPlayerPool__StopRumble
   0x002535E4 CPlayerPool__SetInvincibility
   0x0025360C ValueTracker_Set
-  0x00253624 func_00253624
+  0x00253624 CPlayerOverlay__Lower
   0x00253640 CPlayer__CanGetRefill
   0x002536B4 CPlayer__IsSpecialPickup
   0x002536D8 CPlayer__GetSpecialPickupIndex
@@ -1033,8 +1034,8 @@ module CPlayer: 0x00246BC0..0x00257A3C, 250 functions; pad
   0x00254640 CPlayer__UpdateSpeedScale
   0x00254704 CPlayer__TickFlashlight
   0x00254744 CPlayer__ResetLives
-  0x00254768 func_00254768
-  0x00254834 func_00254834
+  0x00254768 CPlayer__DrawSightIcon
+  0x00254834 CPlayer__DrawCenterIcon
   0x002548FC CPlayer__IsInMatchEndState
   0x0025492C CPlayerPool__UpdateMatchClock
   0x00254A5C CPlayerPool__IsScoreLimitReached
@@ -1340,10 +1341,10 @@ module EnemyAI: 0x0025AD90..0x0026060C, 119 functions; pad
   0x0025ED4C EnemyAI_DrawWithBlend
   0x0025EE38 EnemyAI_CheckOffscreen
   0x0025EEA4 EnemyAI_SleepIfOffscreen
-  0x0025EF1C func_0025EF1C
-  0x0025EF24 func_0025EF24
-  0x0025EF2C func_0025EF2C
-  0x0025EF48 func_0025EF48
+  0x0025EF1C EnemyAI_EventNull3
+  0x0025EF24 EnemyAI_EventNull4
+  0x0025EF2C EnemyAI_EventPlayCinema
+  0x0025EF48 EnemyAI_EventPlayCinemaRemote
   0x0025EF68 EnemyAI_CheckGrab
   0x0025EFF8 EnemyAnim_WaitForTrigger
   0x0025F068 EnemyMode_InteractiveIdle_Update
@@ -1622,38 +1623,38 @@ module GameObject: 0x00267090..0x00269048, 62 functions; pad
   0x00267944 GameObject_GetGroundRotation
   0x00267D2C func_00267D2C
   0x00267D60 func_00267D60
-  0x00267D94 func_00267D94
-  0x00267DBC func_00267DBC
+  0x00267D94 GameObject_IsLeader
+  0x00267DBC GameObject_IsFollower
   0x00267DE4 func_00267DE4
   0x00267E18 func_00267E18
   0x00267E4C func_00267E4C
-  0x00267E74 func_00267E74
-  0x00267EA8 func_00267EA8
-  0x00267EE8 func_00267EE8
-  0x00267F10 func_00267F10
+  0x00267E74 GameObject_IsLeashed
+  0x00267EA8 GameObject_CanClimbLedges
+  0x00267EE8 GameObject_CanClimbUp
+  0x00267F10 GameObject_CanDropDown
   0x00267F64 GameObject_CanEnterWater
   0x00267FA8 GameObject_CanLeaveWater
-  0x00267FD0 func_00267FD0
-  0x00268014 func_00268014
-  0x0026803C func_0026803C
-  0x00268080 func_00268080
-  0x002680A8 func_002680A8
-  0x002680D0 func_002680D0
-  0x002680F8 func_002680F8
-  0x00268120 func_00268120
+  0x00267FD0 GameObject_CanEnterInfoFlag52_80
+  0x00268014 GameObject_CanLeaveInfoFlag52_80
+  0x0026803C GameObject_CanEnterInfoFlag400000
+  0x00268080 GameObject_CanLeaveInfoFlag400000
+  0x002680A8 GameObject_CanEnterRegionFlag1000
+  0x002680D0 GameObject_CanLeaveRegionFlag1000
+  0x002680F8 GameObject_CanEnterRegionFlag80
+  0x00268120 GameObject_CanLeaveRegionFlag80
   0x00268148 func_00268148
   0x00268150 func_00268150
   0x00268158 func_00268158
-  0x00268160 func_00268160
-  0x002681BC func_002681BC
+  0x00268160 GameObject_CastsShadow
+  0x002681BC GameObject_IsMover
   0x00268210 func_00268210
-  0x002682A4 func_002682A4
+  0x002682A4 GameObject_TiltsToGround
   0x002682B8 GameObject_IsEnemy
-  0x002682CC func_002682CC
+  0x002682CC GameObject_IsInanimate
   0x00268304 GameObject_GetWallRadius
   0x002683CC GameObject_GetDeadCollisionHeight
-  0x0026841C func_0026841C
-  0x00268460 func_00268460
+  0x0026841C GameObject_GetCollisionYOffset
+  0x00268460 GameObject_GetSweepRadius
   0x00268508 GameObject_GetAttackCombatRadius
   0x00268534 GameObject_GetLeashRadius
   0x00268560 GameObject_GetFloorPointAt
@@ -1670,7 +1671,7 @@ module GameObject: 0x00267090..0x00269048, 62 functions; pad
   0x00268AB4 GameObject_GetViewWaterHeight
   0x00268B50 GameObject_GetRegionTopAbove
   0x00268B98 GameObject_GetHeightAboveRegionBottom
-  0x00268BE0 func_00268BE0
+  0x00268BE0 GameObject_HasFlag1
   0x00268C04 GameObject_GetTypeId
   0x00268C48 GameObject_DropPickupAt
   0x00268E60 GameObject_GetFloorKind
@@ -1708,8 +1709,8 @@ module CGameRegion: 0x00269A90..0x0026D068, 53 functions; pad
   0x0026BD20 CGameRegion__GetNormal
   0x0026BE60 CGameRegion__GetHeight
   0x0026BFB4 CGameRegion__GetCeilingNormalRaw
-  0x0026C0E0 func_0026C0E0
-  0x0026C114 func_0026C114
+  0x0026C0E0 CGameRegion__GetFloorSurface
+  0x0026C114 CGameRegion__GetWallSurface
   0x0026C148 CGameRegion__IntersectWater
   0x0026C240 CGameRegion__GetEdgeYaw
   0x0026C308 CGameRegion__GetEdgeDirection
@@ -1718,11 +1719,11 @@ module CGameRegion: 0x00269A90..0x0026D068, 53 functions; pad
   0x0026C590 CGameRegion__FloodClearFlag4
   0x0026C5C4 CGameRegion__FloodSetWater
   0x0026C678 CGameRegion__FloodClearWater
-  0x0026C724 func_0026C724
-  0x0026C764 func_0026C764
-  0x0026C7A8 func_0026C7A8
-  0x0026C804 func_0026C804
-  0x0026C844 func_0026C844
+  0x0026C724 CGameRegion__SetFlag80000
+  0x0026C764 CGameRegion__ClearFlag80000
+  0x0026C7A8 CGameRegion__SetFlag4000
+  0x0026C804 CGameRegion__SetFlag40000
+  0x0026C844 CGameRegion__ClearFlag40000
   0x0026C888 CGameRegion__SetGroupHeight
   0x0026C8B0 CGameRegion__FloodSetFlag4Same
   0x0026C934 CGameRegion__FloodClearFlag4Same
@@ -1752,7 +1753,7 @@ module HalfToFloat: 0x0026D200..0x0026D228, 2 functions; pad
 
 module GameObject#3: 0x0026D230..0x0026E758, 31 functions; pad
   // name runs (possible objects the padding cannot show): DList 4, NodePool 3, WeightedTable 4, GameObject 1, LevelEvent 1, GameObject 1, CGameRegion 1, LevelEvent 2, Event 12, LevelEvent 2
-  0x0026D230 func_0026D230
+  0x0026D230 DList_Init
   0x0026D240 DList_AddHead
   0x0026D288 DList_AddTail
   0x0026D2D0 DList_Remove
@@ -1768,7 +1769,7 @@ module GameObject#3: 0x0026D230..0x0026E758, 31 functions; pad
   0x0026E110 GameObject_FireTriggers
   0x0026E19C CGameRegion__FireTriggers
   0x0026E210 LevelEvent_Trigger
-  0x0026E294 func_0026E294
+  0x0026E294 LevelEvent_MarkFired
   0x0026E2FC Event_Hide
   0x0026E318 Event_Show
   0x0026E348 Event_PlayCinema
@@ -1777,8 +1778,8 @@ module GameObject#3: 0x0026D230..0x0026E758, 31 functions; pad
   0x0026E3EC Event_PlaySound
   0x0026E40C Event_SetMusicRemote
   0x0026E42C Event_PlaySoundRemote
-  0x0026E44C func_0026E44C
-  0x0026E46C func_0026E46C
+  0x0026E44C Event_SetAmbient
+  0x0026E46C Event_SetAmbientRemote
   0x0026E48C Event_DisableCollision
   0x0026E4A4 Event_EnableCollision
   0x0026E4B8 LevelEvent_ProcessTriggers
@@ -1789,7 +1790,7 @@ module Rumble: 0x0026E760..0x0026EE24, 10 functions; pad
   0x0026E760 Rumble_GetLevelAt
   0x0026E928 Rumble_Init
   0x0026E9D8 Rumble_ClearLink
-  0x0026E9EC func_0026E9EC
+  0x0026E9EC Rumble_SetLink
   0x0026E9F4 Rumble_IsFinished
   0x0026EA48 Rumble_GetLevelOne
   0x0026EB3C RumblePool_Init
@@ -1897,7 +1898,7 @@ module CAudioWorld: 0x0026F080..0x00274B34, 101 functions; pad
   0x002742F4 SndVoicePool_StopByFlags
   0x002743D0 Sound_DistanceFalloff
   0x00274440 Sound_CentsToPitch
-  0x002744D0 func_002744D0
+  0x002744D0 Sound_RandomVary
   0x00274560 Sound_RandomVolume
   0x002745DC Sound_DistanceAttenuation
   0x002746AC SndVoice_SetVolume
@@ -1982,19 +1983,19 @@ module SndQueue: 0x00275FA0..0x00276814, 12 functions; pad
   0x002766C8 SndQueue_CancelSoundId
   0x0027672C SndQueue_CancelOwner
   0x00276790 SndQueue_CancelFlags
-  0x002767F8 func_002767F8
+  0x002767F8 SndQueue_LinkHead
 
 module SoundEffectInfo: 0x00276820..0x002768C8, 14 functions; pad
   0x00276820 SoundEffectInfo_GetGroup
   0x0027682C SoundEffectInfo_GetSample
   0x00276838 SoundEffectInfo_GetPriority
   0x00276844 SoundEffectInfo_GetChance
-  0x00276850 func_00276850
-  0x0027685C func_0027685C
+  0x00276850 SoundEffectInfo_GetField08
+  0x0027685C SoundEffectInfo_GetField0A
   0x00276868 SoundEffectInfo_GetPan
   0x00276874 SoundEffectInfo_GetPitch
-  0x00276880 func_00276880
-  0x0027688C func_0027688C
+  0x00276880 SoundEffectInfo_GetField0F
+  0x0027688C SoundEffectInfo_GetField10
   0x00276898 SoundEffectInfo_GetFlags
   0x002768A4 SoundEffectInfo_GetRandomRange0
   0x002768B0 SoundEffectInfo_GetRandomRange1
@@ -2010,7 +2011,7 @@ module SpeechPlayer: 0x002768D0..0x00277088, 7 functions; pad
   0x00277024 SpeechPlayer_StopUnlocked
 
 module Hud: 0x00277090..0x0027BB7C, 50 functions; pad
-  // name runs (possible objects the padding cannot show): COnScreen 1, COverlay 1, Hud 3, COnScreen 5, Hud 1, COnScreen 2, Hud 8, COverlay 2, COnScreen 8, Hud 4, COnScreen 3, Hud 1, COnScreen 1, Hud 1, COnScreen 2, Hud 4, COnScreen 3
+  // name runs (possible objects the padding cannot show): COnScreen 1, COverlay 1, Hud 3, COnScreen 5, Hud 1, COnScreen 2, Hud 8, COverlay 2, COnScreen 7, Hud 5, COnScreen 3, Hud 1, COnScreen 1, Hud 1, COnScreen 2, Hud 4, COnScreen 3
   0x00277090 COnScreen__DrawBossBar
   0x00277328 COverlay__Update
   0x00277668 Hud_DrawBoxOutline
@@ -2041,7 +2042,7 @@ module Hud: 0x00277090..0x0027BB7C, 50 functions; pad
   0x0027AD98 COnScreen__ClearBoss
   0x0027ADA0 COnScreen__ClearBoss2
   0x0027ADA8 COnScreen__DrawBossBars
-  0x0027AE00 func_0027AE00
+  0x0027AE00 Hud_LoadGraphicSet
   0x0027AE44 Hud_GetImageFrame
   0x0027AEA8 Hud_GetSpriteSize
   0x0027AF4C Hud_SetupFillMode
@@ -2068,8 +2069,8 @@ module Demo: 0x0027BB80..0x0027BD0C, 3 functions; pad
   0x0027BC68 Demo_AdvanceMatchStream
 
 module CCamera: 0x0027BD10..0x0028233C, 67 functions; pad
-  // name runs (possible objects the padding cannot show): CShakeAxis 2, CShake 1, CCamera 8, CCameraPool 2, CCamera 1, CCameraPool 3, CCamera 2, CCameraViewParams 1, CCamera 20, CCameraPool 8, CCamera 1, CCameraPool 2, CCameraText 1, CShakeAxis 3, CShake 3, CCamera 3, CCameraPool 6
-  0x0027BD10 func_0027BD10
+  // name runs (possible objects the padding cannot show): CIntelligence 1, CShakeAxis 1, CShake 1, CCamera 8, CCameraPool 2, CCamera 1, CCameraPool 3, CCamera 2, CCameraViewParams 1, CCamera 20, CCameraPool 8, CCamera 1, CCameraPool 2, CCameraText 1, CShakeAxis 3, CShake 3, CCamera 3, CCameraPool 6
+  0x0027BD10 CIntelligence__Init
   0x0027BD30 CShakeAxis__Advance
   0x0027BE90 CShake__ApplyOffset
   0x0027C074 CCamera__UpdateFlash
@@ -2175,7 +2176,7 @@ module Cinema: 0x002837E0..0x00284654, 34 functions; pad
   0x002842F8 Cinema_FollowsPlayer
   0x00284330 Cinema_OverridesMusic2
   0x00284358 Cinema_OverridesMusic1
-  0x00284380 func_00284380
+  0x00284380 Cinema_SetHoldFade
   0x00284390 Cinema_GetCameraFov
   0x002843D4 Cinema_GetFarClip
   0x002843F4 Cinema_GetFogColor
@@ -2234,7 +2235,7 @@ module Controller: 0x002847E0..0x00285CE8, 37 functions; pad
   0x00285CD4 Controller_EnableMenuSounds
 
 module CEngineApp: 0x00285CF0..0x0028A018, 90 functions; pad
-  // name runs (possible objects the padding cannot show): EngineMode03 1, EngineMode07 1, Credits 2, CEngineApp 4, Render 1, CEngineApp 2, Engine 1, CEngineApp 7, Util 2, Engine 1, mainproc 2, CEngineApp 11, EngineMode13 2, EngineMode00 3, EngineMode01 3, EngineMode03 2, EngineMode02 3, EngineMode04 3, EngineMode05 3, EngineMode06 3, EngineMode07 2, EngineMode08 3, EngineMode09 3, EngineMode11 3, EngineMode10 3, EngineMode12 3, EngineMode13 2, EngineMode14 3, EngineMode15 3, EngineMode16 3, EngineMode17 5
+  // name runs (possible objects the padding cannot show): EngineMode03 1, EngineMode07 1, Credits 2, CEngineApp 4, Render 1, CEngineApp 2, Engine 1, CEngineApp 7, Util 2, Engine 1, mainproc 1, CEngineApp 12, EngineMode13 2, EngineMode00 3, EngineMode01 3, EngineMode03 2, EngineMode02 3, EngineMode04 3, EngineMode05 3, EngineMode06 3, EngineMode07 2, EngineMode08 3, EngineMode09 3, EngineMode11 3, EngineMode10 3, EngineMode12 3, EngineMode13 2, EngineMode14 3, EngineMode15 3, EngineMode16 3, EngineMode17 3, CEngineApp 2
   0x00285CF0 EngineMode03_ExpansionPak_Draw
   0x00285E60 EngineMode07_Title_Draw
   0x002860A4 Credits_Draw
@@ -2258,7 +2259,7 @@ module CEngineApp: 0x00285CF0..0x0028A018, 90 functions; pad
   0x00288800 Util_StrCpy
   0x00288838 Engine_Idle
   0x00288860 mainproc
-  0x002888BC func_002888BC
+  0x002888BC CEngineApp__NewGame
   0x0028891C CEngineApp__InitFade
   0x0028894C CEngineApp__UpdateFade
   0x00288B1C CEngineApp__DrawFade
@@ -2323,8 +2324,8 @@ module CEngineApp: 0x00285CF0..0x0028A018, 90 functions; pad
   0x00289D94 EngineMode17_Switch_Init
   0x00289DFC EngineMode17_Switch_Retrace
   0x00289F28 EngineMode17_Switch_Draw
-  0x00289F30 func_00289F30
-  0x00289FE4 func_00289FE4
+  0x00289F30 CEngineApp__CheckEndCinema
+  0x00289FE4 CEngineApp__StopRumble
 
 module __scHandleRSP: 0x0028A020..0x0028B424, 17 functions; pad
   // name runs (possible objects the padding cannot show): __scMain 1, __scHandleRetrace 1, __scHandleRSP 1, __scHandleRDP 1, __scSchedule 1, osCreateScheduler 1, osScAddClient 1, osScRemoveClient 1, osScGetCmdQ 1, __scAppendList 1, __scTaskReady 1, __scTaskComplete 1, __scExec 1, __scYield 1, Sched 3
@@ -3102,18 +3103,18 @@ module osPiGetCmdQueue: 0x002A3060..0x002A3088, 1 functions; pad
   0x002A3060 osPiGetCmdQueue
 
 module exception_stubs: 0x002A3088..0x002A3280, 7 functions; known + known: exception-vector stubs, asm (docs/ASM_ORIGIN.md)
-  0x002A3088 func_002A3088
-  0x002A3100 func_002A3100
-  0x002A31AC func_002A31AC
-  0x002A31C8 func_002A31C8
-  0x002A31E4 func_002A31E4
-  0x002A31F0 func_002A31F0
-  0x002A31FC func_002A31FC
+  0x002A3088 HostIo_VectorStubs
+  0x002A3100 HostIo_InstallVectors
+  0x002A31AC HostIo_InvalICacheAll
+  0x002A31C8 HostIo_InvalDCacheAll
+  0x002A31E4 HostIo_GetSR
+  0x002A31F0 HostIo_SetSR
+  0x002A31FC HostIo_ReadTlb
 
 module exception_context: 0x002A3708..0x002A3AD4, 3 functions; gap + known + known: exception context save/return, asm (docs/ASM_ORIGIN.md)
-  0x002A3708 func_002A3708
-  0x002A3774 func_002A3774
-  0x002A37CC func_002A37CC
+  0x002A3708 HostIo_RestoreVectors
+  0x002A3774 HostIo_ExceptionReturn
+  0x002A37CC HostIo_SaveContext
 
 module libgcc/_divdi3: 0x002A3AE0..0x002A40CC, 1 functions; known + pad + known: GCC 2.8.1 libgcc2.c L_divdi3 (file header)
   0x002A3AE0 __divdi3
@@ -3468,7 +3469,7 @@ module Cinema#2: 0x0040F240..0x00413228, 44 functions; pad
   0x004131B0 Cinema_IsWaitCue
 
 module MenuItem: 0x00413230..0x00417484, 52 functions; pad
-  // name runs (possible objects the padding cannot show): MenuItem 7, Menu 5, MenuPool 1, MenuItem 6, Menu 2, MenuItem 2, Menu 3, MenuPool 9, MenuItem 1, Menu 5, MenuItemDesc 2, MenuItem 4, MenuModel 2, Menu 1, MenuPool 2
+  // name runs (possible objects the padding cannot show): MenuItem 7, Menu 5, MenuPool 1, MenuItem 5, Menu 3, MenuItem 2, Menu 3, MenuPool 9, MenuItem 1, Menu 5, MenuItemDesc 2, MenuItem 4, MenuModel 2, Menu 1, MenuPool 2
   0x00413230 MenuItem_FormatBinding
   0x004133A4 MenuItem_UpdateBinding
   0x0041363C MenuItem_Layout
@@ -3487,7 +3488,7 @@ module MenuItem: 0x00413230..0x00417484, 52 functions; pad
   0x00416188 MenuItem_DrawChar
   0x004161B4 MenuItem_DrawBinding
   0x00416214 MenuItem_SetModel
-  0x004162E4 func_004162E4
+  0x004162E4 Menu_GetControllerInput
   0x004162FC Menu_CharWidth
   0x004163C0 Menu_TextWidth
   0x00416454 MenuItem_SelectSubmenu
@@ -3529,7 +3530,7 @@ module MpMenu: 0x00417490..0x0041A3A8, 110 functions; pad
   0x0041778C MpMenu_StartTeamBlood
   0x00417910 WeaponsMenu_ToggleLabel
   0x00417ACC Menu_ClaimPressingController
-  0x00417B74 func_00417B74
+  0x00417B74 Menu_SetPakWatch
   0x00417BB0 Mp_SetupMatchRules
   0x00417C0C Mp_JoinPressingController
   0x00417CA0 Menu_FindPressingController
@@ -3550,7 +3551,7 @@ module MpMenu: 0x00417490..0x0041A3A8, 110 functions; pad
   0x0041812C PlayerSetupMenu_Play
   0x00418158 PlayerSetupMenu_ControlTypeLabel
   0x004181A4 CharacterMenu_Init
-  0x004181C8 func_004181C8
+  0x004181C8 CharacterMenu_InitAfterPak
   0x004181F4 CharacterMenu_Poll
   0x0041822C CharacterMenu_LoadSelect
   0x0041828C CharacterMenu_LoadUpdate
@@ -3597,7 +3598,7 @@ module MpMenu: 0x00417490..0x0041A3A8, 110 functions; pad
   0x004194F8 DeathmatchMenu_OpenTeamBlood
   0x00419534 DeathmatchMenu_OpenWeapons
   0x00419560 SingleMenu_Init
-  0x00419594 func_00419594
+  0x00419594 SingleMenu_InitAfterPak
   0x004195C0 SingleMenu_NewGame
   0x00419618 SingleMenu_Load
   0x00419664 SingleMenu_GoBack
@@ -3629,8 +3630,8 @@ module MpMenu: 0x00417490..0x0041A3A8, 110 functions; pad
   0x0041A028 SoundMenu_StepMusicTrack
   0x0041A0CC SoundMenu_MusicTrackLabel
   0x0041A140 PauseMenu_SoundOptions
-  0x0041A1D8 func_0041A1D8
-  0x0041A234 func_0041A234
+  0x0041A1D8 PauseMenu_ResolutionText
+  0x0041A234 PauseMenu_ToggleResolution
   0x0041A254 PauseMenu_Init
   0x0041A32C PauseMenu_Close
   0x0041A38C PauseMenu_Update
@@ -3757,7 +3758,7 @@ module NameEntryMenu: 0x0041D050..0x0041D884, 8 functions; pad
   0x0041D84C NameEntryMenu_IsMatchOver
 
 module PakMenu: 0x0041D890..0x00424A5C, 140 functions; pad
-  // name runs (possible objects the padding cannot show): SaveGame 1, PakMenu 16, GameNoteMenu 1, CharNoteMenu 1, PakMessage 1, PakConfirmMenu 2, PakMenu 3, Pak 6, PakMenu 2, SaveGame 1, PakMenu 16, GameNoteMenu 10, CharNoteMenu 10, PakMessage 25, SavePortalMenu 10, DamagedPakMenu 10, PakConfirmMenu 13, Video 8, InventoryMenu 4
+  // name runs (possible objects the padding cannot show): SaveGame 1, PakMenu 16, GameNoteMenu 1, CharNoteMenu 1, PakMessage 1, PakConfirmMenu 2, PakMenu 2, Pak 7, PakMenu 2, SaveGame 1, PakMenu 16, GameNoteMenu 10, CharNoteMenu 10, PakMessage 24, SavePortalMenu 11, DamagedPakMenu 10, PakConfirmMenu 13, Video 8, InventoryMenu 4
   0x0041D890 SaveGame_Build
   0x0041DA28 PakMenu_UpdateNoteRows
   0x0041DC5C PakMenu_GetReturnMenu
@@ -3782,7 +3783,7 @@ module PakMenu: 0x0041D890..0x00424A5C, 140 functions; pad
   0x00420F34 PakConfirmMenu_SelectNo
   0x004211AC PakMenu_PickDefaultPort
   0x0042123C PakMenu_HasPort
-  0x00421250 func_00421250
+  0x00421250 Pak_ClearDamagedContinued
   0x00421260 Pak_IsTurok2Note
   0x004212EC Pak_GetBufferSize
   0x0042130C Pak_SetBufferSize
@@ -3800,9 +3801,9 @@ module PakMenu: 0x0041D890..0x00424A5C, 140 functions; pad
   0x004218C4 PakMenu_PollBootPak
   0x004219A8 PakMenu_GetPlayerAndPort
   0x004219E0 PakMenu_ProbeOwnerPort
-  0x00421A20 func_00421A20
+  0x00421A20 PakMenu_UnwatchAndWarp
   0x00421A54 PakMenu_FindNoteByName
-  0x00421AEC func_00421AEC
+  0x00421AEC PakMenu_GetStatsReturnMenu
   0x00421B50 PakMenu_FindNextPakPort
   0x00421BE4 PakMenu_UpdateModeText
   0x00421CA0 PakMenu_UpdateTitle
@@ -3820,7 +3821,7 @@ module PakMenu: 0x0041D890..0x00424A5C, 140 functions; pad
   0x00422124 GameNoteMenu_SelectNo
   0x00422190 CharNoteMenu_InitLoad
   0x004221AC CharNoteMenu_InitDelete
-  0x004221C4 func_004221C4
+  0x004221C4 CharNoteMenu_InitSave
   0x00422204 CharNoteMenu_UpdateTitle
   0x00422258 CharNoteMenu_UpdateName
   0x00422314 CharNoteMenu_UpdateType
@@ -3852,7 +3853,7 @@ module PakMenu: 0x0041D890..0x00424A5C, 140 functions; pad
   0x00422C34 PakMessage_UpdateLine4
   0x00422D60 PakMessage_UpdateLine5
   0x00422E8C PakMessage_UpdateOk
-  0x00422ED8 func_00422ED8
+  0x00422ED8 SavePortalMenu_IsCinemaPlaying
   0x00422F14 SavePortalMenu_Init
   0x00422FC0 SavePortalMenu_InitB
   0x00423040 SavePortalMenu_Poll
@@ -3890,7 +3891,7 @@ module PakMenu: 0x0041D890..0x00424A5C, 140 functions; pad
   0x00424008 Video_ResizeViMode
   0x004242EC Video_NextResolution
   0x00424508 Video_SetResolution
-  0x0042452C func_0042452C
+  0x0042452C Video_StartResolutionChange
   0x0042454C Video_UpdateResolution
   0x004245E0 Video_GetResolutionText
   0x0042464C Video_SetMode
@@ -4040,9 +4041,9 @@ module CScene#2: 0x00429F20..0x0042CF84, 25 functions; pad + ultralib
   0x0042C560 CScene__FindNearestWarpDest
   0x0042C700 CScene__RequestWarp
   0x0042C758 CScene__SetupLighting
-  0x0042C79C func_0042C79C
-  0x0042C840 func_0042C840
-  0x0042C96C func_0042C96C
+  0x0042C79C CScene__RestoreFiredEvents
+  0x0042C840 CScene__ReapplyFiredEvents
+  0x0042C96C CScene__FlushDelayedEvents
   0x0042C9DC CScene__UnloadLevel
   0x0042CAB4 CScene__DecompressParticles
   0x0042CBE4 CScene__DecompressIntelligence
@@ -4054,8 +4055,8 @@ module SceneActorPool: 0x0042CF90..0x0042D114, 2 functions; pad
   0x0042CF90 SceneActorPool_Construct
   0x0042D0A0 CInstancePool__Construct
 
-module unk_0042D120: 0x0042D120..0x0042D1B8, 1 functions; pad
-  0x0042D120 func_0042D120
+module CDLightSet: 0x0042D120..0x0042D1B8, 1 functions; pad
+  0x0042D120 CDLightSet__Construct
 
 module Light: 0x0042D1C0..0x0042D214, 1 functions; pad
   0x0042D1C0 Light_SetDefaultDirection
@@ -4063,8 +4064,8 @@ module Light: 0x0042D1C0..0x0042D214, 1 functions; pad
 module CParticleSystem: 0x0042D220..0x0042D408, 1 functions; pad
   0x0042D220 CParticleSystem__Construct
 
-module unk_0042D410: 0x0042D410..0x0042D50C, 1 functions; pad
-  0x0042D410 func_0042D410
+module SwooshSystem: 0x0042D410..0x0042D50C, 1 functions; pad
+  0x0042D410 SwooshSystem_Construct
 
 module CPlayer#2: 0x0042DA60..0x0042EB4C, 13 functions; pad
   // name runs (possible objects the padding cannot show): CPlayer 6, CPlayerPool 3, CPlayer 4
@@ -4085,10 +4086,10 @@ module CPlayer#2: 0x0042DA60..0x0042EB4C, 13 functions; pad
 module COnScreen: 0x0042EB50..0x0042EC2C, 3 functions; pad
   0x0042EB50 COnScreen__Construct
   0x0042EBB4 func_0042EBB4
-  0x0042EBBC func_0042EBBC
+  0x0042EBBC COnScreen__ResetBossBars
 
 module Demo#2: 0x0042EC30..0x00430068, 28 functions; pad
-  // name runs (possible objects the padding cannot show): Demo 9, DemoStream 4, Bits 1, DemoStream 2, Demo 5, CCamera 1, CCameraPool 5, CEmitterPool 1
+  // name runs (possible objects the padding cannot show): Demo 9, DemoStream 4, Bits 1, DemoStream 2, Demo 2, DemoStream 1, Demo 2, CCamera 1, CCameraPool 5, CEmitterPool 1
   0x0042EC30 Demo_ReadRunLength
   0x0042ECF0 Demo_DecodeButtons
   0x0042EF2C Demo_Start
@@ -4100,14 +4101,14 @@ module Demo#2: 0x0042EC30..0x00430068, 28 functions; pad
   0x0042F590 Demo_PlayNext
   0x0042F600 DemoStream_Init
   0x0042F630 DemoStream_Decode
-  0x0042F650 func_0042F650
-  0x0042F670 func_0042F670
+  0x0042F650 DemoStream_CallHandler2
+  0x0042F670 DemoStream_RunHandler2
   0x0042F6A4 Bits_Test
   0x0042F6C8 DemoStream_ReadBit
   0x0042F700 DemoStream_ReadBits
   0x0042F75C Demo_DecodeStick
   0x0042F7C8 Demo_DecodeMatch
-  0x0042F838 func_0042F838
+  0x0042F838 DemoStream_Tick
   0x0042F868 Demo_UpdateChecksum
   0x0042F958 Demo_UpdateMatchStream
   0x0042F9B0 CCamera__Construct
@@ -4122,14 +4123,15 @@ module Cont: 0x00430070..0x00430298, 2 functions; pad
   0x00430070 Cont_InitAll
   0x004301C8 Cont_ResetSlot
 
-module unk_004302A0: 0x004302A0..0x004304FC, 4 functions; pad
-  0x004302A0 func_004302A0
-  0x00430330 func_00430330
-  0x004303AC func_004303AC
-  0x00430454 func_00430454
+module CEngineApp#2: 0x004302A0..0x004304FC, 4 functions; pad
+  // name runs (possible objects the padding cannot show): Render 1, CEngineApp 3
+  0x004302A0 Render_InitUnitQuad
+  0x00430330 CEngineApp__QuitToLegal
+  0x004303AC CEngineApp__StartCinemaGame
+  0x00430454 CEngineApp__StartGame
 
-module unk_00430500: 0x00430500..0x004307A8, 1 functions; pad
-  0x00430500 func_00430500
+module Automap: 0x00430500..0x004307A8, 1 functions; pad
+  0x00430500 Automap_ClearBuffers
 
 module Primagen_2: 0x00403C14..0x00407F14, 58 functions; region
   0x00403C14 Primagen_SetStage_2
@@ -4401,7 +4403,7 @@ module Cinema_2: 0x0040F240..0x00413228, 44 functions; pad
   0x004131B0 Cinema_IsWaitCue_2
 
 module MenuItem_2: 0x00413230..0x00417484, 52 functions; pad
-  // name runs (possible objects the padding cannot show): MenuItem 7, Menu 5, MenuPool 1, MenuItem 6, Menu 2, MenuItem 2, Menu 3, MenuPool 9, MenuItem 1, Menu 5, MenuItemDesc 2, MenuItem 4, MenuModel 2, Menu 1, MenuPool 2
+  // name runs (possible objects the padding cannot show): MenuItem 7, Menu 5, MenuPool 1, MenuItem 5, Menu 3, MenuItem 2, Menu 3, MenuPool 9, MenuItem 1, Menu 5, MenuItemDesc 2, MenuItem 4, MenuModel 2, Menu 1, MenuPool 2
   0x00413230 MenuItem_FormatBinding_2
   0x004133A4 MenuItem_UpdateBinding_2
   0x0041363C MenuItem_Layout_2
@@ -4420,7 +4422,7 @@ module MenuItem_2: 0x00413230..0x00417484, 52 functions; pad
   0x00416188 MenuItem_DrawChar_2
   0x004161B4 MenuItem_DrawBinding_2
   0x00416214 MenuItem_SetModel_2
-  0x004162E4 func_0044F2E4
+  0x004162E4 Menu_GetControllerInput_2
   0x004162FC Menu_CharWidth_2
   0x004163C0 Menu_TextWidth_2
   0x00416454 MenuItem_SelectSubmenu_2
@@ -4456,13 +4458,13 @@ module MenuItem_2: 0x00413230..0x00417484, 52 functions; pad
   0x00417418 MenuPool_CloseMenu_2
 
 module MpMenu_2: 0x00417490..0x0041A308, 110 functions; pad
-  // name runs (possible objects the padding cannot show): MpMenu 3, WeaponsMenu 1, Menu 2, Mp 2, Menu 1, Mp 1, FinalScoreMenu 5, RumbleMenu 2, PlayerSetupMenu 8, CharacterMenu 7, TeamMenu 8, FragTagMenu 5, MpMenu 22, WeaponsMenu 3, DeathmatchMenu 2, SingleMenu 5, TitleMenu 7, QuitMenu 2, Menu 2, PauseMenu 7, SoundMenu 9, PauseMenu 6
+  // name runs (possible objects the padding cannot show): MpMenu 3, WeaponsMenu 1, Menu 2, Mp 2, Menu 1, Mp 1, FinalScoreMenu 5, RumbleMenu 2, PlayerSetupMenu 8, CharacterMenu 7, TeamMenu 3, FragTagMenu 10, MpMenu 2, BloodLustMenu 10, TeamBloodMenu 10, WeaponsMenu 1, DeathmatchMenu 4, SingleMenu 5, TitleMenu 7, QuitMenu 2, Menu 2, PauseMenu 7, SoundMenu 9, PauseMenu 6
   0x00417490 MpMenu_StartFragTag_2
   0x0041760C MpMenu_StartBloodLust_2
   0x0041778C MpMenu_StartTeamBlood_2
   0x00417910 WeaponsMenu_ToggleLabel_2
   0x00417ACC Menu_ClaimPressingController_2
-  0x00417B74 func_00450B74
+  0x00417B74 Menu_SetPakWatch_2
   0x00417BB0 Mp_SetupMatchRules_2
   0x00417C0C Mp_JoinPressingController_2
   0x00417CA0 Menu_FindPressingController_2
@@ -4480,10 +4482,10 @@ module MpMenu_2: 0x00417490..0x0041A308, 110 functions; pad
   0x00418040 PlayerSetupMenu_StepControlType_2
   0x0041808C PlayerSetupMenu_EditName_2
   0x004180B8 PlayerSetupMenu_NameLabel_2
-  0x004180DC func_004510DC
+  0x004180DC PlayerSetupMenu_Play_2
   0x00418108 PlayerSetupMenu_ControlTypeLabel_2
   0x00418154 CharacterMenu_Init_2
-  0x00418178 func_00451178
+  0x00418178 CharacterMenu_InitAfterPak_2
   0x004181A4 CharacterMenu_Poll_2
   0x004181B4 CharacterMenu_LoadSelect_2
   0x00418214 CharacterMenu_LoadUpdate_2
@@ -4492,78 +4494,78 @@ module MpMenu_2: 0x00417490..0x0041A308, 110 functions; pad
   0x00418310 TeamMenu_Poll_2
   0x00418320 TeamMenu_ChooseBlue_2
   0x00418368 TeamMenu_ChooseRed_2
-  0x004183B4 func_004513B4
-  0x00418408 func_00451408
-  0x00418490 func_00451490
-  0x004184E4 func_004514E4
-  0x0041856C func_0045156C
+  0x004183B4 FragTagMenu_StepTimeLimit_2
+  0x00418408 FragTagMenu_TimeLimitLabel_2
+  0x00418490 FragTagMenu_StepTagLimit_2
+  0x004184E4 FragTagMenu_TagLimitLabel_2
+  0x0041856C FragTagMenu_StepLevel_2
   0x004185C0 FragTagMenu_LevelLabel_2
-  0x0041865C func_0045165C
-  0x004186B0 func_004516B0
-  0x0041876C func_0045176C
-  0x004187BC func_004517BC
+  0x0041865C FragTagMenu_StepTextureSet_2
+  0x004186B0 FragTagMenu_TextureSetLabel_2
+  0x0041876C FragTagMenu_StepCrosshairs_2
+  0x004187BC FragTagMenu_CrosshairsLabel_2
   0x00418804 MpMenu_StepPlayerSpeed_2
   0x0041890C MpMenu_PlayerSpeedLabel_2
-  0x00418994 func_00451994
-  0x004189E8 func_004519E8
-  0x00418A70 func_00451A70
-  0x00418AC4 func_00451AC4
-  0x00418B4C func_00451B4C
-  0x00418BA0 func_00451BA0
-  0x00418CAC func_00451CAC
-  0x00418D00 func_00451D00
-  0x00418DBC func_00451DBC
-  0x00418E0C func_00451E0C
-  0x00418E54 func_00451E54
-  0x00418EA8 func_00451EA8
-  0x00418F30 func_00451F30
-  0x00418F84 func_00451F84
-  0x0041900C func_0045200C
-  0x00419060 func_00452060
-  0x0041916C func_0045216C
-  0x004191C0 func_004521C0
-  0x0041927C func_0045227C
-  0x004192CC func_004522CC
+  0x00418994 BloodLustMenu_StepTimeLimit_2
+  0x004189E8 BloodLustMenu_TimeLimitLabel_2
+  0x00418A70 BloodLustMenu_StepFragLimit_2
+  0x00418AC4 BloodLustMenu_FragLimitLabel_2
+  0x00418B4C BloodLustMenu_StepLevel_2
+  0x00418BA0 BloodLustMenu_LevelLabel_2
+  0x00418CAC BloodLustMenu_StepTextureSet_2
+  0x00418D00 BloodLustMenu_TextureSetLabel_2
+  0x00418DBC BloodLustMenu_StepCrosshairs_2
+  0x00418E0C BloodLustMenu_CrosshairsLabel_2
+  0x00418E54 TeamBloodMenu_StepTimeLimit_2
+  0x00418EA8 TeamBloodMenu_TimeLimitLabel_2
+  0x00418F30 TeamBloodMenu_StepFragLimit_2
+  0x00418F84 TeamBloodMenu_FragLimitLabel_2
+  0x0041900C TeamBloodMenu_StepLevel_2
+  0x00419060 TeamBloodMenu_LevelLabel_2
+  0x0041916C TeamBloodMenu_StepTextureSet_2
+  0x004191C0 TeamBloodMenu_TextureSetLabel_2
+  0x0041927C TeamBloodMenu_StepCrosshairs_2
+  0x004192CC TeamBloodMenu_CrosshairsLabel_2
   0x00419314 WeaponsMenu_Toggle_2
-  0x00419400 func_00452400
-  0x0041942C func_0045242C
+  0x00419400 DeathmatchMenu_OpenBloodLust_2
+  0x0041942C DeathmatchMenu_OpenFragTag_2
   0x00419458 DeathmatchMenu_OpenTeamBlood_2
-  0x00419494 func_00452494
+  0x00419494 DeathmatchMenu_OpenWeapons_2
   0x004194C0 SingleMenu_Init_2
-  0x004194F4 func_004524F4
+  0x004194F4 SingleMenu_InitAfterPak_2
   0x00419520 SingleMenu_NewGame_2
   0x00419578 SingleMenu_Load_2
   0x004195C4 SingleMenu_GoBack_2
   0x00419610 TitleMenu_Single_2
   0x004196E8 TitleMenu_MultiUpdate_2
   0x0041975C TitleMenu_Multi_2
-  0x004197B8 func_004527B8
-  0x004197E4 func_004527E4
-  0x00419810 func_00452810
+  0x004197B8 TitleMenu_Options_2
+  0x004197E4 TitleMenu_EnterCheat_2
+  0x00419810 TitleMenu_Cheats_2
   0x0041983C TitleMenu_SoundOptions_2
   0x004198C0 QuitMenu_Yes_2
   0x00419900 QuitMenu_Init_2
   0x0041990C Menu_StepDebugMode_2
   0x00419960 Menu_DebugModeLabel_2
   0x004199EC PauseMenu_Resume_2
-  0x00419A24 func_00452A24
-  0x00419A50 func_00452A50
-  0x00419A7C func_00452A7C
-  0x00419AA8 func_00452AA8
-  0x00419AD4 func_00452AD4
-  0x00419B00 func_00452B00
+  0x00419A24 PauseMenu_MissionStatus_2
+  0x00419A50 PauseMenu_Inventory_2
+  0x00419A7C PauseMenu_Options_2
+  0x00419AA8 PauseMenu_EnterCheat_2
+  0x00419AD4 PauseMenu_Cheats_2
+  0x00419B00 PauseMenu_Quit_2
   0x00419B2C SoundMenu_GoBack_2
   0x00419BB4 SoundMenu_StepSpeechVolume_2
   0x00419C14 SoundMenu_SpeechVolumeLabel_2
   0x00419CF4 SoundMenu_StepMusicVolume_2
-  0x00419D64 func_00452D64
+  0x00419D64 SoundMenu_MusicVolumeLabel_2
   0x00419E44 SoundMenu_StepSfxVolume_2
-  0x00419EA8 func_00452EA8
+  0x00419EA8 SoundMenu_SfxVolumeLabel_2
   0x00419F88 SoundMenu_StepMusicTrack_2
   0x0041A02C SoundMenu_MusicTrackLabel_2
   0x0041A0A0 PauseMenu_SoundOptions_2
-  0x0041A138 func_00453138
-  0x0041A194 func_00453194
+  0x0041A138 PauseMenu_ResolutionText_2
+  0x0041A194 PauseMenu_ToggleResolution_2
   0x0041A1B4 PauseMenu_Init_2
   0x0041A28C PauseMenu_Close_2
   0x0041A2EC PauseMenu_Update_2
@@ -4690,7 +4692,7 @@ module NameEntryMenu_2: 0x0041CFA0..0x0041D7AC, 8 functions; pad(other copy)
   0x0041D79C NameEntryMenu_IsMatchOver_2
 
 module PakMenu_2: 0x0041D7B0..0x0042497C, 140 functions; pad
-  // name runs (possible objects the padding cannot show): SaveGame 1, PakMenu 16, GameNoteMenu 1, CharNoteMenu 1, PakMessage 1, PakConfirmMenu 2, PakMenu 3, Pak 6, PakMenu 2, SaveGame 1, PakMenu 16, GameNoteMenu 10, CharNoteMenu 10, PakMessage 25, SavePortalMenu 10, DamagedPakMenu 10, PakConfirmMenu 13, Video 8, InventoryMenu 4
+  // name runs (possible objects the padding cannot show): SaveGame 1, PakMenu 16, GameNoteMenu 1, CharNoteMenu 1, PakMessage 1, PakConfirmMenu 2, PakMenu 2, Pak 7, PakMenu 2, SaveGame 1, PakMenu 16, GameNoteMenu 10, CharNoteMenu 10, PakMessage 24, SavePortalMenu 11, DamagedPakMenu 10, PakConfirmMenu 13, Video 8, InventoryMenu 4
   0x0041D7B0 SaveGame_Build_2
   0x0041D948 PakMenu_UpdateNoteRows_2
   0x0041DB7C PakMenu_GetReturnMenu_2
@@ -4715,7 +4717,7 @@ module PakMenu_2: 0x0041D7B0..0x0042497C, 140 functions; pad
   0x00420E54 PakConfirmMenu_SelectNo_2
   0x004210CC PakMenu_PickDefaultPort_2
   0x0042115C PakMenu_HasPort_2
-  0x00421170 func_0045A170
+  0x00421170 Pak_ClearDamagedContinued_2
   0x00421180 Pak_IsTurok2Note_2
   0x0042120C Pak_GetBufferSize_2
   0x0042122C Pak_SetBufferSize_2
@@ -4733,9 +4735,9 @@ module PakMenu_2: 0x0041D7B0..0x0042497C, 140 functions; pad
   0x004217E4 PakMenu_PollBootPak_2
   0x004218C8 PakMenu_GetPlayerAndPort_2
   0x00421900 PakMenu_ProbeOwnerPort_2
-  0x00421940 func_0045A940
+  0x00421940 PakMenu_UnwatchAndWarp_2
   0x00421974 PakMenu_FindNoteByName_2
-  0x00421A0C func_0045AA0C
+  0x00421A0C PakMenu_GetStatsReturnMenu_2
   0x00421A70 PakMenu_FindNextPakPort_2
   0x00421B04 PakMenu_UpdateModeText_2
   0x00421BC0 PakMenu_UpdateTitle_2
@@ -4753,7 +4755,7 @@ module PakMenu_2: 0x0041D7B0..0x0042497C, 140 functions; pad
   0x00422044 GameNoteMenu_SelectNo_2
   0x004220B0 CharNoteMenu_InitLoad_2
   0x004220CC CharNoteMenu_InitDelete_2
-  0x004220E4 func_0045B0E4
+  0x004220E4 CharNoteMenu_InitSave_2
   0x00422124 CharNoteMenu_UpdateTitle_2
   0x00422178 CharNoteMenu_UpdateName_2
   0x00422234 CharNoteMenu_UpdateType_2
@@ -4785,7 +4787,7 @@ module PakMenu_2: 0x0041D7B0..0x0042497C, 140 functions; pad
   0x00422B54 PakMessage_UpdateLine4_2
   0x00422C80 PakMessage_UpdateLine5_2
   0x00422DAC PakMessage_UpdateOk_2
-  0x00422DF8 func_0045BDF8
+  0x00422DF8 SavePortalMenu_IsCinemaPlaying_2
   0x00422E34 SavePortalMenu_Init_2
   0x00422EE0 SavePortalMenu_InitB_2
   0x00422F60 SavePortalMenu_Poll_2
@@ -4820,10 +4822,10 @@ module PakMenu_2: 0x0041D7B0..0x0042497C, 140 functions; pad
   0x00423C58 PakConfirmMenu_UpdateYes_2
   0x00423CC4 PakConfirmMenu_UpdateNo_2
   0x00423D30 Video_ApplyResolution_2
-  0x00423F28 func_0045CF28
+  0x00423F28 Video_ResizeViMode_2
   0x0042420C Video_NextResolution_2
   0x00424428 Video_SetResolution_2
-  0x0042444C func_0045D44C
+  0x0042444C Video_StartResolutionChange_2
   0x0042446C Video_UpdateResolution_2
   0x00424500 Video_GetResolutionText_2
   0x0042456C Video_SetMode_2
@@ -4875,7 +4877,7 @@ module Pak_2: 0x00425680..0x00427094, 42 functions; pad
   0x004269B4 Pak_FindFreeExtLetter_2
   0x00426AF8 Pak_NeedsRepair_2
   0x00426B34 Pak_ProbeRumble_2
-  0x00426BA8 func_0045FBA8
+  0x00426BA8 Pak_DecodeText_2
   0x00426BF4 Pak_EncodeText_2
   0x00426C74 Str_Compare_2
   0x00426CAC Str_Length_2
@@ -4955,30 +4957,31 @@ module libultra/io/contpfs.c_2: 0x00429380..0x00429E38, 8 functions; pad + ultra
   0x00429DE4 __osPfsSelectBank_2
 
 module CScene_2: 0x00429E40..0x0042CEA4, 25 functions; pad + ultralib
-  0x00429E40 func_00462E40
+  // name runs (possible objects the padding cannot show): MatrixHeap 1, CScene 24
+  0x00429E40 MatrixHeap_Construct_2
   0x00429EC0 CScene__Construct_2
   0x0042A9A0 CScene__LoadLightSettings_2
   0x0042AB2C CScene__LoadLevel_2
   0x0042B304 CScene__DecompressLinks_2
-  0x0042B5D0 func_004645D0
+  0x0042B5D0 CScene__DecompressCollision_2
   0x0042B960 CScene__DecompressAnimatedInstances_2
-  0x0042BE68 func_00464E68
-  0x0042C0B4 func_004650B4
+  0x0042BE68 CScene__StreamAllSections_2
+  0x0042C0B4 CScene__FindWarpDests_2
   0x0042C2DC CScene__InitPersistentData_2
   0x0042C338 CScene__LoadBitSections_2
   0x0042C38C CScene__LoadBitSections2_2
   0x0042C3D8 CScene__WarpToLevel_2
   0x0042C414 CScene__ConstructWarp_2
-  0x0042C480 func_00465480
+  0x0042C480 CScene__FindNearestWarpDest_2
   0x0042C620 CScene__RequestWarp_2
   0x0042C678 CScene__SetupLighting_2
-  0x0042C6BC func_004656BC
-  0x0042C760 func_00465760
-  0x0042C88C func_0046588C
+  0x0042C6BC CScene__RestoreFiredEvents_2
+  0x0042C760 CScene__ReapplyFiredEvents_2
+  0x0042C88C CScene__FlushDelayedEvents_2
   0x0042C8FC CScene__UnloadLevel_2
   0x0042C9D4 CScene__DecompressParticles_2
   0x0042CB04 CScene__DecompressIntelligence_2
-  0x0042CC24 func_00465C24
+  0x0042CC24 CScene__DecompressPaths_2
   0x0042CD30 CScene__ConstructMap_2
 
 module SceneActorPool_2: 0x0042CEB0..0x0042D034, 2 functions; pad
@@ -4986,8 +4989,8 @@ module SceneActorPool_2: 0x0042CEB0..0x0042D034, 2 functions; pad
   0x0042CEB0 SceneActorPool_Construct_2
   0x0042CFC0 CInstancePool__Construct_2
 
-module unk_0042D040_2: 0x0042D040..0x0042D0D8, 1 functions; pad
-  0x0042D040 func_00466040
+module CDLightSet_2: 0x0042D040..0x0042D0D8, 1 functions; pad
+  0x0042D040 CDLightSet__Construct_2
 
 module unk_0042D0E0_2: 0x0042D0E0..0x0042D134, 1 functions; pad
   0x0042D0E0 func_004660E0
@@ -4995,8 +4998,8 @@ module unk_0042D0E0_2: 0x0042D0E0..0x0042D134, 1 functions; pad
 module CParticleSystem_2: 0x0042D140..0x0042D328, 1 functions; pad
   0x0042D140 CParticleSystem__Construct_2
 
-module unk_0042D330_2: 0x0042D330..0x0042D42C, 1 functions; pad
-  0x0042D330 func_00466330
+module SwooshSystem_2: 0x0042D330..0x0042D42C, 1 functions; pad
+  0x0042D330 SwooshSystem_Construct_2
 
 module CPlayer_2: 0x0042D980..0x0042EA6C, 13 functions; pad
   // name runs (possible objects the padding cannot show): CPlayer 6, CPlayerPool 3, CPlayer 4
@@ -5017,10 +5020,10 @@ module CPlayer_2: 0x0042D980..0x0042EA6C, 13 functions; pad
 module COnScreen_2: 0x0042EA70..0x0042EB4C, 3 functions; pad
   0x0042EA70 COnScreen__Construct_2
   0x0042EAD4 func_00467AD4
-  0x0042EADC func_00467ADC
+  0x0042EADC COnScreen__ResetBossBars_2
 
 module Demo_2: 0x0042EB50..0x0042FF88, 28 functions; pad
-  // name runs (possible objects the padding cannot show): Demo 10, DemoStream 6, Demo 5, CCamera 1, CCameraPool 5, CEmitterPool 1
+  // name runs (possible objects the padding cannot show): Demo 10, DemoStream 6, Demo 2, DemoStream 3, CCamera 1, CCameraPool 5, CEmitterPool 1
   0x0042EB50 Demo_ReadRunLength_2
   0x0042EC10 Demo_DecodeButtons_2
   0x0042EE4C Demo_Start_2
@@ -5032,14 +5035,14 @@ module Demo_2: 0x0042EB50..0x0042FF88, 28 functions; pad
   0x0042F4B0 Demo_PlayNext_2
   0x0042F520 func_00468520
   0x0042F550 DemoStream_Decode_2
-  0x0042F570 func_00468570
-  0x0042F590 func_00468590
+  0x0042F570 DemoStream_CallHandler2_2
+  0x0042F590 DemoStream_RunHandler2_2
   0x0042F5C4 func_004685C4
   0x0042F5E8 func_004685E8
   0x0042F620 func_00468620
   0x0042F67C Demo_DecodeStick_2
   0x0042F6E8 Demo_DecodeMatch_2
-  0x0042F758 func_00468758
+  0x0042F758 DemoStream_Tick_2
   0x0042F788 func_00468788
   0x0042F878 func_00468878
   0x0042F8D0 CCamera__Construct_2
@@ -5054,8 +5057,9 @@ module Cont_2: 0x0042FF90..0x004301B8, 2 functions; pad
   0x0042FF90 Cont_InitAll_2
   0x004300E8 Cont_ResetSlot_2
 
-module unk_004301C0_2: 0x004301C0..0x0043041C, 4 functions; pad
-  0x004301C0 func_004691C0
-  0x00430250 func_00469250
-  0x004302CC func_004692CC
-  0x00430374 func_00469374
+module CEngineApp_2: 0x004301C0..0x0043041C, 4 functions; pad
+  // name runs (possible objects the padding cannot show): Render 1, CEngineApp 3
+  0x004301C0 Render_InitUnitQuad_2
+  0x00430250 CEngineApp__QuitToLegal_2
+  0x004302CC CEngineApp__StartCinemaGame_2
+  0x00430374 CEngineApp__StartGame_2
