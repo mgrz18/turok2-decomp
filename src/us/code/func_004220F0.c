@@ -3,11 +3,7 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-#ifdef TARGET_PORT
 #define T2_TEXT(s) ((s32 *) (s))
-#else
-#define T2_TEXT(s) (&s)
-#endif
 
 #ifdef TARGET_PORT
 #else

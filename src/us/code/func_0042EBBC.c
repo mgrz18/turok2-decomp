@@ -15,7 +15,6 @@ extern u8 D_800B2C40[];
 extern void COverlay__Construct(void *, s32, s32);
 extern void COverlay__StartScript(void *, void *);
 
-#ifdef TARGET_PORT
 #include "structs/player.h"
 
 /* Host body: this is COnScreen's boss-bar reset (m_pBoss, m_BossOverlay, m_pBoss2,
@@ -33,13 +32,3 @@ void COnScreen__ResetBossBars(void *arg0) {
     COverlay__Construct(&os->m_BossOverlay2, 0, -20);
     COverlay__StartScript(&os->m_BossOverlay2, D_800B2C40);
 }
-#else
-void COnScreen__ResetBossBars(Lists *lists) {
-    lists->unk40 = 0;
-    COverlay__Construct(lists->list0, 0, -40);
-    COverlay__StartScript(lists->list0, D_800B2C30);
-    lists->unk88 = 0;
-    COverlay__Construct(lists->list1, 0, -20);
-    COverlay__StartScript(lists->list1, D_800B2C40);
-}
-#endif

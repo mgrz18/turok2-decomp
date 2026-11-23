@@ -57,7 +57,6 @@ void TotemDefense_UpdateFight(TotemDefenseState *fight) {
     if (gEngineApp_m_Game.m_Settings.mode != 13 || gScene.m_Mode != 4) {
         return;
     }
-#ifdef TARGET_PORT
     /* the port (round 9 x1): the mission time and the player's camera by member (N64 0x54 of the
      * definition, 0x51C of CPlayer: as an s32 the camera pointer was cut) */
     if ((f32) (fight->obj->header.m_pIntelligence->m_Destructible.m_TotemMissionDuration * 15) <= fight->timer) {
@@ -65,12 +64,6 @@ void TotemDefense_UpdateFight(TotemDefenseState *fight) {
                                   (sptr) ((CPlayer *) CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList))->m_pCamera, sTotemDefenseText_DefendTheTotem, 4.0f);
         Sound__PlaySpeech(0x182);
     }
-#else
-    if ((f32) (*(s32 *) (((BossObj *) fight->obj)->def + 0x54) * 15) <= fight->timer) {
-        CCameraPool__AddTimedText(gEngineApp_m_Game.m_CameraPool, *(s32 *) ((u8 *) CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList) + 0x51C), sTotemDefenseText_DefendTheTotem, 4.0f);
-        Sound__PlaySpeech(0x182);
-    }
-#endif
     bar = &gEngineApp_m_OnScreen;
     COnScreen__SetBossPercent(bar, toInt(fight->timer * (1.0f / 15) / (f32) ((BossDef *) fight->def)->time * 100.0f));
     COnScreen__SetBossPercent2(bar, toInt((f32) (((BossDef *) fight->def)->kills - fight->kills) / (f32) ((BossDef *) fight->def)->kills * 100.0f));

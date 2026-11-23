@@ -5,7 +5,6 @@
 
 extern void CGameRegion__FloodClearFlag4(void *arg0);
 extern void CGameRegion__FloodSetFlag4(void *arg0);
-#ifdef TARGET_PORT
 #include "structs/vector.h"
 
 /* Host body: the position comes as a CVector3 (floats: SSE registers on x86-64). The Rage Wars
@@ -24,17 +23,3 @@ void ImpactEvent_FloodRegionFlag4(void *arg0, CVector3 input, s32 arg4) {
         CGameRegion__FloodClearFlag4(region);
     }
 }
-#else
-extern void GameObject_TraceMove(void *arg0, Triple input, Triple *output,
-                          s32 *value, s32 unused0, s32 unused1);
-void ImpactEvent_FloodRegionFlag4(void *arg0, Triple input, s32 arg4) {
-    Triple output;
-    sptr value;
-    GameObject_TraceMove(arg0, input, &output, &value, 0, 0);
-    if (arg4 != 0) {
-        CGameRegion__FloodSetFlag4((void *)value);
-    } else {
-        CGameRegion__FloodClearFlag4((void *)value);
-    }
-}
-#endif

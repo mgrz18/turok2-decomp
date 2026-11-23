@@ -99,11 +99,7 @@ struct PoseContext {
     /* 0x08 */ f32 (*bones)[4][4];
     /* 0x0C */ void *anims;
     /* 0x10 */ void *file;
-#ifdef TARGET_PORT
     /* 0x14 */ sptr arg2;
-#else
-    /* 0x14 */ s32 arg2;
-#endif
     /* 0x18 */ void *channel;
     /* 0x1C */ void *blendChannel;
     /* 0x20 */ KeyLookup keys;
@@ -140,15 +136,11 @@ void CMtxF__SetAxisAngle(f32 (*m)[4], f32 angle, f32 x, f32 y, f32 z);
 void CMtxF__Copy(f32 (*dst)[4], f32 (*src)[4]);
 void CMtxF__Translate(f32 (*m)[4], f32 x, f32 y, f32 z);
 void CMtxF__ScaleAxes(f32 (*m)[4], f32 x, f32 y, f32 z);
-#ifdef TARGET_PORT
 /* The N64 passes the object itself as the wobble's phase (CGameObjectInstance__WobbleBone reads the low 16 bits of
  * its address); on the host that is an ASLR-dependent host address: pass the address the object
  * would have in the N64 heap (port/runtime/t2boot.c), the same in every run. */
 void CGameObjectInstance__WobbleBone(s32 time, s32 flags, f32 (*m)[4]);
 u32 T2Port_N64Address(const void *p);
-#else
-void CGameObjectInstance__WobbleBone(PoseObject *obj, s32 flags, f32 (*m)[4]);
-#endif
 f32 GameObject_GetCollisionHeight(PoseObject *obj);
 f32 CGameRegion__GetCeilingHeight(CGameRegion *region, f32 x, f32 z); /* the ceiling height */
 

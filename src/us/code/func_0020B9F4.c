@@ -18,18 +18,11 @@ void Render_QueueModelByResource(sptr res, sptr arg1, sptr arg2, s32 index, s32 
 
     file = CCache__Request(0, res, 0x18, 0, 0, 0, sRenderCacheDesc_SimpObjectIndex, 0);
     if (file != 0) {
-#ifdef TARGET_PORT
         /* the cache entries hold host pointers: read them pointer-wide (--high-memory) */
         handle = CCache__Request(0, CISet__GetROMAddressAndSize(*(s32 **) file, res, 1, &size), size, 0, 0,
                                Model_DecompressCallbackTerminated, sRenderCacheDesc_Geometry, 0);
         if (handle != 0) {
             count = CISet__GetBlock(*(void **) handle, 2);
-#else
-        handle = CCache__Request(0, CISet__GetROMAddressAndSize(*(s32 *) file, res, 1, &size), size, 0, 0,
-                               Model_DecompressCallbackTerminated, sRenderCacheDesc_Geometry, 0);
-        if (handle != 0) {
-            count = CISet__GetBlock(*(s32 *) handle, 2);
-#endif
             if (index >= 0 && index < *count) {
                 if (sBatchResource != (void **) handle || sBatchLod != index || sBatchPass != arg4 || sBatchInstanceCount == 32) {
                     Render_FlushModelBatch();

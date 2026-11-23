@@ -5,11 +5,7 @@
 #include "globals/menu_text.h"
 #include "globals/game.h"
 
-#ifdef TARGET_PORT
 #define T2_TEXT(s) ((void *) (s))
-#else
-#define T2_TEXT(s) (&s)
-#endif
 
 #ifdef TARGET_PORT
 #else

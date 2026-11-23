@@ -33,13 +33,9 @@ typedef struct {
 
 extern u8 D_8010FF34[];
 
-#ifdef TARGET_PORT
 /* on MIPS the instance reaches it in $a0 (the caller's first argument, untouched) */
 s32 GameObject_CastsShadow(CGameObjectInstance *);
 #define GameObject_CastsShadow() GameObject_CastsShadow(a)
-#else
-s32 GameObject_CastsShadow(void);
-#endif
 void *MtxPool_Alloc(void *, s32);
 f32 func_00298470(f32);     /* sqrtf */
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
