@@ -774,7 +774,7 @@ dropped 45 more, 496 in all; the 296 host branches that do not
 compile for the N64, host-only names, are left). `asm_diff.py` now numbers local labels by first appearance, so
 a de-faked branch that only renumbers `.L` labels compares equal.
 
-**Still fake (51 files, `grep -rl FAKEMATCH src/us`).** The 16 of the list
+**Still fake after round 21 (51 files; round 22 below).** The 16 of the list
 above (each retried this round: the permuter from the natural draft against
 the fake's object, and for CAI__Setup the flags read at each of 25 points:
 all 9 words off) and the 35 marked in this audit (25 functions of the 58 files found were de-faked), each with what it misses
@@ -785,6 +785,96 @@ PakMenu_InitLoadGame_2 (4 of 103 unpinned), Trail_DetachOwner (5-6 of 169),
 CParticle__Steer (5 of 390 without its barrier), _getRate (1 of 148;
 libaudio, which j5's ultralib work may replace).
 
+
+### The FAKEMATCH second pass (round 22)
+
+**What de-faked them this time: the callees' real types and the real source.**
+The drafts were written against m2c's guesses; where the guess was wrong, the
+trick stood in for a type:
+
+| function | what the trick stood for |
+|---|---|
+| RumbleMenu_Play | `Controller_ResetRumble` returns `void` (its definition, func_00285AE0.c); declared `s32`, the draft needed two equal arms to keep the player pointer out of `$v1` (the permuter, from the typed draft against the fake) |
+| Cinema_RequestOnce, Cinema_RequestOnce_2 | the player as a `CPlayer *` and `m_Data.m_LevelIntroPlayedFlags` read as bytes, with `n = id - 0x8D` as its own variable: no register pins |
+| osPiGetCmdQueue | ultralib's pigetcmdq.c as it is |
+| __alSeqNextDelta | ultralib's seq.c: it returns `char` (the draft returned `s32` and needed two equal arms) |
+
+A script that compares each FAKEMATCH file's local prototypes with the
+definitions found in `src/` (return types only) flagged about 50 differences
+in 20 files; the others did not change the code of the functions they are in.
+
+**Unmarked fakes the round-21 scan missed** (its patterns were `asm("$n")`,
+empty `__asm__` barriers and arms equal as text):
+
+- arms equal in effect but not as text (`return new_var;` / `return 0;`, an
+  `if (temp_a0)` on a known pointer, an unreachable `do { } while (new_var)`
+  after a return): 9 getters of the enemy definition (GameObject_CanLeaveWater,
+  GameObject_CanLeaveInfoFlag52_80, GameObject_IsFollower, GameObject_CanClimbUp,
+  GameObject_CanEnter/LeaveRegionFlag80, GameObject_CanEnter/LeaveRegionFlag1000,
+  GameObject_GetAttackCombatRadius) are now the plain getter of round 21
+  (`if (def->m_Type == 1) return field; return 0;`); Generator_Advance (an
+  `if (state)` whose arms differ in statement order) is marked;
+- `do { return ...; } while (0)`: func_00267D2C and func_00267E18, the permuter's
+  other form of func_00267D60's fake, are marked;
+- pins written `__asm__("$f0")` (AlignToGround, DrawShadow) and two barriers in
+  the `#else` of a TARGET_PORT pair (CCamera__DrawGlares): marked;
+- `if (1)`: three, none needed (VM_Alloc, Automap_IsShown, Lighting_CollectVolumes).
+
+**`do { } while (0)` blocks.** A loop note raises the priority of the pseudos
+used inside it (GCC weights references by loop depth) and stops cse from
+following a jump past it, so the bulk matching and the permuter used these
+blocks the way the FAKEMATCH files use pins. `tools/undowhile.py <files>`
+tries each one outside a macro as a plain block and keeps it when every
+function of the file still matches: 15 of 83 went (68 stay, 9 of them in FAKEMATCH files). About 60 are left in 50
+files that are not marked FAKEMATCH (libgcc's longlong.h macros aside); some
+are probably the original's macros (round 21 said so of func_0021D39C.c's), the
+rest are the same kind of trick as a pin. They are not counted in the 52 below.
+
+**Still fake: 52 files** (`grep -rl FAKEMATCH src`): 51 - 5 de-faked + 6
+marked this round. Each says in its first comment what it misses by without
+its trick. The near ones, retried this round with the permuter from a natural
+draft against the fake's object (15 min each, `-j 4`):
+
+| function | draft (words off by hand) | best score (permuter) | what the zero was |
+|---|---|---|---|
+| CGameObjectInstance__DrawShadow | 3 of 238 | 5 | (none; the best reads an unset local) |
+| CParticle__Steer | 5 of 390 | 0 | `do { fa = 0.5f; } while (0);` in place of the barrier: another trick, now in the file (plain C instead of an asm barrier) |
+| Trail_DetachOwner | 5 of 169 | 330 of 460 | (none) |
+| Render_SortTreeFind | 12 of 18 | 0 | the equal arms again, on `if (arg1)`, plus a flag variable |
+| func_00267D60 | 5 of 13 | 0 | `do { case 1: case 4: return ...; } while (0);` in the switch |
+| SndVoicePool_StopAllExcept | 12 of 66 | 35 of 60 | (none) |
+| CCache__HeapAlloc | 11 of 57 | 0 | `do { result = CHeap__AllocTop(...); } while (0);`: another trick, but defined C, so it replaces round 21's test of an unset local and the port's alternative body |
+
+By hand this round, each without a natural zero: Bits_GetFloat (the
+unsigned-to-float result in `$f0`: 7-14 words over six arrangements of the
+expression), func_00253934 (the oxygen fraction: one `mov.s` short, five
+shapes), Controller_ProcessInput (assigning `fy` before `fx` gives the ROM's
+registers but swaps the two conversions: 7 words; `register` alone changes
+nothing), Turret_Setup (the fifth address in `$a0`), PakMenu_InitLoadGame_2 (the
+prototype fix of MenuPool_OpenMenu_2 changes nothing: 4 words), _getRate
+(ultralib's env.c with inline `_frexpf`/`_ldexpf` is 92 words off: the game's
+copy is the KMC build of j5's list; left to the ultralib work),
+CEngineApp__UpdateFade (a plain if/else: 100 of 116), Blast_CanHit (returns in
+place of the pinned result: 23 of 144), Generator_Advance (64 of 66).
+
+What stays fake, in short: register allocation and scheduling choices that
+the natural forms tried do not reproduce (pins, barriers, loop notes), in 52
+files; none of them can change without changing the ROM's code, and each
+file's first comment names its distance without the trick.
+
+Checks at the end of the round (branch names-R22_k2): `tools/asm_diff.py --base f980f639 -j 6`
+0 of 3,938; clean `make verify` OK; the port (Release) boot + 3 demos det `6ab97584` (52,000
+lines), the default whole-game run det `dc8126d3` (600,000 lines, END 2, the one `death:` at
+263,578); `aligncheck.py` the 2 known sites; `mklayout.py --check` up to date.
+
+
+**After the merge (round 22 coordinator).** `tools/undowhile.py` re-run over the 65 files
+of the merged tree that still have a `while (0)`: one more wrapper goes
+(`CScene__BuildGeometryDisplayList`, func_00221D3C.c, its bare block unwrapped; asm_diff 0),
+the rest are still needed. `tools/unify_host_bodies.py` reports 0 redundant N64 alternatives
+(470 files). 52 files carry the FAKEMATCH marker; `tools/progress.py`: 117 functions, 67,876
+bytes (7.07% of the C-origin code; it now also finds `Menu_Construct`, whose two `TARGET_PORT`
+prototypes stand before one body).
 
 ### The G pass (the last drafts)
 

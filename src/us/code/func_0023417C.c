@@ -3,58 +3,7 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "globals/engine.h"
-#ifdef TARGET_PORT
 #include "structs/swoosh.h"
-#endif
-
-typedef struct Mtx44 { s32 w[16]; } Mtx44;
-
-typedef struct EmitInfo {
-    /* 0x00 */ f32 unk0;
-    /* 0x04 */ f32 unk4;
-    /* 0x08 */ f32 unk8;
-} EmitInfo;
-
-typedef struct EmitNode EmitNode;
-struct EmitNode {
-    /* 0x00 */ EmitNode *prev;
-    /* 0x04 */ EmitNode *next;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ u8 padC[4];
-    /* 0x10 */ CVector3 pos;
-    /* 0x1C */ u8 rot[0xC];
-    /* 0x28 */ Mtx44 mtx[2];
-    /* 0xA8 */ f32 fraction;
-    /* 0xAC */ f32 length;
-    /* 0xB0 */ CParticle *owner;
-};
-
-/* structs/swoosh.h Swoosh */
-typedef struct Emitter {
-    /* 0x00 */ void *prev;
-    /* 0x04 */ void *next;
-    /* 0x08 */ EmitInfo *info;
-    /* 0x0C */ void *tex0;
-    /* 0x10 */ void *tex1;
-    /* 0x14 */ s32 texture[2];
-    /* 0x1C */ void *owner;
-    /* 0x20 */ s32 id;
-    /* 0x24 */ f32 unk24;
-    /* 0x28 */ u8 pad28[0x3C - 0x28];
-    /* 0x3C */ u32 flags;
-    /* 0x40 */ EmitNode *nodes;
-    /* 0x44 */ EmitNode *tail;
-    /* 0x48 */ s32 count;
-#ifdef TARGET_PORT
-    /* round 20 i3: Swoosh.length, after the host SwooshLinks' padding (Trail_DrawTextured reads it there) */
-    u8 pad4C[__builtin_offsetof(Swoosh, length) - __builtin_offsetof(Swoosh, nodes.count) - sizeof(s32)];
-#endif
-    /* 0x4C */ f32 totalLength;
-} Emitter;
-#ifdef TARGET_PORT
-_Static_assert(__builtin_offsetof(Emitter, count) == __builtin_offsetof(Swoosh, nodes.count), "Emitter.count");
-_Static_assert(__builtin_offsetof(Emitter, totalLength) == __builtin_offsetof(Swoosh, length), "Emitter.totalLength");
-#endif
 
 void CMtxF__ToMtxAffine(void *, void *);
 void CMtxF__FromMtxAffine(void *, void *);
@@ -66,7 +15,7 @@ void CMtxF__ScaleAxes(void *, f32, f32, f32);
 f32 func_00298470(f32);                 /* sqrtf */
 
 /* Rage Wars' func_802A6174: places one node on its owner, or freezes it when the owner went away (-1). */
-static __inline__ void placeNode(Emitter *e, EmitNode *n, CParticle *o) {
+static __inline__ void placeNode(Swoosh *e, SwooshNode *n, CParticle *o) {
     u8 m[0x40];
     f32 k;
 
@@ -83,44 +32,44 @@ static __inline__ void placeNode(Emitter *e, EmitNode *n, CParticle *o) {
         CMtxF__ClampEntries(m);
         CMtxF__GetTranslation(m, &n->pos);
         if (e->flags & 4) {
-            CMtxF__GetScale(m, n->rot);
+            CMtxF__GetScale(m, &n->scale);
         } else {
             CMtxF__ToMtxAffine(m, &n->mtx[gEvenOdd]);
         }
     }
 }
 
-/* Places every node of the emitter on its owner and sums the distances between consecutive nodes. */
-void Trail_PlaceNodes(Emitter *e) {
+/* Places every node of the swoosh on its owner and sums the distances between consecutive nodes. */
+void Trail_PlaceNodes(Swoosh *e) {
     CVector3 d;
-    EmitNode *n;
+    SwooshNode *n;
     CParticle *o;
-    EmitNode *prev;
+    SwooshNode *prev;
     f32 len;
     s32 moved;
 
-    n = e->nodes;
+    n = e->nodes.head;
     moved = 0;
-    e->totalLength = 0.0f;
+    e->length = 0.0f;
     if (n != NULL) {
         do {
             o = n->owner;
             if (o != NULL) {
                 placeNode(e, n, o);
                 moved = 1;
-                n->unk8 = e->info->unk8;
+                n->life = e->info->nodeLife;
             }
             prev = n->prev;
             if (prev != NULL) {
                 CVector3__Subtract(&d, &n->pos, &prev->pos);
                 len = func_00298470(d.x * d.x + d.y * d.y + d.z * d.z);
                 prev->length = len;
-                e->totalLength += len;
+                e->length += len;
             }
             n = n->next;
         } while (n != NULL);
     }
     if (moved) {
-        e->unk24 = e->info->unk0;
+        e->time = e->info->unk0;
     }
 }

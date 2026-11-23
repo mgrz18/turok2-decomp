@@ -172,9 +172,14 @@ typedef struct CGameObjectInstance {
     /* 0x0B4 */ u32 m_rpGeometryHeaderSize;
     /* 0x0B8 */ u16 m_nTypeFlag;
     /* 0x0BA */ s16 m_nAnims;
-    /* 0x0BC */ CVector3 m_vMin;
-    /* 0x0C8 */ CVector3 m_vMax;
-    /* 0x0D4 */ s32 m_dwFlags;
+    union {
+        struct {
+            /* 0x0BC */ CVector3 m_vMin;
+            /* 0x0C8 */ CVector3 m_vMax;
+        };
+        /* 0x0BC */ CBox m_Bounds;            /* the same two corners as one box */
+    };
+    /* 0x0D4 */ u32 m_dwFlags;
     /* 0x0D8 */ CAnimationState m_CurrentAnimation;
     /* 0x0EC */ CAnimationState m_BlendAnimation;
     /* 0x100 */ s16 m_BlendLength;

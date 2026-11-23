@@ -8,6 +8,6 @@ typedef struct {
 
 
 /* arg1 scaled by the rate, rounded down to a multiple of 16. */
-s32 _timeToSamplesNoRound(RateSource *arg0, s32 arg1) {
+s32 _timeToSamples(RateSource *arg0, s32 arg1) {
     return (s32) (((f32) arg1 * (f32) arg0->rate * 0.000001f) + 0.5f) & ~0xF;
 }

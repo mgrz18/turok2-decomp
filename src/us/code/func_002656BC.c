@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/swoosh.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
@@ -11,7 +12,6 @@ typedef struct B01Pair {
     s32 a;
     s32 b;
 } B01Pair;
-extern u8 gEngineApp_m_SwooshSystem[];
 void ImpactEvent_Call(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, B01Pair extra);
 void SwooshSet_FreeOwner(void *p, CGameObjectInstance *actor);
 void Door_CloseEnter(CGameObjectInstance *actor) {
@@ -19,7 +19,7 @@ void Door_CloseEnter(CGameObjectInstance *actor) {
     extra.a = 0;
     CScene__SetInstanceSavedBit(&gScene, actor, 0);
     GameObject_FireTriggers(actor, 0x8000, actor);
-    SwooshSet_FreeOwner(gEngineApp_m_SwooshSystem, actor);
+    SwooshSet_FreeOwner(&gEngineApp_m_SwooshSystem, actor);
     if (gScene.m_Mode != 4) {
         ImpactEvent_Call(actor, actor, 7, actor->header.m_vPos, extra);
         actor->m_dwFlags |= 0x8000000;

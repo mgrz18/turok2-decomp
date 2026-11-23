@@ -141,7 +141,8 @@ n4 329, n5 517, n6 280, n7 1,076 (485 of them `_2`), n8 497 (239 `_2`).
   old `func_` name also kept splat using that name; it is renamed too now.
 - **libultra pfs**: the plain names of seven pfs functions moved to the first
   module's originals (n8); the second module's are `_2`
-  (`__osPfsDeclearPage_2.c`, `osPfsChecker_2.c` renamed with them).
+  (`__osPfsDeclearPage_2.c`, `osPfsChecker_2.c` renamed with them; since round 22 those
+  copies are built from ultralib under the `_2` names, docs/LIBULTRA.md, and the files are gone).
 - **Module-2 calls by link address**: where the copies sit 0xE0 lower, the
   first module's name at a link address can be another function. `Str_Length`
   (0x00426D8C) is `Pak_BytesToPages_2` for module-2 callers, and 0x0042EB50
@@ -412,6 +413,16 @@ renamed, so a names round compares against the old tree without a rebuild.
   the rest are BSS whose role is not certain yet (`D_8011B114`/`D_8011F144` pak boot
   flags, `D_801309A8`/`AC` note-menu flags, `D_8011AD48` a quad's vertices).
 
+### Round 22, part k4: `D_` interiors
+
+Three `D_` left the C as members of their object: `D_800F283A` is the low half of
+`gAudioFrameSize` (`__amHandleFrameMsg` stores `gAudioFrameSize` into a `s16`: GCC
+narrows the load), `D_8012F9A8` is `gLevelScript.values[1]` (Primagen_UpdateMode2),
+`D_8012F628` is `gLevelScript.targetAngle` (a new `LevelScriptState` field at 0x20,
+was `pad020`; Primagen_UpdateMode20 and its copy). **133 left** (129 + the 4 ROM offsets).
+The largest group still in the C is `D_8012F604` (65 uses): the word before `gLevelScript`
+(`LevelScriptBlock.m_Word`, a port-only type so far).
+
 ## Declarations
 
 The named globals now have one declaration each, with the real type, in
@@ -449,6 +460,16 @@ the expansion pak path copies), defined in `versions/symbols_manual.us.txt`
 ([SEGMENTS.md](SEGMENTS.md#the-virtual-segments-real-start-round-21)). Four
 absolute ROM offsets keep their `D_` (`D_94F`, `D_11059`, `D_29E60`, `D_A4694`).
 
+## Function counts after round 22
+
+k1 deleted 121 libultra game files (one function each, all named): their functions come from
+`lib/ultralib` now (docs/LIBULTRA.md). The game C defines **4,025** functions, 3,937 named and
+**88** `func_` (unchanged: none of the deleted files was a `func_`); 4,187 function names in all
+(asm and ultralib ones included). `_timeToSamples` / `_timeToSamplesNoRound` were swapped and
+are fixed (k1); 0x0029E460 is `memcpy` in the ELF (ultralib's alias; the game C still calls it
+by its address name, see below). `tools/apply_names.py --check`: 0 errors, 0 warnings on the
+merged tree, and a re-run renames nothing.
+
 ## Left as `func_` (round 21)
 
 The 88 C functions round 21 did not name, by reason:
@@ -476,7 +497,17 @@ The 88 C functions round 21 did not name, by reason:
   (`cosf`), `func_002982F0` (`sinf`), `func_00298470` (`sqrtf`) and
   `func_0029E460` (`memcpy`). GCC knows these names as builtins and would
   inline or fold the calls, so the build would no longer match
-  (`versions/names.us.txt` notes it for `sqrtf`).
+  (`versions/names.us.txt` notes it for `sqrtf`). Tried in round 22 (k4), all
+  callers renamed, `tools/asm_diff.py`: `sqrtf` changes 88 files (GCC 2.8 inlines
+  `sqrt.s`); `cosf`/`sinf` (through `apply_names.py`, so the names resolve) change
+  9 of 102 (`func_0023BE24`, `func_00244E84`, `func_0024FE10`, `func_00250EC0`,
+  `func_00259944`, `func_0027D160`, `func_002A073C`, `func_004004D8`,
+  `func_00406598`): not inlined, but GCC treats the libm names as `const` calls and
+  schedules them and the floats around them differently. A per-file `-fno-builtin`
+  would have to go on every caller (and also turns off `memcpy`/`abs`/`fabs` there);
+  a `#define cosf func_002974C0` in a header only moves the address name. The port
+  would also need its own spelling for each (`port_shim.h`), since a game function
+  called `cosf` would take libm's place for the whole host program.
 - **`func_0028D380` is `main`**: SN64's `boot_main` (`src/us/asm/boot.s`,
   Turok 3's SNMAIN.s) jumps to `main`, and `versions/symbols_manual.us.txt`
   already gives the address that name. The C keeps `func_0028D380` because GCC

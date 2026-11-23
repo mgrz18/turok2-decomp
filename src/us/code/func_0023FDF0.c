@@ -36,7 +36,7 @@ typedef struct HitInst {
         struct { u8 _hp_joints[T2_HOFF_HitInst(m_pmtDrawMtxs)]; Joint *joints; }; /* N64 0x98 */
         struct { u8 _hp_animKey[T2_HOFF_HitInst(m_rpObject)]; sptr animKey; }; /* N64 0xA4 */
         struct { u8 _hp_animSize[T2_HOFF_HitInst(m_rpObjectHeader)]; s32 animSize; }; /* N64 0xB0 */
-        struct { u8 _hp_bounds[T2_HOFF_HitInst(m_vMin)]; CBox bounds; }; /* N64 0xBC: m_vMin, m_vMax */
+        struct { u8 _hp_bounds[T2_HOFF_HitInst(m_Bounds)]; CBox bounds; }; /* N64 0xBC: m_vMin, m_vMax */
         struct { u8 _hp_hitMask[T2_HOFF_HitInst(m_AI.m_VisBits)]; s32 hitMask; }; /* N64 0x14C */
     };
 } HitInst;

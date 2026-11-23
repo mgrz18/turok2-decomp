@@ -2,7 +2,8 @@
 """How much of the game's code is matched C.
 
 A function counts as matched when a C file under src/ defines it in C rather
-than pulling it in with INCLUDE_ASM, and the file is linked: the ROM only
+than pulling it in with INCLUDE_ASM, and the file is linked (or it comes from
+one of the libultra objects built from lib/ultralib, docs/LIBULTRA.md): the ROM only
 builds byte-exact (`make verify`) if that C compiles to the original bytes, so
 linked C is matched C by construction.
 
@@ -91,6 +92,21 @@ def linked_c_files():
     return sorted({ROOT / m for m in re.findall(r"build/(src/[^ ()]+)\.o", text)})
 
 
+def ultralib_functions():
+    """The functions of the libultra objects built from lib/ultralib (docs/LIBULTRA.md):
+    linked C like the game's, read from the built objects (their names after the
+    Makefile's objcopy renames, the second VM module's `_2` copies included)."""
+    text = LD_SCRIPT.read_text()
+    names = set()
+    for m in sorted(set(re.findall(r"(build/lib/[^ ()]+\.o)", text))):
+        with open(ROOT / m, "rb") as f:
+            st = ELFFile(f).get_section_by_name(".symtab")
+            for sym in st.iter_symbols() if st else ():
+                if sym["st_info"]["type"] == "STT_FUNC" and sym["st_shndx"] != "SHN_UNDEF":
+                    names.add(sym.name)
+    return names
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--badge", action="store_true")
@@ -101,6 +117,7 @@ def main():
     not_c = asm_origin()
 
     sizes = {}
+    alias = {}   # every name of a counted function -> the one it is counted under
     total = {"engine": 0, "virtual": 0, "libultra": 0}
     copy = 0
     with ELF.open("rb") as fh:
@@ -116,6 +133,8 @@ def main():
         # The second VM module (.virtual_1) is linked over the first, so an
         # address can name two functions: key them by section too.
         funcs = {}
+        names_at = {}   # (sec, addr) -> every sized function name there (an address can carry two:
+                        # a game name and an ultralib alias, docs/LIBULTRA.md)
         for sym in elf.get_section_by_name(".symtab").iter_symbols():
             if sym["st_info"]["type"] != "STT_FUNC" or not sym["st_size"]:
                 continue
@@ -123,11 +142,13 @@ def main():
                 sec = elf.get_section(sym["st_shndx"]).name
             elif VM2_NAMED[0] <= sym["st_value"] < VM2_NAMED[1]:   # absolute, by its name in the second module
                 funcs[(".virtual_1", sym["st_value"] - VM2_SHIFT)] = (sym.name, sym["st_size"])
+                names_at.setdefault((".virtual_1", sym["st_value"] - VM2_SHIFT), set()).add(sym.name)
                 continue
             else:   # defined absolutely: the section that covers it
                 sec = next((n for n, (a, d) in data.items() if a <= sym["st_value"] < a + len(d)), None)
             if sec in data:
                 funcs[(sec, sym["st_value"])] = (sym.name, sym["st_size"])
+                names_at.setdefault((sec, sym["st_value"]), set()).add(sym.name)
         by_addr = {addr: (sec, size) for (sec, addr), (_, size) in funcs.items() if sec != ".virtual_1"}
 
         def same(sec, addr, size, sec2, addr2):
@@ -145,6 +166,10 @@ def main():
                 continue
             sizes[name] = (size, region(addr))
             total[region(addr)] += size
+            for other in names_at.get((sec, addr), ()):
+                alias[other] = name
+            if sec != ".virtual_1":   # an address name (asm_origin's func_XXXXXXXX) for a function
+                alias.setdefault(f"func_{addr:08X}", name)   # the ELF now calls otherwise
 
     done = {"engine": 0, "virtual": 0, "libultra": 0}
     count = {"engine": 0, "virtual": 0, "libultra": 0}
@@ -162,7 +187,8 @@ def main():
         fake_files += faked
         src = re.sub(r"/\*.*?\*/", "", src, flags=re.S)
         plain = "M2C_" not in src.replace('#include "m2c_macros.h"', "")
-        for name in DEF.findall(src):
+        for name in DEF.findall(re.sub(r"(?m)^[ \t]*#.*$", "", src)):   # a TARGET_PORT pair of prototypes before one body
+            name = alias.get(name, name)
             if name in sizes and name not in matched_names:
                 matched_names.add(name)
                 size, reg = sizes[name]
@@ -173,10 +199,19 @@ def main():
                     fake += size
                     fake_n += 1
 
+    # libultra built from lib/ultralib: matched (make verify) and readable C, never faked.
+    for name in sorted({alias.get(n, n) for n in ultralib_functions()}):
+        if name in sizes and name not in matched_names:
+            matched_names.add(name)
+            size, reg = sizes[name]
+            done[reg] += size
+            count[reg] += 1
+            readable += size
+
     # Code that is not C by origin: out of the C totals, into its own row.
     asm = {"engine": 0, "virtual": 0, "libultra": 0}
     asm_n = 0
-    for name in not_c:
+    for name in {alias.get(n, n) for n in not_c}:
         if name in matched_names:
             print(f"progress.py: {name} is listed in {ASM_ORIGIN.name} but linked C defines it",
                   file=sys.stderr)

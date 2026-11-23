@@ -22,6 +22,7 @@ extern s32 gPakCheckDone;
  * the last one read back with a good checksum. */
 extern PakProfile gPakProfile;
 extern PakProfile gPakProfileRead;
+extern u8 gPakProfileRead_character;     /* gPakProfileRead.character (its users keep s8 views: local type) */
 
 /* The pak menus' state. */
 extern s32 gPakMenuStartPressed;

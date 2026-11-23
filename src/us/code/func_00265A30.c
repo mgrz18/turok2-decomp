@@ -10,44 +10,16 @@
 #include "structs/game_object.h"
 #include "globals/ai.h"
 
-
-#ifdef TARGET_PORT
-typedef struct ActionState {
-/* the view at the host offsets of CAI (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_ActionState(m) __builtin_offsetof(CAI, m)
-    union {
-        struct { u8 _hp_table[T2_HOFF_ActionState(m_pModeTable)]; void *table; }; /* N64 0x2C */
-        struct { u8 _hp_anim[T2_HOFF_ActionState(m_AnimIndex)]; u8 anim; }; /* N64 0xC6 */
-        struct { u8 _hp_active[T2_HOFF_ActionState(m_AnimRepeatedCount)]; s8 active; }; /* N64 0xC7 */
-        struct { u8 _hp_update[T2_HOFF_ActionState(m_pfStep)]; void (*update)(CGameObjectInstance *, void *); }; /* N64 0xF0 */
-        struct { u8 _hp_onEvent[T2_HOFF_ActionState(m_pfHurt)]; void (*onEvent)(CGameObjectInstance *, void *); }; /* N64 0xF8 */
-    };
-} ActionState;
-#else
-typedef struct {
-    /* 0x00 */ u8 pad0[0x2C];
-    /* 0x2C */ void *table;
-    /* 0x30 */ u8 pad30[0x96];
-    /* 0xC6 */ u8 anim;
-    /* 0xC7 */ s8 active;
-    /* 0xC8 */ u8 padC8[0x28];
-    /* 0xF0 */ void (*update)(CGameObjectInstance *, void *);
-    /* 0xF4 */ u8 padF4[4];
-    /* 0xF8 */ void (*onEvent)(CGameObjectInstance *, void *);
-} ActionState;
-#endif
-
 extern void Destructible_Step(CGameObjectInstance *actor, void *state);
 extern void Destructible_Hurt(CGameObjectInstance *actor, void *state);
 extern void TotemDefense_Init();
 
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS TotemDefense_Init receives Destructible_Setup's own argument
  * registers (pass-through); the host passes them. */
-void Destructible_Setup(CGameObjectInstance *actor, ActionState *state) {
-    state->table = gDestructibleModeTable;
-    state->update = Destructible_Step;
-    state->onEvent = Destructible_Hurt;
+void Destructible_Setup(CGameObjectInstance *actor, CAI *state) {
+    state->m_pModeTable = gDestructibleModeTable;
+    state->m_pfStep = Destructible_Step;
+    state->m_pfHurt = Destructible_Hurt;
     if (actor->m_nTypeFlag == 0x64D) {
         TotemDefense_Init(actor, state);
     }

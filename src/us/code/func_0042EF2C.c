@@ -59,13 +59,11 @@ void Demo_Start(DemoHeader *arg) {
     setup = &gEngineApp_m_Settings;
     GameSettings_SetDefaults(setup);
     if (s->playerCount >= 2) {
-        do {
-            for (i = 0; i < s->playerCount; i++) {
-                setup->slots[i].m_bActive = 1;
-                setup->slots[i].m_nCharacter = config->characters[i];
-            }
-            gEngineApp_m_Settings.multiplayer = 1;
-        } while (0);
+        for (i = 0; i < s->playerCount; i++) {
+            setup->slots[i].m_bActive = 1;
+            setup->slots[i].m_nCharacter = config->characters[i];
+        }
+        gEngineApp_m_Settings.multiplayer = 1;
     } else {
         setup->defaultSlot.m_bActive = 1;
         setup->multiplayer = 0;

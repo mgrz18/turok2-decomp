@@ -6,47 +6,10 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/collision.h"
-#ifdef TARGET_PORT
 #include "structs/particle.h"
-#endif
-
-/* An instance that can be hit: an actor (or the instance sweeping). */
-#ifdef TARGET_PORT
-typedef struct HitInst {
-/* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_HitInst(m) __builtin_offsetof(CGameObjectInstance, m)
-    union {
-        struct { u8 _hp_type[T2_HOFF_HitInst(header.m_Type)]; u8 type; }; /* N64 0x0 */
-        struct { u8 _hp_pos[T2_HOFF_HitInst(header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_def[T2_HOFF_HitInst(header.m_pIntelligence)]; s32 *def; }; /* N64 0x14 */
-        struct { u8 _hp_typeId[T2_HOFF_HitInst(m_nTypeFlag)]; u16 typeId; }; /* N64 0xB8 */
-        struct { u8 _hp_flags[T2_HOFF_HitInst(m_dwFlags)]; s32 flags; }; /* N64 0xD4 */
-        struct { u8 _hp_bounds[T2_HOFF_HitInst(m_vMin)]; CBox bounds; }; /* N64 0xBC: m_vMin, m_vMax */
-        struct { u8 _hp_particleDef[__builtin_offsetof(CParticle, m_pEffect)]; s32 *particleDef; }; /* N64 0xF8: a particle's (type 2) */
-        struct { u8 _hp_owner[__builtin_offsetof(CParticle, m_pOwner)]; struct HitInst *owner; }; /* N64 0x10C: a particle's (type 2) */
-    };
-} HitInst;
-#else
-typedef struct HitInst {
-    /* 0x000 */ u8 type;
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ s32 *def;
-    /* 0x018 */ u8 pad18[0xA0];
-    /* 0x0B8 */ u16 typeId;
-    /* 0x0BA */ u8 padBA[2];
-    /* 0x0BC */ CBox bounds;
-    /* 0x0D4 */ s32 flags;
-    /* 0x0D8 */ u8 padD8[0x20];
-    /* 0x0F8 */ s32 *particleDef;
-    /* 0x0FC */ u8 padFC[0x10];
-    /* 0x10C */ struct HitInst *owner;
-} HitInst;
-#endif
 
 typedef struct InstanceHit {
-    /* 0x00 */ HitInst *inst;
+    /* 0x00 */ CGameObjectInstance *inst;
     /* 0x04 */ f32 t;
 } InstanceHit;
 
@@ -56,8 +19,8 @@ void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
 s32 Collision_CompareInstanceHits();
 s32 Collision_SwapInstanceHits();
 void Sweep_GetVolumeBounds(Sweep *sweep, SweepBox *box);
-void Sweep_TestInstance(Sweep *sweep, SweepBox *box, HitInst *other);
-void Sweep_TestBox(Sweep *sweep, HitInst *other, CVector3 *start, CBox *box);
+void Sweep_TestInstance(Sweep *sweep, SweepBox *box, CGameObjectInstance *other);
+void Sweep_TestBox(Sweep *sweep, CGameObjectInstance *other, CVector3 *start, CBox *box);
 
 #define MIN(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
@@ -71,8 +34,8 @@ void Collision_SweepActors(Sweep *sweep) {
     f32 t;
     CVector3 *start;
     CCollisionInfo *def;
-    HitInst *inst;
-    HitInst *other;
+    CGameObjectInstance *inst;
+    CGameObjectInstance *other;
     CScene *world;
     InstanceHit *hit;
     GameSettings *multi;
@@ -85,10 +48,10 @@ void Collision_SweepActors(Sweep *sweep) {
     if (def->m_InstanceBehavior == 0 || !(def->m_dwFlags & 0x40000000)) {
         return;
     }
-    inst = (HitInst *)sweep->inst;
-    start = &inst->pos;
-    box.m_vMin.x = MIN(sweep->end.x, inst->pos.x);
-    box.m_vMax.x = MAX(sweep->end.x, inst->pos.x);
+    inst = (CGameObjectInstance *)sweep->inst;
+    start = &inst->header.m_vPos;
+    box.m_vMin.x = MIN(sweep->end.x, inst->header.m_vPos.x);
+    box.m_vMax.x = MAX(sweep->end.x, inst->header.m_vPos.x);
     box.m_vMin.y = MIN(sweep->end.y, start->y);
     box.m_vMax.y = MAX(sweep->end.y, start->y);
     box.m_vMin.z = MIN(sweep->end.z, start->z);
@@ -98,36 +61,36 @@ void Collision_SweepActors(Sweep *sweep) {
     world = &gScene;
     count = world->m_nMovers;
     for (i = 0; i < count && nHits < 0x80; i++) {
-        other = (HitInst *)world->m_pMovers[i];
+        other = (CGameObjectInstance *)world->m_pMovers[i];
         if (inst == other) {
             continue;
         }
-        if (def->m_InstanceBehavior == 7 && (HitInst *)gCollisionResultsP->m_pInstance == other) {
+        if (def->m_InstanceBehavior == 7 && (CGameObjectInstance *)gCollisionResultsP->m_pInstance == other) {
             continue;
         }
-        if ((def->m_dwFlags & 0x20000000) && other->typeId == 0x64F) {
+        if ((def->m_dwFlags & 0x20000000) && other->m_nTypeFlag == 0x64F) {
             continue;
         }
-        if (inst->type == 2 && inst->owner == other) {
-            if (*inst->particleDef & 0x40) {
+        if (inst->header.m_Type == 2 && ((CParticle *)inst)->m_pOwner == other) {
+            if (((CParticle *)inst)->m_pEffect->m_dwFlags & 0x40) {
                 continue;
             }
             if (gEngineApp_m_Settings.multiplayer) {
                 continue;
             }
-            switch (*other->def) {
+            switch (other->header.m_pIntelligence->m_Type) {
                 case 1:
                     continue;
                 case 4:
                     continue;
             }
         }
-        if (!(box.m_vMax.x > other->bounds.m_vMin.x) || !(box.m_vMin.x < other->bounds.m_vMax.x) ||
-            !(box.m_vMax.z > other->bounds.m_vMin.z) || !(box.m_vMin.z < other->bounds.m_vMax.z) ||
-            !(box.m_vMax.y > other->bounds.m_vMin.y) || !(box.m_vMin.y < other->bounds.m_vMax.y)) {
+        if (!(box.m_vMax.x > other->m_Bounds.m_vMin.x) || !(box.m_vMin.x < other->m_Bounds.m_vMax.x) ||
+            !(box.m_vMax.z > other->m_Bounds.m_vMin.z) || !(box.m_vMin.z < other->m_Bounds.m_vMax.z) ||
+            !(box.m_vMax.y > other->m_Bounds.m_vMin.y) || !(box.m_vMin.y < other->m_Bounds.m_vMax.y)) {
             continue;
         }
-        if (Sweep_HitBox(sweep, &other->bounds, &t)) {
+        if (Sweep_HitBox(sweep, &other->m_Bounds, &t)) {
             hit->inst = other;
             hit->t = t;
             hit++;
@@ -142,7 +105,7 @@ void Collision_SweepActors(Sweep *sweep) {
                 break;
             }
             other = hit->inst;
-            if ((other->flags & 0x300000) && !(multi = &gEngineApp_m_Settings)->multiplayer) {
+            if ((other->m_dwFlags & 0x300000) && !(multi = &gEngineApp_m_Settings)->multiplayer) {
                 Sweep_GetVolumeBounds(sweep, &volume);
                 Sweep_TestInstance(sweep, &volume, other);
             } else {

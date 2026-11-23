@@ -14,7 +14,6 @@
 #include "protos/menu.h"
 #include "structs/camera.h"
 
-extern s8 gPakProfileRead_character[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 s32 PakMenu_CheckPak(Menu *o, s32 pad, s32 z);
 CPlayer *CPlayerPool__FindByController(CPlayerPool *world, ControllerProfile *s);
 void CPlayer__SetCharacter(CPlayer *a, s32 b);
@@ -48,7 +47,7 @@ s32 CharNoteMenu_SelectYes(s32 unused, Menu *own) {
         plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, own->controller);
         own->player = plr;
         O01Restore(plr);
-        CPlayer__SetCharacter(plr, gPakProfileRead_character[0]);
+        CPlayer__SetCharacter(plr, (s8) gPakProfileRead_character);
         MenuPool_OpenChildMenu((u8 *)plr->m_pCamera->m_MenuPool, own, (u8 *)&gPlayerSetupMenuDesc);
         return 1;
     }

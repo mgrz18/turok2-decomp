@@ -14,70 +14,31 @@
 # compiled at all; their functions are the host compiler's (libgcc, libm) or port/runtime's.
 
 set(T2_LINK_REPLACED
+    # (The libultra files the N64 build now compiles from lib/ultralib are gone from
+    # src/us/code: versions/ultralib_objects.us.txt, docs/LIBULTRA.md. Only the ones
+    # that still exist are listed.)
     # threads, queues, events (t2os.c)
     func_0029B060.c   # osCreateThread
-    func_0029BB10.c   # osStartThread
-    func_0029B9B0.c   # osSetThreadPri
-    func_0029B150.c   # osGetThreadPri
-    func_0029DF70.c   # osYieldThread
     func_0029DE00.c   # osDestroyThread
-    func_0029B030.c   # osCreateMesgQueue
-    func_0029B820.c   # osSendMesg
-    func_0029B5B0.c   # osJamMesg
-    func_0029B6F0.c   # osRecvMesg
-    func_0029B950.c   # osSetEventMesg
-    func_0029AA20.c   # osViSetEvent
     # time (t2ultra.c: virtual clock)
-    func_0029BA80.c   # osSetTimer
-    func_0029B170.c   # osGetTime
     # VI
     func_0029A720.c   # osCreateViManager
-    func_0029A580.c   # osViBlack
-    func_0029A6E0.c   # osViGetCurrentFramebuffer
-    func_0029AA80.c   # osViSetMode
-    func_0029AAD0.c   # osViSetSpecialFeatures
-    func_0029AC40.c   # osViSetYScale
-    func_0029AC90.c   # osViSwapBuffer
     # SP / DP
     func_0029A248.c   # osSpTaskLoad
     func_0029A34C.c   # osSpTaskStartGo
-    func_0029A4F0.c   # osSpTaskYield
-    func_0029A510.c   # osSpTaskYielded
-    func_0029A380.c   # __osSpDeviceBusy
-    func_0029A560.c   # __osSpGetStatus
-    func_0029A4D0.c   # __osSpSetStatus
-    func_00298D50.c   # osDpSetNextBuffer
-    func_00298DF0.c   # __osDpDeviceBusy
     # AI
-    func_00298480.c   # osAiGetStatus
-    func_002984A0.c   # osAiSetFrequency
     func_002985C0.c   # osAiSetNextBuffer
-    func_00298650.c   # __osAiDeviceBusy
     # PI
     func_0029D5D0.c   # osCartRomInit
     func_0029D450.c   # osCreatePiManager
-    func_0029DA30.c   # osEPiRawReadIo
-    func_0029D190.c   # osEPiRawStartDma
-    func_0029DBD0.c   # osEPiRawWriteIo
     func_002A3060.c   # osPiGetCmdQueue
     func_0029B410.c   # osPiRawReadIo
-    func_00299EB0.c   # osPiRawStartDma
     func_002A2FB0.c   # osPiStartDma
     # SI: controllers, rumble
     func_00298A40.c   # osContInit
-    func_002986F8.c   # osContGetQuery
-    func_002987B4.c   # osContGetReadData
-    func_00298900.c   # osContReset
-    func_00298670.c   # osContStartQuery
-    func_00298720.c   # osContStartReadData
     func_0029A080.c   # __osSiRawStartDma
-    func_0029A140.c   # __osSiDeviceBusy
-    func_00299198.c   # osMotorInit
-    func_00298FD4.c   # osMotorStart
-    func_00298E10.c   # osMotorStop
     # system, TLB, 64DD
     func_0029B1F0.c   # osInitialize
-    func_0029BF80.c   # osVirtualToPhysical
     func_0028E5D0.c   # osMapTLBRdb
     func_0029D370.c   # osLeoDiskInit
     # engine boot and VM (t2boot.c)
@@ -95,16 +56,6 @@ set(T2_LINK_REPLACED
     func_0026FD88.c   # __amHandleFrameMsg
     func_002700D0.c   # __amDMA
     # the sound player API (m2c views with N64 offsets): port/audio/t2audio_sndp.c
-    func_00293470.c   # alSndpAllocate
-    func_00293530.c   # alSndpDeallocate
-    func_00293580.c   # alSndpGetState
-    func_00293CE0.c   # alSndpPlay
-    func_00293D40.c   # alSndpSetFXMix
-    func_00293D90.c   # alSndpSetPan
-    func_00293DE0.c   # alSndpSetPitch
-    func_00293E60.c   # alSndpSetSound
-    func_00293E70.c   # alSndpSetVol
-    func_00293EC0.c   # alSndpStop
     # the sound world (Rage Wars views of CAudioWorld/SndVoice/SndQueue at N64 offsets):
     # port/audio/t2audio_world.c (docs/port/AUDIO.md §8)
     func_002706A0.c   # CAudioWorld__StartVoice
@@ -188,46 +139,21 @@ set(T2_LINK_REPLACED
     func_00276DFC.c   # SpeechPlayer_Stop
     func_00276E78.c   # SpeechPlayer_PickEntry
     func_00277024.c   # SpeechPlayer_StopUnlocked
-    func_00293E30.c   # alSndpSetPriority (port/audio/t2audio_sndp.c)
     # libaudio's synthesizer driver, voice calls and event helpers (views at N64 offsets):
     # port/audio/t2audio_lib.c
-    func_00293F10.c   # alSynAddPlayer
     func_00294C70.c   # __nextSampleTime
     func_00294D18.c   # _timeToSamples
     func_00294C30.c   # _timeToSamplesNoRound
     func_00294BDC.c   # _collectPVoices
     func_00294B9C.c   # _freePVoice
-    func_00294090.c   # _allocatePVoice
-    func_00294160.c   # alSynFreeVoice
     func_00294200.c   # alSynSetFXMix
-    func_002942B0.c   # alSynSetPan
-    func_00294340.c   # alSynSetPitch
-    func_002943D0.c   # alSynSetPriority
-    func_002943E0.c   # alSynSetVol
-    func_002944A0.c   # alSynStartVoice
-    func_00294650.c   # alSynStopVoice
-    func_00291140.c   # alEvtqFlush
-    func_002911B8.c   # alEvtqFlushType
     func_00293BA8.c   # _removeEvents
-    func_0028FA00.c   # alCSPGetState
-    func_00296340.c   # alFilterNew
     func_002954F8.c   # alSaveNew
     func_002973E0.c   # alSaveParam
-    func_00290E90.c   # alCSPSetSeq
-    func_00290E10.c   # alCSPSetBank
-    func_00290EC0.c   # alCSPSetVol
-    func_00290E40.c   # alCSPSetChlFXMix
-    func_00290DE0.c   # alCSPPlay
-    func_00290EF0.c   # alCSPStop
     func_00296690.c   # alResampleParam
     func_0026FFA0.c   # AudioDMA_CacheBlock
     # libultra's compressed sequence player, cseq.c and the shared seqplayer.c helpers (Rage Wars
     # views at N64 offsets, s32 pointers): port/audio/t2audio_csp.c (docs/port/AUDIO.md §9)
-    func_0028FA10.c   # alCSPNew
-    func_00290C60.c   # __CSPPostNextSeqEvent
-    func_00290D5C.c   # __CSPSetUsptFromTempo
-    func_00290CCC.c   # __CSPRepostEvent
-    func_00290ACC.c   # __CSPHandleMetaMsg
     func_0028F460.c   # __getTrackByte
     func_0028F98C.c   # __readVarLen
     func_0028F518.c   # alCSeqNew
@@ -240,20 +166,6 @@ set(T2_LINK_REPLACED
     func_0028F1F0.c   # alCSeqNewMarker
     func_0028F828.c   # alCSeqSetLoc
     func_0028F89C.c   # alCSeqGetLoc
-    func_0029247C.c   # __mapVoice
-    func_002924CC.c   # __unmapVoice
-    func_002925E0.c   # __lookupVoice
-    func_00292640.c   # __lookupSoundQuick
-    func_00292774.c   # __vsVol
-    func_002927E8.c   # __vsDelta
-    func_00292804.c   # __vsPan
-    func_00292A74.c   # __seqpReleaseVoice
-    func_00292530.c   # __voiceNeedsNoteKill
-    func_00292A20.c   # __setInstChanState
-    func_002929A0.c   # __resetPerfChanState
-    func_002928F0.c   # __initChanState
-    func_00292844.c   # __initFromBank
-    func_00292B94.c   # __seqpStopOsc
     # the adec speech decoder and its loader pull (views at N64 offsets, the frame pointer in an
     # s32): port/audio/t2audio_adec.c (docs/port/AUDIO.md §10)
     func_002A1170.c   # adecStreamOpen

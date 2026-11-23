@@ -1,30 +1,18 @@
 #include "common.h"
 #include "globals/audio.h"
+#include "globals/audiomgr.h"
 #include "protos/ultra.h"
 
-/* An audio DMA buffer (libultra sample code's DMABuffer). */
-typedef struct DMABuffer {
-    /* 0x00 */ struct DMABuffer *next;  /* ALLink */
-    /* 0x04 */ struct DMABuffer *prev;
-    /* 0x08 */ s32 startAddr;
-    /* 0x0C */ u32 lastFrame;
-} DMABuffer;
-
-typedef struct {
-    /* 0x0 */ DMABuffer *firstUsed;
-    /* 0x4 */ DMABuffer *firstFree;
-} DMAState;
 
 s32 alUnlink(void *);                      /* alUnlink */
 s32 alLink(void *, void *);              /* alLink */
-extern DMAState gAudioDmaState_firstUsed;
 
 /* Waits for this frame's audio DMAs and frees the buffers not used lately. */
 void __clearAudioDMA(void) {
     s32 sp10;
     u32 var_s0;
-    DMABuffer *temp_s1;
-    DMABuffer *var_s0_2;
+    AMDMABuffer *temp_s1;
+    AMDMABuffer *var_s0_2;
 
     var_s0 = 0;
     sp10 = 0;
@@ -34,22 +22,22 @@ void __clearAudioDMA(void) {
             var_s0 += 1;
         } while (var_s0 < (u32) nextDMA);
     }
-    var_s0_2 = gAudioDmaState_firstUsed.firstUsed;
+    var_s0_2 = gAudioDmaState.firstUsed;
     if (var_s0_2 != NULL) {
         do {
-            temp_s1 = var_s0_2->next;
+            temp_s1 = (AMDMABuffer *) var_s0_2->node.next;
             if ((u32) (var_s0_2->lastFrame + 1) < (u32) audFrameCt) {
-                if (gAudioDmaState_firstUsed.firstUsed == var_s0_2) {
-                    gAudioDmaState_firstUsed.firstUsed = temp_s1;
+                if (gAudioDmaState.firstUsed == var_s0_2) {
+                    gAudioDmaState.firstUsed = temp_s1;
                 }
                 alUnlink(var_s0_2);
-                if (gAudioDmaState_firstUsed.firstFree == NULL) {
-                    gAudioDmaState_firstUsed.firstFree = var_s0_2;
-                    var_s0_2->next = NULL;
-                    var_s0_2->prev = 0;
+                if (gAudioDmaState.firstFree == NULL) {
+                    gAudioDmaState.firstFree = var_s0_2;
+                    var_s0_2->node.next = NULL;
+                    var_s0_2->node.prev = 0;
                     goto block_11;
                 }
-                alLink(var_s0_2, gAudioDmaState_firstUsed.firstFree);
+                alLink(var_s0_2, gAudioDmaState.firstFree);
                 var_s0_2 = temp_s1;
             } else {
 block_11:

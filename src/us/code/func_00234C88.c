@@ -1,38 +1,12 @@
 #include "common.h"
 
-#ifdef TARGET_PORT
-/* Round 20 i3: a Swoosh (structs/swoosh.h) at its host offsets. The N64 pad read the frame from
- * texture[1] and id, and wrote the end frame over texture[1] (the trail's texture handle). */
 #include "structs/swoosh.h"
-typedef struct FrameAnim {
-    u8 pad0[__builtin_offsetof(Swoosh, unk2C)];
-    f32 endFrame;               /* unk2C */
-    f32 frame;                  /* unk30 */
-    u8 pad34[0x4];              /* layer */
-    s32 randomFrame;            /* unk38 */
-} FrameAnim;
-_Static_assert(__builtin_offsetof(FrameAnim, frame) == __builtin_offsetof(Swoosh, unk30), "FrameAnim.frame");
-_Static_assert(__builtin_offsetof(FrameAnim, randomFrame) == __builtin_offsetof(Swoosh, unk38), "FrameAnim.randomFrame");
-#else
-typedef struct FrameAnim {
-    /* 0x00 */ u8 pad0[0x2C];
-    /* 0x2C */ f32 endFrame;
-    /* 0x30 */ f32 frame;
-    /* 0x34 */ u8 pad34[0x4];
-    /* 0x38 */ s32 randomFrame;
-} FrameAnim;
-#endif
-
-typedef struct FrameAnimDef {
-    /* 0x00 */ u8 pad0[0x1E];
-    /* 0x1E */ u8 mode;
-} FrameAnimDef;
 
 s32 Random_Next(void);                /* random */
 
 /* The frame index of an animation of `count` frames, by the definition's playback mode:
  * clamp (and remember the end), clamp, loop, ping-pong, random every time, random once. */
-s32 Trail_GetAnimFrame(FrameAnim *anim, FrameAnimDef *def, s32 *count) {
+s32 Trail_GetAnimFrame(Swoosh *anim, SwooshInfo *def, s32 *count) {
     s32 frame;
     s32 *f;
     s32 period;
@@ -40,7 +14,7 @@ s32 Trail_GetAnimFrame(FrameAnim *anim, FrameAnimDef *def, s32 *count) {
 
     frame = anim->frame;
     f = &frame;
-    switch (def->mode) {
+    switch (def->animMode) {
     case 0:
         if (*f >= *count - 1) {
             *f = *count - 1;

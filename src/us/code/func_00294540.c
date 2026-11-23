@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern Node_func_80239AF4_de *__allocParam(void);
-extern s32 _timeToSamplesNoRound(ALSynth *, s32);
+extern s32 _timeToSamples(ALSynth *, s32);
 void alSynStartVoiceParams(ALSynth *s, ALVoice *v, void *w, f32 pitch, s16 vol, u8 pan, s8 fxmix, s32 t)
 {
     ALStartParamAlt *update;
@@ -23,7 +23,7 @@ void alSynStartVoiceParams(ALSynth *s, ALVoice *v, void *w, f32 pitch, s16 vol, 
         update->volume = vol;
         update->fxMix = fxmix;
         update->pitch = pitch;
-        update->samples = _timeToSamplesNoRound(s, t);
+        update->samples = _timeToSamples(s, t);
         update->wave = w;
         f = v->pvoice->channelKnob;
         (*f->setParam)(f, 3, update);

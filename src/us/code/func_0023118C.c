@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/CODE_80281A70.CPP, Particle_DrawRenderList, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/swoosh.h"
 #include "structs/region.h"
 #include "structs/particle.h"
 #include "gfx.h"
@@ -23,7 +24,6 @@ typedef struct {
     /* 0x0C */ CVector3 max;
 } Box;
 
-extern u8 gEngineApp_m_SwooshSystem[];
 
 extern s32 Frustum_TestBox(void *planes, Box *box);
 extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
@@ -113,7 +113,7 @@ void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
                     }
                     if (!node->m_ActiveSwooshes || built) break;
                     if (!(node->m_pEffect->m_dwFlags & 0x10000)) {
-                        Swoosh_AddParticleNode(gEngineApp_m_SwooshSystem, node, node->m_mtxDraw[gEvenOdd]);
+                        Swoosh_AddParticleNode(&gEngineApp_m_SwooshSystem, node, node->m_mtxDraw[gEvenOdd]);
                     }
                 } else {
                     if (!node->m_ActiveSwooshes || built) break;
@@ -128,7 +128,7 @@ void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
                     }
                     node->m_dwFlags |= builtFlag;
                     if (!(node->m_pEffect->m_dwFlags & 0x10000)) {
-                        Swoosh_AddParticleNode(gEngineApp_m_SwooshSystem, node, node->m_mtxDraw[gEvenOdd]);
+                        Swoosh_AddParticleNode(&gEngineApp_m_SwooshSystem, node, node->m_mtxDraw[gEvenOdd]);
                     }
                 }
             } while (0);

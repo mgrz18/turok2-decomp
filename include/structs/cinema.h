@@ -100,6 +100,13 @@ typedef struct {
     /* 0x08 */ SplineNode nodes[1];
 } Spline;
 
+/* The packed source of a spline in the cinema file (Cinema_PrepareResource builds the Splines from
+ * them): a stride and a count, then the points (or the weights). SplineTable heads a list of them;
+ * a SplineSourceCursor walks the source as a header, the points or the weights. */
+typedef struct SplineSource { s32 stride, count; union { char data[0]; CVector3 points[0]; f32 weights[0]; }; } SplineSource;
+typedef struct SplineTable { s32 count; } SplineTable;
+typedef union SplineSourceCursor { SplineSource *header; CVector3 *points; f32 *weights; } SplineSourceCursor;
+
 typedef struct {
     /* 0x00 */ u8 pad0[0x10];
     /* 0x10 */ f32 time;

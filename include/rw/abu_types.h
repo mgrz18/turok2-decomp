@@ -17,6 +17,7 @@
 #include "structs/vector.h"
 #include "structs/libaudio.h"
 #include "structs/list.h" /* CList (Rage Wars' IntrusiveList) */
+#include "structs/sched.h" /* OSSched, OSScTask, OSScClient */
 #include "structs/adec.h" /* DecodeState, FftTables */
 #include "structs/table.h" /* StrideTable (Rage Wars' StridedTable) */
 
@@ -1267,25 +1268,6 @@ struct PlaneEquation {
     f32 distance;
 };
 typedef struct PlaneEquation PlaneEquation;
-struct CacheEntry;
-struct CacheEntry {
-    struct CacheEntry *next;
-    void *key;
-    u16 state;
-    u16 size;
-    s32 padC;
-    char data[0x80];
-};
-typedef struct CacheEntry CacheEntry;
-struct Window;
-typedef struct Window Window;
-struct Window {
-    struct Window *next;
-    struct Window *prev;
-    u32 base;
-    s32 frame;
-    s32 buffer;
-};
 struct ListLink;
 struct ListLink {
     struct ListLink *next;
@@ -2055,7 +2037,6 @@ struct Obj80264124 {
     char object[1];
 };
 typedef struct Obj80264124 Obj80264124;
-struct OSSched;
 struct View_func_8028FA60_de;
 typedef struct View_func_8028FA60_de View_func_8028FA60_de;
 struct Scene_func_8028FA60_de;
@@ -2068,11 +2049,6 @@ struct Scene_func_8028FA60_de {
     char pad14[0x38 - 0x14];
     s32 music;
     s64 *time;
-};
-struct OSScClientWork;
-struct OSScClientWork {
-    struct OSScClientWork *next;
-    OSMesgQueue *queue;
 };
 struct View_func_8028FA60_de {
     char pad0[0x78];
@@ -2091,37 +2067,10 @@ struct FrameSchedule {
     u32 duration;
     char pad128[0x18];
 };
-struct OSScTask_s;
-struct OSScTask_s {
-    struct OSScTask_s *next;
-    u32 state;
-    u32 flags;
-    void *framebuffer;
-    struct { s32 type; } list;
-};
 typedef struct FrameSchedule FrameSchedule;
 typedef struct Scene_func_8028FA60_de Scene_func_8028FA60_de;
-typedef struct OSScTask_s OSScTask_s;
-struct OSSched {
-    char pad0[0x20];
-    s16 retraceMessage;
-    char pad22[0x40 - 0x22];
-    OSMesgQueue interruptQueue;
-    char pad58[0x78 - 0x58];
-    OSMesgQueue commandQueue;
-    char pad90[0x2E0 - 0x90];
-    struct OSScClientWork *clientList;
-    struct OSScTask_s *audioListHead;
-    struct OSScTask_s *gfxListHead;
-    struct OSScTask_s *audioListTail;
-    struct OSScTask_s *gfxListTail;
-    struct OSScTask_s *curRSPTask;
-    struct OSScTask_s *curRDPTask;
-    u32 frameCount;
-    s32 doAudio;
-};
-typedef struct OSScClientWork OSScClientWork;
-typedef struct OSSched OSSched;
+typedef struct OSScTask_s OSScTask_s; /* structs/sched.h's OSScTask */
+typedef OSScClient OSScClientWork; /* structs/sched.h */
 struct Ctx_func_8028F544_de;
 struct Node_func_8028F544_de;
 typedef struct Ctx_func_8028F544_de Ctx_func_8028F544_de;

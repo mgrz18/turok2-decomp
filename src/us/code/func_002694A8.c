@@ -1,17 +1,15 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/collision.h"
 
 
-typedef struct CollisionInfo {
-    /* 0x00 */ s32 flags;
-} CollisionInfo;
 
-extern CollisionInfo D_800F1BE0;
+extern CCollisionInfo D_800F1BE0;
 
 s32 GameObject_CanEnterWater(CGameObjectInstance *actor);
 s32 GameObject_CanDropDown(CGameObjectInstance *actor);
 f32 CGameRegion__GetHeight(void *region, f32 x, f32 z);
-void Collision_MoveInstance(CGameObjectInstance *actor, CVector3 pos, CollisionInfo *info);
+void Collision_MoveInstance(CGameObjectInstance *actor, CVector3 pos, CCollisionInfo *info);
 
 /* Slides an actor to (x, z) with collision, keeping its height above the floor. */
 void GameObject_SlideTo(CGameObjectInstance *actor, f32 x, f32 z) {
@@ -30,19 +28,19 @@ void GameObject_SlideTo(CGameObjectInstance *actor, f32 x, f32 z) {
     to.x = x;
     to.y = actor->header.m_vPos.y;
     to.z = z;
-    oldFlags = D_800F1BE0.flags;
+    oldFlags = D_800F1BE0.m_dwFlags;
     if (noA) {
-        D_800F1BE0.flags = oldFlags & ~0x40000;
+        D_800F1BE0.m_dwFlags = oldFlags & ~0x40000;
     } else {
-        D_800F1BE0.flags = oldFlags | 0x40000;
+        D_800F1BE0.m_dwFlags = oldFlags | 0x40000;
     }
     if (noB) {
-        D_800F1BE0.flags &= ~0x30000;
+        D_800F1BE0.m_dwFlags &= ~0x30000;
     } else {
-        D_800F1BE0.flags |= 0x30000;
+        D_800F1BE0.m_dwFlags |= 0x30000;
     }
     Collision_MoveInstance(actor, to, &D_800F1BE0);
-    D_800F1BE0.flags = oldFlags;
+    D_800F1BE0.m_dwFlags = oldFlags;
     actor->m_vVelocity = savedVelocity;
     actor->header.m_vPos.y = CGameRegion__GetHeight(actor->header.m_pCurrentRegion, actor->header.m_vPos.x, actor->header.m_vPos.z) + height;
 }

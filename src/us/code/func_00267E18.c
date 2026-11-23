@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 22): the `do { return ...; } while (0)` (the permuter's other form of func_00267D60's fake);
+ * the plain getter, on the typed CIntelligence too, gives the definition $a0 and the type $v1: 5 of 13 words. */
 #include "structs/vector.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/8024D018_4.CPP, func_8024DE10_de.

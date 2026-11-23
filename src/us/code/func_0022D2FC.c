@@ -14,6 +14,7 @@
  * CParticle__BuildMatrix, CParticle__DrawSprite and CParticleSystem__Spawn are after Rage Wars
  * (Particle_BuildMatrix, Particle_DrawSprite and func_802800C0_de). */
 #include "common.h"
+#include "globals/swoosh.h"
 #include "structs/list.h"
 #include "gfx.h"
 #include "gbi_t2.h"
@@ -37,10 +38,7 @@ struct CROMParticleEffect *T2Port_ParticleEffects(void *data, s32 *count); /* po
 #include "protos/iset.h"
 #include "protos/cache.h"
 #include "protos/scene.h"
-#ifdef TARGET_PORT
-#include "structs/particle.h"
 #include "structs/camera.h"
-#endif
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -111,21 +109,6 @@ typedef struct {
 } MtxParticleDesc;
 #endif
 
-#ifdef TARGET_PORT
-typedef struct MtxCamera {
-/* the view at the host offsets of CCamera (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_MtxCamera(m) __builtin_offsetof(CCamera, m)
-    union {
-        struct { u8 _hp_fovY[T2_HOFF_MtxCamera(m_Fov)]; f32 fovY; }; /* N64 0x6C */
-    };
-} MtxCamera;
-#else
-typedef struct {
-    /* 0x00 */ u8 pad0[0x6C];
-    /* 0x6C */ f32 fovY;
-} MtxCamera;
-#endif
 
 #ifdef TARGET_PORT
 typedef struct MtxParticle {
@@ -180,7 +163,7 @@ typedef struct {
 
 /* CParticle__Attach under this part's view (the effect code below declares it as (Effect *, s32, s32)). */
 extern void MtxParticle_Place(MtxParticle *p, CVector3 *outPosition, CVector3 *outHeading) asm("CParticle__Attach");
-extern CMtxF *CParticle__GetParentTransform(MtxParticle *p, MtxCamera *camera);
+extern CMtxF *CParticle__GetParentTransform(MtxParticle *p, CCamera *camera);
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);       /* cross product */
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);         /* out = in * s */
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a + b */
@@ -237,7 +220,7 @@ static __inline__ f32 rampFade(f32 time, s32 ramp) {
     return 1.0f;
 }
 
-void CParticle__BuildMatrix(MtxParticle *particle, void *out, MtxCamera *camera, f32 depth) {
+void CParticle__BuildMatrix(MtxParticle *particle, void *out, CCamera *camera, f32 depth) {
     CMtxF rotation, basis, local, world, shakeMtx;
     CVector3 position;
     CVector3 up;
@@ -274,7 +257,7 @@ void CParticle__BuildMatrix(MtxParticle *particle, void *out, MtxCamera *camera,
             register f32 d asm("$f5") = depth;     /* pin, see top */
             depthScale = particleDepthScale(particle->desc, d);
         }
-        fov = camera->fovY;
+        fov = camera->m_Fov;
         scale = depthScale * (1.0f / 47.5f) * (fov + (47.5f - fov) * 0.25f);
     } else {
         scale = 1.0f;
@@ -1072,7 +1055,6 @@ typedef struct EffectActor {
 } EffectActor;
 #endif
 
-extern u8 gEngineApp_m_SwooshSystem[];
 #ifdef TARGET_PORT
 #include "structs/particle.h"
 #define D_8010FF34 (&gScene.m_DLightSet)
@@ -1115,7 +1097,7 @@ void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
         CParticle__StopLoopSound(actor);
         if (actor->registered) {
             CParticle__BuildCameraMatrix(actor);
-            Trail_DetachOwner(gEngineApp_m_SwooshSystem, actor);
+            Trail_DetachOwner(&gEngineApp_m_SwooshSystem, actor);
         }
         /* the light pointer-wide, in the host CParticle's member (the view has the N64 offset) */
         if (((CParticle *) actor)->m_pDLight != NULL) {
@@ -1417,21 +1399,6 @@ typedef struct Effect {
 
 
 
-#ifdef TARGET_PORT
-typedef struct Camera {
-/* the view at the host offsets of CCamera (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_Camera(m) __builtin_offsetof(CCamera, m)
-    union {
-        struct { u8 _hp_view[T2_HOFF_Camera(m_mfView)]; CMtxF view; }; /* N64 0x20C */
-    };
-} Camera;
-#else
-typedef struct {
-    /* 0x000 */ u8 pad0[0x20C];
-    /* 0x20C */ CMtxF view;
-} Camera;
-#endif
 
 extern Render D_800F1BA0;
 #ifdef TARGET_PORT
@@ -1444,7 +1411,6 @@ _Static_assert(sizeof(Entry) == sizeof(CROMParticleEffect), "Entry");
 _Static_assert(sizeof(ParticleHead) == sizeof(CObjectHead), "ParticleHead");
 #endif
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
-extern u8 gEngineApp_m_SwooshSystem[];
 #ifndef TARGET_PORT
 extern u8 D_8010FF34[];
 #endif
@@ -1613,7 +1579,7 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
     Effect *effect;
     Render *render;
     CVector3 *vel;
-    Camera *camera;
+    CCamera *camera;
     f32 distSq;
     f32 scale;
     f32 depth;
@@ -1760,7 +1726,7 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
                         if (!(source->flags & 0x100000)) {
                             if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
                                 camera = gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
-                                CMtxF__TransformPoint(&camera->view, &source->pos, &aimDelta);
+                                CMtxF__TransformPoint(&camera->m_mfView, &source->pos, &aimDelta);
                                 depth = aimDelta.z;
                                 if (depth < 0.0f) {
                                     depth = -depth;
@@ -2019,7 +1985,7 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
                 effect->unk1BC = gProjectilePower;
                 CParticle__Attach(effect, 0, 0);
                 if (entry->unk6 != -1) {
-                    Trail_AddNode(gEngineApp_m_SwooshSystem, effect, entry->unk6);
+                    Trail_AddNode(&gEngineApp_m_SwooshSystem, effect, entry->unk6);
                 }
                 if (entry->unk7 != -1) {
                     ((CParticle *) effect)->m_pDLight = DLight_Spawn(D_8010FF34, entry->unk7);

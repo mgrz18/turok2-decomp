@@ -3,6 +3,7 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002A52E4.c, func_002A52E4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
+#include "globals/swoosh.h"
 #include "globals/engine.h"
 #include "structs/particle.h"
 #include "structs/swoosh.h"
@@ -47,7 +48,6 @@ struct R8Emit {
 /* The particle a swoosh follows: m_mtxDraw at 0x48, m_pEffect at 0xF8 (Rage Wars 0x60 / 0x118). */
 typedef CParticle R8Actor;
 typedef CSwooshSystem R8Mgr;
-extern u8 gEngineApp_m_SwooshSystem[];
 void CMtxF__ToMtxAffine(void *, void *);
 void CMtxF__FromMtxAffine(void *, void *);
 void CMtxF__ClampEntries(void *);
@@ -117,7 +117,7 @@ void Trail_DetachOwner(R8Mgr *mgr, R8Actor *who) {
                 }
                 CMtxF__ScaleAxes(sp10, k, k, k);
                 CMtxF__ClampEntries(sp10);
-                Swoosh_NewNode(gEngineApp_m_SwooshSystem, e, sp10);
+                Swoosh_NewNode(&gEngineApp_m_SwooshSystem, e, sp10);
               }
             }
             if (e->owner != ((void *)0)) {

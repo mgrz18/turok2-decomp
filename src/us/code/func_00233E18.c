@@ -1,21 +1,13 @@
 #include "structs/vector.h"
+#include "structs/swoosh.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002A41D8.c, func_002A41D8.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py.
+ * The points are structs/swoosh.h's SwooshNode. */
 
 typedef struct V16 {
     f32 x, y, z, w;
 } V16;
-typedef struct Ent41D8 {   /* structs/swoosh.h SwooshNode */
-    void *prev;
-    void *next;
-    f32 life;
-    s32 unkC;
-    CVector3 pos;
-    f32 unk1C;
-    f32 unk20;
-    f32 unk24;
-} Ent41D8;
 typedef struct Out41D8 {
     V16 a;
     V16 b;
@@ -28,7 +20,7 @@ void CVector3__Cross(void *out, void *a, void *b);
 void CVector3__Normalize(void *v);
 void CMtxF__Identity(void *m);
 void CMtxF__RotateVector(u8 *p, void *a, void *b);
-void Trail_ComputeNodeFrame(Ent41D8 *e0, Ent41D8 *e1, u8 *arg2, Out41D8 *out) {
+void Trail_ComputeNodeFrame(SwooshNode *e0, SwooshNode *e1, u8 *arg2, Out41D8 *out) {
     V16 v10, v20, v30, v40, v50;
     f32 ty, tz;
     CVector3__Subtract(&v20, &e0->pos, &e1->pos);
@@ -46,9 +38,9 @@ void Trail_ComputeNodeFrame(Ent41D8 *e0, Ent41D8 *e1, u8 *arg2, Out41D8 *out) {
     CVector3__Normalize(&v40);
     CVector3__Cross(&v50, &v30, &v40);
     CVector3__Normalize(&v50);
-    CVector3__Scale(&v50, &v50, e0->unk1C);
-    CVector3__Scale(&v40, &v40, e0->unk20);
-    CVector3__Scale(&v30, &v30, e0->unk24);
+    CVector3__Scale(&v50, &v50, e0->scale.x);
+    CVector3__Scale(&v40, &v40, e0->scale.y);
+    CVector3__Scale(&v30, &v30, e0->scale.z);
     CMtxF__Identity(out);
     out->a.x = v50.x;
     out->a.y = v50.y;

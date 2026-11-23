@@ -136,11 +136,11 @@ void CStaticObject__Draw(PlacedProp *prop) {
     u8 *colors;
     void *data;
 
-    do { /* a block of its own, as an early-out macro would make; it decides the register allocation */
+    { /* a block of its own, as an early-out macro would make; it decides the register allocation */
         if (prop->flags & 0x40) {
             return;
         }
-    } while (0);
+    }
     argument = prop->descriptor->argument;
     if (gEngineApp_m_Settings.multiplayer) {
         mode = Actor_GetTypeClass(prop);

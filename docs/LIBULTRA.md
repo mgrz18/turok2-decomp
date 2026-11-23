@@ -3,8 +3,8 @@
 Turok 2 links Nintendo's **libultra 2.0I, `libgultra_rom`** (the GCC build of
 the library, the ROM flavour), with libaudio and libc from the same archive.
 This page gives the evidence, the per-function map against
-[decompals/ultralib](https://github.com/decompals/ultralib), and what replacing
-the game's own libultra C with ultralib's sources takes. (The older
+[decompals/ultralib](https://github.com/decompals/ultralib), and how the build
+compiles 120 of its modules from ultralib's own sources (round 22). (The older
 [LIBULTRA-MATCHING.md](LIBULTRA-MATCHING.md) is the log of the first matching
 rounds; its addresses predate the current layout.)
 
@@ -20,7 +20,7 @@ SN's host I/O, the exception stubs and GCC's libgcc. The block at ROM 0xC3074
 
 ## How the version was found
 
-`tools/ultralib_version.py` compiles every C file of `references/ultralib`
+`tools/ultralib_version.py` compiles every C file of `lib/ultralib`
 (commit e24c836) once per version and flavour, with the defines ultralib's
 Makefile and `makefiles/gcc.mk` give it (`BUILD_VERSION`, `NDEBUG` except for
 2.0I `libgultra_rom`, `_FINALROM` for `_rom`, `-funsigned-char` up to 2.0J),
@@ -111,42 +111,114 @@ The game's own `load.c` (`alAdpcmPull`, `alRaw16Pull`, `alAdecPull`,
 `alLoadParam`, `_decodeChunk`, at 0x0029F190 after libc) is Acclaim's: it adds
 the ADEC decoder and is linked apart from libaudio.
 
-## Replacing the game's libultra C with ultralib
+## The build: 120 modules from lib/ultralib (round 22)
 
-The task (README Phase 5) is to build these functions from ultralib's sources
-instead of the game's own per-function C. What the map says about it:
+ultralib is a **git submodule**, `lib/ultralib`, pinned at e24c836 (it has no
+license file, so none of its sources are copied into this repository). A fresh
+checkout needs `git clone --recursive` or `git submodule update --init`; the
+N64 build needs nothing else from the network. The port does not use it.
 
-- **What can come from ultralib as is**: the 291 identical functions. Grouped
-  by object (versions/modules.us.txt: the linker pads every object to 16
-  bytes, so each ultralib file is one module), 132 of the library's 173
-  modules (232 functions, 24 of the modules in the VM copies) are whole
-  ultralib files every function of which is identical; their game files can
-  be deleted and the ultralib file compiled in their place, all of them with
-  one config: `-O3 -mfp64` with ultralib's 2.0I `_rom` defines and
-  `-funsigned-char`.
-- **What stays the game's**: the 38 that differ, plus the 23 asm functions
-  until the `.s` files are wired the same way (ultralib's `.s` need its
-  `asm.h`/`regdef.h` and `gas` with `-P`, see its Makefile).
-- **Licensing**: ultralib has **no license file** (checked at e24c836). A
-  vendored copy cannot be added to this repo; it has to be a git submodule
-  (`lib/ultralib`, pinned) that the build checks out, like
-  `references/` today but tracked.
-- **Build**: the game is one function per file and splat's yaml lists every
-  file; an ultralib object brings several functions, and the 16-byte padding
-  between objects is stale linker bytes (the `stray_*.s` files) that the
-  ultralib object will not reproduce. Each replacement is: delete the game
-  files of the module, replace their yaml subsegments with one entry for the
-  ultralib object, keep the stray words as they are (the strays sit after the
-  object, so `make verify` still holds), and add a Makefile rule that compiles
-  `lib/ultralib/src/<file>.c` with the flags of the map.
-- **The port**: `port/cmake/game.cmake` compiles every `src/us/code/*.c` for
-  the host, and link.cmake swaps the kernel/VI/PI parts for `port/runtime`;
-  libaudio, gu and the pfs code it uses as the game's C. Files that move to
-  ultralib have to be compiled from `lib/ultralib` by the port as well (with
-  its `include/PR` replaced by the port's types), or stay in
-  T2_LINK_REPLACED.
+**120 of the library's 173 modules** (209 game files, one function each) are
+compiled from ultralib's own files and linked in place of the game's C:
+96 in `.code` (libaudio, gu, io, os, libc), the 12 Controller Pak files of the
+first paged VM module and their 12 copies in the second.
+`versions/ultralib_objects.us.txt` lists them, each with the game files it
+replaces. `make verify` is byte-exact.
 
-This round did the study and the map; the submodule and the first
-replacements are a build-system change for the coordinator to schedule (they
-touch the yaml, the Makefile and the port's CMake, which other parts change
-too).
+How it is built:
+
+- **Flags** (Makefile `UL_CPP_FLAGS`, `UL_CC_FLAGS`): ultralib's defines for
+  2.0I `libgultra_rom` (`BUILD_VERSION=VERSION_I`, `_FINALROM`, no `NDEBUG`,
+  `_MIPS_SZLONG=32`, `F3DEX_GBI`), the game's cc1 at `-O3 -mfp64 -fforce-addr
+  -fno-builtin -funsigned-char`, then `tools/sn_as.sh` like every C file. The
+  preprocessor runs from `lib/ultralib/src`, as ultralib's own build does:
+  `assert()` passes `__FILE__`, and the ROM has the names as `audio/csplayer.c`.
+- **The yaml**: one `c` subsegment per object
+  (`../../lib/ultralib/src/audio/csplayer`) in place of the module's function
+  files, the stray padding words after it untouched; its `.rodata` as one
+  `.rodata` subsegment where the ROM has it, splitting splat's unnamed rodata
+  pieces where it starts or ends inside one.
+- **The second VM module's copies**: the game links the pfs objects twice, and
+  the second copy's functions are `osPfsAllocateFile_2` and so on.
+  `lib/ultralib_vm2/io/<file>_2.c` is a two-line wrapper (ours): it includes
+  `vm2_names.h`, which `#define`s every ultralib global with a `_2` twin in the
+  game to that name, then ultralib's file. Same code, the second copy's names.
+- **Data**: the game keeps libultra's `.data` in the KSEG0 data that lies in
+  `code_rodata`'s range, so `sl.c`, `motor.c` and `thread.c` have their
+  `.data` renamed to `.rodata` on the built object and placed there, where
+  their symbols are (`alGlobals`, `__osMotorinitialized`, `__osThreadTail`).
+- **Names**: `versions/ultralib_aliases.us.txt` (an ld script) gives the
+  ultralib names the game spells otherwise: `__osContPifRam` (the game's
+  `__osContBuffer`, Rage Wars' name), `__osMaxControllers`
+  (`__osContNumControllers`), motor.c's four tentative buffers
+  (`__osMotorStartData` ...) and `func_0029E460` (the game's callers of
+  `memcpy`, which keeps an address name in the game C).
+  `versions/ultralib_renames.us.txt` is applied to the built objects
+  (`objcopy`, Makefile): the game's names for two static functions
+  (`__CSPSetUsptFromTempo` is csplayer.c's `__setUsptFromTempo`,
+  `__osClearPage_2`), so the ELF types them as functions for
+  `tools/port/gendata.py` (an untyped address became port data); the
+  `.data=.rodata` renames above; and the two names the game C uses inside
+  seqplayer.c's `.rodata` (`sSeqPlayerAssertExpr`, `sSeqPlayerAssertFile`,
+  `objcopy --add-symbol`). Every named symbol of `build/ref.elf` is in the
+  new ELF at the same address, the swapped pair excepted. Linking
+  `synsetvol.c` showed that `_timeToSamples` and `_timeToSamplesNoRound` had
+  their names swapped in the game (0x00294C30 cuts to 16 samples: ultralib's
+  `_timeToSamples`); they are renamed.
+- `tools/filter_defined_syms.py` reads `build/lib` too, and does not count a
+  COMMON symbol as defined (ultralib's `pfsisplug.c` has a tentative
+  `__osPfsPifRam`; the linker script discards COMMON, the symbol files place it).
+
+`tools/ultralib_build.py` does the work: for every module whose functions are
+all identical in the map, it compiles the ultralib file with the Makefile's
+flags and checks the whole object against the ROM (`.text` word for word with
+relocations masked, `.rodata` found where it covers the game C's own, no
+`.data`/`.bss`); `--write` rewrites the yaml and the list. Re-run:
+`python tools/ultralib_build.py --write && make setup`.
+
+**What stays the game's C**, and why:
+
+| Modules | Why |
+|---|---|
+| 41 (38 functions differ, + the files they share) | not identical: float code (KMC GCC 2.7.2 vs SN's 2.8.1), Acclaim's changes, a revision ultralib does not have, libc (above) |
+| `controller.c`, `timerintr.c` | every function identical, but in another order than ultralib's file (the game has `__osPackRequestData` before `__osContGetInitData`, `__osTimerServicesInit` after `__osTimerInterrupt`): 2.0I's file had another order |
+| `save.c`, `sirawdma.c`, `sprawdma.c`, `pirawread.c`, `sirawread.c` | their `.rodata` (assert's strings) ends inside a word, and the ROM has stale linker bytes in that word's padding: an object section is padded with zeros, and the next piece cannot start inside a word (`subalign: 4`) |
+| `siacs.c`, `piacs.c` (`.data` 4 + `.bss` 4), `vimgr.c` (0x1C + 0x1220), `pimgr.c` (0x28 + 0x11CC) | `.bss` of their own: the game's BSS has no segment in the yaml (its symbols are addresses), and splat would auto-link the object's `.bss` after `.code`'s; it needs a placed NOLOAD section first |
+| `aisetnextbuf.c` | its one byte of `.data` is a function-local static (`hdwrBugFlag`) no game symbol places, and it would end mid-word |
+| the 23 asm functions | ultralib's `.s` need its `asm.h`/`regdef.h` through the C preprocessor; the game's hand-written asm stays |
+
+Single functions out of a file that differs cannot come from ultralib: an
+object brings the whole file, and SN's cc1 here has no `-ffunction-sections`
+path the linker script could pick from.
+
+**The port** keeps the game's C for the files of these modules it links
+(libaudio, gu, libc, the first VM module's pfs). It is 64-bit: the game's C
+is typed for the host (`sptr`, the port's views), ultralib's assumes 32-bit
+pointers, and port/runtime replaces the kernel parts anyway. Those files are
+still in `src/us/code`, compile to the same code as before and are not linked
+by the N64 build (the list says which). 121 game files, which
+neither build linked any more (the kernel/VI/PI/SI/AI files port/runtime
+replaces, motor.c's three, the second VM module's copies, `sprintf`), are deleted.
+
+Checked in round 22 (Linux, Release at the coordinator's `-O2`): `gendata.py` rerun with
+`decls.json` deleted, `mklayout.py` (layout committed), `aligncheck.py` the 2 known
+`GameNoteMenu_SelectYes` sites; the boot and the 3 demos det `6ab97584…` (52,000 lines); the
+default whole-game run (300,000 frames, `aimdrive.py`) det `dc8126d3…` (600,000 lines, the one
+`death:` at 263,578). `port/gen` changed only where the ELF is now exact: `alGlobals` and
+`__osFaultedThread` are sized by their objects (4 bytes each, where gendata had read up to the
+next label: three and two garbage pointer slots fewer).
+
+**After the merge (round 22 coordinator).** Merged first, then k4, k3, k2 on top: every
+`tools/asm_diff.py --base f980f639` run shows the same 4 files and nothing else
+(func_00294540/_002949A4/_00294C30/_00294D18.c: only the `jal` targets of the swapped pair, the
+old source's name now resolving to the other address), and the ROM is identical (`make
+verify`). `tools/ultralib_build.py` (check) still takes 0 more modules (120 of 173);
+`tools/ultralib_version.py --versions I --map` and `tools/modules.py --write` were re-run
+(`versions/ultralib.us.txt`, `modules.us.txt`: the swapped pair, `memcpy`). `tools/progress.py`
+counts the ultralib objects' functions as linked C now (it read 94.76% engine without them) and
+resolves asm_origin's address names through the ELF's new names: engine and total 100%. A fresh
+`git clone --recursive` builds the ROM (`make setup && make verify`).
+
+**Round 23**: the 88 game files of ultralib-built modules that only the port links still sit in
+`src/us/code` beside the game's own C; they move out (a port libultra directory), and the
+game files move into the recovered modules (docs/MODULES.md).

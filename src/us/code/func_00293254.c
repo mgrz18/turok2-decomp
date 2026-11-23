@@ -1,66 +1,22 @@
-/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
- * for the ROM's register allocation or layout; with one arm: __alSeqNextDelta: 8 of 26 words. */
-#include "rw/junk_types.h" /* ALSeq */
+#include "common.h"
+#include "structs/libaudio.h"
 
-s32 __alSeqReadVarLen();
-#ifdef TARGET_PORT
-/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS __alSeqReadVarLen receives __alSeqNextDelta's own argument
- * registers (pass-through); the host passes them. */
-s32 __alSeqNextDelta(ALSeq *seq, s32 *arg1)
-{
-  uptr temp_s1;
-  temp_s1 = (uptr) seq->curPtr;
-  if (temp_s1 < ((u32) ((sptr) seq->base + (s32) seq->len)))
-  {
-    if (seq)
-    {
-      *arg1 = __alSeqReadVarLen(seq);
-      seq->curPtr = (u8 *) temp_s1;
-      return 1;
-    }
-    else
-    {
-      *arg1 = __alSeqReadVarLen(seq);
-      seq->curPtr = (u8 *) temp_s1;
-      return 1;
-    }
-  }
-  if (seq || temp_s1)
-  {
-    return 0;
-  }
-  else
-  {
-    return 0;
-  }
+s32 __alSeqReadVarLen(ALSeq *seq);
+
+/* libaudio seq.c (2.0I), as in ultralib: the delta time of the next event, read without moving
+ * the sequence; FALSE at the end of the data. readVarLen is __alSeqReadVarLen here (not inlined).
+ * Round 22 de-faked it: the function returns char (the m2c draft returned s32 and needed two
+ * equal arms). */
+char __alSeqNextDelta(ALSeq *seq, s32 *pDeltaTicks) {
+    u8 *savedPtr;
+
+    /* sct 1/16/96 - Put in safety check here to make sure we don't read past sequence data. */
+    if (seq->curPtr >= seq->base + seq->len)
+        return 0;
+
+    savedPtr = seq->curPtr;
+    *pDeltaTicks = __alSeqReadVarLen(seq); /* read the delta time */
+    seq->curPtr = savedPtr;
+
+    return 1;
 }
-#else
-s32 __alSeqNextDelta(ALSeq *seq, s32 *arg1)
-{
-  uptr temp_s1;
-  temp_s1 = (uptr) seq->curPtr;
-  if (temp_s1 < ((u32) ((sptr) seq->base + (s32) seq->len)))
-  {
-    if (seq)
-    {
-      *arg1 = __alSeqReadVarLen();
-      seq->curPtr = (u8 *) temp_s1;
-      return 1;
-    }
-    else
-    {
-      *arg1 = __alSeqReadVarLen();
-      seq->curPtr = (u8 *) temp_s1;
-      return 1;
-    }
-  }
-  if (seq || temp_s1)
-  {
-    return 0;
-  }
-  else
-  {
-    return 0;
-  }
-}
-#endif

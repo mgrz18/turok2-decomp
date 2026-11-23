@@ -32,6 +32,21 @@ typedef struct CWarpPoint {
     /* 0x12 */ s16 m_nID;                         /* the spawn point's id */
 } CWarpPoint; /* size 0x14 */
 
+/* A placed object of the level file (CScene__DecompressAnimatedInstances walks a block of them;
+ * CGameObjectInstance__ConstructFromRecord builds the instance; Rage Wars' InputRecAt27). */
+typedef struct CObjectRecord {
+    /* 0x00 */ s32 unk_00;
+    /* 0x04 */ CVector3 m_vPos;
+    /* 0x10 */ CVector3 m_vScale;
+    /* 0x1C */ u16 unk_1C;
+    /* 0x1E */ u16 unk_1E;
+    /* 0x20 */ u16 m_nRegion;                     /* CScene__GetRegion; 0xFFFF: none (a warp sets its m_nID) */
+    /* 0x22 */ u16 m_nIntelligence;               /* CScene__GetIntelligence */
+    /* 0x24 */ s16 m_Angle;                       /* 65536 = 2 pi */
+    /* 0x26 */ u8 unk_26;
+    /* 0x27 */ u8 unk_27;
+} CObjectRecord; /* size 0x28 */
+
 /* A streamed sector of the level: its data block and its extent on the ground plane. */
 typedef struct CSceneSector {
     /* 0x00 */ void **m_hData;

@@ -25,6 +25,7 @@ typedef struct {
 } BossTimers;
 #endif
 
+extern LevelScriptState gLevelScript; /* local: globals/boss.h is not included here (its gLevelScript_timer clashes with this file's view) */
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a - b */
 extern f32 CVector3__GetYaw(CVector3 *v);                                    /* heading */
@@ -33,7 +34,6 @@ extern f32 func_002982F0(f32 angle);                                      /* sin
 extern f32 func_002974C0(f32 angle);                                      /* cos */
 
 extern s32 D_800F1F50[];
-extern f32 D_8012F628;          /* last angle to the target */
 extern BossTimers gLevelScript_timer; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 /* Pushes the target away from the boss while the push timer has run out. */
@@ -50,9 +50,9 @@ void Primagen_UpdateMode20(CGameObjectInstance *obj, CAI *ai) {
     D_800F1F50[0] &= ~0x8000;
     if (t.m_Sight.m_pTarget != NULL) {
         AI_TurnClamped(obj, ai, 0.261799425f, t.m_Sight.m_Angle);
-        D_8012F628 = t.m_Sight.m_Angle;
+        gLevelScript.targetAngle = t.m_Sight.m_Angle;
     } else {
-        AI_TurnClamped(obj, ai, 0.261799425f, D_8012F628);
+        AI_TurnClamped(obj, ai, 0.261799425f, gLevelScript.targetAngle);
     }
     target = t.m_Sight.m_pTarget;
     if (target != NULL && gLevelScript_timer.pushTimer <= 0.0f) {

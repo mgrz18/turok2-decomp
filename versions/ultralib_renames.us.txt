@@ -1,0 +1,14 @@
+# The game's names for static functions of ultralib files, applied to the built object
+# (objcopy --redefine-sym, Makefile): the symbol keeps its type (a local function), so the
+# ELF names it as before for the tools that read it (tools/port/gendata.py, mklayout.py).
+# A .section=.other token renames a section instead (objcopy --rename-section): the .data of a
+# few objects goes into the KSEG0 data the game keeps in code_rodata's range.
+# A +name=.section:offset token adds a game name for a place inside the object (the data
+# names the game C uses there; objcopy --add-symbol).
+# object source: old=new ...  (docs/LIBULTRA.md)
+lib/ultralib/src/audio/csplayer.c: __setUsptFromTempo=__CSPSetUsptFromTempo
+lib/ultralib_vm2/io/pfsallocatefile_2.c: __osClearPage=__osClearPage_2
+lib/ultralib/src/audio/sl.c: .data=.rodata
+lib/ultralib/src/io/motor.c: .data=.rodata
+lib/ultralib/src/os/thread.c: .data=.rodata
+lib/ultralib/src/audio/seqplayer.c: +sSeqPlayerAssertExpr=.rodata:0 +sSeqPlayerAssertFile=.rodata:4

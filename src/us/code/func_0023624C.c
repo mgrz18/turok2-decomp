@@ -2,12 +2,6 @@
 #include "structs/particle.h"
 #include "structs/swoosh.h"
 
-/* The swoosh record: the time it fades out in. */
-typedef struct {
-    /* 0x0 */ u8 pad0[4];
-    /* 0x4 */ f32 fadeTime;
-} SwooshDef;
-
 /* Detaches every swoosh of owner arg1 (flags & 1: counted in a game object's m_ActiveSwooshes,
  * & 2: in a particle's), letting each fade out. */
 void Swoosh_DetachOwner(CSwooshSystem *arg0, void *arg1) {
@@ -39,7 +33,7 @@ void Swoosh_DetachOwner(CSwooshSystem *arg0, void *arg1) {
                     }
                 }
                 var_v1->owner = NULL;
-                temp_f1 = ((SwooshDef *) var_v1->info)->fadeTime;
+                temp_f1 = var_v1->info->fadeTime;
                 if (var_v1->time < temp_f1) {
                     var_v1->time = temp_f1;
                 }

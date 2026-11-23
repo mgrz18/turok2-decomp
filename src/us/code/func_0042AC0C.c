@@ -3,6 +3,7 @@
  * CPlayerPool__GetFirstActive result and the actor array keeps the last loop's load in $v0, `actor += 0x288` gives the player
  * loop its register order, and the sound switch with one shared call keeps w in $s3. */
 #include "common.h"
+#include "globals/swoosh.h"
 #include "structs/world.h"
 #include "structs/game.h"
 #include "structs/player.h"
@@ -23,7 +24,6 @@
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
  * level's data blocks and spawns its actors. */
 
-extern u8 gEngineApp_m_SwooshSystem[];
 
 extern s32 ProPack__Decompress(s32, sptr);
 extern void CCollisionInfo__Reset(void);
@@ -134,7 +134,7 @@ loaded:
     CParticleSystem__Construct(&w->m_ParticleSystem, *(sptr *) w->m_pParticleEffects);
     SceneActorPool_Construct(&w->m_ActorPool);
     CInstancePool__Construct(&w->m_InstancePool);
-    SwooshSystem_Construct(gEngineApp_m_SwooshSystem);
+    SwooshSystem_Construct(&gEngineApp_m_SwooshSystem);
     CCollisionInfo__Reset();
     CDLightSet__Construct(&w->m_DLightSet);
     LoopSounds_Construct(&gLoopSounds, gLoopSoundEntries, 0xF);
@@ -321,11 +321,11 @@ loaded:
     CParticleSystem__Construct(&w->m_ParticleSystem, *w->m_pParticleEffects);
     SceneActorPool_Construct(&w->m_ActorPool);
     CInstancePool__Construct(&w->m_InstancePool);
-    SwooshSystem_Construct(gEngineApp_m_SwooshSystem);
+    SwooshSystem_Construct(&gEngineApp_m_SwooshSystem);
     CCollisionInfo__Reset();
     CDLightSet__Construct(&w->m_DLightSet);
     LoopSounds_Construct(&gLoopSounds, gLoopSoundEntries, 0xF);
-    COnScreen__ResetBossBars(gEngineApp_m_SwooshSystem - 0x1C8);
+    COnScreen__ResetBossBars((u8 *) &gEngineApp_m_SwooshSystem - 0x1C8);
     if (*w->m_pLevels < level) {
         level = *w->m_pLevels - 1;
         announce = 0;

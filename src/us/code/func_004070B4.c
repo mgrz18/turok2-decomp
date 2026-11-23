@@ -9,14 +9,13 @@ typedef struct {
     /* 0x8 */ s8 unk8;
 } State;
 
-extern State gLevelScript_script2_cursor; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
-#define SCRIPT (((BossStep2 **) &gLevelScript_script2_cursor)[-1])
+#define SCRIPT gLevelScript.script2.steps
 
 void Primagen_SetSpawnScript(s32 arg0) {
-    gLevelScript_script2_cursor.unk0 = -1;
-    gLevelScript_script2_cursor.unk8 = 1;
-    gLevelScript_script2_cursor.unk4 = -1;
+    gLevelScript.script2.cursor = -1;
+    gLevelScript.script2On = 1;
+    gLevelScript.script2.current = -1;
     if (arg0 == 0) {
         SCRIPT = NULL;
     }

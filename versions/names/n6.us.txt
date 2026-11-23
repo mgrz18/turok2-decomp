@@ -110,9 +110,9 @@ __allocParam = 0x00294B58; // ultralib synthesizer.c (file header)
 __freeParam = 0x00294B84; // ultralib synthesizer.c (file header)
 _freePVoice = 0x00294B9C; // ultralib synthesizer.c; rw_junk same size and order
 _collectPVoices = 0x00294BDC; // ultralib synthesizer.c; rw_junk same size and order
-_timeToSamplesNoRound = 0x00294C30; // ultralib synthesizer.c: micros * outputRate / 1e6
+_timeToSamples = 0x00294C30; // ultralib synthesizer.c: micros * outputRate / 1e6 + 0.5, & ~0xF (alSynSetVol, alSynStartVoiceParams call it; the two names were swapped before round 22)
 __nextSampleTime = 0x00294C70; // ultralib synthesizer.c; rw_junk same size and order
-_timeToSamples = 0x00294D18; // ultralib synthesizer.c: the rounding twin of _timeToSamplesNoRound (+ a rodata 0.5)
+_timeToSamplesNoRound = 0x00294D18; // ultralib synthesizer.c: micros * outputRate / 1e6 + 0.5, not cut to 16 samples (alAudioFrame calls it)
 
 // libaudio filters: auxbus.c, reverb.c, load.c, mainbus.c, resample.c, save.c, env.c, filter.c
 alAuxBusPull = 0x00294D60; // ultralib auxbus.c: clears AL_AUX_L_OUT/R_OUT (0x6C0/0x800), pulls each source; installed by alAuxBusNew

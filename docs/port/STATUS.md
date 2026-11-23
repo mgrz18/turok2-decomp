@@ -22,6 +22,61 @@ The matching build is unchanged: `tools/asm_diff.py --base 70f3333c -j 8` report
 over all 3,938 files after every merge and at the end, and a clean `make clean && make setup &&
 make -j8 build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
+## Round 22 (Phase 5, readable code, part 2): the merge
+
+Four branches merged, in this order: k1 (libultra from the pinned `decompals/ultralib` submodule:
+120 of 173 modules built from its sources, 121 game files deleted, the `_timeToSamples` /
+`_timeToSamplesNoRound` names swapped back; docs/LIBULTRA.md), k4 (`gScheduler` is `OSSched`,
+`gEngineApp_m_SwooshSystem` is `CSwooshSystem`, the audio manager's SDK types, field symbols as
+members of their owner; docs/GLOBALS.md), k3 (structs and host-view twins: `SwooshInfo`,
+`m_Bounds`, `CTurretIntelligence`, `CObjectRecord`, the cinema splines, `CCollisionInfo`;
+docs/STRUCTS_TODO.md) and k2 (the FAKEMATCH second pass, `tools/undowhile.py`;
+docs/MATCHING.md). Only README.md conflicted (the Phase 5 lines; each branch's line kept). Re-run
+on the merged tree, each its own commit: `unview.py` (one more twin, func_00407BBC.c),
+`undowhile.py` (one more wrapper, func_00221D3C.c), `unify_host_bodies.py` (0),
+`apply_names.py` (nothing to rename); `ultralib_version.py --versions I --map` and
+`modules.py --write` (the swapped pair, `memcpy`); `tools/progress.py` taught the ultralib
+objects (engine and total 100%, readable 99.91%).
+
+The N64 build needs the submodule now: `git submodule update --init` (or `git clone
+--recursive`; a fresh recursive clone builds the ROM with `make setup && make -j8 build && make
+verify`). `tools/asm_diff.py --base f980f639 -j 8` after every merge and at the end: 4 of 3,817
+files, only the `jal`s of the swapped pair (func_00294540/_002949A4/_00294C30/_00294D18.c, the
+old source's name resolving to the other address); a clean `make setup && make -j8 build && make
+verify` gives the identical ROM.
+
+The port reads renamed and retyped C; no behaviour change. Linux, this tree:
+`versions/port_layout.us.json` regenerated from the clean build (a clean `make setup` runs
+`filter_defined_syms.py` before `build/lib` has the ultralib objects, so two renamed statics stay
+as absolute symbols; an incremental setup drops them and `mklayout.py --check` then calls the
+file stale: harmless, same addresses, same port binary; a fresh clone matches the committed file); gendata rerun with `decls.json` deleted after each merge; `aligncheck.py` (Release) the 2
+known `GameNoteMenu_SelectYes` sites; boot + 3 demos (26,000 frames, `--pak-blank`) det
+`6ab97584…` (52,000 lines); the default whole-game run (Release, `aimdrive.py`, 300,000
+frames) det **`dc8126d3…`** (600,000 lines, the one `death:` line at 263,578, the hub after the
+credits). Port tests: `make -C port test` (rnc_test, t2asset_test, t2asset_typed_test) OK,
+gbi_test 0 mismatches, t2os deterministic on 3 runs, `t2audio_test --direct 0/40` max
+difference 0, `--adec` 27,136 samples, the swoosh self test OK (k3's `SwooshInfo`). abicheck:
+0 harmful (round 21: 1, the `Destructible_Hurt` indirect call, now typed); ptrargs: 0 to retype;
+outptr: 0 BAD (16 ok, as before); n64viewcheck: view/local 198 -> 183, view/moves 75 -> 66,
+view/suspect 41 -> 35, one new raw/BAD that is not new code: `ImpactEvent_ApplyBlast` (below),
+now typed so the checker sees it. f2ucheck: 112 float -> unsigned conversions (79): 34 newly
+reported, all in the GBI rectangle macros (`(unsigned int)` of float coordinates) of the cinema
+letterbox in func_0040F240.c and its copy func_00448240.c, lines unchanged since f980f639 (the
+files k2 and k3 both retyped); one gone with a deleted libultra file.
+
+**Two host bugs, open for round 23** (k3 found them; both were there at f980f639, kept as they
+were, with a comment):
+
+- `ImpactEvent_ApplyBlast` (func_00237AFC.c) compares the blast's source with `(u8 *)owner +
+  0x288`: `CPlayer.m_WeaponActor` on the N64, another field on the host (0x348 there). On the host the test reads
+  another member than the N64's (no effect seen in the runs above).
+- `Rumble_SetLink` writes an `s32` at 0x38 of a `RumbleEffect`: the owner pointer on the N64,
+  another place on the host.
+
+**Round 23**: move the game files into the recovered modules (`versions/modules.us.txt`,
+docs/MODULES.md); move the port's own copies of libultra's C (the 88 game files of
+ultralib-built modules that only the port links) out of `src/us/code`; the two bugs above.
+
 ## Round 21 (Phase 5, readable code, part 1): the merge
 
 Five branches merged, in this order: j5 (libultra is 2.0I `libgultra_rom`; the module map,

@@ -111,10 +111,8 @@ void CScene__BuildGeometryDisplayList(CScene *w) {
             g->w1 = 0xFFFE;
         }
         r = 0;
-        do {
-            n = w->m_nSectors;
-            regions = w->m_Sectors;
-        } while (0);
+        n = w->m_nSectors;
+        regions = w->m_Sectors;
         if (n > 0) {
             do {
                 region = regions + r;
@@ -172,9 +170,7 @@ void CScene__BuildGeometryDisplayList(CScene *w) {
                             off += sizeof(CStaticObject);
                         } while (k < cnt);
                     }
-                    do {
-                        t = CISet__GetBlock(grp, 1);
-                    } while (0);
+                    t = CISet__GetBlock(grp, 1);
                     k = 0;
                     cnt2 = t->count;
                     actors = (CLevelActor *)t->entries;

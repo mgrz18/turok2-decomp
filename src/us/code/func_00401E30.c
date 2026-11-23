@@ -13,13 +13,11 @@ static __inline__ void State_NextStep(WaveBossState *s) {
     s32 value;
 
     s->step++;
-    do {
-        s->stepIndex++;
-        step = s->step;
-        value = step->spawnCount;
-        s->timer = 0;
-        s->toSpawn += value;
-    } while (0);
+    s->stepIndex++;
+    step = s->step;
+    value = step->spawnCount;
+    s->timer = 0;
+    s->toSpawn += value;
     if (step->partPicks != 0 && step->spawnCount != 0) {
         s->waveActive = 1;
     } else {

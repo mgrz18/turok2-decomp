@@ -2,9 +2,7 @@
 #define STRUCTS_SCHED_H
 
 /* The SDK scheduler's message and client (PR/sched.h). The engine's frames
- * carry their OSScMsg in CFrameData.m_Msg (structs/frame.h). OSScTask and
- * OSSched (with Acclaim's additions, 0x80 bytes before clientList) are still
- * local views in the scheduler files and rw/abu_types.h. */
+ * carry their OSScMsg in CFrameData.m_Msg (structs/frame.h). */
 
 #include "common.h"
 #include "ultra_types.h"
@@ -22,13 +20,13 @@ typedef struct SCClient_s {
     /* 0x4 */ OSMesgQueue *msgQ;
 } OSScClient; /* size 0x8 */
 
-#ifdef TARGET_PORT
-/* The port: the scheduler's task and the scheduler itself as typed structs (PR/sched.h's
- * OSScTask and OSSched, with Acclaim's 0x80 bytes before the client list). On the N64 the
- * scheduler files keep their local views; on the host they are replaced by port/game/t2sched.c,
- * which uses these. T2 names: rw/abu_types.h declares its own OSSched / OSScTask_s views. */
-typedef struct T2ScTask {
-    /* 0x00 */ struct T2ScTask *next;
+/* A task (PR/sched.h's OSScTask, tag OSScTask_s) and the scheduler (OSSched, with Acclaim's
+ * 0x80 bytes before the client list), both targets. On the N64 the scheduler files
+ * (src/us/code/func_0028A020.c .. func_0028B3E8.c) use these through rw/abu_types.h; on the
+ * host they are replaced by port/game/t2sched.c, which uses them at the host's sizes.
+ * gScheduler (globals/frame.h) is the engine's one OSSched. */
+typedef struct OSScTask_s {
+    /* 0x00 */ struct OSScTask_s *next;
     /* 0x04 */ u32 state;               /* OS_SC_NEEDS_RSP 2, OS_SC_NEEDS_RDP 1, 0x10 yielded... */
     /* 0x08 */ u32 flags;               /* OS_SC_PARALLEL_TASK 0x20, OS_SC_SWAPBUFFER 0x40... */
     /* 0x0C */ void *framebuffer;
@@ -37,9 +35,9 @@ typedef struct T2ScTask {
     /* 0x54 */ OSMesg msg;
     /* 0x58 */ u64 startTime;
     /* 0x60 */ u64 totalTime;
-} T2ScTask;
+} OSScTask; /* size 0x68 */
 
-typedef struct T2Sched {
+typedef struct OSSched {
     /* 0x000 */ OSScMsg retraceMsg;     /* type 1 */
     /* 0x020 */ OSScMsg prenmiMsg;      /* type 4 */
     /* 0x040 */ OSMesgQueue interruptQ; /* Sched_GetInterruptQ */
@@ -49,15 +47,20 @@ typedef struct T2Sched {
     /* 0x0B0 */ OSThread thread;
     /* 0x260 */ u8 unk260[0x80];
     /* 0x2E0 */ OSScClient *clientList;
-    /* 0x2E4 */ T2ScTask *audioListHead;
-    /* 0x2E8 */ T2ScTask *gfxListHead;
-    /* 0x2EC */ T2ScTask *audioListTail;
-    /* 0x2F0 */ T2ScTask *gfxListTail;
-    /* 0x2F4 */ T2ScTask *curRSPTask;
-    /* 0x2F8 */ T2ScTask *curRDPTask;
+    /* 0x2E4 */ OSScTask *audioListHead;
+    /* 0x2E8 */ OSScTask *gfxListHead;
+    /* 0x2EC */ OSScTask *audioListTail;
+    /* 0x2F0 */ OSScTask *gfxListTail;
+    /* 0x2F4 */ OSScTask *curRSPTask;
+    /* 0x2F8 */ OSScTask *curRDPTask;
     /* 0x2FC */ u32 frameCount;
     /* 0x300 */ s32 doAudio;
-} T2Sched;
+} OSSched; /* size 0x304 */
+
+#if defined(TARGET_PORT) && defined(__mips__)
+_Static_assert(sizeof(OSScTask) == 0x68, "OSScTask");
+_Static_assert(__builtin_offsetof(OSSched, clientList) == 0x2E0, "OSSched.clientList");
+_Static_assert(sizeof(OSSched) == 0x304, "OSSched");
 #endif
 
 #endif

@@ -6,7 +6,7 @@
 [![total matched](https://img.shields.io/badge/total%20matched-100%25-brightgreen)](tools/progress.py)
 [![engine matched](https://img.shields.io/badge/engine%20matched-100%25-brightgreen)](tools/progress.py)
 [![VM modules matched](https://img.shields.io/badge/VM%20modules%20matched-100%25-brightgreen)](tools/progress.py)
-[![readable](https://img.shields.io/badge/readable%20C-99.83%25-blue)](tools/progress.py)
+[![readable](https://img.shields.io/badge/readable%20C-99.91%25-blue)](tools/progress.py)
 [![asm decoded](https://img.shields.io/badge/asm%20decoded-95.2%25-brightgreen)](docs/VRAM-LAYOUT.md)
 [![functions](https://img.shields.io/badge/functions-13%2C275-brightgreen)](docs/VRAM-LAYOUT.md)
 [![functions named](https://img.shields.io/badge/C%20functions%20named-92%25-blue)](docs/NAMES.md)
@@ -17,7 +17,7 @@
 
 Work-in-progress **matching decompilation** of **Turok 2: Seeds of Evil** (Nintendo 64, US 1.0): C source that compiles back to the exact original ROM.
 
-> **Status: all the C is matched.** The ROM rebuilds byte-exact from C (`make verify` passes the SHA1): 2,531 engine functions and 1,311 functions of the paged VM modules, built with SN64 GCC 2.8.1 (`cc1 -O2 -mno-fix4300`) + `asn64`. 51 files are marked FAKEMATCH, each documented (round 21's audit found 58 unmarked fakes and de-faked 25 functions; [docs/MATCHING.md](docs/MATCHING.md)), and 99.83% is readable C with named fields. The badges count C-origin code; the 9 KB of hand-written asm (libultra's `.s` files, SN64's boot and TLB code, the RNC unpacker, the exception stubs) is tracked apart ([docs/ASM_ORIGIN.md](docs/ASM_ORIGIN.md)).
+> **Status: all the C is matched.** The ROM rebuilds byte-exact from C (`make verify` passes the SHA1): 2,531 engine functions and 1,311 functions of the paged VM modules, built with SN64 GCC 2.8.1 (`cc1 -O2 -mno-fix4300`) + `asn64`. 52 files are marked FAKEMATCH, each documented (round 21's audit found 58 unmarked fakes and de-faked 25 functions, round 22 de-faked 5 more, rewrote 9 and marked 6 the audit had missed; [docs/MATCHING.md](docs/MATCHING.md)), and 99.83% is readable C with named fields. The badges count C-origin code; the 9 KB of hand-written asm (libultra's `.s` files, SN64's boot and TLB code, the RNC unpacker, the exception stubs) is tracked apart ([docs/ASM_ORIGIN.md](docs/ASM_ORIGIN.md)).
 >
 > **Native PC port (Phase 7, closed):** the same C runs as a 64-bit program on libultraship, on Linux and macOS. A new game plays through to the good ending, frame for frame the same on both hosts, and a self-contained Mac app is ready for its first session in a real window. See [docs/port/STATUS.md](docs/port/STATUS.md) and [docs/port/QUICKSTART.md](docs/port/QUICKSTART.md).
 
@@ -70,6 +70,10 @@ On an x86_64 Linux host the same steps run without containers: install
 (`libc6:i386`), and `cc1` runs natively, far faster than emulated.
 
 ```bash
+# 0. The libultra sources the build compiles: decompals/ultralib, a pinned
+#    submodule (clone with --recursive, or:)
+git submodule update --init
+
 # 1. Clone reference projects (gitignored, not part of this repo)
 mkdir -p references && cd references
 git clone --recursive https://github.com/Drahsid/turok3.git
@@ -149,15 +153,15 @@ one possible.
 ### Phase 5 — Readable code (in progress)
 What a source port needs: code a person can read and change without breaking it.
 - [x] Shared struct headers in `include/structs/` (offsets checked with `tools/check_structs.py`)
-- [ ] Hoist the remaining repeated local structs: 172 names in 2+ files (291 before round L, 228 before round 21); host-view twins 137 -> 99 (`tools/hoist_structs.py`, `tools/unview.py`; [docs/STRUCTS_TODO.md](docs/STRUCTS_TODO.md))
-- [ ] Name the functions: 4,058 of the 4,146 C functions named (4,187 names with the asm ones); 88 C `func_` left: empty or constant stubs, setters/getters and type or flag tests of unknown structs, sector sums, unclear Rage Wars imports, and five whose real name changes the code (`cosf`, `sinf`, `sqrtf`, `memcpy` are GCC builtins; `main`) ([docs/NAMES.md](docs/NAMES.md#left-as-func_-round-21))
-- [ ] Name the globals: 1,676 data names (`versions/names/data_*.us.txt`); 132 `D_` left in the C (11 labels in code, 10 VM data, 52 pool words kept for a reason, 67 interiors of named BSS objects that want their struct's members) and 4 absolute ROM offsets ([docs/NAMES.md](docs/NAMES.md#round-21-part-j2-the-d_-left-in-the-c))
+- [ ] Hoist the remaining repeated local structs: 142 of 698 local struct names in 2+ files (291 before round L, 228 before round 21, 172 before round 22; k1's 121 deleted libultra files took 5); host-view twins 137 -> 99 -> 62 in 37 files (the swoosh, M04 sound, collision-response, turret and level-record families done; left: FAKEMATCH files, field-symbol views, animation views; `tools/hoist_structs.py`, `tools/unview.py`; [docs/STRUCTS_TODO.md](docs/STRUCTS_TODO.md))
+- [ ] Name the functions: the game C defines 4,025 functions (4,146 before round 22: the 121 deleted libultra files, one function each, now come from `lib/ultralib`), 3,937 named (4,187 names with the asm and ultralib ones); 88 C `func_` left: empty or constant stubs, setters/getters and type or flag tests of unknown structs, sector sums, unclear Rage Wars imports, and five whose real name changes the code (`cosf`, `sinf`, `sqrtf`, `memcpy` are GCC builtins: renaming changes 88 files for `sqrtf`, 9 for `cosf`/`sinf`; `main`) ([docs/NAMES.md](docs/NAMES.md#left-as-func_-round-21))
+- [ ] Name the globals: 1,676 data names (`versions/names/data_*.us.txt`); 129 `D_` left in the C (11 labels in code, 10 VM data, 52 pool words kept for a reason, 64 interiors of named BSS objects that want their struct's members; round 22 made 3 of them members) and 4 absolute ROM offsets ([docs/NAMES.md](docs/NAMES.md#round-21-part-j2-the-d_-left-in-the-c))
 - [x] Float and string pools written as C literals: 471 of the 1,076 `D_` symbols the C read are gone, each converted file owning its `.rodata` slice (849 subsegments); checked with `tools/rodata_check.py` / `tools/rodata_match.py` and `make verify` ([docs/MATCHING.md](docs/MATCHING.md))
-- [ ] One declaration with the real type for every global: 48 headers in `include/globals/`; local `extern`s of named globals 5,269 -> 911 -> 337 lines (261 with a `local` comment; 123 lines, 48 names, still without a header; 10 redeclare a header global) (`tools/hoist_externs.py`, `tools/asm_diff.py`; [docs/GLOBALS.md](docs/GLOBALS.md))
-- [ ] De-fake the FAKEMATCH functions: after an honest audit (register pins, empty asm barriers, identical if/else arms), 51 files marked, 25 functions de-faked; each says why the fake works and what it misses by without it ([docs/MATCHING.md](docs/MATCHING.md))
+- [ ] One declaration with the real type for every global: 48 headers in `include/globals/`; local `extern`s of named globals 5,269 -> 911 -> 337 -> 269 lines (239 with a `local` comment; 51 lines, 27 names, without a header: field symbols whose header a base-sharing view clashes with, one-file struct views, non-game symbols; 0 redeclare a header global without a comment). `gScheduler` (`OSSched`), `gEngineApp_m_SwooshSystem` (`CSwooshSystem`) and the audio manager's DMA state (SDK types) have their headers (`tools/hoist_externs.py`, `tools/asm_diff.py`; [docs/GLOBALS.md](docs/GLOBALS.md))
+- [ ] De-fake the FAKEMATCH functions: 52 files marked (round 21: 51 after its audit, 25 de-faked; round 22: 5 de-faked by the callees' real types and ultralib's source, 9 unmarked fakes rewritten as plain getters, 6 more marked, 16 `do { } while (0)` (15, and 1 more on the merged tree) and 3 `if (1)` dropped; what is left needs the permuter or changes the ROM, about 60 `do { } while (0)` left unmarked); each says why the fake works and what it misses by without it ([docs/MATCHING.md](docs/MATCHING.md#the-fakematch-second-pass-round-22))
 - [x] One body for the N64 and the host where the host's compiles to the same N64 code: 496 `TARGET_PORT` alternatives dropped (`tools/unify_host_bodies.py`, re-runnable)
-- [ ] Recover the original source-file boundaries: the module map is done (320 modules from the linker's object padding, ultralib's files and the two VM copies; `tools/modules.py`, [docs/MODULES.md](docs/MODULES.md)); the files are not moved yet
-- [ ] libultra from [decompals/ultralib](https://github.com/decompals/ultralib): the game links **2.0I `libgultra_rom`** (280 functions compile identically, 132 whole files; [docs/LIBULTRA.md](docs/LIBULTRA.md)); the pinned ultralib submodule is next
+- [ ] Recover the original source-file boundaries: the module map is done (320 modules from the linker's object padding, ultralib's files and the two VM copies; `tools/modules.py`, [docs/MODULES.md](docs/MODULES.md)); the files are not moved yet: round 23 moves them into the recovered modules, and moves the port's own copies of libultra's C (the 88 game files of ultralib-built modules the port still links, docs/LIBULTRA.md) out of `src/us/code`
+- [x] libultra from [decompals/ultralib](https://github.com/decompals/ultralib): the game links **2.0I `libgultra_rom`**; ultralib is a pinned submodule (`lib/ultralib`, no files copied) and **120 of the library's 173 modules are built from its own sources** (209 game files no longer linked, 121 of them deleted; `tools/ultralib_build.py`, `versions/ultralib_objects.us.txt`). The other 53 stay the game's C, each with its reason: 41 differ, 2 have another function order, 5 end their `.rodata` in stale linker bytes, 5 have `.bss` or an unplaced static of their own ([docs/LIBULTRA.md](docs/LIBULTRA.md)). The port keeps the game's C for what it links
 
 ### Phase 6 — Assets
 - [x] Map every asset in the ROM: models, textures, levels, animations, sounds, music, text. 100% of the asset region (0x1E0000-0x1FF7AEC, 31.5 MB) classified, 99.7% exported to files: 2705 models, 1839 textures + 114 graphic sets, 490 skeletons / 1857 animations, 165 levels, 197 cinemas, 2 sound banks (866 waves), 1319 effects, 19 sequences, 140 streams. See [docs/assets/README.md](docs/assets/README.md)

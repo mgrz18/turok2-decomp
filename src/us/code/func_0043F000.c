@@ -56,7 +56,6 @@ typedef struct {
     /* 0x08 */ u8 pad8[0x5C - 0x8];
     /* 0x5C */ CVector3 dest; /* 0x8012FA30 */
 } BossCtl;
-extern f32 gLevelScript_script; /* local type: the field's real type (or the member path) changes the ROM's code here */          /* cooldown */
 extern s32 gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */          /* stage, as the script selection reads it */
 
 void Primagen_UpdateMode19_2(CGameObjectInstance *obj, CAI *ai) {
@@ -158,9 +157,9 @@ void Primagen_UpdateMode19_2(CGameObjectInstance *obj, CAI *ai) {
     if (D_8012F604.scriptOn && D_8012F604.state != 3 && D_8012F604.state != 11) {
         if (D_8012F604.index == -1) {
             if (gLevelScript_script_cursor != -1) {
-                gLevelScript_script = gLevelScript_script_steps[gLevelScript_script_cursor].delay;
+                gLevelScript_script.timer = gLevelScript_script_steps[gLevelScript_script_cursor].delay;
             } else {
-                gLevelScript_script = 0.0f;
+                gLevelScript_script.timer = 0.0f;
             }
             do {
                 gLevelScript_script_cursor++;

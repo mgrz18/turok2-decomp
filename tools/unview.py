@@ -39,6 +39,12 @@ TWIN = re.compile(
     r"#define T2_HOFF_\2\(m\) __builtin_offsetof\((\w+), m\)\n.*?\} \2;\n)"
     r"#else\n(typedef (?:struct|union)\b[^{]*\{.*?\} \2;\n)#endif\n", re.S)
 FIELD = re.compile(r"struct \{ u8 _hp_\w+\[T2_HOFF_\w+\((.+?)\)\]; [^;]*?\**\s*(\w+)\s*(?:\[[^\]]*\])?; \};")
+FIELD_FN = re.compile(r"struct \{ u8 _hp_\w+\[T2_HOFF_\w+\((.+?)\)\]; [^;(]*\(\*\s*(\w+)\)\([^;]*\); \};")
+
+
+def fields(text):
+    """(path, field) of a twin's members, function pointers too."""
+    return FIELD.findall(text) + FIELD_FN.findall(text)
 
 
 def headers():
@@ -50,6 +56,17 @@ def headers():
             out.setdefault(n, f"structs/{h.name}")
     return out
 
+
+
+def unwrap(src, inc):
+    """An `#ifdef TARGET_PORT` block of #includes only that holds inc: its includes are plain now
+    (the ones the file does not include already)."""
+    def fix(m):
+        if inc not in m.group(1):
+            return m.group(0)
+        rest = src[:m.start()] + src[m.end():]
+        return "".join(l for l in m.group(1).splitlines(True) if l not in rest)
+    return re.sub(r"#ifdef TARGET_PORT\n((?:#include[^\n]*\n)+)#endif\n", fix, src)
 
 MODE = {"precise": True}
 
@@ -84,6 +101,8 @@ def convert_from(src, twins, only, hdrs):
     for view in done:
         real, fmap = twins[view]
         inc = f'#include "{hdrs[real]}"\n'
+        # a header the file included only for its host twins is needed on the N64 too now
+        src = unwrap(src, inc)
         if inc not in src:
             incs = [x.end() for x in re.finditer(r"^#include[^\n]*\n", src, re.M)]
             at = incs[0] if incs else 0
@@ -98,7 +117,7 @@ def convert(src, only, hdrs):
         view, real = m.group(2), m.group(3)
         if only and view not in only:
             continue
-        fmap = {f: path for path, f in FIELD.findall(m.group(1))}
+        fmap = {f: path for path, f in fields(m.group(1))}
         if real not in hdrs:
             continue
         done.append((m, view, real, fmap))
@@ -108,6 +127,8 @@ def convert(src, only, hdrs):
         src = src[:m.start()] + src[m.end():]
     for m, view, real, fmap in done:
         inc = f'#include "{hdrs[real]}"\n'
+        # a header the file included only for its host twins is needed on the N64 too now
+        src = unwrap(src, inc)
         if inc not in src:
             incs = [x.end() for x in re.finditer(r"^#include[^\n]*\n", src, re.M)]
             at = incs[0] if incs else 0
@@ -130,7 +151,7 @@ def main():
     if a.twin_from:
         other = subprocess.run(["git", "-C", str(ROOT), "show", f"{a.base}:{a.twin_from}"],
                                capture_output=True, text=True, check=True).stdout
-        twins = {m.group(2): (m.group(3), {f: path for path, f in FIELD.findall(m.group(1))})
+        twins = {m.group(2): (m.group(3), {f: path for path, f in fields(m.group(1))})
                  for m in TWIN.finditer(other)}
     for f in a.files:
         p = Path(f)

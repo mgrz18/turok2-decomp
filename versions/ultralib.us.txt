@@ -114,9 +114,9 @@
 0x00294B84    24 __freeParam = src/audio/synthesizer.c:__freeParam; identical O3,O3fp64,O2,O2fp64
 0x00294B9C    64 _freePVoice = src/audio/synthesizer.c:_freePVoice; identical O3,O3fp64,O2,O2fp64
 0x00294BDC    84 _collectPVoices = src/audio/synthesizer.c:_collectPVoices; identical O3,O3fp64,O2,O2fp64
-0x00294C30    64 _timeToSamplesNoRound = src/audio/synthesizer.c:_timeToSamplesNoRound; differs 6/17/16
+0x00294C30    64 _timeToSamples = src/audio/synthesizer.c:_timeToSamples; differs 6/18/16
 0x00294C70   168 __nextSampleTime = src/audio/synthesizer.c:__nextSampleTime; identical O3,O3fp64,O2,O2fp64
-0x00294D18    60 _timeToSamples = src/audio/synthesizer.c:_timeToSamples; differs 6/18/15
+0x00294D18    60 _timeToSamplesNoRound = src/audio/synthesizer.c:_timeToSamplesNoRound; differs 6/17/15
 0x00294D60   220 alAuxBusPull = src/audio/auxbus.c:alAuxBusPull; identical O3,O3fp64,O2,O2fp64
 0x00294E3C    48 alAuxBusParam = src/audio/auxbus.c:alAuxBusParam; identical O3,O3fp64,O2,O2fp64
 0x00294E70  1172 alFxNew = src/audio/drvrnew.c:alFxNew; differs 133/296/293
@@ -280,7 +280,7 @@
 0x0029E3B0    40 osWritebackDCacheAll = src/os/writebackdcacheall.s:osWritebackDCacheAll; asm
 0x0029E3E0    88 sprintf = src/libc/sprintf.c:sprintf; identical O3,O3fp64,O2,O2fp64
 0x0029E438    40 proutSprintf = src/libc/sprintf.c:proutSprintf; identical O3,O3fp64,O2,O2fp64
-0x0029E460    40 func_0029E460 = src/libc/string.c:memcpy; identical O3,O3fp64,O2,O2fp64
+0x0029E460    40 memcpy = src/libc/string.c:memcpy; identical O3,O3fp64,O2,O2fp64
 0x0029E488    56 strchr = src/libc/string.c:strchr; identical O3,O3fp64,O2,O2fp64
 0x0029E4C0    36 strlen = src/libc/string.c:strlen; identical O3,O3fp64,O2,O2fp64
 0x0029E4F0  1348 _Printf = src/libc/xprintf.c:_Printf; differs 5/339/337
