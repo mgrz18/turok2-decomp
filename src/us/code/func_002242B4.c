@@ -26,7 +26,6 @@ u32 CScene__GetRegionIndex(CScene *arg0, sptr arg1) {
     }
     offset = ((char *)CISet__GetBlock(arg0->m_pRegionData, 2)) + 8;
     result = arg1 - offset;
-#ifdef TARGET_PORT
     /* the host CGameRegion stride (sizeof(CGameRegion), three pointer pairs), as
      * CScene__GetRegion indexes it, not the N64's 0x20 bytes (>> 5). Round 9 fixed it twice:
      * x1: the index came out too big, Automap_RevealRegion's CScene__SetLevelBit set map bits
@@ -36,7 +35,4 @@ u32 CScene__GetRegionIndex(CScene *arg0, sptr arg1) {
      * camera's region read floats and crashed after the Mother's phase-2 cinema). Unsigned,
      * like the N64's shift. */
     return (u32) ((uptr) result / sizeof(CGameRegion));
-#else
-    return (u32)result >> 5;
-#endif
 }

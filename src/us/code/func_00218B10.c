@@ -84,14 +84,10 @@ __inline__ s32 CAnimationState__Load(AnimPlayer *player, sptr file, s32 base, s3
         return 0;
     }
     tree = CAnimationState__GetData(player);
-#ifdef TARGET_PORT
     /* block 0 is a CUSet (s32 element size, s32 count: the frames); the u16 view reads the
      * count's low half at +6, which on a little-endian host (the archive swaps the words)
      * is at +4 */
     player->frames = ((s32 *) CISet__GetBlock(tree, 0))[1];
-#else
-    player->frames = ((AnimHeader *) CISet__GetBlock(tree, 0))->frames;
-#endif
     player->current = index;
     player->keys = ((AnimHeader *) CISet__GetBlock(CISet__GetBlock(tree, 3), 0))->field2;
     return 1;

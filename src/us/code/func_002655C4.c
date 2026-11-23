@@ -2,7 +2,6 @@
 #include "structs/game_object.h"
 
 /* Calls the current AI mode's callback, if any. */
-#ifdef TARGET_PORT
 /* ABI (docs/port/ABI.md section 5, abicheck indirect missing_args): MIPS calls the mode callback
  * with this function's own a0/a1 (pass-through: the actor and its AI); the host passes them, and
  * the actor stays a full pointer (the callbacks take CGameObjectInstance *). */
@@ -16,23 +15,3 @@ void Door_Step(void *arg0, CAI *arg1) {
         }
     }
 }
-#else
-void Door_Step(sptr arg0, CAI *arg1) {
-    s32 (*temp_v0_2)();
-    CAIModeInfo *temp_v0;
-
-    temp_v0 = arg1->m_pModeCurrent;
-    if (temp_v0 != NULL) {
-        temp_v0_2 = temp_v0->m_pfCallback;
-        if (temp_v0_2 != NULL) {
-#ifdef TARGET_PORT
-            /* ABI: on MIPS the mode callback receives this function's a0/a1 (the actor, its AI)
-             * untouched; the host passes them. */
-            ((s32 (*)(sptr, CAI *)) temp_v0_2)(arg0, arg1);
-#else
-            temp_v0_2();
-#endif
-        }
-    }
-}
-#endif

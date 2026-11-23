@@ -113,11 +113,7 @@ void CGameObjectInstance__FireAnimEvents(ObjectLinks *obj, void *anim, f32 from,
                         if (resource == 0) {
                             goto masked;
                         }
-#ifdef TARGET_PORT
                         table = CISet__GetBlock(*(void **)resource, 3); /* the data pointer, pointer-wide */
-#else
-                        table = CISet__GetBlock((void *)*resource, 3);
-#endif
                     }
                     fire = ((BoneInfo *)CISet__GetBlock(CISet__GetBlock(table, events[i].bone), 1))->mask & obj->boneMask;
                 }

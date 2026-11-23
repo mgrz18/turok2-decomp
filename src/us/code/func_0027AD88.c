@@ -10,7 +10,6 @@ typedef struct {
     /* 0x44 */ s32 unk44;
 } ModeState;
 
-#ifdef TARGET_PORT
 #include "structs/player.h"
 
 /* Host body: the view stores the percent at m_BossPercent's N64 offset 0x44, which on the host is
@@ -18,8 +17,3 @@ typedef struct {
 void COnScreen__SetBossPercent(void *arg0, s32 arg1) {
     ((COnScreen *)arg0)->m_BossPercent = arg1;
 }
-#else
-void COnScreen__SetBossPercent(ModeState *arg0, s32 arg1) {
-    arg0->unk44 = arg1;
-}
-#endif

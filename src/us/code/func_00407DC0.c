@@ -59,15 +59,10 @@ void Primagen_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
                 ScriptAnimator_Apply(&gLevelScript.anims[i]);
                 ScreenTint_UpdateMode();
             }
-#ifdef TARGET_PORT
             /* the actor's draw matrices, lights and texture by member (N64 0x98, 0x110, 0x151) */
             Render_DrawModel(req->m_hModel, ((CGameObjectInstance *) actor)->m_pmtDrawMtxs, 1,
                              (char *) &((CGameObjectInstance *) actor)->m_Lights[gEvenOdd], 0, req->m_nModel,
                              ((CGameObjectInstance *) actor)->m_AI.m_nTexture);
-#else
-            Render_DrawModel(req->m_hModel, *(s32 *) (actor + 0x98), 1, &((CLights1 *) (actor + 0x110))[gEvenOdd], 0,
-                          req->m_nModel, *(s8 *) (actor + 0x151));
-#endif
             gBlendState = 0;
         }
     }

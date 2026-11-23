@@ -14,11 +14,7 @@ void InteractiveAnim_DrawAllModels(u8 *actor, u8 *state, CDrawArgs *req) {
     s32 i;
     s32 count;
 
-#ifdef TARGET_PORT
     count = *CISet__GetBlock(*(sptr *) req->m_hModel, 2); /* the handle holds a pointer */
-#else
-    count = *CISet__GetBlock(*(s32 *) req->m_hModel, 2);
-#endif
     for (i = 0; i < count; i++) {
         req->m_nModel = i;
         req->m_nShadowModel = i;

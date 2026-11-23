@@ -21,11 +21,7 @@ void CParticle__AttachToHitNode(CParticle *actor, CMtxF *mtx, s32 kind) {
     if (mtx != NULL) {
         CMtxF__InvertAffine(&m, mtx);
     } else {
-#ifdef TARGET_PORT
         CMtxF__FromMtxAffine(&tmp, (u8 *) ((CGameObjectInstance *) owner)->m_pmtDrawMtxs + gCollisionResults.m_nInstanceNode * 0x40);
-#else
-        CMtxF__FromMtxAffine(&tmp, *(u8 **) (owner + 0x98) + gCollisionResults.m_nInstanceNode * 0x40);
-#endif
         CMtxF__InvertAffine(&m, &tmp);
     }
     CMtxF__TransformPoint(&m, &gCollisionResults.m_vInstancePos, &actor->m_vAttachPos);

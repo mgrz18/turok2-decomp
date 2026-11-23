@@ -17,14 +17,10 @@ extern void CGameRegion__GetCeilingNormal(CVector3 *);
 #endif
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 extern void CVector3__Scale(CVector3 *, CVector3 *, float);
-#ifdef TARGET_PORT
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CGameRegion__GetCeilingNormal gets the
  * region in $a1 untouched from this function's own second argument (its only caller,
  * func_0022CF40, passes the region); the host takes and passes it. */
 Vector4f *CGameRegion__GetCeilingTiltRotation(Vector4f *out, void *region) {
-#else
-Vector4f *CGameRegion__GetCeilingTiltRotation(Vector4f *out) {
-#endif
     CVector3 a;
     CVector3 up;
     CVector3 axis;

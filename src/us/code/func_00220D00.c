@@ -27,15 +27,10 @@ typedef struct { u8 pad0[8]; u16 type; u8 padA[0x12]; } SrcA;          /* 0x1C *
 typedef struct { u8 pad0[0x28]; u16 type; u8 pad2A[0xA]; } SrcB;       /* 0x34 */
 typedef struct { u8 pad0[0x14]; u16 type; u8 pad16[0xA]; } SrcC;       /* 0x20 */
 typedef struct { u8 pad0[0x48]; } SrcD;                                /* 0x48 */
-#ifdef TARGET_PORT
 /* The port: the built records at their host sizes (CStaticObject and CLevelActor hold pointers;
  * the 0xC0 light volumes do not). The readers index them as typed arrays. */
 #define GRID_STATIC_SIZE ((s32) sizeof(CStaticObject))
 #define GRID_ACTOR_SIZE ((s32) sizeof(CLevelActor))
-#else
-#define GRID_STATIC_SIZE 0x90
-#define GRID_ACTOR_SIZE 0x198
-#endif
 typedef struct { u8 pad0[GRID_STATIC_SIZE]; } ItemA;                    /* 0x90 */
 typedef struct { u8 pad0[0xC0]; } ItemD;                               /* 0xC0 */
 

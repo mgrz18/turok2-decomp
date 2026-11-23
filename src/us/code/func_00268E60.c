@@ -35,11 +35,7 @@ s32 GameObject_GetFloorKind(u8 *obj) {
         }
     }
     if (obj[0] == 1) {
-#ifdef TARGET_PORT
         objFlags = ((CGameObjectInstance *) obj)->m_AI.m_dwFlags; /* N64 +0x140 */
-#else
-        objFlags = *(u32 *) (obj + 0x140);
-#endif
         if (objFlags & 0x400) {
             result = 1;
         }

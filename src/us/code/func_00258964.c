@@ -5,7 +5,6 @@
 s32 WeaponActor_Update(s32, s32);
 s32 WeaponActor_Draw(sptr, sptr, sptr);
 
-#ifdef TARGET_PORT
 #include "structs/game_object.h"
 
 void WeaponActor_SwitchToRequestedInline(CGameObjectInstance *weapon, CAI *state);
@@ -26,22 +25,3 @@ void WeaponActor_InitAI(CGameObjectInstance *weapon, CAI *ai) {
     ai->m_VarF32[2] = 1.0f;
     WeaponActor_SwitchToRequestedInline(weapon, ai);
 }
-#else
-s32 WeaponActor_SwitchToRequestedInline(s32, s32);
-
-void WeaponActor_InitAI(sptr arg0, void *arg1) {
-    M2C_FIELD(arg1, CAIModeInfo **, 0x2C) = sWeaponActorModeTable;
-    M2C_FIELD(arg1, s32 (**)(s32, s32), 0xF0) = WeaponActor_Update;
-    M2C_FIELD(arg1, s32 (**)(s32, s32, s32), 0xF4) = WeaponActor_Draw;
-    M2C_FIELD(arg1, s32 *, 0x10C) = 0;
-    M2C_FIELD(arg1, s32 *, 0x110) = 0;
-    M2C_FIELD(arg1, s32 *, 0x118) = 0;
-    M2C_FIELD(arg1, s32 *, 0x120) = 0;
-    M2C_FIELD(arg1, s32 *, 0x124) = 0;
-    M2C_FIELD(arg1, s32 *, 0x128) = 0;
-    M2C_FIELD(arg1, s32 *, 0x12C) = 0;
-    M2C_FIELD(arg1, s32 *, 0x130) = 0;
-    M2C_FIELD(arg1, f32 *, 0x114) = 1.0f;
-    WeaponActor_SwitchToRequestedInline(arg0, (sptr) arg1);
-}
-#endif

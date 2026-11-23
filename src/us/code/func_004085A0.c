@@ -36,14 +36,10 @@ static __inline__ s32 helperAlive(void) {
 }
 
 static __inline__ void stunHelper(void) {
-#ifdef TARGET_PORT
     /* a DamageEvent: 0x18 bytes on the N64, 0x28 on the host (two pointers); the byte buffer
      * overflowed into the caller's stack (macOS: __stack_chk_fail once the totem defence was
      * won and the helpers got stunned, round 10 y4) */
     DamageEvent anim[1];
-#else
-    u8 anim[0x18];
-#endif
     CListedInstance *actor;
 
     if (gTotemDefense.timer > 0.0f) {

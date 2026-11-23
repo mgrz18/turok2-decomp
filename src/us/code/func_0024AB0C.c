@@ -40,12 +40,8 @@ typedef struct B05P14 {
 } B05P14;
 typedef struct B05Fx { u8 pad0[8]; void *unk8; f32 unkC; s16 unk10; s16 unk12; s16 unk14; s16 unk16; } B05Fx;
 #endif
-#ifdef TARGET_PORT
 #include "globals/scene.h"
 #define D_8010FF34 ((u8 *) &gScene.m_DLightSet)
-#else
-extern u8 D_8010FF34[];
-#endif
 void CDLightSet__Free(u8 *, void *);
 s32 Random_Next();
 B05Fx *CDLightSet__Alloc(u8 *, u8 *);

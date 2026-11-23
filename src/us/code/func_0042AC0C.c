@@ -48,20 +48,12 @@ extern void Cinema_RequestOnce(s32 sound);
 extern void MatrixHeap_Construct(void *heap, void *data, s32 size);
 extern void func_0042C79C(CScene *w);
 extern void func_0042C840(CScene *w);
-#ifdef TARGET_PORT /* unprototyped: the host passes the pass-through arguments */
 extern void func_0042C96C();
-#else
-extern void func_0042C96C(void);
-#endif
 extern void SceneActorPool_Construct(CLevelActorPool *);
 extern void CInstancePool__Construct(void *);
 extern void func_0042D120(void *);
-#ifdef TARGET_PORT
 /* the particle data is a pointer: m_pParticleEffects is the cache handle (read pointer-wide) */
 extern void CParticleSystem__Construct(CParticleSystem *, sptr);
-#else
-extern void CParticleSystem__Construct(CParticleSystem *, s32);
-#endif
 extern void func_0042D410(void *);
 extern void CPlayerPool__LevelStart(void *);
 extern void CPlayer__StopLoopingSounds(void *);

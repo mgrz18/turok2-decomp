@@ -9,11 +9,7 @@
 #include "structs/game_object.h"
 #include "protos/ai.h"
 
-#ifdef TARGET_PORT
 #define T2_AI(e) ((u8 *) &(e)->m_AI) /* the AI by member (N64 0x140) */
-#else
-#define T2_AI(e) ((u8 *)(e) + 0x140)
-#endif
 f32 func_0026841C(CGameObjectInstance *e);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *e);
 s32 Action_CheckRequiredItem(CGameObjectInstance *e, u8 *p, CGameObjectInstance *me);

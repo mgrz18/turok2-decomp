@@ -4,7 +4,6 @@
 #include "rw/abu_types.h"
 #include "globals/collision.h"
 
-#ifdef TARGET_PORT
 /* The port: the behaviours are words in the table (gendata swaps them as such), read as words;
  * the N64 view read the low byte of each big-endian word (u8 at +3), which on the host is the
  * high byte: every behaviour came out 0 and nothing collided with walls or floors. */
@@ -48,32 +47,3 @@ void CCollisionSetup__Construct(EntryRecAt24 *arg0) {
         e += 1;
     }
 }
-#else
-void CCollisionSetup__Construct(EntryRecAt24 *arg0)
-{
-    EntryRecAt24 *e = arg0;
-    s32 counter = -1;
-    if (e->dst != 0) {
-        do {
-            Dst *dst = e->dst;
-            gCollisionResultsP->m_pInstance = NULL;
-            gCollisionResultsP->m_nInstanceNode = counter;
-            gCollisionResultsP->m_pShape = NULL;
-            gCollisionResultsP->m_pWallRegion = NULL;
-            gCollisionResultsP->m_nFloorKind = 0;
-            gCollisionResultsP->m_pFloorRegion = NULL;
-            gCollisionResultsP->m_pWaterRegion = NULL;
-            dst->unk0 = e->val0;
-            dst->unk4 = e->flag0;
-            dst->unk5 = e->flag1;
-            dst->unk6 = e->flag2;
-            dst->unk8 = e->x;
-            dst->unkC = e->y;
-            dst->unk10 = e->z;
-            dst->unk14 = e->w;
-            dst->unk18 = e->extra;
-            e += 1;
-        } while (e->dst != 0);
-    }
-}
-#endif

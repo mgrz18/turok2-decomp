@@ -28,16 +28,10 @@ typedef struct Viewer {
 
 extern char D_800A5F6C[];       /* "grid section" */
 
-#ifdef TARGET_PORT /* the viewers are cameras: next = m_pNext, min/max = m_AnimMin/m_AnimMax (host layout) */
 #include "structs/camera.h"
 #define V_NEXT(v) ((Viewer *) ((CCamera *) (v))->m_pNext)
 #define V_MIN(v) (&((CCamera *) (v))->m_AnimMin.x)
 #define V_MAX(v) (&((CCamera *) (v))->m_AnimMax.x)
-#else
-#define V_NEXT(v) ((v)->next)
-#define V_MIN(v) ((v)->min)
-#define V_MAX(v) ((v)->max)
-#endif
 
 
 /* Loads the grid sections inside the visible bounds that some viewer overlaps. */

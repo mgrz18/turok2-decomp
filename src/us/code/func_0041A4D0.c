@@ -70,18 +70,10 @@ void CheatsMenu_Init(Menu41A4D4 *menu) {
     weapon = -1;
 found:
     sCheatsMenuSelection = weapon;
-#ifdef TARGET_PORT
     /* the N64 word at items + 0x2D8: the 19th item's flags (MenuItem is larger on the host) */
     if (weapon != -1) {
         ((Menu *) menu)->items[18].flags |= 0x1800000;
     } else {
         ((Menu *) menu)->items[18].flags &= ~0x1800000;
     }
-#else
-    if (weapon != -1) {
-        menu->player->flags |= 0x1800000;
-    } else {
-        menu->player->flags &= ~0x1800000;
-    }
-#endif
 }

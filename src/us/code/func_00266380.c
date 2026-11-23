@@ -23,7 +23,6 @@ typedef struct {
 
 extern CPlayer *CPlayerPool__FindTagged(CPlayerPool *list);
 
-#ifdef TARGET_PORT
 /* The port (round 9 x1): the action's CAI by member. The N64 view's 0x34/0x36 are m_Mode and
  * m_ModeBefore, 0xC7 m_AnimRepeatedCount (the go animation played through), 0x110/0x114
  * m_VarBuffer[1]/[2] (Action_Setup and Action_IdleEnter clear them); on the host those offsets
@@ -61,37 +60,3 @@ void Action_GoUpdate(CGameObjectInstance *actor, ActionState *state_) {
         }
     }
 }
-#else
-void Action_GoUpdate(CGameObjectInstance *actor, ActionState *state) {
-    CDoorIntelligence *info = &actor->header.m_pIntelligence->m_Door;
-    CGame *game;
-    CPlayer *player;
-    s32 mode;
-
-    if (actor->m_nTypeFlag == 0x64E && state->unk36 != state->unk34) {
-        game = &gEngineApp_m_Game;
-        player = CPlayerPool__FindTagged(&game->m_PlayerList);
-        if (player != NULL && state->tagCleared == 0) {
-            mode = player->m_pOptions->m_TagMode;
-            if (mode == 1) {
-                player->m_pOptions->m_TagMode = 0;
-                player->m_pOptions->m_LastTagMode = mode;
-                game->m_Settings.match.tagPhase = mode;
-                state->tagCleared = mode;
-            }
-        }
-    }
-    if (state->active != 0) {
-        if (info->m_dwFlags & 2) {
-            actor->m_dwFlags &= ~0x2000;
-            actor->m_dwFlags &= ~0x100;
-        }
-        if (state->done != 0) {
-            CAI__SetMode(actor, state, 0);
-        }
-        if (actor->m_nTypeFlag == 0x64C) {
-            CAI__SetMode(actor, state, 2);
-        }
-    }
-}
-#endif

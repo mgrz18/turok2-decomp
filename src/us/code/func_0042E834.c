@@ -3,13 +3,8 @@
 #include "structs/player.h"
 #include "protos/list.h"
 
-#ifdef TARGET_PORT /* the CPlayer links at their host offsets */
 #define PLAYER_LAST T2_OFFSETOF(CPlayer, m_pLast)
 #define PLAYER_NEXT T2_OFFSETOF(CPlayer, m_pNext)
-#else
-#define PLAYER_LAST 0x131C
-#define PLAYER_NEXT 0x1320
-#endif
 
 extern void memset(void *p, s32 c, sptr n); /* memset */
 

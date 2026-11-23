@@ -7,7 +7,6 @@
 #include "structs/weapon.h"
 #include "globals/player.h"
 
-#ifdef TARGET_PORT
 #include "structs/game_object.h"
 #include "structs/camera.h"
 /* The host: the weapon actor itself (scale, orientation, owner in m_AI.m_pParent) and the
@@ -18,21 +17,6 @@ typedef CGameObjectInstance WeaponModel;
 #define WM_OWNER(m) ((CPlayer *)(m)->m_AI.m_pParent)
 #define CAMERA_VIEW_ORIENT(cam) ((cam)->m_mfViewOrient)
 #define CAMERA_VIEW_ALIGN(cam) (&(cam)->m_qViewAlign)
-#else
-#define WM_OFFSET(m) (&(m)->offset)
-#define WM_MATRIX(m) ((m)->matrix)
-#define WM_OWNER(m) ((m)->owner)
-#define CAMERA_VIEW_ORIENT(cam) (((u8 *)(cam)) + 0x14C)
-#define CAMERA_VIEW_ALIGN(cam) (((u8 *)(cam)) + 0x12C)
-typedef struct {
-    /* 0x000 */ u8 pad0[0x34];
-    /* 0x034 */ CVector3 offset;
-    /* 0x040 */ u8 pad40[0x58 - 0x40];
-    /* 0x058 */ f32 matrix[4][4];
-    /* 0x098 */ u8 pad98[0x1A8 - 0x98];
-    /* 0x1A8 */ CPlayer *owner;
-} WeaponModel;
-#endif
 
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern void CMtxF__SetScale(f32 *mtx, f32 x, f32 y, f32 z);

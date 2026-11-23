@@ -9,16 +9,8 @@
 #define T2_TEXT(s) (&s)
 #endif
 
-#ifdef TARGET_PORT
 extern char D_800B3F00[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
-#else
-extern s32 D_800B3F00;
-#endif
-#ifdef TARGET_PORT
 extern char D_800B3F18[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
-#else
-extern s32 D_800B3F18;
-#endif
 
 
 s32 OptionsMenu_ControlSideText(MenuItem *arg0, Menu *arg1) {

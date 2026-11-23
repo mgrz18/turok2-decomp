@@ -14,7 +14,6 @@ typedef struct {
 
 void ScriptAnimator_SetScript(void *slot, void *arg);
 
-#ifdef TARGET_PORT
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
@@ -28,13 +27,3 @@ void MantidQueen_FlashWeakSpot(void *state, void *arg) {
         ScriptAnimator_SetScript(&s->spots[index].anim, arg);
     }
 }
-#else
-void MantidQueen_FlashWeakSpot(State00403494 *s, void *arg) {
-    s32 index = s->info[5];
-
-    if (index != -1) {
-        /* &s->slots[index].body, computed as an address */
-        ScriptAnimator_SetScript((void *)(index * sizeof(Slot00403494) + (sptr)s + 0xC), arg);
-    }
-}
-#endif

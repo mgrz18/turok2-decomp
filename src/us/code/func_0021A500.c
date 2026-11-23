@@ -58,11 +58,7 @@ void func_0021A500(B10Obj *o) {
     if (fl & 1) {
         return;
     }
-#ifdef TARGET_PORT
     r = GameObject_IsOnGround(o); /* ABI: the object in $a0 untouched on MIPS */
-#else
-    r = GameObject_IsOnGround();
-#endif
     if (o->p14 == 0) {
         return;
     }

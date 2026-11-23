@@ -1082,11 +1082,7 @@ s16 *CPlayer__GetFiringAmmo(u8 *, s32);
 void CParticle__StopLoopSound(EffectActor *);
 void CParticle__BuildCameraMatrix(EffectActor *);
 void Trail_DetachOwner(void *, EffectActor *);
-#ifdef TARGET_PORT
 void CDLightSet__Free(void *, CDLight *);
-#else
-void CDLightSet__Free(void *, s32);
-#endif
 
 void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
     EffectActor *child;
@@ -1120,35 +1116,21 @@ void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
             CParticle__BuildCameraMatrix(actor);
             Trail_DetachOwner(gEngineApp_m_SwooshSystem, actor);
         }
-#ifdef TARGET_PORT
         /* the light pointer-wide, in the host CParticle's member (the view has the N64 offset) */
         if (((CParticle *) actor)->m_pDLight != NULL) {
             CDLightSet__Free(D_8010FF34, ((CParticle *) actor)->m_pDLight);
             ((CParticle *) actor)->m_pDLight = NULL;
         }
-#else
-        if (actor->sound != 0) {
-            CDLightSet__Free(D_8010FF34, actor->sound);
-            actor->sound = 0;
-        }
-#endif
         if (actor->liveCount != NULL) {
             (*actor->liveCount)--;
         }
         actor->flags &= ~0x02000100;
         CList__Remove(actor->list, actor);
         actor->list = NULL;
-#ifdef TARGET_PORT
         CList__AddHead(&((CParticleSystem *) mgr)->m_FreeList, actor);
         if (actor->flags & 0x01000000) {
             CList__Remove(&((CParticleSystem *) mgr)->m_DrawList, actor);
         }
-#else
-        CList__AddHead(mgr + 0xEC00, actor);
-        if (actor->flags & 0x01000000) {
-            CList__Remove(mgr + 0xEC14, actor);
-        }
-#endif
     }
 }
 
@@ -1552,11 +1534,7 @@ extern void Color_Darken(u8, u8, u8, u8, u8 *, u8 *, u8 *);
 extern void AI_HearNoise(Actor *actor, s32 *ai, CVector3 *from, s32 arg3);
 extern void CParticle__Attach(Effect *effect, sptr, sptr);
 extern void Trail_AddNode(void *, Effect *, s32);
-#ifdef TARGET_PORT
 extern void *DLight_Spawn(void *, s32);
-#else
-extern sptr DLight_Spawn(void *, s32);
-#endif
 extern void CParticle__StartLoopSound(Effect *effect, s32 sound);
 extern void Sound__Play(s16 sound, CVector3 pos, sptr a, sptr b);
 
@@ -1611,7 +1589,6 @@ static __inline__ Effect *allocateEffect(EffectSystem *sys, u8 index) {
     return effect;
 }
 
-#ifdef TARGET_PORT
 /* The host aimEffect: the hit target is a CGameObjectInstance (bones, intelligence, AI by member). */
 static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
     CMtxF targetMtx;
@@ -1647,42 +1624,6 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
         }
     }
 }
-#else
-static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
-    CMtxF targetMtx;
-    CMtxF targetInv;
-    CVector3 up;
-    Actor *targetActor;
-    s32 targetTeam;
-    CCollisionResults *scene;
-
-    if (gCollisionResults.m_nInstanceNode != -1) {
-        effect->mode = -4;
-        targetActor = (Actor *)gCollisionResults.m_pInstance;
-        targetTeam = gCollisionResults.m_Frame.action;
-        CMtxF__FromMtxAffine(&targetMtx, &targetActor->bones[gCollisionResults.m_nInstanceNode]);
-        CMtxF__InvertAffine(&targetInv, &targetMtx);
-        scene = &gCollisionResults;
-        CMtxF__TransformPoint(&targetInv, &scene->m_vInstancePos, &effect->attachPos);
-        up = gCollisionResults.m_vVelocity;
-        CVector3__Normalize(&up);
-        CMtxF__RotateVector(&targetInv, &up, vel);
-        effect->target = (sptr) targetActor;
-        effect->flags |= 0x10000;
-        effect->shake = gCollisionResults.m_nInstanceNode;
-        if (targetActor->def->m_Type == 1) {
-            if (effect->owner != 0) {
-                AI_HearNoise(targetActor, &targetActor->ai, &effect->owner->pos, 3);
-            } else {
-                AI_HearNoise(targetActor, &targetActor->ai, &scene->m_vInstancePos, 3);
-            }
-        }
-        if (effect->kind == 0x56 && targetTeam == 2) {
-            effect->flags |= 0x4000000;
-        }
-    }
-}
-#endif
 
 s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount, sptr arg4, s32 kind,
                   CVector3 arg6, CQuaternion rotation, CVector3 pos, void *region, s32 arg10, s32 arg11) {
@@ -1718,11 +1659,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
     s32 spread;
     u32 *bits;
     u8 mask;
-#ifdef TARGET_PORT
     void *resource;
-#else
-    sptr resource;
-#endif
     EntryBlock *block;
     s32 numEntries;
     Entry *templates;
@@ -1780,12 +1717,8 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     ownerId = owner;
                     break;
                 case 0:
-#ifdef TARGET_PORT
                     /* type 0 (a static object): its id word at N64 0x80 */
                     ownerId = (void *) (sptr) ((CStaticObject *) owner)->m_LitKey;
-#else
-                    ownerId = owner->ownerId;
-#endif
                     owner = 0;
                     break;
             }
@@ -2144,17 +2077,10 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     Trail_AddNode(gEngineApp_m_SwooshSystem, effect, entry->unk6);
                 }
                 if (entry->unk7 != -1) {
-#ifdef TARGET_PORT
                     ((CParticle *) effect)->m_pDLight = DLight_Spawn(D_8010FF34, entry->unk7);
                 } else {
                     ((CParticle *) effect)->m_pDLight = NULL;
                 }
-#else
-                    effect->sound = DLight_Spawn(D_8010FF34, entry->unk7);
-                } else {
-                    effect->sound = 0;
-                }
-#endif
                 if (!(effect->flags & 0x200000) && (sound = entry->sound) != 0) {
                     switch (effect->kind) {
                         case 0x22:

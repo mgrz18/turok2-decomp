@@ -6,11 +6,7 @@ s32 COnScreen__SetBoss(sptr, sptr, sptr);
 s32 TotemDefense_DrawTotem(sptr, s32, sptr);
 
 s32 COnScreen__SetBoss2(s32 *, void *, s32 *); /* extern */
-#ifdef TARGET_PORT
 extern char D_800C0560[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
-#else
-extern s32 D_800C0560;
-#endif
 extern s32 D_800C0568;
 
 #ifdef TARGET_PORT
