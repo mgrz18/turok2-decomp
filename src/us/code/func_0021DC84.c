@@ -1,3 +1,6 @@
+/* FAKEMATCH (round 22): 1 register pin (`register f32 py __asm__("$f1")`, missed by the round-21 scan);
+ * without it: CGameObjectInstance__DrawShadow 3 of 238 words (the object's y in $f12, not $f1; reading the
+ * field twice instead of py gives the same). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0024AA08.c, func_0024AA08, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game_object.h"
