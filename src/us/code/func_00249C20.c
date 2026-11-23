@@ -3,6 +3,7 @@
  * jump table at 0x800A6B28 is 8-aligned from there (from its own start,
  * 0x800A6B0C, it would not be). */
 #include "common.h"
+#include "structs/camera.h"
 #include "structs/player_options.h"
 #include "structs/game.h"
 #include "structs/vector.h"
@@ -20,21 +21,6 @@
  * toward it (identity when there is none). */
 
 
-#ifdef TARGET_PORT
-typedef struct AimView {
-/* the view at the host offsets of CCamera (tools/port/hostview.py): each field in its own
- * member of one union, placed by __builtin_offsetof of the member it reads */
-#define T2_HOFF_AimView(m) __builtin_offsetof(CCamera, m)
-    union {
-        struct { u8 _hp_mtx[T2_HOFF_AimView(m_mfViewOrient)]; f32 mtx[4][4]; }; /* N64 0x14C */
-    };
-} AimView;
-#else
-typedef struct AimView {
-    /* 0x000 */ u8 pad0[0x14C];
-    /* 0x14C */ f32 mtx[4][4];
-} AimView;
-#endif
 
 typedef struct AimActor AimActor;
 #ifdef TARGET_PORT
@@ -47,7 +33,7 @@ struct AimActor {
         struct { u8 _hp_height[T2_HOFF_AimActor(m_CharacterActor.m_CollisionYOffset)]; f32 height; }; /* N64 0x54 */
         struct { u8 _hp_aimPos[T2_HOFF_AimActor(m_CharacterActor.m_AI.m_vBoreTarget)]; CVector3 aimPos; }; /* N64 0x214 */
         struct { u8 _hp_options[T2_HOFF_AimActor(m_pOptions)]; CPlayerOptions *options; }; /* N64 0x518 */
-        struct { u8 _hp_view[T2_HOFF_AimActor(m_pCamera)]; AimView *view; }; /* N64 0x51C */
+        struct { u8 _hp_view[T2_HOFF_AimActor(m_pCamera)]; CCamera *view; }; /* N64 0x51C */
         struct { u8 _hp_weapon[T2_HOFF_AimActor(m_Data.m_CurrentWeapon)]; s16 weapon; }; /* N64 0x996 */
         struct { u8 _hp_lockState[T2_HOFF_AimActor(m_CrossHairMode)]; s32 lockState; }; /* N64 0xB2C */
         struct { u8 _hp_lockTimer[T2_HOFF_AimActor(m_CrossHairTimer)]; f32 lockTimer; }; /* N64 0xB30 */
@@ -75,7 +61,7 @@ struct AimActor {
     /* 0x0214 */ CVector3 aimPos;
     /* 0x0220 */ u8 pad220[0x518 - 0x220];
     /* 0x0518 */ CPlayerOptions *options;
-    /* 0x051C */ AimView *view;
+    /* 0x051C */ CCamera *view;
     /* 0x0520 */ u8 pad520[0x996 - 0x520];
     /* 0x0996 */ s16 weapon;
     /* 0x0998 */ u8 pad998[0xB2C - 0x998];
@@ -233,7 +219,7 @@ void Player_UpdateAim(AimActor *pl) {
     CVector3 delta;
     CVector3 aimDir;
     AimActor *target;
-    AimView *view;
+    CCamera *view;
     s32 canLock;
     s32 hold;
     s32 range;
@@ -247,7 +233,7 @@ void Player_UpdateAim(AimActor *pl) {
     off.x = 0.0f;
     off.y = 0.0f;
     off.z = -1024.0f;
-    CMtxF__TransformPoint(view->mtx, &off, &aimDir);
+    CMtxF__TransformPoint(view->m_mfViewOrient, &off, &aimDir);
     canLock = TRUE;
     stiff = 0.080000006f;
     damp = 0.52f;
