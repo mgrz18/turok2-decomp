@@ -8,6 +8,7 @@ Render_QueueModelByResource = 0x0020B9F4; // model.h: "Render_QueueModelByKey / 
 Render_DrawModelImmediate = 0x0020BBE4; // draws a model's group display lists at once (matrix, lights, render mode, segment 6) instead of batching; caller EnemyAI_DrawFaded
 Render_ClearSortTrees = 0x0020BFC0; // clears sOpaqueSortFirst/Root and sTranslucentSortFirst/Root; precedes Render_SortTreeFind/Insert
 Math_ModFloor = 0x00213F2C; // a - floor(a / b) * b (0 when b == 0); math block (CMtxF__/CQuaternion__ neighbours)
+Actor_GetGroundRotation = 0x002156D4; // returns GameObject_GetGroundRotation(obj) by value (a struct-returning wrapper); callers Actor_SpawnParticle
 Anim_CalcKeyCount = 0x00216964; // ceil(a / b * 30) (or * 15 when that is >= 90, else a): keys at 30/15 fps; between Anim_DecodeTracks and Anim_Decompress
 Anim_GetBoneTranslation = 0x0021794C; // bone arg1's translation: the raw key when the index is -1, else CVector3__Lerp between two keys of the CISet block; pairs with Anim_GetBoneRotation
 Anim_GetBoneRotation = 0x002179F0; // bone arg1's quaternion: the raw s16 key * 1/32767 when the index is -1, else CQuaternion__Slerp between two keys
@@ -245,3 +246,16 @@ Render_InitUnitQuad_2 = 0x004691C0; // module-2 copy of 0x004302A0 (+0xE0)
 CEngineApp__QuitToLegal_2 = 0x00469250; // module-2 copy of 0x00430330 (+0xE0); callers QuitMenu_Yes_2...
 CEngineApp__StartCinemaGame_2 = 0x004692CC; // module-2 copy of 0x004303AC (+0xE0); caller PakMessage_SelectOk_2
 CEngineApp__StartGame_2 = 0x00469374; // module-2 copy of 0x00430454 (+0xE0); callers MpMenu_StartFragTag_2...
+
+// asm by origin (versions/asm_origin.us.txt, docs/ASM_ORIGIN.md): the SN host-I/O exception code
+// in us/asm/A3C88.s, after HostIo_ThreadMain; named from what each routine does and its callers.
+HostIo_VectorStubs = 0x002A3088; // asm: the exception-vector stubs (mtc0 ErrorEPC, jr $k0) that HostIo_InstallVectors copies to 0x80000000/0x80000180
+HostIo_InstallVectors = 0x002A3100; // asm: swaps the stubs into the exception vectors, flushes the caches; caller HostIo_Init
+HostIo_InvalICacheAll = 0x002A31AC; // asm: icache invalidate-all loop (cache 0x01)
+HostIo_InvalDCacheAll = 0x002A31C8; // asm: dcache invalidate-all loop (cache 0x00)
+HostIo_GetSR = 0x002A31E4; // asm: mfc0 Status; callers HostIo_DisableInt/RestoreInt/CommandLoop
+HostIo_SetSR = 0x002A31F0; // asm: mtc0 Status; callers HostIo_DisableInt/RestoreInt
+HostIo_ReadTlb = 0x002A31FC; // asm: tlbr of the 32 entries into the saved-TLB buffer (D_80128A90), returns EntryHi; caller HostIo_ScanTlb
+HostIo_RestoreVectors = 0x002A3708; // asm: puts the vector stubs back, then the cache loops
+HostIo_ExceptionReturn = 0x002A3774; // asm: the exception return paths (ld through $k0, mtc0 EPC, eret)
+HostIo_SaveContext = 0x002A37CC; // asm: context save, sd of every GPR and cop0 register through $k0
