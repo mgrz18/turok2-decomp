@@ -1,0 +1,6 @@
+# The game's names for static functions of ultralib files, applied to the built object
+# (objcopy --redefine-sym, Makefile): the symbol keeps its type (a local function), so the
+# ELF names it as before for the tools that read it (tools/port/gendata.py, mklayout.py).
+# object source: old=new ...  (docs/LIBULTRA.md)
+lib/ultralib/src/audio/csplayer.c: __setUsptFromTempo=__CSPSetUsptFromTempo
+lib/ultralib_vm2/io/pfsallocatefile_2.c: __osClearPage=__osClearPage_2
