@@ -21,7 +21,7 @@ references/rw_abu    https://github.com/AbuN64/ragewars-decomp
 references/rw_junk   https://github.com/thejunkman9000/Turok-Rage-Wars-Decomp
     --include include include/their --define __UNBAKE_STDARG_GCC VERSION_US_REV1
     --exclude port/ wip/ test/
-references/ultralib  https://github.com/decompals/ultralib   (libultra 2.0I)
+lib/ultralib (submodule) https://github.com/decompals/ultralib   (libultra 2.0I; the build uses it)
     --src src --include . include include/compiler/gcc include/PR
     --define _MIPS_SZLONG=32 __USE_ISOC99 F3DEX_GBI BUILD_VERSION=VERSION_I NDEBUG _FINALROM
     --cc "tools/sn64/cc1 -quiet -G0 -mips3 -mgas -meb -mno-fix4300 -mhard-float

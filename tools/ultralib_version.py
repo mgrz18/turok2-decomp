@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Which libultra does Turok 2 link? Compile decompals/ultralib per version.
 
-Every C file of references/ultralib is compiled with Turok 2's cc1 (SN64 GCC
+Every C file of lib/ultralib (the pinned submodule) is compiled with Turok 2's cc1 (SN64 GCC
 2.8.1) for each ultralib version (2.0I/J/K/L) and target flavour (libgultra,
 libgultra_rom), with the defines ultralib's Makefile and makefiles/gcc.mk give
 that version (NDEBUG except 2.0I libgultra_rom, _FINALROM for _rom,
@@ -35,7 +35,7 @@ os.environ.setdefault("MATCH_ELF", str(ROOT / "build" / "ref.elf"))
 import match_func  # noqa: E402
 import xmatch_ref  # noqa: E402
 
-UL = ROOT / "references" / "ultralib"
+UL = ROOT / "lib" / "ultralib"   # the pinned submodule (docs/LIBULTRA.md)
 CC = ("tools/sn64/cc1 -quiet -G0 -mips3 -mgas -meb -mno-fix4300 -mhard-float "
       "-mcpu=VR4300 -fforce-addr -fno-builtin")
 CONFIGS = {                     # name -> extra cc1 flags
