@@ -5,10 +5,9 @@
  * 1 swaps red and green, 2 copies red into green, 3 copies green into red. */
 
 #include "common.h"
+#include "protos/iset.h"
 
 s32 ProPackDecompress(void **res, s32 flag);
-u8 *CISet__GetBlock(s32 *file, s32 index);                 /* address of a sub-block */
-u16 *CISet__GetBlockAndSize(s32 *table, s32 index, u32 *size);    /* address and size of an entry */
 
 #ifdef TARGET_PORT
 #include "structs/cache.h"
@@ -57,7 +56,7 @@ void Texture_DecompressCallback(s32 unused, LoadRequest *req) {
     if (*file == 0) {
         return;
     }
-    type = *CISet__GetBlock(file, 0);
+    type = *(u8 *)CISet__GetBlock(file, 0);
     if (type >= 2) {
         return;
     }
@@ -67,7 +66,7 @@ void Texture_DecompressCallback(s32 unused, LoadRequest *req) {
     table = (s32 *) CISet__GetBlock(file, 2);
     count = *table;
     for (i = 0; i < count; i++) {
-        pixels = CISet__GetBlockAndSize(table, i, &size);
+        pixels = (u16 *)CISet__GetBlockAndSize(table, i, (s32 *)&size);
         n = size >> 1;
         for (j = 0; j < n; j++) {
             pixel = &pixels[j];
