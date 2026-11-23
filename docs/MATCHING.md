@@ -825,7 +825,7 @@ used inside it (GCC weights references by loop depth) and stops cse from
 following a jump past it, so the bulk matching and the permuter used these
 blocks the way the FAKEMATCH files use pins. `tools/undowhile.py <files>`
 tries each one outside a macro as a plain block and keeps it when every
-function of the file still matches: 15 of 92 went. About 60 are left in 50
+function of the file still matches: 15 of 83 went (68 stay, 5 of them in FAKEMATCH files). About 60 are left in 50
 files that are not marked FAKEMATCH (libgcc's longlong.h macros aside); some
 are probably the original's macros (round 21 said so of func_0021D39C.c's), the
 rest are the same kind of trick as a pin. They are not counted in the 52 below.
@@ -835,7 +835,32 @@ marked this round. Each says in its first comment what it misses by without
 its trick. The near ones, retried this round with the permuter from a natural
 draft against the fake's object (15 min each, `-j 4`):
 
-@@PERMUTER@@
+| function | draft (words off by hand) | best score (permuter) | what the zero was |
+|---|---|---|---|
+| CGameObjectInstance__DrawShadow | 3 of 238 | 5 | (none; the best reads an unset local) |
+| CParticle__Steer | 5 of 390 | 0 | `do { fa = 0.5f; } while (0);` in place of the barrier: another trick, now in the file (plain C instead of an asm barrier) |
+| Trail_DetachOwner | 5 of 169 | 330 of 460 | (none) |
+| Render_SortTreeFind | 12 of 18 | 0 | the equal arms again, on `if (arg1)`, plus a flag variable |
+| func_00267D60 | 5 of 13 | 0 | `do { case 1: case 4: return ...; } while (0);` in the switch |
+| SndVoicePool_StopAllExcept | 12 of 66 | 35 of 60 | (none) |
+| CCache__HeapAlloc | 11 of 57 | 0 | `do { result = CHeap__AllocTop(...); } while (0);`: another trick, but defined C, so it replaces round 21's test of an unset local and the port's alternative body |
+
+By hand this round, each without a natural zero: Bits_GetFloat (the
+unsigned-to-float result in `$f0`: 7-14 words over six arrangements of the
+expression), func_00253934 (the oxygen fraction: one `mov.s` short, five
+shapes), Controller_ProcessInput (assigning `fy` before `fx` gives the ROM's
+registers but swaps the two conversions: 7 words; `register` alone changes
+nothing), Turret_Setup (the fifth address in `$a0`), PakMenu_InitLoadGame_2 (the
+prototype fix of MenuPool_OpenMenu_2 changes nothing: 4 words), _getRate
+(ultralib's env.c with inline `_frexpf`/`_ldexpf` is 92 words off: the game's
+copy is the KMC build of j5's list; left to the ultralib work),
+CEngineApp__UpdateFade (a plain if/else: 100 of 116), Blast_CanHit (returns in
+place of the pinned result: 23 of 144), Generator_Advance (64 of 66).
+
+What stays fake, in short: register allocation and scheduling choices that
+the natural forms tried do not reproduce (pins, barriers, loop notes), in 52
+files; none of them can change without changing the ROM's code, and each
+file's first comment names its distance without the trick.
 
 
 ### The G pass (the last drafts)
