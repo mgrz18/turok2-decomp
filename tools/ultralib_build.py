@@ -44,6 +44,8 @@ LIST = ROOT / "versions" / "ultralib_objects.us.txt"
 ROM = ROOT / "baserom.us.z64"
 OUT = ROOT / "build" / "ultralib_check"
 LIB_VRAM = (0x0028EF90, 0x0029F190)
+# The Controller Pak code in the first paged VM module (its copy in the second one is _2).
+VM_PFS = (0x00427000, 0x0042A000)
 # The engine's rodata (segment code_rodata, KSEG0): where the live library's .rodata is.
 RODATA_ROM = (0xA5DF8, 0xC3074)
 R_MIPS_32, R_MIPS_26, R_MIPS_HI16, R_MIPS_LO16 = 2, 4, 5, 6
@@ -69,7 +71,7 @@ def modules():
         m = re.match(r"  0x([0-9A-F]{8}) (\w+)", line)
         if m and cur:
             cur[3].append(int(m.group(1), 16))
-    return [m for m in out if m[0].startswith("libultra/") and LIB_VRAM[0] <= m[1] < LIB_VRAM[1]]
+    return [m for m in out if m[0].startswith("libultra/") and not m[0].endswith("_2") and (LIB_VRAM[0] <= m[1] < LIB_VRAM[1] or VM_PFS[0] <= m[1] < VM_PFS[1])]
 
 
 def ulmap():
