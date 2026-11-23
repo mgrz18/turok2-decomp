@@ -20,6 +20,7 @@
 #include "structs/sched.h" /* OSSched, OSScTask, OSScClient */
 #include "structs/adec.h" /* DecodeState, FftTables */
 #include "structs/table.h" /* StrideTable (Rage Wars' StridedTable) */
+#include "structs/level_file.h" /* ResidentDataChunk, CollisionBuildVertex */
 
 /* Pads written as `next - offset - sizeof(T *)` assume 4-byte pointers. The
  * port build (64-bit host, TARGET_PORT) keeps the N64 pad size: its layout is
@@ -479,11 +480,6 @@ typedef struct AnimRef {
                u32 span;
                void **data;
 } AnimRef;
-typedef struct ResidentDataChunk {
-    s32 width;
-    s32 count;
-    u8 data[1];
-} ResidentDataChunk;
 struct SineTable;
 struct SineTable {
     f32 count;
@@ -1147,12 +1143,6 @@ struct TripleRecAt8 {
     s32 b;
     f32 c;
 };
-typedef struct CollisionBuildVertex {
-    f32 x;
-    f32 y;
-    f32 z;
-    f32 ceiling;
-} CollisionBuildVertex;
 struct Packed;
 struct Packed {
     unsigned short unk0;

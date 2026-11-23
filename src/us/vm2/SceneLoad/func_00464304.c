@@ -5,6 +5,8 @@
 #include "structs/list.h"
 #include "protos/list.h"
 #include "protos/iset.h"
+#include "structs/world.h"
+#include "structs/world.h"
 
 struct IntPair;
 struct IntPair {
@@ -51,11 +53,6 @@ struct WorldRecAt1B40C {
 };
 struct WorldRecAt1B40C;
 typedef struct WorldRecAt1B40C WorldRecAt1B40C;
-typedef struct ResidentDataChunk {
-    s32 width;
-    s32 count;
-    u8 data[1];
-} ResidentDataChunk;
 extern s32 ProPackDecompress(void ***handle, s32 arg1);
 static __inline__ s32 groupHas(WorldRecAt1B40C *world, s32 n) {
     s32 index;
