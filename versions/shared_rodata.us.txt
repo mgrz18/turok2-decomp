@@ -165,10 +165,10 @@ func_00440AC8 0x800C055C  # copy of func_00407AC8 (round 25: was asm), which own
 func_00464E68 0x800A5F6C  # copy of func_0042BF48 (round 25: was asm), which owns the pool
 func_004650B4 0x800A5FC4  # copy of func_0042C194 (round 25: was asm), which owns the pool
 func_00465480 0x800A600C  # copy of func_0042C560 (round 25: was asm), which owns the pool
-func_004419E0 0x800C0570  # copy of func_004089E0 (round 25: was asm), which owns the pool
-func_00441CF4 0x800C05A8  # copy of func_00408CF4 (round 25: was asm), which owns the pool
-func_00441DCC 0x800C05B0  # copy of func_00408DCC (round 25: was asm), which owns the pool
-func_00441EAC 0x800C05B4  # copy of func_00408EAC (round 25: was asm), which owns the pool
+TotemDefense_2:TotemDefense_DrawTotem_2 0x800C0570  # copy of func_004089E0 (round 25: was asm), which owns the pool
+TotemDefense_2:TotemDefense_TryHitEnemy_2 0x800C05A8  # copy of func_00408CF4 (round 25: was asm), which owns the pool
+TotemDefense_2:TotemDefense_StopEnemies_2 0x800C05B0  # copy of func_00408DCC (round 25: was asm), which owns the pool
+TotemDefense_2:TotemDefense_TryHitEnemyAfterDelay_2 0x800C05B4  # copy of func_00408EAC (round 25: was asm), which owns the pool
 func_0045AE50 0x800C1414  # copy of func_00421F30 (round 25: was asm), which owns the pool
 func_0045AF80 0x800C1418  # copy of func_00422060 (round 25: was asm), which owns the pool
 func_0045B350 0x800C1428  # copy of func_00422430 (round 25: was asm), which owns the pool
