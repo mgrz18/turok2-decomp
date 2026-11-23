@@ -46,6 +46,16 @@ bytes, then tries again until `make verify` passes. After an import also run
 `tools/centralize_types.py --write` (shared types per source decomp,
 `include/rw/`) and `tools/rw_protos.py` (prototypes for `--rw-protos`).
 
+## Where the files are
+
+One directory per recovered module ([MODULES.md](MODULES.md)): `src/us/code/<module>/`,
+`src/us/vm1/<module>/`, `src/us/vm2/<module>/`, and `src/port_libultra/` for the libultra C only
+the port compiles. `python3 tools/srcfiles.py func_0027ECF0` prints a file's path (names are
+unique across the tree; a function of a merged module is found in `<module>.c`), and the yaml
+names each file by its path (`c, code/CList/CList`). A new function file goes in its module's
+directory (`srcfiles.new_path`, from `versions/modules.us.txt`); `tools/merge_module.py` makes a
+module one file where `make verify` allows it.
+
 ## Traps
 
 - `make setup` does not delete asm an earlier split left in `us/`; delete
