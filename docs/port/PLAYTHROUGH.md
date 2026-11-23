@@ -4096,3 +4096,14 @@ that fight costs 50 and leaves **7** health, the first life goes after 3 hits at
 as a working combination with no margin. Keeping the Cave Totem on the assists as well moves the
 losses to the Queen and the lair; keeping the totem alone does not reach the end. A real fix needs
 health before 124 or a safer start of 124 on this stream.
+
+## 44. Round 23 (part l2): the default on the fixed floor kind
+
+`GameObject_GetFloorKind` now reads `m_pInstanceBelow` at its host offset (docs/port/STATUS.md,
+Round 23 part l2). A landing on an object plays that object's floor sound, and that sound draws
+from the random stream. The default command (`playthrough.py --all --talismans 2 --cheats-off
+1,2,3,4,5,6`, Release, 300,000 frames) diverges from `dc8126d3…` at frame 75,675 (level 135, the
+sisters). Its outcome is unchanged, with no re-tuning: END 2 at 249,990 (was 245,208), no life
+lost, lowest health 28 (was 38). The one `death:` line is at 268,360, the hub after the credits.
+The new reference det md5 is **`cd2d68ce…`** (600,000 lines). The combinations of section 43
+were not re-run.

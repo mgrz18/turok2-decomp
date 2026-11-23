@@ -647,3 +647,21 @@ the ABI's 16-byte alignment for a typed extern array of 16 bytes or more). The s
 accesses to globals that are not 16-aligned in a built binary (0 on the fixed build). Run it
 after a merge that adds or moves data symbols.
 
+## 14. Round 23 (part l2): the untyped raw sites read
+
+Section 9 left the 110 (now 103) `untyped` raw sites of `n64viewcheck.py` unread. Round 23 read
+them, together with the two host bugs round 22 found (`ImpactEvent_ApplyBlast` compared against
+`(u8 *) owner + 0x288`, `Rumble_SetLink` wrote an `s32` at the N64 `RumbleEffect.owner`). Five
+live functions used an N64 offset on a struct whose host layout differs. All five now use the
+member, asm_diff 0 (docs/port/STATUS.md, Round 23 part l2, has the table):
+`ImpactEvent_ApplyBlast`, `Rumble_SetLink`, `GameObject_GetFloorKind` (`m_pInstanceBelow`),
+`PlayerSetupMenu_NameLabel` (and `_2`), `OptionsMenu_ResolutionText`. The rest are ROM records,
+`GameSettings`/`GameMatch` bytes, own allocations, members at the same offset on both, or dead
+standalone copies of functions whose inlined copies are typed (listed there).
+
+Only `GameObject_GetFloorKind` changes the default route. A landing on an object now plays that
+object's floor sound, which draws from the random stream. The run diverges at frame 75,675
+(level 135) and still ends as before: END 2, no life lost, lowest health 28. The new det md5 is
+`cd2d68ce…` (600,000 lines), and boot + demos is unchanged (`6ab97584…`). No legacy switch was
+needed. After the fixes the checker gives raw/BAD 10 (the known ones of section 8) and
+raw/untyped 99.

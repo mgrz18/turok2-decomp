@@ -22,6 +22,57 @@ The matching build is unchanged: `tools/asm_diff.py --base 70f3333c -j 8` report
 over all 3,938 files after every merge and at the end, and a clean `make clean && make setup &&
 make -j8 build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
+## Round 23, part l2: the two host bugs, and more of the same pattern
+
+Five functions read or wrote an engine struct at its N64 offset on the host. Each now uses the
+member; `tools/asm_diff.py --base bab902cd -j 8` gives 0 of 3,817 files, and a clean `make setup
+&& make -j8 build && make verify` gives the identical ROM. Only the third fix changes play.
+
+| function (file) | the N64 offset | on the host | in play |
+|---|---|---|---|
+| `ImpactEvent_ApplyBlast` (func_00237AFC.c) | `source == (u8 *) owner + 0x288`, `CPlayer.m_WeaponActor` | a place inside `m_CharacterActor` (the member is at 0x348): the test never held | a blast from the player's own weapon actor (melee weapon < 2, or 0x22) is now moved three quarters of the way back to the player, as on the N64. It does not fire in the demos or the default run (counted with a probe build) |
+| `Rumble_SetLink` (func_0026E9EC.c) and its caller `CBarrel__Update` (func_0024BD18.c) | an `s32` at 0x38, `RumbleEffect.owner` | `amplitude.unk4` (owner is at 0x50) | none: `CPlayer.m_pRumble` is never set (the only `Rumble_Start` call passes owner 0), so the call never runs. `m_pRumble` is typed `struct RumbleEffect *` now (it was an incomplete `CGameRumble`) |
+| `GameObject_GetFloorKind` (func_00268E60.c) | `obj + 0x30`, `m_pInstanceBelow` | `m_vWaterDisplacement.y/z` read as a pointer: almost always 0, so the floor kind of what the actor stands on was never asked | the landing sound (`GameObject_PlayLandSound`) and the impact floor sounds (`ImpactEvent_PlayFloorSound`) on an object now use that object's floor kind. **The det log changes** (below) |
+| `PlayerSetupMenu_NameLabel` (func_00418108.c; its module-2 copy func_004510B8.c too) | the text at `MenuItem` +0x14, `Menu.controller` at +0x20 | the text is at 0x18, `controller` at 0x30: the name line got a pointer built from the wrong word | the multiplayer player setup window's name line |
+| `OptionsMenu_ResolutionText` (func_0041C798.c) | the text stored as an `s32` at `MenuItem` +0x14 | half of it into the padding before the text (0x18) | the options window's resolution line |
+
+The first two are the bugs round 22 left open. The other three came from reading the 103
+`untyped` raw sites of `n64viewcheck.py` (round 13 left them unread). Each site was checked
+against its struct's host layout and its callers. The rest are fine: ROM records and ISet blocks
+(kept byte offsets), `GameSettings` / `GameMatch` (no pointers), the cinema's own temp blocks,
+`CAutomap.unk4`, `CAI.m_VisBits` (`MotherBoss_PickWarpAnim`). Or they are dead code: no caller in
+the C and no address in the generated data. These dead standalone functions have the same
+N64-offset reads, and their inlined copies are typed: `GameObject_GetInstanceBelow`,
+`GameObject_GetFloorHeightAt`, `CEmitter__Advance`, `CGameObjectInstance__EmitFlaggedHotPoints`,
+`CPlayer__TopUpHealth`, `CPlayer__UpdateCrouch`, `CPlayer__GetSelectableWeapons`,
+`CPlayerPool__FreePlayers`, `Actor_IsInRegionFlag40`, `CSun__SetSunDir`,
+`CScene__SetLevelBitInLevel`, `CScene__SetSavedBit`, `func_00226D54`, `Generator_SpawnPickup`,
+`Generator_SpawnEffect`, `PauseMenu_ResolutionText`, `PakMenu_GetPort`, `PakMenu_IsSavePortalMenu`.
+They are left as they are.
+
+**The default route on the fixed floor kind.** The level-135 sisters' fight (frame 75,675) is the
+first place where the player lands on an object with the "stands on an instance" flag. That
+landing now plays the object's floor sound, which draws from the random stream, and the run
+diverges from there. It still plays the whole game: END 2 at frame 249,990 (was 245,208), the
+same ending state (`ending 0/1`, cinema 130), and no life lost. The one `death:` line is at
+268,360 (was 263,578), the hub after the credits as before. The lowest health on the route is
+28 (was 38). No re-tuning and no legacy switch were needed. New md5s, Linux Release, this tree:
+
+- boot + 3 demos (26,000 frames, `--pak-blank`): **`6ab97584…`** (52,000 lines), unchanged.
+- the default whole-game run (`aimdrive.py`, 300,000 frames): **`cd2d68ce…`** (600,000 lines; was
+  `dc8126d3…`).
+
+Checks on the fixed tree: n64viewcheck raw/BAD 11 -> 10, the 10 known since round 12
+(STABILITY.md 8). `ImpactEvent_ApplyBlast` is gone, and view/local is 183 -> 182 (the
+`Rumble_SetLink` view). raw/untyped is 103 -> 99 and stride/untyped 19 -> 18 (the fixed
+sites). abicheck has 0 harmful sites, outptr 0 BAD, and aligncheck lists only the 2 known `GameNoteMenu_SelectYes` sites.
+`mklayout.py --check` is up to date.
+
+Functions touched (for the l1 file move): `ImpactEvent_ApplyBlast`, `Rumble_SetLink`,
+`CBarrel__Update` (prototype and call), `GameObject_GetFloorKind`, `PlayerSetupMenu_NameLabel`,
+`PlayerSetupMenu_NameLabel_2`, `OptionsMenu_ResolutionText`. Also `include/structs/player.h`
+(`m_pRumble`) and `tools/ghidra/turok2_types.h`.
+
 ## Round 22 (Phase 5, readable code, part 2): the merge
 
 Four branches merged, in this order: k1 (libultra from the pinned `decompals/ultralib` submodule:
@@ -65,7 +116,7 @@ letterbox in func_0040F240.c and its copy func_00448240.c, lines unchanged since
 files k2 and k3 both retyped); one gone with a deleted libultra file.
 
 **Two host bugs, open for round 23** (k3 found them; both were there at f980f639, kept as they
-were, with a comment):
+were, with a comment; both fixed in round 23, part l2, above):
 
 - `ImpactEvent_ApplyBlast` (func_00237AFC.c) compares the blast's source with `(u8 *)owner +
   0x288`: `CPlayer.m_WeaponActor` on the N64, another field on the host (0x348 there). On the host the test reads
