@@ -33,7 +33,6 @@
 extern u8 gScheduler[];
 extern s32 D_800B6E60;
 extern s32 D_800B6E64;
-extern u32 gNumTicks1;
 
 extern void Video_UpdateResolution(void);
 extern void Music_FadeOut(void);
