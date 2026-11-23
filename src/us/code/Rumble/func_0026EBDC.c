@@ -1,22 +1,19 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00285B34.c, func_80285B64_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#include "rw/abu_types.h" /* Clip */
 #include "structs/vector.h"
 #include "globals/scene.h"
 #include "protos/list.h"
 #include "protos/scene.h"
+u32 __osDisableInt(void);
+void __osRestoreInt(u32 mask);
 
 #ifdef TARGET_PORT
 /* Host body (round 7 v2): the pool and its effects as RumblePool / RumbleEffect
  * (structs/rumble.h); the N64 views put the free list's head at 0x0, the active list at 0x14
  * and the curves at 0x20/0x2C of the effect (pointers before them on the host). */
 #include "structs/rumble.h"
-typedef struct Clip {
-    s16 mode;
-    s16 frames;
-} Clip;
-extern s32 __osDisableInt(void);
-extern void __osRestoreInt(s32 mask);
 extern void RumbleCurve_Init(RumbleCurve *slot, void *curve);
 
 RumbleEffect *Rumble_Start(RumblePool *pool, Clip *key, CVector3 position, f32 value0, f32 value1, RumbleEffect **owner) {
@@ -43,13 +40,6 @@ RumbleEffect *Rumble_Start(RumblePool *pool, Clip *key, CVector3 position, f32 v
     return node;
 }
 #else
-struct Clip;
-struct Clip {
-    s16 mode;
-    s16 frames;
-};
-struct Clip;
-typedef struct Clip Clip;
 struct Node_func_80285B64_de;
 struct Node_func_80285B64_de {
     char pad0[8];
@@ -71,8 +61,6 @@ struct Pool_func_80285B64_de {
 };
 struct Pool_func_80285B64_de;
 typedef struct Pool_func_80285B64_de Pool_func_80285B64_de;
-extern s32 __osDisableInt(void);
-extern void __osRestoreInt(s32 mask);
 extern void RumbleCurve_Init(void *slot, sptr handle);
 static __inline__ void bind(Node_func_80285B64_de *node, s32 offset, s32 id) {
     RumbleCurve_Init((char *)node + offset, CScene__GetCurve(&gScene, id));

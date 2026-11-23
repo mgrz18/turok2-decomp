@@ -1,7 +1,8 @@
 #include "common.h"
+#include "structs/rumble.h"
 #include "m2c_macros.h"
 
-extern s32 RumbleCurve_Advance(void *);
+s32 RumbleCurve_Advance(RumbleCurve *curve);
 
 s32 Rumble_IsFinished(u8 *arg0) {
     s32 r = 0;

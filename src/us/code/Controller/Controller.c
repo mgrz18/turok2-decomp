@@ -10,6 +10,7 @@
 
 sptr osContReset(OSMesgQueue *mq, OSContStatus *data);
 void osContGetQuery(OSContStatus *data);
+s32 Controller_IsPakWatched(s32 arg0);
 void Controller_UpdateConnection(ControllerProfile *arg0);
 void Controller_ProcessInput(ControllerProfile *c, s8 x, s8 y, s32 btn);
 
@@ -647,7 +648,7 @@ s32 Controller_AnyPakWatched(void) {
     return 0;
 }
 
-u8 Controller_IsPakWatched(s32 arg0) {
+s32 Controller_IsPakWatched(s32 arg0) { /* the u8 flag, zero-extended by the load; the callers take the whole register */
     return *(((u8 *)(gPakWatched + arg0)));
 }
 

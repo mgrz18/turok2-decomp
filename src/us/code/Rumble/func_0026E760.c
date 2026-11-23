@@ -24,8 +24,8 @@ typedef struct {
     /* 0x28 */ f32 base;
 } EmitterList;
 
-extern s32 __osDisableInt(void);         /* disable interrupts */
-extern void __osRestoreInt(s32 mask);    /* restore interrupts */
+u32 __osDisableInt(void);
+void __osRestoreInt(u32 mask);
 extern s32 Demo_GetPlayerCount(void);
 extern s32 Cinema_PathPlaying(void);
 extern f32 func_00298470(f32);          /* sqrtf */
