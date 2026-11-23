@@ -862,6 +862,11 @@ the natural forms tried do not reproduce (pins, barriers, loop notes), in 52
 files; none of them can change without changing the ROM's code, and each
 file's first comment names its distance without the trick.
 
+Checks at the end of the round (branch names-R22_k2): `tools/asm_diff.py --base f980f639 -j 6`
+0 of 3,938; clean `make verify` OK; the port (Release) boot + 3 demos det `6ab97584` (52,000
+lines), the default whole-game run det `dc8126d3` (600,000 lines, END 2, the one `death:` at
+263,578); `aligncheck.py` the 2 known sites; `mklayout.py --check` up to date.
+
 
 ### The G pass (the last drafts)
 
