@@ -7,11 +7,7 @@
 #include "structs/world.h"
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, u8 *b);
-#ifdef TARGET_PORT
 void *CISet__GetBlock(s32 *table, s32 index);
-#else
-void *CISet__GetBlock();
-#endif
 s32 func_002261A8(CScene *lv, s32 unused, CVector3 *pt) {
     CVector3 d;
     f32 bestIdx = -1.0f;

@@ -2,11 +2,7 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-#ifdef TARGET_PORT
 #define T2_TEXT(s) ((s32 *) (s))
-#else
-#define T2_TEXT(s) (&s)
-#endif
 
 extern char D_800B490C[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 

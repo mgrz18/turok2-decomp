@@ -4,11 +4,7 @@
 #include "rw/abu_types.h"
 #include "globals/game.h"
 
-#ifdef TARGET_PORT
 #define T2_TEXT(s) ((void *) (s))
-#else
-#define T2_TEXT(s) (&s)
-#endif
 
 extern char D_800B57AC[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
 extern char D_800B57C8[]; /* the port: a string (gendata copies it as bytes, not as a swapped word) */
