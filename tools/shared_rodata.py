@@ -21,6 +21,20 @@ the built ROM at its address, word by word: what the C says has to be what is th
 jump-table entry names the second module's own label in the object and the
 first module's in the ROM; the two copies of a function are laid out alike,
 so each entry has to keep its distance from the table's first entry.
+
+A merged second-module file (tools/merge_module.py: one C file per module) is
+one object, but its original files' .rodata went to different places of the
+first module's pool. Its lines name the part of the file that each original
+file was, by the first function that file emitted:
+
+    MpMenu_2:FragTagMenu_TimeLimitLabel_2 0x800C0E84
+
+`--split STEM` (tools/sn_as.sh, between cc1 and the assembler) then moves the
+.rodata cc1 writes for the functions from that one up to the next part's into
+a section `.rodata.<function>`: a string or literal written before a function
+goes with it, a jump table with the function it is in, a literal pool of
+tools/sn_li.py with the function it was flushed after. Each part gets its own
+output section as a file did, and `--check` holds each part against the ROM.
 """
 
 import re
@@ -39,12 +53,14 @@ MARK = "    /* versions/shared_rodata.us.txt */\n"
 
 
 def entries():
+    """(stem, part, address): part is None for a file placed whole, else the first function of the part."""
     out = []
     for line in LIST.read_text().splitlines():
         line = line.split("#")[0].strip()
         if line:
             stem, addr = line.split()
-            out.append((stem, int(addr, 16)))
+            stem, _, part = stem.partition(":")
+            out.append((stem, part or None, int(addr, 16)))
     return out
 
 
@@ -52,18 +68,69 @@ def obj(stem):
     return srcfiles.obj(stem) or f"build/src/us/code/{stem}.c.o"
 
 
+def section(part):
+    return f".rodata.{part}" if part else ".rodata"
+
+
+RODATA = re.compile(r"^\s*(\.section\s+\.r(o)?data\b[^#]*|\.rdata\b)\s*(#.*)?$")
+DIRECTIVE = re.compile(r"^\s*\.(section|text|data|rdata|bss|sdata|sbss|previous)\b")
+ENT = re.compile(r"^\s*\.ent\s+(\S+)")
+END = re.compile(r"^\s*\.end\s+(\S+)")
+
+
+def split(stem):
+    """Filter (stdin to stdout) for the assembler input of a merged file with parts: each .rodata chunk
+    goes to the section of its part (see the module docstring)."""
+    starts = [p for s, p, _ in entries() if s == stem and p]
+    lines = sys.stdin.read().splitlines()
+    if not starts:
+        sys.stdout.write("\n".join(lines) + "\n")
+        return
+    ents = [(n, ENT.match(l).group(1)) for n, l in enumerate(lines) if ENT.match(l)]
+    order = [f for _, f in ents]
+    missing = [p for p in starts if p not in order]
+    if missing:
+        sys.exit(f"{stem}: parts name functions the file does not emit: {missing}")
+    group, cur = {}, None
+    for f in order:
+        cur = f if f in starts else cur
+        group[f] = cur
+    out, inside, last, sec = [], None, None, None
+    for n, l in enumerate(lines):
+        m = ENT.match(l)
+        if m:
+            inside = last = m.group(1)
+        elif END.match(l):
+            inside = None
+        if RODATA.match(l):
+            if "sn_li" in l:            # a literal pool flushed at the next directive: the function it was written in
+                owner = last
+            elif inside:                # a jump table
+                owner = inside
+            else:                       # strings and constants written before the function that uses them
+                owner = next((f for k, f in ents if k > n), last)
+            part = group.get(owner)
+            if part is None:
+                sys.exit(f"{stem}: .rodata at line {n + 1} ({owner}) is before the file's first part")
+            out.append(f"\t.section {section(part)}")
+            continue
+        out.append(l)
+    sys.stdout.write("\n".join(out) + "\n")
+
+
 def write_ld():
     t = LD.read_text()
     if MARK in t:
         t = t[:t.index(MARK)] + t[t.index("    /DISCARD/ :"):]
     block = [MARK]
-    for stem, addr in entries():
+    for stem, part, addr in entries():
         if f"{obj(stem)}(.rodata)" in t:
             sys.exit(f"{stem}: its .rodata is already placed by the yaml")
         if f"{obj(stem)}(.text)" not in t:
             sys.exit(f"{stem}: not linked (no c subsegment in the yaml)")
-        block.append(f"    .shared_rodata_{stem} 0x{addr:08X} (NOLOAD) :\n    {{\n"
-                     f"        {obj(stem)}(.rodata);\n    }}\n")
+        name = f"{stem}_{part}" if part else stem
+        block.append(f"    .shared_rodata_{name} 0x{addr:08X} (NOLOAD) :\n    {{\n"
+                     f"        {obj(stem)}({section(part)});\n    }}\n")
     i = t.index("    /DISCARD/ :")
     LD.write_text(t[:i] + "".join(block) + t[i:])
 
@@ -84,14 +151,17 @@ def check():
             return None
 
         bad = 0
-        for stem, addr in entries():
-            with (ROOT / obj(stem)).open("rb") as oh:
+        for stem, part, addr in entries():
+            sname = section(part)
+            if part:
+                stem = f"{stem}:{part}"
+            with (ROOT / obj(stem.split(":")[0])).open("rb") as oh:
                 o = ELFFile(oh)
-                sec = o.get_section_by_name(".rodata")
+                sec = o.get_section_by_name(sname)
                 data = sec.data() if sec else b""
                 rel = set()
                 for s in o.iter_sections():
-                    if isinstance(s, RelocationSection) and s.name in (".rel.rodata", ".rela.rodata"):
+                    if isinstance(s, RelocationSection) and s.name in (".rel" + sname, ".rela" + sname):
                         rel |= {r["r_offset"] & ~3 for r in s.iter_relocations()}
             off = rom_of(addr)
             if off is None:
@@ -126,5 +196,7 @@ def check():
 if __name__ == "__main__":
     if "--check" in sys.argv:
         check()
+    elif "--split" in sys.argv:
+        split(sys.argv[sys.argv.index("--split") + 1])
     else:
         write_ld()
