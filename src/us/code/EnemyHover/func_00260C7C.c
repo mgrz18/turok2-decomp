@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy.h"
+#include "protos/mtxf.h"
 
-s32 AI_IsAimedAt(CGameObjectInstance *self, CAI *ai, void *target, f32 angle);
-void CMtxF__SetRotateY(CMtxF *mtx, f32 angle);
-void CMtxF__TransformPoint(CMtxF *mtx, CVector3 *in, CVector3 *out);
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
 
 /* AI callback: with a target, pushes the actor sideways (by its yaw) by the

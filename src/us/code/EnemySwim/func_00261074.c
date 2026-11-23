@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/engine.h"
+#include "protos/enemy.h"
 
 /* How this actor uses CAI's m_VarBuffer: two angles turned toward 0. */
 typedef struct {
@@ -9,11 +10,6 @@ typedef struct {
 } AITurnVars;
 
 f32 Math_DecayToZero(f32, f32);
-#ifdef TARGET_PORT
-s8 EnemyAI_GetBehaviorIndex(sptr, sptr); /* ABI: returns s8 (the host leaves the upper bits of the return register undefined) */
-#else
-s32 EnemyAI_GetBehaviorIndex(sptr, sptr);
-#endif
 
 void EnemyRam_Advance(sptr arg0, CAI *arg1) {
     f32 temp_f0;

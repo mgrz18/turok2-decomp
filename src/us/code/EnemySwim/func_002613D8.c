@@ -2,11 +2,10 @@
 #include "structs/game_object.h"
 #include "structs/collision.h"
 #include "globals/collision.h"
+#include "protos/ai.h"
 
 
 void DamageEvent_Set(DamageEvent *event, CGameObjectInstance *source, s32 damage, f32 radius, s32 flags, void *shield);
-void CAI__CallHurt(CGameObjectInstance *actor, void *ai, DamageEvent *event);
-void CAI__SetMode(CGameObjectInstance *self, CAI *ai, s32 mode);
 
 void EnemyRam_Collision(CGameObjectInstance *self, CAI *ai) {
     DamageEvent event;

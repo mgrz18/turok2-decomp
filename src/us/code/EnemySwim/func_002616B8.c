@@ -2,9 +2,8 @@
 #include "structs/game_object.h"
 #include "protos/ai.h"
 #include "protos/game.h"
+#include "protos/enemy.h"
 
-void AI_UpdateTargets(CGameObjectInstance *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
-void AI_ComputeFrameMotion(CGameObjectInstance *self, CAI *ai, CAIFrameMotion *out);
 f32 func_002974C0(f32 x);
 f32 Math_Approach(f32 cur, f32 target, f32 rate);
 f32 GameObject_GetWaterHeight(CGameObjectInstance *self);
