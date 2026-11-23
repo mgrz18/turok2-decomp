@@ -3,17 +3,8 @@
 #include "protos/ai.h"
 
 
-/* LevelScriptState (structs/boss.h) from found[1] on, D_8012F978 (+0x370):
- * the word before it is found[0], the other actor; mode is bossMode. */
-typedef struct {
-    /* 0x00 */ CGameObjectInstance *actor;
-    /* 0x04 */ u8 pad4[0x64 - 0x4];
-    /* 0x64 */ s32 mode;
-} LevelScriptF978;
-
 extern s32 D_800F1C40[];
 extern s32 D_800F1F50[];
-extern LevelScriptF978 D_8012F978;
 
 #include "structs/boss.h"
 #include "globals/boss.h"

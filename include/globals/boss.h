@@ -175,5 +175,6 @@ extern void *gTotemDefense_def;           /* gTotemDefense.def */
 extern s32 gTotemDefense_state;          /* gTotemDefense.state */
 extern f32 gTotemDefense_timer;          /* gTotemDefense.timer */
 extern s32 gTotemDefense_kills;          /* gTotemDefense.kills */
+extern s32 gTotemDefense_warned;         /* gTotemDefense.warned */
 
 #endif

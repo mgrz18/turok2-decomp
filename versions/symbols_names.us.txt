@@ -5692,6 +5692,7 @@ gTotemDefense_def = 0x8012FB54;
 gTotemDefense_state = 0x8012FB58;
 gTotemDefense_timer = 0x8012FB5C;
 gTotemDefense_kills = 0x8012FB60;
+gTotemDefense_warned = 0x8012FB64;
 gMotherBoss = 0x8012FB70;
 gMotherBoss_phase = 0x801301CC;
 gMotherBoss_activeMask = 0x801301D0;

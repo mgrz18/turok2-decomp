@@ -13,8 +13,7 @@ extern void ImpactEvent_Send(CGameObjectInstance *src, CGameObjectInstance *dst,
                           CVector3 pos, EffectParams params);
 
 extern s32 D_800F1F50[];
-extern s32 gLevelScript_values; /* local type: the field's real type (or the member path) changes the ROM's code here */          /* parts left (mode 1) */
-extern s32 D_8012F990;          /* parts left (mode 2) */
+extern s32 gLevelScript_values[]; /* local type: values[0] as one row; the real s32 [2][8] (or the member path) changes the ROM code here. [0]: parts left (mode 1), [2]: parts left (mode 2, was D_8012F990) */
 
 void Primagen_HandleAnimEvent(s32 arg0, CGameObjectInstance *obj, s32 arg2, CVector3 pos, s32 event) {
     CAITargets t;
@@ -27,7 +26,7 @@ void Primagen_HandleAnimEvent(s32 arg0, CGameObjectInstance *obj, s32 arg2, CVec
     if (t.m_Sight.m_pTarget == NULL) {
         return;
     }
-    if (event == 2 && t.m_Sight.m_Dist <= 409.59998f && D_8012F990 > 0) {
+    if (event == 2 && t.m_Sight.m_Dist <= 409.59998f && gLevelScript_values[2] > 0) {
         params.upper = 0xA00;
         params.lower = 0x400;
         params.b[0] = 0;
@@ -36,7 +35,7 @@ void Primagen_HandleAnimEvent(s32 arg0, CGameObjectInstance *obj, s32 arg2, CVec
         params.b[3] = 0;
         ImpactEvent_Send(obj, obj, 3, -1, t.m_Sight.m_pTarget->header.m_vPos, params);
     }
-    if (event == 1 && t.m_Sight.m_Dist <= 716.8f && gLevelScript_values > 0) {
+    if (event == 1 && t.m_Sight.m_Dist <= 716.8f && gLevelScript_values[0] > 0) {
         params.upper = size * 256.0f;
         params.lower = 0x800;
         params.b[0] = 0;

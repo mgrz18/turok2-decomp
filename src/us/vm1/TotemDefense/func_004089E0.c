@@ -6,9 +6,10 @@
 
 /* As CGameObjectInstance__DrawModelLitVertices (engine), for a model drawn from its cached "lit vertices"
  * resource: the region sets come from CGameObjectInstance__GetDeathModels and the colour from the
- * module global D_8012FB64. */
+ * totem defense state (gTotemDefense.warned). */
 
-extern s32 D_8012FB64;
+#include "structs/boss.h"
+#include "globals/boss.h"
 
 void CGameObjectInstance__GetDeathModels(CGameObjectInstance *, s32, s32 *, s32 *);
 void CGameObjectInstance__DrawShadow(CGameObjectInstance *, sptr, CDrawArgs *);
@@ -44,6 +45,6 @@ void TotemDefense_DrawTotem(CGameObjectInstance *actor, s32 arg1, CDrawArgs *par
     } else {
         data = (char *) (header + 2);
     }
-    Render_QueueModelInstance(params->m_hModel, ((sptr)actor->m_pmtDrawMtxs), 1, 0, data, D_8012FB64, -1);
+    Render_QueueModelInstance(params->m_hModel, ((sptr)actor->m_pmtDrawMtxs), 1, 0, data, gTotemDefense.warned, -1);
     CCache__Unlock(0, resource);
 }

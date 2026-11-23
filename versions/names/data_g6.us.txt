@@ -263,6 +263,7 @@ gTotemDefense_def = 0x8012FB54; // +0x04, its definition + 0x14; TotemDefense_In
 gTotemDefense_state = 0x8012FB58; // +0x08; TotemDefense_GetState, TotemDefense_Init
 gTotemDefense_timer = 0x8012FB5C; // +0x0C, the time left; TotemDefense_Init/Update
 gTotemDefense_kills = 0x8012FB60; // +0x10, past the local BossFight struct (a field to add); TotemDefense_AddKill, TotemDefense_Init
+gTotemDefense_warned = 0x8012FB64; // +0x14, the warning flag, also the totem's draw colour (TotemDefense_DrawTotem reads it as gTotemDefense.warned); TotemDefense_StartAnim clears it through this symbol (was D_8012FB64, round 24 m2)
 gMotherBoss = 0x8012FB70; // MotherBossState: MotherBoss_* (n7: "Mother state")
 gMotherBoss_phase = 0x801301CC; // +0x65C; MotherBoss_StartPhase2Cinema, MotherBoss_PickPhaseAnim
 gMotherBoss_activeMask = 0x801301D0; // +0x660; MotherBoss_Mode01/10/21_FlashSpotsThenIdle
