@@ -136,6 +136,12 @@ holds once. The build models it so:
   name the copy's labels, the ROM's the original's). That check caught
   func_0045BDAC, whose Rage Wars case list linked byte-exact but did not
   give Turok 2's table.
+- A merged vm2 module (one C file, docs/MODULES.md) keeps one placement per
+  original file: `CPlayer_2:CPlayer__LoseLife_2 0x800A6AC8` names the part
+  that starts with that function, `tools/sn_as.sh` runs
+  `tools/shared_rodata.py --split` on the file's assembler input to put each
+  part's .rodata in a section of its own, and each part is placed and checked
+  as a file was (round 25).
 - Where the copy is the original file byte for byte, the copy is one C file
   made from the original's source with the second-module names
   (src/us/vm2/Cinema/func_00448240.c from func_0040F240.c, func_0044C230.c from

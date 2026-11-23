@@ -62,8 +62,10 @@ module one file where `make verify` allows it.
   `us/` before rebuilding after a yaml change.
 - `make verify` compares the ROM it finds: delete both `build/turok2.us.elf`
   and `build/turok2.us.z64` to force a relink.
-- A paged VM module is in the ROM twice; the second copy's jumps land in the
-  first, so its functions with `j` inside cannot be C. `tools/progress.py`
-  leaves that copy out of the count.
+- A paged VM module is in the ROM twice; the second copy is linked over the
+  first (`VIRTUAL_1_LINKED`, docs/VMASM.md), so its `j`s and jump tables
+  resolve and every one of its functions is C (round 25). `tools/progress.py`
+  counts a byte copy once. Its .rodata goes over the first copy's pool
+  (`versions/shared_rodata.us.txt`), per original file even in a merged file.
 - Commits carry no Co-Authored-By trailer; `gh` may switch back to another
   account, so switch to mgrz18 in the same command as the push.

@@ -185,6 +185,72 @@ its other functions.
 | the files' `cc1-flags` differ | 4 | two files per module, or the flags proven equal |
 | a merged file of the same name exists (`code/CEngineApp` / `vm1/CEngineApp`, `vm1/Demo` / `code/Demo`) | 2 | `--name`; both are refused for `.rodata` order anyway |
 
+## Round 25, part n3: the second VM module (vm2)
+
+The 14 vm2 directories the round-24 table stopped at asm or at the shared pool.
+
+**No vm2 function is asm any more.** The 57 asm subsegments between vm2's C files held
+100 functions (`TotemDefense_DrawTotem_2`, `CScene__DecompressCollision_2`, `Primagen_*_2`,
+`MotherBoss_*_2`, `BlindOne_*_2`, the `func_` copies in `Demo` and `PakMenu` ...). Every one is
+byte for byte its first-module twin (`progress.py` counts such copies once, which is why
+nobody wrote them): at the same link address, or 0xE0 below it in `Demo` and `PakMenu`, whose
+`j`-free bodies do not care. Each is now its twin's C file with the second module's names
+(functions by position in the module, data with a `_2` symbol such as `gMotherSpawnPoints_2`)
+and a header line saying whose copy it is; 44 read the first module's pool and have their
+twin's `.rodata` address in `versions/shared_rodata.us.txt`. `MotherBoss_AnimEvent_2` went into
+`func_00442A64.c` with `MotherBoss_TeleportTarget_2`, as vm1's `func_00409A64.c` holds both. The
+generator was a one-off (twin pairs from `versions/modules.us.txt`, `.rodata` addresses from the
+link map); `make verify` is what checked it.
+
+**A merged vm2 file places its `.rodata` per original file.** A vm2 module's files read the
+first module's pool at different, not adjacent addresses (`CPlayer`: 0x800A6A98, 0x800A6AC4,
+0x800A6AC8, 0x800A70D8 ...), so one placement per merged object cannot work. The merged file
+keeps one placement per part instead: `versions/shared_rodata.us.txt` names a part by the
+merged file and the first function its original file emitted,
+
+    CPlayer_2:CPlayer__LoseLife_2 0x800A6AC8
+
+and the assembler input does the rest (`tools/sn_as.sh`, only for a file with such lines):
+`tools/sn_li.py` writes its `li.s` literal pool out before each part's first function (as it did
+at the end of each file: without it the pools of all parts landed in the last one), and
+`tools/shared_rodata.py --split` moves each `.rodata` chunk into `.rodata.<function>` of its
+part: a string written before a function goes with that function, a jump table with the
+function it is in, an `sn_li` pool with the function it was flushed after. `make setup` gives
+each part its output section (NOLOAD) and `make verify` checks each part against the ROM as it
+did each file. `tools/merge_module.py` writes the part lines itself (one file still hands its
+line over whole). Strings a TU shares between parts are emitted once, in the first part that
+uses them; that holds wherever the parts read the same pool address (the menus' "  %02d",
+"none" at 0x800C1318 for three OptionsMenu parts), and `make verify` would catch any other case.
+`ASSEMBLER=asn64` does not split (it has no such filter): parts need the default gas route.
+
+**Merged (8 directories, 221 files -> 8):** `vm2/CPlayer`, `vm2/NameEntryMenu`, `vm2/TotemDefense`,
+`vm2/OptionsMenu`, `vm2/MissionMenu`, `vm2/CheatMenu`, `vm2/MotherBoss`, `vm2/Pak`. The last six first got one
+declaration per name, without touching shared headers: a field symbol the ROM's code reads as
+an array is reached through a pointer (`s32 *kills = &gTotemDefense.kills; *kills += 1;`,
+`u8 *value = &gEngineApp_m_Settings_unk17;` keep the address-building code that `x[0]` gave,
+where the plain member does not), a local struct of a name another file or `rw/abu_types.h` also
+defines is that header's or renamed, the CheatMenu files take vm1 `CheatMenu.c`'s declarations,
+MotherBoss's local prototypes take `void *` arguments, and the two callers whose arguments
+disagree with the module's prototype (`CAI__CallHurt` with three, `ImpactEvent_Send` with
+another 8-byte params type) call through a function type of their own (still a direct `jal`;
+`asm_diff` 0); in Pak, `Pak_RefreshNotes_2` returns its last `osPfsFreeBlocks_2` as vm1's
+`Pak_RefreshNotes` does (its caller tests it) and `rw/abu_protos.h` left the two files that needed
+nothing from it.
+
+**Left (6 directories), all header work now, no asm and no pool question:**
+
+| Directory | Files | First conflicts (`tools/merge_check.py`) |
+|---|---:|---|
+| `vm2/BlindOne` | 70 | `rw/abu_protos.h` against `protos/*.h` (`CCache__*`, `CList__*`), `AI_UpdateTargets`, local struct names |
+| `vm2/Demo` | 28 | `CList__AddHead` .. (`rw/abu_protos.h` vs `protos/list.h`), `CEngineApp__SetupFadeTo`, `Triple` vs a local `Triple`, `CCache__Allocate` |
+| `vm2/MpMenu` | 109 | field symbols read as arrays (`gEngineApp_m_Settings_match[]`, `_unk16[]`, `_unk18[]`, `_match_teamScore`), `Controller_ConfirmPressed` in five forms, `MenuPool_OpenChildMenu_2`, `Menu_StepValue_2`, `sprintf`, local struct names |
+| `vm2/PakMenu` | 139 | `osCreateMesgQueue` and the libultra prototypes, `CCache__*`, local struct names (87 messages on the first pass) |
+| `vm2/Primagen` | 53 | the `gLevelScript` field-symbol views (`ModeState0040457C`, `LevelScriptF950` against `LevelScriptState`), a local type used before a file defines it |
+| `vm2/SceneLoad` | 23 | the `CList`/`CCache`/`CScene` prototype families (`rw/abu_protos.h` vs `protos/*.h`), `ProPackDecompress` in four forms, local struct names (72 messages) |
+
+These are the families part n1 works on in vm1 (`CList`/`CISet`/`CCache`, the field-symbol views,
+`gLevelScript`); the vm2 copies can follow once vm1's declarations are one. None needs a ROM change.
+
 ### The dry-run table (round 24; merged rows updated after the merges)
 
 | Directory | Files | Result of the dry run (round 24), or merged |
@@ -287,27 +353,27 @@ its other functions.
 | `vm1/SceneLoad` | 24 | .rodata interleaved with another directory's (15 subsegments between, e.g. `func_00220530`) |
 | `vm1/StatsMenu` | 15 | declarations differ (1: `gEngineApp_m_Settings_match_tag`) |
 | `vm1/TotemDefense` | 18 | .rodata not in .text order (8 inverted pairs of 9 subsegments) |
-| `vm2/BlindOne` | 60 | its .text subsegments are not adjacent |
+| `vm2/BlindOne` | 60 | its .text subsegments are not adjacent; round 25: no asm left (70 files), declarations differ (n3 table above) |
 | `vm2/CEngineApp` | 4 | **merged** (round 24, first batch) |
 | `vm2/COnScreen` | 2 | **merged** (round 24, first batch) |
-| `vm2/CPlayer` | 13 | vm2 files placing .rodata over vm1's pool one by one (6 files, versions/shared_rodata.us.txt) |
-| `vm2/CheatMenu` | 48 | vm2 files placing .rodata over vm1's pool one by one (7 files, versions/shared_rodata.us.txt) |
+| `vm2/CPlayer` | 13 | **merged** (round 25, n3: its 6 pool placements are parts of `CPlayer_2.c`) |
+| `vm2/CheatMenu` | 48 | **merged** (round 25, n3: declarations as vm1's `CheatMenu.c`, 7 parts) |
 | `vm2/Cont` | 2 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `RumblePool_Init`)) |
 | `vm2/ContinueMenu` | 2 | **merged** (round 24, first batch) |
-| `vm2/Demo` | 21 | its .text subsegments are not adjacent |
+| `vm2/Demo` | 21 | its .text subsegments are not adjacent; round 25: no asm left (28 files), declarations differ (n3 table above) |
 | `vm2/GameOverMenu` | 3 | **merged** (round 24, first batch) |
-| `vm2/MissionMenu` | 14 | vm2 files placing .rodata over vm1's pool one by one (7 files, versions/shared_rodata.us.txt) |
-| `vm2/MotherBoss` | 30 | its .text subsegments are not adjacent |
-| `vm2/MpMenu` | 106 | its .text subsegments are not adjacent |
-| `vm2/NameEntryMenu` | 8 | vm2 files placing .rodata over vm1's pool one by one (2 files, versions/shared_rodata.us.txt) |
-| `vm2/OptionsMenu` | 31 | vm2 files placing .rodata over vm1's pool one by one (6 files, versions/shared_rodata.us.txt) |
-| `vm2/Pak` | 41 | its .text subsegments are not adjacent |
-| `vm2/PakMenu` | 133 | its .text subsegments are not adjacent |
-| `vm2/Primagen` | 35 | its .text subsegments are not adjacent |
+| `vm2/MissionMenu` | 14 | **merged** (round 25, n3: one declaration per name, 7 parts) |
+| `vm2/MotherBoss` | 30 | **merged** (round 25, n3: its asm in C, one declaration per name, 19 parts) |
+| `vm2/MpMenu` | 106 | its .text subsegments are not adjacent; round 25: no asm left (109 files), declarations differ (n3 table above) |
+| `vm2/NameEntryMenu` | 8 | **merged** (round 25, n3: 2 parts) |
+| `vm2/OptionsMenu` | 31 | **merged** (round 25, n3: one declaration per name, 6 parts) |
+| `vm2/Pak` | 41 | **merged** (round 25, n3: its asm in C, one declaration per name, 3 parts) |
+| `vm2/PakMenu` | 133 | its .text subsegments are not adjacent; round 25: no asm left (139 files), declarations differ (n3 table above) |
+| `vm2/Primagen` | 35 | its .text subsegments are not adjacent; round 25: no asm left (53 files), declarations differ (n3 table above) |
 | `vm2/SceneActorPool` | 2 | **merged** (round 24, first batch) |
-| `vm2/SceneLoad` | 19 | its .text subsegments are not adjacent |
+| `vm2/SceneLoad` | 19 | its .text subsegments are not adjacent; round 25: no asm left (23 files), declarations differ (n3 table above) |
 | `vm2/StatsMenu` | 15 | declarations differ (2: `CPlayerPool__GetIndex`, `gEngineApp_m_Settings_match_tag`); local types differ (1: `FieldRecAt14`) |
-| `vm2/TotemDefense` | 7 | its .text subsegments are not adjacent |
+| `vm2/TotemDefense` | 7 | **merged** (round 25, n3: its asm in C, 4 parts) |
 
 ## Evidence
 
