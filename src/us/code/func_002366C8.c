@@ -2,12 +2,6 @@
 #include "structs/particle.h"
 #include "structs/swoosh.h"
 
-/* The swoosh record: the time it fades out in. */
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ f32 y;
-} SwooshPoint;
-
 s32 Swoosh_Update(void *, void *);                  /* extern */
 s32 NodePool_Free(void *, void *);              /* extern */
 
@@ -44,7 +38,7 @@ void SwooshSystem_UpdateSwooshes(CSwooshSystem *arg0) {
                     }
                 }
                 var_s0->owner = NULL;
-                temp_f1 = ((SwooshPoint *) var_s0->info)->y;
+                temp_f1 = var_s0->info->fadeTime;
                 if (var_s0->time < temp_f1) {
                     var_s0->time = temp_f1;
                 }

@@ -56,11 +56,34 @@ typedef struct SwooshNode {
     /* 0xB4 */ s32 unkB4;
 } SwooshNode; /* size 0xB8 */
 
+/* A swoosh record (CScene__GetSwoosh, the level's "particle swooshes", ROM data: the same bytes
+ * on the host): a point's life, how the texture runs, the colours and the texture blend steps. */
+typedef struct SwooshInfo {
+    /* 0x00 */ f32 unk0;
+    /* 0x04 */ f32 fadeTime;            /* Swoosh_DetachOwner */
+    /* 0x08 */ f32 nodeLife;            /* a new point's SwooshNode.life */
+    /* 0x0C */ s32 unkC;
+    /* 0x10 */ s16 sound;
+    /* 0x12 */ u8 closed;
+    /* 0x13 */ u8 unk13[0x16 - 0x13];
+    /* 0x16 */ u8 prim[3];
+    /* 0x19 */ u8 env[3];
+    /* 0x1C */ u8 texMode;              /* 0: the texture runs along the length, else with time */
+    /* 0x1D */ u8 textureScale;
+    /* 0x1E */ u8 animMode;             /* Trail_GetAnimFrame */
+    /* 0x1F */ u8 tex0;                 /* sTrailTextures index */
+    /* 0x20 */ u8 tex1;
+    /* 0x21 */ u8 scaleS;
+    /* 0x22 */ u8 scaleT;
+    /* 0x23 */ u8 count;                /* blends[count] */
+    /* 0x24 */ u8 blends[1];
+} SwooshInfo;
+
 /* A swoosh (a trail): its record (CScene__GetSwoosh), textures, owner and points. */
 typedef struct Swoosh {
     /* 0x00 */ struct Swoosh *prev;
     /* 0x04 */ struct Swoosh *next;
-    /* 0x08 */ void *info;              /* the swoosh record ("particle swooshes", ROM) */
+    /* 0x08 */ SwooshInfo *info;        /* the swoosh record */
     /* 0x0C */ void *tex0;              /* sTrailTextures[info->tex0] */
     /* 0x10 */ void *tex1;
     /* 0x14 */ s32 texture[2];          /* Material_GetTextureSet's handle for the record's texture id */
