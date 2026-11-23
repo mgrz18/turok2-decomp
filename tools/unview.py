@@ -51,6 +51,17 @@ def headers():
     return out
 
 
+
+def unwrap(src, inc):
+    """An `#ifdef TARGET_PORT` block of #includes only that holds inc: its includes are plain now
+    (the ones the file does not include already)."""
+    def fix(m):
+        if inc not in m.group(1):
+            return m.group(0)
+        rest = src[:m.start()] + src[m.end():]
+        return "".join(l for l in m.group(1).splitlines(True) if l not in rest)
+    return re.sub(r"#ifdef TARGET_PORT\n((?:#include[^\n]*\n)+)#endif\n", fix, src)
+
 MODE = {"precise": True}
 
 
@@ -85,7 +96,7 @@ def convert_from(src, twins, only, hdrs):
         real, fmap = twins[view]
         inc = f'#include "{hdrs[real]}"\n'
         # a header the file included only for its host twins is needed on the N64 too now
-        src = src.replace("#ifdef TARGET_PORT\n" + inc + "#endif\n", inc)
+        src = unwrap(src, inc)
         if inc not in src:
             incs = [x.end() for x in re.finditer(r"^#include[^\n]*\n", src, re.M)]
             at = incs[0] if incs else 0
@@ -111,7 +122,7 @@ def convert(src, only, hdrs):
     for m, view, real, fmap in done:
         inc = f'#include "{hdrs[real]}"\n'
         # a header the file included only for its host twins is needed on the N64 too now
-        src = src.replace("#ifdef TARGET_PORT\n" + inc + "#endif\n", inc)
+        src = unwrap(src, inc)
         if inc not in src:
             incs = [x.end() for x in re.finditer(r"^#include[^\n]*\n", src, re.M)]
             at = incs[0] if incs else 0
