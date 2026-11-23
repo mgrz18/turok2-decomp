@@ -18,6 +18,7 @@ module CList: 0x00200500..0x00200AD4, 13 functions; region
   0x00200A9C CList__Contains
 
 module ProPackDecompress: 0x00200AE0..0x00200C38, 2 functions; pad
+  // name runs (possible objects the padding cannot show): ProPack 1, ProPackDecompress 1
   0x00200AE0 ProPack__Decompress
   0x00200B00 ProPackDecompress
 
@@ -34,6 +35,7 @@ module RNC: 0x002010C0..0x002017A8, 1 functions; pad
   0x002010C0 RNC_UnpackMethod2
 
 module CISet: 0x002017B0..0x00201AC8, 14 functions; pad
+  // name runs (possible objects the padding cannot show): CISet 8, CUSet 4, CMutex 2
   0x002017B0 CISet__GetDataSize
   0x002017D4 CISet__GetBlock
   0x002017E8 CISet__GetBlockAndSize
@@ -77,6 +79,7 @@ module CHeap: 0x002021F0..0x0020285C, 7 functions; pad
   0x0020280C CHeap__GetFreeStats
 
 module CHashTable: 0x00202860..0x00202BA8, 5 functions; pad
+  // name runs (possible objects the padding cannot show): CHashTable 3, RoundToPowerOfTwo 1, CHashTable 1
   0x00202860 CHashTable__Construct
   0x00202934 CHashTable__Insert
   0x00202A08 CHashTable__Remove
@@ -84,6 +87,7 @@ module CHashTable: 0x00202860..0x00202BA8, 5 functions; pad
   0x00202B0C CHashTable__GetLongestChain
 
 module CCache: 0x00202BB0..0x00206918, 56 functions; pad
+  // name runs (possible objects the padding cannot show): CCache 11, CMemEntry 3, CCache 42
   0x00202BB0 CCache__Construct
   0x00202EEC CCache__WaitForDisplayLists
   0x00203068 CCache__FreeOldestMemEntry
@@ -156,6 +160,7 @@ module Texture: 0x00206990..0x00207A64, 8 functions; pad
   0x00207A54 Texture_InvalidateCache
 
 module Render: 0x00207A70..0x0020C0CC, 30 functions; pad
+  // name runs (possible objects the padding cannot show): Render 5, Model 2, Render 5, Model 5, Render 7, Model 4, Render 2
   0x00207A70 Render_SetCombineMode
   0x00207FEC Render_SetRenderMode
   0x002086BC Render_DrawShadowQuad
@@ -188,6 +193,7 @@ module Render: 0x00207A70..0x0020C0CC, 30 functions; pad
   0x0020C030 Render_SortTreeInsert
 
 module CMtxF: 0x0020C0D0..0x002150B8, 124 functions; pad
+  // name runs (possible objects the padding cannot show): CMtxF 8, CQuaternion 2, CVector3 4, CQuaternion 1, CVector3 1, Angle 1, CVector3 17, CMtxF 35, Angle 3, CQuaternion 6, Random 4, Math 6, Angle 2, Random 1, Timer 1, Edge 5, Color 1, LightVolume 1, Actors 3, Lighting 4, Model 1, Lighting 2, LightVolume 2, Lighting 3, CStaticObject 7, Instance 1, CStaticObject 1, Model 1
   0x0020C0D0 CMtxF__TransformBox
   0x0020C208 CMtxF__InvertAffine
   0x0020C618 CMtxF__MultiplyAffine
@@ -314,6 +320,7 @@ module CMtxF: 0x0020C0D0..0x002150B8, 124 functions; pad
   0x00214F68 Model_PulseVertexColors
 
 module CLevelActor: 0x002150C0..0x00215ADC, 10 functions; pad
+  // name runs (possible objects the padding cannot show): CLevelActor 2, Actor 2, CLevelActor 6
   0x002150C0 CLevelActor__Construct
   0x002152AC CLevelActor__Draw
   0x002154DC Actor_DrawGroundShadow
@@ -326,6 +333,7 @@ module CLevelActor: 0x002150C0..0x00215ADC, 10 functions; pad
   0x00215A00 CLevelActor__TouchGeometry
 
 module Anim: 0x00215AE0..0x00218B08, 49 functions; pad
+  // name runs (possible objects the padding cannot show): CAnimationState 2, Anim 4, AnimCurve 3, Bits 1, CAnimationState 3, Bits 1, Math 1, BitAddr 3, Bits 20, Pack 2, Anim 4, AnimCurve 2, Curve 3
   0x00215AE0 CAnimationState__GetBonePosition
   0x00215F4C CAnimationState__GetBoneRotation
   0x00216464 Anim_DecodeQuantizedChannel
@@ -390,6 +398,7 @@ module CAnimationState: 0x00218B10..0x00219BBC, 11 functions; pad
   0x00219ACC CAnimationState__Load
 
 module CGameObjectInstance: 0x00219BC0..0x0022025C, 65 functions; pad
+  // name runs (possible objects the padding cannot show): CGameObjectInstance 19, Shadow 1, CGameObjectInstance 39, Anim 3, CMtxF 1, Quaternion 1, CGameObjectInstance 1
   0x00219BC0 CGameObjectInstance__Construct
   0x00219F74 CGameObjectInstance__PickRandomAnim
   0x0021A150 CGameObjectInstance__SetupAnimation
@@ -457,6 +466,7 @@ module CGameObjectInstance: 0x00219BC0..0x0022025C, 65 functions; pad
   0x00220208 CGameObjectInstance__ConstructLitVertices
 
 module CScene: 0x00220260..0x00226F8C, 96 functions; pad
+  // name runs (possible objects the padding cannot show): CScene 89, SortRecord 4, CScene 1, Blast 2
   0x00220260 CScene__SetInstanceSavedBit
   0x00220408 CScene__GetInstanceSavedBit
   0x00220530 CScene__Update
@@ -559,6 +569,7 @@ module Sort: 0x00226F90..0x0022723C, 2 functions; pad
   0x00227184 Sort_Insertion
 
 module CInstancePool: 0x00227240..0x00228908, 18 functions; pad
+  // name runs (possible objects the padding cannot show): CLevelActorPool 3, CPooledLevelActor 2, CLevelActorPool 4, CInstancePool 2, CListedInstance 1, CInstancePool 4, DLights 2
   0x00227240 CLevelActorPool__Spawn
   0x002274A4 CLevelActorPool__Update
   0x00227664 func_00227664
@@ -579,6 +590,7 @@ module CInstancePool: 0x00227240..0x00228908, 18 functions; pad
   0x002288D0 DLights_SwapBuffers
 
 module DLights: 0x00228910..0x00228BA4, 6 functions; pad
+  // name runs (possible objects the padding cannot show): DLights 1, DLight 1, CDLightSet 4
   0x00228910 DLights_GetAtPoint
   0x00228AB0 DLight_Spawn
   0x00228AEC CDLightSet__Alloc
@@ -587,6 +599,7 @@ module DLights: 0x00228910..0x00228BA4, 6 functions; pad
   0x00228B98 CDLightSet__GetNext
 
 module CSun: 0x00228BB0..0x00228C38, 7 functions; pad
+  // name runs (possible objects the padding cannot show): CSunFrameData 2, CSun 5
   0x00228BB0 CSunFrameData__Construct
   0x00228BBC func_00228BBC
   0x00228BC4 CSun__SetSunDir
@@ -601,6 +614,7 @@ module Color: 0x00228C40..0x00229334, 3 functions; pad
   0x002291D4 Color_Darken
 
 module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
+  // name runs (possible objects the padding cannot show): CParticle 19, CParticleSystem 2, CParticle 1, CParticleSystem 6, CParticle 24, CParticleSystem 11, CCamera 1, CParticle 1, CParticleSystem 1, Swoosh 1, Morph 2, Swoosh 1, Trail 9, Animator 1, ScreenTint 1, Quat 2, SwooshSystem 1, RibbonVtxPool 2, Swoosh 1, SwooshGroup 3, Swoosh 2, ScriptAnimator 7, SwooshSet 1, SwooshSystem 6, Path 1, Trail 4, ImpactEvent 1, Blast 3, ImpactEvent 7, Blast 5, ImpactEvent 29, Path 4, Collision 1, Sweep 6, SweepHit 2, Sweep 1, Quad 1, Plane 4, Quad 12, Sphere 1, Cylinder 1, Circle 1, Collision 1, ModelSweep 2, Collision 2, ModelSweep 1, Collision 1, Sweep 1, Collision 1, Sweep 1, CPlayer 1, Pickup 6, Sweep 1, CPlayer 1, Pickup 7
   0x00229340 CParticle__SpawnChild
   0x00229618 CParticle__Wobble
   0x002298C4 CParticle__UpdateHomingMissile
@@ -819,6 +833,7 @@ module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
   0x0023F7B8 Pickup_Feedback
 
 module Sweep: 0x0023F880..0x002407FC, 6 functions; pad
+  // name runs (possible objects the padding cannot show): Sweep 2, Collision 4
   0x0023F880 Sweep_TestBoxFaces
   0x0023FDF0 Sweep_TestBox
   0x0024032C Collision_SweepActors
@@ -834,11 +849,13 @@ module Collision#2: 0x00241010..0x00241854, 1 functions; pad
   0x00241010 Collision_SweepRegions
 
 module CCollisionSetup: 0x00241860..0x0024195C, 3 functions; pad
+  // name runs (possible objects the padding cannot show): CCollisionInfo 1, CCollisionResults 1, CCollisionSetup 1
   0x00241860 CCollisionInfo__Reset
   0x00241894 CCollisionResults__Clear
   0x002418C0 CCollisionSetup__Construct
 
 module AI: 0x00241960..0x00246BBC, 48 functions; pad
+  // name runs (possible objects the padding cannot show): Platform 8, AI 1, CAI 1, AI 2, CAI 2, AI 7, Actor 1, DamageEvent 1, CAI 1, AI 10, Actor 1, AI 1, ValuePair 1, AI 1, CAI 1, AI 2, Actor 2, AI 5
   0x00241960 Platform_GetCollisionBox
   0x00241CB0 Platform_LandOnTop
   0x00241E30 Platform_CollideGround
@@ -889,6 +906,7 @@ module AI: 0x00241960..0x00246BBC, 48 functions; pad
   0x00246B24 AI_DropPickupsByMask
 
 module CPlayer: 0x00246BC0..0x00257A3C, 250 functions; pad
+  // name runs (possible objects the padding cannot show): CPlayer 1, CPlayerContState 1, Player 1, CPlayer 4, Player 2, CPlayer 11, Player 2, Hud 1, CPlayer 2, CBarrel 10, CPlayer 17, PlayerStand 1, PlayerWalk 1, PlayerWade 1, PlayerSwim 1, PlayerClimb 1, CPlayer 1, PlayerJumpPad 1, CPlayer 1, PlayerShock 1, CPlayerPool 1, CPlayer 1, CPlayerPool 5, Hud 1, CPlayerPool 16, ValueTracker 2, CPlayer 15, Actor 2, CPlayer 6, PlayerPool 1, CPlayer 6, Actor 1, CPlayer 11, CPlayerPool 6, CBarrel 5, CPlayer 1, CBarrel 3, CPlayer 5, Player 1, PlayerStand 1, PlayerWalk 1, PlayerJump 2, PlayerFall 1, PlayerDodge 2, PlayerDodgeFall 1, PlayerWade 1, PlayerSwim 1, PlayerState12 2, PlayerClimb 1, PlayerState15 2, PlayerState16 2, PlayerState17 2, PlayerDeathWait 2, PlayerCinema50 1, CPlayer 1, PlayerDeath0A 2, PlayerDeath32 2, PlayerDeath1E 2, PlayerDeath28 2, PlayerDeath0B 2, PlayerDeath0C 2, PlayerDeath0D 2, PlayerDeath0E 2, PlayerDeath0F 2, PlayerDeath14 2, PlayerDeath46 2, PlayerDeath3C 2, PlayerJumpPad 1, PlayerRideIdle 2, PlayerRideMove 2, PlayerShock 1, Ease 1, CPlayer 5, Actor 2, CPlayerPool 1, CPlayer 4, PickupCounter 3, Weapon 1, Actor 1, CPlayerPool 1, CPlayer 3, Hud 1, Particle 2, Angle 1, CBarrel 3, CPlayer 1, Weapon 1, CPlayer 3, Sound 2, CPlayer 2, PlayerWade 1, PlayerDeath 1, PlayerCinema50 1, CPlayer 1, CPlayerPool 2, CPlayer 1, Cinema 1, String 1
   0x00246BC0 CPlayer__ReadInput
   0x002470E8 CPlayerContState__Init
   0x00247124 Player_SwapStrafeTurnBits
@@ -1141,6 +1159,7 @@ module CPlayer: 0x00246BC0..0x00257A3C, 250 functions; pad
   0x00257A10 String_CountTrailingSpaces
 
 module WeaponMode: 0x00257A40..0x00259E58, 49 functions; pad
+  // name runs (possible objects the padding cannot show): WeaponActor 1, CPlayer 1, WeaponActor 2, WeaponMode 4, WeaponActor 6, WeaponMode 6, WeaponAnim 2, WeaponBarrel 1, WeaponMode 1, WeaponBarrel 1, WeaponNode 1, WeaponMode 2, WeaponBarrel 1, WeaponActor 1, WeaponNode 1, WeaponActor 1, WeaponAnim 1, WeaponMode 2, WeaponActor 1, WeaponMode 1, WeaponSound 1, WeaponMode 2, WeaponBarrel 1, WeaponNode 2, WeaponBarrel 1, WeaponMode 5
   0x00257A40 WeaponActor_BuildMatrix
   0x00257BA0 CPlayer__GetNextUsableWeapon
   0x00257D48 WeaponActor_Update
@@ -1270,6 +1289,7 @@ module EnemyAnim: 0x00259E60..0x0025AD88, 76 functions; pad
   0x0025AD5C EnemyAnim_Move_B0600
 
 module EnemyAI: 0x0025AD90..0x0026060C, 119 functions; pad
+  // name runs (possible objects the padding cannot show): AI 1, EnemyAI 13, EnemyMode 1, EnemyAnim 1, EnemyMode 2, EnemyAnim 1, EnemyMode 1, EnemyAI 9, AI 1, EnemyMode 4, EnemyAnim 1, EnemyMode 5, EnemyAI 3, AI 1, EnemyAI 11, EnemyAnim 1, EnemyMode 22, EnemyAI 1, EnemyMode 16, EnemyAnim 6, EnemyMode 1, Projectile 1, EnemyMode 1, EnemyAI 15
   0x0025AD90 AI_TurnHeadToTarget
   0x0025B078 EnemyAI_PickDeathMode
   0x0025B2D4 EnemyAI_OnDamage
@@ -1391,6 +1411,7 @@ module EnemyAI: 0x0025AD90..0x0026060C, 119 functions; pad
   0x002605AC EnemyAI_DrawFadeOut
 
 module EnemyHover: 0x00260610..0x00260D54, 9 functions; pad
+  // name runs (possible objects the padding cannot show): EnemyStationary 2, EnemyFly 1, EnemyHover 5, EnemyAI 1
   0x00260610 EnemyStationary_Setup
   0x00260634 EnemyStationary_Update
   0x00260730 EnemyFly_SteerToPath
@@ -1402,6 +1423,7 @@ module EnemyHover: 0x00260610..0x00260D54, 9 functions; pad
   0x00260C7C EnemyAI_Sidestep
 
 module EnemySwim: 0x00260D60..0x0026214C, 19 functions; pad
+  // name runs (possible objects the padding cannot show): EnemyFly 1, EnemyRam 6, EnemySwim 12
   0x00260D60 EnemyFly_SteerToPathScaled
   0x00260FF8 EnemyRam_Setup
   0x00261074 EnemyRam_Advance
@@ -1502,6 +1524,7 @@ module Throwable: 0x002649A0..0x002651FC, 13 functions; pad
   0x0026508C Throwable_FlyingUpdate
 
 module Door: 0x00265200..0x00265A24, 16 functions; pad
+  // name runs (possible objects the padding cannot show): Door 14, AI 2
   0x00265200 Door_OpenUpdate
   0x002653F8 Door_CloseUpdate
   0x00265544 Door_Setup
@@ -1556,6 +1579,7 @@ module Action: 0x00265F90..0x002666A4, 17 functions; pad
   0x00266644 Action_DrawFade
 
 module InteractiveAnim: 0x002666B0..0x00266B7C, 15 functions; pad
+  // name runs (possible objects the padding cannot show): AI 1, InteractiveAnim 14
   0x002666B0 AI_PlayAnim
   0x002666F4 InteractiveAnim_Setup
   0x00266794 InteractiveAnim_Advance
@@ -1573,6 +1597,7 @@ module InteractiveAnim: 0x002666B0..0x00266B7C, 15 functions; pad
   0x00266AB4 InteractiveAnim_DrawAllModels
 
 module BinaryRange: 0x00266B80..0x00267088, 13 functions; pad
+  // name runs (possible objects the padding cannot show): GetMemSize 1, memmove 1, memset 1, memcmp 1, BinarySearch 1, BinaryRange 1, BitBytes 1, BitTest 1, BitSet 1, BitToggle 1, SmoothStep 1, IsDataPointer 1, IsCodePointer 1
   0x00266B80 GetMemSize
   0x00266B90 memmove
   0x00266C5C memset
@@ -1660,6 +1685,7 @@ module GameObject#2: 0x00269050..0x00269A8C, 6 functions; pad
   0x002699E4 GameObject_PlayLandSound
 
 module CGameRegion: 0x00269A90..0x0026D068, 53 functions; pad
+  // name runs (possible objects the padding cannot show): CGameRegion 14, BoundingBox 1, UnpackScaledVec4 1, CGameRegion 29, BoundingBox 1, BoundingRect 3, CGameRegion 4
   0x00269A90 CGameRegion__GetCeilingNormal
   0x00269C3C CGameRegion__GetCeilingHeight
   0x00269DF0 CGameRegion__GetSlideVelocity
@@ -1715,14 +1741,17 @@ module CGameRegion: 0x00269A90..0x0026D068, 53 functions; pad
   0x0026D028 CGameRegion__GetMaxHeight
 
 module RandomInPackedRange: 0x0026D070..0x0026D1F8, 2 functions; pad
+  // name runs (possible objects the padding cannot show): Material 1, RandomInPackedRange 1
   0x0026D070 Material_Unpack
   0x0026D128 RandomInPackedRange
 
 module HalfToFloat: 0x0026D200..0x0026D228, 2 functions; pad
+  // name runs (possible objects the padding cannot show): FloatToHalf 1, HalfToFloat 1
   0x0026D200 FloatToHalf
   0x0026D210 HalfToFloat
 
 module GameObject#3: 0x0026D230..0x0026E758, 31 functions; pad
+  // name runs (possible objects the padding cannot show): DList 4, NodePool 3, WeightedTable 4, GameObject 1, LevelEvent 1, GameObject 1, CGameRegion 1, LevelEvent 2, Event 12, LevelEvent 2
   0x0026D230 func_0026D230
   0x0026D240 DList_AddHead
   0x0026D288 DList_AddTail
@@ -1756,6 +1785,7 @@ module GameObject#3: 0x0026D230..0x0026E758, 31 functions; pad
   0x0026E6D4 LevelEvent_CheckRequiredItem
 
 module Rumble: 0x0026E760..0x0026EE24, 10 functions; pad
+  // name runs (possible objects the padding cannot show): Rumble 6, RumblePool 1, Rumble 1, RumblePool 2
   0x0026E760 Rumble_GetLevelAt
   0x0026E928 Rumble_Init
   0x0026E9D8 Rumble_ClearLink
@@ -1777,6 +1807,7 @@ module Level: 0x0026EFB0..0x0026F078, 2 functions; pad
   0x0026EFB8 Level_GetHub
 
 module CAudioWorld: 0x0026F080..0x00274B34, 101 functions; pad
+  // name runs (possible objects the padding cannot show): Frustum 1, Plane 2, Frustum 4, Plane 1, amCreateAudioMgr 1, __amMain 1, __amDmaNew 1, __amHandleFrameMsg 1, __clearAudioDMA 1, AudioDMA 1, __amDMA 1, CAudioWorld 45, Sound 1, SndVoice 7, SndVoicePool 3, SndVoice 1, SndVoicePool 7, SndVoice 3, SndVoicePool 5, Sound 5, SndVoice 8, SndVoicePool 1
   0x0026F080 Frustum_FromCorners
   0x0026F348 Plane_FromPoints
   0x0026F400 Plane_SegmentFraction
@@ -1894,6 +1925,7 @@ module SndSeq: 0x00274B40..0x0027551C, 12 functions; pad
   0x00275450 SndSeq_Load
 
 module Sound: 0x00275520..0x00275BC4, 31 functions; pad
+  // name runs (possible objects the padding cannot show): Sound 17, Music 6, Sound 8
   0x00275520 Sound__Initialize
   0x00275544 Sound__Play
   0x002755B0 Sound__PlayPitched
@@ -1978,6 +2010,7 @@ module SpeechPlayer: 0x002768D0..0x00277088, 7 functions; pad
   0x00277024 SpeechPlayer_StopUnlocked
 
 module Hud: 0x00277090..0x0027BB7C, 50 functions; pad
+  // name runs (possible objects the padding cannot show): COnScreen 1, COverlay 1, Hud 3, COnScreen 5, Hud 1, COnScreen 2, Hud 8, COverlay 2, COnScreen 8, Hud 4, COnScreen 3, Hud 1, COnScreen 1, Hud 1, COnScreen 2, Hud 4, COnScreen 3
   0x00277090 COnScreen__DrawBossBar
   0x00277328 COverlay__Update
   0x00277668 Hud_DrawBoxOutline
@@ -2035,6 +2068,7 @@ module Demo: 0x0027BB80..0x0027BD0C, 3 functions; pad
   0x0027BC68 Demo_AdvanceMatchStream
 
 module CCamera: 0x0027BD10..0x0028233C, 67 functions; pad
+  // name runs (possible objects the padding cannot show): CShakeAxis 2, CShake 1, CCamera 8, CCameraPool 2, CCamera 1, CCameraPool 3, CCamera 2, CCameraViewParams 1, CCamera 20, CCameraPool 8, CCamera 1, CCameraPool 2, CCameraText 1, CShakeAxis 3, CShake 3, CCamera 3, CCameraPool 6
   0x0027BD10 func_0027BD10
   0x0027BD30 CShakeAxis__Advance
   0x0027BE90 CShake__ApplyOffset
@@ -2104,6 +2138,7 @@ module CCamera: 0x0027BD10..0x0028233C, 67 functions; pad
   0x002821AC CCameraPool__AddTextEx
 
 module CEmitter: 0x00282340..0x002837DC, 10 functions; pad
+  // name runs (possible objects the padding cannot show): CEmitter 1, CEmitterPool 2, CEmitter 2, CEmitterPool 2, Emitter 3
   0x00282340 CEmitter__Draw
   0x00282E4C CEmitterPool__Advance
   0x00283238 CEmitterPool__Draw
@@ -2199,6 +2234,7 @@ module Controller: 0x002847E0..0x00285CE8, 37 functions; pad
   0x00285CD4 Controller_EnableMenuSounds
 
 module CEngineApp: 0x00285CF0..0x0028A018, 90 functions; pad
+  // name runs (possible objects the padding cannot show): EngineMode03 1, EngineMode07 1, Credits 2, CEngineApp 4, Render 1, CEngineApp 2, Engine 1, CEngineApp 7, Util 2, Engine 1, mainproc 2, CEngineApp 11, EngineMode13 2, EngineMode00 3, EngineMode01 3, EngineMode03 2, EngineMode02 3, EngineMode04 3, EngineMode05 3, EngineMode06 3, EngineMode07 2, EngineMode08 3, EngineMode09 3, EngineMode11 3, EngineMode10 3, EngineMode12 3, EngineMode13 2, EngineMode14 3, EngineMode15 3, EngineMode16 3, EngineMode17 5
   0x00285CF0 EngineMode03_ExpansionPak_Draw
   0x00285E60 EngineMode07_Title_Draw
   0x002860A4 Credits_Draw
@@ -2291,6 +2327,7 @@ module CEngineApp: 0x00285CF0..0x0028A018, 90 functions; pad
   0x00289FE4 func_00289FE4
 
 module __scHandleRSP: 0x0028A020..0x0028B424, 17 functions; pad
+  // name runs (possible objects the padding cannot show): __scMain 1, __scHandleRetrace 1, __scHandleRSP 1, __scHandleRDP 1, __scSchedule 1, osCreateScheduler 1, osScAddClient 1, osScRemoveClient 1, osScGetCmdQ 1, __scAppendList 1, __scTaskReady 1, __scTaskComplete 1, __scExec 1, __scYield 1, Sched 3
   0x0028A020 __scMain
   0x0028A17C __scHandleRetrace
   0x0028A43C __scHandleRSP
@@ -2344,6 +2381,7 @@ module Boot: 0x0028D380..0x0028D81C, 4 functions; pad
   0x0028D814 func_0028D814
 
 module VM: 0x0028D820..0x0028EE3C, 20 functions; pad
+  // name runs (possible objects the padding cannot show): VM 6, osMapTLBRdb 1, VM 13
   0x0028D820 VM_Initialize
   0x0028DAEC VM_AcquireNextTLB
   0x0028DBAC VM_MapTLBEntry
@@ -2372,6 +2410,7 @@ module stvm_tlb: 0x0028EE40..0x0028EF84, 4 functions; known + pad + known: STVM 
   0x0028EEFC func_0028EEFC
 
 module libultra/audio/cseq.c: 0x0028EF90..0x0028FA00, 12 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): __alCSeqGetTrackEvent 1, alCSeqNewMarker 1, __getTrackByte 1, alCSeqNew 1, alCSeqNextEvent 1, alCSeqGetTicks 1, alCSeqTicksToSec 1, alCSeqSecToTicks 1, alCSeqSetLoc 1, alCSeqGetLoc 1, __alCSeqNextDelta 1, __readVarLen 1
   0x0028EF90 __alCSeqGetTrackEvent
   0x0028F1F0 alCSeqNewMarker
   0x0028F460 __getTrackByte
@@ -2389,6 +2428,7 @@ module libultra/audio/cspgetstate.c: 0x0028FA00..0x0028FA0C, 1 functions; ultral
   0x0028FA00 alCSPGetState
 
 module libultra/audio/csplayer.c: 0x0028FA10..0x00290D8C, 8 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): alCSPNew 1, __CSPVoiceHandler 1, __CSPHandleNextSeqEvent 1, __CSPHandleMIDIMsg 1, __CSPHandleMetaMsg 1, __CSPPostNextSeqEvent 1, __CSPRepostEvent 1, __CSPSetUsptFromTempo 1
   0x0028FA10 alCSPNew
   0x0028FB80 __CSPVoiceHandler
   0x002900B0 __CSPHandleNextSeqEvent
@@ -2420,6 +2460,7 @@ module libultra/audio/cspstop.c: 0x00290EF0..0x00290F1C, 1 functions; ultralib
   0x00290EF0 alCSPStop
 
 module libultra/audio/event.c: 0x00290F20..0x00291268, 5 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): alEvtqNew 1, alEvtqNextEvent 1, alEvtqPostEvent 1, alEvtqFlush 1, alEvtqFlushType 1
   0x00290F20 alEvtqNew
   0x00290F9C alEvtqNextEvent
   0x00291034 alEvtqPostEvent
@@ -2436,6 +2477,7 @@ module libultra/audio/heapinit.c: 0x002912F0..0x00291324, 1 functions; pad + ult
   0x002912F0 alHeapInit
 
 module libultra/audio/seqplayer.c: 0x00291330..0x00292DE0, 21 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): alSeqpNew 1, __seqpVoiceHandler 1, __handleNextSeqEvent 1, __handleMIDIMsg 1, __mapVoice 1, __unmapVoice 1, __voiceNeedsNoteKill 1, __lookupVoice 1, __lookupSoundQuick 1, __vsVol 1, __vsDelta 1, __vsPan 1, __initFromBank 1, __initChanState 1, __resetPerfChanState 1, __setInstChanState 1, __seqpReleaseVoice 1, __seqpStopOsc 1, __postNextSeqEvent 1, __handleMetaMsg 1, __setUsptFromTempo 1
   0x00291330 alSeqpNew
   0x002914B4 __seqpVoiceHandler
   0x002919F0 __handleNextSeqEvent
@@ -2459,6 +2501,7 @@ module libultra/audio/seqplayer.c: 0x00291330..0x00292DE0, 21 functions; pad + u
   0x00292DB0 __setUsptFromTempo
 
 module libultra/audio/seq.c: 0x00292DE0..0x002933A4, 13 functions; ultralib
+  // name runs (possible objects the padding cannot show): alSeqNextEvent 1, alSeqNew 1, alSeqGetTicks 1, alSeqTicksToSec 1, alSeqSecToTicks 1, alSeqNewMarker 1, alSeqSetLoc 1, alSeqGetLoc 1, __alSeqNextDelta 1, __alSeqReadVarLen 1, __alSeqReadByte 1, __alSeqReadShort 1, __alSeqReadWord 1
   0x00292DE0 alSeqNextEvent
   0x00292F48 alSeqNew
   0x00293028 alSeqGetTicks
@@ -2474,6 +2517,7 @@ module libultra/audio/seq.c: 0x00292DE0..0x002933A4, 13 functions; ultralib
   0x00293354 __alSeqReadWord
 
 module libultra/audio/sl.c: 0x002933B0..0x0029346C, 4 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): alUnlink 1, alLink 1, alInit 1, alClose 1
   0x002933B0 alUnlink
   0x002933E0 alLink
   0x00293400 alInit
@@ -2489,6 +2533,7 @@ module libultra/audio/sndpgetstate.c: 0x00293580..0x002935A4, 1 functions; pad +
   0x00293580 alSndpGetState
 
 module libultra/audio/sndplayer.c: 0x002935B0..0x00293CD8, 5 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): alSndpNew 1, _handleEvent 1, _sndpVoiceHandler 1, _removeEvents 1, _DivS32ByF32 1
   0x002935B0 alSndpNew
   0x002936E0 _handleEvent
   0x00293B1C _sndpVoiceHandler
@@ -2523,6 +2568,7 @@ module libultra/audio/synaddplayer.c: 0x00293F10..0x00293F60, 1 functions; pad +
   0x00293F10 alSynAddPlayer
 
 module libultra/audio/synallocvoice.c: 0x00293F60..0x00294148, 2 functions; ultralib
+  // name runs (possible objects the padding cannot show): alSynAllocVoice 1, _allocatePVoice 1
   0x00293F60 alSynAllocVoice
   0x00294090 _allocatePVoice
 
@@ -2557,6 +2603,7 @@ module libultra/audio/synstopvoice.c: 0x00294650..0x002946CC, 1 functions; pad +
   0x00294650 alSynStopVoice
 
 module libultra/audio/synthesizer.c: 0x002946D0..0x00294D54, 9 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): alSynNew 1, alAudioFrame 1, __allocParam 1, __freeParam 1, _freePVoice 1, _collectPVoices 1, _timeToSamplesNoRound 1, __nextSampleTime 1, _timeToSamples 1
   0x002946D0 alSynNew
   0x002949A4 alAudioFrame
   0x00294B58 __allocParam
@@ -2568,10 +2615,12 @@ module libultra/audio/synthesizer.c: 0x002946D0..0x00294D54, 9 functions; pad + 
   0x00294D18 _timeToSamples
 
 module libultra/audio/auxbus.c: 0x00294D60..0x00294E6C, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): alAuxBusPull 1, alAuxBusParam 1
   0x00294D60 alAuxBusPull
   0x00294E3C alAuxBusParam
 
 module libultra/audio/drvrnew.c: 0x00294E70..0x00295688, 8 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): alFxNew 1, alLoadNew 1, alMainBusNew 1, alAuxBusNew 1, alResampleNew 1, alSaveNew 1, alEnvmixerNew 1, init 1
   0x00294E70 alFxNew
   0x00295304 alLoadNew
   0x002953B4 alMainBusNew
@@ -2582,6 +2631,7 @@ module libultra/audio/drvrnew.c: 0x00294E70..0x00295688, 8 functions; pad + ultr
   0x002955EC init_lpfilter
 
 module libultra/audio/env.c: 0x00295690..0x00296334, 7 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): alEnvmixerPull 1, _pullSubFrame 1, _getRate 1, alEnvmixerParam 1, _getVol 1, _frexpf 1, _ldexpf 1
   0x00295690 alEnvmixerPull
   0x00295BDC _pullSubFrame
   0x00295EC8 _getRate
@@ -2594,14 +2644,17 @@ module libultra/audio/filter.c: 0x00296340..0x0029635C, 1 functions; pad + ultra
   0x00296340 alFilterNew
 
 module libultra/audio/mainbus.c: 0x00296360..0x002964D0, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): alMainBusPull 1, alMainBusParam 1
   0x00296360 alMainBusPull
   0x002964A0 alMainBusParam
 
 module libultra/audio/resample.c: 0x002964D0..0x00296750, 2 functions; ultralib
+  // name runs (possible objects the padding cannot show): alResamplePull 1, alResampleParam 1
   0x002964D0 alResamplePull
   0x00296690 alResampleParam
 
 module libultra/audio/reverb.c: 0x00296750..0x002972D8, 8 functions; ultralib
+  // name runs (possible objects the padding cannot show): alFxPull 1, alFxParamHdl 1, _loadOutputBuffer 1, _saveBuffer 1, alFxParam 1, _loadBuffer 1, _filterBuffer 1, _doModFunc 1
   0x00296750 alFxPull
   0x00296AF4 alFxParamHdl
   0x00296CD0 _loadOutputBuffer
@@ -2612,6 +2665,7 @@ module libultra/audio/reverb.c: 0x00296750..0x002972D8, 8 functions; ultralib
   0x00297260 _doModFunc
 
 module libultra/audio/save.c: 0x002972E0..0x00297414, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): alSavePull 1, alSaveParam 1
   0x002972E0 alSavePull
   0x002973E0 alSaveParam
 
@@ -2622,20 +2676,24 @@ module libultra/gu/cosf.c: 0x002974C0..0x002975C4, 1 functions; pad + ultralib
   0x002974C0 func_002974C0
 
 module libultra/gu/lookat.c: 0x002975D0..0x00297AD8, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): guLookAt 1, guLookAtF 1
   0x002975D0 guLookAt
   0x00297860 guLookAtF
 
 module libultra/gu/mtxutil.c: 0x00297AE0..0x00297D4C, 4 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): guMtxIdent 1, guMtxIdentF 1, guMtxF2L 1, guMtxL2F 1
   0x00297AE0 guMtxIdent
   0x00297BCC guMtxIdentF
   0x00297C1C guMtxF2L
   0x00297CB4 guMtxL2F
 
 module libultra/gu/ortho.c: 0x00297D50..0x00297FAC, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): guOrtho 1, guOrthoF 1
   0x00297D50 guOrtho
   0x00297E8C guOrthoF
 
 module libultra/gu/perspective.c: 0x00297FB0..0x002982E8, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): guPerspective 1, guPerspectiveF 1
   0x00297FB0 guPerspective
   0x0029815C guPerspectiveF
 
@@ -2658,19 +2716,23 @@ module libultra/io/ai.c: 0x00298650..0x00298664, 1 functions; pad + ultralib
   0x00298650 __osAiDeviceBusy
 
 module libultra/io/contquery.c: 0x00298670..0x00298718, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): osContStartQuery 1, osContGetQuery 1
   0x00298670 osContStartQuery
   0x002986F8 osContGetQuery
 
 module libultra/io/contreaddata.c: 0x00298720..0x00298900, 3 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): osContStartReadData 1, osContGetReadData 1, __osPackReadData 1
   0x00298720 osContStartReadData
   0x002987B4 osContGetReadData
   0x0029884C __osPackReadData
 
 module libultra/io/contreset.c: 0x00298900..0x00298A40, 2 functions; ultralib
+  // name runs (possible objects the padding cannot show): osContReset 1, __osPackResetData 1
   0x00298900 osContReset
   0x00298A0C __osPackResetData
 
 module libultra/io/controller.c: 0x00298A40..0x00298D4C, 3 functions; ultralib
+  // name runs (possible objects the padding cannot show): osContInit 1, __osPackRequestData 1, __osContGetInitData 1
   0x00298A40 osContInit
   0x00298BE0 __osPackRequestData
   0x00298C98 __osContGetInitData
@@ -2682,19 +2744,23 @@ module libultra/io/dp.c: 0x00298DF0..0x00298E08, 1 functions; pad + ultralib
   0x00298DF0 __osDpDeviceBusy
 
 module libultra/io/motor.c: 0x00298E10..0x00299674, 3 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): osMotorStop 1, osMotorStart 1, osMotorInit 1
   0x00298E10 osMotorStop
   0x00298FD4 osMotorStart
   0x00299198 osMotorInit
 
 module libultra/io/contramread.c: 0x00299680..0x00299A38, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): __osContRamRead 1, __osPackRamReadData 1
   0x00299680 __osContRamRead
   0x002998B0 __osPackRamReadData
 
 module libultra/io/contramwrite.c: 0x00299A40..0x00299DF8, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): __osContRamWrite 1, __osPackRamWriteData 1
   0x00299A40 __osContRamWrite
   0x00299C60 __osPackRamWriteData
 
 module libultra/io/crc.c: 0x00299E00..0x00299EA8, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): __osContAddressCrc 1, __osContDataCrc 1
   0x00299E00 __osContAddressCrc
   0x00299E48 __osContDataCrc
 
@@ -2702,6 +2768,7 @@ module libultra/io/pirawdma.c: 0x00299EB0..0x00299F84, 1 functions; pad + ultral
   0x00299EB0 osPiRawStartDma
 
 module libultra/io/siacs.c: 0x00299F90..0x0029A078, 3 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): __osSiCreateAccessQueue 1, __osSiGetAccess 1, __osSiRelAccess 1
   0x00299F90 __osSiCreateAccessQueue
   0x00299FE4 __osSiGetAccess
   0x0029A050 __osSiRelAccess
@@ -2713,6 +2780,7 @@ module libultra/io/si.c: 0x0029A140..0x0029A158, 1 functions; pad + ultralib
   0x0029A140 __osSiDeviceBusy
 
 module libultra/io/sptask.c: 0x0029A160..0x0029A378, 3 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): _VirtualToPhysicalTask 1, osSpTaskLoad 1, osSpTaskStartGo 1
   0x0029A160 _VirtualToPhysicalTask
   0x0029A248 osSpTaskLoad
   0x0029A34C osSpTaskStartGo
@@ -2748,6 +2816,7 @@ module libultra/io/vigetcurrframebuf.c: 0x0029A6E0..0x0029A718, 1 functions; pad
   0x0029A6E0 osViGetCurrentFramebuffer
 
 module libultra/io/vimgr.c: 0x0029A720..0x0029AA10, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): osCreateViManager 1, viMgrMain 1
   0x0029A720 osCreateViManager
   0x0029A890 viMgrMain
 
@@ -2827,6 +2896,7 @@ module libultra/os/thread.c: 0x0029BC30..0x0029BC64, 1 functions; pad + ultralib
   0x0029BC30 __osDequeueThread
 
 module libultra/os/timerintr.c: 0x0029BC70..0x0029BF74, 4 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): __osTimerInterrupt 1, __osTimerServicesInit 1, __osSetTimerIntr 1, __osInsertTimer 1
   0x0029BC70 __osTimerInterrupt
   0x0029BDB8 __osTimerServicesInit
   0x0029BE0C __osSetTimerIntr
@@ -2836,6 +2906,7 @@ module libultra/os/virtualtophysical.c: 0x0029BF80..0x0029BFE0, 1 functions; pad
   0x0029BF80 osVirtualToPhysical
 
 module libultra/os/exceptasm.s: 0x0029BFE0..0x0029CAE4, 7 functions; known + ultralib + known: ultralib exceptasm.s (docs/ASM_ORIGIN.md)
+  // name runs (possible objects the padding cannot show): __osException 1, send 1, __osEnqueueAndYield 1, __osEnqueueThread 1, __osPopThread 1, __osDispatchThread 1, __osCleanupThread 1
   0x0029BFE0 __osException
   0x0029C5D8 send_mesg
   0x0029C6DC __osEnqueueAndYield
@@ -2845,6 +2916,7 @@ module libultra/os/exceptasm.s: 0x0029BFE0..0x0029CAE4, 7 functions; known + ult
   0x0029CADC __osCleanupThread
 
 module libultra/io/leointerrupt.c: 0x0029CAF0..0x0029D18C, 3 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): __osLeoInterrupt 1, __osLeoAbnormalResume 1, __osLeoResume 1
   0x0029CAF0 __osLeoInterrupt
   0x0029D000 __osLeoAbnormalResume
   0x0029D0D4 __osLeoResume
@@ -2871,6 +2943,7 @@ module libultra/io/epirawwrite.c: 0x0029DBD0..0x0029DD10, 1 functions; pad + ult
   0x0029DBD0 osEPiRawWriteIo
 
 module libultra/io/piacs.c: 0x0029DD10..0x0029DDF8, 3 functions; ultralib
+  // name runs (possible objects the padding cannot show): __osPiCreateAccessQueue 1, __osPiGetAccess 1, __osPiRelAccess 1
   0x0029DD10 __osPiCreateAccessQueue
   0x0029DD64 __osPiGetAccess
   0x0029DDD0 __osPiRelAccess
@@ -2897,6 +2970,7 @@ module libultra/os/getsr.s: 0x0029DFE0..0x0029DFEC, 1 functions; pad + ultralib
   0x0029DFE0 __osGetSR
 
 module libultra/os/interrupt.s: 0x0029DFF0..0x0029E02C, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): __osDisableInt 1, __osRestoreInt 1
   0x0029DFF0 __osDisableInt
   0x0029E010 __osRestoreInt
 
@@ -2931,15 +3005,18 @@ module libultra/os/writebackdcacheall.s: 0x0029E3B0..0x0029E3D8, 1 functions; pa
   0x0029E3B0 osWritebackDCacheAll
 
 module libultra/libc/sprintf.c: 0x0029E3E0..0x0029E460, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): sprintf 1, proutSprintf 1
   0x0029E3E0 sprintf
   0x0029E438 proutSprintf
 
 module libultra/libc/string.c: 0x0029E460..0x0029E4E4, 3 functions; ultralib
+  // name runs (possible objects the padding cannot show): strchr 2, strlen 1
   0x0029E460 func_0029E460
   0x0029E488 strchr
   0x0029E4C0 strlen
 
 module libultra/libc/xprintf.c: 0x0029E4F0..0x0029EEA0, 2 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): _Printf 1, _Putfld 1
   0x0029E4F0 _Printf
   0x0029EA34 _Putfld
 
@@ -2953,6 +3030,7 @@ module libultra/libc/xldtob.c: 0x0029F180..0x0029F188, 1 functions; pad + ultral
   0x0029F180 _Ldtob
 
 module alAdpcmPull: 0x0029F190..0x0029FE6C, 5 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): alAdpcmPull 1, alRaw16Pull 1, alAdecPull 1, alLoadParam 1, _decodeChunk 1
   0x0029F190 alAdpcmPull
   0x0029F5D4 alRaw16Pull
   0x0029F958 alAdecPull
@@ -2960,6 +3038,7 @@ module alAdpcmPull: 0x0029F190..0x0029FE6C, 5 functions; pad + ultralib
   0x0029FCF4 _decodeChunk
 
 module adecHuffDecode: 0x0029FE70..0x002A12EC, 18 functions; pad
+  // name runs (possible objects the padding cannot show): adecReadBits 1, adecHuffDecode 1, adecDecodeFrame 1, mdctInitTwiddles 1, mdctFftInit 1, adecDequantize 1, mdctFft 1, adecImdctFrame 1, adecDecodeFrameOk 1, mdctBuildBitrevTable 1, mdctPackSpectrum 1, mdctTwiddleMul 1, mdctFftCtx 1, adecRoundClampS16 1, adecStreamOpen 1, adecNextFrame 1, adecGetStopFlag 1, adecClearStopFlag 1
   0x0029FE70 adecReadBits
   0x002A0044 adecHuffDecode
   0x002A0448 adecDecodeFrame
@@ -2980,6 +3059,7 @@ module adecHuffDecode: 0x0029FE70..0x002A12EC, 18 functions; pad
   0x002A12DC adecClearStopFlag
 
 module HostIo: 0x002A12F0..0x002A2FA8, 34 functions; pad
+  // name runs (possible objects the padding cannot show): HostIo 26, PCinit 1, PCinitThreaded 1, PCopen 1, PCcreat 1, PCclose 1, PCread 1, PCwrite 1, PClseek 1
   0x002A12F0 HostIo_DisableInt
   0x002A1324 HostIo_RestoreInt
   0x002A1350 HostIo_WriteWord
@@ -3061,6 +3141,7 @@ module unk_002C23E0: 0x002C23E0..0x002C2474, 1 functions; pad
   0x002C23E0 func_002C23E0
 
 module Primagen: 0x00400000..0x00407F14, 115 functions; region
+  // name runs (possible objects the padding cannot show): Automap 12, MantidQueen 43, Primagen 60
   0x00400000 Automap_RevealRegion
   0x004001D0 Automap_Update
   0x004004D8 Automap_Draw
@@ -3387,6 +3468,7 @@ module Cinema#2: 0x0040F240..0x00413228, 44 functions; pad
   0x004131B0 Cinema_IsWaitCue
 
 module MenuItem: 0x00413230..0x00417484, 52 functions; pad
+  // name runs (possible objects the padding cannot show): MenuItem 7, Menu 5, MenuPool 1, MenuItem 6, Menu 2, MenuItem 2, Menu 3, MenuPool 9, MenuItem 1, Menu 5, MenuItemDesc 2, MenuItem 4, MenuModel 2, Menu 1, MenuPool 2
   0x00413230 MenuItem_FormatBinding
   0x004133A4 MenuItem_UpdateBinding
   0x0041363C MenuItem_Layout
@@ -3441,6 +3523,7 @@ module MenuItem: 0x00413230..0x00417484, 52 functions; pad
   0x00417418 MenuPool_CloseMenu
 
 module MpMenu: 0x00417490..0x0041A3A8, 110 functions; pad
+  // name runs (possible objects the padding cannot show): MpMenu 3, WeaponsMenu 1, Menu 2, Mp 2, Menu 1, Mp 1, FinalScoreMenu 5, RumbleMenu 2, PlayerSetupMenu 8, CharacterMenu 7, TeamMenu 3, FragTagMenu 10, MpMenu 2, BloodLustMenu 10, TeamBloodMenu 10, WeaponsMenu 1, DeathmatchMenu 4, SingleMenu 5, TitleMenu 7, QuitMenu 2, Menu 2, PauseMenu 7, SoundMenu 9, PauseMenu 6
   0x00417490 MpMenu_StartFragTag
   0x0041760C MpMenu_StartBloodLust
   0x0041778C MpMenu_StartTeamBlood
@@ -3562,6 +3645,7 @@ module GameOverMenu: 0x0041A420..0x0041A4CC, 3 functions; pad
   0x0041A494 GameOverMenu_TickCountdown
 
 module CheatMenu: 0x0041A4D0..0x0041BA48, 48 functions; pad
+  // name runs (possible objects the padding cannot show): CheatsMenu 2, EnterCheatMenu 9, Cheat 1, CheatsMenu 1, CheatMenu 35
   0x0041A4D0 CheatsMenu_Init
   0x0041A5DC CheatsMenu_WarpSelect
   0x0041A8F0 EnterCheatMenu_Init
@@ -3612,6 +3696,7 @@ module CheatMenu: 0x0041A4D0..0x0041BA48, 48 functions; pad
   0x0041B9DC CheatMenu_FrootyStripesText
 
 module OptionsMenu: 0x0041BA50..0x0041C954, 31 functions; pad
+  // name runs (possible objects the padding cannot show): GameSettings 1, PlayerOptions 2, OptionsMenu 28
   0x0041BA50 GameSettings_SetDefaults
   0x0041BC04 PlayerOptions_SetDefaults
   0x0041BC50 PlayerOptions_SetDefaultName
@@ -3672,6 +3757,7 @@ module NameEntryMenu: 0x0041D050..0x0041D884, 8 functions; pad
   0x0041D84C NameEntryMenu_IsMatchOver
 
 module PakMenu: 0x0041D890..0x00424A5C, 140 functions; pad
+  // name runs (possible objects the padding cannot show): SaveGame 1, PakMenu 16, GameNoteMenu 1, CharNoteMenu 1, PakMessage 1, PakConfirmMenu 2, PakMenu 3, Pak 6, PakMenu 2, SaveGame 1, PakMenu 16, GameNoteMenu 10, CharNoteMenu 10, PakMessage 25, SavePortalMenu 10, DamagedPakMenu 10, PakConfirmMenu 13, Video 8, InventoryMenu 4
   0x0041D890 SaveGame_Build
   0x0041DA28 PakMenu_UpdateNoteRows
   0x0041DC5C PakMenu_GetReturnMenu
@@ -3814,6 +3900,7 @@ module PakMenu: 0x0041D890..0x00424A5C, 140 functions; pad
   0x00424A10 InventoryMenu_SelectOk
 
 module MissionMenu: 0x00424A60..0x00425754, 15 functions; pad
+  // name runs (possible objects the padding cannot show): Mission 1, MissionMenu 10, GfxPool 4
   0x00424A60 Mission_LevelObjectivesDone
   0x00424B90 MissionMenu_UpdateObjective1Count
   0x00424D54 MissionMenu_UpdateObjective2Count
@@ -3831,6 +3918,7 @@ module MissionMenu: 0x00424A60..0x00425754, 15 functions; pad
   0x00425710 func_00425710
 
 module Pak: 0x00425760..0x00427174, 42 functions; pad
+  // name runs (possible objects the padding cannot show): Pak 25, Str 4, Pak 2, Crc32 1, Str 7, Char 2, Pak 1
   0x00425760 Pak_RefreshNotes
   0x004258E8 Pak_Mount
   0x00425AB8 Pak_ProbeAll
@@ -3875,11 +3963,13 @@ module Pak: 0x00425760..0x00427174, 42 functions; pad
   0x00427164 Pak_IsDirectoryAllocated
 
 module libultra/io/pfsallocatefile.c: 0x00427180..0x00427780, 3 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): osPfsAllocateFile 1, __osPfsDeclearPage 1, __osClearPage 1
   0x00427180 osPfsAllocateFile
   0x00427524 __osPfsDeclearPage
   0x004276F0 __osClearPage
 
 module libultra/io/pfsdeletefile.c: 0x00427780..0x00427C1C, 3 functions; ultralib
+  // name runs (possible objects the padding cannot show): osPfsDeleteFile 1, __osPfsReleasePages 1, __osBlockSum 1
   0x00427780 osPfsDeleteFile
   0x004279AC __osPfsReleasePages
   0x00427B4C __osBlockSum
@@ -3891,6 +3981,7 @@ module libultra/io/pfsfreeblocks.c: 0x00427E60..0x00427F78, 1 functions; pad + u
   0x00427E60 osPfsFreeBlocks
 
 module libultra/io/pfsgetstatus.c: 0x00427F80..0x00428160, 3 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): __osPfsGetStatus 1, __osPfsRequestOneChannel 1, __osPfsGetOneChannelData 1
   0x00427F80 __osPfsGetStatus
   0x00428058 __osPfsRequestOneChannel
   0x004280E4 __osPfsGetOneChannelData
@@ -3899,11 +3990,13 @@ module libultra/io/pfsinitpak.c: 0x00428160..0x00428330, 1 functions; ultralib
   0x00428160 osPfsInitPak
 
 module libultra/io/pfschecker.c: 0x00428330..0x00428A18, 3 functions; ultralib
+  // name runs (possible objects the padding cannot show): osPfsChecker 1, corrupted 2
   0x00428330 osPfsChecker
   0x0042876C corrupted_init
   0x004288B8 corrupted
 
 module libultra/io/pfsisplug.c: 0x00428A20..0x00428CEC, 3 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): osPfsIsPlug 1, __osPfsRequestData 1, __osPfsGetInitData 1
   0x00428A20 osPfsIsPlug
   0x00428B9C __osPfsRequestData
   0x00428C38 __osPfsGetInitData
@@ -3918,6 +4011,7 @@ module libultra/io/pfssearchfile.c: 0x004292E0..0x00429454, 1 functions; ultrali
   0x004292E0 osPfsFindFile
 
 module libultra/io/contpfs.c: 0x00429460..0x00429F18, 8 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): __osRepairPackId 1, __osCheckPackId 1, __osGetId 1, __osPfsRWInode 1, __osSumcalc 1, __osIdCheckSum 1, __osCheckId 1, __osPfsSelectBank 1
   0x00429460 __osRepairPackId
   0x00429748 __osCheckPackId
   0x004298B8 __osGetId
@@ -3928,6 +4022,7 @@ module libultra/io/contpfs.c: 0x00429460..0x00429F18, 8 functions; pad + ultrali
   0x00429EC4 __osPfsSelectBank
 
 module CScene#2: 0x00429F20..0x0042CF84, 25 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): MatrixHeap 1, CScene 24
   0x00429F20 MatrixHeap_Construct
   0x00429FA0 CScene__Construct
   0x0042AA80 CScene__LoadLightSettings
@@ -3955,6 +4050,7 @@ module CScene#2: 0x00429F20..0x0042CF84, 25 functions; pad + ultralib
   0x0042CE10 CScene__ConstructMap
 
 module SceneActorPool: 0x0042CF90..0x0042D114, 2 functions; pad
+  // name runs (possible objects the padding cannot show): SceneActorPool 1, CInstancePool 1
   0x0042CF90 SceneActorPool_Construct
   0x0042D0A0 CInstancePool__Construct
 
@@ -3971,6 +4067,7 @@ module unk_0042D410: 0x0042D410..0x0042D50C, 1 functions; pad
   0x0042D410 func_0042D410
 
 module CPlayer#2: 0x0042DA60..0x0042EB4C, 13 functions; pad
+  // name runs (possible objects the padding cannot show): CPlayer 6, CPlayerPool 3, CPlayer 4
   0x0042DA60 CPlayer__SetupActors
   0x0042DC18 CPlayer__NewGame
   0x0042DE74 CPlayer__LevelStart
@@ -3991,6 +4088,7 @@ module COnScreen: 0x0042EB50..0x0042EC2C, 3 functions; pad
   0x0042EBBC func_0042EBBC
 
 module Demo#2: 0x0042EC30..0x00430068, 28 functions; pad
+  // name runs (possible objects the padding cannot show): Demo 9, DemoStream 4, Bits 1, DemoStream 2, Demo 5, CCamera 1, CCameraPool 5, CEmitterPool 1
   0x0042EC30 Demo_ReadRunLength
   0x0042ECF0 Demo_DecodeButtons
   0x0042EF2C Demo_Start
@@ -4303,6 +4401,7 @@ module Cinema_2: 0x0040F240..0x00413228, 44 functions; pad
   0x004131B0 Cinema_IsWaitCue_2
 
 module MenuItem_2: 0x00413230..0x00417484, 52 functions; pad
+  // name runs (possible objects the padding cannot show): MenuItem 7, Menu 5, MenuPool 1, MenuItem 6, Menu 2, MenuItem 2, Menu 3, MenuPool 9, MenuItem 1, Menu 5, MenuItemDesc 2, MenuItem 4, MenuModel 2, Menu 1, MenuPool 2
   0x00413230 MenuItem_FormatBinding_2
   0x004133A4 MenuItem_UpdateBinding_2
   0x0041363C MenuItem_Layout_2
@@ -4357,6 +4456,7 @@ module MenuItem_2: 0x00413230..0x00417484, 52 functions; pad
   0x00417418 MenuPool_CloseMenu_2
 
 module MpMenu_2: 0x00417490..0x0041A308, 110 functions; pad
+  // name runs (possible objects the padding cannot show): MpMenu 3, WeaponsMenu 1, Menu 2, Mp 2, Menu 1, Mp 1, FinalScoreMenu 5, RumbleMenu 2, PlayerSetupMenu 8, CharacterMenu 7, TeamMenu 8, FragTagMenu 5, MpMenu 22, WeaponsMenu 3, DeathmatchMenu 2, SingleMenu 5, TitleMenu 7, QuitMenu 2, Menu 2, PauseMenu 7, SoundMenu 9, PauseMenu 6
   0x00417490 MpMenu_StartFragTag_2
   0x0041760C MpMenu_StartBloodLust_2
   0x0041778C MpMenu_StartTeamBlood_2
@@ -4478,6 +4578,7 @@ module GameOverMenu_2: 0x0041A380..0x0041A42C, 3 functions; pad
   0x0041A3F4 GameOverMenu_TickCountdown_2
 
 module CheatMenu_2: 0x0041A430..0x0041B9B0, 48 functions; pad
+  // name runs (possible objects the padding cannot show): CheatsMenu 2, EnterCheatMenu 9, Cheat 1, CheatsMenu 1, CheatMenu 35
   0x0041A430 CheatsMenu_Init_2
   0x0041A53C CheatsMenu_WarpSelect_2
   0x0041A858 EnterCheatMenu_Init_2
@@ -4528,6 +4629,7 @@ module CheatMenu_2: 0x0041A430..0x0041B9B0, 48 functions; pad
   0x0041B944 CheatMenu_FrootyStripesText_2
 
 module OptionsMenu_2: 0x0041B9B0..0x0041C8B4, 31 functions; pad(other copy)
+  // name runs (possible objects the padding cannot show): GameSettings 1, PlayerOptions 2, OptionsMenu 28
   0x0041B9B0 GameSettings_SetDefaults_2
   0x0041BB64 PlayerOptions_SetDefaults_2
   0x0041BBB0 PlayerOptions_SetDefaultName_2
@@ -4588,6 +4690,7 @@ module NameEntryMenu_2: 0x0041CFA0..0x0041D7AC, 8 functions; pad(other copy)
   0x0041D79C NameEntryMenu_IsMatchOver_2
 
 module PakMenu_2: 0x0041D7B0..0x0042497C, 140 functions; pad
+  // name runs (possible objects the padding cannot show): SaveGame 1, PakMenu 16, GameNoteMenu 1, CharNoteMenu 1, PakMessage 1, PakConfirmMenu 2, PakMenu 3, Pak 6, PakMenu 2, SaveGame 1, PakMenu 16, GameNoteMenu 10, CharNoteMenu 10, PakMessage 25, SavePortalMenu 10, DamagedPakMenu 10, PakConfirmMenu 13, Video 8, InventoryMenu 4
   0x0041D7B0 SaveGame_Build_2
   0x0041D948 PakMenu_UpdateNoteRows_2
   0x0041DB7C PakMenu_GetReturnMenu_2
@@ -4730,6 +4833,7 @@ module PakMenu_2: 0x0041D7B0..0x0042497C, 140 functions; pad
   0x00424930 InventoryMenu_SelectOk_2
 
 module MissionMenu_2: 0x00424980..0x00425674, 15 functions; pad
+  // name runs (possible objects the padding cannot show): Mission 1, MissionMenu 10, GfxPool 4
   0x00424980 Mission_LevelObjectivesDone_2
   0x00424AB0 MissionMenu_UpdateObjective1Count_2
   0x00424C74 MissionMenu_UpdateObjective2Count_2
@@ -4747,6 +4851,7 @@ module MissionMenu_2: 0x00424980..0x00425674, 15 functions; pad
   0x00425630 func_0045E630
 
 module Pak_2: 0x00425680..0x00427094, 42 functions; pad
+  // name runs (possible objects the padding cannot show): Pak 25, Str 4, Pak 2, Crc32 1, Str 7, Char 2, Pak 1
   0x00425680 Pak_RefreshNotes_2
   0x00425808 Pak_Mount_2
   0x004259D8 Pak_ProbeAll_2
@@ -4791,11 +4896,13 @@ module Pak_2: 0x00425680..0x00427094, 42 functions; pad
   0x00427084 Pak_IsDirectoryAllocated_2
 
 module libultra/io/pfsallocatefile.c_2: 0x004270A0..0x004276A0, 3 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): osPfsAllocateFile 1, __osPfsDeclearPage 1, __osClearPage 1
   0x004270A0 osPfsAllocateFile_2
   0x00427444 __osPfsDeclearPage_2
   0x00427610 __osClearPage_2
 
 module libultra/io/pfsdeletefile.c_2: 0x004276A0..0x00427B3C, 3 functions; ultralib
+  // name runs (possible objects the padding cannot show): osPfsDeleteFile 1, __osPfsReleasePages 1, __osBlockSum 1
   0x004276A0 osPfsDeleteFile_2
   0x004278CC __osPfsReleasePages_2
   0x00427A6C __osBlockSum_2
@@ -4807,6 +4914,7 @@ module libultra/io/pfsfreeblocks.c_2: 0x00427D80..0x00427E98, 1 functions; pad +
   0x00427D80 osPfsFreeBlocks_2
 
 module libultra/io/pfsgetstatus.c_2: 0x00427EA0..0x00428080, 3 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): __osPfsGetStatus 1, __osPfsRequestOneChannel 1, __osPfsGetOneChannelData 1
   0x00427EA0 __osPfsGetStatus_2
   0x00427F78 __osPfsRequestOneChannel_2
   0x00428004 __osPfsGetOneChannelData_2
@@ -4815,11 +4923,13 @@ module libultra/io/pfsinitpak.c_2: 0x00428080..0x00428250, 1 functions; ultralib
   0x00428080 osPfsInitPak_2
 
 module libultra/io/pfschecker.c_2: 0x00428250..0x00428938, 3 functions; ultralib
+  // name runs (possible objects the padding cannot show): osPfsChecker 1, corrupted 2
   0x00428250 osPfsChecker_2
   0x0042868C corrupted_init_2
   0x004287D8 corrupted_2
 
 module libultra/io/pfsisplug.c_2: 0x00428940..0x00428C0C, 3 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): osPfsIsPlug 1, __osPfsRequestData 1, __osPfsGetInitData 1
   0x00428940 osPfsIsPlug_2
   0x00428ABC __osPfsRequestData_2
   0x00428B58 __osPfsGetInitData_2
@@ -4834,6 +4944,7 @@ module libultra/io/pfssearchfile.c_2: 0x00429200..0x00429374, 1 functions; ultra
   0x00429200 osPfsFindFile_2
 
 module libultra/io/contpfs.c_2: 0x00429380..0x00429E38, 8 functions; pad + ultralib
+  // name runs (possible objects the padding cannot show): __osRepairPackId 1, __osCheckPackId 1, __osGetId 1, __osPfsRWInode 1, __osSumcalc 1, __osIdCheckSum 1, __osCheckId 1, __osPfsSelectBank 1
   0x00429380 __osRepairPackId_2
   0x00429668 __osCheckPackId_2
   0x004297D8 __osGetId_2
@@ -4871,6 +4982,7 @@ module CScene_2: 0x00429E40..0x0042CEA4, 25 functions; pad + ultralib
   0x0042CD30 CScene__ConstructMap_2
 
 module SceneActorPool_2: 0x0042CEB0..0x0042D034, 2 functions; pad
+  // name runs (possible objects the padding cannot show): SceneActorPool 1, CInstancePool 1
   0x0042CEB0 SceneActorPool_Construct_2
   0x0042CFC0 CInstancePool__Construct_2
 
@@ -4887,6 +4999,7 @@ module unk_0042D330_2: 0x0042D330..0x0042D42C, 1 functions; pad
   0x0042D330 func_00466330
 
 module CPlayer_2: 0x0042D980..0x0042EA6C, 13 functions; pad
+  // name runs (possible objects the padding cannot show): CPlayer 6, CPlayerPool 3, CPlayer 4
   0x0042D980 CPlayer__SetupActors_2
   0x0042DB38 CPlayer__NewGame_2
   0x0042DD94 CPlayer__LevelStart_2
@@ -4907,6 +5020,7 @@ module COnScreen_2: 0x0042EA70..0x0042EB4C, 3 functions; pad
   0x0042EADC func_00467ADC
 
 module Demo_2: 0x0042EB50..0x0042FF88, 28 functions; pad
+  // name runs (possible objects the padding cannot show): Demo 10, DemoStream 6, Demo 5, CCamera 1, CCameraPool 5, CEmitterPool 1
   0x0042EB50 Demo_ReadRunLength_2
   0x0042EC10 Demo_DecodeButtons_2
   0x0042EE4C Demo_Start_2

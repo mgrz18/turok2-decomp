@@ -181,6 +181,35 @@ def build(rom):
     return fs, mods
 
 
+def rodata_order(mods):
+    """Each object's .rodata is linked in the same order as its .text: a module whose
+    .rodata lies below the previous module's is out of order (a wrong boundary, or
+    rodata shared across objects). Uses build/turok2.us.map (a `make` build)."""
+    mp = ROOT / "build" / "turok2.us.map"
+    if not mp.exists():
+        return None
+    text, ro = {}, {}
+    for m in re.finditer(r"^ \.(text|rodata)\s+0x([0-9a-f]+)\s+0x([0-9a-f]+) (build/src/\S+\.c\.o)$",
+                         mp.read_text(), re.M):
+        sec, addr, size, obj = m.group(1), int(m.group(2), 16), int(m.group(3), 16), m.group(4)
+        if size:
+            (text if sec == "text" else ro)[obj] = addr
+    ro_at = {text[o]: a for o, a in ro.items() if o in text}       # function vram -> its .rodata
+    bad, last = [], None
+    for m in mods:
+        if m["region"] == "vm2":
+            continue
+        rs = [ro_at[f[0]] for f in m["funcs"] if f[0] in ro_at]
+        if not rs:
+            continue
+        if last and min(rs) < last[1] and m["region"] == last[2]:
+            bad.append(f"{last[0]} -> {m['name']}")
+        # (inside one module the order is not checked: the per-function files put a literal
+        # shared by two functions with either, so even ultralib's synthesizer.c is "out of order")
+        last = (m["name"], max(rs), m["region"])
+    return bad
+
+
 def check(fs, mods):
     errs = []
     flat = [f for m in mods for f in m["funcs"]]
@@ -206,13 +235,22 @@ def main():
     fs, mods = build(rom)
     errs = check(fs, mods)
     ev = Counter(e for m in mods for e in m["evidence"] if ":" not in e)
+    multi = sum(1 for m in mods if len(m["parts"]) > 1 and m["region"] != "vm2")
     print(f"{len(fs)} functions, {len(mods)} modules "
           f"({sum(1 for m in mods if m['region'] == 'engine')} engine, "
           f"{sum(1 for m in mods if m['region'] == 'vm1')} VM module, "
           f"{sum(1 for m in mods if m['region'] == 'vm2')} module-2 copies); "
-          f"boundaries by evidence: {dict(sorted(ev.items()))}", file=sys.stderr)
+          f"boundaries by evidence: {dict(sorted(ev.items()))}; "
+          f"{multi} modules hold more than one name prefix", file=sys.stderr)
     for e in errs:
         print("ERROR:", e, file=sys.stderr)
+    ro = rodata_order(mods)
+    if ro is None:
+        print("(no build/turok2.us.map: .rodata order not checked)", file=sys.stderr)
+    else:
+        print(f".rodata order: {len(ro)} exceptions", file=sys.stderr)
+        for b in ro:
+            print("  rodata:", b, file=sys.stderr)
     if args.write:
         lines = ["// Turok 2's functions by original module (object file); written by tools/modules.py --write.",
                  "// module: first..last vram, functions, evidence for its start; then one function per line.",
@@ -221,6 +259,9 @@ def main():
             f0, f1 = m["funcs"][0], m["funcs"][-1]
             lines.append(f"\nmodule {m['name']}: 0x{f0[0]:08X}..0x{f1[0] + f1[1]:08X}, "
                          f"{len(m['funcs'])} functions; {' + '.join(m['evidence'])}")
+            if len(m["parts"]) > 1:
+                lines.append("  // name runs (possible objects the padding cannot show): "
+                             + ", ".join(f"{p} {n}" for p, n in m["parts"]))
             lines += [f"  0x{f[0]:08X} {f[2]}" for f in m["funcs"]]
         OUT.write_text("\n".join(lines) + "\n")
         print(f"wrote {OUT.relative_to(ROOT)}", file=sys.stderr)
