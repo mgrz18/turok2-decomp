@@ -245,6 +245,16 @@ Widescreen (the game frame is 4:3 with bars today); 60 fps with interpolation; a
 resolution; enhancements (texture packs, a settings menu, mouse-look refinements, Windows and Linux
 packages, Armorines on the same base).
 
+## Round 21, part j1: function names only (branch names-R21_j1; NAMES.md)
+
+255 more function names (`versions/names/n9.us.txt`); the port's sources that call them by name
+follow (`port/game/t2sched.c`: `Scheduler_RDPDoneHook`; `port/game/t2swoosh.c`:
+`SwooshSystem_Construct`, `SwooshSystem_AddTimer`, `DList_Init`, `SwooshSystem_PlaceDecal`), as do
+`turok2.us.toml`, `tools/ghidra/annotations.json` and `versions/port_layout.us.json`. No behaviour
+change: boot and demos (26,000, `--pak-blank`) det `6ab97584…`, and the default whole-game run
+(Release, `aimdrive.py`, 300,000 frames) det **`dc8126d3…`**, both identical to the coordinator's
+binary at 7340fcdd.
+
 ## Round 20, part i1: the render sweep (hub, levels 1-3, menus): the arena walls, the menu texts, the automap (branch names-R20_i1; FIDELITY.md 13, RENDER.md 8)
 
 - **The Mother's arena olive walls: fixed.** Not the recolour (the N64's 54 texture requests at
