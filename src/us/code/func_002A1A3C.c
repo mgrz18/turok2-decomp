@@ -12,7 +12,6 @@ void HostIo_WriteBlock(s32 address, const u8 *source, u32 length)
   while ((length != 0) && ((address & 3) != 0))
   {
     HostIo_WriteByte(address++, *(source++));
- do { } while (0);
     length--;
   }
   if (length >= 4)

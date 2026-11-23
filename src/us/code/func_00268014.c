@@ -41,8 +41,6 @@ s32 GameObject_CanLeaveInfoFlag52_80(void *arg0)
       return 0;
     }
   }
- do { } while (0);
-  ;
   return (*((s32 *) (new_var3 - -0x48))) & 0x1000;
 }
 #endif

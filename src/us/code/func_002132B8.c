@@ -135,11 +135,7 @@ s32 Lighting_CollectVolumes(CBox *q, CLightVolume **out, s32 *cnt)
         rec++;
       }
     }
-    do
-    {
-      *cnt = n;
-    }
-    while (0);
+    *cnt = n;
   }
   else
   {
