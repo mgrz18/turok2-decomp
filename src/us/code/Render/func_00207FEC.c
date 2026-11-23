@@ -15,17 +15,7 @@
 #include "structs/light.h"
 #include "globals/render.h"
 #include "protos/cache.h"
-
-typedef struct Material {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 texture; /* resource handle, Texture_Request resolves it */
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ u8 prim[4];
-    /* 0x14 */ u8 env[4];
-    /* 0x18 */ u16 maskS;
-    /* 0x1A */ u16 maskT;
-} Material;
+#include "structs/batch.h"
 
 typedef struct TextureFrame {
     /* 0x0 */ u8 unk0;
@@ -267,8 +257,8 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
             maskS = 1 << (info.frame->shiftS + 6);
             maskT = 1 << (info.frame->shiftT + 6);
         } else {
-            maskS = mat->maskS;
-            maskT = mat->maskT;
+            maskS = mat->scaleS;
+            maskT = mat->scaleT;
         }
         if (mat->flags & 0x20) {
             extra = G_TX_CLAMP;

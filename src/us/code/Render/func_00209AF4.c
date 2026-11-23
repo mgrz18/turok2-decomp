@@ -1,18 +1,11 @@
 /* Close in structure to thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0026AD8C.c, with Turok 2's extra level-of-detail table. */
 #include "common.h"
 #include "structs/table.h"
+#include "structs/gbi.h"
 #include "gfx.h"
 #include "gbi_t2.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
-
-/* An F3DEX2 vertex (libultra's Vtx), 16 bytes. */
-typedef struct Vtx {
-    /* 0x0 */ s16 ob[3];
-    /* 0x6 */ u16 flag;
-    /* 0x8 */ s16 tc[2];
-    /* 0xC */ u8 cn[4];
-} Vtx;
 
 /* F3DEX2 triangle word: three vertex indices, each times 2 (libultra's __gsSP1Triangle_w1). */
 #define TRI_WORD(a, b, c) (((((a) * 2) & 0xFF) << 16) | ((((b) * 2) & 0xFF) << 8) | (((c) * 2) & 0xFF))
@@ -64,7 +57,7 @@ void Model_Decompress(s32 unused, void ***handle, s32 withExtra, s32 withTermina
     s32 *parts;
     s32 *partTbl;
     u8 *base;
-    Vtx *vtxBase;
+    Vtx_t *vtxBase;
     void **block;
     s32 *vtxTbl;
     s32 *frames;
@@ -200,7 +193,7 @@ void Model_Decompress(s32 unused, void ***handle, s32 withExtra, s32 withTermina
             partTbl = (s32 *)(base + off + lodOff);
             partOff = TABLE_SIZE(partCount);
             TableSet(partTbl, 0, partOff);
-            vtxBase = (Vtx *)((u8 *)CISet__GetBlock(frameTbl, i) + 8);
+            vtxBase = (Vtx_t *)((u8 *)CISet__GetBlock(frameTbl, i) + 8);
             for (j = 0; j < partCount;) {
                 part = CISet__GetBlock(parts, j);
                 partSize = 0x10;

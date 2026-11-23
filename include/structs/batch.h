@@ -12,9 +12,11 @@
 typedef struct Material {
     /* 0x00 */ u32 flags;           /* 0x700 translucent; 0x4000 drawn last with its alpha */
     /* 0x04 */ u32 id;              /* the sort key's upper 24 bits */
-    /* 0x08 */ u8 pad08[0xF];
-    /* 0x17 */ u8 alpha;
-    /* 0x18 */ u16 scaleS;          /* texture scale */
+    /* 0x08 */ s32 texture;         /* resource handle, Texture_Request resolves it */
+    /* 0x0C */ s32 unkC;
+    /* 0x10 */ u8 prim[4];          /* primitive colour */
+    /* 0x14 */ u8 env[4];           /* environment colour; env[3] is the alpha a batch draws with */
+    /* 0x18 */ u16 scaleS;          /* texture scale (gSPTexture); Render_SetupMaterial loads the texture with it */
     /* 0x1A */ u16 scaleT;
 } Material;
 

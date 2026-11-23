@@ -16,7 +16,7 @@ typedef struct MorphFrame {
 
 /* Blends the morph frames around time t into the output frame: t wraps into [0, frames - 2), and
  * the two frames either side of it are mixed, positions in 16.16 and normals in 8.8 fixed point. */
-void Model_BlendMorphFrames(void *resource, f32 t) {
+void Model_BlendMorphFrames(void *resource, f32 t, void *unused) { /* Render_DrawModelMorph passes a third argument */
     MorphFrame *frames[2];
     s32 counts[2];
     Vtx_tn *verts[2];

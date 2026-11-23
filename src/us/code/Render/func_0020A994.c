@@ -78,7 +78,7 @@ void Render_DrawBatches(void) {
         do {
             item = node->head;
             if (item != NULL) {
-                GFX_W(gDList++, 0xFA000000, node->material->alpha);         /* gDPSetPrimColor(0, 0, 0, 0, 0, alpha) */
+                GFX_W(gDList++, 0xFA000000, node->material->env[3]);         /* gDPSetPrimColor(0, 0, 0, 0, 0, alpha) */
                 do {
                     if (item->lights != NULL) {
                         GFX_W(gDList++, 0xDB020000, 0x18);
