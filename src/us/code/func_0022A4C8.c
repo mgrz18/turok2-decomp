@@ -1,4 +1,6 @@
-/* FAKEMATCH (round 21 audit): 1 empty `__asm__` barrier; without them: CParticle__Steer 5 of 390 words. */
+/* FAKEMATCH: a do { } while (0) around `fa = 0.5f` (the permuter, round 22, in place of round 21's empty
+ * `__asm__` barrier); without it CParticle__Steer copies the player pointer before the two constants are
+ * loaded: 5 of 390 words. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0027ADBC.c, func_0027ADBC, with Turok 2's layouts. */
 /* A projectile's per-frame steering: by type, then homing, thrust and movement. */
 
@@ -169,9 +171,8 @@ void CParticle__Steer(Projectile *o) {
             if (p2 != NULL) {
                 tpp = &tp;
                 velp = &o->velocity;
-                fa = 0.5f;
+                do { fa = 0.5f; } while (0);
                 fb = 2.0f;
-                __asm__ __volatile__("");
                 p = p2;
                 do {
                     h = p->m_CharacterActor.m_CollisionYOffset;

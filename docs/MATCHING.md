@@ -774,7 +774,7 @@ dropped 45 more, 496 in all; the 296 host branches that do not
 compile for the N64, host-only names, are left). `asm_diff.py` now numbers local labels by first appearance, so
 a de-faked branch that only renumbers `.L` labels compares equal.
 
-**Still fake (51 files, `grep -rl FAKEMATCH src/us`).** The 16 of the list
+**Still fake after round 21 (51 files; round 22 below).** The 16 of the list
 above (each retried this round: the permuter from the natural draft against
 the fake's object, and for CAI__Setup the flags read at each of 25 points:
 all 9 words off) and the 35 marked in this audit (25 functions of the 58 files found were de-faked), each with what it misses
@@ -784,6 +784,58 @@ CCache__HeapAlloc (11 of 57, whatever the shape of the two allocations),
 PakMenu_InitLoadGame_2 (4 of 103 unpinned), Trail_DetachOwner (5-6 of 169),
 CParticle__Steer (5 of 390 without its barrier), _getRate (1 of 148;
 libaudio, which j5's ultralib work may replace).
+
+
+### The FAKEMATCH second pass (round 22)
+
+**What de-faked them this time: the callees' real types and the real source.**
+The drafts were written against m2c's guesses; where the guess was wrong, the
+trick stood in for a type:
+
+| function | what the trick stood for |
+|---|---|
+| RumbleMenu_Play | `Controller_ResetRumble` returns `void` (its definition, func_00285AE0.c); declared `s32`, the draft needed two equal arms to keep the player pointer out of `$v1` (the permuter, from the typed draft against the fake) |
+| Cinema_RequestOnce, Cinema_RequestOnce_2 | the player as a `CPlayer *` and `m_Data.m_LevelIntroPlayedFlags` read as bytes, with `n = id - 0x8D` as its own variable: no register pins |
+| osPiGetCmdQueue | ultralib's pigetcmdq.c as it is |
+| __alSeqNextDelta | ultralib's seq.c: it returns `char` (the draft returned `s32` and needed two equal arms) |
+
+A script that compares each FAKEMATCH file's local prototypes with the
+definitions found in `src/` (return types only) flagged about 50 differences
+in 20 files; the others did not change the code of the functions they are in.
+
+**Unmarked fakes the round-21 scan missed** (its patterns were `asm("$n")`,
+empty `__asm__` barriers and arms equal as text):
+
+- arms equal in effect but not as text (`return new_var;` / `return 0;`, an
+  `if (temp_a0)` on a known pointer, an unreachable `do { } while (new_var)`
+  after a return): 9 getters of the enemy definition (GameObject_CanLeaveWater,
+  GameObject_CanLeaveInfoFlag52_80, GameObject_IsFollower, GameObject_CanClimbUp,
+  GameObject_CanEnter/LeaveRegionFlag80, GameObject_CanEnter/LeaveRegionFlag1000,
+  GameObject_GetAttackCombatRadius) are now the plain getter of round 21
+  (`if (def->m_Type == 1) return field; return 0;`); Generator_Advance (an
+  `if (state)` whose arms differ in statement order) is marked;
+- `do { return ...; } while (0)`: func_00267D2C and func_00267E18, the permuter's
+  other form of func_00267D60's fake, are marked;
+- pins written `__asm__("$f0")` (AlignToGround, DrawShadow) and two barriers in
+  the `#else` of a TARGET_PORT pair (CCamera__DrawGlares): marked;
+- `if (1)`: three, none needed (VM_Alloc, Automap_IsShown, Lighting_CollectVolumes).
+
+**`do { } while (0)` blocks.** A loop note raises the priority of the pseudos
+used inside it (GCC weights references by loop depth) and stops cse from
+following a jump past it, so the bulk matching and the permuter used these
+blocks the way the FAKEMATCH files use pins. `tools/undowhile.py <files>`
+tries each one outside a macro as a plain block and keeps it when every
+function of the file still matches: 15 of 92 went. About 60 are left in 50
+files that are not marked FAKEMATCH (libgcc's longlong.h macros aside); some
+are probably the original's macros (round 21 said so of func_0021D39C.c's), the
+rest are the same kind of trick as a pin. They are not counted in the 52 below.
+
+**Still fake: 52 files** (`grep -rl FAKEMATCH src`): 51 - 5 de-faked + 6
+marked this round. Each says in its first comment what it misses by without
+its trick. The near ones, retried this round with the permuter from a natural
+draft against the fake's object (15 min each, `-j 4`):
+
+@@PERMUTER@@
 
 
 ### The G pass (the last drafts)
