@@ -1,3 +1,7 @@
+/* One object (merged, round 25). Every function is DEFERRED (include/common.h): GCC 2.8 wrote each
+ * one's strings at its definition but its code and float literals at the end of the file, so the ROM has
+ * the strings of OptionsMenu_ControlSideText and OptionsMenu_StickHorzText before GameSettings_SetDefaults's
+ * 1.0f (docs/MODULES.md, "Round 25, part n2"). */
 /* WRONG CUT: real function 0x0041BA50, size 0x1B4 (through 0x0041BC04): splat cut its tail
  * off as func_0041BBB0. */
 #include "common.h"
