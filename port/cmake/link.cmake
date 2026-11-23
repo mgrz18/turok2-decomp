@@ -37,9 +37,6 @@ set(T2_LINK_REPLACED
     # SI: controllers, rumble
     func_00298A40.c   # osContInit
     func_0029A080.c   # __osSiRawStartDma
-    func_00299198.c   # osMotorInit
-    func_00298FD4.c   # osMotorStart
-    func_00298E10.c   # osMotorStop
     # system, TLB, 64DD
     func_0029B1F0.c   # osInitialize
     func_0028E5D0.c   # osMapTLBRdb
