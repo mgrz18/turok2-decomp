@@ -5,17 +5,11 @@
 #include "globals/frame.h"
 #include "ultra_types.h"
 #include "globals/audio.h"
+#include "globals/audiomgr.h"
 #include "protos/ultra.h"
 u32 osAiGetStatus(void);
-extern s32 gAudioInfo[];
-typedef struct B12Timer2 {
-    struct B12Timer2 *next;
-    u8 pad4[4];
-    u16 count;
-} B12Timer2;
-extern B12Timer2 *gAudioDmaCache;
 void osScAddClient(void *a, void *b, void *c);
-void __amHandleFrameMsg(s32 buf, s32 z);
+void __amHandleFrameMsg(AMAudioInfo *info, s32 z);
 void alClose(void *g);
 void __amMain(void) {
     void *sp10[2];
@@ -25,7 +19,7 @@ void __amMain(void) {
     s32 done;
     OSTime last;
     OSTime now;
-    B12Timer2 *p;
+    AMCacheEntry *p;
     cnt = arg = done = 0;
     last = 0;
     osScAddClient(&gScheduler, sp10, &gAudioFrameMsgQ);
@@ -47,8 +41,8 @@ void __amMain(void) {
                     __amHandleFrameMsg(gAudioInfo[audFrameCt % 3], arg);
                 }
                 for (p = gAudioDmaCache; p; p = p->next) {
-                    if (p->count) {
-                        p->count--;
+                    if (p->state) {
+                        p->state--;
                     }
                 }
             }

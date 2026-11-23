@@ -1268,25 +1268,6 @@ struct PlaneEquation {
     f32 distance;
 };
 typedef struct PlaneEquation PlaneEquation;
-struct CacheEntry;
-struct CacheEntry {
-    struct CacheEntry *next;
-    void *key;
-    u16 state;
-    u16 size;
-    s32 padC;
-    char data[0x80];
-};
-typedef struct CacheEntry CacheEntry;
-struct Window;
-typedef struct Window Window;
-struct Window {
-    struct Window *next;
-    struct Window *prev;
-    u32 base;
-    s32 frame;
-    s32 buffer;
-};
 struct ListLink;
 struct ListLink {
     struct ListLink *next;
