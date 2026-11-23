@@ -117,9 +117,9 @@ struct M1Ref {
                 u8 pad0[0xC];
                 s32 unkC;
 };
-void Sound__Play(s16 id, CVector3 pos, sptr a, sptr b);
-void Actor_SpawnParticle(M1Actor *a, s32 id, CVector3 pos, s32 n);
-void AI_DropPickupsOnce(M1Actor *a, M1State *s, s32 n, s32 x, s32 y);
+s32 Sound__Play(s16, CVector3, sptr, sptr);
+void Actor_SpawnParticle(void *, s32, CVector3, s32); /* the definition (AI) takes three; these callers pass a fourth, 0 */
+void AI_DropPickupsOnce(void *, void *, u32, u32, u32);
 void SwooshSet_FreeOwner(u8 *p, M1Actor *a);
 void Destructible_GoEnter(M1Actor *actor, M1State *state) {
     M1Info *info = &actor->def->info;

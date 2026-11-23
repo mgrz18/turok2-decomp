@@ -69,10 +69,10 @@ struct Shared_Actor {
     u8 pad5[8];
     struct Shared_Entity * entity;
 };
-extern void Actor_SpawnParticle(void *, s32, Triple, s32);
-extern s32 Sound__Play(s16, CVector3, sptr, sptr);
+void Actor_SpawnParticle(void *, s32, CVector3, s32); /* the definition (AI) takes three; these callers pass a fourth, 0 */
+s32 Sound__Play(s16, CVector3, sptr, sptr);
 struct Player;
-extern void AI_DropPickupsOnce(struct Player *, s32 *, s32, s32, s32);
+void AI_DropPickupsOnce(void *, void *, u32, u32, u32);
 typedef struct {
     s16 hi;
     s16 id;
@@ -325,7 +325,7 @@ void Destructible_GoDeathEnter(Obj54E0 *arg0, void *arg1) {
             Sound__Play(rec->unk34.half.id, arg0->pos.v, 0, -1);
         }
         if (rec->unk30 != -1) {
-            Actor_SpawnParticle(arg0, rec->unk30, arg0->pos.t, 0);
+            Actor_SpawnParticle(arg0, rec->unk30, arg0->pos.v, 0);
         }
         AI_DropPickupsOnce(arg0, arg1, 8, rec->unk38, rec->unk3C);
     }
