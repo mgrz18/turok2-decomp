@@ -22,7 +22,7 @@ typedef struct SCClient_s {
 
 /* A task (PR/sched.h's OSScTask, tag OSScTask_s) and the scheduler (OSSched, with Acclaim's
  * 0x80 bytes before the client list), both targets. On the N64 the scheduler files
- * (src/us/code/func_0028A020.c .. func_0028B3E8.c) use these through rw/abu_types.h; on the
+ * (src/us/code/__scHandleRSP/func_0028A020.c .. func_0028B3E8.c) use these through rw/abu_types.h; on the
  * host they are replaced by port/game/t2sched.c, which uses them at the host's sizes.
  * gScheduler (globals/frame.h) is the engine's one OSSched. */
 typedef struct OSScTask_s {

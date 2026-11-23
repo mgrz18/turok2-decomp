@@ -22,7 +22,7 @@ too; anything else stays a name, so rebuild the ELF once after adding names.
 Usage:
     python3 tools/asm_diff.py                     working tree vs HEAD, all of src/
     python3 tools/asm_diff.py --base ecba2b71     against another revision
-    python3 tools/asm_diff.py src/us/code/func_0027ECF0.c ...   only these files
+    python3 tools/asm_diff.py src/us/code/CCamera/func_0027ECF0.c ...   only these files
     python3 tools/asm_diff.py -v                  show the differing lines
 
 Exit status: 0 when every file compiles and matches, 1 otherwise.

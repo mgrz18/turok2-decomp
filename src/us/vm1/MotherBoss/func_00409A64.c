@@ -4,7 +4,7 @@
  * MotherBoss_TeleportTarget is the first-module twin of src/us/code/MotherBoss_TeleportTarget_2.c.
  * FAKEMATCH (MotherBoss_AnimEvent): the actor count uses fewerActorsThan, the inline copy
  * of MotherBoss_FewerActorsThan with identical if/else arms in its loop (the same fake as
- * src/us/code/func_0040C4F4.c, func_0040A418.c and func_0040A8FC.c, where func_0040C4F4.c says why and what was
+ * src/us/vm1/MotherBoss/func_0040C4F4.c, func_0040A418.c and func_0040A8FC.c, where func_0040C4F4.c says why and what was
  * tried); the plain loop puts the counter in $v0 instead of $v1. */
 #include "common.h"
 #include "structs/game_object.h"

@@ -3,7 +3,7 @@
 
 Everything the engine loads goes through CCache__Request(key = ROM address, size,
 ..., decompressCallback, description). The ROM addresses come from nested
-"ISets" (CISet__GetBlock / GetROMAddressAndSize, src/us/code/func_002017D4.c ..
+"ISets" (CISet__GetBlock / GetROMAddressAndSize, src/us/code/CISet/func_002017D4.c ..
 func_0020188C.c):
 
     ISet  = u32 count; u32 offset[count + 1]; data...

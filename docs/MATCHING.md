@@ -51,7 +51,7 @@ leftover LNK record, so it cannot be the first target the plan assumed.
 A matched function gets its own `c` subsegment in `versions/turok2.us.yaml`:
 
     python3 tools/c_subsegment.py code/func_0025FA54 func_0025FA54 --write
-    make setup      # splat writes src/us/code/func_0025FA54.c with INCLUDE_ASM
+    make setup      # splat writes src/us/code/EnemyAI/func_0025FA54.c with INCLUDE_ASM
 
 then the INCLUDE_ASM line is replaced by the C, and `make verify` must still
 pass. A file may hold a run of contiguous functions, some matched and the rest
@@ -586,7 +586,7 @@ func_0024ED54, func_00255D70, func_00424008):
 - func_00248720's pool opens at 0x800A6AB4, 4 past a boundary, after a
   1.5707964f only the VM's func_0042DE74 reads; it holds floats only, so its
   own file links and no merge was needed. func_0022D2FC took its place at the
-  head of the particle file (`src/us/code/func_0022D2FC.c`): left
+  head of the particle file (`src/us/code/CParticle/func_0022D2FC.c`): left
   undeclared until the later parts, its matrix helpers took their float
   arguments as doubles, so it declares them with the later parts' `Mtx44 *`
   prototypes, and its own types are `Mtx`-prefixed.
