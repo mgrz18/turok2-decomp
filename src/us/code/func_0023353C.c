@@ -1,12 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/gbi.h"
 
-typedef struct MorphVtx {
-    /* 0x00 */ s16 ob[3];
-    /* 0x06 */ u16 flag;
-    /* 0x08 */ s16 tc[2];
-    /* 0x0C */ u8 cn[4];
-} MorphVtx;
 
 typedef struct MorphPoint {         /* 0x14 bytes */
     /* 0x00 */ CVector3 pos;
@@ -75,7 +70,7 @@ extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 
 /* Blends a vertex buffer between two point sets with a cosine ease: in over the
  * duration, out over the last fadeTime. */
-void Morph_BlendVertices(MorphOwner *owner, MorphClock *clock, MorphVtx *dst, Morph *morph) {
+void Morph_BlendVertices(MorphOwner *owner, MorphClock *clock, Vtx_t *dst, Morph *morph) {
     CVector3 a;
     CVector3 b;
     f32 t;

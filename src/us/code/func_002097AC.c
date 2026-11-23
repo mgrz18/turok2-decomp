@@ -1,21 +1,15 @@
 #include "common.h"
 #include "globals/engine.h"
 #include "protos/iset.h"
+#include "structs/gbi.h"
 
 /* A vertex as the morph frames store it. */
-typedef struct MorphVtx {
-    /* 0x00 */ s16 ob[3];
-    /* 0x06 */ u16 flag;
-    /* 0x08 */ s16 tc[2];
-    /* 0x0C */ s8 n[3];
-    /* 0x0F */ u8 a;
-} MorphVtx;
 
 /* A morph frame: a vertex count and the vertices. */
 typedef struct MorphFrame {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 count;
-    /* 0x08 */ MorphVtx verts[1];
+    /* 0x08 */ Vtx_tn verts[1];
 } MorphFrame;
 
 
@@ -25,10 +19,10 @@ typedef struct MorphFrame {
 void Model_BlendMorphFrames(void *resource, f32 t) {
     MorphFrame *frames[2];
     s32 counts[2];
-    MorphVtx *verts[2];
+    Vtx_tn *verts[2];
     void *anim;
     MorphFrame *outFrame;
-    MorphVtx *out;
+    Vtx_tn *out;
     s32 outCount;
     s32 *state;
     s32 numFrames;
@@ -71,8 +65,8 @@ void Model_BlendMorphFrames(void *resource, f32 t) {
         return;
     }
     for (j = 0; j < outCount; j++) {
-        MorphVtx *a = &verts[0][j];
-        MorphVtx *b = &verts[1][j];
+        Vtx_tn *a = &verts[0][j];
+        Vtx_tn *b = &verts[1][j];
 
         out[j].ob[0] = (a->ob[0] * p0 + b->ob[0] * p1) >> 16;
         out[j].ob[1] = (a->ob[1] * p0 + b->ob[1] * p1) >> 16;

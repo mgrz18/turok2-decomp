@@ -1,12 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/gbi.h"
 
-typedef struct MorphVtx {
-    /* 0x00 */ s16 ob[3];
-    /* 0x06 */ u16 flag;
-    /* 0x08 */ s16 tc[2];
-    /* 0x0C */ u8 cn[4];
-} MorphVtx;
 
 typedef struct MorphPoint {         /* 0x14 bytes */
     /* 0x00 */ CVector3 pos;
@@ -77,7 +72,7 @@ extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 #define LERP_COLOR(a, b) ((f32)(a) + t * (f32)((b) - (a)))
 
 /* Morph_BlendVertices with texture coordinates: S scaled by texS, T stepping by texStepT. */
-void Morph_BlendVerticesTex(MorphOwner *owner, MorphClock *clock, MorphVtx *dst, f32 texS, Morph *morph) {
+void Morph_BlendVerticesTex(MorphOwner *owner, MorphClock *clock, Vtx_t *dst, f32 texS, Morph *morph) {
     CVector3 a;
     CVector3 b;
     f32 t;
