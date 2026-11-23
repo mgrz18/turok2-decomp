@@ -240,7 +240,8 @@ SKIP_SECTIONS = {'.virtual_1', '.audio_ctl', '.audio_wavetable', '.sound_data',
 # Not for every object: 16 everywhere moved the data apart and broke the game (code that still
 # walks from one N64 object into the next: the level-50 trace changed, then the gfx watchdog).
 ALIGN16 = {"gControllers", "sBatchInstances", "sBatchResources",
-           "gLoadSavePersistentData"}   # round 19 merge: GameNoteMenu_SelectYes copies the level flags with movaps
+           "gLoadSavePersistentData",   # round 19 merge: GameNoteMenu_SelectYes copies the level flags with movaps
+           "sSortNodes"}   # round 21 j2: Render_FlushModelBatch clears a node with movaps (the data before it grew by 12 bytes)
 
 def elf_tables(path):
     """(sections, symbols) of the matching ELF, in the layout file's shape (mklayout.py)."""
