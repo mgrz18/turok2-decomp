@@ -1,11 +1,10 @@
-/* FAKEMATCH (round 21 audit): 3 register pins (`register ... asm("$n")`); without them: Cinema_RequestOnce
- * 16 of 29 words. */
 #include "common.h"
 #include "rw/abu_types.h"
 #include "gfx.h"
 #include "structs/vector.h"
 #include "structs/world.h"
 #include "structs/game_object.h"
+#include "structs/player.h"
 #include "structs/cinema.h"
 #include "structs/event.h"
 #include "structs/collision.h"
@@ -1212,26 +1211,24 @@ void Cinema_StopAtEnd(void) {
     gCinemaPlayerP->stopAtEnd = 1;
 }
 
-void Cinema_RequestOnce(s32 a0) {
-    register s32 a asm("$7");
-    register u8 *bits asm("$4");
-    register s32 id asm("$5");
+/* Plays a level-intro cinema (ids 0x8D-0x92) once per player: bit (id - 0x8D) of the player's
+ * m_LevelIntroPlayedFlags is tested and set (Cinema_BitTest / Cinema_BitSet, written out). */
+void Cinema_RequestOnce(s32 id) {
+    CPlayer *player = (CPlayer *) gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+    u8 *flags;
+    s32 n, i, m;
     u8 b;
-    s32 m;
-    s32 i;
-    a = a0;
-    bits = (u8 *) gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
     if (gCinemaEnabled != 0) {
-        id = a - 0x8D;
-        if ((u32)id < 6 && bits != 0) {
-            bits += 0x9F4;
-            i = id >> 3;
-            m = 1 << (id & 7);
-            b = bits[i];
-            if ((b & m) != 0) return;
-            bits[i] = b | m;
+        n = id - 0x8D;
+        if ((u32) n < 6 && player != NULL) {
+            flags = (u8 *) &player->m_Data.m_LevelIntroPlayedFlags;
+            i = n >> 3;
+            m = 1 << (n & 7);
+            b = flags[i];
+            if (b & m) return;
+            flags[i] = b | m;
         }
-        Cinema_RequestById(a);
+        Cinema_RequestById(id);
     }
 }
 
