@@ -1,3 +1,6 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: CCache__AllocateMemoryForDecompressionTop: 9
+ * of 91 words. */
 #include "common.h"
 #include "globals/cache.h"
 #include "protos/cache.h"

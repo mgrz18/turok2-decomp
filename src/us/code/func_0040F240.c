@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 3 register pins (`register ... asm("$n")`); without them: Cinema_RequestOnce
+ * 16 of 29 words. */
 #include "common.h"
 #include "rw/abu_types.h"
 #include "gfx.h"

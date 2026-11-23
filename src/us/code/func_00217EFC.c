@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: func_00217EFC: 14 of 73 words. */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SYSTEM/802609CC.CPP, func_80260A5C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 

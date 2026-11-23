@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 1 register pin (`register ... asm("$n")`) and 1 empty `__asm__` barrier;
+ * without them: CScene__CheckAutoActivation 14 of 263 words. */
 #include "structs/vector.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0028A258.c, func_0028A258.

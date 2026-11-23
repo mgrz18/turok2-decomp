@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 4 register pins (`register ... asm("$n")`); without them:
+ * CParticle__GetDistanceScale 15 of 58 words. */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00284064.c, func_00284064.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 

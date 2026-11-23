@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 1 register pin (`register ... asm("$n")`); without them:
+ * CScene__DecompressGridSection 278 of 324 words (size 0x50c vs 0x510). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0028795C.c, func_0028795C, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/table.h"

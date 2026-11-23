@@ -1,3 +1,6 @@
+/* FAKEMATCH (round 21 audit): 6 register pins (`register ... asm("$n")`); without them: Menu_DrawBar 26 of
+ * 180 words; an if/else whose two arms are the same code, kept for the ROM's
+ * register allocation or layout; with one arm: Menu_StepValueLR: 12 of 47 words. */
 /* One file, 0x413230-0x417484, .rodata 0x800C0AF0-0x800C0E64: the menu
  * code from MenuItem_FormatBinding to MenuPool_CloseMenu. Objects start 16-aligned in
  * .text and in .rodata, with junk words before: stray_00413228 opens it,

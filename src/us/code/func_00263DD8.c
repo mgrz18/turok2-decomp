@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: Platform_UpdatePosition: 13 of 191 words. */
 #include "structs/vector.h"
 #include "common.h"
 #include "structs/game_object.h"

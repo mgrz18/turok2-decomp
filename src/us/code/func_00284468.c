@@ -1,3 +1,6 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: Cinema_RunEnd: 7 of 34 words, as the plain
+ * form. */
 
 #include "common.h"
 #include "structs/cinema.h"

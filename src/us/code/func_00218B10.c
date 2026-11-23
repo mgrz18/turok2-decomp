@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 1 register pin (`register ... asm("$n")`); without them:
+ * CAnimationState__GetRootMotion 31 of 343 words. */
 /* One source file, 0x219710-0x219BC0 (stray words at 0x219708 and 0x219BBC
  * bound the object): CAnimationState__SwitchToQueued, CAnimationState__GetRootMotion, CAnimationState__FindKeys and the
  * small animation-player helpers after it. Its .rodata opens at 0x800A5A10

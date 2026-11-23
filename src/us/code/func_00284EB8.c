@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 1 register pin (`register ... asm("$n")`); without them:
+ * Controller_ProcessInput 18 of 194 words. */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00263E1C.c, func_00263E1C.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 

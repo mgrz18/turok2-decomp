@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 2 register pins (`register ... asm("$n")`); without them:
+ * Lighting_CollectVolumes 76 of 243 words (size 0x3c8 vs 0x3cc). */
 #include "structs/vector.h"
 #include "globals/scene.h"
 

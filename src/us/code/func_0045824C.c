@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 2 empty `__asm__` barriers; without them: PakMenu_SelectNote_2 60 of 521
+ * words. */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00407748.c, func_00407748.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 

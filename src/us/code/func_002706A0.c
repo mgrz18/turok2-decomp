@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: CAudioWorld__StartVoice: 114 of 137 words. */
 #include "structs/vector.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00257814.c, func_00257814.

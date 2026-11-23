@@ -1,3 +1,6 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: CAudioWorld__CountHandleVoices: 7 of 60 words.
+ * */
 #include "common.h"
 #include "structs/sound.h"
 #include "protos/ultra.h"

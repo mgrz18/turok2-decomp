@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: CCache__AllocateAt: 9 of 80 words. */
 #ifdef TARGET_PORT
 /* The port: the same through CMemEntry (structs/cache.h). B12Node is the N64 layout (key = data,
  * unk4 = size, flags at 0xC); on the host `data` is 8 bytes, so its flags slot is lockCount. The

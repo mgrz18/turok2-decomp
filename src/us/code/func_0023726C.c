@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 1 register pin (`register ... asm("$n")`); without them: Blast_CanHit 8 of
+ * 144 words. */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002661FC.c, func_002661FC.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "globals/scene.h"

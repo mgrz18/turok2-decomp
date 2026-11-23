@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): an if/else whose two arms are the same code, kept
+ * for the ROM's register allocation or layout; with one arm: Sort_Insertion: 11 of 46 words. */
 
 typedef signed char s8;
 typedef unsigned char u8;

@@ -1,3 +1,4 @@
+/* FAKEMATCH (round 21 audit): 1 empty `__asm__` barrier; without them: CParticle__Steer 5 of 390 words. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0027ADBC.c, func_0027ADBC, with Turok 2's layouts. */
 /* A projectile's per-frame steering: by type, then homing, thrust and movement. */
 

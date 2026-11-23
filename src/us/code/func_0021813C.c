@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 21 audit): 1 register pin (`register ... asm("$n")`); without them: func_0021813C 8 of
+ * 55 words. */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00260CBC.c, func_00260CBC.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 

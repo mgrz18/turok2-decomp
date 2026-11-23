@@ -1,3 +1,6 @@
+/* FAKEMATCH (round 21 audit): 6 register pins (`register ... asm("$n")`); without them: Menu_DrawBar_2 26
+ * of 180 words; an if/else whose two arms are the same code, kept for the ROM's
+ * register allocation or layout; with one arm: Menu_StepValueLR_2: 12 of 47 words. */
 /* The second VM module's copy of src/us/code/MenuItem_FormatBinding.c, byte for byte,
  * at the same link address (named 0x44C230-0x450484, linked 0x413230-0x417484):
  * the same source, with the functions under their second-module names. Its
