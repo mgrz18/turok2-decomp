@@ -1,3 +1,5 @@
+/* FAKEMATCH (round 22): 1 register pin (`register f32 t __asm__("$f0")`, written __asm__, which the round-21
+ * scan for asm("$ did not match); without it: CGameObjectInstance__AlignToGround 28 of 87 words. */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00246FF4.c, func_00246FF4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"

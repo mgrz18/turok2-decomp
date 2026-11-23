@@ -118,9 +118,7 @@ void CAudioWorld__Initialize(CAudioWorld *m) {
             a = t->soundArray[j];
             b = t->soundArray[i];
             if (a < b) {
-                do {
-                    t->soundArray[i] = a;
-                } while (0);
+                t->soundArray[i] = a;
                 t->soundArray[j] = b;
             }
         }

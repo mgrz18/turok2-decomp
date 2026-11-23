@@ -19,9 +19,7 @@ s32 AI_IsEyeLineBlocked(CGameObjectInstance *from, s32 unused, CGameObjectInstan
     target.y += GameObject_GetCollisionHeight(to) * 0.8f;
     target.y += to->m_CollisionYOffset;
     Collision_MoveInstance(from, target, &gCollisionInfoSight);
-    do {
-        *(CObjectHead *) from = saved;
-    } while (0);
+    *(CObjectHead *) from = saved;
     if (gCollisionResults.m_pWallRegion != NULL && (gCollisionResults.m_pWallRegion->m_wFlags & 2)) {
         return 1;
     }

@@ -27,9 +27,7 @@ void CBarrel__Update(CBarrel *menu, CPlayer *player, u32 *input) {
     if (Cinema_IsActive() != 0) {
         return;
     }
-    do {
-        menu->m_bStickWheel = player->m_pOptions->m_WeaponSelect == 1;
-    } while (0);
+    menu->m_bStickWheel = player->m_pOptions->m_WeaponSelect == 1;
     if (gEngineApp_m_Game_m_MenuPool.head != 0 && menu->m_State != 0) {
         CBarrel__Close(menu);
         return;

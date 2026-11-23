@@ -19,7 +19,6 @@ s32 Automap_IsShown(void *arg0)
       if (Cinema_PathPlaying() == 0)
       {
         var_v0 = gEngineApp_m_Settings.nextMode ^ 1;
-        if (1)
         {
           var_s0 = ((u32) var_v0) > 0U;
           goto block_4;

@@ -1,19 +1,15 @@
 #include "common.h"
-#include "structs/intelligence.h"
 #include "structs/game_object.h"
+#include "structs/intelligence.h"
 
-s32 GameObject_CanEnterRegionFlag1000(CInstanceHeader *arg0)
-{
-  CIntelligence *new_var2;
-  unsigned int new_var3;
-  CIntelligence *temp_a0;
-  CIntelligence **new_var;
-  new_var = &arg0->m_pIntelligence;
-  temp_a0 = *new_var;
-  if ((new_var2 = temp_a0)->m_Type != 1)
-  {
+/* Enemies only: bit 0x200 of the enemy definition flags. Round 22 rewrote the m2c draft (two equal arms or a dead
+ * do-while, an unmarked fake) as the getters round 21 de-faked: the case that returns the
+ * field is tested first. */
+s32 GameObject_CanEnterRegionFlag1000(CGameObjectInstance *obj) {
+    CIntelligence *def = obj->header.m_pIntelligence;
+
+    if (def->m_Type == 1) {
+        return def->m_Enemy.m_dwEnemyFlags & 0x200;
+    }
     return 0;
- new_var3 = 0; do { } while (new_var3);
-  }
-  return new_var2->m_Enemy.m_dwEnemyFlags & 0x200;
 }

@@ -1,41 +1,15 @@
-#ifdef TARGET_PORT
-/* The port: the instance's definition by member (CInstanceHeader.m_pIntelligence, 0x14 on the
- * N64, 0x18 on the host); the enemy definition's words are at the same offsets. */
 #include "common.h"
 #include "structs/game_object.h"
-s32 GameObject_CanLeaveWater(void *arg0) {
-    CIntelligence *def = ((CGameObjectInstance *) arg0)->header.m_pIntelligence;
+#include "structs/intelligence.h"
 
-    if (def->m_Type != 1) {
-        return 0;
-    }
-    return *(s32 *) ((u8 *) def + 0x48) & 0x8;
-}
-#else
+/* Enemies only: bit 8 of the enemy definition's m_dwEnemyFlags. Round 22 rewrote the m2c
+ * draft (identical arms, an empty do-while) as the getters round 21 de-faked: the test for the
+ * case that returns the field first. */
+s32 GameObject_CanLeaveWater(CGameObjectInstance *obj) {
+    CIntelligence *def = obj->header.m_pIntelligence;
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
-typedef float f32;
-typedef double f64;
-s32 GameObject_CanLeaveWater(void *arg0)
-{
-  void *temp_a0;
-  unsigned long long new_var;
-  temp_a0 = *((void **) (((s8 *) arg0) + 0x14));
-  if ((*((s32 *) (((s8 *) temp_a0) + (new_var = 0)))) != 1)
-  {
-    if (1)
-    {
-      return new_var;
+    if (def->m_Type == 1) {
+        return def->m_Enemy.m_dwEnemyFlags & 8;
     }
- do { } while (new_var);
-  }
-  return (*((s32 *) (((s8 *) temp_a0) + 0x48))) & 8;
+    return 0;
 }
-#endif

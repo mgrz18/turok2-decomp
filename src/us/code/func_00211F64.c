@@ -122,9 +122,7 @@ void LightVolume_Construct(Volume *vol, VolumeRec *rec) {
     scale.y = rec->scale[1] * 2.384185791015625e-05f;
     scale.z = rec->scale[2] * 2.384185791015625e-05f;
     vol->width = 2.0f * rec->width * 4.656612873077393e-10f;
-    do {
-        vol->height = 2.0f * rec->height * 4.656612873077393e-10f;
-    } while (0);
+    vol->height = 2.0f * rec->height * 4.656612873077393e-10f;
     if (gEngineApp_m_Settings.cheatFlags & 0x4000) {
         vol->unk8[0] = 0.0f;
         vol->unk8[1] = 0.0f;

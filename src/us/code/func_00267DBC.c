@@ -1,24 +1,15 @@
 #include "common.h"
-#include "structs/intelligence.h"
 #include "structs/game_object.h"
+#include "structs/intelligence.h"
 
-/* The instance's intelligence is type 1 with type flag 2 (GameObject_IsLeader: flag 1). */
-s32 GameObject_IsFollower(CInstanceHeader *arg0)
-{
-  CIntelligence *temp_a0;
-  unsigned char new_var;
-  temp_a0 = arg0->m_pIntelligence;
-  new_var = 0;
-  if ((*((s32 *) (((s8 *) temp_a0) + new_var))) != 1)
-  {
-    if (temp_a0)
-    {
-      return new_var;
+/* Enemies only: bit 2 of the definition flags. Round 22 rewrote the m2c draft (two equal arms or a dead
+ * do-while, an unmarked fake) as the getters round 21 de-faked: the case that returns the
+ * field is tested first. */
+s32 GameObject_IsFollower(CGameObjectInstance *obj) {
+    CIntelligence *def = obj->header.m_pIntelligence;
+
+    if (def->m_Type == 1) {
+        return def->m_dwTypeFlags & 2;
     }
-    else
-    {
-      return 0;
-    }
-  }
-  return temp_a0->m_dwTypeFlags & 2;
+    return 0;
 }

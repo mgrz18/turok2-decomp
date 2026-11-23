@@ -1,3 +1,6 @@
+/* FAKEMATCH (round 22): 2 empty `__asm__` barriers around the N64 write of the gDPSetTextureFilter words in
+ * CCamera__DrawGlares (the round-21 scan missed them: they sit in the #else of a TARGET_PORT pair); the
+ * port's form (one Gfx through gDList++) on the N64: 13 of 98 words. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars),
  * src/game/func_00238D20.c, with Turok 2's CCamera. */
 #include "common.h"
