@@ -266,7 +266,8 @@ def main():
                     "if every file compiles the same under them")
     ap.add_argument("--inline", help="stems (comma-separated) or `all`: their functions are written DEFERRED "
                     "(`inline`: output after the others, string literals at the definition)")
-    ap.add_argument("--rodata-free", action="store_true", help="(experiment) skip the .rodata order check")
+    ap.add_argument("--rodata-free", action="store_true", help="no .rodata order check: the slices and the unnamed "
+                    "data between them become the merged file's one .rodata (make verify decides)")
     ap.add_argument("--dry-run", action="store_true", help="print the merged file, change nothing")
     ap.add_argument("--no-fix", action="store_true", help="round 23's merge: no static renames, no include hoisting, "
                     "no typedef dedupe against the headers, no deferred prototypes")
@@ -312,7 +313,16 @@ def main():
     if not adjacent(cs):
         sys.exit(f"{a.dir}: its .text subsegments are not adjacent")
     ro_order = [e[2].rsplit("/", 1)[-1] for e in ro]
-    if not a.rodata_free and (not adjacent(ro, allow_pads=True) or ro_order != [s for s in text_order if s in ro_order]):
+    if a.rodata_free and ro:
+        # the merged object's .rodata is one block: whatever lies between its first and last slice must be data its
+        # files will now emit themselves (literals given back, DEFERRED order); another file's slice cannot be
+        idx = [pos[e[0]] for e in ro]
+        between = [k for k in range(idx[0], idx[-1] + 1) if k not in idx]
+        other = [lines[entry_lines[k]].strip() for k in between if ANY_ENTRY.match(lines[entry_lines[k]]).group(3)]
+        if other:
+            sys.exit(f"{a.dir}: another file's .rodata lies inside the module's: {other[0]}")
+        pads.update(entry_lines[k] for k in between)
+    elif not adjacent(ro, allow_pads=True) or ro_order != [s for s in text_order if s in ro_order]:
         sys.exit(f"{a.dir}: its .rodata is not one block in .text order ({ro_order})")
     # a second-VM-module file whose .rodata is placed over the first module's pool (tools/shared_rodata.py) owns
     # that placement by its file name: one such file per module can hand it to the merged file, two cannot
