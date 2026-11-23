@@ -29,6 +29,7 @@ extern CScene gScene;
 /* Field symbols, kept where a file reaches the field by its own symbol
  * (a %hi/%lo pair or a base register GCC does not share with gScene). */
 extern s32 gScene_m_CinemasKey;
+extern s32 gScene_unk_30;           /* gScene.unk_30 (field symbol) */
 extern s32 *gScene_m_pCinemas;
 extern s32 gScene_m_nDrawActors;
 extern CList gScene_m_InstancePool_m_FreeList;

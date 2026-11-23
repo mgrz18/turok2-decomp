@@ -24,7 +24,7 @@
  * opens the save menu; otherwise shows why the pak cannot be used. */
 
 
-extern s32 D_800F70A8; /* save size */
+extern s32 gScene_unk_30; /* local: globals/scene.h; gScene.unk_30 (the member) moves the ROM's registers here. save size */
 void Pak_ProbeSlot(s32 ch);
 s32 Pak_GetStatus(s32 ch);
 s32 Pak_IsRumblePak(s32 ch);
@@ -62,9 +62,9 @@ void PakMenu_InitSaveGame(Menu *own) {
         if (Pak_GetStatus(sel.channel) == 0) {
             SaveGame_Build(plr);
             {
-                u32 crc = Crc32_Compute(gSaveBuffer, D_800F70A8 + 0x684, 0xB);
+                u32 crc = Crc32_Compute(gSaveBuffer, gScene_unk_30 + 0x684, 0xB);
                 sptr buf = (sptr)gSaveBuffer;
-                sptr size = D_800F70A8;
+                sptr size = gScene_unk_30;
 
                 *(u32 *)(size + buf + 0x684) = crc;
             }

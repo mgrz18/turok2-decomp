@@ -5,13 +5,13 @@
 #include "globals/pak.h"
 #include "structs/game.h"
 #include "globals/menu_desc.h"
+#include "globals/scene.h"
 
 /* Controller pak menu, load: finds a pad with a controller pak (trying each pad in turn), checks it for the
  * game's notes and free space and opens the load menu, or shows why the pak cannot be used. */
 
 extern s32 D_8011F144;
 extern s32 D_8011B114;
-extern s32 D_800F70A8;
 s32 Controller_AnyConnected(void);
 void CEngineApp__UpdateControllers(u8 *a);
 s32 Str_Compare_2(u8 *a, char *b);
@@ -180,7 +180,7 @@ L3:
     if (s0 != 0) {
         goto blk59;
     }
-    m1 = Pak_BytesToPages_2(D_800F70A8 + 0x688);
+    m1 = Pak_BytesToPages_2(gScene.unk_30 + 0x688);
     r2 = Pak_BytesToPages_2(0x18);
     if (sp3C == 0 || sp38 < r2) {
         goto L56;

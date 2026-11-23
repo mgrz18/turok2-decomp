@@ -12,9 +12,9 @@
 #include "globals/pak.h"
 #include "structs/save.h"
 #include "globals/menu_desc.h"
+#include "globals/scene.h"
 
 void *memset(void *s, int c, uptr n);
-extern s32 D_800F70A8;
 s32 PakMenu_CheckPak_2();
 s32 Pak_FindNote_2();
 s32 Pak_ReadNote_2();
@@ -50,7 +50,7 @@ s32 PakMenu_SelectNote_2(s32 *arg0, Menu *arg1) {
     u8 *a1p;
     s2 = 0;
     s5 = *arg0 - 3;
-    s7 = D_800F70A8 + 0x688;
+    s7 = gScene.unk_30 + 0x688;
     if (gPakMenuAnyPak != 0) {
         s4 = gPakMenuPort;
     } else {
@@ -100,7 +100,7 @@ L004079A0:
         CCache__Deallocate(0, gLoadBufferHandle);
     }
     if (s0 == 0) {
-        s0 = D_800F70A8 + 0x688;
+        s0 = gScene.unk_30 + 0x688;
     } else {
         s0 = s0 << 8;
     }
@@ -113,7 +113,7 @@ L004079A0:
     if (hs != s7) goto L00407ACC;
     if (Crc32_Compute_2(gLoadBuffer, hs - 4, 0xB) != *(s32 *)(*(s32 *)gLoadBuffer + (sptr)gLoadBuffer - 4)) goto L00407ACC;
     s0 = 0;
-    if (D_800F70A8 != *(s32 *)((sptr)gLoadBuffer + 4)) { s2 = 1; goto L00407AD0; }
+    if (gScene.unk_30 != *(s32 *)((sptr)gLoadBuffer + 4)) { s2 = 1; goto L00407AD0; }
     gPakNoteIndex = s5;
     MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gGameNoteDeleteMenuDesc_2, (sptr)arg1->player, (sptr)arg1->controller, (sptr)arg1->desc);
     return 1;
@@ -179,7 +179,7 @@ L00407CDC:
         CCache__Deallocate(0, gLoadBufferHandle);
     }
     if (s0 == 0) {
-        s0 = D_800F70A8 + 0x688;
+        s0 = gScene.unk_30 + 0x688;
     } else {
         s0 = s0 << 8;
     }
@@ -191,7 +191,7 @@ L00407CDC:
     hs = *(s32 *)gLoadBuffer;
     if (hs != s7) goto L00407E70;
     if (Crc32_Compute_2(gLoadBuffer, hs - 4, 0xB) != *(s32 *)(*(s32 *)gLoadBuffer + (sptr)gLoadBuffer - 4)) goto L00407E70;
-    if (D_800F70A8 != *(s32 *)((sptr)gLoadBuffer + 4)) goto L00407E70;
+    if (gScene.unk_30 != *(s32 *)((sptr)gLoadBuffer + 4)) goto L00407E70;
     MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gGameNoteLoadMenuDesc_2, (sptr)arg1->player, (sptr)arg1->controller, 0);
     return 1;
 L00407E70:

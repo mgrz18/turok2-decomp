@@ -5,7 +5,7 @@
  * its actor lists, the particle and actor pools, and the level-warp state.
  * One object of 0x19078 bytes and more (gEngineApp_m_SwooshSystem, world + 0x19240, is
  * passed on as an object of its own). Other symbols point inside it and must
- * keep being used where the code uses them: gScene_m_CinemasKey (+0x24), D_800F70A8
+ * keep being used where the code uses them: gScene_m_CinemasKey (+0x24), gScene_unk_30
  * (+0x30), gScene_m_pCinemas (+0x60), gScene_m_pBitSections (+0x6C), gScene_m_Heap (+0xD0),
  * gScene_m_pActors (+0xE0), gScene_m_nDrawActors (+0x8EC).
  *
@@ -110,7 +110,7 @@ typedef struct CScene {
     /* 0x00024 */ s32 m_CinemasKey;                 /* gScene_m_CinemasKey */
     /* 0x00028 */ s32 unk_28;
     /* 0x0002C */ s32 unk_2C;
-    /* 0x00030 */ s32 unk_30;                       /* D_800F70A8: the count of unk_28 */
+    /* 0x00030 */ s32 unk_30;                       /* gScene_unk_30: the count of unk_28 */
     /* 0x00034 */ s32 unk_34;                       /* the count of unk_2C */
     /* 0x00038 */ s32 *m_pLevels;                   /* the level table: count first */
     /* 0x0003C */ s32 *m_pTextureSets;

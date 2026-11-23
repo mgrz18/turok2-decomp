@@ -5446,6 +5446,7 @@ gEngineApp_m_pCurrentFrameData = 0x800F7070;
 gEngineApp_m_CartridgeIndex = 0x800F7074;
 gScene = 0x800F7078;
 gScene_m_CinemasKey = 0x800F709C;
+gScene_unk_30 = 0x800F70A8;
 gScene_m_pCinemas = 0x800F70D8;
 gScene_m_pBitSections = 0x800F70E4;
 gScene_m_Heap = 0x800F7148;

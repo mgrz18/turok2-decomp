@@ -313,6 +313,7 @@ gEngineApp_m_CartridgeIndex = 0x800F7074; // +0x3C4, the ROM address of the cart
 // ---- The scene (gEngineApp.m_Scene, CWorld in structs/world.h, 0x800F7078-0x801100EF) ----
 gScene = 0x800F7078; // CScene (our CWorld): Turok 3's CScene, gEngineApp.m_Scene; name seeded by the tooling agent (614 uses)
 gScene_m_CinemasKey = 0x800F709C; // +0x24 (Cinema_*)
+gScene_unk_30 = 0x800F70A8; // +0x30 (CScene.unk_30, the size of the level flags: the save code reads it as gScene.unk_30; three save-menu functions keep this symbol, their member access moves the ROM's registers; was D_800F70A8, round 24 m2)
 gScene_m_pCinemas = 0x800F70D8; // +0x60
 gScene_m_pBitSections = 0x800F70E4; // +0x6C (CScene__RestoreFiredEvent)
 gScene_m_Heap = 0x800F7148; // +0xD0, the matrix pool (MtxPool_Alloc in the shadow and bone code)
