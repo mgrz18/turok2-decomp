@@ -128,3 +128,47 @@ func_0045F2FC 0x800C18A0  # copy of func_004263DC, which now owns the pool
 CPlayer_2:CPlayerPool__NewGame_2 0x800A7080  # copy of func_0042E4CC, which now owns the pool
 func_0045302C 0x800C1040  # copy of func_0041A0CC, which now owns the pool
 func_00455788 0x800C132C  # copy of func_0041C788, which now owns the pool
+func_00446F70 0x800C090C  # copy of func_0040DF70 (round 25: was asm), which owns the pool
+func_00447108 0x800C0910  # copy of func_0040E108 (round 25: was asm), which owns the pool
+func_0044803C 0x800C0940  # copy of func_0040F03C (round 25: was asm), which owns the pool
+func_0044325C 0x800C0668  # copy of func_0040A25C (round 25: was asm), which owns the pool
+func_00443418 0x800C0848  # copy of func_0040A418 (round 25: was asm), which owns the pool
+func_004438FC 0x800C0864  # copy of func_0040A8FC (round 25: was asm), which owns the pool
+func_0044480C 0x800C087C  # copy of func_0040B80C (round 25: was asm), which owns the pool
+func_00444918 0x800C0888  # copy of func_0040B918 (round 25: was asm), which owns the pool
+func_00444C64 0x800C0890  # copy of func_0040BC64 (round 25: was asm), which owns the pool
+func_00444D60 0x800C0894  # copy of func_0040BD60 (round 25: was asm), which owns the pool
+func_00444FF0 0x800C0898  # copy of func_0040BFF0 (round 25: was asm), which owns the pool
+func_00445110 0x800C08A0  # copy of func_0040C110 (round 25: was asm), which owns the pool
+func_004452C4 0x800C08B4  # copy of func_0040C2C4 (round 25: was asm), which owns the pool
+func_00445394 0x800C08B8  # copy of func_0040C394 (round 25: was asm), which owns the pool
+func_00450910 0x800C0EB0  # copy of func_00417910 (round 25: was asm), which owns the pool
+func_00450BB0 0x800C0EE0  # copy of func_00417BB0 (round 25: was asm), which owns the pool
+func_00450DD4 0x800C0E70  # copy of func_00417DD4 (round 25: was asm), which owns the pool
+func_0043DFE0 0x800C041C  # copy of func_00404FE0 (round 25: was asm), which owns the pool
+func_0043E0E0 0x800C0420  # copy of func_004050E0 (round 25: was asm), which owns the pool
+func_0043E288 0x800C043C  # copy of func_00405288 (round 25: was asm), which owns the pool
+func_0043E3C4 0x800C0448  # copy of func_004053C4 (round 25: was asm), which owns the pool
+func_0043E6DC 0x800C0464  # copy of func_004056DC (round 25: was asm), which owns the pool
+func_0043EE04 0x800C0494  # copy of func_00405E04 (round 25: was asm), which owns the pool
+func_0043F598 0x800C04C0  # copy of func_00406598 (round 25: was asm), which owns the pool
+func_0043F88C 0x800C04DC  # copy of func_0040688C (round 25: was asm), which owns the pool
+func_0043FC4C 0x800C04F0  # copy of func_00406C4C (round 25: was asm), which owns the pool
+func_0043FE0C 0x800C0500  # copy of func_00406E0C (round 25: was asm), which owns the pool
+func_0043FFE4 0x800C0504  # copy of func_00406FE4 (round 25: was asm), which owns the pool
+func_00440374 0x800C050C  # copy of func_00407374 (round 25: was asm), which owns the pool
+func_004404D0 0x800C0518  # copy of func_004074D0 (round 25: was asm), which owns the pool
+func_004406B0 0x800C0538  # copy of func_004076B0 (round 25: was asm), which owns the pool
+func_004408B8 0x800C0550  # copy of func_004078B8 (round 25: was asm), which owns the pool
+func_004409C4 0x800C0558  # copy of func_004079C4 (round 25: was asm), which owns the pool
+func_00440AC8 0x800C055C  # copy of func_00407AC8 (round 25: was asm), which owns the pool
+func_00464E68 0x800A5F6C  # copy of func_0042BF48 (round 25: was asm), which owns the pool
+func_004650B4 0x800A5FC4  # copy of func_0042C194 (round 25: was asm), which owns the pool
+func_00465480 0x800A600C  # copy of func_0042C560 (round 25: was asm), which owns the pool
+func_004419E0 0x800C0570  # copy of func_004089E0 (round 25: was asm), which owns the pool
+func_00441CF4 0x800C05A8  # copy of func_00408CF4 (round 25: was asm), which owns the pool
+func_00441DCC 0x800C05B0  # copy of func_00408DCC (round 25: was asm), which owns the pool
+func_00441EAC 0x800C05B4  # copy of func_00408EAC (round 25: was asm), which owns the pool
+func_0045AE50 0x800C1414  # copy of func_00421F30 (round 25: was asm), which owns the pool
+func_0045AF80 0x800C1418  # copy of func_00422060 (round 25: was asm), which owns the pool
+func_0045B350 0x800C1428  # copy of func_00422430 (round 25: was asm), which owns the pool

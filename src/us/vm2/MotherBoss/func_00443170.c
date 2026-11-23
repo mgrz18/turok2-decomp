@@ -1,0 +1,42 @@
+/* The second VM module's copy of src/us/vm1/MotherBoss/func_0040A170.c (byte for byte, at the same link address or 0xE0 below
+ * it, docs/VMASM.md), with the second module's names. */
+#include "common.h"
+#include "structs/pick.h"
+#include "structs/game_object.h"
+#include "globals/boss.h"
+
+/* Picks the module object's idle anim for the current phase (0, 1; none in phase 2) from the AI's flags. */
+
+extern s16 WeightedTable_PickStatic(Pick *table);
+
+s16 MotherBoss_PickPhaseAnim_2(void *obj, CAI *ai) {
+    Pick picks[8];
+    s32 n = 0;
+
+    switch (gMotherBoss.phase) {
+        case 0:
+            if (ai->m_VisBits & 0x1C) {
+                picks[n].id = 0x55FA;
+                picks[n++].weight = 4;
+            }
+            if (ai->m_VisBits & 0x1C0) {
+                picks[n].id = 0x5604;
+                picks[n++].weight = 4;
+            }
+            break;
+        case 1:
+            if (ai->m_VisBits & 2) {
+                picks[n].id = 0x5654;
+                picks[n++].weight = 4;
+            }
+            if (ai->m_VisBits & 0x20) {
+                picks[n].id = 0x565E;
+                picks[n++].weight = 4;
+            }
+            break;
+        case 2:
+            break;
+    }
+    picks[n].id = -1;
+    return WeightedTable_PickStatic(picks);
+}

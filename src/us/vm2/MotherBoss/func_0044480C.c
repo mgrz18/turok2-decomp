@@ -1,0 +1,26 @@
+/* The second VM module's copy of src/us/vm1/MotherBoss/func_0040B80C.c (byte for byte, at the same link address or 0xE0 below
+ * it, docs/VMASM.md), with the second module's names. */
+#include "common.h"
+#include "structs/game_object.h"
+#include "structs/boss.h"
+#include "globals/boss.h"
+#include "protos/ai.h"
+
+/* AI state: turn toward the target; after 100 steps, or when the target is within 460.8 and less than 20
+ * degrees off, go to anim state 0x16. */
+
+extern void AI_UpdateTargets(void *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
+
+void MotherBoss_Mode23_Approach_2(void *obj, void *ai) {
+    CAITargets t;
+    MotherBossState *state;
+
+    AI_UpdateTargets(obj, ai, &t, 1, 1);
+    AI_TurnClamped(obj, ai, 0.261799425f, t.m_Path.m_Angle);
+    state = &gMotherBoss;
+    if (++state->counter > 100 ||
+        (t.m_Path.m_pTarget != NULL && t.m_Sight.m_pTarget != NULL && t.m_Path.m_FlatDist < 460.8f &&
+         (t.m_Sight.m_Angle < 0.0f ? -t.m_Sight.m_Angle <= 0.34906590f : t.m_Sight.m_Angle <= 0.34906590f))) {
+        CAI__SetMode(obj, ai, 0x16);
+    }
+}

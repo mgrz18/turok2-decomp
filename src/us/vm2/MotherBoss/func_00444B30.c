@@ -1,0 +1,31 @@
+/* The second VM module's copy of src/us/vm1/MotherBoss/func_0040BB30.c (byte for byte, at the same link address or 0xE0 below
+ * it, docs/VMASM.md), with the second module's names. */
+#include "common.h"
+#include "structs/game_object.h"
+#include "structs/boss.h"
+#include "globals/boss.h"
+#include "protos/ai.h"
+
+/* AI state: turn toward the target, fire (MotherBoss_TeleportTarget_2) every third step, and go to anim state 0x16 once
+ * the anim is done. */
+
+
+extern void AI_UpdateTargets(void *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+extern void MotherBoss_TeleportTarget_2(void *obj, s32 first);
+
+void MotherBoss_Mode28_TeleportTarget_2(void *obj, CAI *ai) {
+    CAITargets t;
+    MotherBossState *state;
+
+    AI_UpdateTargets(obj, ai, &t, 0, 1);
+    AI_TurnClamped(obj, ai, 0.261799425f, t.m_Sight.m_Angle);
+    state = &gMotherBoss;
+    if (state->counter % 3 == 0) {
+        MotherBoss_TeleportTarget_2(obj, state->counter == 0);
+    }
+    state->counter++;
+    if (ai->m_AnimRepeatedCount) {
+        state->counter = 0;
+        CAI__SetMode(obj, ai, 0x16);
+    }
+}
