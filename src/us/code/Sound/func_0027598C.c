@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/audio.h"
 
-void CAudioWorld__SetForce2D(void *, s32);              /* extern */
+void CAudioWorld__SetForce2D(CAudioWorld *, s32);             /* extern */
 
 #ifdef TARGET_PORT
 int T2Port_AudioReady(void);

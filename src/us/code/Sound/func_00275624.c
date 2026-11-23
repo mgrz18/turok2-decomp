@@ -6,10 +6,8 @@
 #include "globals/audio.h"
 
 extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, sptr, s32);
-extern s32 CAudioWorld__GetForce2D(struct ContextRecAt2BC0 *arg0);
-extern void CAudioWorld__SetForce2D(struct ContextRecAt2BC0 *arg0, s32 arg1);
-extern int CAudioWorld__GetForce2D(struct ContextRecAt2BC0 *arg0);
-extern void CAudioWorld__SetForce2D(struct ContextRecAt2BC0 *arg0, int arg1);
+extern s32 CAudioWorld__GetForce2D(CAudioWorld *arg0);
+extern void CAudioWorld__SetForce2D(CAudioWorld *arg0, s32 arg1);
 #ifdef TARGET_PORT
 int T2Port_AudioReady(void);
 #endif

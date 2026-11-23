@@ -7,7 +7,6 @@
  * 0x120 + i * 0x28 of the block. */
 #define ITEM_FLAGS(i) (0x120 + (i) * 0x28)
 
-#include "rw/abu_protos.h"
 
 
 void StatsMenu_InitContinue_2(Menu *arg0) {

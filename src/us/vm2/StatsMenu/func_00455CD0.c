@@ -1,6 +1,5 @@
 #include "common.h"
 #include "structs/menu.h"
-#include "rw/abu_protos.h"
 #include "globals/game.h"
 
 typedef struct {

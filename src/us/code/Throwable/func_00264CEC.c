@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/collision.h"
 #include "globals/collision.h"
+#include "protos/ai.h"
 
 void DamageEvent_Set(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, sptr arg5);
-void CAI__CallHurt(void *actor, void *behavior, DamageEvent *event);
 s32 CAI__SetMode(void *actor, void *state, s32 mode);
 
 void Throwable_Collision(u8 *actor, u8 *state) {
