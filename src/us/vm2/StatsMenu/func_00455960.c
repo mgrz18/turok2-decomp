@@ -5,6 +5,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 typedef struct RenderCounters {
     u8 pad0[0x34];
@@ -20,12 +21,11 @@ typedef struct Shared_Game {
 
 typedef struct GameSession GameSession;
 
-extern Shared_Game D_8011A6D8;
 extern int gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern void CEngineApp__QuitToLegal_2(GameSession *);
 
 int StatsMenu_ContinueNo_2(int unused, Menu *menu) {
-    RenderCounters *sync = &D_8011A6D8.counters;
+    RenderCounters *sync = (RenderCounters *) &gEngineApp_m_Settings.match;
     int team;
     if (sync->option34 != 0) {
         team = menu->player->m_pOptions->m_TagMode;

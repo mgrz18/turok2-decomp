@@ -2,8 +2,8 @@
 #include "structs/world.h"
 #include "structs/collision.h"
 #include "globals/scene.h"
+#include "globals/collision.h"
 
-extern CCollisionInfo D_800F1C60;
 
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *inst);
 f32 GameObject_GetCollisionRadius(CGameObjectInstance *inst);
@@ -27,7 +27,7 @@ void Collision_TestInstances(Sweep *sweep) {
     s32 i;
 
     def = sweep->def;
-    if (def->m_InstanceBehavior == 0 || (def->m_dwFlags & 0x40000000) || def == &D_800F1C60) {
+    if (def->m_InstanceBehavior == 0 || (def->m_dwFlags & 0x40000000) || def == &gCollisionInfoNoInstances) {
         return;
     }
     inst = sweep->obj;

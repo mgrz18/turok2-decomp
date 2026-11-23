@@ -19,7 +19,7 @@ typedef struct {
     s32 size;
 } ExtraInfo;
 
-extern s32 D_800F70A8; /* size of the extra data */
+extern s32 gScene_unk_30; /* local: globals/scene.h; gScene.unk_30 (the member) moves the ROM's registers here. size of the extra data */
 
 /* Struct pointee: the load of ->data is scheduled before the gSaveBufferHandle store. */
 
@@ -31,7 +31,7 @@ void memset(void *dst, s32 value, sptr size);
 void func_0029E460(void *dst, void *src, s32 size);
 
 void SaveGame_Build_2(CPlayer *player) {
-    s32 size = D_800F70A8 + 0x688;
+    s32 size = gScene_unk_30 + 0x688;
     s32 allocSize;
     SaveGame *data;
 
@@ -39,7 +39,7 @@ void SaveGame_Build_2(CPlayer *player) {
         CCache__Flush(0);
         CCache__Deallocate(0, gSaveBufferHandle);
     }
-    allocSize = D_800F70A8 + 0x688;
+    allocSize = gScene_unk_30 + 0x688;
     gSaveBufferHandle = CCache__Allocate(0, allocSize, 0x33, sPakMenuText_SingleSaveBlock);
     gSaveBuffer = gSaveBufferHandle->data;
     memset(gSaveBuffer, 0, allocSize);
@@ -51,6 +51,6 @@ void SaveGame_Build_2(CPlayer *player) {
     data->minutes = gEngineApp_m_Settings.match.minutes;
     data->hours = gEngineApp_m_Settings.match.hours;
     data->size = size;
-    data->levelFlagsSize = ((ExtraInfo *) &D_800F70A8)->size;
-    func_0029E460(data->levelFlags, gLoadSavePersistentData, ((ExtraInfo *) &D_800F70A8)->size);
+    data->levelFlagsSize = ((ExtraInfo *) &gScene_unk_30)->size;
+    func_0029E460(data->levelFlags, gLoadSavePersistentData, ((ExtraInfo *) &gScene_unk_30)->size);
 }

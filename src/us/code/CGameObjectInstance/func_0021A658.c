@@ -58,7 +58,6 @@ struct ObjectStateC {
 };
 extern void CGameObjectInstance__MoveWithCollision(char *, CVector3 *);
 typedef struct CollisionInfo CollisionInfo;
-extern CollisionInfo D_800F1EB0;
 extern s32 Collision_MoveInstance(void *arg0, CVector3 arg1, CollisionInfo *arg2);
 extern void CGameRegion__FireTriggers(sptr arg0, s32 arg1, void *arg2);
 #ifdef TARGET_PORT
@@ -75,7 +74,7 @@ void CGameObjectInstance__MoveWithCollision(char *arg0, CVector3 *arg1) {
     if ((o->m_dwFlags & 0x10000) && o->m_AI.m_pModeCurrent != NULL) {
         collision = (CollisionInfo *) o->m_AI.m_pModeCurrent->m_pData;
         if (collision == NULL) {
-            collision = &D_800F1EB0;
+            collision = (CollisionInfo *) &gCollisionInfoModeDefault;
         }
         saved = ((ObjectStateC *) collision)->unk_8.v0;
         if ((u32) ((u16) o->m_AI.m_AnimType - 0x2B0C) < 8) {
@@ -114,7 +113,7 @@ void CGameObjectInstance__MoveWithCollision(char *arg0, CVector3 *arg1) {
     if ((((ObjectLinks23C *)(arg0))->unk_100 & 0x10000) && ((ObjectLinks23C *)(arg0))->unk_1A0 != 0) {
         collision = ((ObjectLinks10 *)(((ObjectLinks23C *)(arg0))->unk_1A0))->unk_C;
         if (collision == 0) {
-            collision = &D_800F1EB0;
+            collision = (CollisionInfo *) &gCollisionInfoModeDefault;
         }
         saved = ((ObjectStateC *)(collision))->unk_8.v0;
         if ((u32)(((ObjectLinks23C *)(arg0))->unk_238 - 0x2B0C) < 8) {

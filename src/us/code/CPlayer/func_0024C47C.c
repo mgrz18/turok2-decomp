@@ -589,8 +589,6 @@ typedef struct Player {
 } Player;
 #endif
 
-extern u32 D_800F1E30;
-extern u32 D_800F1F10;
 
 s32 Cinema_PathPlaying(void);
 void Sound__SetMuted(s32 enable);
@@ -882,9 +880,9 @@ void CPlayer__Update(Player *p) {
         }
         stateFlags = &gPlayerStateTable[p->state].physics->flags;
         if (p->state == 14) {
-            stateFlags = &D_800F1E30;
+            stateFlags = &gCollisionInfoNoGravity.m_dwFlags;
             if (p->velX >= 0.0f) {
-                stateFlags = &D_800F1F10;
+                stateFlags = &gCollisionInfoGravity.m_dwFlags;
             }
         }
         flag = 0;

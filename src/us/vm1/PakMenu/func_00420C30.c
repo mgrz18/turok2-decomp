@@ -7,7 +7,6 @@
 #include "globals/menu_desc.h"
 
 extern int PakConfirmMenu_SelectYes(void * owner, struct MenuRecAt24 * menu, void * arg);
-extern s32 D_8011B114;
 extern s32 Pak_DeleteNote(s32 ch, s32 index);
 extern void Pak_ProbeSlot(s32 ch);
 extern s32 Pak_RepairIfDamaged(s32 ch);
@@ -74,7 +73,7 @@ s32 PakConfirmMenu_SelectYes(void *owner, MenuRecAt24 *menu, void *arg) {
         case 1:
         case 2:
             if (gPakMenuAnyPak != 0) {
-                D_8011B114 = 1;
+                gPakMenuConfirmed = 1;
             }
             MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, menu->prompt, menu->player, menu->slot, 0);
             break;

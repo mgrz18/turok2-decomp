@@ -426,6 +426,69 @@ was `pad020`; Primagen_UpdateMode20 and its copy). **133 left** (129 + the 4 ROM
 The largest group still in the C is `D_8012F604` (65 uses): the word before `gLevelScript`
 (`LevelScriptBlock.m_Word`, a port-only type so far).
 
+### Round 24, part m2: the BSS `D_` as members or names
+
+51 of the `D_` round 22 counted as "interiors of named BSS objects" or "BSS whose role is not
+certain" left the C. Each batch was checked with `tools/asm_diff.py` (0 differ), the whole tree
+against `d2d07205` too (0 of 3,759), and a clean `make setup` + build + `make verify` is OK.
+The count of distinct `D_` tokens in `src/` and `include/` (code and comments) went from **142 to
+93**; data names from 1,676 to **1,704**.
+
+- **Members of their owner** (the view is gone, the code reads the struct): `gLevelScriptBlock`
+  (was `D_8012F604`: `LevelScriptBlock` is an N64 type now, and Primagen_UpdateMode19 and its twin
+  read `gLevelScriptBlock.m_Script.<member>`; the `LevelScriptF604` views are gone),
+  `gLevelScript.found[1]`/`.bossMode` (`D_8012F978`), `gTotemDefense.warned` (`D_8012FB64`),
+  `gScene.unk_30` (`D_800F70A8`, 17 save-menu files), `gScene.m_DLightSet` (`D_8010FF34`),
+  `gScene.m_ParticleSystem.m_DrawList.m_pHead` (`D_8010753C`), `gScene.unk_18E5C` (`D_8010FED4`),
+  `gScene.m_Geom[4]` (`D_801100D4`), `gEngineApp_m_OnScreen.m_CharacterSmallLookUpPos[0x80 + ch]`
+  (`D_80110238`), `gEngineApp_m_Game.m_MenuPool` / `.m_Settings.match` (`D_80119850`, an anchor 0x20
+  bytes before CGame), `gEngineApp_m_Settings.match` (`D_8011A6D8`), `.multiplayer` (`D_8011AAD4`),
+  `.slots[n].m_Name` (`D_8011AB8B`), `.slots[1]` (`D_8011AB98`), `gEngineApp_m_Game.m_Automap.m_vPlayerPos`
+  (`D_8011AAB4`: a new anonymous union over `CAutomap.m_Counts` names Automap_SetPlayer's three
+  words), `gPager.stat*` (`D_801206BC`: four new members over `Pager.unkC`) and
+  `gPager.slots[0].age` (`D_80120FCC`), `gContStatus[n].status/.errno` (`D_800F677A/B`),
+  `&gPakWatched[3]` (`D_800F5EA3`), `gContPadData[n].button` (`D_800F5C66`), the camera boxes'
+  `m_vMax` (`D_800F5A18`, `D_800F5A34`), `&gCollisionInfoTrace.m_GroundBehavior` (`D_800F1CC6`).
+- **Not interiors: objects of their own, now named** (the named symbol before each ends earlier).
+  The thirteen `CCollisionInfo` slots `gCollisionSetupTable` fills (`D_800F1B60`-`D_800F1F50`,
+  0x20 apart, not inside `gCollisionInfoTestMoveWater` or `gCollisionResults`):
+  `gCollisionInfoTestMoveClimb`, `Particle`, `TestMoveLand`, `Enemy`, `EnemyB`, `NoInstances`,
+  `Trace`, `PlatformRider`, `NoGravity`, `ModeDefault`, `PooledActor`, `Gravity`, `FlyingEnemy`
+  (data_g5; typed `CCollisionInfo` in `globals/collision.h`, and their users' `s32 []`/`char []`
+  views became `.m_dwFlags` / `&info`). And `gUnitQuadVtx`, `gPakMenuConfirmed`,
+  `gPakBootPending`, `sAdecOutputFrames`, `sHostIoThreadStackEnd`, `sHostIoSavedSR`,
+  `gCharNoteMenuSaving`, `sSavePortalDone` (data_g6, evidence in the table).
+- **Field symbols, where the member moves the ROM's registers** (the reason in each case: GCC
+  shares one base register for the struct's members, `lw $2,%lo(sym)` becomes `la $3,sym` +
+  `lw $2,0($3)`): `gScene_m_ActorPool_m_pFree/m_pHead/m_pTail` (`D_8010AB90/94/98`,
+  CPooledLevelActor__Release), `gScene_unk_30` (three of the 20 `D_800F70A8` files:
+  PakMenu_InitSaveGame and its twin, and SaveGame_Build_2, where the member keeps the address in a
+  register across the store into the save buffer), `gTotemDefense_warned` (TotemDefense_StartAnim's
+  one-element array view, like the other `gTotemDefense_*`), `gContStatus_errno` (Controller_CountConnected: the N64 code matches with `gContStatus[n].errno`, but on the host clang then vectorizes the loop into an aligned 16-byte load of `gContStatus`, whose host address is not 16-aligned: aligncheck found a third site and the whole-game run crashed in the title menu; the `u8 []` field symbol keeps it a byte loop). `values[0][2]` (`D_8012F990`) is read
+  through the existing `gLevelScript_values` as a one-row `s32 []`: the real `s32 [2][8]` changes
+  Primagen_HandleAnimEvent.
+- Two comments named Rage Wars addresses as `D_` (`D_8010C080`, `D_8010F328` in `structs/sound.h`,
+  `structs/controller.h`): they now say the address.
+
+**Left after m2** (distinct tokens; several only in comments):
+
+- *BSS still as `D_`, more time*: `D_800D7BE0` (5 CCache files: an anchor 0x5F0 bytes before
+  `gCache` whose views reach both; needs the cache manager's real struct), `D_800F55F4` (the
+  speech player's queue record, a `QueueRec []` view 0xE68 into `gAudioWorld_seq_track`'s
+  block), `D_800E6790` (`sLitVertexOffsets + 0x9000`, the end of that table, 2 Anim files),
+  `D_800D8E13` (the low byte of a render pass word, one use in func_0020A568),
+  `D_801462C8`/`D_801468A0` (`structs/game.h` comments inside `gVMPages`), `D_800F1402` (a
+  comment about splat's old labels in `gDLightBuffer`), `D_800DD794`/`D_800DE1E0` (a
+  `globals/render.h` comment on `sLitVertexOffsets`).
+- *Not data of the game*: `D_8014A000` (the end of the loaded image/BSS: a linker bound read by
+  InitializeSystemResources and main), `D_800C894C` (the main stack's bottom the recursion guard
+  compares with), `D_8F128560` (an address offset the host-I/O code adds, outside RDRAM), and
+  the four absolute ROM offsets.
+- *Comments only*: `D_8012F990` (the comment in Primagen_HandleAnimEvent that says where it went),
+  `D_8012F9A8` (`structs/boss.h`), `D_80119850` (`structs/game.h`).
+- The 52 pool words, 11 labels and 10 VM data names of round 22 are unchanged (not re-done in
+  round 24: no time); their reasons above still hold.
+
 ## Declarations
 
 The named globals now have one declaration each, with the real type, in

@@ -232,6 +232,7 @@ gMantidQueen_boss = 0x8012F5C0; // +0x220; MantidQueen_EnterMode3-6
 gMantidQueen_waveActive = 0x8012F5F0; // +0x250; MantidQueen_Step, MantidQueen_UpdateMode2/5
 gMantidQueen_blink = 0x8012F5F4; // +0x254; MantidQueen_UpdateTurn, MantidQueen_ChooseAttack, MantidQueen_GetTurnSide
 sPrimagenPathPoint = 0x8012F600; // the index on the path gLevelScript_path (D_800C18F0[path][i]); Primagen_UpdateMode19, Primagen_EnterMode19, Primagen_InitAI
+gLevelScriptBlock = 0x8012F604; // LevelScriptBlock (structs/boss.h): the word before gLevelScript and gLevelScript; Primagen_UpdateMode19 and its module-2 twin address gLevelScript through it (was D_8012F604, round 24 m2)
 gLevelScript = 0x8012F608; // LevelScriptState, the Primagen fight / level script (n7: "Primagen state"); 560 uses, Primagen_*
 gLevelScript_swayPhase = 0x8012F618; // +0x010 (viewed as BossWait); Primagen_RunAttackStep
 gLevelScript_anims = 0x8012F62C; // +0x024 ScriptAnimator[8]; Primagen_Draw
@@ -262,6 +263,7 @@ gTotemDefense_def = 0x8012FB54; // +0x04, its definition + 0x14; TotemDefense_In
 gTotemDefense_state = 0x8012FB58; // +0x08; TotemDefense_GetState, TotemDefense_Init
 gTotemDefense_timer = 0x8012FB5C; // +0x0C, the time left; TotemDefense_Init/Update
 gTotemDefense_kills = 0x8012FB60; // +0x10, past the local BossFight struct (a field to add); TotemDefense_AddKill, TotemDefense_Init
+gTotemDefense_warned = 0x8012FB64; // +0x14, the warning flag, also the totem's draw colour (TotemDefense_DrawTotem reads it as gTotemDefense.warned); TotemDefense_StartAnim clears it through this symbol (was D_8012FB64, round 24 m2)
 gMotherBoss = 0x8012FB70; // MotherBossState: MotherBoss_* (n7: "Mother state")
 gMotherBoss_phase = 0x801301CC; // +0x65C; MotherBoss_StartPhase2Cinema, MotherBoss_PickPhaseAnim
 gMotherBoss_activeMask = 0x801301D0; // +0x660; MotherBoss_Mode01/10/21_FlashSpotsThenIdle
@@ -334,3 +336,14 @@ gRumblePaks = 0x80130AA0; // RumblePak[4]; Pak_ProbeSlot, Pak_ProbeRumble, Pak_P
 gPakState = 0x80130C60; // s32[4] per channel (3: mounted, directory read); Pak_* (n8: "pak kind")
 gPakError = 0x80130C70; // s32[4] per channel, the last pak error; Pak_Mount, Pak_GetFreePages (n8: "pak status")
 gPakFileSystems = 0x80130C80; // OSPfs[4]; Pak_Mount, Pak_RefreshNotes, Pak_Repair
+
+// ---- Round 24 (m2): the BSS words round 22 listed as "role not certain" or as interiors, which
+// are objects of their own (the named symbol before each ends earlier) ----
+gUnitQuadVtx = 0x8011AD48; // Vtx_t[4]: Render_InitUnitQuad (and its module-2 copy) builds a white 32x32-textured unit quad in the XZ plane; CParticle__ draws it (func_00235C30) (was D_8011AD48)
+gPakMenuConfirmed = 0x8011B114; // PakConfirmMenu_SelectYes sets it (repair/format kinds 1, 2 with gPakMenuAnyPak); the pak menu leaves when it or gPakMenuStartPressed is set; CEngineApp__Main and PakMenu_SelectCancel clear it (was D_8011B114)
+gPakBootPending = 0x8011F144; // 1 at boot (CEngineApp__Main, PakMenu_SelectCancel); PakMenu_PollBootPak marks gPakCheckDone while it is set; the pak menu init clears it (was D_8011F144)
+sAdecOutputFrames = 0x80125EF0; // 6 decoded frames of 0x200 bytes: adecHuffDecode returns frame (sAdecFrameCounter % 6) after adecImdctFrame fills it (was D_80125EF0)
+sHostIoThreadStackEnd = 0x801280DC; // the last word of the host-I/O thread's stack (between sHostIoEventQueue and sHostIoRequestBuf): HostIo_StartThread passes its end (+4) to osCreateThread (was D_801280DC)
+sHostIoSavedSR = 0x801286D8; // the stopped context's saved status register: the debugger's resume command (0x12, HostIo_CommandLoop) clears its bit 0 (IE) with the live SR's (was D_801286D8)
+gCharNoteMenuSaving = 0x801309A8; // the character-note menu is saving (CharNoteMenu_InitSave sets it, InitLoad/InitDelete clear it): CharNoteMenu_UpdateTitle/Name/Type/Prompt (was D_801309A8)
+sSavePortalDone = 0x801309AC; // the save-portal menu is done: SavePortalMenu_Poll returns it (set when the pak changes and checks out), SavePortalMenu_Close sets it, its inits clear it (was D_801309AC)

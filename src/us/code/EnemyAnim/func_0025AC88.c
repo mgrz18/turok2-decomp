@@ -3,12 +3,12 @@
 #include "structs/intelligence.h"
 #include "globals/enemy.h"
 #include "protos/ai.h"
+#include "globals/controller.h"
 
 /* Three override slots, 6 bytes apart. */
-extern u16 D_800F5C66[];
 
 s32 EnemyAnim_JoypadTestPlayAnim(CGameObjectInstance *actor, void *state) {
-    u16 *slots = D_800F5C66;
+    u16 *slots = &gContPadData[1].button;
     s32 r;
 
     if (slots[0] != 0) {

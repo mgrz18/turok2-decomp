@@ -65,7 +65,11 @@ typedef struct Pager {
     /* 0x000 */ s32 requests;           /* TLB misses handled */
     /* 0x004 */ s32 misses;             /* pages read in */
     /* 0x008 */ u32 lastAddress;        /* the last faulting address */
-    /* 0x00C */ u8 unkC[0x20 - 0xC];
+    /* 0x00C */ u8 unkC[0x10 - 0xC];
+    /* 0x010 */ u32 statMaxAge;         /* VM_Age: the oldest mapping's age */
+    /* 0x014 */ u32 statMinAge;         /* VM_Age: the youngest mapping's age */
+    /* 0x018 */ s32 statChainAge;       /* VM_Age: the age of gPager_chain_head */
+    /* 0x01C */ s32 statRegionBytes;    /* VM_Age: the regions' pages << 12 */
     /* 0x020 */ s16 event;
     /* 0x022 */ u8 _pad22[2];
     /* 0x024 */ OSMesgQueue completion; /* gPager_completion */

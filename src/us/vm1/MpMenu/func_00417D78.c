@@ -3,6 +3,7 @@
 #include "common.h"
 #include "globals/engine.h"
 #include "globals/menu.h"
+#include "globals/game.h"
 
 typedef struct Shared_PlayerSettingsRecord Shared_PlayerSettingsRecord;
 struct Shared_PlayerSettingsRecord {
@@ -118,7 +119,6 @@ struct Shared_Game {
     };
     u8 reserved688[0xCAC - 0x688];
 };
-extern Shared_Game D_8011A6D8;
 extern s32 FinalScoreMenu_Poll(void);
 void CPlayerPool__EndMatch(void *arg0);
 s32 FinalScoreMenu_Poll(void) {
@@ -127,7 +127,7 @@ s32 FinalScoreMenu_Poll(void) {
     time = sFinalScoreTimer + gFrameIncrement;
     sFinalScoreTimer = time;
     if ((120.0f) <= time) {
-        base = &D_8011A6D8.counters;
+        base = (RenderCounters *) &gEngineApp_m_Settings.match;
         base->teams = 0;
         CPlayerPool__EndMatch((void *) ((char *) base - 0x1440));
         return 1;

@@ -5,6 +5,7 @@
 #include "structs/list.h"
 #include "protos/list.h"
 #include "protos/scene.h"
+#include "globals/camera.h"
 
 struct SceneEffectPool;
 /* Turok 2 effect record: 0x298 bytes (Rage Wars 0x2F8), most fields 0x2C-0x60 earlier. */
@@ -26,7 +27,6 @@ struct SceneEffectPool {
     CList freeEffects;   /* 0x5300 */
     CList activeEffects; /* 0x5314 */
 };
-extern f32 D_800F5A18;
 static __inline__ s32 overlaps(Effect_func_80262E88_de *effect, f32 *max) {
     if (max[0] > effect->min[0] && max[-3] < effect->max[0] && max[2] > effect->min[2] &&
         max[-1] < effect->max[2] && max[1] > effect->min[1] && max[-2] < effect->max[1]) {
@@ -37,6 +37,7 @@ static __inline__ s32 overlaps(Effect_func_80262E88_de *effect, f32 *max) {
 #ifdef TARGET_PORT
 #include "structs/game_object.h"
 #include "structs/world.h"
+#include "globals/camera.h"
 /* The port (round 9 x1): the pool by member (CInstancePool, CListedInstance: the N64 view's
  * 0xBC/0xC8 are m_vMin/m_vMax, 0xD4 m_dwFlags, 0x144 m_AI.m_Health, 0x28C m_pNext, 0x290
  * m_pOwnerCount, 0x5314 the active list). Through the N64 view the host never found the pool's
@@ -48,7 +49,7 @@ void CInstancePool__UpdateVisibility(struct SceneEffectPool *scene_, sptr arg1) 
     CListedInstance *effect;
     CListedInstance *next;
     CGameObjectInstance *o;
-    f32 *max = (&D_800F5A18 + 1);
+    f32 *max = &gCameraVisibleBox.m_vMax.x;
 
     for (effect = scene->m_ActiveList.m_pHead; effect != NULL; effect = next) {
         next = effect->m_pNext;
@@ -81,7 +82,7 @@ void CInstancePool__UpdateVisibility(struct SceneEffectPool *scene, sptr arg1) {
         return;
     }
     do {
-        max = (&D_800F5A18 + 1);
+        max = &gCameraVisibleBox.m_vMax.x;
     next_effect:
         next = effect->next;
         if (overlaps(effect, max)) {

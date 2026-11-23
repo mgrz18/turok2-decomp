@@ -2,6 +2,7 @@
 #include "structs/region.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
+#include "globals/game.h"
 
 extern u8 D_800C894C; /* bottom of the stack */
 #ifdef TARGET_PORT
@@ -12,9 +13,9 @@ int t2os_stack_low(const void *local);
 #else
 #define T2_STACK_LOW(local, bottom) ((uptr) (local) < (uptr) (bottom))
 #endif
-extern CVector3 D_8011AAB4;
 
-#define NEAR(p) (((p)->x - D_8011AAB4.x) * ((p)->x - D_8011AAB4.x) + ((p)->z - D_8011AAB4.z) * ((p)->z - D_8011AAB4.z) < 167772.14f)
+#define PLAYER_POS gEngineApp_m_Game.m_Automap.m_vPlayerPos
+#define NEAR(p) (((p)->x - PLAYER_POS.x) * ((p)->x - PLAYER_POS.x) + ((p)->z - PLAYER_POS.z) * ((p)->z - PLAYER_POS.z) < 167772.14f)
 
 /* Marks the regions around the camera, recursing into neighbours that have
  * a corner within ~410 units of it. */

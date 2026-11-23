@@ -4,8 +4,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/ai.h"
-typedef struct { u8 p[0x1D]; u8 f; } GFx;
-extern GFx D_8011AAD4;
+#include "globals/game.h"
 void InteractiveAnim_Step(CGameObjectInstance *actor, CAI *state);
 void InteractiveAnim_DrawAllModels(CGameObjectInstance *actor, CAI *state);
 s32 Cinema_GetScriptId(void);
@@ -15,7 +14,7 @@ void InteractiveAnim_Setup(CGameObjectInstance *actor, CAI *state) {
     actor->m_dwFlags |= 0x1000000;
     actor->m_dwFlags |= 0x2000000;
     actor->m_dwFlags |= 0x20000;
-    if (D_8011AAD4.f == 0) {
+    if (gEngineApp_m_Settings.multiplayer == 0) {
         actor->m_dwFlags |= 0x10000000;
     }
     if (actor->m_nTypeFlag == 0x453 && Cinema_GetScriptId() == 0x6F) {

@@ -13,6 +13,20 @@ extern CCollisionInfo gCollisionInfoSight;         /* eye-line probes */
 extern CCollisionInfo gCollisionInfoTestMove;      /* GameObject_TestMove, an actor that can leave water */
 extern CCollisionInfo gCollisionInfoLineOfSight;   /* line-of-sight probes */
 extern CCollisionInfo gCollisionInfoTestMoveWater; /* GameObject_TestMove, an actor that cannot */
+/* The other infos gCollisionSetupTable fills (round 24 m2; versions/names/data_g5.us.txt) */
+extern CCollisionInfo gCollisionInfoTestMoveClimb; /* GameObject_TestMove, an actor that can climb up */
+extern CCollisionInfo gCollisionInfoParticle;      /* each new particle effect's template */
+extern CCollisionInfo gCollisionInfoTestMoveLand;  /* GameObject_TestMove, an actor that cannot enter water */
+extern CCollisionInfo gCollisionInfoEnemy;         /* the enemy mode tables' m_pData */
+extern CCollisionInfo gCollisionInfoEnemyB;        /* the same values; the Primagen toggles its flags */
+extern CCollisionInfo gCollisionInfoNoInstances;   /* never tested against instances */
+extern CCollisionInfo gCollisionInfoTrace;         /* GameObject_TraceMove, GameObject_DropPickupAt */
+extern CCollisionInfo gCollisionInfoPlatformRider; /* AI_RideMovingPlatform */
+extern CCollisionInfo gCollisionInfoNoGravity;     /* player state 14, backwards */
+extern CCollisionInfo gCollisionInfoModeDefault;   /* a mode without m_pData */
+extern CCollisionInfo gCollisionInfoPooledActor;   /* CPooledLevelActor__Update */
+extern CCollisionInfo gCollisionInfoGravity;       /* player state 14, forwards; MotherBoss_Init */
+extern CCollisionInfo gCollisionInfoFlyingEnemy;   /* the Primagen's modes (no gravity) */
 
 /* Field symbols of gCollisionResults, kept where the code reaches the
  * field by its own %hi/%lo (CParticle__HitWall/HitWater/HitFloor/HitCeiling). */

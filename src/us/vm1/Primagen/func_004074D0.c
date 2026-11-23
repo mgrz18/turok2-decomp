@@ -2,17 +2,17 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "globals/collision.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 
-extern s32 D_800F1F50[];
 
 void Primagen_EnterMode19(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
 
-    D_800F1F50[0] |= 0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags |= 0x8000;
     AI_UpdateTargets(obj, ai, &t, 0, 1);
-    D_800F1F50[0] &= ~0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags &= ~0x8000;
     obj->m_AI.m_AnimSpeed = 1.0f;
     obj->m_dwFlags |= 0x2000;
     if (gLevelScript.bossMode == 11) {

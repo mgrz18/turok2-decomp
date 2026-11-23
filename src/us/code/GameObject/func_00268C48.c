@@ -5,7 +5,6 @@
 #include "globals/collision.h"
 
 
-extern CCollisionInfo D_800F1CC0;
 
 void Collision_MoveInstance(CInstanceHeader *actor, CVector3 pos, void *info);
 CVector3 CVector3__RandomPerturb(CVector3 *in, f32 amount);
@@ -24,13 +23,13 @@ static __inline__ void tracePos(CInstanceHeader *actor, CVector3 pos, CVector3 *
     void *region;
 
     saved = *actor;
-    oldA = D_800F1CC0.m_GroundBehavior;
-    oldB = D_800F1CC0.m_InstanceBehavior;
+    oldA = gCollisionInfoTrace.m_GroundBehavior;
+    oldB = gCollisionInfoTrace.m_InstanceBehavior;
     oldHits = gCollisionResultsP;
-    D_800F1CC0.m_GroundBehavior = flagA;
-    D_800F1CC0.m_InstanceBehavior = flagB;
+    gCollisionInfoTrace.m_GroundBehavior = flagA;
+    gCollisionInfoTrace.m_InstanceBehavior = flagB;
     gCollisionResultsP = &hits;
-    Collision_MoveInstance(actor, pos, &D_800F1CC0);
+    Collision_MoveInstance(actor, pos, &gCollisionInfoTrace);
     actor->m_vPos.y = pos.y;
     end.x = actor->m_vPos.x;
     end.y = pos.y;
@@ -40,8 +39,8 @@ static __inline__ void tracePos(CInstanceHeader *actor, CVector3 pos, CVector3 *
     *actor = saved;
     *outPos = end;
     *outRegion = region;
-    D_800F1CC0.m_GroundBehavior = oldA;
-    D_800F1CC0.m_InstanceBehavior = oldB;
+    gCollisionInfoTrace.m_GroundBehavior = oldA;
+    gCollisionInfoTrace.m_InstanceBehavior = oldB;
 }
 
 /* Spawns a particle of the given kind where an actor would end up at pos. */

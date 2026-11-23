@@ -55,7 +55,6 @@ struct Target {
 };
 #endif
 
-extern u8 D_8010FF34[];
 
 s32 GameObject_IsInanimate(Target *target);
 s32 Actor_GetTypeClass(Target *target);
@@ -178,7 +177,7 @@ void CParticle__HitTarget(CParticle *p) {
                         Trail_DetachOwner(&gEngineApp_m_SwooshSystem, p);
                     }
                     if (p->m_pDLight) {
-                        CDLightSet__Free(D_8010FF34, p->m_pDLight);
+                        CDLightSet__Free((u8 *) &gScene.m_DLightSet, p->m_pDLight);
                         p->m_pDLight = NULL;
                     }
                 }

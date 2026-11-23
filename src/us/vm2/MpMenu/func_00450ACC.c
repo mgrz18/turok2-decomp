@@ -40,7 +40,6 @@ struct Shared_func_8043DEDC_S3 {
 };
 void Music_RestoreVolume(void);
 unsigned int Controller_ConfirmPressed(void *);
-extern struct SharedRecAt148 D_8011AB98[];
 void Menu_ClaimPressingController_2(func_80250BD4_S1 *arg0) {
     Shared_func_8043DEDC_S3 *settings;
     s8 *status;
@@ -48,7 +47,7 @@ void Menu_ClaimPressingController_2(func_80250BD4_S1 *arg0) {
     s32 on;
     s32 i;
     i = 3;
-    status = (s8 *)&D_8011AB98[0];
+    status = (s8 *)(struct SharedRecAt148 *) &gEngineApp_m_Settings.slots[1];
     for (; i >= 0; i--) {
         ((SharedRecAt148 *)status)->unkA8 = 0;
         status -= 0x40;

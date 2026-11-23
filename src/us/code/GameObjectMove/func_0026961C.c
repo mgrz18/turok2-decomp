@@ -5,8 +5,6 @@
 #include "structs/collision.h"
 
 
-extern CCollisionInfo D_800F1B60;
-extern CCollisionInfo D_800F1BE0;
 
 s32 GameObject_CanClimbUp(CGameObjectInstance *actor);
 s32 GameObject_CanEnterWater(CGameObjectInstance *actor);
@@ -21,11 +19,11 @@ s32 GameObject_TestMove(CGameObjectInstance *actor, CVector3 pos, CCollisionInfo
     s32 hit;
 
     if (actor->header.m_Type == 1 && (actor->m_dwFlags & 0x300000)) {
-        info = &D_800F1BE0;
+        info = &gCollisionInfoTestMoveLand;
     } else {
         alt = GameObject_CanClimbUp(actor);
         if (!GameObject_CanEnterWater(actor)) {
-            info = alt ? &D_800F1B60 : &D_800F1BE0;
+            info = alt ? &gCollisionInfoTestMoveClimb : &gCollisionInfoTestMoveLand;
         } else {
             info = !GameObject_CanLeaveWater(actor) ? &gCollisionInfoTestMoveWater : &gCollisionInfoTestMove;
         }

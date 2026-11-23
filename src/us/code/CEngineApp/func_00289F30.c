@@ -10,13 +10,6 @@ typedef struct B21GameBlk {
     u8 pad0[0x44];
     s32 unk44;          /* 0x44 (0x88) */
 } B21GameBlk;
-typedef struct B21World {
-    u8 pad0[0x5DC];
-    u8 sub5DC[4];       /* 0x5DC */
-    u8 pad5E0[0xE80];
-    B21GameBlk blk;     /* 0x1460 (0x1860) */
-} B21World;
-extern B21World D_80119850;
 s32 MenuPool_CountOpen(void *a);
 s32 Cinema_PathPlaying();
 s32 Cinema_GetScriptId();
@@ -25,10 +18,10 @@ void Cinema_StopAtEnd();
 s32 CEngineApp__CheckEndCinema(CEngineApp *g) {
     B21GameBlk *b;
     s32 r;
-    if (MenuPool_CountOpen(D_80119850.sub5DC) == 0) {
+    if (MenuPool_CountOpen(gEngineApp_m_Game.m_MenuPool) == 0) {
         if (Cinema_PathPlaying()) {
             if (Cinema_GetScriptId() == 0x78) {
-                b = &D_80119850.blk;
+                b = (B21GameBlk *) &gEngineApp_m_Game.m_Settings.match;
                 if (b->unk44 != 0) {
                     goto check;
                 }

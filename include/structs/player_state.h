@@ -32,7 +32,7 @@ typedef struct CLookTuning {
     /* 0x14 */ f32 lookUp;
 } CLookTuning; /* size 0x18 */
 
-/* What a state row's physics points at (D_800F1E30, D_800F1F10). */
+/* What a state row's physics points at (gCollisionInfoNoGravity, gCollisionInfoGravity). */
 typedef struct PlayerStatePhysics {
     /* 0x00 */ u32 flags;                   /* tested for 0x80 by AI_FindBestTarget */
     /* 0x04 */ u8 pad4[4];

@@ -4,12 +4,11 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "protos/ai.h"
+#include "globals/collision.h"
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
 
-extern s32 D_800F1C40[];
-extern s32 D_800F1F50[];
 
 /* Primagen_SetSpawnScript: start the second script for a stage. */
 static __inline__ void StartScript2(s32 stage) {
@@ -45,8 +44,8 @@ void Primagen_UpdateMode24_2(CGameObjectInstance *obj, CAI *ai) {
     obj->m_vVelocity.z = 0.0f;
     gLevelScript.unk3CA = 0;
     gLevelScript.script.current = -1;
-    D_800F1C40[0] &= ~0x300;
-    D_800F1F50[0] &= ~0x300;
+    gCollisionInfoEnemyB.m_dwFlags &= ~0x300;
+    gCollisionInfoFlyingEnemy.m_dwFlags &= ~0x300;
     if (gLevelScript.bossState == 3) {
         obj->header.m_vPos.x = gLevelScript.home.x;
         obj->header.m_vPos.y = gLevelScript.home.y;

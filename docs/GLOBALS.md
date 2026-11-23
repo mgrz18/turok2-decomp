@@ -417,6 +417,27 @@ lines of named globals in 157 files (k4 left 278: k1 deleted 121 libultra files,
 their lines with them), 239 with a `local` comment, 51 lines / 27 names without a header, 0
 header globals redeclared without a comment.
 
+## Round 24, part m2
+
+The BSS `D_` that were interiors of named objects became member accesses or names (docs/NAMES.md,
+"Round 24, part m2", has the list); the new names are declared in their headers:
+
+- `globals/boss.h`: `LevelScriptBlock gLevelScriptBlock` (both targets now; it was a port-only
+  `D_8012F604`), `gTotemDefense_warned`.
+- `globals/collision.h`: the thirteen `CCollisionInfo gCollisionInfo*` slots.
+- `gContStatus_errno` stays a local `u8 []` in Controller_CountConnected (host alignment, NAMES.md).
+- `globals/scene.h`: `gScene_unk_30`, `gScene_m_ActorPool_m_pFree/m_pHead/m_pTail` (field symbols).
+- `globals/pak.h`: `gPakMenuConfirmed`, `gPakBootPending`, `gCharNoteMenuSaving`, `sSavePortalDone`;
+  `globals/adec.h`: `sAdecOutputFrames`; `globals/hostio.h`: `sHostIoThreadStackEnd`, `sHostIoSavedSR`.
+- New struct members (additive): `CAutomap`'s union over `m_Counts` (`m_bHasRegion`,
+  `m_PlayerYaw`, `m_vPlayerPos`), `Pager`'s `statMaxAge`/`statMinAge`/`statChainAge`/
+  `statRegionBytes` over `unkC`.
+
+Left without a header (new): `gUnitQuadVtx` (three files; `globals/render.h` has no `Vtx_t`),
+the two PakMenu files that keep `extern s32 gCharNoteMenuSaving` with a `local:` comment
+(they view `gPakProfileRead_character`, which `globals/pak.h` types otherwise). The 27 names of
+round 22 without a header were not revisited.
+
 ## Left
 
 - **Globals without a header (51 lines, 27 names, after round 22 k4).**

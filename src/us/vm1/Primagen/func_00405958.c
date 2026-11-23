@@ -4,20 +4,20 @@
 #include "globals/boss.h"
 #include "globals/engine.h"
 #include "protos/ai.h"
+#include "globals/collision.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void AI_StopSound(CGameObjectInstance *obj, CAI *ai);
 
-extern s32 D_800F1F50[];
 
 void Primagen_UpdateMode2(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
     s32 limit;
     u32 bit;
 
-    D_800F1F50[0] |= 0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags |= 0x8000;
     AI_UpdateTargets(obj, ai, &t, 1, 1);
-    D_800F1F50[0] &= ~0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags &= ~0x8000;
 
     limit = 0x4B00;
     if (gLevelScript.stage == 0) {

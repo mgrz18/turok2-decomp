@@ -36,4 +36,8 @@ extern volatile s32 sHostIoPiReady;  /* the PI manager is started, DMA allowed *
 extern s32 sHostIoState;             /* 2: the I/O thread is running */
 extern u32 sHostIoTlbPageMasks[8];   /* TLB page masks 4K..16M, 0x80000000 ends it (HostIo_ScanTlb) */
 
+/* Round 24 (m2): BSS words named (versions/names/data_g6.us.txt) */
+extern u8 sHostIoThreadStackEnd[4]; /* the last word of the host-I/O thread's stack */
+extern u32 sHostIoSavedSR; /* the stopped context's saved status register */
+
 #endif

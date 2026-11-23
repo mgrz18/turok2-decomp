@@ -45,7 +45,7 @@ extern void *gTotemDefense_def[]; /* local type: TotemDefenseState field; one-el
 extern s32 gTotemDefense_state[]; /* local type: TotemDefenseState field; one-element arrays here keep the ROM's code */
 extern f32 gTotemDefense_timer[]; /* local type: TotemDefenseState field; one-element arrays here keep the ROM's code */  /* time left */
 extern s32 gTotemDefense_kills[]; /* local type: TotemDefenseState field; one-element arrays here keep the ROM's code */
-extern s32 D_8012FB64[];
+extern s32 gTotemDefense_warned[]; /* local type: TotemDefenseState field; one-element arrays here keep the ROM's code */
 #endif
 
 #ifndef TARGET_PORT
@@ -53,7 +53,7 @@ static __inline__ void startBossAnim(BossActor *obj) {
     BossActor *boss = gTotemDefense[0];
     BossAI *ai = &boss->ai;
 
-    D_8012FB64[0] = 0;
+    gTotemDefense_warned[0] = 0;
     ai->animIndex = CGameObjectInstance__PickRandomAnim(boss, 0x5334, -1);
     ai->animType = 0x5334;
     ai->flags &= ~1;

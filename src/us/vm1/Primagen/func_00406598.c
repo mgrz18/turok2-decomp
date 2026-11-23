@@ -4,6 +4,7 @@
 #include "globals/boss.h"
 #include "globals/engine.h"
 #include "protos/ai.h"
+#include "globals/collision.h"
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
@@ -11,8 +12,6 @@ extern f32 AI_AngleToPoint(CGameObjectInstance *obj, CVector3 point);       /* a
 extern f32 func_002982F0(f32 angle);                                      /* sin */
 extern f32 func_002974C0(f32 angle);                                      /* cos */
 
-extern s32 D_800F1C40[];
-extern s32 D_800F1F50[];
 
 void Primagen_UpdateMode18(CGameObjectInstance *obj, CAI *ai) {
     CVector3 point;
@@ -24,8 +23,8 @@ void Primagen_UpdateMode18(CGameObjectInstance *obj, CAI *ai) {
     if ((gLevelScript.bossMode == 3 || gLevelScript.bossMode == 4) && gLevelScript.timer <= 0.0f && ai->m_AnimRepeatedCount != 0) {
         obj->m_vVelocity.y = 0.0f;
         if (gLevelScript.bossState == 3) {
-            D_800F1C40[0] |= 0x300;
-            D_800F1F50[0] |= 0x300;
+            gCollisionInfoEnemyB.m_dwFlags |= 0x300;
+            gCollisionInfoFlyingEnemy.m_dwFlags |= 0x300;
             CAI__SetMode(obj, ai, 0x19);
         } else {
             CAI__SetMode(obj, ai, 0x13);

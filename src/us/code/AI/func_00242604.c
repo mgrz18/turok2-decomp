@@ -4,7 +4,6 @@
 #include "globals/collision.h"
 
 
-extern CCollisionInfo D_800F1E10;
 
 s32 Platform_CollideGround(Sweep *ctrl, CGameObjectInstance *actor);
 s32 Platform_CollideCylinder(Sweep *ctrl, CGameObjectInstance *actor);
@@ -17,7 +16,7 @@ void Platform_Collide(Sweep *ctrl, CGameObjectInstance *actor) {
 
     info = &actor->header.m_pIntelligence->m_Platform;
     def = ctrl->def;
-    if (def != &D_800F1E10 && def->m_InstanceBehavior != 0) {
+    if (def != &gCollisionInfoPlatformRider && def->m_InstanceBehavior != 0) {
         switch (info->m_CollisionType) {
             case 0:
                 ok = Platform_CollideGround(ctrl, actor);

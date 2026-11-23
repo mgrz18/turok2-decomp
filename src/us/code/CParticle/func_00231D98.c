@@ -41,7 +41,6 @@ struct B19Obj {
 #endif
 #include "structs/particle.h"
 #include "globals/scene.h"
-#define D_8010FF34 (&gScene.m_DLightSet)
 void CParticle__Attach(B19Obj *, sptr, sptr);
 void Trail_AddNode(void *, B19Obj *, s32);
 void *DLight_Spawn(void *, s32);
@@ -55,7 +54,7 @@ void CParticle__StartEffects(B19Obj *o, B19Def *def) {
     CParticle__Attach(o, 0, 0);
     if (def->b6 != -1) Trail_AddNode(&gEngineApp_m_SwooshSystem, o, def->b6);
     /* the light pointer-wide, in the host CParticle's member (the view has the N64 offset) */
-    if (def->b7 != -1) ((CParticle *) o)->m_pDLight = DLight_Spawn(D_8010FF34, def->b7);
+    if (def->b7 != -1) ((CParticle *) o)->m_pDLight = DLight_Spawn(&gScene.m_DLightSet, def->b7);
     else ((CParticle *) o)->m_pDLight = NULL;
     if (!(o->flags & 0x200000) && (t = def->sC) != 0) {
         switch (o->id) {

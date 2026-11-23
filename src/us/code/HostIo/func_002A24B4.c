@@ -7,7 +7,7 @@
 #include "globals/hostio.h"
 #include "protos/ultra.h"
 typedef u32 OSEvent;
-extern u8 D_801280DC[];
+extern u8 sHostIoThreadStackEnd[]; /* local type: globals/hostio.h declares it; this view (its type here) is what the code uses */
 void HostIo_ThreadMain(void *arg);
 void HostIo_StartThread(s32 pri) {
     if (sHostIoPiReady == 0) {
@@ -17,7 +17,7 @@ void HostIo_StartThread(s32 pri) {
         osCreateMesgQueue(&sHostIoReplyQueue, sHostIoReplyBuf, 1);
         osCreateMesgQueue(&sHostIoEventQueue, sHostIoEventBuf, 1);
         osSetEventMesg(0, &sHostIoEventQueue, (OSMesg)1);
-        osCreateThread(&sHostIoThread, 0x4653, HostIo_ThreadMain, 0, D_801280DC + 4, pri);
+        osCreateThread(&sHostIoThread, 0x4653, HostIo_ThreadMain, 0, sHostIoThreadStackEnd + 4, pri);
         osStartThread(&sHostIoThread);
     }
 }

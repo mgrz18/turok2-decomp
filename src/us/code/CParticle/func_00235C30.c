@@ -16,7 +16,7 @@ typedef struct VInfo {
 } VInfo;
 typedef struct Vec3fv { f32 x, y, z; } Vec3fv;
 extern Gfx D_800ACFC8[]; /* a static display list (gendata emits host Gfx) */
-extern u8 D_8011AD48[];
+extern u8 gUnitQuadVtx[]; /* local: no header declares it; the u8 view is what GBI_ADDR takes here */
 extern f32 gCameraVisibleBox[6]; /* local type: the CBox read as six floats by index */
 void Render_InvalidateModeCache(void);
 void Texture_InvalidateCache(void);
@@ -61,7 +61,7 @@ void SwooshSystem_DrawDecals(CSwooshSystem *c) {
                 CList__AddTail(&c->m_FreeDecals, n);
             } else {
                 { Gfx *_g = gDList++; _g->w0 = (0xDA380003); _g->w1 = (GBI_ADDR(p)); }
-                { Gfx *_g = gDList++; _g->w0 = (0x01004008); _g->w1 = (GBI_ADDR(D_8011AD48)); }
+                { Gfx *_g = gDList++; _g->w0 = (0x01004008); _g->w1 = (GBI_ADDR(gUnitQuadVtx)); }
                 { Gfx *_g = gDList++; _g->w0 = (0x06000204); _g->w1 = (0x00040600); }
             }
         }

@@ -4,7 +4,6 @@
 
 void Controller_WatchPak(s32 port);
 
-extern s32 D_801309AC;
 
 /* Takes the port by address: the ROM keeps it in a stack slot (as PakMenu_GetReturnMenu does with its kind). */
 static __inline__ void SelectPort(s32 *port) {
@@ -15,7 +14,7 @@ static __inline__ void SelectPort(s32 *port) {
 void SavePortalMenu_InitB(Menu *event) {
     s32 port;
 
-    D_801309AC = 0;
+    sSavePortalDone = 0;
     gSavePortalActive = 1;
     gPakMenuIsSave = 1;
     gPakMenuIsProfile = 0;

@@ -8,7 +8,6 @@
  * and copies that player's name (trailing spaces trimmed, nothing when it is
  * still the default "player" name) into the edit buffer. */
 
-extern u8 D_8011AB8B[][0x40];   /* player options +0x33: names */
 
 
 #define ROW_SELECTED 0x01800000
@@ -65,7 +64,7 @@ void NameEntryMenu_Init(Menu *menu) {
     }
     gNameEntries[index].timer = 0;
     dst = gNameEntries[index].name;
-    name = D_8011AB8B[index];
+    name = gEngineApp_m_Settings.slots[index].m_Name;
     i = 8;
     spaces = 0;
     while (i > 0) {
