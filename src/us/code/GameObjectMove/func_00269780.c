@@ -7,7 +7,7 @@
 
 
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);    /* height */
-s32 Collision_MoveInstance(CGameObjectInstance *actor, CVector3 pos, CCollisionInfo *info);
+s32 Collision_MoveInstance(CObjectHead *obj, CVector3 to, CCollisionInfo *info);
 
 /* Whether actor can see target: a clear line from 80% of one's height to 80% of the other's. */
 s32 GameObject_CanSee(CGameObjectInstance *actor, CGameObjectInstance *target) {
@@ -19,7 +19,7 @@ s32 GameObject_CanSee(CGameObjectInstance *actor, CGameObjectInstance *target) {
     actor->header.m_vPos.y += GameObject_GetCollisionHeight(actor) * 0.8f;
     to = target->header.m_vPos;
     to.y += GameObject_GetCollisionHeight(target) * 0.8f;
-    hit = Collision_MoveInstance(actor, to, &gCollisionInfoSight);
+    hit = Collision_MoveInstance((CObjectHead *) actor, to, &gCollisionInfoSight);
     *(CObjectHead *) actor = saved;
     return hit == 0;
 }

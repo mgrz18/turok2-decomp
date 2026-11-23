@@ -9,7 +9,7 @@
 s32 GameObject_CanEnterWater(CGameObjectInstance *actor);
 s32 GameObject_CanDropDown(CGameObjectInstance *actor);
 f32 CGameRegion__GetHeight(void *region, f32 x, f32 z);
-void Collision_MoveInstance(CGameObjectInstance *actor, CVector3 pos, CCollisionInfo *info);
+s32 Collision_MoveInstance(CObjectHead *obj, CVector3 to, CCollisionInfo *info);
 
 /* Slides an actor to (x, z) with collision, keeping its height above the floor. */
 void GameObject_SlideTo(CGameObjectInstance *actor, f32 x, f32 z) {
@@ -39,7 +39,7 @@ void GameObject_SlideTo(CGameObjectInstance *actor, f32 x, f32 z) {
     } else {
         gCollisionInfoTestMoveLand.m_dwFlags |= 0x30000;
     }
-    Collision_MoveInstance(actor, to, &gCollisionInfoTestMoveLand);
+    Collision_MoveInstance((CObjectHead *) actor, to, &gCollisionInfoTestMoveLand);
     gCollisionInfoTestMoveLand.m_dwFlags = oldFlags;
     actor->m_vVelocity = savedVelocity;
     actor->header.m_vPos.y = CGameRegion__GetHeight(actor->header.m_pCurrentRegion, actor->header.m_vPos.x, actor->header.m_vPos.z) + height;

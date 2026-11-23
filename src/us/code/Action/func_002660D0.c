@@ -2,7 +2,9 @@
 #include "structs/game_object.h"
 #include "globals/ai.h"
 
-s32 Action_Draw(s32, s32, s32);
+#include "structs/model.h"
+
+void Action_Draw(u8 *actor, u8 *state, CDrawArgs *req);
 extern void Action_Step(void);
 
 /* AI init: mode table, step/draw callbacks, cleared mode scratch. */

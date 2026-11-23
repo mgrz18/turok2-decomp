@@ -4,7 +4,9 @@
 #include "rw/junk_types.h"
 #include "structs/controller.h"
 
-extern void RumblePool_Init(void *a, void *b, s32 n);
+#include "structs/rumble.h"
+
+s32 RumblePool_Init(RumblePool *pool, RumbleEffect *effects, s32 count);
 s32 Cont_ResetSlot_2(S5Ctl *c, s32 port) {
     s32 i;
     c->port = port;
@@ -34,6 +36,6 @@ s32 Cont_ResetSlot_2(S5Ctl *c, s32 port) {
     c->f0 = ((gContStatus[port].errno >> 3) ^ 1) & 1;
     c->fD0 = 0;
     c->fD4 = 0;
-    RumblePool_Init(c->blkA, c->blkB, 3);
+    RumblePool_Init((RumblePool *) c->blkA, (RumbleEffect *) c->blkB, 3);
     return c->f0;
 }

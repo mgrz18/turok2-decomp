@@ -1,9 +1,10 @@
 #include "common.h"
+#include "protos/ultra.h"
 
 s32 __osSpDeviceBusy();                                /* extern */
-s32 __osSpSetStatus(s32);                     /* extern */
+extern void __osSpSetStatus(u32 arg0);
 
-void osSpTaskStartGo(void) {
+void osSpTaskStartGo(OSTask *tp) {
     do {
 
     } while (__osSpDeviceBusy() != 0);

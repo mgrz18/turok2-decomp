@@ -17,13 +17,13 @@ s16 EnemyAnim_PickAttack_B0A60(CGameObjectInstance *arg0, sptr arg1) {
 
     WeightedTable_Clear(sp10);
     if (info->m_wCombatAnimFlags & 0x1F) {
-        WeightedTable_Add((sptr) sp10, (s32) EnemyAnim_Combat_AFE28(arg0, arg1), 0xA);
+        WeightedTable_Add((sptr) sp10, (s32) (s16) EnemyAnim_Combat_AFE28(arg0, arg1), 0xA);
     }
     if (info->m_wLeapAnimFlags & 0x1F) {
-        WeightedTable_Add((sptr) sp10, (s32) EnemyAnim_Leap_AFEB8(arg0, arg1), 0xA);
+        WeightedTable_Add((sptr) sp10, (s32) (s16) EnemyAnim_Leap_AFEB8(arg0, arg1), 0xA);
     }
     if (info->m_wWeaponAnimFlags & 0x1F) {
-        WeightedTable_Add((sptr) sp10, (s32) EnemyAnim_Weapon_B0068(arg0, arg1), 0xA);
+        WeightedTable_Add((sptr) sp10, (s32) (s16) EnemyAnim_Weapon_B0068(arg0, arg1), 0xA);
     }
     return WeightedTable_Pick((sptr) sp10);
 }

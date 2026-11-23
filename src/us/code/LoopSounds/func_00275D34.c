@@ -3,11 +3,10 @@
 
 #include "rw/abu_types.h"
 #include "globals/audio.h"
+#include "protos/list.h"
 
-extern s32 CList__AddTail(CList *list, void *node);
-extern void Sound__Stop(s32 arg0);
+s32 Sound__Stop(s32);
 s32 LoopSounds_Stop(void *arg0, void *arg1) {
-    extern void CList__Remove(void *, s32);
     void *var_s0;
     if (arg1 == 0) {
         return 0;
@@ -18,7 +17,7 @@ s32 LoopSounds_Stop(void *arg0, void *arg1) {
             if (var_s0 == arg1) {
                 Sound__Stop(((SoundSourceNode *)var_s0)->value);
                 sLoopSoundsLastStopped = ((SoundSourceNode *)var_s0)->value;
-                CList__Remove(&((SoundVoicePool *)arg0)->playing, (sptr)var_s0);
+                CList__Remove(&((SoundVoicePool *)arg0)->playing, var_s0);
                 CList__AddTail(arg0, var_s0);
                 return 1;
             }

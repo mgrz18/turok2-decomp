@@ -6,7 +6,9 @@
 
 /* Controller / rumble slot, 0x224 bytes (Controller in Controller_ResetRumble). */
 
-s32 RumblePool_Init(void *dst, void *src, s32 n);
+#include "structs/rumble.h"
+
+s32 RumblePool_Init(RumblePool *pool, RumbleEffect *effects, s32 count);
 
 /* Resets a controller slot; returns whether a controller is plugged into its port. */
 s32 Cont_ResetSlot(ControllerProfile *c, s32 port) {
@@ -39,6 +41,6 @@ s32 Cont_ResetSlot(ControllerProfile *c, s32 port) {
     c->connected = ((gContStatus[port].errno >> 3) ^ 1) & 1;
     c->rumbleLevel = 0;
     c->rumbleTimer = 0;
-    RumblePool_Init(c->rumblePool, c->rumbleNodes, 3);
+    RumblePool_Init((RumblePool *) c->rumblePool, (RumbleEffect *) c->rumbleNodes, 3);
     return c->connected;
 }

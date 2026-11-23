@@ -9,7 +9,7 @@
 s32 GameObject_CanClimbUp(CGameObjectInstance *actor);
 s32 GameObject_CanEnterWater(CGameObjectInstance *actor);
 s32 GameObject_CanLeaveWater(CGameObjectInstance *actor);
-s32 Collision_MoveInstance(CGameObjectInstance *actor, CVector3 pos, CCollisionInfo *info);
+s32 Collision_MoveInstance(CObjectHead *obj, CVector3 to, CCollisionInfo *info);
 
 /* Tests moving an actor to pos with the collision settings that suit it, leaving it where it was; returns the collision result. */
 s32 GameObject_TestMove(CGameObjectInstance *actor, CVector3 pos, CCollisionInfo **outInfo) {
@@ -32,7 +32,7 @@ s32 GameObject_TestMove(CGameObjectInstance *actor, CVector3 pos, CCollisionInfo
         *outInfo = info;
     }
     saved = *(CObjectHead *) actor;
-    hit = Collision_MoveInstance(actor, pos, info);
+    hit = Collision_MoveInstance((CObjectHead *) actor, pos, info);
     *(CObjectHead *) actor = saved;
     return hit;
 }

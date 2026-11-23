@@ -15,7 +15,7 @@ typedef struct Marker {
 } Marker;
 
 extern Marker sBootMarker;           /* the boot marker string */
-extern char gSavedPlayers[]; /* local type: globals/save.h declares it; this view (its type here) is what keeps the ROM's code */           /* the saved players (0x1400) */
+#include "globals/save.h"          /* the saved players (0x1400) */
 extern s32 D_8014A000[];            /* BSS end */
 
 void memset(void *dst, s32 value, sptr size);
@@ -35,7 +35,7 @@ static __inline__ s32 isRestorable(uptr address) {
     if (gWarmBoot != 0) {
         return 1;
     }
-    if (address >= (uptr)gSavedPlayers && address < (uptr)gSavedPlayers + 0x1400) {
+    if (address >= (uptr)&gSavedPlayers && address < (uptr)&gSavedPlayers + 0x1400) {
         return 0;
     }
     if (address >= (uptr)&gEngineApp_m_Settings && address < (uptr)&gEngineApp_m_Settings + 0x184) {

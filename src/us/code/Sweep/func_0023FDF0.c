@@ -23,7 +23,7 @@ typedef struct HitNode {
 
 /* An instance that can be hit. */
 #ifdef TARGET_PORT
-typedef struct HitInst {
+typedef struct HitNodeInst {
 /* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
  * member of one union, placed by __builtin_offsetof of the member it reads */
 #define T2_HOFF_HitInst(m) __builtin_offsetof(CGameObjectInstance, m)
@@ -39,9 +39,9 @@ typedef struct HitInst {
         struct { u8 _hp_bounds[T2_HOFF_HitInst(m_Bounds)]; CBox bounds; }; /* N64 0xBC: m_vMin, m_vMax */
         struct { u8 _hp_hitMask[T2_HOFF_HitInst(m_AI.m_VisBits)]; s32 hitMask; }; /* N64 0x14C */
     };
-} HitInst;
+} HitNodeInst;
 #else
-typedef struct HitInst {
+typedef struct HitNodeInst {
     /* 0x000 */ u8 type;
     /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[4];
@@ -59,15 +59,15 @@ typedef struct HitInst {
     /* 0x0BC */ CBox bounds;
     /* 0x0D4 */ u8 padD4[0x78];
     /* 0x14C */ s32 hitMask;
-} HitInst;
+} HitNodeInst;
 #endif
 
-void *CGameObjectInstance__LoadGeometry(HitInst *inst);
+void *CGameObjectInstance__LoadGeometry(HitNodeInst *inst);
 void CMtxF__FromMtxAffine(f32 (*mtx)[4], Joint *joint);
 void CMtxF__ScaleAxes(f32 (*mtx)[4], f32 x, f32 y, f32 z);
 void CMtxF__TransformPoints(f32 (*mtx)[4], CVector3 *in, CVector3 *out, s32 count);
 s32 Sweep_HitBox(Sweep *sweep, CBox *box, f32 *t);
-s32 Sweep_TestBoxFaces(Sweep *sweep, CBox *box, HitInst *other, CVector3 *start, CVector3 *corners, HitNode *node,
+s32 Sweep_TestBoxFaces(Sweep *sweep, CBox *box, HitNodeInst *other, CVector3 *start, CVector3 *corners, HitNode *node,
                   s32 index);
 
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
@@ -86,7 +86,7 @@ static __inline__ void BoxCorners(CVector3 *c, CBox *b) {
 
 /* Sweep against an actor's boxes: each hit volume of its animated model's
  * nodes, or else its animation's box, or else its bounds. */
-void Sweep_TestBox(Sweep *sweep, HitInst *other, CVector3 *start, CBox *box) {
+void Sweep_TestBox(Sweep *sweep, HitNodeInst *other, CVector3 *start, CBox *box) {
     CVector3 out[8];
     CVector3 in[8];
     CVector3 centre;

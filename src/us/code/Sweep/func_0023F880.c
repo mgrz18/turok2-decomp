@@ -2,14 +2,14 @@
 #include "structs/game_object.h"
 #include "structs/collision.h"
 #include "globals/collision.h"
+#include "structs/particle.h"
+#include "structs/player.h"
 
 /* An instance that can be hit, or the one sweeping (a particle: type 2). */
 #ifdef TARGET_PORT
 /* the host view: the sweeping particle's members (CParticle), its owner's player link
  * (CGameObjectInstance.m_AI.m_pParent) and the player word at N64 0x4F4 (m_WeaponActor's AI
  * variables + 0x20), each at its host offset (one union) */
-#include "structs/particle.h"
-#include "structs/player.h"
 typedef struct HitInst {
     union {
         struct { u8 _hp_type[__builtin_offsetof(CParticle, header.m_Type)]; u8 type; };

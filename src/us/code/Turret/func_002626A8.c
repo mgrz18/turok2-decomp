@@ -7,7 +7,7 @@ typedef void (*AICallback)(void *actor, void *ai);
 void Turret_Step(void *actor, void *ai);
 void Turret_Hurt(void *actor, void *ai);
 void Turret_CalcOrientation(void *actor, void *ai);
-void Turret_Effects(void *actor, void *ai);
+void Turret_Effects(); /* defined with the host or N64 view of its argument (func_00262B58.c) */
 
 /* AI init: installs this actor kind's table and callbacks. */
 void Turret_Setup(void *actor, CAI *ai) {

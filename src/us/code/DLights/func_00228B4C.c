@@ -5,7 +5,7 @@
 typedef struct {
     /* 0x00 */ u8 pad0[0x16];
     /* 0x16 */ s16 unk16;
-} ListNode;
+} DLightListElem;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
