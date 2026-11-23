@@ -104,6 +104,10 @@ endif
 ifneq (,$(wildcard $(SYMS_NAMES_LD)))
 LD_FLAGS         += -T $(FILTERED_DIR)/$(notdir $(SYMS_NAMES_LD))
 endif
+UL_ALIASES      = $(VERSIONS_DIR)/ultralib_aliases.$(VERSION).txt
+ifneq (,$(wildcard $(UL_ALIASES)))
+LD_FLAGS         += -T $(UL_ALIASES)
+endif
 FOREIGN_LABELS  = $(VERSIONS_DIR)/foreign_labels.$(VERSION).txt
 ifneq (,$(wildcard $(FOREIGN_LABELS)))
 LD_FLAGS         += -T $(FOREIGN_LABELS)
@@ -122,7 +126,12 @@ BIN_FILES = $(wildcard $(BIN_DIR)/*.bin)
 # Object outputs (path mirrors splat ld script: build/asm/*.s.o, build/assets/*.bin.o)
 S_OBJS   = $(patsubst $(SPLAT_DIR)/%.s,$(BUILD_DIR)/%.s.o,$(filter $(ASM_DIR)/%,$(S_FILES))) \
            $(patsubst %.s,$(BUILD_DIR)/%.s.o,$(filter $(SRC_ASM_DIR)/%,$(S_FILES)))
-C_OBJS   = $(patsubst %.c,$(BUILD_DIR)/%.c.o,$(C_FILES))
+# libultra objects built from lib/ultralib (decompals/ultralib, a pinned submodule) in place of
+# the game's own per-function C (versions/ultralib_objects.us.txt, docs/LIBULTRA.md).
+UL_DIR    = lib/ultralib
+UL_VM2    = lib/ultralib_vm2
+UL_FILES  = $(patsubst $(BUILD_DIR)/%.c.o,%.c,$(sort $(shell grep -o '$(BUILD_DIR)/lib/[^ ()]*\.c\.o' $(LD_SCRIPT) 2>/dev/null)))
+C_OBJS   = $(patsubst %.c,$(BUILD_DIR)/%.c.o,$(C_FILES) $(UL_FILES))
 BIN_OBJS = $(patsubst $(SPLAT_DIR)/%.bin,$(BUILD_DIR)/%.bin.o,$(BIN_FILES))
 
 O_FILES  = $(S_OBJS) $(C_OBJS) $(BIN_OBJS)
@@ -259,6 +268,50 @@ else
 $(BUILD_DIR)/src/%.c.o: $(BUILD_DIR)/src/%.s_c
 	INC_DIR=$(INCLUDE_DIR) $(TOOLS_DIR)/sn_as.sh $< $@
 endif
+
+# ultralib C: 2.0I libgultra_rom, the defines of ultralib's Makefile and makefiles/gcc.mk (no
+# NDEBUG: the _rom archive of 2.0I keeps its asserts; -funsigned-char up to 2.0J), through the
+# game's cc1 at -O3 -mfp64 (the game's FPU mode, not ultralib's -mgp32 -mfp32: docs/LIBULTRA.md).
+UL_CPP_FLAGS = -P -undef -Wall -lang-c -nostdinc -D_LANGUAGE_C -DF3DEX_GBI_2 -D__GNUC__=2 \
+	-D_MIPS_SZLONG=32 -D__USE_ISOC99 -DF3DEX_GBI -DBUILD_VERSION=VERSION_I \
+	-DBUILD_VERSION_STRING=\"2.0I\" -D_FINALROM \
+	-I$(CURDIR)/$(UL_DIR) -I$(CURDIR)/$(UL_DIR)/include \
+	-I$(CURDIR)/$(UL_DIR)/include/compiler/gcc -I$(CURDIR)/$(UL_DIR)/include/PR
+UL_CC_FLAGS  = -quiet -G0 -mips3 -mgas -meb -mno-fix4300 -mhard-float -mcpu=VR4300 \
+	-fforce-addr -fno-builtin -O3 -mfp64 -funsigned-char
+
+$(UL_DIR)/src/%.c:
+	@echo "$@ is missing: run git submodule update --init (docs/BUILD.md)"; exit 1
+
+# From lib/ultralib/src, as ultralib's own build: assert() passes __FILE__, and the ROM has
+# the file names as "audio/csplayer.c", "io/sirawdma.c" ...
+$(BUILD_DIR)/$(UL_DIR)/%.i: $(UL_DIR)/%.c
+	@mkdir -p $(dir $@)
+	cd $(UL_DIR)/src && $(CPP) -MMD -MP -MT $(CURDIR)/$@ -MF $(CURDIR)/$@.d $(UL_CPP_FLAGS) \
+		-o $(CURDIR)/$@ $(patsubst $(UL_DIR)/src/%,%,$<)
+
+# lib/ultralib_vm2: the second paged VM module's Controller Pak copies, ultralib's files under
+# the game's _2 names (a wrapper per file and vm2_names.h, written by tools/ultralib_build.py).
+$(BUILD_DIR)/$(UL_VM2)/%.i: $(UL_VM2)/%.c $(UL_VM2)/vm2_names.h
+	@mkdir -p $(dir $@)
+	cd $(UL_DIR)/src && $(CPP) -MMD -MP -MT $(CURDIR)/$@ -MF $(CURDIR)/$@.d $(UL_CPP_FLAGS) \
+		-I$(CURDIR)/$(UL_VM2) -I$(CURDIR)/$(UL_DIR)/src -o $(CURDIR)/$@ $(CURDIR)/$<
+
+$(BUILD_DIR)/lib/%.s_c: $(BUILD_DIR)/lib/%.i
+	unix2dos $<
+	$(CC) $(UL_CC_FLAGS) -o $@ $<
+
+UL_RENAMES   = $(VERSIONS_DIR)/ultralib_renames.$(VERSION).txt
+$(BUILD_DIR)/lib/%.c.o: $(BUILD_DIR)/lib/%.s_c $(UL_RENAMES)
+	INC_DIR=$(INCLUDE_DIR) $(TOOLS_DIR)/sn_as.sh $< $@
+	r=$$(sed -n 's|^lib/$*\.c: ||p' $(UL_RENAMES)); \
+	if [ -n "$$r" ]; then $(OBJCOPY) $$(for t in $$r; do case $$t in \
+		.*) echo --rename-section $$t;; +*) echo --add-symbol $${t#+},global;; \
+		*) echo --redefine-sym $$t;; esac; done) $@; fi
+
+# make print-VAR: a variable as make expands it (tools/ultralib_build.py reads the flags).
+print-%:
+	@echo '$($*)'
 
 # n64crc helper tool
 $(N64CRC): $(TOOLS_DIR)/n64crc.c

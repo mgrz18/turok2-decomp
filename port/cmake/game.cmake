@@ -25,7 +25,6 @@ set(T2_GAME_EXCLUDE
     func_002A4BE0.c   # libgcc __umoddi3
     func_0029DFC0.c   # osGetCount          (mfc0 Count)
     func_0029E210.c   # __osSetCompare      (mtc0 Compare)
-    func_0029E3E0.c   # sprintf             (SN64 varargs __builtin_next_arg; host libc)
     func_002A259C.c   # HostIo_Call         (SN debug host I/O, break 1)
     func_00298470.c   # sqrtf               (sqrt.s; host libm)
 )

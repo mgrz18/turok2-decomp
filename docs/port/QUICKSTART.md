@@ -59,7 +59,7 @@ the clone's directory, with only the ROM added. You need
 `git`) and about 2 GB of disk. The N64 toolchain is **not** needed.
 
 ```sh
-git clone https://github.com/mgrz18/turok2-decomp && cd turok2-decomp
+git clone https://github.com/mgrz18/turok2-decomp && cd turok2-decomp   # (the N64 build also needs --recursive: lib/ultralib; the port does not)
 brew install cmake ninja sdl3 libzip glew libpng nlohmann-json tinyxml2 python@3.13
 python3.13 -m venv .venv && .venv/bin/pip install pyelftools 'clang==21.*'
 cp /path/to/your/rom.z64 baserom.us.z64          # sha1 fb0400f2... (above)

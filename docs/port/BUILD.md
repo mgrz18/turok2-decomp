@@ -184,7 +184,7 @@ no-op. From docs/ASM_ORIGIN.md (47 entries) and the 9 excluded C files:
 | watch registers | func_00201074, func_00425710 (copy) | no-op |
 | crash handler | func_002A3088 (vector stubs), func_002A3100, func_002A31FC, func_002A3708, func_002A3774, func_002A37CC | host crash handler (signal handler) or nothing |
 | libgcc (excluded) | func_002A3AE0 `__divdi3`, func_002A40D0 `__moddi3`, func_002A4650 `__udivdi3`, func_002A4BE0 `__umoddi3` | the host compiler's runtime |
-| libc (excluded) | func_0029E3E0 `sprintf`, func_00298470 `sqrtf` | host libc/libm. `_Printf` (func_0029E4F0), `_Putfld`, `_Litob`, `_Ldtob` compile but walk N64 varargs by hand (`(u32)args + 3 & ~3`): replace with `vsnprintf` |
+| libc (excluded) | `sprintf` (its game file is gone since round 22: the N64 build compiles ultralib's `libc/sprintf.c`), func_00298470 `sqrtf` | host libc/libm. `_Printf` (func_0029E4F0), `_Putfld`, `_Litob`, `_Ldtob` compile but walk N64 varargs by hand (`(u32)args + 3 & ~3`): replace with `vsnprintf` |
 | SN debug host I/O (excluded) | func_002A259C `HostIo_Call` (+ `HostIo_ReadWord/WriteWord`, compile but poke 0xA4xxxxxx) | stub returning failure |
 | dead fragments | func_002C22D8, func_002C232C, func_002C23E0 | nothing (dead copies) |
 

@@ -141,7 +141,8 @@ n4 329, n5 517, n6 280, n7 1,076 (485 of them `_2`), n8 497 (239 `_2`).
   old `func_` name also kept splat using that name; it is renamed too now.
 - **libultra pfs**: the plain names of seven pfs functions moved to the first
   module's originals (n8); the second module's are `_2`
-  (`__osPfsDeclearPage_2.c`, `osPfsChecker_2.c` renamed with them).
+  (`__osPfsDeclearPage_2.c`, `osPfsChecker_2.c` renamed with them; since round 22 those
+  copies are built from ultralib under the `_2` names, docs/LIBULTRA.md, and the files are gone).
 - **Module-2 calls by link address**: where the copies sit 0xE0 lower, the
   first module's name at a link address can be another function. `Str_Length`
   (0x00426D8C) is `Pak_BytesToPages_2` for module-2 callers, and 0x0042EB50

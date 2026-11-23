@@ -5,7 +5,7 @@
 #include "globals/libaudio.h"
 
 extern s32 __nextSampleTime(ALSynth *drvr, ALPlayer **client);
-extern s32 _timeToSamples(ALSynth *, s32);
+extern s32 _timeToSamplesNoRound(ALSynth *, s32);
 extern void _collectPVoices(ALSynth *);
 Acmd *alAudioFrame(Acmd *cmdList, s32 *cmdLen, s16 *outBuf, s32 outLen)
 {
@@ -25,7 +25,7 @@ Acmd *alAudioFrame(Acmd *cmdList, s32 *cmdLen, s16 *outBuf, s32 outLen)
          drvr->paramSamples - drvr->curSamples < outLen;
          drvr->paramSamples = __nextSampleTime(drvr, &client)) {
         drvr->paramSamples &= ~0xf;
-        client->samplesLeft += _timeToSamples(drvr, (*client->handler)(client));
+        client->samplesLeft += _timeToSamplesNoRound(drvr, (*client->handler)(client));
     }
     drvr->paramSamples &= ~0xf;
     while (outLen > 0) {

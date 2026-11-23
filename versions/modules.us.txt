@@ -2604,16 +2604,16 @@ module libultra/audio/synstopvoice.c: 0x00294650..0x002946CC, 1 functions; pad +
   0x00294650 alSynStopVoice
 
 module libultra/audio/synthesizer.c: 0x002946D0..0x00294D54, 9 functions; pad + ultralib
-  // name runs (possible objects the padding cannot show): alSynNew 1, alAudioFrame 1, __allocParam 1, __freeParam 1, _freePVoice 1, _collectPVoices 1, _timeToSamplesNoRound 1, __nextSampleTime 1, _timeToSamples 1
+  // name runs (possible objects the padding cannot show): alSynNew 1, alAudioFrame 1, __allocParam 1, __freeParam 1, _freePVoice 1, _collectPVoices 1, _timeToSamples 1, __nextSampleTime 1, _timeToSamplesNoRound 1
   0x002946D0 alSynNew
   0x002949A4 alAudioFrame
   0x00294B58 __allocParam
   0x00294B84 __freeParam
   0x00294B9C _freePVoice
   0x00294BDC _collectPVoices
-  0x00294C30 _timeToSamplesNoRound
+  0x00294C30 _timeToSamples
   0x00294C70 __nextSampleTime
-  0x00294D18 _timeToSamples
+  0x00294D18 _timeToSamplesNoRound
 
 module libultra/audio/auxbus.c: 0x00294D60..0x00294E6C, 2 functions; pad + ultralib
   // name runs (possible objects the padding cannot show): alAuxBusPull 1, alAuxBusParam 1
