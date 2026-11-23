@@ -267,7 +267,7 @@ typedef struct LevelScriptState {
     /* 0x014 */ f32 swayAmount;
     /* 0x018 */ s32 spawnStep;
     /* 0x01C */ s32 subStage;
-    /* 0x020 */ u8 pad020[0x24 - 0x20];
+    /* 0x020 */ f32 targetAngle;                     /* the last angle to the target (Primagen turns toward it) */
     /* 0x024 */ ScriptAnimator anims[8];
     /* 0x344 */ void *intel;                         /* CScene__FindIntelligence(world, 1, ...) */
     /* 0x348 */ s32 spawnsLeft;

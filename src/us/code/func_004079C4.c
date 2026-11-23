@@ -7,7 +7,6 @@
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 
 extern s32 D_800F1F50[];
-extern f32 D_8012F628;          /* last angle to the target */
 
 void Primagen_UpdateMode10(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
@@ -17,9 +16,9 @@ void Primagen_UpdateMode10(CGameObjectInstance *obj, CAI *ai) {
     D_800F1F50[0] &= ~0x8000;
     if (t.m_Sight.m_pTarget != NULL) {
         AI_TurnClamped(obj, ai, 0.261799425f, t.m_Sight.m_Angle);
-        D_8012F628 = t.m_Sight.m_Angle;
+        gLevelScript.targetAngle = t.m_Sight.m_Angle;
     } else {
-        AI_TurnClamped(obj, ai, 0.261799425f, D_8012F628);
+        AI_TurnClamped(obj, ai, 0.261799425f, gLevelScript.targetAngle);
     }
     if (ai->m_AnimRepeatedCount != 0) {
         obj->m_AI.m_AnimSpeed = 1.0f;

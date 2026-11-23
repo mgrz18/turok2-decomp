@@ -9,7 +9,6 @@ extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s
 extern void AI_StopSound(CGameObjectInstance *obj, CAI *ai);
 
 extern s32 D_800F1F50[];
-extern s32 D_8012F9A8[];
 
 void Primagen_UpdateMode2(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
@@ -31,7 +30,7 @@ void Primagen_UpdateMode2(CGameObjectInstance *obj, CAI *ai) {
         CAI__SetMode(obj, ai, 7);
     } else if (gLevelScript.partTimer <= 0.0f) {
         AI_StopSound(obj, ai);
-        gLevelScript.values[0][gLevelScript.part] = D_8012F9A8[gLevelScript.part];
+        gLevelScript.values[0][gLevelScript.part] = gLevelScript.values[1][gLevelScript.part];
         bit = 1 << gLevelScript.part;
         gLevelScript.partActive = 0;
         gLevelScript.partsDone |= bit;
