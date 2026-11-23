@@ -71,7 +71,7 @@ typedef struct SwooshInfo {
     /* 0x00 */ f32 unk0;
     /* 0x04 */ f32 fadeTime;            /* Swoosh_DetachOwner */
     /* 0x08 */ f32 nodeLife;            /* a new point's SwooshNode.life */
-    /* 0x0C */ s32 unkC;
+    /* 0x0C */ s32 bone;                 /* an object swoosh: the bone it follows (SwooshSystem_AddBonePoints) */
     /* 0x10 */ s16 sound;
     /* 0x12 */ u8 closed;
     /* 0x13 */ u8 unk13[0x16 - 0x13];
