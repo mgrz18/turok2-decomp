@@ -22,6 +22,27 @@ The matching build is unchanged: `tools/asm_diff.py --base 70f3333c -j 8` report
 over all 3,938 files after every merge and at the end, and a clean `make clean && make setup &&
 make -j8 build && make verify` gives the identical ROM (`build/turok2.us.z64: OK`).
 
+## Round 23 l1 (Phase 5, readable code, part 3): the files in their modules
+
+Every game C file moved (`git mv`, history follows) into its recovered module's directory:
+`src/us/code/<module>/`, `src/us/vm1/<module>/`, `src/us/vm2/<module>/` (docs/MODULES.md); the 88
+game files of ultralib-built modules that only the port compiles went to `src/port_libultra/`.
+`port/cmake/game.cmake` globs the four trees recursively and orders the list by file name, as the
+one-directory glob did (same archive order, same link order); `link.cmake`'s lists are by file
+name and unchanged. 14 small modules are one C file each (`tools/merge_module.py`; the N64 ROM
+byte-exact). `tools/port/gendata.py` now gathers the declarations in file-name order and keeps that
+order (`imap`): `pick()` breaks a tie between equally common declarations by order, and the new
+paths reordered `compile_commands.json`. One tie shows in `port/gen/relocs.c`: `D_8011AB98`
+(a 169-byte record in func_00417ACC.c, a 64-byte one in func_00417C0C.c) is sized 0xA9 now,
+0xC0 in the round-22 tree; everything else generated is identical.
+
+Linux Release: 3,797 C files (32 hostified), 3,057 linked, 752 compile-only, as round 22 (before
+the merges); `aligncheck.py` the 2 known `GameNoteMenu_SelectYes` sites; `mklayout.py --check` up
+to date (the layout changed only in `STT_FILE` paths and the merged objects' `gcc2_compiled.`
+markers). Boot + 3 demos det `6ab97584…` (52,000 lines) and the default whole-game run det
+`dc8126d3…` (600,000 lines, one `death:` at 263,578) on the moved tree; on the merged tree the
+demos `6ab97584…` and the whole game `dc8126d3…` again (the same `death:` line), with `relocs.c` as above. N64: a clean `make setup`, build and `make verify` OK; `tools/asm_diff.py --base bab902cd`: 0 differ over 3,759 files (the 14 merged files new to it).
+
 ## Round 22 (Phase 5, readable code, part 2): the merge
 
 Four branches merged, in this order: k1 (libultra from the pinned `decompals/ultralib` submodule:
@@ -73,9 +94,8 @@ were, with a comment):
 - `Rumble_SetLink` writes an `s32` at 0x38 of a `RumbleEffect`: the owner pointer on the N64,
   another place on the host.
 
-**Round 23**: move the game files into the recovered modules (`versions/modules.us.txt`,
-docs/MODULES.md); move the port's own copies of libultra's C (the 88 game files of
-ultralib-built modules that only the port links) out of `src/us/code`; the two bugs above.
+**Round 23**: the game files moved into the recovered modules and the port's own copies of
+libultra's C into `src/port_libultra/` (l1, above); the two bugs above (l2).
 
 ## Round 21 (Phase 5, readable code, part 1): the merge
 
