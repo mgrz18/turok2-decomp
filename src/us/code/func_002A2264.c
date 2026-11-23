@@ -10,8 +10,8 @@ extern void HostIo_WriteWord(u32 address, u32 value);
 extern void HostIo_Delay(u32 n);
 extern void HostIo_MemoryTransfer(u32 mode);
 extern void HostIo_CopyMailboxBlock(void);
-extern u32 func_002A31E4(void);
-extern void func_002A31F0(u32 sr);
+extern u32 HostIo_GetSR(void);
+extern void HostIo_SetSR(u32 sr);
 
 /* The debugger host's command loop: wait for commands in the mailbox at 0xB1FFFFF0 and run them
  * until told to continue. */
@@ -45,7 +45,7 @@ void HostIo_CommandLoop(void) {
                     D_801286D8 &= ~1;
                     sHostIoStopped = 0;
                     sHostIoResumeAllowed = 0;
-                    func_002A31F0(func_002A31E4() & ~1);
+                    HostIo_SetSR(HostIo_GetSR() & ~1);
                     break;
                 case 0x13:
                     sHostIoResumeAllowed = 0;

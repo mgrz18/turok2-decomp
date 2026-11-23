@@ -14,7 +14,7 @@ typedef struct SpawnObj {
 
 void GameObject_TraceMove(SpawnObj *obj, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
 CQuaternion CGameObjectInstance__GetRotation(SpawnObj *obj);
-CQuaternion func_002156D4(SpawnObj *obj);
+CQuaternion Actor_GetGroundRotation(SpawnObj *obj);
 s32 CGameObjectInstance__GetGeometryKind(SpawnObj *obj);
 
 #ifdef TARGET_PORT
@@ -50,7 +50,7 @@ void Actor_SpawnParticle(SpawnObj *obj, s32 kind, CVector3 at) {
         break;
     case 3:
         vel = ((CParticle *) obj)->m_vVelocity;
-        rot = func_002156D4(obj);
+        rot = Actor_GetGroundRotation(obj);
         break;
     }
     CParticleSystem__Spawn(&gScene.m_ParticleSystem, obj, obj, NULL, target, kind, vel, rot, pos, (void *) region, -1, mode);
@@ -86,7 +86,7 @@ void Actor_SpawnParticle(SpawnObj *obj, s32 kind, CVector3 at) {
         break;
     case 3:
         vel = obj->velocity;
-        rot = func_002156D4(obj);
+        rot = Actor_GetGroundRotation(obj);
         break;
     }
     CParticleSystem__Spawn(&gScene.m_ParticleSystem, obj, obj, NULL, target, kind, vel, rot, pos, region, -1, mode);

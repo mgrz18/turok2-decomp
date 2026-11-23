@@ -78,16 +78,16 @@ A name in the list that linked C defines is reported on stderr.
 | __osUnmapTLBAll | 68 | us/asm/9EEE0.s | asm | `unmaptlball.s`: `tlbwi` loop |
 | func_0029E340 | 104 | us/asm/9EF40.s | asm | `writebackdcache.s` `osWritebackDCache`: `cache` 0x19/0x01 |
 | func_0029E3B0 | 40 | us/asm/9EFB0.s | asm | `writebackdcacheall.s` `osWritebackDCacheAll`: `cache` 0x01 |
-| func_002A3088 | 120 | us/asm/A3C88.s | asm | exception-vector stubs (`mtc0` ErrorEPC, `jr $k0`) that func_002A3100 copies to 0x80000000/0x80000180 |
-| func_002A3100 | 172 | us/asm/A3C88.s | asm | swaps those stubs into the vectors; `addi $sp` |
-| func_002A31AC | 28 | us/asm/A3C88.s | asm | icache invalidate-all: `cache` 0x01 |
-| func_002A31C8 | 28 | us/asm/A3C88.s | asm | dcache invalidate-all: `cache` 0x00 |
-| func_002A31E4 | 12 | us/asm/A3C88.s | asm | `mfc0` SR |
-| func_002A31F0 | 12 | us/asm/A3C88.s | asm | `mtc0` SR |
-| func_002A31FC | 132 | us/asm/A3C88.s | asm | TLB dump to D_80128A90: `tlbr` loop, `addi $sp` |
-| func_002A3708 | 108 | us/asm/A3C88.s | asm | puts the vector stubs back, then the cache loops |
-| func_002A3774 | 88 | us/asm/A3C88.s | asm | exception return paths: `ld` through `$k0`, `mtc0` EPC, `eret` |
-| func_002A37CC | 776 | us/asm/A3C88.s | asm | context save: `sd` of every GPR and cop0 register through `$k0` |
+| HostIo_VectorStubs | 120 | us/asm/A3C88.s | asm | exception-vector stubs (`mtc0` ErrorEPC, `jr $k0`) that HostIo_InstallVectors copies to 0x80000000/0x80000180 |
+| HostIo_InstallVectors | 172 | us/asm/A3C88.s | asm | swaps those stubs into the vectors; `addi $sp` |
+| HostIo_InvalICacheAll | 28 | us/asm/A3C88.s | asm | icache invalidate-all: `cache` 0x01 |
+| HostIo_InvalDCacheAll | 28 | us/asm/A3C88.s | asm | dcache invalidate-all: `cache` 0x00 |
+| HostIo_GetSR | 12 | us/asm/A3C88.s | asm | `mfc0` SR |
+| HostIo_SetSR | 12 | us/asm/A3C88.s | asm | `mtc0` SR |
+| HostIo_ReadTlb | 132 | us/asm/A3C88.s | asm | TLB dump to D_80128A90: `tlbr` loop, `addi $sp` |
+| HostIo_RestoreVectors | 108 | us/asm/A3C88.s | asm | puts the vector stubs back, then the cache loops |
+| HostIo_ExceptionReturn | 88 | us/asm/A3C88.s | asm | exception return paths: `ld` through `$k0`, `mtc0` EPC, `eret` |
+| HostIo_SaveContext | 776 | us/asm/A3C88.s | asm | context save: `sd` of every GPR and cop0 register through `$k0` |
 | func_00425710 | 68 | us/asm/16F710.s | asm | `mtc0` WatchLo, `mfc0` WatchHi: the bytes of func_00201074 again |
 | func_002C22D8 | 84 | us/asm/C2ED8.s | fragment | func_002892D8 but for one `jal` (0x42AB2C where the live one has 0x42AC0C): a copy from an older link, dead |
 | func_002C23E0 | 148 | us/asm/C2FE0.s | fragment | func_002893D8 from +8 (`stray_002C23D8` holds its first 8 bytes); its `j` goes to 0x289428, inside func_002893D8; dead |
