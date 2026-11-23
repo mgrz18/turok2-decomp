@@ -29,7 +29,8 @@ Usage:
     -j N   parallel files (default 3)
 
 Re-runnable: after a merge, run it again with --write; it only touches pairs
-that are still redundant.
+that are still redundant. Run it until it reports 0: dropping a pair can make
+another one redundant (a declaration the next pair's host branch needs).
 """
 
 import argparse
@@ -118,10 +119,14 @@ def process(rel, syms, write, work):
                 continue
             tried += 1
             got = n64_asm(work, "\n".join(cand), rel, syms, tag + ".cand")
+            if got is None:
+                process.failed.append(rel)  # did not compile: not judged, left as is
+                continue
             if got == base:
                 lines = cand
                 accepted += 1
                 changed = True
+                process.rejected[rel] = set()   # earlier pairs may pass now
                 break                       # line numbers moved: rescan
             process.rejected[rel].add(key)
         if not changed:
@@ -132,6 +137,7 @@ def process(rel, syms, write, work):
 
 
 process.rejected = {}
+process.failed = []
 
 
 def main():
@@ -159,6 +165,8 @@ def main():
     finally:
         shutil.rmtree(work, ignore_errors=True)
     print(f"{len(files)} files: {total} N64 alternatives {'dropped' if args.write else 'redundant'}")
+    if process.failed:
+        print(f"{len(process.failed)} candidates did not compile (host-only names): left as they are")
     return 0
 
 
