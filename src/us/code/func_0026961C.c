@@ -2,23 +2,21 @@
 #include "structs/vector.h"
 #include "structs/game_object.h"
 #include "globals/collision.h"
+#include "structs/collision.h"
 
-typedef struct CollisionInfo {
-    /* 0x00 */ s32 flags;
-} CollisionInfo;
 
-extern CollisionInfo D_800F1B60;
-extern CollisionInfo D_800F1BE0;
+extern CCollisionInfo D_800F1B60;
+extern CCollisionInfo D_800F1BE0;
 
 s32 GameObject_CanClimbUp(CGameObjectInstance *actor);
 s32 GameObject_CanEnterWater(CGameObjectInstance *actor);
 s32 GameObject_CanLeaveWater(CGameObjectInstance *actor);
-s32 Collision_MoveInstance(CGameObjectInstance *actor, CVector3 pos, CollisionInfo *info);
+s32 Collision_MoveInstance(CGameObjectInstance *actor, CVector3 pos, CCollisionInfo *info);
 
 /* Tests moving an actor to pos with the collision settings that suit it, leaving it where it was; returns the collision result. */
-s32 GameObject_TestMove(CGameObjectInstance *actor, CVector3 pos, CollisionInfo **outInfo) {
+s32 GameObject_TestMove(CGameObjectInstance *actor, CVector3 pos, CCollisionInfo **outInfo) {
     CObjectHead saved;
-    CollisionInfo *info;
+    CCollisionInfo *info;
     s32 alt;
     s32 hit;
 
