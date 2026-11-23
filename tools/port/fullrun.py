@@ -679,6 +679,11 @@ N64_FULL_L2_HEALTH = {7: [(-2405.3, -4761.6, 5545.7, 0.0), (-2135.0, 204.8, 3506
 # (was 450). One run per distance on the 133/135 shredder stream: 266 damage and 2 lives at 450, 27 at 600, 61 at 700,
 # 97 at 900 (PLAYTHROUGH.md 42.1). T2I2_QF overrides (DEBUG-ONLY test hook)
 N64_QUEEN_FRONT = os.environ.get("T2I2_QF", "600,200")
+# Round 24 m3 (--stick-aim 5 on the N64 stream): 525. On the round-23 stream 450 cost the combination
+# `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair` a life at the Queen (211 damage);
+# one run each to 185,000: 350, 700, 900 still fighting her, 600 169 damage (lowest 8), 525 21 (lowest 156)
+# (PLAYTHROUGH.md 46). T2R24_SQF overrides (DEBUG-ONLY test hook)
+STICK_QUEEN_FRONT = os.environ.get("T2R24_SQF", "525,200")
 N64_QUEEN_WEAPON = os.environ.get("T2G1_QW", "16") or None   # the scorpion launcher: 6-95 damage, 43-138 (a life) with the shredder
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
 # Round 17 f1: pick steps put before a step of a segment (segment, before step, [(x, y, z, approach
@@ -1459,8 +1464,8 @@ def level5(r, t):
     r.anchors.append((s + L5_QUEEN_AT + add, 2))
     r.note(s + rel + add, "2 the Mantid Queen: fire held, T2_AIM_NODE=boss@2, T2_BOSS_FRONT=450,200")
     r.inputs.append("Z@%d..%d" % (s + rel + add, s + rel + add + length))
-    # (a --stick-aim 5 run keeps 450: one run each, 122 damage and no life at 450, 205 and a life at 600)
-    r.boss_front.append((s + rel + add - 100, N64_QUEEN_FRONT if n64_full() and 5 not in STICK_AIM else "450,200"))
+    # (a --stick-aim 5 run: 450 in round 20 (122 damage and no life at 450, 205 and a life at 600), 525 since round 24)
+    r.boss_front.append((s + rel + add - 100, N64_QUEEN_FRONT if n64_full() and 5 not in STICK_AIM else STICK_QUEEN_FRONT if n64_full() else "450,200"))
     hub_at = s + L5_HUB_AFTER + add
     r.level_start[6] = hub_at
     r.shake_switch[6] = hub_at
