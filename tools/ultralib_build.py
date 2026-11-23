@@ -75,12 +75,12 @@ def modules():
 
 
 def ulmap():
-    """vram -> (size, ultralib file, status)."""
+    """vram -> (size, ultralib file, status, the game's name)."""
     out = {}
     for line in MAP.read_text().splitlines():
         m = re.match(r"0x([0-9A-F]{8})\s+(\d+) (\S+) = (\S+?):(\S+); (.*)", line)
         if m:
-            out[int(m.group(1), 16)] = (int(m.group(2)), m.group(4), m.group(6))
+            out[int(m.group(1), 16)] = (int(m.group(2)), m.group(4), m.group(6), m.group(3))
     return out
 
 
@@ -144,13 +144,15 @@ def same(got, rom, relocs):
 class Yaml:
     def __init__(self):
         self.lines = YAML.read_text().splitlines(keepends=True)
-        self.text_at, self.ro_at, self.entries = {}, {}, []
+        self.text_at, self.ro_at, self.entries, self.c_named = {}, {}, [], {}
         for n, line in enumerate(self.lines):
             m = ENTRY.match(line)
             if not m:
                 continue
             self.entries.append(n)
             f = re.fullmatch(r"code/func_([0-9A-F]{8})", m.group(4) or "")
+            if m.group(3) == "c" and (m.group(4) or "").startswith("code/"):
+                self.c_named[m.group(4)[5:]] = n
             if f and m.group(3) == "c":
                 self.text_at[int(f.group(1), 16)] = n
             elif f and m.group(3) == ".rodata":
@@ -222,6 +224,9 @@ def plan():
         if not rel:
             report.append((name, f"functions from {len(files)} ultralib files"))
             continue
+        for v in funcs:          # a few game files carry the function's name, not its address
+            if v not in y.text_at and um[v][3] in y.c_named:
+                y.text_at[v] = y.c_named[um[v][3]]
         if any(v not in y.text_at for v in funcs):
             report.append((name, "a function is not a `c, code/func_` subsegment"))
             continue
@@ -247,7 +252,7 @@ def plan():
             report.append((name, f"has {', '.join(f'{k} {len(secs[k][0]):#x}' for k in extra)}"))
             continue
         between = [y.lines[i] for i in range(t0, t1 + 1) if ENTRY.match(y.lines[i])]
-        if any(", c, code/func_" not in b for b in between):
+        if any(", c, code/" not in b for b in between):
             report.append((name, "something other than its own functions between them in the yaml"))
             continue
         ro, rrel, align = secs.get(".rodata", (b"", {}, 4))

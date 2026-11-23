@@ -4673,7 +4673,7 @@ segments:
       - [0x171E60, c, ../../lib/ultralib/src/io/pfsfreeblocks]
       - [0x171F78, hasm, ../src/us/asm/stray_00427F78]
       - [0x171F80, c, ../../lib/ultralib/src/io/pfsgetstatus]
-      - [0x172160, c, code/osPfsInitPak]
+      - [0x172160, c, ../../lib/ultralib/src/io/pfsinitpak]
       - [0x172330, c, ../../lib/ultralib/src/io/pfschecker]
       - [0x172A18, hasm, ../src/us/asm/stray_00428A18]
       - [0x172A20, c, ../../lib/ultralib/src/io/pfsisplug]

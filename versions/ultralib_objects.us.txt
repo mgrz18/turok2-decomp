@@ -99,6 +99,7 @@ libultra/io/pfsdeletefile.c = src/io/pfsdeletefile.c: func_00427780.c func_00427
 libultra/io/pfsfilestate.c = src/io/pfsfilestate.c: func_00427C20.c
 libultra/io/pfsfreeblocks.c = src/io/pfsfreeblocks.c: func_00427E60.c
 libultra/io/pfsgetstatus.c = src/io/pfsgetstatus.c: func_00427F80.c func_00428058.c func_004280E4.c
+libultra/io/pfsinitpak.c = src/io/pfsinitpak.c: func_00428160.c
 libultra/io/pfschecker.c = src/io/pfschecker.c: func_00428330.c func_0042876C.c func_004288B8.c
 libultra/io/pfsisplug.c = src/io/pfsisplug.c: func_00428A20.c func_00428B9C.c func_00428C38.c
 libultra/io/pfsreadwritefile.c = src/io/pfsreadwritefile.c: func_00428CF0.c
