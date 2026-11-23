@@ -7,7 +7,7 @@
 #include "globals/rumble.h"
 
 extern void RumblePool_FreeFinished(RumblePool *pool);
-extern u32 osMotorStop(struct Triple *);
+u32 osMotorStop(void *pfs);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define Rumble_GetLevelAt Rumble_GetLevelAt_i3
 #endif

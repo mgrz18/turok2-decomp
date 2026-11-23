@@ -8,8 +8,8 @@
 
 extern s32 osMotorInit(void *queue, void *pfs, s32 channel);
 extern void Controller_ReadAll(void);
-extern void RumblePool_Init(void *, void *, s32);
-extern void osMotorStop(void *);
+s32 RumblePool_Init(void *dst, void *src, s32 n);
+u32 osMotorStop(void *pfs);
 
 static __inline__ void ResetPadMotor(ControllerProfile *pad) {
     osRecvMesg(&gPakAccessQueue, NULL, 1);

@@ -5,7 +5,7 @@
 #include "structs/controller.h"
 
 extern void Controller_UpdateConnection(ControllerProfile *arg0);
-extern s32 RumblePool_Init(void *arg0, void *arg1, s32 arg2);
+s32 RumblePool_Init(void *dst, void *src, s32 n);
 void Controller_UpdateConnection(ControllerProfile *arg0) {
     ControllerProfile *c = arg0;
     s32 type;
