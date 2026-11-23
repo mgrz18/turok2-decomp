@@ -53,7 +53,7 @@ typedef struct CAIModeInfo {
     /* 0x00 */ sptr m_Mode;     /* the header row (the first) holds the next table here */
     /* 0x04 */ sptr unk_04;     /* the enter function (WeaponMode_Switch_Enter, Door_OpenEnter...) or 0 */
     /* 0x08 */ s32 (*m_pfCallback)();
-    /* 0x0C */ void *m_pData;   /* D_800F1C20 in the enemy table */
+    /* 0x0C */ void *m_pData;   /* gCollisionInfoEnemy in the enemy table */
     /* 0x10 */ sptr unk_10;     /* the animation: an id, or a function that picks it (Platform_GetModeAnim) */
     /* 0x14 */ f32 m_AnimSpeed;   /* copied to CAI::m_AnimModeSpeed */
     /* 0x18 */ s32 unk_18;

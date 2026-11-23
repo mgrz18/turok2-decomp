@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/collision.h"
 
 /* An effect's parameters, passed by value. */
 typedef struct {
@@ -12,7 +13,6 @@ extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s
 extern void ImpactEvent_Send(CGameObjectInstance *src, CGameObjectInstance *dst, s32 effect, s32 id,
                           CVector3 pos, EffectParams params);
 
-extern s32 D_800F1F50[];
 extern s32 gLevelScript_values[]; /* local type: values[0] as one row; the real s32 [2][8] (or the member path) changes the ROM code here. [0]: parts left (mode 1), [2]: parts left (mode 2, was D_8012F990) */
 
 void Primagen_HandleAnimEvent(s32 arg0, CGameObjectInstance *obj, s32 arg2, CVector3 pos, s32 event) {
@@ -20,9 +20,9 @@ void Primagen_HandleAnimEvent(s32 arg0, CGameObjectInstance *obj, s32 arg2, CVec
     EffectParams params;
     f32 size = 10.0f; /* set before the calls: the ROM multiplies by 256 at run time */
 
-    D_800F1F50[0] |= 0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags |= 0x8000;
     AI_UpdateTargets(obj, &obj->m_AI, &t, 1, 1);
-    D_800F1F50[0] &= ~0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags &= ~0x8000;
     if (t.m_Sight.m_pTarget == NULL) {
         return;
     }

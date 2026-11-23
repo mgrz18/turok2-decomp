@@ -207,6 +207,23 @@ gCollisionResults_m_vVelocity = 0x800F1DB8; // + 0xD8, the mover's velocity (CPa
 gThrowableCollisionInfo_m_InstanceBehavior = 0x800F1F94; // CCollisionInfo at 0x800F1F90 + 4: the Throwable_* updates set 0 / 2
 gThrowableCollisionInfo_m_GravityAcceleration = 0x800F1F98; // + 8, the gravity Throwable_FlyingEnter divides by
 
+// ---- The other CCollisionInfo globals (round 24 m2; were D_): gCollisionSetupTable
+// (src/us/asm/data_0042D50C.s) fills them; each is its own 0x20-byte slot, not an interior of
+// the named info before it. Values in the comments: flags, instance/wall/ground behaviour, gravity.
+gCollisionInfoTestMoveClimb = 0x800F1B60; // GameObject_TestMove, an actor that cannot enter water but can climb up (GameObject_CanClimbUp); 0x000B0C00, 0/1/0
+gCollisionInfoParticle = 0x800F1BA0; // the template CParticle__ copies into each new particle effect's collision response (func_0022D2FC); 0x5E0F7F08, 1/3/3, gravity -4941.9
+gCollisionInfoTestMoveLand = 0x800F1BE0; // GameObject_TestMove, an actor that cannot enter water (and the player with flags 0x300000); GameObject_CanDropDown toggles its flags 0x40000/0x30000; 0x1E080C00, 0/1/0
+gCollisionInfoEnemy = 0x800F1C20; // the enemy mode tables' m_pData (structs/game_object.h); 0x0040CC0B, 5/6/2, gravity -2304
+gCollisionInfoEnemyB = 0x800F1C40; // the same values as gCollisionInfoEnemy; the Primagen modes set and clear its flags 0x300 (Primagen_UpdateMode6...)
+gCollisionInfoNoInstances = 0x800F1C60; // 0x1E230F40, 0/2/0: Collision_TestInstances and Collision_MoveInstance never test instances with it
+gCollisionInfoTrace = 0x800F1CC0; // GameObject_TraceMove and GameObject_DropPickupAt set its instance/ground behaviour around Collision_MoveInstance; 0x1E0F3F10, 0/1/0
+gCollisionInfoPlatformRider = 0x800F1E10; // AI_RideMovingPlatform moves the rider with it; Platform_Collide and Collision_MoveInstance skip it; 0x1E5F7329, 5/2/2
+gCollisionInfoNoGravity = 0x800F1E30; // CPlayer__Update in state 14 moving backwards (velX < 0); 0x1E5E4329, 5/2/2, no gravity
+gCollisionInfoModeDefault = 0x800F1EB0; // CGameObjectInstance__MoveWithCollision when the current mode has no m_pData; 0x1E5F7F08, 2/2/0
+gCollisionInfoPooledActor = 0x800F1EF0; // CPooledLevelActor__Update; 0x1E4F7F09, 0/3/3, gravity -1536
+gCollisionInfoGravity = 0x800F1F10; // CPlayer__Update in state 14 moving forwards; MotherBoss_Init clears its flags 0x300; 0x1E5EC329, 5/2/2, gravity -2304
+gCollisionInfoFlyingEnemy = 0x800F1F50; // the Primagen's (and flying enemies') modes: 0x00424C0A, 5/2/2, no gravity; the Primagen sets/clears flags 0x300, 0x8000 around AI_UpdateTargets
+
 // ---- Player cinemas (0x800F1FD0-0x800F1FEF) ----
 sDeathCinemaPlayer = 0x800F1FD0; // CPlayer *, set by CPlayer__StartDeathCinema, read by PlayerDeath_CinemaDone
 sCinema50Player = 0x800F1FD8; // CPlayer *, set by PlayerCinema50_Enter, read by PlayerCinema50_Done

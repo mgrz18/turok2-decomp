@@ -5,6 +5,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "protos/ai.h"
+#include "globals/collision.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern f32 AI_AngleToPoint(CGameObjectInstance *obj, CVector3 point);       /* angle to a point */
@@ -14,7 +15,6 @@ extern f32 Math_StepClamped(f32 value, f32 target, f32 rate);
 extern f32 func_002982F0(f32 angle);                                      /* sin */
 extern f32 func_002974C0(f32 angle);                                      /* cos */
 
-extern s32 D_800F1F50[];
 extern s32 gLevelScript_script_current[]; /* local type: the field's real type (or the member path) changes the ROM's code here */        /* boss script index */
 
 void Primagen_UpdateMode27(CGameObjectInstance *obj, CAI *ai) {
@@ -30,9 +30,9 @@ void Primagen_UpdateMode27(CGameObjectInstance *obj, CAI *ai) {
         gLevelScript_script_current[0] = -1;
         CAI__SetMode(obj, ai, 0x13);
     }
-    D_800F1F50[0] |= 0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags |= 0x8000;
     AI_UpdateTargets(obj, ai, &t, 1, 1);
-    D_800F1F50[0] &= ~0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags &= ~0x8000;
     if (t.m_Sight.m_pTarget == NULL) {
         return;
     }

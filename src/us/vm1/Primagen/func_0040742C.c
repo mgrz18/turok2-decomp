@@ -3,11 +3,10 @@
 #include "protos/ai.h"
 
 
-extern s32 D_800F1C40[];
-extern s32 D_800F1F50[];
 
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "globals/collision.h"
 /* host body (round 10 y2): gLevelScript by member. The view anchored at found[1] reached bossMode
  * at the N64 delta +0x64; on the host found[] holds 8-byte pointers and bossMode sits further on:
  * `mode = 8` hit another word, bossMode stayed 1 and the Primagen idled in mode 18 for good (its
@@ -17,8 +16,8 @@ void Primagen_UpdateMode6(sptr arg0, CAI *ai) {
         CAI__SetMode(gLevelScript.found[1], &gLevelScript.found[1]->m_AI, 1);
         CAI__SetMode(gLevelScript.found[0], &gLevelScript.found[0]->m_AI, 1);
         gLevelScript.bossMode = 8;
-        D_800F1C40[0] |= 0x300;
-        D_800F1F50[0] |= 0x300;
+        gCollisionInfoEnemyB.m_dwFlags |= 0x300;
+        gCollisionInfoFlyingEnemy.m_dwFlags |= 0x300;
         CAI__SetMode(arg0, ai, 0x12);
     }
 }

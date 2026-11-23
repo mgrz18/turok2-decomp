@@ -1400,7 +1400,6 @@ typedef struct Effect {
 
 
 
-extern Render D_800F1BA0;
 #ifdef TARGET_PORT
 /* the Effect view's spans over runs of CParticle scalars: contiguous on the host too */
 _Static_assert(__builtin_offsetof(CParticle, m_vGrowth) == __builtin_offsetof(CParticle, m_vSize) + 12, "m_vSize/m_vGrowth");
@@ -1925,7 +1924,7 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
                 effect->rgb1[1] = g1;
                 effect->rgb1[2] = b1;
                 render = &effect->render;
-                *render = D_800F1BA0;
+                *render = *(Render *) &gCollisionInfoParticle;
                 render->unk5 = entry->unkA;
                 render->unk4 = entry->unk9;
                 render->unk6 = entry->unkB;

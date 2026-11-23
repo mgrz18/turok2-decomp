@@ -6,6 +6,7 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "protos/ai.h"
+#include "globals/collision.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern f32 AI_AngleToPoint(CGameObjectInstance *obj, CVector3 point);       /* angle to a point */
@@ -18,7 +19,6 @@ extern f32 func_002974C0(f32 angle);                                      /* cos
 extern f32 Random_Blend(f32 lo, f32 hi);
 extern s32 Primagen_RunAttackStep_2(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
-extern s32 D_800F1F50[];
 typedef struct {
     /* 0x00 */ s32 unk0;   /* 0x8012F9D4 */
     /* 0x04 */ s32 state;  /* 0x8012F9D8 */
@@ -37,10 +37,10 @@ void Primagen_UpdateMode19_2(CGameObjectInstance *obj, CAI *ai) {
     f32 heading;
     BossCtl *ctl = (BossCtl *) &gLevelScript_unk3CC;  /* unk3CC on */
 
-    D_800F1F50[0] |= 0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags |= 0x8000;
     AI_UpdateTargets(obj, ai, &t, 0, 1);
     ctl->unk0 = 3;
-    D_800F1F50[0] &= ~0x8000;
+    gCollisionInfoFlyingEnemy.m_dwFlags &= ~0x8000;
     do {
         target = t.m_Sight.m_pTarget;
         angle = 0.0f;

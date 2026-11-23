@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/collision.h"
 
 typedef f32 Mtx4[4][4];
 
@@ -7,7 +8,6 @@ typedef struct Dest {
     u32 flags;         /* 0x00 */
 } Dest;
 
-extern char D_800F1E10[];
 
 CGameObjectInstance *GameObject_GetPlatformBelow(CGameObjectInstance *actor);
 void GameObject_GetFrameDelta(CGameObjectInstance *mover, CVector3 *move);
@@ -49,7 +49,7 @@ void AI_RideMovingPlatform(CGameObjectInstance *actor, Dest *dst) {
             CVector3__Subtract(&delta, &delta, &pos);
             actor->m_RotY += turn;
             CVector3__Add(&pos, &pos, &delta);
-            Collision_MoveInstance(actor, pos, D_800F1E10);
+            Collision_MoveInstance(actor, pos, &gCollisionInfoPlatformRider);
             actor->m_vVelocity = vel;
             if (mover->header.m_Type == 1 && mover->header.m_pIntelligence->m_Type == 2) {
                 Platform_IdleEnter(mover, actor);

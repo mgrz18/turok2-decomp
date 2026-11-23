@@ -3,11 +3,10 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "protos/ai.h"
+#include "globals/collision.h"
 
 extern f32 func_00298470(f32 x);                                          /* sqrt */
 
-extern s32 D_800F1C40[];
-extern s32 D_800F1F50[];
 
 void Primagen_UpdateMode23(CGameObjectInstance *obj, CAI *ai) {
     CVector3 flat;
@@ -25,8 +24,8 @@ void Primagen_UpdateMode23(CGameObjectInstance *obj, CAI *ai) {
     flat.y = 0.0f;
     flat.z = obj->header.m_vPos.z;
     if (func_00298470(flat.x * flat.x + flat.z * flat.z) < 1638.3999f) {
-        D_800F1C40[0] &= ~0x300;
-        D_800F1F50[0] &= ~0x300;
+        gCollisionInfoEnemyB.m_dwFlags &= ~0x300;
+        gCollisionInfoFlyingEnemy.m_dwFlags &= ~0x300;
     }
     if (!gLevelScript.partActive) {
         CAI__SetMode(obj, ai, 7);
