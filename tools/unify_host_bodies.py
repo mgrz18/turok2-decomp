@@ -119,8 +119,10 @@ def process(rel, syms, write, work):
                 continue
             tried += 1
             got = n64_asm(work, "\n".join(cand), rel, syms, tag + ".cand")
-            if got is None:
-                process.failed.append(rel)  # did not compile: not judged, left as is
+            if got is None:                 # did not compile: not judged, left as is
+                process.rejected[rel].add(key)
+                if (rel, key) not in process.failed:
+                    process.failed.append((rel, key))
                 continue
             if got == base:
                 lines = cand
