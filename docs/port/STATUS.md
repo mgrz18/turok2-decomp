@@ -29,7 +29,7 @@ max difference 0 and `--adec` OK, the swoosh self-test OK. abicheck 0 harmful, p
 outptr 0 BAD, f2ucheck unchanged; n64viewcheck raw/BAD 11 -> 10, raw/untyped 103 -> 99,
 view/local 183 -> 182 (l2's fixes), the rest the same. The combinations (PLAYTHROUGH.md 45):
 `--lair-push both` END 2, 0 lives (`6e0821fa…`); `--real-weapons 1 --stick-aim 1,2,3,4,5,6
---hub-wait 0 --assist-keep lair` END 2 but **1 life** in level 2 (`575f069e…`); `--legacy` END 2,
+--hub-wait 0 --assist-keep lair` END 2 but **1 life** in level 2 (`575f069e…`; round 24 m3: 0 lives again, `cadfe170…`); `--legacy` END 2,
 2 lives, `ac08c89b…` as in round 20.
 
 Phase 5 (README) is complete except three items where work is still possible: the repeated local
