@@ -650,11 +650,15 @@ def main():
             if obj in mod2 or not (undef_by.get(obj, set()) & want):
                 continue
             jobs.append((d['file'], d['command']))
+        # In file-name order, and the results kept in that order: pick() takes the first of
+        # equally common declarations, so the order decides (round 23: the files moved into
+        # module directories, which reordered compile_commands.json and flipped a tie).
+        jobs.sort(key=lambda j: (os.path.basename(j[0]), j[0]))
         decls = collections.defaultdict(list)
         types = {}
         decls['__types__'] = types
         with multiprocessing.Pool(a.j, _init_worker, (a.libclang, want, a.host_target)) as pool:
-            for res in pool.imap_unordered(_worker, jobs, chunksize=4):
+            for res in pool.imap(_worker, jobs, chunksize=4):
                 if '__error__' in res:
                     print('warning:', res.pop('__error__'), file=sys.stderr)
                 for k, v in res.pop('__types__', {}).items():
