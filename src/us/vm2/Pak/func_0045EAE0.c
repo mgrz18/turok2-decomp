@@ -4,7 +4,7 @@
 #include "globals/pak.h"
 
 
-extern void Controller_Lock(s32);
+extern s32 Controller_Lock(s32 flag);
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 extern void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */

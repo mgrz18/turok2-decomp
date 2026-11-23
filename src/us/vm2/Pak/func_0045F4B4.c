@@ -1,7 +1,6 @@
 #include "common.h"
-
-extern s32 gPakState; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
+#include "globals/pak.h"
 
 s32 Pak_IsRumblePak_2(s32 arg0) {
-    return *(((__typeof__(&gPakState))((s8 *)&gPakState + (arg0 * 4)))) == 2;
+    return *(s32 *) ((s8 *) gPakState + arg0 * 4) == 2; /* gPakState[arg0], indexed by bytes as the ROM does */
 }

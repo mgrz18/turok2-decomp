@@ -7,9 +7,9 @@
 #include "globals/controller.h"
 #include "structs/controller.h"
 
-extern s32 Controller_Lock(s32 arg0);
+extern s32 Controller_Lock(s32 flag);
 extern void Controller_ReadAll(void);
-extern s32 osMotorInit(u8 *a0, OSPfs *a1, s32 a2);
+s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);
 extern s32 Pak_Mount_2(s32 a0);
 extern void Controller_Unlock(void);
 void Pak_ProbeSlot_2(s32 kind)

@@ -2,13 +2,13 @@
 #include "structs/pak.h"
 #include "globals/pak.h"
 
-s32 CCache__Deallocate(sptr, sptr);                /* extern */
-s32 CCache__Flush(s32);                     /* extern */
+extern void CCache__Flush(s32);
+extern void CCache__Deallocate(sptr, void **);
 
 void Pak_FreeDirectory_2(void) {
     CCache__Flush(0);
     if (gPakStateBuffer != 0) {
-        CCache__Deallocate(0, gPakStateBuffer);
+        CCache__Deallocate(0, (void **) gPakStateBuffer);
         gPakStateBuffer = 0;
         gPakDirectories = 0;
     }

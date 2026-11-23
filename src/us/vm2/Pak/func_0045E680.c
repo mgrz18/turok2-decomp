@@ -7,7 +7,8 @@ extern s32 osPfsFileState_2(OSPfs *pfs, s32 file_no, OSPfsState *state); /* osPf
 extern s32 osPfsFreeBlocks_2(OSPfs *pfs, s32 *bytes);                  /* osPfsFreeBlocks */
 
 /* Re-reads the directory of the pak on channel ch into the cache. */
-void Pak_RefreshNotes_2(s32 ch) {
+/* Returns the last osPfsFreeBlocks_2 result (the callers test it), as vm1's Pak_RefreshNotes. */
+s32 Pak_RefreshNotes_2(s32 ch) {
     s32 i;
     s32 ret;
     s32 bytes;
@@ -30,5 +31,5 @@ void Pak_RefreshNotes_2(s32 ch) {
             }
         }
     }
-    osPfsFreeBlocks_2(&gPakFileSystems[ch], &bytes);
+    return osPfsFreeBlocks_2(&gPakFileSystems[ch], &bytes);
 }

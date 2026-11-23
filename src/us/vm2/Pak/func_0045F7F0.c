@@ -5,7 +5,7 @@
 #include "structs/pak.h"
 #include "globals/pak.h"
 
-extern s32 Controller_Lock(s32 arg0);
+extern s32 Controller_Lock(s32 flag);
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 void Controller_ReadAll();
