@@ -45,8 +45,16 @@ def index():
 
 
 def find(stem):
-    """The Path of the file named stem (func_0027ECF0, func_0027ECF0.c or a path), or None."""
-    return index().get(Path(stem).name.removesuffix(".c"))
+    """The Path of the file named stem (func_0027ECF0, func_0027ECF0.c or a path), or None. A
+    function of a merged module (one <Module>.c in its directory, tools/merge_module.py) is found
+    in that file."""
+    stem = Path(stem).name.removesuffix(".c")
+    p = index().get(stem)
+    if p is None:
+        d = module_dirs().get(stem)
+        if d is not None and (d / f"{d.name}.c").exists():
+            p = d / f"{d.name}.c"
+    return p
 
 
 def rel(stem):
