@@ -39,6 +39,12 @@ TWIN = re.compile(
     r"#define T2_HOFF_\2\(m\) __builtin_offsetof\((\w+), m\)\n.*?\} \2;\n)"
     r"#else\n(typedef (?:struct|union)\b[^{]*\{.*?\} \2;\n)#endif\n", re.S)
 FIELD = re.compile(r"struct \{ u8 _hp_\w+\[T2_HOFF_\w+\((.+?)\)\]; [^;]*?\**\s*(\w+)\s*(?:\[[^\]]*\])?; \};")
+FIELD_FN = re.compile(r"struct \{ u8 _hp_\w+\[T2_HOFF_\w+\((.+?)\)\]; [^;(]*\(\*\s*(\w+)\)\([^;]*\); \};")
+
+
+def fields(text):
+    """(path, field) of a twin's members, function pointers too."""
+    return FIELD.findall(text) + FIELD_FN.findall(text)
 
 
 def headers():
@@ -111,7 +117,7 @@ def convert(src, only, hdrs):
         view, real = m.group(2), m.group(3)
         if only and view not in only:
             continue
-        fmap = {f: path for path, f in FIELD.findall(m.group(1))}
+        fmap = {f: path for path, f in fields(m.group(1))}
         if real not in hdrs:
             continue
         done.append((m, view, real, fmap))
@@ -145,7 +151,7 @@ def main():
     if a.twin_from:
         other = subprocess.run(["git", "-C", str(ROOT), "show", f"{a.base}:{a.twin_from}"],
                                capture_output=True, text=True, check=True).stdout
-        twins = {m.group(2): (m.group(3), {f: path for path, f in FIELD.findall(m.group(1))})
+        twins = {m.group(2): (m.group(3), {f: path for path, f in fields(m.group(1))})
                  for m in TWIN.finditer(other)}
     for f in a.files:
         p = Path(f)
