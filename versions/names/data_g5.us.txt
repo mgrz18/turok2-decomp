@@ -358,3 +358,5 @@ gScene_m_WarpState = 0x80110028; // +0x18FB0, nonzero during a warp fade (CPlaye
 //   PlayerState17_Enter), D_800C2044, D_800C894C (stack-limit address), D_800E6790-D_800E6798,
 //   D_800F1BA0, D_800F5618, D_800F6CA8, D_800F1FF0/D_800F1FF4 (crash screen), the other
 //   CCollisionInfo globals 0x800F1B60-0x800F1F50 (D_800F1C40 / D_800F1F50 used by the Primagen).
+//   Round 24 (m2): the CCollisionInfo globals are named above (gCollisionInfo*), D_800F1CC6, D_800F5A18/A34,
+//   D_800F677A/B, D_8010C080/D_8010F328 and D_800F70A8 are members now (docs/NAMES.md, round 24 part m2).
