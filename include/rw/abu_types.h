@@ -526,6 +526,12 @@ typedef struct RenderSortRecord {
     s32 index;
     f32 depth;
 } RenderSortRecord;
+/* The records the collision sorts swap (Collision_SortSwap: ModelHit, Collision_SwapInstanceHits:
+ * InstanceHit): a pointer and its key, 16 bytes on the host (RenderSortRecord is 8 there). */
+typedef struct HitSortRecord {
+    void *p;
+    f32 key;
+} HitSortRecord;
 struct RangeNode;
 typedef struct RangeNode RangeNode;
 struct RangeNode {
