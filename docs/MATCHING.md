@@ -825,7 +825,7 @@ used inside it (GCC weights references by loop depth) and stops cse from
 following a jump past it, so the bulk matching and the permuter used these
 blocks the way the FAKEMATCH files use pins. `tools/undowhile.py <files>`
 tries each one outside a macro as a plain block and keeps it when every
-function of the file still matches: 15 of 83 went (68 stay, 5 of them in FAKEMATCH files). About 60 are left in 50
+function of the file still matches: 15 of 83 went (68 stay, 9 of them in FAKEMATCH files). About 60 are left in 50
 files that are not marked FAKEMATCH (libgcc's longlong.h macros aside); some
 are probably the original's macros (round 21 said so of func_0021D39C.c's), the
 rest are the same kind of trick as a pin. They are not counted in the 52 below.
