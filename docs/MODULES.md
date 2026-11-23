@@ -185,12 +185,60 @@ its other functions.
 | the files' `cc1-flags` differ | 4 | two files per module, or the flags proven equal |
 | a merged file of the same name exists (`code/CEngineApp` / `vm1/CEngineApp`, `vm1/Demo` / `code/Demo`) | 2 | `--name`; both are refused for `.rodata` order anyway |
 
+## Round 25, part n1: the header-work directories
+
+Of the 30 directories `merge_check.py` stopped at the compiler ("declarations differ, local types
+differ"), 17 are merged (one C file each; `make verify` OK, `asm_diff` 0): `code/{CEmitter,
+CISet,Cinema,Controller,Destructible,EnemyHover,EnemySwim,Render,Rumble,Sound,SpeechPlayer,
+Texture,Throwable}`, `code/libultra/{io/controller,audio/drvrnew}`, `vm1/StatsMenu`,
+`vm2/StatsMenu`. **75 modules are one C file; 58 directories left.** What it took, by kind:
+
+- *Field symbols read as arrays.* Where every user's code is the same with the array view, the
+  header now declares the array and the scalar users read `[0]`: `__osContNumControllers[]`
+  (globals/libultra.h), `gEngineApp_m_Settings_match_tag[]` / `_unk1C8[]` (globals/game.h),
+  `gThrowableCollisionInfo_m_InstanceBehavior[]` (globals/collision.h). Where it is not (the
+  array view changes `SavedPlayers_Arm`: GCC 2 then keeps the address in a register for two
+  reads), the header keeps both views behind a switch: `gScene_m_LevelID` / `gScene_m_nLevel`
+  are arrays under `SCENE_LEVEL_ARRAYS` (globals/scene.h), which the Cinema module's own header
+  `cinema_scene.h` defines. A struct member read (`gScene.m_LevelID`) or `(&x)[0]` does not give
+  Cinema_Start's code (tried: GCC bases the loads on gScene, or reloads after the stores).
+- *Host-dependent return types.* `Controller_IsPakWatched` now returns s32 (the u8 flag,
+  zero-extended by its `lbu`): one prototype for both targets, N64 code unchanged (a u8
+  prototype adds an `andi` at each N64 caller; before this, the merged Controller.c had it
+  implicitly declared). `EnemyAI_GetBehaviorIndex` cannot: its definition's s8 makes GCC
+  sign-extend at the callers, so `include/protos/enemy.h` keeps `#ifdef TARGET_PORT` s8 / s32
+  in the one header.
+- *Triple vs CVector3 by value*: the callers pass the CVector3 member of their unions
+  (`pos.v`), the same 12 bytes (Destructible).
+- *Prototype families.* New headers: `protos/enemy.h` (AI_UpdateTargets,
+  AI_ComputeFrameMotion, AI_LerpByAggression, AI_IsAimedAt, EnemyAI_GetBehaviorIndex: void *
+  for the actor/AI/output so every caller's view fits), `protos/mtxf.h` (CMtxF__SetRotateY,
+  CMtxF__TransformPoint); fixed: `protos/ai.h` CAI__CallHurt takes its three arguments,
+  `protos/iset.h` CUSet__GetTotalSize / CUSet__Transpose on struct tags, `rw/abu_protos.h`
+  Controller_IsPakWatched. Pointer-only differences are free on the N64; an s16 parameter, a
+  narrower return or a float argument are not, and were kept as the definition has them.
+- *An extra argument*: `Model_BlendMorphFrames` takes the third argument its one caller passes
+  (unused).
+- *The port*: a merged file goes through clang too, which rejects what GCC 2.8 lets pass
+  (a later declaration that disagrees with the definition in pointer types: Throwable.c,
+  Rumble's block-scope externs); `merge_check.py` does not see those. The functions the port
+  replaces are under `#ifndef TARGET_PORT` (osContInit, Sound__Initialize, Sound__IsPlaying,
+  six SpeechPlayer functions, alSaveNew) and left `port/cmake/link.cmake`.
+
+Left of the 30: 13, each in the table with what stops it. The pattern is the same everywhere
+(one prototype per function, in a header where the family is shared), but the remaining ones
+are the big imported Rage Wars files with their own basic typedefs and struct views
+(`code/{EnemyAI,GameObject,SndQueue,libultra/audio/cseq}`), the CCache / CScene prototype
+families (`code/{CCache,CGameRegion}`, `vm1/BlindOne`), and two that need a structural change
+first (`Generator`'s host rename macro, `__scHandleRSP`'s sched.h views). None needs a ROM
+change; they need more time.
+
 ### The dry-run table (round 24; merged rows updated after the merges)
 
 | Directory | Files | Result of the dry run (round 24), or merged |
 |---|---|---|
-| `code/libultra/audio/cseq` | 12 | declarations differ (1: `__readVarLen`); local types differ (4: `DecodeResult`, `RuntimeState`, `sptr`, `uptr`) |
-| `code/libultra/audio/drvrnew` | 8 | declarations differ (3: `FuncPtr`, `alFilterNew`, `alHeapDBAlloc`) |
+| `code/libultra/audio/cseq` | 12 | declarations differ (1: `__readVarLen`); local types differ (4: `DecodeResult`, `RuntimeState`, `sptr`, `uptr`). Round 25 n1: 6 conflicts: the Rage Wars files spell out their own s32/sptr typedefs and RuntimeState/DecodeResult views of structs/libaudio.h's ALCSeq/ALEvent; one rewrite onto ALCSeq |
+| `code/libultra/audio/drvrnew` | 8 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `FuncPtr`, `alFilterNew`, `alHeapDBAlloc`)) |
 | `code/libultra/audio/env` | 7 | **merged** (round 24, first batch) |
 | `code/libultra/audio/resample` | 2 | **merged** (round 24, first batch) |
 | `code/libultra/audio/reverb` | 8 | **merged** (round 24, first batch) |
@@ -200,7 +248,7 @@ its other functions.
 | `code/libultra/audio/synthesizer` | 9 | .rodata not in .text order (1 inverted pairs of 3 subsegments) |
 | `code/libultra/gu/lookat` | 2 | the files do not share their cc1 flags |
 | `code/libultra/gu/perspective` | 2 | the files do not share their cc1 flags |
-| `code/libultra/io/controller` | 3 | declarations differ (2: `__osContBuffer`, `__osContNumControllers`) |
+| `code/libultra/io/controller` | 3 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (2: `__osContBuffer`, `__osContNumControllers`)) |
 | `code/libultra/io/piacs` | 3 | **merged** (round 24, first batch) |
 | `code/libultra/io/siacs` | 3 | **merged** (round 24, first batch) |
 | `code/libultra/io/sptask` | 3 | **merged** (round 24, after unifying its declarations; was: declarations differ (2: `__osSpSetStatus`, `osSpTaskStartGo`)) |
@@ -213,60 +261,60 @@ its other functions.
 | `code/BinaryRange` | 13 | **merged** (round 24, first batch) |
 | `code/Boot` | 4 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `gSavedPlayers`)) |
 | `code/CAudioWorld` | 101 | .rodata interrupted by data no C file owns (3: `unnamed@0xA8C94`) |
-| `code/CCache` | 56 | calls typed differently (2: `CCache__AllocateInternal`, `CCache__WaitForDisplayLists`); declarations differ (18: `CCache__DeallocateInternal`, `CCache__DetachCacheEntry`, `CCache__FreeCacheEntry`, `CCache__FreeMemEntry`, ...); local types differ (3: `B12Bucket`, `B12Mgr`, `B12Node`); other (1: `request for member `m_pHead' in something not a structure or`) |
+| `code/CCache` | 56 | calls typed differently (2: `CCache__AllocateInternal`, `CCache__WaitForDisplayLists`); declarations differ (18: `CCache__DeallocateInternal`, `CCache__DetachCacheEntry`, `CCache__FreeCacheEntry`, `CCache__FreeMemEntry`, ...); local types differ (3: `B12Bucket`, `B12Mgr`, `B12Node`); other (1: `request for member `m_pHead' in something not a structure or`). Round 25 n1: 35+ conflicts: its own B12Node/B12Bucket/B12Mgr views against structs/cache.h, osSendMesg, CHeap__Alloc/Free; the cache manager's real struct first (part n4's D_800D7BE0 work) |
 | `code/CCamera` | 66 | .rodata interleaved with another directory's (2 subsegments between, e.g. `func_0042F9B0`) |
 | `code/CCollisionSetup` | 3 | **merged** (round 24, first batch) |
-| `code/CEmitter` | 10 | declarations differ (4: `CList__AddHead`, `CList__Remove`, `Emitter_CompareHeightAsc`, `Sortable`) |
+| `code/CEmitter` | 10 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (4: `CList__AddHead`, `CList__Remove`, `Emitter_CompareHeightAsc`, `Sortable`)) |
 | `code/CEngineApp` | 90 | .rodata interrupted by data no C file owns (1: `unnamed@0xAA9FC`) |
 | `code/CGameObjectInstance` | 64 | .rodata interrupted by data no C file owns (2: `unnamed@0xA66C4`) |
-| `code/CGameRegion` | 53 | calls typed differently (1: `incompatible types in initialization`); declarations differ (24: `CGameRegion__FloodClearFlag4`, `CGameRegion__FloodSetFlag4`, `CGameRegion__FloodSetHeight`, `CGameRegion__GetCeilingHeight`, ...); local types differ (2: `CollisionBuildVertex`, `Node75`); parse errors (6: `&`, `.`, `if`, `return`, ...); other (4: `initializer element is not constant`, `request for member `x' in something not a structure or union`, `request for member `y' in something not a structure or union`, `request for member `z' in something not a structure or union`) |
-| `code/CISet` | 14 | declarations differ (3: `CUSet__GetTotalSize`, `CUSet__Transpose`, `osCreateMesgQueue`); local types differ (2: `CMutex`, `OffsetTable`) |
+| `code/CGameRegion` | 53 | calls typed differently (1: `incompatible types in initialization`); declarations differ (24: `CGameRegion__FloodClearFlag4`, `CGameRegion__FloodSetFlag4`, `CGameRegion__FloodSetHeight`, `CGameRegion__GetCeilingHeight`, ...); local types differ (2: `CollisionBuildVertex`, `Node75`); parse errors (6: `&`, `.`, `if`, `return`, ...); other (4: `initializer element is not constant`, `request for member `x' in something not a structure or union`, `request for member `y' in something not a structure or union`, `request for member `z' in something not a structure or union`). Round 25 n1: 47+ conflicts: CISet__GetBlock and the CScene__ prototype family against protos/scene.h (pointer types and host returns) |
+| `code/CISet` | 14 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `CUSet__GetTotalSize`, `CUSet__Transpose`, `osCreateMesgQueue`); local types differ (2: `CMutex`, `OffsetTable`)) |
 | `code/CInstancePool` | 18 | .rodata interrupted by data no C file owns (1: `unnamed@0xA6C6C`) |
 | `code/CLevelActor` | 9 | .rodata not in .text order (2 inverted pairs of 5 subsegments) |
 | `code/CMtxF` | 124 | .rodata interrupted by data no C file owns (3: `unnamed@0xA6004`) |
 | `code/CParticle` | 212 | .rodata interrupted by data no C file owns (8: `unnamed@0xA7004`) |
 | `code/CPlayer` | 245 | .rodata interleaved with another directory's (7 subsegments between, e.g. `func_0042DA60`) |
 | `code/CScene` | 96 | .rodata interleaved with another directory's (7 subsegments between, e.g. `func_0042AA80`) |
-| `code/Cinema` | 34 | declarations differ (5: `Sound__StopAllExcept`, `gScene`, `gScene_m_LevelID`, `gScene_m_WarpSpawn`, ...) |
+| `code/Cinema` | 34 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (5: `Sound__StopAllExcept`, `gScene`, `gScene_m_LevelID`, `gScene_m_WarpSpawn`, ...)) |
 | `code/Color` | 3 | **merged** (round 24, first batch) |
-| `code/Controller` | 37 | declarations differ (3: `Controller_IsPakWatched`, `RumblePool_Init`, `osMotorStop`) |
+| `code/Controller` | 37 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `Controller_IsPakWatched`, `RumblePool_Init`, `osMotorStop`)) |
 | `code/Crash` | 16 | .rodata interrupted by data no C file owns (1: `unnamed@0xAACEC`) |
 | `code/DLights` | 6 | **merged** (round 24, after unifying its declarations; was: local types differ (1: `ListNode`)) |
 | `code/Demo` | 3 | **merged** (round 24, first batch) |
-| `code/Destructible` | 15 | declarations differ (3: `AI_DropPickupsOnce`, `Actor_SpawnParticle`, `Sound__Play`) |
+| `code/Destructible` | 15 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `AI_DropPickupsOnce`, `Actor_SpawnParticle`, `Sound__Play`)) |
 | `code/Door` | 16 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `ImpactEvent_Call`); local types differ (1: `ResourceManagerState`)) |
-| `code/EnemyAI` | 119 | own basic typedefs (3: `s32`, `s8`, `u16`); calls typed differently (1: `EnemyAI_CheckOffscreen`); declarations differ (50: `AI_AngleToPoint`, `AI_IsAimedAt`, `AI_StopSound`, `AI_TurnClamped`, ...); local types differ (1: `Motion`); parse errors (1: `*`) |
+| `code/EnemyAI` | 119 | own basic typedefs (3: `s32`, `s8`, `u16`); calls typed differently (1: `EnemyAI_CheckOffscreen`); declarations differ (50: `AI_AngleToPoint`, `AI_IsAimedAt`, `AI_StopSound`, `AI_TurnClamped`, ...); local types differ (1: `Motion`); parse errors (1: `*`). Round 25 n1: 69+ conflicts: own basic typedefs, the AI helper family (now protos/enemy.h: the callers here still declare their own), CGameObjectInstance__PickRandomAnim, gEngineApp_m_Settings_multiplayer, EnemyAI_GetBehaviorIndex's definition (s8) against its N64 callers (s32) |
 | `code/EnemyAnim` | 76 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `WeightedTable_Clear`)) |
-| `code/EnemyHover` | 9 | declarations differ (6: `AI_IsAimedAt`, `AI_LerpByAggression`, `AI_UpdateTargets`, `CMtxF__SetRotateY`, ...) |
-| `code/EnemySwim` | 19 | declarations differ (5: `AI_ComputeFrameMotion`, `AI_UpdateTargets`, `CAI__CallHurt`, `CAI__SetMode`, ...) |
-| `code/GameObject` | 62 | own basic typedefs (3: `s32`, `u32`, `u8`); calls typed differently (2: `GameObject_GetGroundHeight`, `GameObject_TraceMove`); declarations differ (5: `CGameRegion__GetHeight`, `CScene__GetObjectTypeID`, `CVector3__Normalize`, `GameObject_GetFrameDelta`, ...); local types differ (2: `CGameRegion`, `Triple`); parse errors (1: `}`); other (1: `structure has no member named `m_pVertices'`) |
+| `code/EnemyHover` | 9 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (6: `AI_IsAimedAt`, `AI_LerpByAggression`, `AI_UpdateTargets`, `CMtxF__SetRotateY`, ...)) |
+| `code/EnemySwim` | 19 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (5: `AI_ComputeFrameMotion`, `AI_UpdateTargets`, `CAI__CallHurt`, `CAI__SetMode`, ...)) |
+| `code/GameObject` | 62 | own basic typedefs (3: `s32`, `u32`, `u8`); calls typed differently (2: `GameObject_GetGroundHeight`, `GameObject_TraceMove`); declarations differ (5: `CGameRegion__GetHeight`, `CScene__GetObjectTypeID`, `CVector3__Normalize`, `GameObject_GetFrameDelta`, ...); local types differ (2: `CGameRegion`, `Triple`); parse errors (1: `}`); other (1: `structure has no member named `m_pVertices'`). Round 25 n1: 16+ conflicts: own basic typedefs (imported Rage Wars files), CVector3__Normalize, GameObject_TraceMove / GetGroundHeight called with different argument lists |
 | `code/GameObjectMove` | 6 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `Collision_MoveInstance`)) |
-| `code/Generator` | 16 | declarations differ (5: `Actor_SpawnParticle`, `CInstancePool__Spawn`, `CLevelActorPool__Spawn`, `CScene__GetIntelligence`, ...); local types differ (1: `B01Info`) |
+| `code/Generator` | 16 | declarations differ (5: `Actor_SpawnParticle`, `CInstancePool__Spawn`, `CLevelActorPool__Spawn`, `CScene__GetIntelligence`, ...); local types differ (1: `B01Info`). Round 25 n1: 7 conflicts: CLevelActorPool__Spawn is renamed by a host macro in one file (#define .._i, the merged file would rename every call), CInstancePool__Spawn Triple vs CVector3, B01Info two views (a CAI view: wants a CGeneratorAIVars) |
 | `code/HostIo` | 34 | the files do not share their cc1 flags |
-| `code/Hud` | 48 | declarations differ (5: `Draw`, `ModeState`, `gEngineApp_m_OnScreen_m_FontXScale`, `gEngineApp_m_OnScreen_m_ShadowXOff`, ...); local types differ (2: `Chunk`, `FontStyle`); parse errors (12: `(Each undeclared identifier is reported `, `*`, `FrameEntry`, `byte`, ...); other (1: `for each function it appears in.)`) |
+| `code/Hud` | 48 | declarations differ (5: `Draw`, `ModeState`, `gEngineApp_m_OnScreen_m_FontXScale`, `gEngineApp_m_OnScreen_m_ShadowXOff`, ...); local types differ (2: `Chunk`, `FontStyle`); parse errors (12: `(Each undeclared identifier is reported `, `*`, `FrameEntry`, `byte`, ...); other (1: `for each function it appears in.)`). Round 25 n1: 21+ conflicts: gEngineApp_m_OnScreen_m_* field symbols read as arrays, `Draw`/`ModeState` names used as both type and function |
 | `code/InteractiveAnim` | 15 | **merged** (round 24, after unifying its declarations; was: declarations differ (3: `AI_PlayAnim`, `CGameObjectInstance__AdvanceAnimation`, `CGameObjectInstance__SetAnimByAction`)) |
 | `code/LevelEvent` | 31 | .rodata interrupted by data no C file owns (1: `unnamed@0xA8C3C`) |
 | `code/LoopSounds` | 10 | **merged** (round 24, after unifying its declarations; was: declarations differ (3: `CList__AddTail`, `CList__Remove`, `Sound__Stop`)) |
 | `code/Platform` | 27 | **merged** (round 24, after unifying its declarations; was: declarations differ (2: `Platform_Step`, `StateInfo`)) |
-| `code/Render` | 28 | calls typed differently (1: `Model_BlendMorphFrames`); declarations differ (2: `CCache__LockForDisplayList`, `CCache__Unlock`); local types differ (2: `Material`, `Vtx`) |
-| `code/Rumble` | 10 | declarations differ (3: `RumbleCurve_Advance`, `__osDisableInt`, `__osRestoreInt`); local types differ (1: `Clip`) |
+| `code/Render` | 28 | **merged** (round 25 n1, after unifying its declarations; was: calls typed differently (1: `Model_BlendMorphFrames`); declarations differ (2: `CCache__LockForDisplayList`, `CCache__Unlock`); local types differ (2: `Material`, `Vtx`)) |
+| `code/Rumble` | 10 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `RumbleCurve_Advance`, `__osDisableInt`, `__osRestoreInt`); local types differ (1: `Clip`)) |
 | `code/RumbleCurve` | 3 | **merged** (round 24, first batch) |
 | `code/SavedPlayers` | 8 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `gSavedPlayers`)) |
-| `code/SndQueue` | 12 | own basic typedefs (2: `s32`, `u8`); declarations differ (1: `SndVoice_Construct`); local types differ (5: `ChannelSet`, `Header`, `ListHead`, `ListLink`, ...) |
-| `code/SndSeq` | 12 | declarations differ (8: `BinarySearch`, `HalfToFloat`, `alCSPSetBank`, `alCSPSetChlFXMix`, ...); local types differ (2: `ContextRecAt2BB8`, `IntPair`) |
+| `code/SndQueue` | 12 | own basic typedefs (2: `s32`, `u8`); declarations differ (1: `SndVoice_Construct`); local types differ (5: `ChannelSet`, `Header`, `ListHead`, `ListLink`, ...). Round 25 n1: 13+ conflicts: imported Rage Wars files with their own s32/u8 typedefs and ListHead/ListLink/Header/ChannelSet views of structs/sound.h |
+| `code/SndSeq` | 12 | declarations differ (8: `BinarySearch`, `HalfToFloat`, `alCSPSetBank`, `alCSPSetChlFXMix`, ...); local types differ (2: `ContextRecAt2BB8`, `IntPair`). Round 25 n1: 11+ conflicts: the alCSP* prototypes (s8/s16 arguments that change the caller's code, s32 vs void returns), IntPair/ContextRecAt2BB8 views |
 | `code/Sort` | 2 | **merged** (round 24, first batch) |
-| `code/Sound` | 31 | declarations differ (2: `CAudioWorld__SetForce2D`, `gEngineApp_m_Settings_unk1C8`) |
-| `code/SpeechPlayer` | 7 | declarations differ (5: `CAudioWorld__GetSndPlayer`, `CAudioWorld__Lock`, `CAudioWorld__Unlock`, `alSndpSetSound`, ...) |
+| `code/Sound` | 31 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (2: `CAudioWorld__SetForce2D`, `gEngineApp_m_Settings_unk1C8`)) |
+| `code/SpeechPlayer` | 7 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (5: `CAudioWorld__GetSndPlayer`, `CAudioWorld__Lock`, `CAudioWorld__Unlock`, `alSndpSetSound`, ...)) |
 | `code/Sweep` | 6 | **merged** (round 24, after unifying its declarations; was: local types differ (1: `HitInst`)) |
-| `code/Texture` | 8 | declarations differ (3: `CISet__GetBlock`, `CISet__GetBlockAndSize`, `Pair`) |
-| `code/Throwable` | 13 | declarations differ (3: `CAI__CallHurt`, `OwnedState`, `gThrowableCollisionInfo_m_InstanceBehavior`) |
+| `code/Texture` | 8 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `CISet__GetBlock`, `CISet__GetBlockAndSize`, `Pair`)) |
+| `code/Throwable` | 13 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `CAI__CallHurt`, `OwnedState`, `gThrowableCollisionInfo_m_InstanceBehavior`)) |
 | `code/Turret` | 15 | **merged** (round 24, after unifying its declarations; was: calls typed differently (1: `Turret_EventShow`); declarations differ (1: `Turret_Effects`)) |
 | `code/VM` | 20 | .rodata not in .text order (1 inverted pairs of 2 subsegments) |
-| `code/WeaponMode` | 49 | declarations differ (13: `Anim`, `Bone`, `CAI__SetMode`, `CCameraPool__AddText`, ...) |
-| `code/__scHandleRSP` | 17 | declarations differ (2: `Sched`, `__scHandleRetrace`); local types differ (1: `Stream`); parse errors (7: `(Each undeclared identifier is reported `, `*`, `Qn`, `Stream`, ...); other (1: `for each function it appears in.)`) |
+| `code/WeaponMode` | 49 | declarations differ (13: `Anim`, `Bone`, `CAI__SetMode`, `CCameraPool__AddText`, ...). Round 25 n1: 21+ conflicts: Anim/Bone views, Sound__Play, CAI__SetMode, the CPlayer__ weapon family |
+| `code/__scHandleRSP` | 17 | declarations differ (2: `Sched`, `__scHandleRetrace`); local types differ (1: `Stream`); parse errors (7: `(Each undeclared identifier is reported `, `*`, `Qn`, `Stream`, ...); other (1: `for each function it appears in.)`). Round 25 n1: 19+ conflicts: Sched/ScTask/Client views of sched.h's OSSched/OSScTask/OSScClient (parse errors once they meet), __scHandleRetrace |
 | `code/adecHuffDecode` | 18 | the files do not share their cc1 flags |
 | `code/alAdpcmPull` | 5 | **merged** (round 24, first batch) |
-| `vm1/BlindOne` | 70 | declarations differ (26: `AI_UpdateTargets`, `Animator_Update`, `CCache__Allocate`, `CCache__AllocateMemoryForDecompression`, ...); parse errors (1: `DrawInfo`) |
+| `vm1/BlindOne` | 70 | declarations differ (26: `AI_UpdateTargets`, `Animator_Update`, `CCache__Allocate`, `CCache__AllocateMemoryForDecompression`, ...); parse errors (1: `DrawInfo`). Round 25 n1: 28+ conflicts: the CCache__ family (protos/cache.h), gScene_m_LevelID, DrawInfo |
 | `vm1/CEngineApp` | 4 | **merged** (round 24, first batch) |
 | `vm1/COnScreen` | 3 | **merged** (round 24, first batch) |
 | `vm1/CPlayer` | 13 | .rodata interleaved with another directory's (39 subsegments between, e.g. `func_00248340`) |
@@ -276,7 +324,7 @@ its other functions.
 | `vm1/Demo` | 28 | .rodata interleaved with another directory's (6 subsegments between, e.g. `func_0027C074`) |
 | `vm1/GameOverMenu` | 3 | **merged** (round 24, first batch) |
 | `vm1/MissionMenu` | 14 | .rodata interrupted by data no C file owns (1: `unnamed@0xC2368`) |
-| `vm1/MotherBoss` | 65 | declarations differ (6: `AI_UpdateTargets`, `Actor_SpawnParticle`, `CAI__CallHurt`, `CLevelActorPool__Spawn`, ...) |
+| `vm1/MotherBoss` | 65 | declarations differ (6: `AI_UpdateTargets`, `Actor_SpawnParticle`, `CAI__CallHurt`, `CLevelActorPool__Spawn`, ...). Round 25 n1: 10 conflicts: AI_UpdateTargets and friends (protos/enemy.h now exists), CLevelActorPool__Spawn, Actor_SpawnParticle (3 vs 4 arguments), WeightedTable_PickStatic |
 | `vm1/MpMenu` | 110 | .rodata interrupted by data no C file owns (3: `unnamed@0xC1A78`) |
 | `vm1/NameEntryMenu` | 8 | .rodata interrupted by data no C file owns (1: `unnamed@0xC1F4C`) |
 | `vm1/OptionsMenu` | 31 | .rodata not in .text order (2 inverted pairs of 4 subsegments) |
@@ -285,7 +333,7 @@ its other functions.
 | `vm1/Primagen` | 115 | .rodata interrupted by data no C file owns (2: `unnamed@0xC0F14`) |
 | `vm1/SceneActorPool` | 2 | **merged** (round 24, first batch) |
 | `vm1/SceneLoad` | 24 | .rodata interleaved with another directory's (15 subsegments between, e.g. `func_00220530`) |
-| `vm1/StatsMenu` | 15 | declarations differ (1: `gEngineApp_m_Settings_match_tag`) |
+| `vm1/StatsMenu` | 15 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (1: `gEngineApp_m_Settings_match_tag`)) |
 | `vm1/TotemDefense` | 18 | .rodata not in .text order (8 inverted pairs of 9 subsegments) |
 | `vm2/BlindOne` | 60 | its .text subsegments are not adjacent |
 | `vm2/CEngineApp` | 4 | **merged** (round 24, first batch) |
@@ -306,7 +354,7 @@ its other functions.
 | `vm2/Primagen` | 35 | its .text subsegments are not adjacent |
 | `vm2/SceneActorPool` | 2 | **merged** (round 24, first batch) |
 | `vm2/SceneLoad` | 19 | its .text subsegments are not adjacent |
-| `vm2/StatsMenu` | 15 | declarations differ (2: `CPlayerPool__GetIndex`, `gEngineApp_m_Settings_match_tag`); local types differ (1: `FieldRecAt14`) |
+| `vm2/StatsMenu` | 15 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (2: `CPlayerPool__GetIndex`, `gEngineApp_m_Settings_match_tag`); local types differ (1: `FieldRecAt14`)) |
 | `vm2/TotemDefense` | 7 | its .text subsegments are not adjacent |
 
 ## Evidence
