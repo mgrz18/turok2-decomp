@@ -7,8 +7,8 @@
 extern unsigned long gT2BitStreamBase;
 #endif
 
-extern int func_00218248(BitFieldSource *arg0, int arg1);
-int func_00218248(BitFieldSource *arg0, int arg1) {
+extern int Bits_GetField(BitFieldSource *arg0, int arg1);
+int Bits_GetField(BitFieldSource *arg0, int arg1) {
     int bitAddress;
     int shift;
     int *word;

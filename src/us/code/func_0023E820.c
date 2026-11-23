@@ -87,7 +87,7 @@ static __inline__ CPickupRow18 *FindRowC(s32 id) {
     return NULL;
 }
 
-/* func_0023EFCC */
+/* Pickup_FindLifeForceEntry */
 static __inline__ CPickupRow14 *FindRowD(s32 id) {
     s32 i;
     CPickupRow14 *p = sLifeForcePickups;

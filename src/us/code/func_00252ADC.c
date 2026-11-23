@@ -10,7 +10,7 @@
 
 extern s32 Cinema_PathPlaying(void);
 extern void LoopSounds_Stop(void *mgr, void *sound);
-extern void func_0021F1B4(CGameObjectInstance *obj);
+extern void CGameObjectInstance__UpdateAI(CGameObjectInstance *obj);
 extern void CGameObjectInstance__UpdateAnimation(CGameObjectInstance *obj);
 
 /* Whether the player's camera has a menu open. */
@@ -51,7 +51,7 @@ void CPlayerPool__AnimateWeapons(CPlayerPool *list) {
                 p->m_WeaponActor.m_dwFlags |= 0x200;
                 weapon->m_dwHotPointFlags = 16;
                 weapon->m_dwFlags &= ~0x20000;
-                func_0021F1B4(weapon);
+                CGameObjectInstance__UpdateAI(weapon);
                 CGameObjectInstance__UpdateAnimation(weapon);
                 gFrameIncrement = frameTime;
                 if (old != p->m_CharAnim) {

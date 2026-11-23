@@ -2,7 +2,7 @@
 #include "structs/light.h"
 #include "structs/boss.h"
 
-void func_00236390(ScriptAnimator *arg0) {
+void ScriptAnimator_AddToBlend(ScriptAnimator *arg0) {
     f32 *temp_v0;
 
     if (arg0->alpha != 0.0f) {

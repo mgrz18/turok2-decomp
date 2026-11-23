@@ -12,7 +12,7 @@
  * animation for the current mode if the definition allows it. State 1 counts
  * the cool-down and re-picks a region. */
 
-extern s16 func_002261A8(void *level, s32 id, CVector3 *pos);
+extern s16 CScene__FindNearestPathPoint(void *level, s32 id, CVector3 *pos);
 
 static __inline__ s32 canAttack(CAI *ai, CEnemyIntelligence *info, s32 state) {
     if (state == 0x20 || state == 0x3D) {
@@ -61,7 +61,7 @@ void EnemyAI_AttackWait(CGameObjectInstance *actor, CAI *ai) {
             ai->m_ActionTime = 0.0f;
             ai->m_Action = 0;
             if (ai->m_PathTrack.m_Mode) {
-                ai->m_PathTrack.m_nCurrentPointIndex = func_002261A8(&gScene, ai->m_PathTrack.m_nCurrentPathIndex, &actor->header.m_vPos);
+                ai->m_PathTrack.m_nCurrentPointIndex = CScene__FindNearestPathPoint(&gScene, ai->m_PathTrack.m_nCurrentPathIndex, &actor->header.m_vPos);
             }
         }
         break;

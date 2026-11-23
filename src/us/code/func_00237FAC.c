@@ -13,7 +13,7 @@ extern void CGameRegion__FloodSetFlag4(void *arg0);
  * function and of GameObject_TraceMove arrived in the wrong register. */
 extern void GameObject_TraceMove(void *arg0, CVector3 input, CVector3 *output, void **region,
                                  s32 unused0, s32 unused1);
-void func_00237FAC(void *arg0, CVector3 input, s32 arg4) {
+void ImpactEvent_FloodRegionFlag4(void *arg0, CVector3 input, s32 arg4) {
     CVector3 output;
     void *region;
 
@@ -27,7 +27,7 @@ void func_00237FAC(void *arg0, CVector3 input, s32 arg4) {
 #else
 extern void GameObject_TraceMove(void *arg0, Triple input, Triple *output,
                           s32 *value, s32 unused0, s32 unused1);
-void func_00237FAC(void *arg0, Triple input, s32 arg4) {
+void ImpactEvent_FloodRegionFlag4(void *arg0, Triple input, s32 arg4) {
     Triple output;
     sptr value;
     GameObject_TraceMove(arg0, input, &output, &value, 0, 0);

@@ -16,7 +16,7 @@ typedef double f64;
 #include "structs/game_object.h"
 #define T2_HOST_FLAGS_OFFSET __builtin_offsetof(CGameObjectInstance, m_dwFlags)
 #endif
-s32 func_00268BE0(void *arg0)
+s32 GameObject_HasFlag1(void *arg0)
 {
   u8 *new_var;
   int new_var2;

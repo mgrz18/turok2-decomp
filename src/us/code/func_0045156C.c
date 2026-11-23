@@ -4,7 +4,7 @@
 
 s32 Menu_StepValue_2(s32, s32, s32, s32, s32, s32);
 
-s32 func_0045156C(s32 arg0, s32 arg1) {
+s32 FragTagMenu_StepLevel_2(s32 arg0, s32 arg1) {
     GameSettings *var_s0;
 
     var_s0 = &gEngineApp_m_Settings;

@@ -8,6 +8,6 @@ typedef struct CKeyEvent {
 
 s32 Sound__SetAmbientTrack(u16);                         /* extern */
 
-void func_0026E46C(CKeyEvent *arg0) {
+void Event_SetAmbientRemote(CKeyEvent *arg0) {
     Sound__SetAmbientTrack(arg0->param);
 }

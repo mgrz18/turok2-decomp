@@ -2,7 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "structs/game_object.h"
-s32 func_002681BC(CGameObjectInstance *a) {
+s32 GameObject_IsMover(CGameObjectInstance *a) {
     CAIModeInfo *p;
     if (a->header.m_Type != 1) {
         return 0;

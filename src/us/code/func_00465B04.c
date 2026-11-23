@@ -3,9 +3,9 @@
 #include "structs/world.h"
 
 /* The second VM module's copy of CScene__DecompressIntelligence, from the same source file as
- * func_002261A8.c: the engine's func_002261A8 and the VM's CScene__DecompressIntelligence.
+ * func_002261A8.c: the engine's CScene__FindNearestPathPoint and the VM's CScene__DecompressIntelligence.
  * Its code reads the first module's pool (versions/shared_rodata.us.txt):
- * func_002261A8's -1.0f at 0x800A6010, then this function's 1.0f and its jump
+ * CScene__FindNearestPathPoint's -1.0f at 0x800A6010, then this function's 1.0f and its jump
  * table at 0x800A6018, so the file's .rodata has to start with that -1.0f
  * for the table to land 8-aligned where the ROM has it. The engine half is
  * compiled into .text_engine, which no output section names: the linker
@@ -13,9 +13,9 @@
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, u8 *b);
 void *CISet__GetBlock();
-static s32 func_002261A8(CScene *lv, s32 unused, CVector3 *pt) __attribute__((section(".text_engine")));
+static s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) __attribute__((section(".text_engine")));
 
-static s32 func_002261A8(CScene *lv, s32 unused, CVector3 *pt) {
+static s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) {
     CVector3 d;
     f32 bestIdx = -1.0f;
     f32 bestD = 0.0f;

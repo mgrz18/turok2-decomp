@@ -151,7 +151,7 @@ void CAnimationState__FindKeys(AnimChannel *channel, KeyLookup *keys);
 void CAnimationState__Release(AnimChannel *channel);
 s32 CAnimationState__IsLoaded(AnimChannel *channel);
 void CGameObjectInstance__PoseBone(AnimObject *obj, PoseContext *ctx, s32, f32 mtx[4][4]);
-void func_002360A0(void *effects, AnimObject *obj, void *bones);
+void SwooshSystem_AddBonePoints(void *effects, AnimObject *obj, void *bones);
 void GameObject_EmitHotPoints(void *list, s32 count, void *bones, AnimObject *obj, void *anims);
 
 /* OS_CYCLES_TO_USEC */
@@ -317,7 +317,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2
                 }
             }
             if (obj->hasEffects) {
-                func_002360A0(gEngineApp_m_SwooshSystem, obj, bones);
+                SwooshSystem_AddBonePoints(gEngineApp_m_SwooshSystem, obj, bones);
             }
             if (ctx.blend) {
                 CAnimationState__Release(blendChannel);

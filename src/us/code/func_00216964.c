@@ -17,7 +17,7 @@ extern f32 D_800ACB50; /* 90.0f: the largest value accepted */
     }
 
 /* ceil(a / b * 30), or ceil(a / b * 15) if that is too big, or a itself. */
-f32 func_00216964(f32 a, f32 b) {
+f32 Anim_CalcKeyCount(f32 a, f32 b) {
     f32 r = 0.0f;
 
     if (a == 1.0f) {

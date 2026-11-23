@@ -6,19 +6,19 @@
 #include "protos/scene.h"
 
 
-s32 func_00267EA8(CGameObjectInstance *obj);
-s32 func_00267EE8(CGameObjectInstance *obj);
-s32 func_00267F10(CGameObjectInstance *obj);
+s32 GameObject_CanClimbLedges(CGameObjectInstance *obj);
+s32 GameObject_CanClimbUp(CGameObjectInstance *obj);
+s32 GameObject_CanDropDown(CGameObjectInstance *obj);
 s32 GameObject_CanEnterWater(CGameObjectInstance *obj);
 s32 GameObject_CanLeaveWater(CGameObjectInstance *obj);
-s32 func_00267FD0(CGameObjectInstance *obj);
-s32 func_00268014(CGameObjectInstance *obj);
-s32 func_0026803C(CGameObjectInstance *obj);
-s32 func_00268080(CGameObjectInstance *obj);
-s32 func_002680A8(CGameObjectInstance *obj);
-s32 func_002680D0(CGameObjectInstance *obj);
-s32 func_002680F8(CGameObjectInstance *obj);
-s32 func_00268120(CGameObjectInstance *obj);
+s32 GameObject_CanEnterInfoFlag52_80(CGameObjectInstance *obj);
+s32 GameObject_CanLeaveInfoFlag52_80(CGameObjectInstance *obj);
+s32 GameObject_CanEnterInfoFlag400000(CGameObjectInstance *obj);
+s32 GameObject_CanLeaveInfoFlag400000(CGameObjectInstance *obj);
+s32 GameObject_CanEnterRegionFlag1000(CGameObjectInstance *obj);
+s32 GameObject_CanLeaveRegionFlag1000(CGameObjectInstance *obj);
+s32 GameObject_CanEnterRegionFlag80(CGameObjectInstance *obj);
+s32 GameObject_CanLeaveRegionFlag80(CGameObjectInstance *obj);
 s32 CGameRegion__IsSteep(CGameRegion *region);
 s32 CGameRegion__ContainsXZ(CGameRegion *region, f32 x, f32 z);
 CGameRegion *CGameRegion__FindBelow(CGameRegion *region, CVector3 pos);
@@ -79,7 +79,7 @@ CGameRegion *Sweep_CrossRegionEdge(Sweep *sweep, CGameRegion *from, s32 edge, CV
         }
         if (!found) {
             canSwim = 0;
-            if ((def->m_dwFlags & 0x20000) || func_00267F10(obj)) {
+            if ((def->m_dwFlags & 0x20000) || GameObject_CanDropDown(obj)) {
                 canSwim = 1;
             }
             if (!canSwim) {
@@ -101,10 +101,10 @@ CGameRegion *Sweep_CrossRegionEdge(Sweep *sweep, CGameRegion *from, s32 edge, CV
     if (!(def->m_dwFlags & 0x10) && (REGION_WORD(to) & 6) == 2) {
         return NULL;
     }
-    if (!(to->m_wFlags & 0x1000) && (from->m_wFlags & 0x1000) && !(def->m_dwFlags & 0x200) && !func_002680D0(obj)) {
+    if (!(to->m_wFlags & 0x1000) && (from->m_wFlags & 0x1000) && !(def->m_dwFlags & 0x200) && !GameObject_CanLeaveRegionFlag1000(obj)) {
         return NULL;
     }
-    if ((to->m_wFlags & 0x1000) && !(from->m_wFlags & 0x1000) && !(def->m_dwFlags & 0x100) && !func_002680A8(obj)) {
+    if ((to->m_wFlags & 0x1000) && !(from->m_wFlags & 0x1000) && !(def->m_dwFlags & 0x100) && !GameObject_CanEnterRegionFlag1000(obj)) {
         return NULL;
     }
     if (!(toInfo->m_wFlags54 & 2) && (fromInfo->m_wFlags54 & 2) && !(def->m_dwFlags & 0x800)) {
@@ -123,27 +123,27 @@ CGameRegion *Sweep_CrossRegionEdge(Sweep *sweep, CGameRegion *from, s32 edge, CV
             return to;
         }
         if (!(toInfo->m_dwFlags & 0x400000) && (fromInfo->m_dwFlags & 0x400000) && !(def->m_dwFlags & 0x4000000)
-            && !func_00268080(obj)) {
+            && !GameObject_CanLeaveInfoFlag400000(obj)) {
             return NULL;
         }
     } while (0);
     if ((toInfo->m_dwFlags & 0x400000) && !(fromInfo->m_dwFlags & 0x400000) && !(def->m_dwFlags & 0x2000000)
-        && !func_0026803C(obj)) {
+        && !GameObject_CanEnterInfoFlag400000(obj)) {
         return NULL;
     }
     if (!(toInfo->m_wFlags52 & 0x80) && (fromInfo->m_wFlags52 & 0x80) && !(def->m_dwFlags & 0x10000000)
-        && !func_00268014(obj)) {
+        && !GameObject_CanLeaveInfoFlag52_80(obj)) {
         return NULL;
     }
     if ((toInfo->m_wFlags52 & 0x80) && !(fromInfo->m_wFlags52 & 0x80) && !(def->m_dwFlags & 0x8000000)
-        && !func_00267FD0(obj)) {
+        && !GameObject_CanEnterInfoFlag52_80(obj)) {
         return NULL;
     }
     if (!(def->m_dwFlags & 0x80)) {
-        if (!(to->m_wFlags & 0x80) && (from->m_wFlags & 0x80) && !(def->m_dwFlags & 0x2000) && !func_00268120(obj)) {
+        if (!(to->m_wFlags & 0x80) && (from->m_wFlags & 0x80) && !(def->m_dwFlags & 0x2000) && !GameObject_CanLeaveRegionFlag80(obj)) {
             return NULL;
         }
-        if ((to->m_wFlags & 0x80) && !(from->m_wFlags & 0x80) && !(def->m_dwFlags & 0x1000) && !func_002680F8(obj)) {
+        if ((to->m_wFlags & 0x80) && !(from->m_wFlags & 0x80) && !(def->m_dwFlags & 0x1000) && !GameObject_CanEnterRegionFlag80(obj)) {
             return NULL;
         }
     }
@@ -172,13 +172,13 @@ CGameRegion *Sweep_CrossRegionEdge(Sweep *sweep, CGameRegion *from, s32 edge, CV
         }
         return NULL;
     }
-    climbs = func_00267EA8(obj);
+    climbs = GameObject_CanClimbLedges(obj);
     canClimb = 0;
-    if ((def->m_dwFlags & 0x10000) || func_00267EE8(obj)) {
+    if ((def->m_dwFlags & 0x10000) || GameObject_CanClimbUp(obj)) {
         canClimb = 1;
     }
     canSwim = 0;
-    if ((def->m_dwFlags & 0x20000) || func_00267F10(obj)) {
+    if ((def->m_dwFlags & 0x20000) || GameObject_CanDropDown(obj)) {
         canSwim = 1;
     }
     if (climbs && fromSpecial) {

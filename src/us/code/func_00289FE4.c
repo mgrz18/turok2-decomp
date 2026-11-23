@@ -3,10 +3,10 @@
 #include "globals/game.h"
 #include "globals/rumble.h"
 
-s32 func_0025359C(CPlayerPool *);                   /* extern */
+s32 CPlayerPool__StopRumble(CPlayerPool *);                   /* extern */
 s32 RumblePool_FreeAll(RumblePool *pool);                   /* extern */
 
-void func_00289FE4(void) {
+void CEngineApp__StopRumble(void) {
     RumblePool_FreeAll(&gRumblePool);
-    func_0025359C(&gEngineApp_m_Game.m_PlayerList);
+    CPlayerPool__StopRumble(&gEngineApp_m_Game.m_PlayerList);
 }

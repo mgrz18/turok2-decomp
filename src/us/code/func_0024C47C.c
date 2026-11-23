@@ -95,7 +95,7 @@ s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 s32 CPlayer__GetCurrentAmmoInfo(CPlayer *player);
 void Hud_DrawSprite(s32 sprite, s32 frame, s16 x, s16 y, f32 sx, f32 sy, s32);
 void Hud_DrawNumber(s32 value, f32 x, f32 y, f32 sx, f32 sy, s32, s32 rightAlign, s32 minDigits);
-void func_00254768(CPlayer *player, CCamera *view);
+void CPlayer__DrawSightIcon(CPlayer *player, CCamera *view);
 
 /* The next display list command. Through this helper, as in the ROM, the
  * head is loaded and stored by symbol; a post-increment written in place
@@ -239,7 +239,7 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
         }
     }
     if (player->m_pOptions->m_TagMode == 1) {
-        func_00254768(player, view);
+        CPlayer__DrawSightIcon(player, view);
     }
 }
 
@@ -630,7 +630,7 @@ void CPlayer__Warp(Player *, s32, s32, s32);
 s32 CGameObjectInstance__SetAnimByAction(Player *, s32, s32);
 sptr CGameObjectInstance__PickRandomAnim(Player *, sptr, sptr);
 void CGameObjectInstance__SetAnim(Player *, sptr, s32);
-void func_0021A500(Player *);
+void CGameObjectInstance__AlignToGround(Player *);
 s16 *CPlayer__GetFiringAmmo(Player *, s32);
 void CBarrel__Update(s32 *, Player *, u8 *);
 void Player_UpdateAim(Player *);
@@ -1045,7 +1045,7 @@ void CPlayer__Update(Player *p) {
         }
     }
     if (!human) {
-        func_0021A500(actor);
+        CGameObjectInstance__AlignToGround(actor);
     }
     p->emitterPos = p->pos;
     p->emitterYaw = p->yaw;

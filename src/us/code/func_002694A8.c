@@ -9,7 +9,7 @@ typedef struct CollisionInfo {
 extern CollisionInfo D_800F1BE0;
 
 s32 GameObject_CanEnterWater(CGameObjectInstance *actor);
-s32 func_00267F10(CGameObjectInstance *actor);
+s32 GameObject_CanDropDown(CGameObjectInstance *actor);
 f32 CGameRegion__GetHeight(void *region, f32 x, f32 z);
 void Collision_MoveInstance(CGameObjectInstance *actor, CVector3 pos, CollisionInfo *info);
 
@@ -23,7 +23,7 @@ void GameObject_SlideTo(CGameObjectInstance *actor, f32 x, f32 z) {
     f32 height;
 
     noA = GameObject_CanEnterWater(actor) == 0;
-    noB = func_00267F10(actor) == 0;
+    noB = GameObject_CanDropDown(actor) == 0;
     height = actor->header.m_vPos.y - CGameRegion__GetHeight(actor->header.m_pCurrentRegion, actor->header.m_vPos.x, actor->header.m_vPos.z);
     savedVelocity = actor->m_vVelocity;
     actor->m_vVelocity.x = actor->m_vVelocity.y = actor->m_vVelocity.z = 0.0f;

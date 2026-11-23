@@ -8,11 +8,11 @@ extern void Music_SetTrack(s32 a);
 extern int QuitMenu_Yes_2(void);
 extern void Music_Stop();
 extern void Music_RestoreVolume();
-extern void func_00469250(void *);
+extern void CEngineApp__QuitToLegal_2(void *);
 s32 QuitMenu_Yes_2(void) {
     Music_SetTrack(-1);
     Music_RestoreVolume();
     Music_Stop();
-    func_00469250(&gEngineApp);
+    CEngineApp__QuitToLegal_2(&gEngineApp);
     return 1;
 }

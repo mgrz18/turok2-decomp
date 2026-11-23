@@ -9,7 +9,7 @@ s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 
 /* Names setting 0x24. */
-s32 func_00451E0C(MenuItem *item) {
+s32 BloodLustMenu_CrosshairsLabel_2(MenuItem *item) {
     switch (gEngineApp_m_Settings.dmCrosshairs) {
     case 0:
         item->text = sBloodLustMenuText_CrosshairsOff;

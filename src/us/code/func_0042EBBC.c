@@ -1,4 +1,4 @@
-/* WRONG CUT: REAL func_0042EBBC size 0x70 (splat's 0x74 includes the padding nop at 0x42EC2C before the 16-aligned Demo_ReadRunLength). */
+/* WRONG CUT: REAL COnScreen__ResetBossBars size 0x70 (splat's 0x74 includes the padding nop at 0x42EC2C before the 16-aligned Demo_ReadRunLength). */
 #include "common.h"
 
 typedef struct Lists {
@@ -23,7 +23,7 @@ extern void COverlay__StartScript(void *, void *);
  * m_pScript, so the second overlay was constructed over m_pBossName/m_pBoss/m_BossPercent (m_pBoss
  * left non-NULL: an empty boss bar on screen from level 1 on, once DrawBossBars tested the right
  * member) and m_pBoss2 was never cleared (round 17 f4). The same calls by member. */
-void func_0042EBBC(void *arg0) {
+void COnScreen__ResetBossBars(void *arg0) {
     COnScreen *os = (COnScreen *)arg0;
 
     os->m_pBoss = NULL;
@@ -34,7 +34,7 @@ void func_0042EBBC(void *arg0) {
     COverlay__StartScript(&os->m_BossOverlay2, D_800B2C40);
 }
 #else
-void func_0042EBBC(Lists *lists) {
+void COnScreen__ResetBossBars(Lists *lists) {
     lists->unk40 = 0;
     COverlay__Construct(lists->list0, 0, -40);
     COverlay__StartScript(lists->list0, D_800B2C30);

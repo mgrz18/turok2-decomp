@@ -12,7 +12,7 @@ typedef struct {
 
 f32 HalfToFloat(u16);                             /* extern */
 
-f32 func_0021F2B0(CGameObjectInstance *arg0) {
+f32 CGameObjectInstance__GetObjectScale(CGameObjectInstance *arg0) {
     f32 var_f0;
     f32 var_f20;
     sptr *temp_v0;

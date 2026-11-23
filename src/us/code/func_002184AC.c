@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-u32 func_002184AC(u32 *stream, u32 width) {
+u32 Bits_ReadAt(u32 *stream, u32 width) {
     u32 bitAddress;
     u32 shift;
     u32 *word;

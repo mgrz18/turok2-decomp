@@ -1,4 +1,4 @@
-/* MATCHES at its real extent (checked with the symbol size patched to 0xA8); the do/while(0) blocks give the register choice and store order (as in func_00430454, its first-module copy). */
+/* MATCHES at its real extent (checked with the symbol size patched to 0xA8); the do/while(0) blocks give the register choice and store order (as in CEngineApp__StartGame, its first-module copy). */
 /* The real function is 0x00469374-0x0046941C (size 0xA8 = 168):
  * splat cut it at the data label D_00469400. */
 #include "common.h"
@@ -10,15 +10,15 @@
  * options and switch the game state. */
 
 
-s32 func_004650B4(void *level, s32 a, s32 id, void *out, s32 flags);
+s32 CScene__FindWarpDests_2(void *level, s32 a, s32 id, void *out, s32 flags);
 
-void func_00469374(CEngineApp *game, s32 warpId) {
+void CEngineApp__StartGame_2(CEngineApp *game, s32 warpId) {
     u8 sp18[0x18];
     s32 id;
 
     id = warpId;
 
-    if (func_004650B4(&gScene, -1, id, sp18, 1) == 0) {
+    if (CScene__FindWarpDests_2(&gScene, -1, id, sp18, 1) == 0) {
         id = 0;
     }
     gEngineApp_m_Settings.match.frames = 0;

@@ -1,6 +1,6 @@
 #include "structs/game_object.h"
 
-s32 func_002680D0(CGameObjectInstance *actor)
+s32 GameObject_CanLeaveRegionFlag1000(CGameObjectInstance *actor)
 {
   int new_var;
   CIntelligence *def;

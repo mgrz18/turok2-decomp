@@ -48,18 +48,18 @@ typedef struct {
 
 /* The global at gEngineApp_m_Game: what this reads of it. */
 
-void func_0021F1B4(DrawActor *actor);
+void CGameObjectInstance__UpdateAI(DrawActor *actor);
 void CGameObjectInstance__UpdateAnimation(DrawActor *actor);
 void CPlayerPool__Update(CPlayerPool *list);
 s32 CPlayerPool__CheckAllReady(CPlayerPool *list);
-void func_00430330(u8 *);
+void CEngineApp__QuitToLegal(u8 *);
 void LoopSounds_Update(sptr);
 
 /* Draws one actor, keeping the frame time step. */
 static __inline__ void drawActor(DrawActor *actor) {
     f32 step = gFrameIncrement;
 
-    func_0021F1B4(actor);
+    CGameObjectInstance__UpdateAI(actor);
     if (actor->flags & 0x2000) {
         CGameObjectInstance__UpdateAnimation(actor);
     }
@@ -85,7 +85,7 @@ void CScene__AdvanceInstances(DrawWorld *world) {
         CPlayerPool__Update(&gEngineApp_m_Game.m_PlayerList);
     }
     if (CPlayerPool__CheckAllReady(&gEngineApp_m_Game.m_PlayerList)) {
-        func_00430330(&gEngineApp);
+        CEngineApp__QuitToLegal(&gEngineApp);
     }
     while (i < count) {
         actor = actors[i++];

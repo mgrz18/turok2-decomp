@@ -53,16 +53,16 @@ func_0029E340        asm       writebackdcache.s osWritebackDCache: cache 0x19/0
 func_0029E3B0        asm       writebackdcacheall.s osWritebackDCacheAll: cache 0x01
 
 # exception-vector / debug stub (us/asm/A3C88.s): k0-based, eret, addi $sp
-func_002A3088        asm       exception vector stubs (mtc0 ErrorEPC, jr k0) copied to 0x80000000/0x80000180
-func_002A3100        asm       installs the vector stubs (swaps words at 0x80000180/0x80000000), addi $sp
-func_002A31AC        asm       icache invalidate-all loop: cache 0x01
-func_002A31C8        asm       dcache invalidate-all loop: cache 0x00
-func_002A31E4        asm       mfc0 SR
-func_002A31F0        asm       mtc0 SR
-func_002A31FC        asm       TLB dump: tlbr loop into D_80128A90, addi $sp
-func_002A3708        asm       re-installs the vector stubs, then the cache loops
-func_002A3774        asm       exception return paths: k0-based ld, mtc0 EPC, eret
-func_002A37CC        asm       context save: sd of every GPR and cop0 register through k0
+HostIo_VectorStubs        asm       exception vector stubs (mtc0 ErrorEPC, jr k0) copied to 0x80000000/0x80000180
+HostIo_InstallVectors        asm       installs the vector stubs (swaps words at 0x80000180/0x80000000), addi $sp
+HostIo_InvalICacheAll        asm       icache invalidate-all loop: cache 0x01
+HostIo_InvalDCacheAll        asm       dcache invalidate-all loop: cache 0x00
+HostIo_GetSR        asm       mfc0 SR
+HostIo_SetSR        asm       mtc0 SR
+HostIo_ReadTlb        asm       TLB dump: tlbr loop into D_80128A90, addi $sp
+HostIo_RestoreVectors        asm       re-installs the vector stubs, then the cache loops
+HostIo_ExceptionReturn        asm       exception return paths: k0-based ld, mtc0 EPC, eret
+HostIo_SaveContext        asm       context save: sd of every GPR and cop0 register through k0
 
 # VM module (us/asm/16F710.s)
 func_00425710        asm       __osSetWatchLo-style: mtc0 WatchLo ($18), mfc0 WatchHi ($19) (= func_00201074)

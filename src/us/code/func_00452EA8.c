@@ -1,4 +1,4 @@
-/* WRONG CUT: the real function is func_00452EA8, size 0xE0 (splat starts it 8 bytes late, at func_00452EA8,
+/* WRONG CUT: the real function is SoundMenu_SfxVolumeLabel_2, size 0xE0 (splat starts it 8 bytes late, at SoundMenu_SfxVolumeLabel_2,
  * past the two loads GCC scheduled ahead of the prologue). */
 #include "common.h"
 #include "globals/menu_text.h"
@@ -11,7 +11,7 @@ s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 
 /* Shows setting unk15 (0-255, centred on 0x80) in steps of 8 from -16 to 15. */
-s32 func_00452EA8(MenuItem *item) {
+s32 SoundMenu_SfxVolumeLabel_2(MenuItem *item) {
     s32 value = (gEngineApp_m_Settings.unk15 - 0x80) / 8;
 
     if (value == 0) {

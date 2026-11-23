@@ -65,7 +65,7 @@ void CMtxF__ClampEntries(void *);
 void CMtxF__GetTranslation(void *, void *);
 void CMtxF__GetScale(void *, void *);
 void CMtxF__ScaleAxes(void *, f32, f32, f32);
-void func_00236A34(Emit *e, EmitNode *n) {
+void Swoosh_UpdateNodeFromOwner(Emit *e, EmitNode *n) {
     u8 m[0x40];
     EmitOwner *o;
     f32 s;

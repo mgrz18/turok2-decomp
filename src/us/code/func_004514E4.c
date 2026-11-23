@@ -7,7 +7,7 @@ s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 /* Writes setting unk26 (or "none" when 0) over the end of the item's text. */
-s32 func_004514E4(MenuItem *item) {
+s32 FragTagMenu_TagLimitLabel_2(MenuItem *item) {
     GameSettings *s = &gEngineApp_m_Settings;
 
     if (s->tagScoreLimit != 0) {

@@ -7,19 +7,19 @@ typedef struct {
     /* 0x34 */ s32 texture;
 } Trail;
 
-s32 func_00207914(void *, s32);                 /* extern */
-s32 func_002316A0(sptr, void *);                 /* extern */
+s32 Material_GetTextureSet(void *, s32);                 /* extern */
+s32 CParticle__AddDrawModeBits(sptr, void *);                 /* extern */
 
-void func_0023685C(s32 arg0, Trail *arg1, s32 arg2) {
+void Trail_LoadTexture(s32 arg0, Trail *arg1, s32 arg2) {
     s32 temp_a1;
     void *temp_s0;
 
     temp_a1 = arg1->texture;
     if (temp_a1 != -1) {
         temp_s0 = arg1->model;
-        func_00207914(temp_s0, temp_a1);
+        Material_GetTextureSet(temp_s0, temp_a1);
         if (arg2 != 0) {
-            func_002316A0(arg2, temp_s0);
+            CParticle__AddDrawModeBits(arg2, temp_s0);
         }
     }
 }

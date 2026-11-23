@@ -3,7 +3,7 @@
 
 /* The swoosh/effect system, gEngineApp_m_SwooshSystem (CEngineApp + 0x19608): weapon and
  * particle trails (swooshes), the points they are made of, repeating timers, the ground
- * decals (drawn with gShadowTexture by func_00235C30) and the ribbon vertex pool the
+ * decals (drawn with gShadowTexture by SwooshSystem_DrawDecals) and the ribbon vertex pool the
  * textured trails are drawn from. The code is Rage Wars' (src/RENDER_3, src/SYSTEM_3) at
  * Turok 2's offsets. The offsets below are the N64's; every link is a pointer, so on the
  * host the members sit where the host types put them and the code reaches them by name.
@@ -63,7 +63,7 @@ typedef struct Swoosh {
     /* 0x08 */ void *info;              /* the swoosh record ("particle swooshes", ROM) */
     /* 0x0C */ void *tex0;              /* sTrailTextures[info->tex0] */
     /* 0x10 */ void *tex1;
-    /* 0x14 */ s32 texture[2];          /* func_00207914's handle for the record's texture id */
+    /* 0x14 */ s32 texture[2];          /* Material_GetTextureSet's handle for the record's texture id */
     /* 0x1C */ void *owner;             /* flags & 1: a CGameObjectInstance, & 2: a CParticle, & 8: a key */
     /* 0x20 */ s32 id;
     /* 0x24 */ f32 time;
@@ -78,7 +78,7 @@ typedef struct Swoosh {
     /* 0x50 */ s32 unk50;
 } Swoosh; /* size 0x54 */
 
-/* A repeating timer (func_00236444, SwooshSystem_UpdateTimers). */
+/* A repeating timer (SwooshSystem_AddTimer, SwooshSystem_UpdateTimers). */
 typedef struct SwooshTimer {
     /* 0x00 */ struct SwooshTimer *prev;
     /* 0x04 */ struct SwooshTimer *next;
@@ -89,7 +89,7 @@ typedef struct SwooshTimer {
     /* 0x18 */ s32 (*callback)(struct SwooshTimer *);
 } SwooshTimer; /* size 0x1C */
 
-/* A ground decal: a CList element and its model matrix (func_00235C30 draws them). */
+/* A ground decal: a CList element and its model matrix (SwooshSystem_DrawDecals draws them). */
 typedef struct SwooshDecal {
     /* 0x00 */ struct SwooshDecal *prev;
     /* 0x04 */ struct SwooshDecal *next;

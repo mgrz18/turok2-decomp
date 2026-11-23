@@ -3,7 +3,7 @@
 
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *inst);
 f32 GameObject_GetCollisionRadius(CGameObjectInstance *inst);
-f32 func_0026841C(CGameObjectInstance *inst);
+f32 GameObject_GetCollisionYOffset(CGameObjectInstance *inst);
 
 #define MIN(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
@@ -19,7 +19,7 @@ void Sweep_GetVolumeBounds(Sweep *sweep, SweepBox *box) {
     def = sweep->def;
     box->radius = GameObject_GetCollisionRadius(inst);
     box->flag = def->m_dwFlags & 0x100000;
-    box->bottom = func_0026841C(inst);
+    box->bottom = GameObject_GetCollisionYOffset(inst);
     box->top = box->bottom + GameObject_GetCollisionHeight(inst);
     box->startBottom = inst->header.m_vPos.y + box->bottom;
     box->startTop = inst->header.m_vPos.y + box->top;

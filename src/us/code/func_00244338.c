@@ -25,7 +25,7 @@ f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);              /* ang
 Location *CPathTrack__GetCurrentPoint(s8 *location);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);                           /* height */
 f32 GameObject_GetCollisionRadius(CGameObjectInstance *a);                           /* radius */
-f32 func_00268460(CGameObjectInstance *a);                           /* reach */
+f32 GameObject_GetSweepRadius(CGameObjectInstance *a);                           /* reach */
 f32 GameObject_GetWaterHeight(CGameObjectInstance *a);                           /* ceiling */
 void GameObject_TraceMove(CGameObjectInstance *a, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
@@ -193,7 +193,7 @@ void AI_GetPathTargetInfo(CGameObjectInstance *self, CAI *plan, CGameObjectInsta
         pos.y = (pos.y < GameObject_GetWaterHeight(self)) ? pos.y : GameObject_GetWaterHeight(self);
     }
     if (boost) {
-        reach = func_00268460(self);
+        reach = GameObject_GetSweepRadius(self);
         probe.x = self->header.m_vPos.x + reach * func_002982F0(plan->m_PathRotY);
         probe.y = plan->m_PathHeight;
         probe.z = self->header.m_vPos.z + reach * func_002974C0(plan->m_PathRotY);

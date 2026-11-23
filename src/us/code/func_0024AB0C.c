@@ -2,7 +2,7 @@
 #include "globals/game.h"
 #include "globals/player.h"
 
-/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0021E5D4.c, func_0021E5D4.
+/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0021E5D4.c, CGameObjectInstance__InitAIType.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 /* Turok 2 layout (Rage Wars: pos 0x8, timer 0x678, fx 0x67C..0x684, flags 0x6B0). */

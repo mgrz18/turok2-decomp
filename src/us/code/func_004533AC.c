@@ -11,10 +11,10 @@
 #include "globals/game.h"
 
 extern s32 GameOverMenu_Poll_2(void);
-extern void func_00469250(void *);
+extern void CEngineApp__QuitToLegal_2(void *);
 s32 GameOverMenu_Poll_2(void) {
     if (gEngineApp_m_Settings_match_countdown <= 0.0f) {
-        func_00469250(&gEngineApp);
+        CEngineApp__QuitToLegal_2(&gEngineApp);
         return 1;
     }
     return 0;

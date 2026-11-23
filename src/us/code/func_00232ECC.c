@@ -16,7 +16,7 @@ typedef struct {
 #ifdef TARGET_PORT
 #include "structs/particle.h"
 /* a particle (N64 0xF8 is CParticle.m_pEffect, 0x160 m_vRot.y): the host members */
-f32 func_00232ECC(CGameObjectInstance *arg0) {
+f32 CParticle__GetSpriteRotY(CGameObjectInstance *arg0) {
     CParticle *p = (CParticle *) arg0;
 
     if (p->m_pEffect->m_pModel == NULL) {
@@ -25,7 +25,7 @@ f32 func_00232ECC(CGameObjectInstance *arg0) {
     return 0.0f;
 }
 #else
-f32 func_00232ECC(CGameObjectInstance *arg0) {
+f32 CParticle__GetSpriteRotY(CGameObjectInstance *arg0) {
     f32 var_f0;
 
     var_f0 = 0.0f;

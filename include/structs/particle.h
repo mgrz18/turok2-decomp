@@ -34,7 +34,7 @@ typedef struct CDLight {
 } CDLight; /* size 0x18 */
 
 /* The scene's dynamic lights (CScene.m_DLightSet, the N64 alias D_8010FF34): eight CDLights
- * on a used and a free list (func_0042D120 builds it; CDLightSet__Alloc/__Free move one
+ * on a used and a free list (CDLightSet__Construct builds it; CDLightSet__Alloc/__Free move one
  * between them; DLights_Load walks the used list). */
 typedef struct CDLightSet {
     /* 0x00 */ CList m_UsedList;

@@ -40,7 +40,7 @@ extern void Sound__StopAllExcept(s32);
 extern void LoopSounds_StopAll(sptr);
 extern s32 LoopSounds_Get(void);
 extern void Controller_Service(void);
-extern void func_00228BBC(CFrameData *frame);
+extern void Scheduler_RDPDoneHook(CFrameData *frame);
 extern s32 osSpTaskYielded(OSTask *task);
 extern s32 osSpTaskYield(void);
 extern s32 osSetIntMask(s32 mask);
@@ -348,7 +348,7 @@ void __scHandleRDP(T2Sched *sc) {
                     gCurrentTickWaiting = 0;
                 }
             }
-            func_00228BBC(frame);
+            Scheduler_RDPDoneHook(frame);
         }
     }
     __scTaskComplete(sc, t);

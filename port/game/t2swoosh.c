@@ -12,15 +12,15 @@
 #include <string.h>
 #include <math.h>
 
-extern void func_0042D410(CSwooshSystem *world);
-extern void func_00236444(CSwooshSystem *, s32 (*)(SwooshTimer *), sptr, s32, f32);
+extern void SwooshSystem_Construct(CSwooshSystem *world);
+extern void SwooshSystem_AddTimer(CSwooshSystem *, s32 (*)(SwooshTimer *), sptr, s32, f32);
 extern void SwooshSystem_UpdateTimers(CSwooshSystem *);
 extern s32 *NodePool_Alloc(void *);
 extern void NodePool_Free(void *, void *);
-extern void func_0026D230(SwooshLinks *);
+extern void DList_Init(SwooshLinks *);
 extern SwooshNode *Swoosh_NewNode(CSwooshSystem *, Swoosh *, void *);
 extern void SwooshGroup_Remove(CSwooshSystem *, Swoosh *, SwooshNode *);
-extern SwooshDecal *func_002364A4(CSwooshSystem *, CVector3, CVector3, s32, sptr);
+extern SwooshDecal *SwooshSystem_PlaceDecal(CSwooshSystem *, CVector3, CVector3, s32, sptr);
 extern void SwooshSet_FreeOwner(CSwooshSystem *, sptr);
 extern void RibbonVtxPool_Reset(CSwooshSystem *);
 extern sptr RibbonVtxPool_Alloc(void *, s32);
@@ -82,7 +82,7 @@ int T2Swoosh_SelfTest(void) {
 
     sFails = 0;
     memset(sys, 0xAB, sizeof(*sys));
-    func_0042D410(sys);
+    SwooshSystem_Construct(sys);
     T2CHECK(walk(&sys->m_FreeNodes) == 96, "free points");
     T2CHECK(walk(&sys->m_SwooshPool.free) == 32 && sys->m_SwooshPool.used.count == 0, "swoosh pool");
     T2CHECK(walk(&sys->m_TimerPool.free) == 3, "timer pool");
@@ -98,7 +98,7 @@ int T2Swoosh_SelfTest(void) {
     /* a timer: twice, then freed */
     gFrameIncrement = 1.0f;
     sTimerCalls = 0;
-    func_00236444(sys, timerCallback, (sptr) sys, 2, 1.0f);
+    SwooshSystem_AddTimer(sys, timerCallback, (sptr) sys, 2, 1.0f);
     T2CHECK(sys->m_TimerPool.used.count == 1, "timer started");
     SwooshSystem_UpdateTimers(sys);
     SwooshSystem_UpdateTimers(sys);
@@ -111,7 +111,7 @@ int T2Swoosh_SelfTest(void) {
     s = (Swoosh *) NodePool_Alloc(&sys->m_SwooshPool);
     T2CHECK(s == &sys->m_Swooshes[0] && walk(&sys->m_SwooshPool.used) == 1, "swoosh allocated");
     if (s != NULL) {
-        func_0026D230(&s->nodes);
+        DList_Init(&s->nodes);
         s->info = info;
         s->flags = 0;
         s->owner = NULL;
@@ -139,7 +139,7 @@ int T2Swoosh_SelfTest(void) {
     pos.x = 1.0f; pos.y = 2.0f; pos.z = 3.0f;
     dir.x = 0.0f; dir.y = 1.0f; dir.z = 0.0f;
     sSwooshSpawned = 0;
-    d = func_002364A4(sys, pos, dir, 3, (sptr) &sTestSystem);
+    d = SwooshSystem_PlaceDecal(sys, pos, dir, 3, (sptr) &sTestSystem);
     T2CHECK(d != NULL && d->owner == (sptr) &sTestSystem, "decal placed");
     T2CHECK(sys->m_FreeDecals.m_nCount == 99 && sys->m_DecalLists[3].m_nCount == 1, "decal lists");
     SwooshSet_FreeOwner(sys, (sptr) &sTestSystem);

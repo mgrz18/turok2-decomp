@@ -5,7 +5,7 @@ sptr Video_GetResolutionText(void);
 
 s32 GetMemSize();                                /* extern */
 
-s32 func_0041A1D8(void *arg0)
+s32 PauseMenu_ResolutionText(void *arg0)
 {
   s32 var_v0;
   int new_var;

@@ -9,7 +9,7 @@ s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 
 /* Names setting 0x2E. */
-s32 func_004522CC(MenuItem *item) {
+s32 TeamBloodMenu_CrosshairsLabel_2(MenuItem *item) {
     switch (gEngineApp_m_Settings.teamCrosshairs) {
     case 0:
         item->text = sBloodLustMenuText_CrosshairsOff;

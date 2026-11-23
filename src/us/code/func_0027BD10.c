@@ -10,7 +10,7 @@ typedef struct {
     /* 0x12 */ s8 unk12;
 } Unk0027BD10;
 
-void func_0027BD10(Unk0027BD10 *arg0) {
+void CIntelligence__Init(Unk0027BD10 *arg0) {
     arg0->unk4 = 1;
     arg0->unk0 = 0;
     arg0->unkC = 0;

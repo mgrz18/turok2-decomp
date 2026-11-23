@@ -21,7 +21,7 @@ void CPlayer__TransformByView(CPlayer *pl, CVector3 *v);
 void GameObject_TraceMove(ShotActor *a, CVector3 pos, CVector3 *outPos, s32 *outArg, s32 x, s32 y);
 
 /* Fires the player's shot of kind 0xE9 at `pos`, aimed along `dir` from the eye, and plays its sound. */
-void func_00238500(void *unused, ShotActor *actor, CVector3 pos, CVector3 dir, s32 mode) {
+void ImpactEvent_FirePlayerShot(void *unused, ShotActor *actor, CVector3 pos, CVector3 dir, s32 mode) {
     CVector3 v;
     CVector3 p;
     CVector3 origin;

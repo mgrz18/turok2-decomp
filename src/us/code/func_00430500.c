@@ -1,4 +1,4 @@
-/* WRONG CUT: the real function is func_00430500, size 0x2A8 (0x430500-0x4307A8): it runs
+/* WRONG CUT: the real function is Automap_ClearBuffers, size 0x2A8 (0x430500-0x4307A8): it runs
  * past splat's end of virtual_text_0 (ROM 0x17A600) into what the yaml calls virtual_rodata_0. */
 #include "common.h"
 #include "structs/game.h"
@@ -17,7 +17,7 @@
     (v).cn[2] = (b);        \
     (v).cn[3] = 0xFF;
 
-void func_00430500(CAutomap *s) {
+void Automap_ClearBuffers(CAutomap *s) {
     s32 i;
     s32 j;
 

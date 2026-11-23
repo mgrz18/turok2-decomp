@@ -26,7 +26,7 @@ f32 HalfToFloat(s32 angle);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 angle);
 void CGameObjectInstance__Construct(CListedInstance *effect, s32 id, s32 variant, s32 unused, sptr count, s32 sound, sptr owner,
                    f32 scale, CVector3 position, s32 flags, CVector3 color, CVector3 direction, s32 arg12);
-void func_0021E5D4(CListedInstance *effect);
+void CGameObjectInstance__InitAIType(CListedInstance *effect);
 
 /* Takes a node from the free list when allowed (always with gScene_m_bStreamAll, otherwise while fewer than
  * three are active), moves it to the active list and attaches the counted reference. */
@@ -60,7 +60,7 @@ static __inline__ CListedInstance *spawn_effect(CInstancePool *scene, s32 id, s3
         return NULL;
     }
     CGameObjectInstance__Construct(effect, id, variant, gDefaultVisBits, count, -1, owner, scale, position, 0x80000, color, direction, 0);
-    func_0021E5D4(effect);
+    CGameObjectInstance__InitAIType(effect);
     return effect;
 }
 

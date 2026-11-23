@@ -23,7 +23,7 @@ s32 CParticle__IsUnderWater(CParticle *p);
 void ImpactEvent_Send(void *source, CParticle *p, s32 effect, s32 arg3, CVector3 pos, CEventValue params);
 void CParticle__SpawnChild(CParticle *p, s32 model, s32 arg2, s32 enabled);
 void Sound__Play(s16 sound, CVector3 pos, sptr arg2, sptr arg3);
-void func_002364A4(void *list, CVector3 pos, CVector3 normal, s32 kind, sptr arg4);
+void SwooshSystem_PlaceDecal(void *list, CVector3 pos, CVector3 normal, s32 kind, sptr arg4);
 void CVector3__Normalize(CVector3 *v);
 f32 Random_Blend(f32 lo, f32 hi);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
@@ -95,7 +95,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
         case 2:
         case 3:
             if (definition->m_dwFlags & 0x800000) {
-                func_002364A4(gEngineApp_m_SwooshSystem, gCollisionResults.m_vInstancePos, gCollisionResults.m_vNormal, kind, 0);
+                SwooshSystem_PlaceDecal(gEngineApp_m_SwooshSystem, gCollisionResults.m_vInstancePos, gCollisionResults.m_vNormal, kind, 0);
             }
             break;
     }

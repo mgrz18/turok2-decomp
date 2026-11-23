@@ -3,7 +3,7 @@
 
 extern void GameObject_EmitHotPoints(s32 *arg0, s32 arg1, sptr arg2, void *arg3, s32 *arg4);
 
-void func_0021EE44(u8 *actor, s32 *data, s32 arg2) {
+void CGameObjectInstance__EmitFlaggedHotPoints(u8 *actor, s32 *data, s32 arg2) {
     s32 *countp;
     s32 *table;
     s32 *entry;

@@ -1,4 +1,4 @@
-/* WRONG CUT: REAL func_0042D120 size 0x98 (splat cut it into func_0042D120 + func_0042D140). */
+/* WRONG CUT: REAL CDLightSet__Construct size 0x98 (splat cut it into CDLightSet__Construct + func_0042D140). */
 #include "common.h"
 #include "structs/list.h"
 #include "protos/list.h"
@@ -22,7 +22,7 @@ typedef struct SlotLists {
 /* The port: on CDLightSet (the N64 view's slots have 4-byte links; on the host the lists
  * overran the set into the scene's level and warp state). */
 #include "structs/particle.h"
-void func_0042D120(CDLightSet *lists) {
+void CDLightSet__Construct(CDLightSet *lists) {
     s32 i;
     CDLight *slot;
 
@@ -37,7 +37,7 @@ void func_0042D120(CDLightSet *lists) {
     }
 }
 #else
-void func_0042D120(SlotLists *lists) {
+void CDLightSet__Construct(SlotLists *lists) {
     s32 i;
     Slot *slot;
 

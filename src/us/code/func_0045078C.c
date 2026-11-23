@@ -7,7 +7,7 @@
 
 extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
 extern s32 Random_Next(void);
-extern void func_00469374(void *a, s32 level);
+extern void CEngineApp__StartGame_2(void *a, s32 level);
 
 /* Mp_SetupMatchRules, inlined. */
 static __inline__ void StartMatch(f32 minutes, s32 a1, s32 started, s32 a3) {
@@ -57,6 +57,6 @@ s32 MpMenu_StartTeamBlood_2(void) {
     } else {
         arg = Random_Next() % 13 + 0x2329;
     }
-    func_00469374(&gEngineApp, arg);
+    CEngineApp__StartGame_2(&gEngineApp, arg);
     return 1;
 }

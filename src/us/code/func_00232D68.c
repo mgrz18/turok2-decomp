@@ -6,7 +6,7 @@
 
 /* Insert arg1 into the list at 0xEC14: after the node with the same key at
  * 0xF8 if there is one, else at the end or the front by a flag. */
-void func_00232D68(CParticleSystem *arg0, CParticle *arg1) {
+void CParticleSystem__InsertDrawSorted(CParticleSystem *arg0, CParticle *arg1) {
     CParticle *p;
 
     for (p = arg0->m_DrawList.m_pHead; p != NULL; p = p->m_pDrawNext) {

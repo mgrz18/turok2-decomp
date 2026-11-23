@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 /* For type-1 objects: whether dead (or flagged 0x800). */
-s32 func_00267FD0(CGameObjectInstance *arg0) {
+s32 GameObject_CanEnterInfoFlag52_80(CGameObjectInstance *arg0) {
     s32 var_v1;
     struct CIntelligence *temp_a1;
 

@@ -9,7 +9,7 @@ s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 
 /* Names setting 0x2D. */
-s32 func_004521C0(MenuItem *item) {
+s32 TeamBloodMenu_TextureSetLabel_2(MenuItem *item) {
     switch (gEngineApp_m_Settings.teamTextureSet) {
     case 0:
         item->text = sBloodLustMenuText_TextureSetCastle;

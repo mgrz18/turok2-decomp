@@ -1,6 +1,6 @@
 #include "structs/game_object.h"
 
-s32 func_00268080(CGameObjectInstance *actor)
+s32 GameObject_CanLeaveInfoFlag400000(CGameObjectInstance *actor)
 {
   u32 *flags;
   CIntelligence *def;

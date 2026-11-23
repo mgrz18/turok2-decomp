@@ -11,7 +11,7 @@
 
 f32 CGameRegion__GetHeight(sptr region, f32 x, f32 z);
 CVector3 CCamera__GetViewOrigin(CCamera *camera);
-void func_00207914(s32 *resource, s32 id);
+void Material_GetTextureSet(s32 *resource, s32 id);
 
 /* CEmitterPool__TakeEmitter, inlined: takes a free emitter. */
 static __inline__ CEmitter *TakeEmitter(CEmitterPool *owner) {
@@ -35,7 +35,7 @@ static __inline__ void InitEmitter(CEmitter *e, CEmitterDef *def, s16 mask, f32 
                                    f32 offset0, f32 offset1, f32 offset2) {
     e->m_pDef = def;
     e->m_Mask = mask;
-    func_00207914(e->m_Texture, def->m_Texture);
+    Material_GetTextureSet(e->m_Texture, def->m_Texture);
     e->m_ScrollS = 0;
     e->m_ScrollT = 0;
     e->m_Throttle = 0;

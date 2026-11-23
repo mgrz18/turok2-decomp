@@ -7,7 +7,7 @@
 s32 Cinema_IsActive(void);
 s32 Cinema_IsFinished(void);
 
-s32 func_00422ED8(void) {
+s32 SavePortalMenu_IsCinemaPlaying(void) {
     if (Cinema_IsActive() != 0 && Cinema_IsFinished() == 0) {
         return 1;
     }

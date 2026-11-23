@@ -7,7 +7,7 @@ typedef struct DLNode {
 } DLNode;
 
 /* Insert at the head of the list *arg0. */
-void func_002767F8(DLNode **arg0, DLNode *arg1) {
+void SndQueue_LinkHead(DLNode **arg0, DLNode *arg1) {
     arg1->next = *arg0;
     arg1->prev = arg0;
     (*arg0)->prev = arg1;

@@ -8,7 +8,7 @@
 void Render_FlushModelBatch(void);
 extern void Model_DecompressCallbackTerminated();
 
-void func_0020B9F4(sptr res, sptr arg1, sptr arg2, s32 index, s32 arg4) {
+void Render_QueueModelByResource(sptr res, sptr arg1, sptr arg2, s32 index, s32 arg4) {
     s32 size;
     sptr file;
     sptr handle;

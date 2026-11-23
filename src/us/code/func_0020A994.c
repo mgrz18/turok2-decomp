@@ -8,10 +8,10 @@
 
 
 s32 Render_SetupMaterial(Material *material, s32 pass);
-void func_00209658(void);
+void Render_BeginDeferredAlpha(void);
 
 /* Emits the batched draws: the opaque nodes in key order (those whose material is flagged 0x4000
- * set aside and drawn afterwards with their alpha as primitive colour, after func_00209658), then
+ * set aside and drawn afterwards with their alpha as primitive colour, after Render_BeginDeferredAlpha), then
  * the translucent ones. Each item loads its lights, its matrix (or segment 1) and its textures as
  * segment 2, sets the texture scale when it changes, and calls the part's display list. */
 void Render_DrawBatches(void) {
@@ -74,7 +74,7 @@ void Render_DrawBatches(void) {
     }
     if (deferred != NULL) {
         node = deferred;
-        func_00209658();
+        Render_BeginDeferredAlpha();
         do {
             item = node->head;
             if (item != NULL) {

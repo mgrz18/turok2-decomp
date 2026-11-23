@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 #include "globals/pickup.h"
 
-void *func_0023EFCC(s32 arg0) {
+void *Pickup_FindLifeForceEntry(s32 arg0) {
     char *v1;
     s32 i;
     v1 = (char *) sLifeForcePickups;

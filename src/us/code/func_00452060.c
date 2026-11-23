@@ -9,7 +9,7 @@ s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 
 /* Names setting 0x2C. */
-s32 func_00452060(MenuItem *item) {
+s32 TeamBloodMenu_LevelLabel_2(MenuItem *item) {
     switch (gEngineApp_m_Settings.teamArena) {
     case 0:
         item->text = sBloodLustMenuText_LevelRandom;

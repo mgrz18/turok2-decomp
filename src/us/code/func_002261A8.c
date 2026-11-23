@@ -12,7 +12,7 @@ void *CISet__GetBlock(s32 *table, s32 index);
 #else
 void *CISet__GetBlock();
 #endif
-s32 func_002261A8(CScene *lv, s32 unused, CVector3 *pt) {
+s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) {
     CVector3 d;
     f32 bestIdx = -1.0f;
     f32 bestD = 0.0f;
@@ -47,7 +47,7 @@ s32 func_002261A8(CScene *lv, s32 unused, CVector3 *pt) {
 }
 
 /* CScene__DecompressIntelligence is VM code (the `virtual` segment) from this same source file:
- * its 1.0f and jump table follow func_002261A8's -1.0f in one .rodata
+ * its 1.0f and jump table follow CScene__FindNearestPathPoint's -1.0f in one .rodata
  * (0x800A6010: -1.0f, 1.0f, then the table at 0x800A6018, 8-aligned in the
  * section), which only one object can give. Its .text goes to a section of its
  * own, .text_vm, which the yaml links into `virtual` (linker_section), while

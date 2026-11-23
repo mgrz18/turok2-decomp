@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "globals/engine.h"
 
-extern void func_0021F1B4(CGameObjectInstance *);
+extern void CGameObjectInstance__UpdateAI(CGameObjectInstance *);
 extern s32 CGameObjectInstance__UpdateAnimation(CGameObjectInstance *);
 
 /* Rebuilds the weapon actor (keeping gFrameIncrement across it) and puts it where
@@ -15,7 +15,7 @@ void CPlayer__RebuildWeaponActor(CPlayer *player) {
 
     weapon->m_dwHotPointFlags = 0x10;
     weapon->m_dwFlags &= ~0x20000;
-    func_0021F1B4(weapon);
+    CGameObjectInstance__UpdateAI(weapon);
     CGameObjectInstance__UpdateAnimation(weapon);
     changed = oldAnim != player->m_CharAnim;
     gFrameIncrement = saved;

@@ -53,7 +53,7 @@ typedef struct EffectParams {
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 s32 Sweep_HitPlane(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
-s32 func_002682CC(HitInst *inst);
+s32 GameObject_IsInanimate(HitInst *inst);
 void ImpactEvent_Send(HitInst *a, HitInst *b, s32 type, s32 arg3, CVector3 pos, EffectParams params);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define Sound__Play Sound__Play_f3
@@ -165,7 +165,7 @@ s32 Sweep_TestBoxFaces(Sweep *sweep, sptr unused, HitInst *other, CVector3 *star
             continue;
         }
         if (!Sweep_HitPlane(sweep, &normal, quad[0], 0,
-                           func_002682CC(other) ? sweep->def->m_WallBehavior : sweep->def->m_InstanceBehavior,
+                           GameObject_IsInanimate(other) ? sweep->def->m_WallBehavior : sweep->def->m_InstanceBehavior,
                            sweep->def->m_GroundFriction, 0)) {
             continue;
         }

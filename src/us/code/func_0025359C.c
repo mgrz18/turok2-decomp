@@ -9,7 +9,7 @@ s32 RumblePool_FreeAll(sptr);                         /* extern */
 /* The port (round 11 C26): the players and their controller profiles by member. The N64 views
  * (0x20 the list head, 0xA50 m_ContState.m_pContState, 0x1320 m_pNext; the profile 0xD0
  * rumbleLevel, 0x140 rumblePool) read other host members: the walk went off the list. */
-void func_0025359C(CPlayerPool *arg0) {
+void CPlayerPool__StopRumble(CPlayerPool *arg0) {
     CPlayer *p = arg0->m_ActiveList.m_pHead;
 
     while (p != NULL) {
@@ -40,7 +40,7 @@ typedef struct {
     /* 0x20 */ Node002534E0 *head;
 } List002534E0;
 
-void func_0025359C(List002534E0 *arg0) {
+void CPlayerPool__StopRumble(List002534E0 *arg0) {
     Node002534E0 *var_s0;
 
     var_s0 = arg0->head;

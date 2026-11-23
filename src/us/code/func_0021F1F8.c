@@ -9,9 +9,9 @@ extern s32 **CGameObjectInstance__LoadGeometry(void);
 extern u8 *CISet__GetBlock(void *base, s32 index);
 
 #ifdef TARGET_PORT
-/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CGameObjectInstance__LoadGeometry receives func_0021F1F8's own argument
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CGameObjectInstance__LoadGeometry receives CGameObjectInstance__GetGeometryKind's own argument
  * registers (pass-through); the host passes them. */
-s32 func_0021F1F8(void * pt0) {
+s32 CGameObjectInstance__GetGeometryKind(void * pt0) {
     s32 **res;
     s32 value;
 
@@ -24,7 +24,7 @@ s32 func_0021F1F8(void * pt0) {
     return value;
 }
 #else
-s32 func_0021F1F8(void) {
+s32 CGameObjectInstance__GetGeometryKind(void) {
     s32 **res;
     s32 value;
 

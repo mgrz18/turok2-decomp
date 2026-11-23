@@ -7,7 +7,7 @@
 
 extern void CScene__RequestWarp_2(void *, int, int);
 extern void Controller_UnwatchPak(void *);
-void func_0045A940(void *unused, void *object) {
+void PakMenu_UnwatchAndWarp_2(void *unused, void *object) {
     Controller_UnwatchPak(object);
     CScene__RequestWarp_2(&gScene, gScene_m_PendingWarpID, 2);
 }

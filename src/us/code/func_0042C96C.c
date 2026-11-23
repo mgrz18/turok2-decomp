@@ -8,7 +8,7 @@
 #include "structs/world.h"
 
 extern void LevelEvent_Fire(sptr);
-void func_0042C96C(CScene *scene) {
+void CScene__FlushDelayedEvents(CScene *scene) {
     CDelayedEvent *d = scene->m_DelayedEvents.m_pHead;
     CDelayedEvent *next;
 
@@ -44,7 +44,7 @@ struct Owner_func_8044D794_de {
     struct Entry_func_8044D794_de *spare;
 };
 extern void LevelEvent_Fire(sptr);
-void func_0042C96C(Owner_func_8044D794_de *arg0) {
+void CScene__FlushDelayedEvents(Owner_func_8044D794_de *arg0) {
     Entry_func_8044D794_de *entry;
     Entry_func_8044D794_de *next;
     entry = arg0->active;

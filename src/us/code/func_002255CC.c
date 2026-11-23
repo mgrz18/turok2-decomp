@@ -6,7 +6,7 @@
 
 
 s32 GameObject_IsSolid(sptr);
-s32 func_002681BC(sptr);
+s32 GameObject_IsMover(sptr);
 
 s32 CGameObjectInstance__ClearDrawMatrices(sptr);                         /* extern */
 
@@ -30,7 +30,7 @@ void CScene__FileInstance(CScene *arg0, CGameObjectInstance *arg1) {
             arg0->m_nDrawActors = (s32) (temp_v1 + 1);
         }
     }
-    if (func_002681BC((sptr) arg1) != 0) {
+    if (GameObject_IsMover((sptr) arg1) != 0) {
         temp_v1_2 = arg0->m_nMovers;
         if (temp_v1_2 != 0x80) {
             arg0->m_pMovers[temp_v1_2] = (CGameObjectInstance *)arg1;

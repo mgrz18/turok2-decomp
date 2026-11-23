@@ -2,7 +2,7 @@
 #define STRUCTS_PICKUP_H
 
 /* A pickup's effect descriptor, what the pickup handlers get
- * (Pickup_GiveWeapon weapons, Pickup_GiveAmmo / func_0023F21C / func_0023F300
+ * (Pickup_GiveWeapon weapons, Pickup_GiveAmmo / Pickup_GivePistolClip / Pickup_GivePistolAmmo
  * ammo, Pickup_GiveHealth health, Pickup_GiveLifeForce life force, Pickup_GiveItem the
  * items by m_Id): the feedback (the screen flash, then the optional
  * message, sound and callback) and what the pickup gives, which each kind

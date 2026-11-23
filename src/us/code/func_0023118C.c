@@ -28,7 +28,7 @@ extern u8 gEngineApp_m_SwooshSystem[];
 extern s32 Frustum_TestBox(void *planes, Box *box);
 extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
 extern void CParticle__BuildMatrix(CParticle *particle, void *mtx, CCamera *camera, f32 depth);
-extern void func_0020B9F4(void *model, void *mtx, void *mtx2, s32 a, s32 b);
+extern void Render_QueueModelByResource(void *model, void *mtx, void *mtx2, s32 a, s32 b);
 extern void CParticle__DrawSprite(CParticle *particle, CCamera *view);
 extern void CParticle__DrawShadow(CParticle *particle, CCamera *view);
 extern void Swoosh_AddParticleNode(void *list, CParticle *particle, void *mtx);
@@ -104,7 +104,7 @@ void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
                     }
                     if (node->m_pEffect->m_pModel != 0) {
                         CScene__GetLightsAt(&gScene, &node->header.m_vPos, &node->m_Lights[gEvenOdd]);
-                        func_0020B9F4(node->m_pEffect->m_pModel, node->m_mtxDraw[gEvenOdd], &node->m_Lights[gEvenOdd], 0, -1);
+                        Render_QueueModelByResource(node->m_pEffect->m_pModel, node->m_mtxDraw[gEvenOdd], &node->m_Lights[gEvenOdd], 0, -1);
                     } else {
                         CParticle__DrawSprite(node, view);
                     }

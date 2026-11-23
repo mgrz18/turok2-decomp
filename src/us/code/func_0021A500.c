@@ -42,10 +42,10 @@ s32 GameObject_IsOnGround();
 #define GameObject_GetGroundRotation GameObject_GetGroundRotation_sret
 #endif
 void GameObject_GetGroundRotation(f32 *loc, B10Obj *o);
-s32 func_002682A4(B10Obj *o);
+s32 GameObject_TiltsToGround(B10Obj *o);
 void CQuaternion__TurnToward(f32 *a, f32 *loc);
 void CQuaternion__SlerpFast(f32 *a, f32 t, f32 *b, f32 *loc);
-void func_0021A500(B10Obj *o) {
+void CGameObjectInstance__AlignToGround(B10Obj *o) {
     f32 loc[4];
     u32 fl;
     u32 mask;
@@ -68,7 +68,7 @@ void func_0021A500(B10Obj *o) {
     }
     GameObject_GetGroundRotation(loc, o);
     s = o->p14->h2 & 1;
-    if (func_002682A4(o) == 0) {
+    if (GameObject_TiltsToGround(o) == 0) {
         return;
     }
     if (s) {

@@ -4,7 +4,7 @@
 SwooshTimer *NodePool_Alloc(void *);
 
 /* Starts a timer: callback arg1 (with arg2) every arg4, arg3 times; the first at once. */
-void func_00236444(CSwooshSystem *arg0, s32 (*arg1)(SwooshTimer *), sptr arg2, s32 arg3, f32 arg4) {
+void SwooshSystem_AddTimer(CSwooshSystem *arg0, s32 (*arg1)(SwooshTimer *), sptr arg2, s32 arg3, f32 arg4) {
     SwooshTimer *temp_v0;
 
     temp_v0 = NodePool_Alloc(&arg0->m_TimerPool);

@@ -9,7 +9,7 @@ s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 
 /* Names setting 0x28. */
-s32 func_004516B0(MenuItem *item) {
+s32 FragTagMenu_TextureSetLabel_2(MenuItem *item) {
     switch (gEngineApp_m_Settings.tagTextureSet) {
     case 0:
         item->text = sBloodLustMenuText_TextureSetCastle;

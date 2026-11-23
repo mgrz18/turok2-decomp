@@ -28,9 +28,9 @@ extern void CEngineApp__InitFade(CEngineApp *);
 extern void guMtxIdent(void *);
 extern void SavedPlayers_Clear(void);
 extern void GameSettings_SetDefaults(void *);
-extern void func_00430500(void *);
+extern void Automap_ClearBuffers(void *);
 extern void Cinema__Initialize(void);
-extern void func_004302A0(void);
+extern void Render_InitUnitQuad(void);
 extern void Light_SetDefaultDirection(void *);
 extern void CSunFrameData__Construct(CFrameData *);
 extern void CEngineApp__AdvanceFrameData(CEngineApp *);
@@ -53,10 +53,10 @@ void CEngineApp__Construct(CEngineApp *state) {
         SavedPlayers_Clear();
         GameSettings_SetDefaults(&gEngineApp_m_Settings);
     }
-    func_00430500(&state->m_Game.m_Automap);
+    Automap_ClearBuffers(&state->m_Game.m_Automap);
     i = 0;
     Cinema__Initialize();
-    func_004302A0();
+    Render_InitUnitQuad();
     Light_SetDefaultDirection(&state->m_Settings.m_Sun);
     state->m_Settings.unk1C8 = 0;
     state->m_Settings.ready = 1;
