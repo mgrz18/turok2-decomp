@@ -24,8 +24,7 @@ set(T2_LINK_REPLACED
     # VI
     vimgr.c           # osCreateViManager, viMgrMain (the merged module)
     # SP / DP
-    func_0029A248.c   # osSpTaskLoad
-    func_0029A34C.c   # osSpTaskStartGo
+    sptask.c          # osSpTaskLoad, osSpTaskStartGo, _VirtualToPhysicalTask (the merged module)
     # AI
     func_002985C0.c   # osAiSetNextBuffer
     # PI
@@ -122,13 +121,7 @@ set(T2_LINK_REPLACED
     func_00275378.c   # SndSeq_UpdateVolume
     func_00275450.c   # SndSeq_Load
     func_002757E4.c   # Sound__IsPlaying
-    func_00275BE8.c   # LoopSounds_Construct
-    func_00275C6C.c   # LoopSounds_Start
-    func_00275D34.c   # LoopSounds_Stop
-    func_00275DC0.c   # LoopSounds_Pause
-    func_00275E1C.c   # LoopSounds_Resume
-    func_00275E98.c   # LoopSounds_Update
-    func_00275EFC.c   # LoopSounds_StopAll
+    # (LoopSounds_Construct .. LoopSounds_StopAll: under #ifndef TARGET_PORT in the merged LoopSounds.c)
     func_00275FA0.c   # SndQueue_Add
     func_00276180.c   # SndQueue_Update
     func_002763AC.c   # SndQueue_InitNode
