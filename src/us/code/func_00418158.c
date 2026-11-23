@@ -5,15 +5,15 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-extern u8 D_800B4210[];
-extern u8 D_800B4220[];
+extern u8 sPlayerSetupMenuText_ControlExpert[];
+extern u8 sPlayerSetupMenuText_ControlArcade[];
 s32 PlayerSetupMenu_ControlTypeLabel(MenuItem *a, Menu *m) {
     switch (m->player->m_pOptions->m_ControlType) {
     case 0:
-        a->text = (char *)D_800B4210;
+        a->text = (char *)sPlayerSetupMenuText_ControlExpert;
         break;
     case 1:
-        a->text = (char *)D_800B4220;
+        a->text = (char *)sPlayerSetupMenuText_ControlArcade;
         break;
     }
     return 0;

@@ -2,7 +2,7 @@
 #define STRUCTS_MORPH_H
 
 /* The morphing trail vertices (Morph_BlendVertices, Morph_BlendVerticesTex, from the
- * trail draw func_00234348): a vertex buffer blended between two point sets, the
+ * trail draw Trail_DrawTextured): a vertex buffer blended between two point sets, the
  * colours between two colour sets. MorphOwner / MorphClock are the trail's Swoosh /
  * SwooshNode (structs/swoosh.h) seen through the fields the blend reads. Hoisted in
  * round 21 from the three files that each had a copy. */

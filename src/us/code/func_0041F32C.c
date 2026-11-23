@@ -13,9 +13,9 @@
 
 void *memset(void *s, int c, uptr n);
 extern s32 D_800F70A8;
-extern u8 D_800B48D4[];
-extern u8 D_800B4B1C[];
-extern u8 D_800C13F0[];
+extern u8 sPakMenuText_OtherGame[];
+extern u8 sCharNoteMenuText_Empty[];
+extern u8 sPakMenuText_SingleSaveBlock[];
 s32 PakMenu_CheckPak();
 s32 Str_Length();
 s32 Str_Compare();
@@ -109,7 +109,7 @@ L004079A0:
     } else {
         s0 = s0 << 8;
     }
-    m = CCache__Allocate(0, s0, 0x33, D_800C13F0);
+    m = CCache__Allocate(0, s0, 0x33, sPakMenuText_SingleSaveBlock);
     gLoadBufferHandle = (sptr)m;
     gLoadBuffer = (SaveGame *)m->data;
     memset((void *)gLoadBuffer, 0, s0);
@@ -130,9 +130,9 @@ L00407AD0:
     if (s0 != 0) goto L00407EE8;
     ch = 0;
     gPakNoteIndex = s5;
-    d = D_800B4B1C;
+    d = sCharNoteMenuText_Empty;
     if (Pak_TextHasInvalidChar(sp38, 0x10) != 0) {
-        Str_Copy(sp38, D_800B48D4);
+        Str_Copy(sp38, sPakMenuText_OtherGame);
     }
     i = 1;
     v1 = 0;
@@ -188,7 +188,7 @@ L00407CDC:
     } else {
         s0 = s0 << 8;
     }
-    m = CCache__Allocate(0, s0, 0x33, D_800C13F0);
+    m = CCache__Allocate(0, s0, 0x33, sPakMenuText_SingleSaveBlock);
     gLoadBufferHandle = (sptr)m;
     gLoadBuffer = (SaveGame *)m->data;
     memset((void *)gLoadBuffer, 0, s0);
