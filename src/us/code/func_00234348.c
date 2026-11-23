@@ -5,69 +5,11 @@
 #include "globals/engine.h"
 #include "protos/cache.h"
 #include "structs/morph.h"
-#ifdef TARGET_PORT
 #include "structs/swoosh.h"
-#endif
 
 /* Draws a textured trail: spaces the texture along the tail by length, picks
  * the animation frame, sets the combiner and colours, then emits two vertex
  * rows per node and the triangle strip between them. */
-
-typedef struct TrailNode TrailNode;
-struct TrailNode {
-    /* 0x00 */ TrailNode *next;
-    /* 0x04 */ TrailNode *prev;
-    /* 0x08 */ f32 time;
-    /* 0x0C */ u8 padC[0x28 - 0xC];
-    /* 0x28 */ u8 matrix[2][0x40];
-    /* 0xA8 */ f32 offset;
-    /* 0xAC */ f32 length;
-};
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x12];
-    /* 0x12 */ u8 closed;
-    /* 0x13 */ u8 pad13[0x16 - 0x13];
-    /* 0x16 */ u8 prim[3];
-    /* 0x19 */ u8 env[3];
-    /* 0x1C */ u8 kind;
-    /* 0x1D */ u8 textureScale;
-    /* 0x1E */ u8 pad1E[0x21 - 0x1E];
-    /* 0x21 */ u8 scaleS;
-    /* 0x22 */ u8 scaleT;
-    /* 0x23 */ u8 count;
-    /* 0x24 */ u8 blends[1];
-} TrailTrack;
-
-/* structs/swoosh.h Swoosh */
-typedef struct {
-    /* 0x00 */ void *prev;
-    /* 0x04 */ void *next;
-    /* 0x08 */ TrailTrack *track;
-    /* 0x0C */ void *first;
-    /* 0x10 */ void *second;
-    /* 0x14 */ s32 model[2];
-    /* 0x1C */ void *owner;
-    /* 0x20 */ s32 id;
-    /* 0x24 */ f32 time;
-    /* 0x28 */ f32 phase;
-    /* 0x2C */ u8 pad2C[0x3C - 0x2C];
-    /* 0x3C */ u32 flags;
-    /* 0x40 */ TrailNode *tail;
-    /* 0x44 */ TrailNode *clock;
-#ifdef TARGET_PORT
-    /* round 20 i3: the host SwooshLinks is 0x18 bytes (count and padding after the two links) */
-    u8 pad48[__builtin_offsetof(Swoosh, length) - __builtin_offsetof(Swoosh, nodes) - 2 * sizeof(void *)];
-#else
-    /* 0x48 */ u8 pad48[0x4C - 0x48];
-#endif
-    /* 0x4C */ f32 length;
-} Trail;
-#ifdef TARGET_PORT
-_Static_assert(__builtin_offsetof(Trail, flags) == __builtin_offsetof(Swoosh, flags), "Trail.flags");
-_Static_assert(__builtin_offsetof(Trail, clock) == __builtin_offsetof(Swoosh, nodes.tail), "Trail.clock");
-_Static_assert(__builtin_offsetof(Trail, length) == __builtin_offsetof(Swoosh, length), "Trail.length");
-#endif
 
 typedef struct {
     /* 0x00 */ u8 kind;
@@ -89,55 +31,55 @@ extern void *Texture_Request(void *model);
 extern void Texture_GetInfo(void *model, AnimInfo *info);
 extern void Render_SetCombineMode(s32 mode);
 extern void Render_SetRenderMode(s32 mode);
-extern s32 Trail_GetAnimFrame(Trail *trail, TrailTrack *track, AnimInfo *info);
+extern s32 Trail_GetAnimFrame(Swoosh *trail, SwooshInfo *track, AnimInfo *info);
 extern void Texture_Load(void *slot, void *model, s32 frame, s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);
 extern Gfx *RibbonVtxPool_Alloc(void *pool, s32 count);
-extern void Morph_BlendVerticesTex(Trail *trail, TrailNode *node, Gfx *vertices, f32 texS, Morph *morph);
+extern void Morph_BlendVerticesTex(Swoosh *trail, SwooshNode *node, Gfx *vertices, f32 texS, Morph *morph);
 
-void Trail_DrawTextured(void *pool, Trail *trail, s32 unused) {
+void Trail_DrawTextured(void *pool, Swoosh *trail, s32 unused) {
     AnimInfo info;
     Morph storage;
     AnimInfo *anim;
     void *model;
-    TrailTrack *track;
-    TrailNode *clock, *next, *node;
+    SwooshInfo *track;
+    SwooshNode *clock, *next, *node;
     Gfx *vertices;
     f32 offset;
     f32 period;
     f32 scale;
     s32 count, edges, i, frame;
 
-    track = trail->track;
-    if (track->kind == 2 && 0.0f < trail->length) {
+    track = trail->info;
+    if (track->texMode == 2 && 0.0f < trail->length) {
         offset = 0.0f;
-        for (node = trail->tail; node != 0; node = node->prev) {
-            node->offset = offset / trail->length;
+        for (node = trail->nodes.head; node != 0; node = node->next) {
+            node->fraction = offset / trail->length;
             offset += node->length;
         }
     }
-    model = Texture_Request(trail->model);
+    model = Texture_Request(trail->texture);
     if (model == 0) return;
     Texture_GetInfo(model, &info);
     anim = &info;
-    storage.items = trail->track->blends;
-    storage.count = trail->track->count;
+    storage.items = trail->info->blends;
+    storage.count = trail->info->count;
     if (trail->flags & 2) {
-        storage.pointsA = trail->first;
-        storage.pointsB = trail->second;
+        storage.pointsA = trail->tex0;
+        storage.pointsB = trail->tex1;
     } else {
-        storage.pointsA = trail->first;
-        storage.pointsB = trail->first;
+        storage.pointsA = trail->tex0;
+        storage.pointsB = trail->tex0;
     }
-    storage.scaleA = trail->track->scaleS * 3.125f;
-    storage.scaleB = trail->track->scaleT * 3.125f;
+    storage.scaleA = trail->info->scaleS * 3.125f;
+    storage.scaleB = trail->info->scaleT * 3.125f;
     if (anim != 0) {
         storage.texScaleS = 1 << (anim->frame->shiftS + 5);
-        storage.texScaleS = storage.texScaleS * trail->track->textureScale - 32.0f;
+        storage.texScaleS = storage.texScaleS * trail->info->textureScale - 32.0f;
         storage.texScaleT = 1 << (anim->frame->shiftT + 5);
         storage.texStepT = 1.0f / (storage.count - 1.0f);
     }
     period = 1.0f;
-    while (trail->phase >= period) trail->phase -= period;
+    while (trail->unk28 >= period) trail->unk28 -= period;
     GFX_CMD(0xE7000000, 0)
     switch (info.frame->kind) {
     case 3:
@@ -151,33 +93,33 @@ void Trail_DrawTextured(void *pool, Trail *trail, s32 unused) {
         break;
     }
     Render_SetRenderMode(0xD);
-    clock = trail->clock;
+    clock = trail->nodes.tail;
     count = track->count;
-    next = clock->next;
+    next = clock->prev;
     frame = Trail_GetAnimFrame(trail, track, &info);
-    Texture_Load(trail->model, model, frame, 0, 0xFFFF, 0xFFFF, 0, 0, 0);
+    Texture_Load(trail->texture, model, frame, 0, 0xFFFF, 0xFFFF, 0, 0, 0);
     edges = count - 1;
-    GFX_CMD(0xDA380003, GBI_ADDR(clock->matrix[gEvenOdd]))
-    while (clock != 0 && next != 0 && 0.0f < clock->time && 0.0f < next->time) {
+    GFX_CMD(0xDA380003, GBI_ADDR(&clock->mtx[gEvenOdd]))
+    while (clock != 0 && next != 0 && 0.0f < clock->life && 0.0f < next->life) {
         vertices = RibbonVtxPool_Alloc(pool, count);
         if (vertices == 0) break;
-        Morph_BlendVerticesTex(trail, clock, vertices, clock->offset, &storage);
+        Morph_BlendVerticesTex(trail, clock, vertices, clock->fraction, &storage);
         GFX_CMD(0x01000000 | (count << 12) | ((count & 0x7F) << 1), GBI_ADDR(vertices))
-        GFX_CMD(0xDA380003, GBI_ADDR(next->matrix[gEvenOdd]))
+        GFX_CMD(0xDA380003, GBI_ADDR(&next->mtx[gEvenOdd]))
         vertices = RibbonVtxPool_Alloc(pool, count);
         if (vertices == 0) break;
-        scale = next->offset;
-        while (clock->offset < scale) scale -= period;
+        scale = next->fraction;
+        while (clock->fraction < scale) scale -= period;
         Morph_BlendVerticesTex(trail, next, vertices, scale, &storage);
         GFX_CMD(0x01000000 | (count << 12) | (((count * 2) & 0x7F) << 1), GBI_ADDR(vertices))
         for (i = 0; i < edges; i++) {
             GFX_CMD((((i * 2 & 255) << 16) | (((count + i) * 2 & 255) << 8) | ((count + i + 1) * 2 & 255)) | (6 << 24), ((i * 2 & 255) << 16) | (((count + i + 1) * 2 & 255) << 8) | ((i + 1) * 2 & 255))
         }
-        if (trail->track->closed) {
+        if (trail->info->closed) {
             GFX_CMD((((i * 2 & 255) << 16) | (((count + i) * 2 & 255) << 8) | (count * 2 & 255)) | (6 << 24), ((i * 2 & 255) << 16) | ((count * 2 & 255) << 8))
         }
         clock = next;
-        next = clock->next;
+        next = clock->prev;
     }
     CCache__Unlock(0, model);
 }

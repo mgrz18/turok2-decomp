@@ -56,6 +56,15 @@ typedef struct SwooshNode {
     /* 0xB4 */ s32 unkB4;
 } SwooshNode; /* size 0xB8 */
 
+/* One step of a textured ribbon's cross-section (structs/morph.h's Morph.items): the colours
+ * and the two points it blends. */
+typedef struct MorphItem {          /* 0xC bytes */
+    /* 0x00 */ u8 colorA[4];
+    /* 0x04 */ u8 colorB[4];
+    /* 0x08 */ u16 pointA;
+    /* 0x0A */ u16 pointB;
+} MorphItem;
+
 /* A swoosh record (CScene__GetSwoosh, the level's "particle swooshes", ROM data: the same bytes
  * on the host): a point's life, how the texture runs, the colours and the texture blend steps. */
 typedef struct SwooshInfo {
@@ -76,7 +85,7 @@ typedef struct SwooshInfo {
     /* 0x21 */ u8 scaleS;
     /* 0x22 */ u8 scaleT;
     /* 0x23 */ u8 count;                /* blends[count] */
-    /* 0x24 */ u8 blends[1];
+    /* 0x24 */ MorphItem blends[1];     /* the ribbon's cross-section (Morph.items) */
 } SwooshInfo;
 
 /* A swoosh (a trail): its record (CScene__GetSwoosh), textures, owner and points. */
