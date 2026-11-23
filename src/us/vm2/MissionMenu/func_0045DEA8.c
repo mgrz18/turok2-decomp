@@ -4,12 +4,12 @@
 #include "common.h"
 #include "globals/menu_text.h"
 #include "globals/menu.h"
-struct FieldRecAt14;
-struct FieldRecAt14 {
+typedef struct MissionTitleField {
     char pad[0x14];
     char *text;
-};
-s32 MissionMenu_UpdateTitle_2(struct FieldRecAt14 *field) {
+} MissionTitleField;
+
+s32 MissionMenu_UpdateTitle_2(MissionTitleField *field) {
     if (sMissionFailed != 0) {
         field->text = sMissionMenuText_MissionFailed;
     } else {

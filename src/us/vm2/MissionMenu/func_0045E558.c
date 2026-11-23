@@ -2,7 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
-#include "protos/cache.h"
+#include "structs/cache.h"
+
+extern void CCache__Deallocate(sptr heap, CMemEntry *handle); /* as GfxPool_Alloc_2 declares it */
 
 extern void GfxPool_Free_2(struct RecordRecAt1C *arg0);
 void GfxPool_Free_2(struct RecordRecAt1C *arg0) {
@@ -15,25 +17,25 @@ void GfxPool_Free_2(struct RecordRecAt1C *arg0) {
     s32 var_v1;
     temp_a1 = arg0->b;
     if (temp_a1 != 0) {
-        CCache__Deallocate(0, temp_a1);
+        CCache__Deallocate(0, (CMemEntry *) temp_a1);
     }
     temp_a1_2 = arg0->c;
     if (temp_a1_2 != 0) {
-        CCache__Deallocate(0, temp_a1_2);
+        CCache__Deallocate(0, (CMemEntry *) temp_a1_2);
     }
     temp_a1_3 = arg0->d;
     if (temp_a1_3 != 0) {
-        CCache__Deallocate(0, temp_a1_3);
+        CCache__Deallocate(0, (CMemEntry *) temp_a1_3);
     }
     temp_a1_4 = arg0->e;
     if (temp_a1_4 != 0) {
-        CCache__Deallocate(0, temp_a1_4);
+        CCache__Deallocate(0, (CMemEntry *) temp_a1_4);
     }
     var_s1 = 0;
     do {
         temp_a1_5 = arg0->values[var_s1];
         if (temp_a1_5 != 0) {
-            CCache__Deallocate(0, temp_a1_5);
+            CCache__Deallocate(0, (CMemEntry *) temp_a1_5);
         }
         var_s1 += 1;
     } while (var_s1 < 3);
