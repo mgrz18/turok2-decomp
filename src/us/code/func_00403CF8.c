@@ -6,10 +6,8 @@
 #include "globals/boss_ai.h"
 #include "protos/scene.h"
 #include "protos/ai.h"
+#include "structs/vector.h"
 
-typedef struct {
-    f32 x, y, z;
-} Vec3_00403CF8;
 
 
 
