@@ -13,7 +13,11 @@ typedef struct LevelEvent {
     u8 pad0[4];                /* the same word; as bytes the struct keeps the N64 build's 2-byte alignment */
 #endif
     /* 0x04 */ u16 actor;       /* index into the level actors */
-    /* 0x06 */ s16 sound;       /* Event_PlaySoundRemote */
+    /* 0x06 */ union {
+        s16 sound;              /* Event_PlaySoundRemote */
+        u16 param;              /* the handler parameter: a sound (Event_PlaySound), a music track
+                                 * (Event_SetMusicRemote), an ambient track, an animation (InteractiveAnim_EventPlay) */
+    };
     /* 0x08 */ u16 music;       /* track to start (>= 2) */
     /* 0x0A */ u16 level;       /* level the actor lives in */
     /* 0x0C */ u16 delay;       /* packed (HalfToFloat) */
