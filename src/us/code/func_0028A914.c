@@ -22,7 +22,7 @@ void __scHandleRDP(OSSched *sc)
     CFrameData *schedules;
     s32 flags;
     task->state &= ~1;
-    if (task->list.type == 1) {
+    if (task->list.t.type == 1) {
         if ((task->flags & 0x20) != 0) {
             gSchedRdpTime = (f32)(((osGetTime() - sRdpStartTime) << 6) / 3) * 1.0e-6f;
         }

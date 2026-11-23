@@ -2,11 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "globals/frame.h"
 #include "ultra_types.h"
 #include "globals/audio.h"
 #include "protos/ultra.h"
 u32 osAiGetStatus(void);
-extern u8 gScheduler[];
 extern s32 gAudioInfo[];
 typedef struct B12Timer2 {
     struct B12Timer2 *next;
@@ -28,7 +28,7 @@ void __amMain(void) {
     B12Timer2 *p;
     cnt = arg = done = 0;
     last = 0;
-    osScAddClient(gScheduler, sp10, &gAudioFrameMsgQ);
+    osScAddClient(&gScheduler, sp10, &gAudioFrameMsgQ);
     do {
         now = osGetTime();
         sAmBusyTime = (u32)(((now - last) << 6) / 3000);

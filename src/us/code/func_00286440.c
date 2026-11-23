@@ -18,7 +18,6 @@ typedef struct {
     /* 0x48 */ s32 unk48;
 } Unk8011ACB0;
 
-extern u8 gScheduler[];
 extern Unk8011ACB0 D_8011ACB0_arr[] __asm__("gEngineApp_m_Settings_match");
 
 extern void memset(void *, s32, sptr);
@@ -43,8 +42,8 @@ void CEngineApp__Construct(CEngineApp *state) {
 
     osCreateMesgQueue(&gGfxFrameMessageQueue, gGfxFrameMessageBuffer, 0x1000);
     memset(gSchedulerStack, 7, 0x2000);
-    osCreateScheduler(gScheduler, gSchedulerStack + 0x2000, gThreadPriorityScheduler, 0, 1);
-    osScAddClient(gScheduler, &gGfxClient, &gGfxFrameMessageQueue);
+    osCreateScheduler(&gScheduler, gSchedulerStack + 0x2000, gThreadPriorityScheduler, 0, 1);
+    osScAddClient(&gScheduler, &gGfxClient, &gGfxFrameMessageQueue);
     state->m_Settings.prevMode = -1;
     CEngineApp__InitFade(state);
     gDList = NULL;

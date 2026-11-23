@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/frame.h"
 #include "globals/audio.h"
 #include "protos/ultra.h"
 
@@ -21,7 +22,6 @@ s32 Sound__Unlock();                            /* extern */
 s32 Sched_SubmitTask(s32 *, void *);           /* extern */
 extern s32 gAudioCmdLists;
 extern u16 D_800F283A;
-extern s32 gScheduler;
 
 s32 __amHandleFrameMsg(FrameTask *arg0) {
     s32 sp10;

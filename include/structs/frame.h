@@ -29,8 +29,8 @@ typedef struct CFrameMsg {
 typedef struct CFrameData {
     /* 0x000 */ u8 m_SunFrame[0x20];     /* CSunFrameData (CSunFrameData__Construct) */
 #ifdef TARGET_PORT
-    T2ScTask m_Task;                     /* structs/sched.h: the host scheduler's task */
-    T2ScTask m_LineTask;
+    OSScTask m_Task;                     /* structs/sched.h: the host scheduler's task */
+    OSScTask m_LineTask;
 #else
     /* 0x020 */ u8 m_Task[0x68];         /* OSScTask */
     /* 0x088 */ u8 m_LineTask[0x68];     /* OSScTask */

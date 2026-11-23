@@ -9,7 +9,7 @@ s32 __scTaskComplete(void *arg0, void *arg1) {
     if ((((s32)((struct OSScTask_s *)arg1)->state)) & 3) {
         return 0;
     }
-    if ((((struct OSScTask_s *)arg1)->list.type) != 1) {
+    if ((((struct OSScTask_s *)arg1)->list.t.type) != 1) {
         return 1;
     }
     if (((((s32)((struct OSScTask_s *)arg1)->flags)) & 0x60) != 0x60) {

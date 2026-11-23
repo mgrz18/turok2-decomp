@@ -6,14 +6,13 @@
 #include "protos/ultra.h"
 
 #ifdef TARGET_PORT
-/* The port: the same through CFrameData (structs/frame.h) and the host scheduler's T2ScTask
+/* The port: the same through CFrameData (structs/frame.h) and the scheduler's OSScTask
  * (structs/sched.h, port/game/t2sched.c); the views below have the N64 layout. */
 #include "structs/game.h"
 
-extern u8 gScheduler[];
-extern void Sched_SubmitTask(void *, T2ScTask *);
+extern void Sched_SubmitTask(void *, OSScTask *);
 
-static void fillTask(T2ScTask *t, CFrameData *task, void *dl, u32 size, u64 *text, u64 *data) {
+static void fillTask(OSScTask *t, CFrameData *task, void *dl, u32 size, u64 *text, u64 *data) {
     t->list.t.data_ptr = dl;
     t->list.t.type = 1;
     t->list.t.ucode_boot = rspbootTextStart;
@@ -48,9 +47,9 @@ void CEngineApp__SubmitGfxTask(CEngineApp *gfx, CFrameData *task) {
         task->m_LineTask.flags = 0x23;
     }
     osWritebackDCacheAll();
-    Sched_SubmitTask(gScheduler, &task->m_Task);
+    Sched_SubmitTask(&gScheduler, &task->m_Task);
     if (task->m_bLines) {
-        Sched_SubmitTask(gScheduler, &task->m_LineTask);
+        Sched_SubmitTask(&gScheduler, &task->m_LineTask);
     }
     gFrameCount++;
     idx = gFrameCount % gTotalFramebuffers;
@@ -110,7 +109,6 @@ typedef struct {
     /* 0x3C0 */ GfxTask *cur;
 } GfxState;
 
-extern u8 gScheduler[];
 
 extern void Sched_SubmitTask(void *, ScTask *);
 
@@ -175,9 +173,9 @@ void CEngineApp__SubmitGfxTask(GfxState *gfx, GfxTask *task) {
         t->framebuffer = task->framebuffer;
     }
     osWritebackDCacheAll();
-    Sched_SubmitTask(gScheduler, &task->sc[0]);
+    Sched_SubmitTask(&gScheduler, &task->sc[0]);
     if (task->twoTasks) {
-        Sched_SubmitTask(gScheduler, &task->sc[1]);
+        Sched_SubmitTask(&gScheduler, &task->sc[1]);
     }
     gFrameCount++;
     idx = gFrameCount % gTotalFramebuffers;
