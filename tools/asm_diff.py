@@ -15,7 +15,8 @@ Renaming a global, moving its declaration to a header, giving it its real type
 or reaching it as `gScene.m_Field` instead of `gScene_m_Field` all compile to
 the same addresses, so they compare equal; anything that moves an access, a
 load order or a register shows as a diff. Symbols the ELF does not know
-(a new alias, defined in versions/symbols_manual.us.txt) are looked up there
+(a new alias, defined in versions/symbols_manual.us.txt, or a name
+tools/apply_names.py just wrote to symbols_names*.us.txt) are looked up there
 too; anything else stays a name, so rebuild the ELF once after adding names.
 
 Usage:
@@ -56,8 +57,12 @@ def symbols(elf_path):
         for sym in ELFFile(fh).get_section_by_name(".symtab").iter_symbols():
             if sym.name and sym.name not in out:
                 out[sym.name] = sym["st_value"]
-    for m in MANUAL.finditer((ROOT / "versions" / "symbols_manual.us.txt").read_text()):
-        out.setdefault(m.group(1), int(m.group(2), 16))
+    # Aliases the ELF does not know yet: manual symbols, and names just added to
+    # the names tables (tools/apply_names.py writes them here; ld's file holds the
+    # module-2 data at its link address).
+    for f in ("symbols_manual.us.txt", "symbols_names_ld.us.txt", "symbols_names.us.txt"):
+        for m in MANUAL.finditer((ROOT / "versions" / f).read_text()):
+            out.setdefault(m.group(1), int(m.group(2), 16))
     return out
 
 
