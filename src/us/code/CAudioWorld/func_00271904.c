@@ -3,9 +3,8 @@
 #include "common.h"
 #include "structs/sound.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 
-s32 __osDisableInt(void);
-void __osRestoreInt(s32);
 /* How many of the manager's voices play the given sound (CMutex taken
  * around the scan). */
 s32 CAudioWorld__CountHandleVoices(CAudioWorld *mgr, s32 sound)
@@ -27,7 +26,7 @@ s32 CAudioWorld__CountHandleVoices(CAudioWorld *mgr, s32 sound)
   if (count != 1)
   {
     __osRestoreInt(mask);
-    osRecvMesg(lock, 0, 1);
+    osRecvMesg(&lock->queue, 0, 1);
     i = 0;
   }
   else
@@ -53,7 +52,7 @@ s32 CAudioWorld__CountHandleVoices(CAudioWorld *mgr, s32 sound)
   if (count2 != 0)
   {
     __osRestoreInt(mask2);
-    osSendMesg(lock2, 0, 1);
+    osSendMesg(&lock2->queue, 0, 1);
   }
   else
   {

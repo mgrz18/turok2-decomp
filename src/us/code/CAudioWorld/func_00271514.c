@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/sound.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 
-s32 __osDisableInt();                                /* extern */
-s32 __osRestoreInt(s32);                         /* extern */
 
 /* Releases the sound manager lock. */
 void CAudioWorld__Unlock(CAudioWorld *arg0) {
@@ -17,7 +16,7 @@ void CAudioWorld__Unlock(CAudioWorld *arg0) {
     temp_s0->count = temp_v1;
     if (temp_v1 != 0) {
         __osRestoreInt(temp_v0);
-        osSendMesg(temp_s0, 0, 1);
+        osSendMesg(&temp_s0->queue, 0, 1);
         return;
     }
     __osRestoreInt(temp_v0);

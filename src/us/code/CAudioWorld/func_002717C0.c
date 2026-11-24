@@ -1,12 +1,11 @@
 #include "common.h"
 #include "structs/sound.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
+#include "protos/audio_world.h"
 
 s32 SndVoicePool_StopAllExcept(void *, s32);                /* extern */
 s32 SndQueue_CancelAllExcept(void *, s32);                /* extern */
-s32 SpeechPlayer_Stop(void *);                      /* extern */
-s32 __osDisableInt();                                /* extern */
-s32 __osRestoreInt(s32);                         /* extern */
 
 void CAudioWorld__StopAllSounds(CAudioWorld *arg0, s32 arg1) {
     s32 temp_a0;
@@ -28,7 +27,7 @@ void CAudioWorld__StopAllSounds(CAudioWorld *arg0, s32 arg1) {
     temp_s0->count = temp_v1;
     if (temp_v1 != 1) {
         __osRestoreInt(temp_a0);
-        osRecvMesg(temp_s0, 0, 1);
+        osRecvMesg(&temp_s0->queue, 0, 1);
         var_a0 = &arg0->pool;
     } else {
         __osRestoreInt(temp_a0);
@@ -43,7 +42,7 @@ void CAudioWorld__StopAllSounds(CAudioWorld *arg0, s32 arg1) {
     temp_s0_2->count = temp_v1_2;
     if (temp_v1_2 != 0) {
         __osRestoreInt(temp_v0);
-        osSendMesg(temp_s0_2, 0, 1);
+        osSendMesg(&temp_s0_2->queue, 0, 1);
     } else {
         __osRestoreInt(temp_v0);
     }

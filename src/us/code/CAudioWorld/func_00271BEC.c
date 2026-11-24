@@ -1,12 +1,12 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80258800_de.c, func_80259038_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "rw/abu_types.h"
+#include "common.h"
+#include "structs/sound.h"
+#include "protos/audio_world.h"
 
-extern s32 CAudioWorld__PickVariant(SceneRecAt2B5C *scene, s16 id, s16 avoid);
-extern s32 BinaryRange(sptr, s32, s32, s32 *, s32 *);
-extern s32 Random_Next(void);
-s32 CAudioWorld__PickVariant(SceneRecAt2B5C *scene, s16 id, s16 avoid) {
+/* A weighted random entry of sound id's range (avoid: not the last one picked). */
+s32 CAudioWorld__PickVariant(CAudioWorld *m, s16 id, s16 avoid) {
     s32 first;
     s32 last;
     s32 total;
@@ -14,24 +14,24 @@ s32 CAudioWorld__PickVariant(SceneRecAt2B5C *scene, s16 id, s16 avoid) {
     s32 draw;
     s32 i;
     total = 0;
-    if (scene->count != 0) {
-        if (BinaryRange(scene->ids, scene->count, id, &first, &last) == 0) {
+    if (m->rangeCount != 0) {
+        if (BinaryRange(m->ranges, m->rangeCount, id, &first, &last) == 0) {
             return -1;
         }
         entry = first;
         if (entry != last) {
             for (i = first; i <= last; i++) {
-                total += scene->weights[i] * 10;
+                total += m->weights[i] * 10;
             }
             draw = Random_Next() % total;
             total = 0;
             for (entry = first; entry < last; entry++) {
-                total += scene->weights[entry] * 10;
+                total += m->weights[entry] * 10;
                 if (total >= draw) {
                         break;
                 }
             }
-            if (avoid != 0 && entry == scene->lastPick) {
+            if (avoid != 0 && entry == m->lastVariant) {
                 if (entry == last) {
                         entry--;
                 } else {

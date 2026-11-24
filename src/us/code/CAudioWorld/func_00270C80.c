@@ -5,6 +5,8 @@
 #include "structs/table.h"
 #include "protos/iset.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
+#include "protos/audio_world.h"
 
 /* Plays a sound or a music cue at pos: refuses while another cue is pending,
  * when 6 of the 17 voices already play this sound id (or for cue 0x44C while
@@ -12,11 +14,7 @@
  * id avoids repeating its last variant), then starts each of its layers under
  * a new play handle, which it returns (-1 when nothing plays). */
 
-extern u32 __osDisableInt(void);
-extern void __osRestoreInt(u32 mask);
-extern s32 Random_Next(void);
 extern f32 Random_Float(f32 range);
-extern s32 BinaryRange(void *ranges, s32 count, s16 id, s32 *lo, s32 *hi);
 extern void CAudioWorld__PlayLayer(CAudioWorld *m, void *layer, CVector3 *pos, s32 variant, s32 handle, s32 a5, sptr a6);
 
 static __inline__ void CAudioWorld_Lock(CAudioWorld *m) {
@@ -25,7 +23,7 @@ static __inline__ void CAudioWorld_Lock(CAudioWorld *m) {
 
     if (++l->count != 1) {
         __osRestoreInt(mask);
-        osRecvMesg(l, 0, 1);
+        osRecvMesg(&l->queue, 0, 1);
     } else {
         __osRestoreInt(mask);
     }
@@ -37,7 +35,7 @@ static __inline__ void CAudioWorld_Unlock(CAudioWorld *m) {
 
     if (--l->count != 0) {
         __osRestoreInt(mask);
-        osSendMesg(l, 0, 1);
+        osSendMesg(&l->queue, 0, 1);
     } else {
         __osRestoreInt(mask);
     }
@@ -93,7 +91,7 @@ chk:
         last = (u16) m->lastVariant; /* the N64's 0x132: the low half of the big-endian word (round 12 a5) */
         sum = 0;
         if (m->rangeCount != 0) {
-            if (BinaryRange(m->ranges, m->rangeCount, id, &lo, &hi) != 0) {
+            if (BinaryRange(m->ranges, m->rangeCount, (s16)id, &lo, &hi) != 0) {
                 i = lo;
                 if (i != hi) {
                     for (count = lo; count <= hi; count++) {
@@ -127,7 +125,7 @@ chk:
     } else {
         sum = 0;
         if (m->rangeCount != 0) {
-            if (BinaryRange(m->ranges, m->rangeCount, id, &lo2, &hi2) != 0) {
+            if (BinaryRange(m->ranges, m->rangeCount, (s16)id, &lo2, &hi2) != 0) {
                 i = lo2;
                 if (i != hi2) {
                     for (r = lo2; r <= hi2; r++) {

@@ -3,10 +3,9 @@
 
 #include "rw/abu_types.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 
 extern void SndQueue_CancelHandle(struct ChannelSet *arg0, s32 arg1);
-extern u32 __osDisableInt(void);
-extern void __osRestoreInt(u32);
 extern void SndVoicePool_StopVoice(void *, s16);
 s32 CAudioWorld__StopHandle(void *arg0, s32 id) {
     void *temp_s0;
@@ -67,5 +66,3 @@ s32 CAudioWorld__StopHandle(void *arg0, s32 id) {
     }
     return found;
 }
-extern u32 __osDisableInt(void);
-extern void __osRestoreInt(u32);

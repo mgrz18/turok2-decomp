@@ -1,7 +1,7 @@
 #include "common.h"
+#include "structs/sound.h"
+#include "protos/audio_world.h"
 
-s32 SpeechPlayer_Stop(s32);                         /* extern */
-
-void CAudioWorld__StopSpeech(sptr arg0) {
-    SpeechPlayer_Stop(arg0 + 0x2BC0);
+void CAudioWorld__StopSpeech(CAudioWorld *m) {
+    SpeechPlayer_Stop(&m->fx);
 }

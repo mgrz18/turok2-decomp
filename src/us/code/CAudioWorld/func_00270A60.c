@@ -9,8 +9,8 @@
 #include "structs/sound.h"
 #include "structs/camera.h"
 #include "protos/ultra.h"
-u32 __osDisableInt(void);
-void __osRestoreInt(u32 mask);
+#include "protos/osint.h"
+#include "protos/audio_world.h"
 /* Static inlines from the Rage Wars header b13_types.h (dropped by the importer). */
 static inline void CAudioWorld_Lock(CAudioWorld *m) {
     CMutex *l = &m->lock;
@@ -32,7 +32,6 @@ static inline void CAudioWorld_Unlock(CAudioWorld *m) {
         __osRestoreInt(mask);
     }
 }
-sptr CCameraPool__GetNearestCamera(void *p, sptr id);
 s32 SndVoicePool_IsSoundPlaying(void *pool, s16 a);
 f32 Sound_DistanceFalloff(sptr id, sptr p);
 s32 SndVoicePool_FindSoundWithOwner(void *pool, s16 a, s32 b);
@@ -42,10 +41,10 @@ SndVoice *SndVoicePool_AllocVoice(void *pool, SoundEffectInfo *info, s32 a3, s32
 void SndVoice_SetPosition(SndVoice *v, sptr id, sptr a6);
 void SndVoice_SetSoundId(SndVoice *v, s16 a);
 void SndVoice_Setup(SndVoice *v, SoundEffectInfo *info, s32 a5);
-s32 CAudioWorld__StartVoice(CAudioWorld *m, s32 id, s32 a2, s32 a3);
+s32 CAudioWorld__StartVoice(CAudioWorld *m, s32 id);
 s32 CAudioWorld__PlayLayer(CAudioWorld *m, SoundEffectInfo *info, sptr id, s32 a3, s32 a4, s32 a5, sptr a6) {
     SndVoice *v;
-    m->listener = CCameraPool__GetNearestCamera(&gEngineApp_m_Game_m_CameraPool, id);
+    m->listener = CCameraPool__GetNearestCamera(&gEngineApp_m_Game_m_CameraPool, (CVector3 *)id);
     if (info->flags & 1) {
         if (SndVoicePool_IsSoundPlaying(&m->pool, m->cueId) != 0) {
             return -1;
@@ -75,7 +74,7 @@ s32 CAudioWorld__PlayLayer(CAudioWorld *m, SoundEffectInfo *info, sptr id, s32 a
     SndVoice_SetSoundId(v, m->cueId);
     SndVoice_Setup(v, info, a5);
     CAudioWorld_Lock(m);
-    CAudioWorld__StartVoice(m, v->id, 0, id);
+    ((s32 (*)(CAudioWorld *, s32, s32, sptr))CAudioWorld__StartVoice)(m, v->id, 0, id);   /* the ROM passes two more arguments */
     CAudioWorld_Unlock(m);
     return 0;
 }

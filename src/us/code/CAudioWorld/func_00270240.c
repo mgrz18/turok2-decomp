@@ -5,6 +5,8 @@
 #include "globals/audio.h"
 #include "globals/engine.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
+#include "protos/audio_world.h"
 
 typedef struct {
     s32 rate;
@@ -21,12 +23,9 @@ typedef struct {
 
 extern u8 gEngineApp_m_Settings_unk15[]; /* local type: the field's real type (or the member path) changes the ROM's code here */     /* volume settings (bytes from -2) */
 
-extern s32 __osDisableInt(void);         /* disable interrupts */
-extern void __osRestoreInt(s32 mask);    /* restore interrupts */
 extern void CMutex__Construct(CMutex *lock);
 extern void alHeapInit(void *heap, sptr base, s32 len);    /* alHeapInit */
 extern void amCreateAudioMgr(ALSynConfig *cfg, s32 a, AiCfg *ai);
-extern BankRes *VM_Alloc(s32 a, s32 b, s32 c);
 extern void CAudioWorld__LoadSfxDataFile(CAudioWorld *m);
 extern void SndSeq_Construct(void *seq, CAudioWorld *m);
 extern void alSndpNew(void *player, void *cfg);           /* alSndpNew */
@@ -49,7 +48,7 @@ static __inline__ void CAudioWorld_Lock(CAudioWorld *m) {
 
     if (++l->count != 1) {
         __osRestoreInt(mask);
-        osRecvMesg(l, NULL, 1);
+        osRecvMesg(&l->queue, NULL, 1);
     } else {
         __osRestoreInt(mask);
     }
@@ -61,7 +60,7 @@ static __inline__ void CAudioWorld_Unlock(CAudioWorld *m) {
 
     if (--l->count != 0) {
         __osRestoreInt(mask);
-        osSendMesg(l, NULL, 1);
+        osSendMesg(&l->queue, NULL, 1);
     } else {
         __osRestoreInt(mask);
     }

@@ -1,29 +1,18 @@
-typedef int s32;
-typedef short s16;
+#include "common.h"
+#include "structs/sound.h"
 
-typedef struct {
-    s32 id;                     /* 0x00 */
-    char pad4[0xCC - 0x4];
-} Slot;                         /* size 0xCC */
-
-typedef struct {
-    char pad0[0x102];
-    s16 unk_102;                /* 0x102 */
-    char pad104[0x1E64 - 0x104];
-    Slot slots[17];             /* 0x1E64 */
-} Player;
-
-s32 CAudioWorld__IsSoundBusy(Player *player, s32 id) {
+/* Busy: the mute flag with sound 0x44C, a pending cue, or 6 voices already playing sound id. */
+s32 CAudioWorld__IsSoundBusy(CAudioWorld *m, s32 id) {
     s32 count;
     s32 i;
 
-    if ((*(s32 *)((char *)player + 0x2BB8) != 0 && id == 0x44C) || player->unk_102 != -1) {
+    if ((m->muted != 0 && id == 0x44C) || m->pendingCue != -1) {
         return 1;
     }
     count = 0;
     if (id < 0x100) {
         for (i = 0; i < 17; i++) {
-            if (player->slots[i].id == id) {
+            if (m->pool.voices[i].soundId == id) {
                 count++;
             }
         }

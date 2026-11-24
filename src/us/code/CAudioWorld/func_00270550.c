@@ -2,8 +2,8 @@
 #include "common.h"
 #include "structs/sound.h"
 #include "protos/iset.h"
+#include "protos/audio_world.h"
 
-extern void *VM_Alloc(s32 a, s32 b, s32 c);
 
 /* Sound manager: find the sound tables in the sound data file. */
 void CAudioWorld__LoadSfxDataFile(CAudioWorld *m) {

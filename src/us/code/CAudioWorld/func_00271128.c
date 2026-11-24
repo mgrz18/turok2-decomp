@@ -8,8 +8,7 @@
 #include "structs/sound.h"
 #include "protos/iset.h"
 #include "protos/ultra.h"
-u32 __osDisableInt(void);
-void __osRestoreInt(u32 mask);
+#include "protos/osint.h"
 static __inline__ void CAudioWorld_Lock(CAudioWorld *m) {
     CMutex *l = &m->lock;
     u32 mask = __osDisableInt();

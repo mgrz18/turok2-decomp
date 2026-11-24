@@ -2,9 +2,8 @@
 #include "ultra_types.h"
 #include "structs/sound.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 
-s32 __osDisableInt();                                /* extern */
-s32 __osRestoreInt(s32);                         /* extern */
 
 void CAudioWorld__Lock(CAudioWorld *arg0) {
     s32 temp_a0;
@@ -17,7 +16,7 @@ void CAudioWorld__Lock(CAudioWorld *arg0) {
     temp_s0->count = temp_v1;
     if (temp_v1 != 1) {
         __osRestoreInt(temp_a0);
-        osRecvMesg(temp_s0, 0, 1);
+        osRecvMesg(&temp_s0->queue, 0, 1);
         return;
     }
     __osRestoreInt(temp_a0);
