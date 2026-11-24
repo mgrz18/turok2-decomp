@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0024D860.c, func_8024D870_de, with Turok 2's layouts. */
 #include "common.h"
+#include "protos/game_object.h"
 #include "structs/game_object.h"
 #include "globals/math.h"
 
@@ -7,15 +8,6 @@
 
 
 
-s32 CGameRegion__IsSteep(void *region);
-void CGameRegion__GetNormal(CVector3 *normal, void *region);
-void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);     /* cross product */
-void CVector3__Normalize(CVector3 *v);                         /* normalize */
-f32 Math_AcosLookup(f32 x);                            /* acos */
-f32 func_002982F0(f32 x);                            /* sin */
-f32 func_002974C0(f32 x);                            /* cos */
-f32 CGameRegion__GetClimbAngle(void *region, f32 x, f32 z, f32 toX, f32 toZ);  /* ground slope */
-void CQuaternion__SlerpFast(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b);           /* slerp */
 
 static __inline__ s32 isHeld(CGameObjectInstance *obj) {
     return (obj->header.m_Type != 1) ? 0 : (obj->m_dwFlags & 1);

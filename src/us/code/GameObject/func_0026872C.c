@@ -1,24 +1,18 @@
 #include "common.h"
-#include "structs/vector.h"
+#include "protos/game_object.h"
 
-typedef struct {
-    u8 pad0[0x4];
-    CVector3 pos;  /* 0x4 */
-    void *node;  /* 0x10 */
-} Placed;
-
-f32 CGameRegion__GetHeight(void *node, f32 x, f32 z);
-
-f32 GameObject_GetRegionFloorHeight(Placed *obj, CVector3 *offset) {
-    void *node = obj->node;
+/* The floor height under an object (offset by offset in x and z when given): its region's, or
+ * its own height when it has no region. */
+f32 GameObject_GetRegionFloorHeight(CInstanceHeader *obj, CVector3 *offset) {
+    CGameRegion *node = obj->m_pCurrentRegion;
     f32 result;
 
     if (node == NULL) {
-        result = obj->pos.y;
+        result = obj->m_vPos.y;
     } else if (offset == NULL) {
-        result = CGameRegion__GetHeight(node, obj->pos.x, obj->pos.z);
+        result = CGameRegion__GetHeight(node, obj->m_vPos.x, obj->m_vPos.z);
     } else {
-        result = CGameRegion__GetHeight(node, obj->pos.x + offset->x, obj->pos.z + offset->z);
+        result = CGameRegion__GetHeight(node, obj->m_vPos.x + offset->x, obj->m_vPos.z + offset->z);
     }
     return result;
 }

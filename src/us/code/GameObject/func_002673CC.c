@@ -1,180 +1,42 @@
-#include "structs/vector.h"
-#include "globals/game.h"
-#include "globals/math.h"
-
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/8024D018_3.CPP, func_8024D4AC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
-#include "structs/intelligence.h"
 #include "structs/game.h"
-struct LevelActor;
-extern f32 Math_AcosLookup(f32 arg0);
-extern float func_002974C0(float x);
-extern float func_002982F0(float x);
-struct Box;
-typedef struct Box Box;
-struct Box;
-struct Box {
-    CVector3 min;
-    CVector3 max;
-};
-struct CQuatern_t;
-typedef struct CQuatern_t CQuatern;
-struct CQuatern_t;
-struct CQuatern_t {
-    float x;
-    float y;
-    float z;
-    float w;
-};
-typedef struct Shared_ParticleLighting Shared_ParticleLighting;
-struct Shared_ParticleLighting {
-    u8 ambient[3], reserved3;
-    u8 ambientCopy[3], reserved7;
-    u8 diffuse[3], reservedB;
-    u8 diffuseCopy[3], reservedF;
-    s8 direction[3];
-    u8 reserved13[5];
-} __attribute__((aligned(4)));
-struct Actor_func_80214310_de;
-typedef struct Actor_func_80214310_de Actor_func_80214310_de;
-struct Actor_func_80214310_de;
-struct Actor_func_80214310_de {
-    char pad0[4];
-    CVector3 position; /* Turok 2 layout (0x8/0x70 in Rage Wars) */
-    char pad10[0x54 - 0x10];
-    f32 eye;
-};
-typedef struct LevelActor LevelActor;
-struct LevelActor {
-    u8 kind;
-    s8 team;
-    char pad2;
-    s8 field3;
-    s16 modelIndex;
-    u16 pad6;
-    CVector3 position0;
-    s32 model;
-    CIntelligence *definition;
-    CVector3 position1;
-    CVector3 motionAngles;
-    void *attached;
-    s32 motionState;
-    s32 motionIndex;
-    f32 floorHeight;
-    CVector3 floorDirection;
-    CVector3 scale;
-    CQuatern rotation;
-    f32 yaw;
-    f32 eyeHeight;
-    f32 transform[16];
-    void *fieldB4;
-    s32 fieldB8;
-    void *shadow;
-    u8 padC0[4];
-    s32 resource;
-    s32 resourceKey;
-    s32 animationKey;
-    s32 resourceFlags;
-    s32 resourceAlignment;
-    s32 resourceHandle;
-    s32 resourceState;
-    s32 resourceWindow;
-    u16 type;
-    u8 stateE6;
-    u8 stateE7;
-    Box bounds;
-    s32 flags;
-    f32 animationTime;
-    s16 animation;
-    s16 nextAnimation;
-    u8 pad10C[2];
-    s8 animationPending;
-    s8 animationChanged;
-    u8 pad110[0x138 - 0x110];
-    u8 state138;
-    u8 state139;
-    u8 shadowAlpha;
-    u8 state13B;
-    u8 pad13C[4];
-    /* no lighting[2] in Turok 2: lockOn is at 0x1C0 */
-    s32 behaviorFlags;
-    s32 active;
-    u8 pad178[4];
-    s32 mask;
-    u8 pad180[0x20];
-    s32 collisionEnabled;
-    u8 pad1A4;
-    s8 animationState;
-    u8 pad1A6[0xA];
-    f32 motionThreshold;
-    u8 pad1B4[4];
-    CVector3 aimPosition;
-    u8 pad1C4[0x14];
-    void *controller;
-    u8 pad1DC[0x14];
-    char *lockOn;
-    u8 pad1F4[0x23A - 0x1F4];
-    s8 lean;
-    u8 updateCount;
-    s32 actionReady;
-    u8 pad240[0x30];
-    u8 effectMode;
-    u8 pad271[0xB];
-    void *update;
-    u8 pad280[0xC];
-    void (*controllerUpdate)(void *, void *);
-    u8 pad290[4];
-    f32 pitch;
-    u8 pad298[0xC];
-    f32 restPitch;
-    u8 pad2A8[0x38];
-    s32 renderFlags;
-    s32 flags2E4;
-};
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-extern void CVector3__Normalize(f32 *arg0);
-extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
-extern CQuatern CGameObjectInstance__GetRotation(char *);
-extern void CQuaternion__ToMatrix(CQuatern *, f32 *);
-extern char *CPlayerPool__FindNearest(void *, CVector3);
-extern f32 GameObject_GetCollisionHeight(char *);
-extern void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
-extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
-extern void CQuaternion__Multiply(CQuatern *, CQuatern *, CQuatern *);
-extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
-#include "structs/game_object.h"
+#include "globals/game.h"
+#include "globals/math.h"
+#include "protos/game_object.h"
+#include "protos/mtxf.h"
 
-/* The port: the same on host types. The N64 views read the aiming actor's sight target at 0x1C0
- * (LevelActor.lockOn: CAI m_pSightTarget) and the target's collision y offset at 0x54
- * (m_CollisionYOffset): on the host both missed (LevelActor has pointers before them), so an
- * enemy's projectile aimed at the nearest player's feet plus a garbage height, over his head. */
-CQuatern GameObject_GetAimRotation(char *actor, CVector3 point) {
+CQuaternion CGameObjectInstance__GetRotation(CGameObjectInstance *actor);
+void CQuaternion__ToMatrix(f32 *q, f32 *m);
+void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);
+CGameObjectInstance *CPlayerPool__FindNearest(void *pool, CVector3 p);
+
+/* The rotation that turns an actor (or the world's z axis, without one) toward its sight target, or
+ * else the nearest player, at three quarters of its collision height. Round 28: on
+ * CGameObjectInstance (Rage Wars' LevelActor view read the sight target at 0x1C0 and the collision
+ * y offset at 0x54, which on the host missed). */
+CQuaternion GameObject_GetAimRotation(CGameObjectInstance *actor, CVector3 point) {
     CVector3 origin;
     CVector3 dir;
     CVector3 forward;
     CVector3 local;
     CVector3 axis;
-    CQuatern turn;
-    CQuatern aim;
-    CQuatern result;
-    f32 matrix[16];
+    CQuaternion turn;
+    CQuaternion aim;
+    CQuaternion result;
+    CMtxF matrix;
     CGameObjectInstance *target;
     CGameObjectInstance *found;
     f32 angle;
     f32 scale;
 
     target = NULL;
-    if (actor != 0 && *(u8 *)actor == 1) {
-        target = ((CGameObjectInstance *) actor)->m_AI.m_pSightTarget;
+    if (actor != NULL && actor->header.m_Type == 1) {
+        target = actor->m_AI.m_pSightTarget;
         aim = CGameObjectInstance__GetRotation(actor);
-        CQuaternion__ToMatrix(&aim, matrix);
+        CQuaternion__ToMatrix((f32 *) &aim, (f32 *) matrix);
         local.x = 0.0f;
         local.y = 0.0f;
         local.z = 1.0f;
@@ -185,7 +47,7 @@ CQuatern GameObject_GetAimRotation(char *actor, CVector3 point) {
         forward.z = 1.0f;
     }
     if (target == NULL) {
-        found = (CGameObjectInstance *) CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, point);
+        found = CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, point);
         if (found != NULL) {
             target = found;
         }
@@ -197,11 +59,11 @@ CQuatern GameObject_GetAimRotation(char *actor, CVector3 point) {
     }
     origin = target->header.m_vPos;
     origin.y += target->m_CollisionYOffset;
-    origin.y += GameObject_GetCollisionHeight((char *) target) * 0.75f;
+    origin.y += GameObject_GetCollisionHeight(target) * 0.75f;
     CVector3__Subtract(&dir, &origin, &point);
-    CVector3__Normalize((f32 *) &dir);
+    CVector3__Normalize(&dir);
     CVector3__Cross(&axis, &forward, &dir);
-    CVector3__Normalize((f32 *) &axis);
+    CVector3__Normalize(&axis);
     angle = Math_AcosLookup(forward.x * dir.x + forward.y * dir.y + forward.z * dir.z) * 0.5f;
     scale = func_002982F0(angle);
     turn.x = axis.x * scale;
@@ -209,7 +71,7 @@ CQuatern GameObject_GetAimRotation(char *actor, CVector3 point) {
     turn.z = axis.z * scale;
     gQuaternionSin = scale;
     turn.w = func_002974C0(angle);
-    if (actor != 0 && *(u8 *)actor == 1) {
+    if (actor != NULL && actor->header.m_Type == 1) {
         CQuaternion__Multiply(&result, &aim, &turn);
     } else {
         result = turn;

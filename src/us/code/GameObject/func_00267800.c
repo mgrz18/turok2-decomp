@@ -1,10 +1,8 @@
 #include "common.h"
+#include "protos/game_object.h"
 #include "structs/game_object.h"
 
 
-f32 CGameRegion__GetHeight(void *node, f32 x, f32 z);
-f32 Platform_GetTopHeight(void *actor, f32 x, f32 z);
-void GameObject_GetFrameDelta(CGameObjectInstance *actor, CVector3 *velocity);
 
 /* GameObject_GetFloorHeightAt, inlined: floor height under (x, z) for an actor. */
 static __inline__ f32 actorFloor(CGameObjectInstance *actor, f32 x, f32 z) {

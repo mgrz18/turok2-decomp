@@ -1,13 +1,9 @@
 #include "common.h"
+#include "protos/game_object.h"
 
-f32 GameObject_GetGroundHeight(void *actor, s32 arg);
-
-/* Whether the actor stands on (or within 0.512 above) the ground. */
-#include "structs/game_object.h"
-/* The port: by member of CGameObjectInstance (N64: the flags 0xD4, the AI's flags 0x140, the
- * position's y 0x8). */
-s32 GameObject_IsOnGround(u8 *actor_) {
-    CGameObjectInstance *actor = (CGameObjectInstance *) actor_;
+/* Whether the actor stands on (or within 0.512 above) the ground. The ROM passes a second
+ * argument (0) that GameObject_GetGroundHeight ignores. */
+s32 GameObject_IsOnGround(CGameObjectInstance *actor) {
     s32 state;
 
     if (actor->header.m_Type == 1) {
@@ -19,5 +15,5 @@ s32 GameObject_IsOnGround(u8 *actor_) {
             return 1;
         }
     }
-    return actor->header.m_vPos.y - GameObject_GetGroundHeight(actor, 0) <= 0.512f;
+    return actor->header.m_vPos.y - ((f32 (*)(CGameObjectInstance *, s32)) GameObject_GetGroundHeight)(actor, 0) <= 0.512f;
 }

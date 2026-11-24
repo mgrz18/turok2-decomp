@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/game_object.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
 #include "globals/scene.h"
@@ -6,21 +7,17 @@
 
 
 
-void Collision_MoveInstance(CInstanceHeader *actor, CVector3 pos, void *info);
-CVector3 CVector3__RandomPerturb(CVector3 *in, f32 amount);
-void CVector3__Normalize(CVector3 *v);
-void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
-u8 *CLevelActorPool__Spawn(CLevelActorPool *table, void *slot, s32 kind, CVector3 velocity, CVector3 pos, void *region, f32 arg);
+u8 *CLevelActorPool__Spawn(CLevelActorPool *table, void *slot, s32 kind, CVector3 velocity, CVector3 pos, CGameRegion *region, f32 arg);
 
 /* GameObject_TraceMove's logic, inlined with the collision flags addressed directly. */
-static __inline__ void tracePos(CInstanceHeader *actor, CVector3 pos, CVector3 *outPos, void **outRegion, s32 flagA, s32 flagB) {
+static __inline__ void tracePos(CInstanceHeader *actor, CVector3 pos, CVector3 *outPos, CGameRegion **outRegion, s32 flagA, s32 flagB) {
     CInstanceHeader saved;
     CVector3 end;
     CCollisionResults hits;
     CCollisionResults *oldHits;
     s32 oldA;
     s32 oldB;
-    void *region;
+    CGameRegion *region;
 
     saved = *actor;
     oldA = gCollisionInfoTrace.m_GroundBehavior;
@@ -29,7 +26,7 @@ static __inline__ void tracePos(CInstanceHeader *actor, CVector3 pos, CVector3 *
     gCollisionInfoTrace.m_GroundBehavior = flagA;
     gCollisionInfoTrace.m_InstanceBehavior = flagB;
     gCollisionResultsP = &hits;
-    Collision_MoveInstance(actor, pos, &gCollisionInfoTrace);
+    Collision_MoveInstance((CGameObjectInstance *) actor, pos, &gCollisionInfoTrace);
     actor->m_vPos.y = pos.y;
     end.x = actor->m_vPos.x;
     end.y = pos.y;
@@ -49,7 +46,7 @@ void GameObject_DropPickupAt(CInstanceHeader *actor, CVector3 pos, s32 kind, f32
     CVector3 dir;
     CVector3 velocity;
     CVector3 at;
-    void *region;
+    CGameRegion *region;
 
     tracePos(actor, pos, &at, &region, 0, 0);
     up.x = 0.0f;

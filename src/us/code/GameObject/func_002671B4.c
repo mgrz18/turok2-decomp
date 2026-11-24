@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "structs/player.h"
+#include "protos/game_object.h"
 
-extern f32 GameObject_GetDeadCollisionHeight(CGameObjectInstance *a);
 
 /* NOTE: Turok 2 differs from Rage Wars in case 11 (subtracts two owner values
  * and falls through to case 1/4) and has no cases 13/14.

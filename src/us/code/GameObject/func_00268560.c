@@ -1,21 +1,19 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8024E140_de_3.c, func_8024E59C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "rw/abu_types.h"
+#include "common.h"
+#include "protos/game_object.h"
 
-#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
-#define GameObject_TraceMove GameObject_TraceMove_fif
-#endif
-extern void GameObject_TraceMove(void *arg0, TripleRecAt8 t, void *arg4, s32 *arg5, s32 arg6, s32 arg7);
-extern f32 CGameRegion__GetHeight(struct Node75 *node, f32 x, f32 z);
-void GameObject_GetFloorPointAt(void *arg0, void *arg1, void *arg2) {
-    CVector3 *source = arg1;
-    CVector3 *output = arg2;
-    TripleRecAt8 t;
-    sptr sp30;
-    t.a = source->x;
-    t.b = 0;
-    t.c = source->z;
-    GameObject_TraceMove(arg0, t, arg2, &sp30, 0, 0);
-    output->y = CGameRegion__GetHeight((struct Node75 *)sp30, output->x, output->z);
+/* The floor point under point: traced from its x and z at height 0, then the height of the region
+ * the trace ends in. Round 28: the position is a CVector3 (Rage Wars' TripleRecAt8 had an s32 y,
+ * which on the host needed the GameObject_TraceMove_fif wrapper of port/game/t2abi.c). */
+void GameObject_GetFloorPointAt(CInstanceHeader *obj, CVector3 *point, CVector3 *out) {
+    CVector3 pos;
+    CGameRegion *region;
+
+    pos.x = point->x;
+    pos.y = 0.0f;
+    pos.z = point->z;
+    GameObject_TraceMove(obj, pos, out, &region, 0, 0);
+    out->y = CGameRegion__GetHeight(region, out->x, out->z);
 }

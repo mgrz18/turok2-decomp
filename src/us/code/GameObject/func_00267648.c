@@ -1,11 +1,10 @@
 #include "common.h"
+#include "protos/game_object.h"
 #include "structs/game_object.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
 
-f32 CGameRegion__GetHeight(void *node, f32 x, f32 z);
-f32 Platform_GetTopHeight(void *actor, f32 x, f32 z);
 
 static __inline__ f32 nodeFloor(CGameObjectInstance *actor, f32 x, f32 z) {
     void *node = actor->header.m_pCurrentRegion;

@@ -1,28 +1,27 @@
 #include "common.h"
+#include "protos/game_object.h"
 
-f32 CGameRegion__GetHeight(void *node, f32 x, f32 z);
-f32 Platform_GetTopHeight(void *actor, f32 x, f32 z);
-
-static __inline__ f32 nodeFloor(u8 *actor, f32 x, f32 z) {
-    void *node = *(void **) (actor + 0x10);
+static __inline__ f32 nodeFloor(CGameObjectInstance *actor, f32 x, f32 z) {
+    CGameRegion *node = actor->header.m_pCurrentRegion;
     f32 result;
 
     if (node == NULL) {
-        result = *(f32 *) (actor + 0x8);
+        result = actor->header.m_vPos.y;
     } else {
         result = CGameRegion__GetHeight(node, x, z);
     }
     return result;
 }
 
-/* Floor height under (x, z) for the actor. */
-f32 GameObject_GetFloorHeightAt(u8 *actor, f32 x, f32 z) {
-    u8 *def;
+/* Floor height under (x, z) for the actor: a platform's top for the platforms that collide by
+ * shape (collision types 1 and 2), its region's floor for type 0, its own height otherwise. */
+f32 GameObject_GetFloorHeightAt(CGameObjectInstance *actor, f32 x, f32 z) {
+    CIntelligence *def;
 
-    if (actor[0] == 1) {
-        def = *(u8 **) (actor + 0x14);
-        if (*(s32 *) def == 2) {
-            switch (*(u16 *) (def + 0x18)) {
+    if (actor->header.m_Type == 1) {
+        def = actor->header.m_pIntelligence;
+        if (def->m_Type == INTELLIGENCE_PLATFORM) {
+            switch (def->m_Platform.m_CollisionType) {
                 case 0:
                     return nodeFloor(actor, x, z);
                 case 1:
@@ -31,5 +30,5 @@ f32 GameObject_GetFloorHeightAt(u8 *actor, f32 x, f32 z) {
             }
         }
     }
-    return *(f32 *) (actor + 0x8);
+    return actor->header.m_vPos.y;
 }

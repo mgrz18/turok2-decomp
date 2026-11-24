@@ -1,75 +1,19 @@
 /* FAKEMATCH (round 22): the `do { return ...; } while (0)` (the permuter's other form of func_00267D60's fake);
  * the plain getter, on the typed CIntelligence too, gives the definition $a0 and the type $v1: 5 of 13 words. */
-#include "structs/vector.h"
+#include "common.h"
+#include "structs/game_object.h"
+#include "structs/intelligence.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/8024D018_4.CPP, func_8024DD24_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct Model;
-struct Model {
-    s32 kind;
-    char pad4[0x10];
-    u32 flags;
-    char pad18[0x34];
-    s32 slots[8];
-};
-struct Model;
-struct Model;
-struct Model;
-struct Model;
-typedef struct Model Model;
-struct Model;
-struct ModelBlend;
-struct ModelBlend {
-    s32 kind;
-    char pad4[0x28];
-    f32 blend;
-    u8 pad30[4];
-    CVector3 effectOffset;
-    u8 pad40[4];
-    s32 collisionFlags;
-    char pad48[4];
-    u32 collisionOptions;
-    char pad50[2];
-    u16 materialFlags;
-    char pad54[4];
-    u8 byte58;
-    u8 byte59;
-    char pad5A[0x9A];
-    f32 height;
-};
-struct ModelBlend;
-typedef struct ModelBlend ModelBlend;
-struct Model;
-struct Model;
-struct Model;
-struct Model;
-struct Model;
-struct Model;
-struct Model;
-struct ModelBlend;
-struct Model;
-struct ModelBlend;
-struct Object;
-struct Model;
-struct Model;
-struct Model;
-struct ModelBlend;
-struct Object {
-    char pad[0x14];
-    struct ModelBlend *owner; /* 0x14 */
-    u8 reserved18[0x740 - 0x18];
-    u8 effect740;
-};
-s32 func_00267D2C(void *arg0)
-{
-    struct Object *object = arg0;
-    struct Model *model;
-    s32 kind;
-    model = (struct Model *)object->owner;
-    kind = model->kind;
+/* An enemy or turret definition's type flag (0 for other definitions). */
+s32 func_00267D2C(CGameObjectInstance *obj) {
+    CIntelligence *def = obj->header.m_pIntelligence;
+    s32 kind = def->m_Type;
+
     if ((kind == 1) || (kind == 4)) {
-        do { return model->flags & 0x20; } while (0);
+        do { return def->m_dwTypeFlags & 0x20; } while (0);
     }
     return 0;
 }

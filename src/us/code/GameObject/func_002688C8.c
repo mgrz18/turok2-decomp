@@ -1,20 +1,20 @@
 #include "common.h"
+#include "protos/game_object.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
 #include "globals/collision.h"
 
 
-void Collision_MoveInstance(CInstanceHeader *actor, CVector3 pos, void *info);
 
 /* Moves an actor to pos with collision, without moving it: returns where it would end up and in which region. */
-void GameObject_TraceMove(CInstanceHeader *actor, CVector3 pos, CVector3 *outPos, void **outRegion, s32 flagA, s32 flagB) {
+void GameObject_TraceMove(CInstanceHeader *actor, CVector3 pos, CVector3 *outPos, CGameRegion **outRegion, s32 flagA, s32 flagB) {
     CInstanceHeader saved;
     CVector3 end;
     CCollisionResults hits;
     CCollisionResults *oldHits;
     s32 oldA;
     s32 oldB;
-    void *region;
+    CGameRegion *region;
     s8 *flags;
 
     saved = *actor;
@@ -25,7 +25,7 @@ void GameObject_TraceMove(CInstanceHeader *actor, CVector3 pos, CVector3 *outPos
     oldB = flags[-2];
     flags[0] = flagA;
     flags[-2] = flagB;
-    Collision_MoveInstance(actor, pos, flags - 6);
+    Collision_MoveInstance((CGameObjectInstance *) actor, pos, (CCollisionInfo *) (flags - 6));
     gCollisionResultsP = oldHits;
     actor->m_vPos.y = pos.y;
     end.x = actor->m_vPos.x;

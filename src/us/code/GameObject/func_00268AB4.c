@@ -17,7 +17,7 @@ f32 GameObject_GetViewWaterHeight(CGameObjectInstance *actor) {
 
     region = actor->header.m_pCurrentRegion;
     if (region == NULL || !(region->m_wFlags & 1)
-        || (info = CScene__GetRegionInfo(&gScene, region)) == NULL) {
+        || (info = CScene__GetRegionInfo(&gScene, &region->m_nInfo)) == NULL) {
         return 0.0f;
     }
     h = info->m_WaterHeight;
