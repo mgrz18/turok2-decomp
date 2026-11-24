@@ -380,14 +380,16 @@ On the old stream (`--legacy`, 290,000 frames):
 
 Do not combine the default with `--l2-heal` (its picks were placed for the old stream).
 
-**The legacy switches** (DEBUG-ONLY, port/game/t2debug.c): `--legacy` writes all three; a human
-player and any run without them get the N64's behaviour.
+**The legacy switches** (DEBUG-ONLY, port/game/t2debug.c): `--legacy` writes all five (the last
+two since round 26); a human player and any run without them get the N64's behaviour.
 
 | switch | restores | with `--legacy`, leave it out with |
 |---|---|---|
 | `T2_LEGACY_SHAKE=1` (`=1,F`: until schedule frame F) | the camera shake radius 0: no shake random draws | `--n64-shake` (`--n64-shake-from L`) |
 | `T2_LEGACY_INTEL9=1` | the type-9 intelligence bodies left big-endian | `--n64-props` |
 | `T2_LEGACY_NOSOUND=1` | no sound world without `--audio`: sound requests draw no random numbers | `--n64-sound` |
+| `T2_LEGACY_VOICE=1` | the voice id tables (`sVoiceTrackSounds`, `sVoiceNoUnkC4Sounds`) read byte-swapped: no voice matches them | (always with `--legacy`) |
+| `T2_LEGACY_BATCHKEY=1` | the draw sort key takes byte 3 of `sBatchPass` (the high byte, 0, on the host) | (always with `--legacy`) |
 
 **Tools.** New this round: `n64audiodump.c` with `refshots.py --audio-dump`, `--wav` writing
 `WAV.txt`, `audiocmp.py`, `sndpcmp.py`, `T2_SNDP_LOG=2` (AUDIO.md 12.1); `n64trace.py --shots
@@ -880,7 +882,7 @@ stream).
 
 | what | switch | where |
 |---|---|---|
-| the old random stream | `T2_LEGACY_SHAKE`, `T2_LEGACY_INTEL9`, `T2_LEGACY_NOSOUND` (`--legacy`) | t2debug.c, game.cpp |
+| the old random stream | `T2_LEGACY_SHAKE`, `T2_LEGACY_INTEL9`, `T2_LEGACY_NOSOUND`, `T2_LEGACY_VOICE`, `T2_LEGACY_BATCHKEY` (`--legacy`) | t2debug.c, game.cpp, t2audio_world.c, Render.c |
 | weapons and ammo | `T2_GIVE_WEAPONS`, `T2_WEAPON` (the schedule; a request is taken when a level loads), `T2_FILL_AMMO` (`--real-weapons 1`: level 1 without); **`T2C34_CW`** (fullrun.py: the City Totem's weapon on the N64 stream, default 9) | t2debug.c, fullrun.py |
 | aim assists | `T2_FACE_NEAREST`, `T2_AIM_ENEMY`, `T2_AIM_AT`, `T2_AIM_NODE`, `T2_BOSS_FRONT` (`--stick-aim L,..`: the stick instead, under `aimdrive.py`) | t2debug.c, aimdrive.py |
 | the stick driver | `T2_AIM_STICK`, `T2_AIMD_*` (**`T2_AIMD_BOSS=L:R`**, `T2_AIMD_BOSS_THREAT`, `_THREAT0`, `_HOLD`, `_LEAD` h3, `--stick-boss`; `T2_AIMD_PRIMARY`, `T2_AIMD_PRIMARY_ONLY` g5; `T2_AIMD_IMMUNE_ACC`, `T2_AIMD_THREAT_NEAR`, `T2_AIMD_FIRE_MAX` f5) | aimdrive.py, fullrun.py |

@@ -640,6 +640,13 @@ N64_FROM = None       # --n64-shake-from L (round 17 f2): the N64's stream only 
 
 
 N64_CAVE_WEAPON = "9"   # the Cave Totem: the shredder on the N64 stream (85-135 damage with the scorpion launcher, 18-64 with it; round 17 f2)
+# round 26 o3: the Cave Totem by stick (--stick-aim 4) on the default stream (since round 26 with the N64's
+# reading of the voice ids): weapon 12. With the shredder the stick costs 140 there, the Blind One 42 more,
+# and 124's pylons kill the player who comes in with 18 (a life). One run per weapon, to 200,000 frames
+# (PLAYTHROUGH.md 47): 12 the totem 94 / 124 left 47 / the Queen left 21, 0 lives; 16 114 / 23 but the
+# Queen fight then runs ~61,000 frames and the route breaks in level 6; 15 122 / 4 and the Queen a life;
+# 10, 11, 13, 14, 17 a life or more by 124. T2R26_SCW overrides (DEBUG-ONLY test hook; "" = N64_CAVE_WEAPON)
+STICK_CAVE_WEAPON = os.environ.get("T2R26_SCW", "12") or None
 N64_MOTHER_MOVE = 4600   # the strafing and steps back at the Mother from her arena + this (5,800 legacy)
 
 
@@ -1358,7 +1365,10 @@ def main_all(out, upto=6, extras=True, hubs_in=None, no_cheats=(), extra_env=(),
         # the switch is scheduled in 103, before the totem's level loads. The plasma rifle: the
         # totem 200 damage and a life lost, the Blind One never hurt (hp 12,800/12,800 at the end);
         # the scorpion launcher: the totem 88 damage, the Blind One dead in 5,200 frames
-        r.weapon.append((l4s + rel + a4 - TOTEM_WEAPON_BEFORE, N64_CAVE_WEAPON if n64(4) else "16"))
+        cw = N64_CAVE_WEAPON if n64(4) else "16"
+        if STICK_CAVE_WEAPON and n64_full() and not LEGACY and 4 in STICK_AIM:
+            cw = STICK_CAVE_WEAPON
+        r.weapon.append((l4s + rel + a4 - TOTEM_WEAPON_BEFORE, cw))
         r.weapon.append((hubs[4] - 200, "10"))
     r.face_levels.append(lv)
     if real or n64(4):
