@@ -1390,13 +1390,14 @@ includers by the prototypes each one uses (every function it declares is defined
 merged file declares them from the definitions; the header's `void *` forms conflicted with ~40 typed
 definitions); externals one prototype each; per-file types `<name>_<vram>`; the camera pool and settings
 array views are asm-label names (`gCameraPoolBytes`, `gSettingsView`). `merge_check --rodata-free
---margs "--vm src/us/vm1/SceneLoad" code/CScene`: 194 error lines -> about 20, left: the definitions in
+--margs "--vm src/us/vm1/SceneLoad" code/CScene`: 194 error lines -> 22, left: the definitions in
 `#ifdef TARGET_PORT .. #else` pairs with typed parameters against callers' `void *` prototypes
-(`CScene__GetRegion`, `CScene__LoadBitSections`, `CScene__ReleaseSectors`, `CScene__UpdateDelayedEvents`,
+(`CScene__GetRegion`, `CScene__ReleaseSectors`, `CScene__UpdateDelayedEvents`,
 `CScene__RestoreFiredEvent(s)`, `CScene__ReapplyFiredEvents`, `CScene__DecompressAnimatedInstances`,
 `CScene__GetIntelligence`), `CScene__InitPersistentData`'s two-argument call, a one-argument `CISet__GetBlock`
-call, `gEngineApp_m_Settings`/`gEngineApp_m_Game_m_CameraPool` read through other local types
-(`CGameFromCameraPool`), `m_GraphicSetsKey`.
+call, `gEngineApp_m_Settings_difficulty`/`gEngineApp_m_Game_m_CameraPool` read through other local types
+(`ViewState`, `CGameFromCameraPool`), a type `CScene__DecompressLinks`' early prototype needs before it is
+declared (`WorldRecAt1B40C`), `m_GraphicSetsKey` (two local types of one name).
 
 The order question has an answer now, the CGameObjectInstance one: `"binary block"`/`"graphicset"`
 (0xA6B38) before `func_00220D00`'s 0.5f, `"level name"` (0xA6BD0, no slice) between `func_0042C194`'s and
