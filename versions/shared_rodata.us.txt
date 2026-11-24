@@ -69,22 +69,22 @@ func_0045078C 0x800C0EA8  # W batch: copy of func_0041778C
 CheatMenu_2:EnterCheatMenu_DrawTextField_2 0x800C126C  # W batch: copy of func_0041A904
 func_00459E54 0x800C1450  # W batch, jtbl
 func_0045B234 0x800C1488  # W batch, jtbl
-MissionMenu_2:Mission_LevelObjectivesDone_2 0x800C1750  # W batch, jtbl
+func_0045D980 0x800C1750  # W batch, jtbl
 MissionMenu_2:MissionMenu_UpdateObjective1Count_2 0x800C1770  # W batch, jtbl
 MissionMenu_2:MissionMenu_UpdateObjective2Count_2 0x800C1790  # W batch, jtbl
 MissionMenu_2:MissionMenu_UpdateLevelName_2 0x800C17B0  # W batch, jtbl
 MissionMenu_2:MissionMenu_UpdateObjective1_2 0x800C17D0  # W batch, jtbl
 MissionMenu_2:MissionMenu_UpdateObjective2_2 0x800C17F0  # W batch, jtbl
 NameEntryMenu_2:NameEntryMenu_DrawName_2 0x800C13E0  # copy of func_0041D51C (W): its pool is the original's
-func_004688D0 0x800A97F0  # copy of func_0042F9B0 (W), in the engine .rodata
+Demo_2:CCamera__Construct_2 0x800A97F0  # copy of func_0042F9B0 (W), in the engine .rodata
 func_0044C230 0x800C0AF0  # copy of the file from func_00413230 (to 0x417484)
 func_00452314 0x800C1008  # X batch: jtbl of func_004193B4
 CheatMenu_2:Cheat_FindWarpLevel_2 0x800C1280  # X batch: jtbl of func_0041AEF0
 Pak_2:Pak_Mount_2 0x800C1870  # X batch: jtbl of func_004258E8
-func_00468AC4 0x800A9A00  # copy of func_0042FBA4: its strings and 1.0f, in the engine .rodata
+Demo_2:CCameraPool__NewGame_2 0x800A9A00  # copy of func_0042FBA4: its strings and 1.0f, in the engine .rodata
 func_0043F000 0x800C04A4  # twin of func_00406000 (X), which now owns the pool
 func_0045060C 0x800C0EA0  # copy of func_0041760C (X), which now owns the pool
-func_0045D6A0 0x800C1720  # copy of func_00424780 (X), which now owns the pool
+Video_2 0x800C1720  # copy of func_00424780 (X), which now owns the pool
 func_0043CF3C 0x800C0398  # X batch
 MotherBoss_2:MotherBoss_Hurt_2 0x800C05C0  # X batch
 MotherBoss_2:MotherBoss_StartPhase2Cinema_2 0x800C0878  # X batch, twin of func_0040ABB4

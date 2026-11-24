@@ -110,22 +110,22 @@ set(T2_LINK_REPLACED
     func_002748D0.c   # SndVoice_Release
     func_00274948.c   # SndVoice_InitPan
     func_00274A98.c   # SndVoicePool_ReleaseVoice
-    func_00274B40.c   # SndSeq_Update
-    func_00275018.c   # SndSeq_UpdateFade
-    func_00275100.c   # SndSeq_SelectSong
-    func_00275224.c   # SndSeq_Duck
-    func_00275234.c   # SndSeq_Unduck
-    func_00275248.c   # SndSeq_Stop
-    func_00275270.c   # SndSeq_GetSongData
-    func_00275324.c   # SndSeq_SetVolume
-    func_00275378.c   # SndSeq_UpdateVolume
-    func_00275450.c   # SndSeq_Load
+    # (SndSeq_Update: under #ifndef TARGET_PORT in the merged SndSeq.c)
+    # (SndSeq_UpdateFade: under #ifndef TARGET_PORT in the merged SndSeq.c)
+    # (SndSeq_SelectSong: under #ifndef TARGET_PORT in the merged SndSeq.c)
+    # (SndSeq_Duck: under #ifndef TARGET_PORT in the merged SndSeq.c)
+    # (SndSeq_Unduck: under #ifndef TARGET_PORT in the merged SndSeq.c)
+    # (SndSeq_Stop: under #ifndef TARGET_PORT in the merged SndSeq.c)
+    # (SndSeq_GetSongData: under #ifndef TARGET_PORT in the merged SndSeq.c)
+    # (SndSeq_SetVolume: under #ifndef TARGET_PORT in the merged SndSeq.c)
+    # (SndSeq_UpdateVolume: under #ifndef TARGET_PORT in the merged SndSeq.c)
+    # (SndSeq_Load: under #ifndef TARGET_PORT in the merged SndSeq.c)
     # (Sound__IsPlaying: under #ifndef TARGET_PORT in the merged Sound.c)
     # (LoopSounds_Construct .. LoopSounds_StopAll: under #ifndef TARGET_PORT in the merged LoopSounds.c)
-    func_00275FA0.c   # SndQueue_Add
-    func_00276180.c   # SndQueue_Update
-    func_002763AC.c   # SndQueue_InitNode
-    func_002764C4.c   # SndQueue_RequeueVoice
+    # (SndQueue_Add: under #ifndef TARGET_PORT in the merged SndQueue.c)
+    # (SndQueue_Update: under #ifndef TARGET_PORT in the merged SndQueue.c)
+    # (SndQueue_InitNode: under #ifndef TARGET_PORT in the merged SndQueue.c)
+    # (SndQueue_RequeueVoice: under #ifndef TARGET_PORT in the merged SndQueue.c)
     # (SpeechPlayer_Update .. SpeechPlayer_StopUnlocked, all but SpeechPlayer_ReadHeader: under #ifndef TARGET_PORT in the merged SpeechPlayer.c)
     # libaudio's synthesizer driver, voice calls and event helpers (views at N64 offsets):
     # port/audio/t2audio_lib.c
@@ -136,8 +136,8 @@ set(T2_LINK_REPLACED
     func_0026FFA0.c   # AudioDMA_CacheBlock
     # libultra's compressed sequence player, cseq.c and the shared seqplayer.c helpers (Rage Wars
     # views at N64 offsets, s32 pointers): port/audio/t2audio_csp.c (docs/port/AUDIO.md §9)
-    func_0028F460.c   # __getTrackByte
-    func_0028F98C.c   # __readVarLen
+    # (__getTrackByte: under #ifndef TARGET_PORT in the merged cseq.c)
+    # (__readVarLen: under #ifndef TARGET_PORT in the merged cseq.c)
     func_0028F518.c   # alCSeqNew
     func_0028EF90.c   # __alCSeqGetTrackEvent
     func_0028F61C.c   # alCSeqNextEvent

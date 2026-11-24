@@ -4,13 +4,11 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 #include "globals/scene.h"
+#include "structs/twin_pakmenu.h"
 
 /* Controller pak menu item: picks the item's text for the pak state and prints the pak's free blocks and
  * the blocks a save needs into it ("%3d"-style, three characters each). */
 
-typedef struct {
-    char c[4];
-} Chars4;
 
 extern Chars4 sPakMenuText_Spaces3; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
 extern u8 sPakMenuFmt_3d[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */

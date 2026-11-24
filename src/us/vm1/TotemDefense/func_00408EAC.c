@@ -3,16 +3,13 @@
 #include "structs/collision.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "structs/twin_totemdefense.h"
 
 extern f32 Random_Float(f32 scale);                                      /* random 0..scale */
 extern void Actor_SpawnParticle(void *actor, s32 event, CVector3 pos, s32 arg);
 extern void DamageEvent_Set(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, void *shield);
 extern void EnemyAI_OnDamage(CListedInstance *actor, void *ai, DamageEvent *event);
 
-typedef struct {
-    /* 0x0 */ u8 pad0[0xC];
-    /* 0xC */ f32 timer;
-} HurtTimer;
 
 /* After a delay, one time in four, hurt the first live player actor. */
 void TotemDefense_TryHitEnemyAfterDelay(HurtTimer *h) {

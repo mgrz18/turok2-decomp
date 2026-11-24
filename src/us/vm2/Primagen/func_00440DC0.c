@@ -7,10 +7,8 @@
 #include "globals/boss.h"
 #include "globals/engine.h"
 #include "protos/game.h"
+#include "structs/twin_primagen.h"
 
-typedef struct {
-    u8 data[0x64];
-} Slot00407DC0;
 
 
 s32 Cinema_PathPlaying(void);

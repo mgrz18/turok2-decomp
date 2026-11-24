@@ -516,7 +516,8 @@ data names 1,704 -> **1,726**.
   not "the end of `sLitVertexOffsets`" (that table only ends there). Declared in `globals/object.h`.
 - `D_800D8E13`: `((u8 *) &sBatchPass)[3]`, the pass word's low byte on the N64. The port read the
   same byte offset before (gendata aliased the symbol to `sBatchPass + 3`), the high byte on a
-  little-endian host; kept so the port's output does not change (noted for the port, see below).
+  little-endian host; kept so the port's output does not change (noted for the port, see below;
+  round 26 o3: the host reads the low byte by default, `T2_LEGACY_BATCHKEY` keeps the old byte).
 
 **The VM data names** (round 22's ten):
 
@@ -573,7 +574,10 @@ heads), `D_800DD794`/`D_800DE1E0`, `D_80119850`, `D_801462C8`, `D_801468A0`, `D_
 **For the port:** `Render_SortDrawItems` (`func_0020A568`) keys the sort tree with byte 3 of
 `sBatchPass`, which is the low byte on the N64 and the high byte (0) on the host, as before this
 round. Using `(u8) sBatchPass` on the host would be the faithful key, but it changes the draw
-order and so the det md5s; left for a port round that re-baselines.
+order and so the det md5s; left for a port round that re-baselines. **Round 26 (part o3):** the host
+now keys with `(u8) sBatchPass` (the N64's byte) by default; `T2_LEGACY_BATCHKEY=1` (written by
+`--legacy`) keeps the old byte. The det log does not see the draw order: the reference md5s did not
+move for it (docs/port/STATUS.md, round 26).
 
 `sVoiceTrackSounds` / `sVoiceNoUnkC4Sounds` are declared without a size on purpose: with `[4]` / `[6]`
 clang vectorized the port's scan of them into an aligned 16-byte load and the demos crashed (the
@@ -589,7 +593,10 @@ other gendata differences of n4 (`gAudioWorld` 0x3050 -> 0x3058 with `SndFx.stre
 descriptors typed) change nothing: a build with only the two reads swapped back matches the old
 run's det log through frame 118,000 and ends on `cd2d68ce`. The merge keeps that swap
 (`T2_VOICE_ID`, with a comment) so the reference runs keep their md5s, as n4 did for `sBatchPass`;
-the faithful reading is for a port round that re-baselines.
+the faithful reading is for a port round that re-baselines. **Round 26 (part o3)** made the
+faithful reading the default; `T2_LEGACY_VOICE=1` (written only by `fullrun.py`/`playthrough.py
+--legacy`) keeps the byte-swapped one, and the reference runs were re-baselined (docs/port/STATUS.md,
+round 26).
 
 ## Declarations
 
@@ -689,3 +696,17 @@ asm with their own register conventions, in a cut file), the STVM TLB routines
 in the engine copy (0x0028EE40-0x0028EEFC: `STVM_MapTLB` is boot.s's name for
 the boot copy, and the engine copy starts one word before its cut), and the
 watch-register helpers 0x00201074/0x00425710.
+
+## Round 26, part o2: the name entry menu
+
+`versions/names/data_o2.us.txt`: the engine pool strings the name entry menu shows,
+`sNameEntryText_Edit` ("edit", its title) and `sNameEntryText_Glyph2`/`3`/`4` (the font glyphs
+2, 3, 4 of its last three keys), declared in `globals/menu_text.h`. They became names because
+`vm1/NameEntryMenu/NameEntryMenu.c` now defines the menu itself (`gNameEntryMenuItems`, was
+`D_0043AD10`, and `gNameEntryMenuDesc`; docs/MODULES.md, round 26 part o2). The four name fields point at `gNameEntries[k].name`.
+
+**After the round-26 merge** (o1, o2, o3 and the `Video`/`AutomapDraw` merges): no data name added or
+removed besides the four above; the distinct `D_` tokens in `src/` and `include/` are still **42**
+(`D_0043AD10` was only in the asm data). The Automap and Video header work removed local views of
+`gEngineApp_m_Settings`, `gEngineApp_m_pCurrentFrameData` and `gEngineApp_m_Game_m_CameraPool_m_MainCamera`,
+not names.

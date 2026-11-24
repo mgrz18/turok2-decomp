@@ -7,10 +7,8 @@
 #include "globals/engine.h"
 #include "structs/light.h"
 #include "protos/game.h"
+#include "structs/twin_blindone.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-} Matrix18;
 
 #ifdef TARGET_PORT
 #include "structs/model.h"

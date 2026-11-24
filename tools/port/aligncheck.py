@@ -37,12 +37,17 @@ for line in dis.stdout:
                 found.setdefault((ent[0], func, "direct"), ins.strip())
             l = re.match(r"\s*lea\s+-?(?:0x[0-9a-f]+)?\(%rip\),(%\w+)", ins)
             if l:
-                recent.append([l.group(1), ent[0], a, 24])
+                recent.append([l.group(1), ent[0], a, 24, ins])
     for r in recent:
         if ALIGNED.search(ins) and ("(" + r[0]) in ins and "%xmm" in ins:
             found.setdefault((r[1], func, "via " + r[0]), ins.strip())
         r[3] -= 1
-    recent = [r for r in recent if r[3] > 0]
+    # a register a later lea/mov/pop overwrites no longer holds the symbol's address (round 26:
+    # GameNoteMenu_SelectYes loads %rsi with gPakMsgDelete*Desc on one path and with the aligned
+    # gLoadSavePersistentData before its movaps: two false sites whenever the descs sat at 8 mod 16)
+    d = re.search(r",\s*(%\w+)\s*$", ins.split("#")[0])
+    dest = d.group(1) if d and ins.split()[0] in ("lea", "mov", "movq", "movabs", "movslq", "pop") else None
+    recent = [r for r in recent if r[3] > 0 and not (dest == r[0] and r[4] is not ins)]
 for (s, f, how), ins in sorted(found.items()):
     print("%-36s %-40s %-10s %s" % (s, f, how, ins))
 print("aligncheck: %d sites" % len(found))

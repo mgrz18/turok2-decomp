@@ -971,6 +971,9 @@ void Render_DrawModel(void **resource, void *matrix, s32 segment, char *lights, 
 
 #include "structs/model.h"
 #include "globals/batch.h"
+#ifdef TARGET_PORT
+int T2Port_LegacyBatchKey(void); /* port/game/t2debug.c */
+#endif
 
 
 /* Returns the node keyed key in the tree under n, or the node a new key would hang from. */
@@ -1022,9 +1025,14 @@ void Render_FlushModelBatch(void) {
         for (i = 0; i < count; i++) {
             part = CISet__GetBlock(parts, i);
             material = CISet__GetBlock(part, 0);
-            /* byte 3 of the pass word: its low byte on the N64 (a symbol of its own at 0x800D8E13 before); on a
-             * little-endian host the high byte, as the port read it before (kept: same output) */
+            /* byte 3 of the pass word: its low byte on the N64 (a symbol of its own at 0x800D8E13 before) */
+#ifdef TARGET_PORT
+            /* the low byte on the host too; T2_LEGACY_BATCHKEY=1 (port/game/t2debug.c) keeps the old
+             * read of byte 3 (the high byte on a little-endian host), as before round 26 */
+            key = (material->id << 8) | (T2Port_LegacyBatchKey() ? ((u8 *)&sBatchPass)[3] : (u8) sBatchPass);
+#else
             key = (material->id << 8) | ((u8 *)&sBatchPass)[3];
+#endif
             if (material->flags & 0x700) {
                 parent = find_node(sTranslucentSortRoot, key);
             } else {

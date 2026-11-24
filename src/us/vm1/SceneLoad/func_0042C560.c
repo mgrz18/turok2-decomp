@@ -4,25 +4,10 @@
 #include "globals/strings.h"
 #include "structs/game.h"
 #include "protos/iset.h"
+#include "structs/twin_sceneload.h"
 
-typedef struct SearchPoint {
-    /* 0x00 */ f32 position[3];
-    /* 0x0C */ u32 fieldC;
-    /* 0x10 */ s16 type;
-    /* 0x12 */ s16 field12;
-} SearchPoint; /* 0x14 */
 
-typedef struct SearchValues {
-    s32 field0;
-    s32 count;
-    s32 values[1];
-} SearchValues;
 
-typedef struct SearchPoints {
-    s32 field0;
-    s32 field4;
-    SearchPoint points[1];
-} SearchPoints;
 
 
 extern void CCache__LoadPersistantIndex(s32, sptr *, sptr, char *);

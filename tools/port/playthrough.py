@@ -519,7 +519,8 @@ def main():
     ap.add_argument("--n64", action="store_true", help="no legacy switch at all (round 18 g1): --n64-shake "
                     "--n64-props --n64-sound together, for --all and --level; the default since the round 18 merge")
     ap.add_argument("--legacy", action="store_true", help="the old stream (round 18 merge): T2_LEGACY_SHAKE, "
-                    "T2_LEGACY_INTEL9, T2_LEGACY_NOSOUND, as every route before round 18 was tuned; --n64-shake, "
+                    "T2_LEGACY_INTEL9, T2_LEGACY_NOSOUND (and round 26's T2_LEGACY_VOICE, T2_LEGACY_BATCHKEY), as "
+                    "every route before round 18 was tuned; --n64-shake, "
                     "--n64-props, --n64-sound then lift one each")
     a, rest = ap.parse_known_args()
     if a.legacy and a.n64:
@@ -576,6 +577,8 @@ def main():
         env.append("T2_LEGACY_INTEL9=1")
     if not a.n64_sound:  # round 17 merge: the silent stream the routes were tuned on (no sound world)
         env.append("T2_LEGACY_NOSOUND=1")
+    if a.legacy:  # round 26 o3: the voice ids byte-swapped and the old draw sort key byte (t2debug.c)
+        env += ["T2_LEGACY_VOICE=1", "T2_LEGACY_BATCHKEY=1"]
     with open(os.path.join(a.out, "teleport.env"), "w") as fp:
         fp.write("T2_TELEPORT=\"%s\"\n" % ";".join(tps))
         for e in env:

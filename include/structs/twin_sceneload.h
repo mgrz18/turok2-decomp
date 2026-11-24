@@ -1,0 +1,88 @@
+/* Local types that vm1/SceneLoad and its vm2 copy both define (one layout): one definition
+ * for both copies (tools/struct_census.py). */
+#ifndef STRUCTS_TWIN_SCENELOAD_H
+#define STRUCTS_TWIN_SCENELOAD_H
+
+#include "common.h"
+#include "structs/world.h"
+#include "structs/collision.h"
+#include "structs/game.h"
+
+typedef struct CollisionBuildTriangle {
+    /* 0x00 */ u16 kind;
+    /* 0x02 */ u16 flags;
+    /* 0x04 */ CollisionBuildVertex *v[3];
+    /* 0x10 */ struct CollisionBuildTriangle *adj[3];
+    /* 0x1C */ s32 mask;
+} CollisionBuildTriangle;
+typedef struct CollisionBuildFace {
+    u8 data[0x14];
+} CollisionBuildFace;
+typedef struct CollisionBuildHeader {
+    s32 count;
+    s32 offsets[5];
+} CollisionBuildHeader;
+typedef struct CollisionBuildList {
+    s32 kind;
+    s32 count;
+    CollisionBuildFace items[1];
+} CollisionBuildList;
+typedef struct CollisionBuildVertexList {
+    s32 kind, count;
+    CollisionBuildVertex items[1];
+} CollisionBuildVertexList;
+typedef struct CollisionBuildTriangleList {
+    s32 kind, count;
+    CollisionBuildTriangle items[1];
+} CollisionBuildTriangleList;
+typedef struct CollisionBuildMeshHandle {
+    void *data;
+} CollisionBuildMeshHandle;
+typedef struct CollisionBuildWorld {
+    /* 0x00000 */ char pad0[0x70];
+    /* 0x00070 */ void *tree;
+    /* 0x00074 */ char pad74[0x18FA8 - 0x74];
+    /* 0x18FA8 */ s32 group;
+} CollisionBuildWorld;
+typedef struct SearchPoint {
+    /* 0x00 */ f32 position[3];
+    /* 0x0C */ u32 fieldC;
+    /* 0x10 */ s16 type;
+    /* 0x12 */ s16 field12;
+} SearchPoint; /* 0x14 */
+typedef struct SearchValues {
+    s32 field0;
+    s32 count;
+    s32 values[1];
+} SearchValues;
+typedef struct SearchPoints {
+    s32 field0;
+    s32 field4;
+    SearchPoint points[1];
+} SearchPoints;
+typedef struct ListRec {   /* a CList (structs/list.h) whose m_nCount is read as count */
+    /* 0x00 */ void *pad0[2];
+    /* 0x08 */ s32 pad8[2];
+    /* 0x10 */ s32 count;
+    /* 0x14 */ u8 pad14[4];
+} ListRec;
+typedef struct ListItem {
+    /* 0x00 */ u8 pad0[0xC];
+    /* 0x0C */ s32 ref; /* an index, made a pointer into the level's table */
+    /* 0x10 */ u8 data[0xC];
+} ListItem; /* 0x1C */
+typedef struct ItemList {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 count;
+    /* 0x08 */ ListItem items[1];
+} ItemList;
+typedef struct Counted {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 count;
+} Counted;
+typedef struct StreamCell {
+    /* 0x00 */ u8 pad0[0x10];
+    /* 0x10 */ s32 occupied;
+} StreamCell; /* 0x14 */
+
+#endif
