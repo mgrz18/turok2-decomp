@@ -243,6 +243,8 @@ def type_names(code):
             names.add(m.group(1))
     elif c.lstrip().startswith("#"):
         names |= {m.group(2) for m in SIMPLE_TYPEDEF.finditer(c)}
+        if re.search(r"\btypedef\b", c):   # a conditional block's struct typedefs (#ifdef TARGET_PORT .. #else ..)
+            names |= set(re.findall(r"\}\s*(\w+)\s*;", c))
     return names
 
 
@@ -295,6 +297,9 @@ def main():
                     "if every file compiles the same under them")
     ap.add_argument("--inline", help="stems (comma-separated) or `all`: their functions are written DEFERRED "
                     "(`inline`: output after the others, string literals at the definition)")
+    ap.add_argument("--before", help="`A,B,..:C`: the source order puts files A,B.. (stems, their .text order kept) "
+                    "right before file C; with --inline A,B,.. the deferred tail of an object whose string literals "
+                    "come before an earlier function's (vm1/Pak: Pak_AllocDirectory's before Pak_SaveNoteVerified's)")
     ap.add_argument("--rodata-free", action="store_true", help="no .rodata order check: the slices and the unnamed "
                     "data between them become the merged file's one .rodata (make verify decides)")
     ap.add_argument("--vm", help="the directory of the same object's functions linked into the VM module (section .text_vm)")
@@ -387,6 +392,14 @@ def main():
     if shared and ro:
         sys.exit(f"{a.dir}: {len(shared)} files place their .rodata over the first VM module's pool "
                  f"(versions/shared_rodata.us.txt) and the yaml places others")
+    if a.before:
+        mv, at = a.before.split(":")
+        mv = [x for x in text_order if x in mv.split(",")]
+        if at not in text_order or at in mv or len(mv) != len(a.before.split(":")[0].split(",")):
+            sys.exit(f"{a.dir}: --before {a.before}: not stems of this directory")
+        rest = [x for x in text_order if x not in mv]
+        k = rest.index(at)
+        text_order = rest[:k] + mv + rest[k:]
     texts = [files[s].read_text() for s in text_order]
     flags = {tuple(FLAGS.findall(t)) for t in texts}
     if len(flags) > 1 and a.cc1_flags:
@@ -405,10 +418,15 @@ def main():
         # `inline` on the N64 build and nothing on the port's
         want = set(text_order) if a.inline == "all" else set(a.inline.split(","))
         lead = re.compile(r"((?:\s|/\*.*?\*/|//[^\n]*\n)*)", re.S)
+        # the definitions inside a conditional block (#ifdef TARGET_PORT .. #else .. #endif) too
+        DEF_IN_IF = re.compile(r"^((?!typedef\b|struct\b|union\b|enum\b|extern\b|static\b|DEFERRED\b|VM_TEXT\b)"
+                               r"[A-Za-z_][\w \t\*]*?\b\w+\s*\([^;{}]*\)\s*\{)", re.M)
         for i, its in enumerate(parsed):
             if text_order[i] in want:
                 parsed[i] = [(lead.sub(lambda m: m.group(1) + "DEFERRED ", c, count=1) if k == "func" and
-                              not re.search(r"\b(inline|__inline__|INLINE|DEFERRED|static)\b", strip_comments(c).split("(")[0]) else c, k, n)
+                              not re.search(r"\b(inline|__inline__|INLINE|DEFERRED|static)\b", strip_comments(c).split("(")[0]) else
+                              DEF_IN_IF.sub(lambda m: "DEFERRED " + m.group(1), c) if k == "cpp" and
+                              re.match(r"\s*#\s*if", strip_comments(c)) else c, k, n)
                              for c, k, n in its]
     renames, hdr, hoisted = {}, {}, []
     if not a.no_fix:
@@ -437,6 +455,21 @@ def main():
                 defined.setdefault(n, signature(it))
     func_order = [n for its in parsed for it, kind, n in its if kind == "func"]
     deferred = {n for its in parsed for it, kind, n in its if kind == "func" and re.match(r"\s*DEFERRED\b", strip_comments(it))}
+    if a.inline:
+        # a deferred function defined inside a conditional block (#ifdef TARGET_PORT .. #else ..) takes its place in the
+        # output order too (its first definition's signature for the early prototype)
+        CPP_DEF = re.compile(r"^DEFERRED\s+([A-Za-z_][\w \t\*]*?\b(\w+)\s*\([^;{}]*\))\s*\{", re.M)
+        func_order = []
+        for its in parsed:
+            for it, kind, n in its:
+                if kind == "func":
+                    func_order.append(n)
+                elif kind == "cpp" and re.match(r"\s*#\s*if", strip_comments(it)):
+                    for m in CPP_DEF.finditer(strip_comments(it)):
+                        if m.group(2) not in func_order:
+                            func_order.append(m.group(2))
+                            deferred.add(m.group(2))
+                            defined.setdefault(m.group(2), re.sub(r"\s+", " ", m.group(1)) + ";\n")
     local_types, type_item = set(), {}
     is_inc = lambda it: re.match(r"#\s*include\b", strip_comments(it).strip())
     for i, its in enumerate(parsed):
@@ -449,6 +482,7 @@ def main():
                     local_types.add(t)
                     type_item.setdefault(t, it)
     out, seen, done, last, have, pending = [], set(), set(), None, set(hdr), []
+    moved = set()   # type declarations move_types wrote early
     if flags and list(flags)[0]:
         out.append(list(flags)[0][0])
     for it in hoisted:
@@ -470,7 +504,26 @@ def main():
         for f in func_order[:func_order.index(n)]:
             if f not in seen and f not in done and f in deferred:
                 seen.add(f)
+                if not a.no_fix:
+                    move_types(defined[f])
                 out.append(defined[f])
+
+    def move_types(sig):
+        """The type declarations a prototype written early needs move up to it."""
+        nonlocal have
+        for t in sorted(needs(sig)):
+            if t in have:
+                continue
+            ti = type_item[t]
+            key = re.sub(r"\s+", " ", strip_comments(ti)).strip()
+            if key in moved:
+                continue
+            moved.add(key)
+            have |= include_types(ti, d) if is_inc(ti) else type_names(ti) | {t}
+            if not is_inc(ti):
+                move_types(strip_comments(ti))
+            out.append(ti)
+            seen.add(key)
 
     def needs(sig):
         return {w for w in re.findall(r"\b\w+\b", sig) if w in local_types and w not in have}
@@ -480,13 +533,7 @@ def main():
         for p in list(pending):
             if force:
                 # a caller comes first: the type declarations its signature needs move up to it
-                for t in sorted(needs(defined[p])):
-                    if t in have:
-                        continue
-                    ti = type_item[t]
-                    out.append(ti)
-                    seen.add(re.sub(r"\s+", " ", strip_comments(ti)).strip())
-                    have |= include_types(ti, d) if is_inc(ti) else type_names(ti)
+                move_types(defined[p])
             if force or not needs(defined[p]):
                 pending.remove(p)
                 if p not in done:
@@ -522,7 +569,7 @@ def main():
                 last = "func"
                 continue
             key = re.sub(r"\s+", " ", strip_comments(it)).strip()
-            if key in seen and ("{" not in key or re.match(r"(typedef|struct|union|enum)\b", key)):
+            if key in seen and ("{" not in key or re.match(r"(typedef|struct|union|enum)\b", key) or key in moved):
                 continue
             m = SIMPLE_TYPEDEF.fullmatch(key) if hdr else None
             if m and hdr.get(m.group(2)) == canon_type(m.group(1)):
