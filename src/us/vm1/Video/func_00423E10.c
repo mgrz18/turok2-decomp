@@ -14,7 +14,7 @@ typedef struct {
 
 extern VideoFlags gVideoModeFlags[];
 extern s32 GetMemSize(void); /* osGetMemSize */
-extern void Video_SetMode(s32 width, s32 height, s32 a2, s32 a3, s32 a4, s32 a5);
+extern void Video_SetMode(unsigned width, int a1, int a2, int a3, int a4, int a5);
 extern void osViSetSpecialFeatures(s32 flags);
 
 static __inline__ void SetConfig(s32 a, s32 b, s32 c, s32 d, s32 e) {
