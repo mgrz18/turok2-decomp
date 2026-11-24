@@ -327,9 +327,9 @@ module CMtxF: 0x0020C0D0..0x002141F0, 114 functions; pad
   0x00214108 func_00214108
   0x00214188 func_00214188
 
-module CStaticObject: 0x002141F0..0x002150B8, 10 functions; rodata (round 29: the .rodata of the object before it ends with
-  // "Lit Vertices" and stale linker bytes up to 0xA63D0, its own with "stat geometry" and stale bytes up to 0xA6440)
+module CStaticObject: 0x002141F0..0x002150B8, 10 functions; rodata pad + rodata pad: at 0xA63C9 (stale words after Lit Vertices; where Lighting_ gives way to CStaticObject__)
   // dir src/us/code/CStaticObject
+  // name runs (possible objects the padding cannot show): CStaticObject 7, Instance 1, CStaticObject 1, Model 1
   0x002141F0 CStaticObject__ConstructCompact
   0x00214564 CStaticObject__Construct
   0x00214844 CStaticObject__Draw
