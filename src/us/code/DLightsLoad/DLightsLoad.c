@@ -5,13 +5,13 @@
 #include "gfx.h"
 #include "gbi_t2.h"
 #include "globals/render.h"
+
 struct LightData;
 struct LightData {
     u16 falloff;
     u16 near;
     u8 color[4];
 };
-struct LightData;
 typedef struct LightData LightData;
 struct LightNode;
 struct LightNode {
@@ -23,7 +23,6 @@ struct LightNode {
 };
 struct UnitLight;
 typedef struct UnitLight UnitLight;
-struct UnitLight;
 struct UnitLight {
     s16 dir[3];
     u8 color[4];
@@ -31,7 +30,6 @@ struct UnitLight {
     u16 near;
     u16 range;
 };
-struct LightNode;
 typedef struct LightNode LightNode;
 extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
 /* sized for gendata (docs/port/DATA.md): 0x800F1400..0x800F1800, two halves of 0x20 lights
@@ -40,8 +38,10 @@ extern UnitLight gDLightBuffer[0x40];
 #include "structs/particle.h"
 #include "structs/camera.h"
 #include "globals/scene.h"
+
 extern LightNode *CDLightSet__GetFirst(void *);
 extern LightNode *CDLightSet__GetNext(void *, LightNode *);
+
 void DLights_Load(char *view) {
     LightNode *node;
     LightData *data;
@@ -88,4 +88,15 @@ void DLights_Load(char *view) {
         }
     }
     gDLightBufferIndex += 8;
+}
+
+#include "m2c_macros.h"
+
+void DLights_SwapBuffers(void) {
+    gDLightBufferIndex = gDLightBufferOffset;
+    if (gDLightBufferOffset == 0) {
+        gDLightBufferOffset = 0x20;
+        return;
+    }
+    gDLightBufferOffset = 0;
 }

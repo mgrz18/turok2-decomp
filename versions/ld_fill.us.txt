@@ -1,0 +1,3 @@
+// Linker padding that starts off 4 (tools/ld_fill.py): BYTE() statements after the object's
+// .rodata line in us/turok2.ld, up to the next 4; the rest is an unnamed rodata subsegment.
+code/CInstancePool/CInstancePool 82 00 12   # 0xA6C95-0xA6C98: stale bytes after "anim object info" (round 27)
