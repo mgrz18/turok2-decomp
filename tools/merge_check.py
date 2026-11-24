@@ -62,7 +62,7 @@ def norm(asm):
             funcs[cur] = body
             cur = None
             continue
-        if cur and sect in (".text", ".text.vm"):
+        if cur and sect in (".text", ".text_vm"):
             body.append(t)
         elif sect in (".rdata", ".rodata") and not re.match(r"\S+:$", t):
             ro.append(LAB.sub("L", t))

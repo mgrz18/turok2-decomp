@@ -52,7 +52,7 @@ typedef u32 uptr;
 #ifdef TARGET_PORT
 #define VM_TEXT
 #else
-#define VM_TEXT __attribute__((section(".text.vm")))
+#define VM_TEXT __attribute__((section(".text_vm")))
 #endif
 
 #endif

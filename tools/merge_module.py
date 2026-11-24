@@ -20,12 +20,12 @@ merged file, the others are gone. Then `make setup`, a clean build and `make ver
 
 One object over the engine and the VM (docs/MODULES.md, round 27): `--vm src/us/vm1/Demo` names the
 directory of the functions that object linked into the paged VM module. They join the merged file,
-each definition written `VM_TEXT` (common.h: `__attribute__((section(".text.vm")))` on the N64 build),
+each definition written `VM_TEXT` (common.h: `__attribute__((section(".text_vm")))` on the N64 build),
 so cc1 outputs them in a section of their own while their literals stay in the object's one .rodata.
 The source order is the two parts' .text orders interleaved by the order of their .rodata slices
 (a file without .rodata goes with the next one that has, of its own part; the rest at the end). The
-yaml keeps the VM part's first `c` subsegment, in dict form with `linker_section: .text.vm` (splat
-writes `<merged>.c.o(.text.vm)` there), and the VM part's .rodata slices go with the merge.
+yaml keeps the VM part's first `c` subsegment, in dict form with `linker_section: .text_vm` (splat
+writes `<merged>.c.o(.text_vm)` there), and the VM part's .rodata slices go with the merge.
 
     python3 tools/merge_module.py src/us/code/CCamera --vm src/us/vm1/Demo
 """
@@ -295,7 +295,7 @@ def main():
                     "(`inline`: output after the others, string literals at the definition)")
     ap.add_argument("--rodata-free", action="store_true", help="no .rodata order check: the slices and the unnamed "
                     "data between them become the merged file's one .rodata (make verify decides)")
-    ap.add_argument("--vm", help="the directory of the same object's functions linked into the VM module (section .text.vm)")
+    ap.add_argument("--vm", help="the directory of the same object's functions linked into the VM module (section .text_vm)")
     ap.add_argument("--dry-run", action="store_true", help="print the merged file, change nothing")
     ap.add_argument("--no-fix", action="store_true", help="round 23's merge: no static renames, no include hoisting, "
                     "no typedef dedupe against the headers, no deferred prototypes")
@@ -427,6 +427,7 @@ def main():
             hoisted, hdr = [], {}   # nothing to drop: the files keep their own include order
     # the VM part's functions go to their own section (common.h VM_TEXT), written before the definition
     vm_lead = re.compile(r"((?:\s|/\*.*?\*/|//[^\n]*\n)*)", re.S)
+    VM_DEF = re.compile(r"^((?!typedef\b|struct\b|union\b|enum\b|extern\b|VM_TEXT\b)[A-Za-z_][\w \t\*]*?\b\w+\s*\([^;{}]*\)\s*\{)", re.M)
     defined = {}
     for its in parsed:
         for it, kind, n in its:
@@ -528,6 +529,9 @@ def main():
             seen.add(key)
             if last in ("cpp", "func") and kind != last and not out[-1].endswith("\n\n"):
                 out.append("\n")
+            if text_order[fi] in vm and kind == "cpp" and re.match(r"\s*#\s*if", strip_comments(it)):
+                # a conditional block (#ifdef TARGET_PORT .. #else .. #endif) of the VM part: its definitions too
+                it = VM_DEF.sub(lambda m: "VM_TEXT " + m.group(1), it)
             out.append(it)
             last = kind
             if kind in ("decl", "cpp"):
@@ -552,7 +556,7 @@ def main():
         if e and k == "vm":
             m = ENTRY.match(lines[e[0]])
             indent = lines[e[0]][:len(lines[e[0]]) - len(lines[e[0]].lstrip())]
-            lines[e[0]] = (f"{indent}- {{start: {m.group(1)}, type: c, name: {rel_dir}/{name}, linker_section: .text.vm}}"
+            lines[e[0]] = (f"{indent}- {{start: {m.group(1)}, type: c, name: {rel_dir}/{name}, linker_section: .text_vm}}"
                            f"   # {a.vm.rstrip('/').split('src/us/')[-1]}: the object's VM part\n")
         elif e:
             lines[e[0]] = lines[e[0]].replace(e[2], f"{rel_dir}/{name}")
