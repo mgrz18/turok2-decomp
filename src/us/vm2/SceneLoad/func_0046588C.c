@@ -1,34 +1,63 @@
-#include "common.h"
+/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_0044E2B8.c, func_0044E3E4.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+
 #include "protos/list.h"
+#include "structs/world.h"
+#ifdef TARGET_PORT
+/* The port: the scene's delayed events typed (structs/world.h): fire them all and free them. */
+#include "common.h"
+#include "structs/world.h"
 
-s32 LevelEvent_Fire(s32);
+void LevelEvent_Fire(void *event);
+void CScene__FlushDelayedEvents_2(CScene *scene) {
+    CDelayedEvent *d = scene->m_DelayedEvents.m_pHead;
+    CDelayedEvent *next;
 
-typedef struct ListNode0046588C {
-    /* 0x0 */ u8 pad0[4];
-    /* 0x4 */ struct ListNode0046588C *next;
-    /* 0x8 */ s32 handle;
-} ListNode0046588C;
-
-/* Owner with an active list at 0x1180 and a free list at 0x1194. */
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x1180];
-    /* 0x1180 */ ListNode0046588C *activeHead;  /* CList */
-    /* 0x1184 */ u8 pad1184[0x1194 - 0x1184];
-    /* 0x1194 */ u8 freeList[0x14];
-} Unk0046588C;
-
-void CScene__FlushDelayedEvents_2(Unk0046588C *arg0) {
-    ListNode0046588C *temp_s0;
-    ListNode0046588C *var_s1;
-
-    var_s1 = arg0->activeHead;
-    if (var_s1 != NULL) {
-        do {
-            temp_s0 = var_s1->next;
-            LevelEvent_Fire(var_s1->handle);
-            CList__Remove(&arg0->activeHead, var_s1);
-            CList__AddHead(arg0->freeList, var_s1);
-            var_s1 = temp_s0;
-        } while (var_s1 != NULL);
+    while (d != NULL) {
+        next = d->m_pNext;
+        LevelEvent_Fire((sptr)d->m_pEvent); /* full width (soak S12, --high-memory) */
+        CList__Remove(&scene->m_DelayedEvents, d);
+        CList__AddHead(&scene->m_FreeDelayedEvents, d);
+        d = next;
     }
 }
+#else
+struct Entry_func_8044D794_de;
+typedef struct Entry_func_8044D794_de Entry_func_8044D794_de;
+struct Owner_func_8044D794_de;
+typedef struct Owner_func_8044D794_de Owner_func_8044D794_de;
+struct Entry_func_8044D794_de;
+struct Entry_func_8044D794_de {
+    char pad0[4];
+    struct Entry_func_8044D794_de *next;
+    s32 handle;
+};
+struct Entry_func_8044D794_de;
+struct Owner_func_8044D794_de;
+struct Owner_func_8044D794_de {
+    char pad0[0x6C];
+    void *unk6C;
+    char pad70[0xC];
+    void *unk7C;
+    char pad80[0x1100];
+    struct Entry_func_8044D794_de *active;
+    char pad1184[0x10]; /* active at 0x1180, spare at 0x1194 */
+    struct Entry_func_8044D794_de *spare;
+};
+void LevelEvent_Fire(void *event);
+#define arg0 ((Owner_func_8044D794_de *) scene)
+/* the definition takes the port body's types (one prototype for the merged object); the view reads them */
+void CScene__FlushDelayedEvents_2(CScene *scene) {
+    Entry_func_8044D794_de *entry;
+    Entry_func_8044D794_de *next;
+    entry = arg0->active;
+    while (entry != 0) {
+        next = entry->next;
+        LevelEvent_Fire(entry->handle);
+        CList__Remove(&arg0->active, entry);
+        CList__AddHead(&arg0->spare, entry);
+        entry = next;
+    }
+}
+#undef arg0
+#endif

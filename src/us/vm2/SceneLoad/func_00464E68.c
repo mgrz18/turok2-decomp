@@ -1,12 +1,19 @@
-/* The second VM module's copy of src/us/vm1/SceneLoad/func_0042BF48.c (byte for byte, at the same link address or 0xE0 below
- * it, docs/VMASM.md), with the second module's names. */
 /* WRONG CUT: REAL CScene__StreamAllSections_2 size 0x24C (splat cut it into CScene__StreamAllSections_2 + func_0042C0B4). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_13.CPP, func_8044CD8C_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/world.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__DecompressGridSection(struct CScene *, s32 ***);
+void CScene__StreamAllSections_2(struct CScene *);
 #include "structs/twin_sceneload.h"
 
 
@@ -41,7 +48,7 @@ typedef struct ObjB {
 #endif
 
 
-extern void CStaticObject__RequestLitVertices(ObjA *a, s32);
+void CStaticObject__RequestLitVertices(void *object, void *camera);
 extern void *CStaticObject__LoadGeometry(ObjA *a);
 extern void *CLevelActor__LoadGeometry(ObjB *b);
 extern void Model_RequestTextures(void *handle);

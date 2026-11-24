@@ -1,5 +1,4 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_13.CPP, func_8044C7B8_de, with Turok 2's layouts. */
-/* Second VM module copy of CScene__DecompressAnimatedInstances (same source); its calls go to the module's own copies, named by link address. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
@@ -14,14 +13,16 @@ typedef struct Handle {
     void *data;
 } Handle;
 
-extern s32 ProPackDecompress(Handle **handle, s32);
+s32 ProPackDecompress(void *handle, s32 arg1);
 extern sptr CScene__GetRegion(CScene *world, s32);
 extern s32 CScene__FindNearestWarpDest_2(CScene *world, CVector3 *pos, s32 group, void *info);
 extern s32 CScene__FindWarpDests_2(CScene *world, s32 group, s32 key, CWarpPoint *out, s32 max);
-extern s32 *CScene__GetIntelligence(CScene *world, u16 id);
+sptr CScene__GetIntelligence(CScene *world, s32 id);
+/* called with the record's u16 id and its result read as a pointer, as the ROM's code has it */
+#define CScene__GetIntelligence_u16 ((s32 *(*)(CScene *, u16)) CScene__GetIntelligence)
 extern void CGameObjectInstance__ConstructFromRecord(CGameObjectInstance *obj, CObjectRecord *rec, s32 mode, s32 index);
 extern sptr CScene__FindRegionAt(CScene *world, CVector3 *pos);
-extern void Angle_Wrap(f32 *angle);
+void Angle_Wrap(f32 *value);
 extern void CPlayer__SetupActors_2(CPlayer *player, CObjectRecord *rec, s32 mode, s32 index);
 extern s32 GameObject_IsFollower(CGameObjectInstance *obj);
 extern s32 GameObject_IsLeader(CGameObjectInstance *obj);
@@ -32,7 +33,9 @@ extern f32 AI_DistSqToPointAtHeight(CGameObjectInstance *obj, CVector3 pos);
    the same definition. The spawn point is indexed afresh on each use and the position copied with
    memcpy (as in Rage Wars): both set loop.c's insn count and giv benefits, which decide the ROM's
    hoisting of the spawns base and of the angle constants. */
-void CScene__DecompressAnimatedInstances_2(CScene *world, Handle **handle) {
+#define handle ((Handle **) handleArg)
+/* the definition takes the callers' type (one prototype for the merged object); its handle view reads it */
+void CScene__DecompressAnimatedInstances_2(CScene *world, void *handleArg) {
     CWarpPoint spawns[4];
     CGameObjectInstance *objects;
     sptr mode;
@@ -90,7 +93,7 @@ void CScene__DecompressAnimatedInstances_2(CScene *world, Handle **handle) {
                     rec = recWalk;
                     obj = objWalk;
                     i++;
-                    obj->header.m_pIntelligence = CScene__GetIntelligence(world, rec->m_nIntelligence);
+                    obj->header.m_pIntelligence = CScene__GetIntelligence_u16(world, rec->m_nIntelligence);
                     objWalk = obj + 1;
                     recWalk = rec + 1;
                 }
@@ -100,7 +103,7 @@ void CScene__DecompressAnimatedInstances_2(CScene *world, Handle **handle) {
                 rec = &records[i];
                 obj = &objects[i];
                 CGameObjectInstance__ConstructFromRecord(obj, rec, mode, i);
-                if (*CScene__GetIntelligence(world, rec->m_nIntelligence) != 0xB && i != 0) {
+                if (*CScene__GetIntelligence_u16(world, rec->m_nIntelligence) != 0xB && i != 0) {
                     continue;
                 }
                 world->m_nFirstActor++;
@@ -164,3 +167,4 @@ void CScene__DecompressAnimatedInstances_2(CScene *world, Handle **handle) {
         world->m_Kind1Cursor = 0;
     }
 }
+#undef handle

@@ -1,8 +1,14 @@
-/* The second VM module's copy of src/us/vm1/SceneLoad/func_0042C560.c (byte for byte, at the same link address or 0xE0 below
- * it, docs/VMASM.md), with the second module's names. */
 /* WRONG CUT: REAL CScene__FindNearestWarpDest_2 size 0x1A0 (splat cut it into CScene__FindNearestWarpDest_2 + func_0042C620 + func_0042C6BC). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_29.CPP, func_8044D3E8_de, with Turok 2's layouts. */
 #include "common.h"
+#include "protos/cache.h"
+/* The request CCache__LoadPersistantSubBlock leaves in v0 (protos/cache.h declares the N64 definition
+ * void): the N64 symbol by another C name, returning it; the port's definition returns it. */
+#ifdef TARGET_PORT
+#define CCache__LoadPersistantSubBlock_v(...) ((void **) CCache__LoadPersistantSubBlock(__VA_ARGS__))
+#else
+void **CCache__LoadPersistantSubBlock_v() __asm__("CCache__LoadPersistantSubBlock");
+#endif
 #include "globals/strings.h"
 #include "structs/game.h"
 #include "protos/iset.h"
@@ -12,10 +18,7 @@
 
 
 
-extern void CCache__LoadPersistantIndex(s32, sptr *, sptr, char *);
-extern void **CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, void *, sptr, char *);
 extern f32 CVector3__Distance(void *a, void *b);
-extern void CCache__Deallocate(sptr, void *);
 
 /* Finds the point of the given type nearest to position; copies it to out and returns its value (0 when none). */
 s32 CScene__FindNearestWarpDest_2(void *world, void *position, s32 type, SearchPoint *out) {
@@ -37,7 +40,7 @@ s32 CScene__FindNearestWarpDest_2(void *world, void *position, s32 type, SearchP
     CCache__LoadPersistantIndex(0, &resource, pool, sCSceneCacheDesc_CartridgeIndex);
     i = 0;
     best = 0;
-    handle = CCache__LoadPersistantSubBlock(0, resource, 8, pool, world, 0, sCSceneCacheDesc_WarpDests);
+    handle = CCache__LoadPersistantSubBlock_v(0, resource, 8, pool, world, 0, sCSceneCacheDesc_WarpDests);
     table = *handle;
     values = CISet__GetBlock(table, 0);
     count = values->count;

@@ -12,10 +12,10 @@
  * script's /DISCARD/ drops it. docs/VMASM.md. */
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, u8 *b);
-void *CISet__GetBlock();
-static s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) __attribute__((section(".text_engine")));
+#include "protos/iset.h"
 
-static s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) {
+/* the section on the definition (the merged object drops a prototype of a function it defines) */
+__attribute__((section(".text_engine"))) static s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) {
     CVector3 d;
     f32 bestIdx = -1.0f;
     f32 bestD = 0.0f;
@@ -23,7 +23,7 @@ static s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) {
     s32 *t;
     s32 n;
     u8 *p;
-    t = CISet__GetBlock(CISet__GetBlock(lv->unk_68), 1);
+    t = CISet__GetBlock(((void *(*)(s32 *)) CISet__GetBlock)(lv->unk_68), 1); /* the inner call passes one (a1 goes through) */
     n = t[1];
     p = (u8 *)(t + 2);
     if (n > 0) {
@@ -42,8 +42,7 @@ static s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) {
     return (s32)bestIdx;
 }
 
-s32 ProPackDecompress(void ***resource, s32 index);
-void *CISet__GetBlock(s32 *table, s32 index);
+s32 ProPackDecompress(void *handle, s32 arg1);
 
 typedef struct {
     /* 0x00 */ s32 type;

@@ -1,5 +1,3 @@
-/* The second VM module's copy of src/us/vm1/SceneLoad/func_0042B6B0.c (byte for byte, at the same link address or 0xE0 below
- * it, docs/VMASM.md), with the second module's names. */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_27.CPP, func_8044C3D4_de, with Turok 2's layouts. */
 #include "common.h"
 #include "globals/camera.h"
@@ -20,7 +18,7 @@
 
 
 
-extern s32 ProPackDecompress(CollisionBuildMeshHandle **handle, s32);
+s32 ProPackDecompress(void *handle, s32 arg1);
 extern void UnpackScaledVec4(CollisionBuildVertex *v);
 extern void CGameRegion__Unpack(CollisionBuildTriangle *tri, CollisionBuildFace *face, CollisionBuildVertex *verts,
                           s32 nverts, CollisionBuildTriangle *tris, s32 ntris);
@@ -36,7 +34,10 @@ static __inline__ s32 testBit(s32 n, u8 *bits) {
    and the trailing chunk behind a five-offset header, builds a 0x20-byte triangle record per source
    face and flags triangles whose group bit, the cinema state or neighbours mark them with the default
    surface mask. */
-void CScene__DecompressCollision_2(CollisionBuildWorld *world, CollisionBuildMeshHandle **handle) {
+/* the callers' (void *, void *) (one prototype for the merged object); the views read them */
+void CScene__DecompressCollision_2(void *worldArg, void *handleArg) {
+#define world ((CollisionBuildWorld *) worldArg)
+#define handle ((CollisionBuildMeshHandle **) handleArg)
     s32 size0;
     s32 size1;
     s32 size3;
@@ -148,4 +149,6 @@ void CScene__DecompressCollision_2(CollisionBuildWorld *world, CollisionBuildMes
         }
         CCache__DeallocAndReplaceCompressedData(0, handle, block);
     }
+#undef world
+#undef handle
 }

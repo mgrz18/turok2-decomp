@@ -1,7 +1,16 @@
-/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/OVLGAME/8044E2B8.CPP, func_8044D668_de.
+/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_0044E2B8.c, func_0044E2B8.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "protos/scene.h"
+#include "structs/vector.h"
+#include "structs/world.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__RestoreFiredEvent(void *, void *);
 struct Item_func_8044D668_de;
 typedef struct Item_func_8044D668_de Item_func_8044D668_de;
 struct Item_func_8044D668_de;
@@ -12,23 +21,19 @@ struct Item_func_8044D668_de {
 };
 struct Level;
 struct Level {
-    char pad0[0x1168]; /* 0x11C0 in Rage Wars */
+    char pad0[0x1168];  /* record tables 0x58 earlier than in Rage Wars */
     s32 counts[2];
-    char pad11C8[8];
+    char pad1170[8];
     Item_func_8044D668_de *items[2];
 };
 struct Level;
 typedef struct Level Level;
-extern void Cinema_Disable();
-extern void Cinema_Enable();
 extern void Cinema_Disable(void);
 extern void Cinema_Enable(void);
 #ifdef TARGET_PORT
 /* The port (round 13 b2): the record tables by member of CScene (the N64 view reads them at
  * 0x1168-0x117C, other members of the host CScene, and keeps the table pointers in s32). */
-#include "structs/world.h"
-void CScene__ReapplyFiredEvents_2(Level *level) {
-    CScene *w = (CScene *) level;
+void CScene__ReapplyFiredEvents_2(CScene *w) {
     s32 i, k, n;
     Item_func_8044D668_de *item;
     Cinema_Disable();
@@ -44,7 +49,9 @@ void CScene__ReapplyFiredEvents_2(Level *level) {
     Cinema_Enable();
 }
 #else
-void CScene__ReapplyFiredEvents_2(Level *level) {
+#define level ((Level *) scene)
+/* the definition takes the callers' type (one prototype for the merged object); the Rage Wars view reads it */
+void CScene__ReapplyFiredEvents_2(CScene *scene) {
     s32 i;
     s32 n;
     Item_func_8044D668_de *item;
@@ -65,4 +72,5 @@ void CScene__ReapplyFiredEvents_2(Level *level) {
     }
     Cinema_Enable();
 }
+#undef level
 #endif

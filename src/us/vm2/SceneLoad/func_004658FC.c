@@ -5,35 +5,46 @@
 #include "protos/player.h"
 #include "protos/game.h"
 
-
-s32 Sound__StopFlags(s32);                     /* extern */
-s32 Sound__DetachAll();                            /* extern */
-s32 LoopSounds_StopAll(sptr);                         /* extern */
-s32 CPlayer__StopLoopingSounds_2(sptr);                         /* extern */
-
-typedef struct {
+typedef struct LevelState {
     /* 0x00 */ u8 pad0[0x98];
-    /* 0x98 */ s32 handles[14];  /* resources released on exit */
-} Unk004658FC;
+    /* 0x98 */ void *handle98;
+    /* 0x9C */ void *handle9C;
+    /* 0xA0 */ void *handleA0;
+    /* 0xA4 */ void *handleA4;
+    /* 0xA8 */ void *handleA8;
+    /* 0xAC */ void *handleAC;
+    /* 0xB0 */ void *handleB0;
+    /* 0xB4 */ void *handleB4;
+    /* 0xB8 */ u8 padB8[0x10];
+    /* 0xC8 */ void *handleC8;
+    /* 0xCC */ void *handleCC;
+} LevelState;
 
-void CScene__UnloadLevel_2(Unk004658FC *arg0) {
-    sptr temp_v0;
 
-    temp_v0 = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
-    if (temp_v0 != 0) {
-        CPlayer__StopLoopingSounds_2(temp_v0);
+extern void CPlayer__StopLoopingSounds_2(void *);
+extern void LoopSounds_StopAll(sptr);
+extern void Sound__DetachAll(void);
+extern void Sound__StopFlags(s32);
+
+/* Tears the level down: releases its resources' handles. */
+void CScene__UnloadLevel_2(LevelState *level) {
+    void *p;
+
+    p = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
+    if (p != NULL) {
+        CPlayer__StopLoopingSounds_2(p);
     }
     LoopSounds_StopAll(LoopSounds_Get());
     Sound__DetachAll();
     Sound__StopFlags(0x1000);
-    CCache__Deallocate(0, arg0->handles[0]);
-    CCache__Deallocate(0, arg0->handles[1]);
-    CCache__Deallocate(0, arg0->handles[2]);
-    CCache__Deallocate(0, arg0->handles[3]);
-    CCache__Deallocate(0, arg0->handles[4]);
-    CCache__Deallocate(0, arg0->handles[6]);
-    CCache__Deallocate(0, arg0->handles[7]);
-    CCache__Deallocate(0, arg0->handles[13]);
-    CCache__Deallocate(0, arg0->handles[5]);
-    CCache__Deallocate(0, arg0->handles[12]);
+    CCache__Deallocate(0, level->handle98);
+    CCache__Deallocate(0, level->handle9C);
+    CCache__Deallocate(0, level->handleA0);
+    CCache__Deallocate(0, level->handleA4);
+    CCache__Deallocate(0, level->handleA8);
+    CCache__Deallocate(0, level->handleB0);
+    CCache__Deallocate(0, level->handleB4);
+    CCache__Deallocate(0, level->handleCC);
+    CCache__Deallocate(0, level->handleAC);
+    CCache__Deallocate(0, level->handleC8);
 }

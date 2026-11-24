@@ -1,8 +1,14 @@
-/* The second VM module's copy of src/us/vm1/SceneLoad/func_0042C194.c (byte for byte, at the same link address or 0xE0 below
- * it, docs/VMASM.md), with the second module's names. */
 /* WRONG CUT: REAL CScene__FindWarpDests_2 size 0x228 (splat cut it into CScene__FindWarpDests_2 + func_0042C2DC + func_0042C338 + func_0042C38C). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_29.CPP, func_8044D220_de, with Turok 2's layouts. */
 #include "common.h"
+#include "protos/cache.h"
+/* The request CCache__LoadPersistantSubBlock leaves in v0 (protos/cache.h declares the N64 definition
+ * void): the N64 symbol by another C name, returning it; the port's definition returns it. */
+#ifdef TARGET_PORT
+#define CCache__LoadPersistantSubBlock_v(...) ((void **) CCache__LoadPersistantSubBlock(__VA_ARGS__))
+#else
+void **CCache__LoadPersistantSubBlock_v() __asm__("CCache__LoadPersistantSubBlock");
+#endif
 #include "globals/strings.h"
 #include "structs/game.h"
 #include "protos/list.h"
@@ -23,10 +29,7 @@ typedef struct Placed {
 } Placed; /* 0x14 */
 
 
-extern void CCache__LoadPersistantIndex(s32, sptr *, sptr, char *);
-extern void **CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, void *, sptr, char *);
-extern s32 BinaryRange(s32 *keys, s32 count, s32 key, s32 *first, s32 *last);
-extern void CCache__Deallocate(sptr, void *);
+s32 BinaryRange(void *array, s32 count, u32 key, s32 *first, s32 *last);
 
 /* Copies up to max placed objects of the given kind (-1: any) whose key matches into out; returns how many. */
 s32 CScene__FindWarpDests_2(void *world, s32 kind, s32 key, Placed *out, s32 max) {
@@ -50,7 +53,7 @@ s32 CScene__FindWarpDests_2(void *world, s32 kind, s32 key, Placed *out, s32 max
     found = 0;
     pool = gEngineApp.m_CartridgeIndex;
     CCache__LoadPersistantIndex(found, &resource, pool, sCSceneCacheDesc_CartridgeIndex);
-    handle = CCache__LoadPersistantSubBlock(found, resource, 8, pool, world, 0, "warp dests");
+    handle = CCache__LoadPersistantSubBlock_v(found, resource, 8, pool, world, 0, "warp dests");
     table = *handle;
     count = (keys = CISet__GetBlock(table, 0))[1];
     keys += 2;

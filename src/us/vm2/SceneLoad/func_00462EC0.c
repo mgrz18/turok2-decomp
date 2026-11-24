@@ -1,5 +1,12 @@
-/* Second-module twin of CScene__Construct (same source; VM callees 0xE0 lower). func_0042CB04/func_0042C9D4 need symbols (the asm has CScene__DecompressParticles + 0x50 and D_0042C9D4). */
 #include "common.h"
+#include "protos/cache.h"
+/* The request CCache__LoadPersistantSubBlock leaves in v0 (protos/cache.h declares the N64 definition
+ * void): the N64 symbol by another C name, returning it; the port's definition returns it. */
+#ifdef TARGET_PORT
+#define CCache__LoadPersistantSubBlock_v(...) ((void **) CCache__LoadPersistantSubBlock(__VA_ARGS__))
+#else
+void **CCache__LoadPersistantSubBlock_v() __asm__("CCache__LoadPersistantSubBlock");
+#endif
 #include "structs/world.h"
 #include "structs/game.h"
 #include "globals/game.h"
@@ -11,23 +18,18 @@
  * sets, object types, objects, intelligence, particle effects, binaries, swooshes, lights, curves, rumbles,
  * graphic sets, cinemas, link groups), then loads five geometry headers (objects 0xDAC-0xDB0). */
 
-extern s32 ProPack__Decompress();
-extern s32 Model_DecompressCallback();
+s32 ProPack__Decompress(s32 unused, void **res);
+void Model_DecompressCallback(sptr arg0, sptr arg1);
 extern s32 CScene__DecompressIntelligence_2();
 extern s32 CScene__DecompressParticles_2();
 
-extern void **CCache__Request(s32, sptr, s32, s32, s32, s32 (*)(), char *, s32);
-extern void CCache__Deallocate(sptr, void **);
-extern void CCache__Flush(s32);
-extern void CCache__LoadPersistantIndex(s32, sptr *, sptr, char *);
-extern void **CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, CScene *, s32 (*)(), char *);
 extern s32 CScene__FindObjectType(CScene *w, s32 id);
 extern s32 CScene__GetObject(CScene *w, s32 index);
-extern void CScene__ClearListCounts(void);
+extern void CScene__ClearListCounts();
 extern void CScene__LoadLevel_2(CScene *w, s32, s32);
-extern void CScene__InitPersistentData_2(CScene *w, s32 file);
+void CScene__InitPersistentData_2(CScene *menu);
 extern void CScene__ConstructWarp_2(CScene *w);
-extern void CPlayerPool__LevelStart_2(CPlayerPool *);
+void CPlayerPool__LevelStart_2(void *pool);
 
 /* Copies the header of object id's geometry (or clears it when the object is missing). */
 static __inline__ void loadGeomHeader(CScene *w, CGeomHeader *out, s32 id) {
@@ -55,12 +57,14 @@ static __inline__ void loadGeomHeader(CScene *w, CGeomHeader *out, s32 id) {
     }
 }
 
+/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CScene__ClearListCounts receives CScene__Construct_2's own argument
+ * registers (pass-through); the host passes them. */
 void CScene__Construct_2(CScene *w, s32 file) {
     sptr cart;
     sptr res;
     f32 *vec;
 
-    CScene__ClearListCounts();
+    CScene__ClearListCounts(w);
     w->m_Mode = 0;
     CScene__ConstructWarp_2(w);
     w->unk_04 = 0;
@@ -72,7 +76,7 @@ void CScene__Construct_2(CScene *w, s32 file) {
     vec = &w->m_qSky.x;
     w->m_qSky.x = vec[1] = vec[2] = 0.0f;
     w->m_qSky.w = 1.0f;
-    CCache__Flush(0);
+    ((void (*)(s32)) CCache__Flush)(0); /* the definition takes none */
     CCache__LoadPersistantIndex(0, &cart, file, "cartridge index");
     res = CISet__GetROMAddress(cart, file, 5);
     w->m_LevelsKey = res;
@@ -80,34 +84,34 @@ void CScene__Construct_2(CScene *w, s32 file) {
     res = CISet__GetROMAddress(cart, file, 3);
     w->m_TextureSetsKey = res;
     CCache__LoadPersistantIndex(0, (sptr *)&w->m_pTextureSets, res, "texture sets index");
-    w->m_pObjectTypes = *CCache__LoadPersistantSubBlock(0, cart, 2, file, w, NULL, "object types");
+    w->m_pObjectTypes = *CCache__LoadPersistantSubBlock_v(0, cart, 2, file, w, NULL, "object types");
     res = CISet__GetROMAddress(cart, file, 0);
     w->m_ObjectsKey = res;
     CCache__LoadPersistantIndex(0, (sptr *)&w->m_pObjects, res, "objects index");
-    w->m_pIntelligence = *CCache__LoadPersistantSubBlock(0, cart, 1, file, w, CScene__DecompressIntelligence_2, "intelligence");
-    w->m_pParticleEffects = (s32 *)CCache__LoadPersistantSubBlock(0, cart, 4, file, w, CScene__DecompressParticles_2, "particle effects");
-    w->m_pObjectTypes2 = *CCache__LoadPersistantSubBlock(0, cart, 0xA, file, w, NULL, "object types");
+    w->m_pIntelligence = *CCache__LoadPersistantSubBlock_v(0, cart, 1, file, w, CScene__DecompressIntelligence_2, "intelligence");
+    w->m_pParticleEffects = (s32 *)CCache__LoadPersistantSubBlock_v(0, cart, 4, file, w, CScene__DecompressParticles_2, "particle effects");
+    w->m_pObjectTypes2 = *CCache__LoadPersistantSubBlock_v(0, cart, 0xA, file, w, NULL, "object types");
     res = CISet__GetROMAddress(cart, file, 9);
     w->m_BinariesKey = res;
     CCache__LoadPersistantIndex(0, (sptr *)&w->m_pBinaries, res, "binaries index");
-    w->m_pSwooshes = *CCache__LoadPersistantSubBlock(0, cart, 0xB, file, w, NULL, "particle swooshes");
-    w->m_pLights = *CCache__LoadPersistantSubBlock(0, cart, 0xC, file, w, NULL, "dynamic lights");
+    w->m_pSwooshes = *CCache__LoadPersistantSubBlock_v(0, cart, 0xB, file, w, NULL, "particle swooshes");
+    w->m_pLights = *CCache__LoadPersistantSubBlock_v(0, cart, 0xC, file, w, NULL, "dynamic lights");
     w->m_pBitSections = gLoadSavePersistentData;
     w->unk_28 = CISet__GetROMAddressAndSize(cart, file, 6, &w->unk_30);
     w->m_pBitSections2 = gGamePersistentData;
     w->unk_2C = CISet__GetROMAddressAndSize(cart, file, 7, &w->unk_34);
-    w->m_pCurves = *CCache__LoadPersistantSubBlock(0, cart, 0xD, file, w, ProPack__Decompress, "curves");
-    w->m_pRumbles = *CCache__LoadPersistantSubBlock(0, cart, 0xE, file, w, ProPack__Decompress, "rumbles");
-    w->m_pRumbleTypes = *CCache__LoadPersistantSubBlock(0, cart, 0xF, file, w, ProPack__Decompress, "rumble types");
-    w->m_pGraphicSetTypes = *CCache__LoadPersistantSubBlock(0, cart, 0x11, file, w, NULL, "graphicset type");
+    w->m_pCurves = *CCache__LoadPersistantSubBlock_v(0, cart, 0xD, file, w, ProPack__Decompress, "curves");
+    w->m_pRumbles = *CCache__LoadPersistantSubBlock_v(0, cart, 0xE, file, w, ProPack__Decompress, "rumbles");
+    w->m_pRumbleTypes = *CCache__LoadPersistantSubBlock_v(0, cart, 0xF, file, w, ProPack__Decompress, "rumble types");
+    w->m_pGraphicSetTypes = *CCache__LoadPersistantSubBlock_v(0, cart, 0x11, file, w, NULL, "graphicset type");
     res = CISet__GetROMAddress(cart, file, 0x10);
     w->m_GraphicSetsKey = res;
     CCache__LoadPersistantIndex(0, (sptr *)&w->m_pGraphicSets, res, "graphicset index");
     res = CISet__GetROMAddress(cart, file, 0x12);
     w->m_CinemasKey = res;
     CCache__LoadPersistantIndex(0, (sptr *)&w->m_pCinemas, res, "Cinemas index");
-    w->m_pLinkGroupTypes = *CCache__LoadPersistantSubBlock(0, cart, 0x13, file, w, NULL, "link group types");
-    CScene__InitPersistentData_2(w, file);
+    w->m_pLinkGroupTypes = *CCache__LoadPersistantSubBlock_v(0, cart, 0x13, file, w, NULL, "link group types");
+    ((void (*)(CScene *, s32)) CScene__InitPersistentData_2)(w, file); /* the definition takes one */
     gPersistentDataLoaded = 1;
     loadGeomHeader(w, &w->m_Geom[0], 0xDAC);
     loadGeomHeader(w, &w->m_Geom[1], 0xDAD);
