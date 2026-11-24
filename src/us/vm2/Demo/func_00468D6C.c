@@ -1,5 +1,5 @@
 #include "common.h"
-#include "rw/abu_protos.h"
+#include "protos/list.h"
 
 void *memset(void *destination, s32 value, uptr size);
 s32 CCamera__Advance(sptr);
