@@ -18,7 +18,7 @@
 
 
 extern f32 Menu_CharWidth(s32 ch, s32 next, f32 a, f32 b);    /* kerned advance */
-extern void Hud_DrawImageFrame(void *font, s32 glyph, s16 x, s16 y, f32 sx, f32 sy, s32 flag);
+void Hud_DrawImageFrame(void *table, s32 frame, s32 x, s32 y, f32 scaleX, f32 scaleY, s32 scaled);
 
 /* The advance follows the currently loaded font. */
 static __inline__ f32 fontGlyphWidth(void) {

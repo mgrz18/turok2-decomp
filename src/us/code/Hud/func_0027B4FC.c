@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern void Hud_DrawMaskedImage(u16 *grid, s16 x0, s32 y);
-extern void Hud_DrawMaskedBlock(s32 *pixels, char *mask, s32 x, s16 y, s32 w, s32 h);
+void Hud_DrawMaskedBlock(void *pTexture, void *pOpacity, int XPos, int YPos, int TextureWidth, int TextureHeight);
 void Hud_DrawMaskedImage(u16 *grid, s16 x0, s32 y) {
     s32 *tile;
     s32 rows;
@@ -23,7 +23,7 @@ void Hud_DrawMaskedImage(u16 *grid, s16 x0, s32 y) {
             w = tile[0];
             h = tile[1];
             area = w * h;
-            Hud_DrawMaskedBlock(tile + 2, (char *)tile + (area * 2 + 8), x, y, w, h);
+            Hud_DrawMaskedBlock(tile + 2, (char *)tile + (area * 2 + 8), x, (s16) y, w, h); /* y narrowed to s16 at the call, as in the ROM */
             x += w;
             tile = (s32 *)((char *)tile + (area * 2 + (area >> 1)));
             tile += 2;

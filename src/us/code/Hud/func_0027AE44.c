@@ -1,17 +1,6 @@
 #include "common.h"
 
-/* A table of frames: a count, then for each an offset from the table's start
- * and a byte. */
-typedef struct {
-    /* 0x0 */ s32 m_Offset;
-    /* 0x4 */ u8 m_Byte;
-} FrameEntry; /* size 0x8 */
-
-typedef struct {
-    /* 0x0 */ s16 m_nFrames;
-    /* 0x2 */ u8 _pad[6];
-    /* 0x8 */ FrameEntry m_Frames[1];
-} FrameTable;
+#include "structs/hud.h"
 
 /* Frame `frame` (wrapped to the count) of *ptable: its data in *pdata and its
  * byte in *pbyte; *pdata is NULL with no table. */

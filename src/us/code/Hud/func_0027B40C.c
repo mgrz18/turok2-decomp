@@ -23,7 +23,7 @@ typedef struct {
 typedef struct {
     /* 0x00 */ u8 *data;
     /* 0x04 */ u8 flag;
-} Chunk;
+} FontChunk;
 
 
 void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */
@@ -32,7 +32,7 @@ void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */
  * points sOnScreenFontTexture at it (NULL until it is loaded). */
 void COnScreen__LoadFontTexture(void) {
     Resource *res;
-    Chunk chunk;
+    FontChunk chunk;
     ChunkTable *table;
     ChunkEntry *entries;
     u8 *data;

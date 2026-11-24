@@ -5,9 +5,11 @@ typedef struct {
     /* 0x04 */ f32 y;
 } FontScale;
 
-extern FontScale gEngineApp_m_OnScreen_m_FontXScale; /* local type: the field's real type (or the member path) changes the ROM's code here */
+#include "globals/onscreen.h"
+/* m_FontXScale and the word after it, as one view (the field's real type changes the ROM's code here). */
+#define sFontScale (*(FontScale *) &gEngineApp_m_OnScreen_m_FontXScale)
 
 void COnScreen__SetFontScale(f32 arg0, f32 arg1) {
-    gEngineApp_m_OnScreen_m_FontXScale.x = arg0;
-    gEngineApp_m_OnScreen_m_FontXScale.y = arg1;
+    sFontScale.x = arg0;
+    sFontScale.y = arg1;
 }

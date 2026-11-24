@@ -9,7 +9,7 @@
 #include "protos/scene.h"
 
 
-extern void Hud_DrawImageFrame(sptr sprites, s32 digit, s16 x, s16 y, f32 size, f32 arg4, s32 arg5);
+void Hud_DrawImageFrame(void *table, s32 frame, s32 x, s32 y, f32 scaleX, f32 scaleY, s32 scaled);
 
 void Hud_DrawNumber(s32 value, f32 x, f32 y, f32 size, f32 arg4, s32 arg5, s32 rightAlign, s32 minDigits) {
     sptr sprites;
@@ -80,7 +80,7 @@ void Hud_DrawNumber(s32 value, f32 x, f32 y, f32 size, f32 arg4, s32 arg5, s32 r
             x -= width;
         }
         if ((u32) digit < 10) {
-            Hud_DrawImageFrame(sprites, digit, x, y, size, arg4, arg5);
+            Hud_DrawImageFrame((void *) sprites, digit, (s16) x, (s16) y, size, arg4, arg5); /* The ROM's caller narrows the coordinates to s16 at the call. */
         }
         if (!rightAlign) {
             x += width;

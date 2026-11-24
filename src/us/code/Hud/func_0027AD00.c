@@ -1,11 +1,6 @@
 #include "common.h"
 
-/* What this sets on its first argument: a value and a mode. */
-typedef struct {
-    /* 0x0 */ s32 unk0;
-    /* 0x4 */ s32 value;
-    /* 0x8 */ s32 mode;
-} ModeState;
+#include "structs/hud.h"
 
 void COverlay__Update();                               /* extern */
 

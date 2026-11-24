@@ -25,7 +25,9 @@ typedef struct {
     /* 0x8 */ TileBlock m_Blocks[1];
 } TileGrid;
 
-void Hud_GetImageFrame(void *table, s32 frame, TileGrid **pgrid, u8 *popaque);
+#include "structs/hud.h"
+
+void Hud_GetImageFrame(FrameTable **ptable, s32 frame, void **pdata, u8 *pbyte);
 void Hud_DrawI4BlockScaled(void *pTexture, f32 XPos, f32 YPos, int TextureWidth, int TextureHeight, f32 ScaleX, f32 ScaleY);
 void Hud_DrawI4Block(void *pTexture, int XPos, int YPos, int TextureWidth, int TextureHeight);
 void Hud_DrawMaskedBlockScaled(void *pTexture, void *pOpacity, f32 XPos, f32 YPos, int TextureWidth, int TextureHeight, f32 ScaleX, f32 ScaleY);
@@ -81,7 +83,7 @@ static __inline__ void DrawScaled(TileGrid *grid, f32 x, f32 y, f32 scaleX, f32 
     }
 }
 
-static __inline__ void Draw(TileGrid *grid, s16 x, s32 y) {
+static __inline__ void drawTileBlock(TileGrid *grid, s16 x, s32 y) {
     TileBlock *block;
     u32 width, height;
     s32 ix, iy;
@@ -167,13 +169,13 @@ void Hud_DrawImageFrame(void *table, s32 frame, s32 x, s32 y, f32 scaleX, f32 sc
         g->w1 = 0;
     }
     if (table != NULL) {
-        Hud_GetImageFrame(table, frame, &grid, &opaque);
+        Hud_GetImageFrame((FrameTable **) table, frame, (void **) &grid, &opaque);
         if (grid != NULL) {
             if (opaque) {
                 if (scaled) {
                     DrawScaled(grid, (s16) x, (s16) y, scaleX, scaleY);
                 } else {
-                    Draw(grid, x, y);
+                    drawTileBlock(grid, x, y);
                 }
             } else if (scaled) {
                 DrawScaledMasked(grid, (s16) x, (s16) y, scaleX, scaleY);
