@@ -390,9 +390,9 @@ change; they need more time.
 | `vm1/Demo` | 28 | .rodata interleaved with another directory's (6 subsegments between, e.g. `func_0027C074`); round 25 (n2): interleaved with `code/CCamera`; also `--name` |
 | `vm1/GameOverMenu` | 3 | **merged** (round 24, first batch) |
 | `vm1/MissionMenu` | 14 | .rodata interrupted by data no C file owns (1: `unnamed@0xC2368`); round 25 (n2): linker padding before `func_00424B90`; also declarations differ |
-| `vm1/MotherBoss` | 65 | declarations differ (6: `AI_UpdateTargets`, `Actor_SpawnParticle`, `CAI__CallHurt`, `CLevelActorPool__Spawn`, ...). Round 25 n1: 10 conflicts: AI_UpdateTargets and friends (protos/enemy.h now exists), CLevelActorPool__Spawn, Actor_SpawnParticle (3 vs 4 arguments), WeightedTable_PickStatic |
+| `vm1/MotherBoss` | 65 | **merged** (round 25 merge, after unifying its declarations as its vm2 twin's; was: declarations differ (6: `AI_UpdateTargets`, `Actor_SpawnParticle`, `CAI__CallHurt`, `CLevelActorPool__Spawn`, ...)) |
 | `vm1/MpMenu` | 110 | .rodata interrupted by data no C file owns (3: `unnamed@0xC1A78`); round 25 (n2): linker padding before one of ten starts; `sMpMenuFmt_3d` read as an extern; also declarations differ |
-| `vm1/NameEntryMenu` | 8 | .rodata interrupted by data no C file owns (1: `unnamed@0xC1F4C`); round 25 (n2): the strings of its key table in `.data` (asm): the table in C first (compiles merged otherwise) |
+| `vm1/NameEntryMenu` | 8 | .rodata interrupted by data no C file owns (1: `unnamed@0xC1F4C`); round 25 (n2): the strings of its key table in `.data` (asm): the table in C first (compiles merged otherwise; round 25 merge: merged with `--rodata-free`, `make verify` fails, the strings are not in the C) |
 | `vm1/OptionsMenu` | 31 | **merged** (round 25, n2: every function `DEFERRED`; was: .rodata not in .text order) |
 | `vm1/Pak` | 42 | .rodata not in .text order (1 inverted pairs of 3 subsegments); round 25 (n2): deferred from index 2..6 on, index 7 defined before 6; also declarations differ |
 | `vm1/PakMenu` | 140 | .rodata interrupted by data no C file owns (2: `unnamed@0xC2008`); round 25 (n2): linker padding (two places); `sPakMenuText_Spaces3` read as an extern; also declarations differ |
@@ -524,6 +524,39 @@ allocation difference); its C must be re-matched under `-fforce-addr` first.
 unattributed data (`60.0f`) inside its `.rodata` and `vm1/Demo` is interleaved with `code/CCamera`.
 
 None of this needs a ROM change.
+
+## Round 25 merge: the state after parts n1-n4
+
+The four parts merged in the order n3, n2, n1, n4 (`make verify` and `asm_diff --base f3e72718` 0
+after each, the port compiled with clang after each). Then `tools/merge_check.py --rodata-free` over
+the 45 directories left: one compiled and compared equal (`vm1/NameEntryMenu`, but `make verify`
+fails after the merge: its key table's strings are `.data`'s, see its row), 36 stop at the compiler,
+8 are refused. `vm1/MotherBoss` was merged after its declarations took the forms its vm2 twin's
+merged file has (`AI_UpdateTargets`, `Actor_SpawnParticle`, `WeightedTable_PickStatic`,
+`CLevelActorPool__Spawn` on `void *` arguments; `CAI__CallHurt` and `ImpactEvent_Send` through a
+function type of their own in the one file each that passes other arguments; `asm_diff` 0 before
+the merge, `make verify` after; clang needed the port-only `MotherBoss_Hurt` prototype gone).
+
+**89 modules are one C file** (14 in round 23, 44 in round 24, 31 in round 25: n1 17, n2 5, n3 8,
+the merge 1). **44 module directories still hold one function per file**, by what stops them:
+
+| Reason | Directories |
+|---|---|
+| one original object over the engine and the VM (its VM functions would need a text section of their own in the merged file: linker-script work) | `code/CPlayer` + `vm1/CPlayer`, `code/CScene` + `vm1/SceneLoad`, `code/CCamera` + `vm1/Demo` (6; `vm1/Demo` also needs `--name`) |
+| linker padding inside the `.rodata` run: the directory is two or more objects, `versions/modules.us.txt` needs the boundary first (part n2) | `code/AI`, `code/CAudioWorld`, `code/CParticle`, `code/LevelEvent`, `vm1/MissionMenu`, `vm1/MpMenu`, `vm1/PakMenu`, `vm1/Primagen` (8) |
+| data the C reads as externs, or strings of `.data` tables in asm (they must become literals or C tables first) | `code/Anim`, `code/CEngineApp` (also `--name`), `code/CGameObjectInstance`, `code/CInstancePool`, `code/CMtxF`, `code/Crash`, `vm1/NameEntryMenu` (7) |
+| deferred functions (`--inline`) plus header work | `code/CLevelActor`, `code/VM`, `vm1/TotemDefense`, `vm1/Pak` (4; `vm1/Pak` also needs a source-order option) |
+| cc1 flags (`func_002A0044` must be re-matched under `-fforce-addr`) | `code/adecHuffDecode` (1) |
+| header work only (one declaration per name; no `.rodata` question) | `code/{CCache, CGameRegion, EnemyAI, GameObject, Generator, Hud, SndQueue, SndSeq, WeaponMode, __scHandleRSP, libultra/audio/cseq}`, `vm1/BlindOne`, `vm2/{BlindOne, Demo, MpMenu, PakMenu, Primagen, SceneLoad}` (18) |
+
+The rows above the last need header work too: `merge_check.py --rodata-free` stops at the compiler
+for every directory it gets that far with except `vm1/NameEntryMenu`; the 8 it refuses before
+compiling are the six interleaved ones, `code/CEngineApp` (its name) and `code/adecHuffDecode`. The fewest
+compiler messages are in `code/CInstancePool` and `code/Crash` (5 each, both with data to give to
+the C first), `code/libultra/audio/cseq` (the Rage Wars `sptr`/`uptr` typedefs and
+`RuntimeState`/`DecodeResult` views), `code/Generator` (`B01Info` twice, the CScene/actor-pool
+prototypes) and `vm2/Demo` (the CList family through `rw/abu_protos.h` in one file, `IntPair`,
+`Triple`, `CCache__Allocate`/`Deallocate`). None needs a ROM change.
 
 ## Evidence
 

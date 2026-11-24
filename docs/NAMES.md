@@ -489,6 +489,108 @@ The count of distinct `D_` tokens in `src/` and `include/` (code and comments) w
 - The 52 pool words, 11 labels and 10 VM data names of round 22 are unchanged (not re-done in
   round 24: no time); their reasons above still hold.
 
+### Round 25, part n4: the last BSS views, the VM data names, every `D_` re-checked
+
+`versions/names/data_g8.us.txt` (22 names), the view rewrites and the comment fixes below. Each batch:
+`tools/asm_diff.py --base f3e72718` over the whole tree 0 differ, a clean `make setup` + build +
+`make verify` OK, the port rebuilt (gendata from scratch, `mklayout.py` rewritten); the demos keep their det md5, the
+whole-game run did not until the merge kept the voice tables' old reading ("For the port" below). Distinct `D_` tokens in `src/` and `include/` (`.c`/`.h`, code and comments): **88 -> 42**;
+data names 1,704 -> **1,726**.
+
+**The BSS views** (all four are gone):
+
+- `D_800D7BE0` (the "anchor 0x5F0 before `gCache`", 45 uses): not an anchor. The ROM never loads
+  0x800D7BE0 (no `%hi/%lo` pair in `build/ref.elf` reaches 0x800D7BE0-0x800D81BF): every access of
+  `CCache__Construct` is its own `%hi/%lo` of `gCache` + the member offset, so the Rage Wars
+  `B12Mgr` view (its fields at `0x5F0 +`) was only a spelling of `gCache`. The N64 body now writes
+  `gCache.memEntries`, `.memAgeList`, `.mutex.queue`, `.blocker`, `.queue`, `.stack`... (the
+  running-pointer loops and the `dlistValid` stores through a pointer stay: the ROM's register use).
+  The four other CCache files only declared the view; the declarations went, and the symbol left
+  `symbols_manual.us.txt`. The cache manager's struct is `CCache` itself; nothing in the ROM uses the
+  0x5E0 bytes before `gHashMask`.
+- `D_800F55F4` (SpeechPlayer_Update): `SndFx` (`gAudioWorld.fx`) gets its real tail, a `stream`
+  record at 0x30 (`sequence`, `head`, `kind`, `tail`: rw_abu's `QueueRec`) over the old pad; the code
+  writes `gAudioWorld.fx.stream.head/.kind/.tail/.sequence` and matches.
+- `D_800E6790` is `sAnimDecodeUnkC`, a BSS word of its own (the f32 `AnimHeader.fC`, stored by
+  Anim_DecodeAnimation and Anim_Decompress before each `Anim_DecodeTracks` pass and read by no code),
+  not "the end of `sLitVertexOffsets`" (that table only ends there). Declared in `globals/object.h`.
+- `D_800D8E13`: `((u8 *) &sBatchPass)[3]`, the pass word's low byte on the N64. The port read the
+  same byte offset before (gendata aliased the symbol to `sBatchPass + 3`), the high byte on a
+  little-endian host; kept so the port's output does not change (noted for the port, see below).
+
+**The VM data names** (round 22's ten):
+
+- `D_004315C8`, `D_004315DC`, `D_00431608`, `D_00431618`: `sPrimagenSoundScript1Picks` ...
+  `4Picks`, the `Pick[]` tables the type-2 steps of the Primagen's sound scripts name (read from
+  the step args in the VM data: script 1's step 0 is `{2, 0x004315C8}` etc.); declared in
+  `globals/boss.h`.
+- `D_004388E0`, `D_0043916C`: `gTeamMenuDesc` (the team pick, TeamMenu_*) and `gSingleMenuDesc`
+  ('single', SingleMenu_Init), the two `MenuDesc` CPlayer__NewGame opens; in `globals/menu_desc.h`,
+  and CPlayer__NewGame passes `&gTeamMenuDesc` / `&gSingleMenuDesc` (the `func_` macros went). The
+  module-2 twin (`vm2/CPlayer/func_00466B38.c`) still calls them `func_00438800` / `func_0043908C`
+  (link addresses), not `D_` tokens.
+- `D_0042B304`, `D_0042B5D0`, `D_0042C9D4`: labels inside the first module's `CScene__LoadLevel` /
+  `CScene__Construct` that the second module's asm calls at their link addresses (callbacks); only
+  comments of `vm2/SceneLoad` (C since part n3: `func_00462EC0.c`, `func_00463B2C.c`) and
+  `vm1/SceneLoad/func_0042AC0C.c` mention them: comments that say what the original code called by address. They stay as
+  mentions.
+- `D_00469400` (the module-2 page buffer) is no longer in the C.
+
+**Main-code data that round 22 counted as pool words but are objects** (each reached by its own
+`%hi/%lo` or by a data pointer, not part of a function's literal pool): `gAIBaseModeTable`
+(`D_800B0700`, `CAIModeInfo[27]`, `globals/ai.h`), `sTrailTexture0Points`-`3Points` (`D_800ACE70`,
+`98`, `C0`, `D_800ACF38`: the records `sTrailTextures` points at, `globals/particle.h`),
+`sDecalSetupDList` (`D_800ACFC8`, a `Gfx[]`), `sVoiceTrackSounds` / `sVoiceNoUnkC4Sounds`
+(`D_800B2A34` / `44`, `globals/audio.h`; the port's `t2audio_world.c` uses the names),
+`gFinalScoreMenuDesc` (`D_800C1E54`), `sEnterCheatKeyLabels` (`D_800C1144`), `sPakMenuText_Space`
+(`D_800C140C`), `sMissionMenuText_Space` (`D_800C1768`), `sBossOverlayScript` / `sBoss2OverlayScript`
+(`D_800B2C30` / `40`), `sDeferredAlphaTexture` (`D_800AB680`). Each is declared in its subsystem's header
+(docs/GLOBALS.md, "Round 25, part n4").
+
+**Comment mentions** rewritten as the address or the function's name (they named splat labels that
+are named functions now: `ProPack__Decompress`, `Texture_DecompressCallback`, `__scMain`,
+`VM_ReaderThread`, `alMainBusPull`, `alSavePull`...): the 11 code labels, `D_0042D50C` (14 file
+heads), `D_800DD794`/`D_800DE1E0`, `D_80119850`, `D_801462C8`, `D_801468A0`, `D_8012F9A8`,
+`D_8012F990`, `D_800F1402`, `D_800B6D1B`.
+
+**The 42 left, each with its reason:**
+
+| `D_` | what | why it stays `D_` |
+| --- | --- | --- |
+| `D_800A57B8` | f32 1.0 + "Lit Vertices" | in `CMtxF/func_0021375C.c`'s `.rodata`, read by `CMtxF/func_00213A70.c`: a pool another C file owns; a literal when CMtxF is one C file (not merged in round 25: unowned data and header work, docs/MODULES.md) |
+| `D_800A5EB0` | f32 127.0 | in `vm1/SceneLoad/func_0042AA80.c`'s `.rodata`, read by the vm2 twin `func_004639A0.c`: the vm2 copy reads the first module's pool (n3's per-part placement keeps that; neither SceneLoad is merged) |
+| `D_800C1064` | f32 120.0 | in `vm2/GameOverMenu_2.c`'s `.rodata`, read by `vm1/GameOverMenu.c`: the same, the other way round |
+| `D_800C1348` | f32 15.0 | in `vm1/NameEntryMenu/func_0041D2C4.c`'s `.rodata`, read by the vm2 twin: vm2 shared pool |
+| `D_800A5404`, `D_800A58F4`, `D_800A5AF8`, `D_800A6404`-`D_800A6424` (9), `D_800A652C`, `D_800A9DFC`, `D_800ACB50`, `D_800ACE68`, `D_800ACE6C`, `D_800ADDB8`, `D_800ADDE4`, `D_800AE344`, `D_800C1BC4`, `D_800C1BC8` (22) | float literals (and `{0, 1, 0}`) of one function each | in `.rodata` no C object owns yet (`asm/data/*.rodata.s` blobs: A6004, A64F4, A66F8, A7004, A712C, AA9FC, ABCA8, C24E0): written as a literal the word would move into the C file's own pool and the blob would keep a copy; they become literals when the blob gets an owner (round 25 n2 found the causes per directory: linker padding = object boundaries to move, data the C reads as externs; none of these modules was merged in round 25) |
+| `D_800AE312`, `D_800AE9D2`, `D_800C1CD2`, `D_800C1E7A`, `D_800C203B`, `D_800C21AA` | interiors: +2 of the per-character `s16` pairs of CPlayer's climbing sounds; an `s16` WeaponMode_Charge_Update stores the shot count into; `MenuColorInit[]` +2; `gCharacterSelectSounds` +2; the low byte of `gResolution` (OptionsMenu); the `u16` VI-mode table PakMenu indexes by flags and region | interiors of tables in the unowned blobs (C24E0, ABCA8): base + offset needs the table's type and an owner, and on the host gendata generates the data in host order, where a byte or halfword view of a word reads the other half; they stay symbols of their own until the blob is a C object |
+| `D_800B7E60` | `osViModeTable[8]` (NTSC HPN1) | EngineMode17_Switch_Init needs its own `%hi/%lo`; an array element other than `[0]` is not named by convention |
+| `D_800B6E60`, `D_800B6E64`, `D_800B7658` | words `__scExec` (two flags) and `VM_HandleTLBMiss` (-1) write, read by no C | inside the unowned ABCA8 blob between other objects' data: their owners (the scheduler's / VM's statics) are not split out, so the role is a guess |
+| `D_800C894C` | the bottom of the main stack (`assets/C3074.bin` `.data`) | not a game object: the recursion guard compares the stack pointer with its address |
+| `D_8014A000` | the end of the loaded image/BSS | a linker bound (InitializeSystemResources, main) |
+| `D_8F128560` | an address offset outside RDRAM | HostIo_MemoryTransfer adds it; not data |
+| `D_0042B304`, `D_0042B5D0`, `D_0042C9D4` | code labels (comments of the vm2 SceneLoad C copies and vm1 `func_0042AC0C.c`) | see above |
+
+**For the port:** `Render_SortDrawItems` (`func_0020A568`) keys the sort tree with byte 3 of
+`sBatchPass`, which is the low byte on the N64 and the high byte (0) on the host, as before this
+round. Using `(u8) sBatchPass` on the host would be the faithful key, but it changes the draw
+order and so the det md5s; left for a port round that re-baselines.
+
+`sVoiceTrackSounds` / `sVoiceNoUnkC4Sounds` are declared without a size on purpose: with `[4]` / `[6]`
+clang vectorized the port's scan of them into an aligned 16-byte load and the demos crashed (the
+host objects are 4-aligned); docs/GLOBALS.md has the detail.
+
+**Merge (C40): the voice tables changed the port's runs.** Before n4 the two tables had no type, so
+gendata emitted them as raw N64 bytes and the host's `SndVoicePool_AllocVoice`
+(`port/audio/t2audio_world.c`) read every id byte-swapped (0x78 as 0x78000000): no voice ever got
+`hasTrack` or lost `unkC4`. Typed, the host matches the ids as the N64 does, the track voices stop
+with the music, and the game's random stream differs from frame 117,323 of the default run on
+(`af8bd840` instead of `cd2d68ce`; END 2, 0 lives; the stick combination `aaa175f2`, 1 life). The
+other gendata differences of n4 (`gAudioWorld` 0x3050 -> 0x3058 with `SndFx.stream`, the menu
+descriptors typed) change nothing: a build with only the two reads swapped back matches the old
+run's det log through frame 118,000 and ends on `cd2d68ce`. The merge keeps that swap
+(`T2_VOICE_ID`, with a comment) so the reference runs keep their md5s, as n4 did for `sBatchPass`;
+the faithful reading is for a port round that re-baselines.
+
 ## Declarations
 
 The named globals now have one declaration each, with the real type, in

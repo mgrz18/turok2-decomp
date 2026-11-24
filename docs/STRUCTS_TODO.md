@@ -23,7 +23,7 @@ different scan, said 717 of 1,699); after the first pass, 612 of 1,557;
 after the second, 534 of 1,416; after the third, 431 of 1,192; after the
 fourth, 291 of 1,013; after round L, 229 of 889 (228 of 863 by the census at
 7340fcdd); after round 21 j3, 174 of 803; after round 22 k3, 148 of 723 (142 of 698 on the
-merged tree); after round 24 m1, 115 of 669; after the round-24 module merges (same-module copies folded), 112 of 665. The vector,
+merged tree); after round 24 m1, 115 of 669; after the round-24 module merges (same-module copies folded), 112 of 665; after round 25 n1, 110 of 657; on the round-25 merged tree, **144 of 656**: part n3 wrote the 100 vm2 functions that were asm as C copies of their vm1 twins, each with its twin's local structs (146 of 666 on n3 alone), so most of the increase is VM-copy pairs, which the census counts as two files. The vector,
 intelligence, libultra, Gfx, sound, libaudio, AI state (CAI and its
 var-buffer views), controller, game and engine, weapon, pak, list, cache,
 boss, particle, collision, save, demo, pager, menu, player / owner /
@@ -864,6 +864,7 @@ read CEmitter.m_Height), Material (Render's runtime one is structs/batch.h's, no
 texture and colour fields), Vtx (Render: structs/gbi.h's `Vtx_t`), Clip (Rumble: rw/abu_types.h's),
 OffsetTable / TableHeader (structs/table.h's OffsetTable / ArrayTable), ByteImage (into
 structs/table.h), CMutex (CISet: ultra_types.h's). struct_census: 110 of 657 names in 2+ files.
+After the merge of round 25 (n3's vm2 C copies, the vm1/MotherBoss merge): 144 of 656.
 
 Every name still defined in 2 or more files, by what it would take. "Same module" names become
 one definition when tools/merge_module.py merges their module (round 25, m3's table in

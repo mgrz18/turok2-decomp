@@ -6,6 +6,52 @@ new game to the good ending with no invincibility and no life lost, on the N64's
 stream. The Mac app is packaged and ready for its first session in a real window
 ([FIRSTRUN.md](FIRSTRUN.md)); that session has not happened yet.
 
+## Round 25 merge (Phase 5): 31 more modules in one C file, vm2 without asm, the last BSS views; the reference md5s unchanged
+
+Merged into `feat/46-hand-matching` in the order n3, n2, n1, n4 (`--no-ff`). n3: the 100 vm2
+functions that were asm are C (copies of their vm1 twins), a merged vm2 file places its `.rodata`
+per original part (`versions/shared_rodata.us.txt` `<merged>:<function>`), 8 vm2 modules merged.
+n2: `merge_module.py --cc1-flags auto`, `--inline` (`DEFERRED` in common.h: `inline` on the N64,
+empty on the port), `--rodata-free`, `tools/rodata_gaps.py`; 5 modules merged. n1: 17 header-work
+modules merged (array views in globals/game.h, libultra.h, collision.h; protos/enemy.h, mtxf.h;
+structs/table.h). n4: `CCache__Construct` on `gCache`'s members, `SndFx.stream`, 22 data names
+(`data_g8`); `apply_names.py` + `make setup` after it. Conflicts: `tools/merge_module.py` merged
+cleanly (its `first_function` now also skips `DEFERRED` definitions), docs/MODULES.md (all
+sections kept, table rows: merged wins, else both notes), the yaml (n2 OptionsMenu + n1 StatsMenu,
+n1 StatsMenu_2 + n3 NameEntryMenu_2), and 11 modify/delete conflicts where a part edited a file
+another part had merged into its module's one C file: n1's `match_tag[0]` carried into
+`CPlayer_2.c`, n4's edits into `Render.c`, `SpeechPlayer.c`, `Texture.c`, `CheatMenu_2.c`,
+`MissionMenu_2.c`; n3's copy `vm2/Primagen/func_0043E3C4.c` took n4's names as its vm1 twin. A dead
+host block inside the N64-only `Sound__IsPlaying` (n1's merge) went (nested `TARGET_PORT` scan).
+After the parts, `vm1/MotherBoss` was merged too (its declarations as its vm2 twin's): **89 modules
+are one C file, 44 directories left** ([MODULES.md](../MODULES.md#round-25-merge-the-state-after-parts-n1-n4)).
+
+**n4 changed the port's runs, and the merge keeps the old behaviour.** Typing the two voice id
+tables (`sVoiceTrackSounds`, `sVoiceNoUnkC4Sounds`, were `D_800B2A34`/`D_800B2A44` read as raw N64
+bytes) made the host match those sound ids as the N64 does: the default run became `af8bd840`
+(first det difference at frame 117,323, the game's random word; END 2, 0 lives) and the stick
+combination `aaa175f2` (1 life). A build with only those two reads swapped back matched the old
+det log and ended on `cd2d68ce`, so the other gendata differences of n4 (`gAudioWorld` 0x3058 with
+`SndFx.stream`, typed menu descriptors) change nothing. `port/audio/t2audio_world.c` keeps the old
+(byte-swapped) reading behind `T2_VOICE_ID` with a comment, as n4 itself kept `sBatchPass`'s byte
+3: both are fidelity fixes for a port round that re-baselines ([NAMES.md](../NAMES.md#round-25-part-n4-the-last-bss-views-the-vm-data-names-every-d_-re-checked)).
+
+Checks: after every merge step `asm_diff --base f3e72718` 0, a clean `make setup` + build +
+`make verify` OK, the port compiled by clang from a fresh gendata (the merged files included; a
+merged file can fail under clang where GCC 2.8 passes it: the `MotherBoss_Hurt` prototype), the
+nested `TARGET_PORT` scan at the 2 known sites. At the end: clean `make verify` OK (shared
+`.rodata` 167 objects), `asm_diff` 0 differ over 2,910 files; a fresh `git clone --recursive`
+(ultralib `e24c836`) builds and verifies (ROM md5 `fad4da8e…`). Port: gendata from scratch,
+`mklayout.py --check` up to date, `aligncheck.py` the 2 known sites; boot + 3 demos `6ab97584…`;
+**default whole game `cd2d68ce…`** (END 2, 0 lives); the stick combination **`cadfe170…`** (END 2,
+0 lives); `make -C port test`, `gbi_test` 0 mismatches, t2os deterministic (`2b277587…` three
+times), `t2audio_test --direct 0/40` max difference 0, `--adec` 27,136 samples, the swoosh
+self-test OK. abicheck 0 harmful, ptrargs 0 retyped, outptr 0 BAD, f2ucheck 112 (unchanged);
+n64viewcheck: every BAD count unchanged (raw 10, cast 1, gptr 3, stride 3; unlinked raw 11, cast 4,
+gptr 20, stride 4); `view/suspect` 28 -> 32 (unlinked 44 -> 51) are the same sites as before
+(`CEmitter__Advance`, `Rumble_GetLevelAt`, the speech `restart`, three vm2 views) reclassified
+from moves/local because a merged file has more struct types in scope; unlinked raw/untyped 140 -> 141.
+
 ## Round 24 merge (Phase 5): headers, globals, 44 modules merged; the reference md5s unchanged
 
 Merged into `feat/46-hand-matching` (no conflicts): m2 (BSS interiors as members, `D_` tokens
