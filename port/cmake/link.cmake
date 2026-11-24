@@ -57,33 +57,33 @@ set(T2_LINK_REPLACED
     # the sound player API (m2c views with N64 offsets): port/audio/t2audio_sndp.c
     # the sound world (Rage Wars views of CAudioWorld/SndVoice/SndQueue at N64 offsets):
     # port/audio/t2audio_world.c (docs/port/AUDIO.md §8)
-    func_002706A0.c   # CAudioWorld__StartVoice
-    func_002708C0.c   # CAudioWorld__StopHandle
-    func_00270A60.c   # CAudioWorld__PlayLayer
-    func_00270C80.c   # CAudioWorld__PlaySound
-    func_00271128.c   # CAudioWorld__PlaySoundIndex
-    func_002712E8.c   # CAudioWorld__Update
-    func_00271570.c   # CAudioWorld__StopSound
-    func_002715B0.c   # CAudioWorld__StopSoundsByOwner
-    func_002715F0.c   # CAudioWorld__StopSoundsByFlags
-    func_00271630.c   # CAudioWorld__PlaySoundPitched
-    func_00271694.c   # CAudioWorld__UpdateAmbientTrack
-    func_002717A8.c   # CAudioWorld__GetPanEnvelope
-    func_002718A0.c   # CAudioWorld__FadeOutMusic
-    func_002718D0.c   # CAudioWorld__SetAmbientTrackEnabled
-    func_002718E0.c   # CAudioWorld__GetStereo
-    func_002718F4.c   # CAudioWorld__GetSndPlayer
-    func_002719F4.c   # CAudioWorld__StopMusic
-    func_00271A10.c   # CAudioWorld__SetFxMix
-    func_00271A70.c   # CAudioWorld__DuckMusic
-    func_00271A8C.c   # CAudioWorld__UnduckMusic
-    func_00271AA8.c   # CAudioWorld__DetachAllVoices
-    func_00271AC4.c   # CAudioWorld__PlaySpeech
-    func_00271B04.c   # CAudioWorld__StopSpeech
-    func_00271B20.c   # CAudioWorld__SortInstrumentSounds
-    func_00271BEC.c   # CAudioWorld__PickVariant
-    func_00271D84.c   # CAudioWorld__GetVariantLayers
-    func_00271DB4.c   # CAudioWorld__IsSoundBusy
+    # (CAudioWorld__StartVoice: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__StopHandle: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__PlayLayer: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__PlaySound: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__PlaySoundIndex: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__Update: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__StopSound: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__StopSoundsByOwner: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__StopSoundsByFlags: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__PlaySoundPitched: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__UpdateAmbientTrack: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__GetPanEnvelope: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__FadeOutMusic: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__SetAmbientTrackEnabled: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__GetStereo: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__GetSndPlayer: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__StopMusic: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__SetFxMix: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__DuckMusic: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__UnduckMusic: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__DetachAllVoices: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__PlaySpeech: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__StopSpeech: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__SortInstrumentSounds: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__PickVariant: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__GetVariantLayers: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
+    # (CAudioWorld__IsSoundBusy: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
     func_00271E20.c   # Sound_CalcPan
     func_00271F6C.c   # SndVoice_InitPitch
     func_00272278.c   # SndVoice_InitVolume
@@ -155,23 +155,8 @@ set(T2_LINK_REPLACED
     func_002A12CC.c   # adecGetStopFlag
     func_002A12DC.c   # adecClearStopFlag
     # the scheduler, typed for the host (port/game/t2sched.c: its views overran on LP64)
-    func_0028A020.c   # __scMain
-    func_0028A17C.c   # __scHandleRetrace
-    func_0028A43C.c   # __scHandleRSP
-    func_0028A914.c   # __scHandleRDP
-    func_0028ABE0.c   # __scSchedule
-    func_0028ADF0.c   # osCreateScheduler
-    func_0028AF00.c   # osScAddClient
-    func_0028AF58.c   # osScRemoveClient
-    func_0028AFE8.c   # osScGetCmdQ
-    func_0028AFF0.c   # __scAppendList
-    func_0028B048.c   # __scTaskReady
-    func_0028B0A8.c   # __scTaskComplete
-    func_0028B0FC.c   # __scExec
-    func_0028B274.c   # __scYield
-    func_0028B2AC.c   # Sched_HandleCmdMsg
-    func_0028B3E0.c   # Sched_GetInterruptQ
-    func_0028B3E8.c   # Sched_SubmitTask
+    # (__scMain .. Sched_SubmitTask: all 17 functions of the merged __scHandleRSP.c, round 28)
+    __scHandleRSP.c
 )
 
 # True if NAME (a game C file name: src/us/vm2/<module>/func_*.c) is module 2 (.virtual_1).

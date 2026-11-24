@@ -2,12 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/sndp.h"
 
 extern void SndVoice_SetPitch(void *arg0, f32 arg1);
-extern void alSndpSetSound(void *sound, s16 sample);
-extern void alSndpSetSound(void *sound, s16 sample);
-extern void alSndpSetSound(void *arg0, s16 arg1);
-extern void alSndpSetPitch(void *arg0, f32 arg1);
 void SndVoice_SetPitch(void *arg0, f32 arg1) {
     RecordCode8025A3EC *slot = arg0;
     OwnerCode8025A3EC8025B5F0 *owner;

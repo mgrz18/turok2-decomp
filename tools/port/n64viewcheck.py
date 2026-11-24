@@ -718,7 +718,7 @@ def main():
     jobs, done = [], set()
     for e in cc:
         f = os.path.abspath(e['file'])
-        if not f.endswith('.c') or '/src/' not in f or f in done:
+        if not f.endswith(".c") or ("/src/" not in f and "/hostified/" not in f) or f in done:
             continue
         if want and f not in want:
             continue

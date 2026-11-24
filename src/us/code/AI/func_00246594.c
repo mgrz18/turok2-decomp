@@ -1,4 +1,6 @@
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "m2c_macros.h"
 
 typedef struct { s16 *base; s16 *p; } S;

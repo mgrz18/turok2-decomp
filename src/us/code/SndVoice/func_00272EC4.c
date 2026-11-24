@@ -3,13 +3,12 @@
 #include "common.h"
 #include "structs/sound.h"
 #include "globals/audio.h"
+#include "protos/sndp.h"
 
 #define PITCH_TABLE sPitchRatioTable
 
 extern void SndVoice_UpdateDoppler(SndVoice *s);
 extern f32 HalfToFloat(s32 halfFloat);
-extern void alSndpSetSound(void *player, s32 id);    /* alSndpSetSound */
-extern void alSndpSetPitch(void *player, f32 pitch); /* alSndpSetPitch */
 
 static __inline__ f32 centsToPitch(f32 x) {
     f32 pos = (x + 6000.0f) * 0.016666668f;

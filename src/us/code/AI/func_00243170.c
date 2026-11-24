@@ -1,198 +1,40 @@
+#include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/vector.h"
-#include "globals/engine.h"
-#ifdef TARGET_PORT
 #include "structs/game_object.h"
-#endif
+#include "globals/engine.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80213ED4.CPP, func_80213ED4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern s32 CGameObjectInstance__SetAnim(void *arg0, sptr arg1, s32 arg2);
-struct SoundSourceNode;
-struct SoundSourceNode {
-    s32 unk0;
-    struct SoundSourceNode *next;
-    s32 value;
-    s32 state;
-    CVector3 position;
-    void *owner;
-};
-struct SoundSourceNode;
-struct SoundSourceNode;
-typedef struct SoundSourceNode SoundSourceNode;
-struct Dest;
-typedef struct Dest Dest;
-struct Source110;
-typedef struct Source110 Source110;
-struct StateEntry;
-typedef struct StateEntry StateEntry;
-struct Source110;
-#ifdef TARGET_PORT
-/* Host views (tools/port/hostview.py, the fields this file reads): Source110 is the
- * CGameObjectInstance, Dest its CAI. At the N64 offsets Dest's scale/entry_scale/
- * state_result missed CAI::m_AnimSpeed/m_AnimModeSpeed/m_AnimIndex, so
- * gFrameIncrement was multiplied by garbage for every animated actor (their animations
- * never advanced). */
-#define T2_HOFF_Source110(m) __builtin_offsetof(CGameObjectInstance, m)
-struct Source110 {
-    union {
-        struct { u8 _hp_flags[T2_HOFF_Source110(m_dwFlags)]; u32 flags; };
-        struct { u8 _hp_limit[T2_HOFF_Source110(m_CurrentAnimation.m_AnimationFrame)]; f32 limit; };
-        struct { u8 _hp_current_state[T2_HOFF_Source110(m_CurrentAnimation.m_nAnimIndex)]; s16 current_state; };
-        struct { u8 _hp_previous_state[T2_HOFF_Source110(m_CurrentAnimation.m_nRequestedAnimIndex)]; s16 previous_state; };
-        struct { u8 _hp_counter[T2_HOFF_Source110(m_CurrentAnimation.m_nFrames)]; s16 counter; };
-        struct { u8 _hp_state_changed[T2_HOFF_Source110(m_CurrentAnimation.m_bCycleCompleted)]; s8 state_changed; };
-        struct { u8 _hp_animationChanged[T2_HOFF_Source110(m_CurrentAnimation.m_bAnimActive)]; u8 animationChanged; };
-        struct { u8 _hp_stateChanged[T2_HOFF_Source110(m_BlendAnimation.m_bAnimActive)]; u8 stateChanged; };
-    };
-};
-#define T2_HOFF_Dest(m) __builtin_offsetof(CAI, m)
-struct Dest {
-    union {
-        struct { u8 _hp_flags[T2_HOFF_Dest(m_dwFlags)]; u32 flags; };
-        struct { u8 _hp_entry[T2_HOFF_Dest(m_pModeCurrent)]; StateEntry *entry; };
-        struct { u8 _hp_state[T2_HOFF_Dest(m_Mode)]; s8 state; };
-        struct { u8 _hp_old_state[T2_HOFF_Dest(m_ModeLastFrame)]; s8 old_state; };
-        struct { u8 _hp_old_entry_flags[T2_HOFF_Dest(m_ModeLastFrameFlags)]; u32 old_entry_flags; };
-        struct { u8 _hp_entry_flags[T2_HOFF_Dest(m_ModeFlags)]; u32 entry_flags; };
-        struct { u8 _hp_scale[T2_HOFF_Dest(m_AnimSpeed)]; f32 scale; };
-        struct { u8 _hp_entry_scale[T2_HOFF_Dest(m_AnimModeSpeed)]; f32 entry_scale; };
-        struct { u8 _hp_result[T2_HOFF_Dest(m_AnimType)]; s16 result; };
-        struct { u8 _hp_state_result[T2_HOFF_Dest(m_AnimIndex)]; s8 state_result; };
-        struct { u8 _hp_count[T2_HOFF_Dest(m_AnimRepeatedCount)]; u8 count; };
-    };
-};
-#else
-struct Source110 {
-    char pad0[0x1C];
-    CVector3 velocity;
-    char pad28[0xD4 - 0x28];
-    u32 flags;          /* 0xD4 (0x100 in Rage Wars); following fields 0x2C earlier */
-    f32 limit;
-    s16 current_state;
-    s16 previous_state;
-    s16 counter;
-    s8 state_changed;
-    u8 animationChanged;
-    u8 pad110[0x13];
-    u8 stateChanged;
-    u8 pad124[0x2E0 - 0x124];
-    u32 renderFlags;
-};
-struct Dest;
-struct Source110;
-struct StateEntry;
-struct Dest {
-    u32 flags;
-    s32 health;
-    s32 maxHealth;
-    s32 handle;
-    s8 level;
-    u8 pad11;
-    u8 state12, state13;
-    s8 state14[4];
-    f32 initialScale;
-    u8 pad1C[0x10];
-    void *table;
-    StateEntry *entry;
-    s8 state;
-    s8 old_state;
-    s8 requestedState;
-    char pad37;
-    u32 old_entry_flags;
-    u32 entry_flags;
-    s32 stateTimer;
-    u8 pad44[4];
-    CVector3 initialPosition;
-    CVector3 previousPosition;
-    f32 initialHeight;
-    f32 cueTimer;
-    void *field68;
-    u8 reserved6C[0x18];
-    u8 reserved84[8];
-    f32 height8C;
-    f32 height90;
-    u8 state94, state95;
-    s16 state96;
-    f32 height9C;       /* Turok 2 has 4 bytes less before here: scale at 0xBC (0xC0) */
-    CVector3 positionA0;
-    void *surfaceAC;
-    CVector3 positionB0;
-    void *surfaceBC;
-    f32 scale;
-    f32 entry_scale;
-    s16 result;
-    s8 state_result;
-    u8 count;
-    s8 secondaryLevel;
-    u8 padCD[3];
-    s32 fieldD0, fieldD4;
-    u8 reservedD8[0x24];
-    struct SoundSourceNode *sound;
-    u8 pending;
-    u8 pad101;
-    s16 channel;
-    u8 pad104[4];
-    void *enter;
-    void *draw;
-    void *hit;
-    u8 pad114[8];
-    void *callback11C;
-    u8 reserved120[4];
-    s32 field124;
-    f32 charge;
-    f32 field12C;
-    s32 field130;
-    f32 restPitch;
-    s32 field138, field13C;
-    u8 pad140[4];
-    s32 field144, field148, field14C, field150;
-    u8 reserved154[0x1C];
-};
-#endif
-typedef void *( *StateCallback)(struct Source110 *, struct Dest *);
-#ifdef TARGET_PORT
-/* a CAIModeInfo row (structs/game_object.h) at its host offsets */
-#define T2_HOFF_StateEntry(m) __builtin_offsetof(CAIModeInfo, m)
-struct StateEntry {
-    union {
-        struct { u8 _hp_id[T2_HOFF_StateEntry(m_Mode)]; sptr id; };
-        struct { u8 _hp_enter[T2_HOFF_StateEntry(unk_04)]; void (*enter)(struct Source110 *, struct Dest *); };
-        struct { u8 _hp_callback[T2_HOFF_StateEntry(unk_10)]; StateCallback callback; };
-        struct { u8 _hp_scale[T2_HOFF_StateEntry(m_AnimSpeed)]; f32 scale; };
-        struct { u8 _hp_threshold[T2_HOFF_StateEntry(unk_18)]; s32 threshold; };
-        struct { u8 _hp_flags[T2_HOFF_StateEntry(unk_1C)]; u32 flags; };
-    };
-};
-#else
-struct StateEntry {
-    s32 id;
-    void (*enter)(struct Source110 *, struct Dest *);
-    char pad8[8];
-    StateCallback callback;
-    f32 scale;
-    s32 threshold;
-    u32 flags;
-};
-#endif
-extern s32 IsCodePointer(StateCallback);
-extern s32 IsDataPointer(uptr);
-extern void *CGameObjectInstance__PickAvailableAction(void *, void *, s32);
-extern sptr CGameObjectInstance__PickRandomAnim(void *, sptr, sptr);
-void CAI__UpdateModeAnim(Source110 *src, Dest *dst) {
-    StateEntry *entry;
+/* A mode's animation (CAIModeInfo.unk_10): a function that picks it, a table of actions, or an id. */
+typedef void *(*StateCallback)(CGameObjectInstance *, CAI *);
+
+s32 CGameObjectInstance__SetAnim(CGameObjectInstance *obj, sptr anim, s32 arg2);
+s32 IsCodePointer(StateCallback);
+s32 IsDataPointer(uptr);
+void *CGameObjectInstance__PickAvailableAction(CGameObjectInstance *obj, void *table, s32 arg2);
+sptr CGameObjectInstance__PickRandomAnim(CGameObjectInstance *obj, sptr anim, sptr arg2);
+
+/* Runs the current mode's animation: on a mode change picks the mode's animation (through its
+ * picker or its action table) and its speed; counts the cycles the animation completes. Round 28:
+ * on CGameObjectInstance and CAI (the N64 views and the port's host-offset ones joined: at the N64
+ * offsets the host missed the animation speeds, and no animation advanced). */
+void CAI__UpdateModeAnim(CGameObjectInstance *src, CAI *dst) {
+    CAIModeInfo *entry;
     StateCallback callback;
     f32 factor;
-    entry = dst->entry;
+    entry = dst->m_pModeCurrent;
     if (entry != 0) {
-        if (dst->old_state != dst->state) {
-            if (entry->scale >= 0.0f) {
-                dst->entry_scale = entry->scale;
+        if (dst->m_ModeLastFrame != dst->m_Mode) {
+            if (entry->m_AnimSpeed >= 0.0f) {
+                dst->m_AnimModeSpeed = entry->m_AnimSpeed;
             }
-            dst->old_entry_flags = dst->entry_flags;
-            dst->entry_flags = entry->flags;
-            src->state_changed = 0;
-            callback = entry->callback;
+            dst->m_ModeLastFrameFlags = dst->m_ModeFlags;
+            dst->m_ModeFlags = entry->unk_1C;
+            src->m_CurrentAnimation.m_bCycleCompleted = 0;
+            callback = (StateCallback) entry->unk_10;
             if (callback != 0) {
                 if (IsCodePointer(callback) != 0) {
 #ifdef TARGET_PORT
@@ -206,58 +48,58 @@ void CAI__UpdateModeAnim(Source110 *src, Dest *dst) {
                     callback = callback(src, dst);
 #endif
                 } else if (IsDataPointer((uptr)callback) != 0) {
-                    callback = (StateCallback)CGameObjectInstance__PickAvailableAction(src, callback, dst->state_result);
+                    callback = (StateCallback)CGameObjectInstance__PickAvailableAction(src, callback, dst->m_AnimIndex);
                 }
                 if (callback != 0) {
                     if (callback != (StateCallback)-1) {
-                        dst->state_result = CGameObjectInstance__PickRandomAnim(src, (sptr)callback, dst->state_result);
-                        dst->result = (s16)callback;
-                        if (src->current_state == dst->state_result) {
-                            src->limit = 0.0f;
+                        dst->m_AnimIndex = CGameObjectInstance__PickRandomAnim(src, (sptr)callback, dst->m_AnimIndex);
+                        dst->m_AnimType = (s16)callback;
+                        if (src->m_CurrentAnimation.m_nAnimIndex == dst->m_AnimIndex) {
+                            src->m_CurrentAnimation.m_AnimationFrame = 0.0f;
                         }
                     }
-                    dst->count = 0;
-                    dst->flags &= ~1U;
+                    dst->m_AnimRepeatedCount = 0;
+                    dst->m_dwFlags &= ~1U;
                 }
             }
-            dst->old_state = (u8)dst->state;
-        } else if ((dst->state_result == -1) || (dst->result == -1)) {
-            dst->count++;
-            dst->flags |= 1;
-        } else if (src->current_state == dst->state_result) {
-            if (!(dst->flags & 1)) {
-                s32 difference = src->counter - entry->threshold;
+            dst->m_ModeLastFrame = (u8)dst->m_Mode;
+        } else if ((dst->m_AnimIndex == -1) || (dst->m_AnimType == -1)) {
+            dst->m_AnimRepeatedCount++;
+            dst->m_dwFlags |= 1;
+        } else if (src->m_CurrentAnimation.m_nAnimIndex == dst->m_AnimIndex) {
+            if (!(dst->m_dwFlags & 1)) {
+                s32 difference = src->m_CurrentAnimation.m_nFrames - entry->unk_18;
                 double converted = difference;
                 if (difference < 0) {
                     converted += 4294967296.0;
                 }
-                if ((f32)converted <= src->limit) {
-                    dst->count++;
-                    dst->flags |= 1;
+                if ((f32)converted <= src->m_CurrentAnimation.m_AnimationFrame) {
+                    dst->m_AnimRepeatedCount++;
+                    dst->m_dwFlags |= 1;
                 }
             }
-            if (src->state_changed != 0) {
-                src->state_changed = 0;
-                if (!(dst->flags & 1)) {
-                    dst->count++;
+            if (src->m_CurrentAnimation.m_bCycleCompleted != 0) {
+                src->m_CurrentAnimation.m_bCycleCompleted = 0;
+                if (!(dst->m_dwFlags & 1)) {
+                    dst->m_AnimRepeatedCount++;
                 }
-                dst->flags &= ~1U;
+                dst->m_dwFlags &= ~1U;
             }
         }
-        if (dst->entry_flags & 0x10) {
-            factor = dst->entry_scale;
+        if (dst->m_ModeFlags & 0x10) {
+            factor = dst->m_AnimModeSpeed;
         } else {
-            factor = dst->scale * dst->entry_scale;
+            factor = dst->m_AnimSpeed * dst->m_AnimModeSpeed;
         }
         gFrameIncrement *= factor;
-        CGameObjectInstance__SetAnim(src, dst->state_result, (dst->entry_flags >> 5) & 1);
-        if ((dst->state_result != -1) && (src->previous_state != dst->state_result)) {
-            dst->count = 0;
-            dst->flags &= ~1U;
-            src->state_changed = 0;
+        CGameObjectInstance__SetAnim(src, dst->m_AnimIndex, (dst->m_ModeFlags >> 5) & 1);
+        if ((dst->m_AnimIndex != -1) && (src->m_CurrentAnimation.m_nRequestedAnimIndex != dst->m_AnimIndex)) {
+            dst->m_AnimRepeatedCount = 0;
+            dst->m_dwFlags &= ~1U;
+            src->m_CurrentAnimation.m_bCycleCompleted = 0;
         }
-        if (src->flags & 0x08000000) {
-            dst->count++;
+        if (src->m_dwFlags & 0x08000000) {
+            dst->m_AnimRepeatedCount++;
         }
     }
 }

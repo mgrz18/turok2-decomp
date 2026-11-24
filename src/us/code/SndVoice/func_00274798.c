@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/sndp.h"
 
 typedef struct {
     /* 0x00 */ s32 index;
@@ -6,8 +7,6 @@ typedef struct {
     /* 0xB0 */ s32 header;
 } Model;
 
-s32 alSndpSetPan(sptr, s32);
-s32 alSndpSetSound(sptr, s16);                    /* extern */
 
 void SndVoice_SetPan(Model *arg0, s32 arg1) {
     sptr var_s0;

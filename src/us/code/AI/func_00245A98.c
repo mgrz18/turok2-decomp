@@ -2,7 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
-#include "protos/ai.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 
 extern void WeightedTable_Clear(WeightedTable *);
 extern void WeightedTable_Add(WeightedTable *, s32, s32);

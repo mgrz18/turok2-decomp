@@ -1,22 +1,19 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80213ED4_2.CPP, func_80214310_de, with Turok 2's layouts. */
 
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/game_object.h"
 
 typedef f32 Mtx4[4][4];
 
 
-f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);
-void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
-f32 func_00298470(f32 x);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
 #define CGameObjectInstance__GetRotation CGameObjectInstance__GetRotation_sret
 #endif
 void CGameObjectInstance__GetRotation(CQuaternion *q, CGameObjectInstance *actor);
 void CQuaternion__ToMatrix(CQuaternion *q, Mtx4 *mtx);
 void CMtxF__TransformPoint(Mtx4 *mtx, CVector3 *in, CVector3 *out);
-f32 Math_AcosLookup(f32 x);
-void CVector3__Normalize(CVector3 *v);
 
 /* Whether target is within range of viewer and inside its horizontal (across) and vertical (up) view angles. */
 s32 AI_IsInViewCone(CGameObjectInstance *viewer, CGameObjectInstance *target, f32 range, f32 across, f32 up) {

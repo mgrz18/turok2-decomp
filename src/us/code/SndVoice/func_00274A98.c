@@ -3,8 +3,8 @@
 
 #include "structs/sound.h"
 #include "rw/junk_types.h" /* SndCore */
+#include "protos/sndp.h"
 
-void alSndpDeallocate(void *p, s32 id);
 s32 SndVoicePool_ReleaseVoice(SndVoicePool *p, s16 idx) {
     SndVoice *v;
     CAudioWorld *m;

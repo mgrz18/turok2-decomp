@@ -1,9 +1,7 @@
 #include "common.h"
 #include "structs/sound.h"
+#include "protos/sndp.h"
 
-s32 alSndpStop(s32);
-s32 alSndpGetState(void *);                          /* extern */
-void alSndpSetSound(void *, s16);                    /* extern */
 
 void SndVoice_Stop(SndVoice *arg0) {
     CAudioWorld *temp_a0;

@@ -999,6 +999,312 @@ the compiler, 3 refused: `code/CScene` and `vm1/SceneLoad`, whose `.rodata` inte
 
 None needs a ROM change.
 
+## Round 28, part q1: header work on the engine (`__scHandleRSP`, `GameObject`, `AI`)
+
+**Merged (2 directories, 79 files):** `code/__scHandleRSP` (17) and `code/GameObject` (62), each with
+`tools/merge_module.py DIR --rodata-free` after the header work below. After each batch:
+`asm_diff --base b9bb8125` 0 over the tree, a clean `make setup` + build + `make verify` OK, the port
+builds from a fresh gendata, and the merged files have no implicit declaration under clang
+`-Wimplicit-function-declaration`.
+
+- *`__scHandleRSP`: the scheduler on `structs/sched.h`.* The 17 files' views (`Sched`, `Client`,
+  `ScTask`, `Vid`/`Job`/`Qn`/`View`, `Panel`, `PendingOwner`/`PendingNode`, `NodeLists`/`Node`,
+  `Stream`/`StreamOwner`, Rage Wars' `Ctx_`/`Node_`/`View_`/`Scene_func_8028F*_de`) are now
+  `OSSched`, `OSScTask` and `OSScClient`; the frame a gfx task draws is a `CFrameData`. The new
+  `protos/sched.h` has one prototype per scheduler function on those types (and the libultra calls only
+  the scheduler makes: `osSetIntMask`, `osSpTaskYield(void)`, `osSpTaskYielded`). What the views
+  hid: `Sched.retraceMsg` (0x20) is `prenmiMsg` (the pre-NMI message goes to the clients), the clients
+  get `&retraceMsg` (0x0); Rage Wars' `music`/`time` are the task's `output_buff` and
+  `*output_buff_size` (`osDpSetNextBuffer`); `osSpTaskYield` takes no argument (the `$a0` the m2c
+  draft passed is only left over). `osScGetCmdQ`, `Sched_GetInterruptQ` and `Sched_SubmitTask` take an
+  `OSSched *` and return or use its queues by member.
+- *`GameObject`: `protos/game_object.h`* holds the module's functions and the calls it makes
+  (CGameRegion, PlatformCollide, GameObjectMove, SweepShapes, the CMtxF vector helpers and the gu
+  math), one prototype each. Eleven files had an N64 view and a port view (`#ifdef TARGET_PORT`) of the
+  same function; each is now one function on `CGameObjectInstance`/`CIntelligence`/`CAI`:
+  `func_00268210`, `GameObject_GetCollisionYOffset`, `GetDeadCollisionHeight`, `GetFrameDelta` and
+  `GetFrameTurn` (the whole `CAIFrameMotion` on the stack, as the port had it), `IsNearFloor`,
+  `IsOnGround`, `GetFloorHeightAt`, `GetFloorKind`, `GetRegionFloorHeight`, `GetAimRotation`.
+  The five `Model`/`ModelBlend`/`Object` getters (`func_00267D2C`.. `GameObject_IsLeashed`) read the
+  definition's `m_dwTypeFlags` (their FAKEMATCH shapes kept). `GameObject_GetFloorPointAt` traces a
+  `CVector3` (Rage Wars' `TripleRecAt8` had an `s32` y): the port's `GameObject_TraceMove_fif` wrapper
+  (`port/game/t2abi.c`) has no caller left. Kept as the ROM has them: `GameObject_GetTypeId` calls
+  `CScene__GetObjectTypeID` through an `s32` type on the N64 (the ROM does not mask the `u16`; the
+  host keeps `protos/scene.h`'s `u16`), `GameObject_IsOnGround` passes `GameObject_GetGroundHeight` a
+  second argument 0 (cast at the call), `CGameRegion__GetNormal` is declared `void` (its definition
+  returns the vector; with that type `GameObject_GetFloorTilt` keeps `$s1` for the result).
+
+**Header work without the merge: `code/AI`** (40 files; 30 of them on the new headers).
+`protos/cai.h` (new) declares the AI functions on their real types; `protos/ai.h` and
+`protos/enemy.h` keep the untyped views the enemy modules call (`CAI__SetMode`, `CAI__CallHurt`,
+`AI_TurnClamped`, `AI_ComputeFrameMotion`...), so an AI file may not include them. Done:
+`AI_InitHealth`, `AI_RideMovingPlatform`, `CAI__UpdateModeAnim` and `CAI__SetMode` on `CAI` /
+`CAIModeInfo` / `CGameObjectInstance` (their `Dest`/`Source110`/`StateEntry` N64 views and the
+port's host-offset views joined; `m_TranqHealth` is written through an `s8` conversion, as the ROM
+converts it), `AI_FindBestTarget` on `CGameObjectInstance` (the nearest player read as a `CPlayer`).
+**Left (7 files)**, with what stops them: `func_00245C5C.c` and `func_0024699C.c` call
+`AI_FindClearHeading`/`GameObject_TraceMove` with three `f32` for the position (the port's `_fif`
+wrappers); `func_0024646C.c` and `func_00246B24.c` call `GameObject_DropPickupAt` the same way and
+redefine the basic types; `func_00246310.c` (`AI_AngleToPoint`), `func_00246690.c`
+(`Actor_SpawnParticle`), `func_00246860.c` (`AI_StartSound`) and `func_00246918.c` (`AI_StopSound`)
+define their function twice (N64 view / port view) on `SpawnObj`/`SndSrc`/`Dest`;
+`func_002449E0.c` defines `AI_GetSightTargetInfo` with an `sptr` third argument and
+`func_002465F0.c` `AI_DistSqToPointAtHeight` on a `B04Obj` view. Each needs the treatment the
+eleven GameObject files got (one function on the engine types, `CVector3` by value).
+
+**Not started: `code/EnemyAI`** (119 files): out of time after AI. Its first conflicts are the same
+untyped `protos/enemy.h` views and the `EnemyAI_GetBehaviorIndex`/`GetCurrentBehavior` `s8`-vs-word
+returns (already written as `#ifdef TARGET_PORT` pairs).
+
+## Round 28, part q2: CCache, CGameRegion, CAudioWorld (and what SndVoice and VM still need)
+
+**Merged (3 directories, 154 files):** `code/CCache` (56), `code/CGameRegion` (53), `code/CAudioWorld`
+(45). `merge_check.py` OK without `--rodata-free` for all three; `make verify` (clean) after each batch,
+`asm_diff --base b9bb8125` 0 over the tree, the port builds from a fresh gendata. How the declarations
+were made one:
+
+- *New headers, the definitions' own signatures:* `protos/heap.h` (`CHeap__Alloc`/`CHeap__Free`,
+  `CDecompressor__DecompressAsync`), `protos/hash.h` (`CHashTable__*`), `protos/osint.h`
+  (`__osDisableInt`/`__osRestoreInt` with the SDK's `u32` mask), `protos/region.h` (the CGameRegion calls
+  the module makes to itself), `protos/audio_world.h` (what CAudioWorld calls in the sound player, the
+  speech player and the camera pool, plus `VM_Alloc`), `protos/sndp.h` (libaudio's `alSndp*` with the
+  SDK's types, for SndVoice); `CVector3__Normalize(CVector3 *)` added to `protos/mtxf.h`. The files' own
+  one-line declarations dropped with `tools/unify_decls.py` (the commands are in the commits).
+- *Trap:* `__osDisableInt` first went into `protos/ultra.h`; the port then failed to compile
+  `code/CISet/CISet.c` (it includes `protos/ultra.h` and declares an `s32` mask). A shared header that
+  many modules include only takes a name no includer declares otherwise; hence `protos/osint.h`.
+- *Rage Wars views rewritten over the engine types:* CCache's `DeallocateInternal` (a `CAI` view of a
+  `CMemEntry`: now one form for both builds), `DetachCacheEntry` (M2C_FIELD), `TakeFreeCacheEntry`,
+  `FreeCacheEntry`, `ReleaseAndReplaceData`; CCache's `DrawDebug` (FAKEMATCH) reads `globals/cache.h`'s
+  `gCache_*` instead of its own array views. CGameRegion's `Node75` (= `CGameRegion`: `prev/cur/next` are
+  `m_pVertices[0..2]`), the `Entry`/`Handle` views (`CGameRegion`, `CRegionInfo`), `Triangle0026CB2C`;
+  `func_0026CB2C.c` no longer includes `rw/abu_protos.h` (the only includer in these directories).
+  CAudioWorld's `Update` (the whole-file Rage Wars type dump: `ContextRecAt2BC0`, `MenuRules`,
+  `MenuMatchGlobals`, `Shared_Quad`, ...), `UpdateAmbientTrack`, `PlaySpeech`, `StopSpeech`,
+  `PickVariant`, `IsSoundBusy` (the 0xCC-byte "slots" are `pool.voices[i].soundId`), the accessors
+  (`BigState2BB0`, `EntryOwner`, ...) all on `structs/sound.h` `CAudioWorld`; the envelope getters return
+  `SndEnv *`. Register allocation decided two forms: a reused local in `DetachCacheEntry` and a typed
+  local for the `void *` parameter of `ReleaseAndReplaceData` each moved a register; two locals and a
+  cast at each use keep the code.
+- *Calls the ROM makes with more arguments, or reading a void result:* cast at the call
+  (`CCache__AllocateInternal` 4 args, `CCache__WaitForDisplayLists(0)`,
+  `CCache__FreeOldestMemEntryWithFlags` read as `s32`, `CGameRegion__FloodSetHeight` read as `f32`,
+  `CAudioWorld__StartVoice` 4 args, `SpeechPlayer_Play` 4 args, `alSndpAllocate` 3 args).
+  `CGameRegion__GetCeilingNormal` is now called with the region on both builds: the ROM leaves `$a1` as
+  the caller got it, which is the code passing it gives (the N64 build had a one-argument prototype).
+  `BinaryRange`'s key is `u32`; the CAudioWorld callers cast to `s16` at the call (the sign extension the
+  ROM does).
+- *A merged module the port replaces:* 27 CAudioWorld functions are `T2_LINK_REPLACED`
+  (`port/audio/t2audio_world.c`); after the merge `tools/portwrap.py` put them under
+  `#ifndef TARGET_PORT` and turned their `link.cmake` lines into comments (without it the port's link
+  fails with duplicate definitions). SndVoice (26 files) and VM (4) need the same after their merge.
+
+**Left of the five (2):**
+
+- `code/SndVoice` (41 files): `alSndp*` done (`protos/sndp.h`). Left: `func_00273EC0.c` carries a whole
+  Rage Wars type dump (about 100 types: `Triple`, `Shared_Quad`, `Voice`, `ContextRecAt2BC0`,
+  `GameplayCamera`, ...) for `SndVoice_Setup`; the port's typed copy in `port/audio/t2audio_world.c`
+  gives the field map (`View_func_8025AE1C_de`: priority 0x28 = `vp.pan`, envelope 0x8C = `env3`,
+  sweeping 0x88 = `hasEnv`, trackId 0xA8 = `soundId`, fixed 0xC0 = `reset`). Then `SndVoice_InitPitch`
+  (`ViewRecAtB0`/`ControllerCode802591C0`), `SndVoice_InitVolume` (called with 3 arguments, defined with
+  2), `Sound_CalcPan(sptr, u8 *)`, `HalfToFloat` (`s32` in `code/HalfToFloat`, `u16` in three callers)
+  and `FloatToHalf` (`u16` vs `s16`), the `CAudioWorld__Get*Envelope`/`GetStereo` callers against the
+  merged CAudioWorld's `SndEnv *` definitions. All 26 port-replaced files are under `portwrap.py` after
+  the merge, so the rewrites do not touch the port's behaviour.
+- `code/VM` (20 files): not reached this round; as round 27 lists (the `gPager_*` views against
+  `globals/pager.h`, `func_0028EE40` in three forms, `--inline` from `func_0028E068` on).
+
+## Round 28, part q4: data in place, `code/CEngineApp`, the CScene question
+
+**Merged: `code/Anim` (49 files -> `Anim.c`), `vm1/MpMenu` (72 -> `MpMenu.c`), `code/CEngineApp` (90 ->
+`CEngineApp_engine.c`, `--name`: `vm1/CEngineApp/CEngineApp.c` keeps its name).** Each:
+`merge_check.py --rodata-free` OK on the one-function files first (every step `asm_diff --base b9bb8125`
+0), then `merge_module.py --rodata-free`, a clean `make setup` + build + `make verify` byte-exact, the
+merged file through clang `-Wimplicit-function-declaration` (no implicit declaration), port md5s.
+
+Header work (one declaration per name):
+
+- **Struct-by-value callees through their words.** The port's `#define X X_i` lines at file scope would
+  rename the definition too once the module is one file (`Bits_ReadFloat` is defined in `Anim`). The
+  callers that pass a struct (or an `f32`) as the words it travels in call an asm-label name instead:
+  `Bits_ReadFloat_3` (`__asm__("Bits_ReadFloat")` on the N64, the real `port/game/t2abi.c` shim on the
+  port), `CQuaternion__Slerp_i`, `CVector3__Lerp_i`. Same code.
+- `Anim`: two files that redeclared Rage Wars basic types and `Func802608ECResult` include
+  `rw/abu_types.h`; `func_00216A9C`'s `Pack` is `AnimPack` (the header's `Pack` has the same layout,
+  but the file does not include it), `func_0021836C`'s `S` is `IdVec`.
+- `MpMenu`: `Controller_ConfirmPressed(ControllerProfile *)`, `Controller_WatchPak(s32)`,
+  `sprintf(char *, const char *, ...)` one prototype each; the blue team score read as a scalar
+  (`globals/game.h` has the array) is `gMatchBlueTeamScore __asm__("gEngineApp_m_Settings_match_teamScore")`.
+- `CEngineApp`: callee prototypes from their definitions (`CPlayerPool__NewGame`, `CCameraPool__NewGame`,
+  `Render_SetRenderMode(u32)`, `Music_SetTrack`, `Controller_SetRumbleOptionAll`, `memset`, `protos/scene.h`'s
+  `CScene__*`). Where a definition takes fewer arguments than a caller passes (`CEngineApp__Boot`,
+  `CEngineApp__BeginDisplayList`, `CEngineApp__UpdateControllers`, `Credits_Draw`, `func_00289108`,
+  `CScene__InitPersistentData`, the N64 one-argument `CCameraPool__NewGame` call), the definition keeps its
+  prototype and the call casts the function (`((void (*)(T)) f)(x)`: the same `jal`, the same argument
+  registers). The array views of scalars (`gCreditsDone`, `gCreditsTimeLeft`,
+  `gMergedController_buttonsSingle`, the `MenuPool` as bytes) are asm-label names.
+  `CEngineApp__SubmitGfxTask`'s N64 body takes the port body's `struct CEngineApp *`/`struct CFrameData *`
+  and reads them through macro views (`#define gfx ((GfxState *) app)`): a local copy moved a register.
+
+**Data defined by the merged file.**
+
+- `Anim`: `D_800A58F4` (0x38000100) is `CAnimationState__GetBoneRotation`'s own literal, 1/32767
+  (`3.051851e-5f`, the value `Anim_GetBoneRotation` already wrote): it was the unnamed piece between two
+  slices. `D_800ACB50` (90.0f) stays an extern: it is in the engine pool (`ABCA8.rodata.s`).
+- `MpMenu`: the ROM's `.rodata` for the object starts with five strings, `"%04d"`, `" "`, `"%02d"`,
+  `"  %02d"`, `"none"`, before `MpMenu_StartFragTag`'s literals, and `"%3d"` sits between
+  `MpMenu_StartFragTag`'s and `MpMenu_StartBloodLust`'s. The functions using them come later in `.text`,
+  and other functions read them by name, so in the original an earlier definition emitted them (an inline
+  label helper or the menu tables: the vm1 `.data` items point at `" "`; cc1 writes a string where it is
+  first expanded and pools later uses). The merged file defines them in place as data under their
+  symbol names, N64 only (the port keeps the generated copies):
+  `const char sFinalScoreMenuFmt_04d_def[] __asm__("sFinalScoreMenuFmt_04d") = "%04d";` and so on
+  (`D_800C0E78` `" "`, `D_800C0E7C` `"%02d"`, `sLimitLabelFmt_02d`, `sLimitLabelText_None`,
+  `sMpMenuFmt_3d`); the label functions read them by name (`MPMENU_FMT_02D` for the one without a
+  header name). `sMpMenuFmt_3d` is also read by `vm2/MpMenu/MpMenu_2.c`: before the merge only the
+  `C1A9C` piece defined it, so it must be defined by the merged file.
+- `CEngineApp`: `mainproc`'s build stamp (`"%s %s"`, `"Nov 10 1998"`, `"13:17:04"`) is in the ROM before
+  `CEngineApp__Main`'s literals although `mainproc` comes later in `.text` (the MpMenu pattern): N64-only
+  `const char sEngineStamp{Fmt,Date,Time}[]` before `CEngineApp__Main`, read by `mainproc` (the port
+  keeps the literals). The unnamed 60.0f at 0xAA9FC is `EngineMode01_Legal_Retrace`'s first literal (the C read
+  it as `D_800A9DFC`); the asm `func_002C232C` reads it too, so `D_800A9DFC` is now an absolute symbol in
+  `versions/symbols_manual.us.txt`.
+
+**`code/CScene` + `vm1/SceneLoad`: not one clean split at 0x224ED0.** Round 27 asked whether the engine
+part is two objects (0x220260..0x224ED0 and on), with `CScene__LoadBinaryBlock` (`func_00224D54`) and
+`CScene__LoadGraphicSet` (`func_00224DF4`) `DEFERRED` at the end of the first. For it: 0x224ED0 starts on
+16; the two functions are the last before it; their strings (`"binary block"`, `"graphicset"`, 0xA6B38)
+come before `func_00220D00`'s 0.5f; and cc1 only puts a function's strings before its code in two ways
+(checked with the game's cc1): the function is `inline` (code at the end of the object, also when an
+`extern inline` body is redefined later in the file: the real definition is still output last), or an
+earlier function expanded the same string. No other function reads 0xA6B38/0xA6B48 (no inlined copy
+elsewhere), so it is the first.
+Against a split there: the `.rodata` of the first object would end at 0xA6BF0 (also on 16, between
+`func_00223A94`'s and `func_00225354`'s slices), yet three strings in it are pooled with functions after
+0x224ED0: `"level index"` (0xA6AC0, `CScene__LoadLevel`'s; read by `CScene__GetLevelName`,
+`func_0022629C`), `"warp dests"` (0xA6BC4, `CScene__FindWarpDests`'; read by `func_0042C560`, whose
+own `.rodata` is at 0xA6C0C, after `func_00226024`'s) and `"level name"` (0xA6BD0: no slice at all; only
+`CScene__GetLevelName` reads it, and it lies before `func_00223A94`'s slice). A literal is pooled only
+inside one compilation unit, so either those three were named global strings in the original (a
+`.rodata` array another object reads by name), or the module is one object and the strings come from
+earlier inline expansions. `CScene__GetLevelName` shows the same pattern as the two loaders (its string
+far before its code; 0x226390, after it, also starts on 16). Next step: try the one-object form first
+(the two loaders and `CScene__GetLevelName` as `static __inline__` helpers defined where their strings
+are, each with a non-inline wrapper where its code is, `merge_check --margs "--vm src/us/vm1/SceneLoad"`
+decides), then the split; the ~140 header conflicts of round 27 come either way.
+
+**State of the part's directories.** Merged: `code/{Anim, CEngineApp}`, `vm1/MpMenu` (211 files -> 3).
+Left:
+
+| Directory | What is left |
+|---|---|
+| `code/Trail` (45) | `rw/abu_types.h`'s `struct Morph` (`blends`/`first`/`second`...) against `structs/morph.h`'s (`items`/`pointsA`/`pointsB`..., same layout): a merged file includes both; the five `rw/abu_types.h` files need rewriting over the real types (the q2 kind of work), then about 15 callee prototypes (`CMtxF__*`, `CVector3__*`, `DList_*`, `NodePool_Alloc`) |
+| `code/CParticle` (62) | about 30 names, the `CParticleSystem__Spawn` family; then the float table as C data |
+| `code/CGameObjectInstance` (64) | about 48 names (`CAnimationState__Reset`, `CGameObjectInstance__PickRandomAnim`...); `sCGameObjectInstanceCacheDesc_AnimObjectInfo` read by 7 files |
+| `code/CMtxF` (124) | about 25 names in the first pass (`Actors_GetLightVolumeFalloff`, `ModelVertex`/`VertexGroup`/`PlacedProp` per-file types, `CISet__GetBlock`, `CStaticObject__*`), more behind them |
+| `code/CScene`, `vm1/SceneLoad`, `vm2/SceneLoad` | the object question above, then the round-27 conflicts |
+
+## Round 28, part q3: the VM bosses (`vm1/{TotemDefense, MantidQueen, Primagen}`, `vm2/Primagen`)
+
+**Merged (4 directories, 179 files -> 4):** `vm1/TotemDefense`, `vm1/MantidQueen`, `vm1/Primagen`, `vm2/Primagen`.
+`make verify` byte-exact and `tools/asm_diff.py --base b9bb8125` 0 over the tree; the port builds from a fresh
+gendata (aligncheck 0 sites, `port_layout` regenerated), the merged files have no implicit declaration under clang
+`-Wimplicit-function-declaration` (N64 and `TARGET_PORT`). Port md5s unchanged: boot + 3 demos 6ab97584, default whole game af8bd840.
+
+*The `.rodata` order: a deferred tail written early.* In all three vm1 objects one function late in `.text`
+emits its literals before an earlier function's (TotemDefense: `TotemDefense_Init`'s `"Enemies"`/`"Time"` and
+`TotemDefense_DrawTotem`'s `"lit vertices"` before `TotemDefense_Complete`'s floats; MantidQueen: the `"Queen"` of
+0x402BB0 before `MantidQueen_ChooseAttack`'s floats; Primagen: the `"Primagen"` of 0x407C20 before 0x405AC8's).
+The source order that gives it: every function from the late one to the end of the object is `DEFERRED`
+(`inline`: output after the others, in the order of their first declaration, literals at the definition) and
+defined before the function whose `.rodata` follows. `--inline all` is wrong here: GCC then inlines a deferred
+function into a later caller (`TotemDefense_UpdateFight` grew by `TotemDefense_Complete`/`_Fail`, +0xC14). So
+the tail must not be called (only have its address taken) by the functions compiled after it; checked for the
+three. `tools/merge_module.py` learned:
+
+- `--before A,B..:C`: files A,B.. (their `.text` order kept) go right before file C in the source order;
+- `--inline` also writes `DEFERRED` on the definitions inside a conditional block (`#ifdef TARGET_PORT ..
+  #else .. #endif`: `TotemDefense_Init`, `MantidQueen_UpdateMode6`, `MantidQueen_NextStep`), which take their place
+  in the output order (their early prototype is the block's first definition's signature, so both bodies take
+  the same parameter types: `MantidQueen_NextStep(void *)`);
+- an early prototype of a deferred function takes the type declarations it needs with it (`move_types`,
+  recursive), and a conditional block's struct typedefs count as its types.
+
+Header work (each step `asm_diff` 0):
+
+- *`AI_TurnClamped`* (vm1/MantidQueen): the definition takes `f32, f32` (`protos/ai.h`, the asm passes the
+  angle in a3 either way); the two callers that passed `*(s32 *)&angle` now pass `CAITargets.m_Path.m_Angle`, with
+  `CAITargets`/`CAI` instead of the per-file views `Info00403144`/`Item00403144` (the port's `AI_TurnClamped_i`
+  shim no longer needed there). The Rage Wars type dump of `MantidQueen_EnterDeath`'s file is gone.
+- *One-element and byte views of a global*: `tools/view_label.py FILE NAME..` (new) turns a file's own
+  `extern T NAME[..];` into an asm-label alias `NAME_v<stem>` and its uses (the CPlayer precedent):
+  `gTotemDefense*` (TotemDefense_Init), `gTotemDefense_kills`, the player-list head, `gMantidQueen` as bytes
+  (`#ifndef TARGET_PORT`), and in vm1/Primagen `gLevelScript` (3 files), `gLevelScript_spawnsLeft`,
+  `_script_current`, `_timer`, `_values`, `_unk3CA`, `_armed`. No symbol or gendata change was needed.
+- *Calls that pass more than the definition takes* go through a cast of their own: `COnScreen__SetBoss` with the
+  CAI in a3 (`COnScreen__SetBoss_4`), `Primagen_RunSpawnStep`/`_RunSoundStep` with three arguments;
+  `Sound__Play` with its CVector3 as three words is `Sound__Play_Words` (asm label).
+- `LevelScriptF950` once, in `structs/twin_primagen.h`; the two `State` views renamed by file; `CInstancePool__Spawn`
+  as `protos/game.h` declares it; `WeightedTable_PickStatic(void *)`, `ScriptAnimator_SetScript(void *, void *)`,
+  `CGameObjectInstance__PickRandomAnim(void *, sptr, sptr)` one form each.
+- *vm2/Primagen follows vm1*: `tools/twin_text.py --base b9bb8125 vm1/Primagen vm2/Primagen 8f57b138` (57 of 58
+  files; `--base` is new).
+
+**A trap: vm2 text is not a port-safe source for vm1.** `tools/twin_text.py --to-vm1` (new: each vm1 file as its
+vm2 twin's text) gave vm1/Pak and 13 TotemDefense files merge-ready text at `asm_diff` 0, and the merged ROM
+verified, but the port crashed at boot: vm2's `Pak_AllocDirectory` reads the cache handle's data pointer as an
+`s32` (the vm2 copy never runs on the port, so its host bugs were never found). Both directories went back to
+their own text; `--to-vm1` stays for a check of the N64 side only.
+
+**Left of the part (3):** `vm1/Pak` (its own text has the CCache family in three forms: `protos/cache.h` in 6 files,
+`void **CCache__Allocate(s32, s32, s32, char *)` in 3; `Pak_Mount`, `Controller_Lock` `s32`/`void`, `osMotorInit`,
+`gPakFileSystems`, `Pak_DecodeText`, `Str_Compare` with two forms; its `.rodata` needs the tail from
+`Pak_AllocDirectory` (0x4263DC) defined before `Pak_SaveNoteVerified` (0x426164): `--inline T --before
+T:func_00426164`, verified byte-exact with the vm2-text files), `vm1/PakMenu` and `vm2/PakMenu` (128 files each,
+not started: no time left).
+
+## Round 28 merge: the state after parts q1-q4
+
+Merged in the order q1, q2, q4, q3 (`--no-ff`). The only textual conflicts were this file (each part's
+section kept) and `versions/port_layout.us.json` (regenerated with `mklayout.py` after each merge); the new
+`protos/` headers (q1 `sched.h`, `game_object.h`, `cai.h`; q2 `heap.h`, `hash.h`, `osint.h`, `region.h`,
+`audio_world.h`, `sndp.h`), `protos/mtxf.h`, `versions/symbols_manual.us.txt`, `shared_rodata.us.txt`,
+the yaml and q3's `tools/merge_module.py` (`--before`, `--inline` inside conditional blocks) merged on
+their own, with no function declared two ways. After each merge: `asm_diff --base b9bb8125` 0 over the
+tree, a clean `make setup` + build + `make verify` OK, the port compiles from a fresh gendata, the merged
+files have no implicit declaration under clang `-Wimplicit-function-declaration`, and the nested
+`TARGET_PORT` scan is the same 2 known sites (`CPlayer.c`, `SndQueue.c`).
+
+**One port fix at the merge.** q1 merged `code/__scHandleRSP`, whose 17 functions the port replaces
+with `port/game/t2sched.c`, but `port/cmake/link.cmake` still listed the 17 old `func_*.c` names, so the
+merged `__scHandleRSP.c` was linked as well. On q1 alone the archive happened not to pull it; after q4
+the host link failed with 17 multiple definitions. `T2_LINK_REPLACED` now names `__scHandleRSP.c` (the
+whole file is the scheduler; it still compiles, in `turok2_game_unlinked`).
+
+**`merge_check.py --rodata-free` over the 14 directories left** (and `vm2/Pak`, one file, nothing to
+merge): none passes as it stands. 12 stop at the compiler, first conflict and number of errors:
+`code/CMtxF` 12 (`Actors_GetLightVolumeFalloff`, the `ModelVertex`/`PlacedProp`/`VertexGroup` views by
+file, `CStaticObject__LoadGeometry`), `code/AI` 17 (`GameObject_GetRegionFloorHeight`: the 7 files
+part q1 lists), `vm1/Pak` 19 (`CCache__Allocate`: the three CCache forms, then `Pak_Mount`,
+`Controller_Lock`, `osMotorInit`, `gPakFileSystems`, `Pak_DecodeText`, `Str_Compare`), `code/SndVoice`
+23 (`HalfToFloat`), `code/VM` 42 (`gPager_entries`), `code/Trail` 52 (`Morph` defined twice),
+`code/CParticle` 54 (`CQuaternion__FromDirection`), `vm2/SceneLoad` 67 (`CList__AddHead`),
+`code/EnemyAI` 68 (`CGameObjectInstance__PickRandomAnim`), `vm1/PakMenu` 72 (`Str_Compare`),
+`code/CGameObjectInstance` 76 (`CAnimationState__Reset`), `vm2/PakMenu` 87 (`CCache__Deallocate`);
+2 are refused, `code/CScene` and `vm1/SceneLoad`, whose `.rodata` interleave (part q4: one object with
+`static __inline__` loaders is the next try).
+
+**State: 136 modules are one C file; 14 directories hold one function per file.**
+
+| Reason | Directories |
+|---|---|
+| header work only (first conflicts above) | `code/{AI, EnemyAI, SndVoice}`, `vm2/PakMenu` (4) |
+| data the C reads as externs, or `.data` tables in asm (`tools/ld_fill.py`, Crash and part q4's data in place show the way) | `code/{CGameObjectInstance, CMtxF, CParticle, Trail}`, `vm1/PakMenu` (5) |
+| one object over the engine and the VM (`.text_vm`; the `.rodata` of `CScene` and `vm1/SceneLoad` interleave) | `code/CScene`, `vm1/SceneLoad`, `vm2/SceneLoad` (3) |
+| deferred functions plus header work | `code/VM`, `vm1/Pak` (`--inline T --before T:func_00426164`, part q3) (2) |
+
+None needs a ROM change.
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte

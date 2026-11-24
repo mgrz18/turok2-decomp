@@ -1,17 +1,12 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00215B90.c, func_00215B90, with Turok 2's layouts. */
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
 
 
 s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);   /* ammo for a weapon */
-f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);                     /* height */
-f32 Math_AcosLookup(f32 x);                        /* acos */
-f32 func_002982F0(f32 x);                        /* sin */
-f32 func_002974C0(f32 x);                        /* cos */
-f32 func_00298470(f32 x);                        /* sqrt */
-void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
-void CVector3__Normalize(CVector3 *v);                          /* normalise */
 void CGameObjectInstance__LocalToWorld(CVector3 *out, CGameObjectInstance *a, CVector3 v);    /* v in a's frame */
 
 /* AI_AngleToPoint: the signed angle from the actor's heading to a point. */

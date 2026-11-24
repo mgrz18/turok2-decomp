@@ -1,10 +1,11 @@
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 
-s32 GameObject_GetTypeId(u8 *obj); /* the object's type id */
 
 /* Maps an object's type id to a class 0-9 (3 by default). */
 s32 Actor_GetTypeClass(u8 *obj) {
-    switch (GameObject_GetTypeId(obj)) {
+    switch (GameObject_GetTypeId((CGameObjectInstance *) obj)) {
     case 1: case 2:
         return 0;
     case 3: case 4:

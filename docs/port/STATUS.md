@@ -6,6 +6,38 @@ new game to the good ending with no invincibility and no life lost, on the N64's
 stream. The Mac app is packaged and ready for its first session in a real window
 ([FIRSTRUN.md](FIRSTRUN.md)); that session has not happened yet.
 
+## Round 28 merge (Phase 5): q1, q2, q4, q3; 136 modules in one C file
+
+Merged into `feat/46-hand-matching` in the order q1 (`__scHandleRSP`, `GameObject`; `AI` header work), q2
+(`CCache`, `CGameRegion`, `CAudioWorld`), q4 (`Anim`, `vm1/MpMenu`, `CEngineApp`; data defined in place),
+q3 (the VM bosses `vm1/{TotemDefense, MantidQueen, Primagen}`, `vm2/Primagen`), `--no-ff`: 136 modules
+are one C file, 14 directories left ([MODULES.md](../MODULES.md#round-28-merge-the-state-after-parts-q1-q4)).
+The port side: the merged `__scHandleRSP.c` is now link-replaced as one file in `port/cmake/link.cmake`
+(`port/game/t2sched.c` is the host scheduler); `link.cmake` still named the 17 old `func_*.c` files, and
+after q4 the link pulled both copies (17 multiple definitions). Every file merged this round compiles with
+no implicit declaration under clang `-Wimplicit-function-declaration`.
+
+**The references, re-run on the merged tree** (Linux Release, fresh gendata), all unchanged:
+boot + 3 demos `6ab97584…`; default (`--all --talismans 2 --cheats-off 1,2,3,4,5,6`) END 2 (252,468),
+5 totems, 0 lives, **`af8bd840…`**; stick combination END 2 (263,622), 0 lives, **`ad941823…`**;
+`--legacy` (290,000) END 2 (252,194), 2 lives, `ac08c89b…`. The swoosh self-test OK.
+
+Checks: `asm_diff --base b9bb8125` 0 differ over the tree after each merge; clean `make setup` + build +
+`make verify` OK; a fresh `git clone --recursive` builds and verifies (ultralib `e24c836`);
+`mklayout.py --check` up to date (regenerated after each merge); `aligncheck` 0 sites; nested
+`TARGET_PORT` scan at the 2 known sites; `make -C port test`, `gbi_test` 0 mismatches, t2os x3,
+`t2audio_test --direct 0/40` max difference 0, `--adec` OK; abicheck 0 harmful, ptrargs 1/0.
+`n64viewcheck.py` and `f2ucheck.py` skipped the build's `hostified/` copies (a file with asm labels or
+register pins, which most merged files now are: `Anim.c`, `CEngineApp_engine.c`, `Primagen.c`,
+`CPlayer.c`...); both now read them. With them, n64viewcheck linked is as round 27 (`gptr/BAD` 3,
+`raw/BAD` 10, `stride/BAD` 3, no `cast/BAD`); unlinked `gptr/BAD` 19 -> 5 (vm2/Primagen's
+`gLevelScript` views gone), `raw/BAD` 11 -> 12 and one more `gptr/BAD` only because two hostified vm2
+files are now read (`Menu_Construct_2`, `FinalScoreMenu_Poll_2`, both there before). f2ucheck: the same
+92 sites in the plain files, plus 42 it now sees in the hostified ones (`CCamera.c` 17, the two
+`MenuItem` copies 9 each, `CParticle/func_0022D2FC.c` 5, `CPlayer.c` 2), none new. outptr: 12 sites
+(16), one `BAD` that is the checker's file-wide look-up: `MantidQueen_SpawnMinion`'s `region` is an
+`sptr`, the `s32 region` it finds is a struct member elsewhere in the merged `MantidQueen.c`.
+
 ## Round 27 merge (Phase 5): p3, p4, p1, p2; 124 modules in one C file
 
 Merged into `feat/46-hand-matching` in the order p3 (`CInstancePool` as three objects, 339 -> 341

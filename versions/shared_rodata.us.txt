@@ -51,9 +51,9 @@ func_00466040 0x800A60B8  # copy of func_0042D120: its literal, in the engine .r
 CheatMenu_2:CheatMenu_GetWarpLevel_2 0x800C12E0  # jtbl of func_0041B148
 func_0045CC58 0x800C16E8  # jtbl
 func_00448240 0x800C0950  # copy of the cinema file (func_0040F240 to func_004131B0)
-func_0043CCF8 0x800C038C  # W batch
-func_0043DC44 0x800C03E8  # W batch, jtbl
-func_0043FAA8 0x800C04E8  # W batch
+Primagen_2:Primagen_InitAI_2 0x800C038C  # W batch
+Primagen_2:Primagen_RunAttackStep_2 0x800C03E8  # W batch, jtbl
+Primagen_2:Primagen_UpdateMode24_2 0x800C04E8  # W batch
 MotherBoss_2:MotherBoss_RandomSpawnPoint_2 0x800C08A8  # W batch
 MotherBoss_2:MotherBoss_OnPhase1CinemaDone_2 0x800C08C4  # W batch
 BlindOne_2:BlindOne_Setup_2 0x800C08D4  # W batch: copy of func_0040CCC0, "Blind"
@@ -82,10 +82,10 @@ MpMenu_2:WeaponsMenu_Toggle_2 0x800C1008  # X batch: jtbl of func_004193B4
 CheatMenu_2:Cheat_FindWarpLevel_2 0x800C1280  # X batch: jtbl of func_0041AEF0
 Pak_2:Pak_Mount_2 0x800C1870  # X batch: jtbl of func_004258E8
 Demo_2:CCameraPool__NewGame_2 0x800A9A00  # copy of func_0042FBA4: its strings and 1.0f, in the engine .rodata
-func_0043F000 0x800C04A4  # twin of func_00406000 (X), which now owns the pool
+Primagen_2:Primagen_UpdateMode19_2 0x800C04A4  # twin of func_00406000 (X), which now owns the pool
 MpMenu_2:MpMenu_StartBloodLust_2 0x800C0EA0  # copy of func_0041760C (X), which now owns the pool
 Video_2 0x800C1720  # copy of func_00424780 (X), which now owns the pool
-func_0043CF3C 0x800C0398  # X batch
+Primagen_2:Primagen_Step_2 0x800C0398  # X batch
 MotherBoss_2:MotherBoss_Hurt_2 0x800C05C0  # X batch
 MotherBoss_2:MotherBoss_StartPhase2Cinema_2 0x800C0878  # X batch, twin of func_0040ABB4
 CheatMenu_2:CheatsMenu_WarpSelect_2 0x800C11E0  # X batch: the warp menu of func_0041A5DC
@@ -95,24 +95,24 @@ MotherBoss_2:MotherBoss_DropPickupsAtSpawnPoints_2 0x800C05D4  # copy of func_00
 MotherBoss_2:MotherBoss_UpdateSpotsAndPickups_2 0x800C05EC  # copy of func_00409784 (X), which now owns the pool
 MotherBoss_2:MotherBoss_TeleportTarget_2 0x800C05F8  # twin of func_00409A64 (X), which now owns the pool
 BlindOne_2:BlindOne_BossInit_2 0x800C08F4  # copy of func_0040D5C4 (X), which now owns the pool
-func_0043EAC8 0x800C0478  # twin of func_00405AC8 (X), which now owns the pool
-func_0043D57C 0x800C03B8  # twin of func_0040457C (FAKEMATCH, as there)
-func_0043CC14 0x800C0388  # twin of func_00403C14
+Primagen_2:Primagen_UpdateMode27_2 0x800C0478  # twin of func_00405AC8 (X), which now owns the pool
+Primagen_2:Primagen_UpdateSpawner_2 0x800C03B8  # twin of func_0040457C (FAKEMATCH, as there)
+Primagen_2:Primagen_SetStage_2 0x800C0388  # twin of func_00403C14
 MotherBoss_2:MotherBoss_Phase1ChooseAttack_2 0x800C0850  # twin of func_0040A6F0 (N)
 func_00464960 0x800A5F54  # twin of func_0042BA40 (B)
 func_00465B04 0x800A6010  # -1.0f of func_002261A8, then 1.0f and jtbl of func_0042CBE4 (one source file)
-func_004407AC 0x800C0540  # copy of func_004077AC, which now owns the pool
-func_00440800 0x800C0544  # copy of func_00407800, which now owns the pool
-func_00440858 0x800C0548  # copy of func_00407858, which now owns the pool
-func_00440894 0x800C054C  # copy of func_00407894, which now owns the pool
-func_0043EC68 0x800C0488  # copy of func_00405C68, which now owns the pool
-func_004402C8 0x800C0508  # copy of func_004072C8, which now owns the pool
-func_004405F8 0x800C051C  # copy of func_004075F8, which now owns the pool
+Primagen_2:Primagen_EnterMode24_2 0x800C0540  # copy of func_004077AC, which now owns the pool
+Primagen_2:Primagen_UpdateMode21_2 0x800C0544  # copy of func_00407800, which now owns the pool
+Primagen_2:Primagen_UpdateMode22_2 0x800C0548  # copy of func_00407858, which now owns the pool
+Primagen_2:Primagen_EnterMode27_2 0x800C054C  # copy of func_00407894, which now owns the pool
+Primagen_2:Primagen_EnterMode7_2 0x800C0488  # copy of func_00405C68, which now owns the pool
+Primagen_2:Primagen_EnterMode2_2 0x800C0508  # copy of func_004072C8, which now owns the pool
+Primagen_2:Primagen_EnterMode18_2 0x800C051C  # copy of func_004075F8, which now owns the pool
 BlindOne_2:BlindOne_BossMode3Enter_2 0x800C0900  # copy of func_0040DC00, which now owns the pool
 BlindOne_2:BlindOne_PhaseVictoryUpdate_2 0x800C093C  # copy of func_0040EB68, which now owns the pool
-func_00440C20 0x800C046C  # copy of func_00407C20, which now owns the pool
-func_0044068C 0x800C0534  # copy of func_0040768C, which now owns the pool
-func_0044065C 0x800C052C  # copy of func_0040765C
+Primagen_2:Primagen_UpdateMode28_2 0x800C046C  # copy of func_00407C20, which now owns the pool
+Primagen_2:Primagen_EnterMode23_2 0x800C0534  # copy of func_0040768C, which now owns the pool
+Primagen_2:Primagen_EnterMode20_2 0x800C052C  # copy of func_0040765C
 CheatMenu_2:EnterCheatMenu_UpdateTextField_2 0x800C1278  # copy of func_0041AAA0 (menu block), which now owns the pool
 NameEntryMenu_2:NameEntryMenu_Init_2 0x800C1340  # copy of func_0041D050 (menu block), which now owns the pool
 MissionMenu_2:GfxPool_Alloc_2 0x800C1810  # copy of func_00425220, which now owns the pool
@@ -145,23 +145,23 @@ MotherBoss_2:MotherBoss_SpawnRandomPickup_2 0x800C08B8  # copy of func_0040C394 
 MpMenu_2:WeaponsMenu_ToggleLabel_2 0x800C0EB0  # copy of func_00417910 (round 25: was asm), which owns the pool
 MpMenu_2:Mp_SetupMatchRules_2 0x800C0EE0  # copy of func_00417BB0 (round 25: was asm), which owns the pool
 MpMenu_2:FinalScoreMenu_BlueScoreLabel_2 0x800C0E70  # copy of func_00417DD4 (round 25: was asm), which owns the pool
-func_0043DFE0 0x800C041C  # copy of func_00404FE0 (round 25: was asm), which owns the pool
-func_0043E0E0 0x800C0420  # copy of func_004050E0 (round 25: was asm), which owns the pool
-func_0043E288 0x800C043C  # copy of func_00405288 (round 25: was asm), which owns the pool
-func_0043E3C4 0x800C0448  # copy of func_004053C4 (round 25: was asm), which owns the pool
-func_0043E6DC 0x800C0464  # copy of func_004056DC (round 25: was asm), which owns the pool
-func_0043EE04 0x800C0494  # copy of func_00405E04 (round 25: was asm), which owns the pool
-func_0043F598 0x800C04C0  # copy of func_00406598 (round 25: was asm), which owns the pool
-func_0043F88C 0x800C04DC  # copy of func_0040688C (round 25: was asm), which owns the pool
-func_0043FC4C 0x800C04F0  # copy of func_00406C4C (round 25: was asm), which owns the pool
-func_0043FE0C 0x800C0500  # copy of func_00406E0C (round 25: was asm), which owns the pool
-func_0043FFE4 0x800C0504  # copy of func_00406FE4 (round 25: was asm), which owns the pool
-func_00440374 0x800C050C  # copy of func_00407374 (round 25: was asm), which owns the pool
-func_004404D0 0x800C0518  # copy of func_004074D0 (round 25: was asm), which owns the pool
-func_004406B0 0x800C0538  # copy of func_004076B0 (round 25: was asm), which owns the pool
-func_004408B8 0x800C0550  # copy of func_004078B8 (round 25: was asm), which owns the pool
-func_004409C4 0x800C0558  # copy of func_004079C4 (round 25: was asm), which owns the pool
-func_00440AC8 0x800C055C  # copy of func_00407AC8 (round 25: was asm), which owns the pool
+Primagen_2:Primagen_NextSpawnStep_2 0x800C041C  # copy of func_00404FE0 (round 25: was asm), which owns the pool
+Primagen_2:Primagen_RunSpawnStep_2 0x800C0420  # copy of func_004050E0 (round 25: was asm), which owns the pool
+Primagen_2:Primagen_NextSoundStep_2 0x800C043C  # copy of func_00405288 (round 25: was asm), which owns the pool
+Primagen_2:Primagen_RunSoundStep_2 0x800C0448  # copy of func_004053C4 (round 25: was asm), which owns the pool
+Primagen_2:Primagen_UpdateMode1_2 0x800C0464  # copy of func_004056DC (round 25: was asm), which owns the pool
+Primagen_2:Primagen_UpdateMode7_2 0x800C0494  # copy of func_00405E04 (round 25: was asm), which owns the pool
+Primagen_2:Primagen_UpdateMode18_2 0x800C04C0  # copy of func_00406598 (round 25: was asm), which owns the pool
+Primagen_2:Primagen_UpdateMode20_2 0x800C04DC  # copy of func_0040688C (round 25: was asm), which owns the pool
+Primagen_2:Primagen_HandleAnimEvent_2 0x800C04F0  # copy of func_00406C4C (round 25: was asm), which owns the pool
+Primagen_2:Primagen_NextAttackStep_2 0x800C0500  # copy of func_00406E0C (round 25: was asm), which owns the pool
+Primagen_2:Primagen_SpawnTossedObject_2 0x800C0504  # copy of func_00406FE4 (round 25: was asm), which owns the pool
+Primagen_2:Primagen_UpdateMode5_2 0x800C050C  # copy of func_00407374 (round 25: was asm), which owns the pool
+Primagen_2:Primagen_EnterMode19_2 0x800C0518  # copy of func_004074D0 (round 25: was asm), which owns the pool
+Primagen_2:Primagen_UpdateMode23_2 0x800C0538  # copy of func_004076B0 (round 25: was asm), which owns the pool
+Primagen_2:Primagen_UpdateMode9_2 0x800C0550  # copy of func_004078B8 (round 25: was asm), which owns the pool
+Primagen_2:Primagen_UpdateMode10_2 0x800C0558  # copy of func_004079C4 (round 25: was asm), which owns the pool
+Primagen_2:Primagen_UpdateMode11_2 0x800C055C  # copy of func_00407AC8 (round 25: was asm), which owns the pool
 func_00464E68 0x800A5F6C  # copy of func_0042BF48 (round 25: was asm), which owns the pool
 func_004650B4 0x800A5FC4  # copy of func_0042C194 (round 25: was asm), which owns the pool
 func_00465480 0x800A600C  # copy of func_0042C560 (round 25: was asm), which owns the pool

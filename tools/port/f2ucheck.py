@@ -82,7 +82,7 @@ def main():
     cc = json.load(open(os.path.join(a.build, 'compile_commands.json')))
     want = {os.path.abspath(f) for f in a.files}
     todo = [e for e in cc if e['file'].endswith('.c') and (not want or os.path.abspath(e['file']) in want)
-            and ('/src/' in e['file'] or '/port/game/' in e['file'])]
+            and ('/src/' in e['file'] or '/hostified/' in e['file'] or '/port/game/' in e['file'])]
     seen = set()
     n = 0
     with ThreadPoolExecutor(a.j) as ex:

@@ -1,10 +1,10 @@
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
 #include "globals/collision.h"
 
-f32 GameObject_GetCollisionHeight(CGameObjectInstance *obj); /* the object's height */
-s32 Collision_MoveInstance(void *obj, CVector3 to, CCollisionInfo *info);
 
 /* Whether the line between the two objects' eyes (0.8 of their height up)
  * hits a wall or floor region flagged 2. */

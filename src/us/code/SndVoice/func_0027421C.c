@@ -1,11 +1,9 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AUDIO/8025A3EC_4.CPP, func_8025BF08_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/sound.h"
+#include "protos/sndp.h"
 
  
-void alSndpSetSound(void *sound, s16 sample);
-s32 alSndpGetState(void *sound);
-void alSndpStop(void *sound);
 
 /* Stop every voice whose second key matches. */
 void SndVoicePool_StopByOwner(SndVoicePool *set, s32 key) {

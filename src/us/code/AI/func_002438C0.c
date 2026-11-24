@@ -1,5 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80213ED4_2.CPP, func_80214624_de, with Turok 2's layouts. */
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "globals/scene.h"
@@ -17,21 +19,13 @@ typedef struct {
 
 
 Location *CPathTrack__GetCurrentPoint(s8 *location);
-void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
-void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a + b */
-void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
-void CVector3__Normalize(CVector3 *v);                          /* normalise */
-f32 CVector3__GetYaw(CVector3 *v);                           /* heading */
-f32 GameObject_GetCollisionRadius(CGameObjectInstance *a);                           /* radius */
-void GameObject_TraceMove(CGameObjectInstance *a, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
 sptr Path_FindFleeRegion(CGameObjectInstance *a, sptr b, CVector3 pos, sptr region, sptr d, CVector3 *out);
 s32 Path_FindRegionPath(CGameObjectInstance *a, CVector3 pos, sptr region, sptr d, CVector3 *hit);
 s32 CGameRegion__ContainsXZ(sptr region, f32 x, f32 z);
-f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);
 
 /* The point beside `target`, on the side away from `from`, where `self`
  * stands touching it. */
-static __inline__ void Approach(CGameObjectInstance *self, CGameObjectInstance *target, CGameObjectInstance *from, CVector3 *outPos, s32 *outRegion) {
+static __inline__ void Approach(CGameObjectInstance *self, CGameObjectInstance *target, CGameObjectInstance *from, CVector3 *outPos, sptr *outRegion) {
     CVector3 dir;
     CVector3 to;
     f32 dist;
@@ -48,7 +42,7 @@ static __inline__ void Approach(CGameObjectInstance *self, CGameObjectInstance *
     dist = GameObject_GetCollisionRadius(target) + GameObject_GetCollisionRadius(self) + 51.199997f;
     CVector3__Scale(&dir, &dir, dist);
     CVector3__Add(&to, &target->header.m_vPos, &dir);
-    GameObject_TraceMove(target, to, outPos, outRegion, 0, 0);
+    GameObject_TraceMove(&target->header, to, outPos, (CGameRegion **) outRegion, 0, 0);
 }
 
 s32 AI_UpdatePathHeading(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *target) {
@@ -103,13 +97,13 @@ s32 AI_UpdatePathHeading(CGameObjectInstance *self, CAI *plan, CGameObjectInstan
         break;
     case 3:
         pos = plan->m_vLeashPos;
-        region = plan->m_pLeashRegion;
+        region = (sptr) plan->m_pLeashRegion;
         break;
     case 7:
         Approach(self, target, plan->m_pSightTarget, &pos, &region);
         break;
     case 1:
-        region = Path_FindFleeRegion(self, plan->m_pPathAvoidRegion, target->header.m_vPos, ((sptr)target->header.m_pCurrentRegion), plan->m_pModeCurrent->m_pData, &pos);
+        region = Path_FindFleeRegion(self, (sptr) plan->m_pPathAvoidRegion, target->header.m_vPos, ((sptr)target->header.m_pCurrentRegion), (sptr) plan->m_pModeCurrent->m_pData, &pos);
         if (region == 0) {
             do {
     default:
@@ -119,7 +113,7 @@ s32 AI_UpdatePathHeading(CGameObjectInstance *self, CAI *plan, CGameObjectInstan
         }
         break;
     }
-    if (Path_FindRegionPath(self, pos, region, plan->m_pModeCurrent->m_pData, &hit) != 0) {
+    if (Path_FindRegionPath(self, pos, region, (sptr) plan->m_pModeCurrent->m_pData, &hit) != 0) {
         if (CGameRegion__ContainsXZ(((sptr)self->header.m_pCurrentRegion), hit.x, hit.z) != 0) {
             plan->m_PathHeight = hit.y;
         } else {

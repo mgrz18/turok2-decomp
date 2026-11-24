@@ -2,10 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "structs/sound.h"
+#include "protos/sndp.h"
 
-void alSndpSetSound(void *p, s32 id);
-s32 alSndpGetState(void *p);
-void alSndpStop(void *p);
 s32 SndVoicePool_StopGroupVoice(SndVoicePool *p, s16 tag, s16 key) {
     s32 i;
     s32 j;

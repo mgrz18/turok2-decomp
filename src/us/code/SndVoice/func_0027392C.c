@@ -5,16 +5,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/sndp.h"
 
-extern void alSndpSetSound(void *sound, s16 sample);
-extern s32 alSndpGetState(void *sound);
-extern void alSndpStop(void *sound);
-extern void alSndpSetSound(void *sound, s16 sample);
-extern s32 alSndpGetState(void *sound);
-extern void alSndpStop(void *sound);
-extern void alSndpSetSound(void *arg0, s16 arg1);
-extern s32 alSndpGetState(void *arg0);
-extern void alSndpStop(void *arg0);
 #ifndef TARGET_PORT
 void SndVoicePool_StopAllExcept(RecordRecAt4V6 *record, s32 value)
 {

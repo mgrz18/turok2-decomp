@@ -1,4 +1,6 @@
 #include "structs/game_object.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80213ED4_22.CPP, func_80217290_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
