@@ -1,71 +1,31 @@
-#ifdef TARGET_PORT
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/game_object.h"
+#include "structs/level_actor.h"
 #include "structs/sound.h"
-#include "protos/game.h"
 
-extern void Sound__StopOwner(void *);
-extern s32 LoopSounds_Stop(struct LoopSounds *, SndSource *);
-
-/* host body (round 8 w2): the AI's looping sound by member (the N64 text below reads and clears
- * the N64 CAI 0xEC: on the host that wrote 0 into the CAI at every enemy death). */
-void AI_StopSound(CInstanceHeader *arg0, CAI *arg1) {
-    void *owner = NULL;
-
-    switch (arg0->m_Type) {
-    case 1:
-    case 2:
-        owner = arg0;
-        break;
-    }
-    if (arg1->m_pAttachedLoopingSound != NULL) {
-        Sound__StopOwner(owner);
-        if (arg1->m_pAttachedLoopingSound != NULL) {
-            LoopSounds_Stop(LoopSounds_Get(), (SndSource *) arg1->m_pAttachedLoopingSound);
-            arg1->m_pAttachedLoopingSound = NULL;
-        }
-    }
-}
-#else
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/TEAM/80217388.CPP, func_80217388_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+ * The same code in Turok 2, on Turok 2's types (one body for the N64 and the port since round 29):
+ * stops the AI's looping sound and every sound the object owns (a static object, type 0, owns its
+ * sounds through its word at 0x80, see AI_StartSound). */
+void AI_StopSound(CGameObjectInstance *obj, CAI *ai) {
+    sptr owner = 0;
 
-
-#include "protos/game.h"
-typedef struct SoundSourceNode SoundSourceNode;
-
-/* Turok 2 layouts (Rage Wars offsets in comments). */
-typedef struct LevelActor {
-    u8 type;                 /* 0x00: 0 = actor, 1/2 = owner itself */
-    u8 pad1[0x80 - 1];
-    s32 resourceFlags;       /* 0x80 (0xD0) */
-} LevelActor;
-
-typedef struct Dest {
-    u8 pad0[0xEC];
-    SoundSourceNode *sound;  /* 0xEC (0xFC) */
-} Dest;
-
-extern void Sound__StopOwner(void *);
-extern s32 LoopSounds_Stop(void *, void *);
-
-void AI_StopSound(void *arg0, Dest *arg1) {
-    void *owner = 0;
-    switch (((LevelActor *)arg0)->type) {
+    switch (obj->header.m_Type) {
     case 1:
     case 2:
-        owner = arg0;
+        owner = (sptr) obj;
         break;
     case 0:
-        owner = (void *)((LevelActor *)arg0)->resourceFlags;
+        owner = ((CStaticObject *) obj)->m_LitKey;
         break;
     }
-    if (arg1->sound != 0) {
+    if (ai->m_pAttachedLoopingSound != NULL) {
         Sound__StopOwner(owner);
-        if (arg1->sound != 0) {
-            LoopSounds_Stop(LoopSounds_Get(), arg1->sound);
-            arg1->sound = 0;
+        if (ai->m_pAttachedLoopingSound != NULL) {
+            LoopSounds_Stop(LoopSounds_Get(), ai->m_pAttachedLoopingSound);
+            ai->m_pAttachedLoopingSound = NULL;
         }
     }
 }
-#endif

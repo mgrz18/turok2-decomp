@@ -9,10 +9,6 @@
 sptr CScene__GetPathRegion(s32 ref);
 #endif
 
-typedef struct {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ s32 region;
-} Location;
 
 
 #ifdef TARGET_PORT
@@ -20,7 +16,6 @@ s8 EnemyAI_GetBehaviorIndex(CGameObjectInstance *self, CAI *plan); /* ABI: retur
 #else
 s32 EnemyAI_GetBehaviorIndex(CGameObjectInstance *self, CAI *plan);
 #endif
-Location *CPathTrack__GetCurrentPoint(s8 *location);
 
 /* The point beside `target`, on the side away from `from`, where `self`
  * stands touching it. */
@@ -65,7 +60,7 @@ void AI_GetPathTargetInfo(CGameObjectInstance *self, CAI *plan, CGameObjectInsta
     f32 angle;
     f32 reach;
     CPlayer *player;
-    Location *loc;
+    CPathPoint *loc;
 
     boost = 0;
     if (self->header.m_pIntelligence->m_Type == 1) {
@@ -141,13 +136,13 @@ void AI_GetPathTargetInfo(CGameObjectInstance *self, CAI *plan, CGameObjectInsta
         gap = GameObject_GetCollisionRadius(self);
         switch (kind) {
         case 4:
-            loc = CPathTrack__GetCurrentPoint(&plan->m_PathTrack.m_Mode);
-            pos = loc->pos;
+            loc = CPathTrack__GetCurrentPoint(&plan->m_PathTrack);
+            pos = loc->m_vPos;
             gap = 0.0f;
 #ifdef TARGET_PORT
-            region = CScene__GetPathRegion(loc->region); /* the region index (func_0042CD04.c) */
+            region = CScene__GetPathRegion(loc->m_Region); /* the region index (func_0042CD04.c) */
 #else
-            region = loc->region;
+            region = loc->m_Region;
 #endif
             if (plan->m_PathTrack.m_Mode == 2 || plan->m_PathTrack.m_Mode == kind) {
                 boost = 1;

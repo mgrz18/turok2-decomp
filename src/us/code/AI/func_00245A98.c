@@ -8,8 +8,7 @@
 extern void WeightedTable_Clear(WeightedTable *);
 extern void WeightedTable_Add(WeightedTable *, s32, s32);
 extern s16 WeightedTable_Pick(WeightedTable *);
-extern sptr CGameObjectInstance__PickRandomAnim(sptr, sptr, sptr);
-s32 AI_PickAnimFromTable(sptr owner, sptr unused, struct IntPair *table, s32 flags) {
+s32 AI_PickAnimFromTable(CGameObjectInstance *owner, sptr unused, struct IntPair *table, s32 flags) {
     WeightedTable picker;
     s32 first;
     s16 pick;

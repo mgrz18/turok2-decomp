@@ -10,15 +10,10 @@ sptr CScene__GetPathRegion(s32 ref);
 #endif
 
 
-typedef struct {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ s32 region;
-} Location;
 
 
 
 
-Location *CPathTrack__GetCurrentPoint(s8 *location);
 sptr Path_FindFleeRegion(CGameObjectInstance *a, sptr b, CVector3 pos, sptr region, sptr d, CVector3 *out);
 s32 Path_FindRegionPath(CGameObjectInstance *a, CVector3 pos, sptr region, sptr d, CVector3 *hit);
 s32 CGameRegion__ContainsXZ(sptr region, f32 x, f32 z);
@@ -51,7 +46,7 @@ s32 AI_UpdatePathHeading(CGameObjectInstance *self, CAI *plan, CGameObjectInstan
     sptr region;
     s32 mode;
     CPlayer *player;
-    Location *loc;
+    CPathPoint *loc;
 
     if (plan->m_Health == 0) {
         mode = 6;
@@ -87,12 +82,12 @@ s32 AI_UpdatePathHeading(CGameObjectInstance *self, CAI *plan, CGameObjectInstan
         region = ((sptr)self->header.m_pCurrentRegion);
         break;
     case 4:
-        loc = CPathTrack__GetCurrentPoint(&plan->m_PathTrack.m_Mode);
-        pos = loc->pos;
+        loc = CPathTrack__GetCurrentPoint(&plan->m_PathTrack);
+        pos = loc->m_vPos;
 #ifdef TARGET_PORT
-        region = CScene__GetPathRegion(loc->region); /* the region index (func_0042CD04.c) */
+        region = CScene__GetPathRegion(loc->m_Region); /* the region index (func_0042CD04.c) */
 #else
-        region = loc->region;
+        region = loc->m_Region;
 #endif
         break;
     case 3:

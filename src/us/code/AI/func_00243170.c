@@ -15,7 +15,6 @@ s32 CGameObjectInstance__SetAnim(CGameObjectInstance *obj, sptr anim, s32 arg2);
 s32 IsCodePointer(StateCallback);
 s32 IsDataPointer(uptr);
 void *CGameObjectInstance__PickAvailableAction(CGameObjectInstance *obj, void *table, s32 arg2);
-sptr CGameObjectInstance__PickRandomAnim(CGameObjectInstance *obj, sptr anim, sptr arg2);
 
 /* Runs the current mode's animation: on a mode change picks the mode's animation (through its
  * picker or its action table) and its speed; counts the cycles the animation completes. Round 28:

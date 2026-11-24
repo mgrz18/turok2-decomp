@@ -4,16 +4,7 @@
 #include "protos/game_object.h"
 #include "protos/cai.h"
 #include "structs/game_object.h"
-
-typedef f32 Mtx4[4][4];
-
-
-#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
-#define CGameObjectInstance__GetRotation CGameObjectInstance__GetRotation_sret
-#endif
-void CGameObjectInstance__GetRotation(CQuaternion *q, CGameObjectInstance *actor);
-void CQuaternion__ToMatrix(CQuaternion *q, Mtx4 *mtx);
-void CMtxF__TransformPoint(Mtx4 *mtx, CVector3 *in, CVector3 *out);
+#include "protos/mtxf.h"
 
 /* Whether target is within range of viewer and inside its horizontal (across) and vertical (up) view angles. */
 s32 AI_IsInViewCone(CGameObjectInstance *viewer, CGameObjectInstance *target, f32 range, f32 across, f32 up) {
@@ -27,7 +18,7 @@ s32 AI_IsInViewCone(CGameObjectInstance *viewer, CGameObjectInstance *target, f3
     CVector3 pitchDir;
     CVector3 pitchForward;
     CQuaternion rotation;
-    Mtx4 matrix;
+    CMtxF matrix;
     f32 distance;
     f32 dirLength;
     f32 forwardLength;
@@ -45,12 +36,12 @@ s32 AI_IsInViewCone(CGameObjectInstance *viewer, CGameObjectInstance *target, f3
     if (range < distance) {
         return 0;
     }
-    CGameObjectInstance__GetRotation(&rotation, viewer);
-    CQuaternion__ToMatrix(&rotation, &matrix);
+    rotation = CGameObjectInstance__GetRotation(viewer);
+    CQuaternion__ToMatrix(&rotation, matrix);
     ahead.x = 0.0f;
     ahead.y = 0.0f;
     ahead.z = distance;
-    CMtxF__TransformPoint(&matrix, &ahead, &forward);
+    CMtxF__TransformPoint(matrix, &ahead, &forward);
     across *= 0.5f;
     up *= 0.5f;
     flatDir.x = dir.x;

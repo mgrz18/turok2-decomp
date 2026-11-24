@@ -1,23 +1,10 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00215410.c, func_80215410_de, with Turok 2's layouts. */
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "globals/scene.h"
-
-typedef struct {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ s32 region;
-    /* 0x10 */ f32 rotY;
-    /* 0x14 */ u16 flags;
-} Location;
-
-
-CGameObjectInstance *AI_FindBestTarget(CGameObjectInstance *self, CAI *plan, s32 arg2, s32 arg3);
-Location *CPathTrack__GetCurrentPoint(s8 *location);
-f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);              /* angle to a point */
-void Angle_Wrap(f32 *angle);                        /* wrap an angle */
-void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
-f32 func_00298470(f32 x);                              /* sqrt */
 
 /* What the plan aims at (the same classes as AI_UpdatePathHeading). */
 static __inline__ s32 Kind(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *target) {
@@ -60,13 +47,13 @@ static __inline__ s32 Kind(CGameObjectInstance *self, CAI *plan, CGameObjectInst
 
 /* Picks the plan's target and fills `out` with its kind, the turn to face
  * it, its position, offset and distance, in 3D and flattened. */
-void AI_GetSightTargetInfo(CGameObjectInstance *self, CAI *plan, sptr unused, CAITarget *out) {
+void AI_GetSightTargetInfo(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *unused, CAITarget *out) {
     CVector3 pos;
     CVector3 delta;
     f32 angle;
     s32 kind;
     CGameObjectInstance *target;
-    Location *loc;
+    CPathPoint *loc;
 
     if (plan->m_PathFindCount == gScene.m_Kind1Cursor && (!(plan->m_dwFlags & 0x40000000) || plan->m_pTargetOverride != NULL)) {
         plan->m_pSightTarget = AI_FindBestTarget(self, plan, 1, 0);
@@ -84,10 +71,10 @@ void AI_GetSightTargetInfo(CGameObjectInstance *self, CAI *plan, sptr unused, CA
     } else {
         switch (kind) {
         case 4:
-            loc = CPathTrack__GetCurrentPoint(&plan->m_PathTrack.m_Mode);
-            pos = loc->pos;
-            if (loc->flags & 1) {
-                angle = loc->rotY - self->m_RotY;
+            loc = CPathTrack__GetCurrentPoint(&plan->m_PathTrack);
+            pos = loc->m_vPos;
+            if (loc->m_Flags & 1) {
+                angle = loc->m_RotY - self->m_RotY;
             } else {
                 angle = AI_AngleToPoint(self, pos);
             }
