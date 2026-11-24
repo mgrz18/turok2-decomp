@@ -7,6 +7,7 @@
 #include "common.h"
 #include "structs/region.h"
 #include "globals/region.h"
+#include "protos/mtxf.h"
 extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
@@ -19,7 +20,6 @@ struct CQuatern_t {
     float z;
     float w;
 };
-extern void CVector3__Normalize(f32 *arg0);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);

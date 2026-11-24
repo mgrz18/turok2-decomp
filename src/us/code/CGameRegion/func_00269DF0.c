@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/region.h"
 #include "globals/region.h"
+#include "protos/mtxf.h"
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);    /* a - b */
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);    /* cross product */
-void CVector3__Normalize(CVector3 *v);                        /* normalize */
 
 /* tri's face normal, cached for the last triangle asked about. */
 static __inline__ CVector3 triNormal(CGameRegion *tri) {

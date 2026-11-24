@@ -2,11 +2,11 @@
 #include "globals/scene.h"
 #include "structs/region.h"
 #include "protos/scene.h"
+#include "protos/region.h"
 
 /* Resource entry: a key, its flags and three child entries. */
 
 
-s32 CGameRegion__FloodSetWaterSame(sptr, s32);                    /* extern */
 
 void CGameRegion__FloodSetWater(CGameRegion *arg0) {
     sptr temp_a0;
@@ -23,15 +23,15 @@ void CGameRegion__FloodSetWater(CGameRegion *arg0) {
             temp_s0 = arg0->m_nInfo;
             arg0->m_wFlags = (u16) (temp_v1 | 1);
             if (temp_a0 != 0) {
-                CGameRegion__FloodSetWaterSame(temp_a0, temp_s0);
+                CGameRegion__FloodSetWaterSame((CGameRegion *)temp_a0, temp_s0);
             }
             temp_a0_2 = (sptr) arg0->m_pNeighbours[1];
             if (temp_a0_2 != 0) {
-                CGameRegion__FloodSetWaterSame(temp_a0_2, temp_s0);
+                CGameRegion__FloodSetWaterSame((CGameRegion *)temp_a0_2, temp_s0);
             }
             temp_a0_3 = (sptr) arg0->m_pNeighbours[2];
             if (temp_a0_3 != 0) {
-                CGameRegion__FloodSetWaterSame(temp_a0_3, temp_s0);
+                CGameRegion__FloodSetWaterSame((CGameRegion *)temp_a0_3, temp_s0);
             }
         }
         temp_v0 = CScene__GetRegionInfo(&gScene, arg0);

@@ -1,31 +1,25 @@
 #include "common.h"
-#include "rw/abu_protos.h"
+#include "structs/vector.h"
+#include "structs/region.h"
 
 void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 
-
-typedef struct {
-    /* 0x0 */ u8 pad0[4];
-    /* 0x4 */ CVector3 *a;
-    /* 0x8 */ CVector3 *b;
-    /* 0xC */ CVector3 *c;
-} Triangle0026CB2C;
-
-void CGameRegion__GetCentroid(Triangle0026CB2C *arg0, CVector3 *arg1) {
+/* The centroid of the region's triangle, as the mean of its three edge midpoints. */
+void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *out) {
     CVector3 sp10;
     CVector3 sp20;
     CVector3 sp30;
-    f32 temp_f20;
+    f32 half;
 
-    CVector3__Add(&sp10, arg0->a, arg0->b);
-    temp_f20 = 0.5f;
-    CVector3__Scale(&sp10, &sp10, temp_f20);
-    CVector3__Add(&sp20, arg0->b, arg0->c);
-    CVector3__Scale(&sp20, &sp20, temp_f20);
-    CVector3__Add(&sp30, arg0->c, arg0->a);
-    CVector3__Scale(&sp30, &sp30, temp_f20);
-    CVector3__Add(arg1, &sp10, &sp20);
-    CVector3__Add(arg1, arg1, &sp30);
-    CVector3__Scale(arg1, arg1, 0.33333334f);
+    CVector3__Add(&sp10, region->m_pVertices[0], region->m_pVertices[1]);
+    half = 0.5f;
+    CVector3__Scale(&sp10, &sp10, half);
+    CVector3__Add(&sp20, region->m_pVertices[1], region->m_pVertices[2]);
+    CVector3__Scale(&sp20, &sp20, half);
+    CVector3__Add(&sp30, region->m_pVertices[2], region->m_pVertices[0]);
+    CVector3__Scale(&sp30, &sp30, half);
+    CVector3__Add(out, &sp10, &sp20);
+    CVector3__Add(out, out, &sp30);
+    CVector3__Scale(out, out, 0.33333334f);
 }

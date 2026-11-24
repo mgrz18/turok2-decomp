@@ -1,14 +1,10 @@
 #include "common.h"
+#include "structs/region.h"
+#include "protos/region.h"
 
-typedef struct {
-    /* 0x0 */ u16 id;
-    /* 0x2 */ u16 flags;
-} Entry;
 
-extern s32 CGameRegion__FloodSetFlag4Same(void *, u16);
-
-void CGameRegion__FloodSetFlag4(Entry *arg0) {
-    if ((arg0 != NULL) && (arg0->flags & 2)) {
-        CGameRegion__FloodSetFlag4Same(arg0, arg0->id);
+void CGameRegion__FloodSetFlag4(CGameRegion *arg0) {
+    if ((arg0 != NULL) && (arg0->m_wFlags & 2)) {
+        CGameRegion__FloodSetFlag4Same(arg0, arg0->m_nInfo);
     }
 }

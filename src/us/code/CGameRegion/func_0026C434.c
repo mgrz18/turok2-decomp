@@ -2,8 +2,8 @@
 #include "common.h"
 #include "structs/region.h"
 #include "globals/region.h"
+#include "protos/region.h"
 
-extern s32 CGameRegion__IsSteep(CGameRegion *tri);                      /* is the triangle a slope? */
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 extern f32 func_00298470(f32);                                /* sqrtf */

@@ -6,8 +6,8 @@
 #include "common.h"
 #include "structs/region.h"
 #include "globals/region.h"
+#include "protos/mtxf.h"
 
-extern void CVector3__Normalize(f32 *arg0);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 static __inline__ void edge(CVector3 *out, CVector3 *a, CVector3 *b) {

@@ -1,18 +1,15 @@
 #include "common.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
+#include "structs/region.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x44];
-    /* 0x44 */ s32 flags;
-} Entry;
 
 
 void CGameRegion__SetFlag40000(s32 arg0) {
-    Entry *temp_v0;
+    CRegionInfo *temp_v0;
 
     temp_v0 = CScene__GetRegionInfo(&gScene, arg0);
     if (temp_v0 != NULL) {
-        temp_v0->flags = (s32) (temp_v0->flags | 0x40000);
+        temp_v0->m_dwFlags |= 0x40000;
     }
 }

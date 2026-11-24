@@ -2,10 +2,10 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/region.h"
+#include "protos/mtxf.h"
 
 extern f32 func_00298470(f32);                                  /* sqrtf */
 extern f32 Math_AcosLookup(f32);                                  /* acosf */
-extern void CMtxF__SetRotateY(f32 mtx[4][4], f32 angle);            /* rotation about Y */
 extern void CMtxF__TransformPoint(f32 mtx[4][4], CVector3 *in, CVector3 *out); /* out = mtx * in */
 
 /* Yaw of a triangle edge (CGameRegion__GetEdgeYaw). */

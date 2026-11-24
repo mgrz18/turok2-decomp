@@ -2,8 +2,8 @@
 #include "structs/region.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
+#include "protos/region.h"
 
-void CGameRegion__FloodClearWaterAll(CGameRegion *);                  /* extern */
 
 void CGameRegion__FloodClearWater(CGameRegion *arg0) {
     CGameRegion *temp_a0;

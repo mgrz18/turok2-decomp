@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 #include "globals/math.h"
+#include "protos/region.h"
 
 extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
@@ -10,16 +11,11 @@ extern float func_002982F0(float x);
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern f32 func_00298470(f32);
-#ifdef TARGET_PORT
-extern void CGameRegion__GetCeilingNormal(CVector3 *, void *);
-#else
-extern void CGameRegion__GetCeilingNormal(CVector3 *);
-#endif
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 extern void CVector3__Scale(CVector3 *, CVector3 *, float);
-/* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CGameRegion__GetCeilingNormal gets the
- * region in $a1 untouched from this function's own second argument (its only caller,
- * CParticle__GetParentTransform, passes the region); the host takes and passes it. */
+/* CGameRegion__GetCeilingNormal gets the region this function was given (its only caller,
+ * CParticle__GetParentTransform, passes it): the ROM leaves $a1 as it came, which is the same code
+ * as passing it (until round 28 the N64 build called it with one argument, docs/port/ABI.md). */
 Vector4f *CGameRegion__GetCeilingTiltRotation(Vector4f *out, void *region) {
     CVector3 a;
     CVector3 up;
@@ -29,11 +25,7 @@ Vector4f *CGameRegion__GetCeilingTiltRotation(Vector4f *out, void *region) {
     float angle;
     float scale;
     float one;
-#ifdef TARGET_PORT
     CGameRegion__GetCeilingNormal(&a, region);
-#else
-    CGameRegion__GetCeilingNormal(&a);
-#endif
     one = 1.0f;
     up.x = 0;
     up.y = one;
