@@ -53,5 +53,20 @@ typedef struct {
     /* 0xC8 */ u8 script2On;      /* 0x8012FA18 */
 } LevelScriptF950;
 #endif
+typedef struct {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+} ModePair;
+typedef struct {
+    /* 0x0 */ s8 unk0;
+    /* 0x1 */ s8 unk1;
+} BossFlags;
+typedef struct {
+    f32 unk_0;                  /* 0x00 */
+    char pad4[0x50 - 0x4];
+    f32 unk_50;                 /* 0x50 */
+    char pad54[0x5C - 0x54];
+    f32 unk_5C;                 /* 0x5C */
+} State_004077AC;
 
 #endif

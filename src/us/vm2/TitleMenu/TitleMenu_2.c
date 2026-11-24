@@ -24,6 +24,7 @@ void SingleMenu_InitAfterPak_2(Menu *arg0) {
 #include "globals/menu.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
+#include "structs/twin_titlemenu.h"
 /* the module-2 copies of protos/menu.h's functions */
 sptr MenuPool_OpenChildMenu_2(struct MenuPool *, struct Menu *, struct MenuDesc *);
 sptr MenuPool_OpenMenu_2(struct MenuPool *, struct MenuDesc *, sptr, sptr, sptr);
@@ -36,11 +37,6 @@ s32 SingleMenu_NewGame_2(s32 arg0, Menu *arg1) {
 }
 
 s32 Pak_ClearDamagedContinued_2();                            /* extern */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ s32 unk1C;
-    /* 0x20 */ s32 unk20;
-} Unk00419618;
 
 s32 SingleMenu_Load_2(s32 arg0, Menu *arg1) {
     Pak_ClearDamagedContinued_2();
@@ -482,17 +478,6 @@ s32 PauseMenu_ToggleResolution_2(void) {
 
 #include "globals/rumble.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x80];
-    /* 0x80 */ u32 flags80;
-    /* 0x84 */ u8 pad84[0x24];
-    /* 0xA8 */ u32 flagsA8;
-} A254Screen;
-typedef struct {
-    /* 0x00 */ s16 state;
-    /* 0x02 */ u8 pad2[0xA];
-    /* 0x0C */ A254Screen *screen;
-} A254Menu;
 void Controller_ResetAllRumble(void);
 extern void RumblePool_FreeAll(RumblePool *pool);
 extern void LoopSounds_Pause(sptr);

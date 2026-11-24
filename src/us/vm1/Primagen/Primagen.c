@@ -1706,10 +1706,6 @@ void Primagen_SetSpawnScript(s32 arg0) {
 
 /* Two words at gLevelScript_script3_cursor; the pointer just before them (gLevelScript_script3_steps) picks
  * the data for the given mode. */
-typedef struct {
-    /* 0x0 */ s32 unk0;
-    /* 0x4 */ s32 unk4;
-} ModePair;
 
 void Primagen_SetSoundScript(s32 arg0) {
     gLevelScript.script3.cursor = -1;
@@ -1804,10 +1800,6 @@ void Primagen_EnterMode2(void *arg0, sptr arg1) {
 }
 
 /* Two flags at gLevelScript_armed; the word 8 bytes before it is gLevelScript_bossState. */
-typedef struct {
-    /* 0x0 */ s8 unk0;
-    /* 0x1 */ s8 unk1;
-} BossFlags;
 extern BossFlags gLevelScript_armed_v0040734C __asm__("gLevelScript_armed"); /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void Primagen_EnterMode5(CGameObjectInstance *arg0) {
@@ -1940,13 +1932,6 @@ void Primagen_UpdateMode23(CGameObjectInstance *obj, CAI *ai) {
 }
 
 /* Fields addressed relative to gLevelScript_timer; the mode word sits 0xC before it. */
-typedef struct {
-    f32 unk_0;                  /* 0x00 */
-    char pad4[0x50 - 0x4];
-    f32 unk_50;                 /* 0x50 */
-    char pad54[0x5C - 0x54];
-    f32 unk_5C;                 /* 0x5C */
-} State_004077AC;
 
 /* The port (round 12 a2): State_004077AC views LevelScriptState from its timer with N64 deltas (0x50 dest.y,
  * 0x5C home.y, -0xC bossState); the host's script blocks hold pointers, so dest and home sit later

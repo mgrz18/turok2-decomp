@@ -39,5 +39,13 @@ typedef struct {
     /* 0x04 */ ViCommonRegs comRegs;
     /* 0x28 */ ViFieldRegs fldRegs[2];
 } ViMode; /* OSViMode, 0x50 */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x4];
+    /* 0x04 */ s8 id;
+} ItemData;
+typedef struct {
+    /* 0x00 */ u8 pad0[0x10];
+    /* 0x10 */ u32 unk10;
+} CallbackArg;
 
 #endif

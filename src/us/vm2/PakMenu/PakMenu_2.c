@@ -1939,10 +1939,6 @@ s32 PakConfirmMenu_SelectYes_2(s32 a, Menu *own, s32 c) {
  * and 2) resets the menu flags and opens the item's menu on its owner's camera. */
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ s8 id;
-} ItemData;
-typedef struct {
     /* the host Menu's leading fields (structs/menu.h: cursor .. param), pointers 8 bytes wide */
     s16 cursor, offsetX, offsetY;
     u8 _pad6[2];
@@ -3343,10 +3339,6 @@ s32 SavePortalMenu_Poll_2(Menu *event) {
 }
 
 /* Only the field read here. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ u32 unk10;
-} CallbackArg;
 
 void SavePortalMenu_Close_2(s32 arg0, CallbackArg *arg1) {
     if ((sSavePortalDone == 0) && (gSavePortalActive != 0) && (arg1->unk10 < 2U)) {
