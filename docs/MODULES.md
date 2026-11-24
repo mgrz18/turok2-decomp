@@ -1305,6 +1305,60 @@ part q1 lists), `vm1/Pak` 19 (`CCache__Allocate`: the three CCache forms, then `
 
 None needs a ROM change.
 
+## Round 29, part r3: `vm1/PakMenu` and `vm2/PakMenu`
+
+**Merged: `vm1/PakMenu` (128 files -> `PakMenu.c`, `merge_module.py --rodata-free` plus hand-written N64 string data)
+and `vm2/PakMenu` (128 -> `PakMenu_2.c`, plain `merge_module.py`: its jump tables over the vm1 pool become
+`PakMenu_2:<function>` parts of `versions/shared_rodata.us.txt`).** Each step `asm_diff --base b8217720` 0;
+after each merge a clean `make setup` + build + `make verify` byte-exact, the whole tree `asm_diff` 0, the
+merged file through clang `-Wimplicit-function-declaration` (none), the port from a fresh gendata, aligncheck 0,
+`port_layout.us.json` regenerated.
+
+Header work (one declaration per name):
+
+- **`protos/pak.h`** (new `genprotos.py` group `pak`: `Pak_*`, `Str_{Compare,Copy,Length}`, `Crc32_Compute`,
+  `Controller_{PakChanged,TakePakChanged,UnwatchPak,WatchPak}`, from the vm1/Pak and code/Controller
+  definitions): `python3 tools/port/genprotos.py gen pak`, then `tools/unify_decls.py vm1/PakMenu protos/pak.h
+  <its names>`. The pak driver's callers passed `char *` for `u8 *` (no code change). Part r2 keeps vm1/Pak's
+  own per-file declarations in the definitions' forms, so the header does not collide with its merge.
+- **`protos/pakmenu.h`** (hand-written): the module's own cross-file calls (`PakMenu_CheckPak`,
+  `_UpdateNoteRows`, `_GetReturnMenu`, `_WriteSaveGame`, `_WriteProfile`) over `struct Menu *`; the callers
+  holding a Rage Wars view (`MenuRecAt24`, `Item`, `Shared_PakMenu`, an `sptr`) cast it. `PakMenu_WriteSaveGame`
+  is called with a third word the definition does not take: a cast of the function at the two calls.
+- **`protos/pak_2.h`** (hand-written; genprotos leaves `_2` out): the `_2` twins of both headers in their
+  definitions' types (`Pak_BytesToPages_2(s32)`, `Pak_GetNoteExtName_2(.., char **)`), plus
+  `MenuPool_OpenMenu_2`/`_OpenChildMenu_2` (the `vm2/TitleMenu_2.c` forms) and `CScene__RequestWarp_2`.
+- `globals/pak.h` instead of the local externs; the scalars read as arrays or other types are asm-label views
+  (the q4 pattern): `gPakProfileReadCharacterView` (s8), `gPakMessageKindView`, `gUnlockedCheatsView`,
+  `gSettingsUnk180View`, `gScenePreviewOptionsView`, `sPakMenuText_Spaces3View` (the `Chars4` copy).
+- The CCache family in one form per module: `void **CCache__Allocate(s32, s32, s32, char *)`,
+  `CCache__Deallocate(sptr, void *)` (protos/cache.h's), and the calls that pass 0 to the argument-less
+  `CCache__Flush` go through `CCache__Flush_Arg(s32) __asm__("CCache__Flush")`. `memset`, `sprintf` (variadic,
+  `s32`) one form each. `CPlayerPool__FindByController`, `CPlayer__CanGetRefill`,
+  `CEngineApp__UpdateControllers` from their definitions (casts at the calls).
+- N64+port twin bodies: `PakMenu_InitLoadGame` and `GameNoteMenu_SelectNo` take the port body's `Menu *` on
+  the N64 too; the N64 body reads it through a macro view of the Rage Wars type (`#define menu
+  ((Shared_PakMenu *) menuArg)`; a local copy moves a register).
+
+**The vm1 `.rodata`: every string before the first jump table.** The object's `.rodata` holds all its string
+literals (0xC1FF0..0xC2037: `"Single Save Block"`, `"%3d"`, `"   "`, `" "`, `"%1d"`, `"%2d"`, `"%3d.%02d.%02d"`,
+`"%04d"`, `"%1d."`) and only then the jump tables in `.text` order, although `PakConfirmMenu_SelectYes`'s table
+belongs to a function before the last five string users. `--inline all` (every function deferred, which gives
+exactly that order in GCC 2.8) changes the code of 20 functions (the deferred functions get inlined into their
+callers), so the MpMenu pattern instead: after `PakMenu_NoteText`'s `"%3d"`, N64-only `const char` data under
+the symbol names (`sPakMenuText_Spaces3`, `sPakMenuText_Space`, `sPakMenuFmt_1d`, `D_800C1414`, `D_800C1418`,
+`D_800C1428`, and the unnamed `"%1d."` as `sPakMenuFmt_1dDot`), read by the five label functions through
+`PAKMENU_FMT_*` (literals on the port, which keeps the generated copies). `"   "`/`" "` were the "data no C file
+owns" at 0xC2008: `PakMenu_FreePagesText`'s.
+
+**vm2 follows vm1:** `python3 tools/twin_text.py --base b8217720 vm1/PakMenu vm2/PakMenu 824a5023` (116 of 128;
+the 12 that differ keep their own text with the same header edits: mostly the string users, whose
+literals the vm2 copies read from the vm1 pool, plus `SaveGame_Build_2`, `PakMenu_SelectPak_2`,
+`PakConfirmMenu_SelectYes_2` and three small helpers). The vm1 text names the `_2` callees without declarations: clang found over 170
+implicit declarations before `protos/pak_2.h` was included (asm_diff cannot see them; the port compiles vm2).
+
+**State of the part's directories:** both merged (256 files -> 2). Nothing left.
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte

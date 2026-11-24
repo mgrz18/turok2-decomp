@@ -51,6 +51,8 @@ GROUPS = collections.OrderedDict([
     ('game', (r'LoopSounds_Get|CParticleSystem__Spawn|GameObject_FireTriggers|Controller_SetRumbleOption|'
               r'ImpactEvent_ApplyBlast|CInstancePool__Spawn|Render_DrawModel|GameObject_GetRegionFloorHeight',
               'other functions with many disagreeing declarations')),
+    ('pak', (r'Pak_\w+|Str_(?:Compare|Copy|Length)|Crc32_Compute|Controller_(?:PakChanged|TakePakChanged|UnwatchPak|WatchPak)',
+             'the controller pak driver (vm1/Pak) and the text helpers the pak menus call')),
     # written by hand (SDK types, not the m2c-typed definitions): apply only
     ('ultra', (None, 'libultra entry points the game calls')),
 ])
