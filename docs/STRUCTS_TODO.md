@@ -23,7 +23,7 @@ different scan, said 717 of 1,699); after the first pass, 612 of 1,557;
 after the second, 534 of 1,416; after the third, 431 of 1,192; after the
 fourth, 291 of 1,013; after round L, 229 of 889 (228 of 863 by the census at
 7340fcdd); after round 21 j3, 174 of 803; after round 22 k3, 148 of 723 (142 of 698 on the
-merged tree); after round 24 m1, 115 of 669; after the round-24 module merges (same-module copies folded), 112 of 665; after round 25 n1, 110 of 657; after round 26 o1, 113 of 624 (the vm1/vm2 twin copies with one layout hoisted, below); after the round-26 merge, 110 of 624 (the `Video` and `AutomapDraw` merges fold their same-module copies); after the round-27 merge, 91 of 629 (the 23 directories merged fold their same-module copies; p1 hoisted `structs/hud.h`, `weapon_node.h`); after the round-28 merge, **84 of 596** (the 12 directories merged fold their same-module copies; q1/q2 put the scheduler, CCache, CGameRegion and CAudioWorld views on their engine types); on the round-25 merged tree, 144 of 656: part n3 wrote the 100 vm2 functions that were asm as C copies of their vm1 twins, each with its twin's local structs (146 of 666 on n3 alone), so most of the increase is VM-copy pairs, which the census counts as two files. The vector,
+merged tree); after round 24 m1, 115 of 669; after the round-24 module merges (same-module copies folded), 112 of 665; after round 25 n1, 110 of 657; after round 26 o1, 113 of 624 (the vm1/vm2 twin copies with one layout hoisted, below); after the round-26 merge, 110 of 624 (the `Video` and `AutomapDraw` merges fold their same-module copies); after the round-27 merge, 91 of 629 (the 23 directories merged fold their same-module copies; p1 hoisted `structs/hud.h`, `weapon_node.h`); after the round-28 merge, 84 of 596 (the 12 directories merged fold their same-module copies; q1/q2 put the scheduler, CCache, CGameRegion and CAudioWorld views on their engine types); after the round-29 merge, **74 of 576** (the 14 directories merged fold their same-module copies; every module is one C file now, so a name left in two files is in two modules); on the round-25 merged tree, 144 of 656: part n3 wrote the 100 vm2 functions that were asm as C copies of their vm1 twins, each with its twin's local structs (146 of 666 on n3 alone), so most of the increase is VM-copy pairs, which the census counts as two files. The vector,
 intelligence, libultra, Gfx, sound, libaudio, AI state (CAI and its
 var-buffer views), controller, game and engine, weapon, pak, list, cache,
 boss, particle, collision, save, demo, pager, menu, player / owner /
@@ -1032,96 +1032,86 @@ their own (top 0 of 0).
 
 ## Every local struct name defined in 2 or more files
 
-84 of the 596 local typedef names. "Fields" are the named offsets of the
+74 of the 576 local typedef names. "Fields" are the named offsets of the
 most common layout (pads left out); a body without offset comments is shown
 as written.
 
 | Name | Files | Layouts | Fields | Files |
 |---|---|---|---|---|
-| Arg0 | 8 | 8 | 0x8 refCount, 0xC flags | CCache, CCamera, func_002242F8, AutomapDraw +4 |
-| Entry | 6 | 5 | `u8 data[0x20];` | Anim, func_00214188, func_0022D2FC, func_0042130C +2 |
-| Item | 4 | 4 | 0x1C *owner, 0x20 *data, 0x24 *string | func_00420F34, MotherBoss_2, func_0045A7A0, func_0045AD1C |
-| Location | 4 | 3 | 0x00 pos, 0x0C region | func_002438C0, func_00244338, func_002449E0, func_0025D9E4 |
-| Model | 4 | 3 | 0x00 index, 0xB0 header | func_0021ED04, CPlayer, func_00274798, func_002747EC |
-| Mtx | 4 | 2 | `long m[4][4];` | func_00297D50, func_0022D2FC, lookat, perspective |
-| Node | 4 | 3 | 0x00 index, 0x04 *prev, 0x08 *next | func_002316F4, SndQueue, func_0042C194, func_004650B4 |
-| PlacedProp | 4 | 4 | 0x00 state, 0x02 id, 0x04 pos, 0x10 *segment, 0x14 *model, 0x18 owner, 0x1C unk1C, 0x28 matrix[16], ... | func_002141F0, func_00214564, func_00214844, func_00214B58 |
-| Slot | 4 | 3 | 0x00 a, 0x16 b, 0x17 c | CCamera, func_0042D120, Demo_2, func_0045A22C |
-| TargetInfo | 4 | 3 | 0x0 *target, 0x4 *def, 0x8 mode | func_0025DF04, func_0025F068, TotemDefense, TotemDefense_2 |
-| VertexGroup | 4 | 2 | 0x0 unk0, 0x4 count, 0x8 verts[1] | func_00212DA4, func_00212F98, func_002130A8, func_00214F68 |
-| Actor | 3 | 3 | `#define T2_HOFF_Actor(m) __builtin_offsetof(CParticle, m) union { stru...` | func_0022D2FC, func_002600E8, func_00260554 |
-| AnimChannel | 3 | 3 | 0x00 time, 0x04 current, 0x06 next, 0x08 frames, 0x0A active, 0x0B blending, 0x0C loopStart, 0x10 **resource | func_00218B10, func_0021CDAC, func_0021F428 |
-| AnimInfo | 3 | 3 | 0x1C intelligence, 0x1E angle | CInstancePool, func_0022D2FC, func_00234348 |
-| Arg1 | 3 | 3 | 0x1C unk1C | CPlayer, WeaponMode, func_0045C050 |
-| Attachment | 3 | 3 | 0x00 field0, 0x02 type, 0x04 field4, 0x08 offset, 0x14 params | func_00214B58, DList, GameObject |
+| Entry | 7 | 5 | `u8 data[0x20];` | Anim, CMtxF, CParticle, CScene +3 |
+| Arg0 | 6 | 6 | 0x8 refCount, 0xC flags | CCache, CCamera, CScene, AutomapDraw +2 |
+| Mtx | 4 | 2 | `long m[4][4];` | func_00297D50, CParticle, lookat, perspective |
+| Node | 4 | 3 | 0x00 index, 0x04 *prev, 0x08 *next | CParticle, CScene, SndQueue, SceneLoad_2 |
+| AnimInfo | 3 | 3 | 0x1C intelligence, 0x1E angle | CInstancePool, CParticle, Trail |
+| Attachment | 3 | 3 | 0x00 field0, 0x02 type, 0x04 field4, 0x08 offset, 0x14 params | CStaticObject, DList, GameObject |
 | EffectParams | 3 | 2 | 0x0 upper, 0x2 lower, 0x4 b[4] | Sweep, Primagen, Primagen_2 |
-| Handle | 3 | 2 | `void *data;` | Render, func_0042BA40, func_00464960 |
+| Handle | 3 | 2 | `void *data;` | CScene, Render, SceneLoad_2 |
 | Holder | 3 | 2 | `union { struct { u8 _hp_held[__builtin_offsetof(CAI, m_pfHurt)]; void ...` | Anim, Primagen, Primagen_2 |
-| KeyLookup | 3 | 2 | 0x00 *posKeys, 0x04 *rotKeys, 0x08 *posTracks, 0x0C *rotTracks, 0x10 offset0, 0x14 offset1, 0x18 rootOffset0, 0x1C rootOffset1, ... | func_00218B10, func_0021B95C, func_0021CDAC |
-| Link | 3 | 2 | 0x0 *next, 0x4 *prev | func_002933B0, func_0028E9E0, func_0028EA10 |
-| ModelVertex | 3 | 3 | 0x0 x, 0x6 bone | func_00212DA4, func_00212F98, func_002130A8 |
+| Item | 3 | 2 | 0x1C *owner, 0x20 *data, 0x24 *string | PakMenu, MotherBoss_2, PakMenu_2 |
+| Model | 3 | 3 | `union { struct { u8 _hp_unk1CC[__builtin_offsetof(CCamera, m_mfProject...` | CGameObjectInstance, CPlayer, SndVoice |
 | RenderCounters | 3 | 3 | `f32 ticks, seconds, minutes, hours; f32 countdown; f32 timeLimit; s32 ...` | MpMenu, StatsMenu, StatsMenu_2 |
-| Resource | 3 | 3 | 0x0 *file, 0x4 size | Anim, func_00225E88, Hud |
+| Resource | 3 | 3 | 0x0 *file, 0x4 size | Anim, CScene, Hud |
 | ScreenRectangle | 3 | 2 | `u8 pad0[__builtin_offsetof(CCamera, m_Viewport)]; f32 x; f32 y; f32 wi...` | CPlayer, func_0040F240, func_00448240 |
-| ShadowActor | 3 | 3 | 0x04 *def, 0x40 unk54 | func_0021E03C, CLevelActor, func_0022D2FC |
-| Src | 3 | 2 | `u8 pad0[0x13]; u8 unk13;` | func_002248D4, func_00224A68, func_00224B58 |
+| ShadowActor | 3 | 3 | 0x04 *def, 0x40 unk54 | CGameObjectInstance, CLevelActor, CParticle |
+| Slot | 3 | 2 | 0x00 a, 0x16 b, 0x17 c | CCamera, func_0042D120, Demo_2 |
+| TargetInfo | 3 | 2 | 0x0 *target, 0x4 *def, 0x8 mode | EnemyAI, TotemDefense, TotemDefense_2 |
 | A254Menu | 2 | 1 | 0x00 state, 0x0C *screen | TitleMenu, TitleMenu_2 |
 | A254Screen | 2 | 1 | 0x80 flags80, 0xA8 flagsA8 | TitleMenu, TitleMenu_2 |
 | ActionParams | 2 | 1 | 0x00 upper, 0x02 lower, 0x04 extra[4] | MotherBoss, MotherBoss_2 |
 | ActionState | 2 | 2 | 0x034 unk34, 0x036 unk36, 0x0C7 active, 0x110 done, 0x114 tagCleared | Action, Door |
 | Actor0040457C | 2 | 1 | `#define T2_HOFF_Actor0040457C(m) __builtin_offsetof(CGameObjectInstanc...` | Primagen, Primagen_2 |
-| AnimFrame | 2 | 2 | 0x0 kind, 0x2 shiftS, 0x3 shiftT | func_0022D2FC, func_00234348 |
+| AnimChannel | 2 | 2 | 0x00 time, 0x04 current, 0x06 next, 0x08 frames, 0x0A active, 0x0B blending, 0x0C loopStart, 0x10 **resource | func_00218B10, CGameObjectInstance |
+| AnimFrame | 2 | 2 | 0x0 kind, 0x2 shiftS, 0x3 shiftT | CParticle, Trail |
 | AnimHeader | 2 | 2 | 0x00 radius, 0x04 frames, 0x08 encoding, 0x0C fC, 0x10 rotTracks, 0x14 posTracks, 0x18 frameCount, 0x1C frameStep | Anim, func_00218B10 |
 | AnimPlayer | 2 | 2 | 0x00 time, 0x04 current, 0x06 next, 0x08 frames, 0x0A active, 0x0B dirty, 0x0C keys, 0x10 *data | func_00218B10, CPathTrack |
-| B04O | 2 | 2 | `u8 pad0[4]; s32 x, y, z;` | func_0024646C, func_00246B24 |
+| Arg0_0042C418 | 2 | 1 | 0x04 done, 0x28 unk28, 0x30 unk30 | CScene, SceneLoad_2 |
+| Arg1 | 2 | 2 | 0x1C unk1C | CPlayer, WeaponMode |
 | BossCtl | 2 | 1 | `#define T2_HOFF_BossCtl(m) __builtin_offsetof(LevelScriptState, m) uni...` | Primagen, Primagen_2 |
 | BossFlags | 2 | 1 | 0x0 unk0, 0x1 unk1 | Primagen, Primagen_2 |
 | BossTimers | 2 | 1 | `#define T2_HOFF_BossTimers(m) __builtin_offsetof(LevelScriptState, m) ...` | Primagen, Primagen_2 |
+| CallbackArg | 2 | 1 | 0x10 unk10 | PakMenu, PakMenu_2 |
 | Callbacks | 2 | 1 | `union { struct { u8 _hp_onDraw[T2_HOFF_Callbacks(m_AI.m_pfDraw)]; void...` | Primagen, Primagen_2 |
-| ColorF | 2 | 1 | `f32 r, g, b;` | func_00211DB0, func_00212DA4 |
 | Cursor | 2 | 2 | 0x0 ptr, 0x4 stride | Anim, Hud |
 | Cylinder | 2 | 2 | `f32 v[6];` | PlatformCollide, SweepShapes |
-| Drawable | 2 | 2 | `u8 pad0[__builtin_offsetof(CStaticObject, m_LitKey)]; s32 unk80; u8 pa...` | func_00214E88, func_0022077C |
-| Element | 2 | 1 | 0x00 type, 0x28 x, 0x2C y, 0x30 z30, 0x34 z34, 0x4C x2, 0x50 y2, 0x54 z2 | func_002261A8, func_00465B04 |
-| GameplayCamera | 2 | 2 | `char pad0[0x2D8]; char clipPlanes[0x60]; CVector3 clipBounds[2];` | CLevelActorPool, func_002745DC |
+| Drawable | 2 | 2 | `union { struct { u8 type; }; struct { u8 _hp_pos[__builtin_offsetof(CI...` | CScene, CStaticObject |
+| Element | 2 | 1 | 0x00 type, 0x28 x, 0x2C y, 0x30 z30, 0x34 z34, 0x4C x2, 0x50 y2, 0x54 z2 | CScene, SceneLoad_2 |
 | Info0040457C | 2 | 1 | `#define T2_HOFF_Info0040457C(m) __builtin_offsetof(CAITargets, m) unio...` | Primagen, Primagen_2 |
+| ItemData | 2 | 1 | 0x04 id | PakMenu, PakMenu_2 |
 | Job | 2 | 1 | 0x00 result, 0x0C unkC, 0x1C 2 | CCamera, Demo_2 |
+| KeyLookup | 2 | 2 | 0x00 *posKeys, 0x04 *rotKeys, 0x08 *posTracks, 0x0C *rotTracks, 0x10 offset0, 0x14 offset1, 0x18 rootOffset0, 0x1C rootOffset1, ... | func_00218B10, CGameObjectInstance |
 | Layer | 2 | 2 | 0x2D8 flags | CheatMenu_2, GameOverMenu_2 |
-| LinkList | 2 | 1 | 0x0 *head, 0x4 *tail | func_0028E9E0, func_0028EA10 |
-| List | 2 | 2 | 0x04 items[1] | func_00221A24, func_00466040 |
+| LevelState | 2 | 1 | 0x98 *handle98, 0x9C *handle9C, 0xA0 *handleA0, 0xA4 *handleA4, 0xA8 *handleA8, 0xAC *handleAC, 0xB0 *handleB0, 0xB4 *handleB4, ... | CScene, SceneLoad_2 |
+| List | 2 | 2 | 0x04 items[1] | CScene, func_00466040 |
 | ListOwner | 2 | 2 | 0xE28 m_List | CCamera, DLights |
 | Material | 2 | 2 | 0x52 flags, 0x5D strength, 0x5F x, 0x60 y, 0x61 z | GameObjectMove, RandomInPackedRange |
 | MenuColorInit | 2 | 1 | `u16 a; u8 pad2[2]; u16 b; u8 pad6[2]; u16 c; u8 padA[3]; u8 d; u8 pad0...` | func_00413230, func_0044C230 |
 | ModePair | 2 | 1 | 0x0 unk0, 0x4 unk4 | Primagen, Primagen_2 |
 | ModeState0040457C | 2 | 1 | `#define T2_HOFF_ModeState0040457C(m) __builtin_offsetof(LevelScriptSta...` | Primagen, Primagen_2 |
 | ModuleObj | 2 | 1 | `u8 pad0[__builtin_offsetof(CGameObjectInstance, m_AI.m_Mode)]; s8 anim...` | MotherBoss, MotherBoss_2 |
-| ObjA | 2 | 1 | `u8 pad0[__builtin_offsetof(CStaticObject, m_pOwner)]; void **block; u8...` | func_0042BF48, func_00464E68 |
-| ObjB | 2 | 1 | `u8 pad0[sizeof(CLevelActor)];` | func_0042BF48, func_00464E68 |
-| Owner | 2 | 2 | 0x00 type, 0x80 *ownerId | func_0022D2FC, func_00273EB8 |
+| ObjA | 2 | 1 | `u8 pad0[__builtin_offsetof(CStaticObject, m_pOwner)]; void **block; u8...` | CScene, SceneLoad_2 |
+| ObjB | 2 | 1 | `u8 pad0[sizeof(CLevelActor)];` | CScene, SceneLoad_2 |
+| Owner | 2 | 2 | 0x00 type, 0x80 *ownerId | CParticle, SndVoice |
 | Part | 2 | 1 | `s16 a; s16 b; u8 c[4];` | MotherBoss, MotherBoss_2 |
 | PartInfo | 2 | 1 | `CGameObjectInstance *actor; u8 pad4[__builtin_offsetof(T2PoseContext, ...` | MotherBoss, MotherBoss_2 |
-| Path | 2 | 2 | 0x40 *segments, 0x4C totalLength | func_00236B7C, MantidQueen |
+| Path | 2 | 2 | 0x40 *segments, 0x4C totalLength | Trail, MantidQueen |
 | PickupDef | 2 | 2 | 0x14 info | Action, Pickup |
-| Placed | 2 | 1 | 0x00 data[4], 0x10 kind, 0x12 unk12 | func_0042C194, func_004650B4 |
-| PlacedPropRecord | 2 | 2 | 0x00 value, 0x04 scale, 0x08 id, 0x0A segment, 0x0C flags, 0x0E model, 0x10 y, 0x12 extents[6], ... | func_002141F0, func_00214564 |
+| Placed | 2 | 1 | 0x00 data[4], 0x10 kind, 0x12 unk12 | CScene, SceneLoad_2 |
 | PlayerList | 2 | 2 | `void *pad0[2]; s32 nPlayers; PlayerCList idle; PlayerCList active; s32...` | CPlayer, CPlayer_2 |
 | Quad | 2 | 2 | `s32 w[4];` | CPlayer, ImpactEvent |
 | Reader | 2 | 2 | 0x8 *p | seq, MantidQueen |
-| S | 2 | 2 | `s16 *base; s16 *p;` | func_00246594, Anim |
+| S | 2 | 2 | `s16 *base; s16 *p;` | AI, Anim |
 | Screen | 2 | 1 | 0xC *layer | CheatMenu_2, GameOverMenu_2 |
-| ShadowParams | 2 | 2 | `u8 pad0[__builtin_offsetof(CDrawArgs, m_pOffset)]; sptr blobType;` | func_0021DC84, func_0022D2FC |
+| ShadowParams | 2 | 2 | `u8 pad0[__builtin_offsetof(CDrawArgs, m_pOffset)]; sptr blobType;` | CGameObjectInstance, CParticle |
 | Shared_Game | 2 | 2 | `char pad0[0x5D8]; RenderCounters counters;` | StatsMenu, StatsMenu_2 |
-| SortEntry | 2 | 2 | 0x00 dist | func_0022077C, func_00226D0C |
-| SortItem | 2 | 2 | 0x4 key | func_00226D30, Sweep |
-| Sound | 2 | 2 | 0x0C id | func_0025C5F8, SpeechPlayer |
+| SortItem | 2 | 2 | 0x4 key | CScene, Sweep |
+| Sound | 2 | 2 | 0x0C id | EnemyAI, SpeechPlayer |
 | SoundEvent | 2 | 2 | `CGameObjectInstance *object; char pad4[0x14 - 0x4]; SoundRange *range;...` | CPlayer, LevelEvent |
 | Sphere | 2 | 2 | 0x00 center, 0x0C radius, 0x10 radiusSq | Path, SweepShapes |
 | State_004070B4 | 2 | 1 | 0x0 unk0, 0x4 unk4, 0x8 unk8 | Primagen, Primagen_2 |
 | State_004077AC | 2 | 1 | `f32 unk_0; char pad4[0x50 - 0x4]; f32 unk_50; char pad54[0x5C - 0x54];...` | Primagen, Primagen_2 |
-| Target | 2 | 2 | 0x78 unk78, 0x7C unk7C | func_002460FC, StatsMenu_2 |
-| TimedNode | 2 | 2 | 0x00 *prev, 0x04 *next, 0x08 *item, 0x0C timer | func_002253F8, synthesizer |
+| Target | 2 | 2 | 0x78 unk78, 0x7C unk7C | AI, StatsMenu_2 |
+| TimedNode | 2 | 2 | 0x00 *prev, 0x04 *next, 0x08 *item, 0x0C timer | CScene, synthesizer |
 | Unk00419618 | 2 | 1 | 0x1C unk1C, 0x20 unk20 | TitleMenu, TitleMenu_2 |
-| ViewState | 2 | 2 | `s32 mask; u8 pad4[0xD]; u8 unk11;` | func_00221210, func_00221D3C |
 
 ## Files that are readable only on paper
 

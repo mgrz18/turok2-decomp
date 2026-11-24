@@ -44,6 +44,19 @@ typedef struct {
     /* 0x02 */ s16 m_nCurrentPointIndex;
 } CPathTrack; /* size 0x4 */
 
+/* A point of a level path (CScene__GetPathPoint, CPathTrack__GetCurrentPoint): the level file's
+ * entries, all 32-bit words and halves, so the host reads them in place. m_Region is the region
+ * index the port resolves with CScene__GetPathRegion (the N64 loader leaves a region there).
+ * The entry size is the path's (its header word); these are the members the AI reads. */
+typedef struct CPathPoint {
+    /* 0x00 */ CVector3 m_vPos;
+    /* 0x0C */ s32 m_Region;
+    /* 0x10 */ f32 m_RotY;           /* the facing, when m_Flags & 1 */
+    /* 0x14 */ u16 m_Flags;
+    /* 0x16 */ u16 m_AnimFlagsA;     /* EnemyAnim_InteractiveIdle's two candidate sets */
+    /* 0x18 */ u16 m_AnimFlagsB;
+} CPathPoint;
+
 /* One row of an AI's mode table (CAI::m_pModeTable, e.g. gEnemyGroundModeTable: a
  * 0x20-byte header row, then one row per mode; m_pModeCurrent points at the
  * current one). The AI step calls m_pfCallback while the mode runs.

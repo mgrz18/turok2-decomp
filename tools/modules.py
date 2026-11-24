@@ -91,6 +91,8 @@ RODATA_PAD = {
     # build's code words) end two slices on 16 inside the old CInstancePool (0xA6C70, 0xA6CA0)
     ("engine", 0x00227C10): "rodata pad: at 0xA6C6C (stale 'e\\en'; of func_00227AE0, func_00227C10: where CLevelActorPool__ gives way to CInstancePool__)",
     ("engine", 0x002284E0): "rodata pad: at 0xA6C96 (stale words after 'anim object info'; of func_002280B0, func_002284E0: where CInstancePool__ gives way to DLights_)",
+    # round 29 (r4): stale bytes after "Lit Vertices" end a slice on 16 inside the old CMtxF
+    ("engine", 0x002141F0): "rodata pad: at 0xA63C9 (stale words after Lit Vertices; where Lighting_ gives way to CStaticObject__)",
     ("vm1", 0x00424B90): "rodata pad: at 0xC2368 (zeros after the string \" \" up to the next 16; one candidate)",
     ("vm1", 0x00419560): "rodata pad: at 0xC1C28 (of 10 candidates: where the multiplayer menus give way to Single/Title/Pause)",
     ("vm1", 0x00423E10): "rodata pad: at 0xC2314 (of 3 candidates: where PakConfirmMenu_ gives way to Video_)",

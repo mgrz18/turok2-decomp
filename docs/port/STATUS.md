@@ -6,6 +6,38 @@ new game to the good ending with no invincibility and no life lost, on the N64's
 stream. The Mac app is packaged and ready for its first session in a real window
 ([FIRSTRUN.md](FIRSTRUN.md)); that session has not happened yet.
 
+## Round 29 merge (Phase 5): r2, r3, r1, r4 and the CScene object; every module is one C file
+
+Merged into `feat/46-hand-matching` in the order r2 (`SndVoice`, `VM`, `vm1/Pak`), r3 (`vm1/PakMenu`,
+`vm2/PakMenu`), r1 (`AI`, `EnemyAI`), r4 (`CMtxF`, the new `CStaticObject`, `Trail`, `CParticle`,
+`CGameObjectInstance`; the CScene header work), `--no-ff`, then the CScene object itself (`code/CScene` +
+`vm1/SceneLoad` in `CScene.c`, `vm2/SceneLoad` in `SceneLoad_2.c`): every module is one C file, 150 merged
+([MODULES.md](../MODULES.md#round-29-merge-the-state-after-parts-r1-r4-and-the-cscene-object)). The port
+side: r1's five `t2abi.c` wrappers without callers removed; `Pak_BytesToPages_2` takes an `sptr` as its
+vm1 twin (ptrargs); `CScene__GetLevelName` reads its two literals on both builds (the object owns the
+bytes of `sCSceneCacheDesc_LevelName` now, which gendata no longer emits); `CScene.c`/`SceneLoad_2.c`
+include `<string.h>` for `memcpy` on the port. Every merged file compiles with no implicit declaration
+under clang `-Wimplicit-function-declaration` and cc1 `-Wimplicit`. `aligncheck.py` now follows a
+symbol's address in a register through the whole function: r4's `sLitVertexOffsets` fault (the
+`movaps` far from its `lea` after `CMtxF.c` inlined `Model_ApplyPackedOffsets`) is a site it finds;
+`--latent` lists the gendata globals aligned only by chance (none).
+
+**The references, re-run on the final tree** (Linux Release, fresh gendata), all unchanged:
+boot + 3 demos `6ab97584…`; default END 2 (252,468), 5 totems, 0 lives, **`af8bd840…`**; stick
+combination END 2 (263,622), 0 lives, **`ad941823…`**; `--legacy` (290,000) END 2 (252,194), 2 lives,
+`ac08c89b…`. The swoosh self-test OK.
+
+Checks: `asm_diff --base b8217720` 0 differ over the tree after each merge, the 14 merged files
+compared function by function (964 functions); clean `make setup` + build + `make verify` OK; a fresh
+`git clone --recursive` builds and verifies (ultralib `e24c836`); `mklayout.py --check` up to date
+(regenerated after each merge); `aligncheck` 0 sites; nested `TARGET_PORT` scan at the 2 known sites
+(r2's `SndVoice.c` had four more, dead host bodies inside port-replaced functions, dropped);
+`make -C port test`, `gbi_test` 0 mismatches, t2os x3, `t2audio_test --direct 0/40` max difference 0,
+`--adec` OK; abicheck 0 harmful, ptrargs 1/0 (after the `Pak_BytesToPages_2` fix; r3 alone gave 2/3),
+outptr the one known `BAD` (`MantidQueen.c`'s file-wide look-up), n64viewcheck linked `gptr/BAD` 3,
+`raw/BAD` 10, `stride/BAD` 3 and unlinked `cast/BAD` 3, `gptr/BAD` 5, `raw/BAD` 12, `stride/BAD` 4: the same
+sites as round 28's final run (the merged files' paths changed, nothing new); f2ucheck the same 134 sites.
+
 ## Round 28 merge (Phase 5): q1, q2, q4, q3; 136 modules in one C file
 
 Merged into `feat/46-hand-matching` in the order q1 (`__scHandleRSP`, `GameObject`; `AI` header work), q2
