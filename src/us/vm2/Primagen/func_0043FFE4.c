@@ -1,0 +1,27 @@
+/* The second VM module's copy of src/us/vm1/Primagen/func_00406FE4.c (byte for byte, at the same link address or 0xE0 below
+ * it, docs/VMASM.md), with the second module's names. */
+#include "common.h"
+#include "structs/game_object.h"
+#include "globals/scene.h"
+#include "protos/scene.h"
+
+extern void *CLevelActorPool__Spawn(CLevelActorPool *table, void *slot, s32 kind, CVector3 velocity, CVector3 pos,
+                           void *region, f32 arg);
+extern void Actor_SpawnParticle(void *actor, s32 event, CVector3 pos, s32 arg);
+
+
+/* Spawn an object of the given kind at pos, thrown upwards, and send it event 0x11D. */
+void Primagen_SpawnTossedObject_2(s32 kind, s32 count, CVector3 pos) {
+    CVector3 velocity;
+    void *region;
+    void *spawned;
+
+    region = CScene__FindRegionAt(&gScene, &pos);
+    velocity.x = 0.0f;
+    velocity.y = 512.0f;
+    velocity.z = 0.0f;
+    spawned = CLevelActorPool__Spawn(&gScene.m_ActorPool, NULL, kind, velocity, pos, region, count);
+    if (spawned != NULL) {
+        Actor_SpawnParticle(spawned, 0x11D, pos, 0);
+    }
+}

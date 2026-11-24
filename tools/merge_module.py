@@ -160,6 +160,22 @@ def static_name(code, kind, name):
     return None
 
 
+def first_function(path, rel_dir, stem):
+    """The first function a file's object holds: cc1's own output in the build tree when there is one
+    (a static inline helper is written where it is first needed, or not at all), else the first
+    definition in the C that is not inline."""
+    s_c = ROOT / "build" / "src" / "us" / rel_dir / f"{stem}.s_c"
+    if s_c.exists():
+        m = re.search(r"^\s*\.ent\s+(\S+)", s_c.read_text(errors="replace"), re.M)
+        if m:
+            return m.group(1)
+    body = strip_comments(path.read_text())
+    for m in re.finditer(r"^([A-Za-z_][^;{}()]*?)\b([A-Za-z_]\w*)\s*\([^;{}]*\)\s*\{", body, re.M):
+        if not re.search(r"\b(__inline__|inline|INLINE)\b", m.group(1)):
+            return m.group(2)
+    sys.exit(f"{path}: no function found for its .rodata part")
+
+
 def rename_statics(parsed, stems):
     """A static defined by more than one file is a separate object in each original object file: keep
     them all, under the first file's name and `<name>_<vram>` in the others (the name the readable files
@@ -280,13 +296,14 @@ def main():
     if not adjacent(ro, allow_pads=True) or ro_order != [s for s in text_order if s in ro_order]:
         sys.exit(f"{a.dir}: its .rodata is not one block in .text order ({ro_order})")
     # a second-VM-module file whose .rodata is placed over the first module's pool (tools/shared_rodata.py) owns
-    # that placement by its file name: one such file per module can hand it to the merged file, two cannot
-    # (one object has one .rodata section, placed at one address)
+    # that placement by its file name: one such file hands it to the merged file; two or more become parts of
+    # it, each named by the first function its file emitted (`<merged>:<function> <address>`), and the
+    # assembler input puts each part's .rodata in a section of its own (shared_rodata.py --split)
     shared = [l.split()[0] for l in SHARED.read_text().splitlines() if l.split("#")[0].strip()
               and l.split()[0] in files]
-    if len(shared) > 1 or (shared and ro):
-        sys.exit(f"{a.dir}: {len(shared)} files place their .rodata over the first VM module's pool one by one "
-                 f"(versions/shared_rodata.us.txt){' and the yaml places others' if ro else ''}")
+    if shared and ro:
+        sys.exit(f"{a.dir}: {len(shared)} files place their .rodata over the first VM module's pool "
+                 f"(versions/shared_rodata.us.txt) and the yaml places others")
     texts = [files[s].read_text() for s in text_order]
     flags = {tuple(FLAGS.findall(t)) for t in texts}
     if len(flags) > 1:
@@ -418,8 +435,15 @@ def main():
         if e:
             lines[e[0]] = lines[e[0]].replace(e[2], f"{rel_dir}/{name}")
     YAML.write_text("".join(l for n, l in enumerate(lines) if n not in drop))
-    if shared:
+    if len(shared) == 1:
         SHARED.write_text(re.sub(rf"^{shared[0]}\b", name, SHARED.read_text(), flags=re.M))
+    elif shared:
+        st = SHARED.read_text()
+        for s in shared:
+            head = first_function(files[s], rel_dir, s)
+            head = renames.get(text_order.index(s), {}).get(head, head)
+            st = re.sub(rf"^{s}\b", f"{name}:{head}", st, flags=re.M)
+        SHARED.write_text(st)
     subprocess.run(["git", "rm", "-q", *[str(files[s].relative_to(ROOT)) for s in text_order]], check=True, cwd=ROOT)
     subprocess.run(["git", "add", str(target.relative_to(ROOT))], check=True, cwd=ROOT)
     print(f"{target.relative_to(ROOT)}: {len(files)} files, {len(ro)} .rodata subsegments")

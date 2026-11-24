@@ -39,6 +39,12 @@ set -euo pipefail
 IN=$1
 OUT=$2
 INC_DIR=${INC_DIR:-us/include}
+# A merged second-VM-module file places each original file's .rodata on its own (`<stem>:<function>`
+# lines in versions/shared_rodata.us.txt): sn_li.py flushes its literal pool before each such function,
+# as it did at the end of each file, and shared_rodata.py --split gives each part its own section.
+STEM=$(basename "$IN"); STEM=${STEM%%.*}
+PARTS=$(sed -n "s/^$STEM:\([^ ]*\) .*/\1/p" versions/shared_rodata.us.txt 2>/dev/null | tr '\n' ' ')
+export SN_LI_FLUSH_AT="$PARTS"
 
 tr -d '\r' < "$IN" \
     | sed -E 's/^([[:space:]]+)move([[:space:]]+)([^,]+),([^,#]+)/\1addu\2\3,\4,$0/' \
@@ -63,5 +69,6 @@ tr -d '\r' < "$IN" \
              print }' \
     | python3 "$(dirname "$0")/sn_li.py" \
     | python3 "$(dirname "$0")/sn_hilo.py" \
+    | { if [ -n "$PARTS" ]; then python3 "$(dirname "$0")/shared_rodata.py" --split "$STEM"; else cat; fi; } \
     | mips-linux-gnu-as -EB -mabi=32 -march=vr4300 -mtune=vr4300 -mips3 -O1 -G0 \
         --no-pad-sections -I "$INC_DIR" -o "$OUT" -
