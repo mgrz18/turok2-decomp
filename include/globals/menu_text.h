@@ -390,6 +390,9 @@ extern char sStatsMenuFmt_02d[];                         /* "%02d" */
 extern char sPakMenuText_SingleSaveBlock[];              /* "Single Save Block" */
 extern char sPakMenuFmt_3d[];                            /* "%3d" */
 extern char sPakMenuText_Spaces3[];                      /* "   " */
+extern char sPakMenuText_Space[];                        /* " " (round 25) */
+extern char sMissionMenuText_Space[];                    /* " " (round 25) */
+extern unsigned char sEnterCheatKeyLabels[];                     /* " ", "Z", "Y" ... "A", a word apart (bytes: the port keeps ROM order) */
 extern char sPakMenuFmt_1d[];                            /* "%1d" */
 extern char sGfxPoolText_AudioHeap[];                    /* "audio heap" */
 extern char sPakText_MempakReadTempData[];               /* "Mempak read temp data" */

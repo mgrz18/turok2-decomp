@@ -1,0 +1,33 @@
+// Data names, part g8 (round 25, part n4): the last BSS views and the VM data names round 22 left as D_.
+// Evidence from build/ref.elf (every %hi/%lo pair of the address in the code) and the VM data bytes.
+
+// ---- the animation decoder (globals/object.h) ----
+sAnimDecodeUnkC = 0x800E6790; // f32: AnimHeader.fC, stored by Anim_DecodeAnimation and Anim_Decompress before each Anim_DecodeTracks pass and read by no code (all ten %lo uses of 0x800E6790..A0 in the ROM are these decoders); its own BSS word before sAnimDecodeRotation, not the end of sLitVertexOffsets (that table ends here, 0x800DD790 + 0x9000)
+
+// ---- Primagen: the sound pick tables of the type-2 steps of script C (Pick[], ending at id -1) ----
+sPrimagenSoundScript1Picks = 0x004315C8; // Pick[4] (sounds 0x3B0D-0x3B10); sPrimagenSoundScript1's step 0 (0x00431660: type 2, arg 0x004315C8)
+sPrimagenSoundScript2Picks = 0x004315DC; // Pick[10] (0x3B02-0x3AFC); sPrimagenSoundScript2's step 0 (0x00431624)
+sPrimagenSoundScript3Picks = 0x00431608; // Pick[3] (id 0 weight 40, id 0 weight 10, 0x3B01); sPrimagenSoundScript3's step at 0x004316C4
+sPrimagenSoundScript4Picks = 0x00431618; // Pick[2] (0x3AFD, 0x3AFE); sPrimagenSoundScript4's step 0 (0x00431700)
+
+// ---- menu descriptors CPlayer__NewGame opens (globals/menu_desc.h) ----
+gTeamMenuDesc = 0x004388E0; // MenuDesc: the team pick ('choose' 'blue blood' / 'red blood'; poll TeamMenu_Poll, selects TeamMenu_ChooseBlue/Red); CPlayer__NewGame opens it in a team game
+gSingleMenuDesc = 0x0043916C; // MenuDesc: 'single' ('new game', 'load', 'go back'; init SingleMenu_Init); CPlayer__NewGame opens it for one player; gSingleMenuAfterPakDesc (0x00439190) is its copy the pak menus return to
+
+// ---- main-code data tables round 22 counted as pool words: objects of their own (each referenced by
+// its own %hi/%lo or by a data pointer, none inside a function's literal pool) ----
+gAIBaseModeTable = 0x800B0700; // CAIModeInfo[27]: the shared mode table every AI mode table chains to through its header row's m_Mode word (only data words hold its address; AI_SetMode walks the chain; the port's gAIBaseModeTable_port reference types it)
+sTrailTexture0Points = 0x800ACE70; // f32[10]: the trail texture record sTrailTextures[0] points at (2 morph points of 5 f32: x, y, z and two more); Trail_AddNode
+sTrailTexture1Points = 0x800ACE98; // f32[10]: sTrailTextures[1]'s record
+sTrailTexture2Points = 0x800ACEC0; // f32[30]: sTrailTextures[2]'s record (6 points)
+sTrailTexture3Points = 0x800ACF38; // f32[30]: sTrailTextures[3]'s record (6 points)
+sDecalSetupDList = 0x800ACFC8; // Gfx[]: the static display list SwooshSystem_DrawDecals calls (gsSPDisplayList) after loading the shadow texture: render mode and combiner of the decals
+sVoiceTrackSounds = 0x800B2A34; // s32[4] (0x78, 0x28, 0x3D, 0x5B): sounds whose voice stops with the music track (SndVoice.hasTrack = 1 when soundId is one of them)
+sVoiceNoUnkC4Sounds = 0x800B2A44; // s32[6] (0x1B6, 0x1B7, 0x1CF, 0x467, 0x7D0, 0x7D2): sounds whose voice gets SndVoice.unkC4 = 0 (1 for every other sound)
+gFinalScoreMenuDesc = 0x800C1E54; // MenuDesc in the main code's data (items 0x800C1DA0, 5 of them, init FinalScoreMenu_Init): PlayerState17_Enter opens it on gEngineApp_m_Game.m_MenuPool
+sEnterCheatKeyLabels = 0x800C1144; // char[27][4]: the cheat keyboard's labels " ", "Z", "Y", ... "A" (EnterCheatMenu_ResultLabel, CheatMenu_WarpText's default; the port reads it as bytes)
+sPakMenuText_Space = 0x800C140C; // " " (PakMenu items' blank text; after sPakMenuText_Spaces3 "   ")
+sMissionMenuText_Space = 0x800C1768; // " " (MissionMenu items' blank text)
+sBossOverlayScript = 0x800B2C30; // COverlay script COnScreen__ResetBossBars starts on m_BossOverlay (its first word 1, then 0, -40: the slide of the boss bar); 0x10 bytes, in the main code's unowned .rodata blob
+sBoss2OverlayScript = 0x800B2C40; // the same for m_BossOverlay2 (-20)
+sDeferredAlphaTexture = 0x800AB680; // texture data: Render_BeginDeferredAlpha's G_SETTIMG (0xFD) points at it

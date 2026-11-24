@@ -1,4 +1,4 @@
-/* CPlayer code: CPlayer__StopLoopingSounds, 0x0042EB04-0x0042EB4C (splat had it inside the data D_0042D50C). */
+/* CPlayer code: CPlayer__StopLoopingSounds, 0x0042EB04-0x0042EB4C (splat had it inside the data at 0x0042D50C). */
 #include "common.h"
 #include "structs/player.h"
 #include "protos/game.h"

@@ -424,13 +424,13 @@ s32 EnterCheatMenu_Enter_2(void)
 }
 
 /* The cheat keyboard's labels (see vm1's EnterCheatMenu_ResultLabel). */
-extern u8 D_800C1144[];
+extern u8 sEnterCheatKeyLabels[]; /* local: globals/menu_text.h is included further down */
 
 s32 EnterCheatMenu_ResultLabel_2(MenuItem *arg0) {
     if ((u32) sEnterCheatResult < 0xCU) {
         arg0->table = (s32 *) sCheatCodes_2[sEnterCheatResult].unk4;
     } else {
-        arg0->table = (s32 *) D_800C1144;
+        arg0->table = (s32 *) sEnterCheatKeyLabels;
     }
     return 0;
 }
@@ -517,7 +517,7 @@ s32 CheatMenu_ToggleFlag_2(s32 arg0, s32 arg1) {
 
 s32 CheatMenu_WarpText_2(MenuItem *o) {
     switch (sCheatsMenuSelection) {
-    default: o->text = (char *)D_800C1144; break;
+    default: o->text = (char *)sEnterCheatKeyLabels; break;
     case 0: o->text = (char *)sCheatMenuText_WarpPortOfAdia; break;
     case 1: o->text = (char *)sCheatMenuText_WarpRiverOfSouls; break;
     case 2: o->text = (char *)sCheatMenuText_WarpDeathMarshes; break;

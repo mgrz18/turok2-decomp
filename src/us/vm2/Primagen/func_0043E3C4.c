@@ -19,8 +19,7 @@ void *t2_n64_to_host(u32 addr);
  * WeightedTable_PickStatic once the Primagen left its first stage). Referenced here, gendata
  * emits them as Pick tables (host byte order) and the symbol table maps their N64 addresses. */
 #include "structs/pick.h"
-extern Pick D_004315C8[], D_004315DC[], D_00431608[], D_00431618[];
-Pick *const t2_sPrimagenSoundPicks[] = { D_004315C8, D_004315DC, D_00431608, D_00431618 };
+Pick *const t2_sPrimagenSoundPicks[] = { sPrimagenSoundScript1Picks, sPrimagenSoundScript2Picks, sPrimagenSoundScript3Picks, sPrimagenSoundScript4Picks };
 #else
 #define BOSS_STEP_PTR(v) (v)
 #endif

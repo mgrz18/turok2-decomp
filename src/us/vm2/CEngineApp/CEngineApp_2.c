@@ -7,7 +7,7 @@
 /* Initialise a unit quad (4 vertices in the XZ plane, 32x32 texels, white). */
 
 
-extern Vtx_t gUnitQuadVtx[4]; /* local: no header declares it (globals/render.h has no Vtx_t) */
+#include "globals/render.h"
 
 void Render_InitUnitQuad_2(void) {
     Vtx_t *v;

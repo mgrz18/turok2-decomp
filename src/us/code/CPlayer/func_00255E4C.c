@@ -13,7 +13,7 @@
 #endif
 
 /* Menu state: the current player pointer is the word at 0x20 (gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead). */
-extern char D_800C1E54[];
+#include "globals/menu_desc.h"
 
 
 void PlayerState17_Enter(CPlayer *player) {
@@ -22,6 +22,6 @@ void PlayerState17_Enter(CPlayer *player) {
     P_S32(player, 0x1298) = 0;
     P_S32(player, 0xD4) &= ~0x800000;
     if (player == current) {
-        MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, D_800C1E54, player, (sptr) player->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, &gFinalScoreMenuDesc, player, (sptr) player->m_ContState.m_pContState, NULL);
     }
 }

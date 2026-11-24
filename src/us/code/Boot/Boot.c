@@ -1,6 +1,6 @@
 /* Boundary fixed in versions/cuts.us.txt: splat's func_0028D374 starts with 3 stray words (a jal
  * Shadow_DrawBlob / swc1 / addu tail that nothing executes); the real function
- * starts at 0x28D380 (splat's D_0028D380), 0x38C bytes. */
+ * starts at 0x28D380 (splat's label there), 0x38C bytes. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002A7F58.c,
  * func_802A71C0_de, with Turok 2's layouts. */
 

@@ -538,13 +538,12 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
 }
 
 extern void Texture_InvalidateCache();
-extern char D_800AB680;
 
 void Render_BeginDeferredAlpha(void) {
     Gfx *cmd;
     Texture_InvalidateCache();
     cmd = gDList++;
-    { Gfx *_gbi = (Gfx *)(cmd); _gbi->w0 = ((((unsigned int)(0xFD) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (21)) | (((unsigned int)(2) & (0xFFFFFFFFU >> (32 - (2)))) << (19)) | (((unsigned int)((1) - 1) & (0xFFFFFFFFU >> (32 - (12)))) << (0))); _gbi->w1 = (GBI_ADDR(&D_800AB680)); };
+    { Gfx *_gbi = (Gfx *)(cmd); _gbi->w0 = ((((unsigned int)(0xFD) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (21)) | (((unsigned int)(2) & (0xFFFFFFFFU >> (32 - (2)))) << (19)) | (((unsigned int)((1) - 1) & (0xFFFFFFFFU >> (32 - (12)))) << (0))); _gbi->w1 = (GBI_ADDR(sDeferredAlphaTexture)); };
     cmd = gDList++;
     { Gfx *_gbi = (Gfx *)(cmd); _gbi->w0 = ((((unsigned int)(0xF5) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (21)) | (((unsigned int)(2) & (0xFFFFFFFFU >> (32 - (2)))) << (19)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (9)))) << (9)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (9)))) << (0))); _gbi->w1 = ((((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (4)))) << (20)) | (((unsigned int)((((unsigned int)(0x0)) << 1)) & (0xFFFFFFFFU >> (32 - (2)))) << (18)) | (((unsigned int)(5) & (0xFFFFFFFFU >> (32 - (4)))) << (14)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (4)))) << (10)) | (((unsigned int)((((unsigned int)(0x0)) << 1)) & (0xFFFFFFFFU >> (32 - (2)))) << (8)) | (((unsigned int)(5) & (0xFFFFFFFFU >> (32 - (4)))) << (4)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (4)))) << (0))); };
     cmd = gDList++;
@@ -973,7 +972,6 @@ void Render_DrawModel(void **resource, void *matrix, s32 segment, char *lights, 
 #include "structs/model.h"
 #include "globals/batch.h"
 
-extern u8 D_800D8E13;               /* low byte of the pass */
 
 /* Returns the node keyed key in the tree under n, or the node a new key would hang from. */
 static __inline__ SortNode *find_node(SortNode *n, u32 key) {
@@ -1024,7 +1022,9 @@ void Render_FlushModelBatch(void) {
         for (i = 0; i < count; i++) {
             part = CISet__GetBlock(parts, i);
             material = CISet__GetBlock(part, 0);
-            key = (material->id << 8) | D_800D8E13;
+            /* byte 3 of the pass word: its low byte on the N64 (a symbol of its own at 0x800D8E13 before); on a
+             * little-endian host the high byte, as the port read it before (kept: same output) */
+            key = (material->id << 8) | ((u8 *)&sBatchPass)[3];
             if (material->flags & 0x700) {
                 parent = find_node(sTranslucentSortRoot, key);
             } else {

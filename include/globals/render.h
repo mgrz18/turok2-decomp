@@ -8,6 +8,7 @@
 #include "gfx.h"
 #include "structs/light.h"
 #include "structs/vector.h"
+#include "structs/gbi.h"
 
 extern s32 gScreenWidth;            /* Turok 3's screen_width */
 extern s32 gScreenHeight;           /* Turok 3's screen_height */
@@ -77,7 +78,7 @@ extern s32 sTexLastWrapT;
 
 /* Lit vertices and the expansion-pak screen */
 #ifdef TARGET_PORT
-/* 0x800DD790-0x800E6790 on the N64: 0x9000 bytes, 3072 vertices (D_800DD794/8 and D_800DE1E0 inside it
+/* 0x800DD790-0x800E6790 on the N64: 0x9000 bytes, 3072 vertices (0x800DD794/8 and 0x800DE1E0 inside it
  * are labels, not objects). The ELF gives the symbol no size, so gendata made it one CVector3 and
  * Actors_AccumulateVertexLighting overran it into gAudioWorld and gLoopSounds. */
 extern CVector3 sLitVertexOffsets[0x9000 / 12];
@@ -85,6 +86,9 @@ extern CVector3 sLitVertexOffsets[0x9000 / 12];
 extern CVector3 sLitVertexOffsets[];
 #endif
 extern f32 sExpansionPakMtx[2][16];   /* per-frame matrices (Mtx) */
+extern Gfx sDecalSetupDList[];         /* the decals' render mode and combiner (SwooshSystem_DrawDecals) */
+extern u8 sDeferredAlphaTexture[];     /* the texture Render_BeginDeferredAlpha loads */
+extern Vtx_t gUnitQuadVtx[4];        /* the unit quad Render_InitUnitQuad builds (XZ plane, white, 32x32 texels) */
 
 /* The VI mode: the selected mode index */
 extern s16 sViModeIndex;            /* the selected VI mode (osViModeTable index) */

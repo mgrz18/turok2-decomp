@@ -1,4 +1,4 @@
-/* CPlayer code: CPlayer__SetCharacter, 0x0042E430-0x0042E5AC (splat had it inside the data D_0042D50C). */
+/* CPlayer code: CPlayer__SetCharacter, 0x0042E430-0x0042E5AC (splat had it inside the data at 0x0042D50C). */
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"

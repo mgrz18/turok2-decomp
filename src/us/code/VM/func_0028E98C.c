@@ -1,5 +1,5 @@
 /* Boundary fixed in versions/cuts.us.txt: splat's VM_ManagerThread (0x23C bytes) holds three functions:
- * VM_ManagerThread (0x100), the reader thread at 0x28E8A4 (splat's D_0028E8A4,
+ * VM_ManagerThread (0x100), the reader thread at 0x28E8A4 (splat's label there,
  * 0xE8) and an unlink at 0x28E98C (0x54). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCHED/8023A284_16.CPP, func_8023C924_de,
  * func_8023CA14_de and func_8023CB0C_de, with Turok 2's layouts. */

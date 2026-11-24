@@ -2,7 +2,7 @@
 #include "common.h"
 #include "structs/gbi.h"
 
-extern Vtx_t gUnitQuadVtx[4]; /* local: no header declares it (globals/render.h has no Vtx_t) */
+#include "globals/render.h"
 
 /* Builds a unit quad in the XZ plane, white, textured 32x32 (S10.5 texture coordinates). */
 void Render_InitUnitQuad(void) {

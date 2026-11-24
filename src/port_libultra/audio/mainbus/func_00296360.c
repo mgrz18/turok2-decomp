@@ -1,5 +1,5 @@
 /* Boundary fixed in versions/cuts.us.txt: splat starts func_0029635C one word early (a stray word); the
- * function starts at 0x296360 (D_00296360). */
+ * function starts at 0x296360 (alMainBusPull). */
 /* From decompals/ultralib (libultra 2.0I): src/audio/mainbus.c, alMainBusPull. */
 
 #include "common.h"

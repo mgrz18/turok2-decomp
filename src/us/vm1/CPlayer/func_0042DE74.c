@@ -1,4 +1,4 @@
-/* CPlayer code: CPlayer__LevelStart, 0x0042DE74-0x0042E14C (splat had it inside the data D_0042D50C). */
+/* CPlayer code: CPlayer__LevelStart, 0x0042DE74-0x0042E14C (splat had it inside the data at 0x0042D50C). */
 #include "common.h"
 #include "structs/game.h"
 #include "structs/player.h"

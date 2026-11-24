@@ -30,7 +30,6 @@ typedef struct Resource {
     /* 0x4 */ s32 size;
 } Resource;
 
-extern f32 D_800E6790;
 
 s32 ProPackDecompress(Resource **res, s32 arg1);
 s32 Anim_DecodeTracks(void *source, Pack *table, s32 tracks, s32 channels, s32 radius, s32 encoding);
@@ -85,7 +84,7 @@ static __inline__ s32 decodeAnim(void *src, void *dst) {
     sAnimDecodeRotation = 0;
     sAnimRemapMin = -2000.0f;
     sAnimRemapMax = 2000.0f;
-    D_800E6790 = h->fC;
+    sAnimDecodeUnkC = h->fC;
     if (Anim_DecodeTracks(posSrc, posDst, h->posTracks, 3, h->radius, h->encoding) == 0) {
         ok = 0;
     } else {
@@ -93,7 +92,7 @@ static __inline__ s32 decodeAnim(void *src, void *dst) {
         sAnimDecodeRotation = 1;
         sAnimRemapMin = -1.0f;
         sAnimRemapMax = 1.0f;
-        D_800E6790 = h->fC;
+        sAnimDecodeUnkC = h->fC;
         ok = Anim_DecodeTracks(rotSrc, rotDst, h->rotTracks, 4, h->radius, h->encoding) != 0;
     }
     return ok;
