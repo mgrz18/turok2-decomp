@@ -3070,10 +3070,7 @@ segments:
       - [0xC1F10, .rodata, vm1/OptionsMenu/OptionsMenu]
       - [0xC1F30, .rodata, vm1/StatsMenu/StatsMenu]
       - [0xC1F38, rodata]
-      - [0xC1F40, .rodata, vm1/NameEntryMenu/func_0041D050]
-      - [0xC1F48, .rodata, vm1/NameEntryMenu/func_0041D2C4]
-      - [0xC1F4C, rodata]
-      - [0xC1FE0, .rodata, vm1/NameEntryMenu/func_0041D51C]
+      - [0xC1F40, .rodata, vm1/NameEntryMenu/NameEntryMenu]
       - [0xC1FEC, rodata]
       - [0xC1FF0, .rodata, vm1/PakMenu/func_0041D890]
       - [0xC2004, .rodata, vm1/PakMenu/func_0041FB50]
@@ -3581,14 +3578,7 @@ segments:
       - [0x166954, hasm, ../src/us/asm/stray_0041C954]
       - [0x166960, c, vm1/StatsMenu/StatsMenu]
       - [0x16704C, hasm, ../src/us/asm/stray_0041D04C]
-      - [0x167050, c, vm1/NameEntryMenu/func_0041D050]
-      - [0x1672C4, c, vm1/NameEntryMenu/func_0041D2C4]
-      - [0x167414, c, vm1/NameEntryMenu/func_0041D414]
-      - [0x1674E4, c, vm1/NameEntryMenu/func_0041D4E4]
-      - [0x16751C, c, vm1/NameEntryMenu/func_0041D51C]
-      - [0x1676D4, c, vm1/NameEntryMenu/func_0041D6D4]
-      - [0x16776C, c, vm1/NameEntryMenu/func_0041D76C]
-      - [0x16784C, c, vm1/NameEntryMenu/func_0041D84C]
+      - [0x167050, c, vm1/NameEntryMenu/NameEntryMenu]
       - [0x167884, hasm, ../src/us/asm/stray_0041D884]
       - [0x167890, c, vm1/PakMenu/func_0041D890]
       - [0x167A28, c, vm1/PakMenu/func_0041DA28]
@@ -3899,6 +3889,8 @@ segments:
       - [0x17A4FC, hasm, ../src/us/asm/stray_004304FC]
       - [0x17A500, c, vm1/Automap/func_00430500]
       - [0x17A7A8, data, virtual_rodata_0]   # func_00430500 runs to 0x4307A8; two junk words, then the data at 0x4307B0
+      - [0x184D10, .data, vm1/NameEntryMenu/NameEntryMenu]   # gNameEntryMenuItems, gNameEntryMenuDesc (C, round 26)
+      - [0x185388, data]                                     # linker padding (stale words), then PakMenu's tables
 
   # Split from `virtual` rather than left as two more subsegments of it.
   #

@@ -403,4 +403,11 @@ extern char sDebugMenuText_DebugAis[];                   /* "debug         :   a
 extern char sDebugMenuText_DebugSnd[];                   /* "debug         :   snd" */
 extern char sDebugMenuText_DebugLinks[];                 /* "debug         : links" */
 
+/* Round 26 (o2): the name entry menu's texts the engine pool holds (its key table is C now,
+ * vm1 NameEntryMenu.c): the title and the three special keys (font glyphs 2, 3, 4). */
+extern char sNameEntryText_Edit[];                       /* "edit" */
+extern char sNameEntryText_Glyph2[];                     /* "\x02" (a space key) */
+extern char sNameEntryText_Glyph3[];                     /* "\x03" (delete) */
+extern char sNameEntryText_Glyph4[];                     /* "\x04" (done) */
+
 #endif

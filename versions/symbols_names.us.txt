@@ -5809,3 +5809,7 @@ gPakError = 0x80130C70;
 gPakFileSystems = 0x80130C80;
 __osPfsPifRam = 0x80130E20;
 gVMPages = 0x80132000;
+sNameEntryText_Edit = 0x800B53E8;
+sNameEntryText_Glyph2 = 0x800B53F0;
+sNameEntryText_Glyph3 = 0x800B53F4;
+sNameEntryText_Glyph4 = 0x800B53F8;
