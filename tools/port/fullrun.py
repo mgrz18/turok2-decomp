@@ -256,6 +256,11 @@ class Route:
         # as with --audio, a player with sound and the N64)
         if not N64_SOUND:
             env.append("T2_LEGACY_NOSOUND=1")
+        # round 26 o3: the voice id tables read byte-swapped and the draw sort key's old byte, as before
+        # round 25/26 (port/game/t2debug.c): every route before round 26 was tuned on that; only --legacy
+        if LEGACY:
+            env.append("T2_LEGACY_VOICE=1")
+            env.append("T2_LEGACY_BATCHKEY=1")
         env += list(env_extra) + list(self.extra_env)
         with open(os.path.join(out, "playthrough.txt"), "w") as fp:
             fp.write("\n".join(self.inputs) + "\n")
@@ -629,6 +634,7 @@ L2_STRETCH_NOCHEATS = [(6, 1, 3000), (9, 3, 2000), (12, 15, 2000)]
 # The extra fire windows it needs, as L2_STRETCH entries (segment, step, frames)
 N64_PROPS = False  # round 17 f3: --n64-props
 N64_SOUND = False  # round 17 merge: --n64-sound
+LEGACY = False     # round 26 o3: --legacy (T2_LEGACY_VOICE, T2_LEGACY_BATCHKEY)
 N64_SHAKE = False
 N64_FROM = None       # --n64-shake-from L (round 17 f2): the N64's stream only from level L's hub visit on
 
@@ -1597,7 +1603,7 @@ LEVEL_HOOKS = {5: level5, 6: level6}
 def cli(argv=None):
     """The command line (also `playthrough.py OUT --all [these options]`, round 13 C28)."""
     global LAIR_PUSH
-    global NAV, NAV_ONLY, NAV_JUMPS, NAV_PAD, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_SOUND, N64_FROM, LAIR_KEEP, L2_HEAL
+    global NAV, NAV_ONLY, NAV_JUMPS, NAV_PAD, L6_SLOT_AFTER, HOP, PRIMAGEN_LATE, LAIR_STRAFE, LAIR_FRONT, LAIR_DRIVE, LAIR_PEEK, STICK_AIM, ASSIST_KEEP, ARMS_HUB_WAIT, N64_SHAKE, N64_PROPS, N64_SOUND, N64_FROM, LAIR_KEEP, L2_HEAL, LEGACY
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
@@ -1658,7 +1664,8 @@ def cli(argv=None):
                     "--n64-sound together, the stream a human player gets (round 18 g1; the default since the "
                     "round 18 merge: kept as an explicit spelling)")
     ap.add_argument("--legacy", action="store_true", help="the old stream the routes before round 18 were tuned on "
-                    "(round 18 merge): T2_LEGACY_SHAKE, T2_LEGACY_INTEL9 and T2_LEGACY_NOSOUND; --n64-shake, "
+                    "(round 18 merge): T2_LEGACY_SHAKE, T2_LEGACY_INTEL9 and T2_LEGACY_NOSOUND, and (round 26) "
+                    "T2_LEGACY_VOICE, T2_LEGACY_BATCHKEY; --n64-shake, "
                     "--n64-props, --n64-sound then lift one each (the validated combinations of rounds 13-18)")
     ap.add_argument("--n64-shake-from", type=int, default=None, choices=(4, 5, 6, 7),
                     help="DEBUG-ONLY (round 17 f2): the old stream (T2_LEGACY_SHAKE) up to the hub visit before "
@@ -1678,6 +1685,7 @@ def cli(argv=None):
     N64_SHAKE = a.n64_shake or not a.legacy
     N64_PROPS = a.n64_props or not a.legacy
     N64_SOUND = a.n64_sound or not a.legacy
+    LEGACY = a.legacy
     N64_FROM = a.n64_shake_from
     LAIR_KEEP = a.lair_keep
     LAIR_FRONT = a.lair_front
