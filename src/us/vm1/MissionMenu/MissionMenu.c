@@ -1,0 +1,441 @@
+#include "common.h"
+#include "globals/menu_text.h"
+#include "structs/menu.h"
+#include "globals/menu.h"
+#include "globals/scene.h"
+#include "protos/scene.h"
+
+s32 MenuItem_TextLength(void *item);
+
+s32 MissionMenu_UpdateObjective1Count(MenuItem *item) {
+    s32 rank = -1;
+
+    switch (sMissionHub) {
+        case -1:
+        case 0:
+        default:
+            item->text = sMissionMenuText_Unavailable;
+            break;
+        case 1:
+            item->text = sMissionMenuText_ActivatedXOf3;
+            rank = CScene__GetLinkGroupCount(&gScene, 2);
+            if (rank != -1) {
+                rank = 3 - rank;
+            }
+            break;
+        case 2:
+            item->text = sMissionMenuText_DestroyedXOf2;
+            rank = CScene__GetLinkGroupCount(&gScene, 4);
+            if (rank != -1) {
+                rank = 2 - rank;
+            }
+            break;
+        case 3:
+            item->text = sMissionMenuText_RescuedXOf5;
+            rank = CScene__GetLinkGroupCount(&gScene, 6);
+            if (rank != -1) {
+                rank = 5 - rank;
+            }
+            break;
+        case 4:
+            item->text = sMissionMenuText_SealedXOf3;
+            rank = CScene__GetLinkGroupCount(&gScene, 8);
+            if (rank != -1) {
+                rank = 3 - rank;
+            }
+            break;
+        case 5:
+            item->text = sMissionMenuText_DestroyedXOf3_B44E8;
+            rank = CScene__GetLinkGroupCount(&gScene, 9);
+            if (rank != -1) {
+                rank = 3 - rank;
+            }
+            break;
+        case 6:
+            item->text = sMissionMenuText_RecalibratedXOf4;
+            rank = CScene__GetLinkGroupCount(&gScene, 11);
+            if (rank != -1) {
+                rank = 4 - rank;
+            }
+            break;
+    }
+    if (rank != -1) {
+        item->text[MenuItem_TextLength(item) - 6] = rank + '0';
+    }
+    return 0;
+}
+
+s32 MissionMenu_UpdateObjective2Count(MenuItem *item) {
+    s32 rank = -1;
+
+    switch (sMissionHub) {
+        case -1:
+        case 0:
+        default:
+            item->text = sMissionMenuText_Space;
+            break;
+        case 1:
+            item->text = sMissionMenuText_RescuedXOf4;
+            rank = CScene__GetLinkGroupCount(&gScene, 3);
+            if (rank != -1) {
+                rank = 4 - rank;
+            }
+            break;
+        case 2:
+            item->text = sMissionMenuText_DestroyedXOf3_B441C;
+            rank = CScene__GetLinkGroupCount(&gScene, 5);
+            if (rank != -1) {
+                rank = 3 - rank;
+            }
+            break;
+        case 3:
+            item->text = sMissionMenuText_DestroyedXOf3_B4470;
+            rank = CScene__GetLinkGroupCount(&gScene, 7);
+            if (rank != -1) {
+                rank = 3 - rank;
+            }
+            break;
+        case 4:
+            item->text = sMissionMenuText_Space;
+            break;
+        case 5:
+            item->text = sMissionMenuText_DestroyedXOf1;
+            rank = CScene__GetLinkGroupCount(&gScene, 10);
+            if (rank != -1) {
+                rank = 1 - rank;
+            }
+            break;
+        case 6:
+            item->text = sMissionMenuText_DestroyedXOf;
+            rank = CScene__GetLinkGroupCount(&gScene, 12);
+            if (rank != -1) {
+                rank = 3 - rank;
+                if (rank == 3) {
+                    item->text = sMissionMenuText_DestroyedXOf3_B4574;
+                }
+            }
+            break;
+    }
+    if (rank != -1) {
+        item->text[MenuItem_TextLength(item) - 6] = rank + '0';
+    }
+    return 0;
+}
+
+void func_00424EF4(s32 arg0) {
+    CScene__GetLinkGroupCount(&gScene, arg0);
+}
+
+#include "m2c_macros.h"
+
+s32 Level_GetHub(s32);
+
+void MissionMenu_InitStatus(void) {
+    sMissionHub = Level_GetHub(gScene_m_LevelID);
+    sMissionFailed = 0;
+}
+
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80442A58_de_3.c, func_80444314_eu.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+
+#include "rw/abu_types.h"
+
+extern s32 Level_GetHub(s32);
+
+void MissionMenu_InitFailed(void) {
+    sMissionHub = Level_GetHub(gScene_m_LevelID);
+    sMissionFailed = 1;
+}
+
+s32 MissionMenu_UpdateTitle(MenuItem *arg0) {
+    if (sMissionFailed != 0) {
+        arg0->table = &sMissionMenuText_MissionFailed;
+    } else {
+        arg0->table = &sMissionMenuText_MissionStatus;
+    }
+    return 1;
+}
+
+s32 MissionMenu_UpdateLevelName(MenuItem *item) {
+    switch (sMissionHub) {
+        case -1:
+        case 0:
+        default:
+            item->text = sMissionMenuText_Space;
+            break;
+        case 1:
+            item->text = sMissionMenuText_PortOfAdia;
+            break;
+        case 2:
+            item->text = sMissionMenuText_RiverOfSouls;
+            break;
+        case 3:
+            item->text = sMissionMenuText_DeathMarshes;
+            break;
+        case 4:
+            item->text = sMissionMenuText_LairOfTheBlindOnes;
+            break;
+        case 5:
+            item->text = sMissionMenuText_HiveOfTheMantids;
+            break;
+        case 6:
+            item->text = sMissionMenuText_PrimagensLightship;
+            break;
+    }
+    return 0;
+}
+
+s32 MissionMenu_UpdateObjective1(MenuItem *item) {
+    switch (sMissionHub) {
+        case -1:
+        case 0:
+        default:
+            item->text = sMissionMenuText_Space;
+            break;
+        case 1:
+            item->text = sMissionMenuText_DistressBeacons;
+            break;
+        case 2:
+            item->text = sMissionMenuText_SoulGates;
+            break;
+        case 3:
+            item->text = sMissionMenuText_Prisoners;
+            break;
+        case 4:
+            item->text = sMissionMenuText_ThermalVents;
+            break;
+        case 5:
+            item->text = sMissionMenuText_QueenEmbryos;
+            break;
+        case 6:
+            item->text = sMissionMenuText_PowerGenerators;
+            break;
+    }
+    return 0;
+}
+
+s32 MissionMenu_UpdateObjective2(MenuItem *item) {
+    switch (sMissionHub) {
+        case -1:
+        case 0:
+        default:
+            item->text = sMissionMenuText_Space;
+            break;
+        case 1:
+            item->text = sMissionMenuText_Children;
+            break;
+        case 2:
+            item->text = sMissionMenuText_SistersOfDespair;
+            break;
+        case 3:
+            item->text = sMissionMenuText_AmmoStorageFacilities;
+            break;
+        case 4:
+            item->text = sMissionMenuText_Space;
+            break;
+        case 5:
+            item->text = sMissionMenuText_MasterComputers;
+            break;
+        case 6:
+            item->text = sMissionMenuText_AssemblyPlants;
+            break;
+    }
+    return 0;
+}
+
+#include "protos/game.h"
+
+void Music_RestoreVolume(void);
+void LoopSounds_Resume(sptr);
+void Controller_ResetAllRumble(void);
+void Controller_SetRumbleOptionAll(s32);
+void MenuItem_SelectSubmenu(sptr, sptr, sptr);
+
+s32 MissionMenu_SelectOk(sptr arg0, sptr arg1, sptr arg2) {
+    s32 ret;
+
+    Music_RestoreVolume();
+    LoopSounds_Resume(LoopSounds_Get());
+    if (sMissionFailed == 0) {
+        MenuItem_SelectSubmenu(arg0, arg1, arg2);
+        ret = 1;
+    } else {
+        Controller_ResetAllRumble();
+        Controller_SetRumbleOptionAll(1);
+        ret = 1;
+    }
+    return ret;
+}
+
+#include "gfx.h"
+#include "globals/frame.h"
+#include "globals/render.h"
+#include "globals/framebuffer.h"
+#include "structs/frame.h"
+#include "structs/cache.h"
+
+/* Frees and reallocates the frame buffers, the depth buffer and the
+ * display-list memory. A handle points at a struct whose first word is the
+ * block address. */
+
+
+
+extern CMemEntry *CCache__Allocate(s32 heap, s32 size, s32 flags, char *name); /* allocate */
+extern CMemEntry *CCache__AllocateAt(s32 heap, sptr addr, s32 size, char *name);  /* claim a fixed block */
+extern void CCache__Deallocate(sptr heap, CMemEntry *handle);                     /* free */
+extern u32 GetMemSize(void);                                             /* osGetMemSize */
+extern void memset(void *dst, s32 value, uptr size);                  /* memset */
+#ifdef TARGET_PORT
+/* The host heap is an arena (port/runtime/t2boot.c), not [end of image, top of RDRAM - 512 KB):
+ * the "top of RDRAM" the frame buffers are placed under is the arena's end + 512 KB. */
+extern uptr T2Port_RdramTop(void);
+#endif
+
+void GfxPool_Alloc(CGfxPool *pool) {
+    u32 mb = 0x100000;
+    u32 i;
+    s32 j;
+    s32 n;
+    CMemEntry *depth;
+    CMemEntry *fb;
+    CMemEntry *block;
+    u32 size;
+    uptr base;
+
+    if (pool->gfx != 0) {
+        CCache__Deallocate(0, pool->gfx);
+    }
+    if (pool->dynamic != 0) {
+        CCache__Deallocate(0, pool->dynamic);
+    }
+    if (pool->depth != 0) {
+        CCache__Deallocate(0, pool->depth);
+    }
+    if (pool->vtx != 0) {
+        CCache__Deallocate(0, pool->vtx);
+    }
+    for (n = 0; n < 3; n++) {
+        if (pool->fb[n] != 0) {
+            CCache__Deallocate(0, pool->fb[n]);
+        }
+    }
+
+    pool->ready = 0;
+    pool->gfx = 0;
+    pool->dynamic = 0;
+    pool->depth = 0;
+    pool->vtx = 0;
+    for (j = 2; j >= 0; j--) {
+        pool->fb[j] = 0;
+    }
+
+    if (GetMemSize() >= mb * 6) {
+        size = 0x54600;
+#ifdef TARGET_PORT
+        base = T2Port_RdramTop();
+#else
+        base = GetMemSize() | 0x80000000;
+#endif
+        depth = CCache__AllocateAt(0, base - mb, size, "Z-Buffer");
+        fb = CCache__AllocateAt(0, base - mb * 2, 0xFD200, "Display Buffer");
+        memset((void *) (uptr)fb->data, 0, 0xFD200);
+        memset((void *) (uptr)depth->data, 0, 0x54600);
+        pool->depth = depth;
+        pool->fb[0] = fb;
+        gDepthBuffer = (uptr)pool->depth->data;
+        for (i = 0; i < gTotalFramebuffers; i++) {
+            gCFB[i] = (uptr)fb->data + i * size;
+        }
+    } else {
+        size = 0x1ECC0;
+        base = 0x80400000;
+        block = CCache__AllocateAt(0, base - (gTotalFramebuffers + 1) * size, (gTotalFramebuffers + 1) * size, "color frame buffers + z buffer");
+        pool->fb[0] = block;
+        for (i = 0; i < gTotalFramebuffers; i++) {
+            gCFB[i] = (uptr)block->data + i * size;
+        }
+        gDepthBuffer = (uptr)block->data + size * i;
+    }
+    for (i = 0; i < gTotalFramebuffers; i++) {
+        memset((void *) gCFB[i], 0, size);
+    }
+    memset((void *) gDepthBuffer, 0, size);
+    pool->gfx = CCache__Allocate(0, (gDisplayListSize + gLineListSize) * (2 * GFX_SIZE), 0x23, "display lists");
+    pool->dynamic = CCache__Allocate(0, 0x8000, 0x23, "fifo");
+    pool->vtx = CCache__Allocate(0, 0x22000, 0x23, sGfxPoolText_AudioHeap);
+    gDisplayList1 = (uptr)pool->gfx->data;
+    gLineList0 = gDisplayList1 + gDisplayListSize * GFX_SIZE;
+    gDisplayList0 = gLineList0 + gLineListSize * GFX_SIZE;
+    gLineList1 = gDisplayList0 + gDisplayListSize * GFX_SIZE;
+    gRspFifoSize = 0x8000;
+    gAudioHeapSize = 0x22000;
+    gRspFifoBuffer = (u64 *) (uptr)pool->dynamic->data;
+    gAudioHeapBase = (uptr)pool->vtx->data;
+    for (i = 0; i < gTotalFramebuffers; i++)
+        ;
+    pool->ready = 1;
+}
+
+/* A record of eight words this clears. */
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 unkC[3];
+    /* 0x18 */ s32 unk18;
+    /* 0x1C */ s32 unk1C;
+} Record8;
+
+void GfxPool_Clear(Record8 *arg0) {
+    s32 var_v1;
+    s32 *var_v0;
+
+    var_v1 = 2;
+    var_v0 = &arg0->unk8;
+    arg0->unk0 = 0;
+    arg0->unk4 = 0;
+    arg0->unk8 = 0;
+    arg0->unk18 = 0;
+    arg0->unk1C = 0;
+    do {
+        var_v0[3] = 0;
+        var_v1 -= 1;
+        var_v0 -= 1;
+    } while (var_v1 >= 0);
+}
+
+/* Frees the graphics pool's cache blocks (as GfxPool_Alloc does first) and clears it. */
+void GfxPool_Free(CGfxPool *pool) {
+    s32 n;
+    s32 j;
+
+    if (pool->gfx != 0) {
+        CCache__Deallocate(0, pool->gfx);
+    }
+    if (pool->dynamic != 0) {
+        CCache__Deallocate(0, pool->dynamic);
+    }
+    if (pool->depth != 0) {
+        CCache__Deallocate(0, pool->depth);
+    }
+    if (pool->vtx != 0) {
+        CCache__Deallocate(0, pool->vtx);
+    }
+    n = 0;
+    do {
+        if (pool->fb[n] != 0) {
+            CCache__Deallocate(0, pool->fb[n]);
+        }
+        n++;
+    } while (n < 3);
+    j = 2;
+    pool->ready = 0;
+    pool->gfx = 0;
+    pool->dynamic = 0;
+    pool->depth = 0;
+    pool->vtx = 0;
+    do {
+        pool->fb[j] = 0;
+        j--;
+    } while (j >= 0);
+}
