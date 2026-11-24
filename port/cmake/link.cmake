@@ -38,13 +38,13 @@ set(T2_LINK_REPLACED
     func_0029A080.c   # __osSiRawStartDma
     # system, TLB, 64DD
     func_0029B1F0.c   # osInitialize
-    func_0028E5D0.c   # osMapTLBRdb
+    # (osMapTLBRdb: under #ifndef TARGET_PORT in the merged VM.c)
     func_0029D370.c   # osLeoDiskInit
     # engine boot and VM (t2boot.c)
     func_00202130.c   # InitializeSystemResources (heap = host arena)
-    func_0028D820.c   # VM_Initialize (no pager)
-    func_0028E60C.c   # VM_Alloc (resident copy)
-    func_0028E6DC.c   # VM_Free
+    # (VM_Initialize: under #ifndef TARGET_PORT in the merged VM.c)
+    # (VM_Alloc: under #ifndef TARGET_PORT in the merged VM.c)
+    # (VM_Free: under #ifndef TARGET_PORT in the merged VM.c)
     # audio (docs/port/AUDIO.md): Sound__Initialize in t2boot.c (only with --audio); the SDK
     # audio manager in port/audio/t2audio_mgr.c (frames through the ABI1 interpreter, resident
     # wave data instead of the loader's DMA windows)
