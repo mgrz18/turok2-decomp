@@ -110,18 +110,21 @@ typedef struct {
 } Info0040457C;
 #endif
 
-extern ModeState0040457C gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
+extern ModeState0040457C gLevelScript_v0040457C __asm__("gLevelScript"); /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
 CGameObjectInstance *CPlayerPool__FindNearest(void *game, CVector3 pos);
 f32 Random_Blend(f32 lo, f32 hi);
-sptr CInstancePool__Spawn(void *a0, s32 a1, s32 model, sptr handle, sptr region, CVector3 pos, f32 a6, CVector3 rot, CVector3 scale, sptr a9);
-void AI_UpdateTargets(CGameObjectInstance *actor, void *level, Info0040457C *info, s32 a3, s32 a4);
+struct CGameObjectInstance *CInstancePool__Spawn(void *, s32, s32, void *, void *, CVector3, f32, CVector3, CVector3, s32 *);
+void AI_UpdateTargets(CGameObjectInstance *, CAI *, CAITargets *, s32, s32);
 void Primagen_NextSpawnStep(void);
-void Primagen_RunSpawnStep(CGameObjectInstance *actor, void *level, s32 a2);
+s32 Primagen_RunSpawnStep(void);
+/* the ROM's call passes the actor, the CAI and the target's word in a0-a2 (the definition reads none) */
+#define Primagen_RunSpawnStep_3 ((void (*)(CGameObjectInstance *, void *, s32)) Primagen_RunSpawnStep)
 void Primagen_NextSoundStep(void);
-void Primagen_RunSoundStep(CGameObjectInstance *actor, void *level, s32 a2);
+s32 Primagen_RunSoundStep(CGameObjectInstance *);
+#define Primagen_RunSoundStep_3 ((void (*)(CGameObjectInstance *, void *, s32)) Primagen_RunSoundStep)
 
 static __inline__ Wave0040457C *CurrentWave(void) {
-    return (Wave0040457C *)(gLevelScript.wave * sizeof(Wave0040457C) + (sptr)gLevelScript.waves);
+    return (Wave0040457C *)(gLevelScript_v0040457C.wave * sizeof(Wave0040457C) + (sptr)gLevelScript_v0040457C.waves);
 }
 
 void Primagen_UpdateSpawner(CGameObjectInstance *actor, void *level) {
@@ -140,127 +143,127 @@ void Primagen_UpdateSpawner(CGameObjectInstance *actor, void *level) {
     if (player == NULL) {
         return;
     }
-    if (gLevelScript.resetRegion != 0) {
-        gLevelScript.region = player->header.m_pCurrentRegion;
-        gLevelScript.resetRegion = 0;
+    if (gLevelScript_v0040457C.resetRegion != 0) {
+        gLevelScript_v0040457C.region = player->header.m_pCurrentRegion;
+        gLevelScript_v0040457C.resetRegion = 0;
     }
-    if (!gLevelScript.doorsOpen) {
-        if (gLevelScript.spawnsLeft > 0) {
-            gLevelScript.doorsOpen = 1;
-            CAI__SetMode(gLevelScript.found[2], gLevelScript.found[2]->ai, 0);
-            CAI__SetMode(gLevelScript.found[3], gLevelScript.found[3]->ai, 0);
+    if (!gLevelScript_v0040457C.doorsOpen) {
+        if (gLevelScript_v0040457C.spawnsLeft > 0) {
+            gLevelScript_v0040457C.doorsOpen = 1;
+            CAI__SetMode(gLevelScript_v0040457C.found[2], gLevelScript_v0040457C.found[2]->ai, 0);
+            CAI__SetMode(gLevelScript_v0040457C.found[3], gLevelScript_v0040457C.found[3]->ai, 0);
         }
     }
-    if (gLevelScript.doorsOpen) {
-        if (gLevelScript.spawnsLeft == 0 && gLevelScript.spawnTimer <= 0.0f) {
-            gLevelScript.doorsOpen = 0;
-            CAI__SetMode(gLevelScript.found[2], gLevelScript.found[2]->ai, 1);
-            CAI__SetMode(gLevelScript.found[3], gLevelScript.found[3]->ai, 1);
+    if (gLevelScript_v0040457C.doorsOpen) {
+        if (gLevelScript_v0040457C.spawnsLeft == 0 && gLevelScript_v0040457C.spawnTimer <= 0.0f) {
+            gLevelScript_v0040457C.doorsOpen = 0;
+            CAI__SetMode(gLevelScript_v0040457C.found[2], gLevelScript_v0040457C.found[2]->ai, 1);
+            CAI__SetMode(gLevelScript_v0040457C.found[3], gLevelScript_v0040457C.found[3]->ai, 1);
         }
     }
-    if (gLevelScript.wavesLeft > 0 && gLevelScript.nextTimer <= 0.0f && gLevelScript.wave != -1) {
+    if (gLevelScript_v0040457C.wavesLeft > 0 && gLevelScript_v0040457C.nextTimer <= 0.0f && gLevelScript_v0040457C.wave != -1) {
         delay = CurrentWave()->delay;
         extra = CurrentWave()->count;
-        gLevelScript.wavesLeft--;
-        if (gLevelScript.wavesLeft == 0) {
-            gLevelScript.wavesDone = 1;
-            gLevelScript.wave = -1;
+        gLevelScript_v0040457C.wavesLeft--;
+        if (gLevelScript_v0040457C.wavesLeft == 0) {
+            gLevelScript_v0040457C.wavesDone = 1;
+            gLevelScript_v0040457C.wave = -1;
         } else if (extra != 3) {
             extra -= 3;
-            gLevelScript.nextTimer = delay - extra * 15 + Random_Blend(0.0f, extra * 2) * 15.0f;
+            gLevelScript_v0040457C.nextTimer = delay - extra * 15 + Random_Blend(0.0f, extra * 2) * 15.0f;
         } else {
-            gLevelScript.nextTimer = delay;
+            gLevelScript_v0040457C.nextTimer = delay;
         }
-        CAI__SetMode(gLevelScript.found[4], gLevelScript.found[4]->ai, 0);
+        CAI__SetMode(gLevelScript_v0040457C.found[4], gLevelScript_v0040457C.found[4]->ai, 0);
     }
-    if ((u32)(gLevelScript.spawnsLeft - 1) < 8 && gLevelScript.waveTimer <= 0.0f) {
+    if ((u32)(gLevelScript_v0040457C.spawnsLeft - 1) < 8 && gLevelScript_v0040457C.waveTimer <= 0.0f) {
         pos.x = 1669.12f;
         pos.y = 1064.96f;
         pos.z = 2816.0f;
         scale.x = 2.0f;
         scale.y = 2.0f;
         scale.z = 2.0f;
-        if (CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->m_vVelocity,
-                          scale, 0)) {
-            gLevelScript.spawnsLeft--;
-            if (gLevelScript.waves != NULL) {
-                if (gLevelScript.spawnsLeft == 0 && CurrentWave()->type != 1) {
-                    gLevelScript.wavesDone = 1;
-                    gLevelScript.wave = -1;
+        if (CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x387, (void *) gLevelScript_v0040457C.handle, (void *) gLevelScript_v0040457C.region, pos, 0.0f, actor->m_vVelocity,
+                          scale, NULL)) {
+            gLevelScript_v0040457C.spawnsLeft--;
+            if (gLevelScript_v0040457C.waves != NULL) {
+                if (gLevelScript_v0040457C.spawnsLeft == 0 && CurrentWave()->type != 1) {
+                    gLevelScript_v0040457C.wavesDone = 1;
+                    gLevelScript_v0040457C.wave = -1;
                 } else {
                     nextWave = 1;
                 }
             }
-            gLevelScript.spawnTimer = 120.0f;
+            gLevelScript_v0040457C.spawnTimer = 120.0f;
         }
     }
-    if ((u32)(gLevelScript.spawnsLeft - 1) < 8 && gLevelScript.waveTimer <= 0.0f) {
+    if ((u32)(gLevelScript_v0040457C.spawnsLeft - 1) < 8 && gLevelScript_v0040457C.waveTimer <= 0.0f) {
         pos.x = -1699.84f;
         pos.y = 1064.96f;
         pos.z = 2877.44f;
         scale.x = 2.0f;
         scale.y = 2.0f;
         scale.z = 2.0f;
-        if (CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->m_vVelocity,
-                          scale, 0)) {
-            gLevelScript.spawnsLeft--;
-            if (gLevelScript.waves != NULL) {
-                if (gLevelScript.spawnsLeft == 0 && CurrentWave()->type != 1) {
-                    gLevelScript.wavesDone = 1;
-                    gLevelScript.wave = -1;
+        if (CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x387, (void *) gLevelScript_v0040457C.handle, (void *) gLevelScript_v0040457C.region, pos, 0.0f, actor->m_vVelocity,
+                          scale, NULL)) {
+            gLevelScript_v0040457C.spawnsLeft--;
+            if (gLevelScript_v0040457C.waves != NULL) {
+                if (gLevelScript_v0040457C.spawnsLeft == 0 && CurrentWave()->type != 1) {
+                    gLevelScript_v0040457C.wavesDone = 1;
+                    gLevelScript_v0040457C.wave = -1;
                 } else {
                     nextWave = 1;
                 }
             }
         }
     }
-    if (nextWave && gLevelScript.wave != -1) {
+    if (nextWave && gLevelScript_v0040457C.wave != -1) {
         delay = CurrentWave()->delay;
         extra = CurrentWave()->count;
-        if (gLevelScript.waves != NULL) {
+        if (gLevelScript_v0040457C.waves != NULL) {
             if (extra != 3) {
                 extra -= 3;
-                gLevelScript.waveTimer = delay - extra * 15 + Random_Blend(0.0f, extra * 2) * 15.0f;
+                gLevelScript_v0040457C.waveTimer = delay - extra * 15 + Random_Blend(0.0f, extra * 2) * 15.0f;
             } else {
-                gLevelScript.waveTimer = delay;
+                gLevelScript_v0040457C.waveTimer = delay;
             }
         }
     }
-    gLevelScript.enemiesAlive = 0;
+    gLevelScript_v0040457C.enemiesAlive = 0;
     for (enemy = gScene.m_InstancePool.m_ActiveList.m_pHead; enemy != NULL; enemy = enemy->m_pNext) {
         enemy->m_Instance.m_AI.m_vLeashPos.x = 0;
         enemy->m_Instance.m_AI.m_vLeashPos.y = 768.0f;
         enemy->m_Instance.m_AI.m_vLeashPos.z = 0;
-        enemy->m_Instance.m_AI.m_pLeashRegion = (struct CGameRegion *)gLevelScript.region;
+        enemy->m_Instance.m_AI.m_pLeashRegion = (struct CGameRegion *)gLevelScript_v0040457C.region;
         if (enemy->m_Instance.m_AI.m_Health > 0) {
-            gLevelScript.enemiesAlive++;
+            gLevelScript_v0040457C.enemiesAlive++;
         }
     }
     flags = &gCollisionInfoFlyingEnemy.m_dwFlags;
     *flags |= 0x8000;
-    AI_UpdateTargets(actor, level, &info, 0, 1);
+    AI_UpdateTargets(actor, level, (CAITargets *) &info, 0, 1);
     *flags &= ~0x8000;
-    if (gLevelScript.wave == -1) {
+    if (gLevelScript_v0040457C.wave == -1) {
         Primagen_NextSpawnStep();
     }
-    Primagen_RunSpawnStep(actor, level, info.unk24);
-    if (gLevelScript.unk420 == -1) {
+    Primagen_RunSpawnStep_3(actor, level, info.unk24);
+    if (gLevelScript_v0040457C.unk420 == -1) {
         Primagen_NextSoundStep();
     }
-    Primagen_RunSoundStep(actor, level, info.unk24);
-    if (gLevelScript.waves != NULL) {
-        if (gLevelScript.enemiesAlive == 0) {
+    Primagen_RunSoundStep_3(actor, level, info.unk24);
+    if (gLevelScript_v0040457C.waves != NULL) {
+        if (gLevelScript_v0040457C.enemiesAlive == 0) {
             wave = CurrentWave();
-            if (wave->type == 1 && wave->flag == 1 && gLevelScript.spawnsLeft == 0 && gLevelScript.unk400 <= 0.0f) {
-                gLevelScript.wavesDone = 1;
-                gLevelScript.wave = -1;
+            if (wave->type == 1 && wave->flag == 1 && gLevelScript_v0040457C.spawnsLeft == 0 && gLevelScript_v0040457C.unk400 <= 0.0f) {
+                gLevelScript_v0040457C.wavesDone = 1;
+                gLevelScript_v0040457C.wave = -1;
             }
         }
-        if (gLevelScript.waves != NULL) {
+        if (gLevelScript_v0040457C.waves != NULL) {
             return;
         }
     }
-    if (gLevelScript.unk3D0 == 1) {
-        gLevelScript.unk3D4 = 0;
+    if (gLevelScript_v0040457C.unk3D0 == 1) {
+        gLevelScript_v0040457C.unk3D4 = 0;
     }
 }

@@ -34,7 +34,7 @@ extern s32 GameObject_IsOnGround(CGameObjectInstance *obj);
 extern f32 func_002982F0(f32 angle);                                      /* sin */
 extern f32 func_002974C0(f32 angle);                                      /* cos */
 
-extern BossTimers gLevelScript_timer; /* local type: the field's real type (or the member path) changes the ROM's code here */
+extern BossTimers gLevelScript_timer_v0040688C __asm__("gLevelScript_timer"); /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 /* Pushes the target away from the boss while the push timer has run out. */
 void Primagen_UpdateMode20(CGameObjectInstance *obj, CAI *ai) {
@@ -55,7 +55,7 @@ void Primagen_UpdateMode20(CGameObjectInstance *obj, CAI *ai) {
         AI_TurnClamped(obj, ai, 0.261799425f, gLevelScript.targetAngle);
     }
     target = t.m_Sight.m_pTarget;
-    if (target != NULL && gLevelScript_timer.pushTimer <= 0.0f) {
+    if (target != NULL && gLevelScript_timer_v0040688C.pushTimer <= 0.0f) {
         pos = target->header.m_vPos;
         CVector3__Subtract(&d, &obj->header.m_vPos, &pos);
         heading = CVector3__GetYaw(&d);
@@ -66,12 +66,12 @@ void Primagen_UpdateMode20(CGameObjectInstance *obj, CAI *ai) {
         }
         target->m_vVelocity.x += push * func_002982F0(heading);
         target->m_vVelocity.z += push * func_002974C0(heading);
-        if (gLevelScript_timer.timer > 0.0f) {
-            gLevelScript_timer.timer -= gFrameIncrement;
+        if (gLevelScript_timer_v0040688C.timer > 0.0f) {
+            gLevelScript_timer_v0040688C.timer -= gFrameIncrement;
         }
     }
-    if (ai->m_AnimRepeatedCount != 0 && gLevelScript_timer.timer <= 0.0f && gLevelScript_timer.pushTimer <= 0.0f) {
-        gLevelScript_timer.index = -1;
+    if (ai->m_AnimRepeatedCount != 0 && gLevelScript_timer_v0040688C.timer <= 0.0f && gLevelScript_timer_v0040688C.pushTimer <= 0.0f) {
+        gLevelScript_timer_v0040688C.index = -1;
         obj->m_AI.m_AnimSpeed = 1.0f;
         CAI__SetMode(obj, ai, 7);
     }

@@ -7,7 +7,7 @@ typedef struct {
     /* 0x0 */ s32 unk0;
     /* 0x4 */ s32 unk4;
     /* 0x8 */ s8 unk8;
-} State;
+} State_004070B4;
 
 
 #define SCRIPT gLevelScript.script2.steps

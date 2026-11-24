@@ -6,7 +6,7 @@
 #include "protos/ai.h"
 #include "structs/twin_primagen.h"
 
-extern s32 gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */           /* stage */
+extern s32 gLevelScript_v00404C44 __asm__("gLevelScript"); /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */           /* stage */
 extern f32 Random_Blend(f32 lo, f32 hi);
 
 
@@ -48,13 +48,13 @@ s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist) {
         case 5:
             break;
         case 6:
-            if (gLevelScript == 1) {
+            if (gLevelScript_v00404C44 == 1) {
                 gLevelScript_bossMode.script.steps = sPrimagenAttackScript2Stage1;
             }
-            if (gLevelScript == 2) {
+            if (gLevelScript_v00404C44 == 2) {
                 gLevelScript_bossMode.script.steps = sPrimagenAttackScript2Stage2;
             }
-            if (gLevelScript == 3) {
+            if (gLevelScript_v00404C44 == 3) {
                 gLevelScript_bossMode.script.steps = sPrimagenAttackScript2Stage3;
             }
             gLevelScript_bossMode.script.cursor = -1;
@@ -63,13 +63,13 @@ s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist) {
             CAI__SetMode(obj, ai, 0x12);
             return 1;
         case 7:
-            if (gLevelScript == 1) {
+            if (gLevelScript_v00404C44 == 1) {
                 gLevelScript_bossMode.script.steps = sPrimagenAttackScriptStage1;
             }
-            if (gLevelScript == 2) {
+            if (gLevelScript_v00404C44 == 2) {
                 gLevelScript_bossMode.script.steps = sPrimagenAttackScriptStage2;
             }
-            if (gLevelScript == 3) {
+            if (gLevelScript_v00404C44 == 3) {
                 gLevelScript_bossMode.script.steps = sPrimagenAttackScriptStage3;
             }
             gLevelScript_bossMode.script.cursor = -1;

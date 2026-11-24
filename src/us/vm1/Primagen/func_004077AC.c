@@ -9,9 +9,9 @@ typedef struct {
     f32 unk_50;                 /* 0x50 */
     char pad54[0x5C - 0x54];
     f32 unk_5C;                 /* 0x5C */
-} State;
+} State_004077AC;
 
-/* The port (round 12 a2): State views LevelScriptState from its timer with N64 deltas (0x50 dest.y,
+/* The port (round 12 a2): State_004077AC views LevelScriptState from its timer with N64 deltas (0x50 dest.y,
  * 0x5C home.y, -0xC bossState); the host's script blocks hold pointers, so dest and home sit later
  * and the write missed dest.y: mode 24 then waited for good for the Primagen to reach a dest.y it
  * never set (stage 2's bossState 6 path, he lands on the floor at y 0). Members instead. */

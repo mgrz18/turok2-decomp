@@ -3,7 +3,7 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 
-s32 ScriptAnimator_SetScript(void *, f32 *);           /* extern */
+void ScriptAnimator_SetScript(void *, void *);
 
 #ifdef TARGET_PORT
 #define MODULE (&gLevelScript) /* the N64 delta 0x3D4 is not the host's */

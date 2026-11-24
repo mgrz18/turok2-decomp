@@ -15,7 +15,7 @@ extern f32 Math_StepClamped(f32 value, f32 target, f32 rate);
 extern f32 func_002982F0(f32 angle);                                      /* sin */
 extern f32 func_002974C0(f32 angle);                                      /* cos */
 
-extern s32 gLevelScript_script_current[]; /* local type: the field's real type (or the member path) changes the ROM's code here */        /* boss script index */
+extern s32 gLevelScript_script_current_v00405AC8[] __asm__("gLevelScript_script_current"); /* local type: the field's real type (or the member path) changes the ROM's code here */        /* boss script index */
 
 void Primagen_UpdateMode27(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
@@ -27,7 +27,7 @@ void Primagen_UpdateMode27(CGameObjectInstance *obj, CAI *ai) {
 
     if (ai->m_AnimRepeatedCount != 0) {
         obj->m_AI.m_AnimSpeed = 1.0f;
-        gLevelScript_script_current[0] = -1;
+        gLevelScript_script_current_v00405AC8[0] = -1;
         CAI__SetMode(obj, ai, 0x13);
     }
     gCollisionInfoFlyingEnemy.m_dwFlags |= 0x8000;

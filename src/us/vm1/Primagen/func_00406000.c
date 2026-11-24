@@ -37,7 +37,7 @@ typedef struct {
     /* 0x5C */ CVector3 dest; /* 0x8012FA30 */
 } BossCtl;
 #endif
-extern s32 gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */          /* stage, as the script selection reads it */
+extern s32 gLevelScript_v00406000 __asm__("gLevelScript"); /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */          /* stage, as the script selection reads it */
 
 void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
@@ -69,13 +69,13 @@ void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
         CVector3__Subtract(&d, &obj->header.m_vPos, &dest);
         if (func_00298470(d.x * d.x + d.z * d.z) <= 50.0f) {
             if (gLevelScriptBlock.m_Script.bossState == 3) {
-                if (gLevelScript == 1) {
+                if (gLevelScript_v00406000 == 1) {
                     gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage1;
                 }
-                if (gLevelScript == 2) {
+                if (gLevelScript_v00406000 == 2) {
                     gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage2;
                 }
-                if (gLevelScript == 3) {
+                if (gLevelScript_v00406000 == 3) {
                     gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage3;
                 }
                 gLevelScriptBlock.m_Script.script.cursor = -1;
@@ -86,13 +86,13 @@ void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
                 return;
             }
             if (gLevelScriptBlock.m_Script.bossState == 11) {
-                if (gLevelScript == 1) {
+                if (gLevelScript_v00406000 == 1) {
                     gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage1;
                 }
-                if (gLevelScript == 2) {
+                if (gLevelScript_v00406000 == 2) {
                     gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage2;
                 }
-                if (gLevelScript == 3) {
+                if (gLevelScript_v00406000 == 3) {
                     gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage3;
                 }
                 gLevelScriptBlock.m_Script.script.cursor = -1;

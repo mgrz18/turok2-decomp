@@ -6,9 +6,6 @@
 #include "globals/engine.h"
 #include "protos/ai.h"
 
-typedef struct {
-    f32 x, y, z;
-} Vec3_00403F3C;
 
 
 
@@ -19,7 +16,7 @@ typedef struct {
 void AI_TurnHeadToTarget(CGameObjectInstance *actor, CAI *level, s32 a2);
 void Animator_Update(void *light);
 s16 WeightedTable_PickStatic(void *table);
-void Primagen_SpawnTossedObject(s16 type, s32 a1, Vec3_00403F3C offset);
+void Primagen_SpawnTossedObject(s16 type, s32 a1, CVector3 offset);
 void Primagen_UpdateHealth(CGameObjectInstance *actor, CAI *level);
 void Primagen_UpdateSpawner(CGameObjectInstance *actor, CAI *level);
 void COnScreen__SetBossPercent(void *a0, s32 percent);
@@ -30,7 +27,7 @@ void COnScreen__SetBossPercent(void *a0, s32 percent);
     }
 
 void Primagen_Step(CGameObjectInstance *actor, CAI *level) {
-    Vec3_00403F3C offset;
+    CVector3 offset;
     s32 type;
     s32 i;
 
