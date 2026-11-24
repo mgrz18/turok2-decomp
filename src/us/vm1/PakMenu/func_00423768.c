@@ -9,8 +9,8 @@
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
 #include "structs/camera.h"
+#include "protos/pakmenu.h"
 
-s32 PakMenu_CheckPak(void *event, s32 port, s32 arg2);
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {
@@ -24,7 +24,7 @@ s32 DamagedPakMenu_SelectRetry(s32 unused, Menu *event) {
     char *dst;
 
     gPakMenuLeaving = 1;
-    if (PakMenu_CheckPak(event, port, 1) != 0) {
+    if (PakMenu_CheckPak((struct Menu *) event, port, 1) != 0) {
         if (event->player != NULL) {
             dst = (char *)event->player->m_pCamera->m_MenuPool;
         } else {

@@ -10,8 +10,8 @@
 #include "protos/menu.h"
 #include "structs/camera.h"
 #include "protos/pak.h"
+#include "protos/pakmenu.h"
 
-extern void PakMenu_UpdateNoteRows(Menu *m);
 
 void PakMenu_InitLoadProfile(Menu *m) {
     s32 kind;

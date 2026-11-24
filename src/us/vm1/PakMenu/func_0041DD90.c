@@ -5,13 +5,13 @@
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
 #include "protos/pak.h"
+#include "protos/pakmenu.h"
 
 /* Checks the controller pak in the given slot before a save/load menu:
  * returns the pak status, or -1 after opening the "pak full" dialog; opens the
  * matching warning dialog (templates D_0043xxxx) when the pak is missing,
  * damaged or unformatted. */
 
-extern void *PakMenu_GetReturnMenu(Menu *c);
 
 s32 PakMenu_CheckPak(Menu *c, s32 slot, s32 quiet) {
     s32 status;

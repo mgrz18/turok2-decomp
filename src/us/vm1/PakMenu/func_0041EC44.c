@@ -7,8 +7,8 @@
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
 #include "protos/pak.h"
+#include "protos/pakmenu.h"
 
-void PakMenu_UpdateNoteRows(Shared_PakMenu *menu);
 #ifdef TARGET_PORT
 /* The port: the Rage Wars view (Shared_PakMenu, PakNotesMenuItem) puts the items, the player and the
  * controller at N64 offsets (0xC, 0x1C, 0x20; items 0x28 apart): on the host it read the channel from
@@ -35,7 +35,7 @@ void PakMenu_InitLoadGame(Menu *menu) {
     menu->items[20].flags &= ~0x01000000;
     Pak_ProbeSlot(menu->controller->port);
     if (Pak_GetStatus(ch) == 0) {
-        PakMenu_UpdateNoteRows((Shared_PakMenu *) menu);
+        PakMenu_UpdateNoteRows((struct Menu *) menu);
         return;
     }
     gPakMenuLeaving = 1;
@@ -77,7 +77,7 @@ void PakMenu_InitLoadGame(Shared_PakMenu *menu)
   new_var = 0;
   if (Pak_GetStatus(ch) == new_var)
   {
-    PakMenu_UpdateNoteRows(menu);
+    PakMenu_UpdateNoteRows((struct Menu *) menu);
     return;
   }
   gPakMenuLeaving = 1;

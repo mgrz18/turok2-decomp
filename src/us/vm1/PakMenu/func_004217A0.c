@@ -2,8 +2,8 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 #include "protos/pak.h"
+#include "protos/pakmenu.h"
 
-s32 PakMenu_CheckPak(sptr, s32, s32);
 
 
 /* A menu window callback: the window (structs/menu.h) and the controller it reads. */
@@ -31,7 +31,7 @@ s32 PakMenu_PollPakB(Menu *arg0) {
                 } else {
                     var_a1 = (s32) arg0->controller->port;
                 }
-                if (PakMenu_CheckPak((sptr) arg0, var_a1, 0) != 0) {
+                if (PakMenu_CheckPak((struct Menu *) arg0, var_a1, 0) != 0) {
                     gPakMenuLeaving = 1;
                 }
             }

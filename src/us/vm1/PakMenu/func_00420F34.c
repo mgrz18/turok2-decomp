@@ -5,6 +5,7 @@
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
+#include "protos/pakmenu.h"
 
 /* Menu item handler: depending on the menu state, checks the item (PakMenu_CheckPak) and prints its text, or (states 1
  * and 2) resets the menu flags and opens the item's menu on its owner's camera. */
@@ -26,8 +27,6 @@ typedef struct {
     /* 0x24 */ void *string;
 } Item;
 
-extern s32 PakMenu_CheckPak(Item *item, s32 id, s32 a2);
-extern void *PakMenu_GetReturnMenu(Item *item);
 
 static __inline__ s32 ItemId(Item *item) {
     s32 id;
@@ -45,7 +44,7 @@ s32 PakConfirmMenu_SelectNo(s32 arg0, Item *item) {
 
     switch (gPakConfirmKind) {
         case 4:
-            if (PakMenu_CheckPak(item, ItemId(item), 1)) {
+            if (PakMenu_CheckPak((struct Menu *) item, ItemId(item), 1)) {
                 gPakMenuLeaving = 1;
                 MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, item->string, item->owner, item->data, 0);
             } else {
@@ -53,7 +52,7 @@ s32 PakConfirmMenu_SelectNo(s32 arg0, Item *item) {
             }
             break;
         case 3:
-            if (PakMenu_CheckPak(item, ItemId(item), 1)) {
+            if (PakMenu_CheckPak((struct Menu *) item, ItemId(item), 1)) {
                 gPakMenuLeaving = 1;
                 MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, item->string, item->owner, item->data, 0);
             } else {
@@ -61,7 +60,7 @@ s32 PakConfirmMenu_SelectNo(s32 arg0, Item *item) {
             }
             break;
         case 0:
-            if (PakMenu_CheckPak(item, ItemId(item), 1)) {
+            if (PakMenu_CheckPak((struct Menu *) item, ItemId(item), 1)) {
                 gPakMenuLeaving = 1;
                 MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, item->string, item->owner, item->data, 0);
             } else {
@@ -76,7 +75,7 @@ s32 PakConfirmMenu_SelectNo(s32 arg0, Item *item) {
                 gPakCheckDone = 1;
                 return 1;
             }
-            string = PakMenu_GetReturnMenu(item);
+            string = PakMenu_GetReturnMenu((struct Menu *) item);
             if (string == NULL) {
                 string = item->string;
             }

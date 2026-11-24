@@ -12,8 +12,8 @@
 #include "protos/menu.h"
 #include "structs/camera.h"
 #include "protos/pak.h"
+#include "protos/pakmenu.h"
 
-void PakMenu_UpdateNoteRows(Menu *o);
 /* O01Pick and O01Capture are separate functions in Rage Wars; inlined here in Turok 2. */
 static inline u8 *O01Pick(PakChannel *sel) {
     u8 *msg;

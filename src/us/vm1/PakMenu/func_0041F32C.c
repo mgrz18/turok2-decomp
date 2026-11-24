@@ -15,10 +15,9 @@
 #include "protos/menu.h"
 #include "globals/scene.h"
 #include "protos/pak.h"
+#include "protos/pakmenu.h"
 
 extern void *memset(void *dst, s32 value, uptr size);
-s32 PakMenu_CheckPak();
-void PakMenu_UpdateNoteRows();
 extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
 extern void CCache__Deallocate(sptr, void *);
 extern void **CCache__Allocate(s32, s32, s32, char *);

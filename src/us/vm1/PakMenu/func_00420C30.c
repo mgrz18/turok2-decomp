@@ -6,12 +6,11 @@
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
 #include "protos/pak.h"
+#include "protos/pakmenu.h"
 
 extern int PakConfirmMenu_SelectYes(void * owner, struct MenuRecAt24 * menu, void * arg);
-extern s32 PakMenu_WriteSaveGame(void *owner, MenuRecAt24 *menu, void *arg);
 s32 PakConfirmMenu_SelectYes(void *owner, MenuRecAt24 *menu, void *arg) {
     extern void MenuPool_OpenMenu(char *, char *, void *, PakMenuSlot *, char *);
-    extern s32 PakMenu_CheckPak(MenuRecAt24 *menu, s32 ch, s32 quiet);
     s32 ch;
     switch (gPakConfirmKind) {
         case 4:
@@ -20,7 +19,7 @@ s32 PakConfirmMenu_SelectYes(void *owner, MenuRecAt24 *menu, void *arg) {
             } else {
                 ch = menu->slot->unk4;
             }
-            if (PakMenu_CheckPak(menu, ch, 1) != 0) {
+            if (PakMenu_CheckPak((struct Menu *) menu, ch, 1) != 0) {
                 gPakMenuLeaving = 1;
                 MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, menu->prompt, menu->player, menu->slot, 0);
                 break;
@@ -38,14 +37,14 @@ s32 PakConfirmMenu_SelectYes(void *owner, MenuRecAt24 *menu, void *arg) {
             } else {
                 ch = menu->slot->unk4;
             }
-            if (PakMenu_CheckPak(menu, ch, 1) != 0) {
+            if (PakMenu_CheckPak((struct Menu *) menu, ch, 1) != 0) {
                 gPakMenuLeaving = 1;
                 MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, menu->prompt, menu->player, menu->slot, 0);
                 break;
             }
             Pak_ProbeSlot(ch);
             if (Pak_DeleteNote(ch, gPakNoteIndex) == 0) {
-                PakMenu_WriteSaveGame(owner, menu, arg);
+                ((s32 (*)(void *, MenuRecAt24 *, void *)) PakMenu_WriteSaveGame)(owner, menu, arg); /* passes a third word the definition does not take */
                 return 1;
             }
             MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (char *)&gPakMsgDeleteFailedDesc, menu->player, menu->slot, menu->prompt);
@@ -56,7 +55,7 @@ s32 PakConfirmMenu_SelectYes(void *owner, MenuRecAt24 *menu, void *arg) {
             } else {
                 ch = menu->slot->unk4;
             }
-            if (PakMenu_CheckPak(menu, ch, 1) != 0) {
+            if (PakMenu_CheckPak((struct Menu *) menu, ch, 1) != 0) {
                 gPakMenuLeaving = 1;
                 MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, menu->prompt, menu->player, menu->slot, 0);
                 break;

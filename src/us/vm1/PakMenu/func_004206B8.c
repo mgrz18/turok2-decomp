@@ -14,8 +14,8 @@
 #include "protos/menu.h"
 #include "structs/camera.h"
 #include "protos/pak.h"
+#include "protos/pakmenu.h"
 
-s32 PakMenu_CheckPak(Menu *o, s32 pad, s32 z);
 CPlayer *CPlayerPool__FindByController(CPlayerPool *world, ControllerProfile *s);
 void CPlayer__SetCharacter(CPlayer *a, s32 b);
 /* Turok 2 inlines this (Rage Wars calls it) */

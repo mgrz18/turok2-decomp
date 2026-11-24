@@ -20,6 +20,7 @@
 #include "structs/camera.h"
 #include "structs/pak.h"
 #include "protos/pak.h"
+#include "protos/pakmenu.h"
 
 /* Controller pak menu, "save" entry: when the pak is ready, builds the save note (with its checksum) and
  * opens the save menu; otherwise shows why the pak cannot be used. */
@@ -27,7 +28,6 @@
 
 extern s32 gScene_unk_30; /* local: globals/scene.h; gScene.unk_30 (the member) moves the ROM's registers here. save size */
 void SaveGame_Build(CPlayer *p);
-void PakMenu_UpdateNoteRows(Menu *o);
 
 void PakMenu_InitSaveGame(Menu *own) {
     CPlayer *plr;

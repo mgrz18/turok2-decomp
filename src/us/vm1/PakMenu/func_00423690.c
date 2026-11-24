@@ -4,8 +4,8 @@
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
+#include "protos/pakmenu.h"
 
-s32 PakMenu_CheckPak(void *event, s32 port, s32 arg2);
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {
@@ -15,7 +15,7 @@ static __inline__ s32 GetPort(Menu *event) {
 }
 
 s32 DamagedPakMenu_SelectRepair(s32 unused, Menu *event) {
-    if (PakMenu_CheckPak(event, GetPort(event), 1) != 0) {
+    if (PakMenu_CheckPak((struct Menu *) event, GetPort(event), 1) != 0) {
         gPakMenuLeaving = 1;
         if (event->context == (char *)&gSavePortalMenuDescB || event->context == (char *)&gSavePortalMenuDesc) {
             gCameraPoolHideViews = 0;

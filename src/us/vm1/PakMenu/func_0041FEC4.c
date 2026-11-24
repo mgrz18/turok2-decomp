@@ -5,15 +5,12 @@
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
 #include "protos/pak.h"
+#include "protos/pakmenu.h"
 
 /* Save/load menu "select pak" handler: checks the pak in the chosen slot;
  * when saving over an existing game file asks for confirmation, when there
  * is no usable pak cycles to the next slot with one. */
 
-extern s32 PakMenu_CheckPak(Menu *c, s32 slot, s32 quiet);
-extern void PakMenu_UpdateNoteRows(Menu *c);
-extern void PakMenu_WriteProfile(void *menu, Menu *c, s32 arg2);
-extern void PakMenu_WriteSaveGame(void *menu, Menu *c, s32 arg2);
 
 /* PakMenu_FindNoteByName, inlined (the found path sets the result before storing the index) */
 static __inline__ s32 findFile(void *unused, char *file, s32 slot, s32 *index) {
@@ -68,7 +65,7 @@ s32 PakMenu_SelectPak(void *menu, Menu *c, s32 arg2) {
     }
     if (gPakMenuIsProfile) {
         if (gPakMenuIsSave) {
-            PakMenu_WriteProfile(menu, c, arg2);
+            PakMenu_WriteProfile((sptr) menu, c, arg2);
             return 1;
         }
     } else if (gPakMenuIsSave) {
@@ -77,7 +74,7 @@ s32 PakMenu_SelectPak(void *menu, Menu *c, s32 arg2) {
             MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakConfirmOverwriteDesc, c->player, c->controller, &gPakSaveGameMenuDesc);
             return 1;
         }
-        PakMenu_WriteSaveGame(menu, c, arg2);
+        ((s32 (*)(void *, Menu *, s32)) PakMenu_WriteSaveGame)(menu, c, arg2); /* passes a third word the definition does not take */
         return 1;
     }
     if (gPakMenuAnyPak) {
