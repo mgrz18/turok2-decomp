@@ -87,6 +87,10 @@ RODATA_PAD = {
     ("engine", 0x0023D050): "rodata pad: at 0xA72B4 (one candidate)",
     ("engine", 0x0023E820): "rodata pad: at 0xA72D8 (of 2 candidates: where Sweep_ gives way to CPlayer__)",
     ("engine", 0x0026DFB0): "rodata pad: at 0xA8C3C (one candidate)",
+    # round 27: stale bytes rodata_gaps.py does not class as PADDING (a string tail, an older
+    # build's code words) end two slices on 16 inside the old CInstancePool (0xA6C70, 0xA6CA0)
+    ("engine", 0x00227C10): "rodata pad: at 0xA6C6C (stale 'e\\en'; of func_00227AE0, func_00227C10: where CLevelActorPool__ gives way to CInstancePool__)",
+    ("engine", 0x002284E0): "rodata pad: at 0xA6C96 (stale words after 'anim object info'; of func_002280B0, func_002284E0: where CInstancePool__ gives way to DLights_)",
     ("vm1", 0x00424B90): "rodata pad: at 0xC2368 (zeros after the string \" \" up to the next 16; one candidate)",
     ("vm1", 0x00419560): "rodata pad: at 0xC1C28 (of 10 candidates: where the multiplayer menus give way to Single/Title/Pause)",
     ("vm1", 0x00423E10): "rodata pad: at 0xC2314 (of 3 candidates: where PakConfirmMenu_ gives way to Video_)",
@@ -115,6 +119,9 @@ RENAMES = {
     ("engine", 0x00241960): "PlatformCollide",
     # amCreateAudioMgr, __amMain, the audio DMA callbacks
     ("engine", 0x0026F760): "AudioMgr",
+    # round 27: DLights_Load, DLights_SwapBuffers, padded off CInstancePool in .rodata and off
+    # the DLights_GetAtPoint .. CDLightSet module in .text
+    ("engine", 0x002284E0): "DLightsLoad",
     # Automap_RevealRegion .. Automap_EdgeVisible (the one-function `Automap` module is later)
     ("vm1", 0x00400000): "AutomapDraw",
     # SingleMenu, TitleMenu, QuitMenu, PauseMenu, SoundMenu: the front-end menus

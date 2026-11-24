@@ -335,8 +335,10 @@ change; they need more time.
 | `code/CGameObjectInstance` | 64 | .rodata interrupted by data no C file owns (2: `unnamed@0xA66C4`); round 25 (n2): `sCGameObjectInstanceCacheDesc_AnimObjectInfo` and a `1.0f` read as externs; also declarations differ |
 | `code/CGameRegion` | 53 | calls typed differently (1: `incompatible types in initialization`); declarations differ (24: `CGameRegion__FloodClearFlag4`, `CGameRegion__FloodSetFlag4`, `CGameRegion__FloodSetHeight`, `CGameRegion__GetCeilingHeight`, ...); local types differ (2: `CollisionBuildVertex`, `Node75`); parse errors (6: `&`, `.`, `if`, `return`, ...); other (4: `initializer element is not constant`, `request for member `x' in something not a structure or union`, `request for member `y' in something not a structure or union`, `request for member `z' in something not a structure or union`). Round 25 n1: 47+ conflicts: CISet__GetBlock and the CScene__ prototype family against protos/scene.h (pointer types and host returns) |
 | `code/CISet` | 14 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `CUSet__GetTotalSize`, `CUSet__Transpose`, `osCreateMesgQueue`); local types differ (2: `CMutex`, `OffsetTable`)) |
-| `code/CInstancePool` | 18 | .rodata interrupted by data no C file owns (1: `unnamed@0xA6C6C`); round 25 (n2): `sCInstancePoolCacheDesc_*` strings read as externs; also declarations differ |
-| `code/CLevelActor` | 9 | .rodata not in .text order (2 inverted pairs of 5 subsegments); round 25 (n2): deferred `func_00215944` (`--inline`); also declarations differ |
+| `code/CInstancePool` | 7 | **merged** (round 27, p3: split into `CLevelActorPool`, `CInstancePool`, `DLightsLoad` at two `.rodata` pads; its strings as literals; the stale bytes off 4 by `tools/ld_fill.py`; was: `sCInstancePoolCacheDesc_*` strings read as externs) |
+| `code/CLevelActorPool` | 9 | **merged** (round 27, p3: split off `CInstancePool`) |
+| `code/DLightsLoad` | 2 | **merged** (round 27, p3: split off `CInstancePool`) |
+| `code/CLevelActor` | 9 | **merged** (round 27, p3: header work, `--inline func_00215944`, the two `DEFERRED` functions moved to where the ROM has their strings; was: .rodata not in .text order) |
 | `code/CMtxF` | 124 | .rodata interrupted by data no C file owns (3: `unnamed@0xA6004`); round 25 (n2): `sCStaticObjectCacheDesc_*` strings and `0, 1.0, 0` read as externs; also declarations differ |
 | `code/CParticle` | 212 | .rodata interrupted by data no C file owns (8: `unnamed@0xA7004`); round 25 (n2): linker padding six times; `D_800A652C` and a float table read as externs; also declarations differ; round 26 (o2): split into `CParticle`, `Trail`, `ImpactEvent`, `Path` (merged), `SweepShapes`, `ModelSweep`, `Pickup` |
 | `code/CPlayer` | 245 | .rodata interleaved with another directory's (7 subsegments between, e.g. `func_0042DA60`); round 25 (n2): interleaved with `vm1/CPlayer`: one object over the engine and the VM; also declarations differ |
@@ -344,7 +346,7 @@ change; they need more time.
 | `code/Cinema` | 34 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (5: `Sound__StopAllExcept`, `gScene`, `gScene_m_LevelID`, `gScene_m_WarpSpawn`, ...)) |
 | `code/Color` | 3 | **merged** (round 24, first batch) |
 | `code/Controller` | 37 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `Controller_IsPakWatched`, `RumblePool_Init`, `osMotorStop`)) |
-| `code/Crash` | 16 | .rodata interrupted by data no C file owns (1: `unnamed@0xAACEC`); round 25 (n2): its object's `.rodata` starts with the strings of its `.data` register tables: those tables in C first; also declarations differ |
+| `code/Crash` | 16 | **merged** (round 27, p3: its `.data` in C, inside `code_rodata` by `tools/ld_fill.py`; `gCrashCauseDesc`'s names its first `.rodata`; was: .rodata starts with the strings of its `.data` tables) |
 | `code/DLights` | 6 | **merged** (round 24, after unifying its declarations; was: local types differ (1: `ListNode`)) |
 | `code/Demo` | 3 | **merged** (round 24, first batch) |
 | `code/Destructible` | 15 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `AI_DropPickupsOnce`, `Actor_SpawnParticle`, `Sound__Play`)) |
@@ -737,6 +739,77 @@ three smallest were taken through one declaration per name and merged (`asm_diff
 | deferred functions plus header work | `code/{CLevelActor, VM}`, `vm1/{TotemDefense, Pak}` (4) |
 
 None needs a ROM change.
+
+## Round 27, part p3: module data in C, two more boundaries, the deferred `CLevelActor`
+
+**`code/CInstancePool` was three objects.** The stale bytes round 26 saw are linker padding that
+`tools/rodata_gaps.py` does not class as `PADDING` (a string tail, `"e\en"`, at 0xA6C6C; an older
+build's code words after `"anim object info"`): `.rodata` ends on 16 twice inside the module.
+`tools/modules.py` has them as two more `RODATA_PAD` entries (two candidates each, the name-prefix
+change taken) and `RENAMES` `DLightsLoad` (`DLights` is the next module): 339 -> 341 modules.
+
+| Was | Now (functions) | Boundary |
+|---|---|---|
+| `code/CInstancePool` (18) | `CLevelActorPool` (9: `CLevelActorPool__*`, `SceneActor_Init`, `CPooledLevelActor__*`), `CInstancePool` (7), `DLightsLoad` (2: `DLights_Load`, `DLights_SwapBuffers`) | 0xA6C70 (of `func_00227AE0`, `func_00227C10`), 0xA6CA0 (of `func_002280B0`, `func_002284E0`) |
+
+All three merged (`merge_module.py --rodata-free`); `CInstancePool__SpawnAnimInstance` passes its
+cache descriptions as literals (`"anim object index"`, `"anim object info"`: the object's whole
+`.rodata`, 0xA6C70-0xA6C95; the `sCInstancePoolCacheDesc_*` names stay in `globals/strings.h` and the
+symbol files, unused by the C).
+
+**Linker padding off 4: `tools/ld_fill.py`.** `CInstancePool`'s `.rodata` ends on a string at
+0xA6C95, and the stale bytes up to 0xA6CA0 start off 4. splat cannot give them a subsegment there (a
+`rodata` piece is disassembled as words; a `bin` piece goes into the segment's DATA group), and the
+script's `SUBALIGN(4)` aligns every input section anyway. `make setup` now runs
+`tools/ld_fill.py`, which writes the bytes as `BYTE()` statements right after the object's
+`(.rodata)` line (`versions/ld_fill.us.txt`: `code/CInstancePool/CInstancePool 82 00 12`); the rest,
+0xA6C98-0xA6CA0, is an unnamed `rodata` subsegment. `make verify` runs `ld_fill.py --check`.
+
+**`code/Crash`: its `.data` in C, inside `code_rodata`.** The answer to round 26's open question:
+splat takes a `.data` subsegment in the `rodata`-only `code_rodata` segment, but writes its line in
+the segment's DATA group (before every `.rodata` line) and a second time in the `code` segment (the
+`.c` subsegment's auto-linked `.data`). `tools/ld_fill.py`'s second form,
+`code/Crash/Crash .data after ABCA8.rodata.s`, keeps one line and moves it after the piece before it
+in ROM. So `Crash.c` defines, before its first function, `gCrashFont` (0x5F rows: ASCII
+0x20-0x7E; `globals/crash.h` had 0x60, one row too many: 0x7F reads on into `sCrashCursorX`),
+`sCrashCursorX/Y`, `sCrashBgColor`, `gCrashCauseDesc` (28 `FlagDesc`, the strings as literals) and
+`sCrashCanExit` (`#ifndef TARGET_PORT`: the port keeps the generated copy); the yaml has
+`[0xB7AA0, .data, code/Crash/Crash]` in the engine data and `[0xAAA70, .rodata, code/Crash/Crash]`
+from the first cause name on: cc1 writes the table's strings first, last entry first (`""`,
+`"Virtual coherency exception on data reference"` .. `"BD"`), then the functions' literals, `": "`,
+`"<"`, `","`, `">\n"`, `"   "`, `"\n"` (`sCrashText_*` were the engine pool's names for the last
+three and `": "`: now literals). The 12 stale bytes at 0xAAA64 stay an unnamed piece. Header work:
+one prototype a name (the definitions': `Crash_PutChar(s32)`, `Crash_PrintHex8(s32)`,
+`Crash_PrintString(u8 *)`, `u8 *` names), `Crash_PrintStack` takes the context as `void *` (its
+`StackContext` view, the low word of `ThreadContext.sp`, no longer called `Thread`), and `gCFB` is
+read as a scalar in both functions (`extern u16 *gCFB`, a local view: `globals/framebuffer.h`'s
+array, written `*(u16 **)gCFB`, shares a base register between `Crash_ShowScreen`'s two reads).
+
+**`code/CLevelActor` (deferred).** One declaration per name (the `CMtxF__*`/`CQuaternion__ToMatrix`/
+`CVector3__ClampLength` callees on `void *`; `CLevelActor__LoadGeometry` as defined;
+`CISet__GetBlock` from `protos/iset.h`; `CScene__GetObjectTypeID` from `protos/scene.h`, the N64
+call through an `s32` function type as in `Generator`; `Actor_DrawGroundShadow` takes
+`GameObject_GetGroundRotation`'s `CQuaternion` result, the port the `_sret` form), then
+`merge_module.py --inline func_00215944`. `merge_module.py` writes a deferred file where its
+functions are in `.text` (last); the ROM has its strings between `Actor_DrawGroundShadow`'s and
+`CLevelActor__Update`'s literals, so the two `DEFERRED` functions were moved there by hand (a
+`DEFERRED` definition puts its literals where it stands and its code at the end).
+
+**State of the part's directories.** Merged: `code/{CLevelActorPool, CInstancePool, DLightsLoad,
+Crash, CLevelActor}` (52 files -> 5). Left, with what stops each:
+
+| Directory | Files | What is left |
+|---|---|---|
+| `code/Anim` | 49 | header work (`Bits_ReadFloat` argument lists, pointer views) before the data question |
+| `code/CEngineApp` | 90 | the name is taken (`vm1/CEngineApp/CEngineApp.c`): `--name`; header work |
+| `code/CGameObjectInstance` | 64 | header work (`CAnimationState__Reset`, `CGameObjectInstance__PickRandomAnim` .. in several forms); `sCGameObjectInstanceCacheDesc_AnimObjectInfo` read as an extern by 7 files |
+| `code/CMtxF` | 124 | header work (the `CMtxF` parameter in `f32 *`, `f32 (*)[4]`, `CMtxF *` forms) |
+| `code/CParticle`, `code/Trail` | 62, 45 | header work (about 50 conflicts each: `Morph` defined twice in `Trail`, the `CParticleSystem__Spawn` family); then the float table / `D_800A652C` as C data |
+| `vm1/MpMenu` | 72 | header work (`Controller_ConfirmPressed`, `Controller_WatchPak` in `s8`/`s32` forms, `sprintf`, the `match_teamScore` scalar view); its `.rodata` is not in `.text` order, so deferred functions too |
+| `vm1/PakMenu` | 128 | header work (the libultra os prototypes, `MenuPool_OpenMenu` arguments) |
+| `code/VM` | 20 | header work: the `gPager_*` views (`B09SlotA`, `B09LNode`, `B09List` against `globals/pager.h`'s `PageEntry`/`PageMapping`), `func_0028EE40` in three forms |
+| `vm1/TotemDefense` | 18 | header work: `gTotemDefense*` one-element array views, `CGameObjectInstance__PickRandomAnim`, `COnScreen__SetBoss*`, `Actor_SpawnParticle` |
+| `vm1/Pak` | 42 | header work (the `CCache__*` family), and a source-order option in `merge_module.py` |
 
 ## Evidence
 
