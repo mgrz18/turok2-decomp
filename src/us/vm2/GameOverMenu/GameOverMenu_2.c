@@ -4,18 +4,11 @@
 #include "structs/game.h"
 #include "globals/game.h"
 
-typedef struct Layer {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ s32 flags;
-} Layer;
-typedef struct Screen {
-    /* 0x0 */ u8 pad0[0xC];
-    /* 0xC */ Layer *layer;
-} Screen;
+#include "structs/menu.h"
 
-void GameOverMenu_Init_2(Screen *screen) {
+void GameOverMenu_Init_2(Menu *menu) {
     gEngineApp_m_Settings.match.countdown = 120.0f;
-    screen->layer->flags &= ~0x4000000;
+    menu->items[1].flags &= ~0x04000000;
 }
 
 #include "structs/vector.h"
