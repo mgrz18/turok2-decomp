@@ -1838,16 +1838,6 @@ void CGameObjectInstance__PoseBone(PoseObject *obj, PoseContext *ctx, s32 bone, 
  * fixed-point 65536 units), timing that call in a profile slot. Then draws
  * the object's attachments. Returns whether the matrices were built. */
 
-typedef struct AnimChannel {
-    /* 0x00 */ f32 time;
-    /* 0x04 */ s16 current;
-    /* 0x06 */ s16 next;
-    /* 0x08 */ s16 frames;
-    /* 0x0A */ s8 active;
-    /* 0x0B */ s8 blending;
-    /* 0x0C */ u32 loopStart;
-    /* 0x10 */ void *resource; /* CAnimationState.pmeAnimData */
-} AnimChannel;
 typedef struct AnimKeyLookup {
     /* 0x00 */ void *posKeys;
     /* 0x04 */ void *rotKeys;
@@ -1871,8 +1861,8 @@ typedef struct AnimObject {
         struct { u8 _hp_animFile[T2_HOFF_AnimObject(m_rpAnims)]; sptr animFile; }; /* N64 0xA8: a ROM address */
         struct { u8 _hp_animCount[T2_HOFF_AnimObject(m_nAnims)]; s16 animCount; }; /* N64 0xBA */
         struct { u8 _hp_flags[T2_HOFF_AnimObject(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
-        struct { u8 _hp_channel[T2_HOFF_AnimObject(m_CurrentAnimation)]; AnimChannel channel; }; /* N64 0xD8 */
-        struct { u8 _hp_blendChannel[T2_HOFF_AnimObject(m_BlendAnimation)]; AnimChannel blendChannel; }; /* N64 0xEC */
+        struct { u8 _hp_channel[T2_HOFF_AnimObject(m_CurrentAnimation)]; CAnimationState channel; }; /* N64 0xD8 */
+        struct { u8 _hp_blendChannel[T2_HOFF_AnimObject(m_BlendAnimation)]; CAnimationState blendChannel; }; /* N64 0xEC */
         struct { u8 _hp_hasEffects[T2_HOFF_AnimObject(m_ActiveSwooshes)]; u8 hasEffects; }; /* N64 0x10F */
         struct { u8 _hp_attachMask[T2_HOFF_AnimObject(m_AI.m_VisBits)]; u32 attachMask; }; /* N64 0x14C */
         struct { u8 _hp_owner[T2_HOFF_AnimObject(m_AI.m_pParent)]; struct AnimObject *owner; }; /* N64 0x1A8 */
@@ -1892,8 +1882,8 @@ typedef struct AnimObject {
     /* 0x0BA */ s16 animCount;
     /* 0x0BC */ u8 padBC[0x18];
     /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ AnimChannel channel;
-    /* 0x0EC */ AnimChannel blendChannel;
+    /* 0x0D8 */ CAnimationState channel;
+    /* 0x0EC */ CAnimationState blendChannel;
     /* 0x100 */ u8 pad100[0xF];
     /* 0x10F */ u8 hasEffects;
     /* 0x110 */ u8 pad110[0x3C];
@@ -1914,8 +1904,8 @@ typedef struct AnimPoseContext {
     /* 0x0C */ s32 *anims;
     /* 0x10 */ s32 *file;
     /* 0x14 */ sptr arg2;
-    /* 0x18 */ AnimChannel *channel;
-    /* 0x1C */ AnimChannel *blendChannel;
+    /* 0x18 */ CAnimationState *channel;
+    /* 0x1C */ CAnimationState *blendChannel;
     /* 0x20 */ AnimKeyLookup keys;
     /* 0x44 */ AnimKeyLookup blendKeys;
     /* 0x68 */ s32 visible;
@@ -1951,7 +1941,7 @@ extern Profile sBoneMatrixProfile;
 extern s32 sBoneMatrixCount[]; /* &sBoneMatrixProfile.calls */
 s32 Cinema_PathPlaying(void);
 void *MtxPool_Alloc(void *pool, s32 count);
-void CAnimationState__FindKeys(AnimChannel *channel, AnimKeyLookup *keys);
+void CAnimationState__FindKeys(CAnimationState *channel, AnimKeyLookup *keys);
 void SwooshSystem_AddBonePoints(void *effects, AnimObject *obj, void *bones);
 void GameObject_EmitHotPoints(void *list, s32 count, void *bones, void *obj, void *anims);
 
@@ -1972,8 +1962,8 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2
     s32 isType9;
     s32 inCinema;
     s32 type;
-    AnimChannel *channel;
-    AnimChannel *blendChannel;
+    CAnimationState *channel;
+    CAnimationState *blendChannel;
     Profile *prof;
     u32 elapsed;
     s32 *lists;
@@ -2028,7 +2018,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2
                 }
             }
             if (!Cinema_PathPlaying()) {
-                if ((channel->blending || blendChannel->blending) && type != 1) {
+                if ((channel->m_bAnimActive || blendChannel->m_bAnimActive) && type != 1) {
                     ctx.moving = 1;
                 } else {
                     ctx.moving = 0;
