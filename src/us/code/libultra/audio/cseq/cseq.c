@@ -201,6 +201,7 @@ void alCSeqNewMarker(ALCSeq *seq, ALCSeqMarker *m, u32 ticks) {
     } while (tempSeq.lastTicks < ticks);
 }
 
+#ifndef TARGET_PORT /* the port's in port/ (port/cmake: __getTrackByte) */
 u8 __getTrackByte(ALCSeq *seq, u32 track)
 {
     u8 theByte;
@@ -235,6 +236,7 @@ u8 __getTrackByte(ALCSeq *seq, u32 track)
     }
     return theByte;
 }
+#endif
 
 void alCSeqNew(RuntimeStateRecAtB8 *state, uptr base) {
     f64 converted;
@@ -406,6 +408,7 @@ s32 __alCSeqNextDelta(Timers *t, u32 *out) {
     return 1;
 }
 
+#ifndef TARGET_PORT /* the port's in port/ (port/cmake: __readVarLen) */
 u32 __readVarLen(ALCSeq *arg0, u32 arg1) {
     sptr temp_v0;
     sptr var_s0;
@@ -419,3 +422,4 @@ u32 __readVarLen(ALCSeq *arg0, u32 arg1) {
     }
     return var_s0;
 }
+#endif

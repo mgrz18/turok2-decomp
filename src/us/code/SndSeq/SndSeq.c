@@ -38,6 +38,7 @@ struct Track {
 
 static __inline__ f32 fade_rate(Track *track,f32 time,f32 rate) {track->unk30=time;return (f32)track->unk20/(time*rate);}
 
+#ifndef TARGET_PORT /* the port's in port/ (port/cmake: SndSeq_Update) */
 void SndSeq_Update(Track *arg0) {
     f32 temp_f0;
     f32 temp_f20;
@@ -176,6 +177,7 @@ block_44:
         break;
     }
 }
+#endif
 
 #ifdef TARGET_PORT
 /* The host layout: AudioStateD844 / AudioRootD844 (rw/abu_types.h) are N64-offset views of
@@ -241,6 +243,7 @@ void SndSeq_Construct(struct AudioStateD844 *state, struct AudioRootD844 *root) 
 #include "common.h"
 #include "structs/sound.h"
 
+#ifndef TARGET_PORT /* the port's in port/ (port/cmake: SndSeq_UpdateFade) */
 void SndSeq_UpdateFade(SndSeq *ch) {
     f32 current;
     f32 target;
@@ -273,9 +276,11 @@ void SndSeq_UpdateFade(SndSeq *ch) {
         ch->current = next;
     }
 }
+#endif
 
 #include "rw/junk_types.h" /* SndNodeRec */
 
+#ifndef TARGET_PORT /* the port's in port/ (port/cmake: SndSeq_SelectSong) */
 s32 SndSeq_SelectSong(SndSeq *s, s32 key) {
     s32 i;
     SndNodeRec *r;
@@ -298,6 +303,7 @@ s32 SndSeq_SelectSong(SndSeq *s, s32 key) {
     s->unkC = res;
     return res != 0;
 }
+#endif
 
 void SndSeq_FadeOut(SndSeq *s) {
     f32 f;
@@ -321,16 +327,20 @@ typedef struct {
     /* 0x40 */ s32 unk40;
 } Flags38;
 
+#ifndef TARGET_PORT /* the port's in port/ (port/cmake: SndSeq_Duck) */
 void SndSeq_Duck(Flags38 *arg0) {
     arg0->unk38 = 1;
     arg0->unk40 = 0;
 }
+#endif
 
 /* Ends a duck: the music stops sliding and returns to full volume. */
+#ifndef TARGET_PORT /* the port's in port/ (port/cmake: SndSeq_Unduck) */
 void SndSeq_Unduck(SndSeq *arg0) {
     arg0->sliding = 0;
     arg0->target = 1.0f;
 }
+#endif
 
 /* A record that owns a handle at 0x14 (passed to alCSPStop) and an index at 0x28. */
 typedef struct {
@@ -340,11 +350,14 @@ typedef struct {
     /* 0x28 */ s32 index;
 } HandleOwner;
 
+#ifndef TARGET_PORT /* the port's in port/ (port/cmake: SndSeq_Stop) */
 void SndSeq_Stop(HandleOwner *arg0) {
     arg0->index = -1;
     alCSPStop((ALCSPlayer *)arg0->handle);
 }
+#endif
 
+#ifndef TARGET_PORT /* the port's in port/ (port/cmake: SndSeq_GetSongData) */
 void *SndSeq_GetSongData(SequenceState *state, s32 index) {
     s32 selection;
     s32 section;
@@ -364,6 +377,7 @@ void *SndSeq_GetSongData(SequenceState *state, s32 index) {
     }
     return ((void *)0);
 }
+#endif
 
 /* Only what this reads and writes: a voice and its volume. */
 typedef struct {
@@ -374,11 +388,14 @@ typedef struct {
 } SoundChannel;
 
 /* Sets the volume (0..1, sent as 0..32767). */
+#ifndef TARGET_PORT /* the port's in port/ (port/cmake: SndSeq_SetVolume) */
 void SndSeq_SetVolume(SoundChannel *arg0, f32 arg1) {
     alCSPSetVol((ALCSPlayer *)arg0->voice, (s16) (s32) (arg1 * 32767.0f));
     arg0->volume = arg1;
 }
+#endif
 
+#ifndef TARGET_PORT /* the port's in port/ (port/cmake: SndSeq_UpdateVolume) */
 void SndSeq_UpdateVolume(SndSeq *s) {
     f32 f;
     if (s->sliding != 0) {
@@ -397,7 +414,9 @@ void SndSeq_UpdateVolume(SndSeq *s) {
     alCSPSetVol((ALCSPlayer *)s->csp, f * 32767.0f);
     s->vol = f;
 }
+#endif
 
+#ifndef TARGET_PORT /* the port's in port/ (port/cmake: SndSeq_Load) */
 void SndSeq_Load(void *arg0)
 {
   f32 temp_f20;
@@ -418,3 +437,4 @@ void SndSeq_Load(void *arg0)
   alCSPSetVol((ALCSPlayer *)(*((s32 *) (((s8 *) arg0) + 0x14))), (s16) ((s32) (temp_f20 * 32767.0f)));
   *((f32 *) (((s8 *) arg0) + 0x2C)) = temp_f20;
 }
+#endif
