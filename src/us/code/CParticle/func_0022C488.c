@@ -58,19 +58,19 @@ struct Target {
 
 s32 GameObject_IsInanimate(Target *target);
 s32 Actor_GetTypeClass(Target *target);
-void CMtxF__FromMtxAffine(f32 *out, Bone *bone);
+void CMtxF__FromMtxAffine(void *out, void *in);
 void func_0021B39C(Target *target, s32 *ai, f32 *matrix, CVector3 origin, CVector3 direction, s32 frame);
-void CMtxF__InvertAffine(f32 *out, f32 *in);
-void CMtxF__TransformPoint(f32 *matrix, CVector3 *in, CVector3 *out);
+void CMtxF__InvertAffine(void *out, void *in);
+void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
 void CVector3__Normalize(CVector3 *v);
-void CMtxF__RotateVector(f32 *matrix, CVector3 *in, CVector3 *out);
-void AI_HearNoise(Target *target, s32 *ai, CVector3 *from, s32 arg3);
-void CParticle__BuildCameraMatrix(CParticle *p);
-void Trail_DetachOwner(void *list, CParticle *p);
+void CMtxF__RotateVector(void *m, CVector3 *in, CVector3 *out);
+void AI_HearNoise(void *target, void *ai, CVector3 *from, s32 arg3);
+void CParticle__BuildCameraMatrix(void *arg0);
+void Trail_DetachOwner(void *list, void *owner);
 void CDLightSet__Free(void *list, CDLight *light);
 s32 CParticle__IsUnderWater(CParticle *p);
 s32 func_00268148(Target *target);
-void ImpactEvent_Send(void *source, CParticle *p, s32 effect, s32 arg3, CVector3 pos, CEventValue params);
+void ImpactEvent_Send(void *src, void *dst, s32 effect, s32 id, CVector3 pos, CEventValue params);
 void CParticle__SpawnChild(CParticle *p, s32 model, s32 arg2, s32 enabled);
 void Sound__Play(s16 sound, CVector3 pos, sptr arg2, sptr arg3);
 void CParticleSystem__Free(CParticleSystem *list, CParticle *p);

@@ -17,8 +17,8 @@ extern s32 CGameRegion__GetFloorSurface(void *region);
 /* gCollisionResults_m_pFloorRegion / gCollisionResults_m_vFloorPos are CCollisionResults (gCollisionResults, structs/collision.h)
  * m_pFloorRegion and m_vFloorPos; kept as their own symbols: reading them
  * through gCollisionResults does not give this code. */
-extern void ImpactEvent_Send(CParticle *, CParticle *, s32 effect, s32, CVector3 pos, CEventValue params);
-extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
+void ImpactEvent_Send(void *src, void *dst, s32 effect, s32 id, CVector3 pos, CEventValue params);
+void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 extern void Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
 extern void CParticleSystem__Free(CParticleSystem *sys, CParticle *p);

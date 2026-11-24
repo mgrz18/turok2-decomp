@@ -2,7 +2,7 @@
 #include "structs/vector.h"
 #include "structs/particle.h"
 
-extern f32 HalfToFloat(s32 half);                        /* half float -> f32 */
+f32 HalfToFloat(s32 half);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);   /* out = in * s */
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a + b */
 extern f32 func_00298470(f32);                             /* sqrtf */

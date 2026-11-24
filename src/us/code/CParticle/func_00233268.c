@@ -7,9 +7,9 @@
 #include "common.h"
 #include "structs/particle.h"
 #endif
-typedef struct B19Obj B19Obj;
+typedef struct B19ProxObj B19ProxObj;
 #ifdef TARGET_PORT
-struct B19Obj {
+struct B19ProxObj {
 /* the view at the host offsets of CParticle (tools/port/hostview.py): each field in its own
  * member of one union, placed by __builtin_offsetof of the member it reads */
 #define T2_HOFF_B19Obj(m) __builtin_offsetof(CParticle, m)
@@ -20,7 +20,7 @@ struct B19Obj {
     };
 };
 #else
-struct B19Obj {
+struct B19ProxObj {
     u8 pad0[0x2];
     u16 id;          /* 0x2 */
     CVector3 pos;     /* 0x4 */
@@ -29,12 +29,12 @@ struct B19Obj {
 };
 #endif
 void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
-void CParticle__CheckProximity(void *, B19Obj *, B19Obj **, s32);
-void CParticleSystem__ResolveInteractions(void *owner, B19Obj **arr, s32 n) {
+void CParticle__CheckProximity();
+void CParticleSystem__ResolveInteractions(void *owner, B19ProxObj **arr, s32 n) {
     s32 i, j;
     CVector3 d;
-    B19Obj *o;
-    B19Obj *e;
+    B19ProxObj *o;
+    B19ProxObj *e;
     for (i = 0; i < n; i++) {
         o = arr[i];
         switch (o->id) {

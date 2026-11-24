@@ -10,8 +10,8 @@ extern u8 CGameRegion__GetWallSurface(void *region); /* ABI: it returns u8 (as s
 #else
 extern s32 CGameRegion__GetWallSurface(void *region);                     /* region's surface type */
 #endif
-extern void ImpactEvent_Send(CParticle *, CParticle *, s32 effect, s32, CVector3 pos, CEventValue params);
-extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
+void ImpactEvent_Send(void *src, void *dst, s32 effect, s32 id, CVector3 pos, CEventValue params);
+void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 extern void Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
 extern void CParticleSystem__Free(CParticleSystem *sys, CParticle *p);

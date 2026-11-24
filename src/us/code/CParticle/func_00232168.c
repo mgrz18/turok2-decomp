@@ -4,12 +4,12 @@
 #include "globals/collision.h"
 
 
-void CMtxF__FromMtxAffine(CMtxF *out, void *src);
-void CMtxF__InvertAffine(CMtxF *out, CMtxF *in);
-void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
+void CMtxF__FromMtxAffine(void *out, void *in);
+void CMtxF__InvertAffine(void *out, void *in);
+void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
 void CVector3__Normalize(CVector3 *v);
-void CMtxF__RotateVector(CMtxF *m, CVector3 *in, CVector3 *out);
-void AI_HearNoise(u8 *owner, u8 *ai, void *pos, s32 n);
+void CMtxF__RotateVector(void *m, CVector3 *in, CVector3 *out);
+void AI_HearNoise(void *target, void *ai, CVector3 *from, s32 arg3);
 
 void CParticle__AttachToHitNode(CParticle *actor, CMtxF *mtx, s32 kind) {
     CMtxF tmp;

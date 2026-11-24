@@ -14,7 +14,7 @@ extern void CMtxF__SetLookDirection(CMtxF m, CVector3 *dir);             /* matr
 extern f32 CGameRegion__GetHeight(void *region, f32 x, f32 z);        /* ground height */
 extern void CGameRegion__GetTiltRotation(CQuaternion *out, void *region);         /* ground orientation */
 extern void CGameRegion__GetCeilingTiltRotation(CQuaternion *out, void *region);         /* wall orientation */
-extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF m);                /* to matrix */
+void CQuaternion__ToMatrix(CQuaternion *q, void *m);
 extern void CMtxF__MultiplyAffine(CMtxF out, CMtxF a, CMtxF b);      /* out = a * b */
 extern f32 CGameRegion__GetEdgeYaw(void *region, s32 attach);
 extern void CMtxF__SetRotateY(CMtxF m, f32 angle);

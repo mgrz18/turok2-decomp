@@ -3,23 +3,26 @@
 
 #include "structs/particle.h"
 #include "structs/game_object.h"
-typedef struct { f32 x, y, z, w; } Vector4f;
 
 extern f32 func_00298470(f32);                              /* sqrtf */
-extern f32 GameObject_GetCollisionYOffset(CGameObjectInstance *actor);               /* its height */
-extern f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);
-extern f32 HalfToFloat(s32 value);
+f32 GameObject_GetCollisionYOffset(CGameObjectInstance *item);
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);
+f32 HalfToFloat(s32 half);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a - b */
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
 extern void CVector3__Normalize(CVector3 *v);                        /* normalize */
-#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
-#define CQuaternion__FromDirection CQuaternion__FromDirection_byval
+/* The quaternion facing dir, returned by value: the N64 definition's (out, dir) seen as a struct return
+ * (the hidden pointer is its first argument); the port calls its by-value shim (ABI.md, struct_scalar). */
+#ifdef TARGET_PORT
+extern CQuaternion CQuaternion__FromDirection_byval(CVector3 *dir);
+#define CQuaternion__FromDirection_r CQuaternion__FromDirection_byval
+#else
+extern CQuaternion CQuaternion__FromDirection_r(CVector3 *dir) __asm__("CQuaternion__FromDirection");
 #endif
-extern Vector4f CQuaternion__FromDirection(CVector3 *dir);                  /* quaternion facing dir */
-extern void CQuaternion__SlerpFast(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b);
-extern void CQuaternion__ToMatrix(Vector4f *q, CMtxF *m);
-extern void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
+void CQuaternion__SlerpFast(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b);
+void CQuaternion__ToMatrix(CQuaternion *q, void *m);
+void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
 extern void CParticle__Wobble(CParticle *p, f32 scale);
 
 /* Speeds up along the heading, stopping at the definition's limit. */
@@ -54,9 +57,9 @@ void CParticle__UpdateHoming(CParticle *p) {
     CVector3 aim;
     CVector3 delta;
     CVector3 forward;
-    Vector4f from;
-    Vector4f to;
-    Vector4f turn;
+    CQuaternion from;
+    CQuaternion to;
+    CQuaternion turn;
     CMtxF matrix;
     struct CGameObjectInstance *target;
     f32 dist;
@@ -78,8 +81,8 @@ void CParticle__UpdateHoming(CParticle *p) {
             return;
         }
         CVector3__Normalize(&delta);
-        to = CQuaternion__FromDirection(&delta);
-        from = CQuaternion__FromDirection(&p->m_vDirection);
+        to = CQuaternion__FromDirection_r(&delta);
+        from = CQuaternion__FromDirection_r(&p->m_vDirection);
         speed = func_00298470(p->m_vVelocity.x * p->m_vVelocity.x + p->m_vVelocity.y * p->m_vVelocity.y + p->m_vVelocity.z * p->m_vVelocity.z);
         if (dist < 1024.0f) {
             amount = dist - 204.79999f;

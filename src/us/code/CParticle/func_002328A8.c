@@ -5,7 +5,7 @@
 #include "globals/engine.h"
 #include "protos/scene.h"
 
-s32 Render_QueueModelByResource(sptr, void *, void *, s32, s32); /* extern */
+void Render_QueueModelByResource(void *model, void *mtx, void *mtx2, s32 a, s32 b);
 
 void CParticle__DrawModel(CParticle *arg0) {
     CScene__GetLightsAt(&gScene, &arg0->header.m_vPos, &arg0->m_Lights[gEvenOdd]);

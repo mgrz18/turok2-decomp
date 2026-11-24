@@ -12,8 +12,8 @@
 #include "structs/vector.h"
 
 s32 Random_Next(void);
-s32 Collision_MoveInstance(CParticle *p, CVector3 pos, u32 *flags);
-f32 GameObject_GetCollisionHeight(CPlayer *player);
+s32 Collision_MoveInstance(void *obj, CVector3 to, void *info);
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);
 f32 GameObject_GetCollisionRadius(CPlayer *player);
 f32 func_00298470(f32 x);
 void CParticle__FireExpireEvent(CParticle *p);
@@ -172,7 +172,7 @@ void CParticle__Update(CParticle *p) {
         for (player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; player != NULL; player = player->m_pNext) {
             if (player->m_Data.m_Health != 0 && player->m_Mode != 2) {
                 top = player->m_CharacterActor.header.m_vPos.y + player->m_CharacterActor.m_CollisionYOffset;
-                if (top - 20.479999f <= p->header.m_vPos.y && p->header.m_vPos.y <= top + GameObject_GetCollisionHeight(player) + 20.479999f) {
+                if (top - 20.479999f <= p->header.m_vPos.y && p->header.m_vPos.y <= top + GameObject_GetCollisionHeight((CGameObjectInstance *) player) + 20.479999f) {
                     dist = func_00298470((player->m_CharacterActor.header.m_vPos.x - p->header.m_vPos.x) * (player->m_CharacterActor.header.m_vPos.x - p->header.m_vPos.x)
                                          + (player->m_CharacterActor.header.m_vPos.z - p->header.m_vPos.z) * (player->m_CharacterActor.header.m_vPos.z - p->header.m_vPos.z));
                     if (dist < GameObject_GetCollisionRadius(player) + 51.199997f) {

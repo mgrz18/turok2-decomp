@@ -8,25 +8,25 @@
 /* Same family as CParticle__UpdateHomingMissile (homing missile): here a projectile that flies
  * back to a point beside its owner's player and is caught there. */
 
-extern void *LoopSounds_Start(sptr bank, s32 sound, CVector3 *pos, CVector3 *pos2, sptr loops);  /* starts a sound */
+void *LoopSounds_Start(void *pool, s32 id, CVector3 *pos, void *pos2, sptr loops);
 extern void CParticle__StopLoopSound(void *obj);
 
-extern f32 HalfToFloat(s32 half);                         /* half float -> f32 */
+f32 HalfToFloat(s32 half);
 extern f32 func_00298470(f32);                              /* sqrtf */
 extern f32 Math_AcosLookup(f32);                              /* acosf */
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a - b */
 extern void CVector3__Normalize(CVector3 *v);                        /* normalize */
-extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
+void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 extern void CQuaternion__Normalize(CQuaternion *q);                        /* normalize */
-extern void CQuaternion__SlerpFast(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b); /* slerp */
-extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF m);               /* to matrix */
-extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);  /* transform */
+void CQuaternion__SlerpFast(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b);
+void CQuaternion__ToMatrix(CQuaternion *q, void *m);
+void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
 extern void CParticle__Wobble(void *obj, f32 scale);
 
 extern void CPlayer__TransformByView(CPlayer *player, CVector3 *pos);      /* player-relative point to world */
-extern f32 GameObject_GetCollisionHeight(CGameObjectInstance *owner);                     /* height */
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);
 
 
 extern f32 D_800ACE68; /* speed above which it flies home (15) */

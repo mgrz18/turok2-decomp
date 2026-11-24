@@ -4,8 +4,8 @@
 #include "globals/collision.h"
 
 struct CollisionInfo;
-CGameObjectInstance *CCamera__GetPlayer(CCamera *cam);
-s32 Collision_MoveInstance(void *obj, CVector3 to, struct CollisionInfo *info);
+void *CCamera__GetPlayer(void *cam);
+s32 Collision_MoveInstance(void *obj, CVector3 to, void *info);
 
 /* Whether the line from the camera to `target` is clear: a collision test
  * from the camera's position, made with the camera's player (moved there and

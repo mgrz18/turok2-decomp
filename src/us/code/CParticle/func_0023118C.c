@@ -20,11 +20,11 @@
  * flag stays in a saved register and nothing else is hoisted out of the walk. */
 
 extern s32 Frustum_TestBox(void *planes, CBox *box);
-extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
+void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
 extern void CParticle__BuildMatrix(CParticle *particle, void *mtx, CCamera *camera, f32 depth);
-extern void Render_QueueModelByResource(void *model, void *mtx, void *mtx2, s32 a, s32 b);
+void Render_QueueModelByResource(void *model, void *mtx, void *mtx2, s32 a, s32 b);
 extern void CParticle__DrawSprite(CParticle *particle, CCamera *view);
-extern void CParticle__DrawShadow(CParticle *particle, CCamera *view);
+extern void CParticle__DrawShadow(); /* (ShadowActor *, void *view), func_0022D2FC.c */
 extern void Swoosh_AddParticleNode(void *list, CParticle *particle, void *mtx);
 
 void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {

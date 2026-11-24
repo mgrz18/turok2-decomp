@@ -3,9 +3,9 @@
 #include "structs/particle.h"
 #include "globals/scene.h"
 
-s32 CDLightSet__Free(s32 *, CDLight *);              /* extern */
-s32 CParticle__BuildCameraMatrix();                            /* extern */
-s32 Trail_DetachOwner(s32 *, void *);           /* extern */
+void CDLightSet__Free(void *list, CDLight *light);
+void CParticle__BuildCameraMatrix(void *arg0);
+void Trail_DetachOwner(void *list, void *owner);
 
 
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CParticle__BuildCameraMatrix receives CParticle__StopEffects's own argument

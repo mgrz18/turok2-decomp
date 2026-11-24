@@ -23,8 +23,9 @@ struct Shared_ParticleView {
     Matrix viewMtx;    /* 0x20C */
 };
 
-extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
-extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
+void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
+/* The camera count read as an array (globals/camera.h declares the scalar): this view keeps the ROM's code. */
+extern s32 gCameraCountWords[] __asm__("gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount");
 extern void CParticle__BuildMatrix(void *, sptr, sptr, f32);
 
 #ifdef TARGET_PORT
@@ -38,7 +39,7 @@ void CParticle__BuildCameraMatrix(void *arg0) {
     CVector3 delta;
     f32 amount;
 
-    if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount[0] == 1) {
+    if (gCameraCountWords[0] == 1) {
         cam = (CCamera *) gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
         CMtxF__TransformPoint(&cam->m_mfView, &p->header.m_vPos, &delta);
         amount = delta.z;
@@ -57,7 +58,7 @@ void CParticle__BuildCameraMatrix(void *arg0) {
     void *arg1;
     f32 amount;
     s32 *state;
-    state = gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
+    state = gCameraCountWords;
     if (state[0] == 1) {
         arg1 = (void *)state[-4];
         CMtxF__TransformPoint(&((struct Shared_ParticleView *)arg1)->viewMtx, &((Shared_Particle *)arg0)->pos, &delta);

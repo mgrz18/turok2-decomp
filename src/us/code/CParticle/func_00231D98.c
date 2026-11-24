@@ -42,13 +42,15 @@ struct B19Obj {
 #include "structs/particle.h"
 #include "globals/scene.h"
 void CParticle__Attach(B19Obj *, sptr, sptr);
-void Trail_AddNode(void *, B19Obj *, s32);
+void Trail_AddNode(void *list, void *owner, s32 arg2);
 void *DLight_Spawn(void *, s32);
 void CParticle__StartLoopSound(B19Obj *, s32);
-#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
-#define Sound__Play Sound__Play_f3
+/* The position as three floats: the port's shim (port/game/t2abi.c), the N64 definition under its own name. */
+#ifdef TARGET_PORT
+void Sound__Play_f3(s32 id, f32 x, f32 y, f32 z, s32 follow, s32 owner);
+#else
+void Sound__Play_f3(s16 id, f32 x, f32 y, f32 z, s32 follow, s32 owner) __asm__("Sound__Play");
 #endif
-void Sound__Play(s16, f32, f32, f32, s32, s32);
 void CParticle__StartEffects(B19Obj *o, B19Def *def) {
     s32 t;
     CParticle__Attach(o, 0, 0);
@@ -64,7 +66,7 @@ void CParticle__StartEffects(B19Obj *o, B19Def *def) {
             CParticle__StartLoopSound(o, t);
             break;
         default:
-            Sound__Play(t, o->pos.x, o->pos.y, o->pos.z, 0, -1);
+            Sound__Play_f3(t, o->pos.x, o->pos.y, o->pos.z, 0, -1);
             break;
         }
     }

@@ -11,7 +11,7 @@ typedef struct B19Info38 B19Info38;
 typedef struct B19List B19List;
 typedef struct B19Handle B19Handle;
 typedef struct B19Parent B19Parent;
-typedef struct B19Obj B19Obj;
+typedef struct B19Spawner B19Spawner;
 struct B19PF {
               u8 pad0[0x1C];
                f32 a;
@@ -39,8 +39,8 @@ struct B19Info38 {
               s8 n;
 };
 struct B19List {
-              B19Obj * head;
-              B19Obj * tail;
+              B19Spawner * head;
+              B19Spawner * tail;
               u8 pad8[0xC];
 };
 struct B19Handle {
@@ -62,7 +62,7 @@ struct B19Parent {
                u8 pad34[0x4];
                B19Info38 * info38;
 };
-struct B19Obj {
+struct B19Spawner {
               s8 kind;
               u8 pad1[0x1];
               u16 id; /* Turok 2: id at 0x2 */
@@ -100,11 +100,11 @@ struct B19Obj {
                 u8 pad1E0[0x4];
                 B19List * slotp;
                 u8 pad1E8[0x4];
-                B19Obj * next;
+                B19Spawner * next;
                 s32 unk1F0;
-                B19Obj * next2;
+                B19Spawner * next2;
 };
-s32 func_00232F38(B19Obj *o) {
+s32 func_00232F38(B19Spawner *o) {
     switch (o->id) {
     case 5: case 6: case 7: case 9: case 0x11: case 0x13: case 0x1A: case 0x101: case 0x110:
         return 1;

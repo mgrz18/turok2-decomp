@@ -77,10 +77,10 @@ typedef struct Projectile {
 #endif
 
 
-extern f32 HalfToFloat(s32 halfFloat);
+f32 HalfToFloat(s32 half);
 extern f32 func_00298470(f32);             /* sqrtf */
-extern f32 GameObject_GetCollisionHeight(CPlayer *node);
-extern f32 GameObject_GetCollisionYOffset(CPlayer *node);
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);
+f32 GameObject_GetCollisionYOffset(CGameObjectInstance *item);
 extern f32 Random_Blend(f32 lo, f32 hi);   /* random in range */
 extern f32 Math_AcosLookup(f32);             /* acosf */
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -88,11 +88,11 @@ extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern void CVector3__LimitLength(CVector3 *v, f32 max);
 extern void CVector3__Normalize(CVector3 *v);
-extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
-extern void CQuaternion__SlerpFast(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b);
-extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *out);
-extern void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
-extern SndSource *LoopSounds_Start(void *pool, s32 id, CVector3 *pos, CVector3 *pos2, sptr arg4);
+void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
+void CQuaternion__SlerpFast(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b);
+void CQuaternion__ToMatrix(CQuaternion *q, void *m);
+void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
+void *LoopSounds_Start(void *pool, s32 id, CVector3 *pos, void *pos2, sptr loops);
 extern void CParticle__StopLoopSound(Projectile *p);
 extern void CParticle__Wobble(Projectile *p, f32 scale);
 extern void CParticle__UpdateHomingMissile(Projectile *p);
@@ -159,7 +159,7 @@ void CParticle__Steer(Projectile *o) {
                     h = p->m_CharacterActor.m_CollisionYOffset;
                     tp = p->m_CharacterActor.header.m_vPos;
                     tp.y += h;
-                    tp.y += GameObject_GetCollisionHeight(p2) * fa;
+                    tp.y += GameObject_GetCollisionHeight((CGameObjectInstance *) p2) * fa;
                     CVector3__Subtract(&d, tpp, &o->pos);
                     k = func_00298470(d.x * d.x + d.y * d.y + d.z * d.z);
                     if (k < 512.0f) {
@@ -174,7 +174,7 @@ void CParticle__Steer(Projectile *o) {
                 } while (p2 != NULL);
             }
             t = o->target;
-            tt = GameObject_GetCollisionYOffset(t);
+            tt = GameObject_GetCollisionYOffset((CGameObjectInstance *) t);
             tp = t->m_CharacterActor.header.m_vPos;
             tp.y += tt;
             CVector3__Subtract(&d, &tp, &o->pos);
@@ -207,10 +207,10 @@ void CParticle__Steer(Projectile *o) {
         def = o->def;
         if (def->flags & 0x40000) {
             if (def->turnRate != 0) {
-                tt = GameObject_GetCollisionYOffset(t);
+                tt = GameObject_GetCollisionYOffset((CGameObjectInstance *) t);
                 tp = t->m_CharacterActor.header.m_vPos;
                 tp.y += tt;
-                tp.y += GameObject_GetCollisionHeight(t) * 0.5f;
+                tp.y += GameObject_GetCollisionHeight((CGameObjectInstance *) t) * 0.5f;
                 CVector3__Subtract(&dir, &tp, &o->pos);
                 CVector3__Normalize(&dir);
                 CQuaternion__FromDirection(&q1, &dir);

@@ -15,9 +15,9 @@ typedef struct {
     /* 0x14C */ CMtxF transform;
 } PlayerView;
 
-extern void CMtxF__FromMtxAffine(CMtxF out, void *in);              /* unpack a bone matrix */
-extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
-extern void CMtxF__RotateVector(CMtxF m, CVector3 *in, CVector3 *out);   /* transform direction */
+void CMtxF__FromMtxAffine(void *out, void *in);
+void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
+void CMtxF__RotateVector(void *m, CVector3 *in, CVector3 *out);
 
 void CParticle__Attach(CParticle *actor, CVector3 *outPosition, CVector3 *outHeading) {
     CMtxF matrix;

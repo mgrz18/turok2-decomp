@@ -6,15 +6,18 @@
 #include "globals/collision.h"
 #include "protos/game.h"
 
-extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
-#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
-#define CMtxF__SetRotateZ CMtxF__SetRotateZ_i
+void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
+/* The angle passed as its word (the float's bits in a1): the port's shim (port/game/t2abi.c,
+ * ABI.md float_int), the N64 definition under its own name. */
+#ifdef TARGET_PORT
+void CMtxF__SetRotateZ_i(void *m, s32 angle);
+#else
+void CMtxF__SetRotateZ_i(void *m, s32 angle) __asm__("CMtxF__SetRotateZ");
 #endif
-extern void CMtxF__SetRotateZ(CMtxF m, s32 angle);              /* rotation about Y */
-extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);  /* transform */
+void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
 extern CMtxF *CParticle__GetParentTransform(CParticle *p, sptr arg1);         /* parent transform */
-extern void GameObject_TraceMove(CParticle *p, CVector3 to, CVector3 *outPos, void **outRegion, s32, s32);
+void GameObject_TraceMove(void *actor, CVector3 to, CVector3 *outPos, void *outRegion, s32 flagA, s32 flagB);
 
 static __inline__ f32 offset_x(CParticle *p) {
     if (p->m_pEffect->m_pModel != NULL) {
@@ -56,7 +59,7 @@ void CParticle__SpawnChild(CParticle *p, s32 model, s32 arg2, s32 flags) {
         offset.x = -offset_x(p);
         offset.y = -offset_y(p);
         offset.z = 0.0f;
-        CMtxF__SetRotateZ(matrix, *(s32 *)&p->m_vRot.z);
+        CMtxF__SetRotateZ_i(matrix, *(s32 *)&p->m_vRot.z);
         CMtxF__TransformPoint(matrix, &offset, &turned);
         parent = CParticle__GetParentTransform(p, 0);
         if (parent != NULL) {

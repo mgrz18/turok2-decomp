@@ -6,14 +6,14 @@ typedef struct {
     /* 0x1B8 */ s32 loop;               /* looping sound handle */
 } SoundObject;
 
-s32 LoopSounds_Stop(sptr, sptr);                    /* extern */
+void LoopSounds_Stop(void *bank, void *handle);
 
 #include "structs/particle.h"
 /* the host CParticle's m_pLoopSound, pointer-wide */
 void CParticle__StopLoopSound(SoundObject *arg0) {
     CParticle *p = (CParticle *) arg0;
     if (p->m_pLoopSound != NULL) {
-        LoopSounds_Stop(LoopSounds_Get(), (sptr) p->m_pLoopSound);
+        LoopSounds_Stop(LoopSounds_Get(), p->m_pLoopSound);
         p->m_pLoopSound = NULL;
     }
 }

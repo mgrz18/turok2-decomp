@@ -172,7 +172,7 @@ extern f32 func_002982F0(f32 angle);                             /* sin */
 extern void CMtxF__SetEulerXYZ(CMtxF m, f32 x, f32 y, f32 z);         /* rotation */
 extern void CMtxF__Identity(CMtxF *m);                              /* identity */
 extern void CMtxF__MultiplyAffine(CMtxF out, CMtxF a, CMtxF b);          /* out = a * b */
-extern void CMtxF__SetRotateZ(CMtxF m, f32 angle);                   /* roll */
+void CMtxF__SetRotateZ(void *m, f32 angle);
 extern void CMtxF__TranslateLocal(CMtxF m, f32 x, f32 y, f32 z);
 extern void CMtxF__Translate(CMtxF *m, f32 x, f32 y, f32 z);         /* translate */
 extern f32 CGameRegion__GetHeight(void *region, f32 x, f32 z);            /* ground height */
@@ -479,13 +479,13 @@ typedef struct {
 void *MtxPool_Alloc(void *pool, s32 count);
 void CGameRegion__GetTiltRotation(CQuaternion *out, void *region);
 f32 GameObject_GetGroundHeight(ShadowActor *actor, s32 arg1);    /* ground height */
-s32 Collision_MoveInstance(void *obj, CVector3 to, CCollisionInfo *info);
+s32 Collision_MoveInstance(void *obj, CVector3 to, void *info);
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);
 void CVector3__ClampLength(CVector3 *v, f32 arg1);
-void CQuaternion__ToMatrix(CQuaternion *rot, CMtxF *m);
+void CQuaternion__ToMatrix(CQuaternion *q, void *m);
 void CMtxF__ScaleAxes(CMtxF *m, f32 x, f32 y, f32 z);  /* scale */
 void CMtxF__Translate(CMtxF *m, f32 x, f32 y, f32 z);  /* translate */
 void CMtxF__ToMtxAffine(CMtxF *m, void *dst);
@@ -493,7 +493,7 @@ void Render_DrawShadowQuad(void *mtx, s32 arg1, u32 alpha);
 
 /* Draws the blob shadow under an actor: on the ground of its region, or
  * where a ray cast straight down from it lands, tilted to the surface. */
-void CParticle__DrawShadow(ShadowActor *actor) {
+void CParticle__DrawShadow(ShadowActor *actor, void *view) { /* view: unused (CParticleSystem__Draw passes the camera) */
     CMtxF mtx;
     CVector3 pos;
     CQuaternion rot;
@@ -732,9 +732,9 @@ extern u8 gParticleSpriteVtx[];             /* the sprite's four vertices */
 extern void *Texture_Request(s32 *ref);
 extern void Texture_GetInfo(void *model, AnimInfo *info);
 extern void Texture_Load(s32 *ref, void *model, s32 frame, s32 a3, s32 shiftS, s32 shiftT, s32 a6, s32 a7, s32 a8);
-extern ParticleHead *CCamera__GetPlayer(ParticleView *view);
-extern s32 Collision_MoveInstance(void *obj, CVector3 to, CCollisionInfo *info);
-extern void CMtxF__TransformPoint(void *m, void *in, void *out);
+void *CCamera__GetPlayer(void *cam);
+s32 Collision_MoveInstance(void *obj, CVector3 to, void *info);
+void CMtxF__TransformPoint(void *m, CVector3 *in, CVector3 *out);
 extern void *MtxPool_Alloc(void *pool, s32 count);
 extern void Render_SetCombineMode(s32 mode);
 extern void Render_SetRenderMode(s32 mode);
@@ -1055,11 +1055,11 @@ typedef struct EffectActor {
 } EffectActor;
 #endif
 
-s16 *CPlayer__GetFiringAmmo(u8 *, s32);
+s16 *CPlayer__GetFiringAmmo(void *player, s32 slot);
 void CParticle__StopLoopSound(EffectActor *);
-void CParticle__BuildCameraMatrix(EffectActor *);
-void Trail_DetachOwner(void *, EffectActor *);
-void CDLightSet__Free(void *, CDLight *);
+void CParticle__BuildCameraMatrix(void *arg0);
+void Trail_DetachOwner(void *list, void *owner);
+void CDLightSet__Free(void *list, CDLight *light);
 
 void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
     EffectActor *child;
@@ -1412,9 +1412,9 @@ extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern void CVector3__Normalize(CVector3 *v);
-extern void CMtxF__RotateVector(CMtxF *m, CVector3 *in, CVector3 *out);
-extern void CMtxF__FromMtxAffine(CMtxF *out, CMtxF *in);
-extern void CMtxF__InvertAffine(CMtxF *out, CMtxF *in);
+void CMtxF__RotateVector(void *m, CVector3 *in, CVector3 *out);
+void CMtxF__FromMtxAffine(void *out, void *in);
+void CMtxF__InvertAffine(void *out, void *in);
 extern void CMtxF__ScaleAxes(CMtxF *m, f32 x, f32 y, f32 z);
 extern void CMtxF__Translate(CMtxF *m, f32 x, f32 y, f32 z);
 extern void CMtxF__SetScale(CMtxF *m, f32 x, f32 y, f32 z);
@@ -1424,17 +1424,17 @@ extern void CMtxF__Identity(CMtxF *m);
 #define GameObject_GetAimRotation GameObject_GetAimRotation_sret
 #endif
 extern void GameObject_GetAimRotation(CQuaternion *q, Owner *owner, CVector3 pos);
-extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *m);
+void CQuaternion__ToMatrix(CQuaternion *q, void *m);
 extern void Material_GetTextureSet(u32 *bits, s32 value);
 extern f32 RandomInPackedRange(PackedRange r);
-extern f32 HalfToFloat(u16 h);
-extern void GameObject_TraceMove(Effect *effect, CVector3 pos, CVector3 *outPos, void **outRegion, s32 a, s32 b);
+f32 HalfToFloat(s32 half);
+void GameObject_TraceMove(void *actor, CVector3 to, CVector3 *outPos, void *outRegion, s32 flagA, s32 flagB);
 extern void Color_ShiftHue(s8, u8, u8, u8, u8 *, u8 *, u8 *);
 extern void Color_Saturate(u8, u8, u8, u8, u8 *, u8 *, u8 *);
 extern void Color_Darken(u8, u8, u8, u8, u8 *, u8 *, u8 *);
-extern void AI_HearNoise(Actor *actor, s32 *ai, CVector3 *from, s32 arg3);
+void AI_HearNoise(void *target, void *ai, CVector3 *from, s32 arg3);
 extern void CParticle__Attach(Effect *effect, sptr, sptr);
-extern void Trail_AddNode(void *, Effect *, s32);
+void Trail_AddNode(void *list, void *owner, s32 arg2);
 extern void *DLight_Spawn(void *, s32);
 extern void CParticle__StartLoopSound(Effect *effect, s32 sound);
 extern void Sound__Play(s16 sound, CVector3 pos, sptr a, sptr b);
@@ -1526,7 +1526,8 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
     }
 }
 
-s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s32 *refCount, sptr arg4, s32 kind,
+/* sys, source, owner: void * as protos/game.h declares them, read through casts (typed locals moved registers). */
+s32 CParticleSystem__Spawn(void *sys, void *source, void *owner, s32 *refCount, sptr arg4, s32 kind,
                   CVector3 arg6, CQuaternion rotation, CVector3 pos, void *region, s32 arg10, s32 arg11) {
     CMtxF mtx;
     CVector3 dir;
@@ -1580,7 +1581,7 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
         return 0;
     }
     count = 0;
-    resource = sys->m_pParticleData;
+    resource = ((CParticleSystem *) sys)->m_pParticleData;
     gCollisionResultsP = &target;
     block = CISet__GetBlock(resource, 1);
     numEntries = block->count;
@@ -1612,7 +1613,7 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
 #endif
         ownerId = 0;
         if (owner != 0) {
-            switch (owner->type) {
+            switch (((Owner *) owner)->type) {
                 case 1:
                 case 2:
                     ownerId = owner;
@@ -1632,7 +1633,7 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
             entry = &entries[i];
             ok = (entry->playerMask & mask) != 0;
             if ((entry->flags & 0x80) && ownerId != 0) {
-                if (findOwned(&sys->m_ActiveList[(s8) entry->params->listIndex], ownerId, entry) != 0) {
+                if (findOwned(&((CParticleSystem *) sys)->m_ActiveList[(s8) entry->params->listIndex], ownerId, entry) != 0) {
                     ok = 0;
                 }
             }
@@ -1711,30 +1712,30 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
             }
             extra = 0;
             if (entry->flags & 0x8000) {
-                switch (source->type) {
+                switch (((Actor *) source)->type) {
                     case 2:
-                        if (!(source->flags & 0x100000)) {
+                        if (!(((Actor *) source)->flags & 0x100000)) {
                             if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
                                 camera = gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
-                                CMtxF__TransformPoint(&camera->m_mfView, &source->pos, &aimDelta);
+                                CMtxF__TransformPoint(&camera->m_mfView, &((Actor *) source)->pos, &aimDelta);
                                 depth = aimDelta.z;
                                 if (depth < 0.0f) {
                                     depth = -depth;
                                 }
-                                CParticle__BuildMatrix(source, &source->matrices[gEvenOdd], camera, depth);
+                                CParticle__BuildMatrix(source, &((Actor *) source)->matrices[gEvenOdd], camera, depth);
                             } else {
-                                CParticle__BuildMatrix(source, &source->matrices[gEvenOdd], 0, 0.0f);
+                                CParticle__BuildMatrix(source, &((Actor *) source)->matrices[gEvenOdd], 0, 0.0f);
                             }
-                            source->flags |= 0x100000;
+                            ((Actor *) source)->flags |= 0x100000;
                         }
-                        CMtxF__FromMtxAffine(&mtx, &source->matrices[gEvenOdd]);
+                        CMtxF__FromMtxAffine(&mtx, &((Actor *) source)->matrices[gEvenOdd]);
                         scale = 0.09765625f;
-                        if (source->model->m_pModel != 0) {
+                        if (((Actor *) source)->model->m_pModel != 0) {
                             scale = 2.857143f;
                         }
                         CMtxF__ScaleAxes(&mtx, scale, scale, scale);
-                        if (source->model->m_dwFlags & 8) {
-                            CMtxF__Translate(&mtx, 0.0f, -source->unk130 * source->unk134, 0.0f);
+                        if (((Actor *) source)->model->m_dwFlags & 8) {
+                            CMtxF__Translate(&mtx, 0.0f, -((Actor *) source)->unk130 * ((Actor *) source)->unk134, 0.0f);
                         }
                         break;
                     case 1:
@@ -1742,7 +1743,7 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
                         CMtxF__SetScale(&mtx, -1.0f, 1.0f, -1.0f);
                         break;
                     default:
-                        CMtxF__SetTranslate(&mtx, source->pos.x, source->pos.y, source->pos.z);
+                        CMtxF__SetTranslate(&mtx, ((Actor *) source)->pos.x, ((Actor *) source)->pos.y, ((Actor *) source)->pos.z);
                         break;
                 }
             } else if (entry->flags & 0x1000000) {
@@ -1777,7 +1778,7 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
                 effect->kind = kind;
                 effect->entry = entry;
                 effect->mode = mode;
-                if (source->type == 2) {
+                if (((Actor *) source)->type == 2) {
                     effect->source = source;
                 } else {
                     effect->source = 0;
@@ -1936,17 +1937,17 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
                 if (entry->params->group != 3) {
                     Effect *other;
 
-                    for (other = sys->m_DrawList.m_pHead; other != 0; other = other->groupNext) {
+                    for (other = ((CParticleSystem *) sys)->m_DrawList.m_pHead; other != 0; other = other->groupNext) {
                         if (other->entry == effect->entry) {
                             break;
                         }
                     }
                     if (other != 0) {
-                        CList__InsertBefore(&sys->m_DrawList, other, effect);
+                        CList__InsertBefore(&((CParticleSystem *) sys)->m_DrawList, other, effect);
                     } else if (effect->entry->flags & 0x2000) {
-                        CList__AddHead(&sys->m_DrawList, effect);
+                        CList__AddHead(&((CParticleSystem *) sys)->m_DrawList, effect);
                     } else {
-                        CList__AddTail(&sys->m_DrawList, effect);
+                        CList__AddTail(&((CParticleSystem *) sys)->m_DrawList, effect);
                     }
                     effect->flags |= 0x1000000;
                 }
@@ -1967,7 +1968,7 @@ s32 CParticleSystem__Spawn(CParticleSystem *sys, Actor *source, Owner *owner, s3
                 }
                 vel = &effect->velocity;
                 CVector3__Scale(vel, vel, gProjectileSpeedScale);
-                if ((kind == 0x2D || kind == 0x4F) && source->type == 2) {
+                if ((kind == 0x2D || kind == 0x4F) && ((Actor *) source)->type == 2) {
                     if (gCollisionResults.m_pInstance != 0) {
                         aimEffect(effect, vel);
                     }
