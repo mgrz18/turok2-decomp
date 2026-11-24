@@ -243,8 +243,8 @@ nothing from it.
 |---|---:|---|
 | `vm2/BlindOne` | 70 | `rw/abu_protos.h` against `protos/*.h` (`CCache__*`, `CList__*`), `AI_UpdateTargets`, local struct names |
 | `vm2/Demo` | 28 | `CList__AddHead` .. (`rw/abu_protos.h` vs `protos/list.h`), `CEngineApp__SetupFadeTo`, `Triple` vs a local `Triple`, `CCache__Allocate` |
-| `vm2/MpMenu` | 109 | field symbols read as arrays (`gEngineApp_m_Settings_match[]`, `_unk16[]`, `_unk18[]`, `_match_teamScore`), `Controller_ConfirmPressed` in five forms, `MenuPool_OpenChildMenu_2`, `Menu_StepValue_2`, `sprintf`, local struct names |
-| `vm2/PakMenu` | 139 | `osCreateMesgQueue` and the libultra prototypes, `CCache__*`, local struct names (87 messages on the first pass) |
+| `vm2/MpMenu` | 109 | field symbols read as arrays (`gEngineApp_m_Settings_match[]`, `_unk16[]`, `_unk18[]`, `_match_teamScore`), `Controller_ConfirmPressed` in five forms, `MenuPool_OpenChildMenu_2`, `Menu_StepValue_2`, `sprintf`, local struct names; round 26 (o2): split off `vm2/TitleMenu` |
+| `vm2/PakMenu` | 139 | `osCreateMesgQueue` and the libultra prototypes, `CCache__*`, local struct names (87 messages on the first pass); round 26 (o2): split off `vm2/Video` |
 | `vm2/Primagen` | 53 | the `gLevelScript` field-symbol views (`ModeState0040457C`, `LevelScriptF950` against `LevelScriptState`), a local type used before a file defines it |
 | `vm2/SceneLoad` | 23 | the `CList`/`CCache`/`CScene` prototype families (`rw/abu_protos.h` vs `protos/*.h`), `ProPackDecompress` in four forms, local struct names (72 messages) |
 
@@ -321,12 +321,12 @@ change; they need more time.
 | `code/libultra/io/vimgr` | 2 | **merged** (round 24, first batch) |
 | `code/libultra/libc/xprintf` | 2 | **merged** (round 24, first batch) |
 | `code/libultra/os/timerintr` | 4 | **merged** (round 24, first batch) |
-| `code/AI` | 48 | .rodata interrupted by data no C file owns (1: `unnamed@0xA7478`); round 25 (n2): linker padding before `func_00241E30` or `func_002427E0`: two objects; also declarations differ |
+| `code/AI` | 48 | .rodata interrupted by data no C file owns (1: `unnamed@0xA7478`); round 25 (n2): linker padding before `func_00241E30` or `func_002427E0`: two objects; also declarations differ; round 26 (o2): split at `AI_InitHealth` (`PlatformCollide` merged, `AI` header work) |
 | `code/Action` | 17 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `Action_Draw`)) |
 | `code/Anim` | 49 | .rodata interrupted by data no C file owns (1: `unnamed@0xA64F4`); round 25 (n2): `D_800A58F4` (a float the C reads as an extern); also declarations differ |
 | `code/BinaryRange` | 13 | **merged** (round 24, first batch) |
 | `code/Boot` | 4 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `gSavedPlayers`)) |
-| `code/CAudioWorld` | 101 | .rodata interrupted by data no C file owns (3: `unnamed@0xA8C94`); round 25 (n2): linker padding three times: four objects; also declarations differ |
+| `code/CAudioWorld` | 101 | .rodata interrupted by data no C file owns (3: `unnamed@0xA8C94`); round 25 (n2): linker padding three times: four objects; also declarations differ; round 26 (o2): split into `Frustum` (merged), `AudioMgr`, `CAudioWorld`, `SndVoice` |
 | `code/CCache` | 56 | calls typed differently (2: `CCache__AllocateInternal`, `CCache__WaitForDisplayLists`); declarations differ (18: `CCache__DeallocateInternal`, `CCache__DetachCacheEntry`, `CCache__FreeCacheEntry`, `CCache__FreeMemEntry`, ...); local types differ (3: `B12Bucket`, `B12Mgr`, `B12Node`); other (1: `request for member `m_pHead' in something not a structure or`). Round 25 n1: 35+ conflicts: its own B12Node/B12Bucket/B12Mgr views against structs/cache.h, osSendMesg, CHeap__Alloc/Free; the cache manager's real struct first (part n4's D_800D7BE0 work) |
 | `code/CCamera` | 66 | .rodata interleaved with another directory's (2 subsegments between, e.g. `func_0042F9B0`); round 25 (n2): interleaved with `vm1/Demo`: one object over the engine and the VM; also declarations differ |
 | `code/CCollisionSetup` | 3 | **merged** (round 24, first batch) |
@@ -338,7 +338,7 @@ change; they need more time.
 | `code/CInstancePool` | 18 | .rodata interrupted by data no C file owns (1: `unnamed@0xA6C6C`); round 25 (n2): `sCInstancePoolCacheDesc_*` strings read as externs; also declarations differ |
 | `code/CLevelActor` | 9 | .rodata not in .text order (2 inverted pairs of 5 subsegments); round 25 (n2): deferred `func_00215944` (`--inline`); also declarations differ |
 | `code/CMtxF` | 124 | .rodata interrupted by data no C file owns (3: `unnamed@0xA6004`); round 25 (n2): `sCStaticObjectCacheDesc_*` strings and `0, 1.0, 0` read as externs; also declarations differ |
-| `code/CParticle` | 212 | .rodata interrupted by data no C file owns (8: `unnamed@0xA7004`); round 25 (n2): linker padding six times; `D_800A652C` and a float table read as externs; also declarations differ |
+| `code/CParticle` | 212 | .rodata interrupted by data no C file owns (8: `unnamed@0xA7004`); round 25 (n2): linker padding six times; `D_800A652C` and a float table read as externs; also declarations differ; round 26 (o2): split into `CParticle`, `Trail`, `ImpactEvent`, `Path` (merged), `SweepShapes`, `ModelSweep`, `Pickup` |
 | `code/CPlayer` | 245 | .rodata interleaved with another directory's (7 subsegments between, e.g. `func_0042DA60`); round 25 (n2): interleaved with `vm1/CPlayer`: one object over the engine and the VM; also declarations differ |
 | `code/CScene` | 96 | .rodata interleaved with another directory's (7 subsegments between, e.g. `func_0042AA80`); round 25 (n2): interleaved with `vm1/SceneLoad`: one object over the engine and the VM; also declarations differ |
 | `code/Cinema` | 34 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (5: `Sound__StopAllExcept`, `gScene`, `gScene_m_LevelID`, `gScene_m_WarpSpawn`, ...)) |
@@ -359,7 +359,7 @@ change; they need more time.
 | `code/HostIo` | 34 | **merged** (round 25, n2: `-msplit-addresses` proven for all 34; was: cc1 flags differ) |
 | `code/Hud` | 48 | declarations differ (5: `Draw`, `ModeState`, `gEngineApp_m_OnScreen_m_FontXScale`, `gEngineApp_m_OnScreen_m_ShadowXOff`, ...); local types differ (2: `Chunk`, `FontStyle`); parse errors (12: `(Each undeclared identifier is reported `, `*`, `FrameEntry`, `byte`, ...); other (1: `for each function it appears in.)`). Round 25 n1: 21+ conflicts: gEngineApp_m_OnScreen_m_* field symbols read as arrays, `Draw`/`ModeState` names used as both type and function |
 | `code/InteractiveAnim` | 15 | **merged** (round 24, after unifying its declarations; was: declarations differ (3: `AI_PlayAnim`, `CGameObjectInstance__AdvanceAnimation`, `CGameObjectInstance__SetAnimByAction`)) |
-| `code/LevelEvent` | 31 | .rodata interrupted by data no C file owns (1: `unnamed@0xA8C3C`); round 25 (n2): linker padding before `func_0026DFB0`: two objects; also declarations differ |
+| `code/LevelEvent` | 31 | .rodata interrupted by data no C file owns (1: `unnamed@0xA8C3C`); round 25 (n2): linker padding before `func_0026DFB0`: two objects; also declarations differ; round 26 (o2): split into `DList` and `LevelEvent` at `LevelEvent_Fire` |
 | `code/LoopSounds` | 10 | **merged** (round 24, after unifying its declarations; was: declarations differ (3: `CList__AddTail`, `CList__Remove`, `Sound__Stop`)) |
 | `code/Platform` | 27 | **merged** (round 24, after unifying its declarations; was: declarations differ (2: `Platform_Step`, `StateInfo`)) |
 | `code/Render` | 28 | **merged** (round 25 n1, after unifying its declarations; was: calls typed differently (1: `Model_BlendMorphFrames`); declarations differ (2: `CCache__LockForDisplayList`, `CCache__Unlock`); local types differ (2: `Material`, `Vtx`)) |
@@ -389,14 +389,14 @@ change; they need more time.
 | `vm1/ContinueMenu` | 2 | **merged** (round 24, first batch) |
 | `vm1/Demo` | 28 | .rodata interleaved with another directory's (6 subsegments between, e.g. `func_0027C074`); round 25 (n2): interleaved with `code/CCamera`; also `--name` |
 | `vm1/GameOverMenu` | 3 | **merged** (round 24, first batch) |
-| `vm1/MissionMenu` | 14 | .rodata interrupted by data no C file owns (1: `unnamed@0xC2368`); round 25 (n2): linker padding before `func_00424B90`; also declarations differ |
+| `vm1/MissionMenu` | 14 | .rodata interrupted by data no C file owns (1: `unnamed@0xC2368`); round 25 (n2): linker padding before `func_00424B90`; also declarations differ; round 26 (o2): split off `Mission` (`Mission_LevelObjectivesDone`) |
 | `vm1/MotherBoss` | 65 | **merged** (round 25 merge, after unifying its declarations as its vm2 twin's; was: declarations differ (6: `AI_UpdateTargets`, `Actor_SpawnParticle`, `CAI__CallHurt`, `CLevelActorPool__Spawn`, ...)) |
-| `vm1/MpMenu` | 110 | .rodata interrupted by data no C file owns (3: `unnamed@0xC1A78`); round 25 (n2): linker padding before one of ten starts; `sMpMenuFmt_3d` read as an extern; also declarations differ |
-| `vm1/NameEntryMenu` | 8 | .rodata interrupted by data no C file owns (1: `unnamed@0xC1F4C`); round 25 (n2): the strings of its key table in `.data` (asm): the table in C first (compiles merged otherwise; round 25 merge: merged with `--rodata-free`, `make verify` fails, the strings are not in the C) |
+| `vm1/MpMenu` | 110 | .rodata interrupted by data no C file owns (3: `unnamed@0xC1A78`); round 25 (n2): linker padding before one of ten starts; `sMpMenuFmt_3d` read as an extern; also declarations differ; round 26 (o2): split off `TitleMenu` at `SingleMenu_Init` |
+| `vm1/NameEntryMenu` | 8 | .rodata interrupted by data no C file owns (1: `unnamed@0xC1F4C`); round 25 (n2): the strings of its key table in `.data` (asm): the table in C first (compiles merged otherwise; round 25 merge: merged with `--rodata-free`, `make verify` fails, the strings are not in the C); **merged** (round 26 o2, with its key table as C `.data`) |
 | `vm1/OptionsMenu` | 31 | **merged** (round 25, n2: every function `DEFERRED`; was: .rodata not in .text order) |
 | `vm1/Pak` | 42 | .rodata not in .text order (1 inverted pairs of 3 subsegments); round 25 (n2): deferred from index 2..6 on, index 7 defined before 6; also declarations differ |
-| `vm1/PakMenu` | 140 | .rodata interrupted by data no C file owns (2: `unnamed@0xC2008`); round 25 (n2): linker padding (two places); `sPakMenuText_Spaces3` read as an extern; also declarations differ |
-| `vm1/Primagen` | 115 | .rodata interrupted by data no C file owns (2: `unnamed@0xC0F14`); round 25 (n2): linker padding twice; also declarations differ |
+| `vm1/PakMenu` | 140 | .rodata interrupted by data no C file owns (2: `unnamed@0xC2008`); round 25 (n2): linker padding (two places); `sPakMenuText_Spaces3` read as an extern; also declarations differ; round 26 (o2): split off `Video` at `Video_ApplyResolution` |
+| `vm1/Primagen` | 115 | .rodata interrupted by data no C file owns (2: `unnamed@0xC0F14`); round 25 (n2): linker padding twice; also declarations differ; round 26 (o2): split into `AutomapDraw`, `MantidQueen`, `Primagen` |
 | `vm1/SceneActorPool` | 2 | **merged** (round 24, first batch) |
 | `vm1/SceneLoad` | 24 | .rodata interleaved with another directory's (15 subsegments between, e.g. `func_00220530`); round 25 (n2): interleaved with `code/CScene`; also declarations differ |
 | `vm1/StatsMenu` | 15 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (1: `gEngineApp_m_Settings_match_tag`)) |
@@ -412,11 +412,11 @@ change; they need more time.
 | `vm2/GameOverMenu` | 3 | **merged** (round 24, first batch) |
 | `vm2/MissionMenu` | 14 | **merged** (round 25, n3: one declaration per name, 7 parts) |
 | `vm2/MotherBoss` | 30 | **merged** (round 25, n3: its asm in C, one declaration per name, 19 parts) |
-| `vm2/MpMenu` | 106 | its .text subsegments are not adjacent; round 25: no asm left (109 files), declarations differ (n3 table above) |
+| `vm2/MpMenu` | 106 | its .text subsegments are not adjacent; round 25: no asm left (109 files), declarations differ (n3 table above); round 26 (o2): split off `vm2/TitleMenu` |
 | `vm2/NameEntryMenu` | 8 | **merged** (round 25, n3: 2 parts) |
 | `vm2/OptionsMenu` | 31 | **merged** (round 25, n3: one declaration per name, 6 parts) |
 | `vm2/Pak` | 41 | **merged** (round 25, n3: its asm in C, one declaration per name, 3 parts) |
-| `vm2/PakMenu` | 133 | its .text subsegments are not adjacent; round 25: no asm left (139 files), declarations differ (n3 table above) |
+| `vm2/PakMenu` | 133 | its .text subsegments are not adjacent; round 25: no asm left (139 files), declarations differ (n3 table above); round 26 (o2): split off `vm2/Video` |
 | `vm2/Primagen` | 35 | its .text subsegments are not adjacent; round 25: no asm left (53 files), declarations differ (n3 table above) |
 | `vm2/SceneActorPool` | 2 | **merged** (round 24, first batch) |
 | `vm2/SceneLoad` | 19 | its .text subsegments are not adjacent; round 25: no asm left (23 files), declarations differ (n3 table above) |
@@ -558,6 +558,100 @@ the C first), `code/libultra/audio/cseq` (the Rage Wars `sptr`/`uptr` typedefs a
 prototypes) and `vm2/Demo` (the CList family through `rw/abu_protos.h` in one file, `IntPair`,
 `Triple`, `CCache__Allocate`/`Deallocate`). None needs a ROM change.
 
+## Round 26, part o2: module boundaries, one data table in C, the engine/VM objects
+
+**Boundaries from `.rodata` padding.** `tools/modules.py` has a new evidence kind, `rodata pad`
+(`RODATA_PAD`): the stale non-zero bytes `tools/rodata_gaps.py` classifies as `PADDING` start a new
+object at a 16-aligned function between the owners of the two slices. Where there is one candidate
+the boundary is as hard as a `.text` pad; where there are several, the one where the name prefix
+changes is taken and the note says how many there were (soft; `make verify` cannot tell them apart:
+an object that ends on 16 leaves no trace in `.text`). A VM boundary is mirrored into the second copy
+(`rodata pad(other copy)`), and module 2 is now paired with module 1 from its first module's twin
+(the stale copy starts inside `Primagen`). 16 boundaries, 320 -> 339 modules:
+
+| Was | Now (functions) | Candidates |
+|---|---|---|
+| `code/CParticle` (216) | `CParticle` (66), `Trail` (45), `ImpactEvent` (45), `Path` (4), `SweepShapes` (30), `ModelSweep` (10), `Pickup` (16) | 1, 3, 2, 1, 1, 2 |
+| `code/AI` (48) | `PlatformCollide` (8), `AI` (40) | 2 |
+| `code/LevelEvent` (31) | `DList` (12: DList/NodePool/WeightedTable, `GameObject_EmitHotPoints`), `LevelEvent` (19) | 1 |
+| `code/CAudioWorld` (101) | `Frustum` (8), `AudioMgr` (7), `CAudioWorld` (45), `SndVoice` (41) | 3, 5, 2 |
+| `vm1/Primagen` (115) | `AutomapDraw` (12), `MantidQueen` (43), `Primagen` (60) | 4, 6 |
+| `vm1/MpMenu`, `vm2/MpMenu` (110) | `MpMenu` (72), `TitleMenu` (38: Single/Title/Quit/Pause/Sound menus) | 10 |
+| `vm1/PakMenu`, `vm2/PakMenu` (140) | `PakMenu` (128), `Video` (12) | 3 |
+| `vm1/MissionMenu`, `vm2/MissionMenu` (15) | `Mission` (1: `Mission_LevelObjectivesDone`), `MissionMenu` (14) | 1 (zeros after `" "` up to 16) |
+
+The new names are the dominant prefix, or `RENAMES` where that prefix is another module's
+(`SweepShapes`, `ModelSweep`, `PlatformCollide`, `AudioMgr`, `AutomapDraw`, `TitleMenu`; the first
+part of the old `LevelEvent` is `DList`, the events keep the name). The files moved with
+`tools/movemods.py` (`git mv` into each module's `// dir`, the yaml and comment paths rewritten);
+`Mission_LevelObjectivesDone_2` was taken out of the merged `vm2/MissionMenu/MissionMenu_2.c` by
+hand (its shared-pool line is the file's again). Every new directory passes the `.rodata` stage of
+`merge_check.py --rodata-free` (none is refused); 4 still have module data read as an extern
+(`code/CParticle`: an unnamed float table; `code/Trail`: `D_800A652C`; `vm1/MpMenu`: `" "`,
+`sMpMenuFmt_3d`; `vm1/PakMenu`: `sPakMenuText_Spaces3`/`_Space`). The `Mission`/`MissionMenu` split
+leaves `sMissionMenuText_Space` in `Mission`'s `.rodata` though only `MissionMenu` reads it: the
+zero pad says the boundary is there, but it is the weakest of the 16.
+
+```
+python3 tools/modules.py --write && python3 tools/movemods.py
+python3 tools/merge_module.py src/us/code/{Path,PlatformCollide,Frustum} --rodata-free   # one at a time
+```
+
+Merged after one declaration per name (pointer-only prototype changes, a renamed `Plane` view):
+`code/Path`, `code/PlatformCollide`, `code/Frustum` (20 files -> 3).
+
+**A module's `.data` in C: `vm1/NameEntryMenu`.** Merged (8 files -> 1) and its menu defined in
+the file: `gNameEntryMenuItems` (45 `MenuItemDesc`, was `D_0043AD10` in
+`virtual_rodata_0.data.s`) and `gNameEntryMenuDesc`, between `NameEntryMenu_CompareName` and
+`NameEntryMenu_DrawName`. cc1 writes a file-scope initializer's strings when it outputs the
+variable, last element first: that is the ROM's `" "`, `"9"`..`"0"`, `"z"`..`"a"` between the two
+functions' literals, from the table's `"a"`..`"z"`, `"0"`..`"9"`, `" "`. The yaml gives the file a
+`.data` subsegment (`[0x184D10, .data, vm1/NameEntryMenu/NameEntryMenu]`) and the stale words after
+it (linker padding) an unnamed `data` one. The title and the last three keys are engine strings
+(`sNameEntryText_Edit`, `_Glyph2/3/4`, now named). The port keeps the generated copy (the
+definitions are `#ifndef TARGET_PORT`: the `s32` data slot holds an N64 address, a handle on the
+host). This is the pattern for the other `.data` tables (below).
+
+**`code/Crash` (not done, the plan).** Its object's `.rodata` starts at 0x800AA070 (rom 0xAAA70,
+after 12 stale bytes at 0xAAA64): `""`, then the exception names `"Virtual coherency exception on
+data reference"` .. `"Interrupt"`, `"IP1"` .. `"IP8"`, `"BD"`, i.e. the strings of `gCrashCauseDesc`
+({mask, value, name}: BD, IP8..IP1, then the 18 exception codes) in reverse, then `": "` (read by
+`func_0028B430` as an extern), then the slices. Its `.data` is in the engine's initialised data
+after `.rodata` (`ABCA8.rodata.s`: the crash font, `sCrashCursorX/Y`, `sCrashBgColor`,
+`gCrashCauseDesc`, `sCrashCanExit`). So: `gCrashCauseDesc` defined in C before the first function,
+`": "`, `sCrashText_Spaces3`, `sCrashText_Newline` as literals, and a `.data` subsegment for the
+file inside `code_rodata` (that segment is all `rodata`-typed today: whether splat links a `.data`
+subsegment there in place is the open question), then the 12 stale bytes an unnamed `rodata` piece.
+
+**The engine/VM objects (`code/CPlayer` + `vm1/CPlayer`, `code/CScene` + `vm1/SceneLoad`,
+`code/CCamera` + `vm1/Demo`): not done.** Checked: SN's cc1 takes
+`__attribute__((section(".text.vm")))` on a function and writes `.section .text.vm,"ax"` for it,
+so one merged file can keep its VM functions in their own section while their literals stay in the
+object's one `.rodata`, in source order (which is what the ROM's interleaved run is). What the build
+needs: (1) in the `virtual` segment, a placeholder subsegment at the VM part's address whose
+linker-script line `make setup` rewrites to `<merged>.c.o(.text.vm)` (as `tools/shared_rodata.py`
+already rewrites per-part `.rodata` sections), with its auto-linked `.data`/`.bss` lines dropped;
+(2) the VM part's `.rodata` slices dropped from the yaml (the merged file's one slice covers the
+run); (3) `merge_module.py` writing the attribute for the functions of the VM directory and the
+functions in `.rodata` order. All three pairs also need header work before they compile merged
+(`merge_check.py --rodata-free`: `code/CPlayer` 245 files, `code/CScene` 96, `code/CCamera` 66 stop
+at the compiler), so the build route was not written this round.
+
+**State after o2: 93 modules are one C file; 57 module directories hold one function per file.**
+The 22 directories the splits made have no `.rodata` question left (18 header work only, 4 data read
+as externs: above); of round 25's 44, `vm1/NameEntryMenu` is merged and the 8 padded ones are split.
+
+| Reason | Directories |
+|---|---|
+| header work only | round 25's 18, plus `code/{AI, AudioMgr (its functions are the port's: #ifndef), CAudioWorld, DList, ImpactEvent, LevelEvent, ModelSweep, Pickup, SndVoice, SweepShapes}`, `vm1/{AutomapDraw, MantidQueen, MissionMenu, Primagen, TitleMenu, Video}`, `vm2/{TitleMenu, Video}` (36) |
+| data the C reads as externs, or `.data` tables in asm | `code/{Anim, CEngineApp, CGameObjectInstance, CInstancePool, CMtxF, Crash, CParticle, Trail}`, `vm1/{MpMenu, PakMenu}` (10) |
+| one object over the engine and the VM | the 6 above |
+| deferred functions plus header work | `code/{CLevelActor, VM}`, `vm1/{TotemDefense, Pak}` (4) |
+| cc1 flags | `code/adecHuffDecode` (1) |
+
+(`vm2/MpMenu`, `vm2/PakMenu` stay in round 25's header-work 18; part o1 works on those 18 and on the
+deferred and flags rows.)
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte
@@ -633,10 +727,12 @@ hints for naming, not evidence of Turok 2's layout.
 
 | Region | Modules | Functions | Of which libraries |
 |---|---:|---:|---|
-| `.code` (engine) | 241 | 2,576 | 155 modules, 289 functions: libultra/libaudio/libc (149 ultralib files), libgcc (6) |
-| VM module | 40 | 893 | 12 modules, 29 functions: the Controller Pak (`pfs*.c`, `contpfs.c`) |
-| VM module, stale copy | 39 | 835 | the same 12 |
-| all | 320 | 4,304 | |
+| `.code` (engine) | 252 | 2,576 | 155 modules, 289 functions: libultra/libaudio/libc (149 ultralib files), libgcc (6) |
+| VM module | 45 | 893 | 12 modules, 29 functions: the Controller Pak (`pfs*.c`, `contpfs.c`) |
+| VM module, stale copy | 42 | 835 | the same 12 |
+| all | 339 | 4,304 | |
+
+(Round 26 o2: 19 more from `.rodata` padding, above.)
 
 The game's own code is 86 modules in `.code` and 28 in the VM module. With
 about one object in four leaving no padding, the real count is nearer 115
@@ -674,12 +770,19 @@ module). "Start evidence" is why the module starts there.
 | DLights | engine | DLights_GetAtPoint | CDLightSet__GetNext | 0x00228910 | 6 | 660 | pad |
 | CSun | engine | CSunFrameData__Construct | func_00228C30 | 0x00228BB0 | 7 | 136 | pad |
 | Color | engine | Color_ShiftHue | Color_Darken | 0x00228C40 | 3 | 1780 | pad |
-| CParticle | engine | CParticle__SpawnChild | Pickup_Feedback | 0x00229340 | 216 | 91452 | pad |
+| CParticle | engine | CParticle__SpawnChild | CParticleSystem__ResolveInteractions | 0x00229340 | 66 | 41088 | pad |
+| Trail | engine | Swoosh_NewNode | SwooshSystem_DrawTrails | 0x002333C0 | 45 | 15072 | rodata pad, rodata pad: at 0xA7034 (one candidate) |
+| ImpactEvent | engine | ImpactEvent_Send | ImpactEvent_AIStopSound | 0x00236EA0 | 45 | 9520 | rodata pad, rodata pad: at 0xA7144 (of 3 candidates: where Swoosh gives way to ImpactEvent_) |
+| Path | engine | Path_ExpandNode | Path_FitsInRegion | 0x002393D0 | 4 | 2864 | rodata pad, rodata pad: at 0xA71FC (of 2 candidates: where ImpactEvent_ gives way to Path_) |
+| SweepShapes | engine | Collision_MoveInstance | Circle_SegmentIntersects | 0x00239F00 | 30 | 12624 | rodata pad, rodata pad: at 0xA7208 (one candidate) |
+| ModelSweep | engine | Collision_TestModels | Sweep_GetVolumeBounds | 0x0023D050 | 10 | 6096 | rodata pad, rodata pad: at 0xA72B4 (one candidate) |
+| Pickup | engine | CPlayer__CollectPickup | Pickup_Feedback | 0x0023E820 | 16 | 4188 | rodata pad, rodata pad: at 0xA72D8 (of 2 candidates: where Sweep_ gives way to CPlayer__) |
 | Sweep | engine | Sweep_TestBoxFaces | Collision_CompareInstanceHits | 0x0023F880 | 6 | 3964 | pad |
 | Collision | engine | Collision_SweepRegionWalls | Collision_SweepMapWalls | 0x00240800 | 2 | 2052 | pad |
 | CollisionRegions | engine | Collision_SweepRegions | Collision_SweepRegions | 0x00241010 | 1 | 2116 | pad |
 | CCollisionSetup | engine | CCollisionInfo__Reset | CCollisionSetup__Construct | 0x00241860 | 3 | 252 | pad |
-| AI | engine | Platform_GetCollisionBox | AI_DropPickupsByMask | 0x00241960 | 48 | 21084 | pad |
+| PlatformCollide | engine | Platform_GetCollisionBox | Platform_HitFace | 0x00241960 | 8 | 3712 | pad |
+| AI | engine | AI_InitHealth | AI_DropPickupsByMask | 0x002427E0 | 40 | 17372 | rodata pad, rodata pad: at 0xA7478 (of func_00241E30, func_002427E0: where Platform_ gives way to AI_) |
 | CPlayer | engine | CPlayer__ReadInput | String_CountTrailingSpaces | 0x00246BC0 | 250 | 69244 | pad |
 | WeaponMode | engine | WeaponActor_BuildMatrix | WeaponMode_AE934_Enter | 0x00257A40 | 49 | 9240 | pad |
 | EnemyAnim | engine | EnemyAnim_Idle_AF6F0 | EnemyAnim_Move_B0600 | 0x00259E60 | 76 | 3880 | pad |
@@ -700,11 +803,15 @@ module). "Start evidence" is why the module starts there.
 | CGameRegion | engine | CGameRegion__GetCeilingNormal | CGameRegion__GetMaxHeight | 0x00269A90 | 53 | 13784 | pad |
 | RandomInPackedRange | engine | Material_Unpack | RandomInPackedRange | 0x0026D070 | 2 | 392 | pad |
 | HalfToFloat | engine | FloatToHalf | HalfToFloat | 0x0026D200 | 2 | 40 | pad |
-| LevelEvent | engine | DList_Init | LevelEvent_CheckRequiredItem | 0x0026D230 | 31 | 5416 | pad |
+| DList | engine | DList_Init | GameObject_EmitHotPoints | 0x0026D230 | 12 | 3456 | pad |
+| LevelEvent | engine | LevelEvent_Fire | LevelEvent_CheckRequiredItem | 0x0026DFB0 | 19 | 1960 | rodata pad, rodata pad: at 0xA8C3C (one candidate) |
 | Rumble | engine | Rumble_GetLevelAt | RumblePool_FreeAll | 0x0026E760 | 10 | 1732 | pad |
 | RumbleCurve | engine | RumbleCurve_Init | RumbleCurve_GetValue | 0x0026EE30 | 3 | 380 | pad |
 | Level | engine | func_0026EFB0 | Level_GetHub | 0x0026EFB0 | 2 | 200 | pad |
-| CAudioWorld | engine | Frustum_FromCorners | SndVoicePool_ReleaseVoice | 0x0026F080 | 101 | 23220 | pad |
+| Frustum | engine | Frustum_FromCorners | Plane_TestBox | 0x0026F080 | 8 | 1760 | pad |
+| AudioMgr | engine | amCreateAudioMgr | __amDMA | 0x0026F760 | 7 | 2784 | rodata pad, rodata pad: at 0xA8C94 (of 3 candidates: where Plane_ gives way to am*) |
+| CAudioWorld | engine | CAudioWorld__Initialize | CAudioWorld__IsSoundBusy | 0x00270240 | 45 | 7136 | rodata pad, rodata pad: at 0xA8CB8 (of 5 candidates: where __am* gives way to CAudioWorld__) |
+| SndVoice | engine | Sound_CalcPan | SndVoicePool_ReleaseVoice | 0x00271E20 | 41 | 11540 | rodata pad, rodata pad: at 0xA8CEC (of func_00271B20, func_00271E20: where CAudioWorld__ gives way to Sound_) |
 | SndSeq | engine | SndSeq_Update | SndSeq_Load | 0x00274B40 | 12 | 2524 | pad |
 | Sound | engine | Sound__Initialize | Sound__Unlock | 0x00275520 | 31 | 1700 | pad |
 | LoopSounds | engine | func_00275BE0 | func_00275F8C | 0x00275BE0 | 10 | 948 | pad |
@@ -890,21 +997,26 @@ module). "Start evidence" is why the module starts there.
 | libgcc/_floatdisf | engine | __floatdisf | __floatdisf | 0x002A5130 | 1 | 176 | known, pad, known: GCC 2.8.1 libgcc2.c L_floatdisf |
 | code_tail_fragments | engine | func_002C22D8 | func_002C232C | 0x002C22D8 | 2 | 256 | gap, known, known: dead copies of older code (docs/ASM_ORIGIN.md) |
 | unk_002C23E0 | engine | func_002C23E0 | func_002C23E0 | 0x002C23E0 | 1 | 148 | pad |
-| Primagen | vm1 | Automap_RevealRegion | func_00407F0C | 0x00400000 | 115 | 32532 | region |
+| AutomapDraw | vm1 | Automap_RevealRegion | Automap_EdgeVisible | 0x00400000 | 12 | 7728 | region |
+| MantidQueen | vm1 | MantidQueen_Init | MantidQueen_GetTurnSide | 0x00401E30 | 43 | 6528 | rodata pad, rodata pad: at 0xC0F14 (of 4 candidates: where Automap_ gives way to MantidQueen_) |
+| Primagen | vm1 | Primagen_Hurt | func_00407F0C | 0x004037B0 | 60 | 18276 | rodata pad, rodata pad: at 0xC0F64 (of 6 candidates: where MantidQueen_ gives way to Primagen_) |
 | TotemDefense | vm1 | TotemDefense_Complete | TotemDefense_OnEvent | 0x00407F20 | 18 | 4312 | pad |
 | MotherBoss | vm1 | MotherBoss_Hurt | MotherBoss_OnDefeatCinemaDone | 0x00409000 | 66 | 14412 | pad |
 | BlindOne | vm1 | BlindOne_UpdateMover | BlindOne_SumGroupHealth | 0x0040C850 | 73 | 10728 | pad |
 | Cinema#2 | vm1 | Cinema_SplineSecondDerivs | Cinema_IsWaitCue | 0x0040F240 | 44 | 16360 | pad |
 | MenuItem | vm1 | MenuItem_FormatBinding | MenuPool_CloseMenu | 0x00413230 | 52 | 16980 | pad |
-| MpMenu | vm1 | MpMenu_StartFragTag | PauseMenu_Update | 0x00417490 | 110 | 12056 | pad |
+| MpMenu | vm1 | MpMenu_StartFragTag | DeathmatchMenu_OpenWeapons | 0x00417490 | 72 | 8400 | pad |
+| TitleMenu | vm1 | SingleMenu_Init | PauseMenu_Update | 0x00419560 | 38 | 3656 | rodata pad, rodata pad: at 0xC1C28 (of 10 candidates: where the multiplayer menus give way to Single/Title/Pause) |
 | ContinueMenu | vm1 | ContinueMenu_Yes | ContinueMenu_No | 0x0041A3B0 | 2 | 108 | pad |
 | GameOverMenu | vm1 | GameOverMenu_Init | GameOverMenu_TickCountdown | 0x0041A420 | 3 | 172 | pad |
 | CheatMenu | vm1 | CheatsMenu_Init | CheatMenu_FrootyStripesText | 0x0041A4D0 | 48 | 5496 | pad |
 | OptionsMenu | vm1 | GameSettings_SetDefaults | OptionsMenu_BrightnessText | 0x0041BA50 | 31 | 3844 | pad |
 | StatsMenu | vm1 | StatsMenu_SaveProfile | StatsMenu_InitAfterPak | 0x0041C960 | 15 | 1772 | pad |
 | NameEntryMenu | vm1 | NameEntryMenu_Init | NameEntryMenu_IsMatchOver | 0x0041D050 | 8 | 2100 | pad |
-| PakMenu | vm1 | SaveGame_Build | InventoryMenu_SelectOk | 0x0041D890 | 140 | 29132 | pad |
-| MissionMenu | vm1 | Mission_LevelObjectivesDone | func_00425710 | 0x00424A60 | 15 | 3316 | pad |
+| PakMenu | vm1 | SaveGame_Build | PakConfirmMenu_UpdateNo | 0x0041D890 | 128 | 25984 | pad |
+| Video | vm1 | Video_ApplyResolution | InventoryMenu_SelectOk | 0x00423E10 | 12 | 3148 | rodata pad, rodata pad: at 0xC2314 (of 3 candidates: where PakConfirmMenu_ gives way to Video_) |
+| Mission | vm1 | Mission_LevelObjectivesDone | Mission_LevelObjectivesDone | 0x00424A60 | 1 | 304 | pad |
+| MissionMenu | vm1 | MissionMenu_UpdateObjective1Count | func_00425710 | 0x00424B90 | 14 | 3012 | rodata pad, rodata pad: at 0xC2368 (zeros after the string " " up to the next 16; one candidate) |
 | Pak | vm1 | Pak_RefreshNotes | Pak_IsDirectoryAllocated | 0x00425760 | 42 | 6676 | pad |
 | libultra/io/pfsallocatefile.c | vm1 | osPfsAllocateFile | __osClearPage | 0x00427180 | 3 | 1536 | pad, ultralib |
 | libultra/io/pfsdeletefile.c | vm1 | osPfsDeleteFile | __osBlockSum | 0x00427780 | 3 | 1180 | ultralib |

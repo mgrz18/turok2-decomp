@@ -1,0 +1,5 @@
+// Round 26 part o2: data names (tools/apply_names.py format).
+sNameEntryText_Edit = 0x800B53E8; // string 'edit': the title item of gNameEntryMenuItems
+sNameEntryText_Glyph2 = 0x800B53F0; // string '\x02': gNameEntryMenuItems, an add-char key
+sNameEntryText_Glyph3 = 0x800B53F4; // string '\x03': gNameEntryMenuItems, the delete key
+sNameEntryText_Glyph4 = 0x800B53F8; // string '\x04': gNameEntryMenuItems, the done key
