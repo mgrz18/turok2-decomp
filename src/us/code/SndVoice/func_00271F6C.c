@@ -1,15 +1,18 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802591A0_de_13.c, func_80259C5C_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. Over
+ * structs/sound.h (round 29, part r2: Rage Wars' ViewRecAtB0 is the SndVoice, its "angles" the
+ * pitch envelope env, its "motion" vp.pitch/vp.distSq; ControllerCode802591C0 is SoundEffectInfo). */
 
-#include "rw/abu_types.h"
+#include "common.h"
+#include "structs/sound.h"
 #include "globals/audio.h"
 #include "protos/half.h"
 
 extern f32 Random_Blend(f32 arg0, f32 arg1);
-extern struct Bytes12 *CAudioWorld__GetPitchEnvelope(ContextRecAt2BC0 *, s32);
-extern s16 SoundEffectInfo_GetRandomRange0(ControllerCode802591C0 *); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
-extern s16 SoundEffectInfo_GetRandomRange1(ControllerCode802591C0 *); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
-void SndVoice_InitPitch(ViewRecAtB0 *view, ControllerCode802591C0 *controller, s32 flags) {
+SndEnv *CAudioWorld__GetPitchEnvelope(CAudioWorld *m, s32 id);
+extern s16 SoundEffectInfo_GetRandomRange0(SoundEffectInfo *); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+extern s16 SoundEffectInfo_GetRandomRange1(SoundEffectInfo *); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+void SndVoice_InitPitch(SndVoice *v, SoundEffectInfo *info, s32 flags) {
     s16 x;
     s16 y;
     f32 fx;
@@ -21,43 +24,43 @@ void SndVoice_InitPitch(ViewRecAtB0 *view, ControllerCode802591C0 *controller, s
     s16 next;
     f32 base;
     f32 result;
-    struct Motion *motion;
-    struct Angles *angles;
-    motion = &view->motion;
-    angles = &view->angles;
-    motion->rate1 = motion->rate2 = 0.0f;
-    if (controller->preset != -1) {
-        *(struct Bytes12 *)angles = *CAudioWorld__GetPitchEnvelope(view->presets, controller->preset);
+    SndVoiceParams *vp;
+    SndEnv *env;
+    vp = &v->vp;
+    env = &v->env;
+    vp->distSq = vp->prevDistSq = 0.0f;
+    if (info->unkA != -1) {
+        *env = *CAudioWorld__GetPitchEnvelope(v->mgr, info->unkA);
     } else {
-        angles->heading = FloatToHalf(controller->yaw);
+        env->level = FloatToHalf(info->unk10);
     }
-    x = SoundEffectInfo_GetRandomRange0(controller);
-    y = SoundEffectInfo_GetRandomRange1(controller);
+    x = SoundEffectInfo_GetRandomRange0(info);
+    y = SoundEffectInfo_GetRandomRange1(info);
     fy = y;
     fx = x;
     turn = (s16)(s32)(fx + ((Random_Blend(fy, fx)) < 0.0f ? -(Random_Blend(fy, fx)) : (Random_Blend(fy, fx))));
-    angles->heading = FloatToHalf(HalfToFloat(angles->heading) + turn);
+    env->level = FloatToHalf(HalfToFloat(env->level) + turn);
     if (flags & 0x40) {
-        angles->heading = FloatToHalf(HalfToFloat(angles->heading) + 1.0e3f);
+        env->level = FloatToHalf(HalfToFloat(env->level) + 1.0e3f);
     }
     if (flags & 0x80) {
-        angles->heading = FloatToHalf(HalfToFloat(angles->heading) - 1.0e3f);
+        env->level = FloatToHalf(HalfToFloat(env->level) - 1.0e3f);
     }
-    if (HalfToFloat(angles->heading) >= 1.2e3f) {
-        angles->heading = FloatToHalf(1.2e3f);
+    if (HalfToFloat(env->level) >= 1.2e3f) {
+        env->level = FloatToHalf(1.2e3f);
     }
-    if (controller->flags & 2) {
-        motion->heading = HalfToFloat(angles->heading);
-        diff = HalfToFloat(angles->pitch);
-        diff -= HalfToFloat(angles->target);
-        if (angles->steps == 0) {
-            view->pitchStep = 0.0f;
+    if (info->flags & 2) {
+        vp->pitch.f = HalfToFloat(env->level);
+        diff = HalfToFloat(env->unk2);
+        diff -= HalfToFloat(env->target);
+        if (env->frames == 0) {
+            v->envStep = 0.0f;
         } else {
-            view->pitchStep = diff / angles->steps;
+            v->envStep = diff / env->frames;
         }
-        view->pitch = HalfToFloat(angles->pitch);
+        v->envValue = HalfToFloat(env->unk2);
     }
-    position = (HalfToFloat(angles->heading) + 6.0e3f) * 0.016666668f;
+    position = (HalfToFloat(env->level) + 6.0e3f) * 0.016666668f;
     index = position;
     if (index != position) {
         next = index + 1;
@@ -66,6 +69,6 @@ void SndVoice_InitPitch(ViewRecAtB0 *view, ControllerCode802591C0 *controller, s
     } else {
         result = sPitchRatioTable[index];
     }
-    motion->heading = result;
-    angles->heading = FloatToHalf(result);
+    vp->pitch.f = result;
+    env->level = FloatToHalf(result);
 }
