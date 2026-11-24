@@ -7,15 +7,15 @@
 
 /* Turok 2: position 0x4 and region 0x10 (Rage Wars 0x8 / 0x14). */
 /* Turok 2: LevelActor is 0x288 bytes, so the weapon actor follows at 0x288. */
-typedef struct Shared_ActorView {
+typedef struct Shared_ActorView_253D68 {
     CGameObjectInstance actor;
     CGameObjectInstance weapon;
-} Shared_ActorView;
+} Shared_ActorView_253D68;
 typedef struct Shared_World Shared_World;
 int CPlayer__SetPosition(void *arg0, void *arg1) {
     sptr region;
     CVector3 *src = arg1;
-    Shared_ActorView *view = arg0;
+    Shared_ActorView_253D68 *view = arg0;
     /* the region pointer-wide, and the position passed (round 9 x2): the ROM calls
      * CScene__FindRegionAt through an int-returning one-argument cast (the position stays in a1
      * from its own caller); on the host that cut the region to 32 bits: with --high-memory the

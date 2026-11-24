@@ -9,7 +9,7 @@ void CBarrel__Close(CBarrel *menu);
 void CBarrel__RunStick(CBarrel *menu, CPlayer *player, u32 *input);
 void CBarrel__RunButtons(CBarrel *menu, CPlayer *player, u32 *input);
 void Rumble_SetLink(struct RumbleEffect *effect, struct RumbleEffect **owner);
-s32 CBarrel__ShouldClose(CBarrel *menu, CPlayer *player);
+s32 CBarrel__ShouldClose(void *, void *);
 
 /* Updates the player's weapon menu: runs it (by stick or by buttons, from
  * the player's control style), then slides it open (state 1), keeps it

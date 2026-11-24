@@ -359,10 +359,10 @@ typedef struct Surface {
     /* 0x54 */ u16 unk54;
 } Surface;
 
-typedef struct Controller {
+typedef struct Controller_24C47C {
     /* 0x00 */ u8 pad0[8];
     /* 0x08 */ CVector3 pos;
-} Controller;
+} Controller_24C47C;
 
 #ifdef TARGET_PORT
 typedef struct Input {
@@ -370,7 +370,7 @@ typedef struct Input {
  * member of one union, placed by __builtin_offsetof of the member it reads */
 #define T2_HOFF_IN(m) __builtin_offsetof(CPlayerContState, m)
     union {
-        struct { u8 _hp_controller[T2_HOFF_IN(m_pContState)]; Controller *controller; }; /* N64 0x10 */
+        struct { u8 _hp_controller[T2_HOFF_IN(m_pContState)]; Controller_24C47C *controller; }; /* N64 0x10 */
         struct { u8 _hp_held[T2_HOFF_IN(m_dwButtons)]; u32 held; }; /* N64 0x24 */
         struct { u8 _hp_pressed[T2_HOFF_IN(m_dwButtonsSingle)]; u32 pressed; }; /* N64 0x28 */
         struct { u8 _hp_unk2C[T2_HOFF_IN(m_dwButtonsSingleNoHold)]; s32 unk2C; }; /* N64 0x2C */
@@ -381,7 +381,7 @@ typedef struct Input {
 #else
 typedef struct Input {
     /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ Controller *controller;
+    /* 0x10 */ Controller_24C47C *controller;
     /* 0x14 */ u8 pad14[0x24 - 0x14];
     /* 0x24 */ u32 held;
     /* 0x28 */ u32 pressed;
@@ -392,19 +392,19 @@ typedef struct Input {
 #endif
 
 #ifdef TARGET_PORT
-typedef struct Voice {
+typedef struct Voice_24C47C {
 /* the view at the host offsets of CAIModeInfo (tools/port/hostview.py): each field in its own
  * member of one union, placed by __builtin_offsetof of the member it reads */
 #define T2_HOFF_VO(m) __builtin_offsetof(CAIModeInfo, m)
     union {
         struct { u8 _hp_bank[T2_HOFF_VO(unk_10)]; s32 bank; }; /* N64 0x10 */
     };
-} Voice;
+} Voice_24C47C;
 #else
-typedef struct Voice {
+typedef struct Voice_24C47C {
     /* 0x00 */ u8 pad0[0x10];
     /* 0x10 */ s32 bank;
-} Voice;
+} Voice_24C47C;
 #endif
 
 /* CPlayer (structs/player.h) as CPlayer__Update reads it, kept local: it uses
@@ -435,7 +435,7 @@ typedef struct Player {
         struct { u8 _hp_emitter40[T2_HOFF_PL(m_WeaponActor.m_qGround)]; Quad emitter40; }; /* N64 0x2C8 */
         struct { u8 _hp_emitterYaw[T2_HOFF_PL(m_WeaponActor.m_RotY)]; f32 emitterYaw; }; /* N64 0x2D8 */
         struct { u8 _hp_unk3C8[T2_HOFF_PL(m_WeaponActor.m_AI)]; u8 unk3C8[0x3F4 - 0x3C8]; }; /* N64 0x3C8 */
-        struct { u8 _hp_voice[T2_HOFF_PL(m_WeaponActor.m_AI.m_pModeTable)]; Voice *voice; }; /* N64 0x3F4 */
+        struct { u8 _hp_voice[T2_HOFF_PL(m_WeaponActor.m_AI.m_pModeTable)]; Voice_24C47C *voice; }; /* N64 0x3F4 */
         struct { u8 _hp_unk430[T2_HOFF_PL(m_WeaponActor.m_AI.m_pParent)]; struct Player *unk430; }; /* N64 0x430 */
         struct { u8 _hp_control[T2_HOFF_PL(m_bActive)]; s32 control; }; /* N64 0x510 */
         struct { u8 _hp_options[T2_HOFF_PL(m_pOptions)]; CPlayerOptions *options; }; /* N64 0x518 */
@@ -513,7 +513,7 @@ typedef struct Player {
     /* 0x02D8 */ f32 emitterYaw;
     /* 0x02DC */ u8 pad2DC[0x3C8 - 0x2DC];
     /* 0x03C8 */ u8 unk3C8[0x3F4 - 0x3C8];
-    /* 0x03F4 */ Voice *voice;
+    /* 0x03F4 */ Voice_24C47C *voice;
     /* 0x03F8 */ u8 pad3F8[0x430 - 0x3F8];
     /* 0x0430 */ struct Player *unk430;
     /* 0x0434 */ u8 pad434[0x510 - 0x434];

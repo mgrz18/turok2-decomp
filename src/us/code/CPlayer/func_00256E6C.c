@@ -1,5 +1,4 @@
-typedef int s32;
-typedef unsigned char u8;
+#include "common.h"
 
 typedef struct {
     char pad0[0x24];

@@ -5,7 +5,7 @@
 
 
 
-extern void CPlayerContState__Init(void *, ControllerProfile *);
+void CPlayerContState__Init(void *, void *);
 extern void CPlayer__Reset(CPlayer *p);
 
 void CPlayer__Construct(CPlayer *p, s32 index, void *options) {

@@ -13,8 +13,8 @@ struct SlotRecAt14 {
     s32 y;
     f32 scale;
 };
-struct Menu;
-struct Menu {
+struct Menu_254C44;
+struct Menu_254C44 {
     s32 active;
     s32 pad4;
     f32 open;
@@ -30,11 +30,11 @@ struct Menu {
     s32 scroll;
     s32 last;
 };
-struct Menu;
-typedef struct Menu Menu;
-struct Menu;
-extern void CBarrel__Reset(Menu *menu);
-void CBarrel__Reset(Menu *menu) {
+struct Menu_254C44;
+typedef struct Menu_254C44 Menu_254C44;
+struct Menu_254C44;
+extern void CBarrel__Reset(Menu_254C44 *menu);
+void CBarrel__Reset(Menu_254C44 *menu) {
     s32 i;
     menu->active = 0;
     menu->pad4 = 0;

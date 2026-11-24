@@ -11,6 +11,6 @@ typedef struct {
 /* Host: the player array pointer-wide, and the host CPlayer's size (the N64 view read the array
  * as a u32 and divided by the N64 size 0x1328: a kill in high memory or a PIE indexed
  * m_KilledBy far out of range, STABILITY.md 7.2 S22). */
-uptr CPlayerPool__GetIndex(Pool0025340C *arg0, uptr arg1) {
+uptr CPlayerPool__GetIndex(void *arg0, uptr arg1) {
     return (arg1 - (uptr) ((CPlayerPool *) arg0)->m_Players) / sizeof(CPlayer);
 }

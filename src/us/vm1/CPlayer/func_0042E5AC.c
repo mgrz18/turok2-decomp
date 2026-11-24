@@ -10,20 +10,20 @@
 #define PLAYER_NEXT T2_OFFSETOF(CPlayer, m_pNext)
 
 
-typedef struct PlayerList {
+typedef struct PlayerList_42E5AC {
     /* 0x00 */ CPlayer **handle;
     /* 0x04 */ CPlayer *players;
     /* 0x08 */ s32 count;
     CPlayerCList list0[1];
     CPlayerCList list1[1];
-} PlayerList;
+} PlayerList_42E5AC;
 
 struct CMemEntry *CCache__Allocate(s32, s32, u32, char *);
 void CCache__Deallocate(sptr, void *);
 void CCache__Flush(s32);
 void Controller_SetRumbleOptionAll(s32);
 void *memset(void *, s32, uptr);
-extern void CPlayerContState__Init(void *, ControllerProfile *);
+void CPlayerContState__Init(void *, void *);
 extern void CPlayer__Reset(CPlayer *p);
 extern void CPlayer__NewGame(CPlayer *p, s32 character, s32 arg2);
 
@@ -41,7 +41,7 @@ static __inline__ void initPlayer(CPlayer *p, s32 index, CPlayerOptions *options
     CPlayer__Reset(p);
 }
 
-void CPlayerPool__NewGame(PlayerList *list, s32 count, s32 arg2) {
+void CPlayerPool__NewGame(PlayerList_42E5AC *list, s32 count, s32 arg2) {
     GameSettings *flags;
     CPlayerOptions *options;
     CPlayer *p;

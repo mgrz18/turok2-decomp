@@ -7,7 +7,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "protos/player.h"
-struct LevelActor;
+struct LevelActor_255940;
 struct Box;
 typedef struct Box Box;
 struct Box;
@@ -35,8 +35,8 @@ struct Shared_ParticleLighting {
     s8 direction[3];
     u8 reserved13[5];
 } __attribute__((aligned(4)));
-typedef struct LevelActor LevelActor;
-struct LevelActor {
+typedef struct LevelActor_255940 LevelActor_255940;
+struct LevelActor_255940 {
     u8 kind;
     s8 team;
     char pad2;
@@ -121,15 +121,15 @@ struct LevelActor {
     s32 renderFlags;
     s32 flags2E4;
 };
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
+struct LevelActor_255940;
+struct LevelActor_255940;
+struct LevelActor_255940;
+struct LevelActor_255940;
+struct LevelActor_255940;
+struct LevelActor_255940;
+struct LevelActor_255940;
+struct LevelActor_255940;
+struct LevelActor_255940;
 extern void CPlayer__MoveOnFoot(void *, void *, void *);
 extern void CPlayer__TurnAndLook(void *, void *, void *);
 s32 GameObject_IsOnGround(void *);
@@ -137,7 +137,7 @@ void PlayerDodgeFall_Update(sptr arg0, sptr arg1) {
     Math_EaseToward(arg0 + 0xAD0, 0.0f, 0.25f);
     CPlayer__TurnAndLook((void *)arg0, (void *)arg1, &gStandLookTuning);
     CPlayer__MoveOnFoot((void *)arg0, (void *)arg1, &gDodgeMoveTuning);
-    if (((LevelActor *)arg1)->position1.y <= 0.0f) {
+    if (((LevelActor_255940 *)arg1)->position1.y <= 0.0f) {
         if (GameObject_IsOnGround((void *) arg1) != 0) {
             CPlayer__SetState((void *) arg0, (void *) arg1, 2);
         }

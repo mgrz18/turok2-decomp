@@ -88,7 +88,7 @@ s32 Cinema_IsFinished(void);
 void CPlayer__NewGame(CPlayer *p, s32 character, s32);
 void CPlayer__Warp(CPlayer *p, s32, s32, s32);
 void CCameraPool__FreeCamera(void *pool, CCamera *cam);
-void CPlayerPool__UpdateMatchClock(PlayerList *list);
+void CPlayerPool__UpdateMatchClock(void *);
 void CPlayerPool__PickTagIt(PlayerList *list);
 
 static __inline__ void reset_strokes(CBarrel *s) {

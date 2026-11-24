@@ -25,12 +25,12 @@ typedef struct {
     /* 0xD0 */ s32 unkD0;
     /* 0xD4 */ u8 padD4[0x140 - 0xD4];
     /* 0x140 */ u8 sub140[1];
-} Attached002534E0;
+} Attached002534E0_25359C;
 
 /* 0x1328-byte list entries (see CPlayerPool__GetIndex) linked through 0x1320. */
 typedef struct Node002534E0 {
     /* 0x0000 */ u8 pad0[0xA50];
-    /* 0x0A50 */ Attached002534E0 *attached;
+    /* 0x0A50 */ Attached002534E0_25359C *attached;
     /* 0x0A54 */ u8 padA54[0x1320 - 0xA54];
     /* 0x1320 */ struct Node002534E0 *next;
 } Node002534E0;

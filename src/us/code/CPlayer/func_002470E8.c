@@ -5,7 +5,10 @@
 
 /* The host: through CPlayerContState (m_pContState is a pointer at 0x10 of a 0x38-byte
  * N64 record, so the word view below would truncate it and miss the host layout). */
-void CPlayerContState__Init(CPlayerContState *arg0, struct ControllerProfile *arg1) {
+void CPlayerContState__Init(void *arg0_, void *arg1_) {
+    CPlayerContState *arg0 = arg0_;
+    struct ControllerProfile *arg1 = arg1_;
+
     memset(arg0, 0, sizeof(*arg0));
     arg0->m_pContState = arg1;
 }
@@ -16,9 +19,12 @@ typedef struct {
     /* 0x00 */ s32 unk0[4];
     /* 0x10 */ s32 value;
     /* 0x14 */ s32 unk14[9];
-} Record14;
+} Record14_2470E8;
 
-void CPlayerContState__Init(Record14 *arg0, sptr arg1) {
+void CPlayerContState__Init(void *arg0_, void *arg1_) {
+    Record14_2470E8 *arg0 = arg0_;
+    sptr arg1 = (sptr) arg1_;
+
     arg0->unk0[0] = 0;
     arg0->unk0[1] = 0;
     arg0->unk0[2] = 0;

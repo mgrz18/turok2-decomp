@@ -16,7 +16,7 @@ typedef struct {
     /* 0x1C */ f32 climbImpulse;
     /* 0x20 */ s16 pad20;
     /* 0x22 */ s16 impulseSound;
-} Tuning;
+} Tuning_24F658;
 
 f32 Math_DecayToZero(f32 value, f32 rate);
 f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
@@ -31,7 +31,7 @@ s32 Sound__Play(s16, CVector3, sptr, sptr);
 /* Swimming movement: forward and strafe speeds, the dodge impulses and the
  * climb, turned by the body's facing and added to the velocity, with drag
  * on the way down and a roll from the strafe. */
-void CPlayer__MoveInWater(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
+void CPlayer__MoveInWater(CPlayer *player, CGameObjectInstance *body, Tuning_24F658 *tuning) {
     CVector3 forward;
     CVector3 strafe;
     CVector3 forwardOut;

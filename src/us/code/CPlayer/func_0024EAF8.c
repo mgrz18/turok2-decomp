@@ -13,7 +13,7 @@
 
 f32 AI_AngleToPoint(CGameObjectInstance *body, CVector3 point);   /* angle to a point */
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);
-void CPlayerContState__Init(void *controls, void *settings);
+void CPlayerContState__Init(void *, void *);
 f32 Actor_GetEyeHeight(CPlayer *player);
 void EnemyAI_Mount(CGameObjectInstance *mount, void *ai, CPlayer *player);
 

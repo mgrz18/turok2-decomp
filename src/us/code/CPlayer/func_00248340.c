@@ -5,7 +5,7 @@
 #include "protos/player.h"
 
 
-void CPlayerContState__Init(void *controls, void *settings);
+void CPlayerContState__Init(void *, void *);
 f32 Actor_GetEyeHeight(CPlayer *player);
 
 /* The ROM clears the float fields with integer stores (sw $zero): a 0.0f

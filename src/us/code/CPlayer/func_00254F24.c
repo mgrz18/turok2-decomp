@@ -14,7 +14,10 @@
  * (attract demo 1 walked into the wall beside its door). The same fix came from the soak (x5
  * S6): with the stick wheel the N64 offsets read m_Items and crashed on a garbage controller.
  * One body, typed like its caller (func_0024BD18.c). */
-s32 CBarrel__ShouldClose(CBarrel *self, CPlayer *other) {
+s32 CBarrel__ShouldClose(void *self_, void *other_) {
+    CBarrel *self = self_;
+    CPlayer *other = other_;
+
     if (self->m_bStickWheel != 0) {
         if (other->m_ContState.m_pContState->buttons & 0xC000) {
             return 0;
@@ -26,7 +29,10 @@ s32 CBarrel__ShouldClose(CBarrel *self, CPlayer *other) {
     return self->m_Turn <= 0.0f;
 }
 #else
-s32 CBarrel__ShouldClose(u8 *self, u8 *other) {
+s32 CBarrel__ShouldClose(void *self_, void *other_) {
+    u8 *self = self_;
+    u8 *other = other_;
+
     if (*(s32 *)(self + 0x380) != 0) {
         if (*(s32 *)(*(u8 **)(other + 0xA50) + 0xB0) & 0xC000) {
             return 0;

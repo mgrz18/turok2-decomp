@@ -16,7 +16,7 @@
 
 
 
-extern void CPlayerContState__Init(void *arg0, ControllerProfile *profile);
+void CPlayerContState__Init(void *, void *);
 extern f32 Actor_GetEyeHeight(CPlayer *player);
 
 void CPlayer__ResetControlState(CPlayer *player) {
