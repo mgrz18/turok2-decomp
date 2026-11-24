@@ -780,25 +780,47 @@ caller passes the heap: `void CCache__Flush(s32)` in the module, with `CCache__A
 same code; `CCamera__Construct`'s `IntPair gCameraVisBits` (a store to `gScreenClearTime` addressed
 off `gCameraVisBits`) is a `CCameraVisPair` view of the header's `gCameraVisBits`.
 
-**Not merged:**
+**Merged: `code/CPlayer` + `vm1/CPlayer` -> `code/CPlayer/CPlayer.c` (245 + 13 = 258 files)**, `make verify`
+byte-exact, `asm_diff --base 88d57333` 0. 92 `.rodata` slices, 6 of the VM part (`CPlayer__Construct`,
+`CPlayerPool__NewGame`...), in order in both parts. Header work in the one-function files first (each step
+`asm_diff` 0, then `merge_check --vm` OK):
 
-- `code/CScene` + `vm1/SceneLoad` (96 + 24 files): 199 compiler error lines merged (`CCache__*`,
-  `CScene__*`, `CList__*`, `CISet__GetBlock` declared several ways); and its engine `.rodata` is not in
-  engine `.text` order (`func_00224D54`'s `"binary block"`, `func_00224DF4`'s `"graphicset"` come
-  before `func_00220D00`'s `0.5f`), so it also needs the deferred-function (`--inline`) analysis
-  before the route applies. `func_002261A8.c` holds its own VM half already (`.text_vm`): the
-  merged file takes it in as one more VM-part function.
-- `code/CPlayer` + `vm1/CPlayer` (245 + 13 files): about 100 error lines merged, many of them
-  per-file struct views of shared types (`Record14`, `Controller`, `Voice`, `Tuning`,
-  `gEngineApp_m_Game_m_DebugLines` as `CAutomap` and as `s32`, `gEngineApp_m_Game_m_CameraPool` as
-  `CCameraPool` and `CGameFromCameraPool`) and prototypes with different arities
-  (`CBarrel__RunButtons`, `CPlayer__UpdateFlashlight`, `CPlayer__RamWithMount`, `CPlayer__TryMount`).
-  Its `.rodata` is in order in both parts (92 slices, 6 of the VM part), so the route applies once
-  it compiles.
+- one prototype per callee (about 40 names): the definition's where its types are
+  visible, else `void *` for an object pointer the files typed differently (pointer arguments only
+  warn); `protos/cache.h` out of the module as in CCamera;
+- the definitions take the argument their callers pass (`CBarrel__RunButtons`' input,
+  `CPlayer__UpdateFlashlight`'s body, `CPlayer__RamWithMount`/`CPlayer__TryMount`'s state flags:
+  unused, the callers set the register); `CPlayer__GetFiringAmmo` returns the `AmmoInfo`, its callers
+  read `->type`;
+- the functions defined in `#ifdef TARGET_PORT .. #else` pairs (`CPlayerContState__Init`,
+  `CBarrel__ShouldClose`, `CPlayerPool__UpdateMatchClock`, `CBarrel__Reset`) take `void *` in both
+  bodies and name their view in a local;
+- per-file types another file or a header defines differently renamed `<name>_<vram>` (`Record14`,
+  `Controller`, `Voice`, `Tuning`, `PlayerList`, `MatchState`, `Globals`, `Plr`, `Menu`,
+  `LevelActor`, `Arg1`...), two self-contained files on `common.h`'s base types;
+- globals a file read through its own type: the header's declaration plus a macro view
+  (`DEBUG_LINES_ON`, `CAMERA_POOL_GAME`, `SETTINGS_VIEW`, `#undef` at the end of the file) where the
+  code stays the same, an asm-label name for the symbol where a view off its address changes the code
+  (`gCameraPoolGameView`, `gMenuPoolGlobalsView`, `gMenuPoolGlobalsView_25492C`,
+  `gCollisionHitInstance`: `extern T name __asm__("symbol")`, the precedent `vm1/MenuItem` and
+  `code/CEngineApp` already use); the N64 m2c call of `Sound__Play` with its CVector3 as three words
+  is `Sound__Play_Words`, an asm label of `Sound__Play`.
 
-Both lists show how to proceed: `tools/merge_check.py --rodata-free --margs "--vm src/us/<vm dir>"
-<engine dir>` for the first conflicts, fix in the one-function files with `asm_diff --base` 0, then
-`merge_module.py <engine dir> --vm <vm dir> --rodata-free`.
+After the merge one string had no owner: `"player anim object info"` (`A7C94.rodata.s`, read as the
+extern `sActorCacheDesc_PlayerAnimObjectInfo`) lay between `func_002525BC`'s and `func_00252E08`'s
+slices; the merged file writes it as a literal (3 uses, pooled) and emits it there.
+`tools/merge_module.py` also learned that a top-level item does not end inside a comment (a comment
+line ending in `;` had cut one in two).
+
+**Not merged: `code/CScene` + `vm1/SceneLoad` (96 + 24 files).** About 140 distinct conflicts merged
+(`CScene__*` prototypes against `protos/scene.h`, `CCache__*`, `CList__*`, `CISet__GetBlock` with 2 and
+3 arguments, `ProPack__Decompress`, per-file types), and the route alone would not order its
+`.rodata`: `func_00224D54`'s `"binary block"` and `func_00224DF4`'s `"graphicset"` come before
+`func_00220D00`'s `0.5f` although they follow it in `.text`, and `"level name"` at 0xA6BD0 is read as an extern (no C file emits it). Two `DEFERRED` functions (`inline`: output at the end of their object, strings at the definition) would give that order only if an engine object ended after them, i.e. the engine part is two objects (0x220260..0x224ED0 and on); so the pair needs the boundary check (`tools/modules.py`) and `--inline` before `--vm`. `func_002261A8.c` already holds its own VM half (`.text_vm`).
+
+How to proceed with a pair: `tools/merge_check.py --rodata-free --margs "--vm src/us/<vm dir>" <engine
+dir>` for the conflicts, fix them in the one-function files with `asm_diff --base` 0, then
+`merge_module.py <engine dir> --vm <vm dir> --rodata-free`, `make setup`, a clean build, `make verify`.
 
 ## Evidence
 
