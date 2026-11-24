@@ -1,4 +1,4 @@
-/* The second VM module's copy of src/us/vm1/PakMenu/func_00424008.c (byte for byte, at the same link address or 0xE0 below
+/* The second VM module's copy of src/us/vm1/Video/func_00424008.c (byte for byte, at the same link address or 0xE0 below
  * it, docs/VMASM.md), with the second module's names. */
 /* xScale is a scratch first: it holds the new horizontal centre the edges are built from, then the scale. That second job is what keeps oldH canonical for CSE (a single-use copy is propagated away, and without one the centre is read from h's load). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FRONTEND/8040B45C_21.CPP, func_8040BDB8_de, with Turok 2's layouts. */

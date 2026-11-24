@@ -69,6 +69,30 @@ KNOWN = {
     0x002A4BE0: ("libgcc/_umoddi3", "known: GCC 2.8.1 libgcc2.c L_umoddi3"),
 }
 
+# Linker padding in .rodata (docs/MODULES.md, round 25 part n2 and round 26 part o2;
+# tools/rodata_gaps.py lists them): stale non-zero bytes, shorter than 16, no symbol, before a
+# .rodata slice on a 16-byte boundary. The slice after is the first of another object, which
+# starts at a 16-aligned function between the function owning the slice before and the one
+# owning the slice after. One candidate: hard; several: the one where the name prefix changes
+# (soft, noted). (region, first vram) -> evidence. A VM boundary holds in the second copy too.
+RODATA_PAD = {
+    ("engine", 0x002427E0): "rodata pad: at 0xA7478 (of func_00241E30, func_002427E0: where Platform_ gives way to AI_)",
+    ("engine", 0x0026F760): "rodata pad: at 0xA8C94 (of 3 candidates: where Plane_ gives way to am*)",
+    ("engine", 0x00270240): "rodata pad: at 0xA8CB8 (of 5 candidates: where __am* gives way to CAudioWorld__)",
+    ("engine", 0x00271E20): "rodata pad: at 0xA8CEC (of func_00271B20, func_00271E20: where CAudioWorld__ gives way to Sound_)",
+    ("engine", 0x002333C0): "rodata pad: at 0xA7034 (one candidate)",
+    ("engine", 0x00236EA0): "rodata pad: at 0xA7144 (of 3 candidates: where Swoosh gives way to ImpactEvent_)",
+    ("engine", 0x002393D0): "rodata pad: at 0xA71FC (of 2 candidates: where ImpactEvent_ gives way to Path_)",
+    ("engine", 0x00239F00): "rodata pad: at 0xA7208 (one candidate)",
+    ("engine", 0x0023D050): "rodata pad: at 0xA72B4 (one candidate)",
+    ("engine", 0x0023E820): "rodata pad: at 0xA72D8 (of 2 candidates: where Sweep_ gives way to CPlayer__)",
+    ("engine", 0x0026DFB0): "rodata pad: at 0xA8C3C (one candidate)",
+    ("vm1", 0x00424B90): "rodata pad: at 0xC2368 (zeros after the string \" \" up to the next 16; one candidate)",
+    ("vm1", 0x00419560): "rodata pad: at 0xC1C28 (of 10 candidates: where the multiplayer menus give way to Single/Title/Pause)",
+    ("vm1", 0x00423E10): "rodata pad: at 0xC2314 (of 3 candidates: where PakConfirmMenu_ gives way to Video_)",
+    ("vm1", 0x00401E30): "rodata pad: at 0xC0F14 (of 4 candidates: where Automap_ gives way to MantidQueen_)",
+    ("vm1", 0x004037B0): "rodata pad: at 0xC0F64 (of 6 candidates: where MantidQueen_ gives way to Primagen_)",
+}
 
 # Readable names where the dominant prefix is taken or says less than the functions do:
 # (region, first vram) -> name. Everything else keeps the dominant prefix.
@@ -77,9 +101,24 @@ RENAMES = {
     ("engine", 0x00241010): "CollisionRegions",
     # GameObject_ApplyCurrent, SlideTo, TestMove, CanSee, CanMoveTo, PlayLandSound: moving an object
     ("engine", 0x00269050): "GameObjectMove",
-    # DList/NodePool/WeightedTable helpers, then the level events and their triggers (Event_*,
-    # LevelEvent_*: 17 of the 31 functions; GameObject_EmitHotPoints is the biggest one)
-    ("engine", 0x0026D230): "LevelEvent",
+    # DList/NodePool/WeightedTable helpers and GameObject_EmitHotPoints (round 26: padded off the
+    # level events in .rodata; the 31 were one module before)
+    ("engine", 0x0026D230): "DList",
+    # the level events and their triggers (Event_*, LevelEvent_*: 17 of its 19 functions)
+    ("engine", 0x0026DFB0): "LevelEvent",
+    # round 26, modules found by .rodata padding (RODATA_PAD) whose dominant prefix is taken:
+    # Sweep_Hit*, the Quad_/Plane_ shape tests (Collision_MoveInstance first)
+    ("engine", 0x00239F00): "SweepShapes",
+    # Collision_TestModels, ModelSweep_*, Collision_TestInstances
+    ("engine", 0x0023D050): "ModelSweep",
+    # Platform_CollideGround/Box/Cylinder, HitFace: an actor against a platform
+    ("engine", 0x00241960): "PlatformCollide",
+    # amCreateAudioMgr, __amMain, the audio DMA callbacks
+    ("engine", 0x0026F760): "AudioMgr",
+    # Automap_RevealRegion .. Automap_EdgeVisible (the one-function `Automap` module is later)
+    ("vm1", 0x00400000): "AutomapDraw",
+    # SingleMenu, TitleMenu, QuitMenu, PauseMenu, SoundMenu: the front-end menus
+    ("vm1", 0x00419560): "TitleMenu",
     # CScene__Construct, LoadLevel, the Decompress* sections, warps, UnloadLevel: the level loader
     # the engine pages in (MatrixHeap_Construct first)
     ("vm1", 0x00429F20): "SceneLoad",
@@ -105,12 +144,14 @@ def src_dirs(mods):
             out[id(m)] = f"src/us/code/{clean(m['name'])}"
         elif m["region"] == "vm1":
             out[id(m)] = f"src/us/vm1/{clean(m['name'])}"
-    for a, b in zip(vm1, vm2):
+    # module 2 starts inside module 1 (its first module is the twin of a later module-1 one)
+    first = next((i for i, a in enumerate(vm1) if clean(a["name"]) == clean(vm2[0]["name"])), 0) if vm2 else 0
+    for a, b in zip(vm1[first:], vm2):
         twin = clean(a["name"])
         if clean(b["name"]) != twin and not b["name"].startswith("unk_"):
             raise SystemExit(f"module 2 out of step with module 1: {b['name']} against {a['name']}")
         out[id(b)] = f"src/us/vm2/{twin}"
-    if len(vm2) > len(vm1):
+    if len(vm2) > len(vm1) - first:
         raise SystemExit("module 2 has more modules than module 1")
     return out
 
@@ -176,6 +217,8 @@ def build(rom):
             starts.setdefault(i, set()).add("ultralib")
         if f[0] in KNOWN and region(f) == "engine":
             starts.setdefault(i, set()).add("known")
+        if (region(f), f[0]) in RODATA_PAD:
+            starts.setdefault(i, set()).add("rodata pad")
     # The two VM copies come from two links of the same objects: a padding boundary
     # between two functions in one copy is one between their twins in the other.
     base = lambda n: n[:-2] if n.endswith("_2") else n
@@ -185,18 +228,20 @@ def build(rom):
             where[(region(f), base(f[2]))] = i
     for i in sorted(starts):
         rg = region(fs[i])
-        if rg not in ("vm1", "vm2") or not ({"pad", "gap"} & starts[i]) or i == 0:
+        if rg not in ("vm1", "vm2") or not ({"pad", "gap", "rodata pad"} & starts[i]) or i == 0:
             continue
         other = "vm2" if rg == "vm1" else "vm1"
         j = where.get((other, base(fs[i][2])))
         k = where.get((other, base(fs[i - 1][2])))
         if j is not None and k == j - 1 and j not in starts:
-            starts[j] = {"pad(other copy)"}
+            starts[j] = {"rodata pad(other copy)" if "rodata pad" in starts[i] else "pad(other copy)"}
     idx = sorted(starts) + [len(fs)]
     mods = []
     for a, b in zip(idx, idx[1:]):
         run = fs[a:b]
         ev = sorted(starts[a])
+        if (region(run[0]), run[0][0]) in RODATA_PAD:
+            ev.append(RODATA_PAD[(region(run[0]), run[0][0])])
         # soft boundaries: runs of one class/module prefix (func_ joins the run before it)
         parts, cur = [], None
         for f in run:

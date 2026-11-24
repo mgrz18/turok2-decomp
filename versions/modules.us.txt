@@ -641,9 +641,9 @@ module Color: 0x00228C40..0x00229334, 3 functions; pad
   0x00228FF8 Color_Saturate
   0x002291D4 Color_Darken
 
-module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
+module CParticle: 0x00229340..0x002333C0, 66 functions; pad
   // dir src/us/code/CParticle
-  // name runs (possible objects the padding cannot show): CParticle 19, CParticleSystem 2, CParticle 1, CParticleSystem 2, CParticle 1, CParticleSystem 1, CParticle 26, CParticleSystem 4, Random 2, CParticle 5, CCamera 1, CParticle 1, CParticleSystem 1, Swoosh 1, Morph 2, Swoosh 1, Trail 9, Animator 1, ScreenTint 1, Quat 1, SwooshSystem 2, RibbonVtxPool 2, Swoosh 1, SwooshGroup 2, SwooshSystem 1, Swoosh 2, ScriptAnimator 4, Color 1, SwooshSystem 2, SwooshSet 1, SwooshSystem 2, Trail 1, Swoosh 1, Sprite 1, Swoosh 1, Path 1, Trail 1, Swoosh 1, SwooshSystem 2, ImpactEvent 1, Blast 3, ImpactEvent 7, Blast 4, ImpactEvent 30, Path 4, Collision 1, Sweep 6, SweepHit 2, Sweep 1, Quad 1, Plane 4, Quad 12, Sphere 1, Cylinder 1, Circle 1, Collision 1, ModelSweep 2, Collision 2, ModelSweep 1, Collision 1, Sweep 1, Collision 1, Sweep 1, CPlayer 1, Pickup 6, Sweep 1, CPlayer 1, Pickup 7
+  // name runs (possible objects the padding cannot show): CParticle 19, CParticleSystem 2, CParticle 1, CParticleSystem 2, CParticle 1, CParticleSystem 1, CParticle 26, CParticleSystem 4, Random 2, CParticle 5, CCamera 1, CParticle 1, CParticleSystem 1
   0x00229340 CParticle__SpawnChild
   0x00229618 CParticle__Wobble
   0x002298C4 CParticle__UpdateHomingMissile
@@ -710,6 +710,10 @@ module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
   0x00233000 CCamera__CanSeeTarget
   0x00233190 CParticle__ExpireNearby
   0x00233268 CParticleSystem__ResolveInteractions
+
+module Trail: 0x002333C0..0x00236EA0, 45 functions; rodata pad + rodata pad: at 0xA7034 (one candidate)
+  // dir src/us/code/Trail
+  // name runs (possible objects the padding cannot show): Swoosh 1, Morph 2, Swoosh 1, Trail 9, Animator 1, ScreenTint 1, Quat 1, SwooshSystem 2, RibbonVtxPool 2, Swoosh 1, SwooshGroup 2, SwooshSystem 1, Swoosh 2, ScriptAnimator 4, Color 1, SwooshSystem 2, SwooshSet 1, SwooshSystem 2, Trail 1, Swoosh 1, Sprite 1, Swoosh 1, Path 1, Trail 1, Swoosh 1, SwooshSystem 2
   0x002333C0 Swoosh_NewNode
   0x0023353C Morph_BlendVertices
   0x00233868 Morph_BlendVerticesTex
@@ -755,6 +759,10 @@ module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
   0x00236C64 Swoosh_AddNodeFromMtx
   0x00236D10 SwooshSystem_FindSwoosh
   0x00236D50 SwooshSystem_DrawTrails
+
+module ImpactEvent: 0x00236EA0..0x002393D0, 45 functions; rodata pad + rodata pad: at 0xA7144 (of 3 candidates: where Swoosh gives way to ImpactEvent_)
+  // dir src/us/code/ImpactEvent
+  // name runs (possible objects the padding cannot show): ImpactEvent 1, Blast 3, ImpactEvent 7, Blast 4, ImpactEvent 30
   0x00236EA0 ImpactEvent_Send
   0x0023726C Blast_CanHit
   0x002374AC Blast_GetPush
@@ -800,10 +808,17 @@ module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
   0x00239254 ImpactEvent_PlayFloorSound
   0x00239350 ImpactEvent_AIStartSound
   0x00239398 ImpactEvent_AIStopSound
+
+module Path: 0x002393D0..0x00239F00, 4 functions; rodata pad + rodata pad: at 0xA71FC (of 2 candidates: where ImpactEvent_ gives way to Path_)
+  // dir src/us/code/Path
   0x002393D0 Path_ExpandNode
   0x002399F8 Path_FindRegionPath
   0x00239C28 Path_FindFleeRegion
   0x00239DB0 Path_FitsInRegion
+
+module SweepShapes: 0x00239F00..0x0023D050, 30 functions; rodata pad + rodata pad: at 0xA7208 (one candidate)
+  // dir src/us/code/SweepShapes
+  // name runs (possible objects the padding cannot show): Collision 1, Sweep 6, SweepHit 2, Sweep 1, Quad 1, Plane 4, Quad 12, Sphere 1, Cylinder 1, Circle 1
   0x00239F00 Collision_MoveInstance
   0x0023A640 Sweep_HitBox
   0x0023A968 Sweep_HitRect
@@ -834,6 +849,10 @@ module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
   0x0023CE94 Sphere_Set
   0x0023CEC0 Cylinder_ContainsPoint
   0x0023CF04 Circle_SegmentIntersects
+
+module ModelSweep: 0x0023D050..0x0023E820, 10 functions; rodata pad + rodata pad: at 0xA72B4 (one candidate)
+  // dir src/us/code/ModelSweep
+  // name runs (possible objects the padding cannot show): Collision 1, ModelSweep 2, Collision 2, ModelSweep 1, Collision 1, Sweep 1, Collision 1, Sweep 1
   0x0023D050 Collision_TestModels
   0x0023D4D4 ModelSweep_TestTriangle
   0x0023D7CC ModelSweep_TestGroup
@@ -844,6 +863,10 @@ module CParticle: 0x00229340..0x0023F87C, 216 functions; pad
   0x0023DF70 Sweep_TestInstance
   0x0023E4A0 Collision_TestInstances
   0x0023E6D8 Sweep_GetVolumeBounds
+
+module Pickup: 0x0023E820..0x0023F87C, 16 functions; rodata pad + rodata pad: at 0xA72D8 (of 2 candidates: where Sweep_ gives way to CPlayer__)
+  // dir src/us/code/Pickup
+  // name runs (possible objects the padding cannot show): CPlayer 1, Pickup 6, Sweep 1, CPlayer 1, Pickup 7
   0x0023E820 CPlayer__CollectPickup
   0x0023ECF8 Pickup_GiveWeapon
   0x0023EF30 Pickup_FindWeaponEntry
@@ -887,9 +910,8 @@ module CCollisionSetup: 0x00241860..0x0024195C, 3 functions; pad
   0x00241894 CCollisionResults__Clear
   0x002418C0 CCollisionSetup__Construct
 
-module AI: 0x00241960..0x00246BBC, 48 functions; pad
-  // dir src/us/code/AI
-  // name runs (possible objects the padding cannot show): Platform 8, AI 1, CAI 1, AI 2, CAI 2, AI 7, Actor 1, DamageEvent 1, CAI 1, AI 10, Actor 1, AI 1, ValuePair 1, AI 1, CAI 1, AI 2, Actor 2, AI 5
+module PlatformCollide: 0x00241960..0x002427E0, 8 functions; pad
+  // dir src/us/code/PlatformCollide
   0x00241960 Platform_GetCollisionBox
   0x00241CB0 Platform_LandOnTop
   0x00241E30 Platform_CollideGround
@@ -898,6 +920,10 @@ module AI: 0x00241960..0x00246BBC, 48 functions; pad
   0x002425A4 Platform_GetTopHeight
   0x00242604 Platform_Collide
   0x002426F4 Platform_HitFace
+
+module AI: 0x002427E0..0x00246BBC, 40 functions; rodata pad + rodata pad: at 0xA7478 (of func_00241E30, func_002427E0: where Platform_ gives way to AI_)
+  // dir src/us/code/AI
+  // name runs (possible objects the padding cannot show): AI 1, CAI 1, AI 2, CAI 2, AI 7, Actor 1, DamageEvent 1, CAI 1, AI 10, Actor 1, AI 1, ValuePair 1, AI 1, CAI 1, AI 2, Actor 2, AI 5
   0x002427E0 AI_InitHealth
   0x002429BC CAI__Setup
   0x00242C00 AI_RideMovingPlatform
@@ -1804,9 +1830,9 @@ module HalfToFloat: 0x0026D200..0x0026D228, 2 functions; pad
   0x0026D200 FloatToHalf
   0x0026D210 HalfToFloat
 
-module LevelEvent: 0x0026D230..0x0026E758, 31 functions; pad
-  // dir src/us/code/LevelEvent
-  // name runs (possible objects the padding cannot show): DList 4, NodePool 3, WeightedTable 4, GameObject 1, LevelEvent 1, GameObject 1, CGameRegion 1, LevelEvent 2, Event 12, LevelEvent 2
+module DList: 0x0026D230..0x0026DFB0, 12 functions; pad
+  // dir src/us/code/DList
+  // name runs (possible objects the padding cannot show): DList 4, NodePool 3, WeightedTable 4, GameObject 1
   0x0026D230 DList_Init
   0x0026D240 DList_AddHead
   0x0026D288 DList_AddTail
@@ -1819,6 +1845,10 @@ module LevelEvent: 0x0026D230..0x0026E758, 31 functions; pad
   0x0026D5E4 WeightedTable_Add
   0x0026D628 WeightedTable_Pick
   0x0026D710 GameObject_EmitHotPoints
+
+module LevelEvent: 0x0026DFB0..0x0026E758, 19 functions; rodata pad + rodata pad: at 0xA8C3C (one candidate)
+  // dir src/us/code/LevelEvent
+  // name runs (possible objects the padding cannot show): LevelEvent 1, GameObject 1, CGameRegion 1, LevelEvent 2, Event 12, LevelEvent 2
   0x0026DFB0 LevelEvent_Fire
   0x0026E110 GameObject_FireTriggers
   0x0026E19C CGameRegion__FireTriggers
@@ -1864,9 +1894,9 @@ module Level: 0x0026EFB0..0x0026F078, 2 functions; pad
   0x0026EFB0 func_0026EFB0
   0x0026EFB8 Level_GetHub
 
-module CAudioWorld: 0x0026F080..0x00274B34, 101 functions; pad
-  // dir src/us/code/CAudioWorld
-  // name runs (possible objects the padding cannot show): Frustum 1, Plane 2, Frustum 4, Plane 1, amCreateAudioMgr 1, __amMain 1, __amDmaNew 1, __amHandleFrameMsg 1, __clearAudioDMA 1, AudioDMA 1, __amDMA 1, CAudioWorld 45, Sound 1, SndVoice 7, SndVoicePool 3, SndVoice 1, SndVoicePool 7, SndVoice 3, SndVoicePool 5, Sound 5, SndVoice 8, SndVoicePool 1
+module Frustum: 0x0026F080..0x0026F760, 8 functions; pad
+  // dir src/us/code/Frustum
+  // name runs (possible objects the padding cannot show): Frustum 1, Plane 2, Frustum 4, Plane 1
   0x0026F080 Frustum_FromCorners
   0x0026F348 Plane_FromPoints
   0x0026F400 Plane_SegmentFraction
@@ -1875,6 +1905,10 @@ module CAudioWorld: 0x0026F080..0x00274B34, 101 functions; pad
   0x0026F56C Frustum_TestPointsNoFar
   0x0026F60C Frustum_TestBox
   0x0026F6C8 Plane_TestBox
+
+module AudioMgr: 0x0026F760..0x00270240, 7 functions; rodata pad + rodata pad: at 0xA8C94 (of 3 candidates: where Plane_ gives way to am*)
+  // dir src/us/code/AudioMgr
+  // name runs (possible objects the padding cannot show): amCreateAudioMgr 1, __amMain 1, __amDmaNew 1, __amHandleFrameMsg 1, __clearAudioDMA 1, AudioDMA 1, __amDMA 1
   0x0026F760 amCreateAudioMgr
   0x0026FB70 __amMain
   0x0026FD4C __amDmaNew
@@ -1882,6 +1916,9 @@ module CAudioWorld: 0x0026F080..0x00274B34, 101 functions; pad
   0x0026FEA0 __clearAudioDMA
   0x0026FFA0 AudioDMA_CacheBlock
   0x002700D0 __amDMA
+
+module CAudioWorld: 0x00270240..0x00271E20, 45 functions; rodata pad + rodata pad: at 0xA8CB8 (of 5 candidates: where __am* gives way to CAudioWorld__)
+  // dir src/us/code/CAudioWorld
   0x00270240 CAudioWorld__Initialize
   0x00270550 CAudioWorld__LoadSfxDataFile
   0x002706A0 CAudioWorld__StartVoice
@@ -1927,6 +1964,10 @@ module CAudioWorld: 0x0026F080..0x00274B34, 101 functions; pad
   0x00271D54 CAudioWorld__GetVariantCue
   0x00271D84 CAudioWorld__GetVariantLayers
   0x00271DB4 CAudioWorld__IsSoundBusy
+
+module SndVoice: 0x00271E20..0x00274B34, 41 functions; rodata pad + rodata pad: at 0xA8CEC (of func_00271B20, func_00271E20: where CAudioWorld__ gives way to Sound_)
+  // dir src/us/code/SndVoice
+  // name runs (possible objects the padding cannot show): Sound 1, SndVoice 7, SndVoicePool 3, SndVoice 1, SndVoicePool 7, SndVoice 3, SndVoicePool 5, Sound 5, SndVoice 8, SndVoicePool 1
   0x00271E20 Sound_CalcPan
   0x00271F6C SndVoice_InitPitch
   0x00272278 SndVoice_InitVolume
@@ -3384,9 +3425,8 @@ module unk_002C23E0: 0x002C23E0..0x002C2474, 1 functions; pad
   // dir src/us/code/unk_002C23E0
   0x002C23E0 func_002C23E0
 
-module Primagen: 0x00400000..0x00407F14, 115 functions; region
-  // dir src/us/vm1/Primagen
-  // name runs (possible objects the padding cannot show): Automap 12, MantidQueen 43, Primagen 60
+module AutomapDraw: 0x00400000..0x00401E30, 12 functions; region
+  // dir src/us/vm1/AutomapDraw
   0x00400000 Automap_RevealRegion
   0x004001D0 Automap_Update
   0x004004D8 Automap_Draw
@@ -3399,6 +3439,9 @@ module Primagen: 0x00400000..0x00407F14, 115 functions; region
   0x00401CC4 Automap_Reset
   0x00401CE8 Automap_ClearVisited
   0x00401D80 Automap_EdgeVisible
+
+module MantidQueen: 0x00401E30..0x004037B0, 43 functions; rodata pad + rodata pad: at 0xC0F14 (of 4 candidates: where Automap_ gives way to MantidQueen_)
+  // dir src/us/vm1/MantidQueen
   0x00401E30 MantidQueen_Init
   0x00401FCC MantidQueen_SendMinions
   0x004021C8 MantidQueen_Update
@@ -3442,6 +3485,9 @@ module Primagen: 0x00400000..0x00407F14, 115 functions; region
   0x004035F8 MantidQueen_CountActiveMinions
   0x00403660 MantidQueen_Draw
   0x00403774 MantidQueen_GetTurnSide
+
+module Primagen: 0x004037B0..0x00407F14, 60 functions; rodata pad + rodata pad: at 0xC0F64 (of 6 candidates: where MantidQueen_ gives way to Primagen_)
+  // dir src/us/vm1/Primagen
   0x004037B0 Primagen_Hurt
   0x00403AD4 Primagen_Effects
   0x00403C14 Primagen_SetStage
@@ -3772,9 +3818,9 @@ module MenuItem: 0x00413230..0x00417484, 52 functions; pad
   0x004172F8 MenuPool_OpenMenuParam
   0x00417418 MenuPool_CloseMenu
 
-module MpMenu: 0x00417490..0x0041A3A8, 110 functions; pad
+module MpMenu: 0x00417490..0x00419560, 72 functions; pad
   // dir src/us/vm1/MpMenu
-  // name runs (possible objects the padding cannot show): MpMenu 3, WeaponsMenu 1, Menu 2, Mp 2, Menu 1, Mp 1, FinalScoreMenu 5, RumbleMenu 2, PlayerSetupMenu 8, CharacterMenu 7, TeamMenu 3, FragTagMenu 10, MpMenu 2, BloodLustMenu 10, TeamBloodMenu 10, WeaponsMenu 1, DeathmatchMenu 4, SingleMenu 5, TitleMenu 7, QuitMenu 2, Menu 2, PauseMenu 7, SoundMenu 9, PauseMenu 6
+  // name runs (possible objects the padding cannot show): MpMenu 3, WeaponsMenu 1, Menu 2, Mp 2, Menu 1, Mp 1, FinalScoreMenu 5, RumbleMenu 2, PlayerSetupMenu 8, CharacterMenu 7, TeamMenu 3, FragTagMenu 10, MpMenu 2, BloodLustMenu 10, TeamBloodMenu 10, WeaponsMenu 1, DeathmatchMenu 4
   0x00417490 MpMenu_StartFragTag
   0x0041760C MpMenu_StartBloodLust
   0x0041778C MpMenu_StartTeamBlood
@@ -3847,6 +3893,10 @@ module MpMenu: 0x00417490..0x0041A3A8, 110 functions; pad
   0x004194CC DeathmatchMenu_OpenFragTag
   0x004194F8 DeathmatchMenu_OpenTeamBlood
   0x00419534 DeathmatchMenu_OpenWeapons
+
+module TitleMenu: 0x00419560..0x0041A3A8, 38 functions; rodata pad + rodata pad: at 0xC1C28 (of 10 candidates: where the multiplayer menus give way to Single/Title/Pause)
+  // dir src/us/vm1/TitleMenu
+  // name runs (possible objects the padding cannot show): SingleMenu 5, TitleMenu 7, QuitMenu 2, Menu 2, PauseMenu 7, SoundMenu 9, PauseMenu 6
   0x00419560 SingleMenu_Init
   0x00419594 SingleMenu_InitAfterPak
   0x004195C0 SingleMenu_NewGame
@@ -4013,9 +4063,9 @@ module NameEntryMenu: 0x0041D050..0x0041D884, 8 functions; pad
   0x0041D76C NameEntryMenu_Confirm
   0x0041D84C NameEntryMenu_IsMatchOver
 
-module PakMenu: 0x0041D890..0x00424A5C, 140 functions; pad
+module PakMenu: 0x0041D890..0x00423E10, 128 functions; pad
   // dir src/us/vm1/PakMenu
-  // name runs (possible objects the padding cannot show): SaveGame 1, PakMenu 16, GameNoteMenu 1, CharNoteMenu 1, PakMessage 1, PakConfirmMenu 2, PakMenu 2, Pak 7, PakMenu 2, SaveGame 1, PakMenu 16, GameNoteMenu 10, CharNoteMenu 10, PakMessage 24, SavePortalMenu 11, DamagedPakMenu 10, PakConfirmMenu 13, Video 8, InventoryMenu 4
+  // name runs (possible objects the padding cannot show): SaveGame 1, PakMenu 16, GameNoteMenu 1, CharNoteMenu 1, PakMessage 1, PakConfirmMenu 2, PakMenu 2, Pak 7, PakMenu 2, SaveGame 1, PakMenu 16, GameNoteMenu 10, CharNoteMenu 10, PakMessage 24, SavePortalMenu 11, DamagedPakMenu 10, PakConfirmMenu 13
   0x0041D890 SaveGame_Build
   0x0041DA28 PakMenu_UpdateNoteRows
   0x0041DC5C PakMenu_GetReturnMenu
@@ -4144,6 +4194,10 @@ module PakMenu: 0x0041D890..0x00424A5C, 140 functions; pad
   0x00423CBC PakConfirmMenu_UpdateLine5
   0x00423D38 PakConfirmMenu_UpdateYes
   0x00423DA4 PakConfirmMenu_UpdateNo
+
+module Video: 0x00423E10..0x00424A5C, 12 functions; rodata pad + rodata pad: at 0xC2314 (of 3 candidates: where PakConfirmMenu_ gives way to Video_)
+  // dir src/us/vm1/Video
+  // name runs (possible objects the padding cannot show): Video 8, InventoryMenu 4
   0x00423E10 Video_ApplyResolution
   0x00424008 Video_ResizeViMode
   0x004242EC Video_NextResolution
@@ -4157,10 +4211,13 @@ module PakMenu: 0x0041D890..0x00424A5C, 140 functions; pad
   0x00424978 InventoryMenu_HasItem
   0x00424A10 InventoryMenu_SelectOk
 
-module MissionMenu: 0x00424A60..0x00425754, 15 functions; pad
-  // dir src/us/vm1/MissionMenu
-  // name runs (possible objects the padding cannot show): Mission 1, MissionMenu 10, GfxPool 4
+module Mission: 0x00424A60..0x00424B90, 1 functions; pad
+  // dir src/us/vm1/Mission
   0x00424A60 Mission_LevelObjectivesDone
+
+module MissionMenu: 0x00424B90..0x00425754, 14 functions; rodata pad + rodata pad: at 0xC2368 (zeros after the string " " up to the next 16; one candidate)
+  // dir src/us/vm1/MissionMenu
+  // name runs (possible objects the padding cannot show): MissionMenu 10, GfxPool 4
   0x00424B90 MissionMenu_UpdateObjective1Count
   0x00424D54 MissionMenu_UpdateObjective2Count
   0x00424EF4 func_00424EF4
@@ -4746,9 +4803,9 @@ module MenuItem_2: 0x00413230..0x00417484, 52 functions; pad
   0x004172F8 MenuPool_OpenMenuParam_2
   0x00417418 MenuPool_CloseMenu_2
 
-module MpMenu_2: 0x00417490..0x0041A308, 110 functions; pad
+module MpMenu_2: 0x00417490..0x004194C0, 72 functions; pad
   // dir src/us/vm2/MpMenu
-  // name runs (possible objects the padding cannot show): MpMenu 3, WeaponsMenu 1, Menu 2, Mp 2, Menu 1, Mp 1, FinalScoreMenu 5, RumbleMenu 2, PlayerSetupMenu 8, CharacterMenu 7, TeamMenu 3, FragTagMenu 10, MpMenu 2, BloodLustMenu 10, TeamBloodMenu 10, WeaponsMenu 1, DeathmatchMenu 4, SingleMenu 5, TitleMenu 7, QuitMenu 2, Menu 2, PauseMenu 7, SoundMenu 9, PauseMenu 6
+  // name runs (possible objects the padding cannot show): MpMenu 3, WeaponsMenu 1, Menu 2, Mp 2, Menu 1, Mp 1, FinalScoreMenu 5, RumbleMenu 2, PlayerSetupMenu 8, CharacterMenu 7, TeamMenu 3, FragTagMenu 10, MpMenu 2, BloodLustMenu 10, TeamBloodMenu 10, WeaponsMenu 1, DeathmatchMenu 4
   0x00417490 MpMenu_StartFragTag_2
   0x0041760C MpMenu_StartBloodLust_2
   0x0041778C MpMenu_StartTeamBlood_2
@@ -4821,6 +4878,10 @@ module MpMenu_2: 0x00417490..0x0041A308, 110 functions; pad
   0x0041942C DeathmatchMenu_OpenFragTag_2
   0x00419458 DeathmatchMenu_OpenTeamBlood_2
   0x00419494 DeathmatchMenu_OpenWeapons_2
+
+module TitleMenu_2: 0x004194C0..0x0041A308, 38 functions; rodata pad(other copy)
+  // dir src/us/vm2/TitleMenu
+  // name runs (possible objects the padding cannot show): SingleMenu 5, TitleMenu 7, QuitMenu 2, Menu 2, PauseMenu 7, SoundMenu 9, PauseMenu 6
   0x004194C0 SingleMenu_Init_2
   0x004194F4 SingleMenu_InitAfterPak_2
   0x00419520 SingleMenu_NewGame_2
@@ -4987,9 +5048,9 @@ module NameEntryMenu_2: 0x0041CFA0..0x0041D7AC, 8 functions; pad(other copy)
   0x0041D6BC NameEntryMenu_Confirm_2
   0x0041D79C NameEntryMenu_IsMatchOver_2
 
-module PakMenu_2: 0x0041D7B0..0x0042497C, 140 functions; pad
+module PakMenu_2: 0x0041D7B0..0x00423D30, 128 functions; pad
   // dir src/us/vm2/PakMenu
-  // name runs (possible objects the padding cannot show): SaveGame 1, PakMenu 16, GameNoteMenu 1, CharNoteMenu 1, PakMessage 1, PakConfirmMenu 2, PakMenu 2, Pak 7, PakMenu 2, SaveGame 1, PakMenu 16, GameNoteMenu 10, CharNoteMenu 10, PakMessage 24, SavePortalMenu 11, DamagedPakMenu 10, PakConfirmMenu 13, Video 8, InventoryMenu 4
+  // name runs (possible objects the padding cannot show): SaveGame 1, PakMenu 16, GameNoteMenu 1, CharNoteMenu 1, PakMessage 1, PakConfirmMenu 2, PakMenu 2, Pak 7, PakMenu 2, SaveGame 1, PakMenu 16, GameNoteMenu 10, CharNoteMenu 10, PakMessage 24, SavePortalMenu 11, DamagedPakMenu 10, PakConfirmMenu 13
   0x0041D7B0 SaveGame_Build_2
   0x0041D948 PakMenu_UpdateNoteRows_2
   0x0041DB7C PakMenu_GetReturnMenu_2
@@ -5118,6 +5179,10 @@ module PakMenu_2: 0x0041D7B0..0x0042497C, 140 functions; pad
   0x00423BDC PakConfirmMenu_UpdateLine5_2
   0x00423C58 PakConfirmMenu_UpdateYes_2
   0x00423CC4 PakConfirmMenu_UpdateNo_2
+
+module Video_2: 0x00423D30..0x0042497C, 12 functions; rodata pad(other copy)
+  // dir src/us/vm2/Video
+  // name runs (possible objects the padding cannot show): Video 8, InventoryMenu 4
   0x00423D30 Video_ApplyResolution_2
   0x00423F28 Video_ResizeViMode_2
   0x0042420C Video_NextResolution_2
@@ -5131,10 +5196,13 @@ module PakMenu_2: 0x0041D7B0..0x0042497C, 140 functions; pad
   0x00424898 InventoryMenu_HasItem_2
   0x00424930 InventoryMenu_SelectOk_2
 
-module MissionMenu_2: 0x00424980..0x00425674, 15 functions; pad
-  // dir src/us/vm2/MissionMenu
-  // name runs (possible objects the padding cannot show): Mission 1, MissionMenu 10, GfxPool 4
+module Mission_2: 0x00424980..0x00424AB0, 1 functions; pad
+  // dir src/us/vm2/Mission
   0x00424980 Mission_LevelObjectivesDone_2
+
+module MissionMenu_2: 0x00424AB0..0x00425674, 14 functions; rodata pad(other copy)
+  // dir src/us/vm2/MissionMenu
+  // name runs (possible objects the padding cannot show): MissionMenu 10, GfxPool 4
   0x00424AB0 MissionMenu_UpdateObjective1Count_2
   0x00424C74 MissionMenu_UpdateObjective2Count_2
   0x00424E14 func_0045DE14

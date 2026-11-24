@@ -69,7 +69,7 @@ func_0045078C 0x800C0EA8  # W batch: copy of func_0041778C
 CheatMenu_2:EnterCheatMenu_DrawTextField_2 0x800C126C  # W batch: copy of func_0041A904
 func_00459E54 0x800C1450  # W batch, jtbl
 func_0045B234 0x800C1488  # W batch, jtbl
-MissionMenu_2:Mission_LevelObjectivesDone_2 0x800C1750  # W batch, jtbl
+func_0045D980 0x800C1750  # W batch, jtbl
 MissionMenu_2:MissionMenu_UpdateObjective1Count_2 0x800C1770  # W batch, jtbl
 MissionMenu_2:MissionMenu_UpdateObjective2Count_2 0x800C1790  # W batch, jtbl
 MissionMenu_2:MissionMenu_UpdateLevelName_2 0x800C17B0  # W batch, jtbl
