@@ -5,9 +5,9 @@
 #include "structs/rect.h"
 #include "globals/collision.h"
 
-f32 GameObject_GetCollisionHeight(CObjectHead *inst);
-f32 GameObject_GetCollisionRadius(CObjectHead *inst);
-f32 GameObject_GetCollisionYOffset(CObjectHead *inst);
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *inst);
+f32 GameObject_GetCollisionRadius(CGameObjectInstance *inst);
+f32 GameObject_GetCollisionYOffset(CGameObjectInstance *inst);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 s32 Sweep_HitPlane(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
 s32 Sweep_HitCylinder(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f32 maxY, f32 minY,
@@ -40,7 +40,7 @@ void Sweep_TestInstance(Sweep *sweep, SweepBox *box, CObjectHead *other) {
 
     x = other->header.m_vPos.x;
     z = other->header.m_vPos.z;
-    radius = GameObject_GetCollisionRadius(other);
+    radius = GameObject_GetCollisionRadius((CGameObjectInstance *) other);
     rect.minX = x - radius;
     rect.maxX = x + radius;
     rect.minZ = z - radius;
@@ -70,8 +70,8 @@ void Sweep_TestInstance(Sweep *sweep, SweepBox *box, CObjectHead *other) {
         }
         special = 1;
     }
-    bottom = other->header.m_vPos.y + GameObject_GetCollisionYOffset(other);
-    top = GameObject_GetCollisionHeight(other) + bottom;
+    bottom = other->header.m_vPos.y + GameObject_GetCollisionYOffset((CGameObjectInstance *) other);
+    top = GameObject_GetCollisionHeight((CGameObjectInstance *) other) + bottom;
     if (box->flag) {
         normal.x = normal.z = 0.0f;
     }

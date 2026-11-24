@@ -30,7 +30,7 @@ typedef union DLCmd {
 #define DLCMD_SEGOFF(c) ((c)->w1 & 0xFFFFFF)
 #endif
 
-void CMtxF__TransformPoint(f32 (*mtx)[4], CVector3 *in, ProjVertex *out);
+#include "protos/mtxf.h"
 void ModelSweep_TestTriangle(ModelSweep *ms, ProjVertex **tri);
 
 /* Walk one polygon group's display list (F3DEX2 G_VTX/G_TRI1/G_TRI2) and
@@ -102,7 +102,7 @@ void ModelSweep_TestGroup(ModelSweep *ms, s32 *group) {
                     pos.x = src[0];
                     pos.y = src[1];
                     pos.z = src[2];
-                    CMtxF__TransformPoint(ms->inverse, &pos, v);
+                    CMtxF__TransformPoint(ms->inverse, &pos, (CVector3 *) v);
                     flags = 2;
                     if (v->x < 0.0f) {
                         flags = 1;

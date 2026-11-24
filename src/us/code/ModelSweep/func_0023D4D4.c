@@ -7,7 +7,8 @@
 typedef struct ProjVertex {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
-    /* 0x08 */ u8 pad8[8];
+    /* 0x08 */ f32 z;
+    /* 0x0C */ s32 flags;
     /* 0x10 */ s16 *pos;
 } ProjVertex;
 
@@ -18,7 +19,7 @@ typedef struct SweptModel {
 } SweptModel;
 
 
-void CMtxF__TransformPoint(f32 (*mtx)[4], CVector3 *in, CVector3 *out);
+#include "protos/mtxf.h"
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 s32 Sweep_HitPlane(Sweep *sweep, CVector3 *normal, CVector3 *point, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
