@@ -1,59 +1,44 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/OVLGAME/80405454_4.CPP, func_80405CDC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "protos/cache.h"
-struct RecordRecAt1C;
-struct RecordRecAt1C;
-struct RecordRecAt1C {
-    s32 a;
-    s32 b;
-    s32 c;
-    s32 values[3];
-    s32 d;
-    s32 e;
-};
-struct RecordRecAt1C;
-extern void GfxPool_Free(struct RecordRecAt1C *arg0);
-void GfxPool_Free(struct RecordRecAt1C *arg0) {
-    sptr temp_a1;
-    sptr temp_a1_2;
-    sptr temp_a1_3;
-    sptr temp_a1_4;
-    sptr temp_a1_5;
-    s32 var_s1;
-    s32 var_v1;
-    temp_a1 = arg0->b;
-    if (temp_a1 != 0) {
-        CCache__Deallocate(0, temp_a1);
+#include "common.h"
+#include "structs/frame.h"
+#include "structs/cache.h"
+
+extern void CCache__Deallocate(sptr heap, CMemEntry *handle);                     /* free */
+
+/* Frees the graphics pool's cache blocks (as GfxPool_Alloc does first) and clears it. */
+void GfxPool_Free(CGfxPool *pool) {
+    s32 n;
+    s32 j;
+
+    if (pool->gfx != 0) {
+        CCache__Deallocate(0, pool->gfx);
     }
-    temp_a1_2 = arg0->c;
-    if (temp_a1_2 != 0) {
-        CCache__Deallocate(0, temp_a1_2);
+    if (pool->dynamic != 0) {
+        CCache__Deallocate(0, pool->dynamic);
     }
-    temp_a1_3 = arg0->d;
-    if (temp_a1_3 != 0) {
-        CCache__Deallocate(0, temp_a1_3);
+    if (pool->depth != 0) {
+        CCache__Deallocate(0, pool->depth);
     }
-    temp_a1_4 = arg0->e;
-    if (temp_a1_4 != 0) {
-        CCache__Deallocate(0, temp_a1_4);
+    if (pool->vtx != 0) {
+        CCache__Deallocate(0, pool->vtx);
     }
-    var_s1 = 0;
+    n = 0;
     do {
-        temp_a1_5 = arg0->values[var_s1];
-        if (temp_a1_5 != 0) {
-            CCache__Deallocate(0, temp_a1_5);
+        if (pool->fb[n] != 0) {
+            CCache__Deallocate(0, pool->fb[n]);
         }
-        var_s1 += 1;
-    } while (var_s1 < 3);
-    var_v1 = 2;
-    arg0->a = 0;
-    arg0->b = 0;
-    arg0->c = 0;
-    arg0->d = 0;
-    arg0->e = 0;
+        n++;
+    } while (n < 3);
+    j = 2;
+    pool->ready = 0;
+    pool->gfx = 0;
+    pool->dynamic = 0;
+    pool->depth = 0;
+    pool->vtx = 0;
     do {
-        arg0->values[var_v1] = 0;
-        var_v1 -= 1;
-    } while (var_v1 >= 0);
+        pool->fb[j] = 0;
+        j--;
+    } while (j >= 0);
 }
