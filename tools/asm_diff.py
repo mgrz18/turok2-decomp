@@ -196,6 +196,31 @@ def functions(path, syms):
     return out, at
 
 
+_SECTIONS = []
+
+
+def elf_string(addr):
+    """The NUL-terminated string the linked ELF holds at addr, written as cc1 writes a literal, or None."""
+    for base, data in _SECTIONS:
+        if base <= addr < base + len(data):
+            end = data.find(b"\0", addr - base)
+            raw = data[addr - base:end] if 0 <= end - (addr - base) <= 512 else None
+            if raw is None or any((b < 0x20 and b not in (9, 10, 13)) or b > 0x7E for b in raw):
+                return None
+            return "".join(chr(b) if 0x20 <= b <= 0x7E and b not in (0x22, 0x5C) else
+                           "\\" + chr(b) if b in (0x22, 0x5C) else "\\%03o" % b for b in raw) + "\\000"
+    return None
+
+
+def literal_view(text):
+    """A function's text with every address that holds a string in the ELF read as that literal: a merged
+    file's literal against the base's named copy of it (CScene__GetLevelName's "level name")."""
+    def one(m):
+        st = elf_string(int(m.group(0)[1:], 16))
+        return "LC[%s]" % st if st is not None else m.group(0)
+    return [ADDR.sub(one, l) for l in text]
+
+
 def canon(text, at):
     """A function's text with every address that holds one of `at`'s strings read as that literal."""
     return [ADDR.sub(lambda m: at.get(m.group(0), m.group(0)), l) for l in text] if at else text
@@ -214,6 +239,9 @@ def main():
     files = [str(Path(f).resolve().relative_to(ROOT)) for f in args.files] or \
         sorted(str(p.relative_to(ROOT)) for p in (ROOT / "src").rglob("*.c"))
     syms = symbols(args.elf)
+    with open(args.elf, "rb") as fh:
+        _SECTIONS.extend((sec["sh_addr"], sec.data()) for sec in ELFFile(fh).iter_sections()
+                         if sec["sh_type"] == "SHT_PROGBITS" and sec["sh_addr"] and sec["sh_flags"] & 2)
     work = Path(tempfile.mkdtemp(prefix="asm_diff."))
     try:
         base = work / "base"
@@ -274,7 +302,7 @@ def main():
                     claimed.add((name, cands[0][0]))
                     at = {**cands[0][2], **at_b}
                     ta, tb = canon(cands[0][1], at), canon(text, at)
-                    if ta == tb:
+                    if ta == tb or literal_view(ta) == literal_view(tb):
                         same += 1
                         continue
                     bad += 1
