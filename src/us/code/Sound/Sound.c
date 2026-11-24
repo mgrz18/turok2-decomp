@@ -120,11 +120,6 @@ s32 CAudioWorld__CountHandleVoices(s32 *, s32);              /* extern */
 
 #ifndef TARGET_PORT /* the port defines Sound__IsPlaying in port/audio/t2audio_world.c */
 void Sound__IsPlaying(s32 arg0) {
-#ifdef TARGET_PORT /* no sound bank on the host yet: audio off (port/game/t2audio.c) */
-    if (!T2Port_AudioReady()) {
-        return;
-    }
-#endif
     CAudioWorld__CountHandleVoices(&gAudioWorld, arg0);
 }
 #endif /* !TARGET_PORT */
