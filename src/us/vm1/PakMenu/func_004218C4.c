@@ -8,10 +8,10 @@
 #include "protos/pakmenu.h"
 
 extern void Controller_UpdatePakInsertion();
-extern void CEngineApp__UpdateControllers(void *arg0);
+void CEngineApp__UpdateControllers(void); /* the definition takes none; the calls pass the app */
 s32 PakMenu_PollBootPak(s32 arg0) {
     if (gPakMenuStartPressed == 0) {
-        CEngineApp__UpdateControllers(&gEngineApp);
+        ((void (*)(void *)) CEngineApp__UpdateControllers)(&gEngineApp);
         Controller_UpdatePakInsertion();
         if (gPakMenuStartPressed == 0) {
             if (gPakBootPending != 0) {

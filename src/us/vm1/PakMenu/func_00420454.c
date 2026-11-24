@@ -22,14 +22,14 @@ extern CGame gEngineApp_m_Game; /* local: as above */
  * bytes) and opens the "game loaded" dialog, or opens the "no save"/"bad
  * save" dialog for the pak note. */
 
-extern u32 gEngineApp_m_Settings_unlockedCheats[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern u8 gEngineApp_m_Settings_unk180[]; /* local type: GameSettings.unk180 read as an array (other registers otherwise) */
+extern u32 gUnlockedCheatsView[] __asm__("gEngineApp_m_Settings_unlockedCheats"); /* local type: the field's real type (or the member path) changes the ROM's code here */
+extern u8 gSettingsUnk180View[] __asm__("gEngineApp_m_Settings_unk180"); /* local type: GameSettings.unk180 read as an array (other registers otherwise) */
 extern f32 gEngineApp_m_Settings_match_seconds[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern f32 gEngineApp_m_Settings_match_minutes[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern f32 gEngineApp_m_Settings_match_hours[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
-extern CPlayer *CPlayerPool__FindByController(void *players, ControllerProfile *ctl);
+void *CPlayerPool__FindByController(char *object, sptr arg1); /* code/CPlayer's definition */
 
 s32 GameNoteMenu_SelectYes(void *menu, Menu *c) {
     s32 slot;
@@ -50,19 +50,19 @@ s32 GameNoteMenu_SelectYes(void *menu, Menu *c) {
         return 1;
     }
     if (sGameNoteLoad != 0) {
-        player = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, c->controller);
+        player = CPlayerPool__FindByController((char *) &gEngineApp_m_Game.m_PlayerList, (sptr) c->controller);
         world = &gScene;
-        keep = gEngineApp_m_Settings_unk180[0];
+        keep = gSettingsUnk180View[0];
         player->m_Data = gLoadBuffer->player;
         *(GameSettingsBlock *)&gEngineApp_m_Settings = gLoadBuffer->settings;
         gEngineApp_m_Settings_match.frames = gLoadBuffer->frames;
         gEngineApp_m_Settings_match_seconds[0] = gLoadBuffer->seconds;
         gEngineApp_m_Settings_match_minutes[0] = gLoadBuffer->minutes;
-        gScene_m_PreviewOptions = gEngineApp_m_Settings_unlockedCheats[0];
+        gScene_m_PreviewOptions = gUnlockedCheatsView[0];
         gEngineApp_m_Settings_match_hours[0] = gLoadBuffer->hours;
         src = gLoadBuffer->levelFlags;
         dst = gLoadSavePersistentData;
-        gEngineApp_m_Settings_unk180[0] = keep;
+        gSettingsUnk180View[0] = keep;
         for (i = 0; i < world->unk_30; i++) {
             *dst++ = *src++;
         }

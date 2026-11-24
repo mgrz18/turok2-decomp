@@ -15,7 +15,7 @@
  * game's notes and free space and opens the load menu, or shows why the pak cannot be used. */
 
 s32 Controller_AnyConnected(void);
-void CEngineApp__UpdateControllers(u8 *a);
+void CEngineApp__UpdateControllers(void); /* the definition takes none; the calls pass the app */
 s32 PakMenu_CheckSlotForSave(Menu *o, s32 a, s32 *b, s32 *c);
 
 #define PAK_ERROR()                                                        \
@@ -73,7 +73,7 @@ void PakMenu_InitSaveGameAnyPak(Menu *arg0) {
     if (Pak_NeedsRepair(gPakMenuPort) != 0) {
         goto blk59;
     }
-    CEngineApp__UpdateControllers(&gEngineApp);
+    ((void (*)(void *)) CEngineApp__UpdateControllers)(&gEngineApp);
     if ((arg0->controller->buttons & 0x1000) && sPakMenuStartLatched == 0) {
         gPakMenuStartPressed = 1;
         sPakMenuStartLatched = 1;

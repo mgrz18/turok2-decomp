@@ -16,7 +16,7 @@
 #include "protos/pak.h"
 #include "protos/pakmenu.h"
 
-CPlayer *CPlayerPool__FindByController(CPlayerPool *world, ControllerProfile *s);
+void *CPlayerPool__FindByController(char *object, sptr arg1); /* code/CPlayer's definition */
 void CPlayer__SetCharacter(CPlayer *a, s32 b);
 /* Turok 2 inlines this (Rage Wars calls it) */
 static inline void O01Restore(CPlayer *a) {
@@ -44,7 +44,7 @@ s32 CharNoteMenu_SelectYes(s32 unused, Menu *own) {
         return 1;
     }
     if (sCharNoteLoad != 0) {
-        plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, own->controller);
+        plr = CPlayerPool__FindByController((char *) &gEngineApp_m_Game.m_PlayerList, (sptr) own->controller);
         own->player = plr;
         O01Restore(plr);
         CPlayer__SetCharacter(plr, (s8) gPakProfileRead_character);

@@ -7,7 +7,7 @@
 #include "globals/game.h"
 
 extern CScene gScene; /* local: globals/scene.h is not included here (its gScene_m_PreviewOptions would clash with this file's local-type view) */
-extern s32 gScene_m_PreviewOptions[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */
+extern s32 gScenePreviewOptionsView[] __asm__("gScene_m_PreviewOptions"); /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */
 extern u8 gLoadSavePersistentData[]; /* local: globals/scene.h is not included here (its gScene_m_PreviewOptions would clash with this file's local-type view) */
 
 void SaveGame_Restore(CPlayer *p) {
@@ -24,7 +24,7 @@ void SaveGame_Restore(CPlayer *p) {
     gEngineApp_m_Settings.match.seconds = gLoadBuffer->seconds;
     gEngineApp_m_Settings.match.minutes = gLoadBuffer->minutes;
     gEngineApp_m_Settings.match.hours = gLoadBuffer->hours;
-    gScene_m_PreviewOptions[0] = gEngineApp_m_Settings.unlockedCheats;
+    gScenePreviewOptionsView[0] = gEngineApp_m_Settings.unlockedCheats;
     gEngineApp_m_Settings.unk180 = keep;
     src = gLoadBuffer->levelFlags;
     dst = gLoadSavePersistentData;

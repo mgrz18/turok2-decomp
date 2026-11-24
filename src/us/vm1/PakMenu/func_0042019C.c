@@ -17,7 +17,7 @@
 
 extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
 extern void CCache__Deallocate(sptr, void *);
-CPlayer *CPlayerPool__FindByController(void *a, void *b);
+void *CPlayerPool__FindByController(char *object, sptr arg1); /* code/CPlayer's definition */
 
 s32 PakMenu_SelectCancel(s32 a0, Menu *arg) {
     struct {
@@ -59,7 +59,7 @@ s32 PakMenu_SelectCancel(s32 a0, Menu *arg) {
     if (gPakMenuIsProfile != 0) {
         if (gPakMenuIsLoad != 0) {
             gPakMenuLeaving = 1;
-            plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, arg->controller);
+            plr = CPlayerPool__FindByController((char *) &gEngineApp_m_Game.m_PlayerList, (sptr) arg->controller);
             MenuPool_OpenMenu((u8 *)plr->m_pCamera->m_MenuPool, (u8 *)&gCharacterMenuDesc, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
@@ -89,7 +89,7 @@ s32 PakMenu_SelectCancel(s32 a0, Menu *arg) {
         }
         return 0;
     }
-    plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, arg->controller);
+    plr = CPlayerPool__FindByController((char *) &gEngineApp_m_Game.m_PlayerList, (sptr) arg->controller);
     if (gPakMenuIsLoad != 0) {
         gPakMenuLeaving = 1;
         MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, (u8 *)&gSingleMenuAfterPakDesc, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
