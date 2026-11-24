@@ -4,9 +4,10 @@
 
 s32 CEngineApp__UpdateCinemaMode(sptr, s32, s32);
 
-extern s32 gMergedController_buttonsSingle[]; /* local type: indexed by a zero variable for the match (gMergedController.buttonsSingle) */
-extern s32 gCreditsDone[]; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
-extern f32 gCreditsTimeLeft[]; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
+/* one-element array views of scalars (globals/controller.h, globals/menu.h), indexed by a zero variable for the match */
+extern s32 gButtonsSingleView[] __asm__("gMergedController_buttonsSingle");
+extern s32 gCreditsDoneView[] __asm__("gCreditsDone");
+extern f32 gCreditsTimeLeftView[] __asm__("gCreditsTimeLeft");
 
 void EngineMode15_Ending_Retrace(sptr arg0)
 {
@@ -17,10 +18,10 @@ void EngineMode15_Ending_Retrace(sptr arg0)
     CEngineApp__UpdateCinemaMode(arg0, 1, 1);
     return;
   }
-  if ((gMergedController_buttonsSingle[0] & 0x1000) && (gCreditsDone[new_var] == 0))
+  if ((gButtonsSingleView[0] & 0x1000) && (gCreditsDoneView[new_var] == 0))
   {
-    gCreditsDone[new_var] = 1;
-    gMergedController_buttonsSingle[new_var] = 0;
-    gCreditsTimeLeft[new_var] = 15.0f;
+    gCreditsDoneView[new_var] = 1;
+    gButtonsSingleView[new_var] = 0;
+    gCreditsTimeLeftView[new_var] = 15.0f;
   }
 }

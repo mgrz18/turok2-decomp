@@ -11,14 +11,14 @@
 extern void CCache__BeginDisplayList(s32, s32, CFrameData *);
 extern void Texture_InvalidateCache(void);
 extern void Render_SetupFog(void);
-extern void CEngineApp__BeginDisplayList(CEngineApp *);
+extern void CEngineApp__BeginDisplayList(void);
 extern void DLights_SwapBuffers(void);
 extern void Controller_UpdatePakInsertion(void);
 extern void CCameraPool__Advance(void *);
-extern void CEngineApp__UpdateControllers(CEngineApp *);
+extern void CEngineApp__UpdateControllers(void);
 extern void CEngineApp__DrawFilledRect(CEngineApp *, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 extern void Video_NextResolution(void);
-extern void Render_SetRenderMode(s32 mode);
+extern s32 Render_SetRenderMode(u32 mode);
 extern s32 Automap_IsShown(void *);
 extern void Automap_Draw(void *);
 extern s32 CCache__EndDisplayList(s32);
@@ -115,11 +115,11 @@ void CEngineApp__Draw(CEngineApp *level) {
     CCache__BeginDisplayList(0, gEvenOdd, gFrameData = gEngineApp.m_pCurrentFrameData);
     Texture_InvalidateCache();
     Render_SetupFog();
-    CEngineApp__BeginDisplayList(level);
+    ((void (*)(CEngineApp *)) CEngineApp__BeginDisplayList)(level);
     DLights_SwapBuffers();
     Controller_UpdatePakInsertion();
     CCameraPool__Advance(level->m_Game.m_CameraPool);
-    CEngineApp__UpdateControllers(level);
+    ((void (*)(CEngineApp *)) CEngineApp__UpdateControllers)(level);
     if (gEngineModeTable[level->m_Settings.mode].draw != NULL) {
         gEngineModeTable[level->m_Settings.mode].draw(level);
     }

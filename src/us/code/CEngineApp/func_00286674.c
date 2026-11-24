@@ -24,12 +24,12 @@ extern void GfxPool_Clear(void *p);
 extern void GfxPool_Alloc(void *p);
 extern void Demo_Reset(void);
 extern void CEngineApp__Construct(CEngineApp *e);
-extern void memset(void *p, s32 c, sptr n);   /* memset */
+extern void *memset(void *dst, s32 value, uptr size);
 extern void CCameraPool__Construct(void *p);
 extern void CPlayerPool__Construct(void *p);
 extern void CCollisionInfo__Reset(void);
-extern void CCameraPool__NewGame(void *p, s32 a);
-extern void CPlayerPool__NewGame(void *p, s32 a, s32 b);
+extern void CCameraPool__NewGame(void *owner, s32 count);
+extern void CPlayerPool__NewGame(void *list, s32 count, s32 arg2);
 extern void Cont_InitAll(void);
 extern void COnScreen__Construct(void *p);
 extern void Pak_AllocDirectory(void);

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game.h"
 
-s32 CEngineApp__Boot(s32 *);                   /* extern */
+extern void CEngineApp__Boot(void);
 
 void Engine_Boot(void) {
-    CEngineApp__Boot(&gEngineApp);
+    ((void (*)(void *)) CEngineApp__Boot)(&gEngineApp);
 }

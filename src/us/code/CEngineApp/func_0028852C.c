@@ -5,7 +5,7 @@
 #include "globals/render.h"
 
 
-extern void Render_SetRenderMode(s32 mode);
+extern s32 Render_SetRenderMode(u32 mode);
 
 /* Fills the rectangle (x0, y0)-(x1, y1) of the z-buffer, then points the color image back at the frame. */
 void CEngineApp__ClearDepthRect(sptr unused, s32 x0, s32 x1, s32 y0, s32 y1) {

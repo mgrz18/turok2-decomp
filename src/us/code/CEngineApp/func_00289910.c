@@ -13,8 +13,7 @@ extern void CEngineApp__NewGame(CEngineApp *, s32, s32);
 extern void SavedPlayers_Restore(void);
 extern void CCollisionInfo__Reset(void);
 extern void Automap_ClearBuffers(void *);
-extern void CScene__InitPersistentData(void *, s32);
-extern void CScene__RequestWarp(void *, s32, s32);
+#include "protos/scene.h"
 
 void EngineMode13_Game_Init(CEngineApp *state) {
     s32 flag;
@@ -45,7 +44,7 @@ void EngineMode13_Game_Init(CEngineApp *state) {
     gEnemyTimeScale = 1.0f;
     gParticleTimeScale = 1.0f;
     Automap_ClearBuffers(&state->m_Game.m_Automap);
-    CScene__InitPersistentData(&gScene, state->m_CartridgeIndex);
+    ((void (*)(void *, s32)) CScene__InitPersistentData)(&gScene, state->m_CartridgeIndex); /* a1 unused */
     CScene__RequestWarp(&gScene, state->m_Settings.matchMode, 0);
     gInSinglePlayerMenu = 0;
 }

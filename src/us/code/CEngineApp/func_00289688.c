@@ -6,7 +6,7 @@
 #include "protos/scene.h"
 #include "protos/menu.h"
 
-s32 Music_SetTrack(s32);                     /* extern */
+extern void Music_SetTrack(s32);
 s32 CEngineApp__NewGame(CEngineApp *, s32, s32);       /* extern */
 s32 Demo_End();                            /* extern */
 

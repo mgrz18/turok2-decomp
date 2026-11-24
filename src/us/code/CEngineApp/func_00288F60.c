@@ -12,7 +12,7 @@ s32 COnScreen__DrawBossBars(sptr);                         /* extern */
 s32 func_00281354(sptr);                         /* extern */
 s32 CEngineApp__DrawFade(sptr);                         /* extern */
 s32 Automap_Update(sptr);                         /* extern */
-s32 Automap_IsShown(sptr);                             /* extern */
+extern s32 Automap_IsShown(void *);
 
 void CEngineApp__DrawWorld(sptr arg0) {
     sptr temp_s0;
@@ -22,7 +22,7 @@ void CEngineApp__DrawWorld(sptr arg0) {
     CScene__Update(arg0 + APP_SCENE);
     func_00281354(arg0 + APP_CAMERAPOOL);
     COnScreen__DrawBossBars(arg0 + APP_ONSCREEN);
-    if (Automap_IsShown(temp_s0) == 0) {
+    if (Automap_IsShown((void *) temp_s0) == 0) {
         CEngineApp__DrawFade(arg0);
     }
 }

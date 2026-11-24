@@ -112,8 +112,14 @@ typedef struct {
 
 extern void Sched_SubmitTask(void *, ScTask *);
 
-/* Builds the RSP task(s) for a frame, hands them to the scheduler, moves to the next frame. */
-void CEngineApp__SubmitGfxTask(GfxState *gfx, GfxTask *task) {
+struct CEngineApp;
+struct CFrameData;
+
+/* Builds the RSP task(s) for a frame, hands them to the scheduler, moves to the next frame.
+ * Takes the port body's parameter types (structs/game.h, structs/frame.h); this body's views as macros (a local copy changes the registers). */
+#define gfx ((GfxState *) app)
+#define task ((GfxTask *) frame)
+void CEngineApp__SubmitGfxTask(struct CEngineApp *app, struct CFrameData *frame) {
     u32 dataSize;
     u32 dataSize2;
     ScTask *t;
@@ -186,4 +192,6 @@ void CEngineApp__SubmitGfxTask(GfxState *gfx, GfxTask *task) {
     cur = gfx->cur;
     cur->dl[1] = gEvenOdd == 0 ? gLineList1 : gLineList0;
 }
+#undef gfx
+#undef task
 #endif

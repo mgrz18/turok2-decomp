@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 #include "gfx.h"
 
-extern s32 Render_SetRenderMode(s32);
+extern s32 Render_SetRenderMode(u32 mode);
 extern void Render_SetCombineMode(u32);
 void CEngineApp__DrawFilledRect(void *unused, u8 *color, s32 left, s32 top, s32 right, s32 bottom) {
     if (color[3] != 0) {

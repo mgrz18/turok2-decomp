@@ -7,7 +7,7 @@
 
 extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[2]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
-extern void Render_SetRenderMode(s32 mode);
+extern s32 Render_SetRenderMode(u32 mode);
 extern void COnScreen__BeginText(void);
 extern void COnScreen__SelectSmallFont();
 extern void COnScreen__SetFontScale(f32 x, f32 y);

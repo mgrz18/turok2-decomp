@@ -3,9 +3,9 @@
 #include "globals/frame.h"
 #include "globals/engine.h"
 
-s32 Music_SetTrack(s32);
+extern void Music_SetTrack(s32);
 s32 Cinema_Stop(void);
-s32 Controller_SetRumbleOptionAll(s32);
+extern void Controller_SetRumbleOptionAll(s32 a);
 s32 Demo_End(void);
 
 s32 Sound__StopAllExcept(s32);                     /* extern */

@@ -11,7 +11,8 @@
 
 extern s32 gInSinglePlayerMenu; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gCameraPoolHideViews; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
-extern u8 gEngineApp_m_Game_m_MenuPool[]; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
+/* globals/menu.h's MenuPool read as bytes: this view (its type here) is what keeps the ROM's code */
+extern u8 gMenuPoolBytes[] __asm__("gEngineApp_m_Game_m_MenuPool");
 
 extern s32 MenuPool_CountOpen(void *);
 extern s32 Demo_GetPlayerCount(void);
@@ -91,7 +92,7 @@ void CEngineApp__Update(CEngineApp *level) {
     CEngineApp__Draw(level);
     level->m_Settings.modeTimer += gFrameIncrement;
     CEngineApp__UpdatePlayTime(level);
-    if (MenuPool_CountOpen(gEngineApp_m_Game_m_MenuPool) == 0 && Cinema_PathPlaying() != 0 && Cinema_GetScriptId() == 0x78) {
+    if (MenuPool_CountOpen(gMenuPoolBytes) == 0 && Cinema_PathPlaying() != 0 && Cinema_GetScriptId() == 0x78) {
         if (gEngineApp_m_Settings_match_unk44 == 0 && level->m_Settings.paused == 0) {
             gEngineApp_m_Settings_match_unk44 = 1;
             Cinema_StopAtEnd();

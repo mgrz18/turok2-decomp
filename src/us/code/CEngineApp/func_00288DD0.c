@@ -10,12 +10,12 @@
 #define APP_AUTOMAP T2_OFFSETOF(CEngineApp, m_Game.m_Automap)
 
 s32 Cinema_RequestById(s32);                         /* extern */
-s32 CPlayerPool__NewGame(sptr, s32, s32);       /* extern */
-s32 CCameraPool__NewGame(sptr, s32);                /* extern */
+extern void CPlayerPool__NewGame(void *list, s32 count, s32 arg2);
+extern void CCameraPool__NewGame(void *owner, s32 count);
 
 void CEngineApp__StartWarp(sptr arg0, s32 arg1) {
-    CCameraPool__NewGame(arg0 + APP_CAMERAPOOL, 1);
-    CPlayerPool__NewGame(arg0 + APP_GAME, 1, 0);
+    CCameraPool__NewGame((void *) (arg0 + APP_CAMERAPOOL), 1);
+    CPlayerPool__NewGame((void *) (arg0 + APP_GAME), 1, 0);
     CScene__RequestWarp(&gScene, ~Cinema_RequestById(arg1), 0);
     CScene__LoadBitSections(&gScene);
     CScene__LoadBitSections2(&gScene);

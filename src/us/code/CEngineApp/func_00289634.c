@@ -1,6 +1,6 @@
 #include "common.h"
 
-void Music_SetTrack(s32);                     /* extern */
+extern void Music_SetTrack(s32);
 
 void EngineMode07_Title_Init(void) {
     Music_SetTrack(0x10);

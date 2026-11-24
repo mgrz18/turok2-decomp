@@ -1,6 +1,6 @@
 #include "common.h"
 
-void Credits_Draw(sptr);                         /* extern */
+extern void Credits_Draw(void);
 void Credits_Update(sptr);                         /* extern */
 void CEngineApp__DrawWorld();                            /* extern */
 
@@ -8,6 +8,6 @@ void CEngineApp__DrawWorld();                            /* extern */
  * registers (pass-through); the host passes them. */
 void EngineMode16_Ending_Draw(sptr arg0) {
     CEngineApp__DrawWorld(arg0);
-    Credits_Draw(arg0);
+    ((void (*)(sptr)) Credits_Draw)(arg0);
     Credits_Update(arg0);
 }
