@@ -2,7 +2,7 @@
 #include "structs/vector.h"
 #include "structs/collision.h"
 
-void CVector3__Subtract(CVector3 *out, CVector3 *a, void *b);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 
 /* Plane_IntersectSegmentT, inlined. */

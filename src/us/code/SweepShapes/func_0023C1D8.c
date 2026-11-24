@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
-#include "rw/abu_protos.h"
+#include "structs/vector.h"
 
 void CVector3__Subtract(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2);
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);

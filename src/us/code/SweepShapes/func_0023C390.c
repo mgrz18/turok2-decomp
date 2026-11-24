@@ -2,7 +2,7 @@
 #include "structs/vector.h"
 #include "structs/collision.h"
 
-extern void CVector3__Subtract(CVector3 *out, CVector3 *a, void *b);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 
 s32 Plane_IntersectSegmentT(CollisionQuad *plane, CVector3 *start, CVector3 *end, f32 *t) {
     CVector3 dir;

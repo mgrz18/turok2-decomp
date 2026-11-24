@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
-#include "rw/abu_protos.h"
+#include "structs/vector.h"
 
 void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
 

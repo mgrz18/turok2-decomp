@@ -11,7 +11,7 @@ struct Plane {
     char pad24[0x24];
     CVector3 normal;
 };
-extern void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 s32 Plane_IsBehind(void *arg0, CVector3 *arg1) {
     Plane *object = arg0;
     CVector3 sp10;
