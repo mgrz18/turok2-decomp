@@ -1,4 +1,3 @@
-/* Second-module copy of BlindOne_PhaseWaitCinemaUpdate (src/us/code/BlindOne_PhaseWaitCinemaUpdate.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"

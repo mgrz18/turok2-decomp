@@ -1,4 +1,3 @@
-/* Second-module copy of BlindOne_EnterPhase (src/us/code/BlindOne_EnterPhase.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"

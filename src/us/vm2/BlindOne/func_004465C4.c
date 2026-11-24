@@ -1,4 +1,4 @@
-/* Second-module copy of BlindOne_BossInit (nonmatching/vm/BlindOne_BossInit.c), with its data addresses 0xE0 lower. */
+/* First-module copy of BlindOne_BossInit_2 (src/us/code/BlindOne_BossInit_2.c). */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -10,10 +10,10 @@
 /* AI init of the second boss: sets the level's warp id, the anim table and callbacks, starts the phase script
  * and shows its health bar ("EyeBall"). */
 
-extern s32 gScene_m_LevelID[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */ /* warp id */
+#include "blindone_scene.h"
 extern void BlindOne_BossUpdate_2(void);
 extern void BlindOne_BossHurt_2(void);
-extern void BlindOne_Draw_2(void);
+void BlindOne_Draw_2(CGameObjectInstance *actor, CAI *ai, struct CDrawArgs *info);
 extern void BlindOne_EnterPhase_2(BlindOneState *state, s32 id);
 extern void COnScreen__SetBoss(void *hud, CGameObjectInstance *obj, char *name);
 

@@ -1,26 +1,17 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void BlindOne_SumGroupHealth_2(s32 arg0, s32 arg1, void **arg2, s32 *arg3, s32 *arg4)
-{
-  s32 var_t0;
-  void **var_a2;
-  void *temp_a0;
-  var_a2 = arg2;
-  var_t0 = 0;
-  if (arg1 > 0)
-  {
-    do
-    {
-      temp_a0 = *var_a2;
-      *arg3 += *((s32 *) (((s8 *) temp_a0) + 0x148));
-      if (((*((s32 *) (((s8 *) temp_a0) + 0x144))) != 0) && ((*((s32 *) (((s8 *) temp_a0) + 0xD4))) & 0x100))
-      {
-        *arg4 += *((s32 *) (((s8 *) temp_a0) + 0x148));
-      }
-      var_t0 += 1;
-      var_a2 = (typeof(var_a2)) ((s8 *) ((typeof(var_a2)) (((s8 *) var_a2) + 4)));
+
+/* Sums `value` over the group, and separately over the members still alive with flag 0x100. */
+void BlindOne_SumGroupHealth_2(void *m, s32 count, CGameObjectInstance **group, s32 *total, s32 *active) {
+    CGameObjectInstance *a;
+    s32 i;
+
+    for (i = 0; i < count; i++) {
+        a = group[i];
+        *total += a->m_AI.m_InitialHealth;
+        if (a->m_AI.m_Health != 0 && (a->m_dwFlags & 0x100)) {
+            *active += a->m_AI.m_InitialHealth;
+        }
     }
-    while (var_t0 < arg1);
-  }
 }

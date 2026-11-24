@@ -1,5 +1,3 @@
-/* The second VM module's copy of src/us/vm1/BlindOne/func_0040E30C.c (byte for byte, at the same link address or 0xE0 below
- * it, docs/VMASM.md), with the second module's names. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"

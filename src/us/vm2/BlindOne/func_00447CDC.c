@@ -1,38 +1,40 @@
-/* Second-module copy of BlindOne_UpdateFight (src/us/code/BlindOne_UpdateFight.c), with its string/data addresses 0xE0 lower. */
-
 #include "common.h"
+#include "structs/boss.h"
 #include "globals/onscreen.h"
-s32 Animator_Update(s32);
-s32 BlindOne_UpdateMover_2(s32);
-s32 BlindOne_GetHealthPercent_2(s32);
-s32 COnScreen__SetBossPercent(s32 *, s32);
-extern s32 sBlindOnePhases_update_2; /* local type: this file typedefs its own s8...f64 instead of common.h (globals/boss.h has the alias) */
-void BlindOne_UpdateFight_2(void *arg0)
+#include "globals/boss.h"
+
+void Animator_Update(void *slot);
+void BlindOne_UpdateMover_2(BlindOneMover *mover);
+s32 BlindOne_GetHealthPercent_2(BlindOneState *state);
+void COnScreen__SetBossPercent(void *hud, s32 value);
+
+void BlindOne_UpdateFight_2(BlindOneState *arg0)
 {
-  s32 (*temp_v0)();
+  void (*temp_v0)(void);
   s32 var_s0;
   s32 var_s1;
-  temp_v0 = *((typeof(&sBlindOnePhases_update_2)) (((s8 *) (&sBlindOnePhases_update_2)) + ((*((s32 *) (((s8 *) arg0) + 0x4FC))) * 8)));
+  temp_v0 = (void (*)(void)) sBlindOnePhases_2[arg0->phase].update;
   if (temp_v0 != 0)
   {
-    temp_v0();
+    /* ABI (docs/port/ABI.md section 5): MIPS passes arg0 through to the phase update (a0) */
+    ((void (*)(BlindOneState *))temp_v0)(arg0);
   }
   var_s0 = 0;
-  if ((*((s32 *) (((s8 *) arg0) + 0x4EC))) > 0)
+  if (arg0->faderCount > 0)
   {
-    var_s1 = 0x3C;
+    var_s1 = 0x3C;      /* faders[i] */
     do
     {
-      Animator_Update((sptr) (arg0 + var_s1));
+      Animator_Update((void *) ((u8 *) arg0 + var_s1));
       var_s0 += 1;
-      var_s1 += 0x64;
+      var_s1 += sizeof(ScriptAnimator);
       var_s0++;
       var_s0--;
     }
-    while (var_s0 < (*((s32 *) (((s8 *) arg0) + 0x4EC))));
+    while (var_s0 < arg0->faderCount);
   }
-  BlindOne_UpdateMover_2((sptr) (arg0 + 0x518));
-  BlindOne_UpdateMover_2((sptr) (arg0 + 0x530));
-  BlindOne_UpdateMover_2((sptr) (arg0 + 0x548));
-  COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, BlindOne_GetHealthPercent_2((sptr) arg0));
+  BlindOne_UpdateMover_2(&arg0->movers[0]);
+  BlindOne_UpdateMover_2(&arg0->movers[1]);
+  BlindOne_UpdateMover_2(&arg0->movers[2]);
+  COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, BlindOne_GetHealthPercent_2(arg0));
 }

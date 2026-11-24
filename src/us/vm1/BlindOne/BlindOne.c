@@ -1229,10 +1229,10 @@ void BlindOne_UpdateFight(BlindOneState *arg0)
     }
     while (var_s0 < arg0->faderCount);
   }
-  BlindOne_UpdateMover((sptr) &arg0->movers[0]);
-  BlindOne_UpdateMover((sptr) &arg0->movers[1]);
-  BlindOne_UpdateMover((sptr) &arg0->movers[2]);
-  COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, BlindOne_GetHealthPercent((sptr) arg0));
+  BlindOne_UpdateMover(&arg0->movers[0]);
+  BlindOne_UpdateMover(&arg0->movers[1]);
+  BlindOne_UpdateMover(&arg0->movers[2]);
+  COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, BlindOne_GetHealthPercent(arg0));
 }
 
 void func_0040ED8C(s32 *arg0) {

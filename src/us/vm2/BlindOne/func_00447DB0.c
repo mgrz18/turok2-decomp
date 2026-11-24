@@ -1,5 +1,3 @@
-/* The second VM module's copy of src/us/vm1/BlindOne/func_0040EDB0.c (byte for byte, at the same link address or 0xE0 below
- * it, docs/VMASM.md), with the second module's names. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -10,41 +8,26 @@
 #include "structs/twin_blindone.h"
 
 
-#ifdef TARGET_PORT
 #include "structs/model.h"
-/* The draw args (CDrawArgs) at the host offsets: the model handle is pointer-wide (STABILITY.md
- * section 7: Render_DrawModel got the handle's high half after a warp to the Blind One). */
-typedef union {
-    struct { u8 _h_unkC[__builtin_offsetof(CDrawArgs, m_hModel)]; sptr unkC; };
-    struct { u8 _h_flag[__builtin_offsetof(CDrawArgs, m_nModel)]; s32 flag; };
-} DrawInfo;
-#else
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ u8 pad10[0x18 - 0x10];
-    /* 0x18 */ s32 flag;
-} DrawInfo;
-#endif
 
-extern void ScriptAnimator_Apply(ScriptAnimator *light);
-extern void ScreenTint_UpdateMode(void);
+void ScriptAnimator_Apply(ScriptAnimator *light);
+void ScreenTint_UpdateMode(void);
 
-void BlindOne_Draw_2(CGameObjectInstance *actor, CAI *ai, DrawInfo *info) {
+void BlindOne_Draw_2(CGameObjectInstance *actor, CAI *ai, CDrawArgs *info) {
     ScriptAnimator_Apply(&gBlindOne.faders[ai->m_BlindOne.m_nFader]);
     ScreenTint_UpdateMode();
     switch (actor->m_nTypeFlag) {
         case 0x450:
             if (ai->m_Mode == 9) {
-                info->flag = 1;
+                info->m_nModel = 1;
             }
             break;
         case 0x455:
             if (ai->m_Mode == 6) {
-                info->flag = 1;
+                info->m_nModel = 1;
             }
             break;
     }
-    Render_DrawModel(info->unkC, actor->m_pmtDrawMtxs, 1, &actor->m_Lights[gEvenOdd], 0, info->flag, actor->m_AI.m_nTexture);
+    Render_DrawModel(info->m_hModel, actor->m_pmtDrawMtxs, 1, &actor->m_Lights[gEvenOdd], 0, info->m_nModel, actor->m_AI.m_nTexture);
     gBlendState = 0;
 }

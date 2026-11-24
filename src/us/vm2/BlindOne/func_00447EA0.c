@@ -1,5 +1,3 @@
-/* The second VM module's copy of src/us/vm1/BlindOne/func_0040EEA0.c (byte for byte, at the same link address or 0xE0 below
- * it, docs/VMASM.md), with the second module's names. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -10,8 +8,8 @@
 #include "protos/game.h"
 
 s32 CGameObjectInstance__DrawModel(sptr, sptr, sptr);
-s32 ScreenTint_UpdateMode(void);
-s32 ScriptAnimator_Apply(void *);
+void ScreenTint_UpdateMode(void);
+void ScriptAnimator_Apply(ScriptAnimator *light);
 
 void BlindOne_Group3Draw_2(CGameObjectInstance *arg0, CAI *arg1, CDrawArgs *arg2)
 {

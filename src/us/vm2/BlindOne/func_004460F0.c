@@ -1,8 +1,7 @@
-/* Second-module copy of BlindOne_PhaseMinionsUpdate (nonmatching/vm/BlindOne_PhaseMinionsUpdate.c), with its data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
-#include "globals/scene.h"
+#include "blindone_scene.h"
 #include "globals/boss.h"
 #include "protos/game.h"
 

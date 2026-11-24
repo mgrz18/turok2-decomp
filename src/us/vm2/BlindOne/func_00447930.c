@@ -1,8 +1,7 @@
-/* Second-module copy of BlindOne_PhaseBossMode0Init (src/us/code/BlindOne_PhaseBossMode0Init.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
-#include "globals/scene.h"
+#include "blindone_scene.h"
 #include "globals/boss.h"
 #include "protos/scene.h"
 #include "protos/ai.h"

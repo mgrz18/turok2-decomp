@@ -3,8 +3,8 @@
 #include "protos/ai.h"
 
 
-void BlindOne_BossFlinchUpdate_2(s32 arg0, CAI *arg1) {
-    if (arg1->m_AnimRepeatedCount >= 7) {
-        CAI__SetMode(arg0, arg1, 7);
+void BlindOne_BossFlinchUpdate_2(CGameObjectInstance *obj, CAI *ai) {
+    if (ai->m_AnimRepeatedCount >= 7) {
+        CAI__SetMode(obj, ai, 7);
     }
 }

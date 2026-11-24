@@ -1,5 +1,3 @@
-/* The second VM module's copy of src/us/vm1/BlindOne/func_0040D8B0.c (byte for byte, at the same link address or 0xE0 below
- * it, docs/VMASM.md), with the second module's names. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/game.h"
@@ -13,7 +11,7 @@ extern void BlindOne_ActorUpdate_2(void);
 extern void BlindOne_ActorHurt_2(void);
 extern void EnemyAI_HeadNodeCallback(void);
 extern void BlindOne_Group3Draw_2(void);
-extern void BlindOne_Draw_2(void);
+void BlindOne_Draw_2(CGameObjectInstance *actor, CAI *ai, struct CDrawArgs *info);
 
 void BlindOne_Group3Init_2(CGameObjectInstance *obj, CAI *ai) {
     void *player;

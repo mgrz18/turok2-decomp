@@ -2,16 +2,13 @@
 #include "structs/game_object.h"
 #include "protos/ai.h"
 
-s32 AI_UpdateTargets(sptr, sptr, sptr, s32, s32);
+void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 
-void BlindOne_BossMode3Update_2(sptr arg0, CAI *arg1)
-{
-  u8 sp18[sizeof(CAITargets)]; /* soak S7 */
-  f32 new_var;
-  AI_UpdateTargets(arg0, (sptr) arg1, (sptr) (&sp18), 0, 1);
-  new_var = arg1->m_ModeTime;
-  if (arg1->m_ConditionTimer < new_var)
-  {
-    CAI__SetMode(arg0, arg1, 5);
-  }
+void BlindOne_BossMode3Update_2(CGameObjectInstance *actor, CAI *ai) {
+    CAITargets targets;
+
+    AI_UpdateTargets(actor, ai, &targets, 0, 1);
+    if (ai->m_ModeTime > ai->m_ConditionTimer) {
+        CAI__SetMode(actor, ai, 5);
+    }
 }

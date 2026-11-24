@@ -1,4 +1,3 @@
-/* Second-module copy of BlindOne_PhaseBossMode1Init (src/us/code/BlindOne_PhaseBossMode1Init.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -9,7 +8,7 @@
  * the next phase. */
 
 
-extern void Sound__Play2D(s32 sound);
+void Sound__Play2D(s32 sound);
 
 /* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase(BlindOneState *state) {
