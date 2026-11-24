@@ -1305,6 +1305,44 @@ part q1 lists), `vm1/Pak` 19 (`CCache__Allocate`: the three CCache forms, then `
 
 None needs a ROM change.
 
+## Round 29, part r2: SndVoice, VM, vm1/Pak
+
+**Merged (3 directories, 103 files):** `code/SndVoice` (41 -> `SndVoice.c`), `code/VM` (20 -> `VM.c`), `vm1/Pak`
+(42 -> `Pak.c`, its own vm1 text). After each: `asm_diff --base b8217720` 0 on the files, the merged file
+through clang with the port's flags and `-Wimplicit-function-declaration` (no implicit declaration), `make verify`.
+
+- *`code/SndVoice`*: `SndVoice_Setup` (`func_00273EC0.c`, the whole Rage Wars type dump) and `SndVoice_InitPitch`
+  (`ViewRecAtB0`/`ControllerCode802591C0`) rewritten over `structs/sound.h` (`SndVoice`, `SoundEffectInfo`, `SndEnv`;
+  the map in the file comments, from `port/audio/t2audio_world.c`); `Sound_DistanceAttenuation` on `SndVoiceParams`
+  and `CCamera`; `Sound_CalcPan(CVector3 *, CCamera *)` as the port's copy (was `sptr, u8 *`). New `protos/half.h`:
+  `f32 HalfToFloat(s32)`, `u16 FloatToHalf(f32)` (the definitions' forms; `u16`/`s16` views gave the same code).
+  Calls that differ from the definition are cast at the call: `SndVoice_InitVolume` with 3 arguments (the ROM
+  passes a2), `SndVoicePool_FindSlot` with `s16` arguments and result (it is defined before `AllocVoice` in the
+  merged file). The 26 `T2_LINK_REPLACED` functions (incl. `Sound_CalcPan`, which `t2audio_world.c` also defines)
+  are under `#ifndef TARGET_PORT` (`tools/portwrap.py`).
+- *`code/VM`*: every Rage Wars view rewritten over `structs/pager.h`/`globals/pager.h`: `B09SlotA` = `PageEntry`
+  (a = team, b = slot), `B09LNode`/`Mapping`/`Link_func_8023CC08_de`/`ResourcePageMapping` = `PageMapping`, `B09List`
+  = `gPager.chain`, `Node_func_*` = `PageRegion`, `PagerState` = `Pager`. Additive types in `structs/pager.h`:
+  `PagerStats` (`VM_GetStats`), `PageRegionRequest`/`PageFreeRequest` (the manager thread's type 3/2 requests; it
+  casts at the calls), `FaultedThread` (moved from `VM_HandleTLBMiss`). New `protos/vm.h`: `func_0028EE40` in one
+  form (osMapTLB's arguments: `void *vaddr`), `func_0028EEC0`, `VM_FindRegion` returning `PageRegion *`.
+  `CLoader__LoadSync` as `CLoader` defines it (casts at the calls). Register trap: `VM_AcquireNextTLB` needs one base
+  for `gPager.expanded`/`mapped` (`s16 *cursor = &gPager_expanded; cursor[1]`), `gPager.mapped` alone gives two
+  `%hi/%lo` pairs. Merged with `--rodata-free`: the ROM has `VM_Alloc`'s `"Virtual Region"` (0xAAE10) before
+  `VM_HandleTLBMiss`'s float constants (0xAAE20); in plain source order cc1 emits them the other way round
+  (`make verify` failed by swapped 0x10-byte halves), so the string is a `static const char sVirtualRegionTag[]`
+  defined before `VM_HandleTLBMiss` (under `#ifndef TARGET_PORT`: only the wrapped `VM_Alloc` uses it). The
+  `DEFERRED` route (`--inline` tail `--before` `func_0028E068`) changes code: `VM_FindRegion` is then inlined.
+  4 port-replaced functions wrapped. The pager's address arithmetic still warns under clang (TLB addresses as
+  `u32`; it never runs on the port).
+- *`vm1/Pak`*: header work on its own vm1 text (no vm2 text): the CCache calls through `protos/cache.h` (a
+  `CMemEntry *` handle, `CCache__Flush` cast at the call with the `0` the ROM passes), `Controller_Lock` `s32` and
+  `osMotorInit` with the SDK's types everywhere, `Pak_Repair`/`Pak_RepairIfDamaged` index `gPakFileSystems` as
+  `OSPfs` (was `arg0 * 0x68` into a `char` view: wrong on the host, whose `OSPfs` is larger),
+  `Str_ToLower` without `rw/abu_protos.h` (the source of the `Pak_Mount`/`Pak_DecodeText`/`Str_Compare` clashes).
+  q3's recipe as given: `T` = `func_004263DC`..`func_00427164` (35 stems), `merge_module.py --rodata-free --inline
+  $T --before $T:func_00426164`. No pak header added (part r3 owns `protos/pak.h`).
+
 ## Round 29, part r3: `vm1/PakMenu` and `vm2/PakMenu`
 
 **Merged: `vm1/PakMenu` (128 files -> `PakMenu.c`, `merge_module.py --rodata-free` plus hand-written N64 string data)
@@ -1531,6 +1569,101 @@ its definition that would expand it call it by an asm-label name, as `LoadGeomet
 | `code/CScene`, `vm1/SceneLoad` | header work (above); the conflicts listed, then the deferred-tail merge with `--vm` |
 | `vm2/SceneLoad` | untouched: follows vm1/SceneLoad |
 
+## Round 29 merge: the state after parts r1-r4, and the CScene object
+
+Merged in the order r2, r3, r1, r4 (`--no-ff`). The only textual conflicts were this file (each part's
+section kept) and `versions/port_layout.us.json` (regenerated with `mklayout.py` after each merge); the
+`protos/` headers (r1 `cai.h`, `enemy_ai.h`; r2 `half.h`, `vm.h`; r3 `pak.h`, `pakmenu.h`, `pak_2.h`),
+`tools/port/genprotos.py` (group `pak`), `gendata.py` `ALIGN16`, `tools/modules.py` (the CStaticObject
+boundary), `shared_rodata.us.txt` and the yaml merged on their own, with no function declared two ways.
+After each merge: `asm_diff --base b8217720` 0 over the tree (function by function for the merged files,
+below), a clean `make setup` + build + `make verify` OK, the port compiles from a fresh gendata, the merged
+files have no implicit declaration under clang `-Wimplicit-function-declaration` (the port) or cc1
+`-Wimplicit` (the N64 build), and the nested `TARGET_PORT` scan is the 2 known sites.
+
+At the merge:
+
+- `SndVoice.c`: the nested scan found four `#ifdef TARGET_PORT` branches inside functions that are
+  themselves under `#ifndef TARGET_PORT` (the port replaces them): dead host bodies, dropped (the N64 text
+  is unchanged).
+- `port/game/t2abi.c`: the five wrappers r1 left without callers are gone (`AI_FindClearHeading_i3`,
+  `GameObject_DropPickupAt_i3`, `CMtxF__RotateZ_i`, `AI_TurnClamped_i`, `AI_AngleToPoint_f3`).
+- `Pak_BytesToPages_2` takes an `sptr` like its vm1 twin (`protos/pak_2.h`, `Pak_2.c`): `ptrargs` found
+  `PakMenu_2` passing a pointer to r3's `s32`.
+
+**Tooling.** `tools/asm_diff.py` compared a merged file with nothing (it was NEW at a base that still had
+the one-function files), so only `make verify` saw a code change in it. Now every `.ent NAME` .. `.end NAME`
+of the merged file is matched by name with the same function of the base files that are gone from the
+working tree (the one in the same directory first; CStaticObject's ten come from the base's `code/CMtxF`),
+with local labels numbered per function and every `.LCn` operand replaced by the data it labels. A
+string the merged file defines under a name (r3's N64-only `const char x[] __asm__("D_..")`, r2's
+`sVirtualRegionTag`) reads as the literal it replaced, and so does an address where the linked ELF
+holds a string (the base's `sCSceneCacheDesc_LevelName` against `CScene__GetLevelName`'s literal). A
+differing function prints `DIFF file: function`; a whole-tree run also prints `GONE` for a base function
+no file defines. Over this round: 14 merged files, 964 functions, 0 differ, none gone (a shift
+`>> 12` -> `>> 13` in `VM.c` shows as `DIFF VM.c: VM_FreeRegion`). `tools/port/aligncheck.py` gave up on a
+register 24 instructions after its `lea`; the merged `CMtxF.c` inlines `Model_ApplyPackedOffsets` and
+its `movaps` into `sLitVertexOffsets` comes later, so even with the symbol misaligned it was not listed.
+It now follows the address through the whole function (copies `mov %r1,%r2`/`lea d(%r1),%r2`, `add`/`sub`
+of a constant, a call drops the caller-saved registers) and checks the access's own offset; `--latent`
+lists the sites on gendata's globals aligned only by chance (none) and those in `ALIGN16` (7, including
+`Lighting_BuildLitVertices`'s, which the old window missed).
+
+**The CScene object: `code/CScene` + `vm1/SceneLoad` in one C file (`CScene.c`), `vm2/SceneLoad` in
+`SceneLoad_2.c`.** r4's 22 conflict lines were all one pattern, a definition whose N64 branch (or both)
+takes a Rage Wars view type while its callers declare the engine type: the definitions take the callers'
+type and read the view through a macro (`#define arg0 ((TimedPool *) scene)`): `CScene__GetRegion`,
+`UpdateDelayedEvents`, `ReleaseSectors`, `RestoreFiredEvent(s)`, `ReapplyFiredEvents`,
+`DecompressAnimatedInstances`, `DecompressLinks`, `GetIntelligence`, then for the deferred tail
+`QueueDelayedEvent`, `FindInstances`, `FlushDelayedEvents`. Calls that pass another number of arguments
+go through a cast of the function (`CScene__InitPersistentData`'s two, the zero-argument
+`FlushDelayedEvents`, the one-argument `CISet__GetBlock` of the N64 `CScene__GetSwoosh`), and the actor
+loader calls `GetIntelligence` with its `u16` id through one. The settings-difficulty and camera-pool views
+of two files are asm-label names (`gSettingsDifficultyView_00221D3C`, `gCameraPoolGame_002237C4`); a
+file's `#define unk1C m_GraphicSetsKey` ends with the file; `CScene__DecompressIntelligence` (the
+`.text_vm` function of `func_002261A8.c`) has `VM_TEXT` on its definition, since the merged object drops
+a prototype of a function it defines (it was the prototype that carried the section). Each step
+`asm_diff` 0, then `merge_check --vm` OK.
+
+The source order is r4's answer: every engine file from `CScene__LoadBinaryBlock` (0x224D54) and every
+VM file from `func_0042C560` is `DEFERRED`; the two loaders are defined before `func_0042B3E4` (their
+`"binary block"`/`"graphicset"` after `CScene__LoadLevel`'s strings), `CScene__GetLevelName` before
+`func_00223A94` (its `"level name"` at 0xA6BD0, which no file owned), and the VM files `func_0042C560`..
+`func_0042CAB4` before `func_002261A8` (their floats between `CScene__DrawWarpFade`'s and
+`CScene__FindNearestPathPoint`'s). Three VM functions compiled after the deferred tail called
+`CScene__RequestWarp`, `GetObject` and `FindObjectType`, which GCC then expanded inline: they call
+`_call` asm-label names (the `LoadGeometry_call` pattern). `tools/merge_module.py` learned, for an object
+over both parts with `--inline`: a deferred file's slice no longer places the files of the interleave
+(its literals come out with the deferred group or where `--before` defines it); `--before` is
+repeatable; the deferred functions are declared first in one order that keeps each part's `.text` order
+and the float slices' `.rodata` order (the two parts merged by slice address; a file with a `.text_vm`
+half of its own, `func_002261A8.c`, taken where both orders reach it), also before a definition `--before`
+moved early; the dict-form yaml entry of that `.text_vm` half goes with the merge. The command:
+
+```
+python3 tools/merge_module.py src/us/code/CScene --rodata-free --vm src/us/vm1/SceneLoad \
+  --inline <the 55 engine files from func_00224D54>,<the 10 VM files from func_0042C560> \
+  --before func_00224D54,func_00224DF4:func_0042B3E4 --before func_0022629C:func_00223A94 \
+  --before func_0042C560,...,func_0042CAB4:func_002261A8
+```
+
+then by hand: `CScene__GetLevelName` reads the literals `"level index"` (pooled with `CScene__LoadLevel`'s)
+and `"level name"` instead of the two `sCSceneCacheDesc_*` names. `make verify` OK at the first build.
+`vm2/SceneLoad` follows its twin: `twin_text.py --base HEAD vm1/SceneLoad vm2/SceneLoad 373e6774` (22 of
+24; `func_004639A0` and the `DecompressIntelligence_2` file keep their text), then
+`DecompressCollision_2` over `(void *, void *)`, the `DecompressIntelligence_2` file on `protos/iset.h`
+(its discarded engine copy keeps `.text_engine` on the definition), the engine callees in one form; a plain
+`merge_module.py` (the seven files whose `.rodata` lies over the vm1 pool become `SceneLoad_2:<function>`
+parts of `shared_rodata.us.txt`). clang found no implicit declaration in the merged files once
+`<string.h>` gives the port `memcpy`.
+
+**State: every module is one C file.** 150 modules are one merged C file (14 this round: `SndVoice`, `VM`,
+`vm1/Pak`, `vm1/PakMenu`, `vm2/PakMenu`, `AI`, `EnemyAI`, `CMtxF`, `CStaticObject`, `Trail`, `CParticle`,
+`CGameObjectInstance`, `CScene` with `vm1/SceneLoad`, `vm2/SceneLoad`): 132 game module directories and
+18 libultra modules. 19 game modules are one function (`code/CAnimationState`, `vm1/Automap`...); libultra's
+22 and libgcc's 6 one-function files are library code outside the merges (docs/LIBULTRA.md). No game directory
+holds two C files. None needed a ROM change.
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte
@@ -1639,7 +1772,8 @@ module). "Start evidence" is why the module starts there.
 | MtxPool | engine | MtxPool_Reset | MtxPool_Alloc | 0x00206920 | 2 | 100 | pad |
 | Texture | engine | Texture_DecompressCallback | Texture_InvalidateCache | 0x00206990 | 8 | 4308 | pad |
 | Render | engine | Render_SetCombineMode | Render_SortTreeInsert | 0x00207A70 | 30 | 18012 | pad |
-| CMtxF | engine | CMtxF__TransformBox | Model_PulseVertexColors | 0x0020C0D0 | 124 | 36840 | pad |
+| CMtxF | engine | CMtxF__TransformBox | func_00214188 | 0x0020C0D0 | 114 | 33056 | pad |
+| CStaticObject | engine | CStaticObject__ConstructCompact | Model_PulseVertexColors | 0x002141F0 | 10 | 3784 | rodata pad, rodata pad: at 0xA63C9 (stale words after Lit Vertices; where Lighting_ gives way to CStaticObject__) |
 | CLevelActor | engine | CLevelActor__Construct | CLevelActor__TouchGeometry | 0x002150C0 | 10 | 2588 | pad |
 | Anim | engine | CAnimationState__GetBonePosition | Bits_CeilLog2 | 0x00215AE0 | 49 | 12328 | pad |
 | CAnimationState | engine | CAnimationState__SwitchToQueued | CAnimationState__Load | 0x00218B10 | 11 | 4268 | pad |
@@ -1924,41 +2058,3 @@ module). "Start evidence" is why the module starts there.
 | Cont | vm1 | Cont_InitAll | Cont_ResetSlot | 0x00430070 | 2 | 552 | pad |
 | CEngineApp#2 | vm1 | Render_InitUnitQuad | CEngineApp__StartGame | 0x004302A0 | 4 | 604 | pad |
 | Automap | vm1 | Automap_ClearBuffers | Automap_ClearBuffers | 0x00430500 | 1 | 680 | pad |
-
-## Round 29, part r2: SndVoice, VM, vm1/Pak
-
-**Merged (3 directories, 103 files):** `code/SndVoice` (41 -> `SndVoice.c`), `code/VM` (20 -> `VM.c`), `vm1/Pak`
-(42 -> `Pak.c`, its own vm1 text). After each: `asm_diff --base b8217720` 0 on the files, the merged file
-through clang with the port's flags and `-Wimplicit-function-declaration` (no implicit declaration), `make verify`.
-
-- *`code/SndVoice`*: `SndVoice_Setup` (`func_00273EC0.c`, the whole Rage Wars type dump) and `SndVoice_InitPitch`
-  (`ViewRecAtB0`/`ControllerCode802591C0`) rewritten over `structs/sound.h` (`SndVoice`, `SoundEffectInfo`, `SndEnv`;
-  the map in the file comments, from `port/audio/t2audio_world.c`); `Sound_DistanceAttenuation` on `SndVoiceParams`
-  and `CCamera`; `Sound_CalcPan(CVector3 *, CCamera *)` as the port's copy (was `sptr, u8 *`). New `protos/half.h`:
-  `f32 HalfToFloat(s32)`, `u16 FloatToHalf(f32)` (the definitions' forms; `u16`/`s16` views gave the same code).
-  Calls that differ from the definition are cast at the call: `SndVoice_InitVolume` with 3 arguments (the ROM
-  passes a2), `SndVoicePool_FindSlot` with `s16` arguments and result (it is defined before `AllocVoice` in the
-  merged file). The 26 `T2_LINK_REPLACED` functions (incl. `Sound_CalcPan`, which `t2audio_world.c` also defines)
-  are under `#ifndef TARGET_PORT` (`tools/portwrap.py`).
-- *`code/VM`*: every Rage Wars view rewritten over `structs/pager.h`/`globals/pager.h`: `B09SlotA` = `PageEntry`
-  (a = team, b = slot), `B09LNode`/`Mapping`/`Link_func_8023CC08_de`/`ResourcePageMapping` = `PageMapping`, `B09List`
-  = `gPager.chain`, `Node_func_*` = `PageRegion`, `PagerState` = `Pager`. Additive types in `structs/pager.h`:
-  `PagerStats` (`VM_GetStats`), `PageRegionRequest`/`PageFreeRequest` (the manager thread's type 3/2 requests; it
-  casts at the calls), `FaultedThread` (moved from `VM_HandleTLBMiss`). New `protos/vm.h`: `func_0028EE40` in one
-  form (osMapTLB's arguments: `void *vaddr`), `func_0028EEC0`, `VM_FindRegion` returning `PageRegion *`.
-  `CLoader__LoadSync` as `CLoader` defines it (casts at the calls). Register trap: `VM_AcquireNextTLB` needs one base
-  for `gPager.expanded`/`mapped` (`s16 *cursor = &gPager_expanded; cursor[1]`), `gPager.mapped` alone gives two
-  `%hi/%lo` pairs. Merged with `--rodata-free`: the ROM has `VM_Alloc`'s `"Virtual Region"` (0xAAE10) before
-  `VM_HandleTLBMiss`'s float constants (0xAAE20); in plain source order cc1 emits them the other way round
-  (`make verify` failed by swapped 0x10-byte halves), so the string is a `static const char sVirtualRegionTag[]`
-  defined before `VM_HandleTLBMiss` (under `#ifndef TARGET_PORT`: only the wrapped `VM_Alloc` uses it). The
-  `DEFERRED` route (`--inline` tail `--before` `func_0028E068`) changes code: `VM_FindRegion` is then inlined.
-  4 port-replaced functions wrapped. The pager's address arithmetic still warns under clang (TLB addresses as
-  `u32`; it never runs on the port).
-- *`vm1/Pak`*: header work on its own vm1 text (no vm2 text): the CCache calls through `protos/cache.h` (a
-  `CMemEntry *` handle, `CCache__Flush` cast at the call with the `0` the ROM passes), `Controller_Lock` `s32` and
-  `osMotorInit` with the SDK's types everywhere, `Pak_Repair`/`Pak_RepairIfDamaged` index `gPakFileSystems` as
-  `OSPfs` (was `arg0 * 0x68` into a `char` view: wrong on the host, whose `OSPfs` is larger),
-  `Str_ToLower` without `rw/abu_protos.h` (the source of the `Pak_Mount`/`Pak_DecodeText`/`Str_Compare` clashes).
-  q3's recipe as given: `T` = `func_004263DC`..`func_00427164` (35 stems), `merge_module.py --rodata-free --inline
-  $T --before $T:func_00426164`. No pak header added (part r3 owns `protos/pak.h`).
