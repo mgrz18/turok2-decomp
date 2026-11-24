@@ -6,7 +6,7 @@
 #define PLAYER_LAST T2_OFFSETOF(CPlayer, m_pLast)
 #define PLAYER_NEXT T2_OFFSETOF(CPlayer, m_pNext)
 
-extern void memset(void *p, s32 c, sptr n); /* memset */
+void *memset(void *, s32, uptr);
 
 void CPlayerPool__Construct(CPlayerPool *pl) {
     memset(pl, 0, sizeof(CPlayerPool));

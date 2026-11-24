@@ -22,11 +22,11 @@ f32 Math_DecayToZero(f32 value, f32 rate);
 f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
 f32 func_00298470(f32 x);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
-CQuaternion CGameObjectInstance__GetRotation(CGameObjectInstance *body);
+CQuaternion CGameObjectInstance__GetRotation(void *);
 void CQuaternion__ToMatrix(CQuaternion *q, f32 *mtx);
-void CMtxF__TransformPoint(f32 *mtx, CVector3 *in, CVector3 *out);
-void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
-void Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
+void CMtxF__TransformPoint(CMtxF, CVector3 *, CVector3 *);
+void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
+s32 Sound__Play(s16, CVector3, sptr, sptr);
 
 /* Swimming movement: forward and strafe speeds, the dodge impulses and the
  * climb, turned by the body's facing and added to the velocity, with drag

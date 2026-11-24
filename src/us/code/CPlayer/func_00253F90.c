@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 
-extern void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
+void CMtxF__TransformPoint(CMtxF, CVector3 *, CVector3 *);
 
 /* Transforms a point by the player camera's view orientation, in place. */
 void CPlayer__TransformByView(CPlayer *player, CVector3 *pos) {

@@ -21,10 +21,10 @@ s32 Cinema_IsActive(void);
 s32 CPlayer__IsInMatchEndState(CPlayer *p);
 void CPlayer__Kill(CPlayer *p, HitSource *src, s32 arg3, s32 type);
 void CCameraPool__AddText(CGameFromCameraPool *game, void *camera, char *text);
-void Sound__PlaySpeech(s32 sound);
+void Sound__PlaySpeech(s32);
 void CCamera__SetHitFlash(void *camera, s32 alpha, s32 time);
-void Sound__Play2D(s32 sound);
-void Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
+s32 Sound__Play2D(s32);
+s32 Sound__Play(s16, CVector3, sptr, sptr);
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))

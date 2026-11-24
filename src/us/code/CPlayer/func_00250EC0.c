@@ -20,8 +20,8 @@ f32 func_002974C0(f32 x);
 f32 Math_DecayToZero(f32 value, f32 rate);
 f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
 void CPlayer__BobView(CPlayer *player, CGameObjectInstance *body);
-void Sound__Play2D(s32 sound);
-void Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
+s32 Sound__Play2D(s32);
+s32 Sound__Play(s16, CVector3, sptr, sptr);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 

@@ -16,8 +16,8 @@ extern s32 CPlayerPool__IsScoreLimitReached(CPlayerPool *list);
 extern CPlayer *CPlayerPool__GetViewPlayer(CPlayerPool *list, u32 index);
 extern void CPlayerPool__ClearLastTagMode(CPlayerPool *list);
 extern s32 CPlayerPool__CountPlaying(CPlayerPool *list);
-extern void Hud_SetupTextureMode(s32 color);
-extern void Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
+void Hud_SetupTextureMode(s32);
+s32 Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
 
 /* Tag: pick who is "it" at the start of a round, flashing over the viewports
  * in turn until the pick lands. */

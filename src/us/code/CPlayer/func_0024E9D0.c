@@ -5,7 +5,7 @@
 #include "protos/player.h"
 
 
-CRegionInfo *GameObject_GetRegionInfo(void *actor);
+void *GameObject_GetRegionInfo(void *);
 
 static __inline__ s32 func_0024E9D0_isSpecial(CPlayer *player) {
     if (player->m_Mode == 18 || player->m_Mode == 16 || player->m_Mode == 17) {

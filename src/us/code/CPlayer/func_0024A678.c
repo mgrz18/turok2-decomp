@@ -5,7 +5,7 @@
 
 
 void CCamera__WorldToScreen(CCamera *, f32 *, f32 *, f32 *);
-void Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
+s32 Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
 
 /* Draws a sprite at a world position projected to the screen (or centred
  * for the HUD sprites 0x2BC, 0x2DA and 0x2E4). */

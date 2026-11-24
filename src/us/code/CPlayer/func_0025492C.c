@@ -25,7 +25,7 @@ typedef struct PlayerList PlayerList;
 
 extern Globals gEngineApp_m_Game_m_MenuPool; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 
-extern s32 MenuPool_CountOpen(void *menuPool);
+s32 MenuPool_CountOpen(void *);
 extern s32 CPlayerPool__CountIdleMenus(PlayerList *list);
 extern s32 CPlayerPool__IsFragLimitReached(PlayerList *list);
 extern void CPlayerPool__EndMatch(PlayerList *list);

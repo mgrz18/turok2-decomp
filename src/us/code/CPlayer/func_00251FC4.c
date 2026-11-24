@@ -77,7 +77,7 @@ void CPlayer__ReadInput(void *input, CPlayer *p);
 s32 Controller_StartPressedNoCinema(ControllerProfile *c);
 s32 Cinema_IsActive(void);
 void Cinema_TrySkip(void);
-s32 MenuPool_CountOpen(Globals *g);
+s32 MenuPool_CountOpen(void *);
 void Music_DuckVolume(void);
 void Sound__StopAllExcept(s32);
 void Sound__DisableAmbientTrack(void);

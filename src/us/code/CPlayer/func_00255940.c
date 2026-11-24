@@ -132,7 +132,7 @@ struct LevelActor;
 struct LevelActor;
 extern void CPlayer__MoveOnFoot(void *, void *, void *);
 extern void CPlayer__TurnAndLook(void *, void *, void *);
-extern s32 GameObject_IsOnGround(void *arg0);
+s32 GameObject_IsOnGround(void *);
 void PlayerDodgeFall_Update(sptr arg0, sptr arg1) {
     Math_EaseToward(arg0 + 0xAD0, 0.0f, 0.25f);
     CPlayer__TurnAndLook((void *)arg0, (void *)arg1, &gStandLookTuning);

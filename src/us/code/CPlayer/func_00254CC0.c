@@ -1,7 +1,7 @@
 #include "common.h"
 #include "gfx.h"
 
-extern void Hud_SetupTextureMode(s32);
+void Hud_SetupTextureMode(s32);
 extern void CBarrel__DrawEight(void *, sptr, sptr);
 extern void CBarrel__DrawRing(void *, sptr, sptr);
 

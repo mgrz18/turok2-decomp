@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/game.h"
 
-s32 GameObject_IsOnGround(sptr);
+s32 GameObject_IsOnGround(void *);
 
 
 #ifdef TARGET_PORT

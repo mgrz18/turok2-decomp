@@ -22,8 +22,8 @@ typedef struct ScreenRectangle {
 #else
 typedef struct ScreenRectangle { char pad0[0x288]; f32 x,y,width,height; } ScreenRectangle;
 #endif
-extern s32 Hud_DrawSprite(s32 arg0, s32 arg1, s16 arg2, s16 arg3, f32 arg4, f32 arg5, s32 arg6);
-void Hud_SetupTextureMode(u8 arg0);
+s32 Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
+void Hud_SetupTextureMode(s32);
 void CPlayer__DrawCenterIcon(void *arg0, struct ScreenRectangle *arg1)
 {
   f32 x;

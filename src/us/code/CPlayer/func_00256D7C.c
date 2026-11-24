@@ -3,7 +3,7 @@
 #include "structs/region.h"
 #include "protos/game.h"
 
-extern CRegionInfo *GameObject_GetRegionInfo(CGameObjectInstance *actor);
+void *GameObject_GetRegionInfo(void *);
 extern f32 func_00298470(f32 x); /* square root */
 
 /* Keeps an actor inside a sphere of radius 20000 in regions with flag 0x4000. */

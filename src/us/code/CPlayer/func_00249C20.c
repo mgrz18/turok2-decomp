@@ -86,22 +86,22 @@ struct AimActor {
 };
 #endif
 
-void CGameObjectInstance__LocalToWorld(CVector3 *out, AimActor *actor, CVector3 off);
+CVector3 *CGameObjectInstance__LocalToWorld(CVector3 *, void *, CVector3);
 f32 Actor_GetEyeHeight(AimActor *);
 f32 func_002974C0(f32);
 f32 func_002982F0(f32);
 f32 func_00298470(f32);
 f32 Math_AcosLookup(f32);
 s32 CPlayer__CanLockOn(AimActor *, AimActor *);
-f32 GameObject_GetCollisionHeight(AimActor *);
+f32 GameObject_GetCollisionHeight(void *);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 CVector3__Normalize(CVector3 *);
-CQuaternion CGameObjectInstance__GetRotation(AimActor *);
+CQuaternion CGameObjectInstance__GetRotation(void *);
 void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);
-void CMtxF__TransformPoint(f32 mtx[4][4], CVector3 *in, CVector3 *out);
+void CMtxF__TransformPoint(CMtxF, CVector3 *, CVector3 *);
 void CVector3__Scale(CVector3 *out, CVector3 *a, f32 s);
-void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
+void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
 
 CQuaternion Player_FindAutoAimTarget(AimActor *pl, AimActor **outTarget, CVector3 *outPos) {
     CVector3 tpos;

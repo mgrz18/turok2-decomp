@@ -3,8 +3,8 @@
 #include "structs/game_object.h"
 #include "globals/collision.h"
 
-extern f32 GameObject_GetCollisionHeight(CGameObjectInstance *obj);   /* the object's height */
-extern s32 Collision_MoveInstance(CGameObjectInstance *obj, CVector3 to, void *info);
+f32 GameObject_GetCollisionHeight(void *);
+s32 Collision_MoveInstance(void *, CVector3, void *);
 
 /* Probes a move of obj, raised by half its height plus its step height, to
  * *to; writes where it ends up back to *to and returns 1 if that differs

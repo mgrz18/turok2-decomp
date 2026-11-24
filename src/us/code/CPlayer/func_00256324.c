@@ -14,10 +14,10 @@
 #define P_VEC(p, off) (*(CVector3 *)((u8 *)(p) + (off)))
 #endif
 
-extern CRegionInfo *GameObject_GetRegionInfo(CGameObjectInstance *actor);
+void *GameObject_GetRegionInfo(void *);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern f32 CVector3__GetYaw(CVector3 *v);
-extern s32 Sound__Play2D(s32 sound);
+s32 Sound__Play2D(s32);
 
 void PlayerJumpPad_Enter(CPlayer *player, CGameObjectInstance *actor) {
     CVector3 pos;

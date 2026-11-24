@@ -8,7 +8,7 @@
 #include "globals/particle.h"
 #include "protos/game.h"
 
-CQuaternion CGameObjectInstance__GetRotation(CPlayer *p);
+CQuaternion CGameObjectInstance__GetRotation(void *);
 AmmoInfo *CPlayer__GetFiringAmmo(CPlayer *p, s32 weapon);
 
 /* A debug print compiled out of the release build. Its empty loop notes stop

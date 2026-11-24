@@ -6,7 +6,7 @@
 #include "globals/render.h"
 #include "globals/engine.h"
 
-extern void Hud_SetupTextureMode(s32 color);
+void Hud_SetupTextureMode(s32);
 extern void Hud_DrawNumber(s32 value, f32 x, f32 y, f32 sx, f32 sy, s32 arg5, s32 arg6, s32 arg7);
 
 /* Draw the match clock (gEngineApp_m_Settings.match.timeLeft, in ticks of 1/15 s), minutes and seconds, centered at the top of the

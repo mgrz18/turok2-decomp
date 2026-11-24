@@ -32,7 +32,7 @@ void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuni
 void CPlayer__MoveOnFoot(CPlayer *player, CGameObjectInstance *body, void *tuning);
 void CCamera__SetShake(void *ui, f32 a, f32 b, f32 c, f32 d, s32 e, CVector3 pos);
 void CMtxF__SetRotateY(CMtxF *m, f32 angle);
-void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
+void CMtxF__TransformPoint(CMtxF, CVector3 *, CVector3 *);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 
 /* Riding: the mount sways the view as it turns, charges on button 8, shakes

@@ -7,7 +7,7 @@
 extern void Math_EaseToward(f32 *value, f32 target, f32 rate);
 extern void CPlayer__TurnAndLook(void *, void *, void *);
 extern void CPlayer__MoveOnFoot(void *, void *, void *);
-extern s32 GameObject_IsOnGround(void *body);
+s32 GameObject_IsOnGround(void *);
 extern f32 GameObject_GetGroundHeight(void *body, s32 arg);
 
 /* Eases the lean back to zero, runs the movement tables, and on the ground

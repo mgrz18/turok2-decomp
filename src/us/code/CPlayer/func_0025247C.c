@@ -6,7 +6,7 @@
 #include "protos/ai.h"
 
 extern s32 Random_Next(void);
-extern void Sound__Play2D(s32 sound);
+s32 Sound__Play2D(s32);
 
 /* Same as CPlayer__PickSpawnPoint. */
 static __inline__ void place_at_spawn(CPlayer *p) {

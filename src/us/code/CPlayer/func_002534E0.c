@@ -5,7 +5,7 @@
 #include "globals/game.h"
 #include "protos/player.h"
 
-s32 Controller_SetRumbleOptionAll(s32);
+void Controller_SetRumbleOptionAll(s32);
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xD0];

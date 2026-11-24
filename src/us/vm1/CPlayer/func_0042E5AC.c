@@ -18,11 +18,11 @@ typedef struct PlayerList {
     CPlayerCList list1[1];
 } PlayerList;
 
-extern CPlayer **CCache__Allocate(s32 heap, s32 size, s32 tag, char *name);
-extern void CCache__Deallocate(sptr heap, CPlayer **handle);
-extern void CCache__Flush(s32);
-extern void Controller_SetRumbleOptionAll(s32);
-extern void memset(void *p, s32 c, sptr n); /* memset */
+struct CMemEntry *CCache__Allocate(s32, s32, u32, char *);
+void CCache__Deallocate(sptr, void *);
+void CCache__Flush(s32);
+void Controller_SetRumbleOptionAll(s32);
+void *memset(void *, s32, uptr);
 extern void CPlayerContState__Init(void *, ControllerProfile *);
 extern void CPlayer__Reset(CPlayer *p);
 extern void CPlayer__NewGame(CPlayer *p, s32 character, s32 arg2);

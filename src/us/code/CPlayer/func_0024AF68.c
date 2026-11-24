@@ -20,7 +20,7 @@ s32 CBarrel__CompareIcons();
 s32 CBarrel__SwapIcons();
 f32 func_002974C0(f32);
 void Hud_GetSpriteSize(s32 sprite, s32 frame, s32 *width, s32 *height);
-void Hud_DrawSprite(s32 sprite, s32 frame, s16 x, s16 y, f32 sx, f32 sy, s32 arg6);
+s32 Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
 
 void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, CPlayer *player) {
     s32 width;

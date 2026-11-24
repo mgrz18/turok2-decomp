@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 
-s32 Render_FlushBatches(void);
+void Render_FlushBatches(void);
 s32 CPlayer__DrawCharacter(sptr, sptr);
 s32 Cinema_FollowsPlayer(void);
 

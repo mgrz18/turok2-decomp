@@ -12,7 +12,7 @@ typedef struct {
 
 s32 Cinema_PathPlaying();                           /* extern */
 s32 Cinema_GetScriptId();                                /* extern */
-s32 MenuPool_CountOpen(void *);                          /* extern */
+s32 MenuPool_CountOpen(void *);
 
 void Cinema_CheckPlayerStart(CinemaState *arg0, CPlayer *arg1) {
     CCamera *temp_a1;

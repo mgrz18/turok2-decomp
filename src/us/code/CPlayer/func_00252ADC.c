@@ -9,9 +9,9 @@
 #endif
 
 extern s32 Cinema_PathPlaying(void);
-extern void LoopSounds_Stop(void *mgr, void *sound);
+s32 LoopSounds_Stop(void *, void *);
 extern void CGameObjectInstance__UpdateAI(CGameObjectInstance *obj);
-extern void CGameObjectInstance__UpdateAnimation(CGameObjectInstance *obj);
+void CGameObjectInstance__UpdateAnimation(void *);
 
 /* Whether the player's camera has a menu open. */
 static __inline__ s32 menu_open(CPlayer *p) {

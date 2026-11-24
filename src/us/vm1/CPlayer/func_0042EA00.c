@@ -9,7 +9,7 @@
 
 extern void CPlayer__Respawn(CPlayer *p);
 extern void CPlayer__Reset(CPlayer *p);
-extern void Sound__PlaySpeech(s32 sound);
+void Sound__PlaySpeech(s32);
 extern void CPlayer__GiveStartingWeapons(CPlayer *p);
 
 void CPlayer__ResetHealth(CPlayer *p) {

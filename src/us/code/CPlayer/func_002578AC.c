@@ -1,9 +1,9 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-M2C_UNK CCache__Deallocate(sptr, sptr);                /* extern */
-M2C_UNK CCache__Flush(M2C_UNK);                     /* extern */
-M2C_UNK Controller_SetRumbleOptionAll(M2C_UNK);                     /* extern */
+void CCache__Deallocate(sptr, void *);
+void CCache__Flush(s32);
+void Controller_SetRumbleOptionAll(s32);
 
 void CPlayerPool__FreePlayers(void *arg0) {
     s32 temp_a1;

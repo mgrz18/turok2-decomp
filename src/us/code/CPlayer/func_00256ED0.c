@@ -11,9 +11,9 @@
 #include "structs/particle.h"
 #include "globals/scene.h"
 void *CDLightSet__Alloc(void *tbl, void *light);
-void CGameObjectInstance__LocalToWorld(CVector3 *out, CGameObjectInstance *actor, CVector3 dir);
-void CVector3__Add(CVector3 *out, CVector3 *a, void *b);
-f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);
+CVector3 *CGameObjectInstance__LocalToWorld(CVector3 *, void *, CVector3);
+void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
+f32 GameObject_GetCollisionHeight(void *);
 void Particle_AttachToActor(CGameObjectInstance *actor, void **slot, void *id, f32 z) {
     CDLight *p;
     CVector3 dir;

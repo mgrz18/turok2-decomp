@@ -44,9 +44,9 @@ typedef struct B05Fx { u8 pad0[8]; void *unk8; f32 unkC; s16 unk10; s16 unk12; s
 void CDLightSet__Free(u8 *, void *);
 s32 Random_Next();
 B05Fx *CDLightSet__Alloc(u8 *, u8 *);
-void CGameObjectInstance__LocalToWorld(CVector3 *out, B05P14 *p, CVector3 off);
-void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
-f32 GameObject_GetCollisionHeight(B05P14 *p);
+CVector3 *CGameObjectInstance__LocalToWorld(CVector3 *, void *, CVector3);
+void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
+f32 GameObject_GetCollisionHeight(void *);
 
 /* A separate function in Rage Wars; inlined here in Turok 2. */
 static inline void fxupd(B05P14 *p, void **slot, u8 *tab, f32 offz, f32 k1, f32 k2) {

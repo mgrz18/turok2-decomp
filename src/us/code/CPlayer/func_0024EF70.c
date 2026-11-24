@@ -34,7 +34,7 @@ typedef struct {
 } Floor;
 #endif
 
-Floor *GameObject_GetRegionInfo(CGameObjectInstance *body);
+void *GameObject_GetRegionInfo(void *);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 
 /* Turns the body and tilts the view from the stick, at the rates of the

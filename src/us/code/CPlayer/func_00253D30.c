@@ -126,7 +126,7 @@ struct LevelActor;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
-extern f32 GameObject_GetCollisionHeight();
+f32 GameObject_GetCollisionHeight(void *);
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS GameObject_GetCollisionHeight receives Actor_GetHeightOrDefault's own argument
  * registers (pass-through); the host passes them. */
 f32 Actor_GetHeightOrDefault(LevelActor *arg0) {

@@ -3,7 +3,7 @@
 #include "globals/engine.h"
 
 extern void CGameObjectInstance__UpdateAI(CGameObjectInstance *);
-extern s32 CGameObjectInstance__UpdateAnimation(CGameObjectInstance *);
+void CGameObjectInstance__UpdateAnimation(void *);
 
 /* Rebuilds the weapon actor (keeping gFrameIncrement across it) and puts it where
  * the character is. */

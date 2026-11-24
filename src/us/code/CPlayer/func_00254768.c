@@ -2,7 +2,7 @@
 
 #include "common.h"
 #include "globals/game.h"
-s32 Hud_SetupTextureMode(s32);
+void Hud_SetupTextureMode(s32);
 s32 Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
 #ifdef TARGET_PORT
 /* The host body on the members (round 12 a5, tools/port/n64viewcheck.py): the caller

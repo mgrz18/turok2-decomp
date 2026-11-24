@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 #include "protos/player.h"
 
-s32 GameObject_IsOnGround(void *);                          /* extern */
+s32 GameObject_IsOnGround(void *);
 
 s32 CPlayer__CheckLanded(s32 arg0, CGameObjectInstance *arg1) {
     if ((arg1->m_vVelocity.y <= 0.0f) && (GameObject_IsOnGround(arg1) != 0)) {

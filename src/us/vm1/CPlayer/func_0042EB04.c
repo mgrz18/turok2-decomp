@@ -3,7 +3,7 @@
 #include "structs/player.h"
 #include "protos/game.h"
 
-extern void LoopSounds_Stop(void *pool, sptr sound);
+s32 LoopSounds_Stop(void *, void *);
 
 /* Stops the player's two looping sounds. */
 void CPlayer__StopLoopingSounds(CPlayer *p) {

@@ -23,7 +23,7 @@ typedef struct MenuRow {
 s32 CPlayer__IsInMatchEndState(CPlayer *player);
 void CBarrel__LayoutEight(CBarrel *menu, s32 open, CPlayer *player);
 s32 CBarrel__GetStickDirection(CBarrel *menu, CPlayer *player);
-void Sound__Play2D(s32 sound);
+s32 Sound__Play2D(s32);
 
 /* Runs the player's weapon menu each frame: the menu buttons open or
  * rebuild it, and the slot under the stick becomes the hovered entry,

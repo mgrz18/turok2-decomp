@@ -65,7 +65,7 @@ struct WarpPlayer {
 
 void CPlayer__StopLoopingSounds();
 s32 Mission_LevelObjectivesDone(s32);
-f32 CVector3__Distance(CVector3 *, CVector3 *);
+f32 CVector3__Distance(void *, void *);
 void CPlayer__LevelStart(WarpPlayer *);
 
 /* Sum of the distances from a warp record to every active player. */
