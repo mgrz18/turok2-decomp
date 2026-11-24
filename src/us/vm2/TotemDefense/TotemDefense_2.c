@@ -115,11 +115,6 @@ s32 TotemDefense_KillsLeft_2(Arg0 *arg0) {
 #include "globals/game.h"
 #include "structs/twin_totemdefense.h"
 
-typedef struct {
-    /* 0x0 */ void *target;
-    /* 0x4 */ TargetDef *def;
-    /* 0x8 */ s32 mode;
-} TargetInfo;
 
 /* Point the player actors at a target (mode 0), or back at the player. */
 void TotemDefense_RetargetEnemies_2(TargetInfo *info, s32 force) {

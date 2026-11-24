@@ -50,11 +50,6 @@ typedef struct {
 } Unk00408BFC;
 s32 TotemDefense_KillsLeft(Unk00408BFC *arg0);
 #include "structs/twin_totemdefense.h"
-typedef struct {
-    /* 0x0 */ void *target;
-    /* 0x4 */ TargetDef *def;
-    /* 0x8 */ s32 mode;
-} TargetInfo;
 void TotemDefense_RetargetEnemies(TargetInfo *info, s32 force);
 void TotemDefense_TryHitEnemy(void);
 void TotemDefense_StopEnemies(void);

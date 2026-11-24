@@ -1935,17 +1935,6 @@ s32 PakConfirmMenu_SelectYes(void *owner, MenuRecAt24 *menu, void *arg) {
 /* Menu item handler: depending on the menu state, checks the item (PakMenu_CheckPak) and prints its text, or (states 1
  * and 2) resets the menu flags and opens the item's menu on its owner's camera. */
 
-typedef struct {
-    /* the host Menu's leading fields (structs/menu.h: cursor .. param), pointers 8 bytes wide */
-    s16 cursor, offsetX, offsetY;
-    u8 _pad6[2];
-    void *block, *items;
-    s32 count;
-    void *desc, *param;
-    /* 0x1C */ CPlayer *owner;
-    /* 0x20 */ ItemData *data;
-    /* 0x24 */ void *string;
-} Item;
 
 static __inline__ s32 ItemId(Item *item) {
     s32 id;
@@ -2061,10 +2050,6 @@ char *Pak_GetBufferSize(s32 block) {
     return (char *) (block << 8);
 }
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x684];
-    /* 0x684 */ s32 unk684;
-} Entry;
 
 void Pak_SetBufferSize(s32 arg0, s32 arg1) {
     ((Entry *) (gScene.unk_30 + arg0))->unk684 = arg1;

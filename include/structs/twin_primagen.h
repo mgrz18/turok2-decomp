@@ -228,5 +228,26 @@ typedef struct {
     /* 0x248 */ void *onUpdate;
 } Callbacks;
 #endif
+/* The object this callback gets (only +0xF8 is used). */
+#ifdef TARGET_PORT
+/* the CAI's m_pfHurt at its host offset (tools/port/hostview.py; round 10 y2): the N64 0xF8
+ * cleared other bytes, the hurt callback stayed */
+typedef struct {
+    union {
+        struct { u8 _hp_held[__builtin_offsetof(CAI, m_pfHurt)]; void *held; }; /* N64 0xF8 */
+    };
+} Holder;
+#else
+typedef struct {
+    /* 0x00 */ u8 pad00[0xF8];
+    /* 0xF8 */ void *held;
+} Holder;
+#endif
+/* An effect's parameters, passed by value. */
+typedef struct {
+    /* 0x0 */ s16 upper;
+    /* 0x2 */ s16 lower;
+    /* 0x4 */ u8 b[4];
+} __attribute__((aligned(4))) EffectParams;
 
 #endif

@@ -270,14 +270,7 @@ VM_TEXT void Demo_Update(void) {
     updateChecksum();
 }
 
-/* One per player, 0x224 bytes apart. */
-typedef struct Slot {
-    /* 0x00 */ s32 a;
-    /* 0x04 */ u8 pad4[0x12];
-    /* 0x16 */ u8 b;
-    /* 0x17 */ u8 c;
-    /* 0x18 */ u8 pad18[0x224 - 0x18];
-} Slot;
+#include "structs/twin_demo.h"
 extern Slot gControllers_buttons[]; /* local type: globals/controller.h declares it; this view (its type here) is what keeps the ROM's code */
 
 VM_TEXT static __inline__ void fire(DemoStream *t) { t->decode(t); }
@@ -388,13 +381,6 @@ VM_TEXT void DemoStream_CallHandler2(Unk0042F650 *arg0) {
     arg0->callback();
 }
 
-typedef struct {
-    /* 0x00 */ s32 result;
-    /* 0x04 */ u8 pad4[0xC - 0x4];
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ u8 pad10[0x1C - 0x10];
-    /* 0x1C */ s32 (*func)();
-} Job;
 
 VM_TEXT void DemoStream_RunHandler2(Job *arg0) {
     arg0->result = arg0->func();

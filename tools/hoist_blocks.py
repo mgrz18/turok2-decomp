@@ -36,7 +36,7 @@ def line_start(src, i):
     return src.rfind("\n", 0, i) + 1
 
 
-def find(src, name):
+def find(src, name, group=()):
     tds = [(s, e) for n, s, e in typedefs(src) if n == name]
     if not tds:
         return None
@@ -47,7 +47,7 @@ def find(src, name):
     if k >= 0 and j >= 0 and not re.search(r"^#(if|endif)", src[k + 1:s], re.M) \
             and not re.search(r"^#(if|endif)", src[e:j + 1], re.M):
         inner = src[k:j]
-        if not ({n for n, _, _ in typedefs(inner)} - {name}) and len(re.findall(r"^#if", inner, re.M)) == 1:
+        if not ({n for n, _, _ in typedefs(inner)} - {name} - set(group)) and len(re.findall(r"^#if", inner, re.M)) == 1:
             s, e = k, src.find("\n", j + 1) + 1
     # comment lines right above
     while True:
@@ -74,16 +74,18 @@ def main():
     srcs = {f: open(f).read() for f in files}
     texts, cuts = [], {f: [] for f in files}
     for n in names:
-        found = {f: find(s, n) for f, s in srcs.items()}
+        found = {f: find(s, n, names) for f, s in srcs.items()}
         if any(v is None for v in found.values()):
             print("skip", n, "(not in every file)"); continue
         t = {norm(srcs[f][s:e]) for f, (s, e) in found.items()}
         if len(t) != 1:
             print("skip", n, "(texts differ)"); continue
         f0 = files[0]; s, e = found[f0]
-        texts.append((s, srcs[f0][s:e]))
+        if (s, srcs[f0][s:e]) not in texts:
+            texts.append((s, srcs[f0][s:e]))
         for f, se in found.items():
-            cuts[f].append(se)
+            if se not in cuts[f]:
+                cuts[f].append(se)
         print("hoist", n)
     if not texts:
         return

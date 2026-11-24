@@ -886,9 +886,6 @@ void CScene__DecompressCollision_2(void *worldArg, void *handleArg) {
 
 #include "structs/game_object.h"
 
-typedef struct Handle {
-    void *data;
-} Handle;
 extern sptr CScene__GetRegion(CScene *world, s32);
 s32 CScene__FindNearestWarpDest_2(void *world, void *position, s32 type, SearchPoint *out);
 sptr CScene__GetIntelligence(CScene *world, s32 id);
@@ -911,11 +908,6 @@ extern f32 AI_DistSqToPointAtHeight(CGameObjectInstance *obj, CVector3 pos);
    memcpy (as in Rage Wars): both set loop.c's insn count and giv benefits, which decide the ROM's
    hoisting of the spawns base and of the angle constants. */
 #define handle ((Handle **) handleArg)
-typedef struct Placed {
-    /* 0x00 */ s32 data[4];
-    /* 0x10 */ s16 kind;
-    /* 0x12 */ s16 unk12;
-} Placed; /* 0x14 */
 s32 CScene__FindWarpDests_2(void *world, s32 kind, s32 key, Placed *out, s32 max);
 
 /* the definition takes the callers' type (one prototype for the merged object); its handle view reads it */
@@ -1055,34 +1047,6 @@ void CScene__DecompressAnimatedInstances_2(CScene *world, void *handleArg) {
 #undef handle
 
 void CScene__DecompressGridSection(struct CScene *, s32 ***);
-#ifdef TARGET_PORT
-/* The port: the grid sections hold their static objects and level actors at the host sizes
- * (CScene__DecompressGridSection), so these views are host twins of CStaticObject (block =
- * m_pOwner) and CLevelActor. With the N64 stride and offset the third attract demo's level load
- * (level 109) wrote the handle into the wrong objects and passed a garbage m_pOwner to
- * CCache__RequestDecompression. */
-#include "structs/level_actor.h"
-typedef struct ObjA {
-    u8 pad0[__builtin_offsetof(CStaticObject, m_pOwner)];
-    void **block;
-    u8 pad28[sizeof(CStaticObject) - __builtin_offsetof(CStaticObject, m_pOwner) - sizeof(void **)];
-} ObjA;
-_Static_assert(sizeof(ObjA) == sizeof(CStaticObject), "ObjA size");
-
-typedef struct ObjB {
-    u8 pad0[sizeof(CLevelActor)];
-} ObjB;
-#else
-typedef struct ObjA {
-    /* 0x00 */ u8 pad0[0x24];
-    /* 0x24 */ void **block;
-    /* 0x28 */ u8 pad28[0x68];
-} ObjA; /* 0x90 */
-
-typedef struct ObjB {
-    /* 0x000 */ u8 pad0[0x198];
-} ObjB; /* 0x198 */
-#endif
 
 void CStaticObject__RequestLitVertices(void *object, void *camera);
 extern void *CStaticObject__LoadGeometry(ObjA *a);
@@ -1171,11 +1135,6 @@ void CScene__StreamAllSections_2(CScene *level) {
 
 #include "globals/strings.h"
 
-typedef struct Node {
-    /* 0x00 */ s32 index;
-    /* 0x04 */ void *prev;
-    /* 0x08 */ void *next;
-} Node;
 s32 BinaryRange(void *array, s32 count, u32 key, s32 *first, s32 *last);
 
 /* Copies up to max placed objects of the given kind (-1: any) whose key matches into out; returns how many. */
@@ -1233,14 +1192,6 @@ s32 CScene__FindWarpDests_2(void *world, s32 kind, s32 key, Placed *out, s32 max
     return found;
 }
 void CScene__LoadBitSections2_2(CScene *menu);
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s32 done;
-    /* 0x08 */ u8 pad8[0x28 - 0x8];
-    /* 0x28 */ s32 unk28;
-    /* 0x2C */ u8 pad2C[4];
-    /* 0x30 */ s32 unk30;
-} Arg0_0042C418;
 void CScene__LoadBitSections_2(Arg0_0042C418 *arg0);
 
 void CScene__InitPersistentData_2(CScene *menu) {
@@ -1522,20 +1473,6 @@ void CScene__FlushDelayedEvents_2(CScene *scene) {
 #undef arg0
 #endif
 
-typedef struct LevelState {
-    /* 0x00 */ u8 pad0[0x98];
-    /* 0x98 */ void *handle98;
-    /* 0x9C */ void *handle9C;
-    /* 0xA0 */ void *handleA0;
-    /* 0xA4 */ void *handleA4;
-    /* 0xA8 */ void *handleA8;
-    /* 0xAC */ void *handleAC;
-    /* 0xB0 */ void *handleB0;
-    /* 0xB4 */ void *handleB4;
-    /* 0xB8 */ u8 padB8[0x10];
-    /* 0xC8 */ void *handleC8;
-    /* 0xCC */ void *handleCC;
-} LevelState;
 
 /* Tears the level down: releases its resources' handles. */
 void CScene__UnloadLevel_2(LevelState *level) {
@@ -1658,18 +1595,6 @@ __attribute__((section(".text_engine"))) static s32 CScene__FindNearestPathPoint
     return (s32)bestIdx;
 }
 
-typedef struct {
-    /* 0x00 */ s32 type;
-    /* 0x04 */ u8 pad4[0x24];
-    /* 0x28 */ f32 x;
-    /* 0x2C */ f32 y;
-    /* 0x30 */ f32 z30;
-    /* 0x34 */ f32 z34;
-    /* 0x38 */ u8 pad38[0x14];
-    /* 0x4C */ f32 x2;
-    /* 0x50 */ f32 y2;
-    /* 0x54 */ f32 z2;
-} Element;
 #ifdef TARGET_PORT
 int T2Port_LegacyIntel9(void); /* port/game/t2debug.c */
 #endif
@@ -1729,9 +1654,6 @@ void CScene__DecompressIntelligence_2(s32 unused, void ***resource) {
     }
 }
 
-typedef struct Entry {
-    u8 data[0x20];
-} Entry;
 
 /* Resolves the references of every item of every group of the loaded resource and keeps it in the
  * level (CScene.unk_68; the references point into block 2 of m_pRegionData). Typed on CScene: the

@@ -15,5 +15,10 @@ typedef struct {
     /* 0x0 */ u8 pad0[0xC];
     /* 0xC */ f32 timer;
 } HurtTimer;
+typedef struct {
+    /* 0x0 */ void *target;
+    /* 0x4 */ TargetDef *def;
+    /* 0x8 */ s32 mode;
+} TargetInfo;
 
 #endif
