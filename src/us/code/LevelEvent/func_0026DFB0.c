@@ -14,7 +14,7 @@
 #include "globals/event.h"
 
 extern void CCameraPool__AddMultiLineText(void *game, void *camera, char *text, sptr arg3, f32 time);
-extern void Sound__PlaySpeech(s32 sound);
+void Sound__PlaySpeech(s32 arg0);
 extern void Cinema_RequestById(s32 track);
 
 void LevelEvent_Fire(LevelEvent *event) {

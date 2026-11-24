@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/event.h"
 
-s32 Music_SetTrack(u16);
+void Music_SetTrack(s32 arg0);
 
 /* The mode parameter this AI callback is handed: only the field it reads. */
 

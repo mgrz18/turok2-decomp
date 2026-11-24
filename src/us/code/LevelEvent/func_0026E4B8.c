@@ -5,10 +5,11 @@
 #include "structs/world.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
+#include "structs/event.h"
 
-extern void LevelEvent_MarkFired(Trigger *trigger);
-extern s32 LevelEvent_CheckRequiredItem(Trigger *trigger, sptr arg);
-extern void LevelEvent_Trigger(Trigger *trigger);
+void LevelEvent_MarkFired(Record14 *arg0);
+s32 LevelEvent_CheckRequiredItem(LevelEvent *arg0, sptr arg1);
+void LevelEvent_Trigger(void *arg0);
 void LevelEvent_ProcessTriggers(Trigger *triggers, s32 count, s32 require, s32 enter, s32 exclude, s32 group, sptr arg) {
     s32 i;
     s32 active;
@@ -32,7 +33,7 @@ void LevelEvent_ProcessTriggers(Trigger *triggers, s32 count, s32 require, s32 e
                     CScene__FireEventsByKeyOnce(world, trigger->flags.bytes.id);
                 }
             } else {
-                LevelEvent_MarkFired(trigger);
+                LevelEvent_MarkFired((Record14 *) trigger);
             }
             active = 1;
         }
@@ -55,7 +56,7 @@ void LevelEvent_ProcessTriggers(Trigger *triggers, s32 count, s32 require, s32 e
 #endif
             active = 0;
         }
-        if (LevelEvent_CheckRequiredItem(trigger, arg) == 0) {
+        if (LevelEvent_CheckRequiredItem((LevelEvent *) trigger, arg) == 0) {
             active = 0;
         }
         if (!active) {

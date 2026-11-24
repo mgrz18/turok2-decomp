@@ -5,9 +5,11 @@
 #include "structs/world.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
+#include "structs/event.h"
+
+void LevelEvent_Fire(LevelEvent *event);
 
 void LevelEvent_Trigger(void *arg0) {
-    extern s32 LevelEvent_Fire(void *arg0);
     func_80278EEC_S1 *object = arg0;
     object->unkE |= 0x10;
     CScene__SetEventFired(&gScene, arg0, 1);

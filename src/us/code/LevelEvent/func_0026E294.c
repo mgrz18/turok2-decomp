@@ -2,9 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "structs/event.h"
+
+void LevelEvent_Fire(LevelEvent *event);
 
 void LevelEvent_MarkFired(Record14 *arg0) {
-    extern void LevelEvent_Fire(void *);
     Record14 copy;
     u8 *bytes = (u8 *)arg0;
     bytes[0xE] |= 0x20;
@@ -12,6 +14,6 @@ void LevelEvent_MarkFired(Record14 *arg0) {
         copy = *arg0;
         ((u8 *)&copy)[0x12] = 2;
         ((u8 *)&copy)[0x10] = 0;
-        LevelEvent_Fire(&copy);
+        LevelEvent_Fire((LevelEvent *) &copy);
     }
 }

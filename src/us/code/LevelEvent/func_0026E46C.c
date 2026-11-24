@@ -3,7 +3,7 @@
 
 /* A key event fired by an animation or a script: its handler gets (object, AI, event). */
 
-s32 Sound__SetAmbientTrack(u16);                         /* extern */
+void Sound__SetAmbientTrack(s32 arg0);
 
 void Event_SetAmbientRemote(LevelEvent *arg0) {
     Sound__SetAmbientTrack(arg0->param);
