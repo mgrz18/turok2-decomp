@@ -2,6 +2,7 @@
 #include "globals/cache.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 
 
 /* Turok 3's CCache__Advance, once a frame: counts the frame delay down,

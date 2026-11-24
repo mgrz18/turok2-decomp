@@ -11,6 +11,7 @@
 #include "gbi_t2.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 #include "globals/cache.h"
 
 /* A tracked allocation (list at gCache_memLockedList). */

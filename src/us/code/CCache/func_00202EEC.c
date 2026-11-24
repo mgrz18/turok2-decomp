@@ -5,6 +5,7 @@
 #include "globals/cache.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 
 void CCache__WaitForDisplayLists(void) {
     s32 temp_v1;

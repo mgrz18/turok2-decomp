@@ -2,6 +2,7 @@
 #include "structs/cache.h"
 #include "globals/cache.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 #include "protos/cache.h"
 
 /* Two cache references. */

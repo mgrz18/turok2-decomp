@@ -7,6 +7,7 @@
 #include "protos/list.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 
 extern void CDecompressor__DecompressSync(CDecompressor *, CCacheEntry *);
 extern void CLoader__LoadSync(CLoader *, uptr, uptr, void *);

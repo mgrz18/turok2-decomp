@@ -5,6 +5,7 @@
 #include "globals/cache.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 
 #include "structs/cache.h"
 #include "globals/cache.h"

@@ -10,6 +10,7 @@
 #include "protos/list.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 #include "protos/heap.h"
 #include "protos/hash.h"
 void *memset(void *s, int c, uptr n);

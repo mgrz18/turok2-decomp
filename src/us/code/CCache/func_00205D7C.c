@@ -3,6 +3,7 @@
 #include "globals/cache.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 
 #ifndef TARGET_PORT
 sptr CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)

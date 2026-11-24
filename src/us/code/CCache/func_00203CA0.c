@@ -10,6 +10,7 @@
 #include "protos/list.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 #include "protos/heap.h"
 
 #ifdef TARGET_PORT /* the bucket stride is the host entry's size (pointer-wide value/next): with the

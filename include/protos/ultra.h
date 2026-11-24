@@ -12,8 +12,6 @@
 #include "common.h"
 #include "ultra_types.h"
 
-u32 __osDisableInt(void);           /* OSIntMask (PR/os_internal_reg.h) */
-void __osRestoreInt(u32);
 void osCreateMesgQueue(OSMesgQueue *, OSMesg *, s32);
 s32 osSendMesg(OSMesgQueue *, OSMesg, s32);
 s32 osJamMesg(OSMesgQueue *, OSMesg, s32);

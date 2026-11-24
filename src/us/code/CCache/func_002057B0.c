@@ -4,6 +4,7 @@
 #include "globals/sysrc.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 #include "protos/heap.h"
 
 

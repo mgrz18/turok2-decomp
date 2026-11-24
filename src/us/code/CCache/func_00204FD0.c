@@ -10,6 +10,7 @@
 #include "globals/sysrc.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 
 sptr CHeap__AllocAt(CHeap *, sptr, s32);
 struct B12Node *CCache__AllocateAt(s32 arg0, sptr arg1, s32 arg2) {

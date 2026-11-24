@@ -4,6 +4,7 @@
 #include "rw/junk_types.h"
 #include "globals/cache.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 
 #include "protos/cache.h"
 B12Node *CCache__Allocate(s32 unused, s32 a1, u32 a2, sptr a3) {

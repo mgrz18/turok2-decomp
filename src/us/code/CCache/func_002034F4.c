@@ -7,6 +7,7 @@
 #include "protos/list.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "protos/osint.h"
 
 #ifdef TARGET_PORT /* the bucket stride is the host entry's size (pointer-wide value/next): with the
                     * N64 0x10 the lookup probed the wrong bucket, never found a resident entry and
