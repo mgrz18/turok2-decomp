@@ -218,6 +218,15 @@ typedef struct DamageEvent {
     /* 0x14 */ u8 pad14[4];
 } DamageEvent; /* size 0x18 */
 
+/* A sphere or vertical cylinder test record: Sphere_Set fills it, Cylinder_ContainsPoint
+ * (radiusSq in XZ) and Circle_SegmentIntersects test against it (SweepShapes; Path's pursuit,
+ * Platform_CollideCylinder's mover). */
+typedef struct Sphere {
+    /* 0x00 */ CVector3 center;
+    /* 0x0C */ f32 radius;
+    /* 0x10 */ f32 radiusSq;
+} Sphere; /* size 0x14 */
+
 /* CBox (an axis-aligned box: gCameraVisibleBox, gCameraViewBox) is in structs/vector.h. */
 
 #endif
