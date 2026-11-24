@@ -1,9 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/collision.h"
 
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-s32 Sweep_HitPlane(void *arg0, void *arg1, void *arg2, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
+s32 Sweep_HitPlane(Sweep *ctrl, CVector3 *normal, CollisionQuad *quad, s32 arg3, s32 arg4, f32 scale, s32 arg6);
 
 s32 Platform_HitFace(void *arg0, CGameObjectInstance *mover, CGameObjectInstance *collider, char *arg3) {
     f32 scale;
