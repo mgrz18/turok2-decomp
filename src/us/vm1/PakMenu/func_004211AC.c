@@ -3,10 +3,9 @@
 
 #include "rw/abu_types.h"
 #include "globals/pak.h"
+#include "protos/pak.h"
 
 extern void PakMenu_PickDefaultPort(void);
-void Pak_ProbeSlot(s32);
-s32 Pak_GetStatus(s32);
 void PakMenu_PickDefaultPort(void) {
     s32 var_s0;
     s32 var_s1;

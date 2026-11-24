@@ -2,9 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/pak.h"
 
-extern void Pak_GetNoteGameName(s32,s32,sptr *),Pak_DecodeText(sptr,void *,s32);
-extern s32 Str_Compare(void *,void *);
 s32 PakMenu_FindNoteByName(void *unused, void *arg1, s32 arg2, s32 *arg3) {
     char sp10[16];
     sptr sp20;

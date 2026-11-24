@@ -14,17 +14,11 @@
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
 #include "globals/scene.h"
+#include "protos/pak.h"
 
 void *memset(void *s, int c, uptr n);
 s32 PakMenu_CheckPak();
-s32 Str_Length();
-s32 Str_Compare();
-s32 Pak_FindNote();
-s32 Pak_ReadNote();
-s32 Crc32_Compute();
-s32 Pak_TextHasInvalidChar();
 void PakMenu_UpdateNoteRows();
-void Str_Copy();
 void CCache__Flush();
 void CCache__Deallocate(sptr, sptr); /* prototyped: the 0 reaches the sptr as a full word (the handle is an sptr) */
 CMemEntry *CCache__Allocate();

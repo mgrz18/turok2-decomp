@@ -15,14 +15,11 @@
 #include "protos/menu.h"
 #include "protos/game.h"
 #include "structs/camera.h"
+#include "protos/pak.h"
 
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
 void Controller_ResetRumble(ControllerProfile *a);
-void Controller_UnwatchPak(sptr a);
-s32 Controller_TakePakChanged(s32 a);
-void Pak_ProbeSlot(s32 a);
-s32 Pak_GetStatus(s32 a);
 void CEngineApp__StartCinemaGame(u8 *a);
 
 s32 PakMessage_SelectOk(s32 a0, Menu *o) {

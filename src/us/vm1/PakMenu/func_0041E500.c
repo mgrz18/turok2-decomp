@@ -8,21 +8,13 @@
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
 #include "globals/scene.h"
+#include "protos/pak.h"
 
 /* Controller pak menu, load: finds a pad with a controller pak (trying each pad in turn), checks it for the
  * game's notes and free space and opens the load menu, or shows why the pak cannot be used. */
 
 s32 Controller_AnyConnected(void);
 void CEngineApp__UpdateControllers(u8 *a);
-s32 Str_Compare(u8 *a, char *b);
-void Pak_ProbeSlot(s32 a);
-s32 Pak_GetStatus(s32 a);
-s32 Pak_CountEmptyNotes(s32 a, s32 *b);
-s32 Pak_GetFreePages(s32 a, s32 *b);
-void Pak_GetNoteGameName(s32 a, s32 b, sptr *c);
-s32 Pak_NeedsRepair(s32 a);
-void Pak_DecodeText(sptr a, u8 *b, s32 c);
-s32 Pak_BytesToPages(sptr a);
 void PakMenu_UpdateNoteRows(Menu *o);
 s32 PakMenu_CheckSlotForSave(Menu *o, s32 a, s32 *b, s32 *c);
 

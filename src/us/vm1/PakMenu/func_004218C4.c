@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 #include "globals/pak.h"
 #include "structs/game.h"
+#include "protos/pak.h"
 
-extern s32 Controller_PakChanged(s32);
 extern void Controller_UpdatePakInsertion();
 extern void CEngineApp__UpdateControllers(void *arg0);
 s32 PakMenu_PollBootPak(s32 arg0) {

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
+#include "protos/pak.h"
 
-void Controller_UnwatchPak(sptr);
 
 
 void PakMenu_UnwatchAndWarp(s32 arg0, s32 arg1) {

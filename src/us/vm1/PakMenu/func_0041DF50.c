@@ -11,13 +11,9 @@
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
 #include "structs/camera.h"
+#include "protos/pak.h"
 
-void Pak_ProbeSlot(s32 ch);
-s32 Pak_GetStatus(s32 ch);
-s32 Pak_IsRumblePak(s32 ch);
-s32 Pak_NeedsRepair(s32 ch);
 void PakMenu_UpdateNoteRows(Menu *o);
-u32 Crc32_Compute(u8 *data, s32 len, u32 crc);
 /* O01Pick and O01Capture are separate functions in Rage Wars; inlined here in Turok 2. */
 static inline u8 *O01Pick(PakChannel *sel) {
     u8 *msg;

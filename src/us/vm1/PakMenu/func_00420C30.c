@@ -5,11 +5,9 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/pak.h"
 
 extern int PakConfirmMenu_SelectYes(void * owner, struct MenuRecAt24 * menu, void * arg);
-extern s32 Pak_DeleteNote(s32 ch, s32 index);
-extern void Pak_ProbeSlot(s32 ch);
-extern s32 Pak_RepairIfDamaged(s32 ch);
 extern s32 PakMenu_WriteSaveGame(void *owner, MenuRecAt24 *menu, void *arg);
 s32 PakConfirmMenu_SelectYes(void *owner, MenuRecAt24 *menu, void *arg) {
     extern void MenuPool_OpenMenu(char *, char *, void *, PakMenuSlot *, char *);

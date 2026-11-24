@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
+#include "protos/pak.h"
 
-void Controller_WatchPak(s32 port);
 
 
 /* Takes the port by address: the ROM keeps it in a stack slot (as PakMenu_GetReturnMenu does with its kind). */

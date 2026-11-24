@@ -4,6 +4,7 @@
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
+#include "protos/pak.h"
 
 /* Save/load menu "select pak" handler: checks the pak in the chosen slot;
  * when saving over an existing game file asks for confirmation, when there
@@ -13,11 +14,6 @@ extern s32 PakMenu_CheckPak(Menu *c, s32 slot, s32 quiet);
 extern void PakMenu_UpdateNoteRows(Menu *c);
 extern void PakMenu_WriteProfile(void *menu, Menu *c, s32 arg2);
 extern void PakMenu_WriteSaveGame(void *menu, Menu *c, s32 arg2);
-extern void Pak_ProbeSlot(s32 slot);
-extern s32 Pak_GetStatus(s32 slot);
-extern void Pak_GetNoteGameName(s32 slot, s32 index, char **out);
-extern void Pak_DecodeText(char *src, char *dst, s32 n);
-extern s32 Str_Compare(char *a, char *b);
 
 /* PakMenu_FindNoteByName, inlined (the found path sets the result before storing the index) */
 static __inline__ s32 findFile(void *unused, char *file, s32 slot, s32 *index) {

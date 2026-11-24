@@ -1,14 +1,12 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
+#include "protos/pak.h"
 
 /* Greys out the controller pak notes that cannot be picked: a used note is
  * selectable unless it is this game's save (gPakCharacterNoteName when loading, mode 1,
  * gPakGameNoteName in mode 2) with Turok 2's game and company codes. */
 
-extern s32 Pak_FindNote(s32 slot, s32 note, s32 *used, char *name, char *ext, s32 *size, char *company, char *game);
-extern s32 Str_Length(char *s);
-extern s32 Str_Compare(char *a, char *b);
 
 /* Game code / company code check on the controller-pak note (as in PakMenu_SelectNote). */
 static __inline__ s32 k7_chk(char *gc, char *cc) {

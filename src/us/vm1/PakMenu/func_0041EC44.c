@@ -6,12 +6,9 @@
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
+#include "protos/pak.h"
 
 void PakMenu_UpdateNoteRows(Shared_PakMenu *menu);
-extern void Pak_ProbeSlot(s32 ch);
-extern s32 Pak_GetStatus(s32 ch);
-extern s32 Pak_IsRumblePak(s32 ch);
-extern s32 Pak_NeedsRepair(s32 ch);
 #ifdef TARGET_PORT
 /* The port: the Rage Wars view (Shared_PakMenu, PakNotesMenuItem) puts the items, the player and the
  * controller at N64 offsets (0xC, 0x1C, 0x20; items 0x28 apart): on the host it read the channel from

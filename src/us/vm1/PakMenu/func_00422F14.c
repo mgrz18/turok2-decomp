@@ -2,9 +2,8 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 #include "structs/pak.h"
+#include "protos/pak.h"
 
-void Controller_WatchPak(s32 port);
-void Pak_ProbeSlot(s32 port);
 
 
 static __inline__ s32 GetPort(Menu *event) {

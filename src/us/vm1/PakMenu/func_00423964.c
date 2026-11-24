@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
+#include "protos/pak.h"
 
-s32 Controller_PakChanged(s32);
 s32 PakMenu_CheckPak(sptr, s32, s32);
 
 

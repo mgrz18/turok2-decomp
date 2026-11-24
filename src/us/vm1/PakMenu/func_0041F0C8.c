@@ -10,15 +10,11 @@
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
 #include "globals/scene.h"
+#include "protos/pak.h"
 
 /* Controller pak save: when the pak has room and an existing note can be replaced, writes the save note;
  * stops the pak sounds and shows the result (or the "not enough space" message). */
 
-u32 Pak_BytesToPages(uptr n);
-s32 Pak_GetFreePages(s32 pad, s32 *out);
-s32 Pak_CountEmptyNotes(s32 pad, s32 *out);
-s32 Pak_FindFreeExtLetter(s32 pad, u8 *ext);
-s32 Pak_SaveNoteVerified(s32 pad, s32 size, sptr buf, char *n1, u8 *ext, char *n2);
 void CCache__Flush(s32 a);
 void CCache__Deallocate(sptr a, sptr b);
 void Cinema_StopAtEnd(void);

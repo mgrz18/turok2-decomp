@@ -1,6 +1,7 @@
 #include "common.h"
 #include "globals/pak.h"
 #include "globals/scene.h"
+#include "protos/pak.h"
 
 /* Pak slot scan step: a pak that already holds one of the game's two files
  * (names gPakCharacterNoteName, gPakGameNoteName) wins at once (*best = 123); otherwise the
@@ -8,12 +9,6 @@
  * the slot with the most free pages is kept. Returns 1 to keep scanning. */
 
 
-extern void Pak_GetNoteGameName(s32 slot, s32 index, char **out);
-extern void Pak_DecodeText(char *src, char *dst, s32 n);
-extern s32 Str_Compare(char *a, char *b);
-extern s32 Pak_GetFreePages(s32 slot, s32 *score);
-extern s32 Pak_CountEmptyNotes(s32 slot, s32 *count);
-extern s32 Pak_BytesToPages(u8 *size);
 
 /* PakMenu_FindNoteByName without the index output */
 static __inline__ s32 hasFile(char *file, s32 slot) {

@@ -9,11 +9,8 @@
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
 #include "structs/camera.h"
+#include "protos/pak.h"
 
-extern void Pak_ProbeSlot(s32 kind);
-extern s32 Pak_GetStatus(s32 kind);
-extern s32 Pak_IsRumblePak(s32 kind);
-extern s32 Pak_NeedsRepair(s32 kind);
 extern void PakMenu_UpdateNoteRows(Menu *m);
 
 void PakMenu_InitLoadProfile(Menu *m) {

@@ -3,10 +3,9 @@
 
 #include "rw/abu_types.h"
 #include "globals/pak.h"
+#include "protos/pak.h"
 
 extern void PakMenu_ProbeOwnerPort(struct Shared_PakMenu *record);
-extern void Pak_ProbeSlot(s32);
-void Pak_ProbeSlot(s32);
 void PakMenu_ProbeOwnerPort(struct Shared_PakMenu *record) {
     s32 value;
     if (gPakMenuAnyPak != 0) {
