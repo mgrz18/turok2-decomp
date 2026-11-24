@@ -3,7 +3,7 @@
 #include "globals/rumble.h"
 #include "globals/menu.h"
 
-extern void Controller_ResetAllRumble(void);
+void Controller_ResetAllRumble(void);
 extern void RumblePool_FreeAll(RumblePool *pool);
 
 /* Restores the per-controller words saved by PauseMenu_Init. */

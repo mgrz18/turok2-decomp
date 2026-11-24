@@ -2,10 +2,10 @@
 #include "m2c_macros.h"
 #include "protos/menu.h"
 
-s32 Music_SetTrack(s32);
+void Music_SetTrack(s32 track);
 
 s32 Music_GetTrack();                                /* extern */
-extern u8 gEngineApp_m_Settings_unk14[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
+#include "globals/game.h"
 
 s32 SoundMenu_StepMusicVolume(sptr arg0, sptr arg1)
 {

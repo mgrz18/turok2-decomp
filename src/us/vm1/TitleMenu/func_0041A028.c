@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 #include "globals/menu.h"
 
-extern void Music_SetTrack(s32 a);
+void Music_SetTrack(s32 track);
 s32 SoundMenu_StepMusicTrack(s32 arg0, struct RecordRecAt20V1 *arg1) {
     s32 var_a0;
     var_a0 = sSoundMenuTrack;

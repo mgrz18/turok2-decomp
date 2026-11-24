@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/game.h"
 
-s32 Music_SetTrack(s32);
+void Music_SetTrack(s32 track);
 s32 CEngineApp__QuitToLegal(sptr);
 
 s32 Music_Stop();                            /* extern */
-s32 Music_RestoreVolume();                            /* extern */
+void Music_RestoreVolume(void);
 
 s32 QuitMenu_Yes(void) {
     Music_SetTrack(-1);

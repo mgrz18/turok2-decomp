@@ -3,12 +3,12 @@
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
 
-s32 Music_SetTrack(s32);
+void Music_SetTrack(s32 track);
 
-s32 Sound__StopAllExcept(s32);                     /* extern */
-s32 Sound__SetForce2D(s32);                     /* extern */
+void Sound__StopAllExcept(s32 volume);
+void Sound__SetForce2D(s32 on);
 s32 Music_GetTrack();                                /* extern */
-s32 Controller_DisableMenuSounds();                            /* extern */
+void Controller_DisableMenuSounds(void);
 
 s32 TitleMenu_SoundOptions(sptr arg0, sptr arg1, sptr arg2) {
     Sound__StopAllExcept(-1);

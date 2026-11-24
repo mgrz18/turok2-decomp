@@ -5,7 +5,7 @@
 #include "protos/menu.h"
 
 
-s32 Controller_WatchPak(s8);                          /* extern */
+void Controller_WatchPak(s32 on);
 
 s32 SingleMenu_NewGame(s32 arg0, Menu *arg1) {
     Controller_WatchPak(arg1->controller->port);

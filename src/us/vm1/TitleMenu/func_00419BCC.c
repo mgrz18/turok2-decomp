@@ -1,11 +1,11 @@
 #include "common.h"
 #include "globals/menu.h"
 
-s32 Music_SetTrack(s32);
+void Music_SetTrack(s32 track);
 s32 MenuItem_SelectSubmenu(sptr, sptr, sptr);
 
-s32 Sound__StopAllExcept(s32);                     /* extern */
-s32 Sound__SetForce2D(s32);                     /* extern */
+void Sound__StopAllExcept(s32 volume);
+void Sound__SetForce2D(s32 on);
 s32 Music_DuckVolume();                            /* extern */
 s32 Controller_EnableMenuSounds();                            /* extern */
 

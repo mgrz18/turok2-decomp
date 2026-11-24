@@ -16,9 +16,9 @@
 #include "structs/menu.h"
 /* Turok 2 layouts (Rage Wars: 8 records of 0x96 bytes at 0xD0, local/mode at 0x1D/0x1E). */
 extern void TitleMenu_Single(void *arg0, Menu *menu);
-extern void Music_RestoreVolume();
+void Music_RestoreVolume(void);
 extern s32 Controller_ConfirmPressed(char *);
-extern void Music_RestoreVolume(void);
+void Music_RestoreVolume(void);
 extern void CEngineApp__StartGame(char *, s32);
 /* The window's controller by member (an m2c view wrote it at N64 offset 0x20: Menu.desc on the host). */
 void TitleMenu_Single(void *arg0, Menu *menu) {

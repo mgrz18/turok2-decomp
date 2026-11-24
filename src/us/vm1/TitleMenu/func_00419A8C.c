@@ -1,7 +1,7 @@
 #include "common.h"
 #include "protos/game.h"
 
-void Music_RestoreVolume();                            /* extern */
+void Music_RestoreVolume(void);
 void Sound__EnableAmbientTrack();                            /* extern */
 void LoopSounds_Resume(sptr);                         /* extern */
 

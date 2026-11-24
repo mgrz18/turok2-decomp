@@ -20,7 +20,7 @@ typedef struct {
 } A254Menu;
 
 
-extern void Controller_ResetAllRumble(void);
+void Controller_ResetAllRumble(void);
 extern void RumblePool_FreeAll(RumblePool *pool);
 extern void LoopSounds_Pause(sptr);
 
