@@ -947,6 +947,28 @@ layouts, `AI_StopSound` defined on `Dest`, `GameObject_TraceMove` with three `f3
 `CGameRegion`, `GameObject_GetGroundHeight` argument lists), `code/__scHandleRSP` (22: the per-file
 `Sched`/`Client`/`Qn` views onto `structs/sched.h` `OSSched`/`OSScTask`, still to write).
 
+## Round 27, part p2: menus and the vm1/vm2 twins
+
+**Merged (9 directories, 358 files -> 9):** `code/ModelSweep`, `code/Pickup`, `code/SweepShapes`,
+`vm1/TitleMenu` (`--rodata-free --inline all`), `vm2/TitleMenu` (`--rodata-free`), `vm1/MissionMenu`,
+`vm1/BlindOne`, `vm2/BlindOne`, `vm2/MpMenu` (`--rodata-free`). `make verify` byte-exact and
+`asm_diff --base 88d57333` 0 over the tree after each. (The part wrote no section of its own; this one
+is from its report.) What it took:
+
+- *Settings bytes as arrays:* `include/globals/game.h` declares `gEngineApp_m_Settings_unk14`/`15`/`16`/`18`
+  as `u8 x[]` (the readers index them); `code/CAudioWorld`'s own `extern u8 gEngineApp_m_Settings_unk15[]`
+  goes when that directory is merged.
+- *The BlindOne scene arrays:* `src/us/vm{1,2}/BlindOne/blindone_scene.h` (`SCENE_LEVEL_ARRAYS`), one
+  definition of the level tables for both VM copies.
+- *Twins:* `tools/twin_text.py` (new) writes the vm2 copy of a module as its vm1 twin, file by file, kept
+  at `asm_diff` 0; `tools/unify_protos.py` (new) gives a name one prototype across a directory's files.
+  The `_2` menu prototypes live in `vm2/TitleMenu_2.c`; `vm2/MpMenu` reads its match state through the
+  `gMatchView` asm label.
+
+**Left of the part (5):** `vm1/Primagen` and `vm2/Primagen` (the `gLevelScript` views), `vm1/MantidQueen`
+(`AI_TurnClamped`: 4th argument `f32` in some callers, `s32` in others), `vm2/SceneLoad` (goes with the
+engine/VM `CScene` pair of part p4), `vm2/PakMenu`.
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte
