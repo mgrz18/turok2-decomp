@@ -1,15 +1,10 @@
 #include "common.h"
+#include "structs/sound.h"
 
-typedef struct ListHead {
-    /* 0x00 */ struct ListHead *next;
-    /* 0x04 */ struct ListHead *prev;
-    /* 0x08 */ u8 data[1];
-} ListHead;
+void SndVoice_Construct(SndVoice *voice, CAudioWorld *owner, s32 index);
 
-s32 SndVoice_Construct(sptr, sptr, s32);
-
-void SndQueue_InitNode(ListHead *arg0, s32 arg1) {
-    arg0->prev = arg0;
-    arg0->next = arg0;
-    SndVoice_Construct((sptr) arg0->data, arg1, -1);
+void SndQueue_InitNode(SndNode *node, CAudioWorld *owner) {
+    node->link.next = &node->link;
+    node->link.prev = &node->link;
+    SndVoice_Construct(&node->body, owner, -1);
 }
