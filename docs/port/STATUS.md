@@ -6,6 +6,38 @@ new game to the good ending with no invincibility and no life lost, on the N64's
 stream. The Mac app is packaged and ready for its first session in a real window
 ([FIRSTRUN.md](FIRSTRUN.md)); that session has not happened yet.
 
+## Round 26, part o3: the port is N64-faithful by default; the reference runs re-baselined
+
+**The N64's reading is now the default for the two things round 25 kept for the md5s.** The voice
+id tables (`SndVoicePool_AllocVoice`, `port/audio/t2audio_world.c`) and the draw sort key
+(`Render_SortDrawItems`, the low byte of `sBatchPass` on the host, `TARGET_PORT` only) now read as
+on the N64. The old readings are two DEBUG-ONLY switches that only `--legacy` writes:
+**`T2_LEGACY_VOICE=1`** and **`T2_LEGACY_BATCHKEY=1`** (port/game/t2debug.c; section 1's table).
+A human player gets the N64's behaviour, as the project rule says.
+
+**The new reference md5s** (Linux Release, `aimdrive.py`, 300,000 frames;
+[PLAYTHROUGH.md 47](PLAYTHROUGH.md#47-round-26-part-o3-the-n64s-voice-ids-and-draw-key-by-default-the-re-baseline)):
+
+| run | result | det md5 |
+|---|---|---|
+| boot + 3 demos | unchanged | `6ab97584…` |
+| **default** (`--all --talismans 2 --cheats-off 1,2,3,4,5,6`) | END 2 (252,468), 5 totems, **0 lives**, no re-tune | **`af8bd840…`** (was `cd2d68ce…`) |
+| **stick combination** (`--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair`) | END 2 (263,622), 5 totems, **0 lives** | **`ad941823…`** (was `cadfe170…`; `aaa175f2…`, 1 life, before the re-tune) |
+| `--legacy` (290,000) | END 2 (252,194), 5 totems, 2 lives (level 110), as before | `ac08c89b…` (unchanged) |
+
+The draw key does not reach the det log: the demos and the default give the md5s that round 25
+measured with the voice fix alone. **The re-tune** applies only to the stick combination's
+default stream. With the shredder, the Cave Totem by stick cost 140 and left the player 18 health
+for 124, where the pylons killed him. `fullrun.py` now arms **weapon 12, the sunfire pod**, for the Cave Totem when
+`--stick-aim` has 4 and the run is not `--legacy` (`STICK_CAVE_WEAPON`, DEBUG-ONLY hook
+`T2R26_SCW`). The totem then costs 94, and the thinnest spot is the Queen (lowest 21).
+The default and `--legacy` route inputs are byte-identical to round 25's; `--legacy`'s
+`teleport.env` adds the two new switches.
+
+Checks: `asm_diff --base 3ffda1bb` 0 differ over 2,910 files; a clean `make setup` + build +
+`make verify` OK (shared `.rodata` 167 objects). Port: a fresh gendata, `mklayout.py --check` up
+to date, and `aligncheck.py` the 2 known sites.
+
 ## Round 25 merge (Phase 5): 31 more modules in one C file, vm2 without asm, the last BSS views; the reference md5s unchanged
 
 Merged into `feat/46-hand-matching` in the order n3, n2, n1, n4 (`--no-ff`). n3: the 100 vm2
