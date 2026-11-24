@@ -297,9 +297,10 @@ def main():
                     "if every file compiles the same under them")
     ap.add_argument("--inline", help="stems (comma-separated) or `all`: their functions are written DEFERRED "
                     "(`inline`: output after the others, string literals at the definition)")
-    ap.add_argument("--before", help="`A,B,..:C`: the source order puts files A,B.. (stems, their .text order kept) "
-                    "right before file C; with --inline A,B,.. the deferred tail of an object whose string literals "
-                    "come before an earlier function's (vm1/Pak: Pak_AllocDirectory's before Pak_SaveNoteVerified's)")
+    ap.add_argument("--before", action="append", help="`A,B,..:C`: the source order puts files A,B.. (stems, their .text "
+                    "order kept) right before file C; with --inline A,B,.. the deferred tail of an object whose string "
+                    "literals come before an earlier function's (vm1/Pak: Pak_AllocDirectory's before "
+                    "Pak_SaveNoteVerified's); repeatable, applied in order")
     ap.add_argument("--rodata-free", action="store_true", help="no .rodata order check: the slices and the unnamed "
                     "data between them become the merged file's one .rodata (make verify decides)")
     ap.add_argument("--vm", help="the directory of the same object's functions linked into the VM module (section .text_vm)")
@@ -323,6 +324,20 @@ def main():
             sys.exit(f"{a.vm}: a file name is in both parts")
         files.update(vm)
     lines, ents = yaml_entries(set(files))
+    # an engine file with a .text_vm half of its own (code/CScene/func_002261A8.c: CScene__DecompressIntelligence,
+    # docs/VMASM.md) has a second, dict-form entry among the VM part's: its place in the VM .text order; the
+    # merged object's VM part covers it (the line and the comment above it go)
+    VM_HALF = re.compile(r"^\s+- \{start: (0x[0-9A-Fa-f]+), type: c, name: ([^,}]+), linker_section: \.text_vm\}")
+    vm_half, half_lines = {}, set()
+    for n, line in enumerate(lines):
+        m = VM_HALF.match(line)
+        if m and m.group(2).rsplit("/", 1)[-1] in files:
+            vm_half[m.group(2).rsplit("/", 1)[-1]] = int(m.group(1), 16)
+            half_lines.add(n)
+            k = n - 1
+            while k >= 0 and lines[k].lstrip().startswith("#"):
+                half_lines.add(k)
+                k -= 1
     text_order = [e[2].rsplit("/", 1)[-1] for e in ents if e[1] == "c"]
     if sorted(text_order) != sorted(files) or len(files) < 2:
         sys.exit(f"{a.dir}: the yaml does not link exactly these files as `c` ({len(text_order)} of {len(files)})")
@@ -339,8 +354,13 @@ def main():
         # its own part that has .rodata; the files after the last such one at the end, engine part first)
         parts = [[e[2].rsplit("/", 1)[-1] for e in cs], [e[2].rsplit("/", 1)[-1] for e in cs_vm]]
         text_order = []
+        # with --inline, a deferred file's slice does not place the files (its float literals come out with the
+        # deferred group at the end, its strings where --before defines it): CScene + vm1/SceneLoad, round 29
+        skip = set() if not a.inline or a.inline == "all" else set(a.inline.split(","))
         for e in ro:
             s = e[2].rsplit("/", 1)[-1]
+            if s in skip:
+                continue
             p = parts[1] if s in vm else parts[0]
             if s in p:
                 k = p.index(s)
@@ -392,11 +412,11 @@ def main():
     if shared and ro:
         sys.exit(f"{a.dir}: {len(shared)} files place their .rodata over the first VM module's pool "
                  f"(versions/shared_rodata.us.txt) and the yaml places others")
-    if a.before:
-        mv, at = a.before.split(":")
+    for before in a.before or ():
+        mv, at = before.split(":")
         mv = [x for x in text_order if x in mv.split(",")]
-        if at not in text_order or at in mv or len(mv) != len(a.before.split(":")[0].split(",")):
-            sys.exit(f"{a.dir}: --before {a.before}: not stems of this directory")
+        if at not in text_order or at in mv or len(mv) != len(before.split(":")[0].split(",")):
+            sys.exit(f"{a.dir}: --before {before}: not stems of this directory")
         rest = [x for x in text_order if x not in mv]
         k = rest.index(at)
         text_order = rest[:k] + mv + rest[k:]
@@ -455,21 +475,57 @@ def main():
                 defined.setdefault(n, signature(it))
     func_order = [n for its in parsed for it, kind, n in its if kind == "func"]
     deferred = {n for its in parsed for it, kind, n in its if kind == "func" and re.match(r"\s*DEFERRED\b", strip_comments(it))}
+    fn_stem = {}
     if a.inline:
         # a deferred function defined inside a conditional block (#ifdef TARGET_PORT .. #else ..) takes its place in the
         # output order too (its first definition's signature for the early prototype)
         CPP_DEF = re.compile(r"^DEFERRED\s+([A-Za-z_][\w \t\*]*?\b(\w+)\s*\([^;{}]*\))\s*\{", re.M)
         func_order = []
-        for its in parsed:
+        for fi, its in enumerate(parsed):
             for it, kind, n in its:
                 if kind == "func":
                     func_order.append(n)
+                    fn_stem.setdefault(n, text_order[fi])
                 elif kind == "cpp" and re.match(r"\s*#\s*if", strip_comments(it)):
                     for m in CPP_DEF.finditer(strip_comments(it)):
+                        fn_stem.setdefault(m.group(2), text_order[fi])
                         if m.group(2) not in func_order:
                             func_order.append(m.group(2))
                             deferred.add(m.group(2))
                             defined.setdefault(m.group(2), re.sub(r"\s+", " ", m.group(1)) + ";\n")
+    # The order the deferred functions are output in (their first declarations' order): each part's .text order,
+    # the two parts merged so that the slices whose literals come out with them (their float constants) keep the
+    # .rodata order; a file with a .text_vm half is taken where both orders reach it. A file --before moved to
+    # define its strings early keeps its .text place here (CScene: func_0022629C's "level name").
+    defer_order = []
+    if a.inline and vm and a.inline != "all":
+        want_d = set(a.inline.split(","))
+        addr = lambda e: int(ENTRY.match(lines[e[0]]).group(1), 16)
+        slice_at = {e[2].rsplit("/", 1)[-1]: addr(e) for e in ro}
+        E = [e[2].rsplit("/", 1)[-1] for e in cs]
+        V = [x for _, x in sorted([(addr(e), e[2].rsplit("/", 1)[-1]) for e in cs_vm] +
+                                  [(v, k) for k, v in vm_half.items()])]
+        E, V = [x for x in E if x in want_d], [x for x in V if x in want_d]
+        both = set(E) & set(V)
+        files_order, i, j = [], 0, 0
+        while i < len(E) or j < len(V):
+            e = E[i] if i < len(E) else None
+            v = V[j] if j < len(V) else None
+            cand = [x for x in ((e if e is not None and (e not in both or e == v) else None),
+                                (v if v is not None and v not in both else None)) if x is not None]
+            if not cand:
+                sys.exit(f"{a.dir}: no deferred output order fits both parts at {e} / {v}")
+            x = min(cand, key=lambda c: (c in slice_at, slice_at.get(c, 0)))
+            files_order.append(x)
+            if x == e:
+                i += 1
+                if x == v:
+                    j += 1
+            else:
+                j += 1
+        rank = {x: k for k, x in enumerate(files_order)}
+        defer_order = sorted((f for f in func_order if f in deferred and fn_stem.get(f) in rank),
+                             key=lambda f: (rank[fn_stem[f]], func_order.index(f)))
     local_types, type_item = set(), {}
     is_inc = lambda it: re.match(r"#\s*include\b", strip_comments(it).strip())
     for i, its in enumerate(parsed):
@@ -501,7 +557,8 @@ def main():
         of one, the deferred functions before it in .text are declared."""
         if not a.inline or n not in deferred:
             return
-        for f in func_order[:func_order.index(n)]:
+        order = defer_order if n in defer_order else func_order
+        for f in order[:order.index(n)]:
             if f not in seen and f not in done and f in deferred:
                 seen.add(f)
                 if not a.no_fix:
@@ -562,6 +619,8 @@ def main():
                 seen.add(key)
                 if pending:
                     flush(force=any(re.search(r"\b%s\b" % p, strip_comments(it)) for p in pending))
+                if defer_order and n not in seen:
+                    earlier_first(n)   # a definition --before moved early declares the deferred ones before it
                 done.add(n)
                 if text_order[fi] in vm:
                     it = vm_lead.sub(lambda m: m.group(1) + "VM_TEXT ", it, count=1)
@@ -578,6 +637,11 @@ def main():
             seen.add(key)
             if last in ("cpp", "func") and kind != last and not out[-1].endswith("\n\n"):
                 out.append("\n")
+            if defer_order and kind == "cpp" and re.match(r"\s*#\s*if", strip_comments(it)):
+                for m in CPP_DEF.finditer(strip_comments(it)):
+                    if m.group(2) not in seen:
+                        earlier_first(m.group(2))
+                        seen.add(m.group(2))
             if text_order[fi] in vm and kind == "cpp" and re.match(r"\s*#\s*if", strip_comments(it)):
                 # a conditional block (#ifdef TARGET_PORT .. #else .. #endif) of the VM part: its definitions too
                 it = VM_DEF.sub(lambda m: "VM_TEXT " + m.group(1), it)
@@ -600,7 +664,7 @@ def main():
         return 0
     target.write_text(merged)
     first = {"c": cs[0], ".rodata": ro[0] if ro else None, "vm": cs_vm[0] if cs_vm else None}
-    drop = {e[0] for e in ents if e not in first.values()} | pads
+    drop = {e[0] for e in ents if e not in first.values()} | pads | half_lines
     for k, e in first.items():
         if e and k == "vm":
             m = ENTRY.match(lines[e[0]])
