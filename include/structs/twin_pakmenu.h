@@ -54,7 +54,7 @@ typedef struct {
     void *block, *items;
     s32 count;
     void *desc, *param;
-    /* 0x1C */ CPlayer *owner;
+    /* 0x1C */ struct CPlayer *owner;
     /* 0x20 */ ItemData *data;
     /* 0x24 */ void *string;
 } Item;
