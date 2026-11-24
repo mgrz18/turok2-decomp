@@ -1,7 +1,6 @@
-/* Second-module twin of Primagen_InitAI (VM module 2 is linked over module 1; same source, its own strings and pool). */
 #include "common.h"
-#include "structs/game_object.h"
 #include "structs/boss.h"
+#include "structs/game_object.h"
 #include "globals/boss.h"
 #include "globals/scene.h"
 #include "globals/boss_ai.h"

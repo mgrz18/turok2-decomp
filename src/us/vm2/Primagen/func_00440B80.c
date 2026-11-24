@@ -5,14 +5,14 @@
 
 
 
-void Primagen_UpdateMode14_2(s32 arg0, CAI *arg1) {
+void Primagen_UpdateMode14_2(CGameObjectInstance *obj, CAI *ai) {
     s32 var_a2;
 
-    if (arg1->m_AnimRepeatedCount != 0) {
+    if (ai->m_AnimRepeatedCount != 0) {
         var_a2 = 0x13;
         if (gLevelScript.unk3CA == 0) {
             var_a2 = 7;
         }
-        CAI__SetMode(arg0, arg1, var_a2);
+        CAI__SetMode(obj, ai, var_a2);
     }
 }

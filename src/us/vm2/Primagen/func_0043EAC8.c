@@ -1,5 +1,7 @@
-/* Second-module twin of Primagen_UpdateMode27 (nonmatching/vm), whole: 0x0043EAC8-0x0043EC68 (its tail is not cut off
- * here). Same source, its own pool. */
+/* the real function is 0x00405AC8-0x00405C68 (size 0x1A0, 104 words); splat's func_00405BFC
+ * (0x00405BFC, 0x6C bytes) is its tail, reached by a j from inside this function.
+ * All 104 words match the ROM (checked over the real extent; gLevelScript_script_current as an array keeps the
+ * store order that leaves li a2,0x13 in the jal delay slot). */
 #include "common.h"
 #include "structs/game_object.h"
 #include "protos/ai.h"
@@ -13,7 +15,7 @@ extern f32 Math_StepClamped(f32 value, f32 target, f32 rate);
 extern f32 func_002982F0(f32 angle);                                      /* sin */
 extern f32 func_002974C0(f32 angle);                                      /* cos */
 
-extern s32 gLevelScript_script_current[]; /* local type: the field's real type (or the member path) changes the ROM's code here */        /* boss script index; an array so the store stays after the obj store */
+extern s32 gLevelScript_script_current_v00405AC8[] __asm__("gLevelScript_script_current"); /* local type: the field's real type (or the member path) changes the ROM's code here */        /* boss script index */
 
 void Primagen_UpdateMode27_2(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
@@ -25,7 +27,7 @@ void Primagen_UpdateMode27_2(CGameObjectInstance *obj, CAI *ai) {
 
     if (ai->m_AnimRepeatedCount != 0) {
         obj->m_AI.m_AnimSpeed = 1.0f;
-        gLevelScript_script_current[0] = -1;
+        gLevelScript_script_current_v00405AC8[0] = -1;
         CAI__SetMode(obj, ai, 0x13);
     }
     gCollisionInfoFlyingEnemy.m_dwFlags |= 0x8000;

@@ -1,5 +1,3 @@
-/* The second VM module's copy of src/us/vm1/Primagen/func_00407CB0.c (byte for byte, at the same link address or 0xE0 below
- * it, docs/VMASM.md), with the second module's names. */
 /* (&gEngineApp_m_Game.m_Settings)->unlockedCheats instead of gEngineApp_m_Game.m_Settings.unlockedCheats gives the ROM's register choice (found
  * with the permuter). */
 #include "common.h"

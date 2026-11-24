@@ -1,12 +1,10 @@
-/* The second VM module's copy of src/us/vm1/Primagen/func_004053C4.c (byte for byte, at the same link address or 0xE0 below
- * it, docs/VMASM.md), with the second module's names. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
 
 extern f32 Random_Blend(f32 lo, f32 hi);
-extern s16 WeightedTable_PickStatic(sptr id); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+s16 WeightedTable_PickStatic(void *); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
 extern void Sound__Play(s16 sound, CVector3 pos, sptr arg2, CGameObjectInstance *source);
 #ifdef TARGET_PORT
 /* A step's arg is an N64 data address for steps 2 (a sound table) and 3 (the next script):
@@ -44,7 +42,7 @@ s32 Primagen_RunSoundStep_2(CGameObjectInstance *obj) {
             gLevelScript.script3.current = -1;
             return 1;
         case 2:
-            sound = (s16) WeightedTable_PickStatic(BOSS_STEP_PTR(gLevelScript.script3.steps[gLevelScript.script3.current].arg));
+            sound = (s16) WeightedTable_PickStatic((void *) BOSS_STEP_PTR(gLevelScript.script3.steps[gLevelScript.script3.current].arg));
             if (sound != -1) {
                 Sound__Play(sound, obj->header.m_vPos, 0, obj);
             }

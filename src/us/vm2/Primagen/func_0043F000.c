@@ -1,5 +1,4 @@
-/* Second-module twin of Primagen_UpdateMode19 (nonmatching/vm; the fix here, a local pointer to the 0x8012F9D4 block, should
- * work there too). Same source, its own strings and pool. */
+/* First-module copy of Primagen_UpdateMode19_2 (src/us/code/Primagen_UpdateMode19_2.c): a local pointer to the 0x8012F9D4 block. */
 #include "common.h"
 #include "structs/game_object.h"
 #define BOSS_STAGE_AS_WORD
@@ -19,13 +18,26 @@ extern f32 func_002974C0(f32 angle);                                      /* cos
 extern f32 Random_Blend(f32 lo, f32 hi);
 extern s32 Primagen_RunAttackStep_2(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
+#ifdef TARGET_PORT
+typedef struct BossCtl {
+/* the view at the host offsets of LevelScriptState (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_BossCtl(m) __builtin_offsetof(LevelScriptState, m)
+    union {
+        struct { u8 _hp_unk0[T2_HOFF_BossCtl(unk3CC) - T2_HOFF_BossCtl(unk3CC)]; s32 unk0; }; /* N64 0x0 */
+        struct { u8 _hp_state[T2_HOFF_BossCtl(bossState) - T2_HOFF_BossCtl(unk3CC)]; s32 state; }; /* N64 0x4 */
+        struct { u8 _hp_dest[T2_HOFF_BossCtl(dest) - T2_HOFF_BossCtl(unk3CC)]; CVector3 dest; }; /* N64 0x5C */
+    };
+} BossCtl;
+#else
 typedef struct {
     /* 0x00 */ s32 unk0;   /* 0x8012F9D4 */
     /* 0x04 */ s32 state;  /* 0x8012F9D8 */
     /* 0x08 */ u8 pad8[0x5C - 0x8];
     /* 0x5C */ CVector3 dest; /* 0x8012FA30 */
 } BossCtl;
-extern s32 gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */          /* stage, as the script selection reads it */
+#endif
+extern s32 gLevelScript_v00406000 __asm__("gLevelScript"); /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */          /* stage, as the script selection reads it */
 
 void Primagen_UpdateMode19_2(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
@@ -57,13 +69,13 @@ void Primagen_UpdateMode19_2(CGameObjectInstance *obj, CAI *ai) {
         CVector3__Subtract(&d, &obj->header.m_vPos, &dest);
         if (func_00298470(d.x * d.x + d.z * d.z) <= 50.0f) {
             if (gLevelScriptBlock.m_Script.bossState == 3) {
-                if (gLevelScript == 1) {
+                if (gLevelScript_v00406000 == 1) {
                     gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage1_2;
                 }
-                if (gLevelScript == 2) {
+                if (gLevelScript_v00406000 == 2) {
                     gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage2_2;
                 }
-                if (gLevelScript == 3) {
+                if (gLevelScript_v00406000 == 3) {
                     gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage3_2;
                 }
                 gLevelScriptBlock.m_Script.script.cursor = -1;
@@ -74,13 +86,13 @@ void Primagen_UpdateMode19_2(CGameObjectInstance *obj, CAI *ai) {
                 return;
             }
             if (gLevelScriptBlock.m_Script.bossState == 11) {
-                if (gLevelScript == 1) {
+                if (gLevelScript_v00406000 == 1) {
                     gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage1_2;
                 }
-                if (gLevelScript == 2) {
+                if (gLevelScript_v00406000 == 2) {
                     gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage2_2;
                 }
-                if (gLevelScript == 3) {
+                if (gLevelScript_v00406000 == 3) {
                     gLevelScriptBlock.m_Script.script.steps = sPrimagenAttackScriptStage3_2;
                 }
                 gLevelScriptBlock.m_Script.script.cursor = -1;

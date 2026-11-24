@@ -1,35 +1,24 @@
 #include "common.h"
 #include "structs/boss.h"
+#include "structs/game_object.h"
 #include "globals/boss.h"
 #include "globals/onscreen.h"
 #include "globals/engine.h"
 #include "protos/ai.h"
-#include "structs/vector.h"
 
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ CVector3 pos;
-} Actor0043CF3C;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ void (*onReset)(Actor0043CF3C *actor, void *level);
-} Def0043CF3C;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ Def0043CF3C *def;
-    /* 0x34 */ u8 pad1[0x54 - 0x34];
-    /* 0x54 */ CVector3 spawn;
-} Level0043CF3C;
 
-void AI_TurnHeadToTarget(Actor0043CF3C *actor, Level0043CF3C *level, s32 a2);
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
+#define AI_TurnHeadToTarget AI_TurnHeadToTarget_i
+#endif
+void AI_TurnHeadToTarget(CGameObjectInstance *actor, CAI *level, s32 a2);
 void Animator_Update(void *light);
 s16 WeightedTable_PickStatic(void *table);
 void Primagen_SpawnTossedObject_2(s16 type, s32 a1, CVector3 offset);
-void Primagen_UpdateHealth_2(Actor0043CF3C *actor, Level0043CF3C *level);
-void Primagen_UpdateSpawner_2(Actor0043CF3C *actor, Level0043CF3C *level);
+void Primagen_UpdateHealth_2(CGameObjectInstance *actor, CAI *level);
+void Primagen_UpdateSpawner_2(CGameObjectInstance *actor, CAI *level);
 void COnScreen__SetBossPercent(void *a0, s32 percent);
 
 #define COUNT_DOWN(t)              \
@@ -37,22 +26,22 @@ void COnScreen__SetBossPercent(void *a0, s32 percent);
         (t) -= gFrameIncrement;         \
     }
 
-void Primagen_Step_2(Actor0043CF3C *actor, Level0043CF3C *level) {
+void Primagen_Step_2(CGameObjectInstance *actor, CAI *level) {
     CVector3 offset;
     s32 type;
     s32 i;
 
     AI_TurnHeadToTarget(actor, level, 0);
-    if (level->def != NULL && level->def->onReset != NULL) {
-        level->def->onReset(actor, level);
+    if (level->m_pModeCurrent != NULL && level->m_pModeCurrent->m_pfCallback != NULL) {
+        level->m_pModeCurrent->m_pfCallback(actor, level);
     }
     for (i = 0; i < 8; i++) {
         Animator_Update(&gLevelScript.anims[i]);
     }
     if (gLevelScript.bossState == 1) {
-        level->spawn.x = gLevelScript.home.x;
-        level->spawn.y = gLevelScript.home.y;
-        level->spawn.z = gLevelScript.home.z;
+        level->m_vDesiredPos.x = gLevelScript.home.x;
+        level->m_vDesiredPos.y = gLevelScript.home.y;
+        level->m_vDesiredPos.z = gLevelScript.home.z;
     }
     COUNT_DOWN(gLevelScript.waveTimer);
     COUNT_DOWN(gLevelScript.script.timer);
@@ -118,7 +107,7 @@ void Primagen_Step_2(Actor0043CF3C *actor, Level0043CF3C *level) {
     Primagen_UpdateHealth_2(actor, level);
     Primagen_UpdateSpawner_2(actor, level);
     COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, gLevelScript.total * 100 / gLevelScript.bonus);
-    if (actor->pos.y < -204.79999f) {
+    if (actor->header.m_vPos.y < -204.79999f) {
         gLevelScript.bossMode = 11;
         gLevelScript.dest.x = 0.0f;
         gLevelScript.dest.y = 0.0f;

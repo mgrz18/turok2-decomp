@@ -2,6 +2,7 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 
+
 void Primagen_SetAttackScript_2(s32 arg0) {
     if (arg0 == 2) {
         if (gLevelScript.stage == 1) {

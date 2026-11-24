@@ -1,11 +1,12 @@
 #include "common.h"
 #include "globals/boss.h"
 
-/* gLevelScript_script3_cursor: two words reset to -1; the word just before it (gLevelScript_script3_steps) holds a table pointer. */
+/* Two words at gLevelScript_script3_cursor; the pointer just before them (gLevelScript_script3_steps) picks
+ * the data for the given mode. */
 typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-} State8012FA24;
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+} ModePair;
 
 
 void Primagen_SetSoundScript_2(s32 arg0) {

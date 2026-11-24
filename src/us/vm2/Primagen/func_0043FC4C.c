@@ -1,5 +1,3 @@
-/* The second VM module's copy of src/us/vm1/Primagen/func_00406C4C.c (byte for byte, at the same link address or 0xE0 below
- * it, docs/VMASM.md), with the second module's names. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/collision.h"
@@ -15,7 +13,7 @@ extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s
 extern void ImpactEvent_Send(CGameObjectInstance *src, CGameObjectInstance *dst, s32 effect, s32 id,
                           CVector3 pos, EffectParams params);
 
-extern s32 gLevelScript_values[]; /* local type: values[0] as one row; the real s32 [2][8] (or the member path) changes the ROM code here. [0]: parts left (mode 1), [2]: parts left (mode 2, the old symbol at 0x8012F990) */
+extern s32 gLevelScript_values_v00406C4C[] __asm__("gLevelScript_values"); /* local type: values[0] as one row; the real s32 [2][8] (or the member path) changes the ROM code here. [0]: parts left (mode 1), [2]: parts left (mode 2, the old symbol at 0x8012F990) */
 
 void Primagen_HandleAnimEvent_2(s32 arg0, CGameObjectInstance *obj, s32 arg2, CVector3 pos, s32 event) {
     CAITargets t;
@@ -28,7 +26,7 @@ void Primagen_HandleAnimEvent_2(s32 arg0, CGameObjectInstance *obj, s32 arg2, CV
     if (t.m_Sight.m_pTarget == NULL) {
         return;
     }
-    if (event == 2 && t.m_Sight.m_Dist <= 409.59998f && gLevelScript_values[2] > 0) {
+    if (event == 2 && t.m_Sight.m_Dist <= 409.59998f && gLevelScript_values_v00406C4C[2] > 0) {
         params.upper = 0xA00;
         params.lower = 0x400;
         params.b[0] = 0;
@@ -37,7 +35,7 @@ void Primagen_HandleAnimEvent_2(s32 arg0, CGameObjectInstance *obj, s32 arg2, CV
         params.b[3] = 0;
         ImpactEvent_Send(obj, obj, 3, -1, t.m_Sight.m_pTarget->header.m_vPos, params);
     }
-    if (event == 1 && t.m_Sight.m_Dist <= 716.8f && gLevelScript_values[0] > 0) {
+    if (event == 1 && t.m_Sight.m_Dist <= 716.8f && gLevelScript_values_v00406C4C[0] > 0) {
         params.upper = size * 256.0f;
         params.lower = 0x800;
         params.b[0] = 0;

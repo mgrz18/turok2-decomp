@@ -1,4 +1,3 @@
-/* Second-module twin of Primagen_UpdateMode24 (VM module 2 is linked over module 1; same source, its own strings and pool). */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -10,7 +9,7 @@
 
 
 
-/* Primagen_SetSpawnScript: start the second script for a stage. */
+/* Primagen_SetSpawnScript_2: start the second script for a stage. */
 static __inline__ void StartScript2(s32 stage) {
     gLevelScript.script2.cursor = -1;
     gLevelScript.script2On = 1;
@@ -26,6 +25,12 @@ static __inline__ void StartScript2(s32 stage) {
     }
     if (stage == 3) {
         gLevelScript.script2.steps = sPrimagenSpawnScript3_2;
+    }
+    if (stage == 4) {
+        gLevelScript.script2.steps = sPrimagenSpawnScript4_2;
+    }
+    if (stage == 5) {
+        gLevelScript.script2.steps = sPrimagenSpawnScript5_2;
     }
 }
 

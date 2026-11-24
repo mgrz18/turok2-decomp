@@ -4,12 +4,12 @@
 #include "protos/ai.h"
 
 
-void Primagen_UpdateMode21_2(CGameObjectInstance *arg0, CAI *arg1) {
-    f32 *animSpeed = &arg0->m_AI.m_AnimSpeed;
+void Primagen_UpdateMode21_2(CGameObjectInstance *obj, CAI *ai) {
+    f32 *animSpeed = &obj->m_AI.m_AnimSpeed;
 
-    if (arg1->m_AnimRepeatedCount != 0) {
+    if (ai->m_AnimRepeatedCount != 0) {
         *animSpeed = 1.0f;
         gLevelScript.script.current = -1;
-        CAI__SetMode(arg0, arg1, 0x13);
+        CAI__SetMode(obj, ai, 0x13);
     }
 }

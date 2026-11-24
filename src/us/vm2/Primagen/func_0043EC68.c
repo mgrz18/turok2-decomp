@@ -1,45 +1,49 @@
 #include "common.h"
-#include "m2c_macros.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
+#include "globals/boss.h"
 
-M2C_UNK ScriptAnimator_SetScript(void *, M2C_UNK *);           /* extern */
-extern M2C_UNK sPrimagenMode7PartScript_2; /* local type: f32[] in globals/boss.h, whose structs/boss.h clashes with this file's M2C_UNK gLevelScript */
-extern M2C_UNK gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
-extern M2C_UNK gLevelScript_bossMode; /* local type: BossMode in globals/boss.h, whose structs/boss.h clashes with this file's M2C_UNK gLevelScript */
+void ScriptAnimator_SetScript(void *, void *);
+
+#ifdef TARGET_PORT
+#define MODULE (&gLevelScript) /* the N64 delta 0x3D4 is not the host's */
+#else
+#define MODULE ((LevelScriptState *) ((u8 *) &gLevelScript_bossMode - 0x3D4))
+#endif
 
 void Primagen_EnterMode7_2(CGameObjectInstance *arg0) {
-    void *temp_s2;
+    LevelScriptState *temp_s2;
 
-    if (M2C_FIELD(&gLevelScript_bossMode, s32 *, 0) == 2) {
-        M2C_FIELD(&gLevelScript_bossMode, s8 *, 4) = 1;
-        M2C_FIELD(&gLevelScript_bossMode, s8 *, 5) = 1;
-        M2C_FIELD(&gLevelScript_bossMode, s32 *, -4) = 2;
+    if (gLevelScript_bossMode.mode == 2) {
+        gLevelScript_bossMode.armed = 1;
+        gLevelScript_bossMode.scriptOn = 1;
+        MODULE->bossState = 2;
     }
-    temp_s2 = ((__typeof__(&gLevelScript_bossMode))((s8 *)&gLevelScript_bossMode - 0x3D4));
-    if (M2C_FIELD(&gLevelScript_bossMode, s32 *, -0x3D4) == 1) {
+    temp_s2 = MODULE;
+    if (MODULE->stage == 1) {
         arg0->m_AI.m_AnimSpeed = 1.0f;
     }
-    if (M2C_FIELD(&gLevelScript_bossMode, s32 *, -0x3D4) == 2) {
+    if (MODULE->stage == 2) {
         arg0->m_AI.m_AnimSpeed = 1.2f;
     }
-    if (M2C_FIELD(&gLevelScript_bossMode, s32 *, -0x3D4) == 3) {
+    if (MODULE->stage == 3) {
         arg0->m_AI.m_AnimSpeed = 1.3f;
     }
-    if ((M2C_FIELD(&gLevelScript_bossMode, s32 *, -0x3D4) == 1) && (M2C_FIELD(temp_s2, s32 *, 0x18) == 0)) {
-        ScriptAnimator_SetScript(((__typeof__(&gLevelScript_bossMode))((s8 *)&gLevelScript_bossMode - 0x284)), &sPrimagenMode7PartScript_2);
-        ScriptAnimator_SetScript(((__typeof__(&gLevelScript_bossMode))((s8 *)&gLevelScript_bossMode - 0x220)), &sPrimagenMode7PartScript_2);
-        ScriptAnimator_SetScript(((__typeof__(&gLevelScript_bossMode))((s8 *)&gLevelScript_bossMode - 0x158)), &sPrimagenMode7PartScript_2);
-        ScriptAnimator_SetScript(((__typeof__(&gLevelScript_bossMode))((s8 *)&gLevelScript_bossMode - 0x1BC)), &sPrimagenMode7PartScript_2);
-        M2C_FIELD(temp_s2, s32 *, 0x18) = (s32) (M2C_FIELD(temp_s2, s32 *, 0x18) + 1);
+    if ((MODULE->stage == 1) && (temp_s2->spawnStep == 0)) {
+        ScriptAnimator_SetScript(&MODULE->anims[3], sPrimagenMode7PartScript_2);
+        ScriptAnimator_SetScript(&MODULE->anims[4], sPrimagenMode7PartScript_2);
+        ScriptAnimator_SetScript(&MODULE->anims[6], sPrimagenMode7PartScript_2);
+        ScriptAnimator_SetScript(&MODULE->anims[5], sPrimagenMode7PartScript_2);
+        temp_s2->spawnStep = (s32) (temp_s2->spawnStep + 1);
     }
-    if ((M2C_FIELD(&gLevelScript, s32 *, 0) == 2) && (M2C_FIELD(&gLevelScript, s32 *, 0x18) == 1)) {
-        ScriptAnimator_SetScript(((__typeof__(&gLevelScript))((s8 *)&gLevelScript + 0x24)), &sPrimagenMode7PartScript_2);
-        ScriptAnimator_SetScript(((__typeof__(&gLevelScript))((s8 *)&gLevelScript + 0xEC)), &sPrimagenMode7PartScript_2);
-        M2C_FIELD(&gLevelScript, s32 *, 0x18) = (s32) (M2C_FIELD(&gLevelScript, s32 *, 0x18) + 1);
+    if ((gLevelScript.stage == 2) && (gLevelScript.spawnStep == 1)) {
+        ScriptAnimator_SetScript(&gLevelScript.anims[0], sPrimagenMode7PartScript_2);
+        ScriptAnimator_SetScript(&gLevelScript.anims[2], sPrimagenMode7PartScript_2);
+        gLevelScript.spawnStep = (s32) (gLevelScript.spawnStep + 1);
     }
-    if ((M2C_FIELD(&gLevelScript, s32 *, 0) == 3) && (M2C_FIELD(&gLevelScript, s32 *, 0x18) == 2)) {
-        ScriptAnimator_SetScript(((__typeof__(&gLevelScript))((s8 *)&gLevelScript + 0x88)), &sPrimagenMode7PartScript_2);
-        M2C_FIELD(&gLevelScript, s32 *, 0x18) = (s32) (M2C_FIELD(&gLevelScript, s32 *, 0x18) + 1);
+    if ((gLevelScript.stage == 3) && (gLevelScript.spawnStep == 2)) {
+        ScriptAnimator_SetScript(&gLevelScript.anims[1], sPrimagenMode7PartScript_2);
+        gLevelScript.spawnStep = (s32) (gLevelScript.spawnStep + 1);
     }
     arg0->m_dwFlags = (s32) (arg0->m_dwFlags | 0x2000);
 }

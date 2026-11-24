@@ -5,9 +5,9 @@
 
 
 
-void Primagen_UpdateMode16_2(CGameObjectInstance *obj, CAI *ai) {
+void Primagen_UpdateMode16_2(sptr arg0, CAI *ai) {
     if (ai->m_AnimRepeatedCount != 0) {
         gLevelScript.scriptCOn = 0;
-        CAI__SetMode(obj, ai, 2);
+        CAI__SetMode(arg0, ai, 2);
     }
 }

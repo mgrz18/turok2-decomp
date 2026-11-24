@@ -1,4 +1,3 @@
-/* Second VM module twin of Primagen_SetStage (same source, same link address). */
 #include "common.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
