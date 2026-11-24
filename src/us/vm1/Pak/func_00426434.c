@@ -3,11 +3,10 @@
 #include "common.h"
 #include "structs/pak.h"
 #include "globals/pak.h"
+#include "structs/cache.h"
+#include "protos/cache.h"
 
 
-extern void **CCache__Allocate(s32, s32, s32, char *);
-extern void CCache__Flush(s32);
-extern void CCache__Deallocate(sptr, void **);
 extern void Controller_Lock(s32);
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
@@ -17,7 +16,7 @@ extern s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 
 
 /* Releases the pak directory buffer and clears its global state. */
 void Pak_FreeDirectory(void) {
-    CCache__Flush(0);
+    ((void (*)(s32))CCache__Flush)(0); /* the ROM passes 0 */
     if (gPakStateBuffer) {
         CCache__Deallocate(0, gPakStateBuffer);
         gPakStateBuffer = 0;

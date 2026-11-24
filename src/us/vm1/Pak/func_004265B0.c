@@ -4,11 +4,10 @@
 #include "globals/menu_text.h"
 #include "structs/pak.h"
 #include "globals/pak.h"
+#include "structs/cache.h"
+#include "protos/cache.h"
 
 
-extern void **CCache__Allocate(s32, s32, s32, char *);
-extern void CCache__Flush(s32);
-extern void CCache__Deallocate(sptr, void **);
 extern void Controller_Lock(s32);
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
@@ -24,15 +23,15 @@ void T2Save_FromPak(void *dst, s32 size);
 s32 Pak_ReadNote(s32 ch, s32 file_no, void *dst, s32 size) {
     s32 result;
     s32 blocks;
-    void **handle;
+    CMemEntry *handle;
     void *buf;
 
     blocks = (size + 0xFF) & ~0xFF;
     if (gPakState[ch] != 3) {
         return -2;
     }
-    handle = CCache__Allocate(0, blocks, 0x23, sPakText_MempakReadTempData);
-    buf = *handle;
+    handle = (CMemEntry *)CCache__Allocate(0, blocks, 0x23, (sptr)sPakText_MempakReadTempData);
+    buf = handle->data;
     Controller_Lock(1);
     Controller_ReadAll();
     result = gPakError[ch];
@@ -50,7 +49,7 @@ s32 Pak_ReadNote(s32 ch, s32 file_no, void *dst, s32 size) {
         }
     }
     Controller_Unlock();
-    CCache__Flush(0);
+    ((void (*)(s32))CCache__Flush)(0); /* the ROM passes 0 */
     if (handle != 0) {
         CCache__Deallocate(0, handle);
     }

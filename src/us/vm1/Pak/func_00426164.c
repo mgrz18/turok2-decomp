@@ -4,11 +4,10 @@
 #include "globals/strings.h"
 #include "structs/pak.h"
 #include "globals/pak.h"
+#include "structs/cache.h"
+#include "protos/cache.h"
 
 
-extern void **CCache__Allocate(s32, s32, s32, char *);
-extern void CCache__Flush(s32);
-extern void CCache__Deallocate(sptr, void **);
 extern void Controller_Lock(s32);
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
@@ -26,15 +25,15 @@ void *T2Save_ToPak(void *data, s32 size);
 static __inline__ s32 readNote(s32 ch, s32 file_no, void *dst, s32 size) {
     s32 result;
     s32 blocks;
-    void **handle;
+    CMemEntry *handle;
     void *buf;
 
     blocks = (size + 0xFF) & ~0xFF;
     if (gPakState[ch] != 3) {
         return -2;
     }
-    handle = CCache__Allocate(0, blocks, 0x23, "Mempak read temp data");
-    buf = *handle;
+    handle = (CMemEntry *)CCache__Allocate(0, blocks, 0x23, (sptr)"Mempak read temp data");
+    buf = handle->data;
     Controller_Lock(1);
     Controller_ReadAll();
     result = gPakError[ch];
@@ -48,7 +47,7 @@ static __inline__ s32 readNote(s32 ch, s32 file_no, void *dst, s32 size) {
         }
     }
     Controller_Unlock();
-    CCache__Flush(0);
+    ((void (*)(s32))CCache__Flush)(0); /* the ROM passes 0 */
     if (handle != 0) {
         CCache__Deallocate(0, handle);
     }
@@ -59,7 +58,7 @@ static __inline__ s32 readNote(s32 ch, s32 file_no, void *dst, s32 size) {
 s32 Pak_SaveNoteVerified(s32 ch, s32 size, void *data, u8 *name, u8 *ext, u8 *code) {
     s32 result;
     s32 file_no;
-    void **handle;
+    CMemEntry *handle;
     void *buf;
     s32 blocks;
     s32 tries;
@@ -72,8 +71,8 @@ s32 Pak_SaveNoteVerified(s32 ch, s32 size, void *data, u8 *name, u8 *ext, u8 *co
     if (gPakState[ch] != 3) {
         return -2;
     }
-    handle = CCache__Allocate(0, blocks, 0x23, "Mempak write temp data");
-    buf = *handle;
+    handle = (CMemEntry *)CCache__Allocate(0, blocks, 0x23, (sptr)"Mempak write temp data");
+    buf = handle->data;
     for (tries = 0; tries < 4; tries++) {
         result = Pak_WriteNote(ch, size, data, name, &file_no, ext, sPakCompanyCode, code);
         if (result != 0) {
@@ -86,7 +85,7 @@ s32 Pak_SaveNoteVerified(s32 ch, s32 size, void *data, u8 *name, u8 *ext, u8 *co
             break;
         }
     }
-    CCache__Flush(0);
+    ((void (*)(s32))CCache__Flush)(0); /* the ROM passes 0 */
     if (handle != 0) {
         CCache__Deallocate(0, handle);
     }
