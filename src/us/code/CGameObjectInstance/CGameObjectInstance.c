@@ -1425,26 +1425,6 @@ void CGameObjectInstance__WobbleBone(s32 time, s32 flags, f32 *matrix) {
 #define T2_F2U(x) ((u32)(x))
 #endif
 
-/* A bone's track references: -1 means "use the default frame". */
-typedef struct JointRef {
-    /* 0x0 */ s16 pos;
-    /* 0x2 */ s16 rot;
-} JointRef;
-typedef struct DefaultFrame {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ s16 rot[4];
-} DefaultFrame;
-typedef struct KeyLookup {
-    /* 0x00 */ JointRef *joints;
-    /* 0x04 */ DefaultFrame *frames;
-    /* 0x08 */ void *posTable;
-    /* 0x0C */ void *rotTable;
-    /* 0x10 */ s32 rotFrame0;
-    /* 0x14 */ s32 rotFrame1;
-    /* 0x18 */ s32 posFrame0;
-    /* 0x1C */ s32 posFrame1;
-    /* 0x20 */ f32 blend;
-} KeyLookup;
 typedef struct TwistPart {
     /* 0x00 */ u8 pad0[0x12];
     /* 0x12 */ s8 count;
@@ -1506,8 +1486,8 @@ struct PoseContext {
     /* 0x14 */ sptr arg2;
     /* 0x18 */ void *channel;
     /* 0x1C */ void *blendChannel;
-    /* 0x20 */ KeyLookup keys;
-    /* 0x44 */ KeyLookup blendKeys;
+    /* 0x20 */ CAnimationKeys keys;
+    /* 0x44 */ CAnimationKeys blendKeys;
     /* 0x68 */ s32 visible;
     /* 0x6C */ s32 blend;
     /* 0x70 */ s32 moving;
@@ -1538,7 +1518,7 @@ void CMtxF__ScaleAxes(void *m, f32 x, f32 y, f32 z);
 u32 T2Port_N64Address(const void *p);
 f32 CGameRegion__GetCeilingHeight(CGameRegion *region, f32 x, f32 z); /* the ceiling height */
 
-static __inline__ void trackPos(KeyLookup *t, s32 i, CVector3 *out) {
+static __inline__ void trackPos(CAnimationKeys *t, s32 i, CVector3 *out) {
     if (t->joints[i].pos == -1) {
         *out = t->frames[i].pos;
     } else {
@@ -1553,7 +1533,7 @@ static __inline__ void trackPos(KeyLookup *t, s32 i, CVector3 *out) {
     }
 }
 
-static __inline__ void defaultRot(KeyLookup *t, s32 i, CQuaternion *out) {
+static __inline__ void defaultRot(CAnimationKeys *t, s32 i, CQuaternion *out) {
     DefaultFrame *frame = &t->frames[i];
 
     out->x = frame->rot[0] * (1.0f / 32767.0f);
@@ -1563,7 +1543,7 @@ static __inline__ void defaultRot(KeyLookup *t, s32 i, CQuaternion *out) {
 }
 
 /* Spherical interpolation between the two keys. */
-static __inline__ void slerpRot(KeyLookup *t, s32 i, CQuaternion *out) {
+static __inline__ void slerpRot(CAnimationKeys *t, s32 i, CQuaternion *out) {
     if (t->joints[i].rot != -1) {
         f32 *data = CISet__GetBlock(t->rotTable, t->joints[i].rot);
 
@@ -1574,7 +1554,7 @@ static __inline__ void slerpRot(KeyLookup *t, s32 i, CQuaternion *out) {
 }
 
 /* Linear interpolation between the two keys. */
-static __inline__ void lerpRot(KeyLookup *t, s32 i, CQuaternion *out) {
+static __inline__ void lerpRot(CAnimationKeys *t, s32 i, CQuaternion *out) {
     if (t->joints[i].rot == -1) {
         defaultRot(t, i, out);
     } else {
@@ -1838,17 +1818,6 @@ void CGameObjectInstance__PoseBone(PoseObject *obj, PoseContext *ctx, s32 bone, 
  * fixed-point 65536 units), timing that call in a profile slot. Then draws
  * the object's attachments. Returns whether the matrices were built. */
 
-typedef struct AnimKeyLookup {
-    /* 0x00 */ void *posKeys;
-    /* 0x04 */ void *rotKeys;
-    /* 0x08 */ void *posTracks;
-    /* 0x0C */ void *rotTracks;
-    /* 0x10 */ s32 offset0;
-    /* 0x14 */ s32 offset1;
-    /* 0x18 */ s32 rootOffset0;
-    /* 0x1C */ s32 rootOffset1;
-    /* 0x20 */ f32 frac;
-} AnimKeyLookup;
 #ifdef TARGET_PORT
 typedef struct AnimObject {
 /* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
@@ -1906,8 +1875,8 @@ typedef struct AnimPoseContext {
     /* 0x14 */ sptr arg2;
     /* 0x18 */ CAnimationState *channel;
     /* 0x1C */ CAnimationState *blendChannel;
-    /* 0x20 */ AnimKeyLookup keys;
-    /* 0x44 */ AnimKeyLookup blendKeys;
+    /* 0x20 */ CAnimationKeys keys;
+    /* 0x44 */ CAnimationKeys blendKeys;
     /* 0x68 */ s32 visible;
     /* 0x6C */ s32 blend;
     /* 0x70 */ s32 moving;
@@ -1941,7 +1910,7 @@ extern Profile sBoneMatrixProfile;
 extern s32 sBoneMatrixCount[]; /* &sBoneMatrixProfile.calls */
 s32 Cinema_PathPlaying(void);
 void *MtxPool_Alloc(void *pool, s32 count);
-void CAnimationState__FindKeys(CAnimationState *channel, AnimKeyLookup *keys);
+void CAnimationState__FindKeys(CAnimationState *channel, CAnimationKeys *keys);
 void SwooshSystem_AddBonePoints(void *effects, AnimObject *obj, void *bones);
 void GameObject_EmitHotPoints(void *list, s32 count, void *bones, void *obj, void *anims);
 

@@ -219,17 +219,6 @@ void CAnimationState__GetRootMotion(CAnimationState *anim, CVector3 *delta, f32 
  * and the fraction between them. */
 
 
-typedef struct KeyLookup {
-    /* 0x00 */ void *posKeys;
-    /* 0x04 */ void *rotKeys;
-    /* 0x08 */ void *posTracks;
-    /* 0x0C */ void *rotTracks;
-    /* 0x10 */ s32 offset0;
-    /* 0x14 */ s32 offset1;
-    /* 0x18 */ s32 rootOffset0;
-    /* 0x1C */ s32 rootOffset1;
-    /* 0x20 */ f32 frac;
-} KeyLookup;
 
 s32 CMemEntry__IsLocked(s32 **resource);
 
@@ -249,7 +238,7 @@ static __inline__ s32 isLoaded(s32 **resource) {
     return CMemEntry__IsLocked(resource) != 0;
 }
 
-void CAnimationState__FindKeys(CAnimationState *anim, KeyLookup *out) {
+void CAnimationState__FindKeys(CAnimationState *anim, CAnimationKeys *out) {
     s32 *file;
     u8 *posKeys;
     void *tracks;
@@ -271,11 +260,11 @@ void CAnimationState__FindKeys(CAnimationState *anim, KeyLookup *out) {
     loop = anim->m_nAnimStartFrame;
     time = anim->m_AnimationFrame;
     frames = anim->m_nFrames;
-    out->posKeys = posKeys + 8;
-    out->rotKeys = (u8 *) CISet__GetBlock(file, 2) + 8;
-    out->posTracks = CISet__GetBlock(tracks, 1);
-    out->rotTracks = CISet__GetBlock(tracks, 2);
-    out->frac = time - FLOOR(time);
+    out->joints = (JointRef *) (posKeys + 8);
+    out->frames = (DefaultFrame *) ((u8 *) CISet__GetBlock(file, 2) + 8);
+    out->posTable = CISet__GetBlock(tracks, 1);
+    out->rotTable = CISet__GetBlock(tracks, 2);
+    out->blend = time - FLOOR(time);
     if (loop == 0xFFFF) {
         loop = 0;
         k0 = FLOOR(time);
@@ -296,8 +285,8 @@ void CAnimationState__FindKeys(CAnimationState *anim, KeyLookup *out) {
             CEIL(k1, anim->m_nAnimStartFrame * scale)
         }
     }
-    out->offset0 = k0 * 4;
-    out->offset1 = k1 * 4;
+    out->rotFrame0 = k0 * 4;
+    out->rotFrame1 = k1 * 4;
     k0 = FLOOR(time);
     if (frames <= k0) {
         CEIL(k0, loop * scale)
@@ -306,8 +295,8 @@ void CAnimationState__FindKeys(CAnimationState *anim, KeyLookup *out) {
     if (frames <= k1) {
         CEIL(k1, loop * scale)
     }
-    out->rootOffset0 = k0 * 4;
-    out->rootOffset1 = k1 * 4;
+    out->posFrame0 = k0 * 4;
+    out->posFrame1 = k1 * 4;
 }
 
 
