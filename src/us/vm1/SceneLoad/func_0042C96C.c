@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "protos/list.h"
+#include "structs/world.h"
 #ifdef TARGET_PORT
 /* The port: the scene's delayed events typed (structs/world.h): fire them all and free them. */
 #include "common.h"
@@ -44,7 +45,9 @@ struct Owner_func_8044D794_de {
     struct Entry_func_8044D794_de *spare;
 };
 void LevelEvent_Fire(void *event);
-void CScene__FlushDelayedEvents(Owner_func_8044D794_de *arg0) {
+#define arg0 ((Owner_func_8044D794_de *) scene)
+/* the definition takes the port body's types (one prototype for the merged object); the view reads them */
+void CScene__FlushDelayedEvents(CScene *scene) {
     Entry_func_8044D794_de *entry;
     Entry_func_8044D794_de *next;
     entry = arg0->active;
@@ -56,4 +59,5 @@ void CScene__FlushDelayedEvents(Owner_func_8044D794_de *arg0) {
         entry = next;
     }
 }
+#undef arg0
 #endif

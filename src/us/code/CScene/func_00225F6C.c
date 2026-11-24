@@ -65,8 +65,10 @@ s32 CScene__FindInstances(void *arg0, s32 key0, s32 key1, s32 key2, CGameObjectI
     return count;
 }
 #else
-extern s32 CScene__FindInstances(Container *arg0, s32 key0, s32 key1, s32 key2, RecordRecAtE4 **out, s32 max);
-s32 CScene__FindInstances(Container *arg0, s32 key0, s32 key1, s32 key2, RecordRecAtE4 **out, s32 max) {
+#define arg0 ((Container *) scene)
+#define out ((RecordRecAtE4 **) outArg)
+/* the definition takes the port body's types (one prototype for the merged object); the view reads them */
+s32 CScene__FindInstances(void *scene, s32 key0, s32 key1, s32 key2, struct CGameObjectInstance **outArg, s32 max) {
     s32 i = arg0->unkE4;
     s32 end = arg0->unkE8;
     RecordRecAtE4 *base = arg0->unkE0;
@@ -85,4 +87,6 @@ s32 CScene__FindInstances(Container *arg0, s32 key0, s32 key1, s32 key2, RecordR
     }
     return count;
 }
+#undef arg0
+#undef out
 #endif

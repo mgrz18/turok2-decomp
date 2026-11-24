@@ -67,7 +67,7 @@ extern void Cinema_RequestOnce(s32 sound);
 extern void MatrixHeap_Construct(void *heap, void *data, s32 size);
 extern void CScene__RestoreFiredEvents(CScene *w);
 extern void CScene__ReapplyFiredEvents(CScene *w);
-extern void CScene__FlushDelayedEvents();
+void CScene__FlushDelayedEvents(struct CScene *);
 extern void SceneActorPool_Construct(CLevelActorPool *);
 extern void CInstancePool__Construct(void *);
 extern void CDLightSet__Construct(void *);
@@ -285,7 +285,7 @@ void CScene__LoadLevel(CScene *w, s32 level, s32 announce) {
     s32 sound;
 
     if (w->m_nLevel != -1) {
-        CScene__FlushDelayedEvents();
+        ((void (*)(void)) CScene__FlushDelayedEvents)(); /* see the ABI note above */
     }
     if (Cinema_IsActive() == 0 && Demo_GetPlayerCount() == 0 && announce != 0 && w->m_bWarpSpawn != 0) {
         switch (w->m_LevelID) {

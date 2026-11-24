@@ -8,7 +8,21 @@
 void Model_DecompressCallback(sptr arg0, sptr arg1);
 
 extern s32 CScene__FindObjectType(void *level, s32 key);
+/* the N64 symbol by another C name: the merged object defines it DEFERRED (inline), and a call by its own
+ * name after that definition would expand it (the CGameObjectInstance__LoadGeometry_call pattern) */
+#ifdef TARGET_PORT
+#define CScene__FindObjectType_call CScene__FindObjectType
+#else
+s32 CScene__FindObjectType_call(void *level, s32 key) __asm__("CScene__FindObjectType");
+#endif
 extern s32 CScene__GetObject(void *level, s32 id);
+/* the N64 symbol by another C name: the merged object defines it DEFERRED (inline), and a call by its own
+ * name after that definition would expand it (the CGameObjectInstance__LoadGeometry_call pattern) */
+#ifdef TARGET_PORT
+#define CScene__GetObject_call CScene__GetObject
+#else
+s32 CScene__GetObject_call(struct CScene *, s32) __asm__("CScene__GetObject");
+#endif
 
 /* Looks key up in the level and loads its record into out (out->valid = 0 when there is none). */
 void CScene__ConstructMap(void *level, CSceneMapRecord *out, s32 key) {
@@ -18,12 +32,12 @@ void CScene__ConstructMap(void *level, CSceneMapRecord *out, s32 key) {
     s32 size;
     s32 res;
 
-    id = CScene__FindObjectType(level, key);
+    id = CScene__FindObjectType_call(level, key);
     if (id == -1) {
         out->valid = 0;
         return;
     }
-    res = CScene__GetObject(level, id);
+    res = CScene__GetObject_call(level, id);
     h1 = CCache__Request(0, res, 0x18, 0, 0, 0, sCSceneCacheDesc_ObjectIndex, 1);
     if (h1 != NULL) {
         h2 = CCache__Request(0, CISet__GetROMAddressAndSize(*h1, res, 1, &size), size, 0, 0, Model_DecompressCallback, sCSceneCacheDesc_Geometry, 1);

@@ -13,6 +13,13 @@ struct CSceneRecord;
 struct LevelEvent;
 void CScene__DecompressParticles(sptr, void ***);
 s32 CScene__GetObject(struct CScene *, s32);
+/* the N64 symbol by another C name: the merged object defines it DEFERRED (inline), and a call by its own
+ * name after that definition would expand it (the CGameObjectInstance__LoadGeometry_call pattern) */
+#ifdef TARGET_PORT
+#define CScene__GetObject_call CScene__GetObject
+#else
+s32 CScene__GetObject_call(struct CScene *, s32) __asm__("CScene__GetObject");
+#endif
 
 s32 ProPackDecompress(void *handle, s32 arg1);
 #ifdef TARGET_PORT
@@ -43,7 +50,7 @@ void CScene__DecompressParticles(sptr arg0, void ***arg1) {
                 if (piece[i].tag == -1) {
                     piece[i].tag = 0;
                 } else {
-                    piece[i].tag = CScene__GetObject(arg0, piece[i].tag);
+                    piece[i].tag = CScene__GetObject_call(arg0, piece[i].tag);
                 }
                 piece[i].unk18 = base + piece[i].unk18;
                 piece[i].unk1C = base + piece[i].unk1C;

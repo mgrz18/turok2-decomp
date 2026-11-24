@@ -2,6 +2,7 @@
 #include "structs/camera.h"
 #include "structs/event.h"
 #include "protos/list.h"
+#include "structs/world.h"
 
 #ifdef TARGET_PORT
 /* The port: the scene's delayed events typed (structs/world.h); the views below have the N64
@@ -46,7 +47,9 @@ void LevelEvent_Fire(void *event);
 
 f32 HalfToFloat(u16);                             /* extern */
 
-void CScene__QueueDelayedEvent(VoiceOwner *arg0, LevelEvent *arg1) {
+#define arg0 ((VoiceOwner *) scene)
+/* the definition takes the port body's types (one prototype for the merged object); the view reads them */
+void CScene__QueueDelayedEvent(CScene *scene, LevelEvent *arg1) {
     f32 temp_f0;
     Voice_00225354 *var_s0;
 
@@ -66,4 +69,5 @@ void CScene__QueueDelayedEvent(VoiceOwner *arg0, LevelEvent *arg1) {
         var_s0->length = (f32) (temp_f0 * 15.0f);
     }
 }
+#undef arg0
 #endif

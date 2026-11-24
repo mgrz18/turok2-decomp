@@ -297,9 +297,10 @@ def main():
                     "if every file compiles the same under them")
     ap.add_argument("--inline", help="stems (comma-separated) or `all`: their functions are written DEFERRED "
                     "(`inline`: output after the others, string literals at the definition)")
-    ap.add_argument("--before", help="`A,B,..:C`: the source order puts files A,B.. (stems, their .text order kept) "
-                    "right before file C; with --inline A,B,.. the deferred tail of an object whose string literals "
-                    "come before an earlier function's (vm1/Pak: Pak_AllocDirectory's before Pak_SaveNoteVerified's)")
+    ap.add_argument("--before", action="append", help="`A,B,..:C`: the source order puts files A,B.. (stems, their .text "
+                    "order kept) right before file C; with --inline A,B,.. the deferred tail of an object whose string "
+                    "literals come before an earlier function's (vm1/Pak: Pak_AllocDirectory's before "
+                    "Pak_SaveNoteVerified's); repeatable, applied in order")
     ap.add_argument("--rodata-free", action="store_true", help="no .rodata order check: the slices and the unnamed "
                     "data between them become the merged file's one .rodata (make verify decides)")
     ap.add_argument("--vm", help="the directory of the same object's functions linked into the VM module (section .text_vm)")
@@ -339,8 +340,13 @@ def main():
         # its own part that has .rodata; the files after the last such one at the end, engine part first)
         parts = [[e[2].rsplit("/", 1)[-1] for e in cs], [e[2].rsplit("/", 1)[-1] for e in cs_vm]]
         text_order = []
+        # with --inline, a deferred file's slice does not place the files (its float literals come out with the
+        # deferred group at the end, its strings where --before defines it): CScene + vm1/SceneLoad, round 29
+        skip = set() if not a.inline or a.inline == "all" else set(a.inline.split(","))
         for e in ro:
             s = e[2].rsplit("/", 1)[-1]
+            if s in skip:
+                continue
             p = parts[1] if s in vm else parts[0]
             if s in p:
                 k = p.index(s)
@@ -392,11 +398,11 @@ def main():
     if shared and ro:
         sys.exit(f"{a.dir}: {len(shared)} files place their .rodata over the first VM module's pool "
                  f"(versions/shared_rodata.us.txt) and the yaml places others")
-    if a.before:
-        mv, at = a.before.split(":")
+    for before in a.before or ():
+        mv, at = before.split(":")
         mv = [x for x in text_order if x in mv.split(",")]
-        if at not in text_order or at in mv or len(mv) != len(a.before.split(":")[0].split(",")):
-            sys.exit(f"{a.dir}: --before {a.before}: not stems of this directory")
+        if at not in text_order or at in mv or len(mv) != len(before.split(":")[0].split(",")):
+            sys.exit(f"{a.dir}: --before {before}: not stems of this directory")
         rest = [x for x in text_order if x not in mv]
         k = rest.index(at)
         text_order = rest[:k] + mv + rest[k:]
