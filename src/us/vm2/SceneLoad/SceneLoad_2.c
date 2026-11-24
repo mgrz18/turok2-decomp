@@ -902,6 +902,9 @@ extern void CPlayer__SetupActors_2(CPlayer *player, CObjectRecord *rec, s32 mode
 extern s32 GameObject_IsFollower(CGameObjectInstance *obj);
 extern s32 GameObject_IsLeader(CGameObjectInstance *obj);
 extern f32 AI_DistSqToPointAtHeight(CGameObjectInstance *obj, CVector3 pos);
+#ifdef TARGET_PORT
+#include <string.h> /* memcpy (the N64 build expands GCC's builtin) */
+#endif
 /* Builds the level's actor block from its records: places every player on the spawn points found for
    the level (one record per player start), then links each remaining actor to the nearest actor with
    the same definition. The spawn point is indexed afresh on each use and the position copied with

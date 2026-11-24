@@ -1624,6 +1624,9 @@ extern void CPlayer__SetupActors(CPlayer *player, CObjectRecord *rec, s32 mode, 
 extern s32 GameObject_IsFollower(CGameObjectInstance *obj);
 extern s32 GameObject_IsLeader(CGameObjectInstance *obj);
 extern f32 AI_DistSqToPointAtHeight(CGameObjectInstance *obj, CVector3 pos);
+#ifdef TARGET_PORT
+#include <string.h> /* memcpy (the N64 build expands GCC's builtin) */
+#endif
 /* Builds the level's actor block from its records: places every player on the spawn points found for
    the level (one record per player start), then links each remaining actor to the nearest actor with
    the same definition. The spawn point is indexed afresh on each use and the position copied with
@@ -3603,15 +3606,8 @@ void *func_0029E460(void *, void *, s32);           /* memcpy */
 
 /* Copies the level's name (sub-block 8 of its level file, a handle: data then size) into
  * arg2, at most arg3 bytes. The level file stays loaded when it is the current level. */
-/* The one object's literals on the N64: "level index" is CScene__LoadLevel's (pooled), "level name" is output
- * here, between func_0042C194's and func_00223A94's .rodata (0xA6BD0); the port reads the generated copies. */
-#ifdef TARGET_PORT
-#define SCENE_DESC_LEVEL_INDEX ((sptr) &sCSceneCacheDesc_LevelIndex)
-#define SCENE_DESC_LEVEL_NAME ((sptr) &sCSceneCacheDesc_LevelName)
-#else
-#define SCENE_DESC_LEVEL_INDEX ((sptr) "level index")
-#define SCENE_DESC_LEVEL_NAME ((sptr) "level name")
-#endif
+/* The one object's literals: "level index" is CScene__LoadLevel's (pooled), "level name" is output here,
+ * between func_0042C194's and func_00223A94's .rodata (0xA6BD0, sCSceneCacheDesc_LevelName). */
 DEFERRED void CScene__GetLevelName(struct CScene *arg0, s32 arg1, void *arg2, s32 arg3) {
     sptr sp20;
     sptr temp_s2;
@@ -3620,8 +3616,8 @@ DEFERRED void CScene__GetLevelName(struct CScene *arg0, s32 arg1, void *arg2, s3
     CMemEntry *temp_v0_2;
 
     temp_v0 = CISet__GetROMAddress((sptr) arg0->m_pLevels, arg0->m_LevelsKey, arg1);
-    temp_s2 = CCache__LoadPersistantIndex(0, (sptr) &sp20, temp_v0, SCENE_DESC_LEVEL_INDEX);
-    temp_v0_2 = (CMemEntry *) CCache__LoadPersistantSubBlock_v(0, sp20, 8, temp_v0, (sptr) arg0, 0, SCENE_DESC_LEVEL_NAME);
+    temp_s2 = CCache__LoadPersistantIndex(0, (sptr) &sp20, temp_v0, (sptr) "level index");
+    temp_v0_2 = (CMemEntry *) CCache__LoadPersistantSubBlock_v(0, sp20, 8, temp_v0, (sptr) arg0, 0, (sptr) "level name");
     var_a2 = temp_v0_2->size;
     if (arg3 < var_a2) {
         var_a2 = arg3;
