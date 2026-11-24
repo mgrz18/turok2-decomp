@@ -5,7 +5,7 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/PAK/80405DC0_16.CPP, func_804098CC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern void * memset(void *arg0, int arg1, uptr arg2);
+extern void *memset(void *dst, s32 value, uptr size);
 extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
 extern void CCache__Deallocate(sptr, void *);
 extern void **CCache__Allocate(s32, s32, s32, char *);

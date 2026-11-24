@@ -10,7 +10,7 @@
 extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
 extern void CCache__Deallocate(sptr, void *);
 extern void **CCache__Allocate(s32, s32, s32, char *);
-extern void memset(void *dst, s32 value, sptr size);
+extern void *memset(void *dst, s32 value, uptr size);
 extern void func_0029E460(char *dst, char *src, s32 n);
 
 static __inline__ s32 SaveFileSize(void) {

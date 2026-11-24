@@ -3,7 +3,7 @@
 #include "structs/save.h"
 
 s32 MenuItem_TextLength(void *item);
-s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
+s32 sprintf(char *dst, const char *fmt, ...);
 
 s32 GameNoteMenu_UpdateLives(MenuItem *item) {
     s32 value = gLoadBuffer->player.m_Lives;

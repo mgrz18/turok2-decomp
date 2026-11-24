@@ -9,7 +9,7 @@
 
 
 /* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
-extern void sprintf(char *dst, const char *fmt, ...);
+s32 sprintf(char *dst, const char *fmt, ...);
 
 s32 PakMenu_NoteText(MenuItem *item, Menu *c) {
     char name[16];

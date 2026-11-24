@@ -6,18 +6,15 @@
 #include "globals/scene.h"
 #include "structs/twin_pakmenu.h"
 #include "protos/pak.h"
+#include "globals/menu_text.h"
 
 /* Controller pak menu item: picks the item's text for the pak state and prints the pak's free blocks and
  * the blocks a save needs into it ("%3d"-style, three characters each). */
 
 
-extern Chars4 sPakMenuText_Spaces3; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
-extern u8 sPakMenuFmt_3d[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
-extern char sPakMenuText_FreePagesXxxNeededXxx_B48B4[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
-extern char sPakMenuText_FreePagesXxxNeededXxx_B4914[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
-extern char sPakMenuText_Space[]; /* local: menu_text.h is not included here (the Chars4 view above) */
+extern Chars4 sPakMenuText_Spaces3View __asm__("sPakMenuText_Spaces3"); /* copied as a Chars4 (one lw/sw) */
 /* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
-void sprintf(char *dst, const char *fmt, ...);
+s32 sprintf(char *dst, const char *fmt, ...);
 
 s32 PakMenu_FreePagesText(MenuItem *item, Menu *own) {
     Chars4 buf;
@@ -35,7 +32,7 @@ s32 PakMenu_FreePagesText(MenuItem *item, Menu *own) {
     } else {
         pad = own->controller->port;
     }
-    buf = sPakMenuText_Spaces3;
+    buf = sPakMenuText_Spaces3View;
     bp = buf.c;
     if (gPakMenuIsSave != 0) {
         item->text = sPakMenuText_FreePagesXxxNeededXxx_B48B4;

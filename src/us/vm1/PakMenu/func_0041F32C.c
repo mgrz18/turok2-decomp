@@ -16,13 +16,13 @@
 #include "globals/scene.h"
 #include "protos/pak.h"
 
-void *memset(void *s, int c, uptr n);
+extern void *memset(void *dst, s32 value, uptr size);
 s32 PakMenu_CheckPak();
 void PakMenu_UpdateNoteRows();
 extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
 extern void CCache__Deallocate(sptr, void *);
 extern void **CCache__Allocate(s32, s32, s32, char *);
-void *memset();
+extern void *memset(void *dst, s32 value, uptr size);
 /* Game code / company code check on the controller-pak note (inlined). */
 static __inline__ s32 k7_chk(u8 *gc, u8 *cc) {
     if (Str_Length(gc) == 4 && Str_Length(cc) == 2 &&
