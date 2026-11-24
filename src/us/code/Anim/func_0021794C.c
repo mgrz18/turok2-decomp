@@ -4,10 +4,13 @@
 #include "rw/abu_types.h"
 #include "protos/iset.h"
 
-#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
-#define CVector3__Lerp CVector3__Lerp_i
+/* CVector3__Lerp with its f32 t as the word it travels in (a1); the port's
+ * CVector3__Lerp_i converts it (docs/port/ABI.md) */
+#ifdef TARGET_PORT
+extern void CVector3__Lerp_i(CVector3 *arg0, s32 arg1, void *arg2, void *arg3);
+#else
+extern void CVector3__Lerp_i(CVector3 *arg0, s32 arg1, void *arg2, void *arg3) __asm__("CVector3__Lerp");
 #endif
-extern void CVector3__Lerp(CVector3 *arg0, s32 arg1, void *arg2, void *arg3);
 void Anim_GetBoneTranslation(void *arg0, s32 arg1, void *arg2) {
     extern void *CISet__GetBlock(void *arg0, s32 arg1);
     ObjectLinks24_2 *o = arg0;
@@ -23,7 +26,7 @@ void Anim_GetBoneTranslation(void *arg0, s32 arg1, void *arg2) {
         return;
     }
     base = CISet__GetBlock(o->unk_8, (s32) idx);
-    CVector3__Lerp(arg2, o->unk_20,
+    CVector3__Lerp_i(arg2, o->unk_20,
                   (char *)base + (o->unk_18) * 4,
                   (char *)base + (o->unk_1C) * 4);
 }

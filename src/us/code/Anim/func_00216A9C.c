@@ -9,10 +9,10 @@
  * Anim_DecodeTracks fills in. A resource that fails to decode is dropped.
  * packInit/packAdd/decodeAnim are Pack_Init/Pack_Add/Anim_DecodeAnimation inlined. */
 
-typedef struct Pack {
+typedef struct AnimPack {
     /* 0x0 */ s32 count;
     /* 0x4 */ s32 offsets[1]; /* count + 1 byte offsets, 0xDEADBEEF past the last one set */
-} Pack;
+} AnimPack;
 
 typedef struct AnimHeader {
     /* 0x00 */ s32 radius;
@@ -32,10 +32,10 @@ typedef struct Resource {
 
 
 s32 ProPackDecompress(Resource **res, s32 arg1);
-s32 Anim_DecodeTracks(void *source, Pack *table, s32 tracks, s32 channels, s32 radius, s32 encoding);
+s32 Anim_DecodeTracks(void *source, AnimPack *table, s32 tracks, s32 channels, s32 radius, s32 encoding);
 void func_0029E460(void *dst, void *src, s32 size);
 
-static __inline__ void packInit(Pack *pack, s32 count) {
+static __inline__ void packInit(AnimPack *pack, s32 count) {
     s32 index;
     s32 *ptr;
     s32 magic;
@@ -54,7 +54,7 @@ static __inline__ void packInit(Pack *pack, s32 count) {
     }
 }
 
-static __inline__ void *packAdd(Pack *pack, void *src, s32 size) {
+static __inline__ void *packAdd(AnimPack *pack, void *src, s32 size) {
     s32 i;
     void *data;
 
@@ -77,8 +77,8 @@ static __inline__ s32 decodeAnim(void *src, void *dst) {
     AnimHeader *h = CISet__GetBlock(src, 0);
     void *posSrc = CISet__GetBlock(src, 1);
     void *rotSrc = CISet__GetBlock(src, 2);
-    Pack *posDst = CISet__GetBlock(dst, 1);
-    Pack *rotDst = CISet__GetBlock(dst, 2);
+    AnimPack *posDst = CISet__GetBlock(dst, 1);
+    AnimPack *rotDst = CISet__GetBlock(dst, 2);
 
     sAnimRawRange = 1;
     sAnimDecodeRotation = 0;
@@ -120,9 +120,9 @@ void Anim_Decompress(s32 arg0, Resource **res) {
     AnimHeader *h;
     s32 n;
     s32 animSize;
-    Pack **blk;
-    Pack *pack;
-    Pack *out;
+    AnimPack **blk;
+    AnimPack *pack;
+    AnimPack *out;
 
     if (ProPackDecompress(res, 1) == 0) {
         return;

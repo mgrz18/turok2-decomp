@@ -8,10 +8,13 @@ extern void Anim_DecodeQuantizedChannel(u32 *stream, Output8025EF54 *out, s32 co
 extern float Bits_Normalize(float value, int bits);
 extern u32 Bits_Read(u32 *, u32);
 extern f32 Math_Remap(f32 value, f32 lower, f32 upper);
-#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
-#define Bits_ReadFloat Bits_ReadFloat_3
+/* Bits_ReadFloat with its Func802608ECResult range as the three words it travels in (a1-a3);
+ * the port's Bits_ReadFloat_3 (port/game/t2abi.c) builds the struct (docs/port/ABI.md) */
+#ifdef TARGET_PORT
+extern f32 Bits_ReadFloat_3(u32 *stream, s32 bits, f32 base, f32 range);
+#else
+extern f32 Bits_ReadFloat_3(u32 *stream, s32 bits, f32 base, f32 range) __asm__("Bits_ReadFloat");
 #endif
-extern f32 Bits_ReadFloat(u32 *stream, s32 bits, f32 base, f32 range);
 void Anim_DecodeQuantizedChannel(u32 *stream, Output8025EF54 *out, s32 count) {
     Decode8025EF54 decode;
     f32 first;
@@ -46,7 +49,7 @@ void Anim_DecodeQuantizedChannel(u32 *stream, Output8025EF54 *out, s32 count) {
     i = 0;
     if (count > 0) {
         do {
-            out->value = Bits_ReadFloat(&decode.stream, decode.bits,
+            out->value = Bits_ReadFloat_3(&decode.stream, decode.bits,
                                        decode.base, decode.range);
             i++;
             out++;

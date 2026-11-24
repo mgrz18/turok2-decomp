@@ -1,17 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SYSTEM/8025E5B0_8.CPP, func_8026033C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
-struct Func802608ECResult;
-typedef struct Func802608ECResult Func802608ECResult;
-struct Func802608ECResult;
-struct Func802608ECResult {
-    u32 value;
-    f32 start;
-    f32 delta;
-};
+#include "rw/abu_types.h"
+
 typedef struct { u32 low; u32 high; } PackedBitWords;
 static __inline__ void write_bits(u32 value, u32 bitAddress, u32 width) {
   u32 address;
