@@ -211,7 +211,6 @@ void SndSeq_Construct(SndSeq *state, CAudioWorld *root) {
     state->target = 1.0f;
 }
 #else
-sptr alHeapDBAlloc(sptr a, s32 b, void *c, s32 d, s32 e);
 void SndSeq_Construct(struct AudioStateD844 *state, struct AudioRootD844 *root) {
     ALSeqpConfig params;
     void *player;

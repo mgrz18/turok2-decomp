@@ -901,6 +901,52 @@ How to proceed with a pair: `tools/merge_check.py --rodata-free --margs "--vm sr
 dir>` for the conflicts, fix them in the one-function files with `asm_diff --base` 0, then
 `merge_module.py <engine dir> --vm <vm dir> --rodata-free`, `make setup`, a clean build, `make verify`.
 
+## Round 27, part p1: header work on 14 code/ directories
+
+**Merged (6 directories, 180 files):** `code/AudioMgr`, `code/LevelEvent`, `code/DList`, `code/Hud`,
+`code/WeaponMode`, `code/ImpactEvent` (header work only; `merge_check.py` OK without `--rodata-free`).
+`make verify` after each batch, `asm_diff --base 88d57333` 0 over the tree, the port builds from a fresh
+gendata (aligncheck 0 sites, `port_layout` regenerated); port md5s unchanged (boot+3 demos 6ab97584,
+default whole-game af8bd840). How the declarations were made one:
+
+- *A header per module for the calls it makes,* where the callers agree with each other but not with
+  the definition in another module: `protos/weapon_mode.h` (WeaponMode: `Sound__Play` with an `s32`
+  sound as its callers compile it, the CPlayer weapon family, `CCameraPool__AddText`,
+  `CMtxF__PreRotateY`), `protos/impact_event.h` (`GameObject_TraceMove`/`GetCollisionHeight`,
+  `CGameObjectInstance__GetAverageScale`). The files' own one-line declarations are dropped by
+  `tools/unify_decls.py DIR HEADER NAME..` (new), then `asm_diff`.
+- *ultralib's prototypes:* `alHeapDBAlloc`, `alLink`, `alUnlink` in `protos/libaudio.h` (the
+  AMDMABuffer nodes cast to `ALLink`); `SndSeq`'s N64 branch lost its own `sptr` declaration.
+- *Arguments the ROM's caller passes and the definition does not take, or narrows:* `__amMain` calls
+  `__amHandleFrameMsg` through a two-argument type of its own; the Hud callers of
+  `Hud_DrawImageFrame`/`Hud_DrawMaskedBlock`/`Hud_DrawI4Block` cast the coordinates to `s16` at the call
+  (in the merged file the definition's `int` prototype is seen first, so the `s16` prototypes no
+  longer narrowed: the merge check showed it as an asm difference).
+- *Rage Wars by-value views replaced by the engine types:* the ImpactEvent blast handlers take
+  `CVector3` and `CImpactBlast` (were `Triple`/`IntPair`/`B15Blk8`), `ImpactEvent_Rumble` passes a
+  `CVector3` to `CScene__StartRumbles`; `DList_Remove` is on `rw/junk_types.h` `DLNode`/`DLList` (its
+  local view had prev/next swapped by name).
+- *Field symbols:* `globals/onscreen.h` now declares `gEngineApp_m_OnScreen_m_ShadowXOff[2]` (every
+  reader takes the pair as an array; a cast of the scalar did not keep the code); the `m_TopR`,
+  `m_FontXScale`, `gFrameCountGameplay` and camera-pool views are casts of the header symbols
+  (`(*(View *) &sym)`, which keeps the code for a struct view).
+- *Local types:* shared ones hoisted into `structs/hud.h` (`FrameEntry`, `FrameTable`, one
+  `ModeState`) and `structs/weapon_node.h`; same-named views of different things renamed by role
+  (`EventParams` x4, `Kind`, `Chunk`, the static `Draw` helper).
+
+**Left of the 14 (8)**, with the first conflicts `errs` (merged-file compile) reports:
+`code/AI` (55: `Dest`/`Source110`/`StateEntry`/`SoundSourceNode` Rage Wars views of CAI in several
+layouts, `AI_StopSound` defined on `Dest`, `GameObject_TraceMove` with three `f32` for the position,
+`CGameObjectInstance__GetRotation` as an sret `void (CQuaternion *, ...)`), `code/CAudioWorld` (50) and
+`code/SndVoice` (59): each has one or two files carrying a whole Rage Wars type dump (`Shared_Quad`,
+`MenuRules`, `ContextRecAt2BC0`, `Voice`, ... redefined against `rw/abu_types.h`), plus the
+`alSndp*`/`HalfToFloat` prototypes and `__osDisableInt`/`__osRestoreInt`; `code/CCache` (59:
+`osSendMesg`, `CHeap__Alloc/Free`, the `CCache__*` family, `gCache_*` views), `code/CGameRegion`
+(74: the `CScene__*` family, `CISet__GetBlock`), `code/EnemyAI` (136), `code/GameObject` (24:
+`CVector3__Normalize` as `f32 *`, basic typedefs, `Triple`/`TripleRecAt8` by value, a local
+`CGameRegion`, `GameObject_GetGroundHeight` argument lists), `code/__scHandleRSP` (22: the per-file
+`Sched`/`Client`/`Qn` views onto `structs/sched.h` `OSSched`/`OSScTask`, still to write).
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte
