@@ -4,14 +4,11 @@
 #include "structs/sound.h"
 #include "structs/camera.h"
 #include "globals/audio.h"
+#include "protos/sndp.h"
 
 f32 HalfToFloat(s32 x);
 s32 Cinema_IsActive(void);
 f32 Math_Approach(f32 value, f32 target, f32 rate);
-void alSndpSetSound(void *sndp, s16 id);
-void alSndpSetVol(void *sndp, s16 vol);
-s32 alSndpGetState(void *sndp);
-void alSndpStop(void *sndp);
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 

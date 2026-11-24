@@ -3,10 +3,8 @@
 
 #include "structs/sound.h"
 #include "rw/junk_types.h" /* SndCore */
+#include "protos/sndp.h"
 
-void alSndpSetSound(void *p, s32 id);
-s32 alSndpGetState(void *p);
-void alSndpStop(void *p);
 s32 SndVoicePool_FindSlot(SndVoicePool *p, s32 a, s32 b, s16 pri, s32 c) {
     CAudioWorld *m;
     SndCore *core;

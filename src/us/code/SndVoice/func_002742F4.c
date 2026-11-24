@@ -1,11 +1,9 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AUDIO/8025A3EC_4.CPP, func_8025C008_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/sound.h"
+#include "protos/sndp.h"
 
  
-void alSndpSetSound(void *sound, s16 sample);
-s32 alSndpGetState(void *sound);
-void alSndpStop(void *sound);
 
 /* Stop every voice in any of the groups in mask. */
 void SndVoicePool_StopByFlags(SndVoicePool *set, u32 mask) {

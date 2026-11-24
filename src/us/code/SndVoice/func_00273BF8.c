@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/sndp.h"
 
 extern void SndVoicePool_PlayVoice(SlotRecAtB8 *base, s16 index);
-extern void alSndpPlay(void *);
 void SndVoicePool_PlayVoice(SlotRecAtB8 *base, s16 index)
 {
   unsigned int offset = index * (sizeof(SlotRecAtB8));

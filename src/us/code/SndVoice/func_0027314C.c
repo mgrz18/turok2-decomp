@@ -4,6 +4,7 @@
 #include "structs/vector.h"
 #include "structs/sound.h"
 #include "globals/camera.h"
+#include "protos/sndp.h"
 
 /* The bank seen from 0x7C: the ROM addresses its sound ids from there. */
 typedef struct SoundVoice {
@@ -13,11 +14,6 @@ typedef struct SoundVoice {
 
 
 extern sptr CCameraPool__GetNearestCamera(void *game, CVector3 *pos);
-extern void alSndpSetSound(void *player, s32 id);    /* alSndpSetSound */
-extern s32 alSndpGetState(void *player);             /* alSndpGetState */
-extern void alSndpStop(void *player);            /* alSndpStop */
-extern void alSndpPlay(void *player);
-extern void alSndpDeallocate(void *player, s32 id);    /* alSndpDeallocate */
 extern void SndVoice_UpdateVolume(SndVoice *s);
 extern void SndVoice_UpdatePan(SndVoice *s);
 extern void SndVoice_UpdatePitch(SndVoice *s);

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/sound.h"
+#include "protos/sndp.h"
 
-s32 alSndpDeallocate(void *, s32);
 
 /* Releases the voice slot and resets the voice. */
 void SndVoice_Release(SndVoice *arg0) {
