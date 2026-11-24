@@ -7,10 +7,10 @@
 #include "globals/menu_desc.h"
 #include "protos/pak.h"
 #include "protos/pakmenu.h"
+#include "protos/menu.h"
 
 extern int PakConfirmMenu_SelectYes(void * owner, struct MenuRecAt24 * menu, void * arg);
 s32 PakConfirmMenu_SelectYes(void *owner, MenuRecAt24 *menu, void *arg) {
-    extern void MenuPool_OpenMenu(char *, char *, void *, PakMenuSlot *, char *);
     s32 ch;
     switch (gPakConfirmKind) {
         case 4:
