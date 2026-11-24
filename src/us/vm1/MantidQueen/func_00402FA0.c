@@ -14,7 +14,6 @@ typedef struct {
  * m_AnimRepeatedCount. The N64 views read other bytes on the host: the push never ended (the
  * repeat count) and never pushed. */
 #define T2_HOFF_Obj00402FA0(m) __builtin_offsetof(CGameObjectInstance, m)
-#define T2_HOFF_Item00402FA0(m) __builtin_offsetof(CAI, m)
 typedef struct {
     union {
         struct { u8 _hp_pos[T2_HOFF_Obj00402FA0(header.m_vPos)]; Vec3_00402FA0 pos; }; /* N64 0x4 */
@@ -43,8 +42,8 @@ typedef struct {
 #ifdef TARGET_PORT
 typedef struct {
     union {
-        struct { u8 _hp_target[T2_HOFF_Item00402FA0(m_pSightTarget)]; Target00402FA0 *target; }; /* N64 0x80 */
-        struct { u8 _hp_count[T2_HOFF_Item00402FA0(m_AnimRepeatedCount)]; s8 count; }; /* N64 0xC7 */
+        struct { u8 _hp_target[__builtin_offsetof(CAI, m_pSightTarget)]; Target00402FA0 *target; }; /* N64 0x80 */
+        struct { u8 _hp_count[__builtin_offsetof(CAI, m_AnimRepeatedCount)]; s8 count; }; /* N64 0xC7 */
     };
 } Item00402FA0;
 #else
