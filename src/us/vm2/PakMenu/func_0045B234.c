@@ -1,10 +1,9 @@
-/* Second-module copy of CharNoteMenu_UpdateType (first module; this one at link address 0x00422234), calling this module's own functions at their link addresses. */
 #include "common.h"
 #include "globals/menu_text.h"
 #include "structs/menu.h"
-extern s32 gCharNoteMenuSaving; /* local: globals/pak.h declares it; this file views gPakProfileRead_character, which the header types otherwise */
+#include "globals/pak.h"
+extern s8 gPakProfileReadCharacterView[] __asm__("gPakProfileRead_character"); /* the s8 view keeps the ROM code */
 
-extern s8 gPakProfileRead_character[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 s32 CharNoteMenu_UpdateType_2(MenuItem *item) {
     char *src;
@@ -15,7 +14,7 @@ s32 CharNoteMenu_UpdateType_2(MenuItem *item) {
         item->text = sCharNoteMenuText_Empty;
     } else {
         item->text = sCharNoteMenuText_Type;
-        switch (gPakProfileRead_character[0]) {
+        switch (gPakProfileReadCharacterView[0]) {
             case 0:
             default:
                 src = sCharNoteMenuText_Turok;

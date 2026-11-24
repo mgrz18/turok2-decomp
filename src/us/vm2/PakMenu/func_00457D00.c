@@ -1,47 +1,42 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00407290.c, func_00407290.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/save.h"
 #include "globals/menu.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 #include "structs/pak.h"
+#include "protos/pak.h"
+#include "globals/pak.h"
 
-extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gPakMenuPort; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
-extern s32 gPakMenuIsSave; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern char gPakProfile[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern char gPakCharacterNoteName[]; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
-extern u8 gPakGameCode[]; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
-extern void *gSaveBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
-extern void *gLoadBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
-s32 Pak_BytesToPages_2(s32 n);
-s32 Pak_GetFreePages_2(s32 pad, s32 *out);
-s32 Pak_CountEmptyNotes_2(s32 pad, s32 *out);
-s32 Pak_FindFreeExtLetter_2(s32 pad, u8 *ext);
-s32 Pak_SaveNoteVerified_2(s32 pad, s32 size, char *n1, char *n2, u8 *ext, u8 *buf);
-void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, void *d, void *e);
-void CCache__Flush(s32 a);
-void CCache__Deallocate(sptr a, void *p);
-/* Controller-pak name for the selected pad (inlined). */
-static __inline__ char *O01Pick(PakQuery *sel) {
+extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
+extern void CCache__Deallocate(sptr, void *);
+/* Static inlines in the Rage Wars source file (dropped by the importer). */
+static inline u8 *O01Pick(PakQuery *sel) {
+    u8 *p;
     switch (sel->channel) {
-    case 0:
     default:
-        return (char *)&gStatsAfterPakMenuDesc1_2;
+    case 0:
+        p = (u8 *)&gStatsAfterPakMenuDesc1_2;
+        break;
     case 1:
-        return (char *)&gStatsAfterPakMenuDesc2_2;
+        p = (u8 *)&gStatsAfterPakMenuDesc2_2;
+        break;
     case 2:
-        return (char *)&gStatsAfterPakMenuDesc3_2;
+        p = (u8 *)&gStatsAfterPakMenuDesc3_2;
+        break;
     case 3:
-        return (char *)&gStatsAfterPakMenuDesc4_2;
+        p = (u8 *)&gStatsAfterPakMenuDesc4_2;
+        break;
     }
+    return p;
 }
-/* Release the menu buffers (inlined). */
-static __inline__ void O01FreeAll(void) {
+static inline void O01FreeAll(void) {
     if (gSaveBufferHandle != 0 || gLoadBufferHandle != 0) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
     }
     if (gSaveBufferHandle != 0) {
         CCache__Deallocate(0, gSaveBufferHandle);
@@ -54,7 +49,7 @@ static __inline__ void O01FreeAll(void) {
     gSaveBuffer = 0;
     gLoadBuffer = 0;
 }
-s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
+s32 PakMenu_WriteProfile_2(sptr unused, Menu *own, s32 unused3) {
     CPlayer *plr;
     CPlayer *pp;
     s32 pv;
@@ -86,7 +81,7 @@ s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
                     if (r == 0) {
                         flag = 1;
                         nv = pad.channel;
-                        r = Pak_SaveNoteVerified_2(nv, 0x18, gPakProfile, gPakCharacterNoteName, ext, gPakGameCode);
+                        r = Pak_SaveNoteVerified_2(nv, 0x18, &gPakProfile, gPakCharacterNoteName, ext, gPakGameCode);
                     }
                 }
             }

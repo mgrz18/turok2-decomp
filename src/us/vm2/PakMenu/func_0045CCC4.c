@@ -1,26 +1,33 @@
-/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_0040BB54.c, func_0040BB54.
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8040B868_de_10.c, func_8040BBC0_us.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-#include "common.h"
+
+#include "rw/abu_types.h"
 #include "globals/menu_text.h"
-#include "structs/menu.h"
 #include "globals/pak.h"
 
-s32 PakConfirmMenu_UpdateNo_2(MenuItem *item) {
-    switch (gPakConfirmKind) {
-    default:
-    case 0:
-        item->text = sPakConfirmMenuText_No;
-        break;
-    case 3:
-        item->text = sPakConfirmMenuText_No;
-        break;
-    case 4:
-        item->text = sPakConfirmMenuText_No;
-        break;
-    case 1:
-    case 2:
-        item->text = sPakConfirmMenuText_ContinueWithoutSaving;
-        break;
+s32 PakConfirmMenu_UpdateNo_2(struct FieldRecAt14 *field) {
+    u32 state = gPakConfirmKind;
+    if (state >= 5) {
+        goto state_other;
     }
+    switch (state) {
+        case 0: goto state_other;
+        case 1: goto case_3;
+        case 2: goto case_3;
+        case 3: goto case_1;
+        case 4: goto case_2;
+        }
+state_other:
+    field->text = sPakConfirmMenuText_No;
+    goto done;
+case_1:
+    field->text = sPakConfirmMenuText_No;
+    goto done;
+case_2:
+    field->text = sPakConfirmMenuText_No;
+    goto done;
+case_3:
+    field->text = sPakConfirmMenuText_ContinueWithoutSaving;
+done:
     return 0;
 }

@@ -1,30 +1,33 @@
-/* WRONG CUT: the real function is 0x0045CC58-0x0045CCC4 (size 0x6C = 108): the
- * switch's case blocks were cut as func_0045CC90, func_0045CCA0 and
- * func_0045CCB0 (the last one already in src/, it must go). */
-#include "common.h"
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8040B868_de_10.c, func_8040BBC0_us.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+
+#include "rw/abu_types.h"
 #include "globals/menu_text.h"
-#include "structs/menu.h"
 #include "globals/pak.h"
 
-/* Set the menu item's text from the game mode gPakConfirmKind. */
-
-
-s32 PakConfirmMenu_UpdateYes_2(MenuItem *item) {
-    switch (gPakConfirmKind) {
-    case 0:
-    default:
-        item->text = sPakConfirmMenuText_Yes;
-        break;
-    case 3:
-        item->text = sPakConfirmMenuText_Yes;
-        break;
-    case 4:
-        item->text = sPakConfirmMenuText_Yes;
-        break;
-    case 1:
-    case 2:
-        item->text = sPakConfirmMenuText_ManageTheControllerPak;
-        break;
+s32 PakConfirmMenu_UpdateYes_2(struct FieldRecAt14 *field) {
+    u32 state = gPakConfirmKind;
+    if (state >= 5) {
+        goto state_other;
     }
+    switch (state) {
+        case 0: goto state_other;
+        case 1: goto case_3;
+        case 2: goto case_3;
+        case 3: goto case_1;
+        case 4: goto case_2;
+        }
+state_other:
+    field->text = sPakConfirmMenuText_Yes;
+    goto done;
+case_1:
+    field->text = sPakConfirmMenuText_Yes;
+    goto done;
+case_2:
+    field->text = sPakConfirmMenuText_Yes;
+    goto done;
+case_3:
+    field->text = sPakConfirmMenuText_ManageTheControllerPak;
+done:
     return 0;
 }

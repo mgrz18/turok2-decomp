@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "globals/pak.h"
-s32 Str_Length_2(char *s);
-s32 Str_Compare_2(char *a, char *b);
+#include "protos/pak_2.h"
+#include "protos/pak.h"
 s32 Pak_IsTurok2Note_2(char *a, char *b) {
     if (Str_Length_2(b) == 4 && Str_Length_2(a) == 2 && Str_Compare_2(b, gPakGameCode) == 0 && Str_Compare_2(a, gPakCompanyCode) == 0) {
         return 1;

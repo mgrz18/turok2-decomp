@@ -1,21 +1,27 @@
-/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/PAK/80409A88.CPP, func_8040A9F8_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
 #include "common.h"
 #include "globals/menu_text.h"
+#include "structs/menu.h"
 #include "globals/pak.h"
-struct FieldRecAt14;
-struct FieldRecAt14 {
-    char pad[0x14];
-    char *text;
-};
-s32 CharNoteMenu_UpdatePrompt_2(struct FieldRecAt14 *field) {
+
+#define T2_TEXT(s) ((s32 *) (s))
+
+#ifdef TARGET_PORT
+#else
+#endif
+#ifdef TARGET_PORT
+#else
+#endif
+#ifdef TARGET_PORT
+#else
+#endif
+
+s32 CharNoteMenu_UpdatePrompt_2(MenuItem *arg0) {
     if (sCharNoteLoad != 0) {
-        field->text = sCharNoteMenuText_Load;
+        arg0->table = T2_TEXT(sCharNoteMenuText_Load);
     } else if (gCharNoteMenuSaving != 0) {
-        field->text = sCharNoteMenuText_Delete_B4B94;
+        arg0->table = T2_TEXT(sCharNoteMenuText_Delete_B4B94);
     } else {
-        field->text = sCharNoteMenuText_Delete_B4B8C;
+        arg0->table = T2_TEXT(sCharNoteMenuText_Delete_B4B8C);
     }
     return 0;
 }

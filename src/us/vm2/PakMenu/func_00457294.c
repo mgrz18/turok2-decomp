@@ -1,61 +1,60 @@
-/* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00406858.c, func_00406858, with Turok 2's layouts. */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "globals/pak.h"
 #include "globals/scene.h"
+#include "protos/pak.h"
 
-/* Controller pak check for saving: a pad that already holds one of the game's two notes is usable as is
- * (0x7B blocks); otherwise checks the pak's free space against the save size and keeps the largest need. */
+/* Pak slot scan step: a pak that already holds one of the game's two files
+ * (names gPakCharacterNoteName, gPakGameNoteName) wins at once (*best = 123); otherwise the
+ * slot is a candidate when the pak is usable and has room for a save, and
+ * the slot with the most free pages is kept. Returns 1 to keep scanning. */
 
-s32 Pak_GetNoteGameName_2(s32 pad, s32 idx, u8 **out);
-void Pak_DecodeText_2(u8 *src, u8 *dst, s32 n);
-s32 Str_Compare_2(char *a, char *b);
-s32 Pak_GetFreePages_2(s32 pad, s32 *out);
-s32 Pak_CountEmptyNotes_2(s32 pad, s32 *out);
-s32 Pak_BytesToPages_2(s32 n);
 
-static __inline__ s32 FindNote(s32 pad, char *name) {
-    u8 buf[16];
-    u8 *ent;
+
+/* PakMenu_FindNoteByName_2 without the index output */
+static __inline__ s32 hasFile(char *file, s32 slot) {
+    char name[16];
+    char *entry;
     s32 i;
 
     for (i = 0; i < 16; i++) {
-        Pak_GetNoteGameName_2(pad, i, &ent);
-        Pak_DecodeText_2(ent, buf, 16);
-        if (Str_Compare_2((char *)buf, name) == 0) {
+        Pak_GetNoteGameName_2(slot, i, &entry);
+        Pak_DecodeText_2(entry, name, 16);
+        if (Str_Compare_2(name, file) == 0) {
             return 1;
         }
     }
     return 0;
 }
 
-s32 PakMenu_CheckSlotForSave_2(sptr unused, s32 pad, s32 *outPad, s32 *outBlocks) {
-    s32 f1;
-    s32 f2;
-    s32 r;
-    s32 a;
-    s32 b;
+s32 PakMenu_CheckSlotForSave_2(void *unused, s32 slot, s32 *bestSlot, s32 *best) {
+    s32 free;
+    s32 files;
+    s32 found;
+    s32 found2;
+    s32 err;
     s32 need;
 
-    f1 = FindNote(pad, gPakCharacterNoteName);
-    f2 = FindNote(pad, gPakGameNoteName);
-    if (f1 != 0 || f2 != 0) {
-        *outPad = pad;
-        *outBlocks = 0x7B;
+    found = hasFile(gPakCharacterNoteName, slot);
+    found2 = hasFile(gPakGameNoteName, slot);
+    if (found || found2) {
+        *bestSlot = slot;
+        *best = 123;
         return 1;
     }
-    r = Pak_GetFreePages_2(gPakMenuPort, &a);
-    if (r == 0) {
-        r = Pak_CountEmptyNotes_2(gPakMenuPort, &b);
-        if (r == 0) {
-            need = Pak_BytesToPages_2(gScene.unk_30 + 0x688);
-            if (b == 0 || a < need) {
-                if (*outBlocks < need) {
-                    *outBlocks = need;
-                    *outPad = pad;
+    err = Pak_GetFreePages_2(gPakMenuPort, &free);
+    if (err == 0) {
+        err = Pak_CountEmptyNotes_2(gPakMenuPort, &files);
+        if (err == 0) {
+            need = Pak_BytesToPages_2((*(u8 * *) &gScene.unk_30) + 0x688);
+            if (files == 0 || free < need) {
+                if (*best < need) {
+                    *best = need;
+                    *bestSlot = slot;
                 }
                 return 0;
             }
         }
     }
-    return r == 0;
+    return err == 0;
 }

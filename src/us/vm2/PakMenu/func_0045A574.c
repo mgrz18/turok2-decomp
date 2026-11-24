@@ -1,20 +1,11 @@
 #include "common.h"
-#include "rw/abu_protos.h"
 #include "globals/menu.h"
 #include "globals/menu_desc.h"
 
-/* Something whose current state is a handler address at 0x24. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x24];
-    /* 0x24 */ s32 stateHandler;
-} StateHolder;
+s32 PakMenu_IsSavePortalMenu_2(char *arg0) {
+    char *p = *(char **) (arg0 + 0x24);
 
-/* Whether the state handler is one of the two at 0x43BE14 / 0x43BDF0 (and clears gCameraPoolHideViews then). */
-s32 PakMenu_IsSavePortalMenu_2(StateHolder *arg0) {
-    s32 temp_v1;
-
-    temp_v1 = arg0->stateHandler;
-    if ((temp_v1 == (sptr) &gSavePortalMenuDescB_2) || (temp_v1 == (sptr) &gSavePortalMenuDesc_2)) {
+    if (p == (char *)&gSavePortalMenuDescB_2 || p == (char *)&gSavePortalMenuDesc_2) {
         gCameraPoolHideViews = 0;
         return 1;
     }

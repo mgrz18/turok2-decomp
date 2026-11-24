@@ -3,7 +3,7 @@
 #include "globals/pak.h"
 
 
-/* Copies the loaded pak profile into the options of the player (second-module copy of PakMenu_RestoreCharacter). */
+/* Copies the saved values into the options of the player. */
 void PakMenu_RestoreCharacter_2(CPlayer *arg0)
 {
   s32 var_a0;

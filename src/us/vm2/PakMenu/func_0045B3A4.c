@@ -1,47 +1,47 @@
+/* WRONG CUT: one function 0x00422484-0x00422608 (size 0x184); splat cut its tail (the last range
+ * tests and the copy loop) into func_00422574. */
 #include "common.h"
 #include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-/* Menu item: append the rank title earned for the number of kills (11 chars). */
-
 
 s32 CharNoteMenu_UpdateRank_2(MenuItem *item) {
-    s32 kills = gPakProfileRead.kills;
-    char *rank = NULL;
+    s32 score = gPakProfileRead.kills;
+    char *src = NULL;
     char *dst;
     s32 i;
 
-    if (kills >= 0 && kills < 50) {
-        rank = sCharNoteMenuText_Pathetic;
-    } else if (kills >= 50 && kills < 150) {
-        rank = sCharNoteMenuText_Poor;
-    } else if (kills >= 150 && kills < 300) {
-        rank = sCharNoteMenuText_Harmless;
-    } else if (kills >= 300 && kills < 500) {
-        rank = sCharNoteMenuText_Nuisance;
-    } else if (kills >= 500 && kills < 800) {
-        rank = sCharNoteMenuText_Acceptable;
-    } else if (kills >= 800 && kills < 1300) {
-        rank = sCharNoteMenuText_Average;
-    } else if (kills >= 1300 && kills < 2000) {
-        rank = sCharNoteMenuText_Good;
-    } else if (kills >= 2000 && kills < 3000) {
-        rank = sCharNoteMenuText_Excellent;
-    } else if (kills >= 3000 && kills < 4500) {
-        rank = sCharNoteMenuText_Dangerous;
-    } else if (kills >= 4500 && kills < 6500) {
-        rank = sCharNoteMenuText_Brutal;
-    } else if (kills >= 6500 && kills < 9999) {
-        rank = sCharNoteMenuText_Savage;
-    } else if (kills >= 9999) {
-        rank = sCharNoteMenuText_Elite;
+    if (score >= 0 && score < 50) {
+        src = sCharNoteMenuText_Pathetic;
+    } else if (score >= 50 && score < 150) {
+        src = sCharNoteMenuText_Poor;
+    } else if (score >= 150 && score < 300) {
+        src = sCharNoteMenuText_Harmless;
+    } else if (score >= 300 && score < 500) {
+        src = sCharNoteMenuText_Nuisance;
+    } else if (score >= 500 && score < 800) {
+        src = sCharNoteMenuText_Acceptable;
+    } else if (score >= 800 && score < 1300) {
+        src = sCharNoteMenuText_Average;
+    } else if (score >= 1300 && score < 2000) {
+        src = sCharNoteMenuText_Good;
+    } else if (score >= 2000 && score < 3000) {
+        src = sCharNoteMenuText_Excellent;
+    } else if (score >= 3000 && score < 4500) {
+        src = sCharNoteMenuText_Dangerous;
+    } else if (score >= 4500 && score < 6500) {
+        src = sCharNoteMenuText_Brutal;
+    } else if (score >= 6500 && score < 9999) {
+        src = sCharNoteMenuText_Savage;
+    } else if (score >= 9999) {
+        src = sCharNoteMenuText_Elite;
     }
     dst = item->text;
     dst += 8;
-    if (rank != NULL) {
+    if (src != NULL) {
         for (i = 0; i < 11; i++) {
-            *dst++ = *rank++;
+            *dst++ = *src++;
         }
     }
     return 0;

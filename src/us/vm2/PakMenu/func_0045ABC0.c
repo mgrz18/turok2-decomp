@@ -1,11 +1,10 @@
-/* Second-module copy of PakMenu_UpdateTitle (first module; this one at link address 0x00421BC0), calling this module's own functions at their link addresses. */
 #include "common.h"
 #include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 
 s32 MenuItem_TextLength_2(void *item);
-s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
+s32 sprintf(char *dst, const char *fmt, ...);
 
 
 s32 PakMenu_UpdateTitle_2(MenuItem *item, Menu *event) {

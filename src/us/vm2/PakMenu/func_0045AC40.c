@@ -1,46 +1,35 @@
-/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/PAK/80409A88_7.CPP, func_8040A37C_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
+/* WRONG CUT: one function 0x00421D20-0x00421DFC (size 0xDC); splat cut its second half into
+ * func_00421D90 (it starts in the middle of an if chain, reading $v0 set here). */
 #include "common.h"
 #include "globals/menu_text.h"
+#include "structs/menu.h"
 #include "globals/pak.h"
-struct Field;
-struct Field {
-    char pad[0x14];
-    char **text;
-    char pad18[0x4];
-    signed int value;
-};
-s32 PakMenu_UpdateSubtitle_2(struct Field *field, s16 *arg1) {
-    s32 option;
-    u32 rel;
-    option = *arg1;
-    rel = option - 3;
+
+
+s32 PakMenu_UpdateSubtitle_2(MenuItem *item, s16 *id) {
+    s32 n = *id;
+    u32 k = n - 3;
+
     if (gPakMenuIsLoad != 0) {
         if (gPakMenuIsProfile != 0) {
-            field->text = sPakMenuText_LoadNote_B4870;
+            item->text = sPakMenuText_LoadNote_B4870;
         } else {
-            field->text = sPakMenuText_LoadNote_B4888;
+            item->text = sPakMenuText_LoadNote_B4888;
         }
-        goto done;
-    }
-    if (gPakMenuIsSave != 0) {
-        if (rel < 16) {
-            field->text = sPakMenuText_DeleteNote;
+    } else if (gPakMenuIsSave != 0) {
+        if (k < 16) {
+            item->text = sPakMenuText_DeleteNote;
             return 0;
         }
-        if (option == 0x15) {
-            field->text = sPakMenuText_Space;
+        if (n == 21) {
+            item->text = sPakMenuText_Space;
         } else if (gPakMenuIsProfile != 0) {
-            field->text = sPakMenuText_SaveNote_B487C;
+            item->text = sPakMenuText_SaveNote_B487C;
         } else {
-            field->text = sPakMenuText_SaveNote_B4894;
+            item->text = sPakMenuText_SaveNote_B4894;
         }
-        goto done;
+    } else if (gPakMenuAnyPak != 0) {
+        item->text = sPakMenuText_ControllerPakMenu;
     }
-    if (gPakMenuAnyPak != 0) {
-        field->text = sPakMenuText_ControllerPakMenu;
-    }
-done:
     return 0;
 }

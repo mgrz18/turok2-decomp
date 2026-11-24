@@ -1,78 +1,61 @@
-/* WRONG CUT: the real function starts at 0x004595D8 (size 0x1A4 = 420): splat
- * cut its first two words (lui/lw gPakMenuAnyPak) as CharNoteMenu_SelectYes_2. */
+/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00408C78.c, func_00408C78.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+
 #include "common.h"
-#include "structs/menu.h"
+#include "protos/pak_2.h"
+#include "structs/camera.h"
 #include "structs/game.h"
 #include "structs/player.h"
-#include "structs/camera.h"
+#include "structs/menu.h"
+#include "structs/pak.h"
 #include "globals/game.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
+#include "structs/camera.h"
+#include "protos/pak.h"
+#include "protos/pakmenu.h"
 
-/* Level chosen: load it, or set up the new player from the saved settings, or
- * open the next menu page. */
-
-extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gPakMenuPort; /* local: globals/pak.h is not included here (its gPakProfile would clash with this file's local-type view) */
-extern s32 gPakMenuLeaving; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 sCharNoteLoad; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gPakNoteIndex; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern u8 gPakProfile_character; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern u16 gPakProfile[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern u16 gPakProfile_deaths[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern u16 gPakProfile_kills[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern u16 gPakProfile_tags[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern u8 gPakProfile_name[8]; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern s8 gPakProfileRead_character; /* local type: the field's real type (or the member path) changes the ROM's code here */
-
-s32 PakMenu_CheckPak_2(Menu *event, s32 mode, s32 arg2);
-CPlayer *CPlayerPool__FindByController(void *state, ControllerProfile *args);
-void CPlayer__SetCharacter_2(CPlayer *player, s32 arg1);
-void MenuPool_OpenChildMenu_2(void *menu, Menu *event, void *page);
-s32 Pak_DeleteNote_2(s32 mode, s32 arg1);
-void MenuPool_OpenMenu_2(void *menu, void *page, void *player, void *args, void *prev);
-
-static __inline__ s32 currentMode(Menu *event) {
-    s32 mode;
-
-    if (gPakMenuAnyPak != 0) {
-        mode = gPakMenuPort;
-    } else {
-        mode = event->controller->port;
-    }
-    return mode;
-}
-
-s32 CharNoteMenu_SelectYes_2(void *arg0, Menu *event) {
-    s32 mode = currentMode(event);
-    CPlayer *player;
-    CPlayerOptions *options;
+void *CPlayerPool__FindByController(char *object, sptr arg1); /* code/CPlayer's definition */
+void CPlayer__SetCharacter_2(CPlayer *a, s32 b);
+/* Turok 2 inlines this (Rage Wars calls it) */
+static inline void O01Restore(CPlayer *a) {
+    CPlayerOptions *s = a->m_pOptions;
     s32 i;
-
-    if (PakMenu_CheckPak_2(event, mode, 0) != 0) {
+    s->m_nCharacter = gPakProfile.character;
+    s->m_Suicides = gPakProfile.suicides;
+    s->m_Deaths = gPakProfile.deaths;
+    s->m_Kills = gPakProfile.kills;
+    s->m_Tags = gPakProfile.tags;
+    for (i = 0; i < 8; i++) {
+        s->m_Name[i] = gPakProfile.name[i];
+    }
+}
+s32 CharNoteMenu_SelectYes_2(s32 unused, Menu *own) {
+    s32 pad;
+    CPlayer *plr;
+    if (gPakMenuAnyPak != 0) {
+        pad = gPakMenuPort;
+    } else {
+        pad = own->controller->port;
+    }
+    if (PakMenu_CheckPak_2(own, pad, 0) != 0) {
         gPakMenuLeaving = 1;
         return 1;
     }
     if (sCharNoteLoad != 0) {
-        player = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, event->controller);
-        event->player = player;
-        options = player->m_pOptions;
-        options->m_nCharacter = gPakProfile_character;
-        options->m_Suicides = gPakProfile[0];
-        options->m_Deaths = gPakProfile_deaths[0];
-        options->m_Kills = gPakProfile_kills[0];
-        options->m_Tags = gPakProfile_tags[0];
-        for (i = 0; i < 8; i++) {
-            options->m_Name[i] = gPakProfile_name[i];
-        }
-        CPlayer__SetCharacter_2(player, gPakProfileRead_character);
-        MenuPool_OpenChildMenu_2(player->m_pCamera->m_MenuPool, event, &gPlayerSetupMenuDesc_2);
+        plr = CPlayerPool__FindByController((char *) &gEngineApp_m_Game.m_PlayerList, (sptr) own->controller);
+        own->player = plr;
+        O01Restore(plr);
+        CPlayer__SetCharacter_2(plr, (s8) gPakProfileRead_character);
+        MenuPool_OpenChildMenu_2((u8 *)plr->m_pCamera->m_MenuPool, own, (u8 *)&gPlayerSetupMenuDesc_2);
         return 1;
     }
-    if (Pak_DeleteNote_2(mode, gPakNoteIndex) == 0) {
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakMsgDeleteDoneDesc_2, event->player, event->controller, event->context);
+    if (Pak_DeleteNote_2(pad, gPakNoteIndex) == 0) {
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgDeleteDoneDesc_2, own->player, own->controller, (void *)own->context);
     } else {
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakMsgDeleteFailedDesc_2, event->player, event->controller, event->context);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgDeleteFailedDesc_2, own->player, own->controller, (void *)own->context);
     }
     return 1;
 }

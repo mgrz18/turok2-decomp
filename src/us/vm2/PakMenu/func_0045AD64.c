@@ -1,19 +1,22 @@
-/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/FRONTEND/8040B45C_18.CPP, func_8040B3DC_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
 #include "common.h"
 #include "globals/menu_text.h"
+#include "structs/menu.h"
 #include "globals/pak.h"
-struct FieldRecAt14;
-struct FieldRecAt14 {
-    char pad[0x14];
-    char *text;
-};
-s32 GameNoteMenu_UpdateTitle_2(struct FieldRecAt14 *field) {
+
+#define T2_TEXT(s) ((s32 *) (s))
+
+#ifdef TARGET_PORT
+#else
+#endif
+#ifdef TARGET_PORT
+#else
+#endif
+
+s32 GameNoteMenu_UpdateTitle_2(MenuItem *arg0) {
     if (sGameNoteLoad != 0) {
-        field->text = sGameNoteMenuText_NoteInfo;
+        arg0->table = T2_TEXT(sGameNoteMenuText_NoteInfo);
     } else {
-        field->text = sGameNoteMenuText_DeleteNote;
+        arg0->table = T2_TEXT(sGameNoteMenuText_DeleteNote);
     }
     return 0;
 }

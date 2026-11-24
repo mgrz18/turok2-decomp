@@ -2,13 +2,14 @@
  * loads the player into $v0 and copies it to $s0 (pp, then p as the copy the branches use), and the constant 1 of
  * the error branch gets its own register (natural C shares one $s register for every 1: cse2 follows the jumps
  * into that branch). Already cse1 replaces the error branch's 1 with the first one's register: the
- * Pak_GetStatus jump is followed, its label having one use and a barrier before it. Tried in the L pass,
+ * Pak_GetStatus_2 jump is followed, its label having one use and a barrier before it. Tried in the L pass,
  * none splitting the 1 or loading the player through $v0: one `p` read once, `plr` copied into `p` in
  * each branch, a chained `gPakMenuIsSave = gPakMenuWrites = 1`, a `one` local for every 1, inline reset
  * and error helpers, early returns instead of the elses, both if/else orders, and an empty do-while
- * (its loop-end note stops cse1, but cse2 runs after loop and ignores it). Twin of PakMenu_InitSaveGame (same C). */
+ * (its loop-end note stops cse1, but cse2 runs after loop and ignores it). Twin of PakMenu_InitSaveGame_2 (same C). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00406F7C.c, func_00406F7C, with Turok 2's layouts. */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
@@ -16,22 +17,18 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 #include "structs/camera.h"
 #include "structs/pak.h"
+#include "protos/pak.h"
+#include "protos/pakmenu.h"
 
 /* Controller pak menu, "save" entry: when the pak is ready, builds the save note (with its checksum) and
  * opens the save menu; otherwise shows why the pak cannot be used. */
 
 
 extern s32 gScene_unk_30; /* local: globals/scene.h; gScene.unk_30 (the member) moves the ROM's registers here. save size */
-void Pak_ProbeSlot_2(s32 ch);
-s32 Pak_GetStatus_2(s32 ch);
-s32 Pak_IsRumblePak_2(s32 ch);
-s32 Pak_NeedsRepair_2(s32 ch);
 void SaveGame_Build_2(CPlayer *p);
-void PakMenu_UpdateNoteRows_2(Menu *o);
-u32 Crc32_Compute_2(u8 *data, s32 len, u32 crc);
-void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, sptr d, void *e);
 
 void PakMenu_InitSaveGame_2(Menu *own) {
     CPlayer *plr;

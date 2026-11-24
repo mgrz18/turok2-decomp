@@ -1,12 +1,12 @@
-/* Second-module copy of DamagedPakMenu_SelectRepair (first module; this one at link address 0x004235B0), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
+#include "protos/pakmenu.h"
 
-s32 PakMenu_CheckPak_2(void *event, s32 port, s32 arg2);
-void MenuPool_OpenMenu_2(char *dst, char *fmt, u8 *player, sptr arg3, char *arg4);
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {
@@ -16,7 +16,7 @@ static __inline__ s32 GetPort(Menu *event) {
 }
 
 s32 DamagedPakMenu_SelectRepair_2(s32 unused, Menu *event) {
-    if (PakMenu_CheckPak_2(event, GetPort(event), 1) != 0) {
+    if (PakMenu_CheckPak_2((struct Menu *) event, GetPort(event), 1) != 0) {
         gPakMenuLeaving = 1;
         if (event->context == (char *)&gSavePortalMenuDescB_2 || event->context == (char *)&gSavePortalMenuDesc_2) {
             gCameraPoolHideViews = 0;

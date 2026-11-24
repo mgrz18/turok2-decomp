@@ -2,9 +2,9 @@
 #include "globals/pak.h"
 
 
-s32 PakMenu_GetPort_2(char *arg0) {
+s32 PakMenu_GetPort_2(void *arg0) {
     if (gPakMenuAnyPak != 0) {
         return gPakMenuPort;
     }
-    return *(s8 *) (*(char **) (arg0 + 0x20) + 4);
+    return *(s8 *)(*(u8 **)((u8 *)arg0 + 0x20) + 4);
 }

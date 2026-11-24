@@ -1,14 +1,10 @@
-/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/PAK/80409A88_5.CPP, func_80409FA0_de.
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80409A5C_de_4.c, func_80409FA0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-#ifdef TARGET_PORT
-typedef __INTPTR_TYPE__ sptr;
-#else
-typedef s32 sptr;
-#endif
-extern void Pak_GetNoteGameName_2(s32,s32,sptr *),Pak_DecodeText_2(sptr,void *,s32);
-extern s32 Str_Compare_2(void *,void *);
+#include "rw/abu_types.h"
+#include "protos/pak_2.h"
+#include "protos/pak.h"
+
 s32 PakMenu_FindNoteByName_2(void *unused, void *arg1, s32 arg2, s32 *arg3) {
     char sp10[16];
     sptr sp20;

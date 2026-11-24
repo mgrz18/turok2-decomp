@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
@@ -9,48 +10,44 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 #include "structs/camera.h"
+#include "protos/pak.h"
+#include "protos/pakmenu.h"
 
-void Pak_ProbeSlot_2(s32 ch);
-s32 Pak_GetStatus_2(s32 ch);
-s32 Pak_IsRumblePak_2(s32 ch);
-s32 Pak_NeedsRepair_2(s32 ch);
-void PakMenu_UpdateNoteRows_2(Menu *o);
-u32 Crc32_Compute_2(u8 *data, s32 len, u32 crc);
-void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, sptr d, void *e);
-/* Static inlines in the Rage Wars source file (dropped by the importer). */
+/* O01Pick and O01Capture are separate functions in Rage Wars; inlined here in Turok 2. */
 static inline u8 *O01Pick(PakChannel *sel) {
-    u8 *p;
+    u8 *msg;
     switch (sel->channel) {
-    default:
     case 0:
-        p = (u8 *)&gStatsAfterPakMenuDesc1_2;
+    default:
+        msg = (u8 *)&gStatsAfterPakMenuDesc1_2;
         break;
     case 1:
-        p = (u8 *)&gStatsAfterPakMenuDesc2_2;
+        msg = (u8 *)&gStatsAfterPakMenuDesc2_2;
         break;
     case 2:
-        p = (u8 *)&gStatsAfterPakMenuDesc3_2;
+        msg = (u8 *)&gStatsAfterPakMenuDesc3_2;
         break;
     case 3:
-        p = (u8 *)&gStatsAfterPakMenuDesc4_2;
+        msg = (u8 *)&gStatsAfterPakMenuDesc4_2;
         break;
     }
-    return p;
+    return msg;
 }
 static inline void O01Capture(CPlayer *a) {
-    CPlayerOptions *p = a->m_pOptions;
+    CPlayerOptions *o = a->m_pOptions;
     s32 i;
-    gPakProfile.character = p->m_nCharacter;
-    gPakProfile.suicides = p->m_Suicides;
-    gPakProfile.deaths = p->m_Deaths;
-    gPakProfile.kills = p->m_Kills;
-    gPakProfile.tags = p->m_Tags;
+    gPakProfile.character = o->m_nCharacter;
+    gPakProfile.suicides = o->m_Suicides;
+    gPakProfile.deaths = o->m_Deaths;
+    gPakProfile.kills = o->m_Kills;
+    gPakProfile.tags = o->m_Tags;
     gPakProfile.reserved[0] = 0;
     gPakProfile.reserved[1] = 0;
     gPakProfile.reserved[2] = 0;
     for (i = 0; i < 8; i++) {
-        gPakProfile.name[i] = p->m_Name[i];
+        gPakProfile.name[i] = o->m_Name[i];
     }
 }
 void PakMenu_InitSaveProfile_2(Menu *own) {

@@ -1,14 +1,10 @@
-/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/FRONTEND/8040B45C_18.CPP, func_8040B3DC_de.
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80409A5C_de_6.c, func_8040A4A0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "common.h"
+#include "rw/abu_types.h"
 #include "globals/menu_text.h"
 #include "globals/pak.h"
-struct FieldRecAt14;
-struct FieldRecAt14 {
-    char pad[0x14];
-    char *text;
-};
+
 s32 DamagedPakMenu_UpdateContinue_2(struct FieldRecAt14 *field) {
     if (gPakMenuIsLoad != 0) {
         field->text = sDamagedPakMenuText_Continue;

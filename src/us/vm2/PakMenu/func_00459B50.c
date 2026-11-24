@@ -6,13 +6,8 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/pak_2.h"
 
-s32 PakMenu_CheckPak_2(Menu *o, s32 pad, s32 z);
-void Pak_ProbeSlot_2(s32 ch);
-s32 Pak_DeleteNote_2(s32 pad, s32 idx);
-s32 Pak_RepairIfDamaged_2(s32 pad);
-s32 PakMenu_WriteSaveGame_2(s32 a, Menu *o, s32 c);
-void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, void *d, void *e);
 s32 PakConfirmMenu_SelectYes_2(s32 a, Menu *own, s32 c) {
     s32 pad;
     switch (gPakConfirmKind) {
@@ -46,7 +41,7 @@ s32 PakConfirmMenu_SelectYes_2(s32 a, Menu *own, s32 c) {
         } else {
             Pak_ProbeSlot_2(pad);
             if (Pak_DeleteNote_2(pad, gPakNoteIndex) == 0) {
-                PakMenu_WriteSaveGame_2(a, own, c);
+                ((s32 (*)(s32, Menu *, s32)) PakMenu_WriteSaveGame_2)(a, own, c); /* passes a third word the definition does not take */
                 return 1;
             } else {
                 MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakMsgDeleteFailedDesc_2, own->player, own->controller, own->context);

@@ -2,15 +2,15 @@
 #include "globals/pak.h"
 #include "globals/menu.h"
 
-/* The second argument: only its word at 0x10 is read (0 or 1 passes). */
+/* Only the field read here. */
 typedef struct {
     /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ u32 kind;
-} Arg1;
+    /* 0x10 */ u32 unk10;
+} CallbackArg;
 
 
-void SavePortalMenu_Close_2(s32 arg0, Arg1 *arg1) {
-    if ((sSavePortalDone == 0) && (gSavePortalActive != 0) && (arg1->kind < 2U)) {
+void SavePortalMenu_Close_2(s32 arg0, CallbackArg *arg1) {
+    if ((sSavePortalDone == 0) && (gSavePortalActive != 0) && (arg1->unk10 < 2U)) {
         sSavePortalDone = 1;
         gCameraPoolHideViews = 1;
     }

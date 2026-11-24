@@ -1,56 +1,59 @@
+/* WRONG CUT: real function 0x0041DC5C, size 0x134 (through 0x0041DD90): splat cut it in two
+ * (PakMenu_GetReturnMenu_2, func_0041DCB0) at a load in a delay slot. MATCHES over the real extent
+ * (checked with the symbol size overridden to 0x134). */
 #include "common.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
 
-/* Pick the menu page to go back to, from the game mode flags. */
+static __inline__ void *TmplForKind(s32 *kindp) {
+    /* by address: kind stays in its stack slot, as in the ROM */
+    void *t;
 
-static __inline__ void *modePage(s32 *mode) {
-    void *page;
-
-    switch (*mode) {
+    switch (*kindp) {
     case 0:
     default:
-        page = &gStatsAfterPakMenuDesc1_2;
+        t = &gStatsAfterPakMenuDesc1_2;
         break;
     case 1:
-        page = &gStatsAfterPakMenuDesc2_2;
+        t = &gStatsAfterPakMenuDesc2_2;
         break;
     case 2:
-        page = &gStatsAfterPakMenuDesc3_2;
+        t = &gStatsAfterPakMenuDesc3_2;
         break;
     case 3:
-        page = &gStatsAfterPakMenuDesc4_2;
+        t = &gStatsAfterPakMenuDesc4_2;
         break;
     }
-    return page;
+    return t;
 }
 
-void *PakMenu_GetReturnMenu_2(Menu *event) {
-    void *page = NULL;
-    s32 mode;
+/* Picks the menu template to open for the current game mode. */
+void *PakMenu_GetReturnMenu_2(Menu *c) {
+    void *tmpl = NULL;
+    s32 kind;
 
-    if (gPakMenuIsSave != 0) {
-        if (gPakMenuIsProfile != 0) {
-            if (gPakMenuAnyPak != 0) {
-                mode = gPakMenuPort;
+    if (gPakMenuIsSave) {
+        if (gPakMenuIsProfile) {
+            if (gPakMenuAnyPak) {
+                kind = gPakMenuPort;
             } else {
-                mode = event->controller->port;
+                kind = c->controller->port;
             }
-            page = modePage(&mode);
+            tmpl = TmplForKind(&kind);
         } else {
-            page = &gSavePortalMenuDescB_2;
+            tmpl = &gSavePortalMenuDescB_2;
         }
-    } else if (gPakMenuIsLoad != 0) {
-        if (gPakMenuIsProfile != 0) {
-            page = &gCharacterMenuAfterPakDesc_2;
-        } else if (gSavePortalActive != 0) {
-            page = &gSavePortalMenuDescB_2;
+    } else if (gPakMenuIsLoad) {
+        if (gPakMenuIsProfile) {
+            tmpl = &gCharacterMenuAfterPakDesc_2;
+        } else if (gSavePortalActive) {
+            tmpl = &gSavePortalMenuDescB_2;
         } else {
-            page = &gSingleMenuAfterPakDesc_2;
+            tmpl = &gSingleMenuAfterPakDesc_2;
         }
-    } else if (gPakMenuAnyPak != 0) {
-        page = &gPakSaveGameAnyPakMenuDesc_2;
+    } else if (gPakMenuAnyPak) {
+        tmpl = &gPakSaveGameAnyPakMenuDesc_2;
     }
-    return page;
+    return tmpl;
 }

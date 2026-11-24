@@ -1,5 +1,7 @@
+/* First-module twin of src/us/code/PakMenu_SelectCancel_2.c. WRONG CUT: REAL PakMenu_SelectCancel_2 size 0x2B8 (0x0042019C-0x00420454); splat cut its tail into func_004203B0. Matches whole (checked with the size overridden). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004085E0.c, func_004085E0, with Turok 2's layouts. */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
@@ -9,14 +11,14 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 #include "structs/camera.h"
 
 /* Controller pak menu: stops the pak sounds and shows the message for the pak's state. */
 
-void CCache__Flush(s32 a);
-void CCache__Deallocate(sptr a, sptr b);
-CPlayer *CPlayerPool__FindByController(void *a, void *b);
-void MenuPool_OpenMenu_2(void *a, void *b, sptr c, sptr d, sptr e);
+extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
+extern void CCache__Deallocate(sptr, void *);
+void *CPlayerPool__FindByController(char *object, sptr arg1); /* code/CPlayer's definition */
 
 s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
     struct {
@@ -29,7 +31,7 @@ s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
     CPlayer *u;
 
     if (gSaveBufferHandle != 0 || gLoadBufferHandle != 0) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
     }
     if (gSaveBufferHandle != 0) {
         CCache__Deallocate(0, gSaveBufferHandle);
@@ -58,7 +60,7 @@ s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
     if (gPakMenuIsProfile != 0) {
         if (gPakMenuIsLoad != 0) {
             gPakMenuLeaving = 1;
-            plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, arg->controller);
+            plr = CPlayerPool__FindByController((char *) &gEngineApp_m_Game.m_PlayerList, (sptr) arg->controller);
             MenuPool_OpenMenu_2((u8 *)plr->m_pCamera->m_MenuPool, (u8 *)&gCharacterMenuDesc_2, (sptr)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
@@ -88,7 +90,7 @@ s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
         }
         return 0;
     }
-    plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, arg->controller);
+    plr = CPlayerPool__FindByController((char *) &gEngineApp_m_Game.m_PlayerList, (sptr) arg->controller);
     if (gPakMenuIsLoad != 0) {
         gPakMenuLeaving = 1;
         MenuPool_OpenMenu_2(gEngineApp_m_Game.m_MenuPool, (u8 *)&gSingleMenuAfterPakDesc_2, (sptr)plr, plr->m_ContState.m_pContState, mm.m);

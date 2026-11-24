@@ -1,9 +1,10 @@
-/* FAKEMATCH (round 21 audit): 2 empty `__asm__` barriers; without them: PakMenu_SelectNote_2 60 of 521
- * words. */
+/* FAKEMATCH (round 21 audit): 2 empty `__asm__` barriers; without them: PakMenu_SelectNote_2 60 of 521 words.
+ * */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00407748.c, func_00407748.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "protos/pak_2.h"
 #include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "structs/cache.h"
@@ -12,27 +13,21 @@
 #include "globals/pak.h"
 #include "structs/save.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 #include "globals/scene.h"
+#include "protos/pak.h"
+#include "protos/pakmenu.h"
 
-void *memset(void *s, int c, uptr n);
-s32 PakMenu_CheckPak_2();
-s32 Pak_FindNote_2();
-s32 Pak_ReadNote_2();
-s32 Crc32_Compute_2();
-s32 Pak_TextHasInvalidChar_2();
-void PakMenu_UpdateNoteRows_2();
-s32 Str_Compare_2();
-void Str_Copy_2();
-void CCache__Flush();
-void CCache__Deallocate();
-CMemEntry *CCache__Allocate();
-void *memset();
-void MenuPool_OpenMenu_2();
-s32 Str_Length_2();
-/* Turok 2 inlines this game/company-code check (Rage Wars calls it) */
-static inline s32 k7_chk(u8 *gc, u8 *cc) {
-    if (Str_Length_2(gc) == 4 && Str_Length_2(cc) == 2) {
-        if (Str_Compare_2(gc, gPakGameCode) == 0 && Str_Compare_2(cc, gPakCompanyCode) == 0) return 1;
+extern void *memset(void *dst, s32 value, uptr size);
+extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
+extern void CCache__Deallocate(sptr, void *);
+extern void **CCache__Allocate(s32, s32, s32, char *);
+extern void *memset(void *dst, s32 value, uptr size);
+/* Game code / company code check on the controller-pak note (inlined). */
+static __inline__ s32 k7_chk(u8 *gc, u8 *cc) {
+    if (Str_Length_2(gc) == 4 && Str_Length_2(cc) == 2 &&
+        Str_Compare_2(gc, gPakGameCode) == 0 && Str_Compare_2(cc, gPakCompanyCode) == 0) {
+        return 1;
     }
     return 0;
 }
@@ -96,7 +91,7 @@ L004079A0:
     if (s2 != 0) goto L00407AD0;
     s0 = sp4C;
     if (gLoadBufferHandle != 0) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
         CCache__Deallocate(0, gLoadBufferHandle);
     }
     if (s0 == 0) {
@@ -175,7 +170,7 @@ L00407CDC:
     if (Str_Compare_2(sp38, gPakGameNoteName) != 0) goto L00407EE8;
     s0 = sp4C;
     if (gLoadBufferHandle != 0) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
         CCache__Deallocate(0, gLoadBufferHandle);
     }
     if (s0 == 0) {
@@ -197,7 +192,7 @@ L00407CDC:
 L00407E70:
     s2 = 1;
     if (gSaveBufferHandle != 0 || gLoadBufferHandle != 0) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
     }
     if (gSaveBufferHandle != 0) {
         CCache__Deallocate(0, gSaveBufferHandle);

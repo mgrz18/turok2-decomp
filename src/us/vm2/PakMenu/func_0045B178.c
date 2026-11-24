@@ -1,4 +1,3 @@
-/* Second-module copy of CharNoteMenu_UpdateName (first module): the name, right-aligned in an 8-space field at text+11. */
 #include "common.h"
 #include "globals/menu_text.h"
 #include "structs/menu.h"
@@ -9,10 +8,9 @@ s32 CharNoteMenu_UpdateName_2(MenuItem *item) {
     s32 len = 8;
     u8 *src;
     char *field;
-    char *dst;
-    s32 i;
     char *p;
-    s32 space;
+    s32 i;
+    char c;
 
     if (gCharNoteMenuSaving != 0) {
         item->text = sCharNoteMenuText_NameExt;
@@ -23,17 +21,15 @@ s32 CharNoteMenu_UpdateName_2(MenuItem *item) {
             len--;
         }
         field = item->text;
-        space = ' ';
         field += 11;
-        p = field + 7;
+        c = ' ';
+        p = &field[7];
         for (i = 7; i >= 0; i--) {
-            *p = space;
-            p--;
+            *p-- = c;
         }
-        p = field + 8;
-        dst = p - len;
+        field = &field[8 - len];
         for (i = 0; i < len; i++) {
-            *dst++ = gPakProfileRead.name[i];
+            *field++ = gPakProfileRead.name[i];
         }
     }
     return 0;

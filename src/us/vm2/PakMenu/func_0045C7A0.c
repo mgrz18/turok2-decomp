@@ -1,14 +1,14 @@
-/* Second-module copy of DamagedPakMenu_SelectContinue (first module; this one at link address 0x004237A0), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 #include "structs/camera.h"
 
-void MenuPool_OpenMenu_2(char *dst, char *fmt, void *arg2, sptr arg3, sptr arg4);
 
 s32 DamagedPakMenu_SelectContinue_2(s32 unused, Menu *event) {
     char *dst;

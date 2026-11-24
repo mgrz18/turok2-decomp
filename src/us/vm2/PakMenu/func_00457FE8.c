@@ -1,7 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00407578.c, func_00407578, with Turok 2's layouts. */
-/* Second VM module copy of PakMenu_WriteSaveGame (same C, second-module symbols). */
 /* The result is tested through a copy (err = r): it stops jump threading before cse1, so the second r == 0 test survives as in the ROM. */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/pak.h"
@@ -9,25 +9,21 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 #include "globals/scene.h"
+#include "protos/pak.h"
 
 /* Controller pak save: when the pak has room and an existing note can be replaced, writes the save note;
  * stops the pak sounds and shows the result (or the "not enough space" message). */
 
-u32 Pak_BytesToPages_2(u32 n);
-s32 Pak_GetFreePages_2(s32 pad, s32 *out);
-s32 Pak_CountEmptyNotes_2(s32 pad, s32 *out);
-s32 Pak_FindFreeExtLetter_2(s32 pad, u8 *ext);
-s32 Pak_SaveNoteVerified_2(s32 pad, s32 size, sptr buf, char *n1, u8 *ext, char *n2);
-void CCache__Flush(s32 a);
-void CCache__Deallocate(sptr a, sptr b);
+extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
+extern void CCache__Deallocate(sptr, void *);
 void Cinema_StopAtEnd_2(void);
 void Cinema_RequestById_2(s32 a);
-void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, sptr d, sptr e);
 
 static __inline__ void FreeAll(void) {
     if (gSaveBufferHandle != 0 || gLoadBufferHandle != 0) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
     }
     if (gSaveBufferHandle != 0) {
         CCache__Deallocate(0, gSaveBufferHandle);

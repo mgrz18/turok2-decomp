@@ -1,29 +1,23 @@
+/* REAL PakMenu_InitSaveGameAnyPak_2 size 0x584 (0x0041E500-0x0041EA84); splat cut it into PakMenu_InitSaveGameAnyPak_2 + func_0041E7D0 + func_0041E824 + func_0041E97C. Matches whole (checked with the size overridden). Twin of src/us/code/PakMenu_InitSaveGameAnyPak_2.c. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004069F4.c, func_004069F4, with Turok 2's layouts. */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "structs/game.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 #include "globals/scene.h"
+#include "protos/pak.h"
+#include "protos/pakmenu.h"
 
 /* Controller pak menu, load: finds a pad with a controller pak (trying each pad in turn), checks it for the
  * game's notes and free space and opens the load menu, or shows why the pak cannot be used. */
 
 s32 Controller_AnyConnected(void);
-void CEngineApp__UpdateControllers(u8 *a);
-s32 Str_Compare_2(u8 *a, char *b);
-void Pak_ProbeSlot_2(s32 a);
-s32 Pak_GetStatus_2(s32 a);
-s32 Pak_CountEmptyNotes_2(s32 a, s32 *b);
-s32 Pak_GetFreePages_2(s32 a, s32 *b);
-void Pak_GetNoteGameName_2(s32 a, s32 b, sptr *c);
-s32 Pak_NeedsRepair_2(s32 a);
-void Pak_DecodeText_2(sptr a, u8 *b, s32 c);
-s32 Pak_BytesToPages_2(s32 a);
-void PakMenu_UpdateNoteRows_2(Menu *o);
+void CEngineApp__UpdateControllers(void); /* the definition takes none; the calls pass the app */
 s32 PakMenu_CheckSlotForSave_2(Menu *o, s32 a, s32 *b, s32 *c);
-void MenuPool_OpenMenu_2(u8 *a, u8 *b, sptr c, ControllerProfile *d, void *e);
 
 #define PAK_ERROR()                                                        \
     gPakMenuLeaving = 1;                                                        \
@@ -80,7 +74,7 @@ void PakMenu_InitSaveGameAnyPak_2(Menu *arg0) {
     if (Pak_NeedsRepair_2(gPakMenuPort) != 0) {
         goto blk59;
     }
-    CEngineApp__UpdateControllers(&gEngineApp);
+    ((void (*)(void *)) CEngineApp__UpdateControllers)(&gEngineApp);
     if ((arg0->controller->buttons & 0x1000) && sPakMenuStartLatched == 0) {
         gPakMenuStartPressed = 1;
         sPakMenuStartLatched = 1;

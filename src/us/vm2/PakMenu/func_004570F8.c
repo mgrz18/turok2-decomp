@@ -1,23 +1,22 @@
-/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/PAK/80405DC0_7.CPP, func_804066BC_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
+/* WRONG CUT: real function 0x0041E1D8, size 0x19C (through 0x0041E374): splat cut it in two
+ * (PakMenu_InitLoadProfile_2, func_0041E294) at a jal's delay slot. */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 #include "structs/camera.h"
+#include "protos/pak.h"
+#include "protos/pakmenu.h"
 
-void PakMenu_UpdateNoteRows_2(Menu *menu);
-extern void Pak_ProbeSlot_2(s32 ch);
-extern s32 Pak_GetStatus_2(s32 ch);
-extern s32 Pak_IsRumblePak_2(s32 ch);
-extern s32 Pak_NeedsRepair_2(s32 ch);
-extern void MenuPool_OpenMenu_2(char *, char *, CPlayer *, ControllerProfile *, char *);
-void PakMenu_InitLoadProfile_2(Menu *menu) {
-    s32 ch;
+
+void PakMenu_InitLoadProfile_2(Menu *m) {
+    s32 kind;
+
     gPakMenuIsSave = 0;
     gPakMenuWrites = 0;
     gPakMenuIsLoad = 1;
@@ -25,24 +24,24 @@ void PakMenu_InitLoadProfile_2(Menu *menu) {
     gPakMenuMode = 1;
     gPakMenuLeaving = 0;
     gPakMenuAnyPak = 0;
-    menu->items[20].flags &= ~0x01000000;
-    ch = menu->controller->port;
-    if (gDamagedPakContinued != 0) {
+    m->items[20].flags &= ~0x1000000;
+    kind = m->controller->port;
+    if (gDamagedPakContinued) {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu_2((char *)menu->player->m_pCamera->m_MenuPool, (char *)&gCharacterMenuAfterPakDesc_2, menu->player, menu->controller, 0);
+        MenuPool_OpenMenu_2((u8 *)m->player->m_pCamera->m_MenuPool, &gCharacterMenuAfterPakDesc_2, m->player, m->controller, NULL);
         return;
     }
-    Pak_ProbeSlot_2(ch);
-    if (Pak_GetStatus_2(ch) == 0) {
-        PakMenu_UpdateNoteRows_2(menu);
+    Pak_ProbeSlot_2(kind);
+    if (!Pak_GetStatus_2(kind)) {
+        PakMenu_UpdateNoteRows_2(m);
         return;
     }
     gPakMenuLeaving = 1;
-    if (Pak_IsRumblePak_2(ch) != 0) {
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (char *)&gPakMsgInsertToLoadDesc_2, menu->player, menu->controller, (char *)&gCharacterMenuAfterPakDesc_2);
-    } else if (Pak_NeedsRepair_2(ch) != 0) {
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (char *)&gDamagedPakAtBootMenuDesc_2, menu->player, menu->controller, (char *)&gPakLoadProfileMenuDesc_2);
+    if (Pak_IsRumblePak_2(kind)) {
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakMsgInsertToLoadDesc_2, m->player, m->controller, &gCharacterMenuAfterPakDesc_2);
+    } else if (Pak_NeedsRepair_2(kind)) {
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gDamagedPakAtBootMenuDesc_2, m->player, m->controller, &gPakLoadProfileMenuDesc_2);
     } else {
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (char *)&gPakMsgPakNotFoundDesc_2, menu->player, menu->controller, (char *)&gCharacterMenuAfterPakDesc_2);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakMsgPakNotFoundDesc_2, m->player, m->controller, &gCharacterMenuAfterPakDesc_2);
     }
 }

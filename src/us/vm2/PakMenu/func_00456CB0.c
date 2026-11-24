@@ -1,22 +1,18 @@
-/* Second-module copy of PakMenu_CheckPak (build/manual/W/PakMenu_CheckPak.c), with its first-module addresses 0xE0 lower. */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
+#include "protos/pak.h"
+#include "protos/pakmenu.h"
 
 /* Checks the controller pak in the given slot before a save/load menu:
  * returns the pak status, or -1 after opening the "pak full" dialog; opens the
  * matching warning dialog (templates D_0043xxxx) when the pak is missing,
  * damaged or unformatted. */
 
-extern void Pak_ProbeSlot_2(s32 slot);
-extern s32 Pak_GetStatus_2(s32 slot);
-extern void *PakMenu_GetReturnMenu_2(Menu *c);
-extern s32 Controller_TakePakChanged(s32 slot);
-extern s32 Pak_IsRumblePak_2(s32 slot);
-extern s32 Pak_NeedsRepair_2(s32 slot);
-extern void MenuPool_OpenMenu_2(void *menus, void *tmpl, sptr a, sptr b, void *parent);
 
 s32 PakMenu_CheckPak_2(Menu *c, s32 slot, s32 quiet) {
     s32 status;

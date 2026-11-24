@@ -1,18 +1,22 @@
 #include "common.h"
+#include "structs/menu.h"
 #include "globals/pak.h"
+extern s32 gPakMessageKindView[] __asm__("gPakMessageKind"); /* the array view keeps the ROM code */
 
 s32 Controller_DisableMenuSounds(void *, void *);              /* extern */
 
-void PakMessage_InitNoController_2(void *arg0)
+void PakMessage_InitNoController_2(Menu *arg0)
 {
-  void *temp_a0;
-  void *temp_a1;
-  s32 new_var;
-  temp_a1 = *((void **) (((s8 *) arg0) + 0xC));
-  *((s32 *) (((s8 *) temp_a1) + 0x120)) = (s32) ((*((s32 *) (((s8 *) temp_a1) + 0x120))) & 0xFBFFFFFF);
-  temp_a0 = *((void **) (((s8 *) arg0) + 0xC));
-  new_var = (s32) ((*((s32 *) (((s8 *) temp_a0) + 0x120))) | 8);
-  gPakMessageKind = 8;
-  *((s32 *) (((s8 *) temp_a0) + 0x120)) = new_var;
+  s32 new_var2;
+  MenuItem *temp_a0;
+  MenuItem *temp_a1;
+  int new_var;
+  temp_a1 = arg0->items;
+  new_var = temp_a1[7].flags & 0xFBFFFFFF;
+  temp_a1[7].flags = (s32) new_var;
+  temp_a0 = arg0->items;
+  new_var2 = temp_a0[7].flags;
+  gPakMessageKindView[0] = 8;
+  temp_a0[7].flags = (s32) (new_var2 | 8);
   Controller_DisableMenuSounds(temp_a0, temp_a1);
 }

@@ -1,76 +1,86 @@
-/* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00408870.c, func_00408870, with Turok 2's layouts. */
+/* WRONG CUT: real function 0x00420454, size 0x264 (through 0x004206B8): splat cut it into
+ * GameNoteMenu_SelectYes_2, func_004205B8 and func_004205C4 inside its straight-line code. */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/world.h"
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "structs/save.h"
-#include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
+#include "protos/pak.h"
+#include "protos/pakmenu.h"
 
-/* Controller pak menu, load: after the pak check, copies the loaded save into the player and the game state
- * and shows the "loaded" message; otherwise reports whether the note could be read. */
+/* local: globals/game.h declares these, but its gEngineApp_m_Settings_unk180 (u8) clashes with the array view below, which the ROM needs here */
+extern GameSettings gEngineApp_m_Settings; /* local: globals/game.h is not included here (its field symbols clash with this file's views of unlockedCheats/unk180) */
+extern GameMatch gEngineApp_m_Settings_match; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
+extern CGame gEngineApp_m_Game; /* local: as above */
 
+/* Load game menu "select" handler: with the pak checked, either restores the
+ * loaded save (player block, game progress, level times, the level's key
+ * bytes) and opens the "game loaded" dialog, or opens the "no save"/"bad
+ * save" dialog for the pak note. */
+
+extern u32 gUnlockedCheatsView[] __asm__("gEngineApp_m_Settings_unlockedCheats"); /* local type: the field's real type (or the member path) changes the ROM's code here */
+extern u8 gSettingsUnk180View[] __asm__("gEngineApp_m_Settings_unk180"); /* local type: GameSettings.unk180 read as an array (other registers otherwise) */
 extern f32 gEngineApp_m_Settings_match_seconds[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern f32 gEngineApp_m_Settings_match_minutes[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern f32 gEngineApp_m_Settings_match_hours[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern u8 gEngineApp_m_Game_m_MenuPool[]; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
-s32 PakMenu_CheckPak_2(Menu *o, s32 pad, s32 z);
-CPlayer *CPlayerPool__FindByController(CPlayerPool *list, ControllerProfile *s);
-s32 Pak_DeleteNote_2(s32 pad, s32 idx);
-void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, sptr d, sptr e);
+extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
-s32 GameNoteMenu_SelectYes_2(s32 unused, Menu *own) {
-    f32 *new_var;
-    s32 pad;
-    CPlayer *plr;
-    CScene *g;
-    u8 save;
+void *CPlayerPool__FindByController(char *object, sptr arg1); /* code/CPlayer's definition */
+
+s32 GameNoteMenu_SelectYes_2(void *menu, Menu *c) {
+    s32 slot;
+    CPlayer *player;
+    u8 keep;
     s32 i;
-    SaveGame *c;
     u8 *src;
-    u8 *dp;
+    u8 *dst;
+    CScene *world;
 
-    if (gPakMenuAnyPak != 0) {
-        pad = gPakMenuPort;
+    if (gPakMenuAnyPak) {
+        slot = gPakMenuPort;
     } else {
-        pad = own->controller->port;
+        slot = c->controller->port;
     }
-    if (PakMenu_CheckPak_2(own, pad, 0) != 0) {
+    if (PakMenu_CheckPak_2(c, slot, 0) != 0) {
         gPakMenuLeaving = 1;
         return 1;
     }
     if (sGameNoteLoad != 0) {
-        plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, own->controller);
-        g = &gScene;
-        save = gEngineApp_m_Settings_unk180;
-        plr->m_Data = gLoadBuffer->player;
-        {
-            *(GameSettingsBlock *)&gEngineApp_m_Settings = gLoadBuffer->settings;
-            c = gLoadBuffer;
+        player = CPlayerPool__FindByController((char *) &gEngineApp_m_Game.m_PlayerList, (sptr) c->controller);
+        world = &gScene;
+        keep = gSettingsUnk180View[0];
+        player->m_Data = gLoadBuffer->player;
+        *(GameSettingsBlock *)&gEngineApp_m_Settings = gLoadBuffer->settings;
+        gEngineApp_m_Settings_match.frames = gLoadBuffer->frames;
+        gEngineApp_m_Settings_match_seconds[0] = gLoadBuffer->seconds;
+        gEngineApp_m_Settings_match_minutes[0] = gLoadBuffer->minutes;
+        gScene_m_PreviewOptions = gUnlockedCheatsView[0];
+        gEngineApp_m_Settings_match_hours[0] = gLoadBuffer->hours;
+        src = gLoadBuffer->levelFlags;
+        dst = gLoadSavePersistentData;
+        gSettingsUnk180View[0] = keep;
+        for (i = 0; i < world->unk_30; i++) {
+            *dst++ = *src++;
         }
-        new_var = &c->seconds;
-        gEngineApp_m_Settings_match.frames = c->frames;
-        gEngineApp_m_Settings_match_seconds[0] = *new_var;
-        gEngineApp_m_Settings_match_minutes[0] = c->minutes;
-        gScene_m_PreviewOptions = gEngineApp_m_Settings.unlockedCheats;
-        gEngineApp_m_Settings_unk180 = save;
-        gEngineApp_m_Settings_match_hours[0] = c->hours;
-        src = c->levelFlags;
-        dp = gLoadSavePersistentData;
-        for (i = 0; i < g->unk_30; i++) {
-            *dp++ = *src++;
-        }
-        gEngineApp_m_Game.m_PlayerList.m_bCinema = 0;
-        gEngineApp_m_Game.m_PlayerList.m_bCinemaStarted = 0;
-        MenuPool_OpenMenu_2(gEngineApp_m_Game.m_MenuPool, &gPakMsgRumblePakDesc_2, plr, plr->m_ContState.m_pContState, 0);
+        gEngineApp_m_Game_m_PlayerList_m_bCinema[0] = 0;
+        gEngineApp_m_Game_m_PlayerList_m_bCinema[1] = 0;
+#ifdef TARGET_PORT
+        /* the port: m_bCinema + 0x588 is gEngineApp_m_Game.m_MenuPool at the N64 offsets */
+        MenuPool_OpenMenu_2(gEngineApp_m_Game.m_MenuPool, &gPakMsgRumblePakDesc_2, (sptr) player, (sptr) player->m_ContState.m_pContState, 0);
+#else
+        MenuPool_OpenMenu_2((u8 *) gEngineApp_m_Game_m_PlayerList_m_bCinema + 0x588, &gPakMsgRumblePakDesc_2, (sptr) player, player->m_ContState.m_pContState, NULL);
+#endif
         return 1;
     }
-    if (Pak_DeleteNote_2(pad, gPakNoteIndex) == 0) {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, &gPakMsgDeleteDoneDesc_2, own->player, own->controller, own->context);
+    if (Pak_DeleteNote_2(slot, gPakNoteIndex) == 0) {
+        MenuPool_OpenMenu_2(gEngineApp_m_Game.m_MenuPool, &gPakMsgDeleteDoneDesc_2, c->player, c->controller, c->context);
     } else {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, &gPakMsgDeleteFailedDesc_2, own->player, own->controller, own->context);
+        MenuPool_OpenMenu_2(gEngineApp_m_Game.m_MenuPool, &gPakMsgDeleteFailedDesc_2, c->player, c->controller, c->context);
     }
     return 1;
 }

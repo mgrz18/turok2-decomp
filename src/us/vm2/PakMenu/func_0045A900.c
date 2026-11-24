@@ -1,20 +1,18 @@
-/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/PAK/80409A88_5.CPP, func_80409F2C_de.
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80409A5C_de_4.c, func_80409F2C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "common.h"
-#include "structs/player.h"
-#include "structs/menu.h"
+#include "rw/abu_types.h"
+#include "protos/pak_2.h"
 #include "globals/pak.h"
+#include "protos/pak.h"
 
-extern void Pak_ProbeSlot_2(s32);
-void Pak_ProbeSlot_2(s32);
-extern void PakMenu_ProbeOwnerPort_2(struct Menu *record);
-void PakMenu_ProbeOwnerPort_2(struct Menu *record) {
+extern void PakMenu_ProbeOwnerPort_2(struct Shared_PakMenu *record);
+void PakMenu_ProbeOwnerPort_2(struct Shared_PakMenu *record) {
     s32 value;
     if (gPakMenuAnyPak != 0) {
         value = gPakMenuPort;
     } else {
-        value = record->controller->port;
+        value = record->owner->unk4;
     }
     Pak_ProbeSlot_2(value);
 }

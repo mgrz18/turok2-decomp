@@ -3,13 +3,11 @@
 #include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
+#include "protos/pak_2.h"
 
 /* Controller pak note list item: prints a note's name (16 characters), extension (4) and size in blocks
  * into the item's text; an empty slot prints blanks. */
 
-s32 Pak_FindNote_2(s32 pad, s32 idx, s32 *valid, u8 *name, u8 *ext, s32 *blocks, u8 *company, u8 *game);
-s32 Pak_TextHasInvalidChar_2(u8 *p, s32 n);
-char *Str_Copy_2(char *dst, char *src);
 /* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
 void sprintf(char *dst, const char *fmt, ...);
 

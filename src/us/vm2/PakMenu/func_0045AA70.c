@@ -2,11 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/pak_2.h"
+#include "protos/pak.h"
 
 extern s32 PakMenu_FindNextPakPort_2(s32 arg0);
-extern void Pak_ProbeSlot_2(s32);
-void Pak_ProbeSlot_2(s32);
-s32 Pak_GetStatus_2(s32);
 s32 PakMenu_FindNextPakPort_2(s32 arg0) {
     s32 var_s0;
     s32 var_s1;

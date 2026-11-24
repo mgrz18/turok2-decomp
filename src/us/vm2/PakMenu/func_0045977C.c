@@ -1,5 +1,9 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00408E1C.c, func_00408E1C, with Turok 2's layouts. */
+/* WRONG CUT: the real function is 0x0042085C-0x00420C30 (size 0x3D4, 245 words): splat split it into PakMessage_SelectOk_2 (0x1C),
+ * func_00420878 (0x68) and func_004208E0 (0x350). All 245 words match (checked over the real extent).
+ * Twin of src/us/code/PakMessage_SelectOk_2.c (first-module callees and data names, +0xE0). */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/menu.h"
@@ -8,19 +12,16 @@
 #include "globals/scene.h"
 #include "structs/game.h"
 #include "globals/menu_desc.h"
+#include "protos/scene.h"
+#include "protos/menu.h"
 #include "protos/game.h"
 #include "structs/camera.h"
+#include "protos/pak.h"
 
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
 void Controller_ResetRumble(ControllerProfile *a);
-void Controller_UnwatchPak(sptr a);
-s32 Controller_TakePakChanged(s32 a);
-void Pak_ProbeSlot_2(s32 a);
-s32 Pak_GetStatus_2(s32 a);
-void CScene__RequestWarp_2(u8 *a, s32 b, s32 c);
 void CEngineApp__StartCinemaGame_2(u8 *a);
-void MenuPool_OpenMenu_2(u8 *a, void *b, CPlayer *c, ControllerProfile *d, sptr e);
 
 s32 PakMessage_SelectOk_2(s32 a0, Menu *o) {
     s32 s0, s1, v;

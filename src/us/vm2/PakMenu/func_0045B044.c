@@ -1,21 +1,31 @@
-#include "globals/menu_desc.h"
-/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/PAK/80409A88_9.CPP, func_8040A6DC_de.
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80409A5C_de_8.c, func_8040A6DC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "common.h"
+#include "rw/abu_types.h"
+#include "protos/pak_2.h"
 #include "globals/menu.h"
+#include "structs/menu.h"
 #include "globals/pak.h"
-struct RecordRecAt24;
-struct RecordRecAt24 {
-    char pad[0x1C];
-    s32 first;
-    s32 second;
-    void *resource;
-};
-struct RecordRecAt24;
-extern s32 GameNoteMenu_SelectNo_2(void *unused, struct RecordRecAt24 *record);
-extern void MenuPool_OpenMenu_2(void *, void *, sptr, sptr, sptr);
-s32 GameNoteMenu_SelectNo_2(void *unused, struct RecordRecAt24 *record) {
+#include "globals/menu_desc.h"
+#include "protos/menu.h"
+
+#ifdef TARGET_PORT
+/* The port: RecordRecAt24 reads the player, the controller and the context at N64 offsets 0x1C/0x20/0x24;
+ * the host Menu (structs/menu.h) has them pointer-wide further on. */
+s32 GameNoteMenu_SelectNo_2(void *unused, Menu *record) {
+    if (sGameNoteLoad != 0) {
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakLoadGameMenuDesc_2, (sptr) record->player,
+                          (sptr) record->controller, 0);
+    } else {
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, record->context, (sptr) record->player,
+                          (sptr) record->controller, 0);
+    }
+    return 1;
+}
+#else
+/* The port body's signature; the N64 body reads the record through the Rage Wars view (a macro). */
+#define record ((struct RecordRecAt24 *) recordArg)
+s32 GameNoteMenu_SelectNo_2(void *unused, Menu *recordArg) {
     do {
         if (sGameNoteLoad != 0) {
             MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakLoadGameMenuDesc_2, record->first, record->second, 0);
@@ -25,3 +35,5 @@ s32 GameNoteMenu_SelectNo_2(void *unused, struct RecordRecAt24 *record) {
     } while (0);
     return 1;
 }
+#undef record
+#endif

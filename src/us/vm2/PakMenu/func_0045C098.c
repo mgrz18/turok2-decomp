@@ -1,13 +1,13 @@
-/* Second-module copy of SavePortalMenu_SelectSave (first module; this one at link address 0x00423098), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
 s32 Cinema_IsActive(void);
 s32 Cinema_IsFinished(void);
-void MenuPool_OpenMenu_2(char *dst, char *fmt, sptr arg2, sptr arg3, sptr arg4);
 
 static __inline__ s32 func_00422EE0_inline(void) {
     if (Cinema_IsActive() != 0 && Cinema_IsFinished() == 0) {

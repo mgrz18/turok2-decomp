@@ -1,17 +1,14 @@
-/* Second-module copy of SavePortalMenu_InitB (first module). The port comes back through a pointer (a stack slot), which gives the ROM's store-then-reload. */
 #include "common.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
+#include "protos/pak.h"
 
-void Controller_WatchPak(s32 port);
 
 
-static __inline__ void GetPort(Menu *event, s32 *port) {
-    if (gPakMenuAnyPak != 0) {
-        *port = gPakMenuPort;
-    } else {
-        *port = event->controller->port;
-    }
+/* Takes the port by address: the ROM keeps it in a stack slot (as PakMenu_GetReturnMenu_2 does with its kind). */
+static __inline__ void SelectPort(s32 *port) {
+    gDamagedPakContinued = 0;
+    Controller_WatchPak(*port);
 }
 
 void SavePortalMenu_InitB_2(Menu *event) {
@@ -22,7 +19,10 @@ void SavePortalMenu_InitB_2(Menu *event) {
     gPakMenuIsSave = 1;
     gPakMenuIsProfile = 0;
     sSavePortalChosen = 0;
-    GetPort(event, &port);
-    gDamagedPakContinued = 0;
-    Controller_WatchPak(port);
+    if (gPakMenuAnyPak != 0) {
+        port = gPakMenuPort;
+    } else {
+        port = event->controller->port;
+    }
+    SelectPort(&port);
 }

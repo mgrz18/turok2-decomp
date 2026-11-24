@@ -1,68 +1,90 @@
-/* Second-module copy of PakConfirmMenu_SelectNo (first module). NOTE: the ROM code reads jtbl_800C1450, whose entries are the first module copy's case addresses (link base 0x420F34, 0xE0 above this copy's 0x420E54): the switch here builds its own table, which will not equal the ROM's. */
 #include "common.h"
-#include "structs/camera.h"
+#include "protos/pak_2.h"
 #include "structs/player.h"
-#include "structs/menu.h"
+#include "structs/camera.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
-#include "structs/camera.h"
+#include "protos/menu.h"
+#include "protos/pakmenu.h"
 
-s32 PakMenu_CheckPak_2(void *event, s32 port, s32 arg2);
-char *PakMenu_GetReturnMenu_2(void *event);
-void MenuPool_OpenMenu_2(char *dst, char *fmt, CPlayer *player, sptr arg3, char *arg4);
+/* Menu item handler: depending on the menu state, checks the item (PakMenu_CheckPak_2) and prints its text, or (states 1
+ * and 2) resets the menu flags and opens the item's menu on its owner's camera. */
 
-static __inline__ s32 GetPort(Menu *event) {
+typedef struct {
+    /* 0x00 */ u8 pad0[0x4];
+    /* 0x04 */ s8 id;
+} ItemData;
+
+typedef struct {
+    /* the host Menu's leading fields (structs/menu.h: cursor .. param), pointers 8 bytes wide */
+    s16 cursor, offsetX, offsetY;
+    u8 _pad6[2];
+    void *block, *items;
+    s32 count;
+    void *desc, *param;
+    /* 0x1C */ CPlayer *owner;
+    /* 0x20 */ ItemData *data;
+    /* 0x24 */ void *string;
+} Item;
+
+
+static __inline__ s32 ItemId(Item *item) {
+    s32 id;
+
     if (gPakMenuAnyPak != 0) {
-        return gPakMenuPort;
-    }
-    return event->controller->port;
-}
-
-static __inline__ void ShowEvent(Menu *event) {
-    if (PakMenu_CheckPak_2(event, GetPort(event), 1) != 0) {
-        gPakMenuLeaving = 1;
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (sptr) event->controller, NULL);
+        id = gPakMenuPort;
     } else {
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (sptr) event->controller, NULL);
+        id = item->data->id;
     }
+    return id;
 }
 
-s32 PakConfirmMenu_SelectNo_2(s32 unused, Menu *event) {
-    char *text;
-    char *dst;
+s32 PakConfirmMenu_SelectNo_2(s32 arg0, Item *item) {
+    void *string;
 
     switch (gPakConfirmKind) {
         case 4:
-            ShowEvent(event);
+            if (PakMenu_CheckPak_2((struct Menu *) item, ItemId(item), 1)) {
+                gPakMenuLeaving = 1;
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, item->string, item->owner, item->data, 0);
+            } else {
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, item->string, item->owner, item->data, 0);
+            }
             break;
         case 3:
-            ShowEvent(event);
+            if (PakMenu_CheckPak_2((struct Menu *) item, ItemId(item), 1)) {
+                gPakMenuLeaving = 1;
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, item->string, item->owner, item->data, 0);
+            } else {
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, item->string, item->owner, item->data, 0);
+            }
             break;
         case 0:
-            ShowEvent(event);
+            if (PakMenu_CheckPak_2((struct Menu *) item, ItemId(item), 1)) {
+                gPakMenuLeaving = 1;
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, item->string, item->owner, item->data, 0);
+            } else {
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, item->string, item->owner, item->data, 0);
+            }
             break;
         case 1:
         case 2:
             gPakMenuLeaving = 1;
             gCameraPoolHideViews = 0;
-            if (gPakMenuAnyPak != 0) {
+            if (gPakMenuAnyPak) {
                 gPakCheckDone = 1;
                 return 1;
             }
-            text = PakMenu_GetReturnMenu_2(event);
-            if (text == NULL) {
-                text = event->context;
+            string = PakMenu_GetReturnMenu_2((struct Menu *) item);
+            if (string == NULL) {
+                string = item->string;
             }
-            if (event->context == &gSavePortalMenuDescB_2 || event->context == &gSavePortalMenuDesc_2) {
+            if (item->string == &gSavePortalMenuDescB_2 || item->string == &gSavePortalMenuDesc_2) {
                 gCameraPoolHideViews = 0;
             }
-            if (event->player != NULL) {
-                dst = (char *)event->player->m_pCamera->m_MenuPool;
-            } else {
-                dst = &gEngineApp_m_Game_m_MenuPool;
-            }
-            MenuPool_OpenMenu_2(dst, text, event->player, (sptr) event->controller, NULL);
+            MenuPool_OpenMenu_2(item->owner != NULL ? item->owner->m_pCamera->m_MenuPool : &gEngineApp_m_Game_m_MenuPool, string, item->owner,
+                          item->data, 0);
             break;
     }
     return 1;

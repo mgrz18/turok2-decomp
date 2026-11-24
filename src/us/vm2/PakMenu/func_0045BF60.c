@@ -1,10 +1,10 @@
-/* Second-module copy of SavePortalMenu_Poll (first module; this one at link address 0x00422F60), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "protos/pak_2.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
+#include "protos/pak.h"
+#include "protos/pakmenu.h"
 
-s32 Controller_PakChanged(s32 port);
-s32 PakMenu_CheckPak_2(void *event, s32 port, s32 arg2);
 
 
 static __inline__ s32 GetPort(Menu *event) {
@@ -17,7 +17,7 @@ static __inline__ s32 GetPort(Menu *event) {
 s32 SavePortalMenu_Poll_2(Menu *event) {
     if (sSavePortalChosen == 0 && sSavePortalDone == 0) {
         if (GetPort(event) != -1 && Controller_PakChanged(GetPort(event)) != 0) {
-            if (PakMenu_CheckPak_2(event, GetPort(event), 0) != 0) {
+            if (PakMenu_CheckPak_2((struct Menu *) event, GetPort(event), 0) != 0) {
                 sSavePortalDone = 1;
             }
         }
