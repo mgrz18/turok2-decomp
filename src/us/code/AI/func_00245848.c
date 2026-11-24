@@ -1,5 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80213ED4_8.CPP, func_802164A8_de, with Turok 2's layouts. */
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/vector.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
@@ -13,10 +15,6 @@ typedef struct {
     s32 unkC;                   /* 0xC: -1 = finished */
 } SoundSource;
 
-extern void AI_StopSound(CGameObjectInstance *, CAI *);
-extern void AI_UpdateRegionFlags(CGameObjectInstance *, CAI *);
-extern void AI_RideMovingPlatform(CGameObjectInstance *, CAI *);
-extern void CAI__UpdateModeAnim(CGameObjectInstance *, CAI *);
 
 void CAI__Update(CGameObjectInstance *src, CAI *dst) {
     SoundSource *sound = (SoundSource *) dst->m_pAttachedLoopingSound;

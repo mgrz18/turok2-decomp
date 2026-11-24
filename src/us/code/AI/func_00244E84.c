@@ -1,20 +1,15 @@
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
 #include "globals/collision.h"
 
 
 
-f32 func_00298470(f32);         /* sqrtf */
-f32 func_002982F0(f32);         /* sinf */
-f32 func_002974C0(f32);         /* cosf */
-f32 Math_AcosLookup(f32);         /* acosf */
-f32 GameObject_GetCollisionRadius(CGameObjectInstance *a);    /* radius */
 /* out receives a CollisionInfo pointer (func_0026961C.c): pointer-sized (sptr). As an s32, the
  * host's 8-byte store overwrote the 4 bytes after it (round 15 d5: with -O2 and no zero-init they
  * were part of a saved register, and AI_GetPathTargetInfo crashed in level 53). */
-s32 GameObject_TestMove(CGameObjectInstance *self, CVector3 pos, sptr *out); /* blocked at pos */
-void Angle_Wrap(f32 *angle); /* wrap */
 
 /* AI_AngleToPoint: the angle from the actor's heading to a point. */
 static __inline__ f32 angleTo(CGameObjectInstance *actor, CVector3 point) {
@@ -60,7 +55,7 @@ f32 AI_FindClearHeading(CGameObjectInstance *self, CVector3 pos, CGameObjectInst
     s32 first;
 
     angle = angleTo(self, pos);
-    if ((self->m_dwFlags & 0x200) && GameObject_TestMove(self, pos, &out)) {
+    if ((self->m_dwFlags & 0x200) && GameObject_TestMove(self, pos, (CCollisionInfo **) &out)) {
         if (target != NULL && gCollisionResults.m_pInstance == target) {
             return angle;
         }

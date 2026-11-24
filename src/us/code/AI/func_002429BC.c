@@ -6,6 +6,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AI/NAV/80212C90_18.CPP, ACTOR_SETUP, with Turok 2's layouts. */
 
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/game_object.h"
 
 typedef struct CAISetupCallbacks {
@@ -13,8 +15,6 @@ typedef struct CAISetupCallbacks {
 } CAISetupCallbacks;
 
 void memset(void *dst, s32 value, sptr size); /* memset */
-void AI_InitHealth(CAI *ai, CIntelligence *def, CVector3 pos, CGameObjectInstance *obj);
-f32 CGameRegion__GetHeight(struct CGameRegion *region, f32 x, f32 z);  /* floor height at */
 s32 CGameObjectInstance__DrawModel();
 void CGameObjectInstance__CalculateOrientationMatrix();
 

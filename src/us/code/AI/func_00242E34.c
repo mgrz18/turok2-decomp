@@ -1,4 +1,6 @@
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/game_object.h"
 #include "structs/region.h"
 #include "structs/intelligence.h"
@@ -10,12 +12,6 @@
 #include "protos/scene.h"
 
 
-f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);
-f32 GameObject_GetWaterHeight(CGameObjectInstance *actor);
-s32 CGameRegion__IsSteep(CGameRegion *region);
-s32 GameObject_IsFacingRegionNormal(CGameObjectInstance *actor);
-f32 CGameRegion__GetHeight(CGameRegion *region, f32 x, f32 z);
-s32 GameObject_IsOnGround(CGameObjectInstance *actor);
 void DamageEvent_Set(DamageEvent *damage, sptr arg1, s32 amount, f32 force, s32 kind, sptr arg5);
 void CAI__CallHurt(CGameObjectInstance *actor, CAI *dst, DamageEvent *damage);
 
@@ -34,7 +30,7 @@ void AI_UpdateRegionFlags(CGameObjectInstance *actor, CAI *dst) {
     if (region == NULL) {
         return;
     }
-    info = CScene__GetRegionInfo(&gScene, region);
+    info = CScene__GetRegionInfo(&gScene, &region->m_nInfo);
     if (info == NULL) {
         return;
     }
@@ -52,9 +48,9 @@ void AI_UpdateRegionFlags(CGameObjectInstance *actor, CAI *dst) {
                 top = GameObject_GetCollisionHeight(actor) + actor->header.m_vPos.y;
                 y = actor->header.m_vPos.y;
             }
-            if (top <= GameObject_GetWaterHeight(actor)) {
+            if (top <= GameObject_GetWaterHeight(&actor->header)) {
                 dst->m_dwFlags |= 0x80;
-            } else if (GameObject_GetWaterHeight(actor) < y) {
+            } else if (GameObject_GetWaterHeight(&actor->header) < y) {
                 dst->m_dwFlags |= 0x100;
             } else {
                 dst->m_dwFlags |= 0x200;

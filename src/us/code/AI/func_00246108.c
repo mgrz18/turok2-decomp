@@ -1,4 +1,6 @@
 #include "structs/vector.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/game_object.h"
 #include "globals/engine.h"
 
@@ -7,8 +9,6 @@
 
 typedef struct { u8 pad0[4]; CVector3 pos; } B04A; /* pos at 0x4 in Turok 2 (0x8 in Rage Wars) */
 typedef struct { CAITarget a; CAITarget b; } B04C;
-void AI_GetPathTargetInfo(B04A *, CAI *, sptr, CAITarget *);
-void AI_GetSightTargetInfo(B04A *, CAI *, sptr, CAITarget *);
 /* A separate function in Rage Wars; inlined here in Turok 2. */
 static inline void fill(CAITarget *d, B04A *a) {
     CVector3 p = a->pos;
@@ -39,11 +39,11 @@ void AI_UpdateTargets(B04A *a, CAI *b, B04C *c, s32 f1, s32 f2) {
         }
     }
     if (f1 != 0)
-        AI_GetPathTargetInfo(a, b, b->m_pPathTarget, &c->b);
+        AI_GetPathTargetInfo((CGameObjectInstance *) a, b, b->m_pPathTarget, &c->b);
     else
         fill(&c->b, a);
     if (f2 != 0) {
-        AI_GetSightTargetInfo(a, b, b->m_pSightTarget, &c->a);
+        AI_GetSightTargetInfo((CGameObjectInstance *) a, b, b->m_pSightTarget, &c->a);
         return;
     }
     fill(&c->a, a);

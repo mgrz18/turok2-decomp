@@ -11,13 +11,28 @@
 #include "structs/collision.h"
 
 /* code/GameObject */
+s32 GameObject_IsSolid(CGameObjectInstance *actor);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);
-f32 GameObject_GetDeadCollisionHeight(CGameObjectInstance *actor);
+f32 GameObject_GetCollisionRadius(CGameObjectInstance *obj);
+CQuaternion GameObject_GetAimRotation(CGameObjectInstance *actor, CVector3 point);
 f32 GameObject_GetGroundHeight(CGameObjectInstance *actor);
-void GameObject_GetFrameDelta(CGameObjectInstance *obj, CVector3 *delta);
+CGameObjectInstance *GameObject_GetPlatformBelow(CGameObjectInstance *actor);
+CQuaternion GameObject_GetGroundRotation(CGameObjectInstance *obj);
+s32 GameObject_IsLeashed(CGameObjectInstance *obj);
+f32 GameObject_GetDeadCollisionHeight(CGameObjectInstance *actor);
+f32 GameObject_GetCollisionYOffset(CGameObjectInstance *item);
+f32 GameObject_GetSweepRadius(u8 *actor);
+f32 GameObject_GetLeashRadius(CGameObjectInstance *actor);
+s32 GameObject_IsOnGround(CGameObjectInstance *actor);
 f32 GameObject_GetFloorHeightAt(CGameObjectInstance *actor, f32 x, f32 z);
 f32 GameObject_GetRegionFloorHeight(CInstanceHeader *obj, CVector3 *offset);
+void GameObject_GetFrameDelta(CGameObjectInstance *obj, CVector3 *delta);
+f32 GameObject_GetFrameTurn(CGameObjectInstance *obj);
 void GameObject_TraceMove(CInstanceHeader *actor, CVector3 pos, CVector3 *outPos, CGameRegion **outRegion, s32 flagA, s32 flagB);
+sptr GameObject_GetRegionInfo(CInstanceHeader *arg0);
+f32 GameObject_GetWaterHeight(CInstanceHeader *arg0);
+s32 GameObject_GetTypeId(CGameObjectInstance *arg0);
+void GameObject_DropPickupAt(CInstanceHeader *actor, CVector3 pos, s32 kind, f32 arg);
 
 /* CGameRegion, PlatformCollide */
 f32 CGameRegion__GetHeight(CGameRegion *tri, f32 x, f32 z);
@@ -26,11 +41,18 @@ void CGameRegion__GetNormal(CVector3 *out, CGameRegion *tri); /* returns out, wh
 s32 CGameRegion__IsSteep(CGameRegion *polygon);
 f32 Platform_GetTopHeight(void *object, f32 x, f32 z);
 
+/* GameObjectMove, CGameObjectInstance */
+s32 GameObject_TestMove(CGameObjectInstance *actor, CVector3 pos, CCollisionInfo **outInfo);
+s32 GameObject_IsFacingRegionNormal(CGameObjectInstance *a);
+
 /* SweepShapes */
 s32 Collision_MoveInstance(CGameObjectInstance *obj, CVector3 pos, CCollisionInfo *def);
 
 /* CMtxF and the gu math */
 void CVector3__Normalize(CVector3 *v);
+void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
+f32 CVector3__GetYaw(CVector3 *v);
+void Angle_Wrap(f32 *angle);
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
@@ -39,5 +61,6 @@ void CQuaternion__SlerpFast(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion
 f32 Math_AcosLookup(f32 x);
 f32 func_002974C0(f32 x); /* cosf */
 f32 func_002982F0(f32 x); /* sinf */
+f32 func_00298470(f32 x); /* sqrtf */
 
 #endif
