@@ -1305,6 +1305,66 @@ part q1 lists), `vm1/Pak` 19 (`CCache__Allocate`: the three CCache forms, then `
 
 None needs a ROM change.
 
+## Round 29, part r1: `code/AI` and `code/EnemyAI`
+
+**Merged (2 directories, 159 files):** `code/AI` (40, `AI.c`) and `code/EnemyAI` (119, `EnemyAI.c`),
+each with `tools/merge_module.py src/us/code/DIR --rodata-free` after the header work below, each in
+its own commit. After each: `asm_diff --base b8217720` 0 over the tree, a clean `make setup` + build +
+`make verify` OK, the port builds from a fresh gendata, and no implicit declaration under clang
+`-Wimplicit-function-declaration` (nor a new pointer/`s32` conversion: the clang warnings of the
+changed files were compared with b8217720's). The port's references are unchanged after both merges: boot + 3 demos `6ab97584`, the default
+whole game `af8bd840` (`port_layout.us.json` regenerated, aligncheck 0).
+
+- *`code/AI`: q1's nine blocking files.* The position arguments are one `CVector3` by value, as
+  GameObject's: `AI_TurnTowardTarget` (`AI_FindClearHeading`), `AI_PushAway` (`GameObject_TraceMove`;
+  its last two arguments are the caller's `outPos`/`outRegion`), `AI_DropPickupsOnce` and
+  `AI_DropPickupsByMask` (`GameObject_DropPickupAt`, on `CDropPickup`). The compiler loads the three
+  words exactly as Rage Wars' three-`s32`/`f32` views did, so the port's `_i3`/`_f3` wrappers
+  (`port/game/t2abi.c`) for these calls have no caller left. One body each for the N64 and the port
+  (their `#ifdef TARGET_PORT` twins joined on the engine types): `AI_AngleToPoint`
+  (`CGameObjectInstance`), `Actor_SpawnParticle` (`CInstanceHeader`, a game object's velocity /
+  rotation / sight target, a particle's), `AI_StartSound` and `AI_StopSound` (`CAI.m_pAttachedLoopingSound`
+  as a `SndSource`; the N64 case 0 is a `CStaticObject` and its owner word is `m_LitKey` at 0x80, which
+  the port's copy had dropped). `AI_GetSightTargetInfo`'s third argument is the (unused) target, as
+  `protos/cai.h` has it; `AI_DistSqToPointAtHeight` reads `m_CollisionYOffset` (the `B04Obj` view's
+  0x54: on the host that view read `m_qGround.z`). `AI_IsInViewCone` takes the rotation by value
+  (`CGameObjectInstance__GetRotation`, no `_sret` rename). New in `structs/game_object.h`:
+  `CPathPoint` (a level path point, `CPathTrack__GetCurrentPoint`; the three `Location` views and
+  EnemyAI's). `protos/cai.h` gained the module's other functions and the calls it makes
+  (`CPathTrack__GetCurrentPoint`, `CGameObjectInstance__PickRandomAnim`/`GetRotation`/`GetGeometryKind`,
+  `Actor_GetGroundRotation`, `CQuaternion__ToMatrix`, `CParticleSystem__Spawn`, `LoopSounds_*`,
+  `Sound__StopOwner`, `Random_Blend`); `AI_PickAnimFromTable` reads `CEnemyAnimPick` rows (was
+  `rw/abu_types.h`'s `IntPair`). `Actor_SpawnParticle` takes the fourth word its callers pass (unused).
+- *`code/EnemyAI`: `protos/enemy_ai.h`* (new): the module's own cross-file calls and the calls it makes
+  into other modules, one prototype each; the AI functions come from `protos/cai.h`, so no EnemyAI file
+  includes `protos/ai.h`/`protos/enemy.h` (their untyped views stay for the other enemy modules) nor
+  `protos/game.h` (its `GameObject_GetRegionFloorHeight(void *, void *)` view; `GameObject_FireTriggers`
+  is copied). The files' local declarations of those functions were removed mechanically (a script over the file-scope
+  prototypes of the names the three headers declare, with their `#ifdef TARGET_PORT #define F F_x`
+  ABI renames); 12 files then needed a hand fix:
+  `EnemyAI_PickAttack` returns `s16`, the ROM's callers take the whole register: `enemy_ai.h`'s
+  `EnemyAI_PickAttack_w` calls it through an `s32` function type on the N64 and directly on the host
+  (the documented host-dependent return; the definition comes first, so the callers cannot redeclare
+  it). `EnemyMode_Alert_Update` passes `gEnemyAlertPoint` through its interior symbols as three floats
+  on the N64 (a struct argument loads one base register) and as one `CVector3` on the host.
+  `EnemyAI_CheckOffscreen` takes the third word `EnemyAI_SleepIfOffscreen` passes on (unused) and
+  sets `CAI.m_dwFlags` (was an `s32 *`). `EnemyAI_CheckGrab` reads `gCollisionResults.m_pInstance` as
+  `*(CGameObjectInstance **) &gCollisionResults` (a pointer-variable view of the same symbol cannot
+  live beside `globals/collision.h`; the member access does not match), `EnemyAI_Init` the
+  multiplayer byte through a one-byte struct (the plain `u8` load is scheduled earlier).
+  One body for the N64 and the port: `EnemyAI_NukedFrozenRemove`, `EnemyAI_StopSoundAndFree`
+  (`Actor` views), `EnemyAI_CurrentHasComboEndAnim` (`m_wAlertAnimFlags`), `AI_HearNoise` (the
+  `AlertState` view). `EnemyAI_HeadNodeCallback` keeps its two bodies (the port's pose context,
+  `structs/pose_host.h`, is not the N64 one), both on `m_AI.m_HeadTurn`/`m_HeadTilt` with the float
+  `CMtxF__RotateX/Z` (no `_i` renames). `EnemyAnim_InteractiveIdle` reads `CPathPoint`;
+  `EnemyAI_DrawWithBlend` passes its `CDrawArgs *` whole (an `s32` parameter truncated it on the host).
+- *Left as they were (not blocking):* the `Object`/`Actor`-style host-offset views inside single
+  functions (`EnemyAI_OnDamage`...), `sptr` parameters passed to pointer parameters (no truncation:
+  `sptr` is pointer-wide), and the ABI wrappers in `port/game/t2abi.c` that no C file calls any more
+  (`AI_FindClearHeading_i3`, `GameObject_DropPickupAt_i3`, `CMtxF__RotateZ_i`, `AI_TurnClamped_i`,
+  `AI_AngleToPoint_f3`): a cleanup can drop them (the other modules still use `GameObject_TraceMove_f3`,
+  `_fif`, `CMtxF__RotateX_i`, `CGameObjectInstance__GetRotation_sret`, `AI_AngleToPoint_i3`).
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte
