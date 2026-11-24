@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 
-s32 *CISet__GetBlock(s32 *file, s32 index); /* returns chunk `index` of a chunked file */
+#include "protos/iset.h"
 
 /* Adds count packed offsets (signed bytes x:16-23, y:8-15, z:0-7, scaled by 2) to points[]. */
 void Model_ApplyPackedOffsets(s32 *file, s32 count, CVector3 *points) {
@@ -13,7 +13,7 @@ void Model_ApplyPackedOffsets(s32 *file, s32 count, CVector3 *points) {
 
     chunk = CISet__GetBlock(file, 1);
     if (*chunk != 0) {
-        packed = CISet__GetBlock(chunk, 0) + 2;
+        packed = (s32 *) CISet__GetBlock(chunk, 0) + 2;
         for (i = 0; i < count; i++) {
 #ifdef TARGET_PORT
             /* Geometry block 1 is not in the archive's swap plan (tools/assets/swap_spec.json,

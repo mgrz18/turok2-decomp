@@ -30,8 +30,8 @@ typedef struct {
 #endif
 
 s32 Model_RequestTextures(sptr);                         /* extern */
-sptr CStaticObject__LoadGeometry();                                /* extern */
-void CStaticObject__BuildLitVerticesCallback(void);
+s32 *CStaticObject__LoadGeometry(void *arg0);
+void CStaticObject__BuildLitVerticesCallback(void *arg0, s32 **arg1);
 
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CStaticObject__LoadGeometry receives CStaticObject__RequestLitVertices's own argument
  * registers (pass-through); the host passes them. */
@@ -40,7 +40,7 @@ void CStaticObject__RequestLitVertices(SpawnSource *arg0) {
     sptr temp_v0_2;
 
     if (!(arg0->flags & 0x40)) {
-        temp_v0 = CStaticObject__LoadGeometry(arg0);
+        temp_v0 = (sptr) CStaticObject__LoadGeometry(arg0);
         if (temp_v0 != 0) {
             Model_RequestTextures(temp_v0);
             temp_v0_2 = CCache__RequestDecompression(0, arg0->spawnFlags | gLitVerticesKey, temp_v0, arg0->id, 8, arg0, &CStaticObject__BuildLitVerticesCallback, &sCStaticObjectCacheDesc_LitVertices, 0);

@@ -16,32 +16,30 @@ typedef struct {
     /* 0x12 */ s8 lod;
 } PropDescriptor;
 
-#ifdef TARGET_PORT /* CStaticObject's host layout (structs/level_actor.h) */
 typedef struct {
+#ifdef TARGET_PORT /* CStaticObject's host layout (structs/level_actor.h) */
     /* 0x00 */ u8 pad0[0x18];
     /* 0x18 */ PropDescriptor *descriptor;
     /* 0x20 */ u8 pad20[0xC];
     void **cache;
-    f32 matrix[16];
 #else
-typedef struct {
     /* 0x00 */ u8 pad0[0x14];
     /* 0x14 */ PropDescriptor *descriptor;
     /* 0x18 */ u8 pad18[0xC];
     /* 0x24 */ s32 cache;
-    /* 0x28 */ f32 matrix[16];
 #endif
+    /* 0x28 */ f32 matrix[16];
     /* 0x68 */ u8 pad68[0x18];
     /* 0x80 */ s32 colorKey;
     /* 0x84 */ s32 value;
     /* 0x88 */ u16 flags;
     /* 0x8A */ u8 colorFrame;
-} PlacedProp;
+} DrawnProp;
 #ifdef TARGET_PORT
 #include "structs/level_actor.h"
-T2_STATIC_OBJECT_CHECK(PlacedProp, matrix, flags);
-_Static_assert(__builtin_offsetof(PlacedProp, cache) == __builtin_offsetof(CStaticObject, m_pOwner), "cache");
-_Static_assert(__builtin_offsetof(PlacedProp, colorKey) == __builtin_offsetof(CStaticObject, m_LitKey), "colorKey");
+T2_STATIC_OBJECT_CHECK(DrawnProp, matrix, flags);
+_Static_assert(__builtin_offsetof(DrawnProp, cache) == __builtin_offsetof(CStaticObject, m_pOwner), "cache");
+_Static_assert(__builtin_offsetof(DrawnProp, colorKey) == __builtin_offsetof(CStaticObject, m_LitKey), "colorKey");
 #endif
 
 /* A vertex (0x10 bytes). */
@@ -62,8 +60,8 @@ typedef struct {
 
 
 s32 Actor_GetTypeClass();
-void **CStaticObject__LoadGeometry(PlacedProp *prop);
-void CStaticObject__BuildLitVerticesCallback(void);
+s32 *CStaticObject__LoadGeometry(void *arg0);
+void CStaticObject__BuildLitVerticesCallback(void *arg0, s32 **arg1);
 void Render_QueueModelInstance(void **resource, void *matrix, s32 segment, void *lights, void *textures, s32 lod, s32 pass);
 
 /* The colour pulse (Rage Wars' func_8027892C_de): every vertex flagged 0x70
@@ -125,7 +123,7 @@ static __inline__ void pulseColors(s32 *object, u8 *colors) {
  * pulsed once a frame. */
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS Actor_GetTypeClass receives CStaticObject__Draw's own argument
  * registers (pass-through); the host passes them. */
-void CStaticObject__Draw(PlacedProp *prop) {
+void CStaticObject__Draw(DrawnProp *prop) {
     s32 argument;
     s32 mode;
     void **instance;
@@ -167,7 +165,7 @@ void CStaticObject__Draw(PlacedProp *prop) {
     } else {
         lod = prop->descriptor->lod;
     }
-    instance = CStaticObject__LoadGeometry(prop);
+    instance = (void **) CStaticObject__LoadGeometry(prop);
     if (instance == NULL) {
         return;
     }

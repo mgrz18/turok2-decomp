@@ -2,20 +2,7 @@
 #include "structs/vector.h"
 #include "globals/scene.h"
 #include "protos/iset.h"
-
-typedef struct {
-    /* 0x0 */ s16 x, y, z;
-    /* 0x6 */ u16 bone; /* matrix index in the high byte; 0x80 = unlit */
-    /* 0x8 */ u8 pad8[4];
-    /* 0xC */ s8 nx, ny, nz;
-    /* 0xF */ u8 padF;
-} ModelVertex; /* size 0x10 */
-
-typedef struct {
-    /* 0x0 */ s32 unk0;
-    /* 0x4 */ s32 count;
-    /* 0x8 */ ModelVertex verts[1];
-} VertexGroup;
+#include "structs/vertex_group.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x11];
@@ -35,7 +22,7 @@ void Lighting_ApplyDirectional(s32 *model, u8 *matrices, CVector3 *colors, s32 s
     CVector3 in;
     CVector3 out;
     VertexGroup *group;
-    ModelVertex *verts;
+    ModelVtx *verts;
     f32 level;
     s32 n;
     s32 i;
@@ -53,15 +40,15 @@ void Lighting_ApplyDirectional(s32 *model, u8 *matrices, CVector3 *colors, s32 s
         count = group->count;
         verts = group->verts;
         for (j = 0; j < count; j++) {
-            if (verts[j].bone & 0x80) {
+            if (verts[j].v.flag & 0x80) {
                 continue;
             }
             if (skinned) {
-                CMtxF__FromMtxAffine(mtx, matrices + (verts[j].bone >> 8) * 64);
+                CMtxF__FromMtxAffine(mtx, matrices + (verts[j].v.flag >> 8) * 64);
             }
-            in.x = verts[j].nx;
-            in.y = verts[j].ny;
-            in.z = verts[j].nz;
+            in.x = verts[j].n.n[0];
+            in.y = verts[j].n.n[1];
+            in.z = verts[j].n.n[2];
             CMtxF__RotateVector(mtx, &in, &out);
             level = out.x * light.x + out.y * light.y + out.z * light.z;
             /* clamp at 0, then add the ambient term */

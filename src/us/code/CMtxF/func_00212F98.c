@@ -1,18 +1,6 @@
 #include "common.h"
 #include "protos/iset.h"
-
-typedef struct {
-    /* 0x0 */ s16 x, y, z;
-    /* 0x6 */ u16 bone;
-    /* 0x8 */ u8 pad8[4];
-    /* 0xC */ u8 r, g, b, a;
-} ModelVertex; /* size 0x10 */
-
-typedef struct {
-    /* 0x0 */ s32 unk0;
-    /* 0x4 */ s32 count;
-    /* 0x8 */ ModelVertex verts[1];
-} VertexGroup;
+#include "structs/vertex_group.h"
 
 typedef struct {
     u8 r, g, b, a;
@@ -24,7 +12,7 @@ typedef struct {
 /* Copies every vertex color of the model into `colors`, clamped to 30..225. */
 void Lighting_CopyVertexColors(s32 *model, Color4 *colors) {
     VertexGroup *group;
-    ModelVertex *verts;
+    ModelVtx *verts;
     Color4 *c;
     s32 i;
     s32 j;
@@ -40,13 +28,13 @@ void Lighting_CopyVertexColors(s32 *model, Color4 *colors) {
         for (j = 0; j < n; j++) {
             c = &colors[k++];
             do {
-                x = verts[j].r;
-                c->r = MIN(verts[j].r, 225) < 31 ? 30 : MIN(x, 225);
+                x = verts[j].v.cn[0];
+                c->r = MIN(verts[j].v.cn[0], 225) < 31 ? 30 : MIN(x, 225);
             } while (0);
-            x = verts[j].g;
-            c->g = MIN(verts[j].g, 225) < 31 ? 30 : MIN(x, 225);
-            x = verts[j].b;
-            c->b = MIN(verts[j].b, 225) < 31 ? 30 : MIN(x, 225);
+            x = verts[j].v.cn[1];
+            c->g = MIN(verts[j].v.cn[1], 225) < 31 ? 30 : MIN(x, 225);
+            x = verts[j].v.cn[2];
+            c->b = MIN(verts[j].v.cn[2], 225) < 31 ? 30 : MIN(x, 225);
         }
     }
 }

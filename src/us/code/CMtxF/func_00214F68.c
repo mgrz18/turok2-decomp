@@ -3,17 +3,12 @@
 #include "globals/engine.h"
 #include "globals/scene.h"
 #include "protos/iset.h"
-#include "structs/gbi.h"
+#include "structs/vertex_group.h"
 
 /* Pulses the vertex colours of a model whose vertices carry a pulse phase
  * (flag bits 0x70) and amplitude shift (bits 0xC), from their saved base colours. */
 
 
-typedef struct {
-    /* 0x0 */ s32 field0;
-    /* 0x4 */ s32 count;
-    /* 0x8 */ Vtx_t vertices[1];
-} VertexGroup;
 
 
 void Model_PulseVertexColors(s32 *object, u8 *colors) {
@@ -25,7 +20,7 @@ void Model_PulseVertexColors(s32 *object, u8 *colors) {
         count = object[0];
         for (g = 0; g < count; g++) {
             VertexGroup *group = CISet__GetBlock(object, g);
-            Vtx_t *v = group->vertices;
+            Vtx_t *v = &group->verts[0].v;
             Vtx_t *end = v + group->count;
 
             while (v != end) {

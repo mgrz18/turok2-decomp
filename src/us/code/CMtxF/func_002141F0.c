@@ -19,7 +19,7 @@ typedef struct {
     /* 0x18 */ u8 bits; /* 0..1 quarter turns, 0x10 negate x, 0x20 negate z */
     /* 0x19 */ u8 x;
     /* 0x1A */ u8 z;
-} PlacedPropRecord;
+} CompactPropRecord;
 
 typedef struct {
     /* 0x00 */ u8 state;
@@ -39,11 +39,11 @@ typedef struct {
     /* 0x84 */ s32 value;
     /* 0x88 */ u16 flags;
     /* 0x8A */ u8 colorFrame;
-} PlacedProp;
+} CompactProp;
 #ifdef TARGET_PORT
 #include "structs/level_actor.h"
 #include "structs/region.h"
-T2_STATIC_OBJECT_CHECK(PlacedProp, matrix, flags);
+T2_STATIC_OBJECT_CHECK(CompactProp, matrix, flags);
 #endif
 
 void CMtxF__SetRotateY(f32 *mtx, f32 angle);
@@ -66,7 +66,7 @@ static __inline__ s32 nextColorKey(void) {
     return gNextUniqueId;
 }
 
-void CStaticObject__ConstructCompact(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *segments, f32 scale) {
+void CStaticObject__ConstructCompact(CompactProp *prop, CompactPropRecord *record, s32 owner, u8 *segments, f32 scale) {
     f32 matrix[16];
     CVector3 pos;
     f32 angle;

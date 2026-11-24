@@ -34,10 +34,10 @@ typedef struct {
     /* 0x84 */ s32 value;
     /* 0x88 */ u16 flags;
     /* 0x8A */ u8 colorFrame;
-} PlacedProp;
+} EventProp;
 #ifdef TARGET_PORT
 #include "structs/level_actor.h"
-T2_STATIC_OBJECT_CHECK(PlacedProp, matrix, flags);
+T2_STATIC_OBJECT_CHECK(EventProp, matrix, flags);
 #endif
 
 void CMtxF__FromMtxAffine(f32 *, f32 *);
@@ -45,7 +45,7 @@ void CMtxF__TransformPoint(f32 *, CVector3 *, CVector3 *);
 void ImpactEvent_Send(void *, void *, s32, s32, CVector3, AttachmentParams);
 
 
-void CStaticObject__SpawnEvents(PlacedProp *prop, s32 all) {
+void CStaticObject__SpawnEvents(EventProp *prop, s32 all) {
     sptr *model;
     s32 **table;
     s32 *header;

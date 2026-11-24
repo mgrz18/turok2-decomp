@@ -6,8 +6,14 @@
 extern void CMtxF__TransformPoint(void *, void *, void *);
 extern void CMtxF__RotateVector(void *arg0, void *arg1, void *arg2);
 extern void CVector3__Normalize(f32 *);
-extern s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, f32 arg1, f32 arg2, f32 arg3,
-                        f32 *arg4, f32 *arg5);
+#ifdef TARGET_PORT
+s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, f32 x, f32 y, f32 z, CVector3 *arg4, f32 *arg5);
+#define Actors_GetLightVolumeFalloff_f3 Actors_GetLightVolumeFalloff
+#else
+/* The N64 definition (func_002123D4.c) takes the point as three u32 words; the floats travel in a1-a3. */
+extern s32 Actors_GetLightVolumeFalloff_f3(ObjectRecAtBC *arg0, f32 x, f32 y, f32 z, CVector3 *arg4, f32 *arg5)
+    __asm__("Actors_GetLightVolumeFalloff");
+#endif
 extern void CVector3__Scale(void *, void *, f32);
 s32 Actors_EvaluateLightVolume(ObjectRecAtBC *arg0, CVector3 arg1, CVector3 arg4, Matrix *arg7,
                   CVector3 *arg8, f32 *arg9) {
@@ -33,8 +39,8 @@ s32 Actors_EvaluateLightVolume(ObjectRecAtBC *arg0, CVector3 arg1, CVector3 arg4
         CMtxF__RotateVector(arg7, &arg4.x, &second);
     }
     CVector3__Normalize(&second.x);
-    if (Actors_GetLightVolumeFalloff(arg0, first.x, first.y, first.z,
-                     &normal.x, &amount) == 0) {
+    if (Actors_GetLightVolumeFalloff_f3(arg0, first.x, first.y, first.z,
+                     &normal, &amount) == 0) {
         return 0;
     }
     {
