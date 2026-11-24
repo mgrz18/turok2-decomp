@@ -65,26 +65,13 @@ void GameObject_GetAimRotation_sret(CQuaternion *out, void *actor, CVector3 poin
 /* ---- a CVector3 by value that the caller passes as three floats or three words ---------- */
 
 extern f32 AI_AngleToPoint(void *actor, CVector3 point);
-f32 AI_AngleToPoint_f3(void *actor, f32 x, f32 y, f32 z) {
-    return AI_AngleToPoint(actor, v3_floats(x, y, z));
-}
 f32 AI_AngleToPoint_i3(s32 actor, s32 x, s32 y, s32 z) {
     return AI_AngleToPoint((void *) (sptr) actor, v3_words(x, y, z));
-}
-
-extern f32 AI_FindClearHeading(void *self, CVector3 pos, void *target, f32 scale);
-f32 AI_FindClearHeading_i3(void *self, s32 x, s32 y, s32 z, void *target, f32 scale) {
-    return AI_FindClearHeading(self, v3_words(x, y, z), target, scale);
 }
 
 extern s32 Collision_MoveInstance(void *obj, CVector3 pos, void *def);
 void Collision_MoveInstance_f3(void *obj, f32 x, f32 y, f32 z, void *def) {
     Collision_MoveInstance(obj, v3_floats(x, y, z), def);
-}
-
-extern void GameObject_DropPickupAt(void *actor, CVector3 pos, s32 kind, f32 arg);
-void GameObject_DropPickupAt_i3(void *actor, s32 x, s32 y, s32 z, s32 kind, f32 arg) {
-    GameObject_DropPickupAt(actor, v3_words(x, y, z), kind, arg);
 }
 
 extern void GameObject_TraceMove(void *actor, CVector3 pos, CVector3 *outPos, void **outRegion,
@@ -180,11 +167,6 @@ void AI_SetTargetOverride_f(void *obj, void *ai, void *owner, f32 time) {
     AI_SetTargetOverride((sptr) obj, ai, (sptr) owner, f_bits(time));
 }
 
-extern void AI_TurnClamped(void *obj, sptr ai, f32 angle, f32 rate);
-void AI_TurnClamped_i(sptr obj, sptr ai, f32 angle, s32 rate) {
-    AI_TurnClamped((void *) obj, ai, angle, bits_f(rate));
-}
-
 extern void AI_TurnHeadToTarget(void *actor, void *ai, f32 pitchOffset);
 void AI_TurnHeadToTarget_i(sptr actor, void *ai, s32 pitchOffset) {
     AI_TurnHeadToTarget((void *) actor, ai, bits_f(pitchOffset));
@@ -209,15 +191,10 @@ void *CLevelActorPool__Spawn_i(void *pool, void *refCount, s32 id, CVector3 vel,
 }
 
 extern void CMtxF__RotateX(void *m, f32 a);
-extern void CMtxF__RotateZ(void *m, f32 a);
 extern void CMtxF__SetRotateY(void *m, f32 a);
 extern void CMtxF__SetRotateZ(void *m, f32 a);
 s32 CMtxF__RotateX_i(s32 m, s32 a) {
     CMtxF__RotateX((void *) (sptr) m, bits_f(a));
-    return 0;
-}
-s32 CMtxF__RotateZ_i(s32 m, s32 a) {
-    CMtxF__RotateZ((void *) (sptr) m, bits_f(a));
     return 0;
 }
 void CMtxF__SetRotateY_i(void *m, s32 a) {
