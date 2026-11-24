@@ -207,4 +207,10 @@ typedef struct {
     /* 0x11EC */ s32 _pad1;
 } CCameraPool; /* size 0x11F0 */
 
+/* A word of visibility bits (gCameraVisBits, gDefaultVisBits) seen as a structure: GCC 2 orders a load or
+ * store through it after other memory accesses where it would move a plain u32 (CCameraPool__Advance). */
+typedef struct CVisBits {
+    /* 0x0 */ u32 m_Bits;
+} CVisBits;
+
 #endif
