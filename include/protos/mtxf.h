@@ -7,5 +7,6 @@
 
 void CMtxF__SetRotateY(CMtxF mf, f32 angle);
 void CMtxF__TransformPoint(CMtxF mf, CVector3 *in, CVector3 *out);
+void CVector3__Normalize(CVector3 *v);
 
 #endif

@@ -2,14 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/sndp.h"
 
 extern s32 SndVoicePool_GetVoiceState(s32 arg0, s16 arg1);
-extern void alSndpSetSound(void *sound, s16 sample);
-extern s32 alSndpGetState(void *sound);
-extern void alSndpSetSound(void *sound, s16 sample);
-extern s32 alSndpGetState(void *sound);
-extern void alSndpSetSound(void *arg0, s16 arg1);
-extern s32 alSndpGetState(void *arg0);
 s32 SndVoicePool_GetVoiceState(s32 arg0, s16 arg1)
 {
   sptr temp_v0;

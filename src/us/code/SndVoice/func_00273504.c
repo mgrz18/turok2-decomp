@@ -5,8 +5,7 @@
 #include "rw/junk_types.h" /* M04Bank2 */
 
 #include "globals/audio.h"
-s16 alSndpAllocate(void *p, s32 a, void *owner);
-void alSndpSetPriority(void *p, s16 id, s32 pri);
+#include "protos/sndp.h"
 void CAudioWorld__Lock(CAudioWorld *m);
 void CAudioWorld__Unlock(CAudioWorld *m);
 s16 SndVoicePool_FindSlot(SndVoicePool *p, s16 a, s16 b, s16 c, s32 d);
@@ -62,7 +61,7 @@ SndVoice *SndVoicePool_AllocVoice(SndVoicePool *p, SoundEffectInfo *info, int ta
       m2 = p->owner;
       new_var2 = &m2->player;
       core = ((u8 *) m2) + 0x7C;
-      snd[idx] = alSndpAllocate(new_var2, ((M04Bank2 *) m2->bank)->tab->v[pri], m2);
+      snd[idx] = ((s16 (*)(void *, void *, void *))alSndpAllocate)(new_var2, ((M04Bank2 *) m2->bank)->tab->v[pri], m2);
       sv = snd[idx];
       if (sv == (-1))
       {

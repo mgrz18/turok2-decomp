@@ -1056,6 +1056,64 @@ eleven GameObject files got (one function on the engine types, `CVector3` by val
 untyped `protos/enemy.h` views and the `EnemyAI_GetBehaviorIndex`/`GetCurrentBehavior` `s8`-vs-word
 returns (already written as `#ifdef TARGET_PORT` pairs).
 
+## Round 28, part q2: CCache, CGameRegion, CAudioWorld (and what SndVoice and VM still need)
+
+**Merged (3 directories, 154 files):** `code/CCache` (56), `code/CGameRegion` (53), `code/CAudioWorld`
+(45). `merge_check.py` OK without `--rodata-free` for all three; `make verify` (clean) after each batch,
+`asm_diff --base b9bb8125` 0 over the tree, the port builds from a fresh gendata. How the declarations
+were made one:
+
+- *New headers, the definitions' own signatures:* `protos/heap.h` (`CHeap__Alloc`/`CHeap__Free`,
+  `CDecompressor__DecompressAsync`), `protos/hash.h` (`CHashTable__*`), `protos/osint.h`
+  (`__osDisableInt`/`__osRestoreInt` with the SDK's `u32` mask), `protos/region.h` (the CGameRegion calls
+  the module makes to itself), `protos/audio_world.h` (what CAudioWorld calls in the sound player, the
+  speech player and the camera pool, plus `VM_Alloc`), `protos/sndp.h` (libaudio's `alSndp*` with the
+  SDK's types, for SndVoice); `CVector3__Normalize(CVector3 *)` added to `protos/mtxf.h`. The files' own
+  one-line declarations dropped with `tools/unify_decls.py` (the commands are in the commits).
+- *Trap:* `__osDisableInt` first went into `protos/ultra.h`; the port then failed to compile
+  `code/CISet/CISet.c` (it includes `protos/ultra.h` and declares an `s32` mask). A shared header that
+  many modules include only takes a name no includer declares otherwise; hence `protos/osint.h`.
+- *Rage Wars views rewritten over the engine types:* CCache's `DeallocateInternal` (a `CAI` view of a
+  `CMemEntry`: now one form for both builds), `DetachCacheEntry` (M2C_FIELD), `TakeFreeCacheEntry`,
+  `FreeCacheEntry`, `ReleaseAndReplaceData`; CCache's `DrawDebug` (FAKEMATCH) reads `globals/cache.h`'s
+  `gCache_*` instead of its own array views. CGameRegion's `Node75` (= `CGameRegion`: `prev/cur/next` are
+  `m_pVertices[0..2]`), the `Entry`/`Handle` views (`CGameRegion`, `CRegionInfo`), `Triangle0026CB2C`;
+  `func_0026CB2C.c` no longer includes `rw/abu_protos.h` (the only includer in these directories).
+  CAudioWorld's `Update` (the whole-file Rage Wars type dump: `ContextRecAt2BC0`, `MenuRules`,
+  `MenuMatchGlobals`, `Shared_Quad`, ...), `UpdateAmbientTrack`, `PlaySpeech`, `StopSpeech`,
+  `PickVariant`, `IsSoundBusy` (the 0xCC-byte "slots" are `pool.voices[i].soundId`), the accessors
+  (`BigState2BB0`, `EntryOwner`, ...) all on `structs/sound.h` `CAudioWorld`; the envelope getters return
+  `SndEnv *`. Register allocation decided two forms: a reused local in `DetachCacheEntry` and a typed
+  local for the `void *` parameter of `ReleaseAndReplaceData` each moved a register; two locals and a
+  cast at each use keep the code.
+- *Calls the ROM makes with more arguments, or reading a void result:* cast at the call
+  (`CCache__AllocateInternal` 4 args, `CCache__WaitForDisplayLists(0)`,
+  `CCache__FreeOldestMemEntryWithFlags` read as `s32`, `CGameRegion__FloodSetHeight` read as `f32`,
+  `CAudioWorld__StartVoice` 4 args, `SpeechPlayer_Play` 4 args, `alSndpAllocate` 3 args).
+  `CGameRegion__GetCeilingNormal` is now called with the region on both builds: the ROM leaves `$a1` as
+  the caller got it, which is the code passing it gives (the N64 build had a one-argument prototype).
+  `BinaryRange`'s key is `u32`; the CAudioWorld callers cast to `s16` at the call (the sign extension the
+  ROM does).
+- *A merged module the port replaces:* 27 CAudioWorld functions are `T2_LINK_REPLACED`
+  (`port/audio/t2audio_world.c`); after the merge `tools/portwrap.py` put them under
+  `#ifndef TARGET_PORT` and turned their `link.cmake` lines into comments (without it the port's link
+  fails with duplicate definitions). SndVoice (26 files) and VM (4) need the same after their merge.
+
+**Left of the five (2):**
+
+- `code/SndVoice` (41 files): `alSndp*` done (`protos/sndp.h`). Left: `func_00273EC0.c` carries a whole
+  Rage Wars type dump (about 100 types: `Triple`, `Shared_Quad`, `Voice`, `ContextRecAt2BC0`,
+  `GameplayCamera`, ...) for `SndVoice_Setup`; the port's typed copy in `port/audio/t2audio_world.c`
+  gives the field map (`View_func_8025AE1C_de`: priority 0x28 = `vp.pan`, envelope 0x8C = `env3`,
+  sweeping 0x88 = `hasEnv`, trackId 0xA8 = `soundId`, fixed 0xC0 = `reset`). Then `SndVoice_InitPitch`
+  (`ViewRecAtB0`/`ControllerCode802591C0`), `SndVoice_InitVolume` (called with 3 arguments, defined with
+  2), `Sound_CalcPan(sptr, u8 *)`, `HalfToFloat` (`s32` in `code/HalfToFloat`, `u16` in three callers)
+  and `FloatToHalf` (`u16` vs `s16`), the `CAudioWorld__Get*Envelope`/`GetStereo` callers against the
+  merged CAudioWorld's `SndEnv *` definitions. All 26 port-replaced files are under `portwrap.py` after
+  the merge, so the rewrites do not touch the port's behaviour.
+- `code/VM` (20 files): not reached this round; as round 27 lists (the `gPager_*` views against
+  `globals/pager.h`, `func_0028EE40` in three forms, `--inline` from `func_0028E068` on).
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte
