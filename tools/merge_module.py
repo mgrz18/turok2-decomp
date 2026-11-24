@@ -80,6 +80,8 @@ def items(text):
             out.append("".join(cur))
             cur = []
             continue
+        if re.search(r"/\*(?:(?!\*/).)*$", "".join(cur), re.S):
+            continue   # inside a comment that goes on (a `;` at the end of one of its lines ends nothing)
         depth = code.count("{") - code.count("}")
         s = code.strip()
         if depth == 0 and s and (s.endswith(";") or s.endswith("}")):
