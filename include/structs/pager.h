@@ -93,4 +93,16 @@ typedef struct Pager {
     /* 0xCF4 */ u8 _padCF4[4];
 } Pager; /* size 0xCF8 */
 
+/* The counters at the start of the Pager (VM_GetStats copies them out). */
+typedef struct PagerStats {
+    /* 0x00 */ s32 requests;
+    /* 0x04 */ s32 misses;
+    /* 0x08 */ u32 lastAddress;
+    /* 0x0C */ u8 unkC[0x10 - 0xC];
+    /* 0x10 */ u32 statMaxAge;
+    /* 0x14 */ u32 statMinAge;
+    /* 0x18 */ s32 statChainAge;
+    /* 0x1C */ s32 statRegionBytes;
+} PagerStats; /* size 0x20 */
+
 #endif

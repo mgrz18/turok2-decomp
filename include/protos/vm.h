@@ -13,5 +13,6 @@ void func_0028EEC0(s32 index);                  /* stvm_tlb: osUnmapTLB */
 s32 VM_AcquireNextTLB(void);
 void VM_MapTLBEntry(s16 page, PageMapping *mapping, s32 unused, u8 *pair);
 void VM_UnmapTLBEntry(PageMapping *mapping);   /* releases its TLB slot */
+PageRegion *VM_FindRegion(u32 page);
 
 #endif

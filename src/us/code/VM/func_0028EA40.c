@@ -4,7 +4,7 @@
 
 
 /* The memory region containing page arg0. */
-s32 *VM_FindRegion(u32 arg0) {
+PageRegion *VM_FindRegion(u32 arg0) {
     PageRegion *var_v1;
     u16 temp_a1;
 
@@ -19,5 +19,5 @@ loop_1:
             }
         }
     }
-    return (s32 *) var_v1;
+    return var_v1;
 }
