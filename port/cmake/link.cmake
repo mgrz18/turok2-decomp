@@ -49,11 +49,11 @@ set(T2_LINK_REPLACED
     # audio manager in port/audio/t2audio_mgr.c (frames through the ABI1 interpreter, resident
     # wave data instead of the loader's DMA windows)
     # (Sound__Initialize: under #ifndef TARGET_PORT in the merged Sound.c)
-    func_0026F760.c   # amCreateAudioMgr
-    func_0026FB70.c   # __amMain
-    func_0026FD4C.c   # __amDmaNew
-    func_0026FD88.c   # __amHandleFrameMsg
-    func_002700D0.c   # __amDMA
+    # (amCreateAudioMgr: under #ifndef TARGET_PORT in the merged AudioMgr.c)
+    # (__amMain: under #ifndef TARGET_PORT in the merged AudioMgr.c)
+    # (__amDmaNew: under #ifndef TARGET_PORT in the merged AudioMgr.c)
+    # (__amHandleFrameMsg: under #ifndef TARGET_PORT in the merged AudioMgr.c)
+    # (__amDMA: under #ifndef TARGET_PORT in the merged AudioMgr.c)
     # the sound player API (m2c views with N64 offsets): port/audio/t2audio_sndp.c
     # the sound world (Rage Wars views of CAudioWorld/SndVoice/SndQueue at N64 offsets):
     # port/audio/t2audio_world.c (docs/port/AUDIO.md §8)
@@ -133,7 +133,7 @@ set(T2_LINK_REPLACED
     # #ifndef TARGET_PORT in the merged synthesizer.c)
     func_00294200.c   # alSynSetFXMix
     # (alSaveNew: under #ifndef TARGET_PORT in the merged drvrnew.c)
-    func_0026FFA0.c   # AudioDMA_CacheBlock
+    # (AudioDMA_CacheBlock: under #ifndef TARGET_PORT in the merged AudioMgr.c)
     # libultra's compressed sequence player, cseq.c and the shared seqplayer.c helpers (Rage Wars
     # views at N64 offsets, s32 pointers): port/audio/t2audio_csp.c (docs/port/AUDIO.md §9)
     # (__getTrackByte: under #ifndef TARGET_PORT in the merged cseq.c)

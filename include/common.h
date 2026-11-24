@@ -46,4 +46,13 @@ typedef u32 uptr;
 #define DEFERRED inline
 #endif
 
+/* A function of an object linked partly into the engine and partly into the paged VM module: its own
+ * text section, which the yaml links into the VM segment while its literals stay in the object's one
+ * .rodata (docs/MODULES.md, round 27; tools/merge_module.py --vm). Nothing on the port. */
+#ifdef TARGET_PORT
+#define VM_TEXT
+#else
+#define VM_TEXT __attribute__((section(".text_vm")))
+#endif
+
 #endif

@@ -1,0 +1,9 @@
+// Linker-script fixes splat cannot express, applied by `make setup` (tools/ld_fill.py; docs/MODULES.md,
+// round 27 p3). One a line:
+//   <splat path> <hex byte> ...          linker padding that starts off 4: BYTE() statements after the
+//                                        object's .rodata line, up to the next 4 (the rest is an unnamed
+//                                        rodata subsegment)
+//   <splat path> .data after <piece>     a C file's .data inside code_rodata: its one line moved after
+//                                        build/asm/data/<piece>.o(.rodata)
+code/CInstancePool/CInstancePool 82 00 12   # 0xA6C95-0xA6C98: stale bytes after "anim object info" (round 27)
+code/Crash/Crash .data after ABCA8.rodata.s     # the crash screen data (0xB7AA0) between the engine data pieces

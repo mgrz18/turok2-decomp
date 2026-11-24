@@ -6,6 +6,29 @@ new game to the good ending with no invincibility and no life lost, on the N64's
 stream. The Mac app is packaged and ready for its first session in a real window
 ([FIRSTRUN.md](FIRSTRUN.md)); that session has not happened yet.
 
+## Round 27 merge (Phase 5): p3, p4, p1, p2; 124 modules in one C file
+
+Merged into `feat/46-hand-matching` in the order p3 (`CInstancePool` as three objects, 339 -> 341
+modules, `tools/ld_fill.py` in `make setup`/`make verify`), p4 (the engine/VM objects in one C file:
+`VM_TEXT` puts the VM part in `.text_vm`), p1 and p2 (header work), `--no-ff`: 124 modules are one C
+file, 26 directories left ([MODULES.md](../MODULES.md#round-27-merge-the-state-after-parts-p1-p4)).
+The port side of p4's merges: a merged file must declare what it calls (`CCache__*` implicitly declared
+had cut 64-bit pointers to `int`); every file merged this round compiles with no implicit declaration
+under clang `-Wimplicit-function-declaration`.
+
+**The references, re-run on the merged tree** (Linux Release, fresh gendata), all unchanged:
+boot + 3 demos `6ab97584…`; default (`--all --talismans 2 --cheats-off 1,2,3,4,5,6`) END 2 (252,468),
+5 totems, 0 lives, **`af8bd840…`**; stick combination END 2 (263,622), 0 lives, **`ad941823…`**;
+`--legacy` (290,000) END 2 (252,194), 2 lives, `ac08c89b…`.
+
+Checks: `asm_diff --base 88d57333` 0 differ over the tree after each merge; clean `make setup` + build +
+`make verify` OK; a fresh `git clone --recursive` builds and verifies; `mklayout.py --check` up to date
+(regenerated after each merge); `aligncheck` 0 sites; nested `TARGET_PORT` scan at the 2 known sites;
+`make -C port test`, `gbi_test` 0 mismatches (its Makefile now builds the two Hud functions from the
+merged `Hud.c`, `--gc-sections`), t2os x3, `t2audio_test --direct 0/40` max difference 0, `--adec` OK;
+abicheck 0 harmful, ptrargs 1/0, n64viewcheck as round 26 (linked: no `cast/BAD`, no `view/BAD`;
+unlinked `cast/BAD` 3, `gptr/BAD` 20 -> 19), f2u and outptr fewer sites (merged files).
+
 ## Round 26 merge (Phase 5): o2, o1, o3; the N64-faithful default; references on the merged tree
 
 Merged into `feat/46-hand-matching` in the order o2 (module boundaries from `.rodata` padding,

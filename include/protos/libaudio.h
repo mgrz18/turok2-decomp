@@ -15,5 +15,8 @@ s32 alCSPGetState(ALCSPlayer *seqp);
 void alCSPSetBank(ALCSPlayer *seqp, ALBank *b);
 void alCSPSetVol(ALCSPlayer *seqp, s16 vol);
 void alCSPSetChlFXMix(ALCSPlayer *seqp, u8 chan, u8 fxmix);
+void *alHeapDBAlloc(u8 *file, s32 line, ALHeap *hp, s32 num, s32 size);
+void alLink(ALLink *element, ALLink *after);
+void alUnlink(ALLink *element);
 
 #endif

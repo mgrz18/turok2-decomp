@@ -592,9 +592,9 @@ module Sort: 0x00226F90..0x0022723C, 2 functions; pad
   0x00226F90 Sort_Quick
   0x00227184 Sort_Insertion
 
-module CInstancePool: 0x00227240..0x00228908, 18 functions; pad
-  // dir src/us/code/CInstancePool
-  // name runs (possible objects the padding cannot show): CLevelActorPool 2, SceneActor 1, CPooledLevelActor 2, CLevelActorPool 4, CInstancePool 2, CListedInstance 1, CInstancePool 4, DLights 2
+module CLevelActorPool: 0x00227240..0x00227C10, 9 functions; pad
+  // dir src/us/code/CLevelActorPool
+  // name runs (possible objects the padding cannot show): CLevelActorPool 2, SceneActor 1, CPooledLevelActor 2, CLevelActorPool 4
   0x00227240 CLevelActorPool__Spawn
   0x002274A4 CLevelActorPool__Update
   0x00227664 SceneActor_Init
@@ -604,6 +604,10 @@ module CInstancePool: 0x00227240..0x00228908, 18 functions; pad
   0x002279A4 CLevelActorPool__CollectVisible
   0x00227AE0 CLevelActorPool__Alloc
   0x00227B7C CLevelActorPool__Free
+
+module CInstancePool: 0x00227C10..0x002284E0, 7 functions; rodata pad + rodata pad: at 0xA6C6C (stale 'e\en'; of func_00227AE0, func_00227C10: where CLevelActorPool__ gives way to CInstancePool__)
+  // dir src/us/code/CInstancePool
+  // name runs (possible objects the padding cannot show): CInstancePool 2, CListedInstance 1, CInstancePool 4
   0x00227C10 CInstancePool__SpawnAnimInstance
   0x00227EE8 CInstancePool__SpawnCopy
   0x002280B0 CListedInstance__Free
@@ -611,6 +615,9 @@ module CInstancePool: 0x00227240..0x00228908, 18 functions; pad
   0x0022828C CInstancePool__UpdateVisibility
   0x002283FC CInstancePool__Alloc
   0x00228484 CInstancePool__Free
+
+module DLightsLoad: 0x002284E0..0x00228908, 2 functions; rodata pad + rodata pad: at 0xA6C96 (stale words after 'anim object info'; of func_002280B0, func_002284E0: where CInstancePool__ gives way to DLights_)
+  // dir src/us/code/DLightsLoad
   0x002284E0 DLights_Load
   0x002288D0 DLights_SwapBuffers
 

@@ -169,6 +169,7 @@ setup:
 	sed -i 's/^\(    \.virtual_1 \)$(VIRTUAL_1_NAMED) :/\1$(VIRTUAL_1_LINKED) :/' $(LD_SCRIPT)
 	grep -q '^    \.virtual_1 $(VIRTUAL_1_LINKED) :' $(LD_SCRIPT)
 	$(PYTHON) $(TOOLS_DIR)/shared_rodata.py
+	$(PYTHON) $(TOOLS_DIR)/ld_fill.py
 
 build: $(O_FILES)
 
@@ -192,6 +193,7 @@ verify: $(TARGET).z64
 		    echo "expected: $(EXPECTED_SHA1)"; \
 		    exit 1)
 	@$(PYTHON) $(TOOLS_DIR)/shared_rodata.py --check
+	@$(PYTHON) $(TOOLS_DIR)/ld_fill.py --check
 
 # ---- Recipes -------------------------------------------------------------
 
