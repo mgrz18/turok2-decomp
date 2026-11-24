@@ -5,13 +5,12 @@
 #include "globals/audio.h"
 #include "globals/sysrc.h"
 #include "globals/audiomgr.h"
+#include "protos/ultra.h"
+#include "protos/libaudio.h"
 
 extern u32 __amDMA(s32 offset, s32 length);
 extern void CLoader__LoadAsync(CLoader *reader, u32, s32, sptr, void *, s32, s32);
 u32 __amDMA(s32 offset, s32 length) {
-    extern u32 osVirtualToPhysical(sptr);
-    extern void alLink(AMDMABuffer *, AMDMABuffer *);
-    extern void alUnlink(AMDMABuffer *);
     AMDMABuffer *window;
     AMDMABuffer *after;
     AMDMABuffer **pool;
@@ -32,15 +31,15 @@ u32 __amDMA(s32 offset, s32 length) {
         after = window;
         if (top >= end) {
             window->lastFrame = audFrameCt;
-            return osVirtualToPhysical((sptr) (window->ptr + address - window->startAddr));
+            return osVirtualToPhysical((void *) (window->ptr + address - window->startAddr));
         }
     }
     pool = &gAudioDmaState_firstFree;
     window = *pool;
     *pool = (AMDMABuffer *) window->node.next;
-    alUnlink(window);
+    alUnlink((ALLink *) window);
     if (after != 0) {
-        alLink(window, after);
+        alLink((ALLink *) window, (ALLink *) after);
     } else if (pool[-1] != 0) {
         after = pool[-1];
         pool[-1] = window;
@@ -59,5 +58,5 @@ u32 __amDMA(s32 offset, s32 length) {
     word = (sptr) window->ptr;
     nextDMA++;
     CLoader__LoadAsync(&gLoader, address, 0x300, word, &gAudioDmaMessageQ, 0, 1);
-    return osVirtualToPhysical(word) + odd;
+    return osVirtualToPhysical((void *) word) + odd;
 }

@@ -5,11 +5,10 @@
 #include "globals/audio.h"
 #include "globals/audiomgr.h"
 #include "protos/ultra.h"
+#include "protos/libaudio.h"
 
 extern void *func_0029E460(void *destination, const void *source, int count);
-extern sptr alHeapDBAlloc(sptr, s32, void *, s32, s32);
 u32 AudioDMA_CacheBlock(void *block, s32 size) {
-    extern u32 osVirtualToPhysical(void *);
     AMCacheEntry *entry;
     AMCacheEntry *unused;
     unused = 0;

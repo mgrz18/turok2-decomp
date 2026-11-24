@@ -7,12 +7,12 @@
 #include "globals/ucode.h"
 #include "globals/frame.h"
 #include "protos/ultra.h"
+#include "protos/libaudio.h"
 
 void *memset(void *s, int c, uptr n);
 void __amDmaNew(void);
 void __amMain(void *arg);
 void alInit(void *g, ALSynConfig *c);
-void *alHeapDBAlloc(u8 *file, s32 line, void *hp, s32 num, s32 size);
 void amCreateAudioMgr(ALSynConfig *cfg, s32 pri, B12AiCfg *c2) {
     s32 freq;
     u32 n;
@@ -42,7 +42,7 @@ void amCreateAudioMgr(ALSynConfig *cfg, s32 pri, B12AiCfg *c2) {
     for (i = 0; i < 0x3B; i++) {
         ALLink *next = &gAudioDmaBuffers[i + 1].node;
         ALLink *prev = &gAudioDmaBuffers[i].node;
-        alLink(next, prev);
+        alLink((ALLink *) next, (ALLink *) prev);
         gAudioDmaBuffers[i].ptr = alHeapDBAlloc(0, 0, cfg->heap, 1, 0x300);
     }
     gAudioDmaBuffers[i].ptr = alHeapDBAlloc(0, 0, cfg->heap, 1, 0x300);

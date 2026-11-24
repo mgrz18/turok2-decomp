@@ -2,10 +2,9 @@
 #include "globals/audio.h"
 #include "globals/audiomgr.h"
 #include "protos/ultra.h"
+#include "protos/libaudio.h"
 
 
-s32 alUnlink(void *);                      /* alUnlink */
-s32 alLink(void *, void *);              /* alLink */
 
 /* Waits for this frame's audio DMAs and frees the buffers not used lately. */
 void __clearAudioDMA(void) {
@@ -30,14 +29,14 @@ void __clearAudioDMA(void) {
                 if (gAudioDmaState.firstUsed == var_s0_2) {
                     gAudioDmaState.firstUsed = temp_s1;
                 }
-                alUnlink(var_s0_2);
+                alUnlink((ALLink *) var_s0_2);
                 if (gAudioDmaState.firstFree == NULL) {
                     gAudioDmaState.firstFree = var_s0_2;
                     var_s0_2->node.next = NULL;
                     var_s0_2->node.prev = 0;
                     goto block_11;
                 }
-                alLink(var_s0_2, gAudioDmaState.firstFree);
+                alLink((ALLink *) var_s0_2, (ALLink *) gAudioDmaState.firstFree);
                 var_s0_2 = temp_s1;
             } else {
 block_11:

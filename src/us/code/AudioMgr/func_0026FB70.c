@@ -9,7 +9,7 @@
 #include "protos/ultra.h"
 u32 osAiGetStatus(void);
 void osScAddClient(void *a, void *b, void *c);
-void __amHandleFrameMsg(AMAudioInfo *info, s32 z);
+s32 __amHandleFrameMsg(AMAudioInfo *arg0);
 void alClose(void *g);
 void __amMain(void) {
     void *sp10[2];
@@ -38,7 +38,8 @@ void __amMain(void) {
         case 7:
                 sAmFramesHandled++;
                 while (!(osAiGetStatus() & 0x80000000)) {
-                    __amHandleFrameMsg(gAudioInfo[audFrameCt % 3], arg);
+                    /* The ROM passes a second argument the definition does not take: called through a type of its own. */
+                    ((void (*)(AMAudioInfo *, s32))__amHandleFrameMsg)(gAudioInfo[audFrameCt % 3], arg);
                 }
                 for (p = gAudioDmaCache; p; p = p->next) {
                     if (p->state) {
