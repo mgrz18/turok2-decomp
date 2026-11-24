@@ -31,7 +31,7 @@ struct SharedRecAtA8 {
     s8 unkA8;
 };
 void Music_RestoreVolume(void);
-unsigned int Controller_ConfirmPressed(void *);
+extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
 void Menu_ClaimPressingController(func_80250BD4_S1 *arg0) {
     CPlayerOptions *settings;
     s8 *status;

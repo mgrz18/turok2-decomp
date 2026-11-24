@@ -5,7 +5,7 @@
 #include "globals/menu.h"
 
 extern s32 MenuItem_TextLength(MenuItem *a);
-extern void sprintf(char *dst, char *fmt, ...);
+extern void sprintf(char *dst, const char *fmt, ...);
 
 s32 MpMenu_PlayerSpeedLabel(MenuItem *a) {
     if (gEngineApp_m_Settings.speed == 1.0f) {

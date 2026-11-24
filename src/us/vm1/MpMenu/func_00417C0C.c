@@ -16,7 +16,7 @@ typedef struct StatusStep {
     char pad[0x40];
 } StatusStep;
 
-extern s32 Controller_ConfirmPressed(ControllerProfile *slot);
+extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
 
 void Mp_JoinPressingController(void) {
     StatusStep *status;

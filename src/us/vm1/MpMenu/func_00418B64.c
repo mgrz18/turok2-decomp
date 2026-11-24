@@ -5,7 +5,7 @@
 #include "globals/game.h"
 
 extern s32 MenuItem_TextLength(MenuItem *a);
-extern void sprintf(char *dst, char *fmt, ...);
+extern void sprintf(char *dst, const char *fmt, ...);
 
 /* Prints the setting at gEngineApp_m_Settings+0x21 into the label, or "none". */
 s32 BloodLustMenu_FragLimitLabel(MenuItem *a) {

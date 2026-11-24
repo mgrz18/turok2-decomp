@@ -7,7 +7,7 @@
 #include "protos/menu.h"
 
 extern s32 Controller_MenuRight(sptr);
-extern s32 Controller_ConfirmPressed(sptr);
+extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
 
 /* Steps the selection (twice when the controller reports busy) and sets the scale
  * from the table plus one, clamped to [0.5, 2.0]. */
@@ -15,7 +15,7 @@ s32 MpMenu_StepPlayerSpeed(void *arg0, Menu *item) {
     f32 scale;
 
     gMpPlayerSpeed = Menu_StepValue(item, gMpPlayerSpeed, 1, 0, 15, 0);
-    if (Controller_MenuRight(item->controller) != 0 || Controller_ConfirmPressed(item->controller) != 0) {
+    if (Controller_MenuRight(item->controller) != 0 || Controller_ConfirmPressed((ControllerProfile *) item->controller) != 0) {
         Menu_StepValue(item, gMpPlayerSpeed, 1, 0, 15, 0);
     }
     scale = sPlayerSpeedTable.scale[gMpPlayerSpeed] + 1.0f;

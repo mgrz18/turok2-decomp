@@ -5,8 +5,7 @@
 #include "structs/controller.h"
 
 extern ControllerProfile *Menu_FindPressingController(s32 *out);
-extern s32 Controller_ConfirmPressed(ControllerProfile *);
-extern s32 Controller_ConfirmPressed(ControllerProfile *slot);
+extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
 ControllerProfile *Menu_FindPressingController(s32 *out) {
     s32 i;
     ControllerProfile *s;
