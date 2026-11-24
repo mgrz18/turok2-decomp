@@ -704,3 +704,9 @@ watch-register helpers 0x00201074/0x00425710.
 2, 3, 4 of its last three keys), declared in `globals/menu_text.h`. They became names because
 `vm1/NameEntryMenu/NameEntryMenu.c` now defines the menu itself (`gNameEntryMenuItems`, was
 `D_0043AD10`, and `gNameEntryMenuDesc`; docs/MODULES.md, round 26 part o2). The four name fields point at `gNameEntries[k].name`.
+
+**After the round-26 merge** (o1, o2, o3 and the `Video`/`AutomapDraw` merges): no data name added or
+removed besides the four above; the distinct `D_` tokens in `src/` and `include/` are still **42**
+(`D_0043AD10` was only in the asm data). The Automap and Video header work removed local views of
+`gEngineApp_m_Settings`, `gEngineApp_m_pCurrentFrameData` and `gEngineApp_m_Game_m_CameraPool_m_MainCamera`,
+not names.

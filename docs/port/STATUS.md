@@ -6,6 +6,46 @@ new game to the good ending with no invincibility and no life lost, on the N64's
 stream. The Mac app is packaged and ready for its first session in a real window
 ([FIRSTRUN.md](FIRSTRUN.md)); that session has not happened yet.
 
+## Round 26 merge (Phase 5): o2, o1, o3; the N64-faithful default; references on the merged tree
+
+Merged into `feat/46-hand-matching` in the order o2 (module boundaries from `.rodata` padding,
+320 -> 339 modules, files moved), o1 (header work, `adecHuffDecode`, the twin structs) and o3 (this
+page's section below), `--no-ff`; then `vm1/Video`, `vm2/Video` and `vm1/AutomapDraw` merged
+([MODULES.md](../MODULES.md#round-26-merge-the-state-after-parts-o1-o3)): 102 modules in one C file.
+
+**The port is N64-faithful by default.** The voice id tables and the draw sort key read as on the
+N64; the old readings exist only behind the DEBUG-ONLY `T2_LEGACY_VOICE=1` and
+`T2_LEGACY_BATCHKEY=1`, which only `--legacy` (`fullrun.py`, `playthrough.py`) writes.
+
+**The references, re-measured on the merged tree** (Linux Release, fresh gendata):
+
+| run | result | det md5 |
+|---|---|---|
+| boot + 3 demos | as o3 | `6ab97584…` |
+| **default** (`--all --talismans 2 --cheats-off 1,2,3,4,5,6`) | END 2 (252,468), 5 totems, 0 lives | **`af8bd840…`** |
+| **stick combination** (`--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair`) | END 2 (263,622), 5 totems, 0 lives | **`ad941823…`** |
+| `--legacy` (290,000) | END 2 (252,194), 5 totems, 2 lives | `ac08c89b…` |
+
+**`aligncheck.py`: the "2 known sites" were a false positive, now 0.** Both were
+`GameNoteMenu_SelectYes`: `%rsi` holds `gPakMsgDeleteDoneDesc`/`FailedDesc` on one path and is
+reloaded with the 16-aligned `gLoadSavePersistentData` before the `movaps`; the heuristic kept the
+first symbol. It showed only when the two descs sat at 8 mod 16, which depends on the data layout
+(the o2 tree put them on 16: 0 sites; round 25, o3 and the merged tree: 2). The tool now forgets a
+register a later `lea`/`mov`/`pop` overwrites.
+
+**A host bug found by the merge work:** `Automap_Draw` read the colour image through a local
+`FrameBuffers` view at 0x110, which is `CFrameData.m_pFrameBuffer` on the N64 but not on the host
+(0x1A0). It now reads the member (N64 code unchanged). The det log does not see the display list:
+the default (`af8bd840…`), the stick combination (`ad941823…`) and the demos (`6ab97584…`) were
+re-run with it and did not move.
+
+Checks: `asm_diff --base 3ffda1bb` 0 differ (bar the moved `Mission_LevelObjectivesDone_2`); clean
+`make setup` + build + `make verify` OK (shared `.rodata` 167 objects); a fresh `git clone
+--recursive` builds and verifies; `mklayout.py --check` up to date; nested `TARGET_PORT` scan at the
+2 known sites; `make -C port test`, `gbi_test` 0 mismatches, t2os x3, `t2audio_test --direct 0/40`
+max difference 0, `--adec` OK; abicheck 0 harmful, ptrargs 1/0, f2u and outptr as round 25,
+n64viewcheck better than round 25 (linked: `cast/BAD` 1 -> 0, no `view/BAD`; unlinked `cast/BAD` 4 -> 3).
+
 ## Round 26, part o3: the port is N64-faithful by default; the reference runs re-baselined
 
 **The N64's reading is now the default for the two things round 25 kept for the md5s.** The voice

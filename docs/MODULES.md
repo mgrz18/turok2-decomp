@@ -395,8 +395,8 @@ change; they need more time.
 | `vm1/NameEntryMenu` | 8 | .rodata interrupted by data no C file owns (1: `unnamed@0xC1F4C`); round 25 (n2): the strings of its key table in `.data` (asm): the table in C first (compiles merged otherwise; round 25 merge: merged with `--rodata-free`, `make verify` fails, the strings are not in the C); **merged** (round 26 o2, with its key table as C `.data`) |
 | `vm1/OptionsMenu` | 31 | **merged** (round 25, n2: every function `DEFERRED`; was: .rodata not in .text order) |
 | `vm1/Pak` | 42 | .rodata not in .text order (1 inverted pairs of 3 subsegments); round 25 (n2): deferred from index 2..6 on, index 7 defined before 6; also declarations differ |
-| `vm1/PakMenu` | 140 | .rodata interrupted by data no C file owns (2: `unnamed@0xC2008`); round 25 (n2): linker padding (two places); `sPakMenuText_Spaces3` read as an extern; also declarations differ; round 26 (o2): split off `Video` at `Video_ApplyResolution` |
-| `vm1/Primagen` | 115 | .rodata interrupted by data no C file owns (2: `unnamed@0xC0F14`); round 25 (n2): linker padding twice; also declarations differ; round 26 (o2): split into `AutomapDraw`, `MantidQueen`, `Primagen` |
+| `vm1/PakMenu` | 140 | .rodata interrupted by data no C file owns (2: `unnamed@0xC2008`); round 25 (n2): linker padding (two places); `sPakMenuText_Spaces3` read as an extern; also declarations differ; round 26 (o2): split off `Video` at `Video_ApplyResolution`; round 26 merge: the split-off `Video` merged |
+| `vm1/Primagen` | 115 | .rodata interrupted by data no C file owns (2: `unnamed@0xC0F14`); round 25 (n2): linker padding twice; also declarations differ; round 26 (o2): split into `AutomapDraw`, `MantidQueen`, `Primagen`; round 26 merge: the split-off `AutomapDraw` merged |
 | `vm1/SceneActorPool` | 2 | **merged** (round 24, first batch) |
 | `vm1/SceneLoad` | 24 | .rodata interleaved with another directory's (15 subsegments between, e.g. `func_00220530`); round 25 (n2): interleaved with `code/CScene`; also declarations differ |
 | `vm1/StatsMenu` | 15 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (1: `gEngineApp_m_Settings_match_tag`)) |
@@ -416,7 +416,7 @@ change; they need more time.
 | `vm2/NameEntryMenu` | 8 | **merged** (round 25, n3: 2 parts) |
 | `vm2/OptionsMenu` | 31 | **merged** (round 25, n3: one declaration per name, 6 parts) |
 | `vm2/Pak` | 41 | **merged** (round 25, n3: its asm in C, one declaration per name, 3 parts) |
-| `vm2/PakMenu` | 133 | its .text subsegments are not adjacent; round 25: no asm left (139 files), declarations differ (n3 table above); round 26 (o2): split off `vm2/Video` |
+| `vm2/PakMenu` | 133 | its .text subsegments are not adjacent; round 25: no asm left (139 files), declarations differ (n3 table above); round 26 (o2): split off `vm2/Video`; round 26 merge: the split-off `Video` merged |
 | `vm2/Primagen` | 35 | its .text subsegments are not adjacent; round 25: no asm left (53 files), declarations differ (n3 table above) |
 | `vm2/SceneActorPool` | 2 | **merged** (round 24, first batch) |
 | `vm2/SceneLoad` | 19 | its .text subsegments are not adjacent; round 25: no asm left (23 files), declarations differ (n3 table above) |
@@ -696,6 +696,47 @@ local `Sched`/`Client`/`Qn` views of `OSSched` per file: one rewrite onto `struc
 `LevelScript` views), `vm2/SceneLoad` (133: the CList family). The 4 deferred directories
 (`code/CLevelActor`, `code/VM`, `vm1/TotemDefense`, `vm1/Pak`) were not reached: each needs the same
 header work before `--inline`. None needs a ROM change.
+
+## Round 26 merge: the state after parts o1-o3
+
+Merged in the order o2 (it moves directories), o1, o3 (`--no-ff`). o1's edits to files o2 moved
+(`vm1/PakMenu/func_00424008.c`, `vm2/PakMenu/func_0045CF28.c`, now in `Video`) came along with
+git's rename detection; o1's six merged directories are one file each on the merged tree. After each
+merge: `asm_diff --base 3ffda1bb` 0 over the tree except `vm2/MissionMenu/MissionMenu_2.c`, whose only
+hunk is `Mission_LevelObjectivesDone_2`, moved to `vm2/Mission` by o2; a clean `make setup` + build +
+`make verify` OK; the port compiles from a fresh gendata; `mklayout.py` regenerated where stale.
+
+**`merge_check.py --rodata-free` over the 51 directories left:** none passed as it stood (44 stop at
+the compiler, 7 refused: the 6 engine/VM objects and `code/CEngineApp`, whose name is taken). The
+three smallest were taken through one declaration per name and merged (`asm_diff` 0, `make verify`):
+
+- `vm1/Video`, `vm2/Video`: `Video_SetMode` reached the main camera through an `extern` of its local
+  `NodeRecAt294` type; it now includes `globals/camera.h` and casts the address. `Video_SetMode` and
+  `Video_ResizeViMode` take the definition's prototype everywhere.
+- `vm1/AutomapDraw`: `Automap_Draw` had three local views (`gEngineApp_m_Settings` as an `s32`,
+  `gEngineApp_m_Settings_nextMode`, `gEngineApp_m_pCurrentFrameData[]`); with `globals/game.h` it reads
+  `gEngineApp_m_Settings_cheatFlags` and `gEngineApp.m_pCurrentFrameData->m_pFrameBuffer` (the
+  struct member schedules as the ROM does, the plain scalar and a cast array do not). The old
+  `FrameBuffers` view read the colour image at 0x110 on the host too, where `CFrameData` has it at
+  0x1A0: a host bug the local view hid from `n64viewcheck.py` (it showed as `view/BAD` once the type
+  was the real one). `Automap_RevealAroundPlayer` takes the automap as `void *` in both files.
+- `code/CInstancePool` (not merged): its prototypes are one now, but the `--rodata-free` merge does
+  not link (`sCInstancePoolCacheDesc_AnimObjectIndex`/`_AnimObjectInfo` are read as externs and the
+  merged `.rodata` no longer defines them). The bytes say more: `"e\en"` stale at 0xA6C6C and stale
+  bytes after `"anim object info"` up to 0xA6CA0, i.e. two more 16-aligned `.rodata` ends inside the
+  module: it is likely three objects (a `rodata pad` that `tools/rodata_gaps.py` does not classify as
+  `PADDING`). Left for the boundary pass.
+
+**State: 102 modules are one C file; 48 directories hold one function per file.**
+
+| Reason | Directories |
+|---|---|
+| header work only (first conflicts above and in part o1) | `code/{AI, AudioMgr, CAudioWorld, CCache, CGameRegion, DList, EnemyAI, GameObject, Hud, ImpactEvent, LevelEvent, ModelSweep, Pickup, SndVoice, SweepShapes, WeaponMode, __scHandleRSP}`, `vm1/{BlindOne, MantidQueen, MissionMenu, Primagen, TitleMenu}`, `vm2/{BlindOne, MpMenu, PakMenu, Primagen, SceneLoad, TitleMenu}` (28) |
+| data the C reads as externs, or `.data` tables in asm | `code/{Anim, CEngineApp, CGameObjectInstance, CInstancePool, CMtxF, Crash, CParticle, Trail}`, `vm1/{MpMenu, PakMenu}` (10) |
+| one object over the engine and the VM (`section(".text.vm")` route, part o2) | `code/{CPlayer, CScene, CCamera}`, `vm1/{CPlayer, SceneLoad, Demo}` (6) |
+| deferred functions plus header work | `code/{CLevelActor, VM}`, `vm1/{TotemDefense, Pak}` (4) |
+
+None needs a ROM change.
 
 ## Evidence
 
