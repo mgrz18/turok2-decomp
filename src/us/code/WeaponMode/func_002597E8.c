@@ -2,9 +2,8 @@
 #include "structs/player.h"
 #include "structs/game_object.h"
 #include "globals/engine.h"
+#include "protos/weapon_mode.h"
 
-s32 CPlayer__StartWeaponBackgroundSound(void *, s32);             /* extern */
-s32 Sound__StopSoundId(s32);                     /* extern */
 
 void WeaponSound_Update_AF12C(CGameObjectInstance *arg0, CAI *arg1) {
     CPlayer *temp_a0;

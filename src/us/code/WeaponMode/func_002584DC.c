@@ -3,14 +3,13 @@
 #include "structs/player.h"
 #include "globals/engine.h"
 #include "protos/ai.h"
+#include "protos/weapon_mode.h"
 
 /* Weapon state for weapon 0x14: drains ammo while firing, every third tick. */
 
 
-extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 extern s16 *CPlayer__GetFiringAmmo(CPlayer *player, s32 weapon);
 extern void CPlayer__StopWeaponFiringSound(CPlayer *player);
-extern s32 CPlayer__FireWeapon(void *player, s32 arg1);
 
 #define USE_AMMO()                                              {                                                               ammo = &player->m_Data.m_AmmoList[*CPlayer__GetFiringAmmo(player, 0x14)];         n = *ammo - 1;                                              if (n < 0) {                                                    n = 0;                                                  }                                                           *ammo = n;                                              }
 

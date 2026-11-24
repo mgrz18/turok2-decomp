@@ -2,10 +2,10 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "protos/ai.h"
+#include "protos/weapon_mode.h"
 
 
 s16 *CPlayer__GetFiringAmmo(CPlayer *player, s32 weapon);
-s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 
 void WeaponMode_Weapon10Fire_Enter(CGameObjectInstance *actor, void *state) {
     CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);

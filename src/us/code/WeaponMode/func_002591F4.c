@@ -3,11 +3,11 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "structs/controller.h"
+#include "protos/weapon_mode.h"
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
 f32 Math_DecayToZero(f32 value, f32 rate);
-void Sound__StopSoundId(s32 sound);
 
 /* A weapon's spinning barrel (an AI callback): the weapon actor's CAI keeps the mode and
  * the barrel's angle and speed (m_Weapon), the actor's parent is the player, whose

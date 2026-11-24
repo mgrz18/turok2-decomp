@@ -1,6 +1,6 @@
 #include "common.h"
+#include "protos/ai.h"
 
-void CAI__SetMode();                            /* extern */
 
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CAI__SetMode receives WeaponActor_SetModeWrapper's own argument
  * registers (pass-through); the host passes them. */

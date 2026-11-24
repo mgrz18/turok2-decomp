@@ -5,11 +5,10 @@
 #include "globals/camera.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "protos/weapon_mode.h"
 
 /* Host body: the N64 State view reads the CAI at N64 offsets (mode table 0x2C, effects 0x108,
  * the weapon vars at 0x10C..); on the host they are members (m_Weapon: CWeaponAIVars). */
-void CCameraPool__AddText(void *buf, sptr a, sptr b);
-void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 id);
 
 void WeaponActor_EquipRequested(CGameObjectInstance *actor, CAI *state) {
     CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);

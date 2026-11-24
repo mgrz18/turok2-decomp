@@ -2,8 +2,8 @@
 #include "structs/player.h"
 #include "structs/game_object.h"
 #include "protos/ai.h"
+#include "protos/weapon_mode.h"
 
-s32 CPlayer__GetWeaponAmmo(void *, s16);                     /* extern */
 
 void WeaponMode_AE694_Update(CGameObjectInstance *arg0, CAI *arg1) {
     CPlayer *temp_s0;

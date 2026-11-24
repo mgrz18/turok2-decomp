@@ -2,8 +2,8 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "protos/ai.h"
+#include "protos/weapon_mode.h"
 
-extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 extern s16 *CPlayer__GetFiringAmmo(CPlayer *player, s32 weapon);
 
 /* Fire check for the first-person weapon: once its cooldown is over and the

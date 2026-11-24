@@ -2,10 +2,10 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "protos/weapon_mode.h"
 
 
 /* Host body: the State view's 0x64 is m_ConditionTimer (cleared as a word), 0x118 m_Weapon.m_FireDelay. */
-void CPlayer__StartWeaponFiringSound(CPlayer *player, s32 id);
 
 void WeaponMode_AE714_Enter(CGameObjectInstance *actor, CAI *state) {
     CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);

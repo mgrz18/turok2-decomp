@@ -1,10 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "protos/weapon_mode.h"
 
-s32 CPlayer__FireWeapon(sptr, s32);
-s32 CPlayer__StartWeaponBackgroundSound(sptr, s32);
-s32 CPlayer__StartWeaponFiringSound(sptr, s32);
 
 
 void WeaponMode_AE634_Enter(CGameObjectInstance *obj, CAI *ai) {

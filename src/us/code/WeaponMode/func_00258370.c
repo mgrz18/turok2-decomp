@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "globals/engine.h"
 #include "protos/ai.h"
+#include "protos/weapon_mode.h"
 #ifdef TARGET_PORT
 #include "structs/camera.h"
 #endif
@@ -11,12 +12,8 @@
 
 
 
-extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
-extern s32 Sound__Play(s32 sound, CVector3 position, CVector3 *source, sptr arg5);
 extern void CPlayer__StopWeaponFiringSound(CPlayer *player);
 extern void CPlayer__StopWeaponBackgroundSound(CPlayer *player);
-extern s32 CPlayer__StartWeaponFiringSound(CPlayer *player, s32 sound);
-extern s32 CPlayer__FireWeapon(void *player, s32 arg1);
 extern void Math_EaseToward(f32 *value, f32 target, f32 rate);
 
 void WeaponMode_SpinFire_Update(void *obj, CAI *state) {

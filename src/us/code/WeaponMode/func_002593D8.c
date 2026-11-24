@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
+#include "protos/weapon_mode.h"
 
 extern f32 Math_Approach(f32 value, f32 target, f32 rate);
-extern void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 sound);
 extern void CPlayer__StopWeaponBackgroundSound(CPlayer *player);
 
 void WeaponActor_Sway_AF084(void *obj, CAI *state) {

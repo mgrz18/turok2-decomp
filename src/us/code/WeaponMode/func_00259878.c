@@ -3,10 +3,10 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 #include "protos/ai.h"
+#include "protos/weapon_mode.h"
 
 
 /* Host body: the State view's 0x110 is m_Weapon.m_BarrelSpeed, 0x118 m_Weapon.m_FireDelay. */
-void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 id);
 void CPlayer__StopWeaponBackgroundSound(CPlayer *player);
 
 void WeaponMode_AE794_Update(CGameObjectInstance *actor, CAI *state) {

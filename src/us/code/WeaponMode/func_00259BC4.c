@@ -2,8 +2,8 @@
 #include "structs/camera.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "protos/weapon_mode.h"
 
-s32 Sound__Play(s16, CVector3, sptr, sptr);
 
 void WeaponMode_AE7F4_Enter(CGameObjectInstance *obj, CAI *ai) {
     CVector3 *temp_v0;

@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/weapon_mode.h"
 
 #ifdef TARGET_PORT
 #include "structs/pose_host.h"
 /* Host body: the pose callback's context is T2PoseContext (structs/pose_host.h; the N64
  * view reads the instance at 0x00 and the bone at 0x90 of the N64 layout). */
 
-extern void CMtxF__PreRotateY(void *arg0, f32 arg1);
 extern void CMtxF__RotateY(void *arg0, f32 arg1);
 
 void WeaponBarrel_NodeMatrix_AEE38(void *arg0, T2PoseContext *state) {
@@ -37,7 +37,6 @@ typedef struct {
     /* 0x90 */ s32 mode;
 } WeaponState;
 
-extern void CMtxF__PreRotateY(void *arg0, f32 arg1);
 extern void CMtxF__RotateY(void *arg0, f32 arg1);
 
 void WeaponBarrel_NodeMatrix_AEE38(void *arg0, WeaponState *state) {

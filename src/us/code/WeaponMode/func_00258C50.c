@@ -3,8 +3,8 @@
 #include "structs/game_object.h"
 #include "structs/weapon.h"
 #include "protos/ai.h"
+#include "protos/weapon_mode.h"
 
-s32 CPlayer__GetWeaponAmmo(sptr, s32);
 s32 WeaponActor_CheckFire(sptr, sptr);
 
 

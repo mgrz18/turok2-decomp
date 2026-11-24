@@ -2,9 +2,9 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "globals/engine.h"
+#include "protos/weapon_mode.h"
 
 extern f32 Math_DecayToZero(f32 value, f32 rate);  /* moves value toward zero */
-extern void Sound__StopSoundId(s32 sound);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 

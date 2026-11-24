@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/weapon_mode.h"
 
-s32 CPlayer__FireWeapon(sptr, s32);
 
 /* Weapon callback: forwards to the owning player (m_AI.m_pParent). */
 void WeaponActor_FireCallback(CGameObjectInstance *arg0, sptr arg1, s32 arg2) {

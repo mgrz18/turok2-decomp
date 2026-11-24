@@ -3,8 +3,8 @@
 #include "structs/weapon.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "protos/weapon_mode.h"
 
-extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 
 /* The next weapon the player can switch to: the first usable one after the
  * current, else the last usable one before it (weapons 12 and 23 are never

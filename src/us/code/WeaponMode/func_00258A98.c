@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 #include "protos/ai.h"
+#include "protos/weapon_mode.h"
 
 /* the CPlayer words by member on the host (N64 0xB2C m_CrossHairMode, 0xB30 m_CrossHairTimer,
  * 0xB38 m_pCrossHairTarget, cleared as a pointer, 0xA64 m_ContState.m_dwButtons) */
@@ -11,7 +12,6 @@
 #define PL_BUTTONS(p) ((p)->m_ContState.m_dwButtons)
 
 extern s32 WeaponActor_CheckFire(CGameObjectInstance *weapon, CAI *state);
-extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 
 void WeaponMode_Switch_Update(CGameObjectInstance *weapon, CAI *state) {
     CPlayer *player = (*(CPlayer **)&((CGameObjectInstance *)weapon)->m_AI.m_pParent);

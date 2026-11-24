@@ -5,10 +5,10 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "protos/ai.h"
+#include "protos/weapon_mode.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 
-extern void CCameraPool__AddText(void *arg0, void *camera, sptr model);
 
 /* WeaponActor_SwitchToRequested, inlined: switches the weapon actor to its owner's
  * requested weapon. */
