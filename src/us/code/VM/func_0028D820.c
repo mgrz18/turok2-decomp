@@ -7,6 +7,7 @@
 #include "globals/pager.h"
 #include "globals/sysrc.h"
 #include "protos/ultra.h"
+#include "protos/vm.h"
 
 
 extern u8 gVirtualRomStart[];       /* ROM 0x14A000: the virtual segment (VM module 1 first) */
@@ -15,8 +16,7 @@ extern u8 gVirtualModule1Size[];    /* 0x3CAE0: VM module 1's size, an absolute 
 u32 GetMemSize(void);            /* osGetMemSize */
 void __osUnmapTLBAll(void);           /* osUnmapTLBAll */
 void VM_ListAddTail(PageChain *chain, PageMapping *slot);
-void CLoader__LoadSync(CLoader *reader, u8 *source, void *size, uptr dest);
-void func_0028EE40(s32 arg0, s32 arg1, s32 arg2, u32 addr, u32 arg4, s32 arg5);
+void CLoader__LoadSync(CLoader *thisx, uptr address, sptr length, void *dest);
 void memset(void *dst, s32 value, sptr size);
 void VM_ManagerThread(void);
 
@@ -65,10 +65,10 @@ void VM_Initialize(void) {
     gPager.regions.source = (u8 *)((uptr)gVirtualRomStart | 0xB0000000);
     gPager.mapped = 0;
     if (GetMemSize() > 0x4FFFFF) {
-        CLoader__LoadSync(&gLoader, gVirtualRomStart, gVirtualModule1Size, extra);
+        CLoader__LoadSync(&gLoader, (uptr)gVirtualRomStart, (sptr)gVirtualModule1Size, (void *)extra);
     }
     if (extra != 0) {
-        func_0028EE40(0, 0x7E000, 0x400000, extra + 0x80000000, extra + 0x80040000, 7);
+        func_0028EE40(0, 0x7E000, (void *)0x400000, extra + 0x80000000, extra + 0x80040000, 7);
         gPager.expanded = 1;
         gPager.mapped = 1;
     }

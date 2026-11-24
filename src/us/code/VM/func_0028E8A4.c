@@ -14,7 +14,7 @@
 
 
 void memset(void *dst, s32 value, sptr size);
-void CLoader__LoadSync(CLoader *reader, u8 *source, sptr size, void *dest);
+void CLoader__LoadSync(CLoader *thisx, uptr address, sptr length, void *dest);
 void VM_HandleTLBMiss(void);
 void VM_FinishPageJob(PageJob *job);
 void VM_FreeRegion(PageJob *job);
@@ -32,7 +32,7 @@ void VM_ReaderThread(void *unused) {
     for (;;) {
         osRecvMesg(&gPager.pending, &message, 1);
         if (*((PageJob *)message)->slot == 0xFF) {
-            CLoader__LoadSync(&gLoader, ((PageJob *)message)->source, (((PageJob *)message)->size + 1) & ~1,
+            CLoader__LoadSync(&gLoader, (uptr)((PageJob *)message)->source, (((PageJob *)message)->size + 1) & ~1,
                           gVMPages + (((PageJob *)message)->mapping->index << 12));
             osInvalDCache(gVMPages + (((PageJob *)message)->mapping->index << 12), 0x1000);
             osInvalICache(gVMPages + (((PageJob *)message)->mapping->index << 12), 0x1000);
