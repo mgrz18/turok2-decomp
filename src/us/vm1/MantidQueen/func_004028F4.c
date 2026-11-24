@@ -22,7 +22,7 @@ typedef struct {
 } Obj004028F4;
 #endif
 
-s16 WeightedTable_PickStatic(struct Pick *table);
+s16 WeightedTable_PickStatic(void *);
 void GameObject_TraceMove(Obj004028F4 *obj, Vec3_004028F4 pos, Vec3_004028F4 *posp, s32 *out, s32 a5, s32 a6);
 
 void MantidQueen_SpawnMinion(s32 a0, Obj004028F4 *obj, s32 a2, Vec3_004028F4 pos) {

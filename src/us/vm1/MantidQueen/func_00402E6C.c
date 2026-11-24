@@ -9,14 +9,17 @@
 #endif
 f32 AI_AngleToPoint(s32, s32, s32, s32);
 
-s32 ScriptAnimator_SetScript(void *, s32 *);           /* extern */
-extern s32 sMantidQueenMode6SpotScript; /* local type: f32[] in globals/boss.h, whose structs/boss.h clashes with this file's u8 [] gMantidQueen */
-extern u8 gMantidQueen[]; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
+#include "globals/boss.h"
+
+void ScriptAnimator_SetScript(void *, void *);
+#ifndef TARGET_PORT
+/* gMantidQueen as bytes: through this view the ROM's code (an asm label, the header's name keeps its type) */
+extern u8 gMantidQueen_bytes[] __asm__("gMantidQueen");
+#endif
 
 #ifdef TARGET_PORT
 #include "structs/game_object.h"
 #include "structs/player.h"
-#include "structs/boss.h"
 #undef AI_AngleToPoint
 extern f32 AI_AngleToPoint(void *actor, CVector3 point);
 
@@ -27,7 +30,7 @@ void MantidQueen_UpdateMode6(sptr arg0, void *arg1)
 {
   CGameObjectInstance *obj = (CGameObjectInstance *) arg0;
   CAI *ai = (CAI *) arg1;
-  WaveBossState *s = (WaveBossState *) gMantidQueen; /* the u8[] view declared above */
+  WaveBossState *s = &gMantidQueen;
   CGameObjectInstance *player;
   s32 spot;
 
@@ -44,7 +47,7 @@ void MantidQueen_UpdateMode6(sptr arg0, void *arg1)
     spot = s->step->weakSpot;
     if (spot != -1)
     {
-      ScriptAnimator_SetScript(&s->spots[spot].anim, &sMantidQueenMode6SpotScript);
+      ScriptAnimator_SetScript(&s->spots[spot].anim, sMantidQueenMode6SpotScript);
     }
   }
 }
@@ -60,8 +63,8 @@ void MantidQueen_UpdateMode6(sptr arg0, void *arg1)
   var_s0 = arg0;
   var_s2 = arg1;
   temp_v0 = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
-  var_s1 = &gMantidQueen;
-  var_s1 = &gMantidQueen;
+  var_s1 = &gMantidQueen_bytes;
+  var_s1 = &gMantidQueen_bytes;
   if (temp_v0 != 0)
   {
     new_var = 0xC;
@@ -70,12 +73,12 @@ void MantidQueen_UpdateMode6(sptr arg0, void *arg1)
   *((s32 *) (((s8 *) var_s0) + 0xD4)) = (s32) ((*((s32 *) (((s8 *) var_s0) + 0xD4))) | 0x2000);
   if ((*((s8 *) (((s8 *) var_s2) + 0xC7))) != 0)
   {
-    AI_PlayAnim(*((s32 *) (((s8 *) (&gMantidQueen)) + 0x220)), (*((s32 *) (((s8 *) (&gMantidQueen)) + 0x220))) + 0x140, 0x5ADC);
+    AI_PlayAnim(*((s32 *) (((s8 *) (&gMantidQueen_bytes)) + 0x220)), (*((s32 *) (((s8 *) (&gMantidQueen_bytes)) + 0x220))) + 0x140, 0x5ADC);
     CAI__SetMode(var_s0, var_s2, 7);
-    temp_v1 = *((s32 *) (((s8 *) (*((void **) (((s8 *) (&gMantidQueen)) + 0x214)))) + 0x14));
+    temp_v1 = *((s32 *) (((s8 *) (*((void **) (((s8 *) (&gMantidQueen_bytes)) + 0x214)))) + 0x14));
     if (temp_v1 != (-1))
     {
-      ScriptAnimator_SetScript((temp_v1 * 0x68) + ((u8 *) (gMantidQueen + new_var)), &sMantidQueenMode6SpotScript);
+      ScriptAnimator_SetScript((temp_v1 * 0x68) + ((u8 *) (gMantidQueen_bytes + new_var)), sMantidQueenMode6SpotScript);
     }
   }
 }

@@ -5,7 +5,7 @@
 #include "protos/ai.h"
 
 s32 MantidQueen_Hurt(s32, s32, s32);
-s32 MantidQueen_Step(sptr, sptr);
+void MantidQueen_Step(); /* defined later on its own view of the actor */
 s32 MantidQueen_Draw(sptr, sptr, sptr);
 
 void EnemyAI_HeadNodeCallback(void);

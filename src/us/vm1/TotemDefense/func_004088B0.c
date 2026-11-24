@@ -72,7 +72,7 @@ static __inline__ void startBossAnim(BossActor *obj) {
  * m_Destructible), the draw callback (N64 0x234 = m_AI.m_pfDraw), the totem's animation on its
  * CAI and gTotemDefense by member. Through the N64 views the host wrote the callbacks and the
  * animation into other CAI fields: the Harbor Totem's defense never ran its own update. */
-void TotemDefense_Init(BossActor *obj_, BossEvents *events_) {
+DEFERRED void TotemDefense_Init(BossActor *obj_, BossEvents *events_) {
     CGameObjectInstance *obj = (CGameObjectInstance *) obj_;
     CAI *events = (CAI *) events_;
     CAI *ai;
@@ -95,7 +95,7 @@ void TotemDefense_Init(BossActor *obj_, BossEvents *events_) {
     COnScreen__SetBoss2(&gEngineApp_m_OnScreen, obj_, "Time");
 }
 #else
-void TotemDefense_Init(BossActor *obj, BossEvents *events) {
+DEFERRED void TotemDefense_Init(BossActor *obj, BossEvents *events) {
     events->onUpdate = TotemDefense_Update;
     events->onEvent = TotemDefense_OnEvent;
     gTotemDefense_obj_v[0] = obj;

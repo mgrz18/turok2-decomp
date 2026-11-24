@@ -9,9 +9,9 @@ typedef struct {
     /* 0x00 */ u8 pad0[0x40];
 } Path;
 
-extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+void AI_UpdateTargets(void *, void *, CAITargets *, s32, s32);
 extern void AI_ComputeFrameMotion(CGameObjectInstance *actor, CAI *ai, Path *path);
-extern s32 AI_IsAimedAt(CGameObjectInstance *actor, CAI *ai, sptr visible, f32 angle);
+s32 AI_IsAimedAt(void *, void *, sptr, f32);
 extern f32 func_00298470(f32); /* sqrtf */
 
 void MantidQueen_ChooseAttack(CGameObjectInstance *actor, CAI *ai) {
@@ -32,7 +32,7 @@ void MantidQueen_ChooseAttack(CGameObjectInstance *actor, CAI *ai) {
     }
     AI_UpdateTargets(actor, ai, &t, 1, 1);
     AI_ComputeFrameMotion(actor, ai, &path);
-    AI_TurnClamped(actor, ai, turn, t.m_Path.m_Angle);
+    AI_TurnClamped(actor, (sptr) ai, turn, t.m_Path.m_Angle);
     visible = t.m_Sight.m_pTarget;
     if (gMantidQueen_blink == 0) {
         side = 0;
