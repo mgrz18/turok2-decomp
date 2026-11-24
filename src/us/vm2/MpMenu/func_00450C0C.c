@@ -23,8 +23,8 @@ struct StatusStep {
     char pad[0x40];
 };
 extern void Mp_JoinPressingController_2(void);
-extern s32 Controller_ConfirmPressed(ControllerProfile *);
-extern s32 Controller_ConfirmPressed(ControllerProfile *slot);
+s32 Controller_ConfirmPressed(ControllerProfile *pad);
+s32 Controller_ConfirmPressed(ControllerProfile *pad);
 void Mp_JoinPressingController_2(void) {
     StatusStep *status;
     CPlayerOptions *settings;

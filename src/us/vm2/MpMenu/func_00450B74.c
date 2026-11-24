@@ -37,7 +37,7 @@ struct MenuRecAt20V2 {
     PakMenuSlot *widget;
 };
 extern void Menu_SetPakWatch_2(void *arg0, s32 arg1);
-extern void Controller_WatchPak(s32 arg);
+void Controller_WatchPak(s32 on);
 extern void Controller_UnwatchPak(sptr arg);
 void Menu_SetPakWatch_2(void *arg0, s32 arg1) {
     s32 val;

@@ -6,12 +6,12 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-extern s32 Controller_ConfirmPressed(void *p);
+s32 Controller_ConfirmPressed(ControllerProfile *pad);
 extern s32 Menu_StepValueLR_2(Menu *a, s32 cur, s32 step, s32 lo, s32 hi, s32 wrap);
 extern void CPlayer__SetCharacter_2(CPlayer *player, s32 v);
 extern void MenuItem_SetModel_2(void *a, s32 b, s32 c);
 extern void Sound__Play2D(s32 a);
-extern void MenuPool_OpenChildMenu_2(sptr a, sptr b, void *c);
+sptr MenuPool_OpenChildMenu_2(struct MenuPool *, struct Menu *, struct MenuDesc *);
 extern s16 D_800C1E7A[][2];     /* 2 bytes into the module copy of gCharacterSelectSounds: [i][0] is the sound */
 s32 CharacterMenu_SelectCharacter_2(void *x, Menu *m, void *y) {
     CPlayer *player = m->player;

@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-s32 Menu_StepValue_2(s32, s32, s32, s32, s32, s32);
+s32 Menu_StepValue_2(struct Menu *, s32, s32, s32, s32, s32);
 
 s32 PlayerSetupMenu_StepControlType_2(s32 arg0, Menu *arg1) {
     CPlayerOptions *temp_s0;

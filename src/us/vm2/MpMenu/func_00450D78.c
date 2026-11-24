@@ -26,13 +26,13 @@ typedef struct S10Game {
                u8 pad7C[4];
                s32 unk80;
 } S10Game;
-extern S10Game gEngineApp_m_Settings_match[]; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
+extern S10Game gMatchView[] __asm__("gEngineApp_m_Settings_match"); /* the array view (GameMatch in globals/game.h) keeps the ROM's code: the stores base on the symbol */
 extern void CPlayerPool__EndMatch(void *p);
 s32 FinalScoreMenu_Poll_2(void) {
     sFinalScoreTimer += gFrameIncrement;
     if (sFinalScoreTimer >= 120.0f) {
-        gEngineApp_m_Settings_match->unk24 = 0;
-        CPlayerPool__EndMatch((u8 *)gEngineApp_m_Settings_match - 0x1440);
+        gMatchView->unk24 = 0;
+        CPlayerPool__EndMatch((u8 *)gMatchView - 0x1440);
         return 1;
     }
     return 0;

@@ -4,7 +4,7 @@
 #include "globals/game.h"
 
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
-s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
+extern void sprintf(char *dst, char *fmt, ...);
 
 /* Writes setting unk26 (or "none" when 0) over the end of the item's text. */
 s32 FragTagMenu_TagLimitLabel_2(MenuItem *item) {

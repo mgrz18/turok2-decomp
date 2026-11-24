@@ -5,9 +5,9 @@
 #include "globals/menu.h"
 #include "globals/menu_data.h"
 
-s32 Menu_StepValue_2(Menu *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap);
+s32 Menu_StepValue_2(struct Menu *, s32, s32, s32, s32, s32);
 s32 Controller_MenuRight(sptr controller);
-s32 Controller_ConfirmPressed(sptr controller);
+s32 Controller_ConfirmPressed(ControllerProfile *pad);
 
 #define MIN(a, b) ((b) < (a) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))

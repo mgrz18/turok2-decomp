@@ -2,7 +2,7 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-s32 Controller_WatchPak(s8);                          /* extern */
+void Controller_WatchPak(s32 on);
 
 /* A menu window callback: the window (structs/menu.h) and the controller it reads. */
 

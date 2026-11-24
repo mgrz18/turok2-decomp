@@ -7,7 +7,7 @@
 
 extern s32 MenuItem_TextLength_2(MenuItem *a);
 /* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
-extern void sprintf(char *dst, const char *fmt, ...);
+extern void sprintf(char *dst, char *fmt, ...);
 
 /* Prints gEngineApp_m_Settings.match.teamScore[1] over the last four characters of the label. */
 s32 FinalScoreMenu_RedScoreLabel_2(MenuItem *a) {

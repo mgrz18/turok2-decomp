@@ -5,7 +5,7 @@
 #include "globals/game.h"
 
 
-extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
+s32 Controller_ConfirmPressed(ControllerProfile *pad);
 extern s32 Random_Next(void);
 extern void CEngineApp__StartGame_2(void *a, s32 level);
 

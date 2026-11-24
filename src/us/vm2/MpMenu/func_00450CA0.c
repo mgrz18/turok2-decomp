@@ -8,8 +8,8 @@
 #include "structs/controller.h"
 #include "structs/list.h"
 extern ControllerProfile *Menu_FindPressingController_2(s32 *out);
-extern s32 Controller_ConfirmPressed(ControllerProfile *);
-extern s32 Controller_ConfirmPressed(ControllerProfile *slot);
+s32 Controller_ConfirmPressed(ControllerProfile *pad);
+s32 Controller_ConfirmPressed(ControllerProfile *pad);
 ControllerProfile *Menu_FindPressingController_2(s32 *out) {
     s32 i;
     ControllerProfile *s;

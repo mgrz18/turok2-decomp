@@ -2,7 +2,7 @@
 #include "structs/game.h"
 #include "globals/game.h"
 
-s32 Menu_StepValue_2(s32, s32, s32, s32, s32, s32);
+s32 Menu_StepValue_2(struct Menu *, s32, s32, s32, s32, s32);
 
 s32 BloodLustMenu_StepLevel_2(s32 arg0, s32 arg1) {
     GameSettings *var_s0;

@@ -5,7 +5,7 @@
 #include "structs/menu.h"
 
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
-s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
+extern void sprintf(char *dst, char *fmt, ...);
 
 
 /* Shows the player's handicap: two special values, otherwise a per-port line with the number. */

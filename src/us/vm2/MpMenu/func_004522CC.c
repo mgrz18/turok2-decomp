@@ -5,7 +5,7 @@
 #include "globals/game.h"
 
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
-s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
+extern void sprintf(char *dst, char *fmt, ...);
 
 
 /* Names setting 0x2E. */

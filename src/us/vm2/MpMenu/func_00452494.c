@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/menu_desc.h"
 
-s32 MenuPool_OpenChildMenu_2(s32, s32, s32);
+sptr MenuPool_OpenChildMenu_2(struct MenuPool *, struct Menu *, struct MenuDesc *);
 
 
 s32 DeathmatchMenu_OpenWeapons_2(s32 arg0, s32 arg1, s32 arg2) {

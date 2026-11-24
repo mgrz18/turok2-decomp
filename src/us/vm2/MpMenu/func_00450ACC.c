@@ -39,7 +39,7 @@ struct Shared_func_8043DEDC_S3 {
     s8 unk2F;
 };
 void Music_RestoreVolume(void);
-unsigned int Controller_ConfirmPressed(void *);
+s32 Controller_ConfirmPressed(ControllerProfile *pad);
 void Menu_ClaimPressingController_2(func_80250BD4_S1 *arg0) {
     Shared_func_8043DEDC_S3 *settings;
     s8 *status;
