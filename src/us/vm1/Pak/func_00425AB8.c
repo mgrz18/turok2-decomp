@@ -8,7 +8,7 @@
 #include "globals/controller.h"
 #include "structs/controller.h"
 
-extern s32 Controller_Lock(s32 flag);
+extern s32 Controller_Lock(s32 arg0);
 extern void Controller_Unlock();
 extern void Controller_ReadAll(void);
 s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);

@@ -1,5 +1,3 @@
-/* The second VM module's copy of src/us/vm1/TotemDefense/func_004089E0.c (byte for byte, at the same link address or 0xE0 below
- * it, docs/VMASM.md), with the second module's names. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/model.h"

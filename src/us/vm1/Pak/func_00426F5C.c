@@ -1,21 +1,19 @@
-/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RESMGR/resmgr_string_memory.CPP, func_802A0324_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+/* WRONG CUT: REAL Str_CatN size 0x58 (splat cut it into Str_CatN + func_00426F7C + func_00426F9C). */
+#include "common.h"
 
-typedef unsigned char u8;
-typedef signed int s32;
-extern u8 *Str_CatN(u8 *destination, u8 *source, s32 count);
-u8 *Str_CatN(u8 *destination, u8 *source, s32 count) {
-    u8 *end = destination + 1;
-    u8 byte;
-    if (*destination != 0) {
-        do { } while (*end++ != 0);
+/* strncat. */
+u8 *Str_CatN(u8 *dst, u8 *src, s32 n) {
+    u8 *p;
+
+    p = dst;
+    while (*p++) {
     }
-    --end;
-    while (count-- != 0) {
-        byte = *source++;
-        *end++ = byte;
-        if (!(byte & 0xFF)) return destination;
+    p--;
+    while (n--) {
+        if ((*p++ = *src++) == 0) {
+            return dst;
+        }
     }
-    *end = 0;
-    return destination;
+    *p = 0;
+    return dst;
 }

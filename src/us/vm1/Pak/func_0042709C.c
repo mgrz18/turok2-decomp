@@ -1,22 +1,17 @@
-#include "common.h"
-#include "m2c_macros.h"
+typedef unsigned char u8;
 
-u8 *Str_ToUpper(u8 *arg0) {
-    u8 *var_v1;
-    u8 temp_a1;
+/* In-place upper-casing of a NUL-terminated string. */
+u8 *Str_ToUpper(u8 *str) {
+    u8 *p = str;
 
-    var_v1 = arg0;
-    if (arg0 == NULL) {
-        return NULL;
+    if (str == 0) {
+        return 0;
     }
-    if (*arg0 != 0) {
-        do {
-            temp_a1 = *var_v1;
-            if ((u32) (temp_a1 - 0x61) < 0x1AU) {
-                *var_v1 = temp_a1 - 0x20;
-            }
-            var_v1 += 1;
-        } while (*var_v1 != 0);
+    while (*p != 0) {
+        if ((u8) (*p - 'a') < 26) {
+            *p -= 0x20;
+        }
+        p++;
     }
-    return arg0;
+    return str;
 }

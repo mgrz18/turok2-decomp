@@ -1,13 +1,13 @@
-/* Second-module copy of src/us/code/Pak_Mount.c (after thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars),
- * src/ovl_a/func_00404018.c, func_00404018); callees named by their link addresses. */
+/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00404018.c, func_00404018.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/junk_types.h"
 #include "structs/controller.h"
 #include "globals/pak.h"
 #include "globals/controller.h"
 
-s32 osPfsInitPak(OSMesgQueue *queue, OSPfs *pfs, int channel); /* osPfsInitPak (link address) */
-s32 Pak_RefreshNotes(s32 pad); /* Pak_RefreshNotes (link address) */
+s32 osPfsInitPak(OSMesgQueue *queue, OSPfs *pfs, int channel);
+s32 Pak_RefreshNotes(s32 pad);
 s32 Pak_Mount(s32 pad) {
     s32 i;
     s32 r;

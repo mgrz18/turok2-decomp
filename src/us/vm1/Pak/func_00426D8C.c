@@ -1,8 +1,8 @@
-/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8029F888_de_2.c, func_802A0238_de.
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RESMGR/resmgr_string_memory.CPP, func_802A0238_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "rw/abu_types.h"
-
+typedef unsigned char u8;
+typedef signed int s32;
 s32 Str_Length(u8 *arg0) {
     u8 *var_v1;
     u8 temp;

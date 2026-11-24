@@ -1,19 +1,20 @@
-#include "common.h"
-#include "structs/pak.h"
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80403E90_de_5.c, func_80404D84_de.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+
+#include "rw/abu_types.h"
 #include "globals/pak.h"
-extern void **CCache__Allocate(s32, s32, s32, char *); /* as the module's other files declare it */
+#include "structs/pak.h"
+#include "protos/cache.h"
 
-
-s32 memset(s32, s32, sptr);       /* extern */
-
+void Pak_AllocDirectory(void);
+void *memset(void *, s32, uptr);
 void Pak_AllocDirectory(void) {
-    s32 *temp_v0;
+    struct Shape_typemap_165 *temp_v0;
     sptr temp_a0;
-
-    temp_v0 = (s32 *) CCache__Allocate(0, 0x810, 0x23, "Mempak pakstate");
-    temp_a0 = *temp_v0;
+    temp_v0 = CCache__Allocate(0, 0x810, 0x23, "Mempak pakstate");
+    temp_a0 = (sptr) temp_v0->data;
     gPakStateBuffer = (CMemEntry *)temp_v0;
     gPakDirectories = (PakDirectory *)temp_a0;
-    memset(temp_a0, 0, 0x810);
+    memset((void *)temp_a0, 0, 0x810);
     gPakDirectoryAllocated = 1;
 }

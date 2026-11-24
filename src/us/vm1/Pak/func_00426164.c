@@ -1,4 +1,4 @@
-/* Second-module copy of Pak_SaveNoteVerified (first module; this one at link address 0x00426084), calling this module's own functions at their link addresses. */
+/* WRONG CUT: REAL Pak_SaveNoteVerified size 0x278 (splat cut it into Pak_SaveNoteVerified + func_004263A0). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC_6.CPP, func_80404958_de, with Turok 2's layouts. */
 #include "common.h"
 #include "globals/strings.h"
@@ -9,7 +9,7 @@
 extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void CCache__Flush(s32);
 extern void CCache__Deallocate(sptr, void **);
-extern s32 Controller_Lock(s32 flag);
+extern void Controller_Lock(s32);
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 extern void *func_0029E460(void *dst, const void *src, s32 size);
@@ -18,6 +18,9 @@ extern s32 Pak_WriteNote(s32 ch, s32 size, void *data, u8 *game_name, s32 *file_
                          u8 *company, u8 *code);
 extern s32 Pak_DeleteNote(s32 ch, s32 index);
 extern s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
+#ifdef TARGET_PORT
+void *T2Save_ToPak(void *data, s32 size);
+#endif
 
 /* Reads note file_no of the pak on channel ch into dst. */
 static __inline__ s32 readNote(s32 ch, s32 file_no, void *dst, s32 size) {
@@ -61,6 +64,10 @@ s32 Pak_SaveNoteVerified(s32 ch, s32 size, void *data, u8 *name, u8 *ext, u8 *co
     s32 blocks;
     s32 tries;
 
+#ifdef TARGET_PORT
+    /* the port: the note goes to the pak big-endian, as the console writes it (port/game/t2save.c) */
+    data = T2Save_ToPak(data, size);
+#endif
     blocks = (size + 0xFF) & ~0xFF;
     if (gPakState[ch] != 3) {
         return -2;

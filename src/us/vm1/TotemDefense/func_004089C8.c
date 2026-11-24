@@ -1,9 +1,8 @@
 #include "common.h"
-#include "structs/boss.h"
-#include "globals/boss.h"
+#include "m2c_macros.h"
+
+extern s32 gTotemDefense_kills_v004089C8[] __asm__("gTotemDefense_kills"); /* local type: gTotemDefense.kills (s32, globals/boss.h); the array keeps the ROM's code */
 
 void TotemDefense_AddKill(void) {
-    s32 *kills = &gTotemDefense.kills; /* through a pointer: `gTotemDefense.kills++` loads it with %lo, the ROM builds the address first */
-
-    *kills += 1;
+    gTotemDefense_kills_v004089C8[0] += 1;
 }

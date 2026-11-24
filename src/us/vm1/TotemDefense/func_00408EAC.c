@@ -1,20 +1,15 @@
-/* The second VM module's copy of src/us/vm1/TotemDefense/func_00408EAC.c (byte for byte, at the same link address or 0xE0 below
- * it, docs/VMASM.md), with the second module's names. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "structs/twin_totemdefense.h"
 
 extern f32 Random_Float(f32 scale);                                      /* random 0..scale */
 void Actor_SpawnParticle(void *, s32, CVector3, s32);
 void DamageEvent_Set(DamageEvent *, void *, s32, f32, s32, void *);
 void EnemyAI_OnDamage(void *, void *, DamageEvent *);
 
-typedef struct {
-    /* 0x0 */ u8 pad0[0xC];
-    /* 0xC */ f32 timer;
-} HurtTimer;
 
 /* After a delay, one time in four, hurt the first live player actor. */
 void TotemDefense_TryHitEnemyAfterDelay(HurtTimer *h) {

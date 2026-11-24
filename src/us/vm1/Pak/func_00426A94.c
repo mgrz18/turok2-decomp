@@ -1,41 +1,51 @@
-/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00405454.c, func_00405454.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
+/* WRONG CUT: REAL Pak_FindFreeExtLetter size 0x144 (splat cut it into Pak_FindFreeExtLetter + func_00426AF8 + func_00426BA8). */
 #include "common.h"
+#include "structs/pak.h"
 #include "globals/pak.h"
-s32 Pak_FindNote(s32 pad, s32 idx, s32 *valid, u8 *name, u8 *ext, s32 *blocks, u8 *company, u8 *game);
-s32 Pak_FindFreeExtLetter(s32 pad, u8 *ext) {
-    s32 mask = 0;
-    s32 i;
-    u8 company[3];
-    u8 game[5];
+#include "protos/cache.h"
+
+
+extern void Controller_Lock(s32);
+extern void Controller_ReadAll(void);
+extern void Controller_Unlock(void);
+extern void *func_0029E460(void *dst, const void *src, s32 size);
+extern s32 Pak_Mount(s32 ch);
+extern s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
+
+extern s32 Pak_FindNote(s32 ch, s32 index, s32 *exists, u8 *name, u8 *ext, s32 *size, u8 *company,
+                         u8 *code);
+
+/* Picks the first note extension letter ('A' + n) no note of the pak on channel ch uses. */
+s32 Pak_FindFreeExtLetter(s32 ch, u8 *ext) {
+    u8 company[8];
+    u8 code[8];
     u8 name[16];
-    u16 t;
-    s32 valid;
-    s32 blocks;
-    if (gPakState[pad] != 3) {
+    s32 exists;
+    s32 size;
+    s32 used;
+    s32 i;
+
+    used = 0;
+    if (gPakState[ch] != 3) {
         return -2;
     }
     for (i = 0; i < 16; i++) {
-        if (Pak_FindNote(pad, i, &valid, name, ext, &blocks, company, game) != 0) {
+        if (Pak_FindNote(ch, i, &exists, name, ext, &size, company, code) != 0) {
             return -1;
         }
-        if (valid != 0) {
-            mask |= 1 << (ext[0] - 0x41);
+        if (exists) {
+            used |= 1 << (ext[0] - 'A');
         }
     }
-    i = 0;
-    ext[0] = 0x41;
+    ext[0] = 'A';
     ext[1] = 0;
     ext[2] = 0;
     ext[3] = 0;
-    while (i < 16) {
-        t = mask & (1 << i);
-        if (t == 0) {
+    for (i = 0; i < 16; i++) {
+        if (!((used & (1 << i)) & 0xFFFF)) {
             break;
         }
         ext[0]++;
-        i++;
     }
     if (i >= 16) {
         return -1;
