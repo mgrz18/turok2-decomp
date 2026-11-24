@@ -1,22 +1,20 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/fuzzy/func_8028F278_de.c, func_8028F278_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
-#include "rw/abu_types.h"
+#include "common.h"
+#include "protos/sched.h"
+#include "protos/ultra.h"
 #include "globals/frame.h"
 #include "structs/game.h"
 #include "globals/render.h"
 #include "globals/engine.h"
-#include "protos/ultra.h"
 
-extern s32 __scSchedule(struct Ctx_func_8028F544_de *, struct Node_func_8028F544_de **, struct Node_func_8028F544_de **, s32);
-extern void __scExec(struct View_func_8028FA60_de *, struct Scene_func_8028FA60_de *, struct Scene_func_8028FA60_de *);
-extern s32 __scTaskComplete(void *,void *);
 extern void Scheduler_RDPDoneHook();
+
 void __scHandleRDP(OSSched *sc)
 {
-    sptr value1 = 0;
-    sptr value2 = 0;
-    OSScTask_s *task = sc->curRDPTask;
+    OSScTask *value1 = 0;
+    OSScTask *value2 = 0;
+    OSScTask *task = sc->curRDPTask;
     void *framebuffer;
     CFrameData *schedule;
     CFrameData *schedules;
@@ -44,8 +42,8 @@ void __scHandleRDP(OSSched *sc)
             gNumTicks1 = gNumTicks0;
             gNumTicks0 = gCurrentTick + 1;
             if (gNumTicks0 >= schedule->m_nPredictTicks && gNumTicksWaiting == 0 && gNumTicksPending == 0) {
-                gPendingFB = schedule->m_pFrameBuffer;
-                osViSwapBuffer(schedule->m_pFrameBuffer);
+                gPendingFB = (u16 *)schedule->m_pFrameBuffer;
+                osViSwapBuffer((void *)schedule->m_pFrameBuffer);
                 gNumTicksPending++;
             } else {
                 gNumTicksWaiting++;

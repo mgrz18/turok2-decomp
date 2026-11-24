@@ -2,44 +2,25 @@
  * `addu $a0, $s3, $zero`, never executed); the function really starts at 0x0028A020,
  * the thread entry osCreateScheduler passes as the address 0x28A020. Written whole as __scMain. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0028E910.c, func_0028E910, with Turok 2's layouts. */
-
 #include "common.h"
+#include "protos/sched.h"
+#include "protos/ultra.h"
 #include "globals/engine.h"
 #include "protos/game.h"
-#include "protos/ultra.h"
-
-typedef struct Client {
-    /* 0x0 */ struct Client *next;
-    /* 0x4 */ void *queue;
-} Client;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x20];
-    /* 0x020 */ s16 retraceMsg;
-    /* 0x022 */ u8 pad22[0x40 - 0x22];
-    /* 0x040 */ u8 queue[0x18];         /* OSMesgQueue */
-    /* 0x058 */ u8 pad58[0x2E0 - 0x58];
-    /* 0x2E0 */ Client *clients;
-} Sched;
-
 
 extern void osViBlack(s32 black);   /* osViBlack */
-extern void __scHandleRetrace(Sched *sc);
 extern void Video_UpdateResolution(void);
-extern void __scHandleRSP(Sched *sc);
-extern void __scHandleRDP(Sched *sc);
 extern void Music_FadeOut(void);
 extern void Sound__StopAllExcept(s32);
-extern void LoopSounds_StopAll(sptr);
-extern void Sched_HandleCmdMsg(Sched *sc);
+extern void LoopSounds_StopAll(void *pool); /* SoundSlotPool * */
 
 /* Scheduler thread: serves retrace, RSP/RDP done, pre-NMI and fault messages forever. */
-void __scMain(Sched *sc) {
+void __scMain(OSSched *sc) {
     s32 msg;
-    Client *client;
+    OSScClient *client;
 
     while (1) {
-        osRecvMesg(sc->queue, &msg, 1);
+        osRecvMesg(&sc->interruptQ, (OSMesg *) &msg, 1);
         switch (msg) {
             case 0x29A:
                 if (sSchedResetPressed != 0) {
@@ -63,11 +44,11 @@ void __scMain(Sched *sc) {
                 Music_FadeOut();
                 Sound__StopAllExcept(-1);
                 LoopSounds_StopAll(LoopSounds_Get());
-                client = sc->clients;
+                client = sc->clientList;
                 sSchedResetPressed = 1;
                 sSchedResetBlankRetraces = 20;
                 while (client != NULL) {
-                    osSendMesg(client->queue, &sc->retraceMsg, 0);
+                    osSendMesg(client->msgQ, (OSMesg) &sc->prenmiMsg, 0);
                     client = client->next;
                 }
                 break;

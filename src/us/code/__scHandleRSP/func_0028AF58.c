@@ -1,15 +1,13 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8028DF90_de_7.c, func_8028F8BC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "protos/sched.h"
+#include "protos/ultra.h"
 
-#include "rw/abu_types.h"
-
-extern void osScRemoveClient(struct OSSched *arg0, void *arg1);
-s32 osSetIntMask(s32);
-extern s32 osSetIntMask(s32);
-void osScRemoveClient(OSSched *arg0, void *arg1) {
+void osScRemoveClient(OSSched *arg0, OSScClient *arg1) {
     s32 saved;
-    OSScClientWork *cur;
-    OSScClientWork *prev;
+    OSScClient *cur;
+    OSScClient *prev;
     prev = 0;
     cur = arg0->clientList;
     saved = osSetIntMask(1);

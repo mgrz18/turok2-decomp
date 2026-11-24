@@ -1,6 +1,7 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "protos/sched.h"
+#include "protos/ultra.h"
 
-s32 Sched_GetInterruptQ(s32 arg0) {
-    return arg0 + 0x40;
+OSMesgQueue *Sched_GetInterruptQ(OSSched *sc) {
+    return &sc->interruptQ;
 }

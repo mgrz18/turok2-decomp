@@ -1,56 +1,22 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0028EAAC.c, func_0028EAAC, with Turok 2's layouts. */
-
 #include "common.h"
+#include "protos/sched.h"
+#include "protos/ultra.h"
 #include "globals/frame.h"
 #include "globals/render.h"
 #include "globals/engine.h"
 #include "globals/sysrc.h"
 #include "globals/framebuffer.h"
-#include "protos/ultra.h"
 
-typedef struct Client {
-    /* 0x0 */ struct Client *next;
-    /* 0x4 */ void *queue;
-} Client;
-
-typedef struct ScTask {
-    /* 0x00 */ struct ScTask *next;
-    /* 0x04 */ s32 state;
-    /* 0x08 */ u8 pad8[0x10 - 0x8];
-    /* 0x10 */ s32 type;
-} ScTask;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x78];
-    /* 0x078 */ u8 cmdQueue[0x18];      /* OSMesgQueue */
-    /* 0x090 */ u8 pad90[0x2E0 - 0x90];
-    /* 0x2E0 */ Client *clients;
-    /* 0x2E4 */ u8 pad2E4[4];
-    /* 0x2E8 */ ScTask *gfxHead;
-    /* 0x2EC */ u8 pad2EC[4];
-    /* 0x2F0 */ ScTask *gfxTail;
-    /* 0x2F4 */ ScTask *curRSPTask;
-    /* 0x2F8 */ ScTask *curRDPTask;
-    /* 0x2FC */ s32 frameCount;
-    /* 0x300 */ s32 doAudio;
-} Sched;
-
-
-extern void __scAppendList(Sched *sc, ScTask *task);
-extern void __scHandleRSP(Sched *sc);
-extern void __scYield(Sched *sc);
-extern s32 __scSchedule(Sched *sc, ScTask **sp, ScTask **dp, s32 state);
-extern void __scExec(Sched *sc, ScTask *sp, ScTask *dp);
 extern void Controller_Service(void);
 
-/* Retrace: queue new tasks, swap the framebuffer when due, start the next tasks, wake the clients. */
-void __scHandleRetrace(Sched *sc) {
-    ScTask *rspTask;
-    ScTask *sp;
-    ScTask *dp;
-    ScTask *task;
-    ScTask *next;
-    Client *client;
+void __scHandleRetrace(OSSched *sc) {
+    OSScTask *rspTask;
+    OSScTask *sp;
+    OSScTask *dp;
+    OSScTask *task;
+    OSScTask *next;
+    OSScClient *client;
     CFrameData *frame;
     s32 state;
     u16 *fb;
@@ -65,7 +31,7 @@ void __scHandleRetrace(Sched *sc) {
         }
     }
     sc->frameCount = sc->frameCount + 1;
-    while (osRecvMesg(sc->cmdQueue, &rspTask, 0) != -1) {
+    while (osRecvMesg(&sc->cmdQ, (OSMesg *) &rspTask, 0) != -1) {
         __scAppendList(sc, rspTask);
     }
     gCurrentTick = gCurrentTick + 1;
@@ -80,7 +46,7 @@ void __scHandleRetrace(Sched *sc) {
         frame = gWaitingFrames[gNextFrameToShow];
         if (!((u32)(gCurrentTick + 1) < frame->m_nPredictTicks)) {
             gPendingFB = (u16 *) frame->m_pFrameBuffer;
-            osViSwapBuffer(frame->m_pFrameBuffer);
+            osViSwapBuffer((void *) frame->m_pFrameBuffer);
             gNumTicksWaiting = gNumTicksWaiting - 1;
             gNumTicksPending = gNumTicksPending + 1;
             gNextFrameToShow = gNextFrameToShow + 1;
@@ -90,14 +56,14 @@ void __scHandleRetrace(Sched *sc) {
         }
     }
     if (sc->curRSPTask == NULL && sc->curRDPTask == NULL) {
-        task = sc->gfxHead;
-        if (task != NULL && task->type == 1 && task->state == 0x32) {
+        task = sc->gfxListHead;
+        if (task != NULL && task->list.t.type == 1 && task->state == 0x32) {
             task->state = 2;
-            sc->curRSPTask = sc->gfxHead;
-            next = sc->gfxHead->next;
-            sc->gfxHead = next;
+            sc->curRSPTask = sc->gfxListHead;
+            next = sc->gfxListHead->next;
+            sc->gfxListHead = next;
             if (next == NULL) {
-                sc->gfxTail = NULL;
+                sc->gfxListTail = NULL;
             }
             __scHandleRSP(sc);
         }
@@ -114,9 +80,9 @@ void __scHandleRetrace(Sched *sc) {
             __scExec(sc, sp, dp);
         }
     }
-    client = sc->clients;
+    client = sc->clientList;
     while (client != NULL) {
-        osSendMesg(client->queue, sc, 0);
+        osSendMesg(client->msgQ, (OSMesg) &sc->retraceMsg, 0);
         client = client->next;
     }
     Controller_Service();

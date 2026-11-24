@@ -1,6 +1,7 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "protos/sched.h"
+#include "protos/ultra.h"
 
-s32 osScGetCmdQ(s32 arg0) {
-    return arg0 + 0x78;
+OSMesgQueue *osScGetCmdQ(OSSched *sc) {
+    return &sc->cmdQ;
 }
