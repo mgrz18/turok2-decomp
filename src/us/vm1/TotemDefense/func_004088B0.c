@@ -28,6 +28,9 @@ typedef struct {
     /* 0xF8 */ void *onEvent;
 } BossEvents;
 
+/* declared first: the deferred functions are output in the order of their first declaration */
+void TotemDefense_Init(BossActor *, BossEvents *);
+
 sptr CGameObjectInstance__PickRandomAnim(void *, sptr, sptr);
 void COnScreen__SetBoss(void *, void *, char *);
 /* the ROM passes the CAI in a3 too (the definition takes three) */
