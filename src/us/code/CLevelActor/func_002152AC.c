@@ -6,6 +6,7 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "protos/cache.h"
+#include "protos/iset.h"
 
 /* Draws a simple object: rebuilds its matrix for this frame's slot once per
  * frame (from a fixed rotation for type 8, else its yaw), then draws its
@@ -13,22 +14,23 @@
  * models 0x6A9..0x6AA override from the game flags (cf. Rage Wars'
  * func_8024F634_de and func_8024F858_de). */
 
-s32 *CLevelActor__LoadGeometry(CLevelActor *);
-void CQuaternion__ToMatrix(void *, f32 *);
-void CMtxF__SetRotateY(f32 *, f32);
-void CMtxF__ScaleAxes(f32 *, f32, f32, f32);
-void CVector3__ClampLength(CVector3 *, f32);
-void CMtxF__Translate(f32 *, f32, f32, f32);
-void CMtxF__SwapYZRows(f32 *);
-void CMtxF__ToMtxAffine(f32 *, f32 *);
+s32 *CLevelActor__LoadGeometry(void *);
+void CQuaternion__ToMatrix(void *, void *);
+void CMtxF__SetRotateY(void *, f32);
+void CMtxF__ScaleAxes(void *, f32, f32, f32);
+s32 CVector3__ClampLength(void *, f32);
+void CMtxF__Translate(void *, f32, f32, f32);
+void CMtxF__SwapYZRows(void *);
+void CMtxF__ToMtxAffine(void *, void *);
 void Model_AdvanceMorph(sptr *, f32); /* the model handle: a host pointer (--high-memory) */
 void Render_QueueModelInstance(s32 *, f32 *, s32, void *, sptr, s32, s32);
+#include "protos/scene.h"
 #ifdef TARGET_PORT
-u16 CScene__GetObjectTypeID(void *, s32); /* ABI: returns u16 (the host leaves the upper bits of the return register undefined) */
+#define getObjectTypeID CScene__GetObjectTypeID /* ABI: returns u16 (the host leaves the upper bits of the return register undefined) */
 #else
-s32 CScene__GetObjectTypeID(void *, s32);
+/* The ROM's caller takes the u16 result as an s32 (no andi): called through a type of its own. */
+#define getObjectTypeID ((s32 (*)(struct CScene *, s32))CScene__GetObjectTypeID)
 #endif
-s32 *CISet__GetBlock(sptr, s32);
 
 void CLevelActor__Draw(CLevelActor *obj) {
     sptr *geometry;
@@ -59,13 +61,13 @@ void CLevelActor__Draw(CLevelActor *obj) {
         Render_QueueModelInstance(geometry, obj->m_Matrices[gEvenOdd], 0, &obj->m_Lights, 0, gEvenOdd, obj->header.m_pIntelligence->m_nTexture);
     } else {
         variant = obj->header.m_pIntelligence->m_nModel;
-        index = CScene__GetObjectTypeID(&gScene, obj->header.m_nObjType);
+        index = getObjectTypeID(&gScene, obj->header.m_nObjType);
         if (index < 0x6AB) {
             if (index >= 0x6A9) {
-                if ((gEngineApp_m_Settings.cheatFlags & 0x800) && *CISet__GetBlock(*geometry, 2) >= 2) {
+                if ((gEngineApp_m_Settings.cheatFlags & 0x800) && *(s32 *)CISet__GetBlock((void *)*geometry, 2) >= 2) {
                     variant = 1;
                 }
-                if ((gEngineApp_m_Settings.cheatFlags & 0x1000) && *CISet__GetBlock(*geometry, 2) >= 3) {
+                if ((gEngineApp_m_Settings.cheatFlags & 0x1000) && *(s32 *)CISet__GetBlock((void *)*geometry, 2) >= 3) {
                     variant = 2;
                 }
             }

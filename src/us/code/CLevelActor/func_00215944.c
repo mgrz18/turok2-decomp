@@ -9,7 +9,6 @@
  * so it sits further on). The grid sections build their level actors at the host layout. */
 #include "structs/level_actor.h"
 typedef CLevelActor ResourceOwner;
-#define key m_Resource
 #define LEVEL_ACTOR_KEY(obj) (((CLevelActor *) (obj))->m_Resource)
 
 void Model_TouchTextures(s32 *);
@@ -39,9 +38,9 @@ void CLevelActor__TouchGeometry(ResourceOwner *arg0) {
     s32 *var_s0;
     sptr temp_s0;
 
-    temp_v0 = CCache__Request(0, arg0->key, 0x18, 4, 0, NULL, "simp object index", 0);
+    temp_v0 = CCache__Request(0, arg0->m_Resource, 0x18, 4, 0, NULL, "simp object index", 0);
     if (temp_v0 != NULL) {
-        temp_s0 = CISet__GetROMAddressAndSize(*temp_v0, arg0->key, 1, &sp20);
+        temp_s0 = CISet__GetROMAddressAndSize(*temp_v0, arg0->m_Resource, 1, &sp20);
         CCache__Unlock(0, temp_v0);
         var_s0 = CCache__Request(0, temp_s0, sp20, 4, 0, Model_DecompressCallbackTerminated, "simp geometry", 0);
     } else {

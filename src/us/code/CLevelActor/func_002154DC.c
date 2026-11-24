@@ -17,15 +17,15 @@ typedef struct {
 
 f32 CGameRegion__GetHeight(sptr, f32, f32);
 f32 GameObject_GetWallRadius(ShadowActor *);
-#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
-#define GameObject_GetGroundRotation GameObject_GetGroundRotation_sret
+#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar): the struct result through an out pointer */
+void GameObject_GetGroundRotation_sret(CQuaternion *out, void *obj);
 #endif
-void GameObject_GetGroundRotation(f32 *, ShadowActor *);
-void CVector3__ClampLength(CVector3 *, f32);
-void CQuaternion__ToMatrix(f32 *, f32 *);
-void CMtxF__ScaleAxes(f32 *, f32, f32, f32);
-void CMtxF__Translate(f32 *, f32, f32, f32);
-void CMtxF__ToMtxAffine(f32 *, f32 *);
+CQuaternion GameObject_GetGroundRotation(void *obj);
+s32 CVector3__ClampLength(void *, f32);
+void CQuaternion__ToMatrix(void *, void *);
+void CMtxF__ScaleAxes(void *, f32, f32, f32);
+void CMtxF__Translate(void *, f32, f32, f32);
+void CMtxF__ToMtxAffine(void *, void *);
 void Render_DrawShadowQuad(f32 *, s32, s32);
 
 
@@ -33,7 +33,7 @@ void Render_DrawShadowQuad(f32 *, s32, s32);
 void Actor_DrawGroundShadow(ShadowActor *actor) {
     f32 matrix[16];
     CVector3 position;
-    f32 rotation[4];
+    CQuaternion rotation;
     f32 ground;
     f32 height;
     f32 size;
@@ -45,12 +45,16 @@ void Actor_DrawGroundShadow(ShadowActor *actor) {
     } else {
         size = 0.0f;
     }
-    GameObject_GetGroundRotation(rotation, actor);
+#ifdef TARGET_PORT
+    GameObject_GetGroundRotation_sret(&rotation, actor);
+#else
+    rotation = GameObject_GetGroundRotation(actor);
+#endif
     position.x = actor->x;
     position.z = actor->z;
     position.y = ground;
     CVector3__ClampLength(&position, 20000.0f);
-    CQuaternion__ToMatrix(rotation, matrix);
+    CQuaternion__ToMatrix(&rotation, matrix);
     CMtxF__ScaleAxes(matrix, size, 1.0f, size);
     CMtxF__Translate(matrix, position.x, position.y, position.z);
     CMtxF__ToMtxAffine(matrix, actor->shadowMatrices[gEvenOdd]);

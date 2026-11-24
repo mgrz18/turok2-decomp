@@ -5,13 +5,13 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 
-void CQuaternion__ToMatrix(void *src, CMtxF *dst);
-void CMtxF__SetRotateY(CMtxF *mtx, f32 angle);
-void CMtxF__ScaleAxes(CMtxF *mtx, f32 x, f32 y, f32 z);
-void CVector3__ClampLength(void *pos, f32 value);
-void CMtxF__Translate(CMtxF *mtx, f32 x, f32 y, f32 z);
-void CMtxF__SwapYZRows(CMtxF *mtx);
-void CMtxF__ToMtxAffine(CMtxF *mtx, void *dst);
+void CQuaternion__ToMatrix(void *, void *);
+void CMtxF__SetRotateY(void *, f32);
+void CMtxF__ScaleAxes(void *, f32, f32, f32);
+s32 CVector3__ClampLength(void *, f32);
+void CMtxF__Translate(void *, f32, f32, f32);
+void CMtxF__SwapYZRows(void *);
+void CMtxF__ToMtxAffine(void *, void *);
 
 /* Builds the object transform (rotation, uniform scale, translation) into its current matrix slot. */
 void CLevelActor__BuildMatrix(CLevelActor *obj) {
