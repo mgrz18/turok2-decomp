@@ -1107,11 +1107,11 @@ void WeaponMode_AE7F4_Enter(CGameObjectInstance *obj, CAI *ai) {
     *(f32 *) &ai->m_VarBuffer[3] = (f32) (gWeaponInfoTable[((CPlayer *) obj->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * 15.0f);
 }
 
-extern s16 D_800AE9D2;
+extern s16 sChargeShotRecord_count;
 extern f32 Random_Blend(f32 lo, f32 hi); /* random in range */
 
 /* Weapon state: on release, charges by the time held (0.1 + t/45, at most 1)
- * and sets the shot count D_800AE9D2 (charge * 3, at least 1), then goes to
+ * and sets the shot count sChargeShotRecord_count (charge * 3, at least 1), then goes to
  * state 5. */
 void WeaponMode_Charge_Update(CGameObjectInstance *obj, CAI *state) {
     f32 base = 0.1f;
@@ -1130,7 +1130,7 @@ void WeaponMode_Charge_Update(CGameObjectInstance *obj, CAI *state) {
     player->weapon_particle_damage_scaler = charge;
     n = charge * 3.0f;
     shots = (n < 1.0f) ? 1 : (s32) n;
-    D_800AE9D2 = shots;
+    sChargeShotRecord_count = shots;
     CAI__SetMode(obj, state, 5);
     player->m_ContState.m_pContState->rumbleBase = 0.0f;
 }

@@ -524,7 +524,7 @@ typedef struct { s32 m[4][4]; } Mtx64;   /* a packed N64 Mtx, 0x40 bytes */
 /* A model shown in the HUD (the weapon held up to the view). */
 
 
-extern f32 D_800ADDB8;
+extern f32 sHiResViewScaleX;
 void Render_InvalidateModeCache(void);
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
@@ -575,7 +575,7 @@ void CPlayer__DrawScope(CPlayerOverlay *m, CCamera *view) {
     CMtxF__SwapYZRows(&mf[0][0]);
     CMtxF__Copy(&mfDraw[0][0], &mf[0][0]);
     if (gResolution == 2) {
-        CMtxF__ScaleColumns(&mfDraw[0][0], D_800ADDB8, 1.0f, 1.0f);
+        CMtxF__ScaleColumns(&mfDraw[0][0], sHiResViewScaleX, 1.0f, 1.0f);
     }
     CMtxF__ToMtxAffine(&mfDraw[0][0], &m->m_mOrient[gEvenOdd]);
     CMtxF__TransformPoint(&mf[0][0], &m->m_vPos, &out);
@@ -5497,7 +5497,7 @@ void PlayerSwim_Update(CPlayer *player, CGameObjectInstance *body) {
     }
 }
 
-extern s16 D_800AE312[];        /* per character: climbing step sound (stride 4) */
+extern CharacterSound sCharacterClimbSounds[];   /* per deathmatch character: .sound is the climbing step sound */
 s32 CGameRegion__IsSteep(void *region);
 f32 CGameRegion__GetDownhillYaw(void *region);
 f32 Angle_Difference(f32 from, f32 to);
@@ -5646,7 +5646,7 @@ void PlayerClimb_Update(CPlayer *player, CGameObjectInstance *body) {
             if (player->m_pOptions->m_TagMode == 1) {
                 Sound__Play2D(0x27DB);
             } else {
-                Sound__Play(D_800AE312[player->m_Data.m_nDeathmatchCharacter * 2], body->header.m_vPos, 0, -1);
+                Sound__Play(sCharacterClimbSounds[player->m_Data.m_nDeathmatchCharacter].sound, body->header.m_vPos, 0, -1);
             }
         } else {
             Sound__Play(0x3AB7, body->header.m_vPos, 0, -1);
@@ -5824,8 +5824,8 @@ typedef struct {
 } Mount;
 #endif
 
-extern f32 D_800AE344;          /* step length */
-extern f32 D_800ADDE4;          /* charge speed: gRidingForwardMoveTuning.forwardMax, its own symbol (through the struct 4 words differ) */
+extern f32 sMountStepLength;          /* step length */
+extern f32 gRidingForwardMoveTuning_forwardMax;          /* charge speed: gRidingForwardMoveTuning.forwardMax, its own symbol (through the struct 4 words differ) */
 void CCamera__SetShake(void *ui, f32 a, f32 b, f32 c, f32 d, s32 e, CVector3 pos);
 void CMtxF__SetRotateY(CMtxF *m, f32 angle);
 
@@ -5857,7 +5857,7 @@ void CPlayer__UpdateRiding(CPlayer *player, CGameObjectInstance *body) {
     if (player->m_ContState.m_dwButtonsDouble & 8) {
         CAI__SetMode(mount, mount->ai, 0x2E);
         player->m_FleeTime = 90.0f;
-        player->m_Speed = D_800ADDE4 * 2;
+        player->m_Speed = gRidingForwardMoveTuning_forwardMax * 2;
     }
 
     fwd = player->m_Speed;
@@ -5881,8 +5881,8 @@ void CPlayer__UpdateRiding(CPlayer *player, CGameObjectInstance *body) {
         }
     }
     player->m_OnEnemyStompTime = next;
-    if (D_800AE344 < next) {
-        player->m_OnEnemyStompTime = next - D_800AE344;
+    if (sMountStepLength < next) {
+        player->m_OnEnemyStompTime = next - sMountStepLength;
         if (mount->aiState != 0x2E) {
             player->m_Speed *= 0.5f;
             player->m_SideSpeed *= 0.5f;

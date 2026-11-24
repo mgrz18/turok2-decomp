@@ -639,7 +639,7 @@ struct B10H {
     u8 pad0[0x2];
                 u16 h2;
 };
-extern f32 D_800A5AF8;
+extern f32 sAlignToGroundMax;
 s32 GameObject_IsOnGround(void *actor);
 /* The ground rotation through an out pointer: the definition's struct return (its hidden first
  * argument) under its own name on the N64, the port's shim (port/game/t2abi.c, ABI.md struct_scalar). */
@@ -692,14 +692,14 @@ void CGameObjectInstance__AlignToGround(B10Obj *o) {
             t = gFrameIncrement;
             t *= 0.0375f;
         }
-        CQuaternion__SlerpFast(&o->f5C, (D_800A5AF8 < t) ? D_800A5AF8 : t, &o->f5C, loc);
+        CQuaternion__SlerpFast(&o->f5C, (sAlignToGroundMax < t) ? sAlignToGroundMax : t, &o->f5C, loc);
     }
 }
 
 #ifndef TARGET_PORT
-/* CGameObjectInstance__AlignToGround's 1.0f, which it reads as D_800A5AF8 (and func_0021CDAC's view of
+/* CGameObjectInstance__AlignToGround's 1.0f, which it reads as sAlignToGroundMax (and CGameObjectInstance__BuildBoneMatrices's view of
  * the "animations index" after it): defined here, after its own literals (the port keeps the generated copy). */
-const f32 sAlignToGroundMax_def __asm__("D_800A5AF8") = 1.0f;
+const f32 sAlignToGroundMax_def __asm__("sAlignToGroundMax") = 1.0f;
 #endif
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80246E34.CPP, func_8024715C_de.
@@ -1945,8 +1945,8 @@ typedef struct Profile {
     /* 0x28 */ f32 average;
 } Profile;
 /* "animations index", CGameObjectInstance__AdvanceAnimation's cache name (func_0021A7EC.c), 4 bytes past
- * D_800A5AF8 (CGameObjectInstance__AlignToGround's 1.0f, a float elsewhere). */
-extern char sAnimIndexName_view[] __asm__("D_800A5AF8");
+ * sAlignToGroundMax (CGameObjectInstance__AlignToGround's 1.0f, a float elsewhere). */
+extern char sAnimIndexName_view[] __asm__("sAlignToGroundMax");
 extern Profile sBoneMatrixProfile;
 extern s32 sBoneMatrixCount[]; /* &sBoneMatrixProfile.calls */
 s32 Cinema_PathPlaying(void);

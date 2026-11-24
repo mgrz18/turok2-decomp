@@ -178,7 +178,7 @@ void CAnimationState__GetBonePosition(R05Anim *a, s32 idx, f32 time, f32 *out)
     } while (k < 3);
 }
 
-/* 1/32767: a quaternion component from its s16 (D_800A58F4) */
+/* 1/32767: a quaternion component from its s16 (the literal at 0x800A58F4) */
 void CQuaternion__Slerp(f32 *out, f32 t, void *a, void *b);
 
 void CAnimationState__GetBoneRotation(R05Anim *a, s32 idx, f32 time, f32 *out)
@@ -425,7 +425,7 @@ s32 Anim_DecodeTracks(sptr source, TrackTable *table, s32 tracks, s32 channels, 
     return 1;
 }
 
-extern f32 D_800ACB50; /* 90.0f: the largest value accepted */
+extern f32 sAnimMaxKeyCount; /* 90.0f: the largest value accepted */
 /* r = ceil(x), through an int. */
 #define CEILF(r, x)                     \
     if ((x) <= 0.0f) {                  \
@@ -451,11 +451,11 @@ f32 Anim_CalcKeyCount(f32 a, f32 b) {
         return 1.0f;
     }
     CEILF(r, a / b * 30.0f)
-    if (r < D_800ACB50) {
+    if (r < sAnimMaxKeyCount) {
         return r;
     }
     CEILF(r, a / b * 15.0f)
-    if (r < D_800ACB50) {
+    if (r < sAnimMaxKeyCount) {
         return r;
     }
     return a;

@@ -16,7 +16,7 @@ typedef struct Marker {
 extern Marker sBootMarker;           /* the boot marker string */
 #include "globals/save.h"          /* the saved players (0x1400) */
 
-extern s32 D_8014A000[];            /* BSS end */
+extern s32 gImageEnd[];             /* local view: the end of the image and its BSS (an absolute symbol) */
 void memset(void *dst, s32 value, sptr size);
 s32 Util_StrCmp(char *marker, char *name);
 void Util_StrCpy(char *marker, char *name);
@@ -87,7 +87,7 @@ s32 func_0028D380(void) {
             src++;
         } while (count-- != 0);
     }
-    for (dst = (u32 *)gGfxYieldBuffer; (uptr)dst < (uptr)D_8014A000; dst++) {
+    for (dst = (u32 *)gGfxYieldBuffer; (uptr)dst < (uptr)gImageEnd; dst++) {
         if (isRestorable((uptr)dst | 0x80000000)) {
             *dst = 0;
         }

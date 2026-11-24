@@ -564,13 +564,13 @@ s32 OptionsMenu_ResolutionText_2(struct RecordRecAt14 *record) {
 }
 
 s32 Video_StartResolutionChange_2();                            /* extern */
-extern u8 D_800C203B;
+#include "globals/render.h"   /* RESOLUTION_LOW_BYTE */
 
 s32 OptionsMenu_ToggleResolution_2(void) {
     if (sResolutionToggleDelay == 0.0f) {
         Video_StartResolutionChange_2();
         sResolutionToggleDelay = 18.0f;
-        gEngineApp_m_Settings.unk180 = D_800C203B;
+        gEngineApp_m_Settings.unk180 = RESOLUTION_LOW_BYTE;
     }
     return 0;
 }

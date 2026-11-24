@@ -1,7 +1,7 @@
 /* WRONG CUT: splat cut a symbol at 0x202128 (200 bytes): its first 8 bytes are junk fill
  * ("Style" text), the real function starts at the 16-aligned 0x202130 (184 bytes; CEngineApp__Main calls it),
  * followed by 8 bytes of fill (a nop and a junk word) before CHeap__AllocAt.
- * Heap set-up at boot: clear everything from the end of the image (D_8014A000) to the top of RDRAM
+ * Heap set-up at boot: clear everything from the end of the image (gImageEnd) to the top of RDRAM
  * (minus 512 KB when the expansion pak is present), hand it to the heap, then start the subsystems. */
 
 #include "common.h"
@@ -15,7 +15,7 @@ void CDecompressor__Construct(CDecompressor *p, s32 n);
 void CLoader__Construct(CLoader *p, s32 n);
 void VM_Initialize(s32 a, s32 b);
 
-extern u8 D_8014A000[];   /* end of the loaded image */
+extern u8 gImageEnd[];   /* local view: the end of the loaded image (an absolute symbol) */
 
 void InitializeSystemResources(void) {
     u8 *base;
@@ -23,7 +23,7 @@ void InitializeSystemResources(void) {
     uptr size;
 
     top = 0x80400000;
-    base = D_8014A000;
+    base = gImageEnd;
     if (GetMemSize() != 0x400000) {
         top = (GetMemSize() | 0x80000000) - 0x80000;
     }

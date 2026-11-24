@@ -146,7 +146,7 @@ typedef struct MenuTextStyle {
 
 extern MenuTextStyle gMenuTextStyles[9];
 
-/* One of a window's 2x8 colour records, from the table D_800C1CD2. */
+/* One of a window's 2x8 colour records, from the table gMenuColorDefaults (MenuItem). */
 typedef struct MenuColor {
     /* 0x00 */ u16 w0;
     /* 0x02 */ u16 w2;

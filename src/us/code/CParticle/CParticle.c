@@ -276,8 +276,8 @@ playing:
 extern f32 Math_AcosLookup(f32);                              /* acosf */
 extern void CPlayer__TransformByView(CPlayer *player, CVector3 *pos);      /* player-relative point to world */
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);
-extern f32 D_800ACE68; /* speed above which it flies home (15) */
-extern f32 D_800ACE6C; /* catch radius (512) */
+extern f32 sReturningHomeFrame; /* speed above which it flies home (15) */
+extern f32 sReturningCatchRadius; /* catch radius (512) */
 
 void CParticle__UpdateReturning(CParticle *obj) {
     CVector3 aim;
@@ -298,7 +298,7 @@ void CParticle__UpdateReturning(CParticle *obj) {
     f32 angle;
     s32 sound;
 
-    if (obj->m_cFrame > D_800ACE68) {
+    if (obj->m_cFrame > sReturningHomeFrame) {
         CQuaternion__FromDirection(&cur, &obj->m_vDirection);
         speed = func_00298470(obj->m_vVelocity.x * obj->m_vVelocity.x + obj->m_vVelocity.y * obj->m_vVelocity.y + obj->m_vVelocity.z * obj->m_vVelocity.z);
         player = (CPlayer *) obj->m_pOwner->m_AI.m_pParent;
@@ -308,8 +308,8 @@ void CParticle__UpdateReturning(CParticle *obj) {
         CPlayer__TransformByView(player, &home);
         CVector3__Subtract(&toCatch, &home, &obj->header.m_vPos);
         dist = func_00298470(toCatch.x * toCatch.x + toCatch.y * toCatch.y + toCatch.z * toCatch.z);
-        if (dist <= D_800ACE6C + 30.72f) {
-            if (dist < D_800ACE6C * (1.0f / 3) || obj->m_cFrame >= 65.0f) {
+        if (dist <= sReturningCatchRadius + 30.72f) {
+            if (dist < sReturningCatchRadius * (1.0f / 3) || obj->m_cFrame >= 65.0f) {
                 obj->header.m_vPos = home;
                 obj->m_nFrames = 1;
                 if (player->m_Data.m_CurrentWeapon == 0x15) {
@@ -321,7 +321,7 @@ void CParticle__UpdateReturning(CParticle *obj) {
         } else {
             aim.x = -102.399994f;
             aim.y = GameObject_GetCollisionHeight(obj->m_pOwner) * 0.5f;
-            aim.z = -D_800ACE6C;
+            aim.z = -sReturningCatchRadius;
             CPlayer__TransformByView(player, &aim);
             CVector3__Subtract(&toHome, &aim, &obj->header.m_vPos);
             func_00298470(toHome.x * toHome.x + toHome.y * toHome.y + toHome.z * toHome.z);
@@ -4469,39 +4469,39 @@ typedef struct B19Q2 {
 
 #ifndef TARGET_PORT
 /* CParticle__GetDistanceScale's constants, which it reads by name (the FAKEMATCH body keeps its
- * register pins): in the ROM's .rodata between func_00232044's literal and func_00232934's, so
+ * register pins): in the ROM's .rodata between CParticle__PlaceAtInstanceHit's literal and CParticle__SpawnAlongPath's, so
  * defined here (the port keeps the generated copies). 0.000492125982 = 1/2032. */
-const f32 sDistanceScale_6404_def __asm__("D_800A6404") = 16.0f;
-const f32 sDistanceScale_6408_def __asm__("D_800A6408") = 0.000492125982f;
-const f32 sDistanceScale_640C_def __asm__("D_800A640C") = 1.0f;
-const f32 sDistanceScale_6410_def __asm__("D_800A6410") = 0.000492125982f;
-const f32 sDistanceScale_6414_def __asm__("D_800A6414") = 0.00100000005f;
-const f32 sDistanceScale_6418_def __asm__("D_800A6418") = 1.0f;
-const f32 sDistanceScale_641C_def __asm__("D_800A641C") = 47.5f;
-const f32 sDistanceScale_6420_def __asm__("D_800A6420") = 0.25f;
-const f32 sDistanceScale_6424_def __asm__("D_800A6424") = 0.0210526325f;
+const f32 sDistanceScaleNear_def __asm__("sDistanceScaleNear") = 16.0f;
+const f32 sDistanceScaleInvRange_def __asm__("sDistanceScaleInvRange") = 0.000492125982f;
+const f32 sDistanceScaleRampMax_def __asm__("sDistanceScaleRampMax") = 1.0f;
+const f32 sDistanceScaleInvRange2_def __asm__("sDistanceScaleInvRange2") = 0.000492125982f;
+const f32 sDistanceScaleUnit_def __asm__("sDistanceScaleUnit") = 0.00100000005f;
+const f32 sDistanceScaleDefault_def __asm__("sDistanceScaleDefault") = 1.0f;
+const f32 sDistanceScaleFovRef_def __asm__("sDistanceScaleFovRef") = 47.5f;
+const f32 sDistanceScaleFovBlend_def __asm__("sDistanceScaleFovBlend") = 0.25f;
+const f32 sDistanceScaleInvFovRef_def __asm__("sDistanceScaleInvFovRef") = 0.0210526325f;
 #endif
-extern f32 D_800A6404;
-extern f32 D_800A6408;
-extern f32 D_800A640C;
-extern f32 D_800A6410;
-extern f32 D_800A6414;
-extern f32 D_800A6418;
-extern f32 D_800A641C;
-extern f32 D_800A6420;
-extern f32 D_800A6424;
+extern f32 sDistanceScaleNear;
+extern f32 sDistanceScaleInvRange;
+extern f32 sDistanceScaleRampMax;
+extern f32 sDistanceScaleInvRange2;
+extern f32 sDistanceScaleUnit;
+extern f32 sDistanceScaleDefault;
+extern f32 sDistanceScaleFovRef;
+extern f32 sDistanceScaleFovBlend;
+extern f32 sDistanceScaleInvFovRef;
 
 /* Static inline in the Rage Wars source file (dropped by the importer). */
 static inline f32 Ramp2(CROMParticleEffect *par, f32 xin) {
     register f32 x asm("$f4") = xin;
     f32 d;
     f32 k;
-    d = x - D_800A6404;
-    k = !(d < 0.0f) ? (!(D_800A640C < d * D_800A6408) ? (!(d < 0.0f) ? d * D_800A6410 : 0.0f) : D_800A640C) : 0.0f;
+    d = x - sDistanceScaleNear;
+    k = !(d < 0.0f) ? (!(sDistanceScaleRampMax < d * sDistanceScaleInvRange) ? (!(d < 0.0f) ? d * sDistanceScaleInvRange2 : 0.0f) : sDistanceScaleRampMax) : 0.0f;
     {
         register f32 fb asm("$f2") = par->m_pDistanceRange->m_FarScale;
         register f32 fa asm("$f3") = par->m_pDistanceRange->m_NearScale;
-        x = x * (fa + (fb - fa) * k) * D_800A6414;
+        x = x * (fa + (fb - fa) * k) * sDistanceScaleUnit;
     }
     return x;
 }
@@ -4513,11 +4513,11 @@ f32 CParticle__GetDistanceScale(CParticle *o, f32 px, B19Q2 *q) {
     if (par->m_dwFlags & 4) {
         t = Ramp2(par, x);
     } else {
-        t = D_800A6418;
+        t = sDistanceScaleDefault;
     }
     {
         f32 m = q->f6C;
-        return t * D_800A6424 * (m + (D_800A641C - m) * D_800A6420);
+        return t * sDistanceScaleInvFovRef * (m + (sDistanceScaleFovRef - m) * sDistanceScaleFovBlend);
     }
 }
 

@@ -4,7 +4,7 @@
 #include "globals/ai.h"
 #include "globals/path.h"
 
-extern u8 D_800C894C;                   /* bottom of the stack */
+#include "globals/frame.h"     /* MAIN_STACK_GUARD */
 #ifdef TARGET_PORT
 /* the N64 compares the stack pointer with its main stack's bottom; the host asks its own thread's
  * stack (t2os_stack_low, port/runtime/t2os.c: the address comparison depended on the layout) */
@@ -28,7 +28,7 @@ void Path_ExpandNode(PathNode *parent, CGameRegion *region) {
     s8 next[3];
     PathNode *node;
 
-    if (T2_STACK_LOW(&parent, &D_800C894C)) {
+    if (T2_STACK_LOW(&parent, MAIN_STACK_GUARD)) {
         return;
     }
     if (sPathSearch->nodeCount >= 150) {

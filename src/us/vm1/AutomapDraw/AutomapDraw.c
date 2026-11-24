@@ -4,7 +4,7 @@
 #include "protos/scene.h"
 #include "globals/game.h"
 
-extern u8 D_800C894C; /* bottom of the stack */
+#include "globals/frame.h"     /* MAIN_STACK_GUARD */
 #ifdef TARGET_PORT
 /* the N64 compares the stack pointer with its main stack's bottom; the host asks its own thread's
  * stack (t2os_stack_low, port/runtime/t2os.c: the address comparison depended on the layout) */
@@ -19,7 +19,7 @@ int t2os_stack_low(const void *local);
 /* Marks the regions around the camera, recursing into neighbours that have
  * a corner within ~410 units of it. */
 void Automap_RevealRegion(CGameRegion *region) {
-    if (region == NULL || T2_STACK_LOW(&region, &D_800C894C)) {
+    if (region == NULL || T2_STACK_LOW(&region, MAIN_STACK_GUARD)) {
         return;
     }
     if (!(region->m_wFlags & 0x400)) {

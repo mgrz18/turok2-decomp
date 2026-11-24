@@ -214,7 +214,6 @@ char *Video_GetResolutionText(void) {
 #ifdef TARGET_PORT
 /* The port: the same through CCameraPool / CCamera (structs/camera.h): the main camera and the
  * active ones get the full-screen viewport. */
-extern unsigned short D_800C21AA[];
 extern void Video_ResizeViMode(s32, s32, s32, s32, s32, s32);
 void Video_SetMode(unsigned width,int a1,int a2,int a3,int a4,int a5) {
     int flags = 0, region = 0;
@@ -223,7 +222,7 @@ void Video_SetMode(unsigned width,int a1,int a2,int a3,int a4,int a5) {
     if (width > 320) flags |= 4;
     if (gViAntiAlias) flags |= 2;
     if (width > 320) flags |= 1;
-    sViModeIndex = *(unsigned short *)((char *)D_800C21AA + flags * 4 + region * 32);
+    sViModeIndex = gViModeChoices[region][flags].index;
     Video_ResizeViMode(width, a1, a2, a3, a4, a5);
     cam = &gEngineApp_m_Game_m_CameraPool.m_MainCamera;
     cam->m_Viewport.m_Width = gScreenWidth;
@@ -250,7 +249,6 @@ struct NodeRecAt294 {
     int x;
     int y;
 };
-extern unsigned short D_800C21AA[];
 extern void Video_ResizeViMode(s32, s32, s32, s32, s32, s32);
 void Video_SetMode(unsigned width,int a1,int a2,int a3,int a4,int a5) {
  int flags=0,region=0; NodeRecAt294 *node; float h;
@@ -258,7 +256,7 @@ void Video_SetMode(unsigned width,int a1,int a2,int a3,int a4,int a5) {
  if(width>320) flags|=4;
  if(gViAntiAlias) flags|=2;
  if(width>320) flags|=1;
- sViModeIndex=*(unsigned short *)((char *)D_800C21AA+flags*4+region*32);
+ sViModeIndex=gViModeChoices[region][flags].index;
  Video_ResizeViMode(width,a1,a2,a3,a4,a5);
  node=(NodeRecAt294 *)&gEngineApp_m_Game_m_CameraPool_m_MainCamera;
  if(node) {node->width=gScreenWidth;h=gScreenHeight;node->x=0;node->y=0;node->height=h;}

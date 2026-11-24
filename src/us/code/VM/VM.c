@@ -202,7 +202,7 @@ void VM_UnmapTLBEntry(PageMapping *mapping) {
     mapping->slot = 0xFF;
 }
 
-extern s32 D_800B7658;
+extern s32 sVMRestartFlag;
 extern FaultedThread *__osGetCurrFaultedThread(void);     /* __osGetCurrFaultedThread */
 extern void osSetIntMask(s32);
 extern void SavedPlayers_Arm(void);
@@ -317,7 +317,7 @@ void VM_HandleTLBMiss(void) {
     osSetIntMask(1);
     SavedPlayers_Arm();
     ((void (*)(void))0x80000400)();
-    D_800B7658 = -1;
+    sVMRestartFlag = -1;
     thread->state = 2;
     osStartThread(thread);
 }

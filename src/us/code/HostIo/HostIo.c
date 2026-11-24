@@ -432,7 +432,7 @@ void HostIo_CopyCartBytes(u32 dst, u32 src, u32 n) {
     }
 }
 
-extern u8 D_8F128560[];
+extern u8 gHostIoHighAddressBias[];   /* local: an absolute symbol, an address offset (not data) */
 
 /* Split the debugger's memory transfer at permission boundaries. */
 void HostIo_MemoryTransfer(u32 mode) {
@@ -446,7 +446,7 @@ void HostIo_MemoryTransfer(u32 mode) {
         HostIo_ScanTlb();
     }
     if (address > 0xEFFFFFFF) {
-        address += (uptr) D_8F128560;
+        address += (uptr) gHostIoHighAddressBias;
     }
     while (remaining != 0) {
         i = 0;

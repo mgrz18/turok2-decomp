@@ -57,7 +57,7 @@ static u32 sArenaSize;
 /* ---- replaced game functions ---- */
 
 /* func_00202130: the heap is one host allocation (the "RDRAM arena", RUNTIME.md §5.3) instead of
- * everything between the end of the image (D_8014A000) and the top of RDRAM. */
+ * everything between the end of the image (gImageEnd) and the top of RDRAM. */
 void VM_Initialize(s32 a, s32 b);
 void InitializeSystemResources(void) {
     memset(sArena, 0, sArenaSize);
@@ -76,7 +76,7 @@ uintptr_t T2Port_RdramTop(void) {
 }
 
 /* round 19 h1: the address an object in the heap would have on the console (the heap starts at
- * the end of the image, D_8014A000), for game code that uses an object's address as a number
+ * the end of the image, gImageEnd), for game code that uses an object's address as a number
  * (a phase, a seed): the host address changes with ASLR, this does not. Other pointers (static
  * data) keep their low 32 bits. */
 uint32_t T2Port_N64Address(const void *p) {
