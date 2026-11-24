@@ -2333,17 +2333,7 @@ typedef struct {
 } ParticleHead;
 #endif /* size 0x34 */
 
-typedef struct {
-    /* 0x0 */ u8 kind;
-    /* 0x1 */ u8 pad1;
-    /* 0x2 */ u8 shiftS;
-    /* 0x3 */ u8 shiftT;
-} AnimFrame;
-typedef struct {
-    /* 0x0 */ s32 count;
-    /* 0x4 */ s32 unk4;
-    /* 0x8 */ AnimFrame *frame;
-} AnimInfo;
+#include "structs/texture.h"
 typedef struct {
     /* 0x0 */ u8 pad0[0x6];
     /* 0x6 */ u8 prim[3];
@@ -2459,7 +2449,7 @@ extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: 
 extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */ /* the current view */
 extern u8 gParticleSpriteVtx[];             /* the sprite's four vertices */
 extern void *Texture_Request(s32 *ref);
-extern void Texture_GetInfo(void *model, AnimInfo *info);
+extern void Texture_GetInfo(void *model, TextureInfo *info);
 extern void Texture_Load(s32 *ref, void *model, s32 frame, s32 a3, s32 shiftS, s32 shiftT, s32 a6, s32 a7, s32 a8);
 void *CCamera__GetPlayer(void *cam);
 extern void *MtxPool_Alloc(void *pool, s32 count);
@@ -2508,7 +2498,7 @@ static __inline__ s32 Particle_Scale(f32 value, f32 div) {
 #define LERP(to, from, t) (((to) - (from)) * (t) + (from))
 
 void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
-    AnimInfo info;
+    TextureInfo info;
     u8 env[3];
     u8 prim[3];
     CVector3 viewPos;
@@ -2655,7 +2645,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     shiftS = 1 << (((desc->flags & 0x100) ? 7 : 6) + info.frame->shiftS);
     shiftT = 1 << (((desc->flags & 0x200) ? 7 : 6) + info.frame->shiftT);
     Texture_Load(&particle->model, model, frame, 0, shiftS, shiftT, 1, 1, 0);
-    switch (info.frame->kind) {
+    switch (info.frame->format) {
         case 0:
         case 1:
             Render_SetCombineMode(0x18);
@@ -2708,7 +2698,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
         }
     }
 
-    if (info.frame->kind == 3) {
+    if (info.frame->format == 3) {
         switch (mode) {
             case 0:
             default:
