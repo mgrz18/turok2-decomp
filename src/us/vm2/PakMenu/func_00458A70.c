@@ -9,7 +9,7 @@
  * into the item's text; an empty slot prints blanks. */
 
 /* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
-void sprintf(char *dst, const char *fmt, ...);
+s32 sprintf(char *dst, const char *fmt, ...);
 
 s32 PakMenu_NoteText_2(MenuItem *item, Menu *own) {
     u8 name[16];

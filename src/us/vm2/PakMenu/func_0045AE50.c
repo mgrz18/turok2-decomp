@@ -5,7 +5,7 @@
 #include "structs/save.h"
 
 s32 MenuItem_TextLength_2(void *item);
-s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
+s32 sprintf(char *dst, const char *fmt, ...);
 
 s32 func_0045AE50(MenuItem *item) {
     s32 value = gLoadBuffer->player.m_Lives;

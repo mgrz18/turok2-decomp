@@ -24,10 +24,10 @@ extern s32 gScene_unk_30; /* local: globals/scene.h; gScene.unk_30 (the member) 
 /* Struct pointee: the load of ->data is scheduled before the gSaveBufferHandle store. */
 
 
-void CCache__Flush(s32 heap);
-void CCache__Deallocate(sptr heap, CMemEntry *handle);
-CMemEntry *CCache__Allocate(s32 heap, s32 size, s32 tag, char *name);
-void memset(void *dst, s32 value, sptr size);
+extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
+extern void CCache__Deallocate(sptr, void *);
+extern void **CCache__Allocate(s32, s32, s32, char *);
+extern void *memset(void *dst, s32 value, uptr size);
 void func_0029E460(void *dst, void *src, s32 size);
 
 void SaveGame_Build_2(CPlayer *player) {
@@ -36,7 +36,7 @@ void SaveGame_Build_2(CPlayer *player) {
     SaveGame *data;
 
     if (gSaveBufferHandle != NULL) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
         CCache__Deallocate(0, gSaveBufferHandle);
     }
     allocSize = gScene_unk_30 + 0x688;
