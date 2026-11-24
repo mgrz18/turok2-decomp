@@ -3,16 +3,9 @@
 
 #include "common.h"
 #include "globals/adec.h"
+#include "structs/adec.h"
 
 /* Acclaim compressed-audio stream decoder state (one instance) */
-typedef struct {
-    /* 0x00 */ u32 hdr0;
-    /* 0x04 */ u32 hdr2;
-    /* 0x08 */ u32 *hdr;
-    /* 0x0C */ u32 nframes;
-    /* 0x10 */ u32 remaining;
-    /* 0x14 */ u16 *rd;       /* bitstream read pointer */
-} AdecStream;
 
 /* Bit reader: fetches `count` fields of `nbits` bits (MSB first) from the stream of 16-bit words at st->rd into dst[],
    sign-extending each field to 16 bits when `sign` is set. Always returns 1. */

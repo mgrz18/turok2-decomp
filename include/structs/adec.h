@@ -24,4 +24,18 @@ typedef struct FftTables {
     /* 0xC */ s32 n;
 } FftTables; /* size 0x10 */
 
+/* Acclaim compressed-audio stream decoder state (one instance: adecReadBits, adecDecodeFrame,
+ * adecImdctFrame). */
+typedef struct {
+    /* 0x00 */ u32 hdr0;
+    /* 0x04 */ u32 hdr2;
+    /* 0x08 */ u32 *hdr;
+    /* 0x0C */ u32 nframes;
+    /* 0x10 */ u32 remaining;
+    /* 0x14 */ u16 *rd;         /* bitstream read pointer */
+    /* 0x18 */ s16 band[16];    /* per-band scale indices of the current frame */
+    /* 0x38 */ u8 pad38[0xB8 - 0x38];
+    /* 0xB8 */ s16 coef[256];   /* quantized coefficients of the current frame */
+} AdecStream;
+
 #endif

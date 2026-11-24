@@ -3,22 +3,13 @@
 
 #include "common.h"
 #include "globals/adec.h"
+#include "structs/adec.h"
 
 /* Acclaim compressed-audio stream decoder state (one instance) */
-typedef struct {
-    /* 0x00 */ u32 hdr0;
-    /* 0x04 */ u32 hdr2;
-    /* 0x08 */ u32 *hdr;
-    /* 0x0C */ u32 nframes;
-    /* 0x10 */ u32 remaining;
-    /* 0x14 */ u16 *rd;         /* bitstream read pointer */
-    /* 0x18 */ s16 band[16];    /* per-band scale indices of the current frame */
-    /* 0x38 */ u8 pad38[0xB8 - 0x38];
-    /* 0xB8 */ s16 coef[256];   /* quantized coefficients of the current frame */
-} AdecStream;
 
-extern s32 adecReadBits(u16 *dst, u16 nbits, u16 count, s16 sign, AdecStream *st);          /* adecReadBits */
-extern s16 adecHuffDecode(AdecHuffSeg *segs, s16 *out, s16 n, s16 *cnt, AdecStream *st);    /* adecHuffDecode */
+s32 adecReadBits(u16 *dst, u16 nbits, u16 count, s16 sign, AdecStream *st);
+struct DecodeBlock;
+s16 adecHuffDecode(struct DecodeBlock *segs, u16 *out, s16 n, u16 *cnt, AdecStream *st);
 
 /* Decodes one frame into st: the 16 scale indices st->band[] (the very first frame raw 6 bit fields, afterwards Huffman coded
    differences against the previous frame) and the 256 coefficients st->coef[]. Returns 1, or -1 on a stream error. */
@@ -41,7 +32,7 @@ s32 adecDecodeFrame(AdecStream *st) {
             seg++;
         }
     } else {
-        rv = adecHuffDecode(seg, st->band, 16, &cnt, st);
+        rv = adecHuffDecode((struct DecodeBlock *)seg, (u16 *)st->band, 16, (u16 *)&cnt, st);
         if (rv != 16) {
             goto fail;
         }
@@ -52,7 +43,7 @@ s32 adecDecodeFrame(AdecStream *st) {
             sAdecPrevScale[i] = st->band[i];
         }
     }
-    rv = adecHuffDecode(seg, st->coef, 256, &cnt, st);
+    rv = adecHuffDecode((struct DecodeBlock *)seg, (u16 *)st->coef, 256, (u16 *)&cnt, st);
     if (rv != 256) {
     fail:
         return -1;

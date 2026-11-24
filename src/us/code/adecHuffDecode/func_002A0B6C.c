@@ -3,17 +3,9 @@
 
 #include "common.h"
 #include "globals/adec.h"
+#include "structs/adec.h"
 
 /* Acclaim compressed-audio stream decoder state (one instance) */
-typedef struct {
-    /* 0x00 */ u32 hdr0;
-    /* 0x04 */ u32 hdr2;
-    /* 0x08 */ u32 *hdr;
-    /* 0x0C */ u32 nframes;
-    /* 0x10 */ u32 remaining;
-    /* 0x14 */ u16 *rd;         /* bitstream read pointer */
-    /* 0x18 */ s16 band[16];    /* per-band scale indices, followed by the coefficients at 0xB8 */
-} AdecStream;
 
 typedef struct {
     f32 re;

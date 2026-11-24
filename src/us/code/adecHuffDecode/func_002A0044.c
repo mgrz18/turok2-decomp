@@ -1,12 +1,23 @@
+/* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -fforce-addr */
+/* Re-matched under -fforce-addr (round 26), the flags of the other adecHuffDecode files: the
+ * phrase address is an integer sum (dictOffset first), no longer the (phrases + 1) - 1 form. */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802BE0D0_de_12.c, func_802BEF84_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
 #include "globals/adec.h"
 
-extern u16 adecReadBits(u16 *, u16, s32, s32, void *);
-s32 adecHuffDecode(DecodeBlock *arg0, u16 *arg1, s16 arg2,
-                    u16 *arg3, void *arg4) {
+s32 adecReadBits(u16 *dst, u16 nbits, u16 count, s16 sign, AdecStream *st);
+#ifdef TARGET_PORT
+#define readBits adecReadBits
+#else
+/* The ROM caller takes the result as a u16 (andi 0xFFFF): called through a type of its own. */
+#define readBits ((u16 (*)(u16 *, u16, u16, s16, AdecStream *))adecReadBits)
+#endif
+struct DecodeBlock;
+s16 adecHuffDecode(struct DecodeBlock *segs, u16 *out, s16 n, u16 *cnt, AdecStream *st);
+s16 adecHuffDecode(DecodeBlock *arg0, u16 *arg1, s16 arg2,
+                    u16 *arg3, AdecStream *arg4) {
     u16 node;
     s16 block, output;
     DecodeTable *table;
@@ -48,7 +59,7 @@ s32 adecHuffDecode(DecodeBlock *arg0, u16 *arg1, s16 arg2,
                         output++;
                     } else if ((s16)value == 0x900) {
                         value = *bits;
-                        if (adecReadBits(bits, table->width, 1, 0, arg4) == 0) {
+                        if (readBits(bits, table->width, 1, 0, arg4) == 0) {
                             return -1;
                         }
                         mask = (s16)output;
@@ -61,8 +72,7 @@ s32 adecHuffDecode(DecodeBlock *arg0, u16 *arg1, s16 arg2,
                         j = 0;
                         dictOffset = (value & 0xFF) * sizeof(DecodePhrase);
                         out = (arg1 + ((s16)output + 1)) - 1;
-                        phrase = (DecodePhrase *)(dictOffset +
-                                   (u8 *)(table->phrases + 1)) - 1;
+                        phrase = (DecodePhrase *)(dictOffset + (sptr)table->phrases);
                         while ((s16)j < phrase->count) {
                             out[(s16)j] = phrase->samples[(s16)j].value;
                             j++;
@@ -90,7 +100,7 @@ s32 adecHuffDecode(DecodeBlock *arg0, u16 *arg1, s16 arg2,
                     node = mask;
                 }
             } else {
-                if (adecReadBits(&sAdecHuffBits, 16, 1, 0, arg4) == 0) {
+                if (readBits(&sAdecHuffBits, 16, 1, 0, arg4) == 0) {
                     return -1;
                 }
                 *available += 16;
