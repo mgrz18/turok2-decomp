@@ -595,7 +595,7 @@ s32 Pak_GetNoteExtName_2(s32 i, s32 j, char **out) {
     return 0;
 }
 s32 Pak_GetNotePages_2(s32 index, s32 entry, s32 *out);
-u32 Pak_BytesToPages_2(s32 arg0);
+u32 Pak_BytesToPages_2(sptr arg0);
 
 s32 Pak_GetNotePages_2(s32 index, s32 entry, s32 *out) {
     if (gPakState[index] != 3) {
@@ -789,7 +789,7 @@ s32 Pak_TextHasInvalidChar_2(u8 *str, s32 len) {
     return 0;
 }
 
-u32 Pak_BytesToPages_2(s32 arg0) {
+u32 Pak_BytesToPages_2(sptr arg0) {
     return (u32) (arg0 + 0xFF) >> 8;
 }
 u32 Crc32_Compute_2(u8 *arg0, u32 arg1, u32 arg2);

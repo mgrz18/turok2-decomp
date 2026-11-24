@@ -14,7 +14,7 @@ struct CScene;
 u32 Crc32_Compute_2(u8 *, u32, u32);
 void Pak_AllocBuffer_2(void ***, void **, s32);
 void Pak_AllocDirectory_2(void);
-u32 Pak_BytesToPages_2(s32);
+u32 Pak_BytesToPages_2(sptr);
 void Pak_ClearDamagedContinued_2(void);
 s32 Pak_CountEmptyNotes_2(s32, s32 *);
 void Pak_DecodeText_2(u8 *, u8 *, s32);
