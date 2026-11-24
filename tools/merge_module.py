@@ -295,6 +295,9 @@ def main():
                     "if every file compiles the same under them")
     ap.add_argument("--inline", help="stems (comma-separated) or `all`: their functions are written DEFERRED "
                     "(`inline`: output after the others, string literals at the definition)")
+    ap.add_argument("--before", help="`A,B,..:C`: the source order puts files A,B.. (stems, their .text order kept) "
+                    "right before file C; with --inline A,B,.. the deferred tail of an object whose string literals "
+                    "come before an earlier function's (vm1/Pak: Pak_AllocDirectory's before Pak_SaveNoteVerified's)")
     ap.add_argument("--rodata-free", action="store_true", help="no .rodata order check: the slices and the unnamed "
                     "data between them become the merged file's one .rodata (make verify decides)")
     ap.add_argument("--vm", help="the directory of the same object's functions linked into the VM module (section .text_vm)")
@@ -387,6 +390,14 @@ def main():
     if shared and ro:
         sys.exit(f"{a.dir}: {len(shared)} files place their .rodata over the first VM module's pool "
                  f"(versions/shared_rodata.us.txt) and the yaml places others")
+    if a.before:
+        mv, at = a.before.split(":")
+        mv = [x for x in text_order if x in mv.split(",")]
+        if at not in text_order or at in mv or len(mv) != len(a.before.split(":")[0].split(",")):
+            sys.exit(f"{a.dir}: --before {a.before}: not stems of this directory")
+        rest = [x for x in text_order if x not in mv]
+        k = rest.index(at)
+        text_order = rest[:k] + mv + rest[k:]
     texts = [files[s].read_text() for s in text_order]
     flags = {tuple(FLAGS.findall(t)) for t in texts}
     if len(flags) > 1 and a.cc1_flags:
@@ -470,7 +481,23 @@ def main():
         for f in func_order[:func_order.index(n)]:
             if f not in seen and f not in done and f in deferred:
                 seen.add(f)
+                if not a.no_fix:
+                    move_types(defined[f])
                 out.append(defined[f])
+
+    def move_types(sig):
+        """The type declarations a prototype written early needs move up to it."""
+        nonlocal have
+        for t in sorted(needs(sig)):
+            if t in have:
+                continue
+            ti = type_item[t]
+            have.add(t)
+            if not is_inc(ti):
+                move_types(strip_comments(ti))
+            out.append(ti)
+            seen.add(re.sub(r"\s+", " ", strip_comments(ti)).strip())
+            have |= include_types(ti, d) if is_inc(ti) else type_names(ti)
 
     def needs(sig):
         return {w for w in re.findall(r"\b\w+\b", sig) if w in local_types and w not in have}
@@ -480,13 +507,7 @@ def main():
         for p in list(pending):
             if force:
                 # a caller comes first: the type declarations its signature needs move up to it
-                for t in sorted(needs(defined[p])):
-                    if t in have:
-                        continue
-                    ti = type_item[t]
-                    out.append(ti)
-                    seen.add(re.sub(r"\s+", " ", strip_comments(ti)).strip())
-                    have |= include_types(ti, d) if is_inc(ti) else type_names(ti)
+                move_types(defined[p])
             if force or not needs(defined[p]):
                 pending.remove(p)
                 if p not in done:
