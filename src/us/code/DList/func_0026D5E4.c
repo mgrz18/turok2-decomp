@@ -1,8 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002798D4.c, func_002798D4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed short s16;
-typedef signed int s32;
+#include "common.h"
+
 typedef struct Pair16 {
                 s16 a;
                 s16 b;
