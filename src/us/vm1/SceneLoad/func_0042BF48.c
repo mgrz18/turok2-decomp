@@ -5,16 +5,9 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 #include "protos/scene.h"
+#include "structs/twin_sceneload.h"
 
-typedef struct Counted {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 count;
-} Counted;
 
-typedef struct StreamCell {
-    /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ s32 occupied;
-} StreamCell; /* 0x14 */
 
 #ifdef TARGET_PORT
 /* The port: the grid sections hold their static objects and level actors at the host sizes

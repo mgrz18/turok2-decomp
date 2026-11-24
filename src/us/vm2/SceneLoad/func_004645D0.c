@@ -8,52 +8,17 @@
 
 #include "structs/world.h"
 #include "structs/collision.h"
+#include "structs/twin_sceneload.h"
 #define WORLD_TREE(w) (((CScene *)(w))->m_pBitSections2)
 #define WORLD_GROUP(w) (((CScene *)(w))->m_nLevel)
 
-typedef struct CollisionBuildTriangle {
-    /* 0x00 */ u16 kind;
-    /* 0x02 */ u16 flags;
-    /* 0x04 */ CollisionBuildVertex *v[3];
-    /* 0x10 */ struct CollisionBuildTriangle *adj[3];
-    /* 0x1C */ s32 mask;
-} CollisionBuildTriangle;
 
-typedef struct CollisionBuildFace {
-    u8 data[0x14];
-} CollisionBuildFace;
 
-typedef struct CollisionBuildHeader {
-    s32 count;
-    s32 offsets[5];
-} CollisionBuildHeader;
 
-typedef struct CollisionBuildList {
-    s32 kind;
-    s32 count;
-    CollisionBuildFace items[1];
-} CollisionBuildList;
 
-typedef struct CollisionBuildVertexList {
-    s32 kind, count;
-    CollisionBuildVertex items[1];
-} CollisionBuildVertexList;
 
-typedef struct CollisionBuildTriangleList {
-    s32 kind, count;
-    CollisionBuildTriangle items[1];
-} CollisionBuildTriangleList;
 
-typedef struct CollisionBuildMeshHandle {
-    void *data;
-} CollisionBuildMeshHandle;
 
-typedef struct CollisionBuildWorld {
-    /* 0x00000 */ char pad0[0x70];
-    /* 0x00070 */ void *tree;
-    /* 0x00074 */ char pad74[0x18FA8 - 0x74];
-    /* 0x18FA8 */ s32 group;
-} CollisionBuildWorld;
 
 extern s32 ProPackDecompress(CollisionBuildMeshHandle **handle, s32);
 extern void UnpackScaledVec4(CollisionBuildVertex *v);

@@ -4,10 +4,8 @@
 #include "structs/camera.h"
 #include "globals/render.h"
 #include "protos/list.h"
+#include "structs/twin_demo.h"
 
-typedef struct Floats {
-    f32 unk0, unk4, unk8, unkC, unk10, unk14;
-} Floats;
 
 typedef struct IntPair {
     s32 field_0;

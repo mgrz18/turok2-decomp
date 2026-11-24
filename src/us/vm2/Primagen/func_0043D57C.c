@@ -8,17 +8,9 @@
 #include "protos/ai.h"
 #include "structs/vector.h"
 #include "globals/collision.h"
+#include "structs/twin_primagen.h"
 
 
-typedef struct {
-    /* 0x00 */ u8 flag;
-    /* 0x01 */ u8 pad01[0x8 - 0x1];
-    /* 0x08 */ s32 count;
-    /* 0x0C */ f32 delay;
-    /* 0x10 */ u8 pad10[0x14 - 0x10];
-    /* 0x14 */ s32 type;
-    /* 0x18 */ u8 pad18[0x1C - 0x18];
-} Wave0040457C;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x140];

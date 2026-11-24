@@ -113,11 +113,8 @@ s32 TotemDefense_KillsLeft_2(Arg0 *arg0) {
 }
 
 #include "globals/game.h"
+#include "structs/twin_totemdefense.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad00[0x44];
-    /* 0x44 */ s16 limit;
-} TargetDef;
 typedef struct {
     /* 0x0 */ void *target;
     /* 0x4 */ TargetDef *def;
@@ -227,10 +224,6 @@ s32 TotemDefense_AnyEnemyAlive_2(void) {
 
 #include "globals/engine.h"
 
-typedef struct {
-    /* 0x0 */ u8 pad0[0xC];
-    /* 0xC */ f32 timer;
-} HurtTimer;
 
 /* After a delay, one time in four, hurt the first live player actor. */
 void TotemDefense_TryHitEnemyAfterDelay_2(HurtTimer *h) {
