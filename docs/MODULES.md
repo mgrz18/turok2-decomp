@@ -1263,6 +1263,48 @@ their own text; `--to-vm1` stays for a check of the N64 side only.
 T:func_00426164`, verified byte-exact with the vm2-text files), `vm1/PakMenu` and `vm2/PakMenu` (128 files each,
 not started: no time left).
 
+## Round 28 merge: the state after parts q1-q4
+
+Merged in the order q1, q2, q4, q3 (`--no-ff`). The only textual conflicts were this file (each part's
+section kept) and `versions/port_layout.us.json` (regenerated with `mklayout.py` after each merge); the new
+`protos/` headers (q1 `sched.h`, `game_object.h`, `cai.h`; q2 `heap.h`, `hash.h`, `osint.h`, `region.h`,
+`audio_world.h`, `sndp.h`), `protos/mtxf.h`, `versions/symbols_manual.us.txt`, `shared_rodata.us.txt`,
+the yaml and q3's `tools/merge_module.py` (`--before`, `--inline` inside conditional blocks) merged on
+their own, with no function declared two ways. After each merge: `asm_diff --base b9bb8125` 0 over the
+tree, a clean `make setup` + build + `make verify` OK, the port compiles from a fresh gendata, the merged
+files have no implicit declaration under clang `-Wimplicit-function-declaration`, and the nested
+`TARGET_PORT` scan is the same 2 known sites (`CPlayer.c`, `SndQueue.c`).
+
+**One port fix at the merge.** q1 merged `code/__scHandleRSP`, whose 17 functions the port replaces
+with `port/game/t2sched.c`, but `port/cmake/link.cmake` still listed the 17 old `func_*.c` names, so the
+merged `__scHandleRSP.c` was linked as well. On q1 alone the archive happened not to pull it; after q4
+the host link failed with 17 multiple definitions. `T2_LINK_REPLACED` now names `__scHandleRSP.c` (the
+whole file is the scheduler; it still compiles, in `turok2_game_unlinked`).
+
+**`merge_check.py --rodata-free` over the 14 directories left** (and `vm2/Pak`, one file, nothing to
+merge): none passes as it stands. 12 stop at the compiler, first conflict and number of errors:
+`code/CMtxF` 12 (`Actors_GetLightVolumeFalloff`, the `ModelVertex`/`PlacedProp`/`VertexGroup` views by
+file, `CStaticObject__LoadGeometry`), `code/AI` 17 (`GameObject_GetRegionFloorHeight`: the 7 files
+part q1 lists), `vm1/Pak` 19 (`CCache__Allocate`: the three CCache forms, then `Pak_Mount`,
+`Controller_Lock`, `osMotorInit`, `gPakFileSystems`, `Pak_DecodeText`, `Str_Compare`), `code/SndVoice`
+23 (`HalfToFloat`), `code/VM` 42 (`gPager_entries`), `code/Trail` 52 (`Morph` defined twice),
+`code/CParticle` 54 (`CQuaternion__FromDirection`), `vm2/SceneLoad` 67 (`CList__AddHead`),
+`code/EnemyAI` 68 (`CGameObjectInstance__PickRandomAnim`), `vm1/PakMenu` 72 (`Str_Compare`),
+`code/CGameObjectInstance` 76 (`CAnimationState__Reset`), `vm2/PakMenu` 87 (`CCache__Deallocate`);
+2 are refused, `code/CScene` and `vm1/SceneLoad`, whose `.rodata` interleave (part q4: one object with
+`static __inline__` loaders is the next try).
+
+**State: 136 modules are one C file; 14 directories hold one function per file.**
+
+| Reason | Directories |
+|---|---|
+| header work only (first conflicts above) | `code/{AI, EnemyAI, SndVoice}`, `vm2/PakMenu` (4) |
+| data the C reads as externs, or `.data` tables in asm (`tools/ld_fill.py`, Crash and part q4's data in place show the way) | `code/{CGameObjectInstance, CMtxF, CParticle, Trail}`, `vm1/PakMenu` (5) |
+| one object over the engine and the VM (`.text_vm`; the `.rodata` of `CScene` and `vm1/SceneLoad` interleave) | `code/CScene`, `vm1/SceneLoad`, `vm2/SceneLoad` (3) |
+| deferred functions plus header work | `code/VM`, `vm1/Pak` (`--inline T --before T:func_00426164`, part q3) (2) |
+
+None needs a ROM change.
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte
